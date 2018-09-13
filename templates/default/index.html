@@ -1,0 +1,188 @@
+$def with (data)
+<div class="main-content">
+		<div class="container-fluid" style="padding-bottom: 66px;">
+			<div class="pos-box bgw mtb15">
+				<div class="position f14 c9 pull-left">
+					<a class="plr10 c4" href="/">$data['lan']['H1']</a>/<span class="plr10 c4">$data['lan']['H2']</span>
+				</div>
+				<span class="pull-right f12 c6" style="line-height:42px; margin-right:15px">
+					免费版 <span id="btversion" class="mr5" onclick="openLog()">$web.ctx.session.version</span>
+					<span id="toUpdate"><a class="btlink" href="javascript:checkUpdate();">$data['lan']['V3']</a></span>
+				</span>
+			</div>
+			<div class="danger-tips">
+				<div class="alert alert-warning" id="messageError" style="display: none;background-color: #ffe0e0;border-color: #ffb0b0;color: #ff2020; margin-bottom:0"></div>
+			</div>
+			<div class="system-info bgw clearfix mtb15">
+				<div class="title c6 f16 plr15">
+					$data['lan']['S1'] <span id="info"> $data['lan']['S2']</span>&#12288;&#12288;&#12288;$data['lan']['S3'] <span id="running"> $data['lan']['S4']</span>
+					<button onclick="ReBoot()" class="btn btn-success btn-xs" style="vertical-align:1px;margin-left:10px;">$data['lan']['S5']</button>
+					<button onclick="reWeb()" style="vertical-align:1px;" class="btn btn-success btn-xs">$data['lan']['S6']</button>
+					<button onclick="repPanel()" style="vertical-align:1px;" class="btn btn-success btn-xs">$data['lan']['S7']</button>
+				</div>
+				<div class="system-info-con mtb15">
+				<ul class="clearfix">
+					<li class="sys-i-c-box col-xs-6 col-sm-4 col-md-4 col-lg-3 plr15">
+						<div class="siteinfo-box b-shadown">
+							<h3 class="f14">$data['lan']['N1']</h3>
+							<div class="siteinfo-box-right">
+								<h4 class="c6">$data['siteCount'] $data['lan']['L3']</h4>
+								<div class="sbr-btn">
+									<a href="/site">$data['lan']['L1']</a>|<a href="javascript:;" onclick="webAdd(0)">$data['lan']['L2']</a>
+								</div>
+							</div>
+						</div>
+					</li>
+					<li class="sys-i-c-box col-xs-6 col-sm-4 col-md-4 col-lg-3 plr15">
+						<div class="siteinfo-box b-shadown">
+							<h3 class="f14">$data['lan']['N3']</h3>
+							<div class="siteinfo-box-right">
+								<h4 class="c6">$data['ftpCount'] $data['lan']['L3']</h4>
+								<div class="sbr-btn">
+									<a href="/ftp">$data['lan']['L1']</a>|<a href="javascript:;" onclick="ftpAdd(0)">$data['lan']['L2']</a>
+								</div>
+							</div>
+						</div>
+					</li>
+					<li class="sys-i-c-box col-xs-6 col-sm-4 col-md-4 col-lg-3 plr15">
+						<div class="siteinfo-box b-shadown">
+							<h3 class="f14">$data['lan']['N2']</h3>
+							<div class="siteinfo-box-right">
+								<h4 class="c6">$data['databaseCount'] $data['lan']['L3']</h4>
+								<div class="sbr-btn">
+									<a href="/database">$data['lan']['L1']</a>|<a href="javascript:;" onclick="DataAdd(0)">$data['lan']['L2']</a>
+								</div>
+							</div>
+						</div>
+					</li>
+                  <li class="sys-i-c-box col-xs-6 col-sm-4 col-md-4 col-lg-3 plr15">
+                      <div class="siteinfo-box b-shadown btvipbox">
+                        <div class="btvip">
+                          <span class="t2">企业运维版</span>
+                          <p><span class="price">98</span>元/月</p>
+                          <button class="btn btn-success btn-sm" onclick="window.open('https://www.bt.cn/admin/index.html')">购买</button>
+                        </div>
+						<div class="btvip-r">
+							<div class="btvipinfo">
+							  <p>1、一对一运维人员对接</p>
+							  <p>2、提供每月3次运维服务</p>
+							  <p>3、双重安全隔离登录</p>
+							</div>
+						</div>
+                      </div>
+                  </li>
+				</ul>
+			</div>
+			</div>
+			<div class="server bgw mtb15">
+				<div class="title c6 f16 plr15">
+					<h3 class="c6 f16 pull-left">$data['lan']['T1']</h3>
+					<a class="pull-left f12 btlink" href="javascript:;" style="background:none;padding:0; margin-left:22px" onclick="GetNetWorkList()">$data['lan']['T2']</a>
+					<a class="pull-left f12 btlink" href="javascript:;" style="background:none;padding:0; margin-left:22px" onclick="GetProcessList()">$data['lan']['T3']</a>
+				</div>
+				<div class="server-circle">
+					<ul class="row" id="systemInfoList">
+						<li class="col-xs-6 col-sm-3 col-md-3 col-lg-2 mtb20 circle-box text-center" id="LoadList">
+							<h3 class="c5 f15">负载状态<a href="https://www.bt.cn/bbs/thread-11402-1-1.html" target="_blank" class="bt-ico-ask" style="cursor: pointer;">?</a></h3>
+							<div class="circle" style="cursor: pointer;">
+								<div class="pie_left">
+									<div class="left"></div>
+								</div>
+								<div class="pie_right">
+									<div class="right"></div>
+								</div>
+								<div class="mask"><span id="Load">0</span>%</div>
+							</div>
+							<h4 id="LoadState" class="c5 f15">获取中:</h4>
+						</li>
+						<li class="col-xs-6 col-sm-3 col-md-3 col-lg-2 mtb20 circle-box text-center">
+							<h3 class="c5 f15">$data['lan']['P1']</h3>
+							<div class="circle">
+								<div class="pie_left">
+									<div class="left"></div>
+								</div>
+								<div class="pie_right">
+									<div class="right"></div>
+								</div>
+								<div class="mask"><span id="state">0</span>%</div>
+							</div>
+							<h4 id="core" class="c5 f15">$data['lan']['S2']</h4>
+						</li> 
+						<li class="col-xs-6 col-sm-3 col-md-3 col-lg-2 mtb20 circle-box text-center">
+							<h3 class="c5 f15">$data['lan']['P2']</h3>
+							<div class="circle mem-release">
+								<div class="pie_left">
+									<div class="left"></div>
+								</div>
+								<div class="pie_right">
+									<div class="right"></div>
+								</div>
+								<div class="mask"><span id="left">0</span>%</div>
+								<div class="mem-re-min"></div>
+								<div class="mem-re-con" title="$data['lan']['P3']"></div>
+							</div>
+							<h4 id="memory" class="c5 f15">$data['lan']['S2']</h4>
+						</li>  
+					</ul>
+				</div>
+			</div>
+			<div class="col-xs-12 col-sm-12 col-md-6 pull-left pd0">
+				<div class="pr8">
+				<div class="bgw">
+				<div class="title c6 f16 plr15">$data['lan']['P4']</div>
+				<div class="setting-con" style="padding:0; height:442px; margin-right: -4px; overflow: hidden;">
+					<div class="container-fluid soft-man">
+						<input name="list1SortOrder" type="hidden" value="" />
+						<div id="indexsoft" class="row"></div>
+					</div>
+				</div>
+				</div>
+				</div>
+			</div>
+			<div class="col-xs-12 col-sm-12 col-md-6 pull-left pd0">
+				<div class="pl7">
+					<div class="bgw" style="height:491px">
+					<div class="title c6 f16 plr15">$data['lan']['NET1']</div>
+					<div class="bw-info">
+						<ul>
+							<li class="bi-line col-xs-6 col-sm-6 col-md-6 pull-left c6 f14"><span class="pull-left">$data['lan']['NET2']</span><a id="upSpeed" class="c6">$data['lan']['S2']</a></li>
+							<li class="bi-line col-xs-6 col-sm-6 col-md-6 pull-left c6 f14"><span class="pull-left">$data['lan']['NET3']</span><a id="downSpeed" class="c6">$data['lan']['S2']</a></li>
+							<li class="pull-left col-xs-6 col-sm-6 col-md-6 c6 f14"><span class="pull-left">$data['lan']['NET4']</span><a id="upAll" title="" class="c6">$data['lan']['S2']</a></li>
+							<li class="pull-left col-xs-6 col-sm-6 col-md-6 c6 f14"><span class="pull-left">$data['lan']['NET5']</span><a id="downAll" title="" class="c6">$data['lan']['S2']</a></li>
+						</ul>
+					</div>
+					<div id="NetImg" style="width:100%;height:330px;"></div>
+					</div>
+				</div>
+			</div>
+       
+          </div>
+		</div>
+	</div>
+	<script type="text/javascript">
+		setCookie('serverType','$web.ctx.session.webserver');
+		var serverType = getCookie('serverType');
+	</script>
+	<script type="text/javascript" src="/static/js/echarts.min.js"></script>
+	<script type="text/javascript" src="/static/js/site.js?date=20180523"></script>
+	<script type="text/javascript" src="/static/js/ftp.js?date=20180307"></script>
+	<script type="text/javascript" src="/static/js/data.js?date=20180307"></script>
+	<script type="text/javascript" src="/static/js/jquery.dragsort-0.5.2.min.js"></script>
+	<script type="text/javascript" src="/static/js/soft.js?date=20180523"></script>
+	<script type="text/javascript" src="/static/js/index.js?date=20180523"></script>
+	<script type="text/javascript">
+		setTimeout(function(){
+			GetDiskInfo();
+		},500)
+
+		setTimeout(function(){
+			indexsoft();
+		},1000);
+		
+		setTimeout(function(){
+			getInfo();
+		},1500);
+	</script>
+	
+	
+	

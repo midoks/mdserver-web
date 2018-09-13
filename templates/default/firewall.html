@@ -1,0 +1,134 @@
+$def with (data)
+<style>
+	.weblog{
+		font-size: 14px;
+	    display:inline-block;
+		line-height:30px;
+	}
+	.weblog em{
+		font-style:normal;
+		color:#666;
+		margin: 0 30px;
+	}
+	.weblog span{
+		margin-right:30px;
+	}
+	.weblog a{
+		color:#20a53a;
+	}
+</style>
+<div class="main-content">
+		<div class="container-fluid" style="padding-bottom: 50px;">
+			<div class="pos-box bgw mtb15">
+				<div class="position f14 c9 pull-left">
+					<a class="plr10 c4" href="/">$data['lan']['H1']</a>/<span class="plr10 c4">$data['lan']['H2']</span>
+				</div>
+				<div class="search pull-right">
+					<form target="hid" onsubmit='getLogs(1,$$("#SearchValue").prop("value"))'>
+						<input type="text" id="SearchValue" class="ser-text pull-left" placeholder="$data['lan']['SEARCH']" />
+						<button type="button" class="ser-sub pull-left" onclick='getLogs(1,$$("#SearchValue").prop("value"))'></button>
+					</form>
+					<iframe name='hid' id="hid" style="display:none"></iframe>
+				</div>
+			</div>
+			<div class="safe container-fluid bgw mtb15 pd15">
+				<div class="mr50 pull-left">
+					<form>
+						<div class="ss-text pull-left">
+							<em>$data['lan']['BTN1']</em>
+							<div class='ssh-item' id="in_safe">
+								
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="mr50 pull-left">
+					<div class="ss-text pull-left mr5">
+						<em>$data['lan']['BTN2']</em>
+						<input type="text" class="bt-input-text" id="mstscPort" value=""  />
+					</div>
+					<div class="ss-text pull-left">
+						<button id="mstscSubmit" onclick='mstsc($$("#mstscPort").prop("value"))' class="btn btn-default btn-sm" type="button">$data['lan']['BTN3']</button>
+					</div>
+				</div>
+				<div class="mr50 pull-left" style="border-right: 1px solid #ccc; padding-right: 40px;">
+					<div class="ss-text pull-left">
+						<em>$data['lan']['BTN4']</em>
+						<div class='ssh-item' id="isPing">
+						</div>
+					</div>
+				</div>
+				<div class="weblog">
+					<span>$data['lan']['S1']</span><a href="javascript:openPath('$web.ctx.session.logsPath');">$web.ctx.session.logsPath</a><em id="logSize">0KB</em>
+					<button class="btn btn-default btn-sm" onclick="CloseLogs();">$data['lan']['BTN5']</button>
+				</div>
+			</div>
+			<div class="white-black-ip bgw mtb15">
+				<div class="black-ip">
+					<div class="def-log">
+						<div class="title c6 plr15">
+							<h3 class="f16">$data['lan']['H3']</h3>
+							<select id="firewalldType" class="bt-input-text" name="type" style="width:95px;">
+								<option value="port">$data['lan']['F1']</option>
+								<option value="address">$data['lan']['F2']</option>
+							</select>
+							<input type="text" class="bt-input-text" style="width: 120px;" id="AcceptPort" placeholder="$data['lan']['F3']">
+							<input type="text" class="bt-input-text" id="Ps" placeholder="$data['lan']['F4']">
+							<button id="toAccept" onclick="AddAcceptPort()" class="btn btn-default btn-sm va0" type="button">$data['lan']['F5']</button>
+							<span id="f-ps" style="margin-left: 10px;">$data['lan']['F6']</span>
+						</div>
+						<div class="divtable pd15">
+							<div class="tablescroll">
+							<table class="table table-hover" style="min-width: 640px;border: 0 none;">
+								<thead>
+								<tr>
+									<th>$data['lan']['TH1']</th>
+									<th>$data['lan']['TH2']</th>
+									<th>$data['lan']['TH3']<a href="https://www.bt.cn/bbs/thread-4708-1-1.html" class="bt-ico-ask" target="_blank" title="$data['lan']['F7']">?</a></th>
+									<th>$data['lan']['TH4']</th>
+									<th>$data['lan']['TH5']</th>
+									<th width="50px" class="text-right">$data['lan']['TH6']</th>
+								</tr>
+								</thead>
+								<tbody id="firewallBody"></tbody>
+							</table>
+							</div>
+							<div class="dataTables_paginate paging_bootstrap pagination">
+								<ul id="firewallPage" class="page"></ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="white-black-ip bgw mtb15">
+				<div class="black-ip">
+					<div class="def-log">
+						<div class="title c6 plr15">
+							<h3 class="f16">$data['lan']['H4']</h3>
+							<a class="btn btn-default btn-sm" onclick="delLogs();" style="margin-top: 1px;">$data['lan']['BTN5']</a>
+						</div>
+						<div class="divtable pd15">
+							<div class="tablescroll">
+							<table class="table table-hover" style="min-width: 640px;border: 0 none;">
+								<thead>
+								<tr>
+									<th>$data['lan']['LTH1']</th>
+									<th>$data['lan']['LTH2']</th>
+									<th>$data['lan']['LTH3']</th>
+									<th>$data['lan']['LTH4']</th>
+								</tr>
+								</thead>
+								<tbody id="logsBody"></tbody>
+							</table>
+							</div>
+							<div class="dataTables_paginate paging_bootstrap pagination">
+								<ul id="logsPage" class="page"></ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div> 
+<script src="/static/js/firewall.js?date=20170920"></script>

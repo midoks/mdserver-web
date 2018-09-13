@@ -1,0 +1,78 @@
+$def with (tData)
+<div class="main-content pb55">
+		<div class="container-fluid">
+			<div class="pos-box bgw mtb15">
+				<div class="position f14 c9 pull-left">
+					<a class="plr10 c4" href="/">$tData['lan']['H1']</a>/<span class="plr10 c4">$tData['lan']['H2']</span>
+				</div>
+				<div class="search pull-right">
+					<form target="hid" onsubmit='getData(1,$$("#SearchValue").prop("value"))'>
+						<input type="text" id="SearchValue" class="ser-text pull-left" placeholder="$tData['lan']['SEARCH']" />
+						<button type="button" class="ser-sub pull-left" onclick='getData(1,$$("#SearchValue").prop("value"))'></button>
+					</form>
+					<iframe name='hid' id="hid" style="display:none"></iframe>
+				</div>
+			</div>
+			<div class="safe bgw mtb15 pd15">
+					<button onclick="DataAdd(0)" title="$tData['lan']['BTNT1']" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">$tData['lan']['BTN1']</button>
+					<button onclick="DataSetuppwd(0)" title="$tData['lan']['BTNT2']" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">$tData['lan']['BTN2']</button>
+					<button onclick="AdminDatabase('','root','$tData['mysql_root']')" title="$tData['lan']['BTNT3']" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">$tData['lan']['BTN3']</button>
+					<span style="float:right">
+						<button id="allDelete" style="float: right;display: none;margin-left:10px;" onclick="allDeleteDatabase();" title="$tData['lan']['BTNT4']" class="btn btn-default btn-sm">$tData['lan']['BTN4']</button>
+						<button onclick="Recycle_bin('open');" id="dataRecycle" title="$tData['lan']['BTNT4']" class="btn btn-default btn-sm" style="margin-left: 5px;"><span class="glyphicon glyphicon-trash" style="margin-right: 5px;"></span>回收站</button>
+					</span>
+					<div class="divtable mtb10">
+						<div class="tablescroll">
+						<table class="table table-hover" style="min-width: 900px;border: 0 none;">
+							<thead>
+							<tr>
+								<th width='30px'><input onclick="checkSelect();" type="checkbox" id="setBox"></th>
+                                <th onclick="listOrder('name','database',this)" style="cursor: pointer;">$tData['lan']['TH1']<span class="glyphicon glyphicon-triangle-top" style="margin-left:5px;color:#bbb"></span></th>
+                                <th onclick="listOrder('name','database',this)" style="cursor: pointer;">$tData['lan']['TH2']<span class="glyphicon glyphicon-triangle-top" style="margin-left:5px;color:#bbb"></span></th>
+                                <th>$tData['lan']['TH3']</th>
+                                <th width="140">$tData['lan']['TH4']</th>
+                                <th>$tData['lan']['TH5']</th>
+                                <th width="260" class="text-right">$tData['lan']['TH6']</th>
+							</tr>
+							</thead>
+							<tbody id="DataBody"></tbody>
+						</table>
+						</div>
+						<div class="dataTables_paginate paging_bootstrap pagination">
+							<span class="sync btn btn-default btn-sm" style="margin-right:5px" onclick="SyncToDatabases(1)" title="$tData['lan']['TP1']">$tData['lan']['SP1']</span>
+							<span class="sync btn btn-default btn-sm" style="margin-right:5px" onclick="SyncToDatabases(0)" title="$tData['lan']['TP2']">$tData['lan']['SP2']</span>
+							<span class="sync btn btn-default btn-sm" onclick="SyncGetDatabases()" title="$tData['lan']['TP3']">$tData['lan']['SP3']</span>
+							<ul id="DataPage" class="page pull-right"></ul>
+						</div>
+					</div>
+			</div>
+			<form id="toPHPMyAdmin" action="$web.ctx.session.phpmyadminDir/index.php" method="post" style="display: none;"  target="_blank">
+				<input type="text" name="pma_username" id="pma_username" value="" />
+				<input type="password" name="pma_password" id="pma_password" value="" />
+				<input type="text" name="server" value="1" />
+				<input type="text" name="target" value="index.php" />
+				<input type="text" name="db" id="db" value="" />
+			</form>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	setCookie('backup_path',"$web.ctx.session.config['backup_path']");
+</script>
+<script type="text/javascript" src="/static/js/data.js?date=20180725"></script>
+<script type="text/javascript" src="/static/js/files.js?date=20180124"></script>
+<script type="text/javascript">
+	$if not tData['isSetup']:
+		layer.msg('$tData["lan"]["JS1"]<a href="/soft#i" style="color:#20a53a;float: right;">$tData["lan"]["JS2"]</a>',{icon:7,shade: [0.3, '#000'],time:0});
+		$$(".layui-layer-shade").css("margin-left","180px");
+	setTimeout(function(){
+		getData(1);
+	},300);
+	
+	$$("#dataRecycle").click(function(){
+		setTimeout(function(){
+			Recycle_bin(6);
+		},1000);
+	});
+</script>
+<script src="/static/js/upload.js?date=20180124"></script>
