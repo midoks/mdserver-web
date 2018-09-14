@@ -1,0 +1,76 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="renderer" content="webkit">
+    <title>MDWEB Linux面板</title>
+    <link rel="shortcut icon" href="/static/favicon.ico" type="image/x-icon" />
+    <link href="/static/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/site.css?date=20180912" rel="stylesheet">
+    <link href="/static/codemirror/lib/codemirror.css" rel="stylesheet">
+    <!--[if lte IE 9]>
+		<script src="/static/js/requestAnimationFrame.js"></script>
+	<![endif]-->
+</head>
+
+<body>
+    <div class="bt-warp bge6">
+        <div id="container" class="container-fluid">
+            <div class="sidebar-scroll">
+                <div class="sidebar-auto">
+                    <div id="task" class="task cw" onclick="messagebox()"></div>
+                    <h3 class="mypcip"><span class="f14 cw">IP</span></h3>
+                    <ul class="menu">
+                        <li id="memuA"> <a class="menu_home" href="/">首页</a></li>
+                        <li id="memuAsite"><a class="menu_web" href="/site">网站</a></li>
+                        <li id="memuAftp"><a class="menu_ftp" href="/ftp">FTP</a></li>
+                        <li id="memuAdatabase"><a class="menu_data" href="/database">数据库</a></li>
+                        <li id="memuAcontrol"><a class="menu_control" href="/control">监控</a></li>
+                        <li id="memuAfirewall"><a class="menu_firewall" href="/firewall">安全</a></li>
+                        <li id="memuAfiles"><a class="menu_folder" href="/files">文件</a></li>
+                        <li id="memuAcrontab"><a class="menu_day" href="/crontab">计划任务</a></li>
+                        <li id="memuAsoft"><a class="menu_soft" href="/soft">软件管理</a><span class="softnum">1</span></li>
+                        <li id="memuAconfig"><a class="menu_set" href="/config">面板设置</a></li>
+                        <li><a class="menu_exit" href="javascript:;" id="dologin">退出</a></li>
+                    </ul>
+                    <div id="newbtpc"></div>
+                    <div class="btpc-plus" onclick="bindBTPanel(0,'b')">+</div>
+                </div>
+            </div>
+            <button style="display: none;" id="bt_copys" class="bt_copy" data-clipboard-text=""></button>
+            <a style="display: none;" id="defaultPath">$web.ctx.session.config['sites_path']</a>
+            <script src="/static/js/jquery-1.10.2.min.js"></script>
+            <script src="/static/js/bootstrap.min.js"></script>
+            <script src="/static/language/$web.ctx.session.lan/lan.js?date=20180124"></script>
+            <script src="/static/layer/layer.js?date=20180301"></script>
+            <script src="/static/js/jquery.fly.min.js"></script>
+            <script src="/static/js/clipboard.min.js"></script>
+            <script src="/static/js/public.js?date=20180620"></script>
+            {% block content %}{% endblock %}
+            <div class="footer bgw">mdweb &copy;2014-2018 面板 (github.com/midoks/mdweb)<a style="margin-left:20px;color:#20a53a;" href="//github.com/midoks/mdweb" target="_blank">HELP</a><a style="margin-left:20px;color:#20a53a;" href="//github.com/midoks/mdweb" target="_blank">《使用手册》</a></div>
+        </div>
+    </div>
+    </div>
+</body>
+<script src="/static/codemirror/lib/codemirror.js"></script>
+<script src="/static/codemirror/addon/edit/editAll.js"></script>
+<script src="/static/codemirror/mode/modeAll.js"></script>
+<script src="/static/codemirror/addon/dialog/dialog.js"></script>
+<script src="/static/codemirror/addon/search/search.js"></script>
+<script src="/static/codemirror/addon/scroll/annotatescrollbar.js"></script>
+<script src="/static/js/jquery.qrcode.min.js"></script>
+<script src="/static/laydate/laydate.js?date=20180301"></script>
+<script type="text/javascript">
+$$("#setBox").click(function() {
+    if ($$(this).prop("checked")) {
+        $$("input[name=id]").prop("checked", true)
+    } else {
+        $$("input[name=id]").prop("checked", false)
+    }
+});
+setCookie('order', 'id desc');
+</script>
+
+</html>
