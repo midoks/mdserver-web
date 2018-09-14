@@ -8,6 +8,10 @@ app.debug = True
 def hello():
     return "Hello World!"
 
+
 @app.route("/")
-def index(name=None):
-	return render_template('index.html', name=name)
+def index():
+    return render_template('default/index.html')
+
+if __name__ == "__main__":
+    app.run()
