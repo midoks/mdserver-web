@@ -1,3 +1,2 @@
-
-import frontend
+from frontend import *
 
