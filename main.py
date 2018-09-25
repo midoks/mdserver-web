@@ -1,12 +1,15 @@
+# coding:utf-8
+
 from flask import Flask
 from flask import Blueprint,render_template
-from views import frontend
+from views import dashboard,site
 
 app = Flask(__name__)
 app.debug = True
 
 DEFAULT_MODULES = (
-    (frontend, ""),
+    (dashboard, "/"),
+    (site, "/site"),
 )
 
 def setting_modules(app, modules):
@@ -14,6 +17,7 @@ def setting_modules(app, modules):
         app.register_blueprint(module, url_prefix=url_prefix)
 
 setting_modules(app, DEFAULT_MODULES)
+
 
 if __name__ == "__main__":
     app.run()

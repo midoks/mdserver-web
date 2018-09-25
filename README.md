@@ -10,3 +10,4 @@ curl -fsSL  https://raw.githubusercontent.com/midoks/mdweb/master/install/instal
 - pip install pip==9.0.3
 - pip install flask
 - pip install gunicorn
+- pip install -r requirements.txt

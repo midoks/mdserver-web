@@ -1,4 +1,7 @@
-$def with (tData)
+{% extends "default/layout.html" %}
+
+{% block content %}
+
 <div class="main-content pb55">
 			<div class="container-fluid">
 				<div class="pos-box bgw mtb15">
@@ -64,3 +67,4 @@ $def with (tData)
 		
 		setCookie('serverType','$web.ctx.session.webserver');
 	</script>
+{% endblock %}
