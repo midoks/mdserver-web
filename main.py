@@ -2,7 +2,7 @@
 
 from flask import Flask
 from flask import Blueprint,render_template
-from views import dashboard,site
+from views import dashboard,site,files
 
 app = Flask(__name__)
 app.debug = True
@@ -10,6 +10,7 @@ app.debug = True
 DEFAULT_MODULES = (
     (dashboard, "/"),
     (site, "/site"),
+    (files, "/files"),
 )
 
 def setting_modules(app, modules):

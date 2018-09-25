@@ -1,7 +1,4 @@
-{% extends "default/layout.html" %}
-
-
-{% block content %}
+{% extends "default/layout.html" %} {% block content %}
 <div class="main-content">
     <div class="container-fluid" style="padding-bottom: 66px;">
         <div class="pos-box bgw mtb15">
@@ -9,7 +6,7 @@
                 <a class="plr10 c4" href="/">首页</a>/<span class="plr10 c4">服务器状态</span>
             </div>
             <span class="pull-right f12 c6" style="line-height:42px; margin-right:15px">
-					免费版 <span id="btversion" class="mr5" onclick="openLog()">0.0.1</span>
+                    免费版 <span id="btversion" class="mr5" onclick="openLog()">0.0.1</span>
             <span id="toUpdate"><a class="btlink" href="javascript:checkUpdate();">检查更新</a></span>
             </span>
         </div>
@@ -27,33 +24,33 @@
                 <ul class="clearfix">
                     <li class="sys-i-c-box col-xs-6 col-sm-4 col-md-4 col-lg-3 plr15">
                         <div class="siteinfo-box b-shadown">
-                            <h3 class="f14">$data['lan']['N1']</h3>
+                            <h3 class="f14">网站</h3>
                             <div class="siteinfo-box-right">
-                                <h4 class="c6">$data['siteCount'] $data['lan']['L3']</h4>
+                                <h4 class="c6">1个</h4>
                                 <div class="sbr-btn">
-                                    <a href="/site">$data['lan']['L1']</a>|<a href="javascript:;" onclick="webAdd(0)">$data['lan']['L2']</a>
+                                    <a href="/site">管理</a>|<a href="javascript:;" onclick="webAdd(0)">添加</a>
                                 </div>
                             </div>
                         </div>
                     </li>
                     <li class="sys-i-c-box col-xs-6 col-sm-4 col-md-4 col-lg-3 plr15">
                         <div class="siteinfo-box b-shadown">
-                            <h3 class="f14">$data['lan']['N3']</h3>
+                            <h3 class="f14">FTP</h3>
                             <div class="siteinfo-box-right">
-                                <h4 class="c6">$data['ftpCount'] $data['lan']['L3']</h4>
+                                <h4 class="c6">1个</h4>
                                 <div class="sbr-btn">
-                                    <a href="/ftp">$data['lan']['L1']</a>|<a href="javascript:;" onclick="ftpAdd(0)">$data['lan']['L2']</a>
+                                    <a href="/ftp">管理</a>|<a href="javascript:;" onclick="ftpAdd(0)">添加</a>
                                 </div>
                             </div>
                         </div>
                     </li>
                     <li class="sys-i-c-box col-xs-6 col-sm-4 col-md-4 col-lg-3 plr15">
                         <div class="siteinfo-box b-shadown">
-                            <h3 class="f14">$data['lan']['N2']</h3>
+                            <h3 class="f14">数据库</h3>
                             <div class="siteinfo-box-right">
-                                <h4 class="c6">$data['databaseCount'] $data['lan']['L3']</h4>
+                                <h4 class="c6">1个</h4>
                                 <div class="sbr-btn">
-                                    <a href="/database">$data['lan']['L1']</a>|<a href="javascript:;" onclick="DataAdd(0)">$data['lan']['L2']</a>
+                                    <a href="/database">管理</a>|<a href="javascript:;" onclick="DataAdd(0)">添加</a>
                                 </div>
                             </div>
                         </div>
@@ -63,9 +60,9 @@
         </div>
         <div class="server bgw mtb15">
             <div class="title c6 f16 plr15">
-                <h3 class="c6 f16 pull-left">$data['lan']['T1']</h3>
-                <a class="pull-left f12 btlink" href="javascript:;" style="background:none;padding:0; margin-left:22px" onclick="GetNetWorkList()">$data['lan']['T2']</a>
-                <a class="pull-left f12 btlink" href="javascript:;" style="background:none;padding:0; margin-left:22px" onclick="GetProcessList()">$data['lan']['T3']</a>
+                <h3 class="c6 f16 pull-left">服务器状态</h3>
+                <a class="pull-left f12 btlink" href="javascript:;" style="background:none;padding:0; margin-left:22px" onclick="GetNetWorkList()">连接管理</a>
+                <a class="pull-left f12 btlink" href="javascript:;" style="background:none;padding:0; margin-left:22px" onclick="GetProcessList()">进程管理</a>
             </div>
             <div class="server-circle">
                 <ul class="row" id="systemInfoList">
@@ -83,7 +80,7 @@
                         <h4 id="LoadState" class="c5 f15">获取中:</h4>
                     </li>
                     <li class="col-xs-6 col-sm-3 col-md-3 col-lg-2 mtb20 circle-box text-center">
-                        <h3 class="c5 f15">$data['lan']['P1']</h3>
+                        <h3 class="c5 f15">CPU使用率</h3>
                         <div class="circle">
                             <div class="pie_left">
                                 <div class="left"></div>
@@ -96,7 +93,7 @@
                         <h4 id="core" class="c5 f15">$data['lan']['S2']</h4>
                     </li>
                     <li class="col-xs-6 col-sm-3 col-md-3 col-lg-2 mtb20 circle-box text-center">
-                        <h3 class="c5 f15">$data['lan']['P2']</h3>
+                        <h3 class="c5 f15">内存使用率</h3>
                         <div class="circle mem-release">
                             <div class="pie_left">
                                 <div class="left"></div>
@@ -116,7 +113,7 @@
         <div class="col-xs-12 col-sm-12 col-md-6 pull-left pd0">
             <div class="pr8">
                 <div class="bgw">
-                    <div class="title c6 f16 plr15">$data['lan']['P4']</div>
+                    <div class="title c6 f16 plr15">软件</div>
                     <div class="setting-con" style="padding:0; height:442px; margin-right: -4px; overflow: hidden;">
                         <div class="container-fluid soft-man">
                             <input name="list1SortOrder" type="hidden" value="" />
@@ -129,7 +126,7 @@
         <div class="col-xs-12 col-sm-12 col-md-6 pull-left pd0">
             <div class="pl7">
                 <div class="bgw" style="height:491px">
-                    <div class="title c6 f16 plr15">$data['lan']['NET1']</div>
+                    <div class="title c6 f16 plr15">网络流量</div>
                     <div class="bw-info">
                         <ul>
                             <li class="bi-line col-xs-6 col-sm-6 col-md-6 pull-left c6 f14"><span class="pull-left">$data['lan']['NET2']</span><a id="upSpeed" class="c6">$data['lan']['S2']</a></li>
