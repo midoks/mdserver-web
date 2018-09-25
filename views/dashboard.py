@@ -14,7 +14,7 @@ def index():
     return render_template('default/index.html')
 
 @dashboard.route("getnetwork")
-def getnetwork():
+def getNetWork():
         #取网络流量信息
         networkIo = psutil.net_io_counters()[:4]
         # if not hasattr(web.ctx.session,'otime'):
