@@ -1,9 +1,11 @@
+# coding:utf-8
+
 from flask import Flask
 from flask import Blueprint,render_template
 
 
-frontend = Blueprint('frontend', __name__, template_folder='templates')
+dashboard = Blueprint('dashboard', __name__, template_folder='templates')
 
-@frontend.route("/")
+@dashboard.route("/")
 def index():
     return render_template('default/index.html')

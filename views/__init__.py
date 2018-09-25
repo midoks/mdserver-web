@@ -1,2 +1,3 @@
-from frontend import *
+from dashboard import *
+from site import *
 
