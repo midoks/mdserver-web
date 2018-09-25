@@ -781,7 +781,7 @@ function GetFileName(fileNameFull) {
 //取磁盘
 function GetDisk() {
 	var LBody = '';
-	$.get('/system?action=GetDiskInfo', function(rdata) {
+	$.get('/files/GetDiskInfo', function(rdata) {
 		for (var i = 0; i < rdata.length; i++) {
 			LBody += "<span onclick=\"GetFiles('" + rdata[i].path + "')\"><span class='glyphicon glyphicon-hdd'></span>&nbsp;" + (rdata[i].path=='/'?lan.files.path_root:rdata[i].path) + "(" + rdata[i].size[2] + ")</span>";
 		}
