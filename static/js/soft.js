@@ -194,7 +194,7 @@ function service(name, status) {
 
 //更新软件列表
 function updateSoftList() {
-    $.get('/plugin?action=getCloudPlugin', function(rdata) {});
+    $.get('/plugins/list?action=getCloudPlugin', function(rdata) {});
 }
 
 //php上传限制
@@ -1810,7 +1810,9 @@ function GetSList(isdisplay) {
         setCookie('p' + getCookie('softType'), isdisplay);
     }
 
-    $.post('/plugin?action=getPluginList&tojs=GetSList' + search + type + page, '', function(rdata) {
+    console.log("1212");
+
+    $.post('/plugins/list&tojs=GetSList' + search + type + page, '', function(rdata) {
         layer.close(loadT);
         var tBody = '';
         var sBody = '';
@@ -2182,197 +2184,7 @@ function get_plugin_coupon(pid) {
         }
     })
 }
-//取专业版代金券
-function get_pro_coupon() {
-    $("#couponlist").html("<div class='cloading'>加载中，请稍后</div>");
-    $.get("/auth?action=get_voucher", function(rdata) {
-        if (rdata != null) {
-            var con = '';
-            var len = rdata.length;
-            for (var i = 0; i < len; i++) {
-                if (rdata[i].status != 1) {
-                    var cyc = rdata[i].cycle + conver_unit(rdata[i].unit);
-                    if (rdata[i].cycle == 999) {
-                        cyc = "永久"
-                    }
-                    con += '<li class="pay-cycle-btn" data-code="' + rdata[i].code + '"><span>' + cyc + '</span></li>';
-                }
-            }
-            $("#couponlist").html('<ul class="pay-btn-group">' + con + '</ul>');
-            $(".pay-btn-group > li").click(function() {
-                $(this).addClass("active").siblings().removeClass("active");
-                $(".paymethod-submit button").css({ "background-color": "#20a53a", "border-color": "#20a53a" });
-            });
-            $(".paymethod-submit button").click(function() {
-                var code = $("#couponlist .pay-btn-group .active").attr("data-code");
-                if (code == undefined) {
-                    layer.msg("请选择代金券");
-                } else {
-                    useCoupon(code);
-                }
-            })
-        } else {
-            $("#couponlist").html("<p class='text-center' style='margin-top:70px'>暂无代金券</p>");
-        }
-    })
-}
-//插件代金券续费
-function useCoupon_plugin(code, pid) {
-    var loadT = layer.msg("提交中，请稍后。", { icon: 16, time: 0, shade: [0.3, "#000"] });
-    $.post("/auth?action=create_order_voucher_plugin", { pid: pid, code: code }, function(rdata) {
-        layer.closeAll();
-        layer.msg(rdata.msg);
-    })
-}
-//专业版代金券续费
-function useCoupon(code) {
-    var loadT = layer.msg("提交中，请稍后。", { icon: 16, time: 0, shade: [0.3, "#000"] });
-    $.post("/auth?action=create_order_voucher", { code: code }, function(rdata) {
-        layer.closeAll();
-        layer.msg(rdata.msg);
-        if (rdata.status === true) {
-            layer.msg("支付成功！专业版升级中，请勿操作！", { icon: 16, time: 0, shade: [0.3, "#000"] });
-            $.get("/system?action=UpdatePro", function(rr) {
-                show_upVip();
-            }).error(function() {
-                show_upVip();
-            });
-        }
-    })
-}
 
-function show_upVip() {
-    layer.closeAll();
-    layer.msg("恭喜您，升级完成！", { icon: 1 });
-    setTimeout(function() { window.location.href = '/'; }, 3000);
-}
-
-//取专业版产品折扣信息
-function get_product_discount() {
-    var con = '<div class="libPay-item f14 plr15">\
-						<div class="li-tit c4">付款方式</div>\
-						<div class="li-con c6" id="Payment"><ul class="pay-btn-group pay-cycle"><li class="pay-cycle-btn active"><span>微信支付</span></li><li class="pay-cycle-btn" onclick="get_pro_coupon()"><span>代金券</span></li></ul></div>\
-					</div>\
-					<div class="payment-con">\
-						<div class="pay-weixin">\
-							<div class="libPay-item f14 plr15">\
-								<div class="li-tit c4">开通时长</div>\
-								<div class="li-con c6" id="PayCycle"></div>\
-							</div>\
-							<div class="lib-price-box text-center"><span class="lib-price-name f14"><b>总计</b></span><span class="price-txt"><b class="sale-price"></b>元</span><s class="cost-price"></s></div>\
-							<div class="paymethod">\
-								<div class="pay-wx"></div>\
-								<div class="pay-wx-info f16 text-center"><span class="wx-pay-ico mr5"></span>微信扫码支付</div>\
-							</div>\
-						</div>\
-						<div class="pay-coupon" style="display:none">\
-							<div class="libPay-item f14 plr15" style="height:200px;overflow:auto">\
-								<div class="li-tit c4 ">代金券列表</div>\
-								<div class="li-con c6" id="couponlist"><div class="btn-group"></div></div>\
-							</div>\
-							<div class="paymethod-submit text-center">\
-								<button class="btn btn-success btn-sm f16" style="width:200px;height:40px;background-color:#999;border-color:#888">提交</button>\
-							</div>\
-						</div>\
-					</div>'
-    $(".libpay-con").html("<div class='cloading'>加载中，请稍后</div>");
-    $.get("/auth?action=get_product_discount_by", function(rdata) {
-        if (rdata != null) {
-            var coucon = '';
-            var qarr = Object.keys(rdata);
-            var qlen = qarr.length;
-            //折扣列表
-            for (var i = 0; i < qlen; i++) {
-                var j = qarr[i];
-                var a = rdata[j].price;
-                var b = rdata[j].sprice;
-                var c = rdata[j].discount;
-                coucon += '<li class="pay-cycle-btn" onclick="getRsCodePro(' + a + ',' + b + ',' + j + ')"><span>' + conver_unit(j) + '</span>' + (c == 1 ? "" : '<em>' + c * 10 + '折</em>') + '</li>';
-            }
-            $(".libpay-con").html(con);
-            $("#PayCycle").html('<ul class="pay-btn-group">' + coucon + '</ul>');
-            $(".pay-btn-group li").click(function() {
-                $(this).addClass("active").siblings().removeClass("active");
-            });
-            $(".pay-cycle li").click(function() {
-                var i = $(this).index();
-                $(this).addClass("active").siblings().removeClass("active");
-                $(".payment-con > div").eq(i).show().siblings().hide();
-            });
-            $("#PayCycle .pay-btn-group li").eq(0).click();
-        }
-    })
-}
-//单位转换
-function conver_unit(name) {
-    var unit = '';
-    switch (name) {
-        case "year":
-            unit = "年";
-            break;
-        case "month":
-            unit = "个月";
-            break;
-        case "day":
-            unit = "天";
-            break;
-        case "1":
-            unit = "1个月";
-            break;
-        case "3":
-            unit = "3个月";
-            break;
-        case "6":
-            unit = "6个月";
-            break;
-        case "12":
-            unit = "1年";
-            break;
-        case "24":
-            unit = "2年";
-            break;
-        case "36":
-            unit = "3年";
-            break;
-        case "999":
-            unit = "永久";
-            break;
-    }
-    return unit;
-}
-var wxpayTimeId = 0;
-
-function getRsCode(pid, price, sprice, cycle) {
-    $(".sale-price").text(price);
-    if (price == sprice) {
-        $(".cost-price").text(sprice + '元').hide();
-    } else {
-        $(".cost-price").text(sprice + '元').show();
-    }
-    $(".pay-wx").html('<span class="loading">加载中，请稍后</span>');
-    $(".libPay").append('<div class="payloadingmask" style="height:100%;width:100%;position:absolute;top:0;left:0;z-index:9;background:#fff;opacity:0"></div>');
-    $.post('/auth?action=get_buy_code', { pid: pid, cycle: cycle }, function(rdata) {
-        $(".payloadingmask").remove();
-        if (rdata.status === false) {
-            layer.msg(rdata.msg, { icon: 2 });
-            return;
-        }
-        $(".pay-wx").html('');
-        $(".pay-wx").qrcode(rdata.msg);
-        clearInterval(wxpayTimeId);
-        wxpayTimeId = setInterval(function() {
-            $.post('/auth?action=check_pay_status', { id: pid }, function(rdata) {
-                if (rdata.status) {
-                    layer.closeAll();
-                    layer.msg('支付成功!', { icon: 1 });
-                    clearInterval(wxpayTimeId);
-                    return;
-                }
-            })
-        }, 3000);
-
-    });
-}
 
 function getRsCodePro(price, sprice, cycle) {
     $(".sale-price").text(price);
@@ -2416,20 +2228,6 @@ function anTo(pluginName, pid) {
     Renewinstall(pluginName, pid, 1);
 }
 
-//登陆宝塔官网帐户
-function loginBT(pluginName, pid) {
-    p1 = $("#p1").val();
-    p2 = $("#p2").val();
-    var loadT = layer.msg(lan.config.token_get, { icon: 16, time: 0, shade: [0.3, '#000'] });
-    $.post("/ssl?action=GetToken", "username=" + p1 + "&password=" + p2, function(b) {
-        layer.close(loadT);
-        layer.msg(b.msg, { icon: b.status ? 1 : 2 });
-        if (b.status) {
-            layer.closeAll();
-            Renewinstall(pluginName, pid);
-        }
-    });
-}
 
 //独立安装
 function oneInstall(name, version) {

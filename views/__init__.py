@@ -6,3 +6,4 @@ from files import *
 from soft import *
 from config import *
 from plugins import *
+from task import *

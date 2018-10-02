@@ -936,7 +936,7 @@ function GetTaskList(a) {
 }
 
 function GetTaskCount() {
-	$.post("/ajax?action=GetTaskCount", "", function(a) {
+	$.get("/task/count", "", function(a) {
 		$(".task").text(a)
 	})
 }
