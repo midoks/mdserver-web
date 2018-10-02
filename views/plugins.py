@@ -1,6 +1,7 @@
 # coding:utf-8
 
 from flask import Blueprint, render_template
+from flask import jsonify
 
 plugins = Blueprint('plugins', __name__, template_folder='templates')
 
@@ -12,4 +13,4 @@ def index():
 
 @plugins.route("/list")
 def list():
-    pass
+    return jsonify({"ss": 3})

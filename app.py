@@ -1,22 +1,17 @@
 from flask import Flask
-# from flask import Blueprint,render_template
-from views import dashboard
-from views import site
-from views import files
-from views import soft
-from views import config
-from views import plugins
+import views
 
 app = Flask(__name__)
 app.debug = True
 
 DEFAULT_MODULES = (
-    (dashboard, "/"),
-    (site, "/site"),
-    (files, "/files"),
-    (soft, "/soft"),
-    (config, "/config"),
-    (plugins, "/plugins"),
+    (views.dashboard, "/"),
+    (views.site, "/site"),
+    (views.files, "/files"),
+    (views.soft, "/soft"),
+    (views.config, "/config"),
+    (views.plugins, "/plugins"),
+    (views.task, "/task"),
 )
 
 
