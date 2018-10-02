@@ -1,8 +1,15 @@
 from flask import Flask
 import views
+import sys
+import web
+import io
+import os
+
+sys.path.append("class/")
 
 app = Flask(__name__)
 app.debug = True
+
 
 DEFAULT_MODULES = (
     (views.dashboard, "/"),
