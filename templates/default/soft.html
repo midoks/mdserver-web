@@ -1,9 +1,12 @@
+{% extends "default/layout.html" %}
+
+{% block content %}
 
 <div class="main-content">
 		<div class="container-fluid" style="padding-bottom:54px">
 			<div class="pos-box bgw mtb15">
 				<div class="position f14 c9 pull-left">
-					<a class="plr10 c4" href="/">$data['lan']['H1']</a>/<span class="plr10 c4">$data['lan']['H2']</span>
+					<a class="plr10 c4" href="/">首页</a>/<span class="plr10 c4">软件管理</span>
 				</div>
 				<div class="search pull-right">
 					<form target="hid" onsubmit='GetSList()'>
@@ -16,21 +19,27 @@
 			<div class="softbox bgw mtb15">
 				<div class="softlist">
 					<div class="divtable pd15 relative">
+
 						<div class="menu-sub softtype">
+							<span typeid="0">全部</span>
+							<span typeid="1" class="on">运行环境</span>
+							<span typeid="2">系统工具</span>
+							<span typeid="3">插件</span>
 						</div>
-						<button class="btn btn-default btn-sm" onclick="flush_cache()" title="从云端更新列表" style="position:absolute;top:12px;right:15px">更新软件列表</button>
+
+						<button class="btn btn-default btn-sm" onclick="flush_cache()" title="从云端更新列表" style="position:absolute;top:12px;right:15px">添加插件</button>
 						<div id="updata_pro_info"></div>
 						<table class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0">
 							<thead>
 								<tr>
-									<th width="165">$data['lan']['TH1']</th>
-									<th>$data['lan']['TH3']</th>
+									<th width="165">软件名称</th>
+									<th>说明</th>
 									<th class="text-center" width="92">价格</th>
 									<th class="text-center" width="120">到期时间</th>
-									<th width="40">$data['lan']['TH4']</th>
-									<th width="40">$data['lan']['TH5']</th>
-									<th width="64">$data['lan']['TH6']</th>
-									<th style="text-align: right;" width="120">$data['lan']['TH7']</th>
+									<th width="40">状态</th>
+									<th width="40">位置</th>
+									<th width="64">状态</th>
+									<th style="text-align: right;" width="120">操作</th>
 								</tr>
 							</thead>
 							<tbody id="softList"></tbody>
@@ -55,3 +64,4 @@ $$.get("/ajax?action=GetCloudHtml&rpath=btpanel_message/updata_pro.html",functio
 	$$("#updata_pro_info").html(rdata);
 });
 </script>
+{% endblock %}

@@ -1,6 +1,11 @@
 from flask import Flask
 # from flask import Blueprint,render_template
-from views import dashboard, site, files, soft
+from views import dashboard
+from views import site
+from views import files
+from views import soft
+from views import config
+from views import plugins
 
 app = Flask(__name__)
 app.debug = True
@@ -9,8 +14,11 @@ DEFAULT_MODULES = (
     (dashboard, "/"),
     (site, "/site"),
     (files, "/files"),
-    (soft, "/soft")
+    (soft, "/soft"),
+    (config, "/config"),
+    (plugins, "/plugins"),
 )
+
 
 def setting_modules(app, modules):
     for module, url_prefix in modules:
