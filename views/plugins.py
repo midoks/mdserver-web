@@ -7,4 +7,9 @@ plugins = Blueprint('plugins', __name__, template_folder='templates')
 
 @plugins.route("/")
 def index():
-    return render_template('default/plugins.html')
+    return render_template('default/ftp.html')
+
+
+@plugins.route("/list")
+def list():
+    pass
