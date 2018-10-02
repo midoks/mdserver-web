@@ -1,29 +1,32 @@
-$def with (data)
+{% extends "default/layout.html" %}
+
+{% block content %}
+
 <div class="main-content">
 		<div class="container-fluid" style="padding-bottom:54px">
 			<div class="pos-box bgw mtb15">
 				<div class="position f14 c9 pull-left">
-					<a class="plr10 c4" href="/">$data['lan']['H1']</a>/<span class="plr10 c4">$data['lan']['H2']</span>
+					<a class="plr10 c4" href="/">首页</a>/<span class="plr10 c4">面板设置</span>
 				</div>
 			</div>
 			<div class="clearfix bgw mtb15 pd15">
 				<div class="safe-port pull-left">
 					<div class="ss-text pull-left mr50">
-						<em>$data['lan']['I1']</em>
+						<em>关闭面板</em>
 						<div class='ssh-item'>
 							<input class='btswitch btswitch-ios' id='closePl' type='checkbox'>
 							<label class='btswitch-btn' for='closePl' onclick='ClosePanel()'></label>
 						</div>
 					</div>
 					<div class="ss-text pull-left mr50">
-						<em>$data['lan']['I2']</em>
+						<em>自动更新</em>
 						<div class='ssh-item'>
 							<input class='btswitch btswitch-ios' id='autoUpdate' type='checkbox' $data['panel']['auto'] >
 							<label class='btswitch-btn' for='autoUpdate' onclick="SetPanelAutoUpload()"></label>
 						</div>
 					</div>
 					<div class="ss-text pull-left mr50">
-						<em class="btlink" style="color: #20a53a;" onclick="GetPanelSSL()" title="点击自定义面板证书">$data['lan']['I3']</em>
+						<em class="btlink" style="color: #20a53a;" onclick="GetPanelSSL()" title="点击自定义面板证书">面板SSL</em>
 						<div class='ssh-item'>
 							<input class='btswitch btswitch-ios' id='panelSSL' type='checkbox'>
 							<label class='btswitch-btn' for='panelSSL' onclick="setPanelSSL()"></label>
@@ -33,11 +36,11 @@ $def with (data)
 			</div>
 			<div class="setbox bgw mtb15">
 				<div class="title c6 plr15">
-					<h3 class="f16">$data['lan']['C1']</h3>
+					<h3 class="f16">设置</h3>
 					<button class="btn btn-default btn-sm" style="float: right;margin-top: 10px;display: none;" onclick="apiSetup()">$data['lan']['C2']</button>
 				</div>
 				<div class="important-title" style="margin: 20px 30px 0px;">
-					<p><span class="glyphicon glyphicon-alert" style="color: #f39c12; margin-right: 10px;"></span>$data['lan']['C3']</p>
+					<p><span class="glyphicon glyphicon-alert" style="color: #f39c12; margin-right: 10px;"></span>为了提高安全，请修改别名、默认端口、面板用户和密码!</p>
 				</div>
 				<div class="setting-con pd15">
 					<form id="set-Config">
@@ -184,5 +187,6 @@ $def with (data)
 <script type="text/javascript" src="/static/js/jquery.qrcode.min.js"></script>
 <script src="/static/js/config.js?date=20180530"></script>
 <script type="text/javascript">
-	setCookie('serverType','$web.ctx.session.webserver');
+	// setCookie('serverType','$web.ctx.session.webserver');
 </script>
+{% endblock %}
