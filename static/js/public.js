@@ -1247,55 +1247,6 @@ function listOrder(skey,type,obj){
 	}
 }
 
-//去关联列表
-function GetBtpanelList(){
-	var con ='';
-	$.post("/config?action=GetPanelList",function(rdata){
-		for(var i=0; i<rdata.length; i++){
-			con +='<h3 class="mypcip mypcipnew" style="opacity:.6" data-url="'+rdata[i].url+'" data-user="'+rdata[i].username+'" data-pw="'+rdata[i].password+'"><span class="f14 cw">'+rdata[i].title+'</span><em class="btedit" onclick="bindBTPanel(0,\'c\',\''+rdata[i].title+'\',\''+rdata[i].id+'\',\''+rdata[i].url+'\',\''+rdata[i].username+'\',\''+rdata[i].password+'\')"></em></h3>'
-		}
-		$("#newbtpc").html(con);
-		$(".mypcipnew").hover(function(){
-			$(this).css("opacity","1");
-		},function(){
-			$(this).css("opacity",".6");
-		}).click(function(){
-		$("#btpanelform").remove();
-		var murl = $(this).attr("data-url");
-		var user = $(this).attr("data-user");
-		var pw = $(this).attr("data-pw");
-		layer.open({
-		  type: 2,
-		  title: false,
-		  closeBtn: 0, //不显示关闭按钮
-		  shade: [0],
-		  area: ['340px', '215px'],
-		  offset: 'rb', //右下角弹出
-		  time: 5, //2秒后自动关闭
-		  anim: 2,
-		  content: [murl+'/login', 'no']
-		});
-			var loginForm ='<div id="btpanelform" style="display:none"><form id="toBtpanel" action="'+murl+'/login" method="post" target="btpfrom">\
-				<input name="username" id="btp_username" value="'+user+'" type="text">\
-				<input name="password" id="btp_password" value="'+pw+'" type="password">\
-				<input name="code" id="bt_code" value="12345" type="text">\
-			</form><iframe name="btpfrom" src=""></iframe></div>';
-			$("body").append(loginForm);
-			layer.msg(lan.bt.panel_open,{icon:16,shade: [0.3, '#000'],time:1000});
-			setTimeout(function(){
-				$("#toBtpanel").submit();
-			},500);
-			setTimeout(function(){
-				window.open(murl);
-			},1000);
-		});
-		$(".btedit").click(function(e){
-			e.stopPropagation();
-		});
-	})
-	
-}
-GetBtpanelList();
 //添加面板快捷登录
 function bindBTPanel(a,type,ip,btid,url,user,pw){
 	var titleName = lan.bt.panel_add;
