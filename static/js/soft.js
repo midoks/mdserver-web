@@ -1896,8 +1896,6 @@ function GetSList(isdisplay) {
                         //+'<td>'+rdata.data[i].type+'</td>'
                         +
                         '<td>' + pps + '</td>' +
-                        '<td class="c9 text-center">免费</td>' +
-                        '<td class="c9 text-center">--</td>' +
                         '<td>' + softPath + '</td>' +
                         '<td>' + state + '</td>' +
                         '<td>' + indexshow + '</td>' +
