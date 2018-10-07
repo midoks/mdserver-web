@@ -1792,7 +1792,6 @@ function GetSList(isdisplay) {
             var checked = '';
 
             checked = rdata.data[i].display ? 'checked' : '';
-            console.log(len);
             for (var j = 0; j < len; j++) {
                 if (rdata.data[i].versions[j].status) continue;
                 version_info += rdata.data[i].versions[j].version + '|';
@@ -1802,9 +1801,6 @@ function GetSList(isdisplay) {
                 version_info = version_info.substring(0, version_info.length - 1);
             }
 
-            console.log(version_info);
-
-            console.log(rdata.data[i]);
             var handle = '<a class="btlink" onclick="AddVersion(\'' + rdata.data[i].name + '\',\'' + version_info + '\',\'' + rdata.data[i].tip + '\',this,\'' + rdata.data[i].title + '\')">' + lan.soft.install + '</a>';
             var isSetup = false;
             if (rdata.data[i].name != 'php') {
