@@ -21,6 +21,10 @@ DEFAULT_MODULES = (
     (views.task, "/task"),
 )
 
+import time
+print "time.time(): %f " % time.time()
+app.config.version = "0.0.1" + str(time.time())
+
 
 def setting_modules(app, modules):
     for module, url_prefix in modules:
