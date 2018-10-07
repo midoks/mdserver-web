@@ -1741,49 +1741,6 @@ function SetPluginConfig(name, param, def) {
 }
 
 
-//取七牛文件列表
-function GetFileList(name) {
-    var loadT = layer.msg(lan.soft.qiniu_lise, { icon: 16, time: 0, shade: [0.3, '#000'] });
-    $.get('/ajax?action=GetQiniuFileList&name=' + name, function(rdata) {
-        layer.close(loadT);
-        if (rdata.status === false) {
-            layer.msg(rdata.msg, { icon: 2 });
-            return;
-        }
-
-        var tBody = ''
-        for (var i = 0; i < rdata.length; i++) {
-            tBody += "<tr>\
-						<td>" + rdata[i].key + "</td>\
-						<td>" + rdata[i].mimeType + "</td>\
-						<td>" + ToSize(rdata[i].fsize) + "</td>\
-						<td>" + getLocalTime(rdata[i].putTime) + "</td>\
-					</tr>"
-        }
-
-        layer.open({
-            type: 1,
-            skin: 'demo-class',
-            area: '700px',
-            title: lan.soft.qiniu_file_title,
-            closeBtn: 2,
-            shift: 0,
-            content: "<div class='divtable' style='margin:17px'>\
-						<table width='100%' class='table table-hover'>\
-							<thead>\
-								<tr>\
-									<th>" + lan.soft.qiniu_th1 + "</th>\
-									<th>" + lan.soft.qiniu_th2 + "</th>\
-									<th>" + lan.soft.qiniu_th3 + "</th>\
-									<th>" + lan.soft.qiniu_th4 + "</th>\
-								</tr>\
-							</thead>\
-							<tbody class='list-list'>" + tBody + "</tbody>\
-						</table>\
-					</div>"
-        });
-    });
-}
 
 //取软件列表
 function GetSList(isdisplay) {
@@ -1810,9 +1767,7 @@ function GetSList(isdisplay) {
         setCookie('p' + getCookie('softType'), isdisplay);
     }
 
-    console.log("1212");
-
-    $.post('/plugins/list&tojs=GetSList' + search + type + page, '', function(rdata) {
+    $.post('/plugins/list?' + search + type + page, '', function(rdata) {
         layer.close(loadT);
         var tBody = '';
         var sBody = '';
@@ -1882,37 +1837,10 @@ function GetSList(isdisplay) {
                         handle = '<a style="color:#C0C0C0;" href="javascript:task();">' + lan.soft.sleep_install + '</a>'
                     }
                 }
-                var enddate = '<td class="c9 text-center">' + rdata.data[i].end + '</td>';
-                if (rdata.data[i].price > 0) {
-                    var price = '<td class="text-center" style="color:#fc6d26">￥' + rdata.data[i].price + '</td>';
-                    var uninstall = ''
-                    if (isSetup) {
-                        uninstall = ' | <a class="btlink" onclick="UninstallVersion(\'' + rdata.data[i].name + '\',\'1.0\',\'' + rdata.data[i].title + '\')">' + lan.soft.uninstall + '</a>'
-                    }
-                    if (rdata.data[i].end == '未开通' || rdata.data[i].end == '已到期' || rdata.data[i].end == '待支付') {
-                        handle = '<a class="btlink" onclick="Renewinstall(\'' + rdata.data[i].title + '\',\'' + rdata.data[i].product_id + '\')">立即购买</a>' + uninstall
-                        titleClick = 'onclick="Renewinstall(\'' + rdata.data[i].title + '\',\'' + rdata.data[i].product_id + '\')" style="cursor:pointer"';
-                        if (rdata.data[i].end == '已到期') {
-
-                            handle = '<a class="btlink" onclick="Renewinstall(\'' + rdata.data[i].title + '\',\'' + rdata.data[i].product_id + '\',1)">立即续费</a>' + uninstall
-                        }
-                        enddate = '<td class="c9 text-center">' + rdata.data[i].end + '&nbsp;&nbsp;<span class="glyphicon glyphicon-repeat cursor" onclick="FPStatus()" title="刷新状态"></span></td>';
-                    }
-                    if (rdata.data[i].end.indexOf('20') != -1 || rdata.data[i].end == '已到期') enddate = '<td class="c9 text-center">' + rdata.data[i].end + '<a class="btlink" onclick="Renewinstall(\'' + rdata.data[i].title + '\',\'' + rdata.data[i].product_id + '\',1)"> (续费)</a></td>';
-
-                } else {
-                    var price = '<td class="c9 text-center">免费</td>';
-                }
-
 
                 sBody += '<tr>' +
-                    '<td><span ' + titleClick + '><img src="/static/img/soft_ico/ico-' + rdata.data[i].name + '.png">' + rdata.data[i].title + ' ' + version + '</span></td>'
-                    //+'<td>'+rdata.data[i].versions[0].no+'</td>'
-                    //+'<td>'+rdata.data[i].type+'</td>'
-                    +
+                    '<td><span ' + titleClick + '><img src="/static/img/soft_ico/ico-' + rdata.data[i].name + '.png">' + rdata.data[i].title + ' ' + version + '</span></td>' +
                     '<td>' + rdata.data[i].ps + '</td>' +
-                    price +
-                    enddate +
                     '<td>' + softPath + '</td>' +
                     '<td>' + state + '</td>' +
                     '<td>' + indexshow + '</td>' +

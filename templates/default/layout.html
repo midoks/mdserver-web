@@ -7,9 +7,10 @@
     <meta name="renderer" content="webkit">
     <title>MDWEB-Linux面板</title>
     <link rel="shortcut icon" href="/static/favicon.ico" type="image/x-icon" />
-    <link href="/static/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/static/css/site.css?date=20180912" rel="stylesheet">
-    <link href="/static/codemirror/lib/codemirror.css" rel="stylesheet">
+    <link href="/static/bootstrap-3.3.5/css/bootstrap.min.css?v={{config.version}}" rel="stylesheet">
+    <link href="/static/css/site.css?v={{config.version}}" rel="stylesheet">
+    <link href="/static/codemirror/lib/codemirror.css?v={{config.version}}" rel="stylesheet">
+    <script src="/static/language/Simplified_Chinese/lan.js?v={{config.version}}"></script>
     <!--[if lte IE 9]>
 		<script src="/static/js/requestAnimationFrame.js"></script>
 	<![endif]-->
@@ -41,35 +42,35 @@
             </div>
             <button style="display: none;" id="bt_copys" class="bt_copy" data-clipboard-text=""></button>
             <a style="display: none;" id="defaultPath">$web.ctx.session.config['sites_path']</a>
-            <script src="/static/js/jquery-1.10.2.min.js"></script>
-            <script src="/static/js/bootstrap.min.js"></script>
-            <script src="/static/layer/layer.js?date=20180301"></script>
-            <script src="/static/js/jquery.fly.min.js"></script>
-            <script src="/static/js/clipboard.min.js"></script>
-            <script src="/static/js/public.js?date=20180620"></script>
+            <script src="/static/js/jquery-1.10.2.min.js?v={{config.version}}"></script>
+            <script src="/static/js/bootstrap.min.js?v={{config.version}}"></script>
+            <script src="/static/layer/layer.js?v={{config.version}}"></script>
+            <script src="/static/js/jquery.fly.min.js?v={{config.version}}"></script>
+            <script src="/static/js/clipboard.min.js?v={{config.version}}"></script>
+            <script src="/static/js/public.js?v={{config.version}}"></script>
             {% block content %}{% endblock %}
             <div class="footer bgw">mdweb &copy;2014-2018 面板 (github.com/midoks/mdweb)<a style="margin-left:20px;color:#20a53a;" href="//github.com/midoks/mdweb" target="_blank">HELP</a><a style="margin-left:20px;color:#20a53a;" href="//github.com/midoks/mdweb" target="_blank">《使用手册》</a></div>
         </div>
     </div>
     </div>
 </body>
-<script src="/static/codemirror/lib/codemirror.js"></script>
-<script src="/static/codemirror/addon/edit/editAll.js"></script>
-<script src="/static/codemirror/mode/modeAll.js"></script>
-<script src="/static/codemirror/addon/dialog/dialog.js"></script>
-<script src="/static/codemirror/addon/search/search.js"></script>
-<script src="/static/codemirror/addon/scroll/annotatescrollbar.js"></script>
-<script src="/static/js/jquery.qrcode.min.js"></script>
-<script src="/static/laydate/laydate.js?date=20180301"></script>
+<script src="/static/codemirror/lib/codemirror.js?v={{config.version}}"></script>
+<script src="/static/codemirror/addon/edit/editAll.js?v={{config.version}}"></script>
+<script src="/static/codemirror/mode/modeAll.js?v={{config.version}}"></script>
+<script src="/static/codemirror/addon/dialog/dialog.js?v={{config.version}}"></script>
+<script src="/static/codemirror/addon/search/search.js?v={{config.version}}"></script>
+<script src="/static/codemirror/addon/scroll/annotatescrollbar.js?v={{config.version}}"></script>
+<script src="/static/js/jquery.qrcode.min.js?v={{config.version}}"></script>
+<script src="/static/laydate/laydate.js?v={{config.version}}"></script>
 <script type="text/javascript">
-$$("#setBox").click(function() {
-    if ($$(this).prop("checked")) {
-        $$("input[name=id]").prop("checked", true)
-    } else {
-        $$("input[name=id]").prop("checked", false)
-    }
-});
-setCookie('order', 'id desc');
+// $$("#setBox").click(function() {
+//     if ($$(this).prop("checked")) {
+//         $$("input[name=id]").prop("checked", true)
+//     } else {
+//         $$("input[name=id]").prop("checked", false)
+//     }
+// });
+// setCookie('order', 'id desc');
 </script>
 
 </html>

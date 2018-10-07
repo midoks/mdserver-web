@@ -1,0 +1,15 @@
+{
+	"title":"VPN",
+	"tip":"lib",
+	"name":"VPN",
+	"type":"其他插件",
+	"ps":"科学上网",
+	"versions":"1.3",
+	"shell":"install.sh",
+	"checks":"/www/server/panel/plugin/safelogin",
+	"author":"宝塔",
+	"home":"http://www.bt.cn/bbs",
+	"date":"2017-11-24",
+	"default":false,
+	"display":0
+}

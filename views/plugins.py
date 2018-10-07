@@ -2,6 +2,7 @@
 
 from flask import Blueprint, render_template
 from flask import jsonify
+from flask import request
 
 import psutil
 import time
@@ -24,12 +25,16 @@ def index():
     return render_template('default/ftp.html')
 
 
-@plugins.route("/list")
+@plugins.route("/list", methods=['GET', 'POST'])
 def list():
 
     data = json.loads(public.readFile("data/type.json"))
     ret = {}
     ret["type"] = data
+
+    plugins_info = []
+
+    print request.args['type']
 
     for dirinfo in os.listdir(__plugin_name):
         path = __plugin_name + "/" + dirinfo
@@ -38,9 +43,10 @@ def list():
             if os.path.exists(jsonFile):
                 try:
                     tmp = json.loads(public.readFile(jsonFile))
-                    print tmp
+                    plugins_info.append(tmp)
+                    # print tmp
                 except:
                     pass
-        print dirinfo
-
+        # print dirinfo
+    ret['data'] = plugins_info
     return jsonify(ret)
