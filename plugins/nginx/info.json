@@ -1,9 +1,9 @@
 {
-	"title":"VPN",
+	"title":"Nginx",
 	"tip":"lib",
-	"name":"VPN",
+	"name":"nginx",
 	"type":"其他插件",
-	"ps":"科学上网",
+	"ps":"轻量级，占有内存少，并发能力强",
 	"versions":[
 		{"status":false,"version":"1.0"}
 	],
@@ -14,5 +14,5 @@
 	"date":"2017-11-24",
 	"default":true,
 	"display":1,
-	"pid": "3"
+	"pid": "1"
 }
