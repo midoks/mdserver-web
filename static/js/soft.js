@@ -1780,7 +1780,7 @@ function GetSList(isdisplay) {
         $("#softPage").html(rdata.page);
         $("#softPage .Pcount").css({ "position": "absolute", "left": "0" })
 
-        $(".task").text(rdata.data[rdata.data.length - 1]);
+        $(".task").text(rdata.data[rdata.length - 1]);
         for (var i = 0; i < rdata.data.length; i++) {
             var len = rdata.data[i].versions.length;
             var version_info = '';
@@ -1790,15 +1790,21 @@ function GetSList(isdisplay) {
             var state = '';
             var indexshow = '';
             var checked = '';
+
             checked = rdata.data[i].display ? 'checked' : '';
+            console.log(len);
             for (var j = 0; j < len; j++) {
                 if (rdata.data[i].versions[j].status) continue;
                 version_info += rdata.data[i].versions[j].version + '|';
+                // console.log(version_info,rdata.data[i].versions[j].status);
             }
             if (version_info != '') {
                 version_info = version_info.substring(0, version_info.length - 1);
             }
 
+            console.log(version_info);
+
+            console.log(rdata.data[i]);
             var handle = '<a class="btlink" onclick="AddVersion(\'' + rdata.data[i].name + '\',\'' + version_info + '\',\'' + rdata.data[i].tip + '\',this,\'' + rdata.data[i].title + '\')">' + lan.soft.install + '</a>';
             var isSetup = false;
             if (rdata.data[i].name != 'php') {
