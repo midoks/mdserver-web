@@ -4,7 +4,9 @@
 	"name":"VPN",
 	"type":"其他插件",
 	"ps":"科学上网",
-	"versions":"0.1",
+	"versions":[
+		{"status":false,"version":"1.0"}
+	],
 	"shell":"install.sh",
 	"checks":"/www/server/panel/plugin/safelogin",
 	"author":"midoks",
