@@ -192,11 +192,6 @@ function service(name, status) {
 }
 
 
-//更新软件列表
-function updateSoftList() {
-    $.get('/plugins/list?action=getCloudPlugin', function(rdata) {});
-}
-
 //php上传限制
 function phpUploadLimit(version, max) {
     var LimitCon = '<p class="conf_p"><input class="phpUploadLimit bt-input-text mr5" type="number" value="' + max + '" name="max">MB<button class="btn btn-success btn-sm" onclick="SetPHPMaxSize(\'' + version + '\')" style="margin-left:20px">' + lan.public.save + '</button></p>';
@@ -1785,8 +1780,8 @@ function GetSList(isdisplay) {
         $("#softPage").html(rdata.page);
         $("#softPage .Pcount").css({ "position": "absolute", "left": "0" })
 
-        $(".task").text(rdata.data[rdata.length - 1]);
-        for (var i = 0; i < rdata.data.length - 1; i++) {
+        $(".task").text(rdata.data[rdata.data.length - 1]);
+        for (var i = 0; i < rdata.data.length; i++) {
             var len = rdata.data[i].versions.length;
             var version_info = '';
             var version = '';
@@ -1947,215 +1942,6 @@ function SoftUpdate(name, version, update) {
         });
     }, msg);
 }
-//续费
-function Renewinstall(pluginName, pid, an) {
-    if (an === undefined) {
-        var txt = "开通";
-    } else {
-        var txt = "续费";
-    }
-    var payhtml = '<div class="libPay" style="padding:15px 30px 30px 30px">\
-				<div class="libPay-item f14 plr15 libPay-select">\
-					<div class="li-tit c3">类型</div>\
-					<div class="li-con c6">\
-						<ul class="li-c-item">\
-							<li class="active"><span class="item-name pull-left">' + pluginName + '</span><span class="item-info f12 pull-right c7">1款插件</span></li>\
-							<li><span class="item-name">升级为专业版</span><span class="item-info f12 pull-right c7">所有插件免费使用</span></li>\
-						</ul>\
-						<p class="pro-info" style="position:absolute;top:151px;left:42px;color: #FF7301;font-size: 12px;display:none">（专业版过期了需要续费后才能登陆使用或者进SSH执行免费版升级命令来切换成免费版）</p>\
-					</div>\
-				</div>\
-				<div class="libpay-con">\
-				</div>\
-			</div>';
-    layer.open({
-        type: 1,
-        title: txt + pluginName,
-        area: ['616px', '680px'],
-        closeBtn: 2,
-        shadeClose: false,
-        content: payhtml
-    });
-    get_plugin_price(pluginName, pid, 1);
-    $(".li-c-item li").click(function() {
-        var i = $(this).index();
-        $(this).addClass("active").siblings().removeClass("active");
-        if (i == 0) {
-            get_plugin_price(pluginName, pid, 1);
-            $(".pro-info").hide();
-        } else {
-            get_product_discount();
-            $(".pro-info").show();
-        }
-    });
-    $(".pay-btn-group > li").click(function() {
-        $(this).addClass("active").siblings().removeClass("active");
-    });
-}
-//升级为专业版
-function updatapro() {
-    var payhtml = '<div class="libPay" style="padding:15px 30px 30px 30px">\
-				<div class="libpay-con">\
-				</div>\
-				<p style="position:absolute;bottom:17px;left:0;width:100%;text-align:center;color:red">注：如需购买多台永久授权，请登录宝塔官网购买。<a class="btlink" href="https://www.bt.cn/download/linuxpro.html#price" target="_blank">去宝塔官网</a></p>\
-			</div>';
-    layer.open({
-        type: 1,
-        title: '升级专业版，所有插件，免费使用',
-        area: ['616px', '540px'],
-        closeBtn: 2,
-        shadeClose: false,
-        content: payhtml
-    });
-    get_product_discount();
-    $(".pay-btn-group > li").click(function() {
-        $(this).addClass("active").siblings().removeClass("active");
-    });
-}
-
-//取插件折扣信息
-function get_plugin_price(pluginName, pid, an) {
-    var con = '<div class="libPay-item f14 plr15">\
-						<div class="li-tit c4">付款方式</div>\
-						<div class="li-con c6" id="Payment"><ul class="pay-btn-group pay-cycle"><li class="pay-cycle-btn active"><span>微信支付</span></li><li class="pay-cycle-btn" onclick="get_plugin_coupon(' + pid + ')"><span>代金券</span></li></ul></div>\
-					</div>\
-					<div class="payment-con">\
-						<div class="pay-weixin">\
-							<div class="libPay-item f14 plr15">\
-								<div class="li-tit c4">开通时长</div>\
-								<div class="li-con c6" id="PayCycle"><div class="btn-group"></div></div>\
-							</div>\
-							<div class="lib-price-box text-center"><span class="lib-price-name f14"><b>总计</b></span><span class="price-txt"><b class="sale-price"></b>元</span><s class="cost-price"></s></div>\
-							<div class="paymethod">\
-								<div class="pay-wx"></div>\
-								<div class="pay-wx-info f16 text-center"><span class="wx-pay-ico mr5"></span>微信扫码支付</div>\
-							</div>\
-						</div>\
-						<div class="pay-coupon" style="display:none">\
-							<div class="libPay-item f14 plr15" style="height:200px;overflow:auto">\
-								<div class="li-tit c4 ">代金券列表</div>\
-								<div class="li-con c6" id="couponlist"><div class="btn-group"></div></div>\
-							</div>\
-							<div class="paymethod-submit text-center">\
-								<button class="btn btn-success btn-sm f16" style="width:200px;height:40px;background-color:#999;border-color:#888">提交</button>\
-							</div>\
-						</div>\
-					</div>'
-    $(".libpay-con").html("<div class='cloading'>加载中，请稍后</div>");
-    $.post('/auth?action=get_plugin_price', { pluginName: pluginName }, function(rdata) {
-
-        if (rdata.status === false) {
-            //未绑定
-            var payhtml = '<div class="libLogin pd20" style="padding-top:100px"><div class="bt-form text-center"><div class="line mb15"><h3 class="c2 f16 text-center mtb20">绑定宝塔官网账号</h3></div><div class="line"><input class="bt-input-text" name="username2" type="text" placeholder="手机" id="p1" aautocomplete="new-password"></div><div class="line"><input autocomplete="new-password" class="bt-input-text" type="password" name="password2"  placeholder="密码" id="p2"></div><div class="line"><input class="login-button" value="登录" type="button" onclick="loginBT(\'' + pluginName + '\',\'' + pid + '\')"></div><p class="text-right"><a class="btlink" href="https://www.bt.cn/register.html" target="_blank">未有账号，去注册</a></p></div></div>';
-            $(".libPay-select").hide();
-            $(".libpay-con").html(payhtml);
-        } else if (an === undefined) {
-            //同意协议
-            var payhtml = '<div class="shuoming pd20"><div class="alert alert-danger f16" style="line-height:30px">注意：您购买的插件只在当前服务器有效。<br>本插件为特价期间，可能存在一定的稳定性问题。<br>有任何问题，欢迎咨询QQ394030111反馈。</div><div class="line text-center"><input id="apply-ps" class="login-button" value="同意" type="button" disabled style="background:#999;border-color:#999;box-shadow:inset 0 1px 2px #999"></div></div>';
-            $(".libPay-select").hide();
-            $(".libpay-con").html(payhtml);
-            var imin = 6;
-            var timehwnd = setInterval(function countdown() {
-                imin--;
-                var applyObj = $("#apply-ps");
-                if (imin == 0) {
-                    applyObj.prop("value", "同意");
-                    applyObj.removeAttr("disabled");
-                    applyObj.attr("onclick", "anTo('" + pluginName + "','" + pid + "')");
-                    applyObj.removeAttr("style");
-                    clearInterval(timehwnd);
-                } else {
-                    applyObj.prop("value", "同意(" + imin + ")");
-                }
-            }, 1000);
-        } else {
-            $(".libPay-select").show();
-            $(".libpay-con").html(con);
-            $("#PayCycle .btn-group").html(rdata);
-            $(".pay-cycle li").click(function() {
-                var i = $(this).index();
-                $(this).addClass("active").siblings().removeClass("active");
-                $(".payment-con > div").eq(i).show().siblings().hide();
-            });
-            $(".btn-group .btn-success").click();
-            $(".btn-group .btn").click(function() {
-                $(this).addClass("btn-success").siblings().removeClass("btn-success");
-            });
-        }
-    })
-}
-
-//取插件优惠券
-function get_plugin_coupon(pid) {
-    var con = '';
-    $("#couponlist").html("<div class='cloading'>加载中，请稍后</div>");
-    $.post('/auth?action=get_voucher_plugin', { pid: pid }, function(rdata) {
-        if (rdata != '') {
-            for (var i = 0, l = rdata.length; i < l; i++) {
-                con += '<li class="pay-cycle-btn" data-code="' + rdata[i].code + '"><span>' + rdata[i].cycle + conver_unit(rdata[i].unit) + '</span></li>';
-            }
-            $("#couponlist").html('<ul class="pay-btn-group">' + con + '</ul>');
-            $(".pay-btn-group > li").click(function() {
-                $(this).addClass("active").siblings().removeClass("active");
-                $(".paymethod-submit button").css({ "background-color": "#20a53a", "border-color": "#20a53a" });
-            });
-            $(".paymethod-submit button").click(function() {
-                var code = $("#couponlist .pay-btn-group .active").attr("data-code");
-                if (code == undefined) {
-                    layer.msg("请选择代金券");
-                } else {
-                    useCoupon_plugin(code, pid);
-                }
-            })
-        } else {
-            $("#couponlist").html("<p class='text-center' style='margin-top:70px'>暂无代金券</p>");
-        }
-    })
-}
-
-
-function getRsCodePro(price, sprice, cycle) {
-    $(".sale-price").text(price);
-    if (price == sprice) {
-        $(".cost-price").text(sprice + '元').hide();
-    } else {
-        $(".cost-price").text(sprice + '元').show();
-    }
-    $(".pay-wx").html('<span class="loading">加载中，请稍后</span>');
-    $(".libPay").append('<div class="payloadingmask" style="height:100%;width:100%;position:absolute;top:0;left:0;z-index:1"></div>');
-    $.post('/auth?action=create_order', { cycle: cycle }, function(rdata) {
-        $(".payloadingmask").remove();
-        if (rdata.status === false) {
-            layer.msg(rdata.msg, { icon: 2 });
-            return;
-        }
-        $(".pay-wx").html('');
-        $(".pay-wx").qrcode(rdata.msg);
-        clearInterval(wxpayTimeId);
-        wxpayTimeId = setInterval(function() {
-            $.post('/auth?action=get_re_order_status', function(rdata) {
-                if (rdata.status) {
-                    layer.closeAll();
-                    layer.msg("支付成功！专业版升级中，请勿操作！", { icon: 16, time: 0, shade: [0.3, "#000"] });
-                    clearInterval(wxpayTimeId);
-                    $.get("/system?action=UpdatePro", function(rr) {
-                        show_upVip();
-                    }).error(function() {
-                        show_upVip();
-                    });
-                    return;
-                }
-            })
-        }, 3000);
-
-    });
-}
-
-function anTo(pluginName, pid) {
-    layer.closeAll();
-    Renewinstall(pluginName, pid, 1);
-}
-
 
 //独立安装
 function oneInstall(name, version) {
@@ -2556,5 +2342,3 @@ $(function() {
         setInterval(function() { GetSList(true); }, 5000);
     }
 });
-
-updateSoftList();

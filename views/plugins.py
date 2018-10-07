@@ -34,7 +34,9 @@ def list():
 
     plugins_info = []
 
-    print request.args['type']
+    typeVal = request.args.get('type', '')
+    if typeVal == "":
+        typeVal = "0"
 
     for dirinfo in os.listdir(__plugin_name):
         path = __plugin_name + "/" + dirinfo
@@ -43,10 +45,13 @@ def list():
             if os.path.exists(jsonFile):
                 try:
                     tmp = json.loads(public.readFile(jsonFile))
-                    plugins_info.append(tmp)
-                    # print tmp
-                except:
+                    if typeVal == "0":
+                        plugins_info.append(tmp)
+                    else:
+                        if tmp['pid'] == typeVal:
+                            plugins_info.append(tmp)
+                except ValueError, Argument:
                     pass
-        # print dirinfo
+
     ret['data'] = plugins_info
     return jsonify(ret)
