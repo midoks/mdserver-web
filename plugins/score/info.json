@@ -11,5 +11,6 @@
 	"home":"http://www.bt.cn/bbs",
 	"date":"2017-10-16",
 	"default":false,
-	"display":0
+	"display":0,
+	"pid":"2"
 }
