@@ -1,9 +1,9 @@
 {
-	"title":"VPN",
+	"title":"MySQL 5.5",
 	"tip":"lib",
-	"name":"VPN",
-	"type":"其他插件",
-	"ps":"科学上网",
+	"name":"mysql",
+	"type":"运行环境",
+	"ps":"MySQL是一种关系数据库管理系统!",
 	"versions":[
 		{"status":false,"version":"1.0"}
 	],
@@ -14,5 +14,5 @@
 	"date":"2017-11-24",
 	"default":true,
 	"display":1,
-	"pid": "3"
+	"pid": "1"
 }
