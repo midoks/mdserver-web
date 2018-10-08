@@ -1,7 +1,6 @@
 from flask import Flask
 import views
 import sys
-import web
 import io
 import os
 
@@ -22,7 +21,7 @@ DEFAULT_MODULES = (
 )
 
 import time
-print "time.time(): %f " % time.time()
+# print "time.time(): %f " % time.time()
 app.config.version = "0.0.1" + str(time.time())
 
 
