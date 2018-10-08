@@ -25,6 +25,11 @@ def index():
     return render_template('default/ftp.html')
 
 
+@plugins.route("/gefile")
+def file():
+    pass
+
+
 @plugins.route("/list", methods=['GET', 'POST'])
 def list():
 
