@@ -25,9 +25,15 @@ def index():
     return render_template('default/ftp.html')
 
 
-@plugins.route("/gefile")
+@plugins.route("/file", methods=['GET'])
 def file():
-    pass
+    file = request.args.get('f', '')
+    print file
+    return jsonify({})
+    # if file:
+    #     print file
+    # else:
+    #     print "error"
 
 
 @plugins.route("/list", methods=['GET', 'POST'])
