@@ -66,3 +66,8 @@ def list():
 
     ret['data'] = plugins_info
     return jsonify(ret)
+
+
+@plugins.route("install", methods=['GET'])
+def install():
+    pass
