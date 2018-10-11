@@ -2119,7 +2119,7 @@ function AddVersion(name, ver, type, obj, title) {
         var data = "name=" + name + "&version=" + version + "&type=" + type;
 
         var loadT = layer.msg(lan.soft.add_install, { icon: 16, time: 0, shade: [0.3, '#000'] });
-        $.post("/plugin?action=install", data, function(rdata) {
+        $.post("/plugins/install", data, function(rdata) {
             layer.closeAll();
             layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
             GetSList();

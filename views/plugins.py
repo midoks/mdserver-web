@@ -75,6 +75,14 @@ def list():
     return jsonify(ret)
 
 
-@plugins.route("install", methods=['GET'])
+@plugins.route("/install", methods=['POST'])
 def install():
-    pass
+    name = request.form['name']
+    if name.strip() == '':
+        return ''
+
+    install = "plugins/" + name + "/install.sh"
+    print install
+    os.system('/bin/bash ' + install + ' install')
+    print request.args
+    return ''
