@@ -27,13 +27,20 @@ def index():
 
 @plugins.route("/file", methods=['GET'])
 def file():
-    file = request.args.get('f', '')
-    print file
-    return jsonify({})
-    # if file:
-    #     print file
-    # else:
-    #     print "error"
+    name = request.args.get('name', '')
+    if name.strip() == '':
+        return ''
+
+    f = request.args.get('f', '')
+    if f.strip() == '':
+        return ''
+
+    file = "plugins/" + name + "/" + f
+    if not os.path.exists(file):
+        return ""
+
+    c = public.readFile(file)
+    return c
 
 
 @plugins.route("/list", methods=['GET', 'POST'])

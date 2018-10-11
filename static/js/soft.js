@@ -1755,6 +1755,7 @@ function GetSList(isdisplay) {
     if (istype == 'undefined' || istype == 'null' || !istype) {
         istype = '0';
     }
+
     type = '&type=' + istype;
     var page = '';
     if (isdisplay) {
@@ -1762,7 +1763,9 @@ function GetSList(isdisplay) {
         setCookie('p' + getCookie('softType'), isdisplay);
     }
 
-    $.post('/plugins/list?' + search + type + page, '', function(rdata) {
+    var condition = (search + type + page).slice(1);
+    $.post('/plugins/list?' + condition, '', function(rdata) {
+        console.log(rdata);
         layer.close(loadT);
         var tBody = '';
         var sBody = '';
@@ -1836,7 +1839,9 @@ function GetSList(isdisplay) {
                 }
 
                 sBody += '<tr>' +
-                    '<td><span ' + titleClick + '><img src="/static/img/soft_ico/ico-' + rdata.data[i].name + '.png">' + rdata.data[i].title + ' ' + version + '</span></td>' +
+                    '<td><span ' + titleClick + 
+                    '><img src="/plugins/file?name=' + rdata.data[i].name + 
+                    '&f=ico.png' + '">' + rdata.data[i].title + ' ' + version + '</span></td>' +
                     '<td>' + rdata.data[i].ps + '</td>' +
                     '<td>' + softPath + '</td>' +
                     '<td>' + state + '</td>' +
@@ -1887,7 +1892,7 @@ function GetSList(isdisplay) {
                         handle = '<a style="color:#C0C0C0;" href="javascript:task();">' + lan.soft.sleep_install + '</a>'
                     }
                     pBody += '<tr>' +
-                        '<td><span ' + titleClick + '><img src="/static/img/soft_ico/ico-' + rdata.data[i].name + '.png">' + rdata.data[i].title + '-' + rdata.data[i].versions[n].version + '</span></td>'
+                        '<td><span ' + titleClick + '><img src="/plugins/file?name=' + rdata.data[i].name + "&f=ico.png"+ '">' + rdata.data[i].title + '-' + rdata.data[i].versions[n].version + '</span></td>'
                         //+'<td>'+rdata.data[i].versions[n].no+'</td>'
                         //+'<td>'+rdata.data[i].type+'</td>'
                         +
