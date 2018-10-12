@@ -16,13 +16,7 @@ import json
 
 
 plugins = Blueprint('plugins', __name__, template_folder='templates')
-
 __plugin_name = "plugins"
-
-
-@plugins.route("/")
-def index():
-    return render_template('default/ftp.html')
 
 
 @plugins.route("/file", methods=['GET'])
@@ -78,11 +72,19 @@ def list():
 @plugins.route("/install", methods=['POST'])
 def install():
 
+    rundir = public.getRunDir()
+
     name = request.form['name']
     if name.strip() == '':
         return ''
 
-    install = "plugins/" + name + "/install.sh"
+    infoJson = __plugin_name + "/" + name + "/info.json"
+    install = __plugin_name + "/" + name + "/install.sh"
+
+    pluginInfo = json.loads(public.readFile(infoJson))
+
+    print pluginInfo
+
     print install
     os.system('/bin/bash ' + install + ' install')
     print request.args
