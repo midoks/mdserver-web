@@ -6,7 +6,7 @@ import time
 import string
 
 
-def runDir():
+def getRunDir():
     return os.getcwd()
 
 
@@ -26,10 +26,9 @@ def md5(str):
     except:
         return False
 
-# 文件的MD5值
-
 
 def GetFileMd5(filename):
+    # 文件的MD5值
     if not os.path.isfile(filename):
         return False
     import hashlib
@@ -43,10 +42,9 @@ def GetFileMd5(filename):
     f.close()
     return myhash.hexdigest()
 
-# 取随机字符串
-
 
 def GetRandomString(length):
+    # 取随机字符串
     from random import Random
     str = ''
     chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789'
@@ -92,10 +90,9 @@ def returnMsg(status, msg, args=()):
             msg = msg.replace(rep, args[i])
     return {'status': status, 'msg': msg}
 
-# 取提示消息
-
 
 def getMsg(key, args=()):
+    # 取提示消息
     try:
         import json
         logMessage = json.loads(
@@ -111,10 +108,9 @@ def getMsg(key, args=()):
     except:
         return key
 
-# 取提示消息
-
 
 def getLan(key):
+    # 取提示消息
     import json
     logMessage = json.loads(
         readFile('static/language/' + get_language() + '/template.json'))
