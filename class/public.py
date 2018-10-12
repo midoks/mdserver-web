@@ -6,6 +6,10 @@ import time
 import string
 
 
+def runDir():
+    return os.getcwd()
+
+
 def M(table):
     import db
     sql = db.Sql()

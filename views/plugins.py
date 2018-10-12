@@ -77,6 +77,7 @@ def list():
 
 @plugins.route("/install", methods=['POST'])
 def install():
+
     name = request.form['name']
     if name.strip() == '':
         return ''
