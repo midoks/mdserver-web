@@ -18,6 +18,12 @@
 	"versions": [
         {
             "status": false,
+            "version": "5.2",
+            "no": "",
+            "task": "1"
+        },
+        {
+            "status": false,
             "version": "5.3",
             "no": "",
             "task": "1"

@@ -5,7 +5,7 @@
 	"type":"其他插件",
 	"ps":"轻量级，占有内存少，并发能力强",
 	"shell":"install.sh",
-	"checks":"/www/server/panel/plugin/safelogin",
+	"checks":"/www/server/panel/plugin/nginx",
 	"author":"伊戈尔·赛索耶夫",
 	"home":"https://www.nginx.org",
 	"path": "/www/server/nginx",

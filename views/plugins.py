@@ -69,23 +69,28 @@ def list():
     return jsonify(ret)
 
 
-@plugins.route("/install", methods=['POST'])
+@plugins.route('/install', methods=['POST'])
 def install():
 
     rundir = public.getRunDir()
 
-    name = request.form['name']
+    name = request.form.get('name', '')
+
     if name.strip() == '':
-        return ''
+        return public.retJson(-1, "123", ())
 
-    infoJson = __plugin_name + "/" + name + "/info.json"
-    install = __plugin_name + "/" + name + "/install.sh"
+    infoJsonPos = __plugin_name + '/' + name + '/' + 'info.json'
 
-    pluginInfo = json.loads(public.readFile(infoJson))
+    if not os.path.exists(infoJsonPos):
+        return public.retJson(-1, "1233", ())
+    pluginInfo = json.loads(public.readFile(infoJsonPos))
 
-    print pluginInfo
-
-    print install
-    os.system('/bin/bash ' + install + ' install')
+    sh = __plugin_name + '/' + name + '/' + pluginInfo['shell']
+    os.system('/bin/bash ' + sh + ' install')
     print request.args
     return ''
+
+
+@plugins.route('/uninstall', methods=['POST'])
+def uninstall():
+    pass

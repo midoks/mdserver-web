@@ -4,6 +4,15 @@ import os
 import sys
 import time
 import string
+import json
+import hashlib
+import shlex
+import datetime
+import subprocess
+import re
+
+from random import Random
+from flask import jsonify
 
 
 def getRunDir():
@@ -31,7 +40,7 @@ def GetFileMd5(filename):
     # 文件的MD5值
     if not os.path.isfile(filename):
         return False
-    import hashlib
+
     myhash = hashlib.md5()
     f = file(filename, 'rb')
     while True:
@@ -45,7 +54,6 @@ def GetFileMd5(filename):
 
 def GetRandomString(length):
     # 取随机字符串
-    from random import Random
     str = ''
     chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789'
     chrlen = len(chars) - 1
@@ -57,7 +65,6 @@ def GetRandomString(length):
 
 def checkCode(code, outime=120):
     # 校验验证码
-    import time
     import web
     try:
         if md5(code.lower()) != web.ctx.session.codeStr:
@@ -70,6 +77,10 @@ def checkCode(code, outime=120):
     except:
         web.ctx.session.login_error = getMsg('CODE_NOT_EXISTS')
         return False
+
+
+def retJson(status, msg, data=()):
+    return jsonify({'status': status, 'msg': msg, 'data': data})
 
 
 def returnJson(status, msg, args=()):
@@ -94,7 +105,6 @@ def returnMsg(status, msg, args=()):
 def getMsg(key, args=()):
     # 取提示消息
     try:
-        import json
         logMessage = json.loads(
             readFile('static/language/' + get_language() + '/public.json'))
         keys = logMessage.keys()
@@ -111,7 +121,7 @@ def getMsg(key, args=()):
 
 def getLan(key):
     # 取提示消息
-    import json
+
     logMessage = json.loads(
         readFile('static/language/' + get_language() + '/template.json'))
     keys = logMessage.keys()
@@ -221,11 +231,9 @@ def httpPost(url, data, timeout=30):
         #WriteLog('网络诊断',str(ex) + '['+url+']');
         return str(ex)
 
-# 写进度
-
 
 def writeSpeed(title, used, total, speed=0):
-    import json
+    # 写进度
     if not title:
         data = {'title': None, 'progress': 0,
                 'total': 0, 'used': 0, 'speed': 0}
@@ -236,11 +244,9 @@ def writeSpeed(title, used, total, speed=0):
     writeFile('/tmp/panelSpeed.pl', json.dumps(data))
     return True
 
-# 取进度
-
 
 def getSpeed():
-    import json
+    # 取进度
     data = readFile('/tmp/panelSpeed.pl')
     if not data:
         data = json.dumps({'title': None, 'progress': 0,
@@ -250,10 +256,6 @@ def getSpeed():
 
 
 def ExecShell(cmdstring, cwd=None, timeout=None, shell=True):
-    import shlex
-    import datetime
-    import subprocess
-    import time
 
     if shell:
         cmdstring_list = cmdstring
@@ -396,11 +398,9 @@ def getStrBetween(startStr, endStr, srcStr):
         return None
     return srcStr[start + 1:end]
 
-# 取CPU类型
-
 
 def getCpuType():
-    import re
+    # 取CPU类型
     cpuinfo = open('/proc/cpuinfo', 'r').read()
     rep = "model\s+name\s+:\s+(.+)"
     tmp = re.search(rep, cpuinfo)
