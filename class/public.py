@@ -13,16 +13,15 @@ import re
 import hashlib
 
 
-def getRunDir():
-    return os.getcwd()
-
-runDir = getRunDir()
-print runDir + "/class/"
-sys.path.append(runDir + "/class/")
+sys.path.append(os.getcwd() + "/class/")
 import db
 
 from random import Random
-from flask import jsonify
+# from flask import jsonify
+
+
+def getRunDir():
+    return os.getcwd()
 
 
 def M(table):
