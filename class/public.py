@@ -10,17 +10,23 @@ import shlex
 import datetime
 import subprocess
 import re
-
-from random import Random
-from flask import jsonify
+import hashlib
 
 
 def getRunDir():
     return os.getcwd()
 
+runDir = getRunDir()
+print runDir + "/class/"
+sys.path.append(runDir + "/class/")
+import db
+
+from random import Random
+from flask import jsonify
+
 
 def M(table):
-    import db
+
     sql = db.Sql()
     return sql.table(table)
 
@@ -28,7 +34,6 @@ def M(table):
 def md5(str):
     # 生成MD5
     try:
-        import hashlib
         m = hashlib.md5()
         m.update(str)
         return m.hexdigest()
@@ -89,7 +94,6 @@ def returnJson(status, msg, args=()):
 
 
 def returnMsg(status, msg, args=()):
-    import json
     # 取通用字曲返回
     logMessage = json.loads(
         readFile('static/language/' + get_language() + '/public.json'))

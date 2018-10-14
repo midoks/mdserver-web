@@ -40,6 +40,8 @@ def file():
 @plugins.route("/list", methods=['GET', 'POST'])
 def list():
 
+    public.M('tasks')
+
     data = json.loads(public.readFile("data/type.json"))
     ret = {}
     ret["type"] = data
@@ -73,16 +75,16 @@ def list():
 def install():
 
     rundir = public.getRunDir()
-
     name = request.form.get('name', '')
 
     if name.strip() == '':
-        return public.retJson(-1, "123", ())
+        return public.retJson(-1, "缺少name数据!", ())
 
     infoJsonPos = __plugin_name + '/' + name + '/' + 'info.json'
 
     if not os.path.exists(infoJsonPos):
-        return public.retJson(-1, "1233", ())
+        return public.retJson(-1, "info.json数据不存在!", ())
+
     pluginInfo = json.loads(public.readFile(infoJsonPos))
 
     sh = __plugin_name + '/' + name + '/' + pluginInfo['shell']
