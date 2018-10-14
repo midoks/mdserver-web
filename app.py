@@ -1,8 +1,10 @@
-from flask import Flask
-import views
 import sys
 import io
 import os
+
+import views
+from flask import Flask
+from datetime import timedelta
 
 sys.path.append("class/")
 
@@ -18,11 +20,16 @@ DEFAULT_MODULES = (
     (views.config, "/config"),
     (views.plugins, "/plugins"),
     (views.task, "/task"),
+    (views.system, "/system"),
+    (views.database, "/database")
 )
 
 import time
 # print "time.time(): %f " % time.time()
 app.config.version = "0.0.1" + str(time.time())
+
+app.config['SECRET_KEY'] = os.urandom(24)
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
 
 
 def setting_modules(app, modules):

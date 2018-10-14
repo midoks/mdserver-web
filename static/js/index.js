@@ -135,7 +135,7 @@ function GetPercent(num, total) {
 
 
 function GetDiskInfo() {
-    $.get('/system?action=GetDiskInfo', function(rdata) {
+    $.get('/system/disknfo', function(rdata) {
         var dBody
         for (var i = 0; i < rdata.length; i++) {
             if (rdata[i].path == '/' || rdata[i].path == '/www') {
@@ -233,7 +233,7 @@ function getNet() {
     var down;
     $.ajax({
         type: "get",
-        url: "/system?action=GetNetWork",
+        url: "/system/network",
         async: true,
         success: function(net) {
             $("#InterfaceSpeed").html(lan.index.interfacespeed + "： 1.0Gbps");
