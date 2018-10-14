@@ -21,7 +21,8 @@ DEFAULT_MODULES = (
     (views.plugins, "/plugins"),
     (views.task, "/task"),
     (views.system, "/system"),
-    (views.database, "/database")
+    (views.database, "/database"),
+    (views.crontab, "/crontab")
 )
 
 import time

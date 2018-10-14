@@ -17,11 +17,17 @@ sys.path.append(os.getcwd() + "/class/")
 import db
 
 from random import Random
-# from flask import jsonify
+from flask import jsonify
 
 
 def getRunDir():
+    # 运行目录
     return os.getcwd()
+
+
+def getBinDir():
+    # 安装软件
+    pass
 
 
 def M(table):

@@ -1,4 +1,7 @@
-$def with (data)
+{% extends "default/layout.html" %}
+
+{% block content %}
+
 <div class="main-content">
 		<div class="container-fluid" style="padding-bottom:54px">
 			<div class="pos-box bgw mtb15">
@@ -173,3 +176,4 @@ $def with (data)
 	toShell();
 	getCronData();
 </script>
+{% endblock %}
