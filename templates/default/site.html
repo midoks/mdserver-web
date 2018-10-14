@@ -6,7 +6,7 @@
 			<div class="container-fluid">
 				<div class="pos-box bgw mtb15">
 					<div class="position f14 c9 pull-left">
-							<a class="plr10 c4" href="/">$tData['lan']['H1']</a>/<span class="plr10 c4">$tData['lan']['H2']</span>
+							<a class="plr10 c4" href="/">首页</a>/<span class="plr10 c4">网站</span>
 						</div>
 					<div class="search pull-right">
 						<form target="hid" onsubmit='getWeb(1,$$("#SearchValue").prop("value"))'>
@@ -18,13 +18,13 @@
 				</div>
 				<div class="safe bgw mtb15 pd15">
 					<div class="important-title">
-						<p><span class="glyphicon glyphicon-alert" style="color: #f39c12; margin-right: 10px;"></span> $tData['lan']['PS']</p>
+						<p><span class="glyphicon glyphicon-alert" style="color: #f39c12; margin-right: 10px;"></span>使用MDWEB Linux面板创建站点时会自动创建权限配置，统一使用www用户。</p>
 					</div>
-					<button onclick="webAdd(0)" class="btn btn-success btn-sm btn-title" type="button">$tData['lan']['BTN1']</button>&nbsp;
-					<button onclick="SiteDefaultPage()" class="btn btn-default btn-sm btn-title" type="button">$tData['lan']['BTN2']</button>
-					<button onclick="GetDefaultSite()" class="btn btn-default btn-sm btn-title" type="button">$tData['lan']['BTN3']</button>
+					<button onclick="webAdd(0)" class="btn btn-success btn-sm btn-title" type="button">添加站点</button>&nbsp;
+					<button onclick="SiteDefaultPage()" class="btn btn-default btn-sm btn-title" type="button">修改默认页</button>
+					<button onclick="GetDefaultSite()" class="btn btn-default btn-sm btn-title" type="button">默认站点</button>
 					<span id="allDelete" style="float: right;display: none;">
-						<button onclick="allDeleteSite();" class="btn btn-default btn-sm">$tData['lan']['BTN4']</button>
+						<button onclick="allDeleteSite();" class="btn btn-default btn-sm">网站搜索</button>
 					</span>
 					<div class="divtable mtb10">
 						<div class="tablescroll">
@@ -32,14 +32,14 @@
 							<thead>
 								<tr>
 									<th width="30"><input type="checkbox" onclick="checkSelect();" id="setBox"></th>
-									<th width="150" onclick="listOrder('name','site',this)" style="cursor: pointer;">$tData['lan']['TH1']<span class="glyphicon glyphicon-triangle-top" style="margin-left:5px;color:#bbb"></span></th>
-									<th onclick="listOrder('status','site',this)" style="cursor: pointer;" width="98">$tData['lan']['TH2']<span class="glyphicon glyphicon-triangle-top" style="margin-left:5px;color:#bbb"></span></th>
-									<th width="58">$tData['lan']['TH3']</th>
-									<th width="26%">$tData['lan']['TH4']</th>
-									<th onclick="listOrder('edate','site',this)" style="cursor: pointer;" width="86">$tData['lan']['TH5']<span class="glyphicon glyphicon-triangle-top" style="margin-left:5px;color:#bbb"></span></th>
-									<th>$tData['lan']['TH6']</th>
+									<th width="150" onclick="listOrder('name','site',this)" style="cursor: pointer;">域名<span class="glyphicon glyphicon-triangle-top" style="margin-left:5px;color:#bbb"></span></th>
+									<th onclick="listOrder('status','site',this)" style="cursor: pointer;" width="98">网站状态<span class="glyphicon glyphicon-triangle-top" style="margin-left:5px;color:#bbb"></span></th>
+									<th width="58">备份</th>
+									<th width="26%">网站目录</th>
+									<th onclick="listOrder('edate','site',this)" style="cursor: pointer;" width="86">到期日期<span class="glyphicon glyphicon-triangle-top" style="margin-left:5px;color:#bbb"></span></th>
+									<th>备注</th>
 									<th>防火墙</th>
-									<th width='130' class='text-right'>$tData['lan']['TH7']</th>
+									<th width='130' class='text-right'>操作</th>
 								</tr>
 							</thead>
 							<tbody id="webBody"></tbody>

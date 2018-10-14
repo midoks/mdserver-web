@@ -8,11 +8,10 @@ import psutil
 import time
 import sys
 import os
-
+import json
 
 sys.path.append("class/")
 import public
-import json
 
 
 plugins = Blueprint('plugins', __name__, template_folder='templates')
@@ -96,3 +95,25 @@ def install():
 @plugins.route('/uninstall', methods=['POST'])
 def uninstall():
     pass
+
+
+@plugins.route('/installed', methods=['POST'])
+def installed():
+
+    rundir = public.getRunDir()
+    name = request.form.get('name', '')
+
+    if name.strip() == '':
+        return public.retJson(-1, "缺少name数据!", ())
+
+    infoJsonPos = __plugin_name + '/' + name + '/' + 'info.json'
+
+    if not os.path.exists(infoJsonPos):
+        return public.retJson(-1, "info.json数据不存在!", ())
+
+    pluginInfo = json.loads(public.readFile(infoJsonPos))
+
+    sh = __plugin_name + '/' + name + '/' + pluginInfo['shell']
+    os.system('/bin/bash ' + sh + ' install')
+    print request.args
+    return ''
