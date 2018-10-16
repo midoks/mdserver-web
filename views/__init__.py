@@ -10,3 +10,4 @@ from plugins import *
 from database import *
 from crontab import *
 from firewall import *
+from control import *
