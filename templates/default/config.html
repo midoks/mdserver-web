@@ -44,9 +44,19 @@
 				</div>
 				<div class="setting-con pd15">
 					<form id="set-Config">
-						<p class="mtb15"><span class="set-tit text-right" title="$data['lan']['CT1']">$data['lan']['CT1']</span><input id="webname" name="webname" class="inputtxt bt-input-text" type="text" value="$web.ctx.session.webname" ><span class="set-info c7">$data['lan']['CY1']</span></p>
-						<p class="mtb15"><span class="set-tit text-right" title="$data['lan']['CT2']">$data['lan']['CT2']</span><input id="banport" name="port" class="inputtxt bt-input-text" type="numner" value="$data['panel']['port']" maxlength="5"><span class="set-info c7">$data['lan']['CY2']</span></p>
-						<p class="mtb15"><span class="set-tit text-right" title="$data['lan']['CT3']">$data['lan']['CT3']</span><input name="domain" class="inputtxt bt-input-text" type="text" value="$data['panel']['domain']"><span class="set-info c7">$:data['lan']['CY3']</span></p>
+						<p class="mtb15">
+							<span class="set-tit text-right" title="别名">别名</span>
+							<input id="webname" name="webname" class="inputtxt bt-input-text" type="text" value="MDWEB面板" ><span class="set-info c7">MDWEB面板</span>
+						</p>
+						<p class="mtb15">
+							<span class="set-tit text-right" title="面板端口">面板端口</span>
+							<input id="banport" name="port" class="inputtxt bt-input-text" type="numner" value="8888" maxlength="5"><span class="set-info c7">建议端口范围8888 - 65535</span>
+						</p>
+						<p class="mtb15">
+							<span class="set-tit text-right" title="域名">域名</span>
+							<input name="domain" class="inputtxt bt-input-text" type="text" value="">
+							<span class="set-info c7">为面板绑定一个访问域名;注意：一旦绑定域名,只能通过域名访问面板!</span>
+						</p>
 						<p class="mtb15"><span class="set-tit text-right" title="$data['lan']['CT4']">$data['lan']['CT4']</span><input name="limitip" class="inputtxt bt-input-text" type="text" value="$data['panel']['limitip']"><span class="set-info c7">$:data['lan']['CY4']</span></p>
 						<p class="mtb15"><span class="set-tit text-right" title="$data['lan']['CT5']">$data['lan']['CT5']</span><input name="sites_path" class="inputtxt bt-input-text" type="text" value="$data['sites_path']"><span class="set-info c7">$data['lan']['CY5']</span></p>
 						<p class="mtb15"><span class="set-tit text-right" title="$data['lan']['CT6']">$data['lan']['CT6']</span><input name="backup_path" class="inputtxt bt-input-text" type="text" value="$data['backup_path']"><span class="set-info c7">$data['lan']['CY6']</span></p>
