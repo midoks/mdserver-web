@@ -24,6 +24,7 @@ DEFAULT_MODULES = (
     (views.database, "/database"),
     (views.crontab, "/crontab"),
     (views.firewall, "/firewall"),
+    (views.control, "/control"),
 )
 
 import time
