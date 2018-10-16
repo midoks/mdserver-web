@@ -1,4 +1,7 @@
-$def with (data)
+{% extends "default/layout.html" %}
+
+{% block content %}
+
 <style>
 	.weblog{
 		font-size: 14px;
@@ -21,7 +24,7 @@ $def with (data)
 		<div class="container-fluid" style="padding-bottom: 50px;">
 			<div class="pos-box bgw mtb15">
 				<div class="position f14 c9 pull-left">
-					<a class="plr10 c4" href="/">$data['lan']['H1']</a>/<span class="plr10 c4">$data['lan']['H2']</span>
+					<a class="plr10 c4" href="/">首页</a>/<span class="plr10 c4">系统安全</span>
 				</div>
 				<div class="search pull-right">
 					<form target="hid" onsubmit='getLogs(1,$$("#SearchValue").prop("value"))'>
@@ -35,7 +38,7 @@ $def with (data)
 				<div class="mr50 pull-left">
 					<form>
 						<div class="ss-text pull-left">
-							<em>$data['lan']['BTN1']</em>
+							<em>启用SSH</em>
 							<div class='ssh-item' id="in_safe">
 								
 							</div>
@@ -44,11 +47,11 @@ $def with (data)
 				</div>
 				<div class="mr50 pull-left">
 					<div class="ss-text pull-left mr5">
-						<em>$data['lan']['BTN2']</em>
+						<em>SSH端口:</em>
 						<input type="text" class="bt-input-text" id="mstscPort" value=""  />
 					</div>
 					<div class="ss-text pull-left">
-						<button id="mstscSubmit" onclick='mstsc($$("#mstscPort").prop("value"))' class="btn btn-default btn-sm" type="button">$data['lan']['BTN3']</button>
+						<button id="mstscSubmit" onclick='mstsc($$("#mstscPort").prop("value"))' class="btn btn-default btn-sm" type="button">更改</button>
 					</div>
 				</div>
 				<div class="mr50 pull-left" style="border-right: 1px solid #ccc; padding-right: 40px;">
@@ -132,3 +135,5 @@ $def with (data)
 	</div>
 </div> 
 <script src="/static/js/firewall.js?date=20170920"></script>
+
+{% endblock %}
