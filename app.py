@@ -22,7 +22,8 @@ DEFAULT_MODULES = (
     (views.task, "/task"),
     (views.system, "/system"),
     (views.database, "/database"),
-    (views.crontab, "/crontab")
+    (views.crontab, "/crontab"),
+    (views.firewall, "/firewall"),
 )
 
 import time
