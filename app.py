@@ -2,7 +2,7 @@ import sys
 import io
 import os
 
-import views
+import route
 from flask import Flask
 from datetime import timedelta
 
@@ -13,18 +13,18 @@ app.debug = True
 
 
 DEFAULT_MODULES = (
-    (views.dashboard, "/"),
-    (views.site, "/site"),
-    (views.files, "/files"),
-    (views.soft, "/soft"),
-    (views.config, "/config"),
-    (views.plugins, "/plugins"),
-    (views.task, "/task"),
-    (views.system, "/system"),
-    (views.database, "/database"),
-    (views.crontab, "/crontab"),
-    (views.firewall, "/firewall"),
-    (views.control, "/control"),
+    (route.dashboard, "/"),
+    (route.site, "/site"),
+    (route.files, "/files"),
+    (route.soft, "/soft"),
+    (route.config, "/config"),
+    (route.plugins, "/plugins"),
+    (route.task, "/task"),
+    (route.system, "/system"),
+    (route.database, "/database"),
+    (route.crontab, "/crontab"),
+    (route.firewall, "/firewall"),
+    (route.control, "/control"),
 )
 
 import time
