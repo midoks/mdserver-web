@@ -62,19 +62,41 @@
 						<p class="mtb15">
 							<span class="set-tit text-right" title="默认建站目录">默认建站目录</span>
 							<input name="sites_path" class="inputtxt bt-input-text" type="text" value="">
+							<span class="set-info c7">新创建的站点,默认将保存到该目录的下级目录!</span>
+						</p>
+
+						<p class="mtb15">
+							<span class="set-tit text-right" title="默认建站目录">默认备份目录</span>
+							<input name="sites_path" class="inputtxt bt-input-text" type="text" value="">
 							<span class="set-info c7">网站和数据库的备份目录!</span>
 						</p>
-						<p class="mtb15"><span class="set-tit text-right" title="$data['lan']['CT6']">$data['lan']['CT6']</span><input name="backup_path" class="inputtxt bt-input-text" type="text" value="$data['backup_path']"><span class="set-info c7">$data['lan']['CY6']</span></p>
-						<p class="mtb15"><span class="set-tit text-right" title="$data['lan']['CT7']">$data['lan']['CT7']</span><input name="address" class="inputtxt bt-input-text" type="text" value="$data['panel']['address']"><span class="set-info c7">$data['lan']['CY7']</span></p>
-						<p class="mtb15"><span class="set-tit text-right" title="$data['lan']['CT8']">$data['lan']['CT8']</span><input id="systemdate" name="systemdate" class="inputtxt bt-input-text disable" type="text" value="$data['systemdate']"><span class="modify btn btn-xs btn-success" onclick="syncDate()">$data['lan']['CY8']</span></p>
-						<p class="mtb15"><span class="set-tit text-right" title="$data['lan']['CT9']">$data['lan']['CT9']</span><input name="username_" class="inputtxt bt-input-text disable" type="text" value="$web.ctx.session.username" disabled><span class="modify btn btn-xs btn-success" onclick="setUserName()">$data['lan']['CY9']</span></p>
-						<p class="mtb15"><span class="set-tit text-right" title="$data['lan']['CT10']">$data['lan']['CT10']</span><input name="password_" class="inputtxt bt-input-text disable" type="text" value="******" disabled><span class="modify btn btn-xs btn-success" onclick="setPassword()">$data['lan']['CY10']</span></p>
-						<p class="mtb15"><span class="set-tit text-right" title="$data['lan']['CT11']">$data['lan']['CT11']</span><input name="btusername" class="inputtxt bt-input-text disable" type="text" value="" disabled><span class="modify btn btn-xs btn-success mr5" onclick="bindBTName(2,'b')">$data['lan']['CY11']</span></p>
+
+						<p class="mtb15">
+							<span class="set-tit text-right" title="服务器IP">服务器IP</span>
+							<input name="backup_path" class="inputtxt bt-input-text" type="text" value="">
+							<span class="set-info c7">
+								默认为外网IP,若您在本地虚拟机测试,请填写虚拟机内网IP!
+							</span>
+						</p>
+						
+						<p class="mtb15">
+							<span class="set-tit text-right" title="服务器时间">服务器时间</span>
+							<input id="systemdate" name="systemdate" class="inputtxt bt-input-text disable" type="text" value=""><span class="modify btn btn-xs btn-success" onclick="syncDate()">同步</span>
+						</p>
+						<p class="mtb15">
+							<span class="set-tit text-right" title="面板用户">面板用户</span>
+							<input name="username_" class="inputtxt bt-input-text disable" type="text" value="" disabled><span class="modify btn btn-xs btn-success" onclick="setUserName()">修改</span>
+						</p>
+						<p class="mtb15">
+							<span class="set-tit text-right" title="面板密码">面板密码</span>
+							<input name="password_" class="inputtxt bt-input-text disable" type="text" value="******" disabled><span class="modify btn btn-xs btn-success" onclick="setPassword()">修改</span>
+						</p>
+				
 						
 
 						
 					</form>
-					<div class="bt-submit set-submit">$data['lan']['C4']</div>
+					<div class="bt-submit set-submit">保存</div>
 				</div>
 			</div>
 		</div>

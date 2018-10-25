@@ -1,4 +1,7 @@
-$def with (data)
+{% extends "default/layout.html" %}
+
+{% block content %}
+
 <div class="main-content">
 		<div class="container-fluid" style="padding-bottom: 50px;">
 			<div class="pos-box bgw mtb15">
@@ -132,5 +135,7 @@ $def with (data)
 		</div>
 	</div>
 </div>
-<script src="/static/js/echarts.min.js"></script>
-<script src="/static/js/control.js?date=20180321"></script>
+<script src="/static/js/echarts.min.js?v={{config.version}}"></script>
+<script src="/static/js/control.js?v={{config.version}}"></script>
+
+{% endblock %}
