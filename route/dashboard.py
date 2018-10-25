@@ -13,3 +13,8 @@ dashboard = Blueprint('dashboard', __name__, template_folder='templates')
 @dashboard.route("/")
 def index():
     return render_template('default/index.html')
+
+
+@dashboard.route("/login")
+def login():
+    return render_template('default/login.html')
