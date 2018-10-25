@@ -76,6 +76,11 @@ def install():
     rundir = public.getRunDir()
     name = request.form.get('name', '')
 
+    mmsg = '安装'
+    if hasattr(request.form, 'upgrade'):
+        mtype = 'update'
+        mmsg = 'upgrade'
+
     if name.strip() == '':
         return public.retJson(-1, "缺少name数据!", ())
 
@@ -86,8 +91,15 @@ def install():
 
     pluginInfo = json.loads(public.readFile(infoJsonPos))
 
-    sh = __plugin_name + '/' + name + '/' + pluginInfo['shell']
-    os.system('/bin/bash ' + sh + ' install')
+    print name
+    taskAdd = (None, mmsg + '[' + name + '-' + "1" + ']',
+               'execshell', '0', time.strftime('%Y-%m-%d %H:%M:%S'), '1')
+
+    print taskAdd
+    public.M('tasks').add('id,name,type,status,addtime, execstr', taskAdd)
+
+    # sh = __plugin_name + '/' + name + '/' + pluginInfo['shell']
+    # os.system('/bin/bash ' + sh + ' install')
     print request.args
     return ''
 

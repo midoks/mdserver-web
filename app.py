@@ -4,6 +4,9 @@ import sys
 import io
 import os
 
+reload(sys)
+sys.setdefaultencoding('utf8')
+
 import route
 from flask import Flask
 from datetime import timedelta
