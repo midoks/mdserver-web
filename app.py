@@ -50,4 +50,4 @@ try:
     if __name__ == "__main__":
         app.run()
 except Exception as ex:
-    return str(ex)
+    print ex
