@@ -31,7 +31,6 @@ def getBinDir():
 
 
 def M(table):
-
     sql = db.Sql()
     return sql.table(table)
 

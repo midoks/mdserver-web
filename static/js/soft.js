@@ -6,7 +6,7 @@ function phpSoftMain(name, key) {
     }
 
     var loadT = layer.msg(lan.public.the, { icon: 16, time: 0, shade: [0.3, '#000'] });
-    $.get('/plugin?action=getPluginInfo&name=php', function(rdata) {
+    $.get('/plugins?action=getPluginInfo&name=php', function(rdata) {
         layer.close(loadT);
         nameA = rdata.versions[key];
         bodys = [
@@ -1765,7 +1765,7 @@ function GetSList(isdisplay) {
 
     var condition = (search + type + page).slice(1);
     $.post('/plugins/list?' + condition, '', function(rdata) {
-        // console.log(rdata);
+        console.log(rdata);
         layer.close(loadT);
         var tBody = '';
         var sBody = '';
@@ -1780,7 +1780,7 @@ function GetSList(isdisplay) {
         }
 
         $(".softtype").html(tBody);
-        $("#softPage").html(rdata.page);
+        $("#softPage").html(rdata.list.page);
         $("#softPage .Pcount").css({ "position": "absolute", "left": "0" })
 
         $(".task").text(rdata.data[rdata.length - 1]);
@@ -1935,7 +1935,7 @@ function SoftUpdate(name, version, update) {
     SafeMessage('更新[' + name + ']', '更新过程可能会导致服务中断,您真的现在就将[' + name + ']更新到[' + update + ']吗?', function() {
         var data = "name=" + name + "&version=" + version + "&type=0&upgrade=" + update;
         var loadT = layer.msg('正在更新[' + name + '-' + version + '],请稍候...', { icon: 16, time: 0, shade: [0.3, '#000'] });
-        $.post('/plugin?action=install', data, function(rdata) {
+        $.post('/plugins/install', data, function(rdata) {
             if (rdata.status) {
                 GetTaskCount();
                 layer.msg('已添加到任务列表,请稍候...', { icon: 1 });
@@ -2037,7 +2037,7 @@ function AddVersion(name, ver, type, obj, title) {
             $(obj).text(lan.soft.install_the);
             var data = "name=" + name;
             var loadT = layer.msg(lan.soft.the_install, { icon: 16, time: 0, shade: [0.3, '#000'] });
-            $.post("/plugin?action=install", data, function(rdata) {
+            $.post("/plugins/install", data, function(rdata) {
                 layer.close(loadT);
                 layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
                 setTimeout(function() { GetSList() }, 2000)
@@ -2197,7 +2197,7 @@ function UninstallVersion(name, version, title) {
     layer.confirm(lan.soft.uninstall_confirm.replace('{1}', title).replace('{2}', version), { icon: 3, closeBtn: 2 }, function() {
         var data = 'name=' + name + '&version=' + version;
         var loadT = layer.msg(lan.public.the, { icon: 16, time: 0, shade: [0.3, '#000'] });
-        $.post('/plugin?action=unInstall', data, function(rdata) {
+        $.post('/plugins?action=unInstall', data, function(rdata) {
             layer.close(loadT)
             GetSList();
             layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
@@ -2325,7 +2325,7 @@ function toIndexDisplay(name, version) {
         status = $("#index_" + name + verinfo).prop("checked") ? "0" : "1";
     }
     var data = "name=" + name + "&status=" + status + "&version=" + version;
-    $.post("plugin?action=setPluginStatus", data, function(rdata) {
+    $.post("/plugins?action=setPluginStatus", data, function(rdata) {
         if (rdata.status) {
             layer.msg(rdata.msg, { icon: 1 })
         }
@@ -2335,7 +2335,7 @@ function toIndexDisplay(name, version) {
 //刷新缓存
 function flush_cache() {
     var loadT = layer.msg(lan.soft.get_list, { icon: 16, time: 0, shade: [0.3, '#000'] })
-    $.post('/plugin?action=flush_cache', {}, function(rdata) {
+    $.post('/plugins?action=flush_cache', {}, function(rdata) {
         layer.close(loadT)
         layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
     });
