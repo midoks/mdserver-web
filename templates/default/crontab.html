@@ -6,16 +6,16 @@
 		<div class="container-fluid" style="padding-bottom:54px">
 			<div class="pos-box bgw mtb15">
 				<div class="position f14 c9 pull-left">
-					<a class="plr10 c4" href="/">$data['lan']['H1']</a>/<span class="plr10 c4">$data['lan']['H2']</span>
+					<a class="plr10 c4" href="/">首页</a>/<span class="plr10 c4">计划任务</span>
 				</div>
 			</div>
 			<div class="setbox bgw mtb15">
 				<div class="title c6 plr15">
-					<h3 class="f16">$data['lan']['H3']</h3>
+					<h3 class="f16">添加计划任务</h3>
 				</div>
 				<div class="setting-con ptb20">
 					<div class="clearfix plan">
-						<span class="typename c4 pull-left f14 text-right mr20">$data['lan']['T1']</span>
+						<span class="typename c4 pull-left f14 text-right mr20">任务类型</span>
 						<div class="dropdown planjs pull-left mr20">
 							<button class="btn btn-default dropdown-toggle" type="button" id="excode" data-toggle="dropdown" style="width:auto">
                                 <b val="toShell">$data['lan']['TT1']</b>
@@ -45,11 +45,11 @@
 						<span class="planSign"><i>*</i>$data['lan']['PS']</span>
 					</div>
 					<div class="clearfix plan">
-						<span class="typename c4 pull-left f14 text-right mr20">$data['lan']['T2']</span>
+						<span class="typename c4 pull-left f14 text-right mr20">任务名称</span>
 						<div class="planname pull-left"><input type="text" name="name" class="bt-input-text"></div>
 					</div>
 					<div class="clearfix plan">
-						<span class="typename c4 pull-left f14 text-right mr20">$data['lan']['T3']</span>
+						<span class="typename c4 pull-left f14 text-right mr20">执行周期</span>
 						<div class="dropdown plancycle pull-left mr20">
 							<button class="btn btn-default dropdown-toggle" type="button" id="cycle" data-toggle="dropdown" style="width:94px">
                                 <b val="week">$data['lan']['TZ6']</b>
@@ -111,11 +111,11 @@
 						</div>
 					</div>
 					<div class="clearfix plan">
-						<span class="typename controls c4 pull-left f14 text-right mr20">$data['lan']['T4']</span>
+						<span class="typename controls c4 pull-left f14 text-right mr20">脚本内容</span>
 						<div id="implement" style="line-height:34px"><textarea class="txtsjs bt-input-text" name="sBody"></textarea></div>
 					</div>
 					<div class="clearfix plan">
-						<div class="bt-submit plan-submit" onclick="planAdd()">$data['lan']['T5']</div>
+						<div class="bt-submit plan-submit" onclick="planAdd()">添加任务</div>
 					</div>
 					<ul class="help-info-text c7 ptb15 mlr20">
 						<li>当添加完备份任务，应该手动运行一次，并检查备份包是否完整</li>
@@ -141,7 +141,7 @@
 			</div>
 			<div class="setbox bgw mtb15">
 				<div class="title c6 plr15">
-					<h3 class="f16">$data['lan']['H4']</h3>
+					<h3 class="f16">任务列表</h3>
 					<span id="allDelete" style="float: right;display: none;">
 						<button onclick="allDeleteCron();" class="btn btn-default btn-sm">$data['lan']['BTN1']</button>
 					</span>
@@ -151,11 +151,11 @@
 						<thead>
 							<tr>
 								<th width='30px'><input onclick="checkSelect();" type="checkbox" id="setBox"></th>
-								<th>$data['lan']['TH1']</th>
-								<th>$data['lan']['TH2']</th>
-								<th>$data['lan']['TH3']</th>
-								<th>$data['lan']['TH4']</th>
-								<th width="190">$data['lan']['TH5']</th>
+								<th>任务名称</th>
+								<th>状态</th>
+								<th>周期</th>
+								<th>执行时机</th>
+								<th width="190">保存数量</th>
 							</tr>
 						</thead>
 						<tbody id="cronbody">

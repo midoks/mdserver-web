@@ -27,7 +27,7 @@ def index():
 '''
 
 
-@firewall.route("/log_list")
+@firewall.route("/log_list", methods=['GET', 'POST'])
 def log_list():
     try:
         table = request.form.get('table', '')
