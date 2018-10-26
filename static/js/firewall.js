@@ -171,7 +171,7 @@ function SetMstscStatus(){
 function ShowAccept(page,search) {
 	search = search == undefined ? '':search;
 	var loadT = layer.load();
-	$.post('/data?action=getData','table=firewall&tojs=ShowAccept&limit=10&p=' + page+"&search="+search, function(data) {
+	$.post('/firewall/log_list','table=firewall&tojs=ShowAccept&limit=10&p=' + page+"&search="+search, function(data) {
 		layer.close(loadT);
 		var Body = '';
 		for (var i = 0; i < data.data.length; i++) {
@@ -267,7 +267,7 @@ function DelAcceptPort(id, port) {
 function getLogs(page,search) {
 	search = search == undefined ? '':search;
 	var loadT = layer.load();
-	$.post('/data?action=getData','table=logs&tojs=getLogs&limit=10&p=' + page+"&search="+search, function(data) {
+	$.post('/firewall/log_list','table=logs&tojs=getLogs&limit=10&p=' + page+"&search="+search, function(data) {
 		layer.close(loadT);
 		var Body = '';
 		for (var i = 0; i < data.data.length; i++) {
