@@ -72,22 +72,6 @@ def GetRandomString(length):
     return str
 
 
-def checkCode(code, outime=120):
-    # 校验验证码
-    import web
-    try:
-        if md5(code.lower()) != web.ctx.session.codeStr:
-            web.ctx.session.login_error = getMsg('CODE_ERR')
-            return False
-        if time.time() - web.ctx.session.codeTime > outime:
-            web.ctx.session.login_error = getMsg('CODE_TIMEOUT')
-            return False
-        return True
-    except:
-        web.ctx.session.login_error = getMsg('CODE_NOT_EXISTS')
-        return False
-
-
 def retJson(status, msg, data=()):
     return jsonify({'status': status, 'msg': msg, 'data': data})
 
@@ -137,13 +121,6 @@ def getLan(key):
     if key in keys:
         msg = logMessage[key]
     return msg
-
-
-def getJson(data):
-    import json
-    import web
-    web.header('Content-Type', 'application/json; charset=utf-8')
-    return json.dumps(data)
 
 
 def readFile(filename):
@@ -333,13 +310,13 @@ def GetLocalIp():
         ipaddress = re.search('\d+.\d+.\d+.\d+', ipaddress).group(0)
         return ipaddress
     except:
-        try:
-            url = web.ctx.session.home + '/Api/getIpAddress'
-            opener = urllib2.urlopen(url)
-            return opener.read()
-        except:
-            import web
-            return web.ctx.host.split(':')[0]
+        pass
+        # try:
+        #     url = web.ctx.session.home + '/Api/getIpAddress'
+        #     opener = urllib2.urlopen(url)
+        #     return opener.read()
+        # except:
+        #     return web.ctx.host.split(':')[0]
 
 # 搜索数据中是否存在
 
@@ -355,7 +332,6 @@ def inArray(arrays, searchStr):
 
 
 def checkWebConfig():
-    import web
     if get_webserver() == 'nginx':
         result = ExecShell(
             "ulimit -n 10240 && /www/server/nginx/sbin/nginx -t -c /www/server/nginx/conf/nginx.conf")
@@ -787,15 +763,15 @@ def CheckCert(certPath='ssl/certificate.pem'):
  # 获取面板地址
 
 
-def getPanelAddr():
-    import web
-    protocol = 'https://' if os.path.exists("data/ssl.pl") else 'http://'
-    h = web.ctx.host.split(':')
-    try:
-        result = protocol + h[0] + ':' + h[1]
-    except:
-        result = protocol + h[0] + ':' + readFile('data/port.pl').strip()
-    return result
+# def getPanelAddr():
+#     import web
+#     protocol = 'https://' if os.path.exists("data/ssl.pl") else 'http://'
+#     h = web.ctx.host.split(':')
+#     try:
+#         result = protocol + h[0] + ':' + h[1]
+#     except:
+#         result = protocol + h[0] + ':' + readFile('data/port.pl').strip()
+#     return result
 
 
 # 字节单位转换

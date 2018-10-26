@@ -16,7 +16,6 @@
 	"update": ["1.14.0", "1.12.2", "1.8.1", "1.15.3", "-Tengine2.2.2", "openresty"],
 	"versions": [
 		{"status": false, "version": "1.14", "run": false, "no": "", "task": "1"},
-		{"status": false, "version": "1.14", "run": false, "no": "", "task": "1"},
 		{"status": false, "version": "1.12", "run": false, "no": "", "task": "1"},
 		{"status": false, "version": "1.8", "run": false, "no": "", "task": "1"},
 		{"status": false, "version": "1.15", "run": false, "no": "", "task": "1"},

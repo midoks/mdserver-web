@@ -14,6 +14,7 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 import db
 import public
+import time
 
 
 global pre, timeoutCount, logPath, isTask, oldEdate, isCheck
@@ -327,6 +328,7 @@ def systemTask():
             count += 1
     except Exception, ex:
         print str(ex)
+        import time
         time.sleep(30)
         systemTask()
 
