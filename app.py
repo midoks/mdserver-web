@@ -46,6 +46,8 @@ def setting_modules(app, modules):
 
 setting_modules(app, DEFAULT_MODULES)
 
-
-if __name__ == "__main__":
-    app.run()
+try:
+    if __name__ == "__main__":
+        app.run()
+except Exception as ex:
+    return str(ex)
