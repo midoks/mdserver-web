@@ -3,6 +3,10 @@
 from flask import Flask
 from flask import Blueprint, render_template
 
+import sys
+sys.path.append("class/")
+import public
+
 
 task = Blueprint('task', __name__, template_folder='templates')
 
@@ -14,4 +18,5 @@ def index():
 
 @task.route("/count")
 def count():
-    return "0"
+    c = public.M('tasks').where("status!=?", ('1',)).count()
+    return str(c)

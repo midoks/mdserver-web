@@ -16,6 +16,7 @@ import public
 
 plugins = Blueprint('plugins', __name__, template_folder='templates')
 __plugin_name = "plugins"
+__row_num = 3
 
 
 @plugins.route("/file", methods=['GET'])
@@ -39,7 +40,7 @@ def file():
 @plugins.route("/list", methods=['GET', 'POST'])
 def list():
 
-    public.M('tasks')
+    # public.M('tasks')
 
     data = json.loads(public.readFile("data/type.json"))
     ret = {}
@@ -63,10 +64,11 @@ def list():
                     else:
                         if tmp['pid'] == typeVal:
                             plugins_info.append(tmp)
-                except ValueError, Argument:
+                except:
                     pass
 
     ret['data'] = plugins_info
+    ret['list'] = get_page(plugins_info, request.args)
     return jsonify(ret)
 
 
@@ -98,10 +100,9 @@ def install():
     print taskAdd
     public.M('tasks').add('id,name,type,status,addtime, execstr', taskAdd)
 
-    # sh = __plugin_name + '/' + name + '/' + pluginInfo['shell']
+    sh = __plugin_name + '/' + name + '/' + pluginInfo['shell']
     # os.system('/bin/bash ' + sh + ' install')
-    print request.args
-    return ''
+    return public.retJson(True, '已将安装任务添加到队列!')
 
 
 @plugins.route('/uninstall', methods=['POST'])
@@ -121,7 +122,7 @@ def installed():
     infoJsonPos = __plugin_name + '/' + name + '/' + 'info.json'
 
     if not os.path.exists(infoJsonPos):
-        return public.retJson(-1, "info.json数据不存在!", ())
+        return public.retJson(-1, "配置数据(info.json)不存在!", ())
 
     pluginInfo = json.loads(public.readFile(infoJsonPos))
 
@@ -129,3 +130,27 @@ def installed():
     os.system('/bin/bash ' + sh + ' install')
     print request.args
     return ''
+
+# 取分页
+
+
+def get_page(data, args):
+    # 包含分页类
+    import page
+    # 实例化分页类
+    page = page.Page()
+    info = {}
+    info['count'] = len(data)
+    info['row'] = __row_num
+    info['p'] = 1
+    if hasattr(args, 'p'):
+        info['p'] = int(get['p'])
+    info['uri'] = {}
+    info['return_js'] = ''
+    if hasattr(args, 'tojs'):
+        info['return_js'] = args.tojs
+
+    # 获取分页数据
+    result = {}
+    result['page'] = page.GetPage(info)
+    return result
