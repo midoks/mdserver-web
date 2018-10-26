@@ -6,28 +6,28 @@
 		<div class="container-fluid" style="padding-bottom: 50px;">
 			<div class="pos-box bgw mtb15">
 				<div class="position f14 c9 pull-left">
-					<a class="plr10 c4" href="/">$data['lan']['H1']</a>/<span class="plr10 c4">$data['lan']['H2']</span>
+					<a class="plr10 c4" href="/">首页监控</a>/<span class="plr10 c4">系统监控</span>
 				</div>
 			</div>
 			<div class="safe container-fluid  bgw mtb15 pd15" style="overflow: hidden;">
 				<div class="mr50 pull-left">
 					<div class="ss-text pull-left">
-						<em>$data['lan']['C1']</em>
+						<em>开启监控</em>
 						<div class='ssh-item' id="openJK">
 						</div>
 					</div>
 				</div>
 				<div class="mr50 pull-left">
 					<div class="ss-text pull-left">
-						<em>$data['lan']['C2']</em>
+						<em>保存天数：</em>
 						<input class="bt-input-text" id="saveDay" value="" type="number">
 					</div>
 					<div class="ss-text pull-left" style="margin-left:10px">
-						<button class="btn btn-default btn-sm" type="button" onclick="SetControl(true);">$data['lan']['C3']</button>
+						<button class="btn btn-default btn-sm" type="button" onclick="SetControl(true);">更改</button>
 					</div>
 				</div>
 				<div class="mr50 pull-left" style="padding-left:50px; border-left:#ccc 1px solid; margin-right:0">
-					<button class="btn btn-default btn-sm" type="button" onclick="CloseControl()">$data['lan']['C4']</button>
+					<button class="btn btn-default btn-sm" type="button" onclick="CloseControl()">清空记录</button>
 				</div>
 			</div>
 			<div class="control">
@@ -36,13 +36,18 @@
 						<div class="bgw pb15">
 							<div class="title c6 plr15 mb15">
 								<h3 class="c-tit f16">平均负载</h3>
-								<div class="searcTime pull-right"><span class="tit">$data['lan']['S1']</span><span class="gt" onclick="Wday(1,'getload')">$data['lan']['D1']</span><span class="gt on" onclick="Wday(0,'getload')">$data['lan']['D2']</span><span class="gt" onclick="Wday(7,'getload')">$data['lan']['D3']</span><span class="gt" onclick="Wday(30,'getload')">$data['lan']['D4']</span>
+								<div class="searcTime pull-right">
+									<span class="tit">区间检索：</span>
+									<span class="gt" onclick="Wday(1,'getload')">昨天</span>
+									<span class="gt on" onclick="Wday(0,'getload')">今天</span>
+									<span class="gt" onclick="Wday(7,'getload')">最近30天</span>
+									<span class="gt" onclick="Wday(30,'getload')">自定义时间</span>
 									<div class="ss">
-										<span class="st">$data['lan']['S2']</span>
+										<span class="st">自定义时间</span>
 										<div class="time">
-											<span class="bt">$data['lan']['G1']<input class="btime" type="text" value="2017/1/10 00:00:00"></span>
-											<span class="et">$data['lan']['G2']<input class="etime" type="text" value="2017/1/13 00:00:00"></span>
-											<div class="sbtn loadbtn">$data['lan']['G3']</div>
+											<span class="bt">开始时间<input class="btime" type="text" value="2017/1/10 00:00:00"></span>
+											<span class="et">结束时间<input class="etime" type="text" value="2017/1/13 00:00:00"></span>
+											<div class="sbtn loadbtn">提交</div>
 										</div>
 									</div>
 								</div>
@@ -55,14 +60,14 @@
 					<div class="pr8">
 						<div class="bgw pb15">
 							<div class="title c6 plr15">
-								<h3 class="c-tit f16">$data['lan']['T1']</h3>
-								<div class="searcTime pull-right"><span class="tit">$data['lan']['S1']</span><span class="gt" onclick="Wday(1,'cpu')">$data['lan']['D1']</span><span class="gt on" onclick="Wday(0,'cpu')">$data['lan']['D2']</span><span class="gt" onclick="Wday(7,'cpu')">$data['lan']['D3']</span><span class="gt" onclick="Wday(30,'cpu')">$data['lan']['D4']</span>
+								<h3 class="c-tit f16">CPU</h3>
+								<div class="searcTime pull-right"><span class="tit">区间检索：</span><span class="gt" onclick="Wday(1,'cpu')">昨天</span><span class="gt on" onclick="Wday(0,'cpu')">今天</span><span class="gt" onclick="Wday(7,'cpu')">最近7天</span><span class="gt" onclick="Wday(30,'cpu')">最近30天</span>
 									<div class="ss">
-										<span class="st">$data['lan']['S2']</span>
+										<span class="st">自定义时间</span>
 										<div class="time">
-											<span class="bt">$data['lan']['G1']<input class="btime" type="text" value="2017/1/10 00:00:00"></span>
-											<span class="et">$data['lan']['G2']<input class="etime" type="text" value="2017/1/13 00:00:00"></span>
-											<div class="sbtn cpubtn">$data['lan']['G3']</div>
+											<span class="bt">开始时间<input class="btime" type="text" value="2017/1/10 00:00:00"></span>
+											<span class="et">结束时间<input class="etime" type="text" value="2017/1/13 00:00:00"></span>
+											<div class="sbtn cpubtn">提交</div>
 										</div>
 									</div>
 								</div>
@@ -75,14 +80,14 @@
 					<div class="pl7">
 						<div class="bgw pb15">
 							<div class="title c6 plr15">
-								<h3 class="c-tit f16">$data['lan']['T2']</h3>
-								<div class="searcTime pull-right"><span class="tit">$data['lan']['S1']</span><span class="gt" onclick="Wday(1,'mem')">$data['lan']['D1']</span><span class="gt on" onclick="Wday(0,'mem')">$data['lan']['D2']</span><span class="gt" onclick="Wday(7,'mem')">$data['lan']['D3']</span><span class="gt" onclick="Wday(30,'mem')">$data['lan']['D4']</span>
+								<h3 class="c-tit f16">内存</h3>
+								<div class="searcTime pull-right"><span class="tit">区间检索：</span><span class="gt" onclick="Wday(1,'mem')">昨天</span><span class="gt on" onclick="Wday(0,'mem')">今天</span><span class="gt" onclick="Wday(7,'mem')">最近7天</span><span class="gt" onclick="Wday(30,'mem')">最近30天</span>
 									<div class="ss">
-										<span class="st">$data['lan']['S2']</span>
+										<span class="st">自定义时间</span>
 										<div class="time">
-											<span class="bt">$data['lan']['G1']<input class="btime" type="text" value="2017/1/10 00:00:00"></span>
-											<span class="et">$data['lan']['G2']<input class="etime" type="text" value="2017/1/13 00:00:00"></span>
-											<div class="sbtn membtn">$data['lan']['G3']</div>
+											<span class="bt">开始时间<input class="btime" type="text" value="2017/1/10 00:00:00"></span>
+											<span class="et">结束时间<input class="etime" type="text" value="2017/1/13 00:00:00"></span>
+											<div class="sbtn membtn">提交</div>
 										</div>
 									</div>
 								</div>
@@ -95,7 +100,7 @@
 					<div class="pr8">
 						<div class="bgw pb15">
 							<div class="title c6 plr15 mb15">
-								<h3 class="c-tit f16">$data['lan']['T3']</h3>
+								<h3 class="c-tit f16">磁盘IO</h3>
 								<div class="searcTime pull-right"><span class="tit">$data['lan']['S1']</span><span class="gt" onclick="Wday(1,'disk')">$data['lan']['D1']</span><span class="gt on" onclick="Wday(0,'disk')">$data['lan']['D2']</span><span class="gt" onclick="Wday(7,'disk')">$data['lan']['D3']</span><span class="gt" onclick="Wday(30,'disk')">$data['lan']['D4']</span>
 									<div class="ss">
 										<span class="st">$data['lan']['S2']</span>
@@ -115,7 +120,7 @@
 					<div class="pl7">
 						<div class="bgw pb15">
 							<div class="title c6 plr15 mb15">
-								<h3 class="c-tit f16">$data['lan']['T4']</h3>
+								<h3 class="c-tit f16">网络IO</h3>
 								<div class="searcTime pull-right"><span class="tit">$data['lan']['S1']</span><span class="gt" onclick="Wday(1,'network')">$data['lan']['D1']</span><span class="gt on" onclick="Wday(0,'network')">$data['lan']['D2']</span><span class="gt" onclick="Wday(7,'network')">$data['lan']['D3']</span><span class="gt" onclick="Wday(30,'network')">$data['lan']['D4']</span>
 									<div class="ss">
 										<span class="st">$data['lan']['S2']</span>
