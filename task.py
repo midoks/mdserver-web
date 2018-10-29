@@ -499,27 +499,28 @@ def btkill():
     b.start()
 
 if __name__ == "__main__":
-    os.system('rm -rf /www/server/phpinfo/*')
-    if os.path.exists('/www/server/nginx/sbin/nginx'):
-        pfile = '/www/server/nginx/conf/enable-php-72.conf'
-        if not os.path.exists(pfile):
-            pconf = '''location ~ [^/]\.php(/|$)
-{
-    try_files $uri =404;
-    fastcgi_pass  unix:/tmp/php-cgi-72.sock;
-    fastcgi_index index.php;
-    include fastcgi.conf;
-    include pathinfo.conf;
-}'''
-            public.writeFile(pfile, pconf)
-    import threading
-    t = threading.Thread(target=systemTask)
-    t.setDaemon(True)
-    t.start()
+    #     os.system('rm -rf /www/server/phpinfo/*')
+    #     if os.path.exists('/www/server/nginx/sbin/nginx'):
+    #         pfile = '/www/server/nginx/conf/enable-php-72.conf'
+    #         if not os.path.exists(pfile):
+    #             pconf = '''location ~ [^/]\.php(/|$)
+    # {
+    #     try_files $uri =404;
+    #     fastcgi_pass  unix:/tmp/php-cgi-72.sock;
+    #     fastcgi_index index.php;
+    #     include fastcgi.conf;
+    #     include pathinfo.conf;
+    # }'''
+    #             public.writeFile(pfile, pconf)
 
-    p = threading.Thread(target=check502Task)
-    p.setDaemon(True)
-    p.start()
+    # import threading
+    # t = threading.Thread(target=systemTask)
+    # t.setDaemon(True)
+    # t.start()
+
+    # p = threading.Thread(target=check502Task)
+    # p.setDaemon(True)
+    # p.start()
 
     #p = threading.Thread(target=btkill)
     # p.setDaemon(True)

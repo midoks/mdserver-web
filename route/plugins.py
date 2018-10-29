@@ -93,15 +93,14 @@ def install():
 
     pluginInfo = json.loads(public.readFile(infoJsonPos))
 
-    print name
-    taskAdd = (None, mmsg + '[' + name + '-' + "1" + ']',
-               'execshell', '0', time.strftime('%Y-%m-%d %H:%M:%S'), '1')
+    execstr = "cd /www/server/mdserver-web/plugins/" + \
+        name + " && /bin/bash " + pluginInfo["install"]
 
-    print taskAdd
+    taskAdd = (None, mmsg + '[' + name + '-' + "1" + ']',
+               'execshell', '0', time.strftime('%Y-%m-%d %H:%M:%S'), execstr)
+
     public.M('tasks').add('id,name,type,status,addtime, execstr', taskAdd)
 
-    sh = __plugin_name + '/' + name + '/' + pluginInfo['shell']
-    # os.system('/bin/bash ' + sh + ' install')
     return public.retJson(True, '已将安装任务添加到队列!')
 
 
