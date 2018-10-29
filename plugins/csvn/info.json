@@ -1,0 +1,17 @@
+{
+	"sort": 7,
+	"ps": "流行SVN代码共享管理软件",
+	"shell": "php.sh",
+	"name": "csvn",
+	"title": "CSVN",
+	"default": false,
+	"versions": "5.2",
+	"tip": "soft",
+	"checks": "/www/server/php/VERSION/bin/php",
+	"display": 1,
+	"author": "Zend",
+	"date": "2017-04-01",
+	"home": "https://www.php.net",
+	"type": "语言解释器",
+	"pid": "3"
+}
