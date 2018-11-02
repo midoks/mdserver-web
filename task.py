@@ -43,6 +43,7 @@ class MyBad():
 
 
 def ExecShell(cmdstring, cwd=None, timeout=None, shell=True):
+    print cmdstring
     try:
         global logPath
         import shlex
@@ -103,17 +104,18 @@ def WriteLogs(logMsg):
 def startTask():
     # 任务队列
     global isTask
-    print isTask
+    print os.path.exists(isTask)
     try:
         while True:
             try:
                 if os.path.exists(isTask):
+                    print "run --- !"
                     sql = db.Sql()
                     sql.table('tasks').where(
                         "status=?", ('-1',)).setField('status', '0')
                     taskArr = sql.table('tasks').where("status=?", ('0',)).field(
                         'id,type,execstr').order("id asc").select()
-                    print tasksArr
+                    print sql
                     for value in taskArr:
                         start = int(time.time())
                         if not sql.table('tasks').where("id=?", (value['id'],)).count():
@@ -132,7 +134,7 @@ def startTask():
                         #     os.system('rm -f ' + isTask)
             except:
                 pass
-            siteEdate()
+            # siteEdate()
             # mainSafe()
             time.sleep(2)
     except:

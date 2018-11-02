@@ -93,7 +93,7 @@ def install():
 
     pluginInfo = json.loads(public.readFile(infoJsonPos))
 
-    execstr = "cd /www/server/mdserver-web/plugins/" + \
+    execstr = "cd " + os.getcwd() + "/plugins/" + \
         name + " && /bin/bash " + pluginInfo["install"]
 
     taskAdd = (None, mmsg + '[' + name + '-' + "1" + ']',
