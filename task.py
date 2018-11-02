@@ -22,8 +22,14 @@ pre = 0
 timeoutCount = 0
 isCheck = 0
 oldEdate = None
-logPath = '/tmp/panelExec.log'
-isTask = '/tmp/panelTask.pl'
+
+logPath = os.getcwd() + '/tmp/panelExec.log'
+isTask = os.getcwd() + '/tmp/panelTask.pl'
+
+if ~os.path.exists(os.getcwd() + "/tmp"):
+    os.system('mkdir -p ' + os.getcwd() + "/tmp")
+    os.system("echo '' > " + logPath)
+    os.system("echo '' > " + isTask)
 
 
 class MyBad():
@@ -97,8 +103,7 @@ def WriteLogs(logMsg):
 def startTask():
     # 任务队列
     global isTask
-    # import time
-    # import public
+    print isTask
     try:
         while True:
             try:
@@ -108,6 +113,7 @@ def startTask():
                         "status=?", ('-1',)).setField('status', '0')
                     taskArr = sql.table('tasks').where("status=?", ('0',)).field(
                         'id,type,execstr').order("id asc").select()
+                    print tasksArr
                     for value in taskArr:
                         start = int(time.time())
                         if not sql.table('tasks').where("id=?", (value['id'],)).count():
@@ -122,14 +128,15 @@ def startTask():
                         end = int(time.time())
                         sql.table('tasks').where("id=?", (value['id'],)).save(
                             'status,end', ('1', end))
-                        if(sql.table('tasks').where("status=?", ('0')).count() < 1):
-                            os.system('rm -f ' + isTask)
+                        # if(sql.table('tasks').where("status=?", ('0')).count() < 1):
+                        #     os.system('rm -f ' + isTask)
             except:
                 pass
             siteEdate()
-            mainSafe()
+            # mainSafe()
             time.sleep(2)
     except:
+        print "ff"
         time.sleep(60)
         startTask()
 
