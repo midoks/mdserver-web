@@ -240,6 +240,38 @@ def getSpeed():
     return json.loads(data)
 
 
+def GetLastLine(inputfile, lineNum):
+    # 读文件指定倒数行数
+    try:
+        fp = open(inputfile, 'r')
+        lastLine = ""
+
+        lines = fp.readlines()
+        count = len(lines)
+        if count > lineNum:
+            num = lineNum
+        else:
+            num = count
+        i = 1
+        lastre = []
+        for i in range(1, (num + 1)):
+            if lines:
+                n = -i
+                lastLine = lines[n].strip()
+                fp.close()
+                lastre.append(lastLine)
+
+        result = ''
+        lineNum -= 1
+        while lineNum > 0:
+            result += lastre[lineNum] + "\n"
+            lineNum -= 1
+
+        return result
+    except:
+        return getMsg('TASK_SLEEP')
+
+
 def ExecShell(cmdstring, cwd=None, timeout=None, shell=True):
 
     if shell:
@@ -346,10 +378,9 @@ def checkWebConfig():
         return result[1]
     return True
 
-# 检查是否为IPv4地址
-
 
 def checkIp(ip):
+    # 检查是否为IPv4地址
     import re
     p = re.compile(
         '^((25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$')
@@ -358,10 +389,9 @@ def checkIp(ip):
     else:
         return False
 
-# 检查端口是否合法
-
 
 def checkPort(port):
+    # 检查端口是否合法
     ports = ['21', '25', '443', '8080', '888', '8888', '8443']
     if port in ports:
         return False
@@ -370,10 +400,9 @@ def checkPort(port):
         return False
     return True
 
-# 字符串取中间
-
 
 def getStrBetween(startStr, endStr, srcStr):
+    # 字符串取中间
     start = srcStr.find(startStr)
     if start == -1:
         return None
@@ -394,23 +423,22 @@ def getCpuType():
     return cpuType
 
 
-# 检查是否允许重启
 def IsRestart():
+    # 检查是否允许重启
     num = M('tasks').where('status!=?', ('1',)).count()
     if num > 0:
         return False
     return True
 
-# 加密密码字符
-
 
 def hasPwd(password):
+    # 加密密码字符
     import crypt
     return crypt.crypt(password, password)
 
 
-# 处理MySQL配置文件
 def CheckMyCnf():
+    # 处理MySQL配置文件
     import os
     confFile = '/etc/my.cnf'
     if os.path.exists(confFile):
@@ -657,19 +685,17 @@ def checkToken(get):
         return False
     return True
 
-# 获取Web服务器
-
 
 def get_webserver():
+    # 获取Web服务器
     webserver = 'nginx'
     if not os.path.exists('/www/server/nginx/sbin/nginx'):
         webserver = 'apache'
     return webserver
 
-# 过滤输入
-
 
 def checkInput(data):
+    # 过滤输入
     if not data:
         return data
     if type(data) != str:
@@ -687,10 +713,9 @@ def checkInput(data):
         data = data.replace(v['d'], v['r'])
     return data
 
-# 取文件指定尾行数
-
 
 def GetNumLines(path, num, p=1):
+    # 取文件指定尾行数
     try:
         import cgi
         if not os.path.exists(path):
@@ -736,10 +761,9 @@ def GetNumLines(path, num, p=1):
         data = []
     return "\n".join(data)
 
-# 验证证书
-
 
 def CheckCert(certPath='ssl/certificate.pem'):
+    # 验证证书
     openssl = '/usr/local/openssl/bin/openssl'
     if not os.path.exists(openssl):
         openssl = 'openssl'
@@ -774,8 +798,8 @@ def CheckCert(certPath='ssl/certificate.pem'):
 #     return result
 
 
-# 字节单位转换
 def to_size(size):
+    # 字节单位转换
     d = ('b', 'KB', 'MB', 'GB', 'TB')
     s = d[0]
     for b in d:

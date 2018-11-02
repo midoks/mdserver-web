@@ -9,7 +9,9 @@ export PATH
 install_tmp='/tmp/bt_install.pl'
 
 echo "Install_csvn"
-#wget -O csvn.tar.xz https://github.com/midoks/mdserver-web/releases/download/init/CollabNetSubversionEdge-5.1.4_linux-x86_64.tar.xz
+
+#sleep 100
+wget -O csvn.tar.xz https://github.com/midoks/mdserver-web/releases/download/init/CollabNetSubversionEdge-5.1.4_linux-x86_64.tar.xz
 #useradd csvn
 
 Install_csvn()
