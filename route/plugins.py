@@ -101,7 +101,7 @@ def install():
 
     public.M('tasks').add('id,name,type,status,addtime, execstr', taskAdd)
 
-    return public.retJson(True, '已将安装任务添加到队列!')
+    return public.returnJson(True, '已将安装任务添加到队列!')
 
 
 @plugins.route('/uninstall', methods=['POST'])
