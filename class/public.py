@@ -17,7 +17,7 @@ sys.path.append(os.getcwd() + "/class/")
 import db
 
 from random import Random
-from flask import jsonify
+# from flask import jsonify
 
 
 def getRunDir():
@@ -74,6 +74,11 @@ def GetRandomString(length):
 
 def retJson(status, msg, data=()):
     return jsonify({'status': status, 'msg': msg, 'data': data})
+
+
+def getJson(data):
+    import json
+    return json.dumps(data)
 
 
 def returnJson(status, msg, args=()):
@@ -244,9 +249,11 @@ def GetLastLine(inputfile, lineNum):
     # 读文件指定倒数行数
     try:
         fp = open(inputfile, 'r')
+        print fp
         lastLine = ""
 
         lines = fp.readlines()
+        print lines
         count = len(lines)
         if count > lineNum:
             num = lineNum
@@ -263,12 +270,16 @@ def GetLastLine(inputfile, lineNum):
 
         result = ''
         lineNum -= 1
+        print lastre
         while lineNum > 0:
-            result += lastre[lineNum] + "\n"
+            print lineNum
+            # lastre[lineNum]
+            # result += lastre[lineNum] + "\n"
             lineNum -= 1
 
         return result
-    except:
+    except (IOError, ZeroDivisionError), e:
+        # print e.message
         return getMsg('TASK_SLEEP')
 
 
@@ -350,20 +361,18 @@ def GetLocalIp():
         # except:
         #     return web.ctx.host.split(':')[0]
 
-# 搜索数据中是否存在
-
 
 def inArray(arrays, searchStr):
+    # 搜索数据中是否存在
     for key in arrays:
         if key == searchStr:
             return True
 
     return False
 
-# 检查Web服务器配置文件是否有错误
-
 
 def checkWebConfig():
+    # 检查Web服务器配置文件是否有错误
     if get_webserver() == 'nginx':
         result = ExecShell(
             "ulimit -n 10240 && /www/server/nginx/sbin/nginx -t -c /www/server/nginx/conf/nginx.conf")

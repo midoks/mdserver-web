@@ -53,9 +53,4 @@ Uninstall_score()
 }
 
 
-action=$1
-if [ "${1}" == 'install' ];then
-	Install_score
-else
-	Uninstall_score
-fi
+Install_score

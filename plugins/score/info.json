@@ -1,16 +1,17 @@
 {
-	"title":"宝塔跑分",
+	"title":"MW跑分",
 	"tip":"lib",
 	"name":"score",
 	"type":"扩展",
 	"ps":"测试服务器基础性能!",
 	"versions":"1.3",
-	"shell":"score.sh",
+	"install":"install.sh",
+	"uninstall":"uninstall.sh",
 	"checks":"/www/server/panel/plugin/score",
-	"author":"宝塔",
-	"home":"http://www.bt.cn/bbs",
-	"date":"2017-10-16",
+	"author":"mdserver-web",
+	"home":"github.com/midoks/mdserver-web",
+	"date":"2018-11-02",
 	"default":false,
 	"display":0,
-	"pid":"2"
+	"pid":"4"
 }
