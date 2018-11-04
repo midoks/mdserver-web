@@ -72,10 +72,6 @@ def GetRandomString(length):
     return str
 
 
-def retJson(status, msg, data=()):
-    return jsonify({'status': status, 'msg': msg, 'data': data})
-
-
 def getJson(data):
     import json
     return json.dumps(data)
