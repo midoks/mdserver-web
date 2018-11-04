@@ -1,8 +1,7 @@
 {
 	"sort": 7,
 	"ps": "最流行的SVN代码共享管理软件",
-	"install": "install.sh",
-	"uninstall": "uninstall.sh",
+	"shell": "install.sh",
 	"name": "csvn",
 	"title": "CSVN",
 	"default": false,
