@@ -241,15 +241,14 @@ def getSpeed():
     return json.loads(data)
 
 
-def GetLastLine(inputfile, lineNum):
+def getLastLine(inputfile, lineNum):
     # 读文件指定倒数行数
     try:
         fp = open(inputfile, 'r')
-        print fp
         lastLine = ""
 
         lines = fp.readlines()
-        print lines
+
         count = len(lines)
         if count > lineNum:
             num = lineNum
@@ -265,17 +264,14 @@ def GetLastLine(inputfile, lineNum):
                 lastre.append(lastLine)
 
         result = ''
-        lineNum -= 1
-        print lastre
-        while lineNum > 0:
-            print lineNum
-            # lastre[lineNum]
-            # result += lastre[lineNum] + "\n"
-            lineNum -= 1
-
+        num -= 1
+        while num > 0:
+            print num
+            lastre[num]
+            result += lastre[num] + "\n"
+            num -= 1
         return result
-    except (IOError, ZeroDivisionError), e:
-        # print e.message
+    except:
         return getMsg('TASK_SLEEP')
 
 
