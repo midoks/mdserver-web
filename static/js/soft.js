@@ -1765,7 +1765,7 @@ function GetSList(isdisplay) {
 
     var condition = (search + type + page).slice(1);
     $.post('/plugins/list?' + condition, '', function(rdata) {
-        console.log(rdata);
+        //console.log(rdata);
         layer.close(loadT);
         var tBody = '';
         var sBody = '';
@@ -1795,10 +1795,15 @@ function GetSList(isdisplay) {
             var checked = '';
 
             checked = rdata.data[i].display ? 'checked' : '';
-            for (var j = 0; j < len; j++) {
-                if (rdata.data[i].versions[j].status) continue;
-                version_info += rdata.data[i].versions[j].version + '|';
-                // console.log(version_info,rdata.data[i].versions[j].status);
+            console.log(rdata.data[0]);
+
+            if (typeof rdata.data[i].versions == "string"){
+                version_info += rdata.data[i].versions + '|';
+            } else {
+                for (var j = 0; j < len; j++) {
+                    if (rdata.data[i].versions[j].status) continue;
+                    version_info += rdata.data[i].versions[j].version + '|';
+                }
             }
             if (version_info != '') {
                 version_info = version_info.substring(0, version_info.length - 1);

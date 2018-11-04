@@ -25,9 +25,7 @@ def GetDiskInfo():
 
 @files.route('/GetExecLog', methods=['POST'])
 def GetExecLog():
-
     file = os.getcwd() + "/tmp/panelExec.log"
-    print file
     v = public.getLastLine(file, 100)
     return v
 
