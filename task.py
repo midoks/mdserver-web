@@ -28,8 +28,12 @@ isTask = os.getcwd() + '/tmp/panelTask.pl'
 
 if ~os.path.exists(os.getcwd() + "/tmp"):
     os.system('mkdir -p ' + os.getcwd() + "/tmp")
-    os.system("echo '' > " + logPath)
-    os.system("echo '' > " + isTask)
+
+if ~os.path.exists(logPath):
+    os.system("touch " + logPath)
+
+if ~os.path.exists(isTask):
+    os.system("touch " + isTask)
 
 
 class MyBad():

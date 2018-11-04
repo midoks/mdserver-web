@@ -28,7 +28,7 @@ def GetExecLog():
 
     file = os.getcwd() + "/tmp/panelExec.log"
     print file
-    v = public.GetLastLine(file, 100)
+    v = public.getLastLine(file, 100)
     return v
 
 
