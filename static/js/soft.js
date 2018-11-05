@@ -1795,7 +1795,7 @@ function GetSList(isdisplay) {
             var checked = '';
 
             checked = rdata.data[i].display ? 'checked' : '';
-            console.log(rdata.data[0]);
+            // console.log(rdata.data[0]);
 
             if (typeof rdata.data[i].versions == "string"){
                 version_info += rdata.data[i].versions + '|';

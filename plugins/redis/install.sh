@@ -10,11 +10,8 @@ serverPath=$(dirname "$rootPath")
 
 install_tmp=${rootPath}/tmp/bt_install.pl
 
-echo "Install_csvn"
 
-mkdir -p $serverPath/redis
-
-Install_csvn()
+Install_redis()
 {
 	echo '正在安装脚本文件...' > $install_tmp
 
@@ -22,15 +19,15 @@ Install_csvn()
 	
 }
 
-Uninstall_csvn()
+Uninstall_redis()
 {
-	echo "Uninstall_csvn"
+	echo "Uninstall_redis"
 }
 
 
 action=$1
 if [ "${1}" == 'install' ];then
-	Install_csvn
+	Install_redis
 else
-	Uninstall_csvn
+	Uninstall_redis
 fi
