@@ -98,7 +98,7 @@ def install():
     pluginInfo = json.loads(public.readFile(infoJsonPos))
 
     execstr = "cd " + os.getcwd() + "/plugins/" + \
-        name + " && /bin/bash " + pluginInfo["shell"] + " install" + version
+        name + " && /bin/bash " + pluginInfo["shell"] + " install " + version
 
     taskAdd = (None, mmsg + '[' + name + '-' + version + ']',
                'execshell', '0', time.strftime('%Y-%m-%d %H:%M:%S'), execstr)

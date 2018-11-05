@@ -8,22 +8,15 @@ rootPath=$(dirname "$rootPath")
 
 install_tmp=${rootPath}'/tmp/bt_install.pl'
 
-echo $curPath
-
-
-
-
-download_Url=http://$nodeAddr:5880
 Install_score()
 {
 	echo '正在安装脚本文件...' > $install_tmp
 	
-	# gcc /www/server/mdserver-web/plugin/score/testcpu.c -o /www/server/mdserver-web/plugin/score/testcpu -lpthread
-	# if [ ! -f '/www/server/mdserver-web/plugin/score/testcpu' ];then
-	# 	sleep 0.1
-	# 	gcc /www/server/mdserver-web/plugin/score/testcpu.c -o /www/server/mdserver-web/plugin/score/testcpu -lpthread
-	# fi
-	
+	gcc $curPath/testcpu.c -o $curPath/testcpu -lpthread
+	if [ ! -f $curPath/testcpu ];then
+		sleep 0.1
+		gcc $curPath/testcpu.c -o $curPath/testcpu -lpthread
+	fi
 	
 	echo '安装完成' > $install_tmp
 }
@@ -35,7 +28,6 @@ Uninstall_score()
 
 
 action=$1
-echo $action
 if [ "${1}" == 'install' ];then
 	Install_score
 else
