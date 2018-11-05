@@ -1,0 +1,19 @@
+{
+	"sort": 7,
+	"ps": "最流行的SVN代码共享管理软件",
+	"shell": "install.sh",
+	"name": "redis",
+	"title": "Redis",
+	"default": false,
+	"versions":[
+		{"status":false,"version":"1.0"}
+	],
+	"tip": "soft",
+	"checks": "/www/server/php/VERSION/bin/php",
+	"display": 1,
+	"author": "Zend",
+	"date": "2017-04-01",
+	"home": "https://www.collab.net",
+	"type": "语言解释器",
+	"pid": "2"
+}

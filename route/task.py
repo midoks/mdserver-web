@@ -20,3 +20,9 @@ def index():
 def count():
     c = public.M('tasks').where("status!=?", ('1',)).count()
     return str(c)
+
+
+@task.route("/list")
+def list():
+    c = public.M('tasks').where("status!=?", ('1',)).count()
+    return str(c)

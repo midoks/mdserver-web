@@ -17,7 +17,6 @@ sys.path.append(os.getcwd() + "/class/")
 import db
 
 from random import Random
-# from flask import jsonify
 
 
 def getRunDir():
@@ -33,6 +32,32 @@ def getBinDir():
 def M(table):
     sql = db.Sql()
     return sql.table(table)
+
+
+def getWebPage(data, args):
+    # 取分页
+    import page
+    # 实例化分页类
+    page = page.Page()
+    info = {}
+    info['count'] = len(data)
+
+    info['row'] = 10
+    if hasattr(args, 'row'):
+        info['row'] = args['row']
+
+    info['p'] = 1
+    if hasattr(args, 'p'):
+        info['p'] = int(get['p'])
+    info['uri'] = {}
+    info['return_js'] = ''
+    if hasattr(args, 'tojs'):
+        info['return_js'] = args.tojs
+
+    # 获取分页数据
+    result = {}
+    result['page'] = page.GetPage(info)
+    return result
 
 
 def md5(str):
@@ -195,7 +220,7 @@ def httpGet(url, timeout=30):
         response = urllib2.urlopen(url, timeout=timeout)
         return response.read()
     except Exception, ex:
-        #WriteLog('网络诊断',str(ex) + '['+url+']');
+        # WriteLog('网络诊断',str(ex) + '['+url+']');
         return str(ex)
 
 
@@ -214,7 +239,7 @@ def httpPost(url, data, timeout=30):
         response = urllib2.urlopen(req, timeout=timeout)
         return response.read()
     except Exception, ex:
-        #WriteLog('网络诊断',str(ex) + '['+url+']');
+        # WriteLog('网络诊断',str(ex) + '['+url+']');
         return str(ex)
 
 
