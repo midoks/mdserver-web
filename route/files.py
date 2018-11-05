@@ -23,7 +23,7 @@ def GetDiskInfo():
     return jsonify({'result': 'ok'})
 
 
-@files.route('/GetExecLog', methods=['POST'])
+@files.route('/get_exec_log', methods=['POST'])
 def GetExecLog():
     file = os.getcwd() + "/tmp/panelExec.log"
     v = public.getLastLine(file, 100)
