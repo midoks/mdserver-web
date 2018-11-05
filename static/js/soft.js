@@ -2040,7 +2040,7 @@ function AddVersion(name, ver, type, obj, title) {
     if (type == "lib") {
         layer.confirm(lan.get('install_confirm', [title, ver]), { icon: 3, closeBtn: 2 }, function() {
             $(obj).text(lan.soft.install_the);
-            var data = "name=" + name;
+            var data = "name=" + name+"&version="+ver;
             var loadT = layer.msg(lan.soft.the_install, { icon: 16, time: 0, shade: [0.3, '#000'] });
             $.post("/plugins/install", data, function(rdata) {
                 layer.close(loadT);

@@ -248,7 +248,6 @@ def getLastLine(inputfile, lineNum):
         lastLine = ""
 
         lines = fp.readlines()
-
         count = len(lines)
         if count > lineNum:
             num = lineNum
@@ -265,9 +264,7 @@ def getLastLine(inputfile, lineNum):
 
         result = ''
         num -= 1
-        while num > 0:
-            print num
-            lastre[num]
+        while num >= 0:
             result += lastre[num] + "\n"
             num -= 1
         return result
