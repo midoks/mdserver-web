@@ -173,7 +173,7 @@ def get_language():
     return readFile(path).strip()
 
 
-def WriteLog(type, logMsg, args=()):
+def writeLog(type, logMsg, args=()):
     # 写日志
     try:
         import time
