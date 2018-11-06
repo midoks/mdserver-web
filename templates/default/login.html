@@ -150,7 +150,7 @@
 			</div>
 			<div class="login_btn"><input id="login-button" value="登录" type="submit"></div>
 			<p class="pwinfo" style="display:none">$tData['lan']['N12']</p>
-			<a class="resetpw" href="http://www.bt.cn/bbs/thread-1172-1-1.html" target="_blank">$tData['lan']['N13']</a>
+			<a class="resetpw" href="//github.com/midoks/mdserver-web" target="_blank">忘记密码</a>
 			</form>
 		</div>
 
@@ -212,19 +212,6 @@
 				}
 			});
 		}
-		$('.bg_img').click(function(event) {
-			if ($(this).hasClass('pc')){
-				$(this).removeClass('pc');
-				$('.scanCode').hide().prev().show();
-				clearInterval(setTime);
-				$('.tips>span>span').html('扫码登录更安全');
-			}else{
-				$(this).addClass('pc');
-				$('.account').hide().next().show();
-				$('.tips>span>span').html('点击账号登录')
-				setTime = window.setInterval(controlTime,2000);
-			}
-		});
 	})
 	window.onresize=function(){
 		Wreset();
