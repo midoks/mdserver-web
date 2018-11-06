@@ -158,42 +158,42 @@
 </div>
 <script type="text/javascript" src="/static/js/jquery-1.10.2.min.js?v={{config.version}}"></script>
 <script src="/static/language/zh-cn.js?v={{config.version}}"></script>
-<script src="/static/language//lan.js?v={{config.version}}"></script>
+<script src="/static/language/Simplified_Chinese/lan.js?v={{config.version}}"></script>
 <script type="text/javascript" src="/static/layer/layer.js?v={{config.version}}"></script>
 <script type="text/javascript" src="/static/js/jquery.qrcode.min.js?v={{config.version}}"></script>
 <script type="text/javascript" src="/static/js/Validform_v5.3.2_min.js?v={{config.version}}"></script>
 <script type="text/javascript">
 	function Wreset(){
-		var w = $$(window).width();
-		var yzmw = $$(".login .line").width() - 140;
-		if($$(".yzm").is(":visible") && w > 640){
-			$$(".login").css({"height":"365px","margin-top":"-230px"});
+		var w = $(window).width();
+		var yzmw = $(".login .line").width() - 140;
+		if($(".yzm").is(":visible") && w > 640){
+			$(".login").css({"height":"365px","margin-top":"-230px"});
 		}
 		else{
-			$$(".login").removeAttr("style")
+			$(".login").removeAttr("style")
 		}
-		$$(".login .yzm .inputtxt").width(yzmw);
+		$(".login .yzm .inputtxt").width(yzmw);
 	}
-	$$(function(){
+	$(function(){
 		Wreset();
 		var setTime = '';
-		$$.get('/public?name=app&fun=login_qrcode', function(res){
+		$.get('/public?name=app&fun=login_qrcode', function(res){
 			if (res.status){
-				$$('#qrcode').qrcode({
-				    render: "canvas", //也可以替换为table
+				$('#qrcode').qrcode({
+				    render: "canvas", //也可以替换为table$
 				    width: 150,
 				    height: 150,
-				    text: res.msg
+				    text: res.msg$
 				});
-				$$('.entrance').show();
+				$('.entrance').show();
 			}
 		}).error(function(res,textStatus,errorThrown) {
 			if (res.status == 404){
-				$$('.entrance').hide();
+				$('.entrance').hide();
 			}
 		});
 		function controlTime(){
-			$$.get('/public?name=app&fun=is_scan_ok',function(res) {
+			$.get('/public?name=app&fun=is_scan_ok',function(res) {
 				if(res.status){
 					layer.msg('扫码成功，请稍后...',{icon:1});
 					clearInterval(setTime);
@@ -202,7 +202,7 @@
 			});
 		}
 		function loginAdmin(key){
-			$$.get('/public?name=app&fun=set_login',{secret_key:key},function(res) {
+			$.get('/public?name=app&fun=set_login',{secret_key:key},function(res) {
 				layer.msg(res.msg,{icon:res.status?1:2})
 				if (res.status){
 					layer.msg('正在安全登录中,请稍后...',{time:0,shade: [0.4,'#fff'],icon:16});
@@ -212,16 +212,16 @@
 				}
 			});
 		}
-		$$('.bg_img').click(function(event) {
-			if ($$(this).hasClass('pc')){
-				$$(this).removeClass('pc');
-				$$('.scanCode').hide().prev().show();
+		$('.bg_img').click(function(event) {
+			if ($(this).hasClass('pc')){
+				$(this).removeClass('pc');
+				$('.scanCode').hide().prev().show();
 				clearInterval(setTime);
-				$$('.tips>span>span').html('扫码登录更安全');
+				$('.tips>span>span').html('扫码登录更安全');
 			}else{
-				$$(this).addClass('pc');
-				$$('.account').hide().next().show();
-				$$('.tips>span>span').html('点击账号登录')
+				$(this).addClass('pc');
+				$('.account').hide().next().show();
+				$('.tips>span>span').html('点击账号登录')
 				setTime = window.setInterval(controlTime,2000);
 			}
 		});
@@ -231,8 +231,8 @@
 	}
 	</script>
 	<script type="text/javascript">
-	$$(function(){
-		$$(".loginform").Validform({
+	$(function(){
+		$(".loginform").Validform({
 			tiptype:function(msg,o,cssctl){
 				if(!o.obj.is("form")){
 					var objtip=o.obj.siblings(".Validform_checktip");
@@ -243,7 +243,7 @@
 		});
 	});
 	
-	$$('#login-button').click(function(){
+	$('#login-button').click(function(){
 		var username = encodeURIComponent($$("input[name='username']").val());
 		var password = encodeURIComponent($$("input[name='password']").val());
 		var code = $$("input[name='code']").val();
@@ -254,20 +254,20 @@
 				
 		var data = 'username='+username+'&password='+password+'&code='+code;
 		var loadT = layer.msg("$tData['lan']['JS2']",{icon:16,time:0,shade: [0.3, '#000']});
-		$$.post('/login',data,function(rdata){
+		$.post('/login',data,function(rdata){
 			layer.close(loadT);
 			if(!rdata.status){
 				if(username == 'admin' && rdata.msg.indexOf('用户名') != -1) rdata.msg += ', <br>获取默认用户和密码命令： bt default';
-				$$("#errorStr").html(rdata.msg);
-				$$("input[name='password']").val('');
+				$("#errorStr").html(rdata.msg);
+				$("input[name='password']").val('');
 				num = rdata.msg.substring(rdata.msg.indexOf('[')+1,rdata.msg.indexOf(']'))
 				if(num < 5){
-					$$(".yzm").show();
-					$$(".login").css("height","332px");
-					$$("input[name='code']").val('');
-					$$(".passcode").click();
+					$(".yzm").show();
+					$(".login").css("height","332px");
+					$("input[name='code']").val('');
+					$(".passcode").click();
 				}
-				$$(".yzm").show();
+				$(".yzm").show();
 				Wreset();
 				layer.msg(rdata.msg,{icon:2,time:5000});
 				return;

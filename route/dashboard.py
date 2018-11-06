@@ -24,20 +24,19 @@ def index():
 
 @dashboard.route("/code")
 def code():
-    pass
-    # import vilidate
- #    vie = vilidate.vieCode()
- #    codeImage = vie.GetCodeImage(80, 4)
- #    try:
- #        from cStringIO import StringIO
- #    except:
- #        from StringIO import StringIO
+    import vilidate
+    vie = vilidate.vieCode()
+    codeImage = vie.GetCodeImage(80, 4)
+    try:
+        from cStringIO import StringIO
+    except:
+        from StringIO import StringIO
 
- #    out = StringIO()
- #    print out
- #    codeImage[0].save(out, "png")
+    out = StringIO()
+    print out
+    codeImage[0].save(out, "png")
 
- #    return out.getvalue()
+    return out.getvalue()
 
 
 @dashboard.route("/login")
