@@ -9,8 +9,6 @@ import psutil
 import time
 import os
 import sys
-
-
 sys.path.append(os.getcwd() + "/class/")
 
 
@@ -37,6 +35,11 @@ def code():
     codeImage[0].save(out, "png")
 
     return out.getvalue()
+
+
+@dashboard.route("/check_login")
+def checkLogin():
+    return render_template('default/login.html')
 
 
 @dashboard.route("/login")
