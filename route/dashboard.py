@@ -1,15 +1,18 @@
 # coding:utf-8
 
-from flask import Flask
-from flask import Blueprint, render_template
-from flask import jsonify
-from flask import request
-
 import psutil
 import time
 import os
 import sys
 sys.path.append(os.getcwd() + "/class/")
+import public
+
+from flask import Flask, session
+from flask import Blueprint, render_template
+from flask import jsonify
+from flask import request
+from flask import make_response
+from flask import Response
 
 
 dashboard = Blueprint('dashboard', __name__, template_folder='templates')
@@ -31,10 +34,13 @@ def code():
         from StringIO import StringIO
 
     out = StringIO()
-    print out
     codeImage[0].save(out, "png")
 
-    return out.getvalue()
+    session['code'] = public.md5("".join(codeImage[1]).lower())
+
+    img = Response(out.getvalue(), headers={'Content-Type': 'image/png'})
+    ret = make_response(img)
+    return ret
 
 
 @dashboard.route("/check_login")
