@@ -53,6 +53,7 @@ def login():
     return render_template('default/login.html')
 
 
-@dashboard.route("/do_login")
+@dashboard.route("/do_login", methods=['POST'])
 def doLogin():
+
     return render_template('default/login.html')
