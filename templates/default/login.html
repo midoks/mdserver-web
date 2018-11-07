@@ -140,16 +140,16 @@
 		<div class="account">
 			<form class="loginform" method="post" action="/login" onsubmit="return false;">
 			<div class="rlogo">mdserver-web</div>
-			<div class="line"><input class="inputtxt" value="" name="username" datatype="*" nullmsg="账户" errormsg="$tData['lan']['N2']" placeholder="账户" type="text"><div class="Validform_checktip"></div></div>
-			<div class="line"><input class="inputtxt" name="password" value="" datatype="*" nullmsg="密码" errormsg="$tData['lan']['N5']" placeholder="密码" type="password"><div class="Validform_checktip"></div></div>
+			<div class="line"><input class="inputtxt" value="" name="username" datatype="*" nullmsg="请填写账户" errormsg="$tData['lan']['N2']" placeholder="账户" type="text"><div class="Validform_checktip"></div></div>
+			<div class="line"><input class="inputtxt" name="password" value="" datatype="*" nullmsg="请填写密码" errormsg="$tData['lan']['N5']" placeholder="密码" type="password"><div class="Validform_checktip"></div></div>
 			<div style="color: red;position: relative;top: -14px;" id="errorStr"></div>
 			<div class="line yzm" style="top: -5px;display:block;">
-				<input type="text" class="inputtxt" name="code" nullmsg="$tData['lan']['N7']" errormsg="验证码" datatype="*" placeholder="验证码">
+				<input type="text" class="inputtxt" name="code" nullmsg="请填写4位验证码" errormsg="验证码" datatype="*" placeholder="验证码">
 				<div class="Validform_checktip"></div>
 				<img width="100" height="40" class="passcode" onClick="this.src=this.src.split('?')[0] + '?'+new Date().getTime()" src="/code" style="border: 1px solid #ccc; float: right;" title="" >
 			</div>
 			<div class="login_btn"><input id="login-button" value="登录" type="submit"></div>
-			<p class="pwinfo" style="display:none">$tData['lan']['N12']</p>
+			<p class="pwinfo" style="display:none">请填写4位验证码</p>
 			<a class="resetpw" href="//github.com/midoks/mdserver-web" target="_blank">忘记密码</a>
 			</form>
 		</div>
@@ -176,42 +176,6 @@
 	}
 	$(function(){
 		Wreset();
-		var setTime = '';
-		$.get('/public?name=app&fun=login_qrcode', function(res){
-			if (res.status){
-				$('#qrcode').qrcode({
-				    render: "canvas", //也可以替换为table$
-				    width: 150,
-				    height: 150,
-				    text: res.msg$
-				});
-				$('.entrance').show();
-			}
-		}).error(function(res,textStatus,errorThrown) {
-			if (res.status == 404){
-				$('.entrance').hide();
-			}
-		});
-		function controlTime(){
-			$.get('/public?name=app&fun=is_scan_ok',function(res) {
-				if(res.status){
-					layer.msg('扫码成功，请稍后...',{icon:1});
-					clearInterval(setTime);
-					loginAdmin(res.msg);
-				}
-			});
-		}
-		function loginAdmin(key){
-			$.get('/public?name=app&fun=set_login',{secret_key:key},function(res) {
-				layer.msg(res.msg,{icon:res.status?1:2})
-				if (res.status){
-					layer.msg('正在安全登录中,请稍后...',{time:0,shade: [0.4,'#fff'],icon:16});
-					setTimeout(function(){
-						location.href = '/';
-					},1000);
-				}
-			});
-		}
 	})
 	window.onresize=function(){
 		Wreset();
@@ -231,17 +195,17 @@
 	});
 	
 	$('#login-button').click(function(){
-		var username = encodeURIComponent($$("input[name='username']").val());
-		var password = encodeURIComponent($$("input[name='password']").val());
-		var code = $$("input[name='code']").val();
+		var username = encodeURIComponent($("input[name='username']").val());
+		var password = encodeURIComponent($("input[name='password']").val());
+		var code = $("input[name='code']").val();
 		if(username == '' || password == ''){
-			layer.msg("$tData['lan']['JS1']",{icon:2});
+			layer.msg("表单错误,请重新输入!",{icon:2});
 			return;
 		}
 				
 		var data = 'username='+username+'&password='+password+'&code='+code;
-		var loadT = layer.msg("$tData['lan']['JS2']",{icon:16,time:0,shade: [0.3, '#000']});
-		$.post('/login',data,function(rdata){
+		var loadT = layer.msg("正在登录中",{icon:16,time:0,shade: [0.3, '#000']});
+		$.post('/do_login',data,function(rdata){
 			layer.close(loadT);
 			if(!rdata.status){
 				if(username == 'admin' && rdata.msg.indexOf('用户名') != -1) rdata.msg += ', <br>获取默认用户和密码命令： bt default';
