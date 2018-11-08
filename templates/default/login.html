@@ -149,7 +149,7 @@
 				<img width="100" height="40" class="passcode" onClick="this.src=this.src.split('?')[0] + '?'+new Date().getTime()" src="/code" style="border: 1px solid #ccc; float: right;" title="" >
 			</div>
 			<div class="login_btn"><input id="login-button" value="登录" type="submit"></div>
-			<p class="pwinfo" style="display:none">请填写4位验证码</p>
+			<p class="pwinfo" style="display:none"></p>
 			<a class="resetpw" href="//github.com/midoks/mdserver-web" target="_blank">忘记密码</a>
 			</form>
 		</div>
@@ -160,7 +160,6 @@
 <script src="/static/language/zh-cn.js?v={{config.version}}"></script>
 <script src="/static/language/Simplified_Chinese/lan.js?v={{config.version}}"></script>
 <script type="text/javascript" src="/static/layer/layer.js?v={{config.version}}"></script>
-<script type="text/javascript" src="/static/js/jquery.qrcode.min.js?v={{config.version}}"></script>
 <script type="text/javascript" src="/static/js/Validform_v5.3.2_min.js?v={{config.version}}"></script>
 <script type="text/javascript">
 	function Wreset(){
