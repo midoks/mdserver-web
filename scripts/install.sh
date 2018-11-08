@@ -8,6 +8,11 @@ startTime=`date +%s`
 
 echo "hello"
 
+
+
+
+
+
 endTime=`date +%s`
 ((outTime=($endTime-$startTime)/60))
 echo -e "Time consumed:\033[32m $outTime \033[0mMinute!"
