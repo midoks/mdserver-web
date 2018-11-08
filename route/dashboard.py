@@ -4,7 +4,7 @@ import psutil
 import time
 import os
 import sys
-sys.path.append(os.getcwd() + "/class/")
+sys.path.append(os.getcwd() + "/class/core/")
 import public
 
 from flask import Flask, session
@@ -20,6 +20,7 @@ dashboard = Blueprint('dashboard', __name__, template_folder='templates')
 
 @dashboard.route("/")
 def index():
+    print session['code']
     return render_template('default/index.html')
 
 

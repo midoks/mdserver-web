@@ -7,7 +7,7 @@ import time
 
 from datetime import timedelta
 
-sys.path.append("core/class/")
+sys.path.append("/class/core/")
 reload(sys)
 sys.setdefaultencoding('utf8')
 
