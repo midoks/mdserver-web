@@ -3,15 +3,17 @@
 import sys
 import io
 import os
+import time
 
+from datetime import timedelta
+
+sys.path.append("core/class/")
 reload(sys)
 sys.setdefaultencoding('utf8')
 
 import route
 from flask import Flask
-from datetime import timedelta
 
-sys.path.append("class/")
 
 app = Flask(__name__)
 app.debug = True
@@ -32,7 +34,7 @@ DEFAULT_MODULES = (
     (route.control, "/control"),
 )
 
-import time
+
 # print "time.time(): %f " % time.time()
 app.config.version = "0.0.1" + str(time.time())
 
