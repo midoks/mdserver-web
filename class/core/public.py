@@ -34,30 +34,30 @@ def M(table):
     return sql.table(table)
 
 
-def getWebPage(data, args):
+def getPage(args, result='1,2,3,4,5,8'):
     # 取分页
     import page
     # 实例化分页类
     page = page.Page()
     info = {}
-    info['count'] = len(data)
+
+    info['count'] = 0
+    if args.has_key('count'):
+        info['count'] = int(args['count'])
 
     info['row'] = 10
-    if hasattr(args, 'row'):
+    if args.has_key('row'):
         info['row'] = args['row']
 
     info['p'] = 1
-    if hasattr(args, 'p'):
+    if args.has_key('p'):
         info['p'] = int(get['p'])
     info['uri'] = {}
     info['return_js'] = ''
-    if hasattr(args, 'tojs'):
+    if args.has_key('tojs'):
         info['return_js'] = args.tojs
 
-    # 获取分页数据
-    result = {}
-    result['page'] = page.GetPage(info)
-    return result
+    return page.GetPage(info, result)
 
 
 def md5(str):
@@ -297,7 +297,7 @@ def getLastLine(inputfile, lineNum):
         return getMsg('TASK_SLEEP')
 
 
-def ExecShell(cmdstring, cwd=None, timeout=None, shell=True):
+def execShell(cmdstring, cwd=None, timeout=None, shell=True):
 
     if shell:
         cmdstring_list = cmdstring
@@ -321,12 +321,12 @@ def ExecShell(cmdstring, cwd=None, timeout=None, shell=True):
 def serviceReload():
     # 重载Web服务配置
     if os.path.exists('/www/server/nginx/sbin/nginx'):
-        result = ExecShell('/etc/init.d/nginx reload')
+        result = execShell('/etc/init.d/nginx reload')
         if result[1].find('nginx.pid') != -1:
-            ExecShell('pkill -9 nginx && sleep 1')
-            ExecShell('/etc/init.d/nginx start')
+            execShell('pkill -9 nginx && sleep 1')
+            execShell('/etc/init.d/nginx start')
     else:
-        result = ExecShell('/etc/init.d/httpd reload')
+        result = execShell('/etc/init.d/httpd reload')
     return result
 
 
@@ -334,9 +334,9 @@ def phpReload(version):
     # 重载PHP配置
     import os
     if os.path.exists('/www/server/php/' + version + '/libphp5.so'):
-        ExecShell('/etc/init.d/httpd reload')
+        execShell('/etc/init.d/httpd reload')
     else:
-        ExecShell('/etc/init.d/php-fpm-' + version + ' reload')
+        execShell('/etc/init.d/php-fpm-' + version + ' reload')
 
 
 def downloadFile(url, filename):
@@ -797,7 +797,7 @@ def CheckCert(certPath='ssl/certificate.pem'):
         if tmp1.find('-----BEGIN CERTIFICATE-----') == -1:
             tmp1 = s + tmp1
         writeFile(certPath, tmp1)
-        result = ExecShell(openssl + " x509 -in " +
+        result = execShell(openssl + " x509 -in " +
                            certPath + " -noout -subject")
         if result[1].find('-bash:') != -1:
             return True

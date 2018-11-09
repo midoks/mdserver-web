@@ -22,7 +22,16 @@ def count():
     return str(c)
 
 
-@task.route("/list")
+@task.route("/list", methods=['GET', 'POST'])
 def list():
-    c = public.M('tasks').where("status!=?", ('1',)).count()
-    return str(c)
+    _list = public.M('tasks').where('', ()).limit(
+        '0,5').order('id desc').select()
+    _ret = {}
+    _ret['data'] = _list
+
+    count = public.M('tasks').where('', ()).count()
+    _page = {}
+    _page['count'] = count
+
+    _ret['page'] = public.getPage(_page)
+    return public.getJson(_ret)
