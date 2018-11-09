@@ -55,7 +55,7 @@ def getPage(args, result='1,2,3,4,5,8'):
     info['uri'] = {}
     info['return_js'] = ''
     if args.has_key('tojs'):
-        info['return_js'] = args.tojs
+        info['return_js'] = args['tojs']
 
     return page.GetPage(info, result)
 
