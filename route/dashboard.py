@@ -20,7 +20,10 @@ dashboard = Blueprint('dashboard', __name__, template_folder='templates')
 
 @dashboard.route("/")
 def index():
-    print session['code']
+
+    print(sys.platform)
+    if session.has_key('code'):
+        print session['code']
     return render_template('default/index.html')
 
 

@@ -68,8 +68,12 @@ def list():
                     pass
 
     ret['data'] = plugins_info
-    # request.args['row'] = __row_num
-    ret['list'] = public.getWebPage(plugins_info, request.args)
+
+    args = {}
+    args['count'] = len(plugins_info)
+    args['p1'] = 1
+
+    ret['list'] = public.getPage(args)
     return jsonify(ret)
 
 

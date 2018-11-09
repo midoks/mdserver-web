@@ -1765,7 +1765,6 @@ function GetSList(isdisplay) {
 
     var condition = (search + type + page).slice(1);
     $.post('/plugins/list?' + condition, '', function(rdata) {
-        //console.log(rdata);
         layer.close(loadT);
         var tBody = '';
         var sBody = '';
@@ -1780,7 +1779,7 @@ function GetSList(isdisplay) {
         }
 
         $(".softtype").html(tBody);
-        $("#softPage").html(rdata.list.page);
+        $("#softPage").html(rdata.list);
         $("#softPage .Pcount").css({ "position": "absolute", "left": "0" })
 
         $(".task").text(rdata.data[rdata.length - 1]);
