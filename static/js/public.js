@@ -693,7 +693,7 @@ function SafeMessage(j, h, g, f) {
 		g();
 	})
 }
-isAction();
+//isAction();
 
 function isAction() {
 	hrefs = window.location.href.split("/");
@@ -907,7 +907,8 @@ function RemoveTask(b) {
 
 function GetTaskList(a) {
 	a = a == undefined ? 1 : a;
-	$.post("/data?action=getData", "tojs=GetTaskList&table=tasks&limit=10&p=" + a, function(g) {
+	$.post("/task/list", "tojs=GetTaskList&table=tasks&limit=10&p=" + a, function(g) {
+		console.log(g);
 		var e = "";
 		var b = "";
 		var c = "";
@@ -1395,7 +1396,7 @@ function execLog(){
 
 function remind(a){
 	a = a == undefined ? 1 : a;
-	$.post("/data?action=getData", "tojs=remind&table=tasks&result=2,4,6,8&limit=8&p=" + a, function(g) {
+	$.post("/task/list", "tojs=remind&table=tasks&result=2,4,6,8&limit=8&p=" + a, function(g) {
 		var e = "";
 		var f = false;
 		var task_count = 0;
@@ -1428,7 +1429,7 @@ function remind(a){
 			}
 		});
 
-	})
+	},'json');
 }
 
 
@@ -1512,7 +1513,7 @@ function tasklist(a){
 	var con='<ul class="cmdlist"></ul><span style="position:  fixed;bottom: 13px;">若任务长时间未执行，请尝试在首页点【重启面板】来重置任务队列</span>';
 	$(".taskcon").html(con);
 	a = a == undefined ? 1 : a;
-	$.post("/data?action=getData", "tojs=GetTaskList&table=tasks&limit=10&p=" + a, function(g) {
+	$.post("/task/list", "tojs=GetTaskList&table=tasks&limit=10&p=" + a, function(g) {
 		var e = "";
 		var b = "";
 		var c = "";
@@ -1541,7 +1542,7 @@ function tasklist(a){
 		$(".cmdlist").html(b + c);
 		GetReloads();
 		return f
-	})
+	},'json')
 }
 
 //检查登陆状态
