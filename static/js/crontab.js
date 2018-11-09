@@ -32,7 +32,7 @@ function GetLogs(id){
 
 function getCronData(){
 	var laid=layer.msg(lan.public.the,{icon:16,time:0,shade: [0.3, '#000']});
-	$.post('/crontab?action=GetCrontab',"",function(rdata){
+	$.post('/crontab/list',"",function(rdata){
 		layer.close(laid);
 		var cbody="";
 		if(rdata == ""){
