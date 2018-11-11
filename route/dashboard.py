@@ -59,4 +59,8 @@ def login():
 
 @dashboard.route("/do_login", methods=['POST'])
 def doLogin():
-    return public.returnJson(False, 'LOGIN_USER_EMPTY')
+    print request.args
+
+    # return "123"
+    # return public.returnJson(False, 'LOGIN_USER_EMPTY')
+    return public.returnJson(True, 'LOGIN_SUCCESS')

@@ -1386,7 +1386,7 @@ function messagebox() {
 
 //取执行日志
 function execLog(){
-	$.post('/files/get_exec_log',{},function(logs){
+	$.post('/task/get_exec_log',{},function(logs){
 		var lbody = '<textarea readonly="" style="margin: 0px;width: 500px;height: 520px;background-color: #333;color:#fff; padding:0 5px" id="exec_log">'+logs+'</textarea>';
 		$(".taskcon").html(lbody);
 		var ob = document.getElementById('exec_log');
@@ -1452,7 +1452,7 @@ function GetReloads() {
 			return
 		}
 		a++;
-		$.post("/files?action=GetTaskSpeed", "", function(h) {
+		$.post("/task/get_task_speed", "", function(h) {
 			if(h.task == undefined) {
 				$(".cmdlist").html(lan.bt.task_not_list);
 				return
@@ -1488,7 +1488,7 @@ function GetReloads() {
 			}catch(e){
 				return;
 			}
-		}).error(function(){});
+		},'json').error(function(){});
 	}, 1000);
 }
 

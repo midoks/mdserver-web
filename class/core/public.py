@@ -12,8 +12,6 @@ import subprocess
 import re
 import hashlib
 
-
-sys.path.append(os.getcwd() + "/class/")
 import db
 
 from random import Random
@@ -110,8 +108,9 @@ def returnJson(status, msg, args=()):
 def returnMsg(status, msg, args=()):
     # 取通用字曲返回
     logMessage = json.loads(
-        readFile('static/language/' + get_language() + '/public.json'))
+        readFile('static/language/' + getLanguage() + '/public.json'))
     keys = logMessage.keys()
+
     if msg in keys:
         msg = logMessage[msg]
         for i in range(len(args)):
@@ -124,7 +123,7 @@ def getMsg(key, args=()):
     # 取提示消息
     try:
         logMessage = json.loads(
-            readFile('static/language/' + get_language() + '/public.json'))
+            readFile('static/language/' + getLanguage() + '/public.json'))
         keys = logMessage.keys()
         msg = None
         if key in keys:
@@ -139,9 +138,8 @@ def getMsg(key, args=()):
 
 def getLan(key):
     # 取提示消息
-
     logMessage = json.loads(
-        readFile('static/language/' + get_language() + '/template.json'))
+        readFile('static/language/' + getLanguage() + '/template.json'))
     keys = logMessage.keys()
     msg = None
     if key in keys:
@@ -166,7 +164,7 @@ def getDate():
     return time.strftime('%Y-%m-%d %X', time.localtime())
 
 
-def get_language():
+def getLanguage():
     path = 'data/language.pl'
     if not os.path.exists(path):
         return 'Simplified_Chinese'
@@ -180,7 +178,7 @@ def writeLog(type, logMsg, args=()):
         import db
         import json
         logMessage = json.loads(
-            readFile('static/language/' + get_language() + '/log.json'))
+            readFile('static/language/' + getLanguage() + '/log.json'))
         keys = logMessage.keys()
         if logMsg in keys:
             logMsg = logMessage[logMsg]
@@ -460,7 +458,7 @@ def hasPwd(password):
     return crypt.crypt(password, password)
 
 
-def CheckMyCnf():
+def checkMyCnf():
     # 处理MySQL配置文件
     import os
     confFile = '/etc/my.cnf'
@@ -692,10 +690,9 @@ def auth_encode(data):
     # 返回
     return pdata
 
-# 检查Token
-
 
 def checkToken(get):
+    # 检查Token
     tempFile = 'data/tempToken.json'
     if not os.path.exists(tempFile):
         return False
@@ -785,7 +782,7 @@ def GetNumLines(path, num, p=1):
     return "\n".join(data)
 
 
-def CheckCert(certPath='ssl/certificate.pem'):
+def checkCert(certPath='ssl/certificate.pem'):
     # 验证证书
     openssl = '/usr/local/openssl/bin/openssl'
     if not os.path.exists(openssl):
