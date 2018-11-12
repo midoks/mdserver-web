@@ -1547,7 +1547,7 @@ function tasklist(a){
 
 //检查登陆状态
 function check_login(){
-	$.post('/ajax?action=CheckLogin',{},function(rdata){
+	$.post('/check_login',{},function(rdata){
 		if(rdata === true) return;
 	});
 }
