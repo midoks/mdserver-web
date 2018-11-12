@@ -157,3 +157,45 @@ def systemtotal():
     data['isuser'] = public.M('users').where('username=?', ('admin',)).count()
     data['version'] = '0.0.1'
     return jsonify(data)
+
+
+@system.route("/disk_info")
+def diskInfo():
+    # 取磁盘分区信息
+    temp = public.execShell("df -h -P|grep '/'|grep -v tmpfs")[0]
+    tempInodes = public.execShell("df -i -P|grep '/'|grep -v tmpfs")[0]
+    temp1 = temp.split('\n')
+    tempInodes1 = tempInodes.split('\n')
+    diskInfo = []
+    n = 0
+    cuts = ['/mnt/cdrom', '/boot', '/boot/efi', '/dev',
+            '/dev/shm', '/run/lock', '/run', '/run/shm', '/run/user']
+    for tmp in temp1:
+        n += 1
+        inodes = tempInodes1[n - 1].split()
+        disk = tmp.split()
+        if len(disk) < 5:
+            continue
+        if disk[1].find('M') != -1:
+            continue
+        if disk[1].find('K') != -1:
+            continue
+        if len(disk[5].split('/')) > 4:
+            continue
+        if disk[5] in cuts:
+            continue
+        arr = {}
+        arr['path'] = disk[5]
+        tmp1 = [disk[1], disk[2], disk[3], disk[4]]
+        arr['size'] = tmp1
+        arr['inodes'] = [inodes[1], inodes[2], inodes[3], inodes[4]]
+        if disk[5] == '/':
+            bootLog = os.getcwd() + '/tmp/panelBoot.pl'
+            if disk[2].find('M') != -1:
+                if os.path.exists(bootLog):
+                    os.system('rm -f ' + bootLog)
+            else:
+                if not os.path.exists(bootLog):
+                    pass
+        diskInfo.append(arr)
+    return public.getJson(diskInfo)

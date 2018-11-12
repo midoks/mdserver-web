@@ -49,7 +49,7 @@ def getPage(args, result='1,2,3,4,5,8'):
 
     info['p'] = 1
     if args.has_key('p'):
-        info['p'] = int(get['p'])
+        info['p'] = int(args['p'])
     info['uri'] = {}
     info['return_js'] = ''
     if args.has_key('tojs'):
