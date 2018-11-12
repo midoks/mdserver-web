@@ -1,5 +1,5 @@
 //检测是否安装环境
-$.post("/ajax?action=CheckInstalled", function(rdata) {
+$.post("/plugins/check_installed", function(rdata) {
     if (rdata == false) {
         RecInstall();
     }
@@ -180,7 +180,7 @@ function ClearSystem() {
 }
 
 function getInfo() {
-    $.get("/system?action=GetSystemTotal", function(info) {
+    $.get("/system/system_total", function(info) {
         setCookie("memRealUsed", parseInt((info.memRealUsed)));
         $("#memory").html(parseInt((info.memRealUsed)) + '/' + info.memTotal + ' (MB)');
         setCookie("mem-before", $("#memory").text());
@@ -205,7 +205,7 @@ function getInfo() {
             $("#messageError").append('<p><span class="glyphicon glyphicon-alert" style="color: #ff4040; margin-right: 10px;"></span>' + lan.index.user_warning + '<span class="c7 mr5" title="此安全问题不可忽略，请尽快处理" style="cursor:no-drop"> [不可忽略]</span><a class="btlink" href="javascript:setUserName();"> [立即修改]</a></p>')
         }
         setImg();
-    });
+    },'json');
 }
 
 
@@ -450,25 +450,25 @@ function setImg() {
 setImg();
 
 //检查更新
-setTimeout(function() {
-    $.get('/ajax?action=UpdatePanel', function(rdata) {
-        if (rdata.status == false) return;
-        if (rdata.version != undefined) {
-            $("#toUpdate").html('<a class="btlink" href="javascript:updateMsg();">' + lan.index.update_go + '</a>');
-            return;
-        }
-        $.get('/system?action=ReWeb', function() {});
-        layer.msg(rdata.msg, { icon: 1 });
-        setTimeout(function() {
-            window.location.reload();
-        }, 3000);
-    }).error(function() {
-        $.get('/system?action=ReWeb', function() {});
-        setTimeout(function() {
-            window.location.reload();
-        }, 3000);
-    });
-}, 3000);
+// setTimeout(function() {
+//     $.get('/system/update_panel', function(rdata) {
+//         if (rdata.status == false) return;
+//         if (rdata.version != undefined) {
+//             $("#toUpdate").html('<a class="btlink" href="javascript:updateMsg();">' + lan.index.update_go + '</a>');
+//             return;
+//         }
+//         $.get('/system?action=ReWeb', function() {});
+//         layer.msg(rdata.msg, { icon: 1 });
+//         setTimeout(function() {
+//             window.location.reload();
+//         }, 3000);
+//     }).error(function() {
+//         $.get('/system?action=ReWeb', function() {});
+//         setTimeout(function() {
+//             window.location.reload();
+//         }, 3000);
+//     },'json');
+// }, 3000);
 
 
 //检查更新
@@ -603,20 +603,20 @@ function WSafeRestart() {
             $.post('/system?action=RestartServer', '', function(rdata) {
                 $(".SafeRestartCode").html("<p class='c9'>" + lan.index.reboot_msg_1 + "</p><p class='c9'>" + lan.index.reboot_msg_2 + "</p><p class='c9'>" + lan.index.reboot_msg_3 + "</p><p>" + lan.index.reboot_msg_4 + "...</p>");
                 var sEver = setInterval(function() {
-                    $.get("/system?action=GetSystemTotal", function(info) {
+                    $.get("/system/system_total", function(info) {
                         clearInterval(sEver);
                         $(".SafeRestartCode").html("<p class='c9'>" + lan.index.reboot_msg_1 + "</p><p class='c9'>" + lan.index.reboot_msg_2 + "</p><p class='c9'>" + lan.index.reboot_msg_3 + "</p><p class='c9'>" + lan.index.reboot_msg_4 + "</p><p>" + lan.index.reboot_msg_5 + "</p>");
                         setTimeout(function() {
                             layer.closeAll();
                         }, 3000);
-                    }).error(function() {
+                    },'json').error(function() {
 
                     });
                 }, 3000);
             }).error(function() {
                 $(".SafeRestartCode").html("<p class='c9'>" + lan.index.reboot_msg_1 + "</p><p class='c9'>" + lan.index.reboot_msg_2 + "</p><p class='c9'>" + lan.index.reboot_msg_3 + "</p><p>" + lan.index.reboot_msg_4 + "...</p>");
                 var sEver = setInterval(function() {
-                    $.get("/system?action=GetSystemTotal", function(info) {
+                    $.get("/system/system_total", function(info) {
                         clearInterval(sEver);
                         $(".SafeRestartCode").html("<p class='c9'>" + lan.index.reboot_msg_1 + "</p><p class='c9'>" + lan.index.reboot_msg_2 + "</p><p class='c9'>" + lan.index.reboot_msg_3 + "</p><p class='c9'>" + lan.index.reboot_msg_4 + "</p><p>" + lan.index.reboot_msg_5 + "</p>");
                         setTimeout(function() {
@@ -624,7 +624,7 @@ function WSafeRestart() {
                             window.location.reload();
                         }, 3000);
 
-                    }).error(function() {
+                    },'json').error(function() {
 
                     });
                 }, 3000);
@@ -635,19 +635,19 @@ function WSafeRestart() {
 }
 
 function reWeb() {
-    layer.confirm(lan.index.panel_reboot_msg, { title: lan.index.panel_reboot_title, closeBtn: 2, icon: 3 }, function() {
-        var loadT = layer.msg(lan.index.panel_reboot_to, { icon: 16, time: 0, shade: [0.3, '#000'] });
-        $.get('/system?action=ReWeb', function(rdata) {
-            layer.close(loadT);
-            layer.msg(rdata.msg, { icon: 5 });
-        }).error(function() {
-            layer.close(loadT);
-            layer.msg(lan.index.panel_reboot_ok, { icon: 1 });
-            setTimeout(function() {
-                window.location.reload();
-            }, 3000)
-        });
-    });
+    // layer.confirm(lan.index.panel_reboot_msg, { title: lan.index.panel_reboot_title, closeBtn: 2, icon: 3 }, function() {
+    //     var loadT = layer.msg(lan.index.panel_reboot_to, { icon: 16, time: 0, shade: [0.3, '#000'] });
+    //     $.get('/system?action=ReWeb', function(rdata) {
+    //         layer.close(loadT);
+    //         layer.msg(rdata.msg, { icon: 5 });
+    //     }).error(function() {
+    //         layer.close(loadT);
+    //         layer.msg(lan.index.panel_reboot_ok, { icon: 1 });
+    //         setTimeout(function() {
+    //             window.location.reload();
+    //         }, 3000)
+    //     });
+    // });
 }
 
 

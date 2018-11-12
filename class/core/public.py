@@ -18,13 +18,11 @@ from random import Random
 
 
 def getRunDir():
-    # 运行目录
     return os.getcwd()
 
 
-def getBinDir():
-    # 安装软件
-    pass
+def getRootDir():
+    return os.path.dirname(os.path.dirname(getRunDir()))
 
 
 def M(table):

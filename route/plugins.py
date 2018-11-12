@@ -10,7 +10,7 @@ import sys
 import os
 import json
 
-sys.path.append("class/")
+sys.path.append("class/core")
 import public
 
 
@@ -130,7 +130,7 @@ def installed():
     infoJsonPos = __plugin_name + '/' + name + '/' + 'info.json'
 
     if not os.path.exists(infoJsonPos):
-        return public.retJson(-1, "配置数据(info.json)不存在!", ())
+        return public.returnJson(-1, "配置数据(info.json)不存在!", ())
 
     pluginInfo = json.loads(public.readFile(infoJsonPos))
 
@@ -139,26 +139,12 @@ def installed():
     print request.args
     return ''
 
-# 取分页
 
-
-def get_page(data, args):
-    # 包含分页类
-    import page
-    # 实例化分页类
-    page = page.Page()
-    info = {}
-    info['count'] = len(data)
-    info['row'] = __row_num
-    info['p'] = 1
-    if hasattr(args, 'p'):
-        info['p'] = int(get['p'])
-    info['uri'] = {}
-    info['return_js'] = ''
-    if hasattr(args, 'tojs'):
-        info['return_js'] = args.tojs
-
-    # 获取分页数据
-    result = {}
-    result['page'] = page.GetPage(info)
-    return result
+@plugins.route('/check_installed', methods=['POST'])
+def checkInstalled():
+    checks = ['nginx', 'apache', 'php', 'mysql']
+    for name in checks:
+        filename = public.getRootDir() + "/server/" + name
+        if os.path.exists(filename):
+            return "True"
+    return "False"
