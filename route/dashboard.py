@@ -47,7 +47,7 @@ def code():
     return ret
 
 
-@dashboard.route("/check_login")
+@dashboard.route("/check_login", methods=['POST'])
 def checkLogin():
     return "true"
 
