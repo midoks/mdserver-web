@@ -568,7 +568,7 @@ function GetFiles(Path) {
 			GetFiles(p);
 		});
 		PathPlaceBtn(rdata.PATH);
-	});
+	},'json');
 	//setTimeout(function(){getCookie('path');},200);
 }
 //统计选择数量
