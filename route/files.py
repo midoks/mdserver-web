@@ -22,8 +22,12 @@ def index():
 @files.route('/get_dir', methods=['POST'])
 def getDir():
     path = request.form.get('path', '').encode('utf-8')
-    print path
-    path = "/"
+    if not os.path.exists(path):
+        path = '/'
+
+    import pwd
+    dirnames = []
+    filenames = []
 
     info = {}
     info['count'] = 10
@@ -85,4 +89,7 @@ def getDir():
             n += 1
         except:
             continue
+    data['DIR'] = sorted(dirnames)
+    data['FILES'] = sorted(filenames)
+    data['PATH'] = ""
     return public.getJson(data)
