@@ -334,7 +334,7 @@ function GetFiles(Path) {
 	var data = 'path=' + Path;
 	var loadT = layer.load();
 	var totalSize = 0;
-	$.post('/files?action=GetDir&tojs=GetFiles&p=' + p + '&showRow=' + showRow + search, data, function(rdata) {
+	$.post('/files/get_dir?tojs=GetFiles&p=' + p + '&showRow=' + showRow + search, data, function(rdata) {
 		layer.close(loadT);
 		
 		var rows = ['100','200','500','1000','2000'];
@@ -781,14 +781,14 @@ function GetFileName(fileNameFull) {
 //取磁盘
 function GetDisk() {
 	var LBody = '';
-	$.get('/system?action=GetDiskInfo', function(rdata) {
+	$.get('/system/disk_info', function(rdata) {
 		for (var i = 0; i < rdata.length; i++) {
 			LBody += "<span onclick=\"GetFiles('" + rdata[i].path + "')\"><span class='glyphicon glyphicon-hdd'></span>&nbsp;" + (rdata[i].path=='/'?lan.files.path_root:rdata[i].path) + "(" + rdata[i].size[2] + ")</span>";
 		}
 		var trash = '<span id="recycle_bin" onclick="Recycle_bin(\'open\')" title="'+lan.files.recycle_bin_title+'" style="position: absolute; border-color: #ccc; right: 77px;"><span class="glyphicon glyphicon-trash"></span>&nbsp;'+lan.files.recycle_bin_title+'</span>';
 		$("#comlist").html(LBody+trash);
 		IsDiskWidth();
-	});
+	},'json');
 }
 
 //返回上一级

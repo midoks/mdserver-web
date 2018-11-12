@@ -52,10 +52,10 @@
     <li onclick="javascript:Batch(3);"><a style="cursor: pointer;">$tData['lan']['L4']</a></li>
     <li onclick="javascript:Batch(4);"><a style="cursor: pointer;">$tData['lan']['L5']</a></li>
 </ul>
-<script src="/static/js/jquery-ui.min.js"></script>
-<script src="/static/js/jquery.contextify.min.js"></script>
-<script src="/static/js/files.js?date=20180425"></script>
-<script src="/static/js/upload.js?date=20171115"></script>
+<script src="/static/js/jquery-ui.min.js?v={{config.version}}"></script>
+<script src="/static/js/jquery.contextify.min.js?v={{config.version}}"></script>
+<script src="/static/js/files.js?v={{config.version}}"></script>
+<script src="/static/js/upload.js?v={{config.version}}"></script>
 <script type="text/javascript">
 setTimeout(function() {
     GetDisk();
@@ -70,19 +70,19 @@ setCookie('uploadSize', 1024 * 1024 * 1024);
 if (getCookie('rank') == undefined || getCookie('rank') == null) {
     setCookie('rank', 'a');
 }
-$$("#set_icon").click(function() {
+$("#set_icon").click(function() {
     setCookie('rank', 'b');
-    $$(this).addClass("active");
-    $$("#set_list").removeClass("active");
+    $(this).addClass("active");
+    $("#set_list").removeClass("active");
     GetFiles(getCookie('Path'));
 });
-$$("#set_list").click(function() {
+$("#set_list").click(function() {
     setCookie('rank', 'a');
-    $$(this).addClass("active");
-    $$("#set_icon").removeClass("active");
+    $(this).addClass("active");
+    $("#set_icon").removeClass("active");
     GetFiles(getCookie('Path'));
 })
-$$(".refreshBtn").click(function() {
+$(".refreshBtn").click(function() {
     GetFiles(getCookie('Path'));
 })
 </script>
