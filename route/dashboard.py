@@ -49,7 +49,7 @@ def code():
 
 @dashboard.route("/check_login")
 def checkLogin():
-    return render_template('default/login.html')
+    return "true"
 
 
 @dashboard.route("/login")
