@@ -145,8 +145,13 @@ def diskinfo():
     return jsonify(diskInfo)
 
 
-@system.route("/systemtotal")
-def systemtotal():
+@system.route("/update_panel")
+def updatePanel():
+    return public.returnJson(False, "12")
+
+
+@system.route("/system_total")
+def systemTotal():
      # 取系统统计信息
     data = GetMemInfo()
     cpu = GetCpuInfo(1)

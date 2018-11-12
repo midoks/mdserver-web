@@ -6,7 +6,7 @@
                 <a class="plr10 c4" href="/">首页</a>/<span class="plr10 c4">服务器状态</span>
             </div>
             <span class="pull-right f12 c6" style="line-height:42px; margin-right:15px">
-                    免费版 <span id="btversion" class="mr5" onclick="openLog()">0.0.1</span>
+                    版本信息 <span id="btversion" class="mr5" onclick="openLog()">0.0.1</span>
             <span id="toUpdate"><a class="btlink" href="javascript:checkUpdate();">检查更新</a></span>
             </span>
         </div>
@@ -146,13 +146,13 @@
 setCookie('serverType', '$web.ctx.session.webserver');
 var serverType = getCookie('serverType');
 </script>
-<script type="text/javascript" src="/static/js/echarts.min.js"></script>
-<script type="text/javascript" src="/static/js/site.js?date=20180523"></script>
-<script type="text/javascript" src="/static/js/ftp.js?date=20180307"></script>
-<script type="text/javascript" src="/static/js/data.js?date=20180307"></script>
-<script type="text/javascript" src="/static/js/jquery.dragsort-0.5.2.min.js"></script>
-<script type="text/javascript" src="/static/js/soft.js?date=20180523"></script>
-<script type="text/javascript" src="/static/js/index.js?date=20180523"></script>
+<script type="text/javascript" src="/static/js/echarts.min.js?v={{config.version}}"></script>
+<script type="text/javascript" src="/static/js/site.js?v={{config.version}}"></script>
+<script type="text/javascript" src="/static/js/ftp.js?v={{config.version}}"></script>
+<script type="text/javascript" src="/static/js/data.js?v={{config.version}}"></script>
+<script type="text/javascript" src="/static/js/jquery.dragsort-0.5.2.min.js?v={{config.version}}"></script>
+<script type="text/javascript" src="/static/js/soft.js?v={{config.version}}"></script>
+<script type="text/javascript" src="/static/js/index.js?v={{config.version}}"></script>
 <script type="text/javascript">
 setTimeout(function() {
     GetDiskInfo();
