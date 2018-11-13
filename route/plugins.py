@@ -83,6 +83,7 @@ def install():
     rundir = public.getRunDir()
     name = request.form.get('name', '')
     version = request.form.get('version', '')
+    stype = request.form.get('type', '0')
 
     mmsg = '安装'
     if hasattr(request.form, 'upgrade'):
@@ -90,26 +91,26 @@ def install():
         mmsg = 'upgrade'
 
     if name.strip() == '':
-        return public.returnJson(-1, "缺少name数据!", ())
+        return public.returnJson(False, "缺少插件名称!", ())
 
     if version.strip() == '':
-        return public.returnJson(-1, "缺少版本信息!", ())
+        return public.returnJson(False, "缺少版本信息!", ())
 
     infoJsonPos = __plugin_name + '/' + name + '/' + 'info.json'
 
     if not os.path.exists(infoJsonPos):
-        return public.retJson(-1, "info.json数据不存在!", ())
+        return public.retJson(False, "配置文件不存在!", ())
 
     pluginInfo = json.loads(public.readFile(infoJsonPos))
 
     execstr = "cd " + os.getcwd() + "/plugins/" + \
-        name + " && /bin/bash " + pluginInfo["shell"] + " install " + version
+        name + " && /bin/bash " + pluginInfo["shell"] \
+        + " install " + version + ' ' + stype
 
     taskAdd = (None, mmsg + '[' + name + '-' + version + ']',
                'execshell', '0', time.strftime('%Y-%m-%d %H:%M:%S'), execstr)
 
     public.M('tasks').add('id,name,type,status,addtime, execstr', taskAdd)
-
     return public.returnJson(True, '已将安装任务添加到队列!')
 
 
@@ -125,12 +126,11 @@ def installed():
     name = request.form.get('name', '')
 
     if name.strip() == '':
-        return public.retJson(-1, "缺少name数据!", ())
+        return public.retJson(-1, "缺少插件名称!", ())
 
     infoJsonPos = __plugin_name + '/' + name + '/' + 'info.json'
-
     if not os.path.exists(infoJsonPos):
-        return public.returnJson(-1, "配置数据(info.json)不存在!", ())
+        return public.returnJson(-1, "配置文件不存在!", ())
 
     pluginInfo = json.loads(public.readFile(infoJsonPos))
 

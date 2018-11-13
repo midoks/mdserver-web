@@ -114,7 +114,7 @@ def returnMsg(status, msg, args=()):
         for i in range(len(args)):
             rep = '{' + str(i + 1) + '}'
             msg = msg.replace(rep, args[i])
-    return {'status': status, 'msg': msg}
+    return {'status': status, 'msg': msg, 'data': args}
 
 
 def getMsg(key, args=()):
