@@ -7,7 +7,6 @@
 	"default": false,
 	"versions":[
 		{
-			"status":false,
 			"version":"4.0"
 		}
 	],
