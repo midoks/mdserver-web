@@ -18,6 +18,13 @@ from flask import Response
 dashboard = Blueprint('dashboard', __name__, template_folder='templates')
 
 
+@dashboard.route("/test")
+def test():
+    os = public.getOs()
+    print os
+    return os
+
+
 @dashboard.route("/")
 def index():
 
