@@ -40,8 +40,6 @@ def file():
 @plugins.route("/list", methods=['GET', 'POST'])
 def list():
 
-    # public.M('tasks')
-
     data = json.loads(public.readFile("data/type.json"))
     ret = {}
     ret["type"] = data
