@@ -17,12 +17,38 @@ import db
 from random import Random
 
 
+def execShell(cmdstring, cwd=None, timeout=None, shell=True):
+
+    if shell:
+        cmdstring_list = cmdstring
+    else:
+        cmdstring_list = shlex.split(cmdstring)
+    if timeout:
+        end_time = datetime.datetime.now() + datetime.timedelta(seconds=timeout)
+
+    sub = subprocess.Popen(cmdstring_list, cwd=cwd, stdin=subprocess.PIPE,
+                           shell=shell, bufsize=4096, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+    while sub.poll() is None:
+        time.sleep(0.1)
+        if timeout:
+            if end_time <= datetime.datetime.now():
+                raise Exception("Timeout：%s" % cmdstring)
+
+    return sub.communicate()
+
+
 def getRunDir():
     return os.getcwd()
 
 
 def getRootDir():
     return os.path.dirname(os.path.dirname(getRunDir()))
+
+
+def getOs():
+    os = execShell('uname')
+    return os[0]
 
 
 def M(table):
@@ -293,27 +319,6 @@ def getLastLine(inputfile, lineNum):
         return getMsg('TASK_SLEEP')
 
 
-def execShell(cmdstring, cwd=None, timeout=None, shell=True):
-
-    if shell:
-        cmdstring_list = cmdstring
-    else:
-        cmdstring_list = shlex.split(cmdstring)
-    if timeout:
-        end_time = datetime.datetime.now() + datetime.timedelta(seconds=timeout)
-
-    sub = subprocess.Popen(cmdstring_list, cwd=cwd, stdin=subprocess.PIPE,
-                           shell=shell, bufsize=4096, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-    while sub.poll() is None:
-        time.sleep(0.1)
-        if timeout:
-            if end_time <= datetime.datetime.now():
-                raise Exception("Timeout：%s" % cmdstring)
-
-    return sub.communicate()
-
-
 def serviceReload():
     # 重载Web服务配置
     if os.path.exists('/www/server/nginx/sbin/nginx'):
@@ -442,7 +447,7 @@ def getCpuType():
     return cpuType
 
 
-def IsRestart():
+def isRestart():
     # 检查是否允许重启
     num = M('tasks').where('status!=?', ('1',)).count()
     if num > 0:
@@ -617,22 +622,8 @@ def get_timeout(url):
     return int((time.time() - start) * 1000)
 
 
-# 获取Token
-def GetToken():
-    try:
-        from json import loads
-        tokenFile = 'data/token.json'
-        if not os.path.exists(tokenFile):
-            return False
-        token = loads(public.readFile(tokenFile))
-        return token
-    except:
-        return False
-
-# 解密数据
-
-
 def auth_decode(data):
+    # 解密数据
     token = GetToken()
     # 是否有生成Token
     if not token:
@@ -732,7 +723,7 @@ def checkInput(data):
     return data
 
 
-def GetNumLines(path, num, p=1):
+def getNumLines(path, num, p=1):
     # 取文件指定尾行数
     try:
         import cgi
