@@ -54,32 +54,30 @@ def getTaskSpeed():
     find = public.M('tasks').where('status=? OR status=?',
                                    ('-1', '0')).field('id,type,name,execstr').find()
     if not len(find):
-        # pass
         return public.returnJson(False, '当前没有任务队列在执行-2!')
 
-        # isTask = os.getcwd() + '/tmp/panelTask.pl'
-        # public.writeFile(isTask, 'True')
+    isTask = os.getcwd() + '/tmp/panelTask.pl'
+    public.writeFile(isTask, 'True')
     print find
     echoMsg = {}
-    # echoMsg['name'] = find['name']
-    # echoMsg['execstr'] = find['execstr']
-    # if find['type'] == 'download':
-    #     import json
-    #     try:
-    #         tmp = public.readFile(tempFile)
-    #         if len(tmp) < 10:
-    #             return public.returnMsg(False, '当前没有任务队列在执行-3!')
-    #         echoMsg['msg'] = json.loads(tmp)
-    #         echoMsg['isDownload'] = True
-    #     except:
-    #         db.Sql().table('tasks').where(
-    #             "id=?", (find['id'],)).save('status', ('0',))
-    #         return public.returnMsg(False, '当前没有任务队列在执行-4!')
-    # else:
-    #     echoMsg['msg'] = self.GetLastLine(tempFile, 20)
-    #     echoMsg['isDownload'] = False
+    echoMsg['name'] = find['name']
+    echoMsg['execstr'] = find['execstr']
+    if find['type'] == 'download':
+        import json
+        try:
+            tmp = public.readFile(tempFile)
+            if len(tmp) < 10:
+                return public.returnMsg(False, '当前没有任务队列在执行-3!')
+            echoMsg['msg'] = json.loads(tmp)
+            echoMsg['isDownload'] = True
+        except:
+            db.Sql().table('tasks').where(
+                "id=?", (find['id'],)).save('status', ('0',))
+            return public.returnMsg(False, '当前没有任务队列在执行-4!')
+    else:
+        echoMsg['msg'] = public.getLastLine(tempFile, 20)
+        echoMsg['isDownload'] = False
 
-    # echoMsg['task'] = public.M('tasks').where("status!=?", ('1',)).field(
-    #     'id,status,name,type').order("id asc").select()
-    print echoMsg
+    echoMsg['task'] = public.M('tasks').where("status!=?", ('1',)).field(
+        'id,status,name,type').order("id asc").select()
     return public.getJson(echoMsg)
