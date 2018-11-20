@@ -5,11 +5,7 @@
 	"title": "Redis",
 	"shell": "install.sh",
 	"default": false,
-	"versions":[
-		{
-			"version":"4.0"
-		}
-	],
+	"versions":["4.0"],
 	"tip": "soft",
 	"checks": "server/redis",
 	"display": 1,
