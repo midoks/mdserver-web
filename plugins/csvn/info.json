@@ -4,16 +4,12 @@
 	"shell": "install.sh",
 	"name": "csvn",
 	"title": "CSVN",
-	"default": false,
-	"versions":[
-		{"status":false,"version":"1.0"}
-	],
+	"versions": ["5.1"],
 	"tip": "soft",
-	"checks": "/www/server/php/VERSION/bin/php",
-	"display": 1,
-	"author": "Zend",
+	"checks": "server/csvn/VERSION/",
+	"author": "midoks",
 	"date": "2017-04-01",
 	"home": "https://www.collab.net",
-	"type": "语言解释器",
+	"type": "SVN代码共享管理软件",
 	"pid": "3"
 }

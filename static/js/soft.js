@@ -1794,14 +1794,12 @@ function GetSList(isdisplay) {
             var checked = '';
 
             checked = rdata.data[i].display ? 'checked' : '';
-            // console.log(rdata.data[0]);
-
+    
             if (typeof rdata.data[i].versions == "string"){
                 version_info += rdata.data[i].versions + '|';
             } else {
                 for (var j = 0; j < len; j++) {
-                    if (rdata.data[i].versions[j].status) continue;
-                    version_info += rdata.data[i].versions[j].version + '|';
+                    version_info += rdata.data[i].versions[j] + '|';
                 }
             }
             if (version_info != '') {
