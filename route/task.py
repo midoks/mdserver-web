@@ -58,7 +58,7 @@ def getTaskSpeed():
 
     isTask = os.getcwd() + '/tmp/panelTask.pl'
     public.writeFile(isTask, 'True')
-    print find
+
     echoMsg = {}
     echoMsg['name'] = find['name']
     echoMsg['execstr'] = find['execstr']
