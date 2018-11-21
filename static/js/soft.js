@@ -913,21 +913,10 @@ function GetPHPStatus(version) {
 
 //软件管理窗口
 function SoftMan(name, version) {
-    switch (name) {
-        case 'nginx':
-            nginxSoftMain(name, version);
-            return;
-            break;
-        case 'apache':
-            nginxSoftMain(name, version);
-            return;
-            break;
-        case 'mysql':
-            name = 'mysqld';
-            break;
-    }
+   
     var loadT = layer.msg(lan.public.the, { icon: 16, time: 0, shade: [0.3, '#000'] });
-    $.get('/system?action=GetConcifInfo', function(rdata) {
+    $.get('/plugins/setting?name='+name, function(rdata) {
+        console.log(rdata)
         layer.close(loadT);
         var nameA = rdata[name.replace('mysqld', 'mysql')];
         var menu = '<p onclick="configChange(\'' + name + '\')">' + lan.soft.config_edit + '</p><p onclick="softChangeVer(\'' + name + '\',\'' + version + '\')">' + lan.soft.nginx_version + '</p>';
@@ -1691,7 +1680,7 @@ function phpmyadmin(msg) {
 //插件设置菜单
 function PluginMan(name, title) {
     loadT = layer.msg(lan.soft.menu_temp, { icon: 16, time: 0, shade: [0.3, '#000'] });
-    $.get('/plugin?action=getConfigHtml&name=' + name, function(rhtml) {
+    $.get('/plugins/setting?name=' + name, function(rhtml) {
         layer.close(loadT);
         if (rhtml.status === false) {
             if (name == "phpguard") {
