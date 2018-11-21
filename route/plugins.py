@@ -116,3 +116,8 @@ def checkInstalled():
         if os.path.exists(filename):
             return "True"
     return "False"
+
+
+@plugins.route('/setting', methods=["GET"])
+def setting():
+    return "False"
