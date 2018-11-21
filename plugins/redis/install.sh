@@ -26,7 +26,7 @@ Install_redis()
 
 	echo '安装完成' > $install_tmp
 
-	# rm -rf $serverPath/tmp
+	rm -rf $serverPath/tmp
 }
 
 Uninstall_redis()

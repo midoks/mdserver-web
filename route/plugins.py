@@ -12,6 +12,7 @@ import json
 
 sys.path.append("class/core")
 import public
+import plugin
 
 
 plugins = Blueprint('plugins', __name__, template_folder='templates')
@@ -39,40 +40,9 @@ def file():
 
 @plugins.route("/list", methods=['GET', 'POST'])
 def list():
-
-    data = json.loads(public.readFile("data/type.json"))
-    ret = {}
-    ret["type"] = data
-
-    plugins_info = []
-
-    typeVal = request.args.get('type', '')
-    if typeVal == "":
-        typeVal = "0"
-
-    for dirinfo in os.listdir(__plugin_name):
-        path = __plugin_name + "/" + dirinfo
-        if os.path.isdir(path):
-            jsonFile = path + "/info.json"
-            if os.path.exists(jsonFile):
-                try:
-                    tmp = json.loads(public.readFile(jsonFile))
-                    if typeVal == "0":
-                        plugins_info.append(tmp)
-                    else:
-                        if tmp['pid'] == typeVal:
-                            plugins_info.append(tmp)
-                except:
-                    pass
-
-    ret['data'] = plugins_info
-
-    args = {}
-    args['count'] = len(plugins_info)
-    args['p1'] = 1
-
-    ret['list'] = public.getPage(args)
-    return jsonify(ret)
+    typeVal = request.args.get('type', '0')
+    data = plugin.plugin().getPluginList(typeVal, 1)
+    return public.getJson(data)
 
 
 @plugins.route('/install', methods=['POST'])

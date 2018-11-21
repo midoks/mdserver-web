@@ -9,7 +9,7 @@ import json
 # import psutil
 import time
 
-sys.path.append(os.getcwd() + "/class/")
+sys.path.append(os.getcwd() + "/class/core")
 reload(sys)
 sys.setdefaultencoding('utf-8')
 import db
@@ -113,13 +113,13 @@ def startTask():
         while True:
             try:
                 if os.path.exists(isTask):
-                    print "run --- !"
+                    # print "run --- !"
                     sql = db.Sql()
                     sql.table('tasks').where(
                         "status=?", ('-1',)).setField('status', '0')
                     taskArr = sql.table('tasks').where("status=?", ('0',)).field(
                         'id,type,execstr').order("id asc").select()
-                    print sql
+                    # print sql
                     for value in taskArr:
                         start = int(time.time())
                         if not sql.table('tasks').where("id=?", (value['id'],)).count():

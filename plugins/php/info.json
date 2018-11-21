@@ -5,8 +5,8 @@
 	"name": "php",
 	"title": "PHP",
 	"default": false,
-	"versions": "5.2,5.3,5.4,5.5,5.6,7.0,7.1,7.2",
-	"update": "5.2.17p1,5.3.29,5.4.45,5.5.38,5.6.32,7.0.26,7.1.12,7.2.0",
+	"versions": ["5.2","5.3","5.4","5.5","5.6","7.0","7.1","7.2"],
+	"updates": ["5.2.17p1","5.3.29","5.4.45","5.5.38","5.6.32","7.0.26","7.1.12","7.2.0"],
 	"tip": "soft",
 	"checks": "/www/server/php/VERSION/bin/php",
 	"display": 1,
@@ -14,79 +14,5 @@
 	"date": "2017-04-01",
 	"home": "https://www.php.net",
 	"type": "语言解释器",
-	"pid": "1",
-	"versions": [
-        {
-            "status": false,
-            "version": "5.2",
-            "no": "",
-            "task": "1"
-        },
-        {
-            "status": false,
-            "version": "5.3",
-            "no": "",
-            "task": "1"
-        },
-        {
-            "status": true,
-            "task": "1",
-            "run": true,
-            "no": "5.4.45",
-            "fpm": true,
-            "max": "50",
-            "version": "5.4",
-            "pathinfo": true,
-            "maxTime": "100",
-            "display": false
-        },
-        {
-            "status": false,
-            "version": "5.5",
-            "no": "",
-            "task": "1"
-        },
-        {
-            "status": true,
-            "task": "1",
-            "run": true,
-            "no": "5.6.30",
-            "fpm": true,
-            "max": "50",
-            "version": "5.6",
-            "pathinfo": true,
-            "maxTime": "100",
-            "display": false
-        },
-        {
-            "status": true,
-            "task": "1",
-            "run": true,
-            "no": "7.0.19",
-            "fpm": true,
-            "max": "50",
-            "version": "7.0",
-            "pathinfo": true,
-            "maxTime": "100",
-            "display": false
-        },
-        {
-            "status": true,
-            "task": "1",
-            "run": true,
-            "no": "7.1.5",
-            "fpm": true,
-            "max": "50",
-            "version": "7.1",
-            "pathinfo": true,
-            "maxTime": "100",
-            "display": false
-        },
-        {
-            "status": false,
-            "version": "7.2",
-            "no": "",
-            "task": "1"
-        }
-    ]
+	"pid": "1"
 }

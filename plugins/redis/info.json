@@ -6,6 +6,7 @@
 	"shell": "install.sh",
 	"default": false,
 	"versions":["4.0"],
+	"updates":["4.0.11"],
 	"tip": "soft",
 	"checks": "server/redis",
 	"display": 1,
