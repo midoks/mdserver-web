@@ -1784,6 +1784,7 @@ function GetSList(isdisplay) {
 
         $(".task").text(rdata.data[rdata.length - 1]);
         for (var i = 0; i < rdata.data.length; i++) {
+            var plugin = rdata.data[i];
             var len = rdata.data[i].versions.length;
             var version_info = '';
             var version = '';
@@ -1793,50 +1794,54 @@ function GetSList(isdisplay) {
             var indexshow = '';
             var checked = '';
 
-            checked = rdata.data[i].display ? 'checked' : '';
+            checked = plugin.display ? 'checked' : '';
     
-            if (typeof rdata.data[i].versions == "string"){
-                version_info += rdata.data[i].versions + '|';
+            if (typeof plugin.versions == "string"){
+                version_info += plugin.versions + '|';
             } else {
                 for (var j = 0; j < len; j++) {
-                    version_info += rdata.data[i].versions[j] + '|';
+                    version_info += plugin.versions[j] + '|';
                 }
             }
             if (version_info != '') {
                 version_info = version_info.substring(0, version_info.length - 1);
             }
 
-            var handle = '<a class="btlink" onclick="AddVersion(\'' + rdata.data[i].name + '\',\'' + version_info + '\',\'' + rdata.data[i].tip + '\',this,\'' + rdata.data[i].title + '\')">' + lan.soft.install + '</a>';
+            var handle = '<a class="btlink" onclick="AddVersion(\'' + plugin.name + '\',\'' + version_info + '\',\'' + plugin.tip + '\',this,\'' + plugin.title + '\')">安装</a>';
             var isSetup = false;
-            if (rdata.data[i].name != 'php') {
+            
+            if (plugin.name != 'php') {
                 for (var n = 0; n < len; n++) {
-                    if (rdata.data[i].versions[n].status == true) {
+                    if (plugin.status == true) {
                         isSetup = true;
-                        if (rdata.data[i].tip == 'lib') {
-                            var mupdate = (rdata.data[i].versions[n].no == rdata.data[i].versions[n].version) ? '' : '<a class="btlink" onclick="SoftUpdate(\'' + rdata.data[i].name + '\',\'' + rdata.data[i].versions[n].version + '\',\'' + rdata.data[i].versions[n].version + '\')">更新</a> | ';
-                            handle = mupdate + '<a class="btlink" onclick="PluginMan(\'' + rdata.data[i].name + '\',\'' + rdata.data[i].title + '\')">' + lan.soft.setup + '</a> | <a class="btlink" onclick="UninstallVersion(\'' + rdata.data[i].name + '\',\'' + rdata.data[i].versions[n].version + '\',\'' + rdata.data[i].title + '\')">' + lan.soft.uninstall + '</a>';
-                            titleClick = 'onclick="PluginMan(\'' + rdata.data[i].name + '\',\'' + rdata.data[i].title + '\')" style="cursor:pointer"';
+                        if (plugin.tip == 'lib') {
+                            var mupdate = (plugin.versions[n].no == plugin.versions[n].version) ? '' : '<a class="btlink" onclick="SoftUpdate(\'' + plugin.name + '\',\'' + plugin.versions[n].version + '\',\'' + plugin.versions[n].version + '\')">更新</a> | ';
+                            handle = mupdate + '<a class="btlink" onclick="PluginMan(\'' + plugin.name + '\',\'' + plugin.title + '\')">' + lan.soft.setup + '</a> | <a class="btlink" onclick="UninstallVersion(\'' + plugin.name + '\',\'' + plugin.versions[n].version + '\',\'' + plugin.title + '\')">卸载</a>';
+                            titleClick = 'onclick="PluginMan(\'' + plugin.name + '\',\'' + plugin.title + '\')" style="cursor:pointer"';
                         } else {
-                            var mupdate = (rdata.data[i].versions[n].no == rdata.data[i].update[n]) ? '' : '<a class="btlink" onclick="SoftUpdate(\'' + rdata.data[i].name + '\',\'' + rdata.data[i].versions[n].version + '\',\'' + rdata.data[i].update[n] + '\')">更新</a> | ';
-                            if (rdata.data[i].versions[n].no == '') mupdate = '';
-                            handle = mupdate + '<a class="btlink" onclick="SoftMan(\'' + rdata.data[i].name + '\',\'' + version_info + '\')">' + lan.soft.setup + '</a> | <a class="btlink" onclick="UninstallVersion(\'' + rdata.data[i].name + '\',\'' + rdata.data[i].versions[n].version + '\',\'' + rdata.data[i].title + '\')">' + lan.soft.uninstall + '</a>';
-                            titleClick = 'onclick="SoftMan(\'' + rdata.data[i].name + '\',\'' + version_info + '\')" style="cursor:pointer"';
+                            console.log(plugin, n);
+
+
+                            var mupdate = '';//(plugin.versions[n] == plugin.updates[n]) '' : '<a class="btlink" onclick="SoftUpdate(\'' + plugin.name + '\',\'' + plugin.versions[n].version + '\',\'' + plugin.updates[n] + '\')">更新</a> | ';
+                            if (plugin.versions[n] == '') mupdate = '';
+                            handle = mupdate + '<a class="btlink" onclick="SoftMan(\'' + plugin.name + '\',\'' + version_info + '\')">' + lan.soft.setup + '</a> | <a class="btlink" onclick="UninstallVersion(\'' + plugin.name + '\',\'' + plugin.versions[n].version + '\',\'' + plugin.title + '\')">卸载</a>';
+                            titleClick = 'onclick="SoftMan(\'' + plugin.name + '\',\'' + version_info + '\')" style="cursor:pointer"';
                         }
 
-                        version = rdata.data[i].versions[n].version;
+                        version = plugin.version;
                         softPath = '<span class="glyphicon glyphicon-folder-open" title="' + rdata.data[i].path + '" onclick="openPath(\'' + rdata.data[i].path + '\')"></span>';
-                        indexshow = '<div class="index-item"><input class="btswitch btswitch-ios" id="index_' + rdata.data[i].name + '" type="checkbox" ' + checked + '><label class="btswitch-btn" for="index_' + rdata.data[i].name + '" onclick="toIndexDisplay(\'' + rdata.data[i].name + '\',\'' + version + '\')"></label></div>';
+                        indexshow = '<div class="index-item"><input class="btswitch btswitch-ios" id="index_' + rdata.data[i].name + '" type="checkbox" ' + checked + '><label class="btswitch-btn" for="index_' + plugin.name + '" onclick="toIndexDisplay(\'' + plugin.name + '\',\'' + version + '\')"></label></div>';
                         if (rdata.data[i].versions[n].run == true) {
                             state = '<span style="color:#20a53a" class="glyphicon glyphicon-play"></span>'
                         } else {
                             state = '<span style="color:red" class="glyphicon glyphicon-pause"></span>'
                         }
                     }
-                    var isTask = rdata.data[i].versions[n].task;
+                    var isTask = plugin.task;
                     if (isTask == '-1') {
-                        handle = '<a style="color:green;" href="javascript:task();">' + lan.soft.the_install + '</a>'
+                        handle = '<a style="color:green;" href="javascript:task();">正在安装...</a>';
                     } else if (isTask == '0') {
-                        handle = '<a style="color:#C0C0C0;" href="javascript:task();">' + lan.soft.sleep_install + '</a>'
+                        handle = '<a style="color:#C0C0C0;" href="javascript:task();">等待安装...</a>';
                     }
                 }
 
@@ -1853,18 +1858,18 @@ function GetSList(isdisplay) {
             } else {
                 var pnum = 0;
                 for (var n = 0; n < len; n++) {
-                    if (rdata.data[i].versions[n].status == true) {
-                        checked = rdata.data[i].versions[n]['display'] ? "checked" : "";
-                        var mupdate = (rdata.data[i].versions[n].no == rdata.data[i].update[n]) ? '' : '<a class="btlink" onclick="SoftUpdate(\'' + rdata.data[i].name + '\',\'' + rdata.data[i].versions[n].version + '\',\'' + rdata.data[i].update[n] + '\')">更新</a> | ';
-                        handle = mupdate + '<a class="btlink" onclick="phpSoftMain(\'' + rdata.data[i].versions[n].version + '\',' + n + ')">' + lan.soft.setup + '</a> | <a class="btlink" onclick="UninstallVersion(\'' + rdata.data[i].name + '\',\'' + rdata.data[i].versions[n].version + '\',\'' + rdata.data[i].title + '\')">' + lan.soft.uninstall + '</a>';
-                        softPath = '<span class="glyphicon glyphicon-folder-open" title="' + rdata.data[i].path + '" onclick="openPath(\'' + rdata.data[i].path + "/" + rdata.data[i].versions[n].version.replace(/\./, "") + '\')"></span>';
-                        titleClick = 'onclick="phpSoftMain(\'' + rdata.data[i].versions[n].version + '\',' + n + ')" style="cursor:pointer"';
-                        indexshow = '<div class="index-item"><input class="btswitch btswitch-ios" id="index_' + rdata.data[i].name + rdata.data[i].versions[n].version.replace(/\./, "") + '" type="checkbox" ' + checked + '><label class="btswitch-btn" for="index_' + rdata.data[i].name + rdata.data[i].versions[n].version.replace(/\./, "") + '" onclick="toIndexDisplay(\'' + rdata.data[i].name + '\',\'' + rdata.data[i].versions[n].version + '\')"></label></div>';
-                        if (rdata.data[i].versions[n].run == true) {
-                            state = '<span style="color:#20a53a" class="glyphicon glyphicon-play"></span>'
-                        } else {
-                            state = '<span style="color:red" class="glyphicon glyphicon-pause"></span>'
-                        }
+                    if (plugin.status == true) {
+                        // checked = plugin.versions[n]['display'] ? "checked" : "";
+                        // var mupdate = (plugin.versions[n] == plugin.updates[n]) ? '' : '<a class="btlink" onclick="SoftUpdate(\'' + rdata.data[i].name + '\',\'' + plugin.versions[n] + '\',\'' + plugin.updates[n] + '\')">更新</a> | ';
+                        // handle = mupdate + '<a class="btlink" onclick="phpSoftMain(\'' + plugin.versions + '\',' + n + ')">' + lan.soft.setup + '</a> | <a class="btlink" onclick="UninstallVersion(\'' + rdata.data[i].name + '\',\'' + plugin.versions[n] + '\',\'' + plugin.title + '\')">卸载</a>';
+                        // softPath = '<span class="glyphicon glyphicon-folder-open" title="' + plugin.path + '" onclick="openPath(\'' + plugin.path + "/" + plugin.versions[n].replace(/\./, "") + '\')"></span>';
+                        // titleClick = 'onclick="phpSoftMain(\'' + plugin.versions[n] + '\',' + n + ')" style="cursor:pointer"';
+                        // indexshow = '<div class="index-item"><input class="btswitch btswitch-ios" id="index_' + plugin.name + plugin.versions[n].replace(/\./, "") + '" type="checkbox" ' + checked + '><label class="btswitch-btn" for="index_' + plugin.name + plugin.versions[n].replace(/\./, "") + '" onclick="toIndexDisplay(\'' + plugin.name + '\',\'' + plugin.versions[n] + '\')"></label></div>';
+                        // if (plugin.run == true) {
+                        //     state = '<span style="color:#20a53a" class="glyphicon glyphicon-play"></span>'
+                        // } else {
+                        //     state = '<span style="color:red" class="glyphicon glyphicon-pause"></span>'
+                        // }
                     } else {
                         handle = '<a class="btlink" onclick="oneInstall(\'' + rdata.data[i].name + '\',\'' + rdata.data[i].versions[n].version + '\')">' + lan.soft.install + '</a>';
                         softPath = '';
@@ -1922,7 +1927,7 @@ function GetSList(isdisplay) {
             $(this).addClass("on").siblings().removeClass("on");
             GetSList();
         })
-    })
+    },'json');
 }
 //刷新状态
 function FPStatus() {
@@ -2327,7 +2332,7 @@ function toIndexDisplay(name, version) {
         status = $("#index_" + name + verinfo).prop("checked") ? "0" : "1";
     }
     var data = "name=" + name + "&status=" + status + "&version=" + version;
-    $.post("/plugins?action=setPluginStatus", data, function(rdata) {
+    $.post("/plugins/set_plugin_status", data, function(rdata) {
         if (rdata.status) {
             layer.msg(rdata.msg, { icon: 1 })
         }
@@ -2345,7 +2350,7 @@ function flush_cache() {
 
 
 $(function() {
-    if (window.document.location.pathname == '/soft') {
+    if (window.document.location.pathname == '/soft/') {
         setInterval(function() { GetSList(true); }, 5000);
     }
 });
