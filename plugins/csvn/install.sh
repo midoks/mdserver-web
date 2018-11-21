@@ -18,7 +18,7 @@ Install_csvn()
 
 	cd $serverPath/tmp && tar -Jxf $serverPath/tmp/csvn.tar.xz
 	mkdir -p $serverPath/csvn
-	mv $serverPath/tmp/csvn $serverPath/csvn/5.1
+	mv $serverPath/tmp/csvn $serverPath/csvn
 	
 	echo '安装完成' > $install_tmp
 
