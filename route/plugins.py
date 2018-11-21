@@ -120,4 +120,13 @@ def checkInstalled():
 
 @plugins.route('/setting', methods=["GET"])
 def setting():
+    name = request.args.get('name', '')
+    html = __plugin_name + '/' + name + '/index.html'
+    return public.readFile(html)
+
+
+@plugins.route('/run', methods=['POST'])
+def run():
+    name = request.args.get('name', '')
+    html = __plugin_name + '/' + name + '/main.html'
     return "False"

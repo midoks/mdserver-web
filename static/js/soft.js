@@ -914,46 +914,20 @@ function GetPHPStatus(version) {
 //软件管理窗口
 function SoftMan(name, version) {
    
-    var loadT = layer.msg(lan.public.the, { icon: 16, time: 0, shade: [0.3, '#000'] });
+    var loadT = layer.msg("正在处理,请稍后...", { icon: 16, time: 0, shade: [0.3, '#000'] });
     $.get('/plugins/setting?name='+name, function(rdata) {
-        console.log(rdata)
+        // console.log(rdata)
         layer.close(loadT);
-        var nameA = rdata[name.replace('mysqld', 'mysql')];
-        var menu = '<p onclick="configChange(\'' + name + '\')">' + lan.soft.config_edit + '</p><p onclick="softChangeVer(\'' + name + '\',\'' + version + '\')">' + lan.soft.nginx_version + '</p>';
-        if (name == "phpmyadmin") {
-            menu = '<p onclick="phpVer(\'' + name + '\',\'' + nameA.phpversion + '\')">' + lan.soft.php_version + '</p><p onclick="safeConf(\'' + name + '\',' + nameA.port + ',' + nameA.auth + ')">' + lan.soft.safe + '</p>';
-        }
-        if (version == undefined || version == '') {
-            var menu = '<p onclick="configChange(\'' + name + '\')">' + lan.soft.config_edit + '</p>';
-        }
-
-        if (name == 'mysqld') {
-            menu += '<p onclick="changeMySQLDataPath()">' + lan.soft.save_path + '</p><p onclick="changeMySQLPort()">' + lan.site.port + '</p><p onclick="mysqlRunStatus()">' + lan.soft.status + '</p><p onclick="mysqlStatus()">' + lan.soft.php_main7 + '</p><p onclick="mysqlLog()">' + lan.soft.log + '</p><p onclick="mysqlSlowLog()">慢日志</p>';
-        } else if (name == 'memcached') {
-            menu += '<p onclick="MemcachedStatus()">负载状态</p><p onclick="MemcachedCache()">性能调整</p>';
-        } else if (name == 'redis') {
-            menu += '<p onclick="RedisStatus()">负载状态</p>';
-        } else if (name == 'tomcat') {
-            menu += '<p onclick="showLogs(\'/www/server/tomcat/logs/catalina.out\')">运行日志</p>';
-        }
 
         layer.open({
             type: 1,
             area: '640px',
-            title: name + lan.soft.admin,
+            title: name + "管理",
             closeBtn: 2,
             shift: 0,
-            content: '<div class="bt-w-main" style="width:640px;">\
-				<div class="bt-w-menu">\
-					<p class="bgw" onclick="service(\'' + name + '\',\'' + nameA.status + '\')">' + lan.soft.service + '</p>' +
-                menu +
-                '</div>\
-				<div id="webEdit-con" class="bt-w-con pd15" style="height:555px;overflow:auto">\
-					<div class="soft-man-con"></div>\
-				</div>\
-			</div>'
+            content: rdata
         });
-        service(name, nameA.status);
+        // service(name, nameA.status);
         $(".bt-w-menu p").click(function() {
             //var i = $(this).index();
             $(this).addClass("bgw").siblings().removeClass("bgw");
