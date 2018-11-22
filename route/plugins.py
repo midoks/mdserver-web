@@ -140,5 +140,5 @@ def run():
 
     data = public.execShell(py)
     if data[1].strip() == '':
-        return public.getJson({"data": data[0].strip(), "code": 0})
-    return public.getJson({"data": data[1].strip(), "code": -1})
+        return public.returnJson(True, "OK", data[0].strip())
+    return public.returnJson(False, data[1].strip())
