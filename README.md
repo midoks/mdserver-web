@@ -3,7 +3,7 @@
 
 ### 自动安装
 ```
-curl -fsSL  https://raw.githubusercontent.com/midoks/mdweb/master/sciprts/install.sh | sh
+curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/install.sh | sh
 ```
 
 ### 手动操作
