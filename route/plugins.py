@@ -127,18 +127,19 @@ def setting():
 
 @plugins.route('/run', methods=['POST', 'GET'])
 def run():
-
     name = request.form.get('name', '')
     func = request.form.get('func', '')
     args = request.form.get('args', '')
+    script = request.form.get('script', 'index')
 
     py = 'python ' + public.getRunDir() + '/' + __plugin_name + '/' + name
     if args == '':
-        py = py + '/index.py' + ' ' + func
+        py = py + '/' + script + '.py' + ' ' + func
     else:
-        py = py + '/index.py' + ' ' + func + ' ' + args
+        py = py + '/' + script + '.py' + ' ' + func + ' ' + args
 
     data = public.execShell(py)
+
     if data[1].strip() == '':
         return public.returnJson(True, "OK", data[0].strip())
     return public.returnJson(False, data[1].strip())
