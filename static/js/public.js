@@ -1552,11 +1552,7 @@ function check_login(){
 	});
 }
 
-$(function(){
-	setInterval(function(){
-		check_login();
-	},60000);
-});
+
 
 //登陆跳转
 function to_login(){
@@ -1573,3 +1569,10 @@ function scroll_handle(e){
 	var scrollTop = this.scrollTop;
 	$(this).find("thead").css({"transform":"translateY("+scrollTop+"px)","position":"relative","z-index":"1"});
 }
+
+
+$(function(){
+	setInterval(function(){
+		check_login();
+	},60000);
+});

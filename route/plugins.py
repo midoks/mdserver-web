@@ -118,15 +118,27 @@ def checkInstalled():
     return "False"
 
 
-@plugins.route('/setting', methods=["GET"])
+@plugins.route('/setting', methods=['GET'])
 def setting():
     name = request.args.get('name', '')
     html = __plugin_name + '/' + name + '/index.html'
     return public.readFile(html)
 
 
-@plugins.route('/run', methods=['POST'])
+@plugins.route('/run', methods=['POST', 'GET'])
 def run():
-    name = request.args.get('name', '')
-    html = __plugin_name + '/' + name + '/main.html'
-    return "False"
+
+    name = request.form.get('name', '')
+    func = request.form.get('func', '')
+    args = request.form.get('args', '')
+
+    py = 'python ' + public.getRunDir() + '/' + __plugin_name + '/' + name
+    if args == '':
+        py = py + '/index.py' + ' ' + func
+    else:
+        py = py + '/index.py' + ' ' + func + ' ' + args
+
+    data = public.execShell(py)
+    if data[1].strip() == '':
+        return public.getJson({"data": data[0].strip(), "code": 0})
+    return public.getJson({"data": data[1].strip(), "code": -1})
