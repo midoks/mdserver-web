@@ -6,7 +6,17 @@ is64bit=`getconf LONG_BIT`
 
 startTime=`date +%s`
 
-echo "hello"
+
+mkdir -p /www/server
+mkdir -p /www/wwwroot
+mkdir -p /www/wwwlogs
+mkdir -p /www/backup/database
+mkdir -p /www/backup/site
+
+
+wget -O /tmp/master.zip https://codeload.github.com/midoks/mdserver-web/zip/master
+unzip /tmp/master.zip
+mv /tmp/mdserver-web-master /www/server/mdserver-web
 
 
 
