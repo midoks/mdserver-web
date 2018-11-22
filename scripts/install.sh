@@ -15,7 +15,7 @@ mkdir -p /www/backup/site
 
 
 wget -O /tmp/master.zip https://codeload.github.com/midoks/mdserver-web/zip/master
-unzip /tmp/master.zip
+cd /tmp && unzip /tmp/master.zip
 mv /tmp/mdserver-web-master /www/server/mdserver-web
 
 
