@@ -1,8 +1,21 @@
 
 
-
-function redisService(){
-	console.log('redisService');
+//服务
+function redisService(name,status){
+	if(status == 'false') status = false;
+	if(status == 'true') status = true;
+	
+	var serviceCon ='<p class="status">当前状态：<span>'+(status?lan.soft.on:lan.soft.off)+'</span><span style="color: '+(status?'#20a53a;':'red;')+' margin-left: 3px;" class="glyphicon '+(status?'glyphicon glyphicon-play':'glyphicon-pause')+'"></span></p>\
+					<div class="sfm-opt">\
+						<button class="btn btn-default btn-sm" onclick="ServiceAdmin(\''+name+'\',\''+(status?'stop':'start')+'\')">'+(status?lan.soft.stop:lan.soft.start)+'</button>\
+						<button class="btn btn-default btn-sm" onclick="ServiceAdmin(\''+name+'\',\'restart\')">'+lan.soft.restart+'</button>\
+						<button class="btn btn-default btn-sm" onclick="ServiceAdmin(\''+name+'\',\'reload\')">'+lan.soft.reload+'</button>\
+					</div>'; 
+	$(".soft-man-con").html(serviceCon);
+	var help = '<ul class="help-info-text c7 mtb15" style="padding-top:30px"><li>'+lan.soft.mysql_mem_err+'</li></ul>';
+	if(name == 'mysqld'){
+		$(".soft-man-con").append(help);
+	}
 }
 
 
@@ -16,12 +29,11 @@ function redisStatus() {
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
     $.post('/plugins/run', {name:'redis', func:'status'}, function(data) {
     	layer.close(loadT);
-    	if (data.code < 0){
+    	if (!data.status){
     		return;
     	}
-    	
+
     	var rdata = $.parseJSON(data.data);
-        
         hit = (parseInt(rdata.keyspace_hits) / (parseInt(rdata.keyspace_hits) + parseInt(rdata.keyspace_misses)) * 100).toFixed(2);
         var Con = '<div class="divtable">\
 						<table class="table table-hover table-bordered" style="width: 490px;">\
@@ -46,4 +58,5 @@ function redisStatus() {
         $(".soft-man-con").html(Con);
     },'json');
 }
-redisStatus();
+
+redisService('redis', false);
