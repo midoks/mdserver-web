@@ -282,21 +282,7 @@ function configChange(type) {
         });
     });
 }
-//配置保存
-function confSafe(fileName) {
-    var data = encodeURIComponent($("#textBody").val());
-    var encoding = 'utf-8';
-    var loadT = layer.msg(lan.soft.the_save, {
-        icon: 16,
-        time: 0
-    });
-    $.post('/files?action=SaveFileBody', 'data=' + data + '&path=' + fileName + '&encoding=' + encoding, function(rdata) {
-        layer.close(loadT);
-        layer.msg(rdata.msg, {
-            icon: rdata.status ? 1 : 2
-        });
-    });
-}
+
 
 
 //设置PATHINFO

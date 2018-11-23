@@ -39,7 +39,15 @@ def status():
         result[t[0]] = t[1]
     return public.getJson(result)
 
+
+def getConf():
+    path = os.path.dirname(os.getcwd()) + "/redis/redis.conf"
+    return path
+
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
         print status()
+    elif func == 'conf':
+        print getConf()
