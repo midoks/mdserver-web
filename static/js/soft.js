@@ -1774,10 +1774,12 @@ function GetSList(isdisplay) {
                     }
                 }
 
+                // console.log(plugin);
+
                 sBody += '<tr>' +
                     '<td><span ' + titleClick + 
                     '><img src="/plugins/file?name=' + rdata.data[i].name + 
-                    '&f=ico.png' + '">' + rdata.data[i].title + ' ' + version + '</span></td>' +
+                    '&f=ico.png' + '">' + rdata.data[i].title + ' ' + version_info + '</span></td>' +
                     '<td>' + rdata.data[i].ps + '</td>' +
                     '<td>' + softPath + '</td>' +
                     '<td>' + state + '</td>' +
@@ -1828,7 +1830,7 @@ function GetSList(isdisplay) {
                         handle = '<a style="color:#C0C0C0;" href="javascript:task();">' + lan.soft.sleep_install + '</a>'
                     }
                     pBody += '<tr>' +
-                        '<td><span ' + titleClick + '><img src="/plugins/file?name=' + rdata.data[i].name + "&f=ico.png"+ '">' + rdata.data[i].title + '-' + rdata.data[i].versions[n].version + '</span></td>'
+                        '<td><span ' + titleClick + '><img src="/plugins/file?name=' + rdata.data[i].name + "&f=ico.png"+ '">' + rdata.data[i].title + '-' + rdata.data[i].versions + '</span></td>'
                         //+'<td>'+rdata.data[i].versions[n].no+'</td>'
                         //+'<td>'+rdata.data[i].type+'</td>'
                         +
