@@ -14,9 +14,20 @@ mkdir -p /www/backup/database
 mkdir -p /www/backup/site
 
 
+yum install -y wget curl unzip zip
+
+
 wget -O /tmp/master.zip https://codeload.github.com/midoks/mdserver-web/zip/master
 cd /tmp && unzip /tmp/master.zip
 mv /tmp/mdserver-web-master /www/server/mdserver-web
+
+yum groupinstall -y "Development Tools"
+
+yum -y install epel-release python-pip python-devel
+pip install --upgrade pip
+pip install -r /www/server/mdserver-web/requirements.txt
+
+
 
 
 
