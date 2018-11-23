@@ -1,22 +1,26 @@
 
 
+
+
 //服务
-function redisService(name,status){
-	if(status == 'false') status = false;
-	if(status == 'true') status = true;
+function redisService(){
+	var status = false;
+	var name = 'redis';
 	
-	var serviceCon ='<p class="status">当前状态：<span>'+(status?lan.soft.on:lan.soft.off)+'</span><span style="color: '+(status?'#20a53a;':'red;')+' margin-left: 3px;" class="glyphicon '+(status?'glyphicon glyphicon-play':'glyphicon-pause')+'"></span></p>\
-		<div class="sfm-opt">\
-			<button class="btn btn-default btn-sm" onclick="ServiceAdmin(\''+name+'\',\''+(status?'stop':'start')+'\')">'+(status?lan.soft.stop:lan.soft.start)+'</button>\
-			<button class="btn btn-default btn-sm" onclick="ServiceAdmin(\''+name+'\',\'restart\')">'+lan.soft.restart+'</button>\
-			<button class="btn btn-default btn-sm" onclick="ServiceAdmin(\''+name+'\',\'reload\')">'+lan.soft.reload+'</button>\
+	var serviceCon ='<p class="status">当前状态：<span>'+(status ? '开启' : '关闭' )+
+		'</span><span style="color: '+
+		(status?'#20a53a;':'red;')+
+		' margin-left: 3px;" class="glyphicon ' + (status?'glyphicon glyphicon-play':'glyphicon-pause')+'"></span></p><div class="sfm-opt">\
+			<button class="btn btn-default btn-sm" onclick="ServiceAdmin(\''+name+'\',\''+(status?'stop':'start')+'\')">'+(status?'停止':'启动')+'</button>\
+			<button class="btn btn-default btn-sm" onclick="ServiceAdmin(\''+name+'\',\'restart\')">重启</button>\
+			<button class="btn btn-default btn-sm" onclick="ServiceAdmin(\''+name+'\',\'reload\')">重载配置</button>\
 		</div>'; 
 	$(".soft-man-con").html(serviceCon);
 }
 
 //配置修改
 function redisConfig(type){
-	console.log('redisConfig');
+
 	var con = '<p style="color: #666; margin-bottom: 7px">提示：Ctrl+F 搜索关键字，Ctrl+G 查找下一个，Ctrl+S 保存，Ctrl+Shift+R 查找替换!</p><textarea class="bt-input-text" style="height: 320px; line-height:18px;" id="textBody"></textarea>\
 					<button id="OnlineEditFileBtn" class="btn btn-success btn-sm" style="margin-top:10px;">保存</button>\
 					<ul class="help-info-text c7 ptb15">\
@@ -100,4 +104,4 @@ function redisStatus() {
     },'json');
 }
 
-redisService('redis', false);
+redisService();
