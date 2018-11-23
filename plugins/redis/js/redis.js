@@ -6,21 +6,62 @@ function redisService(name,status){
 	if(status == 'true') status = true;
 	
 	var serviceCon ='<p class="status">当前状态：<span>'+(status?lan.soft.on:lan.soft.off)+'</span><span style="color: '+(status?'#20a53a;':'red;')+' margin-left: 3px;" class="glyphicon '+(status?'glyphicon glyphicon-play':'glyphicon-pause')+'"></span></p>\
-					<div class="sfm-opt">\
-						<button class="btn btn-default btn-sm" onclick="ServiceAdmin(\''+name+'\',\''+(status?'stop':'start')+'\')">'+(status?lan.soft.stop:lan.soft.start)+'</button>\
-						<button class="btn btn-default btn-sm" onclick="ServiceAdmin(\''+name+'\',\'restart\')">'+lan.soft.restart+'</button>\
-						<button class="btn btn-default btn-sm" onclick="ServiceAdmin(\''+name+'\',\'reload\')">'+lan.soft.reload+'</button>\
-					</div>'; 
+		<div class="sfm-opt">\
+			<button class="btn btn-default btn-sm" onclick="ServiceAdmin(\''+name+'\',\''+(status?'stop':'start')+'\')">'+(status?lan.soft.stop:lan.soft.start)+'</button>\
+			<button class="btn btn-default btn-sm" onclick="ServiceAdmin(\''+name+'\',\'restart\')">'+lan.soft.restart+'</button>\
+			<button class="btn btn-default btn-sm" onclick="ServiceAdmin(\''+name+'\',\'reload\')">'+lan.soft.reload+'</button>\
+		</div>'; 
 	$(".soft-man-con").html(serviceCon);
-	var help = '<ul class="help-info-text c7 mtb15" style="padding-top:30px"><li>'+lan.soft.mysql_mem_err+'</li></ul>';
-	if(name == 'mysqld'){
-		$(".soft-man-con").append(help);
-	}
 }
 
-
-function redisConfig(){
+//配置修改
+function redisConfig(type){
 	console.log('redisConfig');
+	var con = '<p style="color: #666; margin-bottom: 7px">提示：Ctrl+F 搜索关键字，Ctrl+G 查找下一个，Ctrl+S 保存，Ctrl+Shift+R 查找替换!</p><textarea class="bt-input-text" style="height: 320px; line-height:18px;" id="textBody"></textarea>\
+					<button id="OnlineEditFileBtn" class="btn btn-success btn-sm" style="margin-top:10px;">保存</button>\
+					<ul class="help-info-text c7 ptb15">\
+						<li>此处为redis主配置文件,若您不了解配置规则,请勿随意修改。</li>\
+					</ul>';
+	$(".soft-man-con").html(con);
+
+	var loadT = layer.msg('配置文件路径获取中...',{icon:16,time:0,shade: [0.3, '#000']});
+	$.post('/plugins/run', {name:'redis', func:'conf'},function (data) {
+		layer.close(loadT);
+		var loadT2 = layer.msg('文件内容获取中...',{icon:16,time:0,shade: [0.3, '#000']});
+		var fileName = data.data;
+		$.post('/files/get_body', 'path=' + fileName, function(rdata) {
+			layer.close(loadT2);
+			$("#textBody").empty().text(rdata.data.data);
+			$(".CodeMirror").remove();
+			var editor = CodeMirror.fromTextArea(document.getElementById("textBody"), {
+				extraKeys: {"Ctrl-Space": "autocomplete"},
+				lineNumbers: true,
+				matchBrackets:true,
+			});
+			editor.focus();
+			$(".CodeMirror-scroll").css({"height":"300px","margin":0,"padding":0});
+			$("#OnlineEditFileBtn").click(function(){
+				$("#textBody").text(editor.getValue());
+				redisConfSafe(fileName);
+			});
+		},'json');
+	},'json');
+}
+
+//配置保存
+function redisConfSafe(fileName) {
+    var data = encodeURIComponent($("#textBody").val());
+    var encoding = 'utf-8';
+    var loadT = layer.msg('保存中...', {
+        icon: 16,
+        time: 0
+    });
+    $.post('/files/save_body', 'data=' + data + '&path=' + fileName + '&encoding=' + encoding, function(rdata) {
+        layer.close(loadT);
+        layer.msg(rdata.msg, {
+            icon: rdata.status ? 1 : 2
+        });
+    },'json');
 }
 
 
