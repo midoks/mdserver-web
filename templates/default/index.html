@@ -16,7 +16,7 @@
     <div class="container-fluid" style="padding-bottom: 66px;">
         
         <div class="danger-tips">
-            <div class="alert alert-warning" id="messageError" style="display: none;background-color: #ffe0e0;border-color: #ffb0b0;color: #ff2020; margin-bottom:0"></div>
+            <div class="alert alert-warning" id="messageError" style="display: none;background-color: #ffe0e0;border-color: #ffb0b0;color: #ff2020; margin-bottom:0;margin-top: 12px;"></div>
         </div>
 
         <div class="server bgw mtb15">
@@ -36,7 +36,7 @@
                             </div>
                             <div class="mask"><span id="Load">0</span>%</div>
                         </div>
-                        <h4 id="LoadState" class="c5 f15">获取中:</h4>
+                        <h4 id="LoadState" class="c5 f15">获取中...</h4>
                     </li>
                     <li class="col-xs-6 col-sm-3 col-md-3 col-lg-2 mtb20 circle-box text-center">
                         <h3 class="c5 f15">CPU使用率</h3>
@@ -49,7 +49,7 @@
                             </div>
                             <div class="mask"><span id="state">0</span>%</div>
                         </div>
-                        <h4 id="core" class="c5 f15">$data['lan']['S2']</h4>
+                        <h4 id="core" class="c5 f15">获取中...</h4>
                     </li>
                     <li class="col-xs-6 col-sm-3 col-md-3 col-lg-2 mtb20 circle-box text-center">
                         <h3 class="c5 f15">内存使用率</h3>
@@ -61,10 +61,10 @@
                                 <div class="right"></div>
                             </div>
                             <div class="mask"><span id="left">0</span>%</div>
-                            <div class="mem-re-min"></div>
-                            <div class="mem-re-con" title="$data['lan']['P3']"></div>
+                            <div class="mem-re-min" style="display: none;"></div>
+                            <div class="mem-re-con" title=""></div>
                         </div>
-                        <h4 id="memory" class="c5 f15">$data['lan']['S2']</h4>
+                        <h4 id="memory" class="c5 f15">获取中...</h4>
                     </li>
                 </ul>
             </div>
@@ -143,5 +143,6 @@ setTimeout(function() {
 setTimeout(function() {
     getInfo();
 }, 1500);
+
 </script>
 {% endblock %}

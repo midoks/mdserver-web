@@ -15,11 +15,11 @@ Install_openresty()
 	mkdir -p $serverPath/tmp
 	echo '正在安装脚本文件...' > $install_tmp
 
-	wget -O $serverPath/tmp/openresty.tar.gz https://openresty.org/download/openresty-1.13.6.2.tar.gz
-	cd $serverPath/tmp && tar -zxvf openresty.tar.gz
+	#wget -O $serverPath/tmp/openresty.tar.gz https://openresty.org/download/openresty-1.13.6.2.tar.gz
+	#cd $serverPath/tmp && tar -zxvf openresty.tar.gz
 
 	mkdir -p $serverPath/openresty
-	cd openresty* && ./configure --prefix=$serverPath/openresty && make && make install
+	cd $serverPath/tmp/openresty* && ./configure --prefix=$serverPath/openresty && make && make install
 	
 	echo '安装完成' > $install_tmp
 	#rm -rf $serverPath/tmp
