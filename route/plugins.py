@@ -138,6 +138,7 @@ def run():
     else:
         py = py + '/' + script + '.py' + ' ' + func + ' ' + args
 
+    print py
     data = public.execShell(py)
 
     if data[1].strip() == '':

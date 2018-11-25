@@ -359,6 +359,7 @@ function openPath(a) {
 	window.location.href = "/files"
 }
 
+
 function OnlineEditFile(k, f) {
 	if(k != 0) {
 		var l = $("#PathPlace input").val();
