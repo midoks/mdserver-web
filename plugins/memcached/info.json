@@ -1,0 +1,17 @@
+{
+	"sort": 7,
+	"ps": "Memcached 是一个高性能的分布式内存对象缓存系统",
+	"name": "memcached",
+	"title": "Memcached",
+	"shell": "install.sh",
+	"versions":["1.5"],
+	"updates":["1.5.12"],
+	"tip": "soft",
+	"checks": "server/memcached",
+	"display": 1,
+	"author": "Zend",
+	"date": "2017-04-01",
+	"home": "http://memcached.org/",
+	"type": 0,
+	"pid": "2"
+}

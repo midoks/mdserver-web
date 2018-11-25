@@ -4,7 +4,6 @@
 	"name": "redis",
 	"title": "Redis",
 	"shell": "install.sh",
-	"default": false,
 	"versions":["4.0"],
 	"updates":["4.0.11"],
 	"tip": "soft",

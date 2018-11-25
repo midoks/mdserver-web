@@ -4,10 +4,18 @@ function redisOp(a, b) {
 	var d = "";
 
 	switch(b) {
-		case "stop":d = '停止';break;
-		case "start":d = '启动';break;
-		case "restart":d = '重启';break;
-		case "reload":d = '重载';break;
+		case "stop":
+			d = '停止';
+			break;
+		case "start":
+			d = '启动';
+			break;
+		case "restart":
+			d = '重启';
+			break;
+		case "reload":
+			d = '重载';
+			break
 	}
 	layer.confirm( '您真的要{1}{2}服务吗？'.replace('{1}', d).replace('{2}', a), {icon:3,closeBtn: 2}, function() {
 		var e = layer.msg('正在{1}{2}服务,请稍候...'.replace('{1}', d).replace('{2}', a), {icon: 16,time: 0});
