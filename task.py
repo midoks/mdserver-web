@@ -119,7 +119,7 @@ def startTask():
                         "status=?", ('-1',)).setField('status', '0')
                     taskArr = sql.table('tasks').where("status=?", ('0',)).field(
                         'id,type,execstr').order("id asc").select()
-                    # print sql
+                    print sql
                     for value in taskArr:
                         start = int(time.time())
                         if not sql.table('tasks').where("id=?", (value['id'],)).count():

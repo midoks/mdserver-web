@@ -1,0 +1,15 @@
+{
+	"title":"openresty",
+	"tip":"soft",
+	"name":"openresty",
+	"type":"其他插件",
+	"ps":"轻量级，占有内存少，并发能力强",
+	"shell":"install.sh",
+	"checks":"server/openresty",
+	"author":"agentzh",
+	"home":"http://openresty.org",
+	"date":"2017-11-24",
+	"pid": "1",
+	"versions": ["1.13.6"],
+	"updates": ["1.13.6.2"]
+}
