@@ -1,68 +1,27 @@
 {% extends "default/layout.html" %} {% block content %}
 <div class="main-content">
-    <div class="container-fluid" style="padding-bottom: 66px;">
-        <div class="pos-box bgw mtb15">
-            <div class="position f14 c9 pull-left">
-                <a class="plr10 c4" href="/">首页</a>/<span class="plr10 c4">服务器状态</span>
-            </div>
-            <span class="pull-right f12 c6" style="line-height:42px; margin-right:15px">
-                    版本信息 <span id="btversion" class="mr5" onclick="openLog()">0.0.1</span>
-            <span id="toUpdate"><a class="btlink" href="javascript:checkUpdate();">检查更新</a></span>
-            </span>
+
+    <div class="index-pos-box bgw">
+        <div class="position f12 c6 pull-left" style="background:none;padding-left:15px">
+            <span class="ico-system">系统:</span><span id="info" style="margin-left:10px;"> </span>&#12288;&#12288;<span id="running"></span>
         </div>
+        <span class="pull-right f12 c6" style="line-height:52px; margin-right:15px">
+            <span id="btversion" onclick="index.open_log()" style="margin-right:10px">0.0.1</span>
+            <span id="toUpdate"><a class="btlink" href="javascript:index.check_update();">更新</a></span>
+            <span style="margin:0 10px"><a class="btlink" href="javascript:index.re_panel();">修复</a></span>
+            <span><a class="btlink" href="javascript:index.re_server();">重启</a></span>
+        </span>
+    </div>
+
+    <div class="container-fluid" style="padding-bottom: 66px;">
+        
         <div class="danger-tips">
             <div class="alert alert-warning" id="messageError" style="display: none;background-color: #ffe0e0;border-color: #ffb0b0;color: #ff2020; margin-bottom:0"></div>
         </div>
-        <div class="system-info bgw clearfix mtb15">
-            <div class="title c6 f16 plr15">
-                系统:<span id="info"> $data['lan']['S2']</span>&#12288;&#12288;&#12288;已不间断运行:<span id="running"> $data['lan']['S4']</span>
-                <button onclick="ReBoot()" class="btn btn-success btn-xs" style="vertical-align:1px;margin-left:10px;">重启服务器</button>
-                <button onclick="reWeb()" style="vertical-align:1px;" class="btn btn-success btn-xs">重启面板</button>
-                <button onclick="repPanel()" style="vertical-align:1px;" class="btn btn-success btn-xs">修复面板</button>
-            </div>
-            <div class="system-info-con mtb15">
-                <ul class="clearfix">
-                    <li class="sys-i-c-box col-xs-6 col-sm-4 col-md-4 col-lg-3 plr15">
-                        <div class="siteinfo-box b-shadown">
-                            <h3 class="f14">网站</h3>
-                            <div class="siteinfo-box-right">
-                                <h4 class="c6">1个</h4>
-                                <div class="sbr-btn">
-                                    <a href="/site">管理</a>|<a href="javascript:;" onclick="webAdd(0)">添加</a>
-                                </div>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="sys-i-c-box col-xs-6 col-sm-4 col-md-4 col-lg-3 plr15">
-                        <div class="siteinfo-box b-shadown">
-                            <h3 class="f14">FTP</h3>
-                            <div class="siteinfo-box-right">
-                                <h4 class="c6">1个</h4>
-                                <div class="sbr-btn">
-                                    <a href="/ftp">管理</a>|<a href="javascript:;" onclick="ftpAdd(0)">添加</a>
-                                </div>
-                            </div>
-                        </div>
-                    </li>
-                    <li class="sys-i-c-box col-xs-6 col-sm-4 col-md-4 col-lg-3 plr15">
-                        <div class="siteinfo-box b-shadown">
-                            <h3 class="f14">数据库</h3>
-                            <div class="siteinfo-box-right">
-                                <h4 class="c6">1个</h4>
-                                <div class="sbr-btn">
-                                    <a href="/database">管理</a>|<a href="javascript:;" onclick="DataAdd(0)">添加</a>
-                                </div>
-                            </div>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-        </div>
+
         <div class="server bgw mtb15">
             <div class="title c6 f16 plr15">
-                <h3 class="c6 f16 pull-left">服务器状态</h3>
-                <a class="pull-left f12 btlink" href="javascript:;" style="background:none;padding:0; margin-left:22px" onclick="GetNetWorkList()">连接管理</a>
-                <a class="pull-left f12 btlink" href="javascript:;" style="background:none;padding:0; margin-left:22px" onclick="GetProcessList()">进程管理</a>
+                <h3 class="c6 f16 pull-left">状态</h3>
             </div>
             <div class="server-circle">
                 <ul class="row" id="systemInfoList">
@@ -110,6 +69,26 @@
                 </ul>
             </div>
         </div>
+
+        
+        <div class="conter-box system-info bgw clearfix mtb15">
+            <div class="title c6 f16 plr15">
+                概览
+            </div>
+            <div class="system-info-con mtb20">
+                <ul class="clearfix text-center">
+                    <li class="sys-li-box col-xs-3 col-sm-3 col-md-3 col-lg-3">
+                        <p class="name f15 c9">网站</p>
+                        <div class="val"><a class="btlink" href="/site">1</a></div>
+                    </li>
+                    <li class="sys-li-box col-xs-3 col-sm-3 col-md-3 col-lg-3">
+                        <p class="name f15 c9">数据库</p>
+                        <div class="val"><a class="btlink" href="/database">1</a></div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
         <div class="col-xs-12 col-sm-12 col-md-6 pull-left pd0">
             <div class="pr8">
                 <div class="bgw">
@@ -123,17 +102,16 @@
                 </div>
             </div>
         </div>
+
         <div class="col-xs-12 col-sm-12 col-md-6 pull-left pd0">
             <div class="pl7">
                 <div class="bgw" style="height:491px">
-                    <div class="title c6 f16 plr15">网络流量</div>
+                    <div class="title c6 f16 plr15">流量</div>
                     <div class="bw-info">
-                        <ul>
-                            <li class="bi-line col-xs-6 col-sm-6 col-md-6 pull-left c6 f14"><span class="pull-left">上行</span><a id="upSpeed" class="c6">$data['lan']['S2']</a></li>
-                            <li class="bi-line col-xs-6 col-sm-6 col-md-6 pull-left c6 f14"><span class="pull-left">下行</span><a id="downSpeed" class="c6">$data['lan']['S2']</a></li>
-                            <li class="pull-left col-xs-6 col-sm-6 col-md-6 c6 f14"><span class="pull-left">总发送</span><a id="upAll" title="" class="c6">$data['lan']['S2']</a></li>
-                            <li class="pull-left col-xs-6 col-sm-6 col-md-6 c6 f14"><span class="pull-left">总接收</span><a id="downAll" title="" class="c6">$data['lan']['S2']</a></li>
-                        </ul>
+                        <div class="col-sm-6 col-md-3"><p class="c9"><span class="ico-up"></span>上行</p><a id="upSpeed">0</a></div>
+                        <div class="col-sm-6 col-md-3"><p class="c9"><span class="ico-down"></span>下行</p><a id="downSpeed">0</a></div>
+                        <div class="col-sm-6 col-md-3"><p class="c9">总发送</p><a id="upAll">0</a></div>
+                        <div class="col-sm-6 col-md-3"><p class="c9">总接收</p><a id="downAll">0</a></div>
                     </div>
                     <div id="NetImg" style="width:100%;height:330px;"></div>
                 </div>
