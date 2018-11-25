@@ -10,8 +10,42 @@ import public
 
 
 def status():
+    data = public.execShell(
+        "ps -ef|grep redis |grep -v grep | grep -v python | awk '{print $2}'")
+    if data[0] == '':
+        return 'stop'
+    return 'start'
 
-    cmd = os.path.dirname(os.getcwd()) + "/redis/bin/redis-cli info"
+
+def start():
+    path = os.path.dirname(os.getcwd())
+    cmd = path + "/redis/bin/redis-server"
+    cmd = cmd + " " + path + "/redis/redis.conf"
+    data = public.execShell(cmd)
+    if data[0] == '':
+        return 'ok'
+    return 'fail'
+
+
+def stop():
+    data = public.execShell(
+        "ps -ef|grep redis |grep -v grep |grep -v python |awk '{print $2}' | xargs kill -9")
+    if data[0] == '':
+        return 'ok'
+    return 'fail'
+
+
+def restart():
+    return 'ok'
+
+
+def reload():
+    return 'ok'
+
+
+def runInfo():
+    path = os.path.dirname(os.getcwd())
+    cmd = path + "/redis/bin/redis-cli info"
     data = public.execShell(cmd)[0]
     res = [
         'tcp_port',
@@ -44,10 +78,19 @@ def getConf():
     path = os.path.dirname(os.getcwd()) + "/redis/redis.conf"
     return path
 
-
 if __name__ == "__main__":
     func = sys.argv[1]
-    if func == 'status':
-        print status()
+    if func == 'run_info':
+        print runInfo()
     elif func == 'conf':
         print getConf()
+    elif func == 'status':
+        print status()
+    elif func == 'start':
+        print start()
+    elif func == 'stop':
+        print stop()
+    elif func == 'restart':
+        print restart()
+    elif func == 'reload':
+        print reload()
