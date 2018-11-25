@@ -48,7 +48,7 @@ def getRootDir():
 
 def getOs():
     os = execShell('uname')
-    return os[0]
+    return os[0].lower().strip()
 
 
 def M(table):
@@ -92,7 +92,7 @@ def md5(str):
         return False
 
 
-def GetFileMd5(filename):
+def getFileMd5(filename):
     # 文件的MD5值
     if not os.path.isfile(filename):
         return False
@@ -108,7 +108,7 @@ def GetFileMd5(filename):
     return myhash.hexdigest()
 
 
-def GetRandomString(length):
+def getRandomString(length):
     # 取随机字符串
     str = ''
     chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789'

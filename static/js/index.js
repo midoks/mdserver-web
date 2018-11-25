@@ -9,15 +9,11 @@ $(function() {
             $("#memory").text(lan.index.memre);
         }
     }, function() {
-        if (!($(this).hasClass("mem-action"))) {
-            $(this).find(".mem-re-min").show();
-        } else {
-            $(this).find(".mem-re-min").hide();
-        }
         $(this).removeClass("shine_green");
         $(this).find(".mask").css({ "color": "#20a53a" });
         $(this).find(".mem-re-con").css({ "top": "15px", opacity: 1, "display": "none" });
         $("#memory").text(getCookie("mem-before"));
+        $(this).find(".mem-re-min").hide();
     }).click(function() {
         $(this).find(".mem-re-min").hide();
         if (!($(this).hasClass("mem-action"))) {
@@ -126,6 +122,7 @@ function GetPercent(num, total) {
 
 function GetDiskInfo() {
     $.get('/system/disk_info', function(rdata) {
+        console.log(rdata);
         var dBody
         for (var i = 0; i < rdata.length; i++) {
             if (rdata[i].path == '/' || rdata[i].path == '/www') {
@@ -157,7 +154,7 @@ function GetDiskInfo() {
             $("#systemInfoList").append(dBody);
             setImg();
         }
-    });
+    },'json');
 }
 
 //清理垃圾
@@ -167,6 +164,19 @@ function ClearSystem() {
         layer.close(loadT);
         layer.msg('清理完成,共清理[' + rdata[0] + ']个文件,释放[' + ToSize(rdata[1]) + ']磁盘空间!', { icon: 1 });
     });
+}
+
+function setMemImg(info){
+    setCookie("memRealUsed", parseInt((info.memRealUsed)));
+    $("#memory").html(parseInt((info.memRealUsed)) + '/' + info.memTotal + ' (MB)');
+    setCookie("mem-before", $("#memory").text());
+    if (!getCookie('memSize')) setCookie('memSize', parseInt(info.memTotal));
+    var memPre = Math.floor(info.memRealUsed / (info.memTotal / 100));
+    $("#left").html(memPre);
+    setcolor(memPre, "#left", 75, 90, 95);
+    $("#state").html(info.cpuRealUsed);
+    setcolor(memPre, "#state", 30, 70, 90);
+    setImg();
 }
 
 function getInfo() {
@@ -180,7 +190,7 @@ function getInfo() {
         setcolor(memPre, "#left", 75, 90, 95);
         $("#info").html(info.system);
         $("#running").html(info.time);
-        $("#core").html(info.cpuNum + " " + lan.index.cpu_core);
+        $("#core").html(info.cpuNum + " " + '核心');
         $("#state").html(info.cpuRealUsed);
         setcolor(memPre, "#state", 30, 70, 90);
         var memFree = info.memTotal - info.memRealUsed;
@@ -221,28 +231,27 @@ function setcolor(pre, s, s1, s2, s3) {
 function getNet() {
     var up;
     var down;
-    $.ajax({
-        type: "get",
-        url: "/system/network",
-        async: true,
-        success: function(net) {
-            $("#InterfaceSpeed").html(lan.index.interfacespeed + "： 1.0Gbps");
-            $("#upSpeed").html(net.up + ' KB');
-            $("#downSpeed").html(net.down + ' KB');
-            $("#downAll").html(ToSize(net.downTotal));
-            $("#downAll").attr('title', lan.index.package + ':' + net.downPackets)
-            $("#upAll").html(ToSize(net.upTotal));
-            $("#upAll").attr('title', lan.index.package + ':' + net.upPackets)
-            $("#core").html(net.cpu[1] + " " + lan.index.cpu_core);
-            $("#state").html(net.cpu[0]);
-            setcolor(net.cpu[0], "#state", 30, 70, 90);
-            setCookie("upNet", net.up);
-            setCookie("downNet", net.down);
-            getLoad(net.load);
-            setImg();
-        }
-    });
+    $.get("/system/network", function(net) {
+        $("#InterfaceSpeed").html(lan.index.interfacespeed + "： 1.0Gbps");
+        $("#upSpeed").html(net.up + ' KB');
+        $("#downSpeed").html(net.down + ' KB');
+        $("#downAll").html(ToSize(net.downTotal));
+        $("#downAll").attr('title', lan.index.package + ':' + net.downPackets)
+        $("#upAll").html(ToSize(net.upTotal));
+        $("#upAll").attr('title', lan.index.package + ':' + net.upPackets)
+        $("#core").html(net.cpu[1] + " " + lan.index.cpu_core);
+        $("#state").html(net.cpu[0]);
+        setcolor(net.cpu[0], "#state", 30, 70, 90);
+        setCookie("upNet", net.up);
+        setCookie("downNet", net.down);
+        getLoad(net.load);
+    
+        // console.log(net.mem);
+        // setMemImg(net.mem);
+        setImg();
+    },'json');
 }
+
 //网络Io
 function NetImg() {
     var myChartNetwork = echarts.init(document.getElementById('NetImg'));
@@ -476,26 +485,6 @@ function checkUpdate() {
 }
 
 
-function updateMsg() {
-    window.open("http://www.bt.cn/bbs/thread-1186-1-1.html");
-    $.get('/ajax?action=UpdatePanel', function(rdata) {
-        layer.open({
-            type: 1,
-            title: lan.index.update_to + '[' + rdata.version + ']',
-            area: '400px',
-            shadeClose: false,
-            closeBtn: 2,
-            content: '<div class="setchmod bt-form pd20 pb70">' +
-                '<p style="padding: 0 0 10px;line-height: 24px;">' + rdata.updateMsg + '</p>' +
-                '<div class="bt-form-submit-btn">' +
-                '<button type="button" class="btn btn-danger btn-sm btn-title" onclick="layer.closeAll()">' + lan.public.cancel + '</button>' +
-                '<button type="button" class="btn btn-success btn-sm btn-title" onclick="updateVersion(\'' + rdata.version + '\')" >' + lan.index.update_go + '</button>' +
-                '</div>' +
-                '</div>'
-        });
-    });
-}
-
 //开始升级
 function updateVersion(version) {
     var loadT = layer.msg(lan.index.update_the, { icon: 16, time: 0, shade: [0.3, '#000'] });
@@ -523,32 +512,6 @@ function updateVersion(version) {
             window.location.reload();
         }, 3000);
     });
-}
-
-//更新日志
-function openLog() {
-    layer.open({
-        type: 1,
-        area: '640px',
-        title: lan.index.update_log,
-        closeBtn: 2,
-        shift: 5,
-        shadeClose: false,
-        content: '<div class="DrawRecordCon"></div>'
-    });
-    $.get('https://www.bt.cn/Api/getUpdateLogs', function(rdata) {
-        var body = '';
-        for (var i = 0; i < rdata.length; i++) {
-            body += '<div class="DrawRecord DrawRecordlist">\
-					<div class="DrawRecordL">' + rdata[i].addtime + '<i></i></div>\
-					<div class="DrawRecordR">\
-						<h3>' + rdata[i].title + '</h3>\
-						<p>' + rdata[i].body + '</p>\
-					</div>\
-				</div>'
-        }
-        $(".DrawRecordCon").html(body);
-    }, 'jsonp');
 }
 
 
@@ -624,136 +587,7 @@ function WSafeRestart() {
     $(".layui-layer-close").unbind("click");
 }
 
-function reWeb() {
-    // layer.confirm(lan.index.panel_reboot_msg, { title: lan.index.panel_reboot_title, closeBtn: 2, icon: 3 }, function() {
-    //     var loadT = layer.msg(lan.index.panel_reboot_to, { icon: 16, time: 0, shade: [0.3, '#000'] });
-    //     $.get('/system?action=ReWeb', function(rdata) {
-    //         layer.close(loadT);
-    //         layer.msg(rdata.msg, { icon: 5 });
-    //     }).error(function() {
-    //         layer.close(loadT);
-    //         layer.msg(lan.index.panel_reboot_ok, { icon: 1 });
-    //         setTimeout(function() {
-    //             window.location.reload();
-    //         }, 3000)
-    //     });
-    // });
-}
 
-
-//查看网络状态
-function GetNetWorkList(rflush) {
-    var loadT = layer.msg(lan.public.the_get, { icon: 16, time: 0, shade: [0.3, '#000'] });
-    $.post('/ajax?action=GetNetWorkList', '', function(rdata) {
-        layer.close(loadT);
-        var tbody = ""
-        for (var i = 0; i < rdata.length; i++) {
-            tbody += "<tr>" +
-                "<td>" + rdata[i].type + "</td>" +
-                "<td>" + rdata[i].laddr[0] + ":" + rdata[i].laddr[1] + "</td>" +
-                "<td>" + (rdata[i].raddr.length > 1 ? "<a style='color:blue;' title='" + lan.index.net_dorp_ip + "' href=\"javascript:dropAddress('" + rdata[i].raddr[0] + "');\">" + rdata[i].raddr[0] + "</a>:" + rdata[i].raddr[1] : 'NONE') + "</td>" +
-                "<td>" + rdata[i].status + "</td>" +
-                "<td>" + rdata[i].process + "</td>" +
-                "<td>" + rdata[i].pid + "</td>" +
-                "</tr>"
-        }
-
-        if (rflush) {
-            $("#networkList").html(tbody);
-            return;
-        }
-
-        layer.open({
-            type: 1,
-            area: ['650px', '600px'],
-            title: lan.index.net_status_title,
-            closeBtn: 2,
-            shift: 5,
-            shadeClose: true,
-            content: "<div class='divtable' style='margin:15px;'>\
-					<button class='btn btn-default btn-sm pull-right' onclick='GetNetWorkList(true);' style='margin-bottom:5px;'>" + lan.public.fresh + "</button>\
-					<table class='table table-hover table-bordered'>\
-						<thead>\
-						<tr>\
-							<th>" + lan.index.net_protocol + "</th>\
-							<th>" + lan.index.net_address_dst + "</th>\
-							<th>" + lan.index.net_address_src + "</th>\
-							<th>" + lan.index.net_address_status + "</th>\
-							<th>" + lan.index.net_process + "</th>\
-							<th>" + lan.index.net_process_pid + "</th>\
-						</tr>\
-						</thead>\
-						<tbody id='networkList'>" + tbody + "</tbody>\
-					 </table></div>"
-        });
-    });
-}
-
-//进程管理
-function GetProcessList(rflush) {
-    var loadT = layer.msg(lan.index.process_check, { icon: 16, time: 0, shade: [0.3, '#000'] });
-    $.post('/ajax?action=GetProcessList', '', function(rdata) {
-        layer.close(loadT);
-        var tbody = "";
-        for (var i = 0; i < rdata.length; i++) {
-            tbody += "<tr>" +
-                "<td>" + rdata[i].pid + "</td>" +
-                "<td>" + rdata[i].name + "</td>" +
-                "<td>" + rdata[i].cpu_percent + "%</td>" +
-                "<td>" + rdata[i].memory_percent + "%</td>" +
-                "<td>" + ToSize(rdata[i].io_read_bytes) + '/' + ToSize(rdata[i].io_write_bytes) + "</td>" +
-                "<td>" + rdata[i].status + "</td>" +
-                "<td>" + rdata[i].threads + "</td>" +
-                "<td>" + rdata[i].user + "</td>" +
-                "<td><a title='" + lan.index.process_kill_title + "' style='color:red;' href=\"javascript:;\" onclick=\"killProcess(" + rdata[i].pid + ",'" + rdata[i].name + "',this)\">" + lan.index.process_kill + "</a></td>" +
-                "</tr>";
-        }
-
-        if (rflush) {
-            $("#processList").html(tbody);
-            return;
-        }
-
-        layer.open({
-            type: 1,
-            area: ['70%', '600px'],
-            title: lan.index.process_title,
-            closeBtn: 2,
-            shift: 5,
-            shadeClose: true,
-            content: "<div class='divtable' style='margin:15px;'>\
-					<button class='btn btn-default btn-sm pull-right' onclick='GetProcessList(true);' style='margin-bottom:5px;'>" + lan.public.fresh + "</button>\
-					<table class='table table-hover table-bordered'>\
-						<thead>\
-						<tr>\
-							<th>" + lan.index.process_pid + "</th>\
-							<th>" + lan.index.process_name + "</th>\
-							<th>" + lan.index.process_cpu + "</th>\
-							<th>" + lan.index.process_mem + "</th>\
-							<th>" + lan.index.process_disk + "</th>\
-							<th>" + lan.index.process_status + "</th>\
-							<th>" + lan.index.process_thread + "</th>\
-							<th>" + lan.index.process_user + "</th>\
-							<th>" + lan.index.process_act + "</th>\
-						</tr>\
-						</thead>\
-						<tbody id='processList'>" + tbody + "</tbody>\
-					 </table></div>"
-        });
-    });
-}
-//结束指定进程
-function killProcess(pid, name, obj) {
-    var that = $(obj).parents('tr');
-    layer.confirm(lan.get('process_kill_confirm', [name, pid]), { icon: 3, closeBtn: 2 }, function() {
-        loadT = layer.msg(lan.index.kill_msg, { icon: 16, time: 0, shade: [0.3, '#000'] });
-        $.post('/ajax?action=KillProcess', 'pid=' + pid, function(rdata) {
-            that.remove();
-            layer.close(loadT);
-            layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
-        });
-    });
-}
 
 //屏蔽指定IP
 function dropAddress(address) {
@@ -840,16 +674,4 @@ function showDanger(num, port) {
 				</div>'
     });
     $(".showDanger td").css("padding", "8px")
-}
-
-function showDangerIP() {
-    var body = $("#dangerhtmltable").html();
-    layer.open({
-        type: 1,
-        area: ['500px', '500px'],
-        title: '攻击日志',
-        closeBtn: 2,
-        shift: 5,
-        content: '<div class="pd15 divtable" style="height:430px;overflow:auto"><table class="table table-hover"><thead><tr><th>源IP地址</th><th>用户</th><th style="text-align: right;">时间</th></tr></thead>' + body + '</table></div><p style="color:red;padding-left:12px">*以上记录来源于本服务器日志，查看命令：cat /var/log/secure</p>'
-    });
 }

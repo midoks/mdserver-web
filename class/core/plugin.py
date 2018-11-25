@@ -128,7 +128,7 @@ class plugin:
                             else:
                                 if pg['pid'] == sType:
                                     plugins_info.append(pg)
-                    except BaseException, e:
+                    except Exception, e:
                         print e
         args = {}
         args['count'] = len(plugins_info)
