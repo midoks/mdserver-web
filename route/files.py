@@ -108,7 +108,7 @@ def saveBody():
 def getDir():
     path = request.form.get('path', '').encode('utf-8')
     if not os.path.exists(path):
-        path = '/'
+        path = public.getRootDir() + "/wwwroot"
 
     import pwd
     dirnames = []
@@ -133,9 +133,14 @@ def getDir():
     search = None
     if request.form.has_key('search'):
         search = request.form.get('search').strip().lower()
+
     i = 0
     n = 0
+    print 'path:', path
     for filename in os.listdir(path):
+        if filename[0:1] == '.':
+            continue
+        print filename
         if search:
             if filename.lower().find(search) == -1:
                 continue
@@ -176,5 +181,8 @@ def getDir():
             continue
     data['DIR'] = sorted(dirnames)
     data['FILES'] = sorted(filenames)
-    data['PATH'] = path
+    if path[0:2] == '//':
+        data['PATH'] = path[1:]
+    else:
+        data['PATH'] = path
     return public.getJson(data)
