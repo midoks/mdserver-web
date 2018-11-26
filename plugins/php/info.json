@@ -1,7 +1,7 @@
 {
 	"sort": 7,
 	"ps": "PHP是世界上最好的编程语言",
-	"shell": "php.sh",
+	"shell": "install.sh",
 	"name": "php",
 	"title": "PHP",
 	"default": false,
