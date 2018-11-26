@@ -122,8 +122,7 @@ function GetPercent(num, total) {
 
 function GetDiskInfo() {
     $.get('/system/disk_info', function(rdata) {
-        console.log(rdata);
-        var dBody
+        var dBody;
         for (var i = 0; i < rdata.length; i++) {
             if (rdata[i].path == '/' || rdata[i].path == '/www') {
                 if (rdata[i].size[2].indexOf('M') != -1) {
@@ -158,7 +157,7 @@ function GetDiskInfo() {
 }
 
 //清理垃圾
-function ClearSystem() {
+function clearSystem() {
     var loadT = layer.msg('正在清理系统垃圾 <img src="/static/img/ing.gif">', { icon: 16, time: 0, shade: [0.3, "#000"] });
     $.get('/system?action=ClearSystem', function(rdata) {
         layer.close(loadT);
@@ -190,7 +189,23 @@ function getInfo() {
         setcolor(memPre, "#left", 75, 90, 95);
         $("#info").html(info.system);
         $("#running").html(info.time);
-        $("#core").html(info.cpuNum + " " + '核心');
+        var _system = info.system;
+        if(_system.indexOf("Windows") != -1){
+            $(".ico-system").addClass("ico-windows");
+        } else if(_system.indexOf("CentOS") != -1) {
+            $(".ico-system").addClass("ico-centos");
+        } else if(_system.indexOf("Ubuntu") != -1) {
+            $(".ico-system").addClass("ico-ubuntu");
+        } else if(_system.indexOf("Debian") != -1) {
+            $(".ico-system").addClass("ico-debian");
+        } else if(_system.indexOf("Fedora") != -1) {
+            $(".ico-system").addClass("ico-fedora");
+        } else if(_system.indexOf("Mac") != -1){
+            $(".ico-system").addClass("ico-mac");
+        } else {
+            $(".ico-system").addClass("ico-linux");
+        }
+        $("#core").html(info.cpuNum + ' 核心');
         $("#state").html(info.cpuRealUsed);
         setcolor(memPre, "#state", 30, 70, 90);
         var memFree = info.memTotal - info.memRealUsed;
@@ -246,7 +261,6 @@ function getNet() {
         setCookie("downNet", net.down);
         getLoad(net.load);
     
-        // console.log(net.mem);
         // setMemImg(net.mem);
         setImg();
     },'json');

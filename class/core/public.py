@@ -143,6 +143,14 @@ def returnMsg(status, msg, args=()):
     return {'status': status, 'msg': msg, 'data': args}
 
 
+def getInfo(msg, args=()):
+    # 取提示消息
+    for i in range(len(args)):
+        rep = '{' + str(i + 1) + '}'
+        msg = msg.replace(rep, args[i])
+    return msg
+
+
 def getMsg(key, args=()):
     # 取提示消息
     try:

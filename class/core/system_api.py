@@ -125,7 +125,12 @@ class system_api:
         # 取操作系统版本
         os = public.getOs()
         if os == 'darwin':
-            return os
+            data = public.execShell('sw_vers')[0]
+            data_list = data.strip().split("\n")
+            mac_version = ''
+            for x in data_list:
+                mac_version += x.split("\t")[1] + ' '
+            return mac_version
 
         version = public.readFile('/etc/redhat-release')
         if not version:
@@ -146,7 +151,7 @@ class system_api:
         days = math.floor(hours / 24)
         hours = math.floor(hours - (days * 24))
         min = math.floor(min - (days * 60 * 24) - (hours * 60))
-        return public.getMsg('SYS_BOOT_TIME', (str(int(days)), str(int(hours)), str(int(min))))
+        return public.getInfo('已不间断运行: {1}天{2}小时{3}分钟', (str(int(days)), str(int(hours)), str(int(min))))
 
     def getCpuInfo(self, interval=1):
         # 取CPU信息
