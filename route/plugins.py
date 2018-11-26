@@ -84,7 +84,31 @@ def install():
 
 @plugins.route('/uninstall', methods=['POST'])
 def uninstall():
-    pass
+    rundir = public.getRunDir()
+    name = request.form.get('name', '')
+    version = request.form.get('version', '')
+    if name.strip() == '':
+        return public.returnJson(False, "缺少插件名称!", ())
+
+    if version.strip() == '':
+        return public.returnJson(False, "缺少版本信息!", ())
+
+    infoJsonPos = __plugin_name + '/' + name + '/' + 'info.json'
+
+    if not os.path.exists(infoJsonPos):
+        return public.retJson(False, "配置文件不存在!", ())
+
+    pluginInfo = json.loads(public.readFile(infoJsonPos))
+
+    execstr = "cd " + os.getcwd() + "/plugins/" + \
+        name + " && /bin/bash " + pluginInfo["shell"] \
+        + " uninstall " + version
+
+    taskAdd = (None, '卸载[' + name + '-' + version + ']',
+               'execshell', '0', time.strftime('%Y-%m-%d %H:%M:%S'), execstr)
+
+    public.M('tasks').add('id,name,type,status,addtime, execstr', taskAdd)
+    return public.returnJson(True, '已将卸载任务添加到队列!')
 
 
 @plugins.route('/installed', methods=['POST'])

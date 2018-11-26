@@ -16,13 +16,30 @@ function randomStrPwd(b) {
 	return d
 }
 
-function repeatPwd(a) {
-	$("#MyPassword").val(RandomStrPwd(a))
+function msgTpl(msg, args){
+	if (typeof args == 'string'){
+		return msg.replace('{1}', args);
+	} else if (typeof args == 'object'){
+		for (var i = 0; i < args.length; i++) {
+			rep = '{' + (i + 1) + '}';
+			msg = msg.replace(rep, args[i]);
+		}	
+	}
+	return msg;
 }
 
 function refresh() {
 	window.location.reload()
 }
+
+var mdw = {
+};
+
+function repeatPwd(a) {
+	$("#MyPassword").val(RandomStrPwd(a))
+}
+
+
 
 function GetBakPost(b) {
 	$(".baktext").hide().prev().show();
@@ -34,36 +51,6 @@ function GetBakPost(b) {
 	setWebPs(b, c, a);
 	$("a[data-id='" + c + "']").html(a);
 	$(".baktext").remove()
-}
-
-function setWebPs(b, e, a) {
-	var d = layer.load({
-		shade: true,
-		shadeClose: false
-	});
-	var c = "ps=" + a;
-	$.post("/data?action=setPs", "table=" + b + "&id=" + e + "&" + c, function(f) {
-		if(f == true) {
-			if(b == "sites") {
-				getWeb(1)
-			} else {
-				if(b == "ftps") {
-					getFtp(1)
-				} else {
-					getData(1)
-				}
-			}
-			layer.closeAll();
-			layer.msg(lan.public.edit_ok, {
-				icon: 1
-			});
-		} else {
-			layer.msg(lan.public.edit_err, {
-				icon: 2
-			});
-			layer.closeAll();
-		}
-	});
 }
 
 $(".menu-icon").click(function() {
@@ -104,7 +91,7 @@ function getLocalTime(a) {
 	return new Date(parseInt(a) * 1000).format("yyyy/MM/dd hh:mm:ss")
 }
 
-function ToSize(a) {
+function toSize(a) {
 	var d = [" B", " KB", " MB", " GB", " TB", " PB"];
 	var e = 1024;
 	for(var b = 0; b < d.length; b++) {

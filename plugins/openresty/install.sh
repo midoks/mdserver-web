@@ -15,19 +15,22 @@ Install_openresty()
 	mkdir -p $serverPath/tmp
 	echo '正在安装脚本文件...' > $install_tmp
 
-	#wget -O $serverPath/tmp/openresty.tar.gz https://openresty.org/download/openresty-1.13.6.2.tar.gz
-	#cd $serverPath/tmp && tar -zxvf openresty.tar.gz
+	if [ ! -d $serverPath/tmp/openresty.tar.gz ];then
+		wget -O $serverPath/tmp/openresty.tar.gz https://openresty.org/download/openresty-1.13.6.2.tar.gz
+	fi
+	cd $serverPath/tmp && tar -zxvf openresty.tar.gz
 
 	mkdir -p $serverPath/openresty
-	cd $serverPath/tmp/openresty* && ./configure --prefix=$serverPath/openresty && make && make install
+	cd $serverPath/tmp/openresty* && ./configure --prefix=$serverPath/openresty \
+	--with-openssl=$serverPath/tmp/openssl-1.0.2q && make && make install
 	
 	echo '安装完成' > $install_tmp
-	#rm -rf $serverPath/tmp
 }
 
 Uninstall_openresty()
 {
-	echo "Uninstall_safelogin"
+	rm -f $serverPath/openresty
+	echo '卸载完成' > $install_tmp
 }
 
 action=$1

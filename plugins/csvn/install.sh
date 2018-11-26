@@ -14,14 +14,15 @@ Install_csvn()
 	mkdir -p $serverPath/tmp
 
 	echo '正在安装脚本文件...' > $install_tmp
-	wget -O $serverPath/tmp/csvn.tar.xz https://github.com/midoks/mdserver-web/releases/download/init/CollabNetSubversionEdge-5.1.4_linux-x86_64.tar.xz
+
+	if [ ! -d $serverPath/tmp/csvn.tar.xz ];then
+		wget -O $serverPath/tmp/csvn.tar.xz https://github.com/midoks/mdserver-web/releases/download/init/CollabNetSubversionEdge-5.1.4_linux-x86_64.tar.xz
+	fi
 
 	cd $serverPath/tmp && tar -Jxf $serverPath/tmp/csvn.tar.xz
 	mv $serverPath/tmp/csvn $serverPath/csvn
 	
 	echo '安装完成' > $install_tmp
-
-	rm -rf $serverPath/tmp
 }
 
 Uninstall_csvn()
