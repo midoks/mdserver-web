@@ -4,6 +4,7 @@ function ToSizeM(byteLen) {
     return a || 0;
 }
 
+//重置插件弹出框宽度
 function resetPluginWinWidth(width){
     $("div[id^='layui-layer'][class*='layui-layer-page']").width(width);
 }
@@ -328,8 +329,7 @@ function SoftUpdate(name, version, update) {
 //独立安装
 function oneInstall(name, version) {
     var isError = false
-
-
+    
     var optw = '';
     if (name == 'mysql') {
         optw = "<br><br><li style='color:red;'>" + lan.soft.mysql_f + "</li>"
