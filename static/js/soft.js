@@ -4,6 +4,10 @@ function ToSizeM(byteLen) {
     return a || 0;
 }
 
+function resetPluginWinWidth(width){
+    $("div[id^='layui-layer'][class*='layui-layer-page']").width(width);
+}
+
 //软件管理窗口
 function SoftMan(name, version) {
     var loadT = layer.msg("正在处理,请稍后...", { icon: 16, time: 0, shade: [0.3, '#000'] });
