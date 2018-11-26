@@ -17,7 +17,7 @@ $(function() {
     }).click(function() {
         $(this).find(".mem-re-min").hide();
         if (!($(this).hasClass("mem-action"))) {
-            ReMemory();
+            reMemory();
             var btlen = $(".mem-release").find(".mask span").text();
             $(this).addClass("mem-action");
             $(this).find(".mask").css({ "color": "#20a53a" });
@@ -83,7 +83,7 @@ function rocket(sum, m) {
     $(".mem-release").find(".mask span").text(n);
 }
 //释放内存
-function ReMemory() {
+function reMemory() {
     setTimeout(function() {
         $(".mem-release").find('.mask').css({ 'color': '#20a53a', 'font-size': '14px' }).html('<span style="display:none">1</span>' + lan.index.memre_ok_0 + ' <img src="/static/img/ings.gif">');
         $.post('/system?action=ReMemory', '', function(rdata) {
@@ -111,7 +111,7 @@ function ReMemory() {
     }, 2000);
 }
 
-function GetPercent(num, total) {
+function getPercent(num, total) {
     num = parseFloat(num);
     total = parseFloat(total);
     if (isNaN(num) || isNaN(total)) {
@@ -120,7 +120,7 @@ function GetPercent(num, total) {
     return total <= 0 ? "0%" : (Math.round(num / total * 10000) / 100.00);
 }
 
-function GetDiskInfo() {
+function getDiskInfo() {
     $.get('/system/disk_info', function(rdata) {
         var dBody;
         for (var i = 0; i < rdata.length; i++) {
@@ -161,7 +161,7 @@ function clearSystem() {
     var loadT = layer.msg('正在清理系统垃圾 <img src="/static/img/ing.gif">', { icon: 16, time: 0, shade: [0.3, "#000"] });
     $.get('/system?action=ClearSystem', function(rdata) {
         layer.close(loadT);
-        layer.msg('清理完成,共清理[' + rdata[0] + ']个文件,释放[' + ToSize(rdata[1]) + ']磁盘空间!', { icon: 1 });
+        layer.msg('清理完成,共清理[' + rdata[0] + ']个文件,释放[' + toSize(rdata[1]) + ']磁盘空间!', { icon: 1 });
     });
 }
 
@@ -250,9 +250,9 @@ function getNet() {
         $("#InterfaceSpeed").html(lan.index.interfacespeed + "： 1.0Gbps");
         $("#upSpeed").html(net.up + ' KB');
         $("#downSpeed").html(net.down + ' KB');
-        $("#downAll").html(ToSize(net.downTotal));
+        $("#downAll").html(toSize(net.downTotal));
         $("#downAll").attr('title', lan.index.package + ':' + net.downPackets)
-        $("#upAll").html(ToSize(net.upTotal));
+        $("#upAll").html(toSize(net.upTotal));
         $("#upAll").attr('title', lan.index.package + ':' + net.upPackets)
         $("#core").html(net.cpu[1] + " " + lan.index.cpu_core);
         $("#state").html(net.cpu[0]);
@@ -688,4 +688,97 @@ function showDanger(num, port) {
 				</div>'
     });
     $(".showDanger td").css("padding", "8px")
+}
+
+
+//首页软件列表
+function indexSoft() {
+    var loadT = layer.msg('正在获取列表...', { icon: 16, time: 0, shade: [0.3, '#000'] });
+    $.post('/plugins/get_plugin_list', 'display=1', function(rdata) {
+        layer.close(loadT);
+        var con = '';
+        for (var i = 0; i < rdata['data'].length - 1; i++) {
+            var len = rdata.data[i].versions.length;
+            var version_info = '';
+            for (var j = 0; j < len; j++) {
+                if (rdata.data[i].versions[j].status) continue;
+                version_info += rdata.data[i].versions[j].version + '|';
+            }
+            if (version_info != '') {
+                version_info = version_info.substring(0, version_info.length - 1);
+            }
+            if (rdata.data[i].display) {
+                var isDisplay = false;
+                if (rdata.data[i].name != 'php') {
+                    for (var n = 0; n < len; n++) {
+                        if (rdata.data[i].versions[n].status == true) {
+                            isDisplay = true;
+                            var version = rdata.data[i].versions[n].version;
+                            if (rdata.data[i].versions[n].run == true) {
+                                state = '<span style="color:#20a53a" class="glyphicon glyphicon-play"></span>'
+                            } else {
+                                state = '<span style="color:red" class="glyphicon glyphicon-pause"></span>'
+                            }
+                        }
+                    }
+                    if (isDisplay) {
+                        var clickName = 'SoftMan';
+                        if (rdata.data[i].tip == 'lib') {
+                            clickName = 'PluginMan';
+                            version_info = rdata.data[i].title;
+                        }
+
+                        con += '<div class="col-sm-3 col-md-3 col-lg-3" data-id="' + rdata.data[i].pid + '">\
+                                    <span class="spanmove"></span>\
+                                    <div onclick="' + clickName + '(\'' + rdata.data[i].name + '\',\'' + version_info + '\')">\
+                                    <div class="image"><img src="/static/img/soft_ico/ico-' + rdata.data[i].name + '.png"></div>\
+                                    <div class="sname">' + rdata.data[i].title + ' ' + version + state + '</div>\
+                                    </div>\
+                                </div>'
+                    }
+                } else {
+                    for (var n = 0; n < len; n++) {
+                        if (rdata.data[i].versions[n].status == true) {
+                            var version = rdata.data[i].versions[n].version;
+                            if (rdata.data[i].versions[n].run == true) {
+                                state = '<span style="color:#20a53a" class="glyphicon glyphicon-play"></span>'
+                            } else {
+                                state = '<span style="color:red" class="glyphicon glyphicon-pause"></span>'
+                            }
+                        }
+                        if (rdata.data[i].versions[n].display == true) {
+                            con += '<div class="col-sm-3 col-md-3 col-lg-3" data-id="' + rdata.data[i].pid + '">\
+                                <span class="spanmove"></span>\
+                                <div onclick="phpSoftMain(\'' + rdata.data[i].versions[n].version + '\',' + n + ')">\
+                                <div class="image"><img src="/static/img/soft_ico/ico-' + rdata.data[i].name + '.png"></div>\
+                                <div class="sname">' + rdata.data[i].title + ' ' + rdata.data[i].versions[n].version + state + '</div>\
+                                </div>\
+                            </div>'
+                        }
+                    }
+                }
+            }
+        }
+        $("#indexsoft").html(con);
+        //软件位置移动
+        var softboxlen = $("#indexsoft > div").length;
+        var softboxsum = 12;
+        var softboxcon = '';
+        var softboxn = softboxlen;
+        if (softboxlen <= softboxsum) {
+            for (var i = 0; i < softboxsum - softboxlen; i++) {
+                softboxn += 1000;
+                softboxcon += '<div class="col-sm-3 col-md-3 col-lg-3 no-bg" data-id="' + softboxn + '"></div>'
+            }
+            $("#indexsoft").append(softboxcon);
+        }
+        $("#indexsoft").dragsort({ dragSelector: ".spanmove", dragBetween: true, dragEnd: saveOrder, placeHolderTemplate: "<div class='col-sm-3 col-md-3 col-lg-3 dashed-border'></div>" });
+
+        function saveOrder() {
+            var data = $("#indexsoft > div").map(function() { return $(this).attr("data-id"); }).get();
+            var ssort = data.join("|");
+            $("input[name=list1SortOrder]").val(ssort);
+            $.post("/plugin?action=savePluginSort", 'ssort=' + ssort, function(rdata) {});
+        };
+    });
 }

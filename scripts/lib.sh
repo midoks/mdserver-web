@@ -1,7 +1,13 @@
 #!/bin/bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 
+curPath=`pwd`
+rootPath=$(dirname "$curPath")
+serverPath=$(dirname "$rootPath")
+tmpPath=$serverPath/tmp
+libPath=$serverPath/lib
 
+mkdir -p $libPath
 
 
 Install_Curl()
@@ -168,21 +174,15 @@ Install_Pcre()
 
 Install_OpenSSL()
 {
-    if [ ! -d "/usr/local/openssl" ];then
-        cd ${run_path}
-        wget ${download_Url}/src/openssl-1.0.2l.tar.gz -T 20
-        tar -zxf openssl-1.0.2l.tar.gz
-        rm -f openssl-1.0.2l.tar.gz
-        cd openssl-1.0.2l
-        ./config --openssldir=/usr/local/openssl zlib-dynamic shared
+    if [ ! -d ${libPath}/openssl ];then
+        cd ${tmpPath}
+        if [ ! -d ${tmpPath}openssl-1.0.2q.tar.gz ];then
+        	wget https://github.com/midoks/mdserver-web/releases/download/init/openssl-1.0.2q.tar.gz -T 20
+        fi 
+        tar -zxf openssl-1.0.2q.tar.gz
+        cd openssl-1.0.2q
+        ./config --openssldir=${libPath}/openssl zlib-dynamic shared
         make && make install
-        echo '1.0.2l_shared' > /usr/local/openssl/version.pl
-        cd ..
-        rm -rf openssl-1.0.2l
-		cat > /etc/ld.so.conf.d/openssl.conf <<EOF
-/usr/local/openssl/lib
-EOF
-ldconfig
     fi
 }
 Install_Lib()
@@ -207,11 +207,12 @@ if [ ! -f "${lockFile}" ];then
 fi
 }
 
-Install_Lib
+
+# Install_Lib
 Install_OpenSSL
-Install_Pcre
-Install_Curl
-Install_Mhash
-Install_Libmcrypt
-Install_Mcrypt	
-Install_Libiconv
+# Install_Pcre
+# Install_Curl
+# Install_Mhash
+# Install_Libmcrypt
+# Install_Mcrypt	
+# Install_Libiconv

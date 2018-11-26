@@ -29,101 +29,8 @@ function SoftMan(name, version) {
 }
 
 
-//首页软件列表
-function indexsoft() {
-    return;
-    var loadT = layer.msg('正在获取列表...', { icon: 16, time: 0, shade: [0.3, '#000'] });
-    $.post('/plugins/get_plugin_list', 'display=1', function(rdata) {
-        layer.close(loadT);
-        var con = '';
-        for (var i = 0; i < rdata['data'].length - 1; i++) {
-            var len = rdata.data[i].versions.length;
-            var version_info = '';
-            for (var j = 0; j < len; j++) {
-                if (rdata.data[i].versions[j].status) continue;
-                version_info += rdata.data[i].versions[j].version + '|';
-            }
-            if (version_info != '') {
-                version_info = version_info.substring(0, version_info.length - 1);
-            }
-            if (rdata.data[i].display) {
-                var isDisplay = false;
-                if (rdata.data[i].name != 'php') {
-                    for (var n = 0; n < len; n++) {
-                        if (rdata.data[i].versions[n].status == true) {
-                            isDisplay = true;
-                            var version = rdata.data[i].versions[n].version;
-                            if (rdata.data[i].versions[n].run == true) {
-                                state = '<span style="color:#20a53a" class="glyphicon glyphicon-play"></span>'
-                            } else {
-                                state = '<span style="color:red" class="glyphicon glyphicon-pause"></span>'
-                            }
-                        }
-                    }
-                    if (isDisplay) {
-                        var clickName = 'SoftMan';
-                        if (rdata.data[i].tip == 'lib') {
-                            clickName = 'PluginMan';
-                            version_info = rdata.data[i].title;
-                        }
-
-                        con += '<div class="col-sm-3 col-md-3 col-lg-3" data-id="' + rdata.data[i].pid + '">\
-									<span class="spanmove"></span>\
-									<div onclick="' + clickName + '(\'' + rdata.data[i].name + '\',\'' + version_info + '\')">\
-									<div class="image"><img src="/static/img/soft_ico/ico-' + rdata.data[i].name + '.png"></div>\
-									<div class="sname">' + rdata.data[i].title + ' ' + version + state + '</div>\
-									</div>\
-								</div>'
-                    }
-                } else {
-                    for (var n = 0; n < len; n++) {
-                        if (rdata.data[i].versions[n].status == true) {
-                            var version = rdata.data[i].versions[n].version;
-                            if (rdata.data[i].versions[n].run == true) {
-                                state = '<span style="color:#20a53a" class="glyphicon glyphicon-play"></span>'
-                            } else {
-                                state = '<span style="color:red" class="glyphicon glyphicon-pause"></span>'
-                            }
-                        }
-                        if (rdata.data[i].versions[n].display == true) {
-                            con += '<div class="col-sm-3 col-md-3 col-lg-3" data-id="' + rdata.data[i].pid + '">\
-								<span class="spanmove"></span>\
-								<div onclick="phpSoftMain(\'' + rdata.data[i].versions[n].version + '\',' + n + ')">\
-								<div class="image"><img src="/static/img/soft_ico/ico-' + rdata.data[i].name + '.png"></div>\
-								<div class="sname">' + rdata.data[i].title + ' ' + rdata.data[i].versions[n].version + state + '</div>\
-								</div>\
-							</div>'
-                        }
-                    }
-                }
-            }
-        }
-        $("#indexsoft").html(con);
-        //软件位置移动
-        var softboxlen = $("#indexsoft > div").length;
-        var softboxsum = 12;
-        var softboxcon = '';
-        var softboxn = softboxlen;
-        if (softboxlen <= softboxsum) {
-            for (var i = 0; i < softboxsum - softboxlen; i++) {
-                softboxn += 1000;
-                softboxcon += '<div class="col-sm-3 col-md-3 col-lg-3 no-bg" data-id="' + softboxn + '"></div>'
-            }
-            $("#indexsoft").append(softboxcon);
-        }
-        $("#indexsoft").dragsort({ dragSelector: ".spanmove", dragBetween: true, dragEnd: saveOrder, placeHolderTemplate: "<div class='col-sm-3 col-md-3 col-lg-3 dashed-border'></div>" });
-
-        function saveOrder() {
-            var data = $("#indexsoft > div").map(function() { return $(this).attr("data-id"); }).get();
-            var ssort = data.join("|");
-            $("input[name=list1SortOrder]").val(ssort);
-            $.post("/plugin?action=savePluginSort", 'ssort=' + ssort, function(rdata) {});
-        };
-    });
-}
-
 //插件设置菜单
-function PluginMan(name, title) {
+function pluginMan(name, title) {
     loadT = layer.msg(lan.soft.menu_temp, { icon: 16, time: 0, shade: [0.3, '#000'] });
     $.get('/plugins/setting?name=' + name, function(rhtml) {
         layer.close(loadT);
@@ -245,8 +152,8 @@ function GetSList(isdisplay) {
                     if (plugin.status == true) {
                         isSetup = true;
                         if (plugin.tip == 'lib') {
-                            var mupdate = (plugin.versions[n].no == plugin.versions[n].version) ? '' : '<a class="btlink" onclick="SoftUpdate(\'' + plugin.name + '\',\'' + plugin.versions[n].version + '\',\'' + plugin.versions[n].version + '\')">更新</a> | ';
-                            handle = mupdate + '<a class="btlink" onclick="PluginMan(\'' + plugin.name + '\',\'' + plugin.title + '\')">' + lan.soft.setup + '</a> | <a class="btlink" onclick="UninstallVersion(\'' + plugin.name + '\',\'' + plugin.versions[n].version + '\',\'' + plugin.title + '\')">卸载</a>';
+                            var mupdate = (plugin.versions[n].no == plugin.versions[n].version) ? '' : '<a class="btlink" onclick="SoftUpdate(\'' + plugin.name + '\',\'' + plugin.versions + '\',\'' + plugin.versions[n].version + '\')">更新</a> | ';
+                            handle = mupdate + '<a class="btlink" onclick="PluginMan(\'' + plugin.name + '\',\'' + plugin.title + '\')">' + lan.soft.setup + '</a> | <a class="btlink" onclick="UninstallVersion(\'' + plugin.name + '\',\'' + plugin.versions + '\',\'' + plugin.title + '\')">卸载</a>';
                             titleClick = 'onclick="PluginMan(\'' + plugin.name + '\',\'' + plugin.title + '\')" style="cursor:pointer"';
                         } else {
                             console.log(plugin, n);
@@ -254,7 +161,7 @@ function GetSList(isdisplay) {
 
                             var mupdate = '';//(plugin.versions[n] == plugin.updates[n]) '' : '<a class="btlink" onclick="SoftUpdate(\'' + plugin.name + '\',\'' + plugin.versions[n].version + '\',\'' + plugin.updates[n] + '\')">更新</a> | ';
                             if (plugin.versions[n] == '') mupdate = '';
-                            handle = mupdate + '<a class="btlink" onclick="SoftMan(\'' + plugin.name + '\',\'' + version_info + '\')">' + lan.soft.setup + '</a> | <a class="btlink" onclick="UninstallVersion(\'' + plugin.name + '\',\'' + plugin.versions[n].version + '\',\'' + plugin.title + '\')">卸载</a>';
+                            handle = mupdate + '<a class="btlink" onclick="SoftMan(\'' + plugin.name + '\',\'' + version_info + '\')">' + lan.soft.setup + '</a> | <a class="btlink" onclick="UninstallVersion(\'' + plugin.name + '\',\'' + plugin.versions + '\',\'' + plugin.title + '\')">卸载</a>';
                             titleClick = 'onclick="SoftMan(\'' + plugin.name + '\',\'' + version_info + '\')" style="cursor:pointer"';
                         }
 
@@ -329,7 +236,7 @@ function SoftUpdate(name, version, update) {
 //独立安装
 function oneInstall(name, version) {
     var isError = false
-    
+
     var optw = '';
     if (name == 'mysql') {
         optw = "<br><br><li style='color:red;'>" + lan.soft.mysql_f + "</li>"
@@ -486,26 +393,10 @@ function AddVersion(name, ver, type, obj, title) {
 
 //卸载软件
 function UninstallVersion(name, version, title) {
-    var isError = false
-    if (name == 'mysql') {
-        var sUrl = '/data?action=getData&table=databases';
-        $.ajax({
-            url: sUrl,
-            type: "GET",
-            async: false,
-            success: function(dataD) {
-                if (dataD.data.length > 0) {
-                    layer.msg(lan.soft.mysql_del_err + '<p style="color:red">强行卸载: curl http://h.bt.cn/mu.sh|bash</p>', { icon: 5, time: 8000 });
-                    isError = true;;
-                }
-            }
-        });
-    }
-    if (isError) return;
-    layer.confirm(lan.soft.uninstall_confirm.replace('{1}', title).replace('{2}', version), { icon: 3, closeBtn: 2 }, function() {
+    layer.confirm(msgTpl('您真的要卸载[{1}-{2}]吗?', [title, version]), { icon: 3, closeBtn: 2 }, function() {
         var data = 'name=' + name + '&version=' + version;
         var loadT = layer.msg(lan.public.the, { icon: 16, time: 0, shade: [0.3, '#000'] });
-        $.post('/plugins?action=unInstall', data, function(rdata) {
+        $.post('/plugins/uninstall', data, function(rdata) {
             layer.close(loadT)
             GetSList();
             layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
