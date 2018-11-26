@@ -13,7 +13,6 @@ install_tmp=${rootPath}/tmp/bt_install.pl
 
 Install_redis()
 {
-	mkdir -p $serverPath/tmp
 
 	echo '正在安装脚本文件...' > $install_tmp
 
