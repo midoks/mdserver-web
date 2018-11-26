@@ -68,7 +68,7 @@ class plugin:
 
      # 构造本地插件信息
     def getPluginInfo(self, info):
-        print info["checks"]
+        # print info["checks"]
 
         checks = ""
         if info["checks"][0:1] == "/":

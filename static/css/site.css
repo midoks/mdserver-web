@@ -4363,6 +4363,13 @@ html .menu .menu_exit:hover {
     background-repeat:no-repeat;
     padding-left: 20px;
 }
+.ico-mac{
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPCAYAAAA71pVKAAAA9ElEQVQ4T5XSvyvGURTH8dej+AsMyGAykEWSTSkyPFJMyvAsYjFZJWZ/gQyKYjEZLcrkRzZZTXomgyzKj3TkW99u6l63bt3OPe/z43NOQ/6sI+5g6trIsMs4wjUm/gs/og+TuMrBA1jAO06wgn3MohfHeKqC1MvexBY6fz/fcI+xWsZXNHEZtgpu4SCvnRfM4KYOn2O6AF7DXr3syB4ldhXAw3hIe/5ERwEc/d+lcBs9BfAOtlM4RrBUAH8hprKLj0rtRZwWwOES4xupqx3vWMHxggDzOEvhftxmer/A1F8bFrYhbKAbh3jGKOYQoq4ituznfAP/VikQF8NdKgAAAABJRU5ErkJggg==");
+    background-repeat:no-repeat;
+    padding-top: 2px;
+    padding-left: 20px;
+}
+
 .index-pos-box{
     height: 52px;
     box-shadow: 0 1px 2px 0 rgba(0,0,0,.1);
