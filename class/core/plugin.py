@@ -111,9 +111,11 @@ class plugin:
                     try:
                         tmp = json.loads(public.readFile(jsonFile))
                         if tmp['name'] == 'php':
-                            for v in tmp['versions']:
+                            for index in range(len(tmp['versions'])):
+
                                 pg = self.getPluginInfo(tmp)
-                                pg['versions'] = v
+                                pg['versions'] = tmp['versions'][index]
+
                                 # print "sss:", i, v
                                 # pg['updates'] = tmp["updates"][v]
                                 if sType == "0":

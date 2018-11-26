@@ -1,34 +1,8 @@
 #!/bin/bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
-export PATH
-public_file=/www/server/panel/install/public.sh
-if [ ! -f $public_file ];then
-	wget -O $public_file http://download.bt.cn/install/public.sh -T 5;
-fi
-. $public_file
-download_Url=$NODE_URL
-mkdir -p /www/server
-run_path="/root"
-Is_64bit=`getconf LONG_BIT`
 
-centos_version=`cat /etc/redhat-release | grep ' 7.' | grep -i centos`
-if [ "${centos_version}" != '' ]; then
-	rpm_path="centos7"
-else
-	rpm_path="centos6"
-fi
 
-Install_SendMail()
-{
-	yum install postfix mysql-libs -y
-	if [ "${centos_version}" != '' ];then
-		systemctl start postfix
-		systemctl enable postfix	
-	else
-		service postfix start
-		chkconfig --level 2345 postfix on
-	fi
-}
+
 
 Install_Curl()
 {
@@ -226,7 +200,6 @@ if [ ! -f "${lockFile}" ];then
 	for yumPack in make cmake gcc gcc-c++ gcc-g77 flex bison file libtool libtool-libs autoconf kernel-devel patch wget libjpeg libjpeg-devel libpng libpng-devel libpng10 libpng10-devel gd gd-devel libxml2 libxml2-devel zlib zlib-devel glib2 glib2-devel tar bzip2 bzip2-devel libevent libevent-devel ncurses ncurses-devel curl curl-devel libcurl libcurl-devel e2fsprogs e2fsprogs-devel krb5 krb5-devel libidn libidn-devel openssl openssl-devel vim-minimal gettext gettext-devel ncurses-devel gmp-devel pspell-devel libcap diffutils ca-certificates net-tools libc-client-devel psmisc libXpm-devel git-core c-ares-devel libicu-devel libxslt libxslt-devel zip unzip glibc.i686 libstdc++.so.6 cairo-devel bison-devel ncurses-devel libaio-devel perl perl-devel perl-Data-Dumper lsof pcre pcre-devel vixie-cron crontabs expat-devel readline-devel;
 	do yum -y install $yumPack;done
 	
-	Install_SendMail
 	mv /etc/yum.repos.d/epel.repo.backup /etc/yum.repos.d/epel.repo
 	groupadd www
 	useradd -s /sbin/nologin -M -g www www
