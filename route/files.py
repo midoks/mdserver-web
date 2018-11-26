@@ -176,5 +176,5 @@ def getDir():
             continue
     data['DIR'] = sorted(dirnames)
     data['FILES'] = sorted(filenames)
-    data['PATH'] = ""
+    data['PATH'] = path
     return public.getJson(data)
