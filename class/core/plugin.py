@@ -11,7 +11,7 @@ import json
 class plugin:
     __tasks = None
     __plugin_dir = "plugins"
-    __type = "data/type.json"
+    __type = "data/json/type.json"
     setupPath = None
 
     def __init__(self):
