@@ -18,19 +18,16 @@ Install_php()
 	
 }
 
-Uninstall_safelogin()
+Uninstall_php()
 {
-	chattr -i /www/server/panel/plugin/safelogin/token.pl
-	rm -f /www/server/panel/data/limitip.conf
-	sed -i "/ALL/d" /etc/hosts.deny
-	rm -rf /www/server/panel/plugin/safelogin
+	echo "123123"
 }
 
 
 action=$1
 host=$2;
 if [ "${1}" == 'install' ];then
-	Uninstall_php
+	Install_php
 else
 	Uninstall_php
 fi
