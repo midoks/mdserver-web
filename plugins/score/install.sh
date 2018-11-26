@@ -20,12 +20,13 @@ Install_score()
 		sleep 0.1
 		gcc $curPath/testcpu.c -o $serverPath/score/testcpu -lpthread
 	fi
-	
+
 	echo '安装完成' > $install_tmp
 }
 
 Uninstall_score()
 {
+	rm -rf $serverPath/score
 	echo '卸载完成' > $install_tmp
 }
 
