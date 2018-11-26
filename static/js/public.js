@@ -5,7 +5,7 @@ $(document).ready(function() {
 	});
 });
 
-function RandomStrPwd(b) {
+function randomStrPwd(b) {
 	b = b || 32;
 	var c = "AaBbCcDdEeFfGHhiJjKkLMmNnPpRSrTsWtXwYxZyz2345678";
 	var a = c.length;
