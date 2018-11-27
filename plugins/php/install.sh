@@ -7,27 +7,19 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
-
 install_tmp=${rootPath}/tmp/bt_install.pl
-
-Install_php()
-{
-	echo '正在安装脚本文件...' > $install_tmp
-
-	echo '安装完成' > $install_tmp
-	
-}
-
-Uninstall_php()
-{
-	echo "123123"
-}
 
 
 action=$1
-host=$2;
-if [ "${1}" == 'install' ];then
-	Install_php
-else
-	Uninstall_php
+type=$2
+
+if [ "${2}" == "" ];then
+	echo '缺少安装脚本...' > $install_tmp
+	exit 0
+fi 
+
+if [ ! -d $curPath/versions/$2 ];then
+	echo '缺少安装脚本2...' > $install_tmp
 fi
+
+. $curPath/versions/$2/install.sh $1
