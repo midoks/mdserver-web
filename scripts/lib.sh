@@ -4,31 +4,27 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
 serverPath=$(dirname "$rootPath")
-tmpPath=$serverPath/tmp
+sourcePath=$serverPath/source/lib
 libPath=$serverPath/lib
 
+mkdir -p $sourcePath
 mkdir -p $libPath
+rm -rf ${libPath}/lib.pl
 
-
-Install_Curl()
+Install_Zlib()
 {
-	if [ -f "/usr/local/curl/newcurl.pl" ];then
-		return;
-	fi
-	cd ${run_path}
-	curl_version="7.54.1"
-	if [ ! -f "curl-$curl_version.tar.gz" ];then
-		wget -O curl-$curl_version.tar.gz ${download_Url}/src/curl-$curl_version.tar.gz -T 5
-	fi
-	tar zxf curl-$curl_version.tar.gz
-	cd curl-$curl_version
-    ./configure --prefix=/usr/local/curl --enable-ares --without-nss --with-ssl=/usr/local/openssl
-    make && make install
-    cd ..
-    rm -rf curl-$curl_version
-	rm -rf curl-$curl_version.tar.gz
-	echo -e "Install_Curl" >> /www/server/lib.pl
-	echo -e "Ture" >> /usr/local/curl/newcurl.pl
+#----------------------------- zlib start -------------------------#
+if [ ! -d ${libPath}/zlib ];then
+    cd ${sourcePath}
+    if [ ! -f ${sourcePath}/zlib-1.2.11.tar.gz ];then
+    	wget -O zlib-1.2.11.tar.gz https://github.com/madler/zlib/archive/v1.2.11.tar.gz -T 20
+    fi 
+    tar -zxf zlib-1.2.11.tar.gz
+    cd zlib-1.2.11
+    ./configure --prefix=${libPath}/zlib && make && make install
+fi
+echo -e "Install_Zlib" >> ${libPath}/lib.pl
+#----------------------------- zlib end  -------------------------#
 }
 
 Install_Libiconv()
@@ -175,8 +171,8 @@ Install_Pcre()
 Install_OpenSSL()
 {
     if [ ! -d ${libPath}/openssl ];then
-        cd ${tmpPath}
-        if [ ! -d ${tmpPath}openssl-1.0.2q.tar.gz ];then
+        cd ${sourcePath}
+        if [ ! -f ${sourcePath}openssl-1.0.2q.tar.gz ];then
         	wget https://github.com/midoks/mdserver-web/releases/download/init/openssl-1.0.2q.tar.gz -T 20
         fi 
         tar -zxf openssl-1.0.2q.tar.gz
@@ -184,7 +180,9 @@ Install_OpenSSL()
         ./config --openssldir=${libPath}/openssl zlib-dynamic shared
         make && make install
     fi
+    echo -e "Install_OpenSSL" >> ${libPath}/lib.pl
 }
+
 Install_Lib()
 {
 if [ -f "/www/server/nginx/sbin/nginx" ] || [ -f "/www/server/apache/bin/httpd" ] || [ -f "/www/server/mysql/bin/mysql" ]; then
@@ -207,11 +205,10 @@ if [ ! -f "${lockFile}" ];then
 fi
 }
 
-
+Install_Zlib
 # Install_Lib
 Install_OpenSSL
 # Install_Pcre
-# Install_Curl
 # Install_Mhash
 # Install_Libmcrypt
 # Install_Mcrypt	
