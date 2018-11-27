@@ -20,6 +20,7 @@ fi
 
 if [ ! -d $curPath/versions/$2 ];then
 	echo '缺少安装脚本2...' > $install_tmp
+	exit 0
 fi
 
 . $curPath/versions/$2/install.sh $1
