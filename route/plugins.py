@@ -20,7 +20,7 @@ __plugin_name = "plugins"
 __row_num = 3
 
 
-@plugins.route("/file", methods=['GET'])
+@plugins.route('/file', methods=['GET'])
 def file():
     name = request.args.get('name', '')
     if name.strip() == '':
@@ -30,15 +30,15 @@ def file():
     if f.strip() == '':
         return ''
 
-    file = "plugins/" + name + "/" + f
+    file = __plugin_name + '/' + name + '/' + f
     if not os.path.exists(file):
-        return ""
+        return ''
 
     c = public.readFile(file)
     return c
 
 
-@plugins.route("/list", methods=['GET', 'POST'])
+@plugins.route('/list', methods=['GET', 'POST'])
 def list():
     typeVal = request.args.get('type', '0')
     data = plugin.plugin().getPluginList(typeVal, 1)
@@ -51,7 +51,6 @@ def install():
     rundir = public.getRunDir()
     name = request.form.get('name', '')
     version = request.form.get('version', '')
-    stype = request.form.get('type', '0')
 
     mmsg = '安装'
     if hasattr(request.form, 'upgrade'):
@@ -59,21 +58,21 @@ def install():
         mmsg = 'upgrade'
 
     if name.strip() == '':
-        return public.returnJson(False, "缺少插件名称!", ())
+        return public.returnJson(False, '缺少插件名称!', ())
 
     if version.strip() == '':
-        return public.returnJson(False, "缺少版本信息!", ())
+        return public.returnJson(False, '缺少版本信息!', ())
 
     infoJsonPos = __plugin_name + '/' + name + '/' + 'info.json'
 
     if not os.path.exists(infoJsonPos):
-        return public.retJson(False, "配置文件不存在!", ())
+        return public.retJson(False, '配置文件不存在!', ())
 
     pluginInfo = json.loads(public.readFile(infoJsonPos))
 
     execstr = "cd " + os.getcwd() + "/plugins/" + \
         name + " && /bin/bash " + pluginInfo["shell"] \
-        + " install " + version + ' ' + stype
+        + " install " + version
 
     taskAdd = (None, mmsg + '[' + name + '-' + version + ']',
                'execshell', '0', time.strftime('%Y-%m-%d %H:%M:%S'), execstr)
