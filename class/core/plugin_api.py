@@ -8,10 +8,11 @@ import re
 import json
 
 
-class plugin:
+class plugin_api:
     __tasks = None
     __plugin_dir = "plugins"
     __type = "data/json/type.json"
+    __index = 'data/json/index.json'
     setupPath = None
 
     def __init__(self):

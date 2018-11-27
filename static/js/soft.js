@@ -262,8 +262,7 @@ function oneInstall(name, version) {
         closeBtn: 2,
         shadeClose: true,
         content: "<div class='bt-form pd20 pb70 c6'>\
-			<div class='version line'>" + lan.soft.install_version + "：<span style='margin-left:30px'>" + name + " " + version + "</span>" + optw + "</div>\
-	    	<div class='fangshi line'>" + lan.bt.install_type + "：<label data-title='" + lan.bt.install_rpm_title + "'>极速安装<input type='checkbox' checked></label><label data-title='" + lan.bt.install_src_title + "'>源码安装<input type='checkbox'></label></div>\
+			<div class='version line'>安装版本：<span style='margin-left:30px'>" + name + " " + version + "</span>" + optw + "</div>\
 	    	<div class='bt-form-submit-btn'>\
 				<button type='button' class='btn btn-danger btn-sm btn-title one-close'>关闭</button>\
 		        <button type='button' id='bi-btn' class='btn btn-success btn-sm btn-title bi-btn'>提交</button>\
@@ -359,8 +358,7 @@ function AddVersion(name, ver, type, obj, title) {
         closeBtn: 2,
         shadeClose: true,
         content: "<div class='bt-form pd20 pb70 c6'>\
-			<div class='version line'>" + lan.soft.install_version + "：<select id='SelectVersion' class='bt-input-text' style='margin-left:30px'>" + SelectVersion + "</select></div>\
-	    	<div class='fangshi line'>" + lan.bt.install_type + "：<label data-title='" + lan.bt.install_rpm_title + "'>" + lan.bt.install_rpm + "<input type='checkbox' checked></label><label data-title='" + lan.bt.install_src_title + "'>" + lan.bt.install_src + "<input type='checkbox'></label></div>\
+			<div class='version line'>安装版本：<select id='SelectVersion' class='bt-input-text' style='margin-left:30px'>" + SelectVersion + "</select></div>\
 	    	<div class='bt-form-submit-btn'>\
 				<button type='button' class='btn btn-danger btn-sm btn-title' onclick='layer.closeAll()'>" + lan.public.close + "</button>\
 		        <button type='button' id='bi-btn' class='btn btn-success btn-sm btn-title bi-btn'>" + lan.public.submit + "</button>\

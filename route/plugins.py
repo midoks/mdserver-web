@@ -12,7 +12,7 @@ import json
 
 sys.path.append("class/core")
 import public
-import plugin
+import plugin_api
 
 
 plugins = Blueprint('plugins', __name__, template_folder='templates')
@@ -41,7 +41,7 @@ def file():
 @plugins.route('/list', methods=['GET', 'POST'])
 def list():
     typeVal = request.args.get('type', '0')
-    data = plugin.plugin().getPluginList(typeVal, 1)
+    data = plugin_api.plugin_api().getPluginList(typeVal, 1)
     return public.getJson(data)
 
 
