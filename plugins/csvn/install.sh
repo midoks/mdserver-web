@@ -9,14 +9,17 @@ serverPath=$(dirname "$rootPath")
 
 install_tmp=${rootPath}/tmp/bt_install.pl
 
+
+CSVN_SOURCE='https://github.com/midoks/mdserver-web/releases/download/init/CollabNetSubversionEdge-5.1.4_linux-x86_64.tar.xz'
+
 Install_csvn()
 {
 	mkdir -p $serverPath/tmp
 
 	echo '正在安装脚本文件...' > $install_tmp
 
-	if [ ! -d $serverPath/tmp/csvn.tar.xz ];then
-		wget -O $serverPath/tmp/csvn.tar.xz https://github.com/midoks/mdserver-web/releases/download/init/CollabNetSubversionEdge-5.1.4_linux-x86_64.tar.xz
+	if [ ! -f $serverPath/tmp/csvn.tar.xz ];then
+		wget -O $serverPath/so/csvn.tar.xz ${CSVN_SOURCE}
 	fi
 
 	cd $serverPath/tmp && tar -Jxf $serverPath/tmp/csvn.tar.xz
