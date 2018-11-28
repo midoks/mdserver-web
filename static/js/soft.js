@@ -124,7 +124,7 @@ function GetSList(isdisplay) {
         $(".task").text(rdata.data[rdata.length - 1]);
         for (var i = 0; i < rdata.data.length; i++) {
             var plugin = rdata.data[i];
-            var len = rdata.data[i].versions.length;
+            var len = plugin.versions.length;
             var version_info = '';
             var version = '';
             var softPath = '';
@@ -134,6 +134,8 @@ function GetSList(isdisplay) {
             var checked = '';
 
             checked = plugin.display ? 'checked' : '';
+
+            console.log(plugin.versions);
     
             if (typeof plugin.versions == "string"){
                 version_info += plugin.versions + '|';
@@ -146,22 +148,24 @@ function GetSList(isdisplay) {
                 version_info = version_info.substring(0, version_info.length - 1);
             }
 
-            var handle = '<a class="btlink" onclick="AddVersion(\'' + plugin.name + '\',\'' + version_info + '\',\'' + plugin.tip + '\',this,\'' + plugin.title + '\')">安装</a>';
+            console.log(version_info);
+
+            var handle = '<a class="btlink" onclick="addVersion(\'' + plugin.name + '\',\'' + version_info + '\',\'' + plugin.tip + '\',this,\'' + plugin.title + '\')">安装</a>';
             var isSetup = false;
             for (var n = 0; n < len; n++) {
                 if (plugin.status == true) {
                     isSetup = true;
-                    if (plugin.tip == 'lib') {
-                        var mupdate = (plugin.versions[n].no == plugin.versions[n].version) ? '' : '<a class="btlink" onclick="SoftUpdate(\'' + plugin.name + '\',\'' + plugin.versions + '\',\'' + plugin.versions[n].version + '\')">更新</a> | ';
-                        handle = mupdate + '<a class="btlink" onclick="PluginMan(\'' + plugin.name + '\',\'' + plugin.title + '\')">' + lan.soft.setup + '</a> | <a class="btlink" onclick="UninstallVersion(\'' + plugin.name + '\',\'' + plugin.versions + '\',\'' + plugin.title + '\')">卸载</a>';
-                        titleClick = 'onclick="PluginMan(\'' + plugin.name + '\',\'' + plugin.title + '\')" style="cursor:pointer"';
-                    } else {
+                    // if (plugin.tip == 'lib') {
+                    //     var mupdate = (plugin.versions[n].no == plugin.versions[n].version) ? '' : '<a class="btlink" onclick="SoftUpdate(\'' + plugin.name + '\',\'' + plugin.versions + '\',\'' + plugin.versions[n].version + '\')">更新</a> | ';
+                    //     handle = mupdate + '<a class="btlink" onclick="PluginMan(\'' + plugin.name + '\',\'' + plugin.title + '\')">' + lan.soft.setup + '</a> | <a class="btlink" onclick="UninstallVersion(\'' + plugin.name + '\',\'' + plugin.versions + '\',\'' + plugin.title + '\')">卸载</a>';
+                    //     titleClick = 'onclick="PluginMan(\'' + plugin.name + '\',\'' + plugin.title + '\')" style="cursor:pointer"';
+                    // } else {
 
                         var mupdate = '';//(plugin.versions[n] == plugin.updates[n]) '' : '<a class="btlink" onclick="SoftUpdate(\'' + plugin.name + '\',\'' + plugin.versions[n].version + '\',\'' + plugin.updates[n] + '\')">更新</a> | ';
                         if (plugin.versions[n] == '') mupdate = '';
                         handle = mupdate + '<a class="btlink" onclick="SoftMan(\'' + plugin.name + '\',\'' + version_info + '\')">' + lan.soft.setup + '</a> | <a class="btlink" onclick="UninstallVersion(\'' + plugin.name + '\',\'' + plugin.versions + '\',\'' + plugin.title + '\')">卸载</a>';
                         titleClick = 'onclick="SoftMan(\'' + plugin.name + '\',\'' + version_info + '\')" style="cursor:pointer"';
-                    }
+                    // }
 
                     version = plugin.version;
                     softPath = '<span class="glyphicon glyphicon-folder-open" title="' + rdata.data[i].path + '" onclick="openPath(\'' + rdata.data[i].path + '\')"></span>';
@@ -180,10 +184,15 @@ function GetSList(isdisplay) {
                 }
             }
 
+            var plugin_title = plugin.title
+            if (isSetup){
+                plugin_title = plugin.title + ' ' + version_info;
+            }
+
             sBody += '<tr>' +
                 '<td><span ' + titleClick + 
                 '><img src="/plugins/file?name=' + plugin.name + 
-                '&f=ico.png' + '">' + plugin.title + ' ' + version_info + '</span></td>' +
+                '&f=ico.png' + '">' + plugin_title + '</span></td>' +
                 '<td>' + plugin.ps + '</td>' +
                 '<td>' + softPath + '</td>' +
                 '<td>' + state + '</td>' +
@@ -210,7 +219,7 @@ function FPStatus() {
     })
 }
 //更新
-function SoftUpdate(name, version, update) {
+function softUpdate(name, version, update) {
     var msg = "<li>建议您在服务器负载闲时进行软件更新.</li>";
     if (name == 'mysql') msg = "<ul style='color:red;'><li>更新数据库有风险,建议在更新前,先备份您的数据库.</li><li>如果您的是云服务器,强烈建议您在更新前做一个快照.</li><li>建议您在服务器负载闲时进行软件更新.</li></ul>";
     SafeMessage('更新[' + name + ']', '更新过程可能会导致服务中断,您真的现在就将[' + name + ']更新到[' + update + ']吗?', function() {
@@ -286,28 +295,20 @@ function oneInstall(name, version) {
     fly("bi-btn");
 }
 
-function AddVersion(name, ver, type, obj, title) {
-    if (type == "lib") {
-        layer.confirm(lan.get('install_confirm', [title, ver]), { icon: 3, closeBtn: 2 }, function() {
-            $(obj).text(lan.soft.install_the);
-            var data = "name=" + name+"&version="+ver;
-            var loadT = layer.msg(lan.soft.the_install, { icon: 16, time: 0, shade: [0.3, '#000'] });
-            $.post("/plugins/install", data, function(rdata) {
-                layer.close(loadT);
-                layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
-                setTimeout(function() { GetSList() }, 2000)
-            });
-        });
-        return;
-    }
-
-
-    var titlename = name;
-    var veropt = ver.split("|");
+function addVersion(name, ver, type, obj, title) {
+    // console.log(ver.indexOf('|'));
     var SelectVersion = '';
-    for (var i = 0; i < veropt.length; i++) {
-        SelectVersion += '<option>' + name + ' ' + veropt[i] + '</option>';
-    }
+    // if (ver.indexOf('|') >= 0){
+        var titlename = name;
+        var veropt = ver.split("|");
+       
+        for (var i = 0; i < veropt.length; i++) {
+            SelectVersion += '<option>' + name + ' ' + veropt[i] + '</option>';
+        }
+    //} else {
+        // SelectVersion = ver;
+    //}
+
     if (name == 'phpmyadmin' || name == 'nginx' || name == 'apache') {
         var isError = false
         $.ajax({

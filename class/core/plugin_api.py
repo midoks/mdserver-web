@@ -122,6 +122,8 @@ class plugin_api:
                         if type(data['versions']) == list and data['name'] == 'php':
                             for index in range(len(data['versions'])):
                                 tmp = data.copy()
+                                tmp['title'] = tmp['title'] + \
+                                    '-' + data['versions'][index]
                                 tmp['versions'] = data['versions'][index]
                                 pg = self.getPluginInfo(tmp)
                                 if sType == '0':
