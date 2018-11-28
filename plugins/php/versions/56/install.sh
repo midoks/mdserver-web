@@ -19,23 +19,23 @@ install_tmp=${rootPath}/tmp/bt_install.pl
 Install_php()
 {
 #------------------------ install start ------------------------------------#
-echo "安装php-7.2.5 ..." > $install_tmp
+echo "安装php-5.6.36 ..." > $install_tmp
 mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
-if [ ! -f $sourcePath/php/php-7.2.5.tar.xz ];then
-	wget -O $sourcePath/php/php-7.2.5.tar.xz https://museum.php.net/php7/php-7.2.5.tar.xz
+if [ ! -f $sourcePath/php/php-5.6.36.tar.xz ];then
+	wget -O $sourcePath/php/php-5.6.36.tar.xz https://museum.php.net/php5/php-5.6.36.tar.xz
 fi
 
-if [ ! -d $sourcePath/php/php-7.2.5 ];then
-	cd $sourcePath/php && tar -Jxf $sourcePath/php/php-7.2.5.tar.xz
+if [ ! -d $sourcePath/php/php-5.6.36 ];then
+	cd $sourcePath/php && tar -Jxf $sourcePath/php/php-5.6.36.tar.xz
 fi
 
 
-cd $sourcePath/php/php-7.2.5 && ./configure \
---prefix=$serverPath/php/72 \
---exec-prefix=$serverPath/php/72 \
---with-config-file-path=$serverPath/php/72/etc \
+cd $sourcePath/php/php-5.6.36 && ./configure \
+--prefix=$serverPath/php/56 \
+--exec-prefix=$serverPath/php/56 \
+--with-config-file-path=$serverPath/php/56/etc \
 --with-zlib-dir=$serverPath/lib/zlib \
 --without-iconv \
 --enable-zip \
@@ -54,7 +54,7 @@ cd $sourcePath/php/php-7.2.5 && ./configure \
 
 Uninstall_php()
 {
-	echo "卸载php-7.2.5 ..." > $install_tmp
+	echo "卸载php-5.6.36 ..." > $install_tmp
 }
 
 action=${1}
