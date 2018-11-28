@@ -141,6 +141,13 @@ def checkInstalled():
     return "False"
 
 
+@plugins.route('/add_index', methods=['GET'])
+def addIndex():
+    name = request.args.get('name', '')
+    html = __plugin_name + '/' + name + '/index.html'
+    return public.readFile(html)
+
+
 @plugins.route('/setting', methods=['GET'])
 def setting():
     name = request.args.get('name', '')

@@ -10,13 +10,14 @@ import json
 
 class plugin_api:
     __tasks = None
-    __plugin_dir = "plugins"
-    __type = "data/json/type.json"
+    __plugin_dir = 'plugins'
+    __type = 'data/json/type.json'
     __index = 'data/json/index.json'
     setupPath = None
 
     def __init__(self):
         self.setupPath = 'server'
+        # self.__plugin_dir = public.getRunDir() + '/plugins'
 
     # 进程是否存在
     def processExists(self, pname, exe=None):
@@ -69,13 +70,11 @@ class plugin_api:
 
      # 构造本地插件信息
     def getPluginInfo(self, info):
-        # print info["checks"]
-
-        checks = ""
-        if info["checks"][0:1] == "/":
+        checks = ''
+        if info["checks"][0:1] == '/':
             checks = info["checks"]
         else:
-            checks = public.getRootDir() + "/" + info['checks']
+            checks = public.getRootDir() + '/' + info['checks']
 
         pluginInfo = {
             "id": 10000,
@@ -95,44 +94,59 @@ class plugin_api:
         }
 
         pluginInfo['task'] = self.checkSetupTask(pluginInfo['name'])
+
+        if checks.find('VERSION') > -1:
+            pluginInfo['install_checks'] = checks.replace(
+                'VERSION', info['versions'])
+
         pluginInfo['setup'] = os.path.exists(pluginInfo['install_checks'])
         pluginInfo['status'] = os.path.exists(pluginInfo['install_checks'])
         return pluginInfo
 
-    def getPluginList(self, sType, sPage=1, sPageSize=15):
-
+    def getAllList(self, sType='0'):
         ret = {}
         ret['type'] = json.loads(public.readFile(self.__type))
         plugins_info = []
+
         for dirinfo in os.listdir(self.__plugin_dir):
+            if dirinfo[0:1] == '.':
+                continue
+
             path = self.__plugin_dir + '/' + dirinfo
+
             if os.path.isdir(path):
-                jsonFile = path + '/info.json'
-                if os.path.exists(jsonFile):
+                json_file = path + '/info.json'
+                if os.path.exists(json_file):
                     try:
-                        tmp = json.loads(public.readFile(jsonFile))
-                        if tmp['name'] == 'php':
-                            for index in range(len(tmp['versions'])):
-
+                        data = json.loads(public.readFile(json_file))
+                        if type(data['versions']) == list and data['name'] == 'php':
+                            for index in range(len(data['versions'])):
+                                tmp = data.copy()
+                                tmp['versions'] = data['versions'][index]
                                 pg = self.getPluginInfo(tmp)
-                                pg['versions'] = tmp['versions'][index]
-
-                                # print "sss:", i, v
-                                # pg['updates'] = tmp["updates"][v]
-                                if sType == "0":
+                                if sType == '0':
                                     plugins_info.append(pg)
                                 else:
                                     if pg['pid'] == sType:
                                         plugins_info.append(pg)
                         else:
-                            pg = self.getPluginInfo(tmp)
-                            if sType == "0":
+                            pg = self.getPluginInfo(data)
+                            if sType == '0':
                                 plugins_info.append(pg)
                             else:
                                 if pg['pid'] == sType:
                                     plugins_info.append(pg)
                     except Exception, e:
                         print e
+                        # pass
+
+        return plugins_info
+
+    def getPluginList(self, sType, sPage=1, sPageSize=15):
+
+        ret = {}
+        ret['type'] = json.loads(public.readFile(self.__type))
+        plugins_info = self.getAllList(sType)
         args = {}
         args['count'] = len(plugins_info)
         args['p1'] = sPage
@@ -140,3 +154,9 @@ class plugin_api:
         ret['data'] = plugins_info
         ret['list'] = public.getPage(args)
         return ret
+
+    def addIndex(self, name, version):
+        pass
+
+    def run(self):
+        pass

@@ -33,9 +33,9 @@ fi
 
 
 cd $sourcePath/php/php-7.2.5 && ./configure \
---prefix=$serverPath/php/php72 \
---exec-prefix=$serverPath/php/php72 \
---with-config-file-path=$serverPath/php/php72/etc \
+--prefix=$serverPath/php/72 \
+--exec-prefix=$serverPath/php/72 \
+--with-config-file-path=$serverPath/php/72/etc \
 --with-zlib-dir=$serverPath/lib/zlib \
 --without-iconv \
 --enable-zip \
