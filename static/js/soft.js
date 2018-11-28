@@ -148,52 +148,48 @@ function GetSList(isdisplay) {
 
             var handle = '<a class="btlink" onclick="AddVersion(\'' + plugin.name + '\',\'' + version_info + '\',\'' + plugin.tip + '\',this,\'' + plugin.title + '\')">安装</a>';
             var isSetup = false;
-                for (var n = 0; n < len; n++) {
-                    if (plugin.status == true) {
-                        isSetup = true;
-                        if (plugin.tip == 'lib') {
-                            var mupdate = (plugin.versions[n].no == plugin.versions[n].version) ? '' : '<a class="btlink" onclick="SoftUpdate(\'' + plugin.name + '\',\'' + plugin.versions + '\',\'' + plugin.versions[n].version + '\')">更新</a> | ';
-                            handle = mupdate + '<a class="btlink" onclick="PluginMan(\'' + plugin.name + '\',\'' + plugin.title + '\')">' + lan.soft.setup + '</a> | <a class="btlink" onclick="UninstallVersion(\'' + plugin.name + '\',\'' + plugin.versions + '\',\'' + plugin.title + '\')">卸载</a>';
-                            titleClick = 'onclick="PluginMan(\'' + plugin.name + '\',\'' + plugin.title + '\')" style="cursor:pointer"';
-                        } else {
-                            console.log(plugin, n);
+            for (var n = 0; n < len; n++) {
+                if (plugin.status == true) {
+                    isSetup = true;
+                    if (plugin.tip == 'lib') {
+                        var mupdate = (plugin.versions[n].no == plugin.versions[n].version) ? '' : '<a class="btlink" onclick="SoftUpdate(\'' + plugin.name + '\',\'' + plugin.versions + '\',\'' + plugin.versions[n].version + '\')">更新</a> | ';
+                        handle = mupdate + '<a class="btlink" onclick="PluginMan(\'' + plugin.name + '\',\'' + plugin.title + '\')">' + lan.soft.setup + '</a> | <a class="btlink" onclick="UninstallVersion(\'' + plugin.name + '\',\'' + plugin.versions + '\',\'' + plugin.title + '\')">卸载</a>';
+                        titleClick = 'onclick="PluginMan(\'' + plugin.name + '\',\'' + plugin.title + '\')" style="cursor:pointer"';
+                    } else {
 
-
-                            var mupdate = '';//(plugin.versions[n] == plugin.updates[n]) '' : '<a class="btlink" onclick="SoftUpdate(\'' + plugin.name + '\',\'' + plugin.versions[n].version + '\',\'' + plugin.updates[n] + '\')">更新</a> | ';
-                            if (plugin.versions[n] == '') mupdate = '';
-                            handle = mupdate + '<a class="btlink" onclick="SoftMan(\'' + plugin.name + '\',\'' + version_info + '\')">' + lan.soft.setup + '</a> | <a class="btlink" onclick="UninstallVersion(\'' + plugin.name + '\',\'' + plugin.versions + '\',\'' + plugin.title + '\')">卸载</a>';
-                            titleClick = 'onclick="SoftMan(\'' + plugin.name + '\',\'' + version_info + '\')" style="cursor:pointer"';
-                        }
-
-                        version = plugin.version;
-                        softPath = '<span class="glyphicon glyphicon-folder-open" title="' + rdata.data[i].path + '" onclick="openPath(\'' + rdata.data[i].path + '\')"></span>';
-                        indexshow = '<div class="index-item"><input class="btswitch btswitch-ios" id="index_' + rdata.data[i].name + '" type="checkbox" ' + checked + '><label class="btswitch-btn" for="index_' + plugin.name + '" onclick="toIndexDisplay(\'' + plugin.name + '\',\'' + version + '\')"></label></div>';
-                        if (rdata.data[i].versions[n].run == true) {
-                            state = '<span style="color:#20a53a" class="glyphicon glyphicon-play"></span>'
-                        } else {
-                            state = '<span style="color:red" class="glyphicon glyphicon-pause"></span>'
-                        }
+                        var mupdate = '';//(plugin.versions[n] == plugin.updates[n]) '' : '<a class="btlink" onclick="SoftUpdate(\'' + plugin.name + '\',\'' + plugin.versions[n].version + '\',\'' + plugin.updates[n] + '\')">更新</a> | ';
+                        if (plugin.versions[n] == '') mupdate = '';
+                        handle = mupdate + '<a class="btlink" onclick="SoftMan(\'' + plugin.name + '\',\'' + version_info + '\')">' + lan.soft.setup + '</a> | <a class="btlink" onclick="UninstallVersion(\'' + plugin.name + '\',\'' + plugin.versions + '\',\'' + plugin.title + '\')">卸载</a>';
+                        titleClick = 'onclick="SoftMan(\'' + plugin.name + '\',\'' + version_info + '\')" style="cursor:pointer"';
                     }
-                    var isTask = plugin.task;
-                    if (isTask == '-1') {
-                        handle = '<a style="color:green;" href="javascript:task();">正在安装...</a>';
-                    } else if (isTask == '0') {
-                        handle = '<a style="color:#C0C0C0;" href="javascript:task();">等待安装...</a>';
+
+                    version = plugin.version;
+                    softPath = '<span class="glyphicon glyphicon-folder-open" title="' + rdata.data[i].path + '" onclick="openPath(\'' + rdata.data[i].path + '\')"></span>';
+                    indexshow = '<div class="index-item"><input class="btswitch btswitch-ios" id="index_' + rdata.data[i].name + '" type="checkbox" ' + checked + '><label class="btswitch-btn" for="index_' + plugin.name + '" onclick="toIndexDisplay(\'' + plugin.name + '\',\'' + version + '\')"></label></div>';
+                    if (rdata.data[i].versions[n].run == true) {
+                        state = '<span style="color:#20a53a" class="glyphicon glyphicon-play"></span>'
+                    } else {
+                        state = '<span style="color:red" class="glyphicon glyphicon-pause"></span>'
                     }
                 }
+                var isTask = plugin.task;
+                if (plugin.task == '-1') {
+                    handle = '<a style="color:green;" href="javascript:task();">正在安装...</a>';
+                } else if (isTask == '0') {
+                    handle = '<a style="color:#C0C0C0;" href="javascript:task();">等待安装...</a>';
+                }
+            }
 
-                // console.log(plugin);
-
-                sBody += '<tr>' +
-                    '<td><span ' + titleClick + 
-                    '><img src="/plugins/file?name=' + rdata.data[i].name + 
-                    '&f=ico.png' + '">' + rdata.data[i].title + ' ' + version_info + '</span></td>' +
-                    '<td>' + rdata.data[i].ps + '</td>' +
-                    '<td>' + softPath + '</td>' +
-                    '<td>' + state + '</td>' +
-                    '<td>' + indexshow + '</td>' +
-                    '<td style="text-align: right;">' + handle + '</td>' +
-                    '</tr>';
+            sBody += '<tr>' +
+                '<td><span ' + titleClick + 
+                '><img src="/plugins/file?name=' + plugin.name + 
+                '&f=ico.png' + '">' + plugin.title + ' ' + version_info + '</span></td>' +
+                '<td>' + plugin.ps + '</td>' +
+                '<td>' + softPath + '</td>' +
+                '<td>' + state + '</td>' +
+                '<td>' + indexshow + '</td>' +
+                '<td style="text-align: right;">' + handle + '</td>' +
+                '</tr>';
         }
             
 
