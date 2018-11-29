@@ -157,7 +157,7 @@ class plugin_api:
 
         return plugins_info
 
-    def makeList(self, data, sType):
+    def makeList(self, data, sType='0'):
         plugins_info = []
 
         if (data['pid'] == sType):
@@ -168,7 +168,6 @@ class plugin_api:
             else:
                 pg = self.getPluginInfo(data)
                 plugins_info.append(pg)
-                pass
             return plugins_info
 
         if sType == '0':
@@ -200,8 +199,7 @@ class plugin_api:
                         for index in range(len(tmp_data)):
                             plugins_info.append(tmp_data[index])
                     except Exception, e:
-                        print e
-                        # pass
+                        pass
         return plugins_info
 
     def getPluginList(self, sType, sPage=1, sPageSize=15):
@@ -222,7 +220,28 @@ class plugin_api:
             public.writeFile(self.__index, '[]')
 
         indexList = json.loads(public.readFile(self.__index))
-        return indexList
+
+        plist = []
+        app = []
+        for i in indexList:
+            info = i.split('-')
+            if not info[0] in app:
+                app.append(info[0])
+            path = self.__plugin_dir + '/' + info[0]
+            if os.path.isdir(path):
+                json_file = path + '/info.json'
+                if os.path.exists(json_file):
+                    try:
+                        data = json.loads(public.readFile(json_file))
+                        tmp_data = self.makeList(data)
+                        for index in range(len(tmp_data)):
+                            if tmp_data[index]['versions'] == info[1] or info[1] in tmp_data[index]['versions']:
+                                tmp_data[index]['display'] = True
+                                plist.append(tmp_data[index])
+                                continue
+                    except Exception, e:
+                        pass
+        return plist
 
     def addIndex(self, name, version):
         if not os.path.exists(self.__index):
