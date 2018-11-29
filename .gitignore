@@ -108,3 +108,4 @@ venv.bak/
 .idea/*.iml
 tmp/*.pl
 tmp/*.log
+data/json/index.json
