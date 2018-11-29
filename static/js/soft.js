@@ -1,5 +1,5 @@
 //转换单们到MB
-function ToSizeM(byteLen) {
+function toSizeM(byteLen) {
     var a = parseInt(byteLen) / 1024 / 1024;
     return a || 0;
 }
@@ -65,17 +65,6 @@ function pluginMan(name, title) {
     });
 }
 
-
-//设置插件
-function SetPluginConfig(name, param, def) {
-    if (def == undefined) def = 'SetConfig';
-    loadT = layer.msg(lan.config.config_save, { icon: 16, time: 0, shade: [0.3, '#000'] });
-    $.post('/plugin?action=a&name=' + name + '&s=' + def, param, function(rdata) {
-        layer.close(loadT);
-        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
-    });
-}
-
 //取软件列表
 function GetSList(isdisplay) {
     if (isdisplay !== true) {
@@ -134,8 +123,6 @@ function GetSList(isdisplay) {
             var checked = '';
 
             checked = plugin.display ? 'checked' : '';
-
-            console.log(plugin.versions);
     
             if (typeof plugin.versions == "string"){
                 version_info += plugin.versions + '|';
@@ -148,44 +135,42 @@ function GetSList(isdisplay) {
                 version_info = version_info.substring(0, version_info.length - 1);
             }
 
-            console.log(version_info);
-
             var handle = '<a class="btlink" onclick="addVersion(\'' + plugin.name + '\',\'' + version_info + '\',\'' + plugin.tip + '\',this,\'' + plugin.title + '\')">安装</a>';
-            var isSetup = false;
-            for (var n = 0; n < len; n++) {
+
+            
+            if (plugin.setup == true) {
+                // if (plugin.tip == 'lib') {
+                //     var mupdate = (plugin.versions[n].no == plugin.versions[n].version) ? '' : '<a class="btlink" onclick="SoftUpdate(\'' + plugin.name + '\',\'' + plugin.versions + '\',\'' + plugin.versions[n].version + '\')">更新</a> | ';
+                //     handle = mupdate + '<a class="btlink" onclick="PluginMan(\'' + plugin.name + '\',\'' + plugin.title + '\')">' + lan.soft.setup + '</a> | <a class="btlink" onclick="UninstallVersion(\'' + plugin.name + '\',\'' + plugin.versions + '\',\'' + plugin.title + '\')">卸载</a>';
+                //     titleClick = 'onclick="PluginMan(\'' + plugin.name + '\',\'' + plugin.title + '\')" style="cursor:pointer"';
+                // } else {
+
+                    var mupdate = '';//(plugin.versions[n] == plugin.updates[n]) '' : '<a class="btlink" onclick="SoftUpdate(\'' + plugin.name + '\',\'' + plugin.versions[n].version + '\',\'' + plugin.updates[n] + '\')">更新</a> | ';
+                    // if (plugin.versions[n] == '') mupdate = '';
+                    handle = mupdate + '<a class="btlink" onclick="SoftMan(\'' + plugin.name + '\',\'' + version_info + '\')">' + lan.soft.setup + '</a> | <a class="btlink" onclick="UninstallVersion(\'' + plugin.name + '\',\'' + plugin.versions + '\',\'' + plugin.title + '\')">卸载</a>';
+                    titleClick = 'onclick="SoftMan(\'' + plugin.name + '\',\'' + version_info + '\')" style="cursor:pointer"';
+                // }
+
+                softPath = '<span class="glyphicon glyphicon-folder-open" title="' + plugin.path + '" onclick="openPath(\'' + plugin.path + '\')"></span>';
+                indexshow = '<div class="index-item"><input class="btswitch btswitch-ios" id="index_' + plugin.name + '" type="checkbox" ' + checked + '><label class="btswitch-btn" for="index_' + plugin.name + '" onclick="toIndexDisplay(\'' + plugin.name + '\',\'' + plugin.versions + '\')"></label></div>';
                 if (plugin.status == true) {
-                    isSetup = true;
-                    // if (plugin.tip == 'lib') {
-                    //     var mupdate = (plugin.versions[n].no == plugin.versions[n].version) ? '' : '<a class="btlink" onclick="SoftUpdate(\'' + plugin.name + '\',\'' + plugin.versions + '\',\'' + plugin.versions[n].version + '\')">更新</a> | ';
-                    //     handle = mupdate + '<a class="btlink" onclick="PluginMan(\'' + plugin.name + '\',\'' + plugin.title + '\')">' + lan.soft.setup + '</a> | <a class="btlink" onclick="UninstallVersion(\'' + plugin.name + '\',\'' + plugin.versions + '\',\'' + plugin.title + '\')">卸载</a>';
-                    //     titleClick = 'onclick="PluginMan(\'' + plugin.name + '\',\'' + plugin.title + '\')" style="cursor:pointer"';
-                    // } else {
-
-                        var mupdate = '';//(plugin.versions[n] == plugin.updates[n]) '' : '<a class="btlink" onclick="SoftUpdate(\'' + plugin.name + '\',\'' + plugin.versions[n].version + '\',\'' + plugin.updates[n] + '\')">更新</a> | ';
-                        if (plugin.versions[n] == '') mupdate = '';
-                        handle = mupdate + '<a class="btlink" onclick="SoftMan(\'' + plugin.name + '\',\'' + version_info + '\')">' + lan.soft.setup + '</a> | <a class="btlink" onclick="UninstallVersion(\'' + plugin.name + '\',\'' + plugin.versions + '\',\'' + plugin.title + '\')">卸载</a>';
-                        titleClick = 'onclick="SoftMan(\'' + plugin.name + '\',\'' + version_info + '\')" style="cursor:pointer"';
-                    // }
-
-                    version = plugin.version;
-                    softPath = '<span class="glyphicon glyphicon-folder-open" title="' + rdata.data[i].path + '" onclick="openPath(\'' + rdata.data[i].path + '\')"></span>';
-                    indexshow = '<div class="index-item"><input class="btswitch btswitch-ios" id="index_' + rdata.data[i].name + '" type="checkbox" ' + checked + '><label class="btswitch-btn" for="index_' + plugin.name + '" onclick="toIndexDisplay(\'' + plugin.name + '\',\'' + version + '\')"></label></div>';
-                    if (rdata.data[i].versions[n].run == true) {
-                        state = '<span style="color:#20a53a" class="glyphicon glyphicon-play"></span>'
-                    } else {
-                        state = '<span style="color:red" class="glyphicon glyphicon-pause"></span>'
-                    }
-                }
-                var isTask = plugin.task;
-                if (plugin.task == '-1') {
-                    handle = '<a style="color:green;" href="javascript:task();">正在安装...</a>';
-                } else if (isTask == '0') {
-                    handle = '<a style="color:#C0C0C0;" href="javascript:task();">等待安装...</a>';
+                    state = '<span style="color:#20a53a" class="glyphicon glyphicon-play"></span>'
+                } else {
+                    state = '<span style="color:red" class="glyphicon glyphicon-pause"></span>'
                 }
             }
 
-            var plugin_title = plugin.title
-            if (isSetup){
+            var isTask = plugin.task;
+            if (plugin.task == '-2') {
+                handle = '<a style="color:green;" href="javascript:task();">正在卸载...</a>';
+            } else if (plugin.task == '-1') {
+                handle = '<a style="color:green;" href="javascript:task();">正在安装...</a>';
+            } else if (isTask == '0') {
+                handle = '<a style="color:#C0C0C0;" href="javascript:task();">等待中...</a>';
+            }
+
+            var plugin_title = plugin.title;
+            if (plugin.setup && !plugin.coexist){
                 plugin_title = plugin.title + ' ' + version_info;
             }
 
@@ -238,127 +223,32 @@ function softUpdate(name, version, update) {
     }, msg);
 }
 
-//独立安装
-function oneInstall(name, version) {
-    var isError = false
-
-    var optw = '';
-    if (name == 'mysql') {
-        optw = "<br><br><li style='color:red;'>" + lan.soft.mysql_f + "</li>"
-        var sUrl = '/data?action=getData&table=databases';
-        $.ajax({
-            url: sUrl,
-            type: "GET",
-            async: false,
-            success: function(dataD) {
-                if (dataD.data.length > 0) {
-                    layer.msg(lan.soft.mysql_d, { icon: 5, time: 5000 })
-                    isError = true;;
-                }
-            }
-        });
-    }
-
-    if (isError) return;
-    var one = layer.open({
-        type: 1,
-        title: '选择安装方式',
-        area: '350px',
-        closeBtn: 2,
-        shadeClose: true,
-        content: "<div class='bt-form pd20 pb70 c6'>\
-			<div class='version line'>安装版本：<span style='margin-left:30px'>" + name + " " + version + "</span>" + optw + "</div>\
-	    	<div class='bt-form-submit-btn'>\
-				<button type='button' class='btn btn-danger btn-sm btn-title one-close'>关闭</button>\
-		        <button type='button' id='bi-btn' class='btn btn-success btn-sm btn-title bi-btn'>提交</button>\
-	        </div>\
-	    </div>"
-    })
-    $('.fangshi input').click(function() {
-        $(this).attr('checked', 'checked').parent().siblings().find("input").removeAttr('checked');
-    });
-    $("#bi-btn").click(function() {
-        var type = $('.fangshi input').prop("checked") ? '1' : '0';
-        var data = "name=" + name + "&version=" + version + "&type=" + type;
-        var loadT = layer.msg(lan.soft.add_install, { icon: 16, time: 0, shade: [0.3, '#000'] });
-        $.post('/files?action=InstallSoft', data, function(rdata) {
-            layer.closeAll();
-            layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
-            GetSList();
-        })
-
-    });
-    $(".one-close").click(function() {
-        layer.close(one);
-    })
-    InstallTips();
-    fly("bi-btn");
-}
-
 function addVersion(name, ver, type, obj, title) {
-    // console.log(ver.indexOf('|'));
-    var SelectVersion = '';
-    // if (ver.indexOf('|') >= 0){
+
+    var option = '';
+    if (ver.indexOf('|') >= 0){
         var titlename = name;
         var veropt = ver.split("|");
-       
+        var SelectVersion = '';
         for (var i = 0; i < veropt.length; i++) {
             SelectVersion += '<option>' + name + ' ' + veropt[i] + '</option>';
         }
-    //} else {
-        // SelectVersion = ver;
-    //}
-
-    if (name == 'phpmyadmin' || name == 'nginx' || name == 'apache') {
-        var isError = false
-        $.ajax({
-            url: '/ajax?action=GetInstalled',
-            type: 'get',
-            async: false,
-            success: function(rdata) {
-                if (name == 'nginx') {
-                    if (rdata.webserver != name.toLowerCase() && rdata.webserver != false) {
-                        layer.msg(lan.soft.err_install1, { icon: 2 })
-                        isError = true;
-                        return;
-                    }
-                }
-                if (name == 'apache') {
-                    if (rdata.webserver != name.toLowerCase() && rdata.webserver != false) {
-                        layer.msg(lan.soft.err_install2, { icon: 2 })
-                        isError = true;
-                        return;
-                    }
-                }
-                if (name == 'phpmyadmin') {
-                    if (rdata.php.length < 1) {
-                        layer.msg(lan.soft.err_install3, { icon: 2 })
-                        isError = true;
-                        return;
-                    }
-                    if (!rdata.mysql.setup) {
-                        layer.msg(lan.soft.err_install4, { icon: 2 })
-                        isError = true;
-                        return;
-                    }
-
-                }
-            }
-        });
-        if (isError) return;
+        option = "<select id='SelectVersion' class='bt-input-text' style='margin-left:30px'>" + SelectVersion + "</select>";
+    } else {
+        option = '<span id="SelectVersion">' + name + ' ' + ver + '</span>';
     }
 
     layer.open({
         type: 1,
-        title: titlename + lan.soft.install_title,
+        title: titlename + "软件安装",
         area: '350px',
         closeBtn: 2,
         shadeClose: true,
         content: "<div class='bt-form pd20 pb70 c6'>\
-			<div class='version line'>安装版本：<select id='SelectVersion' class='bt-input-text' style='margin-left:30px'>" + SelectVersion + "</select></div>\
+			<div class='version line'>安装版本：" + option + "</div>\
 	    	<div class='bt-form-submit-btn'>\
-				<button type='button' class='btn btn-danger btn-sm btn-title' onclick='layer.closeAll()'>" + lan.public.close + "</button>\
-		        <button type='button' id='bi-btn' class='btn btn-success btn-sm btn-title bi-btn'>" + lan.public.submit + "</button>\
+				<button type='button' class='btn btn-danger btn-sm btn-title' onclick='layer.closeAll()'>关闭</button>\
+		        <button type='button' id='bi-btn' class='btn btn-success btn-sm btn-title bi-btn'>提交</button>\
 	        </div>\
 	    </div>"
     });
@@ -367,7 +257,11 @@ function addVersion(name, ver, type, obj, title) {
         $(this).attr('checked', 'checked').parent().siblings().find("input").removeAttr('checked');
     });
     $("#bi-btn").click(function() {
+
         var info = $("#SelectVersion").val().toLowerCase();
+        if (info == ''){
+            info = $("#SelectVersion").text().toLowerCase();
+        }
         var name = info.split(" ")[0];
         var version = info.split(" ")[1];
         var type = $('.fangshi input').prop("checked") ? '1' : '0';
@@ -384,10 +278,8 @@ function addVersion(name, ver, type, obj, title) {
     fly("bi-btn");
 }
 
-
-
 //卸载软件
-function UninstallVersion(name, version, title) {
+function uninstallVersion(name, version, title) {
     layer.confirm(msgTpl('您真的要卸载[{1}-{2}]吗?', [title, version]), { icon: 3, closeBtn: 2 }, function() {
         var data = 'name=' + name + '&version=' + version;
         var loadT = layer.msg(lan.public.the, { icon: 16, time: 0, shade: [0.3, '#000'] });
@@ -407,8 +299,10 @@ function toIndexDisplay(name, version) {
         var verinfo = version.replace(/\./, "");
         status = $("#index_" + name + verinfo).prop("checked") ? "0" : "1";
     }
+
+
     var data = "name=" + name + "&status=" + status + "&version=" + version;
-    $.post("/plugins/set_plugin_status", data, function(rdata) {
+    $.post("/plugins/set_index", data, function(rdata) {
         if (rdata.status) {
             layer.msg(rdata.msg, { icon: 1 })
         }
