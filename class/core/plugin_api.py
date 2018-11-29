@@ -217,6 +217,13 @@ class plugin_api:
         ret['list'] = public.getPage(args)
         return ret
 
+    def getIndexList(self):
+        if not os.path.exists(self.__index):
+            public.writeFile(self.__index, '[]')
+
+        indexList = json.loads(public.readFile(self.__index))
+        return indexList
+
     def addIndex(self, name, version):
         if not os.path.exists(self.__index):
             public.writeFile(self.__index, '[]')
