@@ -229,10 +229,9 @@ function softUpdate(name, version, update) {
 }
 
 function addVersion(name, ver, type, obj, title) {
-
     var option = '';
+    var titlename = name;
     if (ver.indexOf('|') >= 0){
-        var titlename = name;
         var veropt = ver.split("|");
         var SelectVersion = '';
         for (var i = 0; i < veropt.length; i++) {
