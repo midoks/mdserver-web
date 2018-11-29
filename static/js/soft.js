@@ -92,7 +92,7 @@ function GetSList(isdisplay) {
     }
 
     var condition = (search + type + page).slice(1);
-    $.post('/plugins/list?' + condition, '', function(rdata) {
+    $.get('/plugins/list?' + condition, '', function(rdata) {
         layer.close(loadT);
         var tBody = '';
         var sBody = '';
