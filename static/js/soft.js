@@ -10,7 +10,7 @@ function resetPluginWinWidth(width){
 }
 
 //软件管理窗口
-function softMan(name, version) {
+function softMain(name, version) {
     var loadT = layer.msg("正在处理,请稍后...", { icon: 16, time: 0, shade: [0.3, '#000'] });
     $.get('/plugins/setting?name='+name, function(rdata) {
         layer.close(loadT);
@@ -147,8 +147,8 @@ function GetSList(isdisplay) {
 
                     var mupdate = '';//(plugin.versions[n] == plugin.updates[n]) '' : '<a class="btlink" onclick="SoftUpdate(\'' + plugin.name + '\',\'' + plugin.versions[n].version + '\',\'' + plugin.updates[n] + '\')">更新</a> | ';
                     // if (plugin.versions[n] == '') mupdate = '';
-                    handle = mupdate + '<a class="btlink" onclick="SoftMan(\'' + plugin.name + '\',\'' + version_info + '\')">' + lan.soft.setup + '</a> | <a class="btlink" onclick="uninstallVersion(\'' + plugin.name + '\',\'' + plugin.versions + '\',\'' + plugin.title + '\')">卸载</a>';
-                    titleClick = 'onclick="softMan(\'' + plugin.name + '\',\'' + version_info + '\')" style="cursor:pointer"';
+                    handle = mupdate + '<a class="btlink" onclick="softMain(\'' + plugin.name + '\',\'' + version_info + '\')">' + lan.soft.setup + '</a> | <a class="btlink" onclick="uninstallVersion(\'' + plugin.name + '\',\'' + plugin.versions + '\',\'' + plugin.title + '\')">卸载</a>';
+                    titleClick = 'onclick="softMain(\'' + plugin.name + '\',\'' + version_info + '\')" style="cursor:pointer"';
                 // }
 
                 softPath = '<span class="glyphicon glyphicon-folder-open" title="' + plugin.path + '" onclick="openPath(\'' + plugin.path + '\')"></span>';
@@ -202,12 +202,6 @@ function GetSList(isdisplay) {
     },'json');
 }
 
-//刷新状态
-function FPStatus() {
-    $.get("/auth?action=flush_pay_status", function(res) {
-        layer.msg(res.msg, { icon: res.status ? "1" : "2" })
-    })
-}
 //更新
 function softUpdate(name, version, update) {
     var msg = "<li>建议您在服务器负载闲时进行软件更新.</li>";
@@ -323,6 +317,77 @@ function flush_cache() {
     });
 }
 
+
+//首页软件列表
+function indexSoft() {
+    var loadT = layer.msg('正在获取列表...', { icon: 16, time: 0, shade: [0.3, '#000'] });
+    $.get('/plugins/index_list', function(rdata) {
+        layer.close(loadT);
+        var con = '';
+        for (var i = 0; i < rdata.length; i++) {
+            var plugin = rdata[i];
+            var len = plugin.versions.length;
+            var version_info = '';
+
+            if (typeof plugin.versions == "string"){
+                version_info += plugin.versions + '|';
+            } else {
+                for (var j = 0; j < len; j++) {
+                    version_info += plugin.versions[j] + '|';
+                }
+            }
+            if (version_info != '') {
+                version_info = version_info.substring(0, version_info.length - 1);
+            }
+
+            console.log(version_info, plugin);
+
+
+            if (plugin.status == true) {
+                    state = '<span style="color:#20a53a" class="glyphicon glyphicon-play"></span>'
+                } else {
+                    state = '<span style="color:red" class="glyphicon glyphicon-pause"></span>'
+            }
+
+            var name = plugin.title + ' ' + plugin.versions + '  ';
+            if (plugin.coexist){
+                name = plugin.title + '  ';
+            }
+                
+            //(\'' + plugin.name + '\',\'' + version_info + '\')"
+            if (plugin.display == true) {
+                con += '<div class="col-sm-3 col-md-3 col-lg-3" data-id="' + plugin.pid + '">\
+                    <span class="spanmove"></span>\
+                    <div onclick="softMain(\'' + plugin.name + '\',\'' + version_info + '\')">\
+                    <div class="image"><img src="/static/img/soft_ico/ico-' + plugin.name + '.png"></div>\
+                    <div class="sname">' +  name + state + '</div>\
+                    </div>\
+                </div>'
+            }
+        }
+        $("#indexsoft").html(con);
+        //软件位置移动
+        var softboxlen = $("#indexsoft > div").length;
+        var softboxsum = 12;
+        var softboxcon = '';
+        var softboxn = softboxlen;
+        if (softboxlen <= softboxsum) {
+            for (var i = 0; i < softboxsum - softboxlen; i++) {
+                softboxn += 1000;
+                softboxcon += '<div class="col-sm-3 col-md-3 col-lg-3 no-bg" data-id="' + softboxn + '"></div>'
+            }
+            $("#indexsoft").append(softboxcon);
+        }
+        $("#indexsoft").dragsort({ dragSelector: ".spanmove", dragBetween: true, dragEnd: saveOrder, placeHolderTemplate: "<div class='col-sm-3 col-md-3 col-lg-3 dashed-border'></div>" });
+
+        function saveOrder() {
+            var data = $("#indexsoft > div").map(function() { return $(this).attr("data-id"); }).get();
+            var ssort = data.join("|");
+            $("input[name=list1SortOrder]").val(ssort);
+            $.post("/plugin?action=savePluginSort", 'ssort=' + ssort, function(rdata) {});
+        };
+    },'json');
+}
 
 // $(function() {
 //     if (window.document.location.pathname == '/soft/') {
