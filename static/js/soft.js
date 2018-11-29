@@ -10,7 +10,7 @@ function resetPluginWinWidth(width){
 }
 
 //软件管理窗口
-function SoftMan(name, version) {
+function softMan(name, version) {
     var loadT = layer.msg("正在处理,请稍后...", { icon: 16, time: 0, shade: [0.3, '#000'] });
     $.get('/plugins/setting?name='+name, function(rdata) {
         layer.close(loadT);
@@ -147,12 +147,17 @@ function GetSList(isdisplay) {
 
                     var mupdate = '';//(plugin.versions[n] == plugin.updates[n]) '' : '<a class="btlink" onclick="SoftUpdate(\'' + plugin.name + '\',\'' + plugin.versions[n].version + '\',\'' + plugin.updates[n] + '\')">更新</a> | ';
                     // if (plugin.versions[n] == '') mupdate = '';
-                    handle = mupdate + '<a class="btlink" onclick="SoftMan(\'' + plugin.name + '\',\'' + version_info + '\')">' + lan.soft.setup + '</a> | <a class="btlink" onclick="UninstallVersion(\'' + plugin.name + '\',\'' + plugin.versions + '\',\'' + plugin.title + '\')">卸载</a>';
-                    titleClick = 'onclick="SoftMan(\'' + plugin.name + '\',\'' + version_info + '\')" style="cursor:pointer"';
+                    handle = mupdate + '<a class="btlink" onclick="SoftMan(\'' + plugin.name + '\',\'' + version_info + '\')">' + lan.soft.setup + '</a> | <a class="btlink" onclick="uninstallVersion(\'' + plugin.name + '\',\'' + plugin.versions + '\',\'' + plugin.title + '\')">卸载</a>';
+                    titleClick = 'onclick="softMan(\'' + plugin.name + '\',\'' + version_info + '\')" style="cursor:pointer"';
                 // }
 
                 softPath = '<span class="glyphicon glyphicon-folder-open" title="' + plugin.path + '" onclick="openPath(\'' + plugin.path + '\')"></span>';
-                indexshow = '<div class="index-item"><input class="btswitch btswitch-ios" id="index_' + plugin.name + '" type="checkbox" ' + checked + '><label class="btswitch-btn" for="index_' + plugin.name + '" onclick="toIndexDisplay(\'' + plugin.name + '\',\'' + plugin.versions + '\')"></label></div>';
+                if (plugin.coexist){
+                    indexshow = '<div class="index-item"><input class="btswitch btswitch-ios" id="index_' + plugin.name  + plugin.versions + '" type="checkbox" ' + checked + '><label class="btswitch-btn" for="index_' + plugin.name + plugin.versions + '" onclick="toIndexDisplay(\'' + plugin.name + '\',\'' + plugin.versions + '\',\'' + plugin.coexist +'\')"></label></div>';
+                } else {
+                    indexshow = '<div class="index-item"><input class="btswitch btswitch-ios" id="index_' + plugin.name + '" type="checkbox" ' + checked + '><label class="btswitch-btn" for="index_' + plugin.name + '" onclick="toIndexDisplay(\'' + plugin.name + '\',\'' + plugin.versions + '\')"></label></div>';
+                }
+                
                 if (plugin.status == true) {
                     state = '<span style="color:#20a53a" class="glyphicon glyphicon-play"></span>'
                 } else {
@@ -293,13 +298,14 @@ function uninstallVersion(name, version, title) {
 
 
 //首页显示
-function toIndexDisplay(name, version) {
+function toIndexDisplay(name, version, coexist) {
+
     var status = $("#index_" + name).prop("checked") ? "0" : "1";
-    if (name == "php") {
+    if (coexist == "true") {
         var verinfo = version.replace(/\./, "");
         status = $("#index_" + name + verinfo).prop("checked") ? "0" : "1";
     }
-
+    console.log(name,status,version);
 
     var data = "name=" + name + "&status=" + status + "&version=" + version;
     $.post("/plugins/set_index", data, function(rdata) {
