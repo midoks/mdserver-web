@@ -1,5 +1,5 @@
 {
-	"title":"openresty",
+	"title":"OpenResty",
 	"tip":"soft",
 	"name":"openresty",
 	"type":"其他插件",
@@ -10,6 +10,6 @@
 	"home":"http://openresty.org",
 	"date":"2017-11-24",
 	"pid": "1",
-	"versions": ["1.13.6"],
-	"updates": ["1.13.6.2"]
+	"versions": ["1.11.2", "1.13.6"],
+	"updates": ["1.11.2.5", "1.13.6.2"]
 }

@@ -68,13 +68,44 @@ class plugin_api:
     def checkStatus(self, info):
         pass
 
+    def checkDisplayIndex(self, name, version):
+        if not os.path.exists(self.__index):
+            public.writeFile(self.__index, '[]')
+
+        indexList = json.loads(public.readFile(self.__index))
+        if type(version) == list:
+            for index in range(len(version)):
+                vname = name + '-' + version[index]
+                if vname in indexList:
+                    return True
+        else:
+            vname = name + '-' + version
+            if vname in indexList:
+                return True
+        return False
+
+    def getVersion(self, path):
+        pass
+
      # 构造本地插件信息
     def getPluginInfo(self, info):
         checks = ''
+        path = ''
+        coexist = False
+
         if info["checks"][0:1] == '/':
             checks = info["checks"]
         else:
             checks = public.getRootDir() + '/' + info['checks']
+
+        if info.has_key('path'):
+            path = info['path']
+
+        if path[0:1] != '/':
+            path = public.getRootDir() + '/' + path
+
+        if info.has_key('coexist') and info['coexist']:
+            coexist = True
 
         pluginInfo = {
             "id": 10000,
@@ -85,11 +116,15 @@ class plugin_api:
             "ps": info['ps'],
             "dependnet": "",
             "mutex": "",
+            "path": path,
             "install_checks": checks,
             "uninsatll_checks": checks,
+            "coexist": coexist,
             "versions": info['versions'],
             # "updates": info['updates'],
+            "display": False,
             "setup": False,
+            "setup_version": "",
             "status": False,
         }
 
@@ -99,9 +134,53 @@ class plugin_api:
             pluginInfo['install_checks'] = checks.replace(
                 'VERSION', info['versions'])
 
+        if path.find('VERSION') > -1:
+            pluginInfo['path'] = path.replace(
+                'VERSION', info['versions'])
+
+        pluginInfo['display'] = self.checkDisplayIndex(
+            info['name'], pluginInfo['versions'])
+
         pluginInfo['setup'] = os.path.exists(pluginInfo['install_checks'])
-        pluginInfo['status'] = os.path.exists(pluginInfo['install_checks'])
+        # pluginInfo['status'] = os.path.exists(pluginInfo['install_checks'])
         return pluginInfo
+
+    def makeCoexist(self, data):
+        plugins_info = []
+        for index in range(len(data['versions'])):
+            tmp = data.copy()
+            tmp['title'] = tmp['title'] + \
+                '-' + data['versions'][index]
+            tmp['versions'] = data['versions'][index]
+            pg = self.getPluginInfo(tmp)
+            plugins_info.append(pg)
+
+        return plugins_info
+
+    def makeList(self, data, sType):
+        plugins_info = []
+
+        if (data['pid'] == sType):
+            if type(data['versions']) == list and data.has_key('coexist') and data['coexist']:
+                tmp_data = self.makeCoexist(data)
+                for index in range(len(tmp_data)):
+                    plugins_info.append(tmp_data[index])
+            else:
+                pg = self.getPluginInfo(data)
+                plugins_info.append(pg)
+                pass
+            return plugins_info
+
+        if sType == '0':
+            if type(data['versions']) == list and data.has_key('coexist') and data['coexist']:
+                tmp_data = self.makeCoexist(data)
+                for index in range(len(tmp_data)):
+                    plugins_info.append(tmp_data[index])
+            else:
+                pg = self.getPluginInfo(data)
+                plugins_info.append(pg)
+
+        return plugins_info
 
     def getAllList(self, sType='0'):
         ret = {}
@@ -111,37 +190,18 @@ class plugin_api:
         for dirinfo in os.listdir(self.__plugin_dir):
             if dirinfo[0:1] == '.':
                 continue
-
             path = self.__plugin_dir + '/' + dirinfo
-
             if os.path.isdir(path):
                 json_file = path + '/info.json'
                 if os.path.exists(json_file):
                     try:
                         data = json.loads(public.readFile(json_file))
-                        if type(data['versions']) == list and data['name'] == 'php':
-                            for index in range(len(data['versions'])):
-                                tmp = data.copy()
-                                tmp['title'] = tmp['title'] + \
-                                    '-' + data['versions'][index]
-                                tmp['versions'] = data['versions'][index]
-                                pg = self.getPluginInfo(tmp)
-                                if sType == '0':
-                                    plugins_info.append(pg)
-                                else:
-                                    if pg['pid'] == sType:
-                                        plugins_info.append(pg)
-                        else:
-                            pg = self.getPluginInfo(data)
-                            if sType == '0':
-                                plugins_info.append(pg)
-                            else:
-                                if pg['pid'] == sType:
-                                    plugins_info.append(pg)
+                        tmp_data = self.makeList(data, sType)
+                        for index in range(len(tmp_data)):
+                            plugins_info.append(tmp_data[index])
                     except Exception, e:
                         print e
                         # pass
-
         return plugins_info
 
     def getPluginList(self, sType, sPage=1, sPageSize=15):
@@ -158,7 +218,32 @@ class plugin_api:
         return ret
 
     def addIndex(self, name, version):
-        pass
+        if not os.path.exists(self.__index):
+            public.writeFile(self.__index, '[]')
+
+        indexList = json.loads(public.readFile(self.__index))
+        vname = name + '-' + version
+
+        if vname in indexList:
+            return public.returnJson(False, '请不要重复添加!')
+        if len(indexList) >= 12:
+            return public.returnJson(False, '首页最多只能显示12个软件!')
+
+        indexList.append(vname)
+        public.writeFile(self.__index, json.dumps(indexList))
+        return public.returnJson(True, '添加成功!')
+
+    def removeIndex(self, name, version):
+        if not os.path.exists(self.__index):
+            public.writeFile(self.__index, '[]')
+
+        indexList = json.loads(public.readFile(self.__index))
+        vname = name + '-' + version
+        if not vname in indexList:
+            return public.returnJson(True, '删除成功!')
+        indexList.remove(vname)
+        public.writeFile(self.__index, json.dumps(indexList))
+        return public.returnJson(True, '删除成功!')
 
     def run(self):
         pass

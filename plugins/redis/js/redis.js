@@ -151,9 +151,9 @@ function redisStatus() {
 							<tr><th>uptime_in_days</th><td>' + rdata.uptime_in_days + '</td><td>已运行天数</td></tr>\
 							<tr><th>tcp_port</th><td>' + rdata.tcp_port + '</td><td>当前监听端口</td></tr>\
 							<tr><th>connected_clients</th><td>' + rdata.connected_clients + '</td><td>连接的客户端数量</td></tr>\
-							<tr><th>used_memory_rss</th><td>' + ToSize(rdata.used_memory_rss) + '</td><td>Redis当前占用的系统内存总量</td></tr>\
-							<tr><th>used_memory</th><td>' + ToSize(rdata.used_memory) + '</td><td>Redis当前已分配的内存总量</td></tr>\
-							<tr><th>used_memory_peak</th><td>' + ToSize(rdata.used_memory_peak) + '</td><td>Redis历史分配内存的峰值</td></tr>\
+							<tr><th>used_memory_rss</th><td>' + toSize(rdata.used_memory_rss) + '</td><td>Redis当前占用的系统内存总量</td></tr>\
+							<tr><th>used_memory</th><td>' + toSize(rdata.used_memory) + '</td><td>Redis当前已分配的内存总量</td></tr>\
+							<tr><th>used_memory_peak</th><td>' + toSize(rdata.used_memory_peak) + '</td><td>Redis历史分配内存的峰值</td></tr>\
 							<tr><th>mem_fragmentation_ratio</th><td>' + rdata.mem_fragmentation_ratio + '%</td><td>内存碎片比率</td></tr>\
 							<tr><th>total_connections_received</th><td>' + rdata.total_connections_received + '</td><td>运行以来连接过的客户端的总数量</td></tr>\
 							<tr><th>total_commands_processed</th><td>' + rdata.total_commands_processed + '</td><td>运行以来执行过的命令的总数量</td></tr>\
