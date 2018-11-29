@@ -38,10 +38,16 @@ def file():
     return c
 
 
-@plugins.route('/list', methods=['GET', 'POST'])
+@plugins.route('/list', methods=['GET'])
 def list():
     typeVal = request.args.get('type', '0')
     data = plugin_api.plugin_api().getPluginList(typeVal, 1)
+    return public.getJson(data)
+
+
+@plugins.route('/index_list', methods=['GET'])
+def indexList():
+    data = plugin_api.plugin_api().getIndexList()
     return public.getJson(data)
 
 
