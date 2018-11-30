@@ -85,7 +85,10 @@ class plugin_api:
         return False
 
     def getVersion(self, path):
-        pass
+        version_f = path + '/version.pl'
+        if os.path.exists(version_f):
+            return public.readFile(version_f).strip()
+        return ''
 
      # 构造本地插件信息
     def getPluginInfo(self, info):
@@ -142,6 +145,12 @@ class plugin_api:
             info['name'], pluginInfo['versions'])
 
         pluginInfo['setup'] = os.path.exists(pluginInfo['install_checks'])
+
+        if coexist and pluginInfo['setup']:
+            pluginInfo['setup_version'] = info['versions']
+        else:
+            pluginInfo['setup_version'] = self.getVersion(
+                pluginInfo['path'])
         # pluginInfo['status'] = os.path.exists(pluginInfo['install_checks'])
         return pluginInfo
 
@@ -199,7 +208,7 @@ class plugin_api:
                         for index in range(len(tmp_data)):
                             plugins_info.append(tmp_data[index])
                     except Exception, e:
-                        pass
+                        print e
         return plugins_info
 
     def getPluginList(self, sType, sPage=1, sPageSize=15):
@@ -240,8 +249,13 @@ class plugin_api:
                                 plist.append(tmp_data[index])
                                 continue
                     except Exception, e:
-                        pass
+                        print e
         return plist
+
+    def setIndexSort(self, sort):
+        data = sort.split('|')
+        public.writeFile(self.__index, json.dumps(data))
+        return True
 
     def addIndex(self, name, version):
         if not os.path.exists(self.__index):
