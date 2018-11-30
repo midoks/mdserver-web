@@ -6,6 +6,7 @@
 	"ps":"轻量级，占有内存少，并发能力强",
 	"shell":"install.sh",
 	"checks":"server/openresty",
+	"path":"server/openresty",
 	"author":"agentzh",
 	"home":"http://openresty.org",
 	"date":"2017-11-24",

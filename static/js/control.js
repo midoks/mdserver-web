@@ -123,7 +123,7 @@ function GetToday(){
 //取监控状态
 function GetStatus(){
 	loadT = layer.msg(lan.public.read,{icon:16,time:0})
-	$.post('/config?action=SetControl','type=-1',function(rdata){
+	$.post('/system/get_control','type=-1',function(rdata){
 		layer.close(loadT);
 		if(rdata.status){
 			$("#openJK").html("<input class='btswitch btswitch-ios' id='ctswitch' type='checkbox' checked><label class='btswitch-btn' for='ctswitch' onclick='SetControl()'></label>")
@@ -205,7 +205,7 @@ function getBeforeDate(n){
 }
 //cpu
 function cpu(b,e){
-$.get('/ajax?action=GetCpuIo&start='+b+'&end='+e,function(rdata){
+$.get('/system/get_cpu_io?start='+b+'&end='+e,function(rdata){
 	var myChartCpu = echarts.init(document.getElementById('cupview'));
 	var xData = [];
 	var yData = [];
@@ -294,7 +294,7 @@ $.get('/ajax?action=GetCpuIo&start='+b+'&end='+e,function(rdata){
 
 //内存
 function mem(b,e){
-$.get('/ajax?action=GetCpuIo&start='+b+'&end='+e,function(rdata){
+$.get('/system/get_cpu_io?start='+b+'&end='+e,function(rdata){
 	var myChartMen = echarts.init(document.getElementById('memview'));
 	var xData = [];
 	//var yData = [];
@@ -383,7 +383,7 @@ $.get('/ajax?action=GetCpuIo&start='+b+'&end='+e,function(rdata){
 
 //磁盘io
 function disk(b,e){
-$.get('/ajax?action=GetDiskIo&start='+b+'&end='+e,function(rdata){
+$.get('/system/get_disk_io?start='+b+'&end='+e,function(rdata){
 	var myChartDisk = echarts.init(document.getElementById('diskview'));
 	var rData = [];
 	var wData = [];
@@ -490,7 +490,7 @@ $.get('/ajax?action=GetDiskIo&start='+b+'&end='+e,function(rdata){
 
 //网络Io
 function network(b,e){
-$.get('/ajax?action=GetNetWorkIo&start='+b+'&end='+e,function(rdata){
+$.get('/system/get_network_io?start='+b+'&end='+e,function(rdata){
 	var myChartNetwork = echarts.init(document.getElementById('network'));
 	var aData = [];
 	var bData = [];
@@ -599,7 +599,7 @@ $.get('/ajax?action=GetNetWorkIo&start='+b+'&end='+e,function(rdata){
 }
 //负载
 function getload_old(b,e){
-$.get('/ajax?action=get_load_average&start='+b+'&end='+e,function(rdata){
+$.get('/system/get_load_average?start='+b+'&end='+e,function(rdata){
 	var myChartgetload = echarts.init(document.getElementById('getloadview'));
 	var aData = [];
 	var bData = [];
@@ -729,7 +729,7 @@ $.get('/ajax?action=get_load_average&start='+b+'&end='+e,function(rdata){
 }
 //系统负载
 function getload(b,e){
-	$.get('/ajax?action=get_load_average&start='+b+'&end='+e,function(rdata){
+	$.get('/system/get_load_average?start='+b+'&end='+e,function(rdata){
 	var myChartgetload = echarts.init(document.getElementById('getloadview'));
 	var aData = [];
 	var bData = [];

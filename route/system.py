@@ -37,3 +37,33 @@ def systemTotal():
 def diskInfo():
     diskInfo = system_api.system_api().getDiskInfo()
     return public.getJson(diskInfo)
+
+
+@system.route('/get_control', methods=['POST'])
+def getControl():
+    data = {'status': True, 'day': 30}
+    return public.getJson(data)
+
+
+@system.route('/get_load_average', methods=['GET'])
+def getLoadAverage():
+    data = {'status': True, 'day': 30}
+    return public.getJson(data)
+
+
+@system.route('/get_cpu_io', methods=['GET'])
+def getCpuIo():
+    data = {'status': True, 'day': 30}
+    return public.getJson(data)
+
+
+@system.route('/get_disk_io', methods=['GET'])
+def getDiskIo():
+    data = {'status': True, 'day': 30}
+    return public.getJson(data)
+
+
+@system.route('/get_network_io', methods=['GET'])
+def getNetworkIo():
+    data = {'status': True, 'day': 30}
+    return public.getJson(data)
