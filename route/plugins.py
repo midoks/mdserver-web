@@ -51,6 +51,13 @@ def indexList():
     return public.getJson(data)
 
 
+@plugins.route('/index_sort', methods=['POST'])
+def indexSort():
+    sort = request.form.get('ssrot', '')
+    # data = plugin_api.plugin_api().setIndexSort()
+    return public.returnJson(False, '已将安装任务添加到队列!')
+
+
 @plugins.route('/install', methods=['POST'])
 def install():
 

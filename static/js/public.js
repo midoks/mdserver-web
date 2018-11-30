@@ -341,6 +341,25 @@ function showHidePwd() {
 	})
 }
 
+function showMsg(msg, callback ,icon, time){
+
+	if (typeof time == 'undefined'){
+		time = 2000;
+	}
+
+	if (typeof icon == 'undefined'){
+		icon = {};
+	}
+
+	var loadT = layer.msg(msg, icon);
+	setTimeout(function() {
+		layer.close(loadT);
+		if (typeof callback == 'function'){
+			callback();
+		}
+	}, time);
+}
+
 function openPath(a) {
 	setCookie("Path", a);
 	window.location.href = "/files"
@@ -487,89 +506,6 @@ function OnlineEditFile(k, f) {
 			layer.close(r);
 		});
 	});
-}
-
-function ServiceAdmin(a, b) {
-	if(!isNaN(a)) {
-		a = "php-fpm-" + a
-	}
-	a = a.replace('_soft','');
-	var c = "name=" + a + "&type=" + b;
-	var d = "";
-	
-	switch(b) {
-		case "stop":
-			d = lan.bt.stop;
-			break;
-		case "start":
-			d = lan.bt.start;
-			break;
-		case "restart":
-			d = lan.bt.restart;
-			break;
-		case "reload":
-			d = lan.bt.reload;
-			break
-	}
-	layer.confirm( lan.get('service_confirm',[d,a]), {icon:3,
-		closeBtn: 2
-	}, function() {
-		var e = layer.msg(lan.get('service_the',[d,a]), {
-			icon: 16,
-			time: 0
-		});
-		$.post("/system?action=ServiceAdmin", c, function(g) {
-			layer.close(e);
-			
-			var f = g.status ? lan.get('service_ok',[a,d]):lan.get('service_err',[a,d]);
-			layer.msg(f, {
-				icon: g.status ? 1 : 2
-			});
-			if(b != "reload" && g.status == true) {
-				setTimeout(function() {
-					window.location.reload()
-				}, 1000)
-			}
-			if(!g.status) {
-				layer.msg(g.msg, {
-					icon: 2,
-					time: 0,
-					shade: 0.3,
-					shadeClose: true
-				})
-			}
-		}).error(function() {
-			layer.close(e);
-			layer.msg(lan.public.success, {
-				icon: 1
-			})
-		})
-	})
-}
-
-function GetConfigFile(a) {
-	var b = "";
-	switch(a) {
-		case "mysql":
-			b = "/etc/my.cnf";
-			break;
-		case "nginx":
-			b = "/www/server/nginx/conf/nginx.conf";
-			break;
-		case "pure-ftpd":
-			b = "/www/server/pure-ftpd/etc/pure-ftpd.conf";
-			break;
-		case "apache":
-			b = "/www/server/apache/conf/httpd.conf";
-			break;
-		case "tomcat":
-			b = "/www/server/tomcat/conf/server.xml";
-			break;
-		default:
-			b = "/www/server/php/" + a + "/etc/php.ini";
-			break
-	}
-	OnlineEditFile(0, b)
 }
 
 function GetPHPStatus(a) {

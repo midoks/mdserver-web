@@ -1,0 +1,36 @@
+
+<div class="testServer">
+	<div class="ts-head">
+		<div class="ts-h-score">
+			<div class="ts-h-s-img ts-h-s-imging"></div>
+			<div class="ts-h-s-num"><span>正在跑分中<img src="/static/img/ings.gif"></span></div>
+			<div class="ts-stamper"></div>
+		</div>
+		<div class="ts-btn ts-btn-start" onclick="startTest();">开始跑分</div>
+	</div>
+	<div class="ts-info">公式：1万次整数+2万次浮点+1亿位圆周率+1万次排序 +((磁盘读+磁盘写)*IO速度)+内存容量</div>
+	<div class="ts-content">
+		<div class="ts-c-box ts-cpu">
+			<div class="ts-c-b-score"></div>
+			<div class="ts-c-b-img"></div>
+			<div class="ts-c-b-name">CPU</div>
+			<div class="ts-c-b-info">cpu运算能力</div>
+		</div>
+		<div class="ts-c-box ts-disk">
+			<div class="ts-c-b-score"></div>
+			<div class="ts-c-b-img"></div>
+			<div class="ts-c-b-name">磁盘</div>
+			<div class="ts-c-b-info">磁盘读写能力</div>
+		</div>
+		<div class="ts-c-box ts-mem">
+			<div class="ts-c-b-score"></div>
+			<div class="ts-c-b-img"></div>
+			<div class="ts-c-b-name">内存</div>
+			<div class="ts-c-b-info">内存容量</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+resetPluginWinWidth(700);
+$.getScript("/plugins/file?name=readme&f=js/score.js");
+</script>
