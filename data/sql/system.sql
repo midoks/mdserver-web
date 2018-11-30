@@ -26,3 +26,12 @@ CREATE TABLE IF NOT EXISTS `diskio` (
   `write_time` INTEGER,
   `addtime` INTEGER
 );
+
+CREATE TABLE IF NOT EXISTS `load_average` (
+  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+  `pro` REAL,
+  `one` REAL,
+  `five` REAL,
+  `fifteen` REAL,
+  `addtime` INTEGER
+);
