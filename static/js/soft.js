@@ -66,7 +66,7 @@ function pluginMan(name, title) {
 }
 
 //取软件列表
-function GetSList(isdisplay) {
+function getSList(isdisplay) {
     if (isdisplay !== true) {
         var loadT = layer.msg(lan.soft.get_list, { icon: 16, time: 0, shade: [0.3, '#000'] })
     }
@@ -155,7 +155,7 @@ function GetSList(isdisplay) {
                 if (plugin.coexist){
                     indexshow = '<div class="index-item"><input class="btswitch btswitch-ios" id="index_' + plugin.name  + plugin.versions + '" type="checkbox" ' + checked + '><label class="btswitch-btn" for="index_' + plugin.name + plugin.versions + '" onclick="toIndexDisplay(\'' + plugin.name + '\',\'' + plugin.versions + '\',\'' + plugin.coexist +'\')"></label></div>';
                 } else {
-                    indexshow = '<div class="index-item"><input class="btswitch btswitch-ios" id="index_' + plugin.name + '" type="checkbox" ' + checked + '><label class="btswitch-btn" for="index_' + plugin.name + '" onclick="toIndexDisplay(\'' + plugin.name + '\',\'' + plugin.versions + '\')"></label></div>';
+                    indexshow = '<div class="index-item"><input class="btswitch btswitch-ios" id="index_' + plugin.name + '" type="checkbox" ' + checked + '><label class="btswitch-btn" for="index_' + plugin.name + '" onclick="toIndexDisplay(\'' + plugin.name + '\',\'' + plugin.setup_version + '\')"></label></div>';
                 }
                 
                 if (plugin.status == true) {
@@ -176,7 +176,7 @@ function GetSList(isdisplay) {
 
             var plugin_title = plugin.title;
             if (plugin.setup && !plugin.coexist){
-                plugin_title = plugin.title + ' ' + version_info;
+                plugin_title = plugin.title + ' ' + plugin.setup_version;
             }
 
             sBody += '<tr>' +
@@ -197,7 +197,7 @@ function GetSList(isdisplay) {
         $(".menu-sub span").click(function() {
             setCookie('softType', $(this).attr('typeid'));
             $(this).addClass("on").siblings().removeClass("on");
-            GetSList();
+            getSList();
         })
     },'json');
 }
@@ -269,7 +269,7 @@ function addVersion(name, ver, type, obj, title) {
         $.post("/plugins/install", data, function(rdata) {
             layer.closeAll();
             layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
-            GetSList();
+            getSList();
         });
     });
     InstallTips();
@@ -283,7 +283,7 @@ function uninstallVersion(name, version, title) {
         var loadT = layer.msg(lan.public.the, { icon: 16, time: 0, shade: [0.3, '#000'] });
         $.post('/plugins/uninstall', data, function(rdata) {
             layer.close(loadT)
-            GetSList();
+            getSList();
             layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
         })
     });
@@ -413,6 +413,6 @@ function indexSoft() {
 
 // $(function() {
 //     if (window.document.location.pathname == '/soft/') {
-//         setInterval(function() { GetSList(true); }, 5000);
+//         setInterval(function() { getSList(true); }, 5000);
 //     }
 // });

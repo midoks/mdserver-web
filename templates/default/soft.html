@@ -9,9 +9,9 @@
 					<a class="plr10 c4" href="/">首页</a>/<span class="plr10 c4">软件管理</span>
 				</div>
 				<div class="search pull-right">
-					<form target="hid" onsubmit='GetSList()'>
+					<form target="hid" onsubmit='getSList()'>
 						<input type="text" id="SearchValue" class="ser-text pull-left" placeholder="search" />
-						<button type="button" class="ser-sub pull-left" onclick='GetSList()'></button>
+						<button type="button" class="ser-sub pull-left" onclick='getSList()'></button>
 					</form>
 				</div>
 			</div>
@@ -51,7 +51,7 @@
 <script>
 setCookie('serverType','$web.ctx.session.webserver');
 //取软件列表
-GetSList();
+getSList();
 // $$.get("/ajax?action=GetCloudHtml&rpath=btpanel_message/updata_pro.html",function(rdata){
 // 	$$("#updata_pro_info").html(rdata);
 // });
