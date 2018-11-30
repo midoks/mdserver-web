@@ -298,7 +298,6 @@ function toIndexDisplay(name, version, coexist) {
         var verinfo = version.replace(/\./, "");
         status = $("#index_" + name + verinfo).prop("checked") ? "0" : "1";
     }
-    console.log(name,status,version);
 
     var data = "name=" + name + "&status=" + status + "&version=" + version;
     $.post("/plugins/set_index", data, function(rdata) {
@@ -323,6 +322,7 @@ function indexSoft() {
     var loadT = layer.msg('正在获取列表...', { icon: 16, time: 0, shade: [0.3, '#000'] });
     $.get('/plugins/index_list', function(rdata) {
         layer.close(loadT);
+        $("#indexsoft").html('');
         var con = '';
         for (var i = 0; i < rdata.length; i++) {
             var plugin = rdata[i];
@@ -340,8 +340,6 @@ function indexSoft() {
                 version_info = version_info.substring(0, version_info.length - 1);
             }
 
-            console.log(version_info, plugin);
-
 
             if (plugin.status == true) {
                     state = '<span style="color:#20a53a" class="glyphicon glyphicon-play"></span>'
@@ -353,18 +351,18 @@ function indexSoft() {
             if (plugin.coexist){
                 name = plugin.title + '  ';
             }
-                
-            //(\'' + plugin.name + '\',\'' + version_info + '\')"
+    
             if (plugin.display == true) {
                 con += '<div class="col-sm-3 col-md-3 col-lg-3" data-id="' + plugin.pid + '">\
                     <span class="spanmove"></span>\
                     <div onclick="softMain(\'' + plugin.name + '\',\'' + version_info + '\')">\
-                    <div class="image"><img src="/static/img/soft_ico/ico-' + plugin.name + '.png"></div>\
+                    <div class="image"><img src="plugins/file?name=' + plugin.name + '&f=ico.png"></div>\
                     <div class="sname">' +  name + state + '</div>\
                     </div>\
                 </div>'
             }
         }
+
         $("#indexsoft").html(con);
         //软件位置移动
         var softboxlen = $("#indexsoft > div").length;
@@ -378,13 +376,19 @@ function indexSoft() {
             }
             $("#indexsoft").append(softboxcon);
         }
-        $("#indexsoft").dragsort({ dragSelector: ".spanmove", dragBetween: true, dragEnd: saveOrder, placeHolderTemplate: "<div class='col-sm-3 col-md-3 col-lg-3 dashed-border'></div>" });
 
+        $("#indexsoft").dragsort({ dragSelector: ".spanmove", dragBetween: true, dragEnd: saveOrder, placeHolderTemplate: "<div class='col-sm-3 col-md-3 col-lg-3 dashed-border'></div>" });
         function saveOrder() {
             var data = $("#indexsoft > div").map(function() { return $(this).attr("data-id"); }).get();
             var ssort = data.join("|");
             $("input[name=list1SortOrder]").val(ssort);
-            $.post("/plugin?action=savePluginSort", 'ssort=' + ssort, function(rdata) {});
+            $.post("/plugins/index_sort", 'ssort=' + ssort, function(rdata) {
+                if (!rdata.status){
+                    showMsg('设置失败:'+ rdata.msg, function(){
+                        indexSoft();
+                    }, { icon: 16, time: 0, shade: [0.3, '#000'] });
+                }
+            },'json');
         };
     },'json');
 }
