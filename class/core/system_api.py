@@ -386,6 +386,29 @@ class system_api:
                          '/panel/' + scriptFile)
         return self.GetMemInfo()
 
+    def getNetWorkIo(self, start, end):
+        # 取指定时间段的网络Io
+        data = public.M('network').dbfile('system').where("addtime>=? AND addtime<=?", (start, end)).field(
+            'id,up,down,total_up,total_down,down_packets,up_packets,addtime').order('id asc').select()
+        return self.ToAddtime(data)
+
+    def getDiskIo(self, start, end):
+        # 取指定时间段的磁盘Io
+        data = public.M('diskio').dbfile('system').where("addtime>=? AND addtime<=?", (start, end)).field(
+            'id,read_count,write_count,read_bytes,write_bytes,read_time,write_time,addtime').order('id asc').select()
+        return self.ToAddtime(data)
+
+    def getCpuIo(self, start, end):
+        # 取指定时间段的CpuIo
+        data = public.M('cpuio').dbfile('system').where("addtime>=? AND addtime<=?",
+                                                        (start, end)).field('id,pro,mem,addtime').order('id asc').select()
+        return self.ToAddtime(data, True)
+
+    def getLoadAverage(self, start, end):
+        data = public.M('load_average').dbfile('system').where("addtime>=? AND addtime<=?", (
+            start, end)).field('id,pro,one,five,fifteen,addtime').order('id asc').select()
+        return self.ToAddtime(data)
+
     # 重启面板
     def reWeb(self, get):
         # if not public.IsRestart(): return

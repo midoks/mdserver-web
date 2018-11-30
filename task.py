@@ -108,7 +108,6 @@ def WriteLogs(logMsg):
 def startTask():
     # 任务队列
     global isTask
-    print os.path.exists(isTask)
     try:
         while True:
             try:
@@ -195,27 +194,26 @@ def siteEdate():
 def systemTask():
     # 系统监控任务
     try:
-        import system
+        import system_api
         import psutil
         import time
-        sm = system.system()
+        sm = system_api.system_api()
         filename = 'data/control.conf'
         sql = db.Sql().dbfile('system')
-        csql = '''CREATE TABLE IF NOT EXISTS `load_average` (
-  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
-  `pro` REAL,
-  `one` REAL,
-  `five` REAL,
-  `fifteen` REAL,
-  `addtime` INTEGER
-)'''
-        sql.execute(csql, ())
+        csql = public.readFile('data/sql/system.sql')
+
+        csql_list = csql.split(';')
+        for index in range(len(csql_list)):
+            sql.execute(csql_list[index], ())
+
         cpuIo = cpu = {}
         cpuCount = psutil.cpu_count()
         used = count = 0
         reloadNum = 0
         network_up = network_down = diskio_1 = diskio_2 = networkInfo = cpuInfo = diskInfo = None
+        print 'task init'
         while True:
+            print 'task init 1'
             if not os.path.exists(filename):
                 time.sleep(10)
                 continue
@@ -234,11 +232,11 @@ def systemTask():
             tmp['used'] = psutil.cpu_percent(interval=1)
 
             if not cpuInfo:
-                tmp['mem'] = GetMemUsed()
+                tmp['mem'] = getMemUsed()
                 cpuInfo = tmp
 
             if cpuInfo['used'] < tmp['used']:
-                tmp['mem'] = GetMemUsed()
+                tmp['mem'] = getMemUsed()
                 cpuInfo = tmp
 
             # 取当前网络Io
@@ -257,38 +255,39 @@ def systemTask():
             network_up = networkIo[0]
             network_down = networkIo[1]
 
+            print "tmp:", tmp
+
             if not networkInfo:
                 networkInfo = tmp
             if (tmp['up'] + tmp['down']) > (networkInfo['up'] + networkInfo['down']):
                 networkInfo = tmp
-
             # 取磁盘Io
-            if os.path.exists('/proc/diskstats'):
-                diskio_2 = psutil.disk_io_counters()
-                if not diskio_1:
-                    diskio_1 = diskio_2
-                tmp = {}
-                tmp['read_count'] = diskio_2.read_count - diskio_1.read_count
-                tmp['write_count'] = diskio_2.write_count - diskio_1.write_count
-                tmp['read_bytes'] = diskio_2.read_bytes - diskio_1.read_bytes
-                tmp['write_bytes'] = diskio_2.write_bytes - diskio_1.write_bytes
-                tmp['read_time'] = diskio_2.read_time - diskio_1.read_time
-                tmp['write_time'] = diskio_2.write_time - diskio_1.write_time
-
-                if not diskInfo:
-                    diskInfo = tmp
-                else:
-                    diskInfo['read_count'] += tmp['read_count']
-                    diskInfo['write_count'] += tmp['write_count']
-                    diskInfo['read_bytes'] += tmp['read_bytes']
-                    diskInfo['write_bytes'] += tmp['write_bytes']
-                    diskInfo['read_time'] += tmp['read_time']
-                    diskInfo['write_time'] += tmp['write_time']
-
+            # if os.path.exists('/proc/diskstats'):
+            diskio_2 = psutil.disk_io_counters()
+            if not diskio_1:
                 diskio_1 = diskio_2
+            tmp = {}
+            tmp['read_count'] = diskio_2.read_count - diskio_1.read_count
+            tmp['write_count'] = diskio_2.write_count - diskio_1.write_count
+            tmp['read_bytes'] = diskio_2.read_bytes - diskio_1.read_bytes
+            tmp['write_bytes'] = diskio_2.write_bytes - diskio_1.write_bytes
+            tmp['read_time'] = diskio_2.read_time - diskio_1.read_time
+            tmp['write_time'] = diskio_2.write_time - diskio_1.write_time
+
+            if not diskInfo:
+                diskInfo = tmp
+            else:
+                diskInfo['read_count'] += tmp['read_count']
+                diskInfo['write_count'] += tmp['write_count']
+                diskInfo['read_bytes'] += tmp['read_bytes']
+                diskInfo['write_bytes'] += tmp['write_bytes']
+                diskInfo['read_time'] += tmp['read_time']
+                diskInfo['write_time'] += tmp['write_time']
+            diskio_1 = diskio_2
+
+            print "disk:", diskInfo, count
 
             # print diskInfo
-
             if count >= 12:
                 try:
                     addtime = int(time.time())
@@ -313,7 +312,7 @@ def systemTask():
                             "addtime<?", (deltime,)).delete()
 
                     # LoadAverage
-                    load_average = sm.GetLoadAverage(None)
+                    load_average = getLoadAverage()
                     lpro = round(
                         (load_average['one'] / load_average['max']) * 100, 2)
                     if lpro > 100:
@@ -328,16 +327,17 @@ def systemTask():
                     diskInfo = None
                     count = 0
                     reloadNum += 1
+                    print "end---|"
                     if reloadNum > 1440:
-                        if os.path.exists('data/ssl.pl'):
-                            os.system(
-                                '/etc/init.d/bt restart > /dev/null 2>&1')
                         reloadNum = 0
+                        # if os.path.exists('data/ssl.pl'):
+                        #     os.system(
+                        #         '/etc/init.d/bt restart > /dev/null 2>&1')
                 except Exception, ex:
                     print str(ex)
             del(tmp)
 
-            time.sleep(5)
+            time.sleep(1)
             count += 1
     except Exception, ex:
         print str(ex)
@@ -346,7 +346,7 @@ def systemTask():
         systemTask()
 
 
-def GetMemUsed():
+def getMemUsed():
     # 取内存使用率
     try:
         import psutil
@@ -360,10 +360,22 @@ def GetMemUsed():
     except:
         return 1
 
-# 检查502错误
+
+def getLoadAverage():
+    import psutil
+    c = os.getloadavg()
+    data = {}
+    data['one'] = float(c[0])
+    data['five'] = float(c[1])
+    data['fifteen'] = float(c[2])
+    data['max'] = psutil.cpu_count() * 2
+    data['limit'] = data['max']
+    data['safe'] = data['max'] * 0.75
+    return data
 
 
 def check502():
+    # 检查502错误
     try:
         phpversions = ['53', '54', '55', '56', '70', '71', '72']
         for version in phpversions:
@@ -526,10 +538,10 @@ if __name__ == "__main__":
     # }'''
     #             public.writeFile(pfile, pconf)
 
-    # import threading
-    # t = threading.Thread(target=systemTask)
-    # t.setDaemon(True)
-    # t.start()
+    import threading
+    t = threading.Thread(target=systemTask)
+    t.setDaemon(True)
+    t.start()
 
     # p = threading.Thread(target=check502Task)
     # p.setDaemon(True)
