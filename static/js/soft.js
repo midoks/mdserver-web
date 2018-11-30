@@ -316,9 +316,7 @@ function flush_cache() {
     });
 }
 
-
-//首页软件列表
-function indexSoft() {
+function indexListHtml(callback){
     var loadT = layer.msg('正在获取列表...', { icon: 16, time: 0, shade: [0.3, '#000'] });
     $.get('/plugins/index_list', function(rdata) {
         layer.close(loadT);
@@ -340,7 +338,6 @@ function indexSoft() {
                 version_info = version_info.substring(0, version_info.length - 1);
             }
 
-
             if (plugin.status == true) {
                     state = '<span style="color:#20a53a" class="glyphicon glyphicon-play"></span>'
                 } else {
@@ -348,19 +345,20 @@ function indexSoft() {
             }
 
             var name = plugin.title + ' ' + plugin.versions + '  ';
+            var data_id = plugin.name + '-' + plugin.setup_version;
             if (plugin.coexist){
                 name = plugin.title + '  ';
+                data_id = plugin.name + '-' + plugin.versions;
             }
-    
-            if (plugin.display == true) {
-                con += '<div class="col-sm-3 col-md-3 col-lg-3" data-id="' + plugin.pid + '">\
-                    <span class="spanmove"></span>\
-                    <div onclick="softMain(\'' + plugin.name + '\',\'' + version_info + '\')">\
-                    <div class="image"><img src="plugins/file?name=' + plugin.name + '&f=ico.png"></div>\
-                    <div class="sname">' +  name + state + '</div>\
-                    </div>\
-                </div>'
-            }
+            
+            con += '<div class="col-sm-3 col-md-3 col-lg-3" data-id="' + data_id + '">\
+                <span class="spanmove"></span>\
+                <div onclick="softMain(\'' + plugin.name + '\',\'' + version_info + '\')">\
+                <div class="image"><img src="plugins/file?name=' + plugin.name + '&f=ico.png"></div>\
+                <div class="sname">' +  name + state + '</div>\
+                </div>\
+            </div>';
+        
         }
 
         $("#indexsoft").html(con);
@@ -371,26 +369,46 @@ function indexSoft() {
         var softboxn = softboxlen;
         if (softboxlen <= softboxsum) {
             for (var i = 0; i < softboxsum - softboxlen; i++) {
-                softboxn += 1000;
-                softboxcon += '<div class="col-sm-3 col-md-3 col-lg-3 no-bg" data-id="' + softboxn + '"></div>'
+                // softboxn += 1000;
+                softboxcon += '<div class="col-sm-3 col-md-3 col-lg-3 no-bg" data-id="'  + '"></div>'
             }
             $("#indexsoft").append(softboxcon);
         }
 
-        $("#indexsoft").dragsort({ dragSelector: ".spanmove", dragBetween: true, dragEnd: saveOrder, placeHolderTemplate: "<div class='col-sm-3 col-md-3 col-lg-3 dashed-border'></div>" });
-        function saveOrder() {
-            var data = $("#indexsoft > div").map(function() { return $(this).attr("data-id"); }).get();
-            var ssort = data.join("|");
-            $("input[name=list1SortOrder]").val(ssort);
-            $.post("/plugins/index_sort", 'ssort=' + ssort, function(rdata) {
-                if (!rdata.status){
-                    showMsg('设置失败:'+ rdata.msg, function(){
-                        indexSoft();
-                    }, { icon: 16, time: 0, shade: [0.3, '#000'] });
-                }
-            },'json');
-        };
+        if (typeof callback=='function'){
+            callback();
+        }
+
     },'json');
+}
+
+
+//首页软件列表
+function indexSoft() {
+    indexListHtml(function(){
+        $("#indexsoft").dragsort({ dragSelector: ".spanmove", dragBetween: true, dragEnd: saveOrder, placeHolderTemplate: "<div class='col-sm-3 col-md-3 col-lg-3 dashed-border'></div>" });
+    });
+    
+    function saveOrder() {
+        var data = $("#indexsoft > div").map(function() { return $(this).attr("data-id"); }).get();
+        tmp = [];
+        for(i in data){
+            console.log(data[i]);
+            if (data[i] != ''){
+                tmp.push($.trim(data[i]));
+            }
+        }
+        var ssort = tmp.join("|");
+        console.log(ssort);
+        $("input[name=list1SortOrder]").val(ssort);
+        $.post("/plugins/index_sort", 'ssort=' + ssort, function(rdata) {
+            if (!rdata.status){
+                showMsg('设置失败:'+ rdata.msg, function(){
+                    indexListHtml();
+                }, { icon: 16, time: 0, shade: [0.3, '#000'] });
+            }
+        },'json');
+    };
 }
 
 // $(function() {
