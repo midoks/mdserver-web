@@ -336,6 +336,7 @@ class system_api:
 
             return networkInfo
         except Exception, e:
+            print e
             return None
 
     def getNetWorkApi(self, get=None):
@@ -386,34 +387,72 @@ class system_api:
                          '/panel/' + scriptFile)
         return self.GetMemInfo()
 
-    def getNetWorkIo(self, start, end):
+    def getNetWorkIoData(self, start, end):
         # 取指定时间段的网络Io
         data = public.M('network').dbfile('system').where("addtime>=? AND addtime<=?", (start, end)).field(
             'id,up,down,total_up,total_down,down_packets,up_packets,addtime').order('id asc').select()
-        return self.ToAddtime(data)
+        return self.toAddtime(data)
 
-    def getDiskIo(self, start, end):
+    def getDiskIoData(self, start, end):
         # 取指定时间段的磁盘Io
         data = public.M('diskio').dbfile('system').where("addtime>=? AND addtime<=?", (start, end)).field(
             'id,read_count,write_count,read_bytes,write_bytes,read_time,write_time,addtime').order('id asc').select()
-        return self.ToAddtime(data)
+        return self.toAddtime(data)
 
-    def getCpuIo(self, start, end):
+    def getCpuIoData(self, start, end):
         # 取指定时间段的CpuIo
         data = public.M('cpuio').dbfile('system').where("addtime>=? AND addtime<=?",
                                                         (start, end)).field('id,pro,mem,addtime').order('id asc').select()
-        return self.ToAddtime(data, True)
+        return self.toAddtime(data, True)
 
-    def getLoadAverage(self, start, end):
+    def getLoadAverageData(self, start, end):
         data = public.M('load_average').dbfile('system').where("addtime>=? AND addtime<=?", (
             start, end)).field('id,pro,one,five,fifteen,addtime').order('id asc').select()
-        return self.ToAddtime(data)
+        return self.toAddtime(data)
+
+    def toAddtime(self, data, tomem=False):
+        import time
+        # 格式化addtime列
+
+        if tomem:
+            import psutil
+            mPre = (psutil.virtual_memory().total / 1024 / 1024) / 100
+        length = len(data)
+        he = 1
+        if length > 100:
+            he = 1
+        if length > 1000:
+            he = 3
+        if length > 10000:
+            he = 15
+        if he == 1:
+            for i in range(length):
+                data[i]['addtime'] = time.strftime(
+                    '%m/%d %H:%M', time.localtime(float(data[i]['addtime'])))
+                if tomem and data[i]['mem'] > 100:
+                    data[i]['mem'] = data[i]['mem'] / mPre
+
+            return data
+        else:
+            count = 0
+            tmp = []
+            for value in data:
+                if count < he:
+                    count += 1
+                    continue
+                value['addtime'] = time.strftime(
+                    '%m/%d %H:%M', time.localtime(float(value['addtime'])))
+                if tomem and value['mem'] > 100:
+                    value['mem'] = value['mem'] / mPre
+                tmp.append(value)
+                count = 0
+            return tmp
 
     # 重启面板
     def reWeb(self, get):
         # if not public.IsRestart(): return
         # public.returnMsg(False,'EXEC_ERR_TASK');
-        public.ExecShell('/etc/init.d/bt restart &')
+        # public.ExecShell('/etc/init.d/bt restart &')
         return True
 
     # 修复面板

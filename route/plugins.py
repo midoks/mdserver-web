@@ -1,14 +1,14 @@
 # coding:utf-8
 
-from flask import Blueprint, render_template
-from flask import jsonify
-from flask import request
-
-import psutil
 import time
 import sys
 import os
 import json
+import psutil
+
+from flask import Blueprint, render_template
+from flask import jsonify
+from flask import request
 
 sys.path.append("class/core")
 import public

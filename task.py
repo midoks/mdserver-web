@@ -6,8 +6,10 @@
 import sys
 import os
 import json
-# import psutil
 import time
+print sys.path
+sys.path.append("/usr/local/lib/python2.7/site-packages")
+import psutil
 
 sys.path.append(os.getcwd() + "/class/core")
 reload(sys)
@@ -303,13 +305,13 @@ def systemTask():
                         'up,down,total_up,total_down,down_packets,up_packets,addtime', data)
                     sql.table('network').where(
                         "addtime<?", (deltime,)).delete()
-                    if os.path.exists('/proc/diskstats'):
-                        data = (diskInfo['read_count'], diskInfo['write_count'], diskInfo['read_bytes'], diskInfo[
-                                'write_bytes'], diskInfo['read_time'], diskInfo['write_time'], addtime)
-                        sql.table('diskio').add(
-                            'read_count,write_count,read_bytes,write_bytes,read_time,write_time,addtime', data)
-                        sql.table('diskio').where(
-                            "addtime<?", (deltime,)).delete()
+                    # if os.path.exists('/proc/diskstats'):
+                    data = (diskInfo['read_count'], diskInfo['write_count'], diskInfo['read_bytes'], diskInfo[
+                            'write_bytes'], diskInfo['read_time'], diskInfo['write_time'], addtime)
+                    sql.table('diskio').add(
+                        'read_count,write_count,read_bytes,write_bytes,read_time,write_time,addtime', data)
+                    sql.table('diskio').where(
+                        "addtime<?", (deltime,)).delete()
 
                     # LoadAverage
                     load_average = getLoadAverage()
@@ -351,6 +353,7 @@ def getMemUsed():
     try:
         import psutil
         mem = psutil.virtual_memory()
+        print 'mem:', mem
         memInfo = {'memTotal': mem.total / 1024 / 1024, 'memFree': mem.free / 1024 / 1024,
                    'memBuffers': mem.buffers / 1024 / 1024, 'memCached': mem.cached / 1024 / 1024}
         tmp = memInfo['memTotal'] - memInfo['memFree'] - \

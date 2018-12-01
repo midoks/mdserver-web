@@ -8,6 +8,7 @@ import sys
 from flask import Flask, session
 from flask import Blueprint, render_template
 from flask import jsonify
+from flask import request
 
 sys.path.append("class/core")
 import public
@@ -47,23 +48,31 @@ def getControl():
 
 @system.route('/get_load_average', methods=['GET'])
 def getLoadAverage():
-    data = {'status': True, 'day': 30}
+    start = request.args.get('start', '')
+    end = request.args.get('end', '')
+    data = system_api.system_api().getLoadAverageData(start, end)
     return public.getJson(data)
 
 
 @system.route('/get_cpu_io', methods=['GET'])
 def getCpuIo():
-    data = {'status': True, 'day': 30}
+    start = request.args.get('start', '')
+    end = request.args.get('end', '')
+    data = system_api.system_api().getCpuIoData(start, end)
     return public.getJson(data)
 
 
 @system.route('/get_disk_io', methods=['GET'])
 def getDiskIo():
-    data = {'status': True, 'day': 30}
+    start = request.args.get('start', '')
+    end = request.args.get('end', '')
+    data = system_api.system_api().getDiskIoData(start, end)
     return public.getJson(data)
 
 
 @system.route('/get_network_io', methods=['GET'])
 def getNetworkIo():
-    data = {'status': True, 'day': 30}
+    start = request.args.get('start', '')
+    end = request.args.get('end', '')
+    data = system_api.system_api().getNetWorkIoData(start, end)
     return public.getJson(data)
