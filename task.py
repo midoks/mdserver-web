@@ -8,6 +8,7 @@ import os
 import json
 import time
 print sys.path
+
 sys.path.append("/usr/local/lib/python2.7/site-packages")
 import psutil
 
@@ -16,7 +17,6 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 import db
 import public
-import time
 
 
 global pre, timeoutCount, logPath, isTask, oldEdate, isCheck
@@ -28,13 +28,13 @@ oldEdate = None
 logPath = os.getcwd() + '/tmp/panelExec.log'
 isTask = os.getcwd() + '/tmp/panelTask.pl'
 
-if ~os.path.exists(os.getcwd() + "/tmp"):
+if not os.path.exists(os.getcwd() + "/tmp"):
     os.system('mkdir -p ' + os.getcwd() + "/tmp")
 
-if ~os.path.exists(logPath):
+if not os.path.exists(logPath):
     os.system("touch " + logPath)
 
-if ~os.path.exists(isTask):
+if not os.path.exists(isTask):
     os.system("touch " + isTask)
 
 
@@ -234,11 +234,11 @@ def systemTask():
             tmp['used'] = psutil.cpu_percent(interval=1)
 
             if not cpuInfo:
-                tmp['mem'] = getMemUsed()
+                tmp['mem'] = sm.getMemUsed()
                 cpuInfo = tmp
 
             if cpuInfo['used'] < tmp['used']:
-                tmp['mem'] = getMemUsed()
+                tmp['mem'] = sm.getMemUsed()
                 cpuInfo = tmp
 
             # 取当前网络Io
@@ -314,7 +314,7 @@ def systemTask():
                         "addtime<?", (deltime,)).delete()
 
                     # LoadAverage
-                    load_average = getLoadAverage()
+                    load_average = sm.getLoadAverage()
                     lpro = round(
                         (load_average['one'] / load_average['max']) * 100, 2)
                     if lpro > 100:
@@ -339,7 +339,7 @@ def systemTask():
                     print str(ex)
             del(tmp)
 
-            time.sleep(1)
+            # time.sleep(1)
             count += 1
     except Exception, ex:
         print str(ex)
@@ -348,167 +348,8 @@ def systemTask():
         systemTask()
 
 
-def getMemUsed():
-    # 取内存使用率
-    try:
-        import psutil
-        mem = psutil.virtual_memory()
-        print 'mem:', mem
-        memInfo = {'memTotal': mem.total / 1024 / 1024, 'memFree': mem.free / 1024 / 1024,
-                   'memBuffers': mem.buffers / 1024 / 1024, 'memCached': mem.cached / 1024 / 1024}
-        tmp = memInfo['memTotal'] - memInfo['memFree'] - \
-            memInfo['memBuffers'] - memInfo['memCached']
-        tmp1 = memInfo['memTotal'] / 100
-        return (tmp / tmp1)
-    except:
-        return 1
-
-
-def getLoadAverage():
-    import psutil
-    c = os.getloadavg()
-    data = {}
-    data['one'] = float(c[0])
-    data['five'] = float(c[1])
-    data['fifteen'] = float(c[2])
-    data['max'] = psutil.cpu_count() * 2
-    data['limit'] = data['max']
-    data['safe'] = data['max'] * 0.75
-    return data
-
-
-def check502():
-    # 检查502错误
-    try:
-        phpversions = ['53', '54', '55', '56', '70', '71', '72']
-        for version in phpversions:
-            if not os.path.exists('/etc/init.d/php-fpm-' + version):
-                continue
-            if checkPHPVersion(version):
-                continue
-            if startPHPVersion(version):
-                public.WriteLog('PHP守护程序', '检测到PHP-' + version + '处理异常,已自动修复!')
-    except:
-        pass
-
-
-def startPHPVersion(version):
-    # 处理指定PHP版本
-    try:
-        fpm = '/etc/init.d/php-fpm-' + version
-        if not os.path.exists(fpm):
-            return False
-
-        # 尝试重载服务
-        os.system(fpm + ' reload')
-        if checkPHPVersion(version):
-            return True
-
-        # 尝试重启服务
-        cgi = '/tmp/php-cgi-' + version
-        pid = '/www/server/php' + version + '/php-fpm.pid'
-        os.system('pkill -9 php-fpm-' + version)
-        time.sleep(0.5)
-        if not os.path.exists(cgi):
-            os.system('rm -f ' + cgi)
-        if not os.path.exists(pid):
-            os.system('rm -f ' + pid)
-        os.system(fpm + ' start')
-        if checkPHPVersion(version):
-            return True
-
-        # 检查是否正确启动
-        if os.path.exists(cgi):
-            return True
-    except:
-        return True
-
-
-def checkPHPVersion(version):
-    # 检查指定PHP版本
-    try:
-        url = 'http://127.0.0.1/phpfpm_' + version + '_status'
-        result = public.httpGet(url)
-        # 检查nginx
-        if result.find('Bad Gateway') != -1:
-            return False
-        # 检查Apache
-        if result.find('Service Unavailable') != -1:
-            return False
-        if result.find('Not Found') != -1:
-            CheckPHPINFO()
-
-        # 检查Web服务是否启动
-        if result.find('Connection refused') != -1:
-            global isTask
-            if os.path.exists(isTask):
-                isStatus = public.readFile(isTask)
-                if isStatus == 'True':
-                    return True
-            filename = '/etc/init.d/nginx'
-            if os.path.exists(filename):
-                os.system(filename + ' start')
-            filename = '/etc/init.d/httpd'
-            if os.path.exists(filename):
-                os.system(filename + ' start')
-
-        return True
-    except:
-        return True
-
-
-def CheckPHPINFO():
-    # 检测PHPINFO配置
-    php_versions = ['53', '54', '55', '56', '70', '71', '72']
-    setupPath = '/www/server'
-    path = setupPath + '/panel/vhost/nginx/phpinfo.conf'
-    if not os.path.exists(path):
-        opt = ""
-        for version in php_versions:
-            opt += "\n\tlocation /" + version + \
-                " {\n\t\tinclude enable-php-" + version + ".conf;\n\t}"
-
-        phpinfoBody = '''server
-{
-    listen 80;
-    server_name 127.0.0.2;
-    allow 127.0.0.1;
-    index phpinfo.php index.html index.php;
-    root  /www/server/phpinfo;
-%s   
-}''' % (opt,)
-        public.writeFile(path, phpinfoBody)
-
-    path = setupPath + '/panel/vhost/apache/phpinfo.conf'
-    if not os.path.exists(path):
-        opt = ""
-        for version in php_versions:
-            opt += """\n<Location /%s>
-    SetHandler "proxy:unix:/tmp/php-cgi-%s.sock|fcgi://localhost"
-</Location>""" % (version, version)
-
-        phpinfoBody = '''
-<VirtualHost *:80>
-DocumentRoot "/www/server/phpinfo"
-ServerAdmin phpinfo
-ServerName 127.0.0.2
-%s
-<Directory "/www/server/phpinfo">
-    SetOutputFilter DEFLATE
-    Options FollowSymLinks
-    AllowOverride All
-    Order allow,deny
-    Allow from all
-    DirectoryIndex index.php index.html index.htm default.php default.html default.htm
-</Directory>
-</VirtualHost>
-''' % (opt,)
-        public.writeFile(path, phpinfoBody)
-
-# 502错误检查线程
-
-
 def check502Task():
+    # 502错误检查线程
     try:
         while True:
             if os.path.exists('/www/server/panel/data/502Task.pl'):
@@ -518,28 +359,14 @@ def check502Task():
         time.sleep(600)
         check502Task()
 
-# 自动结束异常进程
-
 
 def btkill():
+    # 自动结束异常进程
     import btkill
     b = btkill.btkill()
     b.start()
 
 if __name__ == "__main__":
-    #     os.system('rm -rf /www/server/phpinfo/*')
-    #     if os.path.exists('/www/server/nginx/sbin/nginx'):
-    #         pfile = '/www/server/nginx/conf/enable-php-72.conf'
-    #         if not os.path.exists(pfile):
-    #             pconf = '''location ~ [^/]\.php(/|$)
-    # {
-    #     try_files $uri =404;
-    #     fastcgi_pass  unix:/tmp/php-cgi-72.sock;
-    #     fastcgi_index index.php;
-    #     include fastcgi.conf;
-    #     include pathinfo.conf;
-    # }'''
-    #             public.writeFile(pfile, pconf)
 
     import threading
     t = threading.Thread(target=systemTask)
