@@ -213,9 +213,9 @@ def systemTask():
         used = count = 0
         reloadNum = 0
         network_up = network_down = diskio_1 = diskio_2 = networkInfo = cpuInfo = diskInfo = None
-        print 'task init'
+        # print 'task init'
         while True:
-            print 'task init 1'
+            # print 'task init 1'
             if not os.path.exists(filename):
                 time.sleep(10)
                 continue
@@ -257,8 +257,7 @@ def systemTask():
             network_up = networkIo[0]
             network_down = networkIo[1]
 
-            print "tmp:", tmp
-
+            # print "tmp:", tmp
             if not networkInfo:
                 networkInfo = tmp
             if (tmp['up'] + tmp['down']) > (networkInfo['up'] + networkInfo['down']):
@@ -287,8 +286,7 @@ def systemTask():
                 diskInfo['write_time'] += tmp['write_time']
             diskio_1 = diskio_2
 
-            print "disk:", diskInfo, count
-
+            # print "disk:", diskInfo, count
             # print diskInfo
             if count >= 12:
                 try:
@@ -339,7 +337,7 @@ def systemTask():
                     print str(ex)
             del(tmp)
 
-            # time.sleep(1)
+            time.sleep(5)
             count += 1
     except Exception, ex:
         print str(ex)
