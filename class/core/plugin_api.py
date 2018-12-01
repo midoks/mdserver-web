@@ -44,6 +44,7 @@ class plugin_api:
         if not self.__tasks:
             self.__tasks = public.M('tasks').where(
                 "status!=?", ('1',)).field('status,name').select()
+
         if sName.find('php-') != -1:
             tmp = sName.split('-')
             sName = tmp[0]
@@ -188,6 +189,7 @@ class plugin_api:
                 pg = self.getPluginInfo(data)
                 plugins_info.append(pg)
 
+        # print plugins_info, data
         return plugins_info
 
     def getAllList(self, sType='0'):
