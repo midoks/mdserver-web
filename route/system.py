@@ -43,8 +43,9 @@ def diskInfo():
 @system.route('/set_control', methods=['POST'])
 def setControl():
     stype = request.form.get('type', '')
-    data = {'status': True, 'day': 30}
-    return public.getJson(data)
+    day = request.form.get('day', '')
+    data = system_api.system_api().setControl(stype, day)
+    return data
 
 
 @system.route('/get_load_average', methods=['GET'])

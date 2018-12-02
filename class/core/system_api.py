@@ -6,9 +6,10 @@ import os
 import re
 import math
 
-
-import public
 from flask import Flask, session
+
+import db
+import public
 
 
 class system_api:
@@ -482,8 +483,36 @@ class system_api:
 
         if stype == '0':
             public.execShell("rm -f " + filename)
+        elif stype == '1':
+            _day = int(day)
+            if _day < 1:
+                return public.returnJson(False, "设置失败!")
+            public.writeFile(filename, day)
+        elif stype == 'del':
+            if not public.isRestart():
+                return public.returnJson(False, '请等待所有安装任务完成再执行')
+            os.remove("data/system.db")
 
-        return public.returnMsg(True, "设置成功!")
+            sql = db.Sql().dbfile('system')
+            csql = public.readFile('data/sql/system.sql')
+            csql_list = csql.split(';')
+            for index in range(len(csql_list)):
+                sql.execute(csql_list[index], ())
+            return public.returnJson(True, "监控服务已关闭")
+        else:
+            data = {}
+            if os.path.exists(filename):
+                try:
+                    data['day'] = int(public.readFile(filename))
+                except:
+                    data['day'] = 30
+                data['status'] = True
+            else:
+                data['day'] = 30
+                data['status'] = False
+            return public.getJson(data)
+
+        return public.returnJson(True, "设置成功!")
 
     # 重启面板
     def reWeb(self, get):
