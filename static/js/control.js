@@ -156,18 +156,18 @@ function setControl(act){
 	$.post('/system/set_control','type='+type+'&day='+day,function(rdata){
 		layer.close(loadT);
 		layer.msg(rdata.msg,{icon:rdata.status?1:2});
-	});
+	},'json');
 }
 
 //清理记录
-function CloseControl(){
+function closeControl(){
 	layer.confirm(lan.control.close_log_msg,{title:lan.control.close_log,icon:3,closeBtn:2}, function() {
 		loadT = layer.msg(lan.public.the,{icon:16,time:0})
-		$.post('/config?action=SetControl','type=del',function(rdata){
+		$.post('/system/set_control','type=del',function(rdata){
 			layer.close(loadT);
-			$.get('/system?action=ReWeb',function(){});
+			// $.get('/system?action=ReWeb',function(){});
 			layer.msg(rdata.msg,{icon:rdata.status?1:2});
-		});
+		},'json');
 	});
 }
 

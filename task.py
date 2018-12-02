@@ -201,9 +201,9 @@ def systemTask():
         import time
         sm = system_api.system_api()
         filename = 'data/control.conf'
+
         sql = db.Sql().dbfile('system')
         csql = public.readFile('data/sql/system.sql')
-
         csql_list = csql.split(';')
         for index in range(len(csql_list)):
             sql.execute(csql_list[index], ())
@@ -327,7 +327,6 @@ def systemTask():
                     diskInfo = None
                     count = 0
                     reloadNum += 1
-                    print "end---|"
                     if reloadNum > 1440:
                         reloadNum = 0
                         # if os.path.exists('data/ssl.pl'):
@@ -345,38 +344,11 @@ def systemTask():
         time.sleep(30)
         systemTask()
 
-
-def check502Task():
-    # 502错误检查线程
-    try:
-        while True:
-            if os.path.exists('/www/server/panel/data/502Task.pl'):
-                check502()
-            time.sleep(600)
-    except:
-        time.sleep(600)
-        check502Task()
-
-
-def btkill():
-    # 自动结束异常进程
-    import btkill
-    b = btkill.btkill()
-    b.start()
-
 if __name__ == "__main__":
 
     import threading
     t = threading.Thread(target=systemTask)
     t.setDaemon(True)
     t.start()
-
-    # p = threading.Thread(target=check502Task)
-    # p.setDaemon(True)
-    # p.start()
-
-    p = threading.Thread(target=btkill)
-    p.setDaemon(True)
-    p.start()
 
     startTask()

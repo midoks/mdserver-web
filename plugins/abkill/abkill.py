@@ -4,9 +4,11 @@
 # 1、将此文件重命名为btkill.py , 然后上传到服务器/root目录
 # 2、执行 python /root/btkill.py
 
-import psutil
 import time
 import os
+import sys
+sys.path.append("/usr/local/lib/python2.7/site-packages")
+import psutil
 
 
 class btkill:
@@ -15,6 +17,7 @@ class btkill:
 
     def checkMain(self):
         pids = psutil.pids()
+        print pids
         num = 0
         for pid in pids:
             try:
@@ -27,6 +30,7 @@ class btkill:
                 cputimes = p.cpu_times()
                 if cputimes.user < 0.1:
                     continue
+                print p
                 percent = p.cpu_percent(interval=0.1)
                 vm = p.memory_info().vms
                 if percent > self.__limit or vm > self.__vmsize:
@@ -68,6 +72,7 @@ class btkill:
         num = 0
         while True:
             num += self.checkMain()
+            print "查杀完成, 共查杀[" + str(num) + "]个异常进程!"
             time.sleep(3)
         print '======================================='
         print "查杀完成, 共查杀[" + str(num) + "]个异常进程!"
