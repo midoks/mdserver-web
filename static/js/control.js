@@ -122,24 +122,25 @@ function GetToday(){
 
 
 //取监控状态
-function GetStatus(){
+function getStatus(){
 	loadT = layer.msg(lan.public.read,{icon:16,time:0})
-	$.post('/system/get_control','type=-1',function(rdata){
+	$.post('/system/set_control','type=-1',function(rdata){
+		console.log(rdata);
 		layer.close(loadT);
 		if(rdata.status){
-			$("#openJK").html("<input class='btswitch btswitch-ios' id='ctswitch' type='checkbox' checked><label class='btswitch-btn' for='ctswitch' onclick='SetControl()'></label>")
+			$("#openJK").html("<input class='btswitch btswitch-ios' id='ctswitch' type='checkbox' checked><label class='btswitch-btn' for='ctswitch' onclick='setControl()'></label>")
 		}
 		else{
-			$("#openJK").html("<input class='btswitch btswitch-ios' id='ctswitch' type='checkbox'><label class='btswitch-btn' for='ctswitch' onclick='SetControl()'></label>")
+			$("#openJK").html("<input class='btswitch btswitch-ios' id='ctswitch' type='checkbox'><label class='btswitch-btn' for='ctswitch' onclick='setControl()'></label>")
 		}
 		$("#saveDay").val(rdata.day)
-	})
+	},'json');
 }
 
-GetStatus()
+getStatus()
 
 //设置监控状态
-function SetControl(act){
+function setControl(act){
 	var day = $("#saveDay").val()
 	if(day < 1){
 		layer.msg(lan.control.save_day_err,{icon:2});
@@ -152,7 +153,7 @@ function SetControl(act){
 	}
 	
 	loadT = layer.msg(lan.public.the,{icon:16,time:0})
-	$.post('/config?action=SetControl','type='+type+'&day='+day,function(rdata){
+	$.post('/system/set_control','type='+type+'&day='+day,function(rdata){
 		layer.close(loadT);
 		layer.msg(rdata.msg,{icon:rdata.status?1:2});
 	});
