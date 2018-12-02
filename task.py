@@ -375,8 +375,8 @@ if __name__ == "__main__":
     # p.setDaemon(True)
     # p.start()
 
-    #p = threading.Thread(target=btkill)
-    # p.setDaemon(True)
-    # p.start()
+    p = threading.Thread(target=btkill)
+    p.setDaemon(True)
+    p.start()
 
     startTask()

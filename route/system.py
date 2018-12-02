@@ -40,8 +40,9 @@ def diskInfo():
     return public.getJson(diskInfo)
 
 
-@system.route('/get_control', methods=['POST'])
-def getControl():
+@system.route('/set_control', methods=['POST'])
+def setControl():
+    stype = request.form.get('type', '')
     data = {'status': True, 'day': 30}
     return public.getJson(data)
 

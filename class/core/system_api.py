@@ -30,6 +30,17 @@ class system_api:
         except:
             return False
 
+    # 检查端口是否占用
+    def isOpen(self, port):
+        import socket
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        try:
+            s.connect(('127.0.0.1', int(port)))
+            s.shutdown(2)
+            return True
+        except:
+            return False
+
     # 检测指定进程是否存活
     def checkProcess(self, pid):
         try:
@@ -428,10 +439,9 @@ class system_api:
             start, end)).field('id,pro,one,five,fifteen,addtime').order('id asc').select()
         return self.toAddtime(data)
 
+    # 格式化addtime列
     def toAddtime(self, data, tomem=False):
         import time
-        # 格式化addtime列
-
         if tomem:
             import psutil
             mPre = (psutil.virtual_memory().total / 1024 / 1024) / 100
@@ -465,6 +475,15 @@ class system_api:
                 tmp.append(value)
                 count = 0
             return tmp
+
+    def setControl(self, stype, day):
+
+        filename = 'data/control.conf'
+
+        if stype == '0':
+            public.execShell("rm -f " + filename)
+
+        return public.returnMsg(True, "设置成功!")
 
     # 重启面板
     def reWeb(self, get):
