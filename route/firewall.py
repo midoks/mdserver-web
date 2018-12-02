@@ -7,7 +7,7 @@ from flask import request
 
 import sys
 import os
-sys.path.append(os.getcwd() + "/class/")
+sys.path.append(os.getcwd() + "/class/core/")
 import db
 
 firewall = Blueprint('firewall', __name__, template_folder='templates')
