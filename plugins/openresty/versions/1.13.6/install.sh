@@ -23,6 +23,7 @@ Install_openresty()
 
 	cd ${openrestyDir}/openresty* && ./configure --prefix=$serverPath/openresty \
 	--with-openssl=$serverPath/source/lib/openssl-1.0.2q && make && make install
+
 	
 	echo '安装完成' > $install_tmp
 }
