@@ -592,6 +592,8 @@ class system_api:
 
                 public.downloadFile(
                     v_new_info['path'], 'mdserver-web.zip')
+
+                public.execShell('unzip -o panel.zip -d ' + './')
                 print v_new_info
 
             return public.returnJson(False, '已经是最新,无需更新!')
