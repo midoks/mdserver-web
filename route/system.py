@@ -24,8 +24,9 @@ def network():
 
 
 @system.route("/update_server")
-def updatePanel():
-    return public.returnJson(False, "12")
+def updateServer():
+    data = system_api.system_api().updateServer('update')
+    return data
 
 
 @system.route("/system_total")
