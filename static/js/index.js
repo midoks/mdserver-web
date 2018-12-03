@@ -487,28 +487,36 @@ setImg();
 //检查更新
 function checkUpdate() {
     var loadT = layer.msg(lan.index.update_get, { icon: 16, time: 0, shade: [0.3, '#000'] });
-    $.get('/system/update_server?check=true', function(rdata) {
+    $.get('/system/update_server?type=check', function(rdata) {
         layer.close(loadT);
         if (rdata.status === false) {
             layer.confirm(rdata.msg, { title: lan.index.update_check, icon: 1, closeBtn: 2, btn: [lan.public.know, lan.public.close] });
             return;
         }
         layer.msg(rdata.msg, { icon: 1 });
-        if (rdata.version != undefined) updateMsg();
+        if (rdata.data != undefined) updateMsg();
     },'json');
 }
 
 function updateMsg(){
-    window.open("http://www.bt.cn/bbs/thread-1186-1-1.html");
-    $.get('/system/update_server',function(rdata){
+    $.get('/system/update_server?type=info',function(rdata){
+
+        var v = rdata.data.version;
+        var v_info = '';
+        if (v.split('.').length>3){
+            v_info = "<span class='label label-warning'>测试版本</span>";
+        } else {
+            v_info = "<span class='label label-success arrowed'>正式版本</span>";
+        }
+
         layer.open({
             type:1,
-            title:lan.index.update_to+'['+rdata.version+']',
+            title:v_info + '<span class="badge badge-inverse">升级到['+rdata.data.version+']</span>',
             area: '400px', 
             shadeClose:false,
             closeBtn:2,
             content:'<div class="setchmod bt-form pd20 pb70">'
-                    +'<p style="padding: 0 0 10px;line-height: 24px;">'+rdata.updateMsg+'</p>'
+                    +'<p style="padding: 0 0 10px;line-height: 24px;">'+rdata.data.content+'</p>'
                     +'<div class="bt-form-submit-btn">'
                     +'<button type="button" class="btn btn-danger btn-sm btn-title" onclick="layer.closeAll()">'+lan.public.cancel+'</button>'
                     +'<button type="button" class="btn btn-success btn-sm btn-title" onclick="updateVersion(\''+rdata.version+'\')" >'+lan.index.update_go+'</button>'
@@ -522,7 +530,7 @@ function updateMsg(){
 //开始升级
 function updateVersion(version) {
     var loadT = layer.msg(lan.index.update_the, { icon: 16, time: 0, shade: [0.3, '#000'] });
-    $.get('/ajax?action=UpdatePanel', 'toUpdate=yes', function(rdata) {
+    $.get('/system/update_server?type=update', function(rdata) {
         layer.closeAll();
         if (rdata.status === false) {
             layer.msg(rdata.msg, { icon: 5, time: 5000 });
@@ -534,17 +542,17 @@ function updateVersion(version) {
             $("#toUpdate").html('');
         }
 
-        layer.msg(lan.index.update_ok, { icon: 1 });
-        $.get('/system?action=ReWeb', function() {});
-        setTimeout(function() {
-            window.location.reload();
-        }, 3000);
+        // layer.msg(lan.index.update_ok, { icon: 1 });
+        // $.get('/system?action=ReWeb', function() {});
+        // setTimeout(function() {
+        //     window.location.reload();
+        // }, 3000);
     }).error(function() {
-        layer.msg(lan.index.update_ok, { icon: 1 });
-        $.get('/system?action=ReWeb', function() {});
-        setTimeout(function() {
-            window.location.reload();
-        }, 3000);
+        // layer.msg(lan.index.update_ok, { icon: 1 });
+        // $.get('/system?action=ReWeb', function() {});
+        // setTimeout(function() {
+        //     window.location.reload();
+        // }, 3000);
     });
 }
 
