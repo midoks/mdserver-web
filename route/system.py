@@ -23,7 +23,7 @@ def network():
     return public.getJson(data)
 
 
-@system.route("/update_panel")
+@system.route("/update_server")
 def updatePanel():
     return public.returnJson(False, "12")
 
