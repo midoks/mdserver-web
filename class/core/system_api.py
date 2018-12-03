@@ -537,6 +537,7 @@ class system_api:
         return ret
 
     def getServerInfo(self):
+
         upAddr = 'https://raw.githubusercontent.com/midoks/mdserver-web/master/version'
         try:
             version = public.httpGet(
@@ -548,7 +549,7 @@ class system_api:
         return {}
     # 更新服务
 
-    def updateServer(self, stype):
+    def updateServer(self, stype, version=''):
 
         try:
             if not public.isRestart():
@@ -579,7 +580,19 @@ class system_api:
                 return public.returnJson(True, '更新信息!', version_new_info)
 
             if stype == 'update':
-                pass
+                if version == '':
+                    return public.returnJson(False, '缺少版本信息!')
+
+                v_new_info = self.getServerInfo()
+                if v_new_info['version'] != version:
+                    return public.returnJson(False, '更新失败,请重试!')
+
+                if not 'path' in v_new_info or v_new_info['path'] == '':
+                    return public.returnJson(False, '下载地址不存在!')
+
+                public.downloadFile(
+                    v_new_info['path'], 'mdserver-web.zip')
+                print v_new_info
 
             return public.returnJson(False, '已经是最新,无需更新!')
         except Exception as ex:

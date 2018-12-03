@@ -26,7 +26,8 @@ def network():
 @system.route("/update_server")
 def updateServer():
     stype = request.args.get('type', 'check')
-    data = system_api.system_api().updateServer(stype)
+    version = request.args.get('version', '')
+    data = system_api.system_api().updateServer(stype, version)
     return data
 
 
