@@ -518,8 +518,8 @@ function updateMsg(){
             content:'<div class="setchmod bt-form pd20 pb70">'
                     +'<p style="padding: 0 0 10px;line-height: 24px;">'+rdata.data.content+'</p>'
                     +'<div class="bt-form-submit-btn">'
-                    +'<button type="button" class="btn btn-danger btn-sm btn-title" onclick="layer.closeAll()">'+lan.public.cancel+'</button>'
-                    +'<button type="button" class="btn btn-success btn-sm btn-title" onclick="updateVersion(\''+rdata.version+'\')" >'+lan.index.update_go+'</button>'
+                    +'<button type="button" class="btn btn-danger btn-sm btn-title" onclick="layer.closeAll()">取消</button>'
+                    +'<button type="button" class="btn btn-success btn-sm btn-title" onclick="updateVersion(\''+rdata.data.version+'\')" >立即更新</button>'
                     +'</div>'
                     +'</div>'
         });
@@ -529,8 +529,8 @@ function updateMsg(){
 
 //开始升级
 function updateVersion(version) {
-    var loadT = layer.msg(lan.index.update_the, { icon: 16, time: 0, shade: [0.3, '#000'] });
-    $.get('/system/update_server?type=update', function(rdata) {
+    var loadT = layer.msg('正在升级面板..', { icon: 16, time: 0, shade: [0.3, '#000'] });
+    $.get('/system/update_server?type=update&version='+version, function(rdata) {
         layer.closeAll();
         if (rdata.status === false) {
             layer.msg(rdata.msg, { icon: 5, time: 5000 });
