@@ -682,7 +682,7 @@ def checkCert(certPath='ssl/certificate.pem'):
 #     return result
 
 
-def to_size(size):
+def toSize(size):
     # 字节单位转换
     d = ('b', 'KB', 'MB', 'GB', 'TB')
     s = d[0]
@@ -692,6 +692,13 @@ def to_size(size):
         size = size / 1024
         s = b
     return str(size) + ' ' + b
+
+
+def getMacAddress():
+    # 获取mac
+    import uuid
+    mac = uuid.UUID(int=uuid.getnode()).hex[-12:]
+    return ":".join([mac[e:e + 2] for e in range(0, 11, 2)])
 
 
 def get_string(t):
