@@ -11,6 +11,7 @@ from flask import Flask, session
 
 import db
 import public
+import config
 
 
 class system_api:
@@ -402,7 +403,7 @@ class system_api:
             return None
 
     def restartServer(self, get):
-        if not public.IsRestart():
+        if not public.isRestart():
             return public.returnMsg(False, 'EXEC_ERR_TASK')
         public.ExecShell("sync && /etc/init.d/bt stop && init 6 &")
         return public.returnMsg(True, 'SYS_REBOOT')
@@ -515,13 +516,55 @@ class system_api:
 
         return public.returnJson(True, "设置成功!")
 
+    def versionDiff(self, old, new):
+        '''
+            test 测试
+            new 有新版本
+            none 没有新版本
+        '''
+        new_list = new.split('.')
+        if len(new_list) > 3:
+            return 'test'
+
+        old_list = old.split('.')
+
+        ret = 'none'
+        for i in range(len(old_list)):
+            tm_new = int(new_list[i])
+            tm_old = int(new_list[i])
+            if tm_new > tm_old:
+                return 'new'
+        return ret
+
+    def getServerInfo(self):
+        upAddr = 'https://raw.githubusercontent.com/midoks/mdserver-web/master/version'
+        try:
+            version = public.httpGet(
+                upAddr + '/info.json')
+            version = json.loads(version)
+            return version[0]['version']
+        except Exception as e:
+            pass
+        return config.config().getVersion()
+
     # 更新服务
     def updateServer(self, stype):
+
         try:
             if not public.isRestart():
-                return public.returnMsg(False, '请等待所有安装任务完成再执行!')
+                return public.returnJson(False, '请等待所有安装任务完成再执行!')
             if stype == 'check':
-                public.httpGet('')
+                version_now = config.config().getVersion()
+                version_new = self.getServerInfo()
+                diff = self.versionDiff(version_now, version_new)
+                if diff == 'new':
+                    return public.returnJson(True, '有新版本!ver:' + version_new)
+                elif diff == 'test':
+                    return public.returnJson(True, '有测试版本!ver:' + version_new)
+                else:
+                    return public.returnJson(False, '已经是最新,无需更新!')
+
+            return public.returnJson(False, '已经是最新,无需更新!')
         except Exception as ex:
             return public.returnJson(False, "连接服务器失败!")
 
