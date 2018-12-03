@@ -500,7 +500,7 @@ function checkUpdate() {
 
 function updateMsg(){
     window.open("http://www.bt.cn/bbs/thread-1186-1-1.html");
-    $.get('/ajax?action=UpdatePanel',function(rdata){
+    $.get('/system/update_server',function(rdata){
         layer.open({
             type:1,
             title:lan.index.update_to+'['+rdata.version+']',
@@ -515,7 +515,7 @@ function updateMsg(){
                     +'</div>'
                     +'</div>'
         });
-    });
+    },'json');
 }
 
 

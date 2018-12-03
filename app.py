@@ -3,20 +3,16 @@
 import sys
 import io
 import os
-import time
 
-from datetime import timedelta
 
-sys.path.append("/class/core/")
+sys.path.append("/class/core")
 reload(sys)
 sys.setdefaultencoding('utf8')
 
 import route
-from flask import Flask
+import config
 
-
-app = Flask(__name__)
-app.debug = True
+app = config.config().makeApp(__name__)
 
 
 DEFAULT_MODULES = (
@@ -33,13 +29,6 @@ DEFAULT_MODULES = (
     (route.firewall, "/firewall"),
     (route.control, "/control"),
 )
-
-
-# print "time.time(): %f " % time.time()
-app.config.version = "0.0.1" + str(time.time())
-
-app.config['SECRET_KEY'] = os.urandom(24)
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
 
 
 def setting_modules(app, modules):
