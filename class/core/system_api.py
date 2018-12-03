@@ -542,12 +542,12 @@ class system_api:
             version = public.httpGet(
                 upAddr + '/info.json')
             version = json.loads(version)
-            return version[0]['version']
+            return version[0]
         except Exception as e:
-            pass
-        return config.config().getVersion()
-
+            print e
+        return {}
     # 更新服务
+
     def updateServer(self, stype):
 
         try:
@@ -555,17 +555,35 @@ class system_api:
                 return public.returnJson(False, '请等待所有安装任务完成再执行!')
             if stype == 'check':
                 version_now = config.config().getVersion()
-                version_new = self.getServerInfo()
-                diff = self.versionDiff(version_now, version_new)
+                version_new_info = self.getServerInfo()
+                if not 'version' in version_new_info:
+                    return public.returnJson(False, '服务器数据有问题!')
+
+                diff = self.versionDiff(
+                    version_now, version_new_info['version'])
                 if diff == 'new':
-                    return public.returnJson(True, '有新版本!ver:' + version_new)
+                    return public.returnJson(True, '有新版本!')
                 elif diff == 'test':
-                    return public.returnJson(True, '有测试版本!ver:' + version_new)
+                    return public.returnJson(True, '有测试版本!')
                 else:
                     return public.returnJson(False, '已经是最新,无需更新!')
 
+            if stype == 'info':
+                version_new_info = self.getServerInfo()
+                version_now = config.config().getVersion()
+
+                if not 'version' in version_new_info:
+                    return public.returnJson(False, '服务器数据有问题!')
+                diff = self.versionDiff(
+                    version_now, version_new_info['version'])
+                return public.returnJson(True, '更新信息!', version_new_info)
+
+            if stype == 'update':
+                pass
+
             return public.returnJson(False, '已经是最新,无需更新!')
         except Exception as ex:
+            print ex
             return public.returnJson(False, "连接服务器失败!")
 
     # 重启面板
