@@ -487,7 +487,7 @@ setImg();
 //检查更新
 function checkUpdate() {
     var loadT = layer.msg(lan.index.update_get, { icon: 16, time: 0, shade: [0.3, '#000'] });
-    $.get('/ajax?action=UpdatePanel&check=true', function(rdata) {
+    $.get('/system/update_server?check=true', function(rdata) {
         layer.close(loadT);
         if (rdata.status === false) {
             layer.confirm(rdata.msg, { title: lan.index.update_check, icon: 1, closeBtn: 2, btn: [lan.public.know, lan.public.close] });
@@ -495,7 +495,7 @@ function checkUpdate() {
         }
         layer.msg(rdata.msg, { icon: 1 });
         if (rdata.version != undefined) updateMsg();
-    });
+    },'json');
 }
 
 
