@@ -9,12 +9,16 @@ rootPath=$(dirname "$curPath")
 
 echo $rootPath
 cd $rootPath
+rm -rf ./*.pyc
+rm -rf ./*/*.pyc
 
 startTime=`date +%s`
 
-zip -r -q -o mdserver-web.zip  ./
+zip -r -q -o mdserver-web.zip  ./ -x@$curPath/pick_filter.txt
 
-mv mdserver-web.zip $rootPath/scripts
+
+
+mv mdserver-web.zip $rootPath/scripts 
 
 endTime=`date +%s`
 ((outTime=($endTime-$startTime)))
