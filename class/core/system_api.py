@@ -516,11 +516,12 @@ class system_api:
         return public.returnJson(True, "设置成功!")
 
     # 更新服务
-    def updateServer(self, type):
+    def updateServer(self, stype):
         try:
             if not public.isRestart():
                 return public.returnMsg(False, '请等待所有安装任务完成再执行!')
-
+            if stype == 'check':
+                public.httpGet('')
         except Exception as ex:
             return public.returnJson(False, "连接服务器失败!")
 
