@@ -172,7 +172,7 @@ Install_OpenSSL()
 {
     if [ ! -d ${libPath}/openssl ];then
         cd ${sourcePath}
-        if [ ! -f ${sourcePath}openssl-1.0.2q.tar.gz ];then
+        if [ ! -f ${sourcePath}/openssl-1.0.2q.tar.gz ];then
         	wget https://github.com/midoks/mdserver-web/releases/download/init/openssl-1.0.2q.tar.gz -T 20
         fi 
         tar -zxf openssl-1.0.2q.tar.gz

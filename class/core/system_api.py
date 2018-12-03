@@ -5,6 +5,7 @@ import time
 import os
 import re
 import math
+import json
 
 from flask import Flask, session
 
@@ -513,6 +514,15 @@ class system_api:
             return public.getJson(data)
 
         return public.returnJson(True, "设置成功!")
+
+    # 更新服务
+    def updateServer(self, type):
+        try:
+            if not public.isRestart():
+                return public.returnMsg(False, '请等待所有安装任务完成再执行!')
+
+        except Exception as ex:
+            return public.returnJson(False, "连接服务器失败!")
 
     # 重启面板
     def reWeb(self, get):

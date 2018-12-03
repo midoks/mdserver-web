@@ -498,6 +498,26 @@ function checkUpdate() {
     },'json');
 }
 
+function updateMsg(){
+    window.open("http://www.bt.cn/bbs/thread-1186-1-1.html");
+    $.get('/ajax?action=UpdatePanel',function(rdata){
+        layer.open({
+            type:1,
+            title:lan.index.update_to+'['+rdata.version+']',
+            area: '400px', 
+            shadeClose:false,
+            closeBtn:2,
+            content:'<div class="setchmod bt-form pd20 pb70">'
+                    +'<p style="padding: 0 0 10px;line-height: 24px;">'+rdata.updateMsg+'</p>'
+                    +'<div class="bt-form-submit-btn">'
+                    +'<button type="button" class="btn btn-danger btn-sm btn-title" onclick="layer.closeAll()">'+lan.public.cancel+'</button>'
+                    +'<button type="button" class="btn btn-success btn-sm btn-title" onclick="updateVersion(\''+rdata.version+'\')" >'+lan.index.update_go+'</button>'
+                    +'</div>'
+                    +'</div>'
+        });
+    });
+}
+
 
 //开始升级
 function updateVersion(version) {
