@@ -12,11 +12,12 @@ function getWeb(page, search) {
 	}else{
 		order = '';
 	}
-	var sUrl = '/data?action=getData'
+	var sUrl = '/site/list'
 	var pdata = 'tojs=getWeb&table=sites&limit=15&p=' + page + '&search=' + search + order;
 	var loadT = layer.load();
 	//取回数据
-	$.post(sUrl,pdata, function(data) {
+	$.post(sUrl, pdata, function(data) {
+		console.log(data)
 		layer.close(loadT);
 		//构造数据列表
 		var Body = '';

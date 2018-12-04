@@ -11,13 +11,8 @@
 			</div>
 			<div class="clearfix bgw mtb15 pd15">
 				<div class="safe-port pull-left">
-					<div class="ss-text pull-left mr50">
-						<em>关闭面板</em>
-						<div class='ssh-item'>
-							<input class='btswitch btswitch-ios' id='closePl' type='checkbox'>
-							<label class='btswitch-btn' for='closePl' onclick='ClosePanel()'></label>
-						</div>
-					</div>
+			
+
 					<div class="ss-text pull-left mr50">
 						<em>自动更新</em>
 						<div class='ssh-item'>
@@ -39,7 +34,7 @@
 					<h3 class="f16">设置</h3>
 					<button class="btn btn-default btn-sm" style="float: right;margin-top: 10px;display: none;" onclick="apiSetup()">$data['lan']['C2']</button>
 				</div>
-				<div class="important-title" style="margin: 20px 30px 0px;">
+				<div class="info-title-tips" style="margin: 20px 30px 0px;">
 					<p><span class="glyphicon glyphicon-alert" style="color: #f39c12; margin-right: 10px;"></span>为了提高安全，请修改别名、默认端口、面板用户和密码!</p>
 				</div>
 				<div class="setting-con pd15">
@@ -91,10 +86,6 @@
 							<span class="set-tit text-right" title="面板密码">面板密码</span>
 							<input name="password_" class="inputtxt bt-input-text disable" type="text" value="******" disabled><span class="modify btn btn-xs btn-success" onclick="setPassword()">修改</span>
 						</p>
-				
-						
-
-						
 					</form>
 					<div class="bt-submit set-submit">保存</div>
 				</div>
@@ -214,7 +205,7 @@
 	text-align: center;
 }
 </style>
-<script src="/static/js/config.js?date=20180530"></script>
+<script src="/static/js/config.js?v={{config.version}}"></script>
 <script type="text/javascript">
 	// setCookie('serverType','$web.ctx.session.webserver');
 </script>

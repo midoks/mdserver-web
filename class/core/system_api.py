@@ -556,14 +556,16 @@ class system_api:
                 if stype == 'check' or stype == 'info' or stype == 'update':
                     return public.returnJson(True, '正在安装中...', 'download')
                 if stype == 'update_status':
-                    if os.path.exists('mdserver-web.zip'):
-                        return public.returnJson(True, '进度!', 100)
+
                     data = public.readFile('tmp/panelExec.log')
                     if data == 'done':
                         return public.returnJson(True, '进度!', 100)
                     else:
                         _data = json.loads(data)
                         return public.returnJson(True, '进度!', _data['pre'])
+
+                    if os.path.exists('mdserver-web.zip'):
+                        return public.returnJson(True, '进度!', 100)
 
             if not public.isRestart():
                 return public.returnJson(False, '请等待所有安装任务完成再执行!')
@@ -612,7 +614,7 @@ class system_api:
                 return public.returnJson(True, '下载中...')
 
             if stype == 'update_install':
-                public.EexecShell('unzip -o mdserver-web.zip -d ./')
+                public.execShell('unzip -o mdserver-web.zip -d ./')
                 public.execShell('rm -f mdserver-web.zip')
                 return public.returnJson(True, '安装更新成功!')
 
@@ -635,14 +637,6 @@ class system_api:
             vp = '_pro'
         public.ExecShell("wget -O update.sh " + public.get_url() +
                          "/install/update" + vp + ".sh && bash update.sh")
-        if hasattr(web.ctx.session, 'getCloudPlugin'):
-            del(web.ctx.session['getCloudPlugin'])
-        return True
-
-    # 升级到专业版
-    def updatePro(self, get):
-        public.ExecShell("wget -O update.sh " + public.get_url() +
-                         "/install/update_pro.sh && bash update.sh pro")
         if hasattr(web.ctx.session, 'getCloudPlugin'):
             del(web.ctx.session['getCloudPlugin'])
         return True
