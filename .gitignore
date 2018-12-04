@@ -109,3 +109,4 @@ tmp/*.pl
 tmp/*.log
 data/json/index.json
 data/system.db
+*.swp
