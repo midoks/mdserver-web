@@ -1,16 +1,4 @@
-//关闭面板
-function ClosePanel(){
-	layer.confirm(lan.config.close_panel_msg,{title:lan.config.close_panel_title,closeBtn:2,icon:13,cancel:function(){
-		$("#closePl").prop("checked",false);
-	}}, function() {
-		$.post('/config?action=ClosePanel','',function(rdata){
-			layer.msg(rdata.msg,{icon:rdata.status?1:2});
-			setTimeout(function(){window.location.reload();},1000);
-		});
-	},function(){
-		$("#closePl").prop("checked",false);
-	});
-}
+
 
 //设置自动更新
 function SetPanelAutoUpload(){
