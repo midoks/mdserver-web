@@ -548,11 +548,11 @@ function updateVersion(version) {
         //     window.location.reload();
         // }, 3000);
     }).error(function() {
-        // layer.msg(lan.index.update_ok, { icon: 1 });
+        layer.msg(lan.index.update_ok, { icon: 1 });
         // $.get('/system?action=ReWeb', function() {});
-        // setTimeout(function() {
-        //     window.location.reload();
-        // }, 3000);
+        setTimeout(function() {
+            window.location.reload();
+        }, 3000);
     });
 }
 
