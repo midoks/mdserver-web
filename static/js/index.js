@@ -592,8 +592,6 @@ function updateStatus(){
 
 }
 
-updateStatus();
-
 
 //重启服务器
 function ReBoot() {
