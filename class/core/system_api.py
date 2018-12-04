@@ -608,6 +608,11 @@ class system_api:
                     'id,name,type,status,addtime, execstr', taskAdd)
                 return public.returnJson(True, '下载中...')
 
+            if stype == 'update_install':
+                public.EexecShell('unzip -o mdserver-web.zip -d ./')
+                public.execShell('rm -f mdserver-web.zip')
+                return public.returnJson(True, '安装更新成功!')
+
             return public.returnJson(False, '已经是最新,无需更新!')
         except Exception as ex:
             print ex
