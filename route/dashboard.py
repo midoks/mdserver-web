@@ -22,13 +22,12 @@ dashboard = Blueprint('dashboard', __name__, template_folder='templates')
 def test():
     os = public.getOs()
     print os
+    print(sys.platform)
     return os
 
 
 @dashboard.route("/")
 def index():
-
-    print(sys.platform)
     if session.has_key('code'):
         print session['code']
     return render_template('default/index.html')
