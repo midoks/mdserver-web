@@ -595,6 +595,9 @@ class system_api:
 
                 public.execShell(
                     'unzip -o mdserver-web.zip -d ' + os.getcwd() + '/')
+
+                public.execShell('rm - rf mdserver - web.zip')
+                public.execShell('restart.sh')
                 print v_new_info
 
             return public.returnJson(False, '已经是最新,无需更新!')
