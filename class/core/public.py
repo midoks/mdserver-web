@@ -467,14 +467,16 @@ def isUpdateLocalSoft():
 
     num = M('tasks').where('status!=?', ('1',)).count()
 
-    if num == 0:
+    if os.path.exists('mdserver-web.zip'):
         return True
 
-    data = M('tasks').where('status!=?', ('1',)).field(
-        'id,type,execstr').limit('1').select()
-    argv = data[0]['execstr'].split('|dl|')
-    if data[0]['type'] == 'download' and argv[1] == 'mdserver-web.zip':
-        return True
+    if num > 0:
+        data = M('tasks').where('status!=?', ('1',)).field(
+            'id,type,execstr').limit('1').select()
+        argv = data[0]['execstr'].split('|dl|')
+        if data[0]['type'] == 'download' and argv[1] == 'mdserver-web.zip':
+            return True
+
     return False
 
 
