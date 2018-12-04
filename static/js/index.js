@@ -491,6 +491,11 @@ function checkUpdate() {
     var loadT = layer.msg(lan.index.update_get, { icon: 16, time: 0, shade: [0.3, '#000'] });
     $.get('/system/update_server?type=check', function(rdata) {
         layer.close(loadT);
+
+        if (rdata.data == 'download'){
+            updateStatus();return;
+        }
+
         if (rdata.status === false) {
             layer.confirm(rdata.msg, { title: lan.index.update_check, icon: 1, closeBtn: 2, btn: [lan.public.know, lan.public.close] });
             return;
@@ -502,6 +507,10 @@ function checkUpdate() {
 
 function updateMsg(){
     $.get('/system/update_server?type=info',function(rdata){
+
+        if (rdata.data == 'download'){
+            updateStatus();return;
+        }
 
         var v = rdata.data.version;
         var v_info = '';
@@ -533,6 +542,11 @@ function updateMsg(){
 function updateVersion(version) {
     var loadT = layer.msg('正在升级面板..', { icon: 16, time: 0, shade: [0.3, '#000'] });
     $.get('/system/update_server?type=update&version='+version, function(rdata) {
+
+        if (rdata.data == 'download'){
+            updateStatus();return;
+        }
+
         layer.closeAll();
         if (rdata.status === false) {
             layer.msg(rdata.msg, { icon: 5, time: 5000 });
@@ -567,11 +581,10 @@ function updateStatus(){
             shadeClose:false,
             closeBtn:2,
             content:'<div class="setchmod bt-form pd20 pb70">'
-                +'<div class="progress"><div id="up_download_progress" class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 40%;"><span class="sr-only">40% 完成</span></div></div>'
-                // +'<p style="padding: 0 0 10px;line-height: 24px;">1231231</p>'
+                +'<div class="progress"><div id="up_download_progress" class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"><span class="sr-only">40% 完成</span></div></div>'
                 +'<div class="bt-form-submit-btn">'
                 +'<button type="button" class="btn btn-danger btn-sm btn-title" onclick="layer.closeAll()">取消</button>'
-                +'<button type="button" class="btn btn-success btn-sm btn-title" onclick="updateVersion()" >确认</button>'
+                +'<button type="button" class="btn btn-success btn-sm btn-title" onclick="updateInstall()" >确认安装</button>'
                 +'</div>'
                 +'</div>'
         });
@@ -586,12 +599,11 @@ function updateStatus(){
             
         },'json');
     },1000);
-    
-
-
-
 }
 
+function updateInstall(){
+
+}
 
 //重启服务器
 function ReBoot() {

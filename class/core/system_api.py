@@ -553,13 +553,16 @@ class system_api:
         try:
 
             if public.isUpdateLocalSoft():
+                if stype == 'check' or stype == 'info' or stype == 'update':
+                    return public.returnJson(True, '正在安装中...', 'download')
                 if stype == 'update_status':
+                    if os.path.exists('mdserver-web.zip'):
+                        return public.returnJson(True, '进度!', 100)
                     data = public.readFile('tmp/panelExec.log')
                     if data == 'done':
                         return public.returnJson(True, '进度!', 100)
                     else:
                         _data = json.loads(data)
-
                         return public.returnJson(True, '进度!', _data['pre'])
 
             if not public.isRestart():
