@@ -547,11 +547,21 @@ class system_api:
         except Exception as e:
             print e
         return {}
-    # 更新服务
 
     def updateServer(self, stype, version=''):
-
+        # 更新服务
         try:
+
+            if public.isUpdateLocalSoft():
+                if stype == 'update_status':
+                    data = public.readFile('tmp/panelExec.log')
+                    if data == 'done':
+                        return public.returnJson(True, '进度!', 100)
+                    else:
+                        _data = json.loads(data)
+
+                        return public.returnJson(True, '进度!', _data['pre'])
+
             if not public.isRestart():
                 return public.returnJson(False, '请等待所有安装任务完成再执行!')
             if stype == 'check':
@@ -563,9 +573,9 @@ class system_api:
                 diff = self.versionDiff(
                     version_now, version_new_info['version'])
                 if diff == 'new':
-                    return public.returnJson(True, '有新版本!')
+                    return public.returnJson(True, '有新版本!', version_new_info['version'])
                 elif diff == 'test':
-                    return public.returnJson(True, '有测试版本!')
+                    return public.returnJson(True, '有测试版本!', version_new_info['version'])
                 else:
                     return public.returnJson(False, '已经是最新,无需更新!')
 
@@ -590,15 +600,13 @@ class system_api:
                 if not 'path' in v_new_info or v_new_info['path'] == '':
                     return public.returnJson(False, '下载地址不存在!')
 
-                public.downloadFile(
-                    v_new_info['path'], 'mdserver-web.zip')
+                execstr = v_new_info['path'] + '|dl|mdserver-web.zip'
+                taskAdd = (None,  '下载[mdserver-web-' + v_new_info['version'] + ']',
+                           'download', '0', time.strftime('%Y-%m-%d %H:%M:%S'), execstr)
 
-                public.execShell(
-                    'unzip -o mdserver-web.zip -d ' + os.getcwd() + '/')
-
-                public.execShell('rm -rf mdserver-web.zip')
-                public.execShell('sh restart.sh')
-                print v_new_info
+                public.M('tasks').add(
+                    'id,name,type,status,addtime, execstr', taskAdd)
+                return public.returnJson(True, '下载中...')
 
             return public.returnJson(False, '已经是最新,无需更新!')
         except Exception as ex:

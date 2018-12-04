@@ -462,26 +462,28 @@ function setImg() {
 }
 setImg();
 
-//检查更新
-// setTimeout(function() {
-//     $.get('/system/update_panel', function(rdata) {
-//         if (rdata.status == false) return;
-//         if (rdata.version != undefined) {
-//             $("#toUpdate").html('<a class="btlink" href="javascript:updateMsg();">' + lan.index.update_go + '</a>');
-//             return;
-//         }
-//         $.get('/system?action=ReWeb', function() {});
-//         layer.msg(rdata.msg, { icon: 1 });
-//         setTimeout(function() {
-//             window.location.reload();
-//         }, 3000);
-//     }).error(function() {
-//         $.get('/system?action=ReWeb', function() {});
-//         setTimeout(function() {
-//             window.location.reload();
-//         }, 3000);
-//     },'json');
-// }, 3000);
+// 检查更新
+setTimeout(function() {
+    $.get('/system/update_server?type=check', function(rdata) {
+        if (rdata.status == false) return;
+        if (rdata.data != undefined) {
+            $("#toUpdate").html('<a class="btlink" href="javascript:updateMsg();">更新</a>');
+            $('#toUpdate a').html('更新<i style="display: inline-block; color: red; font-size: 40px;position: absolute;top: -35px; font-style: normal; right: -8px;">.</i>');
+            $('#toUpdate a').css("position","relative");
+            return;
+        }
+        // $.get('/system?action=ReWeb', function() {});
+        // layer.msg(rdata.msg, { icon: 1 });
+        // setTimeout(function() {
+        //     window.location.reload();
+        // }, 3000);
+    },'json').error(function() {
+        // $.get('/system?action=ReWeb', function() {});
+        // setTimeout(function() {
+        //     window.location.reload();
+        // }, 3000);
+    });
+}, 3000);
 
 
 //检查更新
@@ -542,19 +544,55 @@ function updateVersion(version) {
             $("#toUpdate").html('');
         }
 
+        updateStatus();
         // layer.msg(lan.index.update_ok, { icon: 1 });
         // $.get('/system?action=ReWeb', function() {});
         // setTimeout(function() {
         //     window.location.reload();
         // }, 3000);
-    }).error(function() {
-        layer.msg(lan.index.update_ok, { icon: 1 });
-        // $.get('/system?action=ReWeb', function() {});
+
+    },'json').error(function() {
+        layer.msg('更新失败,请重试!', { icon: 2 });
         setTimeout(function() {
             window.location.reload();
         }, 3000);
     });
 }
+
+function updateStatus(){
+    layer.open({
+            type:1,
+            title:'<span class="badge badge-inverse">软件下载中...</span>',
+            area: '400px', 
+            shadeClose:false,
+            closeBtn:2,
+            content:'<div class="setchmod bt-form pd20 pb70">'
+                +'<div class="progress"><div id="up_download_progress" class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 40%;"><span class="sr-only">40% 完成</span></div></div>'
+                // +'<p style="padding: 0 0 10px;line-height: 24px;">1231231</p>'
+                +'<div class="bt-form-submit-btn">'
+                +'<button type="button" class="btn btn-danger btn-sm btn-title" onclick="layer.closeAll()">取消</button>'
+                +'<button type="button" class="btn btn-success btn-sm btn-title" onclick="updateVersion()" >确认</button>'
+                +'</div>'
+                +'</div>'
+        });
+
+    var t = setInterval(function(){
+        $.get('/system/update_server?type=update_status', function(rdata) {
+            console.log(rdata);
+            $('#up_download_progress').css('width',rdata.data+"%");
+            if (rdata.data ==100){
+                clearInterval(t);
+            }
+            
+        },'json');
+    },1000);
+    
+
+
+
+}
+
+updateStatus();
 
 
 //重启服务器
