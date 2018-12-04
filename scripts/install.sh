@@ -14,6 +14,9 @@ mkdir -p /www/backup/database
 mkdir -p /www/backup/site
 
 
+yum provides '*/applydeltarpm'
+yum install deltarpm
+
 yum install -y wget curl unzip zip
 
 
@@ -26,6 +29,8 @@ yum groupinstall -y "Development Tools"
 yum -y install epel-release python-pip python-devel
 pip install --upgrade pip
 pip install -r /www/server/mdserver-web/requirements.txt
+
+
 
 
 
