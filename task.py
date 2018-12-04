@@ -48,7 +48,7 @@ class MyBad():
         return self._msg
 
 
-def ExecShell(cmdstring, cwd=None, timeout=None, shell=True):
+def execShell(cmdstring, cwd=None, timeout=None, shell=True):
     print cmdstring
     try:
         global logPath
@@ -71,20 +71,20 @@ def ExecShell(cmdstring, cwd=None, timeout=None, shell=True):
         return None
 
 
-def DownloadFile(url, filename):
+def downloadFile(url, filename):
     # 下载文件
     try:
         import urllib
         import socket
         socket.setdefaulttimeout(10)
-        urllib.urlretrieve(url, filename=filename, reporthook=DownloadHook)
+        urllib.urlretrieve(url, filename=filename, reporthook=downloadHook)
         os.system('chown www.www ' + filename)
         WriteLogs('done')
     except:
         WriteLogs('done')
 
 
-def DownloadHook(count, blockSize, totalSize):
+def downloadHook(count, blockSize, totalSize):
     # 下载文件进度回调
     global pre
     used = count * blockSize
@@ -92,6 +92,7 @@ def DownloadHook(count, blockSize, totalSize):
     if pre == pre1:
         return
     speed = {'total': totalSize, 'used': used, 'pre': pre}
+    print speed
     WriteLogs(json.dumps(speed))
     pre = pre1
 
@@ -128,10 +129,10 @@ def startTask():
                         sql.table('tasks').where("id=?", (value['id'],)).save(
                             'status,start', ('-1', start))
                         if value['type'] == 'download':
-                            argv = value['execstr'].split('|bt|')
-                            DownloadFile(argv[0], argv[1])
+                            argv = value['execstr'].split('|dl|')
+                            downloadFile(argv[0], argv[1])
                         elif value['type'] == 'execshell':
-                            ExecShell(value['execstr'])
+                            execShell(value['execstr'])
                         end = int(time.time())
                         sql.table('tasks').where("id=?", (value['id'],)).save(
                             'status,end', ('1', end))
@@ -155,11 +156,11 @@ def mainSafe():
             isCheck += 1
             return True
         isCheck = 0
-        isStart = public.ExecShell(
+        isStart = public.execShell(
             "ps aux |grep 'python main.py'|grep -v grep|awk '{print $2}'")[0]
         if not isStart:
             os.system('/etc/init.d/bt start')
-            isStart = public.ExecShell(
+            isStart = public.execShell(
                 "ps aux |grep 'python main.py'|grep -v grep|awk '{print $2}'")[0]
             public.WriteLog('守护程序', '面板服务程序启动成功 -> PID: ' + isStart)
     except:
