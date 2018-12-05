@@ -625,10 +625,11 @@ class system_api:
 
     # 重启面板
     def reWeb(self, get):
-        # if not public.IsRestart(): return
-        # public.returnMsg(False,'EXEC_ERR_TASK');
+        if not public.isRestart():
+            public.returnMsg(False, '请等待所有安装任务完成再执行!')
+
         # public.ExecShell('/etc/init.d/bt restart &')
-        return True
+        public.returnMsg(True, '执行成功!')
 
     # 修复面板
     def repPanel(self, get):
