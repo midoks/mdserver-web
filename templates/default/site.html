@@ -21,8 +21,8 @@
 						<p><span class="glyphicon glyphicon-alert" style="color:#f39c12; margin-right:10px;"></span>使用mdserver-web|linux面板创建站点时会自动创建权限配置，统一使用www用户。</p>
 					</div>
 					<button onclick="webAdd(0)" class="btn btn-success btn-sm btn-title" type="button">添加站点</button>&nbsp;
-					<button onclick="SiteDefaultPage()" class="btn btn-default btn-sm btn-title" type="button">修改默认页</button>
-					<button onclick="GetDefaultSite()" class="btn btn-default btn-sm btn-title" type="button">默认站点</button>
+					<button onclick="siteDefaultPage()" class="btn btn-default btn-sm btn-title" type="button">修改默认页</button>
+					<button onclick="getDefaultSite()" class="btn btn-default btn-sm btn-title" type="button">默认站点</button>
 					<span id="allDelete" style="float: right;display: none;">
 						<button onclick="allDeleteSite();" class="btn btn-default btn-sm">网站搜索</button>
 					</span>
@@ -54,8 +54,8 @@
 		</div>
 	</div>
 		<script type="text/javascript" src="/static/laydate/laydate.js?v={{config.version}}"></script>
-		<script type="text/javascript" src="/static/js/ftp.js?v={{config.version}}"></script>
-		<script type="text/javascript" src="/static/js/site.js?v={{config.version}}"></script>
+		<script type="text/javascript" src="/static/app/ftp.js?v={{config.version}}"></script>
+		<script type="text/javascript" src="/static/app/site.js?v={{config.version}}"></script>
 		<script type="text/javascript">
 		// $if not tData['isSetup']:
 		// layer.msg('$tData["lan"]["JS1"]<a href="/soft" style="color:#20a53a; float: right;">$tData["lan"]["JS2"]</a>',{icon:7,shade: [0.3, '#000'],time:0});
@@ -64,7 +64,5 @@
 		setTimeout(function(){
 			getWeb(1);
 		},500);
-		
-		setCookie('serverType','$web.ctx.session.webserver');
 	</script>
 {% endblock %}

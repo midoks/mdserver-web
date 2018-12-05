@@ -59,24 +59,22 @@
 		</div>
 	</div>
 </div>
+
+<script type="text/javascript" src="/static/app/data.js?v={{config.version}}"></script>
+<script type="text/javascript" src="/static/app/files.js?v={{config.version}}></script>
 <script type="text/javascript">
-	setCookie('backup_path',"$web.ctx.session.config['backup_path']");
-</script>
-<script type="text/javascript" src="/static/js/data.js?date=20180725"></script>
-<script type="text/javascript" src="/static/js/files.js?date=20180124"></script>
-<script type="text/javascript">
-	$if not tData['isSetup']:
-		layer.msg('$tData["lan"]["JS1"]<a href="/soft#i" style="color:#20a53a;float: right;">$tData["lan"]["JS2"]</a>',{icon:7,shade: [0.3, '#000'],time:0});
-		$$(".layui-layer-shade").css("margin-left","180px");
+	// $if not tData['isSetup']:
+		// layer.msg('$tData["lan"]["JS1"]<a href="/soft#i" style="color:#20a53a;float: right;">$tData["lan"]["JS2"]</a>',{icon:7,shade: [0.3, '#000'],time:0});
+		// $(".layui-layer-shade").css("margin-left","180px");
 	setTimeout(function(){
 		getData(1);
 	},300);
 	
-	$$("#dataRecycle").click(function(){
+	$("#dataRecycle").click(function(){
 		setTimeout(function(){
 			Recycle_bin(6);
 		},1000);
-	});
+	// });
 </script>
-<script src="/static/js/upload.js?date=20180124"></script>
+<script src="/static/app/upload.js?v={{config.version}}"></script>
 {% endblock %}
