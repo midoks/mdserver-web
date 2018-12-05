@@ -174,7 +174,6 @@ function getSList(isdisplay) {
                 plugin_title = plugin.title + ' ' + plugin.setup_version;
             }
 
-            console.log(plugin_title);
 
             sBody += '<tr>' +
                 '<td><span ' + titleClick + 
@@ -311,13 +310,14 @@ function indexListHtml(callback){
                     state = '<span style="color:red" class="glyphicon glyphicon-pause"></span>'
             }
 
-            var name = plugin.title + ' ' + plugin.versions + '  ';
+            var name = plugin.title + ' ' + plugin.setup_version + '  ';
             var data_id = plugin.name + '-' + plugin.setup_version;
             if (plugin.coexist){
                 name = plugin.title + '  ';
                 data_id = plugin.name + '-' + plugin.versions;
             }
             
+
             con += '<div class="col-sm-3 col-md-3 col-lg-3" data-id="' + data_id + '">\
                 <span class="spanmove"></span>\
                 <div onclick="softMain(\'' + plugin.name + '\',\'' + version_info + '\')">\
@@ -365,7 +365,6 @@ function indexSoft() {
             }
         }
         var ssort = tmp.join("|");
-        console.log(ssort);
         $("input[name=list1SortOrder]").val(ssort);
         $.post("/plugins/index_sort", 'ssort=' + ssort, function(rdata) {
             if (!rdata.status){
@@ -377,8 +376,8 @@ function indexSoft() {
     };
 }
 
-// $(function() {
-//     if (window.document.location.pathname == '/soft/') {
-//         setInterval(function() { getSList(); }, 5000);
-//     }
-// });
+$(function() {
+    if (window.document.location.pathname == '/soft/') {
+        setInterval(function() { getSList(); }, 8000);
+    }
+});

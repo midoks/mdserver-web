@@ -46,14 +46,12 @@
 	</div>
 </div>
 <script type="text/javascript" src="/static/js/jquery.dragsort-0.5.2.min.js?v={{config.version}}"></script>
-<script type="text/javascript" src="/static/js/soft.js?v={{config.version}}"></script>
 <script type="text/javascript" src="/static/laydate/laydate.js?v={{config.version}}"></script>
+<script type="text/javascript" src="/static/app/soft.js?v={{config.version}}"></script>
 <script>
-setCookie('serverType','$web.ctx.session.webserver');
 //取软件列表
 getSList();
-// $$.get("/ajax?action=GetCloudHtml&rpath=btpanel_message/updata_pro.html",function(rdata){
-// 	$$("#updata_pro_info").html(rdata);
-// });
 </script>
+
+
 {% endblock %}
