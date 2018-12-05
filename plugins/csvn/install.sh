@@ -14,16 +14,17 @@ CSVN_SOURCE='https://github.com/midoks/mdserver-web/releases/download/init/Colla
 
 Install_csvn()
 {
-	mkdir -p $serverPath/tmp
+	mkdir -p $serverPath/source
 
 	echo '正在安装脚本文件...' > $install_tmp
 
-	if [ ! -f $serverPath/tmp/csvn.tar.xz ];then
-		wget -O $serverPath/so/csvn.tar.xz ${CSVN_SOURCE}
+	if [ ! -f $serverPath/source/csvn.tar.xz ];then
+		wget -O $serverPath/source/csvn.tar.xz ${CSVN_SOURCE}
 	fi
 
-	cd $serverPath/tmp && tar -Jxf $serverPath/tmp/csvn.tar.xz
-	mv $serverPath/tmp/csvn $serverPath/csvn
+	cd $serverPath/source && tar -Jxf $serverPath/source/csvn.tar.xz
+	mv $serverPath/source/csvn $serverPath/csvn
+	echo '5.1' > $serverPath/csvn/version.pl
 	
 	echo '安装完成' > $install_tmp
 }
