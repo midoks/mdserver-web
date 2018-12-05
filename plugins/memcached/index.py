@@ -11,7 +11,7 @@ import public
 
 def status():
     data = public.execShell(
-        "ps -ef|grep redis |grep -v grep | grep -v python | awk '{print $2}'")
+        "ps -ef|grep memcached |grep -v grep | grep -v python | awk '{print $2}'")
     if data[0] == '':
         return 'stop'
     return 'start'
@@ -19,8 +19,8 @@ def status():
 
 def start():
     path = os.path.dirname(os.getcwd())
-    cmd = path + "/redis/bin/redis-server"
-    cmd = cmd + " " + path + "/redis/redis.conf"
+    cmd = path + "/memcached/bin/memcached"
+    cmd = cmd + " " + path + "/memcached/memcached.conf"
     data = public.execShell(cmd)
     if data[0] == '':
         return 'ok'
@@ -29,7 +29,7 @@ def start():
 
 def stop():
     data = public.execShell(
-        "ps -ef|grep redis |grep -v grep |grep -v python |awk '{print $2}' | xargs kill -9")
+        "ps -ef|grep memcached |grep -v grep |grep -v python |awk '{print $2}' | xargs kill -9")
     if data[0] == '':
         return 'ok'
     return 'fail'
@@ -75,7 +75,7 @@ def runInfo():
 
 
 def getConf():
-    path = os.path.dirname(os.getcwd()) + "/redis/redis.conf"
+    path = os.getcwd() + "/plugins/memcached/init.d/memcached.tpl"
     return path
 
 if __name__ == "__main__":

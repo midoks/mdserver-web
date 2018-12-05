@@ -179,18 +179,11 @@ def setting():
 def run():
     name = request.form.get('name', '')
     func = request.form.get('func', '')
+    version = request.form.get('version', '')
     args = request.form.get('args', '')
     script = request.form.get('script', 'index')
 
-    py = 'python ' + public.getRunDir() + '/' + __plugin_name + '/' + name
-    if args == '':
-        py = py + '/' + script + '.py' + ' ' + func
-    else:
-        py = py + '/' + script + '.py' + ' ' + func + ' ' + args
-
-    print py
-    data = public.execShell(py)
-
-    if data[1].strip() == '':
+    data = plugin_api.plugin_api().run(name, func, version, args, script)
+    if data[1] == '':
         return public.returnJson(True, "OK", data[0].strip())
     return public.returnJson(False, data[1].strip())

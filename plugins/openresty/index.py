@@ -45,6 +45,11 @@ def reload():
     return 'fail'
 
 
+def openrestyConf():
+    path = os.path.dirname(os.getcwd())
+    return path + "/openresty/nginx/conf/nginx.conf"
+
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -55,5 +60,7 @@ if __name__ == "__main__":
         print stop()
     elif func == 'reload':
         print reload()
+    elif func == 'conf':
+        print openrestyConf()
     else:
         print 'error'

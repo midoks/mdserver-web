@@ -67,7 +67,11 @@ class plugin_api:
         return isTask
 
     def checkStatus(self, info):
-        pass
+
+        data = self.run(info['name'], 'status', info['setup_version'])
+        if data[0] == 'start':
+            return True
+        return False
 
     def checkDisplayIndex(self, name, version):
         if not os.path.exists(self.__index):
@@ -152,7 +156,7 @@ class plugin_api:
         else:
             pluginInfo['setup_version'] = self.getVersion(
                 pluginInfo['install_checks'])
-        # pluginInfo['status'] = os.path.exists(pluginInfo['install_checks'])
+        pluginInfo['status'] = self.checkStatus(pluginInfo)
         return pluginInfo
 
     def makeCoexist(self, data):
@@ -287,5 +291,19 @@ class plugin_api:
         public.writeFile(self.__index, json.dumps(indexList))
         return public.returnJson(True, '删除成功!')
 
-    def run(self):
-        pass
+    def run(self, name, func, version, args='', script='index'):
+        path = public.getRunDir() + '/' + self.__plugin_dir + \
+            '/' + name + '/' + script + '.py'
+        py = 'python ' + path
+        if args == '':
+            py_cmd = py + ' ' + func + ' ' + version
+        else:
+            py_cmd = py + ' ' + func + ' ' + version + ' ' + args
+
+        # print path
+        # print os.path.exists(path)
+
+        if not os.path.exists(path):
+            return ('', '')
+        data = public.execShell(py_cmd)
+        return (data[0].strip(), data[1].strip())
