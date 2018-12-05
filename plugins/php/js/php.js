@@ -614,3 +614,23 @@ function phpUploadLimit(version, max) {
     var LimitCon = '<p class="conf_p"><input class="phpUploadLimit bt-input-text mr5" type="number" value="' + max + '" name="max">MB<button class="btn btn-success btn-sm" onclick="SetPHPMaxSize(\'' + version + '\')" style="margin-left:20px">' + lan.public.save + '</button></p>';
     $(".soft-man-con").html(LimitCon);
 }
+
+function GetPHPStatus(a) {
+    if(a == "52") {
+        layer.msg(lan.bt.php_status_err, {
+            icon: 2
+        });
+        return
+    }
+    $.post("/ajax?action=GetPHPStatus", "version=" + a, function(b) {
+        layer.open({
+            type: 1,
+            area: "400",
+            title: lan.bt.php_status_title,
+            closeBtn: 2,
+            shift: 5,
+            shadeClose: true,
+            content: "<div style='margin:15px;'><table class='table table-hover table-bordered'>                        <tr><th>"+lan.bt.php_pool+"</th><td>" + b.pool + "</td></tr>                        <tr><th>"+lan.bt.php_manager+"</th><td>" + ((b["process manager"] == "dynamic") ? lan.bt.dynamic : lan.bt.static) + "</td></tr>                     <tr><th>"+lan.bt.php_start+"</th><td>" + b["start time"] + "</td></tr>                      <tr><th>"+lan.bt.php_accepted+"</th><td>" + b["accepted conn"] + "</td></tr>                        <tr><th>"+lan.bt.php_queue+"</th><td>" + b["listen queue"] + "</td></tr>                        <tr><th>"+lan.bt.php_max_queue+"</th><td>" + b["max listen queue"] + "</td></tr>                        <tr><th>"+lan.bt.php_len_queue+"</th><td>" + b["listen queue len"] + "</td></tr>                        <tr><th>"+lan.bt.php_idle+"</th><td>" + b["idle processes"] + "</td></tr>                       <tr><th>"+lan.bt.php_active+"</th><td>" + b["active processes"] + "</td></tr>                       <tr><th>"+lan.bt.php_total+"</th><td>" + b["total processes"] + "</td></tr>                     <tr><th>"+lan.bt.php_max_active+"</th><td>" + b["max active processes"] + "</td></tr>                       <tr><th>"+lan.bt.php_max_children+"</th><td>" + b["max children reached"] + "</td></tr>                     <tr><th>"+lan.bt.php_slow+"</th><td>" + b["slow requests"] + "</td></tr>                     </table></div>"
+        })
+    })
+}

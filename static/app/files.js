@@ -1,5 +1,7 @@
+console.log(lan);
+
 //判断磁盘数量超出宽度
-function IsDiskWidth(){
+function isDiskWidth(){
 	var comlistWidth = $("#comlist").width();
 	var bodyWidth = $(".file-box").width();
 	if(comlistWidth + 530 > bodyWidth){
@@ -11,7 +13,7 @@ function IsDiskWidth(){
 }
 
 //打开回收站
-function Recycle_bin(type){
+function recycle_bin(type){
 	$.post('/files?action=Get_Recycle_bin','',function(rdata){
 		var body = ''
 		switch(type){
@@ -249,7 +251,7 @@ function getFileName(name){
 	return text;
 }
 //判断图片文件
-function ReisImage(fileName){
+function reisImage(fileName){
 	var exts = ['jpg','jpeg','png','bmp','gif','tiff','ico'];
 	for(var i=0; i<exts.length; i++){
 		if(fileName == exts[i]) return true
@@ -258,7 +260,7 @@ function ReisImage(fileName){
 }
 
 //从回收站恢复文件
-function ReRecycleBin(path,obj){
+function reRecycleBin(path,obj){
 	layer.confirm(lan.files.recycle_bin_re_msg,{title:lan.files.recycle_bin_re_title,closeBtn:2,icon:3},function(){
 		var loadT = layer.msg(lan.files.recycle_bin_re_the,{icon:16,time:0,shade: [0.3, '#000']});
 		$.post('/files?action=Re_Recycle_bin','path='+encodeURIComponent(path),function(rdata){
@@ -270,7 +272,7 @@ function ReRecycleBin(path,obj){
 }
 
 //从回收站删除
-function DelRecycleBin(path,obj){
+function delRecycleBin(path,obj){
 	layer.confirm(lan.files.recycle_bin_del_msg,{title:lan.files.recycle_bin_del_title,closeBtn:2,icon:3},function(){
 		var loadT = layer.msg(lan.files.recycle_bin_del_the,{icon:16,time:0,shade: [0.3, '#000']});
 		$.post('/files?action=Del_Recycle_bin','path='+encodeURIComponent(path),function(rdata){
@@ -313,7 +315,7 @@ function Set_Recycle_bin(db){
 
 
 //取数据
-function GetFiles(Path) {
+function getFiles(Path) {
 	var searchtype = Path;
 	if(isNaN(Path)){
 		var p = '1';
@@ -334,7 +336,7 @@ function GetFiles(Path) {
 	var data = 'path=' + Path;
 	var loadT = layer.load();
 	var totalSize = 0;
-	$.post('/files/get_dir?tojs=GetFiles&p=' + p + '&showRow=' + showRow + search, data, function(rdata) {
+	$.post('/files/get_dir?tojs=getFiles&p=' + p + '&showRow=' + showRow + search, data, function(rdata) {
 		layer.close(loadT);
 		
 		var rows = ['100','200','500','1000','2000'];
@@ -367,7 +369,7 @@ function GetFiles(Path) {
 					$("#set_icon").removeClass("active");
 					Body += "<tr class='folderBoxTr' data-path='" + rdata.PATH + "/" + fmp[0] + "' filetype='dir'>\
 						<td><input type='checkbox' name='id' value='"+fmp[0]+"'></td>\
-						<td class='column-name'><span class='cursor' onclick=\"GetFiles('" + rdata.PATH + "/" + fmp[0] + "')\"><span class='ico ico-folder'></span><a class='text' title='" + fmp[0] + fmp[5] + "'>" + cnametext + "</a></span></td>\
+						<td class='column-name'><span class='cursor' onclick=\"getFiles('" + rdata.PATH + "/" + fmp[0] + "')\"><span class='ico ico-folder'></span><a class='text' title='" + fmp[0] + fmp[5] + "'>" + cnametext + "</a></span></td>\
 						<td>"+toSize(fmp[1])+"</td>\
 						<td>"+getLocalTime(fmp[2])+"</td>\
 						<td>"+fmp[3]+"</td>\
@@ -386,8 +388,8 @@ function GetFiles(Path) {
 				$("#set_list").removeClass("active");
 				Body += "<div class='file folderBox menufolder' data-path='" + rdata.PATH + "/" + fmp[0] + "' filetype='dir' title='"+lan.files.file_name+"：" + fmp[0]+"&#13;"+lan.files.file_size+"：" + toSize(fmp[1])+"&#13;"+lan.files.file_etime+"："+getLocalTime(fmp[2])+"&#13;"+lan.files.file_auth+"："+fmp[3]+"&#13;"+lan.files.file_own+"："+fmp[4]+"'>\
 						<input type='checkbox' name='id' value='"+fmp[0]+"'>\
-						<div class='ico ico-folder' ondblclick=\"GetFiles('" + rdata.PATH + "/" + fmp[0] + "')\"></div>\
-						<div class='titleBox' onclick=\"GetFiles('" + rdata.PATH + "/" + fmp[0] + "')\"><span class='tname'>" + fmp[0] + "</span></div>\
+						<div class='ico ico-folder' ondblclick=\"getFiles('" + rdata.PATH + "/" + fmp[0] + "')\"></div>\
+						<div class='titleBox' onclick=\"getFiles('" + rdata.PATH + "/" + fmp[0] + "')\"><span class='tname'>" + fmp[0] + "</span></div>\
 						</div>";
 			}
 		}
@@ -411,12 +413,12 @@ function GetFiles(Path) {
 				bodyZip = "<a class='btlink' href='javascript:;' onclick=\"UnZip('" + rdata.PATH +"/" +fmp[0] + "'," + displayZip + ")\">"+lan.files.file_menu_unzip+"</a> | ";
 			}
 			if(isText(fmp[0])){
-				bodyZip = "<a class='btlink' href='javascript:;' onclick=\"OnlineEditFile(0,'" + rdata.PATH +"/"+ fmp[0] + "')\">"+lan.files.file_menu_edit+"</a> | ";
+				bodyZip = "<a class='btlink' href='javascript:;' onclick=\"onlineEditFile(0,'" + rdata.PATH +"/"+ fmp[0] + "')\">编辑</a> | ";
 			}
 			if(isImage(fmp[0])){
-				download = "<a class='btlink' href='javascript:;' onclick=\"GetImage('" + rdata.PATH +"/"+ fmp[0] + "')\">"+lan.files.file_menu_img+"</a> | ";
+				download = "<a class='btlink' href='javascript:;' onclick=\"getImage('" + rdata.PATH +"/"+ fmp[0] + "')\">预览</a> | ";
 			}else{
-				download = "<a class='btlink' href='javascript:;' onclick=\"GetFileBytes('" + rdata.PATH +"/"+ fmp[0] + "',"+fmp[1]+")\">"+lan.files.file_menu_down+"</a> | ";
+				download = "<a class='btlink' href='javascript:;' onclick=\"getFileBytes('" + rdata.PATH +"/"+ fmp[0] + "',"+fmp[1]+")\">下载</a> | ";
 			}
 			
 			totalSize +=  parseInt(fmp[1]);
@@ -483,7 +485,7 @@ function GetFiles(Path) {
 			BarTools += ' <button onclick="javascript:BackDir();" class="btn btn-default btn-sm glyphicon glyphicon-arrow-left" title="'+lan.files.return+'"></button>';
 		}
 		setCookie('Path',rdata.PATH);
-		BarTools += ' <button onclick="javascript:GetFiles(\'' + rdata.PATH + '\');" class="btn btn-default btn-sm glyphicon glyphicon-refresh" title="'+lan.public.fresh+'"></button> <button onclick="ExecShell()" title="'+lan.files.shell+'" type="button" class="btn btn-default btn-sm"><em class="ico-cmd"></em></button>';
+		BarTools += ' <button onclick="javascript:getFiles(\'' + rdata.PATH + '\');" class="btn btn-default btn-sm glyphicon glyphicon-refresh" title="'+lan.public.fresh+'"></button> <button onclick="ExecShell()" title="'+lan.files.shell+'" type="button" class="btn btn-default btn-sm"><em class="ico-cmd"></em></button>';
 		var copyName = getCookie('copyFileName');
 		var cutName = getCookie('cutFileName');
 		var isPaste = (copyName == 'null') ? cutName : copyName;
@@ -565,7 +567,7 @@ function GetFiles(Path) {
 		//每页行数
 		$(".showRow").change(function(){
 			setCookie('showRow',$(this).val());
-			GetFiles(p);
+			getFiles(p);
 		});
 		PathPlaceBtn(rdata.PATH);
 	},'json');
@@ -622,10 +624,10 @@ function showSeclect(){
 	var BatchTools = '';
 	if(count > 1){
 		BatchTools = '<button onclick="javascript:Batch(1);" class="btn btn-default btn-sm">'+lan.files.file_menu_copy+'</button>\
-						  <button onclick="javascript:Batch(2);" class="btn btn-default btn-sm">'+lan.files.file_menu_mv+'</button>\
-						  <button onclick="javascript:Batch(3);" class="btn btn-default btn-sm">'+lan.files.file_menu_auth+'</button>\
-						  <button onclick="javascript:Batch(5);" class="btn btn-default btn-sm">'+lan.files.file_menu_zip+'</button>\
-						  <button onclick="javascript:Batch(4);" class="btn btn-default btn-sm">'+lan.files.file_menu_del+'</button>'
+		  <button onclick="javascript:Batch(2);" class="btn btn-default btn-sm">'+lan.files.file_menu_mv+'</button>\
+		  <button onclick="javascript:Batch(3);" class="btn btn-default btn-sm">'+lan.files.file_menu_auth+'</button>\
+		  <button onclick="javascript:Batch(5);" class="btn btn-default btn-sm">'+lan.files.file_menu_zip+'</button>\
+		  <button onclick="javascript:Batch(4);" class="btn btn-default btn-sm">'+lan.files.file_menu_del+'</button>'
 		$("#Batch").html(BatchTools);
 	}else{
 		$("#Batch").html(BatchTools);
@@ -709,7 +711,7 @@ function Batch(type,access){
 	setTimeout(function(){getSpeed('.myspeed');},1000);
 	$.post('files?action=SetBatchData',data,function(rdata){
 		layer.close(myloadT);
-		GetFiles(path);
+		getFiles(path);
 		layer.msg(rdata.msg,{icon:1});
 	});
 }
@@ -745,7 +747,7 @@ function BatchPasteTo(data,path){
 	$.post('files?action=BatchPaste',data,function(rdata){
 		layer.close(myloadT);
 		setCookie('BatchSelected', null);
-		GetFiles(path);
+		getFiles(path);
 		layer.msg(rdata.msg,{icon:1});
 	});
 }
@@ -779,15 +781,15 @@ function GetFileName(fileNameFull) {
 	return pName[pName.length - 1];
 }
 //取磁盘
-function GetDisk() {
+function getDisk() {
 	var LBody = '';
 	$.get('/system/disk_info', function(rdata) {
 		for (var i = 0; i < rdata.length; i++) {
-			LBody += "<span onclick=\"GetFiles('" + rdata[i].path + "')\"><span class='glyphicon glyphicon-hdd'></span>&nbsp;" + (rdata[i].path=='/'?lan.files.path_root:rdata[i].path) + "(" + rdata[i].size[2] + ")</span>";
+			LBody += "<span onclick=\"getFiles('" + rdata[i].path + "')\"><span class='glyphicon glyphicon-hdd'></span>&nbsp;" + (rdata[i].path=='/'?lan.files.path_root:rdata[i].path) + "(" + rdata[i].size[2] + ")</span>";
 		}
 		var trash = '<span id="recycle_bin" onclick="Recycle_bin(\'open\')" title="'+lan.files.recycle_bin_title+'" style="position: absolute; border-color: #ccc; right: 77px;"><span class="glyphicon glyphicon-trash"></span>&nbsp;'+lan.files.recycle_bin_title+'</span>';
 		$("#comlist").html(LBody+trash);
-		IsDiskWidth();
+		isDiskWidth();
 	},'json');
 }
 
@@ -807,10 +809,10 @@ function BackDir() {
 		if(back.substr(back.length-1,1) == '/'){
 			back = back.substr(0,back.length-1);
 		}
-		GetFiles(back);
+		getFiles(back);
 	} else {
 		back += Path[0];
-		GetFiles(back);
+		getFiles(back);
 	}
 	setTimeout('PathPlaceBtn(getCookie("Path"));',200);
 }
@@ -828,8 +830,8 @@ function CreateFile(type, path) {
 				icon: rdata.status ? 1 : 2
 			});
 			if(rdata.status){
-				GetFiles($("#DirPathPlace input").val());
-				OnlineEditFile(0,path + '/' + fileName);
+				getFiles($("#DirPathPlace input").val());
+				onlineEditFile(0,path + '/' + fileName);
 			}
 		});
 		return;
@@ -867,7 +869,7 @@ function CreateDir(type, path) {
 			layer.msg(rdata.msg, {
 				icon: rdata.status ? 1 : 2
 			});
-			GetFiles($("#DirPathPlace input").val());
+			getFiles($("#DirPathPlace input").val());
 		});
 		return;
 	}
@@ -901,7 +903,7 @@ function DeleteFile(fileName){
 			layer.msg(rdata.msg, {
 				icon: rdata.status ? 1 : 2
 			});
-			GetFiles($("#DirPathPlace input").val());
+			getFiles($("#DirPathPlace input").val());
 		});
 	});
 }
@@ -915,7 +917,7 @@ function DeleteDir(dirName){
 			layer.msg(rdata.msg, {
 				icon: rdata.status ? 1 : 2
 			});
-			GetFiles($("#DirPathPlace input").val());
+			getFiles($("#DirPathPlace input").val());
 		});
 	});
 }
@@ -926,7 +928,7 @@ function AllDeleteFileSub(data,path){
 		setTimeout(function(){getSpeed('.myspeed');},1000);
 		$.post('files?action=SetBatchData',data,function(rdata){
 			layer.closeAll();
-			GetFiles(path);
+			getFiles(path);
 			layer.msg(rdata.msg,{icon:1});
 		});
 	});
@@ -936,7 +938,7 @@ function AllDeleteFileSub(data,path){
 function ReloadFiles(){
 	setInterval(function(){
 		var path = $("#DirPathPlace input").val();
-		GetFiles(path);
+		getFiles(path);
 	},3000);
 }
 			
@@ -952,7 +954,7 @@ function DownloadFile(action){
 		layer.msg(lan.files.down_task,{time:0,icon:16,shade: [0.3, '#000']});
 		$.post('/files?action=DownloadFile','path='+fpath+'&url='+fUrl+'&filename='+fname,function(rdata){
 			layer.closeAll();
-			GetFiles(fpath);
+			getFiles(fpath);
 			GetTaskCount();
 			layer.msg(rdata.msg,{icon:rdata.status?1:2});
 		});
@@ -1060,7 +1062,7 @@ function ReName(type, fileName) {
 			layer.msg(rdata.msg, {
 				icon: rdata.status ? 1 : 2
 			});
-			GetFiles(path);
+			getFiles(path);
 		});
 		return;
 	}
@@ -1093,7 +1095,7 @@ function CutFile(fileName) {
 		icon: 1,
 		time: 1
 	});
-	GetFiles(path);
+	getFiles(path);
 }
 //复制
 function CopyFile(fileName) {
@@ -1104,7 +1106,7 @@ function CopyFile(fileName) {
 		icon: 1,
 		time: 1
 	});
-	GetFiles(path);
+	getFiles(path);
 }
 //粘贴
 function PasteFile(fileName) {
@@ -1144,7 +1146,7 @@ function PasteTo(path,copyName,cutName,fileName){
 			layer.msg(rdata.msg, {
 				icon: rdata.status ? 1 : 2
 			});
-			GetFiles(path);
+			getFiles(path);
 		});
 		setCookie('copyFileName', null);
 		setCookie('cutFileName', null);
@@ -1161,7 +1163,7 @@ function PasteTo(path,copyName,cutName,fileName){
 			layer.msg(rdata.msg, {
 				icon: rdata.status ? 1 : 2
 			});
-			GetFiles(path);
+			getFiles(path);
 		});
 		setCookie('copyFileName', null);
 		setCookie('cutFileName', null);
@@ -1187,12 +1189,12 @@ function Zip(dirName,submits) {
 			layer.closeAll();
 			if(rdata == null || rdata == undefined){
 				layer.msg(lan.files.zip_ok,{icon:1});
-				GetFiles(path)
+				getFiles(path)
 				ReloadFiles();
 				return;
 			}
 			layer.msg(rdata.msg, {icon: rdata.status ? 1 : 2});
-			if(rdata.status) GetFiles(path);
+			if(rdata.status) getFiles(path);
 		});
 		return
 	}
@@ -1249,7 +1251,7 @@ function UnZip(fileName,type) {
 		$.post('/files?action=UnZip', 'sfile=' + sfile + '&dfile=' + dfile +'&type=' + type + '&coding=' + coding + '&password=' + password, function(rdata) {
 			layer.closeAll();
 			layer.msg(rdata.msg, {icon: rdata.status ? 1 : 2});
-			GetFiles(path);
+			getFiles(path);
 		});
 		return
 	}
@@ -1315,8 +1317,8 @@ function isExts(fileName,exts){
 }
 
 //图片预览
-function GetImage(fileName){
-	var imgUrl = '/download?filename='+fileName;
+function getImage(fileName){
+	var imgUrl = '/files/download?filename='+fileName;
 	layer.open({
 		type:1,
 		closeBtn: 2,
@@ -1329,8 +1331,8 @@ function GetImage(fileName){
 }
 
 //获取文件数据
-function GetFileBytes(fileName, fileSize){
-	window.open('/download?filename='+encodeURIComponent(fileName));
+function getFileBytes(fileName, fileSize){
+	window.open('/files/download?filename='+encodeURIComponent(fileName));
 }
 
 
@@ -1374,7 +1376,7 @@ function SetChmod(action,fileName){
 			if(rdata.status) layer.closeAll();
 			layer.msg(rdata.msg,{icon:rdata.status?1:2});
 			var path = $("#DirPathPlace input").val();
-			GetFiles(path)
+			getFiles(path)
 		});
 		return;
 	}
@@ -1500,7 +1502,7 @@ function RClick(type,path,name){
 		options.items.push({text: lan.files.file_menu_del, onclick: function() {DeleteDir(path)}});
 	}
 	else if(isText(type)){
-		options.items.push({text: lan.files.file_menu_edit, onclick: function() {OnlineEditFile(0,path)}},{text: lan.files.file_menu_down, onclick: function() {GetFileBytes(path)}},{text: lan.files.file_menu_del, onclick: function() {DeleteFile(path)}});
+		options.items.push({text: lan.files.file_menu_edit, onclick: function() {onlineEditFile(0,path)}},{text: lan.files.file_menu_down, onclick: function() {GetFileBytes(path)}},{text: lan.files.file_menu_del, onclick: function() {DeleteFile(path)}});
 	}
 	else if(displayZip != -1){
 		options.items.push({text: lan.files.file_menu_unzip, onclick: function() {UnZip(path,displayZip)}},{text: lan.files.file_menu_down, onclick: function() {GetFileBytes(path)}},{text: lan.files.file_menu_del, onclick: function() {DeleteFile(path)}});
@@ -1544,7 +1546,7 @@ $("body").not(".def-log").click(function(){
 //指定路径
 $("#DirPathPlace input").keyup(function(e){
 	if(e.keyCode == 13) {
-		GetFiles($(this).val());
+		getFiles($(this).val());
 	}
 });
 function PathPlaceBtn(path){
@@ -1571,7 +1573,7 @@ function PathPlaceBtn(path){
 				Gopath = Gopath.substr(0,Gopath.length-1);
 			}
 		}
-		GetFiles(Gopath);
+		getFiles(Gopath);
 		e.stopPropagation();
 	});
 	PathLeft();

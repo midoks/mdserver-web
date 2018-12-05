@@ -1,4 +1,6 @@
-{% extends "default/layout.html" %} {% block content %}
+{% extends "default/layout.html" %}
+
+{% block content %}
 <div class="main-content">
     <div class="container-fluid" style="padding-bottom:50px">
         <div class="file-box bgw mtb15" style="position:relative; padding-top:110px">
@@ -54,15 +56,15 @@
 </ul>
 <script src="/static/js/jquery-ui.min.js?v={{config.version}}"></script>
 <script src="/static/js/jquery.contextify.min.js?v={{config.version}}"></script>
-<script src="/static/js/files.js?v={{config.version}}"></script>
-<script src="/static/js/upload.js?v={{config.version}}"></script>
+<script src="/static/app/files.js?v={{config.version}}"></script>
+<script src="/static/app/upload.js?v={{config.version}}"></script>
 <script type="text/javascript">
 setTimeout(function() {
-    GetDisk();
+    getDisk();
 }, 500);
 var xPath = getCookie('Path');
 setTimeout(function() {
-    GetFiles((xPath != undefined ? xPath : '/www/wwwroot'));
+    getFiles((xPath != undefined ? xPath : '/www/wwwroot'));
 }, 800);
 
 PathPlaceBtn((xPath != undefined ? xPath : '/www/wwwroot'));
@@ -74,16 +76,16 @@ $("#set_icon").click(function() {
     setCookie('rank', 'b');
     $(this).addClass("active");
     $("#set_list").removeClass("active");
-    GetFiles(getCookie('Path'));
+    getFiles(getCookie('Path'));
 });
 $("#set_list").click(function() {
     setCookie('rank', 'a');
     $(this).addClass("active");
     $("#set_icon").removeClass("active");
-    GetFiles(getCookie('Path'));
+    getFiles(getCookie('Path'));
 })
 $(".refreshBtn").click(function() {
-    GetFiles(getCookie('Path'));
+    getFiles(getCookie('Path'));
 })
 </script>
 {% endblock %}

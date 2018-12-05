@@ -366,7 +366,7 @@ function openPath(a) {
 }
 
 
-function OnlineEditFile(k, f) {
+function onlineEditFile(k, f) {
 	if(k != 0) {
 		var l = $("#PathPlace input").val();
 		var h = encodeURIComponent($("#textBody").val());
@@ -375,14 +375,14 @@ function OnlineEditFile(k, f) {
 			icon: 16,
 			time: 0
 		});
-		$.post("/files?action=SaveFileBody", "data=" + h + "&path=" + encodeURIComponent(f) + "&encoding=" + a, function(m) {
+		$.post("/files/save_body", "data=" + h + "&path=" + encodeURIComponent(f) + "&encoding=" + a, function(m) {
 			if(k == 1) {
 				layer.close(loadT);
 			}
 			layer.msg(m.msg, {
 				icon: m.status ? 1 : 2
 			});
-		});
+		},'json');
 		return
 	}
 	var e = layer.msg(lan.bt.read_file, {
@@ -456,7 +456,7 @@ function OnlineEditFile(k, f) {
 			};
 			d = j
 	}
-	$.post("/files?action=GetFileBody", "path=" + encodeURIComponent(f), function(s) {
+	$.post("/files/get_body", "path=" + encodeURIComponent(f), function(s) {
 		if(s.status === false){
 			layer.msg(s.msg,{icon:5});
 			return;
@@ -478,7 +478,7 @@ function OnlineEditFile(k, f) {
 			title: lan.bt.edit_title+"[" + f + "]",
 			content: '<form class="bt-form pd20 pb70"><div class="line"><p style="color:red;margin-bottom:10px">'+lan.bt.edit_ps+'			<select class="bt-input-text" name="encoding" style="width: 74px;position: absolute;top: 31px;right: 19px;height: 22px;z-index: 9999;border-radius: 0;">' + n + '</select></p><textarea class="mCustomScrollbar bt-input-text" id="textBody" style="width:100%;margin:0 auto;line-height: 1.8;position: relative;top: 10px;" value="" />			</div>			<div class="bt-form-submit-btn" style="position:absolute; bottom:0; width:100%">			<button type="button" class="btn btn-danger btn-sm btn-editor-close">'+lan.public.close+'</button>			<button id="OnlineEditFileBtn" type="button" class="btn btn-success btn-sm">'+lan.public.save+'</button>			</div>			</form>'
 		});
-		$("#textBody").text(s.data);
+		$("#textBody").text(s.data.data);
 		var q = $(window).height() * 0.9;
 		$("#textBody").height(q - 160);
 		var t = CodeMirror.fromTextArea(document.getElementById("textBody"), {
@@ -487,7 +487,7 @@ function OnlineEditFile(k, f) {
 				"Ctrl-H": "replaceAll",
 				"Ctrl-S": function() {
 					$("#textBody").text(t.getValue());
-					OnlineEditFile(2, f)
+					onlineEditFile(2, f)
 				}
 			},
 			mode: d,
@@ -500,46 +500,12 @@ function OnlineEditFile(k, f) {
 		t.setSize("auto", q - 150);
 		$("#OnlineEditFileBtn").click(function() {
 			$("#textBody").text(t.getValue());
-			OnlineEditFile(1, f);
+			onlineEditFile(1, f);
 		});
 		$(".btn-editor-close").click(function() {
 			layer.close(r);
 		});
-	});
-}
-
-function GetPHPStatus(a) {
-	if(a == "52") {
-		layer.msg(lan.bt.php_status_err, {
-			icon: 2
-		});
-		return
-	}
-	$.post("/ajax?action=GetPHPStatus", "version=" + a, function(b) {
-		layer.open({
-			type: 1,
-			area: "400",
-			title: lan.bt.php_status_title,
-			closeBtn: 2,
-			shift: 5,
-			shadeClose: true,
-			content: "<div style='margin:15px;'><table class='table table-hover table-bordered'>						<tr><th>"+lan.bt.php_pool+"</th><td>" + b.pool + "</td></tr>						<tr><th>"+lan.bt.php_manager+"</th><td>" + ((b["process manager"] == "dynamic") ? lan.bt.dynamic : lan.bt.static) + "</td></tr>						<tr><th>"+lan.bt.php_start+"</th><td>" + b["start time"] + "</td></tr>						<tr><th>"+lan.bt.php_accepted+"</th><td>" + b["accepted conn"] + "</td></tr>						<tr><th>"+lan.bt.php_queue+"</th><td>" + b["listen queue"] + "</td></tr>						<tr><th>"+lan.bt.php_max_queue+"</th><td>" + b["max listen queue"] + "</td></tr>						<tr><th>"+lan.bt.php_len_queue+"</th><td>" + b["listen queue len"] + "</td></tr>						<tr><th>"+lan.bt.php_idle+"</th><td>" + b["idle processes"] + "</td></tr>						<tr><th>"+lan.bt.php_active+"</th><td>" + b["active processes"] + "</td></tr>						<tr><th>"+lan.bt.php_total+"</th><td>" + b["total processes"] + "</td></tr>						<tr><th>"+lan.bt.php_max_active+"</th><td>" + b["max active processes"] + "</td></tr>						<tr><th>"+lan.bt.php_max_children+"</th><td>" + b["max children reached"] + "</td></tr>						<tr><th>"+lan.bt.php_slow+"</th><td>" + b["slow requests"] + "</td></tr>					 </table></div>"
-		})
-	})
-}
-
-function GetNginxStatus() {
-	$.post("/ajax?action=GetNginxStatus", "", function(a) {
-		layer.open({
-			type: 1,
-			area: "400",
-			title: lan.bt.nginx_title,
-			closeBtn: 2,
-			shift: 5,
-			shadeClose: true,
-			content: "<div style='margin:15px;'><table class='table table-hover table-bordered'>						<tr><th>"+lan.bt.nginx_active+"</th><td>" + a.active + "</td></tr>						<tr><th>"+lan.bt.nginx_accepts+"</th><td>" + a.accepts + "</td></tr>						<tr><th>"+lan.bt.nginx_handled+"</th><td>" + a.handled + "</td></tr>						<tr><th>"+lan.bt.nginx_requests+"</th><td>" + a.requests + "</td></tr>						<tr><th>"+lan.bt.nginx_reading+"</th><td>" + a.Reading + "</td></tr>						<tr><th>"+lan.bt.nginx_writing+"</th><td>" + a.Writing + "</td></tr>						<tr><th>"+lan.bt.nginx_waiting+"</th><td>" + a.Waiting + "</td></tr>					 </table></div>"
-		})
-	})
+	},'json');
 }
 
 function divcenter() {
