@@ -14,8 +14,8 @@ mkdir -p /www/backup/database
 mkdir -p /www/backup/site
 
 
-yum provides '*/applydeltarpm'
-yum install deltarpm
+yum -y provides '*/applydeltarpm'
+yum -y install deltarpm
 
 yum install -y wget curl unzip zip
 

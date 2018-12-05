@@ -25,6 +25,15 @@ Install_csvn()
 	cd $serverPath/source && tar -Jxf $serverPath/source/csvn.tar.xz
 	mv $serverPath/source/csvn $serverPath/csvn
 	echo '5.1' > $serverPath/csvn/version.pl
+
+
+	if id -u csvn > /dev/null 2>&1; then
+        echo "csvn user exists"
+	else
+		useradd csvn
+		cp /etc/sudoers{,.`date +"%Y-%m-%d_%H-%M-%S"`}
+		echo "csvn ALL=(ALL)      ALL" >> /etc/sudoers
+	fi
 	
 	echo '安装完成' > $install_tmp
 }
