@@ -306,16 +306,7 @@ function toIndexDisplay(name, version, coexist) {
         if (rdata.status) {
             layer.msg(rdata.msg, { icon: 1 })
         }
-    })
-}
-
-//刷新缓存
-function flush_cache() {
-    var loadT = layer.msg(lan.soft.get_list, { icon: 16, time: 0, shade: [0.3, '#000'] })
-    $.post('/plugins?action=flush_cache', {}, function(rdata) {
-        layer.close(loadT)
-        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
-    });
+    },'json');
 }
 
 function indexListHtml(callback){
@@ -380,7 +371,6 @@ function indexListHtml(callback){
         if (typeof callback=='function'){
             callback();
         }
-
     },'json');
 }
 
