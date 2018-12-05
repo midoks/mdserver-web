@@ -12,7 +12,7 @@ function getWeb(page, search) {
 	}else{
 		order = '';
 	}
-	var sUrl = '/site/list'
+	var sUrl = '/site/list';
 	var pdata = 'tojs=getWeb&table=sites&limit=15&p=' + page + '&search=' + search + order;
 	var loadT = layer.load();
 	//取回数据
@@ -117,7 +117,7 @@ function getWeb(page, search) {
 			$(this).hide().after("<input class='baktext' type='text' data-id='"+dataid+"' name='bak' value='" + databak + "' placeholder='"+lan.site.site_bak+"' onblur='GetBakPost(\"sites\")' />");
 			$(".baktext").focus();
 		});
-	});
+	},'json');
 }
 
 
@@ -1005,7 +1005,7 @@ function goSet(num) {
 
 
 //设置默认文档
-function SetIndex(id){
+function setIndex(id){
 	var quanju = (id==undefined)?lan.site.public_set:lan.site.local_site;
 	var data=id==undefined?"":"id="+id;
 	$.post('/site?action=GetIndex',data,function(rdata){
@@ -2444,7 +2444,7 @@ function SetRewriteTel(act){
 	});
 }
 //修改默认页
-function SiteDefaultPage(){
+function siteDefaultPage(){
 	stype = getCookie('serverType');
 	layer.open({
 		type: 1,
@@ -2460,6 +2460,7 @@ function SiteDefaultPage(){
 				</div>'
 	});
 }
+
 function changeDefault(type){
 	var vhref='';
 	switch(type){
@@ -2479,5 +2480,5 @@ function changeDefault(type){
 			vhref = '/www/server/stop/index.html';
 			break;
 	}
-	OnlineEditFile(0,vhref);
+	onlineEditFile(0,vhref);
 }
