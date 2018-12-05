@@ -87,7 +87,6 @@ class plugin_api:
 
     def getVersion(self, path):
         version_f = path + '/version.pl'
-        print version_f
         if os.path.exists(version_f):
             return public.readFile(version_f).strip()
         return ''

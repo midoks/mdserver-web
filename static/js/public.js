@@ -875,7 +875,7 @@ function setSelectChecked(c, d) {
 		}
 	}
 }
-GetTaskCount();
+getTaskCount();
 function RecInstall() {
 	$.post("/ajax?action=GetSoftList", "", function(l){
 		var c = "";
