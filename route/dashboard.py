@@ -28,8 +28,8 @@ def test():
 
 @dashboard.route("/")
 def index():
-    if session.has_key('code'):
-        print session['code']
+    # if session.has_key('code'):
+    #     print session['code']
     return render_template('default/index.html')
 
 
