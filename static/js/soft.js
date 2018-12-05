@@ -148,7 +148,7 @@ function getSList(isdisplay) {
 
                     var mupdate = '';//(plugin.versions[n] == plugin.updates[n]) '' : '<a class="btlink" onclick="SoftUpdate(\'' + plugin.name + '\',\'' + plugin.versions[n].version + '\',\'' + plugin.updates[n] + '\')">更新</a> | ';
                     // if (plugin.versions[n] == '') mupdate = '';
-                    handle = mupdate + '<a class="btlink" onclick="softMain(\'' + plugin.name + '\',\'' + version_info + '\')">安装</a> | <a class="btlink" onclick="uninstallVersion(\'' + plugin.name + '\',\'' + plugin_title + '\',\'' + plugin.title + '\')">卸载</a>';
+                    handle = mupdate + '<a class="btlink" onclick="softMain(\'' + plugin.name + '\',\'' + version_info + '\')">安装</a> | <a class="btlink" onclick="uninstallVersion(\'' + plugin.name + '\',\'' + plugin.setup_version + '\',\'' + plugin.title + '\')">卸载</a>';
                     titleClick = 'onclick="softMain(\'' + plugin.name + '\',\'' + version_info + '\')" style="cursor:pointer"';
                 // }
 
@@ -287,7 +287,7 @@ function uninstallVersion(name, version, title) {
             layer.close(loadT)
             getSList();
             layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
-        })
+        },'json');
     });
 }
 
