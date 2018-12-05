@@ -2,9 +2,10 @@
 	<div class="bt-w-main">
 		<div class="bt-w-menu">
 			<p class="bgw" onclick="infojson();">INFO说明</p>
+			<p class="bgw" onclick="indexPy();">index.py说明</p>
 		</div>
 		<div class="bt-w-con pd15">
-			<div class="soft-man-con">
+			<div class="soft-man-con v1">
 				<div><p>在每一个插件中,都必须包含一个info.json文件,格式如下:</p><br/></div>
 <div><pre>{
 "title": "插件开发说明",
@@ -21,16 +22,23 @@
 "date": "2018-11-30",
 "pid": "5"
 }</pre></div>
+			</div>
 			
-
-
-
+			<div class="soft-man-con v2">
+				<div><p>在每一个插件中,都必须包含一个index.py文件</p><br/></div>
 			</div>
 		</div>
 	</div>
 
 </div>
 <script type="text/javascript">
-// resetPluginWinWidth(700);
-// $.getScript("/plugins/file?name=readme&f=js/score.js");
+function infojson() {
+	$('.bt-w-main .soft-man-con').hide();
+	$('.bt-w-main .v1').show();
+}
+
+function indexPy() {
+	$('.bt-w-main .soft-man-con').hide();
+	$('.bt-w-main .v2').show();
+}
 </script>

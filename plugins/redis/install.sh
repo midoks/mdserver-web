@@ -16,23 +16,23 @@ Install_redis()
 
 	echo '正在安装脚本文件...' > $install_tmp
 
-	wget -O $serverPath/tmp/redis.tar.gz http://download.redis.io/releases/redis-4.0.11.tar.gz
-	cd $serverPath/tmp && tar -zxvf redis.tar.gz
+	wget -O $serverPath/source/redis.tar.gz http://download.redis.io/releases/redis-4.0.11.tar.gz
+	cd $serverPath/source && tar -zxvf redis.tar.gz
 
 	mkdir -p $serverPath/redis
 	cd redis* && make PREFIX=$serverPath/redis install
 	sed '/^ *#/d' redis.conf > $serverPath/redis/redis.conf
 
-	echo '安装完成' > $install_tmp
+	echo '4.0' > serverPath/redis/version.pl
 
-	rm -rf $serverPath/tmp
+	echo '安装完成' > $install_tmp
 }
 
 Uninstall_redis()
 {
-	echo "Uninstall_redis"
+	rm -rf $serverPath/redis
+	echo "Uninstall_redis" > $install_tmp
 }
-
 
 action=$1
 if [ "${1}" == 'install' ];then

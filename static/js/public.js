@@ -860,7 +860,7 @@ function GetTaskList(a) {
 	})
 }
 
-function GetTaskCount() {
+function getTaskCount() {
 	$.get("/task/count", "", function(a) {
 		$(".task").text(a)
 	})

@@ -246,7 +246,11 @@ function addWafKey(name) {
 
 
 //查看Nginx负载状态
-function GetNginxStatus() {
+function getStatus() {
+
+    $.post('/plugins/run', {name:'openresty', func:'run_status'}, function(data) {
+        console.log(data);
+    },'json');
     $.post('/ajax?action=GetNginxStatus', '', function(rdata) {
         var con = "<div><table class='table table-hover table-bordered'>\
 						<tr><th>" + lan.bt.nginx_active + "</th><td>" + rdata.active + "</td></tr>\
@@ -258,5 +262,73 @@ function GetNginxStatus() {
 						<tr><th>" + lan.bt.nginx_waiting + "</th><td>" + rdata.Waiting + "</td></tr>\
 					 </table></div>";
         $(".soft-man-con").html(con);
+    },'json');
+}
+
+function openrestyOp(a, b) {
+
+    var c = "name=" + a + "&func=" + b;
+    var d = "";
+
+    switch(b) {
+        case "stop":d = '停止';break;
+        case "start":d = '启动';break;
+        case "restart":d = '重启';break;
+        case "reload":d = '重载';break;
+    }
+    layer.confirm( '您真的要{1}{2}服务吗？'.replace('{1}', d).replace('{2}', a), {icon:3,closeBtn: 2}, function() {
+        var e = layer.msg('正在{1}{2}服务,请稍候...'.replace('{1}', d).replace('{2}', a), {icon: 16,time: 0});
+        $.post("/plugins/run", c, function(g) {
+            layer.close(e);
+            
+            var f = g.data == 'ok' ? '{1}服务已{2}'.replace('{1}', a).replace('{2}', d):'{1}服务{2}失败!'.replace('{1}', a).replace('{2}', d);
+            layer.msg(f, {icon: g.data == 'ok' ? 1 : 2});
+            
+            if(b != "reload" && g.data == 'ok') {
+                if (b == 'start') {
+                    setRedisService('redis', true);
+                } else if (b=='stop'){
+                    setRedisService('redis', false);
+                } else {
+                }
+            }
+            if(g.data != 'ok') {
+                layer.msg(g.data, {icon: 2,time: 0,shade: 0.3,shadeClose: true});
+            }
+        },'json').error(function() {
+            layer.close(e);
+            layer.msg('操作成功!', {icon: 1});
+        });
     })
 }
+
+//服务
+function setOpenrestyService(name, status){
+    var serviceCon ='<p class="status">当前状态：<span>'+(status ? '开启' : '关闭' )+
+        '</span><span style="color: '+
+        (status?'#20a53a;':'red;')+
+        ' margin-left: 3px;" class="glyphicon ' + (status?'glyphicon glyphicon-play':'glyphicon-pause')+'"></span></p><div class="sfm-opt">\
+            <button class="btn btn-default btn-sm" onclick="openrestyOp(\''+name+'\',\''+(status?'stop':'start')+'\')">'+(status?'停止':'启动')+'</button>\
+            <button class="btn btn-default btn-sm" onclick="openrestyOp(\''+name+'\',\'restart\')">重启</button>\
+            <button class="btn btn-default btn-sm" onclick="openrestyOp(\''+name+'\',\'reload\')">重载配置</button>\
+        </div>'; 
+    $(".soft-man-con").html(serviceCon);
+}
+
+//服务
+function openrestyService(){
+
+    $.post('/plugins/run', {name:'openresty', func:'status'}, function(data) {
+        console.log(data);
+        if(!data.status){
+            layer.msg(data.msg,{icon:0,time:3000,shade: [0.3, '#000']});
+            return;
+        }
+        if (data.data == 'start'){
+            setOpenrestyService('openresty', true);
+        } else {
+            setOpenrestyService('openresty', false);
+        }
+    },'json');
+}
+openrestyService();
