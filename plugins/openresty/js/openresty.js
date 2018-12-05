@@ -332,3 +332,69 @@ function openrestyService(){
     },'json');
 }
 openrestyService();
+
+
+
+//配置修改 --- start
+function openrestyConfig(type){
+
+    var con = '<p style="color: #666; margin-bottom: 7px">提示：Ctrl+F 搜索关键字，Ctrl+G 查找下一个，Ctrl+S 保存，Ctrl+Shift+R 查找替换!</p><textarea class="bt-input-text" style="height: 320px; line-height:18px;" id="textBody"></textarea>\
+                    <button id="OnlineEditFileBtn" class="btn btn-success btn-sm" style="margin-top:10px;">保存</button>\
+                    <ul class="help-info-text c7 ptb15">\
+                        <li>此处为redis主配置文件,若您不了解配置规则,请勿随意修改。</li>\
+                    </ul>';
+    $(".soft-man-con").html(con);
+
+    var loadT = layer.msg('配置文件路径获取中...',{icon:16,time:0,shade: [0.3, '#000']});
+    $.post('/plugins/run', {name:'redis', func:'conf'},function (data) {
+        layer.close(loadT);
+
+        var loadT2 = layer.msg('文件内容获取中...',{icon:16,time:0,shade: [0.3, '#000']});
+        var fileName = data.data;
+        $.post('/files/get_body', 'path=' + fileName, function(rdata) {
+            layer.close(loadT2);
+            if (!rdata.status){
+                layer.msg(rdata.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+                return;
+            }
+            $("#textBody").empty().text(rdata.data.data);
+            $(".CodeMirror").remove();
+            var editor = CodeMirror.fromTextArea(document.getElementById("textBody"), {
+                extraKeys: {
+                    "Ctrl-Space": "autocomplete",
+                    "Ctrl-F": "findPersistent",
+                    "Ctrl-H": "replaceAll",
+                    "Ctrl-S": function() {
+                        redisConfSafe(fileName);
+                    }
+                },
+                lineNumbers: true,
+                matchBrackets:true,
+            });
+            editor.focus();
+            $(".CodeMirror-scroll").css({"height":"300px","margin":0,"padding":0});
+            $("#OnlineEditFileBtn").click(function(){
+                $("#textBody").text(editor.getValue());
+                openrestyConfSave(fileName);
+            });
+        },'json');
+    },'json');
+}
+
+
+//配置保存
+function openrestyConfSave(fileName) {
+    var data = encodeURIComponent($("#textBody").val());
+    var encoding = 'utf-8';
+    var loadT = layer.msg('保存中...', {
+        icon: 16,
+        time: 0
+    });
+    $.post('/files/save_body', 'data=' + data + '&path=' + fileName + '&encoding=' + encoding, function(rdata) {
+        layer.close(loadT);
+        layer.msg(rdata.msg, {
+            icon: rdata.status ? 1 : 2
+        });
+    },'json');
+}
+//配置修改 --- end

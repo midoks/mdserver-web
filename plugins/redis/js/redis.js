@@ -109,14 +109,14 @@ function redisConfig(type){
 			$(".CodeMirror-scroll").css({"height":"300px","margin":0,"padding":0});
 			$("#OnlineEditFileBtn").click(function(){
 				$("#textBody").text(editor.getValue());
-				redisConfSafe(fileName);
+				redisConfSave(fileName);
 			});
 		},'json');
 	},'json');
 }
 
 //配置保存
-function redisConfSafe(fileName) {
+function redisConfSave(fileName) {
     var data = encodeURIComponent($("#textBody").val());
     var encoding = 'utf-8';
     var loadT = layer.msg('保存中...', {
