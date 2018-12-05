@@ -1,0 +1,16 @@
+{
+	"sort": 7,
+	"ps": "最流行的SVN代码共享管理软件",
+	"shell": "install.sh",
+	"name": "csvn",
+	"title": "CSVN",
+	"versions": "5.1",
+	"updates":"5.1.4",
+	"tip": "soft",
+	"checks": "server/csvn",
+	"author": "midoks",
+	"date": "2017-04-01",
+	"home": "https://www.collab.net",
+	"type": "SVN代码共享管理软件",
+	"pid": "3"
+}
