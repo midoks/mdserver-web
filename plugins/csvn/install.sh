@@ -34,6 +34,11 @@ Install_csvn()
 		cp /etc/sudoers{,.`date +"%Y-%m-%d_%H-%M-%S"`}
 		echo "csvn ALL=(ALL)      ALL" >> /etc/sudoers
 	fi
+
+	chown -R  csvn:csvn $serverPath/csvn
+	
+	$serverPath/csvn/bin/csvn start
+	$serverPath/csvn/bin/csvn-httpd start
 	
 	echo '安装完成' > $install_tmp
 }
