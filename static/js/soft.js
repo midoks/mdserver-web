@@ -140,18 +140,12 @@ function getSList(isdisplay) {
 
             
             if (plugin.setup == true) {
-                // if (plugin.tip == 'lib') {
-                //     var mupdate = (plugin.versions[n].no == plugin.versions[n].version) ? '' : '<a class="btlink" onclick="SoftUpdate(\'' + plugin.name + '\',\'' + plugin.versions + '\',\'' + plugin.versions[n].version + '\')">更新</a> | ';
-                //     handle = mupdate + '<a class="btlink" onclick="PluginMan(\'' + plugin.name + '\',\'' + plugin.title + '\')">' + lan.soft.setup + '</a> | <a class="btlink" onclick="UninstallVersion(\'' + plugin.name + '\',\'' + plugin.versions + '\',\'' + plugin.title + '\')">卸载</a>';
-                //     titleClick = 'onclick="PluginMan(\'' + plugin.name + '\',\'' + plugin.title + '\')" style="cursor:pointer"';
-                // } else {
 
-                    var mupdate = '';//(plugin.versions[n] == plugin.updates[n]) '' : '<a class="btlink" onclick="SoftUpdate(\'' + plugin.name + '\',\'' + plugin.versions[n].version + '\',\'' + plugin.updates[n] + '\')">更新</a> | ';
-                    // if (plugin.versions[n] == '') mupdate = '';
-                    handle = mupdate + '<a class="btlink" onclick="softMain(\'' + plugin.name + '\',\'' + version_info + '\')">安装</a> | <a class="btlink" onclick="uninstallVersion(\'' + plugin.name + '\',\'' + plugin.setup_version + '\',\'' + plugin.title + '\')">卸载</a>';
-                    titleClick = 'onclick="softMain(\'' + plugin.name + '\',\'' + version_info + '\')" style="cursor:pointer"';
-                // }
-
+                var mupdate = '';//(plugin.versions[n] == plugin.updates[n]) '' : '<a class="btlink" onclick="SoftUpdate(\'' + plugin.name + '\',\'' + plugin.versions[n].version + '\',\'' + plugin.updates[n] + '\')">更新</a> | ';
+                // if (plugin.versions[n] == '') mupdate = '';
+                handle = mupdate + '<a class="btlink" onclick="softMain(\'' + plugin.name + '\',\'' + version_info + '\')">设置</a> | <a class="btlink" onclick="uninstallVersion(\'' + plugin.name + '\',\'' + plugin.setup_version + '\',\'' + plugin.title + '\')">卸载</a>';
+                titleClick = 'onclick="softMain(\'' + plugin.name + '\',\'' + version_info + '\')" style="cursor:pointer"';
+             
                 softPath = '<span class="glyphicon glyphicon-folder-open" title="' + plugin.path + '" onclick="openPath(\'' + plugin.path + '\')"></span>';
                 if (plugin.coexist){
                     indexshow = '<div class="index-item"><input class="btswitch btswitch-ios" id="index_' + plugin.name  + plugin.versions + '" type="checkbox" ' + checked + '><label class="btswitch-btn" for="index_' + plugin.name + plugin.versions + '" onclick="toIndexDisplay(\'' + plugin.name + '\',\'' + plugin.versions + '\',\'' + plugin.coexist +'\')"></label></div>';
@@ -180,6 +174,7 @@ function getSList(isdisplay) {
                 plugin_title = plugin.title + ' ' + plugin.setup_version;
             }
 
+            console.log(plugin_title);
 
             sBody += '<tr>' +
                 '<td><span ' + titleClick + 
@@ -192,7 +187,6 @@ function getSList(isdisplay) {
                 '<td style="text-align: right;">' + handle + '</td>' +
                 '</tr>';
         }
-            
 
         sBody += pBody;
         $("#softList").html(sBody);
@@ -202,26 +196,6 @@ function getSList(isdisplay) {
             getSList();
         })
     },'json');
-}
-
-//更新
-function softUpdate(name, version, update) {
-    var msg = "<li>建议您在服务器负载闲时进行软件更新.</li>";
-    if (name == 'mysql') msg = "<ul style='color:red;'><li>更新数据库有风险,建议在更新前,先备份您的数据库.</li><li>如果您的是云服务器,强烈建议您在更新前做一个快照.</li><li>建议您在服务器负载闲时进行软件更新.</li></ul>";
-    SafeMessage('更新[' + name + ']', '更新过程可能会导致服务中断,您真的现在就将[' + name + ']更新到[' + update + ']吗?', function() {
-        var data = "name=" + name + "&version=" + version + "&type=0&upgrade=" + update;
-        var loadT = layer.msg('正在更新[' + name + '-' + version + '],请稍候...', { icon: 16, time: 0, shade: [0.3, '#000'] });
-        $.post('/plugins/install', data, function(rdata) {
-            if (rdata.status) {
-                GetTaskCount();
-                layer.msg('已添加到任务列表,请稍候...', { icon: 1 });
-            } else {
-                layer.msg('更新失败!', { icon: 2 });
-            }
-
-            layer.close(loadT);
-        });
-    }, msg);
 }
 
 function addVersion(name, ver, type, obj, title) {
@@ -405,6 +379,6 @@ function indexSoft() {
 
 // $(function() {
 //     if (window.document.location.pathname == '/soft/') {
-//         setInterval(function() { getSList(true); }, 5000);
+//         setInterval(function() { getSList(); }, 5000);
 //     }
 // });

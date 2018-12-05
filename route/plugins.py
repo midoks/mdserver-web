@@ -127,7 +127,7 @@ def uninstall():
     return public.returnJson(True, '已将卸载任务添加到队列!')
 
 
-@plugins.route('/installed', methods=['POST'])
+@plugins.route('/find', methods=['POST'])
 def installed():
 
     rundir = public.getRunDir()

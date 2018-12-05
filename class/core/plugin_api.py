@@ -87,6 +87,7 @@ class plugin_api:
 
     def getVersion(self, path):
         version_f = path + '/version.pl'
+        print version_f
         if os.path.exists(version_f):
             return public.readFile(version_f).strip()
         return ''
@@ -151,7 +152,7 @@ class plugin_api:
             pluginInfo['setup_version'] = info['versions']
         else:
             pluginInfo['setup_version'] = self.getVersion(
-                pluginInfo['path'])
+                pluginInfo['install_checks'])
         # pluginInfo['status'] = os.path.exists(pluginInfo['install_checks'])
         return pluginInfo
 
