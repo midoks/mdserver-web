@@ -135,6 +135,7 @@ function getSList(isdisplay) {
                 version_info = version_info.substring(0, version_info.length - 1);
             }
 
+
             var handle = '<a class="btlink" onclick="addVersion(\'' + plugin.name + '\',\'' + version_info + '\',\'' + plugin.tip + '\',this,\'' + plugin.title + '\')">安装</a>';
 
             
@@ -147,7 +148,7 @@ function getSList(isdisplay) {
 
                     var mupdate = '';//(plugin.versions[n] == plugin.updates[n]) '' : '<a class="btlink" onclick="SoftUpdate(\'' + plugin.name + '\',\'' + plugin.versions[n].version + '\',\'' + plugin.updates[n] + '\')">更新</a> | ';
                     // if (plugin.versions[n] == '') mupdate = '';
-                    handle = mupdate + '<a class="btlink" onclick="softMain(\'' + plugin.name + '\',\'' + version_info + '\')">' + lan.soft.setup + '</a> | <a class="btlink" onclick="uninstallVersion(\'' + plugin.name + '\',\'' + plugin.versions + '\',\'' + plugin.title + '\')">卸载</a>';
+                    handle = mupdate + '<a class="btlink" onclick="softMain(\'' + plugin.name + '\',\'' + version_info + '\')">安装</a> | <a class="btlink" onclick="uninstallVersion(\'' + plugin.name + '\',\'' + plugin_title + '\',\'' + plugin.title + '\')">卸载</a>';
                     titleClick = 'onclick="softMain(\'' + plugin.name + '\',\'' + version_info + '\')" style="cursor:pointer"';
                 // }
 
@@ -178,6 +179,7 @@ function getSList(isdisplay) {
             if (plugin.setup && !plugin.coexist){
                 plugin_title = plugin.title + ' ' + plugin.setup_version;
             }
+
 
             sBody += '<tr>' +
                 '<td><span ' + titleClick + 
