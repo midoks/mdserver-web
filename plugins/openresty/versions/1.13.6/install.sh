@@ -19,12 +19,13 @@ Install_openresty()
 	if [ ! -f ${openrestyDir}/openresty-1.13.6.2.tar.gz ];then
 		wget -O ${openrestyDir}/openresty-1.13.6.2.tar.gz https://openresty.org/download/openresty-1.13.6.2.tar.gz
 	fi
+	
 	cd ${openrestyDir} && tar -zxvf openresty-1.13.6.2.tar.gz
 
-	cd ${openrestyDir}/openresty* && ./configure --prefix=$serverPath/openresty \
-	--with-openssl=$serverPath/source/lib/openssl-1.0.2q && make && make install
-
+	cd ${openrestyDir}/openresty-1.13.6.2 && ./configure --prefix=$serverPath/openresty \
+	--with-openssl=$serverPath/source/lib/openssl-1.0.2q && make && make install && \
 	echo '1.13.6' > $serverPath/openresty/version.pl
+
 	echo '安装完成' > $install_tmp
 }
 
