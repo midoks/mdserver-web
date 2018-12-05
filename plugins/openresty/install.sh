@@ -7,36 +7,18 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
-install_tmp=${rootPath}/tmp/bt_install.pl
-
-openrestyDir=${serverPath}/source/openresty
-
-Install_openresty()
-{
-	mkdir -p ${openrestyDir}
-	echo '正在安装脚本文件...' > $install_tmp
-
-	if [ ! -f ${openrestyDir}/openresty-1.13.6.2.tar.gz ];then
-		wget -O ${openrestyDir}/openresty-1.13.6.2.tar.gz https://openresty.org/download/openresty-1.13.6.2.tar.gz
-	fi
-	cd ${openrestyDir} && tar -zxvf openresty-1.13.6.2.tar.gz
-
-	cd ${openrestyDir}/openresty* && ./configure --prefix=$serverPath/openresty \
-	--with-openssl=$serverPath/source/lib/openssl-1.0.2q && make && make install
-	
-	echo '安装完成' > $install_tmp
-}
-
-Uninstall_openresty()
-{
-	rm -rf $serverPath/openresty
-	echo '卸载完成' > $install_tmp
-}
 
 action=$1
-host=$2
-if [ "${1}" == 'install' ];then
-	Install_openresty
-else
-	Uninstall_openresty
+type=$2
+
+if [ "${2}" == "" ];then
+	echo '缺少安装脚本...' > $install_tmp
+	exit 0
+fi 
+
+if [ ! -d $curPath/versions/$2 ];then
+	echo '缺少安装脚本2...' > $install_tmp
+	exit 0
 fi
+
+sh -x $curPath/versions/$2/install.sh $1
