@@ -7,8 +7,11 @@ import os
 import urllib
 import binascii
 import json
-import public
 import re
+import sys
+
+sys.path.append(os.getcwd() + "/class/core")
+import public
 
 
 class score_main:
