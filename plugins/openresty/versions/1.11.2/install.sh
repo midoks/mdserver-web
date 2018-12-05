@@ -7,8 +7,8 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
-install_tmp=${rootPath}/tmp/bt_install.pl
 
+install_tmp=${rootPath}/tmp/bt_install.pl
 openrestyDir=${serverPath}/source/openresty
 
 Install_openresty()
@@ -16,16 +16,15 @@ Install_openresty()
 	mkdir -p ${openrestyDir}
 	echo '正在安装脚本文件...' > $install_tmp
 
-	if [ ! -f ${openrestyDir}/openresty-1.13.6.2.tar.gz ];then
-		wget -O ${openrestyDir}/openresty-1.13.6.2.tar.gz https://openresty.org/download/openresty-1.13.6.2.tar.gz
+	if [ ! -f ${openrestyDir}/openresty-1.11.2.5.tar.gz ];then
+		wget -O ${openrestyDir}/openresty-1.11.2.5.tar.gz https://openresty.org/download/openresty-1.11.2.5.tar.gz
 	fi
-	cd ${openrestyDir} && tar -zxvf openresty-1.13.6.2.tar.gz
+
+	cd ${openrestyDir} && tar -zxvf openresty-1.11.2.5.tar.gz
 
 	cd ${openrestyDir}/openresty* && ./configure --prefix=$serverPath/openresty \
 	--with-openssl=$serverPath/source/lib/openssl-1.0.2q && make && make install
-
-	echo 
-	
+	echo '1.11.2' > ${openrestyDir}/version.pl
 	echo '安装完成' > $install_tmp
 }
 
@@ -34,6 +33,7 @@ Uninstall_openresty()
 	rm -rf $serverPath/openresty
 	echo '卸载完成' > $install_tmp
 }
+
 action=$1
 if [ "${1}" == 'install' ];then
 	Install_openresty
