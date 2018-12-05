@@ -1466,3 +1466,27 @@ $(function(){
 		check_login();
 	},60000);
 });
+
+
+
+
+/*** 其中功能,针对插件通过库使用 start ***/
+function pluginService(_name){
+	$.post('/plugins/run', {name:_name, func:'status'}, function(data) {
+        console.log(data);
+        if(!data.status){
+            layer.msg(data.msg,{icon:0,time:3000,shade: [0.3, '#000']});
+            return;
+        }
+        if (data.data == 'start'){
+            setOpenrestyService('openresty', true);
+        } else {
+            setOpenrestyService('openresty', false);
+        }
+    },'json');
+}
+
+function pluginSetService(_name ,start){
+
+}
+/*** 其中功能,针对插件通过库使用 end ***/

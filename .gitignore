@@ -111,3 +111,4 @@ data/json/index.json
 *.swp
 *.zip
 data/*.db
+data/control.conf
