@@ -177,14 +177,25 @@ function getSList(isdisplay) {
 
             sBody += '<tr>' +
                 '<td><span ' + titleClick + 
-                '><img src="/plugins/file?name=' + plugin.name + 
-                '&f=ico.png' + '">' + plugin_title + '</span></td>' +
+                '><img data-src="/plugins/file?name='+plugin.name+
+                '&f=ico.png" src="/static/img/loading.gif">' + plugin_title + '</span></td>' +
                 '<td>' + plugin.ps + '</td>' +
                 '<td>' + softPath + '</td>' +
                 '<td>' + state + '</td>' +
                 '<td>' + indexshow + '</td>' +
                 '<td style="text-align: right;">' + handle + '</td>' +
                 '</tr>';
+
+            // sBody += '<tr>' +
+            //     '<td><span ' + titleClick + 
+            //     '><img onclick="asyncLoadImage(this,\'/plugins/file?name='+plugin.name+'&f=ico.png\')"src="/plugins/file?name=' + plugin.name + 
+            //     '&f=ico.png' + '">' + plugin_title + '</span></td>' +
+            //     '<td>' + plugin.ps + '</td>' +
+            //     '<td>' + softPath + '</td>' +
+            //     '<td>' + state + '</td>' +
+            //     '<td>' + indexshow + '</td>' +
+            //     '<td style="text-align: right;">' + handle + '</td>' +
+            //     '</tr>';
         }
 
         sBody += pBody;
@@ -193,7 +204,9 @@ function getSList(isdisplay) {
             setCookie('softType', $(this).attr('typeid'));
             $(this).addClass("on").siblings().removeClass("on");
             getSList();
-        })
+        });
+
+        loadImage();
     },'json');
 }
 
@@ -378,6 +391,6 @@ function indexSoft() {
 
 $(function() {
     if (window.document.location.pathname == '/soft/') {
-        setInterval(function() { getSList(); }, 15000);
+        setInterval(function() { getSList(); }, 30000);
     }
 });

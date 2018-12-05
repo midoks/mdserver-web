@@ -1031,7 +1031,7 @@ function RecInstall() {
 			layer.close(loadT);
 			layer.close(k);
 			setTimeout(function() {
-				GetTaskCount()
+				getTaskCount()
 			}, 2000);
 			layer.msg(lan.bt.install_ok, {
 				icon: 1
@@ -1083,7 +1083,7 @@ function fly(a) {
 				layer.msg(lan.bt.task_add, {
 					icon: 1
 				});
-				GetTaskCount()
+				getTaskCount()
 			}
 		});
 	});
@@ -1468,7 +1468,32 @@ $(function(){
 });
 
 
+function asyncLoadImage(obj, url){
+	loadImage(obj, url, showImage);
 
+	function loadImage(obj,url,callback){
+	    var img = new Image();
+	    img.src = url;
+	    
+	    if(img.complete){
+	        callback.call(img,obj);
+	        return;
+	    }
+	    img.onload = function(){
+	        callback.call(img,obj);
+	    }
+	}
+
+	function showImage(obj){
+	    obj.src = this.src;
+	}
+}
+
+function loadImage(){
+	$('img').each(function(i){
+        asyncLoadImage(this, $(this).attr('data-src'));
+    });
+}
 
 /*** 其中功能,针对插件通过库使用 start ***/
 function pluginService(_name){
