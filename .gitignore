@@ -112,3 +112,4 @@ data/json/index.json
 *.zip
 data/*.db
 data/control.conf
+plugins/memcached/init.d/memcached

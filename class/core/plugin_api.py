@@ -490,10 +490,10 @@ class plugin_api:
         else:
             py_cmd = py + ' ' + func + ' ' + version + ' ' + args
 
-        # print path
-        # print os.path.exists(path)
-
         if not os.path.exists(path):
             return ('', '')
         data = public.execShell(py_cmd)
+
+        print py_cmd
+        print os.path.exists(py_cmd)
         return (data[0].strip(), data[1].strip())
