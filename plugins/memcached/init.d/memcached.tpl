@@ -27,9 +27,11 @@ OPTIONS=""
 RETVAL=0
 prog="memcached"
 
+MEM_PATH={$SERVER_PATH}/memcached
+
 start () {
     echo -n $"Starting $prog: "
-    {$PATH}/memcached/bin/memcached -d -l $IP -p $PORT -u $USER -m $CACHESIZE -c $MAXCONN -P {$PATH}/memcached/memcached.pid $OPTIONS
+    $MEM_PATH/bin/memcached -d -l $IP -p $PORT -u $USER -m $CACHESIZE -c $MAXCONN -P $MEM_PATH/memcached.pid $OPTIONS
     if [ "$?" != 0 ] ; then
         echo " failed"
         exit 1
@@ -39,16 +41,16 @@ start () {
 }
 stop () {
     echo -n $"Stopping $prog: "
-    if [ ! -e {$PATH}/memcached/$prog.pid ]; then
+    if [ ! -e $MEM_PATH/$prog.pid ]; then
         echo -n $"$prog is not running."
         exit 1
     fi
-    kill `cat {$PATH}/memcached/memcached.pid`
+    kill `cat $MEM_PATH/memcached.pid`
     if [ "$?" != 0 ] ; then
         echo " failed"
         exit 1
     else
-        rm -f {$PATH}/memcached/memcached.pid
+        rm -f ${MEM_PATH}/memcached.pid
         echo " done"
     fi
 }
