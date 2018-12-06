@@ -7,6 +7,25 @@ import public
 import re
 import json
 
+import threading
+import multiprocessing
+
+
+class pa_thread(threading.Thread):
+
+    def __init__(self, func, args, name=''):
+        threading.Thread.__init__(self)
+        self.name = name
+        self.func = func
+        self.args = args
+        self.result = self.func(*self.args)
+
+    def getResult(self):
+        try:
+            return self.result
+        except Exception:
+            return None
+
 
 class plugin_api:
     __tasks = None
@@ -68,10 +87,25 @@ class plugin_api:
 
     def checkStatus(self, info):
 
+        if not info['setup']:
+            return False
+
         data = self.run(info['name'], 'status', info['setup_version'])
         if data[0] == 'start':
             return True
         return False
+
+    def checkStatusProcess(self, info, i, return_dict):
+
+        if not info['setup']:
+            return_dict[i] = False
+            return
+
+        data = self.run(info['name'], 'status', info['setup_version'])
+        if data[0] == 'start':
+            return_dict[i] = True
+        else:
+            return_dict[i] = False
 
     def checkDisplayIndex(self, name, version):
         if not os.path.exists(self.__index):
@@ -156,7 +190,7 @@ class plugin_api:
         else:
             pluginInfo['setup_version'] = self.getVersion(
                 pluginInfo['install_checks'])
-        pluginInfo['status'] = self.checkStatus(pluginInfo)
+        # pluginInfo['status'] = self.checkStatus(pluginInfo)
         return pluginInfo
 
     def makeCoexist(self, data):
@@ -197,10 +231,7 @@ class plugin_api:
         return plugins_info
 
     def getAllList(self, sType='0'):
-        ret = {}
-        ret['type'] = json.loads(public.readFile(self.__type))
         plugins_info = []
-
         for dirinfo in os.listdir(self.__plugin_dir):
             if dirinfo[0:1] == '.':
                 continue
@@ -217,11 +248,170 @@ class plugin_api:
                         print e
         return plugins_info
 
+    def getAllListPage(self, sType='0', page=1, pageSize=10):
+        plugins_info = []
+        for dirinfo in os.listdir(self.__plugin_dir):
+            if dirinfo[0:1] == '.':
+                continue
+            path = self.__plugin_dir + '/' + dirinfo
+            if os.path.isdir(path):
+                json_file = path + '/info.json'
+                if os.path.exists(json_file):
+                    try:
+                        data = json.loads(public.readFile(json_file))
+                        tmp_data = self.makeList(data, sType)
+                        for index in range(len(tmp_data)):
+                            plugins_info.append(tmp_data[index])
+                    except Exception, e:
+                        print e
+
+        manager = multiprocessing.Manager()
+        return_dict = manager.dict()
+        jobs = []
+        ntmp_list = range(len(plugins_info))
+        for i in ntmp_list:
+            p = multiprocessing.Process(
+                target=self.checkStatusProcess, args=(plugins_info[i], i, return_dict))
+            jobs.append(p)
+            p.start()
+
+        for proc in jobs:
+            proc.join()
+
+        returnData = return_dict.values()
+        for i in ntmp_list:
+            plugins_info[i]['status'] = returnData[i]
+        return plugins_info
+
+    def makeListThread(self, data, sType='0'):
+        plugins_info = []
+
+        if (data['pid'] == sType):
+            if type(data['versions']) == list and data.has_key('coexist') and data['coexist']:
+                tmp_data = self.makeCoexist(data)
+                for index in range(len(tmp_data)):
+                    plugins_info.append(tmp_data[index])
+            else:
+                pg = self.getPluginInfo(data)
+                plugins_info.append(pg)
+            return plugins_info
+
+        if sType == '0':
+            if type(data['versions']) == list and data.has_key('coexist') and data['coexist']:
+                tmp_data = self.makeCoexist(data)
+                for index in range(len(tmp_data)):
+                    plugins_info.append(tmp_data[index])
+            else:
+                pg = self.getPluginInfo(data)
+                plugins_info.append(pg)
+
+        # print plugins_info, data
+        return plugins_info
+
+    def getAllListThread(self, sType='0'):
+        plugins_info = []
+        tmp_list = []
+        threads = []
+        for dirinfo in os.listdir(self.__plugin_dir):
+            if dirinfo[0:1] == '.':
+                continue
+            path = self.__plugin_dir + '/' + dirinfo
+            if os.path.isdir(path):
+                json_file = path + '/info.json'
+                if os.path.exists(json_file):
+                    data = json.loads(public.readFile(json_file))
+                    if sType == '0':
+                        tmp_list.append(data)
+
+                    if (data['pid'] == sType):
+                        tmp_list.append(data)
+
+        ntmp_list = range(len(tmp_list))
+        for i in ntmp_list:
+            t = pa_thread(self.makeListThread, (tmp_list[i], sType))
+            threads.append(t)
+        for i in ntmp_list:
+            threads[i].start()
+        for i in ntmp_list:
+            threads[i].join()
+
+        for i in ntmp_list:
+            t = threads[i].getResult()
+            for index in range(len(t)):
+                plugins_info.append(t[index])
+
+        return plugins_info
+
+    def makeListProcess(self, data, sType, i, return_dict):
+        plugins_info = []
+
+        if (data['pid'] == sType):
+            if type(data['versions']) == list and data.has_key('coexist') and data['coexist']:
+                tmp_data = self.makeCoexist(data)
+                for index in range(len(tmp_data)):
+                    plugins_info.append(tmp_data[index])
+            else:
+                pg = self.getPluginInfo(data)
+                plugins_info.append(pg)
+            # return plugins_info
+
+        if sType == '0':
+            if type(data['versions']) == list and data.has_key('coexist') and data['coexist']:
+                tmp_data = self.makeCoexist(data)
+                for index in range(len(tmp_data)):
+                    plugins_info.append(tmp_data[index])
+            else:
+                pg = self.getPluginInfo(data)
+                plugins_info.append(pg)
+
+        return_dict[i] = plugins_info
+        # return plugins_info
+
+    def getAllListProcess(self, sType='0'):
+        plugins_info = []
+        tmp_list = []
+        manager = multiprocessing.Manager()
+        return_dict = manager.dict()
+        jobs = []
+        for dirinfo in os.listdir(self.__plugin_dir):
+            if dirinfo[0:1] == '.':
+                continue
+            path = self.__plugin_dir + '/' + dirinfo
+            if os.path.isdir(path):
+                json_file = path + '/info.json'
+                if os.path.exists(json_file):
+                    data = json.loads(public.readFile(json_file))
+                    if sType == '0':
+                        tmp_list.append(data)
+
+                    if (data['pid'] == sType):
+                        tmp_list.append(data)
+
+        ntmp_list = range(len(tmp_list))
+        for i in ntmp_list:
+            p = multiprocessing.Process(
+                target=self.makeListProcess, args=(tmp_list[i], sType, i, return_dict))
+            jobs.append(p)
+            p.start()
+
+        for proc in jobs:
+            proc.join()
+
+        returnData = return_dict.values()
+        for i in ntmp_list:
+            for index in range(len(returnData[i])):
+                plugins_info.append(returnData[i][index])
+
+        return plugins_info
+
     def getPluginList(self, sType, sPage=1, sPageSize=15):
 
         ret = {}
         ret['type'] = json.loads(public.readFile(self.__type))
-        plugins_info = self.getAllList(sType)
+        # plugins_info = self.getAllListThread(sType)
+        # plugins_info = self.getAllListProcess(sType)
+        plugins_info = self.getAllListPage(sType)
+
         args = {}
         args['count'] = len(plugins_info)
         args['p1'] = sPage
