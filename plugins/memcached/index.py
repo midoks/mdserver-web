@@ -17,60 +17,88 @@ def status():
     return 'start'
 
 
+def initDreplace():
+
+    file_tpl = os.getcwd() + '/plugins/memcached/init.d/memcached.tpl'
+    file_bin = getConf()
+
+    if os.path.exists(file_bin):
+        return file_bin
+
+    content = public.readFile(file_tpl)
+
+    service_path = os.path.dirname(os.getcwd())
+    content = content.replace('{$PATH}', service_path)
+
+    public.writeFile(file_bin, content)
+    public.execShell('chmod +x ' + file_bin)
+    return file_bin
+
+
 def start():
-    path = os.path.dirname(os.getcwd())
-    cmd = path + "/memcached/bin/memcached"
-    cmd = cmd + " " + path + "/memcached/memcached.conf"
-    data = public.execShell(cmd)
-    if data[0] == '':
+    file = initDreplace()
+    data = public.execShell(file + ' start')
+    if data[1] == '':
         return 'ok'
     return 'fail'
 
 
 def stop():
-    data = public.execShell(
-        "ps -ef|grep memcached |grep -v grep |grep -v python |awk '{print $2}' | xargs kill -9")
-    if data[0] == '':
+    file = initDreplace()
+    data = public.execShell(file + ' stop')
+    if data[1] == '':
         return 'ok'
     return 'fail'
 
 
 def restart():
-    return 'ok'
+    file = initDreplace()
+    data = public.execShell(file + ' reload')
+    if data[1] == '':
+        return 'ok'
+    return 'fail'
 
 
 def reload():
-    return 'ok'
+    file = initDreplace()
+    data = public.execShell(file + ' reload')
+    if data[1] == '':
+        return 'ok'
+    return 'fail'
 
 
 def runInfo():
-    path = os.path.dirname(os.getcwd())
-    cmd = path + "/redis/bin/redis-cli info"
-    data = public.execShell(cmd)[0]
-    res = [
-        'tcp_port',
-        'uptime_in_days',  # 已运行天数
-        'connected_clients',  # 连接的客户端数量
-        'used_memory',  # Redis已分配的内存总量
-        'used_memory_rss',  # Redis占用的系统内存总量
-        'used_memory_peak',  # Redis所用内存的高峰值
-        'mem_fragmentation_ratio',  # 内存碎片比率
-        'total_connections_received',  # 运行以来连接过的客户端的总数量
-        'total_commands_processed',  # 运行以来执行过的命令的总数量
-        'instantaneous_ops_per_sec',  # 服务器每秒钟执行的命令数量
-        'keyspace_hits',  # 查找数据库键成功的次数
-        'keyspace_misses',  # 查找数据库键失败的次数
-        'latest_fork_usec'  # 最近一次 fork() 操作耗费的毫秒数
-    ]
-    data = data.split("\n")
+    # 获取memcached状态
+    import telnetlib
+    import re
+    tn = telnetlib.Telnet('127.0.0.1', 11211)
+    tn.write(b"stats\n")
+    tn.write(b"quit\n")
+    data = tn.read_all()
+    if type(data) == bytes:
+        data = data.decode('utf-8')
+    data = data.replace('STAT', '').replace('END', '').split("\n")
     result = {}
+    res = ['cmd_get', 'get_hits', 'get_misses', 'limit_maxbytes', 'curr_items', 'bytes',
+           'evictions', 'limit_maxbytes', 'bytes_written', 'bytes_read', 'curr_connections']
     for d in data:
         if len(d) < 3:
             continue
-        t = d.strip().split(':')
+        t = d.split()
         if not t[0] in res:
             continue
-        result[t[0]] = t[1]
+        result[t[0]] = int(t[1])
+    result['hit'] = 1
+    if result['get_hits'] > 0 and result['cmd_get'] > 0:
+        result['hit'] = float(result['get_hits']) / \
+            float(result['cmd_get']) * 100
+
+    conf = public.readFile(getConf())
+    result['bind'] = re.search('IP=(.+)', conf).groups()[0]
+    result['port'] = int(re.search('PORT=(\d+)', conf).groups()[0])
+    result['maxconn'] = int(re.search('MAXCONN=(\d+)', conf).groups()[0])
+    result['cachesize'] = int(
+        re.search('CACHESIZE=(\d+)', conf).groups()[0])
     return public.getJson(result)
 
 

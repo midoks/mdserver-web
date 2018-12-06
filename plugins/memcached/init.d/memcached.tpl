@@ -29,28 +29,26 @@ prog="memcached"
 
 start () {
     echo -n $"Starting $prog: "
-    {$PATH}/memcached/bin/memcached -d -l $IP -p $PORT -u $USER -m $CACHESIZE -c $MAXCONN -P /var/run/memcached.pid $OPTIONS
+    {$PATH}/memcached/bin/memcached -d -l $IP -p $PORT -u $USER -m $CACHESIZE -c $MAXCONN -P {$PATH}/memcached/memcached.pid $OPTIONS
     if [ "$?" != 0 ] ; then
         echo " failed"
         exit 1
     else
-        touch /var/lock/subsys/memcached
         echo " done"
     fi
 }
 stop () {
     echo -n $"Stopping $prog: "
-    if [ ! -e /var/run/$prog.pid ]; then
+    if [ ! -e {$PATH}/memcached/$prog.pid ]; then
         echo -n $"$prog is not running."
         exit 1
     fi
-    kill `cat /var/run/memcached.pid`
+    kill `cat {$PATH}/memcached/memcached.pid`
     if [ "$?" != 0 ] ; then
         echo " failed"
         exit 1
     else
-        rm -f /var/lock/subsys/memcached
-        rm -f /var/run/memcached.pid
+        rm -f {$PATH}/memcached/memcached.pid
         echo " done"
     fi
 }
