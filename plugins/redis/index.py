@@ -8,6 +8,45 @@ import time
 sys.path.append(os.getcwd() + "/class/core")
 import public
 
+app_debug = False
+
+
+def getPluginName():
+    return 'redis'
+
+
+def getPluginDir():
+    return public.getPluginDir() + '/' + getPluginName()
+
+
+def getServerDir():
+    return public.getServerDir() + '/' + getPluginName()
+
+
+def getInitDFile():
+    if app_debug:
+        return '/tmp/' + getPluginName()
+    return '/etc/init.d/' + getPluginName()
+
+
+def getConf():
+    path = getPluginDir() + "/config/redis.conf"
+    return path
+
+
+def getInitDTpl():
+    path = getPluginDir() + "/init.d/redis.tpl"
+    return path
+
+
+def getArgs():
+    args = sys.argv[2:]
+    tmp = {}
+    for i in range(len(args)):
+        t = args[i].split(':')
+        tmp[t[0]] = t[1]
+    return tmp
+
 
 def status():
     data = public.execShell(
@@ -17,35 +56,64 @@ def status():
     return 'start'
 
 
+def initDreplace():
+
+    file_tpl = getInitDTpl()
+    service_path = os.path.dirname(os.getcwd())
+
+    initD_path = getServerDir() + '/init.d'
+    if not os.path.exists(initD_path):
+        os.mkdir(initD_path)
+    file_bin = initD_path + '/' + getPluginName()
+
+    # initd replace
+    content = public.readFile(file_tpl)
+    content = content.replace('{$SERVER_PATH}', service_path)
+    public.writeFile(file_bin, content)
+    public.execShell('chmod +x ' + file_bin)
+
+    # config replace
+    conf_content = public.readFile(getConf())
+    conf_content = conf_content.replace('{$SERVER_PATH}', service_path)
+    public.writeFile(getServerDir() + '/redis.conf', conf_content)
+
+    return file_bin
+
+
 def start():
-    path = os.path.dirname(os.getcwd())
-    cmd = path + "/redis/bin/redis-server"
-    cmd = cmd + " " + path + "/redis/redis.conf"
-    data = public.execShell(cmd)
-    if data[0] == '':
+    file = initDreplace()
+    data = public.execShell(file + ' start')
+    if data[1] == '':
         return 'ok'
     return 'fail'
 
 
 def stop():
-    data = public.execShell(
-        "ps -ef|grep redis |grep -v grep |grep -v python |awk '{print $2}' | xargs kill -9")
-    if data[0] == '':
+    file = initDreplace()
+    data = public.execShell(file + ' stop')
+    if data[1] == '':
         return 'ok'
     return 'fail'
 
 
 def restart():
-    return 'ok'
+    file = initDreplace()
+    data = public.execShell(file + ' restart')
+    if data[1] == '':
+        return 'ok'
+    return 'fail'
 
 
 def reload():
-    return 'ok'
+    file = initDreplace()
+    data = public.execShell(file + ' reload')
+    if data[1] == '':
+        return 'ok'
+    return 'fail'
 
 
 def runInfo():
-    path = os.path.dirname(os.getcwd())
-    cmd = path + "/redis/bin/redis-cli info"
+    cmd = getServerDir() + "/bin/redis-cli info"
     data = public.execShell(cmd)[0]
     res = [
         'tcp_port',
@@ -74,17 +142,43 @@ def runInfo():
     return public.getJson(result)
 
 
-def getConf():
-    path = os.path.dirname(os.getcwd()) + "/redis/redis.conf"
-    return path
+def initdStatus():
+    if not app_debug:
+        os_name = public.getOs()
+        if os_name == 'darwin':
+            return "Apple Computer does not support"
+    initd_bin = getInitDFile()
+    if os.path.exists(initd_bin):
+        return 'ok'
+    return 'fail'
+
+
+def initdInstall():
+    import shutil
+    if not app_debug:
+        os_name = public.getOs()
+        if os_name == 'darwin':
+            return "Apple Computer does not support"
+
+    source_bin = initDreplace()
+    initd_bin = getInitDFile()
+    shutil.copyfile(source_bin, initd_bin)
+    public.execShell('chmod +x ' + initd_bin)
+    return 'ok'
+
+
+def initdUinstall():
+    if not app_debug:
+        os_name = public.getOs()
+        if os_name == 'darwin':
+            return "Apple Computer does not support"
+    initd_bin = getInitDFile()
+    os.remove(initd_bin)
+    return 'ok'
 
 if __name__ == "__main__":
     func = sys.argv[1]
-    if func == 'run_info':
-        print runInfo()
-    elif func == 'conf':
-        print getConf()
-    elif func == 'status':
+    if func == 'status':
         print status()
     elif func == 'start':
         print start()
@@ -94,3 +188,15 @@ if __name__ == "__main__":
         print restart()
     elif func == 'reload':
         print reload()
+    elif func == 'initd_status':
+        print initdStatus()
+    elif func == 'initd_install':
+        print initdInstall()
+    elif func == 'initd_uninstall':
+        print initdUinstall()
+    elif func == 'run_info':
+        print runInfo()
+    elif func == 'conf':
+        print getConf()
+    else:
+        print 'error'
