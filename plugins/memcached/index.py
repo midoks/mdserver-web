@@ -9,6 +9,32 @@ sys.path.append(os.getcwd() + "/class/core")
 import public
 
 
+def getAppName():
+    return 'memcached'
+
+
+def getPluginDir():
+    return public.getPluginDir() + '/' + getAppName()
+
+
+def getServerDir():
+    return public.getServerDir() + '/' + getAppName()
+
+
+def getConf():
+    path = getPluginDir() + "/init.d/memcached.tpl"
+    return path
+
+
+def getArgs():
+    args = sys.argv[2:]
+    tmp = {}
+    for i in range(len(args)):
+        t = args[i].split(':')
+        tmp[t[0]] = t[1]
+    return tmp
+
+
 def status():
     data = public.execShell(
         "ps -ef|grep memcached |grep -v grep | grep -v python | awk '{print $2}'")
@@ -20,14 +46,17 @@ def status():
 def initDreplace():
 
     file_tpl = getConf()
-    file_bin = os.getcwd() + '/plugins/memcached/init.d/memcached'
+    service_path = os.path.dirname(os.getcwd())
 
-    if os.path.exists(file_bin):
-        return file_bin
+    initD_path = getServerDir() + '/init.d'
+    if not os.path.exists(initD_path):
+        os.mkdir(initD_path)
+    file_bin = initD_path + '/memcached'
+
+    # if os.path.exists(file_bin):
+    #     return file_bin
 
     content = public.readFile(file_tpl)
-
-    service_path = os.path.dirname(os.getcwd())
     content = content.replace('{$SERVER_PATH}', service_path)
 
     public.writeFile(file_bin, content)
@@ -106,22 +135,28 @@ def runInfo():
         return public.getJson({})
 
 
-def getConf():
-    path = os.getcwd() + "/plugins/memcached/init.d/memcached.tpl"
-    return path
-
-
 def saveConf():
-    args = sys.argv[2]
-    if args == '':
-        return 'fail'
-
-    print args
+     # 设置memcached缓存大小
+    import re
+    confFile = getConf()
+    try:
+        args = getArgs()
+        content = public.readFile(confFile)
+        content = re.sub('IP=.+', 'IP=' + args['ip'], content)
+        content = re.sub('PORT=\d+', 'PORT=' + args['port'], content)
+        content = re.sub('MAXCONN=\d+', 'MAXCONN=' + args['maxconn'], content)
+        content = re.sub('CACHESIZE=\d+', 'CACHESIZE=' +
+                         args['cachesize'], content)
+        public.writeFile(confFile, content)
+        reload()
+        return 'ok'
+    except Exception as e:
+        pass
+    return 'fail'
 
 
 if __name__ == "__main__":
     func = sys.argv[1]
-    print sys.argv
     if func == 'run_info':
         print runInfo()
     elif func == 'conf':
