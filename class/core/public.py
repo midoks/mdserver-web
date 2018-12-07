@@ -46,6 +46,14 @@ def getRootDir():
     return os.path.dirname(os.path.dirname(getRunDir()))
 
 
+def getPluginDir():
+    return getRunDir() + '/plugins'
+
+
+def getServerDir():
+    return getRootDir() + '/server'
+
+
 def getOs():
     os = execShell('uname')
     return os[0].lower().strip()
