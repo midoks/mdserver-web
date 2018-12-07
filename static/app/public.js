@@ -1623,4 +1623,58 @@ function pluginConfigSave(fileName) {
         });
     },'json');
 }
+
+
+function pluginInitD(_name){
+	$.post('/plugins/run', {name:_name, func:'initd_status'}, function(data) {
+        if(!data.status || (data.data!='ok' && data.data!='fail') ){
+            layer.msg(data.data,{icon:0,time:3000,shade: [0.3, '#000']});
+            return;
+        }
+        if (data.data == 'ok'){
+            pluginSetInitD(_name, true);
+        } else {
+            pluginSetInitD(_name, false);
+        }
+    },'json');
+}
+
+function pluginSetInitD(_name, status){
+	var serviceCon ='<p class="status">当前状态：<span>'+(status ? '已加载' : '未加载' )+
+        '</span><span style="color: '+
+        (status?'#20a53a;':'red;')+
+        ' margin-left: 3px;" class="glyphicon ' + (status?'glyphicon glyphicon-play':'glyphicon-pause')+'"></span></p><div class="sfm-opt">\
+            <button class="btn btn-default btn-sm" onclick="pluginOpInitD(\''+_name+'\',\''+(status?'initd_uninstall':'initd_install')+'\')">'+(status?'卸载':'加载')+'</button>\
+        </div>'; 
+    $(".soft-man-con").html(serviceCon);
+}
+
+function pluginOpInitD(a, b) {
+    var c = "name=" + a + "&func=" + b;
+    var d = "";
+    switch(b) {
+        case "initd_install":d = '加载';break;
+        case "initd_uninstall":d = '卸载';break;
+    }
+    layer.confirm( msgTpl('您真的要{1}{2}服务吗？', [d,a]), {icon:3,closeBtn: 2}, function() {
+        var e = layer.msg(msgTpl('正在{1}{2}服务,请稍候...',[d,a]), {icon: 16,time: 0});
+        $.post("/plugins/run", c, function(g) {
+            layer.close(e);
+            var f = g.data == 'ok' ? msgTpl('{1}服务已{2}',[a,d]) : msgTpl('{1}服务{2}失败!',[a,d]);
+            layer.msg(f, {icon: g.data == 'ok' ? 1 : 2});
+            
+            if ( b == 'initd_install' && g.data == 'ok' ) {
+                pluginSetInitD(a, true);
+            }else{
+                pluginSetInitD(a, false);
+            }
+            if(g.data != 'ok') {
+                layer.msg(g.data, {icon: 2,time: 0,shade: 0.3,shadeClose: true});
+            }
+        },'json').error(function() {
+            layer.close(e);
+            layer.msg('系统异常!', {icon: 0});
+        });
+    })
+}
 /*** 其中功能,针对插件通过库使用 end ***/
