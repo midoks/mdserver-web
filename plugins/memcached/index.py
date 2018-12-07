@@ -8,7 +8,7 @@ import time
 sys.path.append(os.getcwd() + "/class/core")
 import public
 
-app_debug = True
+app_debug = False
 
 
 def getAppName():
