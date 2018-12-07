@@ -8,6 +8,8 @@ import time
 sys.path.append(os.getcwd() + "/class/core")
 import public
 
+app_debug = True
+
 
 def getAppName():
     return 'memcached'
@@ -19,6 +21,12 @@ def getPluginDir():
 
 def getServerDir():
     return public.getServerDir() + '/' + getAppName()
+
+
+def getInitDFile():
+    if app_debug:
+        return '/tmp/' + getAppName()
+    return '/etc/init.d/' + getAppName()
 
 
 def getConf():
@@ -37,7 +45,7 @@ def getArgs():
 
 def status():
     data = public.execShell(
-        "ps -ef|grep memcached |grep -v grep | grep -v python | awk '{print $2}'")
+        "ps -ef|grep " + getAppName() + " |grep -v grep | grep -v python | awk '{print $2}'")
     if data[0] == '':
         return 'stop'
     return 'start'
@@ -155,15 +163,43 @@ def saveConf():
     return 'fail'
 
 
+def initdStatus():
+    if not app_debug:
+        os_name = public.getOs()
+        if os_name == 'darwin':
+            return "Apple Computer does not support"
+    initd_bin = getInitDFile()
+    if os.path.exists(initd_bin):
+        return 'ok'
+    return 'fail'
+
+
+def initdInstall():
+    import shutil
+    if not app_debug:
+        os_name = public.getOs()
+        if os_name == 'darwin':
+            return "Apple Computer does not support"
+
+    mem_bin = initDreplace()
+    initd_bin = getInitDFile()
+    shutil.copyfile(mem_bin, initd_bin)
+    public.execShell('chmod +x ' + initd_bin)
+    return 'ok'
+
+
+def initdUinstall():
+    if not app_debug:
+        os_name = public.getOs()
+        if os_name == 'darwin':
+            return "Apple Computer does not support"
+    initd_bin = getInitDFile()
+    os.remove(initd_bin)
+    return 'ok'
+
 if __name__ == "__main__":
     func = sys.argv[1]
-    if func == 'run_info':
-        print runInfo()
-    elif func == 'conf':
-        print getConf()
-    elif func == 'save_conf':
-        print saveConf()
-    elif func == 'status':
+    if func == 'status':
         print status()
     elif func == 'start':
         print start()
@@ -173,5 +209,17 @@ if __name__ == "__main__":
         print restart()
     elif func == 'reload':
         print reload()
+    elif func == 'initd_status':
+        print initdStatus()
+    elif func == 'initd_install':
+        print initdInstall()
+    elif func == 'initd_uninstall':
+        print initdUinstall()
+    elif func == 'run_info':
+        print runInfo()
+    elif func == 'conf':
+        print getConf()
+    elif func == 'save_conf':
+        print saveConf()
     else:
         print 'fail'
