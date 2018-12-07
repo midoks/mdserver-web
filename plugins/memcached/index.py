@@ -11,22 +11,22 @@ import public
 app_debug = False
 
 
-def getAppName():
+def getPluginName():
     return 'memcached'
 
 
 def getPluginDir():
-    return public.getPluginDir() + '/' + getAppName()
+    return public.getPluginDir() + '/' + getPluginName()
 
 
 def getServerDir():
-    return public.getServerDir() + '/' + getAppName()
+    return public.getServerDir() + '/' + getPluginName()
 
 
 def getInitDFile():
     if app_debug:
-        return '/tmp/' + getAppName()
-    return '/etc/init.d/' + getAppName()
+        return '/tmp/' + getPluginName()
+    return '/etc/init.d/' + getPluginName()
 
 
 def getConf():
@@ -45,7 +45,7 @@ def getArgs():
 
 def status():
     data = public.execShell(
-        "ps -ef|grep " + getAppName() + " |grep -v grep | grep -v python | awk '{print $2}'")
+        "ps -ef|grep " + getPluginName() + " |grep -v grep | grep -v python | awk '{print $2}'")
     if data[0] == '':
         return 'stop'
     return 'start'
