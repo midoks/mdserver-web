@@ -18,7 +18,20 @@ from flask import Response
 dashboard = Blueprint('dashboard', __name__, template_folder='templates')
 
 
+from functools import wraps
+
+
+def login_required(func):
+
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        print 'test!!!'
+        return 'test!!!' + func(*args, **kwargs)
+    return wrapper
+
+
 @dashboard.route("/test")
+@login_required
 def test():
     os = public.getOs()
     print os
