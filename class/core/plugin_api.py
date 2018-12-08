@@ -107,6 +107,26 @@ class plugin_api:
         else:
             return_dict[i] = False
 
+    def checkStatusMProcess(self, plugins_info):
+        manager = multiprocessing.Manager()
+        return_dict = manager.dict()
+        jobs = []
+        ntmp_list = range(len(plugins_info))
+        for i in ntmp_list:
+            p = multiprocessing.Process(
+                target=self.checkStatusProcess, args=(plugins_info[i], i, return_dict))
+            jobs.append(p)
+            p.start()
+
+        for proc in jobs:
+            proc.join()
+
+        returnData = return_dict.values()
+        for i in ntmp_list:
+            plugins_info[i]['status'] = returnData[i]
+
+        return plugins_info
+
     def checkDisplayIndex(self, name, version):
         if not os.path.exists(self.__index):
             public.writeFile(self.__index, '[]')
@@ -265,22 +285,7 @@ class plugin_api:
                     except Exception, e:
                         print e
 
-        manager = multiprocessing.Manager()
-        return_dict = manager.dict()
-        jobs = []
-        ntmp_list = range(len(plugins_info))
-        for i in ntmp_list:
-            p = multiprocessing.Process(
-                target=self.checkStatusProcess, args=(plugins_info[i], i, return_dict))
-            jobs.append(p)
-            p.start()
-
-        for proc in jobs:
-            proc.join()
-
-        returnData = return_dict.values()
-        for i in ntmp_list:
-            plugins_info[i]['status'] = returnData[i]
+        plugins_info = self.checkStatusMProcess(plugins_info)
         return plugins_info
 
     def makeListThread(self, data, sType='0'):
@@ -446,6 +451,8 @@ class plugin_api:
                                 continue
                     except Exception, e:
                         print e
+
+        plist = self.checkStatusMProcess(plist)
         return plist
 
     def setIndexSort(self, sort):
