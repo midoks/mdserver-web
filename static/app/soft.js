@@ -333,15 +333,23 @@ function indexListHtml(callback){
                 data_id = plugin.name + '-' + plugin.versions;
             }
             
+            // con += '<div class="col-sm-3 col-md-3 col-lg-3" data-id="' + data_id + '">\
+            //     <span class="spanmove"></span>\
+            //     <div onclick="softMain(\'' + plugin.name + '\',\'' + plugin.setup_version + '\')">\
+            //     <div class="image"><img src="/static/img/loading.gif" data-src="/plugins/file?name=' + plugin.name + '&f=ico.png"></div>\
+            //     <div class="sname">' +  name + state + '</div>\
+            //     </div>\
+            // </div>';
 
             con += '<div class="col-sm-3 col-md-3 col-lg-3" data-id="' + data_id + '">\
                 <span class="spanmove"></span>\
-                <div onclick="softMain(\'' + plugin.name + '\',\'' + version_info + '\')">\
-                <div class="image"><img src="plugins/file?name=' + plugin.name + '&f=ico.png"></div>\
+                <div onclick="softMain(\'' + plugin.name + '\',\'' + plugin.setup_version + '\')">\
+                <div class="image"><img src="/plugins/file?name=' + plugin.name + '&f=ico.png"></div>\
                 <div class="sname">' +  name + state + '</div>\
                 </div>\
             </div>';
-        
+
+            // loadImage();
         }
 
         $("#indexsoft").html(con);
