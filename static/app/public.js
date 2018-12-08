@@ -1495,6 +1495,7 @@ function asyncLoadImage(obj, url){
 
 function loadImage(){
 	$('img').each(function(i){
+		console.log($(this).attr('data-src'));
 		if ($(this).attr('data-src') != ''){
 			asyncLoadImage(this, $(this).attr('data-src'));
 		} 
