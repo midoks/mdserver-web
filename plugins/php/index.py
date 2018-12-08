@@ -8,10 +8,32 @@ import time
 sys.path.append(os.getcwd() + "/class/core")
 import public
 
+app_debug = False
+if public.getOs() == 'darwin':
+    app_debug = True
+
+
+def getPluginName():
+    return 'openresty'
+
+
+def getPluginDir():
+    return public.getPluginDir() + '/' + getPluginName()
+
+
+def getServerDir():
+    return public.getServerDir() + '/' + getPluginName()
+
+
+def getInitDFile():
+    if app_debug:
+        return '/tmp/' + getPluginName()
+    return '/etc/init.d/' + getPluginName()
+
 
 def status():
     data = public.execShell(
-        "ps -ef|grep redis |grep -v grep | grep -v python | awk '{print $2}'")
+        "ps -ef|grep php |grep -v grep | grep -v python | awk '{print $2}'")
     if data[0] == '':
         return 'stop'
     return 'start'
