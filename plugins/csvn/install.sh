@@ -37,8 +37,8 @@ Install_csvn()
 
 	chown -R  csvn:csvn $serverPath/csvn
 
-	$serverPath/csvn/bin/csvn install
-	$serverPath/csvn/bin/csvn-httpd install
+	# $serverPath/csvn/bin/csvn install
+	# $serverPath/csvn/bin/csvn-httpd install
 	
 	echo '安装完成' > $install_tmp
 }
