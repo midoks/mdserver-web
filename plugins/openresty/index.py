@@ -51,6 +51,18 @@ def getInitDTpl():
     return path
 
 
+def makeConf():
+    import shutil
+    vhost = getServerDir() + '/nginx/conf/vhost'
+    if not os.path.exists(vhost):
+        os.mkdir(vhost)
+
+    source_vhost = getPluginDir() + '/conf/nginx_status.conf'
+    dest_vhost = vhost + '/nginx_status.conf'
+    # if not os.path.exists(dest_vhost):
+    shutil.copyfile(source_vhost, dest_vhost)
+
+
 def confReplace():
     service_path = os.path.dirname(os.getcwd())
     content = public.readFile(getConf())
@@ -61,7 +73,7 @@ def confReplace():
         user = public.execShell(
             "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
         user_group = 'root'
-        content = content.replace('{$OS_USER}', user)
+        content = content.replace('{$OS_USER}', 'root')
         content = content.replace('{$OS_USER_GROUP}', user_group)
 
         content = content.replace('{$EVENT_MODEL}', 'kqueue')
@@ -72,7 +84,7 @@ def confReplace():
 
     exe_bin = getServerDir() + "/bin/openresty"
     # exe_bin = getServerDir() + "/nginx/sbin/nginx"
-    public.execShell('chown midoks:root ' + exe_bin)
+    public.execShell('chown root:root ' + exe_bin)
     public.execShell('chmod 755 ' + exe_bin)
     public.execShell('chmod u+s ' + exe_bin)
 
@@ -97,6 +109,9 @@ def initDreplace():
 
     # config replace
     confReplace()
+
+    # make nginx vhost or other
+    makeConf()
 
     return file_bin
 
