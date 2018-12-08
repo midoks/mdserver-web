@@ -391,6 +391,6 @@ function indexSoft() {
 
 $(function() {
     if (window.document.location.pathname == '/soft/') {
-        setInterval(function() { getSList(); }, 30000);
+        setInterval(function() { getSList(); }, 10000);
     }
 });

@@ -1627,7 +1627,11 @@ function pluginConfigSave(fileName) {
 
 function pluginInitD(_name){
 	$.post('/plugins/run', {name:_name, func:'initd_status'}, function(data) {
-        if(!data.status || (data.data!='ok' && data.data!='fail') ){
+        if( !data.status ){
+            layer.msg(data.msg,{icon:0,time:3000,shade: [0.3, '#000']});
+            return;
+        }
+        if( data.data!='ok' && data.data!='fail' ){
             layer.msg(data.data,{icon:0,time:3000,shade: [0.3, '#000']});
             return;
         }
