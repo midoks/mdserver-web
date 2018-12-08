@@ -68,27 +68,34 @@ def confReplace():
     content = public.readFile(getConf())
     content = content.replace('{$SERVER_PATH}', service_path)
 
+    user = 'www'
+    user_group = 'www'
     # macosx do
     if public.getOs() == 'darwin':
         user = public.execShell(
             "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
-        user_group = 'root'
-        content = content.replace('{$OS_USER}', 'root')
-        content = content.replace('{$OS_USER_GROUP}', user_group)
-
+        # user = 'root'
+        user_group = 'staff'
         content = content.replace('{$EVENT_MODEL}', 'kqueue')
     else:
-        content = content.replace('{$OS_USER}', 'www')
-        content = content.replace('{$OS_USER_GROUP}', 'www')
+        user = 'www'
+        user_group = 'www'
         content = content.replace('{$EVENT_MODEL}', 'epoll')
 
-    exe_bin = getServerDir() + "/bin/openresty"
-    # exe_bin = getServerDir() + "/nginx/sbin/nginx"
-    public.execShell('chown root:root ' + exe_bin)
-    public.execShell('chmod 755 ' + exe_bin)
-    public.execShell('chmod u+s ' + exe_bin)
+    content = content.replace('{$OS_USER}', user)
+    content = content.replace('{$OS_USER_GROUP}', user_group)
 
     public.writeFile(getServerDir() + '/nginx/conf/nginx.conf', content)
+
+    exe_bin = getServerDir() + "/bin/openresty"
+    print public.execShell('chown -R ' + user + ':' + user_group + ' ' + exe_bin)
+    print public.execShell('chmod 755 ' + exe_bin)
+    print public.execShell('chmod u+s ' + exe_bin)
+
+    nginx_exe_bin = getServerDir() + "/nginx/sbin/nginx"
+    print public.execShell('chown -R ' + user + ':' + user_group + ' ' + nginx_exe_bin)
+    print public.execShell('chmod 755 ' + nginx_exe_bin)
+    print public.execShell('chmod u+s ' + nginx_exe_bin)
 
 
 def initDreplace():
