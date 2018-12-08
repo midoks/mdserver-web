@@ -24,7 +24,8 @@ Install_openresty()
 	cd ${openrestyDir} && tar -zxvf openresty-1.11.2.5.tar.gz
 
 	cd ${openrestyDir}/openresty-1.11.2.5 && ./configure --prefix=$serverPath/openresty \
-	--with-openssl=$serverPath/source/lib/openssl-1.0.2q && make && make install && \
+	--with-openssl=$serverPath/source/lib/openssl-1.0.2q  \
+	--with-http_stub_status_module && make && make install && \
 	echo '1.11.2' > $serverPath/openresty/version.pl
 	
 
