@@ -88,14 +88,14 @@ def confReplace():
     public.writeFile(getServerDir() + '/nginx/conf/nginx.conf', content)
 
     exe_bin = getServerDir() + "/bin/openresty"
-    print public.execShell('chown -R ' + user + ':' + user_group + ' ' + exe_bin)
-    print public.execShell('chmod 755 ' + exe_bin)
-    print public.execShell('chmod u+s ' + exe_bin)
+    public.execShell('chown -R ' + user + ':' + user_group + ' ' + exe_bin)
+    public.execShell('chmod 755 ' + exe_bin)
+    public.execShell('chmod u+s ' + exe_bin)
 
-    nginx_exe_bin = getServerDir() + "/nginx/sbin/nginx"
-    print public.execShell('chown -R ' + user + ':' + user_group + ' ' + nginx_exe_bin)
-    print public.execShell('chmod 755 ' + nginx_exe_bin)
-    print public.execShell('chmod u+s ' + nginx_exe_bin)
+    ng_exe_bin = getServerDir() + "/nginx/sbin/nginx"
+    public.execShell('chown -R ' + user + ':' + user_group + ' ' + ng_exe_bin)
+    public.execShell('chmod 755 ' + ng_exe_bin)
+    public.execShell('chmod u+s ' + ng_exe_bin)
 
 
 def initDreplace():
