@@ -1469,6 +1469,10 @@ $(function(){
 
 
 function asyncLoadImage(obj, url){
+	
+	if (typeof(url) == 'undefined'){
+		return;
+	}
 	loadImage(obj, url, showImage);
 
 	function loadImage(obj,url,callback){
@@ -1491,7 +1495,9 @@ function asyncLoadImage(obj, url){
 
 function loadImage(){
 	$('img').each(function(i){
-        asyncLoadImage(this, $(this).attr('data-src'));
+		if ($(this).attr('data-src') != ''){
+			asyncLoadImage(this, $(this).attr('data-src'));
+		} 
     });
 }
 
