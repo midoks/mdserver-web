@@ -17,7 +17,7 @@ function softMain(name, version) {
         layer.open({
             type: 1,
             area: '640px',
-            title: name + "管理",
+            title: name + '-' + version + "管理",
             closeBtn: 2,
             shift: 0,
             content: rdata
@@ -25,6 +25,9 @@ function softMain(name, version) {
         $(".bt-w-menu p").click(function() {
             $(this).addClass("bgw").siblings().removeClass("bgw");
         });
+
+        //version to
+        $(".current_plugin_version").attr('version',version).hide();
     });
 }
 
@@ -143,7 +146,7 @@ function getSList(isdisplay) {
 
                 var mupdate = '';//(plugin.versions[n] == plugin.updates[n]) '' : '<a class="btlink" onclick="SoftUpdate(\'' + plugin.name + '\',\'' + plugin.versions[n].version + '\',\'' + plugin.updates[n] + '\')">更新</a> | ';
                 // if (plugin.versions[n] == '') mupdate = '';
-                handle = mupdate + '<a class="btlink" onclick="softMain(\'' + plugin.name + '\',\'' + version_info + '\')">设置</a> | <a class="btlink" onclick="uninstallVersion(\'' + plugin.name + '\',\'' + plugin.setup_version + '\',\'' + plugin.title + '\')">卸载</a>';
+                handle = mupdate + '<a class="btlink" onclick="softMain(\'' + plugin.name + '\',\'' + plugin.setup_version + '\')">设置</a> | <a class="btlink" onclick="uninstallVersion(\'' + plugin.name + '\',\'' + plugin.setup_version + '\',\'' + plugin.title + '\')">卸载</a>';
                 titleClick = 'onclick="softMain(\'' + plugin.name + '\',\'' + version_info + '\')" style="cursor:pointer"';
              
                 softPath = '<span class="glyphicon glyphicon-folder-open" title="' + plugin.path + '" onclick="openPath(\'' + plugin.path + '\')"></span>';
