@@ -32,6 +32,15 @@ def getInitDFile():
     return '/etc/init.d/' + getPluginName()
 
 
+def clearTemp():
+    path_bin = getServerDir() + "/nginx"
+    public.execShell('rm -rf ' + path_bin + '/client_body_temp')
+    public.execShell('rm -rf ' + path_bin + '/fastcgi_temp')
+    public.execShell('rm -rf ' + path_bin + '/proxy_temp')
+    public.execShell('rm -rf ' + path_bin + '/scgi_temp')
+    public.execShell('rm -rf ' + path_bin + '/uwsgi_temp')
+
+
 def getConf():
     path = getPluginDir() + "/conf/nginx.conf"
     return path
@@ -51,12 +60,21 @@ def confReplace():
     if public.getOs() == 'darwin':
         user = public.execShell(
             "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
-        user_group = 'staff'
+        user_group = 'root'
         content = content.replace('{$OS_USER}', user)
         content = content.replace('{$OS_USER_GROUP}', user_group)
+
+        content = content.replace('{$EVENT_MODEL}', 'kqueue')
     else:
         content = content.replace('{$OS_USER}', 'www')
         content = content.replace('{$OS_USER_GROUP}', 'www')
+        content = content.replace('{$EVENT_MODEL}', 'epoll')
+
+    exe_bin = getServerDir() + "/bin/openresty"
+    # exe_bin = getServerDir() + "/nginx/sbin/nginx"
+    public.execShell('chown midoks:root ' + exe_bin)
+    public.execShell('chmod 755 ' + exe_bin)
+    public.execShell('chmod u+s ' + exe_bin)
 
     public.writeFile(getServerDir() + '/nginx/conf/nginx.conf', content)
 
@@ -103,6 +121,8 @@ def start():
 def stop():
     file = initDreplace()
     data = public.execShell(file + ' stop')
+    print data
+    clearTemp()
     if data[1] == '':
         return 'ok'
     return 'fail'
@@ -167,6 +187,8 @@ if __name__ == "__main__":
         print start()
     elif func == 'stop':
         print stop()
+    elif func == 'restart':
+        print restart()
     elif func == 'reload':
         print reload()
     elif func == 'initd_status':
