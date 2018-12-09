@@ -27,7 +27,7 @@ function softMain(name, version) {
         });
 
         //version to
-        $(".current_plugin_version").attr('version',version).hide();
+        $(".plugin_version").attr('version',version).hide();
     });
 }
 
