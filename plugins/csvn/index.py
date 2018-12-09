@@ -40,9 +40,17 @@ def getInitDFile():
 def getArgs():
     args = sys.argv[2:]
     tmp = {}
-    for i in range(len(args)):
-        t = args[i].split(':')
+    args_len = len(args)
+
+    if args_len == 1:
+        t = args[0].strip('{').strip('}')
+        t = t.split(':')
         tmp[t[0]] = t[1]
+    elif args_len > 1:
+        for i in range(len(args)):
+            t = args[i].split(':')
+            tmp[t[0]] = t[1]
+
     return tmp
 
 
@@ -142,6 +150,38 @@ def initdUinstall():
     return 'ok'
 
 
+def userList():
+    import math
+    args = getArgs()
+
+    page = 1
+    page_size = 10
+    if 'page' in args:
+        page = int(args['page'])
+
+    if 'page_size' in args:
+        page_size = int(args['page_size'])
+
+    svn_auth_file = getServerDir() + '/data/conf/svn_auth_file'
+    if not os.path.exists(svn_auth_file):
+        return public.getJson([])
+
+    auth = public.readFile(svn_auth_file)
+    auth_list = auth.split("\n")
+    auth_list_sum = len(auth_list)
+    ulist = []
+    data = {}
+    for x in range(auth_list_sum):
+        tmp = auth_list[x].split(':')
+        ulist.append(tmp[0])
+
+    data['page'] = page
+    data['page_size'] = page_size
+    data['page_count'] = int(math.ceil(auth_list_sum / page_size))
+    start = (page - 1) * page_size
+    data['data'] = ulist[start:page_size]
+    return public.getJson(data)
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -166,5 +206,7 @@ if __name__ == "__main__":
         print getConf()
     elif func == 'save_conf':
         print saveConf()
+    elif func == 'user_list':
+        print userList()
     else:
         print 'fail'
