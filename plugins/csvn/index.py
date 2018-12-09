@@ -77,7 +77,8 @@ def csvnOp(method):
 
     ret_csvn_httpd = public.execShell(_initd_csvn_httpd + ' ' + method)
     # ret_csvn = public.execShell(_initd_csvn + ' ' + method)
-    subprocess.Popen(_initd_csvn + ' ' + method, shell=True)
+    subprocess.Popen(_initd_csvn + ' ' + method,
+                     stdout=subprocess.PIPE, shell=True)
     if ret_csvn_httpd[1] == '':
         return 'ok'
     return 'fail'
