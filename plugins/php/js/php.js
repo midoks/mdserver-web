@@ -634,3 +634,5 @@ function GetPHPStatus(a) {
         })
     })
 }
+
+pluginService('php', $('.bt-form .plugin_version').attr('version'));
