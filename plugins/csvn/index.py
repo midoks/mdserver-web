@@ -101,9 +101,8 @@ def reload():
 
 
 def initdStatus():
-    if app_debug:
-        os_name = public.getOs()
-        if os_name == 'darwin':
+    if not app_debug:
+        if public.getOs() == 'darwin':
             return "Apple Computer does not support"
 
     _initd_csvn = '/etc/init.d/csvn'
@@ -116,9 +115,8 @@ def initdStatus():
 
 def initdInstall():
     import shutil
-    if app_debug:
-        os_name = public.getOs()
-        if os_name == 'darwin':
+    if not app_debug:
+        if public.getOs() == 'darwin':
             return "Apple Computer does not support"
 
     _csvn = getServerDir() + '/bin/csvn'
@@ -132,9 +130,8 @@ def initdInstall():
 
 
 def initdUinstall():
-    if app_debug:
-        os_name = public.getOs()
-        if os_name == 'darwin':
+    if not app_debug:
+        if public.getOs() == 'darwin':
             return "Apple Computer does not support"
 
     _csvn = getServerDir() + '/bin/csvn'
@@ -143,6 +140,7 @@ def initdUinstall():
     ret_csvn = public.execShell(_csvn + ' remove')
     ret_csvn_httpd = public.execShell(_csvn_httpd + ' remove')
     return 'ok'
+
 
 if __name__ == "__main__":
     func = sys.argv[1]
