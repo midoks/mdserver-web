@@ -1495,7 +1495,7 @@ function asyncLoadImage(obj, url){
 
 function loadImage(){
 	$('img').each(function(i){
-		console.log($(this).attr('data-src'));
+		// console.log($(this).attr('data-src'));
 		if ($(this).attr('data-src') != ''){
 			asyncLoadImage(this, $(this).attr('data-src'));
 		} 
@@ -1503,8 +1503,15 @@ function loadImage(){
 }
 
 /*** 其中功能,针对插件通过库使用 start ***/
-function pluginService(_name){
-	$.post('/plugins/run', {name:_name, func:'status'}, function(data) {
+function pluginService(_name, version){
+	
+	var data = {name:_name, func:'status'}
+	if (typeof(version)!=='undefined'){
+		data['version'] = version;
+	}
+	console.log(version);
+
+	$.post('/plugins/run', data, function(data) {
         if(!data.status){
             layer.msg(data.msg,{icon:0,time:3000,shade: [0.3, '#000']});
             return;
