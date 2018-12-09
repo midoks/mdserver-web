@@ -25,6 +25,7 @@ cd /tmp && unzip /tmp/master.zip
 mv /tmp/mdserver-web-master /www/server/mdserver-web
 
 yum groupinstall -y "Development Tools"
+yum -y libevent libevent-devel
 
 yum -y install epel-release python-pip python-devel
 pip install --upgrade pip
