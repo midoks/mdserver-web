@@ -25,15 +25,11 @@ cd /tmp && unzip /tmp/master.zip
 mv /tmp/mdserver-web-master /www/server/mdserver-web
 
 yum groupinstall -y "Development Tools"
-yum -y libevent libevent-devel
+yum -y libevent libevent-devel pcre-devel zlib-devel openssl openssl-devel
 
 yum -y install epel-release python-pip python-devel
 pip install --upgrade pip
 pip install -r /www/server/mdserver-web/requirements.txt
-
-
-
-
 
 
 
