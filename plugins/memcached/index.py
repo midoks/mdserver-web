@@ -151,7 +151,6 @@ def saveConf():
     confFile = getConf()
     try:
         args = getArgs()
-        print args
         content = public.readFile(confFile)
         content = re.sub('IP=.+', 'IP=' + args['ip'], content)
         content = re.sub('PORT=\d+', 'PORT=' + args['port'], content)
