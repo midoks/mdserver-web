@@ -18,7 +18,7 @@ Install_mem()
 	echo '正在安装脚本文件...' > $install_tmp
 
 	wget -O $serverPath/source/memcached.tar.gz http://www.memcached.org/files/memcached-1.5.12.tar.gz
-	cd $serverPath/tmp && tar -zxvf memcached.tar.gz
+	cd $serverPath/source && tar -zxvf memcached.tar.gz
 
 	mkdir -p $serverPath/memcached
 	cd memcached* && ./configure --prefix=$serverPath/memcached && make && make install
