@@ -1504,10 +1504,11 @@ function loadImage(){
 
 /*** 其中功能,针对插件通过库使用 start ***/
 function pluginService(_name, version){
-	
 	var data = {name:_name, func:'status'}
-	if (typeof(version)!=='undefined'){
+	if ( typeof(version) != 'undefined' ){
 		data['version'] = version;
+	} else {
+		version = '';
 	}
 	// console.log(version);
 
@@ -1517,29 +1518,33 @@ function pluginService(_name, version){
             return;
         }
         if (data.data == 'start'){
-            pluginSetService(_name, true);
+            pluginSetService(_name, true, version);
         } else {
-            pluginSetService(_name, false);
+            pluginSetService(_name, false, version);
         }
     },'json');
 }
 
-function pluginSetService(_name ,status){
+function pluginSetService(_name ,status, version){
 	var serviceCon ='<p class="status">当前状态：<span>'+(status ? '开启' : '关闭' )+
         '</span><span style="color: '+
         (status?'#20a53a;':'red;')+
         ' margin-left: 3px;" class="glyphicon ' + (status?'glyphicon glyphicon-play':'glyphicon-pause')+'"></span></p><div class="sfm-opt">\
-            <button class="btn btn-default btn-sm" onclick="pluginOpService(\''+_name+'\',\''+(status?'stop':'start')+'\')">'+(status?'停止':'启动')+'</button>\
-            <button class="btn btn-default btn-sm" onclick="pluginOpService(\''+_name+'\',\'restart\')">重启</button>\
-            <button class="btn btn-default btn-sm" onclick="pluginOpService(\''+_name+'\',\'reload\')">重载配置</button>\
+            <button class="btn btn-default btn-sm" onclick="pluginOpService(\''+_name+'\',\''+(status?'stop':'start')+'\',\''+version+'\')">'+(status?'停止':'启动')+'</button>\
+            <button class="btn btn-default btn-sm" onclick="pluginOpService(\''+_name+'\',\'restart\',\''+version+'\')">重启</button>\
+            <button class="btn btn-default btn-sm" onclick="pluginOpService(\''+_name+'\',\'reload\',\''+version+'\')">重载配置</button>\
         </div>'; 
     $(".soft-man-con").html(serviceCon);
 }
 
 
-function pluginOpService(a, b) {
+function pluginOpService(a, b, v) {
 
     var c = "name=" + a + "&func=" + b;
+    if(v != ''){
+    	c = c + '&version='+v;
+    }
+
     var d = "";
 
     switch(b) {
@@ -1548,45 +1553,50 @@ function pluginOpService(a, b) {
         case "restart":d = '重启';break;
         case "reload":d = '重载';break;
     }
-    layer.confirm( '您真的要{1}{2}服务吗？'.replace('{1}', d).replace('{2}', a), {icon:3,closeBtn: 2}, function() {
-        var e = layer.msg('正在{1}{2}服务,请稍候...'.replace('{1}', d).replace('{2}', a), {icon: 16,time: 0});
+    layer.confirm( msgTpl('您真的要{1}{2}{3}服务吗？', [d,a,v]), {icon:3,closeBtn: 2}, function() {
+        var e = layer.msg(msgTpl('正在{1}{2}{3}服务,请稍候...',[d,a,v]), {icon: 16,time: 0});
         $.post("/plugins/run", c, function(g) {
             layer.close(e);
             
-            var f = g.data == 'ok' ? '{1}服务已{2}'.replace('{1}', a).replace('{2}', d):'{1}服务{2}失败!'.replace('{1}', a).replace('{2}', d);
+            var f = g.data == 'ok' ? msgTpl('{1}{2}服务已{3}',[a,v,d]) : msgTpl('{1}{2}服务{3}失败!',[a,v,d]);
             layer.msg(f, {icon: g.data == 'ok' ? 1 : 2});
             
-            if(b != "reload" && g.data == 'ok') {
-                if (b == 'start') {
-                    pluginSetService(a, true);
-                } else if (b=='stop'){
-                    pluginSetService(a, false);
-                } else {
+            if( b != "reload" && g.data == 'ok' ) {
+                if ( b == 'start' ) {
+                    pluginSetService(a, true, v);
+                } else if ( b == 'stop' ){
+                    pluginSetService(a, false, v);
                 }
             }
-            if(g.data != 'ok') {
-                layer.msg(g.data, {icon: 2,time: 0,shade: 0.3,shadeClose: true});
+
+            if( g.status && g.data != 'ok' ) {
+                layer.msg(g.data, {icon: 2,time: 3000,shade: 0.3,shadeClose: true});
             }
+   
         },'json').error(function() {
             layer.close(e);
-            layer.msg('操作成功!', {icon: 1});
+            layer.msg('操作异常!', {icon: 1});
         });
     })
 }
 
 
 //配置修改 --- start
-function pluginConfig(_name){
+function pluginConfig(_name, version){
+	if ( typeof(version) == 'undefined' ){
+		version = '';
+	}
 
-    var con = '<p style="color: #666; margin-bottom: 7px">提示：Ctrl+F 搜索关键字，Ctrl+G 查找下一个，Ctrl+S 保存，Ctrl+Shift+R 查找替换!</p><textarea class="bt-input-text" style="height: 320px; line-height:18px;" id="textBody"></textarea>\
-                    <button id="OnlineEditFileBtn" class="btn btn-success btn-sm" style="margin-top:10px;">保存</button>\
-                    <ul class="help-info-text c7 ptb15">\
-                        <li>此处为'+ _name +'主配置文件,若您不了解配置规则,请勿随意修改。</li>\
-                    </ul>';
+    var con = '<p style="color: #666; margin-bottom: 7px">提示：Ctrl+F 搜索关键字，Ctrl+G 查找下一个，Ctrl+S 保存，Ctrl+Shift+R 查找替换!</p>\
+    			<textarea class="bt-input-text" style="height: 320px; line-height:18px;" id="textBody"></textarea>\
+                <button id="onlineEditFileBtn" class="btn btn-success btn-sm" style="margin-top:10px;">保存</button>\
+                <ul class="help-info-text c7 ptb15">\
+                    <li>此处为'+ _name + version +'主配置文件,若您不了解配置规则,请勿随意修改。</li>\
+                </ul>';
     $(".soft-man-con").html(con);
 
     var loadT = layer.msg('配置文件路径获取中...',{icon:16,time:0,shade: [0.3, '#000']});
-    $.post('/plugins/run', {name:_name, func:'conf'},function (data) {
+    $.post('/plugins/run', {name:_name, func:'conf',version:version},function (data) {
         layer.close(loadT);
 
         var loadT2 = layer.msg('文件内容获取中...',{icon:16,time:0,shade: [0.3, '#000']});
@@ -1613,7 +1623,7 @@ function pluginConfig(_name){
             });
             editor.focus();
             $(".CodeMirror-scroll").css({"height":"300px","margin":0,"padding":0});
-            $("#OnlineEditFileBtn").click(function(){
+            $("#onlineEditFileBtn").click(function(){
                 $("#textBody").text(editor.getValue());
                 pluginConfigSave(fileName);
             });
