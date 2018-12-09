@@ -8,6 +8,7 @@ import binascii
 import json
 import re
 import sys
+import subprocess
 
 sys.path.append(os.getcwd() + "/class/core")
 import public
@@ -74,7 +75,8 @@ def csvnOp(method):
     #_csvn = getServerDir() + '/bin/csvn'
     #_csvn_httpd = getServerDir() + '/bin/csvn-httpd'
 
-    ret_csvn_httpd = public.execShell(_initd_csvn + ' ' + method)
+    #subprocess.Popen('ping -c4 blog.linuxeye.com',shell=True)
+    ret_csvn_httpd = public.execShell(_initd_csvn_httpd + ' ' + method)
     ret_csvn = public.execShell(_initd_csvn + ' ' + method)
     if ret_csvn[1] == '' and ret_csvn_httpd[1] == '':
         return 'ok'
