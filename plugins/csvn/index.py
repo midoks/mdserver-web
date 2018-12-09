@@ -71,9 +71,11 @@ def csvnOp(method):
 
     _initd_csvn = '/etc/init.d/csvn'
     _initd_csvn_httpd = '/etc/init.d/csvn-httpd'
+    #_csvn = getServerDir() + '/bin/csvn'
+    #_csvn_httpd = getServerDir() + '/bin/csvn-httpd'
 
-    ret_csvn = public.execShell(_initd_csvn + ' ' + method)
     ret_csvn_httpd = public.execShell(_initd_csvn + ' ' + method)
+    ret_csvn = public.execShell(_initd_csvn + ' ' + method)
     if ret_csvn[1] == '' and ret_csvn_httpd[1] == '':
         return 'ok'
     return 'fail'
