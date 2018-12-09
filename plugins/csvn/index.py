@@ -68,7 +68,7 @@ def csvnOp(method):
 
     ret_csvn = public.execShell(_initd_csvn + ' ' + method)
     ret_csvn_httpd = public.execShell(_initd_csvn + ' ' + method)
-    if ret_csvn[1] == '' & & ret_csvn_httpd[1] == '':
+    if ret_csvn[1] == '' and ret_csvn_httpd[1] == '':
         return 'ok'
     return 'fail'
 
