@@ -31,6 +31,28 @@ def getInitDFile():
     return '/etc/init.d/' + getPluginName()
 
 
+def getArgs():
+    args = sys.argv[2:]
+    tmp = {}
+    args_len = len(args)
+
+    if args_len == 1:
+        t = args[0].strip('{').strip('}')
+        t = t.split(':')
+        tmp[t[0]] = t[1]
+    elif args_len > 1:
+        for i in range(len(args)):
+            t = args[i].split(':')
+            tmp[t[0]] = t[1]
+
+    return tmp
+
+
+def getConf(version):
+    path = getPluginDir() + "/init.d/php" + version + '.tpl'
+    return path
+
+
 def status(version):
     data = public.execShell(
         "ps -ef|grep php |grep -v grep | grep -v python | awk '{print $2}'")
@@ -39,33 +61,50 @@ def status(version):
     return 'start'
 
 
+def initDreplace(version):
+
+    file_tpl = getConf(version)
+    service_path = public.getServerDir()
+
+    initD_path = getServerDir() + '/init.d'
+    if not os.path.exists(initD_path):
+        os.mkdir(initD_path)
+    file_bin = initD_path + '/php' + version
+
+    content = public.readFile(file_tpl)
+    content = content.replace('{$SERVER_PATH}', service_path)
+
+    public.writeFile(file_bin, content)
+    public.execShell('chmod +x ' + file_bin)
+    return file_bin
+
+
+def phpOp(version, method):
+    file = initDreplace(version)
+    data = public.execShell(file + ' ' + method)
+    print data
+    if data[1] == '':
+        return 'ok'
+    return 'fail'
+
+
 def start(version):
-    path = os.path.dirname(os.getcwd())
-    cmd = path + "/redis/bin/redis-server"
-    cmd = cmd + " " + path + "/redis/redis.conf"
-    data = public.execShell(cmd)
-    if data[0] == '':
-        return 'ok'
-    return 'fail'
+    return phpOp(version, 'start')
 
 
-def stop():
-    data = public.execShell(
-        "ps -ef|grep redis |grep -v grep |grep -v python |awk '{print $2}' | xargs kill -9")
-    if data[0] == '':
-        return 'ok'
-    return 'fail'
+def stop(version):
+    return phpOp(version, 'stop')
 
 
-def restart():
-    return 'ok'
+def restart(version):
+    return phpOp(version, 'restart')
 
 
-def reload():
-    return 'ok'
+def reload(version):
+    return phpOp(version, 'reload')
 
 
-def runInfo():
+def runInfo(version):
     path = os.path.dirname(os.getcwd())
     cmd = path + "/redis/bin/redis-cli info"
     data = public.execShell(cmd)[0]
@@ -96,10 +135,6 @@ def runInfo():
     return public.getJson(result)
 
 
-def getConf():
-    path = os.path.dirname(os.getcwd()) + "/redis/redis.conf"
-    return path
-
 if __name__ == "__main__":
     func = sys.argv[1]
     version = sys.argv[2]
@@ -107,16 +142,16 @@ if __name__ == "__main__":
     if func == 'status':
         print status(version)
     elif func == 'start':
-        print start()
+        print start(version)
     elif func == 'stop':
-        print stop()
+        print stop(version)
     elif func == 'restart':
-        print restart()
+        print restart(version)
     elif func == 'reload':
-        print reload()
+        print reload(version)
     elif func == 'run_info':
-        print runInfo()
+        print runInfo(version)
     elif func == 'conf':
-        print getConf()
+        print getConf(version)
     else:
         print "fail"
