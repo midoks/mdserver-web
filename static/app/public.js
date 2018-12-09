@@ -1509,7 +1509,7 @@ function pluginService(_name, version){
 	if (typeof(version)!=='undefined'){
 		data['version'] = version;
 	}
-	console.log(version);
+	// console.log(version);
 
 	$.post('/plugins/run', data, function(data) {
         if(!data.status){
