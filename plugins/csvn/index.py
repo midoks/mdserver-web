@@ -64,7 +64,7 @@ def status():
 
 def csvnOp(method):
 
-    if not app_debug:
+    if app_debug:
         os_name = public.getOs()
         if os_name == 'darwin':
             return "Apple Computer does not support"
