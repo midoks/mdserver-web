@@ -137,9 +137,9 @@ def initdUinstall():
 
     ret_csvn = public.execShell(_csvn + ' remove')
     ret_csvn_httpd = public.execShell(_csvn_httpd + ' remove')
-    if ret_csvn[1] == '' and ret_csvn_httpd[1] == '':
-        return 'ok'
-    return 'fail'
+
+    print ret_csvn, ret_csvn_httpd
+    return 'ok'
 
 if __name__ == "__main__":
     func = sys.argv[1]
