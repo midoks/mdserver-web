@@ -46,24 +46,12 @@ def getArgs():
 
 
 def initDreplace():
+    initd_file = getInitDFile()
 
-    file_tpl = getConf()
-    service_path = os.path.dirname(os.getcwd())
+    if not os.path.exists(initd_file):
+        return getServerDir()
 
-    initD_path = getServerDir() + '/init.d'
-    if not os.path.exists(initD_path):
-        os.mkdir(initD_path)
-    file_bin = initD_path + '/memcached'
-
-    # if os.path.exists(file_bin):
-    #     return file_bin
-
-    content = public.readFile(file_tpl)
-    content = content.replace('{$SERVER_PATH}', service_path)
-
-    public.writeFile(file_bin, content)
-    public.execShell('chmod +x ' + file_bin)
-    return file_bin
+    return initd_file
 
 
 def status():
@@ -74,36 +62,31 @@ def status():
     return 'start'
 
 
-def start():
-    file = initDreplace()
-    data = public.execShell(file + ' start')
-    if data[1] == '':
+def csvnOp(method):
+    _initd_csvn = '/etc/init.d/csvn'
+    _initd_csvn_httpd = '/etc/init.d/csvn-httpd'
+
+    ret_csvn = public.execShell(_initd_csvn + ' ' + method)
+    ret_csvn_httpd = public.execShell(_initd_csvn + ' ' + method)
+    if ret_csvn[1] == '' & & ret_csvn_httpd[1] == '':
         return 'ok'
     return 'fail'
+
+
+def start():
+    return csvnOp('start')
 
 
 def stop():
-    file = initDreplace()
-    data = public.execShell(file + ' stop')
-    if data[1] == '':
-        return 'ok'
-    return 'fail'
+    return csvnOp('stop')
 
 
 def restart():
-    file = initDreplace()
-    data = public.execShell(file + ' reload')
-    if data[1] == '':
-        return 'ok'
-    return 'fail'
+    return csvnOp('restart')
 
 
 def reload():
-    file = initDreplace()
-    data = public.execShell(file + ' reload')
-    if data[1] == '':
-        return 'ok'
-    return 'fail'
+    return csvnOp('reload')
 
 
 def initdStatus():
@@ -111,8 +94,11 @@ def initdStatus():
         os_name = public.getOs()
         if os_name == 'darwin':
             return "Apple Computer does not support"
-    initd_bin = getInitDFile()
-    if os.path.exists(initd_bin):
+
+    _initd_csvn = '/etc/init.d/csvn'
+    _initd_csvn_httpd = '/etc/init.d/csvn-httpd'
+
+    if os.path.exists(_initd_csvn) and os.path.exists(_initd_csvn_httpd):
         return 'ok'
     return 'fail'
 
@@ -124,10 +110,25 @@ def initdInstall():
         if os_name == 'darwin':
             return "Apple Computer does not support"
 
-    mem_bin = initDreplace()
-    initd_bin = getInitDFile()
-    shutil.copyfile(mem_bin, initd_bin)
-    public.execShell('chmod +x ' + initd_bin)
+    _csvn = getServerDir() + '/bin/csvn'
+    _csvn_httpd = getServerDir() + '/bin/csvn-httpd'
+
+    public.execShell(_csvn + ' install')
+    public.execShell(_csvn_httpd + ' install')
+    return 'ok'
+
+
+def initdUinstall():
+    if not app_debug:
+        os_name = public.getOs()
+        if os_name == 'darwin':
+            return "Apple Computer does not support"
+
+    _csvn = getServerDir() + '/bin/csvn'
+    _csvn_httpd = getServerDir() + '/bin/csvn-httpd'
+
+    public.execShell(_csvn + ' uninstall')
+    public.execShell(_csvn_httpd + ' uninstall')
     return 'ok'
 
 if __name__ == "__main__":
