@@ -75,10 +75,10 @@ def csvnOp(method):
     #_csvn = getServerDir() + '/bin/csvn'
     #_csvn_httpd = getServerDir() + '/bin/csvn-httpd'
 
-    #subprocess.Popen('ping -c4 blog.linuxeye.com',shell=True)
     ret_csvn_httpd = public.execShell(_initd_csvn_httpd + ' ' + method)
-    ret_csvn = public.execShell(_initd_csvn + ' ' + method)
-    if ret_csvn[1] == '' and ret_csvn_httpd[1] == '':
+    # ret_csvn = public.execShell(_initd_csvn + ' ' + method)
+    subprocess.Popen(_initd_csvn + ' ' + method, shell=True)
+    if ret_csvn_httpd[1] == '':
         return 'ok'
     return 'fail'
 
