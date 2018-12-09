@@ -14,7 +14,7 @@ if public.getOs() == 'darwin':
 
 
 def getPluginName():
-    return 'openresty'
+    return 'php'
 
 
 def getPluginDir():
@@ -31,7 +31,7 @@ def getInitDFile():
     return '/etc/init.d/' + getPluginName()
 
 
-def status():
+def status(version):
     data = public.execShell(
         "ps -ef|grep php |grep -v grep | grep -v python | awk '{print $2}'")
     if data[0] == '':
@@ -39,7 +39,7 @@ def status():
     return 'start'
 
 
-def start():
+def start(version):
     path = os.path.dirname(os.getcwd())
     cmd = path + "/redis/bin/redis-server"
     cmd = cmd + " " + path + "/redis/redis.conf"
@@ -102,12 +102,10 @@ def getConf():
 
 if __name__ == "__main__":
     func = sys.argv[1]
-    if func == 'run_info':
-        print runInfo()
-    elif func == 'conf':
-        print getConf()
-    elif func == 'status':
-        print status()
+    version = sys.argv[2]
+
+    if func == 'status':
+        print status(version)
     elif func == 'start':
         print start()
     elif func == 'stop':
@@ -116,3 +114,9 @@ if __name__ == "__main__":
         print restart()
     elif func == 'reload':
         print reload()
+    elif func == 'run_info':
+        print runInfo()
+    elif func == 'conf':
+        print getConf()
+    else:
+        print "fail"
