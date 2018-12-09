@@ -23,7 +23,7 @@ Install_redis()
 	cd redis* && make PREFIX=$serverPath/redis install
 	sed '/^ *#/d' redis.conf > $serverPath/redis/redis.conf
 
-	echo '4.0' > serverPath/redis/version.pl
+	echo '4.0' > $serverPath/redis/version.pl
 
 	echo '安装完成' > $install_tmp
 }
