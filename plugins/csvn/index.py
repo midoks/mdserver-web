@@ -63,6 +63,12 @@ def status():
 
 
 def csvnOp(method):
+
+    if not app_debug:
+        os_name = public.getOs()
+        if os_name == 'darwin':
+            return "Apple Computer does not support"
+
     _initd_csvn = '/etc/init.d/csvn'
     _initd_csvn_httpd = '/etc/init.d/csvn-httpd'
 
@@ -113,9 +119,11 @@ def initdInstall():
     _csvn = getServerDir() + '/bin/csvn'
     _csvn_httpd = getServerDir() + '/bin/csvn-httpd'
 
-    public.execShell(_csvn + ' install')
-    public.execShell(_csvn_httpd + ' install')
-    return 'ok'
+    ret_csvn = public.execShell(_csvn + ' install')
+    ret_csvn_httpd = public.execShell(_csvn_httpd + ' install')
+    if ret_csvn[1] == '' and ret_csvn_httpd[1] == '':
+        return 'ok'
+    return 'fail'
 
 
 def initdUinstall():
@@ -127,9 +135,11 @@ def initdUinstall():
     _csvn = getServerDir() + '/bin/csvn'
     _csvn_httpd = getServerDir() + '/bin/csvn-httpd'
 
-    public.execShell(_csvn + ' uninstall')
-    public.execShell(_csvn_httpd + ' uninstall')
-    return 'ok'
+    ret_csvn = public.execShell(_csvn + ' remove')
+    ret_csvn_httpd = public.execShell(_csvn_httpd + ' remove')
+    if ret_csvn[1] == '' and ret_csvn_httpd[1] == '':
+        return 'ok'
+    return 'fail'
 
 if __name__ == "__main__":
     func = sys.argv[1]
