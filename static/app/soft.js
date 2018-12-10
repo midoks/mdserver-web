@@ -396,8 +396,8 @@ function indexSoft() {
     };
 }
 
-$(function() {
-    if (window.document.location.pathname == '/soft/') {
-        setInterval(function() { getSList(); }, 10000);
-    }
-});
+// $(function() {
+//     if (window.document.location.pathname == '/soft/') {
+//         setInterval(function() { getSList(); }, 10000);
+//     }
+// });

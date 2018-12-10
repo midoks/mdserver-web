@@ -285,8 +285,12 @@ class plugin_api:
                     except Exception, e:
                         print e
 
-        plugins_info = self.checkStatusMProcess(plugins_info)
-        return plugins_info
+        start = (page - 1) * pageSize
+        end = start + pageSize
+        _plugins_info = plugins_info[start:end]
+
+        _plugins_info = self.checkStatusMProcess(_plugins_info)
+        return (_plugins_info, len(plugins_info))
 
     def makeListThread(self, data, sType='0'):
         plugins_info = []
@@ -409,19 +413,21 @@ class plugin_api:
 
         return plugins_info
 
-    def getPluginList(self, sType, sPage=1, sPageSize=15):
+    def getPluginList(self, sType, sPage=1, sPageSize=10):
 
         ret = {}
         ret['type'] = json.loads(public.readFile(self.__type))
         # plugins_info = self.getAllListThread(sType)
         # plugins_info = self.getAllListProcess(sType)
-        plugins_info = self.getAllListPage(sType)
+        data = self.getAllListPage(sType, sPage, sPageSize)
+        ret['data'] = data[0]
 
         args = {}
-        args['count'] = len(plugins_info)
-        args['p1'] = sPage
+        args['count'] = data[1]
+        args['p'] = sPage
+        args['tojs'] = 'getSList'
+        args['row'] = sPageSize
 
-        ret['data'] = plugins_info
         ret['list'] = public.getPage(args)
         return ret
 

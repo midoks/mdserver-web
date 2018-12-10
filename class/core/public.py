@@ -77,7 +77,7 @@ def getPage(args, result='1,2,3,4,5,8'):
 
     info['row'] = 10
     if args.has_key('row'):
-        info['row'] = args['row']
+        info['row'] = int(args['row'])
 
     info['p'] = 1
     if args.has_key('p'):
