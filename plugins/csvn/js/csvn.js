@@ -17,7 +17,7 @@ function csvnUserList(page) {
         var rdata = $.parseJSON(data.data);
         // console.log(rdata);
 
-        content = '<div class="finduser"><input class="bt-input-text mr5" type="text" placeholder="查找用户名" id="disable_function_val" style="height: 28px; border-radius: 3px;width: 410px;">';
+        content = '<div class="finduser"><input class="bt-input-text mr5" type="text" placeholder="查找用户名" id="find_user" style="height: 28px; border-radius: 3px;width: 505px;">';
         content += '<button class="btn btn-success btn-sm">查找</button></div>';
 
         content += '<div class="divtable" style="margin-top:5px;"><table class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0">';
@@ -80,13 +80,29 @@ function csvnDelUser(name){
             if (data.data !='ok'){
                 layer.msg(data.data,{icon:2,time:2000,shade: [0.3, '#000']});
             }
-        },'json');
 
+            layer.close(loadOpen);
+            layer.msg("删除成功!",{icon:1,time:3000,shade: [0.3, '#000']});
+        },'json');
     });
 }
 
 function csvnAddUser(){
-    console.log('12312123');   
+    var loadOpen = layer.open({
+        type: 1,
+        title: '添加用户',
+        area: '350px',
+        content:"<div class='bt-form pd20 pb70 c6'>\
+            <div class='version line'>\
+            <div>用户名:<input class='bt-input-text mr5' type='text' name='username' style='height: 28px; border-radius: 3px;width: 150px;' placeholder='用户名'></div>\
+            <div style='padding-top:3px;'>密&nbsp;&nbsp;&nbsp;&nbsp;码:<input class='bt-input-text mr5' type='text' name='password' style='height: 28px; border-radius: 3px;width: 150px;' placeholder='密码'></div>\
+            </div>\
+            <div class='bt-form-submit-btn'>\
+                <button type='button' id='csvn_del_close' class='btn btn-danger btn-sm btn-title'>关闭</button>\
+                <button type='button' id='csvn_del_ok' class='btn btn-success btn-sm btn-title bi-btn'>确认</button>\
+            </div>\
+        </div>"
+    });
 }
 
 function csvnModPwdUser(name){
