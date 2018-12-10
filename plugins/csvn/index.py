@@ -150,8 +150,36 @@ def initdUinstall():
     return 'ok'
 
 
-def getAllUserList():
-    pass
+def userAdd():
+    args = getArgs()
+    if not 'username' in args:
+        return 'name missing'
+
+    if not 'password' in args:
+        return 'password missing'
+
+    htpasswd = getServerDir() + "/bin/htpasswd"
+    svn_auth_file = getServerDir() + "/data/conf/svn_auth_file"
+    cmd = htpasswd + ' -b ' + svn_auth_file + ' ' + \
+        args['username'] + ' ' + args['password']
+    data = public.execShell(cmd)
+    if data[1] == '':
+        return 'ok'
+    return 'fail'
+
+
+def userDel():
+    args = getArgs()
+    if not 'username' in args:
+        return 'name missing'
+
+    htpasswd = getServerDir() + "/bin/htpasswd"
+    svn_auth_file = getServerDir() + "/data/conf/svn_auth_file"
+    cmd = htpasswd + ' -D ' + svn_auth_file + ' ' + args['username']
+    data = public.execShell(cmd)
+    if data[1] == '':
+        return 'ok'
+    return 'fail'
 
 
 def userList():
@@ -221,6 +249,10 @@ if __name__ == "__main__":
         print saveConf()
     elif func == 'user_list':
         print userList()
+    elif func == 'user_add':
+        print userAdd()
+    elif func == 'user_del':
+        print userDel()
     elif func == 'project_list':
         print projectList()
     else:
