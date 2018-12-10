@@ -1711,7 +1711,7 @@ function pluginErrorLogs(_name, version){
         version = '';
     }
 
-    var loadT = layer.msg('配置文件路径获取中...',{icon:16,time:0,shade: [0.3, '#000']});
+    var loadT = layer.msg('错误日志路径获取中...',{icon:16,time:0,shade: [0.3, '#000']});
     $.post('/plugins/run', {name:_name, func:'error_log',version:version},function (data) {
         layer.close(loadT);
 
