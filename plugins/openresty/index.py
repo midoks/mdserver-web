@@ -203,17 +203,20 @@ def initdUinstall():
 
 def runInfo():
     # 取Openresty负载状态
-    result = public.httpGet('http://127.0.0.1:6666/nginx_status')
-    tmp = result.split()
-    data = {}
-    data['active'] = tmp[2]
-    data['accepts'] = tmp[9]
-    data['handled'] = tmp[7]
-    data['requests'] = tmp[8]
-    data['Reading'] = tmp[11]
-    data['Writing'] = tmp[13]
-    data['Waiting'] = tmp[15]
-    return public.getJson(data)
+    try:
+        result = public.httpGet('http://127.0.0.1:6666/nginx_status')
+        tmp = result.split()
+        data = {}
+        data['active'] = tmp[2]
+        data['accepts'] = tmp[9]
+        data['handled'] = tmp[7]
+        data['requests'] = tmp[8]
+        data['Reading'] = tmp[11]
+        data['Writing'] = tmp[13]
+        data['Waiting'] = tmp[15]
+        return public.getJson(data)
+    except Exception as e:
+        return 'oprenresty not started'
 
 
 def errorLogPath():

@@ -254,17 +254,21 @@ function getOpenrestyStatus() {
             return;
         }
         
-        var rdata = $.parseJSON(data.data);
-        var con = "<div><table class='table table-hover table-bordered'>\
-                        <tr><th>活动连接(Active connections)</th><td>" + rdata.active + "</td></tr>\
-                        <tr><th>总连接次数(accepts)</th><td>" + rdata.accepts + "</td></tr>\
-                        <tr><th>总握手次数(handled)</th><td>" + rdata.handled + "</td></tr>\
-                        <tr><th>总请求数(requests)</th><td>" + rdata.requests + "</td></tr>\
-                        <tr><th>请求数(Reading)</th><td>" + rdata.Reading + "</td></tr>\
-                        <tr><th>响应数(Writing)</th><td>" + rdata.Writing + "</td></tr>\
-                        <tr><th>驻留进程(Waiting)</th><td>" + rdata.Waiting + "</td></tr>\
-                     </table></div>";
-        $(".soft-man-con").html(con);
+        try {
+            var rdata = $.parseJSON(data.data);
+            var con = "<div><table class='table table-hover table-bordered'>\
+                            <tr><th>活动连接(Active connections)</th><td>" + rdata.active + "</td></tr>\
+                            <tr><th>总连接次数(accepts)</th><td>" + rdata.accepts + "</td></tr>\
+                            <tr><th>总握手次数(handled)</th><td>" + rdata.handled + "</td></tr>\
+                            <tr><th>总请求数(requests)</th><td>" + rdata.requests + "</td></tr>\
+                            <tr><th>请求数(Reading)</th><td>" + rdata.Reading + "</td></tr>\
+                            <tr><th>响应数(Writing)</th><td>" + rdata.Writing + "</td></tr>\
+                            <tr><th>驻留进程(Waiting)</th><td>" + rdata.Waiting + "</td></tr>\
+                         </table></div>";
+            $(".soft-man-con").html(con);
+        }catch(err){
+             showMsg(data.data, function(){}, null,3000);
+        }
     },'json');
 }
 
