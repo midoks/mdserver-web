@@ -1,10 +1,17 @@
 <div class="bt-form">
 	<div class="bt-w-main">
 		<div class="bt-w-menu">
-			<p class="bgw" onclick="infojson();">INFO说明</p>
-			<p class="bgw" onclick="indexPy();">index.py说明</p>
+			<p class="bgw" onclick="readme();">插件说明</p>
+			<p onclick="infojson();">INFO说明</p>
+			<p onclick="indexPy();">index.py说明</p>
 		</div>
+
 		<div class="bt-w-con pd15">
+			<div class="soft-man-con v0">
+				<div><p>在每一个插件中,都必须包含一个info.json文件,格式如下:</p><br/></div>
+<div>123</div>
+			</div>
+
 			<div class="soft-man-con v1">
 				<div><p>在每一个插件中,都必须包含一个info.json文件,格式如下:</p><br/></div>
 <div><pre>{
@@ -32,6 +39,12 @@
 
 </div>
 <script type="text/javascript">
+
+function readme() {
+	$('.bt-w-main .soft-man-con').hide();
+	$('.bt-w-main .v0').show();
+}
+
 function infojson() {
 	$('.bt-w-main .soft-man-con').hide();
 	$('.bt-w-main .v1').show();
