@@ -1,44 +1,16 @@
 <div class="bt-form">
 	<div class="bt-w-main">
 		<div class="bt-w-menu">
-			<p class="bgw" onclick="infojson();">INFO说明</p>
-			<p class="bgw" onclick="indexPy();">index.py说明</p>
+			<p class="bgw" onclick="pluginService('mysql');">服务</p>
+			<p onclick="indexPy();">自启动</p>
 		</div>
 		<div class="bt-w-con pd15">
-			<div class="soft-man-con v1">
-				<div><p>在每一个插件中,都必须包含一个info.json文件,格式如下:</p><br/></div>
-<div><pre>{
-"title": "插件开发说明",
-"tip": "soft",
-"name": "readme",
-"type": "扩展",
-"ps": "(mdserver-web)插件产开发说明,每个版本可能有所变化!",
-"versions": "0.1",
-"shell": "install.sh",
-"checks": "server/readme",
-"path": "server/readme",
-"author": "mdserver-web",
-"home": "github.com/midoks/mdserver-web",
-"date": "2018-11-30",
-"pid": "5"
-}</pre></div>
-			</div>
-			
-			<div class="soft-man-con v2">
-				<div><p>在每一个插件中,都必须包含一个index.py文件</p><br/></div>
+			<div class="soft-man-con">
 			</div>
 		</div>
 	</div>
 
 </div>
 <script type="text/javascript">
-function infojson() {
-	$('.bt-w-main .soft-man-con').hide();
-	$('.bt-w-main .v1').show();
-}
-
-function indexPy() {
-	$('.bt-w-main .soft-man-con').hide();
-	$('.bt-w-main .v2').show();
-}
+	$.getScript( "/plugins/file?name=mysql&f=js/mysql.js");
 </script>
