@@ -75,33 +75,33 @@
 						</div>
 						<div id="ptime" class="pull-left">
 							<div class="dropdown planweek pull-left mr20">
-								<button class="btn btn-default dropdown-toggle" type="button" id="excode" data-toggle="dropdown"><b val="1">$data['lan']['TZZ1']</b> <span class="caret"></span></button>
+								<button class="btn btn-default dropdown-toggle" type="button" id="excode" data-toggle="dropdown"><b val="1">周一</b> <span class="caret"></span></button>
 								<ul class="dropdown-menu" role="menu" aria-labelledby="excode">
 									<li>
-										<a role="menuitem" tabindex="-1" href="javascript:;" value="1">$data['lan']['TZZ1']</a>
+										<a role="menuitem" tabindex="-1" href="javascript:;" value="1">周一</a>
 									</li>
 									<li>
-										<a role="menuitem" tabindex="-1" href="javascript:;" value="2">$data['lan']['TZZ2']</a>
+										<a role="menuitem" tabindex="-1" href="javascript:;" value="2">周二</a>
 									</li>
 									<li>
-										<a role="menuitem" tabindex="-1" href="javascript:;" value="3">$data['lan']['TZZ3']</a>
+										<a role="menuitem" tabindex="-1" href="javascript:;" value="3">周三</a>
 									</li>
 									<li>
-										<a role="menuitem" tabindex="-1" href="javascript:;" value="4">$data['lan']['TZZ4']</a>
+										<a role="menuitem" tabindex="-1" href="javascript:;" value="4">周四</a>
 									</li>
 									<li>
-										<a role="menuitem" tabindex="-1" href="javascript:;" value="5">$data['lan']['TZZ5']</a>
+										<a role="menuitem" tabindex="-1" href="javascript:;" value="5">周五</a>
 									</li>
 									<li>
-										<a role="menuitem" tabindex="-1" href="javascript:;" value="6">$data['lan']['TZZ6']</a>
+										<a role="menuitem" tabindex="-1" href="javascript:;" value="6">周六</a>
 									</li>
 									<li>
-										<a role="menuitem" tabindex="-1" href="javascript:;" value="0">$data['lan']['TZZ7']</a>
+										<a role="menuitem" tabindex="-1" href="javascript:;" value="0">周日</a>
 									</li>
 								</ul>
 							</div>
-							<div class="plan_hms pull-left mr20 bt-input-text"> <span><input type="number" name="hour" value="1" maxlength="2" max="23" min="0"></span> <span class="name">$data['lan']['TZS1']</span> </div>
-							<div class="plan_hms pull-left mr20 bt-input-text"> <span><input type="number" name="minute" value="30" maxlength="2" max="59" min="0"></span> <span class="name">$data['lan']['TZS2']</span> </div>
+							<div class="plan_hms pull-left mr20 bt-input-text"> <span><input type="number" name="hour" value="1" maxlength="2" max="23" min="0"></span> <span class="name">小时</span> </div>
+							<div class="plan_hms pull-left mr20 bt-input-text"> <span><input type="number" name="minute" value="30" maxlength="2" max="59" min="0"></span> <span class="name">分钟</span> </div>
 						</div>
 					</div>
 					<div class="clearfix plan">
@@ -161,7 +161,7 @@
 		</div>
 	</div>
 </div>
-<script src="/static/js/crontab.js?date=20180808"></script>
+<script src="/static/app/crontab.js?v={{config.version}}"></script>
 <script type="text/javascript">
 	setCookie('serverType','$web.ctx.session.webserver');
 	toWeek();
