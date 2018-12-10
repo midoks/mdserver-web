@@ -91,7 +91,7 @@ function csvnAddUser(){
     var loadOpen = layer.open({
         type: 1,
         title: '添加用户',
-        area: '350px',
+        area: '240px',
         content:"<div class='bt-form pd20 pb70 c6'>\
             <div class='version line'>\
             <div>用户名:<input class='bt-input-text mr5' type='text' name='username' style='height: 28px; border-radius: 3px;width: 150px;' placeholder='用户名'></div>\
