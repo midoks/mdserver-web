@@ -150,6 +150,10 @@ def initdUinstall():
     return 'ok'
 
 
+def getAllUserList():
+    pass
+
+
 def userList():
     import math
     args = getArgs()
@@ -176,14 +180,20 @@ def userList():
         tmp = auth_list[x].split(':')
         ulist.append(tmp[0])
 
-    data['list'] = public.getPage({'count': auth_list_sum, 'p': page})
+    page_info = {'count': auth_list_sum, 'p': page,
+                 'row': 10, 'tojs': 'csvnUserList'}
+    data['list'] = public.getPage(page_info)
     data['page'] = page
     data['page_size'] = page_size
     data['page_count'] = int(math.ceil(auth_list_sum / page_size))
     start = (page - 1) * page_size
 
-    data['data'] = ulist[start:page_size]
+    data['data'] = ulist[start:start + page_size]
     return public.getJson(data)
+
+
+def projectList():
+    return []
 
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -211,5 +221,7 @@ if __name__ == "__main__":
         print saveConf()
     elif func == 'user_list':
         print userList()
+    elif func == 'project_list':
+        print projectList()
     else:
         print 'fail'

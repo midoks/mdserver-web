@@ -30,9 +30,9 @@
 				<a class="plr10 c4" href="/">首页</a>/<span class="plr10 c4">系统安全</span>
 			</div>
 			<div class="search pull-right">
-				<form target="hid" onsubmit='getLogs(1,$$("#SearchValue").prop("value"))'>
+				<form target="hid" onsubmit='getLogs(1,$("#SearchValue").prop("value"))'>
 					<input type="text" id="SearchValue" class="ser-text pull-left" placeholder="搜索日志" />
-					<button type="button" class="ser-sub pull-left" onclick='getLogs(1,$$("#SearchValue").prop("value"))'></button>
+					<button type="button" class="ser-sub pull-left" onclick='getLogs(1,$("#SearchValue").prop("value"))'></button>
 				</form>
 				<iframe name='hid' id="hid" style="display:none"></iframe>
 			</div>
@@ -127,5 +127,5 @@
 		</div>
 	</div>
 </div>
-<script src="/static/js/firewall.js?v={{config.version}}"></script>
+<script src="/static/app/firewall.js?v={{config.version}}"></script>
 {% endblock %}
