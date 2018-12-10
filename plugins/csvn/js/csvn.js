@@ -23,7 +23,7 @@ function csvnUserList(page) {
         content += '<div class="divtable" style="margin-top:5px;"><table class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0">';
         content += '<thead><tr>';
         content += '<th>用户名</th>';
-        content += '<th>操作</th>';
+        content += '<th>操作(<a class="btlink" onclick="csvnAddUser();">添加</a>)</th>';
         content += '</tr></thead>';
 
         content += '<tbody>';
@@ -83,6 +83,10 @@ function csvnDelUser(name){
         },'json');
 
     });
+}
+
+function csvnAddUser(){
+    console.log('12312123');   
 }
 
 function csvnModPwdUser(name){
