@@ -49,7 +49,7 @@ def getArgs():
 
 
 def getConf(version):
-    path = getPluginDir() + "/init.d/php" + version + '.tpl'
+    path = getPluginDir() + "/init.d/php.tpl"
     return path
 
 
@@ -62,14 +62,20 @@ def status(version):
     return 'start'
 
 
-def phpFpmReplace(version):
+def contentReplace(content, version):
     service_path = public.getServerDir()
+    content = content.replace('{$SERVER_PATH}', service_path)
+    content = content.replace('{$PHP_VERSION}', version)
+    return content
+
+
+def phpFpmReplace(version):
 
     tpl_php_fpm = getPluginDir() + '/conf/php-fpm.conf'
     service_php_fpm = getServerDir() + '/' + version + '/etc/php-fpm.conf'
     content = public.readFile(tpl_php_fpm)
-    content = content.replace('{$SERVER_PATH}', service_path)
-    content = content.replace('{$PHP_VERSION}', version)
+
+    content = contentReplace(content, version)
 
     public.writeFile(service_php_fpm, content)
 
@@ -84,7 +90,7 @@ def phpFpmWwwReplace(version):
         os.mkdir(service_php_fpm_dir)
 
     content = public.readFile(tpl_php_fpmwww)
-    content = content.replace('{$PHP_VERSION}', version)
+    content = contentReplace(content, version)
     public.writeFile(service_php_fpmwww, content)
 
 
@@ -99,7 +105,7 @@ def initDreplace(version):
     file_bin = initD_path + '/php' + version
 
     content = public.readFile(file_tpl)
-    content = content.replace('{$SERVER_PATH}', service_path)
+    content = contentReplace(content, version)
 
     public.writeFile(file_bin, content)
     public.execShell('chmod +x ' + file_bin)
@@ -113,6 +119,7 @@ def initDreplace(version):
 def phpOp(version, method):
     file = initDreplace(version)
     data = public.execShell(file + ' ' + method)
+    print data
     if data[1] == '':
         return 'ok'
     return 'fail'

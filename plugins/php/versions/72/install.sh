@@ -54,6 +54,7 @@ cd $sourcePath/php/php-7.2.5 && ./configure \
 
 Uninstall_php()
 {
+	rm -rf $serverPath/php/72
 	echo "卸载php-7.2.5 ..." > $install_tmp
 }
 
