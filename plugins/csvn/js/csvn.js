@@ -31,7 +31,7 @@ function csvnUserList(page) {
         ulist = rdata.data;
         for (i in ulist){
             content += '<tr><td>'+ulist[i]+'</td><td>'+
-                '<a class="btlink" onclick="csvnDelUser(\''+ulist[i]+'\')">删除</a>|' +
+                '<a class="btlink" onclick="csvnDelUser(\''+ulist[i]+'\')">删除</a> | ' +
                 '<a class="btlink" onclick="csvnModPwdUser(\''+ulist[i]+'\')">改密</a></td></tr>';
         }
 
@@ -49,7 +49,40 @@ function csvnUserList(page) {
 }
 
 function csvnDelUser(name){
-    console.log(name);   
+    var loadOpen = layer.open({
+        type: 1,
+        title: '删除用户',
+        area: '350px',
+        content:"<div class='bt-form pd20 pb70 c6'>\
+            <div class='version line'>你要确认要删除"+ name + "账户?</div>\
+            <div class='bt-form-submit-btn'>\
+                <button type='button' id='csvn_del_close' class='btn btn-danger btn-sm btn-title'>关闭</button>\
+                <button type='button' id='csvn_del_ok' class='btn btn-success btn-sm btn-title bi-btn'>确认</button>\
+            </div>\
+        </div>"
+    });
+
+    $('#csvn_del_close').click(function(){
+        layer.close(loadOpen);
+    });
+
+    $('#csvn_del_ok').click(function(){
+        _data = {};
+        _data['username'] = name;
+        var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
+        $.post('/plugins/run', {name:'csvn', func:'user_del', args:JSON.stringify(_data)}, function(data) {
+            layer.close(loadT);
+            if (!data.status){
+                layer.msg(data.data,{icon:0,time:2000,shade: [0.3, '#000']});
+                return;
+            }
+
+            if (data.data !='ok'){
+                layer.msg(data.data,{icon:2,time:2000,shade: [0.3, '#000']});
+            }
+        },'json');
+
+    });
 }
 
 function csvnModPwdUser(name){
