@@ -163,7 +163,7 @@ def userAdd():
     cmd = htpasswd + ' -b ' + svn_auth_file + ' ' + \
         args['username'] + ' ' + args['password']
     data = public.execShell(cmd)
-    if data[1] == '':
+    if data[0] == '':
         return 'ok'
     return 'fail'
 
@@ -177,7 +177,7 @@ def userDel():
     svn_auth_file = getServerDir() + "/data/conf/svn_auth_file"
     cmd = htpasswd + ' -D ' + svn_auth_file + ' ' + args['username']
     data = public.execShell(cmd)
-    if data[1] == '':
+    if data[0] == '':
         return 'ok'
     return 'fail'
 
