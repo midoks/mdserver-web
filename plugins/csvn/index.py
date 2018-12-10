@@ -167,6 +167,7 @@ def userList():
         return public.getJson([])
 
     auth = public.readFile(svn_auth_file)
+    auth = auth.strip()
     auth_list = auth.split("\n")
     auth_list_sum = len(auth_list)
     ulist = []
