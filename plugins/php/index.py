@@ -54,11 +54,21 @@ def getConf(version):
 
 
 def status(version):
-    data = public.execShell(
-        "ps -ef|grep php |grep -v grep | grep -v python | awk '{print $2}'")
+    cmd = "ps -ef|grep 'php/" + version + \
+        "' |grep -v grep | grep -v python | awk '{print $2}'"
+    data = public.execShell(cmd)
     if data[0] == '':
         return 'stop'
     return 'start'
+
+
+def phpFpmReplace(version):
+    service_path = public.getServerDir()
+    php_fpm = getPluginDir() + '/conf/php-fpm.conf'
+
+
+def phpFpmWwwReplace(version):
+    php_fpm_www = getPluginDir() + '/conf/www.conf'
 
 
 def initDreplace(version):
@@ -76,6 +86,8 @@ def initDreplace(version):
 
     public.writeFile(file_bin, content)
     public.execShell('chmod +x ' + file_bin)
+
+    phpFpmReplace(version)
     return file_bin
 
 
