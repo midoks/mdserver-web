@@ -64,11 +64,28 @@ def status(version):
 
 def phpFpmReplace(version):
     service_path = public.getServerDir()
-    php_fpm = getPluginDir() + '/conf/php-fpm.conf'
+
+    tpl_php_fpm = getPluginDir() + '/conf/php-fpm.conf'
+    service_php_fpm = getServerDir() + '/' + version + '/etc/php-fpm.conf'
+    content = public.readFile(tpl_php_fpm)
+    content = content.replace('{$SERVER_PATH}', service_path)
+    content = content.replace('{$PHP_VERSION}', version)
+
+    public.writeFile(service_php_fpm, content)
 
 
 def phpFpmWwwReplace(version):
-    php_fpm_www = getPluginDir() + '/conf/www.conf'
+    service_path = public.getServerDir()
+
+    tpl_php_fpmwww = getPluginDir() + '/conf/www.conf'
+    service_php_fpm_dir = getServerDir() + '/' + version + '/etc/php-fpm.d/'
+    service_php_fpmwww = service_php_fpm_dir + '/www.conf'
+    if not os.path.exists(service_php_fpm_dir):
+        os.mkdir(service_php_fpm_dir)
+
+    content = public.readFile(tpl_php_fpmwww)
+    content = content.replace('{$PHP_VERSION}', version)
+    public.writeFile(service_php_fpmwww, content)
 
 
 def initDreplace(version):
@@ -87,14 +104,15 @@ def initDreplace(version):
     public.writeFile(file_bin, content)
     public.execShell('chmod +x ' + file_bin)
 
+    phpFpmWwwReplace(version)
     phpFpmReplace(version)
+
     return file_bin
 
 
 def phpOp(version, method):
     file = initDreplace(version)
     data = public.execShell(file + ' ' + method)
-    print data
     if data[1] == '':
         return 'ok'
     return 'fail'
