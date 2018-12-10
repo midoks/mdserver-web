@@ -216,6 +216,10 @@ def runInfo():
     return public.getJson(data)
 
 
+def errorLogPath():
+    return getServerDir() + '/nginx/logs/error.log'
+
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -238,5 +242,7 @@ if __name__ == "__main__":
         print getConf()
     elif func == 'run_info':
         print runInfo()
+    elif func == 'error_log':
+        print errorLogPath()
     else:
         print 'error'

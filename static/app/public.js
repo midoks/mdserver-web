@@ -1705,4 +1705,31 @@ function pluginOpInitD(a, b) {
         });
     })
 }
+
+function pluginErrorLogs(_name, version){
+    if ( typeof(version) == 'undefined' ){
+        version = '';
+    }
+
+    var loadT = layer.msg('配置文件路径获取中...',{icon:16,time:0,shade: [0.3, '#000']});
+    $.post('/plugins/run', {name:_name, func:'error_log',version:version},function (data) {
+        layer.close(loadT);
+
+        var loadT2 = layer.msg('文件内容获取中...',{icon:16,time:0,shade: [0.3, '#000']});
+        var fileName = data.data;
+        $.post('/files/get_body', 'path=' + fileName, function(rdata) {
+            layer.close(loadT2);
+            if (!rdata.status){
+                layer.msg(rdata.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+                return;
+            }
+            
+            if(rdata.data.data == '') rdata.data.data = '当前没有日志!';
+            var ebody = '<div class="soft-man-con"><textarea readonly="" style="margin: 0px;width: 500px;height: 520px;background-color: #333;color:#fff; padding:0 5px" id="error_log">'+rdata.data.data+'</textarea></div>';
+            $(".soft-man-con").html(ebody);
+            var ob = document.getElementById('error_log');
+            ob.scrollTop = ob.scrollHeight; 
+        },'json');
+    },'json');
+}
 /*** 其中功能,针对插件通过库使用 end ***/
