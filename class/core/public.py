@@ -335,27 +335,6 @@ def getLastLine(inputfile, lineNum):
         return getMsg('TASK_SLEEP')
 
 
-def serviceReload():
-    # 重载Web服务配置
-    if os.path.exists('/www/server/nginx/sbin/nginx'):
-        result = execShell('/etc/init.d/nginx reload')
-        if result[1].find('nginx.pid') != -1:
-            execShell('pkill -9 nginx && sleep 1')
-            execShell('/etc/init.d/nginx start')
-    else:
-        result = execShell('/etc/init.d/httpd reload')
-    return result
-
-
-def phpReload(version):
-    # 重载PHP配置
-    import os
-    if os.path.exists('/www/server/php/' + version + '/libphp5.so'):
-        execShell('/etc/init.d/httpd reload')
-    else:
-        execShell('/etc/init.d/php-fpm-' + version + ' reload')
-
-
 def downloadFile(url, filename):
     import urllib
     urllib.urlretrieve(url, filename=filename, reporthook=downloadHook)
@@ -367,7 +346,7 @@ def downloadHook(count, blockSize, totalSize):
     print '%02d%%' % (100.0 * count * blockSize / totalSize)
 
 
-def GetLocalIp():
+def getLocalIp():
     # 取本地外网IP
     try:
         import re
@@ -400,23 +379,6 @@ def inArray(arrays, searchStr):
             return True
 
     return False
-
-
-def checkWebConfig():
-    # 检查Web服务器配置文件是否有错误
-    if get_webserver() == 'nginx':
-        result = ExecShell(
-            "ulimit -n 10240 && /www/server/nginx/sbin/nginx -t -c /www/server/nginx/conf/nginx.conf")
-        searchStr = 'successful'
-    else:
-        result = ExecShell(
-            "ulimit -n 10240 && /www/server/apache/bin/apachectl -t")
-        searchStr = 'Syntax OK'
-
-    if result[1].find(searchStr) == -1:
-        WriteLog("TYPE_SOFT", 'CONF_CHECK_ERR', (result[1],))
-        return result[1]
-    return True
 
 
 def checkIp(ip):
@@ -492,26 +454,6 @@ def hasPwd(password):
     # 加密密码字符
     import crypt
     return crypt.crypt(password, password)
-
-
-def get_url(timeout=0.5):
-    import json
-    try:
-        nodeFile = '/www/server/panel/data/node.json'
-        node_list = json.loads(readFile(nodeFile))
-        mnode = None
-        for node in node_list:
-            node['ping'] = get_timeout(
-                node['protocol'] + node['address'] + ':' + node['port'] + '/check.txt')
-            if not node['ping']:
-                continue
-            if not mnode:
-                mnode = node
-            if node['ping'] < mnode['ping']:
-                mnode = node
-        return mnode['protocol'] + mnode['address'] + ':' + mnode['port']
-    except:
-        return 'http://download.bt.cn'
 
 
 def get_timeout(url):

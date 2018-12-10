@@ -175,10 +175,12 @@ def userList():
         tmp = auth_list[x].split(':')
         ulist.append(tmp[0])
 
+    data['list'] = public.getPage({'count': auth_list_sum, 'p': page})
     data['page'] = page
     data['page_size'] = page_size
     data['page_count'] = int(math.ceil(auth_list_sum / page_size))
     start = (page - 1) * page_size
+
     data['data'] = ulist[start:page_size]
     return public.getJson(data)
 

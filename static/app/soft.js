@@ -1,8 +1,4 @@
-//转换单们到MB
-function toSizeM(byteLen) {
-    var a = parseInt(byteLen) / 1024 / 1024;
-    return a || 0;
-}
+
 
 //重置插件弹出框宽度
 function resetPluginWinWidth(width){
@@ -361,7 +357,7 @@ function indexListHtml(callback){
         if (softboxlen <= softboxsum) {
             for (var i = 0; i < softboxsum - softboxlen; i++) {
                 // softboxn += 1000;
-                softboxcon += '<div class="col-sm-3 col-md-3 col-lg-3 no-bg" data-id="'  + '"></div>'
+                softboxcon += '<div class="col-sm-3 col-md-3 col-lg-3 no-bg" data-id=""></div>';
             }
             $("#indexsoft").append(softboxcon);
         }

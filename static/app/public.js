@@ -5,6 +5,12 @@ $(document).ready(function() {
 	});
 });
 
+//转换单们到MB
+function toSizeM(byteLen) {
+    var a = parseInt(byteLen) / 1024 / 1024;
+    return a || 0;
+}
+
 function randomStrPwd(b) {
 	b = b || 32;
 	var c = "AaBbCcDdEeFfGHhiJjKkLMmNnPpRSrTsWtXwYxZyz2345678";
