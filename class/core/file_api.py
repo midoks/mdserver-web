@@ -15,6 +15,33 @@ class file_api:
     def __init__(self):
         pass
 
+    def setFileAccept(self, filename):
+        auth = 'www:www'
+        if public.getOs() == 'darwin':
+            user = public.execShell(
+                "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
+            auth = user + ':staff'
+        os.system('chown -R ' + auth + ' ' + filename)
+        os.system('chmod -R 755 ' + filename)
+
+    # 移动到回收站
+    def mvRecycleBin(self, path):
+        rPath = public.getRootDir() + '/recycle_bin/'
+        if not os.path.exists(rPath):
+            os.system('mkdir -p ' + rPath)
+
+        rFile = rPath + path.replace('/', '_mw_') + '_t_' + str(time.time())
+        try:
+            import shutil
+            shutil.move(path, rFile)
+            public.writeLog('TYPE_FILE', public.getInfo(
+                '移动文件[{1}]到回收站成功!', (path)))
+            return True
+        except:
+            public.writeLog('TYPE_FILE', public.getInfo(
+                '移动文件[{1}]到回收站失败!', (path)))
+            return False
+
     def getBody(self, path):
         if not os.path.exists(path):
             return public.returnJson(False, '文件不存在', (path,))
@@ -92,15 +119,6 @@ class file_api:
         except Exception as ex:
             return public.returnJson(False, 'FILE_SAVE_ERR:' + str(ex))
 
-    def setFileAccept(self, filename):
-        auth = 'www:www'
-        if public.getOs() == 'darwin':
-            user = public.execShell(
-                "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
-            auth = user + ':staff'
-        os.system('chown -R ' + auth + ' ' + filename)
-        os.system('chmod -R 755 ' + filename)
-
     def zip(self, sfile, dfile, stype, path):
         if sfile.find(',') == -1:
             if not os.path.exists(path + '/' + sfile):
@@ -125,7 +143,27 @@ class file_api:
         except:
             return public.returnJson(False, '文件压缩失败!')
 
-    # 计算文件数量
+    def delete(self, path):
+
+        if not os.path.exists(path):
+            return public.returnJson(False, '指定文件不存在!')
+
+        # 检查是否为.user.ini
+        if path.find('.user.ini') >= 0:
+            os.system("chattr -i '" + path + "'")
+
+        try:
+            if os.path.exists('data/recycle_bin.pl'):
+                if self.mvRecycleBin(path):
+                    return public.returnJson(True, '已将文件移动到回收站!')
+            os.remove(path)
+            public.writeLog('TYPE_FILE', public.getInfo(
+                '删除文件[{1}]成功!', (path)))
+            return public.returnJson(True, '删除文件成功!')
+        except:
+            return public.returnJson(False, '删除文件失败!')
+
+        # 计算文件数量
     def getFilesCount(self, path, search):
         i = 0
         for name in os.listdir(path):
