@@ -17,7 +17,7 @@ function csvnUserList(page) {
         var rdata = $.parseJSON(data.data);
         // console.log(rdata);
 
-        content = '<div class="finduser"><input class="bt-input-text mr5" type="text" placeholder="查找用户名" id="find_user" style="height: 28px; border-radius: 3px;width: 505px;">';
+        content = '<div class="finduser"><input class="bt-input-text mr5 outline_no" type="text" placeholder="查找用户名" id="find_user" style="height: 28px; border-radius: 3px;width: 505px;">';
         content += '<button class="btn btn-success btn-sm">查找</button></div>';
 
         content += '<div class="divtable" style="margin-top:5px;"><table class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0">';
@@ -94,15 +94,43 @@ function csvnAddUser(){
         area: '240px',
         content:"<div class='bt-form pd20 pb70 c6'>\
             <div class='version line'>\
-            <div>用户名:<input class='bt-input-text mr5' type='text' name='username' style='height: 28px; border-radius: 3px;width: 150px;' placeholder='用户名'></div>\
-            <div style='padding-top:3px;'>密&nbsp;&nbsp;&nbsp;&nbsp;码:<input class='bt-input-text mr5' type='text' name='password' style='height: 28px; border-radius: 3px;width: 150px;' placeholder='密码'></div>\
+            <div><input class='bt-input-text mr5 outline_no' type='text' id='csvn_username' name='username' style='height: 28px; border-radius: 3px;width: 200px;' placeholder='输入用户名'></div>\
+            <div style='padding-top:3px;'><input class='bt-input-text mr5 outline_no' type='text' id='csvn_password' name='password' style='height: 28px; border-radius: 3px;width: 200px;' placeholder='输入密码'></div>\
             </div>\
             <div class='bt-form-submit-btn'>\
-                <button type='button' id='csvn_del_close' class='btn btn-danger btn-sm btn-title'>关闭</button>\
-                <button type='button' id='csvn_del_ok' class='btn btn-success btn-sm btn-title bi-btn'>确认</button>\
+                <button type='button' id='csvn_add_close' class='btn btn-danger btn-sm btn-title'>关闭</button>\
+                <button type='button' id='csvn_add_ok' class='btn btn-success btn-sm btn-title bi-btn'>确认</button>\
             </div>\
         </div>"
     });
+
+    $('#csvn_add_close').click(function(){
+        layer.close(loadOpen);
+    });
+
+    $('#csvn_add_ok').click(function(){
+        _data = {};
+
+        _data['username'] = $('#csvn_username').val();
+        _data['password'] = $('#csvn_password').val();
+
+        var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
+        $.post('/plugins/run', {name:'csvn', func:'user_add', args:JSON.stringify(_data)}, function(data) {
+            layer.close(loadT);
+            if (!data.status){
+                layer.msg(data.data,{icon:0,time:2000,shade: [0.3, '#000']});
+                return;
+            }
+
+            if (data.data !='ok'){
+                layer.msg(data.data,{icon:2,time:2000,shade: [0.3, '#000']});
+            }
+
+            layer.close(loadOpen);
+            layer.msg("删除成功!",{icon:1,time:3000,shade: [0.3, '#000']});
+        },'json');
+    });
+
 }
 
 function csvnModPwdUser(name){
