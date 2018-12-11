@@ -65,6 +65,11 @@ def M(table):
 
 
 def getPage(args, result='1,2,3,4,5,8'):
+    data = getPageObject(args, result)
+    return data[0]
+
+
+def getPageObject(args, result='1,2,3,4,5,8'):
     # 取分页
     import page
     # 实例化分页类
@@ -87,7 +92,7 @@ def getPage(args, result='1,2,3,4,5,8'):
     if args.has_key('tojs'):
         info['return_js'] = args['tojs']
 
-    return page.GetPage(info, result)
+    return (page.GetPage(info, result), page)
 
 
 def md5(str):
