@@ -162,7 +162,7 @@ def mainSafe():
             os.system('/etc/init.d/bt start')
             isStart = public.execShell(
                 "ps aux |grep 'python main.py'|grep -v grep|awk '{print $2}'")[0]
-            public.WriteLog('守护程序', '面板服务程序启动成功 -> PID: ' + isStart)
+            public.writeLog('守护程序', '面板服务程序启动成功 -> PID: ' + isStart)
     except:
         time.sleep(30)
         mainSafe()

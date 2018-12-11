@@ -92,6 +92,39 @@ class file_api:
         except Exception as ex:
             return public.returnJson(False, 'FILE_SAVE_ERR:' + str(ex))
 
+    def setFileAccept(self, filename):
+        auth = 'www:www'
+        if public.getOs() == 'darwin':
+            user = public.execShell(
+                "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
+            auth = user + ':staff'
+        os.system('chown -R ' + auth + ' ' + filename)
+        os.system('chmod -R 755 ' + filename)
+
+    def zip(self, sfile, dfile, stype, path):
+        if sfile.find(',') == -1:
+            if not os.path.exists(path + '/' + sfile):
+                return public.returnMsg(False, '指定文件不存在!')
+
+        try:
+            tmps = public.getRunDir() + '/tmp/panelExec.log'
+            if stype == 'zip':
+                os.system("cd '" + path + "' && zip '" + dfile +
+                          "' -r '" + sfile + "' > " + tmps + " 2>&1")
+            else:
+                sfiles = ''
+                for sfile in sfile.split(','):
+                    if not sfile:
+                        continue
+                    sfiles += " '" + sfile + "'"
+                os.system("cd '" + path + "' && tar -zcvf '" +
+                          dfile + "' " + sfiles + " > " + tmps + " 2>&1")
+            self.setFileAccept(dfile)
+            public.writeLog("TYPE_FILE", '文件压缩成功!', (sfile, dfile))
+            return public.returnJson(True, '文件压缩成功!')
+        except:
+            return public.returnJson(False, '文件压缩失败!')
+
     # 计算文件数量
     def getFilesCount(self, path, search):
         i = 0
