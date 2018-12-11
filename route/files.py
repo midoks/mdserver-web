@@ -48,6 +48,21 @@ def download():
     return response
 
 
+@files.route('/zip', methods=['POST'])
+def zip():
+    sfile = request.form.get('sfile', '').encode('utf-8')
+    dfile = request.form.get('dfile', '').encode('utf-8')
+    stype = request.form.get('type', '').encode('utf-8')
+    path = request.form.get('path', '').encode('utf-8')
+    return file_api.file_api().zip(sfile, dfile, stype, path)
+
+
+@files.route('/zip', methods=['POST'])
+def delete():
+    path = request.form.get('path', '').encode('utf-8')
+    pass
+
+
 @files.route('/get_dir', methods=['POST'])
 def getDir():
     path = request.form.get('path', '').encode('utf-8')

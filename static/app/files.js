@@ -898,13 +898,13 @@ function CreateDir(type, path) {
 function DeleteFile(fileName){
 	layer.confirm(lan.get('recycle_bin_confirm',[fileName]),{title:lan.files.del_file,closeBtn:2,icon:3},function(){
 		layer.msg(lan.public.the,{icon:16,time:0,shade: [0.3, '#000']});
-		$.post('/files?action=DeleteFile', 'path=' + encodeURIComponent(fileName), function(rdata) {
+		$.post('/files/delete', 'path=' + encodeURIComponent(fileName), function(rdata) {
 			layer.closeAll();
 			layer.msg(rdata.msg, {
 				icon: rdata.status ? 1 : 2
 			});
 			getFiles($("#DirPathPlace input").val());
-		});
+		},'json');
 	});
 }
 
@@ -1185,7 +1185,7 @@ function Zip(dirName,submits) {
 		dfile = encodeURIComponent($("#dfile").val());
 		layer.closeAll();
 		layer.msg(lan.files.zip_the, {icon: 16,time: 0,shade: [0.3, '#000']});
-		$.post('/files?action=Zip', 'sfile=' + sfile + '&dfile=' + dfile + '&type=tar&path='+encodeURIComponent(path), function(rdata) {
+		$.post('/files/zip', 'sfile=' + sfile + '&dfile=' + dfile + '&type=tar&path='+encodeURIComponent(path), function(rdata) {
 			layer.closeAll();
 			if(rdata == null || rdata == undefined){
 				layer.msg(lan.files.zip_ok,{icon:1});
@@ -1195,7 +1195,7 @@ function Zip(dirName,submits) {
 			}
 			layer.msg(rdata.msg, {icon: rdata.status ? 1 : 2});
 			if(rdata.status) getFiles(path);
-		});
+		},'json');
 		return
 	}
 	
