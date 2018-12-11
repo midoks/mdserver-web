@@ -8,6 +8,7 @@ from flask import Flask
 from flask import Blueprint, render_template
 from flask import jsonify
 from flask import request
+from flask import app
 
 
 sys.path.append("class/core")
@@ -22,18 +23,26 @@ def index():
     return render_template('default/files.html')
 
 
-@files.route('get_body', methods=['POST'])
+@files.route('/get_body', methods=['POST'])
 def getBody():
     path = request.form.get('path', '').encode('utf-8')
     return file_api.file_api().getBody(path)
 
 
-@files.route('save_body', methods=['POST'])
+@files.route('/save_body', methods=['POST'])
 def saveBody():
     path = request.form.get('path', '').encode('utf-8')
     data = request.form.get('data', '').encode('utf-8')
     encoding = request.form.get('encoding', '').encode('utf-8')
     return file_api.file_api().saveBody(path, data, encoding)
+
+
+@files.route('/download', methods=['GET'])
+def download():
+    file = request.args.get('filename', '').encode('utf-8')
+    return app.send_static_file(file)
+    # return ''
+    # return public.readFile(file)
 
 
 @files.route('/get_dir', methods=['POST'])
@@ -46,6 +55,5 @@ def getDir():
     page = request.args.get('p', '1').strip().lower()
     row = request.args.get('showRow', '10')
 
-    print path, int(page), int(row), search
-
+    # print path, int(page), int(row), search
     return file_api.file_api().getDir(path, int(page), int(row), search)
