@@ -228,8 +228,8 @@ def projectAdd():
     dest = getServerDir() + '/data/repositories/' + args['name']
     cmd = path + ' create ' + dest
     data = public.execShell(cmd)
-    print data
-    if data[0] == '':
+    if data[1] == '':
+        public.execShell('chown -R csvn:csvn ' + dest)
         return 'ok'
     return 'fail'
 
