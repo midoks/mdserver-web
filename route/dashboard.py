@@ -4,8 +4,7 @@ import psutil
 import time
 import os
 import sys
-sys.path.append(os.getcwd() + "/class/core/")
-import public
+
 
 from flask import Flask, session
 from flask import Blueprint, render_template
@@ -14,6 +13,8 @@ from flask import request
 from flask import make_response
 from flask import Response
 
+sys.path.append(os.getcwd() + "/class/core/")
+import public
 
 dashboard = Blueprint('dashboard', __name__, template_folder='templates')
 
