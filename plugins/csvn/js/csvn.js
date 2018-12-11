@@ -94,14 +94,22 @@ function csvnDelUser(name){
     });
 }
 
-function csvnAddUser(){
+function csvnAddUser(username){
+
+    user_input = ''
+    if (typeof(username) == 'undefined'){
+        user_input = "<div><input class='bt-input-text mr5 outline_no' type='text' id='csvn_username' name='username' style='height: 28px; border-radius: 3px;width: 200px;' placeholder='输入用户名'></div>";
+    } else {
+        user_input = "<div><input value='"+ username +"' class='bt-input-text mr5 outline_no' type='text' id='csvn_username' name='username' style='height: 28px; border-radius: 3px;width: 200px;' disabled='true'></div>";
+    }
+
     var loadOpen = layer.open({
         type: 1,
         title: '添加用户',
         area: '240px',
         content:"<div class='bt-form pd20 pb70 c6'>\
             <div class='version line'>\
-            <div><input class='bt-input-text mr5 outline_no' type='text' id='csvn_username' name='username' style='height: 28px; border-radius: 3px;width: 200px;' placeholder='输入用户名'></div>\
+            "+user_input+"\
             <div style='padding-top:3px;'><input class='bt-input-text mr5 outline_no' type='text' id='csvn_password' name='password' style='height: 28px; border-radius: 3px;width: 200px;' placeholder='输入密码'></div>\
             </div>\
             <div class='bt-form-submit-btn'>\
@@ -142,7 +150,7 @@ function csvnAddUser(){
 }
 
 function csvnModPwdUser(name){
-    console.log(name);   
+    csvnAddUser(name);   
 }
 
 
