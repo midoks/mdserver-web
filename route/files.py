@@ -57,10 +57,10 @@ def zip():
     return file_api.file_api().zip(sfile, dfile, stype, path)
 
 
-@files.route('/zip', methods=['POST'])
+@files.route('/delete', methods=['POST'])
 def delete():
     path = request.form.get('path', '').encode('utf-8')
-    pass
+    return file_api.file_api().delete(path)
 
 
 @files.route('/get_dir', methods=['POST'])
