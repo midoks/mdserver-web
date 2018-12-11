@@ -83,6 +83,8 @@ function csvnDelUser(name){
 
             layer.close(loadOpen);
             layer.msg("删除成功!",{icon:1,time:3000,shade: [0.3, '#000']});
+
+            csvnUserList();
         },'json');
     });
 }
@@ -127,7 +129,7 @@ function csvnAddUser(){
             }
 
             layer.close(loadOpen);
-            layer.msg("删除成功!",{icon:1,time:3000,shade: [0.3, '#000']});
+            layer.msg("操作成功!",{icon:1,time:3000,shade: [0.3, '#000']});
         },'json');
     });
 
