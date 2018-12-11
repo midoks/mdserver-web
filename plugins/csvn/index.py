@@ -220,8 +220,72 @@ def userList():
     return public.getJson(data)
 
 
+def projectAdd():
+    args = getArgs()
+    if not 'name' in args:
+        return 'project name missing'
+    path = getServerDir() + '/bin/svnadmin'
+    dest = getServerDir() + '/data/repositories/' + args['name']
+    cmd = path + ' create ' + dest
+    data = public.execShell(cmd)
+    print data
+    if data[0] == '':
+        return 'ok'
+    return 'fail'
+
+
+def projectDel():
+    args = getArgs()
+    if not 'name' in args:
+        return 'project name missing'
+
+    dest = getServerDir() + '/data/repositories/' + args['name']
+    cmd = 'rm -rf ' + dest
+    data = public.execShell(cmd)
+    if data[0] == '':
+        return 'ok'
+    return 'fail'
+
+
 def projectList():
-    return []
+    import math
+    args = getArgs()
+
+    path = getServerDir() + '/data/repositories'
+    dlist = []
+    data = {}
+    if os.path.exists(path):
+        for filename in os.listdir(path):
+            tmp = {}
+            filePath = path + '/' + filename
+            if os.path.isdir(filePath):
+                tmp['name'] = filename
+                verPath = filePath + '/format'
+                if os.path.exists(verPath):
+                    ver = public.readFile(verPath).strip()
+                    tmp['ver'] = ver
+            dlist.append(tmp)
+
+    page = 1
+    page_size = 10
+    if 'page' in args:
+        page = int(args['page'])
+
+    if 'page_size' in args:
+        page_size = int(args['page_size'])
+
+    dlist_sum = len(dlist)
+    page_info = {'count': dlist_sum, 'p': page,
+                 'row': 10, 'tojs': 'csvnProjectList'}
+    data['list'] = public.getPage(page_info)
+    data['page'] = page
+    data['page_size'] = page_size
+    data['page_count'] = int(math.ceil(dlist_sum / page_size))
+
+    start = (page - 1) * page_size
+    data['data'] = dlist[start:start + page_size]
+
+    return public.getJson(data)
 
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -255,5 +319,9 @@ if __name__ == "__main__":
         print userDel()
     elif func == 'project_list':
         print projectList()
+    elif func == 'project_del':
+        print projectDel()
+    elif func == 'project_add':
+        print projectAdd()
     else:
         print 'fail'
