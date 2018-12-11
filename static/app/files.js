@@ -336,10 +336,10 @@ function getFiles(Path) {
 	var data = 'path=' + Path;
 	var loadT = layer.load();
 	var totalSize = 0;
-	$.post('/files/get_dir?tojs=getFiles&p=' + p + '&showRow=' + showRow + search, data, function(rdata) {
+	$.post('/files/get_dir?p=' + p + '&showRow=' + showRow + search, data, function(rdata) {
 		layer.close(loadT);
 		
-		var rows = ['100','200','500','1000','2000'];
+		var rows = ['10','50','100','200','500','1000','2000'];
 		var rowOption = '';
 		for(var i=0;i<rows.length;i++){
 			var rowSelected = '';
@@ -657,7 +657,7 @@ window.onresize = function(){
 		$("#PathPlaceBtn,#DirPathPlace input").width(290);
 	}
 	PathLeft();
-	IsDiskWidth()
+	isDiskWidth();
 }
 
 //批量操作
