@@ -314,7 +314,6 @@ def makeAclFile(content):
     svn_access_file = getServerDir() + '/data/conf/svn_access_file'
     tmp = "\n"
     for k, v in content.items():
-        print k, v
         if k == '':
             tmp += "[/]\n"
         else:
@@ -329,6 +328,9 @@ def makeAclFile(content):
 
 def projectAclList():
     acl = getAllAclList()
+    args = getArgs()
+    if 'page' in acl:
+        page = int(args['page'])
     makeAclFile(acl)
     return public.getJson(acl)
 
