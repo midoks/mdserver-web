@@ -3,12 +3,12 @@
 import os
 import sys
 
-
 from flask import Flask
 from flask import Blueprint, render_template
 from flask import jsonify
 from flask import request
-from flask import app
+from flask import send_file, send_from_directory
+from flask import make_response
 
 
 sys.path.append("class/core")
@@ -39,10 +39,13 @@ def saveBody():
 
 @files.route('/download', methods=['GET'])
 def download():
-    file = request.args.get('filename', '').encode('utf-8')
-    return app.send_static_file(file)
-    # return ''
-    # return public.readFile(file)
+    filename = request.args.get('filename', '').encode('utf-8')
+    if not os.path.exists(filename):
+        return ''
+
+    response = make_response(send_from_directory(
+        os.path.dirname(filename), os.path.basename(filename), as_attachment=True))
+    return response
 
 
 @files.route('/get_dir', methods=['POST'])
