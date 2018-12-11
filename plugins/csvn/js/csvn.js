@@ -186,7 +186,8 @@ function csvnProjectList(page){
         for (i in ulist){
             content += '<tr><td>'+ulist[i]['name']+'</td>'+
                 '<td>'+ulist[i]['ver']+'</td><td>'+
-                '<a class="btlink" onclick="csvnDelProject(\''+ulist[i]['name']+'\')">删除</a>' +
+                '<a class="btlink" onclick="csvnDelProject(\''+ulist[i]['name']+'\')">删除</a> | ' +
+                '<a class="btlink" onclick="csvnAclProject(\''+ulist[i]['name']+'\')">权限</a>' +
                 '</td></tr>';
         }
 
@@ -286,5 +287,27 @@ function csvnAddProject(){
             layer.msg("操作成功!",{icon:1,time:3000,shade: [0.3, '#000']});
         },'json');
     });
+}
 
+function csvnAclProject(name){
+    console.log(name);
+    // content = '<div class="finduser"><input class="bt-input-text mr5 outline_no" type="text" placeholder="查找用户名" id="find_user" style="height: 28px; border-radius: 3px;width: 505px;">';
+    // content += '<button class="btn btn-success btn-sm">查找</button></div>';
+    var loadOpen = layer.open({
+        type: 1,
+        title: '权限设置',
+        area: '400px',
+        content:"<div class='bt-form pd20 pb70 c6'>\
+            <div class='version line'>\
+                <div>\
+                    <input class='bt-input-text mr5 outline_no' type='text' id='csvn_name' name='username' style='height: 28px; border-radius: 3px;width: 200px;' placeholder='用户名'>\
+                    <button class='btn btn-success btn-sm'>添加</button>\
+                </div>\
+            </div>\
+            <div class='bt-form-submit-btn'>\
+                <button type='button' id='csvn_acl_close' class='btn btn-danger btn-sm btn-title'>关闭</button>\
+                <button type='button' id='csvn_acl_ok' class='btn btn-success btn-sm btn-title bi-btn'>确认</button>\
+            </div>\
+        </div>"
+    });
 }
