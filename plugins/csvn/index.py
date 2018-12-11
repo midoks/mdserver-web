@@ -293,7 +293,7 @@ def getAllAclList():
     aData = public.readFile(svn_access_file)
     aData = aData.strip().split('[')[1:]
     allAcl = {}
-    for i in xrange(len(aData)):
+    for i in range(len(aData)):
         oData = aData[i].strip().split(']')
         name = oData[0].strip('/')
         if oData[1] == '':
@@ -310,9 +310,36 @@ def getAllAclList():
     return allAcl
 
 
+def makeAclFile(content):
+    svn_access_file = getServerDir() + '/data/conf/svn_access_file'
+    tmp = "\n"
+    for k, v in content.items():
+        print k, v
+        if k == '':
+            tmp += "[/]\n"
+        else:
+            tmp += "[/" + k + "]\n"
+
+        for iv in range(len(v)):
+            for iik, iiv in v[iv].items():
+                tmp += iik + ' = ' + iiv + "\n"
+        tmp += "\n"
+    return public.writeFile(getServerDir() + '/data/conf/svn_access_file.log', tmp)
+
+
 def projectAclList():
     acl = getAllAclList()
+    makeAclFile(acl)
     return public.getJson(acl)
+
+
+def projectAclAdd():
+    pass
+
+
+def projectAclDel():
+    pass
+
 
 if __name__ == "__main__":
     func = sys.argv[1]
