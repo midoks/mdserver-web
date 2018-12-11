@@ -2,6 +2,11 @@ pluginService('csvn');
 
 
 function csvnUserList(page) {
+    
+    if (typeof(page) =='undefined'){
+        page = 1;
+    }
+
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
     _data = {};
     _data['page'] = page;
@@ -81,10 +86,10 @@ function csvnDelUser(name){
                 layer.msg(data.data,{icon:2,time:2000,shade: [0.3, '#000']});
             }
 
+            
             layer.close(loadOpen);
             layer.msg("删除成功!",{icon:1,time:3000,shade: [0.3, '#000']});
 
-            csvnUserList();
         },'json');
     });
 }
@@ -128,6 +133,7 @@ function csvnAddUser(){
                 layer.msg(data.data,{icon:2,time:2000,shade: [0.3, '#000']});
             }
 
+            csvnUserList();
             layer.close(loadOpen);
             layer.msg("操作成功!",{icon:1,time:3000,shade: [0.3, '#000']});
         },'json');
