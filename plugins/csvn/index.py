@@ -287,6 +287,33 @@ def projectList():
 
     return public.getJson(data)
 
+
+def getAllAclList():
+    svn_access_file = getServerDir() + '/data/conf/svn_access_file'
+    aData = public.readFile(svn_access_file)
+    aData = aData.strip().split('[')[1:]
+    allAcl = {}
+    for i in xrange(len(aData)):
+        oData = aData[i].strip().split(']')
+        name = oData[0].strip('/')
+        if oData[1] == '':
+            allAcl[name] = []
+        else:
+            user = oData[1].strip().split('\n')
+            userAll = []
+            for iu in range(len(user)):
+                ulist = user[iu].split('=')
+                utmp = {}
+                utmp[ulist[0].strip()] = ulist[1].strip()
+                userAll.append(utmp)
+            allAcl[name] = userAll
+    return allAcl
+
+
+def projectAclList():
+    acl = getAllAclList()
+    return public.getJson(acl)
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -323,5 +350,7 @@ if __name__ == "__main__":
         print projectDel()
     elif func == 'project_add':
         print projectAdd()
+    elif func == 'project_acl_list':
+        print projectAclList()
     else:
         print 'fail'
