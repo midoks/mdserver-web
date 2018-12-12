@@ -330,7 +330,8 @@ def makeAclFile(content):
         for iv in range(len(v)):
             tmp += v[iv]['user'] + ' = ' + v[iv]['acl'] + "\n"
         tmp += "\n"
-    return public.writeFile(getServerDir() + '/data/conf/svn_access_file.log', tmp)
+    svn_tmp_path = getServerDir() + '/data/conf/svn_access_file.log'
+    return public.writeFile(svn_access_file, tmp)
 
 
 def projectAclList():
@@ -363,27 +364,27 @@ def projectAclAdd():
 
     acl = getAllAclList()
 
+    tmp_acl = {'user': uname, 'acl': 'rw'}
     if not pname in acl:
-        return 'project not exists!'
+        acl[pname] = [tmp_acl]
+        makeAclFile(acl)
+        return 'ok'
 
     tmp = acl[pname]
     tmp_len = len(tmp)
-    tmp_acl = {'user': uname, 'acl': 'rw'}
+
     if tmp_len == 0:
         acl[pname] = [tmp_acl]
     else:
-        print tmp_len
         is_have = False
         for x in range(tmp_len):
-            # print tmp[x], tmp[x]['user'], uname
             if tmp[x]['user'] == uname:
                 is_have = True
-                return 'fail'
-        # print acl
+                return uname + ' users already exist!'
         if not is_have:
             tmp.append(tmp_acl)
             acl[pname] = tmp
-    # print acl
+
     makeAclFile(acl)
     return 'ok'
 
@@ -394,6 +395,7 @@ def projectAclDel():
         return 'username missing'
     if not 'pname' in args:
         return 'project name missing'
+
     uname = args['uname']
     pname = args['pname']
 
@@ -412,10 +414,11 @@ def projectAclDel():
         return 'project no have user:' + uname
     else:
         is_have = False
+        rtmp = []
         for x in range(tmp_len):
-            if tmp[x]['user'] == uname:
-                tmp.remove(x)
-        acl[pname] = tmp
+            if tmp[x]['user'] != uname:
+                rtmp.append(tmp[x])
+        acl[pname] = rtmp
     makeAclFile(acl)
     return 'ok'
 
