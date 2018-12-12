@@ -79,8 +79,21 @@ def login():
 
 @dashboard.route("/do_login", methods=['POST'])
 def doLogin():
-    print request.args
+    username = request.form.get('username', '').strip()
+    password = request.form.get('password', '').strip()
+    code = request.form.get('code', '').strip()
+    print session
+    if session.has_key('code'):
+        if session['code'] != public.md5(code):
+            return public.returnJson(False, '验证码错误,请重新输入!')
 
-    # return "123"
-    # return public.returnJson(False, 'LOGIN_USER_EMPTY')
-    return public.returnJson(True, 'LOGIN_SUCCESS')
+    userInfo = public.M('users').where(
+        "id=?", (1,)).field('id,username,password').find()
+
+    password = public.md5(password)
+    if userInfo['username'] != username or userInfo['password'] != password:
+        public.writeLog('TYPE_LOGIN', public.getInfo(
+            "< a style='color: red'>密码错误</a>,帐号:{1},密码:{2},登录IP:{3}", (('****', '******', request.remote_addr))))
+        return public.returnJson(False, public.getInfo("用户名或密码错误,您还可以尝试[{1}]次!", ('1')))
+
+    return public.returnJson(True, '登录成功,正在跳转...')

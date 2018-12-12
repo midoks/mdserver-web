@@ -10,131 +10,129 @@
 <title>mdserver-web</title>
 <link rel="stylesheet" type="text/css" href="/static/css/site.css?v={{config.version}}">
 <link rel="stylesheet" type="text/css" href="/static/css/login.css?v={{config.version}}">
-
+<style type="text/css">
+@media screen and (max-width: 640px) {
+    .scanCode{
+    	display: none;
+    }
+    .account{
+    	display: block !important;
+    }
+    .bg_img{
+    	display: none;
+    }
+}
+.bg_img{
+	width: 60px;
+	height: 60px;
+	background-image: url('/static/img/qrCode.png');
+	background-size: 120px 120px;
+	background-repeat: no-repeat;
+	background-position: 0 0;
+	position: absolute;
+	top: 5px;
+	right: 5px;
+}
+.bg_img:hover{
+	background-position: -60px 0;
+	cursor: pointer;
+	/*transition: all 500ms;*/
+}
+.bg_img.pc{
+	background-position: 0 -60px;
+}
+.bg_img.pc:hover{
+	background-position: -60px -60px;
+}
+.qrCode{
+	text-align: center;
+	padding-top: 20px;
+}
+.scanCode .titles{
+	font-size: 23px;
+	margin-top: 25px;
+	color: #444;
+	text-align: center;
+}
+.list_scan{
+	width: 150px;
+	margin: 0 auto; 
+	margin-top: 15px;
+}
+.list_scan>img{
+	width: 40px;
+	height: 40px;
+	float: left;
+	margin-right: 15px;
+}
+.list_scan span{
+	display: inline-block;
+	font-size: 13px;
+	margin-bottom: 5px;
+}
+.list_scan a:hover .weChatSamll{
+	display: block;
+}
+.list_scan .weChatSamll{
+	display: none;
+	width: 150px;
+	height: 150px;
+	position: absolute;
+	border: 1px solid #ececec;
+	border-radius: 5px;
+	bottom: 105px;
+	right: 80px;
+	padding: 20px;
+	background-color: #fff;
+}
+.list_scan .weChatSamll img{
+	width: 100%;
+}
+.list_scan .weChatSamll em{
+	position: absolute;
+	border: 7px solid #ececec;
+	border-color: #ececec transparent transparent transparent;
+	width: 0;
+	height: 0;
+	right: 87px;
+	bottom: -14px;
+	margin-left: -6px;
+}
+.tips{
+	width: 115px;
+	position: absolute;
+	top: 10px;
+	right: 65px;
+	color: rgb(32, 165, 58);
+	background: #dff0d8;
+	padding: 5px 10px;
+	text-align: center;
+	border-radius: 4px;
+}
+.tips em{
+	position: absolute;
+	border: 6px solid #dff0d8;
+	border-color:transparent  transparent transparent #dff0d8; 
+	width: 0;
+	height: 0;
+	right: -11px;
+	top: 8px;
+	margin-left: -6px;
+}
+.tips img{
+	height: 16px;
+	width: 16px;
+	vertical-align: middle;
+	margin-top: -1px;
+	margin-right: 4px;
+}
+.main .login .rlogo{
+	margin-top: 15px;
+	margin-bottom: 25px;
+}
+</style>
 </head>
-
 <body>
-	<style type="text/css">
-		@media screen and (max-width: 640px) {
-		    .scanCode{
-		    	display: none;
-		    }
-		    .account{
-		    	display: block !important;
-		    }
-		    .bg_img{
-		    	display: none;
-		    }
-		}
-		.bg_img{
-			width: 60px;
-			height: 60px;
-			background-image: url('/static/img/qrCode.png');
-			background-size: 120px 120px;
-			background-repeat: no-repeat;
-			background-position: 0 0;
-			position: absolute;
-			top: 5px;
-			right: 5px;
-		}
-		.bg_img:hover{
-			background-position: -60px 0;
-			cursor: pointer;
-			/*transition: all 500ms;*/
-		}
-		.bg_img.pc{
-			background-position: 0 -60px;
-		}
-		.bg_img.pc:hover{
-			background-position: -60px -60px;
-		}
-		.qrCode{
-			text-align: center;
-			padding-top: 20px;
-		}
-		.scanCode .titles{
-			font-size: 23px;
-			margin-top: 25px;
-			color: #444;
-			text-align: center;
-		}
-		.list_scan{
-			width: 150px;
-			margin: 0 auto; 
-			margin-top: 15px;
-		}
-		.list_scan>img{
-			width: 40px;
-			height: 40px;
-			float: left;
-			margin-right: 15px;
-		}
-		.list_scan span{
-			display: inline-block;
-			font-size: 13px;
-			margin-bottom: 5px;
-		}
-		.list_scan a:hover .weChatSamll{
-			display: block;
-		}
-		.list_scan .weChatSamll{
-			display: none;
-			width: 150px;
-			height: 150px;
-			position: absolute;
-			border: 1px solid #ececec;
-			border-radius: 5px;
-			bottom: 105px;
-			right: 80px;
-			padding: 20px;
-			background-color: #fff;
-		}
-		.list_scan .weChatSamll img{
-			width: 100%;
-		}
-		.list_scan .weChatSamll em{
-			position: absolute;
-			border: 7px solid #ececec;
-			border-color: #ececec transparent transparent transparent;
-			width: 0;
-			height: 0;
-			right: 87px;
-			bottom: -14px;
-			margin-left: -6px;
-		}
-		.tips{
-			width: 115px;
-			position: absolute;
-			top: 10px;
-			right: 65px;
-			color: rgb(32, 165, 58);
-			background: #dff0d8;
-			padding: 5px 10px;
-			text-align: center;
-			border-radius: 4px;
-		}
-		.tips em{
-			position: absolute;
-			border: 6px solid #dff0d8;
-			border-color:transparent  transparent transparent #dff0d8; 
-			width: 0;
-			height: 0;
-			right: -11px;
-			top: 8px;
-			margin-left: -6px;
-		}
-		.tips img{
-			height: 16px;
-			width: 16px;
-			vertical-align: middle;
-			margin-top: -1px;
-			margin-right: 4px;
-		}
-		.main .login .rlogo{
-			margin-top: 15px;
-			margin-bottom: 25px;
-		}
-	</style>
 <div class="main">
 	<div class="login">
 		<div class="account">
@@ -162,72 +160,70 @@
 <script type="text/javascript" src="/static/layer/layer.js?v={{config.version}}"></script>
 <script type="text/javascript" src="/static/js/Validform_v5.3.2_min.js?v={{config.version}}"></script>
 <script type="text/javascript">
-	function Wreset(){
-		var w = $(window).width();
-		var yzmw = $(".login .line").width() - 140;
-		if($(".yzm").is(":visible") && w > 640){
-			$(".login").css({"height":"365px","margin-top":"-230px"});
-		}
-		else{
-			$(".login").removeAttr("style")
-		}
-		$(".login .yzm .inputtxt").width(yzmw);
+function Wreset(){
+	var w = $(window).width();
+	var yzmw = $(".login .line").width() - 140;
+	if($(".yzm").is(":visible") && w > 640){
+		$(".login").css({"height":"365px","margin-top":"-230px"});
 	}
-	$(function(){
-		Wreset();
-	})
-	window.onresize=function(){
-		Wreset();
+	else{
+		$(".login").removeAttr("style")
 	}
-	</script>
-	<script type="text/javascript">
-	$(function(){
-		$(".loginform").Validform({
-			tiptype:function(msg,o,cssctl){
-				if(!o.obj.is("form")){
-					var objtip=o.obj.siblings(".Validform_checktip");
-					cssctl(objtip,o.type);
-					objtip.text(msg);
-				}
+	$(".login .yzm .inputtxt").width(yzmw);
+}
+$(function(){
+	Wreset();
+})
+window.onresize=function(){
+	Wreset();
+}
+
+$(function(){
+	$(".loginform").Validform({
+		tiptype:function(msg,o,cssctl){
+			if(!o.obj.is("form")){
+				var objtip=o.obj.siblings(".Validform_checktip");
+				cssctl(objtip,o.type);
+				objtip.text(msg);
 			}
-		});
+		}
 	});
-	
-	$('#login-button').click(function(){
-		var username = encodeURIComponent($("input[name='username']").val());
-		var password = encodeURIComponent($("input[name='password']").val());
-		var code = $("input[name='code']").val();
-		if(username == '' || password == ''){
-			layer.msg("表单错误,请重新输入!",{icon:2});
+});
+
+$('#login-button').click(function(){
+	var username = encodeURIComponent($("input[name='username']").val());
+	var password = encodeURIComponent($("input[name='password']").val());
+	var code = $("input[name='code']").val();
+	if(username == '' || password == ''){
+		layer.msg("表单错误,请重新输入!",{icon:2});
+		return;
+	}
+			
+	var data = 'username='+username+'&password='+password+'&code='+code;
+	var loadT = layer.msg("正在登录中",{icon:16,time:0,shade: [0.3, '#000']});
+	$.post('/do_login',data,function(rdata){
+		layer.close(loadT);
+		if(!rdata.status){
+			if(username == 'admin' && rdata.msg.indexOf('用户名') != -1) rdata.msg += ', <br>获取默认用户和密码命令： mw default';
+			$("#errorStr").html(rdata.msg);
+			$("input[name='password']").val('');
+			num = rdata.msg.substring(rdata.msg.indexOf('[')+1,rdata.msg.indexOf(']'))
+			if(num < 5){
+				$(".yzm").show();
+				$(".login").css("height","332px");
+				$("input[name='code']").val('');
+				$(".passcode").click();
+			}
+			$(".yzm").show();
+			Wreset();
+			layer.msg(rdata.msg,{icon:2,time:5000});
 			return;
 		}
-				
-		var data = 'username='+username+'&password='+password+'&code='+code;
-		var loadT = layer.msg("正在登录中",{icon:16,time:0,shade: [0.3, '#000']});
-		$.post('/do_login',data,function(rdata){
-			console.log(rdata);
-			layer.close(loadT);
-			if(!rdata.status){
-				if(username == 'admin' && rdata.msg.indexOf('用户名') != -1) rdata.msg += ', <br>获取默认用户和密码命令： bt default';
-				$("#errorStr").html(rdata.msg);
-				$("input[name='password']").val('');
-				num = rdata.msg.substring(rdata.msg.indexOf('[')+1,rdata.msg.indexOf(']'))
-				if(num < 5){
-					$(".yzm").show();
-					$(".login").css("height","332px");
-					$("input[name='code']").val('');
-					$(".passcode").click();
-				}
-				$(".yzm").show();
-				Wreset();
-				layer.msg(rdata.msg,{icon:2,time:5000});
-				return;
-			}
-			
-			layer.msg(rdata.msg,{icon:16,time:0,shade: [0.3, '#000']});
-			window.location.href = '/';	
-		},'json');
-	});
+		
+		layer.msg(rdata.msg,{icon:16,time:0,shade: [0.3, '#000']});
+		window.location.href = '/';	
+	},'json');
+});
 
 </script>
 </body>
