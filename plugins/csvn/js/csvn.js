@@ -4,6 +4,11 @@ function csvnPost(method,args,callback){
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
     $.post('/plugins/run', {name:'csvn', func:method, args:JSON.stringify(args)}, function(data) {
         layer.close(loadT);
+        if (!data.status){
+            layer.msg(data.data,{icon:0,time:2000,shade: [0.3, '#000']});
+            return;
+        }
+
         if(typeof(callback) == 'function'){
             callback(data);
         }
@@ -21,10 +26,6 @@ function csvnUserList(page) {
     _data['page_size'] = 10;
 
     csvnPost('user_list', _data, function(data){
-        if (!data.status){
-            layer.msg(data.msg,{icon:0,time:2000,shade: [0.3, '#000']});
-            return;
-        }
 
         var rdata = $.parseJSON(data.data);
         // console.log(rdata);
@@ -294,20 +295,46 @@ function csvnAddProject(){
     });
 }
 
-function csvnAclProject(name){
-    csvnPost('project_acl_list', {'name':name}, function(data){
+function csvnAclAdd(pname){
+    var uname = $('#csvn_username').val();
+    if (uname == ''){
+        layer.msg('添加用户名不能为空!',{icon:0,time:2000,shade: [0.3, '#000']});
+        return;
+    }
+
+    csvnPost('project_acl_add', {'pname':pname,'uname':uname}, function(data){
+        if (data.data != 'ok'){
+            layer.msg(data.data,{icon:0,time:2000,shade: [0.3, '#000']});
+            return;
+        }
+        $('#csvn_acl_close').click();
+        csvnAclProject(pname);
+    });
+}
+
+function csvnAclDel(pname, uname){
+    // console.log(pname,uname);
+    csvnPost('project_acl_del', {'pname':pname,'uname':uname}, function(data){
+        // console.log(data);
+        if (data.data != 'ok'){
+            layer.msg(data.data,{icon:0,time:2000,shade: [0.3, '#000']});
+            return;
+        }
+        $('#csvn_acl_close').click();
+        csvnAclProject(pname);
+    });
+}
+
+function csvnAclProject(pname){
+    csvnPost('project_acl_list', {'name':pname}, function(data){
     
         var rdata = [];
         try {
             rdata = $.parseJSON(data.data);
-        } catch(e){
-            console.log(e);
-        }
+        } catch(e){}
 
         var list = '';
-        console.log(rdata);
         for (i in rdata) {
-            console.log(rdata[i]);
             var acl = '';
             if (rdata[i]['acl'] == 'r'){
                 acl += '<input type="checkbox" id="owner_r" checked="true"> 只读  |  <input type="checkbox" id="owner_r"> 读写';
@@ -316,7 +343,7 @@ function csvnAclProject(name){
             }
 
             list += '<tr><td>'+rdata[i]['user']+'</td><td>' + acl +'</td>'+
-                '<td><a class="btlink" onclick="csvnAclDel(\''+rdata[i]['user']+'\')">删除</a></td>'+'</tr>';
+                '<td><a class="btlink" onclick="csvnAclDel(\''+pname+'\',\''+rdata[i]['user']+'\')">删除</a></td>'+'</tr>';
         }
 
         var loadOpen = layer.open({
@@ -326,8 +353,8 @@ function csvnAclProject(name){
             content:"<div class='bt-form pd20 pb70 c6'>\
                 <div class='version line'>\
                     <div>\
-                        <div><input class='bt-input-text mr5 outline_no' type='text' id='csvn_name' name='username' style='height: 28px; border-radius: 3px;width: 205px;' placeholder='用户名'>\
-                        <button class='btn btn-success btn-sm'>添加</button></div>\
+                        <div><input class='bt-input-text mr5 outline_no' type='text' id='csvn_username' name='username' style='height: 28px; border-radius: 3px;width: 205px;' placeholder='用户名'>\
+                        <button class='btn btn-success btn-sm' onclick='csvnAclAdd(\""+pname+"\");'>添加</button></div>\
                         <div class='divtable' style='margin-top:5px;'><table class='table table-hover'><thead><tr><th>用户</th><th>权限</th><th>操作</th></tr></thead>\
                         <tbody>"+list+"</tbody>\
                         </table></div>\
@@ -337,6 +364,10 @@ function csvnAclProject(name){
                     <button type='button' id='csvn_acl_close' class='btn btn-danger btn-sm btn-title'>关闭</button>\
                 </div>\
             </div>"
+        });
+
+        $('#csvn_acl_close').click(function(){
+            layer.close(loadOpen);
         });
     });
 }
