@@ -112,3 +112,4 @@ data/json/index.json
 *.zip
 data/*.db
 data/control.conf
+scripts/init.d/mw

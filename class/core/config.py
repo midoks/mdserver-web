@@ -31,6 +31,8 @@ class config:
         __app = app
 
         self.initDB()
+
+        self.initInitD()
         return app
 
     def initDB(self):
@@ -42,6 +44,19 @@ class config:
                 sql.execute(csql_list[index], ())
         except Exception, ex:
             print str(ex)
+
+    def initUser(self):
+        pass
+
+    def initInitD(self):
+        script = public.getRunDir() + '/scripts/init.d/mw.tpl'
+        script_bin = public.getRunDir() + '/scripts/init.d/mw'
+
+        content = public.readFile(script)
+        content = content.replace("{$SERVER_PATH}", public.getRunDir())
+
+        public.writeFile(script_bin, content)
+        public.execShell('chmod +x ' + script_bin)
 
     def getVersion(self):
         return self.__version

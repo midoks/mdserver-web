@@ -7,7 +7,7 @@ import sys
 import os
 import json
 import time
-print sys.path
+# print sys.path
 
 sys.path.append("/usr/local/lib/python2.7/site-packages")
 import psutil

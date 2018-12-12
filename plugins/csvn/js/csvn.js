@@ -325,6 +325,10 @@ function csvnAclDel(pname, uname){
     });
 }
 
+function csvnAclSet(pname){
+
+}
+
 function csvnAclProject(pname){
     csvnPost('project_acl_list', {'name':pname}, function(data){
     
@@ -335,6 +339,7 @@ function csvnAclProject(pname){
 
         var list = '';
         for (i in rdata) {
+            var user = rdata[i]['user'];
             var acl = '';
             if (rdata[i]['acl'] == 'r'){
                 acl += '<input type="checkbox" id="owner_r" checked="true"> 只读  |  <input type="checkbox" id="owner_r"> 读写';
@@ -342,8 +347,8 @@ function csvnAclProject(pname){
                 acl += '<input type="checkbox" id="owner_r"> 只读  |  <input type="checkbox" id="owner_r" checked="true"> 读写';
             }
 
-            list += '<tr><td>'+rdata[i]['user']+'</td><td>' + acl +'</td>'+
-                '<td><a class="btlink" onclick="csvnAclDel(\''+pname+'\',\''+rdata[i]['user']+'\')">删除</a></td>'+'</tr>';
+            list += '<tr><td>'+user+'</td><td>' + acl +'</td>'+
+                '<td><a class="btlink" onclick="csvnAclDel(\''+pname+'\',\''+user+'\')">删除</a></td>'+'</tr>';
         }
 
         var loadOpen = layer.open({
