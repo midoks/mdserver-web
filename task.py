@@ -327,12 +327,12 @@ def systemTask():
                     if reloadNum > 1440:
                         reloadNum = 0
                         # if os.path.exists('data/ssl.pl'):
-                        #     os.system(
-                        #         '/etc/init.d/bt restart > /dev/null 2>&1')
+                        os.system(public.getRunDir() +
+                                  '/scripts/init.d/bt restart > /dev/null 2>&1')
                 except Exception, ex:
                     print str(ex)
-            del(tmp)
 
+            del(tmp)
             time.sleep(5)
             count += 1
     except Exception, ex:
