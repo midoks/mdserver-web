@@ -65,6 +65,7 @@ class config:
             initd_bin = '/etc/init.d/mw'
             if not os.path.exists(initd_bin):
                 shutil.copyfile(script_bin, initd_bin)
+                public.execShell('chmod +x ' + initd_bin)
 
     def getVersion(self):
         return self.__version
