@@ -389,8 +389,71 @@ def projectAclAdd():
 
 
 def projectAclDel():
-    pass
+    args = getArgs()
+    if not 'uname' in args:
+        return 'username missing'
+    if not 'pname' in args:
+        return 'project name missing'
+    uname = args['uname']
+    pname = args['pname']
 
+    ulist = getAllUser()
+    if not uname in ulist:
+        return uname + " user not exists!"
+
+    acl = getAllAclList()
+
+    if not pname in acl:
+        return 'project not exists!'
+
+    tmp = acl[pname]
+    tmp_len = len(tmp)
+    if tmp_len == 0:
+        return 'project no have user:' + uname
+    else:
+        is_have = False
+        for x in range(tmp_len):
+            if tmp[x]['user'] == uname:
+                tmp.remove(x)
+        acl[pname] = tmp
+    makeAclFile(acl)
+    return 'ok'
+
+
+def projectAclSet():
+    args = getArgs()
+    if not 'uname' in args:
+        return 'username missing'
+    if not 'pname' in args:
+        return 'project name missing'
+    if not 'acl' in args:
+        return 'acl missing'
+
+    uname = args['uname']
+    pname = args['pname']
+    up_acl = args['acl']
+
+    ulist = getAllUser()
+    if not uname in ulist:
+        return uname + " user not exists!"
+
+    acl = getAllAclList()
+
+    if not pname in acl:
+        return 'project not exists!'
+
+    tmp = acl[pname]
+    tmp_len = len(tmp)
+    if tmp_len == 0:
+        return 'project no have user:' + uname
+    else:
+        is_have = False
+        for x in range(tmp_len):
+            if tmp[x]['user'] == uname:
+                tmp[x]['acl'] = up_acl
+        acl[pname] = tmp
+    makeAclFile(acl)
+    return 'ok'
 
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -432,5 +495,9 @@ if __name__ == "__main__":
         print projectAclList()
     elif func == 'project_acl_add':
         print projectAclAdd()
+    elif func == 'project_acl_del':
+        print projectAclDel()
+    elif func == 'project_acl_set':
+        print projectAclSet()
     else:
         print 'fail'
