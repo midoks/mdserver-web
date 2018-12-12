@@ -182,6 +182,21 @@ def userDel():
     return 'fail'
 
 
+def getAllUser():
+    svn_auth_file = getServerDir() + '/data/conf/svn_auth_file'
+    if not os.path.exists(svn_auth_file):
+        return public.getJson([])
+    auth = public.readFile(svn_auth_file)
+    auth = auth.strip()
+    auth_list = auth.split("\n")
+
+    ulist = []
+    for x in range(len(auth_list)):
+        tmp = auth_list[x].split(':')
+        ulist.append(tmp[0])
+    return ulist
+
+
 def userList():
     import math
     args = getArgs()
@@ -194,26 +209,16 @@ def userList():
     if 'page_size' in args:
         page_size = int(args['page_size'])
 
-    svn_auth_file = getServerDir() + '/data/conf/svn_auth_file'
-    if not os.path.exists(svn_auth_file):
-        return public.getJson([])
+    ulist = getAllUser()
+    ulist_sum = len(ulist)
 
-    auth = public.readFile(svn_auth_file)
-    auth = auth.strip()
-    auth_list = auth.split("\n")
-    auth_list_sum = len(auth_list)
-    ulist = []
-    data = {}
-    for x in range(auth_list_sum):
-        tmp = auth_list[x].split(':')
-        ulist.append(tmp[0])
-
-    page_info = {'count': auth_list_sum, 'p': page,
+    page_info = {'count': ulist_sum, 'p': page,
                  'row': 10, 'tojs': 'csvnUserList'}
+    data = {}
     data['list'] = public.getPage(page_info)
     data['page'] = page
     data['page_size'] = page_size
-    data['page_count'] = int(math.ceil(auth_list_sum / page_size))
+    data['page_count'] = int(math.ceil(ulist_sum / page_size))
     start = (page - 1) * page_size
 
     data['data'] = ulist[start:start + page_size]
@@ -291,6 +296,7 @@ def projectList():
 def getAllAclList():
     svn_access_file = getServerDir() + '/data/conf/svn_access_file'
     aData = public.readFile(svn_access_file)
+    aData = re.sub('#.*', '', aData)
     aData = aData.strip().split('[')[1:]
     allAcl = {}
     for i in range(len(aData)):
@@ -304,13 +310,15 @@ def getAllAclList():
             for iu in range(len(user)):
                 ulist = user[iu].split('=')
                 utmp = {}
-                utmp[ulist[0].strip()] = ulist[1].strip()
+                utmp['user'] = ulist[0].strip()
+                utmp['acl'] = ulist[1].strip()
                 userAll.append(utmp)
             allAcl[name] = userAll
     return allAcl
 
 
 def makeAclFile(content):
+    # print content
     svn_access_file = getServerDir() + '/data/conf/svn_access_file'
     tmp = "\n"
     for k, v in content.items():
@@ -320,23 +328,64 @@ def makeAclFile(content):
             tmp += "[/" + k + "]\n"
 
         for iv in range(len(v)):
-            for iik, iiv in v[iv].items():
-                tmp += iik + ' = ' + iiv + "\n"
+            tmp += v[iv]['user'] + ' = ' + v[iv]['acl'] + "\n"
         tmp += "\n"
     return public.writeFile(getServerDir() + '/data/conf/svn_access_file.log', tmp)
 
 
 def projectAclList():
-    acl = getAllAclList()
     args = getArgs()
-    if 'page' in acl:
-        page = int(args['page'])
-    makeAclFile(acl)
-    return public.getJson(acl)
+    if not 'name' in args:
+        return 'name missing!'
+    name = args['name']
+    acl = getAllAclList()
+
+    if name in acl:
+        return public.getJson(acl[name])
+    else:
+        return 'fail'
+    # makeAclFile(acl)
+    # return public.getJson(acl)
 
 
 def projectAclAdd():
-    pass
+    args = getArgs()
+    if not 'uname' in args:
+        return 'username missing'
+    if not 'pname' in args:
+        return 'project name missing'
+    uname = args['uname']
+    pname = args['pname']
+
+    ulist = getAllUser()
+    if not uname in ulist:
+        return uname + " user not exists!"
+
+    acl = getAllAclList()
+
+    if not pname in acl:
+        return 'project not exists!'
+
+    tmp = acl[pname]
+    tmp_len = len(tmp)
+    tmp_acl = {'user': uname, 'acl': 'rw'}
+    if tmp_len == 0:
+        acl[pname] = [tmp_acl]
+    else:
+        print tmp_len
+        is_have = False
+        for x in range(tmp_len):
+            # print tmp[x], tmp[x]['user'], uname
+            if tmp[x]['user'] == uname:
+                is_have = True
+                return 'fail'
+        # print acl
+        if not is_have:
+            tmp.append(tmp_acl)
+            acl[pname] = tmp
+    # print acl
+    makeAclFile(acl)
+    return 'ok'
 
 
 def projectAclDel():
@@ -381,5 +430,7 @@ if __name__ == "__main__":
         print projectAdd()
     elif func == 'project_acl_list':
         print projectAclList()
+    elif func == 'project_acl_add':
+        print projectAclAdd()
     else:
         print 'fail'
