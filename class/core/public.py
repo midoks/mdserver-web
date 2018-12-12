@@ -368,13 +368,7 @@ def getLocalIp():
         ipaddress = re.search('\d+.\d+.\d+.\d+', ipaddress).group(0)
         return ipaddress
     except:
-        pass
-        # try:
-        #     url = web.ctx.session.home + '/Api/getIpAddress'
-        #     opener = urllib2.urlopen(url)
-        #     return opener.read()
-        # except:
-        #     return web.ctx.host.split(':')[0]
+        return '127.0.0.1'
 
 
 def inArray(arrays, searchStr):

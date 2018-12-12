@@ -36,8 +36,9 @@ def login_required(func):
 def test():
     os = public.getOs()
     print os
+
     print(sys.platform)
-    return os
+    return public.getLocalIp()
 
 
 @dashboard.route("/")
