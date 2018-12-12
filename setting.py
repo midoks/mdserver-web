@@ -16,7 +16,6 @@ reload = False
 daemon = False
 timeout = 7200
 keepalive = 1
-# worker_class = 'geventwebsocket.gunicorn.workers.GeventWebSocketWorker'
 chdir = os.getcwd()
 capture_output = True
 access_log_format = '%(t)s %(p)s %(h)s "%(r)s" %(s)s %(L)s %(b)s %(f)s" "%(a)s"'
