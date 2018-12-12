@@ -4,6 +4,7 @@ import sys
 import io
 import os
 import time
+import shutil
 
 from flask import Flask
 from datetime import timedelta
@@ -59,6 +60,11 @@ class config:
 
         public.writeFile(script_bin, content)
         public.execShell('chmod +x ' + script_bin)
+
+        if public.getOs() != 'darwin':
+            initd_bin = '/etc/init.d/mw'
+            if not os.path.exists(initd_bin):
+                shutil.copyfile(script_bin, initd_bin)
 
     def getVersion(self):
         return self.__version
