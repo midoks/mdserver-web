@@ -107,10 +107,11 @@ venv.bak/
 .idea/*.iml
 tmp/*.pl
 tmp/*.log
-data/json/index.json
 *.swp
 *.zip
-data/*.db
-data/control.conf
 scripts/init.d/mw
 logs/*
+data/*.db
+data/control.conf
+data/iplist.txt
+data/json/index.json
