@@ -10,7 +10,7 @@ from flask import Flask
 from datetime import timedelta
 
 sys.path.append(os.getcwd() + "/class/core")
-sys.setdefaultencoding('utf-8')
+# sys.setdefaultencoding('utf-8')
 import db
 import public
 
