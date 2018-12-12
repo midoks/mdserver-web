@@ -127,7 +127,10 @@ case "$1" in
     'start') mw_start;;
     'stop') mw_stop;;
     'reload') mw_reload;;
-    'restart') mw_stop mw_start;;
+    'restart') 
+        mw_stop
+        sleep 0.3
+        mw_start;;
     'status') mw_status;;
     'logs') error_logs;;
 esac
