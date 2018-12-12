@@ -313,9 +313,7 @@ function csvnAclAdd(pname){
 }
 
 function csvnAclDel(pname, uname){
-    // console.log(pname,uname);
     csvnPost('project_acl_del', {'pname':pname,'uname':uname}, function(data){
-        // console.log(data);
         if (data.data != 'ok'){
             layer.msg(data.data,{icon:0,time:2000,shade: [0.3, '#000']});
             return;
@@ -325,8 +323,23 @@ function csvnAclDel(pname, uname){
     });
 }
 
-function csvnAclSet(pname){
+function csvnAclSet(obj, pname, uname, acl, selected){
 
+    if (selected){
+        $(obj).prop('checked',true);
+        layer.msg('权限没有变化!',{icon:0,time:2000,shade: [0.3, '#000']});
+        return;
+    }
+
+    csvnPost('project_acl_set', {'pname':pname,'uname':uname, 'acl':acl}, function(data){
+        if (data.data != 'ok'){
+            layer.msg(data.data,{icon:0,time:2000,shade: [0.3, '#000']});
+            return;
+        }
+
+        $('#csvn_acl_close').click();
+        csvnAclProject(pname);
+    });
 }
 
 function csvnAclProject(pname){
@@ -342,9 +355,9 @@ function csvnAclProject(pname){
             var user = rdata[i]['user'];
             var acl = '';
             if (rdata[i]['acl'] == 'r'){
-                acl += '<input type="checkbox" id="owner_r" checked="true"> 只读  |  <input type="checkbox" id="owner_r"> 读写';
+                acl += '<input type="checkbox" onclick="csvnAclSet(this,\''+pname+'\',\''+user+'\',\'r\',true)" checked="true"> 只读  |  <input type="checkbox" onclick="csvnAclSet(this,\''+pname+'\',\''+user+'\',\'rw\', false)"> 读写';
             } else {
-                acl += '<input type="checkbox" id="owner_r"> 只读  |  <input type="checkbox" id="owner_r" checked="true"> 读写';
+                acl += '<input type="checkbox" onclick="csvnAclSet(this,\''+pname+'\',\''+user+'\',\'r\',false)"> 只读  |  <input type="checkbox" onclick="csvnAclSet(this,\''+pname+'\',\''+user+'\',\'rw\',true)" checked="true"> 读写';
             }
 
             list += '<tr><td>'+user+'</td><td>' + acl +'</td>'+
