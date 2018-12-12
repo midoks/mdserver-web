@@ -163,6 +163,7 @@ def userAdd():
     cmd = htpasswd + ' -b ' + svn_auth_file + ' ' + \
         args['username'] + ' ' + args['password']
     data = public.execShell(cmd)
+    # print data
     if data[0] == '':
         return 'ok'
     return 'fail'
@@ -345,8 +346,6 @@ def projectAclList():
         return public.getJson(acl[name])
     else:
         return 'fail'
-    # makeAclFile(acl)
-    # return public.getJson(acl)
 
 
 def projectAclAdd():
