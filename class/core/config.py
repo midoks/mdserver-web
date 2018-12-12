@@ -24,11 +24,14 @@ class config:
 
     def makeApp(self, name):
         app = Flask(name)
-        app.debug = True
 
-        app.config.version = self.__version + str(time.time())
+        app.config.version = self.__version
         app.config['SECRET_KEY'] = os.urandom(24)
         app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
+
+        # app.debug = True
+        # app.config.version = self.__version + str(time.time())
+
         __app = app
 
         self.initDB()
