@@ -18,5 +18,8 @@ mw_stop()
 case "$1" in
     'start') mw_start;;
     'stop') mw_stop;;
-    'restart') mw_stop mw_start;;
+    'restart') 
+		mw_stop 
+		mw_start
+		;;
 esac
