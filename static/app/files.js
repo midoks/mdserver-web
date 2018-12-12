@@ -378,7 +378,7 @@ function getFiles(Path) {
 						<a class='btlink' href='javascript:;' onclick=\"CopyFile('" + rdata.PATH +"/"+ fmp[0] + "')\">"+lan.files.file_menu_copy+"</a> | \
 						<a class='btlink' href='javascript:;' onclick=\"CutFile('" + rdata.PATH +"/"+ fmp[0]+ "')\">"+lan.files.file_menu_mv+"</a> | \
 						<a class='btlink' href=\"javascript:ReName(0,'" + fmp[0] + "');\">"+lan.files.file_menu_rename+"</a> | \
-						<a class='btlink' href=\"javascript:SetChmod(0,'" + rdata.PATH + "/"+fmp[0] + "');\">"+lan.files.file_menu_auth+"</a> | \
+						<a class='btlink' href=\"javascript:setChmod(0,'" + rdata.PATH + "/"+fmp[0] + "');\">"+lan.files.file_menu_auth+"</a> | \
 						<a class='btlink' href=\"javascript:Zip('" + rdata.PATH +"/" +fmp[0] + "');\">"+lan.files.file_menu_zip+"</a> | \
 						<a class='btlink' href='javascript:;' onclick=\"DeleteDir('" + rdata.PATH +"/"+ fmp[0] + "')\">"+lan.files.file_menu_del+"</a></span>\
 					</td></tr>";
@@ -433,7 +433,7 @@ function getFiles(Path) {
 						<span><a class='btlink' href='javascript:;' onclick=\"CopyFile('" + rdata.PATH +"/"+ fmp[0] + "')\">"+lan.files.file_menu_copy+"</a> | \
 						<a class='btlink' href='javascript:;' onclick=\"CutFile('" + rdata.PATH +"/"+ fmp[0] + "')\">"+lan.files.file_menu_mv+"</a> | \
 						<a class='btlink' href='javascript:;' onclick=\"ReName(0,'" + fmp[0] + "')\">"+lan.files.file_menu_rename+"</a> | \
-						<a class='btlink' href=\"javascript:SetChmod(0,'" + rdata.PATH +"/"+ fmp[0] + "');\">"+lan.files.file_menu_auth+"</a> | \
+						<a class='btlink' href=\"javascript:setChmod(0,'" + rdata.PATH +"/"+ fmp[0] + "');\">"+lan.files.file_menu_auth+"</a> | \
 						<a class='btlink' href=\"javascript:Zip('" + rdata.PATH +"/" +fmp[0] + "');\">"+lan.files.file_menu_zip+"</a> | \
 						"+bodyZip+download+"\
 						<a class='btlink' href='javascript:;' onclick=\"DeleteFile('" + rdata.PATH +"/"+ fmp[0] + "')\">"+lan.files.file_menu_del+"</a>\
@@ -677,7 +677,7 @@ function Batch(type,access){
 	}
 	
 	if(type == 3 && access == undefined){
-		SetChmod(0,lan.files.all);
+		setChmod(0,lan.files.all);
 		return;
 	}
 	
@@ -1365,7 +1365,7 @@ function UploadFiles(){
 }
 
 //设置权限
-function SetChmod(action,fileName){
+function setChmod(action,fileName){
 	if(action == 1){
 		var chmod = $("#access").val();
 		var chown = $("#chown").val();
@@ -1381,9 +1381,9 @@ function SetChmod(action,fileName){
 		return;
 	}
 	
-	var toExec = fileName == lan.files.all?'Batch(3,1)':'SetChmod(1,\''+fileName+'\')';
-	
-	$.post('/files?action=GetFileAccess','filename='+encodeURIComponent(fileName),function(rdata){
+	var toExec = fileName == lan.files.all?'Batch(3,1)':'setChmod(1,\''+fileName+'\')';
+	$.post('/files/file_access','filename='+encodeURIComponent(fileName),function(rdata){
+		console.log(rdata);
 		layer.open({
 			type:1,
 			closeBtn: 2,
@@ -1439,10 +1439,9 @@ function SetChmod(action,fileName){
 				onacc += access;
 			}
 			$("#access").val(onacc);
-			
 		});
-	})
-	
+
+	},'json');
 }
 
 function onAccess(){
@@ -1494,7 +1493,7 @@ function RClick(type,path,name){
 	  {text: lan.files.file_menu_copy, 	onclick: function() {CopyFile(path)}},
 	  {text: lan.files.file_menu_mv, 	onclick: function() {CutFile(path)}},
 	  {text: lan.files.file_menu_rename, 	onclick: function() {ReName(0,name)}},
-	  {text: lan.files.file_menu_auth, 	onclick: function() {SetChmod(0,path)}},
+	  {text: lan.files.file_menu_auth, 	onclick: function() {setChmod(0,path)}},
 	  {text: lan.files.file_menu_zip, onclick: function() {Zip(path)}}
 	  
 	]};

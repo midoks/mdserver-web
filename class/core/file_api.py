@@ -163,8 +163,19 @@ class file_api:
         except:
             return public.returnJson(False, '删除文件失败!')
 
+    def getAccess(self, filename):
+        data = {}
+        try:
+            stat = os.stat(filename)
+            data['chmod'] = str(oct(stat.st_mode)[-3:])
+            data['chown'] = pwd.getpwuid(stat.st_uid).pw_name
+        except:
+            data['chmod'] = 755
+            data['chown'] = 'www'
+        return data
+
         # 计算文件数量
-    def getFilesCount(self, path, search):
+    def getCount(self, path, search):
         i = 0
         for name in os.listdir(path):
             if search:
@@ -181,7 +192,7 @@ class file_api:
         filenames = []
 
         info = {}
-        info['count'] = self.getFilesCount(path, search)
+        info['count'] = self.getCount(path, search)
         info['row'] = page_size
         info['p'] = page
         info['tojs'] = 'getFiles'
