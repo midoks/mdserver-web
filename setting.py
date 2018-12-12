@@ -1,12 +1,12 @@
 import os
 import time
 import sys
+
 sys.path.append(os.getcwd() + '/class/core')
 import public
 import system_api
 
 cpu_info = system_api.system_api().getCpuInfo()
-
 
 if not os.path.exists(os.getcwd() + '/logs'):
     os.mkdir(os.getcwd() + '/logs')
