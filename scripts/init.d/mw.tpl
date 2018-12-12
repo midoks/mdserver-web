@@ -14,7 +14,7 @@ mw_start(){
             if [ "$isStart" == '' ];then
                     echo -e "\033[31mfailed\033[0m"
                     echo '------------------------------------------------------'
-                    tail -n 20 $panel_path/logs/error.log
+                    tail -n 20 $mw_path/logs/error.log
                     echo '------------------------------------------------------'
                     echo -e "\033[31mError: mw service startup failed.\033[0m"
                     return;
@@ -22,6 +22,26 @@ mw_start(){
             echo -e "\033[32mdone\033[0m"
     else
             echo "Starting mw... mw(pid $(echo $isStart)) already running"
+    fi
+
+
+    isStart=$(ps aux |grep 'task.py'|grep -v grep|awk '{print $2}')
+    if [ "$isStart" == '' ];then
+            echo -e "Starting mw-tasks... \c"
+            nohup python task.py >> $mw_path/logs/task.log 2>&1 &
+            sleep 0.2
+            isStart=$(ps aux |grep 'task.py'|grep -v grep|awk '{print $2}')
+            if [ "$isStart" == '' ];then
+                    echo -e "\033[31mfailed\033[0m"
+                    echo '------------------------------------------------------'
+                    tail -n 20 $mw_path/logs/task.log
+                    echo '------------------------------------------------------'
+                    echo -e "\033[31mError: mw-tasks service startup failed.\033[0m"
+                    return;
+            fi
+            echo -e "\033[32mdone\033[0m"
+    else
+            echo "Starting mw-tasks... Bt-Tasks (pid $isStart) already running"
     fi
 }
 

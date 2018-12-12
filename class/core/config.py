@@ -51,6 +51,8 @@ class config:
     def initInitD(self):
         script = public.getRunDir() + '/scripts/init.d/mw.tpl'
         script_bin = public.getRunDir() + '/scripts/init.d/mw'
+        if os.path.exists(script_bin):
+            return
 
         content = public.readFile(script)
         content = content.replace("{$SERVER_PATH}", public.getRunDir())
