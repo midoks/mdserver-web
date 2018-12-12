@@ -63,6 +63,13 @@ def delete():
     return file_api.file_api().delete(path)
 
 
+@files.route('/file_access', methods=['POST'])
+def fileAccess():
+    filename = request.form.get('filename', '').encode('utf-8')
+    data = file_api.file_api().getAccess(filename)
+    return public.getJson(data)
+
+
 @files.route('/get_dir', methods=['POST'])
 def getDir():
     path = request.form.get('path', '').encode('utf-8')
