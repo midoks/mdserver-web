@@ -275,13 +275,9 @@ def getCsvnPort():
     return '3343'
 
 
-def projectList():
-    import math
-    args = getArgs()
-
+def getALlProjectList():
     path = getServerDir() + '/data/repositories'
     dlist = []
-    data = {}
     if os.path.exists(path):
         for filename in os.listdir(path):
             tmp = {}
@@ -289,6 +285,12 @@ def projectList():
             if os.path.isdir(filePath):
                 tmp['name'] = filename
             dlist.append(tmp)
+    return dlist
+
+
+def projectList():
+    import math
+    args = getArgs()
 
     page = 1
     page_size = 10
@@ -297,6 +299,9 @@ def projectList():
 
     if 'page_size' in args:
         page_size = int(args['page_size'])
+
+    dlist = getALlProjectList()
+    data = {}
 
     dlist_sum = len(dlist)
     page_info = {'count': dlist_sum, 'p': page,
