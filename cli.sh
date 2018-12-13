@@ -9,6 +9,11 @@ mw_start(){
 }
 
 
+mw_start_debug(){
+	gunicorn -b :7200 app:app &
+	python task.py &
+}
+
 mw_stop()
 {
 	ps -ef|grep app:app |grep -v grep|awk '{print $2}'|xargs kill -9
@@ -21,5 +26,9 @@ case "$1" in
     'restart') 
 		mw_stop 
 		mw_start
+		;;
+	'debug') 
+		mw_stop 
+		mw_start_debug
 		;;
 esac
