@@ -530,7 +530,7 @@ def projectScriptLoad():
     commit_tpl = getPluginDir() + '/hook/post-commit.tpl'
     commit_file = hook_path + '/commit'
 
-    ct_content = public.readFile(post_commit_tpl)
+    ct_content = public.readFile(commit_tpl)
     ct_content = ct_content.replace('{$PRJOECT_DIR}', public.getRootDir())
     ct_content = ct_content.replace('{$PORT}', getHttpPort())
     ct_content = ct_content.replace('{$CSVN_USER}', 'admin')
