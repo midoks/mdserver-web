@@ -531,7 +531,7 @@ def projectScriptLoad():
     commit_file = hook_path + '/commit'
 
     ct_content = public.readFile(commit_tpl)
-    ct_content = ct_content.replace('{$PRJOECT_DIR}', public.getRootDir())
+    ct_content = ct_content.replace('{$PROJECT_DIR}', public.getRootDir())
     ct_content = ct_content.replace('{$PORT}', getHttpPort())
     ct_content = ct_content.replace('{$CSVN_USER}', 'admin')
     ct_content = ct_content.replace('{$CSVN_PWD}', 'admin123Q')
