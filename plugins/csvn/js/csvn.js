@@ -326,6 +326,7 @@ function csvnProjectScript(pnanm, has_hook){
     var html = '';
     if (has_hook){
         html += '<button onclick="csvnProjectScriptEdit(\''+pnanm+'\')" class="btn btn-default btn-sm">手动编辑</button>';
+        html += '<button onclick="csvnProjectScriptDebug(\''+pnanm+'\')" class="btn btn-default btn-sm">调试日志</button>';
         html += '<button onclick="csvnProjectScriptLoad(\''+pnanm+'\')" class="btn btn-default btn-sm">重新加载</button>';
         html += '<button onclick="csvnProjectScriptUnload(\''+pnanm+'\')" class="btn btn-default btn-sm">卸载脚本</button>';
     } else {
@@ -383,6 +384,20 @@ function csvnProjectScriptEdit(pname){
         }        
     });
 }
+
+function csvnProjectScriptDebug(pname){
+    csvnPost('project_script_debug', {'pname':pname}, function(data){
+        var rdata = $.parseJSON(data.data);
+        if (rdata['status']){
+            onlineEditFile(0, rdata['path']);
+            $('.layui-layer-close1').click();
+            csvnProjectList();
+        } else {
+            layer.msg(rdata.msg,{icon:1,time:2000,shade: [0.3, '#000']});
+        }        
+    });
+}
+
 
 function csvnAclAdd(pname){
     var uname = $('#csvn_username').val();

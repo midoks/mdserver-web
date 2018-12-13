@@ -575,6 +575,24 @@ def projectScriptEdit():
     return public.getJson(data)
 
 
+def projectScriptEdit():
+    args = getArgs()
+    if not 'pname' in args:
+        return 'project name missing'
+
+    data = {}
+    commit_log = getServerDir() + '/data/repositories/' + \
+        args['pname'] + '/sh.log'
+    if os.path.exists(commit_log):
+        data['status'] = True
+        data['path'] = commit_log
+    else:
+        data['status'] = False
+        data['msg'] = 'file does not exist'
+
+    return public.getJson(data)
+
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
