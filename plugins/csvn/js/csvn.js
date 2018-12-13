@@ -158,18 +158,31 @@ function csvnModPwdUser(name){
     csvnAddUser(name);
 }
 
-function csvnProjectList(page){
+function csvnProjectFind(){
+    var search = $('#csvn_project_find').val();
+    if (search == ''){
+         layer.msg('查找字符不能为空!',{icon:0,time:2000,shade: [0.3, '#000']});
+         return;
+    }
+
+    csvnProjectList(1, search);
+}
+
+function csvnProjectList(page, search){
     var _data = {};
     _data['page'] = page;
     _data['page_size'] = 10;
+    if (typeof(search) != 'undefined'){
+         _data['search'] = search;
+    }
 
     csvnPost('project_list', _data, function(data){
 
         var rdata = $.parseJSON($.trim(data.data));
         var csvn_mg = project_url = 'http://' +rdata['ip'] +(rdata['csvn_port'] == '80' ? '': ':'+rdata['csvn_port']);
 
-        content = '<div class="finduser"><input class="bt-input-text mr5" type="text" placeholder="查找项目" id="disable_function_val" style="height: 28px; border-radius: 3px;width: 505px;">';
-        content += '<button class="btn btn-success btn-sm">查找</button></div>';
+        content = '<div><input class="bt-input-text mr5" type="text" placeholder="查找项目" id="csvn_project_find" style="height: 28px; border-radius: 3px;width: 505px;">';
+        content += '<button class="btn btn-success btn-sm" onclick="csvnProjectFind();">查找</button></div>';
 
         content += '<div class="divtable" style="margin-top:5px;"><table class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0">';
         content += '<thead><tr>';
