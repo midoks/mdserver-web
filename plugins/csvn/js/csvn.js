@@ -179,7 +179,7 @@ function csvnProjectList(page){
         content += '</tr></thead>';
         content += '<tbody>';
 
-        console.log(rdata);
+        // console.log(rdata);
         ulist = rdata.data;
         for (i in ulist){
             var project_url = 'http://' +rdata['ip'] +(rdata['port'] == '80' ? '': ':'+rdata['port'])+ '/svn/'+ulist[i]['name'];
