@@ -182,10 +182,20 @@ function csvnProjectFind(){
 
 function csvnProjectList(page, search){
     var _data = {};
-    _data['page'] = page;
     _data['page_size'] = 10;
     if (typeof(search) != 'undefined'){
          _data['search'] = search;
+    }
+
+    if (typeof(page) != 'undefined'){
+         _data['page'] = page;
+         setCookie('csvnProjectListPage',page);
+    } else {
+        _data['page'] = 1;
+        cookie_page = getCookie('csvnProjectListPage')
+        if (cookie_page >0){
+            _data['page'] = cookie_page;
+        }
     }
 
     csvnPost('project_list', _data, function(data){
