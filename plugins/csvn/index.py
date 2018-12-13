@@ -183,7 +183,7 @@ def userDel():
     return 'fail'
 
 
-def getAllUser():
+def getAllUser(search=''):
     svn_auth_file = getServerDir() + '/data/conf/svn_auth_file'
     if not os.path.exists(svn_auth_file):
         return public.getJson([])
@@ -194,7 +194,11 @@ def getAllUser():
     ulist = []
     for x in range(len(auth_list)):
         tmp = auth_list[x].split(':')
-        ulist.append(tmp[0])
+        if search != '':
+            if tmp[0].find(search) != -1:
+                ulist.append(tmp[0])
+        else:
+            ulist.append(tmp[0])
     return ulist
 
 
@@ -204,13 +208,17 @@ def userList():
 
     page = 1
     page_size = 10
+    search = ''
     if 'page' in args:
         page = int(args['page'])
 
     if 'page_size' in args:
         page_size = int(args['page_size'])
 
-    ulist = getAllUser()
+    if 'search' in args:
+        search = args['search']
+
+    ulist = getAllUser(search)
     ulist_sum = len(ulist)
 
     page_info = {'count': ulist_sum, 'p': page,
