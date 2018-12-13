@@ -275,7 +275,7 @@ def getCsvnPort():
     return '3343'
 
 
-def getALlProjectList():
+def getALlProjectList(search=''):
     path = getServerDir() + '/data/repositories'
     dlist = []
     if os.path.exists(path):
@@ -283,8 +283,13 @@ def getALlProjectList():
             tmp = {}
             filePath = path + '/' + filename
             if os.path.isdir(filePath):
-                tmp['name'] = filename
-            dlist.append(tmp)
+                if search == '':
+                    tmp['name'] = filename
+                    dlist.append(tmp)
+                else:
+                    if filename.find(search) != -1:
+                        tmp['name'] = filename
+                        dlist.append(tmp)
     return dlist
 
 
@@ -294,13 +299,17 @@ def projectList():
 
     page = 1
     page_size = 10
+    search = ''
     if 'page' in args:
         page = int(args['page'])
 
     if 'page_size' in args:
         page_size = int(args['page_size'])
 
-    dlist = getALlProjectList()
+    if 'search' in args:
+        search = args['search']
+
+    dlist = getALlProjectList(search)
     data = {}
 
     dlist_sum = len(dlist)
