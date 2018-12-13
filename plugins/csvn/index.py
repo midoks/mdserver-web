@@ -253,6 +253,28 @@ def projectDel():
     return 'fail'
 
 
+def getHttpPort():
+    http_main_conf = getServerDir() + '/data/conf/csvn_main_httpd.conf'
+    try:
+        if os.path.exists(http_main_conf):
+            content = public.readFile(http_main_conf)
+            return re.search('Listen\s(\d+)', content).groups()[0]
+    except Exception as e:
+        pass   # print e
+    return '80'
+
+
+def getCsvnPort():
+    http_main_conf = getServerDir() + '/data/conf/csvn-wrapper.conf'
+    try:
+        if os.path.exists(http_main_conf):
+            content = public.readFile(http_main_conf)
+            return re.search('wrapper.java.additional.3=-Djetty.port=(\d+)', content).groups()[0]
+    except Exception as e:
+        pass   # print e
+    return '3343'
+
+
 def projectList():
     import math
     args = getArgs()
@@ -266,10 +288,6 @@ def projectList():
             filePath = path + '/' + filename
             if os.path.isdir(filePath):
                 tmp['name'] = filename
-                verPath = filePath + '/format'
-                if os.path.exists(verPath):
-                    ver = public.readFile(verPath).strip()
-                    tmp['ver'] = ver
             dlist.append(tmp)
 
     page = 1
@@ -287,6 +305,9 @@ def projectList():
     data['page'] = page
     data['page_size'] = page_size
     data['page_count'] = int(math.ceil(dlist_sum / page_size))
+    data['ip'] = public.getLocalIp()
+    data['port'] = getHttpPort()
+    data['csvn_port'] = getCsvnPort()
 
     start = (page - 1) * page_size
     data['data'] = dlist[start:start + page_size]

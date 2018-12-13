@@ -10,6 +10,7 @@
 			<p onclick="pluginInitD('csvn');">自启动</p>
 			<p onclick="csvnUserList(1);">用户管理</p>
 			<p onclick="csvnProjectList(1);">项目管理</p>
+			<p onclick="csvnReadme();">使用说明</p>
 		</div>
 		<div class="bt-w-con pd15">
 			<div class="soft-man-con"></div>
@@ -20,4 +21,14 @@
 <script type="text/javascript">
 resetPluginWinWidth(700);
 $.getScript( "/plugins/file?name=csvn&f=js/csvn.js");
+
+
+function csvnReadme(){
+	var html = '<p>* 注意:在启动时会比较慢,需要耐心等待一会</p>';
+	html += '<p>* 注意:csvn需要java环境,在安装会自动检查并安装</p>';
+	html += '<p>* 注意:牢记admin的密码,在后csvn的管理后台和这里不同步</p>';
+	html += '<p>* 注意:在这里添加用户和csvn后台并不同步</p>';
+	html += '<p>* 注意:项目管理的地址一般是正确的,但在特殊环境下,地址可能不一致</p>';
+	$('.bt-w-main .soft-man-con').html(html);
+}
 </script>
