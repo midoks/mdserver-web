@@ -518,16 +518,26 @@ def projectScriptLoad():
     if not 'pname' in args:
         return 'project name missing'
 
+    post_commit_tpl = getPluginDir() + '/hook/post-commit.tpl'
+    hook_path = getServerDir() + '/data/repositories/' + \
+        args['pname'] + '/hooks'
+    post_commit_file = hook_path + '/post-commit'
+
+    pct_content = public.readFile(post_commit_tpl)
+    public.writeFile(pro_commit_file, pct_content)
+    public.execShell('chmod 777 ' + post_commit_file)
+
     commit_tpl = getPluginDir() + '/hook/post-commit.tpl'
-    pro_commit_file = getServerDir() + '/data/repositories/' + '/' + \
-        args['pname'] + '/hooks/post-commit'
+    commit_file = hook_path + '/commit'
 
-    content = public.readFile(commit_tpl)
-    content = content.replace('{$PRJOECT_DIR}', public.getRootDir())
-    content = content.replace('{$PORT}', getHttpPort())
+    ct_content = public.readFile(post_commit_tpl)
+    ct_content = ct_content.replace('{$PRJOECT_DIR}', public.getRootDir())
+    ct_content = ct_content.replace('{$PORT}', getHttpPort())
+    ct_content = ct_content.replace('{$CSVN_USER}', 'admin')
+    ct_content = ct_content.replace('{$CSVN_PWD}', 'admin123Q')
 
-    public.writeFile(pro_commit_file, content)
-    public.execShell('chmod 777 ' + pro_commit_file)
+    public.writeFile(commit_file, ct_content)
+    public.execShell('chmod 777 ' + commit_file)
 
     return 'ok'
 
@@ -537,9 +547,13 @@ def projectScriptUnload():
     if not 'pname' in args:
         return 'project name missing'
 
-    pro_commit_file = getServerDir() + '/data/repositories/' + '/' + \
+    post_commit_file = getServerDir() + '/data/repositories/' + '/' + \
         args['pname'] + '/hooks/post-commit'
-    public.execShell('rm -f ' + pro_commit_file)
+    public.execShell('rm -f ' + post_commit_file)
+
+    commit_file = getServerDir() + '/data/repositories/' + '/' + \
+        args['pname'] + '/hooks/commit'
+    public.execShell('rm -f ' + commit_file)
     return 'ok'
 
 
@@ -549,11 +563,11 @@ def projectScriptEdit():
         return 'project name missing'
 
     data = {}
-    pro_commit_file = getServerDir() + '/data/repositories/' + \
-        args['pname'] + '/hooks/post-commit'
-    if os.path.exists(pro_commit_file):
+    commit_file = getServerDir() + '/data/repositories/' + \
+        args['pname'] + '/hooks/commit'
+    if os.path.exists(commit_file):
         data['status'] = True
-        data['path'] = pro_commit_file
+        data['path'] = commit_file
     else:
         data['status'] = False
         data['msg'] = 'file does not exist'
