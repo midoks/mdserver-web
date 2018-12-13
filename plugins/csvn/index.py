@@ -524,7 +524,7 @@ def projectScriptLoad():
     post_commit_file = hook_path + '/post-commit'
 
     pct_content = public.readFile(post_commit_tpl)
-    public.writeFile(pro_commit_file, pct_content)
+    public.writeFile(post_commit_file, pct_content)
     public.execShell('chmod 777 ' + post_commit_file)
 
     commit_tpl = getPluginDir() + '/hook/post-commit.tpl'
