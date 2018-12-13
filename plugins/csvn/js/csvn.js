@@ -15,22 +15,34 @@ function csvnPost(method,args,callback){
     },'json'); 
 }
 
-function csvnUserList(page) {
-    
-    if (typeof(page) =='undefined'){
-        page = 1;
+function csvnUserFind(){
+    var search = $('#csvn_find_user').val();
+    if (search==''){
+        layer.msg('搜索字符不能为空!',{icon:0,time:2000,shade: [0.3, '#000']});
+        return;
     }
+    csvnUserList(1, search);
+}
 
+function csvnUserList(page, search) {
+    
     var _data = {};
+    if (typeof(page) =='undefined'){
+        var page = 1;
+    }
+    
     _data['page'] = page;
     _data['page_size'] = 10;
+    if(typeof(search) != 'undefined'){
+        _data['search'] = search;
+    }
 
     csvnPost('user_list', _data, function(data){
 
         var rdata = $.parseJSON(data.data);
         // console.log(rdata);
-        content = '<div class="finduser"><input class="bt-input-text mr5 outline_no" type="text" placeholder="查找用户名" id="find_user" style="height: 28px; border-radius: 3px;width: 505px;">';
-        content += '<button class="btn btn-success btn-sm">查找</button></div>';
+        content = '<div class="finduser"><input class="bt-input-text mr5 outline_no" type="text" placeholder="查找用户名" id="csvn_find_user" style="height: 28px; border-radius: 3px;width: 505px;">';
+        content += '<button class="btn btn-success btn-sm" onclick="csvnUserFind();">查找</button></div>';
 
         content += '<div class="divtable" style="margin-top:5px;"><table class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0">';
         content += '<thead><tr>';
