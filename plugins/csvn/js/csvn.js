@@ -188,7 +188,8 @@ function csvnProjectList(page){
                 '<td>'+project_url+'</td><td>'+
                 '<a class="btlink" onclick="csvnDelProject(\''+ulist[i]['name']+'\')">删除</a> | ' +
                 '<a class="btlink" onclick="csvnAclProject(\''+ulist[i]['name']+'\')">权限</a> | ' +
-                '<a class="btlink" target="_blank" href="' + code_url +'">源码</a>' +
+                '<a class="btlink" target="_blank" href="' + code_url +'">源码</a> | ' +
+                '<a class="btlink" onclick="csvnProjectScript(\''+ulist[i]['name']+'\')">脚本</a>' +
                 '</td></tr>';
         }
 
@@ -270,13 +271,7 @@ function csvnAddProject(){
         var _data = {};
         _data['name'] = $('#csvn_name').val();
 
-        var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
-        $.post('/plugins/run', {name:'csvn', func:'project_add', args:JSON.stringify(_data)}, function(data) {
-            layer.close(loadT);
-            if (!data.status){
-                layer.msg(data.data,{icon:0,time:2000,shade: [0.3, '#000']});
-                return;
-            }
+        csvnPost('project_add', _data, function(data){
 
             if (data.data !='ok'){
                 layer.msg(data.data,{icon:2,time:2000,shade: [0.3, '#000']});
@@ -286,7 +281,21 @@ function csvnAddProject(){
             csvnProjectList();
             layer.close(loadOpen);
             layer.msg("操作成功!",{icon:1,time:3000,shade: [0.3, '#000']});
-        },'json');
+        });
+    });
+}
+
+
+function csvnProjectScript(pnanm){
+
+    var loadOpen = layer.open({
+        type: 1,
+        title: '脚本设置',
+        area: '240px',
+        content:'<div class="change-default pd20">\
+            <button  class="btn btn-default btn-sm">'+'加载'+'</button>\
+            <button  class="btn btn-default btn-sm">'+'编辑'+'</button>\
+        </div>'
     });
 }
 
@@ -363,8 +372,7 @@ function csvnAclProject(pname){
             type: 1,
             title: '权限设置',
             area: '300px',
-            content:"<div class='bt-form pd20 pb70 c6'>\
-                <div class='version line'>\
+            content:"<div class='bt-form pd20 c6'>\
                     <div>\
                         <div><input class='bt-input-text mr5 outline_no' type='text' id='csvn_username' name='username' style='height: 28px; border-radius: 3px;width: 205px;' placeholder='用户名'>\
                         <button class='btn btn-success btn-sm' onclick='csvnAclAdd(\""+pname+"\");'>添加</button></div>\
@@ -372,11 +380,7 @@ function csvnAclProject(pname){
                         <tbody>"+list+"</tbody>\
                         </table></div>\
                     </div>\
-                </div>\
-                <div class='bt-form-submit-btn'>\
-                    <button type='button' id='csvn_acl_close' class='btn btn-danger btn-sm btn-title'>关闭</button>\
-                </div>\
-            </div>"
+                </div>"
         });
 
         $('#csvn_acl_close').click(function(){
