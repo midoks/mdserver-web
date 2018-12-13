@@ -524,6 +524,7 @@ def projectScriptLoad():
 
     content = public.readFile(commit_tpl)
     content = content.replace('{$PRJOECT_DIR}', public.getRootDir())
+    content = content.replace('{$PORT}', getHttpPort())
 
     public.writeFile(pro_commit_file, content)
     public.execShell('chmod 777 ' + pro_commit_file)
