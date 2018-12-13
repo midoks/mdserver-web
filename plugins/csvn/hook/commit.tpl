@@ -6,7 +6,7 @@ REV="$2"
 TXN_NAME="$3"
 
 
-WEB_PATH={$PROJECT_DIR}/wwwroot/$REPOS_NAME
+WEB_PATH={$PROJECT_DIR}/wwwroot/$REPOS
 SVN_PATH=http://127.0.0.1:{$PORT}/svn/$REPOS
 
 if [ ! -d  $WEB_PATH ]; then
