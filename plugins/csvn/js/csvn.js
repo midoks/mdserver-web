@@ -152,29 +152,21 @@ function csvnAddUser(username){
             layer.msg("操作成功!",{icon:1,time:3000,shade: [0.3, '#000']});
         },'json');
     });
-
 }
 
 function csvnModPwdUser(name){
-    csvnAddUser(name);   
+    csvnAddUser(name);
 }
 
-
 function csvnProjectList(page){
-    var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
     var _data = {};
     _data['page'] = page;
     _data['page_size'] = 10;
-    $.post('/plugins/run', {name:'csvn', func:'project_list', args:JSON.stringify(_data)}, function(data) {
-        layer.close(loadT);
-        
-        if (!data.status){
-            layer.msg(data.msg,{icon:0,time:2000,shade: [0.3, '#000']});
-            return;
-        }
+
+    csvnPost('project_list', _data, function(data){
 
         var rdata = $.parseJSON($.trim(data.data));
-        // console.log(rdata);
+        var csvn_mg = project_url = 'http://' +rdata['ip'] +(rdata['csvn_port'] == '80' ? '': ':'+rdata['csvn_port']);
 
         content = '<div class="finduser"><input class="bt-input-text mr5" type="text" placeholder="查找项目" id="disable_function_val" style="height: 28px; border-radius: 3px;width: 505px;">';
         content += '<button class="btn btn-success btn-sm">查找</button></div>';
@@ -182,18 +174,21 @@ function csvnProjectList(page){
         content += '<div class="divtable" style="margin-top:5px;"><table class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0">';
         content += '<thead><tr>';
         content += '<th>项目名</th>';
-        content += '<th>当前版本</th>';
-        content += '<th>操作(<a class="btlink" onclick="csvnAddProject();">添加</a>)</th>';
+        content += '<th>地址</th>';
+        content += '<th>操作(<a class="btlink" onclick="csvnAddProject();">添加</a>) | <a class="btlink" target="_blank" href="'+csvn_mg+'">后台管理</a> </th>';
         content += '</tr></thead>';
-
         content += '<tbody>';
 
+        console.log(rdata);
         ulist = rdata.data;
         for (i in ulist){
+            var project_url = 'http://' +rdata['ip'] +(rdata['port'] == '80' ? '': ':'+rdata['port'])+ '/svn/'+ulist[i]['name'];
+            var code_url = 'http://' +rdata['ip'] +(rdata['port'] == '80' ? '': ':'+rdata['port'])+ '/viewvc/'+ulist[i]['name'];
             content += '<tr><td>'+ulist[i]['name']+'</td>'+
-                '<td>'+ulist[i]['ver']+'</td><td>'+
+                '<td>'+project_url+'</td><td>'+
                 '<a class="btlink" onclick="csvnDelProject(\''+ulist[i]['name']+'\')">删除</a> | ' +
-                '<a class="btlink" onclick="csvnAclProject(\''+ulist[i]['name']+'\')">权限</a>' +
+                '<a class="btlink" onclick="csvnAclProject(\''+ulist[i]['name']+'\')">权限</a> | ' +
+                '<a class="btlink" target="_blank" href="' + code_url +'">源码</a>' +
                 '</td></tr>';
         }
 
@@ -206,7 +201,7 @@ function csvnProjectList(page){
 
         content += page;
         $(".soft-man-con").html(content);
-    },'json');
+    });
 }
 
 function csvnDelProject(name){
