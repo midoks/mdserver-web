@@ -114,3 +114,6 @@ data/control.conf
 data/default.db
 data/default.bak.db
 data/system.db
+data/control.conf
+data/iplist.txt
+data/json/index.json
