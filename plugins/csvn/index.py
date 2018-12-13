@@ -528,6 +528,7 @@ def projectScriptLoad():
 
     public.writeFile(pro_commit_file, content)
     public.execShell('chmod 777 ' + pro_commit_file)
+
     return 'ok'
 
 
