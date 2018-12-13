@@ -301,6 +301,19 @@ def getALlProjectList(search=''):
     return dlist
 
 
+def checkProjectListIsHasScript(data):
+    dlen = len(data)
+    for x in range(dlen):
+        path = getServerDir() + '/data/repositories/' + \
+            data[x]['name'] + '/hooks/post-commit'
+        if os.path.exists(path):
+            data[x]['has_hook'] = True
+        else:
+            data[x]['has_hook'] = False
+
+    return data
+
+
 def projectList():
     import math
     args = getArgs()
@@ -318,21 +331,19 @@ def projectList():
         search = args['search']
 
     dlist = getALlProjectList(search)
-    data = {}
-
     dlist_sum = len(dlist)
-    page_info = {'count': dlist_sum, 'p': page,
-                 'row': 10, 'tojs': 'csvnProjectList'}
-    data['list'] = public.getPage(page_info)
-    data['page'] = page
-    data['page_size'] = page_size
-    data['page_count'] = int(math.ceil(dlist_sum / page_size))
+
+    start = (page - 1) * page_size
+    ret_data = dlist[start:start + page_size]
+    ret_data = checkProjectListIsHasScript(ret_data)
+
+    data = {}
+    data['data'] = ret_data
+    data['list'] = public.getPage(
+        {'count': dlist_sum, 'p': page, 'row': 10, 'tojs': 'csvnProjectList'})
     data['ip'] = public.getLocalIp()
     data['port'] = getHttpPort()
     data['csvn_port'] = getCsvnPort()
-
-    start = (page - 1) * page_size
-    data['data'] = dlist[start:start + page_size]
 
     return public.getJson(data)
 
@@ -374,7 +385,7 @@ def makeAclFile(content):
         for iv in range(len(v)):
             tmp += v[iv]['user'] + ' = ' + v[iv]['acl'] + "\n"
         tmp += "\n"
-    svn_tmp_path = getServerDir() + '/data/conf/svn_access_file.log'
+    # svn_tmp_path = getServerDir() + '/data/conf/svn_access_file.log'
     return public.writeFile(svn_access_file, tmp)
 
 
@@ -500,6 +511,54 @@ def projectAclSet():
     makeAclFile(acl)
     return 'ok'
 
+
+def projectScriptLoad():
+
+    args = getArgs()
+    if not 'pname' in args:
+        return 'project name missing'
+
+    commit_tpl = getPluginDir() + '/hook/post-commit.tpl'
+    pro_commit_file = getServerDir() + '/data/repositories/' + '/' + \
+        args['pname'] + '/hooks/post-commit'
+
+    content = public.readFile(commit_tpl)
+    content = content.replace('{$PRJOECT_DIR}', public.getRootDir())
+
+    public.writeFile(pro_commit_file, content)
+    public.execShell('chmod 777 ' + pro_commit_file)
+    return 'ok'
+
+
+def projectScriptUnload():
+    args = getArgs()
+    if not 'pname' in args:
+        return 'project name missing'
+
+    pro_commit_file = getServerDir() + '/data/repositories/' + '/' + \
+        args['pname'] + '/hooks/post-commit'
+    public.execShell('rm -f ' + pro_commit_file)
+    return 'ok'
+
+
+def projectScriptEdit():
+    args = getArgs()
+    if not 'pname' in args:
+        return 'project name missing'
+
+    data = {}
+    pro_commit_file = getServerDir() + '/data/repositories/' + \
+        args['pname'] + '/hooks/post-commit'
+    if os.path.exists(pro_commit_file):
+        data['status'] = True
+        data['path'] = pro_commit_file
+    else:
+        data['status'] = False
+        data['msg'] = 'file does not exist'
+
+    return public.getJson(data)
+
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -544,5 +603,11 @@ if __name__ == "__main__":
         print projectAclDel()
     elif func == 'project_acl_set':
         print projectAclSet()
+    elif func == 'project_script_load':
+        print projectScriptLoad()
+    elif func == 'project_script_unload':
+        print projectScriptUnload()
+    elif func == 'project_script_edit':
+        print projectScriptEdit()
     else:
         print 'fail'

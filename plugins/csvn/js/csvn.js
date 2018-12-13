@@ -5,7 +5,7 @@ function csvnPost(method,args,callback){
     $.post('/plugins/run', {name:'csvn', func:method, args:JSON.stringify(args)}, function(data) {
         layer.close(loadT);
         if (!data.status){
-            layer.msg(data.data,{icon:0,time:2000,shade: [0.3, '#000']});
+            layer.msg(data.msg,{icon:0,time:2000,shade: [0.3, '#000']});
             return;
         }
 
@@ -25,7 +25,7 @@ function csvnUserFind(){
 }
 
 function csvnUserList(page, search) {
-    
+
     var _data = {};
     if (typeof(page) =='undefined'){
         var page = 1;
@@ -214,7 +214,7 @@ function csvnProjectList(page, search){
                 '<a class="btlink" onclick="csvnDelProject(\''+ulist[i]['name']+'\')">删除</a> | ' +
                 '<a class="btlink" onclick="csvnAclProject(\''+ulist[i]['name']+'\')">权限</a> | ' +
                 '<a class="btlink" target="_blank" href="' + code_url +'">源码</a> | ' +
-                '<a class="btlink" onclick="csvnProjectScript(\''+ulist[i]['name']+'\')">脚本</a>' +
+                '<a class="btlink" onclick="csvnProjectScript(\''+ulist[i]['name']+'\','+ ulist[i]['has_hook']+')">脚本</a>' +
                 '</td></tr>';
         }
 
@@ -311,16 +311,66 @@ function csvnAddProject(){
 }
 
 
-function csvnProjectScript(pnanm){
+function csvnProjectScript(pnanm, has_hook){
+
+    var html = '';
+    if (has_hook){
+        html += '<button onclick="csvnProjectScriptEdit(\''+pnanm+'\')" class="btn btn-default btn-sm">手动编辑</button>';
+        html += '<button onclick="csvnProjectScriptLoad(\''+pnanm+'\')" class="btn btn-default btn-sm">重新加载</button>';
+        html += '<button onclick="csvnProjectScriptUnload(\''+pnanm+'\')" class="btn btn-default btn-sm">卸载脚本</button>';
+    } else {
+        html += '<button onclick="csvnProjectScriptLoad(\''+pnanm+'\')" class="btn btn-default btn-sm">加载脚本</button>';
+    }
 
     var loadOpen = layer.open({
         type: 1,
         title: '脚本设置',
         area: '240px',
-        content:'<div class="change-default pd20">\
-            <button  class="btn btn-default btn-sm">'+'加载'+'</button>\
-            <button  class="btn btn-default btn-sm">'+'编辑'+'</button>\
-        </div>'
+        content:'<div class="change-default pd20">'+html+'</div>'
+    });
+}
+
+function csvnProjectScriptLoad(pname){
+    csvnPost('project_script_load', {'pname':pname}, function(data){
+        if (data.data != 'ok'){
+            layer.msg(data.data,{icon:0,time:2000,shade: [0.3, '#000']});
+            return;
+        }
+
+        layer.msg('加载成功!',{icon:1,time:2000,shade: [0.3, '#000']});
+        setTimeout(function(){
+            $('.layui-layer-close1').click();
+            csvnProjectList();
+        },2000);
+    });
+}
+
+function csvnProjectScriptUnload(pname){
+    csvnPost('project_script_unload', {'pname':pname}, function(data){
+        console.log(data);
+        if (data.data != 'ok'){
+            layer.msg(data.data,{icon:0,time:2000,shade: [0.3, '#000']});
+            return;
+        }
+
+        layer.msg('卸载成功!',{icon:1,time:2000,shade: [0.3, '#000']});
+        setTimeout(function(){
+            $('.layui-layer-close1').click();
+            csvnProjectList();
+        },2000);
+    });
+}
+
+function csvnProjectScriptEdit(pname){
+    csvnPost('project_script_edit', {'pname':pname}, function(data){
+        var rdata = $.parseJSON(data.data);
+        if (rdata['status']){
+            onlineEditFile(0, rdata['path']);
+            $('.layui-layer-close1').click();
+            csvnProjectList();
+        } else {
+            layer.msg(rdata.msg,{icon:1,time:2000,shade: [0.3, '#000']});
+        }        
     });
 }
 
