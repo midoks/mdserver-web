@@ -575,7 +575,7 @@ def projectScriptEdit():
     return public.getJson(data)
 
 
-def projectScriptEdit():
+def projectScriptDebug():
     args = getArgs()
     if not 'pname' in args:
         return 'project name missing'
@@ -643,5 +643,7 @@ if __name__ == "__main__":
         print projectScriptUnload()
     elif func == 'project_script_edit':
         print projectScriptEdit()
+    elif func == 'project_script_debug':
+        print projectScriptDebug()
     else:
         print 'fail'
