@@ -1,0 +1,16 @@
+{
+	"ps": "Gogs是一款极易搭建的自助Git服务",
+	"name": "gogs",
+	"title": "Gogs",
+	"versions": "0.1",
+	"updates":"0.1",
+	"tip": "soft",
+	"checks": "server/gogs",
+	"author": "midoks",
+	"date": "201-04-01",
+	"home": "https://gogs.io",
+	"type": "git服务器",
+	"shell": "install.sh",
+	"pid": "3",
+	"sort": 7
+}
