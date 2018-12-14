@@ -15,13 +15,14 @@ Install_abkill()
 {
 	echo '正在安装脚本文件...' > $install_tmp
 	mkdir -p $serverPath/abkill
+	echo '0.1' > $serverPath/abkill/version.pl
 	echo '安装完成' > $install_tmp
 }
 
 Uninstall_abkill()
 {
 	rm -rf $serverPath/abkill
-	echo "Uninstall_redis" > $install_tmp
+	echo "卸载完成" > $install_tmp
 }
 
 action=$1
