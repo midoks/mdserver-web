@@ -80,13 +80,17 @@ def initDreplace():
 
     public.writeFile(file_bin, content)
     public.execShell('chmod +x ' + file_bin)
+
+    log_path = getServerDir() + '/log'
+    if not os.path.exists(log_path):
+        os.mkdir(log_path)
+
     return file_bin
 
 
 def start():
     file = initDreplace()
     data = public.execShell(file + ' start')
-    print data
     if data[1] == '':
         return 'ok'
     return 'fail'
@@ -114,45 +118,6 @@ def reload():
     if data[1] == '':
         return 'ok'
     return 'fail'
-
-
-def runInfo():
-    # 获取memcached状态
-    import telnetlib
-    import re
-
-    try:
-        tn = telnetlib.Telnet('127.0.0.1', 11211)
-        tn.write(b"stats\n")
-        tn.write(b"quit\n")
-        data = tn.read_all()
-        if type(data) == bytes:
-            data = data.decode('utf-8')
-        data = data.replace('STAT', '').replace('END', '').split("\n")
-        result = {}
-        res = ['cmd_get', 'get_hits', 'get_misses', 'limit_maxbytes', 'curr_items', 'bytes',
-               'evictions', 'limit_maxbytes', 'bytes_written', 'bytes_read', 'curr_connections']
-        for d in data:
-            if len(d) < 3:
-                continue
-            t = d.split()
-            if not t[0] in res:
-                continue
-            result[t[0]] = int(t[1])
-        result['hit'] = 1
-        if result['get_hits'] > 0 and result['cmd_get'] > 0:
-            result['hit'] = float(result['get_hits']) / \
-                float(result['cmd_get']) * 100
-
-        conf = public.readFile(getConf())
-        result['bind'] = re.search('IP=(.+)', conf).groups()[0]
-        result['port'] = int(re.search('PORT=(\d+)', conf).groups()[0])
-        result['maxconn'] = int(re.search('MAXCONN=(\d+)', conf).groups()[0])
-        result['cachesize'] = int(
-            re.search('CACHESIZE=(\d+)', conf).groups()[0])
-        return public.getJson(result)
-    except Exception, e:
-        return public.getJson({})
 
 
 def initdStatus():
