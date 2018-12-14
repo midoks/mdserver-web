@@ -108,8 +108,8 @@ scripts/.git/*
 .DS_Store
 .idea/*.xml
 logs/*
-tmp/*.pl
-tmp/*.log
+tmp/*
+version/*
 data/json/index.json
 data/control.conf
 data/default.db
