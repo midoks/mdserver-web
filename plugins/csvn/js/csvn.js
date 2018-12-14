@@ -358,7 +358,6 @@ function csvnProjectScriptLoad(pname){
 
 function csvnProjectScriptUnload(pname){
     csvnPost('project_script_unload', {'pname':pname}, function(data){
-        console.log(data);
         if (data.data != 'ok'){
             layer.msg(data.data,{icon:0,time:2000,shade: [0.3, '#000']});
             return;
@@ -411,7 +410,7 @@ function csvnAclAdd(pname){
             layer.msg(data.data,{icon:0,time:2000,shade: [0.3, '#000']});
             return;
         }
-        $('#csvn_acl_close').click();
+        $('.layui-layer-close1').click();
         csvnAclProject(pname);
     });
 }
@@ -422,7 +421,7 @@ function csvnAclDel(pname, uname){
             layer.msg(data.data,{icon:0,time:2000,shade: [0.3, '#000']});
             return;
         }
-        $('#csvn_acl_close').click();
+        $('.layui-layer-close1').click();
         csvnAclProject(pname);
     });
 }
@@ -441,7 +440,7 @@ function csvnAclSet(obj, pname, uname, acl, selected){
             return;
         }
 
-        $('#csvn_acl_close').click();
+        $('.layui-layer-close1').click();
         csvnAclProject(pname);
     });
 }
@@ -470,7 +469,7 @@ function csvnAclProject(pname){
 
         var loadOpen = layer.open({
             type: 1,
-            title: '权限设置',
+            title: '项目('+pname+')权限设置',
             area: '300px',
             content:"<div class='bt-form pd20 c6'>\
                     <div>\
@@ -481,10 +480,6 @@ function csvnAclProject(pname){
                         </table></div>\
                     </div>\
                 </div>"
-        });
-
-        $('#csvn_acl_close').click(function(){
-            layer.close(loadOpen);
         });
     });
 }

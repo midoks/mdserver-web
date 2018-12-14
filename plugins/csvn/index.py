@@ -356,7 +356,7 @@ def getAllAclList():
     allAcl = {}
     for i in range(len(aData)):
         oData = aData[i].strip().split(']')
-        name = oData[0].strip('/')
+        name = oData[0].strip('/').strip(':')
         if oData[1] == '':
             allAcl[name] = []
         else:
@@ -380,7 +380,7 @@ def makeAclFile(content):
         if k == '':
             tmp += "[/]\n"
         else:
-            tmp += "[/" + k + "]\n"
+            tmp += "[" + k + ":/]\n"
 
         for iv in range(len(v)):
             tmp += v[iv]['user'] + ' = ' + v[iv]['acl'] + "\n"
