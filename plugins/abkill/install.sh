@@ -17,6 +17,7 @@ Install_abkill()
 	mkdir -p $serverPath/abkill
 	echo '安装完成' > $install_tmp
 }
+
 Uninstall_abkill()
 {
 	rm -rf $serverPath/abkill
