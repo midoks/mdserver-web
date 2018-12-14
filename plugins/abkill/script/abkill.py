@@ -31,12 +31,12 @@ class btkill:
                 if cputimes.user < 0.1:
                     continue
                 print p
-                percent = p.cpu_percent(interval=0.1)
+                percent = p.cpu_percent(interval=1)
                 vm = p.memory_info().vms
                 if percent > self.__limit or vm > self.__vmsize:
                     log = time.strftime('%Y-%m-%d %X', time.localtime()) + "  (PID=" + str(
                         pid) + ", NAME=" + name + ", VMS=" + str(vm) + ", PERCENT=" + str(percent) + "%)"
-                    p.kill()
+                    # p.kill()
                     num += 1
                     print log + " >> killed\n"
             except Exception as ex:

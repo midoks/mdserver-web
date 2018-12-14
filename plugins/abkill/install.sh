@@ -10,7 +10,6 @@ serverPath=$(dirname "$rootPath")
 
 install_tmp=${rootPath}/tmp/bt_install.pl
 
-
 Install_abkill()
 {
 	echo '正在安装脚本文件...' > $install_tmp
@@ -21,7 +20,7 @@ Install_abkill()
 
 Uninstall_abkill()
 {
-	rm -rf $serverPath/abkill
+	rm -f $serverPath/abkill
 	echo "卸载完成" > $install_tmp
 }
 
