@@ -150,6 +150,14 @@ def initdUinstall():
     return 'ok'
 
 
+def csvnEdit():
+    data = {}
+    data['svn_access_file'] = getServerDir() + '/data/conf/svn_access_file'
+    data['commit_tpl'] = getPluginDir() + '/hook/commit.tpl'
+    data['post_commit_tpl'] = getPluginDir() + '/hook/post-commit.tpl'
+    return public.getJson(data)
+
+
 def userAdd():
     args = getArgs()
     if not 'username' in args:
@@ -512,6 +520,45 @@ def projectAclSet():
     return 'ok'
 
 
+def getCsvnUser():
+    user = 'admin_sync'
+
+    acl = getAllAclList()
+    if '' in acl:
+        tmp = acl['']
+        is_has = False
+        for data in tmp:
+            if data['user'] == user:
+                is_has = True
+        if not is_has:
+            tmp.append({'user': user, 'acl': 'r'})
+            acl[''] = tmp
+            makeAclFile(acl)
+    return user
+
+
+def getCsvnPwd(user):
+    if app_debug:
+        return user + '123'
+    pwd_file = 'data/csvn_sync.pl'
+
+    if os.path.exists(pwd_file):
+        return public.readFile(pwd_file).strip()
+
+    import time
+    cur_time = time.time()
+    rand_pwd = public.md5(str(cur_time))
+    pwd = user + rand_pwd[:5]
+
+    htpasswd = getServerDir() + "/bin/htpasswd"
+    svn_auth_file = getServerDir() + "/data/conf/svn_auth_file"
+    cmd = htpasswd + ' -b ' + svn_auth_file + ' ' + user + ' ' + pwd
+    data = public.execShell(cmd)
+
+    public.writeFile(pwd_file, pwd)
+    return pwd
+
+
 def projectScriptLoad():
 
     args = getArgs()
@@ -533,8 +580,8 @@ def projectScriptLoad():
     ct_content = public.readFile(commit_tpl)
     ct_content = ct_content.replace('{$PROJECT_DIR}', public.getRootDir())
     ct_content = ct_content.replace('{$PORT}', getHttpPort())
-    ct_content = ct_content.replace('{$CSVN_USER}', 'admin')
-    ct_content = ct_content.replace('{$CSVN_PWD}', 'admin123Q')
+    ct_content = ct_content.replace('{$CSVN_USER}', getCsvnUser())
+    ct_content = ct_content.replace('{$CSVN_PWD}', getCsvnPwd(getCsvnUser()))
 
     public.writeFile(commit_file, ct_content)
     public.execShell('chmod 777 ' + commit_file)
@@ -611,12 +658,8 @@ if __name__ == "__main__":
         print initdInstall()
     elif func == 'initd_uninstall':
         print initdUinstall()
-    elif func == 'run_info':
-        print runInfo()
-    elif func == 'conf':
-        print getConf()
-    elif func == 'save_conf':
-        print saveConf()
+    elif func == 'csvn_edit':
+        print csvnEdit()
     elif func == 'user_list':
         print userList()
     elif func == 'user_add':

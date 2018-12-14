@@ -15,6 +15,25 @@ function csvnPost(method,args,callback){
     },'json'); 
 }
 
+
+
+function csvnEdit(){
+
+    csvnPost('csvn_edit',{} , function(data){
+        console.log(data);
+        var rdata = $.parseJSON(data.data);
+        var edit = '<p class="status">通用的手动编辑:</p>';
+        edit +='<div class="sfm-opt">\
+                <button class="btn btn-default btn-sm" onclick="onlineEditFile(0,\''+rdata['svn_access_file']+'\');">权限编辑</button>\
+                <button class="btn btn-default btn-sm" onclick="onlineEditFile(0,\''+rdata['post_commit_tpl']+'\');">post_commit_tpl</button>\
+                <button class="btn btn-default btn-sm" onclick="onlineEditFile(0,\''+rdata['commit_tpl']+'\');">commit_tpl</button>\
+            </div>'; 
+        $(".soft-man-con").html(edit);
+    });
+    
+}
+
+
 function csvnUserFind(){
     var search = $('#csvn_find_user').val();
     if (search==''){
