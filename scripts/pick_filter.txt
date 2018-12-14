@@ -107,6 +107,7 @@ scripts/.git/*
 .git
 .DS_Store
 .idea/*.xml
+logs/*
 tmp/*.pl
 tmp/*.log
 data/json/index.json
