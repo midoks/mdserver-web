@@ -52,8 +52,13 @@ def getArgs():
     return tmp
 
 
-def getConf():
+def getInitdConf():
     path = getPluginDir() + "/init.d/gogs.tpl"
+    return path
+
+
+def getConf():
+    path = getServerDir() + "/custom/conf/app.ini"
     return path
 
 
@@ -154,6 +159,11 @@ def initdUinstall():
     os.remove(initd_bin)
     return 'ok'
 
+
+def runLog():
+    log_path = getServerDir() + '/log/gogs.log'
+    return log_path
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -172,9 +182,11 @@ if __name__ == "__main__":
         print initdInstall()
     elif func == 'initd_uninstall':
         print initdUinstall()
-    elif func == 'run_info':
-        print runInfo()
+    elif func == 'run_log':
+        print runLog()
     elif func == 'conf':
         print getConf()
+    elif func == 'init_conf':
+        print getInitdConf()
     else:
         print 'fail'
