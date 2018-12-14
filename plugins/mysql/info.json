@@ -5,13 +5,11 @@
 	"type":"运行环境",
 	"ps":"MySQL是一种关系数据库管理系统!",
 	"versions":["5.5"],
-	"updates":["5.5"],
+	"updates":["5.5.62"],
 	"shell":"install.sh",
-	"checks":"/www/server/panel/plugin/safelogin",
+	"checks":"server/mysql",
 	"author":"midoks",
-	"home":"http://www.bt.cn/bbs",
+	"home":"https://dev.mysql.com/downloads/mysql/5.5.html#downloads",
 	"date":"2017-11-24",
-	"default":true,
-	"display":1,
 	"pid": "2"
 }
