@@ -72,7 +72,7 @@ def status():
 
 def initDreplace():
 
-    file_tpl = getConf()
+    file_tpl = getInitdConf()
     service_path = public.getServerDir()
 
     initD_path = getServerDir() + '/init.d'
@@ -98,7 +98,7 @@ def start():
     data = public.execShell(file + ' start')
     if data[1] == '':
         return 'ok'
-    return 'fail'
+    return data[1]
 
 
 def stop():
