@@ -144,7 +144,7 @@ MySQL_Opt
 
 def status():
     data = public.execShell(
-        "ps -ef|grep redis |grep -v grep | grep -v python | awk '{print $2}'")
+        "ps -ef|grep mysqld |grep -v grep | grep -v python | awk '{print $2}'")
     if data[0] == '':
         return 'stop'
     return 'start'

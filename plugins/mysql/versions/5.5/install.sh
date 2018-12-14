@@ -2,6 +2,9 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
+#https://dev.mysql.com/downloads/mysql/5.5.html#downloads
+#https://dev.mysql.com/downloads/file/?id=480541
+
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
@@ -17,17 +20,20 @@ Install_mysql()
 	echo '正在安装脚本文件...' > $install_tmp
 
 	if [ ! -f ${mysqlDir}/mysql-5.5.62.tar.gz ];then
-		wget -O ${mysqlDir}/mysql-5.5.62.tar.gz https://github.com/mysql/mysql-server/archive/mysql-5.5.62.tar.gz
+		wget -O ${mysqlDir}/mysql-5.5.62.tar.gz https://dev.mysql.com/get/Downloads/MySQL-5.5/mysql-5.5.62.tar.gz
 	fi
 
+	if [ ! -f ${mysqlDir}/mysql-5.5.62 ];then
+		 tar -zxvf  ${mysqlDir}/mysql-5.5.62.tar.gz
+	fi
+	
 
-	cd ${mysqlDir} && tar -zxvf mysql-5.5.62.tar.gz
+	cd ${mysqlDir}/mysql-5.5.62 && cmake \
+	-DCMAKE_INSTALL_PREFIX=$serverPath/mysql \
+	&& make && make install
 
-	# cd ${mysqlDir}/mysql-5.5.62 && ./configure --prefix=$serverPath/mysql \
-	# --with-openssl=$serverPath/source/lib/openssl-1.0.2q  \
-	# --with-http_stub_status_module && make && make install && \
+
 	echo '5.5' > $serverPath/mysql/version.pl
-
 	echo '安装完成' > $install_tmp
 }
 
