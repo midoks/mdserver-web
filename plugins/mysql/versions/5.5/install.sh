@@ -9,25 +9,24 @@ serverPath=$(dirname "$rootPath")
 
 
 install_tmp=${rootPath}/tmp/bt_install.pl
-openrestyDir=${serverPath}/source/openresty
+mysqlDir=${serverPath}/source/mysql
 
 Install_mysql()
 {
-	mkdir -p ${openrestyDir}
+	mkdir -p ${mysqlDir}
 	echo '正在安装脚本文件...' > $install_tmp
 
-	if [ ! -f ${openrestyDir}/openresty-1.11.2.5.tar.gz ];then
-		wget -O ${openrestyDir}/openresty-1.11.2.5.tar.gz https://openresty.org/download/openresty-1.11.2.5.tar.gz
+	if [ ! -f ${mysqlDir}/mysql-5.5.62.tar.gz ];then
+		wget -O ${mysqlDir}/mysql-5.5.62.tar.gz https://github.com/mysql/mysql-server/archive/mysql-5.5.62.tar.gz
 	fi
 
 
-	cd ${openrestyDir} && tar -zxvf openresty-1.11.2.5.tar.gz
+	cd ${mysqlDir} && tar -zxvf mysql-5.5.62.tar.gz
 
-	cd ${openrestyDir}/openresty-1.11.2.5 && ./configure --prefix=$serverPath/openresty \
-	--with-openssl=$serverPath/source/lib/openssl-1.0.2q  \
-	--with-http_stub_status_module && make && make install && \
-	echo '1.11.2' > $serverPath/openresty/version.pl
-	
+	# cd ${mysqlDir}/mysql-5.5.62 && ./configure --prefix=$serverPath/mysql \
+	# --with-openssl=$serverPath/source/lib/openssl-1.0.2q  \
+	# --with-http_stub_status_module && make && make install && \
+	echo '5.5' > $serverPath/mysql/version.pl
 
 	echo '安装完成' > $install_tmp
 }
