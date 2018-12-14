@@ -1,0 +1,1 @@
+pluginService('abkill');
