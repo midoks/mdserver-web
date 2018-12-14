@@ -11,7 +11,7 @@ mw_start(){
 
 mw_start_debug(){
 	gunicorn -b :7200 app:app &
-	python task.py &
+	python task.py
 }
 
 mw_stop()
