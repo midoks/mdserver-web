@@ -54,7 +54,7 @@ Install_gogs()
 
 Uninstall_gogs()
 {
-	rm -rf $serverPath/csvn
+	rm -rf $serverPath/gogs
 }
 
 
