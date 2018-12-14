@@ -35,18 +35,26 @@ def getInitDFile():
     return '/etc/init.d/' + getPluginName()
 
 
-def getConf():
-    path = getPluginDir() + "/init.d/memcached.tpl"
-    return path
-
-
 def getArgs():
     args = sys.argv[2:]
     tmp = {}
-    for i in range(len(args)):
-        t = args[i].split(':')
+    args_len = len(args)
+
+    if args_len == 1:
+        t = args[0].strip('{').strip('}')
+        t = t.split(':')
         tmp[t[0]] = t[1]
+    elif args_len > 1:
+        for i in range(len(args)):
+            t = args[i].split(':')
+            tmp[t[0]] = t[1]
+
     return tmp
+
+
+def getConf():
+    path = getPluginDir() + "/init.d/gogs.tpl"
+    return path
 
 
 def status():
@@ -65,10 +73,7 @@ def initDreplace():
     initD_path = getServerDir() + '/init.d'
     if not os.path.exists(initD_path):
         os.mkdir(initD_path)
-    file_bin = initD_path + '/memcached'
-
-    # if os.path.exists(file_bin):
-    #     return file_bin
+    file_bin = initD_path + '/' + getPluginName()
 
     content = public.readFile(file_tpl)
     content = content.replace('{$SERVER_PATH}', service_path)
@@ -81,6 +86,7 @@ def initDreplace():
 def start():
     file = initDreplace()
     data = public.execShell(file + ' start')
+    print data
     if data[1] == '':
         return 'ok'
     return 'fail'
@@ -149,26 +155,6 @@ def runInfo():
         return public.getJson({})
 
 
-def saveConf():
-     # 设置memcached缓存大小
-    import re
-    confFile = getConf()
-    try:
-        args = getArgs()
-        content = public.readFile(confFile)
-        content = re.sub('IP=.+', 'IP=' + args['ip'], content)
-        content = re.sub('PORT=\d+', 'PORT=' + args['port'], content)
-        content = re.sub('MAXCONN=\d+', 'MAXCONN=' + args['maxconn'], content)
-        content = re.sub('CACHESIZE=\d+', 'CACHESIZE=' +
-                         args['cachesize'], content)
-        public.writeFile(confFile, content)
-        reload()
-        return 'ok'
-    except Exception as e:
-        pass
-    return 'fail'
-
-
 def initdStatus():
     if not app_debug:
         os_name = public.getOs()
@@ -225,7 +211,5 @@ if __name__ == "__main__":
         print runInfo()
     elif func == 'conf':
         print getConf()
-    elif func == 'save_conf':
-        print saveConf()
     else:
         print 'fail'
