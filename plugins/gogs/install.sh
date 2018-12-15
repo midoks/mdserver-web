@@ -38,7 +38,7 @@ Install_gogs()
 	if [ "darwin" == "$os" ];then
 		file=gogs_${version}_darwin_amd64.zip
 	else
-		file=gogs_${version}_liunx_amd64.zip
+		file=gogs_${version}_linux_amd64.zip
 	fi
 
 	if [ ! -f $serverPath/source/gogs/$file ];then
