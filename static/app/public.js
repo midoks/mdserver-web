@@ -1518,7 +1518,9 @@ function pluginService(_name, version){
 	}
 	// console.log(version);
 
+	var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
 	$.post('/plugins/run', data, function(data) {
+		layer.close(loadT);
         if(!data.status){
             layer.msg(data.msg,{icon:0,time:3000,shade: [0.3, '#000']});
             return;
@@ -1661,7 +1663,9 @@ function pluginConfigSave(fileName) {
 
 
 function pluginInitD(_name){
+	var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
 	$.post('/plugins/run', {name:_name, func:'initd_status'}, function(data) {
+		layer.close(loadT);
         if( !data.status ){
             layer.msg(data.msg,{icon:0,time:3000,shade: [0.3, '#000']});
             return;
