@@ -1,3 +1,133 @@
+orPluginService('openresty');
+
+
+function orPost(method, args, callback){
+    var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
+    $.post('/plugins/run', {name:'openresty', func:method, args:JSON.stringify(args)}, function(data) {
+        layer.close(loadT);
+        if (!data.status){
+            layer.msg(data.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+            return;
+        }
+
+        if(typeof(callback) == 'function'){
+            callback(data);
+        }
+    },'json'); 
+}
+
+function orPluginService(_name, version){
+    var data = {name:_name, func:'status'}
+    if ( typeof(version) != 'undefined' ){
+        data['version'] = version;
+    } else {
+        version = '';
+    }
+
+    orPost('status', data, function(data){
+        if (data.data == 'start'){
+            orPluginSetService(_name, true, version);
+        } else {
+            orPluginSetService(_name, false, version);
+        }
+    });
+}
+
+function orPluginSetService(_name ,status, version){
+    var serviceCon ='<p class="status">当前状态：<span>'+(status ? '开启' : '关闭' )+
+        '</span><span style="color: '+
+        (status?'#20a53a;':'red;')+
+        ' margin-left: 3px;" class="glyphicon ' + (status?'glyphicon glyphicon-play':'glyphicon-pause')+'"></span></p><div class="sfm-opt">\
+            <button class="btn btn-default btn-sm" onclick="orPluginOpService(\''+_name+'\',\''+(status?'stop':'start')+'\',\''+version+'\')">'+(status?'停止':'启动')+'</button>\
+            <button class="btn btn-default btn-sm" onclick="orPluginOpService(\''+_name+'\',\'restart\',\''+version+'\')">重启</button>\
+            <button class="btn btn-default btn-sm" onclick="orPluginOpService(\''+_name+'\',\'reload\',\''+version+'\')">重载配置</button>\
+        </div>'; 
+    $(".soft-man-con").html(serviceCon);
+}
+
+
+function orPluginOpService(a, b, v) {
+
+    var c = "name=" + a + "&func=" + b;
+    if(v != ''){
+        c = c + '&version='+v;
+    }
+
+    var d = "";
+
+    switch(b) {
+        case "stop":d = '停止';break;
+        case "start":d = '启动';break;
+        case "restart":d = '重启';break;
+        case "reload":d = '重载';break;
+    }
+    layer.confirm( msgTpl('您真的要{1}{2}{3}服务吗？', [d,a,v]), {icon:3,closeBtn: 2}, function() {
+        orPost('get_os',{},function(data){
+            if (data.data == 'darwin'){
+                layer.prompt({title: '检查到权限不足,需要输入密码!', formType: 1},function(pwd, index){
+                
+                    layer.close(index);
+                    var data = {'pwd':pwd};
+                    c += '&args='+JSON.stringify(data);
+                    orPluginOpServiceOp(a,c,d,a,v);
+                });
+            } else {
+                orPluginOpServiceOp(a,c,d,a,v);
+            }
+        });
+    })
+}
+
+function orPluginOpServiceOp(a,c,d,a,v){
+    var e = layer.msg(msgTpl('正在{1}{2}{3}服务,请稍候...',[d,a,v]), {icon: 16,time: 0});
+    $.post("/plugins/run", c, function(g) {
+        layer.close(e);
+        
+        var f = g.data == 'ok' ? msgTpl('{1}{2}服务已{3}',[a,v,d]) : msgTpl('{1}{2}服务{3}失败!',[a,v,d]);
+        layer.msg(f, {icon: g.data == 'ok' ? 1 : 2});
+        
+        if( b != "reload" && g.data == 'ok' ) {
+            if ( b == 'start' ) {
+                orPluginSetService(a, true, v);
+            } else if ( b == 'stop' ){
+                orPluginSetService(a, false, v);
+            }
+        }
+
+        if( g.status && g.data != 'ok' ) {
+            layer.msg(g.data, {icon: 2,time: 3000,shade: 0.3,shadeClose: true});
+        }
+    },'json').error(function() {
+        layer.close(e);
+        layer.msg('操作异常!', {icon: 2});
+    });
+}
+
+
+//查看Nginx负载状态
+function getOpenrestyStatus() {
+    $.post('/plugins/run', {name:'openresty', func:'run_info'}, function(data) {
+        if (!data.status){
+            showMsg(data.msg, function(){}, null,3000);
+            return;
+        }
+        try {
+            var rdata = $.parseJSON(data.data);
+            var con = "<div><table class='table table-hover table-bordered'>\
+                            <tr><th>活动连接(Active connections)</th><td>" + rdata.active + "</td></tr>\
+                            <tr><th>总连接次数(accepts)</th><td>" + rdata.accepts + "</td></tr>\
+                            <tr><th>总握手次数(handled)</th><td>" + rdata.handled + "</td></tr>\
+                            <tr><th>总请求数(requests)</th><td>" + rdata.requests + "</td></tr>\
+                            <tr><th>请求数(Reading)</th><td>" + rdata.Reading + "</td></tr>\
+                            <tr><th>响应数(Writing)</th><td>" + rdata.Writing + "</td></tr>\
+                            <tr><th>驻留进程(Waiting)</th><td>" + rdata.Waiting + "</td></tr>\
+                         </table></div>";
+            $(".soft-man-con").html(con);
+        }catch(err){
+             showMsg(data.data, function(){}, null,3000);
+        }
+    },'json');
+}
 
 //nginx
 function nginxSoftMain(name, version) {
@@ -24,18 +154,18 @@ function nginxSoftMain(name, version) {
             closeBtn: 2,
             shift: 0,
             content: '<div class="bt-w-main" style="width:640px;">\
-				<div class="bt-w-menu">\
-					<p class="bgw" onclick="service(\'' + name + '\',' + nameA.status + ')">' + lan.soft.web_service + '</p>\
-					<p onclick="configChange(\'' + name + '\')">' + lan.soft.config_edit + '</p>\
-					' + waf + '\
-					' + menu + '\
-					' + status + '\
-					<p onclick="showLogs(\'' + logsPath + '\')">错误日志</p>\
-				</div>\
-				<div id="webEdit-con" class="bt-w-con pd15" style="height:555px;overflow:auto">\
-					<div class="soft-man-con"></div>\
-				</div>\
-			</div>'
+                <div class="bt-w-menu">\
+                    <p class="bgw" onclick="service(\'' + name + '\',' + nameA.status + ')">' + lan.soft.web_service + '</p>\
+                    <p onclick="configChange(\'' + name + '\')">' + lan.soft.config_edit + '</p>\
+                    ' + waf + '\
+                    ' + menu + '\
+                    ' + status + '\
+                    <p onclick="showLogs(\'' + logsPath + '\')">错误日志</p>\
+                </div>\
+                <div id="webEdit-con" class="bt-w-con pd15" style="height:555px;overflow:auto">\
+                    <div class="soft-man-con"></div>\
+                </div>\
+            </div>'
         });
         service(name, nameA.status);
         $(".bt-w-menu p").click(function() {
@@ -83,42 +213,42 @@ function waf() {
         var cc = rdata.CCrate.split('/')
 
         var con = "<div class='wafConf'>\
-					<div class='wafConf-btn'>\
-						<span>" + lan.soft.waf_title + "</span><div class='ssh-item'>\
+                    <div class='wafConf-btn'>\
+                        <span>" + lan.soft.waf_title + "</span><div class='ssh-item'>\
                             <input class='btswitch btswitch-ios' id='closeWaf' type='checkbox' " + (rdata.status == 1 ? 'checked' : '') + ">\
                             <label class='btswitch-btn' for='closeWaf' onclick='CloseWaf()'></label>\
-                    	</div>\
-						<div class='pull-right'>\
-                    	<button class='btn btn-default btn-sm' onclick='gzEdit()'>" + lan.soft.waf_edit + "</button>\
-                    	<button class='btn btn-default btn-sm' onclick='upLimit()'>" + lan.soft.waf_up_title + "</button>\
-						</div>\
-					</div>\
-					<div class='wafConf_checkbox label-input-group ptb10 relative'>\
-					<input type='checkbox' id='waf_UrlDeny' " + (rdata['UrlDeny'] == 'on' ? 'checked' : '') + " onclick=\"SetWafConfig('UrlDeny','" + (rdata['UrlDeny'] == 'on' ? 'off' : 'on') + "')\" /><label for='waf_UrlDeny'>" + lan.soft.waf_input1 + "</label>\
-					<input type='checkbox' id='waf_CookieMatch' " + (rdata['CookieMatch'] == 'on' ? 'checked' : '') + " onclick=\"SetWafConfig('CookieMatch','" + (rdata['CookieMatch'] == 'on' ? 'off' : 'on') + "')\" /><label for='waf_CookieMatch'>" + lan.soft.waf_input2 + "</label>\
-					<input type='checkbox' id='waf_postMatch' " + (rdata['postMatch'] == 'on' ? 'checked' : '') + " onclick=\"SetWafConfig('postMatch','" + (rdata['postMatch'] == 'on' ? 'off' : 'on') + "')\" /><label for='waf_postMatch'>" + lan.soft.waf_input3 + "</label>\
-					<input type='checkbox' id='waf_CCDeny' " + (rdata['CCDeny'] == 'on' ? 'checked' : '') + " onclick=\"SetWafConfig('CCDeny','" + (rdata['CCDeny'] == 'on' ? 'off' : 'on') + "')\" /><label for='waf_CCDeny'>" + lan.soft.waf_input4 + "</label>\
-					<input type='checkbox' id='waf_attacklog' " + (rdata['attacklog'] == 'on' ? 'checked' : '') + " onclick=\"SetWafConfig('attacklog','" + (rdata['attacklog'] == 'on' ? 'off' : 'on') + "')\" /><label for='waf_attacklog'>" + lan.soft.waf_input5 + "</label>\
-					<span class='glyphicon glyphicon-folder-open' style='position: absolute; right: 10px; top: 12px; color: orange;cursor: pointer' onclick='openPath(\"/www/wwwlogs/waf\")'></span>\
-					</div>\
-					<div class='wafConf_cc'>\
-					<span>" + lan.soft.waf_input6 + "</span><input id='CCrate_1' class='bt-input-text' type='number' value='" + cc[0] + "' style='width:80px;margin-right:30px'/>\
-					<span>" + lan.soft.waf_input7 + "(" + lan.bt.s + ")</span><input id='CCrate_2' class='bt-input-text' type='number' value='" + cc[1] + "' style='width:80px;'/>\
-					<button onclick=\"SetWafConfig('CCrate','')\" class='btn btn-default btn-sm'>" + lan.public.ok + "</button>\
-					</div>\
-					<div class='wafConf_ip'>\
-						<fieldset>\
-						<legend>" + lan.soft.waf_input8 + "</legend>\
-						<input type='text' id='ipWhitelist_val' class='bt-input-text mr5' placeholder='" + lan.soft.waf_ip + "' style='width:175px;' /><button onclick=\"addWafKey('ipWhitelist')\" class='btn btn-default btn-sm'>" + lan.public.add + "</button>\
-						<div class='table-overflow'><table class='table table-hover'>" + whiteList + "</table></div>\
-						</fieldset>\
-						<fieldset>\
-						<legend>" + lan.soft.waf_input9 + "</legend>\
-						<input type='text' id='ipBlocklist_val' class='bt-input-text mr5' placeholder='" + lan.soft.waf_ip + "' style='width:175px;' /><button onclick=\"addWafKey('ipBlocklist')\" class='btn btn-default btn-sm'>" + lan.public.add + "</button>\
-						<div class='table-overflow'><table class='table table-hover'>" + blackList + "</table></div>\
-						</fieldset>\
-					</div>\
-				</div>"
+                        </div>\
+                        <div class='pull-right'>\
+                        <button class='btn btn-default btn-sm' onclick='gzEdit()'>" + lan.soft.waf_edit + "</button>\
+                        <button class='btn btn-default btn-sm' onclick='upLimit()'>" + lan.soft.waf_up_title + "</button>\
+                        </div>\
+                    </div>\
+                    <div class='wafConf_checkbox label-input-group ptb10 relative'>\
+                    <input type='checkbox' id='waf_UrlDeny' " + (rdata['UrlDeny'] == 'on' ? 'checked' : '') + " onclick=\"SetWafConfig('UrlDeny','" + (rdata['UrlDeny'] == 'on' ? 'off' : 'on') + "')\" /><label for='waf_UrlDeny'>" + lan.soft.waf_input1 + "</label>\
+                    <input type='checkbox' id='waf_CookieMatch' " + (rdata['CookieMatch'] == 'on' ? 'checked' : '') + " onclick=\"SetWafConfig('CookieMatch','" + (rdata['CookieMatch'] == 'on' ? 'off' : 'on') + "')\" /><label for='waf_CookieMatch'>" + lan.soft.waf_input2 + "</label>\
+                    <input type='checkbox' id='waf_postMatch' " + (rdata['postMatch'] == 'on' ? 'checked' : '') + " onclick=\"SetWafConfig('postMatch','" + (rdata['postMatch'] == 'on' ? 'off' : 'on') + "')\" /><label for='waf_postMatch'>" + lan.soft.waf_input3 + "</label>\
+                    <input type='checkbox' id='waf_CCDeny' " + (rdata['CCDeny'] == 'on' ? 'checked' : '') + " onclick=\"SetWafConfig('CCDeny','" + (rdata['CCDeny'] == 'on' ? 'off' : 'on') + "')\" /><label for='waf_CCDeny'>" + lan.soft.waf_input4 + "</label>\
+                    <input type='checkbox' id='waf_attacklog' " + (rdata['attacklog'] == 'on' ? 'checked' : '') + " onclick=\"SetWafConfig('attacklog','" + (rdata['attacklog'] == 'on' ? 'off' : 'on') + "')\" /><label for='waf_attacklog'>" + lan.soft.waf_input5 + "</label>\
+                    <span class='glyphicon glyphicon-folder-open' style='position: absolute; right: 10px; top: 12px; color: orange;cursor: pointer' onclick='openPath(\"/www/wwwlogs/waf\")'></span>\
+                    </div>\
+                    <div class='wafConf_cc'>\
+                    <span>" + lan.soft.waf_input6 + "</span><input id='CCrate_1' class='bt-input-text' type='number' value='" + cc[0] + "' style='width:80px;margin-right:30px'/>\
+                    <span>" + lan.soft.waf_input7 + "(" + lan.bt.s + ")</span><input id='CCrate_2' class='bt-input-text' type='number' value='" + cc[1] + "' style='width:80px;'/>\
+                    <button onclick=\"SetWafConfig('CCrate','')\" class='btn btn-default btn-sm'>" + lan.public.ok + "</button>\
+                    </div>\
+                    <div class='wafConf_ip'>\
+                        <fieldset>\
+                        <legend>" + lan.soft.waf_input8 + "</legend>\
+                        <input type='text' id='ipWhitelist_val' class='bt-input-text mr5' placeholder='" + lan.soft.waf_ip + "' style='width:175px;' /><button onclick=\"addWafKey('ipWhitelist')\" class='btn btn-default btn-sm'>" + lan.public.add + "</button>\
+                        <div class='table-overflow'><table class='table table-hover'>" + whiteList + "</table></div>\
+                        </fieldset>\
+                        <fieldset>\
+                        <legend>" + lan.soft.waf_input9 + "</legend>\
+                        <input type='text' id='ipBlocklist_val' class='bt-input-text mr5' placeholder='" + lan.soft.waf_ip + "' style='width:175px;' /><button onclick=\"addWafKey('ipBlocklist')\" class='btn btn-default btn-sm'>" + lan.public.add + "</button>\
+                        <div class='table-overflow'><table class='table table-hover'>" + blackList + "</table></div>\
+                        </fieldset>\
+                    </div>\
+                </div>"
         $(".soft-man-con").html(con);
     });
 }
@@ -158,7 +288,7 @@ function upLimit() {
 }
 
 //设置waf状态
-function CloseWaf() {
+function closeWaf() {
     var loadT = layer.msg(lan.public.the, { icon: 16, time: 0, shade: [0.3, '#000'] });
     $.post('/waf?action=SetStatus', '', function(rdata) {
         layer.close(loadT)
@@ -168,8 +298,8 @@ function CloseWaf() {
 }
 
 //取规则文件 
-function GetWafFile(name) {
-    OnlineEditFile(0, '/www/server/panel/vhost/wafconf/' + name);
+function getWafFile(name) {
+    onlineEditFile(0, '/www/server/panel/vhost/wafconf/' + name);
 }
 //规则编辑
 function gzEdit() {
@@ -180,13 +310,13 @@ function gzEdit() {
         closeBtn: 2,
         shift: 0,
         content: "<div class='gzEdit'><button class='btn btn-default btn-sm' onclick=\"GetWafFile('cookie')\">Cookie</button>\
-				<button class='btn btn-default btn-sm' onclick=\"GetWafFile('post')\">POST</button>\
-				<button class='btn btn-default btn-sm' onclick=\"GetWafFile('url')\">URL</button>\
-				<button class='btn btn-default btn-sm' onclick=\"GetWafFile('user-agent')\">User-Agent</button>\
-				<button class='btn btn-default btn-sm' onclick=\"GetWafFile('args')\">Args</button>\
-				<button class='btn btn-default btn-sm' onclick=\"GetWafFile('whiteurl')\">" + lan.soft.waf_url_white + "</button>\
-				<button class='btn btn-default btn-sm' onclick=\"GetWafFile('returnhtml')\">" + lan.soft.waf_index + "</button>\
-				<button class='btn btn-default btn-sm' onclick=\"updateWaf('returnhtml')\">" + lan.soft.waf_cloud + "</button></div>"
+                <button class='btn btn-default btn-sm' onclick=\"GetWafFile('post')\">POST</button>\
+                <button class='btn btn-default btn-sm' onclick=\"GetWafFile('url')\">URL</button>\
+                <button class='btn btn-default btn-sm' onclick=\"GetWafFile('user-agent')\">User-Agent</button>\
+                <button class='btn btn-default btn-sm' onclick=\"GetWafFile('args')\">Args</button>\
+                <button class='btn btn-default btn-sm' onclick=\"GetWafFile('whiteurl')\">" + lan.soft.waf_url_white + "</button>\
+                <button class='btn btn-default btn-sm' onclick=\"GetWafFile('returnhtml')\">" + lan.soft.waf_index + "</button>\
+                <button class='btn btn-default btn-sm' onclick=\"updateWaf('returnhtml')\">" + lan.soft.waf_cloud + "</button></div>"
     });
 }
 
@@ -200,7 +330,7 @@ function updateWaf() {
 }
 
 //设置WAF配置值
-function SetWafConfig(name, value) {
+function setWafConfig(name, value) {
     if (name == 'CCrate') {
         var CCrate_1 = $("#CCrate_1").val();
         var CCrate_2 = $("#CCrate_2").val();
@@ -242,34 +372,3 @@ function addWafKey(name) {
         if (name == 'black_fileExt') upLimit();
     });
 }
-
-
-
-//查看Nginx负载状态
-function getOpenrestyStatus() {
-
-    $.post('/plugins/run', {name:'openresty', func:'run_info'}, function(data) {
-        if (!data.status){
-            showMsg(data.msg, function(){}, null,3000);
-            return;
-        }
-        
-        try {
-            var rdata = $.parseJSON(data.data);
-            var con = "<div><table class='table table-hover table-bordered'>\
-                            <tr><th>活动连接(Active connections)</th><td>" + rdata.active + "</td></tr>\
-                            <tr><th>总连接次数(accepts)</th><td>" + rdata.accepts + "</td></tr>\
-                            <tr><th>总握手次数(handled)</th><td>" + rdata.handled + "</td></tr>\
-                            <tr><th>总请求数(requests)</th><td>" + rdata.requests + "</td></tr>\
-                            <tr><th>请求数(Reading)</th><td>" + rdata.Reading + "</td></tr>\
-                            <tr><th>响应数(Writing)</th><td>" + rdata.Writing + "</td></tr>\
-                            <tr><th>驻留进程(Waiting)</th><td>" + rdata.Waiting + "</td></tr>\
-                         </table></div>";
-            $(".soft-man-con").html(con);
-        }catch(err){
-             showMsg(data.data, function(){}, null,3000);
-        }
-    },'json');
-}
-
-pluginService('openresty');

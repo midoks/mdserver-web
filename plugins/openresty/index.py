@@ -4,6 +4,7 @@ import sys
 import io
 import os
 import time
+import subprocess
 
 sys.path.append(os.getcwd() + "/class/core")
 import public
@@ -30,6 +31,23 @@ def getInitDFile():
     if app_debug:
         return '/tmp/' + getPluginName()
     return '/etc/init.d/' + getPluginName()
+
+
+def getArgs():
+    args = sys.argv[2:]
+    tmp = {}
+    args_len = len(args)
+
+    if args_len == 1:
+        t = args[0].strip('{').strip('}')
+        t = t.split(':')
+        tmp[t[0]] = t[1]
+    elif args_len > 1:
+        for i in range(len(args)):
+            t = args[i].split(':')
+            tmp[t[0]] = t[1]
+
+    return tmp
 
 
 def clearTemp():
@@ -87,15 +105,22 @@ def confReplace():
 
     public.writeFile(getServerDir() + '/nginx/conf/nginx.conf', content)
 
-    exe_bin = getServerDir() + "/bin/openresty"
-    public.execShell('chown -R ' + user + ':' + user_group + ' ' + exe_bin)
-    public.execShell('chmod 755 ' + exe_bin)
-    public.execShell('chmod u+s ' + exe_bin)
+    # exe_bin = getServerDir() + "/bin/openresty"
+    # print 'chown -R ' + user + ':' + user_group + ' ' + exe_bin
+    # print public.execShell('chown -R ' + user + ':' + user_group + ' ' + exe_bin)
+    # public.execShell('chmod 755 ' + exe_bin)
+    # public.execShell('chmod u+s ' + exe_bin)
 
     ng_exe_bin = getServerDir() + "/nginx/sbin/nginx"
-    public.execShell('chown -R ' + user + ':' + user_group + ' ' + ng_exe_bin)
-    public.execShell('chmod 755 ' + ng_exe_bin)
-    public.execShell('chmod u+s ' + ng_exe_bin)
+
+    # args = getArgs()
+    # print args['pwd']
+    # sudoPassword = args['pwd']
+    # command = 'chown -R ' + 'root:' + user_group + ' ' + ng_exe_bin
+    # print os.system('echo %s|sudo -S %s' % (args['pwd'], command))
+    # print os.system('echo %s|sudo -S %s' % (sudoPassword, 'chmod 755 ' + ng_exe_bin))
+    # print os.system('echo %s|sudo -S %s' % (sudoPassword, 'chmod u+s ' +
+    # ng_exe_bin))
 
 
 def initDreplace():
@@ -204,7 +229,7 @@ def initdUinstall():
 def runInfo():
     # 取Openresty负载状态
     try:
-        result = public.httpGet('http://127.0.0.1:6666/nginx_status')
+        result = public.httpGet('http://127.0.0.1:80/nginx_status')
         tmp = result.split()
         data = {}
         data['active'] = tmp[2]
@@ -243,6 +268,8 @@ if __name__ == "__main__":
         print initdUinstall()
     elif func == 'conf':
         print getConf()
+    elif func == 'get_os':
+        print public.getOs()
     elif func == 'run_info':
         print runInfo()
     elif func == 'error_log':
