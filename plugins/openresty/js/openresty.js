@@ -63,22 +63,23 @@ function orPluginOpService(a, b, v) {
     }
     layer.confirm( msgTpl('您真的要{1}{2}{3}服务吗？', [d,a,v]), {icon:3,closeBtn: 2}, function() {
         orPost('get_os',{},function(data){
-            if (data.data == 'darwin'){
+            var rdata = $.parseJSON(data.data);
+            if (rdata['os'] == 'darwin' && !rdata['auth']){
                 layer.prompt({title: '检查到权限不足,需要输入密码!', formType: 1},function(pwd, index){
                 
                     layer.close(index);
                     var data = {'pwd':pwd};
                     c += '&args='+JSON.stringify(data);
-                    orPluginOpServiceOp(a,c,d,a,v);
+                    orPluginOpServiceOp(a,b,c,d,a,v);
                 });
             } else {
-                orPluginOpServiceOp(a,c,d,a,v);
+                orPluginOpServiceOp(a,b,c,d,a,v);
             }
         });
     })
 }
 
-function orPluginOpServiceOp(a,c,d,a,v){
+function orPluginOpServiceOp(a,b,c,d,a,v){
     var e = layer.msg(msgTpl('正在{1}{2}{3}服务,请稍候...',[d,a,v]), {icon: 16,time: 0});
     $.post("/plugins/run", c, function(g) {
         layer.close(e);
