@@ -68,6 +68,21 @@ function mwsPost(path, args, callback){
 	},'json');
 }
 
+function syncPost(path, args){
+	var retData;
+	 $.ajax({
+		type : 'post',
+		url : path,  
+		data : args,  
+		async : false,  
+		dataType:'json',
+		success : function(data){  
+        	retData = data;
+		} 
+    });
+	return retData;
+}
+
 function repeatPwd(a) {
 	$("#MyPassword").val(RandomStrPwd(a))
 }
@@ -125,9 +140,7 @@ function getLocalTime(a) {
 }
 
 
-
-
-function ChangePath(d) {
+function changePath(d) {
 	setCookie("SetId", d);
 	setCookie("SetName", "");
 	var c = layer.open({
@@ -151,18 +164,18 @@ function ChangePath(d) {
 		setCookie("SetName", tmp[tmp.length - 1])
 	}
 	b = b.replace(/\/\//g, "/");
-	GetDiskList(b);
-	ActiveDisk()
+	getDiskList(b);
+	activeDisk();
 }
 
-function GetDiskList(b) {
+function getDiskList(b) {
 	var d = "";
 	var a = "";
 	var c = "path=" + b + "&disk=True";
-	$.post("/files?action=GetDir", c, function(h) {
+	$.post("/files/get_dir", c, function(h) {
 		if(h.DISK != undefined) {
 			for(var f = 0; f < h.DISK.length; f++) {
-				a += "<dd onclick=\"GetDiskList('" + h.DISK[f].path + "')\"><span class='glyphicon glyphicon-hdd'></span>&nbsp;" + h.DISK[f].path + "</dd>"
+				a += "<dd onclick=\"getDiskList('" + h.DISK[f].path + "')\"><span class='glyphicon glyphicon-hdd'></span>&nbsp;" + h.DISK[f].path + "</dd>"
 			}
 			$("#changecomlist").html(a)
 		}
@@ -177,7 +190,7 @@ function GetDiskList(b) {
 					e = e.substring(0, 10) + "..."
 				}
 			}
-			d += "<tr><td onclick=\"GetDiskList('" + h.PATH + "/" + g[0] + "')\" title='" + g[0] + "'><span class='glyphicon glyphicon-folder-open'></span>" + e + "</td><td>" + getLocalTime(g[2]) + "</td><td>" + g[3] + "</td><td>" + g[4] + "</td><td><span class='delfile-btn' onclick=\"NewDelFile('" + h.PATH + "/" + g[0] + "')\">X</span></td></tr>"
+			d += "<tr><td onclick=\"getDiskList('" + h.PATH + "/" + g[0] + "')\" title='" + g[0] + "'><span class='glyphicon glyphicon-folder-open'></span>" + e + "</td><td>" + getLocalTime(g[2]) + "</td><td>" + g[3] + "</td><td>" + g[4] + "</td><td><span class='delfile-btn' onclick=\"NewDelFile('" + h.PATH + "/" + g[0] + "')\">X</span></td></tr>"
 		}
 		if(h.FILES != null && h.FILES != "") {
 			for(var f = 0; f < h.FILES.length; f++) {
@@ -201,9 +214,9 @@ function GetDiskList(b) {
 			h.PATH += "/"
 		}
 		$("#PathPlace").find("span").html(h.PATH);
-		ActiveDisk();
+		activeDisk();
 		return
-	})
+	},'json');
 }
 
 function CreateFolder() {
@@ -229,7 +242,7 @@ function CreateFolder() {
 					icon: 2
 				})
 			}
-			GetDiskList(b)
+			getDiskList(b)
 		})
 	});
 	$("#nameNOk").click(function() {
@@ -251,11 +264,11 @@ function NewDelFile(c) {
 				icon: 2
 			})
 		}
-		GetDiskList(a)
+		getDiskList(a)
 	})
 }
 
-function ActiveDisk() {
+function activeDisk() {
 	var a = $("#PathPlace").find("span").text().substring(0, 1);
 	switch(a) {
 		case "C":
@@ -285,7 +298,7 @@ function BackMyComputer() {
 	$(".default").show();
 	$(".file-list").hide();
 	$("#PathPlace").find("span").html("");
-	ActiveDisk()
+	activeDisk()
 }
 
 function BackFile() {
@@ -300,7 +313,7 @@ function BackFile() {
 		for(var b = 0; b < e; b++) {
 			a += d[b] + "/"
 		}
-		GetDiskList(a.replace("//", "/"))
+		getDiskList(a.replace("//", "/"))
 	} else {
 		a = d[0]
 	}
@@ -566,7 +579,7 @@ function isChineseChar(b) {
 	return a.test(b)
 }
 
-function SafeMessage(j, h, g, f) {
+function safeMessage(j, h, g, f) {
 	if(f == undefined) {
 		f = ""
 	}

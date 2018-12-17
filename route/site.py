@@ -31,6 +31,13 @@ def getPhpVersion():
     return site_api.site_api().getPhpVersion()
 
 
+@site.route('get_root_dir', methods=['POST'])
+def getRootDir():
+    data = {}
+    data['dir'] = public.getWwwDir()
+    return public.getJson(data)
+
+
 @site.route('add', methods=['POST'])
 def add():
     webname = request.form.get('webinfo', '').encode('utf-8')
