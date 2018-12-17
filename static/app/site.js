@@ -17,7 +17,6 @@ function getWeb(page, search) {
 	var loadT = layer.load();
 	//取回数据
 	$.post(sUrl, pdata, function(data) {
-		console.log(data)
 		layer.close(loadT);
 		//构造数据列表
 		var Body = '';
@@ -129,7 +128,7 @@ function webAdd(type) {
 		var str="";
 		var domainlist='';
 		var domain = array = $("#mainDomain").val().replace('http://','').replace('https://','').split("\n");
-		var Webport=[];
+		var webport=[];
 		var checkDomain = domain[0].split('.');
 		if(checkDomain.length < 1){
 			layer.msg(lan.site.domain_err_txt,{icon:2});
@@ -138,41 +137,29 @@ function webAdd(type) {
 		for(var i=1; i<domain.length; i++){
 			domainlist += '"'+domain[i]+'",';
 		}
-		Webport = domain[0].split(":")[1];//主域名端口
-		if(Webport==undefined){
-			Webport="80";
+
+		webport = domain[0].split(":")[1];//主域名端口
+		if(webport == undefined){
+			webport="80";
 		}
+
 		domainlist = domainlist.substring(0,domainlist.length-1);//子域名json
 		domain ='{"domain":"'+domain[0]+'","domainlist":['+domainlist+'],"count":'+domain.length+'}';//拼接joson
 		var loadT = layer.msg(lan.public.the_get,{icon:16,time:0,shade: [0.3, "#000"]})
-		var data = $("#addweb").serialize()+"&port="+Webport+"&webname="+domain;
-		$.post('/site?action=AddSite', data, function(ret) {
+		var data = $("#addweb").serialize()+"&port="+webport+"&webname="+domain;
+
+		$.post('/site/add', data, function(ret) {
 			if(ret.status === false){
 				layer.msg(ret.msg,{icon:ret.status?1:2})
-				return
+				return;
 			}
 			
-			var ftpData = '';
-			if (ret.ftpStatus) {
-				ftpData = "<p class='p1'>"+lan.site.ftp+"</p>\
-					 		<p><span>"+lan.site.user+"：</span><strong>" + ret.ftpUser + "</strong></p>\
-					 		<p><span>"+lan.site.password+"：</span><strong>" + ret.ftpPass + "</strong></p>\
-					 		<p style='margin-bottom: 19px; margin-top: 11px; color: #666'>"+lan.site.ftp_tips+"</p>"
-			}
-			var sqlData = '';
-			if (ret.databaseStatus) {
-				sqlData = "<p class='p1'>"+lan.site.database_txt+"</p>\
-					 		<p><span>"+lan.site.database_name+"：</span><strong>" + ret.databaseUser + "</strong></p>\
-					 		<p><span>"+lan.site.user+"：</span><strong>" + ret.databaseUser + "</strong></p>\
-					 		<p><span>"+lan.site.password+"：</span><strong>" + ret.databasePass + "</strong></p>"
-			}
 			if (ret.siteStatus == true) {
 				getWeb(1);
 				layer.closeAll();
 				if(ftpData == '' && sqlData == ''){
 					layer.msg(lan.site.success_txt,{icon:1})
-				}
-				else{
+				} else {
 					layer.open({
 						type: 1,
 						area: '600px',
@@ -200,11 +187,12 @@ function webAdd(type) {
 				});
 			}
 			layer.close(loadT);
-		});
+		},'json');
 		return;
 	}
 	
-	$.post('/site?action=GetPHPVersion',function(rdata){
+	$.post('/site/get_php_version',function(rdata){
+	
 		var defaultPath = $("#defaultPath").html();
 		var php_version = "<div class='line'><span class='tname'>"+lan.site.php_ver+"</span><select class='bt-input-text' name='version' id='c_k3' style='width:100px'>";
 		for(var i=rdata.length-1;i>=0;i--){
@@ -238,53 +226,14 @@ function webAdd(type) {
 	                    	<input id='inputPath' class='bt-input-text mr5' type='text' name='path' value='"+defaultPath+"/' placeholder='"+lan.site.web_root_dir+"' style='width:458px' /><span class='glyphicon glyphicon-folder-open cursor' onclick='ChangePath(\"inputPath\")'></span>\
 	                    </div>\
 	                    </div>\
-	                    <div class='line'>\
-	                    	<span class='tname'>FTP</span>\
-	                    	<div class='info-r'>\
-	                    	<select class='bt-input-text' name='ftp' id='c_k1' style='width:100px'>\
-		                    	<option value='true'>"+lan.site.yes+"</option>\
-		                    	<option value='false' selected>"+lan.site.no+"</option>\
-		                    </select>\
-		                    </div>\
-	                    </div>\
-	                    <div class='line' id='ftpss'>\
-	                    <span class='tname'>"+lan.site.ftp_set+"</span>\
-	                    <div class='info-r c4'>\
-		                    <div class='userpassword'><span class='mr5'>"+lan.site.user+"：<input id='ftp-user' class='bt-input-text' type='text' name='ftp_username' value='' style='width:173px' /></span>\
-		                    <span class='last'>"+lan.site.password+"：<input id='ftp-password' class='bt-input-text' type='text' name='ftp_password' value=''  style='width:173px' /></span></div>\
-		                    <p class='c9 mt10'>"+lan.site.ftp_help+"</p>\
-	                    </div>\
-	                    </div>\
-	                    <div class='line'>\
-	                    <span class='tname'>"+lan.site.database+"</span>\
-							<div class='info-r c4'>\
-								<select class='bt-input-text mr5' name='sql' id='c_k2' style='width:100px'>\
-									<option value='true'>MySQL</option>\
-									<option value='false' selected>"+lan.site.no+"</option>\
-								</select>\
-								<select class='bt-input-text' name='codeing' id='c_codeing' style='width:100px'>\
-									<option value='utf8'>utf-8</option>\
-									<option value='utf8mb4'>utf8mb4</option>\
-									<option value='gbk'>gbk</option>\
-									<option value='big5'>big5</option>\
-								</select>\
-							</div>\
-	                    </div>\
-	                    <div class='line' id='datass'>\
-	                    <span class='tname'>"+lan.site.database_set+"</span>\
-	                    <div class='info-r c4'>\
-		                    <div class='userpassword'><span class='mr5'>"+lan.site.user+"：<input id='data-user' class='bt-input-text' type='text' name='datauser' value=''  style='width:173px' /></span>\
-		                    <span class='last'>"+lan.site.password+"：<input id='data-password' class='bt-input-text' type='text' name='datapassword' value=''  style='width:173px' /></span></div>\
-		                    <p class='c9 mt10'>"+lan.site.database_help+"</p>\
-	                    </div>\
-	                    </div>\
 						"+php_version+"\
 	                    <div class='bt-form-submit-btn'>\
-							<button type='button' class='btn btn-danger btn-sm btn-title' onclick='layer.closeAll()'>"+lan.public.cancel+"</button>\
-							<button type='button' class='btn btn-success btn-sm btn-title' onclick=\"webAdd(1)\">"+lan.public.submit+"</button>\
+							<button type='button' class='btn btn-danger btn-sm btn-title' onclick='layer.closeAll()'>取消</button>\
+							<button type='button' class='btn btn-success btn-sm btn-title' onclick=\"webAdd(1)\">提交</button>\
 						</div>\
 	                  </form>",
 		});
+
 		$(function() {
 			var placeholder = "<div class='placeholder c9' style='top:10px;left:10px'>"+lan.site.domain_help+"</div>";
 			$('#mainDomain').after(placeholder);
@@ -311,27 +260,7 @@ function webAdd(type) {
 					$('#php_w').text('');
 				}
 			})
-			
-			
-			//FTP账号数据绑定域名
-			$('#mainDomain').on('input', function() {
-				var array;
-				var res,ress;
-				var str = $(this).val().replace('http://','').replace('https://','');
-				var len = str.replace(/[^\x00-\xff]/g, "**").length;
-				array = str.split("\n");
-				ress =array[0].split(":")[0];
-				res = ress.replace(new RegExp(/([-.])/g), '_');
-				if(res.length > 15) res = res.substr(0,15);
-				if($("#inputPath").val().substr(0,defaultPath.length) == defaultPath) $("#inputPath").val(defaultPath+'/'+ress);
-				if(!isNaN(res.substr(0,1))) res = "sql"+res;
-				if(res.length > 15) res = res.substr(0,15);
-				$("#Wbeizhu").val(ress);
-				$("#ftp-user").val(res);
-				$("#data-user").val(res);
-				if(isChineseChar(str)) $('.btn-zhm').show();
-				else $('.btn-zhm').hide();
-			})
+			//备注
 			$('#Wbeizhu').on('input', function() {
 				var str = $(this).val();
 				var len = str.replace(/[^\x00-\xff]/g, "**").length;
@@ -346,52 +275,8 @@ function webAdd(type) {
 			//获取当前时间时间戳，截取后6位
 			var timestamp = new Date().getTime().toString();
 			var dtpw = timestamp.substring(7);
-			$("#data-user").val("sql" + dtpw);
-	
-			//生成n位随机密码
-			function _getRandomString(len) {
-				len = len || 32;
-				var $chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678'; // 默认去掉了容易混淆的字符oOLl,9gq,Vv,Uu,I1  
-				var maxPos = $chars.length;
-				var pwd = '';
-				for (i = 0; i < len; i++) {
-					pwd += $chars.charAt(Math.floor(Math.random() * maxPos));
-				}
-				return pwd;
-			}
-			$("#ftp-password").val(_getRandomString(16));
-			$("#data-password").val(_getRandomString(16));
-	
-	
-			$("#ftpss,#datass").hide();
-			//不创建
-			$("#c_k1").change(function() {
-					var val = $("#c_k1").val();
-					if (val == 'false') {
-						$("#ftp-user").attr("disabled", true);
-						$("#ftp-password").attr("disabled", true);
-						$("#ftpss").hide();
-					} else {
-						$("#ftp-user").attr("disabled", false);
-						$("#ftp-password").attr("disabled", false);
-						$("#ftpss").show();
-					}
-				})
-				//不创建
-			$("#c_k2").change(function() {
-				var val = $("#c_k2").val();
-				if (val == 'false') {
-					$("#data-user").attr("disabled", true);
-					$("#data-password").attr("disabled", true);
-					$("#datass").hide();
-				} else {
-					$("#data-user").attr("disabled", false);
-					$("#data-password").attr("disabled", false);
-					$("#datass").show();
-				}
-			});
 		});
-	});
+	}, 'json');
 }
 
 //修改网站目录

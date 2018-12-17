@@ -23,6 +23,7 @@
 					<button onclick="webAdd(0)" class="btn btn-success btn-sm btn-title" type="button">添加站点</button>&nbsp;
 					<button onclick="siteDefaultPage()" class="btn btn-default btn-sm btn-title" type="button">修改默认页</button>
 					<button onclick="getDefaultSite()" class="btn btn-default btn-sm btn-title" type="button">默认站点</button>
+					<button onclick="getDefaultSite()" class="btn btn-default btn-sm btn-title" type="button">分类管理</button>
 					<span id="allDelete" style="float: right;display: none;">
 						<button onclick="allDeleteSite();" class="btn btn-default btn-sm">网站搜索</button>
 					</span>
@@ -56,11 +57,7 @@
 		<script type="text/javascript" src="/static/laydate/laydate.js?v={{config.version}}"></script>
 		<script type="text/javascript" src="/static/app/ftp.js?v={{config.version}}"></script>
 		<script type="text/javascript" src="/static/app/site.js?v={{config.version}}"></script>
-		<script type="text/javascript">
-		// $if not tData['isSetup']:
-		// layer.msg('$tData["lan"]["JS1"]<a href="/soft" style="color:#20a53a; float: right;">$tData["lan"]["JS2"]</a>',{icon:7,shade: [0.3, '#000'],time:0});
-		// $(".layui-layer-shade").css("margin-left","180px");
-		
+		<script type="text/javascript">		
 		setTimeout(function(){
 			getWeb(1);
 		},500);
