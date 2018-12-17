@@ -30,10 +30,8 @@ Install_mysql()
 
 	cd ${mysqlDir}/mysql-5.5.62 && cmake \
 	-DCMAKE_INSTALL_PREFIX=$serverPath/mysql \
-	&& make && make install
-
-
-	echo '5.5' > $serverPath/mysql/version.pl
+	&& make && make install \
+	&& echo '5.5' > $serverPath/mysql/version.pl
 	echo '安装完成' > $install_tmp
 }
 
