@@ -25,8 +25,6 @@ Install_openresty()
 	cd ${openrestyDir}/openresty-1.13.6.2 && ./configure --prefix=$serverPath/openresty \
 	--with-openssl=$serverPath/source/lib/openssl-1.0.2q \
 	--with-http_stub_status_module \
-	--user=www \
-	--group=www \
 	&& make && make install && \
 	echo '1.13.6' > $serverPath/openresty/version.pl
 
