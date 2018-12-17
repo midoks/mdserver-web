@@ -46,3 +46,8 @@ def add():
     version = request.form.get('version', '').encode('utf-8')
     port = request.form.get('port', '').encode('utf-8')
     return site_api.site_api().add(webname, port, ps, path, version)
+
+
+@site.route('delete', methods=['POST'])
+def delete():
+    pass
