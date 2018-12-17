@@ -19,8 +19,8 @@ function getWeb(page, search) {
 	$.post(sUrl, pdata, function(data) {
 		layer.close(loadT);
 		//构造数据列表
-		var Body = '';
-		$("#webBody").html(Body);
+		var body = '';
+		$("#webBody").html(body);
 		for (var i = 0; i < data.data.length; i++) {
 			//当前站点状态
 			if (data.data[i].status == lan.site.running || data.data[i].status == '1') {
@@ -40,22 +40,28 @@ function getWeb(page, search) {
 			//表格主体
 			var shortwebname = data.data[i].name;
 			var shortpath = data.data[i].path;
-			if(data.data[i].name.length > 30) shortwebname = data.data[i].name.substring(0, 30) + "...";
-			if(data.data[i].path.length > 30) shortpath = data.data[i].path.substring(0, 30) + "...";
+			if(data.data[i].name.length > 30) {
+				shortwebname = data.data[i].name.substring(0, 30) + "...";
+			}
+			if(data.data[i].path.length > 30){
+				shortpath = data.data[i].path.substring(0, 30) + "...";
+			}
+			var idname = data.data[i].name.replace(/\./g,'_');
 			
-			Body = "<tr><td><input type='checkbox' name='id' title='"+data.data[i].name+"' onclick='checkSelect();' value='" + data.data[i].id + "'></td>\
+			body = "<tr><td><input type='checkbox' name='id' title='"+data.data[i].name+"' onclick='checkSelect();' value='" + data.data[i].id + "'></td>\
 					<td><a class='btlink webtips' href='javascript:;' onclick=\"webEdit(" + data.data[i].id + ",'" + data.data[i].name + "','" + data.data[i].edate + "','" + data.data[i].addtime + "')\" title='"+data.data[i].name+"'>" + shortwebname + "</td>\
 					<td>" + status + "</td>\
 					<td>" + backup + "</td>\
 					<td><a class='btlink' title='"+lan.site.open_path_txt+data.data[i].path+"' href=\"javascript:openPath('"+data.data[i].path+"');\">" + shortpath + "</a></td>\
 					<td><a class='btlink setTimes' id='site_"+data.data[i].id+"' data-ids='"+data.data[i].id+"'>" + web_end_time + "</a></td>\
 					<td><a class='btlinkbed' href='javascript:;' data-id='"+data.data[i].id+"'>" + data.data[i].ps + "</a></td>\
+					<td><input class='btswitch btswitch-ios' id='closewaf_"+idname+"' type='checkbox'><label class='btswitch-btn' for='closewaf_"+idname+"' onclick=\"set_site_obj_state('" + data.data[i].name + "','open')\" style='width:2.4em;height:1.4em;margin-bottom: 0'></label></td>\
 					<td style='text-align:right; color:#bbb'>\
 					<a href='javascript:;' class='btlink' onclick=\"webEdit(" + data.data[i].id + ",'" + data.data[i].name + "','" + data.data[i].edate + "','" + data.data[i].addtime + "')\">"+lan.site.set+" </a>\
                         | <a href='javascript:;' class='btlink' onclick=\"webDelete('" + data.data[i].id + "','" + data.data[i].name + "')\" title='"+lan.site.site_del_title+"'>"+lan.public.del+"</a>\
 					</td></tr>"
 			
-			$("#webBody").append(Body);
+			$("#webBody").append(body);
 			//setEdate(data.data[i].id,data.data[i].edate);
          	//设置到期日期
             function getDate(a) {
@@ -93,10 +99,10 @@ function getWeb(page, search) {
              this.click();
             });
 		}
-		if(Body.length < 10){
-			Body = "<tr><td colspan='8'>"+lan.site.site_no_data+"</td></tr>";
+		if(body.length < 10){
+			body = "<tr><td colspan='8'>"+lan.site.site_no_data+"</td></tr>";
 			$(".dataTables_paginate").hide();
-			$("#webBody").html(Body);
+			$("#webBody").html(body);
 		}
 		//输出数据列表
 		$(".btn-more").hover(function(){
@@ -118,8 +124,6 @@ function getWeb(page, search) {
 		});
 	},'json');
 }
-
-
 
 //添加站点
 function webAdd(type) {
@@ -146,7 +150,9 @@ function webAdd(type) {
 		domainlist = domainlist.substring(0,domainlist.length-1);//子域名json
 		domain ='{"domain":"'+domain[0]+'","domainlist":['+domainlist+'],"count":'+domain.length+'}';//拼接joson
 		var loadT = layer.msg(lan.public.the_get,{icon:16,time:0,shade: [0.3, "#000"]})
-		var data = $("#addweb").serialize()+"&port="+webport+"&webname="+domain;
+		var data = $("#addweb").serialize()+"&port="+webport+"&webinfo="+domain;
+
+		console.log(data);
 
 		$.post('/site/add', data, function(ret) {
 			if(ret.status === false){

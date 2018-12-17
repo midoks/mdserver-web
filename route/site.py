@@ -33,11 +33,9 @@ def getPhpVersion():
 
 @site.route('add', methods=['POST'])
 def add():
-    webname = request.form.get('webname', '').encode('utf-8')
+    webname = request.form.get('webinfo', '').encode('utf-8')
     ps = request.form.get('ps', '').encode('utf-8')
     path = request.form.get('path', '').encode('utf-8')
     version = request.form.get('version', '').encode('utf-8')
     port = request.form.get('port', '').encode('utf-8')
-    webname = request.form.get('webname', '').encode('utf-8')
-    print webname
-    return site_api.site_api().add(webname, ps, path, version)
+    return site_api.site_api().add(webname, port, ps, path, version)
