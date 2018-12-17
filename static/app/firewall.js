@@ -174,7 +174,6 @@ function showAccept(page,search) {
 	search = search == undefined ? '':search;
 	var loadT = layer.load();
 	$.post('/firewall/get_list','limit=10&p=' + page+"&search="+search, function(data) {
-		console.log(data);
 		layer.close(loadT);
 		var body = '';
 		for (var i = 0; i < data.data.length; i++) {
