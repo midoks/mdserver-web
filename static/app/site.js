@@ -152,8 +152,6 @@ function webAdd(type) {
 		var loadT = layer.msg(lan.public.the_get,{icon:16,time:0,shade: [0.3, "#000"]})
 		var data = $("#addweb").serialize()+"&port="+webport+"&webinfo="+domain;
 
-		console.log(data);
-
 		$.post('/site/add', data, function(ret) {
 			if(ret.status === false){
 				layer.msg(ret.msg,{icon:ret.status?1:2})
@@ -204,12 +202,15 @@ function webAdd(type) {
 		for(var i=rdata.length-1;i>=0;i--){
             php_version += "<option value='"+rdata[i].version+"'>"+rdata[i].name+"</option>";
         }
+
+        var www = syncPost('/site/get_root_dir');
+
 		php_version += "</select><span id='php_w' style='color:red;margin-left: 10px;'></span></div>";
 		layer.open({
 			type: 1,
 			skin: 'demo-class',
 			area: '640px',
-			title: lan.site.site_add,
+			title: '添加网站',
 			closeBtn: 2,
 			shift: 0,
 			shadeClose: false,
@@ -221,15 +222,15 @@ function webAdd(type) {
 							</div>\
 						</div>\
 	                    <div class='line'>\
-	                    <span class='tname'>"+lan.site.note+"</span>\
+	                    <span class='tname'>备注</span>\
 	                    <div class='info-r c4'>\
 	                    	<input id='Wbeizhu' class='bt-input-text' type='text' name='ps' placeholder='"+lan.site.note_ph+"' style='width:458px' />\
 	                    </div>\
 	                    </div>\
 	                    <div class='line'>\
-	                    <span class='tname'>"+lan.site.root_dir+"</span>\
+	                    <span class='tname'>根目录</span>\
 	                    <div class='info-r c4'>\
-	                    	<input id='inputPath' class='bt-input-text mr5' type='text' name='path' value='"+defaultPath+"/' placeholder='"+lan.site.web_root_dir+"' style='width:458px' /><span class='glyphicon glyphicon-folder-open cursor' onclick='ChangePath(\"inputPath\")'></span>\
+	                    	<input id='inputPath' class='bt-input-text mr5' type='text' name='path' value='"+www['dir']+"/' placeholder='"+www['dir']+"' style='width:458px' /><span class='glyphicon glyphicon-folder-open cursor' onclick='changePath(\"inputPath\")'></span>\
 	                    </div>\
 	                    </div>\
 						"+php_version+"\
@@ -266,6 +267,27 @@ function webAdd(type) {
 					$('#php_w').text('');
 				}
 			})
+
+			$('#mainDomain').on('input', function() {
+				// var array;
+				// var res,ress;
+				// var str = $(this).val().replace('http://','').replace('https://','');
+				// var len = str.replace(/[^\x00-\xff]/g, "**").length;
+				// array = str.split("\n");
+				// ress =array[0].split(":")[0];
+				// res = ress.replace(new RegExp(/([-.])/g), '_');
+				// if(res.length > 15) res = res.substr(0,15);
+				// if($("#inputPath").val().substr(0,defaultPath.length) == defaultPath) $("#inputPath").val(defaultPath+'/'+ress);
+				// if(!isNaN(res.substr(0,1))) res = "sql"+res;
+				// if(res.length > 15) res = res.substr(0,15);
+				// $("#Wbeizhu").val(ress);
+				// $("#ftp-user").val(res);
+				// $("#data-user").val(res);
+				// if(isChineseChar(str)) $('.btn-zhm').show();
+				// else $('.btn-zhm').hide();
+				console.log('123');
+			})
+
 			//备注
 			$('#Wbeizhu').on('input', function() {
 				var str = $(this).val();
@@ -306,7 +328,7 @@ function webPathEdit(id){
 						<div class='line mt10'>\
 							<span class='mr5'>"+lan.site.web_dir+"</span>\
 							<input class='bt-input-text mr5' type='text' style='width:50%' placeholder='"+lan.site.web_root_dir+"' value='"+rdata+"' name='webdir' id='inputPath'>\
-							<span onclick='ChangePath(&quot;inputPath&quot;)' class='glyphicon glyphicon-folder-open cursor mr20'></span>\
+							<span onclick='changePath(&quot;inputPath&quot;)' class='glyphicon glyphicon-folder-open cursor mr20'></span>\
 							<button class='btn btn-success btn-sm' onclick='SetSitePath("+id+")'>"+lan.public.save+"</button>\
 						</div>\
 						<div class='line mtb15'>\
@@ -321,7 +343,7 @@ function webPathEdit(id){
 						+'<div class="user_pw_tit" style="margin-top: -8px;padding-top: 11px;">'
 							+'<span class="tit">'+lan.soft.pma_pass+'</span>'
 							+'<span class="btswitch-p"><input '+(userini.pass?'checked':'')+' class="btswitch btswitch-ios" id="pathSafe" type="checkbox">'
-								+'<label class="btswitch-btn phpmyadmin-btn" for="pathSafe" onclick="PathSafe('+id+')"></label>'
+								+'<label class="btswitch-btn phpmyadmin-btn" for="pathSafe" onclick="pathSafe('+id+')"></label>'
 							+'</span>'
 						+'</div>'
 						+'<div class="user_pw" style="margin-top: 10px;display:'+(userini.pass?'block;':'none;')+'">'
@@ -350,7 +372,7 @@ function webPathEdit(id){
 }
 
 //是否设置访问密码
-function PathSafe(id){
+function pathSafe(id){
 	var isPass = $('#pathSafe').prop('checked');
 	if(!isPass){
 		$(".user_pw").show();
@@ -491,23 +513,16 @@ function webStart(wid, wname) {
  */
 function webDelete(wid, wname){
 	var thtml = "<div class='options'>\
-	    	<label><input type='checkbox' id='delftp' name='ftp'><span>FTP</span></label>\
-	    	<label><input type='checkbox' id='deldata' name='data'><span>"+lan.site.database+"</span></label>\
 	    	<label><input type='checkbox' id='delpath' name='path'><span>"+lan.site.root_dir+"</span></label>\
 	    	</div>";
-	SafeMessage(lan.site.site_del_title+"["+wname+"]",lan.site.site_del_info,function(){
-		var ftp='',data='',path='';
-		if($("#delftp").is(":checked")){
-			ftp='&ftp=1';
-		}
-		if($("#deldata").is(":checked")){
-			data='&database=1';
-		}
+	var info = '是否要删除同名根目录';
+	safeMessage('删除站点'+"["+wname+"]",info, function(){
+		var path='';
 		if($("#delpath").is(":checked")){
 			path='&path=1';
 		}
 		var loadT = layer.msg(lan.public.the,{icon:16,time:10000,shade: [0.3, '#000']});
-		$.post("/site?action=DeleteSite","id=" + wid + "&webname=" + wname+ftp+data+path, function(ret){
+		$.post("/site?action=DeleteSite","id=" + wid + "&webname=" + wname+path, function(ret){
 			layer.closeAll();
 			layer.msg(ret.msg,{icon:ret.status?1:2})
 			getWeb(1);

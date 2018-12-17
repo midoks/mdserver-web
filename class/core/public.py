@@ -54,6 +54,10 @@ def getServerDir():
     return getRootDir() + '/server'
 
 
+def getWwwDir():
+    return getRootDir() + '/wwwroot'
+
+
 def getOs():
     os = execShell('uname')
     return os[0].lower().strip()
