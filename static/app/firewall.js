@@ -1,26 +1,27 @@
 setTimeout(function(){
-		GetSshInfo();
-	},500);
+	getSshInfo();
+},500);
 	
-	setTimeout(function(){
-		ShowAccept(1);
-	},1000);
-	
-	setTimeout(function(){
-		getLogs(1);
-	},1500);
-	
-	function CloseLogs(){
-		$.post('/files?action=CloseLogs','',function(rdata){
+setTimeout(function(){
+	showAccept(1);
+},1000);
+
+setTimeout(function(){
+	getLogs(1);
+},1500);
+
+
+function closeLogs(){
+	$.post('/files?action=CloseLogs','',function(rdata){
 		$("#logSize").html(rdata);
 		layer.msg(lan.firewall.empty,{icon:1});
-	});
+	},'json');
 }
 	
 $(function(){
-	$.post('/files?action=GetDirSize','path=/www/wwwlogs',function(rdata){
+	$.post('/files/get_dir_size','path=/Users/midoks/Desktop/fwww/wwwlogs', function(rdata){
 		$("#logSize").html(rdata);
-	});
+	},'json');
 })
 
 $("#firewalldType").change(function(){
@@ -43,8 +44,9 @@ $("#firewalldType").change(function(){
 });
 
 
-function GetSshInfo(){
-	$.post('/firewall?action=GetSshInfo','',function(rdata){
+function getSshInfo(){
+	$.post('/firewall/get_ssh_info', '',function(rdata){
+		console.log(rdata);
 		var SSHchecked = ''
 		if(rdata.status){
 			SSHchecked = "<input class='btswitch btswitch-ios' id='sshswitch' type='checkbox' checked><label class='btswitch-btn' for='sshswitch' onclick='SetMstscStatus()'></label>"
@@ -65,7 +67,7 @@ function GetSshInfo(){
 		
 		$("#isPing").html(isPing)
 		
-	});
+	},'json');
 }
 
 
@@ -83,7 +85,7 @@ function mstsc(port) {
 		$.post('/firewall?action=SetSshPort', data, function(ret) {
 			layer.msg(ret.msg,{icon:ret.status?1:2})
 			layer.close(loadT)
-			GetSshInfo()
+			getSshInfo()
 		});
 	});
 }
@@ -168,37 +170,38 @@ function SetMstscStatus(){
  * 取回数据
  * @param {Int} page  分页号
  */
-function ShowAccept(page,search) {
+function showAccept(page,search) {
 	search = search == undefined ? '':search;
 	var loadT = layer.load();
-	$.post('/firewall/log_list','table=firewall&tojs=ShowAccept&limit=10&p=' + page+"&search="+search, function(data) {
+	$.post('/firewall/get_list','limit=10&p=' + page+"&search="+search, function(data) {
+		console.log(data);
 		layer.close(loadT);
-		var Body = '';
+		var body = '';
 		for (var i = 0; i < data.data.length; i++) {
 			var status = '';
 			switch(data.data[i].status){
 				case 0:
-					status = lan.firewall.status_not;
+					status = '未使用';
 					break;
 				case 1:
-					status = lan.firewall.status_net;
+					status = '外网不通';
 					break;
 				default:
-					status = lan.firewall.status_ok;
+					status = '正常';
 					break;
 			}
-			Body += "<tr>\
+			body += "<tr>\
 						<td><em class='dlt-num'>" + data.data[i].id + "</em></td>\
 						<td>" + (data.data[i].port.indexOf('.') == -1?lan.firewall.accept_port+':['+data.data[i].port+']':lan.firewall.drop_ip+':['+data.data[i].port+']') + "</td>\
 						<td>" + status + "</td>\
 						<td>" + data.data[i].addtime + "</td>\
 						<td>" + data.data[i].ps + "</td>\
-						<td class='text-right'><a href='javascript:;' class='btlink' onclick=\"DelAcceptPort(" + data.data[i].id + ",'" + data.data[i].port + "')\">"+lan.public.del+"</a></td>\
+						<td class='text-right'><a href='javascript:;' class='btlink' onclick=\"delAcceptPort(" + data.data[i].id + ",'" + data.data[i].port + "')\">删除</a></td>\
 					</tr>";
 		}
-		$("#firewallBody").html(Body);
+		$("#firewallBody").html(body);
 		$("#firewallPage").html(data.page);
-	})
+	},'json');
 }
 
 //添加放行
@@ -243,7 +246,7 @@ function AddAcceptPort(){
 }
 
 //删除放行
-function DelAcceptPort(id, port) {
+function delAcceptPort(id, port) {
 	var action = "DelDropAddress";
 	if(port.indexOf('.') == -1){
 		action = "DelAcceptPort";
@@ -267,20 +270,20 @@ function DelAcceptPort(id, port) {
 function getLogs(page,search) {
 	search = search == undefined ? '':search;
 	var loadT = layer.load();
-	$.post('/firewall/log_list','table=logs&tojs=getLogs&limit=10&p=' + page+"&search="+search, function(data) {
+	$.post('/firewall/get_log_list','limit=10&p=' + page+"&search="+search, function(data) {
 		layer.close(loadT);
-		var Body = '';
+		var body = '';
 		for (var i = 0; i < data.data.length; i++) {
-			Body += "<tr>\
-							<td><em class='dlt-num'>" + data.data[i].id + "</em></td>\
-							<td>" + data.data[i].type + "</td>\
-							<td>" + data.data[i].log + "</td>\
-							<td>" + data.data[i].addtime + "</td>\
-						</tr>";
+			body += "<tr>\
+						<td><em class='dlt-num'>" + data.data[i].id + "</em></td>\
+						<td>" + data.data[i].type + "</td>\
+						<td>" + data.data[i].log + "</td>\
+						<td>" + data.data[i].addtime + "</td>\
+					</tr>";
 		}
-		$("#logsBody").html(Body);
+		$("#logsBody").html(body);
 		$("#logsPage").html(data.page);
-	})
+	},'json');
 }
 
 //清理面板日志

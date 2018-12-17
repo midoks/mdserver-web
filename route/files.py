@@ -70,6 +70,17 @@ def fileAccess():
     return public.getJson(data)
 
 
+@files.route('/get_dir_size', methods=['POST'])
+def getDirSize():
+    path = request.form.get('path', '').encode('utf-8')
+    if public.getOs() == 'darwin':
+        tmp = public.execShell('du -sh ' + path)
+    else:
+        tmp = public.execShell('du -sbh ' + path)
+    # print tmp
+    return public.returnJson(True, tmp[0].split()[0])
+
+
 @files.route('/get_dir', methods=['POST'])
 def getDir():
     path = request.form.get('path', '').encode('utf-8')

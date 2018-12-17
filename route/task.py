@@ -2,14 +2,15 @@
 
 import os
 import sys
-sys.path.append("/class/core")
-import public
 
 from flask import Flask
 from flask import Blueprint, render_template
 
 
 task = Blueprint('task', __name__, template_folder='templates')
+
+sys.path.append("/class/core")
+import public
 
 
 @task.route("/")
