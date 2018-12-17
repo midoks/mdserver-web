@@ -64,6 +64,17 @@ def getConf():
     return path
 
 
+def getOs():
+    data = {}
+    data['os'] = public.getOs()
+    ng_exe_bin = getServerDir() + "/nginx/sbin/nginx"
+    if checkAuthEq(ng_exe_bin, 'root'):
+        data['auth'] = True
+    else:
+        data['auth'] = False
+    return public.getJson(data)
+
+
 def getInitDTpl():
     path = getPluginDir() + "/init.d/nginx.tpl"
     return path
@@ -81,6 +92,21 @@ def makeConf():
     shutil.copyfile(source_vhost, dest_vhost)
 
 
+def getFileOwner(filename):
+    import pwd
+    stat = os.lstat(filename)
+    uid = stat.st_uid
+    pw = pwd.getpwuid(uid)
+    return pw.pw_name
+
+
+def checkAuthEq(file, owner='root'):
+    fowner = getFileOwner(file)
+    if (fowner == owner):
+        return True
+    return False
+
+
 def confReplace():
     service_path = os.path.dirname(os.getcwd())
     content = public.readFile(getConf())
@@ -88,8 +114,9 @@ def confReplace():
 
     user = 'www'
     user_group = 'www'
-    # macosx do
+
     if public.getOs() == 'darwin':
+        # macosx do
         user = public.execShell(
             "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
         # user = 'root'
@@ -105,22 +132,17 @@ def confReplace():
 
     public.writeFile(getServerDir() + '/nginx/conf/nginx.conf', content)
 
-    # exe_bin = getServerDir() + "/bin/openresty"
-    # print 'chown -R ' + user + ':' + user_group + ' ' + exe_bin
-    # print public.execShell('chown -R ' + user + ':' + user_group + ' ' + exe_bin)
-    # public.execShell('chmod 755 ' + exe_bin)
-    # public.execShell('chmod u+s ' + exe_bin)
-
+    # give nginx root permission
     ng_exe_bin = getServerDir() + "/nginx/sbin/nginx"
-
-    # args = getArgs()
-    # print args['pwd']
-    # sudoPassword = args['pwd']
-    # command = 'chown -R ' + 'root:' + user_group + ' ' + ng_exe_bin
-    # print os.system('echo %s|sudo -S %s' % (args['pwd'], command))
-    # print os.system('echo %s|sudo -S %s' % (sudoPassword, 'chmod 755 ' + ng_exe_bin))
-    # print os.system('echo %s|sudo -S %s' % (sudoPassword, 'chmod u+s ' +
-    # ng_exe_bin))
+    if not checkAuthEq(ng_exe_bin, 'root'):
+        args = getArgs()
+        sudoPwd = args['pwd']
+        cmd_own = 'chown -R ' + 'root:' + user_group + ' ' + ng_exe_bin
+        os.system('echo %s|sudo -S %s' % (sudoPwd, cmd_own))
+        cmd_mod = 'chmod 755 ' + ng_exe_bin
+        os.system('echo %s|sudo -S %s' % (sudoPwd, cmd_mod))
+        cmd_s = 'chmod u+s ' + ng_exe_bin
+        os.system('echo %s|sudo -S %s' % (sudoPwd, cmd_s))
 
 
 def initDreplace():
@@ -150,7 +172,7 @@ def initDreplace():
 
 def status():
     data = public.execShell(
-        "ps -ef|grep openresty |grep -v grep | grep -v python | awk '{print $2}'")
+        "ps -ef|grep nginx |grep -v grep | grep -v python | awk '{print $2}'")
     if data[0] == '':
         return 'stop'
     return 'start'
@@ -159,7 +181,6 @@ def status():
 def start():
     file = initDreplace()
     data = public.execShell(file + ' start')
-    print data
     if data[1] == '':
         return 'ok'
     return 'fail'
@@ -168,7 +189,6 @@ def start():
 def stop():
     file = initDreplace()
     data = public.execShell(file + ' stop')
-    print data
     clearTemp()
     if data[1] == '':
         return 'ok'
@@ -269,7 +289,7 @@ if __name__ == "__main__":
     elif func == 'conf':
         print getConf()
     elif func == 'get_os':
-        print public.getOs()
+        print getOs()
     elif func == 'run_info':
         print runInfo()
     elif func == 'error_log':
