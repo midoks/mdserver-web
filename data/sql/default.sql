@@ -94,8 +94,8 @@ CREATE TABLE IF NOT EXISTS `sites` (
   `status` TEXT,
   `index` TEXT,
   `ps` TEXT,
-  `addtime` TEXT,
-  `edate` TEXT
+  `edate` TEXT,
+  `addtime` TEXT
 );
 
 CREATE TABLE IF NOT EXISTS `domain` (
