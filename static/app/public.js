@@ -5,6 +5,17 @@ $(document).ready(function() {
 	});
 });
 
+function toSize(a) {
+	var d = [" B", " KB", " MB", " GB", " TB", " PB"];
+	var e = 1024;
+	for(var b = 0; b < d.length; b++) {
+		if(a < e) {
+			return(b == 0 ? a : a.toFixed(2)) + d[b]
+		}
+		a /= e
+	}
+}
+
 //转换单们到MB
 function toSizeM(byteLen) {
     var a = parseInt(byteLen) / 1024 / 1024;
@@ -38,8 +49,13 @@ function refresh() {
 	window.location.reload()
 }
 
-var mdw = {
-};
+function mwsPost(path, args, callback){
+	$.post(path, args, function(rdata){
+		if(typeof(callback) == 'function'){
+			callback(rdata);
+		}
+	},'json');
+}
 
 function repeatPwd(a) {
 	$("#MyPassword").val(RandomStrPwd(a))
@@ -97,16 +113,7 @@ function getLocalTime(a) {
 	return new Date(parseInt(a) * 1000).format("yyyy/MM/dd hh:mm:ss")
 }
 
-function toSize(a) {
-	var d = [" B", " KB", " MB", " GB", " TB", " PB"];
-	var e = 1024;
-	for(var b = 0; b < d.length; b++) {
-		if(a < e) {
-			return(b == 0 ? a : a.toFixed(2)) + d[b]
-		}
-		a /= e
-	}
-}
+
 
 
 function ChangePath(d) {
@@ -370,7 +377,6 @@ function openPath(a) {
 	setCookie("Path", a);
 	window.location.href = "/files"
 }
-
 
 function onlineEditFile(k, f) {
 	if(k != 0) {

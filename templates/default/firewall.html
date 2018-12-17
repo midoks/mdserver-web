@@ -14,7 +14,7 @@
 	margin: 0 30px;
 }
 .weblog span{
-	margin-right:30px;
+	margin-right:5px;
 }
 .weblog a{
 	color:#20a53a;
@@ -38,7 +38,7 @@
 			</div>
 		</div>
 		<div class="safe container-fluid bgw mtb15 pd15">
-			<div class="mr50 pull-left">
+			<div class="mr20 pull-left">
 				<form>
 					<div class="ss-text pull-left">
 						<em>启用SSH</em>
@@ -48,7 +48,7 @@
 					</div>
 				</form>
 			</div>
-			<div class="mr50 pull-left">
+			<div class="mr20 pull-left">
 				<div class="ss-text pull-left mr5">
 					<em>SSH端口:</em>
 					<input type="text" class="bt-input-text" id="mstscPort" value=""  />
@@ -57,7 +57,7 @@
 					<button id="mstscSubmit" onclick='mstsc($$("#mstscPort").prop("value"))' class="btn btn-default btn-sm" type="button">更改</button>
 				</div>
 			</div>
-			<div class="mr50 pull-left" style="border-right: 1px solid #ccc; padding-right: 40px;">
+			<div class="mr20 pull-left" style="border-right: 1px solid #ccc; padding-right: 20px;">
 				<div class="ss-text pull-left">
 					<em>启用禁ping</em>
 					<div class='ssh-item' id="isPing">
@@ -65,18 +65,33 @@
 					</div>
 				</div>
 			</div>
-			<div class="weblog">
-				<span>Web日志:</span><a href="javascript:openPath('/www/wwwlog');">/www/wwwlog</a><em id="logSize">0KB</em>
-				<button class="btn btn-default btn-sm" onclick="CloseLogs();">清空</button>
+
+			<div class="mr20 pull-left" style="border-right: 1px solid #ccc; padding-right: 20px;">
+				<form>
+					<div class="ss-text pull-left">
+						<em>启用防火墙</em>
+						<div class='ssh-item' id="in_safe">
+							<input class='btswitch btswitch-ios' id='firewall_switch' type='checkbox' checked><label class='btswitch-btn sshswitch' for='firewall_switch' ></label>
+						</div>
+					</div>
+				</form>
 			</div>
+
+			<div class="weblog">
+				<span>Web日志:</span><a href="javascript:openPath('/Users/midoks/Desktop/fwww/wwwlogs');">/Users/midoks/Desktop/fwww/wwwlogs</a><em id="logSize">0KB</em>
+				<button class="btn btn-default btn-sm" onclick="closeLogs();">清空</button>
+			</div>
+
 		</div>
 		
 		<div class="white-black-ip bgw mtb15">
             <div class="black-ip">
                 <div class="def-log">
                     <div class="title c6 plr15">
-                        <h3 class="f16">防火墙</h3>
+                        <h3 class="f16">防火墙</h3>             
                     </div>
+
+                    
                     <div class="divtable pd15">
 						<div class="firewall-port-box">
 							<select id="firewalldType" class="bt-input-text c5 mr5" name="type" style="width:80px;">
@@ -89,7 +104,7 @@
                             <table id="firewallBody" class="table table-hover" style="min-width: 640px;border: 0 none;">                               
                             </table>
                         </div>
-                        <div class="dataTables_paginate paging_bootstrap page firewallBody" style="margin-bottom:0">            
+                        <div id="firewallPage" class="dataTables_paginate paging_bootstrap page firewallBody" style="margin-bottom:0">            
                         </div>
                     </div>
                 </div>
