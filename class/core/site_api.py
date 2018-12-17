@@ -91,6 +91,12 @@ class site_api:
 
         return public.getJson(data)
 
+    def createRootDir(self, path):
+        if not os.path.exists(path):
+            os.makedirs(path)
+            public.execShell('chmod -R 755 ' + path)
+            public.execShell('chown -R www:www ' + path)
+
     def add(self, webname, port, ps, path, version):
 
         siteMenu = json.loads(webname)
