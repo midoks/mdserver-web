@@ -61,7 +61,7 @@ class site_api:
 
     def list(self):
         _list = public.M('sites').where('', ()).field(
-            'id,name,path,status,ps,addtime').limit('0,5').order('id desc').select()
+            'id,name,path,status,ps,addtime,edate').limit('0,5').order('id desc').select()
         _ret = {}
         _ret['data'] = _list
 
@@ -101,7 +101,7 @@ class site_api:
         self.sitePort = port.strip().replace(' ', '')
 
         # 写入数据库
-        pid = public.M('sites').add('name,path,status,ps,addtime',
+        pid = public.M('sites').add('name,path,status,ps,addtime,edate',
                                     (self.siteName, self.sitePath, '1', ps, ''))
 
         # public.M('domain').add('pid,name,port,addtime',
@@ -109,3 +109,14 @@ class site_api:
         data = {}
         data['siteStatus'] = False
         return public.getJson(data)
+
+    def delete(self, sid):
+        public.M('sites').where("id=?", (sid,)).delete()
+        return public.returnJson(True, '站点删除成功!')
+
+    def setEndDate(self, sid, edate):
+        result = public.M('sites').where(
+            'id=?', (sid,)).setField('edate', edate)
+        siteName = public.M('sites').where('id=?', (sid,)).getField('name')
+        public.writeLog('TYPE_SITE', '设置成功,站点到期后将自动停止!', (siteName, edate))
+        return public.returnJson(True, '设置成功,站点到期后将自动停止!')

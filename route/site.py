@@ -38,6 +38,13 @@ def getRootDir():
     return public.getJson(data)
 
 
+@site.route('set_end_date', methods=['POST'])
+def setEndDate():
+    sid = request.form.get('id', '').encode('utf-8')
+    edate = request.form.get('edate', '').encode('utf-8')
+    return site_api.site_api().setEndDate(sid, edate)
+
+
 @site.route('add', methods=['POST'])
 def add():
     webname = request.form.get('webinfo', '').encode('utf-8')
@@ -50,4 +57,5 @@ def add():
 
 @site.route('delete', methods=['POST'])
 def delete():
-    pass
+    sid = request.form.get('id', '').encode('utf-8')
+    return site_api.site_api().delete(sid)

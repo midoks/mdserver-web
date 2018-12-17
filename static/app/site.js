@@ -90,10 +90,10 @@ function getWeb(page, search) {
                       dates = '0000-00-00';
                     }
                     var loadT = layer.msg(lan.site.saving_txt, { icon: 16, time: 0, shade: [0.3, "#000"]}); 
-                    $.post('/site?action=SetEdate','id='+id+'&edate='+dates,function(rdata){
+                    $.post('/site/set_end_date','id='+id+'&edate='+dates,function(rdata){
                       layer.close(loadT);
                       layer.msg(rdata.msg,{icon:rdata.status?1:5});
-                    });
+                    },'json');
 				}
               });
              this.click();
@@ -230,7 +230,8 @@ function webAdd(type) {
 	                    <div class='line'>\
 	                    <span class='tname'>根目录</span>\
 	                    <div class='info-r c4'>\
-	                    	<input id='inputPath' class='bt-input-text mr5' type='text' name='path' value='"+www['dir']+"/' placeholder='"+www['dir']+"' style='width:458px' /><span class='glyphicon glyphicon-folder-open cursor' onclick='changePath(\"inputPath\")'></span>\
+	                    	<input id='inputPath' class='bt-input-text mr5' type='text' name='path' value='"+www['dir']+"/' placeholder='"+www['dir']+"' style='width:458px' />\
+	                    	<span class='glyphicon glyphicon-folder-open cursor' onclick='changePath(\"inputPath\")'></span>\
 	                    </div>\
 	                    </div>\
 						"+php_version+"\
@@ -269,23 +270,25 @@ function webAdd(type) {
 			})
 
 			$('#mainDomain').on('input', function() {
-				// var array;
-				// var res,ress;
-				// var str = $(this).val().replace('http://','').replace('https://','');
-				// var len = str.replace(/[^\x00-\xff]/g, "**").length;
-				// array = str.split("\n");
-				// ress =array[0].split(":")[0];
-				// res = ress.replace(new RegExp(/([-.])/g), '_');
-				// if(res.length > 15) res = res.substr(0,15);
-				// if($("#inputPath").val().substr(0,defaultPath.length) == defaultPath) $("#inputPath").val(defaultPath+'/'+ress);
-				// if(!isNaN(res.substr(0,1))) res = "sql"+res;
-				// if(res.length > 15) res = res.substr(0,15);
-				// $("#Wbeizhu").val(ress);
-				// $("#ftp-user").val(res);
-				// $("#data-user").val(res);
-				// if(isChineseChar(str)) $('.btn-zhm').show();
-				// else $('.btn-zhm').hide();
-				console.log('123');
+				var array;
+				var res,ress;
+				var str = $(this).val().replace('http://','').replace('https://','');
+				var len = str.replace(/[^\x00-\xff]/g, "**").length;
+				array = str.split("\n");
+				ress =array[0].split(":")[0];
+				res = ress.replace(new RegExp(/([-.])/g), '_');
+				if(res.length > 15){ 
+					res = res.substr(0,15);
+				}
+
+				var placeholder = $("#inputPath").attr('placeholder');
+				$("#inputPath").val(placeholder+'/'+ress);
+				
+				if(res.length > 15){
+					res = res.substr(0,15);
+				}
+
+				$("#Wbeizhu").val(ress);
 			})
 
 			//备注
@@ -295,7 +298,7 @@ function webAdd(type) {
 				if (len > 20) {
 					str = str.substring(0, 20);
 					$(this).val(str);
-					layer.msg(lan.site.domain_len_msg, {
+					layer.msg('不能超出20个字符!', {
 						icon: 0
 					});
 				}
@@ -522,11 +525,11 @@ function webDelete(wid, wname){
 			path='&path=1';
 		}
 		var loadT = layer.msg(lan.public.the,{icon:16,time:10000,shade: [0.3, '#000']});
-		$.post("/site?action=DeleteSite","id=" + wid + "&webname=" + wname+path, function(ret){
+		$.post("/site/delete","id=" + wid + "&webname=" + wname + path, function(ret){
 			layer.closeAll();
 			layer.msg(ret.msg,{icon:ret.status?1:2})
 			getWeb(1);
-		});
+		},'json');
 	},thtml);
 }
 
@@ -546,7 +549,7 @@ function allDeleteSite(){
 	var thtml = "<div class='options'>\
 	    	<label style=\"width:100%;\"><input type='checkbox' id='delpath' name='path'><span>"+lan.site.all_del_info+"</span></label>\
 	    	</div>";
-	SafeMessage(lan.site.all_del_site,"<a style='color:red;'>"+lan.get('del_all_site',[dataList.length])+"</a>",function(){
+	safeMessage(lan.site.all_del_site,"<a style='color:red;'>"+lan.get('del_all_site',[dataList.length])+"</a>",function(){
 		layer.closeAll();
 		var path = '';
 		if($("#delpath").is(":checked")){
@@ -784,17 +787,16 @@ function delDomain(wid, wname, domain, port,type) {
  * @param {String} domain  源文本
  * @return bool
  */
-function IsDomain(domain) {
-		//domain = 'http://'+domain;
-		var re = new RegExp();
-		re.compile("^[A-Za-z0-9-_]+\\.[A-Za-z0-9-_%&\?\/.=]+$");
-		if (re.test(domain)) {
-			return (true);
-		} else {
-			return (false);
-		}
+function isDomain(domain) {
+	//domain = 'http://'+domain;
+	var re = new RegExp();
+	re.compile("^[A-Za-z0-9-_]+\\.[A-Za-z0-9-_%&\?\/.=]+$");
+	if (re.test(domain)) {
+		return (true);
+	} else {
+		return (false);
 	}
-
+}
 
 
 /**
@@ -804,13 +806,13 @@ function IsDomain(domain) {
  * @param {String} name	主域名
  */
 function WebBackup(id, name) {
-		var loadT =layer.msg(lan.database.backup_the, {icon:16,time:0,shade: [0.3, '#000']});
-		var data = "id="+id;
-		$.post('/site?action=ToBackup', data, function(rdata) {
-			layer.closeAll();
-			layer.msg(rdata.msg,{icon:rdata.status?1:2})
-			getBackup(id);
-		});
+	var loadT =layer.msg(lan.database.backup_the, {icon:16,time:0,shade: [0.3, '#000']});
+	var data = "id="+id;
+	$.post('/site?action=ToBackup', data, function(rdata) {
+		layer.closeAll();
+		layer.msg(rdata.msg,{icon:rdata.status?1:2})
+		getBackup(id);
+	});
 }
 
 /**
