@@ -101,8 +101,8 @@ class site_api:
         self.sitePort = port.strip().replace(' ', '')
 
         # 写入数据库
-        pid = public.M('sites').add('name,path,status,ps,addtime,edate',
-                                    (self.siteName, self.sitePath, '1', ps, ''))
+        pid = public.M('sites').add('name,path,status,ps,edate,addtime',
+                                    (self.siteName, self.sitePath, '1', ps, '0000-00-00', public.getDate()))
 
         # public.M('domain').add('pid,name,port,addtime',
         #                        (get.pid, self.siteName, self.sitePort, public.getDate()))
