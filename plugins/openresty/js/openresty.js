@@ -64,7 +64,7 @@ function orPluginOpService(a, b, v) {
     layer.confirm( msgTpl('您真的要{1}{2}{3}服务吗？', [d,a,v]), {icon:3,closeBtn: 2}, function() {
         orPost('get_os',{},function(data){
             var rdata = $.parseJSON(data.data);
-            if (rdata['os'] == 'darwin' && !rdata['auth']){
+            if (!rdata['auth']){
                 layer.prompt({title: '检查到权限不足,需要输入密码!', formType: 1},function(pwd, index){
                 
                     layer.close(index);
