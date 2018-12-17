@@ -11,6 +11,12 @@ import pwd
 
 
 class site_api:
+    siteName = None  # 网站名称
+    sitePath = None  # 根目录
+    sitePort = None  # 端口
+    phpVersion = None  # PHP版本
+    setupPath = None  # 安装路径
+    isWriteLogs = None  # 是否写日志
 
     def __init__(self):
         pass
@@ -85,9 +91,9 @@ class site_api:
 
         return public.getJson(data)
 
-    def add(self, webname, ps, path, version):
+    def add(self, webname, port, ps, path, version):
 
-        self.siteMenu = json.loads(webname)
+        siteMenu = json.loads(webname)
         self.siteName = self.toPunycode(
             siteMenu['domain'].strip().split(':')[0]).strip()
         self.sitePath = self.toPunycodePath(
@@ -95,8 +101,8 @@ class site_api:
         self.sitePort = port.strip().replace(' ', '')
 
         # 写入数据库
-        # pid = public.M('sites').add('name,path,status,ps,addtime',
-        #                             (self.siteName, self.sitePath, '1', ps, ''))
+        pid = public.M('sites').add('name,path,status,ps,addtime',
+                                    (self.siteName, self.sitePath, '1', ps, ''))
 
         # public.M('domain').add('pid,name,port,addtime',
         #                        (get.pid, self.siteName, self.sitePort, public.getDate()))
