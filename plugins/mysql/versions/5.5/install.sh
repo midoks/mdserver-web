@@ -24,7 +24,7 @@ Install_mysql()
 	fi
 
 	if [ ! -f ${mysqlDir}/mysql-5.5.62 ];then
-		 tar -zxvf  ${mysqlDir}/mysql-5.5.62.tar.gz
+		 cd ${mysqlDir} && tar -zxvf  ${mysqlDir}/mysql-5.5.62.tar.gz
 	fi
 	
 
