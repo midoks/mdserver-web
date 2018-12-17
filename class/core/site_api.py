@@ -19,7 +19,18 @@ class site_api:
     isWriteLogs = None  # 是否写日志
 
     def __init__(self):
-        pass
+        self.setupPath = public.getServerDir()
+        path = self.setupPath + '/openresty/nginx/conf/vhost'
+        if not os.path.exists(path):
+            public.execShell("mkdir -p " + path + " && chmod -R 644 " + path)
+        path = self.setupPath + '/openresty/nginx/conf/rewrite'
+        if not os.path.exists(path):
+            public.execShell("mkdir -p " + path + " && chmod -R 644 " + path)
+        path = self.setupPath + '/stop'
+        if not os.path.exists(path):
+            os.system('mkdir -p ' + path)
+            # os.system('wget -O ' + path + '/index.html ' +
+            #           public.get_url() + '/stop.html &')
 
      # 域名编码转换
     def toPunycode(self, domain):
@@ -94,8 +105,11 @@ class site_api:
     def createRootDir(self, path):
         if not os.path.exists(path):
             os.makedirs(path)
+            print public.execShell('chown -R www:www ' + path)
             public.execShell('chmod -R 755 ' + path)
-            public.execShell('chown -R www:www ' + path)
+
+    def nginxAddConf(self):
+        pass
 
     def add(self, webname, port, ps, path, version):
 
@@ -110,8 +124,12 @@ class site_api:
         pid = public.M('sites').add('name,path,status,ps,edate,addtime',
                                     (self.siteName, self.sitePath, '1', ps, '0000-00-00', public.getDate()))
 
+        self.createRootDir(self.sitePath)
         # public.M('domain').add('pid,name,port,addtime',
         #                        (get.pid, self.siteName, self.sitePort, public.getDate()))
+
+        self.nginxAddConf()
+
         data = {}
         data['siteStatus'] = False
         return public.getJson(data)
