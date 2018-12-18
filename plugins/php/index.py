@@ -15,7 +15,7 @@ sys.path.append(os.getcwd() + "/class/core")
 import public
 
 app_debug = False
-if public.getOs() == 'darwin':
+if public.isAppleSystem():
     app_debug = True
 
 
@@ -72,6 +72,15 @@ def contentReplace(content, version):
     service_path = public.getServerDir()
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$PHP_VERSION}', version)
+
+    if public.isAppleSystem():
+        user = public.execShell(
+            "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
+        content = content.replace('{$PHP_USER}', user)
+        content = content.replace('{$PHP_GROUP}', 'staff')
+    else:
+        content = content.replace('{$PHP_USER}', 'www')
+        content = content.replace('{$PHP_GROUP}', 'www')
     return content
 
 
@@ -89,7 +98,7 @@ def makeOpenrestyConf():
         tpl = getPluginDir() + '/conf/enable-php.conf'
         tpl_content = public.readFile(tpl)
         for x in range(len(versions)):
-            w_content = tpl_content.replace('{$PHP_VERSION}', versions[x])
+            w_content = contentReplace(tpl_content, versions[x])
             desc_file = public.getServerDir() + '/openresty/nginx/conf/enable-php-' + \
                 versions[x] + '.conf'
             if not os.path.exists(desc_file):
