@@ -22,15 +22,10 @@ class site_api:
         self.setupPath = public.getServerDir()
         path = self.setupPath + '/openresty/nginx/conf/vhost'
         if not os.path.exists(path):
-            public.execShell("mkdir -p " + path + " && chmod -R 644 " + path)
+            public.execShell("mkdir -p " + path + " && chmod -R 755 " + path)
         path = self.setupPath + '/openresty/nginx/conf/rewrite'
         if not os.path.exists(path):
-            public.execShell("mkdir -p " + path + " && chmod -R 644 " + path)
-        path = self.setupPath + '/stop'
-        if not os.path.exists(path):
-            os.system('mkdir -p ' + path)
-            # os.system('wget -O ' + path + '/index.html ' +
-            #           public.get_url() + '/stop.html &')
+            public.execShell("mkdir -p " + path + " && chmod -R 755 " + path)
 
      # 域名编码转换
     def toPunycode(self, domain):
@@ -105,11 +100,26 @@ class site_api:
     def createRootDir(self, path):
         if not os.path.exists(path):
             os.makedirs(path)
-            print public.execShell('chown -R www:www ' + path)
+            if not public.isAppleSystem():
+                public.execShell('chown -R www:www ' + path)
             public.execShell('chmod -R 755 ' + path)
 
     def nginxAddConf(self):
-        pass
+        source_tpl = public.getRunDir() + '/data/tpl/nginx.conf'
+        desc_file = self.setupPath + '/openresty/nginx/conf/vhost/' + self.siteName + '.conf'
+        content = public.readFile(source_tpl)
+
+        content = content.replace('{$PORT}', self.sitePort)
+        content = content.replace('{$SERVER_NAME}', self.siteName)
+        content = content.replace('{$ROOT_DIR}', self.sitePath)
+        content = content.replace('{$PHPVER}', self.phpVersion)
+
+        or_rewrite = self.setupPath + '/openresty/nginx/conf/rewrite'
+        content = content.replace('{$OR_REWRITE}', or_rewrite)
+
+        logsPath = public.getLogsDir()
+        content = content.replace('{$LOGPATH}', logsPath)
+        public.writeFile(desc_file, content)
 
     def add(self, webname, port, ps, path, version):
 
@@ -119,10 +129,15 @@ class site_api:
         self.sitePath = self.toPunycodePath(
             self.getPath(path.replace(' ', '')))
         self.sitePort = port.strip().replace(' ', '')
+        self.phpVersion = version
+
+        siteM = public.M('sites')
+        if siteM.where("name=?", (self.siteName,)).count():
+            return public.returnJson(False, '您添加的站点已存在!')
 
         # 写入数据库
-        pid = public.M('sites').add('name,path,status,ps,edate,addtime',
-                                    (self.siteName, self.sitePath, '1', ps, '0000-00-00', public.getDate()))
+        pid = siteM.add('name,path,status,ps,edate,addtime',
+                        (self.siteName, self.sitePath, '1', ps, '0000-00-00', public.getDate()))
 
         self.createRootDir(self.sitePath)
         # public.M('domain').add('pid,name,port,addtime',
@@ -134,7 +149,11 @@ class site_api:
         data['siteStatus'] = False
         return public.getJson(data)
 
-    def delete(self, sid):
+    def delete(self, sid, webname):
+
+        confPath = self.setupPath + '/openresty/nginx/conf/vhost/' + webname + '.conf'
+        if os.path.exists(confPath):
+            os.remove(confPath)
         public.M('sites').where("id=?", (sid,)).delete()
         return public.returnJson(True, '站点删除成功!')
 

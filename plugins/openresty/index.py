@@ -86,11 +86,6 @@ def makeConf():
     if not os.path.exists(vhost):
         os.mkdir(vhost)
 
-    source_vhost = getPluginDir() + '/conf/nginx_status.conf'
-    dest_vhost = vhost + '/nginx_status.conf'
-    # if not os.path.exists(dest_vhost):
-    shutil.copyfile(source_vhost, dest_vhost)
-
 
 def getFileOwner(filename):
     import pwd
