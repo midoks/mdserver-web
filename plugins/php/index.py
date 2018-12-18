@@ -126,8 +126,16 @@ def phpFpmWwwReplace(version):
         public.writeFile(service_php_fpmwww, content)
 
 
+def makePhpIni(version):
+    d_ini = public.getServerDir() + '/php/' + version + '/etc/php.ini'
+    if not os.path.exists(d_ini):
+        s_ini = getPluginDir() + '/conf/php.ini'
+        shutil.copyfile(s_ini, d_ini)
+
+
 def initReplace(version):
     makeOpenrestyConf()
+    makePhpIni(version)
 
     initD_path = getServerDir() + '/init.d'
     file_bin = initD_path + '/php' + version
