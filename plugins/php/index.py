@@ -5,6 +5,8 @@ import io
 import os
 import time
 import re
+import json
+import shutil
 
 reload(sys)
 sys.setdefaultencoding('utf8')
@@ -73,6 +75,27 @@ def contentReplace(content, version):
     return content
 
 
+def makeOpenrestyConf():
+    if public.isInstalledWeb():
+        s_pathinfo = getPluginDir() + '/conf/pathinfo.conf'
+        d_pathinfo = public.getServerDir() + '/openresty/nginx/conf/pathinfo.conf'
+        if not os.path.exists(d_pathinfo):
+            shutil.copyfile(s_pathinfo, d_pathinfo)
+
+        info = getPluginDir() + '/info.json'
+        content = public.readFile(info)
+        content = json.loads(content)
+        versions = content['versions']
+        tpl = getPluginDir() + '/conf/enable-php.conf'
+        tpl_content = public.readFile(tpl)
+        for x in range(len(versions)):
+            w_content = tpl_content.replace('{$PHP_VERSION}', versions[x])
+            desc_file = public.getServerDir() + '/openresty/nginx/conf/enable-php-' + \
+                versions[x] + '.conf'
+            if not os.path.exists(desc_file):
+                public.writeFile(desc_file, w_content)
+
+
 def phpFpmReplace(version):
 
     tpl_php_fpm = getPluginDir() + '/conf/php-fpm.conf'
@@ -98,9 +121,10 @@ def phpFpmWwwReplace(version):
     public.writeFile(service_php_fpmwww, content)
 
 
-def initDreplace(version):
+def initReplace(version):
+    makeOpenrestyConf()
 
-    file_tpl = getConf(version)
+    file_tpl = getPluginDir() + '/init.d/php.tpl'
     service_path = public.getServerDir()
 
     initD_path = getServerDir() + '/init.d'
@@ -121,12 +145,11 @@ def initDreplace(version):
 
 
 def phpOp(version, method):
-    file = initDreplace(version)
+    file = initReplace(version)
     data = public.execShell(file + ' ' + method)
-    print data
     if data[1] == '':
         return 'ok'
-    return 'fail'
+    return data[1]
 
 
 def start(version):
