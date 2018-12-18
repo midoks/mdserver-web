@@ -49,7 +49,7 @@ def getArgs():
 
 
 def getConf(version):
-    path = getPluginDir() + "/init.d/php.tpl"
+    path = getServerDir() + '/' + version + '/etc/php.ini'
     return path
 
 
