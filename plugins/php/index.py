@@ -86,9 +86,9 @@ def contentReplace(content, version):
 
 def makeOpenrestyConf():
     if public.isInstalledWeb():
-        s_pathinfo = getPluginDir() + '/conf/pathinfo.conf'
         d_pathinfo = public.getServerDir() + '/openresty/nginx/conf/pathinfo.conf'
         if not os.path.exists(d_pathinfo):
+            s_pathinfo = getPluginDir() + '/conf/pathinfo.conf'
             shutil.copyfile(s_pathinfo, d_pathinfo)
 
         info = getPluginDir() + '/info.json'
@@ -98,54 +98,48 @@ def makeOpenrestyConf():
         tpl = getPluginDir() + '/conf/enable-php.conf'
         tpl_content = public.readFile(tpl)
         for x in range(len(versions)):
-            w_content = contentReplace(tpl_content, versions[x])
             desc_file = public.getServerDir() + '/openresty/nginx/conf/enable-php-' + \
                 versions[x] + '.conf'
             if not os.path.exists(desc_file):
+                w_content = contentReplace(tpl_content, versions[x])
                 public.writeFile(desc_file, w_content)
 
 
 def phpFpmReplace(version):
-
-    tpl_php_fpm = getPluginDir() + '/conf/php-fpm.conf'
-    service_php_fpm = getServerDir() + '/' + version + '/etc/php-fpm.conf'
-    content = public.readFile(tpl_php_fpm)
-
-    content = contentReplace(content, version)
-
-    public.writeFile(service_php_fpm, content)
+    desc_php_fpm = getServerDir() + '/' + version + '/etc/php-fpm.conf'
+    if not os.path.exists(desc_php_fpm):
+        tpl_php_fpm = getPluginDir() + '/conf/php-fpm.conf'
+        content = public.readFile(tpl_php_fpm)
+        content = contentReplace(content, version)
+        public.writeFile(desc_php_fpm, content)
 
 
 def phpFpmWwwReplace(version):
-    service_path = public.getServerDir()
-
-    tpl_php_fpmwww = getPluginDir() + '/conf/www.conf'
     service_php_fpm_dir = getServerDir() + '/' + version + '/etc/php-fpm.d/'
-    service_php_fpmwww = service_php_fpm_dir + '/www.conf'
+
     if not os.path.exists(service_php_fpm_dir):
         os.mkdir(service_php_fpm_dir)
-
-    content = public.readFile(tpl_php_fpmwww)
-    content = contentReplace(content, version)
-    public.writeFile(service_php_fpmwww, content)
+        tpl_php_fpmwww = getPluginDir() + '/conf/www.conf'
+        service_php_fpmwww = service_php_fpm_dir + '/www.conf'
+        content = public.readFile(tpl_php_fpmwww)
+        content = contentReplace(content, version)
+        public.writeFile(service_php_fpmwww, content)
 
 
 def initReplace(version):
     makeOpenrestyConf()
 
-    file_tpl = getPluginDir() + '/init.d/php.tpl'
-    service_path = public.getServerDir()
-
     initD_path = getServerDir() + '/init.d'
+    file_bin = initD_path + '/php' + version
     if not os.path.exists(initD_path):
         os.mkdir(initD_path)
-    file_bin = initD_path + '/php' + version
+        file_tpl = getPluginDir() + '/init.d/php.tpl'
 
-    content = public.readFile(file_tpl)
-    content = contentReplace(content, version)
+        content = public.readFile(file_tpl)
+        content = contentReplace(content, version)
 
-    public.writeFile(file_bin, content)
-    public.execShell('chmod +x ' + file_bin)
+        public.writeFile(file_bin, content)
+        public.execShell('chmod +x ' + file_bin)
 
     phpFpmWwwReplace(version)
     phpFpmReplace(version)
