@@ -145,6 +145,14 @@ def reload(version):
     return phpOp(version, 'reload')
 
 
+def fpmLog(version):
+    return getServerDir() + '/' + version + '/var/log/php-fpm.log'
+
+
+def fpmSlowLog(version):
+    return getServerDir() + '/' + version + '/var/log/php-fpm-slow.log'
+
+
 def getPhpConf(version):
     gets = [
         {'name': 'short_open_tag', 'type': 1, 'ps': '短标签支持'},
@@ -211,8 +219,10 @@ if __name__ == "__main__":
         print restart(version)
     elif func == 'reload':
         print reload(version)
-    elif func == 'run_info':
-        print runInfo(version)
+    elif func == 'fpm_log':
+        print fpmLog(version)
+    elif func == 'fpm_slow_log':
+        print fpmSlowLog(version)
     elif func == 'conf':
         print getConf(version)
     elif func == 'get_php_conf':
