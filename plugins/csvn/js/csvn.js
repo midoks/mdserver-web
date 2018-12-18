@@ -20,7 +20,7 @@ function csvnPost(method,args,callback){
 function csvnEdit(){
 
     csvnPost('csvn_edit',{} , function(data){
-        console.log(data);
+        // console.log(data);
         var rdata = $.parseJSON(data.data);
         var edit = '<p class="status">通用的手动编辑:</p>';
         edit +='<div class="sfm-opt">\
