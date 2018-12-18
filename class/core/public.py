@@ -73,6 +73,13 @@ def isAppleSystem():
     return False
 
 
+def isInstalledWeb():
+    path = getServerDir() + '/openresty/nginx/sbin/nginx'
+    if os.path.exists(path):
+        return True
+    return False
+
+
 def M(table):
     sql = db.Sql()
     return sql.table(table)

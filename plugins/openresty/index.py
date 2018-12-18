@@ -11,7 +11,8 @@ import public
 
 
 app_debug = False
-if public.getOs() == 'darwin':
+
+if public.isAppleSystem():
     app_debug = True
 
 
@@ -81,10 +82,12 @@ def getInitDTpl():
 
 
 def makeConf():
-    import shutil
     vhost = getServerDir() + '/nginx/conf/vhost'
     if not os.path.exists(vhost):
         os.mkdir(vhost)
+    php_status = getServerDir() + '/nginx/conf/php_status'
+    if not os.path.exists(php_status):
+        os.mkdir(php_status)
 
 
 def getFileOwner(filename):
@@ -195,7 +198,7 @@ def restart():
     data = public.execShell(file + ' restart')
     if data[1] == '':
         return 'ok'
-    return 'fail'
+    return data[1]
 
 
 def reload():
@@ -208,8 +211,7 @@ def reload():
 
 def initdStatus():
     if not app_debug:
-        os_name = public.getOs()
-        if os_name == 'darwin':
+        if public.isAppleSystem():
             return "Apple Computer does not support"
     initd_bin = getInitDFile()
     if os.path.exists(initd_bin):
@@ -220,8 +222,7 @@ def initdStatus():
 def initdInstall():
     import shutil
     if not app_debug:
-        os_name = public.getOs()
-        if os_name == 'darwin':
+        if public.isAppleSystem():
             return "Apple Computer does not support"
 
     source_bin = initDreplace()
@@ -233,8 +234,7 @@ def initdInstall():
 
 def initdUinstall():
     if not app_debug:
-        os_name = public.getOs()
-        if os_name == 'darwin':
+        if public.isAppleSystem():
             return "Apple Computer does not support"
     initd_bin = getInitDFile()
     os.remove(initd_bin)
@@ -244,7 +244,7 @@ def initdUinstall():
 def runInfo():
     # 取Openresty负载状态
     try:
-        result = public.httpGet('http://127.0.0.1:80/nginx_status')
+        result = public.httpGet('http://127.0.0.1/nginx_status')
         tmp = result.split()
         data = {}
         data['active'] = tmp[2]
