@@ -58,9 +58,19 @@ def getWwwDir():
     return getRootDir() + '/wwwroot'
 
 
+def getLogsDir():
+    return getRootDir() + '/wwwlogs'
+
+
 def getOs():
     os = execShell('uname')
     return os[0].lower().strip()
+
+
+def isAppleSystem():
+    if getOs() == 'darwin':
+        return True
+    return False
 
 
 def M(table):

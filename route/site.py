@@ -58,4 +58,5 @@ def add():
 @site.route('delete', methods=['POST'])
 def delete():
     sid = request.form.get('id', '').encode('utf-8')
-    return site_api.site_api().delete(sid)
+    webname = request.form.get('webname', '').encode('utf-8')
+    return site_api.site_api().delete(sid, webname)
