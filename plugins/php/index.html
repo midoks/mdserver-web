@@ -22,5 +22,8 @@
 
 </div>
 <script type="text/javascript">
-$.getScript( "/plugins/file?name=php&f=js/php.js");
+$.getScript( "/plugins/file?name=php&f=js/php.js", function(){
+	pluginService('php', $('.plugin_version').attr('version'));
+});
+
 </script>
