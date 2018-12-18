@@ -200,6 +200,95 @@ def submitPhpConf(version):
     return public.returnJson(True, '设置成功')
 
 
+def getLimitConf(version):
+    fileini = getServerDir() + "/" + version + "/etc/php.ini"
+    phpini = public.readFile(fileini)
+    filefpm = getServerDir() + "/" + version + "/etc/php-fpm.conf"
+    phpfpm = public.readFile(filefpm)
+
+    # print fileini, filefpm
+    data = {}
+    try:
+        rep = "upload_max_filesize\s*=\s*([0-9]+)M"
+        tmp = re.search(rep, phpini).groups()
+        data['max'] = tmp[0]
+    except:
+        data['max'] = '50'
+
+    try:
+        rep = "request_terminate_timeout\s*=\s*([0-9]+)\n"
+        tmp = re.search(rep, phpfpm).groups()
+        data['maxTime'] = tmp[0]
+    except:
+        data['maxTime'] = 0
+
+    try:
+        rep = r"\n;*\s*cgi\.fix_pathinfo\s*=\s*([0-9]+)\s*\n"
+        tmp = re.search(rep, phpini).groups()
+
+        if tmp[0] == '1':
+            data['pathinfo'] = True
+        else:
+            data['pathinfo'] = False
+    except:
+        data['pathinfo'] = False
+
+    return public.getJson(data)
+
+
+def setMaxTime(version):
+    args = getArgs()
+    if not 'time' in args:
+        return 'missing time args!'
+    time = args['time']
+    if int(time) < 30 or int(time) > 86400:
+        return public.returnJson(False, '请填写30-86400间的值!')
+
+    filefpm = getServerDir() + "/" + version + "/etc/php-fpm.conf"
+    conf = public.readFile(filefpm)
+    rep = "request_terminate_timeout\s*=\s*([0-9]+)\n"
+    conf = re.sub(rep, "request_terminate_timeout = " + time + "\n", conf)
+    public.writeFile(filefpm, conf)
+
+    fileini = getServerDir() + "/" + version + "/etc/php.ini"
+    phpini = public.readFile(fileini)
+    rep = "max_execution_time\s*=\s*([0-9]+)\r?\n"
+    phpini = re.sub(rep, "max_execution_time = " + time + "\n", phpini)
+    rep = "max_input_time\s*=\s*([0-9]+)\r?\n"
+    phpini = re.sub(rep, "max_input_time = " + time + "\n", phpini)
+    public.writeFile(fileini, phpini)
+    return public.returnJson(True, '设置成功!')
+
+
+def setMaxSize(version):
+    args = getArgs()
+    if not 'max' in args:
+        return 'missing time args!'
+    max = args['max']
+    if int(max) < 2:
+        return public.returnJson(False, '上传大小限制不能小于2MB!')
+
+    path = getServerDir() + '/' + version + '/etc/php.ini'
+    conf = public.readFile(path)
+    rep = u"\nupload_max_filesize\s*=\s*[0-9]+M"
+    conf = re.sub(rep, u'\nupload_max_filesize = ' + max + 'M', conf)
+    rep = u"\npost_max_size\s*=\s*[0-9]+M"
+    conf = re.sub(rep, u'\npost_max_size = ' + max + 'M', conf)
+    public.writeFile(path, conf)
+
+    # if public.get_webserver() == 'nginx':
+    #     path = web.ctx.session.setupPath + '/nginx/conf/nginx.conf'
+    #     conf = public.readFile(path)
+    #     rep = "client_max_body_size\s+([0-9]+)m"
+    #     tmp = re.search(rep, conf).groups()
+    #     if int(tmp[0]) < int(max):
+    #         conf = re.sub(rep, 'client_max_body_size ' + max + 'm', conf)
+    #         public.writeFile(path, conf)
+
+    public.writeLog("TYPE_PHP", "PHP_UPLOAD_MAX", (version, max))
+    return public.returnJson(True, '设置成功!')
+
+
 if __name__ == "__main__":
 
     if len(sys.argv) < 3:
@@ -229,5 +318,11 @@ if __name__ == "__main__":
         print getPhpConf(version)
     elif func == 'submit_php_conf':
         print submitPhpConf(version)
+    elif func == 'get_limit_conf':
+        print getLimitConf(version)
+    elif func == 'set_max_time':
+        print setMaxTime(version)
+    elif func == 'set_max_size':
+        print setMaxSize(version)
     else:
         print "fail"

@@ -87,203 +87,62 @@ function submitConf(version) {
 }
 
 
-//软件管理
-function phpSoftMain(name, key) {
-    if (!isNaN(name)) {
-        var nametext = "php" + name;
-        name = name.replace(".", "");
-    }
 
-    var loadT = layer.msg(lan.public.the, { icon: 16, time: 0, shade: [0.3, '#000'] });
-    $.get('/plugins?action=getPluginInfo&name=php', function(rdata) {
-        layer.close(loadT);
-        nameA = rdata.versions[key];
-        bodys = [
-            '<p class="bgw pstate" data-id="0"><a href="javascript:service(\'' + name + '\',' + nameA.run + ')">' + lan.soft.php_main1 + '</a><span class="spanmove"></span></p>',
-            '<p data-id="1"><a id="phpext" href="javascript:SetPHPConfig(\'' + name + '\',' + nameA.pathinfo + ')">' + lan.soft.php_main5 + '</a><span class="spanmove"></span></p>',
-            '<p data-id="2"><a href="javascript:SetPHPConf(\'' + name + '\')">' + lan.soft.config_edit + '</a><span class="spanmove"></span></p>',
-            '<p data-id="3"><a href="javascript:phpUploadLimit(\'' + name + '\',' + nameA.max + ')">' + lan.soft.php_main2 + '</a><span class="spanmove"></span></p>',
-            '<p class="phphide" data-id="4"><a href="javascript:phpTimeLimit(\'' + name + '\',' + nameA.maxTime + ')">' + lan.soft.php_main3 + '</a><span class="spanmove"></span></p>',
-            '<p data-id="5"><a href="javascript:configChange(\'' + name + '\')">' + lan.soft.php_main4 + '</a><span class="spanmove"></span></p>',
-            '<p data-id="6"><a href="javascript:disFun(\'' + name + '\')">' + lan.soft.php_main6 + '</a><span class="spanmove"></span></p>',
-            '<p class="phphide" data-id="7"><a href="javascript:SetFpmConfig(\'' + name + '\')">' + lan.soft.php_main7 + '</a><span class="spanmove"></span></p>',
-            '<p class="phphide" data-id="8"><a href="javascript:GetPHPStatus(\'' + name + '\')">' + lan.soft.php_main8 + '</a><span class="spanmove"></span></p>',
-            '<p class="phphide" data-id="9"><a href="javascript:GetFpmLogs(\'' + name + '\')">FPM日志</a><span class="spanmove"></span></p>',
-            '<p class="phphide" data-id="10"><a href="javascript:GetFpmSlowLogs(\'' + name + '\')">慢日志</a><span class="spanmove"></span></p>',
-            '<p data-id="11"><a href="javascript:BtPhpinfo(\'' + name + '\')">phpinfo</a><span class="spanmove"></span></p>'
-        ]
-
-        var sdata = '';
-        if (rdata.phpSort == false) {
-            rdata.phpSort = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-        } else {
-            rdata.phpSort = rdata.phpSort.split('|');
-        }
-        for (var i = 0; i < rdata.phpSort.length; i++) {
-            sdata += bodys[rdata.phpSort[i]];
-        }
-
-        layer.open({
-            type: 1,
-            area: '640px',
-            title: nametext + lan.soft.admin,
-            closeBtn: 2,
-            shift: 0,
-            content: '<div class="bt-w-main" style="width:640px;">\
-				<input name="softMenuSortOrder" type="hidden" />\
-				<div class="bt-w-menu soft-man-menu">\
-					' + sdata + '\
-				</div>\
-				<div id="webEdit-con" class="bt-w-con pd15" style="height:555px;overflow:auto">\
-					<div class="soft-man-con"></div>\
-				</div>\
-			</div>'
-        });
-        if (name == "52") {
-            $(".phphide").hide();
-        }
-
-        if (rdata.versions.length < 5) {
-            $(".phphide").hide();
-            $(".pstate").hide();
-            SetPHPConfig(name, nameA.pathinfo);
-            $("p[data-id='4']").addClass('bgw');
-        } else {
-            service(name, nameA.run);
-        }
-
-        $(".bt-w-menu p a").click(function() {
-            var txt = $(this).text();
-            $(this).parent().addClass("bgw").siblings().removeClass("bgw");
-            if (txt != lan.soft.php_menu_ext) $(".soft-man-con").removeAttr("style");
-        });
-        $(".soft-man-menu").dragsort({ dragSelector: ".spanmove", dragEnd: MenusaveOrder });
+//php上传限制
+function phpUploadLimitReq(version){
+    phpPost('get_limit_conf', version, '', function(ret_data){
+        var rdata = $.parseJSON(ret_data.data);
+        phpUploadLimit(version,rdata['max']);
     });
 }
 
-//FPM日志
-function GetFpmLogs(phpversion) {
-    var loadT = layer.msg(lan.public.the, { icon: 16, time: 0, shade: [0.3, '#000'] });
-    $.get('/ajax?action=GetFpmLogs&version=' + phpversion, function(logs) {
-        layer.close(loadT);
-        if (logs.status !== true) {
-            logs.msg = '';
-        }
-        if (logs.msg == '') logs.msg = '当前没有fpm日志.';
-        var phpCon = '<textarea readonly="" style="margin: 0px;width: 500px;height: 520px;background-color: #333;color:#fff; padding:0 5px" id="error_log">' + logs.msg + '</textarea>';
-        $(".soft-man-con").html(phpCon);
-        var ob = document.getElementById('error_log');
-        ob.scrollTop = ob.scrollHeight;
-    });
+function phpUploadLimit(version,max){
+    var LimitCon = '<p class="conf_p"><input class="phpUploadLimit bt-input-text mr5" type="number" value="'+
+    max+'" name="max">MB<button class="btn btn-success btn-sm" onclick="setPHPMaxSize(\''+
+    version+'\')" style="margin-left:20px">保存</button></p>';
+    $(".soft-man-con").html(LimitCon);
 }
-
-//FPM-Slow日志
-function GetFpmSlowLogs(phpversion) {
-    var loadT = layer.msg(lan.public.the, { icon: 16, time: 0, shade: [0.3, '#000'] });
-    $.get('/ajax?action=GetFpmSlowLogs&version=' + phpversion, function(logs) {
-        layer.close(loadT);
-        if (logs.status !== true) {
-            logs.msg = '';
-        }
-        if (logs.msg == '') logs.msg = '当前没有慢日志.';
-        var phpCon = '<textarea readonly="" style="margin: 0px;width: 500px;height: 520px;background-color: #333;color:#fff; padding:0 5px" id="error_log">' + logs.msg + '</textarea>';
-        $(".soft-man-con").html(phpCon);
-        var ob = document.getElementById('error_log');
-        ob.scrollTop = ob.scrollHeight;
-    });
-}
-
 
 
 //php超时限制
+function phpTimeLimitReq(version){
+    phpPost('get_limit_conf', version, '', function(ret_data){
+        var rdata = $.parseJSON(ret_data.data);
+        phpTimeLimit(version,rdata['maxTime']);
+    });
+}
+
 function phpTimeLimit(version, max) {
-    var LimitCon = '<p class="conf_p"><input class="phpTimeLimit bt-input-text mr5" type="number" value="' + max + '">' + lan.bt.s + '<button class="btn btn-success btn-sm" onclick="SetPHPMaxTime(\'' + version + '\')" style="margin-left:20px">' + lan.public.save + '</button></p>';
+    var LimitCon = '<p class="conf_p"><input class="phpTimeLimit bt-input-text mr5" type="number" value="' + max + '">秒<button class="btn btn-success btn-sm" onclick="setPHPMaxTime(\'' + version + '\')" style="margin-left:20px">保存</button></p>';
     $(".soft-man-con").html(LimitCon);
 }
+
 //设置超时限制
-function SetPHPMaxTime(version) {
+function setPHPMaxTime(version) {
     var max = $(".phpTimeLimit").val();
-    var loadT = layer.msg(lan.soft.the_save, { icon: 16, time: 0, shade: [0.3, '#000'] });
-    $.post('/config?action=setPHPMaxTime', 'version=' + version + '&time=' + max, function(rdata) {
-        $(".bt-w-menu .active").attr('onclick', "phpTimeLimit('" + version + "'," + max + ")");
-        $(".bt-w-menu .active a").attr('href', "javascript:phpTimeLimit('" + version + "'," + max + ");");
-        layer.close(loadT);
+    phpPost('set_max_time',version,{'time':max},function(data){
+        var rdata = $.parseJSON(data.data);
         layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
     });
 }
 //设置PHP上传限制
-function SetPHPMaxSize(version) {
+function setPHPMaxSize(version) {
     max = $(".phpUploadLimit").val();
     if (max < 2) {
         alert(max);
-        layer.msg(lan.soft.php_upload_size, { icon: 2 });
+        layer.msg('上传大小限制不能小于2M', { icon: 2 });
         return;
     }
-    var loadT = layer.msg(lan.soft.the_save, { icon: 16, time: 0, shade: [0.3, '#000'] });
-    $.post('/config?action=setPHPMaxSize', '&version=' + version + '&max=' + max, function(rdata) {
-        $(".bt-w-menu .active").attr('onclick', "phpUploadLimit('" + version + "'," + max + ")");
-        $(".bt-w-menu .active a").attr('href', "javascript:phpUploadLimit('" + version + "'," + max + ");");
-        layer.close(loadT);
+
+    phpPost('set_max_size',version,{'max':max},function(data){
+        var rdata = $.parseJSON(data.data);
         layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
-    })
-}
-//配置修改
-function configChange(type) {
-    var con = '<p style="color: #666; margin-bottom: 7px">' + lan.bt.edit_ps + '</p><textarea class="bt-input-text" style="height: 320px; line-height:18px;" id="textBody"></textarea>\
-					<button id="OnlineEditFileBtn" class="btn btn-success btn-sm" style="margin-top:10px;">' + lan.public.save + '</button>\
-					<ul class="help-info-text c7 ptb15">\
-						<li>' + lan.get('config_edit_ps', [type]) + '</li>\
-					</ul>';
-    $(".soft-man-con").html(con);
-    var fileName = '';
-    switch (type) {
-        case 'mysqld':
-            fileName = '/etc/my.cnf';
-            break;
-        case 'nginx':
-            fileName = '/www/server/nginx/conf/nginx.conf';
-            break;
-        case 'pure-ftpd':
-            fileName = '/www/server/pure-ftpd/etc/pure-ftpd.conf';
-            break;
-        case 'apache':
-            fileName = '/www/server/apache/conf/httpd.conf';
-            break;
-        case 'tomcat':
-            fileName = '/www/server/tomcat/conf/server.xml';
-            break;
-        case 'memcached':
-            fileName = '/etc/init.d/memcached';
-            break;
-        case 'redis':
-            fileName = '/www/server/redis/redis.conf';
-            break;
-        default:
-            fileName = '/www/server/php/' + type + '/etc/php.ini';
-            break;
-    }
-    var loadT = layer.msg(lan.soft.get, { icon: 16, time: 0, shade: [0.3, '#000'] });
-    $.post('/files?action=GetFileBody', 'path=' + fileName, function(rdata) {
-        layer.close(loadT);
-        $("#textBody").empty().text(rdata.data);
-        $(".CodeMirror").remove();
-        var editor = CodeMirror.fromTextArea(document.getElementById("textBody"), {
-            extraKeys: { "Ctrl-Space": "autocomplete" },
-            lineNumbers: true,
-            matchBrackets: true,
-        });
-        editor.focus();
-        $(".CodeMirror-scroll").css({ "height": "300px", "margin": 0, "padding": 0 });
-        $("#OnlineEditFileBtn").click(function() {
-            $("#textBody").text(editor.getValue());
-            confSafe(fileName);
-        });
     });
 }
 
 
 //设置PATHINFO
-function SetPathInfo(version, type) {
+function setPathInfo(version, type) {
     var loadT = layer.msg(lan.public.the, { icon: 16, time: 0, shade: [0.3, '#000'] });
     $.post('/config?action=setPathInfo', 'version=' + version + '&type=' + type, function(rdata) {
         var pathinfo = (type == 'on') ? true : false;
@@ -301,7 +160,7 @@ function SetPathInfo(version, type) {
 
 
 //PHP扩展配置
-function SetPHPConfig(version, pathinfo, go) {
+function setPHPConfig(version, pathinfo, go) {
     $.get('/ajax?action=GetPHPConfig&version=' + version, function(rdata) {
         var body = ""
         var opt = ""
@@ -636,11 +495,7 @@ function GetPHPStatus(version) {
 }
 
 
-//php上传限制
-function phpUploadLimit(version, max) {
-    var LimitCon = '<p class="conf_p"><input class="phpUploadLimit bt-input-text mr5" type="number" value="' + max + '" name="max">MB<button class="btn btn-success btn-sm" onclick="SetPHPMaxSize(\'' + version + '\')" style="margin-left:20px">' + lan.public.save + '</button></p>';
-    $(".soft-man-con").html(LimitCon);
-}
+
 
 function GetPHPStatus(a) {
     if(a == "52") {
@@ -657,7 +512,7 @@ function GetPHPStatus(a) {
             closeBtn: 2,
             shift: 5,
             shadeClose: true,
-            content: "<div style='margin:15px;'><table class='table table-hover table-bordered'>                        <tr><th>"+lan.bt.php_pool+"</th><td>" + b.pool + "</td></tr>                        <tr><th>"+lan.bt.php_manager+"</th><td>" + ((b["process manager"] == "dynamic") ? lan.bt.dynamic : lan.bt.static) + "</td></tr>                     <tr><th>"+lan.bt.php_start+"</th><td>" + b["start time"] + "</td></tr>                      <tr><th>"+lan.bt.php_accepted+"</th><td>" + b["accepted conn"] + "</td></tr>                        <tr><th>"+lan.bt.php_queue+"</th><td>" + b["listen queue"] + "</td></tr>                        <tr><th>"+lan.bt.php_max_queue+"</th><td>" + b["max listen queue"] + "</td></tr>                        <tr><th>"+lan.bt.php_len_queue+"</th><td>" + b["listen queue len"] + "</td></tr>                        <tr><th>"+lan.bt.php_idle+"</th><td>" + b["idle processes"] + "</td></tr>                       <tr><th>"+lan.bt.php_active+"</th><td>" + b["active processes"] + "</td></tr>                       <tr><th>"+lan.bt.php_total+"</th><td>" + b["total processes"] + "</td></tr>                     <tr><th>"+lan.bt.php_max_active+"</th><td>" + b["max active processes"] + "</td></tr>                       <tr><th>"+lan.bt.php_max_children+"</th><td>" + b["max children reached"] + "</td></tr>                     <tr><th>"+lan.bt.php_slow+"</th><td>" + b["slow requests"] + "</td></tr>                     </table></div>"
+            content: "<div style='margin:15px;'><table class='table table-hover table-bordered'><tr><th>"+lan.bt.php_pool+"</th><td>" + b.pool + "</td></tr><tr><th>"+lan.bt.php_manager+"</th><td>" + ((b["process manager"] == "dynamic") ? lan.bt.dynamic : lan.bt.static) + "</td></tr><tr><th>"+lan.bt.php_start+"</th><td>" + b["start time"] + "</td></tr>                      <tr><th>"+lan.bt.php_accepted+"</th><td>" + b["accepted conn"] + "</td></tr>                        <tr><th>"+lan.bt.php_queue+"</th><td>" + b["listen queue"] + "</td></tr>                        <tr><th>"+lan.bt.php_max_queue+"</th><td>" + b["max listen queue"] + "</td></tr>                        <tr><th>"+lan.bt.php_len_queue+"</th><td>" + b["listen queue len"] + "</td></tr>                        <tr><th>"+lan.bt.php_idle+"</th><td>" + b["idle processes"] + "</td></tr>                       <tr><th>"+lan.bt.php_active+"</th><td>" + b["active processes"] + "</td></tr>                       <tr><th>"+lan.bt.php_total+"</th><td>" + b["total processes"] + "</td></tr>                     <tr><th>"+lan.bt.php_max_active+"</th><td>" + b["max active processes"] + "</td></tr>                       <tr><th>"+lan.bt.php_max_children+"</th><td>" + b["max children reached"] + "</td></tr>                     <tr><th>"+lan.bt.php_slow+"</th><td>" + b["slow requests"] + "</td></tr>                     </table></div>"
         })
     })
 }
