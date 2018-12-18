@@ -34,6 +34,7 @@ def login_required(func):
 @dashboard.route("/test")
 @login_required
 def test():
+    print session
     os = public.getOs()
     print os
 
@@ -97,4 +98,6 @@ def doLogin():
             "< a style='color: red'>密码错误</a>,帐号:{1},密码:{2},登录IP:{3}", (('****', '******', request.remote_addr))))
         return public.returnJson(False, public.getInfo("用户名或密码错误,您还可以尝试[{1}]次!", ('1')))
 
+    session['login'] = True
+    session['username'] = userInfo['username']
     return public.returnJson(True, '登录成功,正在跳转...')
