@@ -1,3 +1,92 @@
+function phpPost(method,version, args,callback){
+    var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
+
+    var req_data = {};
+    req_data['name'] = 'php';
+    req_data['func'] = method;
+    req_data['version'] = version;
+ 
+    if (typeof(args) != 'undefined' && args!=''){
+        req_data['args'] = JSON.stringify(args);
+    }
+
+    $.post('/plugins/run', req_data, function(data) {
+        layer.close(loadT);
+        if (!data.status){
+            layer.msg(data.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+            return;
+        }
+
+        if(typeof(callback) == 'function'){
+            callback(data);
+        }
+    },'json'); 
+}
+
+
+//配置修改
+function phpSetConfig(version) {
+    phpPost('get_php_conf', version,'',function(data){
+        // console.log(data);
+        var rdata = $.parseJSON(data.data);
+        // console.log(rdata);
+        var mlist = '';
+        for (var i = 0; i < rdata.length; i++) {
+            var w = '70'
+            if (rdata[i].name == 'error_reporting') w = '250';
+            var ibody = '<input style="width: ' + w + 'px;" class="bt-input-text mr5" name="' + rdata[i].name + '" value="' + rdata[i].value + '" type="text" >';
+            switch (rdata[i].type) {
+                case 0:
+                    var selected_1 = (rdata[i].value == 1) ? 'selected' : '';
+                    var selected_0 = (rdata[i].value == 0) ? 'selected' : '';
+                    ibody = '<select class="bt-input-text mr5" name="' + rdata[i].name + '" style="width: ' + w + 'px;"><option value="1" ' + selected_1 + '>开启</option><option value="0" ' + selected_0 + '>关闭</option></select>'
+                    break;
+                case 1:
+                    var selected_1 = (rdata[i].value == 'On') ? 'selected' : '';
+                    var selected_0 = (rdata[i].value == 'Off') ? 'selected' : '';
+                    ibody = '<select class="bt-input-text mr5" name="' + rdata[i].name + '" style="width: ' + w + 'px;"><option value="On" ' + selected_1 + '>开启</option><option value="Off" ' + selected_0 + '>关闭</option></select>'
+                    break;
+            }
+            mlist += '<p><span>' + rdata[i].name + '</span>' + ibody + ', <font>' + rdata[i].ps + '</font></p>'
+        }
+        var phpCon = '<style>.conf_p p{margin-bottom: 2px}</style><div class="conf_p" style="margin-bottom:0">\
+                        ' + mlist + '\
+                        <div style="margin-top:10px; padding-right:15px" class="text-right"><button class="btn btn-success btn-sm mr5" onclick="phpSetConfig(' + version + ')">刷新</button><button class="btn btn-success btn-sm" onclick="submitConf(' + version + ')">保存</button></div>\
+                    </div>'
+        $(".soft-man-con").html(phpCon);
+    });
+}
+
+
+//提交PHP配置
+function submitConf(version) {
+    var data = {
+        version: version,
+        display_errors: $("select[name='display_errors']").val(),
+        'cgi.fix_pathinfo': $("select[name='cgi.fix_pathinfo']").val(),
+        'date.timezone': $("input[name='date.timezone']").val(),
+        short_open_tag: $("select[name='short_open_tag']").val(),
+        asp_tags: $("select[name='asp_tags']").val() || 'On',
+        safe_mode: $("select[name='safe_mode']").val(),
+        max_execution_time: $("input[name='max_execution_time']").val(),
+        max_input_time: $("input[name='max_input_time']").val(),
+        memory_limit: $("input[name='memory_limit']").val(),
+        post_max_size: $("input[name='post_max_size']").val(),
+        file_uploads: $("select[name='file_uploads']").val(),
+        upload_max_filesize: $("input[name='upload_max_filesize']").val(),
+        max_file_uploads: $("input[name='max_file_uploads']").val(),
+        default_socket_timeout: $("input[name='default_socket_timeout']").val(),
+        error_reporting: $("input[name='error_reporting']").val() || 'On'
+    };
+
+    phpPost('submit_php_conf', version, data, function(ret_data){
+        var rdata = $.parseJSON(ret_data.data);
+        // console.log(rdata);
+        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+    });
+}
+
+
 //软件管理
 function phpSoftMain(name, key) {
     if (!isNaN(name)) {
@@ -104,68 +193,6 @@ function GetFpmSlowLogs(phpversion) {
     });
 }
 
-
-//配置修改
-function SetPHPConf(version) {
-    var loadT = layer.msg(lan.public.the, { icon: 16, time: 0, shade: [0.3, '#000'] });
-    $.post('/config?action=GetPHPConf', 'version=' + version, function(rdata) {
-        layer.close(loadT);
-        var mlist = '';
-        for (var i = 0; i < rdata.length; i++) {
-            var w = '70'
-            if (rdata[i].name == 'error_reporting') w = '250';
-            var ibody = '<input style="width: ' + w + 'px;" class="bt-input-text mr5" name="' + rdata[i].name + '" value="' + rdata[i].value + '" type="text" >';
-            switch (rdata[i].type) {
-                case 0:
-                    var selected_1 = (rdata[i].value == 1) ? 'selected' : '';
-                    var selected_0 = (rdata[i].value == 0) ? 'selected' : '';
-                    ibody = '<select class="bt-input-text mr5" name="' + rdata[i].name + '" style="width: ' + w + 'px;"><option value="1" ' + selected_1 + '>开启</option><option value="0" ' + selected_0 + '>关闭</option></select>'
-                    break;
-                case 1:
-                    var selected_1 = (rdata[i].value == 'On') ? 'selected' : '';
-                    var selected_0 = (rdata[i].value == 'Off') ? 'selected' : '';
-                    ibody = '<select class="bt-input-text mr5" name="' + rdata[i].name + '" style="width: ' + w + 'px;"><option value="On" ' + selected_1 + '>开启</option><option value="Off" ' + selected_0 + '>关闭</option></select>'
-                    break;
-            }
-            mlist += '<p><span>' + rdata[i].name + '</span>' + ibody + ', <font>' + rdata[i].ps + '</font></p>'
-        }
-        var phpCon = '<style>.conf_p p{margin-bottom: 2px}</style><div class="conf_p" style="margin-bottom:0">\
-						' + mlist + '\
-						<div style="margin-top:10px; padding-right:15px" class="text-right"><button class="btn btn-success btn-sm mr5" onclick="SetPHPConf(' + version + ')">' + lan.public.fresh + '</button><button class="btn btn-success btn-sm" onclick="SubmitPHPConf(' + version + ')">' + lan.public.save + '</button></div>\
-					</div>'
-        $(".soft-man-con").html(phpCon);
-    });
-}
-
-
-//提交PHP配置
-function SubmitPHPConf(version) {
-    var data = {
-        version: version,
-        display_errors: $("select[name='display_errors']").val(),
-        'cgi.fix_pathinfo': $("select[name='cgi.fix_pathinfo']").val(),
-        'date.timezone': $("input[name='date.timezone']").val(),
-        short_open_tag: $("select[name='short_open_tag']").val(),
-        asp_tags: $("select[name='asp_tags']").val() || 'On',
-        safe_mode: $("select[name='safe_mode']").val(),
-        max_execution_time: $("input[name='max_execution_time']").val(),
-        max_input_time: $("input[name='max_input_time']").val(),
-        memory_limit: $("input[name='memory_limit']").val(),
-        post_max_size: $("input[name='post_max_size']").val(),
-        file_uploads: $("select[name='file_uploads']").val(),
-        upload_max_filesize: $("input[name='upload_max_filesize']").val(),
-        max_file_uploads: $("input[name='max_file_uploads']").val(),
-        default_socket_timeout: $("input[name='default_socket_timeout']").val(),
-        error_reporting: $("input[name='error_reporting']").val() || 'On'
-    }
-
-    var loadT = layer.msg(lan.public.the, { icon: 16, time: 0, shade: [0.3, '#000'] });
-    $.post('/config?action=SetPHPConf', data, function(rdata) {
-        layer.close(loadT);
-        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
-    });
-
-}
 
 
 //php超时限制

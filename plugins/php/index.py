@@ -4,6 +4,10 @@ import sys
 import io
 import os
 import time
+import re
+
+reload(sys)
+sys.setdefaultencoding('utf8')
 
 sys.path.append(os.getcwd() + "/class/core")
 import public
@@ -32,7 +36,7 @@ def getInitDFile():
 
 
 def getArgs():
-    args = sys.argv[2:]
+    args = sys.argv[3:]
     tmp = {}
     args_len = len(args)
 
@@ -141,38 +145,59 @@ def reload(version):
     return phpOp(version, 'reload')
 
 
-def runInfo(version):
-    path = os.path.dirname(os.getcwd())
-    cmd = path + "/redis/bin/redis-cli info"
-    data = public.execShell(cmd)[0]
-    res = [
-        'tcp_port',
-        'uptime_in_days',  # 已运行天数
-        'connected_clients',  # 连接的客户端数量
-        'used_memory',  # Redis已分配的内存总量
-        'used_memory_rss',  # Redis占用的系统内存总量
-        'used_memory_peak',  # Redis所用内存的高峰值
-        'mem_fragmentation_ratio',  # 内存碎片比率
-        'total_connections_received',  # 运行以来连接过的客户端的总数量
-        'total_commands_processed',  # 运行以来执行过的命令的总数量
-        'instantaneous_ops_per_sec',  # 服务器每秒钟执行的命令数量
-        'keyspace_hits',  # 查找数据库键成功的次数
-        'keyspace_misses',  # 查找数据库键失败的次数
-        'latest_fork_usec'  # 最近一次 fork() 操作耗费的毫秒数
+def getPhpConf(version):
+    gets = [
+        {'name': 'short_open_tag', 'type': 1, 'ps': '短标签支持'},
+        {'name': 'asp_tags', 'type': 1, 'ps': 'ASP标签支持'},
+        {'name': 'max_execution_time', 'type': 2, 'ps': '最大脚本运行时间'},
+        {'name': 'max_input_time', 'type': 2, 'ps': '最大输入时间'},
+        {'name': 'memory_limit', 'type': 2, 'ps': '脚本内存限制'},
+        {'name': 'post_max_size', 'type': 2, 'ps': 'POST数据最大尺寸'},
+        {'name': 'file_uploads', 'type': 1, 'ps': '是否允许上传文件'},
+        {'name': 'upload_max_filesize', 'type': 2, 'ps': '允许上传文件的最大尺寸'},
+        {'name': 'max_file_uploads', 'type': 2, 'ps': '允许同时上传文件的最大数量'},
+        {'name': 'default_socket_timeout', 'type': 2, 'ps': 'Socket超时时间'},
+        {'name': 'error_reporting', 'type': 3, 'ps': '错误级别'},
+        {'name': 'display_errors', 'type': 1, 'ps': '是否输出详细错误信息'},
+        {'name': 'cgi.fix_pathinfo', 'type': 0, 'ps': '是否开启pathinfo'},
+        {'name': 'date.timezone', 'type': 3, 'ps': '时区'}
     ]
-    data = data.split("\n")
-    result = {}
-    for d in data:
-        if len(d) < 3:
+    phpini = public.readFile(getServerDir() + '/' + version + '/etc/php.ini')
+    result = []
+    for g in gets:
+        rep = g['name'] + '\s*=\s*([0-9A-Za-z_& ~]+)(\s*;?|\r?\n)'
+        tmp = re.search(rep, phpini)
+        if not tmp:
             continue
-        t = d.strip().split(':')
-        if not t[0] in res:
-            continue
-        result[t[0]] = t[1]
+        g['value'] = tmp.groups()[0]
+        result.append(g)
     return public.getJson(result)
 
 
+def submitPhpConf(version):
+    gets = ['display_errors', 'cgi.fix_pathinfo', 'date.timezone', 'short_open_tag',
+            'asp_tags', 'max_execution_time', 'max_input_time', 'memory_limit',
+            'post_max_size', 'file_uploads', 'upload_max_filesize', 'max_file_uploads',
+            'default_socket_timeout', 'error_reporting']
+    args = getArgs()
+    filename = getServerDir() + '/' + version + '/etc/php.ini'
+    phpini = public.readFile(filename)
+    for g in gets:
+        if g in args:
+            rep = g + '\s*=\s*(.+)\r?\n'
+            val = g + ' = ' + args[g] + '\n'
+            phpini = re.sub(rep, val, phpini)
+    public.writeFile(filename, phpini)
+    public.execShell(getServerDir() + '/init.d/php' + version + ' reload')
+    return public.returnJson(True, '设置成功')
+
+
 if __name__ == "__main__":
+
+    if len(sys.argv) < 3:
+        print 'missing parameters'
+        exit(0)
+
     func = sys.argv[1]
     version = sys.argv[2]
 
@@ -190,5 +215,9 @@ if __name__ == "__main__":
         print runInfo(version)
     elif func == 'conf':
         print getConf(version)
+    elif func == 'get_php_conf':
+        print getPhpConf(version)
+    elif func == 'submit_php_conf':
+        print submitPhpConf(version)
     else:
         print "fail"
