@@ -149,9 +149,11 @@ def initReplace(version):
     makePhpIni(version)
 
     initD_path = getServerDir() + '/init.d'
-    file_bin = initD_path + '/php' + version
     if not os.path.exists(initD_path):
         os.mkdir(initD_path)
+
+    file_bin = initD_path + '/php' + version
+    if not os.path.exists(file_bin):
         file_tpl = getPluginDir() + '/init.d/php.tpl'
 
         content = public.readFile(file_tpl)

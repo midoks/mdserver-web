@@ -142,7 +142,7 @@ function getSList(isdisplay) {
 
                 var mupdate = '';//(plugin.versions[n] == plugin.updates[n]) '' : '<a class="btlink" onclick="SoftUpdate(\'' + plugin.name + '\',\'' + plugin.versions[n].version + '\',\'' + plugin.updates[n] + '\')">更新</a> | ';
                 // if (plugin.versions[n] == '') mupdate = '';
-                handle = mupdate + '<a class="btlink" onclick="softMain(\'' + plugin.name + '\',\'' + plugin.setup_version + '\')">设置</a> | <a class="btlink" onclick="uninstallVersion(\'' + plugin.name + '\',\'' + plugin.setup_version + '\',\'' + plugin.title + '\')">卸载</a>';
+                handle = mupdate + '<a class="btlink" onclick="softMain(\'' + plugin.name + '\',\'' + plugin.setup_version + '\')">设置</a> | <a class="btlink" onclick="uninstallVersion(\'' + plugin.name + '\',\'' + plugin.setup_version + '\')">卸载</a>';
                 titleClick = 'onclick="softMain(\'' + plugin.name + '\',\'' + version_info + '\')" style="cursor:pointer"';
              
                 softPath = '<span class="glyphicon glyphicon-folder-open" title="' + plugin.path + '" onclick="openPath(\'' + plugin.path + '\')"></span>';
@@ -264,8 +264,8 @@ function addVersion(name, ver, type, obj, title) {
 }
 
 //卸载软件
-function uninstallVersion(name, version, title) {
-    layer.confirm(msgTpl('您真的要卸载[{1}-{2}]吗?', [title, version]), { icon: 3, closeBtn: 2 }, function() {
+function uninstallVersion(name, version) {
+    layer.confirm(msgTpl('您真的要卸载[{1}-{2}]吗?', [name, version]), { icon: 3, closeBtn: 2 }, function() {
         var data = 'name=' + name + '&version=' + version;
         var loadT = layer.msg(lan.public.the, { icon: 16, time: 0, shade: [0.3, '#000'] });
         $.post('/plugins/uninstall', data, function(rdata) {
