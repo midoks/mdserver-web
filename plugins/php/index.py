@@ -399,7 +399,20 @@ def setFpmConfig(version):
     return public.returnJson(True, '设置成功')
 
 
+def checkFpmStatusFile(version):
+    if public.isInstalledWeb():
+        desc_file = public.getServerDir(
+        ) + '/openresty/nginx/conf/php_status/phpfpm_status_' + version + '.conf'
+        if not os.path.exists(desc_file):
+            tpl = getPluginDir() + '/conf/phpfpm_status.conf'
+            content = public.readFile(tpl)
+            content = contentReplace(content, version)
+            public.writeFile(desc_file, content)
+            public.restartWeb()
+
+
 def getFpmStatus(version):
+    checkFpmStatusFile(version)
 
     result = public.httpGet(
         'http://127.0.0.1/phpfpm_status_' + version + '?json')

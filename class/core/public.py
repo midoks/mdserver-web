@@ -80,6 +80,12 @@ def isInstalledWeb():
     return False
 
 
+def restartWeb():
+    if isInstalledWeb():
+        initd = getServerDir() + '/openresty/init.d/openresty'
+        execShell(initd + ' ' + 'reload')
+
+
 def M(table):
     sql = db.Sql()
     return sql.table(table)
