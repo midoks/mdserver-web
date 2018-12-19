@@ -31,6 +31,24 @@ def getPhpVersion():
     return site_api.site_api().getPhpVersion()
 
 
+@site.route('get_domain', methods=['POST'])
+def getDomain():
+    pid = request.form.get('pid', '').encode('utf-8')
+    return site_api.site_api().getDomain(pid)
+
+
+@site.route('get_logs', methods=['POST'])
+def getLogs():
+    siteName = request.form.get('siteName', '').encode('utf-8')
+    return site_api.site_api().getLogs(siteName)
+
+
+@site.route('get_site_php_version', methods=['POST'])
+def getSitePhpVersion():
+    siteName = request.form.get('siteName', '').encode('utf-8')
+    return site_api.site_api().getSitePhpVersion(siteName)
+
+
 @site.route('get_root_dir', methods=['POST'])
 def getRootDir():
     data = {}
