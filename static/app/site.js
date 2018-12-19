@@ -178,17 +178,12 @@ function webAdd(type) {
 						 </div>",
 					});
 					if ($(".success-msg").height() < 150) {
-						$(".success-msg").find("img").css({
-							"width": "150px",
-							"margin-top": "30px"
-						});
+						$(".success-msg").find("img").css({"width": "150px","margin-top": "30px"});
 					}
 				}
 
 			} else {
-				layer.msg(ret.msg, {
-					icon: 2
-				});
+				layer.msg(ret.msg, {icon: 2});
 			}
 			layer.close(loadT);
 		},'json');
@@ -1020,9 +1015,9 @@ function webEdit(id,website,endTime,addtime){
 	+"<p onclick='limitNet("+id+")' title='"+lan.site.site_menu_3+"'>"+lan.site.site_menu_3+"</p>"
 	+"<p onclick=\"Rewrite('"+website+"')\" title='"+lan.site.site_menu_4+"'>"+lan.site.site_menu_4+"</p>"
 	+"<p onclick='SetIndexEdit("+id+")' title='"+lan.site.site_menu_5+"'>"+lan.site.site_menu_5+"</p>"
-	+"<p onclick=\"ConfigFile('"+website+"')\" title='"+lan.site.site_menu_6+"'>"+lan.site.site_menu_6+"</p>"
+	+"<p onclick=\"configFile('"+website+"')\" title='"+lan.site.site_menu_6+"'>"+lan.site.site_menu_6+"</p>"
 	+"<p onclick=\"SetSSL("+id+",'"+website+"')\" title='"+lan.site.site_menu_7+"'>"+lan.site.site_menu_7+"</p>"
-	+"<p onclick=\"PHPVersion('"+website+"')\" title='"+lan.site.site_menu_8+"'>"+lan.site.site_menu_8+"</p>"
+	+"<p onclick=\"phpVersion('"+website+"')\" title='"+lan.site.site_menu_8+"'>"+lan.site.site_menu_8+"</p>"
 	+"<p onclick=\"To301('"+website+"')\" title='"+lan.site.site_menu_10+"'>"+lan.site.site_menu_10+"</p>"
 	+"<p onclick=\"Proxy('"+website+"')\" title='"+lan.site.site_menu_12+"'>"+lan.site.site_menu_11+"</p>"
 	+"<p id='site_"+id+"' onclick=\"Security('"+id+"','"+website+"')\" title='"+lan.site.site_menu_12+"'>"+lan.site.site_menu_12+"</p>"
@@ -2083,7 +2078,7 @@ function ChangeSaveSSL(siteName){
 }
 
 //PHP版本
-function PHPVersion(siteName){
+function phpVersion(siteName){
 	$.post('/site/get_site_php_version','siteName='+siteName,function(version){
 		console.log(version);
 		if(version.status === false){
@@ -2143,50 +2138,6 @@ function PHPVersion(siteName){
 	},'json');
 }
 
-//tomcat
-function toTomcat(siteName){
-	$.post('/site?action=GetSitePHPVersion','siteName='+siteName,function(version){
-		if(version.status === false){
-			layer.msg(lan.site.a_n_n,{icon:5});
-			return;
-		}
-		$.post('/site?action=GetPHPVersion',function(rdata){
-			var versionSelect ='';
-			if(version.tomcatversion){
-				var tomcat_checked = '';
-				if(version.tomcat != -1) tomcat_checked = 'checked';
-				versionSelect += '<div class="webEdit-box padding-10">\
-									<div class="linex">\
-										<label style="font-weight:normal">\
-											<input type="checkbox" name="status"  onclick="Tomcat(\''+siteName+'\')" style="width: 15px; height: 15px; vertical-align: -2px; margin: 0px 3px 0px 0px;" '+tomcat_checked+' />'+lan.site.enable_tomcat+'\
-										</label>\
-									</div>\
-									<ul class="help-info-text c7 ptb10">\
-									<li>'+lan.site.tomcat_help1+' '+version.tomcatversion+','+lan.site.tomcat_help2+'</li>\
-									<li>'+lan.site.tomcat_help3+'</li>\
-									<li>'+lan.site.tomcat_help4+'</li>\
-									<li>'+lan.site.tomcat_help5+'</li>\
-								</ul>\
-								</div>'
-			}else{
-				layer.msg(lan.site.tomcat_err_msg,{icon:2});
-				versionSelect = '<font>'+lan.site.tomcat_err_msg1+'</font>'
-			}
-			
-			$("#webedit-con").html(versionSelect);
-		});
-	});
-}
-//设置Tomcat
-function Tomcat(siteName){
-	var data = 'siteName='+siteName;
-	var loadT = layer.msg(lan.public.config,{icon:16,time:0,shade: [0.3, '#000']});
-	$.post('/site?action=SetTomcat',data,function(rdata){
-		layer.close(loadT);
-		layer.msg(rdata.msg,{icon:rdata.status?1:2});
-	});
-}
-
 
 //设置PHP版本
 function SetPHPVersion(siteName){
@@ -2199,14 +2150,15 @@ function SetPHPVersion(siteName){
 }
 
 //配置文件
-function ConfigFile(webSite){
-	$.post('/files?action=GetFileBody','path=/www/server/panel/vhost/'+getCookie('serverType')+'/'+webSite+'.conf',function(rdata){
+function configFile(webSite){
+	var info = syncPost('/site/get_host_conf', {siteName:webSite});
+	$.post('/files/get_body','path='+info['host'],function(rdata){
 		var mBody = "<div class='webEdit-box padding-10'>\
-		<textarea style='height: 320px; width: 445px; margin-left: 20px;line-height:18px' id='configBody'>"+rdata.data+"</textarea>\
+		<textarea style='height: 320px; width: 445px; margin-left: 20px;line-height:18px' id='configBody'>"+rdata.data.data+"</textarea>\
 			<div class='info-r'>\
-				<button id='SaveConfigFileBtn' class='btn btn-success btn-sm' style='margin-top:15px;'>"+lan.public.save+"</button>\
+				<button id='SaveConfigFileBtn' class='btn btn-success btn-sm' style='margin-top:15px;'>保存</button>\
 				<ul class='help-info-text c7 ptb10'>\
-					<li>"+lan.site.web_config_help+"</li>\
+					<li>此处为站点主配置文件,若您不了解配置规则,请勿随意修改.</li>\
 				</ul>\
 			</div>\
 		</div>";
@@ -2220,23 +2172,23 @@ function ConfigFile(webSite){
 		$("#SaveConfigFileBtn").click(function(){
 			$("#configBody").empty();
 			$("#configBody").text(editor.getValue());
-			SaveConfigFile(webSite,rdata.encoding);
+			saveConfigFile(webSite,rdata.data.encoding, info['host']);
 		})
-	});
+	},'json');
 }
 
 //保存配置文件
-function SaveConfigFile(webSite,encoding){
-	var data = 'encoding='+encoding+'&data='+encodeURIComponent($("#configBody").val())+'&path=/www/server/panel/vhost/'+getCookie('serverType')+'/'+webSite+'.conf';
-	var loadT = layer.msg(lan.site.saving_txt,{icon:16,time:0,shade: [0.3, '#000']});
-	$.post('/files?action=SaveFileBody',data,function(rdata){
+function saveConfigFile(webSite,encoding,path){
+	var data = 'encoding='+encoding+'&data='+encodeURIComponent($("#configBody").val())+'&path='+path;
+	var loadT = layer.msg('保存中...',{icon:16,time:0,shade: [0.3, '#000']});
+	$.post('/files/save_body',data,function(rdata){
 		layer.close(loadT);
 		if(rdata.status){
 			layer.msg(rdata.msg,{icon:1});
 		}else{
 			layer.msg(rdata.msg,{icon:2,time:0,shade:0.3,shadeClose:true});
 		}
-	});
+	},'json');
 }
 
 //伪静态
