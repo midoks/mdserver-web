@@ -45,7 +45,7 @@ cd $sourcePath/php/php-7.2.5 && ./configure \
 --enable-soap \
 --enable-posix \
 --enable-fpm \
-&& make && make install
+&& make && make install && make clean
 
 #------------------------ install end ------------------------------------#
 }
