@@ -292,6 +292,78 @@ function getFpmStatus(version){
     });
 }
 
+//禁用函数
+function disableFunc(version) {
+    phpPost('get_disable_func', version,'',function(data){
+        var rdata = $.parseJSON(data.data);
+        var disable_functions = rdata.disable_functions.split(',');
+        var dbody = ''
+        for (var i = 0; i < disable_functions.length; i++) {
+            if (disable_functions[i] == '') continue;
+            dbody += "<tr><td>" + disable_functions[i] + "</td><td><a style='float:right;' href=\"javascript:setDisableFunc('" + version + "','" + disable_functions[i] + "','" + rdata.disable_functions + "');\">删除</a></td></tr>";
+        }
+
+        var con = "<div class='dirBinding'>" +
+            "<input class='bt-input-text mr5' type='text' placeholder='添加要被禁止的函数名,如: exec' id='disable_function_val' style='height: 28px; border-radius: 3px;width: 410px;' />" +
+            "<button class='btn btn-success btn-sm' onclick=\"setDisableFunc('" + version + "',1,'" + rdata.disable_functions + "')\">添加</button>" +
+            "</div>" +
+            "<div class='divtable mtb15' style='height:350px;overflow:auto'><table class='table table-hover' width='100%' style='margin-bottom:0'>" +
+            "<thead><tr><th>名称</th><th width='100' class='text-right'>操作</th></tr></thead>" +
+            "<tbody id='blacktable'>" + dbody + "</tbody>" +
+            "</table></div>";
+
+        con += '\
+        <ul class="help-info-text">\
+            <li>在此处可以禁用指定函数的调用,以增强环境安全性!</li>\
+            <li>强烈建议禁用如exec,system等危险函数!</li>\
+        </ul>';
+
+        $(".soft-man-con").html(con);
+    });
+}
+//设置禁用函数
+function setDisableFunc(version, act, fs) {
+    var fsArr = fs.split(',');
+    if (act == 1) {
+        var functions = $("#disable_function_val").val();
+        for (var i = 0; i < fsArr.length; i++) {
+            if (functions == fsArr[i]) {
+                layer.msg(lan.soft.fun_msg, { icon: 5 });
+                return;
+            }
+        }
+        fs += ',' + functions;
+        msg = '添加成功';
+    } else {
+
+        fs = '';
+        for (var i = 0; i < fsArr.length; i++) {
+            if (act == fsArr[i]) continue;
+            fs += fsArr[i] + ','
+        }
+        msg = '删除成功';
+        fs = fs.substr(0, fs.length - 1);
+    }
+
+    var data = {
+        'version':version,
+        'disable_functions':fs,
+    };
+
+    phpPost('set_disable_func', version,data,function(data){
+        var rdata = $.parseJSON(data.data);
+        showMsg(rdata.status ? msg : rdata.msg, function(){
+            disableFunc(version);
+        } ,{ icon: rdata.status ? 1 : 2 });        
+    });
+}
+
+
+function phpLibConfig(version){
+    
+}
+
+
 //设置PATHINFO
 function setPathInfo(version, type) {
     var loadT = layer.msg(lan.public.the, { icon: 16, time: 0, shade: [0.3, '#000'] });
@@ -408,73 +480,13 @@ function UninstallPHPLib(version, name, title, pathinfo) {
         });
     });
 }
-//禁用函数
-function disFun(version) {
-    $.get('/ajax?action=GetPHPConfig&version=' + version, function(rdata) {
-        var disable_functions = rdata.disable_functions.split(',');
-        var dbody = ''
-        for (var i = 0; i < disable_functions.length; i++) {
-            if (disable_functions[i] == '') continue;
-            dbody += "<tr><td>" + disable_functions[i] + "</td><td><a style='float:right;' href=\"javascript:disable_functions('" + version + "','" + disable_functions[i] + "','" + rdata.disable_functions + "');\">" + lan.public.del + "</a></td></tr>";
-        }
-
-        var con = "<div class='dirBinding'>" +
-            "<input class='bt-input-text mr5' type='text' placeholder='" + lan.soft.fun_ps1 + "' id='disable_function_val' style='height: 28px; border-radius: 3px;width: 410px;' />" +
-            "<button class='btn btn-success btn-sm' onclick=\"disable_functions('" + version + "',1,'" + rdata.disable_functions + "')\">" + lan.public.add + "</button>" +
-            "</div>" +
-            "<div class='divtable mtb15' style='height:350px;overflow:auto'><table class='table table-hover' width='100%' style='margin-bottom:0'>" +
-            "<thead><tr><th>" + lan.soft.php_ext_name + "</th><th width='100' class='text-right'>" + lan.public.action + "</th></tr></thead>" +
-            "<tbody id='blacktable'>" + dbody + "</tbody>" +
-            "</table></div>";
-
-        con += '\
-		<ul class="help-info-text">\
-			<li>' + lan.soft.fun_ps2 + '</li>\
-			<li>' + lan.soft.fun_ps3 + '</li>\
-		</ul>';
-
-        $(".soft-man-con").html(con);
-    });
-}
-//设置禁用函数
-function disable_functions(version, act, fs) {
-    var fsArr = fs.split(',');
-    if (act == 1) {
-        var functions = $("#disable_function_val").val();
-        for (var i = 0; i < fsArr.length; i++) {
-            if (functions == fsArr[i]) {
-                layer.msg(lan.soft.fun_msg, { icon: 5 });
-                return;
-            }
-        }
-        fs += ',' + functions;
-        msg = lan.public.add_success;
-    } else {
-
-        fs = '';
-        for (var i = 0; i < fsArr.length; i++) {
-            if (act == fsArr[i]) continue;
-            fs += fsArr[i] + ','
-        }
-        msg = lan.public.del_success;
-        fs = fs.substr(0, fs.length - 1);
-    }
-
-    var data = 'version=' + version + '&disable_functions=' + fs;
-    var loadT = layer.msg(lan.public.the, { icon: 16, time: 0, shade: [0.3, '#000'] });
-    $.post('/config?action=setPHPDisable', data, function(rdata) {
-        layer.close(loadT);
-        layer.msg(rdata.status ? msg : rdata.msg, { icon: rdata.status ? 1 : 2 });
-        disFun(version);
-    });
-}
-
 
 //phpinfo
 function BtPhpinfo(version) {
     var con = '<button class="btn btn-default btn-sm" onclick="GetPHPInfo(\'' + version + '\')">' + lan.soft.phpinfo + '</button>';
     $(".soft-man-con").html(con);
 }
+
 //获取PHPInfo
 function GetPHPInfo(version) {
     var loadT = layer.msg(lan.soft.get, { icon: 16, time: 0, shade: [0.3, '#000'] });
@@ -490,25 +502,3 @@ function GetPHPInfo(version) {
         });
     });
 }
-
-
-
-// function GetPHPStatus(a) {
-//     if(a == "52") {
-//         layer.msg(lan.bt.php_status_err, {
-//             icon: 2
-//         });
-//         return
-//     }
-//     $.post("/ajax?action=GetPHPStatus", "version=" + a, function(b) {
-//         layer.open({
-//             type: 1,
-//             area: "400",
-//             title: lan.bt.php_status_title,
-//             closeBtn: 2,
-//             shift: 5,
-//             shadeClose: true,
-//             content: "<div style='margin:15px;'><table class='table table-hover table-bordered'><tr><th>"+lan.bt.php_pool+"</th><td>" + b.pool + "</td></tr><tr><th>"+lan.bt.php_manager+"</th><td>" + ((b["process manager"] == "dynamic") ? lan.bt.dynamic : lan.bt.static) + "</td></tr><tr><th>"+lan.bt.php_start+"</th><td>" + b["start time"] + "</td></tr>                      <tr><th>"+lan.bt.php_accepted+"</th><td>" + b["accepted conn"] + "</td></tr>                        <tr><th>"+lan.bt.php_queue+"</th><td>" + b["listen queue"] + "</td></tr>                        <tr><th>"+lan.bt.php_max_queue+"</th><td>" + b["max listen queue"] + "</td></tr>                        <tr><th>"+lan.bt.php_len_queue+"</th><td>" + b["listen queue len"] + "</td></tr>                        <tr><th>"+lan.bt.php_idle+"</th><td>" + b["idle processes"] + "</td></tr>                       <tr><th>"+lan.bt.php_active+"</th><td>" + b["active processes"] + "</td></tr>                       <tr><th>"+lan.bt.php_total+"</th><td>" + b["total processes"] + "</td></tr>                     <tr><th>"+lan.bt.php_max_active+"</th><td>" + b["max active processes"] + "</td></tr>                       <tr><th>"+lan.bt.php_max_children+"</th><td>" + b["max children reached"] + "</td></tr>                     <tr><th>"+lan.bt.php_slow+"</th><td>" + b["slow requests"] + "</td></tr>                     </table></div>"
-//         })
-//     })
-// }
