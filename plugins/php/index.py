@@ -333,6 +333,72 @@ def setMaxSize(version):
     return public.returnJson(True, '设置成功!')
 
 
+def getFpmConfig(version):
+
+    filefpm = getServerDir() + '/' + version + '/etc/php-fpm.d/www.conf'
+    conf = public.readFile(filefpm)
+    data = {}
+    rep = "\s*pm.max_children\s*=\s*([0-9]+)\s*"
+    tmp = re.search(rep, conf).groups()
+    data['max_children'] = tmp[0]
+
+    rep = "\s*pm.start_servers\s*=\s*([0-9]+)\s*"
+    tmp = re.search(rep, conf).groups()
+    data['start_servers'] = tmp[0]
+
+    rep = "\s*pm.min_spare_servers\s*=\s*([0-9]+)\s*"
+    tmp = re.search(rep, conf).groups()
+    data['min_spare_servers'] = tmp[0]
+
+    rep = "\s*pm.max_spare_servers \s*=\s*([0-9]+)\s*"
+    tmp = re.search(rep, conf).groups()
+    data['max_spare_servers'] = tmp[0]
+
+    rep = "\s*pm\s*=\s*(\w+)\s*"
+    tmp = re.search(rep, conf).groups()
+    data['pm'] = tmp[0]
+    return public.getJson(data)
+
+
+def setFpmConfig(version):
+    args = getArgs()
+    # if not 'max' in args:
+    #     return 'missing time args!'
+
+    version = args['version']
+    max_children = args['max_children']
+    start_servers = args['start_servers']
+    min_spare_servers = args['min_spare_servers']
+    max_spare_servers = args['max_spare_servers']
+    pm = args['pm']
+
+    file = getServerDir() + '/' + version + '/etc/php-fpm.d/www.conf'
+    conf = public.readFile(file)
+
+    rep = "\s*pm.max_children\s*=\s*([0-9]+)\s*"
+    conf = re.sub(rep, "\npm.max_children = " + max_children, conf)
+
+    rep = "\s*pm.start_servers\s*=\s*([0-9]+)\s*"
+    conf = re.sub(rep, "\npm.start_servers = " + start_servers, conf)
+
+    rep = "\s*pm.min_spare_servers\s*=\s*([0-9]+)\s*"
+    conf = re.sub(rep, "\npm.min_spare_servers = " +
+                  min_spare_servers, conf)
+
+    rep = "\s*pm.max_spare_servers \s*=\s*([0-9]+)\s*"
+    conf = re.sub(rep, "\npm.max_spare_servers = " +
+                  max_spare_servers + "\n", conf)
+
+    rep = "\s*pm\s*=\s*(\w+)\s*"
+    conf = re.sub(rep, "\npm = " + pm + "\n", conf)
+
+    public.writeFile(file, conf)
+    # public.phpReload(version)
+    public.writeLog("TYPE_PHP", 'PHP_CHILDREN', (version, max_children,
+                                                 start_servers, min_spare_servers, max_spare_servers))
+    return public.returnJson(True, '设置成功')
+
+
 if __name__ == "__main__":
 
     if len(sys.argv) < 3:
@@ -368,5 +434,9 @@ if __name__ == "__main__":
         print setMaxTime(version)
     elif func == 'set_max_size':
         print setMaxSize(version)
+    elif func == 'get_fpm_conf':
+        print getFpmConfig(version)
+    elif func == 'set_fpm_conf':
+        print setFpmConfig(version)
     else:
         print "fail"

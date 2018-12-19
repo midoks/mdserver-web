@@ -9,7 +9,7 @@
 			<p onclick="phpTimeLimitReq($('.plugin_version').attr('version'));">超时限制</p>
 			<p onclick="pluginConfig('php', $('.plugin_version').attr('version'));">配置文件</p>
 			<p onclick="redisStatus();">禁用函数</p>
-			<p onclick="redisStatus();">性能调整</p>
+			<p onclick="getFpmConfig($('.plugin_version').attr('version'));">性能调整</p>
 			<p onclick="redisStatus();">负载状况</p>
 			<p onclick="pluginLogs('php',$('.plugin_version').attr('version'),'fpm_log');">FPM日志</p>
 			<p onclick="pluginLogs('php',$('.plugin_version').attr('version'),'fpm_show_log');">慢日志</p>
