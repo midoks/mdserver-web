@@ -79,6 +79,29 @@ class site_api:
         _ret['page'] = public.getPage(_page)
         return public.getJson(_ret)
 
+    def getDomain(self, pid):
+        _list = public.M('domain').where("pid=?", (pid,)).field(
+            'id,pid,name,port,addtime').select()
+        return public.getJson(_list)
+
+    def getLogs(self, siteName):
+        logPath = public.getLogsDir() + '/' + siteName + '.log'
+        if not os.path.exists(logPath):
+            return public.returnJson(False, '日志为空')
+        return public.returnJson(True, public.getNumLines(logPath, 1000))
+
+    def getSitePhpVersion(self, siteName):
+        conf = public.readFile(
+            public.getServerDir() + '/openresty/nginx/conf/vhost/' + siteName + '.conf')
+        rep = "enable-php-([0-9]{2,3})\.conf"
+        tmp = re.search(rep, conf).groups()
+        data = {}
+        data['phpversion'] = tmp[0]
+        return public.getJson(data)
+
+    def addDomain(self, domain, webname, pid):
+        pass
+
     def getPhpVersion(self):
         phpVersions = ('00', '52', '53', '54', '55',
                        '56', '70', '71', '72', '73', '74')
@@ -138,15 +161,30 @@ class site_api:
         # 写入数据库
         pid = siteM.add('name,path,status,ps,edate,addtime',
                         (self.siteName, self.sitePath, '1', ps, '0000-00-00', public.getDate()))
+        opid = public.M('domain').where(
+            "name=?", (self.siteName,)).getField('pid')
+        if opid:
+            if public.M('sites').where('id=?', (opid,)).count():
+                return public.returnJson(False, '您添加的域名已存在!')
+            public.M('domain').where('pid=?', (opid,)).delete()
+
+        # 添加更多域名
+        for domain in siteMenu['domainlist']:
+            sdomain = domain
+            swebname = self.siteName
+            spid = str(get.pid)
+            # self.addDomain(domain, webname, pid)
+
+        public.M('domain').add('pid,name,port,addtime',
+                               (pid, self.siteName, self.sitePort, public.getDate()))
 
         self.createRootDir(self.sitePath)
-        # public.M('domain').add('pid,name,port,addtime',
-        #                        (get.pid, self.siteName, self.sitePort, public.getDate()))
 
         self.nginxAddConf()
 
         data = {}
         data['siteStatus'] = False
+        public.restartWeb()
         return public.getJson(data)
 
     def delete(self, sid, webname):

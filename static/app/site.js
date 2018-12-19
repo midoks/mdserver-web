@@ -594,15 +594,16 @@ function syncDeleteSite(dataList,successCount,errorMsg,path){
  * 域名管理
  * @param {Int} id 网站ID
  */
-function DomainEdit(id, name,msg,status) {
-	$.get('/data?action=getData&table=domain&list=True&search=' + id, function(domain) {
+function domainEdit(id, name, msg, status) {
+	$.post('/site/get_domain' ,{pid:id}, function(domain) {
+
 		var echoHtml = "";
 		for (var i = 0; i < domain.length; i++) {
 			echoHtml += "<tr><td><a title='"+lan.site.click_access+"' target='_blank' href='http://" + domain[i].name + ":" + domain[i].port + "' class='btlinkbed'>" + domain[i].name + "</a></td><td><a class='btlinkbed'>" + domain[i].port + "</a></td><td class='text-center'><a class='table-btn-del' href='javascript:;' onclick=\"delDomain(" + id + ",'" + name + "','" + domain[i].name + "','" + domain[i].port + "',1)\"><span class='glyphicon glyphicon-trash'></span></a></td></tr>";
 		}
 		var bodyHtml = "<textarea id='newdomain' class='bt-input-text' style='height: 100px; width: 340px;padding:5px 10px;line-height:20px'></textarea>\
 								<input type='hidden' id='newport' value='80' />\
-								<button type='button' class='btn btn-success btn-sm pull-right' style='margin:30px 35px 0 0' onclick=\"DomainAdd(" + id + ",'" + name + "',1)\">"+lan.public.add+"</button>\
+								<button type='button' class='btn btn-success btn-sm pull-right' style='margin:30px 35px 0 0' onclick=\"domainAdd(" + id + ",'" + name + "',1)\">"+lan.public.add+"</button>\
 							<div class='divtable mtb15' style='height:350px;overflow:auto'>\
 								<table class='table table-hover' width='100%'>\
 								<thead><tr><th>"+lan.site.domain+"</th><th width='70px'>"+lan.site.port+"</th><th width='50px' class='text-center'>"+lan.site.operate+"</th></tr></thead>\
@@ -630,11 +631,14 @@ function DomainEdit(id, name,msg,status) {
 		});
 		$("#newdomain").on("input",function(){
 			var str = $(this).val();
-			if(isChineseChar(str)) $('.btn-zhm').show();
-			else $('.btn-zhm').hide();
+			if(isChineseChar(str)) {
+				$('.btn-zhm').show();
+			} else{
+				$('.btn-zhm').hide();
+			}
 		})
 		//checkDomain();
-	});
+	},'json');
 }
 
 function DomainRoot(id, name,msg) {
@@ -654,7 +658,7 @@ function DomainRoot(id, name,msg) {
 			content: "<div class='divtable padding-10'>\
 						<textarea id='newdomain'></textarea>\
 						<input type='hidden' id='newport' value='80' />\
-						<button type='button' class='btn btn-success btn-sm pull-right' style='margin:30px 35px 0 0' onclick=\"DomainAdd(" + id + ",'" + name + "')\">添加</button>\
+						<button type='button' class='btn btn-success btn-sm pull-right' style='margin:30px 35px 0 0' onclick=\"domainAdd(" + id + ",'" + name + "')\">添加</button>\
 						<table class='table table-hover' width='100%' style='margin-bottom:0'>\
 						<thead><tr><th>"+lan.site.domain+"</th><th width='70px'>"+lan.site.port+"</th><th width='50px' class='text-center'>"+lan.site.operate+"</th></tr></thead>\
 						<tbody id='checkDomain'>" + echoHtml + "</tbody>\
@@ -731,7 +735,7 @@ function checkDomainWebsize(obj,domain){
  * @param {Int} id  网站ID
  * @param {String} webname 主域名
  */
-function DomainAdd(id, webname,type) {
+function domainAdd(id, webname,type) {
 	var Domain = $("#newdomain").val().split("\n");
 	
 	var domainlist="";
@@ -748,7 +752,7 @@ function DomainAdd(id, webname,type) {
 	var data = "domain=" + domainlist + "&webname=" + webname + "&id=" + id;
 	$.post('/site?action=AddDomain', data, function(retuls) {
 		layer.close(loadT);
-		DomainEdit(id,webname,retuls.msg,retuls.status);
+		domainEdit(id,webname,retuls.msg,retuls.status);
 	});
 }
 
@@ -773,7 +777,7 @@ function delDomain(wid, wname, domain, port,type) {
 				layer.msg(ret.msg,{icon:ret.status?1:2})
 				if(type == 1){
 					layer.close(loadT);
-					DomainEdit(wid,wname)
+					domainEdit(wid,wname)
 				}else{
 					layer.closeAll();
 					DomainRoot(wid, wname);
@@ -1019,11 +1023,10 @@ function webEdit(id,website,endTime,addtime){
 	+"<p onclick=\"ConfigFile('"+website+"')\" title='"+lan.site.site_menu_6+"'>"+lan.site.site_menu_6+"</p>"
 	+"<p onclick=\"SetSSL("+id+",'"+website+"')\" title='"+lan.site.site_menu_7+"'>"+lan.site.site_menu_7+"</p>"
 	+"<p onclick=\"PHPVersion('"+website+"')\" title='"+lan.site.site_menu_8+"'>"+lan.site.site_menu_8+"</p>"
-	+"<p onclick=\"toTomcat('"+website+"')\" title='"+lan.site.site_menu_9+"'>"+lan.site.site_menu_9+"</p>"
 	+"<p onclick=\"To301('"+website+"')\" title='"+lan.site.site_menu_10+"'>"+lan.site.site_menu_10+"</p>"
 	+"<p onclick=\"Proxy('"+website+"')\" title='"+lan.site.site_menu_12+"'>"+lan.site.site_menu_11+"</p>"
 	+"<p id='site_"+id+"' onclick=\"Security('"+id+"','"+website+"')\" title='"+lan.site.site_menu_12+"'>"+lan.site.site_menu_12+"</p>"
-	+"<p id='site_"+id+"' onclick=\"GetSiteLogs('"+website+"')\" title='查看站点请求日志'>响应日志</p>";
+	+"<p id='site_"+id+"' onclick=\"getSiteLogs('"+website+"')\" title='查看站点请求日志'>响应日志</p>";
 	layer.open({
 		type: 1,
 		area: '640px',
@@ -1032,13 +1035,13 @@ function webEdit(id,website,endTime,addtime){
 		shift: 0,
 		content: "<div class='bt-form'>"
 			+"<div class='bt-w-menu pull-left' style='height: 565px;'>"
-			+"	<p class='bgw'  onclick=\"DomainEdit(" + id + ",'" + website + "')\">"+lan.site.domain_man+"</p>"
+			+"	<p class='bgw'  onclick=\"domainEdit(" + id + ",'" + website + "')\">"+lan.site.domain_man+"</p>"
 			+"	"+eMenu+""
 			+"</div>"
 			+"<div id='webedit-con' class='bt-w-con webedit-con pd15'></div>"
 			+"</div>"
 	});
-	DomainEdit(id,website);
+	domainEdit(id,website);
 	//域名输入提示
 	var placeholder = "<div class='placeholder'>"+lan.site.domain_help+"</div>";
 	$('#newdomain').after(placeholder);
@@ -1063,9 +1066,10 @@ function webEdit(id,website,endTime,addtime){
 }
 
 //取网站日志
-function GetSiteLogs(siteName){
-	var loadT = layer.msg(lan.public.the,{icon:16,time:0,shade: [0.3, '#000']});
-	$.post('/site?action=GetSiteLogs',{siteName:siteName},function(logs){
+function getSiteLogs(siteName){
+	var loadT = layer.msg('正在处理,请稍候...',{icon:16,time:0,shade: [0.3, '#000']});
+	$.post('/site/get_logs',{siteName:siteName},function(logs){
+		console.log(logs);
 		layer.close(loadT);
 		if(logs.status !== true){
 			logs.msg = '';
@@ -1075,7 +1079,7 @@ function GetSiteLogs(siteName){
 		$("#webedit-con").html(phpCon);
 		var ob = document.getElementById('error_log');
 		ob.scrollTop = ob.scrollHeight;		
-	});
+	},'json');
 }
 
 
@@ -2080,12 +2084,13 @@ function ChangeSaveSSL(siteName){
 
 //PHP版本
 function PHPVersion(siteName){
-	$.post('/site?action=GetSitePHPVersion','siteName='+siteName,function(version){
+	$.post('/site/get_site_php_version','siteName='+siteName,function(version){
+		console.log(version);
 		if(version.status === false){
 			layer.msg(version.msg,{icon:5});
 			return;
 		}
-		$.post('/site?action=GetPHPVersion',function(rdata){
+		$.post('/site/get_php_version',function(rdata){
 			var versionSelect = "<div class='webEdit-box'>\
 									<div class='line'>\
 										<span class='tname' style='width:100px'>"+lan.site.php_ver+"</span>\
@@ -2134,8 +2139,8 @@ function PHPVersion(siteName){
 					$('#php_w').text('');
 				}
 			})
-		});
-	});
+		},'json');
+	},'json');
 }
 
 //tomcat
