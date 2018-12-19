@@ -74,10 +74,18 @@ def contentReplace(content, version):
     content = content.replace('{$PHP_VERSION}', version)
 
     if public.isAppleSystem():
-        user = public.execShell(
-            "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
-        content = content.replace('{$PHP_USER}', user)
-        content = content.replace('{$PHP_GROUP}', 'staff')
+        # user = public.execShell(
+        #     "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
+        content = content.replace('{$PHP_USER}', 'nobody')
+        content = content.replace('{$PHP_GROUP}', 'nobody')
+
+        rep = 'user\s*=\s*(.+)\r?\n'
+        val = ';user = nobody\n'
+        content = re.sub(rep, val, content)
+
+        rep = 'group\s*=\s*(.+)\r?\n'
+        val = ';group = nobody\n'
+        content = re.sub(rep, val, content)
     else:
         content = content.replace('{$PHP_USER}', 'www')
         content = content.replace('{$PHP_GROUP}', 'www')
@@ -119,8 +127,10 @@ def phpFpmWwwReplace(version):
 
     if not os.path.exists(service_php_fpm_dir):
         os.mkdir(service_php_fpm_dir)
+
+    service_php_fpmwww = service_php_fpm_dir + '/www.conf'
+    if not os.path.exists(service_php_fpmwww):
         tpl_php_fpmwww = getPluginDir() + '/conf/www.conf'
-        service_php_fpmwww = service_php_fpm_dir + '/www.conf'
         content = public.readFile(tpl_php_fpmwww)
         content = contentReplace(content, version)
         public.writeFile(service_php_fpmwww, content)
