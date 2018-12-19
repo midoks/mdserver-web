@@ -399,6 +399,15 @@ def setFpmConfig(version):
     return public.returnJson(True, '设置成功')
 
 
+def getFpmStatus(version):
+
+    result = public.httpGet(
+        'http://127.0.0.1/phpfpm_status_' + version + '?json')
+    tmp = json.loads(result)
+    fTime = time.localtime(int(tmp['start time']))
+    tmp['start time'] = time.strftime('%Y-%m-%d %H:%M:%S', fTime)
+    return public.getJson(tmp)
+
 if __name__ == "__main__":
 
     if len(sys.argv) < 3:
@@ -438,5 +447,7 @@ if __name__ == "__main__":
         print getFpmConfig(version)
     elif func == 'set_fpm_conf':
         print setFpmConfig(version)
+    elif func == 'get_fpm_status':
+        print getFpmStatus(version)
     else:
         print "fail"
