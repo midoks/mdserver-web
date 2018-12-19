@@ -194,7 +194,7 @@ def fpmLog(version):
 
 
 def fpmSlowLog(version):
-    return getServerDir() + '/' + version + '/var/log/php-fpm-slow.log'
+    return getServerDir() + '/' + version + '/var/log/www-slow.log'
 
 
 def getPhpConf(version):
