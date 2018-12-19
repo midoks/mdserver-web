@@ -454,9 +454,7 @@ def isRestart():
 
 
 def isUpdateLocalSoft():
-
     num = M('tasks').where('status!=?', ('1',)).count()
-
     if os.path.exists('mdserver-web.zip'):
         return True
 
@@ -476,7 +474,7 @@ def hasPwd(password):
     return crypt.crypt(password, password)
 
 
-def get_timeout(url):
+def getTimeout(url):
     start = time.time()
     result = httpGet(url)
     if result != 'True':
@@ -555,14 +553,6 @@ def checkToken(get):
     if get.token != tempToken['token']:
         return False
     return True
-
-
-def get_webserver():
-    # 获取Web服务器
-    webserver = 'nginx'
-    if not os.path.exists('/www/server/nginx/sbin/nginx'):
-        webserver = 'apache'
-    return webserver
 
 
 def checkInput(data):

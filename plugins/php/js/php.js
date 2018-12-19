@@ -268,6 +268,30 @@ function setFpmConfig(version){
     });
 }
 
+
+function getFpmStatus(version){
+    phpPost('get_fpm_status', version, '', function(ret_data){
+        var rdata = $.parseJSON(ret_data.data);
+        var con = "<div style='height:420px;overflow:hidden;'><table class='table table-hover table-bordered GetPHPStatus' style='margin:0;padding:0'>\
+                        <tr><th>应用池(pool)</th><td>" + rdata.pool + "</td></tr>\
+                        <tr><th>进程管理方式(process manager)</th><td>" + ((rdata['process manager'] == 'dynamic') ? '动态' : '静态') + "</td></tr>\
+                        <tr><th>启动日期(start time)</th><td>" + rdata['start time'] + "</td></tr>\
+                        <tr><th>请求数(accepted conn)</th><td>" + rdata['accepted conn'] + "</td></tr>\
+                        <tr><th>请求队列(listen queue)</th><td>" + rdata['listen queue'] + "</td></tr>\
+                        <tr><th>最大等待队列(max listen queue)</th><td>" + rdata['max listen queue'] + "</td></tr>\
+                        <tr><th>socket队列长度(listen queue len)</th><td>" + rdata['listen queue len'] + "</td></tr>\
+                        <tr><th>空闲进程数量(idle processes)</th><td>" + rdata['idle processes'] + "</td></tr>\
+                        <tr><th>活跃进程数量(active processes)</th><td>" + rdata['active processes'] + "</td></tr>\
+                        <tr><th>总进程数量(total processes)</th><td>" + rdata['total processes'] + "</td></tr>\
+                        <tr><th>最大活跃进程数量(max active processes)</th><td>" + rdata['max active processes'] + "</td></tr>\
+                        <tr><th>到达进程上限次数(max children reached)</th><td>" + rdata['max children reached'] + "</td></tr>\
+                        <tr><th>慢请求数量(slow requests)</th><td>" + rdata['slow requests'] + "</td></tr>\
+                     </table></div>";
+        $(".soft-man-con").html(con);
+        $(".GetPHPStatus td,.GetPHPStatus th").css("padding", "7px");
+    });
+}
+
 //设置PATHINFO
 function setPathInfo(version, type) {
     var loadT = layer.msg(lan.public.the, { icon: 16, time: 0, shade: [0.3, '#000'] });
@@ -467,29 +491,6 @@ function GetPHPInfo(version) {
     });
 }
 
-
-//查看PHP负载状态
-function GetPHPStatus(version) {
-    $.post('/ajax?action=GetPHPStatus', 'version=' + version, function(rdata) {
-        var con = "<div style='height:420px;overflow:hidden;'><table class='table table-hover table-bordered GetPHPStatus' style='margin:0;padding:0'>\
-						<tr><th>" + lan.bt.php_pool + "</th><td>" + rdata.pool + "</td></tr>\
-						<tr><th>" + lan.bt.php_manager + "</th><td>" + ((rdata['process manager'] == 'dynamic') ? lan.bt.dynamic : lan.bt.static) + "</td></tr>\
-						<tr><th>" + lan.bt.php_start + "</th><td>" + rdata['start time'] + "</td></tr>\
-						<tr><th>" + lan.bt.php_accepted + "</th><td>" + rdata['accepted conn'] + "</td></tr>\
-						<tr><th>" + lan.bt.php_queue + "</th><td>" + rdata['listen queue'] + "</td></tr>\
-						<tr><th>" + lan.bt.php_max_queue + "</th><td>" + rdata['max listen queue'] + "</td></tr>\
-						<tr><th>" + lan.bt.php_len_queue + "</th><td>" + rdata['listen queue len'] + "</td></tr>\
-						<tr><th>" + lan.bt.php_idle + "</th><td>" + rdata['idle processes'] + "</td></tr>\
-						<tr><th>" + lan.bt.php_active + "</th><td>" + rdata['active processes'] + "</td></tr>\
-						<tr><th>" + lan.bt.php_total + "</th><td>" + rdata['total processes'] + "</td></tr>\
-						<tr><th>" + lan.bt.php_max_active + "</th><td>" + rdata['max active processes'] + "</td></tr>\
-						<tr><th>" + lan.bt.php_max_children + "</th><td>" + rdata['max children reached'] + "</td></tr>\
-						<tr><th>" + lan.bt.php_slow + "</th><td>" + rdata['slow requests'] + "</td></tr>\
-					 </table></div>";
-        $(".soft-man-con").html(con);
-        $(".GetPHPStatus td,.GetPHPStatus th").css("padding", "7px");
-    })
-}
 
 
 // function GetPHPStatus(a) {
