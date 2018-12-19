@@ -165,8 +165,8 @@ def returnJson(status, msg, args=()):
 
 def returnMsg(status, msg, args=()):
     # 取通用字曲返回
-    logMessage = json.loads(
-        readFile('static/language/' + getLanguage() + '/public.json'))
+    pjson = 'static/language/' + getLanguage() + '/public.json'
+    logMessage = json.loads(readFile(pjson))
     keys = logMessage.keys()
 
     if msg in keys:

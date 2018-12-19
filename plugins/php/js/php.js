@@ -141,6 +141,133 @@ function setPHPMaxSize(version) {
 }
 
 
+function getFpmConfig(version){
+    phpPost('get_fpm_conf', version, {}, function(data){
+        // console.log(data);
+        var rdata = $.parseJSON(data.data);
+        // console.log(rdata);
+        var limitList = "<option value='0'>自定义</option>" +
+            "<option value='1' " + (rdata.max_children == 30 ? 'selected' : '') + ">30并发</option>" +
+            "<option value='2' " + (rdata.max_children == 50 ? 'selected' : '') + ">50并发</option>" +
+            "<option value='3' " + (rdata.max_children == 100 ? 'selected' : '') + ">100并发</option>" +
+            "<option value='4' " + (rdata.max_children == 200 ? 'selected' : '') + ">200并发</option>" +
+            "<option value='5' " + (rdata.max_children == 300 ? 'selected' : '') + ">300并发</option>" +
+            "<option value='6' " + (rdata.max_children == 500 ? 'selected' : '') + ">500并发</option>"
+        var pms = [{ 'name': 'static', 'title': '静态' }, { 'name': 'dynamic', 'title': '动态' }];
+        var pmList = '';
+        for (var i = 0; i < pms.length; i++) {
+            pmList += '<option value="' + pms[i].name + '" ' + ((pms[i].name == rdata.pm) ? 'selected' : '') + '>' + pms[i].title + '</option>';
+        }
+        var body = "<div class='bingfa'>" +
+            "<p class='line'><span class='span_tit'>并发方案：</span><select class='bt-input-text' name='limit' style='width:100px;'>" + limitList + "</select></p>" +
+            "<p class='line'><span class='span_tit'>运行模式：</span><select class='bt-input-text' name='pm' style='width:100px;'>" + pmList + "</select><span class='c9'>*PHP-FPM运行模式</span></p>" +
+            "<p class='line'><span class='span_tit'>max_children：</span><input class='bt-input-text' type='number' name='max_children' value='" + rdata.max_children + "' /><span class='c9'>*允许创建的最大子进程数</span></p>" +
+            "<p class='line'><span class='span_tit'>start_servers：</span><input class='bt-input-text' type='number' name='start_servers' value='" + rdata.start_servers + "' />  <span class='c9'>*起始进程数（服务启动后初始进程数量）</span></p>" +
+            "<p class='line'><span class='span_tit'>min_spare_servers：</span><input class='bt-input-text' type='number' name='min_spare_servers' value='" + rdata.min_spare_servers + "' />   <span class='c9'>*最小空闲进程数（清理空闲进程后的保留数量）</span></p>" +
+            "<p class='line'><span class='span_tit'>max_spare_servers：</span><input class='bt-input-text' type='number' name='max_spare_servers' value='" + rdata.max_spare_servers + "' />   <span class='c9'>*最大空闲进程数（当空闲进程达到此值时清理）</span></p>" +
+            "<div class='mtb15'><button class='btn btn-success btn-sm' onclick='setFpmConfig(\"" + version + "\",1)'>保存</button></div>" +
+            "</div>";
+
+        $(".soft-man-con").html(body);
+        $("select[name='limit']").change(function() {
+            var type = $(this).val();
+            var max_children = rdata.max_children;
+            var start_servers = rdata.start_servers;
+            var min_spare_servers = rdata.min_spare_servers;
+            var max_spare_servers = rdata.max_spare_servers;
+            switch (type) {
+                case '1':
+                    max_children = 30;
+                    start_servers = 5;
+                    min_spare_servers = 5;
+                    max_spare_servers = 20;
+                    break;
+                case '2':
+                    max_children = 50;
+                    start_servers = 15;
+                    min_spare_servers = 15;
+                    max_spare_servers = 35;
+                    break;
+                case '3':
+                    max_children = 100;
+                    start_servers = 20;
+                    min_spare_servers = 20;
+                    max_spare_servers = 70;
+                    break;
+                case '4':
+                    max_children = 200;
+                    start_servers = 25;
+                    min_spare_servers = 25;
+                    max_spare_servers = 150;
+                    break;
+                case '5':
+                    max_children = 300;
+                    start_servers = 30;
+                    min_spare_servers = 30;
+                    max_spare_servers = 180;
+                    break;
+                case '6':
+                    max_children = 500;
+                    start_servers = 35;
+                    min_spare_servers = 35;
+                    max_spare_servers = 250;
+                    break;
+            }
+
+            $("input[name='max_children']").val(max_children);
+            $("input[name='start_servers']").val(start_servers);
+            $("input[name='min_spare_servers']").val(min_spare_servers);
+            $("input[name='max_spare_servers']").val(max_spare_servers);
+        });
+    });
+}
+
+function setFpmConfig(version){
+    var max_children = Number($("input[name='max_children']").val());
+    var start_servers = Number($("input[name='start_servers']").val());
+    var min_spare_servers = Number($("input[name='min_spare_servers']").val());
+    var max_spare_servers = Number($("input[name='max_spare_servers']").val());
+    var pm = $("select[name='pm']").val();
+
+    if (max_children < max_spare_servers) {
+        layer.msg('max_spare_servers 不能大于 max_children', { icon: 2 });
+        return;
+    }
+
+    if (min_spare_servers > start_servers) {
+        layer.msg('min_spare_servers 不能大于 start_servers', { icon: 2 });
+        return;
+    }
+
+    if (max_spare_servers < min_spare_servers) {
+        layer.msg('min_spare_servers 不能大于 max_spare_servers', { icon: 2 });
+        return;
+    }
+
+    if (max_children < start_servers) {
+        layer.msg('start_servers 不能大于 max_children', { icon: 2 });
+        return;
+    }
+
+    if (max_children < 1 || start_servers < 1 || min_spare_servers < 1 || max_spare_servers < 1) {
+        layer.msg('配置值不能小于1', { icon: 2 });
+        return;
+    }
+
+    var data = {
+        version:version,
+        max_children:max_children,
+        start_servers:start_servers,
+        min_spare_servers:min_spare_servers,
+        max_spare_servers:max_spare_servers,
+        pm:pm,
+    };
+    phpPost('set_fpm_conf', version, data, function(ret_data){
+        var rdata = $.parseJSON(ret_data.data);
+        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+    });
+}
+
 //设置PATHINFO
 function setPathInfo(version, type) {
     var loadT = layer.msg(lan.public.the, { icon: 16, time: 0, shade: [0.3, '#000'] });
@@ -317,137 +444,7 @@ function disable_functions(version, act, fs) {
         disFun(version);
     });
 }
-//性能调整
-function SetFpmConfig(version, action) {
-    if (action == 1) {
-        $.post('/system?action=GetMemInfo', '', function(memInfo) {
-            var limit_children = parseInt(memInfo['memTotal'] / 8);
-            var max_children = Number($("input[name='max_children']").val());
-            var start_servers = Number($("input[name='start_servers']").val());
-            var min_spare_servers = Number($("input[name='min_spare_servers']").val());
-            var max_spare_servers = Number($("input[name='max_spare_servers']").val());
-            var pm = $("select[name='pm']").val();
 
-            if (limit_children < max_children) {
-                layer.msg('当前服务器内存不足，最大允许[' + limit_children + ']个子进程!', { icon: 2 });
-                $("input[name='max_children']").focus();
-                return;
-            }
-
-            if (max_children < max_spare_servers) {
-                layer.msg(lan.soft.php_fpm_err1, { icon: 2 });
-                return;
-            }
-
-            if (min_spare_servers > start_servers) {
-                layer.msg(lan.soft.php_fpm_err2, { icon: 2 });
-                return;
-            }
-
-            if (max_spare_servers < min_spare_servers) {
-                layer.msg(lan.soft.php_fpm_err3, { icon: 2 });
-                return;
-            }
-
-            if (max_children < start_servers) {
-                layer.msg(lan.soft.php_fpm_err4, { icon: 2 });
-                return;
-            }
-
-            if (max_children < 1 || start_servers < 1 || min_spare_servers < 1 || max_spare_servers < 1) {
-                layer.msg(lan.soft.php_fpm_err5, { icon: 2 });
-                return;
-            }
-            var data = 'version=' + version + '&max_children=' + max_children + '&start_servers=' + start_servers + '&min_spare_servers=' + min_spare_servers + '&max_spare_servers=' + max_spare_servers + '&pm=' + pm;
-            var loadT = layer.msg(lan.public.the, { icon: 16, time: 0, shade: [0.3, '#000'] });
-            $.post('/config?action=setFpmConfig', data, function(rdata) {
-                layer.close(loadT);
-                var loadT = layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
-            }).error(function() {
-                layer.close(loadT);
-                layer.msg(lan.public.config_ok, { icon: 1 });
-            });
-        });
-        return;
-    }
-
-    $.post('/config?action=getFpmConfig', 'version=' + version, function(rdata) {
-
-        var limitList = "<option value='0'>" + lan.soft.concurrency_m + "</option>" +
-            "<option value='1' " + (rdata.max_children == 30 ? 'selected' : '') + ">30" + lan.soft.concurrency + "</option>" +
-            "<option value='2' " + (rdata.max_children == 50 ? 'selected' : '') + ">50" + lan.soft.concurrency + "</option>" +
-            "<option value='3' " + (rdata.max_children == 100 ? 'selected' : '') + ">100" + lan.soft.concurrency + "</option>" +
-            "<option value='4' " + (rdata.max_children == 200 ? 'selected' : '') + ">200" + lan.soft.concurrency + "</option>" +
-            "<option value='5' " + (rdata.max_children == 300 ? 'selected' : '') + ">300" + lan.soft.concurrency + "</option>" +
-            "<option value='6' " + (rdata.max_children == 500 ? 'selected' : '') + ">500" + lan.soft.concurrency + "</option>"
-        var pms = [{ 'name': 'static', 'title': lan.bt.static }, { 'name': 'dynamic', 'title': lan.bt.dynamic }];
-        var pmList = '';
-        for (var i = 0; i < pms.length; i++) {
-            pmList += '<option value="' + pms[i].name + '" ' + ((pms[i].name == rdata.pm) ? 'selected' : '') + '>' + pms[i].title + '</option>';
-        }
-        var body = "<div class='bingfa'>" +
-            "<p class='line'><span class='span_tit'>" + lan.soft.concurrency_type + "：</span><select class='bt-input-text' name='limit' style='width:100px;'>" + limitList + "</select></p>" +
-            "<p class='line'><span class='span_tit'>" + lan.soft.php_fpm_model + "：</span><select class='bt-input-text' name='pm' style='width:100px;'>" + pmList + "</select><span class='c9'>*" + lan.soft.php_fpm_ps1 + "</span></p>" +
-            "<p class='line'><span class='span_tit'>max_children：</span><input class='bt-input-text' type='number' name='max_children' value='" + rdata.max_children + "' /><span class='c9'>*" + lan.soft.php_fpm_ps2 + "</span></p>" +
-            "<p class='line'><span class='span_tit'>start_servers：</span><input class='bt-input-text' type='number' name='start_servers' value='" + rdata.start_servers + "' />  <span class='c9'>*" + lan.soft.php_fpm_ps3 + "</span></p>" +
-            "<p class='line'><span class='span_tit'>min_spare_servers：</span><input class='bt-input-text' type='number' name='min_spare_servers' value='" + rdata.min_spare_servers + "' />   <span class='c9'>*" + lan.soft.php_fpm_ps4 + "</span></p>" +
-            "<p class='line'><span class='span_tit'>max_spare_servers：</span><input class='bt-input-text' type='number' name='max_spare_servers' value='" + rdata.max_spare_servers + "' />   <span class='c9'>*" + lan.soft.php_fpm_ps5 + "</span></p>" +
-            "<div class='mtb15'><button class='btn btn-success btn-sm' onclick='SetFpmConfig(\"" + version + "\",1)'>" + lan.public.save + "</button></div>" +
-            "</div>"
-
-        $(".soft-man-con").html(body);
-        $("select[name='limit']").change(function() {
-            var type = $(this).val();
-            var max_children = rdata.max_children;
-            var start_servers = rdata.start_servers;
-            var min_spare_servers = rdata.min_spare_servers;
-            var max_spare_servers = rdata.max_spare_servers;
-            switch (type) {
-                case '1':
-                    max_children = 30;
-                    start_servers = 5;
-                    min_spare_servers = 5;
-                    max_spare_servers = 20;
-                    break;
-                case '2':
-                    max_children = 50;
-                    start_servers = 15;
-                    min_spare_servers = 15;
-                    max_spare_servers = 35;
-                    break;
-                case '3':
-                    max_children = 100;
-                    start_servers = 20;
-                    min_spare_servers = 20;
-                    max_spare_servers = 70;
-                    break;
-                case '4':
-                    max_children = 200;
-                    start_servers = 25;
-                    min_spare_servers = 25;
-                    max_spare_servers = 150;
-                    break;
-                case '5':
-                    max_children = 300;
-                    start_servers = 30;
-                    min_spare_servers = 30;
-                    max_spare_servers = 180;
-                    break;
-                case '6':
-                    max_children = 500;
-                    start_servers = 35;
-                    min_spare_servers = 35;
-                    max_spare_servers = 250;
-                    break;
-            }
-
-            $("input[name='max_children']").val(max_children);
-            $("input[name='start_servers']").val(start_servers);
-            $("input[name='min_spare_servers']").val(min_spare_servers);
-            $("input[name='max_spare_servers']").val(max_spare_servers);
-        });
-    });
-}
 
 //phpinfo
 function BtPhpinfo(version) {
@@ -495,24 +492,22 @@ function GetPHPStatus(version) {
 }
 
 
-
-
-function GetPHPStatus(a) {
-    if(a == "52") {
-        layer.msg(lan.bt.php_status_err, {
-            icon: 2
-        });
-        return
-    }
-    $.post("/ajax?action=GetPHPStatus", "version=" + a, function(b) {
-        layer.open({
-            type: 1,
-            area: "400",
-            title: lan.bt.php_status_title,
-            closeBtn: 2,
-            shift: 5,
-            shadeClose: true,
-            content: "<div style='margin:15px;'><table class='table table-hover table-bordered'><tr><th>"+lan.bt.php_pool+"</th><td>" + b.pool + "</td></tr><tr><th>"+lan.bt.php_manager+"</th><td>" + ((b["process manager"] == "dynamic") ? lan.bt.dynamic : lan.bt.static) + "</td></tr><tr><th>"+lan.bt.php_start+"</th><td>" + b["start time"] + "</td></tr>                      <tr><th>"+lan.bt.php_accepted+"</th><td>" + b["accepted conn"] + "</td></tr>                        <tr><th>"+lan.bt.php_queue+"</th><td>" + b["listen queue"] + "</td></tr>                        <tr><th>"+lan.bt.php_max_queue+"</th><td>" + b["max listen queue"] + "</td></tr>                        <tr><th>"+lan.bt.php_len_queue+"</th><td>" + b["listen queue len"] + "</td></tr>                        <tr><th>"+lan.bt.php_idle+"</th><td>" + b["idle processes"] + "</td></tr>                       <tr><th>"+lan.bt.php_active+"</th><td>" + b["active processes"] + "</td></tr>                       <tr><th>"+lan.bt.php_total+"</th><td>" + b["total processes"] + "</td></tr>                     <tr><th>"+lan.bt.php_max_active+"</th><td>" + b["max active processes"] + "</td></tr>                       <tr><th>"+lan.bt.php_max_children+"</th><td>" + b["max children reached"] + "</td></tr>                     <tr><th>"+lan.bt.php_slow+"</th><td>" + b["slow requests"] + "</td></tr>                     </table></div>"
-        })
-    })
-}
+// function GetPHPStatus(a) {
+//     if(a == "52") {
+//         layer.msg(lan.bt.php_status_err, {
+//             icon: 2
+//         });
+//         return
+//     }
+//     $.post("/ajax?action=GetPHPStatus", "version=" + a, function(b) {
+//         layer.open({
+//             type: 1,
+//             area: "400",
+//             title: lan.bt.php_status_title,
+//             closeBtn: 2,
+//             shift: 5,
+//             shadeClose: true,
+//             content: "<div style='margin:15px;'><table class='table table-hover table-bordered'><tr><th>"+lan.bt.php_pool+"</th><td>" + b.pool + "</td></tr><tr><th>"+lan.bt.php_manager+"</th><td>" + ((b["process manager"] == "dynamic") ? lan.bt.dynamic : lan.bt.static) + "</td></tr><tr><th>"+lan.bt.php_start+"</th><td>" + b["start time"] + "</td></tr>                      <tr><th>"+lan.bt.php_accepted+"</th><td>" + b["accepted conn"] + "</td></tr>                        <tr><th>"+lan.bt.php_queue+"</th><td>" + b["listen queue"] + "</td></tr>                        <tr><th>"+lan.bt.php_max_queue+"</th><td>" + b["max listen queue"] + "</td></tr>                        <tr><th>"+lan.bt.php_len_queue+"</th><td>" + b["listen queue len"] + "</td></tr>                        <tr><th>"+lan.bt.php_idle+"</th><td>" + b["idle processes"] + "</td></tr>                       <tr><th>"+lan.bt.php_active+"</th><td>" + b["active processes"] + "</td></tr>                       <tr><th>"+lan.bt.php_total+"</th><td>" + b["total processes"] + "</td></tr>                     <tr><th>"+lan.bt.php_max_active+"</th><td>" + b["max active processes"] + "</td></tr>                       <tr><th>"+lan.bt.php_max_children+"</th><td>" + b["max children reached"] + "</td></tr>                     <tr><th>"+lan.bt.php_slow+"</th><td>" + b["slow requests"] + "</td></tr>                     </table></div>"
+//         })
+//     })
+// }
