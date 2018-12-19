@@ -49,6 +49,13 @@ def getSitePhpVersion():
     return site_api.site_api().getSitePhpVersion(siteName)
 
 
+@site.route('get_host_conf', methods=['POST'])
+def getHostConf():
+    siteName = request.form.get('siteName', '').encode('utf-8')
+    host = site_api.site_api().getHostConf(siteName)
+    return public.getJson({'host': host})
+
+
 @site.route('get_root_dir', methods=['POST'])
 def getRootDir():
     data = {}

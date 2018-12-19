@@ -91,13 +91,15 @@ class site_api:
         return public.returnJson(True, public.getNumLines(logPath, 1000))
 
     def getSitePhpVersion(self, siteName):
-        conf = public.readFile(
-            public.getServerDir() + '/openresty/nginx/conf/vhost/' + siteName + '.conf')
+        conf = public.readFile(self.getHostConf(siteName))
         rep = "enable-php-([0-9]{2,3})\.conf"
         tmp = re.search(rep, conf).groups()
         data = {}
         data['phpversion'] = tmp[0]
         return public.getJson(data)
+
+    def getHostConf(self, siteName):
+        return public.getServerDir() + '/openresty/nginx/conf/vhost/' + siteName + '.conf'
 
     def addDomain(self, domain, webname, pid):
         pass
