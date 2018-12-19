@@ -70,6 +70,7 @@ def status(version):
 
 def contentReplace(content, version):
     service_path = public.getServerDir()
+    content = content.replace('{$ROOT_PATH}', public.getRootDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$PHP_VERSION}', version)
 
@@ -453,6 +454,29 @@ def setDisableFunc(version):
     return public.returnJson(True, '设置成功!')
 
 
+def checkPhpinfoFile(version):
+    if public.isInstalledWeb():
+        desc_file = public.getServerDir(
+        ) + '/openresty/nginx/conf/php_status/phpinfo_' + version + '.conf'
+        if not os.path.exists(desc_file):
+            tpl = getPluginDir() + '/conf/phpinfo.conf'
+            content = public.readFile(tpl)
+            content = contentReplace(content, version)
+            public.writeFile(desc_file, content)
+            public.restartWeb()
+
+
+def getPhpinfo(version):
+    checkPhpinfoFile(version)
+    sPath = public.getRootDir() + '/phpinfo/' + version
+    public.execShell("rm -rf " + public.getRootDir() + '/phpinfo')
+    public.execShell("mkdir -p " + sPath)
+    public.writeFile(sPath + '/phpinfo.php', '<?php phpinfo(); ?>')
+    phpinfo = public.httpGet('http://127.0.0.1/' + version + '/phpinfo.php')
+    os.system("rm -rf " + public.getRootDir() + '/phpinfo')
+    return phpinfo
+
+
 def getLibConf(version):
     fname = public.getServerDir() + '/php/' + version + '/etc/php.ini'
     if not os.path.exists(filename):
@@ -520,6 +544,8 @@ if __name__ == "__main__":
         print getDisableFunc(version)
     elif func == 'set_disable_func':
         print setDisableFunc(version)
+    elif func == 'get_phpinfo':
+        print getPhpinfo(version)
     elif func == 'get_lib_conf':
         print getLibConf(version)
     else:

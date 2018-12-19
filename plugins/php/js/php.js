@@ -359,6 +359,27 @@ function setDisableFunc(version, act, fs) {
 }
 
 
+//phpinfo
+function getPhpinfo(version) {
+    var con = '<button class="btn btn-default btn-sm" onclick="getPHPInfo(\'' + version + '\')">' + lan.soft.phpinfo + '</button>';
+    $(".soft-man-con").html(con);
+}
+
+//获取PHPInfo
+function getPHPInfo(version) {
+    phpPost('get_phpinfo', version, '', function(data){
+        var rdata = data.data;
+        layer.open({
+            type: 1,
+            title: "PHP-" + version + "-PHPINFO",
+            area: ['90%', '90%'],
+            closeBtn: 2,
+            shadeClose: true,
+            content: rdata
+        });
+    });
+}
+
 function phpLibConfig(version){
     
 }
@@ -477,28 +498,6 @@ function UninstallPHPLib(version, name, title, pathinfo) {
             layer.close(loadT);
             layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
             SetPHPConfig(version, pathinfo, true);
-        });
-    });
-}
-
-//phpinfo
-function BtPhpinfo(version) {
-    var con = '<button class="btn btn-default btn-sm" onclick="GetPHPInfo(\'' + version + '\')">' + lan.soft.phpinfo + '</button>';
-    $(".soft-man-con").html(con);
-}
-
-//获取PHPInfo
-function GetPHPInfo(version) {
-    var loadT = layer.msg(lan.soft.get, { icon: 16, time: 0, shade: [0.3, '#000'] });
-    $.get('/ajax?action=GetPHPInfo&version=' + version, function(rdata) {
-        layer.close(loadT);
-        layer.open({
-            type: 1,
-            title: "PHP-" + version + "-PHPINFO",
-            area: ['70%', '90%'],
-            closeBtn: 2,
-            shadeClose: true,
-            content: rdata.replace('a:link {color: #009; text-decoration: none; background-color: #fff;}', '').replace('a:link {color: #000099; text-decoration: none; background-color: #ffffff;}', '')
         });
     });
 }
