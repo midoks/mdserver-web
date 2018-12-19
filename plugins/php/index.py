@@ -393,7 +393,7 @@ def setFpmConfig(version):
     conf = re.sub(rep, "\npm = " + pm + "\n", conf)
 
     public.writeFile(file, conf)
-    # public.phpReload(version)
+    reload(version)
     public.writeLog("TYPE_PHP", 'PHP_CHILDREN', (version, max_children,
                                                  start_servers, min_spare_servers, max_spare_servers))
     return public.returnJson(True, '设置成功')
@@ -413,13 +413,67 @@ def checkFpmStatusFile(version):
 
 def getFpmStatus(version):
     checkFpmStatusFile(version)
-
     result = public.httpGet(
         'http://127.0.0.1/phpfpm_status_' + version + '?json')
     tmp = json.loads(result)
     fTime = time.localtime(int(tmp['start time']))
     tmp['start time'] = time.strftime('%Y-%m-%d %H:%M:%S', fTime)
     return public.getJson(tmp)
+
+
+def getDisableFunc(version):
+    filename = public.getServerDir() + '/php/' + version + '/etc/php.ini'
+    if not os.path.exists(filename):
+        return public.returnJson(False, '指定PHP版本不存在!')
+
+    phpini = public.readFile(filename)
+    data = {}
+    rep = "disable_functions\s*=\s{0,1}(.*)\n"
+    tmp = re.search(rep, phpini).groups()
+    data['disable_functions'] = tmp[0]
+    return public.getJson(data)
+
+
+def setDisableFunc(version):
+    filename = public.getServerDir() + '/php/' + version + '/etc/php.ini'
+    if not os.path.exists(filename):
+        return public.returnJson(False, '指定PHP版本不存在!')
+
+    args = getArgs()
+    disable_functions = args['disable_functions']
+
+    phpini = public.readFile(filename)
+    rep = "disable_functions\s*=\s*.*\n"
+    phpini = re.sub(rep, 'disable_functions = ' +
+                    disable_functions + "\n", phpini)
+    public.writeLog('TYPE_PHP', 'PHP_DISABLE_FUNCTION',
+                    (version, disable_functions))
+    public.writeFile(filename, phpini)
+    reload(version)
+    return public.returnJson(True, '设置成功!')
+
+
+def getLibConf(version):
+    fname = public.getServerDir() + '/php/' + version + '/etc/php.ini'
+    if not os.path.exists(filename):
+        return public.returnJson(False, '指定PHP版本不存在!')
+
+    data = {}
+    rep = "disable_functions\s*=\s{0,1}(.*)\n"
+    tmp = re.search(rep, phpini).groups()
+    data['disable_functions'] = tmp[0]
+
+    rep = "upload_max_filesize\s*=\s*([0-9]+)(M|m|K|k)"
+    tmp = re.search(rep, phpini).groups()
+    data['max'] = tmp[0]
+
+    rep = ur"\n;*\s*cgi\.fix_pathinfo\s*=\s*([0-9]+)\s*\n"
+    tmp = re.search(rep, phpini).groups()
+    if tmp[0] == '0':
+        data['pathinfo'] = False
+    else:
+        data['pathinfo'] = True
+    return public.getJson(data)
 
 if __name__ == "__main__":
 
@@ -462,5 +516,11 @@ if __name__ == "__main__":
         print setFpmConfig(version)
     elif func == 'get_fpm_status':
         print getFpmStatus(version)
+    elif func == 'get_disable_func':
+        print getDisableFunc(version)
+    elif func == 'set_disable_func':
+        print setDisableFunc(version)
+    elif func == 'get_lib_conf':
+        print getLibConf(version)
     else:
         print "fail"
