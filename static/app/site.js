@@ -997,7 +997,7 @@ function webEdit(id,website,endTime,addtime){
 	+"<p onclick=\"phpVersion('"+website+"')\" title='PHP版本'>PHP版本</p>"
 	+"<p onclick=\"To301('"+website+"')\" title='"+lan.site.site_menu_10+"'>"+lan.site.site_menu_10+"</p>"
 	+"<p onclick=\"Proxy('"+website+"')\" title='"+lan.site.site_menu_12+"'>"+lan.site.site_menu_11+"</p>"
-	+"<p id='site_"+id+"' onclick=\"Security('"+id+"','"+website+"')\" title='"+lan.site.site_menu_12+"'>"+lan.site.site_menu_12+"</p>"
+	+"<p id='site_"+id+"' onclick=\"security('"+id+"','"+website+"')\" title='"+lan.site.site_menu_12+"'>"+lan.site.site_menu_12+"</p>"
 	+"<p id='site_"+id+"' onclick=\"getSiteLogs('"+website+"')\" title='查看站点请求日志'>响应日志</p>";
 	layer.open({
 		type: 1,
@@ -1056,14 +1056,14 @@ function getSiteLogs(siteName){
 
 
 //防盗链
-function Security(id,name){
+function security(id,name){
 	var loadT = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});
-	$.post('/site?action=GetSecurity',{id:id,name:name},function(rdata){
+	$.post('/site/get_security',{id:id,name:name},function(rdata){
 		layer.close(loadT);
 		var mbody = '<div>'
 					+'<p style="margin-bottom:8px"><span style="display: inline-block; width: 60px;">URL后缀</span><input class="bt-input-text" type="text" name="sec_fix" value="'+rdata.fix+'" style="margin-left: 5px;width: 425px;height: 30px;margin-right:10px;'+(rdata.status?'background-color: #eee;':'')+'" placeholder="多个请用逗号隔开,例：png,jpeg,jpg,gif,zip" '+(rdata.status?'readonly':'')+'></p>'
 					+'<p style="margin-bottom:8px"><span style="display: inline-block; width: 60px;">许可域名</span><input class="bt-input-text" type="text" name="sec_domains" value="'+rdata.domains+'" style="margin-left: 5px;width: 425px;height: 30px;margin-right:10px;'+(rdata.status?'background-color: #eee;':'')+'" placeholder="支持通配符,多个域名请用逗号隔开,例：*.test.com,test.com" '+(rdata.status?'readonly':'')+'></p>'
-					+'<div class="label-input-group ptb10"><label style="font-weight:normal"><input type="checkbox" name="sec_status" onclick="SetSecurity(\''+name+'\','+id+')" '+(rdata.status?'checked':'')+'>启用防盗链</label></div>'
+					+'<div class="label-input-group ptb10"><label style="font-weight:normal"><input type="checkbox" name="sec_status" onclick="setSecurity(\''+name+'\','+id+')" '+(rdata.status?'checked':'')+'>启用防盗链</label></div>'
 					+'<ul class="help-info-text c7 ptb10">'
 						+'<li>默认允许资源被直接访问,即不限制HTTP_REFERER为空的请求</li>'
 						+'<li>多个URL后缀与域名请使用逗号(,)隔开,如: png,jpeg,zip,js</li>'
@@ -1071,11 +1071,11 @@ function Security(id,name){
 					+'</ul>'
 				+'</div>'
 		$("#webedit-con").html(mbody);
-	});
+	},'json');
 }
 
 //设置防盗链
-function SetSecurity(name,id){
+function setSecurity(name,id){
 	var data = {
 		fix:$("input[name='sec_fix']").val(),
 		domains:$("input[name='sec_domains']").val(),
@@ -1084,11 +1084,11 @@ function SetSecurity(name,id){
 		id:id
 	}
 	var loadT = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});
-	$.post('/site?action=SetSecurity',data,function(rdata){
+	$.post('/site/set_security',data,function(rdata){
 		layer.close(loadT);
 		layer.msg(rdata.msg,{icon:rdata.status?1:2});
 		if(rdata.status) setTimeout(function(){Security(id,name);},1000);
-	});
+	},'json');
 }
 
 

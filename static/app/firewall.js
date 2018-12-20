@@ -11,17 +11,12 @@ setTimeout(function(){
 },1500);
 
 
-function closeLogs(){
-	$.post('/files?action=CloseLogs','',function(rdata){
-		$("#logSize").html(rdata.msg);
-		layer.msg(lan.firewall.empty,{icon:1});
-	},'json');
-}
+
 	
 $(function(){
+	// start 
 	$.post('/firewall/get_www_path',function(data){
-
-		var html ='<span>Web日志:</span><a href="javascript:openPath(\''+data['path']+'\');">'+data['path']+'</a>\
+		var html ='<span>Web日志:</span><a href="javascript:openPath(\''+data['path']+'\');">点击进入目录</a>\
 				<em id="logSize">0KB</em>\
 				<button class="btn btn-default btn-sm" onclick="closeLogs();">清空</button>';
 		$('#firewall_weblog').html(html);
@@ -30,7 +25,15 @@ $(function(){
 			$("#logSize").html(rdata.msg);
 		},'json');
 	},'json');
+	// end
 });
+
+function closeLogs(){
+	$.post('/files?action=CloseLogs','',function(rdata){
+		$("#logSize").html(rdata.msg);
+		layer.msg(lan.firewall.empty,{icon:1});
+	},'json');
+}
 
 $("#firewalldType").change(function(){
 	var type = $(this).val();
