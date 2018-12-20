@@ -252,7 +252,7 @@ class site_api:
 
     def nginxAddConf(self):
         source_tpl = public.getRunDir() + '/data/tpl/nginx.conf'
-        desc_file = self.setupPath + '/openresty/nginx/conf/vhost/' + self.siteName + '.conf'
+        vhost_file = self.setupPath + '/openresty/nginx/conf/vhost/' + self.siteName + '.conf'
         content = public.readFile(source_tpl)
 
         content = content.replace('{$PORT}', self.sitePort)
@@ -265,7 +265,11 @@ class site_api:
 
         logsPath = public.getLogsDir()
         content = content.replace('{$LOGPATH}', logsPath)
-        public.writeFile(desc_file, content)
+        public.writeFile(vhost_file, content)
+
+        rewrite_file = self.setupPath + \
+            '/openresty/nginx/conf/rewrite/' + self.siteName + '.conf'
+        public.writeFile(rewrite_file, '')
 
     def add(self, webname, port, ps, path, version):
 
@@ -312,9 +316,14 @@ class site_api:
 
     def delete(self, sid, webname):
 
-        confPath = self.setupPath + '/openresty/nginx/conf/vhost/' + webname + '.conf'
-        if os.path.exists(confPath):
-            os.remove(confPath)
+        confFile = self.setupPath + '/openresty/nginx/conf/vhost/' + webname + '.conf'
+        if os.path.exists(confFile):
+            os.remove(confFile)
+
+        rewriteFile = self.setupPath + '/openresty/nginx/conf/rewrite/' + webname + '.conf'
+        if os.path.exists(rewriteFile):
+            os.remove(rewriteFile)
+
         public.M('sites').where("id=?", (sid,)).delete()
         return public.returnJson(True, '站点删除成功!')
 
