@@ -13,16 +13,24 @@ setTimeout(function(){
 
 function closeLogs(){
 	$.post('/files?action=CloseLogs','',function(rdata){
-		$("#logSize").html(rdata);
+		$("#logSize").html(rdata.msg);
 		layer.msg(lan.firewall.empty,{icon:1});
 	},'json');
 }
 	
 $(function(){
-	$.post('/files/get_dir_size','path=/Users/midoks/Desktop/fwww/wwwlogs', function(rdata){
-		$("#logSize").html(rdata);
+	$.post('/firewall/get_www_path',function(data){
+			
+		var html ='<span>Web日志:</span><a href="javascript:openPath(\''+data['path']+'\');">'+data['path']+'</a>\
+				<em id="logSize">0KB</em>\
+				<button class="btn btn-default btn-sm" onclick="closeLogs();">清空</button>';
+		$('#firewall_weblog').html(html);
+
+		$.post('/files/get_dir_size','path='+data['path'], function(rdata){
+			$("#logSize").html(rdata.msg);
+		},'json');
 	},'json');
-})
+});
 
 $("#firewalldType").change(function(){
 	var type = $(this).val();
