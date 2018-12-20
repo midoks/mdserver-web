@@ -68,6 +68,9 @@ class site_api:
     def getHostConf(self, siteName):
         return public.getServerDir() + '/openresty/nginx/conf/vhost/' + siteName + '.conf'
 
+    def getRewriteConf(self, siteName):
+        return public.getServerDir() + '/openresty/nginx/conf/rewrite/' + siteName + '.conf'
+
     def getIndexConf(self):
         return public.getServerDir() + '/openresty/nginx/conf/nginx.conf'
 
@@ -222,9 +225,6 @@ class site_api:
             'TYPE_SITE', 'SITE_NETLIMIT_CLOSE_SUCCESS', (siteName,))
         return public.returnJson(True, '已关闭流量限制!')
 
-    def addDomain(self, domain, webname, pid):
-        pass
-
     def getPhpVersion(self):
         phpVersions = ('00', '52', '53', '54', '55',
                        '56', '70', '71', '72', '73', '74')
@@ -243,12 +243,24 @@ class site_api:
 
         return public.getJson(data)
 
+    def getRewriteList(self):
+        rewriteList = {}
+        rewriteList['rewrite'] = []
+        rewriteList['rewrite'].append('0.当前')
+        for ds in os.listdir('rewrite/nginx'):
+            rewriteList['rewrite'].append(ds[0:len(ds) - 5])
+        rewriteList['rewrite'] = sorted(rewriteList['rewrite'])
+        return rewriteList
+
     def createRootDir(self, path):
         if not os.path.exists(path):
             os.makedirs(path)
             if not public.isAppleSystem():
                 public.execShell('chown -R www:www ' + path)
             public.execShell('chmod -R 755 ' + path)
+
+    def addDomain(self, domain, webname, pid):
+        pass
 
     def nginxAddConf(self):
         source_tpl = public.getRunDir() + '/data/tpl/nginx.conf'

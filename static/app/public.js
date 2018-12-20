@@ -108,8 +108,8 @@ $(".menu-icon").click(function() {
 		$(".sub-menu").find(".sub").css("display", "none")
 	}
 });
-var Upload, percentage;
 
+var Upload, percentage;
 Date.prototype.format = function(b) {
 	var c = {
 		"M+": this.getMonth() + 1,
