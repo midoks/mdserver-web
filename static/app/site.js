@@ -2153,7 +2153,7 @@ function rewrite(siteName){
 			
 			$("#myRewrite").change(function(){
 				var rewriteName = $(this).val();
-				console.log(rewriteName,lan.site.rewritename);
+				// var info = syncPost('/site/get_rewrite_conf', {siteName:siteName});
 				if(rewriteName == lan.site.rewritename){
 					rpath = '/www/server/panel/vhost/rewrite/'+siteName+'.conf';
 				}else{
