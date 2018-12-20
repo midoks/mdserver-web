@@ -398,7 +398,7 @@ function showMsg(msg, callback ,icon, time){
 }
 
 function openPath(a) {
-	setCookie("Path", a);
+	setCookie("open_dir_path", a);
 	window.location.href = "/files"
 }
 
