@@ -19,7 +19,7 @@ class system_api:
     pids = None
 
     def __init__(self):
-        self.setupPath = '/www/server'
+        self.setupPath = public.getServerDir()
 
     # 名取PID
     def getPid(self, pname):
