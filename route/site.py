@@ -53,6 +53,27 @@ def setIndex():
     return site_api.site_api().setIndex(sid, index)
 
 
+@site.route('get_limit_net', methods=['POST'])
+def getLimitNet():
+    sid = request.form.get('id', '').encode('utf-8')
+    return site_api.site_api().getLimitNet(sid)
+
+
+@site.route('save_limit_net', methods=['POST'])
+def saveLimitNet():
+    sid = request.form.get('id', '').encode('utf-8')
+    perserver = request.form.get('perserver', '').encode('utf-8')
+    perip = request.form.get('perip', '').encode('utf-8')
+    limit_rate = request.form.get('limit_rate', '').encode('utf-8')
+    return site_api.site_api().saveLimitNet(sid, perserver, perip, limit_rate)
+
+
+@site.route('close_limit_net', methods=['POST'])
+def closeLimitNet():
+    sid = request.form.get('id', '').encode('utf-8')
+    return site_api.site_api().closeLimitNet(sid)
+
+
 @site.route('get_logs', methods=['POST'])
 def getLogs():
     siteName = request.form.get('siteName', '').encode('utf-8')

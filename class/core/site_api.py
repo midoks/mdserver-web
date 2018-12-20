@@ -65,6 +65,12 @@ class site_api:
             return path[0:-1]
         return path
 
+    def getHostConf(self, siteName):
+        return public.getServerDir() + '/openresty/nginx/conf/vhost/' + siteName + '.conf'
+
+    def getIndexConf(self):
+        return public.getServerDir() + '/openresty/nginx/conf/nginx.conf'
+
     def list(self):
         _list = public.M('sites').where('', ()).field(
             'id,name,path,status,ps,addtime,edate').limit('0,5').order('id desc').select()
@@ -129,8 +135,92 @@ class site_api:
         public.writeLog('TYPE_SITE', 'SITE_INDEX_SUCCESS', (siteName, index_l))
         return public.returnJson(True,  '设置成功!')
 
-    def getHostConf(self, siteName):
-        return public.getServerDir() + '/openresty/nginx/conf/vhost/' + siteName + '.conf'
+    def getLimitNet(self, sid):
+        siteName = public.M('sites').where("id=?", (sid,)).getField('name')
+        filename = self.getHostConf(siteName)
+        # 站点总并发
+        data = {}
+        conf = public.readFile(filename)
+        try:
+            rep = "\s+limit_conn\s+perserver\s+([0-9]+);"
+            tmp = re.search(rep, conf).groups()
+            data['perserver'] = int(tmp[0])
+
+            # IP并发限制
+            rep = "\s+limit_conn\s+perip\s+([0-9]+);"
+            tmp = re.search(rep, conf).groups()
+            data['perip'] = int(tmp[0])
+
+            # 请求并发限制
+            rep = "\s+limit_rate\s+([0-9]+)\w+;"
+            tmp = re.search(rep, conf).groups()
+            data['limit_rate'] = int(tmp[0])
+        except:
+            data['perserver'] = 0
+            data['perip'] = 0
+            data['limit_rate'] = 0
+
+        return public.getJson(data)
+
+    def checkIndexConf(self):
+        limit = self.getIndexConf()
+        nginxConf = public.readFile(limit)
+        limitConf = "limit_conn_zone $binary_remote_addr zone=perip:10m;\n\t\tlimit_conn_zone $server_name zone=perserver:10m;"
+        nginxConf = nginxConf.replace(
+            "#limit_conn_zone $binary_remote_addr zone=perip:10m;", limitConf)
+        public.writeFile(limit, nginxConf)
+
+    def saveLimitNet(self, sid, perserver, perip, limit_rate):
+
+        str_perserver = 'limit_conn perserver ' + perserver + ';'
+        str_perip = 'limit_conn perip ' + perip + ';'
+        str_limit_rate = 'limit_rate ' + limit_rate + 'k;'
+
+        siteName = public.M('sites').where("id=?", (sid,)).getField('name')
+        filename = self.getHostConf(siteName)
+
+        conf = public.readFile(filename)
+        if(conf.find('limit_conn perserver') != -1):
+            # 替换总并发
+            rep = "limit_conn\s+perserver\s+([0-9]+);"
+            conf = re.sub(rep, str_perserver, conf)
+
+            # 替换IP并发限制
+            rep = "limit_conn\s+perip\s+([0-9]+);"
+            conf = re.sub(rep, str_perip, conf)
+
+            # 替换请求流量限制
+            rep = "limit_rate\s+([0-9]+)\w+;"
+            conf = re.sub(rep, str_limit_rate, conf)
+        else:
+            conf = conf.replace('#error_page 404/404.html;', "#error_page 404/404.html;\n    " +
+                                str_perserver + "\n    " + str_perip + "\n    " + str_limit_rate)
+
+        public.writeFile(filename, conf)
+        public.restartWeb()
+        public.writeLog('TYPE_SITE', 'SITE_NETLIMIT_OPEN_SUCCESS', (siteName,))
+        return public.returnJson(True, '设置成功!')
+
+    def closeLimitNet(self, sid):
+        siteName = public.M('sites').where("id=?", (sid,)).getField('name')
+        filename = self.getHostConf(siteName)
+        conf = public.readFile(filename)
+        # 清理总并发
+        rep = "\s+limit_conn\s+perserver\s+([0-9]+);"
+        conf = re.sub(rep, '', conf)
+
+        # 清理IP并发限制
+        rep = "\s+limit_conn\s+perip\s+([0-9]+);"
+        conf = re.sub(rep, '', conf)
+
+        # 清理请求流量限制
+        rep = "\s+limit_rate\s+([0-9]+)\w+;"
+        conf = re.sub(rep, '', conf)
+        public.writeFile(filename, conf)
+        public.restartWeb()
+        public.writeLog(
+            'TYPE_SITE', 'SITE_NETLIMIT_CLOSE_SUCCESS', (siteName,))
+        return public.returnJson(True, '已关闭流量限制!')
 
     def addDomain(self, domain, webname, pid):
         pass
