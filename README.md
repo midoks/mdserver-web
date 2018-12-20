@@ -1,4 +1,4 @@
-# mdweb
+# mdserver-web
 简单的Linux面板
 
 ### 自动安装
