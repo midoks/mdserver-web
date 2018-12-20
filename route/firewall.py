@@ -17,9 +17,15 @@ import firewall_api
 firewall = Blueprint('firewall', __name__, template_folder='templates')
 
 
-@firewall.route("/")
+@firewall.route('/')
 def index():
     return render_template('default/firewall.html')
+
+
+@firewall.route('/get_www_path', methods=['POST'])
+def getWwwPath():
+    path = public.getLogsDir()
+    return public.getJson({'path': path})
 
 
 @firewall.route("/get_list", methods=['POST'])
