@@ -93,6 +93,19 @@ def getHostConf():
     return public.getJson({'host': host})
 
 
+@site.route('get_rewrite_conf', methods=['POST'])
+def getRewriteConf():
+    siteName = request.form.get('siteName', '').encode('utf-8')
+    rewrite = site_api.site_api().getRewriteConf(siteName)
+    return public.getJson({'rewrite': rewrite})
+
+
+@site.route('get_rewrite_list', methods=['POST'])
+def getRewriteList():
+    rlist = site_api.site_api().getRewriteList()
+    return public.getJson(rlist)
+
+
 @site.route('get_root_dir', methods=['POST'])
 def getRootDir():
     data = {}

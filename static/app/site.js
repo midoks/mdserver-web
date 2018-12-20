@@ -989,12 +989,12 @@ function webEdit(id,website,endTime,addtime){
 	var eMenu = '';
 	eMenu = "<p onclick='DirBinding("+id+")' title='"+lan.site.site_menu_1+"'>"+lan.site.site_menu_1+"</p>"
 	+"<p onclick='webPathEdit("+id+")' title='"+lan.site.site_menu_2+"'>"+lan.site.site_menu_2+"</p>"
-	+"<p onclick='limitNet("+id+")' title='"+lan.site.site_menu_3+"'>"+lan.site.site_menu_3+"</p>"
-	+"<p onclick=\"Rewrite('"+website+"')\" title='"+lan.site.site_menu_4+"'>"+lan.site.site_menu_4+"</p>"
+	+"<p onclick='limitNet("+id+")' title='流量限制'>流量限制</p>"
+	+"<p onclick=\"rewrite('"+website+"')\" title='伪静态'>伪静态</p>"
 	+"<p onclick='setIndexEdit("+id+")' title='默认文档'>默认文档</p>"
-	+"<p onclick=\"configFile('"+website+"')\" title='"+lan.site.site_menu_6+"'>"+lan.site.site_menu_6+"</p>"
+	+"<p onclick=\"configFile('"+website+"')\" title='配置文件'>配置文件</p>"
 	+"<p onclick=\"setSSL("+id+",'"+website+"')\" title='"+lan.site.site_menu_7+"'>"+lan.site.site_menu_7+"</p>"
-	+"<p onclick=\"phpVersion('"+website+"')\" title='"+lan.site.site_menu_8+"'>"+lan.site.site_menu_8+"</p>"
+	+"<p onclick=\"phpVersion('"+website+"')\" title='PHP版本'>PHP版本</p>"
 	+"<p onclick=\"To301('"+website+"')\" title='"+lan.site.site_menu_10+"'>"+lan.site.site_menu_10+"</p>"
 	+"<p onclick=\"Proxy('"+website+"')\" title='"+lan.site.site_menu_12+"'>"+lan.site.site_menu_11+"</p>"
 	+"<p id='site_"+id+"' onclick=\"Security('"+id+"','"+website+"')\" title='"+lan.site.site_menu_12+"'>"+lan.site.site_menu_12+"</p>"
@@ -1898,65 +1898,6 @@ function VerifyDomain(partnerOrderId,siteName){
 	});
 }
 
-//旧的设置SSL
-function setSSL_old(siteName){
-	var loadT = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});
-	$.post('site?action=GetSSL','siteName='+siteName,function(rdata){
-		layer.close(loadT);
-		var status_selecteda ="";
-		var status_selectedb ="";
-		var status_selectedc ="";
-		if(rdata.key == false) rdata.key = '';
-		if(rdata.csr == false) rdata.csr = '';
-		switch(rdata.type){
-			case -1:
-				status_selecteda = "checked='checked'";
-				break;
-			case 1:
-				status_selectedb = "checked='checked'";
-				break
-			case 0:
-				status_selectedc = "checked='checked'";
-			default:
-				status_selecteda = "checked='checked'";
-		}
-
-		var mBody = '<div class="ssl-con c4">'
-				  + '<div class="ssl-type label-input-group ptb10"><label class="mr20"><input type="radio" name="type" value="0" '+status_selecteda+'/>'+lan.site.ssl_close+'</label><label class="mr20"><input type="radio" name="type" value="1" '+status_selectedb+'/>'+lan.site.lets_ssl+'</label><label><input class="otherssl" name="type" type="radio" value="2" '+status_selectedc+'>'+lan.site.use_other_ssl+'</label></div>'
-				  + '<div class="ssl-type-con"></div>'
-				  + '</div>';
-		var mykeyhtml = '<div class="myKeyCon ptb15"><div class="ssl-con-key pull-left mr20">'+lan.site.ssl_key+'<br><textarea id="key" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.key+'</textarea></div>'
-					+ '<div class="ssl-con-key pull-left">'+lan.site.ssl_crt+'<br><textarea id="csr" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.csr+'</textarea></div>'
-					+ '<div class="ssl-btn pull-left mtb15" style="width:100%"><button class="btn btn-success btn-sm" onclick="ChangeSaveSSL(\''+siteName+'\')">'+lan.site.update_ssl+'</button></div></div>'
-					+ '<ul class="help-info-text c7 pull-left"><li>'+lan.site.ssl_help_2+'</li><li>'+lan.site.ssl_help_3+'</li></ul>';
-		
-		var othersslhtml = '<div class="myKeyCon ptb15"><div class="ssl-con-key pull-left mr20">'+lan.site.ssl_key+'<br><textarea id="key" class="bt-input-text">'+rdata.key+'</textarea></div>'
-					+ '<div class="ssl-con-key pull-left">'+lan.site.ssl_crt+'<br><textarea id="csr" class="bt-input-text">'+rdata.csr+'</textarea></div>'
-					+ '<div class="ssl-btn pull-left mtb15" style="width:100%"><button class="btn btn-success btn-sm" onclick="SaveSSL(\''+siteName+'\')">'+lan.public.save+'</button></div></div>'
-					+ '<ul class="help-info-text c7 pull-left"><li>'+lan.site.bt_ssl_help_10+'</li></ul>';
-		$("#webedit-con").html(mBody);
-		if(rdata.type == 1){
-			$(".ssl-type-con").html(mykeyhtml);
-		}
-		if(rdata.type == 0){
-			$(".ssl-type-con").html(othersslhtml);
-		}
-		$("input[type='radio']").click(function(){
-			var val = $(this).val();
-			if(val == 0){
-				OcSSL('CloseSSLConf',siteName)
-			}
-			if(val == 1){
-				OcSSL("CreateLet",siteName);
-			}
-			if(val == 2){
-				//OcSSL("CreateLet",siteName);
-				$(".ssl-type-con").html(othersslhtml);
-			}
-		});
-	});
-
-}
 //开启与关闭SSL
 function OcSSL(action,siteName){
 	var loadT = layer.msg(lan.site.get_ssl_list,{icon:16,time:0,shade: [0.3, '#000']});
@@ -2057,7 +1998,7 @@ function ChangeSaveSSL(siteName){
 //PHP版本
 function phpVersion(siteName){
 	$.post('/site/get_site_php_version','siteName='+siteName,function(version){
-		console.log(version);
+		// console.log(version);
 		if(version.status === false){
 			layer.msg(version.msg,{icon:5});
 			return;
@@ -2169,11 +2110,11 @@ function saveConfigFile(webSite,encoding,path){
 }
 
 //伪静态
-function Rewrite(siteName){
-	$.post("/site?action=GetRewriteList&siteName="+siteName,function(rdata){
-		var filename = '/www/server/panel/vhost/rewrite/'+siteName+'.conf';
-		if(getCookie('serverType') == 'apache')	filename = rdata.sitePath+'/.htaccess';
-		$.post('/files?action=GetFileBody','path='+filename,function(fileBody){
+function rewrite(siteName){
+	$.post("/site/get_rewrite_list", 'siteName='+siteName,function(rdata){
+		var info = syncPost('/site/get_rewrite_conf', {siteName:siteName});
+		var filename = info['rewrite'];
+		$.post('/files/get_body','path='+filename,function(fileBody){
 			var rList = ''; 
 			for(var i=0;i<rdata.rewrite.length;i++){
 				rList += "<option value='"+rdata.rewrite[i]+"'>"+rdata.rewrite[i]+"</option>";
@@ -2212,20 +2153,20 @@ function Rewrite(siteName){
 			
 			$("#myRewrite").change(function(){
 				var rewriteName = $(this).val();
+				console.log(rewriteName,lan.site.rewritename);
 				if(rewriteName == lan.site.rewritename){
 					rpath = '/www/server/panel/vhost/rewrite/'+siteName+'.conf';
-					if(getCookie('serverType') == 'apache')	filename = rdata.sitePath+'/.htaccess';
 				}else{
 					rpath = '/www/server/panel/rewrite/' + getCookie('serverType')+'/' + rewriteName + '.conf';
 				}
-				
-				$.post('/files?action=GetFileBody','path='+rpath,function(fileBody){
+				rpath = '/www/server/panel/vhost/rewrite/'+siteName+'.conf';
+				$.post('/files/get_body','path='+rpath,function(fileBody){
 					 $("#rewriteBody").val(fileBody.data);
 					 editor.setValue(fileBody.data);
 				});
 			});
 		});
-	});
+	},'json');
 }
 
 
@@ -2233,14 +2174,14 @@ function Rewrite(siteName){
 function SetRewrite(filename){
 	var data = 'data='+encodeURIComponent($("#rewriteBody").val())+'&path='+filename+'&encoding=utf-8';
 	var loadT = layer.msg(lan.site.saving_txt,{icon:16,time:0,shade: [0.3, '#000']});
-	$.post('/files?action=SaveFileBody',data,function(rdata){
+	$.post('/files/save_body',data,function(rdata){
 		layer.close(loadT);
 		if(rdata.status){
 			layer.msg(rdata.msg,{icon:1});
 		}else{
 			layer.msg(rdata.msg,{icon:2,time:0,shade:0.3,shadeClose:true});
 		}
-	});
+	},'json');
 }
 var aindex = null;
 //保存为模板
