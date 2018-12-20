@@ -181,7 +181,7 @@ def start():
     data = public.execShell(file + ' start')
     if data[1] == '':
         return 'ok'
-    return 'fail'
+    return data[1]
 
 
 def stop():
@@ -190,7 +190,7 @@ def stop():
     clearTemp()
     if data[1] == '':
         return 'ok'
-    return 'fail'
+    return data[1]
 
 
 def restart():
@@ -206,7 +206,7 @@ def reload():
     data = public.execShell(file + ' reload')
     if data[1] == '':
         return 'ok'
-    return 'fail'
+    return data[1]
 
 
 def initdStatus():
