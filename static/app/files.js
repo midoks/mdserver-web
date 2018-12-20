@@ -316,13 +316,14 @@ function Set_Recycle_bin(db){
 
 //取数据
 function getFiles(Path) {
+	// console.log(Path);
 	var searchtype = Path;
 	if(isNaN(Path)){
 		var p = '1';
 		Path = encodeURIComponent(Path)
 	}else{
 		var p = Path;
-		Path = getCookie('Path');
+		Path = getCookie('open_dir_path');
 	}
 	
 	var search = '';
