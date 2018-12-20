@@ -6,14 +6,15 @@ import os
 import time
 import shutil
 
+reload(sys)
+sys.setdefaultencoding('utf8')
+
 from flask import Flask
 from datetime import timedelta
 
 sys.path.append(os.getcwd() + "/class/core")
-# sys.setdefaultencoding('utf-8')
 import db
 import public
-import route
 
 
 class MiddleWare:
@@ -90,6 +91,7 @@ class config:
         return self.__app
 
     def initRoute(self):
+        import route
         DEFAULT_MODULES = (
             (route.dashboard, "/"),
             (route.site, "/site"),

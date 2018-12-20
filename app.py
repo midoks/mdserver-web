@@ -4,12 +4,7 @@ import sys
 import io
 import os
 
-
 sys.path.append("/class/core")
-reload(sys)
-sys.setdefaultencoding('utf8')
-
-import route
 import config
 
 app = config.config().makeApp(__name__)
