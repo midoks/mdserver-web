@@ -102,7 +102,7 @@ class config:
             (route.database, "/database"),
             (route.crontab, "/crontab"),
             (route.firewall, "/firewall"),
-            (route.control, "/control"),
+            (route.control, "/control")
         )
         self.modules = DEFAULT_MODULES
         self.settingModules(self.__app, DEFAULT_MODULES)
