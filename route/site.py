@@ -37,6 +37,22 @@ def getDomain():
     return site_api.site_api().getDomain(pid)
 
 
+@site.route('get_index', methods=['POST'])
+def getIndex():
+    sid = request.form.get('id', '').encode('utf-8')
+    data = {}
+    index = site_api.site_api().getIndex(sid)
+    data['index'] = index
+    return public.getJson(data)
+
+
+@site.route('set_index', methods=['POST'])
+def setIndex():
+    sid = request.form.get('id', '').encode('utf-8')
+    index = request.form.get('index', '').encode('utf-8')
+    return site_api.site_api().setIndex(sid, index)
+
+
 @site.route('get_logs', methods=['POST'])
 def getLogs():
     siteName = request.form.get('siteName', '').encode('utf-8')

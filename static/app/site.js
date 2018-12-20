@@ -449,23 +449,22 @@ function SetSitePs(id){
 
 
 //设置默认文档
-function SetIndexEdit(id){
-	$.post('/site?action=GetIndex','id='+id,function(rdata){
-		rdata= rdata.replace(new RegExp(/(,)/g), "\n");
+function setIndexEdit(id){
+	$.post('/site/get_index','id='+id,function(data){
+		var rdata = data['index'];
+		rdata = rdata.replace(new RegExp(/(,)/g), "\n");
 		var setIndexHtml = "<div id='SetIndex'><div class='SetIndex'>\
 				<div class='line'>\
 						<textarea class='bt-input-text' id='Dindex' name='files' style='height: 180px; width:50%; line-height:20px'>"+rdata+"</textarea>\
-						<button type='button' class='btn btn-success btn-sm pull-right' onclick='SetIndexList("+id+")' style='margin: 70px 130px 0px 0px;'>"+lan.public.save+"</button>\
+						<button type='button' class='btn btn-success btn-sm pull-right' onclick='setIndexList("+id+")' style='margin: 70px 130px 0px 0px;'>"+lan.public.save+"</button>\
 				</div>\
 				<ul class='help-info-text c7 ptb10'>\
-					<li>"+lan.site.default_doc_help+"</li>\
+					<li>默认文档，每行一个，优先级由上至下。</li>\
 				</ul>\
 				</div></div>";
 		$("#webedit-con").html(setIndexHtml);
-	});
-	
+	},'json');
 }
-
 
 /**
  * 停止一个站点
@@ -934,7 +933,7 @@ function setIndex(id){
 				+"</div>"
 				+"<div class='bt-form-submit-btn'>"
 				+"	<button type='button' id='web_end_time' class='btn btn-danger btn-sm btn-title' onclick='layer.closeAll()'>"+lan.public.cancel+"</button>"
-			    +"    <button type='button' class='btn btn-success btn-sm btn-title' onclick='SetIndexList("+id+")'>"+lan.public.ok+"</button>"
+			    +"    <button type='button' class='btn btn-success btn-sm btn-title' onclick='setIndexList("+id+")'>"+lan.public.ok+"</button>"
 		        +"</div>"
 				+"</div></form>"
 		});
@@ -988,22 +987,20 @@ function GetDefaultSite(){
 	});
 }
 
-function SetIndexList(id){
+function setIndexList(id){
 	var Dindex = $("#Dindex").val().replace(new RegExp(/(\n)/g), ",");
-	if(id==undefined){
-		var data="id=&Index="+Dindex;
-	}
-	else{
-		var data="id="+id+"&Index="+Dindex;
+	if(id == undefined ){
+		var data="id=&index="+Dindex;
+	} else{
+		var data="id="+id+"&index="+Dindex;
 	}
 	var loadT= layer.load(2);
-	$.post('/site?action=SetIndex',data,function(rdata){
+	$.post('/site/set_index',data,function(rdata){
 		layer.close(loadT);
 		var ico = rdata.status? 1:5;
 		layer.msg(rdata.msg,{icon:ico});
-	});
+	},'json');
 }
-
 
 
 /*站点修改*/
@@ -1014,7 +1011,7 @@ function webEdit(id,website,endTime,addtime){
 	+"<p onclick='webPathEdit("+id+")' title='"+lan.site.site_menu_2+"'>"+lan.site.site_menu_2+"</p>"
 	+"<p onclick='limitNet("+id+")' title='"+lan.site.site_menu_3+"'>"+lan.site.site_menu_3+"</p>"
 	+"<p onclick=\"Rewrite('"+website+"')\" title='"+lan.site.site_menu_4+"'>"+lan.site.site_menu_4+"</p>"
-	+"<p onclick='SetIndexEdit("+id+")' title='"+lan.site.site_menu_5+"'>"+lan.site.site_menu_5+"</p>"
+	+"<p onclick='setIndexEdit("+id+")' title='默认文档'>默认文档</p>"
 	+"<p onclick=\"configFile('"+website+"')\" title='"+lan.site.site_menu_6+"'>"+lan.site.site_menu_6+"</p>"
 	+"<p onclick=\"SetSSL("+id+",'"+website+"')\" title='"+lan.site.site_menu_7+"'>"+lan.site.site_menu_7+"</p>"
 	+"<p onclick=\"phpVersion('"+website+"')\" title='"+lan.site.site_menu_8+"'>"+lan.site.site_menu_8+"</p>"
