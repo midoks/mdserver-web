@@ -98,6 +98,37 @@ class site_api:
         data['phpversion'] = tmp[0]
         return public.getJson(data)
 
+    def getIndex(self, sid):
+        print sid
+        siteName = public.M('sites').where("id=?", (sid,)).getField('name')
+        file = self.getHostConf(siteName)
+        conf = public.readFile(file)
+        rep = "\s+index\s+(.+);"
+        tmp = re.search(rep, conf).groups()
+        return tmp[0].replace(' ', ',')
+
+    def setIndex(self, sid, index):
+        if index.find('.') == -1:
+            return public.returnJson(False,  '默认文档格式不正确，例：index.html')
+
+        index = index.replace(' ', '')
+        index = index.replace(',,', ',')
+
+        if len(index) < 3:
+            return public.returnJson(False,  '默认文档不能为空!')
+
+        siteName = public.M('sites').where("id=?", (sid,)).getField('name')
+        index_l = index.replace(",", " ")
+        file = self.getHostConf(siteName)
+        conf = public.readFile(file)
+        if conf:
+            rep = "\s+index\s+.+;"
+            conf = re.sub(rep, "\n\tindex " + index_l + ";", conf)
+            public.writeFile(file, conf)
+
+        public.writeLog('TYPE_SITE', 'SITE_INDEX_SUCCESS', (siteName, index_l))
+        return public.returnJson(True,  '设置成功!')
+
     def getHostConf(self, siteName):
         return public.getServerDir() + '/openresty/nginx/conf/vhost/' + siteName + '.conf'
 

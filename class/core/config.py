@@ -42,14 +42,15 @@ class config:
         app.config['SECRET_KEY'] = os.urandom(24)
         app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
 
-        # app.debug = True
-        # app.config.version = self.__version + str(time.time())
-
         self.initDB()
         self.initInitD()
         self.initRoute()
         app.wsgi_app = MiddleWare(app.wsgi_app)
         return app
+
+    def startDebug(self):
+        app.debug = True
+        app.config.version = self.__version + str(time.time())
 
     def initDB(self):
         try:
