@@ -74,6 +74,23 @@ def closeLimitNet():
     return site_api.site_api().closeLimitNet(sid)
 
 
+@site.route('get_security', methods=['POST'])
+def getSecurity():
+    sid = request.form.get('id', '').encode('utf-8')
+    name = request.form.get('name', '').encode('utf-8')
+    return site_api.site_api().getSecurity(sid, name)
+
+
+@site.route('set_security', methods=['POST'])
+def setSecurity():
+    fix = request.form.get('fix', '').encode('utf-8')
+    domains = request.form.get('domains', '').encode('utf-8')
+    status = request.form.get('status', '').encode('utf-8')
+    name = request.form.get('name', '').encode('utf-8')
+    sid = request.form.get('id', '').encode('utf-8')
+    return site_api.site_api().setSecurity(sid, name, fix, domains, status)
+
+
 @site.route('get_logs', methods=['POST'])
 def getLogs():
     siteName = request.form.get('siteName', '').encode('utf-8')

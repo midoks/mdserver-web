@@ -225,6 +225,58 @@ class site_api:
             'TYPE_SITE', 'SITE_NETLIMIT_CLOSE_SUCCESS', (siteName,))
         return public.returnJson(True, '已关闭流量限制!')
 
+    def getSecurity(self, sid, name):
+        filename = self.getHostConf(name)
+        conf = public.readFile(filename)
+        data = {}
+        if conf.find('SECURITY-START') != -1:
+            rep = "#SECURITY-START(\n|.){1,500}#SECURITY-END"
+            tmp = re.search(rep, conf).group()
+            data['fix'] = re.search(
+                "\(.+\)\$", tmp).group().replace('(', '').replace(')$', '').replace('|', ',')
+            data['domains'] = ','.join(re.search(
+                "valid_referers\s+none\s+blocked\s+(.+);\n", tmp).groups()[0].split())
+            data['status'] = True
+        else:
+            data['fix'] = 'jpg,jpeg,gif,png,js,css'
+            domains = public.M('domain').where(
+                'pid=?', (sid,)).field('name').select()
+            tmp = []
+            for domain in domains:
+                tmp.append(domain['name'])
+            data['domains'] = ','.join(tmp)
+            data['status'] = False
+        return public.getJson(data)
+
+    def setSecurity(self, sid, name, fix, domains, status):
+        if len(fix) < 2:
+            return public.returnJson(False, 'URL后缀不能为空!')
+        file = self.getHostConf(name)
+        if os.path.exists(file):
+            conf = public.readFile(file)
+            if conf.find('SECURITY-START') != -1:
+                rep = "\s{0,4}#SECURITY-START(\n|.){1,500}#SECURITY-END\n?"
+                conf = re.sub(rep, '', conf)
+                public.writeLog('网站管理', '站点[' + name + ']已关闭防盗链设置!')
+            else:
+                rconf = '''#SECURITY-START 防盗链配置
+    location ~ .*\.(%s)$
+    {
+        expires      30d;
+        access_log /dev/null;
+        valid_referers none blocked %s;
+        if ($invalid_referer){
+           return 404;
+        }
+    }
+    #SECURITY-END
+    include enable-php-''' % (fix.strip().replace(',', '|'), domains.strip().replace(',', ' '))
+                conf = re.sub("include\s+enable-php-", rconf, conf)
+                public.writeLog('网站管理', '站点[' + name + ']已开启防盗链!')
+            public.writeFile(file, conf)
+        public.restartWeb()
+        return public.returnJson(True, '设置成功!')
+
     def getPhpVersion(self):
         phpVersions = ('00', '52', '53', '54', '55',
                        '56', '70', '71', '72', '73', '74')
