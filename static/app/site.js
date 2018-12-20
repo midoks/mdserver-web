@@ -161,27 +161,7 @@ function webAdd(type) {
 			if (ret.siteStatus == true) {
 				getWeb(1);
 				layer.closeAll();
-				if(ftpData == '' && sqlData == ''){
-					layer.msg(lan.site.success_txt,{icon:1})
-				} else {
-					layer.open({
-						type: 1,
-						area: '600px',
-						title: lan.site.success_txt,
-						closeBtn:2,
-						shadeClose: false,
-						content: "<div class='success-msg'>\
-							<div class='pic'><img src='/static/img/success-pic.png'></div>\
-							<div class='suc-con'>\
-								" + ftpData + sqlData + "\
-							</div>\
-						 </div>",
-					});
-					if ($(".success-msg").height() < 150) {
-						$(".success-msg").find("img").css({"width": "150px","margin-top": "30px"});
-					}
-				}
-
+				layer.msg('成功创建站点',{icon:1})
 			} else {
 				layer.msg(ret.msg, {icon: 2});
 			}
