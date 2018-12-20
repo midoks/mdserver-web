@@ -1013,7 +1013,7 @@ function webEdit(id,website,endTime,addtime){
 	+"<p onclick=\"Rewrite('"+website+"')\" title='"+lan.site.site_menu_4+"'>"+lan.site.site_menu_4+"</p>"
 	+"<p onclick='setIndexEdit("+id+")' title='默认文档'>默认文档</p>"
 	+"<p onclick=\"configFile('"+website+"')\" title='"+lan.site.site_menu_6+"'>"+lan.site.site_menu_6+"</p>"
-	+"<p onclick=\"SetSSL("+id+",'"+website+"')\" title='"+lan.site.site_menu_7+"'>"+lan.site.site_menu_7+"</p>"
+	+"<p onclick=\"setSSL("+id+",'"+website+"')\" title='"+lan.site.site_menu_7+"'>"+lan.site.site_menu_7+"</p>"
 	+"<p onclick=\"phpVersion('"+website+"')\" title='"+lan.site.site_menu_8+"'>"+lan.site.site_menu_8+"</p>"
 	+"<p onclick=\"To301('"+website+"')\" title='"+lan.site.site_menu_10+"'>"+lan.site.site_menu_10+"</p>"
 	+"<p onclick=\"Proxy('"+website+"')\" title='"+lan.site.site_menu_12+"'>"+lan.site.site_menu_11+"</p>"
@@ -1186,7 +1186,7 @@ function UpdateRulelist(){
 
 //流量限制
 function limitNet(id){
-	$.post('site?action=GetLimitNet&id='+id,function(rdata){
+	$.post('/site/get_limit_net','id='+id, function(rdata){
 		var status_selected = rdata.perserver != 0?'checked':'';
 		if(rdata.perserver == 0){
 			rdata.perserver = 300;
@@ -1201,12 +1201,12 @@ function limitNet(id){
 						+"<option value='6' "+((rdata.perserver == 60)?'selected':'')+">"+lan.site.limit_net_6+"</option>"
 						+"<option value='7' "+((rdata.perserver == 150)?'selected':'')+">"+lan.site.limit_net_7+"</option>"
 		var body = "<div class='dirBinding flow c4'>"
-				+'<p class="label-input-group ptb10"><label style="font-weight:normal"><input type="checkbox" name="status" '+status_selected+' onclick="SaveLimitNet('+id+')" style="width:15px;height:15px;margin-right:5px" />'+lan.site.limit_net_8+'</label></p>'
+				+'<p class="label-input-group ptb10"><label style="font-weight:normal"><input type="checkbox" name="status" '+status_selected+' onclick="saveLimitNet('+id+')" style="width:15px;height:15px;margin-right:5px" />'+lan.site.limit_net_8+'</label></p>'
 				+"<p class='line' style='padding:10px 0'><span class='span_tit mr5'>"+lan.site.limit_net_9+"：</span><select class='bt-input-text mr20' name='limit' style='width:90px'>"+limitList+"</select></p>"
 			    +"<p class='line' style='padding:10px 0'><span class='span_tit mr5'>"+lan.site.limit_net_10+"：</span><input class='bt-input-text mr20' style='width: 90px;' type='number' name='perserver' value='"+rdata.perserver+"' /></p>"
 			    +"<p class='line' style='padding:10px 0'><span class='span_tit mr5'>"+lan.site.limit_net_12+"：</span><input class='bt-input-text mr20' style='width: 90px;' type='number' name='perip' value='"+rdata.perip+"' /></p>"
 			    +"<p class='line' style='padding:10px 0'><span class='span_tit mr5'>"+lan.site.limit_net_14+"：</span><input class='bt-input-text mr20' style='width: 90px;' type='number' name='limit_rate' value='"+rdata.limit_rate+"' /></p>"
-			    +"<button class='btn btn-success btn-sm mt10' onclick='SaveLimitNet("+id+",1)'>"+lan.public.save+"</button>"
+			    +"<button class='btn btn-success btn-sm mt10' onclick='saveLimitNet("+id+",1)'>"+lan.public.save+"</button>"
 			    +"</div>"
 				+"<ul class='help-info-text c7 mtb15'><li>"+lan.site.limit_net_11+"</li><li>"+lan.site.limit_net_13+"</li><li>"+lan.site.limit_net_15+"</li></ul>"
 			$("#webedit-con").html(body);
@@ -1259,28 +1259,28 @@ function limitNet(id){
 				$("input[name='perip']").val(perip);
 				$("input[name='limit_rate']").val(limit_rate);
 			});
-	});
+	},'json');
 }
 
 
 //保存流量限制配置
-function SaveLimitNet(id,type){
+function saveLimitNet(id, type){
 	var isChecked = $("input[name='status']").attr('checked');
-	if(isChecked == undefined || type == 1){
+	if(isChecked == undefined || type == 1 ){
 		var data = 'id='+id+'&perserver='+$("input[name='perserver']").val()+'&perip='+$("input[name='perip']").val()+'&limit_rate='+$("input[name='limit_rate']").val();
 		var loadT = layer.msg(lan.public.config,{icon:16,time:10000})
-		$.post('site?action=SetLimitNet',data,function(rdata){
+		$.post('/site/save_limit_net',data,function(rdata){
 			layer.close(loadT);
 			limitNet(id);
 			layer.msg(rdata.msg,{icon:rdata.status?1:2});
-		});
+		},'json');
 	}else{
 		var loadT = layer.msg(lan.public.config,{icon:16,time:10000})
-		$.post('site?action=CloseLimitNet&id='+id,function(rdata){
+		$.post('/site/close_limit_net',{id:id},function(rdata){
 			layer.close(loadT);
 			limitNet(id);
 			layer.msg(rdata.msg,{icon:rdata.status?1:2});
-		});
+		},'json');
 	}
 }
 
@@ -1535,10 +1535,10 @@ function set_cert_ssl(certName,siteName){
 }
 
 //宝塔ssl
-function SetSSL(id,siteName){
+function setSSL(id,siteName){
 	var mBody = '<div class="tab-nav">\
-					<span class="on" onclick="BTssl(\'a\','+id+',\''+siteName+'\')">'+lan.site.bt_ssl+'</span>\
-					<span onclick="BTssl(\'lets\','+id+',\''+siteName+'\')">Let\'s Encrypt</span>\
+					<span  onclick="BTssl(\'a\','+id+',\''+siteName+'\')">'+lan.site.bt_ssl+'</span>\
+					<span class="on" onclick="BTssl(\'lets\','+id+',\''+siteName+'\')">Let\'s Encrypt</span>\
 					<span onclick="BTssl(\'other\','+id+',\''+siteName+'\')">'+lan.site.other_ssl+'</span>\
 					<span class="sslclose" onclick="closeSSL(\''+siteName+'\')">'+lan.public.close+'</span>\
 					<span id="ssl_admin" onclick="ssl_admin(\''+siteName+'\')">证书夹</span>'
@@ -1556,36 +1556,36 @@ function SetSSL(id,siteName){
 	$(".tab-nav span").click(function(){
 		$(this).addClass("on").siblings().removeClass("on");
 	});
-	var loadT = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});
-	$.post('site?action=GetSSL','siteName='+siteName,function(rdata){
-		layer.close(loadT);
-		$("#toHttps").attr('checked',rdata.httpTohttps);
-		switch(rdata.type){
-			case -1:
-				$(".tab-nav span").eq(3).addClass("on").siblings().removeClass("on");
-				var txt = "<div class='mtb15'  style='line-height:30px'>"+lan.site.ssl_help_1+"</div>";
-				$(".tab-con").html(txt);
-				break;
-			case 1:
-				$(".tab-nav span").eq(1).addClass("on").siblings().removeClass("on");
-				setCookie('letssl',1);
-				var lets = '<div class="myKeyCon ptb15"><div class="ssl-con-key pull-left mr20">'+lan.site.ssl_key+'<br><textarea id="key" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.key+'</textarea></div>'
-					+ '<div class="ssl-con-key pull-left">'+lan.site.ssl_crt+'<br><textarea id="csr" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.csr+'</textarea></div>'
-					+ '</div>'
-					+ '<ul class="help-info-text c7 pull-left"><li>'+lan.site.ssl_help_2+'</li><li>'+lan.site.ssl_help_3+'</li></ul>'
-				$(".tab-con").html(lets);
-				$(".help-info-text").after("<div class='line mtb15'><button class='btn btn-default btn-sm' onclick=\"OcSSL('CloseSSLConf','"+siteName+"')\" style='margin-left:10px'>"+lan.site.ssl_close+"</button></div>");
-				break;
-			case 0:
-				$(".tab-nav span").eq(2).addClass("on").siblings().removeClass("on");
-				BTssl('other',id,siteName);
-				break;
-			case 2:
-				$(".tab-nav span").eq(0).addClass("on").siblings().removeClass("on");
-				BTssl('a',id,siteName);
-				break;
-		}
-	})
+	// var loadT = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});
+	// $.post('/site?action=GetSSL','siteName='+siteName,function(rdata){
+	// 	layer.close(loadT);
+	// 	$("#toHttps").attr('checked',rdata.httpTohttps);
+	// 	switch(rdata.type){
+	// 		case -1:
+	// 			$(".tab-nav span").eq(3).addClass("on").siblings().removeClass("on");
+	// 			var txt = "<div class='mtb15'  style='line-height:30px'>"+lan.site.ssl_help_1+"</div>";
+	// 			$(".tab-con").html(txt);
+	// 			break;
+	// 		case 1:
+	// 			$(".tab-nav span").eq(1).addClass("on").siblings().removeClass("on");
+	// 			setCookie('letssl',1);
+	// 			var lets = '<div class="myKeyCon ptb15"><div class="ssl-con-key pull-left mr20">'+lan.site.ssl_key+'<br><textarea id="key" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.key+'</textarea></div>'
+	// 				+ '<div class="ssl-con-key pull-left">'+lan.site.ssl_crt+'<br><textarea id="csr" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.csr+'</textarea></div>'
+	// 				+ '</div>'
+	// 				+ '<ul class="help-info-text c7 pull-left"><li>'+lan.site.ssl_help_2+'</li><li>'+lan.site.ssl_help_3+'</li></ul>'
+	// 			$(".tab-con").html(lets);
+	// 			$(".help-info-text").after("<div class='line mtb15'><button class='btn btn-default btn-sm' onclick=\"OcSSL('CloseSSLConf','"+siteName+"')\" style='margin-left:10px'>"+lan.site.ssl_close+"</button></div>");
+	// 			break;
+	// 		case 0:
+	// 			$(".tab-nav span").eq(2).addClass("on").siblings().removeClass("on");
+	// 			BTssl('other',id,siteName);
+	// 			break;
+	// 		case 2:
+	// 			$(".tab-nav span").eq(0).addClass("on").siblings().removeClass("on");
+	// 			BTssl('a',id,siteName);
+	// 			break;
+	// 	}
+	// });
 }
 //关闭SSL
 function closeSSL(siteName){
@@ -1919,7 +1919,7 @@ function VerifyDomain(partnerOrderId,siteName){
 }
 
 //旧的设置SSL
-function SetSSL_old(siteName){
+function setSSL_old(siteName){
 	var loadT = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});
 	$.post('site?action=GetSSL','siteName='+siteName,function(rdata){
 		layer.close(loadT);
@@ -1986,7 +1986,7 @@ function OcSSL(action,siteName){
 		if(!rdata.status){
 			if(!rdata.out){
 				layer.msg(rdata.msg,{icon:rdata.status?1:2});
-				//SetSSL(siteName);
+				//setSSL(siteName);
 				return;
 			}
 			
@@ -2004,7 +2004,7 @@ function OcSSL(action,siteName){
 		
 		setCookie('letssl',0);
 		$.post('/system?action=ServiceAdmin','name='+getCookie('serverType')+'&type=reload',function(result){
-			//SetSSL(siteName);
+			//setSSL(siteName);
 			if(!result.status) layer.msg(result.msg,{icon:2});
 		});
 		layer.msg(rdata.msg,{icon:rdata.status?1:2});
@@ -2036,7 +2036,7 @@ function newSSL(siteName,domains){
 		
 		if(!rdata.out){
 			layer.msg(rdata.msg,{icon:rdata.status?1:2});
-			//SetSSL(siteName);
+			//setSSL(siteName);
 			return;
 		}
 		
@@ -2053,7 +2053,7 @@ function newSSL(siteName,domains){
 function SaveSSL(siteName){
 	var data = 'type=1&siteName='+siteName+'&key='+encodeURIComponent($("#key").val())+'&csr='+encodeURIComponent($("#csr").val());
 	var loadT = layer.msg(lan.site.saving_txt,{icon:16,time:20000,shade: [0.3, '#000']})
-	$.post('site?action=SetSSL',data,function(rdata){
+	$.post('site?action=setSSL',data,function(rdata){
 		layer.close(loadT);
 		if(rdata.status){
 			layer.msg(rdata.msg,{icon:1});
