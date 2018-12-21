@@ -7,8 +7,8 @@ mw_start(){
 	isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`
 	if [ "$isStart" == '' ];then
             echo -e "Starting mw... \c"
-            cd $mw_path && gunicorn -c setting.py app:app &
-            sleep 0.3
+            cd $mw_path && gunicorn -c setting.py app:app
+            sleep 0.6
             port=$(cat ${mw_path}/data/port.pl)
             isStart=$(lsof -i :$port|grep LISTEN)
             if [ "$isStart" == '' ];then
@@ -100,7 +100,7 @@ mw_reload()
         do
                 kill -9 $p
         done
-        cd $mw_path && gunicorn -c setting.py app:app &
+        cd $mw_path && gunicorn -c setting.py app:app
         isStart=`ps aux|grep 'gunicorn -c setting.py app:app'|grep -v grep|awk '{print $2}'`
         if [ "$isStart" == '' ];then
                 echo -e "\033[31mfailed\033[0m"
