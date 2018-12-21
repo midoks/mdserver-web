@@ -62,7 +62,7 @@
 setTimeout(function() {
     getDisk();
 }, 500);
-var xPath = getCookie('Path');
+var xPath = getCookie('open_dir_path');
 setTimeout(function() {
     getFiles((xPath != undefined ? xPath : '/www/wwwroot'));
 }, 800);
@@ -76,16 +76,16 @@ $("#set_icon").click(function() {
     setCookie('rank', 'b');
     $(this).addClass("active");
     $("#set_list").removeClass("active");
-    getFiles(getCookie('Path'));
+    getFiles(getCookie('open_dir_path'));
 });
 $("#set_list").click(function() {
     setCookie('rank', 'a');
     $(this).addClass("active");
     $("#set_icon").removeClass("active");
-    getFiles(getCookie('Path'));
+    getFiles(getCookie('open_dir_path'));
 })
 $(".refreshBtn").click(function() {
-    getFiles(getCookie('Path'));
+    getFiles(getCookie('open_dir_path'));
 })
 </script>
 {% endblock %}

@@ -16,7 +16,7 @@ setTimeout(function(){
 $(function(){
 	// start 
 	$.post('/firewall/get_www_path',function(data){
-		var html ='<span>Web日志:</span><a href="javascript:openPath(\''+data['path']+'\');">点击进入目录</a>\
+		var html ='<span>Web日志:</span><a href="javascript:openPath(\''+data['path']+'\');">点击进入日志目录</a>\
 				<em id="logSize">0KB</em>\
 				<button class="btn btn-default btn-sm" onclick="closeLogs();">清空</button>';
 		$('#firewall_weblog').html(html);
@@ -56,27 +56,35 @@ $("#firewalldType").change(function(){
 
 
 function getSshInfo(){
-	$.post('/firewall/get_ssh_info', '',function(rdata){
-		console.log(rdata);
+	$.post('/firewall/get_ssh_info', '', function(rdata){
+		// console.log(rdata);
 		var SSHchecked = ''
 		if(rdata.status){
-			SSHchecked = "<input class='btswitch btswitch-ios' id='sshswitch' type='checkbox' checked><label class='btswitch-btn' for='sshswitch' onclick='SetMstscStatus()'></label>"
-		}else{
-			SSHchecked = "<input class='btswitch btswitch-ios' id='sshswitch' type='checkbox'><label class='btswitch-btn' for='sshswitch' onclick='SetMstscStatus()'></label>"
-			$("#mstscSubmit").attr('disabled','disabled')
-			$("#mstscPort").attr('disabled','disabled')
+			SSHchecked = "<input class='btswitch btswitch-ios' id='sshswitch' type='checkbox' checked><label class='btswitch-btn' for='sshswitch' onclick='SetMstscStatus()'></label>";
+		} else {
+			SSHchecked = "<input class='btswitch btswitch-ios' id='sshswitch' type='checkbox'><label class='btswitch-btn' for='sshswitch' onclick='SetMstscStatus()'></label>";
+			$("#mstscSubmit").attr('disabled','disabled');
+			$("#mstscPort").attr('disabled','disabled');
 		}
 		
-		$("#in_safe").html(SSHchecked)
-		$("#mstscPort").val(rdata.port)
-		var isPint = ""
+		$("#in_safe").html(SSHchecked);
+		$("#mstscPort").val(rdata.port);
+		var isPint = '';
 		if(rdata.ping){
-			isPing = "<input class='btswitch btswitch-ios' id='noping' type='checkbox'><label class='btswitch-btn' for='noping' onclick='ping(0)'></label>"
+			isPing = "<input class='btswitch btswitch-ios' id='noping' type='checkbox'><label class='btswitch-btn' for='noping' onclick='ping(0)'></label>";
 		}else{
-			isPing = "<input class='btswitch btswitch-ios' id='noping' type='checkbox' checked><label class='btswitch-btn' for='noping' onclick='ping(1)'></label>"
+			isPing = "<input class='btswitch btswitch-ios' id='noping' type='checkbox' checked><label class='btswitch-btn' for='noping' onclick='ping(1)'></label>";
 		}
-		
-		$("#isPing").html(isPing)
+		$("#is_ping").html(isPing);
+
+		// console.log(rdata.firewall_status);
+		var fStatus = '';
+		if (rdata.firewall_status){
+			fStatus = "<input class='btswitch btswitch-ios' id='firewall_status' type='checkbox' checked><label class='btswitch-btn' for='firewall_status' ></label>";
+		}else{
+			fStatus = "<input class='btswitch btswitch-ios' id='firewall_status' type='checkbox'><label class='btswitch-btn' for='firewall_status' ></label>";
+		}
+		$("#firewall_status").html(fStatus);
 		
 	},'json');
 }
@@ -134,12 +142,10 @@ function ping(status){
 	},function(){
 		if(status == 1){
 			$("#noping").prop("checked",true);
-		}
-		else{
+		} else {
 			$("#noping").prop("checked",false);
-			}
 		}
-	)
+	})
 }
 
 	
@@ -174,7 +180,7 @@ function SetMstscStatus(){
 		else{
 			$("#sshswitch").prop("checked",true);
 		}
-	})
+	});
 }
 
 /**
