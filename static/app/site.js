@@ -2155,7 +2155,7 @@ function rewrite(siteName){
 				var rewriteName = $(this).val();
 				// var info = syncPost('/site/get_rewrite_conf', {siteName:siteName});
 				if(rewriteName == lan.site.rewritename){
-					rpath = '/www/server/panel/vhost/rewrite/'+siteName+'.conf';
+					rpath = filename
 				}else{
 					rpath = '/www/server/panel/rewrite/' + getCookie('serverType')+'/' + rewriteName + '.conf';
 				}
