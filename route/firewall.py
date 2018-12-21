@@ -54,7 +54,7 @@ def getSshInfo():
     data['port'] = port
     data['status'] = True
     data['ping'] = True
-    if public.getOs() == 'draim':
+    if public.isAppleSystem():
         data['firewall_status'] = False
     else:
         data['firewall_status'] = True

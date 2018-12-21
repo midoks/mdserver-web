@@ -46,12 +46,13 @@ class config:
         self.initDB()
         self.initInitD()
         self.initRoute()
+        self.startDebug()
         app.wsgi_app = MiddleWare(app.wsgi_app)
         return app
 
     def startDebug(self):
-        app.debug = True
-        app.config.version = self.__version + str(time.time())
+        self.__app.debug = True
+        self.__app.config.version = self.__version + str(time.time())
 
     def initDB(self):
         try:
