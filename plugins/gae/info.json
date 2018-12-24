@@ -1,0 +1,14 @@
+{
+	"title":"GAE",
+	"tip":"soft",
+	"name":"gae",
+	"ps":"GAE 英文全称为 Google App Engine。它是 Google 管理的数据中心中用于 WEB 应用程序的开发和托管的平台",
+	"versions": "0.1",
+	"shell":"install.sh",
+	"checks":"server/gae",
+	"path":"server/gae",
+	"author":"mdserver-web",
+	"home":"https://github.com/midoks/mdserver-web",
+	"date":"2018-11-30",
+	"pid":"5"
+}
