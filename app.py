@@ -4,7 +4,7 @@ import sys
 import io
 import os
 
-sys.path.append("/class/core")
+sys.path.append(os.getcwd() + "/class/core")
 import config
 
 app = config.config().makeApp(__name__)
