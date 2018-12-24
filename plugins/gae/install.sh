@@ -25,7 +25,12 @@ Install_gae()
 		wget -O $serverPath/source/gae/$file https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/$file
 	fi
 
-	cd $serverPath/source/gae && tar zxvf $file
+	if [ ! -f $serverPath/source/gae/google-cloud-sdk ];then
+		cd $serverPath/source/gae && tar zxvf $file
+	fi
+
+	cp -r $serverPath/source/gae/google-cloud-sdk ${serverPath}/gae
+
 
 
 	echo "${1}" > ${serverPath}/gae/version.pl
