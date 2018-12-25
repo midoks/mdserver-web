@@ -37,12 +37,21 @@ def index(reqClass=None, reqAction=None, reqData=None):
     if (reqClass == None):
         reqClass = 'index'
     classFile = ('config', 'control', 'crontab',
-                 'files', 'firewall', 'index', 'login', 'site', 'soft')
+                 'files', 'firewall', 'index', 'login', 'system', 'site', 'soft')
     if not reqClass in classFile:
         return '403 no access!'
 
     if reqAction == None:
         return render_template(reqClass + '.html')
-    else:
-        import classFile
-        print classFile.classFile()
+
+    className = reqClass + '_api'
+    print reqClass, reqAction, className
+
+    eval_str = "__import__('" + className + "')" + "\n" + \
+        className + '.' + className + '()'
+    print eval(eval_str)
+
+    print newClass
+    newInstance = eval(newClass)
+    print newInstance
+    return '123'
