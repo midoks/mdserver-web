@@ -19,7 +19,7 @@ class task_api:
         c = public.M('tasks').where("status!=?", ('1',)).count()
         return str(c)
 
-    def list(self):
+    def listApi(self):
         _list = public.M('tasks').where('', ()).field('id,name,type,status,addtime,start,end').limit(
             '0,5').order('id desc').select()
         _ret = {}
@@ -33,12 +33,12 @@ class task_api:
         _ret['page'] = public.getPage(_page)
         return public.getJson(_ret)
 
-    def getExecLog(self):
+    def getExecLogApi(self):
         file = os.getcwd() + "/tmp/panelExec.log"
         v = public.getLastLine(file, 100)
         return v
 
-    def getTaskSpeed(self):
+    def getTaskSpeedApi(self):
         tempFile = os.getcwd() + '/tmp/panelExec.log'
         freshFile = os.getcwd() + '/tmp/panelFresh'
 

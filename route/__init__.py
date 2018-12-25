@@ -10,6 +10,10 @@ from datetime import timedelta
 
 from flask import Flask
 from flask import render_template
+from flask import make_response
+from flask import Response
+from flask import session
+from flask import request
 
 sys.path.append(os.getcwd() + "/class/core")
 import public
@@ -38,9 +42,67 @@ def publicObject(toObject, func, action=None, get=None):
     return public.retFail('访问异常!')
 
 
-@app.route("/check_login", methods=['POST', 'GET'])
+@app.route("/test")
+def test():
+    print session
+    os = public.getOs()
+    print os
+
+    print(sys.platform)
+    return public.getLocalIp()
+
+
+@app.route("/code")
+def code():
+    import vilidate
+    vie = vilidate.vieCode()
+    codeImage = vie.GetCodeImage(80, 4)
+    try:
+        from cStringIO import StringIO
+    except:
+        from StringIO import StringIO
+
+    out = StringIO()
+    codeImage[0].save(out, "png")
+
+    session['code'] = public.md5("".join(codeImage[1]).lower())
+
+    img = Response(out.getvalue(), headers={'Content-Type': 'image/png'})
+    return make_response(img)
+
+
+@app.route("/check_login", methods=['POST'])
 def checkLogin():
     return "true"
+
+
+@app.route("/login")
+def login():
+    return render_template('login.html')
+
+
+@app.route("/do_login", methods=['POST'])
+def doLogin():
+    username = request.form.get('username', '').strip()
+    password = request.form.get('password', '').strip()
+    code = request.form.get('code', '').strip()
+    print session
+    if session.has_key('code'):
+        if session['code'] != public.md5(code):
+            return public.returnJson(False, '验证码错误,请重新输入!')
+
+    userInfo = public.M('users').where(
+        "id=?", (1,)).field('id,username,password').find()
+
+    password = public.md5(password)
+    if userInfo['username'] != username or userInfo['password'] != password:
+        public.writeLog('TYPE_LOGIN', public.getInfo(
+            "< a style='color: red'>密码错误</a>,帐号:{1},密码:{2},登录IP:{3}", (('****', '******', request.remote_addr))))
+        return public.returnJson(False, public.getInfo("用户名或密码错误,您还可以尝试[{1}]次!", ('1')))
+
+    session['login'] = True
+    session['username'] = userInfo['username']
+    return public.returnJson(True, '登录成功,正在跳转...')
 
 
 @app.route('/<reqClass>/<reqAction>', methods=['POST', 'GET'])
