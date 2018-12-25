@@ -27,7 +27,104 @@ class site_api:
         if not os.path.exists(path):
             public.execShell("mkdir -p " + path + " && chmod -R 755 " + path)
 
-     # 域名编码转换
+    ##### ----- start ----- ###
+    def listApi(self):
+        return self.list()
+
+    def getPhpVersionApi(self):
+        return self.getPhpVersion()
+
+    def getDomainApi(self):
+        pid = request.form.get('pid', '').encode('utf-8')
+        return self.getDomain(pid)
+
+    def getIndexApi(self):
+        sid = request.form.get('id', '').encode('utf-8')
+        data = {}
+        index = self.getIndex(sid)
+        data['index'] = index
+        return public.getJson(data)
+
+    def setIndexApi(self):
+        sid = request.form.get('id', '').encode('utf-8')
+        index = request.form.get('index', '').encode('utf-8')
+        return self.setIndex(sid, index)
+
+    def getLimitNetApi(self):
+        sid = request.form.get('id', '').encode('utf-8')
+        return self.getLimitNet(sid)
+
+    def saveLimitNetApi(self):
+        sid = request.form.get('id', '').encode('utf-8')
+        perserver = request.form.get('perserver', '').encode('utf-8')
+        perip = request.form.get('perip', '').encode('utf-8')
+        limit_rate = request.form.get('limit_rate', '').encode('utf-8')
+        return self.saveLimitNet(sid, perserver, perip, limit_rate)
+
+    def closeLimitNetApi(self):
+        sid = request.form.get('id', '').encode('utf-8')
+        return self.closeLimitNet(sid)
+
+    def getSecurityApi(self):
+        sid = request.form.get('id', '').encode('utf-8')
+        name = request.form.get('name', '').encode('utf-8')
+        return self.getSecurity(sid, name)
+
+    def setSecurityApi(self):
+        fix = request.form.get('fix', '').encode('utf-8')
+        domains = request.form.get('domains', '').encode('utf-8')
+        status = request.form.get('status', '').encode('utf-8')
+        name = request.form.get('name', '').encode('utf-8')
+        sid = request.form.get('id', '').encode('utf-8')
+        return self.setSecurity(sid, name, fix, domains, status)
+
+    def getLogsApi(self):
+        siteName = request.form.get('siteName', '').encode('utf-8')
+        return self.getLogs(siteName)
+
+    def getSitePhpVersionApi(self):
+        siteName = request.form.get('siteName', '').encode('utf-8')
+        return self.getSitePhpVersion(siteName)
+
+    def getHostConfApi(self):
+        siteName = request.form.get('siteName', '').encode('utf-8')
+        host = self.getHostConf(siteName)
+        return public.getJson({'host': host})
+
+    def getRewriteConfApi(self):
+        siteName = request.form.get('siteName', '').encode('utf-8')
+        rewrite = self.getRewriteConf(siteName)
+        return public.getJson({'rewrite': rewrite})
+
+    def getRewriteListApi(self):
+        rlist = self.getRewriteList()
+        return public.getJson(rlist)
+
+    def getRootDirApi(self):
+        data = {}
+        data['dir'] = public.getWwwDir()
+        return public.getJson(data)
+
+    def setEndDateApi(self):
+        sid = request.form.get('id', '').encode('utf-8')
+        edate = request.form.get('edate', '').encode('utf-8')
+        return self.setEndDate(sid, edate)
+
+    def addApi(self):
+        webname = request.form.get('webinfo', '').encode('utf-8')
+        ps = request.form.get('ps', '').encode('utf-8')
+        path = request.form.get('path', '').encode('utf-8')
+        version = request.form.get('version', '').encode('utf-8')
+        port = request.form.get('port', '').encode('utf-8')
+        return self.add(webname, port, ps, path, version)
+
+    def deleteApi(self):
+        sid = request.form.get('id', '').encode('utf-8')
+        webname = request.form.get('webname', '').encode('utf-8')
+        return self.delete(sid, webname)
+    ##### ----- end   ----- ###
+
+    # 域名编码转换
     def toPunycode(self, domain):
         import re
         if sys.version_info[0] == 2:

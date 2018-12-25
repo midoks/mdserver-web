@@ -10,6 +10,8 @@ import json
 import threading
 import multiprocessing
 
+from flask import request
+
 
 class pa_thread(threading.Thread):
 
@@ -27,7 +29,7 @@ class pa_thread(threading.Thread):
             return None
 
 
-class plugin_api:
+class plugins_api:
     __tasks = None
     __plugin_dir = 'plugins'
     __type = 'data/json/type.json'
@@ -37,6 +39,156 @@ class plugin_api:
     def __init__(self):
         self.setupPath = 'server'
         # self.__plugin_dir = public.getRunDir() + '/plugins'
+
+    ##### ----- start ----- ###
+    def listApi(self):
+        sType = request.args.get('type', '0')
+        sPage = request.args.get('p', '1')
+        print sPage
+        data = self.getPluginList(sType, int(sPage))
+        return public.getJson(data)
+
+    def fileApi(self):
+        name = request.args.get('name', '')
+        if name.strip() == '':
+            return ''
+
+        f = request.args.get('f', '')
+        if f.strip() == '':
+            return ''
+
+        file = self.__plugin_dir + '/' + name + '/' + f
+        if not os.path.exists(file):
+            return ''
+
+        c = public.readFile(file)
+        return c
+
+    def indexListApi(self):
+        data = self.getIndexList()
+        return public.getJson(data)
+
+    def indexSortApi(self):
+        sort = request.form.get('ssort', '')
+        if sort.strip() == '':
+            return public.returnJson(False, '排序数据不能为空!')
+        data = self.setIndexSort(sort)
+        if data:
+            return public.returnJson(True, '成功!')
+        return public.returnJson(False, '失败!')
+
+    def installApi(self):
+        rundir = public.getRunDir()
+        name = request.form.get('name', '')
+        version = request.form.get('version', '')
+
+        mmsg = '安装'
+        if hasattr(request.form, 'upgrade'):
+            mtype = 'update'
+            mmsg = 'upgrade'
+
+        if name.strip() == '':
+            return public.returnJson(False, '缺少插件名称!', ())
+
+        if version.strip() == '':
+            return public.returnJson(False, '缺少版本信息!', ())
+
+        infoJsonPos = self.__plugin_dir + '/' + name + '/' + 'info.json'
+
+        if not os.path.exists(infoJsonPos):
+            return public.retJson(False, '配置文件不存在!', ())
+
+        pluginInfo = json.loads(public.readFile(infoJsonPos))
+
+        execstr = "cd " + os.getcwd() + "/plugins/" + \
+            name + " && /bin/bash " + pluginInfo["shell"] \
+            + " install " + version
+
+        taskAdd = (None, mmsg + '[' + name + '-' + version + ']',
+                   'execshell', '0', time.strftime('%Y-%m-%d %H:%M:%S'), execstr)
+
+        public.M('tasks').add('id,name,type,status,addtime, execstr', taskAdd)
+        return public.returnJson(True, '已将安装任务添加到队列!')
+
+    def uninstallApi(self):
+        rundir = public.getRunDir()
+        name = request.form.get('name', '')
+        version = request.form.get('version', '')
+        if name.strip() == '':
+            return public.returnJson(False, "缺少插件名称!", ())
+
+        if version.strip() == '':
+            return public.returnJson(False, "缺少版本信息!", ())
+
+        infoJsonPos = __plugin_name + '/' + name + '/' + 'info.json'
+
+        if not os.path.exists(infoJsonPos):
+            return public.retJson(False, "配置文件不存在!", ())
+
+        pluginInfo = json.loads(public.readFile(infoJsonPos))
+
+        execstr = "cd " + os.getcwd() + "/plugins/" + \
+            name + " && /bin/bash " + pluginInfo["shell"] \
+            + " uninstall " + version
+
+        taskAdd = (None, '卸载[' + name + '-' + version + ']',
+                   'execshell', '0', time.strftime('%Y-%m-%d %H:%M:%S'), execstr)
+
+        public.M('tasks').add('id,name,type,status,addtime, execstr', taskAdd)
+        return public.returnJson(True, '已将卸载任务添加到队列!')
+
+    def installed(self):
+        rundir = public.getRunDir()
+        name = request.form.get('name', '')
+
+        if name.strip() == '':
+            return public.retJson(-1, "缺少插件名称!", ())
+
+        infoJsonPos = __plugin_name + '/' + name + '/' + 'info.json'
+        if not os.path.exists(infoJsonPos):
+            return public.returnJson(-1, "配置文件不存在!", ())
+
+        pluginInfo = json.loads(public.readFile(infoJsonPos))
+
+        sh = __plugin_name + '/' + name + '/' + pluginInfo['shell']
+        os.system('/bin/bash ' + sh + ' install')
+        print request.args
+        return ''
+
+    def checkInstalled(self):
+        checks = ['nginx', 'apache', 'php', 'mysql']
+        for name in checks:
+            filename = public.getRootDir() + "/server/" + name
+            if os.path.exists(filename):
+                return "True"
+        return "False"
+
+    def setIndexApi(self):
+        name = request.form.get('name', '')
+        status = request.form.get('status', '0')
+        version = request.form.get('version', '')
+        if status == '1':
+            return self.addIndex(name, version)
+        return self.removeIndex(name, version)
+
+    def settingApi(self):
+        name = request.args.get('name', '')
+        html = self.__plugin_dir + '/' + name + '/index.html'
+        return public.readFile(html)
+
+    def runApi(self):
+        name = request.form.get('name', '')
+        func = request.form.get('func', '')
+        version = request.form.get('version', '')
+        args = request.form.get('args', '')
+        script = request.form.get('script', 'index')
+
+        data = self.run(name, func, version, args, script)
+        if data[1] == '':
+            return public.returnJson(True, "OK", data[0].strip())
+        return public.returnJson(False, data[1].strip())
+
+    ##### ----- end ----- ###
 
     # 进程是否存在
     def processExists(self, pname, exe=None):
@@ -414,6 +566,7 @@ class plugin_api:
         return plugins_info
 
     def getPluginList(self, sType, sPage=1, sPageSize=10):
+        print sType, sPage, sPageSize
 
         ret = {}
         ret['type'] = json.loads(public.readFile(self.__type))

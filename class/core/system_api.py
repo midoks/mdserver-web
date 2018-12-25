@@ -8,6 +8,7 @@ import math
 import json
 
 from flask import Flask, session
+from flask import request
 
 import db
 import public
@@ -25,13 +26,48 @@ class system_api:
     def networkApi(self):
         return self.getNetWork()
 
-    # @system.route("/update_server")
     def updateServerApi(self):
         stype = request.args.get('type', 'check')
         version = request.args.get('version', '')
-        data = self.updateServer(stype, version)
+        return self.updateServer(stype, version)
+
+    def systemTotalApi(self):
+        data = self.getSystemTotal()
+        return public.getJson(data)
+
+    def diskInfoApi(self):
+        diskInfo = self.getDiskInfo()
+        return public.getJson(diskInfo)
+
+    def setControlApi(self):
+        stype = request.form.get('type', '')
+        day = request.form.get('day', '')
+        data = self.setControl(stype, day)
         return data
 
+    def getLoadAverageApi(self):
+        start = request.args.get('start', '')
+        end = request.args.get('end', '')
+        data = self.getLoadAverageData(start, end)
+        return public.getJson(data)
+
+    def getCpuIoApi(self):
+        start = request.args.get('start', '')
+        end = request.args.get('end', '')
+        data = self.getCpuIoData(start, end)
+        return public.getJson(data)
+
+    def getDiskIoApi(self):
+        start = request.args.get('start', '')
+        end = request.args.get('end', '')
+        data = self.getDiskIoData(start, end)
+        return public.getJson(data)
+
+    def getNetworkIoApi(self):
+        start = request.args.get('start', '')
+        end = request.args.get('end', '')
+        data = self.getNetWorkIoData(start, end)
+        return public.getJson(data)
     ##### ----- end ----- ###
 
     # 名取PID
