@@ -6,6 +6,8 @@ import os
 import time
 import shutil
 
+from datetime import timedelta
+
 from flask import Flask
 from flask import render_template
 
@@ -26,13 +28,26 @@ import public
 # from firewall import *
 
 app = Flask(__name__, template_folder='templates/default')
+app.config.version = '0.0.1'
+app.config['SECRET_KEY'] = os.urandom(24)
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
+
+
+def funConvert(fun):
+    block = fun.split('_')
+    func = block[0]
+    for x in range(len(block) - 1):
+        suf = block[x + 1].title()
+        func += suf
+    return func
 
 
 def publicObject(toObject, func, action=None, get=None):
-    name = func + '_api'
+    name = funConvert(func)
     if hasattr(toObject, name):
         efunc = 'toObject.' + name + '()'
-        return eval(efunc)
+        data = eval(efunc)
+        return public.getJson(data)
 
     return 'fail'
 
@@ -54,7 +69,6 @@ def index(reqClass=None, reqAction=None, reqData=None):
         return render_template(reqClass + '.html')
 
     className = reqClass + '_api'
-    # print reqClass, reqAction, className
 
     eval_str = "__import__('" + className + "')." + className + '()'
     newInstance = eval(eval_str)

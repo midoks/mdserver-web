@@ -21,8 +21,11 @@ class system_api:
     def __init__(self):
         self.setupPath = public.getServerDir()
 
-    def network_api(self):
-        print "ok-network_api"
+    ##### ----- start ----- ###
+    def network(self):
+        return self.getNetWork()
+
+    ##### ----- end ----- ###
 
     # 名取PID
     def getPid(self, pname):
