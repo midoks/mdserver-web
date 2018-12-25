@@ -9,7 +9,7 @@ import shutil
 reload(sys)
 sys.setdefaultencoding('utf8')
 
-from flask import Flask
+from flask import Flask, session
 from datetime import timedelta
 
 sys.path.append(os.getcwd() + "/class/core")
@@ -17,13 +17,12 @@ import db
 import public
 
 
-class MiddleWare:
+class middleWare:
 
     def __init__(self, wsgi_app):
         self.wsgi_app = wsgi_app
 
     def __call__(self, *args, **kwargs):
-        # print args
         return self.wsgi_app(*args, **kwargs)
 
 
@@ -46,8 +45,8 @@ class config:
         self.initDB()
         self.initInitD()
         self.initRoute()
-        self.startDebug()
-        app.wsgi_app = MiddleWare(app.wsgi_app)
+        # self.startDebug()
+        app.wsgi_app = middleWare(app.wsgi_app)
         return app
 
     def startDebug(self):
