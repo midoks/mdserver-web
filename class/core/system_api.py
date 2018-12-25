@@ -24,7 +24,8 @@ class system_api:
 
     ##### ----- start ----- ###
     def networkApi(self):
-        return self.getNetWork()
+        data = self.getNetWork()
+        return public.getJson(data)
 
     def updateServerApi(self):
         stype = request.args.get('type', 'check')
