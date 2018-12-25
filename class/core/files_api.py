@@ -9,11 +9,68 @@ import re
 import json
 import pwd
 
+from flask import request
+from flask import send_file, send_from_directory
+from flask import make_response
 
-class file_api:
+
+class files_api:
 
     def __init__(self):
         pass
+
+    ##### ----- start ----- ###
+    def getBodyApi(self):
+        path = request.form.get('path', '').encode('utf-8')
+        return self.getBody(path)
+
+    def saveBodyApi(self):
+        path = request.form.get('path', '').encode('utf-8')
+        data = request.form.get('data', '').encode('utf-8')
+        encoding = request.form.get('encoding', '').encode('utf-8')
+        return self.saveBody(path, data, encoding)
+
+    def downloadApi(self):
+        filename = request.args.get('filename', '').encode('utf-8')
+        if not os.path.exists(filename):
+            return ''
+        response = make_response(send_from_directory(
+            os.path.dirname(filename), os.path.basename(filename), as_attachment=True))
+        return response
+
+    def zipApi(self):
+        sfile = request.form.get('sfile', '').encode('utf-8')
+        dfile = request.form.get('dfile', '').encode('utf-8')
+        stype = request.form.get('type', '').encode('utf-8')
+        path = request.form.get('path', '').encode('utf-8')
+        return self.zip(sfile, dfile, stype, path)
+
+    def deleteApi(self):
+        path = request.form.get('path', '').encode('utf-8')
+        return self.delete(path)
+
+    def fileAccessApi(self):
+        filename = request.form.get('filename', '').encode('utf-8')
+        data = self.getAccess(filename)
+        return public.getJson(data)
+
+    def getDirSizeApi(self):
+        path = request.form.get('path', '').encode('utf-8')
+        if public.getOs() == 'darwin':
+            tmp = public.execShell('du -sh ' + path)
+        else:
+            tmp = public.execShell('du -sbh ' + path)
+        return public.returnJson(True, tmp[0].split()[0])
+
+    def getDirApi(self):
+        path = request.form.get('path', '').encode('utf-8')
+        if not os.path.exists(path):
+            path = public.getRootDir() + "/wwwroot"
+        search = request.args.get('search', '').strip().lower()
+        page = request.args.get('p', '1').strip().lower()
+        row = request.args.get('showRow', '10')
+        return self.getDir(path, int(page), int(row), search)
+    ##### ----- start ----- ###
 
     def setFileAccept(self, filename):
         auth = 'www:www'

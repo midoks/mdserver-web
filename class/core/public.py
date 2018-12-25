@@ -170,6 +170,7 @@ def returnData(status, msg, data):
 
 def retOK(data):
     return {'status': True, 'msg': 'OK!', 'data': data}
+    return getJson(info)
 
 
 def retFail(msg, data=None):
