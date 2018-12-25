@@ -47,11 +47,8 @@ def index(reqClass=None, reqAction=None, reqData=None):
     className = reqClass + '_api'
     print reqClass, reqAction, className
 
-    eval_str = "__import__('" + className + "')" + "\n" + \
-        className + '.' + className + '()'
-    print eval(eval_str)
+    eval_str = "__import__('" + className + "')." + className + '()'
+    newInstance = eval(eval_str)
 
-    print newClass
-    newInstance = eval(newClass)
     print newInstance
     return '123'
