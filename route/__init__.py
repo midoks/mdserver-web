@@ -5,6 +5,7 @@ import io
 import os
 import time
 import shutil
+import uuid
 
 from datetime import timedelta
 
@@ -14,14 +15,55 @@ from flask import make_response
 from flask import Response
 from flask import session
 from flask import request
+from flask import redirect
+from flask import url_for
+
+from flask_session import Session
 
 sys.path.append(os.getcwd() + "/class/core")
+import db
 import public
+
 
 app = Flask(__name__, template_folder='templates/default')
 app.config.version = '0.0.1'
-app.config['SECRET_KEY'] = os.urandom(24)
+# app.config['SECRET_KEY'] = os.urandom(24)
+app.config['SECRET_KEY'] = uuid.UUID(int=uuid.getnode()).hex[-12:]
+# app.secret_key = uuid.UUID(int=uuid.getnode()).hex[-12:]
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
+try:
+    from flask_sqlalchemy import SQLAlchemy
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/py_mw_session.db'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+    sdb = SQLAlchemy(app)
+    app.config['SESSION_TYPE'] = 'sqlalchemy'
+    app.config['SESSION_SQLALCHEMY'] = sdb
+    app.config['SESSION_SQLALCHEMY_TABLE'] = 'session'
+except:
+    app.config['SESSION_TYPE'] = 'filesystem'
+    app.config['SESSION_FILE_DIR'] = '/tmp/py_mw_session_' + \
+        str(sys.version_info[0])
+    app.config['SESSION_FILE_THRESHOLD'] = 1024
+    app.config['SESSION_FILE_MODE'] = 384
+
+app.config['SESSION_PERMANENT'] = True
+app.config['SESSION_USE_SIGNER'] = True
+app.config['SESSION_KEY_PREFIX'] = 'MW_:'
+app.config['SESSION_COOKIE_NAME'] = "MW_VER_1"
+Session(app)
+
+
+def initDB():
+    try:
+        sql = db.Sql().dbfile('default')
+        csql = public.readFile('data/sql/default.sql')
+        csql_list = csql.split(';')
+        for index in range(len(csql_list)):
+            sql.execute(csql_list[index], ())
+    except Exception, ex:
+        print str(ex)
+
+initDB()
 
 
 def funConvert(fun):
@@ -31,6 +73,12 @@ def funConvert(fun):
         suf = block[x + 1].title()
         func += suf
     return func
+
+
+def isLogined():
+    if 'login' in session and 'username' in session:
+        return True
+    return False
 
 
 def publicObject(toObject, func, action=None, get=None):
@@ -65,7 +113,7 @@ def code():
     out = StringIO()
     codeImage[0].save(out, "png")
 
-    session['code'] = public.md5("".join(codeImage[1]).lower())
+    session['code'] = public.md5(''.join(codeImage[1]).lower())
 
     img = Response(out.getvalue(), headers={'Content-Type': 'image/png'})
     return make_response(img)
@@ -78,6 +126,8 @@ def checkLogin():
 
 @app.route("/login")
 def login():
+    if isLogined():
+        return redirect('/')
     return render_template('login.html')
 
 
@@ -86,7 +136,6 @@ def doLogin():
     username = request.form.get('username', '').strip()
     password = request.form.get('password', '').strip()
     code = request.form.get('code', '').strip()
-    print session
     if session.has_key('code'):
         if session['code'] != public.md5(code):
             return public.returnJson(False, '验证码错误,请重新输入!')
@@ -119,6 +168,8 @@ def index(reqClass=None, reqAction=None, reqData=None):
         return '403 no access!'
 
     if reqAction == None:
+        if not isLogined():
+            return redirect('/login')
         return render_template(reqClass + '.html')
 
     className = reqClass + '_api'
