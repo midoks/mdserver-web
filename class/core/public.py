@@ -164,6 +164,14 @@ def getJson(data):
     return json.dumps(data)
 
 
+def retOK(msg, data):
+    return returnJson(True, msg, data)
+
+
+def retFail(msg, data):
+    return returnJson(False, msg, data)
+
+
 def returnJson(status, msg, args=()):
     # 取通用Json返回
     return getJson(returnMsg(status, msg, args))
