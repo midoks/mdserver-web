@@ -12,8 +12,8 @@ mw_start(){
 mw_start_debug(){
 	# gunicorn -c setting.py app:app 
 	python task.py &
-	# gunicorn -b :7200 app:app
-	gunicorn -c setting.py app:app
+	gunicorn -b :7200 app:app
+	# gunicorn -c setting.py app:app
 	
 }
 
