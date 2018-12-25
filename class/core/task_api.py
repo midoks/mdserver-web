@@ -15,7 +15,7 @@ class task_api:
     def __init__(self):
         pass
 
-    def count(self):
+    def countApi(self):
         c = public.M('tasks').where("status!=?", ('1',)).count()
         return str(c)
 

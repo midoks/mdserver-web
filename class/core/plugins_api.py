@@ -38,7 +38,6 @@ class plugins_api:
 
     def __init__(self):
         self.setupPath = 'server'
-        # self.__plugin_dir = public.getRunDir() + '/plugins'
 
     ##### ----- start ----- ###
     def listApi(self):
@@ -94,6 +93,7 @@ class plugins_api:
             return public.returnJson(False, '缺少版本信息!', ())
 
         infoJsonPos = self.__plugin_dir + '/' + name + '/' + 'info.json'
+        print infoJsonPos
 
         if not os.path.exists(infoJsonPos):
             return public.retJson(False, '配置文件不存在!', ())
@@ -174,6 +174,7 @@ class plugins_api:
     def settingApi(self):
         name = request.args.get('name', '')
         html = self.__plugin_dir + '/' + name + '/index.html'
+        print html
         return public.readFile(html)
 
     def runApi(self):
@@ -651,6 +652,7 @@ class plugins_api:
         path = public.getRunDir() + '/' + self.__plugin_dir + \
             '/' + name + '/' + script + '.py'
         py = 'python ' + path
+
         if args == '':
             py_cmd = py + ' ' + func + ' ' + version
         else:

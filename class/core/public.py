@@ -164,7 +164,7 @@ def getJson(data):
     return json.dumps(data)
 
 
-def returnData(status, msg, data):
+def returnData(status, msg, data=None):
     return {'status': status, 'msg': msg, 'data': data}
 
 
@@ -177,9 +177,8 @@ def retFail(msg, data=None):
     return {'status': False, 'msg': msg, 'data': data}
 
 
-def returnJson(status, msg, args=()):
-    # 取通用Json返回
-    return getJson(returnMsg(status, msg, args))
+def returnJson(status, msg, data=None):
+    return getJson({'status': status, 'msg': msg, 'data': data})
 
 
 def returnMsg(status, msg, args=()):
