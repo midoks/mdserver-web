@@ -10,6 +10,7 @@ from flask import Flask
 from flask import render_template
 
 sys.path.append(os.getcwd() + "/class/core")
+import public
 
 # from dashboard import *
 # from site import *
@@ -27,12 +28,20 @@ sys.path.append(os.getcwd() + "/class/core")
 app = Flask(__name__, template_folder='templates/default')
 
 
+def publicObject(toObject, func, action=None, get=None):
+    name = func + '_api'
+    if hasattr(toObject, name):
+        efunc = 'toObject.' + name + '()'
+        return eval(efunc)
+
+    return 'fail'
+
+
 @app.route('/<reqClass>/<reqAction>', methods=['POST', 'GET'])
 @app.route('/<reqClass>/', methods=['POST', 'GET'])
 @app.route('/<reqClass>', methods=['POST', 'GET'])
 @app.route('/', methods=['POST', 'GET'])
 def index(reqClass=None, reqAction=None, reqData=None):
-    print reqClass, reqAction, reqData
 
     if (reqClass == None):
         reqClass = 'index'
@@ -45,10 +54,8 @@ def index(reqClass=None, reqAction=None, reqData=None):
         return render_template(reqClass + '.html')
 
     className = reqClass + '_api'
-    print reqClass, reqAction, className
+    # print reqClass, reqAction, className
 
     eval_str = "__import__('" + className + "')." + className + '()'
     newInstance = eval(eval_str)
-
-    print newInstance
-    return '123'
+    return publicObject(newInstance, reqAction)
