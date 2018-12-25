@@ -6,8 +6,10 @@ import os
 
 sys.path.append(os.getcwd() + "/class/core")
 import config
+from route import app
 
-app = config.config().makeApp(__name__)
+
+# app = config.config().makeApp(__name__)
 
 try:
     if __name__ == "__main__":
