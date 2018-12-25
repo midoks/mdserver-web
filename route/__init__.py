@@ -51,8 +51,8 @@ def index(reqClass=None, reqAction=None, reqData=None):
 
     if (reqClass == None):
         reqClass = 'index'
-    classFile = ('config', 'control', 'crontab',
-                 'files', 'firewall', 'index', 'plugins', 'login', 'system', 'site', 'soft')
+    classFile = ('config', 'control', 'crontab', 'files', 'firewall',
+                 'index', 'plugins', 'login', 'system', 'site', 'task', 'soft')
     if not reqClass in classFile:
         return '403 no access!'
 
