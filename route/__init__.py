@@ -43,13 +43,17 @@ def funConvert(fun):
 
 
 def publicObject(toObject, func, action=None, get=None):
-    name = funConvert(func)
+    name = funConvert(func) + 'Api'
     if hasattr(toObject, name):
         efunc = 'toObject.' + name + '()'
         data = eval(efunc)
         return public.getJson(data)
+    return public.retFail('Access Exception!')
 
-    return 'fail'
+
+@app.route("/check_login", methods=['POST', 'GET'])
+def checkLogin():
+    return "true"
 
 
 @app.route('/<reqClass>/<reqAction>', methods=['POST', 'GET'])
