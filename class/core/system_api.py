@@ -22,8 +22,15 @@ class system_api:
         self.setupPath = public.getServerDir()
 
     ##### ----- start ----- ###
-    def network(self):
+    def networkApi(self):
         return self.getNetWork()
+
+    # @system.route("/update_server")
+    def updateServerApi(self):
+        stype = request.args.get('type', 'check')
+        version = request.args.get('version', '')
+        data = self.updateServer(stype, version)
+        return data
 
     ##### ----- end ----- ###
 

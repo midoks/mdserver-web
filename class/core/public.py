@@ -164,12 +164,16 @@ def getJson(data):
     return json.dumps(data)
 
 
-def retOK(msg, data):
-    return returnJson(True, msg, data)
+def returnData(status, msg, data):
+    return {'status': status, 'msg': msg, 'data': data}
 
 
-def retFail(msg, data):
-    return returnJson(False, msg, data)
+def retOK(data):
+    return {'status': True, 'msg': 'OK!', 'data': data}
+
+
+def retFail(msg, data=None):
+    return {'status': False, 'msg': msg, 'data': data}
 
 
 def returnJson(status, msg, args=()):
