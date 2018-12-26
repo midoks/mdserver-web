@@ -123,11 +123,24 @@ function gaeAsyncProject(pname){
     });
 }
 
+
+function stringToEntity(str,radix){
+    let arr=[]
+    //返回的字符实体默认10进制，也可以选择16进制
+    radix=radix||0
+    for(let i=0;i<str.length;i++){                               
+    arr.push((!radix?'&#'+str.charCodeAt(i):'&#x'+str.charCodeAt(i).toString(16))+';')
+    }
+    let tmp=arr.join('')
+    // console.log(`'${str}' 转实体为 '${tmp}'`)
+    return tmp
+}
+
 function gaeProjectCmd(pname){
     gaePost('project_list_cmd', {'name':pname}, function(data){
         var data_str = data.data;
         if (data_str.indexOf('gcloud') !== -1){
-            layer.msg(data.data,{icon:1,time:5000,shade: [0.3, '#000']});
+            layer.msg(stringToEntity(data.data),{icon:1,time:5000,shade: [0.3, '#000']});
         } else {
             layer.msg(data.data,{icon:0,time:5000,shade: [0.3, '#000']});
         }
