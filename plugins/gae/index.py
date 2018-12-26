@@ -73,13 +73,63 @@ def getAllProjectList(search):
 def checkProjectListIsSet(data):
     dlen = len(data)
     for x in range(dlen):
-        path = getServerDir() + data[x]['name'] + '.json'
+        path = getServerDir() + '/' + data[x]['name'] + '.json'
         if os.path.exists(path):
-            data[x]['isset'] = True
+            if os.path.getsize(path) == 0:
+                data[x]['isset'] = False
+            else:
+                data[x]['isset'] = True
         else:
             data[x]['isset'] = False
 
     return data
+
+
+def projectListEdit():
+    args = getArgs()
+    if not 'name' in args:
+        return 'missing name!'
+
+    file = getServerDir() + '/' + args['name'] + '.json'
+    if not os.path.exists(file):
+        public.execShell('touch ' + file)
+    return file
+
+
+def projectListDel():
+    args = getArgs()
+    if not 'name' in args:
+        return 'missing name!'
+
+    file = getServerDir() + '/' + args['name'] + '.json'
+    if os.path.exists(file):
+        public.execShell('rm -rf ' + file)
+    return 'ok'
+
+
+def projectListAsync():
+    import subprocess
+    args = getArgs()
+    if not 'name' in args:
+        return 'missing name!'
+
+    file = getServerDir() + '/' + args['name'] + '.json'
+    if not os.path.exists(file):
+        return 'file not exists!'
+
+    content = public.readFile(file)
+    contentObj = json.loads(content)
+    asyncUser = contentObj['client_email']
+    cmd = getServerDir() + '/google-cloud-sdk/bin/'
+    projectDir = public.getWwwDir() + '/' + args['name']
+
+    public.execShell(cmd + 'gcloud config set account ' + asyncUser)
+    asyncCmd = 'cd ' + projectDir + ' && ' + cmd + 'gcloud app deploy << y &'
+    public.execShell(asyncCmd)
+
+    # subprocess.Popen(asyncCmd,
+    # stdout=subprocess.PIPE, shell=True)
+    return 'ok'
 
 
 def projectList():
@@ -116,5 +166,11 @@ if __name__ == "__main__":
         print status()
     elif func == 'project_list':
         print projectList()
+    elif func == 'project_list_edit':
+        print projectListEdit()
+    elif func == 'project_list_del':
+        print projectListDel()
+    elif func == 'project_list_async':
+        print projectListAsync()
     else:
         print 'error'
