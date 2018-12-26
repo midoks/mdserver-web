@@ -50,9 +50,10 @@ function projectList(page, search){
 
         ulist = rdata.data;
         for (i in ulist){
+            setName =  ulist[i]['isset'] ? '已设置' : '设置';
             content += '<tr><td>'+ulist[i]['name']+'</td>'+
                 '<td>'+ulist[i]['dir']+'</td><td>'+
-                '<a class="btlink" onclick="gaeSetProject(\''+ulist[i]['name']+'\')">设置</a> | ' +
+                '<a class="btlink" onclick="gaeSetProject(\''+ulist[i]['name']+'\','+ulist[i]['isset']+')">'+setName+'</a> | ' +
                 '<a class="btlink" onclick="gaeAsyncProject(\''+ulist[i]['name']+'\')">同步</a> | ' +
                 '<a class="btlink" target="_blank" href="' + '' +'">查看命令</a>' +
                 '</td></tr>';
@@ -79,29 +80,25 @@ function projectListFind(){
     projectList(1, search);
 }
 
-function gaeSetProject(pname){
+function gaeSetProject(pname,isset){
+
+    var html = '';
+
+    if (isset){
+        html += '<button onclick="gaeProjectDel(\''+pname+'\')" class="btn btn-default btn-sm">删除</button>';
+    }
+    html += '<button onclick="gaeProjectEdit(\''+pname+'\')" class="btn btn-default btn-sm">编辑</button>';
 
     var loadOpen = layer.open({
         type: 1,
-        title: '项目('+pname+')同步密钥设置',
-        area: '600px',
-        content:"<div class='bt-form pd20 c6'>\
-                <div>\
-                    <div class='divtable'>\
-                    <table class='table table-hover'>\
-                    <thead><tr><th>用户</th><th>权限</th><th>操作</th></tr></thead>\
-                    <tbody></tbody>\
-                    </table>\
-                    </div>\
-                    <div class='bt-form-submit-btn'><button type='button' class='btn btn-danger btn-sm btn-title' onclick='layer.closeAll()'>关闭</button>\
-                    <button type='button' class='btn btn-success btn-sm btn-title' onclick=';'>确定</button></div>\
-                </div>\
-            </div>"
+        title: '['+ pname +']密钥设置',
+        area: '240px',
+        content:'<div class="change-default pd20">'+html+'</div>'
     });
+}
 
-    // gaePost('project_list_set', '', function(data){
-    //     console.log(data);
-    // });
+function gaeProjectEdit(pname){
+    
 }
 
 

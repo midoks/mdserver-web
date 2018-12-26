@@ -70,6 +70,18 @@ def getAllProjectList(search):
     return dlist
 
 
+def checkProjectListIsSet(data):
+    dlen = len(data)
+    for x in range(dlen):
+        path = getServerDir() + data[x]['name'] + '.json'
+        if os.path.exists(path):
+            data[x]['isset'] = True
+        else:
+            data[x]['isset'] = False
+
+    return data
+
+
 def projectList():
     args = getArgs()
 
@@ -90,6 +102,7 @@ def projectList():
 
     start = (page - 1) * page_size
     ret_data = dlist[start:start + page_size]
+    ret_data = checkProjectListIsSet(ret_data)
 
     data = {}
     data['data'] = ret_data
