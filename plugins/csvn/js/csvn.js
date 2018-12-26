@@ -340,16 +340,16 @@ function csvnAddProject(){
 }
 
 
-function csvnProjectScript(pnanm, has_hook){
+function csvnProjectScript(pname, has_hook){
 
     var html = '';
     if (has_hook){
-        html += '<button onclick="csvnProjectScriptEdit(\''+pnanm+'\')" class="btn btn-default btn-sm">手动编辑</button>';
-        html += '<button onclick="csvnProjectScriptDebug(\''+pnanm+'\')" class="btn btn-default btn-sm">调试日志</button>';
-        html += '<button onclick="csvnProjectScriptLoad(\''+pnanm+'\')" class="btn btn-default btn-sm">重新加载</button>';
-        html += '<button onclick="csvnProjectScriptUnload(\''+pnanm+'\')" class="btn btn-default btn-sm">卸载脚本</button>';
+        html += '<button onclick="csvnProjectScriptEdit(\''+pname+'\')" class="btn btn-default btn-sm">手动编辑</button>';
+        html += '<button onclick="csvnProjectScriptDebug(\''+pname+'\')" class="btn btn-default btn-sm">调试日志</button>';
+        html += '<button onclick="csvnProjectScriptLoad(\''+pname+'\')" class="btn btn-default btn-sm">重新加载</button>';
+        html += '<button onclick="csvnProjectScriptUnload(\''+pname+'\')" class="btn btn-default btn-sm">卸载脚本</button>';
     } else {
-        html += '<button onclick="csvnProjectScriptLoad(\''+pnanm+'\')" class="btn btn-default btn-sm">加载脚本</button>';
+        html += '<button onclick="csvnProjectScriptLoad(\''+pname+'\')" class="btn btn-default btn-sm">加载脚本</button>';
     }
 
     var loadOpen = layer.open({
