@@ -53,7 +53,7 @@ function projectList(page, search){
             content += '<tr><td>'+ulist[i]['name']+'</td>'+
                 '<td>'+ulist[i]['dir']+'</td><td>'+
                 '<a class="btlink" onclick="gaeSetProject(\''+ulist[i]['name']+'\')">设置</a> | ' +
-                '<a class="btlink" onclick="csvnAclProject(\''+ulist[i]['name']+'\')">同步</a> | ' +
+                '<a class="btlink" onclick="gaeAsyncProject(\''+ulist[i]['name']+'\')">同步</a> | ' +
                 '<a class="btlink" target="_blank" href="' + '' +'">查看命令</a>' +
                 '</td></tr>';
         }
@@ -79,10 +79,29 @@ function projectListFind(){
     projectList(1, search);
 }
 
-function gaeSetProject(name){
-    gaePost('project_list_set', '', function(data){
-        console.log
+function gaeSetProject(pname){
+
+    var loadOpen = layer.open({
+        type: 1,
+        title: '项目('+pname+')同步密钥设置',
+        area: '600px',
+        content:"<div class='bt-form pd20 c6'>\
+                <div>\
+                    <div class='divtable'>\
+                    <table class='table table-hover'>\
+                    <thead><tr><th>用户</th><th>权限</th><th>操作</th></tr></thead>\
+                    <tbody></tbody>\
+                    </table>\
+                    </div>\
+                    <div class='bt-form-submit-btn'><button type='button' class='btn btn-danger btn-sm btn-title' onclick='layer.closeAll()'>关闭</button>\
+                    <button type='button' class='btn btn-success btn-sm btn-title' onclick=';'>确定</button></div>\
+                </div>\
+            </div>"
     });
+
+    // gaePost('project_list_set', '', function(data){
+    //     console.log(data);
+    // });
 }
 
 
