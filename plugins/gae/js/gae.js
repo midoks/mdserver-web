@@ -55,7 +55,8 @@ function projectList(page, search){
                 '<td>'+ulist[i]['dir']+'</td><td>'+
                 '<a class="btlink" onclick="gaeSetProject(\''+ulist[i]['name']+'\','+ulist[i]['isset']+')">'+setName+'</a> | ' +
                 '<a class="btlink" onclick="gaeAsyncProject(\''+ulist[i]['name']+'\')">同步</a> | ' +
-                '<a class="btlink" target="_blank" href="' + '' +'">查看命令</a>' +
+                '<a class="btlink" target="_blank" onclick="gaeProjectCmd(\''+ulist[i]['name']+'\')">命令</a> | ' +
+                '<a class="btlink" target="_blank" onclick="gaeProjectUrl(\''+ulist[i]['name']+'\')">访问</a>' +
                 '</td></tr>';
         }
 
@@ -109,12 +110,38 @@ function gaeProjectDel(pname){
     });
 }
 
-
 function gaeAsyncProject(pname){
-    console.log(pname);
     gaePost('project_list_async', {'name':pname}, function(data){
         console.log(data);
-        // layer.msg('同步成功!',{icon:0,time:2000,shade: [0.3, '#000']});
+        if (data.data !='ok'){
+            layer.msg(data.data,{icon:0,time:2000,shade: [0.3, '#000']});
+        } else {
+            layer.msg('同步成功!',{icon:0,time:2000,shade: [0.3, '#000']});
+        } 
+    });
+}
+
+
+function gaeProjectCmd(pname){
+    gaePost('project_list_cmd', {'name':pname}, function(data){
+        var data_str = data.data;
+        if (data_str.indexOf('gcloud') !== -1){
+            layer.msg(data.data,{icon:1,time:5000,shade: [0.3, '#000']});
+        } else {
+            layer.msg(data.data,{icon:0,time:5000,shade: [0.3, '#000']});
+        }
+    });
+}
+
+
+function gaeProjectUrl(pname){
+    gaePost('project_list_url', {'name':pname}, function(data){
+        var data_str = data.data;
+        if (data_str.indexOf('appspot.com') !== -1){
+            window.open(data.data);
+        } else {
+            layer.msg(data.data,{icon:0,time:5000,shade: [0.3, '#000']});
+        }
     });
 }
 
