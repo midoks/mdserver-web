@@ -32,7 +32,7 @@ Install_csvn()
 	else
 		useradd csvn
 		cp /etc/sudoers{,.`date +"%Y-%m-%d_%H-%M-%S"`}
-		echo "csvn ALL=(ALL)      ALL" >> /etc/sudoers
+		echo "csvn ALL=(ALL)    NOPASSWD: ALL" >> /etc/sudoers
 	fi
 
 	chown -R  csvn:csvn $serverPath/csvn
