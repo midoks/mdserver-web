@@ -103,6 +103,11 @@ def projectListDel():
 
     file = getServerDir() + '/' + args['name'] + '.json'
     if os.path.exists(file):
+        content = public.readFile(file)
+        contentObj = json.loads(content)
+        asyncUser = contentObj['client_email']
+        cmd = getServerDir() + '/google-cloud-sdk/bin/'
+        public.execShell(cmd + 'gcloud auth revoke ' + asyncUser)
         public.execShell('rm -rf ' + file)
     return 'ok'
 
