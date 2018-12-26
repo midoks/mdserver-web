@@ -107,6 +107,13 @@ def projectListDel():
     return 'ok'
 
 
+def checkUserExist(cmd, user):
+    data = public.execShell(cmd + 'gcloud auth list | grep ' + user)
+    if data[0] == '':
+        return False
+    return True
+
+
 def projectListAsync():
     import subprocess
     args = getArgs()
@@ -123,12 +130,19 @@ def projectListAsync():
     cmd = getServerDir() + '/google-cloud-sdk/bin/'
     projectDir = public.getWwwDir() + '/' + args['name']
 
-    public.execShell(cmd + 'gcloud config set account ' + asyncUser)
-    asyncCmd = 'cd ' + projectDir + ' && ' + cmd + 'gcloud app deploy << y &'
-    public.execShell(asyncCmd)
+    if not checkUserExist(cmd, asyncUser):
+        public.execShell(
+            cmd + 'gcloud auth activate-service-account --key-file ' + file)
 
-    # subprocess.Popen(asyncCmd,
-    # stdout=subprocess.PIPE, shell=True)
+    pName = contentObj['project_id']
+    setUserCmd = cmd + 'gcloud config set account ' + asyncUser
+    setUserCmd += ' && ' + cmd + 'gcloud config set project ' + pName
+    asyncCmd = setUserCmd + ' && cd ' + projectDir + \
+        ' && ' + cmd + 'gcloud app deploy << y'
+
+    taskAdd = (None,  'gae[async]',
+               'execshell', '0', time.strftime('%Y-%m-%d %H:%M:%S'), asyncCmd)
+    public.M('tasks').add('id,name,type,status,addtime, execstr', taskAdd)
     return 'ok'
 
 
