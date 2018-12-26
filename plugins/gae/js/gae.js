@@ -43,7 +43,7 @@ function projectList(page, search){
         content += '<thead><tr>';
         content += '<th>项目名</th>';
         content += '<th>地址</th>';
-        content += '<th>操作</th>';
+        content += '<th>操作(<a class="btlink" target="_blank" href="https://console.cloud.google.com/">官方地址</a>)</th>';
         content += '</tr></thead>';
         content += '<tbody>';
 
@@ -112,15 +112,13 @@ function gaeProjectDel(pname){
 
 function gaeAsyncProject(pname){
     gaePost('project_list_async', {'name':pname}, function(data){
-        console.log(data);
         if (data.data !='ok'){
             layer.msg(data.data,{icon:0,time:2000,shade: [0.3, '#000']});
         } else {
-            layer.msg('同步成功!',{icon:0,time:2000,shade: [0.3, '#000']});
+            layer.msg('加入任务,请自行观察!',{icon:1,time:2000,shade: [0.3, '#000']});
         } 
     });
 }
-
 
 function gaeProjectCmd(pname){
     gaePost('project_list_cmd', {'name':pname}, function(data){
