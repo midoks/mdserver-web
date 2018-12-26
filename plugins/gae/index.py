@@ -164,8 +164,13 @@ def projectListCmd():
     contentObj = json.loads(content)
     asyncUser = contentObj['client_email']
     cmd = getServerDir() + '/google-cloud-sdk/bin/'
+    pName = contentObj['project_id']
     projectDir = public.getWwwDir() + '/' + args['name']
-    asyncCmd = 'cd ' + projectDir + ' && ' + cmd + 'gcloud app deploy << y'
+
+    setUserCmd = cmd + 'gcloud config set account ' + asyncUser
+    setUserCmd += ' && ' + cmd + 'gcloud config set project ' + pName
+    asyncCmd = setUserCmd + ' && cd ' + projectDir + \
+        ' && ' + cmd + 'gcloud app deploy << y'
     return asyncCmd
 
 
