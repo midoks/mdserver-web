@@ -81,9 +81,7 @@ function projectListFind(){
 }
 
 function gaeSetProject(pname,isset){
-
     var html = '';
-
     if (isset){
         html += '<button onclick="gaeProjectDel(\''+pname+'\')" class="btn btn-default btn-sm">删除</button>';
     }
@@ -98,7 +96,26 @@ function gaeSetProject(pname,isset){
 }
 
 function gaeProjectEdit(pname){
-    
+    gaePost('project_list_edit', {'name':pname}, function(data){
+        onlineEditFile(0,data.data);
+    });
+}
+
+
+function gaeProjectDel(pname){
+    gaePost('project_list_del', {'name':pname}, function(data){
+        layer.msg('删除成功!',{icon:0,time:2000,shade: [0.3, '#000']});
+        projectList();
+    });
+}
+
+
+function gaeAsyncProject(pname){
+    console.log(pname);
+    gaePost('project_list_async', {'name':pname}, function(data){
+        console.log(data);
+        // layer.msg('同步成功!',{icon:0,time:2000,shade: [0.3, '#000']});
+    });
 }
 
 
