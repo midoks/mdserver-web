@@ -167,10 +167,10 @@ def projectListCmd():
     pName = contentObj['project_id']
     projectDir = public.getWwwDir() + '/' + args['name']
 
-    setUserCmd = cmd + 'gcloud config set account ' + asyncUser
-    setUserCmd += ' && ' + cmd + 'gcloud config set project ' + pName
-    asyncCmd = setUserCmd + ' && cd ' + projectDir + \
-        ' && ' + cmd + 'gcloud app deploy <<EOF y' + "\nEOF"
+    setUserCmd = 'sudo ' + cmd + 'gcloud config set account ' + asyncUser
+    setUserCmd += ' && sudo ' + cmd + 'gcloud config set project ' + pName
+    asyncCmd = setUserCmd + ' && sudo cd ' + projectDir + \
+        ' && sudo ' + cmd + 'gcloud app deploy <<y'
     return asyncCmd
 
 
