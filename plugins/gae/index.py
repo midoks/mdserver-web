@@ -170,7 +170,7 @@ def projectListCmd():
     setUserCmd = cmd + 'gcloud config set account ' + asyncUser
     setUserCmd += ' && ' + cmd + 'gcloud config set project ' + pName
     asyncCmd = setUserCmd + ' && cd ' + projectDir + \
-        ' && ' + cmd + 'gcloud app deploy << y'
+        ' && ' + cmd + 'gcloud app deploy <<EOF y' + "\nEOF"
     return asyncCmd
 
 
