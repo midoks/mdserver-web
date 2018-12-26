@@ -20,4 +20,4 @@ if [ ! -d  $WEB_PATH ]; then
 		--non-interactive
 fi
 
-cd $WEB_PATH && svn update --username={$CSVN_USER} --password={$CSVN_PWD}
+cd $WEB_PATH && svn update --username={$CSVN_USER} --password={$CSVN_PWD} --no-auth-cache  --non-interactive
