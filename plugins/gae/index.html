@@ -1,7 +1,8 @@
 <div class="bt-form">
 	<div class="bt-w-main">
 		<div class="bt-w-menu">
-			<p class="bgw" onclick="readme();">插件说明</p>	
+			<p class="bgw" onclick="readme();">插件说明</p>
+			<p onclick="projectList();">项目列表</p>
 		</div>
 
 		<div class="bt-w-con pd15">
@@ -12,12 +13,15 @@
 
 </div>
 <script type="text/javascript">
+$.getScript( "/plugins/file?name=gae&f=js/gae.js");
 
-function readme() {
-	$('.bt-w-main .soft-man-con').hide();
-	$('.bt-w-main .v0').show();
+readme();
+function readme(){
+	var html = '<p>开发文档:https://cloud.google.com/sdk/docs/</p>';
+	html += '<p>* 注意:本插件通过Google <a class="btlink" target="_blank" href="https://cloud.google.com/sdk/docs/scripting-gcloud">JSON 格式</a>赋权免交互式</p>';
+	html += '<p>* 注意:添加:gcloud auth activate-service-account --key-file [KEY_FILE] << y</p>';
+	
+	html += '<p>* 注意:设置后,一般同步项目命令:gcloud app deploy << y</p>';
+	$('.bt-w-main .soft-man-con').html(html);
 }
-
-//../google-cloud-sdk/bin/gcloud app deploy << y
-
 </script>
