@@ -105,8 +105,10 @@ function gaeProjectEdit(pname){
 
 function gaeProjectDel(pname){
     gaePost('project_list_del', {'name':pname}, function(data){
-        layer.msg('删除成功!',{icon:0,time:2000,shade: [0.3, '#000']});
-        projectList();
+        showMsg('删除成功!',function(){
+            $('.layui-layer-close1').click();
+            projectList();
+        },{icon:0,time:2000,shade: [0.3, '#000']});
     });
 }
 
@@ -116,7 +118,8 @@ function gaeAsyncProject(pname){
             layer.msg(data.data,{icon:0,time:2000,shade: [0.3, '#000']});
         } else {
             layer.msg('加入任务,请自行观察!',{icon:1,time:2000,shade: [0.3, '#000']});
-        } 
+        }
+        $('.layui-layer-close1').click();
     });
 }
 
