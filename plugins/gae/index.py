@@ -115,7 +115,7 @@ def projectListAsync():
 
     file = getServerDir() + '/' + args['name'] + '.json'
     if not os.path.exists(file):
-        return 'file not exists!'
+        return 'not configured file!'
 
     content = public.readFile(file)
     contentObj = json.loads(content)
@@ -130,6 +130,42 @@ def projectListAsync():
     # subprocess.Popen(asyncCmd,
     # stdout=subprocess.PIPE, shell=True)
     return 'ok'
+
+
+def projectListCmd():
+    args = getArgs()
+    if not 'name' in args:
+        return 'missing name!'
+
+    file = getServerDir() + '/' + args['name'] + '.json'
+    if not os.path.exists(file):
+        return 'not configured file!'
+
+    content = public.readFile(file)
+    contentObj = json.loads(content)
+    asyncUser = contentObj['client_email']
+    cmd = getServerDir() + '/google-cloud-sdk/bin/'
+    projectDir = public.getWwwDir() + '/' + args['name']
+    asyncCmd = 'cd ' + projectDir + ' && ' + cmd + 'gcloud app deploy << y'
+    return asyncCmd
+
+
+def projectListUrl():
+    args = getArgs()
+    if not 'name' in args:
+        return 'missing name!'
+
+    file = getServerDir() + '/' + args['name'] + '.json'
+    if not os.path.exists(file):
+        return 'not configured file!'
+
+    content = public.readFile(file)
+    contentObj = json.loads(content)
+    asyncUser = contentObj['client_email']
+    plist = asyncUser.split('@')
+
+    url = 'https://' + plist[0] + '.appspot.com'
+    return url
 
 
 def projectList():
@@ -172,5 +208,9 @@ if __name__ == "__main__":
         print projectListDel()
     elif func == 'project_list_async':
         print projectListAsync()
+    elif func == 'project_list_cmd':
+        print projectListCmd()
+    elif func == 'project_list_url':
+        print projectListUrl()
     else:
         print 'error'
