@@ -95,8 +95,6 @@ def test():
     print session
     os = public.getOs()
     print os
-
-    print(sys.platform)
     return public.getLocalIp()
 
 
@@ -121,11 +119,18 @@ def code():
 
 @app.route("/check_login", methods=['POST'])
 def checkLogin():
-    return "true"
+    if isLogined():
+        return "true"
+    return "false"
 
 
 @app.route("/login")
 def login():
+
+    dologin = request.args.get('dologin', '')
+    if dologin == 'True':
+        session.clear()
+
     if isLogined():
         return redirect('/')
     return render_template('login.html')
@@ -136,6 +141,7 @@ def doLogin():
     username = request.form.get('username', '').strip()
     password = request.form.get('password', '').strip()
     code = request.form.get('code', '').strip()
+    print session
     if session.has_key('code'):
         if session['code'] != public.md5(code):
             return public.returnJson(False, '验证码错误,请重新输入!')

@@ -63,8 +63,7 @@ def getLogsDir():
 
 
 def getOs():
-    os = execShell('uname')
-    return os[0].lower().strip()
+    return sys.platform
 
 
 def isAppleSystem():
