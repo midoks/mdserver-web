@@ -123,7 +123,8 @@ class site_api:
     def deleteApi(self):
         sid = request.form.get('id', '').encode('utf-8')
         webname = request.form.get('webname', '').encode('utf-8')
-        return self.delete(sid, webname)
+        path = request.form.get('path', '0').encode('utf-8')
+        return self.delete(sid, webname, path)
     ##### ----- end   ----- ###
 
     # 域名编码转换
@@ -477,17 +478,25 @@ class site_api:
         public.restartWeb()
         return public.getJson(data)
 
-    def delete(self, sid, webname):
-
+    def deleteWSLogs(self, webname):
+        assLogPath = public.getLogsDir() + '/' + webname + '.log'
+        errLogPath = public.getLogsDir() + '/' + webname + '.error.log'
         confFile = self.setupPath + '/openresty/nginx/conf/vhost/' + webname + '.conf'
-        if os.path.exists(confFile):
-            os.remove(confFile)
-
         rewriteFile = self.setupPath + '/openresty/nginx/conf/rewrite/' + webname + '.conf'
-        if os.path.exists(rewriteFile):
-            os.remove(rewriteFile)
+        logs = [assLogPath, errLogPath, confFile, rewriteFile]
+        for i in logs:
+            public.deleteFile(i)
+
+    def delete(self, sid, webname, path):
+
+        self.deleteWSLogs(webname)
+
+        if path == '1':
+            rootPath = public.getWwwDir() + '/' + webname
+            public.execShell('rm -rf ' + rootPath)
 
         public.M('sites').where("id=?", (sid,)).delete()
+        public.restartWeb()
         return public.returnJson(True, '站点删除成功!')
 
     def setEndDate(self, sid, edate):

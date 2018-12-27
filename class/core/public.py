@@ -72,6 +72,11 @@ def isAppleSystem():
     return False
 
 
+def deleteFile(file):
+    if os.path.exists(file):
+        os.remove(file)
+
+
 def isInstalledWeb():
     path = getServerDir() + '/openresty/nginx/sbin/nginx'
     if os.path.exists(path):
