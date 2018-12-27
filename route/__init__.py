@@ -76,7 +76,7 @@ def funConvert(fun):
 
 
 def isLogined():
-    if 'login' in session and 'username' in session:
+    if 'login' in session and 'username' in session and session['login'] == True:
         return True
     return False
 
