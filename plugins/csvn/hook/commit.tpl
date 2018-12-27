@@ -28,7 +28,7 @@ fi
 cd $SAVE_PATH && svn update --username={$CSVN_USER} --password={$CSVN_PWD} --no-auth-cache  --non-interactive
 
 WEB_PATH={$PROJECT_DIR}/wwwroot/$REPOS
-mkdir -p $WEB_PATH
+sudo mkdir -p $WEB_PATH
 
-rsync -vauP --exclude=".*" $SAVE_PATH/ $WEB_PATH
+sudo rsync -vauP --exclude=".*" $SAVE_PATH/ $WEB_PATH
 sudo chown -R www:www $WEB_PATH
