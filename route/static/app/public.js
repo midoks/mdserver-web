@@ -671,10 +671,9 @@ $(function() {
 		$(this).addClass("fb-selected").siblings().removeClass("fb-selected")
 	})
 });
+
 $("#dologin").click(function() {
-	layer.confirm(lan.bt.loginout, {icon:3,
-		closeBtn: 2
-	}, function() {
+	layer.confirm('您真的要退出面板吗?', {icon:3,closeBtn: 2}, function() {
 		window.location.href = "/login?dologin=True"
 	});
 	return false
