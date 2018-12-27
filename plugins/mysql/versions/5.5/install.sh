@@ -30,14 +30,14 @@ Install_mysql()
 
 	cd ${mysqlDir}/mysql-5.5.62 && cmake \
 	-DCMAKE_INSTALL_PREFIX=$serverPath/mysql \
-	&& make && make install \
+	&& make && make install && make clean \
 	&& echo '5.5' > $serverPath/mysql/version.pl
 	echo '安装完成' > $install_tmp
 }
 
 Uninstall_mysql()
 {
-	rm -rf $serverPath/mysql
+	#rm -rf $serverPath/mysql
 	echo '卸载完成' > $install_tmp
 }
 
