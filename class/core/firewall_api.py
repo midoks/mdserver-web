@@ -33,7 +33,7 @@ class firewall_api:
         search = request.form.get('search', '').strip()
         return self.getLogList(int(p), int(limit), search)
 
-    def getSshInfo(self):
+    def getSshInfoApi(self):
         file = '/etc/ssh/sshd_config'
         conf = public.readFile(file)
         rep = "#*Port\s+([0-9]+)\s*\n"
