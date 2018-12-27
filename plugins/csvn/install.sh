@@ -12,8 +12,23 @@ install_tmp=${rootPath}/tmp/bt_install.pl
 
 CSVN_SOURCE='https://github.com/midoks/mdserver-web/releases/download/init/CollabNetSubversionEdge-5.1.4_linux-x86_64.tar.xz'
 
+CheckJAVA()
+{
+	which "java" > /dev/null
+	if [ $? -eq 0 ]
+	then
+    	echo 'java is exist'
+	else
+    	echo 'java install...'
+    	yum install -y java
+	fi
+}
+
+
 Install_csvn()
 {
+	CheckJAVA
+	exit 0 
 	mkdir -p $serverPath/source
 
 	echo '正在安装脚本文件...' > $install_tmp
