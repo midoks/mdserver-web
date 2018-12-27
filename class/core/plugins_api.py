@@ -174,7 +174,6 @@ class plugins_api:
     def settingApi(self):
         name = request.args.get('name', '')
         html = self.__plugin_dir + '/' + name + '/index.html'
-        print html
         return public.readFile(html)
 
     def runApi(self):
