@@ -92,7 +92,7 @@ def contentReplace(content, version):
         val = ';user = nobody\n'
         content = re.sub(rep, val, content)
 
-        rep = r'group\s*=\s*(.+)\r?\n'
+        rep = r'[^\.]group\s*=\s*(.+)\r?\n'
         val = ';group = nobody\n'
         content = re.sub(rep, val, content)
 
