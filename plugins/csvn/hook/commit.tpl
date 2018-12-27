@@ -9,8 +9,12 @@ REV="$2"
 TXN_NAME="$3"
 
 
+if [ ! -d  {$PROJECT_DIR}/csvn ]; then
+	sudo mkdir -p {$PROJECT_DIR}/csvn
+	sudo chown -R csvn:csvn {$PROJECT_DIR}/csvn
+fi
+
 SAVE_PATH={$PROJECT_DIR}/csvn/$REPOS
-mkdir -p {$PROJECT_DIR}/csvn
 SVN_PATH=http://127.0.0.1:{$PORT}/svn/$REPOS
 
 if [ ! -d  $SAVE_PATH ]; then
