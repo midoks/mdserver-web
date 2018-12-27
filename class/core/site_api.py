@@ -9,6 +9,8 @@ import re
 import json
 import pwd
 
+from flask import request
+
 
 class site_api:
     siteName = None  # 网站名称
