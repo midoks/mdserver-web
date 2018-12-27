@@ -80,13 +80,22 @@ def contentReplace(content, version):
         content = content.replace('{$PHP_USER}', 'nobody')
         content = content.replace('{$PHP_GROUP}', 'nobody')
 
+        rep = 'listen.owner\s*=\s*(.+)\r?\n'
+        val = ';listen.owner = nobody\n'
+        content = re.sub(rep, val, content)
+
+        rep = 'listen.group\s*=\s*(.+)\r?\n'
+        val = ';listen.group = nobody\n'
+        content = re.sub(rep, val, content)
+
         rep = 'user\s*=\s*(.+)\r?\n'
         val = ';user = nobody\n'
         content = re.sub(rep, val, content)
 
-        rep = 'group\s*=\s*(.+)\r?\n'
+        rep = r'group\s*=\s*(.+)\r?\n'
         val = ';group = nobody\n'
         content = re.sub(rep, val, content)
+
     else:
         content = content.replace('{$PHP_USER}', 'www')
         content = content.replace('{$PHP_GROUP}', 'www')
