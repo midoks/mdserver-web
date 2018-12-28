@@ -8,7 +8,7 @@ mw_start(){
 	if [ "$isStart" == '' ];then
             echo -e "Starting mw... \c"
             cd $mw_path && gunicorn -c setting.py app:app
-            sleep 0.6
+            sleep 0.2
             port=$(cat ${mw_path}/data/port.pl)
             isStart=$(lsof -i :$port|grep LISTEN)
             if [ "$isStart" == '' ];then
