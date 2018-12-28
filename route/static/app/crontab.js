@@ -1,6 +1,6 @@
 var num = 0;
 //查看任务日志
-function GetLogs(id){
+function getLogs(id){
 	layer.msg(lan.public.the_get,{icon:16,time:0,shade: [0.3, '#000']});
 	var data='&id='+id
 	$.post('/crontab?action=GetLogs',data,function(rdata){
@@ -32,35 +32,35 @@ function GetLogs(id){
 
 function getCronData(){
 	var laid=layer.msg(lan.public.the,{icon:16,time:0,shade: [0.3, '#000']});
-	$.post('/crontab/list',"",function(rdata){
+	$.post('/crontab/list','',function(rdata){
 		layer.close(laid);
-		var cbody="";
+		console.log(rdata);
+		var cbody = "";
 		if(rdata == ""){
-			cbody="<tr><td colspan='6'>"+lan.crontab.task_empty+"</td></tr>"
-		}
-		else{
-			for(var i=0;i<rdata.length;i++){
+			cbody="<tr><td colspan='6'>"+lan.crontab.task_empty+"</td></tr>";
+		}else{
+			for(var i=0;i<rdata.data.length;i++){
 				cbody += "<tr>\
-							<td><input type='checkbox' onclick='checkSelect();' title='"+rdata[i].name+"' name='id' value='"+rdata[i].id+"'></td>\
-							<td>"+rdata[i].name+"</td>\
-							<td>"+rdata[i].type+"</td>\
-							<td>"+rdata[i].cycle+"</td>\
-							<td>"+rdata[i].addtime+"</td>\
+							<td><input type='checkbox' onclick='checkSelect();' title='"+rdata.data[i].name+"' name='id' value='"+rdata.data[i].id+"'></td>\
+							<td>"+rdata.data[i].name+"</td>\
+							<td>"+rdata.data[i].type+"</td>\
+							<td>"+rdata.data[i].cycle+"</td>\
+							<td>"+rdata.data[i].addtime+"</td>\
 							<td>\
-								<a href=\"javascript:StartTask("+rdata[i].id+");\" class='btlink'>"+lan.public.exec+"</a> | \
-								<a href=\"javascript:OnlineEditFile(0,'/www/server/cron/"+rdata[i].echo+"');\" class='btlink'>"+lan.public.script+"</a> | \
-								<a href=\"javascript:GetLogs("+rdata[i].id+");\" class='btlink'>"+lan.public.log+"</a> | \
-								<a href=\"javascript:planDel("+rdata[i].id+" ,'"+rdata[i].name.replace('\\','\\\\').replace("'","\\'").replace('"','')+"');\" class='btlink'>"+lan.public.del+"</a>\
+								<a href=\"javascript:startTask("+rdata.data[i].id+");\" class='btlink'>"+lan.public.exec+"</a> | \
+								<a href=\"javascript:onlineEditFile(0,'/www/server/cron/"+rdata.data[i].echo+"');\" class='btlink'>"+lan.public.script+"</a> | \
+								<a href=\"javascript:getLogs("+rdata.data[i].id+");\" class='btlink'>"+lan.public.log+"</a> | \
+								<a href=\"javascript:planDel("+rdata.data[i].id+" ,'"+rdata.data[i].name.replace('\\','\\\\').replace("'","\\'").replace('"','')+"');\" class='btlink'>"+lan.public.del+"</a>\
 							</td>\
-						</tr>"
+						</tr>";
 			}
 		}
 		$('#cronbody').html(cbody);
-	});
+	},'json');
 }
 
 //执行任务脚本
-function StartTask(id){
+function startTask(id){
 	layer.msg(lan.public.the,{icon:16,time:0,shade: [0.3, '#000']});
 	var data='id='+id;
 	$.post('/crontab?action=StartTask',data,function(rdata){
@@ -71,7 +71,7 @@ function StartTask(id){
 
 
 //清空日志
-function CloseLogs(id){
+function closeLogs(id){
 	layer.msg(lan.public.the,{icon:16,time:0,shade: [0.3, '#000']});
 	var data='id='+id;
 	$.post('/crontab?action=DelLogs',data,function(rdata){
@@ -83,10 +83,10 @@ function CloseLogs(id){
 
 //删除
 function planDel(id,name){
-	SafeMessage(lan.get('del',[name]),lan.crontab.del_task,function(){
+	safeMessage(lan.get('del',[name]),lan.crontab.del_task,function(){
 			layer.msg(lan.public.the,{icon:16,time:0,shade: [0.3, '#000']});
 			var data='id='+id;
-			$.post('/crontab?action=DelCrontab',data,function(rdata){
+			$.post('/crontab/del',data,function(rdata){
 				layer.closeAll();
 				layer.msg(rdata.msg,{icon:rdata.status?1:2});
 				getCronData();
@@ -280,7 +280,7 @@ function planAdd(){
 		layer.closeAll();
 		layer.msg(rdata.msg,{icon:rdata.status?1:2});
 		getCronData();
-	});
+	},'json');
 }
 
 //批量添加任务
