@@ -53,6 +53,12 @@ app.config['SESSION_COOKIE_NAME'] = "MW_VER_1"
 Session(app)
 
 
+# debug macosx dev
+if public.isAppleSystem():
+    app.debug = True
+    app.config.version = app.config.version + str(time.time())
+
+
 import common
 common.init()
 

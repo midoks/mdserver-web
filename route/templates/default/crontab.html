@@ -116,7 +116,7 @@
 						<li>磁盘容量不够、数据库密码错误、网络不稳定等原因，可能导致数据备份不完整</li>
 					</ul>
 				</div>
-				<form id="set-Config" action="/crontab?action=AddCrontab" enctype="multipart/form-data" method="post" style="display: none;">
+				<form id="set-Config" action="/crontab/add" enctype="multipart/form-data" method="post" style="display: none;">
 					<input type="text" name="name" value="" />
 					<input type="text" name="type" value="" />
 					<input type="number" name="where1" value="" />
@@ -149,12 +149,10 @@
 								<th>状态</th>
 								<th>周期</th>
 								<th>执行时机</th>
-								<th width="190">保存数量	备</th>
+								<th width="190">保存数量</th>
 							</tr>
 						</thead>
-						<tbody id="cronbody">
-							
-						</tbody>
+						<tbody id="cronbody"></tbody>
 					</table>
 				</div>
 			</div>
@@ -163,11 +161,10 @@
 </div>
 <script src="/static/app/crontab.js?v={{config.version}}"></script>
 <script type="text/javascript">
-	setCookie('serverType','$web.ctx.session.webserver');
-	toWeek();
-	toHour();
-	toMinute();
-	toShell();
-	getCronData();
+toWeek();
+toHour();
+toMinute();
+toShell();
+getCronData();
 </script>
 {% endblock %}

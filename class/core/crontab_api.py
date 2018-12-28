@@ -17,8 +17,10 @@ class crontab_api:
     def __init__(self):
         pass
 
+    ##### ----- start ----- ###
     def listApi(self):
         return '123'
 
-    ##### ----- start ----- ###
+    def addApi(self):
+        return 'ok'
     ##### ----- start ----- ###
