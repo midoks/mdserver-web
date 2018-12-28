@@ -46,7 +46,7 @@ except:
     app.config['SESSION_FILE_THRESHOLD'] = 1024
     app.config['SESSION_FILE_MODE'] = 384
 
-app.config['SESSION_PERMANENT'] = False
+app.config['SESSION_PERMANENT'] = True
 app.config['SESSION_USE_SIGNER'] = True
 app.config['SESSION_KEY_PREFIX'] = 'MW_:'
 app.config['SESSION_COOKIE_NAME'] = "MW_VER_1"
