@@ -143,7 +143,7 @@ function syncDeleteCron(dataList,successCount,errorMsg){
 }
 
 	
-function IsURL(str_url){
+function isURL(str_url){
 	var strRegex = '^(https|http|ftp|rtsp|mms)?://.+';
 	var re=new RegExp(strRegex);
 	if (re.test(str_url)){
