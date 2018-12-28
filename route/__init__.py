@@ -46,7 +46,7 @@ except:
     app.config['SESSION_FILE_THRESHOLD'] = 1024
     app.config['SESSION_FILE_MODE'] = 384
 
-app.config['SESSION_PERMANENT'] = True
+app.config['SESSION_PERMANENT'] = False
 app.config['SESSION_USE_SIGNER'] = True
 app.config['SESSION_KEY_PREFIX'] = 'MW_:'
 app.config['SESSION_COOKIE_NAME'] = "MW_VER_1"
@@ -117,10 +117,11 @@ def checkLogin():
 
 @app.route("/login")
 def login():
-
+    print session
     dologin = request.args.get('dologin', '')
     if dologin == 'True':
         session.clear()
+        return redirect('/login')
 
     if isLogined():
         return redirect('/')
@@ -162,7 +163,7 @@ def index(reqClass=None, reqAction=None, reqData=None):
     classFile = ('config', 'control', 'crontab', 'files', 'firewall',
                  'index', 'plugins', 'login', 'system', 'site', 'task', 'soft')
     if not reqClass in classFile:
-        return '403 no access!'
+        return redirect('/')
 
     if reqAction == None:
         if not isLogined():

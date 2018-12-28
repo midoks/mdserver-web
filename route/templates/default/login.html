@@ -209,7 +209,9 @@ $('#login-button').click(function(){
 	$.post('/do_login',data,function(rdata){
 		layer.close(loadT);
 		if(!rdata.status){
-			if(username == 'admin' && rdata.msg.indexOf('用户名') != -1) rdata.msg += ', <br>获取默认用户和密码命令： mw default';
+			if(username == 'admin' && rdata.msg.indexOf('用户名') != -1){
+				rdata.msg += ', <br>获取默认用户和密码命令： mw default';
+			}
 			$("#errorStr").html(rdata.msg);
 			$("input[name='password']").val('');
 			num = rdata.msg.substring(rdata.msg.indexOf('[')+1,rdata.msg.indexOf(']'))
