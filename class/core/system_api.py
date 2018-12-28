@@ -15,6 +15,17 @@ import public
 import config
 
 
+from threading import Thread
+from time import sleep
+
+
+def async(f):
+    def wrapper(*args, **kwargs):
+        thr = Thread(target=f, args=args, kwargs=kwargs)
+        thr.start()
+    return wrapper
+
+
 class system_api:
     setupPath = None
     pids = None
@@ -72,12 +83,18 @@ class system_api:
 
     # 重启面板
     def restartApi(self):
-        cmd = public.getRunDir() + '/scripts/init.d/mw start'
-        public.execShell(cmd)
+        self.restartMw()
         return public.returnJson(True, '面板已重启!')
     ##### ----- end ----- ###
 
-    # 名取PID
+    @async
+    def restartMw(self):
+        sleep(1)
+        print '123123'
+        cmd = public.getRunDir() + '/scripts/init.d/mw reload'
+        print public.execShell(cmd)
+
+        # 名取PID
     def getPid(self, pname):
         try:
             if not self.pids:
