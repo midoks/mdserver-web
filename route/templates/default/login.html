@@ -146,8 +146,7 @@
 			<div class="line yzm" style="top: -5px;{% if not session['code'] %}display:none;{% endif %}">
 				<input type="text" class="inputtxt" name="code" nullmsg="请填写4位验证码" errormsg="验证码" datatype="*" placeholder="验证码">
 				<div class="Validform_checktip"></div>
-				<div id='mw_yzm'><img width="100" height="40" class="passcode" onClick="this.src=this.src.split('?')[0] + '?'+new Date().getTime()" src="/code" style="border: 1px solid #ccc; float: right;" title="" ></div>
-				<!-- <img width="100" height="40" class="passcode" onClick="this.src=this.src.split('?')[0] + '?'+new Date().getTime()" src="/code" style="border: 1px solid #ccc; float: right;" title="" > -->
+				<div id='mw_yzm'>{% if session['code'] %}<img width="100" height="40" class="passcode" onClick="this.src=this.src.split('?')[0] + '?'+new Date().getTime()" src="/code" style="border: 1px solid #ccc; float: right;" title="" >{% endif %}</div>
 			</div>
 			<div class="login_btn"><input id="login-button" value="登录" type="submit"></div>
 			<p class="pwinfo" style="display:none"></p>
@@ -164,19 +163,18 @@
 <script type="text/javascript" src="/static/js/Validform_v5.3.2_min.js?v={{config.version}}"></script>
 <script type="text/javascript">
 $(function(){
-	Wreset();
+	wreset();
 })
 window.onresize=function(){
-	Wreset();
+	wreset();
 }
 
-function Wreset(){
+function wreset(){
 	var w = $(window).width();
 	var yzmw = $(".login .line").width() - 140;
 	if($(".yzm").is(":visible") && w > 640){
 		$(".login").css({"height":"365px","margin-top":"-230px"});
-	}
-	else{
+	} else {
 		$(".login").removeAttr("style")
 	}
 	$(".login .yzm .inputtxt").width(yzmw);
@@ -216,13 +214,13 @@ $('#login-button').click(function(){
 			$("input[name='password']").val('');
 			num = rdata.msg.substring(rdata.msg.indexOf('[')+1,rdata.msg.indexOf(']'))
 			if(num < 5){
-				$(".yzm").show();
+				$('#mw_yzm').html('<img width="100" height="40" class="passcode" onClick="this.src=this.src.split(\'?\')[0] + \'?\'+new Date().getTime()" src="/code" style="border: 1px solid #ccc; float: right;" title="" >');
 				$(".login").css("height","332px");
 				$("input[name='code']").val('');
 				$(".passcode").click();
 			}
 			$(".yzm").show();
-			Wreset();
+			wreset();
 			layer.msg(rdata.msg,{icon:2,time:5000});
 			return;
 		}
