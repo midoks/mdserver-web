@@ -129,7 +129,6 @@ case "$1" in
     'reload') mw_reload;;
     'restart') 
         mw_stop
-        sleep 0.3
         mw_start;;
     'status') mw_status;;
     'logs') error_logs;;
