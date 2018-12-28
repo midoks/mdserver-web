@@ -72,10 +72,8 @@ class system_api:
 
     # 重启面板
     def restartApi(self):
-
-        cmd = public.getRunDir() + '/scripts/init.d/mw restart &'
-        print public.execShell(cmd)
-
+        cmd = public.getRunDir() + '/scripts/init.d/mw start'
+        public.execShell(cmd)
         return public.returnJson(True, '面板已重启!')
     ##### ----- end ----- ###
 
