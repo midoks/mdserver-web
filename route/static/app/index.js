@@ -606,34 +606,119 @@ function updateInstall(){
 }
 
 //重启服务器
-function ReBoot() {
+function reBoot() {
     layer.open({
         type: 1,
-        title: lan.index.reboot_title,
-        area: ['500px', '280px'],
+        title: '重启服务器或者面板',
+        area: '330px',
         closeBtn: 2,
         shadeClose: false,
-        content: "<div class='bt-form bt-window-restart'>\
-			<div class='pd15'>\
-			<p style='color:red; margin-bottom:10px; font-size:15px;'>" + lan.index.reboot_warning + "</p>\
-			<div class='SafeRestart' style='line-height:26px'>\
-				<p>" + lan.index.reboot_ps + "</p>\
-				<p>" + lan.index.reboot_ps_1 + "</p>\
-				<p>" + lan.index.reboot_ps_2 + "</p>\
-				<p>" + lan.index.reboot_ps_3 + "</p>\
-				<p>" + lan.index.reboot_ps_4 + "</p>\
-			</div>\
-			</div>\
-			<div class='bt-form-submit-btn'>\
-				<button type='button' id='web_end_time' class='btn btn-danger btn-sm btn-title' onclick='layer.closeAll()'>" + lan.public.cancel + "</button>\
-				<button type='button' id='web_del_send' class='btn btn-success btn-sm btn-title'  onclick='WSafeRestart()'>" + lan.public.ok + "</button>\
-			</div>\
-		</div>"
-    })
+        content: '<div class="rebt-con"><div class="rebt-li"><a data-id="server" href="javascript:;">重启服务器</a></div><div class="rebt-li"><a data-id="panel" href="javascript:;">重启面板</a></div></div>'
+    });
+
+
+    $('.rebt-con a').click(function () {
+        var type = $(this).attr('data-id');
+        switch (type) {
+            case 'panel':
+                layer.confirm('即将重启面板服务，继续吗？', { title: lan.index.panel_reboot_title, closeBtn: 2, icon: 3 }, function () {
+                    var loadT = layer.load();
+                    $.post('/system/restart','',function (rdata) {
+                        layer.close(loadT);
+                        layer.msg(rdata.msg);
+                        setTimeout(function () { window.location.reload(); }, 3000);
+                    },'json');
+                });
+                break;
+            case 'server':
+                var rebootbox = bt.open({
+                    type: 1,
+                    title: lan.index.reboot_title,
+                    area: ['500px', '280px'],
+                    closeBtn: 2,
+                    shadeClose: false,
+                    content: "<div class='bt-form bt-window-restart'>\
+                            <div class='pd15'>\
+                            <p style='color:red; margin-bottom:10px; font-size:15px;'>"+ lan.index.reboot_warning + "</p>\
+                            <div class='SafeRestart' style='line-height:26px'>\
+                                <p>"+ lan.index.reboot_ps + "</p>\
+                                <p>"+ lan.index.reboot_ps_1 + "</p>\
+                                <p>"+ lan.index.reboot_ps_2 + "</p>\
+                                <p>"+ lan.index.reboot_ps_3 + "</p>\
+                                <p>"+ lan.index.reboot_ps_4 + "</p>\
+                            </div>\
+                            </div>\
+                            <div class='bt-form-submit-btn'>\
+                                <button type='button' class='btn btn-danger btn-sm btn-reboot'>"+ lan.public.cancel + "</button>\
+                                <button type='button' class='btn btn-success btn-sm WSafeRestart' >"+ lan.public.ok + "</button>\
+                            </div>\
+                        </div>"
+                });
+                setTimeout(function () {
+                    $(".btn-reboot").click(function () {
+                        rebootbox.close();
+                    })
+                    $(".WSafeRestart").click(function () {
+                        var body = '<div class="SafeRestartCode pd15" style="line-height:26px"></div>';
+                        $(".bt-window-restart").html(body);
+                        $(".SafeRestartCode").append("<p>" + lan.index.reboot_msg_1 + "</p>");
+                        bt.pub.set_server_status_by("name={{session['webserver']}}&type=stop", function (r1) {
+                            $(".SafeRestartCode p").addClass('c9');
+                            $(".SafeRestartCode").append("<p>" + lan.index.reboot_msg_2 + "...</p>");
+                            bt.pub.set_server_status_by("name=mysqld&type=stop", function (r2) {
+                                $(".SafeRestartCode p").addClass('c9');
+                                $(".SafeRestartCode").append("<p>" + lan.index.reboot_msg_3 + "...</p>");
+                                bt.system.root_reload(function (rdata) {
+                                    $(".SafeRestartCode p").addClass('c9');
+                                    $(".SafeRestartCode").append("<p>" + lan.index.reboot_msg_4 + "...</p>");
+                                    var sEver = setInterval(function () {
+                                        bt.system.get_total(function () {
+                                            clearInterval(sEver);
+                                            $(".SafeRestartCode p").addClass('c9');
+                                            $(".SafeRestartCode").append("<p>" + lan.index.reboot_msg_5 + "...</p>");
+                                            setTimeout(function () {
+                                                layer.closeAll();
+                                            }, 3000);
+                                        })
+                                    }, 3000);
+                                })
+                            })
+                        })
+                    })
+                }, 100);
+                break;
+        }
+    });
+      
+
+
+  //   layer.open({
+  //       type: 1,
+  //       title: lan.index.reboot_title,
+  //       area: ['500px', '280px'],
+  //       closeBtn: 2,
+  //       shadeClose: false,
+  //       content: "<div class='bt-form bt-window-restart'>\
+		// 	<div class='pd15'>\
+		// 	<p style='color:red; margin-bottom:10px; font-size:15px;'>" + lan.index.reboot_warning + "</p>\
+		// 	<div class='SafeRestart' style='line-height:26px'>\
+		// 		<p>" + lan.index.reboot_ps + "</p>\
+		// 		<p>" + lan.index.reboot_ps_1 + "</p>\
+		// 		<p>" + lan.index.reboot_ps_2 + "</p>\
+		// 		<p>" + lan.index.reboot_ps_3 + "</p>\
+		// 		<p>" + lan.index.reboot_ps_4 + "</p>\
+		// 	</div>\
+		// 	</div>\
+		// 	<div class='bt-form-submit-btn'>\
+		// 		<button type='button' id='web_end_time' class='btn btn-danger btn-sm btn-title' onclick='layer.closeAll()'>" + lan.public.cancel + "</button>\
+		// 		<button type='button' id='web_del_send' class='btn btn-success btn-sm btn-title'  onclick='WSafeRestart()'>" + lan.public.ok + "</button>\
+		// 	</div>\
+		// </div>"
+  //   })
 }
 
 //重启服务器
-function WSafeRestart() {
+function wSafeRestart() {
     var body = '<div class="SafeRestartCode pd15" style="line-height:26px"></div>';
     $(".bt-window-restart").html(body);
     var data = "name=" + serverType + "&type=stop";
@@ -705,7 +790,7 @@ function repPanel() {
 }
 
 //获取警告信息
-function GetWarning() {
+function getWarning() {
     $.get('/ajax?action=GetWarning', function(wlist) {
         var num = 0;
         for (var i = 0; i < wlist.data.length; i++) {
@@ -727,7 +812,7 @@ function GetWarning() {
 }
 
 //按钮调用
-function WarningTo(to_url, def) {
+function warningTo(to_url, def) {
     var loadT = layer.msg(lan.public.the_get, { icon: 16, time: 0, shade: [0.3, '#000'] });
     $.post(to_url, {}, function(rdata) {
         layer.close(loadT);
@@ -736,7 +821,7 @@ function WarningTo(to_url, def) {
     });
 }
 
-function SetSafeHide() {
+function setSafeHide() {
     setCookie('safeMsg', '1');
     $("#safeMsg").remove();
 }

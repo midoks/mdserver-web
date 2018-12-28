@@ -69,6 +69,14 @@ class system_api:
         end = request.args.get('end', '')
         data = self.getNetWorkIoData(start, end)
         return public.getJson(data)
+
+    # 重启面板
+    def restartApi(self):
+
+        cmd = public.getRunDir() + '/scripts/init.d/mw restart &'
+        print public.execShell(cmd)
+
+        return public.returnJson(True, '面板已重启!')
     ##### ----- end ----- ###
 
     # 名取PID
