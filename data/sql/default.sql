@@ -40,7 +40,14 @@ CREATE TABLE IF NOT EXISTS `crontab` (
   `where_hour` INTEGER,
   `where_minute` INTEGER,
   `echo` TEXT,
-  `addtime` TEXT
+  `addtime` TEXT,
+  `status` INTEGER DEFAULT '1',
+  `save` INTEGER DEFAULT '3',
+  `backup_to` TEXT DEFAULT 'off', 
+  `sname` TEXT,
+  `sbody` TEXT,
+  'stype' TEXT,
+  `urladdress` TEXT
 );
 
 CREATE TABLE IF NOT EXISTS `databases` (

@@ -29,6 +29,7 @@ def initDB():
         csql_list = csql.split(';')
         for index in range(len(csql_list)):
             sql.execute(csql_list[index], ())
+
     except Exception, ex:
         print str(ex)
 

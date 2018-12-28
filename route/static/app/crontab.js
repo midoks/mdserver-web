@@ -276,7 +276,7 @@ function planAdd(){
 	$("#set-Config input[name='sName']").val(sName);
 	layer.msg(lan.public.the_add,{icon:16,time:0,shade: [0.3, '#000']});
 	var data= $("#set-Config").serialize() + '&sBody='+sBody + '&urladdress=' + urladdress;
-	$.post('/crontab?action=AddCrontab',data,function(rdata){
+	$.post('/crontab/add',data,function(rdata){
 		layer.closeAll();
 		layer.msg(rdata.msg,{icon:rdata.status?1:2});
 		getCronData();
@@ -307,7 +307,7 @@ function allAddCrontab(dataList,successCount,errorMsg){
 	var pdata = $("#set-Config").serialize() + '&sBody=&urladdress=';
 	$.ajax({
 			type:'POST',
-			url:'/crontab?action=AddCrontab',
+			url:'/crontab/add',
 			data:pdata,
 			async: true,
 			success:function(frdata){
