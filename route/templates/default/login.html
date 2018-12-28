@@ -146,7 +146,8 @@
 			<div class="line yzm" style="top: -5px;{% if not session['code'] %}display:none;{% endif %}">
 				<input type="text" class="inputtxt" name="code" nullmsg="请填写4位验证码" errormsg="验证码" datatype="*" placeholder="验证码">
 				<div class="Validform_checktip"></div>
-				<img width="100" height="40" class="passcode" onClick="this.src=this.src.split('?')[0] + '?'+new Date().getTime()" src="/code" style="border: 1px solid #ccc; float: right;" title="" >
+				<div id='mw_yzm'><img width="100" height="40" class="passcode" onClick="this.src=this.src.split('?')[0] + '?'+new Date().getTime()" src="/code" style="border: 1px solid #ccc; float: right;" title="" ></div>
+				<!-- <img width="100" height="40" class="passcode" onClick="this.src=this.src.split('?')[0] + '?'+new Date().getTime()" src="/code" style="border: 1px solid #ccc; float: right;" title="" > -->
 			</div>
 			<div class="login_btn"><input id="login-button" value="登录" type="submit"></div>
 			<p class="pwinfo" style="display:none"></p>

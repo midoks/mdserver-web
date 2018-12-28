@@ -53,17 +53,8 @@ app.config['SESSION_COOKIE_NAME'] = "MW_VER_1"
 Session(app)
 
 
-def initDB():
-    try:
-        sql = db.Sql().dbfile('default')
-        csql = public.readFile('data/sql/default.sql')
-        csql_list = csql.split(';')
-        for index in range(len(csql_list)):
-            sql.execute(csql_list[index], ())
-    except Exception, ex:
-        print str(ex)
-
-initDB()
+import common
+common.init()
 
 
 def funConvert(fun):
