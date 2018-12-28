@@ -44,7 +44,7 @@ from metadata import save_metadata
 DB_HOST = '127.0.0.1'
 DB_USER = 'root'
 DB_PORT = 3306
-DB_PASS = ''
+DB_PASS = 'root'
 DB_NAME = 'ssbc'
 BLACK_FILE = 'black_list.txt'
 
@@ -62,6 +62,7 @@ MAX_QUEUE_PT = 200
 
 geoip = pygeoip.GeoIP('GeoIP.dat')
 
+
 def load_res_blacklist(black_list_path):
     black_list = []
     file_path = os.path.join(os.path.dirname(__file__), black_list_path)
@@ -74,8 +75,10 @@ def load_res_blacklist(black_list_path):
     f.close()
     return black_list
 
+
 def is_ip_allowed(ip):
-    return geoip.country_code_by_addr(ip) not in ('CN','TW','HK')
+    return geoip.country_code_by_addr(ip) not in ('CN', 'TW', 'HK')
+
 
 def entropy(length):
     return "".join(chr(randint(0, 255)) for _ in xrange(length))
@@ -94,9 +97,9 @@ def decode_nodes(nodes):
         return n
 
     for i in range(0, length, 26):
-        nid = nodes[i:i+20]
-        ip = inet_ntoa(nodes[i+20:i+24])
-        port = unpack("!H", nodes[i+24:i+26])[0]
+        nid = nodes[i:i + 20]
+        ip = inet_ntoa(nodes[i + 20:i + 24])
+        port = unpack("!H", nodes[i + 24:i + 26])[0]
         n.append((nid, ip, port))
 
     return n
@@ -107,7 +110,7 @@ def timer(t, f):
 
 
 def get_neighbor(target, nid, end=10):
-    return target[:end]+nid[end:]
+    return target[:end] + nid[end:]
 
 
 class KNode(object):
@@ -173,8 +176,10 @@ class DHTClient(Thread):
         nodes = decode_nodes(msg["r"]["nodes"])
         for node in nodes:
             (nid, ip, port) = node
-            if len(nid) != 20: continue
-            if ip == self.bind_ip: continue
+            if len(nid) != 20:
+                continue
+            if ip == self.bind_ip:
+                continue
             n = KNode(nid, ip, port)
             self.nodes.append(n)
 
@@ -193,11 +198,11 @@ class DHTServer(DHTClient):
             "announce_peer": self.on_announce_peer_request,
         }
 
-        self.ufd = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+        self.ufd = socket.socket(
+            socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         self.ufd.bind((self.bind_ip, self.bind_port))
 
         timer(RE_JOIN_DHT_INTERVAL, self.re_join_DHT)
-
 
     def run(self):
         self.re_join_DHT()
@@ -290,12 +295,14 @@ class DHTServer(DHTClient):
 
 
 class Master(Thread):
+
     def __init__(self):
         Thread.__init__(self)
         self.setDaemon(True)
         self.queue = Queue()
         self.metadata_queue = Queue()
-        self.dbconn = mdb.connect(DB_HOST, DB_USER, DB_PASS, DB_NAME, port=DB_PORT, charset='utf8')
+        self.dbconn = mdb.connect(
+            DB_HOST, DB_USER, DB_PASS, DB_NAME, port=DB_PORT, charset='utf8')
         self.dbconn.autocommit(False)
         self.dbcurr = self.dbconn.cursor()
         self.dbcurr.execute('SET NAMES utf8')
@@ -314,9 +321,9 @@ class Master(Thread):
             return
         self.n_valid += 1
 
-        save_metadata(self.dbcurr, binhash, address, start_time, data,self.black_list)
+        save_metadata(self.dbcurr, binhash, address,
+                      start_time, data, self.black_list)
         self.n_new += 1
-
 
     def run(self):
         self.name = threading.currentThread().getName()
@@ -339,31 +346,35 @@ class Master(Thread):
             date = datetime.datetime(date.year, date.month, date.day)
 
             # Check if we have this info_hash
-            self.dbcurr.execute('SELECT id FROM search_hash WHERE info_hash=%s', (info_hash,))
+            self.dbcurr.execute(
+                'SELECT id FROM search_hash WHERE info_hash=%s', (info_hash,))
             y = self.dbcurr.fetchone()
             if y:
                 self.n_valid += 1
                 # 更新最近发现时间，请求数
-                self.dbcurr.execute('UPDATE search_hash SET last_seen=%s, requests=requests+1 WHERE info_hash=%s', (utcnow, info_hash))
+                self.dbcurr.execute(
+                    'UPDATE search_hash SET last_seen=%s, requests=requests+1 WHERE info_hash=%s', (utcnow, info_hash))
             else:
                 if dtype == 'pt':
-                    t = threading.Thread(target=simMetadata.download_metadata, args=(address, binhash, self.metadata_queue))
+                    t = threading.Thread(target=simMetadata.download_metadata, args=(
+                        address, binhash, self.metadata_queue))
                     t.setDaemon(True)
                     t.start()
                     self.n_downloading_pt += 1
                 elif dtype == 'lt' and self.n_downloading_lt < MAX_QUEUE_LT:
-                    t = threading.Thread(target=ltMetadata.download_metadata, args=(address, binhash, self.metadata_queue))
+                    t = threading.Thread(target=ltMetadata.download_metadata, args=(
+                        address, binhash, self.metadata_queue))
                     t.setDaemon(True)
                     t.start()
                     self.n_downloading_lt += 1
 
             if self.n_reqs >= 1000:
                 self.dbcurr.execute('INSERT INTO search_statusreport(date,new_hashes,total_requests, valid_requests)  VALUES(%s,%s,%s,%s) ON DUPLICATE KEY UPDATE ' +
-                    'total_requests=total_requests+%s, valid_requests=valid_requests+%s, new_hashes=new_hashes+%s',
-                    (date, self.n_new, self.n_reqs, self.n_valid, self.n_reqs, self.n_valid, self.n_new))
+                                    'total_requests=total_requests+%s, valid_requests=valid_requests+%s, new_hashes=new_hashes+%s',
+                                    (date, self.n_new, self.n_reqs, self.n_valid, self.n_reqs, self.n_valid, self.n_new))
                 self.dbconn.commit()
-                print '\n', time.ctime(), 'n_reqs', self.n_reqs, 'n_valid', self.n_valid, 'n_new', self.n_new, 'n_queue', self.queue.qsize(), 
-                print 'n_d_pt', self.n_downloading_pt, 'n_d_lt', self.n_downloading_lt, 
+                print '\n', time.ctime(), 'n_reqs', self.n_reqs, 'n_valid', self.n_valid, 'n_new', self.n_new, 'n_queue', self.queue.qsize(),
+                print 'n_d_pt', self.n_downloading_pt, 'n_d_lt', self.n_downloading_lt,
                 self.n_reqs = self.n_valid = self.n_new = 0
 
     def log_announce(self, binhash, address=None):
@@ -385,7 +396,8 @@ def announce(info_hash, address):
 
 
 def rpc_server():
-    rpcserver = SimpleXMLRPCServer.SimpleXMLRPCServer(('localhost', 8004), logRequests=False)
+    rpcserver = SimpleXMLRPCServer.SimpleXMLRPCServer(
+        ('localhost', 8004), logRequests=False)
     rpcserver.register_function(announce, 'announce')
     print 'Starting xml rpc server...'
     rpcserver.serve_forever()
@@ -402,5 +414,3 @@ if __name__ == "__main__":
     dht = DHTServer(master, "0.0.0.0", 6881, max_node_qsize=200)
     dht.start()
     dht.auto_send_find_node()
-
-
