@@ -33,6 +33,10 @@ class Sql():
         self.__DB_FILE = 'data/' + name + '.db'
         return self
 
+    def dbPos(self, path, name):
+        self.__DB_FILE = path + '/' + name + '.db'
+        return self
+
     def table(self, table):
         # 设置表名
         self.__DB_TABLE = table
