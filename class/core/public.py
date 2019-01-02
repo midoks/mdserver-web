@@ -62,6 +62,10 @@ def getLogsDir():
     return getRootDir() + '/wwwlogs'
 
 
+def getBackupDir():
+    return getRootDir() + '/backup'
+
+
 def getOs():
     return sys.platform
 

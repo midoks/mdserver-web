@@ -22,7 +22,7 @@
 			<div class="setbox bgw mtb15">
 				<div class="title c6 plr15">
 					<h3 class="f16">设置</h3>
-					<button class="btn btn-default btn-sm" style="float: right;margin-top: 10px;display: none;" onclick="apiSetup()"></button>
+					
 				</div>
 				<div class="info-title-tips" style="margin: 20px 30px 0px;">
 					<p><span class="glyphicon glyphicon-alert" style="color: #f39c12; margin-right: 10px;"></span>为了提高安全，请修改别名、默认端口、面板用户和密码!</p>
@@ -35,7 +35,7 @@
 						</p>
 						<p class="mtb15">
 							<span class="set-tit text-right" title="面板端口">面板端口</span>
-							<input id="banport" name="port" class="inputtxt bt-input-text" type="numner" value="8888" maxlength="5"><span class="set-info c7">建议端口范围8888 - 65535</span>
+							<input id="banport" name="port" class="inputtxt bt-input-text" type="numner" value="{{data['port']}}" maxlength="5"><span class="set-info c7">建议端口范围8888 - 65535</span>
 						</p>
 						<p class="mtb15">
 							<span class="set-tit text-right" title="域名">域名</span>
@@ -46,27 +46,25 @@
 
 						<p class="mtb15">
 							<span class="set-tit text-right" title="默认建站目录">默认建站目录</span>
-							<input name="sites_path" class="inputtxt bt-input-text" type="text" value="">
+							<input name="sites_path" class="inputtxt bt-input-text" type="text" value="{{data['site_path']}}">
 							<span class="set-info c7">新创建的站点,默认将保存到该目录的下级目录!</span>
 						</p>
 
 						<p class="mtb15">
 							<span class="set-tit text-right" title="默认建站目录">默认备份目录</span>
-							<input name="sites_path" class="inputtxt bt-input-text" type="text" value="{{data['site_path']}}">
+							<input name="sites_path" class="inputtxt bt-input-text" type="text" value="{{data['backup_path']}}">
 							<span class="set-info c7">网站和数据库的备份目录!</span>
 						</p>
 
 						<p class="mtb15">
 							<span class="set-tit text-right" title="服务器IP">服务器IP</span>
-							<input name="backup_path" class="inputtxt bt-input-text" type="text" value="">
-							<span class="set-info c7">
-								默认为外网IP,若您在本地虚拟机测试,请填写虚拟机内网IP!
-							</span>
+							<input name="backup_path" class="inputtxt bt-input-text" type="text" value="{{data['ip']}}">
+							<span class="set-info c7">默认为外网IP,若您在本地虚拟机测试,请填写虚拟机内网IP!</span>
 						</p>
 						
 						<p class="mtb15">
 							<span class="set-tit text-right" title="服务器时间">服务器时间</span>
-							<input id="systemdate" name="systemdate" class="inputtxt bt-input-text disable" type="text" value=""><span class="modify btn btn-xs btn-success" onclick="syncDate()">同步</span>
+							<input id="systemdate" name="systemdate" class="inputtxt bt-input-text disable" type="text" value="{{data['systemdate']}}"><span class="modify btn btn-xs btn-success" onclick="syncDate()">同步</span>
 						</p>
 						<p class="mtb15">
 							<span class="set-tit text-right" title="面板用户">面板用户</span>
