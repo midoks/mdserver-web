@@ -16,6 +16,11 @@ class config_api:
         pass
 
     ##### ----- start ----- ###
-    def getApi(self):
-        print '123123'
+    def get(self):
+
+        data = {}
+
+        data['site_path'] = public.getWwwDir()
+
+        return data
     ##### ----- end ----- ###

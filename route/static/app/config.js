@@ -1,15 +1,5 @@
 
 
-//设置自动更新
-function SetPanelAutoUpload(){
-	loadT = layer.msg(lan.public.config,{icon:16,time:0});
-	$.post('/config?action=AutoUpdatePanel','',function(rdata){
-		layer.close(loadT);
-		layer.msg(rdata.msg,{icon:rdata.status?1:2});
-	});
-}
-
-
 $(".set-submit").click(function(){
 	var data = $("#set-Config").serialize();
 	layer.msg(lan.config.config_save,{icon:16,time:0,shade: [0.3, '#000']});
@@ -22,8 +12,16 @@ $(".set-submit").click(function(){
 			},1500);
 		}
 	});
-	
 });
+
+//设置自动更新
+function SetPanelAutoUpload(){
+	loadT = layer.msg(lan.public.config,{icon:16,time:0});
+	$.post('/config?action=AutoUpdatePanel','',function(rdata){
+		layer.close(loadT);
+		layer.msg(rdata.msg,{icon:rdata.status?1:2});
+	});
+}
 
 
 function syncDate(){
