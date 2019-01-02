@@ -174,7 +174,13 @@ def index(reqClass=None, reqAction=None, reqData=None):
     if reqAction == None:
         if not isLogined():
             return redirect('/login')
-        return render_template(reqClass + '.html')
+
+        if reqClass == 'config':
+            import config_api
+            data = config_api.config_api().get()
+            return render_template(reqClass + '.html', data=data)
+        else:
+            return render_template(reqClass + '.html')
 
     className = reqClass + '_api'
 

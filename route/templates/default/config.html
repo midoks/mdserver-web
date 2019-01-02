@@ -1,7 +1,5 @@
 {% extends "layout.html" %}
-
 {% block content %}
-
 <div class="main-content">
 		<div class="container-fluid" style="padding-bottom:54px">
 			<div class="pos-box bgw mtb15">
@@ -24,7 +22,7 @@
 			<div class="setbox bgw mtb15">
 				<div class="title c6 plr15">
 					<h3 class="f16">设置</h3>
-					<button class="btn btn-default btn-sm" style="float: right;margin-top: 10px;display: none;" onclick="apiSetup()">$data['lan']['C2']</button>
+					<button class="btn btn-default btn-sm" style="float: right;margin-top: 10px;display: none;" onclick="apiSetup()"></button>
 				</div>
 				<div class="info-title-tips" style="margin: 20px 30px 0px;">
 					<p><span class="glyphicon glyphicon-alert" style="color: #f39c12; margin-right: 10px;"></span>为了提高安全，请修改别名、默认端口、面板用户和密码!</p>
@@ -54,7 +52,7 @@
 
 						<p class="mtb15">
 							<span class="set-tit text-right" title="默认建站目录">默认备份目录</span>
-							<input name="sites_path" class="inputtxt bt-input-text" type="text" value="">
+							<input name="sites_path" class="inputtxt bt-input-text" type="text" value="{{data['site_path']}}">
 							<span class="set-info c7">网站和数据库的备份目录!</span>
 						</p>
 
@@ -136,12 +134,15 @@
 	left: 90px;
 	bottom: -8px;
 }
+
 .iconCode .weChat{
 	margin-left: 15px;
 }
+
 .iconCode .weChat:hover .weChatSamll{
 	display: block;
 }
+
 .iconCode .QRcode{
 	margin-bottom: 15px;
 	text-align: center;
@@ -169,9 +170,11 @@
 	font-size: 15px;
 	color: #808080;
 }
+
 .personalDetails .userList{
 	height: 100%;
 }
+
 .personalDetails .userList .addweChat{
 	height: 50px;
 	text-align: center;
@@ -179,9 +182,11 @@
 	color: #20a53a;
 	font-size: 16px;
 }
+
 .personalDetails .userList .addweChat:hover{
 	
 }
+
 .personalDetails .userList .item{
 	height: 70px;
 	padding: 10px 15px;
@@ -189,6 +194,7 @@
 	margin: 15px 65px;
 	border-radius: 5px;
 }
+
 .personalDetails .userList .cancelBind{
 	height: 50px;
 	width: 60px;
@@ -199,6 +205,5 @@
 </style>
 <script src="/static/app/config.js?v={{config.version}}"></script>
 <script type="text/javascript">
-	// setCookie('serverType','$web.ctx.session.webserver');
 </script>
 {% endblock %}
