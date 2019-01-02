@@ -27,47 +27,10 @@ function softMain(name, version) {
     });
 }
 
-
-//插件设置菜单
-function pluginMan(name, title) {
-    loadT = layer.msg(lan.soft.menu_temp, { icon: 16, time: 0, shade: [0.3, '#000'] });
-    $.get('/plugins/setting?name=' + name, function(rhtml) {
-        layer.close(loadT);
-        if (rhtml.status === false) {
-            if (name == "phpguard") {
-                layer.msg(lan.soft.menu_phpsafe, { icon: 1 })
-            } else {
-                layer.msg(rhtml.msg, { icon: 2 });
-            }
-            return;
-        }
-        layer.open({
-            type: 1,
-            shift: 5,
-            offset: '20%',
-            closeBtn: 2,
-            area: '700px',
-            title: '' + title,
-            content: rhtml
-        });
-        rcode = rhtml.split('<script type="javascript/text">')[1]
-        if (!rcode) rcode = rhtml.split('<script type="text/javascript">')[1]
-        rcode = rcode.replace('</script>', '');
-        setTimeout(function() {
-            if (!!(window.attachEvent && !window.opera)) {
-                execScript(rcode);
-            } else {
-                window.eval(rcode);
-            }
-        }, 200)
-
-    });
-}
-
 //取软件列表
 function getSList(isdisplay) {
     if (isdisplay !== true) {
-        var loadT = layer.msg(lan.soft.get_list, { icon: 16, time: 0, shade: [0.3, '#000'] })
+        var loadT = layer.msg('正在获取列表...', { icon: 16, time: 0, shade: [0.3, '#000'] })
     }
     if (!isdisplay || isdisplay === true)
         isdisplay = getCookie('p' + getCookie('softType'));
@@ -252,7 +215,7 @@ function addVersion(name, ver, type, obj, title) {
         var type = $('.fangshi input').prop("checked") ? '1' : '0';
         var data = "name=" + name + "&version=" + version + "&type=" + type;
 
-        var loadT = layer.msg(lan.soft.add_install, { icon: 16, time: 0, shade: [0.3, '#000'] });
+        var loadT = layer.msg('正在添加到安装器...', { icon: 16, time: 0, shade: [0.3, '#000'] });
         $.post("/plugins/install", data, function(rdata) {
             layer.closeAll();
             layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
@@ -267,7 +230,7 @@ function addVersion(name, ver, type, obj, title) {
 function uninstallVersion(name, version) {
     layer.confirm(msgTpl('您真的要卸载[{1}-{2}]吗?', [name, version]), { icon: 3, closeBtn: 2 }, function() {
         var data = 'name=' + name + '&version=' + version;
-        var loadT = layer.msg(lan.public.the, { icon: 16, time: 0, shade: [0.3, '#000'] });
+        var loadT = layer.msg('正在处理,请稍候...', { icon: 16, time: 0, shade: [0.3, '#000'] });
         $.post('/plugins/uninstall', data, function(rdata) {
             layer.close(loadT)
             getSList();
