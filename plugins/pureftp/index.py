@@ -90,6 +90,14 @@ def initDreplace():
     public.writeFile(file_bin, content)
     public.execShell('chmod +x ' + file_bin)
 
+    pureTplConfig = getPluginDir() + "/init.d/pure-config.pl"
+    pureSbinConfig = getServerDir() + "/sbin/pure-config.pl"
+
+    content = public.readFile(pureTplConfig)
+    content = contentReplace(content)
+    public.writeFile(pureSbinConfig, content)
+    public.execShell('chmod +x ' + pureSbinConfig)
+
     # # config replace
     # conf_content = public.readFile(getConf())
     # conf_content = conf_content.replace('{$SERVER_PATH}', service_path)
@@ -103,7 +111,7 @@ def start():
     data = public.execShell(file + ' start')
     if data[1] == '':
         return 'ok'
-    return 'fail'
+    return data[1]
 
 
 def stop():
@@ -111,7 +119,7 @@ def stop():
     data = public.execShell(file + ' stop')
     if data[1] == '':
         return 'ok'
-    return 'fail'
+    return data[1]
 
 
 def restart():
@@ -127,7 +135,7 @@ def reload():
     data = public.execShell(file + ' reload')
     if data[1] == '':
         return 'ok'
-    return 'fail'
+    return data[1]
 
 
 def initdStatus():
