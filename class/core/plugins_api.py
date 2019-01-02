@@ -125,7 +125,7 @@ class plugins_api:
         if version.strip() == '':
             return public.returnJson(False, "缺少版本信息!", ())
 
-        infoJsonPos = __plugin_name + '/' + name + '/' + 'info.json'
+        infoJsonPos = self.__plugin_dir + '/' + name + '/' + 'info.json'
 
         if not os.path.exists(infoJsonPos):
             return public.retJson(False, "配置文件不存在!", ())
