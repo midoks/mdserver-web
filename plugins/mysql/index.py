@@ -186,13 +186,16 @@ def status():
 
 
 def start():
-    path = os.path.dirname(os.getcwd())
-    cmd = path + "/redis/bin/redis-server"
-    cmd = cmd + " " + path + "/redis/redis.conf"
+    initMysql = getServerDir() + '/scripts/mysql_install_db ' + '--basedir=' + \
+        getServerDir() + ' --datadir=' + getServerDir() + '/bin/mysql/data'
+    return initMysql
+
+    cmd = getServerDir() + '/bin/mysqld_safe ' + getServerDir() + \
+        '/conf/my.cnf ' + '--user=mysql&'
     data = public.execShell(cmd)
     if data[0] == '':
-        return 'ok'
-    return 'fail'
+        return 'stop'
+    return data[0]
 
 
 def stop():
