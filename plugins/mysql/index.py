@@ -173,7 +173,7 @@ MySQL_Opt
         public.writeFile('/etc/my.cnf', mycnf)
 
     os.system(shellStr)
-    WriteLog('TYPE_SOFE', 'MYSQL_CHECK_ERR')
+    public.writeLog('TYPE_SOFE', 'MYSQL_CHECK_ERR')
     return True
 
 
@@ -188,10 +188,11 @@ def status():
 def start():
     initMysql = getServerDir() + '/scripts/mysql_install_db ' + '--basedir=' + \
         getServerDir() + ' --datadir=' + getServerDir() + '/bin/mysql/data'
-    return initMysql
+    # return initMysql
 
     cmd = getServerDir() + '/bin/mysqld_safe ' + getServerDir() + \
         '/conf/my.cnf ' + '--user=mysql&'
+    return cmd
     data = public.execShell(cmd)
     if data[0] == '':
         return 'stop'
