@@ -16,6 +16,7 @@ Install_pureftp()
 
 	VER=$1
 	FILE=pure-ftpd-${VER}.tar.gz
+	FDIR=pure-ftpd-${VER}
 	DOWNLOAD=https://download.pureftpd.org/pub/pure-ftpd/releases/pure-ftpd-${VER}.tar.gz
 	
 
@@ -23,22 +24,18 @@ Install_pureftp()
 		wget -O $serverPath/source/pureftp/$FILE $DOWNLOAD
 	fi
 
-	if [ ! -d $serverPath/source/pureftp/$FILE ];then
-		cd $serverPath/source/pureftp && tar zxvf $FILE
+	if [ ! -d $serverPath/source/pureftp/$FDIR ];then
+		cd $serverPath/source/pureftp  && tar zxvf $FILE
 	fi
 
-	cd pure-ftpd-${1} &&  ./configure --prefix=${serverPath}/pureftp \
-　　--without-inetd \
-　　--with-altlog \
-　　--with-puredb \
-　　--with-throttling \
-　　--with-peruserlimits \
-　　--with-tls && make && make install
-
-
-
+	cd $serverPath/source/pureftp/$FDIR &&  ./configure --prefix=${serverPath}/pureftp \
+　　 	--with-everything && make && make install && make clean
+	
 	echo "${1}" > ${serverPath}/pureftp/version.pl
 	echo '安装完成' > $install_tmp
+	
+
+	
 }
 
 Uninstall_pureftp()

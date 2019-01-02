@@ -1,7 +1,11 @@
 <div class="bt-form">
 	<div class="bt-w-main">
 		<div class="bt-w-menu">
-			<p class="bgw" onclick="readme();">服务</p>
+			<p class="bgw" onclick="pluginService('pureftp');">服务</p>
+			<p onclick="pluginInitD('pureftp');">自启动</p>
+			<p onclick="pluginConfig('pureftp');">配置修改</p>
+
+			
 		</div>
 
 		<div class="bt-w-con pd15">
@@ -11,5 +15,7 @@
 
 </div>
 <script type="text/javascript">
-$.getScript( "/plugins/file?name=pureftp&f=js/ftp.js", function(){});
+$.getScript( "/plugins/file?name=pureftp&f=js/ftp.js", function(){
+	pluginService('pureftp');
+});
 </script>
