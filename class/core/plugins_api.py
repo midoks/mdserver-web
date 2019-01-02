@@ -7,8 +7,13 @@ import public
 import re
 import json
 
+import sys
+reload(sys)
+sys.setdefaultencoding('utf8')
+
 import threading
 import multiprocessing
+
 
 from flask import request
 
