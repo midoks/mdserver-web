@@ -1,15 +1,21 @@
+
+function ftpList(page, search){
+	
+}
+
+
 /**
  * 取回FTP数据列表
  * @param {Number} page   当前页
  */
-function getFtp(page,search) {
+function getFtp(page, search) {
 	if(page == undefined) page = 1
 	search = search == undefined ? '':search;
 	search = $("#SearchValue").prop("value");
 	order = getCookie('order');
 	if(order){
 		order = '&order=' + order;
-	}else{
+	} else {
 		order = '';
 	}
 	var sUrl = '/data?action=getData'
@@ -26,7 +32,7 @@ function getFtp(page,search) {
 		for (var i = 0; i < data.data.length; i++) {
 			if(data.data[i].status == '1'){
 				var ftp_status = "<a href='javascript:;' title='"+lan.ftp.stop_title+"' onclick=\"ftpStop("+data.data[i].id+",'"+data.data[i].name+"')\"><span style='color:#5CB85C'>"+lan.ftp.start+" </span> <span style='color:#5CB85C' class='glyphicon glyphicon-play'></span></a>";
-			}else{
+			} else {
 				var ftp_status = "<a href='javascript:;' title='"+lan.ftp.start_title+"' onclick=\"ftpStart("+data.data[i].id+",'"+data.data[i].name+"')\"><span style='color:red'>"+lan.ftp.stop+" </span> <span style='color:red;' class='glyphicon glyphicon-pause'></span></a>";;
 			}
 			Body +="<tr><td><input type='checkbox' onclick='checkSelect();' title='"+data.data[i].name+"' name='id' value='"+data.data[i].id+"'></td>\
@@ -137,7 +143,7 @@ function ftpAdd(type) {
  * @return {bool}
  */
 function ftpDelete(id,ftp_username){
-	SafeMessage(lan.public.del+"["+ftp_username+"]",lan.get('confirm_del',[ftp_username]),function(){
+	safeMessage(lan.public.del+"["+ftp_username+"]",lan.get('confirm_del',[ftp_username]),function(){
 		layer.msg(lan.public.the_del,{icon:16,time:0,shade: [0.3, '#000']});
 		var data='&id='+id+'&username='+ftp_username;
 		$.post('/ftp?action=DeleteUser',data,function(rdata){
@@ -357,6 +363,7 @@ function ftpPortEdit(port) {
 		if(e.keyCode == 13) $("#poseFtpPort").click();
 	});
 }
+
 //修改FTP服务端口
 function ftpPortPost(port){
 	layer.closeAll();
