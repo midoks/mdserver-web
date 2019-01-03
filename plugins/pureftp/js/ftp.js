@@ -81,13 +81,17 @@ function ftpList(page, search){
 
         ulist = rdata.data;
         for (i in ulist){
-        	console.log(ulist[i]);
+        	// console.log(ulist[i]);
+        	status = '<a href="javascript:;" onclick="ftpStart(\''+ulist[i]['id']+'\',\''+ulist[i]['name']+'\')" <span="" style="color:red">已停用<span style="color:red" class="glyphicon glyphicon-pause"></span></a>';
+        	if (ulist[i]['status'] == '1'){
+        		status = '<a href="javascript:;" title="FTP帐户" onclick="ftpStop(\''+ulist[i]['id']+'\',\''+ulist[i]['name']+'\')"><span style="color:#5CB85C">已启用</span><span style="color:#5CB85C" class="glyphicon glyphicon-play"></span></a>';
+        	}
             content += '<tr><td>'+ulist[i]['name']+'</td>'+
         		'<td>'+ulist[i]['password']+'</td>'+
-        		'<td><a href="javascript:;" onclick="ftp.start_user(2,\'kkk\')" <span="" style="color:red">已停用<span style="color:red" class="glyphicon glyphicon-pause"></span></a></td>' +
+        		'<td>'+status+'</td>' +
         		'<td>'+ulist[i]['path']+'</td>' +
         		'<td>'+ulist[i]['ps']+'</td>' +
-            	'<td><a class="btlink" onclick="ftpMod(\''+ulist[i]['id']+'\',\''+ulist[i]['name']+'\'))">改密</a> | ' +
+            	'<td><a class="btlink" onclick="ftpMod(\''+ulist[i]['id']+'\',\''+ulist[i]['name']+'\',\''+ulist[i]['password']+'\')">改密</a> | ' +
             	'<a class="btlink" onclick="ftpDelete(\''+ulist[i]['id']+'\',\''+ulist[i]['name']+'\')">删除</a></td></tr>';
         }
 
@@ -245,6 +249,11 @@ function ftpDelete(id,ftp_username){
 }
 
 
+function ftpMod(id,name,password){
+	console.log(id,name,password);
+}
+
+
 //批量删除
 // function allDeleteFtp(){
 // 	var checkList = $("input[name=id]");
@@ -325,28 +334,28 @@ function ftpDelete(id,ftp_username){
  * @param {Number} id	FTP的ID
  * @param {String} username	FTP用户名
  */
-// function ftpStop(id, username) {
-// 	layer.confirm(lan.ftp.stop_confirm.replace('{1}',username), {
-// 		title: lan.ftp.stop_title,icon:3,
-// 		closeBtn:2
-// 	}, function(index) {
-// 		if (index > 0) {
-// 			var loadT = layer.load({shade: true,shadeClose: false});
-// 			var data='id=' + id + '&username=' + username + '&status=0';
-// 			$.post('/ftp?action=SetStatus',data, function(rdata) {
-// 				layer.close(loadT);
-// 				if (rdata.status == true) {
-// 					layer.msg(rdata.msg, {icon: 1});
-// 					getFtp(1);
-// 				} else {
-// 					layer.msg(rdata.msg, {icon: 5});
-// 				}
-// 			});
-// 		} else {
-// 			layer.closeAll();
-// 		}
-// 	});
-// }
+function ftpStop(id, username) {
+	layer.confirm('您真的要停止{1}的FTP吗?'.replace('{1}',username), {
+		title: 'FTP帐户',icon:3,
+		closeBtn:2
+	}, function(index) {
+		if (index > 0) {
+			var loadT = layer.load({shade: true,shadeClose: false});
+			var data='id=' + id + '&username=' + username + '&status=0';
+			$.post('/ftp?action=SetStatus',data, function(rdata) {
+				layer.close(loadT);
+				if (rdata.status == true) {
+					layer.msg(rdata.msg, {icon: 1});
+					getFtp(1);
+				} else {
+					layer.msg(rdata.msg, {icon: 5});
+				}
+			});
+		} else {
+			layer.closeAll();
+		}
+	});
+}
 
 /**
  * 启动FTP帐号
