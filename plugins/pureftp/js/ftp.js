@@ -1,6 +1,67 @@
+function ftpPost(method,args,callback){
+    var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
+    $.post('/plugins/run', {name:'pureftp', func:method, args:JSON.stringify(args)}, function(data) {
+        layer.close(loadT);
+        if (!data.status){
+            layer.msg(data.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+            return;
+        }
+
+        if(typeof(callback) == 'function'){
+            callback(data);
+        }
+    },'json'); 
+}
 
 function ftpList(page, search){
-	
+	var _data = {};
+    if (typeof(page) =='undefined'){
+        var page = 1;
+    }
+    
+    _data['page'] = page;
+    _data['page_size'] = 10;
+    if(typeof(search) != 'undefined'){
+        _data['search'] = search;
+    }
+
+    ftpPost('get_ftp_list', _data, function(data){
+
+        var rdata = $.parseJSON(data.data);
+        content = '<div class="info-title-tips"><p><span class="glyphicon glyphicon-alert" style="color: #f39c12; margin-right: 10px;"></span>当前FTP地址为：ftp://'+rdata['info']['ip']+':'+rdata['info']['port']+'</p></div>';
+        content += '<div class="finduser"><input class="bt-input-text mr5 outline_no" type="text" placeholder="查找用户名" id="csvn_find_user" style="height: 28px; border-radius: 3px;width: 435px;">';
+        content += '<button class="btn btn-success btn-sm" onclick="csvnUserFind();">查找</button></div>';
+
+        content += '<div class="divtable" style="margin-top:5px;"><table class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0">';
+        content += '<thead><tr>';
+        content += '<th>用户名</th>';
+        content += '<th>密码</th>';
+        content += '<th>状态</th>';
+        content += '<th>根目录</th>';
+        content += '<th>备注</th>';
+        content += '<th>操作(<a class="btlink" onclick="addFtp(0);">添加</a>|<a class="btlink">修改FTP端口</a>)</th>';
+        content += '</tr></thead>';
+
+        content += '<tbody>';
+
+        ulist = rdata.data;
+        for (i in ulist){
+            content += '<tr><td>'+ulist[i]+'</td><td>'+
+                '<a class="btlink" onclick="csvnDelUser(\''+ulist[i]+'\')">删除</a> | ' +
+                '<a class="btlink" onclick="csvnModPwdUser(\''+ulist[i]+'\')">改密</a></td></tr>';
+        }
+
+        content += '</tbody>';
+        content += '</table></div>';
+
+        page = '<div class="dataTables_paginate paging_bootstrap pagination" style="margin-top:0px;"><ul id="softPage" class="page"><div>';
+        page += rdata.list;
+        page += '</div></ul></div>';
+
+        content += page;
+
+        $(".soft-man-con").html(content);
+    });
 }
 
 
@@ -66,13 +127,14 @@ function getFtp(page, search) {
  *添加FTP帐户
  * @param {Number} type	添加类型
  */
-function ftpAdd(type) {
+function addFtp(type) {
 	if (type == 1) {
 		var loadT = layer.load({
 			shade: true,
 			shadeClose: false
 		});
 		var data = $("#ftpAdd").serialize();
+		console.log(data);
 		$.post('/ftp?action=AddUser', data, function(rdata) {
 			if (rdata.status) {
 				getFtp(1);
@@ -95,41 +157,39 @@ function ftpAdd(type) {
 		type: 1,
 		skin: 'demo-class',
 		area: '500px',
-		title: lan.ftp.add_title,
+		title: '添加FTP帐户',
 		closeBtn: 2,
 		shift: 5,
 		shadeClose: false,
 		content: "<form class='bt-form pd20 pb70' id='ftpAdd'>\
 					<div class='line'>\
-					<span class='tname'>"+lan.ftp.add_user+"</span>\
+					<span class='tname'>用户名</span>\
 					<div class='info-r'><input class='bt-input-text' type='text' id='ftpUser' name='ftp_username' style='width:330px' /></div>\
 					</div>\
 					<div class='line'>\
-					<span class='tname'>"+lan.ftp.add_pass+"</span>\
-					<div class='info-r'><input class='bt-input-text mr5' type='text' name='ftp_password' id='MyPassword' style='width:330px' value='"+(RandomStrPwd(10))+"' /><span title='"+lan.ftp.add_pass_rep+"' class='glyphicon glyphicon-repeat cursor' onclick='repeatPwd(10)'></span></div>\
+					<span class='tname'>密码</span>\
+					<div class='info-r'><input class='bt-input-text mr5' type='text' name='ftp_password' id='MyPassword' style='width:330px' value='"+(randomStrPwd(16))+"' /><span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatPwd(16)'></span></div>\
 					</div>\
 					<div class='line'>\
-					<span class='tname'>"+lan.ftp.add_path+"</span>\
-					<div class='info-r'><input id='inputPath' class='bt-input-text mr5' type='text' name='path' value='"+defaultPath+"/' placeholder='"+lan.ftp.add_path_title+"'  style='width:330px' /><span class='glyphicon glyphicon-folder-open cursor' onclick='ChangePath(\"inputPath\")'></span><p class='c9 mt10'>"+lan.ftp.add_path_ps+"</p></div>\
+					<span class='tname'>根目录</span>\
+					<div class='info-r'><input id='inputPath' class='bt-input-text mr5' type='text' name='path' value='"+defaultPath+"/' placeholder='"+lan.ftp.add_path_title+"'  style='width:330px' /><span class='glyphicon glyphicon-folder-open cursor' onclick='changePath(\"inputPath\")'></span><p class='c9 mt10'>"+lan.ftp.add_path_ps+"</p></div>\
 					</div>\
                     <div class='line' style='display:none'>\
-					<span class='tname'>"+lan.ftp.add_ps+"</span>\
+					<span class='tname'>备注</span>\
 					<div class='info-r'>\
 					<input class='bt-input-text' type='text' name='ps' value='' placeholder='"+lan.ftp.add_ps_title+"' />\
 					</div></div>\
 					<div class='bt-form-submit-btn'>\
-						<button type='button' class='btn btn-danger btn-sm btn-title' onclick='layer.closeAll()'>"+lan.public.close+"</button>\
-				        <button type='button' class='btn btn-success btn-sm btn-title' onclick=\"ftpAdd(1)\" >"+lan.public.submit+"</button>\
+						<button type='button' class='btn btn-danger btn-sm btn-title' onclick='layer.closeAll()'>关闭</button>\
+				        <button type='button' class='btn btn-success btn-sm btn-title' onclick=\"ftpAdd(1)\" >提交</button>\
 			        </div>\
 			      </form>"
 	});
 	
-	
-	$("#ftpUser").keyup(function()
-	{
+	$("#ftpUser").keyup(function(){
+		console.log('dd');
 		var ftpName = $(this).val();
-		if($("#inputPath").val().substr(0,11) == '/www/wwwroo' )
-		{
+		if( $("#inputPath").val().substr(0,11) == '/www/wwwroo' ){
 			$("#inputPath").val('/www/wwwroot/'+ftpName);
 		}
 	});

@@ -84,7 +84,7 @@ function syncPost(path, args){
 }
 
 function repeatPwd(a) {
-	$("#MyPassword").val(RandomStrPwd(a))
+	$("#MyPassword").val(randomStrPwd(a))
 }
 
 

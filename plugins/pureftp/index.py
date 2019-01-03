@@ -172,6 +172,33 @@ def initdUinstall():
     os.remove(initd_bin)
     return 'ok'
 
+
+def getFtpPort():
+    import re
+    try:
+        file = getServerDir() + '/etc/pure-ftpd.conf'
+        conf = public.readFile(file)
+        rep = "\n#?\s*Bind\s+[0-9]+\.[0-9]+\.[0-9]+\.+[0-9]+,([0-9]+)"
+        port = re.search(rep, conf).groups()[0]
+    except:
+        port = '21'
+    return port
+
+
+def getFtpList():
+
+    data = {}
+    info = {}
+    info['ip'] = public.getLocalIp()
+    info['port'] = getFtpPort()
+    data['info'] = info
+
+    return public.getJson(data)
+
+
+def addFtp():
+    return 'o'
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -192,5 +219,9 @@ if __name__ == "__main__":
         print initdUinstall()
     elif func == 'conf':
         print getConf()
+    elif func == 'get_ftp_list':
+        print getFtpList()
+    elif func == 'add_ftp':
+        print addFtp()
     else:
         print 'error'
