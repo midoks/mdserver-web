@@ -75,17 +75,6 @@ INSERT INTO `firewall` (`id`, `port`, `ps`, `addtime`) VALUES
 (5, '22', 'SSH远程管理服务', '0000-00-00 00:00:00');
 
 
-CREATE TABLE IF NOT EXISTS `ftps` (
-  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
-  `pid` INTEGER,
-  `name` TEXT,
-  `password` TEXT,
-  `path` TEXT,
-  `status` TEXT,
-  `ps` TEXT,
-  `addtime` TEXT
-);
-
 
 CREATE TABLE IF NOT EXISTS `logs` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT,

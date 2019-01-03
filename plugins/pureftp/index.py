@@ -42,7 +42,7 @@ def getInitDTpl():
 
 
 def getArgs():
-    args = sys.argv[3:]
+    args = sys.argv[2:]
     tmp = {}
     args_len = len(args)
 
@@ -173,6 +173,35 @@ def initdUinstall():
     return 'ok'
 
 
+def pftpDB():
+    file = getServerDir() + '/ftps.db'
+    if not os.path.exists(file):
+        conn = public.M('ftps').dbPos(getServerDir(), 'ftps')
+        csql = public.readFile(getPluginDir() + '/conf/ftps.sql')
+        csql_list = csql.split(';')
+        for index in range(len(csql_list)):
+            conn.execute(csql_list[index], ())
+    else:
+        conn = public.M('ftps').dbPos(getServerDir(), 'ftps')
+    return conn
+
+
+def pftpAdd(username, password, path):
+    cmd = getServerDir() + '/bin/pure-pw useradd ' + username + ' -u midoks -d ' + \
+        path + '<<EOF \n' + password + '\n' + password + '\nEOF'
+    return public.execShell(cmd)
+
+
+def pftpReload():
+    public.execShell(getServerDir() + '/bin/pure-pw mkdb ' +
+                     getServerDir() + '/etc/pureftpd.pdb')
+
+
+def getWwwDir():
+    path = public.getWwwDir()
+    return path
+
+
 def getFtpPort():
     import re
     try:
@@ -186,18 +215,68 @@ def getFtpPort():
 
 
 def getFtpList():
+    args = getArgs()
+    page = 1
+    page_size = 3
+    if 'page' in args:
+        page = int(args['page'])
+
+    if 'page_size' in args:
+        page_size = int(args['page_size'])
+    page_size = 2
 
     data = {}
+    conn = pftpDB()
+    clist = conn.where('', ()).field('id,pid,name,password,path,status,ps,addtime').limit(
+        '0,1').order('id desc').select()
+
+    count = conn.count()
+    _page = {}
+    _page['count'] = count
+    _page['p'] = page
+    _page['row'] = page_size
+    _page['tojs'] = 'ftpList'
+    data['page'] = public.getPage(_page)
+
     info = {}
     info['ip'] = public.getLocalIp()
     info['port'] = getFtpPort()
     data['info'] = info
+    data['data'] = clist
 
     return public.getJson(data)
 
 
 def addFtp():
-    return 'o'
+    import urllib
+    args = getArgs()
+    if not 'ftp_username' in args:
+        return 'ftp_username missing'
+
+    if not 'ftp_password' in args:
+        return 'ftp_password missing'
+
+    if not 'path' in args:
+        return 'path missing'
+
+    if not 'ps' in args:
+        return 'ps missing'
+
+    path = urllib.unquote(args['path'])
+    user = args['ftp_username']
+    pwd = args['ftp_password']
+    ps = args['ps']
+
+    addtime = time.strftime('%Y-%m-%d %X', time.localtime())
+
+    data = pftpAdd(user, pwd, path)
+    conn = pftpDB()
+    conn.add('pid,name,password,path,status,ps,addtime',
+             (0, user, pwd, path, 1, ps, addtime))
+    pftpReload()
+    if data[1] == '':
+        return 'ok'
+    return data[0]
 
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -219,6 +298,8 @@ if __name__ == "__main__":
         print initdUinstall()
     elif func == 'conf':
         print getConf()
+    elif func == 'get_www_dir':
+        print getWwwDir()
     elif func == 'get_ftp_list':
         print getFtpList()
     elif func == 'add_ftp':
