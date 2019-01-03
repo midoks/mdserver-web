@@ -217,20 +217,29 @@ def getFtpPort():
 def getFtpList():
     args = getArgs()
     page = 1
-    page_size = 3
+    page_size = 10
+    search = ''
     if 'page' in args:
         page = int(args['page'])
 
     if 'page_size' in args:
         page_size = int(args['page_size'])
-    page_size = 2
+
+    if 'search' in args:
+        search = args['search']
 
     data = {}
     conn = pftpDB()
-    clist = conn.where('', ()).field('id,pid,name,password,path,status,ps,addtime').limit(
-        '0,1').order('id desc').select()
+    limit = str((page - 1) * page_size) + ',' + str(page_size)
+    # print limit, search
+    condition = ''
+    if not search == '':
+        condition = "name like '%" + search + "%'"
+    field = 'id,pid,name,password,path,status,ps,addtime'
+    clist = conn.where(condition, ()).field(
+        field).limit(limit).order('id desc').select()
 
-    count = conn.count()
+    count = conn.where(condition, ()).count()
     _page = {}
     _page['count'] = count
     _page['p'] = page
@@ -278,6 +287,23 @@ def addFtp():
         return 'ok'
     return data[0]
 
+
+def delFtp():
+    args = getArgs()
+    if not 'id' in args:
+        return 'ftp_username missing'
+
+    if not 'username' in args:
+        return 'username missing'
+
+    public.execShell(getServerDir() +
+                     '/bin/pure-pw userdel ' + args['username'])
+    pftpReload()
+    conn = pftpDB()
+    conn.where("id=?", (args['id'],)).delete()
+    public.writeLog('TYPE_FTP', 'FTP_DEL_SUCCESS', (args['username'],))
+    return 'ok'
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -304,5 +330,7 @@ if __name__ == "__main__":
         print getFtpList()
     elif func == 'add_ftp':
         print addFtp()
+    elif func == 'del_ftp':
+        print delFtp()
     else:
         print 'error'

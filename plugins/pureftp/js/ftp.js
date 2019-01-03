@@ -38,6 +38,15 @@ function ftpAsyncPost(method,args){
 	);
 }
 
+function ftpListFind(){
+    var search = $('#ftp_find_user').val();
+    if (search==''){
+        layer.msg('搜索字符不能为空!',{icon:0,time:2000,shade: [0.3, '#000']});
+        return;
+    }
+    ftpList(1, search);
+}
+
 function ftpList(page, search){
 	var _data = {};
     if (typeof(page) =='undefined'){
@@ -55,8 +64,8 @@ function ftpList(page, search){
         var rdata = $.parseJSON(data.data);
         console.log(rdata);
         content = '<div class="info-title-tips"><p><span class="glyphicon glyphicon-alert" style="color: #f39c12; margin-right: 10px;"></span>当前FTP地址为：ftp://'+rdata['info']['ip']+':'+rdata['info']['port']+'</p></div>';
-        content += '<div class="finduser"><input class="bt-input-text mr5 outline_no" type="text" placeholder="查找用户名" id="csvn_find_user" style="height: 28px; border-radius: 3px;width: 435px;">';
-        content += '<button class="btn btn-success btn-sm" onclick="csvnUserFind();">查找</button></div>';
+        content += '<div class="finduser"><input class="bt-input-text mr5 outline_no" type="text" placeholder="查找用户名" id="ftp_find_user" style="height: 28px; border-radius: 3px;width: 605px;">';
+        content += '<button class="btn btn-success btn-sm" onclick="ftpListFind();">查找</button></div>';
 
         content += '<div class="divtable" style="margin-top:5px;"><table class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0">';
         content += '<thead><tr>';
@@ -78,8 +87,8 @@ function ftpList(page, search){
         		'<td><a href="javascript:;" onclick="ftp.start_user(2,\'kkk\')" <span="" style="color:red">已停用<span style="color:red" class="glyphicon glyphicon-pause"></span></a></td>' +
         		'<td>'+ulist[i]['path']+'</td>' +
         		'<td>'+ulist[i]['ps']+'</td>' +
-            	'<td><a class="btlink" onclick="csvnModPwdUser(\''+ulist[i]+'\')">改密</a> | ' +
-            	'<a class="btlink" onclick="delFtp(\''+ulist[i]['id']+'\',\''+ulist[i]['name']+'\')">删除</a></td></tr>';
+            	'<td><a class="btlink" onclick="ftpMod(\''+ulist[i]['id']+'\',\''+ulist[i]['name']+'\'))">改密</a> | ' +
+            	'<a class="btlink" onclick="ftpDelete(\''+ulist[i]['id']+'\',\''+ulist[i]['name']+'\')">删除</a></td></tr>';
         }
 
         content += '</tbody>';
@@ -171,18 +180,6 @@ function addFtp(type) {
 			ftpList();
 			layer.close(loadT);
 		});
-
-		// $.post('/ftp?action=AddUser', data, function(rdata) {
-		// 	if (rdata.status) {
-		// 		ftpList();
-		// 		layer.closeAll();
-		// 		layer.msg(rdata.msg, {icon: 1});
-		// 	} else {
-		// 		ftpList();
-		// 		layer.closeAll();
-		// 		layer.msg(rdata.msg, {icon: 5});
-		// 	}
-		// });
 		return true;
 	}
 
@@ -235,21 +232,17 @@ function addFtp(type) {
  * @param {String} ftp_username  欲被删除的用户名
  * @return {bool}
  */
-// function ftpDelete(id,ftp_username){
-// 	safeMessage(lan.public.del+"["+ftp_username+"]",lan.get('confirm_del',[ftp_username]),function(){
-// 		layer.msg(lan.public.the_del,{icon:16,time:0,shade: [0.3, '#000']});
-// 		var data='&id='+id+'&username='+ftp_username;
-// 		$.post('/ftp?action=DeleteUser',data,function(rdata){
-// 			layer.closeAll();
-// 			if(rdata['status'] == true){
-// 				getFtp(1);
-// 				layer.msg(rdata.msg,{icon:1});
-// 			}else{
-// 				layer.msg(rdata.msg,{icon:2});
-// 			}
-// 		});
-// 	});
-// }
+function ftpDelete(id,ftp_username){
+	safeMessage(lan.public.del+"["+ftp_username+"]",lan.get('confirm_del',[ftp_username]),function(){
+		layer.msg(lan.public.the_del,{icon:16,time:0,shade: [0.3, '#000']});
+		var data='&id='+id+'&username='+ftp_username;
+
+		ftpPost('del_ftp', data, function(data){
+			layer.msg('删除成功!', {icon: 1});
+			ftpList();
+		})
+	});
+}
 
 
 //批量删除
