@@ -402,6 +402,7 @@ def stopPort():
         return 'status missing'
 
     data = pftpStop(args['username'])
+    pftpReload()
     conn = pftpDB()
     conn.where('id=?', (int(args['id']),)).save(
         'status', (args['status'],))
@@ -423,6 +424,7 @@ def startPort():
         return 'status missing'
 
     data = pftpStart(args['username'])
+    pftpReload()
     conn = pftpDB()
     conn.where('id=?', (int(args['id']),)).save(
         'status', (args['status'],))
