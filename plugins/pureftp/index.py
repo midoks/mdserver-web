@@ -203,8 +203,8 @@ def pftpAdd(username, password, path):
 
 def pftpMod(username, password):
     user = pftpUser()
-    cmd = getServerDir() + '/bin/pure-pw passwd ' + username + ' -u ' + user + ' -d ' + \
-        path + '<<EOF \n' + password + '\n' + password + '\nEOF'
+    cmd = getServerDir() + '/bin/pure-pw passwd ' + username + \
+        '<<EOF \n' + password + '\n' + password + '\nEOF'
     return public.execShell(cmd)
 
 
@@ -327,16 +327,44 @@ def modFtp():
         return 'id missing'
 
     if not 'name' in args:
-        return 'username missing'
+        return 'name missing'
 
     if not 'password' in args:
         return 'password missing'
 
-    data = pftpMod(args['user'], args['password'])
+    conn = pftpDB()
+    data = pftpMod(args['name'], args['password'])
     pftpReload()
+
+    conn.where('id=?', (int(args['id']),)).save(
+        'password', (args['password'],))
+    # print data
     if data[1] == '':
         return 'ok'
     return data[0]
+
+
+def modFtpPort():
+    import re
+    args = getArgs()
+    if not 'port' in args:
+        return 'port missing'
+    try:
+        port = args['port']
+        if int(port) < 1 or int(port) > 65535:
+            return '端口范围不正确!'
+        file = file = getServerDir() + '/etc/pure-ftpd.conf'
+        conf = public.readFile(file)
+        rep = u"\n#?\s*Bind\s+[0-9]+\.[0-9]+\.[0-9]+\.+[0-9]+,([0-9]+)"
+        # preg_match(rep,conf,tmp)
+        conf = re.sub(rep, "\nBind        0.0.0.0," + port, conf)
+        public.writeFile(file, conf)
+        restart()
+        return 'ok'
+    except Exception as ex:
+
+        return str(ex)
+
 
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -368,5 +396,7 @@ if __name__ == "__main__":
         print delFtp()
     elif func == 'mod_ftp':
         print modFtp()
+    elif func == 'mod_ftp_port':
+        print modFtpPort()
     else:
         print 'error'
