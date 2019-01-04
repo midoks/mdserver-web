@@ -284,18 +284,18 @@ function ftpStop(id, username) {
 		if (index > 0) {
 			var loadT = layer.load({shade: true,shadeClose: false});
 			var data='id=' + id + '&username=' + username + '&status=0';
-			$.post('/ftp?action=SetStatus',data, function(rdata) {
+			ftpPost('stop_ftp', data, function(data){
 				layer.close(loadT);
-				if (rdata.status == true) {
-					layer.msg(rdata.msg, {icon: 1});
-					getFtp(1);
+				if (data.data == 'ok'){
+					showMsg('启动成功!', function(){
+						ftpList();
+					},{icon: 1});
 				} else {
-					layer.msg(rdata.msg, {icon: 5});
+					layer.msg(data.data, {icon: 2});
 				}
 			});
-		} else {
-			layer.closeAll();
 		}
+		$('.layui-layer-close1').click();
 	});
 }
 
@@ -304,17 +304,19 @@ function ftpStop(id, username) {
  * @param {Number} id	FTP的ID
  * @param {String} username	FTP用户名
  */
-// function ftpStart(id, username) {
-// 	var loadT = layer.load({shade: true,shadeClose: false});
-// 	var data='id=' + id + '&username=' + username + '&status=1';
-// 	$.post('/ftp?action=SetStatus',data, function(rdata) {
-// 		layer.close(loadT);
-// 		if (rdata.status == true) {
-// 			layer.msg(rdata.msg, {icon: 1});
-// 			getFtp(1);
-// 		} else {
-// 			layer.msg(rdata.msg, {icon: 5});
-// 		}
-// 	});
-// }
+function ftpStart(id, username) {
+	var loadT = layer.load({shade: true,shadeClose: false});
+	var data='id=' + id + '&username=' + username + '&status=1';
+	ftpPost('start_ftp', data, function(data){
+		layer.close(loadT);
+		if (data.data == 'ok'){
+			showMsg('启动成功!', function(){
+				ftpList();
+			},{icon: 1});
+		} else {
+			layer.msg(data.data, {icon: 2});
+		}
+		
+	});
+}
 
