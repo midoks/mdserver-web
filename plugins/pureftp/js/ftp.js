@@ -74,7 +74,7 @@ function ftpList(page, search){
         content += '<th style="width:10%;">状态</th>';
         content += '<th>根目录</th>';
         content += '<th>备注</th>';
-        content += '<th>操作(<a class="btlink" onclick="addFtp(0);">添加</a>|<a class="btlink" onclick="modFtpPort(0)">端口</a>)</th>';
+        content += '<th>操作(<a class="btlink" onclick="addFtp(0);">添加</a>|<a class="btlink" onclick="modFtpPort(0,\''+rdata['info']['port']+'\')">端口</a>)</th>';
         content += '</tr></thead>';
 
         content += '<tbody>';
@@ -190,6 +190,44 @@ function ftpDelete(id,ftp_username){
 	});
 }
 
+function modFtpPort(type, port){
+	var index = layer.open({
+		type: 1,
+		skin: 'demo-class',
+		area: '500px',
+		title: '修改FTP帐户端口',
+		content: "<form class='bt-form pd20 pb70'>\
+					<div class='line'>\
+					<span class='tname'>默认端口</span>\
+					<div class='info-r'><input class='bt-input-text mr5' type='text' id='ftpPort' name='ftp_port' style='width:330px' value='"+port+"'/></div>\
+					</div>\
+					<div class='bt-form-submit-btn'>\
+						<button id='ftp_port_close' type='button' class='btn btn-danger btn-sm btn-title'>关闭</button>\
+				        <button id='ftp_port_submit' type='button' class='btn btn-success btn-sm btn-title'>提交</button>\
+			        </div>\
+			      </form>",
+	});
+
+	$('#ftp_port_close').click(function(){
+		$('.layui-layer-close1').click();
+	});
+
+	$('#ftp_port_submit').click(function(){
+		var port = $('#ftpPort').val();
+		data = 'port='+port
+		ftpPost('mod_ftp_port', data,function(data){
+			ftpList();
+			if (data.data == 'ok'){
+				layer.msg('修改成功!', {icon: 1});
+			} else {
+				layer.msg(data.data, {icon: 2});
+			}
+			$('.layui-layer-close1').click();
+		});
+	});
+
+}
+
 
 function ftpModPwd(id,name,password){
 	var index = layer.open({
@@ -220,10 +258,14 @@ function ftpModPwd(id,name,password){
 	});
 
 	$('#ftp_mod_submit').click(function(){
-		console.log('123123');
-		data='id='+id+'&name='+name+'&password='+password
+		pwd = $('#MyPassword').val();
+		data='id='+id+'&name='+name+'&password='+pwd
 		ftpPost('mod_ftp', data,function(data){
-			console.log(data);
+			ftpList();
+			if (data.data == 'ok'){
+				layer.msg('修改成功!', {icon: 1});
+			}
+			$('.layui-layer-close1').click();
 		});
 	});
 }
