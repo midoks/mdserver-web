@@ -59,8 +59,7 @@ def getArgs():
 
 
 def status():
-    cmd = "ps -ef|grep " + getPluginName() + \
-        " |grep -v grep | grep -v python | awk '{print $2}'"
+    cmd = "ps -ef|grep pure-ftpd |grep -v grep | grep -v python | awk '{print $2}'"
     data = public.execShell(cmd)
     if data[0] == '':
         return 'stop'
