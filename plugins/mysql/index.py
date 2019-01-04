@@ -188,11 +188,11 @@ def status():
 def start():
     initMysql = getServerDir() + '/scripts/mysql_install_db ' + '--basedir=' + \
         getServerDir() + ' --datadir=' + getServerDir() + '/bin/mysql/data'
-    # return initMysql
+    return initMysql
 
     cmd = getServerDir() + '/bin/mysqld_safe ' + getServerDir() + \
         '/conf/my.cnf ' + '--user=mysql&'
-    return cmd
+    # return cmd
     data = public.execShell(cmd)
     if data[0] == '':
         return 'stop'
