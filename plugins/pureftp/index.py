@@ -9,7 +9,7 @@ sys.path.append(os.getcwd() + "/class/core")
 import public
 
 app_debug = False
-if public.getOs() == 'darwin':
+if public.isAppleSystem():
     app_debug = True
 
 
@@ -186,8 +186,24 @@ def pftpDB():
     return conn
 
 
+def pftpUser():
+    if public.isAppleSystem():
+        user = public.execShell(
+            "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
+        return user
+    return 'www'
+
+
 def pftpAdd(username, password, path):
-    cmd = getServerDir() + '/bin/pure-pw useradd ' + username + ' -u midoks -d ' + \
+    user = pftpUser()
+    cmd = getServerDir() + '/bin/pure-pw useradd ' + username + ' -u ' + user + ' -d ' + \
+        path + '<<EOF \n' + password + '\n' + password + '\nEOF'
+    return public.execShell(cmd)
+
+
+def pftpMod(username, password):
+    user = pftpUser()
+    cmd = getServerDir() + '/bin/pure-pw passwd ' + username + ' -u ' + user + ' -d ' + \
         path + '<<EOF \n' + password + '\n' + password + '\nEOF'
     return public.execShell(cmd)
 
@@ -304,6 +320,24 @@ def delFtp():
     public.writeLog('TYPE_FTP', 'FTP_DEL_SUCCESS', (args['username'],))
     return 'ok'
 
+
+def modFtp():
+    args = getArgs()
+    if not 'id' in args:
+        return 'id missing'
+
+    if not 'name' in args:
+        return 'username missing'
+
+    if not 'password' in args:
+        return 'password missing'
+
+    data = pftpMod(args['user'], args['password'])
+    pftpReload()
+    if data[1] == '':
+        return 'ok'
+    return data[0]
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -332,5 +366,7 @@ if __name__ == "__main__":
         print addFtp()
     elif func == 'del_ftp':
         print delFtp()
+    elif func == 'mod_ftp':
+        print modFtp()
     else:
         print 'error'
