@@ -196,6 +196,14 @@ def pftpUser():
 
 def pftpAdd(username, password, path):
     user = pftpUser()
+
+    if not os.path.exists(path):
+        os.mkdir(path)
+        if public.isAppleSystem():
+            os.system('chown ' + user + '.staff ' + path)
+        else:
+            os.system('chown www.www ' + path)
+
     cmd = getServerDir() + '/bin/pure-pw useradd ' + username + ' -u ' + user + ' -d ' + \
         path + '<<EOF \n' + password + '\n' + password + '\nEOF'
     return public.execShell(cmd)
