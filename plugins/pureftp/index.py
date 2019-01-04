@@ -4,6 +4,7 @@ import sys
 import io
 import os
 import time
+import shutil
 
 sys.path.append(os.getcwd() + "/class/core")
 import public
@@ -84,23 +85,29 @@ def initDreplace():
     file_bin = initD_path + '/' + getPluginName()
 
     # initd replace
-    content = public.readFile(file_tpl)
-    content = contentReplace(content)
-    public.writeFile(file_bin, content)
-    public.execShell('chmod +x ' + file_bin)
+    if not os.path.exists(file_bin):
+        content = public.readFile(file_tpl)
+        content = contentReplace(content)
+        public.writeFile(file_bin, content)
+        public.execShell('chmod +x ' + file_bin)
 
-    pureTplConfig = getPluginDir() + "/init.d/pure-config.pl"
     pureSbinConfig = getServerDir() + "/sbin/pure-config.pl"
+    if not os.path.exists(pureSbinConfig):
+        pureTplConfig = getPluginDir() + "/init.d/pure-config.pl"
+        content = public.readFile(pureTplConfig)
+        content = contentReplace(content)
+        public.writeFile(pureSbinConfig, content)
+        public.execShell('chmod +x ' + pureSbinConfig)
 
-    content = public.readFile(pureTplConfig)
-    content = contentReplace(content)
-    public.writeFile(pureSbinConfig, content)
-    public.execShell('chmod +x ' + pureSbinConfig)
+    pureFtpdConfig = getServerDir() + "/etc/pure-ftpd.conf"
+    pureFtpdConfigBak = getServerDir() + "/etc/pure-ftpd.bak.conf"
+    pureFtpdConfigTpl = getPluginDir() + "/conf/pure-ftpd.conf"
 
-    # # config replace
-    # conf_content = public.readFile(getConf())
-    # conf_content = conf_content.replace('{$SERVER_PATH}', service_path)
-    # public.writeFile(getServerDir() + '/redis.conf', conf_content)
+    if not os.path.exists(pureFtpdConfigBak):
+        shutil.copyfile(pureFtpdConfig, pureFtpdConfigBak)
+        content = public.readFile(pureFtpdConfigTpl)
+        content = contentReplace(content)
+        public.writeFile(pureFtpdConfig, content)
 
     return file_bin
 
@@ -197,7 +204,7 @@ def pftpAdd(username, password, path):
     user = pftpUser()
 
     if not os.path.exists(path):
-        os.mkdir(path)
+        os.makedirs(path)
         if public.isAppleSystem():
             os.system('chown ' + user + '.staff ' + path)
         else:
@@ -374,7 +381,8 @@ def modFtpPort():
         conf = public.readFile(file)
         rep = u"\n#?\s*Bind\s+[0-9]+\.[0-9]+\.[0-9]+\.+[0-9]+,([0-9]+)"
         # preg_match(rep,conf,tmp)
-        conf = re.sub(rep, "\nBind        0.0.0.0," + port, conf)
+        conf = re.sub(
+            rep, "\nBind                         0.0.0.0," + port, conf)
         public.writeFile(file, conf)
         restart()
         return 'ok'
