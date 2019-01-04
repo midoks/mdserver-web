@@ -208,6 +208,16 @@ def pftpMod(username, password):
     return public.execShell(cmd)
 
 
+def pftpStop(username):
+    cmd = getServerDir() + '/bin/pure-pw usermod ' + username + ' -r 1'
+    return public.execShell(cmd)
+
+
+def pftpStart(username):
+    cmd = getServerDir() + '/bin/pure-pw usermod ' + username + " -r ''"
+    return public.execShell(cmd)
+
+
 def pftpReload():
     public.execShell(getServerDir() + '/bin/pure-pw mkdb ' +
                      getServerDir() + '/etc/pureftpd.pdb')
@@ -362,8 +372,49 @@ def modFtpPort():
         restart()
         return 'ok'
     except Exception as ex:
-
         return str(ex)
+
+
+def stopPort():
+    args = getArgs()
+    if not 'id' in args:
+        return 'id missing'
+
+    if not 'username' in args:
+        return 'username missing'
+
+    if not 'status' in args:
+        return 'status missing'
+
+    data = pftpStop(args['username'])
+    conn = pftpDB()
+    conn.where('id=?', (int(args['id']),)).save(
+        'status', (args['status'],))
+
+    if data[1] == '':
+        return 'ok'
+    return data[0]
+
+
+def startPort():
+    args = getArgs()
+    if not 'id' in args:
+        return 'id missing'
+
+    if not 'username' in args:
+        return 'username missing'
+
+    if not 'status' in args:
+        return 'status missing'
+
+    data = pftpStart(args['username'])
+    conn = pftpDB()
+    conn.where('id=?', (int(args['id']),)).save(
+        'status', (args['status'],))
+
+    if data[1] == '':
+        return 'ok'
+    return data[0]
 
 
 if __name__ == "__main__":
@@ -398,5 +449,9 @@ if __name__ == "__main__":
         print modFtp()
     elif func == 'mod_ftp_port':
         print modFtpPort()
+    elif func == 'stop_ftp':
+        print stopPort()
+    elif func == 'start_ftp':
+        print startPort()
     else:
         print 'error'
