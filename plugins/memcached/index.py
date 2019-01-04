@@ -4,12 +4,13 @@ import sys
 import io
 import os
 import time
+import re
 
 sys.path.append(os.getcwd() + "/class/core")
 import public
 
 app_debug = False
-if public.getOs() == 'darwin':
+if public.isAppleSystem():
     app_debug = True
 
 
@@ -32,16 +33,37 @@ def getInitDFile():
 
 
 def getConf():
+    path = getServerDir() + "/init.d/memcached"
+    return path
+
+
+def getConfTpl():
     path = getPluginDir() + "/init.d/memcached.tpl"
     return path
+
+
+def getMemPort():
+    path = getConf()
+    content = public.readFile(path)
+    rep = 'PORT\s*=\s*(\d*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0]
 
 
 def getArgs():
     args = sys.argv[2:]
     tmp = {}
-    for i in range(len(args)):
-        t = args[i].split(':')
+    args_len = len(args)
+
+    if args_len == 1:
+        t = args[0].strip('{').strip('}')
+        t = t.split(':')
         tmp[t[0]] = t[1]
+    elif args_len > 1:
+        for i in range(len(args)):
+            t = args[i].split(':')
+            tmp[t[0]] = t[1]
+
     return tmp
 
 
@@ -55,7 +77,7 @@ def status():
 
 def initDreplace():
 
-    file_tpl = getConf()
+    file_tpl = getConfTpl()
     service_path = public.getServerDir()
 
     initD_path = getServerDir() + '/init.d'
@@ -110,9 +132,9 @@ def runInfo():
     # 获取memcached状态
     import telnetlib
     import re
-
+    port = getMemPort()
     try:
-        tn = telnetlib.Telnet('127.0.0.1', 11211)
+        tn = telnetlib.Telnet('127.0.0.1', int(port))
         tn.write(b"stats\n")
         tn.write(b"quit\n")
         data = tn.read_all()
@@ -221,6 +243,8 @@ if __name__ == "__main__":
         print runInfo()
     elif func == 'conf':
         print getConf()
+    elif func == 'conf_tpl':
+        print getConfTpl()
     elif func == 'save_conf':
         print saveConf()
     else:
