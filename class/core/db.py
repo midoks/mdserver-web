@@ -227,7 +227,7 @@ class Sql():
     def execute(self, sql, param):
         # 执行SQL语句返回受影响行
         self.__GetConn()
-        print sql, param
+        # print sql, param
         try:
             result = self.__DB_CONN.execute(sql, param)
             self.__DB_CONN.commit()
