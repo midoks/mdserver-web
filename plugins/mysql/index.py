@@ -62,6 +62,7 @@ def contentReplace(content):
     service_path = public.getServerDir()
     content = content.replace('{$ROOT_PATH}', public.getRootDir())
     content = content.replace('{$SERVER_PATH}', service_path)
+    content = content.replace('{$SERVER_APP_PATH}', service_path + '/mysql')
     return content
 
 
@@ -105,7 +106,7 @@ def start():
 
     init_file = initDreplace()
     initMysql = getServerDir() + '/scripts/mysql_install_db ' + '--basedir=' + \
-        getServerDir() + ' --datadir=' + getServerDir() + '/bin/mysql/data'
+        getServerDir() + ' --datadir=' + getServerDir() + '/data'
     return initMysql
 
     cmd = getServerDir() + '/bin/mysqld_safe ' + getServerDir() + \
