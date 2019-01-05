@@ -178,9 +178,9 @@ def saveConf():
         content = re.sub('MAXCONN=\d+', 'MAXCONN=' + args['maxconn'], content)
         content = re.sub('CACHESIZE=\d+', 'CACHESIZE=' +
                          args['cachesize'], content)
-        print public.writeFile(confFile, content)
+        public.writeFile(confFile, content)
         restart()
-        return 'ok'
+        return 'save ok'
     except Exception as e:
         pass
     return 'fail'
