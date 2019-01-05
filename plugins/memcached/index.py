@@ -85,14 +85,12 @@ def initDreplace():
         os.mkdir(initD_path)
     file_bin = initD_path + '/memcached'
 
-    # if os.path.exists(file_bin):
-    #     return file_bin
+    if not os.path.exists(file_bin):
+        content = public.readFile(file_tpl)
+        content = content.replace('{$SERVER_PATH}', service_path)
+        public.writeFile(file_bin, content)
+        public.execShell('chmod +x ' + file_bin)
 
-    content = public.readFile(file_tpl)
-    content = content.replace('{$SERVER_PATH}', service_path)
-
-    public.writeFile(file_bin, content)
-    public.execShell('chmod +x ' + file_bin)
     return file_bin
 
 
@@ -171,6 +169,7 @@ def saveConf():
      # 设置memcached缓存大小
     import re
     confFile = getConf()
+    print confFile
     try:
         args = getArgs()
         content = public.readFile(confFile)
@@ -179,8 +178,8 @@ def saveConf():
         content = re.sub('MAXCONN=\d+', 'MAXCONN=' + args['maxconn'], content)
         content = re.sub('CACHESIZE=\d+', 'CACHESIZE=' +
                          args['cachesize'], content)
-        public.writeFile(confFile, content)
-        reload()
+        print public.writeFile(confFile, content)
+        restart()
         return 'ok'
     except Exception as e:
         pass
