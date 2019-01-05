@@ -256,7 +256,7 @@ else
   esac
 fi
 
-ulimit -s unlimited
+#ulimit -s unlimited
 case "$mode" in
   'start')
     # Start daemon

@@ -4,6 +4,7 @@ import sys
 import io
 import os
 import time
+import subprocess
 
 sys.path.append(os.getcwd() + "/class/core")
 import public
@@ -104,22 +105,21 @@ def status():
 
 def myOp(method):
     init_file = initDreplace()
-    data = public.execShell(init_file + ' ' + method)
-    if data[1] == '':
+    cmd = init_file + ' ' + method
+    if method == 'start':
+        subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True,
+                         bufsize=4096, stderr=subprocess.PIPE)
         return 'ok'
-    return data[1]
+    else:
+        data = public.execShell(cmd)
+        if data[1] == '':
+            return 'ok'
+        return data[1]
 
 
 def start():
     return myOp('start')
 
-
-# def stop():
-#     data = public.execShell(
-#         "ps -ef|grep mysql |grep -v grep |grep -v python |awk '{print $2}' | xargs kill -9")
-#     if data[0] == '':
-#         return 'ok'
-#     return 'fail'
 
 def stop():
     return myOp('stop')
