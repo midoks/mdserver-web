@@ -4,3 +4,4 @@ gunicorn
 psutil
 pillow
 chardet
+MySQL-python

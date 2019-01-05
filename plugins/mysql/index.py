@@ -10,6 +10,7 @@ import re
 sys.path.append(os.getcwd() + "/class/core")
 import public
 
+
 app_debug = False
 if public.isAppleSystem():
     app_debug = True
@@ -21,6 +22,9 @@ def getPluginName():
 
 def getPluginDir():
     return public.getPluginDir() + '/' + getPluginName()
+
+sys.path.append(getPluginDir() + "/class")
+import mysql
 
 
 def getServerDir():
@@ -51,7 +55,7 @@ def getArgs():
 
 
 def getConf():
-    path = getServerDir() + '/conf/my.cnf'
+    path = getServerDir() + '/etc/my.cnf'
     return path
 
 
@@ -68,6 +72,24 @@ def contentReplace(content):
     return content
 
 
+def pSqliteDb():
+    file = getServerDir() + '/mysql.db'
+    name = 'mysql'
+    if not os.path.exists(file):
+        conn = public.M(name).dbPos(getServerDir(), name)
+        csql = public.readFile(getPluginDir() + '/conf/mysql.sql')
+        csql_list = csql.split(';')
+        for index in range(len(csql_list)):
+            conn.execute(csql_list[index], ())
+    else:
+        conn = public.M(name).dbPos(getServerDir(), name)
+    return conn
+
+
+def pMysqlDb():
+    return ''
+
+
 def initDreplace():
     initd_tpl = getInitdTpl()
 
@@ -82,7 +104,7 @@ def initDreplace():
         public.writeFile(file_bin, content)
         public.execShell('chmod +x ' + file_bin)
 
-    mysql_conf_dir = getServerDir() + '/conf'
+    mysql_conf_dir = getServerDir() + '/etc'
     if not os.path.exists(mysql_conf_dir):
         os.mkdir(mysql_conf_dir)
 
@@ -120,6 +142,10 @@ def initMysqlData():
         cmd = 'cd ' + serverdir + ' && ./scripts/mysql_install_db --user=midoks --basedir=' + \
             serverdir + ' --ldata=' + datadir
         public.execShell(cmd)
+
+        pwd = public.getRandomString(16)
+        cmd_pass = serverdir + '/bin/mysqladmin -uroot -p12345'
+        print cmd_pass
     return True
 
 
@@ -184,6 +210,14 @@ def initdUinstall():
             return "Apple Computer does not support"
     initd_bin = getInitDFile()
     os.remove(initd_bin)
+    return 'ok'
+
+
+def runInfo():
+    db = mysql.mysql()
+    db.__DB_CNF = getConf()
+    data = db.query('show global status')
+    print data
     return 'ok'
 
 
