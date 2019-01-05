@@ -102,36 +102,35 @@ def status():
     return 'start'
 
 
-def start():
-
+def myOp(method):
     init_file = initDreplace()
-    initMysql = getServerDir() + '/scripts/mysql_install_db ' + '--basedir=' + \
-        getServerDir() + ' --datadir=' + getServerDir() + '/data'
-    return initMysql
+    data = public.execShell(init_file + ' ' + method)
+    if data[1] == '':
+        return 'ok'
+    return data[1]
 
-    cmd = getServerDir() + '/bin/mysqld_safe ' + getServerDir() + \
-        '/conf/my.cnf ' + '--user=mysql&'
-    # return cmd
-    data = public.execShell(cmd)
-    if data[0] == '':
-        return 'stop'
-    return data[0]
 
+def start():
+    return myOp('start')
+
+
+# def stop():
+#     data = public.execShell(
+#         "ps -ef|grep mysql |grep -v grep |grep -v python |awk '{print $2}' | xargs kill -9")
+#     if data[0] == '':
+#         return 'ok'
+#     return 'fail'
 
 def stop():
-    data = public.execShell(
-        "ps -ef|grep mysql |grep -v grep |grep -v python |awk '{print $2}' | xargs kill -9")
-    if data[0] == '':
-        return 'ok'
-    return 'fail'
+    return myOp('stop')
 
 
 def restart():
-    return 'ok'
+    return myOp('restart')
 
 
 def reload():
-    return 'ok'
+    return myOp('reload')
 
 
 def initdStatus():
