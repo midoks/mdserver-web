@@ -5,6 +5,7 @@ import io
 import os
 import time
 import subprocess
+import re
 
 sys.path.append(os.getcwd() + "/class/core")
 import public
@@ -103,10 +104,30 @@ def status():
     return 'start'
 
 
+def getDataDir():
+
+    file = getConf()
+    content = public.readFile(file)
+    rep = 'datadir\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
+
+
+def initMysqlData():
+    datadir = getDataDir()
+    serverdir = getServerDir()
+    if not os.path.exists(datadir + '/mysql'):
+        cmd = 'cd ' + serverdir + ' && ./scripts/mysql_install_db --user=midoks --basedir=' + \
+            serverdir + ' --ldata=' + datadir
+        public.execShell(cmd)
+    return True
+
+
 def myOp(method):
     init_file = initDreplace()
     cmd = init_file + ' ' + method
     if method == 'start':
+        initMysqlData()
         subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True,
                          bufsize=4096, stderr=subprocess.PIPE)
         return 'ok'
@@ -166,6 +187,9 @@ def initdUinstall():
     return 'ok'
 
 
+def getShowLog():
+    return 'ok'
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -188,5 +212,7 @@ if __name__ == "__main__":
         print runInfo()
     elif func == 'conf':
         print getConf()
+    elif func == 'show_log':
+        print getShowLog()
     else:
         print 'error'
