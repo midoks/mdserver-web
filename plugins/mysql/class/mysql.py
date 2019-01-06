@@ -51,6 +51,9 @@ class mysql:
     def setPwd(self, pwd):
         self.__DB_PASS = pwd
 
+    def getPwd(self):
+        return self.__DB_PASS
+
     def execute(self, sql):
         # 执行SQL语句返回受影响行
         if not self.__Conn():
