@@ -146,11 +146,20 @@ def getShowLogFile():
     return tmp.groups()[0].strip()
 
 
+def pGetDbUser():
+    if public.isAppleSystem():
+        user = public.execShell(
+            "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
+        return user
+    return 'mysql'
+
+
 def initMysqlData():
     datadir = getDataDir()
     if not os.path.exists(datadir + '/mysql'):
         serverdir = getServerDir()
-        cmd = 'cd ' + serverdir + ' && ./scripts/mysql_install_db --user=midoks --basedir=' + \
+        user = pGetDbUser()
+        cmd = 'cd ' + serverdir + ' && ./scripts/mysql_install_db --user=' + user + ' --basedir=' + \
             serverdir + ' --ldata=' + datadir
         public.execShell(cmd)
         return 0
