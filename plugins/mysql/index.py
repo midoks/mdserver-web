@@ -339,6 +339,29 @@ def setDbStatus():
     public.writeFile(conFile, content)
     return public.returnJson(True, '设置成功!')
 
+# 检测数据库执行错误
+
+
+def isSqlError(mysqlMsg):
+    mysqlMsg = str(mysqlMsg)
+    if "MySQLdb" in mysqlMsg:
+        return public.returnJson(False, 'MySQLdb组件缺失! <br>进入SSH命令行输入： pip install mysql-python')
+    if "2002," in mysqlMsg:
+        return public.returnMsg(False, '数据库连接失败,请检查数据库服务是否启动!')
+    if "using password:" in mysqlMsg:
+        return public.returnMsg(False, '数据库管理密码错误!')
+    if "Connection refused" in mysqlMsg:
+        return public.returnMsg(False, '数据库连接失败,请检查数据库服务是否启动!')
+    if "1133" in mysqlMsg:
+        return public.returnMsg(False, '数据库用户不存在!')
+    return None
+
+
+def syncGetDatabases():
+    pdb = pMysqlDb()
+    data = pdb.query('show variables')
+    return ''
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -373,5 +396,7 @@ if __name__ == "__main__":
         print setMyPort()
     elif func == 'init_pwd':
         print initMysqlPwd()
+    elif func == 'sync_get_databases':
+        print syncGetDatabases()
     else:
         print 'error'
