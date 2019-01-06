@@ -1,0 +1,15 @@
+{
+	"title":"phpMyAdmin",
+	"tip":"soft",
+	"name":"phpmyadmin",
+	"type":"运行环境",
+	"ps":"著名Web端MySQL管理工具",
+	"versions":["4.8.4"],
+	"updates":["4.8.4"],
+	"shell":"install.sh",
+	"checks":"server/phpmyadmin",
+	"author":"phpMyAdmin",
+	"home":"https://www.phpmyadmin.net/",
+	"date":"2017-11-24",
+	"pid": "2"
+}
