@@ -94,36 +94,28 @@ def initDreplace():
     return file_bin
 
 
-def start():
+def memOp(method):
     file = initDreplace()
-    data = public.execShell(file + ' start')
+    data = public.execShell(file + ' ' + method)
     if data[1] == '':
         return 'ok'
-    return 'fail'
+    return data[1]
+
+
+def start():
+    return memOp('start')
 
 
 def stop():
-    file = initDreplace()
-    data = public.execShell(file + ' stop')
-    if data[1] == '':
-        return 'ok'
-    return 'fail'
+    return memOp('stop')
 
 
 def restart():
-    file = initDreplace()
-    data = public.execShell(file + ' reload')
-    if data[1] == '':
-        return 'ok'
-    return 'fail'
+    return memOp('restart')
 
 
 def reload():
-    file = initDreplace()
-    data = public.execShell(file + ' reload')
-    if data[1] == '':
-        return 'ok'
-    return 'fail'
+    return memOp('reload')
 
 
 def runInfo():
