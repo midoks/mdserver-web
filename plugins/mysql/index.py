@@ -359,8 +359,40 @@ def isSqlError(mysqlMsg):
 
 def syncGetDatabases():
     pdb = pMysqlDb()
-    data = pdb.query('show variables')
-    return ''
+    psdb = pSqliteDb('databases')
+    data = pdb.query('show databases')
+    isError = isSqlError(data)
+    if isError != None:
+        return isError
+    users = pdb.query(
+        "select User,Host from mysql.user where User!='root' AND Host!='localhost' AND Host!=''")
+    nameArr = ['information_schema', 'performance_schema', 'mysql', 'sys']
+    n = 0
+    for value in data:
+        b = False
+        for key in nameArr:
+            if value[0] == key:
+                b = True
+                break
+        if b:
+            continue
+        if psdb.where("name=?", (value[0],)).count():
+            continue
+        host = '127.0.0.1'
+        for user in users:
+            if value[0] == user[0]:
+                host = user[1]
+                break
+
+        ps = public.getMsg('INPUT_PS')
+        if value[0] == 'test':
+            ps = public.getMsg('DATABASE_TEST')
+        addTime = time.strftime('%Y-%m-%d %X', time.localtime())
+        if psdb.table('databases').add('name,username,password,accept,ps,addtime', (value[0], value[0], '', host, ps, addTime)):
+            n += 1
+
+    msg = public.getInfo('本次共从服务器获取了{1}个数据库!', (str(n),))
+    return public.returnJson(True, msg)
 
 if __name__ == "__main__":
     func = sys.argv[1]
