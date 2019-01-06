@@ -94,39 +94,6 @@ function myPort(){
     });
 }
 
-function dbList(){
-    var con = '<div class="safe bgw">\
-            <button onclick="database.add_database()" title="添加数据库" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">添加数据库</button>\
-            <button onclick="bt.database.set_root()" title="设置MySQL管理员密码" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">root密码</button>\
-            <button onclick="bt.database.open_phpmyadmin(\'\',\'root\',\'bce2de353cba1ce2\')" title="打开phpMyadmin" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">phpMyAdmin</button>\
-            <span style="float:right">              \
-                <button batch="true" style="float: right;display: none;margin-left:10px;" onclick="database.batch_database(\'del\');" title="删除选中项" class="btn btn-default btn-sm">删除选中</button>\
-                <button onclick="bt.recycle_bin.open_recycle_bin(6)" id="dataRecycle" title="删除选中项" class="btn btn-default btn-sm" style="margin-left: 5px;"><span class="glyphicon glyphicon-trash" style="margin-right: 5px;"></span>回收站</button>\
-            </span>\
-            <div class="divtable mtb10">\
-                <div class="tablescroll">\
-                    <table id="DataBody" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
-                    <thead><tr><th width="30"><input class="check" onclick="bt.check_select();" type="checkbox"></th>\
-                    <th>数据库名</th>\
-                    <th>用户名</th>\
-                    <th>密码</th>\
-                    <th>备份</th><th>备注</th>\
-                    <th style="text-align:right;">操作</th></tr></thead>\
-                    <tbody>\
-                    </tbody></table>\
-                </div>\
-                 <div id="databasePage" class="dataTables_paginate paging_bootstrap page"><div><span class="Pcurrent">1</span><span class="Pcount">共2条数据</span></div></div>\
-                <div class="table_toolbar">\
-                    <span class="sync btn btn-default btn-sm" style="margin-right:5px" onclick="database.sync_to_database(1)" title="将选中数据库信息同步到服务器">同步选中</span>\
-                    <span class="sync btn btn-default btn-sm" style="margin-right:5px" onclick="database.sync_to_database(0)" title="将所有数据库信息同步到服务器">同步所有</span>\
-                    <span class="sync btn btn-default btn-sm" onclick="database.sync_database()" title="从服务器获取数据库列表">从服务器获取</span>\
-                </div>\
-            </div>\
-        </div>';
-
-    $(".soft-man-con").html(con);
-}
-
 //设置二进制日志
 function SetBinLog() {
     var loadT = layer.msg(lan.public.the, { icon: 16, time: 0, shade: 0.3 });
@@ -444,4 +411,46 @@ function comMySqlMem() {
     var b = sort_buffer_size + read_buffer_size + read_rnd_buffer_size + join_buffer_size + thread_stack + binlog_cache_size
     var memSize = a + max_connections * b
     $("input[name='memSize']").val(memSize.toFixed(2));
+}
+
+function dbList(){
+    var con = '<div class="safe bgw">\
+            <button onclick="database.add_database()" title="添加数据库" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">添加数据库</button>\
+            <button onclick="bt.database.set_root()" title="设置MySQL管理员密码" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">root密码</button>\
+            <button onclick="bt.database.open_phpmyadmin(\'\',\'root\',\'bce2de353cba1ce2\')" title="打开phpMyadmin" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">phpMyAdmin</button>\
+            <span style="float:right">              \
+                <button batch="true" style="float: right;display: none;margin-left:10px;" onclick="database.batch_database(\'del\');" title="删除选中项" class="btn btn-default btn-sm">删除选中</button>\
+                <button onclick="bt.recycle_bin.open_recycle_bin(6)" id="dataRecycle" title="删除选中项" class="btn btn-default btn-sm" style="margin-left: 5px;"><span class="glyphicon glyphicon-trash" style="margin-right: 5px;"></span>回收站</button>\
+            </span>\
+            <div class="divtable mtb10">\
+                <div class="tablescroll">\
+                    <table id="DataBody" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
+                    <thead><tr><th width="30"><input class="check" onclick="bt.check_select();" type="checkbox"></th>\
+                    <th>数据库名</th>\
+                    <th>用户名</th>\
+                    <th>密码</th>\
+                    <th>备份</th><th>备注</th>\
+                    <th style="text-align:right;">操作</th></tr></thead>\
+                    <tbody>\
+                    </tbody></table>\
+                </div>\
+                 <div id="databasePage" class="dataTables_paginate paging_bootstrap page"><div><span class="Pcurrent">1</span><span class="Pcount">共2条数据</span></div></div>\
+                <div class="table_toolbar">\
+                    <span class="sync btn btn-default btn-sm" style="margin-right:5px" onclick="database.sync_to_database(1)" title="将选中数据库信息同步到服务器">同步选中</span>\
+                    <span class="sync btn btn-default btn-sm" style="margin-right:5px" onclick="database.sync_to_database(0)" title="将所有数据库信息同步到服务器">同步所有</span>\
+                    <span class="sync btn btn-default btn-sm" onclick="syncGetDatabase()" title="从服务器获取数据库列表">从服务器获取</span>\
+                </div>\
+            </div>\
+        </div>';
+
+    $(".soft-man-con").html(con);
+}
+
+function syncGetDatabase(){
+    myPost('sync_get_databases', null, function(data){
+        var rdata = $.parseJSON(data.data);
+        showMsg(rdata.msg,function(){
+            dbList();
+        },{ icon: rdata.status ? 1 : 2 });
+    });
 }
