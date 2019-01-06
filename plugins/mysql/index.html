@@ -6,16 +6,18 @@
 			<p onclick="pluginConfig('mysql');">配置文件</p>
 			<p onclick="myPort();">端口</p>
 			<p onclick="runInfo();">当前状态</p>
+			<p onclick="myPerfOpt();">性能优化</p>
 			<p onclick="pluginLogs('mysql','','show_log');">慢日志</p>
+			<p onclick="dbList()">管理列表</p>
 		</div>
 		<div class="bt-w-con pd15">
-			<div class="soft-man-con">
-			</div>
+			<div class="soft-man-con"></div>
 		</div>
 	</div>
 
 </div>
 <script type="text/javascript">
+resetPluginWinWidth(750);
 pluginService('mysql');
 $.getScript( "/plugins/file?name=mysql&f=js/mysql.js");
 </script>

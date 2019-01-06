@@ -282,6 +282,49 @@ def runInfo():
         result['Position'] = 'OFF'
     return public.getJson(result)
 
+
+def myDbStatus():
+    result = {}
+    db = pMysqlDb()
+    data = db.query('show variables')
+    gets = ['table_open_cache', 'thread_cache_size', 'query_cache_type', 'key_buffer_size', 'query_cache_size', 'tmp_table_size', 'max_heap_table_size', 'innodb_buffer_pool_size',
+            'innodb_additional_mem_pool_size', 'innodb_log_buffer_size', 'max_connections', 'sort_buffer_size', 'read_buffer_size', 'read_rnd_buffer_size', 'join_buffer_size', 'thread_stack', 'binlog_cache_size']
+    result['mem'] = {}
+    for d in data:
+        for g in gets:
+            if d[0] == g:
+                result['mem'][g] = d[1]
+    if result['mem']['query_cache_type'] != 'ON':
+        result[
+            'mem']['query_cache_size'] = '0'
+    return public.getJson(result)
+
+
+def setDbStatus():
+    gets = ['key_buffer_size', 'query_cache_size', 'tmp_table_size', 'max_heap_table_size', 'innodb_buffer_pool_size', 'innodb_log_buffer_size', 'max_connections', 'query_cache_type',
+            'table_open_cache', 'thread_cache_size', 'sort_buffer_size', 'read_buffer_size', 'read_rnd_buffer_size', 'join_buffer_size', 'thread_stack', 'binlog_cache_size']
+    emptys = ['max_connections', 'query_cache_type',
+              'thread_cache_size', 'table_open_cache']
+    args = getArgs()
+    conFile = getConf()
+    content = public.readFile(conFile)
+    n = 0
+    for g in gets:
+        s = 'M'
+        if n > 5:
+            s = 'K'
+        if g in emptys:
+            s = ''
+        rep = '\s*' + g + '\s*=\s*\d+(M|K|k|m|G)?\n'
+        c = g + ' = ' + args[g] + s + '\n'
+        if content.find(g) != -1:
+            content = re.sub(rep, '\n' + c, content, 1)
+        else:
+            content = content.replace('[mysqld]\n', '[mysqld]\n' + c)
+        n += 1
+    public.writeFile(conFile, content)
+    return public.returnJson(True, '设置成功!')
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -302,6 +345,10 @@ if __name__ == "__main__":
         print initdUinstall()
     elif func == 'run_info':
         print runInfo()
+    elif func == 'db_status':
+        print myDbStatus()
+    elif func == 'set_db_status':
+        print setDbStatus()
     elif func == 'conf':
         print getConf()
     elif func == 'show_log':
