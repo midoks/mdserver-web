@@ -72,22 +72,26 @@ def contentReplace(content):
     return content
 
 
-def pSqliteDb():
+def pSqliteDb(dbname='databases'):
     file = getServerDir() + '/mysql.db'
     name = 'mysql'
     if not os.path.exists(file):
-        conn = public.M(name).dbPos(getServerDir(), name)
+        conn = public.M(dbname).dbPos(getServerDir(), name)
         csql = public.readFile(getPluginDir() + '/conf/mysql.sql')
         csql_list = csql.split(';')
         for index in range(len(csql_list)):
             conn.execute(csql_list[index], ())
     else:
-        conn = public.M(name).dbPos(getServerDir(), name)
+        conn = public.M(dbname).dbPos(getServerDir(), name)
     return conn
 
 
 def pMysqlDb():
-    return ''
+    db = mysql.mysql()
+    db.__DB_CNF = getConf()
+    db.setPwd(pSqliteDb('config').where(
+        'id=?', (1,)).getField('mysql_root'))
+    return db
 
 
 def initDreplace():
@@ -127,7 +131,6 @@ def status():
 
 
 def getDataDir():
-
     file = getConf()
     content = public.readFile(file)
     rep = 'datadir\s*=\s*(.*)'
@@ -135,33 +138,50 @@ def getDataDir():
     return tmp.groups()[0].strip()
 
 
+def getShowLogFile():
+    file = getConf()
+    content = public.readFile(file)
+    rep = 'slow-query-log-file\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
+
+
 def initMysqlData():
     datadir = getDataDir()
-    serverdir = getServerDir()
     if not os.path.exists(datadir + '/mysql'):
+        serverdir = getServerDir()
         cmd = 'cd ' + serverdir + ' && ./scripts/mysql_install_db --user=midoks --basedir=' + \
             serverdir + ' --ldata=' + datadir
         public.execShell(cmd)
+        return 0
+    return 1
 
-        pwd = public.getRandomString(16)
-        cmd_pass = serverdir + '/bin/mysqladmin -uroot -p12345'
-        print cmd_pass
+
+def initMysqlPwd():
+    time.sleep(3)
+
+    serverdir = getServerDir()
+
+    pwd = public.getRandomString(16)
+    cmd_pass = serverdir + '/bin/mysqladmin -uroot password ' + pwd
+    pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
+    public.execShell(cmd_pass)
     return True
 
 
 def myOp(method):
+    import commands
     init_file = initDreplace()
     cmd = init_file + ' ' + method
-    if method == 'start':
-        initMysqlData()
+    try:
+        initData = initMysqlData()
         subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True,
                          bufsize=4096, stderr=subprocess.PIPE)
+        if (initData == 0):
+            initMysqlPwd()
         return 'ok'
-    else:
-        data = public.execShell(cmd)
-        if data[1] == '':
-            return 'ok'
-        return data[1]
+    except Exception as e:
+        return str(e)
 
 
 def start():
@@ -213,16 +233,54 @@ def initdUinstall():
     return 'ok'
 
 
+def getMyPort():
+    file = getConf()
+    content = public.readFile(file)
+    rep = 'port\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
+
+
+def setMyPort():
+    args = getArgs()
+    if not 'port' in args:
+        return 'port missing'
+
+    port = args['port']
+    file = getConf()
+    content = public.readFile(file)
+    rep = "port\s*=\s*([0-9]+)\s*\n"
+    content = re.sub(rep, 'port = ' + port + '\n', content)
+    public.writeFile(file, content)
+    restart()
+    return public.returnJson(True, '编辑成功!')
+
+
 def runInfo():
-    db = mysql.mysql()
-    db.__DB_CNF = getConf()
+    db = pMysqlDb()
     data = db.query('show global status')
-    print data
-    return 'ok'
+    gets = ['Max_used_connections', 'Com_commit', 'Com_rollback', 'Questions', 'Innodb_buffer_pool_reads', 'Innodb_buffer_pool_read_requests', 'Key_reads', 'Key_read_requests', 'Key_writes', 'Key_write_requests', 'Qcache_hits', 'Qcache_inserts', 'Bytes_received', 'Bytes_sent', 'Aborted_clients', 'Aborted_connects',
+            'Created_tmp_disk_tables', 'Created_tmp_tables', 'Innodb_buffer_pool_pages_dirty', 'Opened_files', 'Open_tables', 'Opened_tables', 'Select_full_join', 'Select_range_check', 'Sort_merge_passes', 'Table_locks_waited', 'Threads_cached', 'Threads_connected', 'Threads_created', 'Threads_running', 'Connections', 'Uptime']
+    try:
+        if data[0] == 1045:
+            return public.returnJson(False, 'MySQL密码错误!')
+    except:
+        pass
 
-
-def getShowLog():
-    return 'ok'
+    result = {}
+    for d in data:
+        for g in gets:
+            if d[0] == g:
+                result[g] = d[1]
+    result['Run'] = int(time.time()) - int(result['Uptime'])
+    tmp = db.query('show master status')
+    try:
+        result['File'] = tmp[0][0]
+        result['Position'] = tmp[0][1]
+    except:
+        result['File'] = 'OFF'
+        result['Position'] = 'OFF'
+    return public.getJson(result)
 
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -247,6 +305,10 @@ if __name__ == "__main__":
     elif func == 'conf':
         print getConf()
     elif func == 'show_log':
-        print getShowLog()
+        print getShowLogFile()
+    elif func == 'my_port':
+        print getMyPort()
+    elif func == 'set_my_port':
+        print setMyPort()
     else:
         print 'error'

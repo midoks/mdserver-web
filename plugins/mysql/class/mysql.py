@@ -33,6 +33,7 @@ class mysql:
                 self.__DB_PORT = int(re.search(rep, myconf).groups()[0])
             except:
                 self.__DB_PORT = 3306
+            # print self.__DB_PASS
             #self.__DB_PASS = public.M('config').where('id=?', (1,)).getField('mysql_root')
             try:
                 self.__DB_CONN = MySQLdb.connect(host=self.__DB_HOST, user=self.__DB_USER, passwd=self.__DB_PASS,
@@ -46,6 +47,9 @@ class mysql:
         except MySQLdb.Error, e:
             self.__DB_ERR = e
             return False
+
+    def setPwd(self, pwd):
+        self.__DB_PASS = pwd
 
     def execute(self, sql):
         # 执行SQL语句返回受影响行

@@ -1,3 +1,96 @@
+function str2Obj(str){
+    var data = {};
+    kv = str.split('&');
+    for(i in kv){
+        v = kv[i].split('=');
+        data[v[0]] = v[1];
+    }
+    return data;
+}
+
+function myPost(method,args,callback){
+
+    var _args = null; 
+    if (typeof(args) == 'string'){
+        _args = JSON.stringify(str2Obj(args));
+    } else {
+        _args = JSON.stringify(args);
+    }
+
+    var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
+    $.post('/plugins/run', {name:'mysql', func:method, args:_args}, function(data) {
+        layer.close(loadT);
+        if (!data.status){
+            layer.msg(data.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+            return;
+        }
+
+        if(typeof(callback) == 'function'){
+            callback(data);
+        }
+    },'json'); 
+}
+
+function runInfo(){
+    myPost('run_info','',function(data){
+        var rdata = $.parseJSON(data.data);
+        // console.log(rdata);
+        var cache_size = ((parseInt(rdata.Qcache_hits) / (parseInt(rdata.Qcache_hits) + parseInt(rdata.Qcache_inserts))) * 100).toFixed(2) + '%';
+        if (cache_size == 'NaN%') cache_size = 'OFF';
+        var Con = '<div class="divtable"><table class="table table-hover table-bordered" style="width: 490px;margin-bottom:10px;background-color:#fafafa">\
+                    <tbody>\
+                        <tr><th>启动时间</th><td>' + getLocalTime(rdata.Run) + '</td><th>每秒查询</th><td>' + parseInt(rdata.Questions / rdata.Uptime) + '</td></tr>\
+                        <tr><th>总连接次数</th><td>' + rdata.Connections + '</td><th>每秒事务</th><td>' + parseInt((parseInt(rdata.Com_commit) + parseInt(rdata.Com_rollback)) / rdata.Uptime) + '</td></tr>\
+                        <tr><th>发送</th><td>' + toSize(rdata.Bytes_sent) + '</td><th>File</th><td>' + rdata.File + '</td></tr>\
+                        <tr><th>接收</th><td>' + toSize(rdata.Bytes_received) + '</td><th>Position</th><td>' + rdata.Position + '</td></tr>\
+                    </tbody>\
+                    </table>\
+                    <table class="table table-hover table-bordered" style="width: 490px;">\
+                    <thead style="display:none;"><th></th><th></th><th></th><th></th></thead>\
+                    <tbody>\
+                        <tr><th>活动/峰值连接数</th><td>' + rdata.Threads_running + '/' + rdata.Max_used_connections + '</td><td colspan="2">若值过大,增加max_connections</td></tr>\
+                        <tr><th>线程缓存命中率</th><td>' + ((1 - rdata.Threads_created / rdata.Connections) * 100).toFixed(2) + '%</td><td colspan="2">若过低,增加thread_cache_size</td></tr>\
+                        <tr><th>索引命中率</th><td>' + ((1 - rdata.Key_reads / rdata.Key_read_requests) * 100).toFixed(2) + '%</td><td colspan="2">若过低,增加key_buffer_size</td></tr>\
+                        <tr><th>Innodb索引命中率</th><td>' + ((1 - rdata.Innodb_buffer_pool_reads / rdata.Innodb_buffer_pool_read_requests) * 100).toFixed(2) + '%</td><td colspan="2">若过低,增加innodb_buffer_pool_size</td></tr>\
+                        <tr><th>查询缓存命中率</th><td>' + cache_size + '</td><td colspan="2">' + lan.soft.mysql_status_ps5 + '</td></tr>\
+                        <tr><th>创建临时表到磁盘</th><td>' + ((rdata.Created_tmp_disk_tables / rdata.Created_tmp_tables) * 100).toFixed(2) + '%</td><td colspan="2">若过大,尝试增加tmp_table_size</td></tr>\
+                        <tr><th>已打开的表</th><td>' + rdata.Open_tables + '</td><td colspan="2">若过大,增加table_cache_size</td></tr>\
+                        <tr><th>没有使用索引的量</th><td>' + rdata.Select_full_join + '</td><td colspan="2">若不为0,请检查数据表的索引是否合理</td></tr>\
+                        <tr><th>没有索引的JOIN量</th><td>' + rdata.Select_range_check + '</td><td colspan="2">若不为0,请检查数据表的索引是否合理</td></tr>\
+                        <tr><th>排序后的合并次数</th><td>' + rdata.Sort_merge_passes + '</td><td colspan="2">若值过大,增加sort_buffer_size</td></tr>\
+                        <tr><th>锁表次数</th><td>' + rdata.Table_locks_waited + '</td><td colspan="2">若值过大,请考虑增加您的数据库性能</td></tr>\
+                    <tbody>\
+            </table></div>'
+        $(".soft-man-con").html(Con);
+    });
+}
+
+
+function myPort(){
+    myPost('my_port','',function(data){
+        var con = '<div class="line ">\
+            <div class="info-r  ml0">\
+            <input name="port" class="bt-input-text mr5 port" type="text" style="width:100px" value="'+data.data+'">\
+            <button id="btn_change_port" name="btn_change_port" class="btn btn-success btn-sm mr5 ml5 btn_change_port">修改</button>\
+            </div></div>';
+        $(".soft-man-con").html(con);
+
+        $('#btn_change_port').click(function(){
+            var port = $("input[name='port']").val();
+            // console.log(port);
+            myPost('set_my_port','port='+port,function(data){
+                var rdata = $.parseJSON(data.data);
+                if (rdata.status){
+                    layer.msg('修改成功!',{icon:1,time:2000,shade: [0.3, '#000']});
+                } else {
+                    layer.msg(rdata.msg,{icon:1,time:2000,shade: [0.3, '#000']});
+                }
+            });
+        });
+    });
+}
+
+
 function selectChange() {
     $("#SelectVersion,#selectVer").change(function() {
         var info = $(this).val();
@@ -297,21 +390,7 @@ function changeMySQLDataPath(act) {
     });
 }
 
-//MySQL-Slow日志
-function mysqlSlowLog() {
-    var loadT = layer.msg(lan.public.the, { icon: 16, time: 0, shade: [0.3, '#000'] });
-    $.post('/database?action=GetSlowLogs', {}, function(logs) {
-        layer.close(loadT);
-        if (logs.status !== true) {
-            logs.msg = '';
-        }
-        if (logs.msg == '') logs.msg = '当前没有慢日志.';
-        var phpCon = '<textarea readonly="" style="margin: 0px;width: 500px;height: 520px;background-color: #333;color:#fff; padding:0 5px" id="error_log">' + logs.msg + '</textarea>';
-        $(".soft-man-con").html(phpCon);
-        var ob = document.getElementById('error_log');
-        ob.scrollTop = ob.scrollHeight;
-    });
-}
+
 
 //数据库日志
 function mysqlLog(act) {
@@ -340,38 +419,6 @@ function mysqlLog(act) {
     });
 }
 
-//取数据库运行状态
-function mysqlRunStatus() {
-    $.post('/database?action=GetRunStatus', "", function(rdata) {
-        var cache_size = ((parseInt(rdata.Qcache_hits) / (parseInt(rdata.Qcache_hits) + parseInt(rdata.Qcache_inserts))) * 100).toFixed(2) + '%';
-        if (cache_size == 'NaN%') cache_size = 'OFF';
-        var Con = '<div class="divtable"><table class="table table-hover table-bordered" style="width: 490px;margin-bottom:10px;background-color:#fafafa">\
-                        <tbody>\
-                            <tr><th>' + lan.soft.mysql_status_title1 + '</th><td>' + getLocalTime(rdata.Run) + '</td><th>' + lan.soft.mysql_status_title5 + '</th><td>' + parseInt(rdata.Questions / rdata.Uptime) + '</td></tr>\
-                            <tr><th>' + lan.soft.mysql_status_title2 + '</th><td>' + rdata.Connections + '</td><th>' + lan.soft.mysql_status_title6 + '</th><td>' + parseInt((parseInt(rdata.Com_commit) + parseInt(rdata.Com_rollback)) / rdata.Uptime) + '</td></tr>\
-                            <tr><th>' + lan.soft.mysql_status_title3 + '</th><td>' + ToSize(rdata.Bytes_sent) + '</td><th>' + lan.soft.mysql_status_title7 + '</th><td>' + rdata.File + '</td></tr>\
-                            <tr><th>' + lan.soft.mysql_status_title4 + '</th><td>' + ToSize(rdata.Bytes_received) + '</td><th>' + lan.soft.mysql_status_title8 + '</th><td>' + rdata.Position + '</td></tr>\
-                        </tbody>\
-                        </table>\
-                        <table class="table table-hover table-bordered" style="width: 490px;">\
-                        <thead style="display:none;"><th></th><th></th><th></th><th></th></thead>\
-                        <tbody>\
-                            <tr><th>' + lan.soft.mysql_status_title9 + '</th><td>' + rdata.Threads_running + '/' + rdata.Max_used_connections + '</td><td colspan="2">' + lan.soft.mysql_status_ps1 + '</td></tr>\
-                            <tr><th>' + lan.soft.mysql_status_title10 + '</th><td>' + ((1 - rdata.Threads_created / rdata.Connections) * 100).toFixed(2) + '%</td><td colspan="2">' + lan.soft.mysql_status_ps2 + '</td></tr>\
-                            <tr><th>' + lan.soft.mysql_status_title11 + '</th><td>' + ((1 - rdata.Key_reads / rdata.Key_read_requests) * 100).toFixed(2) + '%</td><td colspan="2">' + lan.soft.mysql_status_ps3 + '</td></tr>\
-                            <tr><th>' + lan.soft.mysql_status_title12 + '</th><td>' + ((1 - rdata.Innodb_buffer_pool_reads / rdata.Innodb_buffer_pool_read_requests) * 100).toFixed(2) + '%</td><td colspan="2">' + lan.soft.mysql_status_ps4 + '</td></tr>\
-                            <tr><th>' + lan.soft.mysql_status_title13 + '</th><td>' + cache_size + '</td><td colspan="2">' + lan.soft.mysql_status_ps5 + '</td></tr>\
-                            <tr><th>' + lan.soft.mysql_status_title14 + '</th><td>' + ((rdata.Created_tmp_disk_tables / rdata.Created_tmp_tables) * 100).toFixed(2) + '%</td><td colspan="2">' + lan.soft.mysql_status_ps6 + '</td></tr>\
-                            <tr><th>' + lan.soft.mysql_status_title15 + '</th><td>' + rdata.Open_tables + '</td><td colspan="2">' + lan.soft.mysql_status_ps7 + '</td></tr>\
-                            <tr><th>' + lan.soft.mysql_status_title16 + '</th><td>' + rdata.Select_full_join + '</td><td colspan="2">' + lan.soft.mysql_status_ps8 + '</td></tr>\
-                            <tr><th>' + lan.soft.mysql_status_title17 + '</th><td>' + rdata.Select_range_check + '</td><td colspan="2">' + lan.soft.mysql_status_ps9 + '</td></tr>\
-                            <tr><th>' + lan.soft.mysql_status_title18 + '</th><td>' + rdata.Sort_merge_passes + '</td><td colspan="2">' + lan.soft.mysql_status_ps10 + '</td></tr>\
-                            <tr><th>' + lan.soft.mysql_status_title19 + '</th><td>' + rdata.Table_locks_waited + '</td><td colspan="2">' + lan.soft.mysql_status_ps11 + '</td></tr>\
-                        <tbody>\
-                </table></div>'
-        $(".soft-man-con").html(Con);
-    });
-}
 
 //数据库配置状态
 function mysqlStatus() {
