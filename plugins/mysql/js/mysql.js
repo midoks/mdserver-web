@@ -33,8 +33,13 @@ function myPost(method,args,callback){
 
 function runInfo(){
     myPost('run_info','',function(data){
+
         var rdata = $.parseJSON(data.data);
-        // console.log(rdata);
+        if (typeof(rdata['status']) != 'undefined'){
+            layer.msg(rdata['msg'],{icon:0,time:2000,shade: [0.3, '#000']});
+            return;
+        }
+
         var cache_size = ((parseInt(rdata.Qcache_hits) / (parseInt(rdata.Qcache_hits) + parseInt(rdata.Qcache_inserts))) * 100).toFixed(2) + '%';
         if (cache_size == 'NaN%') cache_size = 'OFF';
         var Con = '<div class="divtable"><table class="table table-hover table-bordered" style="margin-bottom:10px;background-color:#fafafa">\
