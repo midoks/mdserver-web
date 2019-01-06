@@ -44,9 +44,17 @@ def getInitDTpl():
 def getArgs():
     args = sys.argv[2:]
     tmp = {}
-    for i in range(len(args)):
-        t = args[i].split(':')
+    args_len = len(args)
+
+    if args_len == 1:
+        t = args[0].strip('{').strip('}')
+        t = t.split(':')
         tmp[t[0]] = t[1]
+    elif args_len > 1:
+        for i in range(len(args)):
+            t = args[i].split(':')
+            tmp[t[0]] = t[1]
+
     return tmp
 
 
@@ -178,6 +186,10 @@ def initdUinstall():
     os.remove(initd_bin)
     return 'ok'
 
+
+def runLog():
+    return getServerDir() + '/data/redis.log'
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -200,5 +212,7 @@ if __name__ == "__main__":
         print runInfo()
     elif func == 'conf':
         print getConf()
+    elif func == 'run_log':
+        print runLog()
     else:
         print 'error'
