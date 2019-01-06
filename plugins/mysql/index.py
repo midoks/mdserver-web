@@ -167,7 +167,7 @@ def initMysqlData():
 
 
 def initMysqlPwd():
-    time.sleep(3)
+    time.sleep(5)
 
     serverdir = getServerDir()
 
