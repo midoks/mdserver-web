@@ -371,5 +371,7 @@ if __name__ == "__main__":
         print getMyPort()
     elif func == 'set_my_port':
         print setMyPort()
+    elif func == 'init_pwd':
+        print initMysqlPwd()
     else:
         print 'error'
