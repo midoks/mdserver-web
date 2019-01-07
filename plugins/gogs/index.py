@@ -52,8 +52,13 @@ def getArgs():
     return tmp
 
 
-def getInitdConf():
+def getInitdConfTpl():
     path = getPluginDir() + "/init.d/gogs.tpl"
+    return path
+
+
+def getInitdConf():
+    path = getServerDir() + "/init.d/gogs"
     return path
 
 
@@ -72,7 +77,7 @@ def status():
 
 def initDreplace():
 
-    file_tpl = getInitdConf()
+    file_tpl = getInitdConfTpl()
     service_path = public.getServerDir()
 
     initD_path = getServerDir() + '/init.d'
@@ -82,7 +87,6 @@ def initDreplace():
 
     content = public.readFile(file_tpl)
     content = content.replace('{$SERVER_PATH}', service_path)
-
     public.writeFile(file_bin, content)
     public.execShell('chmod +x ' + file_bin)
 
