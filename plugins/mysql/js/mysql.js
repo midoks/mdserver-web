@@ -461,7 +461,19 @@ function setRootPwd(type, pwd){
     });
 }
 
-function addDatabase(){
+function addDatabase(type){
+    if (type==1){
+        var data = $("#add_db").serialize();
+        myPost('add_db', data, function(data){
+            var rdata = $.parseJSON(data.data);
+            console.log(rdata);
+            // showMsg(rdata.msg,function(){
+            //     dbList();
+            //     $('.layui-layer-close1').click();
+            // },{icon: rdata.status ? 1 : 2});   
+        });
+        return;
+    }
     var index = layer.open({
         type: 1,
         skin: 'demo-class',
@@ -495,18 +507,32 @@ function addDatabase(){
                             <option value='%'>所有人</option>\
                             <option value='ip'>指定IP</option>\
                             </select>\
-                            <input id='dataAccess_subid' class='bt-input-text mr5' type='text' name='address' placeholder='多个IP使用逗号(,)分隔' style='width: 230px; display: inline-block;'>\
                         </div>\
                     </div>\
                     <div class='bt-form-submit-btn'>\
                         <button id='my_mod_close' type='button' class='btn btn-danger btn-sm btn-title'>关闭</button>\
-                        <button type='button' class='btn btn-success btn-sm btn-title' onclick=\"setRootPwd(1)\" >提交</button>\
+                        <button type='button' class='btn btn-success btn-sm btn-title' onclick=\"addDatabase(1)\" >提交</button>\
                     </div>\
                   </form>",
     });
 
     $('#my_mod_close').click(function(){
         $('.layui-layer-close1').click();
+    });
+
+    $('select[name="dataAccess"]').change(function(){
+        var v = $(this).val();
+        if (v == 'ip'){
+            $(this).after("<input id='dataAccess_subid' class='bt-input-text mr5' type='text' name='address' placeholder='多个IP使用逗号(,)分隔' style='width: 230px; display: inline-block;'>");
+        } else {
+            $('#dataAccess_subid').remove();
+        }
+    });
+}
+
+function delDb(id, name){
+    safeMessage('删除['+name+']','您真的要删除['+name+']吗？',function(){
+        
     });
 }
 
@@ -532,7 +558,7 @@ function dbList(page, search){
             list += '<td>' + rdata.data[i]['name'] +'</td>';
             list += '<td>' + rdata.data[i]['username'] +'</td>';
             list += '<td>' + 
-                        '<span class="password" data-pw="cajKa4ZAmQJNaYsx">**********</span>' +
+                        '<span class="password" data-pw="'+rdata.data[i]['password']+'">**********</span>' +
                         '<span onclick="bt.pub.show_hide_pass(this)" class="glyphicon glyphicon-eye-open cursor pw-ico" style="margin-left:10px"></span>'+
                         '<span class="ico-copy cursor btcopy" style="margin-left:10px" title="复制密码" data-pw="cajKa4ZAmQJNaYsx" onclick="bt.pub.copy_pass(\'cajKa4ZAmQJNaYsx\')"></span>'+
                     '</td>';
@@ -543,7 +569,7 @@ function dbList(page, search){
                         '<a href="javascript:;" class="btlink" title="MySQL优化修复工具">工具</a> | ' +
                         '<a href="javascript:;" class="btlink" title="设置数据库权限">权限</a> | ' +
                         '<a href="javascript:;" class="btlink" title="修改数据库密码">改密</a> | ' +
-                        '<a href="javascript:;" class="btlink" title="删除数据库">删除</a>' +
+                        '<a href="javascript:;" class="btlink" title="删除数据库" onclick="delDb(\''+rdata.data[i]['id']+'\',\''+rdata.data[i]['name']+'\')">删除</a>' +
                     '</td>';
             list += '</tr>';
         }

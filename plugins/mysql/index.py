@@ -346,13 +346,15 @@ def isSqlError(mysqlMsg):
     if "MySQLdb" in mysqlMsg:
         return public.returnJson(False, 'MySQLdb组件缺失! <br>进入SSH命令行输入： pip install mysql-python')
     if "2002," in mysqlMsg:
-        return public.returnMsg(False, '数据库连接失败,请检查数据库服务是否启动!')
+        return public.returnJson(False, '数据库连接失败,请检查数据库服务是否启动!')
     if "using password:" in mysqlMsg:
-        return public.returnMsg(False, '数据库管理密码错误!')
+        return public.returnJson(False, '数据库管理密码错误!')
     if "Connection refused" in mysqlMsg:
-        return public.returnMsg(False, '数据库连接失败,请检查数据库服务是否启动!')
+        return public.returnJson(False, '数据库连接失败,请检查数据库服务是否启动!')
     if "1133" in mysqlMsg:
-        return public.returnMsg(False, '数据库用户不存在!')
+        return public.returnJson(False, '数据库用户不存在!')
+    if "1007" in mysqlMsg:
+        return public.returnJson(False, '数据库已经存在!')
     return None
 
 
@@ -464,6 +466,99 @@ def setRootPwd():
         return public.returnJson(False, '修改错误:' + str(ex))
 
 
+def __createUser(dbname, username, password, address):
+    pdb = pMysqlDb()
+    pdb.execute(
+        "CREATE USER `%s`@`localhost` IDENTIFIED BY '%s'" % (username, password))
+    pdb.execute(
+        "grant all privileges on %s.* to `%s`@`localhost`" % (dbname, username))
+    for a in address.split(','):
+        pdb.execute(
+            "CREATE USER `%s`@`%s` IDENTIFIED BY '%s'" % (username, a, password))
+        pdb.execute(
+            "grant all privileges on %s.* to `%s`@`%s`" % (dbname, username, a))
+    pdb.execute("flush privileges")
+
+
+def addDb():
+    args = getArgs()
+    if not 'password' in args:
+        return 'password missing'
+
+    if not 'name' in args:
+        return 'name missing'
+
+    if not 'codeing' in args:
+        return 'codeing missing'
+
+    if not 'db_user' in args:
+        return 'db_user missing'
+
+    if not 'dataAccess' in args:
+        return 'dataAccess missing'
+
+    if not 'address' in args:
+        address = ''
+    else:
+        address = args['address'].strip()
+
+    dbname = args['name'].strip()
+    dbuser = args['db_user'].strip()
+    codeing = args['codeing'].strip()
+    password = args['password'].strip()
+    dataAccess = args['dataAccess'].strip()
+
+    reg = "^[\w\.-]+$"
+    if not re.match(reg, args['name']):
+        return public.returnJson(False, '数据库名称不能带有特殊符号!')
+    checks = ['root', 'mysql', 'test', 'sys', 'panel_logs']
+    if dbuser in checks or len(dbuser) < 1:
+        return public.returnJson(False, '数据库用户名不合法!')
+    if dbname in checks or len(dbname) < 1:
+        return public.returnJson(False, '数据库名称不合法!')
+
+    if len(password) < 1:
+        password = public.md5(time.time())[0:8]
+
+    wheres = {
+        'utf8':   'utf8_general_ci',
+        'utf8mb4':   'utf8mb4_general_ci',
+        'gbk':   'gbk_chinese_ci',
+        'big5':   'big5_chinese_ci'
+    }
+    codeStr = wheres[codeing]
+
+    pdb = pMysqlDb()
+    psdb = pSqliteDb('databases')
+
+    if psdb.where("name=? or username=?", (dbname, dbuser)).count():
+        return public.returnJson(False, '数据库已存在!')
+
+    result = pdb.execute("create database `" + dbname +
+                         "` DEFAULT CHARACTER SET " + codeing + " COLLATE " + codeStr)
+    # print result
+    isError = isSqlError(result)
+    if isError != None:
+        return isError
+
+    pdb.execute("drop user '" + dbuser + "'@'localhost'")
+    for a in address.split(','):
+        pdb.execute("drop user '" + dbuser + "'@'" + a + "'")
+
+    __createUser(dbname, dbuser, password, address)
+
+    addTime = time.strftime('%Y-%m-%d %X', time.localtime())
+    psdb.add('pid,name,username,password,accept,ps,addtime',
+             (0, dbname, dbuser, password, address, '', addTime))
+    return public.returnJson(True, '添加成功!')
+
+
+def delDb():
+    try:
+        return public.returnJson(True, '删除成功!')
+    except Exception as ex:
+        return public.returnJson(False, '删除失败!')
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -500,6 +595,10 @@ if __name__ == "__main__":
         print initMysqlPwd()
     elif func == 'get_db_list':
         print getDbList()
+    elif func == 'add_db':
+        print addDb()
+    elif func == 'del_db':
+        print delDb()
     elif func == 'sync_get_databases':
         print syncGetDatabases()
     elif func == 'set_root_pwd':
