@@ -100,6 +100,7 @@ def initDreplace():
 def start():
     file = initDreplace()
     data = public.execShell(file + ' start')
+    # print data
     if data[1] == '':
         return 'ok'
     return data[1]
