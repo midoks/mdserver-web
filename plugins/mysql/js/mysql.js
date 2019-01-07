@@ -536,6 +536,27 @@ function delDb(id, name){
     });
 }
 
+function openPhpmyadmin(name,username,password){
+
+    if($("#toPHPMyAdmin").attr('action').indexOf('phpmyadmin') == -1){
+        layer.msg(lan.database.phpmyadmin_err,{icon:2,shade: [0.3, '#000']})
+        setTimeout(function(){ window.location.href = '/soft'; },3000);
+            return;
+    }
+
+    var murl = $("#toPHPMyAdmin").attr('action');
+    $("#pma_username").val(username);
+    $("#pma_password").val(password);
+    $("#db").val(name);
+
+    layer.msg(lan.database.phpmyadmin,{icon:16,shade: [0.3, '#000'],time:1000});
+
+    setTimeout(function(){
+        $("#toPHPMyAdmin").submit();
+    },200);
+
+}
+
 function dbList(page, search){
     var _data = {};
     if (typeof(page) =='undefined'){
@@ -577,7 +598,7 @@ function dbList(page, search){
         var con = '<div class="safe bgw">\
             <button onclick="addDatabase()" title="添加数据库" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">添加数据库</button>\
             <button onclick="setRootPwd(0,\''+rdata.info['root_pwd']+'\')" title="设置MySQL管理员密码" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">root密码</button>\
-            <button onclick="bt.database.open_phpmyadmin(\'\',\'root\',\'bce2de353cba1ce2\')" title="打开phpMyadmin" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">phpMyAdmin</button>\
+            <button onclick="openPhpmyadmin(\'\',\'root\',\'bce2de353cba1ce2\')" title="打开phpMyadmin" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">phpMyAdmin</button>\
             <span style="float:right">              \
                 <button batch="true" style="float: right;display: none;margin-left:10px;" onclick="database.batch_database(\'del\');" title="删除选中项" class="btn btn-default btn-sm">删除选中</button>\
                 <button onclick="bt.recycle_bin.open_recycle_bin(6)" id="dataRecycle" title="删除选中项" class="btn btn-default btn-sm" style="margin-left: 5px;"><span class="glyphicon glyphicon-trash" style="margin-right: 5px;"></span>回收站</button>\
@@ -603,6 +624,14 @@ function dbList(page, search){
                 </div>\
             </div>\
         </div>';
+
+        con += '<form id="toPHPMyAdmin" action="http://47.91.231.139:888/phpmyadmin_aad18801b99fea74/index.php" method="post" style="display: none;" target="_blank">\
+            <input type="text" name="pma_username" id="pma_username" value="">\
+            <input type="password" name="pma_password" id="pma_password" value="">\
+            <input type="text" name="server" value="1">\
+            <input type="text" name="target" value="index.php">\
+            <input type="text" name="db" id="db" value="">\
+        </form>';
 
         $(".soft-man-con").html(con);
         $('#databasePage').html(rdata.page);

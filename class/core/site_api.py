@@ -1,6 +1,5 @@
 # coding: utf-8
 
-import psutil
 import time
 import os
 import sys
@@ -8,6 +7,9 @@ import public
 import re
 import json
 import pwd
+
+sys.path.append("/usr/local/lib/python2.7/site-packages")
+import psutil
 
 from flask import request
 
