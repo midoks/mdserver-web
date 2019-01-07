@@ -174,6 +174,10 @@ def initReplace(version):
     phpFpmWwwReplace(version)
     phpFpmReplace(version)
 
+    session_path = '/tmp/session'
+    if not os.path.exists(session_path):
+        os.mkdir(session_path)
+
     return file_bin
 
 
