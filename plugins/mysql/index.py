@@ -339,10 +339,9 @@ def setDbStatus():
     public.writeFile(conFile, content)
     return public.returnJson(True, '设置成功!')
 
-# 检测数据库执行错误
-
 
 def isSqlError(mysqlMsg):
+    # 检测数据库执行错误
     mysqlMsg = str(mysqlMsg)
     if "MySQLdb" in mysqlMsg:
         return public.returnJson(False, 'MySQLdb组件缺失! <br>进入SSH命令行输入： pip install mysql-python')
@@ -355,6 +354,46 @@ def isSqlError(mysqlMsg):
     if "1133" in mysqlMsg:
         return public.returnMsg(False, '数据库用户不存在!')
     return None
+
+
+def getDbList():
+    args = getArgs()
+    page = 1
+    page_size = 10
+    search = ''
+    data = {}
+    if 'page' in args:
+        page = int(args['page'])
+
+    if 'page_size' in args:
+        page_size = int(args['page_size'])
+
+    if 'search' in args:
+        search = args['search']
+
+    conn = pSqliteDb('databases')
+    limit = str((page - 1) * page_size) + ',' + str(page_size)
+    condition = ''
+    if not search == '':
+        condition = "name like '%" + search + "%'"
+    field = 'id,pid,name,username,password,accept,ps,addtime'
+    clist = conn.where(condition, ()).field(
+        field).limit(limit).order('id desc').select()
+    count = conn.where(condition, ()).count()
+    _page = {}
+    _page['count'] = count
+    _page['p'] = page
+    _page['row'] = page_size
+    _page['tojs'] = 'dbList'
+    data['page'] = public.getPage(_page)
+    data['data'] = clist
+
+    info = {}
+    info['root_pwd'] = pSqliteDb('config').where(
+        'id=?', (1,)).getField('mysql_root')
+    data['info'] = info
+
+    return public.getJson(data)
 
 
 def syncGetDatabases():
@@ -394,6 +433,37 @@ def syncGetDatabases():
     msg = public.getInfo('本次共从服务器获取了{1}个数据库!', (str(n),))
     return public.returnJson(True, msg)
 
+
+def setRootPwd():
+    args = getArgs()
+    if not 'password' in args:
+        return 'password missing'
+    password = args['password']
+    try:
+        pdb = pMysqlDb()
+        result = pdb.query("show databases")
+        isError = isSqlError(result)
+        if isError != None:
+            return isError
+
+        m_version = public.readFile(getServerDir() + '/version.pl')
+        if m_version.find('5.7') == 0 or m_version.find('8.0') == 0:
+            pdb.execute(
+                "UPDATE mysql.user SET authentication_string='' WHERE user='root'")
+            pdb.execute(
+                "ALTER USER 'root'@'localhost' IDENTIFIED BY '%s'" % password)
+            pdb.execute(
+                "ALTER USER 'root'@'127.0.0.1' IDENTIFIED BY '%s'" % password)
+        else:
+            result = pdb.execute(
+                "update mysql.user set Password=password('" + password + "') where User='root'")
+        pdb.execute("flush privileges")
+        pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (password,))
+        return public.returnJson(True, '数据库root密码修改成功!')
+    except Exception as ex:
+        return public.returnJson(False, '修改错误:' + str(ex))
+
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -428,7 +498,11 @@ if __name__ == "__main__":
         print setMyPort()
     elif func == 'init_pwd':
         print initMysqlPwd()
+    elif func == 'get_db_list':
+        print getDbList()
     elif func == 'sync_get_databases':
         print syncGetDatabases()
+    elif func == 'set_root_pwd':
+        print setRootPwd()
     else:
         print 'error'
