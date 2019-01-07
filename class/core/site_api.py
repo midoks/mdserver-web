@@ -384,6 +384,7 @@ class site_api:
         for val in phpVersions:
             tmp = {}
             if val == '00':
+                tmp['version'] = '00'
                 tmp['name'] = '纯静态'
                 data.append(tmp)
 

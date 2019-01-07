@@ -1,8 +1,10 @@
 <div class="bt-form">
 	<div class="bt-w-main">
 		<div class="bt-w-menu">
-			<p class="bgw" onclick="pluginService('mysql');">php版本</p>
-			<p onclick="pluginInitD('mysql');">安全设置</p>
+			<p class="bgw" onclick="pluginService('phpmyadmin');">服务</p>
+			<p onclick="pluginService('phpmyadmin');">重新模版</p>
+			<p onclick="">PHP版本</p>
+			<p onclick="">安全设置</p>
 		</div>
 		<div class="bt-w-con pd15">
 			<div class="soft-man-con"></div>
@@ -11,6 +13,6 @@
 
 </div>
 <script type="text/javascript">
-pluginService('mysql');
+pluginService('phpmyadmin');
 $.getScript( "/plugins/file?name=phpmyadmin&f=js/phpmyadmin.js");
 </script>
