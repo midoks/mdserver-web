@@ -37,6 +37,8 @@ cd $sourcePath/php/php-5.6.36 && ./configure \
 --exec-prefix=$serverPath/php/56 \
 --with-config-file-path=$serverPath/php/56/etc \
 --with-zlib-dir=$serverPath/lib/zlib \
+--with-mysql \
+--with-mysqli \
 --without-iconv \
 --enable-zip \
 --enable-mbstring \
@@ -45,7 +47,7 @@ cd $sourcePath/php/php-5.6.36 && ./configure \
 --enable-soap \
 --enable-posix \
 --enable-fpm \
-&& make && make install
+&& make && make install && make clean
 
 #------------------------ install end ------------------------------------#
 }
