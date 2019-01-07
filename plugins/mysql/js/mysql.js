@@ -413,10 +413,144 @@ function comMySqlMem() {
     $("input[name='memSize']").val(memSize.toFixed(2));
 }
 
-function dbList(){
-    var con = '<div class="safe bgw">\
-            <button onclick="database.add_database()" title="添加数据库" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">添加数据库</button>\
-            <button onclick="bt.database.set_root()" title="设置MySQL管理员密码" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">root密码</button>\
+function syncGetDatabase(){
+    myPost('sync_get_databases', null, function(data){
+        var rdata = $.parseJSON(data.data);
+        showMsg(rdata.msg,function(){
+            dbList();
+        },{ icon: rdata.status ? 1 : 2 });
+    });
+}
+
+function setRootPwd(type, pwd){
+    if (type==1){
+        var data = $("#mod_pwd").serialize();
+        myPost('set_root_pwd', data, function(data){
+            var rdata = $.parseJSON(data.data);
+            // console.log(rdata);
+            showMsg(rdata.msg,function(){
+                dbList();
+                $('.layui-layer-close1').click();
+            },{icon: rdata.status ? 1 : 2});   
+        });
+        return;
+    }
+
+    var index = layer.open({
+        type: 1,
+        skin: 'demo-class',
+        area: '500px',
+        title: '修改数据库密码',
+        closeBtn: 1,
+        shift: 5,
+        shadeClose: true,
+        content: "<form class='bt-form pd20 pb70' id='mod_pwd'>\
+                    <div class='line'>\
+                    <span class='tname'>root密码</span>\
+                    <div class='info-r'><input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:330px' value='"+pwd+"' /><span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatPwd(16)'></span></div>\
+                    </div>\
+                    <div class='bt-form-submit-btn'>\
+                        <button id='my_mod_close' type='button' class='btn btn-danger btn-sm btn-title'>关闭</button>\
+                        <button type='button' class='btn btn-success btn-sm btn-title' onclick=\"setRootPwd(1)\" >提交</button>\
+                    </div>\
+                  </form>",
+    });
+
+    $('#my_mod_close').click(function(){
+        $('.layui-layer-close1').click();
+    });
+}
+
+function addDatabase(){
+    var index = layer.open({
+        type: 1,
+        skin: 'demo-class',
+        area: '500px',
+        title: '添加数据库',
+        closeBtn: 1,
+        shift: 5,
+        shadeClose: true,
+        content: "<form class='bt-form pd20 pb70' id='add_db'>\
+                    <div class='line'>\
+                        <span class='tname'>数据库名</span>\
+                        <div class='info-r'><input name='name' class='bt-input-text mr5' placeholder='新的数据库名称' type='text' style='width:65%' value=''>\
+                        <select class='bt-input-text mr5 codeing_a5nGsm' name='codeing' style='width:27%'>\
+                            <option value='utf8'>utf-8</option>\
+                            <option value='utf8mb4'>utf8mb4</option>\
+                            <option value='gbk'>gbk</option>\
+                            <option value='big5'>big5</option>\
+                        </select>\
+                        </div>\
+                    </div>\
+                    <div class='line'><span class='tname'>用户名</span><div class='info-r'><input name='db_user' class='bt-input-text mr5' placeholder='数据库用户' type='text' style='width:65%' value=''></div></div>\
+                    <div class='line'>\
+                    <span class='tname'>密码</span>\
+                    <div class='info-r'><input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:330px' value='"+(randomStrPwd(16))+"' /><span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatPwd(16)'></span></div>\
+                    </div>\
+                    <div class='line'>\
+                        <span class='tname'>访问权限</span>\
+                        <div class='info-r '>\
+                            <select class='bt-input-text mr5' name='dataAccess' style='width:100px'>\
+                            <option value='127.0.0.1'>本地服务器</option>\
+                            <option value='%'>所有人</option>\
+                            <option value='ip'>指定IP</option>\
+                            </select>\
+                            <input id='dataAccess_subid' class='bt-input-text mr5' type='text' name='address' placeholder='多个IP使用逗号(,)分隔' style='width: 230px; display: inline-block;'>\
+                        </div>\
+                    </div>\
+                    <div class='bt-form-submit-btn'>\
+                        <button id='my_mod_close' type='button' class='btn btn-danger btn-sm btn-title'>关闭</button>\
+                        <button type='button' class='btn btn-success btn-sm btn-title' onclick=\"setRootPwd(1)\" >提交</button>\
+                    </div>\
+                  </form>",
+    });
+
+    $('#my_mod_close').click(function(){
+        $('.layui-layer-close1').click();
+    });
+}
+
+function dbList(page, search){
+    var _data = {};
+    if (typeof(page) =='undefined'){
+        var page = 1;
+    }
+    
+    _data['page'] = page;
+    _data['page_size'] = 10;
+    if(typeof(search) != 'undefined'){
+        _data['search'] = search;
+    }
+    myPost('get_db_list', _data, function(data){
+        var rdata = $.parseJSON(data.data);
+        // console.log(rdata);
+        var list = '';
+        for(i in rdata.data){
+            // console.log(i, rdata.data[i]);
+            list += '<tr>';
+            list +='<td><input value="1" class="check" onclick="bt.check_select();" type="checkbox"></td>';
+            list += '<td>' + rdata.data[i]['name'] +'</td>';
+            list += '<td>' + rdata.data[i]['username'] +'</td>';
+            list += '<td>' + 
+                        '<span class="password" data-pw="cajKa4ZAmQJNaYsx">**********</span>' +
+                        '<span onclick="bt.pub.show_hide_pass(this)" class="glyphicon glyphicon-eye-open cursor pw-ico" style="margin-left:10px"></span>'+
+                        '<span class="ico-copy cursor btcopy" style="margin-left:10px" title="复制密码" data-pw="cajKa4ZAmQJNaYsx" onclick="bt.pub.copy_pass(\'cajKa4ZAmQJNaYsx\')"></span>'+
+                    '</td>';
+            list += '<td>备份</td>';
+            list += '<td>' + rdata.data[i]['ps'] +'</td>';
+            list += '<td style="text-align:right">' + 
+                        '<a href="javascript:;" class="btlink" title="数据库管理">管理</a> | ' +
+                        '<a href="javascript:;" class="btlink" title="MySQL优化修复工具">工具</a> | ' +
+                        '<a href="javascript:;" class="btlink" title="设置数据库权限">权限</a> | ' +
+                        '<a href="javascript:;" class="btlink" title="修改数据库密码">改密</a> | ' +
+                        '<a href="javascript:;" class="btlink" title="删除数据库">删除</a>' +
+                    '</td>';
+            list += '</tr>';
+        }
+
+        var con = '<div class="safe bgw">\
+            <button onclick="addDatabase()" title="添加数据库" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">添加数据库</button>\
+            <button onclick="setRootPwd(0,\''+rdata.info['root_pwd']+'\')" title="设置MySQL管理员密码" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">root密码</button>\
             <button onclick="bt.database.open_phpmyadmin(\'\',\'root\',\'bce2de353cba1ce2\')" title="打开phpMyadmin" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">phpMyAdmin</button>\
             <span style="float:right">              \
                 <button batch="true" style="float: right;display: none;margin-left:10px;" onclick="database.batch_database(\'del\');" title="删除选中项" class="btn btn-default btn-sm">删除选中</button>\
@@ -432,9 +566,10 @@ function dbList(){
                     <th>备份</th><th>备注</th>\
                     <th style="text-align:right;">操作</th></tr></thead>\
                     <tbody>\
+                    '+ list +'\
                     </tbody></table>\
                 </div>\
-                 <div id="databasePage" class="dataTables_paginate paging_bootstrap page"><div><span class="Pcurrent">1</span><span class="Pcount">共2条数据</span></div></div>\
+                 <div id="databasePage" class="dataTables_paginate paging_bootstrap page"></div>\
                 <div class="table_toolbar">\
                     <span class="sync btn btn-default btn-sm" style="margin-right:5px" onclick="database.sync_to_database(1)" title="将选中数据库信息同步到服务器">同步选中</span>\
                     <span class="sync btn btn-default btn-sm" style="margin-right:5px" onclick="database.sync_to_database(0)" title="将所有数据库信息同步到服务器">同步所有</span>\
@@ -443,14 +578,8 @@ function dbList(){
             </div>\
         </div>';
 
-    $(".soft-man-con").html(con);
-}
-
-function syncGetDatabase(){
-    myPost('sync_get_databases', null, function(data){
-        var rdata = $.parseJSON(data.data);
-        showMsg(rdata.msg,function(){
-            dbList();
-        },{ icon: rdata.status ? 1 : 2 });
+        $(".soft-man-con").html(con);
+        $('#databasePage').html(rdata.page);
     });
 }
+
