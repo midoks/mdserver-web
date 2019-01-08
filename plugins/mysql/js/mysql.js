@@ -460,16 +460,49 @@ function setRootPwd(type, pwd){
     });
 }
 
+function showHidePass(obj){
+    var a = "glyphicon-eye-open";
+    var b = "glyphicon-eye-close";
+    
+    if($(obj).hasClass(a)){
+        $(obj).removeClass(a).addClass(b);
+        $(obj).prev().text($(obj).prev().attr('data-pw'))
+    }
+    else{
+        $(obj).removeClass(b).addClass(a);
+        $(obj).prev().text('***');
+    }
+}
+
+function copyPass(password){
+    var clipboard = new ClipboardJS('#bt_copys');
+    clipboard.on('success', function (e) {
+        bt.msg({msg:'复制成功',icon:1});
+    });
+
+    clipboard.on('error', function (e) {
+        bt.msg({msg:'复制失败，浏览器不兼容!',icon:2});
+    });
+    $("#bt_copys").attr('data-clipboard-text',password);
+    $("#bt_copys").click();
+}
+
 function addDatabase(type){
     if (type==1){
         var data = $("#add_db").serialize();
-        myPost('add_db', data, function(data){
+        data = decodeURIComponent(data);
+        var dataObj = str2Obj(data);
+        if(!dataObj['address']){
+            dataObj['address'] = dataObj['dataAccess'];
+        }
+        myPost('add_db', dataObj, function(data){
             var rdata = $.parseJSON(data.data);
-            console.log(rdata);
-            // showMsg(rdata.msg,function(){
-            //     dbList();
-            //     $('.layui-layer-close1').click();
-            // },{icon: rdata.status ? 1 : 2});   
+            showMsg(rdata.msg,function(){
+                if (rdata.status){
+                    dbList();
+                }
+                $('.layui-layer-close1').click();
+            },{icon: rdata.status ? 1 : 2},600);
         });
         return;
     }
@@ -503,11 +536,12 @@ function addDatabase(type){
                         <div class='info-r '>\
                             <select class='bt-input-text mr5' name='dataAccess' style='width:100px'>\
                             <option value='127.0.0.1'>本地服务器</option>\
-                            <option value='%'>所有人</option>\
+                            <option value=\"%\">所有人</option>\
                             <option value='ip'>指定IP</option>\
                             </select>\
                         </div>\
                     </div>\
+                    <input type='hidden' name='ps' value='' />\
                     <div class='bt-form-submit-btn'>\
                         <button id='my_mod_close' type='button' class='btn btn-danger btn-sm btn-title'>关闭</button>\
                         <button type='button' class='btn btn-success btn-sm btn-title' onclick=\"addDatabase(1)\" >提交</button>\
@@ -515,10 +549,15 @@ function addDatabase(type){
                   </form>",
     });
 
+    $("input[name='name']").keyup(function(){
+        var v = $(this).val();
+        $("input[name='db_user']").val(v);
+        $("input[name='ps']").val(v);
+    });
+
     $('#my_mod_close').click(function(){
         $('.layui-layer-close1').click();
     });
-
     $('select[name="dataAccess"]').change(function(){
         var v = $(this).val();
         if (v == 'ip'){
@@ -531,7 +570,14 @@ function addDatabase(type){
 
 function delDb(id, name){
     safeMessage('删除['+name+']','您真的要删除['+name+']吗？',function(){
-        
+        var data='id='+id+'&name='+name
+        myPost('del_db', data, function(data){
+            var rdata = $.parseJSON(data.data);
+            showMsg(rdata.msg,function(){
+                dbList();
+                $('.layui-layer-close1').click();
+            },{icon: rdata.status ? 1 : 2},1000);
+        });
     });
 }
 
@@ -598,12 +644,12 @@ function dbList(page, search){
             list += '<td>' + rdata.data[i]['name'] +'</td>';
             list += '<td>' + rdata.data[i]['username'] +'</td>';
             list += '<td>' + 
-                        '<span class="password" data-pw="'+rdata.data[i]['password']+'">**********</span>' +
-                        '<span onclick="bt.pub.show_hide_pass(this)" class="glyphicon glyphicon-eye-open cursor pw-ico" style="margin-left:10px"></span>'+
-                        '<span class="ico-copy cursor btcopy" style="margin-left:10px" title="复制密码" data-pw="cajKa4ZAmQJNaYsx" onclick="bt.pub.copy_pass(\'cajKa4ZAmQJNaYsx\')"></span>'+
+                        '<span class="password" data-pw="'+rdata.data[i]['password']+'">***</span>' +
+                        '<span onclick="showHidePass(this)" class="glyphicon glyphicon-eye-open cursor pw-ico" style="margin-left:10px"></span>'+
+                        '<span class="ico-copy cursor btcopy" style="margin-left:10px" title="复制密码" onclick="copyPass(\''+rdata.data[i]['password']+'\')"></span>'+
                     '</td>';
             list += '<td>备份</td>';
-            list += '<td>' + rdata.data[i]['ps'] +'</td>';
+            list += '<td>'+rdata.data[i]['ps']+'</td>';
             list += '<td style="text-align:right">' + 
                         '<a href="javascript:;" class="btlink" onclick="openPhpmyadmin(\''+rdata.data[i]['name']+'\',\''+rdata.data[i]['username']+'\',\''+rdata.data[i]['password']+'\')" title="数据库管理">管理</a> | ' +
                         '<a href="javascript:;" class="btlink" title="MySQL优化修复工具">工具</a> | ' +

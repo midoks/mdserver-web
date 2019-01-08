@@ -54,6 +54,13 @@ def getArgs():
     return tmp
 
 
+def checkArgs(data, ck=[]):
+    for i in range(len(ck)):
+        if not ck[i] in data:
+            return (False, public.returnJson(False, ck[i] + 'missing!'))
+    return (True, public.returnJson(True, 'ok'))
+
+
 def getConf():
     path = getServerDir() + '/etc/my.cnf'
     return path
@@ -482,20 +489,11 @@ def __createUser(dbname, username, password, address):
 
 def addDb():
     args = getArgs()
-    if not 'password' in args:
-        return 'password missing'
 
-    if not 'name' in args:
-        return 'name missing'
-
-    if not 'codeing' in args:
-        return 'codeing missing'
-
-    if not 'db_user' in args:
-        return 'db_user missing'
-
-    if not 'dataAccess' in args:
-        return 'dataAccess missing'
+    data = checkArgs(args,
+                     ['password', 'name', 'codeing', 'db_user', 'dataAccess', 'ps'])
+    if not data[0]:
+        return data[1]
 
     if not 'address' in args:
         address = ''
@@ -507,6 +505,7 @@ def addDb():
     codeing = args['codeing'].strip()
     password = args['password'].strip()
     dataAccess = args['dataAccess'].strip()
+    ps = args['ps'].strip()
 
     reg = "^[\w\.-]+$"
     if not re.match(reg, args['name']):
@@ -549,15 +548,43 @@ def addDb():
 
     addTime = time.strftime('%Y-%m-%d %X', time.localtime())
     psdb.add('pid,name,username,password,accept,ps,addtime',
-             (0, dbname, dbuser, password, address, '', addTime))
+             (0, dbname, dbuser, password, address, ps, addTime))
     return public.returnJson(True, '添加成功!')
 
 
 def delDb():
+    args = getArgs()
+    data = checkArgs(args, ['id', 'name'])
+    if not data[0]:
+        return data[1]
     try:
+        id = args['id']
+        name = args['name']
+        psdb = pSqliteDb('databases')
+        pdb = pMysqlDb()
+        find = psdb.where("id=?", (id,)).field(
+            'id,pid,name,username,password,accept,ps,addtime').find()
+        accept = find['accept']
+        username = find['username']
+
+        # 删除MYSQL
+        result = pdb.execute("drop database `" + name + "`")
+        isError = isSqlError(result)
+        if isError != None:
+            return isError
+
+        users = pdb.query(
+            "select Host from mysql.user where User='" + username + "' AND Host!='localhost'")
+        pdb.execute("drop user '" + username + "'@'localhost'")
+        for us in users:
+            pdb.execute("drop user '" + username + "'@'" + us[0] + "'")
+        pdb.execute("flush privileges")
+
+        # 删除SQLITE
+        psdb.where("id=?", (id,)).delete()
         return public.returnJson(True, '删除成功!')
     except Exception as ex:
-        return public.returnJson(False, '删除失败!')
+        return public.returnJson(False, '删除失败!' + str(ex))
 
 if __name__ == "__main__":
     func = sys.argv[1]
