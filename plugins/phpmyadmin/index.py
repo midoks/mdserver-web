@@ -47,7 +47,21 @@ def getArgs():
 def getConf():
     return public.getServerDir() + '/openresty/nginx/conf/vhost/phpmyadmin.conf'
 
-#{$PHP_VERSION}
+
+def getPort():
+    file = getConf()
+    content = public.readFile(file)
+    rep = 'listen\s*(.*);'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
+
+
+def getHomePage():
+    port = getPort()
+    ip = '127.0.0.1'
+    if not public.isAppleSystem():
+        ip = public.getLocalIp()
+    return 'http://' + ip + ':' + port + '/phpmyadmin/index.php'
 
 
 def getPhpVer(expect=55):
@@ -129,5 +143,7 @@ if __name__ == "__main__":
         print reload()
     elif func == 'conf':
         print getConf()
+    elif func == 'get_home_page':
+        print getHomePage()
     else:
         print 'error'

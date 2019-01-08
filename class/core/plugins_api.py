@@ -161,7 +161,7 @@ class plugins_api:
         return ''
 
     def checkInstalled(self):
-        checks = ['nginx', 'apache', 'php', 'mysql']
+        checks = ['nginx', 'php']
         for name in checks:
             filename = public.getRootDir() + "/server/" + name
             if os.path.exists(filename):
