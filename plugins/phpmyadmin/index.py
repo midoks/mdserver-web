@@ -110,9 +110,12 @@ def status():
 def start():
     file_tpl = getPluginDir() + '/conf/phpmyadmin.conf'
     file_conf = getConf()
-    centent = public.readFile(file_tpl)
-    centent = contentReplace(centent)
-    public.writeFile(file_conf, centent)
+
+    if not os.path.exists(file_conf):
+        centent = public.readFile(file_tpl)
+        centent = contentReplace(centent)
+        public.writeFile(file_conf, centent)
+
     public.restartWeb()
     return 'ok'
 
@@ -158,7 +161,29 @@ def getPmaPort():
         port = getPort()
         return public.returnJson(True, 'OK', port)
     except Exception as e:
+        print e
         return public.returnJson(False, '插件未启动!')
+
+
+def setPmaPort():
+    args = getArgs()
+    if not 'port' in args:
+        return public.returnJson(False, 'port missing!')
+
+    port = args['port']
+    if port == '80':
+        return public.returnJson(False, '80端不能使用!')
+
+    file = getConf()
+    if not os.path.exists(file):
+        return public.returnJson(False, '插件未启动!')
+    content = public.readFile(file)
+    rep = 'listen\s*(.*);'
+    content = re.sub(rep, "listen " + port + ';', content)
+    public.writeFile(file, content)
+    public.restartWeb()
+    return public.returnJson(True, '修改成功!')
+
 
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -182,5 +207,7 @@ if __name__ == "__main__":
         print getSetPhpVer()
     elif func == 'get_pma_port':
         print getPmaPort()
+    elif func == 'set_pma_port':
+        print setPmaPort()
     else:
         print 'error'
