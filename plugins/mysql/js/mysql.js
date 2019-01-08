@@ -177,8 +177,7 @@ function myPerfOpt() {
     //获取MySQL配置
     myPost('db_status','',function(data){
         var rdata = $.parseJSON(data.data);
-        console.log(rdata);
-
+        // console.log(rdata);
         var key_buffer_size = toSizeM(rdata.mem.key_buffer_size);
         var query_cache_size = toSizeM(rdata.mem.query_cache_size);
         var tmp_table_size = toSizeM(rdata.mem.tmp_table_size);
@@ -538,10 +537,15 @@ function delDb(id, name){
 
 function openPhpmyadmin(name,username,password){
 
+    var url = $("#toPHPMyAdmin").attr('action');
+    console.log(url);
+
+
+
     if($("#toPHPMyAdmin").attr('action').indexOf('phpmyadmin') == -1){
-        layer.msg(lan.database.phpmyadmin_err,{icon:2,shade: [0.3, '#000']})
+        layer.msg('请先安装phpMyAdmin',{icon:2,shade: [0.3, '#000']})
         setTimeout(function(){ window.location.href = '/soft'; },3000);
-            return;
+        return;
     }
 
     var murl = $("#toPHPMyAdmin").attr('action');
@@ -549,7 +553,7 @@ function openPhpmyadmin(name,username,password){
     $("#pma_password").val(password);
     $("#db").val(name);
 
-    layer.msg(lan.database.phpmyadmin,{icon:16,shade: [0.3, '#000'],time:1000});
+    layer.msg('正在打开phpMyAdmin',{icon:16,shade: [0.3, '#000'],time:1000});
 
     setTimeout(function(){
         $("#toPHPMyAdmin").submit();
