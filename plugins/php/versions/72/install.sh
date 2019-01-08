@@ -37,6 +37,7 @@ cd $sourcePath/php/php-7.2.5 && ./configure \
 --exec-prefix=$serverPath/php/72 \
 --with-config-file-path=$serverPath/php/72/etc \
 --with-zlib-dir=$serverPath/lib/zlib \
+--enable-mysqlnd \
 --without-iconv \
 --enable-zip \
 --enable-mbstring \

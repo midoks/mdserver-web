@@ -133,6 +133,33 @@ def reload():
     return start()
 
 
+def setPhpVer():
+    args = getArgs()
+
+    if not 'phpver' in args:
+        return 'phpver missing'
+
+    cacheFile = getServerDir() + '/php.pl'
+    public.writeFile(cacheFile, args['phpver'])
+    restart()
+
+    return 'ok'
+
+
+def getSetPhpVer():
+    cacheFile = getServerDir() + '/php.pl'
+    if os.path.exists(cacheFile):
+        return public.readFile(cacheFile).strip()
+    return ''
+
+
+def getPmaPort():
+    try:
+        port = getPort()
+        return public.returnJson(True, 'OK', port)
+    except Exception as e:
+        return public.returnJson(False, '插件未启动!')
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -149,5 +176,11 @@ if __name__ == "__main__":
         print getConf()
     elif func == 'get_home_page':
         print getHomePage()
+    elif func == 'set_php_ver':
+        print setPhpVer()
+    elif func == 'get_set_php_ver':
+        print getSetPhpVer()
+    elif func == 'get_pma_port':
+        print getPmaPort()
     else:
         print 'error'
