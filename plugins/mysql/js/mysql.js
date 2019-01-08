@@ -487,6 +487,50 @@ function copyPass(password){
     $("#bt_copys").click();
 }
 
+function setDbPass(id, username, password){
+
+    var index = layer.open({
+        type: 1,
+        skin: 'demo-class',
+        area: '500px',
+        title: '修改数据库密码',
+        closeBtn: 1,
+        shift: 5,
+        shadeClose: true,
+        content: "<form class='bt-form pd20 pb70' id='mod_pwd'>\
+                    <div class='line'>\
+                        <span class='tname'>用户名</span>\
+                        <div class='info-r'><input name=\"name\" class='bt-input-text mr5' type='text' style='width:330px' value='"+username+"' /></div>\
+                    </div>\
+                    <div class='line'>\
+                    <span class='tname'>密码</span>\
+                    <div class='info-r'><input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:330px' value='"+password+"' /><span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatPwd(16)'></span></div>\
+                    </div>\
+                    <div class='bt-form-submit-btn'>\
+                        <button id='my_mod_close' type='button' class='btn btn-danger btn-sm btn-title'>关闭</button>\
+                        <button id='my_mod_save' type='button' class='btn btn-success btn-sm btn-title'>提交</button>\
+                    </div>\
+                  </form>",
+    });
+
+    $('#my_mod_close').click(function(){
+        $('.layui-layer-close1').click();
+    });
+
+    $('#my_mod_save').click(function(){
+        var data = $("#mod_pwd").serialize();
+        console.log(data);
+        // myPost('set_root_pwd', data, function(data){
+        //     var rdata = $.parseJSON(data.data);
+        //     // console.log(rdata);
+        //     showMsg(rdata.msg,function(){
+        //         dbList();
+        //         $('.layui-layer-close1').click();
+        //     },{icon: rdata.status ? 1 : 2});   
+        // });
+    });
+}
+
 function addDatabase(type){
     if (type==1){
         var data = $("#add_db").serialize();
@@ -654,7 +698,7 @@ function dbList(page, search){
                         '<a href="javascript:;" class="btlink" onclick="openPhpmyadmin(\''+rdata.data[i]['name']+'\',\''+rdata.data[i]['username']+'\',\''+rdata.data[i]['password']+'\')" title="数据库管理">管理</a> | ' +
                         '<a href="javascript:;" class="btlink" title="MySQL优化修复工具">工具</a> | ' +
                         '<a href="javascript:;" class="btlink" title="设置数据库权限">权限</a> | ' +
-                        '<a href="javascript:;" class="btlink" title="修改数据库密码">改密</a> | ' +
+                        '<a href="javascript:;" class="btlink"  onclick="setDbPass('+rdata.data[i]['id']+',\''+ rdata.data[i]['username'] +'\',\'' + rdata.data[i]['password'] + '\')">改密</a> | ' +
                         '<a href="javascript:;" class="btlink" title="删除数据库" onclick="delDb(\''+rdata.data[i]['id']+'\',\''+rdata.data[i]['name']+'\')">删除</a>' +
                     '</td>';
             list += '</tr>';
