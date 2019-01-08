@@ -537,13 +537,28 @@ function delDb(id, name){
 
 function openPhpmyadmin(name,username,password){
 
-    var url = $("#toPHPMyAdmin").attr('action');
-    console.log(url);
+    data = syncPost('/plugins/check',{'name':'phpmyadmin'});
+    if (!data.status){
+        layer.msg(data.msg,{icon:2,shade: [0.3, '#000']});
+        return;
+    }
 
+    data = syncPost('/plugins/run',{'name':'phpmyadmin','func':'status'});
+    if (data.data != 'start'){
+        layer.msg('phpMyAdmin未启动',{icon:2,shade: [0.3, '#000']});
+        return;
+    }
 
+    data = syncPost('/plugins/run',{'name':'phpmyadmin','func':'get_home_page'});
+    var rdata = $.parseJSON(data.data);
+    if (!rdata.status){
+        layer.msg(rdata.msg,{icon:2,shade: [0.3, '#000']});
+        return;
+    }
+    $("#toPHPMyAdmin").attr('action',rdata.data);
 
     if($("#toPHPMyAdmin").attr('action').indexOf('phpmyadmin') == -1){
-        layer.msg('请先安装phpMyAdmin',{icon:2,shade: [0.3, '#000']})
+        layer.msg('请先安装phpMyAdmin',{icon:2,shade: [0.3, '#000']});
         setTimeout(function(){ window.location.href = '/soft'; },3000);
         return;
     }
@@ -590,7 +605,7 @@ function dbList(page, search){
             list += '<td>备份</td>';
             list += '<td>' + rdata.data[i]['ps'] +'</td>';
             list += '<td style="text-align:right">' + 
-                        '<a href="javascript:;" class="btlink" title="数据库管理">管理</a> | ' +
+                        '<a href="javascript:;" class="btlink" onclick="openPhpmyadmin(\''+rdata.data[i]['name']+'\',\''+rdata.data[i]['username']+'\',\''+rdata.data[i]['password']+'\')" title="数据库管理">管理</a> | ' +
                         '<a href="javascript:;" class="btlink" title="MySQL优化修复工具">工具</a> | ' +
                         '<a href="javascript:;" class="btlink" title="设置数据库权限">权限</a> | ' +
                         '<a href="javascript:;" class="btlink" title="修改数据库密码">改密</a> | ' +
@@ -602,7 +617,7 @@ function dbList(page, search){
         var con = '<div class="safe bgw">\
             <button onclick="addDatabase()" title="添加数据库" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">添加数据库</button>\
             <button onclick="setRootPwd(0,\''+rdata.info['root_pwd']+'\')" title="设置MySQL管理员密码" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">root密码</button>\
-            <button onclick="openPhpmyadmin(\'\',\'root\',\'bce2de353cba1ce2\')" title="打开phpMyadmin" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">phpMyAdmin</button>\
+            <button onclick="openPhpmyadmin(\'\',\'root\',\''+rdata.info['root_pwd']+'\')" title="打开phpMyadmin" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">phpMyAdmin</button>\
             <span style="float:right">              \
                 <button batch="true" style="float: right;display: none;margin-left:10px;" onclick="database.batch_database(\'del\');" title="删除选中项" class="btn btn-default btn-sm">删除选中</button>\
                 <button onclick="bt.recycle_bin.open_recycle_bin(6)" id="dataRecycle" title="删除选中项" class="btn btn-default btn-sm" style="margin-left: 5px;"><span class="glyphicon glyphicon-trash" style="margin-right: 5px;"></span>回收站</button>\
@@ -629,7 +644,7 @@ function dbList(page, search){
             </div>\
         </div>';
 
-        con += '<form id="toPHPMyAdmin" action="http://47.91.231.139:888/phpmyadmin_aad18801b99fea74/index.php" method="post" style="display: none;" target="_blank">\
+        con += '<form id="toPHPMyAdmin" action="" method="post" style="display: none;" target="_blank">\
             <input type="text" name="pma_username" id="pma_username" value="">\
             <input type="password" name="pma_password" id="pma_password" value="">\
             <input type="text" name="server" value="1">\

@@ -57,11 +57,15 @@ def getPort():
 
 
 def getHomePage():
-    port = getPort()
-    ip = '127.0.0.1'
-    if not public.isAppleSystem():
-        ip = public.getLocalIp()
-    return 'http://' + ip + ':' + port + '/phpmyadmin/index.php'
+    try:
+        port = getPort()
+        ip = '127.0.0.1'
+        if not public.isAppleSystem():
+            ip = public.getLocalIp()
+        url = 'http://' + ip + ':' + port + '/phpmyadmin/index.php'
+        return public.returnJson(True, 'OK', url)
+    except Exception as e:
+        return public.returnJson(False, '插件未启动!')
 
 
 def getPhpVer(expect=55):
