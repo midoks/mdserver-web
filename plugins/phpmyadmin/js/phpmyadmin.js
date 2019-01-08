@@ -34,7 +34,13 @@ function pmaPost(method,args,callback){
 function homePage(){
     pmaPost('get_home_page', '', function(data){
         console.log(data);
-        var con = '<button class="btn btn-default btn-sm" onclick="window.open(\'' + data.data + '\')">主页</button>';
+        var rdata = $.parseJSON(data.data);
+        console.log(rdata);
+        if (!rdata.status){
+            layer.msg(rdata.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+            return;
+        }
+        var con = '<button class="btn btn-default btn-sm" onclick="window.open(\'' + rdata.data + '\')">主页</button>';
         $(".soft-man-con").html(con);
     });
 }

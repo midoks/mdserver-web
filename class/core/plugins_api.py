@@ -142,31 +142,18 @@ class plugins_api:
         public.M('tasks').add('id,name,type,status,addtime, execstr', taskAdd)
         return public.returnJson(True, '已将卸载任务添加到队列!')
 
-    def installed(self):
-        rundir = public.getRunDir()
+    def checkApi(self):
         name = request.form.get('name', '')
-
         if name.strip() == '':
-            return public.retJson(-1, "缺少插件名称!", ())
+            return public.returnJson(False, "缺少插件名称!", ())
 
-        infoJsonPos = __plugin_name + '/' + name + '/' + 'info.json'
+        infoJsonPos = self.__plugin_dir + '/' + name + '/' + 'info.json'
         if not os.path.exists(infoJsonPos):
-            return public.returnJson(-1, "配置文件不存在!", ())
+            return public.returnJson(False, "配置文件不存在!", ())
 
-        pluginInfo = json.loads(public.readFile(infoJsonPos))
+        #
 
-        sh = __plugin_name + '/' + name + '/' + pluginInfo['shell']
-        os.system('/bin/bash ' + sh + ' install')
-        print request.args
-        return ''
-
-    def checkInstalled(self):
-        checks = ['nginx', 'php']
-        for name in checks:
-            filename = public.getRootDir() + "/server/" + name
-            if os.path.exists(filename):
-                return "True"
-        return "False"
+        return public.returnJson(True, "插件存在!", ())
 
     def setIndexApi(self):
         name = request.form.get('name', '')
@@ -571,7 +558,7 @@ class plugins_api:
         return plugins_info
 
     def getPluginList(self, sType, sPage=1, sPageSize=10):
-        print sType, sPage, sPageSize
+        # print sType, sPage, sPageSize
 
         ret = {}
         ret['type'] = json.loads(public.readFile(self.__type))
