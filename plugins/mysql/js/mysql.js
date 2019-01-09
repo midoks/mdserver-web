@@ -790,6 +790,39 @@ function delDbBatch(){
     });
 }
 
+
+function setDataByKey(tab, key, obj) {     
+    var _span = $(obj);
+    var _input = $("<input class='baktext' value="+_span.text()+" type='text' placeholder='备注信息' />");
+    _span.hide().after(_input);
+    _input.focus();
+    _input.blur(function(){
+        // var item = $(this).parents('tr').data('item');
+        // console.log(item); 
+        // var _txt = $(this);
+        // var data = {table:tab,id:item.id};
+        // data[key] = _txt.val()
+        // bt.pub.set_data_ps(data,function(rdata){
+        //     if(rdata.status){   
+        //         _span.text(_txt.val());                             
+        //         _span.show();
+        //         _txt.remove();
+        //     }
+        // })
+    })
+    _input.keyup(function(){
+        if(event.keyCode == 13){
+            _input.trigger('blur');
+        }
+    })
+}
+
+function setDbPs(data,callback){
+    bt.send('setPs','data/setPs',data,function(rdata){          
+        if(callback) callback(rdata);
+    })
+}
+
 function openPhpmyadmin(name,username,password){
 
     data = syncPost('/plugins/check',{'name':'phpmyadmin'});
@@ -856,7 +889,7 @@ function dbList(page, search){
                         '<span class="ico-copy cursor btcopy" style="margin-left:10px" title="复制密码" onclick="copyPass(\''+rdata.data[i]['password']+'\')"></span>'+
                     '</td>';
             list += '<td>备份</td>';
-            list += '<td>'+rdata.data[i]['ps']+'</td>';
+            list += '<td><span class="c9 input-edit" onclick="setDataByKey(\'databases\',\'ps\',this)" style="display: inline-block;">'+rdata.data[i]['ps']+'</span></td>';
             list += '<td style="text-align:right">' + 
                         '<a href="javascript:;" class="btlink" onclick="openPhpmyadmin(\''+rdata.data[i]['name']+'\',\''+rdata.data[i]['username']+'\',\''+rdata.data[i]['password']+'\')" title="数据库管理">管理</a> | ' +
                         '<a href="javascript:;" class="btlink" title="MySQL优化修复工具">工具</a> | ' +
