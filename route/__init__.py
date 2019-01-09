@@ -7,6 +7,9 @@ import time
 import shutil
 import uuid
 
+reload(sys)
+sys.setdefaultencoding('utf8')
+
 from datetime import timedelta
 
 from flask import Flask
@@ -28,8 +31,8 @@ import public
 app = Flask(__name__, template_folder='templates/default')
 app.config.version = '0.0.1'
 # app.config['SECRET_KEY'] = os.urandom(24)
-app.config['SECRET_KEY'] = uuid.UUID(int=uuid.getnode()).hex[-12:]
 # app.secret_key = uuid.UUID(int=uuid.getnode()).hex[-12:]
+app.config['SECRET_KEY'] = uuid.UUID(int=uuid.getnode()).hex[-12:]
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
 try:
     from flask_sqlalchemy import SQLAlchemy

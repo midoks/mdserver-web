@@ -16,7 +16,7 @@ setTimeout(function(){
 $(function(){
 	// start 
 	$.post('/firewall/get_www_path',function(data){
-		var html ='<span>Web日志:</span><a href="javascript:openPath(\''+data['path']+'\');">点击进入日志目录</a>\
+		var html ='<a href="javascript:openPath(\''+data['path']+'\');">日志目录</a>\
 				<em id="logSize">0KB</em>\
 				<button class="btn btn-default btn-sm" onclick="closeLogs();">清空</button>';
 		$('#firewall_weblog').html(html);
