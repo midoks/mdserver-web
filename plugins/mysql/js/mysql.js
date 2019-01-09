@@ -888,7 +888,7 @@ function dbList(page, search){
                         '<span onclick="showHidePass(this)" class="glyphicon glyphicon-eye-open cursor pw-ico" style="margin-left:10px"></span>'+
                         '<span class="ico-copy cursor btcopy" style="margin-left:10px" title="复制密码" onclick="copyPass(\''+rdata.data[i]['password']+'\')"></span>'+
                     '</td>';
-            list += '<td>备份</td>';
+            // list += '<td>备份</td>';
             list += '<td><span class="c9 input-edit" onclick="setDataByKey(\'databases\',\'ps\',this)" style="display: inline-block;">'+rdata.data[i]['ps']+'</span></td>';
             list += '<td style="text-align:right">' + 
                         '<a href="javascript:;" class="btlink" onclick="openPhpmyadmin(\''+rdata.data[i]['name']+'\',\''+rdata.data[i]['username']+'\',\''+rdata.data[i]['password']+'\')" title="数据库管理">管理</a> | ' +
@@ -915,7 +915,9 @@ function dbList(page, search){
                     <th>数据库名</th>\
                     <th>用户名</th>\
                     <th>密码</th>\
-                    <th>备份</th><th>备注</th>\
+                    '+
+                    // '<th>备份</th>'+
+                    '<th>备注</th>\
                     <th style="text-align:right;">操作</th></tr></thead>\
                     <tbody>\
                     '+ list +'\
