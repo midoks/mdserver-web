@@ -378,6 +378,20 @@ def mapToList(map_obj):
         return []
 
 
+def __createUser(dbname, username, password, address):
+    pdb = pMysqlDb()
+    pdb.execute(
+        "CREATE USER `%s`@`localhost` IDENTIFIED BY '%s'" % (username, password))
+    pdb.execute(
+        "grant all privileges on %s.* to `%s`@`localhost`" % (dbname, username))
+    for a in address.split(','):
+        pdb.execute(
+            "CREATE USER `%s`@`%s` IDENTIFIED BY '%s'" % (username, a, password))
+        pdb.execute(
+            "grant all privileges on %s.* to `%s`@`%s`" % (dbname, username, a))
+    pdb.execute("flush privileges")
+
+
 def getDbList():
     args = getArgs()
     page = 1
@@ -449,19 +463,59 @@ def syncGetDatabases():
         if value[0] == 'test':
             ps = public.getMsg('DATABASE_TEST')
         addTime = time.strftime('%Y-%m-%d %X', time.localtime())
-        if psdb.table('databases').add('name,username,password,accept,ps,addtime', (value[0], value[0], '', host, ps, addTime)):
+        if psdb.add('name,username,password,accept,ps,addtime', (value[0], value[0], '', host, ps, addTime)):
             n += 1
 
     msg = public.getInfo('本次共从服务器获取了{1}个数据库!', (str(n),))
     return public.returnJson(True, msg)
 
 
-def toDbBase():
-    return 'fff'
+def toDbBase(find):
+    pdb = pMysqlDb()
+    psdb = pSqliteDb('databases')
+    if len(find['password']) < 3:
+        find['username'] = find['name']
+        find['password'] = public.md5(str(time.time()) + find['name'])[0:10]
+        psdb.where("id=?", (find['id'],)).save(
+            'password,username', (find['password'], find['username']))
+
+    result = pdb.execute("create database `" + find['name'] + "`")
+    if "using password:" in str(result):
+        return -1
+    if "Connection refused" in str(result):
+        return -1
+
+    password = find['password']
+    __createUser(find['name'], find['username'], password, find['accept'])
+    return 1
 
 
 def syncToDatabases():
-    return public.returnJson(False, 'f')
+    args = getArgs()
+    data = checkArgs(args, ['type'])
+    if not data[0]:
+        return data[1]
+
+    pdb = pMysqlDb()
+    result = pdb.execute("show databases")
+    isError = isSqlError(result)
+    if isError:
+        return isError
+
+    stype = int(args['type'])
+    psdb = pSqliteDb('databases')
+    n = 0
+    data = psdb.field('id,name,username,password,accept').select()
+    if stype == 0:
+        for value in data:
+            result = toDbBase(value)
+            if result == 1:
+                n += 1
+    else:
+        pass
+
+    msg = public.getInfo('本次共同步了{1}个数据库!', (str(n),))
+    return public.returnJson(True, msg)
 
 
 def setRootPwd():
@@ -532,20 +586,6 @@ def setUserPwd():
     except Exception as ex:
         print str(ex)
         return public.returnJson(False, public.getInfo('修改数据库[{1}]密码失败!', (name)))
-
-
-def __createUser(dbname, username, password, address):
-    pdb = pMysqlDb()
-    pdb.execute(
-        "CREATE USER `%s`@`localhost` IDENTIFIED BY '%s'" % (username, password))
-    pdb.execute(
-        "grant all privileges on %s.* to `%s`@`localhost`" % (dbname, username))
-    for a in address.split(','):
-        pdb.execute(
-            "CREATE USER `%s`@`%s` IDENTIFIED BY '%s'" % (username, a, password))
-        pdb.execute(
-            "grant all privileges on %s.* to `%s`@`%s`" % (dbname, username, a))
-    pdb.execute("flush privileges")
 
 
 def addDb():
@@ -691,6 +731,7 @@ def setDbAccess():
 
     __createUser(dbname, name, password, access)
 
+    psdb.where('username=?', (name,)).save('accept', (access,))
     return public.returnJson(True, '设置成功!')
 
 if __name__ == "__main__":

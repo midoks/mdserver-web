@@ -422,7 +422,10 @@ function syncGetDatabase(){
 }
 
 function syncToDatabase(type){
-    myPost('sync_to_databases', null, function(data){
+
+    var data = 'type='+type; 
+
+    myPost('sync_to_databases', data, function(data){
         console.log(data);
         var rdata = $.parseJSON(data.data);
         console.log(rdata);
