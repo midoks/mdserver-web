@@ -119,13 +119,11 @@ function GetToday(){
    return str;
 }
 
-
-
 //取监控状态
 function getStatus(){
 	loadT = layer.msg(lan.public.read,{icon:16,time:0})
 	$.post('/system/set_control','type=-1',function(rdata){
-		console.log(rdata);
+		// console.log(rdata);
 		layer.close(loadT);
 		if(rdata.status){
 			$("#openJK").html("<input class='btswitch btswitch-ios' id='ctswitch' type='checkbox' checked><label class='btswitch-btn' for='ctswitch' onclick='setControl()'></label>")
@@ -136,8 +134,7 @@ function getStatus(){
 		$("#saveDay").val(rdata.day)
 	},'json');
 }
-
-getStatus()
+getStatus();
 
 //设置监控状态
 function setControl(act){

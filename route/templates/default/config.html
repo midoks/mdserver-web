@@ -22,27 +22,38 @@
 			<div class="setbox bgw mtb15">
 				<div class="title c6 plr15">
 					<h3 class="f16">设置</h3>
-					
 				</div>
 				<div class="info-title-tips" style="margin: 20px 30px 0px;">
-					<p><span class="glyphicon glyphicon-alert" style="color: #f39c12; margin-right: 10px;"></span>为了提高安全，请修改别名、默认端口、面板用户和密码!</p>
+					<p>
+						<span class="glyphicon glyphicon-alert" style="color: #f39c12; margin-right: 10px;">
+						</span>为了提高安全，请修改别名、默认端口、面板用户和密码!</p>
 				</div>
 				<div class="setting-con pd15">
-					<form id="set-Config">
+					<form id="set_config">
 						<p class="mtb15">
-							<span class="set-tit text-right" title="别名">别名</span>
+							<span class="set-tit text-right">别名</span>
 							<input id="webname" name="webname" class="inputtxt bt-input-text" type="text" value="MDWEB面板" ><span class="set-info c7">MDWEB面板</span>
 						</p>
 						<p class="mtb15">
-							<span class="set-tit text-right" title="面板端口">面板端口</span>
-							<input id="banport" name="port" class="inputtxt bt-input-text" type="numner" value="{{data['port']}}" maxlength="5"><span class="set-info c7">建议端口范围8888 - 65535</span>
+							<span class="set-tit text-right">面板端口</span>
+							<input id="banport" name="port" class="inputtxt bt-input-text" type="numner" value="{{data['port']}}" maxlength="5"><span class="set-info c7">建议端口范围7200 - 65535</span>
+						</p>
+
+						<p class="mtb15">
+							<span class="set-tit text-right">安全入口</span>
+							<input id="admin_path" name="admin_path" class="inputtxt bt-input-text disable" type="text" value="/"><span class="modify btn btn-xs btn-success" onclick="">修改</span>
+							<span class="set-info c7">面板管理入口,设置后只能通过指定安全入口登录面板,如: /abc</span>
 						</p>
 						<p class="mtb15">
-							<span class="set-tit text-right" title="域名">域名</span>
+							<span class="set-tit text-right">域名</span>
 							<input name="domain" class="inputtxt bt-input-text" type="text" value="">
 							<span class="set-info c7">为面板绑定一个访问域名;注意：一旦绑定域名,只能通过域名访问面板!</span>
 						</p>
-						<p class="mtb15"><span class="set-tit text-right" title="授权IP">授权IP</span><input name="limitip" class="inputtxt bt-input-text" type="text" value=""><span class="set-info c7">设置访问授权IP,多个请使用逗号(,)隔开;注意：一旦设置授权IP,只有指定IP的电脑能访问面板!</span></p>
+						<p class="mtb15">
+							<span class="set-tit text-right" title="授权IP">授权IP</span>
+							<input name="limitip" class="inputtxt bt-input-text" type="text" value="">
+							<span class="set-info c7">设置访问授权IP,多个请使用逗号(,)隔开;注意：一旦设置授权IP,只有指定IP的电脑能访问面板!</span>
+						</p>
 
 						<p class="mtb15">
 							<span class="set-tit text-right" title="默认建站目录">默认建站目录</span>
@@ -61,14 +72,14 @@
 							<input name="backup_path" class="inputtxt bt-input-text" type="text" value="{{data['ip']}}">
 							<span class="set-info c7">默认为外网IP,若您在本地虚拟机测试,请填写虚拟机内网IP!</span>
 						</p>
-						
+			
 						<p class="mtb15">
 							<span class="set-tit text-right" title="服务器时间">服务器时间</span>
 							<input id="systemdate" name="systemdate" class="inputtxt bt-input-text disable" type="text" value="{{data['systemdate']}}"><span class="modify btn btn-xs btn-success" onclick="syncDate()">同步</span>
 						</p>
 						<p class="mtb15">
 							<span class="set-tit text-right" title="面板用户">面板用户</span>
-							<input name="username_" class="inputtxt bt-input-text disable" type="text" value="" disabled><span class="modify btn btn-xs btn-success" onclick="setUserName()">修改</span>
+							<input name="username_" class="inputtxt bt-input-text disable" type="text" value="{{data['username']}}" disabled><span class="modify btn btn-xs btn-success" onclick="setUserName()">修改</span>
 						</p>
 						<p class="mtb15">
 							<span class="set-tit text-right" title="面板密码">面板密码</span>
@@ -81,126 +92,6 @@
 		</div>
 	</div>
 </div>
-<style>
-.boxConter{
-	height: 458px;
-	position: relative;
-	overflow:auto;
-}
-.iconCode{
-	padding: 50px 60px;
-}
-.box-conter{
-	width: 100%;
-}
-#QRcode{
-	margin-bottom: 25px;
-	text-align: center;
-}
-
-.iconCode #QRcode,
-.iconCode .codeTip{
-	width: 100%;
-	text-align: center;
-	font-size: 17px;
-}
-.iconCode .weChatSamll img{
-	width: 100%;
-}
-.iconCode .weChatSamll{
-	display: none;
-	width: 200px;
-	height: 200px;
-	position: absolute;
-	border: 1px solid #ececec;
-	border-radius: 5px;
-	bottom: 150px;
-	right: 50px;
-	padding: 20px;
-	background-color: #fff;
-}
-.iconCode .weChatSamll:after{
-	content: '';
-	width: 15px;
-	height: 15px;
-	background: #ffffff;
-	border-bottom: 1px solid #ececec;
-	border-right: 1px solid #ececec;
-	transform: rotate(45deg);
-	position: absolute;
-	border-radius: 4px;
-	left: 90px;
-	bottom: -8px;
-}
-
-.iconCode .weChat{
-	margin-left: 15px;
-}
-
-.iconCode .weChat:hover .weChatSamll{
-	display: block;
-}
-
-.iconCode .QRcode{
-	margin-bottom: 15px;
-	text-align: center;
-}
-
-.codeTip ul li{
-	margin-bottom: 10px;
-}
-
-.personalDetails .head_img{
-	width: 50px;
-	height: 50px;
-	float: left;
-	margin-right: 30px;
-}
-.personalDetails .head_img img{
-	height: 100%;
-	border-radius:50%;
-}
-.personalDetails .nick_name{
-	height: 50px;
-	line-height: 50px;
-	width: 148px;
-	float: left;
-	font-size: 15px;
-	color: #808080;
-}
-
-.personalDetails .userList{
-	height: 100%;
-}
-
-.personalDetails .userList .addweChat{
-	height: 50px;
-	text-align: center;
-	padding-top: 20px;
-	color: #20a53a;
-	font-size: 16px;
-}
-
-.personalDetails .userList .addweChat:hover{
-	
-}
-
-.personalDetails .userList .item{
-	height: 70px;
-	padding: 10px 15px;
-	border: 1px solid #ececec;
-	margin: 15px 65px;
-	border-radius: 5px;
-}
-
-.personalDetails .userList .cancelBind{
-	height: 50px;
-	width: 60px;
-	float: right;
-	line-height: 50px;
-	text-align: center;
-}
-</style>
 <script src="/static/app/config.js?v={{config.version}}"></script>
 <script type="text/javascript">
 </script>

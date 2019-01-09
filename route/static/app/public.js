@@ -87,8 +87,6 @@ function repeatPwd(a) {
 	$("#MyPassword").val(randomStrPwd(a))
 }
 
-
-
 function GetBakPost(b) {
 	$(".baktext").hide().prev().show();
 	var c = $(".baktext").attr("data-id");
@@ -679,119 +677,7 @@ $("#dologin").click(function() {
 	return false
 });
 
-function setPassword(a) {
-	if(a == 1) {
-		p1 = $("#p1").val();
-		p2 = $("#p2").val();
-		if(p1 == "" || p1.length < 8) {
-			layer.msg(lan.bt.pass_err_len, {
-				icon: 2
-			});
-			return
-		}
-		
-		//准备弱口令匹配元素
-		var checks = ['admin888','123123123','12345678','45678910','87654321','asdfghjkl','password','qwerqwer'];
-		pchecks = 'abcdefghijklmnopqrstuvwxyz1234567890';
-		for(var i=0;i<pchecks.length;i++){
-			checks.push(pchecks[i]+pchecks[i]+pchecks[i]+pchecks[i]+pchecks[i]+pchecks[i]+pchecks[i]+pchecks[i]);
-		}
-		
-		//检查弱口令
-		cps = p1.toLowerCase();
-		var isError = "";
-		for(var i=0;i<checks.length;i++){
-			if(cps == checks[i]){
-				isError += '['+checks[i]+'] ';
-			}
-		}
-		
-		if(isError != ""){
-			layer.msg(lan.bt.pass_err+isError,{icon:5});
-			return;
-		}
-		
-		
-		if(p1 != p2) {
-			layer.msg(lan.bt.pass_err_re, {
-				icon: 2
-			});
-			return
-		}
-		$.post("/config?action=setPassword", "password1=" + encodeURIComponent(p1) + "&password2=" + encodeURIComponent(p2), function(b) {
-			if(b.status) {
-				layer.closeAll();
-				layer.msg(b.msg, {
-					icon: 1
-				})
-			} else {
-				layer.msg(b.msg, {
-					icon: 2
-				})
-			}
-		});
-		return
-	}
-	layer.open({
-		type: 1,
-		area: "290px",
-		title: lan.bt.pass_title,
-		closeBtn: 2,
-		shift: 5,
-		shadeClose: false,
-		content: "<div class='bt-form pd20 pb70'><div class='line'><span class='tname'>"+lan.public.pass+"</span><div class='info-r'><input class='bt-input-text' type='text' name='password1' id='p1' value='' placeholder='"+lan.bt.pass_new_title+"' style='width:100%'/></div></div><div class='line'><span class='tname'>"+lan.bt.pass_re+"</span><div class='info-r'><input class='bt-input-text' type='text' name='password2' id='p2' value='' placeholder='"+lan.bt.pass_re_title+"' style='width:100%' /></div></div><div class='bt-form-submit-btn'><span style='float: left;' title='"+lan.bt.pass_rep+"' class='btn btn-default btn-sm' onclick='randPwd(10)'>"+lan.bt.pass_rep_btn+"</span><button type='button' class='btn btn-danger btn-sm' onclick=\"layer.closeAll()\">"+lan.public.close+"</button> <button type='button' class='btn btn-success btn-sm' onclick=\"setPassword(1)\">"+lan.public.edit+"</button></div></div>"
-	});
-}
 
-
-function randPwd(){
-	var pwd = RandomStrPwd(12);
-	$("#p1").val(pwd);
-	$("#p2").val(pwd);
-	layer.msg(lan.bt.pass_rep_ps,{time:2000})
-}
-
-function setUserName(a) {
-	if(a == 1) {
-		p1 = $("#p1").val();
-		p2 = $("#p2").val();
-		if(p1 == "" || p1.length < 3) {
-			layer.msg(lan.bt.user_len, {
-				icon: 2
-			});
-			return
-		}
-		if(p1 != p2) {
-			layer.msg(lan.bt.user_err_re, {
-				icon: 2
-			});
-			return
-		}
-		$.post("/config?action=setUsername", "username1=" + encodeURIComponent(p1) + "&username2=" + encodeURIComponent(p2), function(b) {
-			if(b.status) {
-				layer.closeAll();
-				layer.msg(b.msg, {
-					icon: 1
-				});
-				$("input[name='username_']").val(p1)
-			} else {
-				layer.msg(b.msg, {
-					icon: 2
-				})
-			}
-		});
-		return
-	}
-	layer.open({
-		type: 1,
-		area: "290px",
-		title: lan.bt.user_title,
-		closeBtn: 2,
-		shift: 5,
-		shadeClose: false,
-		content: "<div class='bt-form pd20 pb70'><div class='line'><span class='tname'>"+lan.bt.user+"</span><div class='info-r'><input class='bt-input-text' type='text' name='password1' id='p1' value='' placeholder='"+lan.bt.user_new+"' style='width:100%'/></div></div><div class='line'><span class='tname'>"+lan.bt.pass_re+"</span><div class='info-r'><input class='bt-input-text' type='text' name='password2' id='p2' value='' placeholder='"+lan.bt.pass_re_title+"' style='width:100%'/></div></div><div class='bt-form-submit-btn'><button type='button' class='btn btn-danger btn-sm' onclick=\"layer.closeAll()\">"+lan.public.close+"</button> <button type='button' class='btn btn-success btn-sm' onclick=\"setUserName(1)\">"+lan.public.edit+"</button></div></div>"
-	})
-}
 var openWindow = null;
 var downLoad = null;
 var speed = null;
@@ -877,208 +763,6 @@ function setSelectChecked(c, d) {
 	}
 }
 getTaskCount();
-function RecInstall() {
-	$.post("/ajax?action=GetSoftList", "", function(l){
-		var c = "";
-		var g = "";
-		var e = "";
-		for(var h = 0; h < l.length; h++) {
-			if(l[h].name == "Tomcat") {
-				continue
-			}
-			var o = "";
-			var m = "<input id='data_" + l[h].name + "' data-info='" + l[h].name + " " + l[h].versions[0].version + "' type='checkbox' checked>";
-			for(var b = 0; b < l[h].versions.length; b++) {
-				var d = "";
-				if((l[h].name == "PHP" && (l[h].versions[b].version == "5.4" || l[h].versions[b].version == "54")) || (l[h].name == "MySQL" && l[h].versions[b].version == "5.5") || (l[h].name == "phpMyAdmin" && l[h].versions[b].version == "4.4")) {
-					d = "selected";
-					m = "<input id='data_" + l[h].name + "' data-info='" + l[h].name + " " + l[h].versions[b].version + "' type='checkbox' checked>"
-				}
-				o += "<option value='" + l[h].versions[b].version + "' " + d + ">" + l[h].name + " " + l[h].versions[b].version + "</option>"
-			}
-			var f = "<li><span class='ico'><img src='/static/img/" + l[h].name.toLowerCase() + ".png'></span><span class='name'><select id='select_" + l[h].name + "' class='sl-s-info'>" + o + "</select></span><span class='pull-right'>" + m + "</span></li>";
-			if(l[h].name == "Nginx") {
-				c = f
-			} else {
-				if(l[h].name == "Apache") {
-					g = f
-				} else {
-					e += f
-				}
-			}
-		}
-		c += e;
-		g += e;
-		g = g.replace(new RegExp(/(data_)/g), "apache_").replace(new RegExp(/(select_)/g), "apache_select_");
-		var k = layer.open({
-			type: 1,
-			title: lan.bt.install_title,
-			area: ["658px", "423px"],
-			closeBtn: 2,
-			shadeClose: false,
-			content: "<div class='rec-install'><div class='important-title'><p><span class='glyphicon glyphicon-alert' style='color: #f39c12; margin-right: 10px;'></span>"+lan.bt.install_ps+" <a href='javascript:jump()' style='color:#20a53a'>"+lan.bt.install_s+"</a> "+lan.bt.install_s1+"</p></div><div class='rec-box'><h3>"+lan.bt.install_lnmp+"</h3><div class='rec-box-con'><ul class='rec-list'>" + c + "</ul><p class='fangshi'>"+lan.bt.install_type+"：<label data-title='"+lan.bt.install_rpm_title+"' style='margin-right:0'>"+lan.bt.install_rpm+"<input type='checkbox' checked></label><label data-title='"+lan.bt.install_src_title+"'>"+lan.bt.install_src+"<input type='checkbox'></label></p><div class='onekey'>"+lan.bt.install_key+"</div></div></div><div class='rec-box' style='margin-left:16px'><h3>LAMP</h3><div class='rec-box-con'><ul class='rec-list'>" + g + "</ul><p class='fangshi'>"+lan.bt.install_type+"：<label data-title='"+lan.bt.install_rpm_title+"' style='margin-right:0'>"+lan.bt.install_rpm+"<input type='checkbox' checked></label><label data-title='"+lan.bt.install_src_title+"'>"+lan.bt.install_src+"<input type='checkbox'></label></p><div class='onekey'>一键安装</div></div></div></div>"
-		});
-		$(".fangshi input").click(function() {
-			$(this).attr("checked", "checked").parent().siblings().find("input").removeAttr("checked")
-		});
-		$(".sl-s-info").change(function() {
-			var p = $(this).find("option:selected").text();
-			var n = $(this).attr("id");
-			p = p.toLowerCase();
-			$(this).parents("li").find("input").attr("data-info", p)
-		});
-		$("#apache_select_PHP").change(function() {
-			var n = $(this).val();
-			j(n, "apache_select_", "apache_")
-		});
-		$("#select_PHP").change(function() {
-			var n = $(this).val();
-			j(n, "select_", "data_")
-		});
-
-		function j(p, r, q) {
-			var n = "4.4";
-			switch(p) {
-				case "5.2":
-					n = "4.0";
-					break;
-				case "5.3":
-					n = "4.0";
-					break;
-				case "5.4":
-					n = "4.4";
-					break;
-				case "5.5":
-					n = "4.4";
-					break;
-				default:
-					n = "4.7"
-			}
-			$("#" + r + "phpMyAdmin option[value='" + n + "']").attr("selected", "selected").siblings().removeAttr("selected");
-			$("#" + r + "_phpMyAdmin").attr("data-info", "phpmyadmin " + n)
-		}
-		$("#select_MySQL,#apache_select_MySQL").change(function() {
-			var n = $(this).val();
-			a(n)
-		});
-		
-		$("#apache_select_Apache").change(function(){
-			var apacheVersion = $(this).val();
-			if(apacheVersion == '2.2'){
-				layer.msg(lan.bt.install_apache22);
-			}else{
-				layer.msg(lan.bt.install_apache24);
-			}
-		});
-		
-		$("#apache_select_PHP").change(function(){
-			var apacheVersion = $("#apache_select_Apache").val();
-			var phpVersion = $(this).val();
-			if(apacheVersion == '2.2'){
-				if(phpVersion != '5.2' && phpVersion != '5.3' && phpVersion != '5.4'){
-					layer.msg(lan.bt.insatll_s22+'PHP-' + phpVersion,{icon:5});
-					$(this).val("5.4");
-					$("#apache_PHP").attr('data-info','php 5.4');
-					return false;
-				}
-			}else{
-				if(phpVersion == '5.2'){
-					layer.msg(lan.bt.insatll_s24+'PHP-' + phpVersion,{icon:5});
-					$(this).val("5.4");
-					$("#apache_PHP").attr('data-info','php 5.4');
-					return false;
-				}
-			}
-		});
-
-		function a(n) {
-			memSize = getCookie("memSize");
-			max = 64;
-			msg = "64M";
-			switch(n) {
-				case "5.1":
-					max = 256;
-					msg = "256M";
-					break;
-				case "5.7":
-					max = 1500;
-					msg = "2GB";
-					break;
-				case "5.6":
-					max = 800;
-					msg = "1GB";
-					break;
-				case "AliSQL":
-					max = 800;
-					msg = "1GB";
-					break;
-				case "mariadb_10.0":
-					max = 800;
-					msg = "1GB";
-					break;
-				case "mariadb_10.1":
-					max = 1500;
-					msg = "2GB";
-					break
-			}
-			if(memSize < max) {
-				layer.msg( lan.bt.insatll_mem.replace("{1}",msg).replace("{2}",n), {
-					icon: 5
-				})
-			}
-		}
-		var de = null;
-		$(".onekey").click(function() {
-			if(de) return;
-			var v = $(this).prev().find("input").eq(0).prop("checked") ? "1" : "0";
-			var r = $(this).parents(".rec-box-con").find(".rec-list li").length;
-			var n = "";
-			var q = "";
-			var p = "";
-			var x = "";
-			var s = "";
-			de = true;
-			for(var t = 0; t < r; t++) {
-				var w = $(this).parents(".rec-box-con").find("ul li").eq(t);
-				var u = w.find("input");
-				if(u.prop("checked")) {
-					n += u.attr("data-info") + ","
-				}
-			}
-			q = n.split(",");
-			loadT = layer.msg(lan.bt.install_to, {
-				icon: 16,
-				time: 0,
-				shade: [0.3, "#000"]
-			});
-			for(var t = 0; t < q.length - 1; t++) {
-				p = q[t].split(" ")[0].toLowerCase();
-				x = q[t].split(" ")[1];
-				s = "name=" + p + "&version=" + x + "&type=" + v + "&id=" + (t + 1);
-				$.ajax({
-					url: "/files?action=InstallSoft",
-					data: s,
-					type: "POST",
-					async: false,
-					success: function(y) {}
-				});
-			}
-			layer.close(loadT);
-			layer.close(k);
-			setTimeout(function() {
-				getTaskCount()
-			}, 2000);
-			layer.msg(lan.bt.install_ok, {
-				icon: 1
-			});
-			setTimeout(function() {
-				task()
-			}, 1000)
-		});
-		InstallTips();
-		fly("onekey")
-	})
-}
 
 function jump() {
 	layer.closeAll();
@@ -1358,7 +1042,7 @@ function remind(a){
 }
 
 
-function GetReloads() {
+function getReloads() {
 	var a = 0;
 	var mm = $(".bt-w-menu .bgw").html()
 	if(mm == undefined || mm.indexOf(lan.bt.task_list) == -1) {
@@ -1477,8 +1161,6 @@ function check_login(){
 	});
 }
 
-
-
 //登陆跳转
 function to_login(){
 	layer.confirm('您的登陆状态已过期，请重新登陆!',{title:'会话已过期',icon:2,closeBtn: 1,shift: 5},function(){
@@ -1501,7 +1183,6 @@ $(function(){
 		check_login();
 	},60000);
 });
-
 
 function asyncLoadImage(obj, url){
 	
