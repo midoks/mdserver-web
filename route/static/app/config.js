@@ -15,14 +15,6 @@ $(".set-submit").click(function(){
 	});
 });
 
-//设置自动更新
-function setPanelAutoUpload(){
-	loadT = layer.msg(lan.public.config,{icon:16,time:0});
-	$.post('/config?action=AutoUpdatePanel', '', function(rdata){
-		layer.close(loadT);
-		layer.msg(rdata.msg,{icon:rdata.status?1:2});
-	});
-}
 
 function setPassword(a) {
 	if(a == 1) {
