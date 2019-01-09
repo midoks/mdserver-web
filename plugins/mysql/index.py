@@ -7,6 +7,9 @@ import time
 import subprocess
 import re
 
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
 sys.path.append(os.getcwd() + "/class/core")
 import public
 
@@ -365,6 +368,16 @@ def isSqlError(mysqlMsg):
     return None
 
 
+def mapToList(map_obj):
+    # map to list
+    try:
+        if type(map_obj) != list and type(map_obj) != str:
+            map_obj = list(map_obj)
+        return map_obj
+    except:
+        return []
+
+
 def getDbList():
     args = getArgs()
     page = 1
@@ -471,6 +484,46 @@ def setRootPwd():
         return public.returnJson(True, '数据库root密码修改成功!')
     except Exception as ex:
         return public.returnJson(False, '修改错误:' + str(ex))
+
+
+def setUserPwd():
+    args = getArgs()
+    data = checkArgs(args, ['password', 'name'])
+    if not data[0]:
+        return data[1]
+
+    newpassword = args['password']
+    username = args['name']
+    id = args['id']
+    try:
+        pdb = pMysqlDb()
+        psdb = pSqliteDb('databases')
+        name = psdb.where('id=?', (id,)).getField('name')
+
+        m_version = public.readFile(getServerDir() + '/version.pl')
+        if m_version.find('5.7') == 0 or m_version.find('8.0') == 0:
+            tmp = pdb.query(
+                "select Host from mysql.user where User='" + name + "' AND Host!='localhost'")
+            accept = mapToList(tmp)
+            pdb.execute(
+                "update mysql.user set authentication_string='' where User='" + username + "'")
+            result = pdb.execute(
+                "ALTER USER `%s`@`localhost` IDENTIFIED BY '%s'" % (username, newpassword))
+            for my_host in accept:
+                pdb.execute("ALTER USER `%s`@`%s` IDENTIFIED BY '%s'" % (
+                    username, my_host[0], newpassword))
+        else:
+            result = pdb.execute("update mysql.user set Password=password('" +
+                                 newpassword + "') where User='" + username + "'")
+        isError = isSqlError(result)
+        if isError != None:
+            return isError
+        pdb.execute("flush privileges")
+        psdb.where("id=?", (id,)).setField('password', newpassword)
+        return public.returnJson(True, public.getInfo('修改数据库[{1}]密码成功!', (name)))
+    except Exception as ex:
+        print str(ex)
+        return public.returnJson(False, public.getInfo('修改数据库[{1}]密码失败!', (name)))
 
 
 def __createUser(dbname, username, password, address):
@@ -586,6 +639,30 @@ def delDb():
     except Exception as ex:
         return public.returnJson(False, '删除失败!' + str(ex))
 
+
+def getDbAccess():
+    args = getArgs()
+    data = checkArgs(args, ['username'])
+    if not data[0]:
+        return data[1]
+    username = args['username']
+    pdb = pMysqlDb()
+
+    users = pdb.query("select Host from mysql.user where User='" +
+                      username + "' AND Host!='localhost'")
+    isError = isSqlError(users)
+    if isError != None:
+        return isError
+
+    users = mapToList(users)
+    if len(users) < 1:
+        return public.returnJson(True, "127.0.0.1")
+    accs = []
+    for c in users:
+        accs.append(c[0])
+    userStr = ','.join(accs)
+    return public.returnJson(True, userStr)
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -630,5 +707,9 @@ if __name__ == "__main__":
         print syncGetDatabases()
     elif func == 'set_root_pwd':
         print setRootPwd()
+    elif func == 'set_user_pwd':
+        print setUserPwd()
+    elif func == 'get_db_access':
+        print getDbAccess()
     else:
         print 'error'

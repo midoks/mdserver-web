@@ -109,12 +109,19 @@ def status():
 
 def start():
     file_tpl = getPluginDir() + '/conf/phpmyadmin.conf'
-    file_conf = getConf()
+    file_run = getConf()
 
-    if not os.path.exists(file_conf):
+    if not os.path.exists(file_run):
         centent = public.readFile(file_tpl)
         centent = contentReplace(centent)
-        public.writeFile(file_conf, centent)
+        public.writeFile(file_run, centent)
+
+    conf_run = getServerDir() + '/phpmyadmin/config.inc.php'
+    if not os.path.exists(conf_run):
+        conf_tpl = getPluginDir() + '/conf/config.inc.php'
+        centent = public.readFile(conf_tpl)
+        # centent = contentReplace(centent)
+        print public.writeFile(conf_run, centent)
 
     public.restartWeb()
     return 'ok'
