@@ -60,7 +60,7 @@ def getArgs():
 def checkArgs(data, ck=[]):
     for i in range(len(ck)):
         if not ck[i] in data:
-            return (False, public.returnJson(False, ck[i] + 'missing!'))
+            return (False, public.returnJson(False, '参数:(' + ck[i] + ')没有!'))
     return (True, public.returnJson(True, 'ok'))
 
 
@@ -456,6 +456,13 @@ def syncGetDatabases():
     return public.returnJson(True, msg)
 
 
+def toDbBase():
+
+
+def syncToDatabases():
+    return public.returnJson(False, 'f')
+
+
 def setRootPwd():
     args = getArgs()
     if not 'password' in args:
@@ -663,6 +670,28 @@ def getDbAccess():
     userStr = ','.join(accs)
     return public.returnJson(True, userStr)
 
+
+def setDbAccess():
+    args = getArgs()
+    data = checkArgs(args, ['username', 'access'])
+    if not data[0]:
+        return data[1]
+    name = args['username']
+    access = args['access']
+    pdb = pMysqlDb()
+    psdb = pSqliteDb('databases')
+
+    dbname = psdb.where('username=?', (name,)).getField('name')
+    password = psdb.where("username=?", (name,)).getField('password')
+    users = pdb.query("select Host from mysql.user where User='" +
+                      name + "' AND Host!='localhost'")
+    for us in users:
+        pdb.execute("drop user '" + name + "'@'" + us[0] + "'")
+
+    __createUser(dbname, name, password, access)
+
+    return public.returnJson(True, '设置成功!')
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -705,11 +734,15 @@ if __name__ == "__main__":
         print delDb()
     elif func == 'sync_get_databases':
         print syncGetDatabases()
+    elif func == 'sync_to_databases':
+        print syncToDatabases()
     elif func == 'set_root_pwd':
         print setRootPwd()
     elif func == 'set_user_pwd':
         print setUserPwd()
     elif func == 'get_db_access':
         print getDbAccess()
+    elif func == 'set_db_access':
+        print setDbAccess()
     else:
         print 'error'
