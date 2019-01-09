@@ -6,6 +6,7 @@ import os
 import time
 import subprocess
 import re
+import json
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -492,7 +493,7 @@ def toDbBase(find):
 
 def syncToDatabases():
     args = getArgs()
-    data = checkArgs(args, ['type'])
+    data = checkArgs(args, ['type', 'ids'])
     if not data[0]:
         return data[1]
 
@@ -505,15 +506,22 @@ def syncToDatabases():
     stype = int(args['type'])
     psdb = pSqliteDb('databases')
     n = 0
-    data = psdb.field('id,name,username,password,accept').select()
+
     if stype == 0:
+        data = psdb.field('id,name,username,password,accept').select()
         for value in data:
             result = toDbBase(value)
             if result == 1:
                 n += 1
     else:
-        pass
-
+        data = json.loads(args['ids'])
+        for value in data:
+            find = psdb.where("id=?", (value,)).field(
+                'id,name,username,password,accept').find()
+            # print find
+            result = toDbBase(find)
+            if result == 1:
+                n += 1
     msg = public.getInfo('本次共同步了{1}个数据库!', (str(n),))
     return public.returnJson(True, msg)
 

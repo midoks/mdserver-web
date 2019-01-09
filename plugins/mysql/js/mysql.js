@@ -31,6 +31,18 @@ function myPost(method,args,callback){
     },'json'); 
 }
 
+function myAsyncPost(method,args){
+    var _args = null; 
+    if (typeof(args) == 'string'){
+        _args = JSON.stringify(str2Obj(args));
+    } else {
+        _args = JSON.stringify(args);
+    }
+
+    var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
+    return syncPost('/plugins/run', {name:'mysql', func:method, args:_args}); 
+}
+
 function runInfo(){
     myPost('run_info','',function(data){
 
@@ -113,9 +125,6 @@ function closeMySqlLog() {
         mysqlLog();
     });
 }
-
-
-
 
 
 //数据库存储信置
@@ -422,13 +431,14 @@ function syncGetDatabase(){
 }
 
 function syncToDatabase(type){
-
-    var data = 'type='+type; 
-
-    myPost('sync_to_databases', data, function(data){
-        console.log(data);
+    var data = [];
+    $('input[type="checkbox"].check:checked').each(function () {
+        if (!isNaN($(this).val())) data.push($(this).val());
+    });
+    var postData = 'type='+type+'&ids='+JSON.stringify(data); 
+    myPost('sync_to_databases', postData, function(data){
         var rdata = $.parseJSON(data.data);
-        console.log(rdata);
+        // console.log(rdata);
         showMsg(rdata.msg,function(){
             dbList();
         },{ icon: rdata.status ? 1 : 2 });
@@ -499,6 +509,32 @@ function copyPass(password){
     });
     $("#bt_copys").attr('data-clipboard-text',password);
     $("#bt_copys").click();
+}
+
+function readerTableChecked(){
+    $('table').find('th').find('input').bind('click',function(){
+        $('table').find('td').find('input').each(function(i,obj){
+            checked = $(this).prop('checked');
+            $(this).prop('checked',!checked);
+        });
+    });    
+}
+
+function checkSelect(){
+    setTimeout(function () {
+        var num = $('input[type="checkbox"].check:checked').length;
+        // console.log(num);
+        if (num == 1) {
+            $('button[batch="true"]').hide();
+            $('button[batch="false"]').show();
+        }else if (num>1){
+            $('button[batch="true"]').show();
+            $('button[batch="false"]').show();
+        }else{
+            $('button[batch="true"]').hide();
+            $('button[batch="false"]').hide();
+        }
+    },5)
 }
 
 function setDbAccess(username){
@@ -726,6 +762,34 @@ function delDb(id, name){
     });
 }
 
+function delDbBatch(){
+    var arr = [];
+    $('input[type="checkbox"].check:checked').each(function () {
+        var _val = $(this).val();
+        var _name = $(this).parent().next().text();
+        if (!isNaN(_val)) {
+            arr.push({'id':_val,'name':_name});
+        }
+    });
+
+    safeMessage('批量删除数据库','<a style="color:red;">您共选择了[2]个数据库,删除后将无法恢复,真的要删除吗?</a>',function(){
+        var i = 0;
+        $(arr).each(function(){
+            var data  = myAsyncPost('del_db', this);
+            var rdata = $.parseJSON(data.data);
+            if (!rdata.status){
+                layer.msg(rdata.msg,{icon:2,time:2000,shade: [0.3, '#000']});
+            }
+            i++;
+        });
+        
+        var msg = '成功删除['+i+']个数据库!';
+        showMsg(msg,function(){
+            dbList();
+        },{icon: 1}, 600);
+    });
+}
+
 function openPhpmyadmin(name,username,password){
 
     data = syncPost('/plugins/check',{'name':'phpmyadmin'});
@@ -783,7 +847,7 @@ function dbList(page, search){
         var list = '';
         for(i in rdata.data){
             list += '<tr>';
-            list +='<td><input value="1" class="check" onclick="bt.check_select();" type="checkbox"></td>';
+            list +='<td><input value="'+rdata.data[i]['id']+'" class="check" onclick="checkSelect();" type="checkbox"></td>';
             list += '<td>' + rdata.data[i]['name'] +'</td>';
             list += '<td>' + rdata.data[i]['username'] +'</td>';
             list += '<td>' + 
@@ -803,18 +867,18 @@ function dbList(page, search){
             list += '</tr>';
         }
 
+        //<button onclick="" id="dataRecycle" title="删除选中项" class="btn btn-default btn-sm" style="margin-left: 5px;"><span class="glyphicon glyphicon-trash" style="margin-right: 5px;"></span>回收站</button>
         var con = '<div class="safe bgw">\
             <button onclick="addDatabase()" title="添加数据库" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">添加数据库</button>\
             <button onclick="setRootPwd(0,\''+rdata.info['root_pwd']+'\')" title="设置MySQL管理员密码" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">root密码</button>\
             <button onclick="openPhpmyadmin(\'\',\'root\',\''+rdata.info['root_pwd']+'\')" title="打开phpMyadmin" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">phpMyAdmin</button>\
             <span style="float:right">              \
-                <button batch="true" style="float: right;display: none;margin-left:10px;" onclick="database.batch_database(\'del\');" title="删除选中项" class="btn btn-default btn-sm">删除选中</button>\
-                <button onclick="bt.recycle_bin.open_recycle_bin(6)" id="dataRecycle" title="删除选中项" class="btn btn-default btn-sm" style="margin-left: 5px;"><span class="glyphicon glyphicon-trash" style="margin-right: 5px;"></span>回收站</button>\
+                <button batch="true" style="float: right;display: none;margin-left:10px;" onclick="delDbBatch();" title="删除选中项" class="btn btn-default btn-sm">删除选中</button>\
             </span>\
             <div class="divtable mtb10">\
                 <div class="tablescroll">\
                     <table id="DataBody" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
-                    <thead><tr><th width="30"><input class="check" onclick="bt.check_select();" type="checkbox"></th>\
+                    <thead><tr><th width="30"><input class="check" onclick="checkSelect();" type="checkbox"></th>\
                     <th>数据库名</th>\
                     <th>用户名</th>\
                     <th>密码</th>\
@@ -843,6 +907,7 @@ function dbList(page, search){
 
         $(".soft-man-con").html(con);
         $('#databasePage').html(rdata.page);
+
+        readerTableChecked();
     });
 }
-
