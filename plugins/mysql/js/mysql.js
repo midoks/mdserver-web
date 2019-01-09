@@ -421,6 +421,17 @@ function syncGetDatabase(){
     });
 }
 
+function syncToDatabase(type){
+    myPost('sync_to_databases', null, function(data){
+        console.log(data);
+        var rdata = $.parseJSON(data.data);
+        console.log(rdata);
+        showMsg(rdata.msg,function(){
+            dbList();
+        },{ icon: rdata.status ? 1 : 2 });
+    });
+}
+
 function setRootPwd(type, pwd){
     if (type==1){
         var data = $("#mod_pwd").serialize();
@@ -477,11 +488,11 @@ function showHidePass(obj){
 function copyPass(password){
     var clipboard = new ClipboardJS('#bt_copys');
     clipboard.on('success', function (e) {
-        bt.msg({msg:'复制成功',icon:1});
+        layer.msg({msg:'复制成功',icon:1});
     });
 
     clipboard.on('error', function (e) {
-        bt.msg({msg:'复制失败，浏览器不兼容!',icon:2});
+        layer.msg({msg:'复制失败，浏览器不兼容!',icon:2});
     });
     $("#bt_copys").attr('data-clipboard-text',password);
     $("#bt_copys").click();
@@ -489,9 +500,90 @@ function copyPass(password){
 
 function setDbAccess(username){
     myPost('get_db_access','username='+username, function(data){
-        console.log(data);
-    });
+        var rdata = $.parseJSON(data.data);
+        if (!rdata.status){
+            layer.msg(rdata.msg,{icon:2,shade: [0.3, '#000']});
+            return;
+        }
+        
+        var index = layer.open({
+            type: 1,
+            area: '500px',
+            title: '设置数据库权限',
+            closeBtn: 1,
+            shift: 5,
+            shadeClose: true,
+            content: "<form class='bt-form pd20 pb70' id='set_db_access'>\
+                        <div class='line'>\
+                            <span class='tname'>访问权限</span>\
+                            <div class='info-r '>\
+                                <select class='bt-input-text mr5' name='dataAccess' style='width:100px'>\
+                                <option value='127.0.0.1'>本地服务器</option>\
+                                <option value=\"%\">所有人</option>\
+                                <option value='ip'>指定IP</option>\
+                                </select>\
+                            </div>\
+                        </div>\
+                        <div class='bt-form-submit-btn'>\
+                            <button id='my_mod_close' type='button' class='btn btn-danger btn-sm btn-title'>关闭</button>\
+                            <button id='my_mod_save' type='button' class='btn btn-success btn-sm btn-title'>提交</button>\
+                        </div>\
+                      </form>",
+        });
 
+        layer.ready(function(){
+            if (rdata.msg == '127.0.0.1'){
+                $('select[name="dataAccess"]').find("option[value='127.0.0.1']").attr("selected",true);
+            } else if (rdata.msg == '%'){
+                $('select[name="dataAccess"]').find('option[value="%"]').attr("selected",true);
+            } else if ( rdata.msg == 'ip' ){
+                $('select[name="dataAccess"]').find('option[value="ip"]').attr("selected",true);
+                $('select[name="dataAccess"]').after("<input id='dataAccess_subid' class='bt-input-text mr5' type='text' name='address' placeholder='多个IP使用逗号(,)分隔' style='width: 230px; display: inline-block;'>");
+            } else {
+                $('select[name="dataAccess"]').find('option[value="ip"]').attr("selected",true);
+                $('select[name="dataAccess"]').after("<input value='"+rdata.msg+"' id='dataAccess_subid' class='bt-input-text mr5' type='text' name='address' placeholder='多个IP使用逗号(,)分隔' style='width: 230px; display: inline-block;'>");
+            }
+        });
+
+        $('#my_mod_close').click(function(){
+            $('.layui-layer-close1').click();
+        });
+
+
+        $('select[name="dataAccess"]').change(function(){
+            var v = $(this).val();
+            if (v == 'ip'){
+                $(this).after("<input id='dataAccess_subid' class='bt-input-text mr5' type='text' name='address' placeholder='多个IP使用逗号(,)分隔' style='width: 230px; display: inline-block;'>");
+            } else {
+                $('#dataAccess_subid').remove();
+            }
+        });
+
+        $('#my_mod_save').click(function(){
+            var data = $("#set_db_access").serialize();
+            data = decodeURIComponent(data);
+            var dataObj = str2Obj(data);
+            if(!dataObj['access']){
+                dataObj['access'] = dataObj['dataAccess'];
+                if ( dataObj['dataAccess'] == 'ip'){
+                    if (dataObj['address']==''){
+                        layer.msg('IP地址不能空!',{icon:2,shade: [0.3, '#000']});
+                        return;
+                    }
+                    dataObj['access'] = dataObj['address'];
+                }
+            }
+            dataObj['username'] = username;
+            // console.log(data,dataObj);
+            myPost('set_db_access', dataObj, function(data){
+                var rdata = $.parseJSON(data.data);
+                showMsg(rdata.msg,function(){
+                    dbList();
+                    $('.layui-layer-close1').click();
+                },{icon: rdata.status ? 1 : 2});   
+            });
+        });
+    });
 }
 
 function setDbPass(id, username, password){
@@ -626,7 +718,7 @@ function delDb(id, name){
             showMsg(rdata.msg,function(){
                 dbList();
                 $('.layui-layer-close1').click();
-            },{icon: rdata.status ? 1 : 2},1000);
+            },{icon: rdata.status ? 1 : 2}, 600);
         });
     });
 }
@@ -731,8 +823,8 @@ function dbList(page, search){
                 </div>\
                  <div id="databasePage" class="dataTables_paginate paging_bootstrap page"></div>\
                 <div class="table_toolbar">\
-                    <span class="sync btn btn-default btn-sm" style="margin-right:5px" onclick="database.sync_to_database(1)" title="将选中数据库信息同步到服务器">同步选中</span>\
-                    <span class="sync btn btn-default btn-sm" style="margin-right:5px" onclick="database.sync_to_database(0)" title="将所有数据库信息同步到服务器">同步所有</span>\
+                    <span class="sync btn btn-default btn-sm" style="margin-right:5px" onclick="syncToDatabase(1)" title="将选中数据库信息同步到服务器">同步选中</span>\
+                    <span class="sync btn btn-default btn-sm" style="margin-right:5px" onclick="syncToDatabase(0)" title="将所有数据库信息同步到服务器">同步所有</span>\
                     <span class="sync btn btn-default btn-sm" onclick="syncGetDatabase()" title="从服务器获取数据库列表">从服务器获取</span>\
                 </div>\
             </div>\
