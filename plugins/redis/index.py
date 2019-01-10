@@ -37,7 +37,7 @@ def getConf():
 
 
 def getInitDTpl():
-    path = getPluginDir() + "/init.d/redis.tpl"
+    path = getPluginDir() + "/init.d/" + getPluginName() + ".tpl"
     return path
 
 
