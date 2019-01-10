@@ -83,7 +83,7 @@ def load_res_blacklist(black_list_path):
 
 
 def is_ip_allowed(ip):
-    return geoip.country_code_by_addr(ip) not in ('CN', 'TW', 'HK')
+    return geoip.country_code_by_addr(ip) not in ('CN')
 
 
 def entropy(length):
