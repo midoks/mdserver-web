@@ -1,70 +1,40 @@
 #!/bin/sh
 # chkconfig: 2345 55 25
-# description: Redis Service
+# description: DHTSpider Service
 
 ### BEGIN INIT INFO
-# Provides:          Redis
+# Provides:          DHTSpider
 # Required-Start:    $all
 # Required-Stop:     $all
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: starts Redis
+# Short-Description: starts DHTSpider
 # Description:       starts the MDW-Web
 ### END INIT INFO
 
-# Simple Redis init.d script conceived to work on Linux systems
-# as it does use of the /proc filesystem.
 
-CONF="{$SERVER_PATH}/redis/redis.conf"
-REDISPORT=$(cat $CONF |grep port|grep -v '#'|awk '{print $2}')
-REDISPASS=$(cat $CONF |grep requirepass|grep -v '#'|awk '{print $2}')
-if [ "$REDISPASS" != "" ];then
-	REDISPASS=" -a $REDISPASS"
-fi
-EXEC={$SERVER_PATH}/redis/bin/redis-server
-CLIEXEC="{$SERVER_PATH}/redis/bin/redis-cli -p $REDISPORT$REDISPASS"
-PIDFILE={$SERVER_PATH}/redis/redis_6379.pid
-
-mkdir -p {$SERVER_PATH}/redis/data
-
-redis_start(){
-	if [ -f $PIDFILE ]
-	then
-			echo "$PIDFILE exists, process is already running or crashed"
-	else
-			echo "Starting Redis server..."
-			nohup $EXEC $CONF >> {$SERVER_PATH}/redis/logs.pl 2>&1 &
-	fi
+dht_start(){
+	cd {$SERVER_PATH}/simdht/workers
+	nohup python simdht_worker.py >> {$SERVER_PATH}/simdht/logs.pl 2>&1 &
 }
-redis_stop(){
-	if [ ! -f $PIDFILE ]
-	then
-			echo "$PIDFILE does not exist, process is not running"
-	else
-			PID=$(cat $PIDFILE)
-			echo "Stopping ..."
-			$CLIEXEC shutdown
-			while [ -x /proc/${PID} ]
-			do
-				echo "Waiting for Redis to shutdown ..."
-				sleep 1
-			done
-			echo "Redis stopped"
-	fi
+dht_stop(){
+	echo "Stopping ..."
+	ps -ef | grep "python simdht" | grep -v grep | awk '{print $2}' | xargs kill
+	echo "Redis stopped"
 }
 
 
 case "$1" in
     start)
-		redis_start
+		dht_start
         ;;
     stop)
-        redis_stop
+        dht_stop
         ;;
 	restart|reload)
-		redis_stop
+		dht_stop
 		sleep 0.3
-		redis_start
+		dht_start
 		;;
     *)
         echo "Please use start or stop as first argument"

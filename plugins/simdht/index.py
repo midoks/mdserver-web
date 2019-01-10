@@ -51,6 +51,21 @@ def getInitDTpl():
     return path
 
 
+def getSqlFile():
+    file = getPluginDir() + "/conf/simdht.sql"
+    return file
+
+
+def getDbConf():
+    file = getServerDir() + "/workers/db.cfg"
+    return file
+
+
+def getRunLog():
+    file = getServerDir() + "/logs.pl"
+    return file
+
+
 def initDreplace():
 
     ddir = getServerDir() + '/workers'
@@ -76,11 +91,16 @@ def initDreplace():
 
 
 def status():
-    return 'stop'
+    data = public.execShell(
+        "ps -ef|grep \"python simdht_worker.py\" | grep -v grep | awk '{print $2}'")
+    if data[0] == '':
+        return 'stop'
+    return 'start'
 
 
 def start():
     file = initDreplace()
+
     data = public.execShell(file + ' start')
     if data[1] == '':
         return 'ok'
@@ -123,5 +143,11 @@ if __name__ == "__main__":
         print restart()
     elif func == 'reload':
         print reload()
+    elif func == 'get_sql':
+        print getSqlFile()
+    elif func == 'get_db_conf':
+        print getDbConf()
+    elif func == 'get_run_Log':
+        print getRunLog()
     else:
         print 'error'
