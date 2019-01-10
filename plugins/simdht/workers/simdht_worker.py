@@ -25,6 +25,7 @@ from threading import Timer, Thread
 from time import sleep
 from collections import deque
 from Queue import Queue
+from configparser import ConfigParser
 
 import pygeoip
 import MySQLdb as mdb
@@ -41,11 +42,16 @@ import simMetadata
 from bencode import bencode, bdecode
 from metadata import save_metadata
 
-DB_HOST = '127.0.0.1'
-DB_USER = 'root'
-DB_PORT = 3306
-DB_PASS = 'root'
-DB_NAME = 'ssbc'
+
+from configparser import ConfigParser
+cp = ConfigParser()
+cp.read("db.cfg")
+section = cp.sections()[0]
+DB_HOST = cp.get(section, "DB_HOST")
+DB_USER = cp.get(section, "DB_USER")
+DB_PORT = cp.getint(section, "DB_PORT")
+DB_PASS = cp.get(section, "DB_PASS")
+DB_NAME = cp.get(section, "DB_NAME")
 BLACK_FILE = 'black_list.txt'
 
 BOOTSTRAP_NODES = (

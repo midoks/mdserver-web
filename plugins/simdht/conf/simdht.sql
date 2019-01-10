@@ -1,0 +1,52 @@
+CREATE TABLE `search_hash` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `info_hash` varchar(40) NOT NULL,
+  `category` varchar(20) NOT NULL,
+  `data_hash` varchar(32) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `extension` varchar(20) NOT NULL,
+  `classified` tinyint(1) NOT NULL,
+  `source_ip` varchar(20) DEFAULT NULL,
+  `tagged` tinyint(1) NOT NULL,
+  `length` bigint(20) NOT NULL,
+  `create_time` datetime NOT NULL,
+  `last_seen` datetime NOT NULL,
+  `requests` int(10) unsigned NOT NULL,
+  `comment` varchar(255) DEFAULT NULL,
+  `creator` varchar(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `info_hash` (`info_hash`),
+  KEY `search_hash_tagged_50480647a28d03e1_uniq` (`tagged`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+CREATE TABLE `search_filelist` (
+  `info_hash` varchar(40) NOT NULL,
+  `file_list` longtext NOT NULL,
+  PRIMARY KEY (`info_hash`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+CREATE TABLE `search_extra` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `hash_id` int(11) NOT NULL,
+  `update_time` datetime NOT NULL,
+  `status` varchar(20) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `hash_id` (`hash_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+CREATE TABLE `search_statusreport` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `date` date NOT NULL,
+  `new_hashes` int(11) NOT NULL,
+  `total_requests` int(11) NOT NULL,
+  `valid_requests` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `search_statusreport_date_625dc87b8a52c947_uniq` (`date`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+CREATE TABLE `search_reckeywords` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `keyword` varchar(20) NOT NULL,
+  `order` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
