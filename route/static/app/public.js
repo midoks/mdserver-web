@@ -1453,7 +1453,7 @@ function pluginLogs(_name, version, func, line){
 
         var loadT2 = layer.msg('文件内容获取中...',{icon:16,time:0,shade: [0.3, '#000']});
         var fileName = data.data;
-        $.post('/files/get_last_body', 'path=' + fileName+'&line'+file_line, function(rdata) {
+        $.post('/files/get_last_body', 'path=' + fileName+'&line='+file_line, function(rdata) {
             layer.close(loadT2);
             if (!rdata.status){
                 layer.msg(rdata.msg,{icon:0,time:2000,shade: [0.3, '#000']});
