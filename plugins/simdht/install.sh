@@ -11,6 +11,8 @@ serverPath=$(dirname "$rootPath")
 
 install_tmp=${rootPath}/tmp/bt_install.pl
 
+pip install pygeoip
+pip install pytz
 
 Install_dht()
 {

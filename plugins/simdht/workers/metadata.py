@@ -9,9 +9,16 @@ import datetime
 import time
 import json
 
+
 import metautils
 from bencode import bencode, bdecode
 geoip = pygeoip.GeoIP('GeoIP.dat')
+
+# setting time
+import pytz
+pytz.timezone('Asia/Shanghai')
+# print datetime.datetime.utcnow()
+
 
 def decode(encoding, s):
     if type(s) is list:
@@ -25,10 +32,12 @@ def decode(encoding, s):
             pass
     return s.decode(encoding, 'ignore')
 
+
 def decode_utf8(encoding, d, i):
-    if i+'.utf-8' in d:
-        return d[i+'.utf-8'].decode('utf8')
+    if i + '.utf-8' in d:
+        return d[i + '.utf-8'].decode('utf8')
     return decode(encoding, d[i])
+
 
 def parse_metadata(data):
     info = {}
@@ -40,9 +49,10 @@ def parse_metadata(data):
     except:
         return None
     try:
-        info['create_time'] = datetime.datetime.fromtimestamp(float(torrent['creation date']))
+        info['create_time'] = datetime.datetime.fromtimestamp(
+            float(torrent['creation date']))
     except:
-        info['create_time'] = datetime.datetime.utcnow()
+        info['create_time'] = datetime.datetime.now()
 
     if torrent.get('encoding'):
         encoding = torrent['encoding']
@@ -58,7 +68,7 @@ def parse_metadata(data):
         info['creator'] = decode_utf8(encoding, torrent, 'created by')[:15]
 
     if 'info' in torrent:
-        detail = torrent['info'] 
+        detail = torrent['info']
     else:
         detail = torrent
     info['name'] = decode_utf8(encoding, detail, 'name')
@@ -66,9 +76,11 @@ def parse_metadata(data):
         info['files'] = []
         for x in detail['files']:
             if 'path.utf-8' in x:
-                v = {'path': decode(encoding, '/'.join(x['path.utf-8'])), 'length': x['length']}
+                v = {'path': decode(
+                    encoding, '/'.join(x['path.utf-8'])), 'length': x['length']}
             else:
-                v = {'path': decode(encoding, '/'.join(x['path'])), 'length': x['length']}
+                v = {'path': decode(
+                    encoding, '/'.join(x['path'])), 'length': x['length']}
             if 'filehash' in x:
                 v['filehash'] = x['filehash'].encode('hex')
             info['files'].append(v)
@@ -82,7 +94,7 @@ def parse_metadata(data):
 
 
 def save_metadata(dbcurr, binhash, address, start_time, data, blacklist):
-    utcnow = datetime.datetime.utcnow()
+    utcnow = datetime.datetime.now()
     name = threading.currentThread().getName()
     try:
         info = parse_metadata(data)
@@ -109,34 +121,35 @@ def save_metadata(dbcurr, binhash, address, start_time, data, blacklist):
             files = info['files']
     else:
         files = [{'path': info['name'], 'length': info['length']}]
-    files.sort(key=lambda z:z['length'], reverse=True)
+    files.sort(key=lambda z: z['length'], reverse=True)
     bigfname = files[0]['path']
     info['extension'] = metautils.get_extension(bigfname).lower()
     info['category'] = metautils.get_category(info['extension'])
 
     if 'files' in info:
         try:
-            dbcurr.execute('INSERT INTO search_filelist VALUES(%s, %s)', (info['info_hash'], json.dumps(info['files'])))
+            dbcurr.execute('INSERT INTO search_filelist VALUES(%s, %s)', (info[
+                           'info_hash'], json.dumps(info['files'])))
         except:
             print name, 'insert error', sys.exc_info()[1]
         del info['files']
 
     try:
         try:
-            print '\n', 'Saved', info['info_hash'], info['name'], (time.time()-start_time), 's', address[0], geoip.country_name_by_addr(address[0]),
+            print '\n', 'Saved', info['info_hash'], info['name'], (time.time() - start_time), 's', address[0], geoip.country_name_by_addr(address[0]),
         except:
             print '\n', 'Saved', info['info_hash'], sys.exc_info()[1]
         try:
-            ret = dbcurr.execute('INSERT INTO search_hash(info_hash,category,data_hash,name,extension,classified,source_ip,tagged,' + 
-            'length,create_time,last_seen,requests,comment,creator) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)',
-            (info['info_hash'], info['category'], info['data_hash'], info['name'], info['extension'], info['classified'],
-            info['source_ip'], info['tagged'], info['length'], info['create_time'], info['last_seen'], info['requests'],
-            info.get('comment',''), info.get('creator','')))
+            ret = dbcurr.execute('INSERT INTO search_hash(info_hash,category,data_hash,name,extension,classified,source_ip,tagged,' +
+                                 'length,create_time,last_seen,requests,comment,creator) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)',
+                                 (info['info_hash'], info['category'], info['data_hash'], info['name'], info['extension'], info['classified'],
+                                  info['source_ip'], info['tagged'], info['length'], info[
+                                      'create_time'], info['last_seen'], info['requests'],
+                                  info.get('comment', ''), info.get('creator', '')))
         except:
-            print 'insert search_hash err: ',info['info_hash']
+            print 'insert search_hash err: ', info['info_hash']
         dbcurr.connection.commit()
     except:
         print name, 'save error', info
         traceback.print_exc()
         return
-
