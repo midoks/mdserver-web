@@ -199,7 +199,7 @@ def getMinData(conn, smin):
 
     pre = time.strftime("%Y-%m-%d %H:%M:%S",
                         time.localtime(time.time() - smin - time_diff))
-    sql = "select count(*) from search_hash where create_time > '" + pre + "'"
+    sql = "select count(id) from search_hash where create_time > '" + pre + "'"
     data = conn.query(sql)
     return data[0][0]
 
