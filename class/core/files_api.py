@@ -26,13 +26,14 @@ class files_api:
 
     def getLastBodyApi(self):
         path = request.form.get('path', '').encode('utf-8')
-        line = request.form.get('line', 100)
+        line = request.form.get('line', '100')
 
         if not os.path.exists(path):
             return public.returnJson(False, '文件不存在', (path,))
 
         try:
-            data = public.getLastLine(path, line)
+            data = public.getNumLines(path, int(line))
+            print data
             return public.returnJson(True, 'OK', data)
         except Exception as ex:
             return public.returnJson(False, u'无法正确读取文件!' + str(ex))

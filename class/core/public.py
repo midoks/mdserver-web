@@ -387,6 +387,60 @@ def getLastLine(inputfile, lineNum):
         return getMsg('TASK_SLEEP')
 
 
+def getNumLines(path, num, p=1):
+    pyVersion = sys.version_info[0]
+    try:
+        import cgi
+        if not os.path.exists(path):
+            return ""
+        start_line = (p - 1) * num
+        count = start_line + num
+        fp = open(path, 'rb')
+        buf = ""
+        fp.seek(-1, 2)
+        if fp.read(1) == "\n":
+            fp.seek(-1, 2)
+        data = []
+        b = True
+        n = 0
+        for i in range(count):
+            while True:
+                newline_pos = str.rfind(str(buf), "\n")
+                pos = fp.tell()
+                if newline_pos != -1:
+                    if n >= start_line:
+                        line = buf[newline_pos + 1:]
+                        try:
+                            data.insert(0, cgi.escape(line))
+                        except:
+                            pass
+                    buf = buf[:newline_pos]
+                    n += 1
+                    break
+                else:
+                    if pos == 0:
+                        b = False
+                        break
+                    to_read = min(4096, pos)
+                    fp.seek(-to_read, 1)
+                    t_buf = fp.read(to_read)
+                    if pyVersion == 3:
+                        if type(t_buf) == bytes:
+                            t_buf = t_buf.decode('utf-8')
+                    buf = t_buf + buf
+                    fp.seek(-to_read, 1)
+                    if pos - to_read == 0:
+                        buf = "\n" + buf
+            if not b:
+                break
+        fp.close()
+    except Exception as e:
+        print str(e)
+        return ''
+
+    return "\n".join(data)
+
+
 def downloadFile(url, filename):
     import urllib
     urllib.urlretrieve(url, filename=filename, reporthook=downloadHook)
@@ -599,54 +653,6 @@ def checkInput(data):
     for v in checkList:
         data = data.replace(v['d'], v['r'])
     return data
-
-
-def getNumLines(path, num, p=1):
-    # 取文件指定尾行数
-    try:
-        import cgi
-        if not os.path.exists(path):
-            return ""
-        start_line = (p - 1) * num
-        count = start_line + num
-        fp = open(path)
-        buf = ""
-        fp.seek(-1, 2)
-        if fp.read(1) == "\n":
-            fp.seek(-1, 2)
-        data = []
-        b = True
-        n = 0
-        for i in range(count):
-            while True:
-                newline_pos = string.rfind(buf, "\n")
-                pos = fp.tell()
-                if newline_pos != -1:
-                    if n >= start_line:
-                        line = buf[newline_pos + 1:]
-                        try:
-                            data.insert(0, cgi.escape(line))
-                        except:
-                            pass
-                    buf = buf[:newline_pos]
-                    n += 1
-                    break
-                else:
-                    if pos == 0:
-                        b = False
-                        break
-                    to_read = min(4096, pos)
-                    fp.seek(-to_read, 1)
-                    buf = fp.read(to_read) + buf
-                    fp.seek(-to_read, 1)
-                    if pos - to_read == 0:
-                        buf = "\n" + buf
-            if not b:
-                break
-        fp.close()
-    except:
-        data = []
-    return "\n".join(data)
 
 
 def checkCert(certPath='ssl/certificate.pem'):
