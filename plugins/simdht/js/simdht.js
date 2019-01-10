@@ -49,8 +49,9 @@ function dhtTrendData(callback){
 function dhtTrendRender() {
     var myChartNetwork = echarts.init(document.getElementById('dht_trend'));
     var xData = [];
-    var yData = [];
-    var zData = [];
+    var oneData = [];
+    var twoData = [];
+    var threeData = [];
 
     function getTime() {
         var now = new Date();
@@ -78,39 +79,40 @@ function dhtTrendRender() {
     }
 
     function addData(data) {
-        console.log(data);
+        // console.log(data);
+        var rdata = $.parseJSON(data.data);
         xData.push(getTime());
-        yData.push(data[0]);
-        zData.push(data[1]);
-        // if (shift) {
-        //     xData.shift();
-        //     yData.shift();
-        //     zData.shift();
-        // }
+        oneData.push(rdata[0]);
+        twoData.push(rdata[1]);
+        threeData.push(rdata[2]);
+
+        xData.shift();
+        oneData.shift();
+        twoData.shift();
+        threeData.shift();
     }
     for (var i = 8; i >= 0; i--) {
         var time = (new Date()).getTime();
-        xData.push(format(time - (i * 3 * 1000)));
-        yData.push(0);
-        zData.push(0);
+        xData.push(format(time - (i * 5 * 1000)));
+        oneData.push(0);
+        twoData.push(0);
+        threeData.push(0);
     }
     // 指定图表的配置项和数据
     var option = {
         title: {
-            text: lan.index.interface_net,
+            text: '接口流量实时',
             left: 'center',
             textStyle: {
-                color: '#888888',
-                fontStyle: 'normal',
-                fontFamily: lan.index.net_font,
-                fontSize: 16,
+                color: '#888888',fontStyle: 'normal',
+                fontFamily: '宋体',fontSize: 16,
             }
         },
         tooltip: {
             trigger: 'axis'
         },
         legend: {
-            data: [lan.index.net_up, lan.index.net_down],
+            data: ['5s', '10s', '15s'],
             bottom: '2%'
         },
         xAxis: {
@@ -124,7 +126,7 @@ function dhtTrendRender() {
             }
         },
         yAxis: {
-            name: lan.index.unit + 'KB/s',
+            name: '单位个数',
             splitLine: {
                 lineStyle: {
                     color: "#eee"
@@ -137,38 +139,30 @@ function dhtTrendRender() {
             }
         },
         series: [{
-            name: lan.index.net_up,
+            name: '5s',
             type: 'line',
-            data: yData,
+            data: oneData,
             smooth: true,
             showSymbol: false,
             symbol: 'circle',
             symbolSize: 6,
             areaStyle: {
                 normal: {
-                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-                        offset: 0,
-                        color: 'rgba(255, 140, 0,0.5)'
-                    }, {
-                        offset: 1,
-                        color: 'rgba(255, 140, 0,0.8)'
-                    }], false)
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, 
+                        [{offset: 0,color: 'rgba(205, 51, 51,0.5)'}, 
+                        {offset: 1,color: 'rgba(205, 51, 51,0.8)'}], false)
                 }
             },
             itemStyle: {
-                normal: {
-                    color: '#f7b851'
-                }
+                normal: {color: '#cd3333'}
             },
             lineStyle: {
-                normal: {
-                    width: 1
-                }
+                normal: {width: 1}
             }
         }, {
-            name: lan.index.net_down,
+            name: '10s',
             type: 'line',
-            data: zData,
+            data: twoData,
             smooth: true,
             showSymbol: false,
             symbol: 'circle',
@@ -185,9 +179,34 @@ function dhtTrendRender() {
                 }
             },
             itemStyle: {
+                normal: {color: '#52a9ff'}
+            },
+            lineStyle: {
                 normal: {
-                    color: '#52a9ff'
+                    width: 1
                 }
+            }
+        },{
+            name: '15s',
+            type: 'line',
+            data: threeData,
+            smooth: true,
+            showSymbol: false,
+            symbol: 'circle',
+            symbolSize: 6,
+            areaStyle: {
+                normal: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                        offset: 0,
+                        color: 'rgba(30, 144, 255,0.5)'
+                    }, {
+                        offset: 1,
+                        color: 'rgba(30, 144, 255,0.8)'
+                    }], false)
+                }
+            },
+            itemStyle: {
+                normal: {color: '#C6E2FF'}
             },
             lineStyle: {
                 normal: {
@@ -196,23 +215,32 @@ function dhtTrendRender() {
             }
         }]
     };
-    setInterval(function() {
+    
+
+    // 使用刚指定的配置项和数据显示图表。
+    myChartNetwork.setOption(option);
+    window.addEventListener("resize", function() {
+        myChartNetwork.resize();
+    });
+
+    function render(){
         dhtTrendData(function(data){
             addData(data);
         });
         myChartNetwork.setOption({
             xAxis: {data: xData},
             series: [
-                {name: '5s',data: yData}, 
-                {name: '10s',data: zData}
+                {name: '5s',data: oneData}, 
+                {name: '10s',data: twoData},
+                {name: '15s',data: threeData}
             ]
         });
+    }
+    render();
+
+    setInterval(function() {
+        render();
     }, 5000);
-    // 使用刚指定的配置项和数据显示图表。
-    myChartNetwork.setOption(option);
-    window.addEventListener("resize", function() {
-        myChartNetwork.resize();
-    });
 }
 
 

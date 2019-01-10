@@ -15,7 +15,7 @@
 
 dht_start(){
 	cd {$SERVER_PATH}/simdht/workers
-	nohup python simdht_worker.py >> {$SERVER_PATH}/simdht/logs.pl 2>&1 &
+	nohup python simdht_worker.py > {$SERVER_PATH}/simdht/logs.pl 2>&1 &
 }
 dht_stop(){
 	echo "Stopping ..."

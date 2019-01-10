@@ -11,6 +11,11 @@ sys.path.append(os.getcwd() + "/class/core")
 import public
 
 
+app_debug = False
+if public.isAppleSystem():
+    app_debug = True
+
+
 def getPluginName():
     return 'simdht'
 
@@ -187,30 +192,37 @@ def isSqlError(mysqlMsg):
     return None
 
 
-def getMinData(conn, min):
+def getMinData(conn, smin):
+    time_diff = 0
+    if public.isAppleSystem():
+        time_diff = 3 * 60
+
     pre = time.strftime("%Y-%m-%d %H:%M:%S",
-                        time.localtime(time.time() - min))
+                        time.localtime(time.time() - smin - time_diff))
     sql = "select count(*) from search_hash where create_time > '" + pre + "'"
     data = conn.query(sql)
     return data[0][0]
 
 
 def getTrendData():
-    import time
-    args = getArgs()
-    data = checkArgs(args, ['interval'])
-    if not data[0]:
-        return data[1]
-    pdb = pMysqlDb()
-    interval = int(args['interval'])
-    result = pdb.execute("show tables")
-    isError = isSqlError(result)
-    if isError:
-        return isError
-    one = getMinData(pdb, interval)
-    two = getMinData(pdb, interval * 2)
-    three = getMinData(pdb, interval * 3)
-    return public.getJson([one, two, three])
+    try:
+        args = getArgs()
+        data = checkArgs(args, ['interval'])
+        if not data[0]:
+            return data[1]
+        pdb = pMysqlDb()
+        interval = int(args['interval'])
+        result = pdb.execute("show tables")
+        isError = isSqlError(result)
+        if isError:
+            return isError
+        one = getMinData(pdb, interval)
+        two = getMinData(pdb, interval * 2)
+        three = getMinData(pdb, interval * 3)
+        return public.getJson([one, two, three])
+    except Exception as e:
+        return public.getJson([0, 0, 0])
+
 
 if __name__ == "__main__":
     func = sys.argv[1]
