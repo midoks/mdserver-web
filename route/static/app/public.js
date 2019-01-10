@@ -1431,7 +1431,7 @@ function pluginOpInitD(a, b) {
     })
 }
 
-function pluginLogs(_name, version, func){
+function pluginLogs(_name, version, func, line){
     if ( typeof(version) == 'undefined' ){
         version = '';
     }
@@ -1441,24 +1441,33 @@ function pluginLogs(_name, version, func){
         func_name = func;
     }
 
+    var file_line = 100;
+    if ( typeof(line) != 'undefined' ){
+        file_line = line;
+    }
 
-    var loadT = layer.msg('错误日志路径获取中...',{icon:16,time:0,shade: [0.3, '#000']});
+
+    var loadT = layer.msg('日志路径获取中...',{icon:16,time:0,shade: [0.3, '#000']});
     $.post('/plugins/run', {name:_name, func:func_name, version:version},function (data) {
         layer.close(loadT);
 
         var loadT2 = layer.msg('文件内容获取中...',{icon:16,time:0,shade: [0.3, '#000']});
         var fileName = data.data;
-        $.post('/files/get_body', 'path=' + fileName, function(rdata) {
+        $.post('/files/get_last_body', 'path=' + fileName+'&line'+file_line, function(rdata) {
             layer.close(loadT2);
             if (!rdata.status){
                 layer.msg(rdata.msg,{icon:0,time:2000,shade: [0.3, '#000']});
                 return;
             }
             
-            if(rdata.data.data == '') rdata.data.data = '当前没有日志!';
-            var ebody = '<div class="soft-man-con"><textarea readonly="" style="margin: 0px;width: 500px;height: 520px;background-color: #333;color:#fff; padding:0 5px" id="error_log">'+rdata.data.data+'</textarea></div>';
+            if(rdata.data == '') {
+            	rdata.data = '当前没有日志!';
+            }
+            var ebody = '<div class="soft-man-con">\
+            	<textarea readonly="" style="margin: 0px;width: 500px;height: 520px;background-color: #333;color:#fff; padding:0 5px" id="info_log">'+rdata.data+'</textarea>\
+            	</div>';
             $(".soft-man-con").html(ebody);
-            var ob = document.getElementById('error_log');
+            var ob = document.getElementById('info_log');
             ob.scrollTop = ob.scrollHeight; 
         },'json');
     },'json');

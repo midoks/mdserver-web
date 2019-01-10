@@ -24,6 +24,19 @@ class files_api:
         path = request.form.get('path', '').encode('utf-8')
         return self.getBody(path)
 
+    def getLastBodyApi(self):
+        path = request.form.get('path', '').encode('utf-8')
+        line = request.form.get('line', 100)
+
+        if not os.path.exists(path):
+            return public.returnJson(False, '文件不存在', (path,))
+
+        try:
+            data = public.getLastLine(path, line)
+            return public.returnJson(True, 'OK', data)
+        except Exception as ex:
+            return public.returnJson(False, u'无法正确读取文件!' + str(ex))
+
     def saveBodyApi(self):
         path = request.form.get('path', '').encode('utf-8')
         data = request.form.get('data', '').encode('utf-8')
@@ -70,7 +83,7 @@ class files_api:
         page = request.args.get('p', '1').strip().lower()
         row = request.args.get('showRow', '10')
         return self.getDir(path, int(page), int(row), search)
-    ##### ----- start ----- ###
+    ##### ----- end ----- ###
 
     def setFileAccept(self, filename):
         auth = 'www:www'
