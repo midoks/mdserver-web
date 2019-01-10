@@ -69,6 +69,7 @@ TOKEN_LENGTH = 2
 section_queue = cp.sections()[1]
 MAX_QUEUE_LT = cp.getint(section_db, "MAX_QUEUE_LT")
 MAX_QUEUE_PT = cp.getint(section_db, "MAX_QUEUE_PT")
+MAX_NODE_QSIZE = cp.getint(section_db, "MAX_NODE_QSIZE")
 
 geoip = pygeoip.GeoIP('GeoIP.dat')
 
@@ -421,6 +422,6 @@ if __name__ == "__main__":
     rpcthread.setDaemon(True)
     rpcthread.start()
 
-    dht = DHTServer(master, "0.0.0.0", 6881, max_node_qsize=200)
+    dht = DHTServer(master, "0.0.0.0", 6881, max_node_qsize=MAX_NODE_QSIZE)
     dht.start()
     dht.auto_send_find_node()

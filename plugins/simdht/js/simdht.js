@@ -32,6 +32,14 @@ function dhtPost(method, args, callback){
 
 
 function dhtTrend(){
+
+    var obj = $('#dht_trend');
+
+    if (obj.length>0){
+        console.log('已经加载图表...');
+        return;
+    }
+
     var trend = '<div id="dht_trend" style="width:100%;height:330px;"></div>';
     $('.soft-man-con').html(trend);
     dhtTrendRender();
