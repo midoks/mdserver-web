@@ -49,12 +49,12 @@ from metadata import save_metadata
 from configparser import ConfigParser
 cp = ConfigParser()
 cp.read("db.cfg")
-section = cp.sections()[0]
-DB_HOST = cp.get(section, "DB_HOST")
-DB_USER = cp.get(section, "DB_USER")
-DB_PORT = cp.getint(section, "DB_PORT")
-DB_PASS = cp.get(section, "DB_PASS")
-DB_NAME = cp.get(section, "DB_NAME")
+section_db = cp.sections()[0]
+DB_HOST = cp.get(section_db, "DB_HOST")
+DB_USER = cp.get(section_db, "DB_USER")
+DB_PORT = cp.getint(section_db, "DB_PORT")
+DB_PASS = cp.get(section_db, "DB_PASS")
+DB_NAME = cp.get(section_db, "DB_NAME")
 BLACK_FILE = 'black_list.txt'
 
 BOOTSTRAP_NODES = (
@@ -66,8 +66,9 @@ TID_LENGTH = 2
 RE_JOIN_DHT_INTERVAL = 3
 TOKEN_LENGTH = 2
 
-MAX_QUEUE_LT = 30
-MAX_QUEUE_PT = 200
+section_queue = cp.sections()[1]
+MAX_QUEUE_LT = cp.getint(section_db, "MAX_QUEUE_LT")
+MAX_QUEUE_PT = cp.getint(section_db, "MAX_QUEUE_PT")
 
 geoip = pygeoip.GeoIP('GeoIP.dat')
 
