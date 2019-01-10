@@ -18,6 +18,9 @@ def getPluginName():
 def getPluginDir():
     return public.getPluginDir() + '/' + getPluginName()
 
+sys.path.append(getPluginDir() + "/class")
+import mysql
+
 
 def getServerDir():
     return public.getServerDir() + '/' + getPluginName()
@@ -44,6 +47,13 @@ def getArgs():
             tmp[t[0]] = t[1]
 
     return tmp
+
+
+def checkArgs(data, ck=[]):
+    for i in range(len(ck)):
+        if not ck[i] in data:
+            return (False, public.returnJson(False, '参数:(' + ck[i] + ')没有!'))
+    return (True, public.returnJson(True, 'ok'))
 
 
 def getInitDTpl():
@@ -131,6 +141,77 @@ def reload():
     return 'fail'
 
 
+def matchData(reg, content):
+    tmp = re.search(reg, content).groups()
+    return tmp[0]
+
+
+def getDbConfInfo():
+    cfg = getDbConf()
+    content = public.readFile(cfg)
+    data = {}
+    data['DB_HOST'] = matchData("DB_HOST\s*=\s(.*)", content)
+    data['DB_USER'] = matchData("DB_USER\s*=\s(.*)", content)
+    data['DB_PORT'] = matchData("DB_PORT\s*=\s(.*)", content)
+    data['DB_PASS'] = matchData("DB_PASS\s*=\s(.*)", content)
+    data['DB_NAME'] = matchData("DB_NAME\s*=\s(.*)", content)
+    return data
+
+
+def pMysqlDb():
+    data = getDbConfInfo()
+    conn = mysql.mysql()
+    conn.setHost(data['DB_HOST'])
+    conn.setUser(data['DB_USER'])
+    conn.setPwd(data['DB_PASS'])
+    conn.setPort(int(data['DB_PORT']))
+    conn.setDb(data['DB_NAME'])
+    return conn
+
+
+def isSqlError(mysqlMsg):
+    # 检测数据库执行错误
+    mysqlMsg = str(mysqlMsg)
+    if "MySQLdb" in mysqlMsg:
+        return public.returnJson(False, 'MySQLdb组件缺失! <br>进入SSH命令行输入： pip install mysql-python')
+    if "2002," in mysqlMsg:
+        return public.returnJson(False, '数据库连接失败,请检查数据库服务是否启动!')
+    if "using password:" in mysqlMsg:
+        return public.returnJson(False, '数据库管理密码错误!')
+    if "Connection refused" in mysqlMsg:
+        return public.returnJson(False, '数据库连接失败,请检查数据库服务是否启动!')
+    if "1133" in mysqlMsg:
+        return public.returnJson(False, '数据库用户不存在!')
+    if "1007" in mysqlMsg:
+        return public.returnJson(False, '数据库已经存在!')
+    return None
+
+
+def getMinData(conn, min):
+    pre = time.strftime("%Y-%m-%d %H:%M:%S",
+                        time.localtime(time.time() - min))
+    sql = "select count(*) from search_hash where create_time > '" + pre + "'"
+    data = conn.query(sql)
+    return data[0][0]
+
+
+def getTrendData():
+    import time
+    args = getArgs()
+    data = checkArgs(args, ['interval'])
+    if not data[0]:
+        return data[1]
+    pdb = pMysqlDb()
+    interval = int(args['interval'])
+    result = pdb.execute("show tables")
+    isError = isSqlError(result)
+    if isError:
+        return isError
+    one = getMinData(pdb, interval)
+    two = getMinData(pdb, interval * 2)
+    three = getMinData(pdb, interval * 3)
+    return public.getJson([one, two, three])
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -149,5 +230,7 @@ if __name__ == "__main__":
         print getDbConf()
     elif func == 'get_run_Log':
         print getRunLog()
+    elif func == 'get_trend_data':
+        print getTrendData()
     else:
         print 'error'
