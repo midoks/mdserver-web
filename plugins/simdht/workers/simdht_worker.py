@@ -30,7 +30,6 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 sys.path.append('/usr/local/lib/python2.7/site-packages')
-from configparser import ConfigParser
 
 import pygeoip
 import MySQLdb as mdb
@@ -69,9 +68,9 @@ RE_JOIN_DHT_INTERVAL = 3
 TOKEN_LENGTH = 2
 
 section_queue = cp.sections()[1]
-MAX_QUEUE_LT = cp.getint(section_db, "MAX_QUEUE_LT")
-MAX_QUEUE_PT = cp.getint(section_db, "MAX_QUEUE_PT")
-MAX_NODE_QSIZE = cp.getint(section_db, "MAX_NODE_QSIZE")
+MAX_QUEUE_LT = cp.getint(section_queue, "MAX_QUEUE_LT")
+MAX_QUEUE_PT = cp.getint(section_queue, "MAX_QUEUE_PT")
+MAX_NODE_QSIZE = cp.getint(section_queue, "MAX_NODE_QSIZE")
 
 geoip = pygeoip.GeoIP('GeoIP.dat')
 
