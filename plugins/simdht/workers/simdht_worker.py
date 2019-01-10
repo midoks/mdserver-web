@@ -25,10 +25,12 @@ from threading import Timer, Thread
 from time import sleep
 from collections import deque
 from Queue import Queue
-from configparser import ConfigParser
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
+
+sys.path.append('/usr/local/lib/python2.7/site-packages')
+from configparser import ConfigParser
 
 import pygeoip
 import MySQLdb as mdb
