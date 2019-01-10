@@ -32,9 +32,7 @@ function dhtPost(method, args, callback){
 
 
 function dhtTrend(){
-
     var obj = $('#dht_trend');
-
     if (obj.length>0){
         console.log('已经加载图表...');
         return;
@@ -246,9 +244,20 @@ function dhtTrendRender() {
     }
     render();
 
-    setInterval(function() {
+    renderTick = setInterval(function() {
         render();
     }, 5000);
+
+    checkTick = setInterval(function() {
+        var obj = $('#dht_trend');
+        if (obj.length>0){
+            return;
+        } else {
+            console.log('取消定时请求...');
+            clearInterval(renderTick);
+            clearInterval(checkTick);
+        }
+    }, 300);
 }
 
 
