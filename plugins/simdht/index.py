@@ -86,7 +86,7 @@ def initDreplace():
     ddir = getServerDir() + '/workers'
     if not os.path.exists(ddir):
         sdir = getPluginDir() + '/workers'
-        print public.execShell('cp -rf ' + sdir + ' ' + getServerDir())
+        public.execShell('cp -rf ' + sdir + ' ' + getServerDir())
 
     file_tpl = getInitDTpl()
     service_path = os.path.dirname(os.getcwd())
