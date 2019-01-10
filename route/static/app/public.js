@@ -1149,7 +1149,7 @@ function tasklist(a){
 		
 		$(".task_count").text(task_count);
 		$(".cmdlist").html(b + c);
-		GetReloads();
+		getReloads();
 		return f
 	},'json')
 }
