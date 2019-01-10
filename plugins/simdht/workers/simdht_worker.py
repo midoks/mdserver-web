@@ -27,6 +27,9 @@ from collections import deque
 from Queue import Queue
 from configparser import ConfigParser
 
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
 import pygeoip
 import MySQLdb as mdb
 try:
