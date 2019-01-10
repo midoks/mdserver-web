@@ -16,7 +16,8 @@ CREATE TABLE `search_hash` (
   `creator` varchar(20) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `info_hash` (`info_hash`),
-  KEY `search_hash_tagged_50480647a28d03e1_uniq` (`tagged`)
+  KEY `search_hash_uniq` (`tagged`),
+  KEY `create_time` (`create_time`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 CREATE TABLE `search_filelist` (
@@ -25,14 +26,6 @@ CREATE TABLE `search_filelist` (
   PRIMARY KEY (`info_hash`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-CREATE TABLE `search_extra` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `hash_id` int(11) NOT NULL,
-  `update_time` datetime NOT NULL,
-  `status` varchar(20) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `hash_id` (`hash_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 CREATE TABLE `search_statusreport` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -42,11 +35,4 @@ CREATE TABLE `search_statusreport` (
   `valid_requests` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `search_statusreport_date_625dc87b8a52c947_uniq` (`date`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-CREATE TABLE `search_reckeywords` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `keyword` varchar(20) NOT NULL,
-  `order` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
