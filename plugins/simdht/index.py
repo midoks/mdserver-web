@@ -147,6 +147,39 @@ def reload():
     return 'fail'
 
 
+def initdStatus():
+    if not app_debug:
+        if public.isAppleSystem():
+            return "Apple Computer does not support"
+
+    initd_bin = getInitDFile()
+    if os.path.exists(initd_bin):
+        return 'ok'
+    return 'fail'
+
+
+def initdInstall():
+    import shutil
+    if not app_debug:
+        if public.isAppleSystem():
+            return "Apple Computer does not support"
+
+    mysql_bin = initDreplace()
+    initd_bin = getInitDFile()
+    shutil.copyfile(mysql_bin, initd_bin)
+    public.execShell('chmod +x ' + initd_bin)
+    return 'ok'
+
+
+def initdUinstall():
+    if not app_debug:
+        if public.isAppleSystem():
+            return "Apple Computer does not support"
+    initd_bin = getInitDFile()
+    os.remove(initd_bin)
+    return 'ok'
+
+
 def matchData(reg, content):
     tmp = re.search(reg, content).groups()
     return tmp[0]
@@ -237,6 +270,12 @@ if __name__ == "__main__":
         print restart()
     elif func == 'reload':
         print reload()
+    elif func == 'initd_status':
+        print initdStatus()
+    elif func == 'initd_install':
+        print initdInstall()
+    elif func == 'initd_uninstall':
+        print initdUinstall()
     elif func == 'get_sql':
         print getSqlFile()
     elif func == 'get_db_conf':
