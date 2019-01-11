@@ -435,7 +435,6 @@ def getNumLines(path, num, p=1):
                 break
         fp.close()
     except Exception as e:
-        print str(e)
         return ''
 
     return "\n".join(data)

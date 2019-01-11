@@ -182,8 +182,25 @@ def binLog():
         os.system('rm -f ' + path + '/mysql-bin.*')
 
     public.writeFile(conf, con)
-
     return public.returnJson(True, '设置成功!')
+
+
+def getErrorLog():
+    args = getArgs()
+    path = getDataDir()
+    filename = ''
+    for n in os.listdir(path):
+        if len(n) < 5:
+            continue
+        if n == 'error.log':
+            filename = path + '/' + n
+            break
+    if not os.path.exists(filename):
+        return public.returnJson(False, '指定文件不存在!')
+    if args.has_key('close'):
+        public.writeFile(filename, '')
+        return public.returnJson(True, '日志已清空')
+    return public.getNumLines(filename, 1000)
 
 
 def getShowLogFile():
@@ -811,6 +828,8 @@ if __name__ == "__main__":
         print getConf()
     elif func == 'bin_log':
         print binLog()
+    elif func == 'error_log':
+        print getErrorLog()
     elif func == 'show_log':
         print getShowLogFile()
     elif func == 'my_port':
