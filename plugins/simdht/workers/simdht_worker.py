@@ -58,6 +58,7 @@ DB_PASS = cp.get(section_db, "DB_PASS")
 DB_NAME = cp.get(section_db, "DB_NAME")
 DB_SIZE_LIMIT = cp.get(section_db, "DB_SIZE_LIMIT")
 DB_SIZE_TICK = cp.getint(section_db, "DB_SIZE_TICK")
+DB_DEL_LINE = cp.getint(section_db, "DB_DEL_LINE")
 BLACK_FILE = 'black_list.txt'
 
 BOOTSTRAP_NODES = (
@@ -457,7 +458,7 @@ class DBCheck(Master):
         db_size = data[0][0]
 
         if db_size > db_size_limit:
-            self.delete_db()
+            self.delete_db(DB_DEL_LINE)
 
         # print 'db size limit:', int(DB_SIZE_LIMIT) * 1024, db_size
         # self.delete_db()
