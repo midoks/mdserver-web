@@ -49,7 +49,7 @@ from metadata import save_metadata
 
 from configparser import ConfigParser
 cp = ConfigParser()
-cp.read("db.cfg")
+cp.read("../db.cfg")
 section_db = cp.sections()[0]
 DB_HOST = cp.get(section_db, "DB_HOST")
 DB_USER = cp.get(section_db, "DB_USER")
