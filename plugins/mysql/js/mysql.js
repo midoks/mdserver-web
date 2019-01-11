@@ -969,8 +969,30 @@ function myLogs(){
             
                 setTimeout(function(){
                     myLogs();
-                }, 3000);
+                }, 2000);
             });
+        });
+
+         //清空日志
+        $(".btn-clear").click(function () {
+            myPost('error_log', 'close=1', function(data){
+                var rdata = $.parseJSON(data.data);
+                layer.msg(rdata.msg, { icon: rdata.status ? 1 : 5 });
+            
+                setTimeout(function(){
+                    myLogs();
+                }, 2000);
+            });
+        })
+
+        myPost('error_log', 'p=1', function(data){
+            var error_body = data.data;
+            if (error_body == "") {
+                error_body = '当前没有日志内容!';
+            }
+            $("#error_log").text(error_body);
+            var ob = document.getElementById('error_log');
+            ob.scrollTop = ob.scrollHeight;
         });
     });
 }
