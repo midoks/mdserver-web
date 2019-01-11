@@ -453,15 +453,16 @@ class DBCheck(Master):
         sql = "select (concat(round(sum(DATA_LENGTH/1024/1024),2),'M') + concat(round(sum(INDEX_LENGTH/1024/1024),2),'M') ) \
             as sdata from information_schema.tables where TABLE_SCHEMA='" + DB_NAME + "' and TABLE_NAME in('search_hash','search_filelist', 'search_statusreport')"
 
-        db_size_limit = int(DB_SIZE_LIMIT) * 1024
+        db_size_limit = float(DB_SIZE_LIMIT) * 1024
+        print db_size_limit
         data = self.query(sql)
         db_size = data[0][0]
 
         if db_size > db_size_limit:
             self.delete_db(DB_DEL_LINE)
 
-        # print 'db size limit:', int(DB_SIZE_LIMIT) * 1024, db_size
-        # self.delete_db()
+        print 'db size limit:', int(DB_SIZE_LIMIT) * 1024, db_size
+        # self.delete_db(DB_DEL_LINE)
 
     def run(self):
         while True:
