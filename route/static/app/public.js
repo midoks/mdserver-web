@@ -1464,7 +1464,7 @@ function pluginLogs(_name, version, func, line){
             	rdata.data = '当前没有日志!';
             }
             var ebody = '<div class="soft-man-con">\
-            	<textarea readonly="" style="margin: 0px;width: 500px;height: 520px;background-color: #333;color:#fff; padding:0 5px" id="info_log">'+rdata.data+'</textarea>\
+            	<textarea readonly="" style="margin: 0px;width: 100%;height: 520px;background-color: #333;color:#fff; padding:0 5px" id="info_log">'+rdata.data+'</textarea>\
             	</div>';
             $(".soft-man-con").html(ebody);
             var ob = document.getElementById('info_log');

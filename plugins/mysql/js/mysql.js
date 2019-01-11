@@ -946,3 +946,31 @@ function dbList(page, search){
         readerTableChecked();
     });
 }
+
+
+function myLogs(){
+    
+    myPost('bin_log', {status:1}, function(data){
+        var rdata = $.parseJSON(data.data);
+
+        var limitCon = '<p class="conf_p">\
+                        <span class="f14 c6 mr20">'+ lan.soft.mysql_log_bin + ' </span><span class="f14 c6 mr20">' + toSize(rdata.msg) + '</span>\
+                        <button class="btn btn-success btn-xs btn-bin va0">'+ (rdata.status ? lan.soft.off : lan.soft.on) + '</button>\
+                        <p class="f14 c6 mtb10" style="border-top:#ddd 1px solid; padding:10px 0">'+ lan.soft.mysql_log_err + '<button class="btn btn-default btn-clear btn-xs" style="float:right;" >' + lan.soft.mysql_log_close + '</button></p>\
+                        <textarea readonly style="margin: 0px;width: 100%;height: 440px;background-color: #333;color:#fff; padding:0 5px" id="error_log"></textarea>\
+                    </p>'
+        $(".soft-man-con").html(limitCon);
+
+        //设置二进制日志
+        $(".btn-bin").click(function () {
+            myPost('bin_log', 'close=change', function(data){
+                var rdata = $.parseJSON(data.data);
+                layer.msg(rdata.msg, { icon: rdata.status ? 1 : 5 });
+            
+                setTimeout(function(){
+                    myLogs();
+                }, 3000);
+            });
+        });
+    });
+}

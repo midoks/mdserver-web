@@ -149,6 +149,43 @@ def getDataDir():
     return tmp.groups()[0].strip()
 
 
+def binLog():
+    args = getArgs()
+    # data = checkArgs(args, ['status'])
+    # if not data[0]:
+    #     return data[1]
+
+    conf = getConf()
+    con = public.readFile(conf)
+
+    if con.find('#log-bin=mysql-bin') != -1:
+        if args.has_key('status'):
+            return public.returnJson(False, '0')
+        con = con.replace('#log-bin=mysql-bin', 'log-bin=mysql-bin')
+        con = con.replace('#binlog_format=mixed', 'binlog_format=mixed')
+        os.system('sync')
+        restart()
+    else:
+        path = getDataDir()
+        if args.has_key('status'):
+            dsize = 0
+            for n in os.listdir(path):
+                if len(n) < 9:
+                    continue
+                if n[0:9] == 'mysql-bin':
+                    dsize += os.path.getsize(path + '/' + n)
+            return public.returnJson(True, dsize)
+        con = con.replace('log-bin=mysql-bin', '#log-bin=mysql-bin')
+        con = con.replace('binlog_format=mixed', '#binlog_format=mixed')
+        os.system('sync')
+        restart()
+        os.system('rm -f ' + path + '/mysql-bin.*')
+
+    public.writeFile(conf, con)
+
+    return public.returnJson(True, '设置成功!')
+
+
 def getShowLogFile():
     file = getConf()
     content = public.readFile(file)
@@ -170,8 +207,8 @@ def initMysqlData():
     if not os.path.exists(datadir + '/mysql'):
         serverdir = getServerDir()
         user = pGetDbUser()
-        cmd = 'cd ' + serverdir + ' && ./scripts/mysql_install_db --user=' + user + ' --basedir=' + \
-            serverdir + ' --ldata=' + datadir
+        cmd = 'cd ' + serverdir + ' && ./scripts/mysql_install_db --user=' + \
+            user + ' --basedir=' + serverdir + ' --ldata=' + datadir
         public.execShell(cmd)
         return 0
     return 1
@@ -772,6 +809,8 @@ if __name__ == "__main__":
         print setDbStatus()
     elif func == 'conf':
         print getConf()
+    elif func == 'bin_log':
+        print binLog()
     elif func == 'show_log':
         print getShowLogFile()
     elif func == 'my_port':
