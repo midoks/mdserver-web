@@ -15,7 +15,7 @@ import public
 
 
 app_debug = False
-if public.getOs() == 'darwin':
+if public.isAppleSystem():
     app_debug = True
 
 
@@ -110,7 +110,7 @@ def reload():
 
 def initdStatus():
     if not app_debug:
-        if public.getOs() == 'darwin':
+        if public.isAppleSystem():
             return "Apple Computer does not support"
 
     _initd_csvn = '/etc/init.d/csvn'
@@ -124,7 +124,7 @@ def initdStatus():
 def initdInstall():
     import shutil
     if not app_debug:
-        if public.getOs() == 'darwin':
+        if public.isAppleSystem():
             return "Apple Computer does not support"
 
     _csvn = getServerDir() + '/bin/csvn'
@@ -139,7 +139,7 @@ def initdInstall():
 
 def initdUinstall():
     if not app_debug:
-        if public.getOs() == 'darwin':
+        if public.isAppleSystem():
             return "Apple Computer does not support"
 
     _csvn = getServerDir() + '/bin/csvn'
