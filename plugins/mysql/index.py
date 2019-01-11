@@ -312,6 +312,10 @@ def myDbStatus():
     result = {}
     db = pMysqlDb()
     data = db.query('show variables')
+    isError = isSqlError(data)
+    if isError != None:
+        return isError
+
     gets = ['table_open_cache', 'thread_cache_size', 'query_cache_type', 'key_buffer_size', 'query_cache_size', 'tmp_table_size', 'max_heap_table_size', 'innodb_buffer_pool_size',
             'innodb_additional_mem_pool_size', 'innodb_log_buffer_size', 'max_connections', 'sort_buffer_size', 'read_buffer_size', 'read_rnd_buffer_size', 'join_buffer_size', 'thread_stack', 'binlog_cache_size']
     result['mem'] = {}
