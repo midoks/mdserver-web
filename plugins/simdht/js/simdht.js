@@ -107,7 +107,7 @@ function dhtTrendRender() {
     // 指定图表的配置项和数据
     var option = {
         title: {
-            text: '接口流量实时',
+            text: '种子收录趋势',
             left: 'center',
             textStyle: {
                 color: '#888888',fontStyle: 'normal',
