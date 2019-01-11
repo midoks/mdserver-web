@@ -459,6 +459,8 @@ class DBCheck(Master):
 
         if db_size > db_size_limit:
             self.delete_db(DB_DEL_LINE)
+            self.query('OPTIMIZE TABLE  `search_hash`')
+            self.query('OPTIMIZE TABLE  `search_filelist`')
 
         print 'db size limit:', db_size_limit, db_size
         # self.delete_db(DB_DEL_LINE)
