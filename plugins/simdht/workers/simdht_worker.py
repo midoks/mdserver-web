@@ -478,9 +478,11 @@ if __name__ == "__main__":
     rpcthread.setDaemon(True)
     rpcthread.start()
 
+    print 'DBCheck start'
     check = DBCheck(master)
     check.start()
 
+    print 'DHTServer start'
     dht = DHTServer(master, "0.0.0.0", 6881, max_node_qsize=MAX_NODE_QSIZE)
     dht.start()
     dht.auto_send_find_node()
