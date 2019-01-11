@@ -350,7 +350,6 @@ class Master(Thread):
         self.name = threading.currentThread().getName()
         print self.name, 'started'
         while True:
-
             while self.metadata_queue.qsize() > 0:
                 self.got_torrent()
             address, binhash, dtype = self.queue.get()
@@ -398,8 +397,6 @@ class Master(Thread):
                 print '\n', time.ctime(), 'n_reqs', self.n_reqs, 'n_valid', self.n_valid, 'n_new', self.n_new, 'n_queue', self.queue.qsize(),
                 print 'n_d_pt', self.n_downloading_pt, 'n_d_lt', self.n_downloading_lt,
                 self.n_reqs = self.n_valid = self.n_new = 0
-
-                self.check_db_size()
 
     def log_announce(self, binhash, address=None):
         self.queue.put([address, binhash, 'pt'])
