@@ -72,7 +72,7 @@ def getSqlFile():
 
 
 def getDbConf():
-    file = getServerDir() + "/workers/db.cfg"
+    file = getServerDir() + "/db.cfg"
     return file
 
 
@@ -87,6 +87,12 @@ def initDreplace():
     if not os.path.exists(ddir):
         sdir = getPluginDir() + '/workers'
         public.execShell('cp -rf ' + sdir + ' ' + getServerDir())
+
+    cfg = getServerDir() + '/db.cfg'
+    if not os.path.exists(cfg):
+        cfg_tpl = getPluginDir() + '/workers/db.cfg'
+        content = public.readFile(cfg_tpl)
+        public.writeFile(cfg, content)
 
     file_tpl = getInitDTpl()
     service_path = os.path.dirname(os.getcwd())
