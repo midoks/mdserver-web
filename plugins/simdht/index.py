@@ -126,6 +126,7 @@ def stop():
     file = initDreplace()
     data = public.execShell(file + ' stop')
     if data[1] == '':
+        public.execShell('rm -rf /tmp/mysql.sock')
         return 'ok'
     return 'fail'
 
