@@ -525,6 +525,10 @@ def getLibConf(version):
         libs.append(lib)
     return public.returnJson(True, 'OK!', libs)
 
+
+def installLib(version):
+    return version, 'ok'
+
 if __name__ == "__main__":
 
     if len(sys.argv) < 3:
@@ -574,5 +578,7 @@ if __name__ == "__main__":
         print getPhpinfo(version)
     elif func == 'get_lib_conf':
         print getLibConf(version)
+    elif func == 'install_lib':
+        print installLib(version)
     else:
         print "fail"
