@@ -383,24 +383,22 @@ function getPHPInfo(version) {
 function phpLibConfig(version){
     
     phpPost('get_lib_conf', version, '', function(data){
-        console.log(data);
-        var rdata = $.parseJSON(data.data);
-        console.log(rdata.data);
 
+        var rdata = $.parseJSON(data.data);
         var libs = rdata.data;
 
-        var body = ""
-        var opt = ""
+        var body = "";
+        var opt = "";
         for (var i = 0; i < libs.length; i++) {
             if (libs[i].versions.indexOf(version) == -1) continue;
             if (libs[i]['task'] == '-1' && libs[i].phpversions.indexOf(version) != -1) {
-                opt = '<a style="color:green;" href="javascript:messageBox();">' + lan.soft.the_install + '</a>'
+                opt = '<a style="color:green;" href="javascript:messageBox();">安装</a>'
             } else if (libs[i]['task'] == '0' && libs[i].phpversions.indexOf(version) != -1) {
-                opt = '<a style="color:#C0C0C0;" href="javascript:messageBox();">' + lan.soft.sleep_install + '</a>'
+                opt = '<a style="color:#C0C0C0;" href="javascript:messageBox();">等待安装...</a>'
             } else if (libs[i].status) {
-                opt = '<a style="color:red;" href="javascript:UninstallPHPLib(\'' + version + '\',\'' + libs[i].name + '\',\'' + libs[i].title + '\',' + '' + ');">' + lan.soft.uninstall + '</a>'
+                opt = '<a style="color:red;" href="javascript:uninstallPHPLib(\'' + version + '\',\'' + libs[i].name + '\',\'' + libs[i].title + '\',' + '' + ');">卸载</a>'
             } else {
-                opt = '<a class="btlink" href="javascript:InstallPHPLib(\'' + version + '\',\'' + libs[i].name + '\',\'' + libs[i].title + '\',' + '' + ');">' + lan.soft.install + '</a>'
+                opt = '<a class="btlink" href="javascript:installPHPLib(\'' + version + '\',\'' + libs[i].name + '\',\'' + libs[i].title + '\',' + '' + ');">安装</a>'
             }
 
             body += '<tr>' +
@@ -417,17 +415,21 @@ function phpLibConfig(version){
             '<table class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0">' +
             '<thead>' +
             '<tr>' +
-            '<th>' + lan.soft.php_ext_name + '</th>' +
-            '<th width="64">' + lan.soft.php_ext_type + '</th>' +
-            '<th>' + lan.soft.php_ext_ps + '</th>' +
-            '<th width="40">' + lan.soft.php_ext_status + '</th>' +
-            '<th style="text-align: right;" width="50">' + lan.public.action + '</th>' +
+            '<th>名称</th>' +
+            '<th width="64">类型</th>' +
+            '<th>说明</th>' +
+            '<th width="40">状态</th>' +
+            '<th style="text-align: right;" width="50">操作</th>' +
             '</tr>' +
             '</thead>' +
             '<tbody>'  + body + '</tbody>' +
             '</table>' +
             '</div>' +
-            '<ul class="help-info-text c7 pull-left"><li>请按实际需求安装扩展,不要安装不必要的PHP扩展,这会影响PHP执行效率,甚至出现异常</li><li>Redis扩展只允许在1个PHP版本中使用,安装到其它PHP版本请在[软件管理]重装Redis</li><li>opcache/xcache/apc等脚本缓存扩展,请只安装其中1个,否则可能导致您的站点程序异常</li></ul>';
+            '<ul class="help-info-text c7 pull-left">\
+                <li>请按实际需求安装扩展,不要安装不必要的PHP扩展,这会影响PHP执行效率,甚至出现异常</li>\
+                <li>Redis扩展只允许在1个PHP版本中使用,安装到其它PHP版本请在[软件管理]重装Redis</li>\
+                <li>opcache/xcache/apc等脚本缓存扩展,请只安装其中1个,否则可能导致您的站点程序异常</li>\
+            </ul>';
         $('.soft-man-con').html(con);
     });
 
@@ -516,11 +518,11 @@ function setPHPConfig(version, pathinfo, go) {
 }
 
 //安装扩展
-function InstallPHPLib(version, name, title, pathinfo) {
-    layer.confirm(lan.soft.php_ext_install_confirm.replace('{1}', name), { icon: 3, closeBtn: 2 }, function() {
+function installPHPLib(version, name, title, pathinfo) {
+    layer.confirm('您真的要安装{1}吗?'.replace('{1}', name), { icon: 3, closeBtn: 2 }, function() {
         name = name.toLowerCase();
         var data = "name=" + name + "&version=" + version + "&type=1";
-        var loadT = layer.msg(lan.soft.add_install, { icon: 16, time: 0, shade: [0.3, '#000'] });
+        var loadT = layer.msg('正在添加到安装器...', { icon: 16, time: 0, shade: [0.3, '#000'] });
         $.post('/files?action=InstallSoft', data, function(rdata) {
             setTimeout(function() {
                 layer.close(loadT);
@@ -533,13 +535,13 @@ function InstallPHPLib(version, name, title, pathinfo) {
 
         fly("bi-btn");
         InstallTips();
-        GetTaskCount();
+        getTaskCount();
     });
 }
 
 //卸载扩展
-function UninstallPHPLib(version, name, title, pathinfo) {
-    layer.confirm(lan.soft.php_ext_uninstall_confirm.replace('{1}', name), { icon: 3, closeBtn: 2 }, function() {
+function uninstallPHPLib(version, name, title, pathinfo) {
+    layer.confirm('您真的要安装{1}吗?'.replace('{1}', name), { icon: 3, closeBtn: 2 }, function() {
         name = name.toLowerCase();
         var data = 'name=' + name + '&version=' + version;
         var loadT = layer.msg(lan.public.the, { icon: 16, time: 0, shade: [0.3, '#000'] });

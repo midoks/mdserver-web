@@ -410,20 +410,6 @@ class Master(Thread):
             self.queue.put([address, binhash, 'lt'])
 
 
-def announce(info_hash, address):
-    binhash = info_hash.decode('hex')
-    master.log_announce(binhash, address)
-    return 'ok'
-
-
-def rpc_server():
-    rpcserver = SimpleXMLRPCServer.SimpleXMLRPCServer(
-        ('localhost', 8004), logRequests=False)
-    rpcserver.register_function(announce, 'announce')
-    print 'Starting xml rpc server...'
-    rpcserver.serve_forever()
-
-
 class DBCheck(Master):
 
     def __init__(self, master):
@@ -466,6 +452,20 @@ class DBCheck(Master):
         while True:
             self.check_db_size()
             time.sleep(DB_SIZE_TICK)
+
+
+def announce(info_hash, address):
+    binhash = info_hash.decode('hex')
+    master.log_announce(binhash, address)
+    return 'ok'
+
+
+def rpc_server():
+    rpcserver = SimpleXMLRPCServer.SimpleXMLRPCServer(
+        ('localhost', 8004), logRequests=False)
+    rpcserver.register_function(announce, 'announce')
+    print 'Starting xml rpc server...'
+    rpcserver.serve_forever()
 
 if __name__ == "__main__":
     # max_node_qsize bigger, bandwith bigger, spped higher
