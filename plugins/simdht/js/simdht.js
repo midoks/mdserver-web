@@ -246,7 +246,7 @@ function dhtTrendRender() {
 
     renderTick = setInterval(function() {
         render();
-    }, 2500);
+    }, 3000);
 
     checkTick = setInterval(function() {
         var obj = $('#dht_trend');
