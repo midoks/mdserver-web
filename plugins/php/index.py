@@ -496,25 +496,34 @@ def getPhpinfo(version):
 
 def getLibConf(version):
     fname = public.getServerDir() + '/php/' + version + '/etc/php.ini'
-    if not os.path.exists(filename):
+    if not os.path.exists(fname):
         return public.returnJson(False, '指定PHP版本不存在!')
 
-    data = {}
-    rep = "disable_functions\s*=\s{0,1}(.*)\n"
-    tmp = re.search(rep, phpini).groups()
-    data['disable_functions'] = tmp[0]
+    phpini = public.readFile(fname)
 
-    rep = "upload_max_filesize\s*=\s*([0-9]+)(M|m|K|k)"
-    tmp = re.search(rep, phpini).groups()
-    data['max'] = tmp[0]
+    libpath = getPluginDir() + '/versions/phplib.conf'
+    phplib = json.loads(public.readFile(libpath))
 
-    rep = ur"\n;*\s*cgi\.fix_pathinfo\s*=\s*([0-9]+)\s*\n"
-    tmp = re.search(rep, phpini).groups()
-    if tmp[0] == '0':
-        data['pathinfo'] = False
-    else:
-        data['pathinfo'] = True
-    return public.getJson(data)
+    libs = []
+    tasks = public.M('tasks').where(
+        "status!=?", ('1',)).field('status,name').select()
+    for lib in phplib:
+        lib['task'] = '1'
+        for task in tasks:
+            tmp = public.getStrBetween('[', ']', task['name'])
+            if not tmp:
+                continue
+            tmp1 = tmp.split('-')
+            if tmp1[0].lower() == lib['name'].lower():
+                lib['task'] = task['status']
+                lib['phpversions'] = []
+                lib['phpversions'].append(tmp1[1])
+        if phpini.find(lib['check']) == -1:
+            lib['status'] = False
+        else:
+            lib['status'] = True
+        libs.append(lib)
+    return public.returnJson(True, 'OK!', libs)
 
 if __name__ == "__main__":
 

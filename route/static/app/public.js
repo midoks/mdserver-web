@@ -35,11 +35,11 @@ function randomStrPwd(b) {
 
 function getRandomString(len) {
 	len = len || 32;
-	var $chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678'; // 默认去掉了容易混淆的字符oOLl,9gq,Vv,Uu,I1  
-	var maxPos = $chars.length;
+	var chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678'; // 默认去掉了容易混淆的字符oOLl,9gq,Vv,Uu,I1  
+	var maxPos = chars.length;
 	var pwd = '';
 	for (i = 0; i < len; i++) {
-		pwd += $chars.charAt(Math.floor(Math.random() * maxPos));
+		pwd += chars.charAt(Math.floor(Math.random() * maxPos));
 	}
 	return pwd;
 }
@@ -683,7 +683,7 @@ var downLoad = null;
 var speed = null;
 
 function task() {
-	messagebox();
+	messageBox();
 }
 
 function ActionTask() {
@@ -858,14 +858,13 @@ function listOrder(skey,type,obj){
 }
 
 //添加面板快捷登录
-function bindBTPanel(a,type,ip,btid,url,user,pw){
-	var titleName = lan.bt.panel_add;
+function bindPanel(a,type,ip,btid,url,user,pw){
+	var titleName = '关联面板';
 	if(type == "b"){
-		btn = "<button type='button' class='btn btn-success btn-sm' onclick=\"bindBTPanel(1,'b')\">"+lan.public.add+"</button>";
-	}
-	else{
-		titleName = lan.bt.panel_edit+ip;
-		btn = "<button type='button' class='btn btn-default btn-sm' onclick=\"bindBTPaneldel('"+btid+"')\">"+lan.public.del+"</button><button type='button' class='btn btn-success btn-sm' onclick=\"bindBTPanel(1,'c','"+ip+"','"+btid+"')\" style='margin-left:7px'>"+lan.public.edit+"</button>";
+		btn = "<button type='button' class='btn btn-success btn-sm' onclick=\"bindPanel(1,'b')\">"+lan.public.add+"</button>";
+	} else {
+		titleName = '修改关联' + ip;
+		btn = "<button type='button' class='btn btn-default btn-sm' onclick=\"bindPaneldel('"+btid+"')\">"+lan.public.del+"</button><button type='button' class='btn btn-success btn-sm' onclick=\"bindBTPanel(1,'c','"+ip+"','"+btid+"')\" style='margin-left:7px'>"+lan.public.edit+"</button>";
 	}
 	if(url == undefined) url="http://";
 	if(user == undefined) user="";
@@ -909,20 +908,21 @@ function bindBTPanel(a,type,ip,btid,url,user,pw){
 		shift: 5,
 		shadeClose: false,
 		content: "<div class='bt-form pd20 pb70'>\
-		<div class='line'><span class='tname'>"+lan.bt.panel_address+"</span>\
-		<div class='info-r'><input class='bt-input-text' type='text' name='btaddress' id='btaddress' value='"+url+"' placeholder='"+lan.bt.panel_address+"' style='width:100%'/></div>\
-		</div>\
-		<div class='line'><span class='tname'>"+lan.bt.panel_user+"</span>\
-		<div class='info-r'><input class='bt-input-text' type='text' name='btuser' id='btuser' value='"+user+"' placeholder='"+lan.bt.panel_user+"' style='width:100%'/></div>\
-		</div>\
-		<div class='line'><span class='tname'>"+lan.bt.panel_pass+"</span>\
-		<div class='info-r'><input class='bt-input-text' type='password' name='btpassword' id='btpassword' value='"+pw+"' placeholder='"+lan.bt.panel_pass+"' style='width:100%'/></div>\
-		</div>\
-		<div class='line'><span class='tname'>"+lan.bt.panel_ps+"</span>\
-		<div class='info-r'><input class='bt-input-text' type='text' name='bttitle' id='bttitle' value='"+ip+"' placeholder='"+lan.bt.panel_ps+"' style='width:100%'/></div>\
-		</div>\
-		<div class='line'><ul class='help-info-text c7'><li>"+lan.bt.panel_ps_1+"</li><li>"+lan.bt.panel_ps_2+"</li><li>"+lan.bt.panel_ps_3+"</li></ul></div>\
-		<div class='bt-form-submit-btn'><button type='button' class='btn btn-danger btn-sm' onclick=\"layer.closeAll()\">"+lan.public.close+"</button> "+btn+"</div></div>"
+				<div class='line'><span class='tname'>"+lan.bt.panel_address+"</span>\
+				<div class='info-r'><input class='bt-input-text' type='text' name='btaddress' id='btaddress' value='"+url+"' placeholder='"+lan.bt.panel_address+"' style='width:100%'/></div>\
+				</div>\
+				<div class='line'><span class='tname'>"+lan.bt.panel_user+"</span>\
+				<div class='info-r'><input class='bt-input-text' type='text' name='btuser' id='btuser' value='"+user+"' placeholder='"+lan.bt.panel_user+"' style='width:100%'/></div>\
+				</div>\
+				<div class='line'><span class='tname'>"+lan.bt.panel_pass+"</span>\
+				<div class='info-r'><input class='bt-input-text' type='password' name='btpassword' id='btpassword' value='"+pw+"' placeholder='"+lan.bt.panel_pass+"' style='width:100%'/></div>\
+				</div>\
+				<div class='line'><span class='tname'>"+lan.bt.panel_ps+"</span>\
+				<div class='info-r'><input class='bt-input-text' type='text' name='bttitle' id='bttitle' value='"+ip+"' placeholder='"+lan.bt.panel_ps+"' style='width:100%'/></div>\
+				</div>\
+				<div class='line'><ul class='help-info-text c7'><li>"+lan.bt.panel_ps_1+"</li><li>"+lan.bt.panel_ps_2+"</li><li>"+lan.bt.panel_ps_3+"</li></ul></div>\
+				<div class='bt-form-submit-btn'><button type='button' class='btn btn-danger btn-sm' onclick=\"layer.closeAll()\">"+lan.public.close+"</button> "+btn+"</div>\
+			</div>"
 	});
 	$("#btaddress").on("input",function(){
 		var str =$(this).val();
@@ -937,7 +937,7 @@ function bindBTPanel(a,type,ip,btid,url,user,pw){
 	});
 }
 //删除快捷登录
-function bindBTPaneldel(id){
+function bindPaneldel(id){
 	$.post("/config?action=DelPanelInfo","id="+id,function(rdata){
 		layer.closeAll();
 		layer.msg(rdata.msg,{icon:rdata.status?1:2});
@@ -967,7 +967,7 @@ function getSpeed(sele){
 	});
 }
 //消息盒子
-function messagebox() {
+function messageBox() {
 	layer.open({
 		type: 1,
 		title: lan.bt.task_title,
@@ -1029,18 +1029,16 @@ function remind(a){
 		$(".msg_count").text(g.data.length);
 		$(".taskcon").html(con);
 		$("#taskPage").html(g.page);
+
 		$("#Rs-checkAll").click(function(){
 			if($(this).prop("checked")){
 				$("#remind").find("input").prop("checked",true)
-			}
-			else{
+			} else {
 				$("#remind").find("input").prop("checked",false)
 			}
 		});
-
 	},'json');
 }
-
 
 function getReloads() {
 	var a = 0;
@@ -1051,7 +1049,7 @@ function getReloads() {
 		speed = null;
 		return
 	}
-	if(speed) return;
+	if(speed) {return;}
 	speed = setInterval(function() {
 		var mm = $(".bt-w-menu .bgw").html()
 		if(mm == undefined || mm.indexOf(lan.bt.task_list) == -1) {
@@ -1061,10 +1059,10 @@ function getReloads() {
 			return
 		}
 		a++;
-		$.post("/task/get_task_speed", "", function(h) {
+		$.post('/task/get_task_speed', '', function(h) {
 			if(h.task == undefined) {
 				$(".cmdlist").html(lan.bt.task_not_list);
-				return
+				return;
 			}
 			var b = "";
 			var d = "";
@@ -1181,7 +1179,7 @@ function scroll_handle(e){
 $(function(){
 	setInterval(function(){
 		check_login();
-	},60000);
+	},6000);
 });
 
 function asyncLoadImage(obj, url){
@@ -1189,7 +1187,6 @@ function asyncLoadImage(obj, url){
 	if (typeof(url) == 'undefined'){
 		return;
 	}
-	loadImage(obj, url, showImage);
 
 	function loadImage(obj,url,callback){
 	    var img = new Image();
@@ -1207,6 +1204,7 @@ function asyncLoadImage(obj, url){
 	function showImage(obj){
 	    obj.src = this.src;
 	}
+	loadImage(obj, url, showImage);
 }
 
 function loadImage(){

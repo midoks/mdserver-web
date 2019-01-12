@@ -35,7 +35,7 @@
                         <li><a class="menu_exit" href="javascript:;" id="dologin">退出</a></li>
                     </ul>
                     <div id="newbtpc"></div>
-                    <div class="btpc-plus" onclick="bindBTPanel(0,'b')">+</div>
+                    <div class="btpc-plus" onclick="bindPanel(0,'b')">+</div>
                 </div>
             </div>
             <button style="display: none;" id="bt_copys" class="bt_copy" data-clipboard-text=""></button>
@@ -45,7 +45,7 @@
             <script src="/static/js/jquery.fly.min.js?v={{config.version}}"></script>
             <script src="/static/js/clipboard.min.js?v={{config.version}}"></script>
             <script src="/static/app/public.js?v={{config.version}}"></script>
-            <script type="text/javascript" src="/static/js/echarts.min.js?v={{config.version}}"></script>
+            <script src="/static/js/echarts.min.js?v={{config.version}}"></script>
             <script type="text/javascript" src="/static/js/jquery.dragsort-0.5.2.min.js?v={{config.version}}"></script>
             {% block content %}{% endblock %}
             <div class="footer bgw">mdserver-web &copy;2018-∞ 面板 (<a style="color:#20a53a;" target="_blank" href="//github.com/midoks/mdserver-web">源码</a>)<a style="margin-left:20px;color:#20a53a;" href="//github.com/midoks/mdserver-web/wiki/mdserver-web" target="_blank">wiki</a>
@@ -53,6 +53,7 @@
     </div>
     </div>
 </body>
+
 <script src="/static/codemirror/lib/codemirror.js?v={{config.version}}"></script>
 <script src="/static/codemirror/addon/edit/editAll.js?v={{config.version}}"></script>
 <script src="/static/codemirror/mode/modeAll.js?v={{config.version}}"></script>

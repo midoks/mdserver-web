@@ -1,6 +1,6 @@
 {
 	"id":3,
-	"title":"宝塔SSH终端",
+	"title":"SSH终端",
 	"tip":"lib",
 	"name":"webssh",
 	"type":"扩展",

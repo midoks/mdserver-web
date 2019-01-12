@@ -1,4 +1,4 @@
-function phpPost(method,version, args,callback){
+function phpPost(method, version, args,callback){
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
 
     var req_data = {};
@@ -382,25 +382,74 @@ function getPHPInfo(version) {
 
 function phpLibConfig(version){
     
+    phpPost('get_lib_conf', version, '', function(data){
+        console.log(data);
+        var rdata = $.parseJSON(data.data);
+        console.log(rdata.data);
+
+        var libs = rdata.data;
+
+        var body = ""
+        var opt = ""
+        for (var i = 0; i < libs.length; i++) {
+            if (libs[i].versions.indexOf(version) == -1) continue;
+            if (libs[i]['task'] == '-1' && libs[i].phpversions.indexOf(version) != -1) {
+                opt = '<a style="color:green;" href="javascript:messageBox();">' + lan.soft.the_install + '</a>'
+            } else if (libs[i]['task'] == '0' && libs[i].phpversions.indexOf(version) != -1) {
+                opt = '<a style="color:#C0C0C0;" href="javascript:messageBox();">' + lan.soft.sleep_install + '</a>'
+            } else if (libs[i].status) {
+                opt = '<a style="color:red;" href="javascript:UninstallPHPLib(\'' + version + '\',\'' + libs[i].name + '\',\'' + libs[i].title + '\',' + '' + ');">' + lan.soft.uninstall + '</a>'
+            } else {
+                opt = '<a class="btlink" href="javascript:InstallPHPLib(\'' + version + '\',\'' + libs[i].name + '\',\'' + libs[i].title + '\',' + '' + ');">' + lan.soft.install + '</a>'
+            }
+
+            body += '<tr>' +
+                '<td>' + libs[i].name + '</td>' +
+                '<td>' + libs[i].type + '</td>' +
+                '<td>' + libs[i].msg + '</td>' +
+                '<td><span class="ico-' + (libs[i].status ? 'start' : 'stop') + ' glyphicon glyphicon-' + (libs[i].status ? 'ok' : 'remove') + '"></span></td>' +
+                '<td style="text-align: right;">' + opt + '</td>' +
+                '</tr>';
+        }
+
+
+        var con = '<div class="divtable" id="phpextdiv" style="margin-right:10px;height: 420px; overflow: auto; margin-right: 0px;">' +
+            '<table class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0">' +
+            '<thead>' +
+            '<tr>' +
+            '<th>' + lan.soft.php_ext_name + '</th>' +
+            '<th width="64">' + lan.soft.php_ext_type + '</th>' +
+            '<th>' + lan.soft.php_ext_ps + '</th>' +
+            '<th width="40">' + lan.soft.php_ext_status + '</th>' +
+            '<th style="text-align: right;" width="50">' + lan.public.action + '</th>' +
+            '</tr>' +
+            '</thead>' +
+            '<tbody>'  + body + '</tbody>' +
+            '</table>' +
+            '</div>' +
+            '<ul class="help-info-text c7 pull-left"><li>请按实际需求安装扩展,不要安装不必要的PHP扩展,这会影响PHP执行效率,甚至出现异常</li><li>Redis扩展只允许在1个PHP版本中使用,安装到其它PHP版本请在[软件管理]重装Redis</li><li>opcache/xcache/apc等脚本缓存扩展,请只安装其中1个,否则可能导致您的站点程序异常</li></ul>';
+        $('.soft-man-con').html(con);
+    });
+
 }
 
 
 //设置PATHINFO
-function setPathInfo(version, type) {
-    var loadT = layer.msg(lan.public.the, { icon: 16, time: 0, shade: [0.3, '#000'] });
-    $.post('/config?action=setPathInfo', 'version=' + version + '&type=' + type, function(rdata) {
-        var pathinfo = (type == 'on') ? true : false;
-        var pathinfoOpt = '<a style="color:red;" href="javascript:SetPathInfo(\'' + version + '\',\'off\');">' + lan.public.off + '</a>'
-        if (!pathinfo) {
-            pathinfoOpt = '<a class="link" href="javascript:SetPathInfo(\'' + version + '\',\'on\');">' + lan.public.on + '</a>'
-        }
-        var pathinfo1 = '<td>PATH_INFO</td><td>' + lan.soft.php_menu_ext + '</td><td>' + lan.soft.mvc_ps + '</td><td><span class="ico-' + (pathinfo ? 'start' : 'stop') + ' glyphicon glyphicon-' + (pathinfo ? 'ok' : 'remove') + '"></span></td><td style="text-align: right;" width="50">' + pathinfoOpt + '</td>';
-        $("#pathInfo").html(pathinfo1);
-        $(".bt-w-menu .bgw").attr('onclick', "SetPHPConfig('" + version + "'," + pathinfo + ",1)");
-        $(".bt-w-menu .bgw a").attr('href', "javascript:SetPHPConfig('" + version + "'," + pathinfo + ",1);");
-        layer.msg(rdata.msg, { icon: 1 });
-    });
-}
+// function setPathInfo(version, type) {
+//     var loadT = layer.msg(lan.public.the, { icon: 16, time: 0, shade: [0.3, '#000'] });
+//     $.post('/config?action=setPathInfo', 'version=' + version + '&type=' + type, function(rdata) {
+//         var pathinfo = (type == 'on') ? true : false;
+//         var pathinfoOpt = '<a style="color:red;" href="javascript:SetPathInfo(\'' + version + '\',\'off\');">' + lan.public.off + '</a>'
+//         if (!pathinfo) {
+//             pathinfoOpt = '<a class="link" href="javascript:SetPathInfo(\'' + version + '\',\'on\');">' + lan.public.on + '</a>'
+//         }
+//         var pathinfo1 = '<td>PATH_INFO</td><td>' + lan.soft.php_menu_ext + '</td><td>' + lan.soft.mvc_ps + '</td><td><span class="ico-' + (pathinfo ? 'start' : 'stop') + ' glyphicon glyphicon-' + (pathinfo ? 'ok' : 'remove') + '"></span></td><td style="text-align: right;" width="50">' + pathinfoOpt + '</td>';
+//         $("#pathInfo").html(pathinfo1);
+//         $(".bt-w-menu .bgw").attr('onclick', "SetPHPConfig('" + version + "'," + pathinfo + ",1)");
+//         $(".bt-w-menu .bgw a").attr('href', "javascript:SetPHPConfig('" + version + "'," + pathinfo + ",1);");
+//         layer.msg(rdata.msg, { icon: 1 });
+//     });
+// }
 
 
 //PHP扩展配置
@@ -411,9 +460,9 @@ function setPHPConfig(version, pathinfo, go) {
         for (var i = 0; i < rdata.libs.length; i++) {
             if (rdata.libs[i].versions.indexOf(version) == -1) continue;
             if (rdata.libs[i]['task'] == '-1' && rdata.libs[i].phpversions.indexOf(version) != -1) {
-                opt = '<a style="color:green;" href="javascript:messagebox();">' + lan.soft.the_install + '</a>'
+                opt = '<a style="color:green;" href="javascript:messageBox();">' + lan.soft.the_install + '</a>'
             } else if (rdata.libs[i]['task'] == '0' && rdata.libs[i].phpversions.indexOf(version) != -1) {
-                opt = '<a style="color:#C0C0C0;" href="javascript:messagebox();">' + lan.soft.sleep_install + '</a>'
+                opt = '<a style="color:#C0C0C0;" href="javascript:messageBox();">' + lan.soft.sleep_install + '</a>'
             } else if (rdata.libs[i].status) {
                 opt = '<a style="color:red;" href="javascript:UninstallPHPLib(\'' + version + '\',\'' + rdata.libs[i].name + '\',\'' + rdata.libs[i].title + '\',' + pathinfo + ');">' + lan.soft.uninstall + '</a>'
             } else {
