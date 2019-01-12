@@ -51,3 +51,7 @@ def initInitD():
         if not os.path.exists(initd_bin):
             shutil.copyfile(script_bin, initd_bin)
             public.execShell('chmod +x ' + initd_bin)
+
+
+def initUserInfo():
+    return ''
