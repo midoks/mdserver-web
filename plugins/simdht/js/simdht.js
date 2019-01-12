@@ -44,7 +44,7 @@ function dhtTrend(){
 }
 
 function dhtTrendData(callback){
-    dhtPostMin('get_trend_data',{interval:5},function(data){
+    dhtPostMin('get_trend_data',{interval:1},function(data){
         if(typeof(callback) == 'function'){
             callback(data);
         }
@@ -118,7 +118,7 @@ function dhtTrendRender() {
             trigger: 'axis'
         },
         legend: {
-            data: ['5s', '10s', '15s'],
+            data: ['1s', '5s', '10s'],
             bottom: '2%'
         },
         xAxis: {
@@ -145,7 +145,7 @@ function dhtTrendRender() {
             }
         },
         series: [{
-            name: '5s',
+            name: '1s',
             type: 'line',
             data: oneData,
             smooth: true,
@@ -166,7 +166,7 @@ function dhtTrendRender() {
                 normal: {width: 1}
             }
         }, {
-            name: '10s',
+            name: '5s',
             type: 'line',
             data: twoData,
             smooth: true,
@@ -193,7 +193,7 @@ function dhtTrendRender() {
                 }
             }
         },{
-            name: '15s',
+            name: '10s',
             type: 'line',
             data: threeData,
             smooth: true,
@@ -236,9 +236,9 @@ function dhtTrendRender() {
         myChartNetwork.setOption({
             xAxis: {data: xData},
             series: [
-                {name: '5s',data: oneData}, 
-                {name: '10s',data: twoData},
-                {name: '15s',data: threeData}
+                {name: '1s',data: oneData}, 
+                {name: '5s',data: twoData},
+                {name: '10s',data: threeData}
             ]
         });
     }
@@ -246,7 +246,7 @@ function dhtTrendRender() {
 
     renderTick = setInterval(function() {
         render();
-    }, 5000);
+    }, 2500);
 
     checkTick = setInterval(function() {
         var obj = $('#dht_trend');
