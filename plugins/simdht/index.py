@@ -232,13 +232,12 @@ def isSqlError(mysqlMsg):
     return None
 
 
-def getMinData(conn, smin):
+def getMinData(conn, sec):
     time_diff = 0
     if public.isAppleSystem():
         time_diff = 3 * 60
-
     pre = time.strftime("%Y-%m-%d %H:%M:%S",
-                        time.localtime(time.time() - smin - time_diff))
+                        time.localtime(time.time() - sec - time_diff))
     sql = "select count(id) from search_hash where create_time > '" + pre + "'"
     data = conn.query(sql)
     return data[0][0]
@@ -251,16 +250,17 @@ def getTrendData():
         if not data[0]:
             return data[1]
         pdb = pMysqlDb()
-        interval = int(args['interval'])
+        # interval = int(args['interval'])
         result = pdb.execute("show tables")
         isError = isSqlError(result)
         if isError:
             return isError
-        one = getMinData(pdb, interval)
-        two = getMinData(pdb, interval * 2)
-        three = getMinData(pdb, interval * 3)
+        one = getMinData(pdb, 1)
+        two = getMinData(pdb, 5)
+        three = getMinData(pdb, 10)
         return public.getJson([one, two, three])
     except Exception as e:
+        print str(e)
         return public.getJson([0, 0, 0])
 
 
