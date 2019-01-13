@@ -1,3 +1,14 @@
+
+function str2Obj(str){
+    var data = {};
+    kv = str.split('&');
+    for(i in kv){
+        v = kv[i].split('=');
+        data[v[0]] = v[1];
+    }
+    return data;
+}
+
 function phpPost(method, version, args,callback){
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
 
@@ -6,7 +17,9 @@ function phpPost(method, version, args,callback){
     req_data['func'] = method;
     req_data['version'] = version;
  
-    if (typeof(args) != 'undefined' && args!=''){
+    if (typeof(args) == 'string'){
+        req_data['args'] = JSON.stringify(str2Obj(args));
+    } else {
         req_data['args'] = JSON.stringify(args);
     }
 
@@ -312,11 +325,10 @@ function disableFunc(version) {
             "<tbody id='blacktable'>" + dbody + "</tbody>" +
             "</table></div>";
 
-        con += '\
-        <ul class="help-info-text">\
-            <li>在此处可以禁用指定函数的调用,以增强环境安全性!</li>\
-            <li>强烈建议禁用如exec,system等危险函数!</li>\
-        </ul>';
+        con += '<ul class="help-info-text">\
+                    <li>在此处可以禁用指定函数的调用,以增强环境安全性!</li>\
+                    <li>强烈建议禁用如exec,system等危险函数!</li>\
+                </ul>';
 
         $(".soft-man-con").html(con);
     });
@@ -383,14 +395,16 @@ function getPHPInfo(version) {
 function phpLibConfig(version){
     
     phpPost('get_lib_conf', version, '', function(data){
-
         var rdata = $.parseJSON(data.data);
         var libs = rdata.data;
 
-        var body = "";
-        var opt = "";
+        var body = '';
+        var opt = '';
         for (var i = 0; i < libs.length; i++) {
-            if (libs[i].versions.indexOf(version) == -1) continue;
+            if (libs[i].versions.indexOf(version) == -1){
+                continue;
+            }
+
             if (libs[i]['task'] == '-1' && libs[i].phpversions.indexOf(version) != -1) {
                 opt = '<a style="color:green;" href="javascript:messageBox();">安装</a>'
             } else if (libs[i]['task'] == '0' && libs[i].phpversions.indexOf(version) != -1) {
@@ -522,19 +536,24 @@ function installPHPLib(version, name, title, pathinfo) {
     layer.confirm('您真的要安装{1}吗?'.replace('{1}', name), { icon: 3, closeBtn: 2 }, function() {
         name = name.toLowerCase();
         var data = "name=" + name + "&version=" + version + "&type=1";
-        var loadT = layer.msg('正在添加到安装器...', { icon: 16, time: 0, shade: [0.3, '#000'] });
-        $.post('/files?action=InstallSoft', data, function(rdata) {
-            setTimeout(function() {
-                layer.close(loadT);
-                SetPHPConfig(version, pathinfo, true);
-                setTimeout(function() {
-                    layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
-                }, 1000);
-            }, 1000);
+        // var loadT = layer.msg('正在添加到安装器...', { icon: 16, time: 0, shade: [0.3, '#000'] });
+        // $.post('/files?action=InstallSoft', data, function(rdata) {
+        //     setTimeout(function() {
+        //         layer.close(loadT);
+        //         SetPHPConfig(version, pathinfo, true);
+        //         setTimeout(function() {
+        //             layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+        //         }, 1000);
+        //     }, 1000);
+        // });
+
+        phpPost('install_lib', version, data, function(data){
+            var rdata = $.parseJSON(data.data);
+            console.log(rdata);
         });
 
-        fly("bi-btn");
-        InstallTips();
+        // fly("bi-btn");
+        // installTips();
         getTaskCount();
     });
 }

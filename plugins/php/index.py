@@ -54,6 +54,13 @@ def getArgs():
     return tmp
 
 
+def checkArgs(data, ck=[]):
+    for i in range(len(ck)):
+        if not ck[i] in data:
+            return (False, public.returnJson(False, '参数:(' + ck[i] + ')没有!'))
+    return (True, public.returnJson(True, 'ok'))
+
+
 def getConf(version):
     path = getServerDir() + '/' + version + '/etc/php.ini'
     return path
@@ -300,8 +307,10 @@ def getLimitConf(version):
 
 def setMaxTime(version):
     args = getArgs()
-    if not 'time' in args:
-        return 'missing time args!'
+    data = checkArgs(args, ['time'])
+    if not data[0]:
+        return data[1]
+
     time = args['time']
     if int(time) < 30 or int(time) > 86400:
         return public.returnJson(False, '请填写30-86400间的值!')
@@ -527,7 +536,21 @@ def getLibConf(version):
 
 
 def installLib(version):
-    return version, 'ok'
+    args = getArgs()
+    data = checkArgs(args, ['type', 'name'])
+    if not data[0]:
+        return data[1]
+
+    name = args['name']
+    stype = args['type']
+    execstr = "cd " + getPluginDir() + '/versions/' + version + " && /bin/bash " + \
+        name + '.sh' + " " + stype + " " + version
+
+    rettime = time.strftime('%Y-%m-%d %H:%M:%S')
+    public.M('tasks').add('id,name,type,status,addtime,execstr', (None,
+                                                                  '安装[' + name + '-' + version + ']', 'execshell', '0', rettime, execstr))
+    # print execstr
+    return public.returnJson(True, '已将下载任务添加到队列!')
 
 if __name__ == "__main__":
 
