@@ -769,7 +769,7 @@ function jump() {
 	window.location.href = "/soft"
 }
 
-function InstallTips() {
+function installTips() {
 	$(".fangshi label").mouseover(function() {
 		var a = $(this).attr("data-title");
 		layer.tips(a, this, {
