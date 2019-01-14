@@ -47,6 +47,7 @@ cd $sourcePath/php/php-5.6.36 && ./configure \
 --enable-soap \
 --enable-posix \
 --enable-fpm \
+--enable-sockets \
 && make && make install && make clean
 
 #------------------------ install end ------------------------------------#
