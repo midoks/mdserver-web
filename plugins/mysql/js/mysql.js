@@ -861,7 +861,15 @@ function openPhpmyadmin(name,username,password){
     setTimeout(function(){
         $("#toPHPMyAdmin").submit();
     },200);
+}
 
+function repTools(dbname){
+    console.log(dbname);
+    myPost('get_db_info', {name:dbname}, function(data){
+        console.log(data);
+        var rdata = $.parseJSON(data.data);
+        console.log(rdata);
+    });
 }
 
 function dbList(page, search){
@@ -892,7 +900,7 @@ function dbList(page, search){
             list += '<td><span class="c9 input-edit" onclick="setDataByKey(\'databases\',\'ps\',this)" style="display: inline-block;">'+rdata.data[i]['ps']+'</span></td>';
             list += '<td style="text-align:right">' + 
                         '<a href="javascript:;" class="btlink" onclick="openPhpmyadmin(\''+rdata.data[i]['name']+'\',\''+rdata.data[i]['username']+'\',\''+rdata.data[i]['password']+'\')" title="数据库管理">管理</a> | ' +
-                        '<a href="javascript:;" class="btlink" title="MySQL优化修复工具">工具</a> | ' +
+                        '<a href="javascript:;" class="btlink" onclick="repTools(\''+rdata.data[i]['name']+'\')" title="MySQL优化修复工具">工具</a> | ' +
                         '<a href="javascript:;" class="btlink" onclick="setDbAccess(\''+rdata.data[i]['username']+'\')" title="设置数据库权限">权限</a> | ' +
                         '<a href="javascript:;" class="btlink" onclick="setDbPass('+rdata.data[i]['id']+',\''+ rdata.data[i]['username'] +'\',\'' + rdata.data[i]['password'] + '\')">改密</a> | ' +
                         '<a href="javascript:;" class="btlink" onclick="delDb(\''+rdata.data[i]['id']+'\',\''+rdata.data[i]['name']+'\')" title="删除数据库">删除</a>' +

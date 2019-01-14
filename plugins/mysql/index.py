@@ -800,6 +800,61 @@ def setDbAccess():
     psdb.where('username=?', (name,)).save('accept', (access,))
     return public.returnJson(True, '设置成功!')
 
+
+def getDbInfo():
+    args = getArgs()
+    data = checkArgs(args, ['name'])
+    if not data[0]:
+        return data[1]
+
+    db_name = args['name']
+    pdb = pMysqlDb()
+    # print 'show tables from `%s`' % db_name
+    table_res = pdb.query('show tables from `%s`' % db_name)
+    isError = isSqlError(table_res)
+    if isError != None:
+        return isError
+
+    tables = mapToList(table_res)
+
+    ret = {}
+    if type(tables) == list:
+        try:
+            data = mapToList(pdb.query(
+                "select sum(DATA_LENGTH)+sum(INDEX_LENGTH) from information_schema.tables  where table_schema='%s'" % db_name))[0][0]
+        except:
+            data = 0
+
+        if not data:
+            data = 0
+        ret['data_size'] = public.toSize(data)
+        ret['database'] = db_name
+
+        ret3 = []
+
+        for i in tables:
+            if i == 1049:
+                return public.returnJson(False, '指定数据库不存在!')
+            table = mapToList(
+                pdb.query("show table status from `%s` where name = '%s'" % (db_name, i[0])))
+            if not table:
+                continue
+            try:
+                ret2 = {}
+                ret2['type'] = table[0][1]
+                data_size = table[0][6]
+                ret2['rows_count'] = table[0][4]
+                ret2['collation'] = table[0][14]
+                ret2['data_size'] = public.toSize(int(data_size))
+                ret2['table_name'] = i[0]
+                ret3.append(ret2)
+            except:
+                continue
+        ret['tables'] = (ret3)
+
+    return public.getJson(ret)
+
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -856,5 +911,7 @@ if __name__ == "__main__":
         print getDbAccess()
     elif func == 'set_db_access':
         print setDbAccess()
+    elif func == 'get_db_info':
+        print getDbInfo()
     else:
         print 'error'
