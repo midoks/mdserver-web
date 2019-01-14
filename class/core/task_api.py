@@ -10,6 +10,9 @@ import json
 import pwd
 
 
+from flask import request
+
+
 class task_api:
 
     def __init__(self):
@@ -20,8 +23,16 @@ class task_api:
         return str(c)
 
     def listApi(self):
-        _list = public.M('tasks').where('', ()).field('id,name,type,status,addtime,start,end').limit(
-            '0,5').order('id desc').select()
+
+        p = request.form.get('p', '1').encode('utf-8')
+        limit = request.form.get('limit', '10').strip()
+        search = request.form.get('search', '').strip()
+
+        start = (int(p) - 1) * int(limit)
+        limit_str = str(start) + ',' + str(limit)
+
+        _list = public.M('tasks').where('', ()).field(
+            'id,name,type,status,addtime,start,end').limit(limit_str).order('id desc').select()
         _ret = {}
         _ret['data'] = _list
 
@@ -29,6 +40,7 @@ class task_api:
         _page = {}
         _page['count'] = count
         _page['tojs'] = 'remind'
+        _page['p'] = p
 
         _ret['page'] = public.getPage(_page)
         return public.getJson(_ret)

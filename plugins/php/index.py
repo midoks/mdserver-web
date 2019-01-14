@@ -538,25 +538,36 @@ def getLibConf(version):
 
 def installLib(version):
     args = getArgs()
-    data = checkArgs(args, ['type', 'name'])
+    data = checkArgs(args, ['name'])
     if not data[0]:
         return data[1]
 
     name = args['name']
-    stype = args['type']
     execstr = "cd " + getPluginDir() + '/versions/' + version + " && /bin/bash " + \
-        name + '.sh' + " " + stype + " " + version
+        name + '.sh' + ' install ' + version
 
     rettime = time.strftime('%Y-%m-%d %H:%M:%S')
     insert_info = (None, '安装[' + name + '-' + version + ']',
                    'execshell', '0', rettime, execstr)
     public.M('tasks').add('id,name,type,status,addtime,execstr', insert_info)
-    # print execstr
     return public.returnJson(True, '已将下载任务添加到队列!')
 
 
 def uninstallLib(version):
-    return 'ok'
+    args = getArgs()
+    data = checkArgs(args, ['name'])
+    if not data[0]:
+        return data[1]
+
+    name = args['name']
+    execstr = "cd " + getPluginDir() + '/versions/' + version + " && /bin/bash " + \
+        name + '.sh' + ' uninstall ' + version
+
+    rettime = time.strftime('%Y-%m-%d %H:%M:%S')
+    insert_info = (None, '安装[' + name + '-' + version + ']',
+                   'execshell', '0', rettime, execstr)
+    public.M('tasks').add('id,name,type,status,addtime,execstr', insert_info)
+    return public.returnJson(True, '已将卸载载任务添加到队列!')
 
 if __name__ == "__main__":
 
