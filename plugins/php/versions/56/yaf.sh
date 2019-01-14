@@ -10,8 +10,8 @@ rootPath=$(dirname "$rootPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
-echo $serverPath,$sourcePath
-Install_yaf()
+
+Install_lib()
 {
 	extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20131226/yaf.so
 
@@ -57,7 +57,7 @@ Install_yaf()
 }
 
 
-Uninstall_yaf()
+Uninstall_lib()
 {
 	if [ ! -f "$serverPath/php/$version/bin/php-config" ];then
 		echo "php$version 未安装,请选择其它版本!"
@@ -83,7 +83,7 @@ Uninstall_yaf()
 actionType=$1
 version=$2
 if [ "$actionType" == 'install' ];then
-	Install_yaf
+	Install_lib
 elif [ "$actionType" == 'uninstall' ];then
-	Uninstall_yaf
+	Uninstall_lib
 fi
