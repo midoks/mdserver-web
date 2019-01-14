@@ -469,92 +469,79 @@ function phpLibConfig(version){
 
 
 //PHP扩展配置
-function setPHPConfig(version, pathinfo, go) {
-    $.get('/ajax?action=GetPHPConfig&version=' + version, function(rdata) {
-        var body = ""
-        var opt = ""
-        for (var i = 0; i < rdata.libs.length; i++) {
-            if (rdata.libs[i].versions.indexOf(version) == -1) continue;
-            if (rdata.libs[i]['task'] == '-1' && rdata.libs[i].phpversions.indexOf(version) != -1) {
-                opt = '<a style="color:green;" href="javascript:messageBox();">' + lan.soft.the_install + '</a>'
-            } else if (rdata.libs[i]['task'] == '0' && rdata.libs[i].phpversions.indexOf(version) != -1) {
-                opt = '<a style="color:#C0C0C0;" href="javascript:messageBox();">' + lan.soft.sleep_install + '</a>'
-            } else if (rdata.libs[i].status) {
-                opt = '<a style="color:red;" href="javascript:UninstallPHPLib(\'' + version + '\',\'' + rdata.libs[i].name + '\',\'' + rdata.libs[i].title + '\',' + pathinfo + ');">' + lan.soft.uninstall + '</a>'
-            } else {
-                opt = '<a class="btlink" href="javascript:InstallPHPLib(\'' + version + '\',\'' + rdata.libs[i].name + '\',\'' + rdata.libs[i].title + '\',' + pathinfo + ');">' + lan.soft.install + '</a>'
-            }
+// function setPHPConfig(version, pathinfo, go) {
+//     $.get('/ajax?action=GetPHPConfig&version=' + version, function(rdata) {
+//         var body = ""
+//         var opt = ""
+//         for (var i = 0; i < rdata.libs.length; i++) {
+//             if (rdata.libs[i].versions.indexOf(version) == -1) continue;
+//             if (rdata.libs[i]['task'] == '-1' && rdata.libs[i].phpversions.indexOf(version) != -1) {
+//                 opt = '<a style="color:green;" href="javascript:messageBox();">' + lan.soft.the_install + '</a>'
+//             } else if (rdata.libs[i]['task'] == '0' && rdata.libs[i].phpversions.indexOf(version) != -1) {
+//                 opt = '<a style="color:#C0C0C0;" href="javascript:messageBox();">' + lan.soft.sleep_install + '</a>'
+//             } else if (rdata.libs[i].status) {
+//                 opt = '<a style="color:red;" href="javascript:UninstallPHPLib(\'' + version + '\',\'' + rdata.libs[i].name + '\',\'' + rdata.libs[i].title + '\',' + pathinfo + ');">' + lan.soft.uninstall + '</a>'
+//             } else {
+//                 opt = '<a class="btlink" href="javascript:InstallPHPLib(\'' + version + '\',\'' + rdata.libs[i].name + '\',\'' + rdata.libs[i].title + '\',' + pathinfo + ');">' + lan.soft.install + '</a>'
+//             }
 
-            body += '<tr>' +
-                '<td>' + rdata.libs[i].name + '</td>' +
-                '<td>' + rdata.libs[i].type + '</td>' +
-                '<td>' + rdata.libs[i].msg + '</td>' +
-                '<td><span class="ico-' + (rdata.libs[i].status ? 'start' : 'stop') + ' glyphicon glyphicon-' + (rdata.libs[i].status ? 'ok' : 'remove') + '"></span></td>' +
-                '<td style="text-align: right;">' + opt + '</td>' +
-                '</tr>'
-        }
+//             body += '<tr>' +
+//                 '<td>' + rdata.libs[i].name + '</td>' +
+//                 '<td>' + rdata.libs[i].type + '</td>' +
+//                 '<td>' + rdata.libs[i].msg + '</td>' +
+//                 '<td><span class="ico-' + (rdata.libs[i].status ? 'start' : 'stop') + ' glyphicon glyphicon-' + (rdata.libs[i].status ? 'ok' : 'remove') + '"></span></td>' +
+//                 '<td style="text-align: right;">' + opt + '</td>' +
+//                 '</tr>'
+//         }
 
-        var pathinfoOpt = '<a style="color:red;" href="javascript:SetPathInfo(\'' + version + '\',\'off\');">' + lan.soft.off + '</a>'
-        if (!rdata.pathinfo) {
-            pathinfoOpt = '<a class="btlink" href="javascript:SetPathInfo(\'' + version + '\',\'on\');">' + lan.soft.on + '</a>'
-        }
-        var pathinfo1 = '<tr id="pathInfo"><td>PATH_INFO</td><td>' + lan.soft.php_menu_ext + '</td><td>' + lan.soft.mvc_ps + '</td><td><span class="ico-' + (rdata.pathinfo ? 'start' : 'stop') + ' glyphicon glyphicon-' + (rdata.pathinfo ? 'ok' : 'remove') + '"></span></td><td style="text-align: right;" width="50">' + pathinfoOpt + '</td></tr>';
-        var con = '<div class="divtable" id="phpextdiv" style="margin-right:10px;height: 420px; overflow: auto; margin-right: 0px;">' +
-            '<table class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0">' +
-            '<thead>' +
-            '<tr>' +
-            '<th>' + lan.soft.php_ext_name + '</th>' +
-            '<th width="64">' + lan.soft.php_ext_type + '</th>' +
-            '<th>' + lan.soft.php_ext_ps + '</th>' +
-            '<th width="40">' + lan.soft.php_ext_status + '</th>' +
-            '<th style="text-align: right;" width="50">' + lan.public.action + '</th>' +
-            '</tr>' +
-            '</thead>' +
-            '<tbody>' + pathinfo1 + body + '</tbody>' +
-            '</table>' +
-            '</div>' +
-            '<ul class="help-info-text c7 pull-left"><li>请按实际需求安装扩展,不要安装不必要的PHP扩展,这会影响PHP执行效率,甚至出现异常</li><li>Redis扩展只允许在1个PHP版本中使用,安装到其它PHP版本请在[软件管理]重装Redis</li><li>opcache/xcache/apc等脚本缓存扩展,请只安装其中1个,否则可能导致您的站点程序异常</li></ul>';
-        var divObj = document.getElementById('phpextdiv');
-        var scrollTopNum = 0;
-        if (divObj) scrollTopNum = divObj.scrollTop;
-        $(".soft-man-con").html(con);
-        document.getElementById('phpextdiv').scrollTop = scrollTopNum;
-    });
+//         var pathinfoOpt = '<a style="color:red;" href="javascript:SetPathInfo(\'' + version + '\',\'off\');">' + lan.soft.off + '</a>'
+//         if (!rdata.pathinfo) {
+//             pathinfoOpt = '<a class="btlink" href="javascript:SetPathInfo(\'' + version + '\',\'on\');">' + lan.soft.on + '</a>'
+//         }
+//         var pathinfo1 = '<tr id="pathInfo"><td>PATH_INFO</td><td>' + lan.soft.php_menu_ext + '</td><td>' + lan.soft.mvc_ps + '</td><td><span class="ico-' + (rdata.pathinfo ? 'start' : 'stop') + ' glyphicon glyphicon-' + (rdata.pathinfo ? 'ok' : 'remove') + '"></span></td><td style="text-align: right;" width="50">' + pathinfoOpt + '</td></tr>';
+//         var con = '<div class="divtable" id="phpextdiv" style="margin-right:10px;height: 420px; overflow: auto; margin-right: 0px;">' +
+//             '<table class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0">' +
+//             '<thead>' +
+//             '<tr>' +
+//             '<th>' + lan.soft.php_ext_name + '</th>' +
+//             '<th width="64">' + lan.soft.php_ext_type + '</th>' +
+//             '<th>' + lan.soft.php_ext_ps + '</th>' +
+//             '<th width="40">' + lan.soft.php_ext_status + '</th>' +
+//             '<th style="text-align: right;" width="50">' + lan.public.action + '</th>' +
+//             '</tr>' +
+//             '</thead>' +
+//             '<tbody>' + pathinfo1 + body + '</tbody>' +
+//             '</table>' +
+//             '</div>' +
+//             '<ul class="help-info-text c7 pull-left"><li>请按实际需求安装扩展,不要安装不必要的PHP扩展,这会影响PHP执行效率,甚至出现异常</li><li>Redis扩展只允许在1个PHP版本中使用,安装到其它PHP版本请在[软件管理]重装Redis</li><li>opcache/xcache/apc等脚本缓存扩展,请只安装其中1个,否则可能导致您的站点程序异常</li></ul>';
+//         var divObj = document.getElementById('phpextdiv');
+//         var scrollTopNum = 0;
+//         if (divObj) scrollTopNum = divObj.scrollTop;
+//         $(".soft-man-con").html(con);
+//         document.getElementById('phpextdiv').scrollTop = scrollTopNum;
+//     });
 
-    if (go == undefined) {
-        setTimeout(function() {
-            if ($(".bgw #phpext").html() != '安装扩展') {
-                return;
-            }
-            SetPHPConfig(version, pathinfo);
-        }, 3000);
-    }
-}
+//     if (go == undefined) {
+//         setTimeout(function() {
+//             if ($(".bgw #phpext").html() != '安装扩展') {
+//                 return;
+//             }
+//             SetPHPConfig(version, pathinfo);
+//         }, 3000);
+//     }
+// }
 
 //安装扩展
 function installPHPLib(version, name, title, pathinfo) {
     layer.confirm('您真的要安装{1}吗?'.replace('{1}', name), { icon: 3, closeBtn: 2 }, function() {
         name = name.toLowerCase();
         var data = "name=" + name + "&version=" + version + "&type=1";
-        // var loadT = layer.msg('正在添加到安装器...', { icon: 16, time: 0, shade: [0.3, '#000'] });
-        // $.post('/files?action=InstallSoft', data, function(rdata) {
-        //     setTimeout(function() {
-        //         layer.close(loadT);
-        //         SetPHPConfig(version, pathinfo, true);
-        //         setTimeout(function() {
-        //             layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
-        //         }, 1000);
-        //     }, 1000);
-        // });
 
         phpPost('install_lib', version, data, function(data){
             var rdata = $.parseJSON(data.data);
-            console.log(rdata);
+            layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+            getTaskCount();
         });
-
-        // fly("bi-btn");
-        // installTips();
-        getTaskCount();
     });
 }
 
@@ -563,11 +550,10 @@ function uninstallPHPLib(version, name, title, pathinfo) {
     layer.confirm('您真的要安装{1}吗?'.replace('{1}', name), { icon: 3, closeBtn: 2 }, function() {
         name = name.toLowerCase();
         var data = 'name=' + name + '&version=' + version;
-        var loadT = layer.msg(lan.public.the, { icon: 16, time: 0, shade: [0.3, '#000'] });
-        $.post('/files?action=UninstallSoft', data, function(rdata) {
-            layer.close(loadT);
+        phpPost('uninstall_lib', version, data, function(data){
+            var rdata = $.parseJSON(data.data);
             layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
-            SetPHPConfig(version, pathinfo, true);
+            getTaskCount();
         });
     });
 }
