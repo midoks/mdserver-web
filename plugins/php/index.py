@@ -495,11 +495,12 @@ def checkPhpinfoFile(version):
 def getPhpinfo(version):
     checkPhpinfoFile(version)
     sPath = public.getRootDir() + '/phpinfo/' + version
-    public.execShell("rm -rf " + public.getRootDir() + '/phpinfo')
+    # public.execShell("rm -rf " + public.getRootDir() + '/phpinfo')
     public.execShell("mkdir -p " + sPath)
     public.writeFile(sPath + '/phpinfo.php', '<?php phpinfo(); ?>')
-    phpinfo = public.httpGet('http://127.0.0.1/' + version + '/phpinfo.php')
-    os.system("rm -rf " + public.getRootDir() + '/phpinfo')
+    # print 'http://127.0.0.1/' + version + '/phpinfo.php'
+    phpinfo = public.httpGet('http://127.0.0.1/' + version + '/phpinfo.php', 3)
+    # os.system("rm -rf " + public.getRootDir() + '/phpinfo')
     return phpinfo
 
 
@@ -547,10 +548,15 @@ def installLib(version):
         name + '.sh' + " " + stype + " " + version
 
     rettime = time.strftime('%Y-%m-%d %H:%M:%S')
-    public.M('tasks').add('id,name,type,status,addtime,execstr', (None,
-                                                                  '安装[' + name + '-' + version + ']', 'execshell', '0', rettime, execstr))
+    insert_info = (None, '安装[' + name + '-' + version + ']',
+                   'execshell', '0', rettime, execstr)
+    public.M('tasks').add('id,name,type,status,addtime,execstr', insert_info)
     # print execstr
     return public.returnJson(True, '已将下载任务添加到队列!')
+
+
+def uninstallLib(version):
+    return 'ok'
 
 if __name__ == "__main__":
 
@@ -603,5 +609,7 @@ if __name__ == "__main__":
         print getLibConf(version)
     elif func == 'install_lib':
         print installLib(version)
+    elif func == 'uninstall_lib':
+        print uninstallLib(version)
     else:
         print "fail"
