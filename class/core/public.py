@@ -310,7 +310,7 @@ def httpGet(url, timeout=30):
         response = urllib2.urlopen(url, timeout=timeout)
         return response.read()
     except Exception, ex:
-        # WriteLog('网络诊断',str(ex) + '['+url+']');
+        # writeLog('网络诊断', str(ex) + '[' + url + ']')
         return str(ex)
 
 
