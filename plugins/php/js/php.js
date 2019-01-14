@@ -541,6 +541,7 @@ function installPHPLib(version, name, title, pathinfo) {
             var rdata = $.parseJSON(data.data);
             layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
             getTaskCount();
+            phpLibConfig(version);
         });
     });
 }
@@ -554,6 +555,7 @@ function uninstallPHPLib(version, name, title, pathinfo) {
             var rdata = $.parseJSON(data.data);
             layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
             getTaskCount();
+            phpLibConfig(version);
         });
     });
 }
