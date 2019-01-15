@@ -22,7 +22,7 @@ if [ ! -f /usr/local/bin/brew ];then
 fi
 
 
-if [ ! -f $DEV/server/mdserver-web ]; then
+if [ ! -d $DEV/server/mdserver-web ]; then
 	wget -O /tmp/master.zip https://codeload.github.com/midoks/mdserver-web/zip/master
 	cd /tmp && unzip /tmp/master.zip
 	mv /tmp/mdserver-web-master $DEV/server/mdserver-web
@@ -30,7 +30,11 @@ if [ ! -f $DEV/server/mdserver-web ]; then
 	rm -rf /tmp/mdserver-web-master
 fi
 
-
 pip install -r $DEV/server/mdserver-web/requirements.txt
 
+cd $DEV/server/mdserver-web && ./cli.sh start
+cd $DEV/server/mdserver-web && ./cli.sh stop
+
+sleep 5
+cd $DEV/server/mdserver-web && ./scripts/init.d/mw default
 cd $DEV/server/mdserver-web && ./cli.sh debug
