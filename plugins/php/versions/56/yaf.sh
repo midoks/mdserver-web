@@ -35,7 +35,6 @@ Install_lib()
 		tar xvf yaf-$wafV.tgz
 		cd yaf-$wafV
 		
-		echo "$serverPath/php/$version/bin/phpize"
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config
 		make && make install
@@ -48,8 +47,8 @@ Install_lib()
 		echo "ERROR!"
 		return;
 	fi
-	echo "extension=$extFile"
-	echo "extension=$extFile" >> $serverPath/php/$version/etc/php.ini
+	
+	echo "extension=yaf.so" >> $serverPath/php/$version/etc/php.ini
 	
 	$serverPath/php/init.d/php$version reload
 	echo '==========================================================='
