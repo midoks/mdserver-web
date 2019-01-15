@@ -114,6 +114,7 @@ data/json/index.json
 data/control.conf
 data/default.db
 data/system.db
+data/default.pl
 data/control.conf
 data/iplist.txt
 data/json/index.json
