@@ -8,7 +8,7 @@ DEV="/Users/${USER}/Desktop/mwdev"
 
 
 mkdir -p $DEV
-mkdir -p $DEV
+mkdir -p $DEV/wwwroot
 mkdir -p $DEV/server
 mkdir -p $DEV/wwwlogs
 mkdir -p $DEV/backup/database
