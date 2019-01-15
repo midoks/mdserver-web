@@ -1,0 +1,17 @@
+{
+	"sort": 7,
+	"ps": "简单高效的全文搜索引擎",
+	"name": "sphinx",
+	"title": "sphinx",
+	"shell": "install.sh",
+	"versions":["4.0"],
+	"updates":["4.0.11"],
+	"tip": "soft",
+	"checks": "server/sphinx",
+	"display": 1,
+	"author": "midoks",
+	"date": "2017-04-01",
+	"home": "http://sphinxsearch.com/",
+	"type": 0,
+	"pid": "5"
+}
