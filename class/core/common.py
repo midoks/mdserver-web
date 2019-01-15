@@ -55,6 +55,7 @@ def initInitD():
 
 
 def initUserInfo():
+
     data = public.M('users').where('id=?', (1,)).getField('password')
     if data == '21232f297a57a5a743894a0e4a801fc3':
         pwd = public.getRandomString(8).lower()
