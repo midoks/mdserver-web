@@ -30,6 +30,10 @@ if [ ! -d $DEV/server/mdserver-web ]; then
 	rm -rf /tmp/mdserver-web-master
 fi
 
+if [ ! -d $DEV/server/lib ]; then
+	cd $DEV/server/mdserver-web/scripts && ./lib.sh
+fi  
+
 pip install -r $DEV/server/mdserver-web/requirements.txt
 
 cd $DEV/server/mdserver-web && ./cli.sh start
