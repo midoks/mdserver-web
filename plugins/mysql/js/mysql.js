@@ -8,7 +8,7 @@ function str2Obj(str){
     return data;
 }
 
-function myPost(method,args,callback){
+function myPost(method,args,callback, title){
 
     var _args = null; 
     if (typeof(args) == 'string'){
@@ -17,7 +17,12 @@ function myPost(method,args,callback){
         _args = JSON.stringify(args);
     }
 
-    var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
+    var _title = '正在获取...';
+    if (typeof(title) != 'undefined'){
+        _title = title;
+    }
+
+    var loadT = layer.msg(_title, { icon: 16, time: 0, shade: 0.3 });
     $.post('/plugins/run', {name:'mysql', func:method, args:_args}, function(data) {
         layer.close(loadT);
         if (!data.status){
@@ -863,14 +868,6 @@ function openPhpmyadmin(name,username,password){
     },200);
 }
 
-function repTools(dbname){
-    console.log(dbname);
-    myPost('get_db_info', {name:dbname}, function(data){
-        console.log(data);
-        var rdata = $.parseJSON(data.data);
-        console.log(rdata);
-    });
-}
 
 function dbList(page, search){
     var _data = {};
@@ -1002,5 +999,157 @@ function myLogs(){
             var ob = document.getElementById('error_log');
             ob.scrollTop = ob.scrollHeight;
         });
+    });
+}
+
+
+function repCheckeds(tables) {
+    var dbs = []
+    if (tables) {
+        dbs.push(tables)
+    } else {
+        var db_tools = $("input[value^='dbtools_']");
+        for (var i = 0; i < db_tools.length; i++) {
+            if (db_tools[i].checked) dbs.push(db_tools[i].value.replace('dbtools_', ''));
+        }
+    }
+
+    if (dbs.length < 1) {
+        layer.msg('请至少选择一张表!', { icon: 2 });
+        return false;
+    }
+    return dbs;
+}
+
+function repDatabase(db_name, tables) {
+    dbs = repCheckeds(tables);
+    
+    myPost('repair_table', { db_name: db_name, tables: JSON.stringify(dbs) }, function(data){
+        var rdata = $.parseJSON(data.data);
+        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+        repTools(db_name, true);
+    },'已送修复指令,请稍候...');
+}
+
+
+function optDatabase(db_name, tables) {
+    dbs = repCheckeds(tables);
+    
+    myPost('opt_table', { db_name: db_name, tables: JSON.stringify(dbs) }, function(data){
+        var rdata = $.parseJSON(data.data);
+        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+        repTools(db_name, true);
+    },'已送优化指令,请稍候...');
+}
+
+function toDatabaseType(db_name, tables, type){
+    dbs = repCheckeds(tables);
+    myPost('alter_table', { db_name: db_name, tables: JSON.stringify(dbs),table_type: type }, function(data){
+        var rdata = $.parseJSON(data.data);
+        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+        repTools(db_name, true);
+    }, '已送引擎转换指令,请稍候...');
+}
+
+
+function selectedTools(my_obj, db_name) {
+    var is_checked = false
+
+    if (my_obj) is_checked = my_obj.checked;
+    var db_tools = $("input[value^='dbtools_']");
+    var n = 0;
+    for (var i = 0; i < db_tools.length; i++) {
+        if (my_obj) db_tools[i].checked = is_checked;
+        if (db_tools[i].checked) n++;
+    }
+    if (n > 0) {
+        var my_btns = '<button class="btn btn-default btn-sm" onclick="repDatabase(\'' + db_name + '\',null)">修复</button>\
+            <button class="btn btn-default btn-sm" onclick="optDatabase(\'' + db_name + '\',null)">优化</button>\
+            <button class="btn btn-default btn-sm" onclick="toDatabaseType(\'' + db_name + '\',null,\'InnoDB\')">转为InnoDB</button></button>\
+            <button class="btn btn-default btn-sm" onclick="toDatabaseType(\'' + db_name + '\',null,\'MyISAM\')">转为MyISAM</button>'
+        $("#db_tools").html(my_btns);
+    } else {
+        $("#db_tools").html('');
+    }
+}
+
+function repTools(db_name, res){
+    myPost('get_db_info', {name:db_name}, function(data){
+        var rdata = $.parseJSON(data.data);
+        var types = { InnoDB: "MyISAM", MyISAM: "InnoDB" };
+        var tbody = '';
+        for (var i = 0; i < rdata.tables.length; i++) {
+            if (!types[rdata.tables[i].type]) continue;
+            tbody += '<tr>\
+                    <td><input value="dbtools_' + rdata.tables[i].table_name + '" class="check" onclick="selectedTools(null,\'' + db_name + '\');" type="checkbox"></td>\
+                    <td><span style="width:220px;"> ' + rdata.tables[i].table_name + '</span></td>\
+                    <td>' + rdata.tables[i].type + '</td>\
+                    <td><span style="width:90px;"> ' + rdata.tables[i].collation + '</span></td>\
+                    <td>' + rdata.tables[i].rows_count + '</td>\
+                    <td>' + rdata.tables[i].data_size + '</td>\
+                    <td style="text-align: right;">\
+                        <a class="btlink" onclick="repDatabase(\''+ db_name + '\',\'' + rdata.tables[i].table_name + '\')">修复</a> |\
+                        <a class="btlink" onclick="optDatabase(\''+ db_name + '\',\'' + rdata.tables[i].table_name + '\')">优化</a> |\
+                        <a class="btlink" onclick="toDatabaseType(\''+ db_name + '\',\'' + rdata.tables[i].table_name + '\',\'' + types[rdata.tables[i].type] + '\')">转为' + types[rdata.tables[i].type] + '</a>\
+                    </td>\
+                </tr> '
+        }
+
+        if (res) {
+            $(".gztr").html(tbody);
+            $("#db_tools").html('');
+            $("input[type='checkbox']").attr("checked", false);
+            $(".tools_size").html('大小：' + rdata.data_size);
+            return;
+        }
+
+        layer.open({
+            type: 1,
+            title: "MySQL工具箱【" + db_name + "】",
+            area: ['780px', '580px'],
+            closeBtn: 2,
+            shadeClose: false,
+            content: '<div class="pd15">\
+                            <div class="db_list">\
+                                <span><a>数据库名称：'+ db_name + '</a>\
+                                <a class="tools_size">大小：'+ rdata.data_size + '</a></span>\
+                                <span id="db_tools" style="float: right;"></span>\
+                            </div >\
+                            <div class="divtable">\
+                            <div  id="database_fix"  style="height:360px;overflow:auto;border:#ddd 1px solid">\
+                            <table class="table table-hover "style="border:none">\
+                                <thead>\
+                                    <tr>\
+                                        <th><input class="check" onclick="selectedTools(this,\''+ db_name + '\');" type="checkbox"></th>\
+                                        <th>表名</th>\
+                                        <th>引擎</th>\
+                                        <th>字符集</th>\
+                                        <th>行数</th>\
+                                        <th>大小</th>\
+                                        <th style="text-align: right;">操作</th>\
+                                    </tr>\
+                                </thead>\
+                                <tbody class="gztr">' + tbody + '</tbody>\
+                            </table>\
+                            </div>\
+                        </div>\
+                        <ul class="help-info-text c7">\
+                            <li>【修复】尝试使用REPAIR命令修复损坏的表，仅能做简单修复，若修复不成功请考虑使用myisamchk工具</li>\
+                            <li>【优化】执行OPTIMIZE命令，可回收未释放的磁盘空间，建议每月执行一次</li>\
+                            <li>【转为InnoDB/MyISAM】转换数据表引擎，建议将所有表转为InnoDB</li>\
+                        </ul></div>'
+        });
+        tableFixed('database_fix');
+        //表格头固定
+        function tableFixed(name) {
+            var tableName = document.querySelector('#' + name);
+            tableName.addEventListener('scroll', scrollHandle);
+        }
+
+        function scrollHandle(e) {
+            var scrollTop = this.scrollTop;
+            //this.querySelector('thead').style.transform = 'translateY(' + scrollTop + 'px)';
+            $(this).find("thead").css({ "transform": "translateY(" + scrollTop + "px)", "position": "relative", "z-index": "1" });
+        }
     });
 }

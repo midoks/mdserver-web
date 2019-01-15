@@ -855,6 +855,79 @@ def getDbInfo():
     return public.getJson(ret)
 
 
+def repairTable():
+    args = getArgs()
+    data = checkArgs(args, ['db_name', 'tables'])
+    if not data[0]:
+        return data[1]
+
+    db_name = args['db_name']
+    tables = json.loads(args['tables'])
+    pdb = pMysqlDb()
+    mysql_table = mapToList(pdb.query('show tables from `%s`' % db_name))
+    ret = []
+    if type(mysql_table) == list:
+        if len(mysql_table) > 0:
+            for i in mysql_table:
+                for i2 in tables:
+                    if i2 == i[0]:
+                        ret.append(i2)
+            if len(ret) > 0:
+                for i in ret:
+                    pdb.execute('REPAIR TABLE `%s`.`%s`' % (db_name, i))
+                return public.returnJson(True, "修复完成!")
+    return public.returnJson(False, "修复失败!")
+
+
+def optTable():
+    args = getArgs()
+    data = checkArgs(args, ['db_name', 'tables'])
+    if not data[0]:
+        return data[1]
+
+    db_name = args['db_name']
+    tables = json.loads(args['tables'])
+    pdb = pMysqlDb()
+    mysql_table = mapToList(pdb.query('show tables from `%s`' % db_name))
+    ret = []
+    if type(mysql_table) == list:
+        if len(mysql_table) > 0:
+            for i in mysql_table:
+                for i2 in tables:
+                    if i2 == i[0]:
+                        ret.append(i2)
+            if len(ret) > 0:
+                for i in ret:
+                    pdb.execute('OPTIMIZE TABLE `%s`.`%s`' % (db_name, i))
+                return public.returnJson(True, "优化成功!")
+    return public.returnJson(False, "优化失败或者已经优化过了!")
+
+
+def alterTable():
+    args = getArgs()
+    data = checkArgs(args, ['db_name', 'tables'])
+    if not data[0]:
+        return data[1]
+
+    db_name = args['db_name']
+    tables = json.loads(args['tables'])
+    table_type = args['table_type']
+    pdb = pMysqlDb()
+    mysql_table = mapToList(pdb.query('show tables from `%s`' % db_name))
+    ret = []
+    if type(mysql_table) == list:
+        if len(mysql_table) > 0:
+            for i in mysql_table:
+                for i2 in tables:
+                    if i2 == i[0]:
+                        ret.append(i2)
+            if len(ret) > 0:
+                for i in ret:
+                    pdb.execute('alter table `%s`.`%s` ENGINE=`%s`' %
+                                (db_name, i, table_type))
+                return public.returnJson(True, "更改成功!")
+    return public.returnJson(False, "更改失败!")
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -913,5 +986,11 @@ if __name__ == "__main__":
         print setDbAccess()
     elif func == 'get_db_info':
         print getDbInfo()
+    elif func == 'repair_table':
+        print repairTable()
+    elif func == 'opt_table':
+        print optTable()
+    elif func == 'alter_table':
+        print alterTable()
     else:
         print 'error'
