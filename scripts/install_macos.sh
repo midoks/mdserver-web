@@ -2,39 +2,35 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 LANG=en_US.UTF-8
-is64bit=`getconf LONG_BIT`
 
-startTime=`date +%s`
-
-
-mkdir -p /www/server
-mkdir -p /www/wwwroot
-mkdir -p /www/wwwlogs
-mkdir -p /www/backup/database
-mkdir -p /www/backup/site
+USER=$(who | sed -n "2,1p" |awk '{print $1}')
+DEV="/Users/${USER}/Desktop/mwdev"
 
 
-yum -y provides '*/applydeltarpm'
-yum -y install deltarpm
+mkdir -p $DEV
+mkdir -p $DEV
+mkdir -p $DEV/server
+mkdir -p $DEV/wwwlogs
+mkdir -p $DEV/backup/database
+mkdir -p $DEV/backup/site
 
-yum install -y wget curl unzip zip
-
-
-wget -O /tmp/master.zip https://codeload.github.com/midoks/mdserver-web/zip/master
-cd /tmp && unzip /tmp/master.zip
-mv /tmp/mdserver-web-master /www/server/mdserver-web
-
-yum groupinstall -y "Development Tools"
-paces="wget python-devel python-imaging zip unzip openssl openssl-devel gcc libxml2 libxml2-dev libxslt* zlib zlib-devel libjpeg-devel libpng-devel libwebp libwebp-devel freetype freetype-devel lsof pcre pcre-devel vixie-cron crontabs"
-yum -y install $paces
-
-yum -y install epel-release python-pip python-devel
-pip install --upgrade pip
-pip install -r /www/server/mdserver-web/requirements.txt
+# install brew
+if [ ! -f /usr/local/bin/brew ];then
+	/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+	brew install python@2
+	brew install mysql
+fi
 
 
+if [ ! -f $DEV/server/mdserver-web ]; then
+	wget -O /tmp/master.zip https://codeload.github.com/midoks/mdserver-web/zip/master
+	cd /tmp && unzip /tmp/master.zip
+	mv /tmp/mdserver-web-master $DEV/server/mdserver-web
+	rm -f /tmp/master.zip
+	rm -rf /tmp/mdserver-web-master
+fi
 
 
-endTime=`date +%s`
-((outTime=($endTime-$startTime)/60))
-echo -e "Time consumed:\033[32m $outTime \033[0mMinute!"
+pip install -r $DEV/server/mdserver-web/requirements.txt
+
+cd $DEV/server/mdserver-web && ./cli.sh debug
