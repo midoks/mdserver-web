@@ -12,7 +12,7 @@ from flask import request
 
 import db
 import public
-import config
+import config_api
 
 
 from threading import Thread
@@ -643,7 +643,7 @@ class system_api:
             if not public.isRestart():
                 return public.returnJson(False, '请等待所有安装任务完成再执行!')
             if stype == 'check':
-                version_now = config.config().getVersion()
+                version_now = config_api.config_api().getVersion()
                 version_new_info = self.getServerInfo()
                 if not 'version' in version_new_info:
                     return public.returnJson(False, '服务器数据有问题!')
@@ -659,7 +659,7 @@ class system_api:
 
             if stype == 'info':
                 version_new_info = self.getServerInfo()
-                version_now = config.config().getVersion()
+                version_now = config_api.config_api().getVersion()
 
                 if not 'version' in version_new_info:
                     return public.returnJson(False, '服务器数据有问题!')
