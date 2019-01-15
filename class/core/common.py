@@ -20,6 +20,7 @@ import db
 def init():
     initDB()
     initInitD()
+    initUserInfo()
 
 
 def initDB():
@@ -54,4 +55,10 @@ def initInitD():
 
 
 def initUserInfo():
-    return ''
+    data = public.M('users').where('id=?', (1,)).getField('password')
+    if data == '21232f297a57a5a743894a0e4a801fc3':
+        pwd = public.getRandomString(8).lower()
+        file_pw = public.getRunDir() + '/data/default.pl'
+        public.writeFile(file_pw, pwd)
+        public.M('users').where('id=?', (1,)).setField(
+            'password', public.md5(pwd))
