@@ -49,7 +49,6 @@ class MyBad():
 
 
 def execShell(cmdstring, cwd=None, timeout=None, shell=True):
-    print cmdstring
     try:
         global logPath
         import shlex
