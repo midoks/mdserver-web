@@ -4,7 +4,7 @@ import sys
 import io
 import os
 import time
-
+import re
 sys.path.append(os.getcwd() + "/class/core")
 import public
 
@@ -67,6 +67,8 @@ def contentReplace(content):
     service_path = public.getServerDir()
     content = content.replace('{$ROOT_PATH}', public.getRootDir())
     content = content.replace('{$SERVER_PATH}', service_path)
+    content = content.replace('{$SERVER_APP}', service_path + '/sphinx')
+    return content
 
 
 def status():
@@ -89,7 +91,7 @@ def initDreplace():
 
     # initd replace
     content = public.readFile(file_tpl)
-    content = content.replace('{$SERVER_PATH}', service_path)
+    content = contentReplace(content)
     public.writeFile(file_bin, content)
     public.execShell('chmod +x ' + file_bin)
 
@@ -167,6 +169,21 @@ def initdUinstall():
     return 'ok'
 
 
+def runLog():
+    path = getConf()
+    content = public.readFile(path)
+    rep = 'log\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0]
+
+
+def queryLog():
+    path = getConf()
+    content = public.readFile(path)
+    rep = 'query_log\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0]
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -185,11 +202,11 @@ if __name__ == "__main__":
         print initdInstall()
     elif func == 'initd_uninstall':
         print initdUinstall()
-    elif func == 'run_info':
-        print runInfo()
     elif func == 'conf':
         print getConf()
     elif func == 'run_log':
         print runLog()
+    elif func == 'query_log':
+        print queryLog()
     else:
         print 'error'
