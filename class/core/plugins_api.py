@@ -653,6 +653,6 @@ class plugins_api:
             return ('', '')
         data = public.execShell(py_cmd)
 
-        print py_cmd
+        # print py_cmd
         # print os.path.exists(py_cmd)
         return (data[0].strip(), data[1].strip())

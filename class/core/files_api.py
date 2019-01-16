@@ -33,7 +33,6 @@ class files_api:
 
         try:
             data = public.getNumLines(path, int(line))
-            print data
             return public.returnJson(True, 'OK', data)
         except Exception as ex:
             return public.returnJson(False, u'无法正确读取文件!' + str(ex))

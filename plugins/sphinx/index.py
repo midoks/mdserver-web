@@ -5,6 +5,8 @@ import io
 import os
 import time
 import re
+import subprocess
+
 sys.path.append(os.getcwd() + "/class/core")
 import public
 
@@ -149,10 +151,10 @@ def reload():
 
 def rebuild():
     file = initDreplace()
-    data = public.execShell(file + ' rebuild')
-    if data[1] == '':
-        return 'ok'
-    return 'fail'
+    subprocess.Popen(file + ' rebuild &',
+                     stdout=subprocess.PIPE, shell=True)
+    # data = public.execShell(file + ' rebuild')
+    return 'ok'
 
 
 def initdStatus():
