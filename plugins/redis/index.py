@@ -154,8 +154,7 @@ def runInfo():
 
 def initdStatus():
     if not app_debug:
-        os_name = public.getOs()
-        if os_name == 'darwin':
+        if public.isAppleSystem():
             return "Apple Computer does not support"
     initd_bin = getInitDFile()
     if os.path.exists(initd_bin):
@@ -166,8 +165,7 @@ def initdStatus():
 def initdInstall():
     import shutil
     if not app_debug:
-        os_name = public.getOs()
-        if os_name == 'darwin':
+        if public.isAppleSystem():
             return "Apple Computer does not support"
 
     source_bin = initDreplace()
@@ -179,8 +177,7 @@ def initdInstall():
 
 def initdUinstall():
     if not app_debug:
-        os_name = public.getOs()
-        if os_name == 'darwin':
+        if public.isAppleSystem():
             return "Apple Computer does not support"
     initd_bin = getInitDFile()
     os.remove(initd_bin)

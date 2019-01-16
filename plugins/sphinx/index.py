@@ -31,8 +31,13 @@ def getInitDFile():
     return '/etc/init.d/' + getPluginName()
 
 
+def getConfTpl():
+    path = getPluginDir() + "/conf/sphinx.conf"
+    return path
+
+
 def getConf():
-    path = getPluginDir() + "/config/redis.conf"
+    path = getServerDir() + "/sphinx.conf"
     return path
 
 
@@ -58,9 +63,15 @@ def getArgs():
     return tmp
 
 
+def contentReplace(content):
+    service_path = public.getServerDir()
+    content = content.replace('{$ROOT_PATH}', public.getRootDir())
+    content = content.replace('{$SERVER_PATH}', service_path)
+
+
 def status():
     data = public.execShell(
-        "ps -ef|grep redis |grep -v grep | grep -v python | awk '{print $2}'")
+        "ps -ef|grep sphinx |grep -v grep | grep -v python | awk '{print $2}'")
     if data[0] == '':
         return 'stop'
     return 'start'
@@ -83,9 +94,11 @@ def initDreplace():
     public.execShell('chmod +x ' + file_bin)
 
     # config replace
-    conf_content = public.readFile(getConf())
-    conf_content = conf_content.replace('{$SERVER_PATH}', service_path)
-    public.writeFile(getServerDir() + '/redis.conf', conf_content)
+    conf_bin = getConf()
+    if not os.path.exists(conf_bin):
+        conf_content = public.readFile(getConfTpl())
+        conf_content = contentReplace(conf_content)
+        public.writeFile(getServerDir() + '/sphinx.conf', conf_content)
 
     return file_bin
 
@@ -122,40 +135,9 @@ def reload():
     return 'fail'
 
 
-def runInfo():
-    cmd = getServerDir() + "/bin/redis-cli info"
-    data = public.execShell(cmd)[0]
-    res = [
-        'tcp_port',
-        'uptime_in_days',  # 已运行天数
-        'connected_clients',  # 连接的客户端数量
-        'used_memory',  # Redis已分配的内存总量
-        'used_memory_rss',  # Redis占用的系统内存总量
-        'used_memory_peak',  # Redis所用内存的高峰值
-        'mem_fragmentation_ratio',  # 内存碎片比率
-        'total_connections_received',  # 运行以来连接过的客户端的总数量
-        'total_commands_processed',  # 运行以来执行过的命令的总数量
-        'instantaneous_ops_per_sec',  # 服务器每秒钟执行的命令数量
-        'keyspace_hits',  # 查找数据库键成功的次数
-        'keyspace_misses',  # 查找数据库键失败的次数
-        'latest_fork_usec'  # 最近一次 fork() 操作耗费的毫秒数
-    ]
-    data = data.split("\n")
-    result = {}
-    for d in data:
-        if len(d) < 3:
-            continue
-        t = d.strip().split(':')
-        if not t[0] in res:
-            continue
-        result[t[0]] = t[1]
-    return public.getJson(result)
-
-
 def initdStatus():
     if not app_debug:
-        os_name = public.getOs()
-        if os_name == 'darwin':
+        if public.isAppleSystem():
             return "Apple Computer does not support"
     initd_bin = getInitDFile()
     if os.path.exists(initd_bin):
@@ -166,8 +148,7 @@ def initdStatus():
 def initdInstall():
     import shutil
     if not app_debug:
-        os_name = public.getOs()
-        if os_name == 'darwin':
+        if public.isAppleSystem():
             return "Apple Computer does not support"
 
     source_bin = initDreplace()
@@ -179,16 +160,12 @@ def initdInstall():
 
 def initdUinstall():
     if not app_debug:
-        os_name = public.getOs()
-        if os_name == 'darwin':
+        if public.isAppleSystem():
             return "Apple Computer does not support"
     initd_bin = getInitDFile()
     os.remove(initd_bin)
     return 'ok'
 
-
-def runLog():
-    return getServerDir() + '/data/redis.log'
 
 if __name__ == "__main__":
     func = sys.argv[1]
