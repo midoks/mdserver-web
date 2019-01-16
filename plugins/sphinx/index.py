@@ -108,25 +108,25 @@ def initDreplace():
 def start():
     file = initDreplace()
     data = public.execShell(file + ' start')
-    if data[1] == '':
+    if data[0] == '':
         return 'ok'
-    return 'fail'
+    return data[0]
 
 
 def stop():
     file = initDreplace()
     data = public.execShell(file + ' stop')
-    if data[1] == '':
+    if data[0] == '':
         return 'ok'
-    return 'fail'
+    return data[0]
 
 
 def restart():
     file = initDreplace()
     data = public.execShell(file + ' restart')
-    if data[1] == '':
+    if data[0] == '':
         return 'ok'
-    return 'fail'
+    return data[0]
 
 
 def reload():
