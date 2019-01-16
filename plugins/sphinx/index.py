@@ -79,6 +79,15 @@ def status():
     return 'start'
 
 
+def mkdirAll():
+    content = public.readFile(getConf())
+    rep = 'path\s*=\s*(.*)'
+    p = re.compile(rep)
+    tmp = p.findall(content)
+    for x in tmp:
+        public.execShell('mkdir -p ' + x)
+
+
 def initDreplace():
 
     file_tpl = getInitDTpl()
@@ -102,36 +111,45 @@ def initDreplace():
         conf_content = contentReplace(conf_content)
         public.writeFile(getServerDir() + '/sphinx.conf', conf_content)
 
+    mkdirAll()
     return file_bin
 
 
 def start():
     file = initDreplace()
     data = public.execShell(file + ' start')
-    if data[0] == '':
+    if data[1] == '':
         return 'ok'
-    return data[0]
+    return data[1]
 
 
 def stop():
     file = initDreplace()
     data = public.execShell(file + ' stop')
-    if data[0] == '':
+    if data[1] == '':
         return 'ok'
-    return data[0]
+    return data[1]
 
 
 def restart():
     file = initDreplace()
     data = public.execShell(file + ' restart')
-    if data[0] == '':
+    if data[1] == '':
         return 'ok'
-    return data[0]
+    return data[1]
 
 
 def reload():
     file = initDreplace()
     data = public.execShell(file + ' reload')
+    if data[1] == '':
+        return 'ok'
+    return 'fail'
+
+
+def rebuild():
+    file = initDreplace()
+    data = public.execShell(file + ' rebuild')
     if data[1] == '':
         return 'ok'
     return 'fail'
@@ -196,6 +214,8 @@ if __name__ == "__main__":
         print restart()
     elif func == 'reload':
         print reload()
+    elif func == 'rebuild':
+        print rebuild()
     elif func == 'initd_status':
         print initdStatus()
     elif func == 'initd_install':
