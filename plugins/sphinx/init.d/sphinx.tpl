@@ -32,6 +32,10 @@ start () {
     fi
 }
 
+rebuild () {
+    ${APP_PATH}/bin/bin/indexer -c ${APP_CONF} --all --rotate 
+}
+
 
 stop () {
     echo -n $"Stopping $prog: "
@@ -65,6 +69,9 @@ case "$1" in
         ;;
     restart|reload)
         restart
+        ;;
+    rebuild)
+        rebuild
         ;;
     *)
         echo $"Usage: $0 {start|stop|status|restart|reload}"
