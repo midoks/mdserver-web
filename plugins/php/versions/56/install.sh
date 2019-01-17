@@ -43,14 +43,17 @@ cd $sourcePath/php/php-5.6.36 && ./configure \
 --enable-zip \
 --enable-mbstring \
 --enable-ftp \
+--enable-pcntl \
+--enable-shmop \
 --enable-sysvmsg \
---enable-opcache \
+--enable-sysvsem \
+--enable-sysvshm \
+--enable-sockets \
 --enable-intl \
 --enable-wddx \
 --enable-soap \
 --enable-posix \
 --enable-fpm \
---enable-sockets \
 && make && make install && make clean
 
 #------------------------ install end ------------------------------------#
