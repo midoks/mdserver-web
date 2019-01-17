@@ -2115,20 +2115,24 @@ function rewrite(siteName){
 		var info = syncPost('/site/get_rewrite_conf', {siteName:siteName});
 		var filename = info['rewrite'];
 		$.post('/files/get_body','path='+filename,function(fileBody){
+			var centent = fileBody['data']['data'];
 			var rList = ''; 
 			for(var i=0;i<rdata.rewrite.length;i++){
-				rList += "<option value='"+rdata.rewrite[i]+"'>"+rdata.rewrite[i]+"</option>";
+				if (i==0){
+					rList += "<option value='0'>"+rdata.rewrite[i]+"</option>";	
+				} else {
+					rList += "<option value='"+rdata.rewrite[i]+"'>"+rdata.rewrite[i]+"</option>";		
+				}
 			}
 			var webBakHtml = "<div class='bt-form'>\
 						<div class='line'>\
 						<select id='myRewrite' class='bt-input-text mr20' name='rewrite' style='width:30%;'>"+rList+"</select>\
-						<span>"+lan.site.rule_cov_tool+"：<a href='https://www.bt.cn/Tools' target='_blank' style='color:#20a53a'>"+lan.site.a_c_n+"</a>\</span></div><div class='line'>\
-						<textarea class='bt-input-text' style='height: 260px; width: 480px; line-height:18px;margin-top:10px;padding:5px;' id='rewriteBody'>"+fileBody.data+"</textarea></div>\
-						<button id='SetRewriteBtn' class='btn btn-success btn-sm'>"+lan.public.save+"</button>\
-						<button id='SetRewriteBtnTel' class='btn btn-success btn-sm'>"+lan.site.save_as_template+"</button>\
+						<textarea class='bt-input-text' style='height: 260px; width: 480px; line-height:18px;margin-top:10px;padding:5px;' id='rewriteBody'>"+centent+"</textarea></div>\
+						<button id='SetRewriteBtn' class='btn btn-success btn-sm'>保存</button>\
+						<button id='SetRewriteBtnTel' class='btn btn-success btn-sm'>另存为模板</button>\
 						<ul class='help-info-text c7 ptb15'>\
-							<li>"+lan.site.url_rw_help_1+"</li>\
-							<li>"+lan.site.url_rw_help_2+"</li>\
+							<li>请选择您的应用，若设置伪静态后，网站无法正常访问，请尝试设置回default</li>\
+							<li>您可以对伪静态规则进行修改，修改完后保存即可。</li>\
 						</ul>\
 						</div>";
 			$("#webedit-con").html(webBakHtml);
@@ -2143,35 +2147,39 @@ function rewrite(siteName){
 			$("#SetRewriteBtn").click(function(){
 				$("#rewriteBody").empty();
 				$("#rewriteBody").text(editor.getValue());
-				SetRewrite(filename);
+				setRewrite(filename);
 			});
 			$("#SetRewriteBtnTel").click(function(){
 				$("#rewriteBody").empty();
 				$("#rewriteBody").text(editor.getValue());
-				SetRewriteTel();
+				setRewriteTel();
 			});
 			
 			$("#myRewrite").change(function(){
 				var rewriteName = $(this).val();
-				// var info = syncPost('/site/get_rewrite_conf', {siteName:siteName});
-				if(rewriteName == lan.site.rewritename){
+				if(rewriteName == '0'){
 					rpath = filename;
 				}else{
-					rpath = '/www/server/panel/rewrite/' + getCookie('serverType')+'/' + rewriteName + '.conf';
+					var info = syncPost('/site/get_rewrite_tpl', {tplname:rewriteName});
+					if (!info['status']){
+						layer.msg(info['msg']);
+						return;
+					}
+					rpath = info['data'];
 				}
-				rpath = '/www/server/panel/vhost/rewrite/'+siteName+'.conf';
+				
 				$.post('/files/get_body','path='+rpath,function(fileBody){
-					 $("#rewriteBody").val(fileBody.data);
-					 editor.setValue(fileBody.data);
-				});
+					$("#rewriteBody").val(fileBody['data']['data']);
+					editor.setValue(fileBody['data']['data']);
+				},'json');
 			});
-		});
+		},'json');
 	},'json');
 }
 
 
 //设置伪静态
-function SetRewrite(filename){
+function setRewrite(filename){
 	var data = 'data='+encodeURIComponent($("#rewriteBody").val())+'&path='+filename+'&encoding=utf-8';
 	var loadT = layer.msg(lan.site.saving_txt,{icon:16,time:0,shade: [0.3, '#000']});
 	$.post('/files/save_body',data,function(rdata){
@@ -2185,7 +2193,7 @@ function SetRewrite(filename){
 }
 var aindex = null;
 //保存为模板
-function SetRewriteTel(act){
+function setRewriteTel(act){
 	if(act != undefined){
 		name = $("#rewriteName").val();
 		if(name == ''){
