@@ -197,12 +197,40 @@ def runLog():
     return tmp.groups()[0]
 
 
+def getPort():
+    path = getConf()
+    content = public.readFile(path)
+    rep = 'listen\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0]
+
+
 def queryLog():
     path = getConf()
     content = public.readFile(path)
     rep = 'query_log\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0]
+
+
+def runStatus():
+    s = status()
+    if s != 'start':
+        return public.returnJson(False, '没有启动程序')
+
+    sys.path.append(getPluginDir() + "/class")
+    import sphinxapi
+
+    sh = sphinxapi.SphinxClient()
+    port = getPort()
+    sh.SetServer('127.0.0.1', port)
+    info_status = sh.Status()
+
+    rData = {}
+    for x in range(len(info_status)):
+        rData[info_status[x][0]] = info_status[x][1]
+
+    return public.returnJson(True, 'ok', rData)
 
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -230,5 +258,7 @@ if __name__ == "__main__":
         print runLog()
     elif func == 'query_log':
         print queryLog()
+    elif func == 'run_status':
+        print runStatus()
     else:
         print 'error'

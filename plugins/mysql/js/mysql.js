@@ -82,7 +82,7 @@ function runInfo(){
                         <tr><th>排序后的合并次数</th><td>' + rdata.Sort_merge_passes + '</td><td colspan="2">若值过大,增加sort_buffer_size</td></tr>\
                         <tr><th>锁表次数</th><td>' + rdata.Table_locks_waited + '</td><td colspan="2">若值过大,请考虑增加您的数据库性能</td></tr>\
                     <tbody>\
-            </table></div>'
+            </table></div>';
         $(".soft-man-con").html(Con);
     });
 }
@@ -108,26 +108,6 @@ function myPort(){
                 }
             });
         });
-    });
-}
-
-//设置二进制日志
-function SetBinLog() {
-    var loadT = layer.msg(lan.public.the, { icon: 16, time: 0, shade: 0.3 });
-    $.post('/database?action=BinLog', "", function(rdata) {
-        layer.close(loadT);
-        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 5 });
-        mysqlLog();
-    });
-}
-
-//清空日志
-function closeMySqlLog() {
-    var loadT = layer.msg(lan.public.the, { icon: 16, time: 0, shade: 0.3 });
-    $.post('/database?action=GetErrorLog', "close=1", function(rdata) {
-        layer.close(loadT);
-        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 5 });
-        mysqlLog();
     });
 }
 
@@ -157,33 +137,6 @@ function changeMySQLDataPath(act) {
 }
 
 
-
-//数据库日志
-function mysqlLog(act) {
-    //获取二进制日志相关信息
-    $.post('/database?action=BinLog', "status=1", function(rdata) {
-        var limitCon = '<p class="conf_p">\
-                            <span class="f14 c6 mr20">' + lan.soft.mysql_log_bin + ' </span><span class="f14 c6 mr20">' + ToSize(rdata.msg) + '</span>\
-                            <button class="btn btn-success btn-xs va0" onclick="SetBinLog();">' + (rdata.status ? lan.soft.off : lan.soft.on) + '</button>\
-                            <p class="f14 c6 mtb10" style="border-top:#ddd 1px solid; padding:10px 0">' + lan.soft.mysql_log_err + '<button class="btn btn-default btn-xs" style="float:right;" onclick="closeMySqlLog();">' + lan.soft.mysql_log_close + '</button></p>\
-                            <textarea readonly style="margin: 0px;width: 515px;height: 440px;background-color: #333;color:#fff; padding:0 5px" id="error_log"></textarea>\
-                        </p>'
-
-        $(".soft-man-con").html(limitCon);
-
-        //获取错误日志
-        $.post('/database?action=GetErrorLog', "", function(error_body) {
-            if (error_body.status === false) {
-                layer.msg(error_body.msg, { icon: 5 });
-                error_body = lan.soft.mysql_log_ps1;
-            }
-            if (error_body == "") error_body = lan.soft.mysql_log_ps1;
-            $("#error_log").text(error_body);
-            var ob = document.getElementById('error_log');
-            ob.scrollTop = ob.scrollHeight;
-        });
-    });
-}
 
 
 //数据库配置状态
