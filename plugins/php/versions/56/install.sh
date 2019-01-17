@@ -43,6 +43,9 @@ cd $sourcePath/php/php-5.6.36 && ./configure \
 --enable-zip \
 --enable-mbstring \
 --enable-ftp \
+--enable-sysvmsg \
+--enable-opcache \
+--enable-intl \
 --enable-wddx \
 --enable-soap \
 --enable-posix \
