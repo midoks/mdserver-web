@@ -100,6 +100,13 @@ class site_api:
         rewrite = self.getRewriteConf(siteName)
         return public.getJson({'rewrite': rewrite})
 
+    def getRewriteTplApi(self):
+        tplname = request.form.get('tplname', '').encode('utf-8')
+        file = public.getRunDir() + '/rewrite/nginx/' + tplname + '.conf'
+        if not os.path.exists(file):
+            return public.returnJson(False, '模版不存在!')
+        return public.returnJson(True, 'OK', file)
+
     def getRewriteListApi(self):
         rlist = self.getRewriteList()
         return public.getJson(rlist)
