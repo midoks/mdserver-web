@@ -63,6 +63,7 @@ cd $sourcePath/php/php-5.6.36 && ./configure \
 
 Uninstall_php()
 {
+	rm -rf $serverPath/php/56
 	echo "卸载php-5.6.36 ..." > $install_tmp
 }
 
