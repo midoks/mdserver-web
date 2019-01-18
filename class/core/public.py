@@ -313,39 +313,90 @@ def writeFile(filename, str):
         return False
 
 
-def httpGet(url, timeout=30):
-    # 发送GET请求
-    try:
-        import urllib2
-        import ssl
+def HttpGet(url, timeout=10):
+    """
+    发送GET请求
+    @url 被请求的URL地址(必需)
+    @timeout 超时时间默认60秒
+    return string
+    """
+    if sys.version_info[0] == 2:
         try:
-            ssl._create_default_https_context = ssl._create_unverified_context
-        except:
-            pass
-        response = urllib2.urlopen(url, timeout=timeout)
-        return response.read()
-    except Exception, ex:
-        # writeLog('网络诊断', str(ex) + '[' + url + ']')
-        return str(ex)
+            import urllib2
+            import ssl
+            if sys.version_info[0] == 2:
+                reload(urllib2)
+                reload(ssl)
+            try:
+                ssl._create_default_https_context = ssl._create_unverified_context
+            except:
+                pass
+            response = urllib2.urlopen(url, timeout=timeout)
+            return response.read()
+        except Exception as ex:
+            return str(ex)
+    else:
+        try:
+            import urllib.request
+            import ssl
+            try:
+                ssl._create_default_https_context = ssl._create_unverified_context
+            except:
+                pass
+            response = urllib.request.urlopen(url, timeout=timeout)
+            result = response.read()
+            if type(result) == bytes:
+                result = result.decode('utf-8')
+            return result
+        except Exception as ex:
+            return str(ex)
 
 
-def httpPost(url, data, timeout=30):
-    # 发送POST请求
-    try:
-        import urllib
-        import urllib2
-        import ssl
+def httpGet(url, timeout=10):
+    return HttpGet(url, timeout)
+
+
+def HttpPost(url, data, timeout=10):
+    """
+    发送POST请求
+    @url 被请求的URL地址(必需)
+    @data POST参数，可以是字符串或字典(必需)
+    @timeout 超时时间默认60秒
+    return string
+    """
+    if sys.version_info[0] == 2:
         try:
+            import urllib
+            import urllib2
+            import ssl
             ssl._create_default_https_context = ssl._create_unverified_context
-        except:
-            pass
-        data = urllib.urlencode(data)
-        req = urllib2.Request(url, data)
-        response = urllib2.urlopen(req, timeout=timeout)
-        return response.read()
-    except Exception, ex:
-        # WriteLog('网络诊断',str(ex) + '['+url+']');
-        return str(ex)
+            data = urllib.urlencode(data)
+            req = urllib2.Request(url, data)
+            response = urllib2.urlopen(req, timeout=timeout)
+            return response.read()
+        except Exception as ex:
+            return str(ex)
+    else:
+        try:
+            import urllib.request
+            import ssl
+            try:
+                ssl._create_default_https_context = ssl._create_unverified_context
+            except:
+                pass
+            data = urllib.parse.urlencode(data).encode('utf-8')
+            req = urllib.request.Request(url, data)
+            response = urllib.request.urlopen(req, timeout=timeout)
+            result = response.read()
+            if type(result) == bytes:
+                result = result.decode('utf-8')
+            return result
+        except Exception as ex:
+            return str(ex)
+
+
+def httpPost(url, data, timeout=10):
+    return HttpPost(url, data, timeout)
 
 
 def writeSpeed(title, used, total, speed=0):
