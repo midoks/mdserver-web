@@ -27,6 +27,8 @@ Install_sphinx()
 		fi
 	fi
 
+	cd ${SPHINX_DIR} && tar -zxvf sphinx-3.1.1.tar.gz
+
 	cp -rf ${SPHINX_DIR}/sphinx-3.1.1/ $serverPath/sphinx/bin
 
 	echo '3.1.1' > $serverPath/sphinx/version.pl
