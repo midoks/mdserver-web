@@ -222,7 +222,7 @@ function addVersion(name, ver, type, obj, title) {
             getSList();
         });
     });
-    InstallTips();
+    installTips();
     fly("bi-btn");
 }
 
