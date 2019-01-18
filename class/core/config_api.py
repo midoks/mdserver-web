@@ -53,26 +53,50 @@ class config_api:
         session['username'] = name1
         return public.returnJson(True, '用户修改成功!')
 
+    def setApi(self):
+        webname = request.form.get('webname', '')
+        port = request.form.get('port', '')
+        host_ip = request.form.get('host_ip', '')
+        domain = request.form.get('domain', '')
+        if domain != '':
+            reg = "^([\w\-\*]{1,100}\.){1,4}(\w{1,10}|\w{1,10}\.\w{1,10})$"
+            if not re.match(reg, domain):
+                return public.returnJson(False, '主域名格式不正确')
+
+        if int(port) >= 65535 or int(port) < 100:
+            return public.returnJson(False, '端口范围不正确!')
+
+        if webname != public.getConfig('title'):
+            public.setConfig('title', webname)
+
+        if port != public.getHostPort():
+            import system_api
+            public.setHostPort(port)
+            system_api.system_api().restartMw()
+
+        if host_ip != public.getHostAddr():
+            public.setHostAddr(host_ip)
+
+        mhost = public.getHostAddr()
+        info = {
+            'uri': '/config',
+            'host': mhost + ':' + port
+        }
+        return public.returnJson(True, '保存成功!', info)
+
     ##### ----- end ----- ###
 
     def get(self):
 
         data = {}
-
+        data['title'] = public.getConfig('title')
         data['site_path'] = public.getWwwDir()
         data['backup_path'] = public.getBackupDir()
         sformat = 'date +"%Y-%m-%d %H:%M:%S %Z %z"'
         data['systemdate'] = public.execShell(sformat)[0].strip()
 
-        if os.path.exists('data/port.pl'):
-            data['port'] = public.readFile('data/port.pl').strip()
-        else:
-            data['port'] = '7200'
-
-        if os.path.exists('data/iplist.txt'):
-            data['ip'] = public.readFile('data/iplist.txt').strip()
-        else:
-            data['ip'] = '127.0.0.1'
+        data['port'] = public.getHostPort()
+        data['ip'] = public.getHostAddr()
 
         data['username'] = public.M('users').where(
             "id=?", (1,)).getField('username')
