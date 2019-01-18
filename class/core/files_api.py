@@ -83,7 +83,64 @@ class files_api:
         page = request.args.get('p', '1').strip().lower()
         row = request.args.get('showRow', '10')
         return self.getDir(path, int(page), int(row), search)
+
+    def createFileApi(self):
+        file = request.form.get('path', '').encode('utf-8')
+        try:
+            if not self.checkFileName(file):
+                return public.returnJson(False, '文件名中不能包含特殊字符!')
+            if os.path.exists(file):
+                return public.returnJson(False, '指定文件已存在!')
+            _path = os.path.dirname(file)
+            if not os.path.exists(_path):
+                os.makedirs(_path)
+            open(file, 'w+').close()
+            self.setFileAccept(file)
+            # public.WriteLog('TYPE_FILE', 'FILE_CREATE_SUCCESS', (get.path,))
+            return public.returnJson(True, '文件创建成功!')
+        except Exception as e:
+            # print str(e)
+            return public.returnJson(True, '文件创建失败!')
+
+    def createDirApi(self):
+        path = request.form.get('path', '').encode('utf-8')
+        try:
+            if not self.checkFileName(path):
+                return public.returnJson(False, '目录名中不能包含特殊字符!')
+            if os.path.exists(path):
+                return public.returnJson(False, '指定目录已存在!')
+            os.makedirs(path)
+            self.setFileAccept(path)
+            # public.writeLog('TYPE_FILE', 'DIR_CREATE_SUCCESS', (get.path,))
+            return public.returnJson(True, '目录创建成功!')
+        except Exception as e:
+            return public.returnJson(False, '目录创建失败!')
+
+    def downloadFileApi(self):
+        import db
+        import time
+        url = request.form.get('url', '').encode('utf-8')
+        path = request.form.get('path', '').encode('utf-8')
+        filename = request.form.get('filename', '').encode('utf-8')
+
+        isTask = public.getRootDir() + '/tmp/panelTask.pl'
+        execstr = url + '|bt|' + path + '/' + filename
+        public.M('tasks').add('name,type,status,addtime,execstr',
+                              ('下载文件[' + filename + ']', 'download', '0', time.strftime('%Y-%m-%d %H:%M:%S'), execstr))
+        public.writeFile(isTask, 'True')
+        self.setFileAccept(path + '/' + filename)
+        return public.returnJson(True, '已将下载任务添加到队列!')
     ##### ----- end ----- ###
+
+    def checkFileName(self, filename):
+        # 检测文件名
+        nots = ['\\', '&', '*', '|', ';']
+        if filename.find('/') != -1:
+            filename = filename.split('/')[-1]
+        for n in nots:
+            if n in filename:
+                return False
+        return True
 
     def setFileAccept(self, filename):
         auth = 'www:www'

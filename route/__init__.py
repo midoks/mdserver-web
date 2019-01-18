@@ -26,10 +26,11 @@ from flask_session import Session
 sys.path.append(os.getcwd() + "/class/core")
 import db
 import public
+import config_api
 
 
 app = Flask(__name__, template_folder='templates/default')
-app.config.version = '0.0.1'
+app.config.version = config_api.config_api().getVersion()
 # app.config['SECRET_KEY'] = os.urandom(24)
 # app.secret_key = uuid.UUID(int=uuid.getnode()).hex[-12:]
 app.config['SECRET_KEY'] = uuid.UUID(int=uuid.getnode()).hex[-12:]

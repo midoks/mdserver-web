@@ -15,10 +15,13 @@ from flask import request
 
 class config_api:
 
+    __version = '0.0.1'
+
     def __init__(self):
         pass
 
     ##### ----- start ----- ###
+
     def syncDateApi(self):
         if public.isAppleSystem():
             return public.returnJson(True, '开发系统不必同步时间!')
@@ -94,6 +97,9 @@ class config_api:
         return public.returnJson(True, '保存成功!', info)
 
     ##### ----- end ----- ###
+
+    def getVersion(self):
+        return self.__version
 
     def get(self):
 

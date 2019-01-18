@@ -479,8 +479,8 @@ function getFiles(Path) {
 						'+lan.files.new+' <span class="caret"></span>\
 						</button>\
 						<ul class="dropdown-menu">\
-						<li><a href="javascript:CreateFile(0,\'' + Path + '\');">'+lan.files.new_empty_file+'</a></li>\
-						<li><a href="javascript:CreateDir(0,\'' + Path + '\');">'+lan.files.new_dir+'</a></li>\
+						<li><a href="javascript:createFile(0,\'' + Path + '\');">'+lan.files.new_empty_file+'</a></li>\
+						<li><a href="javascript:createDir(0,\'' + Path + '\');">'+lan.files.new_dir+'</a></li>\
 						</ul>\
 						</div>';
 		if (rdata.PATH != '/') {
@@ -789,7 +789,7 @@ function getDisk() {
 		for (var i = 0; i < rdata.length; i++) {
 			LBody += "<span onclick=\"getFiles('" + rdata[i].path + "')\"><span class='glyphicon glyphicon-hdd'></span>&nbsp;" + (rdata[i].path=='/'?lan.files.path_root:rdata[i].path) + "(" + rdata[i].size[2] + ")</span>";
 		}
-		var trash = '<span id="recycle_bin" onclick="Recycle_bin(\'open\')" title="'+lan.files.recycle_bin_title+'" style="position: absolute; border-color: #ccc; right: 77px;"><span class="glyphicon glyphicon-trash"></span>&nbsp;'+lan.files.recycle_bin_title+'</span>';
+		var trash = '<span id="recycle_bin" onclick="Recycle_bin(\'open\')" title="回收站" style="position: absolute; border-color: #ccc; right: 77px;"><span class="glyphicon glyphicon-trash"></span>&nbsp;回收站</span>';
 		$("#comlist").html(LBody+trash);
 		isDiskWidth();
 	},'json');
@@ -819,14 +819,14 @@ function BackDir() {
 	setTimeout('PathPlaceBtn(getCookie("Path"));',200);
 }
 //新建文件
-function CreateFile(type, path) {
+function createFile(type, path) {
 	if (type == 1) {
 		var fileName = $("#newFileName").val();
 		layer.msg(lan.public.the, {
 			icon: 16,
 			time: 10000
 		});
-		$.post('/files?action=CreateFile', 'path=' + encodeURIComponent(path + '/' + fileName), function(rdata) {
+		$.post('/files/create_file', 'path=' + encodeURIComponent(path + '/' + fileName), function(rdata) {
 			layer.closeAll();
 			layer.msg(rdata.msg, {
 				icon: rdata.status ? 1 : 2
@@ -835,7 +835,7 @@ function CreateFile(type, path) {
 				getFiles($("#DirPathPlace input").val());
 				onlineEditFile(0,path + '/' + fileName);
 			}
-		});
+		},'json');
 		return;
 	}
 	layer.open({
@@ -846,33 +846,33 @@ function CreateFile(type, path) {
 		title: lan.files.new_empty_file,
 		content: '<div class="bt-form pd20 pb70">\
 					<div class="line">\
-					<input type="text" class="bt-input-text" name="Name" id="newFileName" value="" placeholder="'+lan.files.file_name+'" style="width:100%" />\
+					<input type="text" class="bt-input-text" name="Name" id="newFileName" value="" placeholder="文件名" style="width:100%" />\
 					</div>\
 					<div class="bt-form-submit-btn">\
-					<button type="button" class="btn btn-danger btn-sm" onclick="layer.closeAll()">'+lan.public.close+'</button>\
-					<button id="CreateFileBtn" type="button" class="btn btn-success btn-sm" onclick="CreateFile(1,\'' + path + '\')">'+lan.files.new+'</button>\
+					<button type="button" class="btn btn-danger btn-sm" onclick="layer.closeAll()">关闭</button>\
+					<button id="createFileBtn" type="button" class="btn btn-success btn-sm" onclick="createFile(1,\'' + path + '\')">新建</button>\
 					</div>\
 				</div>'
 	});
 	$("#newFileName").focus().keyup(function(e){
-		if(e.keyCode == 13) $("#CreateFileBtn").click();
+		if(e.keyCode == 13) $("#createFileBtn").click();
 	});
 }
 //新建目录
-function CreateDir(type, path) {
+function createDir(type, path) {
 	if (type == 1) {
 		var dirName = $("#newDirName").val();
 		layer.msg(lan.public.the, {
 			icon: 16,
 			time: 10000
 		});
-		$.post('/files?action=CreateDir', 'path=' + encodeURIComponent(path + '/' + dirName), function(rdata) {
+		$.post('/files/create_dir', 'path=' + encodeURIComponent(path + '/' + dirName), function(rdata) {
 			layer.closeAll();
 			layer.msg(rdata.msg, {
 				icon: rdata.status ? 1 : 2
 			});
 			getFiles($("#DirPathPlace input").val());
-		});
+		},'json');
 		return;
 	}
 	layer.open({
@@ -883,16 +883,16 @@ function CreateDir(type, path) {
 		title: lan.files.new_dir,
 		content: '<div class="bt-form pd20 pb70">\
 					<div class="line">\
-					<input type="text" class="bt-input-text" name="Name" id="newDirName" value="" placeholder="'+lan.files.dir_name+'" style="width:100%" />\
+					<input type="text" class="bt-input-text" name="Name" id="newDirName" value="" placeholder="目录名称" style="width:100%" />\
 					</div>\
 					<div class="bt-form-submit-btn">\
-					<button type="button" class="btn btn-danger btn-sm btn-title" onclick="layer.closeAll()">'+lan.public.close+'</button>\
-					<button type="button" id="CreateDirBtn" class="btn btn-success btn-sm btn-title" onclick="CreateDir(1,\'' + path + '\')">'+lan.files.new+'</button>\
+					<button type="button" class="btn btn-danger btn-sm btn-title" onclick="layer.closeAll()">关闭</button>\
+					<button type="button" id="createDirBtn" class="btn btn-success btn-sm btn-title" onclick="createDir(1,\'' + path + '\')">新建</button>\
 					</div>\
 				</div>'
 	});
 	$("#newDirName").focus().keyup(function(e){
-		if(e.keyCode == 13) $("#CreateDirBtn").click();
+		if(e.keyCode == 13) $("#createDirBtn").click();
 	});
 }
 
@@ -945,7 +945,7 @@ function ReloadFiles(){
 }
 			
 //下载文件
-function DownloadFile(action){
+function downloadFile(action){
 	
 	if(action == 1){
 		var fUrl = $("#mUrl").val();
@@ -954,12 +954,12 @@ function DownloadFile(action){
 		fname = encodeURIComponent($("#dfilename").val());
 		layer.closeAll();
 		layer.msg(lan.files.down_task,{time:0,icon:16,shade: [0.3, '#000']});
-		$.post('/files?action=DownloadFile','path='+fpath+'&url='+fUrl+'&filename='+fname,function(rdata){
+		$.post('/files/download_file','path='+fpath+'&url='+fUrl+'&filename='+fname,function(rdata){
 			layer.closeAll();
 			getFiles(fpath);
 			GetTaskCount();
 			layer.msg(rdata.msg,{icon:rdata.status?1:2});
-		});
+		},'json');
 		return;
 	}
 	var path = $("#DirPathPlace input").val();
@@ -971,17 +971,17 @@ function DownloadFile(action){
 		title: lan.files.down_title,
 		content: '<form class="bt-form pd20 pb70">\
 					<div class="line">\
-					<span class="tname">'+lan.files.down_url+':</span><input type="text" class="bt-input-text" name="url" id="mUrl" value="" placeholder="'+lan.files.down_url+'" style="width:330px" />\
+					<span class="tname">URL地址:</span><input type="text" class="bt-input-text" name="url" id="mUrl" placeholder="URL地址" style="width:330px" />\
 					</div>\
 					<div class="line">\
-					<span class="tname ">'+lan.files.down_to+':</span><input type="text" class="bt-input-text" name="path" id="dpath" value="'+path+'" placeholder="'+lan.files.down_to+'" style="width:330px" />\
+					<span class="tname ">下载到:</span><input type="text" class="bt-input-text" name="path" id="dpath" value="'+path+'" placeholder="下载到" style="width:330px" />\
 					</div>\
 					<div class="line">\
-					<span class="tname">'+lan.files.file_name+':</span><input type="text" class="bt-input-text" name="filename" id="dfilename" value="" placeholder="'+lan.files.down_save+'" style="width:330px" />\
+					<span class="tname">文件名:</span><input type="text" class="bt-input-text" name="filename" id="dfilename" value="" placeholder="文件名" style="width:330px" />\
 					</div>\
 					<div class="bt-form-submit-btn">\
-					<button type="button" class="btn btn-danger btn-sm" onclick="layer.closeAll()">'+lan.public.close+'</button>\
-					<button type="button" id="dlok" class="btn btn-success btn-sm dlok" onclick="DownloadFile(1)">'+lan.public.ok+'</button>\
+					<button type="button" class="btn btn-danger btn-sm" onclick="layer.closeAll()">关闭</button>\
+					<button type="button" id="dlok" class="btn btn-success btn-sm dlok" onclick="downloadFile(1)">确定</button>\
 					</div>\
 				</form>'
 	});
@@ -1550,6 +1550,7 @@ $("#DirPathPlace input").keyup(function(e){
 		getFiles($(this).val());
 	}
 });
+
 function PathPlaceBtn(path){
 	var html = '';
 	var title = '';

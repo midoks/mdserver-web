@@ -8,32 +8,32 @@
                 <div class="ptb15">
                     <div class="clearfix">
                         <div class="pull-left">
-                            <button id="backBtn" class="backBtn btn btn-default btn-sm glyphicon glyphicon-arrow-left pull-left" title="$tData['lan']['BTN1']" onClick="BackDir()"></button>
-                            <button class="backBtn refreshBtn btn btn-default btn-sm glyphicon glyphicon-refresh pull-right" title="$tData['lan']['BTN2']" style="margin-left:-1px;"></button>
+                            <button id="backBtn" class="backBtn btn btn-default btn-sm glyphicon glyphicon-arrow-left pull-left" title="" onClick="BackDir()"></button>
+                            <button class="backBtn refreshBtn btn btn-default btn-sm glyphicon glyphicon-refresh pull-right" title="" style="margin-left:-1px;"></button>
                             <span id='DirPathPlace' class="pull-left"><input id="fileInputPath" type="text"></span>
                             <span id='PathPlaceBtn' class="pull-left"></span>
                         </div>
                         <div class="pull-left mlr15" style="line-height:26px"><span id='DirInfo'></span></div>
                         <div class="search pull-right" style="position: absolute; top: 6px; right: 5px;">
-                            <form target="hid" onsubmit='GetFiles(1)'>
+                            <form target="hid" onsubmit='getFiles(1)'>
                                 <input type="text" id="SearchValue" class="ser-text pull-left" placeholder="" />
-                                <button type="button" class="ser-sub pull-left" onclick='GetFiles(1)'></button>
+                                <button type="button" class="ser-sub pull-left" onclick='getFiles(1)'></button>
                             </form>
                             <iframe name='hid' id="hid" style="display:none"></iframe>
                         </div>
                     </div>
                 </div>
                 <div class="clearfix ptb10">
-                    <button class="btn btn-default btn-sm pull-left" onclick="UploadFiles()">上传</button>
-                    <button class="btn btn-default btn-sm pull-left" onclick="DownloadFile()" title="$tData['lan']['TI1']" style="margin:0 5px">远程下载</button>
+                    <button class="btn btn-default btn-sm pull-left" onclick="uploadFiles()">上传</button>
+                    <button class="btn btn-default btn-sm pull-left" onclick="downloadFile()" title="$tData['lan']['TI1']" style="margin:0 5px">远程下载</button>
                     <span id='BarTools'></span>
                     <span id='Batch' style="background-color:#fff;position:absolute;right:190px;z-index:10"></span>
                     <span id='comlist' class="comlist"></span>
                     <div class="btn-group btn-group-sm pull-right" style="margin-right:5px;">
-                        <button id="set_icon" title="$tData['lan']['TI2']" type="button" class="btn btn-default">
+                        <button id="set_icon" type="button" class="btn btn-default">
                             <i class="glyphicon glyphicon-th"></i>
                         </button>
-                        <button id="set_list" title="$tData['lan']['TI3']" type="button" class="btn btn-default active">
+                        <button id="set_list" type="button" class="btn btn-default active">
                             <i class="glyphicon glyphicon-th-list"></i>
                         </button>
                     </div>
