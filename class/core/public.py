@@ -55,7 +55,15 @@ def getServerDir():
 
 
 def getWwwDir():
+    file = getRunDir() + '/data/site.pl'
+    if os.path.exists(file):
+        return readFile(file).strip()
     return getRootDir() + '/wwwroot'
+
+
+def setWwwDir(wdir):
+    file = getRunDir() + '/data/site.pl'
+    return writeFile(file, wdir)
 
 
 def getLogsDir():
@@ -64,6 +72,11 @@ def getLogsDir():
 
 def getBackupDir():
     return getRootDir() + '/backup'
+
+
+def setBackupDir(bdir):
+    file = getRunDir() + '/data/backup.pl'
+    return writeFile(file, wdir)
 
 
 def getOs():
