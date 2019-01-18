@@ -186,6 +186,8 @@ def retFail(msg, data=None):
 
 
 def returnJson(status, msg, data=None):
+    if data == None:
+        return getJson({'status': status, 'msg': msg})
     return getJson({'status': status, 'msg': msg, 'data': data})
 
 
@@ -561,6 +563,54 @@ def getTimeout(url):
     return int((time.time() - start) * 1000)
 
 
+def makeConf():
+    file = getRunDir() + '/data/json/config.json'
+    if not os.path.exists(file):
+        c = {}
+        c['title'] = 'Linux面板'
+        c['home'] = 'http://github/midoks/mdserver-web'
+        c['recycle_bin'] = True
+        c['template'] = 'default'
+        writeFile(file, json.dumps(c))
+        return c
+    c = readFile(file)
+    return json.loads(c)
+
+
+def getConfig(k):
+    c = makeConf()
+    return c[k]
+
+
+def setConfig(k, v):
+    c = makeConf()
+    c[k] = v
+    file = getRunDir() + '/data/json/config.json'
+    return writeFile(file, json.dumps(c))
+
+
+def getHostAddr():
+    if os.path.exists('data/iplist.txt'):
+        return readFile('data/iplist.txt').strip()
+    return '127.0.0.1'
+
+
+def setHostAddr(addr):
+    file = getRunDir() + '/data/iplist.txt'
+    return writeFile(file, addr)
+
+
+def getHostPort():
+    if os.path.exists('data/port.pl'):
+        return readFile('data/port.pl').strip()
+    return '7200'
+
+
+def setHostPort(port):
+    file = getRunDir() + '/data/port.pl'
+    return writeFile(file, port)
+
+
 def auth_decode(data):
     # 解密数据
     token = GetToken()
@@ -676,9 +726,7 @@ def checkCert(certPath='ssl/certificate.pem'):
             return False
     return True
 
- # 获取面板地址
-
-
+# 获取面板地址
 # def getPanelAddr():
 #     import web
 #     protocol = 'https://' if os.path.exists("data/ssl.pl") else 'http://'

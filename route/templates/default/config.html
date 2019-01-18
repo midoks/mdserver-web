@@ -40,7 +40,7 @@
 					<form id="set_config">
 						<p class="mtb15">
 							<span class="set-tit text-right">别名</span>
-							<input id="webname" name="webname" class="inputtxt bt-input-text" type="text" value="MDWEB面板" ><span class="set-info c7">MDWEB面板</span>
+							<input id="webname" name="webname" class="inputtxt bt-input-text" type="text" value="{{data['title']}}" ><span class="set-info c7">面板名称</span>
 						</p>
 						<p class="mtb15">
 							<span class="set-tit text-right">面板端口</span>
@@ -57,11 +57,6 @@
 							<input name="domain" class="inputtxt bt-input-text" type="text" value="">
 							<span class="set-info c7">为面板绑定一个访问域名;注意：一旦绑定域名,只能通过域名访问面板!</span>
 						</p>
-						<p class="mtb15">
-							<span class="set-tit text-right" title="授权IP">授权IP</span>
-							<input name="limitip" class="inputtxt bt-input-text" type="text" value="">
-							<span class="set-info c7">设置访问授权IP,多个请使用逗号(,)隔开;注意：一旦设置授权IP,只有指定IP的电脑能访问面板!</span>
-						</p>
 
 						<p class="mtb15">
 							<span class="set-tit text-right" title="默认建站目录">默认建站目录</span>
@@ -77,7 +72,7 @@
 
 						<p class="mtb15">
 							<span class="set-tit text-right" title="服务器IP">服务器IP</span>
-							<input name="backup_path" class="inputtxt bt-input-text" type="text" value="{{data['ip']}}">
+							<input name="host_ip" class="inputtxt bt-input-text" type="text" value="{{data['ip']}}">
 							<span class="set-info c7">默认为外网IP,若您在本地虚拟机测试,请填写虚拟机内网IP!</span>
 						</p>
 			

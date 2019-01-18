@@ -1,18 +1,16 @@
 
-
 $(".set-submit").click(function(){
 	var data = $("#set_config").serialize();
-	console.log(data);
 	layer.msg('正在保存配置...',{icon:16,time:0,shade: [0.3, '#000']});
-	$.post('/config?action=setPanel',data,function(rdata){
+	$.post('/config/set',data,function(rdata){
 		layer.closeAll();
 		layer.msg(rdata.msg,{icon:rdata.status?1:2});
 		if(rdata.status){
 			setTimeout(function(){
-				window.location.href = ((window.location.protocol.indexOf('https') != -1)?'https://':'http://') + rdata.host + window.location.pathname;
-			},1500);
+				window.location.href = ((window.location.protocol.indexOf('https') != -1)?'https://':'http://') + rdata.data.host + window.location.pathname;
+			},2500);
 		}
-	});
+	},'json');
 });
 
 

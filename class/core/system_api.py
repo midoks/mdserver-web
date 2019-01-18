@@ -90,9 +90,8 @@ class system_api:
     @async
     def restartMw(self):
         sleep(1)
-        print '123123'
         cmd = public.getRunDir() + '/scripts/init.d/mw reload'
-        print public.execShell(cmd)
+        public.execShell(cmd)
 
         # 名取PID
     def getPid(self, pname):
