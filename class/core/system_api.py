@@ -81,6 +81,12 @@ class system_api:
         data = self.getNetWorkIoData(start, end)
         return public.getJson(data)
 
+    def reMemoryApi(self):
+        os.system('sync')
+        scriptFile = 'script/rememory.sh'
+        public.execShell("/bin/bash " + public.getRunDir() + scriptFile)
+        return self.getMemInfo()
+
     # 重启面板
     def restartApi(self):
         self.restartMw()
