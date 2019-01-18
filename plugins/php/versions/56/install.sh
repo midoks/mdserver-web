@@ -37,8 +37,9 @@ cd $sourcePath/php/php-5.6.36 && ./configure \
 --exec-prefix=$serverPath/php/56 \
 --with-config-file-path=$serverPath/php/56/etc \
 --with-zlib-dir=$serverPath/lib/zlib \
---with-mysql \
---with-mysqli \
+--with-mysql=mysqlnd \
+--with-pdo-mysql=mysqlnd \
+--with-mysqli=mysqlnd \
 --without-iconv \
 --enable-zip \
 --enable-mbstring \
