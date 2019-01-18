@@ -58,6 +58,9 @@ class config_api:
         port = request.form.get('port', '')
         host_ip = request.form.get('host_ip', '')
         domain = request.form.get('domain', '')
+        sites_path = request.form.get('sites_path', '')
+        backup_path = request.form.get('backup_path', '')
+
         if domain != '':
             reg = "^([\w\-\*]{1,100}\.){1,4}(\w{1,10}|\w{1,10}\.\w{1,10})$"
             if not re.match(reg, domain):
@@ -68,6 +71,12 @@ class config_api:
 
         if webname != public.getConfig('title'):
             public.setConfig('title', webname)
+
+        if sites_path != public.getWwwDir():
+            public.setWwwDir(sites_path)
+
+        if backup_path != public.getWwwDir():
+            public.setBackupDir(backup_path)
 
         if port != public.getHostPort():
             import system_api
