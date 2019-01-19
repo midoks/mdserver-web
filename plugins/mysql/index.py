@@ -857,6 +857,7 @@ def getDbInfo():
                 data_size = table[0][6]
                 ret2['rows_count'] = table[0][4]
                 ret2['collation'] = table[0][14]
+                ret2['data_byte'] = data_size
                 ret2['data_size'] = public.toSize(data_size)
                 ret2['table_name'] = i[0]
                 ret3.append(ret2)
