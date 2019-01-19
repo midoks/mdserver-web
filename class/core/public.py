@@ -811,7 +811,7 @@ def toSize(size):
             return str(size) + ' ' + b
         size = size / 1024
         s = b
-    size = round(size, 2)
+    #size = round(size, 2)
     return str(size) + ' ' + b
 
 
