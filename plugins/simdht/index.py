@@ -263,6 +263,9 @@ def getTrendData():
         print str(e)
         return public.getJson([0, 0, 0])
 
+def dhtCmd():
+    file = initDreplace()
+    return file+' rstart'
 
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -290,5 +293,7 @@ if __name__ == "__main__":
         print getRunLog()
     elif func == 'get_trend_data':
         print getTrendData()
+    elif func == 'dht_cmd':
+        print dhtCmd();
     else:
         print 'error'
