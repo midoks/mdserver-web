@@ -809,7 +809,7 @@ def toSize(size):
     for b in d:
         if size < 1024:
             return str(round(size, 2)) + ' ' + b
-        size = size / 1024
+        size = size / 1024.0
         s = b
     return str(round(size, 2)) + ' ' + b
 
