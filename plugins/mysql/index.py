@@ -828,7 +828,7 @@ def getDbInfo():
         if not data:
             data = 0
         ret['data_size'] = public.toSize(data)
-        print ret
+        # print ret
         ret['database'] = db_name
 
         ret3 = []
