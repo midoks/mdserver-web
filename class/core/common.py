@@ -38,8 +38,8 @@ def initDB():
 def initInitD():
     script = public.getRunDir() + '/scripts/init.d/mw.tpl'
     script_bin = public.getRunDir() + '/scripts/init.d/mw'
-    if os.path.exists(script_bin):
-        return
+    # if os.path.exists(script_bin):
+    #     return
 
     content = public.readFile(script)
     content = content.replace("{$SERVER_PATH}", public.getRunDir())
@@ -47,7 +47,7 @@ def initInitD():
     public.writeFile(script_bin, content)
     public.execShell('chmod +x ' + script_bin)
 
-    if public.getOs() != 'darwin':
+    if not public.isAppleSystem():
         initd_bin = '/etc/init.d/mw'
         if not os.path.exists(initd_bin):
             shutil.copyfile(script_bin, initd_bin)
