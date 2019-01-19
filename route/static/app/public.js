@@ -1179,7 +1179,7 @@ function scroll_handle(e){
 $(function(){
 	setInterval(function(){
 		check_login();
-	},6000);
+	},60000);
 });
 
 function asyncLoadImage(obj, url){
