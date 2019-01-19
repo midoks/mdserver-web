@@ -50,6 +50,7 @@ def initInitD():
     if not public.isAppleSystem():
         initd_bin = '/etc/init.d/mw'
         if not os.path.exists(initd_bin):
+            import shutil
             shutil.copyfile(script_bin, initd_bin)
             public.execShell('chmod +x ' + initd_bin)
 
