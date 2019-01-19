@@ -777,6 +777,17 @@ def getDbAccess():
     userStr = ','.join(accs)
     return public.returnJson(True, userStr)
 
+def toSize(size):
+    d = ('b', 'KB', 'MB', 'GB', 'TB')
+    s = d[0]
+    for b in d:
+        if size < 1024:
+            return str(size) + ' ' + b
+        size = size / 1024
+        s = b
+    _size = round(size, 2)
+    print size,_size
+    return str(size) + ' ' + b
 
 def setDbAccess():
     args = getArgs()
@@ -827,7 +838,7 @@ def getDbInfo():
 
         if not data:
             data = 0
-        ret['data_size'] = public.toSize(data)
+        ret['data_size'] = toSize(data)
         # print ret
         ret['database'] = db_name
 
@@ -846,7 +857,7 @@ def getDbInfo():
                 data_size = table[0][6]
                 ret2['rows_count'] = table[0][4]
                 ret2['collation'] = table[0][14]
-                ret2['data_size'] = public.toSize(data_size)
+                ret2['data_size'] = toSize(data_size)
                 ret2['table_name'] = i[0]
                 ret3.append(ret2)
             except:
