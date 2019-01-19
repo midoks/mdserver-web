@@ -265,7 +265,7 @@ def getTrendData():
 
 def dhtCmd():
     file = initDreplace()
-    return file+' rstart'
+    return file+' restart'
 
 if __name__ == "__main__":
     func = sys.argv[1]
