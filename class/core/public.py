@@ -76,7 +76,7 @@ def getBackupDir():
 
 def setBackupDir(bdir):
     file = getRunDir() + '/data/backup.pl'
-    return writeFile(file, wdir)
+    return writeFile(file, bdir)
 
 
 def getOs():
