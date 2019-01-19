@@ -260,4 +260,13 @@ function dhtTrendRender() {
     }, 300);
 }
 
-
+function dhtRead(){
+    dhtPost('dht_cmd','', function(data){
+        console.log(data);
+        var readme = '<p>* 在手动导入SQL-先把数据表创建</p>';
+        readme += '<p>* 修改成对应配置文件</p>';
+        readme += '<p></p>';
+        $('.soft-man-con').html(readme);
+    });
+   
+}
