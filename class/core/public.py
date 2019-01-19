@@ -808,12 +808,10 @@ def toSize(size):
     s = d[0]
     for b in d:
         if size < 1024:
-            return str(size) + ' ' + b
+            return str(round(size, 2)) + ' ' + b
         size = size / 1024
         s = b
-    _size = round(size, 2)
-    print size,_size
-    return str(size) + ' ' + b
+    return str(round(size, 2)) + ' ' + b
 
 
 def getMacAddress():
