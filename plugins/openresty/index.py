@@ -121,8 +121,6 @@ def confReplace():
         user_group = 'staff'
         content = content.replace('{$EVENT_MODEL}', 'kqueue')
     else:
-        user = 'www'
-        user_group = 'www'
         content = content.replace('{$EVENT_MODEL}', 'epoll')
 
     content = content.replace('{$OS_USER}', user)
