@@ -237,7 +237,9 @@ def sphinxCmd():
     file = getConf()
     content = public.readFile(file)
     print content
-    return ''
+    rep = 'index\s(.*)'
+    tmp = re.findall(rep, content)
+    print tmp
 
 if __name__ == "__main__":
     func = sys.argv[1]
