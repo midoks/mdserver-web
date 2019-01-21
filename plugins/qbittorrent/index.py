@@ -17,14 +17,11 @@ if public.isAppleSystem():
 
 
 def getPluginName():
-    return 'simdht'
+    return 'qbittorrent'
 
 
 def getPluginDir():
     return public.getPluginDir() + '/' + getPluginName()
-
-sys.path.append(getPluginDir() + "/class")
-import mysql
 
 
 def getServerDir():
@@ -113,7 +110,7 @@ def initDreplace():
 
 def status():
     data = public.execShell(
-        "ps -ef|grep \"python simdht_worker.py\" | grep -v grep | awk '{print $2}'")
+        "ps -ef|grep qbittorrent-nox-bin | grep -v grep | awk '{print $2}'")
     if data[0] == '':
         return 'stop'
     return 'start'
@@ -186,23 +183,6 @@ def initdUinstall():
     return 'ok'
 
 
-def matchData(reg, content):
-    tmp = re.search(reg, content).groups()
-    return tmp[0]
-
-
-def getDbConfInfo():
-    cfg = getDbConf()
-    content = public.readFile(cfg)
-    data = {}
-    data['DB_HOST'] = matchData("DB_HOST\s*=\s(.*)", content)
-    data['DB_USER'] = matchData("DB_USER\s*=\s(.*)", content)
-    data['DB_PORT'] = matchData("DB_PORT\s*=\s(.*)", content)
-    data['DB_PASS'] = matchData("DB_PASS\s*=\s(.*)", content)
-    data['DB_NAME'] = matchData("DB_NAME\s*=\s(.*)", content)
-    return data
-
-
 def pMysqlDb():
     data = getDbConfInfo()
     conn = mysql.mysql()
@@ -214,58 +194,16 @@ def pMysqlDb():
     return conn
 
 
-def isSqlError(mysqlMsg):
-    # 检测数据库执行错误
-    mysqlMsg = str(mysqlMsg)
-    if "MySQLdb" in mysqlMsg:
-        return public.returnJson(False, 'MySQLdb组件缺失! <br>进入SSH命令行输入： pip install mysql-python')
-    if "2002," in mysqlMsg:
-        return public.returnJson(False, '数据库连接失败,请检查数据库服务是否启动!')
-    if "using password:" in mysqlMsg:
-        return public.returnJson(False, '数据库管理密码错误!')
-    if "Connection refused" in mysqlMsg:
-        return public.returnJson(False, '数据库连接失败,请检查数据库服务是否启动!')
-    if "1133" in mysqlMsg:
-        return public.returnJson(False, '数据库用户不存在!')
-    if "1007" in mysqlMsg:
-        return public.returnJson(False, '数据库已经存在!')
-    return None
+def test():
+    from qbittorrent import Client
+    qb = Client('http://154.48.251.71:8080/')
+    qb.login('admin', 'adminadmin')
 
-
-def getMinData(conn, sec):
-    time_diff = 0
-    if public.isAppleSystem():
-        time_diff = 3 * 60
-    pre = time.strftime("%Y-%m-%d %H:%M:%S",
-                        time.localtime(time.time() - sec - time_diff))
-    sql = "select count(id) from search_hash where create_time > '" + pre + "'"
-    data = conn.query(sql)
-    return data[0][0]
-
-
-def getTrendData():
-    try:
-        args = getArgs()
-        data = checkArgs(args, ['interval'])
-        if not data[0]:
-            return data[1]
-        pdb = pMysqlDb()
-        # interval = int(args['interval'])
-        result = pdb.execute("show tables")
-        isError = isSqlError(result)
-        if isError:
-            return isError
-        one = getMinData(pdb, 1)
-        two = getMinData(pdb, 5)
-        three = getMinData(pdb, 10)
-        return public.getJson([one, two, three])
-    except Exception as e:
-        print str(e)
-        return public.getJson([0, 0, 0])
-
-def dhtCmd():
-    file = initDreplace()
-    return file+' restart'
+    # magnet_link = "magnet:?xt=urn:btih:57a0ec92a61c60585f1b7a206a75798aa69285a5"
+    # print qb.download_from_link(magnet_link)
+    torrents = qb.torrents(filter='downloading')
+    for torrent in torrents:
+        print public.returnJson(False, torrent)
 
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -293,7 +231,7 @@ if __name__ == "__main__":
         print getRunLog()
     elif func == 'get_trend_data':
         print getTrendData()
-    elif func == 'dht_cmd':
-        print dhtCmd();
+    elif func == 'test':
+        print test()
     else:
         print 'error'
