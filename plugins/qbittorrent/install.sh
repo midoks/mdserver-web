@@ -14,6 +14,7 @@ install_tmp=${rootPath}/tmp/bt_install.pl
 Install_qbittorrent()
 {
 	if [ $sysName == 'Darwin' ]; then
+		echo 'apple system'
 	else
 		yum -y install qt-devel boost-devel openssl-devel qt5-qtbase-devel qt5-linguist
 	fi
