@@ -34,5 +34,12 @@ CREATE TABLE `search_statusreport` (
   `total_requests` int(11) NOT NULL,
   `valid_requests` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `search_statusreport_date_625dc87b8a52c947_uniq` (`date`)
+  UNIQUE KEY `search_statusreport_uniq` (`date`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- sphinx delta need  ---
+CREATE TABLE `sph_counter` (
+  `counter_id` int(11) NOT NULL COMMENT '标识不同的数据表',
+  `max_doc_id` int(11) NOT NULL COMMENT '每个索引表的最大ID,会实时更新',
+  PRIMARY KEY (`counter_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
