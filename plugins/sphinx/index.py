@@ -232,6 +232,13 @@ def runStatus():
 
     return public.returnJson(True, 'ok', rData)
 
+
+def sphinxCmd():
+    file = getConf()
+    content = public.readFile(file)
+    print content
+    return ''
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -260,5 +267,7 @@ if __name__ == "__main__":
         print queryLog()
     elif func == 'run_status':
         print runStatus()
+    elif func == 'sphinx_cmd':
+        print sphinxCmd()
     else:
         print 'error'
