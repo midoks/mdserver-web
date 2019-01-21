@@ -6,7 +6,7 @@ curPath=`pwd`
 rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
-
+sysName=`uname`
 
 install_tmp=${rootPath}/tmp/bt_install.pl
 
