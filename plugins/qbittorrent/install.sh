@@ -18,6 +18,8 @@ Install_qbittorrent()
 		yum -y install qt-devel boost-devel openssl-devel qt5-qtbase-devel qt5-linguist
 	fi
 
+	pip install python-qbittorrent
+
 	echo '正在安装脚本文件...' > $install_tmp
 	mkdir -p $serverPath/qbittorrent
 
