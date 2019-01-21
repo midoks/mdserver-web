@@ -37,8 +37,7 @@ Install_qbittorrent()
 		
 		#修改为固定端口号
 		#sed -i "s/i2p ? 1 : tracker_req().listen_port/8999/" src/http_tracker_connection.cpp
-		./configure --prefix=$serverPath/lib/libtorrent CXXFLAGS=-std=c++11
-		make && make install
+		./configure --prefix=$serverPath/lib/libtorrent --disable-gui CXXFLAGS=-std=c++11 && make && make install
 		#echo "/www/server/lib/libtorrent/lib" > /etc/ld.so.conf.d/libtorrent-x86_64.conf
 		echo "$serverPath/lib/libtorrent/lib" > /etc/ld.so.conf.d/libtorrent-x86_64.conf
 		ldconfig
