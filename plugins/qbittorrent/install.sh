@@ -30,16 +30,19 @@ Install_qbittorrent()
 	if [ ! -f ${QB_DIR}/libtorrent-rasterbar-1.1.9.tar.gz ];then
 		wget -O ${QB_DIR}/libtorrent-rasterbar-1.1.9.tar.gz https://github.com/arvidn/libtorrent/releases/download/libtorrent-1_1_9/libtorrent-rasterbar-1.1.9.tar.gz
 	fi
-	cd ${QB_DIR} && tar -zxf libtorrent-rasterbar-1.1.9.tar.gz
-	cd ${QB_DIR} && cd libtorrent-rasterbar-1.1.9
-	
-	#修改为固定端口号
-	#sed -i "s/i2p ? 1 : tracker_req().listen_port/8999/" src/http_tracker_connection.cpp
-	./configure --prefix=$serverPath/lib/libtorrent CXXFLAGS=-std=c++11
-	make && make install
-	#echo "/www/server/lib/libtorrent/lib" > /etc/ld.so.conf.d/libtorrent-x86_64.conf
-	echo "$serverPath/lib/libtorrent/lib" > /etc/ld.so.conf.d/libtorrent-x86_64.conf
-	ldconfig
+
+	if [ ! -f  $serverPath/lib/libtorrent ];then
+		cd ${QB_DIR} && tar -zxf libtorrent-rasterbar-1.1.9.tar.gz
+		cd ${QB_DIR} && cd libtorrent-rasterbar-1.1.9
+		
+		#修改为固定端口号
+		#sed -i "s/i2p ? 1 : tracker_req().listen_port/8999/" src/http_tracker_connection.cpp
+		./configure --prefix=$serverPath/lib/libtorrent CXXFLAGS=-std=c++11
+		make && make install
+		#echo "/www/server/lib/libtorrent/lib" > /etc/ld.so.conf.d/libtorrent-x86_64.conf
+		echo "$serverPath/lib/libtorrent/lib" > /etc/ld.so.conf.d/libtorrent-x86_64.conf
+		ldconfig
+	fi
 	#export LD_LIBRARY_PATH=/www/server/lib/libtorrent/lib
 	#export CPLUS_INCLUDE_PATH=/www/server/lib/libtorrent/include/
 	export CPLUS_INCLUDE_PATH=$serverPath/lib/libtorrent/include/
