@@ -81,3 +81,9 @@ function runStatus(){
     });
 }
 
+function readme(){
+    
+
+    $(".soft-man-con").html(Con);
+}
+
