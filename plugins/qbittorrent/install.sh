@@ -57,7 +57,7 @@ Install_qbittorrent()
 		cd ${QB_DIR} && tar -zxvf qbittorrent-4.1.5.tar.gz
 	fi 
 	
-	cd ${QB_DIR}/qBittorrent-release-4.1.5 && ./configure --prefix=$serverPath/qbittorrent --disable-gui && make && make install
+	cd ${QB_DIR}/qBittorrent-release-4.1.5 && ./configure --prefix=$serverPath/qbittorrent --disable-gui  CXXFLAGS=-std=c++11 && make && make install
 
 	echo '4.1.5' > $serverPath/qbittorrent/version.pl
 	echo '安装完成' > $install_tmp
