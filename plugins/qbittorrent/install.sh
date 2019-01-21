@@ -53,8 +53,11 @@ Install_qbittorrent()
 		wget -O ${QB_DIR}/qbittorrent-4.1.5.tar.gz https://github.com/qbittorrent/qBittorrent/archive/release-4.1.5.tar.gz
 	fi
 
-	cd ${QB_DIR} && tar -zxvf qbittorrent-4.1.5.tar.gz && \
-	./configure --prefix=$serverPath/qbittorrent --disable-gui && make && make install
+	if [ ! -f ${QB_DIR}/qBittorrent-release-4.1.5 ];then
+		cd ${QB_DIR} && tar -zxvf qbittorrent-4.1.5.tar.gz
+	fi 
+	
+	cd ${QB_DIR}/qBittorrent-release-4.1.5 && ./configure --prefix=$serverPath/qbittorrent --disable-gui && make && make install
 
 	echo '4.1.5' > $serverPath/qbittorrent/version.pl
 	echo '安装完成' > $install_tmp
