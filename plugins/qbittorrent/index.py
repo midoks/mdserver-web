@@ -68,8 +68,8 @@ def getSqlFile():
     return file
 
 
-def getDbConf():
-    file = getServerDir() + "/db.cfg"
+def getConf():
+    file = getServerDir() + "/qb.conf"
     return file
 
 
@@ -85,9 +85,9 @@ def initDreplace():
         sdir = getPluginDir() + '/workers'
         public.execShell('cp -rf ' + sdir + ' ' + getServerDir())
 
-    cfg = getServerDir() + '/db.cfg'
+    cfg = getServerDir() + '/qb.conf'
     if not os.path.exists(cfg):
-        cfg_tpl = getPluginDir() + '/workers/db.cfg'
+        cfg_tpl = getPluginDir() + '/conf/qb.conf'
         content = public.readFile(cfg_tpl)
         public.writeFile(cfg, content)
 
@@ -188,7 +188,7 @@ def matchData(reg, content):
 
 
 def getDbConfInfo():
-    cfg = getDbConf()
+    cfg = getConf()
     content = public.readFile(cfg)
     data = {}
     data['DB_HOST'] = matchData("DB_HOST\s*=\s(.*)", content)
@@ -245,8 +245,8 @@ if __name__ == "__main__":
         print initdUinstall()
     elif func == 'get_sql':
         print getSqlFile()
-    elif func == 'get_db_conf':
-        print getDbConf()
+    elif func == 'conf':
+        print getConf()
     elif func == 'get_run_Log':
         print getRunLog()
     elif func == 'get_trend_data':
