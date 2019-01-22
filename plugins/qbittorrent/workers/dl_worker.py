@@ -32,15 +32,53 @@ sys.path.append('/usr/local/lib/python2.7/site-packages')
 import MySQLdb as mdb
 
 
-# from configparser import ConfigParser
-# cp = ConfigParser()
-# cp.read("../db.cfg")
-# section_db = cp.sections()[0]
-# DB_HOST = cp.get(section_db, "DB_HOST")
-# DB_USER = cp.get(section_db, "DB_USER")
-# DB_PORT = cp.getint(section_db, "DB_PORT")
-# DB_PASS = cp.get(section_db, "DB_PASS")
-# DB_NAME = cp.get(section_db, "DB_NAME")
+from configparser import ConfigParser
+cp = ConfigParser()
+cp.read("../qb.conf")
+section_db = cp.sections()[0]
+DB_HOST = cp.get(section_db, "DB_HOST")
+DB_USER = cp.get(section_db, "DB_USER")
+DB_PORT = cp.getint(section_db, "DB_PORT")
+DB_PASS = cp.get(section_db, "DB_PASS")
+DB_NAME = cp.get(section_db, "DB_NAME")
+
+
+section_qb = cp.sections()[1]
+QB_HOST = cp.get(section_qb, "QB_HOST")
+QB_PORT = cp.get(section_qb, "QB_PORT")
+QB_USER = cp.get(section_qb, "QB_USER")
+QB_PWD = cp.get(section_qb, "QB_PWD")
+
+
+class downloadBT(Thread):
+
+    def __init__(self):
+        Thread.__init__(self)
+        self.setDaemon(True)
+        self.dbconn = mdb.connect(
+            DB_HOST, DB_USER, DB_PASS, DB_NAME, port=DB_PORT, charset='utf8')
+        self.dbconn.autocommit(False)
+        self.dbcurr = self.dbconn.cursor()
+        self.dbcurr.execute('SET NAMES utf8')
+        self.qb = self.qb()
+
+    def query(self, sql):
+        self.dbcurr.execute(sql)
+        result = self.dbcurr.fetchall()
+        data = map(list, result)
+        return data
+
+    def qb(self):
+        from qbittorrent import Client
+        url = 'http://' + QB_HOST + ':' + QB_PORT + '/'
+        qb = Client(url)
+        qb.login(QB_USER, QB_PWD)
+        return qb
+
+    def proccess(self):
+        while True:
+            print 123123
+            time.sleep(1)
 
 
 def checkDL():
@@ -51,9 +89,10 @@ def checkDL():
 
 if __name__ == "__main__":
 
-    # import threading
-    # t = threading.Thread(target=checkDL)
-    # t.setDaemon(True)
-    # t.start()
+    dl = downloadBT()
+
+    import threading
+    t = threading.Thread(target=dl.proccess)
+    t.start()
 
     checkDL()
