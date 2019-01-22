@@ -5,6 +5,7 @@ import io
 import os
 import time
 import re
+import string
 import subprocess
 
 sys.path.append(os.getcwd() + "/class/core")
@@ -235,11 +236,30 @@ def runStatus():
 
 def sphinxCmd():
     file = getConf()
+    bin_dir = getServerDir()
     content = public.readFile(file)
-    print content
     rep = 'index\s(.*)'
-    tmp = re.findall(rep, content)
-    print tmp
+    sindex = re.findall(rep, content)
+    indexlen = len(sindex)
+    if indexlen > 0:
+        cmd = {}
+        cmd_index = []
+        cmd_delta = []
+        for x in range(indexlen):
+            if string.find(sindex[x], ':') != -1:
+                t = sindex[x].split(':')
+                cmd_delta.append(t[0].strip())
+            else:
+                cmd_index.append(sindex[x])
+
+        cmd['index'] = cmd_index
+        cmd['delta'] = cmd_delta
+        cmd['cmd'] = bin_dir + '/bin/bin/searchd -c ' + bin_dir + '/sphinx.conf'
+
+        return public.returnJson(True, 'ok', cmd)
+    else:
+        return public.returnJson(False, 'no index')
+
 
 if __name__ == "__main__":
     func = sys.argv[1]
