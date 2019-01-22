@@ -262,7 +262,7 @@ function dhtTrendRender() {
 
 function dhtRead(){
     dhtPost('dht_cmd','', function(data){
-        console.log(data);
+        // console.log(data);
         var readme = '<p>* 在手动导入SQL-先把数据表创建</p>';
         readme += '<p>* 修改成对应的配置文件</p>';
         readme += '<p>* 加入到计划[自行调节]:'+data.data+'</p>';
