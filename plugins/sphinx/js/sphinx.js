@@ -55,7 +55,7 @@ function runStatus(){
         }
         var idata = rdata.data;
         console.log(idata);
-        var Con = '<div class="divtable"><table class="table table-hover table-bordered" style="margin-bottom:10px;background-color:#fafafa">\
+        var con = '<div class="divtable"><table class="table table-hover table-bordered" style="margin-bottom:10px;background-color:#fafafa">\
                     <tbody>\
                         <tr><th>运行时间</th><td>' + idata.uptime + 's</td><th>每秒查询</th><td>' + parseInt(parseInt(idata.queries) / parseInt(idata.uptime)) + '</td></tr>\
                         <tr><th>总连接次数</th><td>' + idata.connections + '</td><th>work_queue_length</th><td>' +idata.work_queue_length + '</td></tr>\
@@ -77,13 +77,25 @@ function runStatus(){
                     <tbody>\
             </table></div>';
 
-        $(".soft-man-con").html(Con);
+        $(".soft-man-con").html(con);
     });
 }
 
 function readme(){
-    
+    spPost('sphinx_cmd', '', function(data){
+        var rdata = $.parseJSON(data.data);
+        if (!rdata['status']){
+            layer.msg(rdata['msg'],{icon:2,time:2000,shade: [0.3, '#000']});
+            return;
+        }
 
-    $(".soft-man-con").html(Con);
+        var con = '';
+
+        console.log(rdata);
+
+        $(".soft-man-con").html(con);
+    });
+    
+    
 }
 
