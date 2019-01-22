@@ -64,7 +64,7 @@ def getInitDTpl():
 
 
 def getSqlFile():
-    file = getPluginDir() + "/conf/simdht.sql"
+    file = getPluginDir() + "/conf/qb.sql"
     return file
 
 
@@ -129,7 +129,6 @@ def stop():
     file = initDreplace()
     data = public.execShell(file + ' stop')
     if data[1] == '':
-        public.execShell('rm -rf /tmp/mysql.sock')
         return 'ok'
     return 'fail'
 
@@ -183,6 +182,23 @@ def initdUinstall():
     return 'ok'
 
 
+def matchData(reg, content):
+    tmp = re.search(reg, content).groups()
+    return tmp[0]
+
+
+def getDbConfInfo():
+    cfg = getDbConf()
+    content = public.readFile(cfg)
+    data = {}
+    data['DB_HOST'] = matchData("DB_HOST\s*=\s(.*)", content)
+    data['DB_USER'] = matchData("DB_USER\s*=\s(.*)", content)
+    data['DB_PORT'] = matchData("DB_PORT\s*=\s(.*)", content)
+    data['DB_PASS'] = matchData("DB_PASS\s*=\s(.*)", content)
+    data['DB_NAME'] = matchData("DB_NAME\s*=\s(.*)", content)
+    return data
+
+
 def pMysqlDb():
     data = getDbConfInfo()
     conn = mysql.mysql()
@@ -194,11 +210,15 @@ def pMysqlDb():
     return conn
 
 
-def test():
+def pQbClient():
     from qbittorrent import Client
     qb = Client('http://154.48.251.71:8080/')
     qb.login('admin', 'adminadmin')
+    return qb
 
+
+def test():
+    qb = pQbClient()
     # magnet_link = "magnet:?xt=urn:btih:57a0ec92a61c60585f1b7a206a75798aa69285a5"
     # print qb.download_from_link(magnet_link)
     torrents = qb.torrents(filter='downloading')

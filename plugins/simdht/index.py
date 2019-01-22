@@ -132,7 +132,6 @@ def stop():
     file = initDreplace()
     data = public.execShell(file + ' stop')
     if data[1] == '':
-        public.execShell('rm -rf /tmp/mysql.sock')
         return 'ok'
     return 'fail'
 
@@ -263,9 +262,10 @@ def getTrendData():
         print str(e)
         return public.getJson([0, 0, 0])
 
+
 def dhtCmd():
     file = initDreplace()
-    return file+' restart'
+    return file + ' restart'
 
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -294,6 +294,6 @@ if __name__ == "__main__":
     elif func == 'get_trend_data':
         print getTrendData()
     elif func == 'dht_cmd':
-        print dhtCmd();
+        print dhtCmd()
     else:
         print 'error'
