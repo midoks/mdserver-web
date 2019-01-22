@@ -1377,7 +1377,7 @@ function pluginConfigTpl(_name, version, func, config_tpl_func, read_config_tpl_
 
 
     var con = '<p style="color: #666; margin-bottom: 7px">提示：Ctrl+F 搜索关键字，Ctrl+G 查找下一个，Ctrl+S 保存，Ctrl+Shift+R 查找替换!</p>\
-    			<select id="config_tpl" class="bt-input-text mr20" style="width:30%;margin-bottom: 3px;"><option value="0">无选择</option></select>\
+    			<select id="config_tpl" class="bt-input-text mr20" style="width:30%;margin-bottom: 3px;"><option value="0">请选择</option></select>\
     			<textarea class="bt-input-text" style="height: 320px; line-height:18px;" id="textBody"></textarea>\
                 <button id="onlineEditFileBtn" class="btn btn-success btn-sm" style="margin-top:10px;">保存</button>\
                 <ul class="help-info-text c7 ptb15">\
