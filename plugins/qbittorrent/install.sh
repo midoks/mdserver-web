@@ -27,8 +27,6 @@ Install_qbittorrent()
 	QB_DIR=${serverPath}/source/qbittorrent
 	mkdir -p $QB_DIR
 
-	
-
 	echo '4.1.5' > $serverPath/qbittorrent/version.pl
 	echo '安装完成' > $install_tmp
 }
