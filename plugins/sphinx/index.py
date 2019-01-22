@@ -62,8 +62,35 @@ def getArgs():
         for i in range(len(args)):
             t = args[i].split(':')
             tmp[t[0]] = t[1]
-
     return tmp
+
+
+def checkArgs(data, ck=[]):
+    for i in range(len(ck)):
+        if not ck[i] in data:
+            return (False, public.returnJson(False, '参数:(' + ck[i] + ')没有!'))
+    return (True, public.returnJson(True, 'ok'))
+
+
+def configTpl():
+    path = getPluginDir() + '/tpl'
+    pathFile = os.listdir(path)
+    tmp = []
+    for one in pathFile:
+        file = path + '/' + one
+        tmp.append(file)
+    return public.getJson(tmp)
+
+
+def readConfigTpl():
+    args = getArgs()
+    data = checkArgs(args, ['file'])
+    if not data[0]:
+        return data[1]
+
+    content = public.readFile(args['file'])
+    content = contentReplace(content)
+    return public.returnJson(True, 'ok', content)
 
 
 def contentReplace(content):
@@ -247,14 +274,13 @@ def sphinxCmd():
         cmd_delta = []
         for x in range(indexlen):
             if string.find(sindex[x], ':') != -1:
-                t = sindex[x].split(':')
-                cmd_delta.append(t[0].strip())
+                cmd_delta.append(sindex[x])
             else:
                 cmd_index.append(sindex[x])
 
         cmd['index'] = cmd_index
         cmd['delta'] = cmd_delta
-        cmd['cmd'] = bin_dir + '/bin/bin/searchd -c ' + bin_dir + '/sphinx.conf'
+        cmd['cmd'] = bin_dir + '/bin/bin/indexer -c ' + bin_dir + '/sphinx.conf'
 
         return public.returnJson(True, 'ok', cmd)
     else:
@@ -283,6 +309,10 @@ if __name__ == "__main__":
         print initdUinstall()
     elif func == 'conf':
         print getConf()
+    elif func == 'config_tpl':
+        print configTpl()
+    elif func == 'read_config_tpl':
+        print readConfigTpl()
     elif func == 'run_log':
         print runLog()
     elif func == 'query_log':

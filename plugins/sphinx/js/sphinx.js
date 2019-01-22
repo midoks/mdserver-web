@@ -91,11 +91,22 @@ function readme(){
 
         var con = '';
 
-        console.log(rdata);
+        //主索引
+        for (var i = 0; i < rdata['data']['index'].length; i++) {
+            var index_t = rdata['data']['index'][i];
+            con += '<p>主索引:' + rdata['data']['cmd'] + ' '+ index_t +' --rotate </p>';
+        }
+
+        for (var i = 0; i < rdata['data']['delta'].length; i++) {
+            var delta_t = rdata['data']['delta'][i];
+            var list = delta_t.split(':');
+            console.log(list);
+            con += '<p>增量索引:' + rdata['data']['cmd'] + ' '+ list[0] +' --rotate </p>';
+            con += '<p>合并索引:' + rdata['data']['cmd'] + ' --merge '+ list[1] + ' ' + list[0] +' --rotate </p>';
+        }
 
         $(".soft-man-con").html(con);
     });
-    
     
 }
 
