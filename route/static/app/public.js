@@ -1391,6 +1391,7 @@ function pluginConfigTpl(_name, version, func, config_tpl_func, read_config_tpl_
     	return f 
     }
 
+    var fileName = '';
     $.post('/plugins/run',{name:_name, func:_config_tpl_func,version:version}, function(data){
     	var rdata = $.parseJSON(data.data);
     	for (var i = 0; i < rdata.length; i++) {
@@ -1410,7 +1411,7 @@ function pluginConfigTpl(_name, version, func, config_tpl_func, read_config_tpl_
 		                layer.msg(rdata.msg,{icon:0,time:2000,shade: [0.3, '#000']});
 		                return;
 		            }
-    				
+
     				$("#textBody").empty().text(rdata.data);
     				$(".CodeMirror").remove();
 		            var editor = CodeMirror.fromTextArea(document.getElementById("textBody"), {
@@ -1428,6 +1429,11 @@ function pluginConfigTpl(_name, version, func, config_tpl_func, read_config_tpl_
 		            });
 		            editor.focus();
 		            $(".CodeMirror-scroll").css({"height":"300px","margin":0,"padding":0});
+		            $("#onlineEditFileBtn").unbind('click');
+		            $("#onlineEditFileBtn").click(function(){
+		                $("#textBody").text(editor.getValue());
+		                pluginConfigSave(fileName);
+		            });
     			},'json');
     		}
     	});
@@ -1439,7 +1445,7 @@ function pluginConfigTpl(_name, version, func, config_tpl_func, read_config_tpl_
         layer.close(loadT);
 
         var loadT2 = layer.msg('文件内容获取中...',{icon:16,time:0,shade: [0.3, '#000']});
-        var fileName = data.data;
+        fileName = data.data;
         $.post('/files/get_body', 'path=' + fileName, function(rdata) {
             layer.close(loadT2);
             if (!rdata.status){
