@@ -119,6 +119,7 @@ class downloadBT(Thread):
         self.execShell(cmd)
 
     def video_do(self, dir):
+
         return ''
 
     def checkTask(self):
@@ -135,9 +136,11 @@ class downloadBT(Thread):
             if len(torrents) > 0:
                 for torrent in torrents:
                     path = torrent['save_path'] + torrent['name']
+                    self.video_do(path)
                     print path, torrent
                     # self.ffmpeg(
                     #     '/Users/midoks/Desktop/www/btplayer/public/video/test.mp4')
+                print time.time(), "done task!"
             else:
                 print time.time(), "no task!"
             time.sleep(3)
