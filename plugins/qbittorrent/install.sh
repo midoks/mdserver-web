@@ -23,8 +23,6 @@ Install_qbittorrent()
 		yum install -y ffmpeg
 	fi
 
-	
-
 	pip install python-qbittorrent
 
 	echo '正在安装脚本文件...' > $install_tmp
