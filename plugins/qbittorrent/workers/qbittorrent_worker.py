@@ -132,12 +132,13 @@ class downloadBT(Thread):
     def completed(self):
         while True:
             torrents = self.qb.torrents(filter='completed')
-            # print torrents
-            for torrent in torrents:
-                print torrent
-                self.ffmpeg(
-                    '/Users/midoks/Desktop/www/btplayer/public/video/test.mp4')
-            print time.time(), "no task!"
+            if len(torrents) > 0:
+                for torrent in torrents:
+                    print torrent
+                    # self.ffmpeg(
+                    #     '/Users/midoks/Desktop/www/btplayer/public/video/test.mp4')
+            else:
+                print time.time(), "no task!"
             time.sleep(60)
 
 
