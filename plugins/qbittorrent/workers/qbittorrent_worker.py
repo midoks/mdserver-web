@@ -134,7 +134,8 @@ class downloadBT(Thread):
             torrents = self.qb.torrents(filter='completed')
             if len(torrents) > 0:
                 for torrent in torrents:
-                    print torrent
+                    path = torrent['save_path'] + torrent['name']
+                    print path, torrent
                     # self.ffmpeg(
                     #     '/Users/midoks/Desktop/www/btplayer/public/video/test.mp4')
             else:
