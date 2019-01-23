@@ -114,7 +114,9 @@ class downloadBT(Thread):
         cmd = 'ffmpeg -i ' + file + ' -c copy -map 0 -f segment -segment_list ' + \
             m3u8_file + ' -segment_time 5 ' + tofile
         print cmd
-        print self.execShell(cmd)
+        data = self.execShell(cmd)
+        if data[0] != '':
+            print data
 
     def file_arr(self, path, filters=['.DS_Store']):
         file_list = []
