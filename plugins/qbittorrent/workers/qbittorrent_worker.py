@@ -142,8 +142,9 @@ class downloadBT(Thread):
         return video
 
     def video_do(self, path):
-        print self.file_video(path)
-        # self.ffmpeg('/Users/midoks/Desktop/www/btplayer/public/video/test.mp4')
+        vlist = self.file_video(path)
+        for i in range(len(vlist)):
+            self.ffmpeg(vlist[i])
         return ''
 
     def checkTask(self):
