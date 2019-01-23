@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 # encoding: utf-8
 """
-磁力搜索meta信息入库程序
+下载检测
 """
 
 import hashlib
 import os
-import SimpleXMLRPCServer
 import time
 import datetime
 import traceback
@@ -20,8 +19,6 @@ from struct import unpack
 from socket import inet_ntoa
 from threading import Timer, Thread
 from time import sleep
-from collections import deque
-from Queue import Queue
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -49,6 +46,9 @@ QB_PORT = cp.get(section_qb, "QB_PORT")
 QB_USER = cp.get(section_qb, "QB_USER")
 QB_PWD = cp.get(section_qb, "QB_PWD")
 
+section_file = cp.sections()[2]
+FILE_TO = cp.get(section_file, "FILE_TO")
+
 
 class downloadBT(Thread):
 
@@ -75,24 +75,52 @@ class downloadBT(Thread):
         qb.login(QB_USER, QB_PWD)
         return qb
 
-    def proccess(self):
+    def ffmpeg(self, file=''):
+        vfile = '/Users/midoks/Desktop/www/btplayer/public/video/test.mp4'
+        m3u8_dir = FILE_TO + '/m3u8'
+        m3u8_file = m3u8_dir + '/test.m3u8'
+        os.system('mkdir -p ' + m3u8_dir)
+        tofile = FILE_TO + '/m3u8/' + '%03d.ts'
+        cmd = 'ffmpeg -i ' + vfile + \
+            ' -c copy -map 0 -f segment -segment_list ' + \
+            m3u8_file + ' -segment_time 5 ' + tofile
+        print cmd
+        os.system(cmd)
+
+    def checkTask(self):
         while True:
-            print 123123
-            time.sleep(1)
+            torrents = self.qb.torrents()
+            for torrent in torrents:
+                print torrent
+            print time.time(), "no task!"
+            time.sleep(10)
+
+    def completed(self):
+        while True:
+            torrents = self.qb.torrents(filter='completed')
+            print torrents
+            for torrent in torrents:
+                print torrent
+                self.ffmpeg()
+            print time.time(), "no task!"
+            time.sleep(10)
 
 
-def checkDL():
+def test():
     while True:
-        print time.time()
+        print time.time(), "no download task!",
         time.sleep(1)
-        checkDL()
+        test()
 
 if __name__ == "__main__":
 
     dl = downloadBT()
 
     import threading
-    t = threading.Thread(target=dl.proccess)
-    t.start()
+    # t = threading.Thread(target=dl.checkTask)
+    # t.start()
 
-    checkDL()
+    completed = threading.Thread(target=dl.completed)
+    completed.start()
+
+    # test()
