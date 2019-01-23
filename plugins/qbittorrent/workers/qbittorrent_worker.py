@@ -158,7 +158,6 @@ class downloadBT(Thread):
 
     def completed(self):
         while True:
-            time.sleep(1)
             torrents = self.qb.torrents(filter='completed')
             if len(torrents) > 0:
                 for torrent in torrents:
