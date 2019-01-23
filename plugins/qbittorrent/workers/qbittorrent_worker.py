@@ -75,17 +75,51 @@ class downloadBT(Thread):
         qb.login(QB_USER, QB_PWD)
         return qb
 
+    def execShell(self, cmdstring, cwd=None, timeout=None, shell=True):
+        import subprocess
+        if shell:
+            cmdstring_list = cmdstring
+        else:
+            cmdstring_list = shlex.split(cmdstring)
+        if timeout:
+            end_time = datetime.datetime.now() + datetime.timedelta(seconds=timeout)
+
+        sub = subprocess.Popen(cmdstring_list, cwd=cwd, stdin=subprocess.PIPE,
+                               shell=shell, bufsize=4096, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+        while sub.poll() is None:
+            time.sleep(0.1)
+            if timeout:
+                if end_time <= datetime.datetime.now():
+                    raise Exception("Timeout：%s" % cmdstring)
+
+        return sub.communicate()
+
+    def md5(self, str):
+        # 生成MD5
+        try:
+            m = hashlib.md5()
+            m.update(str)
+            return m.hexdigest()
+        except:
+            return False
+
     def ffmpeg(self, file=''):
-        vfile = '/Users/midoks/Desktop/www/btplayer/public/video/test.mp4'
-        m3u8_dir = FILE_TO + '/m3u8'
-        m3u8_file = m3u8_dir + '/test.m3u8'
+        #vfile = '/Users/midoks/Desktop/www/btplayer/public/video/test.mp4'
+        md5file = self.md5(file)
+        m3u8_dir = FILE_TO + '/m3u8/' + md5file
         os.system('mkdir -p ' + m3u8_dir)
-        tofile = FILE_TO + '/m3u8/' + '%03d.ts'
-        cmd = 'ffmpeg -i ' + vfile + \
+        m3u8_file = m3u8_dir + '/' + md5file + '.m3u8'
+
+        tofile = FILE_TO + '/m3u8/' + md5file + '/%03d.ts'
+        cmd = 'ffmpeg -i ' + file + \
             ' -c copy -map 0 -f segment -segment_list ' + \
             m3u8_file + ' -segment_time 5 ' + tofile
         print cmd
-        os.system(cmd)
+        self.execShell(cmd)
+
+    def video_do(self, dir):
+        return ''
 
     def checkTask(self):
         while True:
@@ -98,10 +132,11 @@ class downloadBT(Thread):
     def completed(self):
         while True:
             torrents = self.qb.torrents(filter='completed')
-            print torrents
+            # print torrents
             for torrent in torrents:
                 print torrent
-                self.ffmpeg()
+                self.ffmpeg(
+                    '/Users/midoks/Desktop/www/btplayer/public/video/test.mp4')
             print time.time(), "no task!"
             time.sleep(60)
 
