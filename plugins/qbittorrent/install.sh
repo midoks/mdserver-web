@@ -17,13 +17,14 @@ Install_qbittorrent()
 		echo 'apple system'
 	else
 		yum -y install qbittorrent-nox
+		#安装Nux-Dextop源
+		sudo rpm --import http://li.nux.ro/download/nux/RPM-GPG-KEY-nux.ro 
+		sudo rpm -Uvh http://li.nux.ro/download/nux/dextop/el7/x86_64/nux-dextop-release-0-1.el7.nux.noarch.rpm
+		yum install -y ffmpeg
 	fi
 
-	#安装Nux-Dextop源
-	sudo rpm --import http://li.nux.ro/download/nux/RPM-GPG-KEY-nux.ro 
-	sudo rpm -Uvh http://li.nux.ro/download/nux/dextop/el7/x86_64/nux-dextop-release-0-1.el7.nux.noarch.rpm
-	yum install -y ffmpeg
 	
+
 	pip install python-qbittorrent
 
 	echo '正在安装脚本文件...' > $install_tmp
