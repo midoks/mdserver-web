@@ -105,7 +105,6 @@ class downloadBT(Thread):
             return False
 
     def ffmpeg(self, file=''):
-        #vfile = '/Users/midoks/Desktop/www/btplayer/public/video/test.mp4'
         md5file = self.md5(file)
         m3u8_dir = FILE_TO + '/m3u8/' + md5file
         os.system('mkdir -p ' + m3u8_dir)
@@ -116,10 +115,11 @@ class downloadBT(Thread):
             ' -c copy -map 0 -f segment -segment_list ' + \
             m3u8_file + ' -segment_time 5 ' + tofile
         print cmd
-        self.execShell(cmd)
+        print self.execShell(cmd)
 
     def video_do(self, dir):
 
+        # self.ffmpeg('/Users/midoks/Desktop/www/btplayer/public/video/test.mp4')
         return ''
 
     def checkTask(self):
@@ -137,9 +137,7 @@ class downloadBT(Thread):
                 for torrent in torrents:
                     path = torrent['save_path'] + torrent['name']
                     self.video_do(path)
-                    print path, torrent
-                    # self.ffmpeg(
-                    #     '/Users/midoks/Desktop/www/btplayer/public/video/test.mp4')
+                    print torrent
                 print time.time(), "done task!"
             else:
                 print time.time(), "no task!"
