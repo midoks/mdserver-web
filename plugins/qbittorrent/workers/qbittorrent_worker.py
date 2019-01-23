@@ -159,7 +159,9 @@ class downloadBT(Thread):
     def completed(self):
         while True:
             torrents = self.qb.torrents(filter='completed')
-            if len(torrents) > 0:
+            tlen = len(torrents)
+            print "torrents count:", tlen
+            if tlen > 0:
                 for torrent in torrents:
                     path = torrent['save_path'] + torrent['name']
                     self.video_do(path)
