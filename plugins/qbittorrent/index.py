@@ -130,7 +130,7 @@ def stop():
     data = public.execShell(file + ' stop')
     if data[1] == '':
         return 'ok'
-    return 'fail'
+    return data[1]
 
 
 def restart():
@@ -138,7 +138,7 @@ def restart():
     data = public.execShell(file + ' restart')
     if data[1] == '':
         return 'ok'
-    return 'fail'
+    return data[1]
 
 
 def reload():
@@ -146,7 +146,7 @@ def reload():
     data = public.execShell(file + ' reload')
     if data[1] == '':
         return 'ok'
-    return 'fail'
+    return data[1]
 
 
 def initdStatus():
