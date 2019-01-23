@@ -110,7 +110,7 @@ def initDreplace():
 
 def status():
     data = public.execShell(
-        "ps -ef|grep dl_worker | grep -v grep | awk '{print $2}'")
+        "ps -ef|grep qbittorrent_worker | grep -v grep | awk '{print $2}'")
     if data[0] == '':
         return 'stop'
     return 'start'
@@ -215,6 +215,10 @@ def pQbClient():
     qb = Client('http://154.48.251.71:8080/')
     qb.login('admin', 'adminadmin')
     return qb
+
+
+def qbList():
+    return ''
 
 
 def test():

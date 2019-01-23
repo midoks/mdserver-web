@@ -16,13 +16,14 @@
 qb_start(){
 	cd {$SERVER_PATH}/qbittorrent/workers
 	nohup python qbittorrent_worker.py > {$SERVER_PATH}/qbittorrent/logs.pl 2>&1 &
+	echo "qbittorrent started"
 }
 
 qb_stop(){
 	echo "Stopping ..."
 	#ps -ef | grep qbittorrent-nox-bin | grep -v grep | awk '{print $2}' | xargs kill
-	ps -ef | grep "python qbittorrent_worker.py" | grep -v grep | awk '{print $2}' | xargs kill
-	echo "Redis stopped"
+	ps -ef | grep "qbittorrent_worker.py" | grep -v grep | awk '{print $2}' | xargs kill
+	echo "qbittorrent stopped"
 }
 
 
