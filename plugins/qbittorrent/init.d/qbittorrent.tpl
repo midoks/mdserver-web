@@ -21,8 +21,8 @@ qb_start(){
 
 qb_stop(){
 	echo "Stopping ..."
-	#ps -ef | grep qbittorrent-nox-bin | grep -v grep | awk '{print $2}' | xargs kill
-	ps -ef | grep "qbittorrent_worker.py" | grep -v grep | awk '{print $2}' | xargs kill
+	#ps -ef | grep qbittorrent-nox-bin | grep -v grep | awk '{print $2}' | xargs kill -9
+	ps -ef | grep "qbittorrent_worker.py" | grep -v grep | awk '{print $2}' | xargs kill -9
 	echo "qbittorrent stopped"
 }
 
