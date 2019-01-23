@@ -165,7 +165,7 @@ class downloadBT(Thread):
                 for torrent in torrents:
                     path = torrent['save_path'] + torrent['name']
                     self.video_do(path)
-                    print torrent
+                    # print torrent
                 print time.time(), "done task!"
             else:
                 print time.time(), "no task!"
