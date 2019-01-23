@@ -103,7 +103,7 @@ class downloadBT(Thread):
                 print torrent
                 self.ffmpeg()
             print time.time(), "no task!"
-            time.sleep(10)
+            time.sleep(60)
 
 
 def test():
