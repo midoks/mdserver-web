@@ -140,7 +140,7 @@ class downloadBT(Thread):
                     #     '/Users/midoks/Desktop/www/btplayer/public/video/test.mp4')
             else:
                 print time.time(), "no task!"
-            time.sleep(60)
+            time.sleep(3)
 
 
 def test():
