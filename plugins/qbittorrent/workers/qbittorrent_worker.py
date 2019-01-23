@@ -117,8 +117,32 @@ class downloadBT(Thread):
         print cmd
         print self.execShell(cmd)
 
-    def video_do(self, dir):
+    def file_arr(self, path, filters=['.DS_Store']):
+        file_list = []
+        flist = os.listdir(path)
+        # print flist
+        for i in range(len(flist)):
+            file_path = os.path.join(path, flist[i])
+            if flist[i] in filters:
+                continue
+            if os.path.isdir(file_path):
+                tmp = self.file_arr(file_path, filters)
+                file_list.extend(tmp)
+            else:
+                file_list.append(file_path)
+        return file_list
 
+    def file_video(self.path, has=['.mp4']):
+        flist = self.file_arr(path)
+        video = []
+        for i in range(len(flist)):
+            t = os.path.splitext(flist[i])
+            if t[1] in has:
+                video.append(flist[i])
+        return video
+
+    def video_do(self, path):
+        print self.file_video(path)
         # self.ffmpeg('/Users/midoks/Desktop/www/btplayer/public/video/test.mp4')
         return ''
 
