@@ -106,13 +106,12 @@ class downloadBT(Thread):
 
     def ffmpeg(self, file=''):
         md5file = self.md5(file)
-        m3u8_dir = FILE_TO + '/m3u8/' + md5file
+        m3u8_dir = FILE_TO + '/m3u8/' + md5file[0:6]
         os.system('mkdir -p ' + m3u8_dir)
-        m3u8_file = m3u8_dir + '/' + md5file + '.m3u8'
+        m3u8_file = m3u8_dir + '/' + md5file[0:6] + '.m3u8'
 
-        tofile = FILE_TO + '/m3u8/' + md5file + '/%03d.ts'
-        cmd = 'ffmpeg -i ' + file + \
-            ' -c copy -map 0 -f segment -segment_list ' + \
+        tofile = FILE_TO + '/m3u8/' + md5file[0:6] + '/%03d.ts'
+        cmd = 'ffmpeg -i ' + file + ' -c copy -map 0 -f segment -segment_list ' + \
             m3u8_file + ' -segment_time 5 ' + tofile
         print cmd
         print self.execShell(cmd)
