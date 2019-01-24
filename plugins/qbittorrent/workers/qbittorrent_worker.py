@@ -112,34 +112,47 @@ class downloadBT(Thread):
         except:
             return False
 
-    def get_transfer_dir(self, to):
+    def get_transfer_ts_file(self, to):
         return FILE_TRANSFER_TO + '/' + to + '.ts'
 
-    def fg_transfer_cmd(self, file, to_file):
+    def get_transfer_mp4_file(self, to):
+        return FILE_TRANSFER_TO + '/' + to + '.mp4'
+
+    def fg_transfer_mp4_cmd(self, sfile, dfile):
+        cmd = 'ffmpeg -i ' + sfile + ' -c:v libx264 -strict -2 ' + dfile
+        return cmd
+
+    def fg_transfer_ts_cmd(self, file, to_file):
         cmd = 'ffmpeg -y -i ' + file + \
             ' -vcodec copy -acodec copy -vbsf h264_mp4toannexb ' + to_file
         return cmd
 
     def fg_m3u8_cmd(self, ts_file, m3u8_file, to_file):
         cmd = 'ffmpeg -i ' + ts_file + ' -c copy -map 0 -f segment -segment_list ' + \
-            m3u8_file + ' -segment_time 5 ' + to_file
+            m3u8_file + ' -segment_time 3 ' + to_file
         return cmd
 
     def ffmpeg(self, file=''):
         md5file = self.md5(file)[0:6]
-        tdfile = self.get_transfer_dir(md5file)
+        tsfile = self.get_transfer_ts_file(md5file)
 
         m3u8_dir = FILE_TO + '/m3u8/' + md5file
         self.execShell('mkdir -p ' + m3u8_dir)
 
-        cmd_tc = self.fg_transfer_cmd(file, tdfile)
+        mp4file = self.get_transfer_mp4_file(md5file)
+        cmd_mp4 = self.fg_transfer_mp4_cmd(file, mp4file)
+        print 'cmd_mp4:', cmd_mp4
+        data_tc = self.execShell(cmd_mp4)
+        print 'mp4:', cmd_mp4[1]
+
+        cmd_tc = self.fg_transfer_ts_cmd(file, tsfile)
         print 'cmd_tc:', cmd_tc
         data_tc = self.execShell(cmd_tc)
         print 'tc:', data_tc[1]
 
         m3u8_file = m3u8_dir + '/' + md5file + '.m3u8'
         tofile = FILE_TO + '/m3u8/' + md5file + '/%03d.ts'
-        cmd_mc = self.fg_m3u8_cmd(tdfile, m3u8_file, tofile)
+        cmd_mc = self.fg_m3u8_cmd(tsfile, m3u8_file, tofile)
         print 'cmd_mc:', cmd_mc
         data_mc = self.execShell(cmd_tc)
         print 'mc:', data_mc[1]
