@@ -235,6 +235,12 @@ def pQbClient():
     return qb
 
 
+def getQbUrl():
+    info = getQbConf()
+    url = 'http://' + info['QB_HOST'] + ':' + info['QB_PORT'] + '/'
+    return public.returnJson(True, 'ok', url)
+
+
 def qbList():
     args = getArgs()
     # data = checkArgs(args, ['type'])
@@ -266,6 +272,17 @@ def qbDel():
         return data[1]
     qb = pQbClient()
     data = qb.delete(args['hash'])
+    return public.returnJson(True, '操作成功!', data)
+
+
+def qbAdd():
+    args = getArgs()
+    data = checkArgs(args, ['hash'])
+    if not data[0]:
+        return data[1]
+    url = 'magnet:?xt=urn:btih:' + args['hash']
+    qb = pQbClient()
+    data = qb.download_from_link(url)
     return public.returnJson(True, '操作成功!', data)
 
 
@@ -305,6 +322,10 @@ if __name__ == "__main__":
         print qbList()
     elif func == 'qb_del':
         print qbDel()
+    elif func == 'qb_add':
+        print qbAdd()
+    elif func == 'qb_url':
+        print getQbUrl()
     elif func == 'test':
         print test()
     else:
