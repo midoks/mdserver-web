@@ -151,16 +151,20 @@ class downloadBT(Thread):
     def checkTask(self):
         while True:
             torrents = self.qb.torrents()
-            for torrent in torrents:
-                print torrent
-            print time.time(), "no task!"
+            tlen = len(torrents)
+            print "downloading torrents count:", tlen
+            if tlen > 0:
+                for torrent in torrents:
+                    print torrent
+            else:
+                print time.time(), "no task!"
             time.sleep(10)
 
     def completed(self):
         while True:
             torrents = self.qb.torrents(filter='completed')
             tlen = len(torrents)
-            print "torrents count:", tlen
+            print "completed torrents count:", tlen
             if tlen > 0:
                 for torrent in torrents:
                     path = torrent['save_path'] + torrent['name']
@@ -183,8 +187,8 @@ if __name__ == "__main__":
     dl = downloadBT()
 
     import threading
-    # t = threading.Thread(target=dl.checkTask)
-    # t.start()
+    task = threading.Thread(target=dl.checkTask)
+    task.start()
 
     completed = threading.Thread(target=dl.completed)
     completed.start()
