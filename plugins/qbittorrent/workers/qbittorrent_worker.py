@@ -162,7 +162,7 @@ class downloadBT(Thread):
             if tlen > 0:
                 print "downloading torrents count:", tlen
                 for torrent in torrents:
-                    print torrent
+                    print torrent['name'], ' task downloading!'
             else:
                 print time.time(), "no task!"
             time.sleep(10)
