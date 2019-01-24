@@ -112,24 +112,38 @@ class downloadBT(Thread):
         except:
             return False
 
-    def ffmpeg(self, file=''):
-        md5file = self.md5(file)
-        m3u8_dir = FILE_TO + '/m3u8/' + md5file[0:6]
-        os.system('mkdir -p ' + m3u8_dir)
-        m3u8_file = m3u8_dir + '/' + md5file[0:6] + '.m3u8'
+    def get_transfer_dir(self, to):
+        return FILE_TRANSFER_TO + '/' + to
 
-        tofile = FILE_TO + '/m3u8/' + md5file[0:6] + '/%03d.ts'
+    def fg_transfer_cmd(self, file, to_file):
+        cmd = 'ffmpeg -y -i ' + file + \
+            ' -vcodec copy -acodec copy -vbsf h264_mp4toannexb ' + to_file + '.ts'
+        return cmd
+
+    def fg_m3u8_cmd(self, ts_file, to_file):
         cmd = 'ffmpeg -i ' + file + ' -c copy -map 0 -f segment -segment_list -bsf:v h264_mp4toannexb ' + \
             m3u8_file + ' -segment_time 5 ' + tofile
-        print cmd
-        data = self.execShell(cmd)
+        return cmd
+
+    def ffmpeg(self, file=''):
+        md5file = self.md5(file)[0:6]
+        tdfile = self.get_transfer_dir(md5file)
+
+        m3u8_dir = FILE_TO + '/m3u8/' + md5file
+        self.execShell('mkdir -p ' + m3u8_dir)
+
+        cmd_tc = self.fg_transfer_cmd(file, tdfile)
+        data_tc = self.execShell(cmd_tc)
+        print 'tc:', data_tc
+
+        m3u8_file = m3u8_dir + '/' + md5file + '.m3u8'
+        tofile = FILE_TO + '/m3u8/' + md5file + '/%03d.ts'
+        cmd_mc = self.fg_m3u8_cmd(tdfile, tofile)
+        data_mc = self.execShell(cmd_tc)
+        print 'mc:', data_mc
 
         self.execShell('chown -R ' + FILE_OWN + ':' +
                        FILE_GROUP + ' ' + m3u8_dir)
-
-        print data
-        if data[0] != '':
-            print data
 
     def file_arr(self, path, filters=['.DS_Store']):
         file_list = []
