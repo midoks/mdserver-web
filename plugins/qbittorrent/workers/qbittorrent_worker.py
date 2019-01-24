@@ -48,6 +48,9 @@ QB_PWD = cp.get(section_qb, "QB_PWD")
 
 section_file = cp.sections()[2]
 FILE_TO = cp.get(section_file, "FILE_TO")
+FILE_TRANSFER_TO = cp.get(section_file, "FILE_TRANSFER_TO")
+FILE_OWN = cp.get(section_file, "FILE_OWN")
+FILE_GROUP = cp.get(section_file, "FILE_GROUP")
 
 
 class downloadBT(Thread):
@@ -116,6 +119,10 @@ class downloadBT(Thread):
             m3u8_file + ' -segment_time 5 ' + tofile
         print cmd
         data = self.execShell(cmd)
+
+        self.execShell('chown -R ' + FILE_OWN + ':' +
+                       FILE_GROUP + ' ' + m3u8_dir)
+
         print data
         if data[0] != '':
             print data
