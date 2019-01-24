@@ -158,8 +158,8 @@ class downloadBT(Thread):
         while True:
             torrents = self.qb.torrents()
             tlen = len(torrents)
-            print "downloading torrents count:", tlen
             if tlen > 0:
+                print "downloading torrents count:", tlen
                 for torrent in torrents:
                     print torrent
             else:
