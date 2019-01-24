@@ -53,8 +53,8 @@ FILE_OWN = cp.get(section_file, "FILE_OWN")
 FILE_GROUP = cp.get(section_file, "FILE_GROUP")
 
 section_task = cp.sections()[3]
-TASK_RATE = cp.get(section_task, "TASK_RATE")
-TASK_COMPLETED_RATE = cp.get(section_task, "TASK_COMPLETED_RATE")
+TASK_RATE = cp.getint(section_task, "TASK_RATE")
+TASK_COMPLETED_RATE = cp.getint(section_task, "TASK_COMPLETED_RATE")
 
 
 class downloadBT(Thread):
@@ -176,7 +176,7 @@ class downloadBT(Thread):
                     print torrent['name'], ' task downloading!'
             else:
                 print time.time(), "no task!"
-            time.sleep(10)
+            time.sleep(TASK_RATE)
 
     def completed(self):
         while True:
@@ -190,7 +190,7 @@ class downloadBT(Thread):
                 print time.time(), "done task!"
             else:
                 print time.time(), "no task!"
-            time.sleep(3)
+            time.sleep(TASK_COMPLETED_RATE)
 
 
 def test():
