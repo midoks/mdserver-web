@@ -135,14 +135,14 @@ class downloadBT(Thread):
         cmd_tc = self.fg_transfer_cmd(file, tdfile)
         print 'cmd_tc:', cmd_tc
         data_tc = self.execShell(cmd_tc)
-        print 'tc:', data_tc
+        print 'tc:', data_tc[1]
 
         m3u8_file = m3u8_dir + '/' + md5file + '.m3u8'
         tofile = FILE_TO + '/m3u8/' + md5file + '/%03d.ts'
         cmd_mc = self.fg_m3u8_cmd(tdfile, m3u8_file, tofile)
         print 'cmd_mc:', cmd_mc
         data_mc = self.execShell(cmd_tc)
-        print 'mc:', data_mc
+        print 'mc:', data_mc[1]
 
         self.execShell('chown -R ' + FILE_OWN + ':' +
                        FILE_GROUP + ' ' + m3u8_dir)
