@@ -121,7 +121,7 @@ class downloadBT(Thread):
         return cmd
 
     def fg_m3u8_cmd(self, ts_file, m3u8_file, to_file):
-        cmd = 'ffmpeg -i ' + ts_file + ' -c copy -map 0 -f segment -segment_list -bsf:v h264_mp4toannexb ' + \
+        cmd = 'ffmpeg -i ' + ts_file + ' -c copy -map 0 -f segment -segment_list ' + \
             m3u8_file + ' -segment_time 5 ' + to_file
         return cmd
 
