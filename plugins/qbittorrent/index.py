@@ -86,9 +86,9 @@ def getRunLog():
 def initDreplace():
 
     ddir = getServerDir() + '/workers'
-    # if not os.path.exists(ddir):
-    sdir = getPluginDir() + '/workers'
-    public.execShell('cp -rf ' + sdir + ' ' + getServerDir())
+    if not os.path.exists(ddir):
+        sdir = getPluginDir() + '/workers'
+        public.execShell('cp -rf ' + sdir + ' ' + getServerDir())
 
     cfg = getServerDir() + '/qb.conf'
     if not os.path.exists(cfg):
@@ -105,10 +105,11 @@ def initDreplace():
     file_bin = initD_path + '/' + getPluginName()
 
     # initd replace
-    content = public.readFile(file_tpl)
-    content = content.replace('{$SERVER_PATH}', service_path)
-    public.writeFile(file_bin, content)
-    public.execShell('chmod +x ' + file_bin)
+    if not os.path.exists(file_bin):
+        content = public.readFile(file_tpl)
+        content = content.replace('{$SERVER_PATH}', service_path)
+        public.writeFile(file_bin, content)
+        public.execShell('chmod +x ' + file_bin)
 
     return file_bin
 
