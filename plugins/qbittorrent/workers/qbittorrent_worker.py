@@ -21,7 +21,7 @@ from threading import Timer, Thread
 from time import sleep
 
 reload(sys)
-sys.setdefaultencoding("utf8")
+sys.setdefaultencoding("utf-8")
 
 sys.path.append('/usr/local/lib/python2.7/site-packages')
 
