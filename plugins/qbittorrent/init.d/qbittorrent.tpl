@@ -15,7 +15,7 @@
 
 qb_start(){
 	cd {$SERVER_PATH}/qbittorrent/workers
-	python qbittorrent_worker.py > {$SERVER_PATH}/qbittorrent/logs.pl &
+	nohup python qbittorrent_worker.py > {$SERVER_PATH}/qbittorrent/logs.pl &
 	echo "qbittorrent started"
 }
 
