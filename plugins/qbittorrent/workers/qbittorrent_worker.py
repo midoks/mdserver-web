@@ -116,6 +116,7 @@ class downloadBT(Thread):
             m3u8_file + ' -segment_time 5 ' + tofile
         print cmd
         data = self.execShell(cmd)
+        print data
         if data[0] != '':
             print data
 
@@ -175,7 +176,6 @@ class downloadBT(Thread):
                 for torrent in torrents:
                     path = torrent['save_path'] + torrent['name']
                     self.video_do(path)
-                    # print torrent
                 print time.time(), "done task!"
             else:
                 print time.time(), "no task!"
