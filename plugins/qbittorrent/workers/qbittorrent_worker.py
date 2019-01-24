@@ -112,7 +112,7 @@ class downloadBT(Thread):
         m3u8_file = m3u8_dir + '/' + md5file[0:6] + '.m3u8'
 
         tofile = FILE_TO + '/m3u8/' + md5file[0:6] + '/%03d.ts'
-        cmd = 'ffmpeg -i ' + file + ' -c copy -map 0 -f segment -segment_list ' + \
+        cmd = 'ffmpeg -i ' + file + ' -c copy -map 0 -f segment -segment_list -bsf:v h264_mp4toannexb ' + \
             m3u8_file + ' -segment_time 5 ' + tofile
         print cmd
         data = self.execShell(cmd)
