@@ -10,6 +10,11 @@ import sys
 sys.path.append(os.getcwd() + "/class/core")
 import public
 
+reload(sys)
+sys.setdefaultencoding("utf8")
+
+sys.path.append('/usr/local/lib/python2.7/site-packages')
+
 
 app_debug = False
 if public.isAppleSystem():
@@ -199,6 +204,17 @@ def getDbConfInfo():
     return data
 
 
+def getQbConf():
+    cfg = getConf()
+    content = public.readFile(cfg)
+    data = {}
+    data['QB_HOST'] = matchData("QB_HOST\s*=\s(.*)", content)
+    data['QB_PORT'] = matchData("QB_PORT\s*=\s(.*)", content)
+    data['QB_USER'] = matchData("QB_USER\s*=\s(.*)", content)
+    data['QB_PWD'] = matchData("QB_PWD\s*=\s(.*)", content)
+    return data
+
+
 def pMysqlDb():
     data = getDbConfInfo()
     conn = mysql.mysql()
@@ -212,13 +228,20 @@ def pMysqlDb():
 
 def pQbClient():
     from qbittorrent import Client
-    qb = Client('http://154.48.251.71:8080/')
-    qb.login('admin', 'adminadmin')
+    info = getQbConf()
+    url = 'http://' + info['QB_HOST'] + ':' + info['QB_PORT'] + '/'
+    qb = Client(url)
+    qb.login(info['QB_USER'], info['QB_PWD'])
     return qb
 
 
 def qbList():
-    return ''
+    try:
+        qb = pQbClient()
+        torrents = qb.torrents()
+        return public.returnJson(True, 'ok', torrents)
+    except Exception as e:
+        return public.returnJson(False, str(e))
 
 
 def test():
@@ -253,8 +276,8 @@ if __name__ == "__main__":
         print getConf()
     elif func == 'get_run_Log':
         print getRunLog()
-    elif func == 'get_trend_data':
-        print getTrendData()
+    elif func == 'qb_list':
+        print qbList()
     elif func == 'test':
         print test()
     else:
