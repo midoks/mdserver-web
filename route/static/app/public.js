@@ -22,6 +22,9 @@ function toSizeM(byteLen) {
     return a || 0;
 }
 
+
+
+
 function randomStrPwd(b) {
 	b = b || 32;
 	var c = "AaBbCcDdEeFfGHhiJjKkLMmNnPpRSrTsWtXwYxZyz2345678";
@@ -345,36 +348,8 @@ function aotuHeight() {
 	var a = $("body").height() - 40;
 	$(".main-content").css("min-height", a)
 }
-$(function() {
-	aotuHeight()
-});
-$(window).resize(function() {
-	aotuHeight()
-});
 
-function showHidePwd() {
-	var a = "glyphicon-eye-open",
-		b = "glyphicon-eye-close";
-	$(".pw-ico").click(function() {
-		var g = $(this).attr("class"),
-			e = $(this).prev();
-		if(g.indexOf(a) > 0) {
-			var h = e.attr("data-pw");
-			$(this).removeClass(a).addClass(b);
-			e.text(h)
-		} else {
-			$(this).removeClass(b).addClass(a);
-			e.text("**********")
-		}
-		var d = $(this).next().position().left;
-		var f = $(this).next().position().top;
-		var c = $(this).next().width();
-		$(this).next().next().css({
-			left: d + c + "px",
-			top: f + "px"
-		})
-	})
-}
+
 
 function showMsg(msg, callback ,icon, time){
 
@@ -700,7 +675,7 @@ function ActionTask() {
 	})
 }
 
-function RemoveTask(b) {
+function removeTask(b) {
 	var a = layer.msg(lan.public.the_del, {
 		icon: 16,
 		time: 0,
@@ -1591,3 +1566,11 @@ function pluginLogs(_name, version, func, line){
     },'json');
 }
 /*** 其中功能,针对插件通过库使用 end ***/
+
+
+$(function() {
+	aotuHeight();
+});
+$(window).resize(function() {
+	aotuHeight();
+});

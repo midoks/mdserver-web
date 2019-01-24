@@ -459,11 +459,11 @@ function showHidePass(obj){
 function copyPass(password){
     var clipboard = new ClipboardJS('#bt_copys');
     clipboard.on('success', function (e) {
-        layer.msg({msg:'复制成功',icon:1});
+        layer.msg('复制成功',{icon:1,time:2000});
     });
 
     clipboard.on('error', function (e) {
-        layer.msg({msg:'复制失败，浏览器不兼容!',icon:2});
+        layer.msg('复制失败，浏览器不兼容!',{icon:2,time:2000});
     });
     $("#bt_copys").attr('data-clipboard-text',password);
     $("#bt_copys").click();
@@ -912,9 +912,9 @@ function myLogs(){
         var rdata = $.parseJSON(data.data);
 
         var limitCon = '<p class="conf_p">\
-                        <span class="f14 c6 mr20">'+ lan.soft.mysql_log_bin + ' </span><span class="f14 c6 mr20">' + toSize(rdata.msg) + '</span>\
+                        <span class="f14 c6 mr20">二进制日志 </span><span class="f14 c6 mr20">' + toSize(rdata.msg) + '</span>\
                         <button class="btn btn-success btn-xs btn-bin va0">'+ (rdata.status ? lan.soft.off : lan.soft.on) + '</button>\
-                        <p class="f14 c6 mtb10" style="border-top:#ddd 1px solid; padding:10px 0">'+ lan.soft.mysql_log_err + '<button class="btn btn-default btn-clear btn-xs" style="float:right;" >' + lan.soft.mysql_log_close + '</button></p>\
+                        <p class="f14 c6 mtb10" style="border-top:#ddd 1px solid; padding:10px 0">错误日志<button class="btn btn-default btn-clear btn-xs" style="float:right;" >清空</button></p>\
                         <textarea readonly style="margin: 0px;width: 100%;height: 440px;background-color: #333;color:#fff; padding:0 5px" id="error_log"></textarea>\
                     </p>'
         $(".soft-man-con").html(limitCon);

@@ -236,12 +236,37 @@ def pQbClient():
 
 
 def qbList():
+    args = getArgs()
+    # data = checkArgs(args, ['type'])
+    # if not data[0]:
+    #     return data[1]
+    args_type = ''
+    if 'type' in args:
+        args_type = args['type']
+
+    f = ['downloading', 'completed']
+    tfilter = ''
+    if args_type in f:
+        tfilter = args['type']
     try:
         qb = pQbClient()
-        torrents = qb.torrents()
-        return public.returnJson(True, 'ok', torrents)
+        torrents = qb.torrents(filter=tfilter)
+        data = {}
+        data['type'] = tfilter
+        data['torrents'] = torrents
+        return public.returnJson(True, 'ok', data)
     except Exception as e:
         return public.returnJson(False, str(e))
+
+
+def qbDel():
+    args = getArgs()
+    data = checkArgs(args, ['hash'])
+    if not data[0]:
+        return data[1]
+    qb = pQbClient()
+    data = qb.delete(args['hash'])
+    return public.returnJson(True, '操作成功!', data)
 
 
 def test():
@@ -278,6 +303,8 @@ if __name__ == "__main__":
         print getRunLog()
     elif func == 'qb_list':
         print qbList()
+    elif func == 'qb_del':
+        print qbDel()
     elif func == 'test':
         print test()
     else:
