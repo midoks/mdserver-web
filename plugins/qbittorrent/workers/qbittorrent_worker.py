@@ -157,7 +157,7 @@ class downloadBT(Thread):
 
     def checkTask(self):
         while True:
-            torrents = self.qb.torrents()
+            torrents = self.qb.torrents(filter='downloading')
             tlen = len(torrents)
             if tlen > 0:
                 print "downloading torrents count:", tlen
