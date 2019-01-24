@@ -61,6 +61,7 @@ class downloadBT(Thread):
         self.dbcurr = self.dbconn.cursor()
         self.dbcurr.execute('SET NAMES utf8')
         self.qb = self.qb()
+        self.has_suffix = ['.mp4']
 
     def query(self, sql):
         self.dbcurr.execute(sql)
@@ -133,19 +134,24 @@ class downloadBT(Thread):
                 file_list.append(file_path)
         return file_list
 
-    def file_video(self, path, has=['.mp4']):
+    def find_dir_video(self, path, has=['.mp4']):
         flist = self.file_arr(path)
         video = []
         for i in range(len(flist)):
             t = os.path.splitext(flist[i])
-            if t[1] in has:
+            if t[1] in self.has_suffix:
                 video.append(flist[i])
         return video
 
     def video_do(self, path):
-        vlist = self.file_video(path)
-        for i in range(len(vlist)):
-            self.ffmpeg(vlist[i])
+        if os.path.isfile(path):
+            t = os.path.splitext(path)
+            if t[1] in self.has_suffix:
+                self.ffmpeg(path)
+        else:
+            vlist = self.find_dir_video(path)
+            for i in range(len(vlist)):
+                self.ffmpeg(vlist[i])
         return ''
 
     def checkTask(self):
