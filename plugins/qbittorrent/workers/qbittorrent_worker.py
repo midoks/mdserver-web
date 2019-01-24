@@ -52,6 +52,10 @@ FILE_TRANSFER_TO = cp.get(section_file, "FILE_TRANSFER_TO")
 FILE_OWN = cp.get(section_file, "FILE_OWN")
 FILE_GROUP = cp.get(section_file, "FILE_GROUP")
 
+section_task = cp.sections()[3]
+TASK_RATE = cp.get(section_file, "TASK_RATE")
+TASK_COMPLETED_RATE = cp.get(section_file, "TASK_COMPLETED_RATE")
+
 
 class downloadBT(Thread):
 
