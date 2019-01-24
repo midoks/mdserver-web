@@ -113,11 +113,11 @@ class downloadBT(Thread):
             return False
 
     def get_transfer_dir(self, to):
-        return FILE_TRANSFER_TO + '/' + to
+        return FILE_TRANSFER_TO + '/' + to + '.ts'
 
     def fg_transfer_cmd(self, file, to_file):
         cmd = 'ffmpeg -y -i ' + file + \
-            ' -vcodec copy -acodec copy -vbsf h264_mp4toannexb ' + to_file + '.ts'
+            ' -vcodec copy -acodec copy -vbsf h264_mp4toannexb ' + to_file
         return cmd
 
     def fg_m3u8_cmd(self, ts_file, m3u8_file, to_file):
