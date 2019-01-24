@@ -191,7 +191,7 @@ class downloadBT(Thread):
                 for torrent in torrents:
                     print torrent['name'], ' task downloading!'
             else:
-                print time.time(), "no task!"
+                print time.time(), "no downloading task!"
             time.sleep(TASK_RATE)
 
     def completed(self):
