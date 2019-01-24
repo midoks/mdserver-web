@@ -120,8 +120,8 @@ class downloadBT(Thread):
             ' -vcodec copy -acodec copy -vbsf h264_mp4toannexb ' + to_file + '.ts'
         return cmd
 
-    def fg_m3u8_cmd(self, ts_file, to_file):
-        cmd = 'ffmpeg -i ' + file + ' -c copy -map 0 -f segment -segment_list -bsf:v h264_mp4toannexb ' + \
+    def fg_m3u8_cmd(self, ts_file, m3u8_file, to_file):
+        cmd = 'ffmpeg -i ' + ts_file + ' -c copy -map 0 -f segment -segment_list -bsf:v h264_mp4toannexb ' + \
             ts_file + ' -segment_time 5 ' + to_file
         return cmd
 
@@ -139,7 +139,7 @@ class downloadBT(Thread):
 
         m3u8_file = m3u8_dir + '/' + md5file + '.m3u8'
         tofile = FILE_TO + '/m3u8/' + md5file + '/%03d.ts'
-        cmd_mc = self.fg_m3u8_cmd(tdfile, tofile)
+        cmd_mc = self.fg_m3u8_cmd(tdfile, m3u8_file, tofile)
         print 'cmd_mc:', cmd_mc
         data_mc = self.execShell(cmd_tc)
         print 'mc:', data_mc
