@@ -57,6 +57,10 @@ TASK_RATE = cp.getint(section_task, "TASK_RATE")
 TASK_COMPLETED_RATE = cp.getint(section_task, "TASK_COMPLETED_RATE")
 
 
+def formatTime():
+    return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+
+
 class downloadBT(Thread):
 
     def __init__(self):
@@ -142,20 +146,20 @@ class downloadBT(Thread):
         mp4file = self.get_transfer_mp4_file(md5file)
         cmd_mp4 = self.fg_transfer_mp4_cmd(file, mp4file)
         print 'cmd_mp4:', cmd_mp4
-        data_tc = self.execShell(cmd_mp4)
+        data_tc = os.system(cmd_mp4)
         print 'mp4:', cmd_mp4[1]
 
-        cmd_tc = self.fg_transfer_ts_cmd(file, tsfile)
-        print 'cmd_tc:', cmd_tc
-        data_tc = self.execShell(cmd_tc)
-        print 'tc:', data_tc[1]
+        cmd_ts = self.fg_transfer_ts_cmd(mp4file, tsfile)
+        print 'cmd_ts:', cmd_ts
+        data_ts = self.execShell(cmd_ts)
+        print 'ts:', data_ts[1]
 
         m3u8_file = m3u8_dir + '/' + md5file + '.m3u8'
         tofile = FILE_TO + '/m3u8/' + md5file + '/%03d.ts'
         cmd_mc = self.fg_m3u8_cmd(tsfile, m3u8_file, tofile)
-        print 'cmd_mc:', cmd_mc
+        print 'cmd_m3u8:', cmd_mc
         data_mc = self.execShell(cmd_tc)
-        print 'mc:', data_mc[1]
+        print 'm3u8:', data_mc[1]
 
         self.execShell('chown -R ' + FILE_OWN + ':' +
                        FILE_GROUP + ' ' + m3u8_dir)
@@ -204,7 +208,7 @@ class downloadBT(Thread):
                 for torrent in torrents:
                     print torrent['name'], ' task downloading!'
             else:
-                print time.time(), "no downloading task!"
+                print formatTime(), "no downloading task!"
             time.sleep(TASK_RATE)
 
     def completed(self):
@@ -216,15 +220,15 @@ class downloadBT(Thread):
                 for torrent in torrents:
                     path = torrent['save_path'] + torrent['name']
                     self.video_do(path)
-                print time.time(), "done task!"
+                print formatTime(), "done task!"
             else:
-                print time.time(), "no completed task!"
+                print formatTime(), "no completed task!"
             time.sleep(TASK_COMPLETED_RATE)
 
 
 def test():
     while True:
-        print time.time(), "no download task!",
+        print formatTime(), "no download task!",
         time.sleep(1)
         test()
 
