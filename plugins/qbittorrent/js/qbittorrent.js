@@ -62,8 +62,43 @@ function getLocalTime(nS) {
 }
 
 
-function qbAdd(type){
-   
+
+function qbAdd(){
+
+    var loadOpen = layer.open({
+        type: 1,
+        title: '添加资源',
+        area: '400px',
+        content:"<div class='bt-form pd20 pb70 c6'>\
+            <div class='version line'>\
+            <div><input class='bt-input-text mr5 outline_no' type='text' id='qb_hash' name='qb_hash' style='height: 28px; border-radius: 3px;width: 350px;' placeholder='hash'></div>\
+            </div>\
+            <div class='bt-form-submit-btn'>\
+                <button type='button' id='qb_close' class='btn btn-danger btn-sm btn-title'>关闭</button>\
+                <button type='button' id='qb_ok' class='btn btn-success btn-sm btn-title bi-btn'>确认</button>\
+            </div>\
+        </div>"
+    });
+
+    $('#qb_close').click(function(){
+        layer.close(loadOpen);
+    });
+
+    $('#qb_ok').click(function(){
+        var hash = $('#qb_hash').val();
+        qbPost('qb_add', {hash:hash}, function(data){
+
+            var rdata = $.parseJSON(data.data);
+            if (rdata['status']){
+                showMsg(rdata.msg, function(){
+                    qbList();
+                },{icon:1,time:2000,shade: [0.3, '#000']});
+                layer.close(loadOpen);
+            } else {
+                layer.msg(rdata.msg,{icon:2,time:2000,shade: [0.3, '#000']});
+            }
+        });
+    });
 }
 
 
@@ -85,6 +120,13 @@ function qbListFind(){
     } else {
         qbList(qbs);
     }
+}
+
+function openAdminUrl(){
+    qbPost('qb_url', '', function(data){
+        var rdata = $.parseJSON(data.data);
+        window.open(rdata.data);
+    });
 }
 
 function qbList(search){
@@ -113,7 +155,7 @@ function qbList(search){
         content += '<thead><tr>';
         content += '<th>种子(hash)</th>';
         content += '<th>添加时间</th>';
-        content += '<th>操作(<a class="btlink" onclick="qbAdd();">添加</a> | <a class="btlink" onclick="">管理</a>)</th>';
+        content += '<th>操作(<a class="btlink" onclick="qbAdd();">添加</a> | <a class="btlink" onclick="openAdminUrl();">管理</a>)</th>';
         content += '</tr></thead>';
 
         content += '<tbody>';
