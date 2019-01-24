@@ -122,8 +122,11 @@ class downloadBT(Thread):
     def get_transfer_mp4_file(self, to):
         return FILE_TRANSFER_TO + '/' + to + '.mp4'
 
+    def get_transfer_m3u5_dir(self, dirname):
+        return FILE_TO + '/m3u8/' + dirname
+
     def fg_transfer_mp4_cmd(self, sfile, dfile):
-        cmd = 'ffmpeg -i ' + sfile + ' -c:v libx264 -strict -2 ' + dfile
+        cmd = 'ffmpeg -y -i ' + sfile + ' -c:v libx264 -strict -2 ' + dfile
         return cmd
 
     def fg_transfer_ts_cmd(self, file, to_file):
@@ -132,7 +135,7 @@ class downloadBT(Thread):
         return cmd
 
     def fg_m3u8_cmd(self, ts_file, m3u8_file, to_file):
-        cmd = 'ffmpeg -i ' + ts_file + ' -c copy -map 0 -f segment -segment_list ' + \
+        cmd = 'ffmpeg -y -i ' + ts_file + ' -c copy -map 0 -f segment -segment_list ' + \
             m3u8_file + ' -segment_time 3 ' + to_file
         return cmd
 
@@ -140,14 +143,14 @@ class downloadBT(Thread):
         md5file = self.md5(file)[0:6]
         tsfile = self.get_transfer_ts_file(md5file)
 
-        m3u8_dir = FILE_TO + '/m3u8/' + md5file
+        m3u8_dir = self.get_transfer_m3u5_dir(md5file)
         self.execShell('mkdir -p ' + m3u8_dir)
 
         mp4file = self.get_transfer_mp4_file(md5file)
         cmd_mp4 = self.fg_transfer_mp4_cmd(file, mp4file)
         print 'cmd_mp4:', cmd_mp4
-        data_tc = os.system(cmd_mp4)
-        print 'mp4:', cmd_mp4[1]
+        data_mp4 = self.execShell(cmd_mp4)
+        print 'mp4:', data_mp4[1]
 
         cmd_ts = self.fg_transfer_ts_cmd(mp4file, tsfile)
         print 'cmd_ts:', cmd_ts
@@ -155,11 +158,11 @@ class downloadBT(Thread):
         print 'ts:', data_ts[1]
 
         m3u8_file = m3u8_dir + '/' + md5file + '.m3u8'
-        tofile = FILE_TO + '/m3u8/' + md5file + '/%03d.ts'
-        cmd_mc = self.fg_m3u8_cmd(tsfile, m3u8_file, tofile)
-        print 'cmd_m3u8:', cmd_mc
-        data_mc = self.execShell(cmd_tc)
-        print 'm3u8:', data_mc[1]
+        tofile = m3u8_dir + '/%03d.ts'
+        cmd_m3u8 = self.fg_m3u8_cmd(tsfile, m3u8_file, tofile)
+        print 'cmd_m3u8:', cmd_m3u8
+        data_m3u8 = self.execShell(cmd_m3u8)
+        print 'm3u8:', data_m3u8[1]
 
         self.execShell('chown -R ' + FILE_OWN + ':' +
                        FILE_GROUP + ' ' + m3u8_dir)
@@ -213,13 +216,18 @@ class downloadBT(Thread):
 
     def completed(self):
         while True:
+
             torrents = self.qb.torrents(filter='completed')
             tlen = len(torrents)
             print "completed torrents count:", tlen
             if tlen > 0:
                 for torrent in torrents:
                     path = torrent['save_path'] + torrent['name']
-                    self.video_do(path)
+                    try:
+                        self.video_do(path)
+                    except Exception as e:
+                        print formatTime(), str(e)
+
                 print formatTime(), "done task!"
             else:
                 print formatTime(), "no completed task!"
