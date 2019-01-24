@@ -205,7 +205,7 @@ class downloadBT(Thread):
                     self.video_do(path)
                 print time.time(), "done task!"
             else:
-                print time.time(), "no task!"
+                print time.time(), "no completed task!"
             time.sleep(TASK_COMPLETED_RATE)
 
 
