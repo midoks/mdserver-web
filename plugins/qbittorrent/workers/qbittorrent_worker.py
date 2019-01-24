@@ -134,7 +134,7 @@ class downloadBT(Thread):
                 file_list.append(file_path)
         return file_list
 
-    def find_dir_video(self, path, has=['.mp4']):
+    def find_dir_video(self, path):
         flist = self.file_arr(path)
         video = []
         for i in range(len(flist)):
