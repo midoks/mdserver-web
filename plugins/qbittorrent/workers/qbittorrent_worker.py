@@ -146,11 +146,13 @@ class downloadBT(Thread):
         m3u8_dir = self.get_transfer_m3u5_dir(md5file)
         self.execShell('mkdir -p ' + m3u8_dir)
 
-        mp4file = self.get_transfer_mp4_file(md5file)
-        cmd_mp4 = self.fg_transfer_mp4_cmd(file, mp4file)
-        print 'cmd_mp4:', cmd_mp4
-        data_mp4 = self.execShell(cmd_mp4)
-        print 'mp4:', data_mp4[1]
+        if not os.path.exists(mp4file):
+            mp4file = self.get_transfer_mp4_file(md5file)
+            cmd_mp4 = self.fg_transfer_mp4_cmd(file, mp4file)
+            print 'cmd_mp4:', cmd_mp4
+            data_mp4 = self.execShell(cmd_mp4)
+            print 'mp4:', data_mp4[1]
+        print formatTime(), 'mp4 exists:', mp4file
 
         cmd_ts = self.fg_transfer_ts_cmd(mp4file, tsfile)
         print 'cmd_ts:', cmd_ts
