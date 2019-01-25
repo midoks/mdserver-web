@@ -204,10 +204,24 @@ class crontab_api:
         return public.returnJson(False, '添加失败')
 
     def delApi(self):
-        id = request.form.get('id', '')
+        sid = request.form.get('id', '')
         try:
+            find = public.M('crontab').where("id=?", (sid,)).delete()
+            if not self.removeForCrond(find['echo']):
+                return public.returnJson(False, '无法写入文件，请检查是否开启了系统加固功能!')
+
+            cronPath = public.getServerDir() + '/cron'
+            sfile = cronPath + '/' + find['echo']
+            if os.path.exists(sfile):
+                os.remove(sfile)
+            sfile = cronPath + '/' + find['echo'] + '.log'
+            if os.path.exists(sfile):
+                os.remove(sfile)
+
             public.M('crontab').where("id=?", (id,)).delete()
-            return public.returnJson(True, '添加成功')
+            public.writeLog('计划任务', public.getInfo(
+                '删除计划任务[{1}]成功!', (find['name'],)))
+            return public.returnJson(True, '删除成功')
         except Exception as e:
             return public.returnJson(False, '删除失败')
 

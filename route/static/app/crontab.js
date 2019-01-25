@@ -88,7 +88,7 @@ function startTask(id){
 
 //清空日志
 function closeLogs(id){
-	layer.msg(lan.public.the,{icon:16,time:0,shade: [0.3, '#000']});
+	layer.msg('正在处理,请稍候...',{icon:16,time:0,shade: [0.3, '#000']});
 	var data='id='+id;
 	$.post('/crontab/del_logs',data,function(rdata){
 		layer.closeAll();
@@ -100,16 +100,15 @@ function closeLogs(id){
 //删除
 function planDel(id,name){
 	safeMessage(lan.get('del',[name]),lan.crontab.del_task,function(){
-			layer.msg(lan.public.the,{icon:16,time:0,shade: [0.3, '#000']});
-			var data='id='+id;
-			$.post('/crontab/del',data,function(rdata){
-				layer.closeAll();
-				layer.msg(rdata.msg,{icon:rdata.status?1:2});
-				getCronData();
-			});
+		layer.msg('正在处理,请稍候...',{icon:16,time:0,shade: [0.3, '#000']});
+		var data='id='+id;
+		$.post('/crontab/del',data,function(rdata){
+			layer.closeAll();
+			layer.msg(rdata.msg,{icon:rdata.status?1:2,time:2000});
+			getCronData();
+		},'json');
 	});
 }
-
 
 //批量删除
 function allDeleteCron(){
