@@ -1,3 +1,13 @@
+function isURL(str_url){
+	var strRegex = '^(https|http|ftp|rtsp|mms)?://.+';
+	var re=new RegExp(strRegex);
+	if (re.test(str_url)){
+		return (true);
+	}else{
+		return (false);
+	}
+}
+
 var num = 0;
 //查看任务日志
 function getLogs(id){
@@ -6,7 +16,7 @@ function getLogs(id){
 	$.post('/crontab/logs', data, function(rdata){
 		layer.closeAll();
 		if(!rdata.status) {
-			layer.msg(rdata.msg,{icon:2});
+			layer.msg(rdata.msg,{icon:2, time:2000});
 			return;
 		};
 		layer.open({
@@ -16,9 +26,9 @@ function getLogs(id){
 			shadeClose:false,
 			closeBtn:2,
 			content:'<div class="setchmod bt-form pd20 pb70">'
-					+'<pre id="crontab-log" style="overflow: auto; border: 0px none; padding: 15px; margin: 0px; height: 410px; background-color: rgb(255, 255, 255);"></pre>'
+					+'<pre id="crontab-log" style="overflow: auto; border: 0px none; line-height:23px;padding: 15px; margin: 0px; white-space: pre-wrap; height: 405px; background-color: rgb(51,51,51);color:#f1f1f1;border-radius:0px;font-family:"></pre>'
 					+'<div class="bt-form-submit-btn" style="margin-top: 0px;">'
-					+'<button type="button" class="btn btn-success btn-sm" onclick="CloseLogs('+id+')">清空</button>'
+					+'<button type="button" class="btn btn-success btn-sm" onclick="closeLogs('+id+')">清空</button>'
 					+'<button type="button" class="btn btn-danger btn-sm" onclick="layer.closeAll()">关闭</button>'
 				    +'</div>'
 					+'</div>'
@@ -27,7 +37,7 @@ function getLogs(id){
 		setTimeout(function(){
 			$("#crontab-log").text(rdata.msg);
 		},200);
-	});
+	},'json');
 }
 
 function getCronData(){
@@ -54,7 +64,7 @@ function getCronData(){
 							<td>"+rdata.data[i].addtime+"</td>\
 							<td>\
 								<a href=\"javascript:startTask("+rdata.data[i].id+");\" class='btlink'>执行</a> | \
-								<a href=\"javascript:onlineEditFile(0,'/www/server/cron/"+rdata.data[i].echo+"');\" class='btlink'>脚本</a> | \
+								<a href=\"javascript:editTaskInfo('"+rdata.data[i].id+"');\" class='btlink'>编辑</a> | \
 								<a href=\"javascript:getLogs("+rdata.data[i].id+");\" class='btlink'>日志</a> | \
 								<a href=\"javascript:planDel("+rdata.data[i].id+" ,'"+rdata.data[i].name.replace('\\','\\\\').replace("'","\\'").replace('"','')+"');\" class='btlink'>删除</a>\
 							</td>\
@@ -67,12 +77,12 @@ function getCronData(){
 
 //执行任务脚本
 function startTask(id){
-	layer.msg(lan.public.the,{icon:16,time:0,shade: [0.3, '#000']});
+	layer.msg('正在处理,请稍候...',{icon:16,time:0,shade: [0.3, '#000']});
 	var data='id='+id;
-	$.post('/crontab?action=StartTask',data,function(rdata){
+	$.post('/crontab/start_task',data,function(rdata){
 		layer.closeAll();
 		layer.msg(rdata.msg,{icon:rdata.status?1:2});
-	});
+	},'json');
 }
 
 
@@ -80,7 +90,7 @@ function startTask(id){
 function closeLogs(id){
 	layer.msg(lan.public.the,{icon:16,time:0,shade: [0.3, '#000']});
 	var data='id='+id;
-	$.post('/crontab?action=DelLogs',data,function(rdata){
+	$.post('/crontab/del_logs',data,function(rdata){
 		layer.closeAll();
 		layer.msg(rdata.msg,{icon:rdata.status?1:2});
 	});
@@ -244,7 +254,7 @@ function planAdd(){
 	
 	var urladdress = $("#urladdress").val();
 	if(sType == 'toUrl'){
-		if(!IsURL(urladdress)){
+		if(!isURL(urladdress)){
 			layer.msg(lan.crontab.input_url_err,{icon:2});
 			$("implement textarea[name='urladdress']").focus();
 			return;
@@ -283,6 +293,10 @@ function planAdd(){
 	layer.msg(lan.public.the_add,{icon:16,time:0,shade: [0.3, '#000']});
 	var data= $("#set-Config").serialize() + '&sBody='+sBody + '&urladdress=' + urladdress;
 	$.post('/crontab/add',data,function(rdata){
+		if(!rdata.status) {
+			layer.msg(rdata.msg,{icon:2, time:2000});
+			return;
+		}
 		layer.closeAll();
 		layer.msg(rdata.msg,{icon:rdata.status?1:2});
 		getCronData();
@@ -476,6 +490,306 @@ function toBackup(type){
 			$(".planname input[name='name']").val(sMsg+'['+sName+']');
 		});
 	});
+}
+
+
+// 编辑计划任务
+function editTaskInfo(id){
+	layer.msg('正在获取,请稍候...',{icon:16,time:0,shade: [0.3, '#000']});
+	$.post('/crontab/get_crond_find',{id:id},function(rdata){
+		layer.closeAll();
+		var sTypeName = '',sTypeDom = '',cycleName = '',cycleDom = '',weekName = '',weekDom = '',sNameName ='',sNameDom = '',backupsName = '',backupsDom ='';
+		obj = {
+			from:{
+				id:rdata.id,
+				name: rdata.name,
+				type: rdata.type,
+				where1: rdata.where1,
+				hour: rdata.where_hour,
+				minute: rdata.where_minute,
+				week: rdata.where1,
+				stype: rdata.stype,
+				sbody: rdata.sbody,
+				sname: rdata.sname,
+				backup_to: rdata.backup_to,
+				save: rdata.save,
+				urladdress: rdata.urladdress,
+			},
+			sTypeArray:[['toShell','Shell脚本'],['site','备份网站'],['database','备份数据库'],['logs','日志切割'],['path','备份目录'],['rememory','释放内存'],['toUrl','访问URL']],
+			cycleArray:[['day','每天'],['day-n','N天'],['hour','每小时'],['hour-n','N小时'],['minute-n','N分钟'],['week','每星期'],['month','每月']],
+			weekArray:[[1,'周一'],[2,'周二'],[3,'周三'],[4,'周四'],[5,'周五'],[6,'周六'],[7,'周日']],
+			sNameArray:[],
+			backupsArray:[],
+			create:function(callback){
+				console.log(obj);
+				for(var i = 0; i <obj['sTypeArray'].length; i++){
+					if(obj.from['stype'] == obj['sTypeArray'][i][0]){
+						sTypeName  = obj['sTypeArray'][i][1];
+					}
+					sTypeDom += '<li><a role="menuitem"  href="javascript:;" value="'+ obj['sTypeArray'][i][0] +'">'+ obj['sTypeArray'][i][1] +'</a></li>';
+				}
+
+				for(var i = 0; i <obj['cycleArray'].length; i++){
+					if(obj.from['type'] == obj['cycleArray'][i][0])  cycleName  = obj['cycleArray'][i][1];
+					cycleDom += '<li><a role="menuitem"  href="javascript:;" value="'+ obj['cycleArray'][i][0] +'">'+ obj['cycleArray'][i][1] +'</a></li>';
+				}
+
+				for(var i = 0; i <obj['weekArray'].length; i++){
+					if(obj.from['week'] == obj['weekArray'][i][0])  weekName  = obj['weekArray'][i][1];
+					weekDom += '<li><a role="menuitem"  href="javascript:;" value="'+ obj['weekArray'][i][0] +'">'+ obj['weekArray'][i][1] +'</a></li>';
+				}
+
+				if(obj.from.stype == 'site' || obj.from.stype == 'database' || obj.from.stype == 'path' || obj.from.stype == 'logs'){
+					$.post('/crontab?action=GetDataList',{type:obj.from.stype  == 'databases'?'database':'sites'},function(rdata){
+						obj.sNameArray = rdata.data;
+						obj.sNameArray.unshift({name:'ALL',ps:'所有'});
+						obj.backupsArray = rdata.orderOpt;
+						obj.backupsArray.unshift({name:'服务器磁盘',value:'localhost'});
+						for(var i = 0; i <obj['sNameArray'].length; i++){
+							if(obj.from['sName'] == obj['sNameArray'][i]['name'])  sNameName  = obj['sNameArray'][i]['ps'];
+							sNameDom += '<li><a role="menuitem"  href="javascript:;" value="'+ obj['sNameArray'][i]['name'] +'">'+ obj['sNameArray'][i]['ps'] +'</a></li>';
+						}
+						for(var i = 0; i <obj['backupsArray'].length; i++){
+							if(obj.from['backupTo'] == obj['backupsArray'][i]['value'])  backupsName  = obj['backupsArray'][i]['name'];
+							backupsDom += '<li><a role="menuitem"  href="javascript:;" value="'+ obj['backupsArray'][i]['value'] +'">'+ obj['backupsArray'][i]['name'] +'</a></li>';
+						}
+						callback();
+					});
+				}else{
+					callback();
+				}
+			}
+		};
+		obj.create(function(){
+			layer.open({
+				type:1,
+				title:'编辑计划任务-['+rdata.name+']',
+				area: ['850px','450px'], 
+				skin:'layer-create-content',
+				shadeClose:false,
+				closeBtn:2,
+				content:'<div class="setting-con ptb20">\
+								<div class="clearfix plan ptb10">\
+									<span class="typename c4 pull-left f14 text-right mr20">任务类型</span>\
+									<div class="dropdown stype_list pull-left mr20">\
+										<button class="btn btn-default dropdown-toggle" type="button" id="excode" data-toggle="dropdown" style="width:auto" disabled="disabled">\
+											<b val="'+ obj.from.type +'">'+ sTypeName +'</b>\
+											<span class="caret"></span>\
+										</button>\
+										<ul class="dropdown-menu" role="menu" aria-labelledby="sType">'+ sTypeDom +'</ul>\
+									</div>\
+								</div>\
+								<div class="clearfix plan ptb10">\
+									<span class="typename c4 pull-left f14 text-right mr20">任务名称</span>\
+									<div class="planname pull-left"><input type="text" name="name" class="bt-input-text sName_create" value="'+ obj.from.name +'"></div>\
+								</div>\
+								<div class="clearfix plan ptb10">\
+									<span class="typename c4 pull-left f14 text-right mr20">执行周期</span>\
+									<div class="dropdown  pull-left mr20">\
+										<button class="btn btn-default dropdown-toggle cycle_btn" type="button" data-toggle="dropdown" style="width:94px">\
+											<b val="'+ obj.from.stype +'">'+ cycleName +'</b>\
+											<span class="caret"></span>\
+										</button>\
+										<ul class="dropdown-menu" role="menu" aria-labelledby="cycle">'+ cycleDom +'</ul>\
+									</div>\
+									<div class="pull-left optional_week">\
+										<div class="dropdown week_btn pull-left mr20" style="display:'+ (obj.from.type == "week"  ?'block;':'none') +'">\
+											<button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" >\
+												<b val="'+ obj.from.week +'">'+ weekName +'</b> \
+												<span class="caret"></span>\
+											</button>\
+											<ul class="dropdown-menu" role="menu" aria-labelledby="week">'+ weekDom +'</ul>\
+										</div>\
+										<div class="plan_hms pull-left mr20 bt-input-text where1_input" style="display:'+ (obj.from.type == "day-n" || obj.from.type == 'month' ?'block;':'none') +'"><span><input type="number" name="where1" class="where1_create" value="'+obj.from.where1 +'" maxlength="2" max="23" min="0"></span> <span class="name">日</span> </div>\
+										<div class="plan_hms pull-left mr20 bt-input-text hour_input" style="display:'+ (obj.from.type == "day" || obj.from.type == 'day-n' || obj.from.type == 'hour-n' || obj.from.type == 'week' || obj.from.type == 'month'?'block;':'none') +'"><span><input type="number" name="hour" class="hour_create" value="'+ ( obj.from.type == 'hour-n' ? obj.from.where1 : obj.from.hour ) +'" maxlength="2" max="23" min="0"></span> <span class="name">时</span> </div>\
+										<div class="plan_hms pull-left mr20 bt-input-text minute_input"><span><input type="number" name="minute" class="minute_create" value="'+ (obj.from.type == 'minute-n' ? obj.from.where1 : obj.from.minute)+'" maxlength="2" max="59" min="0"></span> <span class="name">分</span> </div>\
+									</div>\
+								</div>\
+								<div class="clearfix plan ptb10 site_list" style="display:none">\
+									<span class="typename controls c4 pull-left f14 text-right mr20">'+ sTypeName  +'</span>\
+									<div style="line-height:34px"><div class="dropdown pull-left mr20 sName_btn" style="display:'+ (obj.from.sType != "path"?'block;':'none') +'">\
+										<button class="btn btn-default dropdown-toggle" type="button"  data-toggle="dropdown" style="width:auto" disabled="disabled">\
+											<b id="sName" val="'+ obj.from.sname +'">'+ sNameName +'</b>\
+											<span class="caret"></span>\
+										</button>\
+										<ul class="dropdown-menu" role="menu" aria-labelledby="sName">'+ sNameDom +'</ul>\
+									</div>\
+									<div class="info-r" style="float: left;margin-right: 25px;display:'+ (obj.from.sType == "path"?'block;':'none') +'">\
+										<input id="inputPath" class="bt-input-text mr5 " type="text" name="path" value="'+ obj.from.sName +'" placeholder="备份目录" style="width:208px;height:33px;" disabled="disabled">\
+									</div>\
+									<div class="textname pull-left mr20">备份到</div>\
+										<div class="dropdown  pull-left mr20">\
+											<button class="btn btn-default dropdown-toggle backup_btn" type="button"  data-toggle="dropdown" style="width:auto;">\
+												<b val="'+ obj.from.backup_to +'">'+ backupsName +'</b>\
+												<span class="caret"></span>\
+											</button>\
+											<ul class="dropdown-menu" role="menu" aria-labelledby="backupTo">'+ backupsDom +'</ul>\
+										</div>\
+										<div class="textname pull-left mr20">保留最新</div>\
+										<div class="plan_hms pull-left mr20 bt-input-text">\
+											<span><input type="number" name="save" class="save_create" value="'+ obj.from.save +'" maxlength="4" max="100" min="1"></span><span class="name">份</span>\
+										</div>\
+									</div>\
+								</div>\
+								<div class="clearfix plan ptb10"  style="display:'+ (obj.from.stype == "toShell"?'block;':'none') +'">\
+									<span class="typename controls c4 pull-left f14 text-right mr20">脚本内容</span>\
+									<div style="line-height:34px"><textarea class="txtsjs bt-input-text sBody_create" name="sBody">'+ obj.from.sbody +'</textarea></div>\
+								</div>\
+								<div class="clearfix plan ptb10" style="display:'+ (obj.from.stype == "rememory"?'block;':'none') +'">\
+									<span class="typename controls c4 pull-left f14 text-right mr20">提示</span>\
+									<div style="line-height:34px">释放PHP、MYSQL、PURE-FTPD、APACHE、NGINX的内存占用,建议在每天半夜执行!</div>\
+								</div>\
+								<div class="clearfix plan ptb10" style="display:'+ (obj.from.stype == "toUrl"?'block;':'none') +'">\
+									<span class="typename controls c4 pull-left f14 text-right mr20">URL地址</span>\
+									<div style="line-height:34px"><input type="text" style="width:400px; height:34px" class="bt-input-text url_create" name="urladdress"  placeholder="URL地址" value="'+ obj.from.urladdress +'"></div>\
+								</div>\
+								<div class="clearfix plan ptb10">\
+									<div class="bt-submit plan-submits " style="margin-left: 141px;">保存编辑</div>\
+								</div>\
+							</div>'
+			});
+			setTimeout(function(){
+				if(obj.from.stype == 'toShell'){
+					$('.site_list').hide();
+				}else if(obj.from.stype == 'rememory'){
+					$('.site_list').hide();
+				}else if( obj.from.stype == 'toUrl'){
+					$('.site_list').hide();
+				}else{
+					$('.site_list').show();
+				}
+
+				$('.sName_create').blur(function () {
+					obj.from.name = $(this).val();
+				});
+				$('.where1_create').blur(function () {
+					obj.from.where1 = $(this).val();
+				});
+	
+				$('.hour_create').blur(function () {
+					obj.from.hour = $(this).val();
+				});
+	
+				$('.minute_create').blur(function () {
+					obj.from.minute = $(this).val();
+				});
+	
+				$('.save_create').blur(function () {
+					obj.from.save = $(this).val();
+				});
+	
+				$('.sBody_create').blur(function () {
+					obj.from.sBody = $(this).val();
+				});
+				$('.url_create').blur(function () {
+					obj.from.urladdress = $(this).val();
+				});
+	
+				$('[aria-labelledby="cycle"] a').unbind().click(function () {
+					$('.cycle_btn').find('b').attr('val',$(this).attr('value')).html($(this).html());
+					var type = $(this).attr('value');
+					switch(type){
+						case 'day':
+							$('.week_btn').hide();
+							$('.where1_input').hide();
+							$('.hour_input').show().find('input').val('1');
+							$('.minute_input').show().find('input').val('30');
+							obj.from.week = '';
+							obj.from.type = '';
+							obj.from.hour = 1;
+							obj.from.minute = 30;
+						break;
+						case 'day-n':
+							$('.week_btn').hide();
+							$('.where1_input').show().find('input').val('1');
+							$('.hour_input').show().find('input').val('1');
+							$('.minute_input').show().find('input').val('30');
+							obj.from.week = '';
+							obj.from.where1 = 1;
+							obj.from.hour = 1;
+							obj.from.minute = 30;
+						break;
+						case 'hour':
+							$('.week_btn').hide();
+							$('.where1_input').hide();
+							$('.hour_input').hide();
+							$('.minute_input').show().find('input').val('30');
+							obj.from.week = '';
+							obj.from.where1 = '';
+							obj.from.hour = '';
+							obj.from.minute = 30;
+						break;
+						case 'hour-n':
+							$('.week_btn').hide();
+							$('.where1_input').hide();
+							$('.hour_input').show().find('input').val('1');
+							$('.minute_input').show().find('input').val('30');
+							obj.from.week = '';
+							obj.from.where1 = '';
+							obj.from.hour = 1;
+							obj.from.minute = 30;
+						break;
+						case 'minute-n':
+							$('.week_btn').hide();
+							$('.where1_input').hide();
+							$('.hour_input').hide();
+							$('.minute_input').show();
+							obj.from.week = '';
+							obj.from.where1 = '';
+							obj.from.hour = '';
+							obj.from.minute = 30;
+						break;
+						case 'week':
+							$('.week_btn').show();
+							$('.where1_input').hide();
+							$('.hour_input').show();
+							$('.minute_input').show();
+							obj.from.week = 1;
+							obj.from.where1 = '';
+							obj.from.hour = 1;
+							obj.from.minute = 30;
+						break;
+						case 'month':
+							$('.week_btn').hide();
+							$('.where1_input').show();
+							$('.hour_input').show();
+							$('.minute_input').show();
+							obj.from.week = '';
+							obj.from.where1 = 1;
+							obj.from.hour = 1;
+							obj.from.minute = 30;
+						break;
+					}
+					obj.from.type = $(this).attr('value');
+				});
+	
+				$('[aria-labelledby="week"] a').unbind().click(function () {
+					$('.week_btn').find('b').attr('val',$(this).attr('value')).html($(this).html());
+					obj.from.week = $(this).attr('value');
+				});
+	
+				$('[aria-labelledby="backupTo"] a').unbind().click(function () {
+					$('.backup_btn').find('b').attr('val',$(this).attr('value')).html($(this).html());
+					obj.from.backupTo = $(this).attr('value');
+				});
+				$('.plan-submits').unbind().click(function(){
+					if(obj.from.type == 'hour-n'){
+						obj.from.where1 = obj.from.hour;
+						obj.from.hour = '';
+					}else if(obj.from.type == 'minute-n'){
+						obj.from.where1 = obj.from.minute;
+						obj.from.minute = '';
+					}
+					layer.msg('正在保存编辑内容，请稍后...',{icon:16,time:0,shade: [0.3, '#000']});
+					$.post('/crontab/modify_crond',obj.from,function(rdata){
+						layer.closeAll();
+						getCronData();
+						layer.msg(rdata.msg,{icon:rdata.status?1:2});
+					},'json');
+				});
+			},100);
+		});
+	},'json');
 }
 
 
