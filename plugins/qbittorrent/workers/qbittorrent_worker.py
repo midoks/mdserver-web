@@ -141,7 +141,6 @@ class downloadBT(Thread):
 
     def ffmpeg(self, file=''):
         md5file = self.md5(file)[0:6]
-        tsfile = self.get_transfer_ts_file(md5file)
 
         m3u8_dir = self.get_transfer_m3u5_dir(md5file)
         self.execShell('mkdir -p ' + m3u8_dir)
@@ -154,6 +153,7 @@ class downloadBT(Thread):
             print 'mp4:', data_mp4[1]
         print formatTime(), 'mp4 exists:', mp4file
 
+        tsfile = self.get_transfer_ts_file(md5file)
         cmd_ts = self.fg_transfer_ts_cmd(mp4file, tsfile)
         print 'cmd_ts:', cmd_ts
         data_ts = self.execShell(cmd_ts)
