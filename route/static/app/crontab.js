@@ -1,9 +1,9 @@
 var num = 0;
 //查看任务日志
 function getLogs(id){
-	layer.msg(lan.public.the_get,{icon:16,time:0,shade: [0.3, '#000']});
-	var data='&id='+id
-	$.post('/crontab?action=GetLogs',data,function(rdata){
+	layer.msg('正在获取,请稍候...',{icon:16,time:0,shade: [0.3, '#000']});
+	var data='&id='+id;
+	$.post('/crontab/logs', data, function(rdata){
 		layer.closeAll();
 		if(!rdata.status) {
 			layer.msg(rdata.msg,{icon:2});
@@ -18,39 +18,45 @@ function getLogs(id){
 			content:'<div class="setchmod bt-form pd20 pb70">'
 					+'<pre id="crontab-log" style="overflow: auto; border: 0px none; padding: 15px; margin: 0px; height: 410px; background-color: rgb(255, 255, 255);"></pre>'
 					+'<div class="bt-form-submit-btn" style="margin-top: 0px;">'
-					+'<button type="button" class="btn btn-success btn-sm" onclick="CloseLogs('+id+')">'+lan.public.empty+'</button>'
-					+'<button type="button" class="btn btn-danger btn-sm" onclick="layer.closeAll()">'+lan.public.close+'</button>'
+					+'<button type="button" class="btn btn-success btn-sm" onclick="CloseLogs('+id+')">清空</button>'
+					+'<button type="button" class="btn btn-danger btn-sm" onclick="layer.closeAll()">关闭</button>'
 				    +'</div>'
 					+'</div>'
 		});
-		
+
 		setTimeout(function(){
 			$("#crontab-log").text(rdata.msg);
-		},200)
+		},200);
 	});
 }
 
 function getCronData(){
-	var laid=layer.msg(lan.public.the,{icon:16,time:0,shade: [0.3, '#000']});
-	$.post('/crontab/list','',function(rdata){
-		layer.close(laid);
+	var load = layer.msg(lan.public.the,{icon:16,time:0,shade: [0.3, '#000']});
+	$.post('/crontab/list', '', function(rdata){
+		layer.close(load);
 		console.log(rdata);
 		var cbody = "";
 		if(rdata == ""){
 			cbody="<tr><td colspan='6'>"+lan.crontab.task_empty+"</td></tr>";
 		}else{
 			for(var i=0;i<rdata.data.length;i++){
+				//状态
+				var status = rdata.data[i]['status'] == '1'? '正常':'停用';
+
 				cbody += "<tr>\
 							<td><input type='checkbox' onclick='checkSelect();' title='"+rdata.data[i].name+"' name='id' value='"+rdata.data[i].id+"'></td>\
 							<td>"+rdata.data[i].name+"</td>\
+							<td>"+status+"</td>\
 							<td>"+rdata.data[i].type+"</td>\
 							<td>"+rdata.data[i].cycle+"</td>\
+							<td>-</td>\
+							<td>--</td>\
 							<td>"+rdata.data[i].addtime+"</td>\
 							<td>\
-								<a href=\"javascript:startTask("+rdata.data[i].id+");\" class='btlink'>"+lan.public.exec+"</a> | \
-								<a href=\"javascript:onlineEditFile(0,'/www/server/cron/"+rdata.data[i].echo+"');\" class='btlink'>"+lan.public.script+"</a> | \
-								<a href=\"javascript:getLogs("+rdata.data[i].id+");\" class='btlink'>"+lan.public.log+"</a> | \
-								<a href=\"javascript:planDel("+rdata.data[i].id+" ,'"+rdata.data[i].name.replace('\\','\\\\').replace("'","\\'").replace('"','')+"');\" class='btlink'>"+lan.public.del+"</a>\
+								<a href=\"javascript:startTask("+rdata.data[i].id+");\" class='btlink'>执行</a> | \
+								<a href=\"javascript:onlineEditFile(0,'/www/server/cron/"+rdata.data[i].echo+"');\" class='btlink'>脚本</a> | \
+								<a href=\"javascript:getLogs("+rdata.data[i].id+");\" class='btlink'>日志</a> | \
+								<a href=\"javascript:planDel("+rdata.data[i].id+" ,'"+rdata.data[i].name.replace('\\','\\\\').replace("'","\\'").replace('"','')+"');\" class='btlink'>删除</a>\
 							</td>\
 						</tr>";
 			}
