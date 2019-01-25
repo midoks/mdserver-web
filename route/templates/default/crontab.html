@@ -50,58 +50,36 @@
                                 <span class="caret"></span>
                             </button>
 							<ul class="dropdown-menu" role="menu" aria-labelledby="cycle">
-								<li>
-									<a role="menuitem" tabindex="-1" href="javascript:;" value="day">每天</a>
-								</li>
-								<li>
-									<a role="menuitem" tabindex="-1" href="javascript:;" value="day-n">N天</a>
-								</li>
-								<li>
-									<a role="menuitem" tabindex="-1" href="javascript:;" value="hour">每小时</a>
-								</li>
-								<li>
-									<a role="menuitem" tabindex="-1" href="javascript:;" value="hour-n">N小时</a>
-								</li>
-								<li>
-									<a role="menuitem" tabindex="-1" href="javascript:;" value="minute-n">N分钟</a>
-								</li>
-								<li>
-									<a role="menuitem" tabindex="-1" href="javascript:;" value="week">每星期</a>
-								</li>
-								<li>
-									<a role="menuitem" tabindex="-1" href="javascript:;" value="month">每月</a>
-								</li>
+								<li><a role="menuitem" tabindex="-1" href="javascript:;" value="day">每天</a></li>
+								<li><a role="menuitem" tabindex="-1" href="javascript:;" value="day-n">N天</a></li>
+								<li><a role="menuitem" tabindex="-1" href="javascript:;" value="hour">每小时</a></li>
+								<li><a role="menuitem" tabindex="-1" href="javascript:;" value="hour-n">N小时</a></li>
+								<li><a role="menuitem" tabindex="-1" href="javascript:;" value="minute-n">N分钟</a></li>
+								<li><a role="menuitem" tabindex="-1" href="javascript:;" value="week">每星期</a></li>
+								<li><a role="menuitem" tabindex="-1" href="javascript:;" value="month">每月</a></li>
 							</ul>
 						</div>
 						<div id="ptime" class="pull-left">
 							<div class="dropdown planweek pull-left mr20">
 								<button class="btn btn-default dropdown-toggle" type="button" id="excode" data-toggle="dropdown"><b val="1">周一</b> <span class="caret"></span></button>
 								<ul class="dropdown-menu" role="menu" aria-labelledby="excode">
-									<li>
-										<a role="menuitem" tabindex="-1" href="javascript:;" value="1">周一</a>
-									</li>
-									<li>
-										<a role="menuitem" tabindex="-1" href="javascript:;" value="2">周二</a>
-									</li>
-									<li>
-										<a role="menuitem" tabindex="-1" href="javascript:;" value="3">周三</a>
-									</li>
-									<li>
-										<a role="menuitem" tabindex="-1" href="javascript:;" value="4">周四</a>
-									</li>
-									<li>
-										<a role="menuitem" tabindex="-1" href="javascript:;" value="5">周五</a>
-									</li>
-									<li>
-										<a role="menuitem" tabindex="-1" href="javascript:;" value="6">周六</a>
-									</li>
-									<li>
-										<a role="menuitem" tabindex="-1" href="javascript:;" value="0">周日</a>
-									</li>
+									<li><a role="menuitem" tabindex="-1" href="javascript:;" value="1">周一</a></li>
+									<li><a role="menuitem" tabindex="-1" href="javascript:;" value="2">周二</a></li>
+									<li><a role="menuitem" tabindex="-1" href="javascript:;" value="3">周三</a></li>
+									<li><a role="menuitem" tabindex="-1" href="javascript:;" value="4">周四</a></li>
+									<li><a role="menuitem" tabindex="-1" href="javascript:;" value="5">周五</a></li>
+									<li><a role="menuitem" tabindex="-1" href="javascript:;" value="6">周六</a></li>
+									<li><a role="menuitem" tabindex="-1" href="javascript:;" value="0">周日</a></li>
 								</ul>
 							</div>
-							<div class="plan_hms pull-left mr20 bt-input-text"> <span><input type="number" name="hour" value="1" maxlength="2" max="23" min="0"></span> <span class="name">小时</span> </div>
-							<div class="plan_hms pull-left mr20 bt-input-text"> <span><input type="number" name="minute" value="30" maxlength="2" max="59" min="0"></span> <span class="name">分钟</span> </div>
+							<div class="plan_hms pull-left mr20 bt-input-text">
+								<span><input type="number" name="hour" value="1" maxlength="2" max="23" min="0"></span>
+								<span class="name">小时</span>
+							</div>
+							<div class="plan_hms pull-left mr20 bt-input-text">
+								<span><input type="number" name="minute" value="30" maxlength="2" max="59" min="0"></span>
+								<span class="name">分钟</span>
+							</div>
 						</div>
 					</div>
 					<div class="clearfix plan">
@@ -109,7 +87,7 @@
 						<div id="implement" style="line-height:34px"><textarea class="txtsjs bt-input-text" name="sBody"></textarea></div>
 					</div>
 					<div class="clearfix plan">
-						<div class="bt-submit plan-submit" onclick="planAdd()">添加任务</div>
+						<div class="bt-submit plan-submit" onclick="planAdd();">添加任务</div>
 					</div>
 					<ul class="help-info-text c7 ptb15 mlr20">
 						<li>当添加完备份任务，应该手动运行一次，并检查备份包是否完整</li>
@@ -137,7 +115,7 @@
 				<div class="title c6 plr15">
 					<h3 class="f16">任务列表</h3>
 					<span id="allDelete" style="float: right;display: none;">
-						<button onclick="allDeleteCron();" class="btn btn-default btn-sm">$data['lan']['BTN1']</button>
+						<button onclick="allDeleteCron();" class="btn btn-default btn-sm">删除选中</button>
 					</span>
 				</div>
 				<div class="setting-con divtable pd15">
