@@ -148,16 +148,16 @@ class crontab_api:
 
     def addApi(self):
         iname = request.form.get('name', '')
-        stype = request.form.get('type', '')
+        field_type = request.form.get('type', '')
         week = request.form.get('week', '')
         where1 = request.form.get('where1', '')
         hour = request.form.get('hour', '')
         minute = request.form.get('minute', '')
         save = request.form.get('save', '')
-        backupTo = request.form.get('backupTo', '')
-        sType = request.form.get('sType', '')
-        sName = request.form.get('sName', '')
-        sBody = request.form.get('sBody', '')
+        backup_to = request.form.get('backupTo', '')
+        stype = request.form.get('sType', '')
+        sname = request.form.get('sName', '')
+        sbody = request.form.get('sBody', '')
         urladdress = request.form.get('urladdress', '')
 
         if len(iname) < 1:
@@ -165,26 +165,27 @@ class crontab_api:
 
         params = {
             'name': iname,
-            'type': stype,
+            'type': field_type,
             'week': week,
             'where1': where1,
             'hour': hour,
             'minute': minute,
             'save': save,
-            'backupTo': backupTo,
-            'sType': sType,
-            'sName': sName,
-            'sBody': sBody,
+            'backup_to': backup_to,
+            'stype': stype,
+            'sname': sname,
+            'sbody': sbody,
             'urladdress': urladdress,
         }
 
         # print params
-        cuonConfig, _params, name = self.getCrondCycle(params)
+        cuonConfig, get, name = self.getCrondCycle(params)
         cronPath = public.getServerDir() + '/cron'
 
         cronName = self.getShell(params)
         # print cuonConfig, _params, name
         # print cronPath, cronName
+        # print stype
 
         if type(cronName) == dict:
             return cronName
@@ -197,8 +198,9 @@ class crontab_api:
             return wRes
 
         self.crondReload()
-        addData = public.M('crontab').add(self.field, (iname, stype, where1, hour, minute, cronName, time.strftime(
-            '%Y-%m-%d %X', time.localtime()), 1, save, backupTo, sType, sName, sBody, urladdress))
+        addData = public.M('crontab').add('name,type,where1,where_hour,where_minute,echo,addtime,status,save,backup_to,stype,sname,sbody,urladdress', (iname, field_type, where1, hour, minute, cronName, time.strftime(
+            '%Y-%m-%d %X', time.localtime()), 1, save, backup_to, stype, sname, sbody, urladdress))
+
         if addData > 0:
             return public.returnJson(True, '添加成功')
         return public.returnJson(False, '添加失败')
@@ -206,27 +208,36 @@ class crontab_api:
     def delApi(self):
         sid = request.form.get('id', '')
         try:
-            find = public.M('crontab').where("id=?", (sid,)).delete()
+            find = public.M('crontab').where(
+                "id=?", (sid,)).field('name,echo').find()
             if not self.removeForCrond(find['echo']):
                 return public.returnJson(False, '无法写入文件，请检查是否开启了系统加固功能!')
 
             cronPath = public.getServerDir() + '/cron'
             sfile = cronPath + '/' + find['echo']
+
             if os.path.exists(sfile):
                 os.remove(sfile)
             sfile = cronPath + '/' + find['echo'] + '.log'
             if os.path.exists(sfile):
                 os.remove(sfile)
 
-            public.M('crontab').where("id=?", (id,)).delete()
+            public.M('crontab').where("id=?", (sid,)).delete()
             public.writeLog('计划任务', public.getInfo(
                 '删除计划任务[{1}]成功!', (find['name'],)))
             return public.returnJson(True, '删除成功')
         except Exception as e:
-            return public.returnJson(False, '删除失败')
+            return public.returnJson(False, '删除失败:' + str(e))
 
     def delLogsApi(self):
-        return public.returnJson(True, '删除成功')
+        sid = request.form.get('id', '')
+        try:
+            echo = public.M('crontab').where("id=?", (sid,)).getField('echo')
+            logFile = public.getServerDir() + '/cron/' + echo + '.log'
+            os.remove(logFile)
+            return public.returnJson(True, '任务日志已清空!')
+        except:
+            return public.returnJson(False, '任务日志清空失败!')
     ##### ----- start ----- ###
 
     # 转换大写星期
@@ -346,7 +357,7 @@ class crontab_api:
                     shell = head + "curl -sS --connect-timeout 10 -m 60 '" + \
                         param['urladdress'] + "'"
                 else:
-                    shell = head + param['sBody'].replace("\r\n", "\n")
+                    shell = head + param['sbody'].replace("\r\n", "\n")
 
                 shell += '''
 echo "----------------------------------------------------------------------------"

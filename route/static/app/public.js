@@ -22,9 +22,6 @@ function toSizeM(byteLen) {
     return a || 0;
 }
 
-
-
-
 function randomStrPwd(b) {
 	b = b || 32;
 	var c = "AaBbCcDdEeFfGHhiJjKkLMmNnPpRSrTsWtXwYxZyz2345678";
@@ -348,8 +345,6 @@ function aotuHeight() {
 	var a = $("body").height() - 40;
 	$(".main-content").css("min-height", a)
 }
-
-
 
 function showMsg(msg, callback ,icon, time){
 
