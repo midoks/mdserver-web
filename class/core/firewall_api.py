@@ -54,7 +54,7 @@ class firewall_api:
         if public.isAppleSystem():
             return public.returnJson(True, '开发机不能设置!')
 
-        status = request.form.get('status', '1').strip()
+        status = request.form.get('status')
         filename = '/etc/sysctl.conf'
         conf = public.readFile(filename)
         if conf.find('net.ipv4.icmp_echo') != -1:
