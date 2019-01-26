@@ -120,14 +120,13 @@ function ping(status){
 		}
 	}},function(){
 		layer.msg('正在处理,请稍候...',{icon:16,time:20000});
-		$.post('/firewall/set_ping','status='+status, function(ret) {
-			console.log(ret);
+		$.post('/firewall/set_ping','status='+status, function(data) {
 			layer.closeAll();
-			if (ret.status == true) {
+			if (data['status'] == true) {
 				if(status == 0){
-					layer.msg('已禁Ping', {icon: 1});
+					layer.msg(data['msg'], {icon: 1});
 				} else {
-					layer.msg('已解除禁Ping', {icon: 1});
+					layer.msg('已解除禁PING', {icon: 1});
 				}
 				setTimeout(function(){window.location.reload();},3000);
 			} else {
