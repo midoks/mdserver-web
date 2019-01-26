@@ -93,19 +93,20 @@ function closeLogs(id){
 	$.post('/crontab/del_logs',data,function(rdata){
 		layer.closeAll();
 		layer.msg(rdata.msg,{icon:rdata.status?1:2});
-	});
+	},'json');
 }
 
 
 //删除
 function planDel(id,name){
-	safeMessage(lan.get('del',[name]),lan.crontab.del_task,function(){
-		layer.msg('正在处理,请稍候...',{icon:16,time:0,shade: [0.3, '#000']});
+	safeMessage(lan.get('del',[name]),'您确定要删除该任务吗?',function(){
+		var load = layer.msg('正在处理,请稍候...',{icon:16,time:0,shade: [0.3, '#000']});
 		var data='id='+id;
 		$.post('/crontab/del',data,function(rdata){
-			layer.closeAll();
-			layer.msg(rdata.msg,{icon:rdata.status?1:2,time:2000});
-			getCronData();
+			layer.close(load);
+			showMsg(rdata.msg, function(){
+				getCronData();
+			},{icon:rdata.status?1:2,time:2000});
 		},'json');
 	});
 }
@@ -174,7 +175,7 @@ function planAdd(){
 	var name = $(".planname input[name='name']").val();
 	if(name == ''){
 		$(".planname input[name='name']").focus();
-		layer.msg(lan.crontab.add_task_empty,{icon:2});
+		layer.msg('任务名称不能为空!',{icon:2});
 		return;
 	}
 	$("#set-Config input[name='name']").val(name);
@@ -198,12 +199,11 @@ function planAdd(){
 		case 'month':
 			is1=31;
 			break;
-		
 	}
 	
 	if(where1 > is1 || where1 < is2){
 		$("#ptime input[name='where1']").focus();
-		layer.msg(lan.public.input_err,{icon:2});
+		layer.msg('表单不合法,请重新输入!',{icon:2});
 		return;
 	}
 	
@@ -212,22 +212,21 @@ function planAdd(){
 	var hour = $("#ptime input[name='hour']").val();
 	if(hour > 23 || hour < 0){
 		$("#ptime input[name='hour']").focus();
-		layer.msg(lan.crontab.input_hour_err,{icon:2});
+		layer.msg('小时值不合法!',{icon:2});
 		return;
 	}
 	$("#set-Config input[name='hour']").val(hour);
 	var minute = $("#ptime input[name='minute']").val();
 	if(minute > 59 || minute < 0){
 		$("#ptime input[name='minute']").focus();
-		layer.msg(lan.crontab.input_minute_err,{icon:2});
+		layer.msg('分钟值不合法!',{icon:2});
 		return;
 	}
 	$("#set-Config input[name='minute']").val(minute);
 	
 	var save = $("#save").val();
-	
 	if(save < 0){
-		layer.msg(lan.crontab.input_number_err,{icon:2});
+		layer.msg('不能有负数!',{icon:2});
 		return;
 	}
 	
@@ -467,19 +466,19 @@ function toBackup(type){
 					  	'+sOpt+'\
 					  </ul>\
 					</div>\
-					<div class="textname pull-left mr20">'+lan.crontab.backup_to+'</div>\
+					<div class="textname pull-left mr20">备份到</div>\
 					<div class="dropdown planBackupTo pull-left mr20">\
 					  <button class="btn btn-default dropdown-toggle" type="button" id="excode" data-toggle="dropdown" style="width:auto;">\
-						<b val="localhost">'+lan.crontab.disk+'</b> <span class="caret"></span>\
+						<b val="localhost">服务器磁盘</b> <span class="caret"></span>\
 					  </button>\
 					  <ul class="dropdown-menu" role="menu" aria-labelledby="excode">\
-						<li><a role="menuitem" tabindex="-1" href="javascript:;" value="localhost">'+lan.crontab.disk+'</a></li>\
+						<li><a role="menuitem" tabindex="-1" href="javascript:;" value="localhost">服务器磁盘</a></li>\
 						'+ orderOpt +'\
 					  </ul>\
 					</div>\
-					<div class="textname pull-left mr20">'+lan.crontab.save_new+'</div><div class="plan_hms pull-left mr20 bt-input-text">\
+					<div class="textname pull-left mr20">保留最新</div><div class="plan_hms pull-left mr20 bt-input-text">\
 					<span><input type="number" name="save" id="save" value="3" maxlength="4" max="100" min="1"></span>\
-					<span class="name">'+lan.crontab.save_num+'</span>\
+					<span class="name">份</span>\
 					</div>';
 		$("#implement").html(sBody);
 		getselectname();
