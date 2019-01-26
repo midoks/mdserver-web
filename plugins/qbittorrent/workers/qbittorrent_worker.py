@@ -200,7 +200,9 @@ class downloadBT(Thread):
             return
 
         m3u8_dir = self.get_transfer_m3u5_dir(md5file)
-        self.execShell('mkdir -p ' + m3u8_dir)
+        if not os.path.exists(m3u8_dir):
+            self.execShell('mkdir -p ' + m3u8_dir)
+
         m3u8_file = m3u8_dir + '/' + md5file + '.m3u8'
         tofile = m3u8_dir + '/%010d.ts'
         cmd_m3u8 = self.fg_m3u8_cmd(tsfile, m3u8_file, tofile)
