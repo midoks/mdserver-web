@@ -179,8 +179,7 @@ class downloadBT(Thread):
         print self.debug('cmd_mp4:' + cmd_mp4)
 
         if not os.path.exists(mp4file):
-            data_mp4 = os.system(cmd_mp4)
-            print self.debug('mp4:' + data_mp4[1])
+            os.system(cmd_mp4)
         else:
             print self.debug('mp4 exists:' + mp4file)
 
@@ -192,8 +191,7 @@ class downloadBT(Thread):
         cmd_ts = self.fg_transfer_ts_cmd(mp4file, tsfile)
         print self.debug('cmd_ts:' + cmd_ts)
         if not os.path.exists(tsfile):
-            data_ts = self.execShell(cmd_ts)
-            print self.debug('dats_ts:' + data_ts[1])
+            os.system(cmd_ts)
         else:
             print self.debug('data_ts exists:' + mp4file)
 
@@ -208,10 +206,7 @@ class downloadBT(Thread):
         cmd_m3u8 = self.fg_m3u8_cmd(tsfile, m3u8_file, tofile)
         print self.debug('cmd_m3u8:' + cmd_m3u8)
         if not os.path.exists(m3u8_file):
-
-            data_m3u8 = os.system(cmd_m3u8)
-            print self.debug('data_m3u8:' + data_m3u8[1])
-
+            os.system(cmd_m3u8)
             self.execShell('chown -R ' + FILE_OWN + ':' +
                            FILE_GROUP + ' ' + m3u8_dir)
         else:
