@@ -83,7 +83,7 @@ class crontab_api:
     def modifyCrondApi(self):
         sid = request.form.get('id', '')
         iname = request.form.get('name', '')
-        stype = request.form.get('type', '')
+        field_type = request.form.get('type', '')
         week = request.form.get('week', '')
         where1 = request.form.get('where1', '')
         hour = request.form.get('hour', '')
@@ -100,7 +100,7 @@ class crontab_api:
 
         params = {
             'name': iname,
-            'type': stype,
+            'type': field_type,
             'week': week,
             'where1': where1,
             'hour': hour,
@@ -128,7 +128,7 @@ class crontab_api:
         cronInfo['urladdress'] = get['urladdress']
 
         addData = public.M('crontab').where('id=?', (sid,)).save('name,type,where1,where_hour,where_minute,save,backup_to,sbody,urladdress', (get[
-            'name'], get['type'], get['where1'], get['hour'], get['minute'], get['save'], get['backup_to'], get['sbody'], get['urladdress']))
+            'name'], field_type, get['where1'], get['hour'], get['minute'], get['save'], get['backup_to'], get['sbody'], get['urladdress']))
 
         self.removeForCrond(cronInfo['echo'])
         self.syncToCrond(cronInfo)
@@ -204,6 +204,14 @@ class crontab_api:
         if addData > 0:
             return public.returnJson(True, '添加成功')
         return public.returnJson(False, '添加失败')
+
+    def startTaskApi(self):
+        sid = request.form.get('id', '')
+        echo = public.M('crontab').where('id=?', (sid,)).getField('echo')
+        execstr = public.getServerDir() + '/cron/' + echo
+        os.system('chmod +x ' + execstr)
+        os.system('nohup ' + execstr + ' >> ' + execstr + '.log 2>&1 &')
+        return public.returnJson(True, '任务已执行!')
 
     def delApi(self):
         sid = request.form.get('id', '')
