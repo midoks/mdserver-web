@@ -39,10 +39,24 @@ class firewall_api:
         rep = "#*Port\s+([0-9]+)\s*\n"
         port = re.search(rep, conf).groups(0)[0]
 
+        isPing = True
+        try:
+            if public.isAppleSystem():
+                isPing = True
+            else:
+                file = '/etc/sysctl.conf'
+                conf = public.readFile(file)
+                rep = "#*net\.ipv4\.icmp_echo_ignore_all\s*=\s*([0-9]+)"
+                tmp = re.search(rep, conf).groups(0)[0]
+                if tmp == '1':
+                    isPing = False
+        except:
+            isPing = True
+
         data = {}
         data['port'] = port
         data['status'] = True
-        data['ping'] = True
+        data['ping'] = isPing
         if public.isAppleSystem():
             data['firewall_status'] = False
         else:
