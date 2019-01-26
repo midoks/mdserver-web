@@ -122,16 +122,19 @@ class downloadBT(Thread):
     def get_transfer_mp4_file(self, to):
         return FILE_TRANSFER_TO + '/' + to + '.mp4'
 
+    def get_lock_file(self, to):
+        return FILE_TRANSFER_TO + '/' + to + '.lock'
+
     def get_transfer_m3u5_dir(self, dirname):
         return FILE_TO + '/m3u8/' + dirname
 
     def fg_transfer_mp4_cmd(self, sfile, dfile):
-        cmd = 'ffmpeg -y -i ' + sfile + ' -c:v libx264 -strict -2 ' + dfile
+        cmd = 'ffmpeg -y -i "' + sfile + '" -c:v libx264 -strict -2 ' + dfile
         return cmd
 
     def fg_transfer_ts_cmd(self, file, to_file):
         cmd = 'ffmpeg -y -i ' + file + \
-            ' -vcodec copy -acodec copy -vbsf h264_mp4toannexb ' + to_file
+            ' -s 480x360 -vcodec copy -acodec copy -vbsf h264_mp4toannexb ' + to_file
         return cmd
 
     def fg_m3u8_cmd(self, ts_file, m3u8_file, to_file):
@@ -139,41 +142,80 @@ class downloadBT(Thread):
             m3u8_file + ' -segment_time 3 ' + to_file
         return cmd
 
+    def debug(self, msg):
+        return formatTime() + ":" + msg
+
+    def lock(self, sign):
+        l = self.get_lock_file(sign)
+        self.execShell('touch ' + l)
+
+    def unlock(self, sign):
+        l = self.get_lock_file(sign)
+        self.execShell('rm -rf ' + l)
+
+    def islock(self, sign):
+        l = self.get_lock_file(sign)
+        if os.path.exists(l):
+            return True
+        return False
+
     def ffmpeg(self, file=''):
+
         md5file = self.md5(file)[0:6]
 
-        mp4file = self.get_transfer_mp4_file(md5file)
-        if not os.path.exists(mp4file):
-            cmd_mp4 = self.fg_transfer_mp4_cmd(file, mp4file)
-            print 'cmd_mp4:', cmd_mp4
-            data_mp4 = self.execShell(cmd_mp4)
-            print 'mp4:', data_mp4[1]
+        if self.islock(md5file):
+            print self.debug('file:' + file + 'is lock, doing')
         else:
-            print formatTime(), 'mp4 exists:', mp4file
+            self.lock(md5file)
+
+        if not os.path.exists(file):
+            print formatTime(), 'file not exists:', file
+            return
+        print self.debug('source file ' + file)
+
+        mp4file = self.get_transfer_mp4_file(md5file)
+        cmd_mp4 = self.fg_transfer_mp4_cmd(file, mp4file)
+        print self.debug('cmd_mp4:' + cmd_mp4)
+
+        if not os.path.exists(mp4file):
+            data_mp4 = self.execShell(cmd_mp4)
+            print self.debug('mp4:' + data_mp4[1])
+        else:
+            print self.debug('mp4 exists:' + mp4file)
+
+        if not os.path.exists(mp4file):
+            print self.debug('mp4 not exists')
+            return
 
         tsfile = self.get_transfer_ts_file(md5file)
+        cmd_ts = self.fg_transfer_ts_cmd(mp4file, tsfile)
+        print self.debug('cmd_ts:' + cmd_ts)
         if not os.path.exists(tsfile):
-            cmd_ts = self.fg_transfer_ts_cmd(mp4file, tsfile)
-            print 'cmd_ts:', cmd_ts
             data_ts = self.execShell(cmd_ts)
-            print 'ts:', data_ts[1]
+            print self.debug('dats_ts:' + data_ts[1])
         else:
-            print formatTime(), 'ts exists:', mp4file
+            print self.debug('data_ts exists:' + mp4file)
+
+        if not os.path.exists(tsfile):
+            print self.debug('ts not exists')
+            return
 
         m3u8_dir = self.get_transfer_m3u5_dir(md5file)
         self.execShell('mkdir -p ' + m3u8_dir)
         m3u8_file = m3u8_dir + '/' + md5file + '.m3u8'
-        tofile = m3u8_dir + '/%03d.ts'
-        if not os.path.exists(tofile):
-            cmd_m3u8 = self.fg_m3u8_cmd(tsfile, m3u8_file, tofile)
-            print 'cmd_m3u8:', cmd_m3u8
-            data_m3u8 = self.execShell(cmd_m3u8)
-            print 'm3u8:', data_m3u8[1]
+        tofile = m3u8_dir + '/%010d.ts'
+        cmd_m3u8 = self.fg_m3u8_cmd(tsfile, m3u8_file, tofile)
+        print self.debug('cmd_m3u8:' + cmd_m3u8)
+        if not os.path.exists(m3u8_file):
+
+            data_m3u8 = os.system(cmd_m3u8)
+            print self.debug('data_m3u8:' + data_m3u8[1])
 
             self.execShell('chown -R ' + FILE_OWN + ':' +
                            FILE_GROUP + ' ' + m3u8_dir)
         else:
-            print formatTime(), 'm3u8 exists:', tofile
+            print self.debug('m3u8 exists:' + tofile)
+        self.unlock(md5file)
 
     def file_arr(self, path, filters=['.DS_Store']):
         file_list = []
@@ -230,6 +272,7 @@ class downloadBT(Thread):
             print "completed torrents count:", tlen
             if tlen > 0:
                 for torrent in torrents:
+                    # print torrent
                     path = torrent['save_path'] + torrent['name']
                     try:
                         self.video_do(path)
