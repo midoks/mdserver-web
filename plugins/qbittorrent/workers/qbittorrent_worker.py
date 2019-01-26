@@ -163,11 +163,11 @@ class downloadBT(Thread):
 
         md5file = self.md5(file)[0:6]
 
-        if self.islock(md5file):
-            print self.debug('file:' + file + ' is lock, doing')
-            return
-        else:
-            self.lock(md5file)
+        # if self.islock(md5file):
+        #     print self.debug('file:' + file + ' is lock, doing')
+        #     return
+        # else:
+        #     self.lock(md5file)
 
         if not os.path.exists(file):
             print formatTime(), 'file not exists:', file
@@ -211,7 +211,7 @@ class downloadBT(Thread):
                            FILE_GROUP + ' ' + m3u8_dir)
         else:
             print self.debug('m3u8 exists:' + tofile)
-        self.unlock(md5file)
+        # self.unlock(md5file)
 
     def file_arr(self, path, filters=['.DS_Store']):
         file_list = []
