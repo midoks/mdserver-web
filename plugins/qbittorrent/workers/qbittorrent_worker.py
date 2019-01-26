@@ -142,32 +142,38 @@ class downloadBT(Thread):
     def ffmpeg(self, file=''):
         md5file = self.md5(file)[0:6]
 
-        m3u8_dir = self.get_transfer_m3u5_dir(md5file)
-        self.execShell('mkdir -p ' + m3u8_dir)
-
         mp4file = self.get_transfer_mp4_file(md5file)
         if not os.path.exists(mp4file):
             cmd_mp4 = self.fg_transfer_mp4_cmd(file, mp4file)
             print 'cmd_mp4:', cmd_mp4
             data_mp4 = self.execShell(cmd_mp4)
             print 'mp4:', data_mp4[1]
-        print formatTime(), 'mp4 exists:', mp4file
+        else:
+            print formatTime(), 'mp4 exists:', mp4file
 
         tsfile = self.get_transfer_ts_file(md5file)
-        cmd_ts = self.fg_transfer_ts_cmd(mp4file, tsfile)
-        print 'cmd_ts:', cmd_ts
-        data_ts = self.execShell(cmd_ts)
-        print 'ts:', data_ts[1]
+        if not os.path.exists(tsfile):
+            cmd_ts = self.fg_transfer_ts_cmd(mp4file, tsfile)
+            print 'cmd_ts:', cmd_ts
+            data_ts = self.execShell(cmd_ts)
+            print 'ts:', data_ts[1]
+        else:
+            print formatTime(), 'ts exists:', mp4file
 
+        m3u8_dir = self.get_transfer_m3u5_dir(md5file)
+        self.execShell('mkdir -p ' + m3u8_dir)
         m3u8_file = m3u8_dir + '/' + md5file + '.m3u8'
         tofile = m3u8_dir + '/%03d.ts'
-        cmd_m3u8 = self.fg_m3u8_cmd(tsfile, m3u8_file, tofile)
-        print 'cmd_m3u8:', cmd_m3u8
-        data_m3u8 = self.execShell(cmd_m3u8)
-        print 'm3u8:', data_m3u8[1]
+        if not os.path.exists(tofile):
+            cmd_m3u8 = self.fg_m3u8_cmd(tsfile, m3u8_file, tofile)
+            print 'cmd_m3u8:', cmd_m3u8
+            data_m3u8 = self.execShell(cmd_m3u8)
+            print 'm3u8:', data_m3u8[1]
 
-        self.execShell('chown -R ' + FILE_OWN + ':' +
-                       FILE_GROUP + ' ' + m3u8_dir)
+            self.execShell('chown -R ' + FILE_OWN + ':' +
+                           FILE_GROUP + ' ' + m3u8_dir)
+        else:
+            print formatTime(), 'm3u8 exists:', tofile
 
     def file_arr(self, path, filters=['.DS_Store']):
         file_list = []
