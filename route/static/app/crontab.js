@@ -806,19 +806,19 @@ function closeOpt(){
 //星期
 function toWeek(){
 	var mBody = '<div class="dropdown planweek pull-left mr20">\
-					  <button class="btn btn-default dropdown-toggle" type="button" id="excode" data-toggle="dropdown">\
-						<b val="1">'+lan.crontab.TZZ1+'</b> <span class="caret"></span>\
-					  </button>\
-					  <ul class="dropdown-menu" role="menu" aria-labelledby="excode">\
-						<li><a role="menuitem" tabindex="-1" href="javascript:;" value="1">'+lan.crontab.TZZ1+'</a></li>\
-						<li><a role="menuitem" tabindex="-1" href="javascript:;" value="2">'+lan.crontab.TZZ2+'</a></li>\
-						<li><a role="menuitem" tabindex="-1" href="javascript:;" value="3">'+lan.crontab.TZZ3+'</a></li>\
-						<li><a role="menuitem" tabindex="-1" href="javascript:;" value="4">'+lan.crontab.TZZ4+'</a></li>\
-						<li><a role="menuitem" tabindex="-1" href="javascript:;" value="5">'+lan.crontab.TZZ5+'</a></li>\
-						<li><a role="menuitem" tabindex="-1" href="javascript:;" value="6">'+lan.crontab.TZZ6+'</a></li>\
-						<li><a role="menuitem" tabindex="-1" href="javascript:;" value="0">'+lan.crontab.TZZ7+'</a></li>\
-					  </ul>\
-					</div>';
+				  <button class="btn btn-default dropdown-toggle" type="button" id="excode" data-toggle="dropdown">\
+					<b val="1">'+lan.crontab.TZZ1+'</b> <span class="caret"></span>\
+				  </button>\
+				  <ul class="dropdown-menu" role="menu" aria-labelledby="excode">\
+					<li><a role="menuitem" tabindex="-1" href="javascript:;" value="1">'+lan.crontab.TZZ1+'</a></li>\
+					<li><a role="menuitem" tabindex="-1" href="javascript:;" value="2">'+lan.crontab.TZZ2+'</a></li>\
+					<li><a role="menuitem" tabindex="-1" href="javascript:;" value="3">'+lan.crontab.TZZ3+'</a></li>\
+					<li><a role="menuitem" tabindex="-1" href="javascript:;" value="4">'+lan.crontab.TZZ4+'</a></li>\
+					<li><a role="menuitem" tabindex="-1" href="javascript:;" value="5">'+lan.crontab.TZZ5+'</a></li>\
+					<li><a role="menuitem" tabindex="-1" href="javascript:;" value="6">'+lan.crontab.TZZ6+'</a></li>\
+					<li><a role="menuitem" tabindex="-1" href="javascript:;" value="0">'+lan.crontab.TZZ7+'</a></li>\
+				  </ul>\
+				</div>';
 	$("#ptime").html(mBody);
 	getselectname()
 }

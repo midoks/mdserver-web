@@ -138,9 +138,7 @@ class crontab_api:
     def logsApi(self):
         sid = request.form.get('id', '')
         echo = public.M('crontab').where("id=?", (sid,)).field('echo').find()
-        print echo
         logFile = public.getServerDir() + '/cron/' + echo['echo'] + '.log'
-        print logFile
         if not os.path.exists(logFile):
             return public.returnJson(False, '当前日志为空!')
         log = public.getNumLines(logFile, 2000)
