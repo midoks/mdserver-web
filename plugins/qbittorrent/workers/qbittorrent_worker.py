@@ -164,7 +164,8 @@ class downloadBT(Thread):
         md5file = self.md5(file)[0:6]
 
         if self.islock(md5file):
-            print self.debug('file:' + file + 'is lock, doing')
+            print self.debug('file:' + file + ' is lock, doing')
+            return
         else:
             self.lock(md5file)
 
@@ -178,7 +179,7 @@ class downloadBT(Thread):
         print self.debug('cmd_mp4:' + cmd_mp4)
 
         if not os.path.exists(mp4file):
-            data_mp4 = self.execShell(cmd_mp4)
+            data_mp4 = os.system(cmd_mp4)
             print self.debug('mp4:' + data_mp4[1])
         else:
             print self.debug('mp4 exists:' + mp4file)
