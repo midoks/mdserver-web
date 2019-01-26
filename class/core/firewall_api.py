@@ -48,6 +48,25 @@ class firewall_api:
         else:
             data['firewall_status'] = True
         return public.getJson(data)
+
+    def setPingApi(self):
+
+        if public.isAppleSystem():
+            return public.returnJson(True, '开发机不能设置!')
+
+        status = request.form.get('status', '1').strip()
+        filename = '/etc/sysctl.conf'
+        conf = public.readFile(filename)
+        if conf.find('net.ipv4.icmp_echo') != -1:
+            rep = u"net\.ipv4\.icmp_echo.*"
+            conf = re.sub(rep, 'net.ipv4.icmp_echo_ignore_all=' + status, conf)
+        else:
+            conf += "\nnet.ipv4.icmp_echo_ignore_all=" + status
+
+        public.writeFile(filename, conf)
+        public.execShell('sysctl -p')
+        return public.returnJson(True, '设置成功!')
+
     ##### ----- start ----- ###
 
     def getList(self, page, limit):

@@ -10,8 +10,6 @@ setTimeout(function(){
 	getLogs(1);
 },1500);
 
-
-
 	
 $(function(){
 	// start 
@@ -113,39 +111,36 @@ function mstsc(port) {
  * @param {Int} state 0.禁ping 1.可ping
  */
 function ping(status){
-	var msg = status==0?lan.firewall.ping_msg:lan.firewall.ping_un_msg;
+	var msg = status == 0 ? '禁PING后不影响服务器正常使用，但无法ping通服务器，您真的要禁PING吗？' : '解除禁PING状态可能会被黑客发现您的服务器，您真的要解禁吗？';
 	layer.confirm(msg,{title:lan.firewall.ping_title,closeBtn:2,cancel:function(){
 		if(status == 1){
 			$("#noping").prop("checked",true);
-		}
-		else{
+		} else {
 			$("#noping").prop("checked",false);
-			}
-		}},function(){
-		layer.msg(lan.public.the,{icon:16,time:20000});
-		$.post('/firewall?action=SetPing','status='+status, function(ret) {
+		}
+	}},function(){
+		layer.msg('正在处理,请稍候...',{icon:16,time:20000});
+		$.post('/firewall/set_ping','status='+status, function(ret) {
+			console.log(ret);
 			layer.closeAll();
 			if (ret.status == true) {
 				if(status == 0){
-					layer.msg(lan.firewall.ping, {icon: 1});
-				}
-				else{
-					layer.msg(lan.firewall.ping_un, {icon: 1});
+					layer.msg('已禁Ping', {icon: 1});
+				} else {
+					layer.msg('已解除禁Ping', {icon: 1});
 				}
 				setTimeout(function(){window.location.reload();},3000);
-				
-				
 			} else {
-				layer.msg(lan.firewall.ping_err, {icon: 2});
+				layer.msg('连接服务器失败', {icon: 2});
 			}
-		})
+		},'json');
 	},function(){
 		if(status == 1){
 			$("#noping").prop("checked",true);
 		} else {
 			$("#noping").prop("checked",false);
 		}
-	})
+	});
 }
 
 	
