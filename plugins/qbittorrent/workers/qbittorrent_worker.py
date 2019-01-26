@@ -129,7 +129,7 @@ class downloadBT(Thread):
         return FILE_TO + '/m3u8/' + dirname
 
     def fg_transfer_mp4_cmd(self, sfile, dfile):
-        cmd = 'ffmpeg -y -i "' + sfile + '" –threads 2 -c:v libx264 -strict -2 ' + dfile
+        cmd = 'ffmpeg -y -i "' + sfile + '" -threads 2 -c:v libx264 -strict -2 ' + dfile
         return cmd
 
     def fg_transfer_ts_cmd(self, file, to_file):
