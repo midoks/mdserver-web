@@ -111,7 +111,7 @@ function mstsc(port) {
  * @param {Int} state 0.禁ping 1.可ping
  */
 function ping(status){
-	var msg = status == 0 ? '禁PING后不影响服务器正常使用，但无法ping通服务器，您真的要禁PING吗？' : '解除禁PING状态可能会被黑客发现您的服务器，您真的要解禁吗？';
+	var msg = status == 1 ? '禁PING后不影响服务器正常使用，但无法ping通服务器，您真的要禁PING吗？' : '解除禁PING状态可能会被黑客发现您的服务器，您真的要解禁吗？';
 	layer.confirm(msg,{title:lan.firewall.ping_title,closeBtn:2,cancel:function(){
 		if(status == 1){
 			$("#noping").prop("checked",true);
@@ -123,7 +123,7 @@ function ping(status){
 		$.post('/firewall/set_ping','status='+status, function(data) {
 			layer.closeAll();
 			if (data['status'] == true) {
-				if(status == 0){
+				if(status == 1){
 					layer.msg(data['msg'], {icon: 1});
 				} else {
 					layer.msg('已解除禁PING', {icon: 1});
