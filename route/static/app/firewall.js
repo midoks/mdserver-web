@@ -68,10 +68,10 @@ function getSshInfo(){
 		$("#in_safe").html(SSHchecked);
 		$("#mstscPort").val(rdata.port);
 		var isPint = '';
-		if(!rdata.ping){
-			isPing = "<input class='btswitch btswitch-ios' id='noping' type='checkbox'><label class='btswitch-btn' for='noping' onclick='ping(0)'></label>";
+		if(rdata.ping){
+			isPing = "<input class='btswitch btswitch-ios' id='noping' type='checkbox'><label class='btswitch-btn' for='noping' onclick='ping(1)'></label>";
 		}else{
-			isPing = "<input class='btswitch btswitch-ios' id='noping' type='checkbox' checked><label class='btswitch-btn' for='noping' onclick='ping(1)'></label>";
+			isPing = "<input class='btswitch btswitch-ios' id='noping' type='checkbox' checked><label class='btswitch-btn' for='noping' onclick='ping(0)'></label>";
 		}
 		$("#is_ping").html(isPing);
 
