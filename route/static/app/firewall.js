@@ -58,9 +58,9 @@ function getSshInfo(){
 		// console.log(rdata);
 		var SSHchecked = ''
 		if(rdata.status){
-			SSHchecked = "<input class='btswitch btswitch-ios' id='sshswitch' type='checkbox' checked><label class='btswitch-btn' for='sshswitch' onclick='SetMstscStatus()'></label>";
+			SSHchecked = "<input class='btswitch btswitch-ios' id='sshswitch' type='checkbox' checked><label class='btswitch-btn' for='sshswitch' onclick='setMstscStatus()'></label>";
 		} else {
-			SSHchecked = "<input class='btswitch btswitch-ios' id='sshswitch' type='checkbox'><label class='btswitch-btn' for='sshswitch' onclick='SetMstscStatus()'></label>";
+			SSHchecked = "<input class='btswitch btswitch-ios' id='sshswitch' type='checkbox'><label class='btswitch-btn' for='sshswitch' onclick='setMstscStatus()'></label>";
 			$("#mstscSubmit").attr('disabled','disabled');
 			$("#mstscPort").attr('disabled','disabled');
 		}
@@ -93,7 +93,7 @@ function getSshInfo(){
  */
 
 function mstsc(port) {
-	layer.confirm(lan.firewall.ssh_port_msg, {title: lan.firewall.ssh_port_title}, function(index) {
+	layer.confirm('更改远程端口时，将会注消所有已登录帐户，您真的要更改远程端口吗？', {title: '远程端口'}, function(index) {
 		var data = "port=" + port;
 		var loadT = layer.load({
 			shade: true,
@@ -101,18 +101,19 @@ function mstsc(port) {
 		});
 		$.post('/firewall?action=SetSshPort', data, function(ret) {
 			layer.msg(ret.msg,{icon:ret.status?1:2})
-			layer.close(loadT)
-			getSshInfo()
+			layer.close(loadT);
+			getSshInfo();
 		});
 	});
 }
+
 /**
  * 更改禁ping状态
  * @param {Int} state 0.禁ping 1.可ping
  */
 function ping(status){
 	var msg = status == 1 ? '禁PING后不影响服务器正常使用，但无法ping通服务器，您真的要禁PING吗？' : '解除禁PING状态可能会被黑客发现您的服务器，您真的要解禁吗？';
-	layer.confirm(msg,{title:lan.firewall.ping_title,closeBtn:2,cancel:function(){
+	layer.confirm(msg,{title:'是否禁ping',closeBtn:2,cancel:function(){
 		if(status == 1){
 			$("#noping").prop("checked",true);
 		} else {
@@ -142,16 +143,16 @@ function ping(status){
 	});
 }
 
-	
-	
+
+
 /**
  * 设置远程服务状态
  * @param {Int} state 0.启用 1.关闭
  */
-function SetMstscStatus(){
+function setMstscStatus(){
 	status = $("#sshswitch").prop("checked")==true?1:0;
-	var msg = status==1?lan.firewall.ssh_off_msg:lan.firewall.ssh_on_msg;
-	layer.confirm(msg,{title:lan.public.warning,closeBtn:2,cancel:function(){
+	var msg = status==1?'停用SSH服务的同时也将注销所有已登录用户,继续吗？':'确定启用SSH服务吗？';
+	layer.confirm(msg,{title:'警告',closeBtn:2,cancel:function(){
 		if(status == 0){
 			$("#sshswitch").prop("checked",false);
 		}
@@ -160,18 +161,17 @@ function SetMstscStatus(){
 		}
 	}},function(index){
 		if(index > 0){
-			layer.msg(lan.public.the,{icon:16,time:20000});
+			layer.msg('正在处理,请稍候...',{icon:16,time:20000});
 			$.post('/firewall?action=SetSshStatus','status='+status,function(rdata){
 				layer.closeAll();
 				layer.msg(rdata.msg,{icon:rdata.status?1:2});
 				refresh();
-			})
+			},'json');
 		}
 	},function(){
 		if(status == 0){
 			$("#sshswitch").prop("checked",false);
-		}
-		else{
+		} else {
 			$("#sshswitch").prop("checked",true);
 		}
 	});
