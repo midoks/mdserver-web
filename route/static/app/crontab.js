@@ -852,7 +852,7 @@ function toMinute(){
 //从文件
 function toFile(){
 	var tBody = '<input type="text" value="" name="file" id="viewfile" onclick="fileupload()" readonly="true">\
-				<button class="btn btn-default" onclick="fileupload()">'+lan.public.upload+'</button>';
+				<button class="btn btn-default" onclick="fileupload()">上次</button>';
 	$("#implement").html(tBody);
 	$(".planname input[name='name']").removeAttr('readonly style').val("");
 }
