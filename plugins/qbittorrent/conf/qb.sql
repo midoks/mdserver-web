@@ -1,8 +1,7 @@
-CREATE TABLE `download_list` (
+CREATE TABLE `pl_hash_list` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `info_hash` varchar(40) NOT NULL,
-  `data_hash` varchar(32) NOT NULL,
   `name` varchar(255) NOT NULL,
+  `info_hash` varchar(40) NOT NULL,
   `length` bigint(20) NOT NULL,
   `create_time` datetime NOT NULL,
   PRIMARY KEY (`id`),

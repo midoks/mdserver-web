@@ -211,6 +211,7 @@ class downloadBT(Thread):
             os.system(cmd_m3u8)
             self.execShell('chown -R ' + FILE_OWN + ':' +
                            FILE_GROUP + ' ' + m3u8_dir)
+            print self.query("insert into pl_download_list (`info_hash`) values('1221')")
         else:
             print self.debug('m3u8 exists:' + tofile)
         # self.unlock(md5file)
