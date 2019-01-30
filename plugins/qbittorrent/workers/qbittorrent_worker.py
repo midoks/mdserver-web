@@ -211,10 +211,26 @@ class downloadBT(Thread):
             os.system(cmd_m3u8)
             self.execShell('chown -R ' + FILE_OWN + ':' +
                            FILE_GROUP + ' ' + m3u8_dir)
-            print self.query("insert into pl_download_list (`info_hash`) values('1221')")
+
+            self.add_hash()
         else:
             print self.debug('m3u8 exists:' + tofile)
         # self.unlock(md5file)
+
+    def add_hash(self):
+        ct = formatTime()
+        print self.sign_torrent
+        total_size = str(self.sign_torrent['total_size'])
+        shash = self.sign_torrent['hash']
+        sname = self.sign_torrent['name']
+
+        sql = "select id from pl_hash_list where info_hash='" + shash + "'"
+        info = self.query(sql)
+        if len(info[0]) > 0:
+            sid = str(info[0][0])
+            print self.query("insert into pl_hash_file (`pid`,`name`,`m3u8`,`length`,`create_time`) values('" + sid + "','" + sname + "','" + 'dd' + "','" + total_size + "','" + ct + "')")
+        else:
+            print self.query("insert into pl_hash_list (`name`,`info_hash`,`data_hash`,`length`,`create_time`) values('" + sname + "','" + shash + "','da12','" + total_size + "','" + ct + "')")
 
     def file_arr(self, path, filters=['.DS_Store']):
         file_list = []
@@ -271,6 +287,7 @@ class downloadBT(Thread):
             print "completed torrents count:", tlen
             if tlen > 0:
                 for torrent in torrents:
+                    self.sign_torrent = torrent
                     # print torrent
                     path = torrent['save_path'] + torrent['name']
                     try:

@@ -215,7 +215,7 @@ function showAccept(page,search) {
 }
 
 //添加放行
-function AddAcceptPort(){
+function addAcceptPort(){
 	var type = $("#firewalldType").val();
 	var port = $("#AcceptPort").val();
 	var ps = $("#Ps").val();
@@ -224,7 +224,7 @@ function AddAcceptPort(){
 		ports = port.split(':');
 		for(var i=0;i<ports.length;i++){
 			if(isNaN(ports[i]) || ports[i] < 1 || ports[i] > 65535 ){
-				layer.msg(lan.firewall.port_err,{icon:5});
+				layer.msg('端口范围不合法!',{icon:5});
 				return;
 			}
 		}
@@ -233,11 +233,11 @@ function AddAcceptPort(){
 	
 	
 	if(ps.length < 1){
-		layer.msg(lan.firewall.ps_err,{icon:2});
+		layer.msg('备注/说明 不能为空!',{icon:2});
 		$("#Ps").focus();
 		return;
 	}
-	var loadT = layer.msg(lan.public.the_add,{icon:16,time:0,shade: [0.3, '#000']})
+	var loadT = layer.msg('正在添加,请稍候...',{icon:16,time:0,shade: [0.3, '#000']})
 	$.post('/firewall?action='+action,'port='+port+"&ps="+ps+'&type='+type,function(rdata){
 		layer.close(loadT);
 		if(rdata.status == true || rdata.status == 'true'){
@@ -249,10 +249,9 @@ function AddAcceptPort(){
 			layer.msg(rdata.msg,{icon:2});
 		}
 		
-		$("#AcceptPort").attr('value',"");
-		$("#Ps").attr('value',"");
-	})
-	
+		$("#AcceptPort").attr('value','');
+		$("#Ps").attr('value','');
+	},'json');
 }
 
 //删除放行
@@ -262,8 +261,8 @@ function delAcceptPort(id, port) {
 		action = "DelAcceptPort";
 	}
 	
-	layer.confirm(lan.get('confirm_del',[port]), {title: lan.firewall.del_title,closeBtn:2}, function(index) {
-		var loadT = layer.msg(lan.public.the_del,{icon:16,time:0,shade: [0.3, '#000']})
+	layer.confirm(lan.get('confirm_del',[port]), {title: '删除防火墙规则',closeBtn:2}, function(index) {
+		var loadT = layer.msg('正在删除,请稍候...',{icon:16,time:0,shade: [0.3, '#000']})
 		$.post("/firewall?action="+action,"id=" + id + "&port=" + port, function(ret) {
 			layer.close(loadT);
 			layer.msg(ret.msg,{icon:ret.status?1:2})
@@ -298,8 +297,8 @@ function getLogs(page,search) {
 
 //清理面板日志
 function delLogs(){
-	layer.confirm(lan.firewall.close_log_msg,{title:lan.firewall.close_log,closeBtn:2},function(){
-		var loadT = layer.msg(lan.firewall.close_the,{icon:16});
+	layer.confirm('即将清空面板日志，继续吗？',{title:'清空日志',closeBtn:2},function(){
+		var loadT = layer.msg('正在清理,请稍候...',{icon:16});
 		$.post('/ajax?action=delClose','',function(rdata){
 			layer.close(loadT);
 			layer.msg(rdata.msg,{icon:rdata.status?1:2});

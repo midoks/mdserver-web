@@ -14,10 +14,135 @@ from flask import request
 
 class firewall_api:
 
+    __isFirewalld = False
+    __isUfw = False
+
     def __init__(self):
-        pass
+        if os.path.exists('/usr/sbin/firewalld'):
+            self.__isFirewalld = True
+        if os.path.exists('/usr/sbin/ufw'):
+            self.__isUfw = True
+
+    def firewallReload(self):
+        if self.__isUfw:
+            public.execShell('/usr/sbin/ufw reload')
+            return
+        if self.__isFirewalld:
+            public.execShell('firewall-cmd --reload')
+        else:
+            public.execShell('/etc/init.d/iptables save')
+            public.execShell('/etc/init.d/iptables restart')
 
     ##### ----- start ----- ###
+    # 添加屏蔽IP
+    def addDropAddressApi(self):
+        import re
+        port = request.form.get('port', '').strip()
+        ps = request.form.get('ps', '').strip()
+
+        rep = "^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(\/\d{1,2})?$"
+        if not re.search(rep, port):
+            return public.returnJson(False, 'FIREWALL_IP_FORMAT')
+        address = port
+        if public.M('firewall').where("port=?", (address,)).count() > 0:
+            return public.returnJson(False, 'FIREWALL_IP_EXISTS')
+        if self.__isUfw:
+            public.ExecShell('ufw deny from ' + address + ' to any')
+        else:
+            if self.__isFirewalld:
+                public.ExecShell(
+                    'firewall-cmd --permanent --add-rich-rule=\'rule family=ipv4 source address="' + address + '" drop\'')
+            else:
+                public.ExecShell('iptables -I INPUT -s ' +
+                                 address + ' -j DROP')
+
+        public.writeLog("TYPE_FIREWALL", 'FIREWALL_DROP_IP', (address,))
+        addtime = time.strftime('%Y-%m-%d %X', time.localtime())
+        public.M('firewall').add('port,ps,addtime', (address, ps, addtime))
+        self.firewallReload()
+        return public.returnJson(True, 'ADD_SUCCESS')
+
+    # 删除IP屏蔽
+    def delDropAddressApi(self):
+        port = request.form.get('port', '').strip()
+        ps = request.form.get('ps', '').strip()
+        sid = request.form.get('id', '').strip()
+        address = port
+        if self.__isUfw:
+            public.execShell('ufw delete deny from ' + address + ' to any')
+        else:
+            if self.__isFirewalld:
+                public.execShell(
+                    'firewall-cmd --permanent --remove-rich-rule=\'rule family=ipv4 source address="' + address + '" drop\'')
+            else:
+                public.execShell('iptables -D INPUT -s ' +
+                                 address + ' -j DROP')
+
+        public.writeLog("TYPE_FIREWALL", 'FIREWALL_ACCEPT_IP', (address,))
+        public.M('firewall').where("id=?", (sid,)).delete()
+
+        self.firewallReload()
+        return public.returnJson(True, 'DEL_SUCCESS')
+
+    # 添加放行端口
+    def addAcceptPort(self):
+        import re
+        import time
+        port = request.form.get('port', '').strip()
+        ps = request.form.get('ps', '').strip()
+        sid = request.form.get('id', '').strip()
+
+        rep = "^\d{1,5}(:\d{1,5})?$"
+        if not re.search(rep, port):
+            return public.returnJson(False, 'PORT_CHECK_RANGE')
+
+        if public.M('firewall').where("port=?", (port,)).count() > 0:
+            return public.returnJson(False, 'FIREWALL_PORT_EXISTS')
+        if self.__isUfw:
+            public.execShell('ufw allow ' + port + '/tcp')
+        else:
+            if self.__isFirewalld:
+                # self.__Obj.AddAcceptPort(port)
+                port = port.replace(':', '-')
+                public.execShell(
+                    'firewall-cmd --permanent --zone=public --add-port=' + port + '/tcp')
+            else:
+                public.execShell(
+                    'iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport ' + port + ' -j ACCEPT')
+        public.writeLog("TYPE_FIREWALL", 'FIREWALL_ACCEPT_PORT', (port,))
+        addtime = time.strftime('%Y-%m-%d %X', time.localtime())
+        public.M('firewall').add('port,ps,addtime', (port, ps, addtime))
+
+        self.firewallReload()
+        return public.returnJson(True, 'ADD_SUCCESS')
+
+    # 删除放行端口
+    def delAcceptPort(self, get):
+        port = request.form.get('port', '').strip()
+        sid = request.form.get('id', '').strip()
+
+        try:
+            if(port == web.ctx.host.split(':')[1]):
+                return public.returnJson(False, 'FIREWALL_PORT_PANEL')
+            if self.__isUfw:
+                public.execShell('ufw delete allow ' + port + '/tcp')
+            else:
+                if self.__isFirewalld:
+                    public.execShell(
+                        'firewall-cmd --permanent --zone=public --remove-port=' + port + '/tcp')
+                    public.execShell(
+                        'firewall-cmd --permanent --zone=public --remove-port=' + port + '/udp')
+                else:
+                    public.execShell(
+                        'iptables -D INPUT -p tcp -m state --state NEW -m tcp --dport ' + port + ' -j ACCEPT')
+            public.writeLog("TYPE_FIREWALL", 'FIREWALL_DROP_PORT', (port,))
+            public.M('firewall').where("id=?", (sid,)).delete()
+
+            self.firewallReload()
+            return public.returnJson(True, 'DEL_SUCCESS')
+        except:
+            return public.returnJson(False, 'DEL_ERROR')
+
     def getWwwPathApi(self):
         path = public.getLogsDir()
         return public.getJson({'path': path})
