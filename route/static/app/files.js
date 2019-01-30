@@ -449,7 +449,7 @@ function getFiles(Path) {
 						</div>";
 			}
 		}
-		var dirInfo = '('+lan.files.get_size.replace('{1}',rdata.DIR.length+'').replace('{2}',rdata.DIR.length+'')+'<font id="pathSize">'+(toSize(totalSize))+'<a class="btlink ml5" onClick="GetPathSize()">'+lan.files.get+'</a></font>)';
+		var dirInfo = '('+lan.files.get_size.replace('{1}',rdata.DIR.length+'').replace('{2}',rdata.DIR.length+'')+'<font id="pathSize">'+(toSize(totalSize))+'<a class="btlink ml5" onClick="getPathSize()">获取</a></font>)';
 		$("#DirInfo").html(dirInfo);
 		if(getCookie("rank")=="a"){
 			var tablehtml = '<table width="100%" border="0" cellpadding="0" cellspacing="0" class="table table-hover">\
@@ -1533,14 +1533,15 @@ function RClickAll(e){
 		.show();
 }
 //取目录大小
-function GetPathSize(){
+function getPathSize(){
 	var path = encodeURIComponent($("#DirPathPlace input").val());
-	layer.msg("正在计算，请稍候",{icon:16,time:0,shade: [0.3, '#000']})
-	$.post("/files?action=GetDirSize","path="+path,function(rdata){
+	layer.msg("正在计算，请稍候...",{icon:16,time:0,shade: [0.3, '#000']})
+	$.post("/files/get_dir_size","path="+path,function(rdata){
 		layer.closeAll();
-		$("#pathSize").text(rdata)
-	})
+		$("#pathSize").text(rdata.msg);
+	},'json');
 }
+
 $("body").not(".def-log").click(function(){
 	$("#rmenu").hide()
 });

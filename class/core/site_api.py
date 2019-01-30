@@ -486,7 +486,7 @@ class site_api:
         data = {}
         data['siteStatus'] = False
         public.restartWeb()
-        return public.getJson(data)
+        return public.returnJson(True, '添加成功')
 
     def deleteWSLogs(self, webname):
         assLogPath = public.getLogsDir() + '/' + webname + '.log'
