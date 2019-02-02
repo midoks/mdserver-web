@@ -27,6 +27,10 @@ paces="wget python-devel python-imaging zip unzip openssl openssl-devel gcc libx
 yum -y install $paces
 yum -y lsof net-tools.x86_64
 yum -y install ncurses-devel mysql-dev
-yum -y install epel-release python-pip python-devel
+yum -y install epel-release python-devel
+
+wget https://bootstrap.pypa.io/get-pip.py
+python get-pip.py
+
 pip install --upgrade pip
 pip install -r /www/server/mdserver-web/requirements.txt
