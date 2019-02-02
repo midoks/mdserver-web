@@ -18,13 +18,13 @@ fi
 
 yum install -y wget curl unzip zip
 
-if [ ! -d '/www/server/mdserver-web' ];then
+# if [ ! -d '/www/server/mdserver-web' ];then
 	wget -O /tmp/master.zip https://codeload.github.com/midoks/mdserver-web/zip/master
 	cd /tmp && unzip /tmp/master.zip
 	mv /tmp/mdserver-web-master /www/server/mdserver-web
 	rm -rf /tmp/master.zip
 	rm -rf /tmp/mdserver-web-master
-fi 
+# fi 
 
 yum groupinstall -y "Development Tools"
 paces="wget python-devel python-imaging libicu-devel zip unzip openssl openssl-devel gcc libxml2 libxml2-dev libxslt* zlib zlib-devel libjpeg-devel libpng-devel libwebp libwebp-devel freetype freetype-devel lsof pcre pcre-devel vixie-cron crontabs"
