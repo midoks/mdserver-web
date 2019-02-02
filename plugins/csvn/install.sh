@@ -28,7 +28,6 @@ CheckJAVA()
 Install_csvn()
 {
 	CheckJAVA
-	exit 0 
 	mkdir -p $serverPath/source
 
 	echo '正在安装脚本文件...' > $install_tmp
