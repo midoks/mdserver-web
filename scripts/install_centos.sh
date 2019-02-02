@@ -27,11 +27,11 @@ if [ ! -d '/www/server/mdserver-web' ];then
 fi 
 
 yum groupinstall -y "Development Tools"
-paces="wget python-devel python-imaging zip unzip openssl openssl-devel gcc libxml2 libxml2-dev libxslt* zlib zlib-devel libjpeg-devel libpng-devel libwebp libwebp-devel freetype freetype-devel lsof pcre pcre-devel vixie-cron crontabs"
+paces="wget python-devel python-imaging libicu-devel zip unzip openssl openssl-devel gcc libxml2 libxml2-dev libxslt* zlib zlib-devel libjpeg-devel libpng-devel libwebp libwebp-devel freetype freetype-devel lsof pcre pcre-devel vixie-cron crontabs"
 yum -y install $paces
 yum -y lsof net-tools.x86_64
 yum -y install ncurses-devel mysql-dev locate cmake
-yum -y install epel-release python-devel
+yum -y install epel-release
 
 if [ ! -f '/usr/bin/pip' ];then
 	wget https://bootstrap.pypa.io/get-pip.py
