@@ -37,6 +37,10 @@ if [ ! -f '/usr/bin/pip' ];then
 fi 
 
 
+if [ ! -d /www/server/lib ]; then
+	cd /www/server/mdserver-web/scripts && ./lib.sh
+fi  
+
 pip install -r /www/server/mdserver-web/requirements.txt
 
 
