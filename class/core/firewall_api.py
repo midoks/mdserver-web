@@ -16,12 +16,15 @@ class firewall_api:
 
     __isFirewalld = False
     __isUfw = False
+    __isMac = False
 
     def __init__(self):
         if os.path.exists('/usr/sbin/firewalld'):
             self.__isFirewalld = True
         if os.path.exists('/usr/sbin/ufw'):
             self.__isUfw = True
+        if public.isAppleSystem():
+            self.__isMac = True
 
     def firewallReload(self):
         if self.__isUfw:
@@ -29,6 +32,8 @@ class firewall_api:
             return
         if self.__isFirewalld:
             public.execShell('firewall-cmd --reload')
+        elif self.__isMac:
+            pass
         else:
             public.execShell('/etc/init.d/iptables save')
             public.execShell('/etc/init.d/iptables restart')
@@ -74,6 +79,8 @@ class firewall_api:
             if self.__isFirewalld:
                 public.execShell(
                     'firewall-cmd --permanent --remove-rich-rule=\'rule family=ipv4 source address="' + address + '" drop\'')
+            elif self.__isMac:
+                pass
             else:
                 public.execShell('iptables -D INPUT -s ' +
                                  address + ' -j DROP')
@@ -85,19 +92,20 @@ class firewall_api:
         return public.returnJson(True, 'DEL_SUCCESS')
 
     # 添加放行端口
-    def addAcceptPort(self):
+    def addAcceptPortApi(self):
         import re
         import time
         port = request.form.get('port', '').strip()
         ps = request.form.get('ps', '').strip()
-        sid = request.form.get('id', '').strip()
+        stype = request.form.get('type', '').strip()
 
         rep = "^\d{1,5}(:\d{1,5})?$"
         if not re.search(rep, port):
-            return public.returnJson(False, 'PORT_CHECK_RANGE')
+            return public.returnJson(False, '端口范围不正确!')
 
         if public.M('firewall').where("port=?", (port,)).count() > 0:
-            return public.returnJson(False, 'FIREWALL_PORT_EXISTS')
+            return public.returnJson(False, '您要放行的端口已存在，无需重复放行!')
+
         if self.__isUfw:
             public.execShell('ufw allow ' + port + '/tcp')
         else:
@@ -106,15 +114,19 @@ class firewall_api:
                 port = port.replace(':', '-')
                 public.execShell(
                     'firewall-cmd --permanent --zone=public --add-port=' + port + '/tcp')
+            elif self.__isMac:
+                pass
             else:
                 public.execShell(
                     'iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport ' + port + ' -j ACCEPT')
-        public.writeLog("TYPE_FIREWALL", 'FIREWALL_ACCEPT_PORT', (port,))
+
+        public.writeLog("TYPE_FIREWALL", public.getInfo(
+            '放行端口[{1}]成功', (port,)))
         addtime = time.strftime('%Y-%m-%d %X', time.localtime())
         public.M('firewall').add('port,ps,addtime', (port, ps, addtime))
 
         self.firewallReload()
-        return public.returnJson(True, 'ADD_SUCCESS')
+        return public.returnJson(True, '添加放行(' + port + ')端口成功!')
 
     # 删除放行端口
     def delAcceptPort(self, get):
