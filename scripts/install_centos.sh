@@ -15,8 +15,6 @@ yum -y install deltarpm
 
 yum install -y wget curl unzip zip
 
-
-
 if [ ! -d '/www/server/mdserver-web' ];then
 	wget -O /tmp/master.zip https://codeload.github.com/midoks/mdserver-web/zip/master
 	cd /tmp && unzip /tmp/master.zip
@@ -29,7 +27,7 @@ yum groupinstall -y "Development Tools"
 paces="wget python-devel python-imaging zip unzip openssl openssl-devel gcc libxml2 libxml2-dev libxslt* zlib zlib-devel libjpeg-devel libpng-devel libwebp libwebp-devel freetype freetype-devel lsof pcre pcre-devel vixie-cron crontabs"
 yum -y install $paces
 yum -y lsof net-tools.x86_64
-yum -y install ncurses-devel mysql-dev locate
+yum -y install ncurses-devel mysql-dev locate cmake
 yum -y install epel-release python-devel
 
 if [ ! -f '/usr/bin/pip' ];then
