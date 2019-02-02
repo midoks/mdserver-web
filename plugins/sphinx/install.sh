@@ -11,6 +11,9 @@ sysName=`uname`
 install_tmp=${rootPath}/tmp/bt_install.pl
 
 
+yum install -y postgresql-libs unixODBC
+
+
 Install_sphinx()
 {
 
