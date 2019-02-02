@@ -129,10 +129,11 @@ def initDreplace():
     file_bin = initD_path + '/' + getPluginName()
 
     # initd replace
-    content = public.readFile(file_tpl)
-    content = contentReplace(content)
-    public.writeFile(file_bin, content)
-    public.execShell('chmod +x ' + file_bin)
+    if not os.path.exists(file_bin):
+        content = public.readFile(file_tpl)
+        content = contentReplace(content)
+        public.writeFile(file_bin, content)
+        public.execShell('chmod +x ' + file_bin)
 
     # config replace
     conf_bin = getConf()
