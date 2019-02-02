@@ -10,8 +10,11 @@ mkdir -p /www/backup/database
 mkdir -p /www/backup/site
 
 
-yum -y provides '*/applydeltarpm'
-yum -y install deltarpm
+if [ ! -f /usr/bin/applydeltarpm ];then
+	yum -y provides '*/applydeltarpm'
+	yum -y install deltarpm
+fi
+
 
 yum install -y wget curl unzip zip
 
