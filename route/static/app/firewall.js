@@ -219,7 +219,7 @@ function addAcceptPort(){
 	var type = $("#firewalldType").val();
 	var port = $("#AcceptPort").val();
 	var ps = $("#Ps").val();
-	var action = "AddDropAddress";
+	var action = "add_drop_address";
 	if(type == 'port'){
 		ports = port.split(':');
 		for(var i=0;i<ports.length;i++){
@@ -228,7 +228,7 @@ function addAcceptPort(){
 				return;
 			}
 		}
-		action = "AddAcceptPort";
+		action = "add_accept_port";
 	}
 	
 	
@@ -238,7 +238,7 @@ function addAcceptPort(){
 		return;
 	}
 	var loadT = layer.msg('正在添加,请稍候...',{icon:16,time:0,shade: [0.3, '#000']})
-	$.post('/firewall?action='+action,'port='+port+"&ps="+ps+'&type='+type,function(rdata){
+	$.post('/firewall/'+action,'port='+port+"&ps="+ps+'&type='+type,function(rdata){
 		layer.close(loadT);
 		if(rdata.status == true || rdata.status == 'true'){
 			layer.msg(rdata.msg,{icon:1});
