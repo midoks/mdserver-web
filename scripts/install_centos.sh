@@ -29,8 +29,11 @@ yum -y lsof net-tools.x86_64
 yum -y install ncurses-devel mysql-dev locate
 yum -y install epel-release python-devel
 
-wget https://bootstrap.pypa.io/get-pip.py
-python get-pip.py
+if [ ! -f '/usr/bin/pip' ];then
+	wget https://bootstrap.pypa.io/get-pip.py
+	python get-pip.py
+	pip install --upgrade pip
+fi 
 
-pip install --upgrade pip
+
 pip install -r /www/server/mdserver-web/requirements.txt
