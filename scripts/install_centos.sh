@@ -26,7 +26,7 @@ yum groupinstall -y "Development Tools"
 paces="wget python-devel python-imaging zip unzip openssl openssl-devel gcc libxml2 libxml2-dev libxslt* zlib zlib-devel libjpeg-devel libpng-devel libwebp libwebp-devel freetype freetype-devel lsof pcre pcre-devel vixie-cron crontabs"
 yum -y install $paces
 yum -y lsof net-tools.x86_64
-yum -y install ncurses-devel mysql-dev
+yum -y install ncurses-devel mysql-dev locate
 yum -y install epel-release python-devel
 
 wget https://bootstrap.pypa.io/get-pip.py
