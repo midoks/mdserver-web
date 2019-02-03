@@ -631,7 +631,7 @@ function editTaskInfo(id){
 								</div>\
 								<div class="clearfix plan ptb10"  style="display:'+ (obj.from.stype == "toShell"?'block;':'none') +'">\
 									<span class="typename controls c4 pull-left f14 text-right mr20">脚本内容</span>\
-									<div style="line-height:34px"><textarea class="txtsjs bt-input-text sBody_create" name="sBody">'+ obj.from.sbody +'</textarea></div>\
+									<div style="line-height:34px"><textarea class="txtsjs bt-input-text sBody_create" name="sbody">'+ obj.from.sbody +'</textarea></div>\
 								</div>\
 								<div class="clearfix plan ptb10" style="display:'+ (obj.from.stype == "rememory"?'block;':'none') +'">\
 									<span class="typename controls c4 pull-left f14 text-right mr20">提示</span>\
@@ -677,7 +677,7 @@ function editTaskInfo(id){
 				});
 	
 				$('.sBody_create').blur(function () {
-					obj.from.sBody = $(this).val();
+					obj.from.sbody = $(this).val();
 				});
 				$('.url_create').blur(function () {
 					obj.from.urladdress = $(this).val();
@@ -768,7 +768,7 @@ function editTaskInfo(id){
 	
 				$('[aria-labelledby="backupTo"] a').unbind().click(function () {
 					$('.backup_btn').find('b').attr('val',$(this).attr('value')).html($(this).html());
-					obj.from.backupTo = $(this).attr('value');
+					obj.from.backup_to = $(this).attr('value');
 				});
 				$('.plan-submits').unbind().click(function(){
 					if(obj.from.type == 'hour-n'){
