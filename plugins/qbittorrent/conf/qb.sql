@@ -1,5 +1,5 @@
 CREATE TABLE `pl_hash_list` (
-  `id` bigint(11) NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `info_hash` varchar(40) NOT NULL,
   `length` bigint(20) NOT NULL,
@@ -10,8 +10,8 @@ CREATE TABLE `pl_hash_list` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 CREATE TABLE `pl_hash_file` (
-  `id` bigint(11) NOT NULL AUTO_INCREMENT,
-  `pid` bigint(11)  NOT NULL,
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `pid` bigint(20)  NOT NULL,
   `name` varchar(40) NOT NULL,
   `m3u8` varchar(40) NOT NULL,
   `length` bigint(20) NOT NULL,
