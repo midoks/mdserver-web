@@ -163,12 +163,6 @@ class downloadBT(Thread):
 
         md5file = self.md5(file)[0:6]
 
-        # if self.islock(md5file):
-        #     print self.debug('file:' + file + ' is lock, doing')
-        #     return
-        # else:
-        #     self.lock(md5file)
-
         if not os.path.exists(file):
             print formatTime(), 'file not exists:', file
             return
@@ -211,13 +205,13 @@ class downloadBT(Thread):
             os.system(cmd_m3u8)
             self.execShell('chown -R ' + FILE_OWN + ':' +
                            FILE_GROUP + ' ' + m3u8_dir)
-
             self.add_hash()
         else:
+            self.add_hash()
             print self.debug('m3u8 exists:' + tofile)
-        # self.unlock(md5file)
 
     def add_hash(self):
+        print '-------------------------add_hash---start-----------------------'
         ct = formatTime()
         print self.sign_torrent
         total_size = str(self.sign_torrent['total_size'])
@@ -228,9 +222,17 @@ class downloadBT(Thread):
         info = self.query(sql)
         if len(info[0]) > 0:
             sid = str(info[0][0])
+
+            print info
+
+            sql = "select id from pl_hash_file where name='" + \
+                sname + "' and pid='" + pid + "'"
+            print self.query(sql)
+
             print self.query("insert into pl_hash_file (`pid`,`name`,`m3u8`,`length`,`create_time`) values('" + sid + "','" + sname + "','" + 'dd' + "','" + total_size + "','" + ct + "')")
         else:
             print self.query("insert into pl_hash_list (`name`,`info_hash`,`data_hash`,`length`,`create_time`) values('" + sname + "','" + shash + "','da12','" + total_size + "','" + ct + "')")
+        print '-------------------------add_hash---end-------------------------'
 
     def file_arr(self, path, filters=['.DS_Store']):
         file_list = []
