@@ -234,6 +234,7 @@ class downloadBT(Thread):
             else:
                 print shash, 'already is exists!'
         else:
+            print 'insert into pl_hash_list'
             pid = self.dbcurr.execute("insert into pl_hash_list (`name`,`info_hash`,`length`,`create_time`) values('" +
                                       sname + "','" + shash + "','" + total_size + "','" + ct + "')")
             file_data = self.query(
