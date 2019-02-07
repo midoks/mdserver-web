@@ -205,34 +205,45 @@ class downloadBT(Thread):
             os.system(cmd_m3u8)
             self.execShell('chown -R ' + FILE_OWN + ':' +
                            FILE_GROUP + ' ' + m3u8_dir)
-            self.add_hash()
+            self.add_hash(md5file)
         else:
-            self.add_hash()
+            self.add_hash(md5file)
             print self.debug('m3u8 exists:' + tofile)
 
-    def add_hash(self):
+    def add_hash_file(self):
+        pass
+
+    def add_hash(self, m3u8_name):
         print '-------------------------add_hash---start-----------------------'
         ct = formatTime()
-        print self.sign_torrent
+        # print (self.sign_torrent)
         total_size = str(self.sign_torrent['total_size'])
         shash = self.sign_torrent['hash']
         sname = self.sign_torrent['name']
 
-        sql = "select id from pl_hash_list where info_hash='" + shash + "'"
-        info = self.query(sql)
-        if len(info[0]) > 0:
-            sid = str(info[0][0])
+        info = self.query(
+            "select id from pl_hash_list where info_hash='" + shash + "'")
 
-            print info
-
-            sql = "select id from pl_hash_file where name='" + \
-                sname + "' and pid='" + pid + "'"
-            print self.query(sql)
-
-            print self.query("insert into pl_hash_file (`pid`,`name`,`m3u8`,`length`,`create_time`) values('" + sid + "','" + sname + "','" + 'dd' + "','" + total_size + "','" + ct + "')")
+        if len(info) > 0:
+            pid = str(info[0][0])
+            file_data = self.query(
+                "select id from pl_hash_file where name='" + sname + "' and pid='" + pid + "'")
+            if len(file_data) == 0:
+                self.query("insert into pl_hash_file (`pid`,`name`,`m3u8`,`length`,`create_time`) values('" +
+                           pid + "','" + sname + "','" + m3u8_name + "','" + total_size + "','" + ct + "')")
+            else:
+                print shash, 'already is exists!'
         else:
-            print self.query("insert into pl_hash_list (`name`,`info_hash`,`data_hash`,`length`,`create_time`) values('" + sname + "','" + shash + "','da12','" + total_size + "','" + ct + "')")
-        print '-------------------------add_hash---end-------------------------'
+            pid = self.dbcurr.execute("insert into pl_hash_list (`name`,`info_hash`,`length`,`create_time`) values('" +
+                                      sname + "','" + shash + "','" + total_size + "','" + ct + "')")
+            file_data = self.query(
+                "select id from pl_hash_file where name='" + sname + "' and pid='" + pid + "'")
+            if len(file_data) == 0:
+                self.query("insert into pl_hash_file (`pid`,`name`,`m3u8`,`length`,`create_time`) values('" +
+                           pid + "','" + sname + "','" + m3u8_name + "','" + total_size + "','" + ct + "')")
+            else:
+                print shash, 'already is exists!'
+        print '-------------------------add_hash---end--------------------------'
 
     def file_arr(self, path, filters=['.DS_Store']):
         file_list = []
