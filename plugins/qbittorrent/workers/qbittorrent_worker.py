@@ -304,6 +304,7 @@ class downloadBT(Thread):
                     self.sign_torrent = torrent
                     # print torrent
                     path = torrent['save_path'] + torrent['name']
+                    path = path.encode()
                     try:
                         self.video_do(path)
                     except Exception as e:
