@@ -521,7 +521,7 @@ class DBDataCheck(Master):
     def run(self):
         while True:
             self.check_db_data()
-            time.sleep(1)
+            time.sleep(43200)
 
 
 def announce(info_hash, address):
