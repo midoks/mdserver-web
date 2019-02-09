@@ -454,6 +454,21 @@ class DBCheck(Master):
             time.sleep(DB_SIZE_TICK)
 
 
+class DBDataCheck(Master):
+
+    def __init__(self, master):
+        Master.__init__(self)
+        self.setDaemon(True)
+
+    def check_db_data(self):
+        pass
+
+    def run(self):
+        while True:
+            self.check_db_data()
+            time.sleep(DB_SIZE_TICK)
+
+
 def announce(info_hash, address):
     binhash = info_hash.decode('hex')
     master.log_announce(binhash, address)
@@ -479,6 +494,10 @@ if __name__ == "__main__":
     print 'DBCheck start'
     check = DBCheck(master)
     check.start()
+
+    print 'DBDataCheck start'
+    checkData = DBDataCheck(master)
+    checkData.start()
 
     print 'DHTServer start'
     dht = DHTServer(master, "0.0.0.0", 6881, max_node_qsize=MAX_NODE_QSIZE)
