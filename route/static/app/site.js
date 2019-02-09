@@ -2010,7 +2010,7 @@ function phpVersion(siteName){
 				versionSelect += "<option value='"+ rdata[i].version +"' "+ optionSelect +">"+ rdata[i].name +"</option>"
 			}
 			versionSelect += "</select>\
-							<button class='btn btn-success btn-sm' onclick=\"SetPHPVersion('"+siteName+"')\">"+lan.site.switch+"</button>\
+							<button class='btn btn-success btn-sm' onclick=\"setPHPVersion('"+siteName+"')\">"+lan.site.switch+"</button>\
 							</div>\
 							<span id='php_w' style='color:red;margin-left: 32px;'></span>\
 						</div>\
@@ -2053,9 +2053,9 @@ function phpVersion(siteName){
 
 
 //设置PHP版本
-function SetPHPVersion(siteName){
+function setPHPVersion(siteName){
 	var data = 'version='+$("#phpVersion").val()+'&siteName='+siteName;
-	var loadT = layer.msg(lan.site.saving_txt,{icon:16,time:0,shade: [0.3, '#000']});
+	var loadT = layer.msg('正在保存...',{icon:16,time:0,shade: [0.3, '#000']});
 	$.post('/site?action=SetPHPVersion',data,function(rdata){
 		layer.close(loadT);
 		layer.msg(rdata.msg,{icon:rdata.status?1:2});
