@@ -130,7 +130,7 @@ class downloadBT(Thread):
 
     def fg_transfer_mp4_cmd(self, sfile, dfile):
         cmd = 'ffmpeg -y -i "' + sfile + \
-            '" -threads 1  -crf 32 -c:v libx264 -strict -2 ' + dfile
+            '" -threads 1  -preset veryslow -crf 28 -c:v libx264 -strict -2 ' + dfile
         return cmd
 
     def fg_transfer_ts_cmd(self, file, to_file):
