@@ -13,6 +13,7 @@ import SimpleXMLRPCServer
 import time
 import datetime
 import traceback
+import math
 import sys
 import json
 import socket
@@ -326,11 +327,31 @@ class Master(Thread):
         self.visited = set()
         self.black_list = load_res_blacklist(BLACK_FILE)
 
+    def isSqlError(self, mysqlMsg):
+        mysqlMsg = str(mysqlMsg)
+        if "MySQLdb" in mysqlMsg:
+            return [False, 'MySQLdb组件缺失! <br>进入SSH命令行输入： pip install mysql-python']
+        if "2002," in mysqlMsg:
+            return [False, '数据库连接失败,请检查数据库服务是否启动!']
+        if "using password:" in mysqlMsg:
+            return [False, '数据库管理密码错误!']
+        if "Connection refused" in mysqlMsg:
+            return [False, '数据库连接失败,请检查数据库服务是否启动!']
+        if "1133" in mysqlMsg:
+            return [False, '数据库用户不存在!']
+        if "1007" in mysqlMsg:
+            return [False, '数据库已经存在!']
+        return [True, 'OK']
+
     def query(self, sql):
-        self.dbcurr.execute(sql)
-        result = self.dbcurr.fetchall()
-        data = map(list, result)
-        return data
+        try:
+            self.dbcurr.execute(sql)
+            result = self.dbcurr.fetchall()
+            data = map(list, result)
+            return data
+        except Exception as e:
+            print e
+            return []
 
     def got_torrent(self):
         binhash, address, data, dtype, start_time = self.metadata_queue.get()
@@ -421,14 +442,13 @@ class DBCheck(Master):
             str(line)
         data = self.query(sql)
         for x in range(len(data)):
-            iid = data[x][0]
-            infohash = data[x][1]
+            iid = str(data[x][0])
+            infohash = str(data[x][1])
 
-            sqldel = "delete from search_hash where id='" + str(iid) + "'"
+            sqldel = "delete from search_hash where id='" + iid + "'"
             self.query(sqldel)
 
-            sqldel2 = "delete from search_filelist where info_hash='" + \
-                str(infohash) + "'"
+            sqldel2 = "delete from search_filelist where info_hash='" + infohash + "'"
             self.query(sqldel2)
             print 'delete ', iid, infohash, 'done'
 
@@ -445,7 +465,7 @@ class DBCheck(Master):
             self.query('OPTIMIZE TABLE  `search_hash`')
             self.query('OPTIMIZE TABLE  `search_filelist`')
 
-        print 'db size limit:', db_size_limit, db_size
+        print 'db size limit:', db_size_limit, 'db has size:', db_size
         # self.delete_db(DB_DEL_LINE)
 
     def run(self):
@@ -461,12 +481,47 @@ class DBDataCheck(Master):
         self.setDaemon(True)
 
     def check_db_data(self):
-        pass
+
+        max_data = self.query('select max(id) from search_hash')
+        max_id = max_data[0][0]
+
+        min_data = self.query('select min(id) from search_hash')
+        min_id = min_data[0][0]
+
+        print 'min_id', min_id, 'max_id', max_id, 'ok!'
+
+        limit_num = 1000
+        page = math.ceil((max_id - min_id) / limit_num)
+
+        for p in range(int(page)):
+            start_id = int(min_id) + p * limit_num
+            end_id = start_id + 1000
+            sql = 'select sh.id, sh.info_hash as h1, sf.info_hash as h2 from search_hash sh \
+                left join search_filelist sf on sh.info_hash = sf.info_hash \
+                WHERE sf.info_hash is null and sh.id between ' + str(start_id) + ' and ' + str(end_id) + ' limit ' + str(limit_num)
+            print 'delete invalid data page ', p, 'start_id:', str(start_id), ' end_id:', str(end_id), 'done'
+            # print sql
+            list_data = []
+            try:
+                list_data = self.query(sql)
+            except Exception as e:
+                print str(e)
+
+            # print list_data
+            for x in range(len(list_data)):
+                iid = str(list_data[x][0])
+                infohash = str(list_data[x][1])
+                sqldel = "delete from search_hash where info_hash='" + infohash + "'"
+                self.query(sqldel)
+                print 'delete invalid data', iid, infohash, 'done'
+
+        self.query('OPTIMIZE TABLE  `search_hash`')
+        self.query('OPTIMIZE TABLE  `search_filelist`')
 
     def run(self):
         while True:
             self.check_db_data()
-            time.sleep(DB_SIZE_TICK)
+            time.sleep(1)
 
 
 def announce(info_hash, address):
