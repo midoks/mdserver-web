@@ -153,12 +153,7 @@ function webAdd(type) {
 		var data = $("#addweb").serialize()+"&port="+webport+"&webinfo="+domain;
 
 		$.post('/site/add', data, function(ret) {
-			if(ret.status === false){
-				layer.msg(ret.msg,{icon:ret.status?1:2})
-				return;
-			}
-			
-			if (ret.siteStatus == true) {
+			if (ret.status == true) {
 				getWeb(1);
 				layer.closeAll();
 				layer.msg('成功创建站点',{icon:1})

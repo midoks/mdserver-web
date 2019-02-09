@@ -441,9 +441,17 @@ class site_api:
         content = content.replace('{$LOGPATH}', logsPath)
         public.writeFile(vhost_file, content)
 
+        rewrite_content = '''
+location /{
+    if (!-e $request_filename) {
+       rewrite  ^(.*)$  /index.php/$1  last;
+       break;
+    }
+}
+        '''
         rewrite_file = self.setupPath + \
             '/openresty/nginx/conf/rewrite/' + self.siteName + '.conf'
-        public.writeFile(rewrite_file, '')
+        public.writeFile(rewrite_file, rewrite_content)
 
     def add(self, webname, port, ps, path, version):
 
