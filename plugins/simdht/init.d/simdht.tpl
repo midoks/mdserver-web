@@ -16,11 +16,12 @@
 dht_start(){
 	cd {$SERVER_PATH}/simdht/workers
 	nohup python simdht_worker.py > {$SERVER_PATH}/simdht/logs.pl 2>&1 &
+	echo "simdht started"
 }
 dht_stop(){
 	echo "Stopping ..."
 	ps -ef | grep "python simdht" | grep -v grep | awk '{print $2}' | xargs kill
-	echo "Redis stopped"
+	echo "simdht stopped"
 }
 
 
