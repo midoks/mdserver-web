@@ -107,6 +107,18 @@ def restartWeb():
         execShell(initd + ' ' + 'reload')
 
 
+def checkWebConfig():
+    op_dir = getServerDir() + '/openresty'
+    cmd = "ulimit -n 10240 && " + op_dir + \
+        "/nginx/sbin/nginx -t -c " + op_dir + "/nginx/conf/nginx.conf"
+    result = execShell(cmd)
+    searchStr = 'successful'
+    if result[1].find(searchStr) == -1:
+        writeLog("TYPE_SOFT", 'CONF_CHECK_ERR', (result[1],))
+        return result[1]
+    return True
+
+
 def M(table):
     sql = db.Sql()
     return sql.table(table)

@@ -129,6 +129,27 @@ class site_api:
         port = request.form.get('port', '').encode('utf-8')
         return self.add(webname, port, ps, path, version)
 
+    def addDomainApi(self):
+        isError = public.checkWebConfig()
+        if isError != True:
+            return public.returnJson(False, 'ERROR: 检测到配置文件有错误,请先排除后再操作<br><br><a style="color:red;">' + isError.replace("\n", '<br>') + '</a>')
+
+        domain = request.form.get('domain', '').encode('utf-8')
+        webname = request.form.get('webname', '').encode('utf-8')
+        pid = request.form.get('id', '').encode('utf-8')
+        if len(domain) < 3:
+            return public.returnJson(False, '域名不能为空!')
+        domains = get.domain.split(',')
+        for domain in domains:
+            if domain == "":
+                continue
+            domain = domain.split(':')
+            domain_name = self.ToPunycode(domain[0])
+            domain_port = '80'
+
+            public.M('domain').add('pid,name,port,addtime',
+                                   (pid, domain_name, domain_port, public.getDate()))
+
     def deleteApi(self):
         sid = request.form.get('id', '').encode('utf-8')
         webname = request.form.get('webname', '').encode('utf-8')
