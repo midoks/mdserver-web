@@ -61,7 +61,7 @@ def clearTemp():
 
 
 def getConf():
-    path = getPluginDir() + "/conf/nginx.conf"
+    path = getServerDir() + "/nginx/conf/nginx.conf"
     return path
 
 
