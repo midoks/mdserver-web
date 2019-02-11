@@ -12,6 +12,7 @@ function getWeb(page, search) {
 	}else{
 		order = '';
 	}
+
 	var sUrl = '/site/list';
 	var pdata = 'tojs=getWeb&table=sites&limit=15&p=' + page + '&search=' + search + order;
 	var loadT = layer.load();
@@ -1473,9 +1474,10 @@ function isContains(str, substr) {
 }
 //证书夹
 function ssl_admin(siteName){
-	var loadT = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});
-	$.get('/ssl?action=GetCertList',function(rdata){
+	var loadT = layer.msg('正在提交任务...',{icon:16,time:0,shade: [0.3, '#000']});
+	$.get('/ssl/get_cert_list',function(data){
 		layer.close(loadT);
+		var rdata = data['data'];
 		var tbody = '';
 		for(var i=0;i<rdata.length;i++){
 			tbody += '<tr><td>'+rdata[i].subject+'</td><td>'+rdata[i].dns.join('<br>')+'</td><td>'+rdata[i].notAfter+'</td><td>'+rdata[i].issuer+'</td><td style="text-align: right;"><a onclick="set_cert_ssl(\''+rdata[i].subject+'\',\''+siteName+'\')" class="btlink">部署</a> | <a onclick="remove_ssl(\''+rdata[i].subject+'\')" class="btlink">删除</a></td></tr>'
@@ -1486,7 +1488,7 @@ function ssl_admin(siteName){
 		<tbody>'+tbody+'</tbody>\
 		</table></div></div>';
 		$(".tab-con").html(txt);
-	});
+	},'json');
 }
 
 //删除证书
@@ -1527,7 +1529,7 @@ function setSSL(id,siteName){
 			  + '<div class="tab-con" style="padding: 0px;"></div>'
 			  
 	$("#webedit-con").html(mBody);
-	//BTssl('a',id,siteName);
+	opSSL('lets',id,siteName);
 	$(".tab-nav span").click(function(){
 		$(this).addClass("on").siblings().removeClass("on");
 	});
@@ -1618,9 +1620,18 @@ function opSSL(type,id,siteName){
 		  + '<ul class="help-info-text c7 ptb15"><li>'+lan.site.bt_ssl_help_5+'(包括根域名)</li><li>'+lan.site.bt_ssl_help_6+'</li><li>'+lan.site.bt_ssl_help_7+'</li><li>建议使用二级域名为www的域名申请证书,此时系统会默认赠送顶级域名为可选名称</li><li>在未指定SSL默认站点时,未开启SSL的站点使用HTTPS会直接访问到已开启SSL的站点</li></ul>'
 		  + '</div>';
 	
-	var lets =  '<div class="btssl"><div class="label-input-group" style="margin-left: 110px;margin-top: 10px;"><input type="checkbox" name="checkDomain" id="checkDomain" checked=""><label class="mr20" for="checkDomain" style="font-weight:normal">提前校验域名(提前发现问题,减少失败率)</label></div><div class="line mtb15"><span class="tname text-center">管理员邮箱</span><input class="bt-input-text" style="width:240px;" type="text" name="admin_email" /></div><div class="line mtb15"><span class="tname text-center">'+lan.site.domain+'</span><ul id="ymlist" style="padding: 5px 10px;max-height:180px;overflow:auto; width:240px;border:#ccc 1px solid;border-radius:3px"></ul></div>'
-			  + '<div class="line mtb15" style="margin-left:80px"><button class="btn btn-success btn-sm letsApply">'+lan.site.btapply+'</button></div>'
-			  + '<ul class="help-info-text c7 ptb15"><li>'+lan.site.bt_ssl_help_5+'</li><li>'+lan.site.bt_ssl_help_8+'</li><li>'+lan.site.bt_ssl_help_9+'</li><li>在未指定SSL默认站点时,未开启SSL的站点使用HTTPS会直接访问到已开启SSL的站点</li></ul>'
+	// var lets =  '<div class="btssl"><div class="label-input-group" style="margin-left: 110px;margin-top: 10px;"><input type="checkbox" name="checkDomain" id="checkDomain" checked=""><label class="mr20" for="checkDomain" style="font-weight:normal">提前校验域名(提前发现问题,减少失败率)</label></div><div class="line mtb15"><span class="tname text-center">管理员邮箱</span><input class="bt-input-text" style="width:240px;" type="text" name="admin_email" /></div><div class="line mtb15"><span class="tname text-center">'+lan.site.domain+'</span><ul id="ymlist" style="padding: 5px 10px;max-height:180px;overflow:auto; width:240px;border:#ccc 1px solid;border-radius:3px"></ul></div>'
+	// 		  + '<div class="line mtb15" style="margin-left:80px"><button class="btn btn-success btn-sm letsApply">'+lan.site.btapply+'</button></div>'
+	// 		  + '<ul class="help-info-text c7 ptb15"><li>'+lan.site.bt_ssl_help_5+'</li><li>'+lan.site.bt_ssl_help_8+'</li><li>'+lan.site.bt_ssl_help_9+'</li><li>在未指定SSL默认站点时,未开启SSL的站点使用HTTPS会直接访问到已开启SSL的站点</li></ul>'
+	// 		  + '</div>';
+
+	var lets =  '<div class="btssl"><div class="label-input-group">'
+			  + '<div class="line mtb10"><form><span class="tname text-center">验证方式</span><div style="margin-top:7px;display:inline-block"><input type="radio" name="c_type" onclick="file_check()" id="check_file" checked="checked" /><label class="mr20" for="check_file" style="font-weight:normal">文件验证</label><input type="radio" onclick="dns_check()" name="c_type" id="check_dns" /><label class="mr20" for="check_dns" style="font-weight:normal">DNS验证</label></div></form></div>'
+			  + '<div class="check_message line"><div style="margin-left:100px"><input type="checkbox" name="checkDomain" id="checkDomain" checked=""><label class="mr20" for="checkDomain" style="font-weight:normal">提前校验域名(提前发现问题,减少失败率)</label></div></div>'
+			  + '</div><div class="line mtb10"><span class="tname text-center">管理员邮箱</span><input class="bt-input-text" style="width:240px;" type="text" name="admin_email" /></div>'
+			  + '<div class="line mtb10"><span class="tname text-center">'+lan.site.domain+'</span><ul id="ymlist" style="padding: 5px 10px;max-height:180px;overflow:auto; width:240px;border:#ccc 1px solid;border-radius:3px"></ul></div>'
+			  + '<div class="line mtb10" style="margin-left:100px"><button class="btn btn-success btn-sm letsApply">'+lan.site.btapply+'</button></div>'
+			  + '<ul class="help-info-text c7" id="lets_help"><li>'+lan.site.bt_ssl_help_5+'</li><li>'+lan.site.bt_ssl_help_8+'</li><li>'+lan.site.bt_ssl_help_9+'</li><li>在未指定SSL默认站点时,未开启SSL的站点使用HTTPS会直接访问到已开启SSL的站点</li></ul>'
 			  + '</div>';
 	
 	var other = '<div class="myKeyCon ptb15"><div class="ssl-con-key pull-left mr20">'+lan.site.ssl_key+'<br><textarea id="key" class="bt-input-text"></textarea></div>'
