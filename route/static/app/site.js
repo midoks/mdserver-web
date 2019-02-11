@@ -706,23 +706,24 @@ function checkDomainWebsize(obj,domain){
  */
 function domainAdd(id, webname,type) {
 	var Domain = $("#newdomain").val().split("\n");
-	
-	var domainlist="";
+
+	var domainlist = '';
 	for(var i=0; i<Domain.length; i++){
-		domainlist += Domain[i]+",";
+		domainlist += Domain[i]+ ',';
 	}
 	
 	if(domainlist.length < 3){
 		layer.msg(lan.site.domain_empty,{icon:5});
 		return;
 	}
+
 	domainlist = domainlist.substring(0,domainlist.length-1);
 	var loadT = layer.load();
 	var data = "domain=" + domainlist + "&webname=" + webname + "&id=" + id;
-	$.post('/site?action=AddDomain', data, function(retuls) {
+	$.post('/site/add_domain', data, function(retuls) {
 		layer.close(loadT);
-		domainEdit(id,webname,retuls.msg,retuls.status);
-	});
+		domainEdit(id, webname, retuls.msg, retuls.status);
+	},'json');
 }
 
 /**
@@ -738,20 +739,20 @@ function delDomain(wid, wname, domain, port,type) {
 		layer.msg(lan.site.domain_last_cannot);
 	}
 	layer.confirm(lan.site.domain_del_confirm,{icon:3,closeBtn:2}, function(index) {
-			var url = "/site?action=DelDomain"
-			var data = "id=" + wid + "&webname=" + wname + "&domain=" + domain + "&port=" + port;
-			var loadT = layer.msg(lan.public.the_del,{time:0,icon:16});
-			$.post(url,data, function(ret) {
+		var url = "/site/del_domain"
+		var data = "id=" + wid + "&webname=" + wname + "&domain=" + domain + "&port=" + port;
+		var loadT = layer.msg(lan.public.the_del,{time:0,icon:16});
+		$.post(url,data, function(ret) {
+			layer.close(loadT);
+			layer.msg(ret.msg,{icon:ret.status?1:2})
+			if(type == 1){
 				layer.close(loadT);
-				layer.msg(ret.msg,{icon:ret.status?1:2})
-				if(type == 1){
-					layer.close(loadT);
-					domainEdit(wid,wname)
-				}else{
-					layer.closeAll();
-					DomainRoot(wid, wname);
-				}
-			});
+				domainEdit(wid,wname)
+			}else{
+				layer.closeAll();
+				DomainRoot(wid, wname);
+			}
+		},'json');
 	});
 }
 
@@ -2056,10 +2057,10 @@ function phpVersion(siteName){
 function setPHPVersion(siteName){
 	var data = 'version='+$("#phpVersion").val()+'&siteName='+siteName;
 	var loadT = layer.msg('正在保存...',{icon:16,time:0,shade: [0.3, '#000']});
-	$.post('/site?action=SetPHPVersion',data,function(rdata){
+	$.post('/site/set_php_version',data,function(rdata){
 		layer.close(loadT);
 		layer.msg(rdata.msg,{icon:rdata.status?1:2});
-	});
+	},'json');
 }
 
 //配置文件

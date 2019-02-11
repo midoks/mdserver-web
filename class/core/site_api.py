@@ -38,6 +38,24 @@ class site_api:
     def getPhpVersionApi(self):
         return self.getPhpVersion()
 
+    def setPhpVersionApi(self):
+        siteName = request.form.get('siteName', '').encode('utf-8')
+        version = request.form.get('version', '').encode('utf-8')
+
+        # nginx
+        file = self.setupPath + '/openresty/nginx/conf/vhost/' + siteName + '.conf'
+        conf = public.readFile(file)
+        if conf:
+            rep = "enable-php-([0-9]{2,3})\.conf"
+            tmp = re.search(rep, conf).group()
+            conf = conf.replace(tmp, 'enable-php-' + version + '.conf')
+            public.writeFile(file, conf)
+
+        public.restartWeb()
+        msg = public.getInfo('成功切换网站[{1}]的PHP版本为PHP-{2}', (siteName, version))
+        public.writeLog("TYPE_SITE", msg)
+        return public.returnJson(True, msg)
+
     def getDomainApi(self):
         pid = request.form.get('pid', '').encode('utf-8')
         return self.getDomain(pid)
@@ -139,16 +157,92 @@ class site_api:
         pid = request.form.get('id', '').encode('utf-8')
         if len(domain) < 3:
             return public.returnJson(False, '域名不能为空!')
-        domains = get.domain.split(',')
+        domains = domain.split(',')
         for domain in domains:
             if domain == "":
                 continue
             domain = domain.split(':')
-            domain_name = self.ToPunycode(domain[0])
+            print domain
+            domain_name = self.toPunycode(domain[0])
             domain_port = '80'
 
+            reg = "^([\w\-\*]{1,100}\.){1,4}([\w\-]{1,24}|[\w\-]{1,24}\.[\w\-]{1,24})$"
+            if not re.match(reg, domain_name):
+                return public.returnJson(False, '域名格式不正确!')
+
+            if len(domain) == 2:
+                domain_port = domain[1]
+            if domain_port == "":
+                domain_port = "80"
+
+            if not public.checkPort(domain_port):
+                return public.returnJson(False, '端口范围不合法!')
+
+            opid = public.M('domain').where(
+                "name=? AND (port=? OR pid=?)", (domain, domain_port, pid)).getField('pid')
+            if opid:
+                if public.M('sites').where('id=?', (opid,)).count():
+                    return public.returnMsg(False, '指定域名已绑定过!')
+                public.M('domain').where('pid=?', (opid,)).delete()
+
+            if public.M('binding').where('domain=?', (domain,)).count():
+                return public.returnMsg(False, '您添加的域名已存在!')
+
+            self.nginxAddDomain(webname, domain_name, domain_port)
+
+            # 添加放行端口
+            # if port != '80':
+            #     import firewalls
+            #     get.ps = get.domain
+            #     firewalls.firewalls().AddAcceptPort(get)
+
+            public.restartWeb()
+            msg = public.getInfo('网站[{1}]添加域名[{2}]成功!', (webname, domain_name))
+            public.writeLog('TYPE_SITE', msg)
             public.M('domain').add('pid,name,port,addtime',
                                    (pid, domain_name, domain_port, public.getDate()))
+
+        return public.returnJson(True, '域名添加成功!')
+
+    def delDomainApi(self):
+        domain = request.form.get('domain', '').encode('utf-8')
+        webname = request.form.get('webname', '').encode('utf-8')
+        port = request.form.get('port', '').encode('utf-8')
+        pid = request.form.get('id', '')
+
+        find = public.M('domain').where("pid=? AND name=?",
+                                        (pid, domain)).field('id,name').find()
+
+        domain_count = public.M('domain').where("pid=?", (pid,)).count()
+        if domain_count == 1:
+            return public.returnJson(False, '最后一个域名不能删除!')
+
+        file = self.setupPath + '/openresty/nginx/conf/vhost/' + webname + '.conf'
+        conf = public.readFile(file)
+        if conf:
+            # 删除域名
+            rep = "server_name\s+(.+);"
+            tmp = re.search(rep, conf).group()
+            newServerName = tmp.replace(' ' + domain + ';', ';')
+            newServerName = newServerName.replace(' ' + domain + ' ', ' ')
+            conf = conf.replace(tmp, newServerName)
+
+            # 删除端口
+            rep = "listen\s+([0-9]+);"
+            tmp = re.findall(rep, conf)
+            port_count = public.M('domain').where(
+                'pid=? AND port=?', (pid, port)).count()
+            if public.inArray(tmp, port) == True and port_count < 2:
+                rep = "\n*\s+listen\s+" + port + ";"
+                conf = re.sub(rep, '', conf)
+            # 保存配置
+            public.writeFile(file, conf)
+
+        public.M('domain').where("id=?", (find['id'],)).delete()
+        msg = public.getInfo('网站[{1}]删除域名[{2}]成功!', (webname, domain))
+        public.writeLog('TYPE_SITE', msg)
+        public.restartWeb()
+        return public.returnJson(True, '站点删除成功!')
 
     def deleteApi(self):
         sid = request.form.get('id', '').encode('utf-8')
@@ -227,7 +321,7 @@ class site_api:
         logPath = public.getLogsDir() + '/' + siteName + '.log'
         if not os.path.exists(logPath):
             return public.returnJson(False, '日志为空')
-        return public.returnJson(True, public.getNumLines(logPath, 1000))
+        return public.returnJson(True, public.getNumLines(logPath, 100))
 
     def getSitePhpVersion(self, siteName):
         conf = public.readFile(self.getHostConf(siteName))
@@ -238,7 +332,6 @@ class site_api:
         return public.getJson(data)
 
     def getIndex(self, sid):
-        print sid
         siteName = public.M('sites').where("id=?", (sid,)).getField('name')
         file = self.getHostConf(siteName)
         conf = public.readFile(file)
@@ -442,8 +535,30 @@ class site_api:
                 public.execShell('chown -R www:www ' + path)
             public.execShell('chmod -R 755 ' + path)
 
-    def addDomain(self, domain, webname, pid):
-        pass
+    def nginxAddDomain(self, webname, domain, port):
+        file = self.setupPath + '/openresty/nginx/conf/vhost/' + webname + '.conf'
+        conf = public.readFile(file)
+        if not conf:
+            return
+
+        # 添加域名
+        rep = "server_name\s*(.*);"
+        tmp = re.search(rep, conf).group()
+        domains = tmp.split(' ')
+        if not public.inArray(domains, domain):
+            newServerName = tmp.replace(';', ' ' + domain + ';')
+            conf = conf.replace(tmp, newServerName)
+
+        # 添加端口
+        rep = "listen\s+([0-9]+)\s*[default_server]*\s*;"
+        tmp = re.findall(rep, conf)
+        if not public.inArray(tmp, port):
+            listen = re.search(rep, conf).group()
+            conf = conf.replace(
+                listen, listen + "\n\tlisten " + port + ';')
+        # 保存配置文件
+        public.writeFile(file, conf)
+        return True
 
     def nginxAddConf(self):
         source_tpl = public.getRunDir() + '/data/tpl/nginx.conf'

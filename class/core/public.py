@@ -571,7 +571,7 @@ def checkIp(ip):
 
 def checkPort(port):
     # 检查端口是否合法
-    ports = ['21', '25', '443', '8080', '888', '8888', '8443']
+    ports = ['21', '25', '443', '7200', '8080', '888', '8888', '8443']
     if port in ports:
         return False
     intport = int(port)
