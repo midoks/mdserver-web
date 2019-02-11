@@ -60,6 +60,28 @@ class site_api:
         pid = request.form.get('pid', '').encode('utf-8')
         return self.getDomain(pid)
 
+    # 获取站点所有域名
+    def getSiteDomainsApi(self):
+        pid = request.form.get('id', '').encode('utf-8')
+
+        data = {}
+        domains = public.M('domain').where(
+            'pid=?', (pid,)).field('name,id').select()
+        binding = public.M('binding').where(
+            'pid=?', (pid,)).field('domain,id').select()
+        if type(binding) == str:
+            return binding
+        for b in binding:
+            tmp = {}
+            tmp['name'] = b['domain']
+            tmp['id'] = b['id']
+            domains.append(tmp)
+        data['domains'] = domains
+        data['email'] = public.M('users').getField('email')
+        if data['email'] == '287962566@qq.com':
+            data['email'] = ''
+        return public.returnJson(True, 'OK', data)
+
     def getIndexApi(self):
         sid = request.form.get('id', '').encode('utf-8')
         data = {}
