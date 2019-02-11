@@ -254,7 +254,7 @@ def getTrendData():
         isError = isSqlError(result)
         if isError:
             return isError
-        one = getMinData(pdb, 1)
+        one = getMinData(pdb, 2)
         two = getMinData(pdb, 5)
         three = getMinData(pdb, 10)
         return public.getJson([one, two, three])
