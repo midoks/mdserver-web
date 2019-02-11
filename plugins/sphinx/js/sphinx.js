@@ -74,7 +74,7 @@ function runStatus(){
             return;
         }
         var idata = rdata.data;
-        console.log(idata);
+        // console.log(idata);
         var con = '<div class="divtable"><table class="table table-hover table-bordered" style="margin-bottom:10px;background-color:#fafafa">\
                     <tbody>\
                         <tr><th>运行时间</th><td>' + secToTime(idata.uptime) + '</td><th>每秒查询</th><td>' + parseInt(parseInt(idata.queries) / parseInt(idata.uptime)) + '</td></tr>\
