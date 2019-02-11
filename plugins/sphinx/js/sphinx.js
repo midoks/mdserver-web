@@ -45,6 +45,26 @@ function rebuildIndex(){
     });
 }
 
+function secToTime(s) {
+    var t;
+    if(s > -1){
+        var hour = Math.floor(s/3600);
+        var min = Math.floor(s/60) % 60;
+        var sec = s % 60;
+        if(hour < 10) {
+            t = '0'+ hour + ":";
+        } else {
+            t = hour + ":";
+        }
+
+        if(min < 10){t += "0";}
+        t += min + ":";
+        if(sec < 10){t += "0";}
+        t += sec.toFixed(2);
+    }
+    return t;
+}
+
 
 function runStatus(){
     spPost('run_status', '', function(data){
@@ -57,7 +77,7 @@ function runStatus(){
         console.log(idata);
         var con = '<div class="divtable"><table class="table table-hover table-bordered" style="margin-bottom:10px;background-color:#fafafa">\
                     <tbody>\
-                        <tr><th>运行时间</th><td>' + idata.uptime + 's</td><th>每秒查询</th><td>' + parseInt(parseInt(idata.queries) / parseInt(idata.uptime)) + '</td></tr>\
+                        <tr><th>运行时间</th><td>' + secToTime(idata.uptime) + '</td><th>每秒查询</th><td>' + parseInt(parseInt(idata.queries) / parseInt(idata.uptime)) + '</td></tr>\
                         <tr><th>总连接次数</th><td>' + idata.connections + '</td><th>work_queue_length</th><td>' +idata.work_queue_length + '</td></tr>\
                         <tr><th>agent_connect</th><td>' + idata.agent_connect+ '</td><th>workers_active</th><td>' + idata.workers_active + '</td></tr>\
                         <tr><th>agent_retry</th><td>' + idata.agent_retry + '</td><th>workers_total</th><td>' + idata.workers_total + '</td></tr>\
