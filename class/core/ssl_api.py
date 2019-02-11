@@ -35,7 +35,7 @@ class ssl_api:
                     continue
                 tmp1 = json.loads(tmp)
                 data.append(tmp1)
-            return data
+            return public.returnJson(True, 'OK', data)
         except:
-            return []
+            return public.returnJson(True, 'OK', [])
     ##### ----- end ----- ###

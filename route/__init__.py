@@ -172,7 +172,7 @@ def index(reqClass=None, reqAction=None, reqData=None):
     if (reqClass == None):
         reqClass = 'index'
     classFile = ('config', 'control', 'crontab', 'files', 'firewall',
-                 'index', 'plugins', 'login', 'system', 'site', 'task', 'soft')
+                 'index', 'plugins', 'login', 'system', 'site', 'ssl', 'task', 'soft')
     if not reqClass in classFile:
         return redirect('/')
 
