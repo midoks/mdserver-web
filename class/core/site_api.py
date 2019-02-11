@@ -162,7 +162,7 @@ class site_api:
             if domain == "":
                 continue
             domain = domain.split(':')
-            print domain
+            # print domain
             domain_name = self.toPunycode(domain[0])
             domain_port = '80'
 
