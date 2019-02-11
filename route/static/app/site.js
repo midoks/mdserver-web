@@ -983,17 +983,17 @@ function setIndexList(id){
 function webEdit(id,website,endTime,addtime){
 	var system = "{$Think.session.system}";
 	var eMenu = '';
-	eMenu = "<p onclick='DirBinding("+id+")' title='"+lan.site.site_menu_1+"'>"+lan.site.site_menu_1+"</p>"
-	+"<p onclick='webPathEdit("+id+")' title='"+lan.site.site_menu_2+"'>"+lan.site.site_menu_2+"</p>"
+	eMenu = "<p onclick='DirBinding("+id+")' title='子目录绑定'>子目录绑定</p>"
+	+"<p onclick='webPathEdit("+id+")' title='网站目录'>网站目录</p>"
 	+"<p onclick='limitNet("+id+")' title='流量限制'>流量限制</p>"
 	+"<p onclick=\"rewrite('"+website+"')\" title='伪静态'>伪静态</p>"
 	+"<p onclick='setIndexEdit("+id+")' title='默认文档'>默认文档</p>"
 	+"<p onclick=\"configFile('"+website+"')\" title='配置文件'>配置文件</p>"
-	+"<p onclick=\"setSSL("+id+",'"+website+"')\" title='"+lan.site.site_menu_7+"'>"+lan.site.site_menu_7+"</p>"
+	+"<p onclick=\"setSSL("+id+",'"+website+"')\" title='SSL'>SSL</p>"
 	+"<p onclick=\"phpVersion('"+website+"')\" title='PHP版本'>PHP版本</p>"
-	+"<p onclick=\"To301('"+website+"')\" title='"+lan.site.site_menu_10+"'>"+lan.site.site_menu_10+"</p>"
-	+"<p onclick=\"Proxy('"+website+"')\" title='"+lan.site.site_menu_12+"'>"+lan.site.site_menu_11+"</p>"
-	+"<p id='site_"+id+"' onclick=\"security('"+id+"','"+website+"')\" title='"+lan.site.site_menu_12+"'>"+lan.site.site_menu_12+"</p>"
+	+"<p onclick=\"To301('"+website+"')\" title='301重定向'>301重定向</p>"
+	+"<p onclick=\"Proxy('"+website+"')\" title='反向代理'>反向代理</p>"
+	+"<p id='site_"+id+"' onclick=\"security('"+id+"','"+website+"')\" title='防盗链'>防盗链</p>"
 	+"<p id='site_"+id+"' onclick=\"getSiteLogs('"+website+"')\" title='查看站点请求日志'>响应日志</p>";
 	layer.open({
 		type: 1,
@@ -1011,7 +1011,7 @@ function webEdit(id,website,endTime,addtime){
 	});
 	domainEdit(id,website);
 	//域名输入提示
-	var placeholder = "<div class='placeholder'>"+lan.site.domain_help+"</div>";
+	var placeholder = "<div class='placeholder'>每行填写一个域名，默认为80端口<br>泛解析添加方法 *.domain.com<br>如另加端口格式为 www.domain.com:88</div>";
 	$('#newdomain').after(placeholder);
 	$(".placeholder").click(function(){
 		$(this).hide();
@@ -1513,10 +1513,9 @@ function set_cert_ssl(certName,siteName){
 //宝塔ssl
 function setSSL(id,siteName){
 	var mBody = '<div class="tab-nav">\
-					<span  onclick="BTssl(\'a\','+id+',\''+siteName+'\')">'+lan.site.bt_ssl+'</span>\
-					<span class="on" onclick="BTssl(\'lets\','+id+',\''+siteName+'\')">Let\'s Encrypt</span>\
-					<span onclick="BTssl(\'other\','+id+',\''+siteName+'\')">'+lan.site.other_ssl+'</span>\
-					<span class="sslclose" onclick="closeSSL(\''+siteName+'\')">'+lan.public.close+'</span>\
+					<span class="on" onclick="opSSL(\'lets\','+id+',\''+siteName+'\')">Let\'s Encrypt</span>\
+					<span onclick="opSSL(\'other\','+id+',\''+siteName+'\')">其他证书</span>\
+					<span class="sslclose" onclick="closeSSL(\''+siteName+'\')">关闭</span>\
 					<span id="ssl_admin" onclick="ssl_admin(\''+siteName+'\')">证书夹</span>'
 					+ '<div class="ss-text pull-right mr30" style="position: relative;top:-4px">\
 	                    <em>强制HTTPS</em>\
@@ -1611,17 +1610,11 @@ function closeSSLHTML(txt,siteName){
 	$(".tab-con").html("<div class='line mtb15'>"+lan.get('ssl_enable',[txt])+"</div><div class='line mtb15'><button class='btn btn-success btn-sm' onclick=\"OcSSL('CloseSSLConf','"+siteName+"')\">"+lan.site.ssl_close+"</button></div>");
 }
 
-//宝塔SSL
-function BTssl(type,id,siteName){
-	var a = '<div class="btssl"><div class="alert alert-warning" style="padding:10px">'+lan.site.bt_bind_no+'</div>'
-			+ '<div class="line mtb10"><span class="tname text-right mr20">'+lan.site.bt_user+'</span><input id="btusername" class="bt-input-text" type="text" name="bt_panel_username" maxlength="11" style="width:200px" ><i style="font-style:normal;margin-left:10px;color:#999"></i></div>'
-			+ '<div class="line mtb10"><span class="tname text-right mr20">'+lan.site.password+'</span><input id="btpassword" class="bt-input-text" type="password" name="bt_panel_password" style="width:200px" ></div>'
-			+ '<div class="line mtb15" style="margin-left:100px"><button class="btn btn-success btn-sm mr20 btlogin">'+lan.site.login+'</button><button class="btn btn-success btn-sm" onclick="javascript:window.open(\'https://www.bt.cn/register.html\')">'+lan.site.bt_reg+'</button></div>'
-			+ '<ul class="help-info-text c7 ptb15"><li style="color:red">'+lan.site.bt_ssl_help_1+'</li><li>'+lan.site.bt_ssl_help_2+'</li><li>'+lan.site.bt_ssl_help_3+'</li><li>'+lan.site.bt_ssl_help_4+'</li></ul>'
-			+ '</div>';
+//SSL
+function opSSL(type,id,siteName){
 	var b = '<div class="btssl"><div class="line mtb15"><span class="tname text-center">'+lan.site.domain+'</span><select id="domainlist" class="bt-input-text" style="width:220px"></select></div>'
 		  + '<div class="line mtb15" style="margin-left:80px"><button class="btn btn-success btn-sm btsslApply">'+lan.site.btapply+'</button></div>'
-		  + '<div class="btssllist mtb15"><div class="divtable"><div id="btssl_table_list" style="max-height:205px;border:#ddd 1px solid;overflow:auto"><table class="table table-hover" style="border:none"><thead><tr><th>'+lan.site.domain+'</th><th>'+lan.site.endtime+'</th><th>'+lan.site.status+'<a href="https://www.bt.cn/bbs/thread-7860-1-1.html" class="bt-ico-ask" title="查看说明" target="_blank">?</a></th><th class="text-right" width="120">'+lan.site.operate+'</th></tr></thead><tbody id="ssllist"></tbody></table></div></div></div>'
+		  + '<div class="btssllist mtb15"><div class="divtable"><div id="btssl_table_list" style="max-height:205px;border:#ddd 1px solid;overflow:auto"><table class="table table-hover" style="border:none"><thead><tr><th>域名</th><th>到期时间</th><th>状态<a href="https://www.bt.cn/bbs/thread-7860-1-1.html" class="bt-ico-ask" title="查看说明" target="_blank">?</a></th><th class="text-right" width="120">操作</th></tr></thead><tbody id="ssllist"></tbody></table></div></div></div>'
 		  + '<ul class="help-info-text c7 ptb15"><li>'+lan.site.bt_ssl_help_5+'(包括根域名)</li><li>'+lan.site.bt_ssl_help_6+'</li><li>'+lan.site.bt_ssl_help_7+'</li><li>建议使用二级域名为www的域名申请证书,此时系统会默认赠送顶级域名为可选名称</li><li>在未指定SSL默认站点时,未开启SSL的站点使用HTTPS会直接访问到已开启SSL的站点</li></ul>'
 		  + '</div>';
 	
@@ -1633,41 +1626,8 @@ function BTssl(type,id,siteName){
 	var other = '<div class="myKeyCon ptb15"><div class="ssl-con-key pull-left mr20">'+lan.site.ssl_key+'<br><textarea id="key" class="bt-input-text"></textarea></div>'
 					+ '<div class="ssl-con-key pull-left">'+lan.site.ssl_crt+'<br><textarea id="csr" class="bt-input-text"></textarea></div>'
 					+ '<div class="ssl-btn pull-left mtb15" style="width:100%"><button class="btn btn-success btn-sm" onclick="SaveSSL(\''+siteName+'\')">'+lan.public.save+'</button></div></div>'
-					+ '<ul class="help-info-text c7 pull-left"><li>'+lan.site.bt_ssl_help_10+'</li><li>如果浏览器提示证书链不完整,请检查是否正确拼接PEM证书</li><li>PEM格式证书 = 域名证书.crt + 根证书(root_bundle).crt</li><li>在未指定SSL默认站点时,未开启SSL的站点使用HTTPS会直接访问到已开启SSL的站点</li></ul>';
-					
+					+ '<ul class="help-info-text c7 pull-left"><li>'+lan.site.bt_ssl_help_10+'</li><li>如果浏览器提示证书链不完整,请检查是否正确拼接PEM证书</li><li>PEM格式证书 = 域名证书.crt + 根证书(root_bundle).crt</li><li>在未指定SSL默认站点时,未开启SSL的站点使用HTTPS会直接访问到已开启SSL的站点</li></ul>';			
 	switch(type){
-		case 'a':
-			$.get("/ssl?action=GetUserInfo",function(rdata){
-				if(rdata.status){
-					BTssl('b',id,siteName);
-				}
-				else{
-					$(".tab-con").html(a);
-					$("#btusername").blur(function(){
-						if(!(/^1(3|4|5|7|8)\d{9}$/.test($(this).val()))){ 
-							$("#btusername").css("border","1px solid #e53451");
-							$("#btusername").next("i").html(lan.site.phone_input);
-						}
-						else{
-							$("#btusername").removeAttr("style").css("width","200px");
-							$("#btusername").next("i").empty();
-						}
-					});
-					$(".btlogin").click(function(){
-						var data = "username="+$("#btusername").val()+"&password="+$("#btpassword").val();
-						$.post("/ssl?action=GetToken",data,function(tdata){
-							if(tdata.status){
-								layer.msg(tdata.msg,{icon:1});
-								BTssl('b',id,siteName);
-							}
-							else{
-								layer.msg(tdata.msg,{icon:2})
-							}
-						})
-					})
-				}
-			});
-			break;
 		case 'b':
 			$(".tab-con").html(b);
 			var opt = '';
@@ -1766,7 +1726,7 @@ function BTssl(type,id,siteName){
 				$.post('site?action=GetSSL','siteName='+siteName,function(rdata){
 					if(rdata.csr === false){
 						setCookie('letssl',0);
-						BTssl(type,id,siteName);
+						opSSL(type,id,siteName);
 						return;
 					}
 					var lets = '<div class="myKeyCon ptb15"><div class="ssl-con-key pull-left mr20">'+lan.site.ssl_key+'<br><textarea id="key" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.key+'</textarea></div>'
@@ -1780,15 +1740,16 @@ function BTssl(type,id,siteName){
 			}
 			$(".tab-con").html(lets);
 			var opt='';
-			$.post('/site?action=GetSiteDomains',{id:id}, function(rdata) {
-				for(var i=0;i<rdata.domains.length;i++){
-					var isIP = isValidIP(rdata.domains[i].name);
-					var x = isContains(rdata.domains[i].name, '*');
+			$.post('/site/get_site_domains',{id:id}, function(rdata) {
+				var data = rdata['data'];
+				for(var i=0;i<data.domains.length;i++){
+					var isIP = isValidIP(data.domains[i].name);
+					var x = isContains(data.domains[i].name, '*');
 					if(!isIP && !x){
-						opt+='<li style="line-height:26px"><input type="checkbox" style="margin-right:5px; vertical-align:-2px" value="'+rdata.domains[i].name+'">'+rdata.domains[i].name+'</li>'
+						opt+='<li style="line-height:26px"><input type="checkbox" style="margin-right:5px; vertical-align:-2px" value="'+data.domains[i].name+'">'+data.domains[i].name+'</li>'
 					}
 				}
-				$("input[name='admin_email']").val(rdata.email);
+				$("input[name='admin_email']").val(data.email);
 				$("#ymlist").html(opt);
 				$("#ymlist li input").click(function(e){
 					e.stopPropagation();
@@ -1815,7 +1776,7 @@ function BTssl(type,id,siteName){
 					newSSL(siteName,domains);
 					
 				})
-			});
+			},'json');
 			break;
 		case 'other':
 			$(".tab-con").html(other);
@@ -1834,7 +1795,7 @@ function BTssl(type,id,siteName){
 			});
 			break;
 	}
-	table_fixed("btssl_table_list")
+	// table_fixed("btssl_table_list")
 }
 
 //取证书列表
