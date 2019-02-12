@@ -1551,7 +1551,7 @@ function setSSL(id,siteName){
 	// 				+ '</div>'
 	// 				+ '<ul class="help-info-text c7 pull-left"><li>'+lan.site.ssl_help_2+'</li><li>'+lan.site.ssl_help_3+'</li></ul>'
 	// 			$(".tab-con").html(lets);
-	// 			$(".help-info-text").after("<div class='line mtb15'><button class='btn btn-default btn-sm' onclick=\"OcSSL('CloseSSLConf','"+siteName+"')\" style='margin-left:10px'>"+lan.site.ssl_close+"</button></div>");
+	// 			$(".help-info-text").after("<div class='line mtb15'><button class='btn btn-default btn-sm' onclick=\"ocSSL('CloseSSLConf','"+siteName+"')\" style='margin-left:10px'>"+lan.site.ssl_close+"</button></div>");
 	// 			break;
 	// 		case 0:
 	// 			$(".tab-nav span").eq(2).addClass("on").siblings().removeClass("on");
@@ -1609,7 +1609,7 @@ function httpToHttps(siteName){
 
 //关闭SSL内容
 function closeSSLHTML(txt,siteName){
-	$(".tab-con").html("<div class='line mtb15'>"+lan.get('ssl_enable',[txt])+"</div><div class='line mtb15'><button class='btn btn-success btn-sm' onclick=\"OcSSL('CloseSSLConf','"+siteName+"')\">"+lan.site.ssl_close+"</button></div>");
+	$(".tab-con").html("<div class='line mtb15'>"+lan.get('ssl_enable',[txt])+"</div><div class='line mtb15'><button class='btn btn-success btn-sm' onclick=\"ocSSL('CloseSSLConf','"+siteName+"')\">"+lan.site.ssl_close+"</button></div>");
 }
 
 //SSL
@@ -1745,7 +1745,7 @@ function opSSL(type,id,siteName){
 						+ '</div>'
 						+ '<ul class="help-info-text c7 pull-left"><li>'+lan.site.ssl_help_2+'</li><li>'+lan.site.ssl_help_3+'</li></ul>';
 					$(".tab-con").html(lets);
-					$(".help-info-text").after("<div class='line mtb15'><button class='btn btn-default btn-sm' onclick=\"OcSSL('CloseSSLConf','"+siteName+"')\" style='margin-left:10px'>"+lan.site.ssl_close+"</button></div>");
+					$(".help-info-text").after("<div class='line mtb15'><button class='btn btn-default btn-sm' onclick=\"ocSSL('CloseSSLConf','"+siteName+"')\" style='margin-left:10px'>"+lan.site.ssl_close+"</button></div>");
 				});
 				return;
 			}
@@ -1794,16 +1794,18 @@ function opSSL(type,id,siteName){
 			var key = '';
 			var csr = '';
 			var loadT = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});
-			$.post('site?action=GetSSL','siteName='+siteName,function(rdata){
+			$.post('site/get_ssl','siteName='+siteName,function(data){
+				// console.log(data);
 				layer.close(loadT);
+				var rdata = data['data'];
 				if(rdata.status){
-					$(".ssl-btn").append("<button class='btn btn-default btn-sm' onclick=\"OcSSL('CloseSSLConf','"+siteName+"')\" style='margin-left:10px'>"+lan.site.ssl_close+"</button>");
+					$(".ssl-btn").append("<button class='btn btn-default btn-sm' onclick=\"ocSSL('CloseSSLConf','"+siteName+"')\" style='margin-left:10px'>"+lan.site.ssl_close+"</button>");
 				}
 				if(rdata.key == false) rdata.key = '';
 				if(rdata.csr == false) rdata.csr = '';
 				$("#key").val(rdata.key);
 				$("#csr").val(rdata.csr);
-			});
+			},'json');
 			break;
 	}
 	// table_fixed("btssl_table_list")
@@ -1827,7 +1829,7 @@ function getSSLlist(siteName){
 					//icoask = '<i class="ico-font-ask" title="'+tips+'">?</i>';
 				}
 				if(rdata.data[i].setup){
-					txt = lan.site.deployed+' | <a class="btlink" href="javascript:OcSSL(\'CloseSSLConf\',\''+siteName+'\')">'+lan.public.close+'</a></div>';
+					txt = lan.site.deployed+' | <a class="btlink" href="javascript:ocSSL(\'CloseSSLConf\',\''+siteName+'\')">'+lan.public.close+'</a></div>';
 				}
 				
 				tr += '<tr><td>'+rdata.data[i].commonName+'</td><td>'+getLocalTime(rdata.data[i].endtime).split(" ")[0]+'</td><td title='+tips+'>'+rdata.data[i].stateName+icoask+'</td><td class="text-right">'+txt+'</td></tr>'
@@ -1867,7 +1869,7 @@ function VerifyDomain(partnerOrderId,siteName){
 }
 
 //开启与关闭SSL
-function OcSSL(action,siteName){
+function ocSSL(action,siteName){
 	var loadT = layer.msg(lan.site.get_ssl_list,{icon:16,time:0,shade: [0.3, '#000']});
 	$.post("site?action="+action,'siteName='+siteName+'&updateOf=1',function(rdata){
 		layer.close(loadT)
@@ -1910,7 +1912,7 @@ function newSSL(siteName,domains){
 	var force = '';
 	if($("#checkDomain").prop("checked")) force = '&force=true';
 	var email = $("input[name='admin_email']").val();
-	$.post('site?action=CreateLet','siteName='+siteName+'&domains='+domains+'&updateOf=1&email='+email + force,function(rdata){
+	$.post('/site/create_let','siteName='+siteName+'&domains='+domains+'&updateOf=1&email='+email + force,function(rdata){
 		layer.close(loadT)
 		if(rdata.status){
 			var mykeyhtml = '<div class="myKeyCon ptb15"><div class="ssl-con-key pull-left mr20">'+lan.site.ssl_key+'<br><textarea id="key" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.key+'</textarea></div>'
@@ -1919,7 +1921,7 @@ function newSSL(siteName,domains){
 					+ '<ul class="help-info-text c7 pull-left"><li>'+lan.site.ssl_help_2+'</li><li>'+lan.site.ssl_help_3+'</li></ul>';
 			$(".btssl").html(mykeyhtml);
 			layer.msg(rdata.msg,{icon:rdata.status?1:2});
-			setCookie('letssl',1);
+			// setCookie('letssl',1);
 			return;
 		}
 		
@@ -1932,10 +1934,10 @@ function newSSL(siteName,domains){
 		data = "<p>"+rdata.msg+"</p><hr />"
 		if(rdata.err[0].length > 10) data += '<p style="color:red;">' + rdata.err[0].replace(/\n/g,'<br>') + '</p>';
 		if(rdata.err[1].length > 10) data += '<p style="color:red;">' + rdata.err[1].replace(/\n/g,'<br>') + '</p>';
-		setCookie('letssl',0);
+		// setCookie('letssl',0);
 		layer.msg(data,{icon:2,area:'500px',time:0,shade:0.3,shadeClose:true});
 		
-	});
+	},'json');
 }
 
 //保存SSL
@@ -1947,7 +1949,7 @@ function SaveSSL(siteName){
 		if(rdata.status){
 			layer.msg(rdata.msg,{icon:1});
 			$(".ssl-btn").find(".btn-default").remove();
-			$(".ssl-btn").append("<button class='btn btn-default btn-sm' onclick=\"OcSSL('CloseSSLConf','"+siteName+"')\" style='margin-left:10px'>"+lan.site.ssl_close+"</button>");
+			$(".ssl-btn").append("<button class='btn btn-default btn-sm' onclick=\"ocSSL('CloseSSLConf','"+siteName+"')\" style='margin-left:10px'>"+lan.site.ssl_close+"</button>");
 		}else{
 			layer.msg(rdata.msg,{icon:2,time:0,shade:0.3,shadeClose:true});
 		}
