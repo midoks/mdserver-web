@@ -82,6 +82,133 @@ class site_api:
             data['email'] = ''
         return public.returnJson(True, 'OK', data)
 
+    def getSslApi(self):
+        siteName = request.form.get('siteName', '').encode('utf-8')
+        path = '/etc/letsencrypt/live/' + siteName
+        csrpath = path + "/fullchain.pem"  # 生成证书路径
+        keypath = path + "/privkey.pem"  # 密钥文件路径
+        key = public.readFile(keypath)
+        csr = public.readFile(csrpath)
+
+        file = self.getHostConf(siteName)
+        conf = public.readFile(file)
+
+        keyText = 'ssl_certificate'
+        status = True
+        if(conf.find(keyText) == -1):
+            status = False
+            type = -1
+
+        toHttps = self.isToHttps(siteName)
+        id = public.M('sites').where("name=?", (siteName,)).getField('id')
+        domains = public.M('domain').where(
+            "pid=?", (id,)).field('name').select()
+        data = {'status': status, 'domain': domains, 'key': key,
+                'csr': csr, 'type': type, 'httpTohttps': toHttps}
+        return public.returnJson(True, 'OK', data)
+
+    def createLetApi(self):
+        siteName = request.form.get('siteName', '').encode('utf-8')
+        updateOf = request.form.get('updateOf', '')
+        domains = request.form.get('domains', '').encode('utf-8')
+        force = request.form.get('force', '').encode('utf-8')
+        renew = request.form.get('renew', '').encode('utf-8')
+        email_args = request.form.get('email', '').encode('utf-8')
+
+        domains = json.loads(domains)
+        email = public.M('users').getField('email')
+        if email_args.strip() != '':
+            public.M('users').setField('email', email_args)
+            email = email_args
+
+        if not len(domains):
+            return public.returnJson(False, '请选择域名')
+
+        file = self.getHostConf(siteName)
+        if os.path.exists(file):
+            siteConf = public.readFile(file)
+            if siteConf.find('301-START') != -1:
+                return public.returnJson(False, '检测到您的站点做了301重定向设置，请先关闭重定向!')
+
+        path = '/etc/letsencrypt/live/' + siteName
+        csrpath = path + "/fullchain.pem"  # 生成证书路径
+        keypath = path + "/privkey.pem"  # 密钥文件路径
+
+        actionstr = updateOf
+        siteInfo = public.M('sites').where(
+            'name=?', (siteName,)).field('id,name,path').find()
+        # runPath = self.getRunPath(get)
+        srcPath = siteInfo['path']
+        # if runPath != False and runPath != '/':
+        #     siteInfo['path'] += runPath
+        # path = siteInfo['path']
+
+        # 检测acem是否安装
+        if public.isAppleSystem():
+            user = public.execShell(
+                "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
+            acem = '/Users/' + user + '/.acme.sh/acme.sh'
+        else:
+            acem = '/root/.acme.sh/acme.sh'
+        if not os.path.exists(acem):
+            acem = '/.acme.sh/acme.sh'
+        if not os.path.exists(acem):
+            try:
+                public.execShell("curl -sS curl https://get.acme.sh | sh")
+            except:
+                return public.returnJson(False, '尝试自动安装ACME失败,请通过以下命令尝试手动安装<p>安装命令: curl https://get.acme.sh | sh</p>' + acem)
+        if not os.path.exists(acem):
+            return public.returnJson(False, '尝试自动安装ACME失败,请通过以下命令尝试手动安装<p>安装命令: curl https://get.acme.sh | sh</p>' + acem)
+
+        force_bool = False
+        if force == 'true':
+            force_bool = True
+
+        if renew == 'true':
+            execStr = acem + " --renew --yes-I-know-dns-manual-mode-enough-go-ahead-please"
+        else:
+            execStr = acem + " --issue --force"
+
+        # 确定主域名顺序
+        domainsTmp = []
+        if siteName in domains:
+            domainsTmp.append(siteName)
+        for domainTmp in domains:
+            if domainTmp == siteName:
+                continue
+            domainsTmp.append(domainTmp)
+        domains = domainsTmp
+
+        home_path = public.getServerDir() + '/openresty/nginx/conf/cert/' + \
+            domains[0]
+        home_cert = home_path + '/fullchain.cer'
+        home_key = home_path + '/' + domains[0] + '.key'
+
+        domainCount = 0
+        for domain in domains:
+            if public.checkIp(domain):
+                continue
+            if domain.find('*.') != -1:
+                return public.returnJson(False, '泛域名不能使用【文件验证】的方式申请证书!')
+            if public.M('domain').where('name=?', (domain,)).count():
+                p = siteInfo['path']
+            else:
+                p = public.M('binding').where(
+                    'domain=?', (domain,)).getField('path')
+            path = p
+            execStr += ' -w ' + path
+            execStr += ' -d ' + domain
+            domainCount += 1
+        if domainCount == 0:
+            return public.returnJson(False, '请选择域名(不包括IP地址与泛域名)!')
+        print execStr
+
+        cmd = 'export ACCOUNT_EMAIL=' + email + ' && ' + execStr
+        # result = public.execShell(cmd)
+        print domains
+        print file
+        return public.returnJson(True, 'OK')
+
     def getIndexApi(self):
         sid = request.form.get('id', '').encode('utf-8')
         data = {}
@@ -239,7 +366,7 @@ class site_api:
         if domain_count == 1:
             return public.returnJson(False, '最后一个域名不能删除!')
 
-        file = self.setupPath + '/openresty/nginx/conf/vhost/' + webname + '.conf'
+        file = getHostConf(webname)
         conf = public.readFile(file)
         if conf:
             # 删除域名
@@ -540,6 +667,17 @@ class site_api:
                 data.append(tmp)
 
         return public.getJson(data)
+
+    # 是否跳转到https
+    def isToHttps(self, siteName):
+        file = self.getHostConf(siteName)
+        conf = public.readFile(file)
+        if conf:
+            if conf.find('HTTP_TO_HTTPS_START') != -1:
+                return True
+            if conf.find('$server_port !~ 443') != -1:
+                return True
+        return False
 
     def getRewriteList(self):
         rewriteList = {}
