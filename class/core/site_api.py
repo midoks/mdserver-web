@@ -240,10 +240,10 @@ class site_api:
             return public.getJson(data)
 
         if not os.path.exists(letpath):
-            public.ExecShell("mkdir -p " + letpath)
-        public.ExecShell("ln -sf \"" + home_cert + "\" \"" + csrpath + '"')
-        public.ExecShell("ln -sf \"" + home_key + "\" \"" + keypath + '"')
-        public.ExecShell('echo "let" > "' + letpath + '/README"')
+            public.execShell("mkdir -p " + letpath)
+        public.execShell("ln -sf \"" + home_cert + "\" \"" + csrpath + '"')
+        public.execShell("ln -sf \"" + home_key + "\" \"" + keypath + '"')
+        public.execShell('echo "let" > "' + letpath + '/README"')
         if(actionstr == '2'):
             return public.returnJson(True, '证书已更新!')
 
