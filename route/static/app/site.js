@@ -1564,32 +1564,42 @@ function setSSL(id,siteName){
 	// 	}
 	// });
 }
+
+
 //关闭SSL
-function closeSSL(siteName){
-	var loadT = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});
-	$.post('site?action=GetSSL','siteName='+siteName,function(rdata){
-		layer.close(loadT);
-		switch(rdata.type){
-			case -1:
-				var txt = "<div class='mtb15' style='line-height:30px'>"+lan.site.ssl_help_1+"</div>";
-				setCookie('letssl',0);
-				$(".tab-con").html(txt);
-				break;
-			case 1:
-				var txt = "Let's Encrypt";
-				closeSSLHTML(txt,siteName);
-				break;
-			case 0:
-				var txt = lan.site.other;
-				closeSSLHTML(txt,siteName);
-				break;
-			case 2:
-				var txt = lan.site.bt_ssl;
-				closeSSLHTML(txt,siteName);
-				break;
-		}
-	})
+function closeSSL(siteName){	
+	var txt = "<div class='mtb15' style='line-height:30px'>本站点未设置SSL，如需设置SSL，请选择切换类目申请开启SSL<br/>\
+				<p style='color:red;'>关闭SSL以后,请务必清除浏览器缓存再访问站点</p>\
+			</div>";
+	setCookie('letssl',0);
+	$(".tab-con").html(txt);
 }
+
+// function closeSSL(siteName){
+// 	var loadT = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});
+// 	$.post('site?action=GetSSL','siteName='+siteName,function(rdata){
+// 		layer.close(loadT);
+// 		switch(rdata.type){
+// 			case -1:
+// 				var txt = "<div class='mtb15' style='line-height:30px'>"+lan.site.ssl_help_1+"</div>";
+// 				setCookie('letssl',0);
+// 				$(".tab-con").html(txt);
+// 				break;
+// 			case 1:
+// 				var txt = "Let's Encrypt";
+// 				closeSSLHTML(txt,siteName);
+// 				break;
+// 			case 0:
+// 				var txt = lan.site.other;
+// 				closeSSLHTML(txt,siteName);
+// 				break;
+// 			case 2:
+// 				var txt = lan.site.bt_ssl;
+// 				closeSSLHTML(txt,siteName);
+// 				break;
+// 		}
+// 	});
+// }
 
 //设置httpToHttps
 function httpToHttps(siteName){
@@ -1619,11 +1629,6 @@ function opSSL(type,id,siteName){
 		  + '<div class="btssllist mtb15"><div class="divtable"><div id="btssl_table_list" style="max-height:205px;border:#ddd 1px solid;overflow:auto"><table class="table table-hover" style="border:none"><thead><tr><th>域名</th><th>到期时间</th><th>状态<a href="https://www.bt.cn/bbs/thread-7860-1-1.html" class="bt-ico-ask" title="查看说明" target="_blank">?</a></th><th class="text-right" width="120">操作</th></tr></thead><tbody id="ssllist"></tbody></table></div></div></div>'
 		  + '<ul class="help-info-text c7 ptb15"><li>'+lan.site.bt_ssl_help_5+'(包括根域名)</li><li>'+lan.site.bt_ssl_help_6+'</li><li>'+lan.site.bt_ssl_help_7+'</li><li>建议使用二级域名为www的域名申请证书,此时系统会默认赠送顶级域名为可选名称</li><li>在未指定SSL默认站点时,未开启SSL的站点使用HTTPS会直接访问到已开启SSL的站点</li></ul>'
 		  + '</div>';
-	
-	// var lets =  '<div class="btssl"><div class="label-input-group" style="margin-left: 110px;margin-top: 10px;"><input type="checkbox" name="checkDomain" id="checkDomain" checked=""><label class="mr20" for="checkDomain" style="font-weight:normal">提前校验域名(提前发现问题,减少失败率)</label></div><div class="line mtb15"><span class="tname text-center">管理员邮箱</span><input class="bt-input-text" style="width:240px;" type="text" name="admin_email" /></div><div class="line mtb15"><span class="tname text-center">'+lan.site.domain+'</span><ul id="ymlist" style="padding: 5px 10px;max-height:180px;overflow:auto; width:240px;border:#ccc 1px solid;border-radius:3px"></ul></div>'
-	// 		  + '<div class="line mtb15" style="margin-left:80px"><button class="btn btn-success btn-sm letsApply">'+lan.site.btapply+'</button></div>'
-	// 		  + '<ul class="help-info-text c7 ptb15"><li>'+lan.site.bt_ssl_help_5+'</li><li>'+lan.site.bt_ssl_help_8+'</li><li>'+lan.site.bt_ssl_help_9+'</li><li>在未指定SSL默认站点时,未开启SSL的站点使用HTTPS会直接访问到已开启SSL的站点</li></ul>'
-	// 		  + '</div>';
 
 	var lets =  '<div class="btssl"><div class="label-input-group">'
 			  + '<div class="line mtb10"><form><span class="tname text-center">验证方式</span><div style="margin-top:7px;display:inline-block"><input type="radio" name="c_type" onclick="file_check()" id="check_file" checked="checked" /><label class="mr20" for="check_file" style="font-weight:normal">文件验证</label><input type="radio" onclick="dns_check()" name="c_type" id="check_dns" /><label class="mr20" for="check_dns" style="font-weight:normal">DNS验证</label></div></form></div>'

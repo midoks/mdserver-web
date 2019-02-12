@@ -22,6 +22,8 @@ class site_api:
     setupPath = None  # 安装路径
     isWriteLogs = None  # 是否写日志
 
+    sslDir = None
+
     def __init__(self):
         self.setupPath = public.getServerDir()
         path = self.setupPath + '/openresty/nginx/conf/vhost'
@@ -31,9 +33,22 @@ class site_api:
         if not os.path.exists(path):
             public.execShell("mkdir -p " + path + " && chmod -R 755 " + path)
 
+        self.sslDir = public.getServerDir() + '/letsencrypt'
+
     ##### ----- start ----- ###
     def listApi(self):
-        return self.list()
+        _list = public.M('sites').where('', ()).field(
+            'id,name,path,status,ps,addtime,edate').limit('0,5').order('id desc').select()
+        _ret = {}
+        _ret['data'] = _list
+
+        count = public.M('sites').where('', ()).count()
+        _page = {}
+        _page['count'] = count
+        _page['tojs'] = 'getWeb'
+
+        _ret['page'] = public.getPage(_page)
+        return public.getJson(_ret)
 
     def getPhpVersionApi(self):
         return self.getPhpVersion()
@@ -130,7 +145,7 @@ class site_api:
             if siteConf.find('301-START') != -1:
                 return public.returnJson(False, '检测到您的站点做了301重定向设置，请先关闭重定向!')
 
-        letpath = '/etc/letsencrypt/live/' + siteName
+        letpath = public.getServerDir() + '/letsencrypt/live/' + siteName
         csrpath = letpath + "/fullchain.pem"  # 生成证书路径
         keypath = letpath + "/privkey.pem"  # 密钥文件路径
 
@@ -212,10 +227,10 @@ class site_api:
                 home_cert = home_path + '/fullchain.cer'
                 home_key = home_path + '/' + domains[0] + '.key'
 
+        print home_cert
+
         cmd = 'export ACCOUNT_EMAIL=' + email + ' && ' + execStr
         result = public.execShell(cmd)
-
-        print home_cert
 
         if not os.path.exists(home_cert.replace("\*", "*")):
             data = {}
@@ -253,11 +268,6 @@ class site_api:
         result['key'] = public.readFile(keypath)
         public.restartWeb()
 
-        print execStr
-        print domains
-        print file
-        print result[0]
-        print result[1]
         return public.getJson(True, 'OK')
 
     def getIndexApi(self):
@@ -506,20 +516,6 @@ class site_api:
 
     def getIndexConf(self):
         return public.getServerDir() + '/openresty/nginx/conf/nginx.conf'
-
-    def list(self):
-        _list = public.M('sites').where('', ()).field(
-            'id,name,path,status,ps,addtime,edate').limit('0,5').order('id desc').select()
-        _ret = {}
-        _ret['data'] = _list
-
-        count = public.M('sites').where('', ()).count()
-        _page = {}
-        _page['count'] = count
-        _page['tojs'] = 'getWeb'
-
-        _ret['page'] = public.getPage(_page)
-        return public.getJson(_ret)
 
     def getDomain(self, pid):
         _list = public.M('domain').where("pid=?", (pid,)).field(
