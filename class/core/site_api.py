@@ -130,18 +130,15 @@ class site_api:
             if siteConf.find('301-START') != -1:
                 return public.returnJson(False, '检测到您的站点做了301重定向设置，请先关闭重定向!')
 
-        path = '/etc/letsencrypt/live/' + siteName
-        csrpath = path + "/fullchain.pem"  # 生成证书路径
-        keypath = path + "/privkey.pem"  # 密钥文件路径
+        letpath = '/etc/letsencrypt/live/' + siteName
+        csrpath = letpath + "/fullchain.pem"  # 生成证书路径
+        keypath = letpath + "/privkey.pem"  # 密钥文件路径
 
         actionstr = updateOf
         siteInfo = public.M('sites').where(
             'name=?', (siteName,)).field('id,name,path').find()
-        # runPath = self.getRunPath(get)
+        path = self.getSitePath(siteName)
         srcPath = siteInfo['path']
-        # if runPath != False and runPath != '/':
-        #     siteInfo['path'] += runPath
-        # path = siteInfo['path']
 
         # 检测acem是否安装
         if public.isAppleSystem():
@@ -179,35 +176,89 @@ class site_api:
             domainsTmp.append(domainTmp)
         domains = domainsTmp
 
-        home_path = public.getServerDir() + '/openresty/nginx/conf/cert/' + \
-            domains[0]
-        home_cert = home_path + '/fullchain.cer'
-        home_key = home_path + '/' + domains[0] + '.key'
-
         domainCount = 0
         for domain in domains:
             if public.checkIp(domain):
                 continue
             if domain.find('*.') != -1:
                 return public.returnJson(False, '泛域名不能使用【文件验证】的方式申请证书!')
-            if public.M('domain').where('name=?', (domain,)).count():
-                p = siteInfo['path']
-            else:
-                p = public.M('binding').where(
-                    'domain=?', (domain,)).getField('path')
-            path = p
             execStr += ' -w ' + path
             execStr += ' -d ' + domain
             domainCount += 1
         if domainCount == 0:
             return public.returnJson(False, '请选择域名(不包括IP地址与泛域名)!')
-        print execStr
+
+        home_path = public.getServerDir() + '/openresty/nginx/conf/cert/' + \
+            domains[0]
+        home_cert = home_path + '/fullchain.cer'
+        home_key = home_path + '/' + domains[0] + '.key'
+
+        if not os.path.exists(home_cert):
+            home_path = '/.acme.sh/' + domains[0]
+            home_cert = home_path + '/fullchain.cer'
+            home_key = home_path + '/' + domains[0] + '.key'
+
+        if not os.path.exists(home_cert):
+            home_path = '/root/.acme.sh/' + domains[0]
+            home_cert = home_path + '/fullchain.cer'
+            home_key = home_path + '/' + domains[0] + '.key'
+
+        if public.isAppleSystem():
+            user = public.execShell(
+                "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
+            acem = '/Users/' + user + '/.acme.sh/'
+            if not os.path.exists(home_cert):
+                home_path = acem + domains[0]
+                home_cert = home_path + '/fullchain.cer'
+                home_key = home_path + '/' + domains[0] + '.key'
 
         cmd = 'export ACCOUNT_EMAIL=' + email + ' && ' + execStr
-        # result = public.execShell(cmd)
+        result = public.execShell(cmd)
+
+        print home_cert
+
+        if not os.path.exists(home_cert.replace("\*", "*")):
+            data = {}
+            data['err'] = result
+            data['out'] = result[0]
+            data['msg'] = '签发失败,我们无法验证您的域名:<p>1、检查域名是否绑定到对应站点</p>\
+                <p>2、检查域名是否正确解析到本服务器,或解析还未完全生效</p>\
+                <p>3、如果您的站点设置了反向代理,或使用了CDN,请先将其关闭</p>\
+                <p>4、如果您的站点设置了301重定向,请先将其关闭</p>\
+                <p>5、如果以上检查都确认没有问题，请尝试更换DNS服务商</p>'
+            data['result'] = {}
+            if result[1].find('new-authz error:') != -1:
+                data['result'] = json.loads(
+                    re.search("{.+}", result[1]).group())
+                if data['result']['status'] == 429:
+                    data['msg'] = '签发失败,您尝试申请证书的失败次数已达上限!<p>1、检查域名是否绑定到对应站点</p>\
+                        <p>2、检查域名是否正确解析到本服务器,或解析还未完全生效</p>\
+                        <p>3、如果您的站点设置了反向代理,或使用了CDN,请先将其关闭</p>\
+                        <p>4、如果您的站点设置了301重定向,请先将其关闭</p>\
+                        <p>5、如果以上检查都确认没有问题，请尝试更换DNS服务商</p>'
+            data['status'] = False
+            return public.getJson(data)
+
+        if not os.path.exists(letpath):
+            public.ExecShell("mkdir -p " + letpath)
+        public.ExecShell("ln -sf \"" + home_cert + "\" \"" + csrpath + '"')
+        public.ExecShell("ln -sf \"" + home_key + "\" \"" + keypath + '"')
+        public.ExecShell('echo "let" > "' + letpath + '/README"')
+        if(actionstr == '2'):
+            return public.returnJson(True, '证书已更新!')
+
+        # 写入配置文件
+        # result = self.SetSSLConf(get)
+        result['csr'] = public.readFile(csrpath)
+        result['key'] = public.readFile(keypath)
+        public.restartWeb()
+
+        print execStr
         print domains
         print file
-        return public.returnJson(True, 'OK')
+        print result[0]
+        print result[1]
+        return public.getJson(True, 'OK')
 
     def getIndexApi(self):
         sid = request.form.get('id', '').encode('utf-8')
@@ -437,6 +488,15 @@ class site_api:
         if path[-1] == '/':
             return path[0:-1]
         return path
+
+    def getSitePath(self, siteName):
+        file = self.getHostConf(siteName)
+        if os.path.exists(file):
+            conf = public.readFile(file)
+            rep = '\s*root\s*(.+);'
+            path = re.search(rep, conf).groups()[0]
+            return path
+        return ''
 
     def getHostConf(self, siteName):
         return public.getServerDir() + '/openresty/nginx/conf/vhost/' + siteName + '.conf'
