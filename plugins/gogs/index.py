@@ -81,17 +81,19 @@ def status():
 
 
 def contentReplace(content):
-    user = public.execShell(
-        "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
+    user = 'root'
+    if public.isAppleSystem():
+        user = public.execShell(
+            "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
+        content = content.replace('{$HOME_DIR}', '/Users/' + user)
+    else:
+        content = content.replace('{$HOME_DIR}', '/root')
+
     service_path = public.getServerDir()
     content = content.replace('{$ROOT_PATH}', public.getRootDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$RUN_USER}', user)
 
-    if public.isAppleSystem():
-        content = content.replace('{$HOME_DIR}', '/Users/' + user)
-    else:
-        content = content.replace('{$HOME_DIR}', '/root')
     return content
 
 
