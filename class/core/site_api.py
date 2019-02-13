@@ -33,7 +33,10 @@ class site_api:
         if not os.path.exists(path):
             public.execShell("mkdir -p " + path + " && chmod -R 755 " + path)
 
-        self.sslDir = public.getServerDir() + '/letsencrypt'
+        if public.isAppleSystem():
+            self.sslDir = public.getServerDir() + '/letsencrypt/'
+        else:
+            self.sslDir = '/etc/letsencrypt/live/'
 
     ##### ----- start ----- ###
     def listApi(self):
@@ -97,9 +100,29 @@ class site_api:
             data['email'] = ''
         return public.returnJson(True, 'OK', data)
 
+    def getCertListApi(self):
+        try:
+            vpath = self.sslDir
+            if not os.path.exists(vpath):
+                os.system('mkdir -p ' + vpath)
+            data = []
+            for d in os.listdir(vpath):
+                mpath = vpath + '/' + d + '/info.json'
+                if not os.path.exists(mpath):
+                    continue
+                tmp = public.readFile(mpath)
+                if not tmp:
+                    continue
+                tmp1 = json.loads(tmp)
+                data.append(tmp1)
+            return public.returnJson(True, 'OK', data)
+        except:
+            return public.returnJson(True, 'OK', [])
+
     def getSslApi(self):
         siteName = request.form.get('siteName', '').encode('utf-8')
-        path = '/etc/letsencrypt/live/' + siteName
+
+        path = self.sslDir + siteName
         csrpath = path + "/fullchain.pem"  # 生成证书路径
         keypath = path + "/privkey.pem"  # 密钥文件路径
         key = public.readFile(keypath)
@@ -110,16 +133,17 @@ class site_api:
 
         keyText = 'ssl_certificate'
         status = True
+        stype = 0
         if(conf.find(keyText) == -1):
             status = False
-            type = -1
+            stype = -1
 
         toHttps = self.isToHttps(siteName)
         id = public.M('sites').where("name=?", (siteName,)).getField('id')
         domains = public.M('domain').where(
             "pid=?", (id,)).field('name').select()
         data = {'status': status, 'domain': domains, 'key': key,
-                'csr': csr, 'type': type, 'httpTohttps': toHttps}
+                'csr': csr, 'type': stype, 'httpTohttps': toHttps}
         return public.returnJson(True, 'OK', data)
 
     def setSslApi(self):
@@ -127,7 +151,7 @@ class site_api:
         key = request.form.get('key', '').encode('utf-8')
         csr = request.form.get('csr', '').encode('utf-8')
 
-        path = '/etc/letsencrypt/live/' + siteName
+        path = self.sslDir + siteName
         if not os.path.exists(path):
             public.execShell('mkdir -p ' + path)
 
@@ -165,18 +189,17 @@ class site_api:
 
         # 写入配置文件
         result = self.setSslConf(siteName)
+        print result['msg']
         if not result['status']:
             return public.getJson(result)
-        isError = public.checkWebConfig()
 
+        isError = public.checkWebConfig()
         if(type(isError) == str):
             public.execShell('\\cp -a /tmp/backup1.conf ' + keypath)
             public.execShell('\\cp -a /tmp/backup2.conf ' + csrpath)
             return public.returnJson(False, 'ERROR: <br><a style="color:red;">' + isError.replace("\n", '<br>') + '</a>')
 
         public.restartWeb()
-        if os.path.exists(path + '/partnerOrderId'):
-            os.system('rm -f ' + path + '/partnerOrderId')
         public.writeLog('TYPE_SITE', '证书已保存!')
         return public.returnJson(True, '证书已保存!')
 
@@ -939,18 +962,20 @@ location /{
         file = self.getHostConf(siteName)
         conf = public.readFile(file)
 
+        keyPath = self.sslDir + siteName + '/privkey.pem'
+        certPath = self.sslDir + siteName + '/fullchain.pem'
         if conf:
             if conf.find('ssl_certificate') == -1:
                 sslStr = """#error_page 404/404.html;
-    ssl_certificate    /etc/letsencrypt/live/%s/fullchain.pem;
-    ssl_certificate_key    /etc/letsencrypt/live/%s/privkey.pem;
+    ssl_certificate    %s;
+    ssl_certificate_key  %s;
     ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
     ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:HIGH:!aNULL:!MD5:!RC4:!DHE;
     ssl_prefer_server_ciphers on;
     ssl_session_cache shared:SSL:10m;
     ssl_session_timeout 10m;
     error_page 497  https://$host$request_uri;
-""" % (siteName, siteName)
+""" % (certPath, keyPath)
             if(conf.find('ssl_certificate') != -1):
                 return public.returnData(True, 'SSL开启成功!')
 
@@ -971,29 +996,28 @@ location /{
                 return public.returnData(False, '证书错误: <br><a style="color:red;">' + isError.replace("\n", '<br>') + '</a>')
 
         public.restartWeb()
-        keyPath = '/etc/letsencrypt/live/' + siteName + '/privkey.pem'
-        certPath = '/etc/letsencrypt/live/' + siteName + '/fullchain.pem'
         self.saveCert(keyPath, certPath)
+
         msg = public.getInfo('网站[{1}]开启SSL成功!', siteName)
         public.writeLog('TYPE_SITE', msg)
         return public.returnData(True, 'SSL开启成功!')
 
     def saveCert(self, keyPath, certPath):
         try:
-            certInfo = self.getCertName(get)
+            certInfo = self.getCertName(certPath)
             if not certInfo:
-                return public.returnJson(False, '证书解析失败!')
-            vpath = self.sslDir + '/' + certInfo['subject']
+                return public.returnData(False, '证书解析失败!')
+            vpath = self.sslDir + certInfo['subject']
             if not os.path.exists(vpath):
                 os.system('mkdir -p ' + vpath)
             public.writeFile(vpath + '/privkey.pem',
-                             public.readFile(get.keyPath))
+                             public.readFile(keyPath))
             public.writeFile(vpath + '/fullchain.pem',
-                             public.readFile(get.certPath))
+                             public.readFile(certPath))
             public.writeFile(vpath + '/info.json', json.dumps(certInfo))
-            return public.returnJson(True, '证书保存成功!')
-        except:
-            return public.returnJson(False, '证书保存失败!')
+            return public.returnData(True, '证书保存成功!')
+        except Exception as e:
+            return public.returnData(False, '证书保存失败!')
 
     # 获取证书名称
     def getCertName(self, certPath):

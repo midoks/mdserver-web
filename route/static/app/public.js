@@ -44,6 +44,16 @@ function getRandomString(len) {
 	return pwd;
 }
 
+//验证IP地址
+function isValidIP(ip) {
+    var reg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
+    return reg.test(ip);
+}
+
+function isContains(str, substr) {
+    return str.indexOf(substr) >= 0;
+}
+
 function msgTpl(msg, args){
 	if (typeof args == 'string'){
 		return msg.replace('{1}', args);

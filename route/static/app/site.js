@@ -1464,18 +1464,11 @@ function To301(siteName,type){
 	});
 }
 
-//验证IP地址
-function isValidIP(ip) {
-    var reg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
-    return reg.test(ip);
-}
-function isContains(str, substr) {
-    return str.indexOf(substr) >= 0;
-}
+
 //证书夹
 function ssl_admin(siteName){
 	var loadT = layer.msg('正在提交任务...',{icon:16,time:0,shade: [0.3, '#000']});
-	$.get('/ssl/get_cert_list',function(data){
+	$.get('/site/get_cert_list',function(data){
 		layer.close(loadT);
 		var rdata = data['data'];
 		var tbody = '';
@@ -1875,8 +1868,8 @@ function VerifyDomain(partnerOrderId,siteName){
 
 //开启与关闭SSL
 function ocSSL(action,siteName){
-	var loadT = layer.msg(lan.site.get_ssl_list,{icon:16,time:0,shade: [0.3, '#000']});
-	$.post("site?action="+action,'siteName='+siteName+'&updateOf=1',function(rdata){
+	var loadT = layer.msg('正在获取证书列表，请稍后..',{icon:16,time:0,shade: [0.3, '#000']});
+	$.post("/site/"+action,'siteName='+siteName+'&updateOf=1',function(rdata){
 		layer.close(loadT)
 		
 		if(!rdata.status){
@@ -1902,13 +1895,13 @@ function ocSSL(action,siteName){
 		$.post('/system?action=ServiceAdmin','name='+getCookie('serverType')+'&type=reload',function(result){
 			//setSSL(siteName);
 			if(!result.status) layer.msg(result.msg,{icon:2});
-		});
+		},'json');
 		layer.msg(rdata.msg,{icon:rdata.status?1:2});
 		if(action == 'CloseSSLConf'){
 			layer.msg(lan.site.ssl_close_info,{icon:1,time:5000});
 		}
 		$(".bt-w-menu .bgw").click();
-	})
+	},'json');
 }
 
 //生成SSL
