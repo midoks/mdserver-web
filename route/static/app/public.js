@@ -339,7 +339,7 @@ function setCookie(a, c) {
 	var b = 30;
 	var d = new Date();
 	d.setTime(d.getTime() + b * 24 * 60 * 60 * 1000);
-	document.cookie = a + "=" + escape(c) + ";expires=" + d.toGMTString()
+	document.cookie = a + "=" + escape(c) + ";path=/;expires=" + d.toGMTString();
 }
 
 function getCookie(b) {

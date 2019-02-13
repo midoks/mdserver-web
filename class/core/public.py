@@ -287,22 +287,12 @@ def writeLog(type, logMsg, args=()):
         import time
         import db
         import json
-        logMessage = json.loads(
-            readFile('static/language/' + getLanguage() + '/log.json'))
-        keys = logMessage.keys()
-        if logMsg in keys:
-            logMsg = logMessage[logMsg]
-            for i in range(len(args)):
-                rep = '{' + str(i + 1) + '}'
-                logMsg = logMsg.replace(rep, args[i])
-        if type in keys:
-            type = logMessage[type]
         sql = db.Sql()
         mDate = time.strftime('%Y-%m-%d %X', time.localtime())
         data = (type, logMsg, mDate)
         result = sql.table('logs').add('type,log,addtime', data)
-    except:
-        pass
+    except Exception as e:
+        print e
 
 
 def writeFile(filename, str):

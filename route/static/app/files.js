@@ -13,7 +13,7 @@ function isDiskWidth(){
 }
 
 //打开回收站
-function recycle_bin(type){
+function recycleBin(type){
 	$.post('/files?action=Get_Recycle_bin','',function(rdata){
 		var body = ''
 		switch(type){
@@ -199,12 +199,12 @@ function recycle_bin(type){
 				</div>\
 				<div class="re-con">\
 					<div class="re-con-menu">\
-						<p class="on" onclick="Recycle_bin(1)">'+lan.files.recycle_bin_type1+'</p>\
-						<p onclick="Recycle_bin(2)">'+lan.files.recycle_bin_type2+'</p>\
-						<p onclick="Recycle_bin(3)">'+lan.files.recycle_bin_type3+'</p>\
-						<p onclick="Recycle_bin(4)">'+lan.files.recycle_bin_type4+'</p>\
-						<p onclick="Recycle_bin(5)">'+lan.files.recycle_bin_type5+'</p>\
-						<p onclick="Recycle_bin(6)">'+lan.files.recycle_bin_type6+'</p>\
+						<p class="on" onclick="recycleBin(1)">全部</p>\
+						<p onclick="recycleBin(2)">文件夹</p>\
+						<p onclick="recycleBin(3)">'+lan.files.recycle_bin_type3+'</p>\
+						<p onclick="recycleBin(4)">'+lan.files.recycle_bin_type4+'</p>\
+						<p onclick="recycleBin(5)">'+lan.files.recycle_bin_type5+'</p>\
+						<p onclick="recycleBin(6)">'+lan.files.recycle_bin_type6+'</p>\
 					</div>\
 					<div class="re-con-con">\
 					<div style="margin: 15px;" class="divtable">\
@@ -231,10 +231,10 @@ function recycle_bin(type){
 			});
 			
 			if(window.location.href.indexOf("database") != -1){
-				Recycle_bin(6);
+				recycleBin(6);
 				$(".re-con-menu p:last-child").addClass("on").siblings().removeClass("on");
 			}else{
-				Recycle_bin(1);
+				recycleBin(1);
 			}
 		}
 		$(".re-con-menu p").click(function(){
@@ -263,7 +263,7 @@ function reisImage(fileName){
 function reRecycleBin(path,obj){
 	layer.confirm(lan.files.recycle_bin_re_msg,{title:lan.files.recycle_bin_re_title,closeBtn:2,icon:3},function(){
 		var loadT = layer.msg(lan.files.recycle_bin_re_the,{icon:16,time:0,shade: [0.3, '#000']});
-		$.post('/files?action=Re_Recycle_bin','path='+encodeURIComponent(path),function(rdata){
+		$.post('/files?action=Re_recycleBin','path='+encodeURIComponent(path),function(rdata){
 			layer.close(loadT);
 			layer.msg(rdata.msg,{icon:rdata.status?1:5});
 			$(obj).parents('tr').remove();
@@ -309,7 +309,7 @@ function Set_Recycle_bin(db){
 	$.post('/files?action=Recycle_bin',data,function(rdata){
 		layer.close(loadT);
 		layer.msg(rdata.msg,{icon:rdata.status?1:5});
-	});
+	},'json');
 }
 
 
@@ -321,19 +321,23 @@ function getFiles(Path) {
 	if(isNaN(Path)){
 		var p = '1';
 		Path = encodeURIComponent(Path);
-	}else{
-		var p = Path;
+		console.log(1,Path);
+	} else {
+		var p = '1';
 		Path = getCookie('open_dir_path');
+		console.log(2,Path);
 	}
 	console.log(Path);
 	
 	var search = '';
 	var searchV = $("#SearchValue").val();
-	if(searchV.length > 1 && searchtype == "1"){
+	if(searchV.length > 1 && searchtype == '1'){
 		search = "&search="+searchV;
 	}
 	var showRow = getCookie('showRow');
-	if(!showRow) showRow = '100';
+	if(!showRow) {
+		showRow = '100';
+	}
 	var Body = '';
 	var data = 'path=' + Path;
 	var loadT = layer.load();
@@ -366,7 +370,7 @@ function getFiles(Path) {
 				}
 			}
 			var timetext ='--';
-			if(getCookie("rank") == "a"){
+			if(getCookie('rank') == 'a'){
 					$("#set_list").addClass("active");
 					$("#set_icon").removeClass("active");
 					Body += "<tr class='folderBoxTr' data-path='" + rdata.PATH + "/" + fmp[0] + "' filetype='dir'>\
@@ -377,15 +381,14 @@ function getFiles(Path) {
 						<td>"+fmp[3]+"</td>\
 						<td>"+fmp[4]+"</td>\
 						<td class='editmenu'><span>\
-						<a class='btlink' href='javascript:;' onclick=\"CopyFile('" + rdata.PATH +"/"+ fmp[0] + "')\">"+lan.files.file_menu_copy+"</a> | \
-						<a class='btlink' href='javascript:;' onclick=\"CutFile('" + rdata.PATH +"/"+ fmp[0]+ "')\">"+lan.files.file_menu_mv+"</a> | \
-						<a class='btlink' href=\"javascript:ReName(0,'" + fmp[0] + "');\">"+lan.files.file_menu_rename+"</a> | \
-						<a class='btlink' href=\"javascript:setChmod(0,'" + rdata.PATH + "/"+fmp[0] + "');\">"+lan.files.file_menu_auth+"</a> | \
-						<a class='btlink' href=\"javascript:Zip('" + rdata.PATH +"/" +fmp[0] + "');\">"+lan.files.file_menu_zip+"</a> | \
-						<a class='btlink' href='javascript:;' onclick=\"DeleteDir('" + rdata.PATH +"/"+ fmp[0] + "')\">"+lan.files.file_menu_del+"</a></span>\
+						<a class='btlink' href='javascript:;' onclick=\"CopyFile('" + rdata.PATH +"/"+ fmp[0] + "')\">复制</a> | \
+						<a class='btlink' href='javascript:;' onclick=\"CutFile('" + rdata.PATH +"/"+ fmp[0]+ "')\">剪切</a> | \
+						<a class='btlink' href=\"javascript:ReName(0,'" + fmp[0] + "');\">重命名</a> | \
+						<a class='btlink' href=\"javascript:setChmod(0,'" + rdata.PATH + "/"+fmp[0] + "');\">权限</a> | \
+						<a class='btlink' href=\"javascript:Zip('" + rdata.PATH +"/" +fmp[0] + "');\">压缩</a> | \
+						<a class='btlink' href='javascript:;' onclick=\"DeleteDir('" + rdata.PATH +"/"+ fmp[0] + "')\">删除</a></span>\
 					</td></tr>";
-			}
-			else{
+			} else {
 				$("#set_icon").addClass("active");
 				$("#set_list").removeClass("active");
 				Body += "<div class='file folderBox menufolder' data-path='" + rdata.PATH + "/" + fmp[0] + "' filetype='dir' title='"+lan.files.file_name+"：" + fmp[0]+"&#13;"+lan.files.file_size+"：" + toSize(fmp[1])+"&#13;"+lan.files.file_etime+"："+getLocalTime(fmp[2])+"&#13;"+lan.files.file_auth+"："+fmp[3]+"&#13;"+lan.files.file_own+"："+fmp[4]+"'>\
@@ -414,12 +417,14 @@ function getFiles(Path) {
 			if(displayZip != -1){
 				bodyZip = "<a class='btlink' href='javascript:;' onclick=\"UnZip('" + rdata.PATH +"/" +fmp[0] + "'," + displayZip + ")\">"+lan.files.file_menu_unzip+"</a> | ";
 			}
+			
 			if(isText(fmp[0])){
 				bodyZip = "<a class='btlink' href='javascript:;' onclick=\"onlineEditFile(0,'" + rdata.PATH +"/"+ fmp[0] + "')\">编辑</a> | ";
 			}
+
 			if(isImage(fmp[0])){
 				download = "<a class='btlink' href='javascript:;' onclick=\"getImage('" + rdata.PATH +"/"+ fmp[0] + "')\">预览</a> | ";
-			}else{
+			} else {
 				download = "<a class='btlink' href='javascript:;' onclick=\"getFileBytes('" + rdata.PATH +"/"+ fmp[0] + "',"+fmp[1]+")\">下载</a> | ";
 			}
 			
@@ -789,7 +794,7 @@ function getDisk() {
 		for (var i = 0; i < rdata.length; i++) {
 			LBody += "<span onclick=\"getFiles('" + rdata[i].path + "')\"><span class='glyphicon glyphicon-hdd'></span>&nbsp;" + (rdata[i].path=='/'?lan.files.path_root:rdata[i].path) + "(" + rdata[i].size[2] + ")</span>";
 		}
-		var trash = '<span id="recycle_bin" onclick="Recycle_bin(\'open\')" title="回收站" style="position: absolute; border-color: #ccc; right: 77px;"><span class="glyphicon glyphicon-trash"></span>&nbsp;回收站</span>';
+		var trash = '<span id="recycle_bin" onclick="recycleBin(\'open\')" title="回收站" style="position: absolute; border-color: #ccc; right: 77px;"><span class="glyphicon glyphicon-trash"></span>&nbsp;回收站</span>';
 		$("#comlist").html(LBody+trash);
 		isDiskWidth();
 	},'json');
@@ -1003,8 +1008,7 @@ function ExecShell(action){
 			if(rdata.status){
 				$("#mExec").val('');
 				GetShellEcho();
-			}
-			else{
+			} else {
 				layer.msg(rdata.msg,{icon:rdata.status?1:2});
 			}
 			
