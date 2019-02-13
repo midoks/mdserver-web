@@ -7,7 +7,7 @@ import public
 import re
 import json
 import pwd
-
+import shutil
 sys.path.append("/usr/local/lib/python2.7/site-packages")
 import psutil
 
@@ -121,6 +121,64 @@ class site_api:
         data = {'status': status, 'domain': domains, 'key': key,
                 'csr': csr, 'type': type, 'httpTohttps': toHttps}
         return public.returnJson(True, 'OK', data)
+
+    def setSslApi(self):
+        siteName = request.form.get('siteName', '').encode('utf-8')
+        key = request.form.get('key', '').encode('utf-8')
+        csr = request.form.get('csr', '').encode('utf-8')
+
+        path = '/etc/letsencrypt/live/' + siteName
+        if not os.path.exists(path):
+            public.execShell('mkdir -p ' + path)
+
+        csrpath = path + "/fullchain.pem"  # 生成证书路径
+        keypath = path + "/privkey.pem"  # 密钥文件路径
+
+        if(key.find('KEY') == -1):
+            return public.returnJson(False, '秘钥错误，请检查!')
+        if(csr.find('CERTIFICATE') == -1):
+            return public.returnJson(False, '证书错误，请检查!')
+
+        public.writeFile('/tmp/cert.pl', csr)
+        if not public.checkCert('/tmp/cert.pl'):
+            return public.returnJson(False, '证书错误,请粘贴正确的PEM格式证书!')
+
+        public.execShell('\\cp -a ' + keypath + ' /tmp/backup1.conf')
+        public.execShell('\\cp -a ' + csrpath + ' /tmp/backup2.conf')
+
+        # 清理旧的证书链
+        if os.path.exists(path + '/README'):
+            public.execShell('rm -rf ' + path)
+            public.execShell('rm -rf ' + path + '-00*')
+            public.execShell('rm -rf /etc/letsencrypt/archive/' + siteName)
+            public.execShell(
+                'rm -rf /etc/letsencrypt/archive/' + siteName + '-00*')
+            public.execShell(
+                'rm -f /etc/letsencrypt/renewal/' + siteName + '.conf')
+            public.execShell('rm -f /etc/letsencrypt/renewal/' +
+                             siteName + '-00*.conf')
+            public.execShell('rm -f ' + path + '/README')
+            public.execShell('mkdir -p ' + path)
+
+        public.writeFile(keypath, key)
+        public.writeFile(csrpath, csr)
+
+        # 写入配置文件
+        result = self.setSslConf(siteName)
+        if not result['status']:
+            return public.getJson(result)
+        isError = public.checkWebConfig()
+
+        if(type(isError) == str):
+            public.execShell('\\cp -a /tmp/backup1.conf ' + keypath)
+            public.execShell('\\cp -a /tmp/backup2.conf ' + csrpath)
+            return public.returnJson(False, 'ERROR: <br><a style="color:red;">' + isError.replace("\n", '<br>') + '</a>')
+
+        public.restartWeb()
+        if os.path.exists(path + '/partnerOrderId'):
+            os.system('rm -f ' + path + '/partnerOrderId')
+        public.writeLog('TYPE_SITE', '证书已保存!')
+        return public.returnJson(True, '证书已保存!')
 
     def createLetApi(self):
         siteName = request.form.get('siteName', '').encode('utf-8')
@@ -688,17 +746,17 @@ class site_api:
                 public.writeLog('网站管理', '站点[' + name + ']已关闭防盗链设置!')
             else:
                 rconf = '''#SECURITY-START 防盗链配置
-    location ~ .*\.(%s)$
-    {
-        expires      30d;
-        access_log /dev/null;
-        valid_referers none blocked %s;
-        if ($invalid_referer){
-           return 404;
-        }
+location ~ .*\.(%s)$
+{
+    expires      30d;
+    access_log /dev/null;
+    valid_referers none blocked %s;
+    if ($invalid_referer){
+       return 404;
     }
-    #SECURITY-END
-    include enable-php-''' % (fix.strip().replace(',', '|'), domains.strip().replace(',', ' '))
+}
+# SECURITY-END
+include enable-php-''' % (fix.strip().replace(',', '|'), domains.strip().replace(',', ' '))
                 conf = re.sub("include\s+enable-php-", rconf, conf)
                 public.writeLog('网站管理', '站点[' + name + ']已开启防盗链!')
             public.writeFile(file, conf)
@@ -875,3 +933,94 @@ location /{
         siteName = public.M('sites').where('id=?', (sid,)).getField('name')
         public.writeLog('TYPE_SITE', '设置成功,站点到期后将自动停止!', (siteName, edate))
         return public.returnJson(True, '设置成功,站点到期后将自动停止!')
+
+    # ssl相关方法 start
+    def setSslConf(self, siteName):
+        file = self.getHostConf(siteName)
+        conf = public.readFile(file)
+
+        if conf:
+            if conf.find('ssl_certificate') == -1:
+                sslStr = """#error_page 404/404.html;
+    ssl_certificate    /etc/letsencrypt/live/%s/fullchain.pem;
+    ssl_certificate_key    /etc/letsencrypt/live/%s/privkey.pem;
+    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+    ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:HIGH:!aNULL:!MD5:!RC4:!DHE;
+    ssl_prefer_server_ciphers on;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 10m;
+    error_page 497  https://$host$request_uri;
+""" % (siteName, siteName)
+            if(conf.find('ssl_certificate') != -1):
+                return public.returnData(True, 'SSL开启成功!')
+
+            conf = conf.replace('#error_page 404/404.html;', sslStr)
+
+            rep = "listen\s+([0-9]+)\s*[default_server]*;"
+            tmp = re.findall(rep, conf)
+            if not public.inArray(tmp, '443'):
+                listen = re.search(rep, conf).group()
+                conf = conf.replace(
+                    listen, listen + "\n\tlisten 443 ssl http2;")
+            shutil.copyfile(file, '/tmp/backup.conf')
+
+            public.writeFile(file, conf)
+            isError = public.checkWebConfig()
+            if(isError != True):
+                shutil.copyfile('/tmp/backup.conf', file)
+                return public.returnData(False, '证书错误: <br><a style="color:red;">' + isError.replace("\n", '<br>') + '</a>')
+
+        public.restartWeb()
+        keyPath = '/etc/letsencrypt/live/' + siteName + '/privkey.pem'
+        certPath = '/etc/letsencrypt/live/' + siteName + '/fullchain.pem'
+        self.saveCert(keyPath, certPath)
+        msg = public.getInfo('网站[{1}]开启SSL成功!', siteName)
+        public.writeLog('TYPE_SITE', msg)
+        return public.returnData(True, 'SSL开启成功!')
+
+    def saveCert(self, keyPath, certPath):
+        try:
+            certInfo = self.getCertName(get)
+            if not certInfo:
+                return public.returnJson(False, '证书解析失败!')
+            vpath = self.sslDir + '/' + certInfo['subject']
+            if not os.path.exists(vpath):
+                os.system('mkdir -p ' + vpath)
+            public.writeFile(vpath + '/privkey.pem',
+                             public.readFile(get.keyPath))
+            public.writeFile(vpath + '/fullchain.pem',
+                             public.readFile(get.certPath))
+            public.writeFile(vpath + '/info.json', json.dumps(certInfo))
+            return public.returnJson(True, '证书保存成功!')
+        except:
+            return public.returnJson(False, '证书保存失败!')
+
+    # 获取证书名称
+    def getCertName(self, certPath):
+        try:
+            openssl = '/usr/local/openssl/bin/openssl'
+            if not os.path.exists(openssl):
+                openssl = 'openssl'
+            result = public.execShell(
+                openssl + " x509 -in " + certPath + " -noout -subject -enddate -startdate -issuer")
+            tmp = result[0].split("\n")
+            data = {}
+            data['subject'] = tmp[0].split('=')[-1]
+            data['notAfter'] = self.strfToTime(tmp[1].split('=')[1])
+            data['notBefore'] = self.strfToTime(tmp[2].split('=')[1])
+            data['issuer'] = tmp[3].split('O=')[-1].split(',')[0]
+            if data['issuer'].find('/') != -1:
+                data['issuer'] = data['issuer'].split('/')[0]
+            result = public.execShell(
+                openssl + " x509 -in " + certPath + " -noout -text|grep DNS")
+            data['dns'] = result[0].replace(
+                'DNS:', '').replace(' ', '').strip().split(',')
+            return data
+        except:
+            return None
+
+    # 转换时间
+    def strfToTime(self, sdate):
+        import time
+        return time.strftime('%Y-%m-%d', time.strptime(sdate, '%b %d %H:%M:%S %Y %Z'))
+    # ssl相关方法 end

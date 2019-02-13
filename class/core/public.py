@@ -201,19 +201,10 @@ def returnData(status, msg, data=None):
     return {'status': status, 'msg': msg, 'data': data}
 
 
-def retOK(data):
-    return {'status': True, 'msg': 'OK!', 'data': data}
-    return getJson(info)
-
-
-def retFail(msg, data=None):
-    return {'status': False, 'msg': msg, 'data': data}
-
-
 def returnJson(status, msg, data=None):
     if data == None:
-        return getJson({'status': status, 'msg': msg})
-    return getJson({'status': status, 'msg': msg, 'data': data})
+        return returnData(status, msg)
+    return returnData(status, msg, data)
 
 
 def returnMsg(status, msg, args=()):
