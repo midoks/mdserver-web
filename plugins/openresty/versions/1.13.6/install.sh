@@ -23,6 +23,7 @@ Install_openresty()
 	cd ${openrestyDir} && tar -zxvf openresty-1.13.6.2.tar.gz
 
 	cd ${openrestyDir}/openresty-1.13.6.2 && ./configure --prefix=$serverPath/openresty \
+	--with-http_v2_module \
 	--with-openssl=$serverPath/source/lib/openssl-1.0.2q \
 	--with-http_stub_status_module \
 	&& make && make install && \
