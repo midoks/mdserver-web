@@ -67,12 +67,32 @@ def getConf():
     return path
 
 
+def getConfTpl():
+    path = getPluginDir() + "/conf/app.ini"
+    return path
+
+
 def status():
     data = public.execShell(
         "ps -ef|grep " + getPluginName() + " |grep -v grep | grep -v python | awk '{print $2}'")
     if data[0] == '':
         return 'stop'
     return 'start'
+
+
+def contentReplace(content):
+    user = public.execShell(
+        "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
+    service_path = public.getServerDir()
+    content = content.replace('{$ROOT_PATH}', public.getRootDir())
+    content = content.replace('{$SERVER_PATH}', service_path)
+    content = content.replace('{$RUN_USER}', user)
+
+    if public.isAppleSystem():
+        content = content.replace('{$HOME_DIR}', '/Users/' + user)
+    else:
+        content = content.replace('{$HOME_DIR}', '/root')
+    return content
 
 
 def initDreplace():
@@ -85,10 +105,19 @@ def initDreplace():
         os.mkdir(initD_path)
     file_bin = initD_path + '/' + getPluginName()
 
-    content = public.readFile(file_tpl)
-    content = content.replace('{$SERVER_PATH}', service_path)
-    public.writeFile(file_bin, content)
-    public.execShell('chmod +x ' + file_bin)
+    if not os.path.exists(file_bin):
+        public.execShell('mkdir -p ' + getServerDir() + '/custom/conf')
+        content = public.readFile(file_tpl)
+        content = contentReplace(content)
+        public.writeFile(file_bin, content)
+        public.execShell('chmod +x ' + file_bin)
+
+    conf_bin = getConf()
+    if not os.path.exists(file_bin):
+        conf_tpl = getConfTpl()
+        content = public.readFile(conf_tpl)
+        content = contentReplace(content)
+        public.writeFile(conf_bin, content)
 
     log_path = getServerDir() + '/log'
     if not os.path.exists(log_path):
