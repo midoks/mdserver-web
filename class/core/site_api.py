@@ -450,7 +450,7 @@ class site_api:
         result['key'] = public.readFile(keypath)
         public.restartWeb()
 
-        return public.getJson(True, 'OK')
+        return public.returnJson(True, 'OK', result)
 
     def getIndexApi(self):
         sid = request.form.get('id', '').encode('utf-8')
