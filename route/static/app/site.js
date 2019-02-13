@@ -283,66 +283,65 @@ function webAdd(type) {
 
 //修改网站目录
 function webPathEdit(id){
-	$.post("/data?action=getKey","table=sites&key=path&id="+id,function(rdata){
-		$.post('/site?action=GetDirUserINI','path='+rdata+'&id='+id,function(userini){
-			var userinicheckeds = userini.userini?'checked':'';
-			var logscheckeds = userini.logs?'checked':'';
-			var opt = ''
-			var selected = '';
-			for(var i=0;i<userini.runPath.dirs.length;i++){
-				selected = '';
-				if(userini.runPath.dirs[i] == userini.runPath.runPath) selected = 'selected';
-				opt += '<option value="'+ userini.runPath.dirs[i] +'" '+selected+'>'+ userini.runPath.dirs[i] +'</option>'
-			}
-			var webPathHtml = "<div class='webedit-box soft-man-con'>\
-						<div class='label-input-group ptb10'>\
-							<input type='checkbox' name='userini' id='userini'"+userinicheckeds+" /><label class='mr20' for='userini' style='font-weight:normal'>"+lan.site.anti_XSS_attack+"(open_basedir)</label>\
-							<input type='checkbox' name='logs' id='logs'"+logscheckeds+" /><label for='logs' style='font-weight:normal'>"+lan.site.write_access_log+"</label>\
-						</div>\
-						<div class='line mt10'>\
-							<span class='mr5'>"+lan.site.web_dir+"</span>\
-							<input class='bt-input-text mr5' type='text' style='width:50%' placeholder='"+lan.site.web_root_dir+"' value='"+rdata+"' name='webdir' id='inputPath'>\
-							<span onclick='changePath(&quot;inputPath&quot;)' class='glyphicon glyphicon-folder-open cursor mr20'></span>\
-							<button class='btn btn-success btn-sm' onclick='SetSitePath("+id+")'>"+lan.public.save+"</button>\
-						</div>\
-						<div class='line mtb15'>\
-							<span class='mr5'>"+lan.site.run_dir+"</span>\
-							<select class='bt-input-text' type='text' style='width:50%; margin-right:41px' name='runPath' id='runPath'>"+opt+"</select>\
-							<button class='btn btn-success btn-sm' onclick='SetSiteRunPath("+id+")' style='margin-top: -1px;'>"+lan.public.save+"</button>\
-						</div>\
-						<ul class='help-info-text c7 ptb10'>\
-							<li>"+lan.site.site_help_1+"</li>\
-							<li>"+lan.site.site_help_2+"</li>\
-						</ul>"
-						+'<div class="user_pw_tit" style="margin-top: -8px;padding-top: 11px;">'
-							+'<span class="tit">'+lan.soft.pma_pass+'</span>'
-							+'<span class="btswitch-p"><input '+(userini.pass?'checked':'')+' class="btswitch btswitch-ios" id="pathSafe" type="checkbox">'
-								+'<label class="btswitch-btn phpmyadmin-btn" for="pathSafe" onclick="pathSafe('+id+')"></label>'
-							+'</span>'
-						+'</div>'
-						+'<div class="user_pw" style="margin-top: 10px;display:'+(userini.pass?'block;':'none;')+'">'
-							+'<p><span>'+lan.soft.pma_user+'</span><input id="username_get" class="bt-input-text" name="username_get" value="" type="text" placeholder="'+lan.soft.edit_empty+'"></p>'
-							+'<p><span>'+lan.soft.pma_pass1+'</span><input id="password_get_1" class="bt-input-text" name="password_get_1" value="" type="password" placeholder="'+lan.soft.edit_empty+'"></p>'
-							+'<p><span>'+lan.soft.pma_pass2+'</span><input id="password_get_2" class="bt-input-text" name="password_get_1" value="" type="password" placeholder="'+lan.soft.edit_empty+'"></p>'
-							+'<p><button class="btn btn-success btn-sm" onclick="SetPathSafe('+id+')">'+lan.public.save+'</button></p>'
-						+'</div>'
-					+'</div>';
-			$("#webedit-con").html(webPathHtml);
-			
-			$("#userini").change(function(){
-				$.post('/site?action=SetDirUserINI','path='+rdata,function(userini){
-					layer.msg(userini.msg+'<p style="color:red;">注意：设置防跨站需要重启PHP才能生效!</p>',{icon:userini.status?1:2});
-				});
+	$.post('/site/get_dir_user_ini','&id='+id, function(data){
+		var userini = data['data'];
+		var userinicheckeds = userini.userini?'checked':'';
+		var logscheckeds = userini.logs?'checked':'';
+		var opt = ''
+		var selected = '';
+		for(var i=0;i<userini.runPath.dirs.length;i++){
+			selected = '';
+			if(userini.runPath.dirs[i] == userini.runPath.runPath) selected = 'selected';
+			opt += '<option value="'+ userini.runPath.dirs[i] +'" '+selected+'>'+ userini.runPath.dirs[i] +'</option>'
+		}
+		var webPathHtml = "<div class='webedit-box soft-man-con'>\
+					<div class='label-input-group ptb10'>\
+						<input type='checkbox' name='userini' id='userini'"+userinicheckeds+" /><label class='mr20' for='userini' style='font-weight:normal'>"+lan.site.anti_XSS_attack+"(open_basedir)</label>\
+						<input type='checkbox' name='logs' id='logs'"+logscheckeds+" /><label for='logs' style='font-weight:normal'>"+lan.site.write_access_log+"</label>\
+					</div>\
+					<div class='line mt10'>\
+						<span class='mr5'>"+lan.site.web_dir+"</span>\
+						<input class='bt-input-text mr5' type='text' style='width:50%' placeholder='"+lan.site.web_root_dir+"' value='"+rdata+"' name='webdir' id='inputPath'>\
+						<span onclick='changePath(&quot;inputPath&quot;)' class='glyphicon glyphicon-folder-open cursor mr20'></span>\
+						<button class='btn btn-success btn-sm' onclick='SetSitePath("+id+")'>"+lan.public.save+"</button>\
+					</div>\
+					<div class='line mtb15'>\
+						<span class='mr5'>"+lan.site.run_dir+"</span>\
+						<select class='bt-input-text' type='text' style='width:50%; margin-right:41px' name='runPath' id='runPath'>"+opt+"</select>\
+						<button class='btn btn-success btn-sm' onclick='SetSiteRunPath("+id+")' style='margin-top: -1px;'>"+lan.public.save+"</button>\
+					</div>\
+					<ul class='help-info-text c7 ptb10'>\
+						<li>"+lan.site.site_help_1+"</li>\
+						<li>"+lan.site.site_help_2+"</li>\
+					</ul>"
+					+'<div class="user_pw_tit" style="margin-top: -8px;padding-top: 11px;">'
+						+'<span class="tit">'+lan.soft.pma_pass+'</span>'
+						+'<span class="btswitch-p"><input '+(userini.pass?'checked':'')+' class="btswitch btswitch-ios" id="pathSafe" type="checkbox">'
+							+'<label class="btswitch-btn phpmyadmin-btn" for="pathSafe" onclick="pathSafe('+id+')"></label>'
+						+'</span>'
+					+'</div>'
+					+'<div class="user_pw" style="margin-top: 10px;display:'+(userini.pass?'block;':'none;')+'">'
+						+'<p><span>'+lan.soft.pma_user+'</span><input id="username_get" class="bt-input-text" name="username_get" value="" type="text" placeholder="'+lan.soft.edit_empty+'"></p>'
+						+'<p><span>'+lan.soft.pma_pass1+'</span><input id="password_get_1" class="bt-input-text" name="password_get_1" value="" type="password" placeholder="'+lan.soft.edit_empty+'"></p>'
+						+'<p><span>'+lan.soft.pma_pass2+'</span><input id="password_get_2" class="bt-input-text" name="password_get_1" value="" type="password" placeholder="'+lan.soft.edit_empty+'"></p>'
+						+'<p><button class="btn btn-success btn-sm" onclick="SetPathSafe('+id+')">'+lan.public.save+'</button></p>'
+					+'</div>'
+				+'</div>';
+		$("#webedit-con").html(webPathHtml);
+		
+		$("#userini").change(function(){
+			$.post('/site?action=SetDirUserINI','path='+rdata,function(userini){
+				layer.msg(userini.msg+'<p style="color:red;">注意：设置防跨站需要重启PHP才能生效!</p>',{icon:userini.status?1:2});
 			});
-			
-			$("#logs").change(function(){
-				$.post('/site?action=logsOpen','id='+id,function(userini){
-					layer.msg(userini.msg,{icon:userini.status?1:2});
-				});
-			});
-			
 		});
-	});
+		
+		$("#logs").change(function(){
+			$.post('/site?action=logsOpen','id='+id,function(userini){
+				layer.msg(userini.msg,{icon:userini.status?1:2});
+			});
+		});
+		
+	},'json');
 }
 
 //是否设置访问密码
@@ -982,9 +981,8 @@ function setIndexList(id){
 
 /*站点修改*/
 function webEdit(id,website,endTime,addtime){
-	var system = "{$Think.session.system}";
 	var eMenu = '';
-	eMenu = "<p onclick='DirBinding("+id+")' title='子目录绑定'>子目录绑定</p>"
+	eMenu = "<p onclick='dirBinding("+id+")' title='子目录绑定'>子目录绑定</p>"
 	+"<p onclick='webPathEdit("+id+")' title='网站目录'>网站目录</p>"
 	+"<p onclick='limitNet("+id+")' title='流量限制'>流量限制</p>"
 	+"<p onclick=\"rewrite('"+website+"')\" title='伪静态'>伪静态</p>"
@@ -992,14 +990,14 @@ function webEdit(id,website,endTime,addtime){
 	+"<p onclick=\"configFile('"+website+"')\" title='配置文件'>配置文件</p>"
 	+"<p onclick=\"setSSL("+id+",'"+website+"')\" title='SSL'>SSL</p>"
 	+"<p onclick=\"phpVersion('"+website+"')\" title='PHP版本'>PHP版本</p>"
-	+"<p onclick=\"To301('"+website+"')\" title='301重定向'>301重定向</p>"
+	+"<p onclick=\"To301('"+website+"')\" title='重定向'>重定向</p>"
 	+"<p onclick=\"Proxy('"+website+"')\" title='反向代理'>反向代理</p>"
 	+"<p id='site_"+id+"' onclick=\"security('"+id+"','"+website+"')\" title='防盗链'>防盗链</p>"
 	+"<p id='site_"+id+"' onclick=\"getSiteLogs('"+website+"')\" title='查看站点请求日志'>响应日志</p>";
 	layer.open({
 		type: 1,
 		area: '640px',
-		title: lan.site.website_change+'['+website+']  --  '+lan.site.addtime+'['+addtime+']',
+		title: '站点修改['+website+']  --  添加时间['+addtime+']',
 		closeBtn: 2,
 		shift: 0,
 		content: "<div class='bt-form'>"
@@ -1231,7 +1229,6 @@ function limitNet(id){
 						break;
 				}
 				
-				
 				$("input[name='perserver']").val(perserver);
 				$("input[name='perip']").val(perip);
 				$("input[name='limit_rate']").val(limit_rate);
@@ -1263,8 +1260,9 @@ function saveLimitNet(id, type){
 
 
 //子目录绑定
-function DirBinding(id){
-	$.post('/site?action=GetDirBinding&id='+id,function(rdata){
+function dirBinding(id){
+	$.post('/site/get_dir_binding',{'id':id},function(data){
+		var rdata = data['data'];
 		var echoHtml = '';
 		for(var i=0;i<rdata.binding.length;i++){
 			echoHtml += "<tr><td>"+rdata.binding[i].domain+"</td><td>"+rdata.binding[i].port+"</td><td>"+rdata.binding[i].path+"</td><td class='text-right'><a class='btlink' href='javascript:SetDirRewrite("+rdata.binding[i].id+");'>"+lan.site.site_menu_4+"</a> | <a class='btlink' href='javascript:DelBinding("+rdata.binding[i].id+","+id+");'>"+lan.public.del+"</a></td></tr>";
@@ -1276,18 +1274,17 @@ function DirBinding(id){
 		}
 		
 		var body = "<div class='dirBinding c5'>"
-			   +lan.site.domain+"：<input class='bt-input-text mr20' type='text' name='domain' />"
-			   +lan.site.subdirectories+"：<select class='bt-input-text mr20' name='dirName'>"+dirList+"</select>"
-			   +"<button class='btn btn-success btn-sm' onclick='AddDirBinding("+id+")'>"+lan.public.add+"</button>"
-			   +"</div>"
-			   +"<div class='divtable mtb15' style='height:470px;overflow:auto'><table class='table table-hover' width='100%' style='margin-bottom:0'>"
-			   +"<thead><tr><th>"+lan.site.domain+"</th><th width='70'>"+lan.site.port+"</th><th width='100'>"+lan.site.subdirectories+"</th><th width='100' class='text-right'>"+lan.site.operate+"</th></tr></thead>"
-			   +"<tbody id='checkDomain'>" + echoHtml + "</tbody>"
-			   +"</table></div>"
+			   + "域名：<input class='bt-input-text mr20' type='text' name='domain' />"
+			   + "子目录：<select class='bt-input-text mr20' name='dirName'>"+dirList+"</select>"
+			   + "<button class='btn btn-success btn-sm' onclick='AddDirBinding("+id+")'>添加</button>"
+			   + "</div>"
+			   + "<div class='divtable mtb15' style='height:470px;overflow:auto'><table class='table table-hover' width='100%' style='margin-bottom:0'>"
+			   + "<thead><tr><th>域名</th><th width='70'>端口</th><th width='100'>子目录</th><th width='100' class='text-right'>操作</th></tr></thead>"
+			   + "<tbody id='checkDomain'>" + echoHtml + "</tbody>"
+			   + "</table></div>";
 		
 		$("#webedit-con").html(body);
-	})
-	
+	},'json');
 }
 
 //子目录伪静态
@@ -1797,7 +1794,7 @@ function opSSL(type,id,siteName){
 				layer.close(loadT);
 				var rdata = data['data'];
 				if(rdata.status){
-					$(".ssl-btn").append("<button class='btn btn-default btn-sm' onclick=\"ocSSL('CloseSSLConf','"+siteName+"')\" style='margin-left:10px'>"+lan.site.ssl_close+"</button>");
+					$(".ssl-btn").append("<button class='btn btn-default btn-sm' onclick=\"ocSSL('close_ssl_conf','"+siteName+"')\" style='margin-left:10px'>"+lan.site.ssl_close+"</button>");
 				}
 				if(rdata.key == false) rdata.key = '';
 				if(rdata.csr == false) rdata.csr = '';
@@ -1875,30 +1872,28 @@ function ocSSL(action,siteName){
 		if(!rdata.status){
 			if(!rdata.out){
 				layer.msg(rdata.msg,{icon:rdata.status?1:2});
-				//setSSL(siteName);
+				setSSL(siteName);
 				return;
 			}
-			
-			data = "<p>"+lan.site.get_ssl_err+"：</p><hr />"
+			data = "<p>证书获取失败：</p><hr />"
 			for(var i=0;i<rdata.out.length;i++){
-				data += "<p>"+lan.site.domain+": "+rdata.out[i].Domain+"</p>"
-					  + "<p>"+lan.site.err_type+": "+rdata.out[i].Type+"</p>"
-					  + "<p>"+lan.site.details+": "+rdata.out[i].Detail+"</p>"
-					  + "<hr />"
+				data += "<p>域名: "+rdata.out[i].Domain+"</p>"
+					  + "<p>错误类型: "+rdata.out[i].Type+"</p>"
+					  + "<p>详情: "+rdata.out[i].Detail+"</p>"
+					  + "<hr />";
 			}
-			
 			layer.msg(data,{icon:2,time:0,shade:0.3,shadeClose:true});
 			return;
 		}
-		
+
 		setCookie('letssl',0);
-		$.post('/system?action=ServiceAdmin','name='+getCookie('serverType')+'&type=reload',function(result){
-			//setSSL(siteName);
-			if(!result.status) layer.msg(result.msg,{icon:2});
-		},'json');
+		// $.post('/system?action=ServiceAdmin','name='+getCookie('serverType')+'&type=reload',function(result){
+		// 	//setSSL(siteName);
+		// 	if(!result.status) layer.msg(result.msg,{icon:2});
+		// },'json');
 		layer.msg(rdata.msg,{icon:rdata.status?1:2});
-		if(action == 'CloseSSLConf'){
-			layer.msg(lan.site.ssl_close_info,{icon:1,time:5000});
+		if(action == 'close_ssl_conf'){
+			layer.msg('已关闭SSL,请务必清除浏览器缓存后再访问站点!',{icon:1,time:5000});
 		}
 		$(".bt-w-menu .bgw").click();
 	},'json');
@@ -1947,7 +1942,7 @@ function saveSSL(siteName){
 		if(rdata.status){
 			layer.msg(rdata.msg,{icon:1});
 			$(".ssl-btn").find(".btn-default").remove();
-			$(".ssl-btn").append("<button class='btn btn-default btn-sm' onclick=\"ocSSL('CloseSSLConf','"+siteName+"')\" style='margin-left:10px'>"+lan.site.ssl_close+"</button>");
+			$(".ssl-btn").append("<button class='btn btn-default btn-sm' onclick=\"ocSSL('close_ssl_conf','"+siteName+"')\" style='margin-left:10px'>"+lan.site.ssl_close+"</button>");
 		}else{
 			layer.msg(rdata.msg,{icon:2,time:0,shade:0.3,shadeClose:true});
 		}
