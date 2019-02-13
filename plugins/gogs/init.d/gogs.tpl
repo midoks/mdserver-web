@@ -26,7 +26,7 @@ if [ -f /etc/init.d/functions ];then
 fi
 
 # Default values
-HOME=/root
+HOME={$HOME_DIR}
 NAME=gogs
 GOGS_HOME={$SERVER_PATH}/gogs
 GOGS_PATH=${GOGS_HOME}/$NAME
