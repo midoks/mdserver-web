@@ -100,6 +100,56 @@ class site_api:
             data['email'] = ''
         return public.returnJson(True, 'OK', data)
 
+    def getDirBindingApi(self):
+        mid = request.form.get('id', '').encode('utf-8')
+
+        path = public.M('sites').where('id=?', (mid,)).getField('path')
+        if not os.path.exists(path):
+            checks = ['/', '/usr', '/etc']
+            if path in checks:
+                data = {}
+                data['dirs'] = []
+                data['binding'] = []
+                return public.returnJson(True, 'OK', data)
+            os.system('mkdir -p ' + path)
+            os.system('chmod 755 ' + path)
+            os.system('chown www:www ' + path)
+            siteName = public.M('sites').where(
+                'id=?', (get.id,)).getField('name')
+            public.writeLog(
+                '网站管理', '站点[' + siteName + '],根目录[' + path + ']不存在,已重新创建!')
+
+        dirnames = []
+        for filename in os.listdir(path):
+            try:
+                filePath = path + '/' + filename
+                if os.path.islink(filePath):
+                    continue
+                if os.path.isdir(filePath):
+                    dirnames.append(filename)
+            except:
+                pass
+
+        data = {}
+        data['dirs'] = dirnames
+        data['binding'] = public.M('binding').where('pid=?', (mid,)).field(
+            'id,pid,domain,path,port,addtime').select()
+        return public.returnJson(True, 'OK', data)
+
+    def getDirUserIniApi(self):
+        mid = request.form.get('id', '').encode('utf-8')
+
+        path = public.M('sites').where('id=?', (mid,)).getField('path')
+        name = public.M('sites').where("id=?", (mid,)).getField('name')
+        data = {}
+        data['logs'] = self.getLogsStatus(name)
+        data['userini'] = False
+        if os.path.exists(path + '/.user.ini'):
+            data['userini'] = True
+        data['runPath'] = self.getSiteRunPath(mid)
+        data['pass'] = self.getHasPwd(name)
+        return public.returnJson(True, 'OK', data)
+
     def getCertListApi(self):
         try:
             vpath = self.sslDir
@@ -202,6 +252,54 @@ class site_api:
         public.restartWeb()
         public.writeLog('TYPE_SITE', '证书已保存!')
         return public.returnJson(True, '证书已保存!')
+
+    def closeSslConfApi(self):
+        siteName = request.form.get('siteName', '').encode('utf-8')
+
+        file = self.getHostConf(siteName)
+        conf = public.readFile(file)
+
+        if conf:
+            rep = "\n\s*#HTTP_TO_HTTPS_START(.|\n){1,300}#HTTP_TO_HTTPS_END"
+            conf = re.sub(rep, '', conf)
+            rep = "\s+ssl_certificate\s+.+;\s+ssl_certificate_key\s+.+;"
+            conf = re.sub(rep, '', conf)
+            rep = "\s+ssl_protocols\s+.+;\n"
+            conf = re.sub(rep, '', conf)
+            rep = "\s+ssl_ciphers\s+.+;\n"
+            conf = re.sub(rep, '', conf)
+            rep = "\s+ssl_prefer_server_ciphers\s+.+;\n"
+            conf = re.sub(rep, '', conf)
+            rep = "\s+ssl_session_cache\s+.+;\n"
+            conf = re.sub(rep, '', conf)
+            rep = "\s+ssl_session_timeout\s+.+;\n"
+            conf = re.sub(rep, '', conf)
+            rep = "\s+ssl_ecdh_curve\s+.+;\n"
+            conf = re.sub(rep, '', conf)
+            rep = "\s+ssl_session_tickets\s+.+;\n"
+            conf = re.sub(rep, '', conf)
+            rep = "\s+ssl_stapling\s+.+;\n"
+            conf = re.sub(rep, '', conf)
+            rep = "\s+ssl_stapling_verify\s+.+;\n"
+            conf = re.sub(rep, '', conf)
+            rep = "\s+add_header\s+.+;\n"
+            conf = re.sub(rep, '', conf)
+            rep = "\s+add_header\s+.+;\n"
+            conf = re.sub(rep, '', conf)
+            rep = "\s+ssl\s+on;"
+            conf = re.sub(rep, '', conf)
+            rep = "\s+error_page\s497.+;"
+            conf = re.sub(rep, '', conf)
+            rep = "\s+if.+server_port.+\n.+\n\s+\s*}"
+            conf = re.sub(rep, '', conf)
+            rep = "\s+listen\s+443.*;"
+            conf = re.sub(rep, '', conf)
+            public.writeFile(file, conf)
+
+        msg = public.getInfo('网站[{1}]关闭SSL成功!', (siteName,))
+        public.writeLog('TYPE_SITE', msg)
+        public.restartWeb()
+        return public.returnJson(True, 'SSL已关闭!')
 
     def createLetApi(self):
         siteName = request.form.get('siteName', '').encode('utf-8')
@@ -589,6 +687,39 @@ class site_api:
             return path
         return ''
 
+    # 取当站点前运行目录
+    def getSiteRunPath(self, mid):
+        siteName = public.M('sites').where('id=?', (mid,)).getField('name')
+        sitePath = public.M('sites').where('id=?', (mid,)).getField('path')
+        path = sitePath
+
+        filename = self.getHostConf(siteName)
+        if os.path.exists(filename):
+            conf = public.readFile(filename)
+            rep = '\s*root\s*(.+);'
+            path = re.search(rep, conf).groups()[0]
+
+        data = {}
+        if sitePath == path:
+            data['runPath'] = '/'
+        else:
+            data['runPath'] = path.replace(sitePath, '')
+
+        dirnames = []
+        dirnames.append('/')
+        for filename in os.listdir(sitePath):
+            try:
+                filePath = sitePath + '/' + filename
+                if os.path.islink(filePath):
+                    continue
+                if os.path.isdir(filePath):
+                    dirnames.append('/' + filename)
+            except:
+                pass
+
+        data['dirs'] = dirnames
+        return data
+
     def getHostConf(self, siteName):
         return public.getServerDir() + '/openresty/nginx/conf/vhost/' + siteName + '.conf'
 
@@ -608,6 +739,24 @@ class site_api:
         if not os.path.exists(logPath):
             return public.returnJson(False, '日志为空')
         return public.returnJson(True, public.getNumLines(logPath, 100))
+
+    # 取日志状态
+    def getLogsStatus(self, siteName):
+        filename = self.getHostConf(siteName)
+        conf = public.readFile(filename)
+        if conf.find('#ErrorLog') != -1:
+            return False
+        if conf.find("access_log  /dev/null") != -1:
+            return False
+        return True
+
+    # 取目录加密状态
+    def getHasPwd(self, siteName):
+        filename = self.getHostConf(siteName)
+        conf = public.readFile(filename)
+        if conf.find('#AUTH_START') != -1:
+            return True
+        return False
 
     def getSitePhpVersion(self, siteName):
         conf = public.readFile(self.getHostConf(siteName))
