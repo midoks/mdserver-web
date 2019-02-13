@@ -106,14 +106,14 @@ def initDreplace():
     file_bin = initD_path + '/' + getPluginName()
 
     if not os.path.exists(file_bin):
-        public.execShell('mkdir -p ' + getServerDir() + '/custom/conf')
         content = public.readFile(file_tpl)
         content = contentReplace(content)
         public.writeFile(file_bin, content)
         public.execShell('chmod +x ' + file_bin)
 
     conf_bin = getConf()
-    if not os.path.exists(file_bin):
+    if not os.path.exists(conf_bin):
+        public.execShell('mkdir -p ' + getServerDir() + '/custom/conf')
         conf_tpl = getConfTpl()
         content = public.readFile(conf_tpl)
         content = contentReplace(content)
