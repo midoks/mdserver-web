@@ -49,12 +49,13 @@ Install_gogs()
 	mv $serverPath/source/gogs/gogs_${version}/gogs/ $serverPath/gogs
 	echo $version > $serverPath/gogs/version.pl
 
-	echo '安装完成' > $install_tmp
+	echo 'install success' > $install_tmp
 }
 
 Uninstall_gogs()
 {
 	rm -rf $serverPath/gogs
+	echo 'uninstall success' > $install_tmp
 }
 
 
