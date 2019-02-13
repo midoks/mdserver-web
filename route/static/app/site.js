@@ -6,10 +6,10 @@
 function getWeb(page, search) {
 	search = $("#SearchValue").prop("value");
 	page = page == undefined ? '1':page;
-	order = getCookie('order');
+	var order = getCookie('order');
 	if(order){
 		order = '&order=' + order;
-	}else{
+	} else {
 		order = '';
 	}
 
@@ -170,7 +170,7 @@ function webAdd(type) {
 	
 		var defaultPath = $("#defaultPath").html();
 		var php_version = "<div class='line'><span class='tname'>"+lan.site.php_ver+"</span><select class='bt-input-text' name='version' id='c_k3' style='width:100px'>";
-		for(var i=rdata.length-1;i>=0;i--){
+		for (var i=rdata.length-1;i>=0;i--) {
             php_version += "<option value='"+rdata[i].version+"'>"+rdata[i].name+"</option>";
         }
 
