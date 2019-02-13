@@ -442,7 +442,10 @@ class site_api:
             return public.returnJson(True, '证书已更新!')
 
         # 写入配置文件
-        # result = self.SetSSLConf(get)
+        result = self.setSslConf(siteName)
+        print result['msg']
+        if not result['status']:
+            return public.getJson(result)
         result['csr'] = public.readFile(csrpath)
         result['key'] = public.readFile(keypath)
         public.restartWeb()

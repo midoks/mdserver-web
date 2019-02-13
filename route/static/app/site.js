@@ -1462,6 +1462,29 @@ function To301(siteName,type){
 }
 
 
+//文件验证
+function file_check(){
+	$(".check_message").html('<div style="margin-left:100px"><input type="checkbox" name="checkDomain" id="checkDomain" checked=""><label class="mr20" for="checkDomain" style="font-weight:normal">提前校验域名(提前发现问题,减少失败率)</label></div>');
+	$("#lets_help").html('<li>'+lan.site.bt_ssl_help_5+'</li><li>'+lan.site.bt_ssl_help_8+'</li><li>'+lan.site.bt_ssl_help_9+'</li><li>在未指定SSL默认站点时,未开启SSL的站点使用HTTPS会直接访问到已开启SSL的站点</li>');
+}
+
+dnsapis = {};
+//DNS验证
+function dns_check(){
+	var loadT = layer.msg('正在安装DNS组件,请稍候...',{icon:16,time:0,shade:0.3});
+	$.post('/site?action=GetDnsApi',{},function(rdata){
+		layer.close(loadT)
+		var obody = '<span class="tname">选择DNS接口</span><select onchange="dns_select(this)" class="bt-input-text" style="width:120px" name="dns_select" id="dns_selects">';
+		for(var i=0;i<rdata.length;i++){
+			dnsapis[rdata[i]['name']] = rdata[i];
+			obody += '<option value="'+rdata[i]['name']+'" title="'+rdata[i]['ps']+'">'+rdata[i]['title']+'</option>';
+		}
+		obody += '</select><span id="dnsapi_edit"></span> 等待 <input type="number" class="bt-input-text" name="dnssleep" value="20" style="width:50px;vertical-align:-1px" min="10" max="120" />秒'
+		$(".check_message").html(obody);
+		$("#lets_help").html("<li>在DNS验证中，我们提供了3个自动化DNS-API，并提供了手动模式</li><li>使用DNS接口申请证书可自动续期，手动模式下证书到期后手需重新申请</li><li>使用【宝塔DNS云解析】接口前您需要确认当前要申请SSL证书的域名DNS为【云解析】</li><li>使用【DnsPod/阿里云DNS】接口前您需要先在弹出的窗口中设置对应接口的API</li>")
+	});
+}
+
 //证书夹
 function ssl_admin(siteName){
 	var loadT = layer.msg('正在提交任务...',{icon:16,time:0,shade: [0.3, '#000']});
