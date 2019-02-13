@@ -203,8 +203,8 @@ def returnData(status, msg, data=None):
 
 def returnJson(status, msg, data=None):
     if data == None:
-        return returnData(status, msg)
-    return returnData(status, msg, data)
+        return getJson({'status': status, 'msg': msg})
+    return getJson({'status': status, 'msg': msg, 'data': data})
 
 
 def returnMsg(status, msg, args=()):
