@@ -326,6 +326,24 @@ def submitGogsConf():
     reload()
     return public.returnJson(True, '设置成功')
 
+
+def userList():
+    args = getArgs()
+    page = 1
+    page_size = 10
+    search = ''
+    if 'page' in args:
+        page = int(args['page'])
+
+    if 'page_size' in args:
+        page_size = int(args['page_size'])
+
+    if 'search' in args:
+        search = args['search']
+
+    return public.returnJson(True, '设置成功')
+
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -354,5 +372,7 @@ if __name__ == "__main__":
         print getGogsConf()
     elif func == 'submit_gogs_conf':
         print submitGogsConf()
+    elif func == 'user_list':
+        print userList()
     else:
         print 'fail'

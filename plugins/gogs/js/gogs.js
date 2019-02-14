@@ -112,6 +112,55 @@ function submitGogsConf() {
 }
 
 
+function gogsUserList(page, search) {
+
+    var _data = {};
+    if (typeof(page) =='undefined'){
+        var page = 1;
+    }
+    
+    _data['page'] = page;
+    _data['page_size'] = 10;
+    if(typeof(search) != 'undefined'){
+        _data['search'] = search;
+    }
+
+    gogsPost('user_list', _data, function(data){
+
+        var rdata = $.parseJSON(data.data);
+        // console.log(rdata);
+        content = '<div class="finduser"><input class="bt-input-text mr5 outline_no" type="text" placeholder="查找用户名" id="find_user" style="height: 28px; border-radius: 3px;width: 435px;">';
+        content += '<button class="btn btn-success btn-sm" onclick="userFind();">查找</button></div>';
+
+        content += '<div class="divtable" style="margin-top:5px;"><table class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0">';
+        content += '<thead><tr>';
+        content += '<th>用户名</th>';
+        content += '<th>操作(<a class="btlink" onclick="csvnAddUser();">管理</a>)</th>';
+        content += '</tr></thead>';
+
+        content += '<tbody>';
+
+        ulist = rdata.data;
+        for (i in ulist){
+            content += '<tr><td>'+ulist[i]+'</td><td>'+
+                '<a class="btlink" onclick="csvnDelUser(\''+ulist[i]+'\')">删除</a> | ' +
+                '<a class="btlink" onclick="csvnModPwdUser(\''+ulist[i]+'\')">改密</a></td></tr>';
+        }
+
+        content += '</tbody>';
+        content += '</table></div>';
+
+        page = '<div class="dataTables_paginate paging_bootstrap pagination" style="margin-top:0px;"><ul id="softPage" class="page"><div>';
+        page += rdata.list;
+        page += '</div></ul></div>';
+
+        content += page;
+
+        $(".soft-man-con").html(content);
+    });
+}
+
+
 function gogsRead(){
     var readme = '<p>* 默认使用MySQL,第一个启动加载各种配置,并修改成正确的数据库配置</p>';
     readme += '<p>* 邮件端口使用456,gogs仅支持使用STARTTLS的SMTP协议</p>';
