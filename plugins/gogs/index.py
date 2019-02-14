@@ -4,6 +4,7 @@
 import time
 import os
 import sys
+import re
 
 sys.path.append("/usr/local/lib/python2.7/site-packages")
 import psutil
@@ -200,6 +201,40 @@ def runLog():
     log_path = getServerDir() + '/log/gogs.log'
     return log_path
 
+
+def getGogsConf():
+    gets = [
+        {'name': 'HOST', 'type': -1, 'ps': '主机地址'},
+        {'name': 'NAME', 'type': -1, 'ps': '数据库名称'},
+        {'name': 'USER', 'type': -1, 'ps': '数据库用户名'},
+        {'name': 'REQUIRE_SIGNIN_VIEW', 'type': 2, 'ps': '强制登录浏览'},
+    ]
+    conf = public.readFile(getConf())
+    result = []
+    for g in gets:
+        rep = g['name'] + '\s*=\s*(.*)'
+        tmp = re.search(rep, conf)
+        if not tmp:
+            continue
+        g['value'] = tmp.groups()[0]
+        result.append(g)
+    return public.getJson(result)
+
+
+def submitGogsConf():
+    gets = ['REQUIRE_SIGNIN_VIEW']
+    args = getArgs()
+    # print args
+    filename = getConf()
+    conf = public.readFile(filename)
+    for g in gets:
+        if g in args:
+            rep = g + '\s*=\s*(.*)'
+            val = g + ' = ' + args[g] + '\n'
+            conf = re.sub(rep, val, conf)
+    public.writeFile(filename, conf)
+    return public.returnJson(True, '设置成功')
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -224,5 +259,9 @@ if __name__ == "__main__":
         print getConf()
     elif func == 'init_conf':
         print getInitdConf()
+    elif func == 'get_gogs_conf':
+        print getGogsConf()
+    elif func == 'submit_gogs_conf':
+        print submitGogsConf()
     else:
         print 'fail'
