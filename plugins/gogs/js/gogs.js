@@ -110,3 +110,10 @@ function submitGogsConf() {
         gogsSetConfig();
     });
 }
+
+
+function gogsRead(){
+    var readme = '<p>* 默认使用MySQL,第一个启动加载各种配置,并修改成正确的数据库配置</p>';
+    readme += '<p>* 邮件端口使用456,gogs仅支持使用STARTTLS的SMTP协议</p>';
+    $('.soft-man-con').html(readme);   
+}
