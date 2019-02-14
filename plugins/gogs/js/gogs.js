@@ -87,12 +87,26 @@ function gogsSetConfig(){
 //提交PHP配置
 function submitGogsConf() {
     var data = {
+        DOMAIN: $("select[name='DOMAIN']").val(),
+        ROOT_URL: $("select[name='ROOT_URL']").val(),
+        HTTP_ADDR: $("select[name='HTTP_ADDR']").val(),
+        HTTP_PORT: $("select[name='HTTP_PORT']").val(),
+        START_SSH_SERVER: $("select[name='START_SSH_SERVER']").val() || 'false',
+        SSH_PORT: $("select[name='SSH_PORT']").val(),
+        ROOT_URL: $("select[name='ROOT_URL']").val(),
         REQUIRE_SIGNIN_VIEW: $("select[name='REQUIRE_SIGNIN_VIEW']").val() || 'false',
+        ENABLE_CAPTCHA: $("select[name='ENABLE_CAPTCHA']").val() || 'true',
+        DISABLE_REGISTRATION: $("select[name='DISABLE_REGISTRATION']").val() || 'false',
+        ENABLE_NOTIFY_MAIL: $("select[name='ENABLE_NOTIFY_MAIL']").val() || 'false',
+        FORCE_PRIVATE: $("select[name='FORCE_PRIVATE']").val() || 'false',
+        SHOW_FOOTER_BRANDING: $("select[name='SHOW_FOOTER_BRANDING']").val() || 'false',
+        SHOW_FOOTER_VERSION: $("select[name='SHOW_FOOTER_VERSION']").val() || 'false',
+        SHOW_FOOTER_TEMPLATE_LOAD_TIME: $("select[name='SHOW_FOOTER_TEMPLATE_LOAD_TIME']").val() || 'false',
     };
 
     gogsPost('submit_gogs_conf', data, function(ret_data){
         var rdata = $.parseJSON(ret_data.data);
-        console.log(rdata);
         layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+        gogsSetConfig();
     });
 }
