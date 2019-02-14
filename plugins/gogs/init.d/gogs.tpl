@@ -65,7 +65,12 @@ start() {
 stop() {
     cd ${GOGS_HOME}
     echo "Shutting down ${SERVICENAME}: \c"
-    pkill ${NAME}
+    which "killproc" > /dev/null
+    if [ $? -eq 0 ];then
+        killproc ${NAME}
+    else
+        pkill ${NAME}
+    fi
     RETVAL=$?
     [ $RETVAL = 0 ] && rm -f ${LOCKFILE}  && echo "\033[32mdone\033[0m"
 }
