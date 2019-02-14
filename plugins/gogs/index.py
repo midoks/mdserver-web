@@ -204,13 +204,28 @@ def runLog():
 
 def getGogsConf():
     gets = [
-        {'name': 'HOST', 'type': -1, 'ps': '主机地址'},
-        {'name': 'NAME', 'type': -1, 'ps': '数据库名称'},
-        {'name': 'USER', 'type': -1, 'ps': '数据库用户名'},
+        {'name': 'DOMAIN', 'type': -1, 'ps': '服务器域名'},
+        {'name': 'ROOT_URL', 'type': -1, 'ps': '公开的完整URL路径'},
+        {'name': 'HTTP_ADDR', 'type': -1, 'ps': '应用HTTP监听地址'},
+        {'name': 'HTTP_PORT', 'type': -1, 'ps': '应用 HTTP 监听端口号'},
+
+        {'name': 'START_SSH_SERVER', 'type': 2, 'ps': '启动内置SSH服务器'},
+        {'name': 'SSH_PORT', 'type': -1, 'ps': 'SSH 端口号'},
+
         {'name': 'REQUIRE_SIGNIN_VIEW', 'type': 2, 'ps': '强制登录浏览'},
+        {'name': 'ENABLE_CAPTCHA', 'type': 2, 'ps': '启用验证码服务'},
+        {'name': 'DISABLE_REGISTRATION', 'type': 2, 'ps': '禁止注册,只能由管理员创建帐号'},
+        {'name': 'ENABLE_NOTIFY_MAIL', 'type': 2, 'ps': '是否开启邮件通知'},
+
+        {'name': 'FORCE_PRIVATE', 'type': 2, 'ps': '强制要求所有新建的仓库都是私有'},
+
+        {'name': 'SHOW_FOOTER_BRANDING', 'type': 2, 'ps': 'Gogs推广信息'},
+        {'name': 'SHOW_FOOTER_VERSION', 'type': 2, 'ps': 'Gogs版本信息'},
+        {'name': 'SHOW_FOOTER_TEMPLATE_LOAD_TIME', 'type': 2, 'ps': 'Gogs模板加载时间'},
     ]
     conf = public.readFile(getConf())
     result = []
+
     for g in gets:
         rep = g['name'] + '\s*=\s*(.*)'
         tmp = re.search(rep, conf)
@@ -222,17 +237,22 @@ def getGogsConf():
 
 
 def submitGogsConf():
-    gets = ['REQUIRE_SIGNIN_VIEW']
+    gets = ['DOMAIN', 'ROOT_URL', 'HTTP_ADDR',
+            'HTTP_PORT', 'START_SSH_SERVER', 'SSH_PORT',
+            'REQUIRE_SIGNIN_VIEW', 'FORCE_PRIVATE',
+            'ENABLE_CAPTCHA', 'DISABLE_REGISTRATION', 'ENABLE_NOTIFY_MAIL',
+            'SHOW_FOOTER_BRANDING', 'SHOW_FOOTER_VERSION',
+            'SHOW_FOOTER_TEMPLATE_LOAD_TIME']
     args = getArgs()
-    # print args
     filename = getConf()
     conf = public.readFile(filename)
     for g in gets:
         if g in args:
             rep = g + '\s*=\s*(.*)'
-            val = g + ' = ' + args[g] + '\n'
+            val = g + ' = ' + args[g]
             conf = re.sub(rep, val, conf)
     public.writeFile(filename, conf)
+    reload()
     return public.returnJson(True, '设置成功')
 
 if __name__ == "__main__":

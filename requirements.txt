@@ -5,3 +5,4 @@ psutil
 pillow
 chardet
 MySQL-python
+ConfigParser
