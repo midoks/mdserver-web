@@ -25,6 +25,9 @@ def getPluginName():
 def getPluginDir():
     return public.getPluginDir() + '/' + getPluginName()
 
+sys.path.append(getPluginDir() + "/class")
+import mysql
+
 
 def getServerDir():
     return public.getServerDir() + '/' + getPluginName()
@@ -129,10 +132,78 @@ def initDreplace():
     return file_bin
 
 
+def getDbConfValue():
+    content = public.readFile(getConf())
+
+    rep_scope = "\[database\](.*?)\["
+    tmp = re.findall(rep_scope, content, re.S)
+
+    rep = '(\w*)\s*=\s*(.*)'
+    tmp = re.findall(rep, tmp[0])
+    r = {}
+    for x in range(len(tmp)):
+        k = tmp[x][0]
+        v = tmp[x][1]
+        r[k] = v
+    return r
+
+
+def pMysqlDb():
+    conf = getDbConfValue()
+
+    host = conf['HOST'].split(':')
+    conn = mysql.mysql()
+
+    conn.setHost(host[0])
+    conn.setUser(conf['USER'])
+    conn.setPwd(conf['PASSWD'])
+    conn.setPort(int(host[1]))
+    conn.setDb(conf['NAME'])
+    return conn
+
+
+def isSqlError(mysqlMsg):
+    # 检测数据库执行错误
+    _mysqlMsg = str(mysqlMsg)
+    # print _mysqlMsg
+    if "MySQLdb" in _mysqlMsg:
+        return public.returnData(False, 'MySQLdb组件缺失! <br>进入SSH命令行输入： pip install mysql-python')
+    if "2002," in _mysqlMsg:
+        return public.returnData(False, '数据库连接失败,请检查数据库服务是否启动!')
+    if "using password:" in _mysqlMsg:
+        return public.returnData(False, '数据库管理密码错误!')
+    if "Connection refused" in _mysqlMsg:
+        return public.returnData(False, '数据库连接失败,请检查数据库服务是否启动!')
+    if "1133," in _mysqlMsg:
+        return public.returnData(False, '数据库用户不存在!')
+    if "1007," in _mysqlMsg:
+        return public.returnData(False, '数据库已经存在!')
+    if "1044," in _mysqlMsg:
+        return public.returnData(False, mysqlMsg[1])
+    if "2003," in _mysqlMsg:
+        return public.returnData(False, mysqlMsg[1])
+    return public.returnData(True, 'OK')
+
+
 def start():
+
+    is_frist = True
+    conf_bin = getConf()
+    if os.path.exists(conf_bin):
+        is_frist = False
+
     file = initDreplace()
+
+    if is_frist:
+        return "第一次启动Gogs,默认使用MySQL连接!<br>可以在配置文件中重新设置,再启动!"
+
+    conn = pMysqlDb()
+    list_table = conn.query('show tables')
+    data = isSqlError(list_table)
+    if not data['status']:
+        return data['msg']
+
     data = public.execShell(file + ' start')
-    # print data
     if data[1] == '':
         return 'ok'
     return data[0]
