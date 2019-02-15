@@ -39,9 +39,9 @@ function gogsPost(method,args,callback, title){
 
 function gogsSetConfig(){
     gogsPost('get_gogs_conf', '', function(data){
-        console.log(data);
+        // console.log(data);
         var rdata = $.parseJSON(data.data);
-        console.log(rdata);
+        // console.log(rdata);
         var mlist = '';
         for (var i = 0; i < rdata.length; i++) {
             var w = '140';
@@ -134,24 +134,29 @@ function gogsUserList(page, search) {
 
         content += '<div class="divtable" style="margin-top:5px;"><table class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0">';
         content += '<thead><tr>';
-        content += '<th>用户名</th>';
-        content += '<th>操作(<a class="btlink" onclick="csvnAddUser();">管理</a>)</th>';
+        content += '<th>序号</th>';
+        content += '<th>用户或组织</th>';
+        content += '<th>邮件地址</th>';
+        content += '<th>操作(<a href="'+rdata['data']['root_url']+'" class="btlink" target="_blank">WEB管理</a>)</th>';
         content += '</tr></thead>';
 
         content += '<tbody>';
 
-        ulist = rdata.data;
+        ulist = rdata['data']['data'];
         for (i in ulist){
-            content += '<tr><td>'+ulist[i]+'</td><td>'+
-                '<a class="btlink" onclick="csvnDelUser(\''+ulist[i]+'\')">删除</a> | ' +
-                '<a class="btlink" onclick="csvnModPwdUser(\''+ulist[i]+'\')">改密</a></td></tr>';
+            email = ulist[i][2] == '' ? '无' : ulist[i][2];
+            content += '<tr><td>'+ulist[i][0]+'</td>'+
+                '<td>'+ulist[i][1]+'</td>'+
+                '<td>'+email+'</td>'+
+                '<td><a class="btlink" onclick="userProjectList(\''+ulist[i][1]+'\')">项目管理</a></td>'+
+                '</tr>';
         }
 
         content += '</tbody>';
         content += '</table></div>';
 
-        page = '<div class="dataTables_paginate paging_bootstrap pagination" style="margin-top:0px;"><ul id="softPage" class="page"><div>';
-        page += rdata.list;
+        var page = '<div class="dataTables_paginate paging_bootstrap pagination" style="margin-top:0px;"><ul id="softPage" class="page"><div>';
+        page += rdata['data']['list'];
         page += '</div></ul></div>';
 
         content += page;
@@ -160,6 +165,139 @@ function gogsUserList(page, search) {
     });
 }
 
+function userProjectList(user, search){
+    var req = {};
+    if (!isNaN(user)){
+        req['page'] = user;
+        req['name'] = user = getCookie('gogsUserSelected');
+    } else {
+        req['page'] = 1;
+        req['name'] = user;
+        setCookie('gogsUserSelected', user);
+    }
+    
+    req['page_size'] = 5;
+    req['search'] = '';
+    if(typeof(search) != 'undefined'){
+        req['search'] = search;
+    }
+
+    $('.layui-layer-close1').click();
+    gogsPost('user_project_list', req, function(data){
+        var rdata = [];
+        try {
+            rdata = $.parseJSON(data.data);
+        } catch(e){}
+
+        if (!rdata['status']){
+            layer.msg(rdata['msg'], { icon: 2 });
+            return;
+        }
+
+        var list = '';
+        // console.log(rdata);
+        var project_list = rdata['data']['data'];
+        for (i in project_list) {
+            var name = project_list[i]['name'];
+            list += '<tr><td>'+name+'</td>\
+                    <td>\
+                        <a class="btlink" target="_blank" href="'+rdata['data']['root_url']+user+'/'+name+'">源码</a> | \
+                        <a class="btlink" onclick="projectScript(\''+user+'\',\''+name+'\','+project_list[i]['has_hook']+');">脚本</a>\
+                    </td>\
+                </tr>';
+        }
+
+        var page = '<div class="dataTables_paginate paging_bootstrap pagination" style="margin-top:0px;"><ul id="softPage" class="page"><div>';
+        page += rdata['data']['list'];
+        page += '</div></ul></div>';
+
+        var loadOpen = layer.open({
+            type: 1,
+            title: '用户('+user+')项目列表',
+            area: '300px',
+            content:"<div class='bt-form pd20 c6'>\
+                    <div>\
+                            <div class='divtable' style='margin-top:5px;'>\
+                                <table class='table table-hover'>\
+                                    <thead><tr><th>项目</th><th>操作</th></tr></thead>\
+                                    <tbody>" + list + "</tbody>\
+                                </table>" + 
+                                page +
+                    "</div></div></div>"
+        });
+    });
+}
+
+
+function projectScript(user, name,has_hook){
+    // console.log(user,name,has_hook);
+    var html = '';
+    if (has_hook){
+        html += '<button onclick="projectScriptEdit(\''+user+'\',\''+name+'\')" class="btn btn-default btn-sm">手动编辑</button>';
+        html += '<button onclick="projectScriptDebug(\''+user+'\',\''+name+'\')" class="btn btn-default btn-sm">调试日志</button>';
+        html += '<button onclick="projectScriptLoad(\''+user+'\',\''+name+'\')" class="btn btn-default btn-sm">重新加载</button>';
+        html += '<button onclick="projectScriptUnload(\''+user+'\',\''+name+'\')" class="btn btn-default btn-sm">卸载脚本</button>';
+    } else {
+        html += '<button onclick="projectScriptLoad(\''+user+'\',\''+name+'\')" class="btn btn-default btn-sm">加载脚本</button>';
+    }
+
+    var loadOpen = layer.open({
+        type: 1,
+        title: '['+user+']['+name+']脚本设置',
+        area: '240px',
+        content:'<div class="change-default pd20">'+html+'</div>'
+    });
+}
+
+function projectScriptEdit(user,name){
+    gogsPost('project_script_edit', {'user':user,'name':name}, function(data){
+        var rdata = $.parseJSON(data.data);
+        if (rdata['status']){
+            onlineEditFile(0, rdata['data']['path']);
+        } else {
+            layer.msg(rdata.msg,{icon:1,time:2000,shade: [0.3, '#000']});
+        }        
+    });
+}
+
+function projectScriptLoad(user,name){
+    gogsPost('project_script_load', {'user':user,'name':name}, function(data){
+        if (data.data != 'ok'){
+            layer.msg(data.data,{icon:0,time:2000,shade: [0.3, '#000']});
+            return;
+        }
+
+        layer.msg('加载成功!',{icon:1,time:2000,shade: [0.3, '#000']});
+        setTimeout(function(){
+            userProjectList(1);
+        }, 2000);
+    });
+}
+
+function projectScriptUnload(user,name){
+    gogsPost('project_script_unload', {'user':user,'name':name}, function(data){
+        if (data.data != 'ok'){
+            layer.msg(data.data,{icon:0,time:2000,shade: [0.3, '#000']});
+            return;
+        }
+
+        layer.msg('卸载成功!',{icon:1,time:2000,shade: [0.3, '#000']});
+        setTimeout(function(){
+            userProjectList(1);
+        }, 2000);
+    });
+} 
+
+function projectScriptDebug(user,name){
+    gogsPost('project_script_debug', {'user':user,'name':name}, function(data){
+        var rdata = $.parseJSON(data.data);
+        if (rdata['status']){
+            onlineEditFile(0, rdata['path']);
+        } else {
+            layer.msg(rdata.msg,{icon:1,time:2000,shade: [0.3, '#000']});
+        }        
+    });
+}
 
 function gogsRead(){
     var readme = '<p>* 默认使用MySQL,第一个启动加载各种配置,并修改成正确的数据库配置</p>';
