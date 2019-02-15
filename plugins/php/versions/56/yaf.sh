@@ -48,7 +48,7 @@ Install_lib()
 		return;
 	fi
 	
-	echo "extension=yaf.so" >> $serverPath/php/$version/etc/php.ini
+	echo -e "[yaf]\nextension=yaf.so\nyaf.use_namespace=1" >> $serverPath/php/$version/etc/php.ini
 	
 	$serverPath/php/init.d/php$version reload
 	echo '==========================================================='
@@ -71,6 +71,8 @@ Uninstall_lib()
 	
 	echo $serverPath/php/$version/etc/php.ini
 	sed -i '_bak' '/yaf.so/d' $serverPath/php/$version/etc/php.ini
+	sed -i '_bak' '/yaf.use_namespace/d' $serverPath/php/$version/etc/php.ini
+	sed -i '_bak' '/\[yaf\]/d'  $serverPath/php/$version/etc/php.ini
 		
 	rm -f $extFile
 	$serverPath/php/init.d/php$version reload
