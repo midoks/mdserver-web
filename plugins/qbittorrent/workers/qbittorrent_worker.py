@@ -72,7 +72,13 @@ class downloadBT(Thread):
         self.dbcurr = self.dbconn.cursor()
         self.dbcurr.execute('SET NAMES utf8')
         self.qb = self.qb()
-        self.has_suffix = ['.mp4']
+
+        _has_suffix = ['mp4', 'rmvb']
+        has_suffix = []
+        for x in range(len(_has_suffix)):
+            has_suffix.append('.' + _has_suffix[x])
+            has_suffix.append('.' + _has_suffix[x].upper())
+        self.has_suffix = has_suffix
 
     def query(self, sql):
         self.dbcurr.execute(sql)
