@@ -132,6 +132,24 @@ def initDreplace():
     return file_bin
 
 
+def getRootUrl():
+    content = public.readFile(getConf())
+    rep = 'ROOT_URL\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    if not tmp:
+        return ''
+    return tmp.groups()[0]
+
+
+def getRootPath():
+    content = public.readFile(getConf())
+    rep = 'ROOT\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    if not tmp:
+        return ''
+    return tmp.groups()[0]
+
+
 def getDbConfValue():
     content = public.readFile(getConf())
 
@@ -273,6 +291,11 @@ def runLog():
     return log_path
 
 
+def postReceiveLog():
+    log_path = getServerDir() + '/log/hooks/post-receive.log'
+    return log_path
+
+
 def getGogsConf():
     gets = [
         {'name': 'DOMAIN', 'type': -1, 'ps': '服务器域名'},
@@ -308,11 +331,19 @@ def getGogsConf():
 
 
 def submitGogsConf():
-    gets = ['DOMAIN', 'ROOT_URL', 'HTTP_ADDR',
-            'HTTP_PORT', 'START_SSH_SERVER', 'SSH_PORT',
-            'REQUIRE_SIGNIN_VIEW', 'FORCE_PRIVATE',
-            'ENABLE_CAPTCHA', 'DISABLE_REGISTRATION', 'ENABLE_NOTIFY_MAIL',
-            'SHOW_FOOTER_BRANDING', 'SHOW_FOOTER_VERSION',
+    gets = ['DOMAIN',
+            'ROOT_URL',
+            'HTTP_ADDR',
+            'HTTP_PORT',
+            'START_SSH_SERVER',
+            'SSH_PORT',
+            'REQUIRE_SIGNIN_VIEW',
+            'FORCE_PRIVATE',
+            'ENABLE_CAPTCHA',
+            'DISABLE_REGISTRATION',
+            'ENABLE_NOTIFY_MAIL',
+            'SHOW_FOOTER_BRANDING',
+            'SHOW_FOOTER_VERSION',
             'SHOW_FOOTER_TEMPLATE_LOAD_TIME']
     args = getArgs()
     filename = getConf()
@@ -328,7 +359,9 @@ def submitGogsConf():
 
 
 def userList():
+    import math
     args = getArgs()
+
     page = 1
     page_size = 10
     search = ''
@@ -341,8 +374,197 @@ def userList():
     if 'search' in args:
         search = args['search']
 
-    return public.returnJson(True, '设置成功')
+    data = {}
 
+    data['root_url'] = getRootUrl()
+
+    pm = pMysqlDb()
+    start = (page - 1) * page_size
+    list_count = pm.query('select count(id) as num from user')
+    count = list_count[0][0]
+
+    list_data = pm.query(
+        'select id,name,email from user order by id desc limit ' + str(start) + ',' + str(page_size))
+
+    page_info = {'count': count, 'p': page,
+                 'row': page_size, 'tojs': 'gogsUserList'}
+    data['list'] = public.getPage(page_info)
+    data['page'] = page
+    data['page_size'] = page_size
+    data['page_count'] = int(math.ceil(count / page_size))
+    data['data'] = list_data
+    return public.returnJson(True, 'OK', data)
+
+
+def getAllUserProject(user, search=''):
+    path = getRootPath() + '/' + user
+    dlist = []
+    if os.path.exists(path):
+        for filename in os.listdir(path):
+            tmp = {}
+            filePath = path + '/' + filename
+            if os.path.isdir(filePath):
+                if search == '':
+                    tmp['name'] = filename.replace('.git', '')
+                    dlist.append(tmp)
+                else:
+                    if filename.find(search) != -1:
+                        tmp['name'] = filename.replace('.git', '')
+                        dlist.append(tmp)
+    return dlist
+
+
+def checkProjectListIsHasScript(user, data):
+    path = getRootPath() + '/' + user
+    for x in range(len(data)):
+        name = data[x]['name'] + '.git'
+        path_tmp = path + '/' + name + '/custom_hooks/post-receive'
+        if os.path.exists(path_tmp):
+            data[x]['has_hook'] = True
+        else:
+            data[x]['has_hook'] = False
+    return data
+
+
+def userProjectList():
+    import math
+    args = getArgs()
+    # print args
+
+    page = 1
+    page_size = 5
+    search = ''
+
+    if not 'name' in args:
+        return public.returnJson(False, '缺少参数name')
+    if 'page' in args:
+        page = int(args['page'])
+
+    if 'page_size' in args:
+        page_size = int(args['page_size'])
+
+    if 'search' in args:
+        search = args['search']
+
+    data = {}
+
+    ulist = getAllUserProject(args['name'])
+    dlist_sum = len(ulist)
+
+    start = (page - 1) * page_size
+    ret_data = ulist[start:start + page_size]
+    ret_data = checkProjectListIsHasScript(args['name'], ret_data)
+
+    data['root_url'] = getRootUrl()
+    data['data'] = ret_data
+    data['args'] = args
+    data['list'] = public.getPage(
+        {'count': dlist_sum, 'p': page, 'row': page_size, 'tojs': 'userProjectList'})
+
+    return public.returnJson(True, 'OK', data)
+
+
+def projectScriptEdit():
+    args = getArgs()
+
+    if not 'user' in args:
+        return public.returnJson(True, 'username missing')
+
+    if not 'name' in args:
+        return public.returnJson(True, 'project name missing')
+
+    user = args['user']
+    name = args['name'] + '.git'
+    post_receive = getRootPath() + '/' + user + '/' + name + \
+        '/custom_hooks/post-receive'
+    if os.path.exists(post_receive):
+        return public.returnJson(True, 'OK', {'path': post_receive})
+    else:
+        return public.returnJson(False, 'file does not exist')
+
+
+def projectScriptLoad():
+    args = getArgs()
+    if not 'user' in args:
+        return public.returnJson(True, 'username missing')
+
+    if not 'name' in args:
+        return public.returnJson(True, 'project name missing')
+
+    user = args['user']
+    name = args['name'] + '.git'
+
+    path = getRootPath() + '/' + user + '/' + name
+    post_receive_tpl = getPluginDir() + '/hook/post-receive.tpl'
+    post_receive = path + '/custom_hooks/post-receive'
+
+    if not os.path.exists(path + '/custom_hooks'):
+        public.execShell('mkdir -p ' + path + '/custom_hooks')
+
+    pct_content = public.readFile(post_receive_tpl)
+    pct_content = pct_content.replace('{$PATH}', path + '/custom_hooks')
+    public.writeFile(post_receive, pct_content)
+    public.execShell('chmod 777 ' + post_receive)
+
+    commit_tpl = getPluginDir() + '/hook/commit.tpl'
+    commit = path + '/custom_hooks/commit'
+
+    codeDir = public.getRootDir() + '/git'
+
+    cc_content = public.readFile(commit_tpl)
+    cc_content = cc_content.replace('{$GITROOTURL}', getRootUrl())
+    cc_content = cc_content.replace('{$CODE_DIR}', codeDir)
+    cc_content = cc_content.replace('{$USERNAME}', user)
+    cc_content = cc_content.replace('{$PROJECT}', args['name'])
+    cc_content = cc_content.replace('{$WEB_ROOT}', public.getWwwDir())
+    public.writeFile(commit, cc_content)
+    public.execShell('chmod 777 ' + commit)
+
+    return 'ok'
+
+
+def projectScriptUnload():
+    args = getArgs()
+    if not 'user' in args:
+        return public.returnJson(True, 'username missing')
+
+    if not 'name' in args:
+        return public.returnJson(True, 'project name missing')
+
+    user = args['user']
+    name = args['name'] + '.git'
+
+    post_receive = getRootPath() + '/' + user + '/' + name + \
+        '/custom_hooks/post-receive'
+    public.execShell('rm -f ' + post_receive)
+
+    commit = getRootPath() + '/' + user + '/' + name + \
+        '/custom_hooks/commit'
+    public.execShell('rm -f ' + commit)
+    return 'ok'
+
+
+def projectScriptDebug():
+    args = getArgs()
+    if not 'user' in args:
+        return public.returnJson(True, 'username missing')
+
+    if not 'name' in args:
+        return public.returnJson(True, 'project name missing')
+    user = args['user']
+    name = args['name'] + '.git'
+    commit_log = getRootPath() + '/' + user + '/' + name + \
+        '/custom_hooks/sh.log'
+
+    data = {}
+    if os.path.exists(commit_log):
+        data['status'] = True
+        data['path'] = commit_log
+    else:
+        data['status'] = False
+        data['msg'] = '没有日志文件'
+
+    return public.getJson(data)
 
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -364,6 +586,8 @@ if __name__ == "__main__":
         print initdUinstall()
     elif func == 'run_log':
         print runLog()
+    elif func == 'post_receive_log':
+        print postReceiveLog()
     elif func == 'conf':
         print getConf()
     elif func == 'init_conf':
@@ -374,5 +598,15 @@ if __name__ == "__main__":
         print submitGogsConf()
     elif func == 'user_list':
         print userList()
+    elif func == 'user_project_list':
+        print userProjectList()
+    elif func == 'project_script_edit':
+        print projectScriptEdit()
+    elif func == 'project_script_load':
+        print projectScriptLoad()
+    elif func == 'project_script_unload':
+        print projectScriptUnload()
+    elif func == 'project_script_debug':
+        print projectScriptDebug()
     else:
         print 'fail'
