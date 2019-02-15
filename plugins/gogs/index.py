@@ -566,6 +566,13 @@ def projectScriptDebug():
 
     return public.getJson(data)
 
+
+def gogsEdit():
+    data = {}
+    data['post_receive'] = getPluginDir() + '/hook/post-receive.tpl'
+    data['commit'] = getPluginDir() + '/hook/commit.tpl'
+    return public.getJson(data)
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -608,5 +615,7 @@ if __name__ == "__main__":
         print projectScriptUnload()
     elif func == 'project_script_debug':
         print projectScriptDebug()
+    elif func == 'gogs_edit':
+        print gogsEdit()
     else:
         print 'fail'
