@@ -111,6 +111,20 @@ function submitGogsConf() {
     });
 }
 
+function gogsEdit(){
+
+    gogsPost('gogs_edit',{} , function(data){
+        // console.log(data);
+        var rdata = $.parseJSON(data.data);
+        var edit = '<p class="status">通用的手动编辑:</p>';
+        edit +='<div class="sfm-opt">\
+                <button class="btn btn-default btn-sm" onclick="onlineEditFile(0,\''+rdata['post_receive']+'\');">post-receive.tpl</button>\
+                <button class="btn btn-default btn-sm" onclick="onlineEditFile(0,\''+rdata['commit']+'\');">commit.tpl</button>\
+            </div>'; 
+        $(".soft-man-con").html(edit);
+    });
+    
+}
 
 function gogsUserList(page, search) {
 
