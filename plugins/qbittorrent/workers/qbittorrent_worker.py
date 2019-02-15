@@ -225,6 +225,7 @@ class downloadBT(Thread):
         info = self.query(
             "select id from pl_hash_list where info_hash='" + shash + "'")
 
+        sname = mdb.escape_string(sname)
         if len(info) > 0:
             pid = str(info[0][0])
             file_data = self.query(
