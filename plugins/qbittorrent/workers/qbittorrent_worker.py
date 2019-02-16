@@ -73,7 +73,7 @@ class downloadBT(Thread):
         self.dbcurr.execute('SET NAMES utf8')
         self.qb = self.qb()
 
-        _has_suffix = ['mp4', 'rmvb', 'flv', 'avi', 'mpg', 'mkv']
+        _has_suffix = ['mp4', 'rmvb', 'flv', 'avi', 'mpg', 'mkv', 'wmw']
         has_suffix = []
         for x in range(len(_has_suffix)):
             has_suffix.append('.' + _has_suffix[x])
