@@ -130,6 +130,76 @@ class files_api:
         public.writeFile(isTask, 'True')
         self.setFileAccept(path + '/' + filename)
         return public.returnJson(True, '已将下载任务添加到队列!')
+
+    def getRecycleBinApi(self):
+        rPath = public.getRootDir() + '/Recycle_bin/'
+        if not os.path.exists(rPath):
+            os.system('mkdir -p ' + rPath)
+        data = {}
+        data['dirs'] = []
+        data['files'] = []
+        data['status'] = os.path.exists('data/recycle_bin.pl')
+        data['status_db'] = os.path.exists('data/recycle_bin_db.pl')
+        for file in os.listdir(rPath):
+            try:
+                tmp = {}
+                fname = rPath + file
+                tmp1 = file.split('_bt_')
+                tmp2 = tmp1[len(tmp1) - 1].split('_t_')
+                tmp['rname'] = file
+                tmp['dname'] = file.replace('_mw_', '/').split('_t_')[0]
+                tmp['name'] = tmp2[0]
+                tmp['time'] = int(float(tmp2[1]))
+                if os.path.islink(fname):
+                    filePath = os.readlink(fname)
+                    link = ' -> ' + filePath
+                    if os.path.exists(filePath):
+                        tmp['size'] = os.path.getsize(filePath)
+                    else:
+                        tmp['size'] = 0
+                else:
+                    tmp['size'] = os.path.getsize(fname)
+                if os.path.isdir(fname):
+                    data['dirs'].append(tmp)
+                else:
+                    data['files'].append(tmp)
+            except:
+                continue
+        return public.returnJson(True, 'OK', data)
+
+    # 回收站开关
+    def recycleBinApi(self):
+        c = 'data/recycle_bin.pl'
+        db = request.form.get('db', '').encode('utf-8')
+        if db != '':
+            c = 'data/recycle_bin_db.pl'
+        if os.path.exists(c):
+            os.remove(c)
+            public.writeLog('文件管理', '已关闭回收站功能!')
+            return public.returnJson(True, '已关闭回收站功能!')
+        else:
+            public.writeFile(c, 'True')
+            public.writeLog('文件管理', '已开启回收站功能!')
+            return public.returnJson(True, '已开启回收站功能!')
+
+    def deleteDirApi(self):
+        path = request.form.get('path', '').encode('utf-8')
+        if not os.path.exists(path):
+            return public.returnJson(False, '指定文件不存在!')
+
+        # 检查是否为.user.ini
+        if path.find('.user.ini'):
+            os.system("chattr -i '" + path + "'")
+        try:
+            if os.path.exists('data/recycle_bin.pl'):
+                if self.mvRecycleBin(path):
+                    return public.returnJson(True, '已将文件移动到回收站!')
+            os.remove(path)
+            public.writeLog('文件管理', '删除文件成功！', (path,))
+            return public.returnJson(True, '删除文件成功!')
+        except:
+            return public.returnJson(False, '删除文件失败!')
+
     ##### ----- end ----- ###
 
     def checkFileName(self, filename):
