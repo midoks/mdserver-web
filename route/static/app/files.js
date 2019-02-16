@@ -158,71 +158,41 @@ function recycleBin(type){
 				}
 				$("#RecycleBody").html(body);
 				return;
-			case 6:
-				for(var i=0;i<rdata.files.length;i++){
-					if(rdata.files[i].name.indexOf('BTDB_') != -1){
-						var shortwebname = rdata.files[i].name.replace(/'/,"\\'");
-						var shortpath = rdata.files[i].dname;
-						if(shortwebname.length > 20) shortwebname = shortwebname.substring(0, 20) + "...";
-						if(shortpath.length > 20) shortpath = shortpath.substring(0, 20) + "...";
-						body += '<tr>\
-								<td><span class="ico ico-'+(GetExtName(rdata.files[i].name))+'"></span><span class="tname" title="'+rdata.files[i].name+'">'+shortwebname.replace('BTDB_','')+'</span></td>\
-								<td><span title="'+rdata.files[i].dname+'">mysql://'+shortpath.replace('BTDB_','')+'</span></td>\
-								<td>-</td>\
-								<td>'+getLocalTime(rdata.files[i].time)+'</td>\
-								<td style="text-align: right;">\
-									<a class="btlink" href="javascript:;" onclick="reRecycleBin(\'' + rdata.files[i].rname.replace(/'/,"\\'") + '\',this)">'+lan.files.recycle_bin_re+'</a>\
-									 | <a class="btlink" href="javascript:;" onclick="delRecycleBin(\'' + rdata.files[i].rname.replace(/'/,"\\'") + '\',this)">'+lan.files.recycle_bin_del+'</a>\
-								</td>\
-							</tr>'
-					}
-				}
-				$("#RecycleBody").html(body);
-				return;
-				break;
 		}
 				
 		
 		var tablehtml = '<div class="re-head">\
 				<div style="margin-left: 3px;" class="ss-text">\
-                        <em>'+lan.files.recycle_bin_on+'</em>\
+                        <em>文件回收站</em>\
                         <div class="ssh-item">\
                                 <input class="btswitch btswitch-ios" id="setRecycleBin" type="checkbox" '+(rdata.status?'checked':'')+'>\
                                 <label class="btswitch-btn" for="setRecycleBin" onclick="setRecycleBin()"></label>\
                         </div>\
-                        <em style="margin-left: 20px;">'+lan.files.recycle_bin_on_db+'</em>\
-                        <div class="ssh-item">\
-                                <input class="btswitch btswitch-ios" id="Set_Recycle_bin_db" type="checkbox" '+(rdata.status_db?'checked':'')+'>\
-                                <label class="btswitch-btn" for="Set_Recycle_bin_db" onclick="setRecycleBin(1)"></label>\
-                        </div>\
                 </div>\
-				<span style="line-height: 32px; margin-left: 30px;">'+lan.files.recycle_bin_ps+'</span>\
-                <button style="float: right" class="btn btn-default btn-sm" onclick="closeRecycleBin();">'+lan.files.recycle_bin_close+'</button>\
+				<span style="line-height: 32px; margin-left: 30px;">注意：关闭回收站，删除的文件无法恢复！</span>\
+                <button style="float: right" class="btn btn-default btn-sm" onclick="closeRecycleBin();">清空回收站</button>\
 				</div>\
 				<div class="re-con">\
 					<div class="re-con-menu">\
 						<p class="on" onclick="recycleBin(1)">全部</p>\
 						<p onclick="recycleBin(2)">文件夹</p>\
-						<p onclick="recycleBin(3)">'+lan.files.recycle_bin_type3+'</p>\
-						<p onclick="recycleBin(4)">'+lan.files.recycle_bin_type4+'</p>\
-						<p onclick="recycleBin(5)">'+lan.files.recycle_bin_type5+'</p>\
-						<p onclick="recycleBin(6)">'+lan.files.recycle_bin_type6+'</p>\
+						<p onclick="recycleBin(3)">文件</p>\
+						<p onclick="recycleBin(4)">图片</p>\
+						<p onclick="recycleBin(5)">文档</p>\
 					</div>\
 					<div class="re-con-con">\
 					<div style="margin: 15px;" class="divtable">\
 					<table width="100%" class="table table-hover">\
 						<thead>\
 							<tr>\
-								<th>'+lan.files.recycle_bin_th1+'</th>\
-								<th>'+lan.files.recycle_bin_th2+'</th>\
-								<th>'+lan.files.recycle_bin_th3+'</th>\
-								<th width="150">'+lan.files.recycle_bin_th4+'</th>\
-								<th style="text-align: right;" width="110">'+lan.files.recycle_bin_th5+'</th>\
+								<th>文件名</th><th>原位置</th>\
+								<th>大小</th><th width="150">删除时间</th>\
+								<th style="text-align: right;" width="110">操作</th>\
 							</tr>\
 						</thead>\
 					<tbody id="RecycleBody" class="list-list">'+body+'</tbody>\
 			</table></div></div></div>';
-		if(type == "open"){
+		if(type == 'open'){
 			layer.open({
 				type: 1,
 				shift: 5,
