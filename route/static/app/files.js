@@ -31,7 +31,7 @@ function recycleBin(type){
 								<td>'+toSize(rdata.dirs[i].size)+'</td>\
 								<td>'+getLocalTime(rdata.dirs[i].time)+'</td>\
 								<td style="text-align: right;">\
-									<a class="btlink" href="javascript:;" onclick="ReRecycleBin(\'' + rdata.dirs[i].rname.replace(/'/,"\\'") + '\',this)">'+lan.files.recycle_bin_re+'</a>\
+									<a class="btlink" href="javascript:;" onclick="reRecycleBin(\'' + rdata.dirs[i].rname.replace(/'/,"\\'") + '\',this)">'+lan.files.recycle_bin_re+'</a>\
 									 | <a class="btlink" href="javascript:;" onclick="delRecycleBin(\'' + rdata.dirs[i].rname.replace(/'/,"\\'") + '\',this)">'+lan.files.recycle_bin_del+'</a>\
 								</td>\
 							</tr>'
@@ -48,7 +48,7 @@ function recycleBin(type){
 								<td>-</td>\
 								<td>'+getLocalTime(rdata.files[i].time)+'</td>\
 								<td style="text-align: right;">\
-									<a class="btlink" href="javascript:;" onclick="ReRecycleBin(\'' + rdata.files[i].rname.replace(/'/,"\\'") + '\',this)">'+lan.files.recycle_bin_re+'</a>\
+									<a class="btlink" href="javascript:;" onclick="reRecycleBin(\'' + rdata.files[i].rname.replace(/'/,"\\'") + '\',this)">'+lan.files.recycle_bin_re+'</a>\
 									 | <a class="btlink" href="javascript:;" onclick="delRecycleBin(\'' + rdata.files[i].rname.replace(/'/,"\\'") + '\',this)">'+lan.files.recycle_bin_del+'</a>\
 								</td>\
 							</tr>'
@@ -65,7 +65,7 @@ function recycleBin(type){
 								<td>'+toSize(rdata.files[i].size)+'</td>\
 								<td>'+getLocalTime(rdata.files[i].time)+'</td>\
 								<td style="text-align: right;">\
-									<a class="btlink" href="javascript:;" onclick="ReRecycleBin(\'' + rdata.files[i].rname.replace(/'/,"\\'") + '\',this)">'+lan.files.recycle_bin_re+'</a>\
+									<a class="btlink" href="javascript:;" onclick="reRecycleBin(\'' + rdata.files[i].rname.replace(/'/,"\\'") + '\',this)">'+lan.files.recycle_bin_re+'</a>\
 									 | <a class="btlink" href="javascript:;" onclick="delRecycleBin(\'' + rdata.files[i].rname.replace(/'/,"\\'") + '\',this)">'+lan.files.recycle_bin_del+'</a>\
 								</td>\
 							</tr>'
@@ -85,7 +85,7 @@ function recycleBin(type){
 								<td>'+toSize(rdata.dirs[i].size)+'</td>\
 								<td>'+getLocalTime(rdata.dirs[i].time)+'</td>\
 								<td style="text-align: right;">\
-									<a class="btlink" href="javascript:;" onclick="ReRecycleBin(\'' + rdata.dirs[i].rname.replace(/'/,"\\'") + '\',this)">'+lan.files.recycle_bin_re+'</a>\
+									<a class="btlink" href="javascript:;" onclick="reRecycleBin(\'' + rdata.dirs[i].rname.replace(/'/,"\\'") + '\',this)">'+lan.files.recycle_bin_re+'</a>\
 									 | <a class="btlink" href="javascript:;" onclick="delRecycleBin(\'' + rdata.dirs[i].rname.replace(/'/,"\\'") + '\',this)">'+lan.files.recycle_bin_del+'</a>\
 								</td>\
 							</tr>'
@@ -106,7 +106,7 @@ function recycleBin(type){
 								<td>'+toSize(rdata.files[i].size)+'</td>\
 								<td>'+getLocalTime(rdata.files[i].time)+'</td>\
 								<td style="text-align: right;">\
-									<a class="btlink" href="javascript:;" onclick="ReRecycleBin(\'' + rdata.files[i].rname.replace(/'/,"\\'") + '\',this)">'+lan.files.recycle_bin_re+'</a>\
+									<a class="btlink" href="javascript:;" onclick="reRecycleBin(\'' + rdata.files[i].rname.replace(/'/,"\\'") + '\',this)">'+lan.files.recycle_bin_re+'</a>\
 									 | <a class="btlink" href="javascript:;" onclick="delRecycleBin(\'' + rdata.files[i].rname.replace(/'/,"\\'") + '\',this)">'+lan.files.recycle_bin_del+'</a>\
 								</td>\
 							</tr>'
@@ -127,7 +127,7 @@ function recycleBin(type){
 								<td>'+toSize(rdata.files[i].size)+'</td>\
 								<td>'+getLocalTime(rdata.files[i].time)+'</td>\
 								<td style="text-align: right;">\
-									<a class="btlink" href="javascript:;" onclick="ReRecycleBin(\'' + rdata.files[i].rname.replace(/'/,"\\'") + '\',this)">'+lan.files.recycle_bin_re+'</a>\
+									<a class="btlink" href="javascript:;" onclick="reRecycleBin(\'' + rdata.files[i].rname.replace(/'/,"\\'") + '\',this)">'+lan.files.recycle_bin_re+'</a>\
 									 | <a class="btlink" href="javascript:;" onclick="delRecycleBin(\'' + rdata.files[i].rname.replace(/'/,"\\'") + '\',this)">'+lan.files.recycle_bin_del+'</a>\
 								</td>\
 							</tr>'
@@ -150,7 +150,7 @@ function recycleBin(type){
 								<td>'+toSize(rdata.files[i].size)+'</td>\
 								<td>'+getLocalTime(rdata.files[i].time)+'</td>\
 								<td style="text-align: right;">\
-									<a class="btlink" href="javascript:;" onclick="ReRecycleBin(\'' + rdata.files[i].rname.replace(/'/,"\\'") + '\',this)">'+lan.files.recycle_bin_re+'</a>\
+									<a class="btlink" href="javascript:;" onclick="reRecycleBin(\'' + rdata.files[i].rname.replace(/'/,"\\'") + '\',this)">'+lan.files.recycle_bin_re+'</a>\
 									 | <a class="btlink" href="javascript:;" onclick="delRecycleBin(\'' + rdata.files[i].rname.replace(/'/,"\\'") + '\',this)">'+lan.files.recycle_bin_del+'</a>\
 								</td>\
 							</tr>'
@@ -171,7 +171,7 @@ function recycleBin(type){
 								<td>-</td>\
 								<td>'+getLocalTime(rdata.files[i].time)+'</td>\
 								<td style="text-align: right;">\
-									<a class="btlink" href="javascript:;" onclick="ReRecycleBin(\'' + rdata.files[i].rname.replace(/'/,"\\'") + '\',this)">'+lan.files.recycle_bin_re+'</a>\
+									<a class="btlink" href="javascript:;" onclick="reRecycleBin(\'' + rdata.files[i].rname.replace(/'/,"\\'") + '\',this)">'+lan.files.recycle_bin_re+'</a>\
 									 | <a class="btlink" href="javascript:;" onclick="delRecycleBin(\'' + rdata.files[i].rname.replace(/'/,"\\'") + '\',this)">'+lan.files.recycle_bin_del+'</a>\
 								</td>\
 							</tr>'
@@ -265,11 +265,11 @@ function reisImage(fileName){
 function reRecycleBin(path,obj){
 	layer.confirm(lan.files.recycle_bin_re_msg,{title:lan.files.recycle_bin_re_title,closeBtn:2,icon:3},function(){
 		var loadT = layer.msg(lan.files.recycle_bin_re_the,{icon:16,time:0,shade: [0.3, '#000']});
-		$.post('/files?action=Re_recycleBin','path='+encodeURIComponent(path),function(rdata){
+		$.post('/files/re_recycle_bin','path='+encodeURIComponent(path),function(rdata){
 			layer.close(loadT);
 			layer.msg(rdata.msg,{icon:rdata.status?1:5});
 			$(obj).parents('tr').remove();
-		});
+		},'json');
 	});
 }
 
@@ -277,11 +277,11 @@ function reRecycleBin(path,obj){
 function delRecycleBin(path,obj){
 	layer.confirm(lan.files.recycle_bin_del_msg,{title:lan.files.recycle_bin_del_title,closeBtn:2,icon:3},function(){
 		var loadT = layer.msg(lan.files.recycle_bin_del_the,{icon:16,time:0,shade: [0.3, '#000']});
-		$.post('/files?action=Del_Recycle_bin','path='+encodeURIComponent(path),function(rdata){
+		$.post('/files/del_recycle_bin','path='+encodeURIComponent(path),function(rdata){
 			layer.close(loadT);
 			layer.msg(rdata.msg,{icon:rdata.status?1:5});
 			$(obj).parents('tr').remove();
-		});
+		},'json');
 	});
 }
 
@@ -302,7 +302,6 @@ function closeRecycleBin(){
 
 
 //回收站开关
-//Set_Recycle_bin
 function setRecycleBin(db){
 	var loadT = layer.msg('正在处理,请稍候...',{icon:16,time:0,shade: [0.3, '#000']});
 	var data = {}
@@ -314,8 +313,6 @@ function setRecycleBin(db){
 		layer.msg(rdata.msg,{icon:rdata.status?1:5});
 	},'json');
 }
-
-
 
 //取数据
 function getFiles(Path) {
@@ -523,7 +520,7 @@ function getFiles(Path) {
 				$(this).prop("checked", false);
 				$(this).parents("tr").removeClass("ui-selected");
 			}
-			showSeclect()
+			showSeclect();
 		});
 
 		$("#setBox").click(function() {

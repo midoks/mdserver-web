@@ -16,8 +16,10 @@ from flask import make_response
 
 class files_api:
 
+    rPath = None
+
     def __init__(self):
-        pass
+        self.rPath = public.getRootDir() + '/recycle_bin/'
 
     ##### ----- start ----- ###
     def getBodyApi(self):
@@ -132,7 +134,7 @@ class files_api:
         return public.returnJson(True, '已将下载任务添加到队列!')
 
     def getRecycleBinApi(self):
-        rPath = public.getRootDir() + '/Recycle_bin/'
+        rPath = self.rPath
         if not os.path.exists(rPath):
             os.system('mkdir -p ' + rPath)
         data = {}
@@ -144,7 +146,7 @@ class files_api:
             try:
                 tmp = {}
                 fname = rPath + file
-                tmp1 = file.split('_bt_')
+                tmp1 = file.split('_mw_')
                 tmp2 = tmp1[len(tmp1) - 1].split('_t_')
                 tmp['rname'] = file
                 tmp['dname'] = file.replace('_mw_', '/').split('_t_')[0]
@@ -182,6 +184,42 @@ class files_api:
             public.writeLog('文件管理', '已开启回收站功能!')
             return public.returnJson(True, '已开启回收站功能!')
 
+    def reRecycleBinApi(self):
+        rPath = self.rPath
+        path = request.form.get('path', '').encode('utf-8')
+        dFile = path.replace('_mw_', '/').split('_t_')[0]
+        try:
+            import shutil
+            shutil.move(rPath + path, dFile)
+            msg = public.getInfo('移动文件[{1}]到回收站成功!', (dFile,))
+            public.writeLog('文件管理', msg)
+            return public.returnJson(True, '恢复成功!')
+        except Exception as e:
+            msg = public.getInfo('从回收站恢复[{1}]失败!', (dFile,))
+            public.writeLog('文件管理', msg)
+            return public.returnJson(False, '恢复失败!')
+
+    def delRecycleBinApi(self):
+        rPath = self.rPath
+        path = request.form.get('path', '').encode('utf-8')
+        empty = request.form.get('empty', '').encode('utf-8')
+        dFile = path.split('_t_')[0]
+
+        if not self.checkDir(path):
+            return public.returnJson(False, '敏感目录,请不要花样作死!')
+
+        os.system('which chattr && chattr -R -i ' + rPath + path)
+        if os.path.isdir(rPath + path):
+            import shutil
+            shutil.rmtree(rPath + path)
+        else:
+            os.remove(rPath + path)
+
+        tfile = path.replace('_mw_', '/').split('_t_')[0]
+        msg = public.getInfo('已彻底从回收站删除{1}!', (tfile,))
+        public.writeLog('文件管理', msg)
+        return public.returnJson(True, msg)
+
     def deleteDirApi(self):
         path = request.form.get('path', '').encode('utf-8')
         if not os.path.exists(path):
@@ -201,6 +239,40 @@ class files_api:
             return public.returnJson(False, '删除文件失败!')
 
     ##### ----- end ----- ###
+
+    # 检查敏感目录
+    def checkDir(self, path):
+        path = path.replace('//', '/')
+        if path[-1:] == '/':
+            path = path[:-1]
+
+        nDirs = ('',
+                 '/',
+                 '/*',
+                 '/www',
+                 '/root',
+                 '/boot',
+                 '/bin',
+                 '/etc',
+                 '/home',
+                 '/dev',
+                 '/sbin',
+                 '/var',
+                 '/usr',
+                 '/tmp',
+                 '/sys',
+                 '/proc',
+                 '/media',
+                 '/mnt',
+                 '/opt',
+                 '/lib',
+                 '/srv',
+                 '/selinux',
+                 '/www/server',
+                 '/www/server/data',
+                 public.getRootDir())
+
+        return not path in nDirs
 
     def checkFileName(self, filename):
         # 检测文件名
@@ -223,7 +295,7 @@ class files_api:
 
     # 移动到回收站
     def mvRecycleBin(self, path):
-        rPath = public.getRootDir() + '/recycle_bin/'
+        rPath = self.rPath
         if not os.path.exists(rPath):
             os.system('mkdir -p ' + rPath)
 
