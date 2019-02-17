@@ -8,6 +8,7 @@ import public
 import re
 import json
 import pwd
+import shutil
 
 from flask import request
 from flask import send_file, send_from_directory
@@ -219,6 +220,30 @@ class files_api:
         msg = public.getInfo('已彻底从回收站删除{1}!', (tfile,))
         public.writeLog('文件管理', msg)
         return public.returnJson(True, msg)
+
+    # 获取进度
+    def getSpeedApi(self):
+        data = public.getSpeed()
+        print data
+        return public.returnJson(True, '已清空回收站!', data)
+
+    def closeRecycleBinApi(self):
+        rPath = self.rPath
+        os.system('which chattr && chattr -R -i ' + rPath)
+        rlist = os.listdir(rPath)
+        i = 0
+        l = len(rlist)
+        for name in rlist:
+            i += 1
+            path = rPath + name
+            public.writeSpeed(name, i, l)
+            if os.path.isdir(path):
+                shutil.rmtree(path)
+            else:
+                os.remove(path)
+        public.writeSpeed(None, 0, 0)
+        public.writeLog('文件管理', '已清空回收站!')
+        return public.returnJson(True, '已清空回收站!')
 
     def deleteDirApi(self):
         path = request.form.get('path', '').encode('utf-8')
