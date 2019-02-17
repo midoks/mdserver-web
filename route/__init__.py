@@ -84,11 +84,14 @@ def isLogined():
 
 def publicObject(toObject, func, action=None, get=None):
     name = funConvert(func) + 'Api'
-    if hasattr(toObject, name):
-        efunc = 'toObject.' + name + '()'
-        data = eval(efunc)
-        return data
-    return public.retFail('访问异常!')
+    try:
+        if hasattr(toObject, name):
+            efunc = 'toObject.' + name + '()'
+            data = eval(efunc)
+            return data
+    except Exception as e:
+        data = {'msg': '访问异常:' + str(e) + '!', "status": False}
+        return public.getInfo(data)
 
 
 @app.route("/test")

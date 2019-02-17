@@ -262,7 +262,7 @@ function closeRecycleBin(){
 		setTimeout(function(){
 			getSpeed('.myspeed');
 		},1000);
-		$.post('/files?action=Close_Recycle_bin','',function(rdata){
+		$.post('/files/close_recycle_bin', '', function(rdata){
 			layer.close(loadT);
 			layer.msg(rdata.msg,{icon:rdata.status?1:5});
 			$("#RecycleBody").html('');
@@ -286,18 +286,15 @@ function setRecycleBin(db){
 
 //取数据
 function getFiles(Path) {
-	console.log(Path);
 	var searchtype = Path;
 	if(isNaN(Path)){
-		var p = '1';
+		var p = 1;
 		Path = encodeURIComponent(Path);
-		console.log(1,Path);
 	} else {
-		var p = '1';
+		var p = Path;
 		Path = getCookie('open_dir_path');
-		console.log(2,Path);
+		Path = encodeURIComponent(Path);
 	}
-	console.log(Path);
 	
 	var search = '';
 	var searchV = $("#SearchValue").val();
@@ -461,7 +458,7 @@ function getFiles(Path) {
 		if (rdata.PATH != '/') {
 			BarTools += ' <button onclick="javascript:BackDir();" class="btn btn-default btn-sm glyphicon glyphicon-arrow-left" title="'+lan.files.return+'"></button>';
 		}
-		setCookie('Path',rdata.PATH);
+		setCookie('open_dir_path',rdata.PATH);
 		BarTools += ' <button onclick="javascript:getFiles(\'' + rdata.PATH + '\');" class="btn btn-default btn-sm glyphicon glyphicon-refresh" title="'+lan.public.fresh+'"></button> <button onclick="ExecShell()" title="'+lan.files.shell+'" type="button" class="btn btn-default btn-sm"><em class="ico-cmd"></em></button>';
 		var copyName = getCookie('copyFileName');
 		var cutName = getCookie('cutFileName');
@@ -548,8 +545,10 @@ function getFiles(Path) {
 		});
 		PathPlaceBtn(rdata.PATH);
 	},'json');
-	//setTimeout(function(){getCookie('path');},200);
+	setTimeout(function(){getCookie('open_dir_path');},200);
 }
+
+
 //统计选择数量
 function totalFile(){
 	var el = $("input[name='id']");

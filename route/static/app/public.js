@@ -926,14 +926,18 @@ function bindPaneldel(id){
 }
 
 function getSpeed(sele){
-	if(!$(sele)) return;
-	$.get('/ajax?action=GetSpeed',function(speed){
-		if(speed.title === null) return;
-		mspeed = '';
-		if(speed.speed > 0){
-			mspeed = '<span class="pull-right">'+ToSize(speed.speed)+'/s</span>';
+	if(!$(sele)) {
+		return;
+	}
+	$.get('/files/get_speed',function(speed){
+		if(speed.title === null){
+			return;
 		}
-		body = '<p>'+speed.title+' <img src="/static/img/ing.gif"></p>\
+		var mspeed = '';
+		if(speed.speed > 0){
+			mspeed = '<span class="pull-right">'+toSize(speed.speed)+'/s</span>';
+		}
+		var body = '<p>'+speed.title+' <img src="/static/img/ing.gif"></p>\
 		<div class="bt-progress"><div class="bt-progress-bar" style="width:'+speed.progress+'%"><span class="bt-progress-text">'+speed.progress+'%</span></div></div>\
 		<p class="f12 c9"><span class="pull-left">'+speed.used+'/'+speed.total+'</span>'+mspeed+'</p>';
 		$(sele).prev().hide();
@@ -944,7 +948,7 @@ function getSpeed(sele){
 		setTimeout(function(){
 			getSpeed(sele);
 		},1000);
-	});
+	},'json');
 }
 //消息盒子
 function messageBox() {
