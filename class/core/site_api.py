@@ -22,6 +22,7 @@ class site_api:
 
     setupPath = None  # 安装路径
     vhostPath = None
+    logsPath = None
     rewritePath = None
     sslDir = None  # ssl目录
 
@@ -34,6 +35,8 @@ class site_api:
         self.rewritePath = rw = self.setupPath + '/nginx/rewrite'
         if not os.path.exists(rw):
             public.execShell("mkdir -p " + rw + " && chmod -R 755 " + rw)
+
+        self.logsPath = public.getRootDir() + '/wwwlogs'
 
         # ssl conf
         if public.isAppleSystem():
@@ -165,6 +168,24 @@ class site_api:
         public.writeFile(filename, 'open_basedir=' + path + '/:/tmp/:/proc/')
         public.execShell("which chattr && chattr +i " + filename)
         return public.returnJson(True, '已打开防跨站设置!')
+
+    def logsOpenApi(self):
+        mid = request.form.get('id', '').encode('utf-8')
+        name = public.M('sites').where("id=?", (mid,)).getField('name')
+
+        # NGINX
+        filename = self.getHostConf(name)
+        if os.path.exists(filename):
+            conf = public.readFile(filename)
+            rep = self.logsPath + "/" + name + ".log"
+            if conf.find(rep) != -1:
+                conf = conf.replace(rep, "off")
+            else:
+                conf = conf.replace('access_log  off', 'access_log  ' + rep)
+            public.writeFile(filename, conf)
+
+        public.restartWeb()
+        return public.returnJson(True, '操作成功!')
 
     def getCertListApi(self):
         try:
