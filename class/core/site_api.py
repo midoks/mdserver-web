@@ -19,22 +19,25 @@ class site_api:
     sitePath = None  # 根目录
     sitePort = None  # 端口
     phpVersion = None  # PHP版本
-    setupPath = None  # 安装路径
-    isWriteLogs = None  # 是否写日志
 
-    sslDir = None
+    setupPath = None  # 安装路径
+    vhostPath = None
+    rewritePath = None
+    sslDir = None  # ssl目录
 
     def __init__(self):
-        self.setupPath = public.getServerDir()
-        path = self.setupPath + '/openresty/nginx/conf/vhost'
-        if not os.path.exists(path):
-            public.execShell("mkdir -p " + path + " && chmod -R 755 " + path)
-        path = self.setupPath + '/openresty/nginx/conf/rewrite'
-        if not os.path.exists(path):
-            public.execShell("mkdir -p " + path + " && chmod -R 755 " + path)
+        # nginx conf
+        self.setupPath = public.getServerDir() + '/web_conf'
+        self.vhostPath = vh = self.setupPath + '/nginx/vhost'
+        if not os.path.exists(vh):
+            public.execShell("mkdir -p " + vh + " && chmod -R 755 " + vh)
+        self.rewritePath = rw = self.setupPath + '/nginx/rewrite'
+        if not os.path.exists(rw):
+            public.execShell("mkdir -p " + rw + " && chmod -R 755 " + rw)
 
+        # ssl conf
         if public.isAppleSystem():
-            self.sslDir = public.getServerDir() + '/letsencrypt/'
+            self.sslDir = self.setupPath + '/letsencrypt/'
         else:
             self.sslDir = '/etc/letsencrypt/live/'
 
@@ -61,7 +64,7 @@ class site_api:
         version = request.form.get('version', '').encode('utf-8')
 
         # nginx
-        file = self.setupPath + '/openresty/nginx/conf/vhost/' + siteName + '.conf'
+        file = self.getHostConf(siteName)
         conf = public.readFile(file)
         if conf:
             rep = "enable-php-([0-9]{2,3})\.conf"
@@ -71,7 +74,7 @@ class site_api:
 
         public.restartWeb()
         msg = public.getInfo('成功切换网站[{1}]的PHP版本为PHP-{2}', (siteName, version))
-        public.writeLog("TYPE_SITE", msg)
+        public.writeLog("网站管理", msg)
         return public.returnJson(True, msg)
 
     def getDomainApi(self):
@@ -609,7 +612,7 @@ class site_api:
         if domain_count == 1:
             return public.returnJson(False, '最后一个域名不能删除!')
 
-        file = getHostConf(webname)
+        file = self.getHostConf(webname)
         conf = public.readFile(file)
         if conf:
             # 删除域名
@@ -724,10 +727,10 @@ class site_api:
         return data
 
     def getHostConf(self, siteName):
-        return public.getServerDir() + '/openresty/nginx/conf/vhost/' + siteName + '.conf'
+        return self.vhostPath + '/' + siteName + '.conf'
 
     def getRewriteConf(self, siteName):
-        return public.getServerDir() + '/openresty/nginx/conf/rewrite/' + siteName + '.conf'
+        return self.rewritePath + '/' + siteName + '.conf'
 
     def getIndexConf(self):
         return public.getServerDir() + '/openresty/nginx/conf/nginx.conf'
@@ -985,7 +988,7 @@ include enable-php-''' % (fix.strip().replace(',', '|'), domains.strip().replace
             public.execShell('chmod -R 755 ' + path)
 
     def nginxAddDomain(self, webname, domain, port):
-        file = self.setupPath + '/openresty/nginx/conf/vhost/' + webname + '.conf'
+        file = self.vhostPath + '/' + webname + '.conf'
         conf = public.readFile(file)
         if not conf:
             return
@@ -1011,16 +1014,14 @@ include enable-php-''' % (fix.strip().replace(',', '|'), domains.strip().replace
 
     def nginxAddConf(self):
         source_tpl = public.getRunDir() + '/data/tpl/nginx.conf'
-        vhost_file = self.setupPath + '/openresty/nginx/conf/vhost/' + self.siteName + '.conf'
+        vhost_file = self.vhostPath + '/' + self.siteName + '.conf'
         content = public.readFile(source_tpl)
 
         content = content.replace('{$PORT}', self.sitePort)
         content = content.replace('{$SERVER_NAME}', self.siteName)
         content = content.replace('{$ROOT_DIR}', self.sitePath)
         content = content.replace('{$PHPVER}', self.phpVersion)
-
-        or_rewrite = self.setupPath + '/openresty/nginx/conf/rewrite'
-        content = content.replace('{$OR_REWRITE}', or_rewrite)
+        content = content.replace('{$OR_REWRITE}', self.rewritePath)
 
         logsPath = public.getLogsDir()
         content = content.replace('{$LOGPATH}', logsPath)
@@ -1034,8 +1035,7 @@ location /{
     }
 }
         '''
-        rewrite_file = self.setupPath + \
-            '/openresty/nginx/conf/rewrite/' + self.siteName + '.conf'
+        rewrite_file = self.rewritePath + '/' + self.siteName + '.conf'
         public.writeFile(rewrite_file, rewrite_content)
 
     def add(self, webname, port, ps, path, version):
