@@ -154,6 +154,18 @@ class site_api:
         data['path'] = path
         return public.returnJson(True, 'OK', data)
 
+    def setDirUserIniApi(self):
+        path = request.form.get('path', '').encode('utf-8')
+        filename = path + '/.user.ini'
+        self.delUserInI(path)
+        if os.path.exists(filename):
+            public.execShell("which chattr && chattr -i " + filename)
+            os.remove(filename)
+            return public.returnJson(True, '已清除防跨站设置!')
+        public.writeFile(filename, 'open_basedir=' + path + '/:/tmp/:/proc/')
+        public.execShell("which chattr && chattr +i " + filename)
+        return public.returnJson(True, '已打开防跨站设置!')
+
     def getCertListApi(self):
         try:
             vpath = self.sslDir
@@ -1188,6 +1200,25 @@ location /{
             return data
         except:
             return None
+
+    # 清除多余user.ini
+    def delUserInI(self, path, up=0):
+        for p1 in os.listdir(path):
+            try:
+                npath = path + '/' + p1
+                if os.path.isdir(npath):
+                    if up < 100:
+                        self.delUserInI(npath, up + 1)
+                else:
+                    continue
+                useriniPath = npath + '/.user.ini'
+                if not os.path.exists(useriniPath):
+                    continue
+                public.execShell('which chattr && chattr -i ' + useriniPath)
+                public.execShell('rm -f ' + useriniPath)
+            except:
+                continue
+        return True
 
     # 转换时间
     def strfToTime(self, sdate):
