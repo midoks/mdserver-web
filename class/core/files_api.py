@@ -224,7 +224,6 @@ class files_api:
     # 获取进度
     def getSpeedApi(self):
         data = public.getSpeed()
-        print data
         return public.returnJson(True, '已清空回收站!', data)
 
     def closeRecycleBinApi(self):
