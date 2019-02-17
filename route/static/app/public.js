@@ -929,7 +929,8 @@ function getSpeed(sele){
 	if(!$(sele)) {
 		return;
 	}
-	$.get('/files/get_speed',function(speed){
+	$.get('/files/get_speed',function(data){
+		var speed = data['data'];
 		if(speed.title === null){
 			return;
 		}
