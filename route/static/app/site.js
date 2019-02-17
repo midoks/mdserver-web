@@ -330,13 +330,13 @@ function webPathEdit(id){
 						+'<p><button class="btn btn-success btn-sm" onclick="SetPathSafe('+id+')">保存</button></p>'
 					+'</div>'
 				+'</div>';
-		$("#webedit-con").html(webPathHtml);
-		
+
+		$("#webedit-con").html(webPathHtml);		
 		$("#userini").change(function(){
-			$.post('/site?action=SetDirUserINI','path='+rdata,function(userini){
+			$.post('/site/set_dir_user_ini','path='+webpath,function(userini){
 				layer.msg(userini.msg+'<p style="color:red;">注意：设置防跨站需要重启PHP才能生效!</p>',{icon:userini.status?1:2});
-			});
-		},'json');
+			},'json');
+		});
 		
 		$("#logs").change(function(){
 			$.post('/site?action=logsOpen','id='+id,function(userini){
