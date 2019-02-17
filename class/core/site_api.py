@@ -151,6 +151,7 @@ class site_api:
             data['userini'] = True
         data['runPath'] = self.getSiteRunPath(mid)
         data['pass'] = self.getHasPwd(name)
+        data['path'] = path
         return public.returnJson(True, 'OK', data)
 
     def getCertListApi(self):
@@ -409,8 +410,7 @@ class site_api:
                 home_cert = home_path + '/fullchain.cer'
                 home_key = home_path + '/' + domains[0] + '.key'
 
-        print home_cert
-
+        # print home_cert
         cmd = 'export ACCOUNT_EMAIL=' + email + ' && ' + execStr
         result = public.execShell(cmd)
 
@@ -584,12 +584,6 @@ class site_api:
                 return public.returnMsg(False, '您添加的域名已存在!')
 
             self.nginxAddDomain(webname, domain_name, domain_port)
-
-            # 添加放行端口
-            # if port != '80':
-            #     import firewalls
-            #     get.ps = get.domain
-            #     firewalls.firewalls().AddAcceptPort(get)
 
             public.restartWeb()
             msg = public.getInfo('网站[{1}]添加域名[{2}]成功!', (webname, domain_name))

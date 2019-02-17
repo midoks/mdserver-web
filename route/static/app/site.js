@@ -285,46 +285,49 @@ function webAdd(type) {
 function webPathEdit(id){
 	$.post('/site/get_dir_user_ini','&id='+id, function(data){
 		var userini = data['data'];
+		var webpath = userini['path'];
 		var userinicheckeds = userini.userini?'checked':'';
 		var logscheckeds = userini.logs?'checked':'';
 		var opt = ''
 		var selected = '';
 		for(var i=0;i<userini.runPath.dirs.length;i++){
 			selected = '';
-			if(userini.runPath.dirs[i] == userini.runPath.runPath) selected = 'selected';
+			if(userini.runPath.dirs[i] == userini.runPath.runPath){ 
+				selected = 'selected';
+			}
 			opt += '<option value="'+ userini.runPath.dirs[i] +'" '+selected+'>'+ userini.runPath.dirs[i] +'</option>'
 		}
 		var webPathHtml = "<div class='webedit-box soft-man-con'>\
 					<div class='label-input-group ptb10'>\
-						<input type='checkbox' name='userini' id='userini'"+userinicheckeds+" /><label class='mr20' for='userini' style='font-weight:normal'>"+lan.site.anti_XSS_attack+"(open_basedir)</label>\
-						<input type='checkbox' name='logs' id='logs'"+logscheckeds+" /><label for='logs' style='font-weight:normal'>"+lan.site.write_access_log+"</label>\
+						<input type='checkbox' name='userini' id='userini'"+userinicheckeds+" /><label class='mr20' for='userini' style='font-weight:normal'>防跨站攻击(open_basedir)</label>\
+						<input type='checkbox' name='logs' id='logs'"+logscheckeds+" /><label for='logs' style='font-weight:normal'>写访问日志</label>\
 					</div>\
 					<div class='line mt10'>\
-						<span class='mr5'>"+lan.site.web_dir+"</span>\
-						<input class='bt-input-text mr5' type='text' style='width:50%' placeholder='"+lan.site.web_root_dir+"' value='"+rdata+"' name='webdir' id='inputPath'>\
+						<span class='mr5'>网站目录</span>\
+						<input class='bt-input-text mr5' type='text' style='width:50%' placeholder='网站根目录' value='"+webpath+"' name='webdir' id='inputPath'>\
 						<span onclick='changePath(&quot;inputPath&quot;)' class='glyphicon glyphicon-folder-open cursor mr20'></span>\
-						<button class='btn btn-success btn-sm' onclick='SetSitePath("+id+")'>"+lan.public.save+"</button>\
+						<button class='btn btn-success btn-sm' onclick='SetSitePath("+id+")'>保存</button>\
 					</div>\
 					<div class='line mtb15'>\
-						<span class='mr5'>"+lan.site.run_dir+"</span>\
+						<span class='mr5'>运行目录</span>\
 						<select class='bt-input-text' type='text' style='width:50%; margin-right:41px' name='runPath' id='runPath'>"+opt+"</select>\
-						<button class='btn btn-success btn-sm' onclick='SetSiteRunPath("+id+")' style='margin-top: -1px;'>"+lan.public.save+"</button>\
+						<button class='btn btn-success btn-sm' onclick='SetSiteRunPath("+id+")' style='margin-top: -1px;'>保存</button>\
 					</div>\
 					<ul class='help-info-text c7 ptb10'>\
-						<li>"+lan.site.site_help_1+"</li>\
-						<li>"+lan.site.site_help_2+"</li>\
+						<li>部分程序需要指定二级目录作为运行目录，如ThinkPHP5，Laravel</li>\
+						<li>选择您的运行目录，点保存即可</li>\
 					</ul>"
 					+'<div class="user_pw_tit" style="margin-top: -8px;padding-top: 11px;">'
-						+'<span class="tit">'+lan.soft.pma_pass+'</span>'
+						+'<span class="tit">密码访问</span>'
 						+'<span class="btswitch-p"><input '+(userini.pass?'checked':'')+' class="btswitch btswitch-ios" id="pathSafe" type="checkbox">'
 							+'<label class="btswitch-btn phpmyadmin-btn" for="pathSafe" onclick="pathSafe('+id+')"></label>'
 						+'</span>'
 					+'</div>'
 					+'<div class="user_pw" style="margin-top: 10px;display:'+(userini.pass?'block;':'none;')+'">'
-						+'<p><span>'+lan.soft.pma_user+'</span><input id="username_get" class="bt-input-text" name="username_get" value="" type="text" placeholder="'+lan.soft.edit_empty+'"></p>'
-						+'<p><span>'+lan.soft.pma_pass1+'</span><input id="password_get_1" class="bt-input-text" name="password_get_1" value="" type="password" placeholder="'+lan.soft.edit_empty+'"></p>'
-						+'<p><span>'+lan.soft.pma_pass2+'</span><input id="password_get_2" class="bt-input-text" name="password_get_1" value="" type="password" placeholder="'+lan.soft.edit_empty+'"></p>'
-						+'<p><button class="btn btn-success btn-sm" onclick="SetPathSafe('+id+')">'+lan.public.save+'</button></p>'
+						+'<p><span>授权账号</span><input id="username_get" class="bt-input-text" name="username_get" value="" type="text" placeholder="不修改请留空"></p>'
+						+'<p><span>访问密码</span><input id="password_get_1" class="bt-input-text" name="password_get_1" value="" type="password" placeholder="不修改请留空"></p>'
+						+'<p><span>重复密码</span><input id="password_get_2" class="bt-input-text" name="password_get_1" value="" type="password" placeholder="不修改请留空"></p>'
+						+'<p><button class="btn btn-success btn-sm" onclick="SetPathSafe('+id+')">保存</button></p>'
 					+'</div>'
 				+'</div>';
 		$("#webedit-con").html(webPathHtml);
@@ -333,12 +336,12 @@ function webPathEdit(id){
 			$.post('/site?action=SetDirUserINI','path='+rdata,function(userini){
 				layer.msg(userini.msg+'<p style="color:red;">注意：设置防跨站需要重启PHP才能生效!</p>',{icon:userini.status?1:2});
 			});
-		});
+		},'json');
 		
 		$("#logs").change(function(){
 			$.post('/site?action=logsOpen','id='+id,function(userini){
 				layer.msg(userini.msg,{icon:userini.status?1:2});
-			});
+			},'josn');
 		});
 		
 	},'json');
