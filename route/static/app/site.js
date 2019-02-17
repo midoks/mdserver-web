@@ -339,7 +339,7 @@ function webPathEdit(id){
 		});
 		
 		$("#logs").change(function(){
-			$.post('/site?action=logsOpen','id='+id,function(userini){
+			$.post('/site/logs_open','id='+id,function(userini){
 				layer.msg(userini.msg,{icon:userini.status?1:2});
 			},'josn');
 		});
