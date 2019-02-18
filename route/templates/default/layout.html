@@ -39,15 +39,23 @@
                 </div>
             </div>
             <button style="display: none;" id="bt_copys" class="bt_copy" data-clipboard-text=""></button>
+            <link rel="stylesheet" href="/static/build/xterm.css?v={{config.version}}">
+            <link rel="stylesheet" href="/static/build/addons/fullscreen/fullscreen.css?v={{config.version}}">
             <script src="/static/js/jquery-1.10.2.min.js?v={{config.version}}"></script>
             <script src="/static/js/bootstrap.min.js?v={{config.version}}"></script>
             <script src="/static/layer/layer.js?v={{config.version}}"></script>
             <script src="/static/js/jquery.fly.min.js?v={{config.version}}"></script>
             <script src="/static/js/clipboard.min.js?v={{config.version}}"></script>
+            <script src="/static/build/xterm.js?v={{config.version}}"></script>
+            <script src="/static/build/addons/attach/attach.js?v={{config.version}}"></script>
+            <script src="/static/build/addons/fit/fit.js?v={{config.version}}"></script>
+            <script src="/static/build/addons/fullscreen/fullscreen.js?v={{config.version}}"></script>
+            <script src="/static/js/socket.io.min.js?v={{config.version}}"></script>
+            <script src="/static/build/addons/winptyCompat/winptyCompat.js?v={{config.version}}"></script>
             <script src="/static/app/public.js?v={{config.version}}"></script>
             <script src="/static/js/echarts.min.js?v={{config.version}}"></script>
-            <script type="text/javascript" src="/static/js/jquery.dragsort-0.5.2.min.js?v={{config.version}}"></script>
-            <script src="/static/js/socket.io.min.js?v={{config.version}}"></script>
+            <script src="/static/js/jquery.dragsort-0.5.2.min.js?v={{config.version}}"></script>
+            
             {% block content %}{% endblock %}
             <div class="footer bgw">mdserver-web &copy;2018-∞ 面板 (<a style="color:#20a53a;" target="_blank" href="//github.com/midoks/mdserver-web">源码</a>)<a style="margin-left:20px;color:#20a53a;" href="//github.com/midoks/mdserver-web/wiki/mdserver-web" target="_blank">wiki</a>
         </div>

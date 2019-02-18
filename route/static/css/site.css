@@ -4647,3 +4647,33 @@ select[disabled]{
 .btswitch-btn.bt-waf-firewall{
     width:2.4em;height:1.4em;margin-bottom: 0
 }
+
+
+/*6.0终端样式*/
+.term-box{
+    padding:0 10px 10px;
+    background-color:#333333;
+}
+.shell-text-input .bt-input-text-shell{
+    width:100%;
+    padding:10px 10px 0;
+    border:0 none;
+    height:60px;
+    overflow:auto;
+    resize:none;
+}
+.shell-text-input .bt-input-text-shell:focus,.shell-text-input .bt-input-text-shell:active{
+    border:0 none;
+    outline:none;
+}
+.shell-btn-group{
+    height:30px;
+    position:absolute;
+    bottom:10px;
+    right:10px;
+}
+.shell_btn_close{
+    margin-right:8px;
+}
+
+

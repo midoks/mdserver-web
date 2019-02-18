@@ -851,3 +851,34 @@ def get_string_arr(t):
                 if s1 == s_arr[i][j]:
                     t_arr.append(str(i) + str(j))
     return t_arr
+
+
+def getSSHPort():
+    try:
+        file = '/etc/ssh/sshd_config'
+        conf = ReadFile(file)
+        rep = "#*Port\s+([0-9]+)\s*\n"
+        port = re.search(rep, conf).groups(0)[0]
+        return int(port)
+    except:
+        return 22
+
+
+def getSSHStatus():
+    if os.path.exists('/usr/bin/apt-get'):
+        status = execShell("service ssh status | grep -P '(dead|stop)'")
+    else:
+        import system_api
+        version = system_api.system_api().getSystemVersion()
+        if version.find(' Mac ') != -1:
+            return True
+        if version.find(' 7.') != -1:
+            status = execShell("systemctl status sshd.service | grep 'dead'")
+        else:
+            status = execShell(
+                "/etc/init.d/sshd status | grep -e 'stopped' -e '已停'")
+    if len(status[0]) > 3:
+        status = False
+    else:
+        status = True
+    return status

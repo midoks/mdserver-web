@@ -1,14 +1,10 @@
 <script type="text/javascript">
+
+resetPluginWinWidth(480);
 $.getScript( "/plugins/file?name=webssh&f=js/webssh.js", function() {
 	if ($(".term-box #term").text() != 'W') {
         layer.closeAll();
-        webShell();
+        web_shell2();
     }
 });
-</script>
-<script type="text/javascript">
-    // if ($(".term-box #term").text() != 'W') {
-    //     layer.closeAll();
-    //     web_shell();
-    // }
 </script>
