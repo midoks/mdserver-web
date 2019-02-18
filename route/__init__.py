@@ -8,7 +8,7 @@ import shutil
 import uuid
 
 reload(sys)
-sys.setdefaultencoding('utf8')
+sys.setdefaultencoding('utf-8')
 
 
 from datetime import timedelta
@@ -26,6 +26,7 @@ from flask_session import Session
 
 
 sys.path.append(os.getcwd() + "/class/core")
+sys.path.append("/usr/local/lib/python2.7/site-packages")
 import db
 import public
 import config_api
@@ -35,13 +36,8 @@ app.config.version = config_api.config_api().getVersion()
 # app.config['SECRET_KEY'] = os.urandom(24)
 # app.secret_key = uuid.UUID(int=uuid.getnode()).hex[-12:]
 app.config['SECRET_KEY'] = uuid.UUID(int=uuid.getnode()).hex[-12:]
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=31)
 
-# socketio
-sys.path.append("/usr/local/lib/python2.7/site-packages")
-from flask_socketio import SocketIO, emit, send
-socketio = SocketIO()
-socketio.init_app(app)
 
 try:
     from flask_sqlalchemy import SQLAlchemy
@@ -63,6 +59,11 @@ app.config['SESSION_USE_SIGNER'] = True
 app.config['SESSION_KEY_PREFIX'] = 'MW_:'
 app.config['SESSION_COOKIE_NAME'] = "MW_VER_1"
 Session(app)
+
+# socketio
+from flask_socketio import SocketIO, emit, send
+socketio = SocketIO()
+socketio.init_app(app)
 
 
 # debug macosx dev
