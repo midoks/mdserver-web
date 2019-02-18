@@ -70,11 +70,8 @@ class plugins_api:
 
     def indexListApi(self):
         data = self.getIndexList()
-        print data
-        # return public.getJson(data)
-        print public.returnJson(True, '成功!')
-        return public.returnJson(True, '成功!')
-        # return rr
+        # print data
+        return public.getJson(data)
 
     def indexSortApi(self):
         sort = request.form.get('ssort', '')
@@ -244,7 +241,6 @@ class plugins_api:
         return False
 
     def checkStatusProcess(self, info, i, return_dict):
-
         if not info['setup']:
             return_dict[i] = False
             return
@@ -255,12 +251,31 @@ class plugins_api:
         else:
             return_dict[i] = False
 
-    def checkStatusMProcess(self, plugins_info):
+    def checkStatusThreads(self, plugins_info):
         manager = multiprocessing.Manager()
         return_dict = manager.dict()
         jobs = []
         ntmp_list = range(len(plugins_info))
         for i in ntmp_list:
+            p = multiprocessing.Process(
+                target=self.checkStatusProcess, args=(plugins_info[i], i, return_dict))
+            jobs.append(p)
+            p.start()
+
+        for proc in jobs:
+            proc.join()
+
+        returnData = return_dict.values()
+        for i in ntmp_list:
+            plugins_info[i]['status'] = returnData[i]
+
+        return plugins_info
+
+    def checkStatusMProcess(self, plugins_info):
+        manager = multiprocessing.Manager()
+        return_dict = manager.dict()
+        jobs = []
+        for i in range(len(plugins_info)):
             p = multiprocessing.Process(
                 target=self.checkStatusProcess, args=(plugins_info[i], i, return_dict))
             jobs.append(p)
@@ -359,6 +374,7 @@ class plugins_api:
             pluginInfo['setup_version'] = self.getVersion(
                 pluginInfo['install_checks'])
         # pluginInfo['status'] = self.checkStatus(pluginInfo)
+        pluginInfo['status'] = False
         return pluginInfo
 
     def makeCoexist(self, data):
@@ -437,7 +453,7 @@ class plugins_api:
         end = start + pageSize
         _plugins_info = plugins_info[start:end]
 
-        _plugins_info = self.checkStatusMProcess(_plugins_info)
+        # _plugins_info = self.checkStatusMProcess(_plugins_info)
         return (_plugins_info, len(plugins_info))
 
     def makeListThread(self, data, sType='0'):
@@ -585,7 +601,7 @@ class plugins_api:
             public.writeFile(self.__index, '[]')
 
         indexList = json.loads(public.readFile(self.__index))
-
+        print self.__index, indexList
         plist = []
         app = []
         for i in indexList:
@@ -605,9 +621,9 @@ class plugins_api:
                                 plist.append(tmp_data[index])
                                 continue
                     except Exception, e:
-                        print e
+                        print 'getIndexList:', e
 
-        plist = self.checkStatusMProcess(plist)
+        # plist = self.checkStatusMProcess(plist)
         return plist
 
     def setIndexSort(self, sort):

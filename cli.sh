@@ -4,7 +4,7 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 
 
 mw_start(){
-	gunicorn -c setting.py app:app &
+	gunicorn -c setting.py app:app
 	python task.py &
 }
 
@@ -12,8 +12,8 @@ mw_start(){
 mw_start_debug(){
 	# gunicorn -c setting.py app:app 
 	python task.py &
-	gunicorn -b :7200 app:app
-	# gunicorn -b :7200 -k gevent app:app
+	# gunicorn -b :7200 app:app
+	gunicorn -b :7200 -k gevent app:app
 	# gunicorn -c setting.py app:app
 	
 }
