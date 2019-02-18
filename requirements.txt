@@ -1,5 +1,6 @@
 flask
 flask_session
+flask_socketio
 gunicorn
 psutil
 pillow
