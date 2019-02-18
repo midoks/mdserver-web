@@ -2,6 +2,8 @@ flask
 flask_session
 flask_socketio
 gunicorn
+gevent
+gevent-websocket
 psutil
 pillow
 chardet
