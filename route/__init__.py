@@ -216,6 +216,8 @@ except:
 def connect_ssh():
     global shell, ssh
     print 'connect_ssh'
+    print paramiko.AutoAddPolicy()
+
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     try:
         ssh.connect('127.0.0.1', public.getSSHPort())
@@ -226,14 +228,14 @@ def connect_ssh():
                 ssh.connect('localhost', public.getSSHPort())
             except:
                 return False
-        import firewalls
-        fw = firewalls.firewalls()
-        get = common.dict_obj()
-        get.status = '0'
-        fw.SetSshStatus(get)
-        ssh.connect('127.0.0.1', public.GetSSHPort())
-        get.status = '1'
-        fw.SetSshStatus(get)
+        # import firewalls
+        # fw = firewalls.firewalls()
+        # get = common.dict_obj()
+        # get.status = '0'
+        # fw.SetSshStatus(get)
+        ssh.connect('127.0.0.1', public.getSSHPort())
+        # get.status = '1'
+        # fw.SetSshStatus(get)
     shell = ssh.invoke_shell(term='xterm', width=100, height=29)
     shell.setblocking(0)
     return True
