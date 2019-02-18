@@ -1,10 +1,12 @@
 # coding:utf-8
 
-import os
+
 import time
 import sys
+import os
 chdir = os.getcwd()
 sys.path.append(chdir + '/class/core')
+sys.path.append("/usr/local/lib/python2.7/site-packages")
 import public
 import system_api
 
@@ -20,6 +22,7 @@ threads = 1
 backlog = 512
 reload = True
 daemon = True
+# worker_class = 'geventwebsocket.gunicorn.workers.GeventWebSocketWorker'
 timeout = 7200
 keepalive = 1
 capture_output = True

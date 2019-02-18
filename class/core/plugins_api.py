@@ -70,7 +70,11 @@ class plugins_api:
 
     def indexListApi(self):
         data = self.getIndexList()
-        return public.getJson(data)
+        print data
+        # return public.getJson(data)
+        print public.returnJson(True, '成功!')
+        return public.returnJson(True, '成功!')
+        # return rr
 
     def indexSortApi(self):
         sort = request.form.get('ssort', '')
