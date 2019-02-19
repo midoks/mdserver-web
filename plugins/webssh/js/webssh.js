@@ -1,12 +1,15 @@
 function web_shell2() {
-    var termCols = 50;
-    var termRows = 12;
+    var termCols = 65;
+    var termRows = 18;
     var sendTotal = 0;
     if(!socket)socket = io.connect();
     var term = new Terminal({ cols: termCols, rows: termRows, screenKeys: true, useStyle: true});
+    console.log(term);
+    // term.fit()
     term.open();
     gterm = term
     term.setOption('cursorBlink', true);
+    term.setOption('fontSize', 10);
 
     socket.on('server_response', function (data) {
         console.log('server_response',data);

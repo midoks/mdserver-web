@@ -100,7 +100,7 @@ def publicObject(toObject, func, action=None, get=None):
             return data
     except Exception as e:
         data = {'msg': '访问异常:' + str(e) + '!', "status": False}
-        return public.getInfo(data)
+        return public.getJson(data)
 
 
 @app.route("/test")
