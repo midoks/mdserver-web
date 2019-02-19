@@ -37,8 +37,8 @@ function web_shell2() {
 
     var term_box = layer.open({
         type: 1,
-        title: "宝塔终端",
-        area: ['480px','360px'],
+        title: "本地终端",
+        area: ['500px','400px'],
         closeBtn: 2,
         shadeClose: false,
         content: '<div class="term-box"><div id="term"></div></div>\
