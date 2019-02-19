@@ -19,6 +19,7 @@ function web_shell2() {
             setTimeout(function () {
                 layer.closeAll();
                 term.destroy();
+                clearInterval(interval);
             }, 500);
         }
     });
@@ -51,13 +52,13 @@ function web_shell2() {
                 </div>',
         cancel: function () {
             term.destroy();
-            clearInterval(interval)
+            clearInterval(interval);
         }
     });
 	$(".shell_btn_close").click(function(){
 		layer.close(term_box);
 		term.destroy();
-        clearInterval(interval)
+        clearInterval(interval);
 	})
 	
     setTimeout(function () {
@@ -157,9 +158,7 @@ function web_shell2() {
             }
         });
 
-    }, 100)
-
-    
+    }, 100);
 }
 
 function shell_to_baidu() {
