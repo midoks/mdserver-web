@@ -70,7 +70,6 @@ class plugins_api:
 
     def indexListApi(self):
         data = self.getIndexList()
-        # print data
         return public.getJson(data)
 
     def indexSortApi(self):
@@ -251,23 +250,33 @@ class plugins_api:
         else:
             return_dict[i] = False
 
-    def checkStatusThreads(self, plugins_info):
-        manager = multiprocessing.Manager()
-        return_dict = manager.dict()
-        jobs = []
-        ntmp_list = range(len(plugins_info))
-        for i in ntmp_list:
-            p = multiprocessing.Process(
-                target=self.checkStatusProcess, args=(plugins_info[i], i, return_dict))
-            jobs.append(p)
-            p.start()
+    def checkStatusThreads(self, info, i):
+        if not info['setup']:
+            return False
+        data = self.run(info['name'], 'status', info['setup_version'])
+        if data[0] == 'start':
+            return True
+        else:
+            return False
 
-        for proc in jobs:
-            proc.join()
+    def checkStatusMThreads(self, plugins_info):
+        try:
+            threads = []
+            ntmp_list = range(len(plugins_info))
+            for i in ntmp_list:
+                t = pa_thread(self.checkStatusThreads, (plugins_info[i], i))
+                threads.append(t)
 
-        returnData = return_dict.values()
-        for i in ntmp_list:
-            plugins_info[i]['status'] = returnData[i]
+            for i in ntmp_list:
+                threads[i].start()
+            for i in ntmp_list:
+                threads[i].join()
+
+            for i in ntmp_list:
+                t = threads[i].getResult()
+                plugins_info[i]['status'] = t
+        except Exception as e:
+            print 'checkStatusMThreads:', str(e)
 
         return plugins_info
 
@@ -453,7 +462,7 @@ class plugins_api:
         end = start + pageSize
         _plugins_info = plugins_info[start:end]
 
-        # _plugins_info = self.checkStatusMProcess(_plugins_info)
+        _plugins_info = self.checkStatusMThreads(_plugins_info)
         return (_plugins_info, len(plugins_info))
 
     def makeListThread(self, data, sType='0'):
@@ -601,7 +610,6 @@ class plugins_api:
             public.writeFile(self.__index, '[]')
 
         indexList = json.loads(public.readFile(self.__index))
-        print self.__index, indexList
         plist = []
         app = []
         for i in indexList:
@@ -623,7 +631,9 @@ class plugins_api:
                     except Exception, e:
                         print 'getIndexList:', e
 
+        # 使用gevent模式时,无法使用多进程
         # plist = self.checkStatusMProcess(plist)
+        plist = self.checkStatusMThreads(plist)
         return plist
 
     def setIndexSort(self, sort):

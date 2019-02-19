@@ -10,9 +10,9 @@ sys.path.append("/usr/local/lib/python2.7/site-packages")
 import public
 import system_api
 
-# cpu_info = system_api.system_api().getCpuInfo()
-# workers = cpu_info[1] + 1
-workers = 1
+cpu_info = system_api.system_api().getCpuInfo()
+workers = cpu_info[1] + 1
+# workers = 2
 
 
 if not os.path.exists(os.getcwd() + '/logs'):
