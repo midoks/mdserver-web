@@ -459,7 +459,8 @@ function getFiles(Path) {
 			BarTools += ' <button onclick="javascript:BackDir();" class="btn btn-default btn-sm glyphicon glyphicon-arrow-left" title="'+lan.files.return+'"></button>';
 		}
 		setCookie('open_dir_path',rdata.PATH);
-		BarTools += ' <button onclick="javascript:getFiles(\'' + rdata.PATH + '\');" class="btn btn-default btn-sm glyphicon glyphicon-refresh" title="'+lan.public.fresh+'"></button> <button onclick="ExecShell()" title="'+lan.files.shell+'" type="button" class="btn btn-default btn-sm"><em class="ico-cmd"></em></button>';
+		BarTools += ' <button onclick="javascript:getFiles(\'' + rdata.PATH + '\');" class="btn btn-default btn-sm glyphicon glyphicon-refresh" title="'+lan.public.fresh+'"></button>\
+			<button onclick="webShell()" title="'+lan.files.shell+'" type="button" class="btn btn-default btn-sm"><em class="ico-cmd"></em></button>';
 		var copyName = getCookie('copyFileName');
 		var cutName = getCookie('cutFileName');
 		var isPaste = (copyName == 'null') ? cutName : copyName;
@@ -970,59 +971,6 @@ function downloadFile(action){
 }
 
 
-//执行SHELL
-function ExecShell(action){
-	if(action == 1){
-		var path = $("#DirPathPlace input").val();
-		var exec = encodeURIComponent($("#mExec").val());
-		$.post('/files?action=ExecShell','path='+path+'&shell='+exec,function(rdata){
-			if(rdata.status){
-				$("#mExec").val('');
-				GetShellEcho();
-			} else {
-				layer.msg(rdata.msg,{icon:rdata.status?1:2});
-			}
-			
-		});
-		return;
-	}
-	layer.open({
-		type: 1,
-		shift: 5,
-		closeBtn: 2,
-		area: ['70%','600px'], 
-		title: lan.files.shell_title,
-		content: '<div class="bt-form pd15">\
-					<div class="shellcode"><pre id="Result"></pre></div>\
-					<div class="line">\
-					<input type="text" class="bt-input-text" name="exec" id="mExec" value="" placeholder="'+lan.files.shell_ps+'" onkeydown="if(event.keyCode==13)ExecShell(1);" /><span class="shellbutton btn btn-default btn-sm pull-right" onclick="ExecShell(1)" style="width:10%">'+lan.files.shell_go+'</span>\
-					</div>\
-				</div>'
-	});
-	setTimeout(function(){
-		outTimeGet();
-	},1000);
-	
-}
-
-var outTime = null;
-//取SHELL输出
-function outTimeGet(){
-	outTime = setInterval(function(){
-		if(!$("#mExec").attr('name')){
-			clearInterval(outTime);
-			return;
-		}
-		GetShellEcho();
-	},1000);
-}
-
-function GetShellEcho(){
-	$.post('/files?action=GetExecShellMsg','',function(rdata){
-		$("#Result").html(rdata);
-		$(".shellcode").scrollTop($(".shellcode")[0].scrollHeight);
-	});
-}
 
 //重命名
 function ReName(type, fileName) {
