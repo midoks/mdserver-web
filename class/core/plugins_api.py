@@ -204,6 +204,8 @@ class plugins_api:
 
     # 检查是否正在安装
     def checkSetupTask(self, sName):
+        sName = ''
+        version = ''
         if not self.__tasks:
             self.__tasks = public.M('tasks').where(
                 "status!=?", ('1',)).field('status,name').select()

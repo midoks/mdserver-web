@@ -78,9 +78,9 @@ def downloadFile(url, filename):
         socket.setdefaulttimeout(10)
         urllib.urlretrieve(url, filename=filename, reporthook=downloadHook)
         os.system('chown www.www ' + filename)
-        WriteLogs('done')
+        writeLogs('done')
     except:
-        WriteLogs('done')
+        writeLogs('done')
 
 
 def downloadHook(count, blockSize, totalSize):
@@ -91,12 +91,12 @@ def downloadHook(count, blockSize, totalSize):
     if pre == pre1:
         return
     speed = {'total': totalSize, 'used': used, 'pre': pre}
-    print speed
-    WriteLogs(json.dumps(speed))
+    # print 'task downloadHook', speed
+    writeLogs(json.dumps(speed))
     pre = pre1
 
 
-def WriteLogs(logMsg):
+def writeLogs(logMsg):
     # 写输出日志
     try:
         global logPath
@@ -122,13 +122,14 @@ def startTask():
                         'id,type,execstr').order("id asc").select()
                     # print sql
                     for value in taskArr:
+                        # print value
                         start = int(time.time())
                         if not sql.table('tasks').where("id=?", (value['id'],)).count():
                             continue
                         sql.table('tasks').where("id=?", (value['id'],)).save(
                             'status,start', ('-1', start))
                         if value['type'] == 'download':
-                            argv = value['execstr'].split('|dl|')
+                            argv = value['execstr'].split('|mw|')
                             downloadFile(argv[0], argv[1])
                         elif value['type'] == 'execshell':
                             execShell(value['execstr'])

@@ -70,15 +70,15 @@ class task_api:
             try:
                 tmp = public.readFile(tempFile)
                 if len(tmp) < 10:
-                    return public.returnMsg(False, '当前没有任务队列在执行-3!')
+                    return public.returnJson(False, '当前没有任务队列在执行-3!')
                 echoMsg['msg'] = json.loads(tmp)
                 echoMsg['isDownload'] = True
             except:
-                db.Sql().table('tasks').where(
+                public.M('tasks').where(
                     "id=?", (find['id'],)).save('status', ('0',))
-                return public.returnMsg(False, '当前没有任务队列在执行-4!')
+                return public.returnJson(False, '当前没有任务队列在执行-4!')
         else:
-            echoMsg['msg'] = public.getLastLine(tempFile, 20)
+            echoMsg['msg'] = public.getLastLine(tempFile, 10)
             echoMsg['isDownload'] = False
 
         echoMsg['task'] = public.M('tasks').where("status!=?", ('1',)).field(
