@@ -16,7 +16,7 @@ function web_shell2() {
 
         console.log('server_response_data',data.data);
         console.log('编码:'+data.data.charCodeAt(0));
-        if (data.data == '\n'){
+        if (data.data.charCodeAt(0) == 13){
             console.log('按了回车键!');
         }
 
