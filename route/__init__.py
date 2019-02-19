@@ -288,7 +288,6 @@ def connected_msg(msg):
     print 'connect_event:connected_msg', msg
     try:
         recv = shell.recv(8192)
-        print recv
         print recv.decode("utf-8")
         emit('server_response', {'data': recv.decode("utf-8")})
     except Exception as e:
