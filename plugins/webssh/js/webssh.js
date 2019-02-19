@@ -108,15 +108,9 @@ function web_shell2() {
 
 
             var menudiv = '<ul class="contextmenu">\
-                        <li>\
-                            <a class="shell_copy_btn menu_ssh" data-clipboard-text="'+ selectText + '" ' + style_str + '>复制到剪切板</a>\
-                        </li>\
-                        <li>\
-                            <a  onclick="shell_paste_text()" '+ paste_str+'>粘贴选中项</a>\
-                        </li>\
-                        <li>\
-                            <a onclick="shell_to_baidu()" ' + style_str + '>百度搜索</a>\
-                        </li>\
+                        <li><a class="shell_copy_btn menu_ssh" data-clipboard-text="'+ selectText + '" ' + style_str + '>复制到剪切板</a></li>\
+                        <li><a  onclick="shell_paste_text()" '+ paste_str+'>粘贴选中项</a></li>\
+                        <li><a onclick="shell_to_baidu()" ' + style_str + '>百度搜索</a></li>\
                     </ul>';
             $("body").append(menudiv);
             $(".contextmenu").css({
@@ -174,7 +168,6 @@ function shell_to_baidu() {
     window.open('https://www.baidu.com/s?wd=' + selectText)
     gterm.focus();
 }
-
 
 function shell_paste_text(){
     socket.emit('webssh', getCookie('ssh_selection'));
