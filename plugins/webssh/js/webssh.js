@@ -12,8 +12,12 @@ function web_shell2() {
     term.setOption('fontSize', 10);
 
     socket.on('server_response', function (data) {
-        console.log('server_response',data);
         term.write(data.data);
+
+        console.log('server_response_data',data.data);
+        if (data.data == '\n'){
+            console.log('按了回车键!');
+        }
 
         if (data.data == '\r\n登出\r\n' || data.data == '登出\r\n' || data.data == '\r\nlogout\r\n' || data.data == 'logout\r\n') {
             setTimeout(function () {
@@ -30,7 +34,6 @@ function web_shell2() {
     }
     
     term.on('data', function (data) {
-        console.log('data',data);
         socket.emit('webssh', data);
     });
 
