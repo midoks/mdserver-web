@@ -1,5 +1,5 @@
 function web_shell2() {
-    var termCols = 68;
+    var termCols = 83;
     var termRows = 21;
     var sendTotal = 0;
     if(!socket)socket = io.connect();
@@ -38,7 +38,7 @@ function web_shell2() {
     var term_box = layer.open({
         type: 1,
         title: "本地终端",
-        area: ['500px','400px'],
+        area: ['600px','400px'],
         closeBtn: 2,
         shadeClose: false,
         content: '<div class="term-box"><div id="term"></div></div>\
