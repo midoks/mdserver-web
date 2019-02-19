@@ -285,7 +285,7 @@ def connected_msg(msg):
     global shell, ssh
     try:
         recv = shell.recv(8192)
-        print recv.decode("utf-8")
+        # print recv.decode("utf-8")
         emit('server_response', {'data': recv.decode("utf-8")})
     except Exception as e:
         pass
