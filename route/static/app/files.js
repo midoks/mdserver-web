@@ -43,7 +43,7 @@ function recycleBin(type){
 						if(shortwebname.length > 20) shortwebname = shortwebname.substring(0, 20) + "...";
 						if(shortpath.length > 20) shortpath = shortpath.substring(0, 20) + "...";
 						body += '<tr>\
-								<td><span class="ico ico-'+(GetExtName(rdata.files[i].name))+'"></span><span class="tname" title="'+rdata.files[i].name+'">'+shortwebname.replace('BTDB_','')+'</span></td>\
+								<td><span class="ico ico-'+(getExtName(rdata.files[i].name))+'"></span><span class="tname" title="'+rdata.files[i].name+'">'+shortwebname.replace('BTDB_','')+'</span></td>\
 								<td><span title="'+rdata.files[i].dname+'">mysql://'+shortpath.replace('BTDB_','')+'</span></td>\
 								<td>-</td>\
 								<td>'+getLocalTime(rdata.files[i].time)+'</td>\
@@ -60,7 +60,7 @@ function recycleBin(type){
 					if(shortwebname.length > 20) shortwebname = shortwebname.substring(0, 20) + "...";
 					if(shortpath.length > 20) shortpath = shortpath.substring(0, 20) + "...";
 					body += '<tr>\
-								<td><span class="ico ico-'+(GetExtName(rdata.files[i].name))+'"></span><span class="tname" title="'+rdata.files[i].name+'">'+shortwebname+'</span></td>\
+								<td><span class="ico ico-'+(getExtName(rdata.files[i].name))+'"></span><span class="tname" title="'+rdata.files[i].name+'">'+shortwebname+'</span></td>\
 								<td><span title="'+rdata.files[i].dname+'">'+shortpath+'</span></td>\
 								<td>'+toSize(rdata.files[i].size)+'</td>\
 								<td>'+getLocalTime(rdata.files[i].time)+'</td>\
@@ -101,7 +101,7 @@ function recycleBin(type){
 					if(shortwebname.length > 20) shortwebname = shortwebname.substring(0, 20) + "...";
 					if(shortpath.length > 20) shortpath = shortpath.substring(0, 20) + "...";
 					body += '<tr>\
-								<td><span class="ico ico-'+(GetExtName(rdata.files[i].name))+'"></span><span class="tname" title="'+rdata.files[i].name+'">'+shortwebname+'</span></td>\
+								<td><span class="ico ico-'+(getExtName(rdata.files[i].name))+'"></span><span class="tname" title="'+rdata.files[i].name+'">'+shortwebname+'</span></td>\
 								<td><span title="'+rdata.files[i].dname+'">'+shortpath+'</span></td>\
 								<td>'+toSize(rdata.files[i].size)+'</td>\
 								<td>'+getLocalTime(rdata.files[i].time)+'</td>\
@@ -122,7 +122,7 @@ function recycleBin(type){
 						if(shortwebname.length > 20) shortwebname = shortwebname.substring(0, 20) + "...";
 						if(shortpath.length > 20) shortpath = shortpath.substring(0, 20) + "...";
 						body += '<tr>\
-								<td><span class="ico ico-'+(GetExtName(rdata.files[i].name))+'"></span><span class="tname" title="'+rdata.files[i].name+'">'+shortwebname+'</span></td>\
+								<td><span class="ico ico-'+(getExtName(rdata.files[i].name))+'"></span><span class="tname" title="'+rdata.files[i].name+'">'+shortwebname+'</span></td>\
 								<td><span title="'+rdata.files[i].dname+'">'+shortpath+'</span></td>\
 								<td>'+toSize(rdata.files[i].size)+'</td>\
 								<td>'+getLocalTime(rdata.files[i].time)+'</td>\
@@ -145,7 +145,7 @@ function recycleBin(type){
 						if(shortwebname.length > 20) shortwebname = shortwebname.substring(0, 20) + "...";
 						if(shortpath.length > 20) shortpath = shortpath.substring(0, 20) + "...";
 						body += '<tr>\
-								<td><span class="ico ico-'+(GetExtName(rdata.files[i].name))+'"></span><span class="tname" title="'+rdata.files[i].name+'">'+shortwebname+'</span></td>\
+								<td><span class="ico ico-'+(getExtName(rdata.files[i].name))+'"></span><span class="tname" title="'+rdata.files[i].name+'">'+shortwebname+'</span></td>\
 								<td><span title="'+rdata.files[i].dname+'">'+shortpath+'</span></td>\
 								<td>'+toSize(rdata.files[i].size)+'</td>\
 								<td>'+getLocalTime(rdata.files[i].time)+'</td>\
@@ -398,7 +398,7 @@ function getFiles(Path) {
 			totalSize +=  parseInt(fmp[1]);
 			if(getCookie("rank")=="a"){
 				Body += "<tr class='folderBoxTr' data-path='" + rdata.PATH +"/"+ fmp[0] + "' filetype='" + fmp[0] + "'><td><input type='checkbox' name='id' value='"+fmp[0]+"'></td>\
-						<td class='column-name'><span class='ico ico-"+(GetExtName(fmp[0]))+"'></span><a class='text' title='" + fmp[0] + fmp[5] + "'>" + cnametext + "</a></td>\
+						<td class='column-name'><span class='ico ico-"+(getExtName(fmp[0]))+"'></span><a class='text' title='" + fmp[0] + fmp[5] + "'>" + cnametext + "</a></td>\
 						<td>" + (toSize(fmp[1])) + "</td>\
 						<td>" + ((fmp[2].length > 11)?fmp[2]:getLocalTime(fmp[2])) + "</td>\
 						<td>"+fmp[3]+"</td>\
@@ -416,14 +416,14 @@ function getFiles(Path) {
 			else{
 				Body += "<div class='file folderBox menufile' data-path='" + rdata.PATH +"/"+ fmp[0] + "' filetype='"+fmp[0]+"' title='"+lan.files.file_name+"：" + fmp[0]+"&#13;"+lan.files.file_size+"：" + toSize(fmp[1])+"&#13;"+lan.files.file_etime+"："+getLocalTime(fmp[2])+"&#13;"+lan.files.file_auth+"："+fmp[3]+"&#13;"+lan.files.file_own+"："+fmp[4]+"'>\
 						<input type='checkbox' name='id' value='"+fmp[0]+"'>\
-						<div class='ico ico-"+(GetExtName(fmp[0]))+"'></div>\
+						<div class='ico ico-"+(getExtName(fmp[0]))+"'></div>\
 						<div class='titleBox'><span class='tname'>" + fmp[0] + "</span></div>\
 						</div>";
 			}
 		}
 		var dirInfo = '('+lan.files.get_size.replace('{1}',rdata.DIR.length+'').replace('{2}',rdata.DIR.length+'')+'<font id="pathSize">'+(toSize(totalSize))+'<a class="btlink ml5" onClick="getPathSize()">获取</a></font>)';
 		$("#DirInfo").html(dirInfo);
-		if(getCookie("rank")=="a"){
+		if(getCookie('rank')=='a'){
 			var tablehtml = '<table width="100%" border="0" cellpadding="0" cellspacing="0" class="table table-hover">\
 							<thead>\
 								<tr>\
@@ -451,16 +451,16 @@ function getFiles(Path) {
 						'+lan.files.new+' <span class="caret"></span>\
 						</button>\
 						<ul class="dropdown-menu">\
-						<li><a href="javascript:createFile(0,\'' + Path + '\');">'+lan.files.new_empty_file+'</a></li>\
-						<li><a href="javascript:createDir(0,\'' + Path + '\');">'+lan.files.new_dir+'</a></li>\
+						<li><a href="javascript:createFile(0,\'' + Path + '\');">新建空白文件</a></li>\
+						<li><a href="javascript:createDir(0,\'' + Path + '\');">新建目录</a></li>\
 						</ul>\
 						</div>';
 		if (rdata.PATH != '/') {
-			BarTools += ' <button onclick="javascript:BackDir();" class="btn btn-default btn-sm glyphicon glyphicon-arrow-left" title="'+lan.files.return+'"></button>';
+			BarTools += ' <button onclick="javascript:backDir();" class="btn btn-default btn-sm glyphicon glyphicon-arrow-left" title="返回上一级"></button>';
 		}
 		setCookie('open_dir_path',rdata.PATH);
-		BarTools += ' <button onclick="javascript:getFiles(\'' + rdata.PATH + '\');" class="btn btn-default btn-sm glyphicon glyphicon-refresh" title="'+lan.public.fresh+'"></button>\
-			<button onclick="webShell()" title="'+lan.files.shell+'" type="button" class="btn btn-default btn-sm"><em class="ico-cmd"></em></button>';
+		BarTools += ' <button onclick="javascript:getFiles(\'' + rdata.PATH + '\');" class="btn btn-default btn-sm glyphicon glyphicon-refresh" title="返回上一级"></button>\
+			<button onclick="webShell()" title="终端" type="button" class="btn btn-default btn-sm"><em class="ico-cmd"></em></button>';
 		var copyName = getCookie('copyFileName');
 		var cutName = getCookie('cutFileName');
 		var isPaste = (copyName == 'null') ? cutName : copyName;
@@ -544,7 +544,7 @@ function getFiles(Path) {
 			setCookie('showRow',$(this).val());
 			getFiles(p);
 		});
-		PathPlaceBtn(rdata.PATH);
+		pathPlaceBtn(rdata.PATH);
 	},'json');
 	setTimeout(function(){getCookie('open_dir_path');},200);
 }
@@ -633,7 +633,7 @@ window.onresize = function(){
 	if($(window).width()<1160){
 		$("#PathPlaceBtn,#DirPathPlace input").width(290);
 	}
-	PathLeft();
+	pathLeft();
 	isDiskWidth();
 }
 
@@ -731,7 +731,7 @@ function BatchPasteTo(data,path){
 
 
 //取扩展名
-function GetExtName(fileName){
+function getExtName(fileName){
 	var extArr = fileName.split(".");	
 	var exts = ['folder','folder-unempty','sql','c','cpp','cs','flv','css','js','htm','html','java','log','mht','php','url','xml','ai','bmp','cdr','gif','ico','jpeg','jpg','JPG','png','psd','webp','ape','avi','flv','mkv','mov','mp3','mp4','mpeg','mpg','rm','rmvb','swf','wav','webm','wma','wmv','rtf','docx','fdf','potm','pptx','txt','xlsb','xlsx','7z','cab','iso','rar','zip','gz','bt','file','apk','bookfolder','folder','folder-empty','folder-unempty','fromchromefolder','documentfolder','fromphonefolder','mix','musicfolder','picturefolder','videofolder','sefolder','access','mdb','accdb','sql','c','cpp','cs','js','fla','flv','htm','html','java','log','mht','php','url','xml','ai','bmp','cdr','gif','ico','jpeg','jpg','JPG','png','psd','webp','ape','avi','flv','mkv','mov','mp3','mp4','mpeg','mpg','rm','rmvb','swf','wav','webm','wma','wmv','doc','docm','dotx','dotm','dot','rtf','docx','pdf','fdf','ppt','pptm','pot','potm','pptx','txt','xls','csv','xlsm','xlsb','xlsx','7z','gz','cab','iso','rar','zip','bt','file','apk','css'];
 	var extLastName = extArr[extArr.length - 1];
@@ -773,7 +773,7 @@ function getDisk() {
 }
 
 //返回上一级
-function BackDir() {
+function backDir() {
 	var str = $("#DirPathPlace input").val().replace('//','/');
 	if(str.substr(str.length-1,1) == '/'){
 			str = str.substr(0,str.length-1);
@@ -793,7 +793,7 @@ function BackDir() {
 		back += Path[0];
 		getFiles(back);
 	}
-	setTimeout('PathPlaceBtn(getCookie("Path"));',200);
+	setTimeout('pathPlaceBtn(getCookie("open_dir_path"));',200);
 }
 //新建文件
 function createFile(type, path) {
@@ -1475,7 +1475,7 @@ $("#DirPathPlace input").keyup(function(e){
 	}
 });
 
-function PathPlaceBtn(path){
+function pathPlaceBtn(path){
 	var html = '';
 	var title = '';
 	var	Dpath = path;
@@ -1502,10 +1502,10 @@ function PathPlaceBtn(path){
 		getFiles(Gopath);
 		e.stopPropagation();
 	});
-	PathLeft();
+	pathLeft();
 }
 //计算当前目录偏移
-function PathLeft(){
+function pathLeft(){
 	var UlWidth = $("#PathPlaceBtn ul").width();
 	var SpanPathWidth = $("#PathPlaceBtn").width() - 50;
 	var Ml = UlWidth - SpanPathWidth;
