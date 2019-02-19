@@ -1,6 +1,6 @@
 function web_shell2() {
-    var termCols = 65;
-    var termRows = 18;
+    var termCols = 68;
+    var termRows = 21;
     var sendTotal = 0;
     if(!socket)socket = io.connect();
     var term = new Terminal({ cols: termCols, rows: termRows, screenKeys: true, useStyle: true});

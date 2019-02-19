@@ -238,7 +238,7 @@ def connect_ssh():
             except:
                 return False
         ssh.connect('127.0.0.1', public.getSSHPort())
-    shell = ssh.invoke_shell(term='xterm', width=65, height=18)
+    shell = ssh.invoke_shell(term='xterm', width=68, height=21)
     shell.setblocking(0)
     return True
 
