@@ -12,15 +12,21 @@ import system_api
 
 # cpu_info = system_api.system_api().getCpuInfo()
 # workers = cpu_info[1] + 1
-workers = 2
 
 
 if not os.path.exists(os.getcwd() + '/logs'):
     os.mkdir(os.getcwd() + '/logs')
 
-bt_port = public.readFile('data/port.pl')
-bind = ['0.0.0.0:%s' % bt_port]
+mw_port = public.readFile('data/port.pl')
+if mw_port:
+    mw_port.strip()
+bind = []
+if os.path.exists('data/ipv6.pl'):
+    bind.append('[0:0:0:0:0:0:0:0]:%s' % mw_port)
+else:
+    bind.append('0.0.0.0:%s' % mw_port)
 
+workers = 1
 threads = 4
 backlog = 512
 reload = False
