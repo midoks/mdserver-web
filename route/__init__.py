@@ -214,30 +214,31 @@ except:
     public.execShell('pip install paramiko==2.0.2 &')
 
 
+def create_rsa():
+    public.execShell("rm -f /root/.ssh/*")
+    public.execShell('ssh-keygen -q -t rsa -P "" -f /root/.ssh/id_rsa')
+    public.execShell('cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys')
+    public.execShell('chmod 600 /root/.ssh/authorized_keys')
+
+
 def connect_ssh():
+    print 'connect_ssh_init'
     global shell, ssh
-    print 'connect_ssh'
-    print paramiko.AutoAddPolicy()
+    if not os.path.exists('/root/.ssh/authorized_keys') or not os.path.exists('/root/.ssh/id_rsa') or not os.path.exists('/root/.ssh/id_rsa.pub'):
+        create_rsa()
 
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     try:
         ssh.connect('127.0.0.1', public.getSSHPort())
     except Exception as e:
-        print 'connect_ssh:', str(e)
+        print 'connect_ssh error:', str(e)
         if public.getSSHStatus():
             try:
                 ssh.connect('localhost', public.getSSHPort())
             except:
                 return False
-        # import firewalls
-        # fw = firewalls.firewalls()
-        # get = common.dict_obj()
-        # get.status = '0'
-        # fw.SetSshStatus(get)
         ssh.connect('127.0.0.1', public.getSSHPort())
-        # get.status = '1'
-        # fw.SetSshStatus(get)
-    shell = ssh.invoke_shell(term='xterm', width=100, height=29)
+    shell = ssh.invoke_shell(term='xterm', width=65, height=18)
     shell.setblocking(0)
     return True
 
@@ -252,7 +253,6 @@ def get_input_data(data):
 
 @socketio.on('webssh')
 def webssh(msg):
-    emit('server_response', {'data': '会话丢失，请重新登陆面板!\r\n'})
     print 'webssh', msg
     if not isLogined():
         emit('server_response', {'data': '会话丢失，请重新登陆面板!\r\n'})
@@ -262,14 +262,12 @@ def webssh(msg):
     if not shell:
         ssh_success = connect_ssh()
     if not shell:
-        emit('server_response', {
-             'data': public.getMsg('INIT_WEBSSH_CONN_ERR')})
+        emit('server_response', {'data': '连接SSH服务失败!\r\n'})
         return
     if shell.exit_status_ready():
         ssh_success = connect_ssh()
     if not ssh_success:
-        emit('server_response', {
-             'data': public.getMsg('INIT_WEBSSH_CONN_ERR')})
+        emit('server_response', {'data': '连接SSH服务失败!\r\n'})
         return
     shell.send(msg)
     try:
@@ -277,15 +275,14 @@ def webssh(msg):
         recv = shell.recv(4096)
         emit('server_response', {'data': recv.decode("utf-8")})
     except Exception as ex:
-        pass
+        print str(ex)
 
 
 @socketio.on('connect_event')
 def connected_msg(msg):
-    connect_ssh()
     if not isLogined():
         print 'not login'
-        emit(pdata.s_response, {'data': public.getMsg('INIT_WEBSSH_LOGOUT')})
+        emit(pdata.s_response, {'data': '会话丢失，请重新登陆面板!\r\n'})
         return None
     global shell, ssh
     print 'connect_event:connected_msg', msg
@@ -308,7 +305,7 @@ def websocket_test(data):
     mods = ['site', 'ftp', 'database', 'ajax', 'system', 'crontab', 'files',
             'config', 'panel_data', 'plugin', 'ssl', 'auth', 'firewall', 'panel_wxapp']
     if not pdata['s_module'] in mods:
-        result = public.returnMsg(False, "INIT_WEBSOCKET_ERR")
+        result = '指定模块不存在!'
     else:
         result = eval("%s(pdata)" % pdata['s_module'])
     if not hasattr(pdata, 's_response'):
