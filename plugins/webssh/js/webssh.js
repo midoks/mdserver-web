@@ -11,16 +11,20 @@ function web_shell2() {
     term.setOption('cursorBlink', true);
     term.setOption('fontSize', 10);
 
+    var req_str = ''
     socket.on('server_response', function (data) {
         term.write(data.data);
 
         console.log('server_response_data',data.data);
         console.log('编码:'+data.data.charCodeAt(0));
+        req_str += data.data;
         if (data.data.charCodeAt(0) == 13){
             console.log('按了回车键!');
+            req_str = '';
         }
+        console.log(req_str);
 
-        if (data.data == '\r\n登出\r\n' || data.data == '登出\r\n' || data.data == '\r\nlogout\r\n' || data.data == 'logout\r\n') {
+        if (req_str == '\r\n登出\r\n' || req_str == '登出\r\n' || req_str == '\r\nlogout\r\n' || req_str == 'logout\r\n') {
             setTimeout(function () {
                 layer.closeAll();
             }, 500);
