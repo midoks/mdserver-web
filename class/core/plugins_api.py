@@ -232,7 +232,6 @@ class plugins_api:
         return isTask
 
     def checkStatus(self, info):
-
         if not info['setup']:
             return False
 

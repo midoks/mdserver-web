@@ -681,17 +681,17 @@ function ActionTask() {
 }
 
 function removeTask(b) {
-	var a = layer.msg(lan.public.the_del, {
+	var a = layer.msg('正在删除,请稍候...', {
 		icon: 16,
 		time: 0,
 		shade: [0.3, "#000"]
 	});
-	$.post("/files?action=RemoveTask", "id=" + b, function(c) {
+	$.post("/files/remove_task", "id=" + b, function(c) {
 		layer.close(a);
 		layer.msg(c.msg, {
 			icon: c.status ? 1 : 5
 		});
-	}).error(function(){
+	},'json').error(function(){
 		layer.msg(lan.bt.task_close,{icon:1});
 	});
 }
@@ -990,7 +990,7 @@ function execLog(){
 
 function remind(a){
 	a = a == undefined ? 1 : a;
-	$.post("/task/list", "tojs=remind&table=tasks&result=2,4,6,8&limit=8&p=" + a, function(g) {
+	$.post("/task/list", "table=tasks&result=2,4,6,8&limit=10&p=" + a, function(g) {
 		var e = "";
 		var f = false;
 		var task_count = 0;
@@ -1006,7 +1006,11 @@ function remind(a){
 					<tbody id="remind">'+e+'</tbody>\
 					</table></div>\
 					<div class="mtb15" style="height:32px">\
-						<div class="pull-left buttongroup" style="display:none;"><button class="btn btn-default btn-sm mr5 rs-del" disabled="disabled">'+lan.public.del+'</button><button class="btn btn-default btn-sm mr5 rs-read" disabled="disabled">'+lan.bt.task_tip_read+'</button><button class="btn btn-default btn-sm">'+lan.bt.task_tip_all+'</button></div>\
+						<div class="pull-left buttongroup" style="display:none;">\
+							<button class="btn btn-default btn-sm mr5 rs-del" disabled="disabled">'+lan.public.del+'</button>\
+							<button class="btn btn-default btn-sm mr5 rs-read" disabled="disabled">'+lan.bt.task_tip_read+'</button>\
+							<button class="btn btn-default btn-sm">'+lan.bt.task_tip_all+'</button>\
+						</div>\
 						<div id="taskPage" class="page"></div>\
 					</div>';
 		
@@ -1062,15 +1066,15 @@ function getReloads() {
 							c += f[e] + "<br>"
 						}
 						if(h.task[g].name.indexOf("扫描") != -1) {
-							b = "<li><span class='titlename'>" + h.task[g].name + "</span><span class='state'>正在扫描<img src='/static/img/ing.gif'> | <a href=\"javascript:RemoveTask(" + h.task[g].id + ")\">关闭</a></span><span class='opencmd'></span><div class='cmd'>" + c + "</div></li>"
+							b = "<li><span class='titlename'>" + h.task[g].name + "</span><span class='state'>正在扫描<img src='/static/img/ing.gif'> | <a href=\"javascript:removeTask(" + h.task[g].id + ")\">关闭</a></span><span class='opencmd'></span><div class='cmd'>" + c + "</div></li>"
 						} else {
-							b = "<li><span class='titlename'>" + h.task[g].name + "</span><span class='state'>正在安装<img src='/static/img/ing.gif'> | <a href=\"javascript:RemoveTask(" + h.task[g].id + ")\">关闭</a></span><div class='cmd'>" + c + "</div></li>"
+							b = "<li><span class='titlename'>" + h.task[g].name + "</span><span class='state'>正在安装<img src='/static/img/ing.gif'> | <a href=\"javascript:removeTask(" + h.task[g].id + ")\">关闭</a></span><div class='cmd'>" + c + "</div></li>"
 						}
 					} else {
 						b = "<li><div class='line-progress' style='width:" + h.msg.pre + "%'></div><span class='titlename'>" + h.task[g].name + "<a style='margin-left:130px;'>" + (toSize(h.msg.used) + "/" + toSize(h.msg.total)) + "</a></span><span class='com-progress'>" + h.msg.pre + "%</span><span class='state'>"+lan.bt.task_downloading+" <img src='/static/img/ing.gif'> | <a href=\"javascript:RemoveTask(" + h.task[g].id + ")\">"+lan.public.close+"</a></span></li>"
 					}
 				} else {
-					d += "<li><span class='titlename'>" + h.task[g].name + "</span><span class='state'>等待 | <a style='color:green' href=\"javascript:RemoveTask(" + h.task[g].id + ')">删除</a></span></li>'
+					d += "<li><span class='titlename'>" + h.task[g].name + "</span><span class='state'>等待 | <a style='color:green' href=\"javascript:removeTask(" + h.task[g].id + ')">删除</a></span></li>'
 				}
 			}
 			$(".cmdlist").html(b + d);
@@ -1102,10 +1106,11 @@ function RscheckSelect(){
 
 
 function tasklist(a){
-	var con='<ul class="cmdlist"></ul><span style="position:  fixed;bottom: 13px;">若任务长时间未执行，请尝试在首页点【重启面板】来重置任务队列</span>';
+	var con='<ul class="cmdlist"></ul>\
+		<span style="position:  fixed;bottom: 13px;">若任务长时间未执行，请尝试在首页点【重启面板】来重置任务队列</span>';
 	$(".taskcon").html(con);
 	a = a == undefined ? 1 : a;
-	$.post("/task/list", "tojs=GetTaskList&table=tasks&limit=10&p=" + a, function(g) {
+	$.post("/task/list", "tojs=getTaskList&table=tasks&limit=10&p=" + a, function(g) {
 		var e = "";
 		var b = "";
 		var c = "";
@@ -1116,14 +1121,14 @@ function tasklist(a){
 				case "-1":
 					f = true;
 					if(g.data[d].type != "download") {
-						b = "<li><span class='titlename'>" + g.data[d].name + "</span><span class='state pull-right c6'>"+lan.bt.task_install+" <img src='/static/img/ing.gif'> | <a class='btlink' href=\"javascript:RemoveTask(" + g.data[d].id + ")\">"+lan.public.close+"</a></span><span class='opencmd'></span><pre class='cmd'></pre></li>"
+						b = "<li><span class='titlename'>" + g.data[d].name + "</span><span class='state pull-right c6'>正在安装<img src='/static/img/ing.gif'> | <a class='btlink' href=\"javascript:removeTask(" + g.data[d].id + ")\">关闭</a></span><span class='opencmd'></span><pre class='cmd'></pre></li>"
 					} else {
-						b = "<li><div class='line-progress' style='width:0%'></div><span class='titlename'>" + g.data[d].name + "<a id='speed' style='margin-left:130px;'>0.0M/12.5M</a></span><span class='com-progress'>0%</span><span class='state'>"+lan.bt.task_downloading+" <img src='/static/img/ing.gif'> | <a href=\"javascript:RemoveTask(" + g.data[d].id + ")\">"+lan.public.close+"</a></span></li>"
+						b = "<li><div class='line-progress' style='width:0%'></div><span class='titlename'>" + g.data[d].name + "<a id='speed' style='margin-left:130px;'>0.0M/12.5M</a></span><span class='com-progress'>0%</span><span class='state'>下载中 <img src='/static/img/ing.gif'> | <a href=\"javascript:removeTask(" + g.data[d].id + ")\">关闭</a></span></li>"
 					}
 					task_count++;
 					break;
 				case "0":
-					c += "<li><span class='titlename'>" + g.data[d].name + "</span><span class='state pull-right c6'>"+lan.bt.task_sleep+"</span> | <a href=\"javascript:RemoveTask(" + g.data[d].id + ")\" class='btlink'>"+lan.public.del+"</a></li>";
+					c += "<li><span class='titlename'>" + g.data[d].name + "</span><span class='state pull-right c6'>等待</span> | <a href=\"javascript:removeTask(" + g.data[d].id + ")\" class='btlink'>"+lan.public.del+"</a></li>";
 					task_count++;
 					break;
 			}
@@ -1134,7 +1139,7 @@ function tasklist(a){
 		$(".cmdlist").html(b + c);
 		getReloads();
 		return f
-	},'json')
+	},'json');
 }
 
 //检查登陆状态

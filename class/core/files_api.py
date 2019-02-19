@@ -134,6 +134,36 @@ class files_api:
         # self.setFileAccept(path + '/' + filename)
         return public.returnJson(True, '已将下载任务添加到队列!')
 
+    def removeTaskApi(self):
+        mid = request.form.get('id', '').encode('utf-8')
+        try:
+            name = public.M('tasks').where('id=?', (mid,)).getField('name')
+            status = public.M('tasks').where('id=?', (mid,)).getField('status')
+            public.M('tasks').delete(mid)
+            if status == '-1':
+                os.system(
+                    "kill `ps -ef |grep 'python panelSafe.pyc'|grep -v grep|grep -v panelExec|awk '{print $2}'`")
+                os.system(
+                    "kill `ps aux | grep 'python task.pyc$'|awk '{print $2}'`")
+                os.system('''
+pids=`ps aux | grep 'sh'|grep -v grep|grep install|awk '{print $2}'`
+arr=($pids)
+
+for p in ${arr[@]}
+do
+    kill -9 $p
+done
+            ''')
+
+                os.system(
+                    'rm -f ' + name.replace('扫描目录[', '').replace(']', '') + '/scan.pl')
+                isTask = public.getRootDir() + '/tmp/panelTask.pl'
+                public.writeFile(isTask, 'True')
+                os.system('/etc/init.d/mw start')
+        except:
+            os.system('/etc/init.d/mw start')
+        return public.returnJson(True, '任务已删除!')
+
     def getRecycleBinApi(self):
         rPath = self.rPath
         if not os.path.exists(rPath):
