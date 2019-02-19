@@ -67,7 +67,7 @@ setTimeout(function() {
     getFiles((xPath != undefined ? xPath : '/www/wwwroot'));
 }, 800);
 
-PathPlaceBtn((xPath != undefined ? xPath : '/www/wwwroot'));
+pathPlaceBtn((xPath != undefined ? xPath : '/www/wwwroot'));
 setCookie('uploadSize', 1024 * 1024 * 1024);
 if (getCookie('rank') == undefined || getCookie('rank') == null) {
     setCookie('rank', 'a');
