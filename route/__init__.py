@@ -222,7 +222,6 @@ def create_rsa():
 
 
 def connect_ssh():
-    print 'connect_ssh_init'
     global shell, ssh
     if not os.path.exists('/root/.ssh/authorized_keys') or not os.path.exists('/root/.ssh/id_rsa') or not os.path.exists('/root/.ssh/id_rsa.pub'):
         create_rsa()
@@ -231,7 +230,6 @@ def connect_ssh():
     try:
         ssh.connect('127.0.0.1', public.getSSHPort())
     except Exception as e:
-        print 'connect_ssh error:', str(e)
         if public.getSSHStatus():
             try:
                 ssh.connect('localhost', public.getSSHPort())
@@ -275,7 +273,7 @@ def webssh(msg):
         recv = shell.recv(4096)
         emit('server_response', {'data': recv.decode("utf-8")})
     except Exception as ex:
-        print str(ex)
+        print 'webssh:' + str(ex)
 
 
 @socketio.on('connect_event')
@@ -289,7 +287,7 @@ def connected_msg(msg):
         print recv.decode("utf-8")
         emit('server_response', {'data': recv.decode("utf-8")})
     except Exception as e:
-        print 'connect_event:' + str(e)
+        print 'connected_msg:' + str(e)
 
 
 @socketio.on('panel')
