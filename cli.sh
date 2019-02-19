@@ -10,9 +10,8 @@ mw_start(){
 
 
 mw_start_debug(){
-	# gunicorn -c setting.py app:app 
+	
 	python task.py &
-	# gunicorn -b :7200 app:app
 	gunicorn -b :7200 -k gevent -w 1 app:app
 	# gunicorn -b :7200 -k eventlet -w 1 app:app 
 	# gunicorn -c setting.py app:app

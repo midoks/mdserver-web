@@ -127,11 +127,11 @@ class files_api:
         filename = request.form.get('filename', '').encode('utf-8')
 
         isTask = public.getRootDir() + '/tmp/panelTask.pl'
-        execstr = url + '|bt|' + path + '/' + filename
+        execstr = url + '|mw|' + path + '/' + filename
         public.M('tasks').add('name,type,status,addtime,execstr',
                               ('下载文件[' + filename + ']', 'download', '0', time.strftime('%Y-%m-%d %H:%M:%S'), execstr))
         public.writeFile(isTask, 'True')
-        self.setFileAccept(path + '/' + filename)
+        # self.setFileAccept(path + '/' + filename)
         return public.returnJson(True, '已将下载任务添加到队列!')
 
     def getRecycleBinApi(self):
