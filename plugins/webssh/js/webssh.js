@@ -12,7 +12,10 @@ function web_shell2() {
 
     socket.on('server_response', function (data) {
         term.write(data.data);
-        if (req_str == '\r\n登出\r\n' || req_str == '登出\r\n' || req_str == '\r\nlogout\r\n' || req_str == 'logout\r\n') {
+        if (data.data == '\r\n登出\r\n' || 
+            data.data == '登出\r\n' || 
+            data.data == '\r\nlogout\r\n' || 
+            data.data == 'logout\r\n') {
             setTimeout(function () {
                 layer.closeAll();
                 term.destroy();
