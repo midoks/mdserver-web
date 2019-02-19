@@ -26,7 +26,7 @@ if os.path.exists('data/ipv6.pl'):
 else:
     bind.append('0.0.0.0:%s' % mw_port)
 
-workers = 1
+workers = 2
 threads = 4
 backlog = 512
 reload = False
