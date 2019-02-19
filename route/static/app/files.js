@@ -934,7 +934,7 @@ function downloadFile(action){
 		$.post('/files/download_file','path='+fpath+'&url='+fUrl+'&filename='+fname,function(rdata){
 			layer.closeAll();
 			getFiles(fpath);
-			GetTaskCount();
+			getTaskCount();
 			layer.msg(rdata.msg,{icon:rdata.status?1:2});
 		},'json');
 		return;
