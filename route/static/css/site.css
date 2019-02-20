@@ -3452,8 +3452,8 @@ html .menu .menu_exit:hover {
     margin: 0;
     padding: 10px;
     clear: both;
-    height: 360px;
-    overflow: auto
+    height: 160px;
+    overflow: auto;
 }
 
 #up_box li {

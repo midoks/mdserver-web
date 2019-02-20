@@ -1262,31 +1262,31 @@ function getFileBytes(fileName, fileSize){
 
 
 //上传文件
-function UploadFiles(){
+function uploadFiles(){
 	var path = $("#DirPathPlace input").val()+"/";
 	layer.open({
 		type:1,
 		closeBtn: 2,
 		title:lan.files.up_title,
-		area: ['500px','500px'], 
+		area: ['500px','300px'], 
 		shadeClose:false,
 		content:'<div class="fileUploadDiv"><input type="hidden" id="input-val" value="'+path+'" />\
 				<input type="file" id="file_input"  multiple="true" autocomplete="off" />\
-				<button type="button"  id="opt" autocomplete="off">'+lan.files.up_add+'</button>\
-				<button type="button" id="up" autocomplete="off" >'+lan.files.up_start+'</button>\
+				<button type="button"  id="opt" autocomplete="off">添加文件</button>\
+				<button type="button" id="up" autocomplete="off" >开始上传</button>\
 				<span id="totalProgress" style="position: absolute;top: 7px;right: 147px;"></span>\
 				<span style="float:right;margin-top: 9px;">\
-				<font>'+lan.files.up_coding+':</font>\
+				<font>文件编码:</font>\
 				<select id="fileCodeing" >\
-					<option value="byte">'+lan.files.up_bin+'</option>\
+					<option value="byte">二进制</option>\
 					<option value="utf-8">UTF-8</option>\
 					<option value="gb18030">GB2312</option>\
 				</select>\
 				</span>\
-				<button type="button" id="filesClose" autocomplete="off" onClick="layer.closeAll()" >'+lan.public.close+'</button>\
+				<button type="button" id="filesClose" autocomplete="off" onClick="layer.closeAll()" >关闭</button>\
 				<ul id="up_box"></ul></div>'
 	});
-	UploadStart();
+	uploadStart();
 }
 
 //设置权限
