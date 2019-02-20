@@ -44,7 +44,6 @@ function getCronData(){
 	var load = layer.msg(lan.public.the,{icon:16,time:0,shade: [0.3, '#000']});
 	$.post('/crontab/list', '', function(rdata){
 		layer.close(load);
-		console.log(rdata);
 		var cbody = "";
 		if(rdata == ""){
 			cbody="<tr><td colspan='6'>"+lan.crontab.task_empty+"</td></tr>";
@@ -231,21 +230,20 @@ function planAdd(){
 	}
 	
 	$("#set-Config input[name='save']").val(save);
-	
-	
 	$("#set-Config input[name='week']").val($(".planweek").find("b").attr("val"));
+
 	var sType = $(".planjs").find("b").attr("val");
 	var sBody = encodeURIComponent($("#implement textarea[name='sBody']").val());
 	
 	if(sType == 'toFile'){
 		if($("#viewfile").val() == ''){
-			layer.msg(lan.crontab.input_file_err,{icon:2});
+			layer.msg('请选择脚本文件!',{icon:2});
 			return;
 		}
-	}else{
+	} else {
 		if(sBody == ''){
 			$("#implement textarea[name='sBody']").focus();
-			layer.msg(lan.crontab.input_script_err,{icon:2});
+			layer.msg('脚本代码不能为空!',{icon:2});
 			return;
 		}
 	}
@@ -253,12 +251,12 @@ function planAdd(){
 	var urladdress = $("#urladdress").val();
 	if(sType == 'toUrl'){
 		if(!isURL(urladdress)){
-			layer.msg(lan.crontab.input_url_err,{icon:2});
+			layer.msg('URL地址不正确!',{icon:2});
 			$("implement textarea[name='urladdress']").focus();
 			return;
 		}
 	}
-	urladdress = encodeURIComponent(urladdress);
+	// urladdress = encodeURIComponent(urladdress);
 	$("#set-Config input[name='urladdress']").val(urladdress);
 	$("#set-Config input[name='sType']").val(sType);
 	$("#set-Config textarea[name='sBody']").val(decodeURIComponent(sBody));
@@ -267,7 +265,6 @@ function planAdd(){
 		var backupTo = $(".planBackupTo").find("b").attr("val");
 		$("#backupTo").val(backupTo);
 	}
-	
 	
 	var sName = $("#sName").attr("val");
 	
@@ -279,16 +276,15 @@ function planAdd(){
 			dataList.push(tmp);
 		}
 		if(dataList.length < 1){
-			layer.msg(lan.crontab.input_empty_err,{icon:5});
+			layer.msg('对象列表为空，无法继续!',{icon:5});
 			return;
 		}
-		
 		allAddCrontab(dataList,0,'');
 		return;
 	}
 	
 	$("#set-Config input[name='sName']").val(sName);
-	layer.msg(lan.public.the_add,{icon:16,time:0,shade: [0.3, '#000']});
+	layer.msg('正在添加,请稍候...!',{icon:16,time:0,shade: [0.3, '#000']});
 	var data= $("#set-Config").serialize() + '&sBody='+sBody + '&urladdress=' + urladdress;
 	$.post('/crontab/add',data,function(rdata){
 		if(!rdata.status) {
@@ -358,7 +354,7 @@ $(".dropdown ul li a").click(function(){
 			break;
 		case 'day-n':
 			closeOpt();
-			toWhere1(lan.crontab.day);
+			toWhere1('天');
 			toHour();
 			toMinute();
 			break;
@@ -368,12 +364,12 @@ $(".dropdown ul li a").click(function(){
 			break;
 		case 'hour-n':
 			closeOpt();
-			toWhere1(lan.crontab.hour);
+			toWhere1('小时');
 			toMinute();
 			break;
 		case 'minute-n':
 			closeOpt();
-			toWhere1(lan.crontab.minute);
+			toWhere1('分钟');
 			break;
 		case 'week':
 			closeOpt();
@@ -383,7 +379,7 @@ $(".dropdown ul li a").click(function(){
 			break;
 		case 'month':
 			closeOpt();
-			toWhere1(lan.crontab.sun);
+			toWhere1('日');
 			toHour();
 			toMinute();
 			break;
@@ -392,27 +388,27 @@ $(".dropdown ul li a").click(function(){
 			break;
 		case 'toShell':
 			toShell();
-			$(".controls").html(lan.crontab.sbody);
+			$(".controls").html('脚本内容');
 			break;
 		case 'rememory':
 			rememory();
-			$(".controls").html(lan.public.msg);
+			$(".controls").html('提示');
 			break;
 		case 'site':
 			toBackup('sites');
-			$(".controls").html(lan.crontab.backup_site);
+			$(".controls").html('备份网站');
 			break;
 		case 'database':
 			toBackup('databases');
-			$(".controls").html(lan.crontab.backup_database);
+			$(".controls").html('备份数据库');
 			break;
 		case 'logs':
 			toBackup('logs');
-			$(".controls").html(lan.crontab.log_site);
+			$(".controls").html('切割网站');
 			break;
 		case 'toUrl':
 			toUrl();
-			$(".controls").html(lan.crontab.url_address);
+			$(".controls").html('URL地址');
 			break;
 	}
 })
@@ -423,20 +419,20 @@ function toBackup(type){
 	var sMsg = "";
 	switch(type){
 		case 'sites':
-			sMsg = lan.crontab.backup_site;
+			sMsg = '备份网站';
 			sType = "sites";
 			break;
 		case 'databases':
-			sMsg = lan.crontab.backup_database;
+			sMsg = '备份数据库';
 			sType = "databases";
 			break;
 		case 'logs':
-			sMsg = lan.crontab.backup_log;
+			sMsg = '切割日志';
 			sType = "sites";
 			break;
 	}
 	var data='type='+sType
-	$.post('/crontab?action=GetDataList',data,function(rdata){
+	$.post('/crontab/get_data_list',data,function(rdata){
 		$(".planname input[name='name']").attr('readonly','true').css({"background-color":"#f6f6f6","color":"#666"});
 		var sOpt = "";
 		if(rdata.data.length == 0){
@@ -455,14 +451,13 @@ function toBackup(type){
 			orderOpt += '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="'+rdata.orderOpt[i].value+'">'+rdata.orderOpt[i].name+'</a></li>'
 		}
 		
-		
 
 		var sBody = '<div class="dropdown pull-left mr20">\
 					  <button class="btn btn-default dropdown-toggle" type="button" id="backdata" data-toggle="dropdown" style="width:auto">\
 						<b id="sName" val="'+rdata.data[0].name+'">'+rdata.data[0].name+'['+rdata.data[0].ps+']</b> <span class="caret"></span>\
 					  </button>\
 					  <ul class="dropdown-menu" role="menu" aria-labelledby="backdata">\
-					  	<li><a role="menuitem" tabindex="-1" href="javascript:;" value="backupAll">'+lan.public.all+'</a></li>\
+					  	<li><a role="menuitem" tabindex="-1" href="javascript:;" value="backupAll">所有</a></li>\
 					  	'+sOpt+'\
 					  </ul>\
 					</div>\
@@ -487,7 +482,7 @@ function toBackup(type){
 			if(!sName) return;
 			$(".planname input[name='name']").val(sMsg+'['+sName+']');
 		});
-	});
+	},'json');
 }
 
 
@@ -496,17 +491,18 @@ function editTaskInfo(id){
 	layer.msg('正在获取,请稍候...',{icon:16,time:0,shade: [0.3, '#000']});
 	$.post('/crontab/get_crond_find',{id:id},function(rdata){
 		layer.closeAll();
+		// console.log('init:', rdata);
 		var sTypeName = '',sTypeDom = '',cycleName = '',cycleDom = '',weekName = '',weekDom = '',sNameName ='',sNameDom = '',backupsName = '',backupsDom ='';
 		obj = {
 			from:{
 				id:rdata.id,
 				name: rdata.name,
-				type: rdata.type,
+				type: rdata['type'],
+				stype: rdata.stype,
 				where1: rdata.where1,
 				hour: rdata.where_hour,
 				minute: rdata.where_minute,
 				week: rdata.where1,
-				stype: rdata.stype,
 				sbody: rdata.sbody,
 				sname: rdata.sname,
 				backup_to: rdata.backup_to,
@@ -519,7 +515,6 @@ function editTaskInfo(id){
 			sNameArray:[],
 			backupsArray:[],
 			create:function(callback){
-				console.log(obj);
 				for(var i = 0; i <obj['sTypeArray'].length; i++){
 					if(obj.from['stype'] == obj['sTypeArray'][i][0]){
 						sTypeName  = obj['sTypeArray'][i][1];
@@ -538,21 +533,25 @@ function editTaskInfo(id){
 				}
 
 				if(obj.from.stype == 'site' || obj.from.stype == 'database' || obj.from.stype == 'path' || obj.from.stype == 'logs'){
-					$.post('/crontab?action=GetDataList',{type:obj.from.stype  == 'databases'?'database':'sites'},function(rdata){
+					$.post('/crontab/get_data_list',{type:obj.from.stype  == 'databases'?'database':'sites'},function(rdata){
 						obj.sNameArray = rdata.data;
 						obj.sNameArray.unshift({name:'ALL',ps:'所有'});
 						obj.backupsArray = rdata.orderOpt;
 						obj.backupsArray.unshift({name:'服务器磁盘',value:'localhost'});
 						for(var i = 0; i <obj['sNameArray'].length; i++){
-							if(obj.from['sName'] == obj['sNameArray'][i]['name'])  sNameName  = obj['sNameArray'][i]['ps'];
+							if(obj.from['sname'] == obj['sNameArray'][i]['name']){
+								sNameName  = obj['sNameArray'][i]['ps'];
+							}
 							sNameDom += '<li><a role="menuitem"  href="javascript:;" value="'+ obj['sNameArray'][i]['name'] +'">'+ obj['sNameArray'][i]['ps'] +'</a></li>';
 						}
 						for(var i = 0; i <obj['backupsArray'].length; i++){
-							if(obj.from['backupTo'] == obj['backupsArray'][i]['value'])  backupsName  = obj['backupsArray'][i]['name'];
+							if(obj.from['backup_to'] == obj['backupsArray'][i]['value'])  {
+								backupsName  = obj['backupsArray'][i]['name'];
+							}
 							backupsDom += '<li><a role="menuitem"  href="javascript:;" value="'+ obj['backupsArray'][i]['value'] +'">'+ obj['backupsArray'][i]['name'] +'</a></li>';
 						}
 						callback();
-					});
+					},'json');
 				}else{
 					callback();
 				}
@@ -657,6 +656,8 @@ function editTaskInfo(id){
 					$('.site_list').show();
 				}
 
+				obj.from.minute = $('.minute_create').val();
+
 				$('.sName_create').blur(function () {
 					obj.from.name = $(this).val();
 				});
@@ -736,6 +737,7 @@ function editTaskInfo(id){
 							obj.from.where1 = '';
 							obj.from.hour = '';
 							obj.from.minute = 30;
+							console.log(obj.from);
 						break;
 						case 'week':
 							$('.week_btn').show();
@@ -774,7 +776,7 @@ function editTaskInfo(id){
 					if(obj.from.type == 'hour-n'){
 						obj.from.where1 = obj.from.hour;
 						obj.from.hour = '';
-					}else if(obj.from.type == 'minute-n'){
+					} else if(obj.from.type == 'minute-n') {
 						obj.from.where1 = obj.from.minute;
 						obj.from.minute = '';
 					}
@@ -807,34 +809,34 @@ function closeOpt(){
 function toWeek(){
 	var mBody = '<div class="dropdown planweek pull-left mr20">\
 				  <button class="btn btn-default dropdown-toggle" type="button" id="excode" data-toggle="dropdown">\
-					<b val="1">'+lan.crontab.TZZ1+'</b> <span class="caret"></span>\
+					<b val="1">周一</b> <span class="caret"></span>\
 				  </button>\
 				  <ul class="dropdown-menu" role="menu" aria-labelledby="excode">\
-					<li><a role="menuitem" tabindex="-1" href="javascript:;" value="1">'+lan.crontab.TZZ1+'</a></li>\
-					<li><a role="menuitem" tabindex="-1" href="javascript:;" value="2">'+lan.crontab.TZZ2+'</a></li>\
-					<li><a role="menuitem" tabindex="-1" href="javascript:;" value="3">'+lan.crontab.TZZ3+'</a></li>\
-					<li><a role="menuitem" tabindex="-1" href="javascript:;" value="4">'+lan.crontab.TZZ4+'</a></li>\
-					<li><a role="menuitem" tabindex="-1" href="javascript:;" value="5">'+lan.crontab.TZZ5+'</a></li>\
-					<li><a role="menuitem" tabindex="-1" href="javascript:;" value="6">'+lan.crontab.TZZ6+'</a></li>\
-					<li><a role="menuitem" tabindex="-1" href="javascript:;" value="0">'+lan.crontab.TZZ7+'</a></li>\
+					<li><a role="menuitem" tabindex="-1" href="javascript:;" value="1">周一</a></li>\
+					<li><a role="menuitem" tabindex="-1" href="javascript:;" value="2">周二</a></li>\
+					<li><a role="menuitem" tabindex="-1" href="javascript:;" value="3">周三</a></li>\
+					<li><a role="menuitem" tabindex="-1" href="javascript:;" value="4">周四</a></li>\
+					<li><a role="menuitem" tabindex="-1" href="javascript:;" value="5">周五</a></li>\
+					<li><a role="menuitem" tabindex="-1" href="javascript:;" value="6">周六</a></li>\
+					<li><a role="menuitem" tabindex="-1" href="javascript:;" value="0">周日</a></li>\
 				  </ul>\
 				</div>';
 	$("#ptime").html(mBody);
-	getselectname()
+	getselectname();
 }
 //指定1
 function toWhere1(ix){
 	var mBody ='<div class="plan_hms pull-left mr20 bt-input-text">\
 					<span><input type="number" name="where1" value="3" maxlength="2" max="31" min="0"></span>\
 					<span class="name">'+ix+'</span>\
-					</div>';
+				</div>';
 	$("#ptime").append(mBody);
 }
 //小时
 function toHour(){
 	var mBody = '<div class="plan_hms pull-left mr20 bt-input-text">\
 					<span><input type="number" name="hour" value="1" maxlength="2" max="23" min="0"></span>\
-					<span class="name">'+lan.crontab.hour+'</span>\
+					<span class="name">小时</span>\
 					</div>';
 	$("#ptime").append(mBody);
 }
@@ -843,7 +845,7 @@ function toHour(){
 function toMinute(){
 	var mBody = '<div class="plan_hms pull-left mr20 bt-input-text">\
 					<span><input type="number" name="minute" value="30" maxlength="2" max="59" min="0"></span>\
-					<span class="name">'+lan.crontab.minute+'</span>\
+					<span class="name">分钟</span>\
 					</div>';
 	$("#ptime").append(mBody);
 	
