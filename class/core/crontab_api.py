@@ -247,6 +247,17 @@ class crontab_api:
     # 取数据列表
     def getDataListApi(self):
         stype = request.form.get('type', '').encode('utf-8')
+        if stype == 'databases':
+            db_list = {}
+            db_list['orderOpt'] = []
+            path = public.getServerDir() + '/mysql'
+            if not os.path.exists(path + '/mysql.db'):
+                db_list['data'] = []
+            else:
+                db_list['data'] = public.M('databases').dbPos(
+                    path, 'mysql').field('name,ps').select()
+            return public.getJson(db_list)
+
         data = {}
         data['data'] = public.M(stype).field('name,ps').select()
         data['orderOpt'] = []
