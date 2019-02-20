@@ -50,7 +50,7 @@ MyAjax.prototype.handle = function(d, f) {
 	i.send(g[0]), j.async === !1 && l.handle(i, j)
 };
 
-function UploadStart(d) {
+function uploadStart(d) {
 	var a = function(e) {
 		this.uptype = e.UpType;
 		this.url = e.url;
@@ -99,7 +99,7 @@ function UploadStart(d) {
 						if(e.size <= 0) {
 							this.up_box.insertAdjacentHTML("beforeEnd", "<li>" + e.name + "<em style='color: red;'>"+lan.upload.file_err_empty+"</em></li>")
 						} else {
-							this.up_box.insertAdjacentHTML("beforeEnd", "<li><span class='filename'>" + e.name + "</span><span class='filesize'>" + (ToSize(e.size)) + "</span><em>"+lan.upload.up_sleep+"</em></li>");
+							this.up_box.insertAdjacentHTML("beforeEnd", "<li><span class='filename'>" + e.name + "</span><span class='filesize'>" + (toSize(e.size)) + "</span><em>"+lan.upload.up_sleep+"</em></li>");
 							this.FilesArray.push([e, (this.filesalllength - 1 < 0 ? 0 : this.filesalllength) + j])
 						}
 					}
@@ -179,17 +179,17 @@ function UploadStart(d) {
 				progress: function(j) {
 					h.FileProgress = Math.floor(j.loaded / j.total * 100) + "%";
 					if(h.FileProgress == "100%") {
-						h.FileProgress = lan.upload.up_save
+						h.FileProgress = '正在保存..';
 					}
-					h.SetTxt(i[e][1], lan.upload.up_speed + h.FileProgress, "#005100")
+					h.SetTxt(i[e][1], '上传进度:' + h.FileProgress, "#005100")
 				},
 				success: function(j) {
 					h.str.serverdata = false;
-					h.SetTxt(i[e][1], lan.upload.up_ok, "#005100");
+					h.SetTxt(i[e][1], '已上传成功', "#005100");
 					h.ready(i, e + 1, g);
 					h.num++;
 					if(i.length > 1) {
-						var k = (h.num == i.length) ? lan.upload.up_ok_1 : lan.upload.up_ok_2;
+						var k = (h.num == i.length) ? '上传完成': '已上传';
 						$("#totalProgress").html("<p>" + k + h.num + "/" + i.length + "</p><progress value='" + h.num + "' max='" + i.length + "' ></progress>")
 					}
 					if(h.num == i.length) {
@@ -199,7 +199,7 @@ function UploadStart(d) {
 						h.num = 0
 					}
 					if(!d) {
-						GetFiles(getCookie("Path"))
+						getFiles(getCookie("open_dir_path"));
 					}
 				},
 				error: function(j) {
@@ -216,23 +216,21 @@ function UploadStart(d) {
 			UpType: new Array(),
 			FilesSize: 5242880000,
 			MaxUpNum: 100,
-			url: "/files?action=UploadFile&path=" + document.getElementById("input-val").value
+			url: "/files/upload_file?path=" + encodeURIComponent(document.getElementById("input-val").value)
 		});
 		c.opt.addEventListener("click", function() {
 			c.file_input.click()
 		}, false);
 		c.up.addEventListener("click", function() {
-			c.read()
+			c.read();
 		}, false);
 		c.file_input.addEventListener("change", function() {
-			c.SelectFile()
+			c.SelectFile();
 		}, false)
 	} catch(b) {
 		c.opt.disabled = true;
 		c.up.disabled = true;
 		c.file_input.disabled = true;
-		layer.msg(lan.upload.ie_err, {
-			icon: 5
-		})
+		layer.msg('抱歉,IE 6/7/8 不支持请更换浏览器再上传', {icon: 5});
 	}
 };

@@ -164,6 +164,31 @@ done
             os.system('/etc/init.d/mw start')
         return public.returnJson(True, '任务已删除!')
 
+    # 上传文件
+    def uploadFileApi(self):
+        from werkzeug.utils import secure_filename
+        from flask import request
+
+        path = request.args.get('path', '').encode('utf-8')
+
+        if not os.path.exists(path):
+            os.makedirs(path)
+        f = request.files['zunfile']
+        filename = os.path.join(path, f.filename)
+        if sys.version_info[0] == 2:
+            filename = filename.encode('utf-8')
+        s_path = path
+        if os.path.exists(filename):
+            s_path = filename
+        p_stat = os.stat(s_path)
+        f.save(filename)
+        os.chown(filename, p_stat.st_uid, p_stat.st_gid)
+        os.chmod(filename, p_stat.st_mode)
+
+        msg = public.getInfo('上传文件[{1}] 到 [{2}]成功!', (filename, path))
+        public.writeLog('文件管理', msg)
+        return public.returnMsg(True, '上传成功!')
+
     def getRecycleBinApi(self):
         rPath = self.rPath
         if not os.path.exists(rPath):
