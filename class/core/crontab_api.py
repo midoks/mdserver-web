@@ -358,7 +358,7 @@ class crontab_api:
                 'path': head + "python " + public.getServerDir() + "/mdserver-web/scripts/backup.py path " + param['sname'] + " " + str(param['save']),
                 'site':   head + "python " + public.getServerDir() + "/mdserver-web/scripts/backup.py site " + param['sname'] + " " + str(param['save']),
                 'database': head + "python " + public.getServerDir() + "/mdserver-web/scripts/backup.py database " + param['sname'] + " " + str(param['save']),
-                'logs':   head + "python " + public.getServerDir() + "/mdserver-web/scripts/logs_backup " + param['sname'] + log + " " + str(param['save']),
+                'logs':   head + "python " + public.getServerDir() + "/mdserver-web/scripts/logs_backup.py " + param['sname'] + log + " " + str(param['save']),
                 'rememory': head + "/bin/bash " + public.getServerDir() + '/mdserver-web/scripts/rememory.sh'
             }
             if param['backup_to'] != 'localhost':
@@ -371,7 +371,7 @@ class crontab_api:
                     'path': head + "python " + cfile + " path " + param['sname'] + " " + str(param['save']),
                     'site':   head + "python " + cfile + " site " + param['sname'] + " " + str(param['save']),
                     'database': head + "python " + cfile + " database " + param['sname'] + " " + str(param['save']),
-                    'logs':   head + "python " + public.getServerDir() + "/mdserver-web/scripts/logs_backup " + param['sname'] + log + " " + str(param['save']),
+                    'logs':   head + "python " + public.getServerDir() + "/mdserver-web/scripts/logs_backup.py " + param['sname'] + log + " " + str(param['save']),
                     'rememory': head + "/bin/bash " + public.getServerDir() + '/mdserver-web/scripts/rememory.sh'
                 }
             try:
