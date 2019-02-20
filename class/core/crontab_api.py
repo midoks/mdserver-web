@@ -129,7 +129,6 @@ class crontab_api:
 
         addData = public.M('crontab').where('id=?', (sid,)).save('name,type,where1,where_hour,where_minute,save,backup_to,sbody,urladdress', (get[
             'name'], field_type, get['where1'], get['hour'], get['minute'], get['save'], get['backup_to'], get['sbody'], get['urladdress']))
-
         self.removeForCrond(cronInfo['echo'])
         self.syncToCrond(cronInfo)
         public.writeLog('计划任务', '修改计划任务[' + cronInfo['name'] + ']成功')
@@ -244,6 +243,26 @@ class crontab_api:
             return public.returnJson(True, '任务日志已清空!')
         except:
             return public.returnJson(False, '任务日志清空失败!')
+
+    # 取数据列表
+    def getDataListApi(self):
+        stype = request.form.get('type', '').encode('utf-8')
+        data = {}
+        data['data'] = public.M(stype).field('name,ps').select()
+        data['orderOpt'] = []
+        # try:
+        #     tmp = public.readFile('data/libList.conf')
+        #     libs = json.loads(tmp)
+        #     import imp
+        #     for lib in libs:
+        #         imp.find_module(lib['module'])
+        #         tmp = {}
+        #         tmp['name'] = lib['name']
+        #         tmp['value'] = lib['opt']
+        #         data['orderOpt'].append(tmp)
+        # except Exception as e:
+        #     print e
+        return public.getJson(data)
     ##### ----- start ----- ###
 
     # 转换大写星期
@@ -336,26 +355,25 @@ class crontab_api:
             log = '.log'
 
             wheres = {
-                'path': head + "python " + public.getServerDir() + "/panel/script/backup.py path " + param['sname'] + " " + str(param['save']),
-                'site':   head + "python " + public.getServerDir() + "/panel/script/backup.py site " + param['sname'] + " " + str(param['save']),
-                'database': head + "python " + public.getServerDir() + "/panel/script/backup.py database " + param['sname'] + " " + str(param['save']),
-                'logs':   head + "python " + public.getServerDir() + "/panel/script/logsBackup " + param['sname'] + log + " " + str(param['save']),
-                'rememory': head + "/bin/bash " + public.getServerDir() + '/panel/script/rememory.sh'
+                'path': head + "python " + public.getServerDir() + "/mdserver-web/scripts/backup.py path " + param['sname'] + " " + str(param['save']),
+                'site':   head + "python " + public.getServerDir() + "/mdserver-web/scripts/backup.py site " + param['sname'] + " " + str(param['save']),
+                'database': head + "python " + public.getServerDir() + "/mdserver-web/scripts/backup.py database " + param['sname'] + " " + str(param['save']),
+                'logs':   head + "python " + public.getServerDir() + "/mdserver-web/scripts/logs_backup " + param['sname'] + log + " " + str(param['save']),
+                'rememory': head + "/bin/bash " + public.getServerDir() + '/mdserver-web/scripts/rememory.sh'
             }
             if param['backup_to'] != 'localhost':
-                cfile = public.getServerDir() + "/panel/plugin/" + param[
+                cfile = public.getServerDir() + "/mdserver-web/plugin/" + param[
                     'backup_to'] + "/" + param['backup_to'] + "_main.py"
                 if not os.path.exists(cfile):
-                    cfile = public.getServerDir() + "/panel/script/backup_" + \
+                    cfile = public.getServerDir() + "/mdserver-web/script/backup_" + \
                         param['backup_to'] + ".py"
                 wheres = {
                     'path': head + "python " + cfile + " path " + param['sname'] + " " + str(param['save']),
                     'site':   head + "python " + cfile + " site " + param['sname'] + " " + str(param['save']),
                     'database': head + "python " + cfile + " database " + param['sname'] + " " + str(param['save']),
-                    'logs':   head + "python " + public.getServerDir() + "/panel/script/logsBackup " + param['sname'] + log + " " + str(param['save']),
-                    'rememory': head + "/bin/bash " + public.getServerDir() + '/panel/script/rememory.sh'
+                    'logs':   head + "python " + public.getServerDir() + "/mdserver-web/scripts/logs_backup " + param['sname'] + log + " " + str(param['save']),
+                    'rememory': head + "/bin/bash " + public.getServerDir() + '/mdserver-web/scripts/rememory.sh'
                 }
-
             try:
                 shell = wheres[stype]
             except:

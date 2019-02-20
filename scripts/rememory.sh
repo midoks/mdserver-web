@@ -6,71 +6,73 @@ export PATH
 #+------------------------------------
 
 endDate=`date +"%Y-%m-%d %H:%M:%S"`
+sysName=`uname`
+curPath=`pwd`
+rootPath=$(dirname "$curPath")
+
 log="释放内存!"
 echo "★[$endDate] $log"
 echo '----------------------------------------------------------------------------'
 
-if [ -f "/etc/init.d/php-fpm-52" ];then
-	/etc/init.d/php-fpm-52 reload
+if [ $sysName == 'Darwin' ]; then
+	echo '苹果内存释放!'
+else
+	echo 'do start!'
 fi
 
-if [ -f "/etc/init.d/php-fpm-53" ];then
-	/etc/init.d/php-fpm-53 reload
+if [ -f $rootPath"/php/init.d/php52" ];then
+	$rootPath"/php/init.d/php52" reload
 fi
 
-if [ -f "/etc/init.d/php-fpm-54" ];then
-	/etc/init.d/php-fpm-54 reload
+
+if [ -f $rootPath"/php/init.d/php53" ];then
+	$rootPath"/php/init.d/php53" reload
 fi
 
-if [ -f "/etc/init.d/php-fpm-55" ];then
-	/etc/init.d/php-fpm-55 reload
+if [ -f $rootPath"/php/init.d/php54" ];then
+	$rootPath"/php/init.d/php54" reload
 fi
 
-if [ -f "/etc/init.d/php-fpm-56" ];then
-	/etc/init.d/php-fpm-56 reload
+if [ -f $rootPath"/php/init.d/php55" ];then
+	$rootPath"/php/init.d/php55" reload
 fi
 
-if [ -f "/etc/init.d/php-fpm-70" ];then
-	/etc/init.d/php-fpm-70 reload
+if [ -f $rootPath"/php/init.d/php56" ];then
+	$rootPath"/php/init.d/php56" reload
 fi
 
-if [ -f "/etc/init.d/php-fpm-71" ];then
-	/etc/init.d/php-fpm-71 reload
+if [ -f $rootPath"/php/init.d/php70" ];then
+	$rootPath"/php/init.d/php70" reload
 fi
 
-if [ -f "/etc/init.d/php-fpm-72" ];then
-	/etc/init.d/php-fpm-72 reload
+if [ -f $rootPath"/php/init.d/php71" ];then
+	$rootPath"/php/init.d/php71" reload
 fi
 
-if [ -f "/etc/init.d/php-fpm-73" ];then
-	/etc/init.d/php-fpm-73 reload
+if [ -f $rootPath"/php/init.d/php72" ];then
+	$rootPath"/php/init.d/php72" reload
 fi
 
-if [ -f "/etc/init.d/php-fpm-74" ];then
-	/etc/init.d/php-fpm-74 reload
+if [ -f $rootPath"/php/init.d/php73" ];then
+	$rootPath"/php/init.d/php73" reload
 fi
 
-if [ -f "/etc/init.d/mysqld" ];then
-	/etc/init.d/mysqld reload
+if [ -f $rootPath"/php/init.d/php74" ];then
+	$rootPath"/php/init.d/php74" reload
 fi
 
-if [ -f "/etc/init.d/nginx" ];then
-	/etc/init.d/nginx reload
-fi
-
-if [ -f "/etc/init.d/httpd" ];then
-	/etc/init.d/httpd graceful
-fi
-
-if [ -f "/etc/init.d/pure-ftpd" ];then
-	pkill -9 pure-ftpd
-	sleep 0.3
-	/etc/init.d/pure-ftpd start 2>/dev/null
+if [ -f $rootPath"/openresty/nginx/sbin/nginx" ];then
+	$rootPath"/openresty/nginx/sbin/nginx" -s reload
 fi
 
 sync
 sleep 2
 sync
-echo 3 > /proc/sys/vm/drop_caches
+
+if [ $sysName == 'Darwin' ]; then
+	echo 'done!'
+else
+	echo 3 > /proc/sys/vm/drop_caches
+fi
 
 echo '----------------------------------------------------------------------------'
