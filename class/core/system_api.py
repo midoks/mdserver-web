@@ -81,11 +81,12 @@ class system_api:
         data = self.getNetWorkIoData(start, end)
         return public.getJson(data)
 
-    def reMemoryApi(self):
+    def rememoryApi(self):
         os.system('sync')
-        scriptFile = 'script/rememory.sh'
-        public.execShell("/bin/bash " + public.getRunDir() + scriptFile)
-        return self.getMemInfo()
+        scriptFile = public.getRunDir() + '/script/rememory.sh'
+        public.execShell("/bin/bash " + scriptFile)
+        data = self.getMemInfo()
+        return public.getJson(data)
 
     # 重启面板
     def restartApi(self):
@@ -195,7 +196,7 @@ class system_api:
         data['title'] = self.GetTitle()
         data['network'] = self.GetNetWorkApi(get)
         data['panel_status'] = not os.path.exists(
-            '/www/server/panel/data/close.pl')
+            '/www/server/mdserver-web/data/close.pl')
         import firewalls
         ssh_info = firewalls.firewalls().GetSshInfo(None)
         data['enable_ssh_status'] = ssh_info['status']
@@ -208,15 +209,14 @@ class system_api:
 
     def getTitle(self):
         titlePl = 'data/title.pl'
-        title = '宝塔Linux面板'
+        title = 'Linux面板'
         if os.path.exists(titlePl):
             title = public.readFile(titlePl).strip()
         return title
 
     def getSystemVersion(self):
         # 取操作系统版本
-        os = public.getOs()
-        if os == 'darwin':
+        if public.getOs() == 'darwin':
             data = public.execShell('sw_vers')[0]
             data_list = data.strip().split("\n")
             mac_version = ''
@@ -390,10 +390,10 @@ class system_api:
     # 清理其它
     def clearOther(self):
         clearPath = [
-            {'path': '/www/server/panel', 'find': 'testDisk_'},
+            {'path': '/www/server/mdserver-web', 'find': 'testDisk_'},
             {'path': '/www/wwwlogs', 'find': 'log'},
             {'path': '/tmp', 'find': 'panelBoot.pl'},
-            {'path': '/www/server/panel/install', 'find': '.rpm'}
+            {'path': '/www/server/mdserver-web/install', 'find': '.rpm'}
         ]
 
         total = count = 0
@@ -449,7 +449,7 @@ class system_api:
             print e
             return None
 
-    def getNetWorkApi(self, get=None):
+    def getNetWorkApi(self):
         # 取网络流量信息
         try:
             tmpfile = 'data/network.temp'
@@ -479,23 +479,6 @@ class system_api:
             return networkInfo
         except:
             return None
-
-    def restartServer(self, get):
-        if not public.isRestart():
-            return public.returnMsg(False, 'EXEC_ERR_TASK')
-        public.ExecShell("sync && /etc/init.d/bt stop && init 6 &")
-        return public.returnMsg(True, 'SYS_REBOOT')
-
-    # 释放内存
-    def reMemory(self, get):
-        os.system('sync')
-        scriptFile = 'script/rememory.sh'
-        if not os.path.exists(scriptFile):
-            public.downloadFile(web.ctx.session.home +
-                                '/script/rememory.sh', scriptFile)
-        public.ExecShell("/bin/bash " + self.setupPath +
-                         '/panel/' + scriptFile)
-        return self.GetMemInfo()
 
     def getNetWorkIoData(self, start, end):
         # 取指定时间段的网络Io

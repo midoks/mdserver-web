@@ -86,8 +86,8 @@ function rocket(sum, m) {
 function reMemory() {
     setTimeout(function() {
         $(".mem-release").find('.mask').css({ 'color': '#20a53a', 'font-size': '14px' }).html('<span style="display:none">1</span>' + lan.index.memre_ok_0 + ' <img src="/static/img/ings.gif">');
-        $.post('/system?action=ReMemory', '', function(rdata) {
-            var percent = GetPercent(rdata.memRealUsed, rdata.memTotal);
+        $.post('/system/rememory', '', function(rdata) {
+            var percent = getPercent(rdata.memRealUsed, rdata.memTotal);
             var memText = rdata.memRealUsed + "/" + rdata.memTotal + " (MB)";
             percent = Math.round(percent);
             $(".mem-release").find('.mask').css({ 'color': '#20a53a', 'font-size': '14px' }).html("<span style='display:none'>" + percent + "</span>" + lan.index.memre_ok);
@@ -107,7 +107,7 @@ function reMemory() {
                 $(".mem-release").find('.mask').removeAttr("style").html("<span>" + percent + "</span>%");
                 $(".mem-release").find(".mem-re-min").show();
             }, 2000)
-        });
+        },'json');
     }, 2000);
 }
 
