@@ -150,7 +150,7 @@ function ping(status){
  * @param {Int} state 0,开启 1.禁用
  */
 function firewall(status){
-	var msg = status == 1 ? '禁PING后不影响服务器正常使用，但无法ping通服务器，您真的要禁PING吗？' : '解除禁PING状态可能会被黑客发现您的服务器，您真的要解禁吗？';
+	var msg = status == 1 ? '禁用防火墙会增加服务器不安全性，您真的要禁用防火墙吗？' : '开启防火墙,增加服务器安全!';
 	layer.confirm(msg,{title:'是否禁ping',closeBtn:2,cancel:function(){
 		if(status == 1){
 			$("#noping").prop("checked",true);
