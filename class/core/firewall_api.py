@@ -298,12 +298,12 @@ class firewall_api:
     def getFwStatus(self):
         if self.__isUfw:
             data = public.execShell(
-                "ps -ef|grep ufw |grep -v grep | grep -v python | awk '{print $2}'")
+                "ps -ef|grep ufw |grep -v grep | awk '{print $2}'")
             if data[0] == '':
                 return False
             return True
         if self.__isFirewalld:
-            cmd = "ps -ef|grep firewalld |grep -v grep | grep -v python | awk '{print $2}'"
+            cmd = "ps -ef|grep firewalld |grep -v grep | awk '{print $2}'"
             print cmd
             data = public.execShell(cmd)
             if data[0] == '':
@@ -313,7 +313,7 @@ class firewall_api:
             return False
         else:
             data = public.execShell(
-                "ps -ef|grep iptables |grep -v grep | grep -v python | awk '{print $2}'")
+                "ps -ef|grep iptables |grep -v grep  | awk '{print $2}'")
             if data[0] == '':
                 return False
             return True
