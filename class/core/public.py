@@ -107,6 +107,11 @@ def restartWeb():
         execShell(initd + ' ' + 'reload')
 
 
+def restartMw():
+    import system_api
+    system_api.system_api().restartMw()
+
+
 def checkWebConfig():
     op_dir = getServerDir() + '/openresty'
     cmd = "ulimit -n 10240 && " + op_dir + \

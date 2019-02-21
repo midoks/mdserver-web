@@ -14,6 +14,42 @@ $(".set-submit").click(function(){
 });
 
 
+function modifyAuthPath() {
+    var auth_path = $("#admin_path").val();
+    btn = "<button type='button' class='btn btn-success btn-sm' onclick=\"bindBTName(1,'b')\">确定</button>";
+    layer.open({
+        type: 1,
+        area: "500px",
+        title: "修改安全入口",
+        closeBtn: 2,
+        shift: 5,
+        shadeClose: false,
+        content: '<div class="bt-form bt-form pd20 pb70">\
+                    <div class="line ">\
+                        <span class="tname">入口地址</span>\
+                        <div class="info-r">\
+                            <input name="auth_path_set" class="bt-input-text mr5" type="text" style="width: 311px" value="'+ auth_path+'">\
+                        </div></div>\
+                        <div class="bt-form-submit-btn">\
+                            <button type="button" class= "btn btn-sm btn-danger" onclick="layer.closeAll()"> 关闭</button>\
+                            <button type="button" class="btn btn-sm btn-success" onclick="setAuthPath();">提交</button>\
+                    </div></div>'
+    });
+}
+
+function setAuthPath() {
+    var auth_path = $("input[name='auth_path_set']").val();
+    var loadT = layer.msg(lan.config.config_save, { icon: 16, time: 0, shade: [0.3, '#000'] });
+    $.post('/config/set_admin_path', { admin_path: auth_path }, function (rdata) {
+        layer.close(loadT);
+        if (rdata.status) {
+            layer.closeAll();
+            $("#admin_path").val(auth_path);
+        }
+        setTimeout(function () { layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 }); }, 200);
+    },'json');
+}
+
 function setPassword(a) {
 	if(a == 1) {
 		p1 = $("#p1").val();
