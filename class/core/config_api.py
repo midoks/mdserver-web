@@ -96,6 +96,44 @@ class config_api:
         }
         return public.returnJson(True, '保存成功!', info)
 
+    def setAdminPathApi(self):
+        admin_path = request.form.get('admin_path', '').strip()
+        admin_path_checks = ['/', '/close', '/login', '/site',
+                             '/sites',
+                             '/download_file', '/control',
+                             '/crontab', '/firewall', '/files',
+                             'config', '/soft', '/ajax',
+                             '/system', '/code',
+                             '/ssl', '/plugin']
+        if admin_path == '':
+            admin_path = '/'
+        if admin_path != '/':
+            if len(admin_path) < 6:
+                return public.returnJson(False, '安全入口地址长度不能小于6位!')
+            if admin_path in admin_path_checks:
+                return public.returnJson(False, '该入口已被面板占用,请使用其它入口!')
+            if not re.match("^/[\w\./-_]+$", admin_path):
+                return public.returnJson(False, '入口地址格式不正确,示例: /my_panel')
+        else:
+            domain = public.readFile('data/domain.conf')
+            if not domain:
+                domain = ''
+            limitip = public.readFile('data/limitip.conf')
+            if not limitip:
+                limitip = ''
+            if not domain.strip() and not limitip.strip():
+                return public.returnJson(False, '警告，关闭安全入口等于直接暴露你的后台地址在外网，十分危险，至少开启以下一种安全方式才能关闭：<a style="color:red;"><br>1、绑定访问域名<br>2、绑定授权IP</a>')
+
+        admin_path_file = 'data/admin_path.pl'
+        admin_path_old = '/'
+        if os.path.exists(admin_path_file):
+            admin_path_old = public.readFile(admin_path_file).strip()
+
+        if admin_path_old != admin_path:
+            public.writeFile(admin_path_file, admin_path)
+            public.restartMw()
+        return public.returnJson(True, '修改成功!')
+
     ##### ----- end ----- ###
 
     def getVersion(self):
@@ -112,6 +150,12 @@ class config_api:
 
         data['port'] = public.getHostPort()
         data['ip'] = public.getHostAddr()
+
+        admin_path_file = 'data/admin_path.pl'
+        if not os.path.exists(admin_path_file):
+            data['admin_path'] = '/'
+        else:
+            data['admin_path'] = public.readFile(admin_path_file)
 
         data['username'] = public.M('users').where(
             "id=?", (1,)).getField('username')
