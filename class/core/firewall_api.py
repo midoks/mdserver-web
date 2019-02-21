@@ -216,7 +216,7 @@ class firewall_api:
                 public.execShell('/usr/sbin/ufw stop')
                 return
             if self.__isFirewalld:
-                public.execShell('firewall-cmd --stop')
+                public.execShell('systemctl stop firewalld.service')
             elif self.__isMac:
                 pass
             else:
