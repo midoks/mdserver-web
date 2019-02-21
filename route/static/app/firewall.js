@@ -102,7 +102,7 @@ function mstsc(port) {
 			layer.msg(ret.msg,{icon:ret.status?1:2})
 			layer.close(loadT);
 			getSshInfo();
-		});
+		},'json');
 	});
 }
 

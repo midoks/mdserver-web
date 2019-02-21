@@ -76,7 +76,6 @@ class firewall_api:
             public.execShell('ufw allow ' + port + '/tcp')
         else:
             if self.__isFirewalld:
-                # self.__Obj.AddAcceptPort(port)
                 port = port.replace(':', '-')
                 public.execShell(
                     'firewall-cmd --permanent --zone=public --add-port=' + port + '/tcp')
@@ -191,6 +190,42 @@ class firewall_api:
         else:
             data['firewall_status'] = self.getFwStatus()
         return public.getJson(data)
+
+    def setSshPortApi(self):
+        port = request.form.get('port', '1').strip()
+        if int(port) < 22 or int(port) > 65535:
+            return public.returnJson(False, '端口范围必需在22-65535之间!')
+
+        ports = ['21', '25', '80', '443', '8080', '888', '8888']
+        if port in ports:
+            return public.returnJson(False, '')
+
+        file = '/etc/ssh/sshd_config'
+        conf = public.readFile(file)
+
+        rep = "#*Port\s+([0-9]+)\s*\n"
+        conf = re.sub(rep, "Port " + port + "\n", conf)
+        public.writeFile(file, conf)
+
+        if self.__isFirewalld:
+            public.execShell('setenforce 0')
+            public.execShell(
+                'sed -i "s#SELINUX=enforcing#SELINUX=disabled#" /etc/selinux/config')
+            public.execShell("systemctl restart sshd.service")
+        elif self.__isUfw:
+            public.execShell('ufw allow ' + port + '/tcp')
+            public.execShell("service ssh restart")
+        else:
+            public.execShell(
+                'iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport ' + port + ' -j ACCEPT')
+            public.execShell("/etc/init.d/sshd restart")
+
+        self.firewallReload()
+        public.M('firewall').where(
+            "ps=?", ('SSH远程管理服务',)).setField('port', port)
+        msg = public.getInfo('改SSH端口为[{1}]成功!', port)
+        public.writeLog("防火墙管理", msg)
+        return public.returnMsg(True, '修改成功!')
 
     def setPingApi(self):
 
