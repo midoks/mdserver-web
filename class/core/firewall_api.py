@@ -227,7 +227,7 @@ class firewall_api:
                 public.execShell('/usr/sbin/ufw start')
                 return
             if self.__isFirewalld:
-                public.execShell('firewall-cmd --reload')
+                public.execShell('systemctl start firewalld.service')
             elif self.__isMac:
                 pass
             else:
