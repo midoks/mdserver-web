@@ -195,9 +195,10 @@ function setMstscStatus(){
 		if(index > 0){
 			layer.msg('正在处理,请稍候...',{icon:16,time:20000});
 			$.post('/firewall/set_ssh_status','status='+status,function(rdata){
+				console.log(rdata);
 				layer.closeAll();
 				layer.msg(rdata.msg,{icon:rdata.status?1:2});
-				refresh();
+				setTimeout(function(){window.location.reload();},3000);
 			},'json');
 		}
 	},function(){
