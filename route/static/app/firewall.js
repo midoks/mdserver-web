@@ -98,7 +98,7 @@ function mstsc(port) {
 			shade: true,
 			shadeClose: false
 		});
-		$.post('/firewall?action=SetSshPort', data, function(ret) {
+		$.post('/firewall/set_ssh_port', data, function(ret) {
 			layer.msg(ret.msg,{icon:ret.status?1:2})
 			layer.close(loadT);
 			getSshInfo();
