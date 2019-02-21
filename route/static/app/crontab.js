@@ -121,7 +121,7 @@ function allDeleteCron(){
 		tmp.id = checkList[i].value;
 		dataList.push(tmp);
 	}
-	SafeMessage(lan.crontab.del_task_all_title,"<a style='color:red;'>"+lan.get('del_all_task',[dataList.length])+"</a>",function(){
+	safeMessage('批量删除任务!',"<a style='color:red;'>"+lan.get('del_all_task',[dataList.length])+"</a>",function(){
 		layer.closeAll();
 		syncDeleteCron(dataList,0,'');
 	});
