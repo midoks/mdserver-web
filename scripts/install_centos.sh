@@ -16,6 +16,37 @@ if [ ! -f /usr/bin/applydeltarpm ];then
 fi
 
 
+if [ -f "/etc/init.d/iptables" ];then
+
+	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 22 -j ACCEPT
+	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
+	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 888 -j ACCEPT
+	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 7200 -j ACCEPT
+	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 30000:40000 -j ACCEPT
+	service iptables save
+
+	iptables_status=`service iptables status | grep 'not running'`
+	if [ "${iptables_status}" == '' ];then
+		service iptables restart
+	fi
+fi
+
+if [ "${isVersion}" == '' ];then
+	if [ ! -f "/etc/init.d/iptables" ];then
+		yum install firewalld -y
+		systemctl enable firewalld
+		systemctl start firewalld
+
+		firewall-cmd --permanent --zone=public --add-port=22/tcp
+		firewall-cmd --permanent --zone=public --add-port=80/tcp
+		firewall-cmd --permanent --zone=public --add-port=888/tcp
+		firewall-cmd --permanent --zone=public --add-port=7200/tcp
+		firewall-cmd --permanent --zone=public --add-port=30000-40000/tcp
+		firewall-cmd --reload
+	fi
+fi
+
+
 yum install -y wget curl unzip zip
 
 # if [ ! -d '/www/server/mdserver-web' ];then
