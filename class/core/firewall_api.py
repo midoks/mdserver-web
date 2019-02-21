@@ -169,9 +169,32 @@ class firewall_api:
         except:
             isPing = True
 
+        import system_api
+        panelsys = system_api.system_api()
+        version = panelsys.getSystemVersion()
+        if os.path.exists('/usr/bin/apt-get'):
+            if os.path.exists('/etc/init.d/sshd'):
+                cmd = "service sshd status | grep -P '(dead|stop)'|grep -v grep"
+                status = public.execShell(cmd)
+            else:
+                cmd = "service ssh status | grep -P '(dead|stop)'|grep -v grep"
+                status = public.execShell(cmd)
+        else:
+            if version.find(' 7.') != -1:
+                cmd = "systemctl status sshd.service | grep 'dead'|grep -v grep"
+                status = public.execShell(cmd)
+            else:
+                cmd = "/etc/init.d/sshd status | grep -e 'stopped' -e '已停'|grep -v grep"
+                status = public.execShell(cmd)
+        if len(status[0]) > 3:
+            status = False
+        else:
+            status = True
+
         data = {}
         data['port'] = port
-        data['status'] = True
+
+        data['status'] = status
         data['ping'] = isPing
         if public.isAppleSystem():
             data['firewall_status'] = False
