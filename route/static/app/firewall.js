@@ -151,7 +151,7 @@ function ping(status){
  */
 function firewall(status){
 	var msg = status == 1 ? '禁用防火墙会增加服务器不安全性，您真的要禁用防火墙吗？' : '开启防火墙,增加服务器安全!';
-	layer.confirm(msg,{title:'是否禁ping',closeBtn:2,cancel:function(){
+	layer.confirm(msg,{title:'是否开启防火墙!',closeBtn:2,cancel:function(){
 		if(status == 1){
 			$("#noping").prop("checked",true);
 		} else {
