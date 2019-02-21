@@ -221,11 +221,11 @@ class firewall_api:
             public.execShell("/etc/init.d/sshd restart")
 
         self.firewallReload()
-        public.M('firewall').where(
-            "ps=?", ('SSH远程管理服务',)).setField('port', port)
+        # public.M('firewall').where(
+        #     "ps=?", ('SSH远程管理服务',)).setField('port', port)
         msg = public.getInfo('改SSH端口为[{1}]成功!', port)
         public.writeLog("防火墙管理", msg)
-        return public.returnMsg(True, '修改成功!')
+        return public.returnJson(True, '修改成功!')
 
     def setPingApi(self):
 
