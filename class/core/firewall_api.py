@@ -219,8 +219,9 @@ class firewall_api:
         if public.isAppleSystem():
             return public.returnJson(True, '开发机不能操作!')
 
+        status = request.form.get('status', '1').strip()
         version = public.readFile('/etc/redhat-release')
-        if int(get['status']) == 1:
+        if int(status) == 1:
             msg = 'SSH服务已停用'
             act = 'stop'
         else:
