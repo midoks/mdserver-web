@@ -16,11 +16,22 @@ from random import Random
 import public
 import db
 
+from flask import redirect
+
 
 def init():
+
+    checkClose()
+
     initDB()
     initInitD()
     initUserInfo()
+
+
+# 检查面板是否关闭
+def checkClose():
+    if os.path.exists('data/close.pl'):
+        return redirect('/close')
 
 
 def initDB():

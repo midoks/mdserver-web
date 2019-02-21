@@ -683,6 +683,7 @@ class plugins_api:
         if not os.path.exists(path):
             return ('', '')
         data = public.execShell(py_cmd)
+        # data = os.popen(py_cmd).read()
 
         if public.isAppleSystem():
             print py_cmd
