@@ -303,8 +303,9 @@ class firewall_api:
                 return False
             return True
         if self.__isFirewalld:
-            data = public.execShell(
-                "ps -ef|grep firewalld |grep -v grep | grep -v python | awk '{print $2}'")
+            cmd = "ps -ef|grep firewalld |grep -v grep | grep -v python | awk '{print $2}'"
+            print cmd
+            data = public.execShell(cmd)
             if data[0] == '':
                 return False
             return True
