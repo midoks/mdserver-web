@@ -194,7 +194,7 @@ function setMstscStatus(){
 	}},function(index){
 		if(index > 0){
 			layer.msg('正在处理,请稍候...',{icon:16,time:20000});
-			$.post('/firewall?action=SetSshStatus','status='+status,function(rdata){
+			$.post('/firewall/set_ssh_status','status='+status,function(rdata){
 				layer.closeAll();
 				layer.msg(rdata.msg,{icon:rdata.status?1:2});
 				refresh();
