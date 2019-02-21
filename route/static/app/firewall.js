@@ -78,9 +78,9 @@ function getSshInfo(){
 		// console.log(rdata.firewall_status);
 		var fStatus = '';
 		if (rdata.firewall_status){
-			fStatus = "<input class='btswitch btswitch-ios' id='firewall_status' type='checkbox' checked><label class='btswitch-btn' for='firewall_status' ></label>";
+			fStatus = "<input class='btswitch btswitch-ios' id='firewall_status' type='checkbox' checked><label class='btswitch-btn' for='firewall_status' onclick='firewall(1)'></label>";
 		}else{
-			fStatus = "<input class='btswitch btswitch-ios' id='firewall_status' type='checkbox'><label class='btswitch-btn' for='firewall_status' ></label>";
+			fStatus = "<input class='btswitch btswitch-ios' id='firewall_status' type='checkbox'><label class='btswitch-btn' for='firewall_status' onclick='firewall(0)'></label>";
 		}
 		$("#firewall_status").html(fStatus);
 		
@@ -146,8 +146,8 @@ function ping(status){
 
 
 /**
- * 更改禁ping状态
- * @param {Int} state 0.禁ping 1.可ping
+ * 更改防火墙状态
+ * @param {Int} state 0,开启 1.禁用
  */
 function firewall(status){
 	var msg = status == 1 ? '禁PING后不影响服务器正常使用，但无法ping通服务器，您真的要禁PING吗？' : '解除禁PING状态可能会被黑客发现您的服务器，您真的要解禁吗？';
