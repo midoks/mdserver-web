@@ -26,18 +26,6 @@ class firewall_api:
         if public.isAppleSystem():
             self.__isMac = True
 
-    def firewallReload(self):
-        if self.__isUfw:
-            public.execShell('/usr/sbin/ufw reload')
-            return
-        if self.__isFirewalld:
-            public.execShell('firewall-cmd --reload')
-        elif self.__isMac:
-            pass
-        else:
-            public.execShell('/etc/init.d/iptables save')
-            public.execShell('/etc/init.d/iptables restart')
-
     ##### ----- start ----- ###
     # 添加屏蔽IP
     def addDropAddressApi(self):
@@ -197,7 +185,7 @@ class firewall_api:
         if public.isAppleSystem():
             data['firewall_status'] = False
         else:
-            data['firewall_status'] = True
+            data['firewall_status'] = self.getFwStatus()
         return public.getJson(data)
 
     def setPingApi(self):
@@ -216,6 +204,36 @@ class firewall_api:
 
         public.writeFile(filename, conf)
         public.execShell('sysctl -p')
+        return public.returnJson(True, '设置成功!')
+
+    def setFirewailApi(self):
+        if public.isAppleSystem():
+            return public.returnJson(True, '开发机不能设置!')
+
+        status = request.form.get('status', '1')
+        if status == '1':
+            if self.__isUfw:
+                public.execShell('/usr/sbin/ufw stop')
+                return
+            if self.__isFirewalld:
+                public.execShell('firewall-cmd --stop')
+            elif self.__isMac:
+                pass
+            else:
+                public.execShell('/etc/init.d/iptables save')
+                public.execShell('/etc/init.d/iptables stop')
+        else:
+            if self.__isUfw:
+                public.execShell('/usr/sbin/ufw start')
+                return
+            if self.__isFirewalld:
+                public.execShell('firewall-cmd --reload')
+            elif self.__isMac:
+                pass
+            else:
+                public.execShell('/etc/init.d/iptables save')
+                public.execShell('/etc/init.d/iptables restart')
+
         return public.returnJson(True, '设置成功!')
 
     def delPanelLogsApi(self):
@@ -264,3 +282,37 @@ class firewall_api:
 
         data['page'] = public.getPage(_page)
         return public.getJson(data)
+
+    def firewallReload(self):
+        if self.__isUfw:
+            public.execShell('/usr/sbin/ufw reload')
+            return
+        if self.__isFirewalld:
+            public.execShell('firewall-cmd --reload')
+        elif self.__isMac:
+            pass
+        else:
+            public.execShell('/etc/init.d/iptables save')
+            public.execShell('/etc/init.d/iptables restart')
+
+    def getFwStatus(self):
+        if self.__isUfw:
+            data = public.execShell(
+                "ps -ef|grep ufw |grep -v grep | grep -v python | awk '{print $2}'")
+            if data[0] == '':
+                return False
+            return True
+        if self.__isFirewalld:
+            data = public.execShell(
+                "ps -ef|grep firewalld |grep -v grep | grep -v python | awk '{print $2}'")
+            if data[0] == '':
+                return False
+            return True
+        elif self.__isMac:
+            return False
+        else:
+            data = public.execShell(
+                "ps -ef|grep iptables |grep -v grep | grep -v python | awk '{print $2}'")
+            if data[0] == '':
+                return False
+            return True
