@@ -123,9 +123,9 @@ class firewall_api:
     def delAcceptPortApi(self):
         port = request.form.get('port', '').strip()
         sid = request.form.get('id', '').strip()
-
+        mw_port = public.readFile('data/port.pl')
         try:
-            if(port == web.ctx.host.split(':')[1]):
+            if(port == mw_port):
                 return public.returnJson(False, '失败，不能删除当前面板端口!')
             if self.__isUfw:
                 public.execShell('ufw delete allow ' + port + '/tcp')
