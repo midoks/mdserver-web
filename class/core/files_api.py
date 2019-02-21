@@ -72,10 +72,7 @@ class files_api:
 
     def getDirSizeApi(self):
         path = request.form.get('path', '').encode('utf-8')
-        if public.getOs() == 'darwin':
-            tmp = public.execShell('du -sh ' + path)
-        else:
-            tmp = public.execShell('du -sbh ' + path)
+        tmp = self.getDirSize(path)
         return public.returnJson(True, tmp[0].split()[0])
 
     def getDirApi(self):
@@ -99,7 +96,8 @@ class files_api:
                 os.makedirs(_path)
             open(file, 'w+').close()
             self.setFileAccept(file)
-            # public.WriteLog('TYPE_FILE', 'FILE_CREATE_SUCCESS', (get.path,))
+            msg = public.getInfo('创建文件[{1}]成功!', (file,))
+            public.writeLog('文件管理', msg)
             return public.returnJson(True, '文件创建成功!')
         except Exception as e:
             # print str(e)
@@ -114,7 +112,8 @@ class files_api:
                 return public.returnJson(False, '指定目录已存在!')
             os.makedirs(path)
             self.setFileAccept(path)
-            # public.writeLog('TYPE_FILE', 'DIR_CREATE_SUCCESS', (get.path,))
+            msg = public.getInfo('创建目录[{1}]成功!', (path,))
+            public.writeLog('文件管理', msg)
             return public.returnJson(True, '目录创建成功!')
         except Exception as e:
             return public.returnJson(False, '目录创建失败!')
@@ -317,6 +316,15 @@ done
         except:
             return public.returnJson(False, '删除文件失败!')
 
+    def closeLogsApi(self):
+        logPath = public.getLogsDir()
+        os.system('rm -f ' + logPath + '/*')
+        os.system('kill -USR1 `cat ' + public.getServerDir() +
+                  'openresty/nginx/logs/nginx.pid`')
+        public.writeLog('文件管理', '网站日志已被清空!')
+        tmp = self.getDirSize(logPath)
+        return public.returnJson(True, tmp[0].split()[0])
+
     ##### ----- end ----- ###
 
     # 检查敏感目录
@@ -352,6 +360,13 @@ done
                  public.getRootDir())
 
         return not path in nDirs
+
+    def getDirSize(self, path):
+        if public.getOs() == 'darwin':
+            tmp = public.execShell('du -sh ' + path)
+        else:
+            tmp = public.execShell('du -sbh ' + path)
+        return tmp
 
     def checkFileName(self, filename):
         # 检测文件名

@@ -27,9 +27,9 @@ $(function(){
 });
 
 function closeLogs(){
-	$.post('/files?action=CloseLogs','',function(rdata){
+	$.post('/files/close_logs','',function(rdata){
 		$("#logSize").html(rdata.msg);
-		layer.msg(lan.firewall.empty,{icon:1});
+		layer.msg('已清理!',{icon:1});
 	},'json');
 }
 
@@ -112,6 +112,44 @@ function mstsc(port) {
  * @param {Int} state 0.禁ping 1.可ping
  */
 function ping(status){
+	var msg = status == 1 ? '禁PING后不影响服务器正常使用，但无法ping通服务器，您真的要禁PING吗？' : '解除禁PING状态可能会被黑客发现您的服务器，您真的要解禁吗？';
+	layer.confirm(msg,{title:'是否禁ping',closeBtn:2,cancel:function(){
+		if(status == 1){
+			$("#noping").prop("checked",true);
+		} else {
+			$("#noping").prop("checked",false);
+		}
+	}},function(){
+		layer.msg('正在处理,请稍候...',{icon:16,time:20000});
+		$.post('/firewall/set_ping','status='+status, function(data) {
+			layer.closeAll();
+			if (data['status'] == true) {
+				if(status == 1){
+					layer.msg(data['msg'], {icon: 1});
+				} else {
+					layer.msg('已解除禁PING', {icon: 1});
+				}
+				setTimeout(function(){window.location.reload();},3000);
+			} else {
+				layer.msg('连接服务器失败', {icon: 2});
+			}
+		},'json');
+	},function(){
+		if(status == 1){
+			$("#noping").prop("checked",true);
+		} else {
+			$("#noping").prop("checked",false);
+		}
+	});
+}
+
+
+
+/**
+ * 更改禁ping状态
+ * @param {Int} state 0.禁ping 1.可ping
+ */
+function firewall(status){
 	var msg = status == 1 ? '禁PING后不影响服务器正常使用，但无法ping通服务器，您真的要禁PING吗？' : '解除禁PING状态可能会被黑客发现您的服务器，您真的要解禁吗？';
 	layer.confirm(msg,{title:'是否禁ping',closeBtn:2,cancel:function(){
 		if(status == 1){
@@ -299,10 +337,10 @@ function getLogs(page,search) {
 function delLogs(){
 	layer.confirm('即将清空面板日志，继续吗？',{title:'清空日志',closeBtn:2},function(){
 		var loadT = layer.msg('正在清理,请稍候...',{icon:16});
-		$.post('/ajax?action=delClose','',function(rdata){
+		$.post('/firewall/del_panel_logs','',function(rdata){
 			layer.close(loadT);
 			layer.msg(rdata.msg,{icon:rdata.status?1:2});
 			getLogs(1);
-		});
+		},'json');
 	});
 }
