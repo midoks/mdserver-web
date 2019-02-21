@@ -206,7 +206,7 @@ class firewall_api:
         public.execShell('sysctl -p')
         return public.returnJson(True, '设置成功!')
 
-    def setFirewailApi(self):
+    def setFwApi(self):
         if public.isAppleSystem():
             return public.returnJson(True, '开发机不能设置!')
 

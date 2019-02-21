@@ -158,7 +158,7 @@ function firewall(status){
 		}
 	}},function(){
 		layer.msg('正在处理,请稍候...',{icon:16,time:20000});
-		$.post('/firewall/set_ping','status='+status, function(data) {
+		$.post('/firewall/set_fw','status='+status, function(data) {
 			layer.closeAll();
 			if (data['status'] == true) {
 				if(status == 1){
