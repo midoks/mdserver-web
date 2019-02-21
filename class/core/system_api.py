@@ -179,7 +179,7 @@ class system_api:
         data['version'] = '0.0.1'
         return data
 
-    def getLoadAverage(self, get=None):
+    def getLoadAverage(self):
         c = os.getloadavg()
         data = {}
         data['one'] = float(c[0])
@@ -251,7 +251,7 @@ class system_api:
         used = psutil.cpu_percent(interval=interval)
         return used, cpuCount
 
-    def getMemInfo(self, get=None):
+    def getMemInfo(self):
         # 取内存信息
         mem = psutil.virtual_memory()
         if public.getOs() == 'darwin':
@@ -413,7 +413,7 @@ class system_api:
         os.system('echo > /tmp/panelBoot.pl')
         return total, count
 
-    def getNetWork(self, get=None):
+    def getNetWork(self):
         # return self.GetNetWorkApi(get);
         # 取网络流量信息
         try:
@@ -441,8 +441,8 @@ class system_api:
             session['otime'] = time.time()
 
             networkInfo['cpu'] = self.getCpuInfo()
-            networkInfo['load'] = self.getLoadAverage(get)
-            networkInfo['mem'] = self.getMemInfo(get)
+            networkInfo['load'] = self.getLoadAverage()
+            networkInfo['mem'] = self.getMemInfo()
 
             return networkInfo
         except Exception, e:
