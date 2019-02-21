@@ -112,6 +112,15 @@ def test():
     return public.getLocalIp()
 
 
+@app.route('/close')
+def close():
+    if not os.path.exists('data/close.pl'):
+        return redirect('/')
+    data = {}
+    data['cmd'] = 'rm -rf ' + public.getRunDir() + '/data/close.pl'
+    return render_template('close.html', data=data)
+
+
 @app.route("/code")
 def code():
     import vilidate
@@ -140,7 +149,7 @@ def checkLogin():
 
 @app.route("/login")
 def login():
-    print session
+    # print session
     dologin = request.args.get('dologin', '')
     if dologin == 'True':
         session.clear()

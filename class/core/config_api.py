@@ -144,6 +144,10 @@ class config_api:
         public.execShell("chown root.root " + filename)
         return public.returnJson(True, '面板已关闭!')
 
+    def getApi(self):
+        data = {}
+
+        return public.getJson(data)
     ##### ----- end ----- ###
 
     def getVersion(self):

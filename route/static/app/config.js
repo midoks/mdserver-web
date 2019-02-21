@@ -1,4 +1,9 @@
 
+$.post('/config/get','',function(rdata){
+	console.log(rdata);
+},'json');
+
+
 $(".set-submit").click(function(){
 	var data = $("#set_config").serialize();
 	layer.msg('正在保存配置...',{icon:16,time:0,shade: [0.3, '#000']});
