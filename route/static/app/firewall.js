@@ -36,20 +36,19 @@ function closeLogs(){
 $("#firewalldType").change(function(){
 	var type = $(this).val();
 	var w = '120px';
-	var p = lan.firewall.port;
-	var t = lan.firewall.accept;
-	var m = lan.firewall.port_ps;
+	var p = '端口';
+	var t = '放行';
+	var m = '说明: 支持放行端口范围，如: 3000:3500';
 	if(type == 'address'){
 		w = '150px';
-		p = lan.firewall.ip;
-		t = lan.firewall.drop;
-		m = lan.firewall.ip_ps;
+		p = '欲屏蔽的IP地址';
+		t = '屏蔽';
+		m = '说明: 支持屏蔽IP段，如: 192.168.0.0/24';
 	}
 	$("#AcceptPort").css("width",w);
 	$("#AcceptPort").attr('placeholder',p);
 	$("#toAccept").html(t);
 	$("#f-ps").html(m);
-	 
 });
 
 
@@ -153,9 +152,9 @@ function firewall(status){
 	var msg = status == 1 ? '禁用防火墙会增加服务器不安全性，您真的要禁用防火墙吗？' : '开启防火墙,增加服务器安全!';
 	layer.confirm(msg,{title:'是否开启防火墙!',closeBtn:2,cancel:function(){
 		if(status == 1){
-			$("#noping").prop("checked",true);
+			$("#firewall_status").prop("checked",true);
 		} else {
-			$("#noping").prop("checked",false);
+			$("#firewall_status").prop("checked",false);
 		}
 	}},function(){
 		layer.msg('正在处理,请稍候...',{icon:16,time:20000});
@@ -174,13 +173,12 @@ function firewall(status){
 		},'json');
 	},function(){
 		if(status == 1){
-			$("#noping").prop("checked",true);
+			$("#firewall_status").prop("checked",true);
 		} else {
-			$("#noping").prop("checked",false);
+			$("#firewall_status").prop("checked",false);
 		}
 	});
 }
-
 
 
 /**
@@ -240,7 +238,7 @@ function showAccept(page,search) {
 			}
 			body += "<tr>\
 						<td><em class='dlt-num'>" + data.data[i].id + "</em></td>\
-						<td>" + (data.data[i].port.indexOf('.') == -1?lan.firewall.accept_port+':['+data.data[i].port+']':lan.firewall.drop_ip+':['+data.data[i].port+']') + "</td>\
+						<td>" + (data.data[i].port.indexOf('.') == -1?'放行端口'+':['+data.data[i].port+']':'屏蔽IP'+':['+data.data[i].port+']') + "</td>\
 						<td>" + status + "</td>\
 						<td>" + data.data[i].addtime + "</td>\
 						<td>" + data.data[i].ps + "</td>\
