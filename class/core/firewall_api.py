@@ -35,49 +35,27 @@ class firewall_api:
 
         rep = "^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(\/\d{1,2})?$"
         if not re.search(rep, port):
-            return public.returnJson(False, 'FIREWALL_IP_FORMAT')
+            return public.returnJson(False, '您输入的IP地址不合法!')
         address = port
         if public.M('firewall').where("port=?", (address,)).count() > 0:
-            return public.returnJson(False, 'FIREWALL_IP_EXISTS')
+            return public.returnJson(False, '您要放屏蔽的IP已存在屏蔽列表，无需重复处理!')
         if self.__isUfw:
-            public.ExecShell('ufw deny from ' + address + ' to any')
+            public.execShell('ufw deny from ' + address + ' to any')
         else:
             if self.__isFirewalld:
-                public.ExecShell(
-                    'firewall-cmd --permanent --add-rich-rule=\'rule family=ipv4 source address="' + address + '" drop\'')
+                cmd = 'firewall-cmd --permanent --add-rich-rule=\'rule family=ipv4 source address="' + \
+                    address + '" drop\''
+                public.execShell(cmd)
             else:
-                public.ExecShell('iptables -I INPUT -s ' +
-                                 address + ' -j DROP')
+                cmd = 'iptables -I INPUT -s ' + address + ' -j DROP'
+                public.execShell(cmd)
 
-        public.writeLog("TYPE_FIREWALL", 'FIREWALL_DROP_IP', (address,))
+        msg = public.getInfo('屏蔽IP[{1}]成功!', (address,))
+        public.writeLog("防火墙管理", msg)
         addtime = time.strftime('%Y-%m-%d %X', time.localtime())
         public.M('firewall').add('port,ps,addtime', (address, ps, addtime))
         self.firewallReload()
-        return public.returnJson(True, 'ADD_SUCCESS')
-
-    # 删除IP屏蔽
-    def delDropAddressApi(self):
-        port = request.form.get('port', '').strip()
-        ps = request.form.get('ps', '').strip()
-        sid = request.form.get('id', '').strip()
-        address = port
-        if self.__isUfw:
-            public.execShell('ufw delete deny from ' + address + ' to any')
-        else:
-            if self.__isFirewalld:
-                public.execShell(
-                    'firewall-cmd --permanent --remove-rich-rule=\'rule family=ipv4 source address="' + address + '" drop\'')
-            elif self.__isMac:
-                pass
-            else:
-                public.execShell('iptables -D INPUT -s ' +
-                                 address + ' -j DROP')
-
-        public.writeLog("TYPE_FIREWALL", 'FIREWALL_ACCEPT_IP', (address,))
-        public.M('firewall').where("id=?", (sid,)).delete()
-
-        self.firewallReload()
-        return public.returnJson(True, 'DEL_SUCCESS')
+        return public.returnJson(True, '添加成功!')
 
     # 添加放行端口
     def addAcceptPortApi(self):
@@ -108,22 +86,47 @@ class firewall_api:
                 public.execShell(
                     'iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport ' + port + ' -j ACCEPT')
 
-        public.writeLog("TYPE_FIREWALL", public.getInfo(
-            '放行端口[{1}]成功', (port,)))
+        msg = public.getInfo('放行端口[{1}]成功', (port,))
+        public.writeLog("防火墙管理", msg)
         addtime = time.strftime('%Y-%m-%d %X', time.localtime())
         public.M('firewall').add('port,ps,addtime', (port, ps, addtime))
 
         self.firewallReload()
         return public.returnJson(True, '添加放行(' + port + ')端口成功!')
 
+    # 删除IP屏蔽
+    def delDropAddressApi(self):
+        port = request.form.get('port', '').strip()
+        ps = request.form.get('ps', '').strip()
+        sid = request.form.get('id', '').strip()
+        address = port
+        if self.__isUfw:
+            public.execShell('ufw delete deny from ' + address + ' to any')
+        else:
+            if self.__isFirewalld:
+                public.execShell(
+                    'firewall-cmd --permanent --remove-rich-rule=\'rule family=ipv4 source address="' + address + '" drop\'')
+            elif self.__isMac:
+                pass
+            else:
+                cmd = 'iptables -D INPUT -s ' + address + ' -j DROP'
+                public.execShell(cmd)
+
+        msg = public.getInfo('解除IP[{1}]的屏蔽!', (address,))
+        public.writeLog("防火墙管理", msg)
+        public.M('firewall').where("id=?", (sid,)).delete()
+
+        self.firewallReload()
+        return public.returnJson(True, 'DEL_SUCCESS')
     # 删除放行端口
-    def delAcceptPort(self, get):
+
+    def delAcceptPortApi(self):
         port = request.form.get('port', '').strip()
         sid = request.form.get('id', '').strip()
 
         try:
             if(port == web.ctx.host.split(':')[1]):
-                return public.returnJson(False, 'FIREWALL_PORT_PANEL')
+                return public.returnJson(False, '失败，不能删除当前面板端口!')
             if self.__isUfw:
                 public.execShell('ufw delete allow ' + port + '/tcp')
             else:
@@ -135,13 +138,14 @@ class firewall_api:
                 else:
                     public.execShell(
                         'iptables -D INPUT -p tcp -m state --state NEW -m tcp --dport ' + port + ' -j ACCEPT')
-            public.writeLog("TYPE_FIREWALL", 'FIREWALL_DROP_PORT', (port,))
+            msg = public.getInfo('删除防火墙放行端口[{1}]成功!', (port,))
+            public.writeLog("防火墙管理", msg)
             public.M('firewall').where("id=?", (sid,)).delete()
 
             self.firewallReload()
-            return public.returnJson(True, 'DEL_SUCCESS')
+            return public.returnJson(True, '删除成功!')
         except:
-            return public.returnJson(False, 'DEL_ERROR')
+            return public.returnJson(False, '删除失败!')
 
     def getWwwPathApi(self):
         path = public.getLogsDir()
@@ -297,14 +301,13 @@ class firewall_api:
 
     def getFwStatus(self):
         if self.__isUfw:
-            data = public.execShell(
-                "ps -ef|grep ufw |grep -v grep | awk '{print $2}'")
+            cmd = "ps -ef|grep ufw |grep -v grep | awk '{print $2}'"
+            data = public.execShell(cmd)
             if data[0] == '':
                 return False
             return True
         if self.__isFirewalld:
             cmd = "ps -ef|grep firewalld |grep -v grep | awk '{print $2}'"
-            print cmd
             data = public.execShell(cmd)
             if data[0] == '':
                 return False
@@ -312,8 +315,8 @@ class firewall_api:
         elif self.__isMac:
             return False
         else:
-            data = public.execShell(
-                "ps -ef|grep iptables |grep -v grep  | awk '{print $2}'")
+            cmd = "ps -ef|grep iptables |grep -v grep  | awk '{print $2}'"
+            data = public.execShell(cmd)
             if data[0] == '':
                 return False
             return True

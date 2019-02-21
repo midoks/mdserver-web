@@ -274,7 +274,7 @@ function addAcceptPort(){
 		layer.close(loadT);
 		if(rdata.status == true || rdata.status == 'true'){
 			layer.msg(rdata.msg,{icon:1});
-			ShowAccept(1);
+			showAccept(1);
 			$("#AcceptPort").val('');
 			$("#Ps").val('');
 		}else{
@@ -288,18 +288,18 @@ function addAcceptPort(){
 
 //删除放行
 function delAcceptPort(id, port) {
-	var action = "DelDropAddress";
+	var action = "del_drop_address";
 	if(port.indexOf('.') == -1){
-		action = "DelAcceptPort";
+		action = "del_accept_port";
 	}
 	
 	layer.confirm(lan.get('confirm_del',[port]), {title: '删除防火墙规则',closeBtn:2}, function(index) {
 		var loadT = layer.msg('正在删除,请稍候...',{icon:16,time:0,shade: [0.3, '#000']})
-		$.post("/firewall?action="+action,"id=" + id + "&port=" + port, function(ret) {
+		$.post("/firewall/"+action, "id=" + id + "&port=" + port, function(ret) {
 			layer.close(loadT);
 			layer.msg(ret.msg,{icon:ret.status?1:2})
-			ShowAccept(1);
-		});
+			showAccept(1);
+		},'json');
 	});
 }
 
