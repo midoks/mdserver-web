@@ -117,9 +117,9 @@ class firewall_api:
         public.M('firewall').where("id=?", (sid,)).delete()
 
         self.firewallReload()
-        return public.returnJson(True, 'DEL_SUCCESS')
-    # 删除放行端口
+        return public.returnJson(True, '删除成功!')
 
+    # 删除放行端口
     def delAcceptPortApi(self):
         port = request.form.get('port', '').strip()
         sid = request.form.get('id', '').strip()
@@ -144,8 +144,8 @@ class firewall_api:
 
             self.firewallReload()
             return public.returnJson(True, '删除成功!')
-        except:
-            return public.returnJson(False, '删除失败!')
+        except Exception as e:
+            return public.returnJson(False, '删除失败!:' + str(e))
 
     def getWwwPathApi(self):
         path = public.getLogsDir()
