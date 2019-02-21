@@ -215,9 +215,31 @@ class firewall_api:
         public.writeLog("防火墙管理", msg)
         return public.returnJson(True, '修改成功!')
 
+    def setSshStatusApi(self):
+        if public.isAppleSystem():
+            return public.returnJson(True, '开发机不能操作!')
+
+        version = public.readFile('/etc/redhat-release')
+        if int(get['status']) == 1:
+            msg = 'SSH服务已停用'
+            act = 'stop'
+        else:
+            msg = 'SSH服务已启用'
+            act = 'start'
+
+        if not os.path.exists('/etc/redhat-release'):
+            public.execShell('service ssh ' + act)
+        elif version.find(' 7.') != -1:
+            public.execShell("systemctl " + act + " sshd.service")
+        else:
+            public.execShell("/etc/init.d/sshd " + act)
+
+        public.writeLog("防火墙管理", msg)
+        return public.returnJson(True, '操作成功!')
+
     def setPingApi(self):
         if public.isAppleSystem():
-            return public.returnJson(True, '开发机不能设置!')
+            return public.returnJson(True, '开发机不能操作!')
 
         status = request.form.get('status')
         filename = '/etc/sysctl.conf'
