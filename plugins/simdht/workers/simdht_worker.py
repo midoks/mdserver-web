@@ -129,6 +129,28 @@ def get_neighbor(target, nid, end=10):
     return target[:end] + nid[end:]
 
 
+def writeFile(filename, str):
+    # 写文件内容
+    try:
+        fp = open(filename, 'w+')
+        fp.write(str)
+        fp.close()
+        return True
+    except:
+        return False
+
+
+def readFile(filename):
+    # 读文件内容
+    try:
+        fp = open(filename, 'r')
+        fBody = fp.read()
+        fp.close()
+        return fBody
+    except:
+        return False
+
+
 class KNode(object):
 
     def __init__(self, nid, ip, port):
@@ -480,13 +502,26 @@ class DBDataCheck(Master):
         Master.__init__(self)
         self.setDaemon(True)
 
+    def get_start_id(self):
+        file = '../start_pos.pl'
+        if os.path.exists(file):
+            c = readFile(file)
+            return int(c)
+        else:
+            return 0
+
+    def set_start_id(self, start_id):
+        file = '../start_pos.pl'
+        writeFile(file, str(start_id))
+        return True
+
     def check_db_data(self):
 
         max_data = self.query('select max(id) from search_hash')
         max_id = max_data[0][0]
 
-        min_data = self.query('select min(id) from search_hash')
-        min_id = min_data[0][0]
+        min_id = self.get_start_id()
+        self.set_start_id(max_id)
 
         print 'min_id', min_id, 'max_id', max_id, 'ok!'
 
