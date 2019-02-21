@@ -14,6 +14,21 @@ $(".set-submit").click(function(){
 });
 
 
+//关闭面板
+function closePanel(){
+	layer.confirm('关闭面板会导致您无法访问面板 ,您真的要关闭宝塔Linux面板吗？',{title:'关闭面板',closeBtn:2,icon:13,cancel:function(){
+		$("#closePl").prop("checked",false);
+	}}, function() {
+		$.post('/config/close_panel','',function(rdata){
+			layer.msg(rdata.msg,{icon:rdata.status?1:2});
+			setTimeout(function(){window.location.reload();},1000);
+		},'json');
+	},function(){
+		$("#closePl").prop("checked",false);
+	});
+}
+
+
 function modifyAuthPath() {
     var auth_path = $("#admin_path").val();
     btn = "<button type='button' class='btn btn-success btn-sm' onclick=\"bindBTName(1,'b')\">确定</button>";
