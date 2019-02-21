@@ -218,6 +218,11 @@ class firewall_api:
         public.execShell('sysctl -p')
         return public.returnJson(True, '设置成功!')
 
+    def delPanelLogsApi(self):
+        public.M('logs').where('id>?', (0,)).delete()
+        public.writeLog('面板设置', '面板操作日志已清空!')
+        return public.returnJson(True, '面板操作日志已清空!')
+
     ##### ----- start ----- ###
 
     def getList(self, page, limit):
