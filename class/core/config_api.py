@@ -134,6 +134,16 @@ class config_api:
             public.restartMw()
         return public.returnJson(True, '修改成功!')
 
+    def closePanelApi(self):
+        filename = 'data/close.pl'
+        if os.path.exists(filename):
+            os.remove(filename)
+            return public.returnJson(True, '开启成功')
+        public.writeFile(filename, 'True')
+        public.execShell("chmod 600 " + filename)
+        public.execShell("chown root.root " + filename)
+        return public.returnJson(True, '面板已关闭!')
+
     ##### ----- end ----- ###
 
     def getVersion(self):
