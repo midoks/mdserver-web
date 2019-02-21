@@ -161,11 +161,7 @@ function firewall(status){
 		$.post('/firewall/set_fw','status='+status, function(data) {
 			layer.closeAll();
 			if (data['status'] == true) {
-				if(status == 1){
-					layer.msg(data['msg'], {icon: 1});
-				} else {
-					layer.msg('已解除禁PING', {icon: 1});
-				}
+				layer.msg(data['msg'], {icon: 1});
 				setTimeout(function(){window.location.reload();},3000);
 			} else {
 				layer.msg('连接服务器失败', {icon: 2});
