@@ -72,24 +72,12 @@ class firewall_api:
         if public.M('firewall').where("port=?", (port,)).count() > 0:
             return public.returnJson(False, '您要放行的端口已存在，无需重复放行!')
 
-        if self.__isUfw:
-            public.execShell('ufw allow ' + port + '/tcp')
-        else:
-            if self.__isFirewalld:
-                port = port.replace(':', '-')
-                public.execShell(
-                    'firewall-cmd --permanent --zone=public --add-port=' + port + '/tcp')
-            elif self.__isMac:
-                pass
-            else:
-                public.execShell(
-                    'iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport ' + port + ' -j ACCEPT')
-
         msg = public.getInfo('放行端口[{1}]成功', (port,))
         public.writeLog("防火墙管理", msg)
         addtime = time.strftime('%Y-%m-%d %X', time.localtime())
         public.M('firewall').add('port,ps,addtime', (port, ps, addtime))
 
+        self.addAcceptPort(port)
         self.firewallReload()
         return public.returnJson(True, '添加放行(' + port + ')端口成功!')
 
@@ -196,9 +184,9 @@ class firewall_api:
         if int(port) < 22 or int(port) > 65535:
             return public.returnJson(False, '端口范围必需在22-65535之间!')
 
-        ports = ['21', '25', '80', '443', '8080', '888', '8888']
+        ports = ['21', '25', '80', '443', '7200', '8080', '888', '8888']
         if port in ports:
-            return public.returnJson(False, '')
+            return public.returnJson(False, '(' + port + ')' + '特殊端口不可设置!')
 
         file = '/etc/ssh/sshd_config'
         conf = public.readFile(file)
@@ -228,7 +216,6 @@ class firewall_api:
         return public.returnJson(True, '修改成功!')
 
     def setPingApi(self):
-
         if public.isAppleSystem():
             return public.returnJson(True, '开发机不能设置!')
 
@@ -321,6 +308,20 @@ class firewall_api:
 
         data['page'] = public.getPage(_page)
         return public.getJson(data)
+
+    def addAcceptPort(self, port):
+        if self.__isUfw:
+            public.execShell('ufw allow ' + port + '/tcp')
+        else:
+            if self.__isFirewalld:
+                port = port.replace(':', '-')
+                cmd = 'firewall-cmd --permanent --zone=public --add-port=' + port + '/tcp'
+                public.execShell(cmd)
+            elif self.__isMac:
+                pass
+            else:
+                cmd = 'iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport ' + port + ' -j ACCEPT'
+                public.execShell(cmd)
 
     def firewallReload(self):
         if self.__isUfw:
