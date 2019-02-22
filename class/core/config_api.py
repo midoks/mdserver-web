@@ -22,6 +22,37 @@ class config_api:
 
     ##### ----- start ----- ###
 
+    # 取面板列表
+    def getPanelListApi(self):
+        data = public.M('panel').field(
+            'id,title,url,username,password,click,addtime').order('click desc').select()
+        return public.getJson(data)
+
+    def addPanelInfoApi(self):
+        title = request.form.get('title', '')
+        url = request.form.get('url', '')
+        username = request.form.get('username', '')
+        password = request.form.get('password', '')
+        # 校验是还是重复
+        isAdd = public.M('panel').where(
+            'title=? OR url=?', (title, url)).count()
+        if isAdd:
+            return public.returnJson(False, '备注或面板地址重复!')
+        isRe = public.M('panel').add('title,url,username,password,click,addtime',
+                                     (title, url, username, password, 0, int(time.time())))
+        if isRe:
+            return public.returnJson(True, '添加成功!')
+        return public.returnJson(False, '添加失败!')
+
+    # 删除面板资料
+    def delPanelInfoApi(self):
+        mid = request.form.get('id', '')
+        isExists = public.M('panel').where('id=?', (mid,)).count()
+        if not isExists:
+            return public.returnJson(False, '指定面板资料不存在!')
+        public.M('panel').where('id=?', (mid,)).delete()
+        return public.returnJson(True, '删除成功!')
+
     def syncDateApi(self):
         if public.isAppleSystem():
             return public.returnJson(True, '开发系统不必同步时间!')
