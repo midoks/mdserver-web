@@ -53,6 +53,26 @@ class config_api:
         public.M('panel').where('id=?', (mid,)).delete()
         return public.returnJson(True, '删除成功!')
 
+     # 修改面板资料
+    def setPanelInfoApi(self):
+        title = request.form.get('title', '')
+        url = request.form.get('url', '')
+        username = request.form.get('username', '')
+        password = request.form.get('password', '')
+        mid = request.form.get('id', '')
+        # 校验是还是重复
+        isSave = public.M('panel').where(
+            '(title=? OR url=?) AND id!=?', (title, url, mid)).count()
+        if isSave:
+            return public.returnMsg(False, '备注或面板地址重复!')
+
+        # 更新到数据库
+        isRe = public.M('panel').where('id=?', (mid,)).save(
+            'title,url,username,password', (title, url, username, password))
+        if isRe:
+            return public.returnMsg(True, '修改成功!')
+        return public.returnMsg(False, '修改失败!')
+
     def syncDateApi(self):
         if public.isAppleSystem():
             return public.returnJson(True, '开发系统不必同步时间!')

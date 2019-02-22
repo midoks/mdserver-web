@@ -839,7 +839,7 @@ function listOrder(skey,type,obj){
 
 
 //获取关联列表
-function getBtpanelList(){
+function getPanelList(){
 	var con ='';
 	$.post("/config/get_panel_list",function(rdata){
 		for(var i=0; i<rdata.length; i++){
@@ -889,7 +889,7 @@ function getBtpanelList(){
 		});
 	},'json');
 }
-getBtpanelList();
+getPanelList();
 
 //添加面板快捷登录
 function bindPanel(a,type,ip,btid,url,user,pw){
@@ -920,14 +920,14 @@ function bindPanel(a,type,ip,btid,url,user,pw){
 			return;
 		}
 		if(type=="c"){
-			gurl = "/config?action=SetPanelInfo";
+			gurl = "/config/set_panel_info";
 			data = data+"&id="+btid;
 		}
 		$.post(gurl, data, function(b) {
 			if(b.status) {
 				layer.closeAll();
 				layer.msg(b.msg, {icon: 1});
-				getBtpanelList();
+				getPanelList();
 			} else {
 				layer.msg(b.msg, {icon: 2})
 			}
@@ -978,7 +978,7 @@ function bindPaneldel(id){
 	$.post("/config/del_panel_info","id="+id,function(rdata){
 		layer.closeAll();
 		layer.msg(rdata.msg,{icon:rdata.status?1:2});
-		getBtpanelList();
+		getPanelList();
 	},'json');
 }
 
