@@ -6,5 +6,6 @@ gevent-websocket
 psutil
 pillow
 chardet
+flask_sqlalchemy
 MySQL-python
 ConfigParser
