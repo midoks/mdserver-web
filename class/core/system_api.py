@@ -601,12 +601,11 @@ class system_api:
 
         upAddr = 'https://raw.githubusercontent.com/midoks/mdserver-web/master/version'
         try:
-            version = public.httpGet(
-                upAddr + '/info.json')
+            version = public.httpGet(upAddr + '/info.json')
             version = json.loads(version)
             return version[0]
         except Exception as e:
-            print e
+            print 'getServerInfo', e
         return {}
 
     def updateServer(self, stype, version=''):
@@ -681,15 +680,13 @@ class system_api:
 
             return public.returnJson(False, '已经是最新,无需更新!')
         except Exception as ex:
-            print ex
+            print 'updateServer', ex
             return public.returnJson(False, "连接服务器失败!")
 
     # 重启面板
     def reWeb(self, get):
         if not public.isRestart():
             public.returnMsg(False, '请等待所有安装任务完成再执行!')
-
-        # public.ExecShell('/etc/init.d/bt restart &')
         public.returnMsg(True, '执行成功!')
 
     # 修复面板
