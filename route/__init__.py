@@ -191,10 +191,9 @@ def doLogin():
 @app.route('/<reqClass>', methods=['POST', 'GET'])
 @app.route('/', methods=['POST', 'GET'])
 def index(reqClass=None, reqAction=None, reqData=None):
-    # comReturn = common.local()
-    # print comReturn
-    # if comReturn:
-    #     return comReturn
+    comReturn = common.local()
+    if comReturn:
+        return comReturn
 
     if (reqClass == None):
         reqClass = 'index'

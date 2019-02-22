@@ -19,9 +19,17 @@
 					</div>
 
 					<div class="ss-text pull-left mr50">
-						<em class="btlink" style="color: #20a53a;" onclick="GetPanelSSL()" title="点击自定义面板证书">面板SSL</em>
+	                    <em title="开启后允许使用ipv6访问面板">监听IPv6</em>
+	                    <div class='ssh-item'>
+	                        <input class='btswitch btswitch-ios' id='panelIPv6' type='checkbox' {{data['ipv6']}}>
+	                        <label class='btswitch-btn' for='panelIPv6' onclick="setIPv6()"></label>
+	                    </div>
+	                </div>
+
+					<div class="ss-text pull-left mr50">
+						<em class="btlink" style="color: #20a53a;" onclick="getPanelSSL()" title="点击自定义面板证书">面板SSL</em>
 						<div class='ssh-item'>
-							<input class='btswitch btswitch-ios' id='panelSSL' type='checkbox'>
+							<input class='btswitch btswitch-ios' id='panelSSL' type='checkbox' {{data['ssl']}}>
 							<label class='btswitch-btn' for='panelSSL' onclick="setPanelSSL()"></label>
 						</div>
 					</div>
