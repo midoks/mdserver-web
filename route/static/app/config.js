@@ -1,7 +1,7 @@
 
-$.post('/config/get','',function(rdata){
-	console.log(rdata);
-},'json');
+// $.post('/config/get','',function(rdata){
+// 	console.log(rdata);
+// },'json');
 
 
 $(".set-submit").click(function(){
@@ -199,8 +199,117 @@ function syncDate(){
 	$.post('/config/sync_date','',function(rdata){
 		layer.close(loadT);
 		layer.msg(rdata.msg,{icon:rdata.status?1:2});
-		setTimeout(function(){
-			window.location.reload();
-		},1500);
+		setTimeout(function(){window.location.reload();},1500);
 	},'json');
 }
+
+
+function setIPv6() {
+    var loadT = layer.msg('正在配置,请稍候...', { icon: 16, time: 0, shade: [0.3, '#000'] });
+    $.post('/config/set_ipv6_status', {}, function (rdata) {
+        layer.close(loadT);
+        layer.msg(rdata.msg, {icon:rdata.status?1:2});
+        setTimeout(function(){window.location.reload();},1500);
+    },'json');
+}
+
+
+//设置面板SSL
+function setPanelSSL(){
+	var status = $("#sshswitch").prop("checked")==true?1:0;
+	var msg = $("#panelSSL").attr('checked')?'关闭SSL后,必需使用http协议访问面板,继续吗?':'<a style="font-weight: bolder;font-size: 16px;">危险！此功能不懂别开启!</a>\
+	<li style="margin-top: 12px;color:red;">必须要用到且了解此功能才决定自己是否要开启!</li>\
+	<li>面板SSL是自签证书，不被浏览器信任，显示不安全是正常现象</li>\
+	<li>开启后导致面板不能访问，可以点击下面链接了解解决方法</li>\
+	<p style="margin-top: 10px;">\
+		<input type="checkbox" id="checkSSL" /><label style="font-weight: 400;margin: 3px 5px 0px;" for="checkSSL">我已了经解详情,并愿意承担风险</label>\
+		<a target="_blank" class="btlink" href="https://www.bt.cn/bbs/thread-4689-1-1.html" style="float: right;">了解详情</a>\
+	</p>';
+	layer.confirm(msg,{title:'设置面板SSL',closeBtn:2,icon:3,area:'550px',cancel:function(){
+		if(status == 0){
+			$("#panelSSL").prop("checked",false);
+		}
+		else{
+			$("#panelSSL").prop("checked",true);
+		}
+	}},function(){
+		if(window.location.protocol.indexOf('https') == -1){
+			if(!$("#checkSSL").prop('checked')){
+				layer.msg(lan.config.ssl_ps,{icon:2});
+				return false;
+			}
+		}
+		var loadT = layer.msg('正在安装并设置SSL组件,这需要几分钟时间...',{icon:16,time:0,shade: [0.3, '#000']});
+		$.post('/config/set_panel_ssl','',function(rdata){
+			layer.close(loadT);
+			layer.msg(rdata.msg,{icon:rdata.status?1:5});
+			if(rdata.status === true){
+				$.post('/system/restart','',function (rdata) {
+                    layer.close(loadT);
+                    layer.msg(rdata.msg);
+                    setTimeout(function(){
+						window.location.href = ((window.location.protocol.indexOf('https') != -1)?'http://':'https://') + window.location.host + window.location.pathname;
+					},3000);
+                },'json');
+			}
+		},'json');
+	},function(){
+		if(status == 0){
+			$("#panelSSL").prop("checked",false);
+		}
+		else{
+			$("#panelSSL").prop("checked",true);
+		}
+	});
+}
+
+
+function getPanelSSL(){
+	var loadT = layer.msg('正在获取证书信息...',{icon:16,time:0,shade: [0.3, '#000']});
+	$.post('/config/get_panel_ssl',{},function(cert){
+		layer.close(loadT);
+		var certBody = '<div class="tab-con">\
+			<div class="myKeyCon ptb15">\
+				<div class="ssl-con-key pull-left mr20">密钥(KEY)<br>\
+					<textarea id="key" class="bt-input-text">'+cert.privateKey+'</textarea>\
+				</div>\
+				<div class="ssl-con-key pull-left">证书(PEM格式)<br>\
+					<textarea id="csr" class="bt-input-text">'+cert.certPem+'</textarea>\
+				</div>\
+				<div class="ssl-btn pull-left mtb15" style="width:100%">\
+					<button class="btn btn-success btn-sm" onclick="savePanelSSL()">保存</button>\
+				</div>\
+			</div>\
+			<ul class="help-info-text c7 pull-left">\
+				<li>粘贴您的*.key以及*.pem内容，然后保存即可<a href="http://www.bt.cn/bbs/thread-704-1-1.html" class="btlink" target="_blank">[帮助]</a>。</li>\
+				<li>如果浏览器提示证书链不完整,请检查是否正确拼接PEM证书</li><li>PEM格式证书 = 域名证书.crt + 根证书(root_bundle).crt</li>\
+			</ul>\
+		</div>'
+		layer.open({
+			type: 1,
+			area: "600px",
+			title: '自定义面板证书',
+			closeBtn: 2,
+			shift: 5,
+			shadeClose: false,
+			content:certBody
+		});
+	},'json');
+}
+
+
+function savePanelSSL(){
+	var data = {
+		privateKey:$("#key").val(),
+		certPem:$("#csr").val()
+	}
+	var loadT = layer.msg('正在安装并设置SSL组件,这需要几分钟时间...',{icon:16,time:0,shade: [0.3, '#000']});
+	$.post('/config/save_panel_ssl',data,function(rdata){
+		layer.close(loadT);
+		if(rdata.status){
+			layer.closeAll();
+		}
+		layer.msg(rdata.msg,{icon:rdata.status?1:2});
+	},'json');
+}
+

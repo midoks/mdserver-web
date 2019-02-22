@@ -144,11 +144,92 @@ class config_api:
         public.execShell("chown root.root " + filename)
         return public.returnJson(True, '面板已关闭!')
 
+    def setIpv6StatusApi(self):
+        ipv6_file = 'data/ipv6.pl'
+        if os.path.exists('data/ipv6.pl'):
+            os.remove(ipv6_file)
+            public.writeLog('面板设置', '关闭面板IPv6兼容!')
+        else:
+            public.writeFile(ipv6_file, 'True')
+            public.writeLog('面板设置', '开启面板IPv6兼容!')
+        public.restartMw()
+        return public.returnJson(True, '设置成功!')
+
+    # 获取面板证书
+    def getPanelSslApi(self):
+        cert = {}
+        cert['privateKey'] = public.readFile('ssl/privateKey.pem')
+        cert['certPem'] = public.readFile('ssl/certificate.pem')
+        cert['rep'] = os.path.exists('ssl/input.pl')
+        return public.getJson(cert)
+
+    # 保存面板证书
+    def savePanelSslApi(self):
+        keyPath = 'ssl/privateKey.pem'
+        certPath = 'ssl/certificate.pem'
+        checkCert = '/tmp/cert.pl'
+
+        certPem = request.form.get('certPem', '').strip()
+        privateKey = request.form.get('privateKey', '').strip()
+
+        public.writeFile(checkCert, certPem)
+        if privateKey:
+            public.writeFile(keyPath, privateKey)
+        if certPem:
+            public.writeFile(certPath, certPem)
+        if not public.checkCert(checkCert):
+            return public.returnJson(False, '证书错误,请检查!')
+        public.writeFile('ssl/input.pl', 'True')
+        return public.returnJson(True, '证书已保存!')
+
+     # 设置面板SSL
+    def setPanelSslApi(self):
+        sslConf = public.getRunDir() + '/data/ssl.pl'
+        if os.path.exists(sslConf):
+            os.system('rm -f ' + sslConf)
+            return public.returnJson(True, 'SSL已关闭，请使用http协议访问面板!')
+        else:
+            os.system('pip install cffi==1.10')
+            os.system('pip install cryptography==2.1')
+            os.system('pip install pyOpenSSL==16.2')
+            try:
+                if not self.createSSL():
+                    return public.returnJson(False, '开启失败，无法自动安装pyOpenSSL组件!<p>请尝试手动安装: pip install pyOpenSSL</p>')
+                public.writeFile(sslConf, 'True')
+            except Exception as ex:
+                return public.returnJson(False, '开启失败，无法自动安装pyOpenSSL组件!<p>请尝试手动安装: pip install pyOpenSSL</p>')
+            return public.returnJson(True, '开启成功，请使用https协议访问面板!')
+
     def getApi(self):
         data = {}
-
         return public.getJson(data)
     ##### ----- end ----- ###
+
+    # 自签证书
+    def createSSL(self):
+        if os.path.exists('ssl/input.pl'):
+            return True
+        import OpenSSL
+        key = OpenSSL.crypto.PKey()
+        key.generate_key(OpenSSL.crypto.TYPE_RSA, 2048)
+        cert = OpenSSL.crypto.X509()
+        cert.set_serial_number(0)
+        cert.get_subject().CN = '120.27.27.98'
+        cert.set_issuer(cert.get_subject())
+        cert.gmtime_adj_notBefore(0)
+        cert.gmtime_adj_notAfter(86400 * 3650)
+        cert.set_pubkey(key)
+        cert.sign(key, 'md5')
+        cert_ca = OpenSSL.crypto.dump_certificate(
+            OpenSSL.crypto.FILETYPE_PEM, cert)
+        private_key = OpenSSL.crypto.dump_privatekey(
+            OpenSSL.crypto.FILETYPE_PEM, key)
+        if len(cert_ca) > 100 and len(private_key) > 100:
+            public.writeFile('ssl/certificate.pem', cert_ca)
+            public.writeFile('ssl/privateKey.pem', private_key)
+            print cert_ca, private_key
+            return True
+        return False
 
     def getVersion(self):
         return self.__version
@@ -170,6 +251,18 @@ class config_api:
             data['admin_path'] = '/'
         else:
             data['admin_path'] = public.readFile(admin_path_file)
+
+        ipv6_file = 'data/ipv6.pl'
+        if os.path.exists('data/ipv6.pl'):
+            data['ipv6'] = 'checked'
+        else:
+            data['ipv6'] = ''
+
+        ssl_file = 'data/ssl.pl'
+        if os.path.exists('data/ssl.pl'):
+            data['ssl'] = 'checked'
+        else:
+            data['ssl'] = ''
 
         data['username'] = public.M('users').where(
             "id=?", (1,)).getField('username')
