@@ -41,18 +41,20 @@ app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=31)
 
 try:
     from flask_sqlalchemy import SQLAlchemy
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/py_mw_session.db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/mw_session.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
-    sdb = SQLAlchemy(app)
     app.config['SESSION_TYPE'] = 'sqlalchemy'
     app.config['SESSION_SQLALCHEMY'] = sdb
     app.config['SESSION_SQLALCHEMY_TABLE'] = 'session'
+    sdb = SQLAlchemy(app)
+    sdb.create_all()
 except:
     app.config['SESSION_TYPE'] = 'filesystem'
     app.config['SESSION_FILE_DIR'] = '/tmp/py_mw_session_' + \
         str(sys.version_info[0])
     app.config['SESSION_FILE_THRESHOLD'] = 1024
     app.config['SESSION_FILE_MODE'] = 384
+    public.execShell("pip install flask_sqlalchemy &")
 
 app.config['SESSION_PERMANENT'] = True
 app.config['SESSION_USE_SIGNER'] = True
@@ -189,6 +191,10 @@ def doLogin():
 @app.route('/<reqClass>', methods=['POST', 'GET'])
 @app.route('/', methods=['POST', 'GET'])
 def index(reqClass=None, reqAction=None, reqData=None):
+    # comReturn = common.local()
+    # print comReturn
+    # if comReturn:
+    #     return comReturn
 
     if (reqClass == None):
         reqClass = 'index'

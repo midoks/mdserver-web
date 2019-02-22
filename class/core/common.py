@@ -21,11 +21,15 @@ from flask import redirect
 
 def init():
 
-    checkClose()
-
     initDB()
     initInitD()
     initUserInfo()
+
+
+def local():
+    result = checkClose()
+    if result:
+        return result
 
 
 # 检查面板是否关闭
