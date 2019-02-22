@@ -102,3 +102,13 @@ CREATE TABLE IF NOT EXISTS `tasks` (
   `end` 	    INTEGER,
   `execstr` 	TEXT
 );
+
+CREATE TABLE IF NOT EXISTS `panel` (
+  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+  `title` TEXT,
+  `url` TEXT,
+  `username` TEXT,
+  `password` TEXT,
+  `click` INTEGER,
+  `addtime` INTEGER
+);
