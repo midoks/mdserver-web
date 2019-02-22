@@ -149,13 +149,10 @@ class config_api:
 
     def setAdminPathApi(self):
         admin_path = request.form.get('admin_path', '').strip()
-        admin_path_checks = ['/', '/close', '/login', '/site',
-                             '/sites',
-                             '/download_file', '/control',
-                             '/crontab', '/firewall', '/files',
-                             'config', '/soft', '/ajax',
-                             '/system', '/code',
-                             '/ssl', '/plugin']
+        admin_path_checks = ['/', '/close', '/login', '/do_login', '/site',
+                             '/sites', '/download_file', '/control', '/crontab',
+                             '/firewall', '/files', 'config', '/soft', '/system',
+                             '/code', '/ssl', '/plugins']
         if admin_path == '':
             admin_path = '/'
         if admin_path != '/':
