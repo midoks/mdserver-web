@@ -683,12 +683,6 @@ class system_api:
             print 'updateServer', ex
             return public.returnJson(False, "连接服务器失败!")
 
-    # 重启面板
-    def reWeb(self, get):
-        if not public.isRestart():
-            public.returnMsg(False, '请等待所有安装任务完成再执行!')
-        public.returnMsg(True, '执行成功!')
-
     # 修复面板
     def repPanel(self, get):
         vp = ''

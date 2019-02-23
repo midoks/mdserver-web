@@ -575,6 +575,97 @@ class site_api:
         port = request.form.get('port', '').encode('utf-8')
         return self.add(webname, port, ps, path, version)
 
+    def addDirBindApi(self):
+        pid = request.form.get('id', '').encode('utf-8')
+        domain = request.form.get('domain', '').encode('utf-8')
+        dirName = request.form.get('dirName', '').encode('utf-8')
+        tmp = domain.split(':')
+        domain = tmp[0]
+        port = '80'
+        if len(tmp) > 1:
+            port = tmp[1]
+        if dirName == '':
+            public.returnJson(False, '目录不能为空!')
+
+        reg = "^([\w\-\*]{1,100}\.){1,4}(\w{1,10}|\w{1,10}\.\w{1,10})$"
+        if not re.match(reg, domain):
+            return public.returnJson(False, '主域名格式不正确!')
+
+        siteInfo = public.M('sites').where(
+            "id=?", (pid,)).field('id,path,name').find()
+        webdir = siteInfo['path'] + '/' + dirName
+
+        sql = public.M('binding')
+        if sql.where("domain=?", (domain,)).count() > 0:
+            return public.returnJson(False, '您添加的域名已存在!')
+        if public.M('domain').where("name=?", (domain,)).count() > 0:
+            return public.returnJson(False, '您添加的域名已存在!')
+
+        filename = self.getHostConf(siteInfo['name'])
+
+        if conf:
+            rep = "enable-php-([0-9]{2,3})\.conf"
+            tmp = re.search(rep, conf).groups()
+            version = tmp[0]
+            bindingConf = '''
+#BINDING-%s-START
+server
+{
+    listen %s;
+    server_name %s;
+    index index.php index.html index.htm default.php default.htm default.html;
+    root %s;
+    
+    include enable-php-%s.conf;
+    include %s/panel/vhost/rewrite/%s.conf;
+    #禁止访问的文件或目录
+    location ~ ^/(\.user.ini|\.htaccess|\.git|\.svn|\.project|LICENSE|README.md)
+    {
+        return 404;
+    }
+    
+    #一键申请SSL证书验证目录相关设置
+    location ~ \.well-known{
+        allow all;
+    }
+    
+    location ~ .*\\.(gif|jpg|jpeg|png|bmp|swf)$
+    {
+        expires      30d;
+        error_log off;
+        access_log /dev/null; 
+    }
+    location ~ .*\\.(js|css)?$
+    {
+        expires      12h;
+        error_log off;
+        access_log /dev/null; 
+    }
+    access_log %s.log;
+    error_log  %s.error.log;
+}
+#BINDING-%s-END''' % (domain, port, domain, webdir, version, self.setupPath, siteInfo['name'], public.GetConfigValue('logs_path') + '/' + siteInfo['name'], public.GetConfigValue('logs_path') + '/' + siteInfo['name'], domain)
+
+            conf += bindingConf
+            shutil.copyfile(filename, '/tmp/backup.conf')
+            public.writeFile(filename, conf)
+        conf = public.readFile(filename)
+
+        # 检查配置是否有误
+        isError = public.checkWebConfig()
+        if isError != True:
+            shutil.copyfile('/tmp/backup.conf', filename)
+            return public.returnJson(False, 'ERROR: <br><a style="color:red;">' + isError.replace("\n", '<br>') + '</a>')
+
+        public.M('binding').add('pid,domain,port,path,addtime',
+                                (id, domain, port, dirName, public.getDate()))
+
+        public.restartWeb()
+        msg = public.getInfo('网站[{1}]子目录[{2}]绑定到[{3}]',
+                             (siteInfo['name'], dirName, domain))
+        public.writeLog('网站管理', msg)
+        return public.returnJson(True, '添加成功!')
+
     def addDomainApi(self):
         isError = public.checkWebConfig()
         if isError != True:
