@@ -276,7 +276,7 @@ class site_api:
 
         # 写入配置文件
         result = self.setSslConf(siteName)
-        print result['msg']
+        # print result['msg']
         if not result['status']:
             return public.getJson(result)
 
@@ -479,7 +479,7 @@ class site_api:
 
         # 写入配置文件
         result = self.setSslConf(siteName)
-        print result['msg']
+        # print result['msg']
         if not result['status']:
             return public.getJson(result)
         result['csr'] = public.readFile(csrpath)
