@@ -1279,7 +1279,7 @@ function dirBinding(id){
 		var body = "<div class='dirBinding c5'>"
 			   + "域名：<input class='bt-input-text mr20' type='text' name='domain' />"
 			   + "子目录：<select class='bt-input-text mr20' name='dirName'>"+dirList+"</select>"
-			   + "<button class='btn btn-success btn-sm' onclick='AddDirBinding("+id+")'>添加</button>"
+			   + "<button class='btn btn-success btn-sm' onclick='addDirBinding("+id+")'>添加</button>"
 			   + "</div>"
 			   + "<div class='divtable mtb15' style='height:470px;overflow:auto'><table class='table table-hover' width='100%' style='margin-bottom:0'>"
 			   + "<thead><tr><th>域名</th><th width='70'>端口</th><th width='100'>子目录</th><th width='100' class='text-right'>操作</th></tr></thead>"
@@ -1342,7 +1342,7 @@ function ShowRewrite(rdata){
 }
 
 //添加子目录绑定
-function AddDirBinding(id){
+function addDirBinding(id){
 	var domain = $("input[name='domain']").val();
 	var dirName = $("select[name='dirName']").val();
 	if(domain == '' || dirName == '' || dirName == null){
