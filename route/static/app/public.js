@@ -149,16 +149,25 @@ function getLocalTime(a) {
 
 
 function changePath(d) {
-	setCookie("SetId", d);
-	setCookie("SetName", "");
+	setCookie('SetId', d);
+	setCookie('SetName', '');
 	var c = layer.open({
 		type: 1,
 		area: "650px",
-		title: lan.bt.dir,
+		title: '选择目录',
 		closeBtn: 2,
 		shift: 5,
 		shadeClose: false,
-		content: "<div class='changepath'><div class='path-top'><button type='button' class='btn btn-default btn-sm' onclick='BackFile()'><span class='glyphicon glyphicon-share-alt'></span> "+lan.public.return+"</button><div class='place' id='PathPlace'>"+lan.bt.path+"：<span></span></div></div><div class='path-con'><div class='path-con-left'><dl><dt id='changecomlist' onclick='backMyComputer()'>"+lan.bt.comp+"</dt></dl></div><div class='path-con-right'><ul class='default' id='computerDefautl'></ul><div class='file-list divtable'><table class='table table-hover' style='border:0 none'><thead><tr class='file-list-head'><th width='40%'>"+lan.bt.filename+"</th><th width='20%'>"+lan.bt.etime+"</th><th width='10%'>"+lan.bt.access+"</th><th width='10%'>"+lan.bt.own+"</th><th width='10%'></th></tr></thead><tbody id='tbody' class='list-list'></tbody></table></div></div></div></div><div class='getfile-btn' style='margin-top:0'><button type='button' class='btn btn-default btn-sm pull-left' onclick='CreateFolder()'>"+lan.bt.adddir+"</button><button type='button' class='btn btn-danger btn-sm mr5' onclick=\"layer.close(getCookie('ChangePath'))\">"+lan.public.close+"</button> <button type='button' class='btn btn-success btn-sm' onclick='GetfilePath()'>"+lan.bt.path_ok+"</button></div>"
+		content: "<div class='changepath'><div class='path-top'><button type='button' class='btn btn-default btn-sm' onclick='backFile()'><span class='glyphicon glyphicon-share-alt'></span>返回</button>\
+		<div class='place' id='PathPlace'>当前路径：<span></span></div></div><div class='path-con'><div class='path-con-left'><dl><dt id='changecomlist' onclick='backMyComputer()'>计算机</dt></dl></div>\
+		<div class='path-con-right'><ul class='default' id='computerDefautl'></ul><div class='file-list divtable'>\
+			<table class='table table-hover' style='border:0 none'>\
+				<thead><tr class='file-list-head'><th width='40%'>文件名</th><th width='20%'>修改时间</th><th width='10%'>权限</th><th width='10%'>所有者</th><th width='10%'></th></tr></thead>\
+				<tbody id='tbody' class='list-list'></tbody></table></div></div></div></div><div class='getfile-btn' style='margin-top:0'>\
+				<button type='button' class='btn btn-default btn-sm pull-left' onclick='createFolder()'>新建文件夹</button>\
+				<button type='button' class='btn btn-danger btn-sm mr5' onclick=\"layer.close(getCookie('ChangePath'))\">关闭</button>\
+				<button type='button' class='btn btn-success btn-sm' onclick='getfilePath()'>选择</button>\
+		</div>"
 	});
 	setCookie("ChangePath", c);
 	var b = $("#" + d).val();
@@ -223,11 +232,11 @@ function getDiskList(b) {
 		}
 		$("#PathPlace").find("span").html(h.PATH);
 		activeDisk();
-		return
+		return;
 	},'json');
 }
 
-function CreateFolder() {
+function createFolder() {
 	var a = "<tr><td colspan='2'><span class='glyphicon glyphicon-folder-open'></span> <input id='newFolderName' class='newFolderName' type='text' value=''></td><td colspan='3'><button id='nameOk' type='button' class='btn btn-success btn-sm'>"+lan.public.ok+"</button>&nbsp;&nbsp;<button id='nameNOk' type='button' class='btn btn-default btn-sm'>"+lan.public.cancel+"</button></td></tr>";
 	if($("#tbody tr").length == 0) {
 		$("#tbody").append(a)
@@ -272,7 +281,7 @@ function NewDelFile(c) {
 				icon: 2
 			})
 		}
-		getDiskList(a)
+		getDiskList(a);
 	})
 }
 
@@ -306,10 +315,10 @@ function backMyComputer() {
 	$(".default").show();
 	$(".file-list").hide();
 	$("#PathPlace").find("span").html("");
-	activeDisk()
+	activeDisk();
 }
 
-function BackFile() {
+function backFile() {
 	var c = $("#PathPlace").find("span").text();
 	if(c.substr(c.length - 1, 1) == "/") {
 		c = c.substr(0, c.length - 1)
@@ -328,7 +337,7 @@ function BackFile() {
 	if(d.length == 1) {}
 }
 
-function GetfilePath() {
+function getfilePath() {
 	var a = $("#PathPlace").find("span").text();
 	a = a.replace(new RegExp(/(\\)/g), "/");
 	$("#" + getCookie("SetId")).val(a + getCookie("SetName"));
@@ -1197,6 +1206,40 @@ function tasklist(a){
 		getReloads();
 		return f
 	},'json');
+}
+
+function activeDisk() {
+	var a = $("#PathPlace").find("span").text().substring(0, 1);
+	switch(a) {
+		case "C":
+			$(".path-con-left dd:nth-of-type(1)").css("background", "#eee").siblings().removeAttr("style");
+			break;
+		case "D":
+			$(".path-con-left dd:nth-of-type(2)").css("background", "#eee").siblings().removeAttr("style");
+			break;
+		case "E":
+			$(".path-con-left dd:nth-of-type(3)").css("background", "#eee").siblings().removeAttr("style");
+			break;
+		case "F":
+			$(".path-con-left dd:nth-of-type(4)").css("background", "#eee").siblings().removeAttr("style");
+			break;
+		case "G":
+			$(".path-con-left dd:nth-of-type(5)").css("background", "#eee").siblings().removeAttr("style");
+			break;
+		case "H":
+			$(".path-con-left dd:nth-of-type(6)").css("background", "#eee").siblings().removeAttr("style");
+			break;
+		default:
+			$(".path-con-left dd").removeAttr("style");
+	}
+}
+
+
+function backMyComputer() {
+	$(".default").show();
+	$(".file-list").hide();
+	$("#PathPlace").find("span").html("");
+	activeDisk();
 }
 
 //检查登陆状态

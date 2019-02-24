@@ -751,6 +751,68 @@ class site_api:
             data['filename'] = filename
         return public.getJson(data)
 
+     # 修改物理路径
+    def setPathApi(self):
+        mid = request.form.get('id', '').encode('utf-8')
+        path = request.form.get('path', '').encode('utf-8')
+
+        path = self.getPath(path)
+        print path
+        if path == "" or mid == '0':
+            return public.returnJson(False,  "目录不能为空!")
+
+        import files_api
+        if not files_api.files_api().checkDir(path):
+            return public.returnJson(False,  "不能以系统关键目录作为站点目录")
+
+        siteFind = public.M("sites").where(
+            "id=?", (mid,)).field('path,name').find()
+        if siteFind["path"] == path:
+            return public.returnJson(False,  "与原路径一致，无需修改!")
+        file = self.getHostConf(siteFind['name'])
+        conf = public.readFile(file)
+        if conf:
+            conf = conf.replace(siteFind['path'], path)
+            public.writeFile(file, conf)
+
+        # 创建basedir
+        userIni = path + '/.user.ini'
+        if os.path.exists(userIni):
+            public.execShell("chattr -i " + userIni)
+        public.writeFile(userIni, 'open_basedir=' + path + '/:/tmp/:/proc/')
+        public.execShell('chmod 644 ' + userIni)
+        public.execShell('chown root:root ' + userIni)
+        public.execShell('chattr +i ' + userIni)
+
+        public.restartWeb()
+        public.M("sites").where("id=?", (mid,)).setField('path', path)
+        msg = public.getInfo('修改网站[{1}]物理路径成功!', (siteFind['name'],))
+        public.writeLog('网站管理', msg)
+        return public.returnJson(True,  "设置成功!")
+
+    # 设置当前站点运行目录
+    def setSiteRunPathApi(self):
+        mid = request.form.get('id', '').encode('utf-8')
+        runPath = request.form.get('runPath', '').encode('utf-8')
+        siteName = public.M('sites').where('id=?', (mid,)).getField('name')
+        sitePath = public.M('sites').where('id=?', (mid,)).getField('path')
+
+        newPath = sitePath + runPath
+        # 处理Nginx
+        filename = self.getHostConf(siteName)
+        if os.path.exists(filename):
+            conf = public.readFile(filename)
+            rep = '\s*root\s*(.+);'
+            path = re.search(rep, conf).groups()[0]
+            conf = conf.replace(path, newPath)
+            public.writeFile(filename, conf)
+
+        self.delUserInI(sitePath)
+        self.setDirUserINI(newPath)
+
+        public.restartWeb()
+        return public.returnJson(True, '设置成功!')
+
     def delDomainApi(self):
         domain = request.form.get('domain', '').encode('utf-8')
         webname = request.form.get('webname', '').encode('utf-8')
@@ -1368,6 +1430,21 @@ location /{
             except:
                 continue
         return True
+
+    # 设置目录防御
+    def setDirUserINI(self, newPath):
+        filename = newPath + '/.user.ini'
+        if os.path.exists(filename):
+            public.execShell("chattr -i " + filename)
+            os.remove(filename)
+            return public.returnJson(True, '已清除防跨站设置!')
+
+        self.delUserInI(newPath)
+        public.writeFile(filename, 'open_basedir=' +
+                         newPath + '/:/tmp/:/proc/')
+        public.execShell("chattr +i " + filename)
+
+        return public.returnJson(True, '已打开防跨站设置!')
 
     # 转换时间
     def strfToTime(self, sdate):

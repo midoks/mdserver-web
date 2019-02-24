@@ -606,8 +606,5 @@ done
 
         data['DIR'] = sorted(dirnames)
         data['FILES'] = sorted(filenames)
-        if path[0:2] == '//':
-            data['PATH'] = path[1:]
-        else:
-            data['PATH'] = path
+        data['PATH'] = path.replace('//', '/')
         return public.getJson(data)
