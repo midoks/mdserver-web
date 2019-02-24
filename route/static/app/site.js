@@ -1268,7 +1268,7 @@ function dirBinding(id){
 		var rdata = data['data'];
 		var echoHtml = '';
 		for(var i=0;i<rdata.binding.length;i++){
-			echoHtml += "<tr><td>"+rdata.binding[i].domain+"</td><td>"+rdata.binding[i].port+"</td><td>"+rdata.binding[i].path+"</td><td class='text-right'><a class='btlink' href='javascript:SetDirRewrite("+rdata.binding[i].id+");'>"+lan.site.site_menu_4+"</a> | <a class='btlink' href='javascript:DelBinding("+rdata.binding[i].id+","+id+");'>"+lan.public.del+"</a></td></tr>";
+			echoHtml += "<tr><td>"+rdata.binding[i].domain+"</td><td>"+rdata.binding[i].port+"</td><td>"+rdata.binding[i].path+"</td><td class='text-right'><a class='btlink' href='javascript:setDirRewrite("+rdata.binding[i].id+");'>伪静态</a> | <a class='btlink' href='javascript:delDirBind("+rdata.binding[i].id+","+id+");'>删除</a></td></tr>";
 		}
 		
 		var dirList = '';
@@ -1291,23 +1291,23 @@ function dirBinding(id){
 }
 
 //子目录伪静态
-function SetDirRewrite(id){
-	$.post('/site?action=GetDirRewrite&id='+id,function(rdata){
+function setDirRewrite(id){
+	$.post('/site/get_dir_bind_rewrite','id='+id,function(rdata){
 		if(!rdata.status){
-			var confirmObj = layer.confirm(lan.site.url_rewrite_alter,{icon:3,closeBtn:2},function(){
-				$.post('/site?action=GetDirRewrite&id='+id+'&add=1',function(rdata){
+			var confirmObj = layer.confirm('你真的要为这个子目录创建独立的伪静态规则吗？',{icon:3,closeBtn:2},function(){
+				$.post('/site/get_dir_bind_rewrite','id='+id+'&add=1',function(rdata){
 					layer.close(confirmObj);
-					ShowRewrite(rdata);
-				});
+					showRewrite(rdata);
+				},'json');
 			});
 			return;
 		}
-		ShowRewrite(rdata);
-	});
+		showRewrite(rdata);
+	},'json');
 }
 
 //显示伪静态
-function ShowRewrite(rdata){
+function showRewrite(rdata){
 	var rList = ''; 
 	for(var i=0;i<rdata.rlist.length;i++){
 		rList += "<option value='"+rdata.rlist[i]+"'>"+rdata.rlist[i]+"</option>";
@@ -1315,18 +1315,17 @@ function ShowRewrite(rdata){
 	var webBakHtml = "<div class='c5 plr15'>\
 						<div class='line'>\
 						<select class='bt-input-text mr20' id='myRewrite' name='rewrite' style='width:30%;'>"+rList+"</select>\
-						<span>"+lan.site.rule_cov_tool+"：<a class='btlink' href='https://www.bt.cn/Tools' target='_blank'>"+lan.site.a_c_n+"</a>\</span>\
 						<textarea class='bt-input-text mtb15' style='height: 260px; width: 470px; line-height:18px;padding:5px;' id='rewriteBody'>"+rdata.data+"</textarea></div>\
-						<button id='SetRewriteBtn' class='btn btn-success btn-sm' onclick=\"SetRewrite('"+rdata.filename+"')\">"+lan.public.save+"</button>\
+						<button id='SetRewriteBtn' class='btn btn-success btn-sm' onclick=\"SetRewrite('"+rdata.filename+"')\">保存</button>\
 						<ul class='help-info-text c7 ptb10'>\
-							<li>"+lan.site.url_rw_help_1+"</li>\
-							<li>"+lan.site.url_rw_help_2+"</li>\
+							<li>请选择您的应用，若设置伪静态后，网站无法正常访问，请尝试设置回default</li>\
+							<li>您可以对伪静态规则进行修改，修改完后保存即可。</li>\
 						</ul>\
 						</div>";
 	layer.open({
 		type: 1,
 		area: '500px',
-		title: lan.site.config_url,
+		title: '配置伪静态规则',
 		closeBtn: 2,
 		shift: 5,
 		shadeClose: true,
@@ -1335,9 +1334,9 @@ function ShowRewrite(rdata){
 	
 	$("#myRewrite").change(function(){
 		var rewriteName = $(this).val();
-		$.post('/files?action=GetFileBody','path=/www/server/panel/rewrite/'+getCookie('serverType')+'/'+rewriteName+'.conf',function(fileBody){
-			 $("#rewriteBody").val(fileBody.data);
-		});
+		$.post('/files/get_body','path='+rdata['rewrite_dir']+'/'+rewriteName+'.conf',function(fileBody){
+			 $("#rewriteBody").val(fileBody.data.data);
+		},'json');
 	});
 }
 
@@ -1351,23 +1350,21 @@ function addDirBinding(id){
 	}
 	
 	var data = 'id='+id+'&domain='+domain+'&dirName='+dirName
-	$.post('site?action=AddDirBinding',data,function(rdata){
-		DirBinding(id);
+	$.post('/site/add_dir_bind',data,function(rdata){
+		dirBinding(id);
 		layer.msg(rdata.msg,{icon:rdata.status?1:2});
-	});
-	
+	},'json');
 }
 
 //删除子目录绑定
-function DelBinding(id,siteId){
+function delDirBind(id,siteId){
 	layer.confirm(lan.site.s_bin_del,{icon:3,closeBtn:2},function(){
-		$.post('site?action=DelDirBinding','id='+id,function(rdata){
-			DirBinding(siteId);
+		$.post('/site/del_dir_bind','id='+id,function(rdata){
+			dirBinding(siteId);
 			layer.msg(rdata.msg,{icon:rdata.status?1:2});
-		});
+		},'json');
 	});
 }
-
 
 //反向代理
 function Proxy(siteName,type){
