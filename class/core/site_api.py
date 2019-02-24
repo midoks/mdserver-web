@@ -36,9 +36,9 @@ class site_api:
         self.rewritePath = rw = self.setupPath + '/nginx/rewrite'
         if not os.path.exists(rw):
             public.execShell("mkdir -p " + rw + " && chmod -R 755 " + rw)
-        self.passPath = pp = self.setupPath + '/nginx/pass'
-        if not os.path.exists(rw):
-            public.execShell("mkdir -p " + rw + " && chmod -R 755 " + rw)
+        self.passPath = self.setupPath + '/nginx/pass'
+        # if not os.path.exists(pp):
+        #     public.execShell("mkdir -p " + rw + " && chmod -R 755 " + rw)
 
         self.logsPath = public.getRootDir() + '/wwwlogs'
         # ssl conf
@@ -822,6 +822,7 @@ class site_api:
         password = request.form.get('password', '').encode('utf-8')
         siteName = request.form.get('siteName', '').encode('utf-8')
         mid = request.form.get('id', '')
+
         if len(username.strip()) == 0 or len(password.strip()) == 0:
             return public.returnJson(False, '用户名或密码不能为空!')
 
@@ -829,10 +830,11 @@ class site_api:
             siteName = public.M('sites').where('id=?', (mid,)).getField('name')
 
         # self.closeHasPwd(get)
-        filename = self.passPath + siteName + '.pass'
+        filename = self.passPath + '/' + siteName + '.pass'
+        print filename
         passconf = username + ':' + public.hasPwd(password)
 
-        if get.siteName == 'phpmyadmin':
+        if siteName == 'phpmyadmin':
             configFile = self.setupPath + '/openresty/nginx/conf/nginx.conf'
         else:
             configFile = self.setupPath + '/openresty/nginx/vhost/' + siteName + '.conf'
@@ -854,7 +856,7 @@ class site_api:
         # 写密码配置
         passDir = self.passPath
         if not os.path.exists(passDir):
-            public.ExecShell('mkdir -p ' + passDir)
+            public.execShell('mkdir -p ' + passDir)
         public.writeFile(filename, passconf)
 
         public.restartWeb()
@@ -879,8 +881,8 @@ class site_api:
     #         conf = re.sub(rep, '', conf)
     #         public.writeFile(get.configFile, conf)
 
-    #     public.serviceReload()
-    #     public.WriteLog("TYPE_SITE", "SITE_AUTH_CLOSE_SUCCESS",
+    #     public.restartWeb()
+    #     public.WriteLog("网站管理", "SITE_AUTH_CLOSE_SUCCESS",
     #                     (get.siteName,))
     #     return public.returnMsg(True, 'SET_SUCCESS')
 

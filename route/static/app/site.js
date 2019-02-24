@@ -356,8 +356,7 @@ function pathSafe(id){
 		var loadT = layer.msg(lan.public.the,{icon:16,time:10000,shade: [0.3, '#000']});
 		$.post('/site?action=CloseHasPwd',{id:id},function(rdata){
 			layer.close(loadT);
-			var ico = rdata.status?1:2;
-			layer.msg(rdata.msg,{icon:ico});
+			layer.msg(rdata.msg,{icon:rdata.status?1:2});
 			$(".user_pw").hide();
 		},'json');
 	}
@@ -375,8 +374,7 @@ function setPathSafe(id){
 	var loadT = layer.msg('正在处理,请稍候...',{icon:16,time:10000,shade: [0.3, '#000']});
 	$.post('/site/set_has_pwd',{id:id,username:username,password:pass1},function(rdata){
 		layer.close(loadT);
-		var ico = rdata.status?1:2;
-		layer.msg(rdata.msg,{icon:ico});
+		layer.msg(rdata.msg,{icon:rdata.status?1:2});
 	},'json');
 }
 
