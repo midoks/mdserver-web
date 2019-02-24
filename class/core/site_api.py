@@ -575,97 +575,6 @@ class site_api:
         port = request.form.get('port', '').encode('utf-8')
         return self.add(webname, port, ps, path, version)
 
-    def addDirBindApi(self):
-        pid = request.form.get('id', '').encode('utf-8')
-        domain = request.form.get('domain', '').encode('utf-8')
-        dirName = request.form.get('dirName', '').encode('utf-8')
-        tmp = domain.split(':')
-        domain = tmp[0]
-        port = '80'
-        if len(tmp) > 1:
-            port = tmp[1]
-        if dirName == '':
-            public.returnJson(False, '目录不能为空!')
-
-        reg = "^([\w\-\*]{1,100}\.){1,4}(\w{1,10}|\w{1,10}\.\w{1,10})$"
-        if not re.match(reg, domain):
-            return public.returnJson(False, '主域名格式不正确!')
-
-        siteInfo = public.M('sites').where(
-            "id=?", (pid,)).field('id,path,name').find()
-        webdir = siteInfo['path'] + '/' + dirName
-
-        sql = public.M('binding')
-        if sql.where("domain=?", (domain,)).count() > 0:
-            return public.returnJson(False, '您添加的域名已存在!')
-        if public.M('domain').where("name=?", (domain,)).count() > 0:
-            return public.returnJson(False, '您添加的域名已存在!')
-
-        filename = self.getHostConf(siteInfo['name'])
-
-        if conf:
-            rep = "enable-php-([0-9]{2,3})\.conf"
-            tmp = re.search(rep, conf).groups()
-            version = tmp[0]
-            bindingConf = '''
-#BINDING-%s-START
-server
-{
-    listen %s;
-    server_name %s;
-    index index.php index.html index.htm default.php default.htm default.html;
-    root %s;
-    
-    include enable-php-%s.conf;
-    include %s/panel/vhost/rewrite/%s.conf;
-    #禁止访问的文件或目录
-    location ~ ^/(\.user.ini|\.htaccess|\.git|\.svn|\.project|LICENSE|README.md)
-    {
-        return 404;
-    }
-    
-    #一键申请SSL证书验证目录相关设置
-    location ~ \.well-known{
-        allow all;
-    }
-    
-    location ~ .*\\.(gif|jpg|jpeg|png|bmp|swf)$
-    {
-        expires      30d;
-        error_log off;
-        access_log /dev/null; 
-    }
-    location ~ .*\\.(js|css)?$
-    {
-        expires      12h;
-        error_log off;
-        access_log /dev/null; 
-    }
-    access_log %s.log;
-    error_log  %s.error.log;
-}
-#BINDING-%s-END''' % (domain, port, domain, webdir, version, self.setupPath, siteInfo['name'], public.GetConfigValue('logs_path') + '/' + siteInfo['name'], public.GetConfigValue('logs_path') + '/' + siteInfo['name'], domain)
-
-            conf += bindingConf
-            shutil.copyfile(filename, '/tmp/backup.conf')
-            public.writeFile(filename, conf)
-        conf = public.readFile(filename)
-
-        # 检查配置是否有误
-        isError = public.checkWebConfig()
-        if isError != True:
-            shutil.copyfile('/tmp/backup.conf', filename)
-            return public.returnJson(False, 'ERROR: <br><a style="color:red;">' + isError.replace("\n", '<br>') + '</a>')
-
-        public.M('binding').add('pid,domain,port,path,addtime',
-                                (id, domain, port, dirName, public.getDate()))
-
-        public.restartWeb()
-        msg = public.getInfo('网站[{1}]子目录[{2}]绑定到[{3}]',
-                             (siteInfo['name'], dirName, domain))
-        public.writeLog('网站管理', msg)
-        return public.returnJson(True, '添加成功!')
-
     def addDomainApi(self):
         isError = public.checkWebConfig()
         if isError != True:
@@ -701,11 +610,11 @@ server
                 "name=? AND (port=? OR pid=?)", (domain, domain_port, pid)).getField('pid')
             if opid:
                 if public.M('sites').where('id=?', (opid,)).count():
-                    return public.returnMsg(False, '指定域名已绑定过!')
+                    return public.returnJson(False, '指定域名已绑定过!')
                 public.M('domain').where('pid=?', (opid,)).delete()
 
             if public.M('binding').where('domain=?', (domain,)).count():
-                return public.returnMsg(False, '您添加的域名已存在!')
+                return public.returnJson(False, '您添加的域名已存在!')
 
             self.nginxAddDomain(webname, domain_name, domain_port)
 
@@ -716,6 +625,131 @@ server
                                    (pid, domain_name, domain_port, public.getDate()))
 
         return public.returnJson(True, '域名添加成功!')
+
+    def addDirBindApi(self):
+        pid = request.form.get('id', '').encode('utf-8')
+        domain = request.form.get('domain', '').encode('utf-8')
+        dirName = request.form.get('dirName', '').encode('utf-8')
+        tmp = domain.split(':')
+        domain = tmp[0]
+        port = '80'
+        if len(tmp) > 1:
+            port = tmp[1]
+        if dirName == '':
+            public.returnJson(False, '目录不能为空!')
+
+        reg = "^([\w\-\*]{1,100}\.){1,4}(\w{1,10}|\w{1,10}\.\w{1,10})$"
+        if not re.match(reg, domain):
+            return public.returnJson(False, '主域名格式不正确!')
+
+        siteInfo = public.M('sites').where(
+            "id=?", (pid,)).field('id,path,name').find()
+        webdir = siteInfo['path'] + '/' + dirName
+
+        if public.M('binding').where("domain=?", (domain,)).count() > 0:
+            return public.returnJson(False, '您添加的域名已存在!')
+        if public.M('domain').where("name=?", (domain,)).count() > 0:
+            return public.returnJson(False, '您添加的域名已存在!')
+
+        filename = self.getHostConf(siteInfo['name'])
+        conf = public.readFile(filename)
+        if conf:
+            rep = "enable-php-([0-9]{2,3})\.conf"
+            tmp = re.search(rep, conf).groups()
+            version = tmp[0]
+
+            source_dirbind_tpl = public.getRunDir() + '/data/tpl/nginx_dirbind.conf'
+            content = public.readFile(source_dirbind_tpl)
+            content = content.replace('{$PORT}', port)
+            content = content.replace('{$PHPVER}', version)
+            content = content.replace('{$DIRBIND}', domain)
+            content = content.replace('{$ROOT_DIR}', webdir)
+            content = content.replace('{$SERVER_MAIN}', siteInfo['name'])
+            content = content.replace('{$OR_REWRITE}', self.rewritePath)
+            content = content.replace('{$LOGPATH}', public.getLogsDir())
+
+            conf += "\r\n" + content
+            shutil.copyfile(filename, '/tmp/backup.conf')
+            public.writeFile(filename, conf)
+        conf = public.readFile(filename)
+
+        # 检查配置是否有误
+        isError = public.checkWebConfig()
+        if isError != True:
+            shutil.copyfile('/tmp/backup.conf', filename)
+            return public.returnJson(False, 'ERROR: <br><a style="color:red;">' + isError.replace("\n", '<br>') + '</a>')
+
+        public.M('binding').add('pid,domain,port,path,addtime',
+                                (pid, domain, port, dirName, public.getDate()))
+
+        public.restartWeb()
+        msg = public.getInfo('网站[{1}]子目录[{2}]绑定到[{3}]',
+                             (siteInfo['name'], dirName, domain))
+        public.writeLog('网站管理', msg)
+        return public.returnJson(True, '添加成功!')
+
+    def delDirBindApi(self):
+        mid = request.form.get('id', '').encode('utf-8')
+        binding = public.M('binding').where(
+            "id=?", (mid,)).field('id,pid,domain,path').find()
+        siteName = public.M('sites').where(
+            "id=?", (binding['pid'],)).getField('name')
+
+        filename = self.getHostConf(siteName)
+        conf = public.readFile(filename)
+        if conf:
+            rep = "\s*.+BINDING-" + \
+                binding['domain'] + \
+                "-START(.|\n)+BINDING-" + binding['domain'] + "-END"
+            conf = re.sub(rep, '', conf)
+            public.writeFile(filename, conf)
+
+        public.M('binding').where("id=?", (mid,)).delete()
+
+        filename = self.getDirBindRewrite(siteName,  binding['path'])
+        if os.path.exists(filename):
+            os.remove(filename)
+        public.restartWeb()
+        msg = public.getInfo('删除网站[{1}]子目录[{2}]绑定',
+                             (siteName, binding['path']))
+        public.writeLog('网站管理', msg)
+        return public.returnJson(True, '删除成功!')
+
+        # 取子目录Rewrite
+    def getDirBindRewriteApi(self):
+        mid = request.form.get('id', '').encode('utf-8')
+        add = request.form.get('add', '0').encode('utf-8')
+        find = public.M('binding').where(
+            "id=?", (mid,)).field('id,pid,domain,path').find()
+        site = public.M('sites').where(
+            "id=?", (find['pid'],)).field('id,name,path').find()
+
+        filename = self.getDirBindRewrite(site['name'], find['path'])
+        if add == '1':
+            public.writeFile(filename, '')
+            file = self.getHostConf(site['name'])
+            conf = public.readFile(file)
+            domain = find['domain']
+            rep = "\n#BINDING-" + domain + \
+                "-START(.|\n)+BINDING-" + domain + "-END"
+            tmp = re.search(rep, conf).group()
+            dirConf = tmp.replace('rewrite/' + site['name'] + '.conf;', 'rewrite/' + site[
+                                  'name'] + '_' + find['path'] + '.conf;')
+            conf = conf.replace(tmp, dirConf)
+            public.writeFile(file, conf)
+        data = {}
+        data['rewrite_dir'] = self.rewritePath
+        data['status'] = False
+        if os.path.exists(filename):
+            data['status'] = True
+            data['data'] = public.readFile(filename)
+            data['rlist'] = []
+            for ds in os.listdir(self.rewritePath):
+                if ds == 'list.txt':
+                    continue
+                data['rlist'].append(ds[0:len(ds) - 5])
+            data['filename'] = filename
+        return public.getJson(data)
 
     def delDomainApi(self):
         domain = request.form.get('domain', '').encode('utf-8')
@@ -849,6 +883,9 @@ server
 
     def getRewriteConf(self, siteName):
         return self.rewritePath + '/' + siteName + '.conf'
+
+    def getDirBindRewrite(self, siteName, dirname):
+        return self.rewritePath + '/' + siteName + '_' + dirname + '.conf'
 
     def getIndexConf(self):
         return public.getServerDir() + '/openresty/nginx/conf/nginx.conf'
@@ -1106,7 +1143,7 @@ include enable-php-''' % (fix.strip().replace(',', '|'), domains.strip().replace
             public.execShell('chmod -R 755 ' + path)
 
     def nginxAddDomain(self, webname, domain, port):
-        file = self.vhostPath + '/' + webname + '.conf'
+        file = self.getHostConf(webname)
         conf = public.readFile(file)
         if not conf:
             return
