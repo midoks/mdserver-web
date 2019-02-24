@@ -306,12 +306,12 @@ function webPathEdit(id){
 						<span class='mr5'>网站目录</span>\
 						<input class='bt-input-text mr5' type='text' style='width:50%' placeholder='网站根目录' value='"+webpath+"' name='webdir' id='inputPath'>\
 						<span onclick='changePath(&quot;inputPath&quot;)' class='glyphicon glyphicon-folder-open cursor mr20'></span>\
-						<button class='btn btn-success btn-sm' onclick='SetSitePath("+id+")'>保存</button>\
+						<button class='btn btn-success btn-sm' onclick='setSitePath("+id+")'>保存</button>\
 					</div>\
 					<div class='line mtb15'>\
 						<span class='mr5'>运行目录</span>\
 						<select class='bt-input-text' type='text' style='width:50%; margin-right:41px' name='runPath' id='runPath'>"+opt+"</select>\
-						<button class='btn btn-success btn-sm' onclick='SetSiteRunPath("+id+")' style='margin-top: -1px;'>保存</button>\
+						<button class='btn btn-success btn-sm' onclick='setSiteRunPath("+id+")' style='margin-top: -1px;'>保存</button>\
 					</div>\
 					<ul class='help-info-text c7 ptb10'>\
 						<li>部分程序需要指定二级目录作为运行目录，如ThinkPHP5，Laravel</li>\
@@ -381,25 +381,24 @@ function SetPathSafe(id){
 }
 
 //提交运行目录
-function SetSiteRunPath(id){
+function setSiteRunPath(id){
 	var NewPath = $("#runPath").val();
 	var loadT = layer.msg(lan.public.the,{icon:16,time:10000,shade: [0.3, '#000']});
-	$.post('/site?action=SetSiteRunPath','id='+id+'&runPath='+NewPath,function(rdata){
+	$.post('/site/set_site_run_path','id='+id+'&runPath='+NewPath,function(rdata){
 		layer.close(loadT);
 		var ico = rdata.status?1:2;
 		layer.msg(rdata.msg,{icon:ico});
-	});
+	},'json');
 }
 
 //提交网站目录
-function SetSitePath(id){
+function setSitePath(id){
 	var NewPath = $("#inputPath").val();
-	var loadT = layer.msg(lan.public.the,{icon:16,time:10000,shade: [0.3, '#000']});
-	$.post('/site?action=SetPath','id='+id+'&path='+NewPath,function(rdata){
+	var loadT = layer.msg('正在处理,请稍候...',{icon:16,time:10000,shade: [0.3, '#000']});
+	$.post('/site/set_path','id='+id+'&path='+NewPath,function(rdata){
 		layer.close(loadT);
-		var ico = rdata.status?1:2;
-		layer.msg(rdata.msg,{icon:ico});
-	});
+		layer.msg(rdata.msg,{icon:rdata.status?1:2});
+	},'json');
 }
 
 //修改网站备注
@@ -410,10 +409,10 @@ function webBakEdit(id){
 					<label><span>"+lan.site.note_ph+"</span></label>\
 					<div class='info-r'>\
 					<textarea name='beizhu' id='webbeizhu' col='5' style='width:96%'>"+rdata+"</textarea>\
-					<br><br><button class='btn btn-success btn-sm' onclick='SetSitePs("+id+")'>"+lan.public.save+"</button>\
+					<br><br><button class='btn btn-success btn-sm' onclick='SetSitePs("+id+")'>保存</button>\
 					</div>\
 					</div>";
-		$("#webedit-con").html(webBakHtml)
+		$("#webedit-con").html(webBakHtml);
 	});
 }
 
