@@ -327,7 +327,7 @@ function webPathEdit(id){
 						+'<p><span>授权账号</span><input id="username_get" class="bt-input-text" name="username_get" value="" type="text" placeholder="不修改请留空"></p>'
 						+'<p><span>访问密码</span><input id="password_get_1" class="bt-input-text" name="password_get_1" value="" type="password" placeholder="不修改请留空"></p>'
 						+'<p><span>重复密码</span><input id="password_get_2" class="bt-input-text" name="password_get_1" value="" type="password" placeholder="不修改请留空"></p>'
-						+'<p><button class="btn btn-success btn-sm" onclick="SetPathSafe('+id+')">保存</button></p>'
+						+'<p><button class="btn btn-success btn-sm" onclick="setPathSafe('+id+')">保存</button></p>'
 					+'</div>'
 				+'</div>';
 
@@ -359,25 +359,25 @@ function pathSafe(id){
 			var ico = rdata.status?1:2;
 			layer.msg(rdata.msg,{icon:ico});
 			$(".user_pw").hide();
-		});
+		},'json');
 	}
 }
 
 //设置访问密码
-function SetPathSafe(id){
+function setPathSafe(id){
 	var username = $("#username_get").val();
 	var pass1 = $("#password_get_1").val();
 	var pass2 = $("#password_get_2").val();
 	if(pass1 != pass2){
-		layer.msg(lan.bt.pass_err_re,{icon:2});
+		layer.msg('两次输入的密码不一致!',{icon:2});
 		return;
 	}
-	var loadT = layer.msg(lan.public.the,{icon:16,time:10000,shade: [0.3, '#000']});
-	$.post('/site?action=SetHasPwd',{id:id,username:username,password:pass1},function(rdata){
+	var loadT = layer.msg('正在处理,请稍候...',{icon:16,time:10000,shade: [0.3, '#000']});
+	$.post('/site/set_has_pwd',{id:id,username:username,password:pass1},function(rdata){
 		layer.close(loadT);
 		var ico = rdata.status?1:2;
 		layer.msg(rdata.msg,{icon:ico});
-	});
+	},'json');
 }
 
 //提交运行目录

@@ -23,6 +23,7 @@ class site_api:
     setupPath = None  # 安装路径
     vhostPath = None
     logsPath = None
+    passPath = None
     rewritePath = None
     sslDir = None  # ssl目录
 
@@ -35,9 +36,11 @@ class site_api:
         self.rewritePath = rw = self.setupPath + '/nginx/rewrite'
         if not os.path.exists(rw):
             public.execShell("mkdir -p " + rw + " && chmod -R 755 " + rw)
+        self.passPath = pp = self.setupPath + '/nginx/pass'
+        if not os.path.exists(rw):
+            public.execShell("mkdir -p " + rw + " && chmod -R 755 " + rw)
 
         self.logsPath = public.getRootDir() + '/wwwlogs'
-
         # ssl conf
         if public.isAppleSystem():
             self.sslDir = self.setupPath + '/letsencrypt/'
@@ -812,6 +815,74 @@ class site_api:
 
         public.restartWeb()
         return public.returnJson(True, '设置成功!')
+
+    # 设置目录加密
+    def setHasPwdApi(self):
+        username = request.form.get('username', '').encode('utf-8')
+        password = request.form.get('password', '').encode('utf-8')
+        siteName = request.form.get('siteName', '').encode('utf-8')
+        mid = request.form.get('id', '')
+        if len(username.strip()) == 0 or len(password.strip()) == 0:
+            return public.returnJson(False, '用户名或密码不能为空!')
+
+        if siteName == '':
+            siteName = public.M('sites').where('id=?', (mid,)).getField('name')
+
+        # self.closeHasPwd(get)
+        filename = self.passPath + siteName + '.pass'
+        passconf = username + ':' + public.hasPwd(password)
+
+        if get.siteName == 'phpmyadmin':
+            configFile = self.setupPath + '/openresty/nginx/conf/nginx.conf'
+        else:
+            configFile = self.setupPath + '/openresty/nginx/vhost/' + siteName + '.conf'
+
+        # 处理Nginx配置
+        conf = public.readFile(configFile)
+        if conf:
+            rep = '#error_page   404   /404.html;'
+            if conf.find(rep) == -1:
+                rep = '#error_page 404/404.html;'
+            data = '''
+    #AUTH_START
+    auth_basic "Authorization";
+    auth_basic_user_file %s;
+    #AUTH_END''' % (filename,)
+            conf = conf.replace(rep, rep + data)
+            public.writeFile(configFile, conf)
+
+        # 写密码配置
+        passDir = self.passPath
+        if not os.path.exists(passDir):
+            public.ExecShell('mkdir -p ' + passDir)
+        public.writeFile(filename, passconf)
+
+        public.restartWeb()
+        msg = public.getInfo('设置网站[{1}]为需要密码认证!', (siteName,))
+        public.writeLog("网站管理", msg)
+        return public.returnJson(True, '设置成功!')
+
+    # 取消目录加密
+    # def CloseHasPwd(self, get):
+    #     if not hasattr(get, 'siteName'):
+    #         get.siteName = public.M('sites').where(
+    #             'id=?', (get.id,)).getField('name')
+
+    #     if get.siteName == 'phpmyadmin':
+    #         get.configFile = self.setupPath + '/nginx/conf/nginx.conf'
+    #     else:
+    #         get.configFile = self.setupPath + '/panel/vhost/nginx/' + get.siteName + '.conf'
+
+    #     if os.path.exists(get.configFile):
+    #         conf = public.readFile(get.configFile)
+    #         rep = "\n\s*#AUTH_START(.|\n){1,200}#AUTH_END"
+    #         conf = re.sub(rep, '', conf)
+    #         public.writeFile(get.configFile, conf)
+
+    #     public.serviceReload()
+    #     public.WriteLog("TYPE_SITE", "SITE_AUTH_CLOSE_SUCCESS",
+    #                     (get.siteName,))
+    #     return public.returnMsg(True, 'SET_SUCCESS')
 
     def delDomainApi(self):
         domain = request.form.get('domain', '').encode('utf-8')
