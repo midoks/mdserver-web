@@ -80,6 +80,59 @@ class site_api:
             return public.returnJson(True, '修改成功!')
         return public.returnJson(False, '修改失败!')
 
+    def stopApi(self):
+        mid = request.form.get('id', '').encode('utf-8')
+        name = request.form.get('name', '').encode('utf-8')
+        path = self.setupPath + '/stop'
+
+        if not os.path.exists(path):
+            os.makedirs(path)
+            public.writeFile(path + '/index.html',
+                             'The website has been closed!!!')
+
+        binding = public.M('binding').where('pid=?', (mid,)).field(
+            'id,pid,domain,path,port,addtime').select()
+        for b in binding:
+            bpath = path + '/' + b['path']
+            if not os.path.exists(bpath):
+                public.execShell('mkdir -p ' + bpath)
+                public.execShell('ln -sf ' + path +
+                                 '/index.html ' + bpath + '/index.html')
+
+        sitePath = public.M('sites').where("id=?", (mid,)).getField('path')
+
+        # nginx
+        file = self.getHostConf(name)
+        conf = public.readFile(file)
+        if conf:
+            conf = conf.replace(sitePath, path)
+            public.writeFile(file, conf)
+
+        public.M('sites').where("id=?", (mid,)).setField('status', '0')
+        public.restartWeb()
+        msg = public.getInfo('网站[{1}]已被停用!', (name,))
+        public.writeLog('网站管理', msg)
+        return public.returnJson(True, '站点已停用!')
+
+    def startApi(self):
+        mid = request.form.get('id', '').encode('utf-8')
+        name = request.form.get('name', '').encode('utf-8')
+        path = self.setupPath + '/stop'
+        sitePath = public.M('sites').where("id=?", (mid,)).getField('path')
+
+        # nginx
+        file = self.getHostConf(name)
+        conf = public.readFile(file)
+        if conf:
+            conf = conf.replace(path, sitePath)
+            public.writeFile(file, conf)
+
+        public.M('sites').where("id=?", (mid,)).setField('status', '1')
+        public.restartWeb()
+        msg = public.getInfo('网站[{1}]已被启用!', (name,))
+        public.writeLog('网站管理', msg)
+        return public.returnJson(True, '站点已启用!')
+
     def getBackupApi(self):
         limit = request.form.get('limit', '').encode('utf-8')
         p = request.form.get('p', '').encode('utf-8')
