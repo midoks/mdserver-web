@@ -55,6 +55,11 @@ class site_api:
         start = (int(p) - 1) * (int(limit))
         _list = public.M('sites').where('', ()).field('id,name,path,status,ps,addtime,edate').limit(
             (str(start)) + ',' + limit).order('id desc').select()
+
+        for i in range(len(_list)):
+            _list[i]['backup_count'] = public.M('backup').where(
+                "pid=? AND type=?", (_list[i]['id'], 0)).count()
+
         _ret = {}
         _ret['data'] = _list
 
@@ -84,7 +89,7 @@ class site_api:
             "id,name,path,status,ps,addtime,edate").find()
 
         start = (int(p) - 1) * (int(limit))
-        _list = public.M('backup').where('type=?', (mid,)).field('id,type,name,pid,filename,size,addtime').limit(
+        _list = public.M('backup').where('pid=?', (mid,)).field('id,type,name,pid,filename,size,addtime').limit(
             (str(start)) + ',' + limit).order('id desc').select()
         _ret = {}
         _ret['data'] = _list
@@ -113,14 +118,14 @@ class site_api:
         execStr = "cd '" + find['path'] + "' && zip '" + \
             zipName + "' -r ./* > " + tmps + " 2>&1"
         # print execStr
-        # print public.execShell(execStr)
+        public.execShell(execStr)
 
         if os.path.exists(zipName):
             fsize = os.path.getsize(zipName)
         else:
             fsize = 0
         sql = public.M('backup').add('type,name,pid,filename,size,addtime',
-                                     (mid, fileName, find['id'], zipName, fsize, public.getDate()))
+                                     (0, fileName, find['id'], zipName, fsize, public.getDate()))
 
         msg = public.getInfo('备份网站[{1}]成功!', (find['name'],))
         public.writeLog('网站管理', msg)

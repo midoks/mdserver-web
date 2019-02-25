@@ -597,14 +597,18 @@ function domainEdit(id, name, msg, status) {
 
 		var echoHtml = "";
 		for (var i = 0; i < domain.length; i++) {
-			echoHtml += "<tr><td><a title='"+lan.site.click_access+"' target='_blank' href='http://" + domain[i].name + ":" + domain[i].port + "' class='btlinkbed'>" + domain[i].name + "</a></td><td><a class='btlinkbed'>" + domain[i].port + "</a></td><td class='text-center'><a class='table-btn-del' href='javascript:;' onclick=\"delDomain(" + id + ",'" + name + "','" + domain[i].name + "','" + domain[i].port + "',1)\"><span class='glyphicon glyphicon-trash'></span></a></td></tr>";
+			echoHtml += "<tr>\
+				<td><a title='"+lan.site.click_access+"' target='_blank' href='http://" + domain[i].name + ":" + domain[i].port + "' class='btlinkbed'>" + domain[i].name + "</a></td>\
+				<td><a class='btlinkbed'>" + domain[i].port + "</a></td>\
+				<td class='text-center'><a class='table-btn-del' href='javascript:;' onclick=\"delDomain(" + id + ",'" + name + "','" + domain[i].name + "','" + domain[i].port + "',1)\"><span class='glyphicon glyphicon-trash'></span></a></td>\
+				</tr>";
 		}
 		var bodyHtml = "<textarea id='newdomain' class='bt-input-text' style='height: 100px; width: 340px;padding:5px 10px;line-height:20px'></textarea>\
 								<input type='hidden' id='newport' value='80' />\
-								<button type='button' class='btn btn-success btn-sm pull-right' style='margin:30px 35px 0 0' onclick=\"domainAdd(" + id + ",'" + name + "',1)\">"+lan.public.add+"</button>\
+								<button type='button' class='btn btn-success btn-sm pull-right' style='margin:30px 35px 0 0' onclick=\"domainAdd(" + id + ",'" + name + "',1)\">添加</button>\
 							<div class='divtable mtb15' style='height:350px;overflow:auto'>\
 								<table class='table table-hover' width='100%'>\
-								<thead><tr><th>"+lan.site.domain+"</th><th width='70px'>"+lan.site.port+"</th><th width='50px' class='text-center'>"+lan.site.operate+"</th></tr></thead>\
+								<thead><tr><th>"+lan.site.domain+"</th><th width='70px'>端口</th><th width='50px' class='text-center'>操作</th></tr></thead>\
 								<tbody id='checkDomain'>" + echoHtml + "</tbody>\
 								</table>\
 							</div>";
@@ -612,7 +616,7 @@ function domainEdit(id, name, msg, status) {
 		if(msg != undefined){
 			layer.msg(msg,{icon:status?1:5});
 		}
-		var placeholder = "<div class='placeholder c9' style='left:28px;width:330px;top:16px;'>"+lan.site.domain_help+"</div>";
+		var placeholder = "<div class='placeholder c9' style='left:28px;width:330px;top:16px;'>每行填写一个域名，默认为80端口<br>泛解析添加方法 *.domain.com<br>如另加端口格式为 www.domain.com:88</div>";
 		$('#newdomain').after(placeholder);
 		$(".placeholder").click(function(){
 			$(this).hide();
@@ -699,33 +703,7 @@ function checkDomain() {
 		var $this = $(this);
 		var domain = $(this).find("td:first-child").text();
 		$(this).find("td:first-child").append("<i class='lading'></i>");
-		checkDomainWebsize($this,domain);
-	})
-}
-//检查域名是否解析备案
-function checkDomainWebsize(obj,domain){
-	var gurl = "http://api.bt.cn/ipaddess";
-	var ip = getCookie('iplist');
-	var data = "domain=" + domain+"&ip="+ip;
-	$.ajax({ url: gurl,data:data,type:"get",dataType:"jsonp",async:true ,success: function(rdata){
-		obj.find("td:first-child").find(".lading").remove();
-		if (rdata.code == -1) {
-			obj.find("td:first-child").append("<i class='yf' data-title='"+lan.site.this_domain_un+"'>"+lan.site.unresolved+"</i>");
-		} else {
-			obj.find("td:first-child").append("<i class='f' data-title='"+lan.site.analytic_ip+"：" + rdata.data.ip + "<br>"+lan.site.current_server_ip+"：" + rdata.data.main_ip + "("+lan.site.parsed_info+")'>"+lan.site.parsed+"</i>");
-		}
-
-		obj.find("i").mouseover(function() {
-			var tipsTitle = $(this).attr("data-title");
-			layer.tips(tipsTitle, this, {
-				tips: [1, '#3c8dbc'],
-				time: 0
-			})
-		})
-		obj.find("i").mouseout(function() {
-			$(".layui-layer-tips").remove();
-		})
-	}})
+	});
 }
 
 /**
@@ -1486,8 +1464,14 @@ function to301(siteName,type){
 
 //文件验证
 function file_check(){
-	$(".check_message").html('<div style="margin-left:100px"><input type="checkbox" name="checkDomain" id="checkDomain" checked=""><label class="mr20" for="checkDomain" style="font-weight:normal">提前校验域名(提前发现问题,减少失败率)</label></div>');
-	$("#lets_help").html('<li>'+lan.site.bt_ssl_help_5+'</li><li>'+lan.site.bt_ssl_help_8+'</li><li>'+lan.site.bt_ssl_help_9+'</li><li>在未指定SSL默认站点时,未开启SSL的站点使用HTTPS会直接访问到已开启SSL的站点</li>');
+	$(".check_message").html('<div style="margin-left:100px">\
+			<input type="checkbox" name="checkDomain" id="checkDomain" checked="">\
+			<label class="mr20" for="checkDomain" style="font-weight:normal">提前校验域名(提前发现问题,减少失败率)</label>\
+		</div>');
+	$("#lets_help").html('<li>申请之前，请确保域名已解析，如未解析会导致审核失败</li>\
+		<li>Let\'s Encrypt免费证书，有效期3个月，支持多域名。默认会自动续签</li>\
+		<li>若您的站点使用了CDN或301重定向会导致续签失败</li>\
+		<li>在未指定SSL默认站点时,未开启SSL的站点使用HTTPS会直接访问到已开启SSL的站点</li>');
 }
 
 dnsapis = {};
