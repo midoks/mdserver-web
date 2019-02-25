@@ -578,8 +578,12 @@ def getTotalStatistics():
     st = status()
     data = {}
     if st == 'start':
+        pm = pMysqlDb()
+        list_count = pm.query('select count(id) as num from repository')
+        count = list_count[0][0]
+
         data['status'] = True
-        data['count'] = 1
+        data['count'] = count
         data['ver'] = public.readFile(getServerDir() + '/version.pl').strip()
         return public.returnJson(True, 'ok', data)
     else:
