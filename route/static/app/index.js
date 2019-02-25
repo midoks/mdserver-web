@@ -850,3 +850,29 @@ function showDanger(num, port) {
     });
     $(".showDanger td").css("padding", "8px")
 }
+
+//加载关键数据总数
+loadKeyDataCount();
+function loadKeyDataCount(){
+    var plist = ['mysql', 'csvn', 'gogs'];
+    for (var i = 0; i < plist.length; i++) {
+        pname = plist[i];
+        function call(pname){
+            $.post('/plugins/run', {name:pname, func:'get_total_statistics'}, function(data) {
+                try {
+                    var rdata = $.parseJSON(data['data']);
+                } catch(e){
+                    return;
+                }
+                if (!rdata['status']){
+                    return;
+                }
+                var html = '<li class="sys-li-box col-xs-3 col-sm-3 col-md-3 col-lg-3">\
+                            <p class="name f15 c9">'+pname+'</p>\
+                            <div class="val"><a class="btlink" onclick="softMain(\''+pname+'\',\''+rdata['data']['ver']+'\')">'+rdata['data']['count']+'</a></div></li>';
+                $('#index_overview').append(html);
+            },'json');
+        }
+        call(pname);
+    }
+}
