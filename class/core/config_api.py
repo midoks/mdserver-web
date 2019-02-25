@@ -312,6 +312,8 @@ class config_api:
         else:
             data['ssl'] = ''
 
+        data['site_count'] = public.M('sites').count()
+
         data['username'] = public.M('users').where(
             "id=?", (1,)).getField('username')
 

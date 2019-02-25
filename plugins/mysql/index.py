@@ -777,6 +777,7 @@ def getDbAccess():
     userStr = ','.join(accs)
     return public.returnJson(True, userStr)
 
+
 def toSize(size):
     d = ('b', 'KB', 'MB', 'GB', 'TB')
     s = d[0]
@@ -786,8 +787,9 @@ def toSize(size):
         size = size / 1024
         s = b
     _size = round(size, 2)
-    print size,_size
+    print size, _size
     return str(size) + ' ' + b
+
 
 def setDbAccess():
     args = getArgs()
@@ -856,7 +858,7 @@ def getDbInfo():
                 ret2['type'] = table[0][1]
                 ret2['rows_count'] = table[0][4]
                 ret2['collation'] = table[0][14]
-                data_size = table[0][6]+table[0][8]
+                data_size = table[0][6] + table[0][8]
                 ret2['data_byte'] = data_size
                 ret2['data_size'] = public.toSize(data_size)
                 ret2['table_name'] = i[0]
@@ -941,6 +943,21 @@ def alterTable():
                 return public.returnJson(True, "更改成功!")
     return public.returnJson(False, "更改失败!")
 
+
+def getTotalStatistics():
+    st = status()
+    data = {}
+    if st == 'start':
+        data['status'] = True
+        data['count'] = pSqliteDb('databases').count()
+        data['ver'] = public.readFile(getServerDir() + '/version.pl').strip()
+        return public.returnJson(True, 'ok', data)
+    else:
+        data['status'] = False
+        data['count'] = 0
+        return public.returnJson(False, 'fail', data)
+
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -1005,5 +1022,7 @@ if __name__ == "__main__":
         print optTable()
     elif func == 'alter_table':
         print alterTable()
+    elif func == 'get_total_statistics':
+        print getTotalStatistics()
     else:
         print 'error'

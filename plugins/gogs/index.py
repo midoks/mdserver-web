@@ -573,6 +573,20 @@ def gogsEdit():
     data['commit'] = getPluginDir() + '/hook/commit.tpl'
     return public.getJson(data)
 
+
+def getTotalStatistics():
+    st = status()
+    data = {}
+    if st == 'start':
+        data['status'] = True
+        data['count'] = 1
+        data['ver'] = public.readFile(getServerDir() + '/version.pl').strip()
+        return public.returnJson(True, 'ok', data)
+    else:
+        data['status'] = False
+        data['count'] = 0
+        return public.returnJson(False, 'fail', data)
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -617,5 +631,7 @@ if __name__ == "__main__":
         print projectScriptDebug()
     elif func == 'gogs_edit':
         print gogsEdit()
+    elif func == 'get_total_statistics':
+        print getTotalStatistics()
     else:
         print 'fail'

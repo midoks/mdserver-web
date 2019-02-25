@@ -640,6 +640,21 @@ def projectScriptDebug():
     return public.getJson(data)
 
 
+def getTotalStatistics():
+    st = status()
+    data = {}
+    if st == 'start':
+        svn_path = getServerDir() + '/data/repositories'
+        data['status'] = True
+        data['count'] = len(os.listdir(svn_path))
+        data['ver'] = public.readFile(getServerDir() + '/version.pl').strip()
+        return public.returnJson(True, 'ok', data)
+    else:
+        data['status'] = False
+        data['count'] = 0
+        return public.returnJson(False, 'fail', data)
+
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -688,5 +703,7 @@ if __name__ == "__main__":
         print projectScriptEdit()
     elif func == 'project_script_debug':
         print projectScriptDebug()
+    elif func == 'get_total_statistics':
+        print getTotalStatistics()
     else:
         print 'fail'
