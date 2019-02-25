@@ -150,9 +150,6 @@ class plugins_api:
         infoJsonPos = self.__plugin_dir + '/' + name + '/' + 'info.json'
         if not os.path.exists(infoJsonPos):
             return public.returnJson(False, "配置文件不存在!", ())
-
-        #
-
         return public.returnJson(True, "插件存在!", ())
 
     def setIndexApi(self):
@@ -179,6 +176,23 @@ class plugins_api:
         if data[1] == '':
             return public.returnJson(True, "OK", data[0].strip())
         return public.returnJson(False, data[1].strip())
+
+    def updateZipApi(self):
+        tmp_path = public.getRootDir() + '/temp'
+        if not os.path.exists(tmp_path):
+            os.makedirs(tmp_path, mode=755)
+        public.execShell("rm -rf " + tmp_path + '/*')
+
+        tmp_file = tmp_path + '/plugin_tmp.zip'
+        from werkzeug.utils import secure_filename
+        from flask import request
+        f = request.files['plugin_zip']
+        if f.filename[-4:] != '.zip':
+            return public.returnJson(False, '仅支持zip文件!')
+            # tmp_file = tmp_path + '/plugin_tmp.tar.gz'
+
+        f.save(tmp_file)
+        # os.remove(tmp_file)
 
     ##### ----- end ----- ###
 
