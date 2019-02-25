@@ -32,9 +32,9 @@ function getWeb(page, search) {
 
 			//是否有备份
 			if (data.data[i].backup_count > 0) {
-				var backup = "<a href='javascript:;' class='btlink' onclick=\"getBackup(" + data.data[i].id + ",'" + data.data[i].name + "')\">"+lan.site.backup_yes+"</a>";
+				var backup = "<a href='javascript:;' class='btlink' onclick=\"getBackup(" + data.data[i].id + ")\">有备份</a>";
 			} else {
-				var backup = "<a href='javascript:;' class='btlink' onclick=\"getBackup(" + data.data[i].id + ",'" + data.data[i].name + "')\">"+lan.site.backup_no+"</a>";
+				var backup = "<a href='javascript:;' class='btlink' onclick=\"getBackup(" + data.data[i].id + ")\">无备份</a>";
 			}
 			//是否设置有效期
 			var web_end_time = (data.data[i].edate == "0000-00-00") ? lan.site.web_end_time : data.data[i].edate;
@@ -809,13 +809,13 @@ function isDomain(domain) {
  * @param {String} name	主域名
  */
 function webBackup(id, name) {
-	var loadT =layer.msg(lan.database.backup_the, {icon:16,time:0,shade: [0.3, '#000']});
-	var data = "id="+id;
-	$.post('/site?action=ToBackup', data, function(rdata) {
+	var loadT =layer.msg('正在备份,请稍候...', {icon:16,time:0,shade: [0.3, '#000']});
+	$.post('/site/to_backup', "id="+id, function(rdata) {
 		layer.closeAll();
-		layer.msg(rdata.msg,{icon:rdata.status?1:2})
+		layer.msg(rdata.msg,{icon:rdata.status?1:2});
+
 		getBackup(id);
-	});
+	},'json');
 }
 
 /**
@@ -825,69 +825,63 @@ function webBackup(id, name) {
  * @param {String} name	主域名
  */
 function webBackupDelete(id,pid){
-	layer.confirm(lan.site.webback_del_confirm,{title:lan.site.del_bak_file,icon:3,closeBtn:2},function(index){
-		var loadT =layer.msg(lan.public.the_del, {icon:16,time:0,shade: [0.3, '#000']});
-		$.post('/site?action=DelBackup','id='+id, function(rdata){
+	layer.confirm('真的要删除备份包吗?',{title:'删除备份文件!',icon:3,closeBtn:2},function(index){
+		var loadT =layer.msg('正在删除,请稍候...', {icon:16,time:0,shade: [0.3, '#000']});
+		$.post('/site/del_backup','id='+id, function(rdata){
 			layer.closeAll();
 			layer.msg(rdata.msg,{icon:rdata.status?1:2});
 			getBackup(pid);
-		});
+		},'json');
 	})
 }
 
 function getBackup(id,name,page) {
-	
+
 	if(page == undefined){
 		page = '1';
 	}
-
-	$.post('/data?action=getFind','table=sites&id=' + id, function(rdata) {
-		$.post('/data?action=getData','table=backup&search=' + id + '&limit=5&p='+page+'&type=0&tojs=getBackup',function(frdata){
-			
-			var body = '';
-				for (var i = 0; i < frdata.data.length; i++) {
-					if(frdata.data[i].type == '1') continue;
-					if(frdata.data[i].filename.length < 15){
-						var ftpdown = "<a class='btlink' href='/cloud?filename="+frdata.data[i].filename+"&name="+ frdata.data[i].name+"' target='_blank'>下载</a> | ";
-					}else{
-						var ftpdown = "<a class='btlink' href='/download?filename="+frdata.data[i].filename+"&name="+frdata.data[i].name+"' target='_blank'>下载</a> | ";
-					}
-					body += "<tr><td><span class='glyphicon glyphicon-file'></span>"+frdata.data[i].name+"</td>\
-							<td>" + (ToSize(frdata.data[i].size)) + "</td>\
-							<td>" + frdata.data[i].addtime + "</td>\
-							<td class='text-right' style='color:#ccc'>"+ ftpdown + "<a class='btlink' href='javascript:;' onclick=\"WebBackupDelete('" + frdata.data[i].id + "',"+id+")\">"+lan.public.del+"</a></td>\
-						</tr>"
+	$.post('/site/get_backup','search=' + id + '&limit=5&p='+page, function(frdata){		
+		var body = '';
+			for (var i = 0; i < frdata.data.length; i++) {
+				if(frdata.data[i].type == '1') {
+					continue;
 				}
-			var ftpdown = '';
-			frdata.page = frdata.page.replace(/'/g,'"').replace(/getBackup\(/g,"getBackup(" + id + ",0,");
-			
-			if(name == 0){
-				var sBody = "<table width='100%' id='webBackupList' class='table table-hover'>\
-							<thead><tr><th>文件名称</th><th>文件大小</th><th>打包时间</th><th width='140px' class='text-right'>操作</th></tr></thead>\
-							<tbody id='webBackupBody' class='list-list'>"+body+"</tbody>\
-							</table>"
-				$("#WebBackupList").html(sBody);
-				$(".page").html(frdata.page);
-				return;
+				
+				var ftpdown = "<a class='btlink' href='/files/download?filename="+frdata.data[i].filename+"&name="+frdata.data[i].name+"' target='_blank'>下载</a> | ";
+				body += "<tr><td><span class='glyphicon glyphicon-file'></span>"+frdata.data[i].name+"</td>\
+						<td>" + (toSize(frdata.data[i].size)) + "</td>\
+						<td>" + frdata.data[i].addtime + "</td>\
+						<td class='text-right' style='color:#ccc'>"+ ftpdown + "<a class='btlink' href='javascript:;' onclick=\"webBackupDelete('" + frdata.data[i].id + "',"+id+")\">删除</a></td>\
+					</tr>"
 			}
-			layer.closeAll();
-			layer.open({
-				type: 1,
-				skin: 'demo-class',
-				area: '700px',
-				title: lan.site.backup_title,
-				closeBtn: 2,
-				shift: 0,
-				shadeClose: false,
-				content: "<div class='bt-form ptb15 mlr15' id='WebBackup'>\
-							<button class='btn btn-default btn-sm' style='margin-right:10px' type='button' onclick=\"webBackup('" + rdata.id + "','" + rdata.name + "')\">打包备份</button>\
-							<div class='divtable mtb15' style='margin-bottom:0'><table width='100%' id='webBackupList' class='table table-hover'>\
-							<thead><tr><th>文件名称</th><th>文件大小</th><th>打包时间</th><th width='140px' class='text-right'>操作</th></tr></thead>\
-							<tbody id='webBackupBody' class='list-list'>"+body+"</tbody>\
-							</table><div class='page'>"+frdata.page+"</div></div></div>"
-			});
-		});
+		var ftpdown = '';
+		frdata.page = frdata.page.replace(/'/g,'"').replace(/getBackup\(/g,"getBackup(" + id + ",0,");
 		
+		if(name == 0){
+			var sBody = "<table width='100%' id='webBackupList' class='table table-hover'>\
+						<thead><tr><th>文件名称</th><th>文件大小</th><th>打包时间</th><th width='140px' class='text-right'>操作</th></tr></thead>\
+						<tbody id='webBackupBody' class='list-list'>"+body+"</tbody>\
+						</table>"
+			$("#webBackupList").html(sBody);
+			$(".page").html(frdata.page);
+			return;
+		}
+		layer.closeAll();
+		layer.open({
+			type: 1,
+			skin: 'demo-class',
+			area: '700px',
+			title: '打包备份',
+			closeBtn: 2,
+			shift: 0,
+			shadeClose: false,
+			content: "<div class='bt-form ptb15 mlr15' id='webBackup'>\
+						<button class='btn btn-default btn-sm' style='margin-right:10px' type='button' onclick=\"webBackup('" + frdata['site']['id'] + "','" +  frdata['site']['name'] + "')\">打包备份</button>\
+						<div class='divtable mtb15' style='margin-bottom:0'><table width='100%' id='webBackupList' class='table table-hover'>\
+						<thead><tr><th>文件名称</th><th>文件大小</th><th>打包时间</th><th width='140px' class='text-right'>操作</th></tr></thead>\
+						<tbody id='webBackupBody' class='list-list'>"+body+"</tbody>\
+						</table><div class='page'>"+frdata.page+"</div></div></div>"
+		});
 	},'json');
 
 }

@@ -53,8 +53,8 @@ class site_api:
         p = request.form.get('p', '').encode('utf-8')
 
         start = (int(p) - 1) * (int(limit))
-        _list = public.M('sites').where('', ()).field(
-            'id,name,path,status,ps,addtime,edate').limit((str(start)) + ',' + limit).order('id desc').select()
+        _list = public.M('sites').where('', ()).field('id,name,path,status,ps,addtime,edate').limit(
+            (str(start)) + ',' + limit).order('id desc').select()
         _ret = {}
         _ret['data'] = _list
 
@@ -74,6 +74,69 @@ class site_api:
         if public.M('sites').where("id=?", (mid,)).setField('ps', ps):
             return public.returnJson(True, '修改成功!')
         return public.returnJson(False, '修改失败!')
+
+    def getBackupApi(self):
+        limit = request.form.get('limit', '').encode('utf-8')
+        p = request.form.get('p', '').encode('utf-8')
+        mid = request.form.get('search', '').encode('utf-8')
+
+        find = public.M('sites').where("id=?", (mid,)).field(
+            "id,name,path,status,ps,addtime,edate").find()
+
+        start = (int(p) - 1) * (int(limit))
+        _list = public.M('backup').where('type=?', (mid,)).field('id,type,name,pid,filename,size,addtime').limit(
+            (str(start)) + ',' + limit).order('id desc').select()
+        _ret = {}
+        _ret['data'] = _list
+
+        count = public.M('backup').where("id=?", (mid,)).count()
+        info = {}
+        info['count'] = count
+        info['tojs'] = 'getBackup'
+        info['p'] = p
+        info['row'] = limit
+        _ret['page'] = public.getPage(info)
+        _ret['site'] = find
+        return public.getJson(_ret)
+
+    def toBackupApi(self):
+        mid = request.form.get('id', '').encode('utf-8')
+        find = public.M('sites').where(
+            "id=?", (mid,)).field('name,path,id').find()
+        fileName = find['name'] + '_' + \
+            time.strftime('%Y%m%d_%H%M%S', time.localtime()) + '.zip'
+        backupPath = public.getBackupDir() + '/site'
+        zipName = backupPath + '/' + fileName
+        if not (os.path.exists(backupPath)):
+            os.makedirs(backupPath)
+        tmps = '/tmp/panelExec.log'
+        execStr = "cd '" + find['path'] + "' && zip '" + \
+            zipName + "' -r ./* > " + tmps + " 2>&1"
+        # print execStr
+        # print public.execShell(execStr)
+
+        if os.path.exists(zipName):
+            fsize = os.path.getsize(zipName)
+        else:
+            fsize = 0
+        sql = public.M('backup').add('type,name,pid,filename,size,addtime',
+                                     (mid, fileName, find['id'], zipName, fsize, public.getDate()))
+
+        msg = public.getInfo('备份网站[{1}]成功!', (find['name'],))
+        public.writeLog('网站管理', msg)
+        return public.returnJson(True, '备份成功!')
+
+    def delBackupApi(self):
+        mid = request.form.get('id', '').encode('utf-8')
+        filename = public.M('backup').where(
+            "id=?", (mid,)).getField('filename')
+        if os.path.exists(filename):
+            os.remove(filename)
+        name = public.M('backup').where("id=?", (mid,)).getField('name')
+        msg = public.getInfo('删除网站[{1}]的备份[{2}]成功!', (name, filename))
+        public.writeLog('网站管理', msg)
+        public.M('backup').where("id=?", (mid,)).delete()
+        return public.returnJson(True, '站点删除成功!')
 
     def getPhpVersionApi(self):
         return self.getPhpVersion()
@@ -767,7 +830,7 @@ class site_api:
             data['filename'] = filename
         return public.getJson(data)
 
-     # 修改物理路径
+        # 修改物理路径
     def setPathApi(self):
         mid = request.form.get('id', '').encode('utf-8')
         path = request.form.get('path', '').encode('utf-8')
