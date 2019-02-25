@@ -14,7 +14,7 @@ function getWeb(page, search) {
 	}
 
 	var sUrl = '/site/list';
-	var pdata = 'tojs=getWeb&table=sites&limit=15&p=' + page + '&search=' + search + order;
+	var pdata = 'limit=10&p=' + page + '&search=' + search + order;
 	var loadT = layer.load();
 	//取回数据
 	$.post(sUrl, pdata, function(data) {
@@ -120,9 +120,38 @@ function getWeb(page, search) {
 			if(databak==lan.site.site_null){
 				databak='';
 			}
-			$(this).hide().after("<input class='baktext' type='text' data-id='"+dataid+"' name='bak' value='" + databak + "' placeholder='"+lan.site.site_bak+"' onblur='GetBakPost(\"sites\")' />");
+			$(this).hide().after("<input class='baktext' type='text' data-id='"+dataid+"' name='bak' value='" + databak + "' placeholder='备注信息' onblur='getBakPost(\"sites\")' />");
 			$(".baktext").focus();
 		});
+	},'json');
+}
+
+
+function getBakPost(b) {
+	$(".baktext").hide().prev().show();
+	var c = $(".baktext").attr("data-id");
+	var a = $(".baktext").val();
+	if(a == "") {
+		a = '空';
+	}
+	setWebPs(b, c, a);
+	$("a[data-id='" + c + "']").html(a);
+	$(".baktext").remove();
+}
+
+function setWebPs(b, e, a) {
+	console.log(b,e,a);
+	var d = layer.load({shade: true,shadeClose: false});
+	var c = 'ps=' + a;
+	$.post('/site/set_ps', 'id=' + e + "&" + c, function(data) {
+		if(data['status']) {
+			getWeb(1);
+			layer.closeAll();
+			layer.msg('修改成功!', {icon: 1});
+		} else {
+			layer.closeAll();
+			layer.msg('修改失败!', {icon: 2});
+		}
 	},'json');
 }
 
@@ -352,9 +381,9 @@ function pathSafe(id){
 	var isPass = $('#pathSafe').prop('checked');
 	if(!isPass){
 		$(".user_pw").show();
-	}else{
+	} else {
 		var loadT = layer.msg(lan.public.the,{icon:16,time:10000,shade: [0.3, '#000']});
-		$.post('/site?action=CloseHasPwd',{id:id},function(rdata){
+		$.post('/site/close_has_pwd',{id:id},function(rdata){
 			layer.close(loadT);
 			layer.msg(rdata.msg,{icon:rdata.status?1:2});
 			$(".user_pw").hide();
@@ -779,7 +808,7 @@ function isDomain(domain) {
  * @param {Number} id	编号
  * @param {String} name	主域名
  */
-function WebBackup(id, name) {
+function webBackup(id, name) {
 	var loadT =layer.msg(lan.database.backup_the, {icon:16,time:0,shade: [0.3, '#000']});
 	var data = "id="+id;
 	$.post('/site?action=ToBackup', data, function(rdata) {
@@ -795,7 +824,7 @@ function WebBackup(id, name) {
  * @param {Number} id	文件编号
  * @param {String} name	主域名
  */
-function WebBackupDelete(id,pid){
+function webBackupDelete(id,pid){
 	layer.confirm(lan.site.webback_del_confirm,{title:lan.site.del_bak_file,icon:3,closeBtn:2},function(index){
 		var loadT =layer.msg(lan.public.the_del, {icon:16,time:0,shade: [0.3, '#000']});
 		$.post('/site?action=DelBackup','id='+id, function(rdata){
@@ -807,9 +836,11 @@ function WebBackupDelete(id,pid){
 }
 
 function getBackup(id,name,page) {
+	
 	if(page == undefined){
 		page = '1';
-	} 
+	}
+
 	$.post('/data?action=getFind','table=sites&id=' + id, function(rdata) {
 		$.post('/data?action=getData','table=backup&search=' + id + '&limit=5&p='+page+'&type=0&tojs=getBackup',function(frdata){
 			
@@ -831,9 +862,9 @@ function getBackup(id,name,page) {
 			frdata.page = frdata.page.replace(/'/g,'"').replace(/getBackup\(/g,"getBackup(" + id + ",0,");
 			
 			if(name == 0){
-				var sBody = "<table width='100%' id='WebBackupList' class='table table-hover'>\
-							<thead><tr><th>"+lan.site.filename+"</th><th>"+lan.site.filesize+"</th><th>"+lan.site.backuptime+"</th><th width='140px' class='text-right'>"+lan.site.operate+"</th></tr></thead>\
-							<tbody id='WebBackupBody' class='list-list'>"+body+"</tbody>\
+				var sBody = "<table width='100%' id='webBackupList' class='table table-hover'>\
+							<thead><tr><th>文件名称</th><th>文件大小</th><th>打包时间</th><th width='140px' class='text-right'>操作</th></tr></thead>\
+							<tbody id='webBackupBody' class='list-list'>"+body+"</tbody>\
 							</table>"
 				$("#WebBackupList").html(sBody);
 				$(".page").html(frdata.page);
@@ -849,15 +880,15 @@ function getBackup(id,name,page) {
 				shift: 0,
 				shadeClose: false,
 				content: "<div class='bt-form ptb15 mlr15' id='WebBackup'>\
-							<button class='btn btn-default btn-sm' style='margin-right:10px' type='button' onclick=\"WebBackup('" + rdata.id + "','" + rdata.name + "')\">"+lan.site.backup_title+"</button>\
-							<div class='divtable mtb15' style='margin-bottom:0'><table width='100%' id='WebBackupList' class='table table-hover'>\
-							<thead><tr><th>"+lan.site.filename+"</th><th>"+lan.site.filesize+"</th><th>"+lan.site.backuptime+"</th><th width='140px' class='text-right'>"+lan.site.operate+"</th></tr></thead>\
-							<tbody id='WebBackupBody' class='list-list'>"+body+"</tbody>\
+							<button class='btn btn-default btn-sm' style='margin-right:10px' type='button' onclick=\"webBackup('" + rdata.id + "','" + rdata.name + "')\">打包备份</button>\
+							<div class='divtable mtb15' style='margin-bottom:0'><table width='100%' id='webBackupList' class='table table-hover'>\
+							<thead><tr><th>文件名称</th><th>文件大小</th><th>打包时间</th><th width='140px' class='text-right'>操作</th></tr></thead>\
+							<tbody id='webBackupBody' class='list-list'>"+body+"</tbody>\
 							</table><div class='page'>"+frdata.page+"</div></div></div>"
 			});
 		});
 		
-	});
+	},'json');
 
 }
 
@@ -990,8 +1021,8 @@ function webEdit(id,website,endTime,addtime){
 	+"<p onclick=\"configFile('"+website+"')\" title='配置文件'>配置文件</p>"
 	+"<p onclick=\"setSSL("+id+",'"+website+"')\" title='SSL'>SSL</p>"
 	+"<p onclick=\"phpVersion('"+website+"')\" title='PHP版本'>PHP版本</p>"
-	+"<p onclick=\"To301('"+website+"')\" title='重定向'>重定向</p>"
-	+"<p onclick=\"Proxy('"+website+"')\" title='反向代理'>反向代理</p>"
+	// +"<p onclick=\"to301('"+website+"')\" title='重定向'>重定向</p>"
+	// +"<p onclick=\"proxyList('"+website+"')\" title='反向代理'>反向代理</p>"
 	+"<p id='site_"+id+"' onclick=\"security('"+id+"','"+website+"')\" title='防盗链'>防盗链</p>"
 	+"<p id='site_"+id+"' onclick=\"getSiteLogs('"+website+"')\" title='查看站点请求日志'>响应日志</p>";
 	layer.open({
@@ -1364,7 +1395,7 @@ function delDirBind(id,siteId){
 }
 
 //反向代理
-function Proxy(siteName,type){
+function proxyList(siteName,type){
 	if(type == 1){
 		type = $("input[name='status']").attr('checked')?'0':'1';
 		toUrl = encodeURIComponent($("input[name='toUrl']").val());
@@ -1418,7 +1449,7 @@ function OpenCache(siteName){
 }
 		
 //301重定向
-function To301(siteName,type){
+function to301(siteName,type){
 	if(type == 1){
 		type = $("input[name='status']").attr('checked')?'0':'1';
 		toUrl = encodeURIComponent($("input[name='toUrl']").val());
@@ -2223,14 +2254,14 @@ function siteDefaultPage(){
 	layer.open({
 		type: 1,
 		area: '460px',
-		title: lan.site.change_defalut_page,
+		title: '修改默认页',
 		closeBtn: 2,
 		shift: 0,
 		content: '<div class="changeDefault pd20">\
-						<button class="btn btn-default btn-sm mg10" style="width:188px" onclick="changeDefault(1)">'+lan.site.default_doc+'</button>\
-						<button class="btn btn-default btn-sm mg10" style="width:188px" onclick="changeDefault(2)">'+lan.site.err_404+'</button>\
-							<button class="btn btn-default btn-sm mg10" style="width:188px" onclick="changeDefault('+(stype=='nginx'?3:4)+')">'+(stype=='nginx'?'Nginx':'Apache')+lan.site.empty_page+'</button>\
-						<button class="btn btn-default btn-sm mg10" style="width:188px" onclick="changeDefault(5)">'+lan.site.default_page_stop+'</button>\
+						<button class="btn btn-default btn-sm mg10" style="width:188px" onclick="changeDefault(1)">默认文档</button>\
+						<button class="btn btn-default btn-sm mg10" style="width:188px" onclick="changeDefault(2)">404错误页</button>\
+							<button class="btn btn-default btn-sm mg10" style="width:188px" onclick="changeDefault('+(stype=='nginx'?3:4)+')">'+(stype=='nginx'?'Nginx':'Apache')+'空白页</button>\
+						<button class="btn btn-default btn-sm mg10" style="width:188px" onclick="changeDefault(5)">默认站点停止页</button>\
 				</div>'
 	});
 }
