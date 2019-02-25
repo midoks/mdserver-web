@@ -342,7 +342,7 @@ function indexSoft() {
         var data = $("#indexsoft > div").map(function() { return $(this).attr("data-id"); }).get();
         tmp = [];
         for(i in data){
-            console.log(data[i]);
+            // console.log(data[i]);
             if (data[i] != ''){
                 tmp.push($.trim(data[i]));
             }
@@ -359,8 +359,86 @@ function indexSoft() {
     };
 }
 
-// $(function() {
-//     if (window.document.location.pathname == '/soft/') {
-//         setInterval(function() { getSList(); }, 10000);
-//     }
-// });
+
+function importPluginOpen(){
+    $("#update_zip").on("change", function () {
+        var files = $("#update_zip")[0].files;
+        if (files.length == 0) {
+            return;
+        }
+        importPlugin(files[0]);
+        $("#update_zip").val('')
+    });
+
+    $("#update_zip").click();
+}
+
+
+function importPlugin(file){
+    var formData = new FormData();
+    formData.append("plugin_zip", file);
+    $.ajax({
+        url: "/plugin?action=update_zip",
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (data) {
+            if (data.status === false) {
+                layer.msg(data.msg, { icon: 2 });
+                return;
+            }
+            var loadT = layer.open({
+                type: 1,
+                area: "500px",
+                title: "安装第三方插件包",
+                closeBtn: 2,
+                shift: 5,
+                shadeClose: false,
+                content: '<style>\
+                    .install_three_plugin{padding:25px;padding-bottom:70px}\
+                    .plugin_user_info p { font-size: 14px;}\
+                    .plugin_user_info {padding: 15px 30px;line-height: 26px;background: #f5f6fa;border-radius: 5px;border: 1px solid #efefef;}\
+                    .btn-content{text-align: center;margin-top: 25px;}\
+                </style>\
+                <div class="bt-form c7  install_three_plugin pb70">\
+                    <div class="plugin_user_info">\
+                        <p><b>名称：</b>'+ data.title + '</p>\
+                        <p><b>版本：</b>' + data.versions +'</p>\
+                        <p><b>描述：</b>' + data.ps + '</p>\
+                        <p><b>大小：</b>' + bt.format_size(data.size, true) + '</p>\
+                        <p><b>作者：</b>' + data.author + '</p>\
+                        <p><b>来源：</b><a class="btlink" href="'+data.home+'" target="_blank">' + data.home + '</a></p>\
+                    </div>\
+                    <ul class="help-info-text c7">\
+                        <li style="color:red;">此为第三方开发的插件，宝塔无法验证其可靠性!</li>\
+                        <li>安装过程可能需要几分钟时间，请耐心等候!</li>\
+                        <li>如果已存在此插件，将被替换!</li>\
+                    </ul>\
+                    <div class="bt-form-submit-btn"><button type="button" class="btn btn-sm btn-danger mr5" onclick="layer.closeAll()">取消</button><button type="button" class="btn btn-sm btn-success" onclick="importPluginInstall(\''+ data.name + '\',\'' + data.tmp_path +'\')">确定安装</button></div>\
+                </div>'
+            });
+        },
+        error: function (responseStr) {
+            layer.msg('上传失败2!', { icon: 2 });
+        }
+    });
+}
+
+
+function importPluginInstall(plugin_name, tmp_path) {
+    layer.msg('正在安装,这可能需要几分钟时间...', { icon: 16, time: 0, shade: [0.3, '#000'] });
+    $.post('/plugin?action=input_zip', { plugin_name: plugin_name, tmp_path: tmp_path }, function (rdata) {
+        layer.closeAll()
+        if (rdata.status) {
+            soft.get_list();
+        }
+        setTimeout(function () { layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 }) }, 1000);
+    });
+}
+
+$(function() {
+    if (window.document.location.pathname == '/soft/') {
+        setInterval(function() { getSList(); }, 8000);
+    }
+});
