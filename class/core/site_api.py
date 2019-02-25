@@ -49,8 +49,12 @@ class site_api:
 
     ##### ----- start ----- ###
     def listApi(self):
+        limit = request.form.get('limit', '').encode('utf-8')
+        p = request.form.get('p', '').encode('utf-8')
+
+        start = (int(p) - 1) * (int(limit))
         _list = public.M('sites').where('', ()).field(
-            'id,name,path,status,ps,addtime,edate').limit('0,5').order('id desc').select()
+            'id,name,path,status,ps,addtime,edate').limit((str(start)) + ',' + limit).order('id desc').select()
         _ret = {}
         _ret['data'] = _list
 
@@ -58,9 +62,18 @@ class site_api:
         _page = {}
         _page['count'] = count
         _page['tojs'] = 'getWeb'
+        _page['p'] = p
+        _page['row'] = limit
 
         _ret['page'] = public.getPage(_page)
         return public.getJson(_ret)
+
+    def setPsApi(self):
+        mid = request.form.get('id', '').encode('utf-8')
+        ps = request.form.get('ps', '').encode('utf-8')
+        if public.M('sites').where("id=?", (mid,)).setField('ps', ps):
+            return public.returnJson(True, '修改成功!')
+        return public.returnJson(False, '修改失败!')
 
     def getPhpVersionApi(self):
         return self.getPhpVersion()
@@ -835,9 +848,9 @@ class site_api:
         passconf = username + ':' + public.hasPwd(password)
 
         if siteName == 'phpmyadmin':
-            configFile = self.setupPath + '/openresty/nginx/conf/nginx.conf'
+            configFile = self.getHostConf('phpmyadmin')
         else:
-            configFile = self.setupPath + '/openresty/nginx/vhost/' + siteName + '.conf'
+            configFile = self.getHostConf(siteName)
 
         # 处理Nginx配置
         conf = public.readFile(configFile)
@@ -846,13 +859,12 @@ class site_api:
             if conf.find(rep) == -1:
                 rep = '#error_page 404/404.html;'
             data = '''
-    #AUTH_START
+    # AUTH_START
     auth_basic "Authorization";
     auth_basic_user_file %s;
-    #AUTH_END''' % (filename,)
+    # AUTH_END''' % (filename,)
             conf = conf.replace(rep, rep + data)
             public.writeFile(configFile, conf)
-
         # 写密码配置
         passDir = self.passPath
         if not os.path.exists(passDir):
@@ -865,26 +877,27 @@ class site_api:
         return public.returnJson(True, '设置成功!')
 
     # 取消目录加密
-    # def CloseHasPwd(self, get):
-    #     if not hasattr(get, 'siteName'):
-    #         get.siteName = public.M('sites').where(
-    #             'id=?', (get.id,)).getField('name')
+    def closeHasPwdApi(self):
+        siteName = request.form.get('siteName', '').encode('utf-8')
+        mid = request.form.get('id', '')
+        if siteName == '':
+            siteName = public.M('sites').where('id=?', (mid,)).getField('name')
 
-    #     if get.siteName == 'phpmyadmin':
-    #         get.configFile = self.setupPath + '/nginx/conf/nginx.conf'
-    #     else:
-    #         get.configFile = self.setupPath + '/panel/vhost/nginx/' + get.siteName + '.conf'
+        if siteName == 'phpmyadmin':
+            configFile = self.getHostConf('phpmyadmin')
+        else:
+            configFile = self.getHostConf(siteName)
 
-    #     if os.path.exists(get.configFile):
-    #         conf = public.readFile(get.configFile)
-    #         rep = "\n\s*#AUTH_START(.|\n){1,200}#AUTH_END"
-    #         conf = re.sub(rep, '', conf)
-    #         public.writeFile(get.configFile, conf)
+        if os.path.exists(configFile):
+            conf = public.readFile(configFile)
+            rep = "\n\s*#AUTH_START(.|\n){1,200}#AUTH_END"
+            conf = re.sub(rep, '', conf)
+            public.writeFile(configFile, conf)
 
-    #     public.restartWeb()
-    #     public.WriteLog("网站管理", "SITE_AUTH_CLOSE_SUCCESS",
-    #                     (get.siteName,))
-    #     return public.returnMsg(True, 'SET_SUCCESS')
+        public.restartWeb()
+        msg = public.getInfo('清除网站[{1}]的密码认证!', (siteName,))
+        public.writeLog("网站管理", msg)
+        return public.returnJson(True, '设置成功!')
 
     def delDomainApi(self):
         domain = request.form.get('domain', '').encode('utf-8')
@@ -931,6 +944,48 @@ class site_api:
         webname = request.form.get('webname', '').encode('utf-8')
         path = request.form.get('path', '0').encode('utf-8')
         return self.delete(sid, webname, path)
+
+    def getProxyListApi(self):
+        siteName = request.form.get('siteName', '').encode('utf-8')
+        conf_path = self.getHostConf(siteName)
+        old_conf = public.readFile(conf_path)
+        rep = "(#PROXY-START(\n|.)+#PROXY-END)"
+        url_rep = "proxy_pass (.*);|ProxyPass\s/\s(.*)|Host\s(.*);"
+        host_rep = "Host\s(.*);"
+
+        if re.search(rep, old_conf):
+            # 构造代理配置
+            if w == "nginx":
+                get.todomain = str(re.search(host_rep, old_conf).group(1))
+                get.proxysite = str(re.search(url_rep, old_conf).group(1))
+            else:
+                get.todomain = ""
+                get.proxysite = str(re.search(url_rep, old_conf).group(2))
+            get.proxyname = "旧代理"
+            get.type = 1
+            get.proxydir = "/"
+            get.advanced = 0
+            get.cachetime = 1
+            get.cache = 0
+            get.subfilter = "[{\"sub1\":\"\",\"sub2\":\"\"},{\"sub1\":\"\",\"sub2\":\"\"},{\"sub1\":\"\",\"sub2\":\"\"}]"
+
+            # proxyname_md5 = self.__calc_md5(get.proxyname)
+            # 备份并替换老虚拟主机配置文件
+            os.system("cp %s %s_bak" % (conf_path, conf_path))
+            conf = re.sub(rep, "", old_conf)
+            public.writeFile(conf_path, conf)
+
+            # self.createProxy(get)
+            public.restartWeb()
+
+        proxyUrl = self.__read_config(self.__proxyfile)
+        sitename = sitename
+        proxylist = []
+        for i in proxyUrl:
+            if i["sitename"] == sitename:
+                proxylist.append(i)
+        return public.getJson(proxylist)
+
     ##### ----- end   ----- ###
 
     # 域名编码转换

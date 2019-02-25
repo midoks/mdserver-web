@@ -97,18 +97,6 @@ function repeatPwd(a) {
 	$("#MyPassword").val(randomStrPwd(a))
 }
 
-function GetBakPost(b) {
-	$(".baktext").hide().prev().show();
-	var c = $(".baktext").attr("data-id");
-	var a = $(".baktext").val();
-	if(a == "") {
-		a = lan.bt.empty;
-	}
-	setWebPs(b, c, a);
-	$("a[data-id='" + c + "']").html(a);
-	$(".baktext").remove()
-}
-
 $(".menu-icon").click(function() {
 	$(".sidebar-scroll").toggleClass("sidebar-close");
 	$(".main-content").toggleClass("main-content-open");
