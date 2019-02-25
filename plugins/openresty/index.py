@@ -65,6 +65,11 @@ def getConf():
     return path
 
 
+def getConfTpl():
+    path = getPluginDir() + '/conf/nginx.conf'
+    return path
+
+
 def getOs():
     data = {}
     data['os'] = public.getOs()
@@ -107,7 +112,7 @@ def checkAuthEq(file, owner='root'):
 
 def confReplace():
     service_path = os.path.dirname(os.getcwd())
-    content = public.readFile(getConf())
+    content = public.readFile(getConfTpl())
     content = content.replace('{$SERVER_PATH}', service_path)
 
     user = 'www'
