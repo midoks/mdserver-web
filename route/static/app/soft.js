@@ -369,7 +369,6 @@ function importPluginOpen(){
         importPlugin(files[0]);
         $("#update_zip").val('')
     });
-
     $("#update_zip").click();
 }
 
@@ -378,7 +377,7 @@ function importPlugin(file){
     var formData = new FormData();
     formData.append("plugin_zip", file);
     $.ajax({
-        url: "/plugin?action=update_zip",
+        url: "/plugins/update_zip",
         type: "POST",
         data: formData,
         processData: false,
