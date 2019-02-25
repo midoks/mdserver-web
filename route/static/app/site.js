@@ -37,7 +37,7 @@ function getWeb(page, search) {
 				var backup = "<a href='javascript:;' class='btlink' onclick=\"getBackup(" + data.data[i].id + ")\">无备份</a>";
 			}
 			//是否设置有效期
-			var web_end_time = (data.data[i].edate == "0000-00-00") ? lan.site.web_end_time : data.data[i].edate;
+			var web_end_time = (data.data[i].edate == "0000-00-00") ? '永久': data.data[i].edate;
 			//表格主体
 			var shortwebname = data.data[i].name;
 			var shortpath = data.data[i].path;
@@ -53,51 +53,51 @@ function getWeb(page, search) {
 					<td><a class='btlink webtips' href='javascript:;' onclick=\"webEdit(" + data.data[i].id + ",'" + data.data[i].name + "','" + data.data[i].edate + "','" + data.data[i].addtime + "')\" title='"+data.data[i].name+"'>" + shortwebname + "</td>\
 					<td>" + status + "</td>\
 					<td>" + backup + "</td>\
-					<td><a class='btlink' title='"+lan.site.open_path_txt+data.data[i].path+"' href=\"javascript:openPath('"+data.data[i].path+"');\">" + shortpath + "</a></td>\
+					<td><a class='btlink' title='打开目录"+data.data[i].path+"' href=\"javascript:openPath('"+data.data[i].path+"');\">" + shortpath + "</a></td>\
 					<td><a class='btlink setTimes' id='site_"+data.data[i].id+"' data-ids='"+data.data[i].id+"'>" + web_end_time + "</a></td>\
 					<td><a class='btlinkbed' href='javascript:;' data-id='"+data.data[i].id+"'>" + data.data[i].ps + "</a></td>\
 					<td><input class='btswitch btswitch-ios' id='closewaf_"+idname+"' type='checkbox'><label class='btswitch-btn' for='closewaf_"+idname+"' onclick=\"set_site_obj_state('" + data.data[i].name + "','open')\" style='width:2.4em;height:1.4em;margin-bottom: 0'></label></td>\
 					<td style='text-align:right; color:#bbb'>\
-					<a href='javascript:;' class='btlink' onclick=\"webEdit(" + data.data[i].id + ",'" + data.data[i].name + "','" + data.data[i].edate + "','" + data.data[i].addtime + "')\">"+lan.site.set+" </a>\
-                        | <a href='javascript:;' class='btlink' onclick=\"webDelete('" + data.data[i].id + "','" + data.data[i].name + "')\" title='"+lan.site.site_del_title+"'>"+lan.public.del+"</a>\
+					<a href='javascript:;' class='btlink' onclick=\"webEdit(" + data.data[i].id + ",'" + data.data[i].name + "','" + data.data[i].edate + "','" + data.data[i].addtime + "')\">设置</a>\
+                        | <a href='javascript:;' class='btlink' onclick=\"webDelete('" + data.data[i].id + "','" + data.data[i].name + "')\" title='删除站点'>删除</a>\
 					</td></tr>"
 			
 			$("#webBody").append(body);
 			//setEdate(data.data[i].id,data.data[i].edate);
          	//设置到期日期
-            function getDate(a) {
-              var dd = new Date();
-              dd.setTime(dd.getTime() + (a == undefined || isNaN(parseInt(a)) ? 0 : parseInt(a)) * 86400000);
-              var y = dd.getFullYear();
-              var m = dd.getMonth() + 1;
-              var d = dd.getDate();
-              return y + "-" + (m < 10 ? ('0' + m) : m) + "-" + (d < 10 ? ('0' + d) : d);
-            }
+			function getDate(a) {
+				var dd = new Date();
+				dd.setTime(dd.getTime() + (a == undefined || isNaN(parseInt(a)) ? 0 : parseInt(a)) * 86400000);
+				var y = dd.getFullYear();
+				var m = dd.getMonth() + 1;
+				var d = dd.getDate();
+				return y + "-" + (m < 10 ? ('0' + m) : m) + "-" + (d < 10 ? ('0' + d) : d);
+			}
             $('#webBody').on('click','#site_'+ data.data[i].id,function(){
-              var _this = $(this);
-              var id = $(this).attr('data-ids');
-              laydate.render({
-                elem: '#site_'+ id //指定元素
-                ,min:getDate(1)
-                ,max:'2099-12-31'
-                ,vlue:getDate(365)
-                ,type:'date'
-                ,format :'yyyy-MM-dd'
-                ,trigger:'click'
-                ,btns:['perpetual', 'confirm']
-                ,theme:'#20a53a'
-                ,done:function(dates){
-					if(_this.html() == '永久'){
-                      dates = '0000-00-00';
-                    }
-                    var loadT = layer.msg(lan.site.saving_txt, { icon: 16, time: 0, shade: [0.3, "#000"]}); 
-                    $.post('/site/set_end_date','id='+id+'&edate='+dates,function(rdata){
-                      layer.close(loadT);
-                      layer.msg(rdata.msg,{icon:rdata.status?1:5});
-                    },'json');
-				}
-              });
-             this.click();
+				var _this = $(this);
+				var id = $(this).attr('data-ids');
+				laydate.render({
+					elem: '#site_'+ id //指定元素
+					,min:getDate(1)
+					,max:'2099-12-31'
+					,vlue:getDate(365)
+					,type:'date'
+					,format :'yyyy-MM-dd'
+					,trigger:'click'
+					,btns:['perpetual', 'confirm']
+					,theme:'#20a53a'
+					,done:function(dates){
+						if(_this.html() == '永久'){
+						 	dates = '0000-00-00';
+						}
+						var loadT = layer.msg(lan.site.saving_txt, { icon: 16, time: 0, shade: [0.3, "#000"]}); 
+						$.post('/site/set_end_date','id='+id+'&edate='+dates,function(rdata){
+							layer.close(loadT);
+							layer.msg(rdata.msg,{icon:rdata.status?1:5});
+						},'json');
+					}
+				});
+            	this.click();
             });
 		}
 		if(body.length < 10){
@@ -117,8 +117,8 @@ function getWeb(page, search) {
 		$(".btlinkbed").click(function(){
 			var dataid = $(this).attr("data-id");
 			var databak = $(this).text();
-			if(databak==lan.site.site_null){
-				databak='';
+			if(databak == null){
+				databak = '';
 			}
 			$(this).hide().after("<input class='baktext' type='text' data-id='"+dataid+"' name='bak' value='" + databak + "' placeholder='备注信息' onblur='getBakPost(\"sites\")' />");
 			$(".baktext").focus();
@@ -476,15 +476,14 @@ function setIndexEdit(id){
  * @param {String} wname 网站名称
  */
 function webStop(wid, wname) {
-	layer.confirm(lan.site.site_stop_txt, {icon:3,closeBtn:2},function(index) {
+	layer.confirm('站点停用后将无法访问，您真的要停用这个站点吗？', {icon:3,closeBtn:2},function(index) {
 		if (index > 0) {
-			var loadT = layer.load()
-			$.post("/site?action=SiteStop","id=" + wid + "&name=" + wname, function(ret) {
+			var loadT = layer.load();
+			$.post("/site/stop","id=" + wid + "&name=" + wname, function(ret) {
 				layer.msg(ret.msg,{icon:ret.status?1:2})
 				layer.close(loadT);
 				getWeb(1);
-				
-			});
+			},'json');
 		}
 	});
 }
@@ -495,14 +494,14 @@ function webStop(wid, wname) {
  * @param {String} wname 网站名称
  */
 function webStart(wid, wname) {
-	layer.confirm(lan.site.site_start_txt,{icon:3,closeBtn:2}, function(index) {
+	layer.confirm('即将启动站点，您真的要启用这个站点吗？',{icon:3,closeBtn:2}, function(index) {
 		if (index > 0) {
 			var loadT = layer.load()
-			$.post("/site?action=SiteStart","id=" + wid + "&name=" + wname, function(ret) {
+			$.post("/site/start","id=" + wid + "&name=" + wname, function(ret) {
 				layer.msg(ret.msg,{icon:ret.status?1:2})
 				layer.close(loadT);
 				getWeb(1);
-			});
+			},'json');
 		}
 	});
 }
