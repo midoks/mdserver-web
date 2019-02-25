@@ -14,7 +14,8 @@ startTime=`date +%s`
 PLUGIN_NAME='readme'
 
 #echo $rootPath/plugins/$PLUGIN_NAME
-cd $rootPath/plugins/$PLUGIN_NAME && zip  $rootPath/plugins/$PLUGIN_NAME/readme_${startTime}.zip -r ./* > /tmp/t.log + 2>&1
+mkdir -p $rootPath/scripts/tmp/$PLUGIN_NAME
+cd $rootPath/plugins/$PLUGIN_NAME && zip  $rootPath/scripts/tmp/$PLUGIN_NAME/readme_${startTime}.zip -r ./* > /tmp/t.log + 2>&1
 
 endTime=`date +%s`
 ((outTime=($endTime-$startTime)/60))
