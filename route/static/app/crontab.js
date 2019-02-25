@@ -50,7 +50,9 @@ function getCronData(){
 		}else{
 			for(var i=0;i<rdata.data.length;i++){
 				//状态
-				var status = rdata.data[i]['status'] == '1'? '正常':'停用';
+				var status = rdata.data[i]['status'] == '1' ?
+				'<span class="btOpen" onclick="setTaskStatus(' + rdata.data[i].id + ',0)" style="color:rgb(92, 184, 92);cursor:pointer" title="停用该计划任务">正常<span class="glyphicon glyphicon-play"></span></span>' 
+				:'<span onclick="setTaskStatus('+ rdata.data[i].id +',1)" class="btClose" style="color:red;cursor:pointer" title="启用该计划任务">停用<span style="color:rgb(255, 0, 0);" class="glyphicon glyphicon-pause"></span></span>';
 
 				cbody += "<tr>\
 							<td><input type='checkbox' onclick='checkSelect();' title='"+rdata.data[i].name+"' name='id' value='"+rdata.data[i].id+"'></td>\
@@ -72,6 +74,23 @@ function getCronData(){
 		}
 		$('#cronbody').html(cbody);
 	},'json');
+}
+
+// 设置计划任务状态
+function setTaskStatus(id,status){
+	var confirm = layer.confirm(status == '0'?'计划任务暂停后将无法继续运行，您真的要停用这个计划任务吗？':'该计划任务已停用，是否要启用这个计划任务', {title:'提示',icon:3,closeBtn:2},function(index) {
+		if (index > 0) {
+			var loadT = layer.msg('正在设置状态，请稍后...',{icon:16,time:0,shade: [0.3, '#000']});
+			$.post('/crontab/set_cron_status',{id:id},function(rdata){
+				layer.closeAll();
+				layer.close(confirm);
+				layer.msg(rdata.data,{icon:rdata.status?1:2});
+				if(rdata.status) {
+					getCronData();
+				}
+			},'json');
+		}
+	});
 }
 
 //执行任务脚本

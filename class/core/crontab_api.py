@@ -73,6 +73,24 @@ class crontab_api:
         _ret['page'] = public.getPage(_page)
         return public.getJson(_ret)
 
+    # 设置计划任务状态
+    def setCronStatusApi(self):
+        mid = request.form.get('id', '')
+        cronInfo = public.M('crontab').where(
+            'id=?', (mid,)).field(self.field).find()
+        status = 1
+        if cronInfo['status'] == status:
+            status = 0
+            self.removeForCrond(cronInfo['echo'])
+        else:
+            cronInfo['status'] = 1
+            self.syncToCrond(cronInfo)
+
+        public.M('crontab').where('id=?', (mid,)).setField('status', status)
+        public.writeLog(
+            '计划任务', '修改计划任务[' + cronInfo['name'] + ']状态为[' + str(status) + ']')
+        return public.returnJson(True, '设置成功')
+
     # 获取指定任务数据
     def getCrondFindApi(self):
         sid = request.form.get('id', '')
