@@ -92,6 +92,12 @@ class system_api:
     def restartApi(self):
         self.restartMw()
         return public.returnJson(True, '面板已重启!')
+
+    def restartServerApi(self):
+        if public.isAppleSystem():
+            return public.returnJson(False, "开发环境不可重起")
+        self.restartServer()
+        return public.returnJson(True, '正在重启服务器!')
     ##### ----- end ----- ###
 
     @async
@@ -99,6 +105,13 @@ class system_api:
         sleep(1)
         cmd = public.getRunDir() + '/scripts/init.d/mw reload'
         public.execShell(cmd)
+
+    @async
+    def restartServer(self):
+        if not public.isRestart():
+            return public.returnJson(False, '请等待所有安装任务完成再执行!')
+        public.execShell("sync && init 6 &")
+        return public.returnJson(True, '命令发送成功!')
 
         # 名取PID
     def getPid(self, pname):
@@ -598,10 +611,10 @@ class system_api:
         return ret
 
     def getServerInfo(self):
-
-        upAddr = 'https://raw.githubusercontent.com/midoks/mdserver-web/master/version'
+        upAddr = 'https://raw.githubusercontent.com/midoks/mdserver-web/master/version/info.json'
         try:
-            version = public.httpGet(upAddr + '/info.json')
+            version = public.httpGet(upAddr)
+            print version
             version = json.loads(version)
             return version[0]
         except Exception as e:
@@ -611,24 +624,9 @@ class system_api:
     def updateServer(self, stype, version=''):
         # 更新服务
         try:
-
-            if public.isUpdateLocalSoft():
-                if stype == 'check' or stype == 'info' or stype == 'update':
-                    return public.returnJson(True, '正在安装中...', 'download')
-                if stype == 'update_status':
-
-                    data = public.readFile('tmp/panelExec.log')
-                    if data == 'done':
-                        return public.returnJson(True, '进度!', 100)
-                    else:
-                        _data = json.loads(data)
-                        return public.returnJson(True, '进度!', _data['pre'])
-
-                    if os.path.exists('mdserver-web.zip'):
-                        return public.returnJson(True, '进度!', 100)
-
             if not public.isRestart():
                 return public.returnJson(False, '请等待所有安装任务完成再执行!')
+
             if stype == 'check':
                 version_now = config_api.config_api().getVersion()
                 version_new_info = self.getServerInfo()
@@ -665,17 +663,14 @@ class system_api:
                 if not 'path' in v_new_info or v_new_info['path'] == '':
                     return public.returnJson(False, '下载地址不存在!')
 
-                execstr = v_new_info['path'] + '|dl|mdserver-web.zip'
-                taskAdd = (None,  '下载[mdserver-web-' + v_new_info['version'] + ']',
-                           'download', '0', time.strftime('%Y-%m-%d %H:%M:%S'), execstr)
+                newUrl = v_new_info['path']
+                toPath = public.getRootDir() + '/temp'
+                if os.path.exists(toPath):
+                    public.execShell('mkdir -p ' + toPath)
+                public.execShell('wget -O ' + toPath + '/mw.zip ' + newUrl)
 
-                public.M('tasks').add(
-                    'id,name,type,status,addtime, execstr', taskAdd)
-                return public.returnJson(True, '下载中...')
-
-            if stype == 'update_install':
                 public.execShell('unzip -o mdserver-web.zip -d ./')
-                public.execShell('rm -f mdserver-web.zip')
+                # public.execShell('rm -f mdserver-web.zip')
                 return public.returnJson(True, '安装更新成功!')
 
             return public.returnJson(False, '已经是最新,无需更新!')
