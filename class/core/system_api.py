@@ -665,12 +665,15 @@ class system_api:
 
                 newUrl = v_new_info['path']
                 toPath = public.getRootDir() + '/temp'
-                if os.path.exists(toPath):
+                if not os.path.exists(toPath):
                     public.execShell('mkdir -p ' + toPath)
-                public.execShell('wget -O ' + toPath + '/mw.zip ' + newUrl)
 
+                if not os.path.exists(toPath + '/mw.zip'):
+                    public.execShell('wget -O ' + toPath + '/mw.zip ' + newUrl)
+
+                public.execShell('unzip -o ' + toPath + '/mw.zip' + ' -d ./')
                 public.execShell('unzip -o mdserver-web.zip -d ./')
-                # public.execShell('rm -f mdserver-web.zip')
+                public.execShell('rm -f mdserver-web.zip')
                 return public.returnJson(True, '安装更新成功!')
 
             return public.returnJson(False, '已经是最新,无需更新!')
@@ -681,7 +684,7 @@ class system_api:
     # 修复面板
     def repPanel(self, get):
         vp = ''
-        if public.readFile('/www/server/panel/class/common.py').find('checkSafe') != -1:
+        if public.readFile('/www/server/mdserver-web/class/common.py').find('checkSafe') != -1:
             vp = '_pro'
         public.ExecShell("wget -O update.sh " + public.get_url() +
                          "/install/update" + vp + ".sh && bash update.sh")

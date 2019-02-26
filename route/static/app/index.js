@@ -543,10 +543,6 @@ function updateVersion(version) {
     var loadT = layer.msg('正在升级面板..', { icon: 16, time: 0, shade: [0.3, '#000'] });
     $.get('/system/update_server?type=update&version='+version, function(rdata) {
 
-        if (rdata.data == 'download'){
-            updateStatus();return;
-        }
-
         layer.closeAll();
         if (rdata.status === false) {
             layer.msg(rdata.msg, { icon: 5, time: 5000 });
@@ -565,7 +561,6 @@ function updateVersion(version) {
     });
 }
 
-
 function pluginService(pname,pfunc, callback){
     $.post('/plugins/run', {name:'openresty', func:pfunc}, function(data) {
         if (!data.status){
@@ -578,8 +573,6 @@ function pluginService(pname,pfunc, callback){
         }
     },'json'); 
 }
-
-
 
 //重启服务器
 function reBoot() {
