@@ -561,7 +561,7 @@ function updateVersion(version) {
     });
 }
 
-function pluginService(pname,pfunc, callback){
+function pluginIndexService(pname,pfunc, callback){
     $.post('/plugins/run', {name:'openresty', func:pfunc}, function(data) {
         if (!data.status){
             layer.msg(data.msg,{icon:0,time:2000,shade: [0.3, '#000']});
@@ -631,10 +631,10 @@ function reBoot() {
                         var body = '<div class="SafeRestartCode pd15" style="line-height:26px"></div>';
                         $(".bt-window-restart").html(body);
                         $(".SafeRestartCode").append("<p>正在停止Web服务</p>");
-                        pluginService('openresty', 'stop', function (r1) {
+                        pluginIndexService('openresty', 'stop', function (r1) {
                             $(".SafeRestartCode p").addClass('c9');
                             $(".SafeRestartCode").append("<p>正在停止MySQL服务...</p>");
-                            pluginService('mysql','stop', function (r2) {
+                            pluginIndexService('mysql','stop', function (r2) {
                                 $(".SafeRestartCode p").addClass('c9');
                                 $(".SafeRestartCode").append("<p>开始重启服务器...</p>");
                                 $.post('/system/restart_server', '',function (rdata) {
