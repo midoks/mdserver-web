@@ -354,8 +354,18 @@ def HttpGet(url, timeout=10):
             return str(ex)
 
 
+def HttpGet2(url, timeout):
+    import urllib
+    import urllib2
+
+    req = urllib2.Request(url)
+    res = urllib2.urlopen(req, timeout=timeout)
+    result = res.read()
+    return result
+
+
 def httpGet(url, timeout=10):
-    return HttpGet(url, timeout)
+    return HttpGet2(url, timeout)
 
 
 def HttpPost(url, data, timeout=10):
