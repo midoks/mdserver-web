@@ -381,6 +381,7 @@ function importPlugin(file){
         type: "POST",
         data: formData,
         processData: false,
+        dataType:'json',
         contentType: false,
         success: function (data) {
             if (data.status === false) {
@@ -405,21 +406,21 @@ function importPlugin(file){
                         <p><b>名称：</b>'+ data.title + '</p>\
                         <p><b>版本：</b>' + data.versions +'</p>\
                         <p><b>描述：</b>' + data.ps + '</p>\
-                        <p><b>大小：</b>' + bt.format_size(data.size, true) + '</p>\
+                        <p><b>大小：</b>' + toSize(data.size) + '</p>\
                         <p><b>作者：</b>' + data.author + '</p>\
                         <p><b>来源：</b><a class="btlink" href="'+data.home+'" target="_blank">' + data.home + '</a></p>\
                     </div>\
                     <ul class="help-info-text c7">\
-                        <li style="color:red;">此为第三方开发的插件，宝塔无法验证其可靠性!</li>\
+                        <li style="color:red;">此为第三方开发的插件，无法验证其可靠性!</li>\
                         <li>安装过程可能需要几分钟时间，请耐心等候!</li>\
                         <li>如果已存在此插件，将被替换!</li>\
                     </ul>\
                     <div class="bt-form-submit-btn"><button type="button" class="btn btn-sm btn-danger mr5" onclick="layer.closeAll()">取消</button><button type="button" class="btn btn-sm btn-success" onclick="importPluginInstall(\''+ data.name + '\',\'' + data.tmp_path +'\')">确定安装</button></div>\
                 </div>'
             });
-        },
-        error: function (responseStr) {
-            layer.msg('上传失败2!', { icon: 2 });
+
+        },error: function (responseStr) {
+            layer.msg('上传失败2!:' + responseStr, { icon: 2 });
         }
     });
 }
@@ -427,13 +428,13 @@ function importPlugin(file){
 
 function importPluginInstall(plugin_name, tmp_path) {
     layer.msg('正在安装,这可能需要几分钟时间...', { icon: 16, time: 0, shade: [0.3, '#000'] });
-    $.post('/plugin?action=input_zip', { plugin_name: plugin_name, tmp_path: tmp_path }, function (rdata) {
+    $.post('/plugins/input_zip', { plugin_name: plugin_name, tmp_path: tmp_path }, function (rdata) {
         layer.closeAll()
         if (rdata.status) {
-            soft.get_list();
+            getSList(true);
         }
         setTimeout(function () { layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 }) }, 1000);
-    });
+    },'json');
 }
 
 $(function() {
