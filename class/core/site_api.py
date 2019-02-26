@@ -167,7 +167,7 @@ class site_api:
         zipName = backupPath + '/' + fileName
         if not (os.path.exists(backupPath)):
             os.makedirs(backupPath)
-        tmps = '/tmp/panelExec.log'
+        tmps = public.getRunDir() + '/tmp/panelExec.log'
         execStr = "cd '" + find['path'] + "' && zip '" + \
             zipName + "' -r ./* > " + tmps + " 2>&1"
         # print execStr
