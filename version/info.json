@@ -1,4 +1,9 @@
 [
+	{
+        "version": "0.0.5",
+        "content": "1.基本功能OK<br/>,2.网站HTTPS功能验证!",
+        "path": "https://github.com//midoks/mdserver-web/archive/0.0.5.zip"
+    },
     {
         "version": "0.0.1.2",
         "content": "1.项目初建!<br/>2.面板更新功能!",
