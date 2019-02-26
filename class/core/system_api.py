@@ -614,7 +614,6 @@ class system_api:
         upAddr = 'https://raw.githubusercontent.com/midoks/mdserver-web/master/version/info.json'
         try:
             version = public.httpGet(upAddr)
-            print version
             version = json.loads(version)
             return version[0]
         except Exception as e:
