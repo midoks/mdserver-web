@@ -1,5 +1,10 @@
 [
 	{
+        "version": "0.0.6",
+        "content": "1.修复重复js方法",
+        "path": "https://github.com//midoks/mdserver-web/archive/0.0.6.zip"
+    },
+	{
         "version": "0.0.5",
         "content": "1.基本功能OK<br/>,2.网站HTTPS功能验证!",
         "path": "https://github.com//midoks/mdserver-web/archive/0.0.5.zip"
