@@ -180,7 +180,7 @@ class plugins_api:
     def updateZipApi(self):
         tmp_path = public.getRootDir() + '/temp'
         if not os.path.exists(tmp_path):
-            os.makedirs(tmp_path, mode=755)
+            os.makedirs(tmp_path)
         public.execShell("rm -rf " + tmp_path + '/*')
 
         tmp_file = tmp_path + '/plugin_tmp.zip'
@@ -189,11 +189,65 @@ class plugins_api:
         f = request.files['plugin_zip']
         if f.filename[-4:] != '.zip':
             return public.returnJson(False, '仅支持zip文件!')
-            # tmp_file = tmp_path + '/plugin_tmp.tar.gz'
-
         f.save(tmp_file)
-        # os.remove(tmp_file)
+        public.execShell('cd ' + tmp_path + ' && unzip ' + tmp_file)
+        os.remove(tmp_file)
 
+        p_info = tmp_path + '/info.json'
+        if not os.path.exists(p_info):
+            d_path = None
+            for df in os.walk(tmp_path):
+                if len(df[2]) < 3:
+                    continue
+                if not 'info.json' in df[2]:
+                    continue
+                if not 'install.sh' in df[2]:
+                    continue
+                if not os.path.exists(df[0] + '/info.json'):
+                    continue
+                d_path = df[0]
+            if d_path:
+                tmp_path = d_path
+                p_info = tmp_path + '/info.json'
+        try:
+            data = json.loads(public.readFile(p_info))
+            data['size'] = public.getPathSize(tmp_path)
+            if not 'author' in data:
+                data['author'] = '未知'
+            if not 'home' in data:
+                data['home'] = 'https://www.bt.cn/bbs/forum-40-1.html'
+            plugin_path = public.getPluginDir() + data['name'] + '/info.json'
+            data['old_version'] = '0'
+            data['tmp_path'] = tmp_path
+            if os.path.exists(plugin_path):
+                try:
+                    old_info = json.loads(public.ReadFile(plugin_path))
+                    data['old_version'] = old_info['versions']
+                except:
+                    pass
+        except:
+            public.execShell("rm -rf " + tmp_path)
+            return public.returnJson(False, '在压缩包中没有找到插件信息,请检查插件包!')
+        return public.getJson(data)
+
+    def inputZipApi(self):
+        plugin_name = request.form.get('plugin_name', '')
+        tmp_path = request.form.get('tmp_path', '')
+
+        if not os.path.exists(tmp_path):
+            return public.returnJson(False, '临时文件不存在,请重新上传!')
+        plugin_path = public.getPluginDir() + '/' + plugin_name
+        if not os.path.exists(plugin_path):
+            print public.execShell('mkdir -p ' + plugin_path)
+        public.execShell("\cp -rf " + tmp_path + '/* ' + plugin_path + '/')
+        public.execShell('chmod -R 755 ' + plugin_path)
+        p_info = public.readFile(plugin_path + '/info.json')
+        if p_info:
+            public.writeLog('软件管理', '安装第三方插件[%s]' %
+                            json.loads(p_info)['title'])
+            return public.returnJson(True, '安装成功!')
+        public.execShell("rm -rf " + plugin_path)
+        return public.returnJson(False, '安装失败!')
     ##### ----- end ----- ###
 
     # 进程是否存在
