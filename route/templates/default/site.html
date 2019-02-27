@@ -20,9 +20,9 @@
 						<p><span class="glyphicon glyphicon-alert" style="color:#f39c12; margin-right:10px;"></span>使用mdserver-web|linux面板创建站点时会自动创建权限配置，统一使用www用户。</p>
 					</div>
 					<button onclick="webAdd(0)" class="btn btn-success btn-sm btn-title" type="button">添加站点</button>&nbsp;
-					<button onclick="siteDefaultPage()" class="btn btn-default btn-sm btn-title" type="button">修改默认页</button>
-					<button onclick="getDefaultSite()" class="btn btn-default btn-sm btn-title" type="button">默认站点</button>
-					<button onclick="getDefaultSite()" class="btn btn-default btn-sm btn-title" type="button">分类管理</button>
+					<button onclick="siteDefaultPage();" class="btn btn-default btn-sm btn-title" type="button">修改默认页</button>
+					<button onclick="getDefaultSite();" class="btn btn-default btn-sm btn-title" type="button">默认站点</button>
+					<button onclick="setClassType();" class="btn btn-default btn-sm btn-title" type="button">分类管理</button>
 					<span id="allDelete" style="float: right;display: none;">
 						<button onclick="allDeleteSite();" class="btn btn-default btn-sm">批量删除</button>
 					</span>
@@ -47,6 +47,14 @@
 						</div>
 						<div class="dataTables_paginate paging_bootstrap pagination">
 							<ul id="webPage" class="page"></ul>
+						</div>
+
+						<div class="site_type">
+							<span>站点分类:</span>
+							<select class="bt-input-text mr5" style="width:100px">
+								<option value="-1">全部分类</option>
+								<option value="0">默认分类</option>
+							</select>
 						</div>
 					</div>
 				</div>
