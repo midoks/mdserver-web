@@ -15,7 +15,7 @@ if public.isAppleSystem():
 
 
 def getPluginName():
-    return 'pureftp'
+    return 'pm2'
 
 
 def getPluginDir():
@@ -30,16 +30,6 @@ def getInitDFile():
     if app_debug:
         return '/tmp/' + getPluginName()
     return '/etc/init.d/' + getPluginName()
-
-
-def getConf():
-    path = getServerDir() + "/etc/pure-ftpd.conf"
-    return path
-
-
-def getInitDTpl():
-    path = getPluginDir() + "/init.d/pure-ftpd.tpl"
-    return path
 
 
 def getArgs():
@@ -59,416 +49,213 @@ def getArgs():
     return tmp
 
 
+def checkArgs(data, ck=[]):
+    for i in range(len(ck)):
+        if not ck[i] in data:
+            return (False, public.returnJson(False, '参数:(' + ck[i] + ')没有!'))
+    return (True, public.returnJson(True, 'ok'))
+
+
 def status():
-    cmd = "ps -ef|grep pure-ftpd |grep -v grep | grep -v python | awk '{print $2}'"
+    cmd = "ps -ef|grep pm2 |grep -v grep | grep -v python | awk '{print $2}'"
     data = public.execShell(cmd)
     if data[0] == '':
         return 'stop'
     return 'start'
 
 
-def contentReplace(content):
-    service_path = public.getServerDir()
-    content = content.replace('{$ROOT_PATH}', public.getRootDir())
-    content = content.replace('{$SERVER_PATH}', service_path)
-    return content
-
-
-def initDreplace():
-
-    file_tpl = getInitDTpl()
-    service_path = os.path.dirname(os.getcwd())
-
-    initD_path = getServerDir() + '/init.d'
-    if not os.path.exists(initD_path):
-        os.mkdir(initD_path)
-    file_bin = initD_path + '/' + getPluginName()
-
-    # initd replace
-    if not os.path.exists(file_bin):
-        content = public.readFile(file_tpl)
-        content = contentReplace(content)
-        public.writeFile(file_bin, content)
-        public.execShell('chmod +x ' + file_bin)
-
-    pureSbinConfig = getServerDir() + "/sbin/pure-config.pl"
-    if not os.path.exists(pureSbinConfig):
-        pureTplConfig = getPluginDir() + "/init.d/pure-config.pl"
-        content = public.readFile(pureTplConfig)
-        content = contentReplace(content)
-        public.writeFile(pureSbinConfig, content)
-        public.execShell('chmod +x ' + pureSbinConfig)
-
-    pureFtpdConfig = getServerDir() + "/etc/pure-ftpd.conf"
-    pureFtpdConfigBak = getServerDir() + "/etc/pure-ftpd.bak.conf"
-    pureFtpdConfigTpl = getPluginDir() + "/conf/pure-ftpd.conf"
-
-    if not os.path.exists(pureFtpdConfigBak):
-        shutil.copyfile(pureFtpdConfig, pureFtpdConfigBak)
-        content = public.readFile(pureFtpdConfigTpl)
-        content = contentReplace(content)
-        public.writeFile(pureFtpdConfig, content)
-
-    return file_bin
-
-
-def start():
-    file = initDreplace()
-    data = public.execShell(file + ' start')
-    if data[1] == '':
-        return 'ok'
-    return data[1]
-
-
-def stop():
-    file = initDreplace()
-    data = public.execShell(file + ' stop')
-    if data[1] == '':
-        return 'ok'
-    return data[1]
-
-
-def restart():
-    file = initDreplace()
-    data = public.execShell(file + ' restart')
-    if data[1] == '':
-        return 'ok'
-    return 'fail'
-
-
-def reload():
-    file = initDreplace()
-    data = public.execShell(file + ' reload')
-    if data[1] == '':
-        return 'ok'
-    return data[1]
-
-
-def initdStatus():
-    if not app_debug:
-        os_name = public.getOs()
-        if os_name == 'darwin':
-            return "Apple Computer does not support"
-    initd_bin = getInitDFile()
-    if os.path.exists(initd_bin):
-        return 'ok'
-    return 'fail'
-
-
-def initdInstall():
-    import shutil
-    if not app_debug:
-        os_name = public.getOs()
-        if os_name == 'darwin':
-            return "Apple Computer does not support"
-
-    source_bin = initDreplace()
-    initd_bin = getInitDFile()
-    shutil.copyfile(source_bin, initd_bin)
-    public.execShell('chmod +x ' + initd_bin)
-    return 'ok'
-
-
-def initdUinstall():
-    if not app_debug:
-        os_name = public.getOs()
-        if os_name == 'darwin':
-            return "Apple Computer does not support"
-    initd_bin = getInitDFile()
-    os.remove(initd_bin)
-    return 'ok'
-
-
-def pftpDB():
-    file = getServerDir() + '/ftps.db'
-    if not os.path.exists(file):
-        conn = public.M('ftps').dbPos(getServerDir(), 'ftps')
-        csql = public.readFile(getPluginDir() + '/conf/ftps.sql')
-        csql_list = csql.split(';')
-        for index in range(len(csql_list)):
-            conn.execute(csql_list[index], ())
-    else:
-        conn = public.M('ftps').dbPos(getServerDir(), 'ftps')
-    return conn
-
-
-def pftpUser():
+def pm2NVMDir():
+    path = '/root/.nvm'
     if public.isAppleSystem():
         user = public.execShell(
             "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
-        return user
-    return 'www'
+        path = '/Users/' + user + '/.nvm'
+    return path
+
+__SR = '''#!/bin/bash
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
+export HOME=/root
+source %s/nvm.sh && ''' % pm2NVMDir()
+__path = getServerDir() + '/list'
 
 
-def pftpAdd(username, password, path):
-    user = pftpUser()
-
-    if not os.path.exists(path):
-        os.makedirs(path)
-        if public.isAppleSystem():
-            os.system('chown ' + user + '.staff ' + path)
-        else:
-            os.system('chown www.www ' + path)
-
-    cmd = getServerDir() + '/bin/pure-pw useradd ' + username + ' -u ' + user + ' -d ' + \
-        path + '<<EOF \n' + password + '\n' + password + '\nEOF'
-    return public.execShell(cmd)
-
-
-def pftpMod(username, password):
-    user = pftpUser()
-    cmd = getServerDir() + '/bin/pure-pw passwd ' + username + \
-        '<<EOF \n' + password + '\n' + password + '\nEOF'
-    return public.execShell(cmd)
-
-
-def pftpStop(username):
-    cmd = getServerDir() + '/bin/pure-pw usermod ' + username + ' -r 1'
-    return public.execShell(cmd)
-
-
-def pftpStart(username):
-    cmd = getServerDir() + '/bin/pure-pw usermod ' + username + " -r ''"
-    return public.execShell(cmd)
-
-
-def pftpReload():
-    public.execShell(getServerDir() + '/bin/pure-pw mkdb ' +
-                     getServerDir() + '/etc/pureftpd.pdb')
-
-
-def getWwwDir():
-    path = public.getWwwDir()
+def pm2LogDir():
+    path = '/root/.pm2'
+    if public.isAppleSystem():
+        user = public.execShell(
+            "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
+        path = '/Users/' + user + '/.pm2'
     return path
 
 
-def getFtpPort():
-    import re
+def pm2Log():
+    path = pm2LogDir() + '/pm2.log'
+    return path
+
+
+def pm2GetList():
     try:
-        file = getServerDir() + '/etc/pure-ftpd.conf'
-        conf = public.readFile(file)
-        rep = "\n#?\s*Bind\s+[0-9]+\.[0-9]+\.[0-9]+\.+[0-9]+,([0-9]+)"
-        port = re.search(rep, conf).groups()[0]
-    except:
-        port = '21'
-    return port
+        tmp = public.execShell("pm2 list|grep -v 'pm2 show'")
+        t2 = tmp[0].replace("│", "").replace("└", "").replace(
+            "─", "").replace("┴", "").replace("┘", "").strip().split("┤")
+        if len(t2) == 1:
+            return []
+        tmpArr = t2[1].strip()
+        if t2[1].find('App name') != -1:
+            tmpArr = t2[2].strip()
+        appList = tmpArr.split('\n')
+        result = []
+        tmp = public.execShell('lsof -c node -P|grep LISTEN')
+        plist = tmp[0].split('\n')
+        for app in appList:
+            if not app:
+                continue
+
+            tmp2 = app.strip().split()
+            appInfo = {}
+            appInfo['name'] = tmp2[0]
+            appInfo['id'] = tmp2[1]
+            appInfo['mode'] = tmp2[3]
+            appInfo['pid'] = tmp2[4]
+            appInfo['status'] = tmp2[5]
+            appInfo['restart'] = tmp2[6]
+            appInfo['uptime'] = tmp2[7]
+            appInfo['cpu'] = tmp2[8]
+            appInfo['mem'] = tmp2[9] + ' ' + tmp2[10]
+            appInfo['user'] = tmp2[11]
+            appInfo['watching'] = tmp2[12]
+            appInfo['port'] = 'OFF'
+            appInfo['path'] = 'OFF'
+            for p in plist:
+                ptmp = p.split()
+                if len(ptmp) < 8:
+                    continue
+                if ptmp[1] == appInfo['pid']:
+                    appInfo['port'] = ptmp[8].split(':')[1].split('->')[0]
+            if os.path.exists(__path + '/' + appInfo['name']):
+                appInfo['path'] = public.readFile(
+                    __path + '/' + appInfo['name'])
+            result.append(appInfo)
+        return result
+    except Exception as e:
+        return []
 
 
-def getFtpList():
+def pm2List():
+    result = pm2GetList()
+    return public.returnJson(True, 'ok', result)
+
+
+def pm2Add():
     args = getArgs()
-    page = 1
-    page_size = 10
-    search = ''
-    if 'page' in args:
-        page = int(args['page'])
+    data = checkArgs(args, ['path', 'run', 'pname'])
+    if not data[0]:
+        return data[1]
 
-    if 'page_size' in args:
-        page_size = int(args['page_size'])
+    path = args['path']
+    run = args['run']
+    pname = args['pname']
 
-    if 'search' in args:
-        search = args['search']
+    runFile = (path + '/' + run).replace('//', '/')
+    if not os.path.exists(runFile):
+        return public.returnJson(False, '指定文件不存在!')
 
-    data = {}
-    conn = pftpDB()
-    limit = str((page - 1) * page_size) + ',' + str(page_size)
-    # print limit, search
-    condition = ''
-    if not search == '':
-        condition = "name like '%" + search + "%'"
-    field = 'id,pid,name,password,path,status,ps,addtime'
-    clist = conn.where(condition, ()).field(
-        field).limit(limit).order('id desc').select()
-
-    count = conn.where(condition, ()).count()
-    _page = {}
-    _page['count'] = count
-    _page['p'] = page
-    _page['row'] = page_size
-    _page['tojs'] = 'ftpList'
-    data['page'] = public.getPage(_page)
-
-    info = {}
-    info['ip'] = public.getLocalIp()
-    info['port'] = getFtpPort()
-    data['info'] = info
-    data['data'] = clist
-
-    return public.getJson(data)
+    nlist = pm2GetList()
+    for node in nlist:
+        if pname == node['name']:
+            return public.returnJson(False, '指定项目名称已经存在!')
+    if os.path.exists(path + '/package.json') and not os.path.exists(path + '/package-lock.json'):
+        public.execShell("cd " + path + ' && npm install -s')
+    public.execShell('cd ' + path + ' && pm2 start ' +
+                     runFile + ' --name "' + pname + '"|grep ' + pname)
+    public.execShell('pm2 save && pm2 startup')
+    if not os.path.exists(__path):
+        public.execShell('mkdir -p ' + __path)
+    public.writeFile(__path + '/' + pname, path)
+    return public.returnJson(True, '添加成功!')
 
 
-def addFtp():
-    import urllib
+def pm2Delete():
     args = getArgs()
-    if not 'ftp_username' in args:
-        return 'ftp_username missing'
+    data = checkArgs(args, ['pname'])
+    if not data[0]:
+        return data[1]
 
-    if not 'ftp_password' in args:
-        return 'ftp_password missing'
-
-    if not 'path' in args:
-        return 'path missing'
-
-    if not 'ps' in args:
-        return 'ps missing'
-
-    path = urllib.unquote(args['path'])
-    user = args['ftp_username']
-    pwd = args['ftp_password']
-    ps = args['ps']
-
-    addtime = time.strftime('%Y-%m-%d %X', time.localtime())
-
-    data = pftpAdd(user, pwd, path)
-    conn = pftpDB()
-    conn.add('pid,name,password,path,status,ps,addtime',
-             (0, user, pwd, path, 1, ps, addtime))
-    pftpReload()
-    if data[1] == '':
-        return 'ok'
-    return data[0]
+    pname = args['pname']
+    cmd = 'pm2 stop "' + pname + '" && pm2 delete "' + \
+        pname + '" | grep "' + pname + '"'
+    result = public.execShell(cmd)[0]
+    if result.find('✓') != -1:
+        public.execShell('pm2 save && pm2 startup')
+        if os.path.exists(__path + '/' + pname):
+            os.remove(__path + '/' + pname)
+        return public.returnJson(True, '删除成功!')
+    return public.returnJson(False, '删除失败!')
 
 
-def delFtp():
+def pm2Stop():
     args = getArgs()
-    if not 'id' in args:
-        return 'ftp_username missing'
+    data = checkArgs(args, ['pname'])
+    if not data[0]:
+        return data[1]
 
-    if not 'username' in args:
-        return 'username missing'
-
-    public.execShell(getServerDir() +
-                     '/bin/pure-pw userdel ' + args['username'])
-    pftpReload()
-    conn = pftpDB()
-    conn.where("id=?", (args['id'],)).delete()
-    public.writeLog('TYPE_FTP', 'FTP_DEL_SUCCESS', (args['username'],))
-    return 'ok'
+    pname = args['pname']
+    result = public.execShell('pm2 stop "' + pname + '"|grep ' + pname)[0]
+    if result.find('stoped') != -1:
+        return public.returnJson(True, '项目[' + pname + ']已停止!')
+    return public.returnJson(True, '项目[' + pname + ']停止失败!')
 
 
-def modFtp():
+def pm2Start():
     args = getArgs()
-    if not 'id' in args:
-        return 'id missing'
+    data = checkArgs(args, ['pname'])
+    if not data[0]:
+        return data[1]
 
-    if not 'name' in args:
-        return 'name missing'
-
-    if not 'password' in args:
-        return 'password missing'
-
-    conn = pftpDB()
-    data = pftpMod(args['name'], args['password'])
-    pftpReload()
-
-    conn.where('id=?', (int(args['id']),)).save(
-        'password', (args['password'],))
-    # print data
-    if data[1] == '':
-        return 'ok'
-    return data[0]
+    pname = args['pname']
+    result = public.execShell('pm2 start "' + pname + '"|grep ' + pname)[0]
+    if result.find('online') != -1:
+        return public.returnJson(True, '项目[' + pname + ']已启动!')
+    return public.returnJson(False, '项目[' + pname + ']启动失败!')
 
 
-def modFtpPort():
+def pm2VerList():
+    # 获取Node版本列表
     import re
-    args = getArgs()
-    if not 'port' in args:
-        return 'port missing'
-    try:
-        port = args['port']
-        if int(port) < 1 or int(port) > 65535:
-            return '端口范围不正确!'
-        file = file = getServerDir() + '/etc/pure-ftpd.conf'
-        conf = public.readFile(file)
-        rep = u"\n#?\s*Bind\s+[0-9]+\.[0-9]+\.[0-9]+\.+[0-9]+,([0-9]+)"
-        # preg_match(rep,conf,tmp)
-        conf = re.sub(
-            rep, "\nBind                         0.0.0.0," + port, conf)
-        public.writeFile(file, conf)
-        restart()
-        return 'ok'
-    except Exception as ex:
-        return str(ex)
+    result = {}
+    rep = 'v\d+\.\d+\.\d+'
 
-
-def stopPort():
-    args = getArgs()
-    if not 'id' in args:
-        return 'id missing'
-
-    if not 'username' in args:
-        return 'username missing'
-
-    if not 'status' in args:
-        return 'status missing'
-
-    data = pftpStop(args['username'])
-    pftpReload()
-    conn = pftpDB()
-    conn.where('id=?', (int(args['id']),)).save(
-        'status', (args['status'],))
-
-    if data[1] == '':
-        return 'ok'
-    return data[0]
-
-
-def startPort():
-    args = getArgs()
-    if not 'id' in args:
-        return 'id missing'
-
-    if not 'username' in args:
-        return 'username missing'
-
-    if not 'status' in args:
-        return 'status missing'
-
-    data = pftpStart(args['username'])
-    pftpReload()
-    conn = pftpDB()
-    conn.where('id=?', (int(args['id']),)).save(
-        'status', (args['status'],))
-
-    if data[1] == '':
-        return 'ok'
-    return data[0]
+    cmd = __SR + ' nvm ls-remote|grep -v v0|grep -v iojs'
+    # print cmd
+    tmp = public.execShell(cmd)
+    result['list'] = re.findall(rep, tmp[0])
+    tmp = public.execShell("nvm version")
+    result['version'] = tmp[0].strip()
+    return public.returnJson(True, 'ok', result)
 
 
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
         print status()
-    elif func == 'start':
-        print start()
-    elif func == 'stop':
-        print stop()
     elif func == 'restart':
         print restart()
     elif func == 'reload':
         print reload()
-    elif func == 'initd_status':
-        print initdStatus()
-    elif func == 'initd_install':
-        print initdInstall()
-    elif func == 'initd_uninstall':
-        print initdUinstall()
-    elif func == 'conf':
-        print getConf()
-    elif func == 'get_www_dir':
-        print getWwwDir()
-    elif func == 'get_ftp_list':
-        print getFtpList()
-    elif func == 'add_ftp':
-        print addFtp()
-    elif func == 'del_ftp':
-        print delFtp()
-    elif func == 'mod_ftp':
-        print modFtp()
-    elif func == 'mod_ftp_port':
-        print modFtpPort()
-    elif func == 'stop_ftp':
-        print stopPort()
-    elif func == 'start_ftp':
-        print startPort()
+    elif func == 'list':
+        print pm2List()
+    elif func == 'add':
+        print pm2Add()
+    elif func == 'delete':
+        print pm2Delete()
+    elif func == 'stop':
+        print pm2Stop()
+    elif func == 'start':
+        print pm2Start()
+    elif func == 'get_logs':
+        print pm2Log()
+    elif func == 'versions':
+        print pm2VerList()
     else:
         print 'error'

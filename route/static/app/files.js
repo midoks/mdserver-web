@@ -465,14 +465,14 @@ function getFiles(Path) {
 		var cutName = getCookie('cutFileName');
 		var isPaste = (copyName == 'null') ? cutName : copyName;
 		if (isPaste != 'null' && isPaste != undefined) {
-			BarTools += ' <button onclick="javascript:PasteFile(\'' + (getFileName(isPaste)) + '\');" class="btn btn-Warning btn-sm">'+lan.files.paste+'</button>';
+			BarTools += ' <button onclick="javascript:pasteFile(\'' + (getFileName(isPaste)) + '\');" class="btn btn-Warning btn-sm">粘贴</button>';
 		}
 		
 		$("#Batch").html('');
 		var BatchTools = '';
 		var isBatch = getCookie('BatchSelected');
 		if (isBatch == 1 || isBatch == '1') {
-			BatchTools += ' <button onclick="javascript:BatchPaste();" class="btn btn-default btn-sm">'+lan.files.paste_all+'</button>';
+			BatchTools += ' <button onclick="javascript:batchPaste();" class="btn btn-default btn-sm">粘贴所有</button>';
 		}
 		$("#Batch").html(BatchTools);
 		$("#setBox").prop("checked", false);

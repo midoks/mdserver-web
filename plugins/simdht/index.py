@@ -113,7 +113,7 @@ def initDreplace():
 
 def status():
     data = public.execShell(
-        "ps -ef|grep \"python simdht_worker.py\" | grep -v grep | awk '{print $2}'")
+        "ps -ef|grep \"simdht_worker.py\" | grep -v grep | awk '{print $2}'")
     if data[0] == '':
         return 'stop'
     return 'start'
