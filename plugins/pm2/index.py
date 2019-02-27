@@ -75,8 +75,8 @@ def pm2NVMDir():
 __SR = '''#!/bin/bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
-export HOME=/root
-source %s/nvm.sh && ''' % pm2NVMDir()
+export HOME=%s
+source %s/nvm.sh && ''' % (getServerDir(), pm2NVMDir())
 __path = getServerDir() + '/list'
 
 
@@ -230,9 +230,74 @@ def pm2VerList():
     # print cmd
     tmp = public.execShell(cmd)
     result['list'] = re.findall(rep, tmp[0])
-    tmp = public.execShell("nvm version")
+    tmp = public.execShell(__SR + "nvm version")
     result['version'] = tmp[0].strip()
     return public.returnJson(True, 'ok', result)
+
+
+def setNodeVersion():
+    args = getArgs()
+    data = checkArgs(args, ['version'])
+    if not data[0]:
+        return data[1]
+    # 切换Node版本
+    version = args['version'].replace('v', '')
+    estr = '''
+export NVM_NODEJS_ORG_MIRROR=http://npm.taobao.org/mirrors/node && nvm install %s
+nvm use %s
+nvm alias default %s
+oldreg=`npm get registry`
+npm config set registry http://registry.npm.taobao.org/
+npm install pm2 -g
+npm config set registry $oldreg 
+''' % (version, version, version)
+    cmd = __SR + estr
+    public.execShell(cmd)
+    return public.returnJson(True, '已切换至[' + version + ']')
+
+
+def getMod():
+    cmd = __SR + "npm list --depth=0 -global"
+    tmp = public.execShell(cmd)
+    modList = tmp[0].replace("│", "").replace("└", "").replace(
+        "─", "").replace("┴", "").replace("┘", "").strip().split()
+    result = []
+    for m in modList:
+        mod = {}
+        tmp = m.split('@')
+        if len(tmp) < 2:
+            continue
+        mod['name'] = tmp[0]
+        mod['version'] = tmp[1]
+        result.append(mod)
+
+    return public.returnJson(True, 'OK', result)
+
+
+# 安装库
+def installMod():
+    args = getArgs()
+    data = checkArgs(args, ['mname'])
+    if not data[0]:
+        return data[1]
+
+    mname = args['mname']
+    public.execShell(__SR + 'npm install ' + mname + ' -g')
+    return public.returnJson(True, '安装成功!')
+
+
+def uninstallMod():
+    args = getArgs()
+    data = checkArgs(args, ['mname'])
+    if not data[0]:
+        return data[1]
+
+    mname = args['mname']
+    myNot = ['pm2', 'npm']
+    if mname in myNot:
+        return public.returnJson(False, '不能卸载[' + mname + ']')
+    public.execShell(__SR + 'npm uninstall ' + mname + ' -g')
+    return public.returnJson(True, '卸载成功!')
 
 
 if __name__ == "__main__":
@@ -257,5 +322,13 @@ if __name__ == "__main__":
         print pm2Log()
     elif func == 'versions':
         print pm2VerList()
+    elif func == 'set_node_version':
+        print setNodeVersion()
+    elif func == 'mod_list':
+        print getMod()
+    elif func == 'install_mod':
+        print installMod()
+    elif func == 'uninstall_mod':
+        print uninstallMod()
     else:
         print 'error'

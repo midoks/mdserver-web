@@ -11,12 +11,12 @@ serverPath=$(dirname "$rootPath")
 
 install_tmp=${rootPath}/tmp/bt_install.pl
 
-npm install pm2 -g
-curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash
-
 Install_pm2()
 {
 	echo '正在安装脚本文件...' > $install_tmp
+	npm install pm2 -g
+	curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash
+
 	mkdir -p $serverPath/pm2
 	echo '1.0' > $serverPath/pm2/version.pl
 	echo '安装完成' > $install_tmp
