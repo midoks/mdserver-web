@@ -117,8 +117,10 @@ function getNodeVersions(){
     });
 
     pm2Post('versions', '', function(data){
-    	console.log(data);
-    	return;
+    	
+    	var rdata = $.parseJSON(data.data);
+        console.log(rdata);
+        var versions = rdata.data;
 
     	var opt = '';
         for(var i=0;i<versions.list.length;i++){
@@ -130,15 +132,108 @@ function getNodeVersions(){
         }
         var con = '<div class="divtable" style="width: 620px;">\
 		                <span>当前版本</span><select style="margin-left: 5px;width:100px;" class="bt-input-text" name="versions">'+opt+'</select>\
-		                <button style="margin-bottom: 3px;margin-left: 5px;" class="btn btn-success btn-sm" onclick="SetNodeVersion()">切换版本</button>\
+		                <button style="margin-bottom: 3px;margin-left: 5px;" class="btn btn-success btn-sm" onclick="setNodeVersion()">切换版本</button>\
 		                <ul class="help-info-text c7 mtb15">\
 		                    <li>当前版本为<font style="color:red;">['+versions.version+']</font></li>\
 		                    <li>版本切换是全局的,切换版本后可能影响您正在运行的项目</li>\
 		                </ul>\
                    </div>';
-        // $("#webEdit-con").html(con);
-
         $(".soft-man-con").html(con);
+    });
+}
+
+
+//切换版本
+function setNodeVersion(){
+    var version = $("select[name='versions']").val();
+    var data = "version="+version;
+    pm2Post('set_node_version', data, function(data){
+        var rdata = $.parseJSON(data.data);
+        layer.msg(rdata.msg,{icon:rdata.status?1:2});
+        if(rdata.status) {
+            getNodeVersions();
+        }
+    });
+}
+
+
+//取模块列表
+function getModList(){
+    var con = '<div class="divtable" style="width: 620px;">\
+                <input class="bt-input-text mr5" name="mname" type="text" value="" style="width:240px" placeholder="模块名称" />\
+                <button class="btn btn-default btn-sm va0" onclick="installMod();">安装</button>\
+                <table class="table table-hover" style="margin-top: 10px; max-height: 380px; overflow: auto;">\
+                    <thead>\
+                        <tr>\
+                            <th>名称</th>\
+                            <th>版本</th>\
+                            <th style="text-align: right;">操作</th>\
+                        </tr>\
+                    </thead>\
+                    <tbody id="modlist"></tbody>\
+                </table>\
+                <ul class="help-info-text c7 mtb15">\
+                    <li>此处安装的模块均为安装到全局.</li>\
+                    <li>仅安装到当前正在使用的nodejs版本.</li>\
+                </ul>\
+            </div>';
+
+    $(".soft-man-con").html(con);
+
+    pm2Post('mod_list', '', function(data){
+        var rdata = $.parseJSON(data.data);
+        var tbody = '';
+        var tmp = rdata['data'];
+        for(var i=0;i<tmp.length;i++){
+            tbody += '<tr>\
+                        <td>'+tmp[i].name+'</td>\
+                        <td>'+tmp[i].version+'</td>\
+                        <td style="text-align: right;">\
+                            <a href="#" class="btlink" onclick="uninstallMod(\''+tmp[i].name+'\')">卸载</a>\
+                        </td>\
+                    </tr>';
+        }
+        $("#modlist").html(tbody);
+    });
+}
+
+
+//安装模块
+function installMod(){
+    var mname = $("input[name='mname']").val();
+    if(!mname){
+        layer.msg('模块名称不能为空!',{icon:2});
+        return;
+    }
+    
+    // var loadT = layer.msg('正在安装模块['+mname+']...',{icon:16,time:0,shade: [0.3, '#000']});
+    // $.post('/plugin?action=a&s=InstallMod&name=pm2',data,function(rdata){
+    //     layer.close(loadT);
+    //     layer.msg(rdata.msg,{icon:rdata.status?1:2});
+    //     if(rdata.status) GetModList();
+    // });
+    
+    var data = {mname:mname};
+    pm2Post('install_mod', data, function(data){
+        var rdata = $.parseJSON(data.data);
+        layer.msg(rdata.msg,{icon:rdata.status?1:2});
+        if(rdata.status) {
+            getModList();
+        }
+    });
+}
+
+
+function uninstallMod(mname){
+    safeMessage('卸载模块['+mname+']','卸载['+mname+']模块后,可能影响现有项目,继续吗?',function(){
+        var data = "mname="+mname;
+        pm2Post('uninstall_mod', data, function(data){
+            var rdata = $.parseJSON(data.data);
+            layer.msg(rdata.msg,{icon:rdata.status?1:2});
+            if(rdata.status) {
+                getModList();
+            }
+        });
     });
 }
 
