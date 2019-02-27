@@ -101,7 +101,7 @@ function getWeb(page, search) {
             });
 		}
 		if(body.length < 10){
-			body = "<tr><td colspan='8'>"+lan.site.site_no_data+"</td></tr>";
+			body = "<tr><td colspan='8'>当前没有站点数据</td></tr>";
 			$(".dataTables_paginate").hide();
 			$("#webBody").html(body);
 		}
@@ -113,6 +113,7 @@ function getWeb(page, search) {
 		});
 		//输出分页
 		$("#webPage").html(data.page);
+		// $("#webPage").html('<div class="site_type"><span>站点分类:</span><select class="bt-input-text mr5" style="width:100px"><option value="-1">全部分类</option><option value="0">默认分类</option></select></div>');
 		
 		$(".btlinkbed").click(function(){
 			var dataid = $(this).attr("data-id");
@@ -2183,6 +2184,7 @@ function setRewrite(filename){
 	},'json');
 }
 var aindex = null;
+
 //保存为模板
 function setRewriteTel(act){
 	if(act != undefined){
@@ -2207,7 +2209,7 @@ function setRewriteTel(act){
 		shift: 5,
 		closeBtn: 2,
 		area: '320px', //宽高
-		title: lan.site.save_rewrite_temp,
+		title: '保存为Rewrite模板',
 		content: '<div class="bt-form pd20 pb70">\
 					<div class="line">\
 						<input type="text" class="bt-input-text" name="rewriteName" id="rewriteName" value="" placeholder="'+lan.site.template_name+'" style="width:100%" />\
@@ -2237,7 +2239,7 @@ function siteDefaultPage(){
 		content: '<div class="changeDefault pd20">\
 						<button class="btn btn-default btn-sm mg10" style="width:188px" onclick="changeDefault(1)">默认文档</button>\
 						<button class="btn btn-default btn-sm mg10" style="width:188px" onclick="changeDefault(2)">404错误页</button>\
-							<button class="btn btn-default btn-sm mg10" style="width:188px" onclick="changeDefault('+(stype=='nginx'?3:4)+')">'+(stype=='nginx'?'Nginx':'Apache')+'空白页</button>\
+						<button class="btn btn-default btn-sm mg10" style="width:188px" onclick="changeDefault('+(stype=='nginx'?3:4)+')">'+(stype=='nginx'?'Nginx':'Apache')+'空白页</button>\
 						<button class="btn btn-default btn-sm mg10" style="width:188px" onclick="changeDefault(5)">默认站点停止页</button>\
 				</div>'
 	});
@@ -2264,3 +2266,75 @@ function changeDefault(type){
 	}
 	onlineEditFile(0,vhref);
 }
+
+function setClassType(){
+	$.post('/site/get_site_types',function(rdata){
+		var list = '',name ='';
+		for (var i = 0; i<rdata.length; i++) {
+			name = rdata[i]['name'];
+			list +='<tr><td>' + name + '</td>\
+				<td><a class="btlink edit_type" href="javascript:;">编辑</a> | <a class="btlink del_type" onclick="removeClassType(\''+rdata[i]['id']+'\',\''+name+'\')">删除</a>\
+				</td></tr>';
+		}
+
+		layer.open({
+			type: 1,
+			area: '350px',
+			title: '网站分类管理',
+			closeBtn: 2,
+			shift: 0,
+			content: '<div class="bt-form edit_site_type">\
+					<div class="divtable mtb15" style="overflow:auto">\
+						<div class="line "><div class="info-r  ml0">\
+							<input name="type_name" class="bt-input-text mr5 type_name" placeholder="请填写分类名称" type="text" style="width:50%" value=""><button name="btn_submit" class="btn btn-success btn-sm mr5 ml5 btn_submit" onclick="addClassType();">添加</button></div>\
+						</div>\
+						<table id="type_table" class="table table-hover" width="100%">\
+							<thead><tr><th>名称</th><th width="80px">操作</th></tr></thead>\
+							<tbody>'+list+'</tbody>\
+						</table>\
+					</div>\
+				</div>'
+		});
+	},'json');
+}
+
+function addClassType(){
+	var name = $("input[name=type_name]").val();
+	$.post('/site/add_site_type','name='+name, function(rdata){
+		showMsg(rdata.msg,function(){
+			if (rdata.status){
+				layer.closeAll();
+				setClassType();
+			}
+		},{icon:rdata.status?1:2});
+		// layer.msg(rdata.msg,{icon:rdata.status?1:2});
+	},'json');
+}
+
+function removeClassType(id,name){
+	if (id == 0){
+		layer.msg('默认分类不可删除/不可编辑!',{icon:2});
+		return;
+	}
+	layer.confirm('是否确定删除分类？',{title: '删除分类【'+ name +'】' }, function(){
+		$.post('/site/remove_site_type','id='+id, function(rdata){
+			showMsg(rdata.msg,function(){
+				if (rdata.status){
+					layer.closeAll();
+					setClassType();
+				}
+			},{icon:rdata.status?1:2});
+		},'json');
+	});
+}
+
+
+
+
+
+
+
+
+
+
+
