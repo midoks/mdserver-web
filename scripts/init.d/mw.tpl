@@ -8,9 +8,18 @@ mw_start(){
 	if [ "$isStart" == '' ];then
             echo -e "Starting mw... \c"
             cd $mw_path && gunicorn -c setting.py app:app
-            sleep 0.2
             port=$(cat ${mw_path}/data/port.pl)
-            isStart=$(lsof -i :$port|grep LISTEN)
+            isStart=""
+            while [[ "$isStart" == "" ]];
+            do
+                echo -e ".\c"
+                sleep 0.5
+                isStart=$(lsof -n -P -i:$port|grep LISTEN|grep -v grep|awk '{print $2}'|xargs)
+                let n+=1
+                if [ $n -gt 8 ];then
+                    break;
+                fi
+            done
             if [ "$isStart" == '' ];then
                     echo -e "\033[31mfailed\033[0m"
                     echo '------------------------------------------------------'
