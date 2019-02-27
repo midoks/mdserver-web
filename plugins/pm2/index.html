@@ -1,11 +1,10 @@
 <div class="bt-form">
 	<div class="bt-w-main">
 		<div class="bt-w-menu">
-			<p class="bgw" onclick="pluginService('pm2');">服务</p>
-			<p onclick="pluginInitD('pm2');">项目列表</p>
-			<p onclick="pluginConfig('pm2');">Node版本</p>
+			<p class="bgw" onclick="pm2List();">项目列表</p>
+			<p onclick="getNodeVersions();">Node版本</p>
 			<p onclick="redisStatus();">模版管理</p>
-			<p onclick="pluginLogs('pm2','','run_log');">日志管理</p>
+			<p onclick="pluginLogs('pm2', '','get_logs');">日志管理</p>
 		</div>
 		<div class="bt-w-con pd15">
 			<div class="soft-man-con"></div>
@@ -13,4 +12,10 @@
 	</div>
 </div>
 <script type="text/javascript">
+
+resetPluginWinWidth(760);
+$.getScript( "/plugins/file?name=pm2&f=js/pm2.js", function(){
+	pm2List();
+});
 </script>
+

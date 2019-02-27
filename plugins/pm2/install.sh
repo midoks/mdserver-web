@@ -12,6 +12,7 @@ serverPath=$(dirname "$rootPath")
 install_tmp=${rootPath}/tmp/bt_install.pl
 
 npm install pm2 -g
+curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash
 
 Install_pm2()
 {
