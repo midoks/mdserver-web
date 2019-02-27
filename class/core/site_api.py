@@ -1107,9 +1107,58 @@ class site_api:
                 proxylist.append(i)
         return public.getJson(proxylist)
 
+    def getSiteTypesApi(self):
+        # 取网站分类
+        data = public.M("site_types").field("id,name").order("id asc").select()
+        data.insert(0, {"id": 0, "name": "默认分类"})
+        return public.getJson(data)
+
+    def addSiteTypeApi(self):
+        name = request.form.get('name', '').strip().encode('utf-8')
+        if not name:
+            return public.returnJson(False, "分类名称不能为空")
+        if len(name) > 18:
+            return public.returnJson(False, "分类名称长度不能超过6个汉字或18位字母")
+        if public.M('site_types').count() >= 10:
+            return public.returnJson(False, '最多添加10个分类!')
+        if public.M('site_types').where('name=?', (name,)).count() > 0:
+            return public.returnJson(False, "指定分类名称已存在!")
+        public.M('site_types').add("name", (name,))
+        return public.returnJson(True, '添加成功!')
+
+    def removeSiteTypeApi(self):
+        mid = request.form.get('id', '').encode('utf-8')
+        if public.M('site_types').where('id=?', (mid,)).count() == 0:
+            return public.returnJson(False, "指定分类不存在!")
+        public.M('site_types').where('id=?', (mid,)).delete()
+        public.M("sites").where("type_id=?", (mid,)).save("type_id", (0,))
+        return public.returnJson(True, "分类已删除!")
+
+    def modifySiteTypeNameApi(self):
+        # 修改网站分类名称
+        name = request.form.get('name', '').strip().encode('utf-8')
+        if not name:
+            return public.returnJson(False, "分类名称不能为空")
+        if len(name) > 18:
+            return public.returnJson(False, "分类名称长度不能超过6个汉字或18位字母")
+        if public.M('site_types').where('id=?', (get.id,)).count() == 0:
+            return public.returnJson(False, "指定分类不存在!")
+        public.M('site_types').where(
+            'id=?', (get.id,)).setField('name', get.name)
+        return public.returnJson(True, "修改成功!")
+
+    def setSiteTypeApi(self):
+        # 设置指定站点的分类
+        site_ids = request.form.get('site_ids', '').encode('utf-8')
+        mid = request.form.get('id', '').encode('utf-8')
+        site_ids = json.loads(site_ids)
+        for sid in site_ids:
+            public.M('sites').where('id=?', (sid,)).setField('type_id', mid)
+        return public.returnJson(True, "设置成功!")
+
     ##### ----- end   ----- ###
 
-    # 域名编码转换
+        # 域名编码转换
     def toPunycode(self, domain):
         import re
         if sys.version_info[0] == 2:
