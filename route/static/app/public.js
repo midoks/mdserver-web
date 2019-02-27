@@ -22,6 +22,16 @@ function toSizeM(byteLen) {
     return a || 0;
 }
 
+//字节单位转换MB
+function toSizeG(bytes){
+	var c = 1024 * 1024;
+	var b = 0;
+	if(bytes > 0){
+		var b = (bytes/c).toFixed(2);
+	}
+	return b;
+}
+
 function randomStrPwd(b) {
 	b = b || 32;
 	var c = "AaBbCcDdEeFfGHhiJjKkLMmNnPpRSrTsWtXwYxZyz2345678";
@@ -724,11 +734,14 @@ function GetTaskList(a) {
 	})
 }
 
+
+//获取任务总数
 function getTaskCount() {
 	$.get("/task/count", "", function(a) {
 		$(".task").text(a)
 	})
 }
+getTaskCount();
 
 function setSelectChecked(c, d) {
 	var a = document.getElementById(c);
@@ -739,7 +752,6 @@ function setSelectChecked(c, d) {
 		}
 	}
 }
-getTaskCount();
 
 function jump() {
 	layer.closeAll();
@@ -779,7 +791,7 @@ function fly(a) {
 				layer.msg(lan.bt.task_add, {
 					icon: 1
 				});
-				getTaskCount()
+				getTaskCount();
 			}
 		});
 	});
@@ -790,13 +802,16 @@ function fly(a) {
 function checkSelect(){
 	setTimeout(function(){
 		var checkList = $("input[name=id]");
+		console.log(checkList);
 		var count = 0;
 		for(var i=0;i<checkList.length;i++){
-			if(checkList[i].checked) count++;
+			if(checkList[i].checked) {
+				count++;
+			}
 		}
 		if(count > 0){
 			$("#allDelete").show();
-		}else{
+		} else {
 			$("#allDelete").hide();
 		}
 	},5);
@@ -811,20 +826,8 @@ function listOrder(skey,type,obj){
 			orderType = 'asc';
 		}
 	}
-	
 	setCookie('order',skey + ' ' + orderType);
-	
-	switch(type){
-		case 'site':
-			getWeb(1);
-			break;
-		case 'database':
-			getData(1);
-			break;
-		case 'ftp':
-			getFtp(1);
-			break;
-	}
+	getWeb(1);
 	$(obj).find(".glyphicon-triangle-bottom").remove();
 	$(obj).find(".glyphicon-triangle-top").remove();
 	if(orderType == 'asc'){
