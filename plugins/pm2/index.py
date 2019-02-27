@@ -64,28 +64,29 @@ def status():
     return 'start'
 
 
-def pm2NVMDir():
-    path = '/root/.nvm'
+def rootDir():
+    path = '/root'
     if public.isAppleSystem():
         user = public.execShell(
             "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
-        path = '/Users/' + user + '/.nvm'
+        path = '/Users/' + user
+    return path
+
+
+def pm2NVMDir():
+    path = rootDir() + '/.nvm'
     return path
 
 __SR = '''#!/bin/bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 export HOME=%s
-source %s/nvm.sh && ''' % (getServerDir(), pm2NVMDir())
+source %s/nvm.sh && ''' % (rootDir(), pm2NVMDir())
 __path = getServerDir() + '/list'
 
 
 def pm2LogDir():
-    path = '/root/.pm2'
-    if public.isAppleSystem():
-        user = public.execShell(
-            "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
-        path = '/Users/' + user + '/.pm2'
+    path = rootDir() + '/.pm2'
     return path
 
 
