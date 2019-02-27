@@ -1,0 +1,15 @@
+{
+	"title":"PM2管理器",
+	"tip":"soft",
+	"name":"pm2",
+	"type":"运行环境",
+	"ps":"node.js管理器，内置 node.js + npm + nvm + pm2.!",
+	"versions":["4.4.15","4.8.4"],
+	"updates":["4.4.15","4.8.4"],
+	"shell":"install.sh",
+	"checks":"server/pm2",
+	"author":"pm2",
+	"home":"http://pm2.keymetrics.io/",
+	"date":"2019-02-27",
+	"pid": "4"
+}
