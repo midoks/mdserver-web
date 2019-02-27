@@ -151,7 +151,7 @@ function nginxSoftMain(name, version) {
         layer.open({
             type: 1,
             area: '640px',
-            title: name + lan.soft.admin,
+            title: name + '管理',
             closeBtn: 2,
             shift: 0,
             content: '<div class="bt-w-main" style="width:640px;">\

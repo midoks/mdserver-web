@@ -1137,14 +1137,14 @@ class site_api:
     def modifySiteTypeNameApi(self):
         # 修改网站分类名称
         name = request.form.get('name', '').strip().encode('utf-8')
+        mid = request.form.get('id', '').encode('utf-8')
         if not name:
             return public.returnJson(False, "分类名称不能为空")
         if len(name) > 18:
             return public.returnJson(False, "分类名称长度不能超过6个汉字或18位字母")
-        if public.M('site_types').where('id=?', (get.id,)).count() == 0:
+        if public.M('site_types').where('id=?', (mid,)).count() == 0:
             return public.returnJson(False, "指定分类不存在!")
-        public.M('site_types').where(
-            'id=?', (get.id,)).setField('name', get.name)
+        public.M('site_types').where('id=?', (mid,)).setField('name', name)
         return public.returnJson(True, "修改成功!")
 
     def setSiteTypeApi(self):

@@ -2267,13 +2267,29 @@ function changeDefault(type){
 	onlineEditFile(0,vhref);
 }
 
+
+function getClassType(){
+	var select = $('.site_type > select');
+	$.post('/site/get_site_types',function(rdata){
+		$(select).html('');
+		$(select).append('<option value="-1">全部分类</option>');
+		for (var i = 0; i<rdata.length; i++) {
+			$(select).append('<option value="'+rdata[i]['id']+'">'+rdata[i]['name']+'</option>');
+		}
+	},'json');
+}
+getClassType();
+
+
+
+
 function setClassType(){
 	$.post('/site/get_site_types',function(rdata){
-		var list = '',name ='';
+
+		var list = '';
 		for (var i = 0; i<rdata.length; i++) {
-			name = rdata[i]['name'];
-			list +='<tr><td>' + name + '</td>\
-				<td><a class="btlink edit_type" href="javascript:;">编辑</a> | <a class="btlink del_type" onclick="removeClassType(\''+rdata[i]['id']+'\',\''+name+'\')">删除</a>\
+			list +='<tr><td>' + rdata[i]['name'] + '</td>\
+				<td><a class="btlink edit_type" onclick="editClassType(\''+rdata[i]['id']+'\',\''+rdata[i]['name']+'\')">编辑</a> | <a class="btlink del_type" onclick="removeClassType(\''+rdata[i]['id']+'\',\''+rdata[i]['name']+'\')">删除</a>\
 				</td></tr>';
 		}
 
@@ -2295,6 +2311,8 @@ function setClassType(){
 					</div>\
 				</div>'
 		});
+
+
 	},'json');
 }
 
@@ -2305,9 +2323,9 @@ function addClassType(){
 			if (rdata.status){
 				layer.closeAll();
 				setClassType();
+				getClassType();
 			}
 		},{icon:rdata.status?1:2});
-		// layer.msg(rdata.msg,{icon:rdata.status?1:2});
 	},'json');
 }
 
@@ -2322,9 +2340,48 @@ function removeClassType(id,name){
 				if (rdata.status){
 					layer.closeAll();
 					setClassType();
+					getClassType();
 				}
 			},{icon:rdata.status?1:2});
 		},'json');
+	});
+}
+
+function editClassType(id,name){
+	if (id == 0){
+		layer.msg('默认分类不可删除/不可编辑!',{icon:2});
+		return;
+	}
+
+	layer.open({
+		type: 1,
+		area: '350px',
+		title: '修改分类管理【' + name + '】',
+		closeBtn: 2,
+		shift: 0,
+		content: "<form class='bt-form bt-form pd20 pb70' id='mod_pwd'>\
+                    <div class='line'>\
+                        <span class='tname'>分类名称</span>\
+                        <div class='info-r'><input name=\"site_type_mod\" class='bt-input-text mr5' type='text' value='"+name+"' /></div>\
+                    </div>\
+                    <div class='bt-form-submit-btn'>\
+                        <button id='site_type_mod' type='button' class='btn btn-success btn-sm btn-title'>提交</button>\
+                    </div>\
+                  </form>"
+	});
+
+	$('#site_type_mod').unbind().click(function(){
+		var _name = $('input[name=site_type_mod]').val();
+		$.post('/site/modify_site_type_name','id='+id+'&name='+_name, function(rdata){
+			showMsg(rdata.msg,function(){
+				if (rdata.status){
+					layer.closeAll();
+					setClassType();
+					getClassType();
+				}
+			},{icon:rdata.status?1:2});
+		},'json');
+
 	});
 }
 
