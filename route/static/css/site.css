@@ -1083,10 +1083,11 @@ html .menu .menu_exit:hover {
 .dataTables_paginate {
     display: block;
     height: 30px;
-    margin-bottom: 10px;
-    margin-top: 15px;
+    margin-bottom: 0px;
+    margin-top: 0px;
     position:relative;
 }
+
 #filePage{
     margin-bottom: 10px;
 }
@@ -1100,10 +1101,11 @@ html .menu .menu_exit:hover {
     border-top: none;
     margin: 0;
 }
-.site_type{
+
+.site_type {
     height: 30px;
     line-height: 30px;
-    bottom: 8px;
+    bottom: -9px;
     position: absolute;
 }
 
@@ -1120,6 +1122,7 @@ html .menu .menu_exit:hover {
     border-right: none;
     /* border: 1px solid #ececec; */
 }
+
 .site_type select{
     border-radius: 0px;
 }
