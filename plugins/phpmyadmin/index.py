@@ -45,7 +45,7 @@ def getArgs():
 
 
 def getConf():
-    return public.getServerDir() + '/openresty/nginx/conf/vhost/phpmyadmin.conf'
+    return public.getServerDir() + '/web_conf/nginx/vhost/phpmyadmin.conf'
 
 
 def getPort():
