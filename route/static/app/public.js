@@ -1536,6 +1536,7 @@ function pluginOpService(a, b, v) {
         $.post("/plugins/run", c, function(g) {
             layer.close(e);
             
+            
             var f = g.data == 'ok' ? msgTpl('{1}{2}服务已{3}',[a,v,d]) : msgTpl('{1}{2}服务{3}失败!',[a,v,d]);
             layer.msg(f, {icon: g.data == 'ok' ? 1 : 2});
             
@@ -1550,14 +1551,17 @@ function pluginOpService(a, b, v) {
             if( g.status && g.data != 'ok' ) {
                 layer.msg(g.data, {icon: 2,time: 3000,shade: 0.3,shadeClose: true});
             }
-   
+
+            setTimeout(function(){
+            	location.reload();
+            },2000);
+  
         },'json').error(function() {
             layer.close(e);
             layer.msg('操作异常!', {icon: 1});
         });
     })
 }
-
 
 //配置修改 --- start
 function pluginConfig(_name, version, func){
