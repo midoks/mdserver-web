@@ -64,7 +64,7 @@ function pm2List() {
 
 	pm2Post('list','', function(data){
 		var rdata = $.parseJSON(data.data);
-		console.log(rdata);
+		// console.log(rdata);
 		if (!rdata['status']){
             layer.msg(rdata['msg'],{icon:2,time:2000,shade: [0.3, '#000']});
             return;

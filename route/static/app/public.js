@@ -1524,7 +1524,6 @@ function pluginOpService(a, b, v) {
     }
 
     var d = "";
-
     switch(b) {
         case "stop":d = '停止';break;
         case "start":d = '启动';break;
@@ -1555,7 +1554,6 @@ function pluginOpService(a, b, v) {
             setTimeout(function(){
             	location.reload();
             },2000);
-  
         },'json').error(function() {
             layer.close(e);
             layer.msg('操作异常!', {icon: 1});
