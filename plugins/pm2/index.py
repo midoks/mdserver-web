@@ -97,7 +97,7 @@ def pm2Log():
 
 def pm2GetList():
     try:
-        tmp = public.execShell("pm2 list|grep -v 'pm2 show'")
+        tmp = public.execShell(__SR + "pm2 list|grep -v 'pm2 show'")
         t2 = tmp[0].replace("│", "").replace("└", "").replace(
             "─", "").replace("┴", "").replace("┘", "").strip().split("┤")
         if len(t2) == 1:
