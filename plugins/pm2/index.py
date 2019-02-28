@@ -301,6 +301,48 @@ def uninstallMod():
     return public.returnJson(True, '卸载成功!')
 
 
+def nodeLogRun():
+    args = getArgs()
+    data = checkArgs(args, ['pname'])
+    if not data[0]:
+        return data[1]
+
+    pname = args['pname']
+    return pm2LogDir() + '/logs/' + pname + '-out.log'
+
+
+def nodeLogErr():
+    args = getArgs()
+    data = checkArgs(args, ['pname'])
+    if not data[0]:
+        return data[1]
+
+    pname = args['pname']
+    return pm2LogDir() + '/logs/' + pname + '-error.log'
+
+
+def nodeLogClearRun():
+    args = getArgs()
+    data = checkArgs(args, ['pname'])
+    if not data[0]:
+        return data[1]
+
+    pname = args['pname']
+    path = pm2LogDir() + '/logs/' + pname + '-out.log'
+    public.execShell('rm -rf ' + path + '&& touch ' + path)
+    return public.returnJson(True, '清空运行成功')
+
+
+def nodeLogClearErr():
+    args = getArgs()
+    data = checkArgs(args, ['pname'])
+    if not data[0]:
+        return data[1]
+    pname = args['pname']
+    path = pm2LogDir() + '/logs/' + pname + '-error.log'
+    public.execShell('rm -rf ' + path + '&& touch ' + path)
+    return public.returnJson(True, '清空错误成功')
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -321,6 +363,14 @@ if __name__ == "__main__":
         print pm2Start()
     elif func == 'get_logs':
         print pm2Log()
+    elif func == 'node_log_run':
+        print nodeLogRun()
+    elif func == 'node_log_err':
+        print nodeLogErr()
+    elif func == 'node_log_clear_run':
+        print nodeLogClearRun()
+    elif func == 'node_log_clear_err':
+        print nodeLogClearErr()
     elif func == 'versions':
         print pm2VerList()
     elif func == 'set_node_version':

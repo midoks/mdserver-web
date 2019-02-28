@@ -1852,6 +1852,59 @@ function pluginLogs(_name, version, func, line){
         },'json');
     },'json');
 }
+
+
+function pluginRollingLogs(_name, version, func, _args, line){
+	if ( typeof(version) == 'undefined' ){
+        version = '';
+    }
+
+    var func_name = 'error_log';
+    if ( typeof(func) != 'undefined' ){
+        func_name = func;
+    }
+
+    var file_line = 100;
+    if ( typeof(line) != 'undefined' ){
+        file_line = line;
+    }
+
+    var reqTimer = null;
+
+    layer.open({
+        type: 1,
+        title: _name + '日志',
+        area: '640px',
+        end: function(){
+        	// console.log('end!!!');
+        	if (reqTimer){
+        		clearInterval(reqTimer);
+        	}
+        },
+        content:'<div class="change-default pd20" id="plugins_rolling_logs">\
+        	<textarea readonly="readonly" style="margin: 0px;width: 100%;height: 360px;background-color: #333;color:#fff; padding:0 5px" id="roll_info_log"></textarea>\
+        	</div>'
+    });
+
+    $.post('/plugins/run', {name:_name, func:func_name, version:version,args:_args},function (data) {
+    	var fileName = data.data;
+    	reqTimer = setInterval(function(){
+    		$.post('/files/get_last_body', 'path=' + fileName+'&line='+file_line, function(rdata) {
+	            if (!rdata.status){   
+	                return;
+	            }
+	            
+	            if(rdata.data == '') {
+	            	rdata.data = '当前没有日志!';
+	            }
+	            var ebody = '<textarea readonly="" style="margin: 0px;width: 100%;height: 360px;background-color: #333;color:#fff; padding:0 5px" id="roll_info_log">'+rdata.data+'</textarea>';
+	            $("#plugins_rolling_logs").html(ebody);
+	            var ob = document.getElementById('roll_info_log');
+	            ob.scrollTop = ob.scrollHeight; 
+	        },'json');
+    	},1000);
+    },'json');
+}
 /*** 其中功能,针对插件通过库使用 end ***/
 
 
