@@ -19,10 +19,14 @@ Install_l2tp()
 	mkdir -p $serverPath/l2tp
 	echo '1.0' > $serverPath/l2tp/version.pl
 
+	cp -rf scripts/l2tp.sh $serverPath/l2tp
+
 	if [ "Darwin" == "$SYSOS" ];then
 		echo 'macosx unavailable' > $install_tmp
 		exit 0 
 	fi
+
+	#cp -rf $serverPath/l2tp
 
 	echo 'install complete' > $install_tmp
 }
