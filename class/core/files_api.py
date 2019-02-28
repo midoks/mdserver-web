@@ -310,7 +310,7 @@ done
             if os.path.exists('data/recycle_bin.pl'):
                 if self.mvRecycleBin(path):
                     return public.returnJson(True, '已将文件移动到回收站!')
-            os.remove(path)
+            public.execShell('rm -rf ' + path)
             public.writeLog('文件管理', '删除文件成功！', (path,))
             return public.returnJson(True, '删除文件成功!')
         except:
