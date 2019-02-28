@@ -84,19 +84,37 @@ def status():
     return 'start'
 
 
-def contentReplace(content):
-    user = 'root'
+def getHomeDir():
     if public.isAppleSystem():
         user = public.execShell(
             "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
-        content = content.replace('{$HOME_DIR}', '/Users/' + user)
+        return '/Users/' + user
     else:
-        content = content.replace('{$HOME_DIR}', '/root')
+        return '/root'
+
+
+def getRunUser():
+    if public.isAppleSystem():
+        user = public.execShell(
+            "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
+        return user
+    else:
+        return 'root'
+
+__SR = '''#!/bin/bash
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
+export USER=%s
+export HOME=%s && ''' % ( getRunUser(), getHomeDir())
+
+
+def contentReplace(content):
 
     service_path = public.getServerDir()
     content = content.replace('{$ROOT_PATH}', public.getRootDir())
     content = content.replace('{$SERVER_PATH}', service_path)
-    content = content.replace('{$RUN_USER}', user)
+    content = content.replace('{$RUN_USER}', getRunUser())
+    content = content.replace('{$HOME_DIR}', getHomeDir())
 
     return content
 
@@ -221,7 +239,7 @@ def start():
     if not data['status']:
         return data['msg']
 
-    data = public.execShell(file + ' start')
+    data = public.execShell(__SR + file + ' start')
     if data[1] == '':
         return 'ok'
     return data[0]
@@ -229,7 +247,7 @@ def start():
 
 def stop():
     file = initDreplace()
-    data = public.execShell(file + ' stop')
+    data = public.execShell(__SR + file + ' stop')
     if data[1] == '':
         return 'ok'
     return data[1]
@@ -237,7 +255,7 @@ def stop():
 
 def restart():
     file = initDreplace()
-    data = public.execShell(file + ' reload')
+    data = public.execShell(__SR + file + ' reload')
     if data[1] == '':
         return 'ok'
     return data[1]
@@ -245,7 +263,7 @@ def restart():
 
 def reload():
     file = initDreplace()
-    data = public.execShell(file + ' reload')
+    data = public.execShell(__SR + file + ' reload')
     if data[1] == '':
         return 'ok'
     return data[1]
