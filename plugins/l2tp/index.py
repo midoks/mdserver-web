@@ -50,16 +50,11 @@ def getArgs():
 
 
 def status():
-    cmd = "ps -ef|grep pure-ftpd |grep -v grep | grep -v python | awk '{print $2}'"
+    cmd = "ps -ef|grep xl2tpd |grep -v grep | grep -v python | awk '{print $2}'"
     data = public.execShell(cmd)
     if data[0] == '':
         return 'stop'
     return 'start'
-
-
-def initDreplace():
-
-    return file_bin
 
 
 def start():
@@ -79,20 +74,16 @@ def stop():
 
 
 def restart():
-    file = initDreplace()
-    data = public.execShell(file + ' restart')
-    if data[1] == '':
-        return 'ok'
-    return 'fail'
+    return 'ok'
 
 
 def reload():
-    file = initDreplace()
-    data = public.execShell(file + ' reload')
-    if data[1] == '':
-        return 'ok'
-    return data[1]
+    return 'ok'
 
+
+def getUserList():
+    data = []
+    return public.getJson(data)
 
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -106,5 +97,11 @@ if __name__ == "__main__":
         print restart()
     elif func == 'reload':
         print reload()
+    elif func == 'user_list':
+        print getUserList()
+    elif func == 'add_user':
+        print addUser()
+    elif func == 'delete_user':
+        print ''
     else:
         print 'error'
