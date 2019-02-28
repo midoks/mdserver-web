@@ -101,8 +101,8 @@ function getWeb(page, search) {
             });
 		}
 		if(body.length < 10){
-			body = "<tr><td colspan='8'>当前没有站点数据</td></tr>";
-			$(".dataTables_paginate").hide();
+			body = "<tr><td colspan='9'>当前没有站点数据</td></tr>";
+			// $(".dataTables_paginate").hide();
 			$("#webBody").html(body);
 		}
 		//输出数据列表
