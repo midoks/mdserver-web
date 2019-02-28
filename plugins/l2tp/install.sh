@@ -10,28 +10,27 @@ serverPath=$(dirname "$rootPath")
 
 
 install_tmp=${rootPath}/tmp/bt_install.pl
-
+SYSOS=`uname`
 
 Install_l2tp()
 {
 	isStart=""
-    while [[ "$isStart" == "" ]];
-    do
-        echo -e ".\c"
-        sleep 0.5
-        startTime=`date +%s`
-        echo $startTime,'end'
-    done
 	echo '正在安装脚本文件...' > $install_tmp
 	mkdir -p $serverPath/l2tp
 	echo '1.0' > $serverPath/l2tp/version.pl
-	echo '安装完成' > $install_tmp
+
+	if [ "Darwin" == "$SYSOS" ];then
+		echo 'macosx unavailable' > $install_tmp
+		exit 0 
+	fi
+
+	echo 'install complete' > $install_tmp
 }
 
 Uninstall_l2tp()
 {
 	rm -rf $serverPath/l2tp
-	echo "卸载完成" > $install_tmp
+	echo "Uninstall completed" > $install_tmp
 }
 
 action=$1

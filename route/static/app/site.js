@@ -1492,14 +1492,14 @@ function dns_check(){
 }
 
 //证书夹
-function ssl_admin(siteName){
+function sslAdmin(siteName){
 	var loadT = layer.msg('正在提交任务...',{icon:16,time:0,shade: [0.3, '#000']});
 	$.get('/site/get_cert_list',function(data){
 		layer.close(loadT);
 		var rdata = data['data'];
 		var tbody = '';
 		for(var i=0;i<rdata.length;i++){
-			tbody += '<tr><td>'+rdata[i].subject+'</td><td>'+rdata[i].dns.join('<br>')+'</td><td>'+rdata[i].notAfter+'</td><td>'+rdata[i].issuer+'</td><td style="text-align: right;"><a onclick="set_cert_ssl(\''+rdata[i].subject+'\',\''+siteName+'\')" class="btlink">部署</a> | <a onclick="remove_ssl(\''+rdata[i].subject+'\')" class="btlink">删除</a></td></tr>'
+			tbody += '<tr><td>'+rdata[i].subject+'</td><td>'+rdata[i].dns.join('<br>')+'</td><td>'+rdata[i].notAfter+'</td><td>'+rdata[i].issuer+'</td><td style="text-align: right;"><a onclick="setCertSsl(\''+rdata[i].subject+'\',\''+siteName+'\')" class="btlink">部署</a> | <a onclick="removeSsl(\''+rdata[i].subject+'\')" class="btlink">删除</a></td></tr>'
 		}
 		var txt = '<div class="mtb15" style="line-height:30px">\
 		<button style="margin-bottom: 7px;display:none;" class="btn btn-success btn-sm">添加</button>\
@@ -1511,8 +1511,8 @@ function ssl_admin(siteName){
 }
 
 //删除证书
-function remove_ssl(certName){
-	SafeMessage('删除证书','您真的要从证书夹删除证书吗?',function(){
+function removeSsl(certName){
+	safeMessage('删除证书','您真的要从证书夹删除证书吗?',function(){
 		var loadT = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});
 		$.post('/ssl?action=RemoveCert',{certName:certName},function(rdata){
 			layer.close(loadT);
@@ -1523,7 +1523,7 @@ function remove_ssl(certName){
 }
 
 //从证书夹部署
-function set_cert_ssl(certName,siteName){
+function setCertSsl(certName,siteName){
 	var loadT = layer.msg('正在部署证书...',{icon:16,time:0,shade: [0.3, '#000']});
 	$.post('/ssl?action=SetCertToSite',{certName:certName,siteName:siteName},function(rdata){
 		layer.close(loadT);
@@ -1537,7 +1537,7 @@ function setSSL(id,siteName){
 					<span class="on" onclick="opSSL(\'lets\','+id+',\''+siteName+'\')">Let\'s Encrypt</span>\
 					<span onclick="opSSL(\'other\','+id+',\''+siteName+'\')">其他证书</span>\
 					<span class="sslclose" onclick="closeSSL(\''+siteName+'\')">关闭</span>\
-					<span id="ssl_admin" onclick="ssl_admin(\''+siteName+'\')">证书夹</span>'
+					<span id="ssl_admin" onclick="sslAdmin(\''+siteName+'\')">证书夹</span>'
 					+ '<div class="ss-text pull-right mr30" style="position: relative;top:-4px">\
 	                    <em>强制HTTPS</em>\
 	                    <div class="ssh-item">\
