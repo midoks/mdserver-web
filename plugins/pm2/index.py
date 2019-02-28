@@ -167,10 +167,10 @@ def pm2Add():
         if pname == node['name']:
             return public.returnJson(False, '指定项目名称已经存在!')
     if os.path.exists(path + '/package.json') and not os.path.exists(path + '/package-lock.json'):
-        public.execShell("cd " + path + ' && npm install -s')
-    public.execShell('cd ' + path + ' && pm2 start ' +
+        public.execShell(__SR + "cd " + path + ' && npm install -s')
+    public.execShell(__SR + 'cd ' + path + ' && pm2 start ' +
                      runFile + ' --name "' + pname + '"|grep ' + pname)
-    public.execShell('pm2 save && pm2 startup')
+    public.execShell(__SR + 'pm2 save && pm2 startup')
     if not os.path.exists(__path):
         public.execShell('mkdir -p ' + __path)
     public.writeFile(__path + '/' + pname, path)
@@ -186,9 +186,9 @@ def pm2Delete():
     pname = args['pname']
     cmd = 'pm2 stop "' + pname + '" && pm2 delete "' + \
         pname + '" | grep "' + pname + '"'
-    result = public.execShell(cmd)[0]
+    result = public.execShell(__SR + cmd)[0]
     if result.find('✓') != -1:
-        public.execShell('pm2 save && pm2 startup')
+        public.execShell(__SR + 'pm2 save && pm2 startup')
         if os.path.exists(__path + '/' + pname):
             os.remove(__path + '/' + pname)
         return public.returnJson(True, '删除成功!')
@@ -202,7 +202,8 @@ def pm2Stop():
         return data[1]
 
     pname = args['pname']
-    result = public.execShell('pm2 stop "' + pname + '"|grep ' + pname)[0]
+    result = public.execShell(__SR + 'pm2 stop "' +
+                              pname + '"|grep ' + pname)[0]
     if result.find('stoped') != -1:
         return public.returnJson(True, '项目[' + pname + ']已停止!')
     return public.returnJson(True, '项目[' + pname + ']停止失败!')
@@ -215,7 +216,8 @@ def pm2Start():
         return data[1]
 
     pname = args['pname']
-    result = public.execShell('pm2 start "' + pname + '"|grep ' + pname)[0]
+    result = public.execShell(
+        __SR + 'pm2 start "' + pname + '"|grep ' + pname)[0]
     if result.find('online') != -1:
         return public.returnJson(True, '项目[' + pname + ']已启动!')
     return public.returnJson(False, '项目[' + pname + ']启动失败!')
