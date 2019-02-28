@@ -228,6 +228,9 @@ class plugins_api:
         except:
             public.execShell("rm -rf " + tmp_path)
             return public.returnJson(False, '在压缩包中没有找到插件信息,请检查插件包!')
+        protectPlist = ('openresty', 'mysql', 'php', 'csvn', 'gogs', 'pureftp')
+        if data['name'] in protectPlist:
+            return public.returnJson(False, '[' + data['name'] + '],重要插件不可修改!')
         return public.getJson(data)
 
     def inputZipApi(self):
