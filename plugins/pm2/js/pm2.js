@@ -76,7 +76,7 @@ function pm2List() {
             if(tmp[i].status != 'online'){
                 var opt = '<a href="javascript:nodeStart(\''+tmp[i].name+'\')" class="btlink">启动</a> | ';
             }else{
-                var opt = '<a href="javascript:nodeStop(\''+tmp[i].name+'\')" class="btlink">停止</a> | <a href="javascript:nodeRestart(\''+tmp[i].name+'\')" class="btlink">重启</a> | <a href="javascript:onekeyCodeSite(\''+tmp[i].name+'\','+tmp[i].port+',\''+tmp[i].path+'\')" class="btlink">映射</a> | ';
+                var opt = '<a href="javascript:nodeStop(\''+tmp[i].name+'\')" class="btlink">停止</a> | ';
             }
             tmp[i].path = tmp[i].path.replace('//','');
             
@@ -96,7 +96,7 @@ function pm2List() {
                         <td>'+tmp[i].mem+'</td>\
                         <td><span onclick="openPath(\''+tmp[i].path+'\')" class="btlink cursor mr20" title="'+tmp[i].path+'">打开</span></td>\
                         <td style="text-align: right;">\
-                            '+opt+'<a href="javascript:delNode(\''+tmp[i].name+'\')" class="btlink">删除</a>\
+                            '+opt+'<a href="javascript:nodeLog(\''+tmp[i].name+'\')" class="btlink">日志</a> | <a href="javascript:delNode(\''+tmp[i].name+'\')" class="btlink">删除</a>\
                         </td>\
                     </tr>';
         }
@@ -119,7 +119,6 @@ function getNodeVersions(){
     pm2Post('versions', '', function(data){
     	
     	var rdata = $.parseJSON(data.data);
-        console.log(rdata);
         var versions = rdata.data;
 
     	var opt = '';
@@ -280,6 +279,25 @@ function nodeStart(pname){
     });
 }
 
+function nodeLog(pname){
+	var html = '';
+    html += '<button onclick="nodeLogRun(\''+pname+'\')" class="btn btn-default btn-sm">运行日志</button>';
+    html += '<button onclick="nodeLogRun(\''+pname+'\')" class="btn btn-default btn-sm">清空运行日志</button>';
+    html += '<button onclick="nodeLogError(\''+pname+'\')" class="btn btn-default btn-sm">错误日志</button>';
+    html += '<button onclick="nodeLogError(\''+pname+'\')" class="btn btn-default btn-sm">清空错误日志</button>';
 
-function onekeyCodeSite(codename, port, path){
+    var loadOpen = layer.open({
+        type: 1,
+        title: '日志',
+        area: '240px',
+        content:'<div class="change-default pd20">'+html+'</div>'
+    });
+}
+
+
+function nodeLogError(pname){
+
+
+
+
 }
