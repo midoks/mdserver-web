@@ -11,25 +11,32 @@ serverPath=$(dirname "$rootPath")
 
 install_tmp=${rootPath}/tmp/bt_install.pl
 
-npm install pm2 -g
 
-Install_pm2()
+Install_l2tp()
 {
+	isStart=""
+    while [[ "$isStart" == "" ]];
+    do
+        echo -e ".\c"
+        sleep 0.5
+        startTime=`date +%s`
+        echo $startTime,'end'
+    done
 	echo '正在安装脚本文件...' > $install_tmp
-	mkdir -p $serverPath/pm2
-	echo '1.0' > $serverPath/pm2/version.pl
+	mkdir -p $serverPath/l2tp
+	echo '1.0' > $serverPath/l2tp/version.pl
 	echo '安装完成' > $install_tmp
 }
 
-Uninstall_pm2()
+Uninstall_l2tp()
 {
-	rm -rf $serverPath/pm2
+	rm -rf $serverPath/l2tp
 	echo "卸载完成" > $install_tmp
 }
 
 action=$1
 if [ "${1}" == 'install' ];then
-	Install_pm2
+	Install_l2tp
 else
-	Uninstall_pm2
+	Uninstall_l2tp
 fi

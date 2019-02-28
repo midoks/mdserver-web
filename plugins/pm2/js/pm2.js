@@ -279,12 +279,18 @@ function nodeStart(pname){
     });
 }
 
+function pm2RollingLogs(func,pname){
+    var args = {'pname':pname}
+    _args = JSON.stringify(args);
+    pluginRollingLogs('pm2','',func, _args);
+}
+
 function nodeLog(pname){
 	var html = '';
-    html += '<button onclick="nodeLogRun(\''+pname+'\')" class="btn btn-default btn-sm">运行日志</button>';
-    html += '<button onclick="nodeLogRun(\''+pname+'\')" class="btn btn-default btn-sm">清空运行日志</button>';
-    html += '<button onclick="nodeLogError(\''+pname+'\')" class="btn btn-default btn-sm">错误日志</button>';
-    html += '<button onclick="nodeLogError(\''+pname+'\')" class="btn btn-default btn-sm">清空错误日志</button>';
+    html += '<button onclick="pm2RollingLogs(\'node_log_run\',\''+pname+'\')" class="btn btn-default btn-sm">运行日志</button>';
+    html += '<button onclick="nodeLogClearRun(\''+pname+'\')" class="btn btn-default btn-sm">清空运行日志</button>';
+    html += '<button onclick="pm2RollingLogs(\'node_log_err\',\''+pname+'\')" class="btn btn-default btn-sm">错误日志</button>';
+    html += '<button onclick="nodeLogClearError(\''+pname+'\')" class="btn btn-default btn-sm">清空错误日志</button>';
 
     var loadOpen = layer.open({
         type: 1,
@@ -295,9 +301,18 @@ function nodeLog(pname){
 }
 
 
-function nodeLogError(pname){
-
-
-
-
+function nodeLogClearRun(pname){
+    var data = 'pname=' + pname;
+    pm2Post('node_log_clear_run', data, function(data){
+        var rdata = $.parseJSON(data.data);
+        layer.msg(rdata.msg,{icon:rdata.status?1:2});
+    });
 }
+
+function nodeLogClearError(pname){
+    var data = 'pname=' + pname;
+    pm2Post('node_log_clear_err', data, function(data){
+        var rdata = $.parseJSON(data.data);
+        layer.msg(rdata.msg,{icon:rdata.status?1:2});
+    });
+} 
