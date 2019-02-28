@@ -74,6 +74,7 @@ function orPluginOpService(a, b, v) {
                 });
             } else {
                 orPluginOpServiceOp(a,b,c,d,a,v);
+
             }
         });
     })
@@ -98,6 +99,10 @@ function orPluginOpServiceOp(a,b,c,d,a,v){
         if( g.status && g.data != 'ok' ) {
             layer.msg(g.data, {icon: 2,time: 3000,shade: 0.3,shadeClose: true});
         }
+
+        setTimeout(function(){
+            location.reload();
+        },2000);
     },'json').error(function() {
         layer.close(e);
         layer.msg('操作异常!', {icon: 2});
