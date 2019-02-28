@@ -14,6 +14,8 @@ install_tmp=${rootPath}/tmp/bt_install.pl
 Install_pm2()
 {
 	echo '正在安装脚本文件...' > $install_tmp
+	yum install -y nodejs
+	curl -o- http://npmjs.org/install.sh | bash
 	npm install pm2 -g
 	curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.34.0/install.sh | bash
 
