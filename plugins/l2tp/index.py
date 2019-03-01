@@ -122,9 +122,9 @@ def addUser():
     if not data[0]:
         return data[1]
     ret = public.execShell('echo ' + args['username'] + '|l2tp -a')
-    if ret[0] == '':
-        return public.returnJson(True, '添加成功!')
-    return public.returnJson(False, '添加失败:' + ret[1])
+    if ret[1] == '':
+        return public.returnJson(True, '添加成功!:' + ret[0])
+    return public.returnJson(False, '添加失败:' + ret[0])
 
 
 def delUser():
@@ -134,9 +134,9 @@ def delUser():
         return data[1]
 
     ret = public.execShell('echo ' + args['username'] + '|l2tp -l')
-    if ret[0] == '':
-        return public.returnJson(True, '删除成功!')
-    return public.returnJson(False, '删除失败:' + ret[1])
+    if ret[1] == '':
+        return public.returnJson(True, '删除成功!:' + ret[0])
+    return public.returnJson(False, '删除失败:' + ret[0])
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
