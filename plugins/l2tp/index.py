@@ -100,6 +100,10 @@ def getUserList():
     conf = public.readFile(path)
 
     conf = re.sub('#(.*)\n', '', conf)
+
+    if conf.strip() == '':
+        return public.returnJson(True, 'ok', [])
+
     ulist = conf.strip().split('\n')
 
     user = []
