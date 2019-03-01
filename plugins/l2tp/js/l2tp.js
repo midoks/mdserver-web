@@ -72,7 +72,7 @@ function userList(){
             con += '<tr>'+
                 '<td>' + list[i]['user']+'</td>' +
                 '<td>' + list[i]['pwd']+'</td>' +
-                '<td><a class="btlink" onclick="modPwd()">改密</a>|<a class="btlink" onclick="delUser(\''+list[i]['user']+'\')">删除</a></td></tr>';
+                '<td><a class="btlink" onclick="modUser(\''+list[i]['user']+'\')">改密</a>|<a class="btlink" onclick="delUser(\''+list[i]['user']+'\')">删除</a></td></tr>';
         }
 
         con += '</tbody>';
@@ -93,14 +93,9 @@ function addUser(){
                 <div><input class='bt-input-text mr5 outline_no' type='text' id='username' name='username' style='height: 28px; border-radius: 3px;width: 200px;' placeholder='输入用户名'></div>\
             </div>\
             <div class='bt-form-submit-btn'>\
-                <button type='button' id='add_close' class='btn btn-danger btn-sm btn-title'>关闭</button>\
                 <button type='button' id='add_ok' class='btn btn-success btn-sm btn-title bi-btn'>确认</button>\
             </div>\
         </div>"
-    });
-
-    $('#add_close').click(function(){
-        layer.close(loadOpen);
     });
 
     $('#add_ok').click(function(){
@@ -121,6 +116,35 @@ function delUser(username){
         var rdata = $.parseJSON(data.data);
         layer.msg(rdata.msg,{icon:rdata.status?1:2,time:2000,shade: [0.3, '#000']});
         setTimeout(function(){userList();},2000);
+    });
+}
+
+function modUser(username){
+    var loadOpen = layer.open({
+        type: 1,
+        title: '修改密码',
+        area: '240px',
+        content:"<div class='bt-form pd20 pb70 c6'>\
+            <div class='version line'>\
+                <div><input class='bt-input-text mr5 outline_no' type='text' name='password' style='height: 28px; border-radius: 3px;width: 200px;' placeholder='输入密码'></div>\
+            </div>\
+            <div class='bt-form-submit-btn'>\
+                <button type='button' id='mod_ok' class='btn btn-success btn-sm btn-title bi-btn'>确认</button>\
+            </div>\
+        </div>"
+    });
+
+    $('#mod_ok').click(function(){
+        _data = {};
+        _data['username'] = username;
+        _data['password'] = $('#password').val();
+        var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
+        lpPost('add_user', _data, function(data){
+            var rdata = $.parseJSON(data.data);
+            layer.close(loadOpen);
+            layer.msg(rdata.msg,{icon:rdata.status?1:2,time:2000,shade: [0.3, '#000']});
+            setTimeout(function(){userList();},2000);
+        });
     });
 }
 
