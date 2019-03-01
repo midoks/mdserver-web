@@ -58,7 +58,25 @@ def status():
     return 'start'
 
 
+def initConf():
+    l2tp_cs = getServerDir() + '/chap-secrets'
+    if not os.path.exists(l2tp_cs):
+        print 'cp -rf ' + getPluginDir() + '/tmp/chap-secrets' + ' ' + getServerDir()
+        public.execShell('cp -rf ' + getPluginDir() +
+                         '/tmp/chap-secrets' + ' ' + getServerDir())
+
+    l2tp_is = getServerDir() + '/ipsec.secrets'
+    if not os.path.exists(l2tp_is):
+        public.execShell('cp -rf ' + getPluginDir() +
+                         '/tmp/ipsec.secrets' + ' ' + getServerDir())
+
+
 def start():
+    initConf()
+
+    if public.isAppleSystem():
+        return "Apple Computer does not support"
+
     data = public.execShell('service xl2tpd start')
     if data[0] == '':
         return 'ok'
@@ -66,6 +84,9 @@ def start():
 
 
 def stop():
+    if public.isAppleSystem():
+        return "Apple Computer does not support"
+
     data = public.execShell('service xl2tpd stop')
     if data[0] == '':
         return 'ok'
@@ -73,6 +94,9 @@ def stop():
 
 
 def restart():
+    if public.isAppleSystem():
+        return "Apple Computer does not support"
+
     data = public.execShell('service xl2tpd restart')
     if data[0] == '':
         return 'ok'
@@ -127,6 +151,9 @@ def getUserList():
 
 
 def addUser():
+    if public.isAppleSystem():
+        return public.returnJson(False, "Apple Computer does not support")
+
     args = getArgs()
     data = checkArgs(args, ['username'])
     if not data[0]:
@@ -138,6 +165,9 @@ def addUser():
 
 
 def delUser():
+    if public.isAppleSystem():
+        return public.returnJson(False, "Apple Computer does not support")
+
     args = getArgs()
     data = checkArgs(args, ['username'])
     if not data[0]:
@@ -150,6 +180,7 @@ def delUser():
 
 
 def modUser():
+
     args = getArgs()
     data = checkArgs(args, ['username', 'password'])
     if not data[0]:
