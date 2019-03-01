@@ -65,14 +65,14 @@ def status():
 
 
 def start():
-    data = public.execShell(file + ' start')
+    data = public.execShell('service xl2tpd start')
     if data[1] == '':
         return 'ok'
     return data[1]
 
 
 def stop():
-    data = public.execShell(file + ' stop')
+    data = public.execShell('service xl2tpd stop')
     if data[1] == '':
         return 'ok'
     return data[1]
