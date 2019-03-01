@@ -117,7 +117,7 @@ function addUser(){
 }
 
 function delUser(username){
-    lpPost('user_del', {username:username}, function(data){
+    lpPost('del_user', {username:username}, function(data){
         var rdata = $.parseJSON(data);
         layer.msg(rdata.msg,{icon:rdata.status?1:2,time:2000,shade: [0.3, '#000']});
         userList();
