@@ -92,6 +92,12 @@ def getPathFile():
     return '/etc/ppp/chap-secrets'
 
 
+def getPathFilePsk():
+    if public.isAppleSystem():
+        return getServerDir() + '/ipsec.secrets'
+    return '/etc/ipsec.secrets'
+
+
 def getUserList():
     import re
     path = getPathFile()
@@ -183,6 +189,8 @@ if __name__ == "__main__":
         print reload()
     elif func == 'conf':
         print getPathFile()
+    elif func == 'conf_psk':
+        print getPathFilePsk()
     elif func == 'user_list':
         print getUserList()
     elif func == 'add_user':
