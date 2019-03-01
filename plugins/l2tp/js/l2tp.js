@@ -107,7 +107,7 @@ function addUser(){
         _data = {};
         _data['username'] = $('#username').val();
         var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
-        lpPost('user_add', _data, function(data){
+        lpPost('add_user', _data, function(data){
             var rdata = $.parseJSON(data);
        
             layer.msg(rdata.msg,{icon:rdata.status?1:2,time:2000,shade: [0.3, '#000']});
