@@ -109,9 +109,9 @@ function addUser(){
         var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
         lpPost('add_user', _data, function(data){
             var rdata = $.parseJSON(data.data);
-       
+            layer.close(loadOpen);
             layer.msg(rdata.msg,{icon:rdata.status?1:2,time:2000,shade: [0.3, '#000']});
-            userList();
+            setTimeout(function(){userList();},2000);
         });
     });
 }
@@ -120,7 +120,7 @@ function delUser(username){
     lpPost('del_user', {username:username}, function(data){
         var rdata = $.parseJSON(data.data);
         layer.msg(rdata.msg,{icon:rdata.status?1:2,time:2000,shade: [0.3, '#000']});
-        userList();
+        setTimeout(function(){userList();},2000);
     });
 }
 
