@@ -155,7 +155,11 @@ def modUser():
 
     # sed -i "/^\<${user}\>/d" /etc/ppp/chap-secrets
     # echo "${user}    l2tpd    ${pass}       *" >> /etc/ppp/chap-secrets
-    public.execShell("sed -i .bak '/^\(" + username + "\)/d' " + path)
+
+    if public.isAppleSystem():
+        public.execShell("sed -i .bak '/^\(" + username + "\)/d' " + path)
+    else:
+        public.execShell("sed -i '/^\(" + username + "\)/d' " + path)
     # print 'echo "' + username + "    l2tpd    " + password + "      *\" >>"
     # + path
     ret = public.execShell("echo \"" + username +
