@@ -66,24 +66,30 @@ def status():
 
 def start():
     data = public.execShell('service xl2tpd start')
-    if data[1] == '':
+    if data[0] == '':
         return 'ok'
     return data[1]
 
 
 def stop():
     data = public.execShell('service xl2tpd stop')
-    if data[1] == '':
+    if data[0] == '':
         return 'ok'
     return data[1]
 
 
 def restart():
-    return 'ok'
+    data = public.execShell('service xl2tpd restart')
+    if data[0] == '':
+        return 'ok'
+    return data[1]
 
 
 def reload():
-    return 'ok'
+    data = public.execShell('service xl2tpd reload')
+    if data[0] == '':
+        return 'ok'
+    return data[1]
 
 
 def getPathFile():
