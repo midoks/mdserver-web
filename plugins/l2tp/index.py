@@ -65,7 +65,6 @@ def status():
 
 
 def start():
-    file = initDreplace()
     data = public.execShell(file + ' start')
     if data[1] == '':
         return 'ok'
@@ -73,7 +72,6 @@ def start():
 
 
 def stop():
-    file = initDreplace()
     data = public.execShell(file + ' stop')
     if data[1] == '':
         return 'ok'
@@ -124,7 +122,7 @@ def addUser():
     if not data[0]:
         return data[1]
     ret = public.execShell('echo ' + args['username'] + '|l2tp -a')
-    if ret[0] == ''
+    if ret[0] == '':
         return public.returnJson(True, '添加成功!')
     return public.returnJson(False, '添加失败:' + ret[1])
 
@@ -136,7 +134,7 @@ def delUser():
         return data[1]
 
     ret = public.execShell('echo ' + args['username'] + '|l2tp -l')
-    if ret[0] == ''
+    if ret[0] == '':
         return public.returnJson(True, '删除成功!')
     return public.returnJson(False, '删除失败:' + ret[1])
 if __name__ == "__main__":
