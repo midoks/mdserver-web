@@ -110,8 +110,8 @@ def getUserList():
         line = re.match(r'(\w*)\s*(\w*)\s*(\w*)\s*(.*)',
                         line.strip(), re.M | re.I).groups()
         line_info['user'] = line[0]
-        line_info['pwd'] = line[1]
-        line_info['psk'] = line[2]
+        line_info['pwd'] = line[2]
+        line_info['type'] = line[1]
         line_info['ip'] = line[3]
         user.append(line_info)
 
@@ -123,8 +123,10 @@ def addUser():
     data = checkArgs(args, ['username'])
     if not data[0]:
         return data[1]
-
-    public.execShell('echo ' + args['username'] + '> ')
+    ret = public.execShell('echo ' + args['username'] + '|l2tp -a')
+    if ret[0] == ''
+        return public.returnJson(True, '添加成功!')
+    return public.returnJson(False, '添加失败:' + ret[1])
 
 
 def delUser():
@@ -133,6 +135,10 @@ def delUser():
     if not data[0]:
         return data[1]
 
+    ret = public.execShell('echo ' + args['username'] + '|l2tp -l')
+    if ret[0] == ''
+        return public.returnJson(True, '删除成功!')
+    return public.returnJson(False, '删除失败:' + ret[1])
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':

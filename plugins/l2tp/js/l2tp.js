@@ -63,7 +63,6 @@ function userList(){
         con += '<thead><tr>';
         con += '<th>用户</th>';
         con += '<th>密码</th>';
-        con += '<th>PSK</th>';
         con += '<th>操作(<a class="btlink" onclick="addUser()">添加</a>)</th>';
         con += '</tr></thead>';
 
@@ -73,7 +72,6 @@ function userList(){
             con += '<tr>'+
                 '<td>' + list[i]['user']+'</td>' +
                 '<td>' + list[i]['pwd']+'</td>' +
-                '<td>' + list[i]['psk']+'</td>' +
                 '<td><a class="btlink" onclick="modPwd()">改密</a>|<a class="btlink" onclick="delUser(\''+list[i]['user']+'\')">删除</a></td></tr>';
         }
 
