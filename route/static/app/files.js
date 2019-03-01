@@ -382,7 +382,7 @@ function getFiles(Path) {
 				}
 			}
 			if(displayZip != -1){
-				bodyZip = "<a class='btlink' href='javascript:;' onclick=\"UnZip('" + rdata.PATH +"/" +fmp[0] + "'," + displayZip + ")\">"+lan.files.file_menu_unzip+"</a> | ";
+				bodyZip = "<a class='btlink' href='javascript:;' onclick=\"unZip('" + rdata.PATH +"/" +fmp[0] + "'," + displayZip + ")\">解压</a> | ";
 			}
 			
 			if(isText(fmp[0])){
@@ -421,7 +421,7 @@ function getFiles(Path) {
 						</div>";
 			}
 		}
-		var dirInfo = '('+lan.files.get_size.replace('{1}',rdata.DIR.length+'').replace('{2}',rdata.DIR.length+'')+'<font id="pathSize">'+(toSize(totalSize))+'<a class="btlink ml5" onClick="getPathSize()">获取</a></font>)';
+		var dirInfo = '(共{1}个目录与{2}个文件,大小:'.replace('{1}',rdata.DIR.length+'').replace('{2}',rdata.DIR.length+'')+'<font id="pathSize">'+(toSize(totalSize))+'<a class="btlink ml5" onClick="getPathSize()">获取</a></font>)';
 		$("#DirInfo").html(dirInfo);
 		if(getCookie('rank')=='a'){
 			var tablehtml = '<table width="100%" border="0" cellpadding="0" cellspacing="0" class="table table-hover">\
@@ -1164,7 +1164,7 @@ function Zip(dirName,submits) {
 }
 		
 //解压目录
-function UnZip(fileName,type) {
+function unZip(fileName,type) {
 	var path = $("#DirPathPlace input").val();
 	if(type.length ==3){
 		var sfile = encodeURIComponent($("#sfile").val());
@@ -1191,7 +1191,7 @@ function UnZip(fileName,type) {
 		shift: 5,
 		closeBtn: 2,
 		area: '490px',
-		title: lan.files.unzip_title,
+		title: '解压文件',
 		content: '<div class="bt-form pd20 pb70">'
 					+'<div class="line unzipdiv">'
 					+'<span class="tname">'+lan.files.unzip_name+'</span><input type="text" class="bt-input-text" id="sfile" value="' +fileName + '" placeholder="'+lan.files.unzip_name_title+'" style="width:330px" /></div>'
@@ -1429,7 +1429,7 @@ function RClick(type,path,name){
 		options.items.push({text: lan.files.file_menu_edit, onclick: function() {onlineEditFile(0,path)}},{text: lan.files.file_menu_down, onclick: function() {GetFileBytes(path)}},{text: lan.files.file_menu_del, onclick: function() {deleteFile(path)}});
 	}
 	else if(displayZip != -1){
-		options.items.push({text: lan.files.file_menu_unzip, onclick: function() {UnZip(path,displayZip)}},{text: lan.files.file_menu_down, onclick: function() {GetFileBytes(path)}},{text: lan.files.file_menu_del, onclick: function() {deleteFile(path)}});
+		options.items.push({text: lan.files.file_menu_unzip, onclick: function() {unZip(path,displayZip)}},{text: lan.files.file_menu_down, onclick: function() {GetFileBytes(path)}},{text: lan.files.file_menu_del, onclick: function() {deleteFile(path)}});
 	}
 	else if(isImage(type)){
 		options.items.push({text: lan.files.file_menu_img, onclick: function() {GetImage(path)}},{text: lan.files.file_menu_down, onclick: function() {GetFileBytes(path)}},{text: lan.files.file_menu_del, onclick: function() {deleteFile(path)}});
