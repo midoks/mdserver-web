@@ -26,12 +26,6 @@ def getServerDir():
     return public.getServerDir() + '/' + getPluginName()
 
 
-def getInitDFile():
-    if app_debug:
-        return '/tmp/' + getPluginName()
-    return '/etc/init.d/' + getPluginName()
-
-
 def getArgs():
     args = sys.argv[2:]
     tmp = {}
