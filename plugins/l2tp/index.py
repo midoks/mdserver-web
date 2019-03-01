@@ -149,10 +149,20 @@ def modUser():
     if not data[0]:
         return data[1]
 
-    ret = public.execShell('echo ' + args['username'] + '|l2tp -d')
+    path = getPathFile()
+    username = args['username']
+    password = args['password']
+
+    # sed -i "/^\<${user}\>/d" /etc/ppp/chap-secrets
+    # echo "${user}    l2tpd    ${pass}       *" >> /etc/ppp/chap-secrets
+    public.execShell("sed -i .bak '/^\(" + username + "\)/d' " + path)
+    # print 'echo "' + username + "    l2tpd    " + password + "      *\" >>"
+    # + path
+    ret = public.execShell("echo \"" + username +
+                           "    l2tpd    " + password + "       *\" >>" + path)
     if ret[1] == '':
-        return public.returnJson(True, '修改成功!:' + ret[0])
-    return public.returnJson(False, '修改失败:' + ret[0])
+        return public.returnJson(True, '修改成功!')
+    return public.returnJson(False, '修改失败')
 
 
 if __name__ == "__main__":

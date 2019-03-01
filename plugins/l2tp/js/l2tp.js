@@ -126,7 +126,7 @@ function modUser(username){
         area: '240px',
         content:"<div class='bt-form pd20 pb70 c6'>\
             <div class='version line'>\
-                <div><input class='bt-input-text mr5 outline_no' type='text' name='password' style='height: 28px; border-radius: 3px;width: 200px;' placeholder='输入密码'></div>\
+                <div><input class='bt-input-text mr5 outline_no' type='text' id='password' name='password' style='height: 28px; border-radius: 3px;width: 200px;' placeholder='输入密码'></div>\
             </div>\
             <div class='bt-form-submit-btn'>\
                 <button type='button' id='mod_ok' class='btn btn-success btn-sm btn-title bi-btn'>确认</button>\
@@ -139,7 +139,7 @@ function modUser(username){
         _data['username'] = username;
         _data['password'] = $('#password').val();
         var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
-        lpPost('add_user', _data, function(data){
+        lpPost('mod_user', _data, function(data){
             var rdata = $.parseJSON(data.data);
             layer.close(loadOpen);
             layer.msg(rdata.msg,{icon:rdata.status?1:2,time:2000,shade: [0.3, '#000']});
