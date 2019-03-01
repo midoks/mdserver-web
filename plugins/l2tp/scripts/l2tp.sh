@@ -784,24 +784,6 @@ mod_user(){
 }
 
 
-mod_user2(){
-    if [ $1 == ''];then
-        echo 'user name cannot be empty'
-        exit 1
-    fi
-
-    if [ $2 == ''];then
-        echo 'password cannot be empty'
-        exit 1
-    fi
-    user=$1
-    pass=$2
-    sed -i "/^\<${user}\>/d" /etc/ppp/chap-secrets
-    echo "${user}    l2tpd    ${pass}       *" >> /etc/ppp/chap-secrets
-    echo "Username ${user}'s password has been changed."
-}
-
-
 
 # Main process
 action=$1
@@ -823,7 +805,7 @@ case ${action} in
         del_user
         ;;
     -m|--mod)
-        mod_user2
+        mod_user
         ;;
     -h|--help)
         echo "Usage: `basename $0` -l,--list   List all users"
