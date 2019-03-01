@@ -49,6 +49,13 @@ def getArgs():
     return tmp
 
 
+def checkArgs(data, ck=[]):
+    for i in range(len(ck)):
+        if not ck[i] in data:
+            return (False, public.returnJson(False, '参数:(' + ck[i] + ')没有!'))
+    return (True, public.returnJson(True, 'ok'))
+
+
 def status():
     cmd = "ps -ef|grep xl2tpd |grep -v grep | grep -v python | awk '{print $2}'"
     data = public.execShell(cmd)
@@ -81,9 +88,50 @@ def reload():
     return 'ok'
 
 
+def getPathFile():
+    if public.isAppleSystem():
+        return getServerDir() + '/chap-secrets'
+    return '/etc/ppp/chap-secrets'
+
+
 def getUserList():
-    data = []
-    return public.getJson(data)
+    import re
+    path = getPathFile()
+    if not os.path.exists(path):
+        return public.returnJson(False, '密码配置文件不存在!')
+    conf = public.readFile(path)
+
+    conf = re.sub('#(.*)\n', '', conf)
+    ulist = conf.strip().split('\n')
+
+    user = []
+    for line in ulist:
+        line_info = {}
+        line = re.match(r'(\w*)\s*(\w*)\s*(\w*)\s*(.*)',
+                        line.strip(), re.M | re.I).groups()
+        line_info['user'] = line[0]
+        line_info['pwd'] = line[1]
+        line_info['psk'] = line[2]
+        line_info['ip'] = line[3]
+        user.append(line_info)
+
+    return public.returnJson(True, 'ok', user)
+
+
+def addUser():
+    args = getArgs()
+    data = checkArgs(args, ['username'])
+    if not data[0]:
+        return data[1]
+
+    public.execShell('echo ' + args['username'] + '> ')
+
+
+def delUser():
+    args = getArgs()
+    data = checkArgs(args, ['username'])
+    if not data[0]:
+        return data[1]
 
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -97,11 +145,13 @@ if __name__ == "__main__":
         print restart()
     elif func == 'reload':
         print reload()
+    elif func == 'conf':
+        print getPathFile()
     elif func == 'user_list':
         print getUserList()
     elif func == 'add_user':
         print addUser()
-    elif func == 'delete_user':
-        print ''
+    elif func == 'del_user':
+        print delUser()
     else:
         print 'error'
