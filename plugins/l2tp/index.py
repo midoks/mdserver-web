@@ -133,7 +133,7 @@ def delUser():
     if not data[0]:
         return data[1]
 
-    ret = public.execShell('echo ' + args['username'] + '|l2tp -l')
+    ret = public.execShell('echo ' + args['username'] + '|l2tp -d')
     if ret[1] == '':
         return public.returnJson(True, '删除成功!:' + ret[0])
     return public.returnJson(False, '删除失败:' + ret[0])
