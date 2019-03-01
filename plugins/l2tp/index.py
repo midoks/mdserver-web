@@ -141,6 +141,20 @@ def delUser():
     if ret[1] == '':
         return public.returnJson(True, '删除成功!:' + ret[0])
     return public.returnJson(False, '删除失败:' + ret[0])
+
+
+def modUser():
+    args = getArgs()
+    data = checkArgs(args, ['username', 'password'])
+    if not data[0]:
+        return data[1]
+
+    ret = public.execShell('echo ' + args['username'] + '|l2tp -d')
+    if ret[1] == '':
+        return public.returnJson(True, '修改成功!:' + ret[0])
+    return public.returnJson(False, '修改失败:' + ret[0])
+
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -161,5 +175,7 @@ if __name__ == "__main__":
         print addUser()
     elif func == 'del_user':
         print delUser()
+    elif func == 'mod_user':
+        print modUser()
     else:
         print 'error'
