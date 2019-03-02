@@ -471,7 +471,7 @@ class site_api:
             public.writeFile(file, conf)
 
         msg = public.getInfo('网站[{1}]关闭SSL成功!', (siteName,))
-        public.writeLog('TYPE_SITE', msg)
+        public.writeLog('网站管理', msg)
         public.restartWeb()
         return public.returnJson(True, 'SSL已关闭!')
 
@@ -624,6 +624,39 @@ class site_api:
         public.restartWeb()
 
         return public.returnJson(True, 'OK', result)
+
+    def httpToHttpsApi(self):
+        siteName = request.form.get('siteName', '').encode('utf-8')
+        file = self.getHostConf(siteName)
+        conf = public.readFile(file)
+        if conf:
+            if conf.find('ssl_certificate') == -1:
+                return public.returnJson(False, '当前未开启SSL')
+            to = """#error_page 404/404.html;
+    #HTTP_TO_HTTPS_START
+    if ($server_port !~ 443){
+        rewrite ^(/.*)$ https://$host$1 permanent;
+    }
+    #HTTP_TO_HTTPS_END"""
+            conf = conf.replace('#error_page 404/404.html;', to)
+            public.writeFile(file, conf)
+
+        public.restartWeb()
+        return public.returnJson(True, '设置成功!')
+
+    def closeToHttpsApi(self):
+        siteName = request.form.get('siteName', '').encode('utf-8')
+        file = self.getHostConf(siteName)
+        conf = public.readFile(file)
+        if conf:
+            rep = "\n\s*#HTTP_TO_HTTPS_START(.|\n){1,300}#HTTP_TO_HTTPS_END"
+            conf = re.sub(rep, '', conf)
+            rep = "\s+if.+server_port.+\n.+\n\s+\s*}"
+            conf = re.sub(rep, '', conf)
+            public.writeFile(file, conf)
+
+        public.restartWeb()
+        return public.returnJson(True, '设置成功!')
 
     def getIndexApi(self):
         sid = request.form.get('id', '').encode('utf-8')
