@@ -1497,21 +1497,21 @@ function sslAdmin(siteName){
 function removeSsl(certName){
 	safeMessage('删除证书','您真的要从证书夹删除证书吗?',function(){
 		var loadT = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});
-		$.post('/ssl?action=RemoveCert',{certName:certName},function(rdata){
+		$.post('/site/remove_cert',{certName:certName},function(rdata){
 			layer.close(loadT);
 			layer.msg(rdata.msg,{icon:rdata.status?1:2});
 			$("#ssl_admin").click();
-		});
+		},'json');
 	});
 }
 
 //从证书夹部署
 function setCertSsl(certName,siteName){
 	var loadT = layer.msg('正在部署证书...',{icon:16,time:0,shade: [0.3, '#000']});
-	$.post('/ssl?action=SetCertToSite',{certName:certName,siteName:siteName},function(rdata){
+	$.post('/site/set_cert_to_site',{certName:certName,siteName:siteName},function(rdata){
 		layer.close(loadT);
 		layer.msg(rdata.msg,{icon:rdata.status?1:2});
-	});
+	},'json');
 }
 
 //ssl
