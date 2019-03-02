@@ -403,9 +403,9 @@ class site_api:
                 'rm -rf /etc/letsencrypt/archive/' + siteName + '-00*')
             public.execShell(
                 'rm -f /etc/letsencrypt/renewal/' + siteName + '.conf')
-            public.execShell('rm -f /etc/letsencrypt/renewal/' +
+            public.execShell('rm -rf /etc/letsencrypt/renewal/' +
                              siteName + '-00*.conf')
-            public.execShell('rm -f ' + path + '/README')
+            public.execShell('rm -rf ' + path + '/README')
             public.execShell('mkdir -p ' + path)
 
         public.writeFile(keypath, key)
@@ -424,8 +424,37 @@ class site_api:
             return public.returnJson(False, 'ERROR: <br><a style="color:red;">' + isError.replace("\n", '<br>') + '</a>')
 
         public.restartWeb()
-        public.writeLog('TYPE_SITE', '证书已保存!')
+        public.writeLog('网站管理', '证书已保存!')
         return public.returnJson(True, '证书已保存!')
+
+    def setCertToSiteApi(self):
+        certName = request.form.get('certName', '').encode('utf-8')
+        siteName = request.form.get('siteName', '').encode('utf-8')
+        try:
+            path = self.sslDir + siteName
+            if not os.path.exists(path):
+                return public.returnJson(False, '证书不存在!')
+
+            result = self.setSslConf(siteName)
+            if not result['status']:
+                return public.getJson(result)
+
+            public.restartWeb()
+            public.writeLog('网站管理', '证书已部署!')
+            return public.returnJson(True, '证书已部署!')
+        except Exception as ex:
+            return public.returnJson(False, '设置错误,' + str(ex))
+
+    def removeCertApi(self):
+        certName = request.form.get('certName', '').encode('utf-8')
+        try:
+            path = self.sslDir + certName
+            if not os.path.exists(path):
+                return public.returnJson(False, '证书已不存在!')
+            os.system("rm -rf " + path)
+            return public.returnJson(True, '证书已删除!')
+        except:
+            return public.returnJson(False, '删除失败!')
 
     def closeSslConfApi(self):
         siteName = request.form.get('siteName', '').encode('utf-8')
@@ -633,11 +662,11 @@ class site_api:
             if conf.find('ssl_certificate') == -1:
                 return public.returnJson(False, '当前未开启SSL')
             to = """#error_page 404/404.html;
-    #HTTP_TO_HTTPS_START
+    # HTTP_TO_HTTPS_START
     if ($server_port !~ 443){
         rewrite ^(/.*)$ https://$host$1 permanent;
     }
-    #HTTP_TO_HTTPS_END"""
+    # HTTP_TO_HTTPS_END"""
             conf = conf.replace('#error_page 404/404.html;', to)
             public.writeFile(file, conf)
 
