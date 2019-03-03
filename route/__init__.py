@@ -242,11 +242,11 @@ def connect_ssh():
 
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     try:
-        ssh.connect('127.0.0.1', public.getSSHPort())
+        ssh.connect('localhost', public.getSSHPort())
     except Exception as e:
         if public.getSSHStatus():
             try:
-                ssh.connect('localhost', public.getSSHPort())
+                ssh.connect('127.0.0.1', public.getSSHPort())
             except:
                 return False
         ssh.connect('127.0.0.1', public.getSSHPort())
