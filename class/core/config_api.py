@@ -15,7 +15,7 @@ from flask import request
 
 class config_api:
 
-    __version = '0.0.9'
+    __version = '0.1.0'
 
     def __init__(self):
         pass
