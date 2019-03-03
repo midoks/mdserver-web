@@ -235,7 +235,21 @@ def create_rsa():
     public.execShell('chmod 600 /root/.ssh/authorized_keys')
 
 
+def clear_ssh():
+    sh = '''
+#!/bin/bash
+PLIST=`who | grep localhost | awk '{print $2}'`
+for i in $PLIST
+do
+   ps -t /dev/{$i} |grep -v TTY|awk '{print $1}' | xargs kill -9
+done
+'''
+    if not public.isAppleSystem():
+        public.execShell(sh)
+
+
 def connect_ssh():
+    clear_ssh()
     global shell, ssh
     if not os.path.exists('/root/.ssh/authorized_keys') or not os.path.exists('/root/.ssh/id_rsa') or not os.path.exists('/root/.ssh/id_rsa.pub'):
         create_rsa()
