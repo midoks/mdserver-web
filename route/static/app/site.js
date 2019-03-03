@@ -444,14 +444,6 @@ function webBakEdit(id){
 	});
 }
 
-//提交网站备注
-function SetSitePs(id){
-	var myPs = $("#webbeizhu").val();
-	$.post('/data?action=setPs','table=sites&id='+id+'&ps='+myPs,function(rdata){
-		layer.msg(rdata?lan.public.edit_ok:lan.public.edit_err,{icon:rdata?1:2});
-	});
-}
-
 
 //设置默认文档
 function setIndexEdit(id){
