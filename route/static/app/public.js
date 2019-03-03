@@ -814,6 +814,19 @@ function checkSelect(){
 		} else {
 			$("#allDelete").hide();
 		}
+
+		var num = $('input[type="checkbox"]:checked');
+        console.log(num);
+        if (num == 1) {
+            $('button[batch="true"]').hide();
+            $('button[batch="false"]').show();
+        }else if (num>1){
+            $('button[batch="true"]').show();
+            $('button[batch="false"]').show();
+		}else{
+            $('button[batch="true"]').hide();
+            $('button[batch="false"]').hide();
+		}
 	},5);
 }
 
