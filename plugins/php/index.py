@@ -12,6 +12,8 @@ reload(sys)
 sys.setdefaultencoding('utf8')
 
 sys.path.append(os.getcwd() + "/class/core")
+sys.path.append("/usr/local/lib/python2.7/site-packages")
+
 import public
 
 app_debug = False
@@ -480,28 +482,29 @@ def setDisableFunc(version):
     return public.returnJson(True, '设置成功!')
 
 
-def checkPhpinfoFile(version):
+def checkPhpinfoFile(v):
     if public.isInstalledWeb():
-        desc_file = public.getServerDir(
-        ) + '/openresty/nginx/conf/php_status/phpinfo_' + version + '.conf'
+        desc_file = public.getServerDir() + '/openresty/nginx/conf/php_status/phpinfo_' + \
+            str(v) + '.conf'
         if not os.path.exists(desc_file):
             tpl = getPluginDir() + '/conf/phpinfo.conf'
             content = public.readFile(tpl)
-            content = contentReplace(content, version)
+            content = contentReplace(content, v)
             public.writeFile(desc_file, content)
             public.restartWeb()
 
 
-def getPhpinfo(version):
-    checkPhpinfoFile(version)
-    sPath = public.getRootDir() + '/phpinfo/' + version
+def getPhpinfo(v):
+    checkPhpinfoFile(v)
+    sPath = public.getRootDir() + '/phpinfo/' + str(v)
     # public.execShell("rm -rf " + public.getRootDir() + '/phpinfo')
     public.execShell("mkdir -p " + sPath)
     public.writeFile(sPath + '/phpinfo.php', '<?php phpinfo(); ?>')
-    # print 'http://127.0.0.1/' + version + '/phpinfo.php'
-    phpinfo = public.httpGet('http://127.0.0.1/' + version + '/phpinfo.php', 3)
+    # print 'http://127.0.0.1/' + str(v) + '/phpinfo.php'
+    phpinfo = public.httpGet('http://127.0.0.1/' + str(v) + '/phpinfo.php')
+    public.writeFile('/tmp/phpinfo.txt', phpinfo)
     # os.system("rm -rf " + public.getRootDir() + '/phpinfo')
-    return phpinfo
+    return ''
 
 
 def getLibConf(version):

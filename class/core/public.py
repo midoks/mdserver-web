@@ -355,13 +355,16 @@ def HttpGet(url, timeout=10):
 
 
 def HttpGet2(url, timeout):
-    import urllib
     import urllib2
 
-    req = urllib2.Request(url)
-    res = urllib2.urlopen(req, timeout=timeout)
-    result = res.read()
-    return result
+    try:
+        req = urllib2.Request(url)
+        res = urllib2.urlopen(req, timeout=timeout)
+        result = res.read()
+        return result
+
+    except Exception as e:
+        return str(e)
 
 
 def httpGet(url, timeout=10):
