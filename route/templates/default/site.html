@@ -23,16 +23,12 @@
 					<button onclick="siteDefaultPage();" class="btn btn-default btn-sm btn-title" type="button">修改默认页</button>
 					<button onclick="getDefaultSite();" class="btn btn-default btn-sm btn-title" type="button">默认站点</button>
 					<button onclick="setClassType();" class="btn btn-default btn-sm btn-title" type="button">分类管理</button>
-					<span style="float: right;display: none;">
-						<button  batch="true" style="float: right; margin-left: 10px;" onclick="allDeleteSite();" class="btn btn-default btn-sm">删除选中</button>
+					<span>
+						<button  batch="true" style="float: right; margin-left: 10px;display: none;" onclick="allDeleteSite();" class="btn btn-default btn-sm">删除选中</button>
 					</span>
-
 					<div class="move_class">
-		                <button batch="false" style="float: right; margin-left: 10px;display: none;" class="btn btn-default btn-sm" onclick="site.batch_site('site_type')">移动至</button>
+		                <button batch="false" style="float: right; margin-left: 10px;display: none;" class="btn btn-default btn-sm" onclick="moveClassTYpe()">移动至</button>
 		            </div>
-					<!-- <span id="allDelete" style="float: right;display: none;">
-						<button onclick="allDeleteSite();" class="btn btn-default btn-sm">批量删除</button>
-					</span> -->
 
 					<div class="divtable mtb10">
 						<div class="tablescroll">

@@ -469,15 +469,6 @@ function copyPass(password){
     $("#bt_copys").click();
 }
 
-function readerTableChecked(){
-    $('table').find('th').find('input').bind('click',function(){
-        $('table').find('td').find('input').each(function(i,obj){
-            checked = $(this).prop('checked');
-            $(this).prop('checked',!checked);
-        });
-    });    
-}
-
 function checkSelect(){
     setTimeout(function () {
         var num = $('input[type="checkbox"].check:checked').length;

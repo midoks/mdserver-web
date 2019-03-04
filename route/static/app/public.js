@@ -797,26 +797,20 @@ function fly(a) {
 	});
 };
 
+function readerTableChecked(){
+    $('thead').find('input').bind('click',function(){
+        $('tbody').find('tr').each(function(i,obj){
+        	var fin = $(this).find('td')[0];
+        	checked = $(fin).find('input').prop('checked');
+        	$(fin).find('input').prop('checked',!checked);
+        });
+    });    
+}
 
 //检查选中项
 function checkSelect(){
 	setTimeout(function(){
-		var checkList = $("input[name=id]");
-		console.log(checkList);
-		var count = 0;
-		for(var i=0;i<checkList.length;i++){
-			if(checkList[i].checked) {
-				count++;
-			}
-		}
-		if(count > 0){
-			$("#allDelete").show();
-		} else {
-			$("#allDelete").hide();
-		}
-
-		var num = $('input[type="checkbox"]:checked');
-        console.log(num);
+		var num = $('tbody').find('input[type="checkbox"]:checked').length;
         if (num == 1) {
             $('button[batch="true"]').hide();
             $('button[batch="false"]').show();
@@ -1025,15 +1019,15 @@ function getSpeed(sele){
 function messageBox() {
 	layer.open({
 		type: 1,
-		title: lan.bt.task_title,
+		title: '消息盒子',
 		area: "640px",
 		closeBtn: 2,
 		shadeClose: false,
 		content: '<div class="bt-form">\
 					<div class="bt-w-main">\
 						<div class="bt-w-menu">\
-							<p class="bgw" id="taskList" onclick="tasklist()">'+lan.bt.task_list+'(<span class="task_count">0</span>)</p>\
-							<p onclick="remind()">'+lan.bt.task_msg+'(<span class="msg_count">0</span>)</p>\
+							<p class="bgw" id="taskList" onclick="tasklist()">任务列表(<span class="task_count">0</span>)</p>\
+							<p onclick="remind()">消息列表(<span class="msg_count">0</span>)</p>\
 							<p onclick="execLog()">执行日志</p>\
 						</div>\
 						<div class="bt-w-con pd15">\
