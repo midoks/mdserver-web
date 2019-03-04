@@ -1,0 +1,15 @@
+{
+	"id":3,
+	"title":"SMB",
+	"tip":"lib",
+	"name":"samba",
+	"type":"软件",
+	"ps":"samba文件共享管理",
+	"versions":"1.0",
+	"shell":"install.sh",
+	"checks":"server/samba",
+	"author":"midoks",
+	"home":"https://www.samba.org/",
+	"date":"2018-12-20",
+	"pid":"4"
+}
