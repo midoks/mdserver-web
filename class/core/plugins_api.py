@@ -252,11 +252,26 @@ class plugins_api:
         public.execShell("rm -rf " + plugin_path)
         return public.returnJson(False, '安装失败!')
 
+    # 由于内容太大无法shell输出,暂时移动的插件模块中
     def phpinfoApi(self):
-        version = request.form.get('version', '')
-        phpinfo = public.httpGet(
-            'http://127.0.0.1/' + version + '/phpinfo.php')
-        return phpinfo
+        v = request.form.get('v', '')
+        sys.path.append("plugins/php")
+
+        import index
+        content = index.getPhpinfo(v)
+        return content
+
+        # self.checkPhpinfoFile(version)
+        # infoPath = public.getRootDir() + '/phpinfo'
+        # sPath = infoPath + '/' + version
+
+        # public.execShell('rm -rf ' + infoPath)
+        # public.execShell('mkdir -p ' + sPath)
+        # public.writeFile(sPath + '/phpinfo.php', '<?php phpinfo(); ?>')
+        # url = 'http://127.0.0.1/' + version + '/phpinfo.php'
+        # phpinfo = public.httpGet(url)
+        # os.system("rm -rf " + infoPath)
+        # return phpinfo
     ##### ----- end ----- ###
 
     # 进程是否存在

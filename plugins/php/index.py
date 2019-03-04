@@ -484,8 +484,8 @@ def setDisableFunc(version):
 
 def checkPhpinfoFile(v):
     if public.isInstalledWeb():
-        desc_file = public.getServerDir() + '/openresty/nginx/conf/php_status/phpinfo_' + \
-            str(v) + '.conf'
+        desc_file = public.getServerDir(
+        ) + '/openresty/nginx/conf/php_status/phpinfo_' + v + '.conf'
         if not os.path.exists(desc_file):
             tpl = getPluginDir() + '/conf/phpinfo.conf'
             content = public.readFile(tpl)
@@ -496,15 +496,14 @@ def checkPhpinfoFile(v):
 
 def getPhpinfo(v):
     checkPhpinfoFile(v)
-    sPath = public.getRootDir() + '/phpinfo/' + str(v)
-    # public.execShell("rm -rf " + public.getRootDir() + '/phpinfo')
+    sPath = public.getRootDir() + '/phpinfo/' + v
+    public.execShell("rm -rf " + public.getRootDir() + '/phpinfo')
     public.execShell("mkdir -p " + sPath)
     public.writeFile(sPath + '/phpinfo.php', '<?php phpinfo(); ?>')
-    # print 'http://127.0.0.1/' + str(v) + '/phpinfo.php'
-    phpinfo = public.httpGet('http://127.0.0.1/' + str(v) + '/phpinfo.php')
-    public.writeFile('/tmp/phpinfo.txt', phpinfo)
-    # os.system("rm -rf " + public.getRootDir() + '/phpinfo')
-    return ''
+    url = 'http://127.0.0.1/' + v + '/phpinfo.php'
+    phpinfo = public.httpGet(url)
+    os.system("rm -rf " + public.getRootDir() + '/phpinfo')
+    return phpinfo
 
 
 def getLibConf(version):

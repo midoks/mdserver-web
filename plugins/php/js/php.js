@@ -378,7 +378,7 @@ function getPhpinfo(version) {
 }
 
 //获取PHPInfo
-function getPHPInfo(version) {
+function getPHPInfo_old(version) {
     phpPost('get_phpinfo', version, '', function(data){
         var rdata = data.data;
         layer.open({
@@ -393,7 +393,7 @@ function getPHPInfo(version) {
 }
 
 //获取PHPInfo
-function getPHPInfo_new(version) {
+function getPHPInfo(version) {
     $.post('/plugins/phpinfo', {v:version}, function(data) {
         layer.open({
             type: 1,

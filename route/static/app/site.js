@@ -984,8 +984,7 @@ function setIndexList(id){
 
 /*站点修改*/
 function webEdit(id,website,endTime,addtime){
-	var eMenu = '';
-	eMenu = "<p onclick='dirBinding("+id+")' title='子目录绑定'>子目录绑定</p>"
+	var eMenu = "<p onclick='dirBinding("+id+")' title='子目录绑定'>子目录绑定</p>"
 	+"<p onclick='webPathEdit("+id+")' title='网站目录'>网站目录</p>"
 	+"<p onclick='limitNet("+id+")' title='流量限制'>流量限制</p>"
 	+"<p onclick=\"rewrite('"+website+"')\" title='伪静态'>伪静态</p>"
@@ -1187,55 +1186,55 @@ function limitNet(id){
 			    +"<button class='btn btn-success btn-sm mt10' onclick='saveLimitNet("+id+",1)'>"+lan.public.save+"</button>"
 			    +"</div>"
 				+"<ul class='help-info-text c7 mtb15'><li>"+lan.site.limit_net_11+"</li><li>"+lan.site.limit_net_13+"</li><li>"+lan.site.limit_net_15+"</li></ul>"
-			$("#webedit-con").html(body);
+		$("#webedit-con").html(body);
 			
-			$("select[name='limit']").change(function(){
-				var type = $(this).val();
-				perserver = 300;
-				perip = 25;
-				limit_rate = 512;
-				switch(type){
-					case '1':
-						perserver = 300;
-						perip = 25;
-						limit_rate = 512;
-						break;
-					case '2':
-						perserver = 200;
-						perip = 10;
-						limit_rate = 1024;
-						break;
-					case '3':
-						perserver = 50;
-						perip = 3;
-						limit_rate = 2048;
-						break;
-					case '4':
-						perserver = 500;
-						perip = 10;
-						limit_rate = 2048;
-						break;
-					case '5':
-						perserver = 400;
-						perip = 15;
-						limit_rate = 1024;
-						break;
-					case '6':
-						perserver = 60;
-						perip = 10;
-						limit_rate = 512;
-						break;
-					case '7':
-						perserver = 150;
-						perip = 4;
-						limit_rate = 1024;
-						break;
-				}
-				
-				$("input[name='perserver']").val(perserver);
-				$("input[name='perip']").val(perip);
-				$("input[name='limit_rate']").val(limit_rate);
-			});
+		$("select[name='limit']").change(function(){
+			var type = $(this).val();
+			perserver = 300;
+			perip = 25;
+			limit_rate = 512;
+			switch(type){
+				case '1':
+					perserver = 300;
+					perip = 25;
+					limit_rate = 512;
+					break;
+				case '2':
+					perserver = 200;
+					perip = 10;
+					limit_rate = 1024;
+					break;
+				case '3':
+					perserver = 50;
+					perip = 3;
+					limit_rate = 2048;
+					break;
+				case '4':
+					perserver = 500;
+					perip = 10;
+					limit_rate = 2048;
+					break;
+				case '5':
+					perserver = 400;
+					perip = 15;
+					limit_rate = 1024;
+					break;
+				case '6':
+					perserver = 60;
+					perip = 10;
+					limit_rate = 512;
+					break;
+				case '7':
+					perserver = 150;
+					perip = 4;
+					limit_rate = 1024;
+					break;
+			}
+			
+			$("input[name='perserver']").val(perserver);
+			$("input[name='perip']").val(perip);
+			$("input[name='limit_rate']").val(limit_rate);
+		});
 	},'json');
 }
 
