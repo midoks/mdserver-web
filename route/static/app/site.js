@@ -1792,23 +1792,22 @@ function newSSL(siteName,domains){
 	$.post('/site/create_let','siteName='+siteName+'&domains='+domains+'&updateOf=1&email='+email + force,function(rdata){
 		layer.close(loadT)
 		if(rdata.status){
-			var mykeyhtml = '<div class="myKeyCon ptb15"><div class="ssl-con-key pull-left mr20">密钥(KEY)<br><textarea id="key" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.key+'</textarea></div>'
-					+ '<div class="ssl-con-key pull-left">证书(PEM格式)<br><textarea id="csr" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.csr+'</textarea></div>'
+			var mykeyhtml = '<div class="myKeyCon ptb15"><div class="ssl-con-key pull-left mr20">密钥(KEY)<br><textarea id="key" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.data.key+'</textarea></div>'
+					+ '<div class="ssl-con-key pull-left">证书(PEM格式)<br><textarea id="csr" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.data.csr+'</textarea></div>'
 					+ '</div>'
 					+ '<ul class="help-info-text c7 pull-left"><li>已为您自动生成Let\'s Encrypt免费证书；</li>\
 						<li>如需使用其他SSL,请切换其他证书后粘贴您的KEY以及PEM内容，然后保存即可。</li></ul>';
 			$(".btssl").html(mykeyhtml);
-			layer.msg(rdata.msg,{icon:rdata.status?1:2});
+			layer.msg(rdata.data.msg,{icon:rdata.status?1:2});
 			setCookie('letssl',1);
 			return;
 		}
 		
 		if(!rdata.out){
 			layer.msg(rdata.msg,{icon:rdata.status?1:2});
-			//setSSL(siteName);
+			setSSL(siteName);
 			return;
 		}
-		
 		data = "<p>"+rdata.msg+"</p><hr />"
 		if(rdata.err[0].length > 10) data += '<p style="color:red;">' + rdata.err[0].replace(/\n/g,'<br>') + '</p>';
 		if(rdata.err[1].length > 10) data += '<p style="color:red;">' + rdata.err[1].replace(/\n/g,'<br>') + '</p>';
