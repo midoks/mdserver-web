@@ -3,7 +3,7 @@
  * @param {Number} page   当前页
  * @param {String} search 搜索条件
  */
-function getWeb(page, search) {
+function getWeb(page, search, type_id) {
 	search = $("#SearchValue").prop("value");
 	page = page == undefined ? '1':page;
 	var order = getCookie('order');
@@ -13,8 +13,15 @@ function getWeb(page, search) {
 		order = '';
 	}
 
+	var type = '';
+	if ( typeof(type_id) == 'undefined' ){
+		type = '&type_id=0';
+	} else {
+		type = '&type_id='+type_id;
+	}
+
 	var sUrl = '/site/list';
-	var pdata = 'limit=10&p=' + page + '&search=' + search + order;
+	var pdata = 'limit=10&p=' + page + '&search=' + search + order + type;
 	var loadT = layer.load();
 	//取回数据
 	$.post(sUrl, pdata, function(data) {
@@ -124,6 +131,8 @@ function getWeb(page, search) {
 			$(this).hide().after("<input class='baktext' type='text' data-id='"+dataid+"' name='bak' value='" + databak + "' placeholder='备注信息' onblur='getBakPost(\"sites\")' />");
 			$(".baktext").focus();
 		});
+
+		readerTableChecked();
 	},'json');
 }
 
@@ -141,7 +150,6 @@ function getBakPost(b) {
 }
 
 function setWebPs(b, e, a) {
-	console.log(b,e,a);
 	var d = layer.load({shade: true,shadeClose: false});
 	var c = 'ps=' + a;
 	$.post('/site/set_ps', 'id=' + e + "&" + c, function(data) {
@@ -506,7 +514,7 @@ function webStart(wid, wname) {
  */
 function webDelete(wid, wname){
 	var thtml = "<div class='options'>\
-	    	<label><input type='checkbox' id='delpath' name='path'><span>"+lan.site.root_dir+"</span></label>\
+	    	<label><input type='checkbox' id='delpath' name='path'><span>根目录</span></label>\
 	    	</div>";
 	var info = '是否要删除同名根目录';
 	safeMessage('删除站点'+"["+wname+"]",info, function(){
@@ -514,7 +522,7 @@ function webDelete(wid, wname){
 		if($("#delpath").is(":checked")){
 			path='&path=1';
 		}
-		var loadT = layer.msg(lan.public.the,{icon:16,time:10000,shade: [0.3, '#000']});
+		var loadT = layer.msg('正在处理,请稍候...',{icon:16,time:10000,shade: [0.3, '#000']});
 		$.post("/site/delete","id=" + wid + "&webname=" + wname + path, function(ret){
 			layer.closeAll();
 			layer.msg(ret.msg,{icon:ret.status?1:2})
@@ -2099,6 +2107,12 @@ function getClassType(){
 		for (var i = 0; i<rdata.length; i++) {
 			$(select).append('<option value="'+rdata[i]['id']+'">'+rdata[i]['name']+'</option>');
 		}
+
+		$(select).bind('change',function(){
+			var select_id = $(this).val();
+			// console.log(select_id);
+			getWeb(1,'',select_id);
+		})
 	},'json');
 }
 getClassType();
@@ -2108,7 +2122,6 @@ getClassType();
 
 function setClassType(){
 	$.post('/site/get_site_types',function(rdata){
-
 		var list = '';
 		for (var i = 0; i<rdata.length; i++) {
 			list +='<tr><td>' + rdata[i]['name'] + '</td>\
@@ -2134,8 +2147,6 @@ function setClassType(){
 					</div>\
 				</div>'
 		});
-
-
 	},'json');
 }
 
@@ -2209,12 +2220,53 @@ function editClassType(id,name){
 }
 
 
+function moveClassTYpe(){
+	$.post('/site/get_site_types',function(rdata){
+		var option = '';
+		for (var i = 0; i<rdata.length; i++) {
+			option +='<option value="'+rdata[i]['id']+'">'+rdata[i]['name']+'</option>';
+		}
+
+		layer.open({
+			type: 1,
+			area: '350px',
+			title: '设置站点分类',
+			closeBtn: 2,
+			shift: 0,
+			content: '<div class="bt-form edit_site_type">\
+					<div class="divtable mtb15" style="overflow:auto;height:80px;">\
+						<div class="line"><span class="tname">默认站点</span>\
+							<div class="info-r">\
+							<select class="bt-input-text mr5" name="type_id" style="width:200px">'+option+'\
+							</select>\
+							</div>\
+						</div>\
+					</div>\
+					<div class="bt-form-submit-btn"><button onclick="setSizeClassType();" type="button" class="btn btn-sm btn-success">提交</button></div>\
+				</div>'
+		});
+	},'json');
+}
 
 
-
-
-
-
-
+function setSizeClassType(){
+	var data = {};
+	data['id'] = $('select[name=type_id]').val();
+	var ids = [];
+    $('table').find('td').find('input').each(function(i,obj){
+        checked = $(this).prop('checked');
+        if (checked) {
+        	ids.push($(this).val());
+        }
+    });
+	data['site_ids'] = JSON.stringify(ids);
+	$.post('/site/set_site_type',data, function(rdata){
+		showMsg(rdata.msg,function(){
+			if (rdata.status){
+				layer.closeAll();
+			}
+		},{icon:rdata.status?1:2});
+	},'json');
+}
 
 

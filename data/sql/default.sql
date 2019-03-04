@@ -65,6 +65,7 @@ CREATE TABLE IF NOT EXISTS `sites` (
   `path` TEXT,
   `status` TEXT,
   `index` TEXT,
+  `type_id` INTEGER,
   `ps` TEXT,
   `edate` TEXT,
   `addtime` TEXT

@@ -51,9 +51,15 @@ class site_api:
     def listApi(self):
         limit = request.form.get('limit', '').encode('utf-8')
         p = request.form.get('p', '').encode('utf-8')
+        type_id = request.form.get('type_id', '').encode('utf-8')
 
         start = (int(p) - 1) * (int(limit))
-        _list = public.M('sites').where('', ()).field('id,name,path,status,ps,addtime,edate').limit(
+
+        siteM = public.M('sites')
+        if type_id != '' and type_id == '-1' and type_id == '0':
+            siteM.where('type_id=?', (type_id))
+
+        _list = siteM.field('id,name,path,status,ps,addtime,edate').limit(
             (str(start)) + ',' + limit).order('id desc').select()
 
         for i in range(len(_list)):
@@ -63,7 +69,7 @@ class site_api:
         _ret = {}
         _ret['data'] = _list
 
-        count = public.M('sites').where('', ()).count()
+        count = siteM.count()
         _page = {}
         _page['count'] = count
         _page['tojs'] = 'getWeb'
@@ -1215,7 +1221,7 @@ class site_api:
         mid = request.form.get('id', '').encode('utf-8')
         site_ids = json.loads(site_ids)
         for sid in site_ids:
-            public.M('sites').where('id=?', (sid,)).setField('type_id', mid)
+            print public.M('sites').where('id=?', (sid,)).setField('type_id', mid)
         return public.returnJson(True, "设置成功!")
 
     ##### ----- end   ----- ###
@@ -1625,13 +1631,12 @@ location /{
         self.sitePort = port.strip().replace(' ', '')
         self.phpVersion = version
 
-        siteM = public.M('sites')
-        if siteM.where("name=?", (self.siteName,)).count():
+        if public.M('sites').where("name=?", (self.siteName,)).count():
             return public.returnJson(False, '您添加的站点已存在!')
 
         # 写入数据库
-        pid = siteM.add('name,path,status,ps,edate,addtime',
-                        (self.siteName, self.sitePath, '1', ps, '0000-00-00', public.getDate()))
+        pid = public.M('sites').add('name,path,status,ps,edate,addtime,type_id',
+                                    (self.siteName, self.sitePath, '1', ps, '0000-00-00', public.getDate(), 0,))
         opid = public.M('domain').where(
             "name=?", (self.siteName,)).getField('pid')
         if opid:
@@ -1643,14 +1648,13 @@ location /{
         for domain in siteMenu['domainlist']:
             sdomain = domain
             swebname = self.siteName
-            spid = str(get.pid)
+            spid = str(pid)
             # self.addDomain(domain, webname, pid)
 
         public.M('domain').add('pid,name,port,addtime',
                                (pid, self.siteName, self.sitePort, public.getDate()))
 
         self.createRootDir(self.sitePath)
-
         self.nginxAddConf()
 
         data = {}
@@ -1661,8 +1665,8 @@ location /{
     def deleteWSLogs(self, webname):
         assLogPath = public.getLogsDir() + '/' + webname + '.log'
         errLogPath = public.getLogsDir() + '/' + webname + '.error.log'
-        confFile = self.setupPath + '/openresty/nginx/conf/vhost/' + webname + '.conf'
-        rewriteFile = self.setupPath + '/openresty/nginx/conf/rewrite/' + webname + '.conf'
+        confFile = self.setupPath + '/web_conf/nginx/conf/vhost/' + webname + '.conf'
+        rewriteFile = self.setupPath + '/web_conf/nginx/conf/rewrite/' + webname + '.conf'
         logs = [assLogPath, errLogPath, confFile, rewriteFile]
         for i in logs:
             public.deleteFile(i)
