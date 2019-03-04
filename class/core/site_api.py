@@ -533,7 +533,7 @@ class site_api:
             if siteConf.find('301-START') != -1:
                 return public.returnJson(False, '检测到您的站点做了301重定向设置，请先关闭重定向!')
 
-        letpath = public.getServerDir() + '/letsencrypt/live/' + siteName
+        letpath = self.sslDir + siteName
         csrpath = letpath + "/fullchain.pem"  # 生成证书路径
         keypath = letpath + "/privkey.pem"  # 密钥文件路径
 
@@ -591,18 +591,12 @@ class site_api:
         if domainCount == 0:
             return public.returnJson(False, '请选择域名(不包括IP地址与泛域名)!')
 
-        home_path = public.getServerDir() + '/openresty/nginx/conf/cert/' + \
-            domains[0]
+        home_path = '/root/.acme.sh/' + domains[0]
         home_cert = home_path + '/fullchain.cer'
         home_key = home_path + '/' + domains[0] + '.key'
 
         if not os.path.exists(home_cert):
             home_path = '/.acme.sh/' + domains[0]
-            home_cert = home_path + '/fullchain.cer'
-            home_key = home_path + '/' + domains[0] + '.key'
-
-        if not os.path.exists(home_cert):
-            home_path = '/root/.acme.sh/' + domains[0]
             home_cert = home_path + '/fullchain.cer'
             home_key = home_path + '/' + domains[0] + '.key'
 
@@ -652,7 +646,6 @@ class site_api:
 
         # 写入配置文件
         result = self.setSslConf(siteName)
-        # print result['msg']
         if not result['status']:
             return public.getJson(result)
         result['csr'] = public.readFile(csrpath)
