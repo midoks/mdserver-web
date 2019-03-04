@@ -260,18 +260,6 @@ class plugins_api:
         import index
         content = index.getPhpinfo(v)
         return content
-
-        # self.checkPhpinfoFile(version)
-        # infoPath = public.getRootDir() + '/phpinfo'
-        # sPath = infoPath + '/' + version
-
-        # public.execShell('rm -rf ' + infoPath)
-        # public.execShell('mkdir -p ' + sPath)
-        # public.writeFile(sPath + '/phpinfo.php', '<?php phpinfo(); ?>')
-        # url = 'http://127.0.0.1/' + version + '/phpinfo.php'
-        # phpinfo = public.httpGet(url)
-        # os.system("rm -rf " + infoPath)
-        # return phpinfo
     ##### ----- end ----- ###
 
     # 进程是否存在
