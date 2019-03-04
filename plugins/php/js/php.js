@@ -373,7 +373,7 @@ function setDisableFunc(version, act, fs) {
 
 //phpinfo
 function getPhpinfo(version) {
-    var con = '<button class="btn btn-default btn-sm" onclick="getPHPInfo(\'' + version + '\')">' + lan.soft.phpinfo + '</button>';
+    var con = '<button class="btn btn-default btn-sm" onclick="getPHPInfo(\'' + version + '\')">查看phpinfo()</button>';
     $(".soft-man-con").html(con);
 }
 
@@ -390,6 +390,20 @@ function getPHPInfo(version) {
             content: rdata
         });
     });
+}
+
+//获取PHPInfo
+function getPHPInfo_new(version) {
+    $.post('/plugins/phpinfo', {v:version}, function(data) {
+        layer.open({
+            type: 1,
+            title: "PHP-" + version + "-PHPINFO",
+            area: ['90%', '90%'],
+            closeBtn: 2,
+            shadeClose: true,
+            content: data
+        });
+    }); 
 }
 
 function phpLibConfig(version){

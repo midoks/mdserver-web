@@ -251,6 +251,12 @@ class plugins_api:
             return public.returnJson(True, '安装成功!')
         public.execShell("rm -rf " + plugin_path)
         return public.returnJson(False, '安装失败!')
+
+    def phpinfoApi(self):
+        version = request.form.get('version', '')
+        phpinfo = public.httpGet(
+            'http://127.0.0.1/' + version + '/phpinfo.php')
+        return phpinfo
     ##### ----- end ----- ###
 
     # 进程是否存在
