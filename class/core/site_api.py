@@ -617,6 +617,7 @@ class site_api:
 
         # print home_cert
         cmd = 'export ACCOUNT_EMAIL=' + email + ' && ' + execStr
+        print cmd
         result = public.execShell(cmd)
 
         if not os.path.exists(home_cert.replace("\*", "*")):
