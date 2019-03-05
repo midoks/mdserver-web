@@ -314,7 +314,12 @@ function projectScriptDebug(user,name){
 }
 
 function gogsRead(){
-    var readme = '<p>* 默认使用MySQL,第一个启动加载各种配置,并修改成正确的数据库配置</p>';
-    readme += '<p>* 邮件端口使用456,gogs仅支持使用STARTTLS的SMTP协议</p>';
+
+    var readme = '<ul class="help-info-text c7">';
+    readme += '<li>默认使用MySQL,第一个启动加载各种配置,并修改成正确的数据库配置</li>';
+    readme += '<li>邮件端口使用456,gogs仅支持使用STARTTLS的SMTP协议</li>';
+    readme += '<li>如果使用项目中脚本本地同步,要把vi ~/.ssh/id_rsa.pub设置gogs的ssh密钥中</li>';
+    readme += '</ul>';
+
     $('.soft-man-con').html(readme);   
 }
