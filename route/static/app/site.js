@@ -1784,12 +1784,12 @@ function ocSSL(action,siteName){
 
 //生成SSL
 function newSSL(siteName,domains){
-	var loadT = layer.msg(lan.site.ssl_apply_2,{icon:16,time:0,shade: [0.3, '#000']});
+	var loadT = layer.msg('正在校验域名，请稍后...',{icon:16,time:0,shade: [0.3, '#000']});
 	var force = '';
 	if($("#checkDomain").prop("checked")) force = '&force=true';
 	var email = $("input[name='admin_email']").val();
 	$.post('/site/create_let','siteName='+siteName+'&domains='+domains+'&updateOf=1&email='+email + force,function(rdata){
-		layer.close(loadT)
+		layer.close(loadT);
 		if(rdata.status){
 			var mykeyhtml = '<div class="myKeyCon ptb15"><div class="ssl-con-key pull-left mr20">密钥(KEY)<br><textarea id="key" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.data.key+'</textarea></div>'
 					+ '<div class="ssl-con-key pull-left">证书(PEM格式)<br><textarea id="csr" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.data.csr+'</textarea></div>'
@@ -1802,11 +1802,10 @@ function newSSL(siteName,domains){
 			return;
 		}
 		
-		if(!rdata.out){
-			layer.msg(rdata.msg,{icon:rdata.status?1:2});
-			setSSL(siteName);
-			return;
-		}
+		// if(!rdata.status){
+		// 	layer.msg(rdata.msg,{icon:rdata.status?1:2});
+		// 	return;
+		// }
 		data = "<p>"+rdata.msg+"</p><hr />"
 		if(rdata.err[0].length > 10) data += '<p style="color:red;">' + rdata.err[0].replace(/\n/g,'<br>') + '</p>';
 		if(rdata.err[1].length > 10) data += '<p style="color:red;">' + rdata.err[1].replace(/\n/g,'<br>') + '</p>';
