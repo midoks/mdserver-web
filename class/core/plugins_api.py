@@ -177,6 +177,17 @@ class plugins_api:
             return public.returnJson(True, "OK", data[0].strip())
         return public.returnJson(False, data[1].strip())
 
+    def callbackApi(self):
+        name = request.form.get('name', '')
+        func = request.form.get('func', '')
+        args = request.form.get('args', '')
+        script = request.form.get('script', 'index')
+
+        data = self.callback(name, func, args, script)
+        if data[0]:
+            return public.returnJson(True, "OK", data[1])
+        return public.returnJson(False, data[1])
+
     def updateZipApi(self):
         tmp_path = public.getRootDir() + '/temp'
         if not os.path.exists(tmp_path):
@@ -251,15 +262,6 @@ class plugins_api:
             return public.returnJson(True, '安装成功!')
         public.execShell("rm -rf " + plugin_path)
         return public.returnJson(False, '安装失败!')
-
-    # 由于内容太大无法shell输出,暂时移动的插件模块中
-    def phpinfoApi(self):
-        v = request.form.get('v', '')
-        sys.path.append("plugins/php")
-
-        import index
-        content = index.getPhpinfo(v)
-        return content
     ##### ----- end ----- ###
 
     # 进程是否存在
@@ -750,6 +752,7 @@ class plugins_api:
         public.writeFile(self.__index, json.dumps(indexList))
         return public.returnJson(True, '删除成功!')
 
+    # shell 调用
     def run(self, name, func, version, args='', script='index'):
         path = public.getRunDir() + '/' + self.__plugin_dir + \
             '/' + name + '/' + script + '.py'
@@ -766,6 +769,29 @@ class plugins_api:
         # data = os.popen(py_cmd).read()
 
         if public.isAppleSystem():
-            print py_cmd
+            print 'run', py_cmd
         # print os.path.exists(py_cmd)
         return (data[0].strip(), data[1].strip())
+
+    # 映射包调用
+    def callback(self, name, func, args='', script='index'):
+        package = public.getRunDir() + '/plugins/' + name
+        if not os.path.exists(package):
+            return (False, "插件不存在!")
+
+        sys.path.append(package)
+        eval_str = "__import__('" + script + "')." + func + '(' + args + ')'
+        newRet = eval(eval_str)
+        if public.isAppleSystem():
+            print 'callback', eval_str, newRet
+
+        return (True, newRet)
+
+    # 由于内容太大无法shell输出,暂时移动的插件模块中
+    def phpinfoApi(self):
+        v = request.form.get('v', '')
+        sys.path.append("plugins/php")
+
+        import index
+        content = index.getPhpinfo(v)
+        return content

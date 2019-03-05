@@ -506,6 +506,10 @@ def getPhpinfo(v):
     return phpinfo
 
 
+def get_php_info(args):
+    return getPhpinfo(args['version'])
+
+
 def getLibConf(version):
     fname = public.getServerDir() + '/php/' + version + '/etc/php.ini'
     if not os.path.exists(fname):

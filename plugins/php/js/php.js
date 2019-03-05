@@ -36,6 +36,33 @@ function phpPost(method, version, args,callback){
     },'json'); 
 }
 
+function phpPostCallbak(method, version, args,callback){
+    var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
+
+    var req_data = {};
+    req_data['name'] = 'php';
+    req_data['func'] = method;
+    args['version'] = version;
+ 
+    if (typeof(args) == 'string'){
+        req_data['args'] = JSON.stringify(str2Obj(args));
+    } else {
+        req_data['args'] = JSON.stringify(args);
+    }
+
+    $.post('/plugins/callback', req_data, function(data) {
+        layer.close(loadT);
+        if (!data.status){
+            layer.msg(data.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+            return;
+        }
+
+        if(typeof(callback) == 'function'){
+            callback(data);
+        }
+    },'json'); 
+}
+
 
 //配置修改
 function phpSetConfig(version) {
@@ -392,19 +419,23 @@ function getPHPInfo_old(version) {
     });
 }
 
-//获取PHPInfo
 function getPHPInfo(version) {
-    $.post('/plugins/phpinfo', {v:version}, function(data) {
+    phpPostCallbak('get_php_info', version, {}, function(data){
+        if (!data.status){
+            layer.msg(rdata.msg, { icon: 2 });
+        }
+
         layer.open({
             type: 1,
             title: "PHP-" + version + "-PHPINFO",
             area: ['90%', '90%'],
             closeBtn: 2,
             shadeClose: true,
-            content: data
+            content: data.data
         });
-    }); 
+    })
 }
+
 
 function phpLibConfig(version){
     
