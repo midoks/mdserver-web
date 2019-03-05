@@ -9,6 +9,8 @@ import json
 import pwd
 import shutil
 sys.path.append("/usr/local/lib/python2.7/site-packages")
+sys.path.append("/usr/lib64/python2.7/site-packages")
+
 import psutil
 
 from flask import request
