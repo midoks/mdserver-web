@@ -15,6 +15,8 @@ if [ ! -f /usr/bin/applydeltarpm ];then
 	yum -y install deltarpm
 fi
 
+#https need
+curl  https://get.acme.sh | sh
 
 if [ -f "/etc/init.d/iptables" ];then
 

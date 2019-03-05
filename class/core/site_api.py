@@ -659,19 +659,19 @@ class site_api:
         file = self.getHostConf(siteName)
         conf = public.readFile(file)
         if conf:
-            if conf.find('ssl_certificate') == -1:
-                return public.returnJson(False, '当前未开启SSL')
+            # if conf.find('ssl_certificate') == -1:
+            #     return public.returnJson(False, '当前未开启SSL')
             to = """#error_page 404/404.html;
-    # HTTP_TO_HTTPS_START
+    #HTTP_TO_HTTPS_START
     if ($server_port !~ 443){
         rewrite ^(/.*)$ https://$host$1 permanent;
     }
-    # HTTP_TO_HTTPS_END"""
+    #HTTP_TO_HTTPS_END"""
             conf = conf.replace('#error_page 404/404.html;', to)
             public.writeFile(file, conf)
 
         public.restartWeb()
-        return public.returnJson(True, '设置成功!')
+        return public.returnJson(True, '设置成功!证书也要设置好哟!')
 
     def closeToHttpsApi(self):
         siteName = request.form.get('siteName', '').encode('utf-8')
@@ -685,7 +685,7 @@ class site_api:
             public.writeFile(file, conf)
 
         public.restartWeb()
-        return public.returnJson(True, '设置成功!')
+        return public.returnJson(True, '关闭HTTPS跳转成功!')
 
     def getIndexApi(self):
         sid = request.form.get('id', '').encode('utf-8')
@@ -819,7 +819,7 @@ class site_api:
 
             public.restartWeb()
             msg = public.getInfo('网站[{1}]添加域名[{2}]成功!', (webname, domain_name))
-            public.writeLog('TYPE_SITE', msg)
+            public.writeLog('网站管理', msg)
             public.M('domain').add('pid,name,port,addtime',
                                    (pid, domain_name, domain_port, public.getDate()))
 
@@ -1118,7 +1118,7 @@ class site_api:
 
         public.M('domain').where("id=?", (find['id'],)).delete()
         msg = public.getInfo('网站[{1}]删除域名[{2}]成功!', (webname, domain))
-        public.writeLog('TYPE_SITE', msg)
+        public.writeLog('网站管理', msg)
         public.restartWeb()
         return public.returnJson(True, '站点删除成功!')
 
