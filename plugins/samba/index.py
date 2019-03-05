@@ -62,8 +62,9 @@ def status():
 
 
 def start():
-	if public.isAppleSystem():
+    if public.isAppleSystem():
         return "Apple Computer does not support"
+
     data = public.execShell('systemctl start smb')
     if data[1] == '':
         return 'ok'
@@ -71,7 +72,7 @@ def start():
 
 
 def stop():
-	if public.isAppleSystem():
+    if public.isAppleSystem():
         return "Apple Computer does not support"
     data = public.execShell('systemctl stop smb')
     if data[1] == '':
@@ -80,7 +81,7 @@ def stop():
 
 
 def restart():
-	if public.isAppleSystem():
+    if public.isAppleSystem():
         return "Apple Computer does not support"
     data = public.execShell('systemctl restart smb')
     if data[1] == '':
@@ -89,7 +90,7 @@ def restart():
 
 
 def reload():
-	if public.isAppleSystem():
+    if public.isAppleSystem():
         return "Apple Computer does not support"
 
     data = public.execShell('systemctl reload smb')
