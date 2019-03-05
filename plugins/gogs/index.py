@@ -159,6 +159,15 @@ def getRootUrl():
     return tmp.groups()[0]
 
 
+def getSshPort():
+    content = public.readFile(getConf())
+    rep = 'SSH_PORT\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    if not tmp:
+        return ''
+    return tmp.groups()[0]
+
+
 def getRootPath():
     content = public.readFile(getConf())
     rep = 'ROOT\s*=\s*(.*)'
@@ -530,7 +539,9 @@ def projectScriptLoad():
     codeDir = public.getRootDir() + '/git'
 
     cc_content = public.readFile(commit_tpl)
-    cc_content = cc_content.replace('{$GITROOTURL}', getRootUrl())
+
+    sshUrl = 'ssh://127.0.0.1:' + getSshPort()
+    cc_content = cc_content.replace('{$GITROOTURL}', sshUrl)
     cc_content = cc_content.replace('{$CODE_DIR}', codeDir)
     cc_content = cc_content.replace('{$USERNAME}', user)
     cc_content = cc_content.replace('{$PROJECT}', args['name'])
