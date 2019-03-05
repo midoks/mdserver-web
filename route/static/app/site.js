@@ -1600,7 +1600,7 @@ function closeSSLHTML(txt,siteName){
 
 //设置httpToHttps
 function httpToHttps(siteName){
-	var isHttps = $("#toHttps").attr('checked');
+	var isHttps = $("#toHttps").prop('checked');
 	if(isHttps){
 		layer.confirm('关闭强制HTTPS后需要清空浏览器缓存才能看到效果,继续吗?',{icon:3,title:"关闭强制HTTPS"},function(){
 			$.post('/site/close_to_https','siteName='+siteName,function(rdata){
