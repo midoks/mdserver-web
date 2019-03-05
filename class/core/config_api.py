@@ -15,7 +15,7 @@ from flask import request
 
 class config_api:
 
-    __version = '0.1.2'
+    __version = '0.2.1'
 
     def __init__(self):
         pass
@@ -64,14 +64,14 @@ class config_api:
         isSave = public.M('panel').where(
             '(title=? OR url=?) AND id!=?', (title, url, mid)).count()
         if isSave:
-            return public.returnMsg(False, '备注或面板地址重复!')
+            return public.returnJson(False, '备注或面板地址重复!')
 
         # 更新到数据库
         isRe = public.M('panel').where('id=?', (mid,)).save(
             'title,url,username,password', (title, url, username, password))
         if isRe:
-            return public.returnMsg(True, '修改成功!')
-        return public.returnMsg(False, '修改失败!')
+            return public.returnJson(True, '修改成功!')
+        return public.returnJson(False, '修改失败!')
 
     def syncDateApi(self):
         if public.isAppleSystem():
