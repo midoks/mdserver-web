@@ -17,7 +17,7 @@ Install_samba()
 	if [ $sysName == 'Darwin' ]; then
 		echo 'The development machine is not open!!!' > $install_tmp
 	else
-		yum -y install samba samba-client samba-swat
+		yum -y install samba*  cifs-utils
 	fi
 	
 	mkdir -p $serverPath/samba
