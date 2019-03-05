@@ -938,7 +938,7 @@ function bindPanel(a,type,ip,btid,url,user,pw){
 			} else {
 				layer.msg(b.msg, {icon: 2})
 			}
-		});
+		},'json');
 		return
 	}
 	layer.open({
