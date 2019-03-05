@@ -1802,15 +1802,8 @@ function newSSL(siteName,domains){
 			return;
 		}
 		
-		// if(!rdata.status){
-		// 	layer.msg(rdata.msg,{icon:rdata.status?1:2});
-		// 	return;
-		// }
-		data = "<p>"+rdata.msg+"</p><hr />"
-		if(rdata.err[0].length > 10) data += '<p style="color:red;">' + rdata.err[0].replace(/\n/g,'<br>') + '</p>';
-		if(rdata.err[1].length > 10) data += '<p style="color:red;">' + rdata.err[1].replace(/\n/g,'<br>') + '</p>';
 		setCookie('letssl',0);
-		layer.msg(data,{icon:2,area:'500px',time:0,shade:0.3,shadeClose:true});
+		layer.msg(rdata.msg,{icon:2,area:'500px',time:0,shade:0.3,shadeClose:true});
 		
 	},'json');
 }
