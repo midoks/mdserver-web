@@ -131,6 +131,10 @@ def initdUinstall():
     os.remove(initd_bin)
     return 'ok'
 
+
+def smbConf():
+    return '/etc/samba/smb.conf'
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -149,3 +153,5 @@ if __name__ == "__main__":
         print initdInstall()
     elif func == 'initd_uninstall':
         print initdUinstall()
+    elif func == 'conf':
+        print smbConf():
