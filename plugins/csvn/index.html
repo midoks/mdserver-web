@@ -25,14 +25,17 @@ resetPluginWinWidth(700);
 $.getScript( "/plugins/file?name=csvn&f=js/csvn.js");
 
 function csvnReadme(){
-	var html = '<p>* 注意:在启动时会比较慢,需要耐心等待一会</p>';
-	html += '<p>* 注意:csvn需要java环境,在安装会自动检查并安装</p>';
-	html += '<p>* 注意:默认后台密码admin:admin,最好马上修改</p>';
-	html += '<p>* 注意:牢记admin的密码,在后csvn的管理后台和这里不同步</p>';
-	html += '<p>* 注意:在这里添加用户和csvn后台并不同步</p>';
-	html += '<p>* 注意:项目管理的地址一般是正确的,但在特殊环境下,地址可能不一致</p>';
-	html += '<p>* 注意:脚本内使用sudo名,需要注释(vi /etc/sudoers)[#Default requiretty]</p>';
 
-	$('.bt-w-main .soft-man-con').html(html);
+	var readme = '<ul class="help-info-text c7">';
+    readme += '<li>注意:在启动时会比较慢,需要耐心等待一会</li>';
+    readme += '<li>注意:csvn需要java环境,在安装会自动检查并安装</li>';
+    readme += '<li>注意:默认后台密码admin:admin,最好马上修改</li>';
+    readme += '<li>注意:牢记admin的密码,在后csvn的管理后台和这里不同步</li>';
+    readme += '<li>注意:在这里添加用户和csvn后台并不同步</li>';
+    readme += '<li>注意:项目管理的地址一般是正确的,但在特殊环境下,地址可能不一致</li>';
+    readme += '<li>注意:脚本内使用sudo名,需要注释(vi /etc/sudoers)[#Default requiretty]</li>';
+    readme += '</ul>';
+
+    $('.bt-w-main .soft-man-con').html(readme);
 }
 </script>
