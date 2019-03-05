@@ -14,13 +14,11 @@ Install_samba()
 {
 	echo '正在安装脚本文件...' > $install_tmp
 	
-
 	if [ $sysName == 'Darwin' ]; then
 		echo 'The development machine is not open!!!' > $install_tmp
-		exit 0
-		
+	else
+		yum -y install samba samba-client samba-swat
 	fi
-	yum install samba -y
 	
 	mkdir -p $serverPath/samba
 	echo '1.0' > $serverPath/samba/version.pl
