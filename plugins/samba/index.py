@@ -10,6 +10,10 @@ import sys
 sys.path.append(os.getcwd() + "/class/core")
 import public
 
+app_debug = False
+if public.isAppleSystem():
+    app_debug = True
+
 
 def getPluginName():
     return 'samba'
