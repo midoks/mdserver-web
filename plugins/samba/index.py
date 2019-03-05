@@ -154,4 +154,6 @@ if __name__ == "__main__":
     elif func == 'initd_uninstall':
         print initdUinstall()
     elif func == 'conf':
-        print smbConf():
+        print smbConf()
+    else:
+        print 'error'
