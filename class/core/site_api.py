@@ -1660,16 +1660,22 @@ location /{
     def deleteWSLogs(self, webname):
         assLogPath = public.getLogsDir() + '/' + webname + '.log'
         errLogPath = public.getLogsDir() + '/' + webname + '.error.log'
-        confFile = self.setupPath + '/web_conf/nginx/conf/vhost/' + webname + '.conf'
-        rewriteFile = self.setupPath + '/web_conf/nginx/conf/rewrite/' + webname + '.conf'
-        logs = [assLogPath, errLogPath, confFile, rewriteFile]
+        confFile = self.setupPath + '/nginx/vhost/' + webname + '.conf'
+        rewriteFile = self.setupPath + '/nginx/rewrite/' + webname + '.conf'
+        rewriteFile = self.setupPath + '/nginx/pass/' + webname + '.conf'
+        keyPath = self.sslDir + webname + '/privkey.pem'
+        certPath = self.sslDir + webname + '/fullchain.pem'
+        logs = [assLogPath,
+                errLogPath,
+                confFile,
+                rewriteFile,
+                keyPath,
+                certPath]
         for i in logs:
             public.deleteFile(i)
 
     def delete(self, sid, webname, path):
-
         self.deleteWSLogs(webname)
-
         if path == '1':
             rootPath = public.getWwwDir() + '/' + webname
             public.execShell('rm -rf ' + rootPath)
@@ -1727,7 +1733,7 @@ location /{
         self.saveCert(keyPath, certPath)
 
         msg = public.getInfo('网站[{1}]开启SSL成功!', siteName)
-        public.writeLog('TYPE_SITE', msg)
+        public.writeLog('网站管理', msg)
         return public.returnData(True, 'SSL开启成功!')
 
     def saveCert(self, keyPath, certPath):
