@@ -611,6 +611,7 @@ class site_api:
 
         # print home_cert
         cmd = 'export ACCOUNT_EMAIL=' + email + ' && ' + execStr
+        print domains
         print cmd
         result = public.execShell(cmd)
 
