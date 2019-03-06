@@ -69,7 +69,7 @@ def start():
     if public.isAppleSystem():
         return "Apple Computer does not support"
 
-    data = public.execShell('systemctl start smb')
+    data = public.execShell('systemctl start rsyncd.service')
     if data[1] == '':
         return 'ok'
     return 'fail'
@@ -78,7 +78,7 @@ def start():
 def stop():
     if public.isAppleSystem():
         return "Apple Computer does not support"
-    data = public.execShell('systemctl stop smb')
+    data = public.execShell('systemctl stop rsyncd.service')
     if data[1] == '':
         return 'ok'
     return 'fail'
@@ -87,7 +87,7 @@ def stop():
 def restart():
     if public.isAppleSystem():
         return "Apple Computer does not support"
-    data = public.execShell('systemctl restart smb')
+    data = public.execShell('systemctl restart rsyncd.service')
     if data[1] == '':
         return 'ok'
     return 'fail'
@@ -97,7 +97,7 @@ def reload():
     if public.isAppleSystem():
         return "Apple Computer does not support"
 
-    data = public.execShell('systemctl reload smb')
+    data = public.execShell('systemctl reload rsyncd.service')
     if data[1] == '':
         return 'ok'
     return 'fail'
