@@ -59,7 +59,7 @@ def checkArgs(data, ck=[]):
 
 def status():
     data = public.execShell(
-        "ps -ef|grep smbd |grep -v grep | grep -v python | awk '{print $2}'")
+        "ps -ef|grep rsync |grep -v grep | grep -v python | awk '{print $2}'")
     if data[0] == '':
         return 'stop'
     return 'start'
