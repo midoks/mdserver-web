@@ -441,10 +441,16 @@ function phpLibConfig(version){
     
     phpPost('get_lib_conf', version, '', function(data){
         var rdata = $.parseJSON(data.data);
-        var libs = rdata.data;
 
+        if (!rdata.status){
+            layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+            return;
+        }
+
+        var libs = rdata.data;
         var body = '';
         var opt = '';
+
         for (var i = 0; i < libs.length; i++) {
             if (libs[i].versions.indexOf(version) == -1){
                 continue;

@@ -132,8 +132,8 @@ def initdUinstall():
     return 'ok'
 
 
-def smbConf():
-    return '/etc/samba/smb.conf'
+def appConf():
+    return '/etc/rsyncd.conf'
 
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -154,6 +154,6 @@ if __name__ == "__main__":
     elif func == 'initd_uninstall':
         print initdUinstall()
     elif func == 'conf':
-        print smbConf()
+        print appConf()
     else:
         print 'error'

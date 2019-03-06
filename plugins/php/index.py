@@ -158,7 +158,7 @@ def phpFpmWwwReplace(version):
 def makePhpIni(version):
     d_ini = public.getServerDir() + '/php/' + version + '/etc/php.ini'
     if not os.path.exists(d_ini):
-        s_ini = getPluginDir() + '/conf/php' + version + '.ini'
+        s_ini = getPluginDir() + '/conf/php' + version[0:1] + '.ini'
         shutil.copyfile(s_ini, d_ini)
 
 
