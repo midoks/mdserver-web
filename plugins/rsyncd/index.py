@@ -82,7 +82,6 @@ def getLog():
 
 
 def initConf():
-    import re
     conf_path = appConf()
     conf = public.readFile(conf_path)
     conf = re.sub('#*(.*)', '', conf)
@@ -105,6 +104,7 @@ def start():
 
 
 def stop():
+    initConf()
     if public.isAppleSystem():
         return "Apple Computer does not support"
     data = public.execShell('systemctl stop rsyncd.service')
@@ -114,6 +114,7 @@ def stop():
 
 
 def restart():
+    initConf()
     if public.isAppleSystem():
         return "Apple Computer does not support"
     data = public.execShell('systemctl restart rsyncd.service')
@@ -123,6 +124,7 @@ def restart():
 
 
 def reload():
+    initConf()
     if public.isAppleSystem():
         return "Apple Computer does not support"
 
@@ -161,6 +163,99 @@ def initdUinstall():
     return 'ok'
 
 
+def getRecListData():
+    path = appConf()
+    content = public.readFile(path)
+
+    flist = re.findall("\[(.*)\]", content)
+    flist_len = len(flist)
+    ret_list = []
+    for i in range(flist_len):
+        tmp = {}
+        tmp['name'] = flist[i]
+        n = i + 1
+        reg = ''
+        if n == flist_len:
+            reg = '\[' + flist[i] + '\](.*)\[?'
+        else:
+            reg = '\[' + flist[i] + '\](.*)\[' + flist[n] + '\]'
+
+        t1 = re.search(reg, content, re.S)
+        if t1:
+            args = t1.groups()[0]
+            # print 'args start', args, 'args_end'
+            t2 = re.findall('\s*(.*)\s*=\s*(.*)', args, re.M)
+            for i in range(len(t2)):
+                tmp[t2[i][0].strip()] = t2[i][1]
+        ret_list.append(tmp)
+    return ret_list
+
+
+def getRecList():
+    ret_list = getRecListData()
+    return public.returnJson(True, 'ok', ret_list)
+
+
+def addRec():
+    args = getArgs()
+
+    data = checkArgs(args, ['name', 'path', 'ps'])
+    if not data[0]:
+        return data[1]
+
+    args_name = args['name']
+    args_path = args['path']
+    args_ps = args['ps']
+
+    path = appConf()
+    content = public.readFile(path)
+
+    con = "\n\n" + '[' + args_name + ']' + "\n"
+    con += 'path = ' + args_path + "\n"
+    con += 'comment = ' + args_ps + "\n"
+    con += 'read only = false'
+
+    content = content + con
+    public.writeFile(path, content)
+    return public.returnJson(True, '添加成功')
+
+
+def delRec():
+    args = getArgs()
+
+    data = checkArgs(args, ['name'])
+    if not data[0]:
+        return data[1]
+
+    args_name = args['name']
+
+    path = appConf()
+    content = public.readFile(path)
+
+    ret_list = getRecListData()
+    ret_list_len = len(ret_list)
+    is_end = False
+    next_name = ''
+    for x in range(ret_list_len):
+        tmp = ret_list[x]
+        if tmp['name'] == args_name:
+            if x == ret_list_len:
+                is_end = True
+            else:
+                next_name = ret_list[x + 1]['name']
+
+    reg = ''
+    if is_end:
+        reg = '\[' + args_name + '\]\s*(.*)'
+    else:
+        reg = '\[' + args_name + '\]\s*(.*)\s*\[' + next_name + '\]'
+
+    conre = re.search(reg,  content, re.S)
+    content = content.replace("[" + args_name + "]\n" + conre.groups()[0], '')
+    public.writeFile(path, content)
+    return public.returnJson(True, '删除成功!')
+
+
 # rsyncdReceive
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -184,5 +279,11 @@ if __name__ == "__main__":
         print appConf()
     elif func == 'run_log':
         print getLog()
+    elif func == 'rec_list':
+        print getRecList()
+    elif func == 'add_rec':
+        print addRec()
+    elif func == 'del_rec':
+        print delRec()
     else:
         print 'error'
