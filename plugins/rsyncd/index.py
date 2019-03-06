@@ -71,6 +71,12 @@ def appConf():
     return '/etc/rsyncd.conf'
 
 
+def appConfPwd():
+    if public.isAppleSystem():
+        return getServerDir() + '/rsyncd.passwd'
+    return '/etc/rsyncd.passwd'
+
+
 def getLog():
     conf_path = appConf()
     conf = public.readFile(conf_path)
@@ -89,6 +95,10 @@ def initConf():
     if conf.strip() == '':
         content = public.readFile(conf_tpl_path)
         public.writeFile(conf_path, content)
+    confpwd_path = appConfPwd()
+    if not os.path.exists(confpwd_path):
+        public.writeFile(confpwd_path, '')
+        public.execShell('chmod 0600 ' + confpwd_path)
 
 
 def start():
@@ -104,7 +114,6 @@ def start():
 
 
 def stop():
-    initConf()
     if public.isAppleSystem():
         return "Apple Computer does not support"
     data = public.execShell('systemctl stop rsyncd.service')
@@ -114,7 +123,6 @@ def stop():
 
 
 def restart():
-    initConf()
     if public.isAppleSystem():
         return "Apple Computer does not support"
     data = public.execShell('systemctl restart rsyncd.service')
@@ -124,7 +132,6 @@ def restart():
 
 
 def reload():
-    initConf()
     if public.isAppleSystem():
         return "Apple Computer does not support"
 
@@ -137,8 +144,9 @@ def reload():
 def initdStatus():
     if public.isAppleSystem():
         return "Apple Computer does not support"
-    initd_bin = getInitDFile()
-    if os.path.exists(initd_bin):
+
+    data = public.execShell('systemctl status rsyncd.service | grep enabled')
+    if data[1] == '':
         return 'ok'
     return 'fail'
 
@@ -146,21 +154,19 @@ def initdStatus():
 def initdInstall():
     if public.isAppleSystem():
         return "Apple Computer does not support"
-
-    source_bin = initDreplace()
-    initd_bin = getInitDFile()
-    shutil.copyfile(source_bin, initd_bin)
-    public.execShell('chmod +x ' + initd_bin)
-    return 'ok'
+    data = public.execShell('systemctl enable rsyncd.service')
+    if data[1] == '':
+        return 'ok'
+    return 'fail'
 
 
 def initdUinstall():
     if public.isAppleSystem():
         return "Apple Computer does not support"
-
-    initd_bin = getInitDFile()
-    os.remove(initd_bin)
-    return 'ok'
+    data = public.execShell('systemctl disable rsyncd.service')
+    if data[1] == '':
+        return 'ok'
+    return 'fail'
 
 
 def getRecListData():
@@ -196,16 +202,33 @@ def getRecList():
     return public.returnJson(True, 'ok', ret_list)
 
 
+def getUPwdList():
+    pwd_path = appConfPwd()
+    pwd_content = public.readFile(pwd_path)
+    plist = pwd_content.strip().split('\n')
+    plist_len = len(plist)
+    data = {}
+    for x in range(plist_len):
+        tmp = plist[x].split(':')
+        data[tmp[0]] = tmp[1]
+    return data
+
+
 def addRec():
     args = getArgs()
-
-    data = checkArgs(args, ['name', 'path', 'ps'])
+    data = checkArgs(args, ['name', 'path', 'pwd', 'ps'])
     if not data[0]:
         return data[1]
 
     args_name = args['name']
+    args_pwd = args['pwd']
     args_path = args['path']
     args_ps = args['ps']
+
+    pwd_path = appConfPwd()
+    pwd_content = public.readFile(pwd_path)
+    pwd_content += args_name + ':' + args_pwd + "\n"
+    public.writeFile(pwd_path, pwd_content)
 
     path = appConf()
     content = public.readFile(path)
@@ -213,6 +236,7 @@ def addRec():
     con = "\n\n" + '[' + args_name + ']' + "\n"
     con += 'path = ' + args_path + "\n"
     con += 'comment = ' + args_ps + "\n"
+    con += 'auth users = ' + args_name + "\n"
     con += 'read only = false'
 
     content = content + con
@@ -222,39 +246,59 @@ def addRec():
 
 def delRec():
     args = getArgs()
+    data = checkArgs(args, ['name'])
+    if not data[0]:
+        return data[1]
+    args_name = args['name']
 
+    cmd = "sed -i '_bak' '/" + args_name + "/d' " + appConfPwd()
+    public.execShell(cmd)
+
+    try:
+
+        path = appConf()
+        content = public.readFile(path)
+
+        ret_list = getRecListData()
+        ret_list_len = len(ret_list)
+        is_end = False
+        next_name = ''
+        for x in range(ret_list_len):
+            tmp = ret_list[x]
+            if tmp['name'] == args_name:
+                if x + 1 == ret_list_len:
+                    is_end = True
+                else:
+                    next_name = ret_list[x + 1]['name']
+        reg = ''
+        if is_end:
+            reg = '\[' + args_name + '\]\s*(.*)'
+        else:
+            reg = '\[' + args_name + '\]\s*(.*)\s*\[' + next_name + '\]'
+
+        conre = re.search(reg,  content, re.S)
+        content = content.replace(
+            "[" + args_name + "]\n" + conre.groups()[0], '')
+        public.writeFile(path, content)
+        return public.returnJson(True, '删除成功!')
+    except Exception as e:
+        return public.returnJson(False, '删除失败!')
+
+
+def cmdRec():
+    args = getArgs()
     data = checkArgs(args, ['name'])
     if not data[0]:
         return data[1]
 
-    args_name = args['name']
+    an = args['name']
+    pwd_list = getUPwdList()
+    ip = public.getLocalIp()
 
-    path = appConf()
-    content = public.readFile(path)
-
-    ret_list = getRecListData()
-    ret_list_len = len(ret_list)
-    is_end = False
-    next_name = ''
-    for x in range(ret_list_len):
-        tmp = ret_list[x]
-        if tmp['name'] == args_name:
-            if x == ret_list_len:
-                is_end = True
-            else:
-                next_name = ret_list[x + 1]['name']
-
-    reg = ''
-    if is_end:
-        reg = '\[' + args_name + '\]\s*(.*)'
-    else:
-        reg = '\[' + args_name + '\]\s*(.*)\s*\[' + next_name + '\]'
-
-    conre = re.search(reg,  content, re.S)
-    content = content.replace("[" + args_name + "]\n" + conre.groups()[0], '')
-    public.writeFile(path, content)
-    return public.returnJson(True, '删除成功!')
-
+    cmd = 'echo "' + pwd_list[an] + '" > /tmp/p.pass' + "<br>"
+    cmd += 'rsync -arv --password-file=/tmp/p.pass --progress --delete  /project  ' + \
+        an + '@' + ip + '::' + an
+    return public.returnJson(True, 'OK!', cmd)
 
 # rsyncdReceive
 if __name__ == "__main__":
@@ -277,6 +321,8 @@ if __name__ == "__main__":
         print initdUinstall()
     elif func == 'conf':
         print appConf()
+    elif func == 'conf_pwd':
+        print appConfPwd()
     elif func == 'run_log':
         print getLog()
     elif func == 'rec_list':
@@ -285,5 +331,7 @@ if __name__ == "__main__":
         print addRec()
     elif func == 'del_rec':
         print delRec()
+    elif func == 'cmd_rec':
+        print cmdRec()
     else:
         print 'error'
