@@ -146,7 +146,7 @@ def initdStatus():
         return "Apple Computer does not support"
 
     data = public.execShell('systemctl status rsyncd.service | grep enabled')
-    if data[0] == '':
+    if data[1] == '':
         return 'ok'
     return 'fail'
 
