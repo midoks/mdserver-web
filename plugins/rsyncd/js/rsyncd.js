@@ -62,7 +62,12 @@ function rsyncdReceive(){
                 '<td>' + list[i]['name']+'</td>' +
                 '<td>' + list[i]['path']+'</td>' +
                 '<td>' + list[i]['comment']+'</td>' +
-                '<td><a class="btlink" onclick="modUser(\''+list[i]['name']+'\')">改密</a>|<a class="btlink" onclick="delReceive(\''+list[i]['name']+'\')">删除</a></td></tr>';
+                '<td>\
+                	<a class="btlink" onclick="modReceive(\''+list[i]['name']+'\')">密钥</a>\
+                	| <a class="btlink" onclick="modReceive(\''+list[i]['name']+'\')">编辑</a>\
+                	| <a class="btlink" onclick="cmdReceive(\''+list[i]['name']+'\')">命令</a>\
+                	| <a class="btlink" onclick="delReceive(\''+list[i]['name']+'\')">删除</a></td>\
+                </tr>';
         }
 
         con += '</tbody>';
