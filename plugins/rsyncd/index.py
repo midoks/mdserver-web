@@ -84,7 +84,7 @@ def getLog():
 def initConf():
     conf_path = appConf()
     conf = public.readFile(conf_path)
-    conf = re.sub('#*(.*)', '', conf)
+    conf = re.sub('^#(.*)', '', conf)
     conf_tpl_path = getPluginDir() + '/conf/rsyncd.conf'
     if conf.strip() == '':
         content = public.readFile(conf_tpl_path)
