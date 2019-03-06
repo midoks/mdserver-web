@@ -233,7 +233,7 @@ function webAdd(type) {
 	                    <div class='line'>\
 	                    <span class='tname'>备注</span>\
 	                    <div class='info-r c4'>\
-	                    	<input id='Wbeizhu' class='bt-input-text' type='text' name='ps' placeholder='"+lan.site.note_ph+"' style='width:458px' />\
+	                    	<input id='Wbeizhu' class='bt-input-text' type='text' name='ps' placeholder='网站备注' style='width:458px' />\
 	                    </div>\
 	                    </div>\
 	                    <div class='line'>\
