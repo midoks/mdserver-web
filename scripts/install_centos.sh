@@ -60,7 +60,7 @@ yum install -y wget curl unzip zip
 # fi 
 
 yum groupinstall -y "Development Tools"
-paces="wget python-devel python-imaging libicu-devel zip unzip openssl openssl-devel gcc libxml2 libxml2-dev libxslt* zlib zlib-devel libjpeg-devel libpng-devel libwebp libwebp-devel freetype freetype-devel lsof pcre pcre-devel vixie-cron crontabs"
+paces="wget python-devel python-imaging libicu-devel zip unzip bzip2-devel openssl openssl-devel gcc libxml2 libxml2-dev libxslt* zlib zlib-devel libjpeg-devel libpng-devel libwebp libwebp-devel freetype freetype-devel lsof pcre pcre-devel vixie-cron crontabs"
 yum -y install $paces
 yum -y lsof net-tools.x86_64
 yum -y install ncurses-devel mysql-dev locate cmake

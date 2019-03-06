@@ -19,24 +19,25 @@ install_tmp=${rootPath}/tmp/bt_install.pl
 Install_php()
 {
 #------------------------ install start ------------------------------------#
-echo "安装php-5.2.17 ..." > $install_tmp
+echo "安装php-7.0.30 ..." > $install_tmp
 mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
-if [ ! -f $sourcePath/php/php-5.2.17.tar.bz2 ];then
-	wget -O $sourcePath/php/php-5.2.17.tar.bz2 https://museum.php.net/php5/php-5.2.17.tar.bz2
+if [ ! -f $sourcePath/php/php-7.0.30.tar.xz ];then
+	wget -O $sourcePath/php/php-7.0.30.tar.xz https://museum.php.net/php7/php-7.0.30.tar.xz
 fi
 
-if [ ! -d $sourcePath/php/php-5.2.17 ];then
-	cd $sourcePath/php && tar -Jxf $sourcePath/php/php-5.2.17.tar.bz2
+if [ ! -d $sourcePath/php/php-7.0.30 ];then
+	cd $sourcePath/php && tar -Jxf $sourcePath/php/php-7.0.30.tar.xz
 fi
 
 
-cd $sourcePath/php/php-5.2.17 && ./configure \
---prefix=$serverPath/php/php52 \
---exec-prefix=$serverPath/php/php52 \
---with-config-file-path=$serverPath/php/php55/etc \
+cd $sourcePath/php/php-7.0.30 && ./configure \
+--prefix=$serverPath/php/70 \
+--exec-prefix=$serverPath/php/70 \
+--with-config-file-path=$serverPath/php/70/etc \
 --with-zlib-dir=$serverPath/lib/zlib \
+--enable-mysqlnd \
 --without-iconv \
 --enable-zip \
 --enable-mbstring \
@@ -45,7 +46,7 @@ cd $sourcePath/php/php-5.2.17 && ./configure \
 --enable-soap \
 --enable-posix \
 --enable-fpm \
-&& make && make install
+&& make && make install && make clean
 
 #------------------------ install end ------------------------------------#
 }
@@ -54,7 +55,8 @@ cd $sourcePath/php/php-5.2.17 && ./configure \
 
 Uninstall_php()
 {
-	echo "卸载php-5.2.17 ..." > $install_tmp
+	rm -rf $serverPath/php/70
+	echo "卸载php-7.0.30 ..." > $install_tmp
 }
 
 action=${1}

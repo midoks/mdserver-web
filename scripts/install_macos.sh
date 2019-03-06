@@ -14,6 +14,8 @@ mkdir -p $DEV/wwwlogs
 mkdir -p $DEV/backup/database
 mkdir -p $DEV/backup/site
 
+brew install libzip bzip2
+
 # install brew
 if [ ! -f /usr/local/bin/brew ];then
 	/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
