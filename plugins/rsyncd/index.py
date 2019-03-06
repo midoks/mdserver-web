@@ -65,7 +65,36 @@ def status():
     return 'start'
 
 
+def appConf():
+    if public.isAppleSystem():
+        return getServerDir() + '/rsyncd.conf'
+    return '/etc/rsyncd.conf'
+
+
+def getLog():
+    conf_path = appConf()
+    conf = public.readFile(conf_path)
+    rep = 'log file\s*=\s*(.*)'
+    tmp = re.search(rep, conf)
+    if not tmp:
+        return ''
+    return tmp.groups()[0]
+
+
+def initConf():
+    import re
+    conf_path = appConf()
+    conf = public.readFile(conf_path)
+    conf = re.sub('#*(.*)', '', conf)
+    conf_tpl_path = getPluginDir() + '/conf/rsyncd.conf'
+    if conf.strip() == '':
+        content = public.readFile(conf_tpl_path)
+        public.writeFile(conf_path, content)
+
+
 def start():
+    initConf()
+
     if public.isAppleSystem():
         return "Apple Computer does not support"
 
@@ -132,9 +161,7 @@ def initdUinstall():
     return 'ok'
 
 
-def appConf():
-    return '/etc/rsyncd.conf'
-
+# rsyncdReceive
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -155,5 +182,7 @@ if __name__ == "__main__":
         print initdUinstall()
     elif func == 'conf':
         print appConf()
+    elif func == 'run_log':
+        print getLog()
     else:
         print 'error'
