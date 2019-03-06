@@ -44,7 +44,7 @@ function rsyncdReceive(){
 			layer.msg(rdata.msg,{icon:rdata.status?1:2,time:2000,shade: [0.3, '#000']});
 			return;
 		}
-		console.log(rdata);
+		// console.log(rdata);
 		var list = rdata.data;
 		var con = '';
         con += '<div class="divtable" style="margin-top:5px;"><table class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0">';
@@ -57,15 +57,14 @@ function rsyncdReceive(){
 
         con += '<tbody>';
 
+        //<a class="btlink" onclick="modReceive(\''+list[i]['name']+'\')">编辑</a>
         for (var i = 0; i < list.length; i++) {
             con += '<tr>'+
                 '<td>' + list[i]['name']+'</td>' +
                 '<td>' + list[i]['path']+'</td>' +
                 '<td>' + list[i]['comment']+'</td>' +
                 '<td>\
-                	<a class="btlink" onclick="modReceive(\''+list[i]['name']+'\')">密钥</a>\
-                	| <a class="btlink" onclick="modReceive(\''+list[i]['name']+'\')">编辑</a>\
-                	| <a class="btlink" onclick="cmdReceive(\''+list[i]['name']+'\')">命令</a>\
+                	<a class="btlink" onclick="cmdReceive(\''+list[i]['name']+'\')">命令</a>\
                 	| <a class="btlink" onclick="delReceive(\''+list[i]['name']+'\')">删除</a></td>\
                 </tr>';
         }
@@ -90,6 +89,13 @@ function addReceive(){
                 </div>\
             </div>\
             <div class='line'>\
+                <span class='tname'>密钥</span>\
+                <div class='info-r c4'>\
+                	<input id='MyPassword' class='bt-input-text' type='text' name='pwd' placeholder='密钥' style='width:200px' />\
+                	<span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatPwd(16)'></span>\
+                </div>\
+            </div>\
+            <div class='line'>\
                 <span class='tname'>同步到</span>\
                 <div class='info-r c4'>\
                 	<input id='inputPath' class='bt-input-text' type='text' name='path' placeholder='/' style='width:200px' />\
@@ -105,12 +111,16 @@ function addReceive(){
             <div class='bt-form-submit-btn'>\
                 <button type='button' id='add_ok' class='btn btn-success btn-sm btn-title bi-btn'>确认</button>\
             </div>\
-        </div>"
+        </div>",
+        success:function(layero, index){
+        	repeatPwd(16);
+        }
     });
 
     $('#add_ok').click(function(){
         _data = {};
         _data['name'] = $('#name').val();
+        _data['pwd'] = $('#MyPassword').val();
         _data['path'] = $('#inputPath').val();
         _data['ps'] = $('#ps').val();
         var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
@@ -136,10 +146,24 @@ function delReceive(name){
 	});
 }
 
+function cmdReceive(name){
+	var _data = {};
+	_data['name'] = name;
+	rsPost('cmd_rec', _data, function(data){
+        var rdata = $.parseJSON(data.data);
+	    layer.open({
+	        type: 1,
+	        title: '命令事例',
+	        area: '400px',
+	        content:"<div class='bt-form pd20 pb70 c6'>"+rdata.data+"</div>"
+    	});
+    });
+}
+
 
 function rsRead(){
 	var readme = '<ul class="help-info-text c7">';
-    readme += '<li>如需将其他服务器数据同步到本地服务器，请在接受配置中 "创建接受任务" </li>';
+    readme += '<li>如需将其他服务器数据同步到本地服务器，请在接受配置中 "创建接收任务" </li>';
     readme += '</ul>';
 
     $('.soft-man-con').html(readme);   
