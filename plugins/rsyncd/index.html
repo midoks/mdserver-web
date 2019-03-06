@@ -1,10 +1,10 @@
 <div class="bt-form">
 	<div class="bt-w-main">
 		<div class="bt-w-menu">
-			<p class="bgw" onclick="pluginService('samba');">服务</p>
-			<p onclick="pluginInitD('samba');">自启动</p>
-			<p onclick="pluginConfig('samba');">配置修改</p>
-			<p onclick="pluginLogs('samba','','run_log');">日志</p>
+			<p class="bgw" onclick="pluginService('rsyncd');">服务</p>
+			<p onclick="pluginInitD('rsyncd');">自启动</p>
+			<p onclick="pluginConfig('rsyncd');">配置修改</p>
+			<p onclick="pluginLogs('rsyncd','','run_log');">日志</p>
 			<p onclick="smbRead()">说明</p>
 		</div>
 		<div class="bt-w-con pd15">
@@ -14,7 +14,7 @@
 </div>
 
 <script type="text/javascript">
-$.getScript( "/plugins/file?name=samba&f=js/samba.js", function() {
-	pluginService('samba');
+$.getScript( "/plugins/file?name=rsyncd&f=js/rsyncd.js", function() {
+	pluginService('rsyncd');
 });
 </script>
