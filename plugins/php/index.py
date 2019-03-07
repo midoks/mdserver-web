@@ -569,11 +569,12 @@ def uninstallLib(version):
     execstr = "cd " + getPluginDir() + '/versions/' + version + " && /bin/bash " + \
         name + '.sh' + ' uninstall ' + version
 
-    rettime = time.strftime('%Y-%m-%d %H:%M:%S')
-    insert_info = (None, '安装[' + name + '-' + version + ']',
-                   'execshell', '0', rettime, execstr)
-    public.M('tasks').add('id,name,type,status,addtime,execstr', insert_info)
-    return public.returnJson(True, '已将卸载载任务添加到队列!')
+    data = public.execShell(execstr)
+    if data[1] == '':
+        return public.returnJson(True, '已经卸载成功!')
+    else:
+        return public.returnJson(False, '卸载出现错误信息!' + data[1])
+
 
 if __name__ == "__main__":
 
