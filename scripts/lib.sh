@@ -27,6 +27,23 @@ echo -e "Install_Zlib" >> ${libPath}/lib.pl
 #----------------------------- zlib end  -------------------------#
 }
 
+
+Install_Libmemcached()
+{
+#----------------------------- libmemcached start -------------------------#
+if [ ! -d ${libPath}/libmemcached ];then
+    cd ${sourcePath}
+    if [ ! -f ${sourcePath}/libmemcached-1.0.4.tar.gz ];then
+    	wget -O libmemcached-1.0.4.tar.gz https://launchpad.net/libmemcached/1.0/1.0.4/+download/libmemcached-1.0.4.tar.gz -T 20
+    fi 
+    tar -zxf libmemcached-1.0.4.tar.gz
+    cd libmemcached-1.0.4
+    ./configure --prefix=${libPath}/libmemcached && make && make install
+fi
+echo -e "Install_Libmemcached" >> ${libPath}/lib.pl
+#----------------------------- libmemcached end -------------------------#
+}
+
 Install_Libiconv()
 {
 	if [ -d '/usr/local/libiconv' ];then
@@ -207,6 +224,7 @@ fi
 
 Install_Zlib
 # Install_Lib
+Install_Libmemcached
 Install_OpenSSL
 # Install_Pcre
 # Install_Mhash
