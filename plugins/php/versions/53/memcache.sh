@@ -11,12 +11,11 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
-LIBNAME=redis
+LIBNAME=memcache
 sysName=`uname`
 actionType=$1
 version=$2
-
-extDir=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20090626/
+extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20090626/${LIBNAME}.so
 
 Install_lib()
 {
@@ -26,32 +25,30 @@ Install_lib()
 		return
 	fi
 	
-	extFile=$extDir${LIBNAME}.so
+	
 	if [ ! -f "$extFile" ];then
 
 		php_lib=$sourcePath/php_${version}_lib
 		mkdir -p $php_lib
 
-		if [ ! -f $php_lib/redis-4.2.0.tgz ];then
-			wget -O $php_lib/redis-4.2.0.tgz http://pecl.php.net/get/redis-4.2.0.tgz
-		fi
+		wget -O $php_lib/memcache-2.2.7.tgz http://pecl.php.net/get/memcache-2.2.7.tgz
 
-		cd $php_lib && tar xvf redis-4.2.0.tgz
-		cd redis-4.2.0
+		cd $php_lib && tar xvf memcache-2.2.7.tgz
+		cd memcache-2.2.7
 		$serverPath/php/$version/bin/phpize
-		./configure --with-php-config=$serverPath/php/$version/bin/php-config
+		./configure --with-php-config=$serverPath/php/$version/bin/php-config --enable-memcache --with-zlib-dir
 		make && make install
 
 		cd $php_lib
-		rm -rf redis-*
+		rm -rf memcache-*
 		rm -f package.xml
 	fi
-	sleep 1
+	
 	if [ ! -f "$extFile" ];then
 		echo "ERROR!"
 		return
 	fi
-	echo "extension=redis.so" >> $serverPath/php/$version/etc/php.ini
+	echo "extension=memcache.so" >> $serverPath/php/$version/etc/php.ini
 
 	$serverPath/php/init.d/php$version reload
 	echo '==========================================================='
@@ -66,21 +63,19 @@ Uninstall_lib()
 		return
 	fi
 	
-	extFile=$extDir${LIBNAME}.so
 	if [ ! -f "$extFile" ];then
 		echo "php$version 未安装${LIBNAME},请选择其它版本!"
 		echo "php-$vphp not install memcache, Plese select other version!"
 		return
 	fi
 	
-	sed -i '_bak' '/redis.so/d' $serverPath/php/$version/etc/php.ini
+	sed -i '_bak' '/memcache.so/d' $serverPath/php/$version/etc/php.ini
 		
 	rm -f $extFile
 	$serverPath/php/init.d/php$version reload
 	echo '==============================================='
 	echo 'successful!'
 }
-
 
 
 if [ "$actionType" == 'install' ];then

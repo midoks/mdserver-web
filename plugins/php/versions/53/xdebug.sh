@@ -11,12 +11,12 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
-LIBNAME=redis
+LIBNAME=xdebug
+LIBV=2.2.7
 sysName=`uname`
 actionType=$1
 version=$2
-
-extDir=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20090626/
+extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20090626/${LIBNAME}.so
 
 Install_lib()
 {
@@ -26,32 +26,32 @@ Install_lib()
 		return
 	fi
 	
-	extFile=$extDir${LIBNAME}.so
+	
 	if [ ! -f "$extFile" ];then
 
 		php_lib=$sourcePath/php_${version}_lib
 		mkdir -p $php_lib
 
-		if [ ! -f $php_lib/redis-4.2.0.tgz ];then
-			wget -O $php_lib/redis-4.2.0.tgz http://pecl.php.net/get/redis-4.2.0.tgz
-		fi
+		wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
 
-		cd $php_lib && tar xvf redis-4.2.0.tgz
-		cd redis-4.2.0
+		cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
+		cd ${LIBNAME}-${LIBV}
 		$serverPath/php/$version/bin/phpize
-		./configure --with-php-config=$serverPath/php/$version/bin/php-config
+		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
+		--enable-memcache --with-zlib-dir=$serverPath/lib/zlib \
+		--with-libmemcached-dir=$serverPath/lib/libmemcached
 		make && make install
 
 		cd $php_lib
-		rm -rf redis-*
+		rm -rf memcached-*
 		rm -f package.xml
 	fi
-	sleep 1
+	
 	if [ ! -f "$extFile" ];then
 		echo "ERROR!"
 		return
 	fi
-	echo "extension=redis.so" >> $serverPath/php/$version/etc/php.ini
+	echo "extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
 
 	$serverPath/php/init.d/php$version reload
 	echo '==========================================================='
@@ -66,21 +66,19 @@ Uninstall_lib()
 		return
 	fi
 	
-	extFile=$extDir${LIBNAME}.so
 	if [ ! -f "$extFile" ];then
 		echo "php$version 未安装${LIBNAME},请选择其它版本!"
-		echo "php-$vphp not install memcache, Plese select other version!"
+		echo "php-$vphp not install ${LIBNAME}, Plese select other version!"
 		return
 	fi
 	
-	sed -i '_bak' '/redis.so/d' $serverPath/php/$version/etc/php.ini
+	sed -i '_bak' '/${LIBNAME}.so/d' $serverPath/php/$version/etc/php.ini
 		
 	rm -f $extFile
 	$serverPath/php/init.d/php$version reload
 	echo '==============================================='
 	echo 'successful!'
 }
-
 
 
 if [ "$actionType" == 'install' ];then
