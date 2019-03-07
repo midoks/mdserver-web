@@ -32,6 +32,22 @@ if [ ! -d $sourcePath/php/php-5.3.29 ];then
 fi
 
 
+
+if [  -f $serverPath/php/53/bin/php.dSYM ];then
+	mv $serverPath/php/53/bin/php.dSYM $serverPath/php/53/bin/php
+fi
+
+if [  -f $serverPath/php/53/sbin/php-fpm.dSYM ];then
+	mv $serverPath/php/53/sbin/php-fpm.dSYM $serverPath/php/53/sbin/php-fpm
+fi
+
+
+if [ -f $serverPath/php/53/bin/php ];then
+	return
+fi
+
+#echo 'going?'
+
 cd $sourcePath/php/php-5.3.29 && ./configure \
 --prefix=$serverPath/php/53 \
 --exec-prefix=$serverPath/php/53 \
