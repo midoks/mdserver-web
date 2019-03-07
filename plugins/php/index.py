@@ -570,10 +570,11 @@ def uninstallLib(version):
         name + '.sh' + ' uninstall ' + version
 
     data = public.execShell(execstr)
-    if data[1] == '':
+    # print data
+    if data[0] == '':
         return public.returnJson(True, '已经卸载成功!')
     else:
-        return public.returnJson(False, '卸载出现错误信息!' + data[1])
+        return public.returnJson(False, '卸载出现错误信息!:' + data[0])
 
 
 if __name__ == "__main__":
