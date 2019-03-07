@@ -56,6 +56,7 @@ cd $sourcePath/php/php-5.3.29 && ./configure \
 --enable-mysqlnd \
 --without-iconv \
 --enable-zip \
+--enable-sockets \
 --enable-mbstring \
 --enable-ftp \
 --enable-wddx \
@@ -63,6 +64,15 @@ cd $sourcePath/php/php-5.3.29 && ./configure \
 --enable-posix \
 --enable-fpm \
 && make && make install && make clean
+
+
+if [  -f $serverPath/php/53/bin/php.dSYM ];then
+	mv $serverPath/php/53/bin/php.dSYM $serverPath/php/53/bin/php
+fi
+
+if [  -f $serverPath/php/53/sbin/php-fpm.dSYM ];then
+	mv $serverPath/php/53/sbin/php-fpm.dSYM $serverPath/php/53/sbin/php-fpm
+fi
 
 #------------------------ install end ------------------------------------#
 }
