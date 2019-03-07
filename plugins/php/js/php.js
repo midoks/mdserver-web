@@ -508,9 +508,12 @@ function installPHPLib(version, name, title, pathinfo) {
 
         phpPost('install_lib', version, data, function(data){
             var rdata = $.parseJSON(data.data);
-            layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
-            getTaskCount();
-            phpLibConfig(version);
+            // layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+            showMsg(rdata.msg, function(){
+                getTaskCount();
+                phpLibConfig(version);
+            },{ icon: rdata.status ? 1 : 2 });
+            
         });
     });
 }
@@ -522,9 +525,12 @@ function uninstallPHPLib(version, name, title, pathinfo) {
         var data = 'name=' + name + '&version=' + version;
         phpPost('uninstall_lib', version, data, function(data){
             var rdata = $.parseJSON(data.data);
-            layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
-            getTaskCount();
-            phpLibConfig(version);
+            // layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+            showMsg(rdata.msg, function(){
+                getTaskCount();
+                phpLibConfig(version);
+            },{ icon: rdata.status ? 1 : 2 });
+            
         });
     });
 }
