@@ -783,7 +783,7 @@ class plugins_api:
         eval_str = "__import__('" + script + "')." + func + '(' + args + ')'
         newRet = eval(eval_str)
         if public.isAppleSystem():
-            print 'callback', eval_str, newRet
+            print 'callback', eval_str
 
         return (True, newRet)
 
