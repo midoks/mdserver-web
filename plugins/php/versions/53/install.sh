@@ -58,6 +58,8 @@ cd $sourcePath/php/php-5.3.29 && ./configure \
 --enable-zip \
 --enable-sockets \
 --enable-mbstring \
+--enable-sysvshm \
+--enable-sysvmsg \
 --enable-ftp \
 --enable-wddx \
 --enable-soap \
