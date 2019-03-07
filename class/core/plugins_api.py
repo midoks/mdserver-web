@@ -115,7 +115,7 @@ class plugins_api:
         public.M('tasks').add('id,name,type,status,addtime, execstr', taskAdd)
         return public.returnJson(True, '已将安装任务添加到队列!')
 
-    def uninstallApi(self):
+    def uninstallOldApi(self):
         rundir = public.getRunDir()
         name = request.form.get('name', '')
         version = request.form.get('version', '')
@@ -141,6 +141,34 @@ class plugins_api:
 
         public.M('tasks').add('id,name,type,status,addtime, execstr', taskAdd)
         return public.returnJson(True, '已将卸载任务添加到队列!')
+
+    # 卸载时间短,不加入任务中...
+    def uninstallApi(self):
+        rundir = public.getRunDir()
+        name = request.form.get('name', '')
+        version = request.form.get('version', '')
+        if name.strip() == '':
+            return public.returnJson(False, "缺少插件名称!", ())
+
+        if version.strip() == '':
+            return public.returnJson(False, "缺少版本信息!", ())
+
+        infoJsonPos = self.__plugin_dir + '/' + name + '/' + 'info.json'
+
+        if not os.path.exists(infoJsonPos):
+            return public.retJson(False, "配置文件不存在!", ())
+
+        pluginInfo = json.loads(public.readFile(infoJsonPos))
+
+        execstr = "cd " + os.getcwd() + "/plugins/" + \
+            name + " && /bin/bash " + pluginInfo["shell"] \
+            + " uninstall " + version
+
+        data = public.execShell(execstr)
+        if data[1] == '':
+            return public.returnJson(True, '已将卸载成功!')
+        else:
+            return public.returnJson(False, '卸载出现错误信息!' + data[1])
 
     def checkApi(self):
         name = request.form.get('name', '')
@@ -786,12 +814,3 @@ class plugins_api:
             print 'callback', eval_str
 
         return (True, newRet)
-
-    # 由于内容太大无法shell输出,暂时移动的插件模块中
-    def phpinfoApi(self):
-        v = request.form.get('v', '')
-        sys.path.append("plugins/php")
-
-        import index
-        content = index.getPhpinfo(v)
-        return content
