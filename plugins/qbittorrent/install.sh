@@ -38,7 +38,7 @@ Install_qbittorrent()
 Uninstall_qbittorrent()
 {
 	rm -rf $serverPath/qbittorrent
-	yum -y remove qbittorrent-nox
+	which yum && yum -y remove qbittorrent-nox
 	echo "Uninstall_qbittorrent" > $install_tmp
 }
 
