@@ -11,48 +11,48 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
-LIBNAME=redis
-sysName=`uname`
 actionType=$1
 version=$2
-
-extDir=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20090626/
+extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20090626/yaf.so
 
 Install_lib()
 {
-	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep "${LIBNAME}.so"`
+	
+	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep 'yaf.so'`
 	if [ "${isInstall}" != "" ];then
-		echo "php$version 已安装${LIBNAME},请选择其它版本!"
+		echo "php-$version 已安装yaf,请选择其它版本!"
 		return
 	fi
 	
-	extFile=$extDir${LIBNAME}.so
 	if [ ! -f "$extFile" ];then
+		
+		wafV='2.3.5';
+		if [ "$version" = '70' ] || [ "$version" = '71' ] || [ "$version" = '72' ];then
+			wafV='3.0.7';
+		fi
 
 		php_lib=$sourcePath/php_${version}_lib
 		mkdir -p $php_lib
-
-		if [ ! -f $php_lib/redis-4.2.0.tgz ];then
-			wget -O $php_lib/redis-4.2.0.tgz http://pecl.php.net/get/redis-4.2.0.tgz
-		fi
-
-		cd $php_lib && tar xvf redis-4.2.0.tgz
-		cd redis-4.2.0
+		wget -O $php_lib/yaf-$wafV.tgz http://pecl.php.net/get/yaf-$wafV.tgz
+		cd $php_lib
+		tar xvf yaf-$wafV.tgz
+		cd yaf-$wafV
+		
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config
 		make && make install
-
-		cd $php_lib
-		rm -rf redis-*
+		cd ..
+		rm -rf yaf-*
 		rm -f package.xml
 	fi
-	sleep 1
+	
 	if [ ! -f "$extFile" ];then
 		echo "ERROR!"
-		return
+		return;
 	fi
-	echo "extension=redis.so" >> $serverPath/php/$version/etc/php.ini
-
+	
+	echo -e "[yaf]\nextension=yaf.so\nyaf.use_namespace=1" >> $serverPath/php/$version/etc/php.ini
+	
 	$serverPath/php/init.d/php$version reload
 	echo '==========================================================='
 	echo 'successful!'
@@ -65,22 +65,22 @@ Uninstall_lib()
 		echo "php$version 未安装,请选择其它版本!"
 		return
 	fi
-	
-	extFile=$extDir${LIBNAME}.so
+
 	if [ ! -f "$extFile" ];then
-		echo "php$version 未安装${LIBNAME},请选择其它版本!"
-		echo "php-$vphp not install memcache, Plese select other version!"
+		echo "php$version 未安装yaf,请选择其它版本!"
 		return
 	fi
 	
-	sed -i '_bak' '/redis.so/d' $serverPath/php/$version/etc/php.ini
+	echo $serverPath/php/$version/etc/php.ini
+	sed -i '_bak' '/yaf.so/d' $serverPath/php/$version/etc/php.ini
+	sed -i '_bak' '/yaf.use_namespace/d' $serverPath/php/$version/etc/php.ini
+	sed -i '_bak' '/\[yaf\]/d'  $serverPath/php/$version/etc/php.ini
 		
 	rm -f $extFile
 	$serverPath/php/init.d/php$version reload
 	echo '==============================================='
 	echo 'successful!'
 }
-
 
 
 if [ "$actionType" == 'install' ];then
