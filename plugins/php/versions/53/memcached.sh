@@ -44,7 +44,6 @@ Install_lib()
 
 		cd $php_lib
 		rm -rf ${LIBNAME}-*
-		rm -f package.xml
 	fi
 	
 	if [ ! -f "$extFile" ];then

@@ -43,8 +43,7 @@ Install_lib()
 			--enable-openssl --with-openssl-dir=$serverPath/lib/openssl --enable-sockets
 		make && make install
 		cd ..
-		rm -rf swoole-*
-		rm -f package.xml
+		rm -rf ${LIBNAME}-*
 	fi
 	
 	while [[ ! -f "$extFile" ]];
