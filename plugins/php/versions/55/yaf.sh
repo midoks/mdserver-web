@@ -11,50 +11,57 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
-LIBNAME=redis
-LIBV=4.2.0
-sysName=`uname`
+
+LIBNAME=yaf
+LIBV='2.3.5'
+
 actionType=$1
 version=$2
+extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20121212/${LIBNAME}.so
 
-extDir=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20121212/
+if [ "$version" = '70' ] || [ "$version" = '71' ] || [ "$version" = '72' ] || [ "$version" = '73' ];then
+	LIBV='3.0.7';
+fi
 
 Install_lib()
 {
+	
 	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep "${LIBNAME}.so"`
 	if [ "${isInstall}" != "" ];then
-		echo "php$version 已安装${LIBNAME},请选择其它版本!"
+		echo "php-$version 已安装yaf,请选择其它版本!"
 		return
 	fi
 	
-	extFile=$extDir${LIBNAME}.so
 	if [ ! -f "$extFile" ];then
+		
+		
 
 		php_lib=$sourcePath/php_${version}_lib
+
 		mkdir -p $php_lib
-
-		if [ ! -f $php_lib/${LIBNAME}-${LIBV}.tgz ];then
-			wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
-		fi
-
-		cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
+		wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
+		cd $php_lib
+		tar xvf ${LIBNAME}-${LIBV}.tgz
 		cd ${LIBNAME}-${LIBV}
+
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config
 		make && make install
-
-		cd $php_lib
-		rm -rf ${LIBNAME}-*
+		cd ..
+		rm -rf yaf-*
+		rm -f package.xml
 	fi
-	sleep 1
+	
 	if [ ! -f "$extFile" ];then
 		echo "ERROR!"
-		return
+		return;
 	fi
-
-	echo "[${LIBNAME}]" >> $serverPath/php/$version/etc/php.ini
-	echo "extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
-
+	
+	echo  "" >> $serverPath/php/$version/etc/php.ini
+	echo  "[${LIBNAME}]" >> $serverPath/php/$version/etc/php.ini
+	echo  "extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
+	echo  "yaf.use_namespace=1" >> $serverPath/php/$version/etc/php.ini
+	
 	$serverPath/php/init.d/php$version reload
 	echo '==========================================================='
 	echo 'successful!'
@@ -67,23 +74,22 @@ Uninstall_lib()
 		echo "php$version 未安装,请选择其它版本!"
 		return
 	fi
-	
-	extFile=$extDir${LIBNAME}.so
+
 	if [ ! -f "$extFile" ];then
-		echo "php$version 未安装${LIBNAME},请选择其它版本!"
-		echo "php-$vphp not install memcache, Plese select other version!"
+		echo "php$version 未安装yaf,请选择其它版本!"
 		return
 	fi
 	
-	sed -i '_bak' "/${LIBNAME}.so/d" $serverPath/php/$version/etc/php.ini
-	sed -i '_bak' "/${LIBNAME}/d" $serverPath/php/$version/etc/php.ini
+	echo $serverPath/php/$version/etc/php.ini
+	sed -i '_bak' "/yaf.so/d" $serverPath/php/$version/etc/php.ini
+	sed -i '_bak' "/yaf.use_namespace/d" $serverPath/php/$version/etc/php.ini
+	sed -i '_bak' "/\[yaf\]/d"  $serverPath/php/$version/etc/php.ini
 		
 	rm -f $extFile
 	$serverPath/php/init.d/php$version reload
 	echo '==============================================='
 	echo 'successful!'
 }
-
 
 
 if [ "$actionType" == 'install' ];then

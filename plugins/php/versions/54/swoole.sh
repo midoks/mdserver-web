@@ -11,22 +11,14 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
-
-LIBNAME=yaf
-LIBV='2.3.5'
-
 actionType=$1
 version=$2
-extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20090626/${LIBNAME}.so
-
-if [ "$version" = '70' ] || [ "$version" = '71' ] || [ "$version" = '72' ] || [ "$version" = '73' ];then
-	LIBV='3.0.7';
-fi
+extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20100525/swoole.so
 
 Install_lib()
 {
-	
-	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep "${LIBNAME}.so"`
+
+	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep 'swoole.so'`
 	if [ "${isInstall}" != "" ];then
 		echo "php-$version 已安装yaf,请选择其它版本!"
 		return
@@ -34,33 +26,42 @@ Install_lib()
 	
 	if [ ! -f "$extFile" ];then
 		
-		
+		wafV='1.10.1';
+		if [ "$version" = '70' ] || [ "$version" = '71' ] || [ "$version" = '72' ];then
+			wafV='2.2.0';
+		fi
 
 		php_lib=$sourcePath/php_${version}_lib
-
 		mkdir -p $php_lib
-		wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
+		wget -O $php_lib/swoole-$wafV.tgz http://pecl.php.net/get/swoole-$wafV.tgz
 		cd $php_lib
-		tar xvf ${LIBNAME}-${LIBV}.tgz
-		cd ${LIBNAME}-${LIBV}
-
+		tar xvf swoole-$wafV.tgz
+		cd swoole-$wafV
+		
 		$serverPath/php/$version/bin/phpize
-		./configure --with-php-config=$serverPath/php/$version/bin/php-config
+		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
+			--enable-openssl --with-openssl-dir=$serverPath/lib/openssl --enable-sockets
 		make && make install
 		cd ..
-		rm -rf yaf-*
-		rm -f package.xml
+		rm -rf ${LIBNAME}-*
 	fi
 	
-	if [ ! -f "$extFile" ];then
-		echo "ERROR!"
-		return;
-	fi
-	
-	echo  "" >> $serverPath/php/$version/etc/php.ini
-	echo  "[${LIBNAME}]" >> $serverPath/php/$version/etc/php.ini
-	echo  "extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
-	echo  "yaf.use_namespace=1" >> $serverPath/php/$version/etc/php.ini
+	while [[ ! -f "$extFile" ]];
+    do
+        echo -e ".\c"
+        sleep 0.5
+        if [ ! -f "$extFile" ];then
+			echo "ERROR!"
+		fi
+        let n+=1
+        if [ $n -gt 8 ];then
+        	echo "WAIT " $n "TIMES FAIL!"
+            return;
+        fi
+    done
+
+	echo "extension=$extFile"
+	echo "extension=$extFile" >> $serverPath/php/$version/etc/php.ini
 	
 	$serverPath/php/init.d/php$version reload
 	echo '==========================================================='
@@ -74,22 +75,22 @@ Uninstall_lib()
 		echo "php$version 未安装,请选择其它版本!"
 		return
 	fi
-
+	
+	
 	if [ ! -f "$extFile" ];then
-		echo "php$version 未安装yaf,请选择其它版本!"
+		echo "php$version 未安装swoole,请选择其它版本!"
 		return
 	fi
 	
 	echo $serverPath/php/$version/etc/php.ini
-	sed -i '_bak' "/yaf.so/d" $serverPath/php/$version/etc/php.ini
-	sed -i '_bak' "/yaf.use_namespace/d" $serverPath/php/$version/etc/php.ini
-	sed -i '_bak' "/\[yaf\]/d"  $serverPath/php/$version/etc/php.ini
+	sed -i '_bak' "/swoole.so/d" $serverPath/php/$version/etc/php.ini
 		
 	rm -f $extFile
 	$serverPath/php/init.d/php$version reload
 	echo '==============================================='
 	echo 'successful!'
 }
+
 
 
 if [ "$actionType" == 'install' ];then

@@ -12,8 +12,11 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
 LIBNAME=memcache
-
+LIBV=2.2.7
 sysName=`uname`
+actionType=$1
+version=$2
+extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20131226/${LIBNAME}.so
 
 Install_lib()
 {
@@ -23,30 +26,28 @@ Install_lib()
 		return
 	fi
 	
-	extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20131226/${LIBNAME}.so
 	if [ ! -f "$extFile" ];then
-
 		php_lib=$sourcePath/php_${version}_lib
 		mkdir -p $php_lib
 
-		wget -O $php_lib/memcache-2.2.7.tgz http://pecl.php.net/get/memcache-2.2.7.tgz
+		wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
 
-		cd $php_lib && tar xvf memcache-2.2.7.tgz
-		cd memcache-2.2.7
+		cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
+		cd ${LIBNAME}-${LIBV}
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config --enable-memcache --with-zlib-dir
 		make && make install
 
 		cd $php_lib
-		rm -rf memcache-*
-		rm -f package.xml
+		rm -rf ${LIBNAME}-*
 	fi
 	
 	if [ ! -f "$extFile" ];then
 		echo "ERROR!"
 		return
 	fi
-	echo "extension=memcache.so" >> $serverPath/php/$version/etc/php.ini
+	echo "extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
+	echo "extension=${LIBNAME}" >> $serverPath/php/$version/etc/php.ini
 
 	$serverPath/php/init.d/php$version reload
 	echo '==========================================================='
@@ -57,18 +58,18 @@ Install_lib()
 Uninstall_lib()
 {
 	if [ ! -f "$serverPath/php/$version/bin/php-config" ];then
-		echo "php$version 未安装,请选择其它版本!"
+		echo "php-$version 未安装,请选择其它版本!"
 		return
 	fi
 	
-	extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20131226/${LIBNAME}.so
 	if [ ! -f "$extFile" ];then
-		echo "php$version 未安装${LIBNAME},请选择其它版本!"
-		echo "php-$vphp not install memcache, Plese select other version!"
+		echo "php-$version 未安装${LIBNAME},请选择其它版本!"
+		echo "php-$version not install memcache, Plese select other version!"
 		return
 	fi
 	
-	sed -i '_bak' '/memcache.so/d' $serverPath/php/$version/etc/php.ini
+	sed -i '_bak' '/${LIBNAME}.so/d' $serverPath/php/$version/etc/php.ini
+	sed -i '_bak' '/${LIBNAME}/d' $serverPath/php/$version/etc/php.ini
 		
 	rm -f $extFile
 	$serverPath/php/init.d/php$version reload
@@ -77,8 +78,6 @@ Uninstall_lib()
 }
 
 
-actionType=$1
-version=$2
 if [ "$actionType" == 'install' ];then
 	Install_lib
 elif [ "$actionType" == 'uninstall' ];then
