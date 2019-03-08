@@ -43,8 +43,7 @@ Install_lib()
 		make && make install
 
 		cd $php_lib
-		rm -rf redis-*
-		rm -f package.xml
+		rm -rf ${LIBNAME}-*
 	fi
 	sleep 1
 	if [ ! -f "$extFile" ];then

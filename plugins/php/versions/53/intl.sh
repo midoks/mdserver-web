@@ -42,8 +42,7 @@ Install_lib()
 		make && make install
 
 		cd $php_lib
-		rm -rf memcached-*
-		rm -f package.xml
+		rm -rf ${LIBNAME}-*
 	fi
 	
 	if [ ! -f "$extFile" ];then

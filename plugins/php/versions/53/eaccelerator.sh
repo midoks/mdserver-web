@@ -11,8 +11,8 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
-LIBNAME=xdebug
-LIBV=2.2.7
+LIBNAME=eaccelerator
+LIBV=0.9.6
 sysName=`uname`
 actionType=$1
 version=$2
@@ -31,15 +31,14 @@ Install_lib()
 
 		php_lib=$sourcePath/php_${version}_lib
 		mkdir -p $php_lib
+		#
+		# wget -O $php_lib/${LIBNAME}-${LIBV}.tgz https://github.com/eaccelerator/eaccelerator/archive/${LIBV}.tar.gz
+		wget -O $php_lib/${LIBNAME}-${LIBV}.tar.bz2 http://dl.wdlinux.cn:5180/soft/eaccelerator-0.9.6.1.tar.bz2
 
-		wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
-
-		cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
+		cd $php_lib && tar jxvf ${LIBNAME}-${LIBV}.tar.bz2
 		cd ${LIBNAME}-${LIBV}
 		$serverPath/php/$version/bin/phpize
-		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
-		--enable-memcache --with-zlib-dir=$serverPath/lib/zlib \
-		--with-libmemcached-dir=$serverPath/lib/libmemcached
+		./configure --with-php-config=$serverPath/php/$version/bin/php-config --enable-eaccelerator=shared --with-eaccelerator-shared-memory
 		make && make install
 
 		cd $php_lib
@@ -64,18 +63,18 @@ Install_lib()
 Uninstall_lib()
 {
 	if [ ! -f "$serverPath/php/$version/bin/php-config" ];then
-		echo "php-$version 未安装,请选择其它版本!"
+		echo "php$version 未安装,请选择其它版本!"
 		return
 	fi
 	
 	if [ ! -f "$extFile" ];then
-		echo "php-$version 未安装${LIBNAME},请选择其它版本!"
-		echo "php-$version not install ${LIBNAME}, Plese select other version!"
+		echo "php$version 未安装${LIBNAME},请选择其它版本!"
+		echo "php-$vphp not install ${LIBNAME}, Plese select other version!"
 		return
 	fi
 	
-	sed -i '_bak' '/${LIBNAME}.so/d' $serverPath/php/$version/etc/php.ini
-	sed -i '_bak' '/${LIBNAME}/d' $serverPath/php/$version/etc/php.ini
+	sed -i '_bak' "/${LIBNAME}.so/d" $serverPath/php/$version/etc/php.ini
+	sed -i '_bak' "/${LIBNAME}/d" $serverPath/php/$version/etc/php.ini
 		
 	rm -f $extFile
 	$serverPath/php/init.d/php$version reload

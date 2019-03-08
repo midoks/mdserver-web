@@ -12,7 +12,7 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
 LIBNAME=mongo
-LIBV=1.6.16
+LIBV=1.5.0
 sysName=`uname`
 actionType=$1
 version=$2
@@ -37,19 +37,20 @@ Install_lib()
 		cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
 		cd ${LIBNAME}-${LIBV}
 		$serverPath/php/$version/bin/phpize
-		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
-		--with-openssl-dir=$serverPath/php/lib/openssl/
+		./configure --with-php-config=$serverPath/php/$version/bin/php-config
 		make && make install
 
 		cd $php_lib
-		rm -rf memcached-*
-		rm -f package.xml
+		rm -rf ${LIBNAME}-*
 	fi
 	
 	if [ ! -f "$extFile" ];then
 		echo "ERROR!"
 		return
 	fi
+
+	echo "" >> $serverPath/php/$version/etc/php.ini
+	echo "[${LIBNAME}]" >> $serverPath/php/$version/etc/php.ini
 	echo "extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
 
 	$serverPath/php/init.d/php$version reload
@@ -71,7 +72,8 @@ Uninstall_lib()
 		return
 	fi
 	
-	sed -i '_bak' '/${LIBNAME}.so/d' $serverPath/php/$version/etc/php.ini
+	sed -i '_bak' "/${LIBNAME}.so/d" $serverPath/php/$version/etc/php.ini
+	sed -i '_bak' "/${LIBNAME}/d" $serverPath/php/$version/etc/php.ini
 		
 	rm -f $extFile
 	$serverPath/php/init.d/php$version reload
