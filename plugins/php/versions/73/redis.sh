@@ -16,7 +16,7 @@ sysName=`uname`
 actionType=$1
 version=$2
 
-extDir=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20170718/
+extDir=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20180731/
 
 Install_lib()
 {

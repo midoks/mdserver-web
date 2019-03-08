@@ -17,7 +17,7 @@ LIBV='2.3.5'
 
 actionType=$1
 version=$2
-extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20090626/yaf.so
+extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20180731/yaf.so
 
 if [ "$version" = '70' ] || [ "$version" = '71' ] || [ "$version" = '72' ] || [ "$version" = '73' ];then
 	LIBV='3.0.7'
