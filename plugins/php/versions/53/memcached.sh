@@ -12,6 +12,7 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
 LIBNAME=memcached
+LIBV=2.2.0
 sysName=`uname`
 actionType=$1
 version=$2
@@ -31,10 +32,10 @@ Install_lib()
 		php_lib=$sourcePath/php_${version}_lib
 		mkdir -p $php_lib
 
-		wget -O $php_lib/${LIBNAME}-2.2.0.tgz http://pecl.php.net/get/${LIBNAME}-2.2.0.tgz
+		wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
 
-		cd $php_lib && tar xvf ${LIBNAME}-2.2.0.tgz
-		cd ${LIBNAME}-2.2.0
+		cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
+		cd ${LIBNAME}-${LIBV}
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
 		--enable-memcache --with-zlib-dir=$serverPath/lib/zlib \
@@ -42,7 +43,7 @@ Install_lib()
 		make && make install
 
 		cd $php_lib
-		rm -rf memcached-*
+		rm -rf ${LIBNAME}-*
 		rm -f package.xml
 	fi
 	
@@ -61,17 +62,18 @@ Install_lib()
 Uninstall_lib()
 {
 	if [ ! -f "$serverPath/php/$version/bin/php-config" ];then
-		echo "php$version 未安装,请选择其它版本!"
+		echo "php-$version 未安装,请选择其它版本!"
 		return
 	fi
 	
 	if [ ! -f "$extFile" ];then
-		echo "php$version 未安装${LIBNAME},请选择其它版本!"
-		echo "php-$vphp not install ${LIBNAME}, Plese select other version!"
+		echo "php-$version 未安装${LIBNAME},请选择其它版本!"
+		echo "php-$version not install ${LIBNAME}, Plese select other version!"
 		return
 	fi
 	
 	sed -i '_bak' '/${LIBNAME}.so/d' $serverPath/php/$version/etc/php.ini
+	sed -i '_bak' '/${LIBNAME}/d' $serverPath/php/$version/etc/php.ini
 		
 	rm -f $extFile
 	$serverPath/php/init.d/php$version reload

@@ -10,29 +10,25 @@ sourcePath=${serverPath}/source
 
 install_tmp=${rootPath}/tmp/bt_install.pl
 
-# echo $curPath
-# echo ${1}
-# echo ${serverPath}
-# echo ${install_tmp}
 
-
+version=7.2.16
 Install_php()
 {
 #------------------------ install start ------------------------------------#
-echo "安装php-7.2.5 ..." > $install_tmp
+echo "安装php-${version} ..." > $install_tmp
 mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
-if [ ! -f $sourcePath/php/php-7.2.5.tar.xz ];then
-	wget -O $sourcePath/php/php-7.2.5.tar.xz https://museum.php.net/php7/php-7.2.5.tar.xz
+if [ ! -f $sourcePath/php/php-${version}.tar.xz ];then
+	wget -O $sourcePath/php/php-${version}.tar.xz http://au1.php.net/distributions/php-${version}.tar.xz
 fi
 
-if [ ! -d $sourcePath/php/php-7.2.5 ];then
-	cd $sourcePath/php && tar -Jxf $sourcePath/php/php-7.2.5.tar.xz
+if [ ! -d $sourcePath/php/php-${version} ];then
+	cd $sourcePath/php && tar -Jxf $sourcePath/php/php-${version}.tar.xz
 fi
 
 
-cd $sourcePath/php/php-7.2.5 && ./configure \
+cd $sourcePath/php/php-${version} && ./configure \
 --prefix=$serverPath/php/72 \
 --exec-prefix=$serverPath/php/72 \
 --with-config-file-path=$serverPath/php/72/etc \
@@ -51,12 +47,10 @@ cd $sourcePath/php/php-7.2.5 && ./configure \
 #------------------------ install end ------------------------------------#
 }
 
-
-
 Uninstall_php()
 {
 	rm -rf $serverPath/php/72
-	echo "卸载php-7.2.5 ..." > $install_tmp
+	echo "卸载php-${version}..." > $install_tmp
 }
 
 action=${1}

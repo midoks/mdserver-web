@@ -15,27 +15,27 @@ install_tmp=${rootPath}/tmp/bt_install.pl
 # echo ${serverPath}
 # echo ${install_tmp}
 
-
+version=7.1.27
 Install_php()
 {
 #------------------------ install start ------------------------------------#
-echo "安装php-7.1.17 ..." > $install_tmp
+echo "安装php-${version} ..." > $install_tmp
 mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
-if [ ! -f $sourcePath/php/php-7.1.17.tar.xz ];then
-	wget -O $sourcePath/php/php-7.1.17.tar.xz https://museum.php.net/php7/php-7.1.17.tar.xz
+if [ ! -f $sourcePath/php/php-${version}.tar.xz ];then
+	wget -O $sourcePath/php/php-${version}.tar.xz http://au1.php.net/distributions/php-${version}.tar.xz
 fi
 
-if [ ! -d $sourcePath/php/php-7.1.17 ];then
-	cd $sourcePath/php && tar -Jxf $sourcePath/php/php-7.1.17.tar.xz
+if [ ! -d $sourcePath/php/php-${version} ];then
+	cd $sourcePath/php && tar -Jxf $sourcePath/php/php-${version}.tar.xz
 fi
 
 
-cd $sourcePath/php/php-7.1.17 && ./configure \
+cd $sourcePath/php/php-${version} && ./configure \
 --prefix=$serverPath/php/71 \
 --exec-prefix=$serverPath/php/71 \
---with-config-file-path=$serverPath/php/72/etc \
+--with-config-file-path=$serverPath/php/71/etc \
 --with-zlib-dir=$serverPath/lib/zlib \
 --enable-mysqlnd \
 --without-iconv \
@@ -54,7 +54,7 @@ cd $sourcePath/php/php-7.1.17 && ./configure \
 Uninstall_php()
 {
 	rm -rf $serverPath/php/71
-	echo "卸载php-7.2.5 ..." > $install_tmp
+	echo "卸载php-${version}..." > $install_tmp
 }
 
 action=${1}
