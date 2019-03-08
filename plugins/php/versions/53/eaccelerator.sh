@@ -2,8 +2,12 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
-curPath=`pwd`
+# php 5.2.17 + eaccelerator 0.9.5.3
+# php 5.3.24 + eaccelerator 0.9.6.1
+# php 5.4.14 + eaccelerator 1.0 dev
 
+
+curPath=`pwd`
 rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 rootPath=$(dirname "$rootPath")
@@ -38,7 +42,8 @@ Install_lib()
 		cd $php_lib && tar jxvf ${LIBNAME}-${LIBV}.tar.bz2
 		cd ${LIBNAME}-${LIBV}
 		$serverPath/php/$version/bin/phpize
-		./configure --with-php-config=$serverPath/php/$version/bin/php-config --enable-eaccelerator=shared --with-eaccelerator-shared-memory
+		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
+		--enable-eaccelerator=shared --with-eaccelerator-shared-memory
 		make && make install
 
 		cd $php_lib
