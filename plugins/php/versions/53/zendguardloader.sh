@@ -36,9 +36,8 @@ Install_lib()
 		if [ $sysName == 'Darwin' ]; then
 			wget -O $php_lib/zend-loader-php5.3.tar.gz http://downloads.zend.com/guard/5.5.0/ZendGuardLoader-php-5.3-darwin-i386.tar.gz
 		else
-			wget -O $php_lib/zend-loader-php5.3.tar.gz http://downloads.zend.com/guard/5.5.0/zend-loader-php5.6-linux-x86_64_update1.tar.gz
+			wget -O $php_lib/zend-loader-php5.3.tar.gz http://downloads.zend.com/guard/5.5.0/ZendGuardLoader-php-5.3-linux-glibc23-x86_64.tar.gz
 		fi 
-
 
 		cd $php_lib && tar xvf zend-loader-php5.3.tar.gz
 		cd ZendGuardLoader-php* && cd php-5.3.x
@@ -52,7 +51,13 @@ Install_lib()
 		return
 	fi
 
-	echo -e "[Zend ZendGuard Loader]\nzend_extension=ZendGuardLoader.so\nzend_loader.enable=1\nzend_loader.disable_licensing=0\nzend_loader.obfuscation_level_support=3\nzend_loader.license_path=" >> $serverPath/php/$version/etc/php.ini
+	echo  "" >> $serverPath/php/$version/etc/php.ini
+	echo  "[Zend ZendGuard Loader]" >> $serverPath/php/$version/etc/php.ini
+	echo  "zend_extension=ZendGuardLoader.so" >> $serverPath/php/$version/etc/php.ini
+	echo  "zend_loader.enable=1" >> $serverPath/php/$version/etc/php.ini
+	echo  "zend_loader.disable_licensing=0" >> $serverPath/php/$version/etc/php.ini
+	echo  "zend_loader.obfuscation_level_support=3" >> $serverPath/php/$version/etc/php.ini
+	echo  "zend_loader.license_path=" >> $serverPath/php/$version/etc/php.ini
 	
 	$serverPath/php/init.d/php$version reload
 	echo '==========================================================='
@@ -72,9 +77,9 @@ Uninstall_lib()
 		return
 	fi
 	
-	sed -i '_bak' '/ZendGuardLoader.so/d'  $serverPath/php/$version/etc/php.ini
-	sed -i '_bak' '/zend_loader/d'  $serverPath/php/$version/etc/php.ini
-	sed -i '_bak' '/\[Zend ZendGuard Loader\]/d'  $serverPath/php/$version/etc/php.ini
+	sed -i '_bak' "/ZendGuardLoader.so/d"  $serverPath/php/$version/etc/php.ini
+	sed -i '_bak' "/zend_loader/d"  $serverPath/php/$version/etc/php.ini
+	sed -i '_bak' "/\[Zend ZendGuard Loader\]/d"  $serverPath/php/$version/etc/php.ini
 		
 	rm -f $extFile
 	$serverPath/php/init.d/php$version reload

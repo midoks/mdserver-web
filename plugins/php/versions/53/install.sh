@@ -60,6 +60,7 @@ cd $sourcePath/php/php-5.3.29 && ./configure \
 --enable-mbstring \
 --enable-sysvshm \
 --enable-sysvmsg \
+--enable-exif \
 --enable-ftp \
 --enable-wddx \
 --enable-soap \
