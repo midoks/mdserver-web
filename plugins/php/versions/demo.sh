@@ -2,6 +2,8 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
+# /bin/bash apc.sh uninstall 53
+
 curPath=`pwd`
 
 rootPath=$(dirname "$curPath")

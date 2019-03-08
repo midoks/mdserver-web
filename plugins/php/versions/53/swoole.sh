@@ -84,7 +84,7 @@ Uninstall_lib()
 	fi
 	
 	echo $serverPath/php/$version/etc/php.ini
-	sed -i '_bak' '/swoole.so/d' $serverPath/php/$version/etc/php.ini
+	sed -i '_bak' "/swoole.so/d" $serverPath/php/$version/etc/php.ini
 		
 	rm -f $extFile
 	$serverPath/php/init.d/php$version reload
