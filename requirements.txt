@@ -1,4 +1,3 @@
-gevent
 wheel
 flask
 flask_session
