@@ -54,7 +54,7 @@ Install_mysql()
 
 Uninstall_mysql()
 {
-	#rm -rf $serverPath/mysql
+	rm -rf $serverPath/mysql
 	echo '卸载完成' > $install_tmp
 }
 
