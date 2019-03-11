@@ -38,12 +38,17 @@ LOGFILE=${LOGPATH}/gogs.log
 RETVAL=0
 
 
+[ -r /etc/sysconfig/$NAME ] && . /etc/sysconfig/$NAME
+DAEMON_OPTS="--check $NAME"
+[ ! -z "$GOGS_USER" ] && DAEMON_OPTS="$DAEMON_OPTS --user=${GOGS_USER}"
+
+
 status(){
   isStart=`ps -ef|grep 'gogs web' |grep -v grep|awk '{print $2}'`
   if [ "$isStart" == '' ];then
-      echo "${SERVICENAME} not running"
+      echo -e "${SERVICENAME} not running"
   else
-      echo "${SERVICENAME}(pid $(echo $isStart)) already running"
+      echo -e "${SERVICENAME}(pid $(echo $isStart)) already running"
   fi
 }
 
@@ -55,16 +60,16 @@ start() {
     fi
 
     cd ${GOGS_HOME}
-    echo "Starting ${SERVICENAME}: \c"
-    ${GOGS_PATH} web > ${LOGFILE} 2>&1 &
+    echo -e "Starting ${SERVICENAME}: \c"
+    daemon $DAEMON_OPTS ${GOGS_PATH} web > ${LOGFILE} 2>&1 &
     RETVAL=$?
-    [ $RETVAL = 0 ] && touch ${LOCKFILE} && echo "\033[32mdone\033[0m"
+    [ $RETVAL = 0 ] && touch ${LOCKFILE} && echo -e "\033[32mdone\033[0m"
     return $RETVAL
 }
 
 stop() {
     cd ${GOGS_HOME}
-    echo "Shutting down ${SERVICENAME}: \c"
+    echo -e "Shutting down ${SERVICENAME}: \c"
     which killproc > /dev/null
     if [ $? -eq 0 ];then
         killproc ${NAME}
@@ -72,7 +77,7 @@ stop() {
         pkill ${NAME}
     fi
     RETVAL=$?
-    [ $RETVAL = 0 ] && rm -f ${LOCKFILE}  && echo "\033[32mdone\033[0m"
+    [ $RETVAL = 0 ] && rm -f ${LOCKFILE}  && echo -e "\033[32mdone\033[0m"
 }
 
 case "$1" in
