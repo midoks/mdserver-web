@@ -16,39 +16,10 @@ LIBV=7.0.5
 sysName=`uname`
 actionType=$1
 version=$2
-extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20090626/${LIBNAME}.so
+extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20100525/${LIBNAME}.so
 
 Install_lib()
 {
-	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep "${LIBNAME}.so"`
-	if [ "${isInstall}" != "" ];then
-		echo "php$version 已安装${LIBNAME},请选择其它版本!"
-		return
-	fi
-	
-	if [ ! -f "$extFile" ];then
-
-		php_lib=$sourcePath/php_${version}_lib
-		mkdir -p $php_lib
-
-		wget -O $php_lib/zendopcache-7.0.5.tgz http://pecl.php.net/get/zendopcache-7.0.5.tgz
-
-		cd $php_lib && tar xvf zendopcache-7.0.5.tgz
-		cd zendopcache-7.0.5
-		$serverPath/php/$version/bin/phpize
-		./configure --with-php-config=$serverPath/php/$version/bin/php-config
-		make && make install
-
-		cd $php_lib
-		rm -rf zendopcache-7.0.5
-		rm -rf zendopcache-7.0.5.tgz
-	fi
-	
-	if [ ! -f "$extFile" ];then
-		echo "ERROR!"
-		return
-	fi
-
 	echo "" >> $serverPath/php/$version/etc/php.ini
 	echo "[opcache]" >> $serverPath/php/$version/etc/php.ini
 	echo "zend_extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
@@ -67,26 +38,10 @@ Install_lib()
 
 
 Uninstall_lib()
-{
-	if [ ! -f "$serverPath/php/$version/bin/php-config" ];then
-		echo "php-$version 未安装,请选择其它版本!"
-		return
-	fi
-	
-	sed -i '_bak' "/${LIBNAME}.so/d" $serverPath/php/$version/etc/php.ini
-	sed -i '_bak' "/${LIBNAME}/d" $serverPath/php/$version/etc/php.ini
-
-	if [ ! -f "$extFile" ];then
-		echo "php-$version 未安装${LIBNAME},请选择其它版本!"
-		echo "php-$version not install ${LIBNAME}, Plese select other version!"
-		return
-	fi
-	
+{	
 	sed -i '_bak' "/${LIBNAME}.so/d" $serverPath/php/$version/etc/php.ini
 	sed -i '_bak' "/${LIBNAME}/d" $serverPath/php/$version/etc/php.ini
 		
-	rm -f $extFile
-
 	$serverPath/php/init.d/php$version reload
 	echo '==============================================='
 	echo 'successful!'

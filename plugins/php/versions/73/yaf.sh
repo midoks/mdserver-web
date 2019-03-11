@@ -68,12 +68,12 @@ Install_lib()
 Uninstall_lib()
 {
 	if [ ! -f "$serverPath/php/$version/bin/php-config" ];then
-		echo "php$version 未安装,请选择其它版本!"
+		echo "php-$version 未安装,请选择其它版本!"
 		return
 	fi
 
 	if [ ! -f "$extFile" ];then
-		echo "php$version 未安装yaf,请选择其它版本!"
+		echo "php-$version 未安装yaf,请选择其它版本!"
 		return
 	fi
 	
