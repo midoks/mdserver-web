@@ -397,11 +397,11 @@ done
         try:
             import shutil
             shutil.move(path, rFile)
-            public.writeLog('TYPE_FILE', public.getInfo(
+            public.writeLog('文件管理', public.getInfo(
                 '移动文件[{1}]到回收站成功!', (path)))
             return True
         except:
-            public.writeLog('TYPE_FILE', public.getInfo(
+            public.writeLog('文件管理', public.getInfo(
                 '移动文件[{1}]到回收站失败!', (path)))
             return False
 
@@ -501,7 +501,7 @@ done
                 os.system("cd '" + path + "' && tar -zcvf '" +
                           dfile + "' " + sfiles + " > " + tmps + " 2>&1")
             self.setFileAccept(dfile)
-            public.writeLog("TYPE_FILE", '文件压缩成功!', (sfile, dfile))
+            public.writeLog("文件管理", '文件压缩成功!', (sfile, dfile))
             return public.returnJson(True, '文件压缩成功!')
         except:
             return public.returnJson(False, '文件压缩失败!')
@@ -520,7 +520,7 @@ done
                 if self.mvRecycleBin(path):
                     return public.returnJson(True, '已将文件移动到回收站!')
             os.remove(path)
-            public.writeLog('TYPE_FILE', public.getInfo(
+            public.writeLog('文件管理', public.getInfo(
                 '删除文件[{1}]成功!', (path)))
             return public.returnJson(True, '删除文件成功!')
         except:
