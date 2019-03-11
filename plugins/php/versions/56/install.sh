@@ -51,7 +51,6 @@ cd $sourcePath/php/php-5.6.36 && ./configure \
 --enable-sysvmsg \
 --enable-sysvsem \
 --enable-sysvshm \
---enable-sockets \
 --enable-intl \
 --enable-wddx \
 --enable-soap \
