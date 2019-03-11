@@ -43,7 +43,9 @@ cd $sourcePath/php/php-5.6.36 && ./configure \
 --without-iconv \
 --enable-zip \
 --enable-mbstring \
+--enable-intl \
 --enable-ftp \
+--enable-sockets \
 --enable-pcntl \
 --enable-shmop \
 --enable-sysvmsg \

@@ -37,6 +37,8 @@ cd $sourcePath/php/php-${version} && ./configure \
 --without-iconv \
 --enable-zip \
 --enable-mbstring \
+--enable-sockets \
+--enable-intl \
 --enable-ftp \
 --enable-wddx \
 --enable-soap \

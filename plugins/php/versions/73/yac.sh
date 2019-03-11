@@ -16,12 +16,9 @@ sourcePath=${serverPath}/source/php
 actionType=$1
 version=$2
 
-LIBNAME=yaf
-LIBV='2.3.5'
-if [ "$version" = '70' ] || [ "$version" = '71' ] || [ "$version" = '72' ] || [ "$version" = '73' ];then
-	LIBV='3.0.7';
-fi
-extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20160303/${LIBNAME}.so
+LIBNAME=yac
+LIBV=2.0.2
+extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20180731/${LIBNAME}.so
 
 Install_lib()
 {
@@ -48,7 +45,7 @@ Install_lib()
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config
 		make && make install
 		cd ..
-		rm -rf ${LIBNAME}-*
+		rm -rf yaf-*
 		rm -f package.xml
 	fi
 	
@@ -67,22 +64,20 @@ Install_lib()
 	echo 'successful!'
 }
 
-
 Uninstall_lib()
 {
 	if [ ! -f "$serverPath/php/$version/bin/php-config" ];then
-		echo "php-$version 未安装,请选择其它版本!"
+		echo "php$version 未安装,请选择其它版本!"
 		return
 	fi
 
 	if [ ! -f "$extFile" ];then
-		echo "php-$version 未安装${LIBNAME},请选择其它版本!"
+		echo "php$version 未安装yaf,请选择其它版本!"
 		return
 	fi
 	
 	echo $serverPath/php/$version/etc/php.ini
 	sed -i '_bak' "/${LIBNAME}.so/d" $serverPath/php/$version/etc/php.ini
-	sed -i '_bak' "/${LIBNAME}.use_namespace/d" $serverPath/php/$version/etc/php.ini
 	sed -i '_bak' "/\[${LIBNAME}\]/d"  $serverPath/php/$version/etc/php.ini
 		
 	rm -f $extFile
