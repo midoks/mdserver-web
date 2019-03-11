@@ -48,8 +48,10 @@ Install_lib()
 		echo "ERROR!"
 		return;
 	fi
-	echo "extension=$extFile"
-	echo "extension=$extFile" >> $serverPath/php/$version/etc/php.ini
+	
+	echo "" >> $serverPath/php/$version/etc/php.ini
+	echo "[${LIBNAME}]" >> $serverPath/php/$version/etc/php.ini
+	echo "extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
 	
 	$serverPath/php/init.d/php$version reload
 	echo '==========================================================='
