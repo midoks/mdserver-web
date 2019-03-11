@@ -25,6 +25,10 @@ if [ -f /etc/init.d/functions ];then
   . /etc/init.d/functions
 fi
 
+if [ -f /etc/rc.d/init.d/functions ];then
+  . /etc/rc.d/init.d/functions
+fi
+
 # Default values
 HOME={$HOME_DIR}
 NAME=gogs
@@ -61,23 +65,23 @@ start() {
 
     cd ${GOGS_HOME}
     echo -e "Starting ${SERVICENAME}: \c"
-    daemon $DAEMON_OPTS ${GOGS_PATH} web > ${LOGFILE} 2>&1 &
+    ${GOGS_PATH} web > ${LOGFILE} 2>&1 &
     RETVAL=$?
     [ $RETVAL = 0 ] && touch ${LOCKFILE} && echo -e "\033[32mdone\033[0m"
     return $RETVAL
 }
 
 stop() {
-    cd ${GOGS_HOME}
-    echo -e "Shutting down ${SERVICENAME}: \c"
-    which killproc > /dev/null
-    if [ $? -eq 0 ];then
-        killproc ${NAME}
-    else
-        pkill ${NAME}
-    fi
-    RETVAL=$?
-    [ $RETVAL = 0 ] && rm -f ${LOCKFILE}  && echo -e "\033[32mdone\033[0m"
+
+    pids=`ps -ef|grep 'gogs web' |grep -v grep|awk '{print $2}'`
+    arr=($pids)
+    echo -e "Stopping gogs... \c";
+
+    ifor p in ${arr[@]}
+    do
+            kill -9 $p
+    done
+    echo -e "\033[32mdone\033[0m"
 }
 
 case "$1" in
