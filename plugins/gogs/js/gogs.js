@@ -87,13 +87,12 @@ function gogsSetConfig(){
 //提交PHP配置
 function submitGogsConf() {
     var data = {
-        DOMAIN: $("select[name='DOMAIN']").val(),
-        ROOT_URL: $("select[name='ROOT_URL']").val(),
+        DOMAIN: $("input[name='DOMAIN']").val(),
+        ROOT_URL: $("input[name='ROOT_URL']").val(),
         HTTP_ADDR: $("select[name='HTTP_ADDR']").val(),
-        HTTP_PORT: $("select[name='HTTP_PORT']").val(),
+        HTTP_PORT: $("input[name='HTTP_PORT']").val(),
         START_SSH_SERVER: $("select[name='START_SSH_SERVER']").val() || 'false',
-        SSH_PORT: $("select[name='SSH_PORT']").val(),
-        ROOT_URL: $("select[name='ROOT_URL']").val(),
+        SSH_PORT: $("input[name='SSH_PORT']").val(),
         REQUIRE_SIGNIN_VIEW: $("select[name='REQUIRE_SIGNIN_VIEW']").val() || 'false',
         ENABLE_CAPTCHA: $("select[name='ENABLE_CAPTCHA']").val() || 'true',
         DISABLE_REGISTRATION: $("select[name='DISABLE_REGISTRATION']").val() || 'false',
