@@ -40,7 +40,9 @@ cd $sourcePath/php/php-5.5.38 && ./configure \
 --enable-mysqlnd \
 --without-iconv \
 --enable-zip \
+--enable-intl \
 --enable-mbstring \
+--enable-sockets \
 --enable-ftp \
 --enable-wddx \
 --enable-soap \

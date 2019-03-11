@@ -12,23 +12,23 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
 
-LIBNAME=yaf
-LIBV='2.3.5'
 
 actionType=$1
 version=$2
-extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20170718/yaf.so
 
+LIBNAME=yaf
+LIBV='2.3.5'
 if [ "$version" = '70' ] || [ "$version" = '71' ] || [ "$version" = '72' ] || [ "$version" = '73' ];then
-	LIBV='3.0.7'
+	LIBV='3.0.7';
 fi
+extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20170718/${LIBNAME}.so
 
 Install_lib()
 {
 	
 	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep "${LIBNAME}.so"`
 	if [ "${isInstall}" != "" ];then
-		echo "php-$version 已安装yaf,请选择其它版本!"
+		echo "php-$version 已安装${LIBNAME},请选择其它版本!"
 		return
 	fi
 	
@@ -48,7 +48,7 @@ Install_lib()
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config
 		make && make install
 		cd ..
-		rm -rf yaf-*
+		rm -rf ${LIBNAME}-*
 		rm -f package.xml
 	fi
 	
@@ -57,7 +57,10 @@ Install_lib()
 		return;
 	fi
 	
-	echo -e "[yaf]\nextension=yaf.so\nyaf.use_namespace=1" >> $serverPath/php/$version/etc/php.ini
+	echo  "" >> $serverPath/php/$version/etc/php.ini
+	echo  "[${LIBNAME}]" >> $serverPath/php/$version/etc/php.ini
+	echo  "extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
+	echo  "${LIBNAME}.use_namespace=1" >> $serverPath/php/$version/etc/php.ini
 	
 	$serverPath/php/init.d/php$version reload
 	echo '==========================================================='
@@ -68,19 +71,19 @@ Install_lib()
 Uninstall_lib()
 {
 	if [ ! -f "$serverPath/php/$version/bin/php-config" ];then
-		echo "php$version 未安装,请选择其它版本!"
+		echo "php-$version 未安装,请选择其它版本!"
 		return
 	fi
 
 	if [ ! -f "$extFile" ];then
-		echo "php$version 未安装yaf,请选择其它版本!"
+		echo "php-$version 未安装${LIBNAME},请选择其它版本!"
 		return
 	fi
 	
 	echo $serverPath/php/$version/etc/php.ini
-	sed -i '_bak' "/yaf.so/d" $serverPath/php/$version/etc/php.ini
-	sed -i '_bak' "/yaf.use_namespace/d" $serverPath/php/$version/etc/php.ini
-	sed -i '_bak' "/\[yaf\]/d"  $serverPath/php/$version/etc/php.ini
+	sed -i '_bak' "/${LIBNAME}.so/d" $serverPath/php/$version/etc/php.ini
+	sed -i '_bak' "/${LIBNAME}.use_namespace/d" $serverPath/php/$version/etc/php.ini
+	sed -i '_bak' "/\[${LIBNAME}\]/d"  $serverPath/php/$version/etc/php.ini
 		
 	rm -f $extFile
 	$serverPath/php/init.d/php$version reload

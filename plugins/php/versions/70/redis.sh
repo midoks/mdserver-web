@@ -17,13 +17,13 @@ sysName=`uname`
 actionType=$1
 version=$2
 
-extDir=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20170718/
+extDir=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20151012/
 
 Install_lib()
 {
 	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep "${LIBNAME}.so"`
 	if [ "${isInstall}" != "" ];then
-		echo "php$version 已安装${LIBNAME},请选择其它版本!"
+		echo "php-$version 已安装${LIBNAME},请选择其它版本!"
 		return
 	fi
 	
@@ -43,10 +43,10 @@ Install_lib()
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config
 		make && make install
 
-		cd $php_lib
-		rm -rf ${LIBNAME}-*
+		# cd $php_lib
+		# rm -rf ${LIBNAME}-*
 	fi
-	sleep 1
+
 	if [ ! -f "$extFile" ];then
 		echo "ERROR!"
 		return

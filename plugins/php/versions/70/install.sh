@@ -42,6 +42,8 @@ cd $sourcePath/php/php-7.0.30 && ./configure \
 --enable-zip \
 --enable-mbstring \
 --enable-ftp \
+--enable-sockets \
+--enable-intl \
 --enable-wddx \
 --enable-soap \
 --enable-posix \

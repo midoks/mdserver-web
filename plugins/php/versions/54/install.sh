@@ -41,6 +41,7 @@ cd $sourcePath/php/php-5.4.45 && ./configure \
 --without-iconv \
 --enable-zip \
 --enable-mbstring \
+--enable-sockets \
 --enable-ftp \
 --enable-wddx \
 --enable-soap \
