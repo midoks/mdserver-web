@@ -63,6 +63,7 @@ cd $sourcePath/php/php-5.3.29 && ./configure \
 --enable-sysvmsg \
 --enable-intl \
 --enable-exif \
+--witd-gd \
 --enable-ftp \
 --enable-wddx \
 --enable-soap \

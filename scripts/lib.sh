@@ -46,24 +46,18 @@ echo -e "Install_Libmemcached" >> ${libPath}/lib.pl
 
 Install_Libiconv()
 {
-	if [ -d '/usr/local/libiconv' ];then
-		return
+	cd ${sourcePath}
+	if [ ! -f ${libPath}/libiconv ];then
+		wget -O libiconv-1.15.tar.gz  https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.15.tar.gz  -T 5
+		tar zxf libiconv-1.15.tar.gz
+		cd libiconv-1.15
+	    ./configure --prefix=${libPath}/libiconv --enable-static
+	    make && make install
+	    cd ${sourcePath}
+	    rm -rf libiconv-1.15
+		rm -f libiconv-1.15.tar.gz
 	fi
-	cd ${run_path}
-	if [ ! -f "libiconv-1.14.tar.gz" ];then
-		wget -O libiconv-1.14.tar.gz ${download_Url}/src/libiconv-1.14.tar.gz -T 5
-	fi
-	mkdir /patch
-	wget -O /patch/libiconv-glibc-2.16.patch ${download_Url}/src/patch/libiconv-glibc-2.16.patch -T 5
-	tar zxf libiconv-1.14.tar.gz
-	cd libiconv-1.14
-    patch -p0 < /patch/libiconv-glibc-2.16.patch
-    ./configure --prefix=/usr/local/libiconv --enable-static
-    make && make install
-    cd ${run_path}
-    rm -rf libiconv-1.14
-	rm -f libiconv-1.14.tar.gz
-	echo -e "Install_Libiconv" >> /www/server/lib.pl
+	echo -e "Install_Libiconv" >> ${libPath}/lib.pl
 }
 
 Install_Libmcrypt()
@@ -202,24 +196,24 @@ Install_OpenSSL()
 
 Install_Lib()
 {
-if [ -f "/www/server/nginx/sbin/nginx" ] || [ -f "/www/server/apache/bin/httpd" ] || [ -f "/www/server/mysql/bin/mysql" ]; then
-	return
-fi
-lockFile='/www/server/panel/data/bt_lib.lock'
-if [ ! -f "${lockFile}" ];then
-	sed -i "s#SELINUX=enforcing#SELINUX=disabled#" /etc/selinux/config
-	rpm -e --nodeps mariadb-libs-*
-	
-	mv /etc/yum.repos.d/epel.repo /etc/yum.repos.d/epel.repo.backup
-	rm -f /var/run/yum.pid
-	for yumPack in make cmake gcc gcc-c++ gcc-g77 flex bison file libtool libtool-libs autoconf kernel-devel patch wget libjpeg libjpeg-devel libpng libpng-devel libpng10 libpng10-devel gd gd-devel libxml2 libxml2-devel zlib zlib-devel glib2 glib2-devel tar bzip2 bzip2-devel libevent libevent-devel ncurses ncurses-devel curl curl-devel libcurl libcurl-devel e2fsprogs e2fsprogs-devel krb5 krb5-devel libidn libidn-devel openssl openssl-devel vim-minimal gettext gettext-devel ncurses-devel gmp-devel pspell-devel libcap diffutils ca-certificates net-tools libc-client-devel psmisc libXpm-devel git-core c-ares-devel libicu-devel libxslt libxslt-devel zip unzip glibc.i686 libstdc++.so.6 cairo-devel bison-devel ncurses-devel libaio-devel perl perl-devel perl-Data-Dumper lsof pcre pcre-devel vixie-cron crontabs expat-devel readline-devel;
-	do yum -y install $yumPack;done
-	
-	mv /etc/yum.repos.d/epel.repo.backup /etc/yum.repos.d/epel.repo
-	groupadd www
-	useradd -s /sbin/nologin -M -g www www
-	echo 'true' > $lockFile
-fi
+	if [ -f "/www/server/nginx/sbin/nginx" ] || [ -f "/www/server/apache/bin/httpd" ] || [ -f "/www/server/mysql/bin/mysql" ]; then
+		return
+	fi
+	lockFile='${libPath}/data/mw_lib.lock'
+	if [ ! -f "${lockFile}" ];then
+		sed -i "s#SELINUX=enforcing#SELINUX=disabled#" /etc/selinux/config
+		rpm -e --nodeps mariadb-libs-*
+		
+		mv /etc/yum.repos.d/epel.repo /etc/yum.repos.d/epel.repo.backup
+		rm -f /var/run/yum.pid
+		for yumPack in make cmake gcc gcc-c++ gcc-g77 flex bison file libtool libtool-libs autoconf kernel-devel patch wget libjpeg libjpeg-devel libpng libpng-devel libpng10 libpng10-devel gd gd-devel libxml2 libxml2-devel zlib zlib-devel glib2 glib2-devel tar bzip2 bzip2-devel libevent libevent-devel ncurses ncurses-devel curl curl-devel libcurl libcurl-devel e2fsprogs e2fsprogs-devel krb5 krb5-devel libidn libidn-devel openssl openssl-devel vim-minimal gettext gettext-devel ncurses-devel gmp-devel pspell-devel libcap diffutils ca-certificates net-tools libc-client-devel psmisc libXpm-devel git-core c-ares-devel libicu-devel libxslt libxslt-devel zip unzip glibc.i686 libstdc++.so.6 cairo-devel bison-devel ncurses-devel libaio-devel perl perl-devel perl-Data-Dumper lsof pcre pcre-devel vixie-cron crontabs expat-devel readline-devel;
+		do yum -y install $yumPack;done
+		
+		mv /etc/yum.repos.d/epel.repo.backup /etc/yum.repos.d/epel.repo
+		groupadd www
+		useradd -s /sbin/nologin -M -g www www
+		echo 'true' > $lockFile
+	fi
 }
 
 Install_Zlib
@@ -230,4 +224,4 @@ Install_OpenSSL
 # Install_Mhash
 # Install_Libmcrypt
 # Install_Mcrypt	
-# Install_Libiconv
+Install_Libiconv

@@ -99,7 +99,7 @@ def getRunUser():
             "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
         return user
     else:
-        return 'root'
+        return 'gogs'
 
 __SR = '''#!/bin/bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin

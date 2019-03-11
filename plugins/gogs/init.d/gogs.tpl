@@ -30,7 +30,7 @@ HOME={$HOME_DIR}
 NAME=gogs
 GOGS_HOME={$SERVER_PATH}/gogs
 GOGS_PATH=${GOGS_HOME}/$NAME
-GOGS_USER=midoks
+GOGS_USER={$RUN_USER}
 SERVICENAME="Gogs"
 LOCKFILE=/tmp/gogs.lock
 LOGPATH=${GOGS_HOME}/log
@@ -65,7 +65,7 @@ start() {
 stop() {
     cd ${GOGS_HOME}
     echo "Shutting down ${SERVICENAME}: \c"
-    which "killproc" > /dev/null
+    which killproc > /dev/null
     if [ $? -eq 0 ];then
         killproc ${NAME}
     else

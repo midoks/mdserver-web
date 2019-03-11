@@ -49,6 +49,14 @@ Install_gogs()
 	mv $serverPath/source/gogs/gogs_${version}/gogs/ $serverPath/gogs
 	echo $version > $serverPath/gogs/version.pl
 
+	if id -u gogs > /dev/null 2>&1; then
+        echo "csvn user exists"
+	else
+		useradd gogs
+		cp /etc/sudoers{,.`date +"%Y-%m-%d_%H-%M-%S"`}
+		echo "gogs ALL=(ALL)    NOPASSWD: ALL" >> /etc/sudoers
+	fi
+
 	echo 'install success' > $install_tmp
 }
 
