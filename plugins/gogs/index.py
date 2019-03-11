@@ -90,7 +90,7 @@ def getHomeDir():
             "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
         return '/Users/' + user
     else:
-        return '/root'
+        return '/home/gogs'
 
 
 def getRunUser():
