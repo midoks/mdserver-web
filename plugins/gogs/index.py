@@ -264,7 +264,7 @@ def stop():
 
 def restart():
     file = initDreplace()
-    data = public.execShell(__SR + file + ' reload')
+    data = public.execShell(__SR + file + ' restart')
     if data[1] == '':
         return 'ok'
     return data[1]
