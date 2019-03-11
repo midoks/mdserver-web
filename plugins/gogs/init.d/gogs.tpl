@@ -75,9 +75,8 @@ stop() {
 
     pids=`ps -ef|grep 'gogs web' |grep -v grep|awk '{print $2}'`
     arr=($pids)
-    echo -e "Stopping gogs... \c";
-
-    ifor p in ${arr[@]}
+    echo -e "Stopping gogs... \c"
+    for p in ${arr[@]}
     do
             kill -9 $p
     done
