@@ -9,7 +9,7 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sysName=`uname`
 
-install_tmp=${rootPath}/tmp/bt_install.pl
+install_tmp=${rootPath}/tmp/mw_install.pl
 Install_rsyncd()
 {
 	echo '正在安装脚本文件...' > $install_tmp
