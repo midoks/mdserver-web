@@ -59,14 +59,15 @@ cd $sourcePath/php/php-5.3.29 && ./configure \
 --enable-sockets \
 --enable-mbstring \
 --enable-xml \
---enable-sysvshm \
---enable-sysvmsg \
 --enable-intl \
 --enable-exif \
 --enable-ftp \
 --enable-wddx \
 --enable-soap \
 --enable-posix \
+--enable-sysvmsg \
+--enable-sysvsem \
+--enable-sysvshm \
 --enable-fpm \
 && make && make install && make clean
 

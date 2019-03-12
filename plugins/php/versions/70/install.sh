@@ -47,6 +47,9 @@ cd $sourcePath/php/php-7.0.30 && ./configure \
 --enable-wddx \
 --enable-soap \
 --enable-posix \
+--enable-sysvmsg \
+--enable-sysvsem \
+--enable-sysvshm \
 --enable-fpm \
 && make && make install && make clean
 
