@@ -39,12 +39,12 @@ Install_lib()
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config
 		make && make install
 
-		cp modules/opcache.la $serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20100525/
+		# cp modules/opcache.la $serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20100525/
 
 		cd $php_lib
-		# rm -rf zendopcache-7.0.5
-		# rm -rf zendopcache-7.0.5.tgz
-		# rm -rf package.xml
+		rm -rf zendopcache-7.0.5
+		rm -rf zendopcache-7.0.5.tgz
+		rm -rf package.xml
 	fi
 	
 	if [ ! -f "$extFile" ];then
