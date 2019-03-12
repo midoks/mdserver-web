@@ -44,10 +44,43 @@ echo -e "Install_Libmemcached" >> ${libPath}/lib.pl
 #----------------------------- libmemcached end -------------------------#
 }
 
+
+Install_Jpegsrc(){
+#----------------------------- Jpegsrc start -------------------------#
+if [ ! -d ${libPath}/jpegsrc ];then
+    cd ${sourcePath}
+    if [ ! -f ${sourcePath}/jpegsrc.v9c.tar.gz ];then
+    	wget -O jpegsrc.v9c.tar.gz http://www.ijg.org/files/jpegsrc.v9c.tar.gz -T 20
+    fi 
+    tar -zxf jpegsrc.v9c.tar.gz
+    cd jpeg-9c
+    ./configure --prefix=${libPath}/jpegsrc && make && make install
+fi
+echo -e "Install_Jpegsrc" >> ${libPath}/lib.pl
+#----------------------------- Jpegsrc end -------------------------#
+}
+
+
+Install_GD(){
+#----------------------------- Jpegsrc start -------------------------#
+if [ ! -d ${libPath}/libgd ];then
+    cd ${sourcePath}
+    if [ ! -f ${sourcePath}/libgd-2.2.5.tar.gz ];then
+    	wget -O libgd-2.2.5.tar.gz https://github.com/libgd/libgd/releases/download/gd-2.2.5/libgd-2.2.5.tar.gz -T 20
+    fi 
+    tar -zxf libgd-2.2.5.tar.gz
+    cd libgd-2.2.5
+    ./configure --prefix=${libPath}/libgd && make && make install
+fi
+echo -e "Install_GD" >> ${libPath}/lib.pl
+#----------------------------- Jpegsrc end -------------------------#
+}
+
 Install_Libiconv()
 {
+#----------------------------- libiconv end -------------------------#
 	cd ${sourcePath}
-	if [ ! -f ${libPath}/libiconv ];then
+	if [ ! -d ${libPath}/libiconv ];then
 		wget -O libiconv-1.15.tar.gz  https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.15.tar.gz  -T 5
 		tar zxf libiconv-1.15.tar.gz
 		cd libiconv-1.15
@@ -58,6 +91,7 @@ Install_Libiconv()
 		rm -f libiconv-1.15.tar.gz
 	fi
 	echo -e "Install_Libiconv" >> ${libPath}/lib.pl
+#----------------------------- libiconv end -------------------------#
 }
 
 Install_Libmcrypt()
@@ -135,28 +169,15 @@ Install_Mhash()
 
 Install_Freetype()
 {
-	if [ -d /usr/local/freetype ];then
-		return;
+	cd ${sourcePath}
+	if [ ! -d ${libPath}/freetype ];then
+		wget -O freetype-2.4.12.tar.gz https://download.savannah.gnu.org/releases/freetype/freetype-2.4.12.tar.gz -T 5
+		tar zxf freetype-2.4.12.tar.gz
+		cd freetype-2.4.12
+	    ./configure --prefix=${libPath}/freetype
+	    make && make install
 	fi
-	cd ${run_path}
-	if [ ! -f "freetype-2.4.12.tar.gz" ];then
-		wget -O freetype-2.4.12.tar.gz ${download_Url}/src/freetype-2.4.12.tar.gz -T 5
-	fi
-	tar zxf freetype-2.4.12.tar.gz
-	cd freetype-2.4.12
-    ./configure --prefix=/usr/local/freetype
-    make && make install
-
-    cat > /etc/ld.so.conf.d/freetype.conf<<EOF
-/usr/local/freetype/lib
-EOF
-    ldconfig
-    ln -sf /usr/local/freetype/include/freetype2 /usr/local/include
-    ln -sf /usr/local/freetype/include/ft2build.h /usr/local/include
-    cd ${run_path}
-    rm -rf freetype-2.4.12
-	rm -f freetype-2.4.12.tar.gz
-	echo -e "Install_Freetype" >> /www/server/lib.pl
+	echo -e "Install_Freetype" >> ${libPath}/lib.pl
 }
 
 Install_Pcre()
@@ -225,3 +246,8 @@ Install_OpenSSL
 # Install_Libmcrypt
 # Install_Mcrypt	
 Install_Libiconv
+Install_Jpegsrc
+Install_Freetype
+Install_GD
+
+

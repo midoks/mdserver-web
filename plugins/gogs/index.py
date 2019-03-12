@@ -90,7 +90,7 @@ def getHomeDir():
             "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
         return '/Users/' + user
     else:
-        return '/home/gogs'
+        return '/root'
 
 
 def getRunUser():
@@ -99,7 +99,7 @@ def getRunUser():
             "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
         return user
     else:
-        return 'gogs'
+        return 'root'
 
 __SR = '''#!/bin/bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
@@ -603,6 +603,17 @@ def gogsEdit():
     return public.getJson(data)
 
 
+def getRsaPublic():
+    path = getHomeDir()
+    path += '/.ssh/id_rsa.pub'
+
+    content = public.readFile(path)
+
+    data = {}
+    data['public'] = content
+    return public.getJson(data)
+
+
 def getTotalStatistics():
     st = status()
     data = {}
@@ -619,6 +630,7 @@ def getTotalStatistics():
         data['status'] = False
         data['count'] = 0
         return public.returnJson(False, 'fail', data)
+
 
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -664,6 +676,8 @@ if __name__ == "__main__":
         print projectScriptDebug()
     elif func == 'gogs_edit':
         print gogsEdit()
+    elif func == 'get_rsa_public':
+        print getRsaPublic()
     elif func == 'get_total_statistics':
         print getTotalStatistics()
     else:

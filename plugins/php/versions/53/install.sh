@@ -46,8 +46,8 @@ if [ -f $serverPath/php/53/bin/php ];then
 	return
 fi
 
-#echo 'going?'
-
+#
+# --without-iconv=$serverPath/lib/libiconv \
 cd $sourcePath/php/php-5.3.29 && ./configure \
 --prefix=$serverPath/php/53 \
 --exec-prefix=$serverPath/php/53 \
@@ -55,6 +55,7 @@ cd $sourcePath/php/php-5.3.29 && ./configure \
 --with-zlib-dir=$serverPath/lib/zlib \
 --enable-mysqlnd \
 --without-iconv \
+--with-gd=$serverPath/lib/libgd \
 --enable-zip \
 --enable-sockets \
 --enable-mbstring \
@@ -63,7 +64,6 @@ cd $sourcePath/php/php-5.3.29 && ./configure \
 --enable-sysvmsg \
 --enable-intl \
 --enable-exif \
---witd-gd \
 --enable-ftp \
 --enable-wddx \
 --enable-soap \
