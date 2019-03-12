@@ -47,6 +47,9 @@ cd $sourcePath/php/php-${version} && ./configure \
 --enable-intl \
 --enable-soap \
 --enable-posix \
+--enable-sysvmsg \
+--enable-sysvsem \
+--enable-sysvshm \
 --enable-fpm \
 && make && make install && make clean
 

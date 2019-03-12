@@ -46,6 +46,9 @@ cd $sourcePath/php/php-5.4.45 && ./configure \
 --enable-wddx \
 --enable-soap \
 --enable-posix \
+--enable-sysvmsg \
+--enable-sysvsem \
+--enable-sysvshm \
 --enable-fpm \
 && make && make install && make clean
 
