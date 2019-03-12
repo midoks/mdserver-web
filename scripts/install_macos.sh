@@ -21,7 +21,7 @@ if [ ! -f /usr/local/bin/brew ];then
 	brew install mysql
 fi
 
-brew install libzip bzip2 gcc
+brew install libzip bzip2 gcc openssl llvm
 
 
 if [ ! -d $DEV/server/mdserver-web ]; then
