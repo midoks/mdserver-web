@@ -43,6 +43,7 @@ Install_lib()
 		cd ZendGuardLoader-php* && cd php-5.3.x
 		cp ZendGuardLoader.so $serverPath/php/$version/lib/php/extensions/no-debug-non-zts-20090626/
 
+		rm -rf $php_lib/ZendGuardLoader*
 		rm -rf $php_lib/zend-loader-php5.3*
 	fi
 	

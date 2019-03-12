@@ -11,12 +11,12 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
-LIBNAME=mongo
-LIBV=1.4.5
+LIBNAME=mongodb
+LIBV=1.5.3
 sysName=`uname`
 actionType=$1
 version=$2
-extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20090626/${LIBNAME}.so
+extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20160303/${LIBNAME}.so
 
 Install_lib()
 {
@@ -38,12 +38,10 @@ Install_lib()
 		cd ${LIBNAME}-${LIBV}
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config
-		echo "./configure --with-php-config=$serverPath/php/$version/bin/php-config \
-		--with-openssl-dir=$serverPath/lib/openssl"
 		make && make install
 
 		cd $php_lib
-		# rm -rf ${LIBNAME}-*
+		rm -rf ${LIBNAME}-*
 	fi
 	
 	if [ ! -f "$extFile" ];then
