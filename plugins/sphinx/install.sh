@@ -8,7 +8,7 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sysName=`uname`
 
-install_tmp=${rootPath}/tmp/bt_install.pl
+install_tmp=${rootPath}/tmp/mw_install.pl
 
 
 yum install -y postgresql-libs unixODBC

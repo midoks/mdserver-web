@@ -8,7 +8,7 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source
 
-install_tmp=${rootPath}/tmp/bt_install.pl
+install_tmp=${rootPath}/tmp/mw_install.pl
 
 
 version=7.3.3
@@ -54,6 +54,7 @@ cd $sourcePath/php/php-${version} && ./configure \
 
 Uninstall_php()
 {
+	$serverPath/php/init.d/php73 stop
 	rm -rf $serverPath/php/73
 	echo "卸载php-${version}..." > $install_tmp
 }

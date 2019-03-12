@@ -8,7 +8,7 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source
 
-install_tmp=${rootPath}/tmp/bt_install.pl
+install_tmp=${rootPath}/tmp/mw_install.pl
 
 # echo $curPath
 # echo ${1}
@@ -65,6 +65,7 @@ cd $sourcePath/php/php-5.6.36 && ./configure \
 
 Uninstall_php()
 {
+	$serverPath/php/init.d/php56 stop
 	rm -rf $serverPath/php/56
 	echo "卸载php-5.6.36 ..." > $install_tmp
 }

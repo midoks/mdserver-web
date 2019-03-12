@@ -8,7 +8,7 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source
 
-install_tmp=${rootPath}/tmp/bt_install.pl
+install_tmp=${rootPath}/tmp/mw_install.pl
 
 # echo $curPath
 # echo ${1}
@@ -60,6 +60,7 @@ cd $sourcePath/php/php-7.0.30 && ./configure \
 
 Uninstall_php()
 {
+	$serverPath/php/init.d/php70 stop
 	rm -rf $serverPath/php/70
 	echo "卸载php-7.0.30 ..." > $install_tmp
 }

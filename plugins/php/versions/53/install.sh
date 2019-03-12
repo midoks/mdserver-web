@@ -8,13 +8,7 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source
 
-install_tmp=${rootPath}/tmp/bt_install.pl
-
-# echo $curPath
-# echo ${1}
-# echo ${serverPath}
-# echo ${install_tmp}
-
+install_tmp=${rootPath}/tmp/mw_install.pl
 
 Install_php()
 {
@@ -48,23 +42,31 @@ fi
 
 #
 # --without-iconv=$serverPath/lib/libiconv \
+
+#--enable-pcntl \
+#--enable-bcmath \
+#--enable-hash \
+#--enable-libxml \
+#--enable-dom \
+#--enable-filter \
+#--enable-fileinfo \
+#--enable-xml \
+#--enable-intl \
+#--enable-exif \
+#--enable-ftp \
+#--enable-wddx \
+#--enable-soap \
+#--enable-posix \
+# --with-zlib-dir=$serverPath/lib/zlib \
+# --enable-zip \
 cd $sourcePath/php/php-5.3.29 && ./configure \
 --prefix=$serverPath/php/53 \
 --exec-prefix=$serverPath/php/53 \
 --with-config-file-path=$serverPath/php/53/etc \
---with-zlib-dir=$serverPath/lib/zlib \
---enable-mysqlnd \
 --without-iconv \
---enable-zip \
 --enable-sockets \
 --enable-mbstring \
---enable-xml \
---enable-intl \
---enable-exif \
---enable-ftp \
---enable-wddx \
---enable-soap \
---enable-posix \
+--enable-mysqlnd \
 --enable-sysvmsg \
 --enable-sysvsem \
 --enable-sysvshm \
@@ -87,6 +89,7 @@ fi
 
 Uninstall_php()
 {
+	$serverPath/php/init.d/php53 stop
 	rm -rf $serverPath/php/53
 	echo "卸载php-5.3.29 ..." > $install_tmp
 }
