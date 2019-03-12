@@ -11,12 +11,12 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
-LIBNAME=intl
-LIBV=3.0.0
+LIBNAME=imagick
+LIBV=3.4.3
 sysName=`uname`
 actionType=$1
 version=$2
-extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20090626/${LIBNAME}.so
+extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20100525/${LIBNAME}.so
 
 Install_lib()
 {
@@ -38,7 +38,8 @@ Install_lib()
 		cd ${LIBNAME}-${LIBV}
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
-		--with-openssl-dir=$serverPath/php/lib/openssl/
+		--enable-memcache --with-zlib-dir=$serverPath/lib/zlib \
+		--with-libmemcached-dir=$serverPath/lib/libmemcached
 		make && make install
 
 		cd $php_lib
@@ -73,10 +74,9 @@ Uninstall_lib()
 		return
 	fi
 	
-	sed -i '_bak' "/${LIBNAME}.so/d" $serverPath/php/$version/etc/php.ini
-	sed -i '_bak' "/${LIBNAME}/d" $serverPath/php/$version/etc/php.ini
+	sed -i '_bak' '/${LIBNAME}.so/d' $serverPath/php/$version/etc/php.ini
+	sed -i '_bak' '/${LIBNAME}/d' $serverPath/php/$version/etc/php.ini
 		
-
 	rm -f $extFile
 	$serverPath/php/init.d/php$version reload
 	echo '==============================================='
