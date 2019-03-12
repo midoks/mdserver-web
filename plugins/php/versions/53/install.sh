@@ -43,27 +43,27 @@ fi
 #
 # --without-iconv=$serverPath/lib/libiconv \
 
-#--enable-pcntl \
-#--enable-bcmath \
-#--enable-hash \
-#--enable-libxml \
-#--enable-dom \
-#--enable-filter \
-#--enable-fileinfo \
-#--enable-xml \
-#--enable-intl \
-#--enable-exif \
-#--enable-ftp \
-#--enable-wddx \
-#--enable-soap \
-#--enable-posix \
-# --with-zlib-dir=$serverPath/lib/zlib \
-# --enable-zip \
+# --enable-intl \
 cd $sourcePath/php/php-5.3.29 && ./configure \
 --prefix=$serverPath/php/53 \
 --exec-prefix=$serverPath/php/53 \
 --with-config-file-path=$serverPath/php/53/etc \
 --without-iconv \
+--with-zlib-dir=$serverPath/lib/zlib \
+--enable-zip \
+--enable-exif \
+--enable-hash \
+--enable-libxml \
+--enable-dom \
+--enable-filter \
+--enable-fileinfo \
+--enable-pcntl \
+--enable-bcmath \
+--enable-xml \
+--enable-ftp \
+--enable-wddx \
+--enable-soap \
+--enable-posix \
 --enable-sockets \
 --enable-mbstring \
 --enable-mysqlnd \
