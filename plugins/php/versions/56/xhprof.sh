@@ -11,34 +11,31 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
-LIBNAME=intl
-LIBV=3.0.0
+LIBNAME=xhprof
+LIBV=0.9.4
 sysName=`uname`
 actionType=$1
 version=$2
-extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20121212/${LIBNAME}.so
+extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20131226/${LIBNAME}.so
 
 Install_lib()
 {
 	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep "${LIBNAME}.so"`
 	if [ "${isInstall}" != "" ];then
-		echo "php$version 已安装${LIBNAME},请选择其它版本!"
+		echo "php-$version 已安装${LIBNAME},请选择其它版本!"
 		return
 	fi
 	
-	
 	if [ ! -f "$extFile" ];then
-
 		php_lib=$sourcePath/php_${version}_lib
 		mkdir -p $php_lib
 
 		wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
 
 		cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
-		cd ${LIBNAME}-${LIBV}
+		cd ${LIBNAME}-${LIBV}/extension
 		$serverPath/php/$version/bin/phpize
-		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
-		--with-openssl-dir=$serverPath/php/lib/openssl/
+		./configure --enable-xhprof --with-php-config=$serverPath/php/$version/bin/php-config
 		make && make install
 
 		cd $php_lib
@@ -49,6 +46,7 @@ Install_lib()
 		echo "ERROR!"
 		return
 	fi
+
 
 	echo "" >> $serverPath/php/$version/etc/php.ini
 	echo "[${LIBNAME}]" >> $serverPath/php/$version/etc/php.ini

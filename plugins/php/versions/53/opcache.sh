@@ -50,7 +50,7 @@ Install_lib()
 	fi
 
 	echo "" >> $serverPath/php/$version/etc/php.ini
-	echo "[opcache]" >> $serverPath/php/$version/etc/php.ini
+	echo "[${LIBNAME}]" >> $serverPath/php/$version/etc/php.ini
 	echo "zend_extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
 	echo "opcache.enable=1" >> $serverPath/php/$version/etc/php.ini
 	echo "opcache.memory_consumption=128" >> $serverPath/php/$version/etc/php.ini

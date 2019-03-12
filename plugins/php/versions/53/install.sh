@@ -55,7 +55,6 @@ cd $sourcePath/php/php-5.3.29 && ./configure \
 --with-zlib-dir=$serverPath/lib/zlib \
 --enable-mysqlnd \
 --without-iconv \
---with-gd=$serverPath/lib/libgd \
 --enable-zip \
 --enable-sockets \
 --enable-mbstring \
