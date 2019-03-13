@@ -28,7 +28,7 @@ Install_lib()
 	
 	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep "${LIBNAME}.so"`
 	if [ "${isInstall}" != "" ];then
-		echo "php-$version 已安装yaf,请选择其它版本!"
+		echo "php-$version 已安装${LIBNAME},请选择其它版本!"
 		return
 	fi
 	
@@ -76,7 +76,8 @@ Uninstall_lib()
 	fi
 
 	if [ ! -f "$extFile" ];then
-		echo "php$version 未安装yaf,请选择其它版本!"
+		echo "php-$version 未安装${LIBNAME},请选择其它版本!"
+		echo "php-$version not install ${LIBNAME}, Plese select other version!"
 		return
 	fi
 	
