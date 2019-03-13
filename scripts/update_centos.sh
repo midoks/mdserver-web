@@ -13,13 +13,12 @@ rm -rf  /etc/init.d/mw
 rm -rf /tmp/master.zip
 rm -rf /tmp/mdserver-web-master
 
-cd /www/server/mdserver-web/scripts && ./lib.sh
+cd /www/server/mdserver-web/scripts && sh lib.sh
 
 pip install -r /www/server/mdserver-web/requirements.txt
 
-
-cd /www/server/mdserver-web && ./cli.sh start
-cd /www/server/mdserver-web && ./cli.sh stop
+cd /www/server/mdserver-web && sh cli.sh start
 sleep 5
-cd /www/server/mdserver-web && ./scripts/init.d/mw default
-cd /www/server/mdserver-web && ./cli.sh start
+cd /www/server/mdserver-web && sh cli.sh stop
+cd /www/server/mdserver-web && sh scripts/init.d/mw default
+cd /www/server/mdserver-web && sh cli.sh start
