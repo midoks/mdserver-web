@@ -477,7 +477,7 @@ done
             fp.write(data)
             fp.close()
 
-            public.writeLog('TYPE_FILE', '文件保存成功', (path,))
+            public.writeLog('文件管理', '文件保存成功', (path,))
             return public.returnJson(True, '文件保存成功')
         except Exception as ex:
             return public.returnJson(False, 'FILE_SAVE_ERR:' + str(ex))
