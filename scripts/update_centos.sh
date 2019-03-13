@@ -17,6 +17,7 @@ sh /etc/init.d/mw stop \
 && rm -rf  /www/server/mdserver-web/scripts/init.d/mw \
 && rm -rf  /etc/init.d/mw
 
+
 cd /www/server/mdserver-web && sh cli.sh start
 
 isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`
