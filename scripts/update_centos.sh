@@ -17,7 +17,7 @@ cd /www/server/mdserver-web/scripts && sh lib.sh
 
 pip install -r /www/server/mdserver-web/requirements.txt
 
-cd /www/server/mdserver-web && sh cli.sh start
+cd /www/server/mdserver-web && sh cli.sh restart
 
 isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`
 port=$(cat data/port.pl)
