@@ -5,8 +5,6 @@ LANG=en_US.UTF-8
 
 wget -O /tmp/master.zip https://codeload.github.com/midoks/mdserver-web/zip/master
 cd /tmp && unzip /tmp/master.zip
-rm -rf  /www/server/mdserver-web/scripts/init.d/mw
-rm -rf  /etc/init.d/mw
 
 
 /usr/bin/cp -rf  /tmp/mdserver-web-master/* /www/server/mdserver-web
@@ -17,7 +15,12 @@ cd /www/server/mdserver-web/scripts && sh lib.sh
 
 pip install -r /www/server/mdserver-web/requirements.txt
 
-cd /www/server/mdserver-web && sh cli.sh restart
+
+sh /etc/init.d/mw stop \
+&& rm -rf  /www/server/mdserver-web/scripts/init.d/mw
+&& rm -rf  /etc/init.d/mw
+
+cd /www/server/mdserver-web && sh cli.sh start
 
 isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`
 port=$(cat data/port.pl)
