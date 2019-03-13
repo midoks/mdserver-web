@@ -220,7 +220,7 @@ function addVersion(name, ver, type, obj, title) {
             layer.closeAll();
             layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
             getSList();
-        });
+        },'json');
     });
     installTips();
     fly("bi-btn");
