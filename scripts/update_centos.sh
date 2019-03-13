@@ -19,7 +19,7 @@ sh /etc/init.d/mw stop && rm -rf  /www/server/mdserver-web/scripts/init.d/mw && 
 
 echo -e "stop mw"
 isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`
-port=$(cat data/port.pl)
+port=$(cat /www/server/mdserver-web/data/port.pl)
 n=0
 while [[ "$isStart" != "" ]];
 do
@@ -46,6 +46,7 @@ do
         break;
     fi
 done
+echo -e "start mw success"
 
 cd /www/server/mdserver-web \
 && sh /etc/init.d/mw default
