@@ -7,13 +7,8 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source
-
+sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
-
-# echo $curPath
-# echo ${1}
-# echo ${serverPath}
-# echo ${install_tmp}
 
 version=7.1.27
 Install_php()
@@ -31,6 +26,13 @@ if [ ! -d $sourcePath/php/php-${version} ];then
 	cd $sourcePath/php && tar -Jxf $sourcePath/php/php-${version}.tar.xz
 fi
 
+OPTIONS=''
+if [ $sysName == 'Darwin' ]; then
+	OPTIONS='--without-iconv'
+else
+	OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
+fi
+
 
 cd $sourcePath/php/php-${version} && ./configure \
 --prefix=$serverPath/php/71 \
@@ -38,7 +40,6 @@ cd $sourcePath/php/php-${version} && ./configure \
 --with-config-file-path=$serverPath/php/71/etc \
 --with-zlib-dir=$serverPath/lib/zlib \
 --enable-mysqlnd \
---without-iconv \
 --enable-zip \
 --enable-mbstring \
 --enable-ftp \
@@ -50,6 +51,7 @@ cd $sourcePath/php/php-${version} && ./configure \
 --enable-sysvmsg \
 --enable-sysvsem \
 --enable-sysvshm \
+$OPTIONS \
 --enable-fpm \
 && make && make install && make clean
 

@@ -7,13 +7,9 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source
-
+sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 
-# echo $curPath
-# echo ${1}
-# echo ${serverPath}
-# echo ${install_tmp}
 
 
 Install_php()
@@ -32,13 +28,19 @@ if [ ! -d $sourcePath/php/php-5.4.45 ];then
 fi
 
 
+OPTIONS=''
+if [ $sysName == 'Darwin' ]; then
+	OPTIONS='--without-iconv'
+else
+	OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
+fi
+
 cd $sourcePath/php/php-5.4.45 && ./configure \
 --prefix=$serverPath/php/54 \
 --exec-prefix=$serverPath/php/54 \
 --with-config-file-path=$serverPath/php/54/etc \
 --with-zlib-dir=$serverPath/lib/zlib \
 --enable-mysqlnd \
---without-iconv \
 --enable-zip \
 --enable-mbstring \
 --enable-sockets \
@@ -49,6 +51,7 @@ cd $sourcePath/php/php-5.4.45 && ./configure \
 --enable-sysvmsg \
 --enable-sysvsem \
 --enable-sysvshm \
+$OPTIONS \
 --enable-fpm \
 && make && make install && make clean
 

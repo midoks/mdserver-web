@@ -7,13 +7,8 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source
-
+sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
-
-# echo $curPath
-# echo ${1}
-# echo ${serverPath}
-# echo ${install_tmp}
 
 
 Install_php()
@@ -31,6 +26,12 @@ if [ ! -d $sourcePath/php/php-5.6.36 ];then
 	cd $sourcePath/php && tar -Jxf $sourcePath/php/php-5.6.36.tar.xz
 fi
 
+OPTIONS=''
+if [ $sysName == 'Darwin' ]; then
+	OPTIONS='--without-iconv'
+else
+	OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
+fi
 
 cd $sourcePath/php/php-5.6.36 && ./configure \
 --prefix=$serverPath/php/56 \
@@ -40,7 +41,6 @@ cd $sourcePath/php/php-5.6.36 && ./configure \
 --with-mysql=mysqlnd \
 --with-pdo-mysql=mysqlnd \
 --with-mysqli=mysqlnd \
---without-iconv \
 --enable-zip \
 --enable-mbstring \
 --enable-intl \
@@ -48,13 +48,14 @@ cd $sourcePath/php/php-5.6.36 && ./configure \
 --enable-sockets \
 --enable-pcntl \
 --enable-shmop \
---enable-sysvmsg \
---enable-sysvsem \
---enable-sysvshm \
 --enable-intl \
 --enable-wddx \
 --enable-soap \
 --enable-posix \
+--enable-sysvmsg \
+--enable-sysvsem \
+--enable-sysvshm \
+$OPTIONS \
 --enable-fpm \
 && make clean && make && make install && make clean
 
