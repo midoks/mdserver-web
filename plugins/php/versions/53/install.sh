@@ -58,6 +58,7 @@ cd $sourcePath/php/php-5.3.29 && ./configure \
 --enable-exif \
 --enable-hash \
 --enable-libxml \
+--enable-simplexml \
 --enable-dom \
 --enable-filter \
 --enable-fileinfo \

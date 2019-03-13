@@ -32,6 +32,7 @@ if [ $sysName == 'Darwin' ]; then
 	OPTIONS='--without-iconv'
 else
 	OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
+	OPTIONS="${OPTIONS} --with-gd --enable-gd-native-ttf"
 fi
 
 
@@ -43,6 +44,7 @@ cd $sourcePath/php/php-${version} && ./configure \
 --enable-mysqlnd \
 --enable-zip \
 --enable-mbstring \
+--enable-simplexml \
 --enable-sockets \
 --enable-intl \
 --enable-ftp \
