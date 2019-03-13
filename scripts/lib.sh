@@ -51,7 +51,7 @@ Install_Libiconv()
 	cd ${sourcePath}
 	if [ ! -d ${libPath}/libiconv ];then
 		# wget -O libiconv-1.15.tar.gz  https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.15.tar.gz  -T 5
-		wget -O libiconv-1.15.tar.gz  https://github.com/midoks/mdserver-web/releases/download/init/libiconv-1.15.tar.gz  -T 5
+		wget -O  https://github.com/midoks/mdserver-web/releases/download/init/libiconv-1.15.tar.gz  -T 5
 		tar zxvf libiconv-1.15.tar.gz
 		cd libiconv-1.15
 	    ./configure --prefix=${libPath}/libiconv --enable-static
