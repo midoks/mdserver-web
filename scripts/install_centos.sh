@@ -15,6 +15,7 @@ if [ ! -f /usr/bin/applydeltarpm ];then
 	yum -y install deltarpm
 fi
 
+yum install -y wget curl libcurl
 #https need
 curl  https://get.acme.sh | sh
 
@@ -49,7 +50,7 @@ if [ "${isVersion}" == '' ];then
 fi
 
 
-yum install -y wget curl libzip-devel mysql-devel libjpeg* libpng* freetype* gd*
+yum install -y  libzip-devel mysql-devel libjpeg* libpng* freetype* gd*
 
 if [ ! -d '/www/server/mdserver-web' ];then
 	wget -O /tmp/master.zip https://codeload.github.com/midoks/mdserver-web/zip/master

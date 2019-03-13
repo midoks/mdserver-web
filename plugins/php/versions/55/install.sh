@@ -28,9 +28,11 @@ fi
 OPTIONS=''
 if [ $sysName == 'Darwin' ]; then
 	OPTIONS='--without-iconv'
+	OPTIONS="${OPTIONS} --with-curl=${serverPath}/lib/curl"
 else
 	OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
 	OPTIONS="${OPTIONS} --with-gd --enable-gd-native-ttf"
+	OPTIONS="${OPTIONS} --with-curl"
 fi
 
 

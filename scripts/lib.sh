@@ -45,37 +45,6 @@ echo -e "Install_Libmemcached" >> ${libPath}/lib.pl
 }
 
 
-Install_Jpegsrc(){
-#----------------------------- Jpegsrc start -------------------------#
-if [ ! -d ${libPath}/jpegsrc ];then
-    cd ${sourcePath}
-    if [ ! -f ${sourcePath}/jpegsrc.v9c.tar.gz ];then
-    	wget -O jpegsrc.v9c.tar.gz http://www.ijg.org/files/jpegsrc.v9c.tar.gz -T 20
-    fi 
-    tar -zxf jpegsrc.v9c.tar.gz
-    cd jpeg-9c
-    ./configure --prefix=${libPath}/jpegsrc && make && make install
-fi
-echo -e "Install_Jpegsrc" >> ${libPath}/lib.pl
-#----------------------------- Jpegsrc end -------------------------#
-}
-
-
-Install_GD(){
-#----------------------------- Jpegsrc start -------------------------#
-if [ ! -d ${libPath}/libgd ];then
-    cd ${sourcePath}
-    if [ ! -f ${sourcePath}/libgd-2.2.5.tar.gz ];then
-    	wget -O libgd-2.2.5.tar.gz https://github.com/libgd/libgd/releases/download/gd-2.2.5/libgd-2.2.5.tar.gz -T 20
-    fi 
-    tar -zxf libgd-2.2.5.tar.gz
-    cd libgd-2.2.5
-    ./configure --prefix=${libPath}/libgd && make && make install
-fi
-echo -e "Install_GD" >> ${libPath}/lib.pl
-#----------------------------- Jpegsrc end -------------------------#
-}
-
 Install_Libiconv()
 {
 #----------------------------- libiconv end -------------------------#
@@ -142,44 +111,6 @@ Install_Mcrypt()
 	echo -e "Install_Mcrypt" >> /www/server/lib.pl
 }
 
-Install_Mhash()
-{
-	if [ -f '/usr/local/lib/libmhash.so' ];then
-		return;
-	fi
-	cd ${run_path}
-	if [ ! -f "mhash-0.9.9.9.tar.gz" ];then
-		wget -O mhash-0.9.9.9.tar.gz ${download_Url}/src/mhash-0.9.9.9.tar.gz -T 5
-	fi
-	tar zxf mhash-0.9.9.9.tar.gz
-	cd mhash-0.9.9.9
-    ./configure
-    make && make install
-    ln -sf /usr/local/lib/libmhash.a /usr/lib/libmhash.a
-    ln -sf /usr/local/lib/libmhash.la /usr/lib/libmhash.la
-    ln -sf /usr/local/lib/libmhash.so /usr/lib/libmhash.so
-    ln -sf /usr/local/lib/libmhash.so.2 /usr/lib/libmhash.so.2
-    ln -sf /usr/local/lib/libmhash.so.2.0.1 /usr/lib/libmhash.so.2.0.1
-    ldconfig
-    cd ${run_path}
-    rm -rf mhash-0.9.9.9*
-	echo -e "Install_Mhash" >> /www/server/lib.pl
-}
-
-
-Install_Freetype()
-{
-	cd ${sourcePath}
-	if [ ! -d ${libPath}/freetype ];then
-		wget -O freetype-2.4.12.tar.gz https://download.savannah.gnu.org/releases/freetype/freetype-2.4.12.tar.gz -T 5
-		tar zxf freetype-2.4.12.tar.gz
-		cd freetype-2.4.12
-	    ./configure --prefix=${libPath}/freetype
-	    make && make install
-	fi
-	echo -e "Install_Freetype" >> ${libPath}/lib.pl
-}
-
 Install_Pcre()
 {
     Cur_Pcre_Ver=`pcre-config --version|grep '^8.' 2>&1`
@@ -237,17 +168,28 @@ Install_Lib()
 	fi
 }
 
+
+Install_Curl()
+{
+#----------------------------- curl start -------------------------#
+if [ ! -d ${libPath}/curl ];then
+    cd ${sourcePath}
+    if [ ! -f ${sourcePath}/curl-7.64.0.tar.gz ];then
+    	wget https://curl.haxx.se/download/curl-7.64.0.tar.gz -T 20
+    fi 
+    tar -zxf curl-7.64.0.tar.gz
+    cd curl-7.64.0
+    ./configure --prefix=${libPath}/curl --with-ssl=${libPath}/openssl
+    make && make install
+fi
+echo -e "Install_Curl" >> ${libPath}/lib.pl
+#----------------------------- curl end -------------------------#
+}
+
 Install_Zlib
-# Install_Lib
 Install_Libmemcached
-Install_OpenSSL
-# Install_Pcre
-# Install_Mhash
-# Install_Libmcrypt
-# Install_Mcrypt	
+Install_OpenSSL	
 Install_Libiconv
-Install_Jpegsrc
-Install_Freetype
-Install_GD
+Install_Curl
 
 
