@@ -235,7 +235,11 @@ function getDiskList(b) {
 }
 
 function createFolder() {
-	var a = "<tr><td colspan='2'><span class='glyphicon glyphicon-folder-open'></span> <input id='newFolderName' class='newFolderName' type='text' value=''></td><td colspan='3'><button id='nameOk' type='button' class='btn btn-success btn-sm'>"+lan.public.ok+"</button>&nbsp;&nbsp;<button id='nameNOk' type='button' class='btn btn-default btn-sm'>"+lan.public.cancel+"</button></td></tr>";
+	var a = "<tr>\
+		<td colspan='2'><span class='glyphicon glyphicon-folder-open'></span><input id='newFolderName' class='newFolderName' type='text' value=''></td>\
+		<td colspan='3'><button id='nameOk' type='button' class='btn btn-success btn-sm'>确定</button>\
+			&nbsp;&nbsp;<button id='nameNOk' type='button' class='btn btn-default btn-sm'>取消</button></td>\
+		</tr>";
 	if($("#tbody tr").length == 0) {
 		$("#tbody").append(a)
 	} else {
@@ -247,7 +251,7 @@ function createFolder() {
 		var b = $("#PathPlace").find("span").text();
 		newTxt = b.replace(new RegExp(/(\/\/)/g), "/") + c;
 		var d = "path=" + newTxt;
-		$.post("/files?action=CreateDir", d, function(e) {
+		$.post("/files/create_dir", d, function(e) {
 			if(e.status == true) {
 				layer.msg(e.msg, {
 					icon: 1
@@ -257,8 +261,8 @@ function createFolder() {
 					icon: 2
 				})
 			}
-			getDiskList(b)
-		})
+			getDiskList(b);
+		},'json');
 	});
 	$("#nameNOk").click(function() {
 		$(this).parents("tr").remove()
@@ -269,7 +273,7 @@ function NewDelFile(c) {
 	var a = $("#PathPlace").find("span").text();
 	newTxt = c.replace(new RegExp(/(\/\/)/g), "/");
 	var b = "path=" + newTxt + "&empty=True";
-	$.post("/files?action=DeleteDir", b, function(d) {
+	$.post("/files/delete_dir", b, function(d) {
 		if(d.status == true) {
 			layer.msg(d.msg, {
 				icon: 1
@@ -280,7 +284,7 @@ function NewDelFile(c) {
 			})
 		}
 		getDiskList(a);
-	})
+	},'json');
 }
 
 function activeDisk() {
@@ -338,8 +342,13 @@ function backFile() {
 function getfilePath() {
 	var a = $("#PathPlace").find("span").text();
 	a = a.replace(new RegExp(/(\\)/g), "/");
+	a_len = a.length;
+	if (a[a_len-1] == '/'){
+		a = a.substr(0,a_len-1);
+	}
+
 	$("#" + getCookie("SetId")).val(a + getCookie("SetName"));
-	layer.close(getCookie("ChangePath"))
+	layer.close(getCookie("ChangePath"));
 }
 
 function setCookie(a, c) {

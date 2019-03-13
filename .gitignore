@@ -119,3 +119,4 @@ data/site.pl
 data/admin_path.pl
 data/close.pl
 ssl/input.pl
+data/datadir.pl

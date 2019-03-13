@@ -88,6 +88,26 @@ function runInfo(){
 }
 
 
+function myDbPos(){
+    myPost('my_db_pos','',function(data){
+        var con = '<div class="line ">\
+            <div class="info-r  ml0">\
+            <input id="datadir" name="datadir" class="bt-input-text mr5 port" type="text" style="width:330px" value="'+data.data+'">\
+            <span class="glyphicon cursor mr5 glyphicon-folder-open icon_datadir" onclick="changePath(\'datadir\')"></span>\
+            <button id="btn_change_path" name="btn_change_path" class="btn btn-success btn-sm mr5 ml5 btn_change_port">迁移</button>\
+            </div></div>';
+        $(".soft-man-con").html(con);
+
+        $('#btn_change_path').click(function(){
+            var datadir = $("input[name='datadir']").val();
+            myPost('set_db_pos','datadir='+datadir,function(data){
+                var rdata = $.parseJSON(data.data);
+                layer.msg(rdata.msg,{icon:rdata.status ? 1 : 5,time:2000,shade: [0.3, '#000']});
+            });
+        });
+    });
+}
+
 function myPort(){
     myPost('my_port','',function(data){
         var con = '<div class="line ">\
@@ -740,36 +760,26 @@ function delDbBatch(){
 }
 
 
-function setDataByKey(tab, key, obj) {     
+function setDbPs(id, name, obj) {
     var _span = $(obj);
-    var _input = $("<input class='baktext' value="+_span.text()+" type='text' placeholder='备注信息' />");
+    var _input = $("<input class='baktext' value=\""+_span.text()+"\" type='text' placeholder='备注信息' />");
     _span.hide().after(_input);
     _input.focus();
     _input.blur(function(){
-        // var item = $(this).parents('tr').data('item');
-        // console.log(item); 
-        // var _txt = $(this);
-        // var data = {table:tab,id:item.id};
-        // data[key] = _txt.val()
-        // bt.pub.set_data_ps(data,function(rdata){
-        //     if(rdata.status){   
-        //         _span.text(_txt.val());                             
-        //         _span.show();
-        //         _txt.remove();
-        //     }
-        // })
-    })
+        $(this).remove();
+        var ps = _input.val();
+        _span.text(ps).show();
+        var data = {name:name,id:id,ps:ps};
+        myPost('set_db_ps', data, function(data){
+            var rdata = $.parseJSON(data.data);
+            layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+        });
+    });
     _input.keyup(function(){
         if(event.keyCode == 13){
             _input.trigger('blur');
         }
-    })
-}
-
-function setDbPs(data,callback){
-    bt.send('setPs','data/setPs',data,function(rdata){          
-        if(callback) callback(rdata);
-    })
+    });
 }
 
 function openPhpmyadmin(name,username,password){
@@ -838,7 +848,7 @@ function dbList(page, search){
                         '<span class="ico-copy cursor btcopy" style="margin-left:10px" title="复制密码" onclick="copyPass(\''+rdata.data[i]['password']+'\')"></span>'+
                     '</td>';
             // list += '<td>备份</td>';
-            list += '<td><span class="c9 input-edit" onclick="setDataByKey(\'databases\',\'ps\',this)" style="display: inline-block;">'+rdata.data[i]['ps']+'</span></td>';
+            list += '<td><span class="c9 input-edit" onclick="setDbPs(\''+rdata.data[i]['id']+'\',\''+rdata.data[i]['name']+'\',this)" style="display: inline-block;">'+rdata.data[i]['ps']+'</span></td>';
             list += '<td style="text-align:right">' + 
                         '<a href="javascript:;" class="btlink" onclick="openPhpmyadmin(\''+rdata.data[i]['name']+'\',\''+rdata.data[i]['username']+'\',\''+rdata.data[i]['password']+'\')" title="数据库管理">管理</a> | ' +
                         '<a href="javascript:;" class="btlink" onclick="repTools(\''+rdata.data[i]['name']+'\')" title="MySQL优化修复工具">工具</a> | ' +
@@ -935,9 +945,12 @@ function myLogs(){
         })
 
         myPost('error_log', 'p=1', function(data){
-            var error_body = data.data;
-            if (error_body == "") {
-                error_body = '当前没有日志内容!';
+            var rdata = $.parseJSON(data.data);
+            var error_body = '';
+            if (rdata.status){
+                error_body = rdata.data;
+            } else {
+                error_body = rdata.msg;
             }
             $("#error_log").text(error_body);
             var ob = document.getElementById('error_log');
