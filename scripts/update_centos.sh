@@ -33,6 +33,4 @@ do
 done
 
 cd /www/server/mdserver-web \
-&& sh cli.sh stop \
-&& sh cli.sh start \
 && sh scripts/init.d/mw default
