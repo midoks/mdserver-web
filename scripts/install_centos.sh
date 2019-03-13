@@ -49,7 +49,7 @@ if [ "${isVersion}" == '' ];then
 fi
 
 
-yum install -y wget curl unzip zip libzip-devel mysql-devel
+yum install -y wget curl unzip zip libzip-devel mysql-devel libpng freetype
 
 # if [ ! -d '/www/server/mdserver-web' ];then
 	wget -O /tmp/master.zip https://codeload.github.com/midoks/mdserver-web/zip/master

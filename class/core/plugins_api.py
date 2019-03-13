@@ -165,10 +165,11 @@ class plugins_api:
             + " uninstall " + version
 
         data = public.execShell(execstr)
-        if data[1] == '':
-            return public.returnJson(True, '已将卸载成功!')
-        else:
-            return public.returnJson(False, '卸载出现错误信息!' + data[1])
+        return public.returnJson(True, '卸载执行成功!')
+        # if data[1] == '':
+        #     return public.returnJson(True, '已将卸载成功!')
+        # else:
+        #     return public.returnJson(False, '卸载出现错误信息!' + data[1])
 
     def checkApi(self):
         name = request.form.get('name', '')

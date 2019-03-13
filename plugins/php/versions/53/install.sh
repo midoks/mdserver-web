@@ -45,6 +45,7 @@ if [ $sysName == 'Darwin' ]; then
 	OPTIONS='--without-iconv'
 else
 	OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
+	OPTIONS="${OPTIONS} --with-gd --enable-gd-native-ttf"
 fi
 
 # --enable-intl \
