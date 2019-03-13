@@ -7,7 +7,7 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source
-
+sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 
 Install_php()
@@ -40,15 +40,18 @@ if [ -f $serverPath/php/53/bin/php ];then
 	return
 fi
 
-#
-# --without-iconv=$serverPath/lib/libiconv \
+OPTIONS=''
+if [ $sysName == 'Darwin' ]; then
+	OPTIONS='--without-iconv'
+else
+	OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
+fi
 
 # --enable-intl \
 cd $sourcePath/php/php-5.3.29 && ./configure \
 --prefix=$serverPath/php/53 \
 --exec-prefix=$serverPath/php/53 \
 --with-config-file-path=$serverPath/php/53/etc \
---without-iconv \
 --with-zlib-dir=$serverPath/lib/zlib \
 --enable-zip \
 --enable-exif \
@@ -70,6 +73,7 @@ cd $sourcePath/php/php-5.3.29 && ./configure \
 --enable-sysvmsg \
 --enable-sysvsem \
 --enable-sysvshm \
+$OPTIONS \
 --enable-fpm \
 && make && make install && make clean
 
@@ -91,7 +95,7 @@ Uninstall_php()
 {
 	$serverPath/php/init.d/php53 stop
 	rm -rf $serverPath/php/53
-	echo "卸载php-5.3.29 ..." > $install_tmp
+	echo "uninstall php-5.3.29 ..." > $install_tmp
 }
 
 action=${1}
