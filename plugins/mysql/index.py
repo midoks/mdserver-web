@@ -151,10 +151,6 @@ def getDataDir():
 
 def binLog():
     args = getArgs()
-    # data = checkArgs(args, ['status'])
-    # if not data[0]:
-    #     return data[1]
-
     conf = getConf()
     con = public.readFile(conf)
 
@@ -163,7 +159,7 @@ def binLog():
             return public.returnJson(False, '0')
         con = con.replace('#log-bin=mysql-bin', 'log-bin=mysql-bin')
         con = con.replace('#binlog_format=mixed', 'binlog_format=mixed')
-        os.system('sync')
+        public.execShell('sync')
         restart()
     else:
         path = getDataDir()
@@ -177,9 +173,9 @@ def binLog():
             return public.returnJson(True, dsize)
         con = con.replace('log-bin=mysql-bin', '#log-bin=mysql-bin')
         con = con.replace('binlog_format=mixed', '#binlog_format=mixed')
-        os.system('sync')
+        public.execShell('sync')
         restart()
-        os.system('rm -f ' + path + '/mysql-bin.*')
+        public.execShell('rm -f ' + path + '/mysql-bin.*')
 
     public.writeFile(conf, con)
     return public.returnJson(True, '设置成功!')
@@ -195,12 +191,14 @@ def getErrorLog():
         if n == 'error.log':
             filename = path + '/' + n
             break
+    print filename
     if not os.path.exists(filename):
         return public.returnJson(False, '指定文件不存在!')
     if args.has_key('close'):
         public.writeFile(filename, '')
-        return public.returnJson(True, '日志已清空')
-    return public.getNumLines(filename, 1000)
+        return public.returnJson(False, '日志已清空')
+    info = public.getNumLines(filename, 1000)
+    return public.returnJson(True, 'OK', info)
 
 
 def getShowLogFile():
@@ -307,6 +305,57 @@ def initdUinstall():
     return 'ok'
 
 
+def getMyDbPos():
+    file = getConf()
+    content = public.readFile(file)
+    rep = 'datadir\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
+
+
+def setMyDbPos():
+    args = getArgs()
+    data = checkArgs(args, ['datadir'])
+    if not data[0]:
+        return data[1]
+
+    s_datadir = getMyDbPos()
+    t_datadir = args['datadir']
+    if t_datadir == s_datadir:
+        return public.returnJson(False, '与当前存储目录相同，无法迁移文件!')
+
+    if not os.path.exists(t_datadir):
+        public.execShell('mkdir -p ' + t_datadir)
+
+    # public.execShell('/etc/init.d/mysqld stop')
+    stop()
+    public.execShell('cp -rf ' + s_datadir + '/* ' + t_datadir + '/')
+    public.execShell('chown -R mysql.mysql ' + t_datadir)
+    public.execShell('chmod -R 755 ' + t_datadir)
+    public.execShell('rm -f ' + t_datadir + '/*.pid')
+    public.execShell('rm -f ' + t_datadir + '/*.err')
+
+    path = getServerDir()
+    myfile = path + '/etc/my.cnf'
+    mycnf = public.readFile(myfile)
+    public.writeFile(path + '/etc/my_backup.cnf', mycnf)
+
+    mycnf = mycnf.replace(s_datadir, t_datadir)
+    public.writeFile(myfile, mycnf)
+    start()
+
+    result = public.execShell(
+        'ps aux|grep mysqld| grep -v grep|grep -v python')
+    if len(result[0]) > 10:
+        public.writeFile('data/datadir.pl', t_datadir)
+        return public.returnJson(True, '存储目录迁移成功!')
+    else:
+        public.execShell('pkill -9 mysqld')
+        public.writeFile(myfile, public.readFile(path + '/etc/my_backup.cnf'))
+        start()
+        return public.returnJson(False, '文件迁移失败!')
+
+
 def getMyPort():
     file = getConf()
     content = public.readFile(file)
@@ -317,8 +366,9 @@ def getMyPort():
 
 def setMyPort():
     args = getArgs()
-    if not 'port' in args:
-        return 'port missing'
+    data = checkArgs(args, ['port'])
+    if not data[0]:
+        return data[1]
 
     port = args['port']
     file = getConf()
@@ -586,8 +636,10 @@ def syncToDatabases():
 
 def setRootPwd():
     args = getArgs()
-    if not 'password' in args:
-        return 'password missing'
+    data = checkArgs(args, ['password'])
+    if not data[0]:
+        return data[1]
+
     password = args['password']
     try:
         pdb = pMysqlDb()
@@ -648,15 +700,31 @@ def setUserPwd():
             return isError
         pdb.execute("flush privileges")
         psdb.where("id=?", (id,)).setField('password', newpassword)
-        return public.returnJson(True, public.getInfo('修改数据库[{1}]密码成功!', (name)))
+        return public.returnJson(True, public.getInfo('修改数据库[{1}]密码成功!', (name,)))
     except Exception as ex:
-        print str(ex)
-        return public.returnJson(False, public.getInfo('修改数据库[{1}]密码失败!', (name)))
+        # print str(ex)
+        return public.returnJson(False, public.getInfo('修改数据库[{1}]密码失败!', (name,)))
+
+
+def setDbPs():
+    args = getArgs()
+    data = checkArgs(args, ['id', 'name', 'ps'])
+    if not data[0]:
+        return data[1]
+
+    ps = args['ps']
+    sid = args['id']
+    name = args['name']
+    try:
+        psdb = pSqliteDb('databases')
+        psdb.where("id=?", (sid,)).setField('ps', ps)
+        return public.returnJson(True, public.getInfo('修改数据库[{1}]备注成功!', (name,)))
+    except Exception as e:
+        return public.returnJson(True, public.getInfo('修改数据库[{1}]备注失败!', (name,)))
 
 
 def addDb():
     args = getArgs()
-
     data = checkArgs(args,
                      ['password', 'name', 'codeing', 'db_user', 'dataAccess', 'ps'])
     if not data[0]:
@@ -990,6 +1058,10 @@ if __name__ == "__main__":
         print getErrorLog()
     elif func == 'show_log':
         print getShowLogFile()
+    elif func == 'my_db_pos':
+        print getMyDbPos()
+    elif func == 'set_db_pos':
+        print setMyDbPos()
     elif func == 'my_port':
         print getMyPort()
     elif func == 'set_my_port':
@@ -1014,6 +1086,8 @@ if __name__ == "__main__":
         print getDbAccess()
     elif func == 'set_db_access':
         print setDbAccess()
+    elif func == 'set_db_ps':
+        print setDbPs()
     elif func == 'get_db_info':
         print getDbInfo()
     elif func == 'repair_table':

@@ -57,9 +57,9 @@ echo "The root password set ${pwd}  successuful"'''
     os.system("/bin/bash mysql_root.sh " + password)
     os.system("rm -f mysql_root.sh")
 
-    result = sql.table('config').where(
+    pos = public.getServerDir() + '/mysql'
+    result = sql.table('config').dbPos(pos, 'mysql').where(
         'id=?', (1,)).setField('mysql_root', password)
-    print(result)
 
 
 def set_panel_pwd(password, ncli=False):
