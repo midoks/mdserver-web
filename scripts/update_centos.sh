@@ -16,10 +16,27 @@ pip install -r /www/server/mdserver-web/requirements.txt
 
 
 sh /etc/init.d/mw stop && rm -rf  /www/server/mdserver-web/scripts/init.d/mw && rm -rf  /etc/init.d/mw
-cd /www/server/mdserver-web && sh cli.sh start
 
+echo -e "stop mw\c"
 isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`
 port=$(cat data/port.pl)
+n=0
+while [[ "$isStart" != "" ]];
+do
+    echo -e ".\c"
+    sleep 0.5
+    isStart=$(lsof -n -P -i:$port|grep LISTEN|grep -v grep|awk '{print $2}'|xargs)
+    let n+=1
+    if [ $n -gt 8 ];then
+        break;
+    fi
+done
+
+
+echo -e "start mw\c"
+cd /www/server/mdserver-web && sh cli.sh start
+isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`
+n=0
 while [[ "$isStart" == "" ]];
 do
     echo -e ".\c"
