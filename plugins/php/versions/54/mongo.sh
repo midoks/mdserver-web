@@ -12,7 +12,7 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
 LIBNAME=mongo
-LIBV=1.4.5
+LIBV=1.6.16
 sysName=`uname`
 actionType=$1
 version=$2
@@ -32,18 +32,24 @@ Install_lib()
 		php_lib=$sourcePath/php_${version}_lib
 		mkdir -p $php_lib
 
-		wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
+		if [ ! -f $php_lib/${LIBNAME}-${LIBV}.tgz ];then
+			wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
+		fi
+
+		OPTIONS=''
+		if [ $sysName == 'Darwin' ]; then
+			OPTIONS="--with-openssl-dir=/usr/local/Cellar/openssl/1.0.2q"
+		fi 
 
 		cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
 		cd ${LIBNAME}-${LIBV}
 		$serverPath/php/$version/bin/phpize
-		./configure --with-php-config=$serverPath/php/$version/bin/php-config
-		echo "./configure --with-php-config=$serverPath/php/$version/bin/php-config \
-		--with-openssl-dir=$serverPath/lib/openssl"
+		./configure --with-php-config=$serverPath/php/$version/bin/php-config $OPTIONS
+		
 		make && make install
 
 		cd $php_lib
-		# rm -rf ${LIBNAME}-*
+		rm -rf ${LIBNAME}-*
 	fi
 	
 	if [ ! -f "$extFile" ];then

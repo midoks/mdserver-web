@@ -16,7 +16,7 @@ LIBV=1.6.16
 sysName=`uname`
 actionType=$1
 version=$2
-extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20131226/${LIBNAME}.so
+extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20121212/${LIBNAME}.so
 
 Install_lib()
 {
