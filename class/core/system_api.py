@@ -601,11 +601,10 @@ class system_api:
             return 'test'
 
         old_list = old.split('.')
-
         ret = 'none'
         for i in range(len(old_list)):
             tm_new = int(new_list[i])
-            tm_old = int(new_list[i])
+            tm_old = int(old_list[i])
             if tm_new > tm_old:
                 return 'new'
         return ret
