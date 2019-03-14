@@ -241,11 +241,12 @@ def clear_ssh():
 PLIST=`who | grep localhost | awk '{print $2}'`
 for i in $PLIST
 do
-   ps -t /dev/{$i} |grep -v TTY|awk '{print $1}' | xargs kill -9
+    echo $i
+    ps -t /dev/{$i} |grep -v TTY|awk '{print $1}' | xargs kill -9
 done
 '''
     if not public.isAppleSystem():
-        public.execShell(sh)
+        print public.execShell(sh)
 
 
 def connect_ssh():
