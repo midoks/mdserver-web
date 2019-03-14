@@ -301,8 +301,7 @@ def webssh(msg):
         recv = shell.recv(4096)
         emit('server_response', {'data': recv.decode("utf-8")})
     except Exception as ex:
-        pass
-        # print 'webssh:' + str(ex)
+        print 'webssh:' + str(ex)
 
 
 @socketio.on('connect_event')
@@ -316,8 +315,7 @@ def connected_msg(msg):
         # print recv.decode("utf-8")
         emit('server_response', {'data': recv.decode("utf-8")})
     except Exception as e:
-        pass
-        # print 'connected_msg:' + str(e)
+        print 'connected_msg:' + str(e)
 
 
 # @socketio.on('panel')
