@@ -246,7 +246,8 @@ do
 done
 '''
     if not public.isAppleSystem():
-        print public.execShell(sh)
+        info = public.execShell(sh)
+        print info[0], info[1]
 
 
 def connect_ssh():
