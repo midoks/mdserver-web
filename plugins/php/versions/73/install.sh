@@ -39,11 +39,11 @@ else
 fi
 
 
+# --with-zlib-dir=$serverPath/lib/zlib \
 cd $sourcePath/php/php-${version} && ./configure \
 --prefix=$serverPath/php/73 \
 --exec-prefix=$serverPath/php/73 \
 --with-config-file-path=$serverPath/php/73/etc \
---with-zlib-dir=$serverPath/lib/zlib \
 --enable-mysqlnd \
 --enable-zip \
 --enable-mbstring \
