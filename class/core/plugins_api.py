@@ -314,17 +314,10 @@ class plugins_api:
             return True
 
     # 检查是否正在安装
-    def checkSetupTask(self, sName):
-        sName = ''
-        version = ''
+    def checkSetupTask(self, sName, sVer, sCoexist):
         if not self.__tasks:
             self.__tasks = public.M('tasks').where(
                 "status!=?", ('1',)).field('status,name').select()
-
-        if sName.find('php-') != -1:
-            tmp = sName.split('-')
-            sName = tmp[0]
-            version = tmp[1]
         isTask = '1'
         for task in self.__tasks:
             tmpt = public.getStrBetween('[', ']', task['name'])
@@ -332,12 +325,9 @@ class plugins_api:
                 continue
             tmp1 = tmpt.split('-')
             name1 = tmp1[0].lower()
-            if sName == 'php':
-                if name1 == sName and tmp1[1] == version:
+                if name1 == sName and tmp1[1] == sVer:
                     isTask = task['status']
             else:
-                if name1 == 'pure':
-                    name1 = 'pure-ftpd'
                 if name1 == sName:
                     isTask = task['status']
         return isTask
@@ -453,7 +443,7 @@ class plugins_api:
         if info.has_key('coexist') and info['coexist']:
             coexist = True
 
-        pluginInfo = {
+        pInfo = {
             "id": 10000,
             "pid": info['pid'],
             "type": 1000,
@@ -474,29 +464,28 @@ class plugins_api:
             "status": False,
         }
 
-        pluginInfo['task'] = self.checkSetupTask(pluginInfo['name'])
-
         if checks.find('VERSION') > -1:
-            pluginInfo['install_checks'] = checks.replace(
+            pInfo['install_checks'] = checks.replace(
                 'VERSION', info['versions'])
 
         if path.find('VERSION') > -1:
-            pluginInfo['path'] = path.replace(
+            pInfo['path'] = path.replace(
                 'VERSION', info['versions'])
 
-        pluginInfo['display'] = self.checkDisplayIndex(
-            info['name'], pluginInfo['versions'])
+        pInfo['task'] = self.checkSetupTask(
+            pInfo['name'], info['versions'], coexist)
+        pInfo['display'] = self.checkDisplayIndex(
+            info['name'], pInfo['versions'])
 
-        pluginInfo['setup'] = os.path.exists(pluginInfo['install_checks'])
+        pInfo['setup'] = os.path.exists(pInfo['install_checks'])
 
-        if coexist and pluginInfo['setup']:
-            pluginInfo['setup_version'] = info['versions']
+        if coexist and pInfo['setup']:
+            pInfo['setup_version'] = info['versions']
         else:
-            pluginInfo['setup_version'] = self.getVersion(
-                pluginInfo['install_checks'])
+            pInfo['setup_version'] = self.getVersion(pInfo['install_checks'])
         # pluginInfo['status'] = self.checkStatus(pluginInfo)
-        pluginInfo['status'] = False
-        return pluginInfo
+        pInfo['status'] = False
+        return pInfo
 
     def makeCoexist(self, data):
         plugins_info = []

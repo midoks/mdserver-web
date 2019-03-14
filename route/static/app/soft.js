@@ -122,12 +122,11 @@ function getSList(isdisplay) {
                 }
             }
 
-            var isTask = plugin.task;
             if (plugin.task == '-2') {
                 handle = '<a style="color:green;" href="javascript:task();">正在卸载...</a>';
             } else if (plugin.task == '-1') {
                 handle = '<a style="color:green;" href="javascript:task();">正在安装...</a>';
-            } else if (isTask == '0') {
+            } else if (plugin.task == '0') {
                 handle = '<a style="color:#C0C0C0;" href="javascript:task();">等待中...</a>';
             }
 
