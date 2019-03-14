@@ -1,7 +1,7 @@
 [
     {
         "version": "0.4.2",
-        "content": "* ssh工具优化<br/>* 面板收藏功能完成<br/>* 网站子目录绑定<br/>* 网站备份",
+        "content": "* ssh工具优化<br/>* 面板收藏功能完成<br/>* 网站子目录绑定<br/>* 网站备份<br/>* 自动更新优化",
         "path": "https://github.com//midoks/mdserver-web/archive/0.4.2.zip"
     },
 	{
