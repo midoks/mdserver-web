@@ -325,6 +325,7 @@ class plugins_api:
                 continue
             tmp1 = tmpt.split('-')
             name1 = tmp1[0].lower()
+            if sCoexist:
                 if name1 == sName and tmp1[1] == sVer:
                     isTask = task['status']
             else:
