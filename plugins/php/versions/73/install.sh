@@ -32,21 +32,23 @@ OPTIONS=''
 if [ $sysName == 'Darwin' ]; then
 	OPTIONS='--without-iconv'
 	OPTIONS="${OPTIONS} --with-curl=${serverPath}/lib/curl"
+	OPTIONS="${OPTIONS} --enable-zip"
 else
 	OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
 	OPTIONS="${OPTIONS} --with-gd --enable-gd-native-ttf"
 	OPTIONS="${OPTIONS} --with-curl"
+	OPTIONS="${OPTIONS} --with-libzip=${serverPath}/lib/libzip"
 fi
 
 
-# --with-zlib-dir=$serverPath/lib/zlib \
+# 
 cd $sourcePath/php/php-${version} && ./configure \
 --prefix=$serverPath/php/73 \
 --exec-prefix=$serverPath/php/73 \
 --with-config-file-path=$serverPath/php/73/etc \
 --enable-mysqlnd \
---enable-zip \
 --enable-mbstring \
+--with-zlib-dir=$serverPath/lib/zlib \
 --enable-ftp \
 --enable-sockets \
 --enable-simplexml \
