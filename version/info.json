@@ -1,4 +1,9 @@
 [
+    {
+        "version": "0.4.2",
+        "content": "* ssh工具优化<br/>* 面板收藏功能完成<br/>* 网站子目录绑定<br/>* 网站备份",
+        "path": "https://github.com//midoks/mdserver-web/archive/0.4.2.zip"
+    },
 	{
         "version": "0.0.6",
         "content": "1.修复重复js方法",
