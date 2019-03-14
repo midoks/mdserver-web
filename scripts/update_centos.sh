@@ -51,4 +51,4 @@ done
 echo -e "start mw success"
 
 cd /www/server/mdserver-web \
-&& sh /etc/init.d/mw default
+&& /etc/init.d/mw default
