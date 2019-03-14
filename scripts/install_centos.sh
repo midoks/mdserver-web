@@ -15,7 +15,7 @@ if [ ! -f /usr/bin/applydeltarpm ];then
 	yum -y install deltarpm
 fi
 
-yum install -y wget curl libcurl
+yum install -y wget curl curl-devel
 #https need
 curl  https://get.acme.sh | sh
 
