@@ -314,6 +314,12 @@ def connected_msg(msg):
         emit(pdata.s_response, {'data': '会话丢失，请重新登陆面板!\r\n'})
         return None
     global shell, ssh
+    ssh_success = True
+    if not shell:
+        ssh_success = connect_ssh()
+    if not ssh_success:
+        emit('server_response', {'data': '连接SSH服务失败!\r\n'})
+        return
     try:
         recv = shell.recv(8192)
         # print recv.decode("utf-8")
