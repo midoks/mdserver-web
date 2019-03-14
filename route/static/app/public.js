@@ -747,10 +747,11 @@ function GetTaskList(a) {
 //获取任务总数
 function getTaskCount() {
 	$.get("/task/count", "", function(a) {
-		$(".task").text(a)
-	})
+		$(".task").text(a);
+	});
 }
 getTaskCount();
+setInterval('getTaskCount',6000);
 
 function setSelectChecked(c, d) {
 	var a = document.getElementById(c);
