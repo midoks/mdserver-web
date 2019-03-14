@@ -15,12 +15,15 @@ mw_start_debug(){
 	gunicorn -b :7200 -k gevent -w 1 app:app
 	# gunicorn -b :7200 -k eventlet -w 1 app:app 
 	# gunicorn -c setting.py app:app
-	
 }
 
 mw_stop()
 {
-	ps -ef|grep app:app |grep -v grep|awk '{print $2}'|xargs kill -9
+	PLIST=`ps -ef|grep app:app |grep -v grep|awk '{print $2}'`
+	for i in $PLIST
+	do
+	    kill -9 $i
+	done
 	ps -ef|grep task.py |grep -v grep|awk '{print $2}'|xargs kill -9
 }
 
