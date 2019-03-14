@@ -241,9 +241,7 @@ def clear_ssh():
 PLIST=`who | grep localhost | awk '{print $2}'`
 for i in $PLIST
 do
-    echo $i
-    echo "ps -t /dev/${i} |grep -v TTY |awk '{print $1}' | xargs kill -9"
-    ps -t /dev/${i} |grep -v TTY |awk '{print $1}' | xargs kill -9
+    ps -t /dev/$i |grep -v TTY |awk '{print $1}' | xargs kill -9
 done
 '''
     if not public.isAppleSystem():
@@ -252,7 +250,7 @@ done
 
 
 def connect_ssh():
-    print 'connect_ssh ....'
+    # print 'connect_ssh ....'
     clear_ssh()
     global shell, ssh
     if not os.path.exists('/root/.ssh/authorized_keys') or not os.path.exists('/root/.ssh/id_rsa') or not os.path.exists('/root/.ssh/id_rsa.pub'):
@@ -283,7 +281,7 @@ def get_input_data(data):
 
 @socketio.on('webssh')
 def webssh(msg):
-    print 'webssh ...'
+    # print 'webssh ...'
     if not isLogined():
         emit('server_response', {'data': '会话丢失，请重新登陆面板!\r\n'})
         return None
@@ -305,7 +303,8 @@ def webssh(msg):
         recv = shell.recv(4096)
         emit('server_response', {'data': recv.decode("utf-8")})
     except Exception as ex:
-        print 'webssh:' + str(ex)
+        pass
+        # print 'webssh:' + str(ex)
 
 
 @socketio.on('connect_event')
@@ -325,7 +324,8 @@ def connected_msg(msg):
         # print recv.decode("utf-8")
         emit('server_response', {'data': recv.decode("utf-8")})
     except Exception as e:
-        print 'connected_msg:' + str(e)
+        pass
+        # print 'connected_msg:' + str(e)
 
 
 # @socketio.on('panel')
