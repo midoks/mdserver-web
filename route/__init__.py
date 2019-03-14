@@ -242,7 +242,8 @@ PLIST=`who | grep localhost | awk '{print $2}'`
 for i in $PLIST
 do
     echo $i
-    ps -t /dev/{$i} |grep -v TTY|awk '{print $1}' | xargs kill -9
+    echo "ps -t /dev/{$i} |grep -v TTY |awk '{print $1}' | xargs kill -9"
+    ps -t /dev/{$i} |grep -v TTY |awk '{print $1}' | xargs kill -9
 done
 '''
     if not public.isAppleSystem():
