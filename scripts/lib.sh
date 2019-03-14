@@ -28,6 +28,23 @@ echo -e "Install_Zlib" >> ${libPath}/lib.pl
 }
 
 
+Install_Libzip()
+{
+#----------------------------- libzip start -------------------------#
+if [ ! -d ${libPath}/libzip ];then
+    cd ${sourcePath}
+    if [ ! -f ${sourcePath}/libzip-1.2.0.tar.gz ];then
+    	wget -O libzip-1.2.0.tar.gz https://nih.at/libzip/libzip-1.2.0.tar.gz -T 20
+    fi 
+    tar -zxf libzip-1.2.0.tar.gz
+    cd libzip-1.2.0
+    ./configure --prefix=${libPath}/libzip && make && make install
+fi
+echo -e "Install_Libzip" >> ${libPath}/lib.pl
+#----------------------------- libzip end  -------------------------#
+}
+
+
 Install_Libmemcached()
 {
 #----------------------------- libmemcached start -------------------------#
@@ -188,6 +205,7 @@ echo -e "Install_Curl" >> ${libPath}/lib.pl
 }
 
 Install_Zlib
+Install_Libzip
 Install_Libmemcached
 Install_OpenSSL	
 Install_Libiconv
