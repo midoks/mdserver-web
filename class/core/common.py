@@ -68,6 +68,8 @@ def initInitD():
             import shutil
             shutil.copyfile(script_bin, initd_bin)
             public.execShell('chmod +x ' + initd_bin)
+            #加入自启动
+            public.execShell('chkconfig --add mw')
 
 
 def initUserInfo():
