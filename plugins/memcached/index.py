@@ -194,10 +194,12 @@ def initdInstall():
         if public.isAppleSystem():
             return "Apple Computer does not support"
 
+
     mem_bin = initDreplace()
     initd_bin = getInitDFile()
     shutil.copyfile(mem_bin, initd_bin)
     public.execShell('chmod +x ' + initd_bin)
+    public.execShell('chkconfig --add ' + getPluginName())
     return 'ok'
 
 
@@ -205,6 +207,8 @@ def initdUinstall():
     if not app_debug:
         if public.isAppleSystem():
             return "Apple Computer does not support"
+
+    public.execShell('chkconfig --del ' + getPluginName())
     initd_bin = getInitDFile()
     os.remove(initd_bin)
     return 'ok'

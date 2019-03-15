@@ -165,6 +165,9 @@ class plugins_api:
             + " uninstall " + version
 
         data = public.execShell(execstr)
+        if public.isAppleSystem():
+            print execstr
+            print data[0],data[1]
         return public.returnJson(True, '卸载执行成功!')
         # if data[1] == '':
         #     return public.returnJson(True, '已将卸载成功!')
