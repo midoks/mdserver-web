@@ -1,4 +1,8 @@
 #!/bin/sh
+# chkconfig: 2345 55 25
+# Description: mysql service
+# distro. For CentOS/Redhat run: 'chkconfig --add mysql'
+
 # Copyright Abandoned 1996 TCX DataKonsult AB & Monty Program KB & Detron HB
 # This file is public domain and comes with NO WARRANTY of any kind
 
