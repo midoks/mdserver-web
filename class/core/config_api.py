@@ -23,6 +23,7 @@ class config_api:
     # redis 自启动 done
     # pureftp 自启动 done
     # sphinx 自启动 done
+    # 修复rsync自启动问题
     __version = '0.5.6'
 
     def __init__(self):
