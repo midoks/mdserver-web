@@ -1,4 +1,18 @@
 #!/bin/bash
+# chkconfig: 2345 55 25
+# description: MW Cloud Service
+
+### BEGIN INIT INFO
+# Provides:          bt
+# Required-Start:    $all
+# Required-Stop:     $all
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: starts mw
+# Description:       starts the mw
+### END INIT INFO
+
+
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 
 mw_path={$SERVER_PATH}
