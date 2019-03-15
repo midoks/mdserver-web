@@ -20,6 +20,7 @@ class config_api:
     # php 自启动 done
     # mysql 自启动 done
     # memcached 自启动 done
+    # redis 自启动 done
     __version = '0.5.2'
 
     def __init__(self):
