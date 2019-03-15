@@ -31,6 +31,7 @@ fi
 
 # Default values
 export HOME={$HOME_DIR}
+export USER={$RUN_USER}
 NAME=gogs
 GOGS_HOME={$SERVER_PATH}/gogs
 GOGS_PATH=${GOGS_HOME}/$NAME
