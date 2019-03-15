@@ -2,7 +2,7 @@
 # chkconfig: 2345 55 25
 # Description: Startup script for nginx webserver on Debian. Place in /etc/init.d and
 # run 'update-rc.d -f nginx defaults', or use the appropriate command on your
-# distro. For CentOS/Redhat run: 'chkconfig --add nginx'
+# distro. For CentOS/Redhat run: 'chkconfig --add openresty'
 
 ### BEGIN INIT INFO
 # Provides:          nginx

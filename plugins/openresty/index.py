@@ -232,6 +232,7 @@ def initdInstall():
     initd_bin = getInitDFile()
     shutil.copyfile(source_bin, initd_bin)
     public.execShell('chmod +x ' + initd_bin)
+    public.execShell('chkconfig --add ' + getPluginName())
     return 'ok'
 
 
