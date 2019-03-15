@@ -6,7 +6,7 @@ import sys
 import os
 chdir = os.getcwd()
 sys.path.append(chdir + '/class/core')
-# sys.path.append("/usr/local/lib/python2.7/site-packages")
+sys.path.append("/usr/local/lib/python2.7/site-packages")
 import public
 import system_api
 # cpu_info = system_api.system_api().getCpuInfo()
