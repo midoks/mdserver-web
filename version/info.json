@@ -1,5 +1,10 @@
 [
     {
+        "version": "0.5.6",
+        "content": "* openresty,php,mysql,memcached,redis,pureftp,sphinx自启动添加 <br/> * 修复rsync自启动问题",
+        "path": "https://github.com/midoks/mdserver-web/releases/download/0.5.6/mdserver-web.zip"
+    },
+    {
         "version": "0.4.2",
         "content": "* ssh工具优化<br/>* 面板收藏功能完成<br/>* 网站子目录绑定<br/>* 网站备份<br/>* 自动更新优化",
         "path": "https://github.com/midoks/mdserver-web/releases/download/0.4.2/mdserver-web.zip"
