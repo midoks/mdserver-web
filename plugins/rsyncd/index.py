@@ -147,9 +147,8 @@ def initdStatus():
 
     data = public.execShell('systemctl status rsyncd.service | grep enabled')
     if data[0] == '':
-        return 'ok'
-    return 'fail'
-
+        return 'fail'
+    return 'ok'
 
 def initdInstall():
     if public.isAppleSystem():
