@@ -240,6 +240,8 @@ def initdUinstall():
     if not app_debug:
         if public.isAppleSystem():
             return "Apple Computer does not support"
+    
+    public.execShell('chkconfig --del ' + getPluginName())
     initd_bin = getInitDFile()
     os.remove(initd_bin)
     return 'ok'
