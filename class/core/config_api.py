@@ -17,7 +17,8 @@ class config_api:
 
     # 本版解决自启动问题
     # openresty 自启动 done
-    __version = '0.5.0'
+    # php 自动 done
+    __version = '0.5.2'
 
     def __init__(self):
         pass

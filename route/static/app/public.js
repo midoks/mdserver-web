@@ -1773,9 +1773,13 @@ function pluginConfigSave(fileName) {
 }
 
 
-function pluginInitD(_name){
+
+function pluginInitD(_name,_version){
+	if (typeof _version == 'undefined'){
+    	_version = '';
+    }
 	var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
-	$.post('/plugins/run', {name:_name, func:'initd_status'}, function(data) {
+	$.post('/plugins/run', {name:_name, func:'initd_status',version : _version}, function(data) {
 		layer.close(loadT);
         if( !data.status ){
             layer.msg(data.msg,{icon:0,time:3000,shade: [0.3, '#000']});
@@ -1786,41 +1790,41 @@ function pluginInitD(_name){
             return;
         }
         if (data.data == 'ok'){
-            pluginSetInitD(_name, true);
+            pluginSetInitD(_name, _version, true);
         } else {
-            pluginSetInitD(_name, false);
+            pluginSetInitD(_name, _version, false);
         }
     },'json');
 }
 
-function pluginSetInitD(_name, status){
+function pluginSetInitD(_name, _version, status){
 	var serviceCon ='<p class="status">当前状态：<span>'+(status ? '已加载' : '未加载' )+
         '</span><span style="color: '+
         (status?'#20a53a;':'red;')+
         ' margin-left: 3px;" class="glyphicon ' + (status?'glyphicon glyphicon-play':'glyphicon-pause')+'"></span></p><div class="sfm-opt">\
-            <button class="btn btn-default btn-sm" onclick="pluginOpInitD(\''+_name+'\',\''+(status?'initd_uninstall':'initd_install')+'\')">'+(status?'卸载':'加载')+'</button>\
+            <button class="btn btn-default btn-sm" onclick="pluginOpInitD(\''+_name+'\',\''+_version+'\',\''+(status?'initd_uninstall':'initd_install')+'\')">'+(status?'卸载':'加载')+'</button>\
         </div>'; 
     $(".soft-man-con").html(serviceCon);
 }
 
-function pluginOpInitD(a, b) {
-    var c = "name=" + a + "&func=" + b;
+function pluginOpInitD(a, _version, b) {
+    var c = "name=" + a + "&func=" + b + "&version="+_version;
     var d = "";
     switch(b) {
         case "initd_install":d = '加载';break;
         case "initd_uninstall":d = '卸载';break;
     }
-    layer.confirm( msgTpl('您真的要{1}{2}服务吗？', [d,a]), {icon:3,closeBtn: 2}, function() {
-        var e = layer.msg(msgTpl('正在{1}{2}服务,请稍候...',[d,a]), {icon: 16,time: 0});
+    layer.confirm( msgTpl('您真的要{1}{2}{3}服务吗？', [d,a,_version]), {icon:3,closeBtn: 2}, function() {
+        var e = layer.msg(msgTpl('正在{1}{2}{3}服务,请稍候...',[d,a,_version]), {icon: 16,time: 0});
         $.post("/plugins/run", c, function(g) {
             layer.close(e);
-            var f = g.data == 'ok' ? msgTpl('{1}服务已{2}',[a,d]) : msgTpl('{1}服务{2}失败!',[a,d]);
+            var f = g.data == 'ok' ? msgTpl('{1}{3}服务已{2}',[a,d,_version]) : msgTpl('{1}{3}服务{2}失败!',[a,d,_version]);
             layer.msg(f, {icon: g.data == 'ok' ? 1 : 2});
             
             if ( b == 'initd_install' && g.data == 'ok' ) {
-                pluginSetInitD(a, true);
+                pluginSetInitD(a, _version, true);
             }else{
-                pluginSetInitD(a, false);
+                pluginSetInitD(a, _version, false);
             }
             if(g.data != 'ok') {
                 layer.msg(g.data, {icon: 2,time: 0,shade: 0.3,shadeClose: true});
