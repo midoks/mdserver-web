@@ -15,7 +15,9 @@ from flask import request
 
 class config_api:
 
-    __version = '0.4.2'
+    # 本版解决自启动问题
+    # openresty 自启动 done
+    __version = '0.5.0'
 
     def __init__(self):
         pass
