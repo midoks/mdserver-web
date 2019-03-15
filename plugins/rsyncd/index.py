@@ -154,7 +154,7 @@ def initdInstall():
     if public.isAppleSystem():
         return "Apple Computer does not support"
     data = public.execShell('systemctl enable rsyncd.service')
-    if data[0] == '':
+    if data[0] != '':
         return 'fail'
     return 'ok'
 
