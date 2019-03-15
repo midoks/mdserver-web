@@ -21,7 +21,8 @@ class config_api:
     # mysql 自启动 done
     # memcached 自启动 done
     # redis 自启动 done
-    # pureftp 自启动 done    
+    # pureftp 自启动 done
+    # sphinx 自启动 done
     __version = '0.5.2'
 
     def __init__(self):
