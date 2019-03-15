@@ -33,10 +33,10 @@ def getServerDir():
     return public.getServerDir() + '/' + getPluginName()
 
 
-def getInitDFile():
+def getInitDFile(version):
     if app_debug:
         return '/tmp/' + getPluginName()
-    return '/etc/init.d/' + getPluginName()
+    return '/etc/init.d/' + getPluginName()+version
 
 
 def getArgs():
@@ -214,6 +214,41 @@ def restart(version):
 
 def reload(version):
     return phpOp(version, 'reload')
+
+
+def initdStatus(version):
+    if not app_debug:
+        if public.isAppleSystem():
+            return "Apple Computer does not support"
+    initd_bin = getInitDFile(version)
+    if os.path.exists(initd_bin):
+        return 'ok'
+    return 'fail'
+
+
+def initdInstall(version):
+    import shutil
+    if not app_debug:
+        if public.isAppleSystem():
+            return "Apple Computer does not support"
+
+    source_bin = initReplace(version)
+    initd_bin = getInitDFile(version)
+    shutil.copyfile(source_bin, initd_bin)
+    public.execShell('chmod +x ' + initd_bin)
+    public.execShell('chkconfig --add ' + getPluginName()+version)
+    return 'ok'
+
+
+def initdUinstall(version):
+    if not app_debug:
+        if public.isAppleSystem():
+            return "Apple Computer does not support"
+    
+    public.execShell('chkconfig --del ' + getPluginName())
+    initd_bin = getInitDFile(version)
+    os.remove(initd_bin)
+    return 'ok'
 
 
 def fpmLog(version):
@@ -595,6 +630,12 @@ if __name__ == "__main__":
         print restart(version)
     elif func == 'reload':
         print reload(version)
+    elif func == 'initd_status':
+        print initdStatus(version)
+    elif func == 'initd_install':
+        print initdInstall(version)
+    elif func == 'initd_uninstall':
+        print initdUinstall(version)
     elif func == 'fpm_log':
         print fpmLog(version)
     elif func == 'fpm_slow_log':
