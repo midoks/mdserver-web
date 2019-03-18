@@ -327,8 +327,8 @@ def systemTask():
                     if reloadNum > 1440:
                         reloadNum = 0
                         # if os.path.exists('data/ssl.pl'):
-                        os.system(public.getRunDir() +
-                                  '/scripts/init.d/mw restart > /dev/null 2>&1')
+                        cmd = public.getRunDir() + '/scripts/init.d/mw restart > /dev/null 2>&1'
+                        os.system(cmd)
                 except Exception, ex:
                     print str(ex)
 
