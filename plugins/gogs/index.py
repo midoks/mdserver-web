@@ -505,7 +505,7 @@ def projectScriptEdit():
     user = args['user']
     name = args['name'] + '.git'
     post_receive = getRootPath() + '/' + user + '/' + name + \
-        '/custom_hooks/post-receive'
+        '/custom_hooks/commit'
     if os.path.exists(post_receive):
         return public.returnJson(True, 'OK', {'path': post_receive})
     else:
