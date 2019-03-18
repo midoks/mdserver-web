@@ -24,7 +24,7 @@ class config_api:
     # pureftp 自启动 done
     # sphinx 自启动 done
     # 修复rsync自启动问题
-    __version = '0.5.6'
+    __version = '0.6.0'
 
     def __init__(self):
         pass

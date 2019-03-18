@@ -70,6 +70,30 @@ class files_api:
         data = self.getAccess(filename)
         return public.getJson(data)
 
+    def setFileAccessApi(self):
+
+        if public.isAppleSystem():
+            return public.returnJson(True,'开发机不设置!')
+
+        filename = request.form.get('filename', '').encode('utf-8')
+        user = request.form.get('user', '').encode('utf-8')
+        access = request.form.get('access', '755')
+        sall = '-R'
+        try:
+            if not self.checkDir(filename): 
+                return public.returnJson(False, '请不要花样作死')
+
+            if not os.path.exists(filename):
+                return public.returnJson(False,'指定文件不存在!')
+
+            os.system('chmod ' + sall + ' ' + access + " '" + filename + "'")
+            os.system('chown ' + sall + ' ' + user + ':' + user + " '" + filename + "'")
+            msg = public.getInfo('设置[{1}]权限为[{2}]所有者为[{3}]', (filename,access,user,))
+            public.writeLog('文件管理', msg)
+            return public.returnJson(True,'设置成功!')
+        except:
+            return public.returnJson(False,'设置失败!')
+
     def getDirSizeApi(self):
         path = request.form.get('path', '').encode('utf-8')
         tmp = self.getDirSize(path)

@@ -1295,55 +1295,55 @@ function setChmod(action,fileName){
 		var chmod = $("#access").val();
 		var chown = $("#chown").val();
 		var data = 'filename='+ encodeURIComponent(fileName)+'&user='+chown+'&access='+chmod;
-		var loadT = layer.msg(lan.public.config,{icon:16,time:0,shade: [0.3, '#000']});
-		$.post('files?action=SetFileAccess',data,function(rdata){
+		var loadT = layer.msg('正在设置...',{icon:16,time:0,shade: [0.3, '#000']});
+		$.post('files/set_file_access',data,function(rdata){
 			layer.close(loadT);
 			if(rdata.status) layer.closeAll();
 			layer.msg(rdata.msg,{icon:rdata.status?1:2});
 			var path = $("#DirPathPlace input").val();
 			getFiles(path)
-		});
+		},'json');
 		return;
 	}
 	
 	var toExec = fileName == lan.files.all?'Batch(3,1)':'setChmod(1,\''+fileName+'\')';
 	$.post('/files/file_access','filename='+encodeURIComponent(fileName),function(rdata){
-		console.log(rdata);
+		// console.log(rdata);
 		layer.open({
 			type:1,
 			closeBtn: 2,
-			title: lan.files.set_auth + '['+fileName+']',
+			title: '设置权限['+fileName+']',
 			area: '400px', 
 			shadeClose:false,
 			content:'<div class="setchmod bt-form ptb15 pb70">\
 						<fieldset>\
-							<legend>'+lan.files.file_own+'</legend>\
-							<p><input type="checkbox" id="owner_r" />'+lan.files.file_read+'</p>\
-							<p><input type="checkbox" id="owner_w" />'+lan.files.file_write+'</p>\
-							<p><input type="checkbox" id="owner_x" />'+lan.files.file_exec+'</p>\
+							<legend>所有者</legend>\
+							<p><input type="checkbox" id="owner_r" />读取</p>\
+							<p><input type="checkbox" id="owner_w" />写入</p>\
+							<p><input type="checkbox" id="owner_x" />执行</p>\
 						</fieldset>\
 						<fieldset>\
-							<legend>'+lan.files.file_group+'</legend>\
-							<p><input type="checkbox" id="group_r" />'+lan.files.file_read+'</p>\
-							<p><input type="checkbox" id="group_w" />'+lan.files.file_write+'</p>\
-							<p><input type="checkbox" id="group_x" />'+lan.files.file_exec+'</p>\
+							<legend>用户组</legend>\
+							<p><input type="checkbox" id="group_r" />读取</p>\
+							<p><input type="checkbox" id="group_w" />写入</p>\
+							<p><input type="checkbox" id="group_x" />执行</p>\
 						</fieldset>\
 						<fieldset>\
-							<legend>'+lan.files.file_public+'</legend>\
-							<p><input type="checkbox" id="public_r" />'+lan.files.file_read+'</p>\
-							<p><input type="checkbox" id="public_w" />'+lan.files.file_write+'</p>\
-							<p><input type="checkbox" id="public_x" />'+lan.files.file_exec+'</p>\
+							<legend>公共</legend>\
+							<p><input type="checkbox" id="public_r" />读取</p>\
+							<p><input type="checkbox" id="public_w" />写入</p>\
+							<p><input type="checkbox" id="public_x" />执行</p>\
 						</fieldset>\
-						<div class="setchmodnum"><input class="bt-input-text" type="text" id="access" maxlength="3" value="'+rdata.chmod+'">'+lan.files.file_menu_auth+'，\
-						<span>'+lan.files.file_own+'\
+						<div class="setchmodnum"><input class="bt-input-text" type="text" id="access" maxlength="3" value="'+rdata.chmod+'">权限，\
+						<span>所有者\
 						<select id="chown" class="bt-input-text">\
 							<option value="www" '+(rdata.chown=='www'?'selected="selected"':'')+'>www</option>\
 							<option value="mysql" '+(rdata.chown=='mysql'?'selected="selected"':'')+'>mysql</option>\
 							<option value="root" '+(rdata.chown=='root'?'selected="selected"':'')+'>root</option>\
 						</select></span></div>\
 						<div class="bt-form-submit-btn">\
-							<button type="button" class="btn btn-danger btn-sm btn-title" onclick="layer.closeAll()">'+lan.public.close+'</button>\
-					        <button type="button" class="btn btn-success btn-sm btn-title" onclick="'+toExec+'" >'+lan.public.ok+'</button>\
+							<button type="button" class="btn btn-danger btn-sm btn-title" onclick="layer.closeAll()">关闭</button>\
+					        <button type="button" class="btn btn-success btn-sm btn-title" onclick="'+toExec+'" >确定</button>\
 				        </div>\
 					</div>'
 		});
