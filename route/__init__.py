@@ -177,8 +177,8 @@ def doLogin():
 
     password = public.md5(password)
     if userInfo['username'] != username or userInfo['password'] != password:
-        public.writeLog('TYPE_LOGIN', public.getInfo(
-            "< a style='color: red'>密码错误</a>,帐号:{1},密码:{2},登录IP:{3}", (('****', '******', request.remote_addr))))
+        public.writeLog('用户登录', public.getInfo(
+            "<a style='color: red'>密码错误</a>,帐号:{1},密码:{2},登录IP:{3}", (('****', '******', request.remote_addr))))
         return public.returnJson(False, public.getInfo("用户名或密码错误,您还可以尝试[{1}]次!", ('1')))
 
     session['login'] = True
