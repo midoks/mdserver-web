@@ -341,11 +341,98 @@ def systemTask():
         time.sleep(30)
         systemTask()
 
+
+# -------------------------------------- PHP监控 start --------------------------------------------- #
+#502错误检查线程
+def check502Task():
+    try:
+        while True:
+            if os.path.exists(public.getRunDir()+'/data/502Task.pl'):
+                check502();
+            time.sleep(10);
+    except:
+        time.sleep(10);
+        check502Task();
+
+def check502():
+    try:
+        phpversions = ['53','54','55','56','70','71','72','73','74']
+        for version in phpversions:
+            sdir = public.getServerDir()
+            php_path = sdir + '/php/' + version + '/sbin/php-fpm'
+            if not os.path.exists(php_path): continue;
+            if checkPHPVersion(version): continue;
+            if startPHPVersion(version):
+                print '检测到PHP-' + version + '处理异常,已自动修复!'
+                public.writeLog('PHP守护程序','检测到PHP-' + version + '处理异常,已自动修复!')
+    except Exception as e:
+        print str(e)
+
+
+#处理指定PHP版本   
+def startPHPVersion(version):
+    sdir = public.getServerDir()
+    try:
+        fpm = sdir+'/php/init.d/php'+version
+        php_path = sdir+'/php/' + version + '/sbin/php-fpm'
+        if not os.path.exists(php_path):
+            if os.path.exists(fpm): os.remove(fpm)
+            return False;
+        
+        #尝试重载服务
+        os.system(fpm + ' reload');
+        if checkPHPVersion(version): return True;
+        
+        #尝试重启服务
+        cgi = '/tmp/php-cgi-'+version + '.sock'
+        pid = sdir+'/php/'+version+'/var/run/php-fpm.pid';
+        os.system('ps -ef | grep php/'+version+' | grep -v grep|grep -v python |awk "{print $2}"|xargs kill')
+        time.sleep(0.5);
+        if not os.path.exists(cgi): os.system('rm -f ' + cgi);
+        if not os.path.exists(pid): os.system('rm -f ' + pid);
+        os.system(fpm + ' start');
+        if checkPHPVersion(version): return True;
+        
+        #检查是否正确启动
+        if os.path.exists(cgi): return True;
+    except Exception as e:
+        print str(e)
+        return True;
+    
+    
+#检查指定PHP版本
+def checkPHPVersion(version):
+    try:
+        url = 'http://127.0.0.1/phpfpm_status_'+version;
+        result = public.httpGet(url);
+        # print version,result
+        #检查nginx
+        if result.find('Bad Gateway') != -1: return False;
+        if result.find('HTTP Error 404: Not Found') != -1: return False;
+        
+        #检查Web服务是否启动
+        if result.find('Connection refused') != -1:
+            global isTask
+            if os.path.exists(isTask): 
+                isStatus = public.readFile(isTask);
+                if isStatus == 'True': return True;
+            filename = '/etc/init.d/openresty';
+            if os.path.exists(filename): os.system(filename + ' start');
+        return True;
+    except:
+        return True;
+
+# --------------------------------------PHP监控 end--------------------------------------------- #
+
 if __name__ == "__main__":
 
     import threading
     t = threading.Thread(target=systemTask)
     t.setDaemon(True)
     t.start()
+
+    p = threading.Thread(target=check502Task)
+    p.setDaemon(True)
+    p.start()
 
     startTask()
