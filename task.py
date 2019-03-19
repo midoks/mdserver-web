@@ -349,9 +349,9 @@ def check502Task():
         while True:
             if os.path.exists(public.getRunDir()+'/data/502Task.pl'):
                 check502();
-            time.sleep(10);
+            time.sleep(30);
     except:
-        time.sleep(10);
+        time.sleep(30);
         check502Task();
 
 def check502():
