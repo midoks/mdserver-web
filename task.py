@@ -386,7 +386,8 @@ def startPHPVersion(version):
         #尝试重启服务
         cgi = '/tmp/php-cgi-'+version + '.sock'
         pid = sdir+'/php/'+version+'/var/run/php-fpm.pid';
-        os.system("ps -ef | grep php/"+version+" | grep -v grep|grep -v python |awk '{print $2}'|xargs kill")
+        data = public.execShell("ps -ef | grep php/"+version+" | grep -v grep|grep -v python |awk '{print $2}'")
+        print data
         time.sleep(0.5);
         if not os.path.exists(cgi): os.system('rm -f ' + cgi);
         if not os.path.exists(pid): os.system('rm -f ' + pid);
