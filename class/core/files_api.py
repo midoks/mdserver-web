@@ -106,6 +106,10 @@ class files_api:
         search = request.args.get('search', '').strip().lower()
         page = request.args.get('p', '1').strip().lower()
         row = request.args.get('showRow', '10')
+        disk = request.form.get('disk', '')
+        if disk == 'True':
+            row = 1000
+
         return self.getDir(path, int(page), int(row), search)
 
     def createFileApi(self):
