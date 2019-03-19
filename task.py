@@ -386,7 +386,7 @@ def startPHPVersion(version):
         #尝试重启服务
         cgi = '/tmp/php-cgi-'+version + '.sock'
         pid = sdir+'/php/'+version+'/var/run/php-fpm.pid';
-        os.system('ps -ef | grep php/'+version+' | grep -v grep|grep -v python |awk "{print $2}"|xargs kill')
+        #os.system('ps -ef | grep php/'+version+' | grep -v grep|grep -v python |awk "{print $2}"|xargs kill')
         time.sleep(0.5);
         if not os.path.exists(cgi): os.system('rm -f ' + cgi);
         if not os.path.exists(pid): os.system('rm -f ' + pid);
@@ -405,7 +405,7 @@ def checkPHPVersion(version):
     try:
         url = 'http://127.0.0.1/phpfpm_status_'+version;
         result = public.httpGet(url);
-        # print version,result
+        print version,result
         #检查nginx
         if result.find('Bad Gateway') != -1: return False;
         if result.find('HTTP Error 404: Not Found') != -1: return False;
