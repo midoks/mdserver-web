@@ -512,10 +512,10 @@ def setDisableFunc(version):
 
     phpini = public.readFile(filename)
     rep = "disable_functions\s*=\s*.*\n"
-    phpini = re.sub(rep, 'disable_functions = ' +
-                    disable_functions + "\n", phpini)
-    public.writeLog('TYPE_PHP', 'PHP_DISABLE_FUNCTION',
-                    (version, disable_functions))
+    phpini = re.sub(rep, 'disable_functions = ' +disable_functions + "\n", phpini)
+
+    msg = public.getInfo('修改PHP-{1}的禁用函数为[{2}]',(version, disable_functions,))
+    public.writeLog('插件管理[PHP]', msg)
     public.writeFile(filename, phpini)
     reload(version)
     return public.returnJson(True, '设置成功!')
@@ -523,13 +523,13 @@ def setDisableFunc(version):
 
 def checkPhpinfoFile(v):
     if public.isInstalledWeb():
-        desc_file = public.getServerDir(
-        ) + '/openresty/nginx/conf/php_status/phpinfo_' + v + '.conf'
-        if not os.path.exists(desc_file):
+        sdir = public.getServerDir()
+        dfile = sdir + '/openresty/nginx/conf/php_status/phpinfo_' + v + '.conf'
+        if not os.path.exists(dfile):
             tpl = getPluginDir() + '/conf/phpinfo.conf'
             content = public.readFile(tpl)
             content = contentReplace(content, v)
-            public.writeFile(desc_file, content)
+            public.writeFile(dfile, content)
             public.restartWeb()
 
 
