@@ -113,7 +113,8 @@ def contentReplace(content, version):
 
 def makeOpenrestyConf():
     if public.isInstalledWeb():
-        d_pathinfo = public.getServerDir() + '/openresty/nginx/conf/pathinfo.conf'
+        sdir =  public.getServerDir() 
+        d_pathinfo = sdir + '/openresty/nginx/conf/pathinfo.conf'
         if not os.path.exists(d_pathinfo):
             s_pathinfo = getPluginDir() + '/conf/pathinfo.conf'
             shutil.copyfile(s_pathinfo, d_pathinfo)
@@ -125,12 +126,21 @@ def makeOpenrestyConf():
         tpl = getPluginDir() + '/conf/enable-php.conf'
         tpl_content = public.readFile(tpl)
         for x in range(len(versions)):
-            desc_file = public.getServerDir() + '/openresty/nginx/conf/enable-php-' + \
-                versions[x] + '.conf'
-            if not os.path.exists(desc_file):
+            dfile = sdir + '/openresty/nginx/conf/enable-php-' + versions[x] + '.conf'
+            if not os.path.exists(dfile):
                 w_content = contentReplace(tpl_content, versions[x])
                 public.writeFile(desc_file, w_content)
 
+        #php-fpm status
+        phpversions = ['53','54','55','56','70','71','72','73','74']
+        for version in phpversions:
+            dfile = sdir + '/openresty/nginx/conf/php_status/phpfpm_status_' + version + '.conf'
+            tpl = getPluginDir() + '/conf/phpfpm_status.conf'
+            if not os.path.exists(dfile):
+                content = public.readFile(tpl)
+                content = contentReplace(content, version)
+                public.writeFile(dfile, content)
+                public.restartWeb()
 
 def phpFpmReplace(version):
     desc_php_fpm = getServerDir() + '/' + version + '/etc/php-fpm.conf'
@@ -384,16 +394,8 @@ def setMaxSize(version):
     conf = re.sub(rep, u'\npost_max_size = ' + max + 'M', conf)
     public.writeFile(path, conf)
 
-    # if public.get_webserver() == 'nginx':
-    #     path = web.ctx.session.setupPath + '/nginx/conf/nginx.conf'
-    #     conf = public.readFile(path)
-    #     rep = "client_max_body_size\s+([0-9]+)m"
-    #     tmp = re.search(rep, conf).groups()
-    #     if int(tmp[0]) < int(max):
-    #         conf = re.sub(rep, 'client_max_body_size ' + max + 'm', conf)
-    #         public.writeFile(path, conf)
-
-    public.writeLog("TYPE_PHP", "PHP_UPLOAD_MAX", (version, max))
+    msg = public.getInfo('设置PHP-{1}最大上传大小为[{2}MB]!',(version, max,))
+    public.writeLog('插件管理[PHP]', msg)
     return public.returnJson(True, '设置成功!')
 
 
@@ -458,20 +460,22 @@ def setFpmConfig(version):
 
     public.writeFile(file, conf)
     reload(version)
-    public.writeLog("TYPE_PHP", 'PHP_CHILDREN', (version, max_children,
-                                                 start_servers, min_spare_servers, max_spare_servers))
-    return public.returnJson(True, '设置成功')
+
+    msg = public.getInfo('设置PHP-{1}并发设置,max_children={2},start_servers={3},min_spare_servers={4},max_spare_servers={5}',(version, max_children,
+                                                 start_servers, min_spare_servers, max_spare_servers,))
+    public.writeLog('插件管理[PHP]', msg)
+    return public.returnJson(True, '设置成功!')
 
 
 def checkFpmStatusFile(version):
     if public.isInstalledWeb():
-        desc_file = public.getServerDir(
-        ) + '/openresty/nginx/conf/php_status/phpfpm_status_' + version + '.conf'
-        if not os.path.exists(desc_file):
+        sdir = public.getServerDir()
+        dfile = sdir + '/openresty/nginx/conf/php_status/phpfpm_status_' + version + '.conf'
+        if not os.path.exists(dfile):
             tpl = getPluginDir() + '/conf/phpfpm_status.conf'
             content = public.readFile(tpl)
             content = contentReplace(content, version)
-            public.writeFile(desc_file, content)
+            public.writeFile(dfile, content)
             public.restartWeb()
 
 
