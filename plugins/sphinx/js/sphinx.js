@@ -103,27 +103,30 @@ function runStatus(){
 
 function readme(){
     spPost('sphinx_cmd', '', function(data){
+
         var rdata = $.parseJSON(data.data);
         if (!rdata['status']){
             layer.msg(rdata['msg'],{icon:2,time:2000,shade: [0.3, '#000']});
             return;
         }
 
-        var con = '';
+        var con = '<ul class="help-info-text c7">';
 
+        con += '<li style="color:red;">如果数据量比较大,第一次启动会失败!(可通过手动建立索引)</li>';
         //主索引
         for (var i = 0; i < rdata['data']['index'].length; i++) {
             var index_t = rdata['data']['index'][i];
-            con += '<p>主索引:' + rdata['data']['cmd'] + ' '+ index_t +' --rotate </p>';
+            con += '<li>主索引:' + rdata['data']['cmd'] + ' '+ index_t +' --rotate</li>';
         }
 
         for (var i = 0; i < rdata['data']['delta'].length; i++) {
             var delta_t = rdata['data']['delta'][i];
             var list = delta_t.split(':');
             console.log(list);
-            con += '<p>增量索引:' + rdata['data']['cmd'] + ' '+ list[0] +' --rotate </p>';
-            con += '<p>合并索引:' + rdata['data']['cmd'] + ' --merge '+ list[1] + ' ' + list[0] +' --rotate </p>';
+            con += '<li>增量索引:' + rdata['data']['cmd'] + ' '+ list[0] +' --rotate</li>';
+            con += '<li>合并索引:' + rdata['data']['cmd'] + ' --merge '+ list[1] + ' ' + list[0] +' --rotate</li>';
         }
+        con += '</ul>';
 
         $(".soft-man-con").html(con);
     });

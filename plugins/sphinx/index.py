@@ -114,8 +114,12 @@ def mkdirAll():
     rep = 'path\s*=\s*(.*)'
     p = re.compile(rep)
     tmp = p.findall(content)
+
     for x in tmp:
-        public.execShell('mkdir -p ' + x)
+        if x.find('binlog') != -1:
+            public.execShell('mkdir -p ' + x)
+        else:
+            public.execShell('mkdir -p ' + os.path.dirname(x))
 
 
 def initDreplace():
@@ -146,8 +150,31 @@ def initDreplace():
     return file_bin
 
 
+def checkIndexSph():
+    content = public.readFile(getConf())
+    rep = 'path\s*=\s*(.*)'
+    p = re.compile(rep)
+    tmp = p.findall(content)
+    for x in tmp:
+        if x.find('binlog') != -1:
+            continue
+        else:
+             p = x+'.sph'
+             if os.path.exists(p):
+                return False
+    return True
+
 def start():
     file = initDreplace()
+
+    data = sphinxConfParse()
+    if 'index' in data :
+        if checkIndexSph():
+            rebuild()
+            time.sleep(5)
+    else:
+        return '配置不正确!'
+
     data = public.execShell(file + ' start')
     if data[1] == '':
         return 'ok'
@@ -264,15 +291,15 @@ def runStatus():
     return public.returnJson(True, 'ok', rData)
 
 
-def sphinxCmd():
+def sphinxConfParse():
     file = getConf()
     bin_dir = getServerDir()
     content = public.readFile(file)
     rep = 'index\s(.*)'
     sindex = re.findall(rep, content)
     indexlen = len(sindex)
+    cmd = {}
     if indexlen > 0:
-        cmd = {}
         cmd_index = []
         cmd_delta = []
         for x in range(indexlen):
@@ -284,8 +311,12 @@ def sphinxCmd():
         cmd['index'] = cmd_index
         cmd['delta'] = cmd_delta
         cmd['cmd'] = bin_dir + '/bin/bin/indexer -c ' + bin_dir + '/sphinx.conf'
+    return cmd
 
-        return public.returnJson(True, 'ok', cmd)
+def sphinxCmd():
+    data = sphinxConfParse()
+    if 'index' in data:
+        return public.returnJson(True, 'ok', data)
     else:
         return public.returnJson(False, 'no index')
 
