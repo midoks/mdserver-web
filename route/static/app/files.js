@@ -982,7 +982,7 @@ function reName(type, fileName) {
 			icon: 16,
 			time: 10000
 		});
-		$.post('/files?action=MvFile', 'sfile=' + oldFileName + '&dfile=' + newFileName, function(rdata) {
+		$.post('/files/mv_file', 'sfile=' + oldFileName + '&dfile=' + newFileName, function(rdata) {
 			layer.closeAll();
 			layer.msg(rdata.msg, {
 				icon: rdata.status ? 1 : 2
@@ -1083,7 +1083,7 @@ function PasteTo(path,copyName,cutName,fileName){
 			icon: 16,
 			time: 0,shade: [0.3, '#000']
 		});
-		$.post('/files?action=MvFile', 'sfile=' + encodeURIComponent(cutName) + '&dfile=' + encodeURIComponent(path + '/'+fileName), function(rdata) {
+		$.post('/files/mv_file', 'sfile=' + encodeURIComponent(cutName) + '&dfile=' + encodeURIComponent(path + '/'+fileName), function(rdata) {
 			layer.closeAll();
 			layer.msg(rdata.msg, {
 				icon: rdata.status ? 1 : 2
