@@ -988,7 +988,7 @@ function reName(type, fileName) {
 				icon: rdata.status ? 1 : 2
 			});
 			getFiles(path);
-		});
+		},'json');
 		return;
 	}
 	layer.open({
