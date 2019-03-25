@@ -65,12 +65,12 @@ class files_api:
     def mvFileApi(self):
         sfile = request.form.get('sfile', '').encode('utf-8')
         dfile = request.form.get('dfile', '').encode('utf-8')
-        if not self.checkFileName(get.dfile):
+        if not self.checkFileName(dfile):
             return public.returnJson(False, '文件名中不能包含特殊字符!')
-        if not os.path.exists(get.sfile):
+        if not os.path.exists(sfile):
             return public.returnJson(False, '指定文件不存在!')
 
-        if not self.checkDir(get.sfile):
+        if not self.checkDir(sfile):
             return public.returnJson(False, 'FILE_DANGER')
 
         import shutil
