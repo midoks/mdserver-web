@@ -602,11 +602,17 @@ class system_api:
 
         old_list = old.split('.')
         ret = 'none'
-        for i in range(len(old_list)):
-            tm_new = int(new_list[i])
-            tm_old = int(old_list[i])
-            if tm_new > tm_old:
-                return 'new'
+
+        # t = [0] * 3
+        isHasNew = True
+        for i in range(3):
+            if int(new_list[i]) > int(old_list[i]):
+                pass
+            else:
+                isHasNew = False
+
+        if isHasNew:
+            return 'new'
         return ret
 
     def getServerInfo(self):
@@ -633,6 +639,7 @@ class system_api:
 
                 diff = self.versionDiff(
                     version_now, version_new_info['version'])
+                print diff
                 if diff == 'new':
                     return public.returnJson(True, '有新版本!', version_new_info['version'])
                 elif diff == 'test':
