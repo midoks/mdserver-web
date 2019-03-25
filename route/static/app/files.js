@@ -404,13 +404,13 @@ function getFiles(Path) {
 						<td>"+fmp[3]+"</td>\
 						<td>"+fmp[4]+"</td>\
 						<td class='editmenu'>\
-						<span><a class='btlink' href='javascript:;' onclick=\"CopyFile('" + rdata.PATH +"/"+ fmp[0] + "')\">"+lan.files.file_menu_copy+"</a> | \
-						<a class='btlink' href='javascript:;' onclick=\"CutFile('" + rdata.PATH +"/"+ fmp[0] + "')\">"+lan.files.file_menu_mv+"</a> | \
-						<a class='btlink' href='javascript:;' onclick=\"reName(0,'" + fmp[0] + "')\">"+lan.files.file_menu_rename+"</a> | \
-						<a class='btlink' href=\"javascript:setChmod(0,'" + rdata.PATH +"/"+ fmp[0] + "');\">"+lan.files.file_menu_auth+"</a> | \
-						<a class='btlink' href=\"javascript:zip('" + rdata.PATH +"/" +fmp[0] + "');\">"+lan.files.file_menu_zip+"</a> | \
+						<span><a class='btlink' href='javascript:;' onclick=\"CopyFile('" + rdata.PATH +"/"+ fmp[0] + "')\">复制batch</a> | \
+						<a class='btlink' href='javascript:;' onclick=\"CutFile('" + rdata.PATH +"/"+ fmp[0] + "')\">剪切</a> | \
+						<a class='btlink' href='javascript:;' onclick=\"reName(0,'" + fmp[0] + "')\">重命名</a> | \
+						<a class='btlink' href=\"javascript:setChmod(0,'" + rdata.PATH +"/"+ fmp[0] + "');\">权限</a> | \
+						<a class='btlink' href=\"javascript:zip('" + rdata.PATH +"/" +fmp[0] + "');\">压缩</a> | \
 						"+bodyZip+download+"\
-						<a class='btlink' href='javascript:;' onclick=\"deleteFile('" + rdata.PATH +"/"+ fmp[0] + "')\">"+lan.files.file_menu_del+"</a>\
+						<a class='btlink' href='javascript:;' onclick=\"deleteFile('" + rdata.PATH +"/"+ fmp[0] + "')\">删除</a>\
 						</span></td></tr>";
 			}
 			else{
@@ -600,11 +600,11 @@ function showSeclect(){
 	var count = totalFile();
 	var BatchTools = '';
 	if(count > 1){
-		BatchTools = '<button onclick="javascript:Batch(1);" class="btn btn-default btn-sm">'+lan.files.file_menu_copy+'</button>\
-		  <button onclick="javascript:Batch(2);" class="btn btn-default btn-sm">'+lan.files.file_menu_mv+'</button>\
-		  <button onclick="javascript:Batch(3);" class="btn btn-default btn-sm">'+lan.files.file_menu_auth+'</button>\
-		  <button onclick="javascript:Batch(5);" class="btn btn-default btn-sm">'+lan.files.file_menu_zip+'</button>\
-		  <button onclick="javascript:Batch(4);" class="btn btn-default btn-sm">'+lan.files.file_menu_del+'</button>'
+		BatchTools = '<button onclick="javascript:batch(1);" class="btn btn-default btn-sm">复制</button>\
+		  <button onclick="javascript:batch(2);" class="btn btn-default btn-sm">剪切</button>\
+		  <button onclick="javascript:batch(3);" class="btn btn-default btn-sm">权限</button>\
+		  <button onclick="javascript:batch(5);" class="btn btn-default btn-sm">压缩</button>\
+		  <button onclick="javascript:batch(4);" class="btn btn-default btn-sm">删除</button>'
 		$("#Batch").html(BatchTools);
 	}else{
 		$("#Batch").html(BatchTools);
@@ -638,7 +638,7 @@ window.onresize = function(){
 }
 
 //批量操作
-function Batch(type,access){
+function batch(type,access){
 	var path = $("#DirPathPlace input").val();
 	var el = document.getElementsByTagName('input');
 	var len = el.length;
@@ -668,7 +668,7 @@ function Batch(type,access){
 		layer.closeAll();
 	}
 	if(type == 4){
-		AllDeleteFileSub(data,path);
+		allDeleteFileSub(data,path);
 		setCookie('BatchPaste',oldType);
 		return;
 	}
@@ -901,15 +901,15 @@ function deleteDir(dirName){
 	});
 }
 //批量删除文件
-function AllDeleteFileSub(data,path){
-	layer.confirm(lan.files.del_all_msg,{title:lan.files.del_all_file,closeBtn:2,icon:3},function(){
-		layer.msg("<div class='myspeed'>"+lan.public.the+"</div>",{icon:16,time:0,shade: [0.3, '#000']});
+function allDeleteFileSub(data,path){
+	layer.confirm('您确实要把这些文件放入回收站吗?',{title:'批量删除文件',closeBtn:2,icon:3},function(){
+		layer.msg("<div class='myspeed'>正在处理,请稍候...</div>",{icon:16,time:0,shade: [0.3, '#000']});
 		setTimeout(function(){getSpeed('.myspeed');},1000);
 		$.post('files?action=SetBatchData',data,function(rdata){
 			layer.closeAll();
 			getFiles(path);
 			layer.msg(rdata.msg,{icon:1});
-		});
+		},'json');
 	});
 }
 
