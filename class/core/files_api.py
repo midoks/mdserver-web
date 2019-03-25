@@ -61,6 +61,27 @@ class files_api:
         path = request.form.get('path', '').encode('utf-8')
         return self.zip(sfile, dfile, stype, path)
 
+    # 移动文件或目录
+    def mvFileApi(self):
+        sfile = request.form.get('sfile', '').encode('utf-8')
+        dfile = request.form.get('dfile', '').encode('utf-8')
+        if not self.checkFileName(get.dfile):
+            return public.returnJson(False, '文件名中不能包含特殊字符!')
+        if not os.path.exists(get.sfile):
+            return public.returnJson(False, '指定文件不存在!')
+
+        if not self.checkDir(get.sfile):
+            return public.returnJson(False, 'FILE_DANGER')
+
+        import shutil
+        try:
+            shutil.move(sfile, dfile)
+            msg = public.getInfo('移动文件或目录[{1}]到[{2}]成功!', (sfile, dfile,))
+            public.writeLog('文件管理', msg)
+            return public.returnJson(True, '移动文件或目录成功!')
+        except:
+            return public.returnJson(False, '移动文件或目录失败!')
+
     def deleteApi(self):
         path = request.form.get('path', '').encode('utf-8')
         return self.delete(path)
@@ -73,26 +94,28 @@ class files_api:
     def setFileAccessApi(self):
 
         if public.isAppleSystem():
-            return public.returnJson(True,'开发机不设置!')
+            return public.returnJson(True, '开发机不设置!')
 
         filename = request.form.get('filename', '').encode('utf-8')
         user = request.form.get('user', '').encode('utf-8')
         access = request.form.get('access', '755')
         sall = '-R'
         try:
-            if not self.checkDir(filename): 
+            if not self.checkDir(filename):
                 return public.returnJson(False, '请不要花样作死')
 
             if not os.path.exists(filename):
-                return public.returnJson(False,'指定文件不存在!')
+                return public.returnJson(False, '指定文件不存在!')
 
             os.system('chmod ' + sall + ' ' + access + " '" + filename + "'")
-            os.system('chown ' + sall + ' ' + user + ':' + user + " '" + filename + "'")
-            msg = public.getInfo('设置[{1}]权限为[{2}]所有者为[{3}]', (filename,access,user,))
+            os.system('chown ' + sall + ' ' + user +
+                      ':' + user + " '" + filename + "'")
+            msg = public.getInfo(
+                '设置[{1}]权限为[{2}]所有者为[{3}]', (filename, access, user,))
             public.writeLog('文件管理', msg)
-            return public.returnJson(True,'设置成功!')
+            return public.returnJson(True, '设置成功!')
         except:
-            return public.returnJson(False,'设置失败!')
+            return public.returnJson(False, '设置失败!')
 
     def getDirSizeApi(self):
         path = request.form.get('path', '').encode('utf-8')

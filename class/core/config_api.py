@@ -16,15 +16,8 @@ from flask import request
 class config_api:
 
     # 本版解决自启动问题
-    # openresty 自启动 done
-    # php 自启动 done
-    # mysql 自启动 done
-    # memcached 自启动 done
-    # redis 自启动 done
-    # pureftp 自启动 done
-    # sphinx 自启动 done
-    # 修复rsync自启动问题
-    __version = '0.6.0'
+    # 文件管理重命名
+    __version = '0.7.1'
 
     def __init__(self):
         pass

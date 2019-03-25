@@ -350,9 +350,9 @@ function getFiles(Path) {
 						<td class='editmenu'><span>\
 						<a class='btlink' href='javascript:;' onclick=\"CopyFile('" + rdata.PATH +"/"+ fmp[0] + "')\">复制</a> | \
 						<a class='btlink' href='javascript:;' onclick=\"CutFile('" + rdata.PATH +"/"+ fmp[0]+ "')\">剪切</a> | \
-						<a class='btlink' href=\"javascript:ReName(0,'" + fmp[0] + "');\">重命名</a> | \
+						<a class='btlink' href=\"javascript:reName(0,'" + fmp[0] + "');\">重命名</a> | \
 						<a class='btlink' href=\"javascript:setChmod(0,'" + rdata.PATH + "/"+fmp[0] + "');\">权限</a> | \
-						<a class='btlink' href=\"javascript:Zip('" + rdata.PATH +"/" +fmp[0] + "');\">压缩</a> | \
+						<a class='btlink' href=\"javascript:zip('" + rdata.PATH +"/" +fmp[0] + "');\">压缩</a> | \
 						<a class='btlink' href='javascript:;' onclick=\"deleteDir('" + rdata.PATH +"/"+ fmp[0] + "')\">删除</a></span>\
 					</td></tr>";
 			} else {
@@ -406,9 +406,9 @@ function getFiles(Path) {
 						<td class='editmenu'>\
 						<span><a class='btlink' href='javascript:;' onclick=\"CopyFile('" + rdata.PATH +"/"+ fmp[0] + "')\">"+lan.files.file_menu_copy+"</a> | \
 						<a class='btlink' href='javascript:;' onclick=\"CutFile('" + rdata.PATH +"/"+ fmp[0] + "')\">"+lan.files.file_menu_mv+"</a> | \
-						<a class='btlink' href='javascript:;' onclick=\"ReName(0,'" + fmp[0] + "')\">"+lan.files.file_menu_rename+"</a> | \
+						<a class='btlink' href='javascript:;' onclick=\"reName(0,'" + fmp[0] + "')\">"+lan.files.file_menu_rename+"</a> | \
 						<a class='btlink' href=\"javascript:setChmod(0,'" + rdata.PATH +"/"+ fmp[0] + "');\">"+lan.files.file_menu_auth+"</a> | \
-						<a class='btlink' href=\"javascript:Zip('" + rdata.PATH +"/" +fmp[0] + "');\">"+lan.files.file_menu_zip+"</a> | \
+						<a class='btlink' href=\"javascript:zip('" + rdata.PATH +"/" +fmp[0] + "');\">"+lan.files.file_menu_zip+"</a> | \
 						"+bodyZip+download+"\
 						<a class='btlink' href='javascript:;' onclick=\"deleteFile('" + rdata.PATH +"/"+ fmp[0] + "')\">"+lan.files.file_menu_del+"</a>\
 						</span></td></tr>";
@@ -680,7 +680,7 @@ function Batch(type,access){
 				names += el[i].value + ',';
 			}
 		}
-		Zip(names);
+		zip(names);
 		return;
 	}
 		
@@ -973,7 +973,7 @@ function downloadFile(action){
 
 
 //重命名
-function ReName(type, fileName) {
+function reName(type, fileName) {
 	if (type == 1) {
 		var path = $("#DirPathPlace input").val();
 		var newFileName = encodeURIComponent(path + '/' + $("#newFileName").val());
@@ -1003,7 +1003,7 @@ function ReName(type, fileName) {
 					</div>\
 					<div class="bt-form-submit-btn">\
 					<button type="button" class="btn btn-danger btn-sm btn-title" onclick="layer.closeAll()">'+lan.public.close+'</button>\
-					<button type="button" id="ReNameBtn" class="btn btn-success btn-sm btn-title" onclick="ReName(1,\'' + fileName.replace(/'/,"\\'") + '\')">'+lan.public.save+'</button>\
+					<button type="button" id="ReNameBtn" class="btn btn-success btn-sm btn-title" onclick="reName(1,\'' + fileName.replace(/'/,"\\'") + '\')">'+lan.public.save+'</button>\
 					</div>\
 				</div>'
 	});
@@ -1097,7 +1097,7 @@ function PasteTo(path,copyName,cutName,fileName){
 
 
 //压缩目录
-function Zip(dirName,submits) {
+function zip(dirName,submits) {
 	var path = $("#DirPathPlace input").val();
 	if(submits != undefined){
 		if(dirName.indexOf(',') == -1){
@@ -1143,7 +1143,7 @@ function Zip(dirName,submits) {
 					+'</div>'
 					+'<div class="bt-form-submit-btn">'
 					+'<button type="button" class="btn btn-danger btn-sm btn-title" onclick="layer.closeAll()">'+lan.public.close+'</button>'
-					+'<button type="button" id="ReNameBtn" class="btn btn-success btn-sm btn-title" onclick="Zip(\'' + param + '\',1)">'+lan.files.file_menu_zip+'</button>'
+					+'<button type="button" id="ReNameBtn" class="btn btn-success btn-sm btn-title" onclick="zip(\'' + param + '\',1)">'+lan.files.file_menu_zip+'</button>'
 					+'</div>'
 				+'</div>'
 	});
@@ -1417,9 +1417,9 @@ function RClick(type,path,name){
 	var options = {items:[
 	  {text: lan.files.file_menu_copy, 	onclick: function() {CopyFile(path)}},
 	  {text: lan.files.file_menu_mv, 	onclick: function() {CutFile(path)}},
-	  {text: lan.files.file_menu_rename, 	onclick: function() {ReName(0,name)}},
+	  {text: lan.files.file_menu_rename, 	onclick: function() {reName(0,name)}},
 	  {text: lan.files.file_menu_auth, 	onclick: function() {setChmod(0,path)}},
-	  {text: lan.files.file_menu_zip, onclick: function() {Zip(path)}}
+	  {text: lan.files.file_menu_zip, onclick: function() {zip(path)}}
 	  
 	]};
 	if(type == "dir"){
