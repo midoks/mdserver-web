@@ -348,8 +348,8 @@ function getFiles(Path) {
 						<td>"+fmp[3]+"</td>\
 						<td>"+fmp[4]+"</td>\
 						<td class='editmenu'><span>\
-						<a class='btlink' href='javascript:;' onclick=\"CopyFile('" + rdata.PATH +"/"+ fmp[0] + "')\">复制</a> | \
-						<a class='btlink' href='javascript:;' onclick=\"CutFile('" + rdata.PATH +"/"+ fmp[0]+ "')\">剪切</a> | \
+						<a class='btlink' href='javascript:;' onclick=\"copyFile('" + rdata.PATH +"/"+ fmp[0] + "')\">复制</a> | \
+						<a class='btlink' href='javascript:;' onclick=\"cutFile('" + rdata.PATH +"/"+ fmp[0]+ "')\">剪切</a> | \
 						<a class='btlink' href=\"javascript:reName(0,'" + fmp[0] + "');\">重命名</a> | \
 						<a class='btlink' href=\"javascript:setChmod(0,'" + rdata.PATH + "/"+fmp[0] + "');\">权限</a> | \
 						<a class='btlink' href=\"javascript:zip('" + rdata.PATH +"/" +fmp[0] + "');\">压缩</a> | \
@@ -404,8 +404,8 @@ function getFiles(Path) {
 						<td>"+fmp[3]+"</td>\
 						<td>"+fmp[4]+"</td>\
 						<td class='editmenu'>\
-						<span><a class='btlink' href='javascript:;' onclick=\"CopyFile('" + rdata.PATH +"/"+ fmp[0] + "')\">复制batch</a> | \
-						<a class='btlink' href='javascript:;' onclick=\"CutFile('" + rdata.PATH +"/"+ fmp[0] + "')\">剪切</a> | \
+						<span><a class='btlink' href='javascript:;' onclick=\"copyFile('" + rdata.PATH +"/"+ fmp[0] + "')\">复制</a> | \
+						<a class='btlink' href='javascript:;' onclick=\"cutFile('" + rdata.PATH +"/"+ fmp[0] + "')\">剪切</a> | \
 						<a class='btlink' href='javascript:;' onclick=\"reName(0,'" + fmp[0] + "')\">重命名</a> | \
 						<a class='btlink' href=\"javascript:setChmod(0,'" + rdata.PATH +"/"+ fmp[0] + "');\">权限</a> | \
 						<a class='btlink' href=\"javascript:zip('" + rdata.PATH +"/" +fmp[0] + "');\">压缩</a> | \
@@ -414,7 +414,7 @@ function getFiles(Path) {
 						</span></td></tr>";
 			}
 			else{
-				Body += "<div class='file folderBox menufile' data-path='" + rdata.PATH +"/"+ fmp[0] + "' filetype='"+fmp[0]+"' title='"+lan.files.file_name+"：" + fmp[0]+"&#13;"+lan.files.file_size+"：" + toSize(fmp[1])+"&#13;"+lan.files.file_etime+"："+getLocalTime(fmp[2])+"&#13;"+lan.files.file_auth+"："+fmp[3]+"&#13;"+lan.files.file_own+"："+fmp[4]+"'>\
+				Body += "<div class='file folderBox menufile' data-path='" + rdata.PATH +"/"+ fmp[0] + "' filetype='"+fmp[0]+"' title='文件名：" + fmp[0]+"&#13;大小：" + toSize(fmp[1])+"&#13;修改时间："+getLocalTime(fmp[2])+"&#13;权限："+fmp[3]+"&#13;所有者："+fmp[4]+"'>\
 						<input type='checkbox' name='id' value='"+fmp[0]+"'>\
 						<div class='ico ico-"+(getExtName(fmp[0]))+"'></div>\
 						<div class='titleBox'><span class='tname'>" + fmp[0] + "</span></div>\
@@ -428,12 +428,12 @@ function getFiles(Path) {
 							<thead>\
 								<tr>\
 									<th width="30"><input type="checkbox" id="setBox" placeholder=""></th>\
-									<th>'+lan.files.file_name+'</th>\
-									<th>'+lan.files.file_size+'</th>\
-									<th>'+lan.files.file_etime+'</th>\
-									<th>'+lan.files.file_auth+'</th>\
-									<th>'+lan.files.file_own+'</th>\
-									<th style="text-align: right;" width="330">'+lan.files.file_act+'</th>\
+									<th>文件名</th>\
+									<th>大小</th>\
+									<th>修改时间</th>\
+									<th>权限</th>\
+									<th>所有者</th>\
+									<th style="text-align: right;" width="330">操作</th>\
 								</tr>\
 							</thead>\
 							<tbody id="filesBody" class="list-list">'+Body+'</tbody>\
@@ -448,7 +448,7 @@ function getFiles(Path) {
 		$("#DirPathPlace input").val(rdata.PATH);
 		var BarTools = '<div class="btn-group">\
 						<button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">\
-						'+lan.files.new+' <span class="caret"></span>\
+						新建<span class="caret"></span>\
 						</button>\
 						<ul class="dropdown-menu">\
 						<li><a href="javascript:createFile(0,\'' + Path + '\');">新建空白文件</a></li>\
@@ -644,14 +644,16 @@ function batch(type,access){
 	var len = el.length;
 	var data='path='+path+'&type='+type;
 	var name = 'data';
+	var datas = [];
 	
 	var oldType = getCookie('BatchPaste');
-	
+
 	for(var i=0;i<len;i++){
 		if(el[i].checked == true && el[i].value != 'on'){
-			data += '&'+name+'='+encodeURIComponent(el[i].value);
+			datas.push(el[i].value)
 		}
 	}
+	data += "&data=" + encodeURIComponent(JSON.stringify(datas))
 	
 	if(type == 3 && access == undefined){
 		setChmod(0,lan.files.all);
@@ -684,22 +686,24 @@ function batch(type,access){
 		return;
 	}
 		
-	myloadT = layer.msg("<div class='myspeed'>"+lan.public.the+"</div>",{icon:16,time:0,shade: [0.3, '#000']});
+	myloadT = layer.msg("<div class='myspeed'>正在处理,请稍候...</div>",{icon:16,time:0,shade: [0.3, '#000']});
 	setTimeout(function(){getSpeed('.myspeed');},1000);
-	$.post('files?action=SetBatchData',data,function(rdata){
+	console.log(data);
+	$.post('files/set_batch_data',data,function(rdata){
 		layer.close(myloadT);
 		getFiles(path);
 		layer.msg(rdata.msg,{icon:1});
-	});
+	},'json');
 }
 
 //批量粘贴
-function BatchPaste(){
+function batchPaste(){
 	var path = $("#DirPathPlace input").val();
 	var type = getCookie('BatchPaste');
 	var data = 'type='+type+'&path='+path;
-	
-	$.post('/files?action=CheckExistsFiles',{dfile:path},function(result){
+
+	$.post('/files/check_exists_files',{dfile:path},function(rdata){
+		var result = rdata['data'];
 		if(result.length > 0){
 			var tbody = '';
 			for(var i=0;i<result.length;i++){
@@ -708,25 +712,25 @@ function BatchPaste(){
 			var mbody = '<div class="divtable"><table class="table table-hover" width="100%" border="0" cellpadding="0" cellspacing="0"><thead><th>文件名</th><th>大小</th><th>最后修改时间</th></thead>\
 						<tbody>'+tbody+'</tbody>\
 						</table></div>';
-			SafeMessage('即将覆盖以下文件',mbody,function(){
-				BatchPasteTo(data,path);
+			safeMessage('即将覆盖以下文件',mbody,function(){
+				batchPasteTo(data,path);
 			});
 			$(".layui-layer-page").css("width","500px");
 		}else{
-			BatchPasteTo(data,path);
+			batchPasteTo(data,path);
 		}
-	});
+	},'json');
 }
 	
-function BatchPasteTo(data,path){
-	myloadT = layer.msg("<div class='myspeed'>"+lan.public.the+"</div>",{icon:16,time:0,shade: [0.3, '#000']});
+function batchPasteTo(data,path){
+	myloadT = layer.msg("<div class='myspeed'>正在处理,请稍候...</div>",{icon:16,time:0,shade: [0.3, '#000']});
 	setTimeout(function(){getSpeed('.myspeed');},1000);
-	$.post('files?action=BatchPaste',data,function(rdata){
+	$.post('files/batch_paste',data,function(rdata){
 		layer.close(myloadT);
 		setCookie('BatchSelected', null);
 		getFiles(path);
 		layer.msg(rdata.msg,{icon:1});
-	});
+	},'json');
 }
 
 
@@ -820,7 +824,7 @@ function createFile(type, path) {
 		shift: 5,
 		closeBtn: 2,
 		area: '320px', 
-		title: lan.files.new_empty_file,
+		title: '新建空白文件',
 		content: '<div class="bt-form pd20 pb70">\
 					<div class="line">\
 					<input type="text" class="bt-input-text" name="Name" id="newFileName" value="" placeholder="文件名" style="width:100%" />\
@@ -839,7 +843,7 @@ function createFile(type, path) {
 function createDir(type, path) {
 	if (type == 1) {
 		var dirName = $("#newDirName").val();
-		layer.msg(lan.public.the, {
+		layer.msg('正在处理,请稍候...', {
 			icon: 16,
 			time: 10000
 		});
@@ -857,7 +861,7 @@ function createDir(type, path) {
 		shift: 5,
 		closeBtn: 2,
 		area: '320px',
-		title: lan.files.new_dir,
+		title: '新建目录',
 		content: '<div class="bt-form pd20 pb70">\
 					<div class="line">\
 					<input type="text" class="bt-input-text" name="Name" id="newDirName" value="" placeholder="目录名称" style="width:100%" />\
@@ -875,8 +879,8 @@ function createDir(type, path) {
 
 //删除文件
 function deleteFile(fileName){
-	layer.confirm(lan.get('recycle_bin_confirm',[fileName]),{title:lan.files.del_file,closeBtn:2,icon:3},function(){
-		layer.msg(lan.public.the,{icon:16,time:0,shade: [0.3, '#000']});
+	layer.confirm(lan.get('recycle_bin_confirm',[fileName]),{title:'删除文件',closeBtn:2,icon:3},function(){
+		layer.msg('正在处理,请稍候...',{icon:16,time:0,shade: [0.3, '#000']});
 		$.post('/files/delete', 'path=' + encodeURIComponent(fileName), function(rdata) {
 			layer.closeAll();
 			layer.msg(rdata.msg, {
@@ -889,8 +893,8 @@ function deleteFile(fileName){
 
 //删除目录
 function deleteDir(dirName){
-	layer.confirm(lan.get('recycle_bin_confirm_dir',[dirName]),{title:lan.files.del_dir,closeBtn:2,icon:3},function(){
-		layer.msg(lan.public.the,{icon:16,time:0,shade: [0.3, '#000']});
+	layer.confirm(lan.get('recycle_bin_confirm_dir',[dirName]),{title:'删除目录',closeBtn:2,icon:3},function(){
+		layer.msg('正在处理,请稍候...',{icon:16,time:0,shade: [0.3, '#000']});
 		$.post('/files/delete_dir', 'path=' + encodeURIComponent(dirName), function(rdata) {
 			layer.closeAll();
 			layer.msg(rdata.msg, {
@@ -905,7 +909,7 @@ function allDeleteFileSub(data,path){
 	layer.confirm('您确实要把这些文件放入回收站吗?',{title:'批量删除文件',closeBtn:2,icon:3},function(){
 		layer.msg("<div class='myspeed'>正在处理,请稍候...</div>",{icon:16,time:0,shade: [0.3, '#000']});
 		setTimeout(function(){getSpeed('.myspeed');},1000);
-		$.post('files?action=SetBatchData',data,function(rdata){
+		$.post('files/set_batch_data',data,function(rdata){
 			layer.closeAll();
 			getFiles(path);
 			layer.msg(rdata.msg,{icon:1});
@@ -914,7 +918,7 @@ function allDeleteFileSub(data,path){
 }
 
 //重载文件列表
-function ReloadFiles(){
+function reloadFiles(){
 	setInterval(function(){
 		var path = $("#DirPathPlace input").val();
 		getFiles(path);
@@ -996,14 +1000,14 @@ function reName(type, fileName) {
 		shift: 5,
 		closeBtn: 2,
 		area: '320px', 
-		title: lan.files.file_menu_rename,
+		title: '重命名',
 		content: '<div class="bt-form pd20 pb70">\
 					<div class="line">\
-					<input type="text" class="bt-input-text" name="Name" id="newFileName" value="' + fileName + '" placeholder="'+lan.files.file_name+'" style="width:100%" />\
+					<input type="text" class="bt-input-text" name="Name" id="newFileName" value="' + fileName + '" placeholder="文件名" style="width:100%" />\
 					</div>\
 					<div class="bt-form-submit-btn">\
-					<button type="button" class="btn btn-danger btn-sm btn-title" onclick="layer.closeAll()">'+lan.public.close+'</button>\
-					<button type="button" id="ReNameBtn" class="btn btn-success btn-sm btn-title" onclick="reName(1,\'' + fileName.replace(/'/,"\\'") + '\')">'+lan.public.save+'</button>\
+					<button type="button" class="btn btn-danger btn-sm btn-title" onclick="layer.closeAll()">关闭</button>\
+					<button type="button" id="ReNameBtn" class="btn btn-success btn-sm btn-title" onclick="reName(1,\'' + fileName.replace(/'/,"\\'") + '\')">保存</button>\
 					</div>\
 				</div>'
 	});
@@ -1012,36 +1016,41 @@ function reName(type, fileName) {
 	});
 }
 //剪切
-function CutFile(fileName) {
+function cutFile(fileName) {
 	var path = $("#DirPathPlace input").val();
 	setCookie('cutFileName', fileName);
 	setCookie('copyFileName', null);
-	layer.msg(lan.files.mv_ok, {
+	layer.msg('已剪切', {
 		icon: 1,
-		time: 1
+		time: 1000
 	});
-	getFiles(path);
+	setTimeout(function(){
+		getFiles(path);
+	},1000);
 }
 //复制
-function CopyFile(fileName) {
+function copyFile(fileName) {
 	var path = $("#DirPathPlace input").val();
 	setCookie('copyFileName', fileName);
 	setCookie('cutFileName', null);
-	layer.msg(lan.files.copy_ok, {
+	layer.msg('已复制', {
 		icon: 1,
-		time: 1
+		time: 1000
 	});
-	getFiles(path);
+
+	setTimeout(function(){
+		getFiles(path);
+	},1000);
 }
 //粘贴
-function PasteFile(fileName) {
+function pasteFile(fileName) {
 	var path = $("#DirPathPlace input").val();
 	var copyName = getCookie('copyFileName');
 	var cutName = getCookie('cutFileName');
 	var filename = copyName;
 	if(cutName != 'null' && cutName != undefined) filename=cutName;
 	filename = filename.split('/').pop();
-	$.post('/files?action=CheckExistsFiles',{dfile:path,filename:filename},function(result){
+	$.post('/files/check_exists_files',{dfile:path,filename:filename},function(result){
 		if(result.length > 0){
 			var tbody = '';
 			for(var i=0;i<result.length;i++){
@@ -1050,29 +1059,29 @@ function PasteFile(fileName) {
 			var mbody = '<div class="divtable"><table class="table table-hover" width="100%" border="0" cellpadding="0" cellspacing="0"><thead><th>文件名</th><th>大小</th><th>最后修改时间</th></thead>\
 						<tbody>'+tbody+'</tbody>\
 						</table></div>';
-			SafeMessage('即将覆盖以下文件',mbody,function(){
-				PasteTo(path,copyName,cutName,fileName);
+			safeMessage('即将覆盖以下文件',mbody,function(){
+				pasteTo(path,copyName,cutName,fileName);
 			});
 		}else{
-			PasteTo(path,copyName,cutName,fileName);
+			pasteTo(path,copyName,cutName,fileName);
 		}
-	});
+	},'json');
 }
 
 
-function PasteTo(path,copyName,cutName,fileName){
+function pasteTo(path,copyName,cutName,fileName){
 	if (copyName != 'null' && copyName != undefined) {
 		layer.msg(lan.files.copy_the, {
 			icon: 16,
 			time: 0,shade: [0.3, '#000']
 		});
-		$.post('/files?action=CopyFile', 'sfile=' + encodeURIComponent(copyName) + '&dfile=' + encodeURIComponent(path +'/'+ fileName), function(rdata) {
+		$.post('/files/copy_file', 'sfile=' + encodeURIComponent(copyName) + '&dfile=' + encodeURIComponent(path +'/'+ fileName), function(rdata) {
 			layer.closeAll();
 			layer.msg(rdata.msg, {
 				icon: rdata.status ? 1 : 2
 			});
 			getFiles(path);
-		});
+		},'json');
 		setCookie('copyFileName', null);
 		setCookie('cutFileName', null);
 		return;
@@ -1115,7 +1124,7 @@ function zip(dirName,submits) {
 			if(rdata == null || rdata == undefined){
 				layer.msg(lan.files.zip_ok,{icon:1});
 				getFiles(path)
-				ReloadFiles();
+				reloadFiles();
 				return;
 			}
 			layer.msg(rdata.msg, {icon: rdata.status ? 1 : 2});
@@ -1306,7 +1315,7 @@ function setChmod(action,fileName){
 		return;
 	}
 	
-	var toExec = fileName == lan.files.all?'Batch(3,1)':'setChmod(1,\''+fileName+'\')';
+	var toExec = fileName == lan.files.all?'batch(3,1)':'setChmod(1,\''+fileName+'\')';
 	$.post('/files/file_access','filename='+encodeURIComponent(fileName),function(rdata){
 		// console.log(rdata);
 		layer.open({
@@ -1415,8 +1424,8 @@ function onAccess(){
 function RClick(type,path,name){
 	var displayZip = isZip(type);
 	var options = {items:[
-	  {text: lan.files.file_menu_copy, 	onclick: function() {CopyFile(path)}},
-	  {text: lan.files.file_menu_mv, 	onclick: function() {CutFile(path)}},
+	  {text: lan.files.file_menu_copy, 	onclick: function() {copyFile(path)}},
+	  {text: lan.files.file_menu_mv, 	onclick: function() {cutFile(path)}},
 	  {text: lan.files.file_menu_rename, 	onclick: function() {reName(0,name)}},
 	  {text: lan.files.file_menu_auth, 	onclick: function() {setChmod(0,path)}},
 	  {text: lan.files.file_menu_zip, onclick: function() {zip(path)}}
