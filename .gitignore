@@ -121,3 +121,4 @@ data/close.pl
 ssl/input.pl
 data/datadir.pl
 data/502Task.pl
+plugins/mw-qbittorrent/
