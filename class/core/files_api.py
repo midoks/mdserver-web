@@ -52,7 +52,7 @@ class files_api:
         if not os.path.exists(filename):
             return ''
         response = make_response(send_from_directory(
-            os.path.dirname(filename), os.path.basename(filename), as_attachment=True))
+            os.path.dirname(filename).encode('utf-8'), os.path.basename(filename).encode('utf-8'), as_attachment=True))
         return response
 
     def zipApi(self):
@@ -385,84 +385,86 @@ done
         data = request.form.get('data')
         if stype == '1' or stype == '2':
             session['selected'] = {
-                'path':path,
-                'type':stype,
-                'access':access,
-                'user':user,
-                'data':data
+                'path': path,
+                'type': stype,
+                'access': access,
+                'user': user,
+                'data': data
             }
-            return public.returnJson(True,'标记成功,请在目标目录点击粘贴所有按钮!')
+            return public.returnJson(True, '标记成功,请在目标目录点击粘贴所有按钮!')
         elif stype == '3':
             for key in json.loads(data):
                 try:
                     key = key.encode('utf-8')
-                    filename = path+'/'+key
-                    if not self.checkDir(filename): 
-                        return public.returnJson(False,'FILE_DANGER');
-                    os.system('chmod -R '+access+" '"+filename+"'")
-                    os.system('chown -R '+user+':'+user+" '"+filename+"'")
+                    filename = path + '/' + key
+                    if not self.checkDir(filename):
+                        return public.returnJson(False, 'FILE_DANGER')
+                    os.system('chmod -R ' + access + " '" + filename + "'")
+                    os.system('chown -R ' + user + ':' +
+                              user + " '" + filename + "'")
                 except:
-                    continue;
-            public.writeLog('文件管理','批量设置权限成功!')
-            return public.returnJson(True,'批量设置权限成功!')
+                    continue
+            public.writeLog('文件管理', '批量设置权限成功!')
+            return public.returnJson(True, '批量设置权限成功!')
         else:
             import shutil
             isRecyle = os.path.exists('data/recycle_bin.pl')
             data = json.loads(data)
-            l = len(data);
-            i = 0;
+            l = len(data)
+            i = 0
             for key in data:
                 try:
-                    filename = path + '/'+key.encode('utf-8')
-                    topath = filename;
-                    if not os.path.exists(filename): 
+                    filename = path + '/' + key.encode('utf-8')
+                    topath = filename
+                    if not os.path.exists(filename):
                         continue
 
-                    i += 1;
-                    public.writeSpeed(key,i,l);
+                    i += 1
+                    public.writeSpeed(key, i, l)
                     if os.path.isdir(filename):
-                        if not self.checkDir(filename): 
-                            return public.returnJson(False,'请不要花样作死!');
+                        if not self.checkDir(filename):
+                            return public.returnJson(False, '请不要花样作死!')
                         if isRecyle:
                             self.mvRecycleBin(topath)
                         else:
                             shutil.rmtree(filename)
                     else:
-                        if key == '.user.ini': 
-                            os.system('which chattr && chattr -i ' + filename);
+                        if key == '.user.ini':
+                            os.system('which chattr && chattr -i ' + filename)
                         if isRecyle:
                             self.mvRecycleBin(topath)
                         else:
                             os.remove(filename)
                 except:
-                    continue;
-                public.writeSpeed(None,0,0);
-            public.writeLog('文件管理','批量删除成功!')
-            return public.returnJson(True,'批量删除成功！')
+                    continue
+                public.writeSpeed(None, 0, 0)
+            public.writeLog('文件管理', '批量删除成功!')
+            return public.returnJson(True, '批量删除成功！')
 
     def checkExistsFilesApi(self):
         dfile = request.form.get('dfile', '').encode('utf-8')
         filename = request.form.get('filename', '').encode('utf-8')
-        data = [];
-        filesx = [];
+        data = []
+        filesx = []
         if filename == '':
-            filesx = json.loads(session['selected']['data']);
+            filesx = json.loads(session['selected']['data'])
         else:
-            filesx.append(filename);
+            filesx.append(filename)
 
         print filesx
-        
+
         for fn in filesx:
-            if fn == '.': continue
-            filename = dfile + '/' + fn;
+            if fn == '.':
+                continue
+            filename = dfile + '/' + fn
             if os.path.exists(filename):
                 tmp = {}
                 stat = os.stat(filename)
                 tmp['filename'] = fn
-                tmp['size'] = os.path.getsize(filename);
-                tmp['mtime'] = str(int(stat.st_mtime));
+                tmp['size'] = os.path.getsize(filename)
+                tmp['mtime'] = str(int(stat.st_mtime))
                 data.append(tmp)
-        return public.returnJson(True,'ok', data)
+        return public.returnJson(True, 'ok', data)
 
     def batchPasteApi(self):
         path = request.form.get('path', '').encode('utf-8')
@@ -470,90 +472,93 @@ done
         # filename = request.form.get('filename', '').encode('utf-8')
         import shutil
         if not self.checkDir(path):
-            return public.returnJson(False,'请不要花样作死!');
-        i = 0;
+            return public.returnJson(False, '请不要花样作死!')
+        i = 0
         myfiles = json.loads(session['selected']['data'])
-        l = len(myfiles);
+        l = len(myfiles)
         if stype == '1':
             for key in myfiles:
                 i += 1
-                public.writeSpeed(key,i,l);
+                public.writeSpeed(key, i, l)
                 try:
-                 
-                    sfile = session['selected']['path'] + '/' + key.encode('utf-8')
+
+                    sfile = session['selected'][
+                        'path'] + '/' + key.encode('utf-8')
                     dfile = path + '/' + key.encode('utf-8')
 
                     if os.path.isdir(sfile):
-                        shutil.copytree(sfile,dfile)
+                        shutil.copytree(sfile, dfile)
                     else:
-                        shutil.copyfile(sfile,dfile)
+                        shutil.copyfile(sfile, dfile)
                     stat = os.stat(sfile)
-                    os.chown(dfile,stat.st_uid,stat.st_gid)
+                    os.chown(dfile, stat.st_uid, stat.st_gid)
                 except:
-                    continue;
-            msg = public.getInfo('从[{1}]批量复制到[{2}]成功',(session['selected']['path'],path,))
-            public.writeLog('文件管理',msg)
+                    continue
+            msg = public.getInfo('从[{1}]批量复制到[{2}]成功',
+                                 (session['selected']['path'], path,))
+            public.writeLog('文件管理', msg)
         else:
             for key in myfiles:
                 try:
                     i += 1
-                    public.writeSpeed(key,i,l);
-          
-                    sfile = session['selected']['path'] + '/' + key.encode('utf-8')
+                    public.writeSpeed(key, i, l)
+
+                    sfile = session['selected'][
+                        'path'] + '/' + key.encode('utf-8')
                     dfile = path + '/' + key.encode('utf-8')
-                    
-                    shutil.move(sfile,dfile)
+
+                    shutil.move(sfile, dfile)
                 except:
-                    continue;
-            msg = public.getInfo('从[{1}]批量移动到[{2}]成功', (session['selected']['path'],path,))
-            public.writeLog('文件管理',msg)
-        public.writeSpeed(None,0,0);
+                    continue
+            msg = public.getInfo('从[{1}]批量移动到[{2}]成功',
+                                 (session['selected']['path'], path,))
+            public.writeLog('文件管理', msg)
+        public.writeSpeed(None, 0, 0)
         errorCount = len(myfiles) - i
         del(session['selected'])
-        msg = public.getInfo('批量操作成功[{1}],失败[{2}]', (str(i),str(errorCount)))
-        return public.returnJson(True, msg);
+        msg = public.getInfo('批量操作成功[{1}],失败[{2}]', (str(i), str(errorCount)))
+        return public.returnJson(True, msg)
 
     def copyFileApi(self):
         sfile = request.form.get('sfile', '').encode('utf-8')
         dfile = request.form.get('dfile', '').encode('utf-8')
 
         if not os.path.exists(sfile):
-            return public.returnJson(False,'指定文件不存在!')
-        
+            return public.returnJson(False, '指定文件不存在!')
+
         if os.path.isdir(sfile):
             return self.copyDir(get)
-        
+
         import shutil
         try:
             shutil.copyfile(sfile, dfile)
-            msg = public.getInfo('复制文件[{1}]到[{2}]成功!', (sfile,dfile,))
-            public.writeLog('文件管理',msg)
+            msg = public.getInfo('复制文件[{1}]到[{2}]成功!', (sfile, dfile,))
+            public.writeLog('文件管理', msg)
             stat = os.stat(sfile)
             os.chown(dfile, stat.st_uid, stat.st_gid)
-            return public.returnJson(True,'文件复制成功!')
+            return public.returnJson(True, '文件复制成功!')
         except:
-            return public.returnJson(False,'文件复制失败!')
-
+            return public.returnJson(False, '文件复制失败!')
 
     ##### ----- end ----- ###
 
     def copyDir(self, sfile, dfile):
 
         if not os.path.exists(sfile):
-            return public.returnJson(False,'指定目录不存在!');
-        
+            return public.returnJson(False, '指定目录不存在!')
+
         if os.path.exists(dfile):
-            return public.returnJson(False,'指定目录已存在!');
+            return public.returnJson(False, '指定目录已存在!')
         import shutil
         try:
             shutil.copytree(sfile, dfile)
             stat = os.stat(sfile)
-            os.chown(dfile,stat.st_uid,stat.st_gid)
-            msg = public.getInfo('复制目录[{1}]到[{2}]成功!', (sfile,dfile))
-            public.writeLog('文件管理',msg)
-            return public.returnJson(True,'目录复制成功!')
+            os.chown(dfile, stat.st_uid, stat.st_gid)
+            msg = public.getInfo('复制目录[{1}]到[{2}]成功!', (sfile, dfile))
+            public.writeLog('文件管理', msg)
+            return public.returnJson(True, '目录复制成功!')
         except:
-            return public.returnJson(False,'目录复制失败!')
+            return public.returnJson(False, '目录复制失败!')
 
     # 检查敏感目录
     def checkDir(self, path):
