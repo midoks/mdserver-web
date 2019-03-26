@@ -101,7 +101,7 @@ class plugins_api:
         # print infoJsonPos
 
         if not os.path.exists(infoJsonPos):
-            return public.retJson(False, '配置文件不存在!', ())
+            return public.returnJson(False, '配置文件不存在!', ())
 
         pluginInfo = json.loads(public.readFile(infoJsonPos))
 
@@ -128,7 +128,7 @@ class plugins_api:
         infoJsonPos = self.__plugin_dir + '/' + name + '/' + 'info.json'
 
         if not os.path.exists(infoJsonPos):
-            return public.retJson(False, "配置文件不存在!", ())
+            return public.returnJson(False, "配置文件不存在!", ())
 
         pluginInfo = json.loads(public.readFile(infoJsonPos))
 
@@ -156,7 +156,7 @@ class plugins_api:
         infoJsonPos = self.__plugin_dir + '/' + name + '/' + 'info.json'
 
         if not os.path.exists(infoJsonPos):
-            return public.retJson(False, "配置文件不存在!", ())
+            return public.returnJson(False, "配置文件不存在!", ())
 
         pluginInfo = json.loads(public.readFile(infoJsonPos))
 
@@ -167,7 +167,7 @@ class plugins_api:
         data = public.execShell(execstr)
         if public.isAppleSystem():
             print execstr
-            print data[0],data[1]
+            print data[0], data[1]
         return public.returnJson(True, '卸载执行成功!')
         # if data[1] == '':
         #     return public.returnJson(True, '已将卸载成功!')
