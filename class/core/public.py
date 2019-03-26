@@ -429,7 +429,7 @@ def writeSpeed(title, used, total, speed=0):
 
 def getSpeed():
     # 取进度
-    path = public.getRootDir()
+    path = getRootDir()
     data = readFile(path + '/tmp/panelSpeed.pl')
     if not data:
         data = json.dumps({'title': None, 'progress': 0,
