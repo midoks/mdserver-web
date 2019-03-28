@@ -1,0 +1,15 @@
+{
+	"id":4,
+	"title":"BBR[DEV]",
+	"tip":"soft",
+	"name":"bbr",
+	"type":"软件",
+	"ps":"BBR是Google提出的一种新型拥塞控制算法,可以使Linux服务器显著地提高吞吐量和减少TCP连接的延迟",
+	"versions":"1.0",
+	"shell":"install.sh",
+	"checks":"server/bbr",
+	"author":"Google",
+	"home":"https://github.com/google/bbr",
+	"date":"2019-03-29",
+	"pid":"4"
+}
