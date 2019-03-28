@@ -1,5 +1,10 @@
 [
     {
+        "version": "0.7.3",
+        "content": "* 修复自动更新错误 <br/> * 优化文件批量处理 <br/> * 添加PHP守护插件",
+        "path": "https://github.com/midoks/mdserver-web/releases/download/0.7.3/mdserver-web.zip"
+    },
+    {
         "version": "0.5.6",
         "content": "* openresty,php,mysql,memcached,redis,pureftp,sphinx自启动添加 <br/> * 修复rsync自启动问题",
         "path": "https://github.com/midoks/mdserver-web/releases/download/0.5.6/mdserver-web.zip"
