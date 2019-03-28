@@ -17,4 +17,5 @@ curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts
 [![截图](/route/static/mdw.jpg)](/route/static/mdw.jpg)
 
 ### wiki
+[了解更多...](https://github.com/midoks/mdserver-web/wiki)
 
