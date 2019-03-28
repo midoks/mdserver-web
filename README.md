@@ -13,5 +13,8 @@ curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts
 curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/update.sh | sh
 ```
 
+### 无图不真相
+[![截图](/route/static/mdw.jpg)](/route/static/mdw.jpg)
+
 ### wiki
 
