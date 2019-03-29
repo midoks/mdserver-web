@@ -1,7 +1,10 @@
 
 function readme(){
 	var con = '<ul class="help-info-text c7">';
-    con += '<li>合并索引:</li>';
+	con += '<li>一旦安装无法退回!谨慎使用</li>';
+    con += '<li>只有KVM架构的VPS才能使用</li>';
+    con += '<li>安装 Google BBR 需升级系统内核，而安装锐速则需降级系统内核，故两者不能同时安装。</li>';
+    con += '<li>安装 Google BBR 需升级系统内核，有可能造成系统不稳定，故不建议将其应用在重要的生产环境中</li>';
     con += '</ul>';
     $(".soft-man-con").html(con);  
 }
