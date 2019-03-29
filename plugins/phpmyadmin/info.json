@@ -9,6 +9,7 @@
 	"updates":["4.4.15"],
 	"shell":"install.sh",
 	"checks":"server/phpmyadmin",
+	"path": "server/phpmyadmin",
 	"author":"phpMyAdmin",
 	"home":"https://www.phpmyadmin.net/",
 	"date":"2017-11-24",

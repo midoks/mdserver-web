@@ -8,7 +8,7 @@
 	"updates": "1.0",
 	"tip": "soft",
 	"checks": "server/php_guard",
-	"path": "server/php/VERSION",
+	"path": "server/php_guard",
 	"display": 1,
 	"author": "midoks",
 	"date": "2019-03-01",

@@ -8,6 +8,7 @@
 	"updates":"1.0",
 	"shell":"install.sh",
 	"checks":"server/pm2",
+	"path": "server/pm2",
 	"author":"pm2",
 	"home":"http://pm2.keymetrics.io/",
 	"date":"2019-02-27",

@@ -9,6 +9,7 @@
 	"updates":["5.5.62"],
 	"shell":"install.sh",
 	"checks":"server/mysql",
+	"path":"server/mysql",
 	"author":"mysql",
 	"home":"https://dev.mysql.com/downloads/mysql",
 	"date":"2017-11-24",
