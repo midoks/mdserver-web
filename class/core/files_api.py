@@ -527,7 +527,7 @@ done
             return public.returnJson(False, '指定文件不存在!')
 
         if os.path.isdir(sfile):
-            return self.copyDir(get)
+            return self.copyDir(sfile, dfile)
 
         import shutil
         try:
