@@ -164,6 +164,7 @@ function cmdReceive(name){
 function rsRead(){
 	var readme = '<ul class="help-info-text c7">';
     readme += '<li>如需将其他服务器数据同步到本地服务器，请在接受配置中 "创建接收任务" </li>';
+    readme += '<li>如果开启防火墙,需要放行873端口</li>';
     readme += '</ul>';
 
     $('.soft-man-con').html(readme);   
