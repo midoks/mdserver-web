@@ -122,7 +122,7 @@ function readme(){
         for (var i = 0; i < rdata['data']['delta'].length; i++) {
             var delta_t = rdata['data']['delta'][i];
             var list = delta_t.split(':');
-            console.log(list);
+            // console.log(list);
             con += '<li>增量索引:' + rdata['data']['cmd'] + ' '+ list[0] +' --rotate</li>';
             con += '<li>合并索引:' + rdata['data']['cmd'] + ' --merge '+ list[1] + ' ' + list[0] +' --rotate</li>';
         }
