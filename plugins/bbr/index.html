@@ -1,9 +1,17 @@
+<div class="bt-form">
+	<div class="bt-w-main">
+		<div class="bt-w-menu">
+			<p class="bgw" onclick="pluginService('bbr');">服务</p>
+			<p onclick="readme();">说明</p>
+		</div>
+		<div class="bt-w-con pd15">
+			<div class="soft-man-con"></div>
+		</div>
+	</div>
+</div>
+
 <script type="text/javascript">
-resetPluginWinWidth(480);
-// $.getScript( "/plugins/file?name=webssh&f=js/webssh.js", function() {
-//});
-if ($(".term-box #term").text() != 'W') {
-    layer.closeAll();
-    webShell();
-}
+$.getScript( "/plugins/file?name=bbr&f=js/brr.js", function() {
+	pluginService('bbr');
+});
 </script>
