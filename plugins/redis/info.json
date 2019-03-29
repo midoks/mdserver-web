@@ -8,6 +8,7 @@
 	"updates":["4.0.11"],
 	"tip": "soft",
 	"checks": "server/redis",
+	"path": "server/redis",
 	"display": 1,
 	"author": "Zend",
 	"date": "2017-04-01",
