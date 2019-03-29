@@ -8,6 +8,7 @@
 	"updates":["3.1.1"],
 	"tip": "soft",
 	"checks": "server/sphinx",
+	"path": "server/sphinx",
 	"display": 1,
 	"author": "midoks",
 	"date": "2017-04-01",

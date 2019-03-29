@@ -8,6 +8,7 @@
 	"updates":["1.5.12"],
 	"tip": "soft",
 	"checks": "server/memcached",
+	"path":"server/memcached",
 	"display": 1,
 	"author": "Zend",
 	"date": "2017-04-01",

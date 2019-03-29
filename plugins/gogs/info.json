@@ -5,6 +5,7 @@
 	"versions": ["0.11.86"],
 	"tip": "soft",
 	"checks": "server/gogs",
+	"path":"server/gogs",
 	"author": "midoks",
 	"date": "201-04-01",
 	"home": "https://gogs.io",
