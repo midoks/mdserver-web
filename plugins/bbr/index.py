@@ -81,7 +81,8 @@ def stop():
             return "Apple Computer does not support"
 
     cmd1 = "sed -i '/net\.core\.default_qdisc=fq/d' /etc/sysctl.conf"
-    public.execShell(cmd1)
+    r1 = public.execShell(cmd1)
+    print r1
     cmd2 = "sed -i '/net\.ipv4\.tcp_congestion_control=bbr/d' /etc/sysctl.conf"
     public.execShell(cmd2)
     public.execShell("sysctl -p")
