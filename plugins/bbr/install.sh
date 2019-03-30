@@ -14,7 +14,8 @@ Install_bbr()
 {
 	echo '正在安装脚本文件...' > $install_tmp
 
-	sh -x $curPath/scripts/bbr.sh
+	chmod +x $curPath/scripts/bbr.sh
+	sh $curPath/scripts/bbr.sh
 
 	mkdir -p $serverPath/bbr
 	echo '1.0' > $serverPath/bbr/version.pl
