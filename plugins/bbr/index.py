@@ -72,7 +72,7 @@ def start():
     cmd = 'echo "net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf'
     public.execShell(cmd)
     public.execShell('sysctl -p')
-    return '重启系统生效'
+    return '执行成功!重启系统生效'
 
 
 def stop():
@@ -85,7 +85,7 @@ def stop():
     cmd2 = "sed -i '/net\.ipv4\.tcp_congestion_control/d' /etc/sysctl.conf"
     public.execShell(cmd2)
     public.execShell("sysctl -p")
-    return '重启系统生效'
+    return '执行成功!重启系统生效'
 
 
 def restart():
