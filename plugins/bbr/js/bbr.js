@@ -5,6 +5,9 @@ function readme(){
     con += '<li>只有KVM架构的VPS才能使用</li>';
     con += '<li>安装 Google BBR 需升级系统内核，而安装锐速则需降级系统内核，故两者不能同时安装。</li>';
     con += '<li>安装 Google BBR 需升级系统内核，有可能造成系统不稳定，故不建议将其应用在重要的生产环境中</li>';
+    con += '<li><hr/></li>';
+    con += '<li>安装升级后,可删除无用的旧内核[谨慎操作]</li>';
+    con += '<li>yum remove $(rpm -qa | grep kernel | grep -v $(uname -r))</li>';
     con += '</ul>';
     $(".soft-man-con").html(con);  
 }
