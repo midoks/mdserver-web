@@ -49,8 +49,10 @@ def getArgs():
 def status():
 
     data = public.execShell('sudo sysctl -n net.ipv4.tcp_congestion_control')
-    print data
-    return 'start'
+    r = data[0].strip()
+    if r == 'bbr':
+        return 'start'
+    return 'stop'
 
 if __name__ == "__main__":
     func = sys.argv[1]
