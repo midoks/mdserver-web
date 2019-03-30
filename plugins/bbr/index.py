@@ -28,6 +28,7 @@ def getInitDFile():
         return '/tmp/' + getPluginName()
     return '/etc/init.d/' + getPluginName()
 
+
 def getArgs():
     args = sys.argv[2:]
     tmp = {}
@@ -44,7 +45,11 @@ def getArgs():
 
     return tmp
 
+
 def status():
+
+    data = public.execShell('sudo sysctl -n net.ipv4.tcp_congestion_control')
+    print data
     return 'start'
 
 if __name__ == "__main__":
