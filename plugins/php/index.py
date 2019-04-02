@@ -143,7 +143,7 @@ def makeOpenrestyConf():
                     content = public.readFile(tpl)
                     content = contentReplace(content, version)
                     public.writeFile(dfile, content)
-                public.restartWeb()
+        public.restartWeb()
 
 def phpFpmReplace(version):
     desc_php_fpm = getServerDir() + '/' + version + '/etc/php-fpm.conf'
