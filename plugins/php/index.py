@@ -112,6 +112,7 @@ def contentReplace(content, version):
 
 
 def makeOpenrestyConf():
+    phpversions = ['00','53','54','55','56','70','71','72','73','74']
     if public.isInstalledWeb():
         sdir =  public.getServerDir() 
         d_pathinfo = sdir + '/openresty/nginx/conf/pathinfo.conf'
@@ -125,24 +126,23 @@ def makeOpenrestyConf():
         versions = content['versions']
         tpl = getPluginDir() + '/conf/enable-php.conf'
         tpl_content = public.readFile(tpl)
-        for x in range(len(versions)):
-            dfile = sdir + '/openresty/nginx/conf/enable-php-' + versions[x] + '.conf'
+        for x in phpversions:
+            dfile = sdir + '/openresty/nginx/conf/enable-php-' + x + '.conf'
             if not os.path.exists(dfile):
-                w_content = contentReplace(tpl_content, versions[x])
-                public.writeFile(desc_file, w_content)
+                if x == '00':
+                    public.writeFile(desc_file, '')
+                else:
+                    w_content = contentReplace(tpl_content, x)
+                    public.writeFile(desc_file, w_content)
 
         #php-fpm status
-        phpversions = ['00','53','54','55','56','70','71','72','73','74']
         for version in phpversions:
             dfile = sdir + '/openresty/nginx/conf/php_status/phpfpm_status_' + version + '.conf'
             tpl = getPluginDir() + '/conf/phpfpm_status.conf'
             if not os.path.exists(dfile):
-                if version == '00':
-                    public.writeFile(dfile, '')
-                else:
-                    content = public.readFile(tpl)
-                    content = contentReplace(content, version)
-                    public.writeFile(dfile, content)
+                content = public.readFile(tpl)
+                content = contentReplace(content, version)
+                public.writeFile(dfile, content)
         public.restartWeb()
 
 def phpFpmReplace(version):
