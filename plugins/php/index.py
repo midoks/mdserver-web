@@ -130,10 +130,10 @@ def makeOpenrestyConf():
             dfile = sdir + '/openresty/nginx/conf/enable-php-' + x + '.conf'
             if not os.path.exists(dfile):
                 if x == '00':
-                    public.writeFile(desc_file, '')
+                    public.writeFile(dfile, '')
                 else:
                     w_content = contentReplace(tpl_content, x)
-                    public.writeFile(desc_file, w_content)
+                    public.writeFile(dfile, w_content)
 
         #php-fpm status
         for version in phpversions:
