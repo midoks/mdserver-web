@@ -2,7 +2,7 @@ wheel
 flask==1.0
 flask-session
 flask-socketio==3.3.2
-gunicorn
+gunicorn==19.9
 gevent==0.4
 gevent-websocket==0.10.1
 psutil==5.4
