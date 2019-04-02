@@ -297,7 +297,7 @@ def cmdRec():
     ip = public.getLocalIp()
 
     cmd = 'echo "' + pwd_list[an] + '" > /tmp/p.pass' + "<br>"
-    cmd = 'chmod 600 /tmp/p.pass' + "<br>"
+    cmd += 'chmod 600 /tmp/p.pass' + "<br>"
     cmd += 'rsync -arv --password-file=/tmp/p.pass --progress --delete  /project  ' + \
         an + '@' + ip + '::' + an
     return public.returnJson(True, 'OK!', cmd)
