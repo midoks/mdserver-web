@@ -15,6 +15,8 @@ if [ ! -f /usr/bin/applydeltarpm ];then
 	yum -y install deltarpm
 fi
 
+
+setenforce 0
 sed -i 's#SELINUX=disabled#SELINUX=enforcing#g' /etc/selinux/config
 
 yum install -y wget curl curl-devel
