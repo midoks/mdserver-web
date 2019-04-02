@@ -132,14 +132,17 @@ def makeOpenrestyConf():
                 public.writeFile(desc_file, w_content)
 
         #php-fpm status
-        phpversions = ['53','54','55','56','70','71','72','73','74']
+        phpversions = ['00','53','54','55','56','70','71','72','73','74']
         for version in phpversions:
             dfile = sdir + '/openresty/nginx/conf/php_status/phpfpm_status_' + version + '.conf'
             tpl = getPluginDir() + '/conf/phpfpm_status.conf'
             if not os.path.exists(dfile):
-                content = public.readFile(tpl)
-                content = contentReplace(content, version)
-                public.writeFile(dfile, content)
+                if version == '00':
+                    public.writeFile(dfile, '')
+                else:
+                    content = public.readFile(tpl)
+                    content = contentReplace(content, version)
+                    public.writeFile(dfile, content)
                 public.restartWeb()
 
 def phpFpmReplace(version):
