@@ -1,10 +1,10 @@
 wheel
-flask
+flask==1.0
 flask-session
-flask-socketio=3.3.2
+flask-socketio==3.3.2
 gunicorn
-gevent
-gevent-websocket
+gevent==0.4
+gevent-websocket==0.10.1
 psutil==5.4
 pillow
 chardet
