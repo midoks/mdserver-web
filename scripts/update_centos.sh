@@ -43,7 +43,7 @@ do
     echo -e ".\c"
     sleep 0.5
     let n+=1
-    if [ $n -gt 8 ];then
+    if [ $n -gt 15 ];then
         break;
     fi
 done
