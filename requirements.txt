@@ -1,13 +1,13 @@
 wheel
 flask
-flask_session
-flask_socketio
+flask-session
+flask-socketio=3.3.2
 gunicorn
 gevent
 gevent-websocket
 psutil==5.4
 pillow
 chardet
-flask_sqlalchemy
+flask-sqlalchemy
 MySQL-python
 ConfigParser
