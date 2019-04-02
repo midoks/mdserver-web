@@ -15,6 +15,8 @@ if [ ! -f /usr/bin/applydeltarpm ];then
 	yum -y install deltarpm
 fi
 
+sed -i 's#SELINUX=disabled#SELINUX=enforcing#g' /etc/selinux/config
+
 yum install -y wget curl curl-devel
 #https need
 curl  https://get.acme.sh | sh
