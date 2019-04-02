@@ -4,7 +4,7 @@ flask_session
 flask_socketio
 gunicorn
 gevent-websocket
-psutil
+psutil==5.4
 pillow
 chardet
 flask_sqlalchemy
