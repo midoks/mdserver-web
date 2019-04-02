@@ -271,13 +271,13 @@ install_config() {
 reboot_os() {
     echo
     echo -e "${green}Info:${plain} The system needs to reboot."
-    read -p "Do you want to restart system? [y/n]" is_reboot
-    if [[ ${is_reboot} == "y" || ${is_reboot} == "Y" ]]; then
-        reboot
-    else
-        echo -e "${green}Info:${plain} Reboot has been canceled..."
-        exit 0
-    fi
+    # read -p "Do you want to restart system? [y/n]" is_reboot
+    # if [[ ${is_reboot} == "y" || ${is_reboot} == "Y" ]]; then
+    #     reboot
+    # else
+    #     echo -e "${green}Info:${plain} Reboot has been canceled..."
+    #     exit 0
+    # fi
 }
 
 install_bbr() {
