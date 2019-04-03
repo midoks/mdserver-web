@@ -44,6 +44,7 @@ cd $sourcePath/php/php-7.0.30 && ./configure \
 --with-zlib-dir=$serverPath/lib/zlib \
 --enable-mysqlnd \
 --with-mysqli=mysqlnd \
+--with-pdo-mysql=mysqlnd \
 --enable-zip \
 --enable-mbstring \
 --enable-simplexml \
