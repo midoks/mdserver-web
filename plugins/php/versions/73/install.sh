@@ -47,6 +47,7 @@ cd $sourcePath/php/php-${version} && ./configure \
 --exec-prefix=$serverPath/php/73 \
 --with-config-file-path=$serverPath/php/73/etc \
 --enable-mysqlnd \
+--with-mysqli=mysqlnd \
 --enable-mbstring \
 --with-zlib-dir=$serverPath/lib/zlib \
 --enable-ftp \

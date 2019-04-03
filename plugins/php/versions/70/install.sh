@@ -43,6 +43,7 @@ cd $sourcePath/php/php-7.0.30 && ./configure \
 --with-config-file-path=$serverPath/php/70/etc \
 --with-zlib-dir=$serverPath/lib/zlib \
 --enable-mysqlnd \
+--with-mysqli=mysqlnd \
 --enable-zip \
 --enable-mbstring \
 --enable-simplexml \
