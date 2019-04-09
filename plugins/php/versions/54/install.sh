@@ -15,7 +15,7 @@ install_tmp=${rootPath}/tmp/mw_install.pl
 Install_php()
 {
 #------------------------ install start ------------------------------------#
-echo "安装php-7.2.5 ..." > $install_tmp
+echo "安装php-5.4.45 ..." > $install_tmp
 mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
