@@ -1178,6 +1178,18 @@ class site_api:
         data.insert(0, {"id": 0, "name": "默认分类"})
         return public.getJson(data)
 
+    def getSiteDocApi(self):
+        stype = request.form.get('type', '0').strip().encode('utf-8')
+        vlist = []
+        vlist.append('')
+        vlist.append(public.getServerDir()+'/openresty/nginx/html/index.html')
+        vlist.append(public.getServerDir()+'/openresty/nginx/html/404.html')
+        vlist.append(public.getServerDir()+'/openresty/nginx/html/index.html')
+        vlist.append(public.getServerDir()+'/web_conf/stop/index.html')
+        data = {}
+        data['path'] = vlist[int(stype)]
+    	return public.returnJson(True, 'ok', data)
+
     def addSiteTypeApi(self):
         name = request.form.get('name', '').strip().encode('utf-8')
         if not name:
