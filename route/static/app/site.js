@@ -2060,32 +2060,21 @@ function siteDefaultPage(){
 		content: '<div class="changeDefault pd20">\
 						<button class="btn btn-default btn-sm mg10" style="width:188px" onclick="changeDefault(1)">默认文档</button>\
 						<button class="btn btn-default btn-sm mg10" style="width:188px" onclick="changeDefault(2)">404错误页</button>\
-						<button class="btn btn-default btn-sm mg10" style="width:188px" onclick="changeDefault('+(stype=='nginx'?3:4)+')">'+(stype=='nginx'?'Nginx':'Apache')+'空白页</button>\
-						<button class="btn btn-default btn-sm mg10" style="width:188px" onclick="changeDefault(5)">默认站点停止页</button>\
+						<button class="btn btn-default btn-sm mg10" style="width:188px" onclick="changeDefault(3)">空白页</button>\
+						<button class="btn btn-default btn-sm mg10" style="width:188px" onclick="changeDefault(4)">默认站点停止页</button>\
 				</div>'
 	});
 }
 
 function changeDefault(type){
-	var vhref='';
-	switch(type){
-		case 1:
-			vhref = '/www/server/panel/data/defaultDoc.html';
-			break;
-		case 2:
-			vhref = '/www/server/panel/data/404.html';
-			break;
-		case 3:
-			vhref = '/www/server/nginx/html/index.html';
-			break;
-		case 4:
-			vhref = '/www/server/apache/htdocs/index.html';
-			break;
-		case 5:
-			vhref = '/www/server/stop/index.html';
-			break;
-	}
-	onlineEditFile(0,vhref);
+	$.post('/site/get_site_doc','type='+type, function(rdata){
+		showMsg('操作成功!',function(){
+			if (rdata.status){
+				vhref = rdata.data.path;
+				onlineEditFile(0,vhref);
+			}
+		},{icon:rdata.status?1:2});
+	},'json');
 }
 
 
