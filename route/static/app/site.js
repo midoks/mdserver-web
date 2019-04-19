@@ -920,20 +920,20 @@ function setIndex(id){
 }
 
 //设置默认站点
-function SetDefaultSite(){
+function setDefaultSite(){
 	var name = $("#defaultSite").val();
-	var loadT = layer.msg(lan.public.the,{icon:16,time:0,shade: [0.3, '#000']});
-	$.post('/site?action=SetDefaultSite','name='+name,function(rdata){
+	var loadT = layer.msg('正在处理,请稍候...',{icon:16,time:0,shade: [0.3, '#000']});
+	$.post('/site/set_default_site','name='+name,function(rdata){
 		layer.closeAll();
 		layer.msg(rdata.msg,{icon:rdata.status?1:5});
-	});
+	},'json');
 }
 
 
 //默认站点
-function GetDefaultSite(){
-	$.post('/site?action=GetDefaultSite','',function(rdata){
-		var opt = '<option value="off">'+lan.site.default_site_no+'</option>';
+function getDefaultSite(){
+	$.post('/site/get_default_site','',function(rdata){
+		var opt = '<option value="off">未设置默认站点</option>';
 		var selected = '';
 		for(var i=0;i<rdata.sites.length;i++){
 			selected = '';
@@ -943,27 +943,27 @@ function GetDefaultSite(){
 		
 		layer.open({
 				type: 1,
-				area: '430px',
-				title: lan.site.default_site_yes,
+				area: '530px',
+				title: '设置默认站点',
 				closeBtn: 2,
 				shift: 5,
 				shadeClose: true,
 				content:'<div class="bt-form ptb15 pb70">\
 							<p class="line">\
-								<span class="tname text-right">'+lan.site.default_site+'</span>\
+								<span class="tname text-right">默认站点</span>\
 								<select id="defaultSite" class="bt-input-text" style="width: 300px;">'+opt+'</select>\
 							</p>\
 							<ul class="help-info-text c6 plr20">\
-							    <li>'+lan.site.default_site_help_1+'</li>\
-							    <li>'+lan.site.default_site_help_2+'</li>\
+							    <li>设置默认站点后,所有未绑定的域名和IP都被定向到默认站点</li>\
+							    <li>可有效防止恶意解析</li>\
 						    </ul>\
 							<div class="bt-form-submit-btn">\
-								<button type="button" class="btn btn-danger btn-sm btn-title" onclick="layer.closeAll()">'+lan.public.cancel+'</button>\
-								<button class="btn btn-success btn-sm btn-title" onclick="SetDefaultSite()">'+lan.public.ok+'</button>\
+								<button type="button" class="btn btn-danger btn-sm btn-title" onclick="layer.closeAll()">取消</button>\
+								<button class="btn btn-success btn-sm btn-title" onclick="setDefaultSite()">确定</button>\
 							</div>\
 						</div>'
 		});
-	});
+	},'json');
 }
 
 function setIndexList(id){
