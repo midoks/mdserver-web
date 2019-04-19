@@ -81,6 +81,41 @@ class site_api:
         _ret['page'] = public.getPage(_page)
         return public.getJson(_ret)
 
+    def setDefaultSiteApi(self):
+        name = request.form.get('name', '').encode('utf-8')
+        import time
+        # 清理旧的
+        defaultSite = public.readFile('data/defaultSite.pl')
+        if defaultSite:
+            path = self.getHostConf(defaultSite)
+            if os.path.exists(path):
+                conf = public.readFile(path)
+                rep = "listen\s+80.+;"
+                conf = re.sub(rep, 'listen 80;', conf, 1)
+                rep = "listen\s+443.+;"
+                conf = re.sub(rep, 'listen 443 ssl;', conf, 1)
+                public.writeFile(path, conf)
+
+        path = self.getHostConf(name)
+        if os.path.exists(path):
+            conf = public.readFile(path)
+            rep = "listen\s+80\s*;"
+            conf = re.sub(rep, 'listen 80 default_server;', conf, 1)
+            rep = "listen\s+443\s*ssl\s*\w*\s*;"
+            conf = re.sub(rep, 'listen 443 ssl default_server;', conf, 1)
+            public.writeFile(path, conf)
+
+        public.writeFile('data/defaultSite.pl', name)
+        public.restartWeb()
+        return public.returnJson(True, '设置成功!')
+
+    def getDefaultSiteApi(self):
+        data = {}
+        data['sites'] = public.M('sites').field(
+            'name').order('id desc').select()
+        data['defaultSite'] = public.readFile('data/defaultSite.pl')
+        return public.getJson(data)
+
     def setPsApi(self):
         mid = request.form.get('id', '').encode('utf-8')
         ps = request.form.get('ps', '').encode('utf-8')
@@ -665,11 +700,11 @@ class site_api:
             # if conf.find('ssl_certificate') == -1:
             #     return public.returnJson(False, '当前未开启SSL')
             to = """#error_page 404/404.html;
-    #HTTP_TO_HTTPS_START
+    # HTTP_TO_HTTPS_START
     if ($server_port !~ 443){
         rewrite ^(/.*)$ https://$host$1 permanent;
     }
-    #HTTP_TO_HTTPS_END"""
+    # HTTP_TO_HTTPS_END"""
             conf = conf.replace('#error_page 404/404.html;', to)
             public.writeFile(file, conf)
 
@@ -1182,13 +1217,15 @@ class site_api:
         stype = request.form.get('type', '0').strip().encode('utf-8')
         vlist = []
         vlist.append('')
-        vlist.append(public.getServerDir()+'/openresty/nginx/html/index.html')
-        vlist.append(public.getServerDir()+'/openresty/nginx/html/404.html')
-        vlist.append(public.getServerDir()+'/openresty/nginx/html/index.html')
-        vlist.append(public.getServerDir()+'/web_conf/stop/index.html')
+        vlist.append(public.getServerDir() +
+                     '/openresty/nginx/html/index.html')
+        vlist.append(public.getServerDir() + '/openresty/nginx/html/404.html')
+        vlist.append(public.getServerDir() +
+                     '/openresty/nginx/html/index.html')
+        vlist.append(public.getServerDir() + '/web_conf/stop/index.html')
         data = {}
         data['path'] = vlist[int(stype)]
-    	return public.returnJson(True, 'ok', data)
+        return public.returnJson(True, 'ok', data)
 
     def addSiteTypeApi(self):
         name = request.form.get('name', '').strip().encode('utf-8')
