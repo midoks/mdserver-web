@@ -7,6 +7,7 @@ import sys
 import os
 import json
 import time
+import threading
 # print sys.path
 
 sys.path.append("/usr/local/lib/python2.7/site-packages")
@@ -36,6 +37,19 @@ if not os.path.exists(logPath):
 
 if not os.path.exists(isTask):
     os.system("touch " + isTask)
+
+
+def async(f):
+    def wrapper(*args, **kwargs):
+        thr = threading.Thread(target=f, args=args, kwargs=kwargs)
+        thr.start()
+    return wrapper
+
+@async
+def restartMw():
+    sleep(1)
+    cmd = public.getRunDir() + '/scripts/init.d/mw restart'
+    public.execShell(cmd)
 
 
 class MyBad():
@@ -326,9 +340,7 @@ def systemTask():
                     reloadNum += 1
                     if reloadNum > 1440:
                         reloadNum = 0
-                        # if os.path.exists('data/ssl.pl'):
-                        cmd = public.getRunDir() + '/scripts/init.d/mw restart > /dev/null 2>&1'
-                        os.system(cmd)
+                        restartMw()
                 except Exception, ex:
                     print str(ex)
 
@@ -428,7 +440,7 @@ def checkPHPVersion(version):
 
 if __name__ == "__main__":
 
-    import threading
+    
     t = threading.Thread(target=systemTask)
     t.setDaemon(True)
     t.start()
