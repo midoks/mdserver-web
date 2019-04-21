@@ -8,25 +8,30 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
 
+install_tmp=${rootPath}/tmp/mw_install.pl
+
+
+Install_of(){
+
+	mkdir -p $serverPath/op_firewall
+	echo '正在安装脚本文件...' > $install_tmp
+
+	echo '0.1' > $serverPath/op_firewall/version.pl
+	echo 'install ok' > $install_tmp
+}
+
+Uninstall_of(){
+
+	rm -rf $serverPath/op_firewall
+}
+
+
 action=$1
 type=$2
 
-if id www &> /dev/null ;then 
-    echo "www UID is `id -u www`"
-    echo "www Shell is `grep "^www:" /etc/passwd |cut -d':' -f7 `"
+action=$1
+if [ "${1}" == 'install' ];then
+	Install_of
 else
-    groupadd www
-	useradd -g www -s /sbin/nologin www
+	Uninstall_of
 fi
-
-if [ "${2}" == "" ];then
-	echo '缺少安装脚本...' > $install_tmp
-	exit 0
-fi 
-
-if [ ! -d $curPath/versions/$2 ];then
-	echo '缺少安装脚本2...' > $install_tmp
-	exit 0
-fi
-
-sh -x $curPath/versions/$2/install.sh $1
