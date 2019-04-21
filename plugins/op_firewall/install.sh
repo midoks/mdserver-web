@@ -13,15 +13,15 @@ install_tmp=${rootPath}/tmp/mw_install.pl
 
 Install_of(){
 
-	mkdir -p $serverPath/op_firewall
+	
 	echo '正在安装脚本文件...' > $install_tmp
+	mkdir -p $serverPath/op_firewall
 
 	echo '0.1' > $serverPath/op_firewall/version.pl
 	echo 'install ok' > $install_tmp
 }
 
 Uninstall_of(){
-
 	rm -rf $serverPath/op_firewall
 }
 
