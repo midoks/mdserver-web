@@ -98,7 +98,7 @@ function getSList(isdisplay) {
             }
 
 
-            var handle = '<a class="btlink" onclick="addVersion(\'' + plugin.name + '\',\'' + version_info + '\',\'' + plugin.tip + '\',this,\'' + plugin.title + '\')">安装</a>';
+            var handle = '<a class="btlink" onclick="addVersion(\'' + plugin.name + '\',\'' + version_info + '\',\'' + plugin.tip + '\',this,\'' + plugin.title + '\','+plugin.coexist+')">安装</a>';//plugin.coexist
 
             
             if (plugin.setup == true) {
@@ -171,18 +171,22 @@ function getSList(isdisplay) {
     },'json');
 }
 
-function addVersion(name, ver, type, obj, title) {
+function addVersion(name, ver, type, obj, title, coexist) {
     var option = '';
-    var titlename = name;
+    var titlename = title;
     if (ver.indexOf('|') >= 0){
         var veropt = ver.split("|");
         var SelectVersion = '';
         for (var i = 0; i < veropt.length; i++) {
-            SelectVersion += '<option>' + name + ' ' + veropt[i] + '</option>';
+            SelectVersion += '<option>' + title + ' ' + veropt[i] + '</option>';
         }
         option = "<select id='SelectVersion' class='bt-input-text' style='margin-left:30px'>" + SelectVersion + "</select>";
     } else {
-        option = '<span id="SelectVersion">' + name + ' ' + ver + '</span>';
+        if (coexist){
+            option = '<span id="SelectVersion">' + title + '</span>';
+        } else {
+            option = '<span id="SelectVersion">' + title + ' ' + ver + '</span>';
+        }
     }
 
     layer.open({
