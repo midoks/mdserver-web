@@ -1,0 +1,15 @@
+{
+	"title":"OP文件访问权限[dev]",
+	"tip":"soft",
+	"name":"op_acl",
+	"type":"其他插件",
+	"ps":"控制访问权限，用于静态文件管理。",
+	"shell":"install.sh",
+	"checks":"server/op_acl",
+	"path":"server/op_acl",
+	"author":"loveshell",
+	"home":"",
+	"date":"2019-04-22",
+	"pid": "5",
+	"versions": ["0.1"]
+}
