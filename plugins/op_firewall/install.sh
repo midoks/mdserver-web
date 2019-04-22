@@ -12,7 +12,6 @@ install_tmp=${rootPath}/tmp/mw_install.pl
 
 
 Install_of(){
-
 	
 	echo '正在安装脚本文件...' > $install_tmp
 	mkdir -p $serverPath/op_firewall

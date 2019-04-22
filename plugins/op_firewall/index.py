@@ -11,7 +11,6 @@ import public
 
 
 app_debug = False
-
 if public.isAppleSystem():
     app_debug = True
 
@@ -51,140 +50,39 @@ def getArgs():
     return tmp
 
 
-def clearTemp():
-    path_bin = getServerDir() + "/nginx"
-    public.execShell('rm -rf ' + path_bin + '/client_body_temp')
-    public.execShell('rm -rf ' + path_bin + '/fastcgi_temp')
-    public.execShell('rm -rf ' + path_bin + '/proxy_temp')
-    public.execShell('rm -rf ' + path_bin + '/scgi_temp')
-    public.execShell('rm -rf ' + path_bin + '/uwsgi_temp')
-
-
 def getConf():
-    path = getServerDir() + "/nginx/conf/nginx.conf"
+    path = public.getServerDir() + "/openresty/nginx/conf/nginx.conf"
     return path
-
-
-def getConfTpl():
-    path = getPluginDir() + '/conf/nginx.conf'
-    return path
-
-
-def getOs():
-    data = {}
-    data['os'] = public.getOs()
-    ng_exe_bin = getServerDir() + "/nginx/sbin/nginx"
-    if checkAuthEq(ng_exe_bin, 'root'):
-        data['auth'] = True
-    else:
-        data['auth'] = False
-    return public.getJson(data)
-
-
-def getInitDTpl():
-    path = getPluginDir() + "/init.d/nginx.tpl"
-    return path
-
-
-def makeConf():
-    vhost = getServerDir() + '/nginx/conf/vhost'
-    if not os.path.exists(vhost):
-        os.mkdir(vhost)
-    php_status = getServerDir() + '/nginx/conf/php_status'
-    if not os.path.exists(php_status):
-        os.mkdir(php_status)
-
-
-def getFileOwner(filename):
-    import pwd
-    stat = os.lstat(filename)
-    uid = stat.st_uid
-    pw = pwd.getpwuid(uid)
-    return pw.pw_name
-
-
-def checkAuthEq(file, owner='root'):
-    fowner = getFileOwner(file)
-    if (fowner == owner):
-        return True
-    return False
-
-
-def confReplace():
-    service_path = os.path.dirname(os.getcwd())
-    content = public.readFile(getConfTpl())
-    content = content.replace('{$SERVER_PATH}', service_path)
-
-    user = 'www'
-    user_group = 'www'
-
-    if public.getOs() == 'darwin':
-        # macosx do
-        user = public.execShell(
-            "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
-        # user = 'root'
-        user_group = 'staff'
-        content = content.replace('{$EVENT_MODEL}', 'kqueue')
-    else:
-        content = content.replace('{$EVENT_MODEL}', 'epoll')
-
-    content = content.replace('{$OS_USER}', user)
-    content = content.replace('{$OS_USER_GROUP}', user_group)
-
-    public.writeFile(getServerDir() + '/nginx/conf/nginx.conf', content)
-
-    # give nginx root permission
-    ng_exe_bin = getServerDir() + "/nginx/sbin/nginx"
-    if not checkAuthEq(ng_exe_bin, 'root'):
-        args = getArgs()
-        sudoPwd = args['pwd']
-        cmd_own = 'chown -R ' + 'root:' + user_group + ' ' + ng_exe_bin
-        os.system('echo %s|sudo -S %s' % (sudoPwd, cmd_own))
-        cmd_mod = 'chmod 755 ' + ng_exe_bin
-        os.system('echo %s|sudo -S %s' % (sudoPwd, cmd_mod))
-        cmd_s = 'chmod u+s ' + ng_exe_bin
-        os.system('echo %s|sudo -S %s' % (sudoPwd, cmd_s))
-
-
-def initDreplace():
-
-    file_tpl = getInitDTpl()
-    service_path = os.path.dirname(os.getcwd())
-
-    initD_path = getServerDir() + '/init.d'
-    if not os.path.exists(initD_path):
-        os.mkdir(initD_path)
-    file_bin = initD_path + '/' + getPluginName()
-
-    # initd replace
-    content = public.readFile(file_tpl)
-    content = content.replace('{$SERVER_PATH}', service_path)
-    public.writeFile(file_bin, content)
-    public.execShell('chmod +x ' + file_bin)
-
-    # config replace
-    confReplace()
-
-    # make nginx vhost or other
-    makeConf()
-
-    return file_bin
 
 
 def status():
-    data = public.execShell(
-        "ps -ef|grep nginx |grep -v grep | grep -v python | awk '{print $2}'")
-    if data[0] == '':
+    path = getConf()
+    if not os.path.exists(path):
+        return 'stop'
+
+    conf = public.readFile(path)
+    if conf.find("#include luawaf.conf;") != -1:
+        return 'stop'
+    if conf.find("luawaf.conf;") == -1:
         return 'stop'
     return 'start'
 
 
+def initDreplace():
+    path = public.getServerDir() + "/openresty/nginx/conf"
+    if not os.path.exists(path + '/waf'):
+        sdir = getPluginDir() + '/waf'
+        cmd = 'cp -rf ' + sdir + ' ' + path
+        public.execShell(cmd)
+
+
 def start():
-    file = initDreplace()
-    data = public.execShell(file + ' start')
-    if data[1] == '':
-        return 'ok'
-    return data[1]
+    initDreplace()
+    # data = public.execShell(file + ' start')
+    # if data[1] == '':
+    #     return 'ok'
+    # return data[1]
+    return 'ok'
 
 
 def stop():
