@@ -1,6 +1,6 @@
-RulePath = "/www/server/panel/vhost/wafconf/"
+RulePath = "{$WAF_PATH}/wafconf"
 attacklog = "on"
-logdir = "/www/wwwlogs/waf/"
+logdir = "{$ROOT_PATH}/wwwlogs/waf/"
 UrlDeny="on"
 Redirect="on"
 CookieMatch="off"

@@ -131,7 +131,9 @@ def confReplace():
     content = content.replace('{$OS_USER}', user)
     content = content.replace('{$OS_USER_GROUP}', user_group)
 
-    public.writeFile(getServerDir() + '/nginx/conf/nginx.conf', content)
+    nconf = getServerDir() + '/nginx/conf/nginx.conf'
+    if not os.path.exists(nconf):
+        public.writeFile(getServerDir() + '/nginx/conf/nginx.conf', content)
 
     # give nginx root permission
     ng_exe_bin = getServerDir() + "/nginx/sbin/nginx"
@@ -240,7 +242,7 @@ def initdUinstall():
     if not app_debug:
         if public.isAppleSystem():
             return "Apple Computer does not support"
-    
+
     public.execShell('chkconfig --del ' + getPluginName())
     initd_bin = getInitDFile()
     os.remove(initd_bin)
