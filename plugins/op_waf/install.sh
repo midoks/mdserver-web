@@ -14,14 +14,14 @@ install_tmp=${rootPath}/tmp/mw_install.pl
 Install_of(){
 	
 	echo '正在安装脚本文件...' > $install_tmp
-	mkdir -p $serverPath/op_firewall
+	mkdir -p $serverPath/op_waf
 
-	echo '0.1' > $serverPath/op_firewall/version.pl
+	echo '0.1' > $serverPath/op_waf/version.pl
 	echo 'install ok' > $install_tmp
 }
 
 Uninstall_of(){
-	rm -rf $serverPath/op_firewall
+	rm -rf $serverPath/op_waf
 }
 
 

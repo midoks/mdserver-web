@@ -1,0 +1,17 @@
+<div class="bt-form">
+	<div class="bt-w-main">
+		<div class="bt-w-menu">
+			<p class="bgw" onclick="pluginService('op_waf');">服务</p>
+			<p onclick="pluginConfig('op_waf');">信息</p>
+		</div>
+		<div class="bt-w-con pd15">
+			<div class="soft-man-con"></div>
+		</div>
+	</div>
+
+</div>
+<script type="text/javascript">
+$.getScript( "/plugins/file?name=openrop_firewallesty&f=js/op_waf.js", function(){
+	pluginService('op_waf');
+});
+</script>
