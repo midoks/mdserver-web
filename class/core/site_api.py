@@ -994,7 +994,6 @@ class site_api:
         path = request.form.get('path', '').encode('utf-8')
 
         path = self.getPath(path)
-        print path
         if path == "" or mid == '0':
             return public.returnJson(False,  "目录不能为空!")
 
@@ -1013,13 +1012,13 @@ class site_api:
             public.writeFile(file, conf)
 
         # 创建basedir
-        userIni = path + '/.user.ini'
-        if os.path.exists(userIni):
-            public.execShell("chattr -i " + userIni)
-        public.writeFile(userIni, 'open_basedir=' + path + '/:/tmp/:/proc/')
-        public.execShell('chmod 644 ' + userIni)
-        public.execShell('chown root:root ' + userIni)
-        public.execShell('chattr +i ' + userIni)
+        # userIni = path + '/.user.ini'
+        # if os.path.exists(userIni):
+            # public.execShell("chattr -i " + userIni)
+        # public.writeFile(userIni, 'open_basedir=' + path + '/:/tmp/:/proc/')
+        # public.execShell('chmod 644 ' + userIni)
+        # public.execShell('chown root:root ' + userIni)
+        # public.execShell('chattr +i ' + userIni)
 
         public.restartWeb()
         public.M("sites").where("id=?", (mid,)).setField('path', path)
