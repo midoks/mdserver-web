@@ -128,7 +128,8 @@ def reload():
     return 'ok'
 
 
-
+def getWafConf():
+    return public.getJson([])
 
 
 if __name__ == "__main__":
@@ -145,5 +146,7 @@ if __name__ == "__main__":
         print reload()
     elif func == 'conf':
         print getConf()
+    elif func == 'waf_conf':
+        print getWafConf()
     else:
         print 'error'

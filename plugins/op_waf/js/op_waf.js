@@ -57,6 +57,11 @@ function wafGloabl(){
             </thead>\
         </table>\
         </div>';
+
+    con += '<div style="width:480px;"><ul class="help-info-text c7">\
+        <li>继承: 全局设置将在站点配置中自动继承为默认值</li>\
+        <li>优先级: IP白名单 > IP黑名单 > URL白名单 > URL黑名单 > CC防御 > 禁止国外IP访问 > User-Agent > URI过滤 > URL参数 > Cookie > POST</li>\
+        </ul></div>';
     $(".soft-man-con").html(con);
 }
 
@@ -72,5 +77,24 @@ function wafSite(){
             </thead>\
         </table>\
         </div>';
+    $(".soft-man-con").html(con);
+}
+
+
+
+function wafLogs(){
+    var con = '<div class="divtable">\
+        <table class="table table-hover waftable" style="color:#fff;">\
+            <thead><tr><th width="18%">名称</th>\
+            <th width="44%">描述</th>\
+            <th width="10%">响应</th>\
+            <th style="text-align: center;" width="10%">状态</th>\
+            <th style="text-align: right;">操作</th></tr>\
+            </thead>\
+        </table>\
+        </div>';
+
+
+    
     $(".soft-man-con").html(con);
 }
