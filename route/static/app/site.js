@@ -63,7 +63,6 @@ function getWeb(page, search, type_id) {
 					<td><a class='btlink' title='打开目录"+data.data[i].path+"' href=\"javascript:openPath('"+data.data[i].path+"');\">" + shortpath + "</a></td>\
 					<td><a class='btlink setTimes' id='site_"+data.data[i].id+"' data-ids='"+data.data[i].id+"'>" + web_end_time + "</a></td>\
 					<td><a class='btlinkbed' href='javascript:;' data-id='"+data.data[i].id+"'>" + data.data[i].ps + "</a></td>\
-					<td><input class='btswitch btswitch-ios' id='closewaf_"+idname+"' type='checkbox'><label class='btswitch-btn' for='closewaf_"+idname+"' onclick=\"set_site_obj_state('" + data.data[i].name + "','open')\" style='width:2.4em;height:1.4em;margin-bottom: 0'></label></td>\
 					<td style='text-align:right; color:#bbb'>\
 					<a href='javascript:;' class='btlink' onclick=\"webEdit(" + data.data[i].id + ",'" + data.data[i].name + "','" + data.data[i].edate + "','" + data.data[i].addtime + "')\">设置</a>\
                         | <a href='javascript:;' class='btlink' onclick=\"webDelete('" + data.data[i].id + "','" + data.data[i].name + "')\" title='删除站点'>删除</a>\
