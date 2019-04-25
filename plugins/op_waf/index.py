@@ -187,6 +187,9 @@ def getWafConf():
     conf = getJsonPath('config')
     return public.readFile(conf)
 
+def getWafSite():
+    return ''
+
 
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -210,5 +213,7 @@ if __name__ == "__main__":
         print getWafSrceen()
     elif func == 'waf_conf':
         print getWafConf()
+    elif func == 'waf_site':
+        print getWafSite()
     else:
         print 'error'

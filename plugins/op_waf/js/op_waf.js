@@ -171,7 +171,6 @@ function wafSite(){
 
 
 function wafHistory(){
-
     var con = '<button class="btn btn-success btn-sm" onclick="UncoverAll()">解封所有</button>';
     con += '<div class="divtable mt10">\
         <table class="table table-hover waftable" style="color:#fff;">\
