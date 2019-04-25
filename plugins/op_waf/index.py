@@ -5,6 +5,7 @@ import io
 import os
 import time
 import subprocess
+import json
 
 sys.path.append(os.getcwd() + "/class/core")
 import public
@@ -16,7 +17,7 @@ if public.isAppleSystem():
 
 
 def getPluginName():
-    return 'op_firewall'
+    return 'op_waf'
 
 
 def getPluginDir():
@@ -48,6 +49,14 @@ def getArgs():
             tmp[t[0]] = t[1]
 
     return tmp
+
+
+def checkArgs(data, ck=[]):
+    for i in range(len(ck)):
+        if not ck[i] in data:
+            return (False, public.returnJson(False, '参数:(' + ck[i] + ')没有!'))
+    return (True, public.returnJson(True, 'ok'))
+
 
 
 def getConf():
@@ -127,9 +136,56 @@ def restart():
 def reload():
     return 'ok'
 
+def getJsonPath(name):
+    path = public.getServerDir() + "/openresty/nginx/conf/waf/"+name+".json"
+    return path
+
+def setObjStatus():
+    args = getArgs()
+    data = checkArgs(args, ['obj', 'statusCode'])
+    if not data[0]:
+        return data[1]
+
+    conf = getJsonPath('config')
+    content = public.readFile(conf)
+    cobj = json.loads(content)
+
+    o =  args['obj']
+    status = args['statusCode']
+    cobj[o]['status'] = status
+
+    cjson = public.getJson(cobj)
+    public.writeFile(conf,cjson)
+    return public.returnJson(True,'设置成功!')
+
+def setObjOpen():
+    args = getArgs()
+    data = checkArgs(args, ['obj'])
+    if not data[0]:
+        return data[1]
+
+    conf = getJsonPath('config')
+    content = public.readFile(conf)
+    cobj = json.loads(content)
+
+    o = args['obj']
+    if cobj[o]["open"]:
+        cobj[o]["open"] = False
+    else:
+        cobj[o]["open"] = True
+
+    cjson = public.getJson(cobj)
+    public.writeFile(conf,cjson)
+    return public.returnJson(True,'设置成功!')
+
+def getWafSrceen():
+    conf = getJsonPath('total')
+    return public.readFile(conf)
+
 
 def getWafConf():
-    return public.getJson([])
+    conf = getJsonPath('config')
+    return public.readFile(conf)
 
 
 if __name__ == "__main__":
@@ -146,6 +202,12 @@ if __name__ == "__main__":
         print reload()
     elif func == 'conf':
         print getConf()
+    elif func == 'set_obj_status':
+        print setObjStatus()
+    elif func == 'set_obj_open':
+        print setObjOpen()
+    elif func == 'waf_srceen':
+        print getWafSrceen()
     elif func == 'waf_conf':
         print getWafConf()
     else:
