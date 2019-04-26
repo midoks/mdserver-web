@@ -3,6 +3,7 @@
 local setmetatable = setmetatable
 local _M = { _VERSION = '0.01' }
 local mt = { __index = _M }
+local json = require "cjson"
 
 
 function _M.new(cpath, rpath)
@@ -46,6 +47,34 @@ function _M.read_file_body(self, filename)
 	return fbody
 end
 
+
+function _M.array_len(self, arr)
+    if not arr then return 0 end
+    local count = 0
+    for _,v in ipairs(arr)
+    do
+        count = count + 1
+    end
+    return count
+end
+
+function _M.is_ipaddr(self, client_ip)
+    local cipn = split(client_ip,'.')
+    if self:array_len(cipn) < 4 then return false end
+    for _,v in ipairs({1,2,3,4})
+    do
+        local ipv = tonumber(cipn[v])
+        if ipv == nil then return false end
+        if ipv > 255 or ipv < 0 then return false end
+    end
+    return true
+end
+
+
+function _M.read_file_body_decode(self, filename)
+    return json.decode(self:read_file_body(filename))
+end
+
 function _M.select_rule(self, rules)
     if not rules then return {} end
     new_rules = {}
@@ -61,13 +90,8 @@ end
 
 
 function _M.read_file(self, name)
-   
-    f = self.rpath .. name .. '.json'
-    ngx.log(ngx.ERR,"read:"..name)
-    ngx.log(ngx.ERR,"read2:".. f)
-   
+    f = self.rpath .. name .. '.json'   
     fbody = self:read_file_body(f)
-    ngx.log(ngx.ERR,"read3:".. fbody)
     if fbody == nil then
         return {}
     end
