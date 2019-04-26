@@ -135,10 +135,14 @@ def stop():
 
 
 def restart():
+    stop()
+    start()
     return 'ok'
 
 
 def reload():
+    stop()
+    start()
     return 'ok'
 
 def getJsonPath(name):
