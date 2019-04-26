@@ -1,49 +1,15 @@
 
 local cpath = "{$WAF_PATH}/"
-local rpath = cpath.."rule/"
+local rpath = "{$WAF_PATH}/rule/"
 local logdir = "{$ROOT_PATH}/wwwlogs/waf/"
 local json = require "cjson"
+local ngx_match = ngx.re.find
 
-function return_message(status,msg)
-    ngx.header.content_type = "application/json;"
-    ngx.status = status
-    ngx.say(json.encode(msg))
-    ngx.exit(status)
-end
-
-
-function return_html(status,html)
-    ngx.header.content_type = "text/html"
-    ngx.status = status
-    ngx.say(html)
-    ngx.exit(status)
-end
-
-function return_text(status,html)
-    ngx.header.content_type = "text/plain"
-    ngx.status = status
-    ngx.say(html)
-    ngx.exit(status)
-end
-
-
-
-function read_file_body(filename)
-    fp = io.open(filename,'r')
-    if fp == nil then
-        return nil
-    end
-    fbody = fp:read("*a")
-    fp:close()
-    if fbody == '' then
-        return nil
-    end
-    return fbody
-end
-
+local _C = require "common"
+local C = _C.new(cpath, rpath)
 
 function read_file(name)
-    fbody = read_file_body(rpath .. name .. '.json')
+    fbody = C:read_file_body(rpath .. name .. '.json')
     if fbody == nil then
         return {}
     end
@@ -51,37 +17,122 @@ function read_file(name)
 end
 
 
-
-function select_rule(rules)
-    if not rules then return {} end
-    new_rules = {}
-    for i,v in ipairs(rules)
-    do 
-        if v[1] == 1 then
-            table.insert(new_rules,v[2])
-        end
-    end
-    return new_rules
+function write_drop_ip(is_drop,drop_time)
+    local filename = cpath .. 'drop_ip.log'
+    local fp = io.open(filename,'ab')
+    if fp == nil then return false end
+    local logtmp = {os.time(),ip,server_name,request_uri,drop_time,is_drop}
+    local logstr = json.encode(logtmp) .. "\n"
+    fp:write(logstr)
+    fp:flush()
+    fp:close()
+    return true
 end
 
 
-local config = json.decode(read_file_body(cpath .. 'config.json'))
-local site_config = json.decode(read_file_body(cpath .. 'site.json'))
+ngx.header.content_type = "text/plain"
+-- ngx.say(cpath .. 'config.json')
 
-local args_rules = select_rule(read_file('args'))
+
+
+
+local config = json.decode(C:read_file_body(cpath .. 'config.json'))
+local site_config = json.decode(C:read_file_body(cpath .. 'site.json'))
+
+
+
+function arrlen(arr)
+    if not arr then return 0 end
+    count = 0
+    for _,v in ipairs(arr)
+    do
+        count = count + 1
+    end
+    return count
+end
+
+function is_ipaddr(client_ip)
+    local cipn = split(client_ip,'.')
+    if arrlen(cipn) < 4 then return false end
+    for _,v in ipairs({1,2,3,4})
+    do
+        local ipv = tonumber(cipn[v])
+        if ipv == nil then return false end
+        if ipv > 255 or ipv < 0 then return false end
+    end
+    return true
+end
+
+function get_client_ip()
+    local client_ip = "unknown"
+    if site_config[server_name] then
+        if site_config[server_name]['cdn'] then
+            for _,v in ipairs(site_config[server_name]['cdn_header'])
+            do
+                if request_header[v] ~= nil and request_header[v] ~= "" then
+                    local header_tmp = request_header[v]
+                    if type(header_tmp) == "table" then header_tmp = header_tmp[1] end
+                    client_ip = split(header_tmp,',')[1]
+                    break;
+                end
+            end 
+        end
+    end
+    if string.match(client_ip,"%d+%.%d+%.%d+%.%d+") == nil or not is_ipaddr(client_ip) then
+        client_ip = ngx.var.remote_addr
+        if client_ip == nil then
+            client_ip = "unknown"
+        end
+    end
+    return client_ip
+end
+
+
+function get_server_name()
+    local c_name = ngx.var.server_name
+    local my_name = ngx.shared.limit:get(c_name)
+    if my_name then return my_name end
+    local tmp = C:read_file_body(cpath .. 'domains.json')
+    if not tmp then return c_name end
+    local domains = json.decode(tmp)
+    for _,v in ipairs(domains)
+    do
+        for _,d_name in ipairs(v['domains'])
+        do
+            if c_name == d_name then
+                ngx.shared.limit:set(c_name,v['name'],3600)
+                return v['name']
+            end
+        end
+    end
+    return c_name
+end
+
+local args_rules = C:select_rule(C:read_file('args'))
+
+local retry = config['retry']
+local retry_time = config['retry_time']
+local retry_cycle = config['retry_cycle']
+local ip
+local server_name
+
 
 function continue_key(key)
     key = tostring(key)
     if string.len(key) > 64 then return false end;
-    local keys = {"content","contents","body","msg","file","files","img","newcontent",""}
+    local keys = {"content","contents","body","msg","file","files","img","newcontent"}
     for _,k in ipairs(keys)
     do
+        ngx.say(k..'---'..key)
         if k == key then return false end;
     end
+    ngx.say('ok:'..key)
     return true;
 end
 
 function is_ngx_match(rules,sbody,rule_name)
+
+    ngx.say(rules)
     if rules == nil or sbody == nil then return false end
     if type(sbody) == "string" then
         sbody = {sbody}
@@ -93,10 +144,12 @@ function is_ngx_match(rules,sbody,rule_name)
 
     for k,body in pairs(sbody)
     do
-        ngx.say('k:'..k..',body:'..body)
+        ngx.say('k:'..k..',body:'..body..tostring(continue_key(k)))
         if continue_key(k) then
+            ngx.say('ddddd-----dddd')
             for i,rule in ipairs(rules)
             do
+                ngx.say('i:'..i..',body:'..rule)
                 if site_config[server_name] and rule_name then
                     local n = i - 1
                     for _,j in ipairs(site_config[server_name]['disable_rule'][rule_name])
@@ -138,6 +191,17 @@ function is_site_config(cname)
     return true
 end
 
+function write_file(filename,body)
+    fp = io.open(filename,'w')
+    if fp == nil then
+        return nil
+    end
+    fp:write(body)
+    fp:flush()
+    fp:close()
+    return true
+end
+
 function write_log(name,rule)
     local count,_ = ngx.shared.drop_ip:get(ip)
     if count then
@@ -176,9 +240,9 @@ end
 
 function inc_log(name,rule)
     local total_path = cpath .. 'total.json'
-    local tbody = ngx.shared.btwaf:get(total_path)
+    local tbody = ngx.shared.limit:get(total_path)
     if not tbody then
-        tbody = read_file_body(total_path)
+        tbody = C:read_file_body(total_path)
         if not tbody then return false end
     end
     local total = json.decode(tbody)
@@ -193,10 +257,10 @@ function inc_log(name,rule)
     total['rules'][name] = total['rules'][name] + 1
     local total_log = json.encode(total)
     if not total_log then return false end
-    ngx.shared.btwaf:set(total_path,total_log)
-    if not ngx.shared.btwaf:get('b_btwaf_timeout') then
+    ngx.shared.limit:set(total_path,total_log)
+    if not ngx.shared.limit:get('b_btwaf_timeout') then
         write_file(total_path,total_log)
-        ngx.shared.btwaf:set('b_btwaf_timeout',1,5)
+        ngx.shared.limit:set('b_btwaf_timeout',1,5)
     end
 end
 
@@ -218,15 +282,24 @@ function args()
 
     if is_ngx_match(args_rules,uri_request_args,'args') then
         ngx.say('123123123----4')
+        ngx.say(get_html)
         write_log('args','regular')
-        return_text(config['get']['status'],get_html)
+        C:return_html(config['get']['status'],get_html)
         return true
     end
     return false
 end
 
 function waf()
-    args()
-    return_html(200, json.encode(config))
+
+    -- server_name = string.gsub(get_server_name(),'_','.')
+    ngx.header.content_type = "text/plain"
+    -- ip = get_client_ip()
+    C:t()
+    -- ngx.say(read_file('args'));
+    -- args()
+    C:return_html(200, '11')
     -- return_message(200, config)
 end
+
+waf()
