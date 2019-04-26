@@ -93,7 +93,7 @@ def initDreplace():
         cmd = 'cp -rf ' + sdir + ' ' + path
         public.execShell(cmd)
 
-    config = public.getServerDir() + "/openresty/nginx/conf/waf/config.lua"
+    config = public.getServerDir() + "/openresty/nginx/conf/waf/lua/init.lua"
     content = public.readFile(config)
     content = contentReplace(content)
     public.writeFile(config, content)
@@ -118,7 +118,12 @@ def start():
 
 
 def stop():
-    initDreplace()
+    path = public.getServerDir() + "/openresty/nginx/conf/waf"
+    if os.path.exists(path):
+        cmd = 'rm -rf '+path
+        public.execShell(cmd)
+
+
 
     path = getConf()
     conf = public.readFile(path)

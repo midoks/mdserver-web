@@ -206,6 +206,68 @@ function setRetry(retry_cycle, retry, retry_time, siteName) {
     });
 }
 
+
+
+//设置规则
+function setObjConf(ruleName, type) {
+    if (type == undefined) {
+        create_l = layer.open({
+            type: 1,
+            title: "编辑规则【" + ruleName + "】",
+            area: ['700px', '530px'],
+            closeBtn: 2,
+            shadeClose: false,
+            content: '<div class="pd15">\
+                <div style="border-bottom:#ccc 1px solid;margin-bottom:10px;padding-bottom:10px">\
+                <input class="bt-input-text" name="ruleValue" type="text" value="" style="width:470px;margin-right:12px;" placeholder="规则内容,请使用正则表达式">\
+                <input class="bt-input-text mr5" name="rulePs" type="text" style="width:120px;" placeholder="描述">\
+                <button class="btn btn-success btn-sm va0 pull-right" onclick="add_rule(\''+ ruleName + '\');">添加</button>\</div>\
+                <div class="divtable">\
+                <div id="jc-file-table" class="table_head_fix" style="max-height:300px;overflow:auto;border:#ddd 1px solid">\
+                <table class="table table-hover" style="border:none">\
+                    <thead>\
+                        <tr>\
+                            <th width="360">规则</th>\
+                            <th>说明</th>\
+                            <th>操作</th>\
+                            <th style="text-align: right;">状态</th>\
+                        </tr>\
+                    </thead>\
+                    <tbody id="set_obj_conf_con" class="gztr"></tbody>\
+                </table>\
+                </div>\
+            </div>\
+            <ul class="help-info-text c7 ptb10">\
+                <li style="color:red;">注意:如果您不了解正则表达式,请不要随意修改规则内容</li>\
+                <li>您可以添加或修改规则内容,但请使用正则表达式</li>\
+                <li>内置规则允许修改,但不可以直接删除,您可以设置规则状态来定义防火墙是否使用此规则</li>\
+            </ul></div>'
+        });
+        tableFixed("jc-file-table")
+    }
+    var loadT = layer.msg('正在获取配置规则，请稍候..', { icon: 16, time: 0 });
+    $.post('/plugin?action=a&name=btwaf&s=get_rule', { ruleName: ruleName }, function (rdata) {
+        layer.close(loadT);
+        var tbody = ''
+        for (var i = 0; i < rdata.length; i++) {
+            var removeRule = ''
+            if (rdata[i][3] != 0) removeRule = ' | <a class="btlink" onclick="remove_rule(\'' + ruleName + '\',' + i + ')">删除</a>';
+            tbody += '<tr>\
+                    <td class="rule_body_'+ i + '">' + rdata[i][1] + '</td>\
+                    <td class="rule_ps_'+ i + '">' + rdata[i][2] + '</td>\
+                    <td class="rule_modify_'+ i + '"><a class="btlink" onclick="modify_rule(' + i + ',\'' + ruleName + '\')">编辑</a>' + removeRule + '</td>\
+                    <td class="text-right">\
+                        <div class="pull-right">\
+                        <input class="btswitch btswitch-ios" id="closeua_'+ i + '" type="checkbox" ' + (rdata[i][0] ? 'checked' : '') + '>\
+                        <label class="btswitch-btn" style="width:2.0em;height:1.2em;margin-bottom: 0" for="closeua_'+ i + '" onclick="set_rule_state(\'' + ruleName + '\',' + i + ')"></label>\
+                        </div>\
+                    </td>\
+                </tr>'
+        }
+        $("#set_obj_conf_con").html(tbody)
+    });
+}
+
 function wafScreen(){
 
     owPost('waf_srceen', {}, function(data){
@@ -278,7 +340,7 @@ function wafGloabl(){
                             <input class="btswitch btswitch-ios" id="closeget" type="checkbox" '+ (rdata.get.open ? 'checked' : '') + '>\
                             <label class="btswitch-btn" for="closeget" onclick="setObjOpen(\'get\')"></label>\
                         </div></td>\
-                        <td class="text-right"><a class="btlink" onclick="set_obj_conf(\'url\')">规则</a> | <a class="btlink" href="javascript:;" onclick="onlineEditFile(0,\'/www/server/btwaf/html/get.html\')">响应内容</a></td>\
+                        <td class="text-right"><a class="btlink" onclick="setObjConf(\'url\')">规则</a> | <a class="btlink" href="javascript:;" onclick="onlineEditFile(0,\'/www/server/btwaf/html/get.html\')">响应内容</a></td>\
                     </tr>\
                 </tbody>\
             </table>\
