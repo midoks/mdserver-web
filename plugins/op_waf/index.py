@@ -141,6 +141,7 @@ def restart():
 
 def reload():
     stop()
+    public.execShell('rm -rf '+public.getServerDir() + "/openresty/nginx/logs/error.log")
     start()
     return 'ok'
 

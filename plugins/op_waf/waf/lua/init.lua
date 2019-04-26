@@ -1,5 +1,7 @@
-local cpath = "/Users/midoks/Desktop/fwww/server/openresty/nginx/conf/waf/"
-local logdir = "/Users/midoks/Desktop/fwww/wwwlogs/waf/"
+
+local cpath = "{$WAF_PATH}/"
+local rpath = cpath.."rule/"
+local logdir = "{$ROOT_PATH}/wwwlogs/waf/"
 local json = require "cjson"
 
 function return_message(status,msg)
@@ -17,6 +19,15 @@ function return_html(status,html)
     ngx.exit(status)
 end
 
+function return_text(status,html)
+    ngx.header.content_type = "text/plain"
+    ngx.status = status
+    ngx.say(html)
+    ngx.exit(status)
+end
+
+
+
 function read_file_body(filename)
     fp = io.open(filename,'r')
     if fp == nil then
@@ -31,13 +42,44 @@ function read_file_body(filename)
 end
 
 
+function read_file(name)
+    fbody = read_file_body(rpath .. name .. '.json')
+    if fbody == nil then
+        return {}
+    end
+    return json.decode(fbody)
+end
 
 
 
+function select_rule(rules)
+    if not rules then return {} end
+    new_rules = {}
+    for i,v in ipairs(rules)
+    do 
+        if v[1] == 1 then
+            table.insert(new_rules,v[2])
+        end
+    end
+    return new_rules
+end
 
 
 local config = json.decode(read_file_body(cpath .. 'config.json'))
 local site_config = json.decode(read_file_body(cpath .. 'site.json'))
+
+local args_rules = select_rule(read_file('args'))
+
+function continue_key(key)
+    key = tostring(key)
+    if string.len(key) > 64 then return false end;
+    local keys = {"content","contents","body","msg","file","files","img","newcontent",""}
+    for _,k in ipairs(keys)
+    do
+        if k == key then return false end;
+    end
+    return true;
+end
 
 function is_ngx_match(rules,sbody,rule_name)
     if rules == nil or sbody == nil then return false end
@@ -50,7 +92,8 @@ function is_ngx_match(rules,sbody,rule_name)
     end
 
     for k,body in pairs(sbody)
-    do  
+    do
+        ngx.say('k:'..k..',body:'..body)
         if continue_key(k) then
             for i,rule in ipairs(rules)
             do
@@ -84,6 +127,16 @@ function is_ngx_match(rules,sbody,rule_name)
     return false
 end
 
+function is_site_config(cname)
+    if site_config[server_name] ~= nil then
+        if cname == 'cc' then
+            return site_config[server_name][cname]['open']
+        else
+            return site_config[server_name][cname]
+        end
+    end
+    return true
+end
 
 function write_log(name,rule)
     local count,_ = ngx.shared.drop_ip:get(ip)
@@ -148,7 +201,7 @@ function inc_log(name,rule)
 end
 
 function write_to_file(logstr)
-    local filename = config["logs_path"] .. '/' .. server_name .. '_' .. ngx.today() .. '.log'
+    local filename = logdir .. '/' .. server_name .. '_' .. ngx.today() .. '.log'
     local fp = io.open(filename,'ab')
     if fp == nil then return false end
     fp:write(logstr)
@@ -158,16 +211,22 @@ function write_to_file(logstr)
 end
 
 function args()
-    if not config['get']['open'] or not is_site_config('get') then return false end 
+    uri_request_args = ngx.req.get_uri_args()
+    ngx.say('123123123----111')
+    if not config['get']['open'] or not is_site_config('get') then return false end
+    ngx.say('123123123----22'..json.encode(uri_request_args))
+
     if is_ngx_match(args_rules,uri_request_args,'args') then
+        ngx.say('123123123----4')
         write_log('args','regular')
-        return_html(config['get']['status'],get_html)
+        return_text(config['get']['status'],get_html)
         return true
     end
     return false
 end
 
 function waf()
-    -- return_html(200,cpath .. 'config.json')
-    return_message(200, config)
+    args()
+    return_html(200, json.encode(config))
+    -- return_message(200, config)
 end
