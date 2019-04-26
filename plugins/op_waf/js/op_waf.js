@@ -167,6 +167,45 @@ function setCcRule(cycle, limit, endtime, siteName, increase){
 
 }
 
+
+//设置retry规则
+function setRetry(retry_cycle, retry, retry_time, siteName) {
+    create_l = layer.open({
+        type: 1,
+        title: "设置恶意容忍规则",
+        area: '500px',
+        closeBtn: 2,
+        shadeClose: false,
+        content: '<form class="bt-form pd20 pb70">\
+                <div class="line">\
+                    <span class="tname">周期</span>\
+                    <div class="info-r"><input class="bt-input-text" name="retry_cycle" type="number" value="'+ retry_cycle + '" /> 秒</div>\
+                </div>\
+                <div class="line">\
+                    <span class="tname">频率</span>\
+                    <div class="info-r"><input class="bt-input-text" name="retry" type="number" value="'+ retry + '" /> 次</div>\
+                </div>\
+                <div class="line">\
+                    <span class="tname">封锁时间</span>\
+                    <div class="info-r"><input class="bt-input-text" name="retry_time" type="number" value="'+ retry_time + '" /> 秒</div>\
+                </div>\
+                <ul class="help-info-text c7 ptb10">\
+                    <li><font style="color:red;">'+ retry_cycle + '</font> 秒内累计恶意请求超过  <font style="color:red;">' + retry + '</font> 次,封锁 <font style="color:red;">' + retry_time + '</font> 秒</li>\
+                    <li><font style="color:red;">全局应用:全局设置当前恶意容忍规则，且覆盖当前全部站点的恶意容忍规则</li>\
+                </ul>\
+                <div class="bt-form-submit-btn"><button type="button" class="btn btn-danger btn-sm btn_retry_all" style="margin-right:10px;display:'+ (siteName == undefined?'inline-block;':'none') +';">全局应用</button><button type="button" class="btn btn-success btn-sm btn_retry_present">应用</button></div>\
+            </form>',
+        success:function(){
+            $('.btn_retry_all').click(function(){
+                save_retry(siteName,1);
+            });
+            $('.btn_retry_present').click(function(){
+                save_retry(siteName,0);
+            });
+        }
+    });
+}
+
 function wafScreen(){
 
     owPost('waf_srceen', {}, function(data){
@@ -229,14 +268,24 @@ function wafGloabl(){
                         <td>封锁连续恶意请求，请到站点配置中调整容忍阈值</td>\
                         <td><a class="btlink" onclick="setRequestCode(\'cc\','+ rdata.cc.status + ')">' + rdata.cc.status + '</a></td>\
                         <td style="text-align: center;">--</td>\
-                        <td class="text-right"><a class="btlink" onclick="set_retry('+ rdata.retry_cycle + ',' + rdata.retry + ',' + rdata.retry_time + ')">初始规则</a></td>\
+                        <td class="text-right"><a class="btlink" onclick="setRetry('+ rdata.retry_cycle + ',' + rdata.retry + ',' + rdata.retry_time + ')">初始规则</a></td>\
+                    </tr>\
+                    <tr>\
+                        <td>GET-URI过滤</td>\
+                        <td>'+ rdata.get.ps + '</td>\
+                        <td><a class="btlink" onclick="setRequestCode(\'get\',' + rdata.get.status + ')">' + rdata.get.status + '</a></td>\
+                        <td><div class="ssh-item">\
+                            <input class="btswitch btswitch-ios" id="closeget" type="checkbox" '+ (rdata.get.open ? 'checked' : '') + '>\
+                            <label class="btswitch-btn" for="closeget" onclick="setObjOpen(\'get\')"></label>\
+                        </div></td>\
+                        <td class="text-right"><a class="btlink" onclick="set_obj_conf(\'url\')">规则</a> | <a class="btlink" href="javascript:;" onclick="onlineEditFile(0,\'/www/server/btwaf/html/get.html\')">响应内容</a></td>\
                     </tr>\
                 </tbody>\
             </table>\
             </div>';
 
 
-        con += '<div style="width:645px;"><ul class="help-info-text c7">\
+        con += '<div style="width:645px;margin-top:10px;"><ul class="help-info-text c7">\
             <li>继承: 全局设置将在站点配置中自动继承为默认值</li>\
             <li>优先级: IP白名单>IP黑名单>URL白名单>URL黑名单>CC防御>禁止国外IP访问>User-Agent>URI过滤>URL参数>Cookie>POST</li>\
             </ul></div>';
