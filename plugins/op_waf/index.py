@@ -135,8 +135,7 @@ def stop():
 
 
 def restart():
-    stop()
-    start()
+    public.restartWeb()
     return 'ok'
 
 
