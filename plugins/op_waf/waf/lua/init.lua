@@ -8,14 +8,6 @@ local ngx_match = ngx.re.find
 local _C = require "common"
 local C = _C.new(cpath, rpath)
 
-function read_file(name)
-    fbody = C:read_file_body(rpath .. name .. '.json')
-    if fbody == nil then
-        return {}
-    end
-    return json.decode(fbody)
-end
-
 
 function write_drop_ip(is_drop,drop_time)
     local filename = cpath .. 'drop_ip.log'
@@ -31,37 +23,13 @@ end
 
 
 ngx.header.content_type = "text/plain"
--- ngx.say(cpath .. 'config.json')
+
+local config = C:read_file_body_decode(cpath .. 'config.json')
+local site_config = C:read_file_body_decode(cpath .. 'site.json')
 
 
 
 
-local config = json.decode(C:read_file_body(cpath .. 'config.json'))
-local site_config = json.decode(C:read_file_body(cpath .. 'site.json'))
-
-
-
-function arrlen(arr)
-    if not arr then return 0 end
-    count = 0
-    for _,v in ipairs(arr)
-    do
-        count = count + 1
-    end
-    return count
-end
-
-function is_ipaddr(client_ip)
-    local cipn = split(client_ip,'.')
-    if arrlen(cipn) < 4 then return false end
-    for _,v in ipairs({1,2,3,4})
-    do
-        local ipv = tonumber(cipn[v])
-        if ipv == nil then return false end
-        if ipv > 255 or ipv < 0 then return false end
-    end
-    return true
-end
 
 function get_client_ip()
     local client_ip = "unknown"
