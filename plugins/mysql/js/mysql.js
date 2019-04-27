@@ -1097,16 +1097,5 @@ function repTools(db_name, res){
                         </ul></div>'
         });
         tableFixed('database_fix');
-        //表格头固定
-        function tableFixed(name) {
-            var tableName = document.querySelector('#' + name);
-            tableName.addEventListener('scroll', scrollHandle);
-        }
-
-        function scrollHandle(e) {
-            var scrollTop = this.scrollTop;
-            //this.querySelector('thead').style.transform = 'translateY(' + scrollTop + 'px)';
-            $(this).find("thead").css({ "transform": "translateY(" + scrollTop + "px)", "position": "relative", "z-index": "1" });
-        }
     });
 }

@@ -58,7 +58,6 @@ def checkArgs(data, ck=[]):
     return (True, public.returnJson(True, 'ok'))
 
 
-
 def getConf():
     path = public.getServerDir() + "/openresty/nginx/conf/nginx.conf"
     return path
@@ -120,10 +119,8 @@ def start():
 def stop():
     path = public.getServerDir() + "/openresty/nginx/conf/waf"
     if os.path.exists(path):
-        cmd = 'rm -rf '+path
+        cmd = 'rm -rf ' + path
         public.execShell(cmd)
-
-
 
     path = getConf()
     conf = public.readFile(path)
@@ -141,13 +138,33 @@ def restart():
 
 def reload():
     stop()
-    public.execShell('rm -rf '+public.getServerDir() + "/openresty/nginx/logs/error.log")
+    public.execShell('rm -rf ' + public.getServerDir() +
+                     "/openresty/nginx/logs/error.log")
     start()
     return 'ok'
 
+
 def getJsonPath(name):
-    path = public.getServerDir() + "/openresty/nginx/conf/waf/"+name+".json"
+    path = public.getServerDir() + "/openresty/nginx/conf/waf/" + name + ".json"
     return path
+
+
+def getRuleJsonPath(name):
+    path = public.getServerDir() + "/openresty/nginx/conf/waf/rule/" + name + ".json"
+    return path
+
+
+def getRule():
+    args = getArgs()
+    data = checkArgs(args, ['rule_name'])
+    if not data[0]:
+        return data[1]
+
+    rule_name = args['rule_name']
+    fpath = getRuleJsonPath(rule_name)
+    content = public.readFile(fpath)
+    return public.returnJson(True, 'ok', content)
+
 
 def setObjStatus():
     args = getArgs()
@@ -159,13 +176,14 @@ def setObjStatus():
     content = public.readFile(conf)
     cobj = json.loads(content)
 
-    o =  args['obj']
+    o = args['obj']
     status = args['statusCode']
     cobj[o]['status'] = status
 
     cjson = public.getJson(cobj)
-    public.writeFile(conf,cjson)
-    return public.returnJson(True,'设置成功!')
+    public.writeFile(conf, cjson)
+    return public.returnJson(True, '设置成功!')
+
 
 def setObjOpen():
     args = getArgs()
@@ -184,8 +202,9 @@ def setObjOpen():
         cobj[o]["open"] = True
 
     cjson = public.getJson(cobj)
-    public.writeFile(conf,cjson)
-    return public.returnJson(True,'设置成功!')
+    public.writeFile(conf, cjson)
+    return public.returnJson(True, '设置成功!')
+
 
 def getWafSrceen():
     conf = getJsonPath('total')
@@ -195,6 +214,7 @@ def getWafSrceen():
 def getWafConf():
     conf = getJsonPath('config')
     return public.readFile(conf)
+
 
 def getWafSite():
     return ''
@@ -214,6 +234,8 @@ if __name__ == "__main__":
         print reload()
     elif func == 'conf':
         print getConf()
+    elif func == 'get_rule':
+        print getRule()
     elif func == 'set_obj_status':
         print setObjStatus()
     elif func == 'set_obj_open':
