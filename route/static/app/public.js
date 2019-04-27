@@ -16,6 +16,19 @@ function toSize(a) {
 	}
 }
 
+//表格头固定
+function tableFixed(name) {
+    var tableName = document.querySelector('#' + name);
+    tableName.addEventListener('scroll', scrollHandle);
+}
+
+function scrollHandle(e) {
+    var scrollTop = this.scrollTop;
+    //this.querySelector('thead').style.transform = 'translateY(' + scrollTop + 'px)';
+    $(this).find("thead").css({ "transform": "translateY(" + scrollTop + "px)", "position": "relative", "z-index": "1" });
+}
+
+
 //转换单们到MB
 function toSizeM(byteLen) {
     var a = parseInt(byteLen) / 1024 / 1024;

@@ -15,6 +15,13 @@ function owPost(method, args, callback){
 }
 
 
+function getRuleByName(rule_name, callback){
+    owPost('get_rule', {rule_name:rule_name}, function(data){
+        callback(data);
+    })
+}
+
+
 function setRequestCode(ruleName, statusCode){
     layer.open({
         type: 1,
@@ -207,6 +214,115 @@ function setRetry(retry_cycle, retry, retry_time, siteName) {
 }
 
 
+//URL白名单
+function urlWhite(type) {
+    if (type == undefined) {
+        layer.open({
+            type: 1,
+            title: "管理URL白名单",
+            area: ['500px', '400px'],
+            closeBtn: 2,
+            shadeClose: false,
+            content: '<div class="tab_list"><div class="tab_block active">标准模式-URL白名单</div><div class="tab_block">增强模式—URL白名单</div></div>\
+                <div class="pd15">\
+                    <div class="url_block">\
+                        <div style="border-bottom:#ccc 1px solid;margin-bottom:10px;padding-bottom:10px">\
+                            <input class="bt-input-text" name="url_white_address" type="text" value="" style="width:400px;margin-right:15px;margin-left:5px" placeholder="URL地址,支持正则表达式">\
+                            <button class="btn btn-success btn-sm va0 pull-right" onclick="add_url_white();">添加</button>\
+                        </div>\
+                        <div class="divtable">\
+                            <div id="urlWhite" style="max-height:300px;overflow:auto;border:#ddd 1px solid">\
+                                <table class="table table-hover" style="border:none">\
+                                    <thead>\
+                                        <tr>\
+                                            <th>URL</th>\
+                                            <th style="text-align: right;">操作</th>\
+                                        </tr>\
+                                    </thead>\
+                                    <tbody id="url_white_con" class="gztr"></tbody>\
+                                </table>\
+                            </div>\
+                            <div class="btn-list">\
+                                <button class="btn btn-success btn-sm va0 mr5 mt10" onclick="file_input(\'url_white\')" >导入</button>\
+                                <button class="btn btn-success btn-sm va0 mt10" onclick="output_data(\'url_white\')">导出</button>\
+                            </div>\
+                        </div>\
+                    </div>\
+                    <div class="url_block" style="display:none">\
+                        <div style="border-bottom:#ccc 1px solid;margin-bottom:10px;padding-bottom:10px">\
+                            <input class="bt-input-text" name="url_increase_white_address" type="text" value="" style="width:400px;margin-right:15px;margin-left:5px" placeholder="URL地址,支持正则表达式">\
+                            <button class="btn btn-success btn-sm va0 pull-right add_increase_white_event" >添加</button>\
+                        </div>\
+                        <div class="divtable">\
+                            <div id="url_increase_white" style="max-height:300px;overflow:auto;border:#ddd 1px solid">\
+                                <table class="table table-hover" style="border:none">\
+                                    <thead>\
+                                        <tr>\
+                                            <th>URL</th>\
+                                            <th style="text-align: right;">操作</th>\
+                                        </tr>\
+                                    </thead>\
+                                    <tbody id="url_increase_white_con" class="gztr"></tbody>\
+                                </table>\
+                            </div>\
+                        </div>\
+                    </div>\
+                    <ul class="help-info-text c7">\
+                        <li>所有规则对白名单中的URL无效,包括IP黑名单和URL黑名单</li>\
+                    </ul></div>',
+            success:function(layero,index){
+                $('.tab_list .tab_block').click(function(){
+                    var index = $(this).index();
+                    $(this).addClass('active').siblings().removeClass('active');
+                    $('.url_block').eq(index).show().siblings().hide();
+                    if(index == 1) {get_golbls_cc();}
+                });
+                $('.add_increase_white_event').click(function(){
+                    var _val = $('[name="url_increase_white_address"]').val();
+                    if(_val == ''){
+                        layer.msg('URL规则不能为空!');
+                        return false;
+                    }
+                    add_golbls_cc({text:_val},function(res){
+                        if(res.status){
+                            get_golbls_cc(function(){
+                                if(res.status) get_golbls_cc(function(){
+                                    layer.msg(res.msg,{icon:res.status?1:2});
+                                });
+                            });
+                            $('[name="url_increase_white_address"]').val('');
+                        }
+                    });
+                });
+                $('#url_increase_white_con').on('click','.del_golbls_cc',function(){
+                    var _val = $(this).attr('data-val');
+                    del_golbls_cc({text:_val},function(res){
+                        if(res.status) get_golbls_cc(function(){
+                            layer.msg(res.msg,{icon:res.status?1:2});
+                        });
+                    });
+                });
+            }
+        });
+        tableFixed("urlWhite");
+    }
+
+
+    getRuleByName('url_white', function(data){
+        var tmp = $.parseJSON(data.data);
+        var rdata = $.parseJSON(tmp.data);
+        console.log(rdata);
+        var tbody = ''
+        for (var i = 0; i < rdata.length; i++) {
+            tbody += '<tr>\
+                    <td>'+ rdata[i] + '</td>\
+                    <td class="text-right"><a class="btlink" onclick="remove_url_white('+ i + ')">删除</a></td>\
+                </tr>'
+        }
+        $("#url_white_con").html(tbody);
+    });
+}
+
 
 //设置规则
 function setObjConf(ruleName, type) {
@@ -341,6 +457,21 @@ function wafGloabl(){
                             <label class="btswitch-btn" for="closeget" onclick="setObjOpen(\'get\')"></label>\
                         </div></td>\
                         <td class="text-right"><a class="btlink" onclick="setObjConf(\'url\')">规则</a> | <a class="btlink" href="javascript:;" onclick="onlineEditFile(0,\'/www/server/btwaf/html/get.html\')">响应内容</a></td>\
+                    </tr>\
+                    <tr>\
+                        <td>URL白名单</td><td>大部分规则对URL白名单无效</td><td style="text-align: center;">--</td>\
+                        <td style="text-align: center;">--</td>\
+                        <td class="text-right"><a class="btlink" onclick="urlWhite()">设置</a></td>\
+                    </tr>\
+                    <tr>\
+                        <td>URL黑名单</td><td>禁止访问的URL地址</td><td><a class="btlink" onclick="setRequestCode(\'get\','+ rdata.get.status + ')">' + rdata.get.status + '</a></td>\
+                        <td style="text-align: center;">--</td>\
+                        <td class="text-right"><a class="btlink" onclick="url_black()">设置</a></td>\
+                    </tr>\
+                    <tr>\
+                        <td>其它</td><td>'+ rdata.other.ps + '</td><td>--</td>\
+                        <td style="text-align: center;">--</td>\
+                        <td class="text-right"><a class="btlink" href="javascript:;" onclick="onlineEditFile(0,\'/www/server/btwaf/html/other.html\')">响应内容</a></td>\
                     </tr>\
                 </tbody>\
             </table>\
