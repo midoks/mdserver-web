@@ -195,7 +195,7 @@ function waf_url()
 end
 
 
-local scan_black_rules = read_file('scan_black')
+local scan_black_rules = C:read_file('scan_black')
 function waf_scan_black()
     if not config['scan']['open'] or not C:is_site_config('scan') then return false end
     if C:is_ngx_match(scan_black_rules['cookie'],request_header['cookie'],false) then
@@ -449,7 +449,7 @@ function waf()
     waf_args()
     waf_scan_black()
 
-    waf_post()
+    -- waf_post()
     -- post_data_chekc()
     -- if site_config[server_name] then
     --     X_Forwarded()
