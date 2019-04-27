@@ -489,6 +489,16 @@ function wafGloabl(){
                         </div></td><td class="text-right"><a class="btlink" onclick="scan_rule()">设置</a></td>\
                     </tr>\
                     <tr>\
+                        <td>IP白名单</td><td>所有规则对IP白名单无效</td><td style="text-align: center;">--</td>\
+                        <td style="text-align: center;">--</td>\
+                        <td class="text-right"><a class="btlink" onclick="ip_white()">设置</a></td>\
+                    </tr>\
+                    <tr>\
+                        <td>IP黑名单</td><td>禁止访问的IP</td><td><a class="btlink" onclick="setRequestCode(\'cc\','+ rdata.cc.status + ')">' + rdata.cc.status + '</a></td>\
+                        <td style="text-align: center;">--</td>\
+                        <td class="text-right"><a class="btlink" onclick="ip_black()">设置</a></td>\
+                    </tr>\
+                    <tr>\
                         <td>URL白名单</td><td>大部分规则对URL白名单无效</td><td style="text-align: center;">--</td>\
                         <td style="text-align: center;">--</td>\
                         <td class="text-right"><a class="btlink" onclick="urlWhite()">设置</a></td>\
