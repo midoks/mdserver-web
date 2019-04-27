@@ -7,13 +7,21 @@ local json = require "cjson"
 
 
 function _M.new(cpath, rpath)
-    ngx.log(ngx.ERR,"read:"..cpath..",rpath:"..rpath)
+    -- ngx.log(ngx.ERR,"read:"..cpath..",rpath:"..rpath)
     local self = {
          cpath = cpath,
          rpath = rpath,
+         config = '',
+         site_config = ''
     }
     local p = setmetatable(self, mt)
     return p
+end
+
+
+function _M.setConfData( self, config, site_config )
+    self.config = config
+    self.site_config = site_config
 end
 
 
@@ -34,7 +42,7 @@ function _M.return_html(self,status,html)
 end
 
 function _M.read_file_body(self, filename)
-    ngx.log(ngx.ERR,"read_file_body:"..filename)
+    -- ngx.log(ngx.ERR,"read_file_body:"..filename)
 	fp = io.open(filename, 'r')
 	if fp == nil then
         return nil
@@ -45,6 +53,17 @@ function _M.read_file_body(self, filename)
         return nil
     end
 	return fbody
+end
+
+function _M.continue_key(self,key)
+    key = tostring(key)
+    if string.len(key) > 64 then return false end;
+    local keys = {"content","contents","body","msg","file","files","img","newcontent"}
+    for _,k in ipairs(keys)
+    do
+        if k == key then return false end;
+    end
+    return true;
 end
 
 
@@ -96,6 +115,10 @@ function _M.read_file(self, name)
         return {}
     end
     return json.decode(fbody)
+end
+
+function _M.read_file_table( self, name )
+    return self:select_rule(self:read_file('args'))
 end
 
 function _M.t(self)

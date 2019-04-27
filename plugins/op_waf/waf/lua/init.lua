@@ -27,6 +27,8 @@ ngx.header.content_type = "text/plain"
 local config = C:read_file_body_decode(cpath .. 'config.json')
 local site_config = C:read_file_body_decode(cpath .. 'site.json')
 
+C.setConfData(config, site_config)
+
 
 
 
@@ -76,7 +78,7 @@ function get_server_name()
     return c_name
 end
 
-local args_rules = C:select_rule(C:read_file('args'))
+local args_rules = C:read_file_table('args')
 
 local retry = config['retry']
 local retry_time = config['retry_time']
@@ -85,18 +87,7 @@ local ip
 local server_name
 
 
-function continue_key(key)
-    key = tostring(key)
-    if string.len(key) > 64 then return false end;
-    local keys = {"content","contents","body","msg","file","files","img","newcontent"}
-    for _,k in ipairs(keys)
-    do
-        ngx.say(k..'---'..key)
-        if k == key then return false end;
-    end
-    ngx.say('ok:'..key)
-    return true;
-end
+
 
 function is_ngx_match(rules,sbody,rule_name)
 
