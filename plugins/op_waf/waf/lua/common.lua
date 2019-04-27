@@ -25,8 +25,6 @@ function _M.setConfData( self, config, site_config )
     self.config = config
     self.site_config = site_config
 
-    -- ngx.say(json.encode(self.config))
-    -- ngx.exit(0)
 end
 
 
@@ -35,8 +33,7 @@ function _M.setParams( self, params )
 end
 
 
-function _M.is_min(self, ip1,ip2)
-    
+function _M.is_min(self, ip1, ip2)
     n = 0
     for _,v in ipairs({1,2,3,4})
     do
@@ -63,6 +60,36 @@ function _M.is_max(self,ip1,ip2)
             return false
         end
     end
+    return true
+end
+
+function _M.split(self, str,reps )
+    local resultStrList = {}
+    string.gsub(str,'[^'..reps..']+',function(w)
+        table.insert(resultStrList,w)
+    end)
+    return resultStrList
+end
+
+function _M.arrip(self, ipstr)
+    if ipstr == 'unknown' then return {0,0,0,0} end
+    if string.find(ipstr,':') then return ipstr end
+    iparr = self:split(ipstr,'.')
+    iparr[1] = tonumber(iparr[1])
+    iparr[2] = tonumber(iparr[2])
+    iparr[3] = tonumber(iparr[3])
+    iparr[4] = tonumber(iparr[4])
+    return iparr
+end
+
+
+function _M.compare_ip(self,ips)
+    local ip = self.params["ip"]
+    local ipn = self.params["ipn"]
+    if ip == 'unknown' then return true end
+    if string.find(ip,':') then return false end
+    if not self:is_max(ipn,ips[2]) then return false end
+    if not self:is_min(ipn,ips[1]) then return false end
     return true
 end
 
