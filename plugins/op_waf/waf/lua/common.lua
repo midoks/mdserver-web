@@ -1,5 +1,4 @@
 
-
 local setmetatable = setmetatable
 local _M = { _VERSION = '0.01' }
 local mt = { __index = _M }
@@ -7,16 +6,17 @@ local json = require "cjson"
 local ngx_match = ngx.re.find
 
 
-function _M.new(cpath, rpath, logdir)
+function _M.new(self, cpath, rpath, logdir)
     -- ngx.log(ngx.ERR,"read:"..cpath..",rpath:"..rpath)
-    local self = {
+    local opt = {
          cpath = cpath,
          rpath = rpath,
          logdir = logdir,
          config = '',
-         site_config = ''
+         site_config = '',
+         params = nil
     }
-    local p = setmetatable(self, mt)
+    local p = setmetatable(opt, mt)
     return p
 end
 
@@ -24,8 +24,47 @@ end
 function _M.setConfData( self, config, site_config )
     self.config = config
     self.site_config = site_config
+
+    -- ngx.say(json.encode(self.config))
+    -- ngx.exit(0)
 end
 
+
+function _M.setParams( self, params )
+    self.params = params
+end
+
+
+function _M.is_min(self, ip1,ip2)
+    
+    n = 0
+    for _,v in ipairs({1,2,3,4})
+    do
+        if ip1[v] == ip2[v] then
+            n = n + 1
+        elseif ip1[v] > ip2[v] then
+            break
+        else
+            return false
+        end
+    end
+    return true
+end
+
+function _M.is_max(self,ip1,ip2)
+    n = 0
+    for _,v in ipairs({1,2,3,4})
+    do
+        if ip1[v] == ip2[v] then
+            n = n + 1
+        elseif ip1[v] < ip2[v] then
+            break
+        else
+            return false
+        end
+    end
+    return true
+end
 
 
 function _M.return_message(self, status, msg)
@@ -71,7 +110,21 @@ function _M.write_file(self, filename, body)
 end
 
 
-function _M.write_to_file(logstr)
+function _M.write_drop_ip(self, is_drop, drop_time)
+    local filename = self.cpath .. 'drop_ip.log'
+    local fp = io.open(filename,'ab')
+    if fp == nil then return false end
+    local logtmp = {os.time(),ip,server_name,request_uri,drop_time,is_drop}
+    local logstr = json.encode(logtmp) .. "\n"
+    fp:write(logstr)
+    fp:flush()
+    fp:close()
+    return true
+end
+
+
+function _M.write_to_file(self, logstr)
+    local server_name = self.params['server_name']
     local filename = self.logdir .. '/' .. server_name .. '_' .. ngx.today() .. '.log'
     self:write_file(filename, logstr)
     return true
@@ -145,7 +198,8 @@ end
 
 
 function _M.inc_log(self, name, rule)
-    local total_path = cpath .. 'total.json'
+    local server_name = self.params['server_name']
+    local total_path = self.cpath .. 'total.json'
     local tbody = ngx.shared.limit:get(total_path)
     if not tbody then
         tbody = self:read_file_body(total_path)
@@ -164,9 +218,9 @@ function _M.inc_log(self, name, rule)
     local total_log = json.encode(total)
     if not total_log then return false end
     ngx.shared.limit:set(total_path,total_log)
-    if not ngx.shared.limit:get('b_btwaf_timeout') then
+    if not ngx.shared.limit:get('mw_waf_timeout') then
         self:write_file(total_path,total_log)
-        ngx.shared.limit:set('b_btwaf_timeout',1,5)
+        ngx.shared.limit:set('mw_waf_timeout',1,5)
     end
 end
 
@@ -200,7 +254,6 @@ end
 
 
 function _M.is_ngx_match(self, rules, sbody, rule_name)
-    ngx.say()
     if rules == nil or sbody == nil then return false end
     if type(sbody) == "string" then
         sbody = {sbody}
@@ -215,7 +268,6 @@ function _M.is_ngx_match(self, rules, sbody, rule_name)
         if self:continue_key(k) then
             for i,rule in ipairs(rules)
             do
-                ngx.say("i:"..i..",rule:"..rule)
                 if self.site_config[server_name] and rule_name then
                     local n = i - 1
                     for _,j in ipairs(self.site_config[server_name]['disable_rule'][rule_name])
@@ -248,12 +300,12 @@ end
 
 
 function _M.write_log(self, name, rule)
-    ngx.say('name:'..name)
-    local ip = C:get_client_ip()
+    local ip = self.params['ip']
+    local retry = self.config['retry']
+    local retry_time = self.config['retry_time']
+    local retry_cycle = self.config['retry_cycle']
     
-
-    
-    local count,_ = ngx.shared.drop_ip:get(ip)
+    local count, _ = ngx.shared.drop_ip:get(ip)
     if count then
         ngx.shared.drop_ip:incr(ip,1)
     else
@@ -265,10 +317,8 @@ function _M.write_log(self, name, rule)
         rule = error_rule
         error_rule = nil
     end
-    
 
-    local logtmp = {ngx.localtime(), ip, method,request_uri, ngx.var.http_user_agent, name, rule}
-    ngx.say('logtmp:'..logtmp)
+    local logtmp = {ngx.localtime(), ip, method, ngx.var.request_uri, ngx.var.http_user_agent, name, rule}
     local logstr = json.encode(logtmp) .. "\n"
     local count,_ = ngx.shared.drop_ip:get(ip)  
     if count > retry and name ~= 'cc' then
@@ -281,7 +331,7 @@ function _M.write_log(self, name, rule)
         end
         local lock_time = retry_time * safe_count
         if lock_time > 86400 then lock_time = 86400 end
-        logtmp = {ngx.localtime(),ip,method,request_uri,ngx.var.http_user_agent,name,retry_cycle .. '秒以内累计超过'..retry..'次以上非法请求,封锁'.. lock_time ..'秒'}
+        logtmp = {ngx.localtime(),ip,method,ngx.var.request_uri, ngx.var.http_user_agent,name,retry_cycle .. '秒以内累计超过'..retry..'次以上非法请求,封锁'.. lock_time ..'秒'}
         logstr = logstr .. json.encode(logtmp) .. "\n"
         ngx.shared.drop_ip:set(ip,retry+1,lock_time)
         self:write_drop_ip('inc',lock_time)
