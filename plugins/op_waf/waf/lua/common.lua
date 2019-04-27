@@ -209,7 +209,6 @@ function _M.select_rule(self, rules)
 end
 
 
-
 function _M.read_file(self, name)
     f = self.rpath .. name .. '.json'   
     fbody = self:read_file_body(f)
@@ -394,6 +393,7 @@ end
 
 
 function _M.is_site_config(self,cname)
+    local server_name = self.params["server_name"]
     if self.site_config[server_name] ~= nil then
         if cname == 'cc' then
             return self.site_config[server_name][cname]['open']
@@ -402,6 +402,41 @@ function _M.is_site_config(self,cname)
         end
     end
     return true
+end
+
+function _M.get_boundary(self)
+    local header = self.params["request_header"]["content-type"]
+    if not header then return nil end
+    if type(header) == "table" then
+        header = header[1]
+    end
+
+    local m = string.match(header, ";%s*boundary=\"([^\"]+)\"")
+    if m then
+        return m
+    end
+    return string.match(header, ";%s*boundary=([^\",;]+)")
+end
+
+
+function _M.return_post_data(self)
+    if method ~= "POST" then return false end
+    content_length = tonumber(self.params["request_header"]['content-length'])
+    if not content_length then return false end
+    max_len = 2560 * 1024000
+    if content_length > max_len then return false end
+    local boundary = self:get_boundary()
+    if boundary then
+        ngx.req.read_body()
+        local data = ngx.req.get_body_data()
+        if not data then return false end
+        local tmp = ngx.re.match(data,[[filename=\"(.+)\.(.*)\"]])
+        if not tmp then return false end
+        if not tmp[2] then return false end
+        return tmp[2]
+        
+    end
+    return false
 end
 
 
