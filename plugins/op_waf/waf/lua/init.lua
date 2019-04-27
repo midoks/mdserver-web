@@ -40,7 +40,15 @@ C:setParams(params)
 -- end
 
 local get_html = C:read_file_body(config["reqfile_path"] .. '/' .. config["get"]["reqfile"])
+local post_html = C:read_file_body(config["reqfile_path"] .. '/' .. config["post"]["reqfile"])
+local user_agent_html = C:read_file_body(config["reqfile_path"] .. '/' .. config["user-agent"]["reqfile"])
 local args_rules = C:read_file_table('args')
+local ip_white_rules = C:read_file('ip_white')
+local ip_black_rules = C:read_file('ip_black')
+local url_white_rules = C:read_file('url_white')
+local url_black_rules = C:read_file('url_black')
+local scan_black_rules = C:read_file('scan_black')
+
 function waf_args()
     if not config['get']['open'] or not C:is_site_config('get') then return false end
     if C:is_ngx_match(args_rules, params['uri_request_args'],'args') then
@@ -52,9 +60,6 @@ function waf_args()
 end
 
 
-
-
-local ip_white_rules = C:read_file('ip_white')
 function waf_ip_white()
     for _,rule in ipairs(ip_white_rules)
     do
@@ -65,7 +70,6 @@ function waf_ip_white()
     return false
 end
 
-local ip_black_rules = C:read_file('ip_black')
 function waf_ip_black()
     for _,rule in ipairs(ip_black_rules)
     do
@@ -77,8 +81,6 @@ function waf_ip_black()
     return false
 end
 
-
-local url_white_rules = C:read_file('url_white')
 function waf_url_white()
     if C:is_ngx_match(url_white_rules,params['request_uri'],false) then
         return true
@@ -92,7 +94,6 @@ function waf_url_white()
 end
 
 
-local url_black_rules = C:read_file('url_black')
 function waf_url_black()
     if C:is_ngx_match(url_black_rules,params['request_uri'],false) then
         ngx.exit(config['get']['status'])
@@ -113,8 +114,6 @@ function waf_drop()
 end
 
 
-
-local user_agent_html = C:read_file_body(config["reqfile_path"] .. '/' .. config["user-agent"]["reqfile"])
 function waf_user_agent()
     if not config['user-agent']['open'] or not C:is_site_config('user-agent') then return false end   
     if C:is_ngx_match(user_agent_rules,params['request_header']['user-agent'],'user_agent') then
@@ -195,22 +194,21 @@ function waf_url()
 end
 
 
-local scan_black_rules = C:read_file('scan_black')
 function waf_scan_black()
     if not config['scan']['open'] or not C:is_site_config('scan') then return false end
-    if C:is_ngx_match(scan_black_rules['cookie'],request_header['cookie'],false) then
+    if C:is_ngx_match(scan_black_rules['cookie'],params["request_header"]["cookie"],false) then
         C:write_log('scan','regular')
         ngx.exit(config['scan']['status'])
         return true
     end
-    if C:is_ngx_match(scan_black_rules['args'],request_uri,false) then
+    if C:is_ngx_match(scan_black_rules['args'],params["request_uri"],false) then
         C:write_log('scan','regular')
         ngx.exit(config['scan']['status'])
         return true
     end
-    for key,value in pairs(request_header)
+    for key,value in pairs(params["request_header"])
     do
-        if C:is_ngx_match(scan_black_rules['header'],key,false) then
+        if C:is_ngx_match(scan_black_rules['header'], key, false) then
             C:write_log('scan','regular')
             ngx.exit(config['scan']['status'])
             return true
@@ -219,35 +217,21 @@ function waf_scan_black()
     return false
 end
 
-function get_boundary()
-    local header = request_header["content-type"]
-    if not header then return nil end
-    if type(header) == "table" then
-        header = header[1]
-    end
-
-    local m = string.match(header, ";%s*boundary=\"([^\"]+)\"")
-    if m then
-        return m
-    end
-    return string.match(header, ";%s*boundary=([^\",;]+)")
-end
-
 function waf_post_referer()
     if method ~= "POST" then return false end
-    if C:is_ngx_match(referer_local, request_header['Referer'],'post') then
+    if C:is_ngx_match(referer_local, params['request_header']['Referer'],'post') then
         C:write_log('post_referer','regular')
-        rC:eturn_html(config['post']['status'],post_html)
+        C:return_html(config['post']['status'],post_html)
         return true
     end
     return false
 end
 
 function waf_post()
-    if not config['post']['open'] or not is_site_config('post') then return false end   
+    if not config['post']['open'] or not C:is_site_config('post') then return false end   
     if method ~= "POST" then return false end
     if waf_post_referer() then return true end
-    content_length = tonumber(request_header['content-length'])
+    content_length = tonumber(params["request_header"]['content-length'])
     max_len = 640 * 1020000
     if content_length > max_len then return false end
     if get_boundary() then return false end
@@ -308,10 +292,10 @@ end
 
 function X_Forwarded()
     if method ~= "GET" then return false end
-    if not config['get']['open'] or not is_site_config('get') then return false end 
-    if is_ngx_match(args_rules,request_header['X-forwarded-For'],'args') then
-        write_log('args','regular')
-        return_html(config['get']['status'],get_html)
+    if not config['get']['open'] or not self:is_site_config('get') then return false end 
+    if C:is_ngx_match(args_rules,param["request_header"]['X-forwarded-For'],'args') then
+        C:write_log('args','regular')
+        C:return_html(config['get']['status'],get_html)
         return true
     end
     return false
@@ -319,11 +303,11 @@ end
 
 
 function post_X_Forwarded()
-    if not config['post']['open'] or not is_site_config('post') then return false end   
+    if not config['post']['open'] or not self:is_site_config('post') then return false end   
     if method ~= "POST" then return false end
-    if is_ngx_match(post_rules,request_header['X-forwarded-For'],'post') then
-        write_log('post','regular')
-        return_html(config['post']['status'],post_html)
+    if C:is_ngx_match(post_rules,param["request_header"]['X-forwarded-For'],'post') then
+        C:write_log('post','regular')
+        C:return_html(config['post']['status'],post_html)
         return true
     end
     return false
@@ -449,18 +433,22 @@ function waf()
     waf_args()
     waf_scan_black()
 
-    -- waf_post()
-    -- post_data_chekc()
-    -- if site_config[server_name] then
-    --     X_Forwarded()
-    --     post_X_Forwarded()
-    --     php_path()
-    --     url_path()
-    --     url_ext()
-    --     url_rule_ex()
-    --     url_tell()
-    --     post_data()
-    -- end
+    waf_post()
+    post_data_chekc()
+
+    local server_name = params["server_name"]
+    ngx.say(server_name)
+    if site_config[server_name] then
+        ngx.say(server_name)
+        X_Forwarded()
+        post_X_Forwarded()
+        php_path()
+        url_path()
+        url_ext()
+        url_rule_ex()
+        url_tell()
+        post_data()
+    end
 end
 
 waf()
