@@ -6,57 +6,56 @@ local json = require "cjson"
 local ngx_match = ngx.re.find
 
 local _C = require "common"
-local C = _C.new(cpath, rpath, logdir)
-
-
-function write_drop_ip(is_drop,drop_time)
-    local filename = cpath .. 'drop_ip.log'
-    local fp = io.open(filename,'ab')
-    if fp == nil then return false end
-    local logtmp = {os.time(),ip,server_name,request_uri,drop_time,is_drop}
-    local logstr = json.encode(logtmp) .. "\n"
-    fp:write(logstr)
-    fp:flush()
-    fp:close()
-    return true
-end
-
-
-
+local C = _C:new(cpath, rpath, logdir)
 
 local config = C:read_file_body_decode(cpath .. 'config.json')
 local site_config = C:read_file_body_decode(cpath .. 'site.json')
+C:setConfData(config, site_config)
 
-C.setConfData(config, site_config)
 
-
+local get_html = C:read_file_body(config["reqfile_path"] .. '/' .. config["get"]["reqfile"])
 local args_rules = C:read_file_table('args')
 
-local retry = config['retry']
-local retry_time = config['retry_time']
-local retry_cycle = config['retry_cycle']
-local ip = C:get_client_ip()
-local server_name = string.gsub(C:get_server_name(),'_','.')
+local ip_white_rules = C:read_file('ip_white')
 
 
+function initParams()
+    local data = {}
+    data['ip'] = C:get_client_ip()
+    data['request_header'] = ngx.req.get_headers()
+    data['uri'] = ngx.unescape_uri(ngx.var.uri)
+    data['server_name'] = string.gsub(C:get_server_name(),'_','.')
+    data['uri_request_args'] = ngx.req.get_uri_args()
+    return data
+end
+
+local params = initParams()
+C:setParams(params)
+
+-- function min_route()
+--     if ngx.var.remote_addr ~= '127.0.0.1' then return false end
+--     if uri == '/get_waf_drop_ip' then
+--         return_message(200,get_waf_drop_ip())
+--     elseif uri == '/remove_waf_drop_ip' then
+--         return_message(200,remove_waf_drop_ip())
+--     elseif uri == '/clean_waf_drop_ip' then
+--         return_message(200,clean_waf_drop_ip())
+--     end
+-- end
 
 function waf_args()
-    uri_request_args = ngx.req.get_uri_args()
     if not config['get']['open'] or not C:is_site_config('get') then return false end
-    if C:is_ngx_match(args_rules,uri_request_args,'args') then
-        ngx.say('okkkkkooo')
-        C:write_log(ip,'args','regular')
-        C:return_html(config['get']['status'],get_html)
+    if C:is_ngx_match(args_rules, params['uri_request_args'],'args') then
+        C:write_log('args','regular')
+        C:return_html(config['get']['status'], get_html)
         return true
     end
     return false
 end
 
+ngx.header.content_type = "text/html"
 function waf()
-    ngx.header.content_type = "text/plain"
     waf_args()
-    C:return_html(200, '11')
-    -- return_message(200, config)
 end
 
 waf()
