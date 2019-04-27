@@ -121,6 +121,54 @@ function _M.read_file_table( self, name )
     return self:select_rule(self:read_file('args'))
 end
 
+
+---------------------------------------------------
+
+function _M.get_server_name(self)
+    local c_name = ngx.var.server_name
+    local my_name = ngx.shared.limit:get(c_name)
+    if my_name then return my_name end
+    local tmp = self:read_file_body(self.cpath .. 'domains.json')
+    if not tmp then return c_name end
+    local domains = json.decode(tmp)
+    for _,v in ipairs(domains)
+    do
+        for _,d_name in ipairs(v['domains'])
+        do
+            if c_name == d_name then
+                ngx.shared.limit:set(c_name,v['name'],3600)
+                return v['name']
+            end
+        end
+    end
+    return c_name
+end
+
+
+function _M.get_client_ip(self)
+    local client_ip = "unknown"
+    if self.site_config[server_name] then
+        if self.site_config[server_name]['cdn'] then
+            for _,v in ipairs(self.site_config[server_name]['cdn_header'])
+            do
+                if request_header[v] ~= nil and request_header[v] ~= "" then
+                    local header_tmp = request_header[v]
+                    if type(header_tmp) == "table" then header_tmp = header_tmp[1] end
+                    client_ip = split(header_tmp,',')[1]
+                    break;
+                end
+            end 
+        end
+    end
+    if string.match(client_ip,"%d+%.%d+%.%d+%.%d+") == nil or not self:is_ipaddr(client_ip) then
+        client_ip = ngx.var.remote_addr
+        if client_ip == nil then
+            client_ip = "unknown"
+        end
+    end
+    return client_ip
+end
+
 function _M.t(self)
     ngx.say(',,,')
 end
