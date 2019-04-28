@@ -86,6 +86,13 @@ def contentReplace(content):
 
 
 def initDreplace():
+
+    config = getPluginDir() + '/waf/config.json'
+    content = public.readFile(config)
+    content = json.loads(content)
+    content['reqfile_path'] = public.getServerDir() + "/openresty/nginx/conf/waf/html"
+    public.writeFile(config, public.getJson(content))
+
     path = public.getServerDir() + "/openresty/nginx/conf"
     if not os.path.exists(path + '/waf'):
         sdir = getPluginDir() + '/waf'
