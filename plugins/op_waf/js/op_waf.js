@@ -456,31 +456,31 @@ function wafGloabl(){
                             <input class="btswitch btswitch-ios" id="closeget" type="checkbox" '+ (rdata.get.open ? 'checked' : '') + '>\
                             <label class="btswitch-btn" for="closeget" onclick="setObjOpen(\'get\')"></label>\
                         </div></td>\
-                        <td class="text-right"><a class="btlink" onclick="setObjConf(\'url\')">规则</a> | <a class="btlink" href="javascript:;" onclick="onlineEditFile(0,\'/www/server/btwaf/html/get.html\')">响应内容</a></td>\
+                        <td class="text-right"><a class="btlink" onclick="setObjConf(\'url\')">规则</a> | <a class="btlink" href="javascript:;" onclick="onlineEditFile(0,\''+rdata['reqfile_path']+'/get.html\')">响应内容</a></td>\
                     </tr>\
                     <tr>\
                         <td>GET-参数过滤</td><td>'+ rdata.get.ps + '</td><td><a class="btlink" onclick="setRequestCode(\'get\',' + rdata.get.status + ')">' + rdata.get.status + '</a></td><td><div class="ssh-item">\
                             <input class="btswitch btswitch-ios" id="closeget" type="checkbox" '+ (rdata.get.open ? 'checked' : '') + '>\
                             <label class="btswitch-btn" for="closeget" onclick="setObjOpen(\'get\')"></label>\
-                        </div></td><td class="text-right"><a class="btlink" onclick="set_obj_conf(\'args\')">规则</a> | <a class="btlink" href="javascript:;" onclick="onlineEditFile(0,\'/www/server/btwaf/html/get.html\')">响应内容</a></td>\
+                        </div></td><td class="text-right"><a class="btlink" onclick="set_obj_conf(\'args\')">规则</a> | <a class="btlink" href="javascript:;" onclick="onlineEditFile(0,\''+rdata['reqfile_path']+'/get.html\')">响应内容</a></td>\
                     </tr>\
                     <tr>\
                         <td>POST过滤</td><td>'+ rdata.post.ps + '</td><td><a class="btlink" onclick="setRequestCode(\'post\',' + rdata.post.status + ')">' + rdata.post.status + '</a></td><td><div class="ssh-item">\
                             <input class="btswitch btswitch-ios" id="closepost" type="checkbox" '+ (rdata.post.open ? 'checked' : '') + '>\
                             <label class="btswitch-btn" for="closepost" onclick="setObjOpen(\'post\')"></label>\
-                        </div></td><td class="text-right"><a class="btlink" onclick="set_obj_conf(\'post\')">规则</a> | <a class="btlink" href="javascript:;" onclick="onlineEditFile(0,\'/www/server/btwaf/html/post.html\')">响应内容</a></td>\
+                        </div></td><td class="text-right"><a class="btlink" onclick="set_obj_conf(\'post\')">规则</a> | <a class="btlink" href="javascript:;" onclick="onlineEditFile(0,\''+rdata['reqfile_path']+'/post.html\')">响应内容</a></td>\
                     </tr>\
                     <tr>\
                         <td>User-Agent过滤</td><td>'+ rdata['user-agent'].ps + '</td><td><a class="btlink" onclick="setRequestCode(\'user-agent\',' + rdata['user-agent'].status + ')">' + rdata['user-agent'].status + '</a></td><td><div class="ssh-item">\
                             <input class="btswitch btswitch-ios" id="closeua" type="checkbox" '+ (rdata['user-agent'].open ? 'checked' : '') + '>\
                             <label class="btswitch-btn" for="closeua" onclick="setObjOpen(\'user-agent\')"></label>\
-                        </div></td><td class="text-right"><a class="btlink" onclick="set_obj_conf(\'user_agent\')">规则</a> | <a class="btlink" href="javascript:;" onclick="OnlineEditFile(0,\'/www/server/btwaf/html/user_agent.html\')">响应内容</a></td>\
+                        </div></td><td class="text-right"><a class="btlink" onclick="set_obj_conf(\'user_agent\')">规则</a> | <a class="btlink" href="javascript:;" onclick="onlineEditFile(0,\''+rdata['reqfile_path']+'/user_agent.html\')">响应内容</a></td>\
                     </tr>\
                     <tr>\
                         <td>Cookie过滤</td><td>'+ rdata.cookie.ps + '</td><td><a class="btlink" onclick="setRequestCode(\'cookie\',' + rdata.cookie.status + ')">' + rdata.cookie.status + '</a></td><td><div class="ssh-item">\
                             <input class="btswitch btswitch-ios" id="closecookie" type="checkbox" '+ (rdata.cookie.open ? 'checked' : '') + '>\
                             <label class="btswitch-btn" for="closecookie" onclick="setObjOpen(\'cookie\')"></label>\
-                        </div></td><td class="text-right"><a class="btlink" onclick="set_obj_conf(\'cookie\')">规则</a> | <a class="btlink" href="javascript:;" onclick="OnlineEditFile(0,\'/www/server/btwaf/html/cookie.html\')">响应内容</a></td>\
+                        </div></td><td class="text-right"><a class="btlink" onclick="set_obj_conf(\'cookie\')">规则</a> | <a class="btlink" href="javascript:;" onclick="onlineEditFile(0,\''+rdata['reqfile_path']+'/cookie.html\')">响应内容</a></td>\
                     </tr>\
                     <tr>\
                         <td>常见扫描器</td><td>'+ rdata.scan.ps + '</td><td><a class="btlink" onclick="setRequestCode(\'scan\',' + rdata.scan.status + ')">' + rdata.scan.status + '</a></td><td><div class="ssh-item">\
@@ -511,7 +511,7 @@ function wafGloabl(){
                     <tr>\
                         <td>其它</td><td>'+ rdata.other.ps + '</td><td>--</td>\
                         <td style="text-align: center;">--</td>\
-                        <td class="text-right"><a class="btlink" href="javascript:;" onclick="onlineEditFile(0,\'/www/server/btwaf/html/other.html\')">响应内容</a></td>\
+                        <td class="text-right"><a class="btlink" href="javascript:;" onclick="onlineEditFile(0,\''+rdata['reqfile_path']+'/other.html\')">响应内容</a></td>\
                     </tr>\
                 </tbody>\
             </table>\
