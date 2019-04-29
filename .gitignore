@@ -122,3 +122,4 @@ ssl/input.pl
 data/datadir.pl
 data/502Task.pl
 plugins/qbittorrent/
+data/default.pl
