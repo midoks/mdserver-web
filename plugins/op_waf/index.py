@@ -211,6 +211,23 @@ def setRetry():
 def setSiteRetry():
     return public.returnJson(True, '设置成功!', [])
 
+def saveScanRule():
+
+    args = getArgs()
+    data = checkArgs(args, ['header', 'cookie','args'])
+    if not data[0]:
+        return data[1]
+
+    conf = getRuleJsonPath('scan_black')
+    content = public.readFile(conf)
+    cobj = json.loads(content)
+
+    cobj['retry'] = args
+
+    cjson = public.getJson(cobj)
+    public.writeFile(conf, cjson)
+
+    return public.returnJson(True, '设置成功!', [])
 
 def setObjOpen():
     args = getArgs()
@@ -271,6 +288,8 @@ if __name__ == "__main__":
         print setRetry()
     elif func == 'set_site_retry':
         print setSiteRetry()
+    elif func == 'save_scan_rule':
+        print saveScanRule()
     elif func == 'waf_srceen':
         print getWafSrceen()
     elif func == 'waf_conf':
