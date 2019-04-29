@@ -192,7 +192,24 @@ def setObjStatus():
     return public.returnJson(True, '设置成功!')
 
 def setRetry():
-    pass
+    args = getArgs()
+    data = checkArgs(args, ['retry', 'retry_time','retry_cycle','is_open_global'])
+    if not data[0]:
+        return data[1]
+
+    conf = getJsonPath('config')
+    content = public.readFile(conf)
+    cobj = json.loads(content)
+
+    cobj['retry'] = args
+
+    cjson = public.getJson(cobj)
+    public.writeFile(conf, cjson)
+
+    return public.returnJson(True, '设置成功!', [])
+
+def setSiteRetry():
+    return public.returnJson(True, '设置成功!', [])
 
 
 def setObjOpen():
@@ -252,6 +269,8 @@ if __name__ == "__main__":
         print setObjOpen()
     elif func == 'set_retry':
         print setRetry()
+    elif func == 'set_site_retry':
+        print setSiteRetry()
     elif func == 'waf_srceen':
         print getWafSrceen()
     elif func == 'waf_conf':
