@@ -382,8 +382,6 @@ function setObjConf(ruleName, type) {
         });
         tableFixed("jc-file-table");
     }
-    var loadT = layer.msg('正在获取配置规则，请稍候..', { icon: 16, time: 0 });
-
 
     getRuleByName(ruleName, function(data){
         var tmp = $.parseJSON(data.data);
@@ -405,6 +403,129 @@ function setObjConf(ruleName, type) {
                 </tr>'
         }
         $("#set_obj_conf_con").html(tbody);
+    });
+}
+
+
+//常用扫描器
+function scanRule() {
+
+    getRuleByName('scan_black', function(data){
+        var tmp = $.parseJSON(data.data);
+        var rdata = $.parseJSON(tmp.data);
+
+        create_l = layer.open({
+            type: 1,
+            title: "常用扫描器过滤规则",
+            area: '650px',
+            closeBtn: 2,
+            shadeClose: false,
+            content: '<form class="bt-form pd20 pb70">\
+                    <div class="line">\
+                        <span class="tname">Header</span>\
+                        <div class="info-r"><textarea style="margin: 0px;width:475px;height: 75px;line-height:20px" class="bt-input-text" name="scan_header" >'+ rdata.header + '</textarea></div>\
+                    </div>\
+                    <div class="line">\
+                        <span class="tname">Cookie</span>\
+                        <div class="info-r"><textarea style="margin: 0px;width:475px;height: 75px;line-height:20px" class="bt-input-text" name="scan_cookie" >'+ rdata.cookie + '</textarea></div>\
+                    </div>\
+                    <div class="line">\
+                        <span class="tname">Args</span>\
+                        <div class="info-r"><textarea style="margin: 0px;width:475px;height: 75px;line-height:20px" class="bt-input-text" name="scan_args" >'+ rdata.args + '</textarea></div>\
+                    </div>\
+                    <ul class="help-info-text c7 ptb10">\
+                        <li>会同时过滤key和value,请谨慎设置</li>\
+                        <li>请使用正则表达式,提交前应先备份原有表达式</li>\
+                    </ul>\
+                    <div class="bt-form-submit-btn">\
+                        <button type="button" class="btn btn-success btn-sm btn-title" onclick="saveScanRule()">确定</button>\
+                    </div>\
+                </form>'
+        });
+    });
+}
+
+//保存扫描器规则
+function saveScanRule() {
+    pdata = {
+        header: $("textarea[name='scan_header']").val(),
+        cookie: $("textarea[name='scan_cookie']").val(),
+        args: $("textarea[name='scan_args']").val()
+    }
+    owPost('save_scan_rule', pdata,function(data){
+        var rdata = $.parseJSON(data.data);
+        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+        layer.close(create_l);
+        wafGloablRefresh(1000);
+    });
+}
+
+//IP白名单
+function ipWhite(type) {
+    if (type == undefined) {
+        create_l = layer.open({
+            type: 1,
+            title: "管理IP白名单",
+            area: ['500px', '500px'],
+            closeBtn: 2,
+            shadeClose: false,
+            content: '<div class="pd15 ipv4_list">\
+                        <div style="border-bottom:#ccc 1px solid;margin-bottom:10px;padding-bottom:10px">\
+                            <input class="bt-input-text" name="start_ip" type="text" value="" style="width:180px;margin-right:15px;margin-left:5px" placeholder="起始IP地址">\
+                            <input class="bt-input-text mr5" name="end_ip" type="text" style="width:180px;margin-left:5px;margin-right:20px" placeholder="结束IP地址">\
+                            <button class="btn btn-success btn-sm va0 pull-right" onclick="add_ip_white();">添加</button>\</div>\
+                        <div class="divtable">\
+                        <div id="ipWhite" style="max-height:300px;overflow:auto;border:#ddd 1px solid">\
+                            <table class="table table-hover" style="border:none">\
+                                <thead>\
+                                    <tr>\
+                                        <th>超始IP</th>\
+                                        <th>结束IP</th>\
+                                        <th style="text-align: right;">操作</th>\
+                                    </tr>\
+                                </thead>\
+                                <tbody id="ip_white_con" class="gztr"></tbody>\
+                            </table>\
+                        </div>\
+                    </div>\
+                    <div style="width:100%" class="mt5">\
+                        <button class="btn btn-success btn-sm va0 mr5 mt10" onclick="file_input(\'ip_white\')" >导入</button>\
+                        <button class="btn btn-success btn-sm va0 mt10" onclick="output_data(\'ip_white\')">导出</button>\
+                    </div>\
+                    <ul class="help-info-text c7 ptb10">\
+                        <li>所有规则对白名单中的IP段无效,包括IP黑名单和URL黑名单,IP白名单具备最高优先权</li>\
+                    </ul>\
+                </div>\
+                <div class="pd15 ipv6_list">\
+                </div>',
+            success:function(index,layero){
+                // $('.tab_list .tab_block').click(function(){
+                //     $(this).addClass('active').siblings().removeClass('active');
+                //     console.log($(this).index());
+                //     if($(this).index() === 0){
+                //         $('.ipv4_list').show().next().hide();
+                //     }else{
+                //         $('.ipv4_list').hide().next().show();
+                //     }
+                // });
+                // <div class="tab_list"><div class="tab_block active">IPv4白名单</div><div class="tab_block">IPv6白名单</div></div>\
+            }
+        });
+        tableFixed("ipWhite");
+    }
+
+    getRuleByName('ip_white', function(data){
+        var tmp = $.parseJSON(data.data);
+        var rdata = $.parseJSON(tmp.data);
+        var tbody = ''
+        for (var i = 0; i < rdata.length; i++) {
+            tbody += '<tr>\
+                    <td>'+ rdata[i][0].join('.') + '</td>\
+                    <td>'+ rdata[i][1].join('.') + '</td>\
+                    <td class="text-right"><a class="btlink" onclick="remove_ip_white('+ i + ')">删除</a></td>\
+                </tr>'
+        }
+        $("#ip_white_con").html(tbody);
     });
 }
 
@@ -516,12 +637,12 @@ function wafGloabl(){
                         <td>常见扫描器</td><td>'+ rdata.scan.ps + '</td><td><a class="btlink" onclick="setRequestCode(\'scan\',' + rdata.scan.status + ')">' + rdata.scan.status + '</a></td><td><div class="ssh-item">\
                             <input class="btswitch btswitch-ios" id="closescan" type="checkbox" '+ (rdata.scan.open ? 'checked' : '') + '>\
                             <label class="btswitch-btn" for="closescan" onclick="setObjOpen(\'scan\')"></label>\
-                        </div></td><td class="text-right"><a class="btlink" onclick="scan_rule()">设置</a></td>\
+                        </div></td><td class="text-right"><a class="btlink" onclick="scanRule()">设置</a></td>\
                     </tr>\
                     <tr>\
                         <td>IP白名单</td><td>所有规则对IP白名单无效</td><td style="text-align: center;">--</td>\
                         <td style="text-align: center;">--</td>\
-                        <td class="text-right"><a class="btlink" onclick="ip_white()">设置</a></td>\
+                        <td class="text-right"><a class="btlink" onclick="ipWhite()">设置</a></td>\
                     </tr>\
                     <tr>\
                         <td>IP黑名单</td><td>禁止访问的IP</td><td><a class="btlink" onclick="setRequestCode(\'cc\','+ rdata.cc.status + ')">' + rdata.cc.status + '</a></td>\
