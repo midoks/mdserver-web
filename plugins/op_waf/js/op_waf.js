@@ -529,6 +529,183 @@ function ipWhite(type) {
     });
 }
 
+
+//IP黑名单
+function ipBlack(type) {
+    if (type == undefined) {
+        create_l = layer.open({
+            type: 1,
+            title: "管理IP黑名单",
+            area: ['500px', '500px'],
+            closeBtn: 2,
+            shadeClose: false,
+            content: '<div class="tab_list"><div class="tab_block active">IPv4黑名单</div><div class="tab_block">IPv6黑名单</div></div>\
+                <div class="pd15 ipv4_block">\
+                    <div style="border-bottom:#ccc 1px solid;margin-bottom:10px;padding-bottom:10px">\
+                        <input class="bt-input-text" name="start_ip" type="text" value="" style="width:150px;margin-right:15px;margin-left:5px" placeholder="起始IP地址">\
+                        <input class="bt-input-text mr5" name="end_ip" type="text" style="width:150px;margin-left:5px;margin-right:20px" placeholder="结束IP地址">\
+                        <button class="btn btn-success btn-sm va0 pull-right" onclick="add_ip_black();">添加</button>\</div>\
+                    <div class="divtable">\
+                    <div id="ipBlack" style="max-height:300px;overflow:auto;border:#ddd 1px solid">\
+                    <table class="table table-hover" style="border:none">\
+                        <thead>\
+                            <tr>\
+                                <th>超始IP</th>\
+                                <th>结束IP</th>\
+                                <th style="text-align: right;">操作</th>\
+                            </tr>\
+                        </thead>\
+                        <tbody id="ip_black_con" class="gztr"></tbody>\
+                    </table>\
+                    </div>\
+                    <div style="width:100%" class="mt10">\
+                        <button class="btn btn-success btn-sm va0 mr5 mt10" onclick="file_input(\'ip_black\')" >导入</button>\
+                        <button class="btn btn-success btn-sm va0 mt10" onclick="output_data(\'ip_black\')">导出</button>\
+                    </div>\
+                </div>\
+                <ul class="help-info-text c7 ptb10">\
+                    <li>黑名单中的IP段将被禁止访问,IP白名单中已存在的除外</li>\
+                </ul>\
+            </div>\
+            <div class="pd15 ipv6_block">\
+                <div style="border-bottom:#ccc 1px solid;margin-bottom:10px;padding-bottom:10px">\
+                    <input class="bt-input-text" name="ipv6_address" type="text" style="width:380px;margin-right:15px;margin-left:5px" placeholder="ipv6地址">\
+                    <button class="btn btn-success btn-sm va0 btn_add_ipv6" style="margin-left:15px;">添加</button>\
+                </div>\
+                <div class="divtable">\
+                    <div id="ipv6_black" style="max-height:300px;overflow:auto;border:#ddd 1px solid">\
+                        <table class="table table-hover" style="border:none">\
+                            <thead><tr><th>IPv6地址</th><th style="text-align: right;">操作</th></tr></thead>\
+                            <tbody id="ipv6_black_con" class="gztr"></tbody>\
+                        </table>\
+                    </div>\
+                </div>\
+                <ul class="help-info-text c7 ptb10">\
+                    <li>黑名单中的IP段将被禁止访问,IP白名单中已存在的除外</li>\
+                </ul>\
+            </div>',
+            success:function(index,layero){
+                $('.tab_list .tab_block').click(function(){
+                    $(this).addClass('active').siblings().removeClass('active');
+                    if($(this).index() === 0){
+                        $('.ipv4_block').show().next().hide();
+                        // var loadT = layer.msg('正在获取防火墙配置..', { icon: 16, time: 0 });
+                        // get_ipv4_address(function(rdata){
+                        //     layer.close(loadT);
+                        //     var tbody = ''
+                        //     for (var i = 0; i < rdata.length; i++) {
+                        //         tbody += '<tr>\
+                        //                 <td>'+ rdata[i][0].join('.') + '</td>\
+                        //                 <td>'+ rdata[i][1].join('.') + '</td>\
+                        //                 <td class="text-right"><a class="btlink" onclick="remove_ip_black('+ i + ')">删除</a></td>\
+                        //             </tr>'
+                        //     }
+                        //     $("#ip_black_con").html(tbody)
+                        // });
+
+
+                        getRuleByName('ip_black', function(data){
+                            var tmp = $.parseJSON(data.data);
+                            var rdata = $.parseJSON(tmp.data);
+                            console.log(rdata);
+                            var tbody = ''
+                            for (var i = 0; i < rdata.length; i++) {
+                                tbody += '<tr>\
+                                        <td>'+ rdata[i][0].join('.') + '</td>\
+                                        <td>'+ rdata[i][1].join('.') + '</td>\
+                                        <td class="text-right"><a class="btlink" onclick="remove_ip_white('+ i + ')">删除</a></td>\
+                                    </tr>'
+                            }
+                            $("#ip_black_con").html(tbody);
+                        });
+                    }else{
+                        $('.ipv4_block').hide().next().show();
+                        // var loadT = layer.msg('正在获取防火墙配置..', { icon: 16, time: 0 });
+                        // get_ipv6_address(function(res){
+                        //     layer.close(loadT);
+                        //     var tbody = '',rdata = res.msg;
+                        //     for (var i = 0; i < rdata.length; i++) {
+                        //         tbody += '<tr>\
+                        //             <td>'+ rdata[i] + '</td>\
+                        //             <td class="text-right"><a class="btlink" onclick="remove_ipv6_black(\''+ rdata[i] + '\')">删除</a></td>\
+                        //         </tr>'
+                        //     }
+                        //     $("#ipv6_black_con").html(tbody)
+                        // });
+                    }
+                });
+                $('.btn_add_ipv6').click(function(){
+                    var ipv6 = $('[name="ipv6_address"]').val();
+                    var loadT = layer.msg('正在添加ipv6黑名单数据，请稍后...', { icon: 16, time: 0 });
+                    add_ipv6_req(ipv6,function(res){
+                        layer.close(loadT);
+                        layer.msg(res.msg,{icon:res.status?1:2});
+                        if(res.status){
+                            $('[name="ipv6_address"]').val('');
+                            $('.tab_list .tab_block:eq(1)').click();
+                        }
+                    });
+                });
+                $('.tab_list .tab_block:eq(0)').click();
+            }
+        });
+        tableFixed("ipBlack");
+    }
+}
+
+//URL黑名单
+function urlBlack(type) {
+    if (type == undefined) {
+        create_l = layer.open({
+            type: 1,
+            title: "管理URL黑名单",
+            area: ['500px', '400px'],
+            closeBtn: 2,
+            shadeClose: false,
+            content: '<div class="pd15">\
+                <div style="border-bottom:#ccc 1px solid;margin-bottom:10px;padding-bottom:10px">\
+                    <input class="bt-input-text" name="url_black_address" type="text" value="" style="width:400px;margin-right:15px;margin-left:5px" placeholder="URL地址,支持正则表达式">\
+                    <button class="btn btn-success btn-sm va0 pull-right" onclick="add_url_black();">添加</button>\</div>\
+                <div class="divtable">\
+                <div id="urlBlack" style="max-height:300px;overflow:auto;border:#ddd 1px solid">\
+                <table class="table table-hover" style="border:none">\
+                    <thead>\
+                        <tr>\
+                            <th>URL</th>\
+                            <th style="text-align: right;">操作</th>\
+                        </tr>\
+                    </thead>\
+                    <tbody id="url_black_con" class="gztr"></tbody>\
+                </table>\
+                </div>\
+                <div style="width:100%" class="pull-left">\
+                    <button class="btn btn-success btn-sm va0 pull-left mr5 mt10" onclick="file_input(\'url_black\')" >导入</button>\
+                    <button class="btn btn-success btn-sm va0 pull-left  mt10" onclick="output_data(\'url_black\')">导出</button>\
+                </div>\
+            </div>\
+            <ul class="help-info-text c7 ptb10">\
+                <li>禁止访问URL黑名单,URL白名单和IP白名单中存在时除外</li>\
+            </ul></div>'
+        });
+        tableFixed("urlBlack");
+    }
+
+    getRuleByName('url_black', function(data){
+        var tmp = $.parseJSON(data.data);
+        var rdata = $.parseJSON(tmp.data);
+        console.log(rdata);
+        var tbody = ''
+        for (var i = 0; i < rdata.length; i++) {
+            tbody += '<tr>\
+                    <td>'+ rdata[i] + '</td>\
+                    <td class="text-right"><a class="btlink" onclick="remove_url_white('+ i + ')">删除</a></td>\
+                </tr>'
+        }
+        $("#url_black_con").html(tbody);
+    });
+}
+
+
 function wafScreen(){
 
     owPost('waf_srceen', {}, function(data){
@@ -647,7 +824,7 @@ function wafGloabl(){
                     <tr>\
                         <td>IP黑名单</td><td>禁止访问的IP</td><td><a class="btlink" onclick="setRequestCode(\'cc\','+ rdata.cc.status + ')">' + rdata.cc.status + '</a></td>\
                         <td style="text-align: center;">--</td>\
-                        <td class="text-right"><a class="btlink" onclick="ip_black()">设置</a></td>\
+                        <td class="text-right"><a class="btlink" onclick="ipBlack()">设置</a></td>\
                     </tr>\
                     <tr>\
                         <td>URL白名单</td><td>大部分规则对URL白名单无效</td><td style="text-align: center;">--</td>\
@@ -657,7 +834,7 @@ function wafGloabl(){
                     <tr>\
                         <td>URL黑名单</td><td>禁止访问的URL地址</td><td><a class="btlink" onclick="setRequestCode(\'get\','+ rdata.get.status + ')">' + rdata.get.status + '</a></td>\
                         <td style="text-align: center;">--</td>\
-                        <td class="text-right"><a class="btlink" onclick="url_black()">设置</a></td>\
+                        <td class="text-right"><a class="btlink" onclick="urlBlack()">设置</a></td>\
                     </tr>\
                     <tr>\
                         <td>其它</td><td>'+ rdata.other.ps + '</td><td>--</td>\
