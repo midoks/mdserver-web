@@ -28,12 +28,6 @@ def getServerDir():
     return public.getServerDir() + '/' + getPluginName()
 
 
-def getInitDFile():
-    if app_debug:
-        return '/tmp/' + getPluginName()
-    return '/etc/init.d/' + getPluginName()
-
-
 def getArgs():
     args = sys.argv[2:]
     tmp = {}
@@ -63,7 +57,68 @@ def getConf():
     return path
 
 
+def initDomainInfo():
+    data = []
+    path_domains = getJsonPath('domains')
+
+    _list = public.M('sites').field('id,name,path').where(
+        'status=?', ('1',)).order('id desc').select()
+
+    for i in range(len(_list)):
+        tmp = {}
+        tmp['name'] = _list[i]['name']
+        tmp['path'] = _list[i]['path']
+
+        _list_domain = public.M('domain').field('name').where(
+            'pid=?', (_list[i]['id'],)).order('id desc').select()
+
+        tmp_j = []
+        for j in range(len(_list_domain)):
+            tmp_j.append(_list_domain[j]['name'])
+
+        tmp['domains'] = tmp_j
+        data.append(tmp)
+    cjson = public.getJson(data)
+    public.writeFile(path_domains, cjson)
+
+
+def initSiteInfo():
+    data = []
+    path_domains = getJsonPath('domains')
+    path_site = getJsonPath('site')
+
+    domain_contents = public.readFile(path_domains)
+    domain_contents = json.loads(domain_contents)
+
+    try:
+        site_contents = public.readFile(path_site)
+    except Exception as e:
+        site_contents = "{}"
+
+    site_contents = json.loads(site_contents)
+
+    for x in range(len(domain_contents)):
+        name = domain_contents[x]['name']
+
+        if name in site_contents:
+            pass
+        else:
+            tmp = {}
+            tmp['cdn'] = False
+            tmp['log'] = True
+            tmp['get'] = True
+            tmp['post'] = True
+            tmp['open'] = False
+            site_contents[name] = tmp
+
+    cjson = public.getJson(site_contents)
+    public.writeFile(path_site, cjson)
+
+
 def status():
+    initDomainInfo()
+    initSiteInfo()
+
     path = getConf()
     if not os.path.exists(path):
         return 'stop'
@@ -90,7 +145,8 @@ def initDreplace():
     config = getPluginDir() + '/waf/config.json'
     content = public.readFile(config)
     content = json.loads(content)
-    content['reqfile_path'] = public.getServerDir() + "/openresty/nginx/conf/waf/html"
+    content['reqfile_path'] = public.getServerDir(
+    ) + "/openresty/nginx/conf/waf/html"
     public.writeFile(config, public.getJson(content))
 
     path = public.getServerDir() + "/openresty/nginx/conf"
@@ -191,9 +247,11 @@ def setObjStatus():
     public.writeFile(conf, cjson)
     return public.returnJson(True, '设置成功!')
 
+
 def setRetry():
     args = getArgs()
-    data = checkArgs(args, ['retry', 'retry_time','retry_cycle','is_open_global'])
+    data = checkArgs(args, ['retry', 'retry_time',
+                            'retry_cycle', 'is_open_global'])
     if not data[0]:
         return data[1]
 
@@ -208,13 +266,15 @@ def setRetry():
 
     return public.returnJson(True, '设置成功!', [])
 
+
 def setSiteRetry():
     return public.returnJson(True, '设置成功!', [])
+
 
 def saveScanRule():
 
     args = getArgs()
-    data = checkArgs(args, ['header', 'cookie','args'])
+    data = checkArgs(args, ['header', 'cookie', 'args'])
     if not data[0]:
         return data[1]
 
@@ -228,6 +288,7 @@ def saveScanRule():
     public.writeFile(conf, cjson)
 
     return public.returnJson(True, '设置成功!', [])
+
 
 def setObjOpen():
     args = getArgs()
