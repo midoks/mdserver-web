@@ -191,6 +191,9 @@ def setObjStatus():
     public.writeFile(conf, cjson)
     return public.returnJson(True, '设置成功!')
 
+def setRetry():
+    pass
+
 
 def setObjOpen():
     args = getArgs()
@@ -247,6 +250,8 @@ if __name__ == "__main__":
         print setObjStatus()
     elif func == 'set_obj_open':
         print setObjOpen()
+    elif func == 'set_retry':
+        print setRetry()
     elif func == 'waf_srceen':
         print getWafSrceen()
     elif func == 'waf_conf':

@@ -177,7 +177,7 @@ function setCcRule(cycle, limit, endtime, siteName, increase){
 
 //设置retry规则
 function setRetry(retry_cycle, retry, retry_time, siteName) {
-    create_l = layer.open({
+    layer.open({
         type: 1,
         title: "设置恶意容忍规则",
         area: '500px',
@@ -204,14 +204,43 @@ function setRetry(retry_cycle, retry, retry_time, siteName) {
             </form>',
         success:function(){
             $('.btn_retry_all').click(function(){
-                save_retry(siteName,1);
+                saveRetry(siteName,1);
             });
             $('.btn_retry_present').click(function(){
-                save_retry(siteName,0);
+                saveRetry(siteName,0);
             });
         }
     });
 }
+
+
+//保存retry规则
+function saveRetry(siteName,type) {
+    var pdata = {
+        siteName: siteName,
+        retry: $("input[name='retry']").val(),
+        retry_time: $("input[name='retry_time']").val(),
+        retry_cycle: $("input[name='retry_cycle']").val(),
+        is_open_global:type
+    }
+
+    var act = 'set_retry';
+    if (siteName != undefined) act = 'set_site_retry';
+    var loadT = layer.msg('正在保存，请稍候..', { icon: 16, time: 0 });
+    $.post('/plugin?action=a&name=btwaf&s=' + act, pdata, function (rdata) {
+        layer.close(loadT);
+        if (rdata.status) {
+            layer.close(create_l);
+            if (siteName != 'undefined') {
+                site_waf_config(siteName, 1);
+            } else {
+                wafconfig();
+            }
+        }
+        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+    });
+}
+
 
 
 //URL白名单
