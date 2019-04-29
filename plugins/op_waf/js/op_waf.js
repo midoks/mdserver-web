@@ -18,7 +18,7 @@ function owPost(method, args, callback){
 function getRuleByName(rule_name, callback){
     owPost('get_rule', {rule_name:rule_name}, function(data){
         callback(data);
-    })
+    });
 }
 
 
@@ -177,7 +177,7 @@ function setCcRule(cycle, limit, endtime, siteName, increase){
 
 //设置retry规则
 function setRetry(retry_cycle, retry, retry_time, siteName) {
-    layer.open({
+    create_layer = layer.open({
         type: 1,
         title: "设置恶意容忍规则",
         area: '500px',
@@ -226,21 +226,13 @@ function saveRetry(siteName,type) {
 
     var act = 'set_retry';
     if (siteName != undefined) act = 'set_site_retry';
-    var loadT = layer.msg('正在保存，请稍候..', { icon: 16, time: 0 });
-    $.post('/plugin?action=a&name=btwaf&s=' + act, pdata, function (rdata) {
-        layer.close(loadT);
-        if (rdata.status) {
-            layer.close(create_l);
-            if (siteName != 'undefined') {
-                site_waf_config(siteName, 1);
-            } else {
-                wafconfig();
-            }
-        }
+    owPost(act, pdata, function(data){
+        var rdata = $.parseJSON(data.data);
         layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+        layer.close(create_layer);
+        wafGloablRefresh(1000);
     });
 }
-
 
 
 //URL白名单
@@ -388,11 +380,14 @@ function setObjConf(ruleName, type) {
                 <li>内置规则允许修改,但不可以直接删除,您可以设置规则状态来定义防火墙是否使用此规则</li>\
             </ul></div>'
         });
-        tableFixed("jc-file-table")
+        tableFixed("jc-file-table");
     }
     var loadT = layer.msg('正在获取配置规则，请稍候..', { icon: 16, time: 0 });
-    $.post('/plugin?action=a&name=btwaf&s=get_rule', { ruleName: ruleName }, function (rdata) {
-        layer.close(loadT);
+
+
+    getRuleByName(ruleName, function(data){
+        var tmp = $.parseJSON(data.data);
+        var rdata = $.parseJSON(tmp.data);
         var tbody = ''
         for (var i = 0; i < rdata.length; i++) {
             var removeRule = ''
@@ -409,7 +404,7 @@ function setObjConf(ruleName, type) {
                     </td>\
                 </tr>'
         }
-        $("#set_obj_conf_con").html(tbody)
+        $("#set_obj_conf_con").html(tbody);
     });
 }
 
@@ -447,6 +442,12 @@ function wafScreen(){
     });
 }
 
+function wafGloablRefresh(time){
+    setTimeout(function(){
+        wafGloabl();
+    }, time);
+}
+
 
 function wafGloabl(){
     owPost('waf_conf', {}, function(data){
@@ -475,7 +476,7 @@ function wafGloabl(){
                         <td>封锁连续恶意请求，请到站点配置中调整容忍阈值</td>\
                         <td><a class="btlink" onclick="setRequestCode(\'cc\','+ rdata.cc.status + ')">' + rdata.cc.status + '</a></td>\
                         <td style="text-align: center;">--</td>\
-                        <td class="text-right"><a class="btlink" onclick="setRetry('+ rdata.retry_cycle + ',' + rdata.retry + ',' + rdata.retry_time + ')">初始规则</a></td>\
+                        <td class="text-right"><a class="btlink" onclick="setRetry('+ rdata.retry.retry_cycle + ',' + rdata.retry.retry + ',' + rdata.retry.retry_time + ')">初始规则</a></td>\
                     </tr>\
                     <tr>\
                         <td>GET-URI过滤</td>\
@@ -491,25 +492,25 @@ function wafGloabl(){
                         <td>GET-参数过滤</td><td>'+ rdata.get.ps + '</td><td><a class="btlink" onclick="setRequestCode(\'get\',' + rdata.get.status + ')">' + rdata.get.status + '</a></td><td><div class="ssh-item">\
                             <input class="btswitch btswitch-ios" id="closeget" type="checkbox" '+ (rdata.get.open ? 'checked' : '') + '>\
                             <label class="btswitch-btn" for="closeget" onclick="setObjOpen(\'get\')"></label>\
-                        </div></td><td class="text-right"><a class="btlink" onclick="set_obj_conf(\'args\')">规则</a> | <a class="btlink" href="javascript:;" onclick="onlineEditFile(0,\''+rdata['reqfile_path']+'/get.html\')">响应内容</a></td>\
+                        </div></td><td class="text-right"><a class="btlink" onclick="setObjConf(\'args\')">规则</a> | <a class="btlink" href="javascript:;" onclick="onlineEditFile(0,\''+rdata['reqfile_path']+'/get.html\')">响应内容</a></td>\
                     </tr>\
                     <tr>\
                         <td>POST过滤</td><td>'+ rdata.post.ps + '</td><td><a class="btlink" onclick="setRequestCode(\'post\',' + rdata.post.status + ')">' + rdata.post.status + '</a></td><td><div class="ssh-item">\
                             <input class="btswitch btswitch-ios" id="closepost" type="checkbox" '+ (rdata.post.open ? 'checked' : '') + '>\
                             <label class="btswitch-btn" for="closepost" onclick="setObjOpen(\'post\')"></label>\
-                        </div></td><td class="text-right"><a class="btlink" onclick="set_obj_conf(\'post\')">规则</a> | <a class="btlink" href="javascript:;" onclick="onlineEditFile(0,\''+rdata['reqfile_path']+'/post.html\')">响应内容</a></td>\
+                        </div></td><td class="text-right"><a class="btlink" onclick="setObjConf(\'post\')">规则</a> | <a class="btlink" href="javascript:;" onclick="onlineEditFile(0,\''+rdata['reqfile_path']+'/post.html\')">响应内容</a></td>\
                     </tr>\
                     <tr>\
                         <td>User-Agent过滤</td><td>'+ rdata['user-agent'].ps + '</td><td><a class="btlink" onclick="setRequestCode(\'user-agent\',' + rdata['user-agent'].status + ')">' + rdata['user-agent'].status + '</a></td><td><div class="ssh-item">\
                             <input class="btswitch btswitch-ios" id="closeua" type="checkbox" '+ (rdata['user-agent'].open ? 'checked' : '') + '>\
                             <label class="btswitch-btn" for="closeua" onclick="setObjOpen(\'user-agent\')"></label>\
-                        </div></td><td class="text-right"><a class="btlink" onclick="set_obj_conf(\'user_agent\')">规则</a> | <a class="btlink" href="javascript:;" onclick="onlineEditFile(0,\''+rdata['reqfile_path']+'/user_agent.html\')">响应内容</a></td>\
+                        </div></td><td class="text-right"><a class="btlink" onclick="setObjConf(\'user_agent\')">规则</a> | <a class="btlink" href="javascript:;" onclick="onlineEditFile(0,\''+rdata['reqfile_path']+'/user_agent.html\')">响应内容</a></td>\
                     </tr>\
                     <tr>\
                         <td>Cookie过滤</td><td>'+ rdata.cookie.ps + '</td><td><a class="btlink" onclick="setRequestCode(\'cookie\',' + rdata.cookie.status + ')">' + rdata.cookie.status + '</a></td><td><div class="ssh-item">\
                             <input class="btswitch btswitch-ios" id="closecookie" type="checkbox" '+ (rdata.cookie.open ? 'checked' : '') + '>\
                             <label class="btswitch-btn" for="closecookie" onclick="setObjOpen(\'cookie\')"></label>\
-                        </div></td><td class="text-right"><a class="btlink" onclick="set_obj_conf(\'cookie\')">规则</a> | <a class="btlink" href="javascript:;" onclick="onlineEditFile(0,\''+rdata['reqfile_path']+'/cookie.html\')">响应内容</a></td>\
+                        </div></td><td class="text-right"><a class="btlink" onclick="setObjConf(\'cookie\')">规则</a> | <a class="btlink" href="javascript:;" onclick="onlineEditFile(0,\''+rdata['reqfile_path']+'/cookie.html\')">响应内容</a></td>\
                     </tr>\
                     <tr>\
                         <td>常见扫描器</td><td>'+ rdata.scan.ps + '</td><td><a class="btlink" onclick="setRequestCode(\'scan\',' + rdata.scan.status + ')">' + rdata.scan.status + '</a></td><td><div class="ssh-item">\
