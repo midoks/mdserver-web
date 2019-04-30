@@ -22,6 +22,14 @@ function tableFixed(name) {
     tableName.addEventListener('scroll', scrollHandle);
 }
 
+function escapeHTML(a){
+    a = "" + a;
+    return a.replace(/&/g, "&amp;").replace(/</g, "&lt;").
+    replace(/>/g, "&gt;").replace(/"/g, '&quot;').
+    replace(/'/g,"‘").replace(/\(/g,"&#40;").replace(/\&#60;/g,"&lt;").
+    replace(/\&#62;/g,"&gt;").replace(/`/g,"&#96;").replace(/=/g,"＝");
+}
+
 function scrollHandle(e) {
     var scrollTop = this.scrollTop;
     //this.querySelector('thead').style.transform = 'translateY(' + scrollTop + 'px)';

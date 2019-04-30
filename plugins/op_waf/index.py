@@ -118,6 +118,7 @@ def initSiteInfo():
     cjson = public.getJson(site_contents_new)
     public.writeFile(path_site, cjson)
 
+
 def initTotalInfo():
     data = []
     path_domains = getJsonPath('domains')
@@ -135,7 +136,7 @@ def initTotalInfo():
     total_contents_new = {}
     for x in range(len(domain_contents)):
         name = domain_contents[x]['name']
-        if 'sites' in  total_contents and name in total_contents['sites']:
+        if 'sites' in total_contents and name in total_contents['sites']:
             pass
         else:
             tmp = {}
@@ -339,18 +340,18 @@ def getSiteConfig():
     total_content = json.loads(total_content)
 
     # print total_content
-    
+
     for x in content:
         tmp = []
         tmp_v = {}
         if 'sites' in total_content and x in total_content['sites']:
-            tmp_v = total_content['sites'][x];
-            
-        key_list = ['get','post','user-agent','cookie','cdn','cc']
+            tmp_v = total_content['sites'][x]
+
+        key_list = ['get', 'post', 'user-agent', 'cookie', 'cdn', 'cc']
         for kx in range(len(key_list)):
             ktmp = {}
 
-            if kx in tmp_v :
+            if kx in tmp_v:
                 ktmp['value'] = tmp_v[key_list[kx]]
             else:
                 ktmp['value'] = ''
@@ -360,9 +361,53 @@ def getSiteConfig():
         # print tmp
         content[x]['total'] = tmp
 
-
     content = public.getJson(content)
     return public.returnJson(True, 'ok!', content)
+
+
+def getLogsList():
+    args = getArgs()
+    data = checkArgs(args, ['siteName'])
+    if not data[0]:
+        return data[1]
+
+    data = []
+    path = public.getLogsDir() + '/waf'
+    files = os.listdir(path)
+    for f in files:
+        if f == '.DS_Store':
+            continue
+        f = f.split('_')
+        if f[0] == args['siteName']:
+            fl = f[1].split('.')
+            data.append(fl[0])
+
+    return public.returnJson(True, 'ok!', data)
+
+
+def getSafeLogs():
+    args = getArgs()
+    data = checkArgs(args, ['siteName', 'toDate', 'p'])
+    if not data[0]:
+        return data[1]
+
+    path = public.getLogsDir() + '/waf'
+    file = path + '/' + args['siteName'] + '_' + args['toDate'] + '.log'
+    if not os.path.exists(file):
+        return public.returnJson(False, "文件不存在!")
+
+    retData = []
+    file = open(file)
+    while 1:
+        lines = file.readlines(100000)
+        if not lines:
+            break
+        for line in lines:
+
+            retData.append(json.loads(line))
+
+    return public.returnJson(True, '设置成功!', retData)
+
 
 def setObjOpen():
     args = getArgs()
@@ -427,6 +472,10 @@ if __name__ == "__main__":
         print saveScanRule()
     elif func == 'get_site_config':
         print getSiteConfig()
+    elif func == 'get_logs_list':
+        print getLogsList()
+    elif func == 'get_safe_logs':
+        print getSafeLogs()
     elif func == 'waf_srceen':
         print getWafSrceen()
     elif func == 'waf_conf':
