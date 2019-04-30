@@ -865,6 +865,357 @@ function back_css(v) {
     }
 }
 
+//查看网站日志
+function siteWafLog(siteName) {
+    var loadT = layer.msg('正在处理，请稍候..', { icon: 16, time: 0 });
+    owPost('get_logs_list', { siteName: siteName } , function (data) {
+        var tmp = $.parseJSON(data.data);
+        var rdata = tmp.data;
+        var selectLogDay = "";
+        var day = rdata[0];
+        for (var i = 0; i < rdata.length; i++) {
+            selectLogDay += '<option value="' + rdata[i] + '">' + rdata[i] + '</option>';
+        }
+        if (rdata == "") {
+            layer.msg("暂无日志记录", { icon: 6, shade: 0.3, time: 1000 });
+            return
+        }
+        layer.open({
+            type: 1,
+            title: "日志【" + siteName + "】",
+            area: ['880px', '500px'],
+            closeBtn: 2,
+            shadeClose: false,
+            content: '<div class="lib-box pd15 lib-box-log">\
+                <div class="lib-con-title" style="height:40px"><select id="selectLogDay" class="bt-input-text" onchange="siteLogCon(\''+ siteName + '\',this.options[this.options.selectedIndex].value,1)">' + selectLogDay + '</select></div>\
+                <div class="lib-con">\
+                    <div class="divtable">\
+                        <div id="site_waf_log" style="max-height:400px;overflow:auto;border:#ddd 1px solid">\
+                        <table class="table table-hover" style="border:none;">\
+                            <thead><tr><th width="150">时间</th><th width="120">用户IP</th><th width="70">类型</th><th>URI地址</th><th class="tdhide">User-Agent</th><th width="60">状态</th><th width="100">过滤器</th><th class="tdhide">过滤规则</th><th width="100" class="text-right">操作</th></tr></thead>\
+                            <tbody id="LogDayCon"></tbody>\
+                        </table>\
+                        </div>\
+                    </div>\
+                    <div class="page pull-right" id="size_log_page" style="margin-top:10px"></div>\
+                </div>\
+                </div>'
+        });
+        siteLogCon(siteName, day, 1);
+        tableFixed("site_waf_log");
+    });
+}
+
+
+//日志内容
+function siteLogCon(siteName, day, page) {
+    if (!page) page = 1;
+    var last = page - 1;
+    var next = page + 1;
+    var pagehtml = '';
+    $("#site_waf_log").scrollTop(0);
+
+    owPost('get_safe_logs', { siteName: siteName, toDate: day, p: page }, function(data){
+        var tmp = $.parseJSON(data.data);
+        if (!tmp.status){
+            layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+            return;
+        }
+        var rdata = tmp.data;
+        var con = '';
+        for (var i = 0; i < rdata.length; i++) {
+            con += '<tr>\
+                <td class="td0">'+ escapeHTML(rdata[i][0]) + '</td>\
+                <td class="td1"><a class="btlink" href="javascript:add_log_ip_black(\''+ escapeHTML(rdata[i][1]) + '\');" title="加入黑名单">' + escapeHTML(rdata[i][1]) + '</a></td>\
+                <td class="td2">'+ escapeHTML(rdata[i][2]) + '</td>\
+                <td class="td3"><span class="td3txt">'+ escapeHTML(rdata[i][3]) + '</span></td>\
+                <td class="tdhide td4">'+ escapeHTML(rdata[i][4]) + '</td><td>已拦截</td>\
+                <td class="td5"><span class="filtertext">'+ escapeHTML(rdata[i][5]) + '</span></td>\
+                <td class="tdhide td6">'+ escapeHTML(rdata[i][6]) + '</td>\
+                <td class="text-right"><a href="javascript:;" class="btlink submit_msg" data-index="'+ i +'">误报</a> | <a href="javascript:;" class="btlink btwaf_details" data-index="'+ i +'">详细</a></td>\
+            </tr>'
+        }
+
+        $("#LogDayCon").html(con);
+        pagehtml = '<a class="Pstart" onclick="site_log_con(\'' + siteName + '\',\'' + day + '\',1)">首页</a><a class="prevPage" onclick="site_log_con(\'' + siteName + '\',\'' + day + '\',' + last + ')">上一页</a><a class="nextPage" onclick="site_log_con(\'' + siteName + '\',\'' + day + '\',' + next + ')">下一页</a><a class="Pcount">第 ' + page + ' 页</a>';
+        $("#size_log_page").html(pagehtml);
+        if (rdata.length < 1) $(".nextPage").hide();
+        if (last < 1) $(".prevPage").hide();
+
+        // 发送误报请求
+        $(".submit_msg").click(function () {
+            var _this = $(this);
+            var res = rdata[$(this).attr('data-index')];
+            layer.confirm('是否确定提交误报反馈？', { title: '误报反馈',closeBtn:2,icon:3}, function () {
+                var url_address = res[3];
+                var rule_arry = res[6].split(" &gt;&gt; ");
+                var pdata = { url_rule: url_address };
+                var loadT = layer.msg('正在添加URL白名单..', { icon: 16, time: 0 });
+                $.post('/plugin?action=a&name=btwaf&s=add_url_white', pdata, function (rdata) {
+                    layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+                    layer.close(loadT);
+                    if (rule_arry[1] != undefined){ $.get('https://www.bt.cn/Api/add_waf_logs?data=' + rule_arry[1],function(rdata){},'jsonp')}
+                });
+            });
+        })
+
+        // 详情
+        $(".btwaf_details").click(function () {
+            var res = rdata[$(this).attr('data-index')];
+            var time =  res[0]; //时间
+            var ip_address = res[1]; //IP地址
+            var req_type = res[2]; // 请求类型
+            var url_address = res[3]; // 请求类型
+            var user_agent = res[4]; // 请求类型
+            var filters = res[5]; //过滤器
+            var filter_rule = ''; //过滤规则
+            var rule_arry =  res[6].split(" &gt;&gt; ");
+            var incoming_value = '',risk_value = ''; //传入值,风险值
+            if(rule_arry.length == 0) filter_rule = rule_arry[0]
+            incoming_value = rule_arry[1] == undefined?'空':rule_arry[1];
+            risk_value = incoming_value.match(new RegExp(rule_arry[0].replace(/\//g,'\\/'),'i'));
+            risk_value = risk_value?risk_value[0]:'空';
+
+            layer.open({
+                type: 1,
+                title: time + "详情",
+                area: '600px',
+                closeBtn: 2,
+                shadeClose: false,
+                content: '<div class="pd15 lib-box">\
+                        <table class="table" style="border:#ddd 1px solid; margin-bottom:10px">\
+                        <tbody><tr><th>时间</th><td>'+ escapeHTML(time) + '</td><th>用户IP</th><td><a class="btlink" href="javascript:add_log_ip_black(\'' + escapeHTML(ip_address) + '\')" title="加入黑名单">' + escapeHTML(ip_address) + '</a></td></tr><tr><th>类型</th><td>' + escapeHTML(req_type) + '</td><th>过滤器</th><td>' + escapeHTML(filters) + '</td></tr></tbody></table>\
+                        <div><b style="margin-left:10px">URI地址</b></div>\
+                        <div class="lib-con pull-left mt10"><div class="divpre">'+ escapeHTML(url_address) + '</div></div>\
+                        <div><b style="margin-left:10px">User-Agent</b></div>\
+                        <div class="lib-con pull-left mt10"><div class="divpre">'+ escapeHTML(user_agent) + '</div></div>\
+                        <div><b style="margin-left:10px">过滤规则</b></div>\
+                        <div class="lib-con pull-left mt10"><div class="divpre">'+ escapeHTML(rule_arry[0]) + '</div></div>\
+                        <div><b style="margin-left:10px">传入值</b></div>\
+                        <div class="lib-con pull-left mt10"><div class="divpre">'+ escapeHTML(incoming_value) + '</div></div>\
+                        <div><b style="margin-left:10px">风险值</b></div>\
+                        <div class="lib-con pull-left mt10"><div class="divpre">'+ escapeHTML(risk_value) + '</div></div>\
+                    </div>'
+            })
+        })
+        $("#LogDayCon td").click(function () {
+            $(this).parents("tr").addClass("active").siblings().removeClass("active");
+        });
+
+    });
+}
+
+function html_encode(value) {
+    return $('<div></div>').html(value).text();
+}
+
+function html_decode(value) {
+    return $('<div></div>').text(value).html();
+}
+
+
+//网站设置
+function siteWafConfig(siteName, type) {
+    if (type == undefined) {
+        create_2 = layer.open({
+            type: 1,
+            title: "网站配置【" + siteName + "】",
+            area: ['700px', '500px'],
+            closeBtn: 2,
+            shadeClose: false,
+            content: '<div id="s_w_c"></div>'
+        });
+    }
+    var loadT = layer.msg('正在获取网站配置..', { icon: 16, time: 0 });
+    $.post('/plugin?action=a&name=btwaf&s=get_site_config_byname', { siteName: siteName }, function (rdata) {
+        nginx_config = rdata;
+        layer.close(loadT);
+        var con = '<div class="pd15">\
+                <div class="lib-con-title">\
+                    <span>网站防火墙开关</span>\
+                    <div class="ssh-item" style="margin-right:20px;">\
+                        <input class="btswitch btswitch-ios" id="closewaf_open" type="checkbox" '+ (rdata.open ? 'checked' : '') + '>\
+                        <label class="btswitch-btn" for="closewaf_open" onclick="set_site_obj_state(\''+ siteName + '\',\'open\')" style="width:2.4em;height:1.4em;margin-bottom: 0"></label>\
+                    </div>\
+                </div>\
+                <div class="lib-con">\
+                    <div class="divtable">\
+                        <table class="table table-hover waftable">\
+                            <thead>\
+                                <tr>\
+                                    <th>名称</th>\
+                                    <th>描述</th>\
+                                    <th width="80">状态</th>\
+                                    <th style="text-align: right;">操作</th>\
+                                </tr>\
+                            </thead>\
+                            <tbody>\
+                                <tr>\
+                                    <td>CC防御</td>\
+                                    <td><font style="color:red;">'+ rdata.cc.cycle + '</font> 秒内,请求同一URI累计超过 <font style="color:red;">' + rdata.cc.limit + '</font> 次,封锁IP <font style="color:red;">' + rdata.cc.endtime + '</font> 秒</td>\
+                                    <td>\
+                                        <div class="ssh-item" style="margin-left:0">\
+                                            <input class="btswitch btswitch-ios" id="closecc" type="checkbox" '+ (rdata.cc.open ? 'checked' : '') + '>\
+                                            <label class="btswitch-btn" for="closecc" onclick="set_site_obj_state(\''+ siteName + '\',\'cc\')"></label>\
+                                        </div>\
+                                    </td>\
+                                    <td class="text-right"><a class="btlink" onclick="set_cc_rule('+ rdata.cc.cycle + ',' + rdata.cc.limit + ',' + rdata.cc.endtime + ',\'' + siteName + '\',' + rdata.cc.increase + ')">设置</a></td>\
+                                </tr>\
+                                <tr>\
+                                    <td>恶意容忍设置</td>\
+                                    <td><font style="color:red;">'+ rdata.retry_cycle + '</font> 秒内,累计超过 <font style="color:red;">' + rdata.retry + '</font> 次恶意请求,封锁IP <font style="color:red;">' + rdata.retry_time + '</font> 秒</td>\
+                                    <td style="text-align: left;">&nbsp;&nbsp;--</td>\
+                                    <td class="text-right"><a class="btlink" onclick="set_retry('+ rdata.retry_cycle + ',' + rdata.retry + ',' + rdata.retry_time + ',\'' + siteName + '\')">设置</a></td>\
+                                </tr>\
+                                <tr>\
+                                    <td>GET-URI过滤</td>\
+                                    <td>'+ rdata.top.get.ps + '</td>\
+                                    <td>\
+                                        <div class="ssh-item" style="margin-left:0">\
+                                            <input class="btswitch btswitch-ios" id="closeget" type="checkbox" '+ (rdata.get ? 'checked' : '') + '>\
+                                            <label class="btswitch-btn" for="closeget" onclick="set_site_obj_state(\''+ siteName + '\',\'get\')"></label>\
+                                        </div>\
+                                    </td>\
+                                    <td class="text-right"><a class="btlink" onclick="set_site_obj_conf(\''+ siteName + '\',\'url\')">规则</a></td>\
+                                </tr>\
+                                <tr>\
+                                    <td>GET-参数过滤</td>\
+                                    <td>'+ rdata.top.get.ps + '</td>\
+                                    <td>\
+                                        <div class="ssh-item" style="margin-left:0">\
+                                            <input class="btswitch btswitch-ios" id="closeargs" type="checkbox" '+ (rdata.get ? 'checked' : '') + '>\
+                                            <label class="btswitch-btn" for="closeargs" onclick="set_site_obj_state(\''+ siteName + '\',\'get\')"></label>\
+                                        </div>\
+                                    </td>\
+                                    <td class="text-right"><a class="btlink" onclick="set_site_obj_conf(\''+ siteName + '\',\'args\')">规则</a></td>\
+                                </tr>\
+                                <tr>\
+                                    <td>POST过滤</td>\
+                                    <td>'+ rdata.top.post.ps + '</td>\
+                                    <td>\
+                                        <div class="ssh-item" style="margin-left:0">\
+                                            <input class="btswitch btswitch-ios" id="closepost" type="checkbox" '+ (rdata.post ? 'checked' : '') + '>\
+                                            <label class="btswitch-btn" for="closepost" onclick="set_site_obj_state(\''+ siteName + '\',\'post\')"></label>\
+                                        </div>\
+                                    </td>\
+                                    <td class="text-right"><a class="btlink" onclick="set_site_obj_conf(\''+ siteName + '\',\'post\')">规则</a></td>\
+                                </tr>\
+                                <tr>\
+                                    <td>User-Agent过滤</td>\
+                                    <td>'+ rdata.top['user-agent'].ps + '</td>\
+                                    <td>\
+                                        <div class="ssh-item" style="margin-left:0">\
+                                            <input class="btswitch btswitch-ios" id="closeua" type="checkbox" '+ (rdata['user-agent'] ? 'checked' : '') + '>\
+                                            <label class="btswitch-btn" for="closeua" onclick="set_site_obj_state(\''+ siteName + '\',\'user-agent\')"></label>\
+                                        </div>\
+                                    </td>\
+                                    <td class="text-right"><a class="btlink" onclick="set_site_obj_conf(\''+ siteName + '\',\'user_agent\')">规则</a></td>\
+                                </tr>\
+                                <tr>\
+                                    <td>Cookie过滤</td>\
+                                    <td>'+ rdata.top.cookie.ps + '</td>\
+                                    <td>\
+                                    <div class="ssh-item" style="margin-left:0">\
+                                        <input class="btswitch btswitch-ios" id="closecookie" type="checkbox" '+ (rdata.cookie ? 'checked' : '') + '>\
+                                        <label class="btswitch-btn" for="closecookie" onclick="set_site_obj_state(\''+ siteName + '\',\'cookie\')"></label>\
+                                    </div>\
+                                    </td>\
+                                    <td class="text-right"><a class="btlink" onclick="set_site_obj_conf(\''+ siteName + '\',\'cookie\')">规则</a></td>\
+                                </tr>\
+                                <tr>\
+                                    <td>禁止国外访问</td>\
+                                    <td>'+ rdata.top.drop_abroad.ps + '</td>\
+                                    <td>\
+                                        <div class="ssh-item" style="margin-left:0">\
+                                            <input class="btswitch btswitch-ios" id="closeabroad" type="checkbox" '+ (rdata.drop_abroad ? 'checked' : '') + '>\
+                                            <label class="btswitch-btn" for="closeabroad" onclick="set_site_obj_state(\''+ siteName + '\',\'drop_abroad\')"></label>\
+                                        </div>\
+                                    </td>\
+                                    <td class="text-right"><a class="btlink" onclick="cn_iplist()">设置</a></td>\
+                                </tr>\
+                                <tr>\
+                                    <td>常见扫描器</td><td>'+ rdata.top.scan.ps + '</td>\
+                                    <td>\
+                                        <div class="ssh-item" style="margin-left:0">\
+                                            <input class="btswitch btswitch-ios" id="closescan" type="checkbox" '+ (rdata.scan ? 'checked' : '') + '>\
+                                            <label class="btswitch-btn" for="closescan" onclick="set_site_obj_state(\''+ siteName + '\',\'scan\')"></label>\
+                                        </div>\
+                                    </td>\
+                                    <td class="text-right"><a class="btlink" onclick="scan_rule()">设置</a></td>\
+                                </tr>\
+                                <tr>\
+                                    <td>使用CDN</td>\
+                                    <td>该站点使用了CDN,启用后方可正确获取客户IP</td>\
+                                    <td>\
+                                        <div class="ssh-item" style="margin-left:0">\
+                                            <input class="btswitch btswitch-ios" id="closecdn" type="checkbox" '+ (rdata.cdn ? 'checked' : '') + '>\
+                                            <label class="btswitch-btn" for="closecdn" onclick="set_site_obj_state(\''+ siteName + '\',\'cdn\')"></label>\
+                                        </div>\
+                                    </td>\
+                                    <td class="text-right"><a class="btlink" onclick="cdn_header(\''+ siteName + '\')">设置</a></td>\
+                                </tr>\
+                                <tr>\
+                                    <td>禁止执行PHP的URL</td>\
+                                    <td>禁止在指定URL运行PHP脚本</td>\
+                                    <td style="text-align: left;">&nbsp;&nbsp;--</td>\
+                                    <td class="text-right"><a class="btlink" onclick="site_rule_admin(\''+ siteName + '\',\'disable_php_path\')">设置</a></td>\
+                                </tr>\
+                                <tr>\
+                                    <td>禁止访问的URL</td>\
+                                    <td>禁止访问指定的URL</td>\
+                                    <td style="text-align: left;">&nbsp;&nbsp;--</td>\
+                                    <td class="text-right"><a class="btlink" onclick="site_rule_admin(\''+ siteName + '\',\'disable_path\')">设置</a></td>\
+                                </tr>\
+                                <tr>\
+                                    <td>禁止扩展名</td>\
+                                    <td>禁止访问指定扩展名</td>\
+                                    <td style="text-align: left;">&nbsp;&nbsp;--</td>\
+                                    <td class="text-right"><a class="btlink" onclick="site_rule_admin(\''+ siteName + '\',\'disable_ext\')">设置</a></td>\
+                                </tr>\
+                                <tr>\
+                                    <td>禁止上传的文件类型</td>\
+                                    <td>禁止上传指定的文件类型</td>\
+                                    <td style="text-align: left;">&nbsp;&nbsp;--</td>\
+                                    <td class="text-right"><a class="btlink" onclick="site_rule_admin(\''+ siteName + '\',\'disable_upload_ext\')">设置</a></td>\
+                                </tr>\
+                                <tr>\
+                                    <td>受保护的URL</td>\
+                                    <td>通过自定义参数加密URL地址,参数错误将被拦截</td>\
+                                    <td style="text-align: left;">&nbsp;&nbsp;--</td>\
+                                    <td class="text-right"><a class="btlink" onclick="site_url_tell(\''+ siteName + '\')">设置</a></td>\
+                                </tr>\
+                                <tr>\
+                                    <td>URL专用过滤</td>\
+                                    <td>为特定URL地址设置过滤规则</td>\
+                                    <td style="text-align: left;">&nbsp;&nbsp;--</td>\
+                                    <td class="text-right"><a class="btlink" onclick="site_url_rule(\''+ siteName + '\')">设置</a></td>\
+                                </tr>\
+                                <tr>\
+                                    <td>敏感文字替换</td>\
+                                    <td>替换设置的敏感文字</td>\
+                                    <td>&nbsp;&nbsp;--</td>\
+                                    <td class="text-right"><a class="btlink" onclick="body_rule_list(true,\''+ siteName + '\')">设置</a></td>\
+                                </tr>\
+                                <tr>\
+                                    <td>CMS专用过滤</td>\
+                                    <td>为特定CMS提供的过滤规则</td>\
+                                    <td style="text-align: left;">&nbsp;&nbsp;--</td>\
+                                    <td class="text-right"><a class="btlink" onclick="site_cms_rule(\''+siteName+'\')">设置</a></td>\
+                                </tr>\
+                            </tbody>\
+                        </table>\
+                    </div>\
+                </div>\
+                <ul class="help-info-text c7">\
+                    <li>注意: 此处大部分配置,仅对当前站点有效!</li>\
+                </ul>\
+            </div>';
+        $("#s_w_c").html(con);
+    });
+}
+
+
+
 function wafSite(){
 
     owPost('get_site_config', {}, function(data){
@@ -900,10 +1251,10 @@ function wafSite(){
                     <td>\
                         <div class="ssh-item" style="margin-left:0">\
                             <input class="btswitch btswitch-ios" id="closeget_'+ i + '" type="checkbox" ' + (v.open ? 'checked' : '') + '>\
-                            <label class="btswitch-btn" for="closeget_'+ i + '" onclick="set_site_obj_state(\'' + v.siteName + '\',\'open\')"></label>\
+                            <label class="btswitch-btn" for="closeget_'+ i + '" onclick="set_site_obj_state(\'' + k + '\',\'open\')"></label>\
                         </div>\
                     </td>\
-                    <td class="text-right"><a onclick="site_waf_log(\''+ k + '\')" class="btlink ' + (v.log_size > 0 ? 'dot' : '') + '">日志</a> | <a onclick="site_waf_config(\'' + v.siteName + '\')" class="btlink">设置</a></td>\
+                    <td class="text-right"><a onclick="siteWafLog(\''+ k + '\')" class="btlink ' + (v.log_size > 0 ? 'dot' : '') + '">日志</a> | <a onclick="siteWafConfig(\'' + k + '\')" class="btlink">设置</a></td>\
                 </tr>'
         });
 
