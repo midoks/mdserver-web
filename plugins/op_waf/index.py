@@ -96,12 +96,11 @@ def initSiteInfo():
         site_contents = "{}"
 
     site_contents = json.loads(site_contents)
-
+    site_contents_new = {}
     for x in range(len(domain_contents)):
         name = domain_contents[x]['name']
-
         if name in site_contents:
-            pass
+            site_contents_new[name] = site_contents[name]
         else:
             tmp = {}
             tmp['cdn'] = False
@@ -109,15 +108,54 @@ def initSiteInfo():
             tmp['get'] = True
             tmp['post'] = True
             tmp['open'] = False
-            site_contents[name] = tmp
 
-    cjson = public.getJson(site_contents)
+            data_cc = {}
+            data_cc['open'] = False
+            tmp['cc'] = data_cc
+
+            site_contents_new[name] = tmp
+
+    cjson = public.getJson(site_contents_new)
     public.writeFile(path_site, cjson)
+
+def initTotalInfo():
+    data = []
+    path_domains = getJsonPath('domains')
+    path_total = getJsonPath('total')
+
+    domain_contents = public.readFile(path_domains)
+    domain_contents = json.loads(domain_contents)
+
+    try:
+        total_contents = public.readFile(path_total)
+    except Exception as e:
+        total_contents = "{}"
+
+    total_contents = json.loads(total_contents)
+    total_contents_new = {}
+    for x in range(len(domain_contents)):
+        name = domain_contents[x]['name']
+        if 'sites' in  total_contents and name in total_contents['sites']:
+            pass
+        else:
+            tmp = {}
+            tmp['cdn'] = 0
+            tmp['log'] = 0
+            tmp['get'] = 0
+            tmp['post'] = 0
+            tmp['total'] = 0
+            _name = {}
+            _name[name] = tmp
+            total_contents['sites'] = _name
+
+    cjson = public.getJson(total_contents)
+    public.writeFile(path_total, cjson)
 
 
 def status():
     initDomainInfo()
     initSiteInfo()
+    initTotalInfo()
 
     path = getConf()
     if not os.path.exists(path):
@@ -290,6 +328,42 @@ def saveScanRule():
     return public.returnJson(True, '设置成功!', [])
 
 
+def getSiteConfig():
+    path = getJsonPath('site')
+    content = public.readFile(path)
+
+    content = json.loads(content)
+
+    total = getJsonPath('total')
+    total_content = public.readFile(total)
+    total_content = json.loads(total_content)
+
+    # print total_content
+    
+    for x in content:
+        tmp = []
+        tmp_v = {}
+        if 'sites' in total_content and x in total_content['sites']:
+            tmp_v = total_content['sites'][x];
+            
+        key_list = ['get','post','user-agent','cookie','cdn','cc']
+        for kx in range(len(key_list)):
+            ktmp = {}
+
+            if kx in tmp_v :
+                ktmp['value'] = tmp_v[key_list[kx]]
+            else:
+                ktmp['value'] = 0
+            ktmp['key'] = key_list[kx]
+            tmp.append(ktmp)
+
+        # print tmp
+        content[x]['total'] = tmp
+
+
+    content = public.getJson(content)
+    return public.returnJson(True, 'ok!', content)
+
 def setObjOpen():
     args = getArgs()
     data = checkArgs(args, ['obj'])
@@ -351,6 +425,8 @@ if __name__ == "__main__":
         print setSiteRetry()
     elif func == 'save_scan_rule':
         print saveScanRule()
+    elif func == 'get_site_config':
+        print getSiteConfig()
     elif func == 'waf_srceen':
         print getWafSrceen()
     elif func == 'waf_conf':
