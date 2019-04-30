@@ -706,6 +706,7 @@ function urlBlack(type) {
 }
 
 
+
 function wafScreen(){
 
     owPost('waf_srceen', {}, function(data){
@@ -854,24 +855,85 @@ function wafGloabl(){
     });
 }
 
+//返回css
+function back_css(v) {
+    if (v > 0) {
+        return 'tipsval'
+    }
+    else {
+        return 'tipsval tipsvalnull'
+    }
+}
 
 function wafSite(){
-    var con = '<div class="divtable">\
-        <table class="table table-hover waftable" style="color:#fff;">\
-            <thead>\
-                <tr><th width="18%">站点</th>\
-                <th>GET</th>\
-                <th>POST</th>\
-                <th>UA</th>\
-                <th>Cookie</th>\
-                <th>CDN</th>\
-                <th>CC</th>\
-                <th>状态</th>\
-                <th>操作</th></tr>\
-            </thead>\
-        </table>\
-        </div>';
-    $(".soft-man-con").html(con);
+
+    owPost('get_site_config', {}, function(data){
+        var tmp = $.parseJSON(data.data);
+        var rdata = $.parseJSON(tmp.data);
+        console.log(rdata);
+
+        var tbody = '';
+        var i = 0;
+        $.each(rdata, function (k, v) {
+            console.log(k,v);
+            i += 1;
+            tbody += '<tr>\
+                    <td><a onclick="site_waf_config(\''+ k + '\')" class="sitename btlink" title="' + k + '">' + k + '</a></td>\
+                    <td>\
+                        <input onclick="set_site_obj_state(\''+ k + '\',\'get\')" type="checkbox" ' + (v.get ? 'checked' : '') + '><span class="' + back_css(v.total[1].value) + '" title="拦截GET渗透次数:' + v.total[1].value + '">' + v.total[1].value + '</span>\
+                    </td>\
+                    <td>\
+                        <input onclick="set_site_obj_state(\''+ k + '\',\'post\')"  type="checkbox" ' + (v.post ? 'checked' : '') + '><span class="' + back_css(v.total[0].value) + '"  title="拦截POST渗透次数:' + v.total[0].value + '">' + v.total[0].value + '</span>\
+                    </td>\
+                    <td>\
+                        <input onclick="set_site_obj_state(\''+ k + '\',\'user-agent\')"  type="checkbox" ' + (v['user-agent'] ? 'checked' : '') + '><span class="' + back_css(v.total[3].value) + '" title="拦截恶意User-Agent次数:' + v.total[3].value + '">' + v.total[3].value + '</span>\
+                    </td>\
+                    <td>\
+                        <input onclick="set_site_obj_state(\''+ k + '\',\'cookie\')"  type="checkbox" ' + (v.cookie ? 'checked' : '') + '><span class="' + back_css(v.total[4].value) + '" title="拦截Cookie渗透次数:' + v.total[4].value + '">' + v.total[4].value + '</span>\
+                    </td>\
+                    <td>\
+                        <input onclick="set_site_obj_state(\''+ k + '\',\'cdn\')"  type="checkbox" ' + (v.cdn ? 'checked' : '') + '>\
+                    </td>\
+                    <td>\
+                        <input onclick="set_site_obj_state(\''+ k + '\',\'cc\')"  type="checkbox" ' + (v.cc.open ? 'checked' : '') + '><span class="' + back_css(v.total[2].value) + '" title="拦截CC攻击次数:' + v.total[2].value + '">' + v.total[2].value + '</span>\
+                    </td>\
+                    <td>\
+                        <div class="ssh-item" style="margin-left:0">\
+                            <input class="btswitch btswitch-ios" id="closeget_'+ i + '" type="checkbox" ' + (v.open ? 'checked' : '') + '>\
+                            <label class="btswitch-btn" for="closeget_'+ i + '" onclick="set_site_obj_state(\'' + v.siteName + '\',\'open\')"></label>\
+                        </div>\
+                    </td>\
+                    <td class="text-right"><a onclick="site_waf_log(\''+ k + '\')" class="btlink ' + (v.log_size > 0 ? 'dot' : '') + '">日志</a> | <a onclick="site_waf_config(\'' + v.siteName + '\')" class="btlink">设置</a></td>\
+                </tr>'
+        });
+
+        var con = '<div class="lib-box">\
+                    <div class="lib-con">\
+                        <div class="divtable">\
+                        <div id="siteCon_fix" style="max-height:580px; overflow:auto;border:#ddd 1px solid">\
+                        <table class="table table-hover waftable" style="border:none">\
+                            <thead>\
+                                <tr>\
+                                    <th>站点</th>\
+                                    <th>GET</th>\
+                                    <th>POST</th>\
+                                    <th>UA</th>\
+                                    <th>Cookie</th>\
+                                    <th title="这个网站使用了CDN或其它代理时请勾选">CDN</th>\
+                                    <th>CC防御</th>\
+                                    <th>状态</th>\
+                                    <th style="text-align: right;">操作</th>\
+                                </tr>\
+                            </thead>\
+                            <tbody>'+ tbody + '</tbody>\
+                        </table>\
+                        </div>\
+                        </div>\
+                    </div>\
+            </div>';
+        $(".soft-man-con").html(con);
+        tableFixed("siteCon_fix");
+    });
 }
 
 
