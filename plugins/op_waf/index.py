@@ -353,7 +353,7 @@ def getSiteConfig():
             if kx in tmp_v :
                 ktmp['value'] = tmp_v[key_list[kx]]
             else:
-                ktmp['value'] = 0
+                ktmp['value'] = ''
             ktmp['key'] = key_list[kx]
             tmp.append(ktmp)
 
