@@ -365,6 +365,23 @@ def getSiteConfig():
     return public.returnJson(True, 'ok!', content)
 
 
+def getSiteConfigByName():
+    args = getArgs()
+    data = checkArgs(args, ['siteName'])
+    if not data[0]:
+        return data[1]
+    path = getJsonPath('site')
+    content = public.readFile(path)
+    content = json.loads(content)
+
+    siteName = args['siteName']
+    retData = {}
+    if siteName in content:
+        retData = content[siteName]
+
+    return public.returnJson(True, 'ok!', retData)
+
+
 def getLogsList():
     args = getArgs()
     data = checkArgs(args, ['siteName'])
@@ -472,6 +489,8 @@ if __name__ == "__main__":
         print saveScanRule()
     elif func == 'get_site_config':
         print getSiteConfig()
+    elif func == 'get_site_config_byname':
+        print getSiteConfigByName()
     elif func == 'get_logs_list':
         print getLogsList()
     elif func == 'get_safe_logs':

@@ -1123,17 +1123,6 @@ function siteWafConfig(siteName, type) {
                                     <td class="text-right"><a class="btlink" onclick="set_site_obj_conf(\''+ siteName + '\',\'cookie\')">规则</a></td>\
                                 </tr>\
                                 <tr>\
-                                    <td>禁止国外访问</td>\
-                                    <td>'+ rdata.top.drop_abroad.ps + '</td>\
-                                    <td>\
-                                        <div class="ssh-item" style="margin-left:0">\
-                                            <input class="btswitch btswitch-ios" id="closeabroad" type="checkbox" '+ (rdata.drop_abroad ? 'checked' : '') + '>\
-                                            <label class="btswitch-btn" for="closeabroad" onclick="set_site_obj_state(\''+ siteName + '\',\'drop_abroad\')"></label>\
-                                        </div>\
-                                    </td>\
-                                    <td class="text-right"><a class="btlink" onclick="cn_iplist()">设置</a></td>\
-                                </tr>\
-                                <tr>\
                                     <td>常见扫描器</td><td>'+ rdata.top.scan.ps + '</td>\
                                     <td>\
                                         <div class="ssh-item" style="margin-left:0">\
@@ -1196,12 +1185,6 @@ function siteWafConfig(siteName, type) {
                                     <td>&nbsp;&nbsp;--</td>\
                                     <td class="text-right"><a class="btlink" onclick="body_rule_list(true,\''+ siteName + '\')">设置</a></td>\
                                 </tr>\
-                                <tr>\
-                                    <td>CMS专用过滤</td>\
-                                    <td>为特定CMS提供的过滤规则</td>\
-                                    <td style="text-align: left;">&nbsp;&nbsp;--</td>\
-                                    <td class="text-right"><a class="btlink" onclick="site_cms_rule(\''+siteName+'\')">设置</a></td>\
-                                </tr>\
                             </tbody>\
                         </table>\
                     </div>\
@@ -1229,7 +1212,7 @@ function wafSite(){
             console.log(k,v);
             i += 1;
             tbody += '<tr>\
-                    <td><a onclick="site_waf_config(\''+ k + '\')" class="sitename btlink" title="' + k + '">' + k + '</a></td>\
+                    <td><a onclick="siteWafConfig(\''+ k + '\')" class="sitename btlink" title="' + k + '">' + k + '</a></td>\
                     <td>\
                         <input onclick="set_site_obj_state(\''+ k + '\',\'get\')" type="checkbox" ' + (v.get ? 'checked' : '') + '><span class="' + back_css(v.total[1].value) + '" title="拦截GET渗透次数:' + v.total[1].value + '">' + v.total[1].value + '</span>\
                     </td>\
