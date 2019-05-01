@@ -85,7 +85,11 @@ def initDomainInfo():
 def initSiteInfo():
     data = []
     path_domains = getJsonPath('domains')
+    path_config = getJsonPath('config')
     path_site = getJsonPath('site')
+
+    config_contents = public.readFile(path_config)
+    config_contents = json.loads(config_contents)
 
     domain_contents = public.readFile(path_domains)
     domain_contents = json.loads(domain_contents)
@@ -109,9 +113,7 @@ def initSiteInfo():
             tmp['post'] = True
             tmp['open'] = False
 
-            data_cc = {}
-            data_cc['open'] = False
-            tmp['cc'] = data_cc
+            tmp['cc'] = config_contents['cc']
 
             site_contents_new[name] = tmp
 

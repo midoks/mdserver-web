@@ -1040,6 +1040,33 @@ function siteWafConfig(siteName, type) {
                         <label class="btswitch-btn" for="closewaf_open" onclick="set_site_obj_state(\''+ siteName + '\',\'open\')" style="width:2.4em;height:1.4em;margin-bottom: 0"></label>\
                     </div>\
                 </div>\
+                <div class="lib-con">\
+                    <div class="divtable">\
+                        <table class="table table-hover waftable">\
+                            <thead>\
+                                <tr>\
+                                    <th>名称</th>\
+                                    <th>描述</th>\
+                                    <th width="80">状态</th>\
+                                    <th style="text-align: right;">操作</th>\
+                                </tr>\
+                            </thead>\
+                            <tbody>\
+                                <tr>\
+                                    <td>CC防御</td>\
+                                    <td><font style="color:red;">'+ rdata.cc.cycle + '</font> 秒内,请求同一URI累计超过 <font style="color:red;">' + rdata.cc.limit + '</font> 次,封锁IP <font style="color:red;">' + rdata.cc.endtime + '</font> 秒</td>\
+                                    <td>\
+                                        <div class="ssh-item" style="margin-left:0">\
+                                            <input class="btswitch btswitch-ios" id="closecc" type="checkbox" '+ (rdata.cc.open ? 'checked' : '') + '>\
+                                            <label class="btswitch-btn" for="closecc" onclick="set_site_obj_state(\''+ siteName + '\',\'cc\')"></label>\
+                                        </div>\
+                                    </td>\
+                                    <td class="text-right"><a class="btlink" onclick="set_cc_rule('+ rdata.cc.cycle + ',' + rdata.cc.limit + ',' + rdata.cc.endtime + ',\'' + siteName + '\',' + rdata.cc.increase + ')">设置</a></td>\
+                                </tr>\
+                            </tbody>\
+                        </table>\
+                    </div>\
+                </div>\
                 <ul class="help-info-text c7">\
                     <li>注意: 此处大部分配置,仅对当前站点有效!</li>\
                 </ul>\
