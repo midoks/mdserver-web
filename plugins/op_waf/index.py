@@ -114,7 +114,15 @@ def initSiteInfo():
             tmp['open'] = False
 
             tmp['cc'] = config_contents['cc']
+            tmp['retry'] = config_contents['retry']
+            tmp['get'] = config_contents['get']
+            tmp['post'] = config_contents['post']
+            tmp['user-agent'] = config_contents['user-agent']
+            tmp['cookie'] = config_contents['cookie']
+            tmp['scan'] = config_contents['scan']
 
+            cdn_header = ['x-forwarded-for', 'x-real-ip']
+            tmp['cdn_header'] = cdn_header
             site_contents_new[name] = tmp
 
     cjson = public.getJson(site_contents_new)
