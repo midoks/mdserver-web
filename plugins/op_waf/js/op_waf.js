@@ -1226,7 +1226,7 @@ function siteWafConfig(siteName, type) {
                                             <label class="btswitch-btn" for="closeargs" onclick="set_site_obj_state(\''+ siteName + '\',\'get\')"></label>\
                                         </div>\
                                     </td>\
-                                    <td class="text-right"><a class="btlink" onclick="set_site_obj_conf(\''+ siteName + '\',\'args\')">规则</a></td>\
+                                    <td class="text-right"><a class="btlink" onclick="setSiteObjConf(\''+ siteName + '\',\'args\')">规则</a></td>\
                                 </tr>\
                                 <tr>\
                                     <td>POST过滤</td>\
@@ -1237,7 +1237,7 @@ function siteWafConfig(siteName, type) {
                                             <label class="btswitch-btn" for="closepost" onclick="set_site_obj_state(\''+ siteName + '\',\'post\')"></label>\
                                         </div>\
                                     </td>\
-                                    <td class="text-right"><a class="btlink" onclick="set_site_obj_conf(\''+ siteName + '\',\'post\')">规则</a></td>\
+                                    <td class="text-right"><a class="btlink" onclick="setSiteObjConf(\''+ siteName + '\',\'post\')">规则</a></td>\
                                 </tr>\
                                 <tr>\
                                     <td>User-Agent过滤</td>\
@@ -1248,7 +1248,7 @@ function siteWafConfig(siteName, type) {
                                             <label class="btswitch-btn" for="closeua" onclick="set_site_obj_state(\''+ siteName + '\',\'user-agent\')"></label>\
                                         </div>\
                                     </td>\
-                                    <td class="text-right"><a class="btlink" onclick="set_site_obj_conf(\''+ siteName + '\',\'user_agent\')">规则</a></td>\
+                                    <td class="text-right"><a class="btlink" onclick="setSiteObjConf(\''+ siteName + '\',\'user_agent\')">规则</a></td>\
                                 </tr>\
                                  <tr>\
                                     <td>Cookie过滤</td>\
@@ -1259,7 +1259,7 @@ function siteWafConfig(siteName, type) {
                                         <label class="btswitch-btn" for="closecookie" onclick="set_site_obj_state(\''+ siteName + '\',\'cookie\')"></label>\
                                     </div>\
                                     </td>\
-                                    <td class="text-right"><a class="btlink" onclick="set_site_obj_conf(\''+ siteName + '\',\'cookie\')">规则</a></td>\
+                                    <td class="text-right"><a class="btlink" onclick="setSiteObjConf(\''+ siteName + '\',\'cookie\')">规则</a></td>\
                                 </tr>\
                                 <tr>\
                                     <td>常见扫描器</td><td>'+ rdata.scan.ps + '</td>\
