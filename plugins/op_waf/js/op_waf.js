@@ -1014,6 +1014,144 @@ function html_decode(value) {
 }
 
 
+//CDN-Header配置
+function cdnHeader(siteName, type) {
+    if (type == undefined) {
+        create_l = layer.open({
+            type: 1,
+            title: "管理网站【" + siteName + "】CDN-Headers",
+            area: ['500px', '500px'],
+            closeBtn: 2,
+            shadeClose: false,
+            content: '<div class="pd15">\
+                <div style="border-bottom:#ccc 1px solid;margin-bottom:10px;padding-bottom:10px">\
+                    <input class="bt-input-text" name="cdn_header_key" type="text" value="" style="width:400px;margin-right:15px;margin-left:5px" placeholder="header名称">\
+                    <button class="btn btn-success btn-sm va0 pull-right" onclick="addCdnHeader(\''+ siteName + '\');">添加</button>\</div>\
+                <div class="divtable">\
+                <div id="cdnHeader" style="max-height:300px;overflow:auto;border:#ddd 1px solid">\
+                <table class="table table-hover" style="border:none">\
+                    <thead>\
+                        <tr>\
+                            <th>header</th>\
+                            <th style="text-align: right;">操作</th>\
+                        </tr>\
+                    </thead>\
+                    <tbody id="cdn_header_con" class="gztr"></tbody>\
+                </table>\
+            </div>\
+            </div>\
+            <ul class="help-info-text c7 ptb10">\
+                <li>防火墙将尝试在以上header中获取客户IP</li>\
+            </ul></div>'
+        });
+        tableFixed("cdnHeader");
+    }
+
+    owPost('get_site_config_byname', { siteName: siteName }, function(data){
+        var tmp = $.parseJSON(data.data);
+        var t1 = tmp.data;
+        var rdata = t1['cdn_header'];
+        var tbody = ''
+        for (var i = 0; i < rdata.length; i++) {
+            tbody += '<tr>\
+                    <td>'+ rdata[i] + '</td>\
+                    <td class="text-right"><a class="btlink" onclick="removeCdnHeader(\''+ siteName + '\',\'' + rdata[i] + '\')">删除</a></td>\
+                </tr>'
+        }
+        $("#cdn_header_con").html(tbody);
+    });
+}
+
+//添加CDN-Header
+function addCdnHeader(siteName) {
+    var pdata = {
+        cdn_header: $("input[name='cdn_header_key']").val(),
+        siteName: siteName
+    }
+
+    if (pdata['cdn_header'] == '') {
+        layer.msg('header不能为空');
+        $("input[name='cdn_header_key']").focus();
+        return;
+    }
+
+    owPost('add_site_cdn_header', pdata, function(data){
+        var rdata = $.parseJSON(data);
+        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+        if (rdata.status) {
+            setTimeout(function(){
+                cdnHeader(siteName, 1);
+            },1000);
+        }
+    });
+}
+
+ //删除CDN-Header
+function removeCdnHeader(siteName, cdn_header_key) {
+    owPost('remove_site_cdn_header', { siteName: siteName, cdn_header: cdn_header_key }, function(data){
+        var rdata = $.parseJSON(data.data);
+        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+        if (rdata.status) {
+            setTimeout(function(){
+                cdnHeader(siteName, 1);
+            },1000);
+        }
+    });
+}
+
+
+//网站规则设置
+function setSiteObjConf(siteName, ruleName, type) {
+    if (type == undefined) {
+        create_l = layer.open({ 
+            type: 1,
+            title: "编辑网站【" + siteName + "】规则【" + ruleName + "】",
+            area: ['700px', '530px'],
+            closeBtn: 2,
+            shadeClose: false,
+            content: '<div class="pd15">\
+                <div class="divtable">\
+                <div id="SetSiteObjConf" class="table_head_fix" style="max-height:375px;overflow:auto;border:#ddd 1px solid">\
+                <table class="table table-hover" style="border:none">\
+                    <thead>\
+                        <tr>\
+                            <th width="450">规则</th>\
+                            <th>说明</th>\
+                            <th style="text-align: right;">状态</th>\
+                        </tr>\
+                    </thead>\
+                    <tbody id="set_site_obj_conf_con" class="gztr"></tbody>\
+                </table>\
+                </div>\
+            </div>\
+            <ul class="help-info-text c7 ptb10">\
+                <li>此处继承全局设置中已启用的规则</li>\
+                <li>此处的设置仅对当前站点有效</li>\
+            </ul></div>'
+        });
+        tableFixed("SetSiteObjConf");
+    }
+
+    getRuleByName(ruleName, function(data){
+        var tmp = $.parseJSON(data.data);
+        var rdata = $.parseJSON(tmp.data);
+        var tbody = '';
+        var tbody = '';
+        for (var i = 0; i < rdata.length; i++) {
+            if (rdata[i][0] == -1) continue;
+            tbody += '<tr>\
+                    <td>'+ rdata[i][1] + '</td>\
+                    <td>'+ rdata[i][2] + '</td>\
+                    <td style="text-align: right;">\
+                        <div class="pull-right"><input class="btswitch btswitch-ios" id="close_'+ i + '" type="checkbox" ' + (rdata[i][0] ? 'checked' : '') + '>\
+                        <label class="btswitch-btn" for="close_'+ i + '" style="width:2em;height:1.2em;margin-bottom: 0" for="closeua_' + i + '" onclick="set_site_rule_state(\'' + siteName + '\',\'' + ruleName + '\',' + i + ')"></label></div>\
+                    </td>\
+                </tr>'
+        }
+        $("#set_site_obj_conf_con").html(tbody)
+    });
+}
+
 //网站设置
 function siteWafConfig(siteName, type) {
     if (type == undefined) {
@@ -1061,13 +1199,13 @@ function siteWafConfig(siteName, type) {
                                             <label class="btswitch-btn" for="closecc" onclick="set_site_obj_state(\''+ siteName + '\',\'cc\')"></label>\
                                         </div>\
                                     </td>\
-                                    <td class="text-right"><a class="btlink" onclick="set_cc_rule('+ rdata.cc.cycle + ',' + rdata.cc.limit + ',' + rdata.cc.endtime + ',\'' + siteName + '\',' + rdata.cc.increase + ')">设置</a></td>\
+                                    <td class="text-right"><a class="btlink" onclick="setCcRule('+ rdata.cc.cycle + ',' + rdata.cc.limit + ',' + rdata.cc.endtime + ',\'' + siteName + '\',' + rdata.cc.increase + ')">设置</a></td>\
                                 </tr>\
                                 <tr>\
                                     <td>恶意容忍设置</td>\
                                     <td><font style="color:red;">'+ rdata.retry.retry_cycle + '</font> 秒内,累计超过 <font style="color:red;">' + rdata.retry.retry + '</font> 次恶意请求,封锁IP <font style="color:red;">' + rdata.retry.retry_time + '</font> 秒</td>\
                                     <td style="text-align: left;">&nbsp;&nbsp;--</td>\
-                                    <td class="text-right"><a class="btlink" onclick="set_retry('+ rdata.retry.retry_cycle + ',' + rdata.retry.retry + ',' + rdata.retry.retry_time + ',\'' + siteName + '\')">设置</a></td>\
+                                    <td class="text-right"><a class="btlink" onclick="setRetry('+ rdata.retry.retry_cycle + ',' + rdata.retry.retry + ',' + rdata.retry.retry_time + ',\'' + siteName + '\')">设置</a></td>\
                                 </tr>\
                                 <tr>\
                                     <td>GET-URI过滤</td>\
@@ -1078,7 +1216,7 @@ function siteWafConfig(siteName, type) {
                                             <label class="btswitch-btn" for="closeget" onclick="set_site_obj_state(\''+ siteName + '\',\'get\')"></label>\
                                         </div>\
                                     </td>\
-                                    <td class="text-right"><a class="btlink" onclick="set_site_obj_conf(\''+ siteName + '\',\'url\')">规则</a></td>\
+                                    <td class="text-right"><a class="btlink" onclick="setSiteObjConf(\''+ siteName + '\',\'url\')">规则</a></td>\
                                 </tr>\
                                 <td>GET-参数过滤</td>\
                                     <td>'+ rdata.get.ps + '</td>\
@@ -1131,7 +1269,7 @@ function siteWafConfig(siteName, type) {
                                             <label class="btswitch-btn" for="closescan" onclick="set_site_obj_state(\''+ siteName + '\',\'scan\')"></label>\
                                         </div>\
                                     </td>\
-                                    <td class="text-right"><a class="btlink" onclick="scan_rule()">设置</a></td>\
+                                    <td class="text-right"><a class="btlink" onclick="scanRule()">设置</a></td>\
                                 </tr>\
                                 <tr>\
                                     <td>使用CDN</td>\
@@ -1142,7 +1280,19 @@ function siteWafConfig(siteName, type) {
                                             <label class="btswitch-btn" for="closecdn" onclick="set_site_obj_state(\''+ siteName + '\',\'cdn\')"></label>\
                                         </div>\
                                     </td>\
-                                    <td class="text-right"><a class="btlink" onclick="cdn_header(\''+ siteName + '\')">设置</a></td>\
+                                    <td class="text-right"><a class="btlink" onclick="cdnHeader(\''+ siteName + '\')">设置</a></td>\
+                                </tr>\
+                                <tr>\
+                                    <td>禁止扩展名</td>\
+                                    <td>禁止访问指定扩展名</td>\
+                                    <td style="text-align: left;">&nbsp;&nbsp;--</td>\
+                                    <td class="text-right"><a class="btlink" onclick="site_rule_admin(\''+ siteName + '\',\'disable_ext\')">设置</a></td>\
+                                </tr>\
+                                <tr>\
+                                    <td>禁止上传的文件类型</td>\
+                                    <td>禁止上传指定的文件类型</td>\
+                                    <td style="text-align: left;">&nbsp;&nbsp;--</td>\
+                                    <td class="text-right"><a class="btlink" onclick="site_rule_admin(\''+ siteName + '\',\'disable_upload_ext\')">设置</a></td>\
                                 </tr>\
                             </tbody>\
                         </table>\
@@ -1154,76 +1304,6 @@ function siteWafConfig(siteName, type) {
             </div>';
         $("#s_w_c").html(con);
     });
-    // var loadT = layer.msg('正在获取网站配置..', { icon: 16, time: 0 });
-    // $.post('/plugin?action=a&name=btwaf&s=get_site_config_byname', { siteName: siteName }, function (rdata) {
-    //     nginx_config = rdata;
-    //     layer.close(loadT);
-    //     var con = '<div class="pd15">\
-    //             <div class="lib-con-title">\
-    //                 <span>网站防火墙开关</span>\
-    //                 <div class="ssh-item" style="margin-right:20px;">\
-    //                     <input class="btswitch btswitch-ios" id="closewaf_open" type="checkbox" '+ (rdata.open ? 'checked' : '') + '>\
-    //                     <label class="btswitch-btn" for="closewaf_open" onclick="set_site_obj_state(\''+ siteName + '\',\'open\')" style="width:2.4em;height:1.4em;margin-bottom: 0"></label>\
-    //                 </div>\
-    //             </div>\
-    //             <div class="lib-con">\
-    //                 <div class="divtable">\
-    //                     <table class="table table-hover waftable">\
-    //                         <thead>\
-    //                             <tr>\
-    //                                 <th>名称</th>\
-    //                                 <th>描述</th>\
-    //                                 <th width="80">状态</th>\
-    //                                 <th style="text-align: right;">操作</th>\
-    //                             </tr>\
-    //                         </thead>\
-    //                         <tbody>\
-    //                             <tr>\
-    //                                 <td>禁止执行PHP的URL</td>\
-    //                                 <td>禁止在指定URL运行PHP脚本</td>\
-    //                                 <td style="text-align: left;">&nbsp;&nbsp;--</td>\
-    //                                 <td class="text-right"><a class="btlink" onclick="site_rule_admin(\''+ siteName + '\',\'disable_php_path\')">设置</a></td>\
-    //                             </tr>\
-    //                             <tr>\
-    //                                 <td>禁止访问的URL</td>\
-    //                                 <td>禁止访问指定的URL</td>\
-    //                                 <td style="text-align: left;">&nbsp;&nbsp;--</td>\
-    //                                 <td class="text-right"><a class="btlink" onclick="site_rule_admin(\''+ siteName + '\',\'disable_path\')">设置</a></td>\
-    //                             </tr>\
-    //                             <tr>\
-    //                                 <td>禁止扩展名</td>\
-    //                                 <td>禁止访问指定扩展名</td>\
-    //                                 <td style="text-align: left;">&nbsp;&nbsp;--</td>\
-    //                                 <td class="text-right"><a class="btlink" onclick="site_rule_admin(\''+ siteName + '\',\'disable_ext\')">设置</a></td>\
-    //                             </tr>\
-    //                             <tr>\
-    //                                 <td>禁止上传的文件类型</td>\
-    //                                 <td>禁止上传指定的文件类型</td>\
-    //                                 <td style="text-align: left;">&nbsp;&nbsp;--</td>\
-    //                                 <td class="text-right"><a class="btlink" onclick="site_rule_admin(\''+ siteName + '\',\'disable_upload_ext\')">设置</a></td>\
-    //                             </tr>\
-    //                             <tr>\
-    //                                 <td>受保护的URL</td>\
-    //                                 <td>通过自定义参数加密URL地址,参数错误将被拦截</td>\
-    //                                 <td style="text-align: left;">&nbsp;&nbsp;--</td>\
-    //                                 <td class="text-right"><a class="btlink" onclick="site_url_tell(\''+ siteName + '\')">设置</a></td>\
-    //                             </tr>\
-    //                             <tr>\
-    //                                 <td>URL专用过滤</td>\
-    //                                 <td>为特定URL地址设置过滤规则</td>\
-    //                                 <td style="text-align: left;">&nbsp;&nbsp;--</td>\
-    //                                 <td class="text-right"><a class="btlink" onclick="site_url_rule(\''+ siteName + '\')">设置</a></td>\
-    //                             </tr>\
-    //                         </tbody>\
-    //                     </table>\
-    //                 </div>\
-    //             </div>\
-    //             <ul class="help-info-text c7">\
-    //                 <li>注意: 此处大部分配置,仅对当前站点有效!</li>\
-    //             </ul>\
-    //         </div>';
-    //     $("#s_w_c").html(con);
-    // });
 }
 
 
