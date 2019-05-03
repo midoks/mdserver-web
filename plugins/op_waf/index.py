@@ -121,8 +121,16 @@ def initSiteInfo():
             tmp['cookie'] = config_contents['cookie']
             tmp['scan'] = config_contents['scan']
 
-            cdn_header = ['x-forwarded-for', 'x-real-ip']
+            cdn_header = ['x-forwarded-for',
+                          'x-real-ip', 'HTTP_CF_CONNECTING_IP']
             tmp['cdn_header'] = cdn_header
+
+            disable_upload_ext = ["php", "jsp"]
+            tmp['disable_upload_ext'] = disable_upload_ext
+
+            disable_path = ['sql']
+            tmp['sql'] = disable_path
+
             site_contents_new[name] = tmp
 
     cjson = public.getJson(site_contents_new)
@@ -392,6 +400,44 @@ def getSiteConfigByName():
     return public.returnJson(True, 'ok!', retData)
 
 
+def addSiteCdnHeader():
+    args = getArgs()
+    data = checkArgs(args, ['siteName', 'cdn_header'])
+    if not data[0]:
+        return data[1]
+    path = getJsonPath('site')
+    content = public.readFile(path)
+    content = json.loads(content)
+
+    siteName = args['siteName']
+    retData = {}
+    if siteName in content:
+        content[siteName]['cdn_header'].append(args['cdn_header'])
+
+    cjson = public.getJson(content)
+    public.writeFile(path, cjson)
+    return public.returnJson(True, '添加成功!')
+
+
+def removeSiteCdnHeader():
+    args = getArgs()
+    data = checkArgs(args, ['siteName', 'cdn_header'])
+    if not data[0]:
+        return data[1]
+    path = getJsonPath('site')
+    content = public.readFile(path)
+    content = json.loads(content)
+
+    siteName = args['siteName']
+    retData = {}
+    if siteName in content:
+        content[siteName]['cdn_header'].remove(args['cdn_header'])
+
+    cjson = public.getJson(content)
+    public.writeFile(path, cjson)
+    return public.returnJson(True, '删除成功!')
+
+
 def getLogsList():
     args = getArgs()
     data = checkArgs(args, ['siteName'])
@@ -501,6 +547,10 @@ if __name__ == "__main__":
         print getSiteConfig()
     elif func == 'get_site_config_byname':
         print getSiteConfigByName()
+    elif func == 'add_site_cdn_header':
+        print addSiteCdnHeader()
+    elif func == 'remove_site_cdn_header':
+        print removeSiteCdnHeader()
     elif func == 'get_logs_list':
         print getLogsList()
     elif func == 'get_safe_logs':
