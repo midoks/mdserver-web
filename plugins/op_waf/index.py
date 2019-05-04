@@ -564,6 +564,35 @@ def setObjOpen():
     return public.returnJson(True, '设置成功!')
 
 
+def setSiteObjOpen():
+    args = getArgs()
+    data = checkArgs(args, ['siteName', 'obj'])
+    if not data[0]:
+        return data[1]
+
+    siteName = args['siteName']
+    obj = args['obj']
+
+    path = getJsonPath('site')
+    content = public.readFile(path)
+    content = json.loads(content)
+
+    if obj in content[siteName]:
+        if content[siteName][obj]:
+            content[siteName][obj] = False
+        else:
+            content[siteName][obj] = True
+    else:
+        if content[siteName][obj]['open']:
+            content[siteName][obj]['open'] = False
+        else:
+            content[siteName][obj]['open'] = True
+
+    cjson = public.getJson(content)
+    public.writeFile(path, cjson)
+    return public.returnJson(True, '设置成功!')
+
+
 def getWafSrceen():
     conf = getJsonPath('total')
     return public.readFile(conf)
@@ -604,6 +633,8 @@ if __name__ == "__main__":
         print setObjStatus()
     elif func == 'set_obj_open':
         print setObjOpen()
+    elif func == 'set_site_obj_open':
+        print setSiteObjOpen()
     elif func == 'set_retry':
         print setRetry()
     elif func == 'set_site_retry':
