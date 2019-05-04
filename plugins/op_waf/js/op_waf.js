@@ -1013,6 +1013,78 @@ function html_decode(value) {
     return $('<div></div>').text(value).html();
 }
 
+//添加站点过滤规则
+function addSiteRule(siteName, ruleName) {
+    var pdata = {
+        ruleValue: $("input[name='site_rule_value']").val(),
+        siteName: siteName,
+        ruleName: ruleName
+    }
+
+    if (pdata['ruleValue'] == '') {
+        layer.msg('过滤规则不能为空');
+        $("input[name='site_rule_value']").focus();
+        return;
+    }
+
+    owPost('add_site_rule', pdata, function(data){
+        var rdata = $.parseJSON(data.data);
+        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+        if (rdata.status) {
+            setTimeout(function(){
+                siteRuleAdmin(siteName, ruleName, 1);
+            },1000);
+        }
+    });
+}
+
+//删除站点过滤规则
+function removeSiteRule(siteName, ruleName, index) {
+    var pdata = {
+        index: index,
+        siteName: siteName,
+        ruleName: ruleName
+    }
+
+    owPost('remove_site_rule', pdata, function(data){
+        console.log(data);
+        var rdata = $.parseJSON(data.data);
+        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+        if (rdata.status) {
+            if (ruleName == 'url_tell') {
+                site_url_tell(siteName, 1);
+                return;
+            }
+
+            if (ruleName == 'url_rule') {
+                site_url_rule(siteName, 1);
+                return;
+            }
+            
+            setTimeout(function(){
+                siteRuleAdmin(siteName, ruleName, 1);
+            },1000);
+        }
+    });
+
+    // var loadT = layer.msg('正在删除，请稍候..', { icon: 16, time: 0 });
+    // $.post('/plugin?action=a&name=btwaf&s=remove_site_rule', pdata, function (rdata) {
+    //     layer.close(loadT);
+    //     layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+    //     if (rdata.status) {
+    //         if (ruleName == 'url_tell') {
+    //             site_url_tell(siteName, 1);
+    //             return;
+    //         }
+
+    //         if (ruleName == 'url_rule') {
+    //             site_url_rule(siteName, 1);
+    //             return;
+    //         }
+    //         site_rule_admin(siteName, ruleName, 1);
+    //     }
+    // });
+}
 
 //网站规则管理
 function siteRuleAdmin(siteName, ruleName, type) {
@@ -1051,7 +1123,7 @@ function siteRuleAdmin(siteName, ruleName, type) {
             content: '<div class="pd15">\
                 <div style="border-bottom:#ccc 1px solid;margin-bottom:10px;padding-bottom:10px">\
                     <input class="bt-input-text" name="site_rule_value" type="text" value="" style="width:400px;margin-right:15px;margin-left:5px" placeholder="'+ placeho + '">\
-                    <button class="btn btn-success btn-sm va0 pull-right" onclick="add_site_rule(\''+ siteName + '\',\'' + ruleName + '\');">添加</button>\</div>\
+                    <button class="btn btn-success btn-sm va0 pull-right" onclick="addSiteRule(\''+ siteName + '\',\'' + ruleName + '\');">添加</button>\</div>\
                 <div class="divtable">\
                 <div id="siteRuleAdmin" class="siteRuleAdmin" style="max-height:273px;overflow:auto;border:#ddd 1px solid">\
                 <table class="table table-hover" style="border:none">\
@@ -1079,7 +1151,7 @@ function siteRuleAdmin(siteName, ruleName, type) {
         for (var i = 0; i < rdata.length; i++) {
             tbody += '<tr>\
                     <td>'+ rdata[i] + '</td>\
-                    <td class="text-right"><a class="btlink" onclick="remove_site_rule(\''+ siteName + '\',\'' + ruleName + '\',' + i + ')">删除</a></td>\
+                    <td class="text-right"><a class="btlink" onclick="removeSiteRule(\''+ siteName + '\',\'' + ruleName + '\',' + i + ')">删除</a></td>\
                 </tr>'
         }
         $("#site_rule_admin_con").html(tbody);

@@ -305,6 +305,49 @@ def getSiteRule():
     return public.returnJson(True, 'ok!', cjson)
 
 
+def addSiteRule():
+    args = getArgs()
+    data = checkArgs(args, ['siteName', 'ruleName', 'ruleValue'])
+    if not data[0]:
+        return data[1]
+
+    siteName = args['siteName']
+    siteRule = args['ruleName']
+    ruleValue = args['ruleValue']
+
+    path = getJsonPath('site')
+    content = public.readFile(path)
+    content = json.loads(content)
+
+    content[siteName][siteRule].append(ruleValue)
+
+    cjson = public.getJson(content)
+    public.writeFile(path, cjson)
+    return public.returnJson(True, '设置成功!')
+
+
+def removeSiteRule():
+    args = getArgs()
+    data = checkArgs(args, ['siteName', 'ruleName', 'index'])
+    if not data[0]:
+        return data[1]
+
+    siteName = args['siteName']
+    siteRule = args['ruleName']
+    index = args['index']
+
+    path = getJsonPath('site')
+    content = public.readFile(path)
+    content = json.loads(content)
+
+    ruleValue = content[siteName][siteRule][int(index)]
+    content[siteName][siteRule].remove(ruleValue)
+
+    cjson = public.getJson(content)
+    public.writeFile(path, cjson)
+    return public.returnJson(True, '设置成功!')
+
+
 def setObjStatus():
     args = getArgs()
     data = checkArgs(args, ['obj', 'statusCode'])
@@ -348,7 +391,6 @@ def setSiteRetry():
 
 
 def saveScanRule():
-
     args = getArgs()
     data = checkArgs(args, ['header', 'cookie', 'args'])
     if not data[0]:
@@ -554,6 +596,10 @@ if __name__ == "__main__":
         print getRule()
     elif func == 'get_site_rule':
         print getSiteRule()
+    elif func == 'add_site_rule':
+        print addSiteRule()
+    elif func == 'remove_site_rule':
+        print removeSiteRule()
     elif func == 'set_obj_status':
         print setObjStatus()
     elif func == 'set_obj_open':
