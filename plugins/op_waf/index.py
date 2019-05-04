@@ -577,7 +577,7 @@ def setSiteObjOpen():
     content = public.readFile(path)
     content = json.loads(content)
 
-    if obj in content[siteName]:
+    if type(content[siteName][obj]) == bool:
         if content[siteName][obj]:
             content[siteName][obj] = False
         else:
