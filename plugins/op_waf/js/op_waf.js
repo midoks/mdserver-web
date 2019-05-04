@@ -1014,6 +1014,78 @@ function html_decode(value) {
 }
 
 
+//网站规则管理
+function siteRuleAdmin(siteName, ruleName, type) {
+    var placeho = '';
+    var ps = '';
+    var title = '';
+    switch (ruleName) {
+        case 'disable_php_path':
+            placeho = 'URI地址,支持正则表达式';
+            ps = '<li>此处请不要包含URI参数,一般针对目录URL,示例：/admin</li>'
+            title = '禁止运行PHP的URL地址'
+            break;
+        case 'disable_path':
+            placeho = 'URI地址,支持正则表达式';
+            ps = '<li>此处请不要包含URI参数,一般针对目录URL,示例：/admin</li>'
+            title = '禁止访问的URL地址'
+            break;
+        case 'disable_ext':
+            placeho = '扩展名，不包含点(.)，示例：sql';
+            ps = '<li>直接填要被禁止访问的扩展名，如我希望禁止访问*.sql文件：sql</li>'
+            title = '禁止访问的扩展名'
+            break;
+        case 'disable_upload_ext':
+            placeho = '扩展名，不包含点(.)，示例：sql';
+            ps = '<li>直接填要被禁止访问的扩展名，如我希望禁止上传*.php文件：php</li>'
+            title = '禁止上传的文件类型'
+            break;
+    }
+    if (type == undefined) {
+        create_l = layer.open({
+            type: 1,
+            title: "管理网站过滤规则【" + title + "】",
+            area: ['500px', '500px'],
+            closeBtn: 2,
+            shadeClose: false,
+            content: '<div class="pd15">\
+                <div style="border-bottom:#ccc 1px solid;margin-bottom:10px;padding-bottom:10px">\
+                    <input class="bt-input-text" name="site_rule_value" type="text" value="" style="width:400px;margin-right:15px;margin-left:5px" placeholder="'+ placeho + '">\
+                    <button class="btn btn-success btn-sm va0 pull-right" onclick="add_site_rule(\''+ siteName + '\',\'' + ruleName + '\');">添加</button>\</div>\
+                <div class="divtable">\
+                <div id="siteRuleAdmin" class="siteRuleAdmin" style="max-height:273px;overflow:auto;border:#ddd 1px solid">\
+                <table class="table table-hover" style="border:none">\
+                    <thead>\
+                        <tr>\
+                            <th>规则</th>\
+                            <th style="text-align: right;">操作</th>\
+                        </tr>\
+                    </thead>\
+                    <tbody id="site_rule_admin_con" class="gztr"></tbody>\
+                </table>\
+                </div>\
+            </div>\
+            <ul class="help-info-text c7 ptb10">\
+                <li>除正则表达式语句外规则值对大小写不敏感,建议统一使用小写</li>'+ ps + '\
+            </ul></div>'
+        });
+        tableFixed("siteRuleAdmin");
+    }
+
+    owPost('get_site_rule', { siteName: siteName, ruleName: ruleName }, function(data){
+        var tmp = $.parseJSON(data.data);
+        var rdata = $.parseJSON(tmp.data);
+        var tbody = ''
+        for (var i = 0; i < rdata.length; i++) {
+            tbody += '<tr>\
+                    <td>'+ rdata[i] + '</td>\
+                    <td class="text-right"><a class="btlink" onclick="remove_site_rule(\''+ siteName + '\',\'' + ruleName + '\',' + i + ')">删除</a></td>\
+                </tr>'
+        }
+        $("#site_rule_admin_con").html(tbody);
+    });
+}
+
 //CDN-Header配置
 function cdnHeader(siteName, type) {
     if (type == undefined) {
@@ -1286,13 +1358,13 @@ function siteWafConfig(siteName, type) {
                                     <td>禁止扩展名</td>\
                                     <td>禁止访问指定扩展名</td>\
                                     <td style="text-align: left;">&nbsp;&nbsp;--</td>\
-                                    <td class="text-right"><a class="btlink" onclick="site_rule_admin(\''+ siteName + '\',\'disable_ext\')">设置</a></td>\
+                                    <td class="text-right"><a class="btlink" onclick="siteRuleAdmin(\''+ siteName + '\',\'disable_ext\')">设置</a></td>\
                                 </tr>\
                                 <tr>\
                                     <td>禁止上传的文件类型</td>\
                                     <td>禁止上传指定的文件类型</td>\
                                     <td style="text-align: left;">&nbsp;&nbsp;--</td>\
-                                    <td class="text-right"><a class="btlink" onclick="site_rule_admin(\''+ siteName + '\',\'disable_upload_ext\')">设置</a></td>\
+                                    <td class="text-right"><a class="btlink" onclick="siteRuleAdmin(\''+ siteName + '\',\'disable_upload_ext\')">设置</a></td>\
                                 </tr>\
                             </tbody>\
                         </table>\

@@ -129,7 +129,7 @@ def initSiteInfo():
             tmp['disable_upload_ext'] = disable_upload_ext
 
             disable_path = ['sql']
-            tmp['sql'] = disable_path
+            tmp['disable_ext'] = disable_path
 
             site_contents_new[name] = tmp
 
@@ -284,6 +284,25 @@ def getRule():
     fpath = getRuleJsonPath(rule_name)
     content = public.readFile(fpath)
     return public.returnJson(True, 'ok', content)
+
+
+def getSiteRule():
+    args = getArgs()
+    data = checkArgs(args, ['siteName', 'ruleName'])
+    if not data[0]:
+        return data[1]
+
+    siteName = args['siteName']
+    siteRule = args['ruleName']
+
+    path = getJsonPath('site')
+    content = public.readFile(path)
+    content = json.loads(content)
+
+    r = content[siteName][siteRule]
+
+    cjson = public.getJson(r)
+    return public.returnJson(True, 'ok!', cjson)
 
 
 def setObjStatus():
@@ -533,6 +552,8 @@ if __name__ == "__main__":
         print getConf()
     elif func == 'get_rule':
         print getRule()
+    elif func == 'get_site_rule':
+        print getSiteRule()
     elif func == 'set_obj_status':
         print setObjStatus()
     elif func == 'set_obj_open':
