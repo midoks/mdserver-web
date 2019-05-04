@@ -1060,30 +1060,12 @@ function removeSiteRule(siteName, ruleName, index) {
                 site_url_rule(siteName, 1);
                 return;
             }
-            
+
             setTimeout(function(){
                 siteRuleAdmin(siteName, ruleName, 1);
             },1000);
         }
     });
-
-    // var loadT = layer.msg('正在删除，请稍候..', { icon: 16, time: 0 });
-    // $.post('/plugin?action=a&name=btwaf&s=remove_site_rule', pdata, function (rdata) {
-    //     layer.close(loadT);
-    //     layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
-    //     if (rdata.status) {
-    //         if (ruleName == 'url_tell') {
-    //             site_url_tell(siteName, 1);
-    //             return;
-    //         }
-
-    //         if (ruleName == 'url_rule') {
-    //             site_url_rule(siteName, 1);
-    //             return;
-    //         }
-    //         site_rule_admin(siteName, ruleName, 1);
-    //     }
-    // });
 }
 
 //网站规则管理
@@ -1243,6 +1225,25 @@ function removeCdnHeader(siteName, cdn_header_key) {
     });
 }
 
+//设置网站防御功能
+function setSiteObjState(siteName, obj) {
+    // var loadT = layer.msg('正在处理，请稍候..', { icon: 16, time: 0 });
+    owPost('set_site_obj_open', { siteName: siteName, obj: obj } , function(data){
+        var rdata = $.parseJSON(data.data);
+        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+        setTimeout(function(){
+            siteWafConfig(siteName, 1);
+            // siteConfig();
+        },1000);
+    });
+    // $.post('/plugin?action=a&name=btwaf&s=set_site_obj_open', { siteName: siteName, obj: obj }, function (rdata) {
+    //     layer.close(loadT);
+    //     site_waf_config(siteName, 1);
+    //     siteconfig();
+    //     layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+    // });
+}
+
 
 //网站规则设置
 function setSiteObjConf(siteName, ruleName, type) {
@@ -1319,7 +1320,7 @@ function siteWafConfig(siteName, type) {
                     <span>网站防火墙开关</span>\
                     <div class="ssh-item" style="margin-right:20px;">\
                         <input class="btswitch btswitch-ios" id="closewaf_open" type="checkbox" '+ (rdata.open ? 'checked' : '') + '>\
-                        <label class="btswitch-btn" for="closewaf_open" onclick="set_site_obj_state(\''+ siteName + '\',\'open\')" style="width:2.4em;height:1.4em;margin-bottom: 0"></label>\
+                        <label class="btswitch-btn" for="closewaf_open" onclick="setSiteObjState(\''+ siteName + '\',\'open\')" style="width:2.4em;height:1.4em;margin-bottom: 0"></label>\
                     </div>\
                 </div>\
                 <div class="lib-con">\
@@ -1340,7 +1341,7 @@ function siteWafConfig(siteName, type) {
                                     <td>\
                                         <div class="ssh-item" style="margin-left:0">\
                                             <input class="btswitch btswitch-ios" id="closecc" type="checkbox" '+ (rdata.cc.open ? 'checked' : '') + '>\
-                                            <label class="btswitch-btn" for="closecc" onclick="set_site_obj_state(\''+ siteName + '\',\'cc\')"></label>\
+                                            <label class="btswitch-btn" for="closecc" onclick="setSiteObjState(\''+ siteName + '\',\'cc\')"></label>\
                                         </div>\
                                     </td>\
                                     <td class="text-right"><a class="btlink" onclick="setCcRule('+ rdata.cc.cycle + ',' + rdata.cc.limit + ',' + rdata.cc.endtime + ',\'' + siteName + '\',' + rdata.cc.increase + ')">设置</a></td>\
@@ -1357,7 +1358,7 @@ function siteWafConfig(siteName, type) {
                                     <td>\
                                         <div class="ssh-item" style="margin-left:0">\
                                             <input class="btswitch btswitch-ios" id="closeget" type="checkbox" '+ (rdata.get ? 'checked' : '') + '>\
-                                            <label class="btswitch-btn" for="closeget" onclick="set_site_obj_state(\''+ siteName + '\',\'get\')"></label>\
+                                            <label class="btswitch-btn" for="closeget" onclick="setSiteObjState(\''+ siteName + '\',\'get\')"></label>\
                                         </div>\
                                     </td>\
                                     <td class="text-right"><a class="btlink" onclick="setSiteObjConf(\''+ siteName + '\',\'url\')">规则</a></td>\
@@ -1367,7 +1368,7 @@ function siteWafConfig(siteName, type) {
                                     <td>\
                                         <div class="ssh-item" style="margin-left:0">\
                                             <input class="btswitch btswitch-ios" id="closeargs" type="checkbox" '+ (rdata.get ? 'checked' : '') + '>\
-                                            <label class="btswitch-btn" for="closeargs" onclick="set_site_obj_state(\''+ siteName + '\',\'get\')"></label>\
+                                            <label class="btswitch-btn" for="closeargs" onclick="setSiteObjState(\''+ siteName + '\',\'get\')"></label>\
                                         </div>\
                                     </td>\
                                     <td class="text-right"><a class="btlink" onclick="setSiteObjConf(\''+ siteName + '\',\'args\')">规则</a></td>\
@@ -1378,7 +1379,7 @@ function siteWafConfig(siteName, type) {
                                     <td>\
                                         <div class="ssh-item" style="margin-left:0">\
                                             <input class="btswitch btswitch-ios" id="closepost" type="checkbox" '+ (rdata.post ? 'checked' : '') + '>\
-                                            <label class="btswitch-btn" for="closepost" onclick="set_site_obj_state(\''+ siteName + '\',\'post\')"></label>\
+                                            <label class="btswitch-btn" for="closepost" onclick="setSiteObjState(\''+ siteName + '\',\'post\')"></label>\
                                         </div>\
                                     </td>\
                                     <td class="text-right"><a class="btlink" onclick="setSiteObjConf(\''+ siteName + '\',\'post\')">规则</a></td>\
@@ -1389,7 +1390,7 @@ function siteWafConfig(siteName, type) {
                                     <td>\
                                         <div class="ssh-item" style="margin-left:0">\
                                             <input class="btswitch btswitch-ios" id="closeua" type="checkbox" '+ (rdata['user-agent'] ? 'checked' : '') + '>\
-                                            <label class="btswitch-btn" for="closeua" onclick="set_site_obj_state(\''+ siteName + '\',\'user-agent\')"></label>\
+                                            <label class="btswitch-btn" for="closeua" onclick="setSiteObjState(\''+ siteName + '\',\'user-agent\')"></label>\
                                         </div>\
                                     </td>\
                                     <td class="text-right"><a class="btlink" onclick="setSiteObjConf(\''+ siteName + '\',\'user_agent\')">规则</a></td>\
@@ -1400,7 +1401,7 @@ function siteWafConfig(siteName, type) {
                                     <td>\
                                     <div class="ssh-item" style="margin-left:0">\
                                         <input class="btswitch btswitch-ios" id="closecookie" type="checkbox" '+ (rdata.cookie ? 'checked' : '') + '>\
-                                        <label class="btswitch-btn" for="closecookie" onclick="set_site_obj_state(\''+ siteName + '\',\'cookie\')"></label>\
+                                        <label class="btswitch-btn" for="closecookie" onclick="setSiteObjState(\''+ siteName + '\',\'cookie\')"></label>\
                                     </div>\
                                     </td>\
                                     <td class="text-right"><a class="btlink" onclick="setSiteObjConf(\''+ siteName + '\',\'cookie\')">规则</a></td>\
@@ -1410,7 +1411,7 @@ function siteWafConfig(siteName, type) {
                                     <td>\
                                         <div class="ssh-item" style="margin-left:0">\
                                             <input class="btswitch btswitch-ios" id="closescan" type="checkbox" '+ (rdata.scan ? 'checked' : '') + '>\
-                                            <label class="btswitch-btn" for="closescan" onclick="set_site_obj_state(\''+ siteName + '\',\'scan\')"></label>\
+                                            <label class="btswitch-btn" for="closescan" onclick="setSiteObjState(\''+ siteName + '\',\'scan\')"></label>\
                                         </div>\
                                     </td>\
                                     <td class="text-right"><a class="btlink" onclick="scanRule()">设置</a></td>\
@@ -1421,7 +1422,7 @@ function siteWafConfig(siteName, type) {
                                     <td>\
                                         <div class="ssh-item" style="margin-left:0">\
                                             <input class="btswitch btswitch-ios" id="closecdn" type="checkbox" '+ (rdata.cdn ? 'checked' : '') + '>\
-                                            <label class="btswitch-btn" for="closecdn" onclick="set_site_obj_state(\''+ siteName + '\',\'cdn\')"></label>\
+                                            <label class="btswitch-btn" for="closecdn" onclick="setSiteObjState(\''+ siteName + '\',\'cdn\')"></label>\
                                         </div>\
                                     </td>\
                                     <td class="text-right"><a class="btlink" onclick="cdnHeader(\''+ siteName + '\')">设置</a></td>\
