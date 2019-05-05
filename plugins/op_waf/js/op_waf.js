@@ -1458,37 +1458,34 @@ function wafSite(){
     owPost('get_site_config', {}, function(data){
         var tmp = $.parseJSON(data.data);
         var rdata = $.parseJSON(tmp.data);
-        console.log(rdata);
-
         var tbody = '';
         var i = 0;
         $.each(rdata, function (k, v) {
-            console.log(k,v);
             i += 1;
             tbody += '<tr>\
                     <td><a onclick="siteWafConfig(\''+ k + '\')" class="sitename btlink" title="' + k + '">' + k + '</a></td>\
                     <td>\
-                        <input onclick="set_site_obj_state(\''+ k + '\',\'get\')" type="checkbox" ' + (v.get ? 'checked' : '') + '><span class="' + back_css(v.total[1].value) + '" title="拦截GET渗透次数:' + v.total[1].value + '">' + v.total[1].value + '</span>\
+                        <input onclick="setSiteObjState(\''+ k + '\',\'get\')" type="checkbox" ' + (v.get ? 'checked' : '') + '><span class="' + back_css(v.total[1].value) + '" title="拦截GET渗透次数:' + v.total[1].value + '">' + v.total[1].value + '</span>\
                     </td>\
                     <td>\
-                        <input onclick="set_site_obj_state(\''+ k + '\',\'post\')"  type="checkbox" ' + (v.post ? 'checked' : '') + '><span class="' + back_css(v.total[0].value) + '"  title="拦截POST渗透次数:' + v.total[0].value + '">' + v.total[0].value + '</span>\
+                        <input onclick="setSiteObjState(\''+ k + '\',\'post\')"  type="checkbox" ' + (v.post ? 'checked' : '') + '><span class="' + back_css(v.total[0].value) + '"  title="拦截POST渗透次数:' + v.total[0].value + '">' + v.total[0].value + '</span>\
                     </td>\
                     <td>\
-                        <input onclick="set_site_obj_state(\''+ k + '\',\'user-agent\')"  type="checkbox" ' + (v['user-agent'] ? 'checked' : '') + '><span class="' + back_css(v.total[3].value) + '" title="拦截恶意User-Agent次数:' + v.total[3].value + '">' + v.total[3].value + '</span>\
+                        <input onclick="setSiteObjState(\''+ k + '\',\'user-agent\')"  type="checkbox" ' + (v['user-agent'] ? 'checked' : '') + '><span class="' + back_css(v.total[3].value) + '" title="拦截恶意User-Agent次数:' + v.total[3].value + '">' + v.total[3].value + '</span>\
                     </td>\
                     <td>\
-                        <input onclick="set_site_obj_state(\''+ k + '\',\'cookie\')"  type="checkbox" ' + (v.cookie ? 'checked' : '') + '><span class="' + back_css(v.total[4].value) + '" title="拦截Cookie渗透次数:' + v.total[4].value + '">' + v.total[4].value + '</span>\
+                        <input onclick="setSiteObjState(\''+ k + '\',\'cookie\')"  type="checkbox" ' + (v.cookie ? 'checked' : '') + '><span class="' + back_css(v.total[4].value) + '" title="拦截Cookie渗透次数:' + v.total[4].value + '">' + v.total[4].value + '</span>\
                     </td>\
                     <td>\
-                        <input onclick="set_site_obj_state(\''+ k + '\',\'cdn\')"  type="checkbox" ' + (v.cdn ? 'checked' : '') + '>\
+                        <input onclick="setSiteObjState(\''+ k + '\',\'cdn\')"  type="checkbox" ' + (v.cdn ? 'checked' : '') + '>\
                     </td>\
                     <td>\
-                        <input onclick="set_site_obj_state(\''+ k + '\',\'cc\')"  type="checkbox" ' + (v.cc.open ? 'checked' : '') + '><span class="' + back_css(v.total[2].value) + '" title="拦截CC攻击次数:' + v.total[2].value + '">' + v.total[2].value + '</span>\
+                        <input onclick="setSiteObjState(\''+ k + '\',\'cc\')"  type="checkbox" ' + (v.cc.open ? 'checked' : '') + '><span class="' + back_css(v.total[2].value) + '" title="拦截CC攻击次数:' + v.total[2].value + '">' + v.total[2].value + '</span>\
                     </td>\
                     <td>\
                         <div class="ssh-item" style="margin-left:0">\
                             <input class="btswitch btswitch-ios" id="closeget_'+ i + '" type="checkbox" ' + (v.open ? 'checked' : '') + '>\
-                            <label class="btswitch-btn" for="closeget_'+ i + '" onclick="set_site_obj_state(\'' + k + '\',\'open\')"></label>\
+                            <label class="btswitch-btn" for="closeget_'+ i + '" onclick="setSiteObjState(\'' + k + '\',\'open\')"></label>\
                         </div>\
                     </td>\
                     <td class="text-right"><a onclick="siteWafLog(\''+ k + '\')" class="btlink ' + (v.log_size > 0 ? 'dot' : '') + '">日志</a> | <a onclick="siteWafConfig(\'' + k + '\')" class="btlink">设置</a></td>\
