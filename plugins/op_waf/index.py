@@ -371,8 +371,8 @@ def removeIpWhite():
     content = public.readFile(path)
     content = json.loads(content)
 
-    v = content[int(index)]
-    content.remove(v)
+    k = content[int(index)]
+    content.remove(k)
 
     cjson = public.getJson(content)
     public.writeFile(path, cjson)
@@ -448,15 +448,9 @@ def saveScanRule():
     if not data[0]:
         return data[1]
 
-    conf = getRuleJsonPath('scan_black')
-    content = public.readFile(conf)
-    cobj = json.loads(content)
-
-    cobj['retry'] = args
-
-    cjson = public.getJson(cobj)
-    public.writeFile(conf, cjson)
-
+    path = getRuleJsonPath('scan_black')
+    cjson = public.getJson(args)
+    public.writeFile(path, cjson)
     return public.returnJson(True, '设置成功!', [])
 
 
@@ -550,6 +544,25 @@ def removeSiteCdnHeader():
     public.writeFile(path, cjson)
     return public.returnJson(True, '删除成功!')
 
+def outputData():
+    args = getArgs()
+    data = checkArgs(args, ['s_Name'])
+    if not data[0]:
+        return data[1]
+
+    path = getRuleJsonPath(args['s_Name'])
+    content = public.readFile(path)
+    return public.returnJson(True, 'ok', content)
+
+def importData():
+    args = getArgs()
+    data = checkArgs(args, ['s_Name', 'pdata'])
+    if not data[0]:
+        return data[1]
+
+    path = getRuleJsonPath(args['s_Name'])
+    public.writeFile(path, args['pdata'])
+    return public.returnJson(True, '设置成功!')
 
 def getLogsList():
     args = getArgs()
@@ -709,6 +722,10 @@ if __name__ == "__main__":
         print getLogsList()
     elif func == 'get_safe_logs':
         print getSafeLogs()
+    elif func == 'output_data':
+        print outputData()
+    elif func == 'import_data':
+        print importData()
     elif func == 'waf_srceen':
         print getWafSrceen()
     elif func == 'waf_conf':
