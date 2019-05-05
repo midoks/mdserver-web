@@ -235,112 +235,36 @@ function saveRetry(siteName,type) {
 }
 
 
-//URL白名单
-function urlWhite(type) {
-    if (type == undefined) {
-        layer.open({
-            type: 1,
-            title: "管理URL白名单",
-            area: ['500px', '400px'],
-            closeBtn: 2,
-            shadeClose: false,
-            content: '<div class="tab_list"><div class="tab_block active">标准模式-URL白名单</div><div class="tab_block">增强模式—URL白名单</div></div>\
-                <div class="pd15">\
-                    <div class="url_block">\
-                        <div style="border-bottom:#ccc 1px solid;margin-bottom:10px;padding-bottom:10px">\
-                            <input class="bt-input-text" name="url_white_address" type="text" value="" style="width:400px;margin-right:15px;margin-left:5px" placeholder="URL地址,支持正则表达式">\
-                            <button class="btn btn-success btn-sm va0 pull-right" onclick="add_url_white();">添加</button>\
-                        </div>\
-                        <div class="divtable">\
-                            <div id="urlWhite" style="max-height:300px;overflow:auto;border:#ddd 1px solid">\
-                                <table class="table table-hover" style="border:none">\
-                                    <thead>\
-                                        <tr>\
-                                            <th>URL</th>\
-                                            <th style="text-align: right;">操作</th>\
-                                        </tr>\
-                                    </thead>\
-                                    <tbody id="url_white_con" class="gztr"></tbody>\
-                                </table>\
-                            </div>\
-                            <div class="btn-list">\
-                                <button class="btn btn-success btn-sm va0 mr5 mt10" onclick="file_input(\'url_white\')" >导入</button>\
-                                <button class="btn btn-success btn-sm va0 mt10" onclick="output_data(\'url_white\')">导出</button>\
-                            </div>\
-                        </div>\
-                    </div>\
-                    <div class="url_block" style="display:none">\
-                        <div style="border-bottom:#ccc 1px solid;margin-bottom:10px;padding-bottom:10px">\
-                            <input class="bt-input-text" name="url_increase_white_address" type="text" value="" style="width:400px;margin-right:15px;margin-left:5px" placeholder="URL地址,支持正则表达式">\
-                            <button class="btn btn-success btn-sm va0 pull-right add_increase_white_event" >添加</button>\
-                        </div>\
-                        <div class="divtable">\
-                            <div id="url_increase_white" style="max-height:300px;overflow:auto;border:#ddd 1px solid">\
-                                <table class="table table-hover" style="border:none">\
-                                    <thead>\
-                                        <tr>\
-                                            <th>URL</th>\
-                                            <th style="text-align: right;">操作</th>\
-                                        </tr>\
-                                    </thead>\
-                                    <tbody id="url_increase_white_con" class="gztr"></tbody>\
-                                </table>\
-                            </div>\
-                        </div>\
-                    </div>\
-                    <ul class="help-info-text c7">\
-                        <li>所有规则对白名单中的URL无效,包括IP黑名单和URL黑名单</li>\
-                    </ul></div>',
-            success:function(layero,index){
-                $('.tab_list .tab_block').click(function(){
-                    var index = $(this).index();
-                    $(this).addClass('active').siblings().removeClass('active');
-                    $('.url_block').eq(index).show().siblings().hide();
-                    if(index == 1) {get_golbls_cc();}
-                });
-                $('.add_increase_white_event').click(function(){
-                    var _val = $('[name="url_increase_white_address"]').val();
-                    if(_val == ''){
-                        layer.msg('URL规则不能为空!');
-                        return false;
-                    }
-                    add_golbls_cc({text:_val},function(res){
-                        if(res.status){
-                            get_golbls_cc(function(){
-                                if(res.status) get_golbls_cc(function(){
-                                    layer.msg(res.msg,{icon:res.status?1:2});
-                                });
-                            });
-                            $('[name="url_increase_white_address"]').val('');
-                        }
-                    });
-                });
-                $('#url_increase_white_con').on('click','.del_golbls_cc',function(){
-                    var _val = $(this).attr('data-val');
-                    del_golbls_cc({text:_val},function(res){
-                        if(res.status) get_golbls_cc(function(){
-                            layer.msg(res.msg,{icon:res.status?1:2});
-                        });
-                    });
-                });
-            }
-        });
-        tableFixed("urlWhite");
+function modifyRule(index, ruleName) {
+    var ruleValue = $('.rule_body_' + index).text();
+    $('.rule_body_' + index).html('<textarea class="bt-input-text" name="rule_body_' + index + '" style="margin: 0px; height: 70px; width: 99%;line-height:20px">' + ruleValue + '</textarea>');
+    var rulePs = $('.rule_ps_' + index).text();
+    $('.rule_ps_' + index).html('<input class="bt-input-text" type="text" name="rule_ps_' + index + '" value="' + rulePs + '" />');
+    $('.rule_modify_' + index).html('<a class="btlink" onclick="modifyRuleSave(' + index + ',\'' + ruleName + '\')">保存</a> | <a class="btlink modr_cancel_' + index + '">取消</a>');
+    $(".modr_cancel_" + index).click(function () {
+        $('.rule_body_' + index).html(ruleValue);
+        $('.rule_ps_' + index).html(rulePs);
+        $('.rule_modify_' + index).html('<a class="btlink" onclick="modifyRule(' + index + ',\'' + ruleName + '\')">编辑</a>');
+    })
+}
+
+function modifyRuleSave(index, ruleName) {
+    var pdata = {
+        index: index,
+        ruleName: ruleName,
+        ruleBody: $("textarea[name='rule_body_" + index + "']").val(),
+        rulePs: $("input[name='rule_ps_" + index + "']").val()
     }
+    
+    owPost('modify_rule', pdata, function(data){
+        var rdata = $.parseJSON(data.data);
 
-
-    getRuleByName('url_white', function(data){
-        var tmp = $.parseJSON(data.data);
-        var rdata = $.parseJSON(tmp.data);
-        console.log(rdata);
-        var tbody = ''
-        for (var i = 0; i < rdata.length; i++) {
-            tbody += '<tr>\
-                    <td>'+ rdata[i] + '</td>\
-                    <td class="text-right"><a class="btlink" onclick="remove_url_white('+ i + ')">删除</a></td>\
-                </tr>'
+        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+        if (rdata.status) {
+            setTimeout(function(){
+                setObjConf(ruleName, 1);
+            },1000);
         }
-        $("#url_white_con").html(tbody);
     });
 }
 
@@ -393,7 +317,7 @@ function setObjConf(ruleName, type) {
             tbody += '<tr>\
                     <td class="rule_body_'+ i + '">' + rdata[i][1] + '</td>\
                     <td class="rule_ps_'+ i + '">' + rdata[i][2] + '</td>\
-                    <td class="rule_modify_'+ i + '"><a class="btlink" onclick="modify_rule(' + i + ',\'' + ruleName + '\')">编辑</a>' + removeRule + '</td>\
+                    <td class="rule_modify_'+ i + '"><a class="btlink" onclick="modifyRule(' + i + ',\'' + ruleName + '\')">编辑</a>' + removeRule + '</td>\
                     <td class="text-right">\
                         <div class="pull-right">\
                         <input class="btswitch btswitch-ios" id="closeua_'+ i + '" type="checkbox" ' + (rdata[i][0] ? 'checked' : '') + '>\
