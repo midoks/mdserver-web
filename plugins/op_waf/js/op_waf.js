@@ -496,6 +496,87 @@ function removeIpWhite(index) {
     });
 }
 
+
+function funDownload(content, filename) {
+    // 创建隐藏的可下载链接
+    var eleLink = document.createElement('a');
+    eleLink.download = filename;
+    eleLink.style.display = 'none';
+    // 字符内容转变成blob地址
+    var blob = new Blob([content]);
+    eleLink.href = URL.createObjectURL(blob);
+    // 触发点击
+    document.body.appendChild(eleLink);
+    eleLink.click();
+    // 然后移除
+    document.body.removeChild(eleLink);
+}
+
+function outputLayer(rdata, name, type) {
+    window.Load_layer = layer.open({
+        type: 1,
+        title: type ? "导出数据" : "导入数据",
+        area: ['400px', '370px'],
+        shadeClose: false,
+        content: '<div class="soft-man-con" style="padding:10px;">' +
+            '<div class="line">' +
+            '<div class="ml0" style="position:relative;" id="focus_tips">' +
+            '<textarea class="bt-input-text mr20 config" name="config" style="width: 300px; height: 250px; line-height: 22px; display: none;" id="lead_data">' + (rdata != '' ? JSON.stringify(rdata) : '') + '</textarea>' +
+            '<div class="placeholder c9" style="top: 15px; left: 15px; display:' + (rdata == "" ? "block;" : "none;") + '">导入格式如下：' +
+            (name == 'ip_white' || name == 'ip_black' ? "[[[127, 0, 0, 1],[127, 0, 0, 255]]]" : "[\"^/test\",\"^/web\"]") +
+            '</div>' +
+            '</div>' +
+            '</div>' +
+            '<div class="line "><div class="ml0">' +
+            (type ? '<button name="btn_save_to" class="btn btn-success btn-sm mr5 btn_save_to" >导出配置</button>' : '<button name="btn_save" class="btn btn-success btn-sm mr5 btn_save">保存</button>') +
+            '</div></div>' +
+            '</div>'
+    });
+    var lead_error = CodeMirror.fromTextArea(document.getElementById("lead_data"), {
+        mode: 'html',
+        matchBrackets: true,
+        matchtags: true,
+        autoMatchParens: true
+    });
+    setTimeout(function () {
+        $('.btn_save').on('click', function () {
+            importData(name, lead_error.getValue());
+        })
+        $('.btn_save_to').on('click', function () {
+            funDownload(lead_error.getValue(), name + '.json');
+        });
+        $('#focus_tips').on('click', function () {
+            $('.placeholder').hide();
+        });
+    }, 100);
+}
+
+
+//导出数据
+function outputData(name, callback) {
+    var loadT = layer.msg('正在导出数据..', { icon: 16, time: 0 });
+
+    owPost('output_data', { s_Name: name } , function(data){
+        var tmp = $.parseJSON(data.data);
+        var rdata = $.parseJSON(tmp.data);
+        if (callback) callback(rdata,res);
+        outputLayer(rdata, name, true);
+    });
+}
+
+//导入数据
+function importData(name, pdata, callback) {
+    owPost('import_data', { s_Name: name, pdata: pdata } , function(data){
+        var rdata = $.parseJSON(data.data);   
+        if (callback) callback();
+        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+    });
+}
+
+function fileInput(name) {
+    outputLayer('', name, false);
+}
+
 //IP白名单
 function ipWhite(type) {
     if (type == undefined) {
@@ -525,8 +606,8 @@ function ipWhite(type) {
                         </div>\
                     </div>\
                     <div style="width:100%" class="mt5">\
-                        <button class="btn btn-success btn-sm va0 mr5 mt10" onclick="file_input(\'ip_white\')" >导入</button>\
-                        <button class="btn btn-success btn-sm va0 mt10" onclick="output_data(\'ip_white\')">导出</button>\
+                        <button class="btn btn-success btn-sm va0 mr5 mt10" onclick="fileInput(\'ip_white\')" >导入</button>\
+                        <button class="btn btn-success btn-sm va0 mt10" onclick="outputData(\'ip_white\')">导出</button>\
                     </div>\
                     <ul class="help-info-text c7 ptb10">\
                         <li>所有规则对白名单中的IP段无效,包括IP黑名单和URL黑名单,IP白名单具备最高优先权</li>\
@@ -565,6 +646,136 @@ function ipWhite(type) {
     });
 }
 
+
+// 获取IPV4黑名单
+function getIpv4Address(callback){
+    getRuleByName('ip_black', function(data){
+        var tmp = $.parseJSON(data.data);
+        var rdata = $.parseJSON(tmp.data);
+        callback(rdata);
+    });
+}
+
+// 获取IPV6黑名单
+function getIpv6Address(callback){
+    getRuleByName('ipv6_black', function(data){
+        var tmp = $.parseJSON(data.data);
+        var rdata = $.parseJSON(tmp.data);
+        callback(rdata);
+    });
+}
+
+
+// 添加ipv6请求
+function AddIpv6Req(ip,callback){
+    owPost('set_ipv6_back', {addr:ip}, function(data){
+        console.log(data);
+        // if(callback) callback(rdata);
+    });
+}
+
+//IP黑名单
+function ipBlack(type) {
+    if (type == undefined) {
+        create_l = layer.open({
+            type: 1,
+            title: "管理IP黑名单",
+            area: ['500px', '500px'],
+            closeBtn: 2,
+            shadeClose: false,
+            content: '<div class="tab_list"><div class="tab_block active">IPv4黑名单</div><div class="tab_block">IPv6黑名单</div></div>\
+                <div class="pd15 ipv4_block">\
+                    <div style="border-bottom:#ccc 1px solid;margin-bottom:10px;padding-bottom:10px">\
+                        <input class="bt-input-text" name="start_ip" type="text" value="" style="width:150px;margin-right:15px;margin-left:5px" placeholder="起始IP地址">\
+                        <input class="bt-input-text mr5" name="end_ip" type="text" style="width:150px;margin-left:5px;margin-right:20px" placeholder="结束IP地址">\
+                        <button class="btn btn-success btn-sm va0 pull-right" onclick="add_ip_black();">添加</button>\</div>\
+                    <div class="divtable">\
+                    <div id="ipBlack" style="max-height:300px;overflow:auto;border:#ddd 1px solid">\
+                    <table class="table table-hover" style="border:none">\
+                        <thead>\
+                            <tr>\
+                                <th>超始IP</th>\
+                                <th>结束IP</th>\
+                                <th style="text-align: right;">操作</th>\
+                            </tr>\
+                        </thead>\
+                        <tbody id="ip_black_con" class="gztr"></tbody>\
+                    </table>\
+                    </div>\
+                    <div style="width:100%" class="mt10">\
+                        <button class="btn btn-success btn-sm va0 mr5 mt10" onclick="fileInput(\'ip_black\')" >导入</button>\
+                        <button class="btn btn-success btn-sm va0 mt10" onclick="outputData(\'ip_black\')">导出</button>\
+                    </div>\
+                </div>\
+                <ul class="help-info-text c7 ptb10">\
+                    <li>黑名单中的IP段将被禁止访问,IP白名单中已存在的除外</li>\
+                </ul>\
+            </div>\
+            <div class="pd15 ipv6_block">\
+                <div style="border-bottom:#ccc 1px solid;margin-bottom:10px;padding-bottom:10px">\
+                    <input class="bt-input-text" name="ipv6_address" type="text" style="width:380px;margin-right:15px;margin-left:5px" placeholder="ipv6地址">\
+                    <button class="btn btn-success btn-sm va0 btn_add_ipv6" style="margin-left:15px;">添加</button>\
+                </div>\
+                <div class="divtable">\
+                    <div id="ipv6_black" style="max-height:300px;overflow:auto;border:#ddd 1px solid">\
+                        <table class="table table-hover" style="border:none">\
+                            <thead><tr><th>IPv6地址</th><th style="text-align: right;">操作</th></tr></thead>\
+                            <tbody id="ipv6_black_con" class="gztr"></tbody>\
+                        </table>\
+                    </div>\
+                </div>\
+                <ul class="help-info-text c7 ptb10">\
+                    <li>黑名单中的IP段将被禁止访问,IP白名单中已存在的除外</li>\
+                </ul>\
+            </div>',
+            success:function(index,layero){
+                $('.tab_list .tab_block').click(function(){
+                    $(this).addClass('active').siblings().removeClass('active');
+                    if($(this).index() === 0){
+                        $('.ipv4_block').show().next().hide();
+                        getIpv4Address(function(rdata){
+                            var tbody = ''
+                            for (var i = 0; i < rdata.length; i++) {
+                                tbody += '<tr>\
+                                        <td>'+ rdata[i][0].join('.') + '</td>\
+                                        <td>'+ rdata[i][1].join('.') + '</td>\
+                                        <td class="text-right"><a class="btlink" onclick="remove_ip_black('+ i + ')">删除</a></td>\
+                                    </tr>'
+                            }
+                            $("#ip_black_con").html(tbody);
+                        });
+                    }else{
+                        $('.ipv4_block').hide().next().show();
+                        getIpv6Address(function(res){
+                            // console.log(res);
+                            var tbody = '',rdata = res;
+                            for (var i = 0; i < rdata.length; i++) {
+                                tbody += '<tr>\
+                                    <td>'+ rdata[i] + '</td>\
+                                    <td class="text-right"><a class="btlink" onclick="remove_ipv6_black(\''+ rdata[i] + '\')">删除</a></td>\
+                                </tr>'
+                            }
+                            $("#ipv6_black_con").html(tbody);
+                        });
+                    }
+                });
+                $('.btn_add_ipv6').click(function(){
+                    var ipv6 = $('[name="ipv6_address"]').val();
+                    add_ipv6_req(ipv6,function(res){
+                        layer.close(loadT);
+                        layer.msg(res.msg,{icon:res.status?1:2});
+                        if(res.status){
+                            $('[name="ipv6_address"]').val('');
+                            $('.tab_list .tab_block:eq(1)').click();
+                        }
+                    });
+                });
+                $('.tab_list .tab_block:eq(0)').click();
+            }
+        });
+        tableFixed("ipBlack");
+    }
+}
 
 function wafScreen(){
 
@@ -1162,7 +1373,6 @@ function siteWafConfig(siteName, type) {
     owPost('get_site_config_byname', { siteName: siteName }, function(data){
         var tmp = $.parseJSON(data.data);
         var rdata = tmp.data;
-        console.log(rdata);
         nginx_config = rdata;
         var con = '<div class="pd15">\
                 <div class="lib-con-title">\
