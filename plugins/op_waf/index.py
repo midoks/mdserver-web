@@ -376,7 +376,95 @@ def removeIpWhite():
 
     cjson = public.getJson(content)
     public.writeFile(path, cjson)
-    return public.returnJson(True, '设置成功!') 
+    return public.returnJson(True, '设置成功!')
+
+def addIpBlack():
+    args = getArgs()
+    data = checkArgs(args, ['start_ip', 'end_ip'])
+    if not data[0]:
+        return data[1]
+
+    start_ip = args['start_ip']
+    end_ip = args['end_ip']
+
+    path = getRuleJsonPath('ip_black')
+    content = public.readFile(path)
+    content = json.loads(content)
+
+    data = []
+
+    start_ip_list = start_ip.split('.')
+    tmp = []
+    for x in range(len(start_ip_list)):
+        tmp.append(int(start_ip_list[x]))
+
+    end_ip_list = end_ip.split('.')
+    tmp2 = []
+    for x in range(len(end_ip_list)):
+        tmp2.append(int(end_ip_list[x]))
+
+    data.append(tmp)
+    data.append(tmp2)
+
+    content.append(data)
+
+    cjson = public.getJson(content)
+    public.writeFile(path, cjson)
+    return public.returnJson(True, '设置成功!')
+
+def removeIpBlack():
+    args = getArgs()
+    data = checkArgs(args, ['index'])
+    if not data[0]:
+        return data[1]
+
+    index = args['index']
+
+    path = getRuleJsonPath('ip_black')
+    content = public.readFile(path)
+    content = json.loads(content)
+
+    k = content[int(index)]
+    content.remove(k)
+
+    cjson = public.getJson(content)
+    public.writeFile(path, cjson)
+    return public.returnJson(True, '设置成功!')
+
+def setIpv6Black():
+    args = getArgs()
+    data = checkArgs(args, ['addr'])
+    if not data[0]:
+        return data[1]
+
+    addr = args['addr'].replace('_',':')
+    path = getRuleJsonPath('ipv6_black')
+
+    content = public.readFile(path)
+    content = json.loads(content)
+    content.append(addr)
+
+    cjson = public.getJson(content)
+    public.writeFile(path, cjson)
+    return public.returnJson(True, '设置成功!')
+
+def delIpv6Black():
+    args = getArgs()
+    data = checkArgs(args, ['addr'])
+    if not data[0]:
+        return data[1]
+
+    addr = args['addr'].replace('_',':')
+    path = getRuleJsonPath('ipv6_black')
+
+    content = public.readFile(path)
+    content = json.loads(content)
+    
+    content.remove(addr)
+
+    cjson = public.getJson(content)
+    public.writeFile(path, cjson)
+    return public.returnJson(True, '设置成功!')   
 
 def removeSiteRule():
     args = getArgs()
@@ -696,6 +784,14 @@ if __name__ == "__main__":
         print addIpWhite()
     elif func == 'remove_ip_white':
         print removeIpWhite()
+    elif func == 'add_ip_black':
+        print addIpBlack()
+    elif func == 'remove_ip_black':
+        print removeIpBlack()
+    elif func == 'set_ipv6_black':
+        print setIpv6Black()
+    elif func == 'del_ipv6_black':
+        print delIpv6Black()
     elif func == 'remove_site_rule':
         print removeSiteRule()
     elif func == 'set_obj_status':

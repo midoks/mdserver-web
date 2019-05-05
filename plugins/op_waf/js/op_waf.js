@@ -667,10 +667,56 @@ function getIpv6Address(callback){
 
 
 // 添加ipv6请求
-function AddIpv6Req(ip,callback){
-    owPost('set_ipv6_back', {addr:ip}, function(data){
-        console.log(data);
-        // if(callback) callback(rdata);
+function addIpv6Req(ip,callback){
+    var ip = ip.replace(/:/g, '_');
+    owPost('set_ipv6_black', {addr:ip}, function(data){
+        var rdata = $.parseJSON(data.data);
+        if(callback) callback(rdata);
+    });
+}
+
+// 添加ipv6请求
+function removeIpv6Black(ip,callback){
+    var ip = ip.replace(/:/g, '_');
+    owPost('del_ipv6_black', {addr:ip}, function(data){
+        var rdata = $.parseJSON(data.data);
+        layer.msg(rdata.msg,{icon:rdata.status?1:2});
+        $('.tab_list .tab_block:eq(1)').click();
+
+        if(callback) callback(rdata);
+    });
+}
+
+//添加IP段到IP黑名单
+function addIpBlack() {
+    var pdata = {
+        start_ip: $("input[name='start_ip']").val(),
+        end_ip: $("input[name='end_ip']").val()
+    }
+
+    if (pdata['start_ip'].split('.').length < 4 || pdata['end_ip'].split('.').length < 4) {
+        layer.msg('起始IP或结束IP格式不正确!');
+        return;
+    }
+
+    owPost('add_ip_black', pdata, function(data){
+        var rdata = $.parseJSON(data.data);
+        if (rdata.status) {
+            ipBlack(1);
+        }
+        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+    });
+}
+
+
+//从IP黑名单删除IP段
+function removeIpBlack(index) {
+    owPost('remove_ip_black', { index: index }, function (data) {
+        var rdata = $.parseJSON(data.data);
+        if (rdata.status) {
+            ipBlack(1);
+        }
+        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
     });
 }
 
@@ -688,7 +734,7 @@ function ipBlack(type) {
                     <div style="border-bottom:#ccc 1px solid;margin-bottom:10px;padding-bottom:10px">\
                         <input class="bt-input-text" name="start_ip" type="text" value="" style="width:150px;margin-right:15px;margin-left:5px" placeholder="起始IP地址">\
                         <input class="bt-input-text mr5" name="end_ip" type="text" style="width:150px;margin-left:5px;margin-right:20px" placeholder="结束IP地址">\
-                        <button class="btn btn-success btn-sm va0 pull-right" onclick="add_ip_black();">添加</button>\</div>\
+                        <button class="btn btn-success btn-sm va0 pull-right" onclick="addIpBlack();">添加</button>\</div>\
                     <div class="divtable">\
                     <div id="ipBlack" style="max-height:300px;overflow:auto;border:#ddd 1px solid">\
                     <table class="table table-hover" style="border:none">\
@@ -739,7 +785,7 @@ function ipBlack(type) {
                                 tbody += '<tr>\
                                         <td>'+ rdata[i][0].join('.') + '</td>\
                                         <td>'+ rdata[i][1].join('.') + '</td>\
-                                        <td class="text-right"><a class="btlink" onclick="remove_ip_black('+ i + ')">删除</a></td>\
+                                        <td class="text-right"><a class="btlink" onclick="removeIpBlack('+ i + ')">删除</a></td>\
                                     </tr>'
                             }
                             $("#ip_black_con").html(tbody);
@@ -747,12 +793,11 @@ function ipBlack(type) {
                     }else{
                         $('.ipv4_block').hide().next().show();
                         getIpv6Address(function(res){
-                            // console.log(res);
                             var tbody = '',rdata = res;
                             for (var i = 0; i < rdata.length; i++) {
                                 tbody += '<tr>\
                                     <td>'+ rdata[i] + '</td>\
-                                    <td class="text-right"><a class="btlink" onclick="remove_ipv6_black(\''+ rdata[i] + '\')">删除</a></td>\
+                                    <td class="text-right"><a class="btlink" onclick="removeIpv6Black(\''+ rdata[i] + '\')">删除</a></td>\
                                 </tr>'
                             }
                             $("#ipv6_black_con").html(tbody);
@@ -761,8 +806,7 @@ function ipBlack(type) {
                 });
                 $('.btn_add_ipv6').click(function(){
                     var ipv6 = $('[name="ipv6_address"]').val();
-                    add_ipv6_req(ipv6,function(res){
-                        layer.close(loadT);
+                    addIpv6Req(ipv6, function(res){
                         layer.msg(res.msg,{icon:res.status?1:2});
                         if(res.status){
                             $('[name="ipv6_address"]').val('');
@@ -774,6 +818,8 @@ function ipBlack(type) {
             }
         });
         tableFixed("ipBlack");
+    } else {
+        $('.tab_list .tab_block:eq(0)').click();
     }
 }
 
@@ -816,7 +862,6 @@ function wafGloablRefresh(time){
         wafGloabl();
     }, time);
 }
-
 
 function wafGloabl(){
     owPost('waf_conf', {}, function(data){
