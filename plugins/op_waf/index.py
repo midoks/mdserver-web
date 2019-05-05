@@ -325,6 +325,58 @@ def addSiteRule():
     public.writeFile(path, cjson)
     return public.returnJson(True, '设置成功!')
 
+def addIpWhite():
+    args = getArgs()
+    data = checkArgs(args, ['start_ip', 'end_ip'])
+    if not data[0]:
+        return data[1]
+
+    start_ip = args['start_ip']
+    end_ip = args['end_ip']
+
+    path = getRuleJsonPath('ip_white')
+    content = public.readFile(path)
+    content = json.loads(content)
+
+    data = []
+
+    start_ip_list = start_ip.split('.')
+    tmp = []
+    for x in range(len(start_ip_list)):
+        tmp.append(int(start_ip_list[x]))
+
+    end_ip_list = end_ip.split('.')
+    tmp2 = []
+    for x in range(len(end_ip_list)):
+        tmp2.append(int(end_ip_list[x]))
+
+    data.append(tmp)
+    data.append(tmp2)
+
+    content.append(data)
+
+    cjson = public.getJson(content)
+    public.writeFile(path, cjson)
+    return public.returnJson(True, '设置成功!')
+
+def removeIpWhite():
+    args = getArgs()
+    data = checkArgs(args, ['index'])
+    if not data[0]:
+        return data[1]
+
+    index = args['index']
+
+    path = getRuleJsonPath('ip_white')
+    content = public.readFile(path)
+    content = json.loads(content)
+
+    v = content[int(index)]
+    content.remove(v)
+
+    cjson = public.getJson(content)
+    public.writeFile(path, cjson)
+    return public.returnJson(True, '设置成功!') 
 
 def removeSiteRule():
     args = getArgs()
@@ -627,6 +679,10 @@ if __name__ == "__main__":
         print getSiteRule()
     elif func == 'add_site_rule':
         print addSiteRule()
+    elif func == 'add_ip_white':
+        print addIpWhite()
+    elif func == 'remove_ip_white':
+        print removeIpWhite()
     elif func == 'remove_site_rule':
         print removeSiteRule()
     elif func == 'set_obj_status':
