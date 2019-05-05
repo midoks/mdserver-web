@@ -286,6 +286,34 @@ def getRule():
     return public.returnJson(True, 'ok', content)
 
 
+def addRule():
+    args = getArgs()
+    data = checkArgs(args, ['ruleName', 'ruleValue', 'ps'])
+    if not data[0]:
+        return data[1]
+
+    ruleValue = args['ruleValue']
+    ruleName = args['ruleName']
+    ps = args['ps']
+
+    fpath = getRuleJsonPath(ruleName)
+    content = public.readFile(fpath)
+    content = json.loads(content)
+
+    tmp_k = []
+    tmp_k.append(1)
+    tmp_k.append(ruleValue)
+    tmp_k.append(ps)
+    tmp_k.append(1)
+
+    content.append(tmp_k)
+
+    cjson = public.getJson(content)
+    public.writeFile(fpath, cjson)
+
+    return public.returnJson(True, '设置成功!', content)
+
+
 def modifyRule():
     args = getArgs()
     data = checkArgs(args, ['index', 'ruleName', 'ruleBody', 'rulePs'])
@@ -817,6 +845,8 @@ if __name__ == "__main__":
         print getConf()
     elif func == 'get_rule':
         print getRule()
+    elif func == 'add_rule':
+        print addRule()
     elif func == 'modify_rule':
         print modifyRule()
     elif func == 'get_site_rule':

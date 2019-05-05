@@ -234,6 +234,32 @@ function saveRetry(siteName,type) {
     });
 }
 
+function addRule(ruleName) {
+    var pdata = {
+        'ruleValue': $("input[name='ruleValue']").val(),
+        'ps': $("input[name='rulePs']").val(),
+        'ruleName': ruleName
+    }
+
+    owPost('add_rule', pdata, function(data){
+        var rdata = $.parseJSON(data.data);
+        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+        if (rdata.status) {
+            setTimeout(function(){
+                setObjConf(ruleName, 1);
+            },1000);
+        }
+    });
+
+    // var loadT = layer.msg('正在添加，请稍候..', { icon: 16, time: 0 });
+    // $.post('/plugin?action=a&name=btwaf&s=add_rule', pdata, function (rdata) {
+    //     layer.close(loadT);
+    //     layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+    //     if (rdata.status) {
+    //         set_obj_conf(ruleName, 1);
+    //     }
+    // });
+}
 
 function modifyRule(index, ruleName) {
     var ruleValue = $('.rule_body_' + index).text();
@@ -255,7 +281,7 @@ function modifyRuleSave(index, ruleName) {
         ruleBody: $("textarea[name='rule_body_" + index + "']").val(),
         rulePs: $("input[name='rule_ps_" + index + "']").val()
     }
-    
+
     owPost('modify_rule', pdata, function(data){
         var rdata = $.parseJSON(data.data);
 
@@ -282,7 +308,7 @@ function setObjConf(ruleName, type) {
                 <div style="border-bottom:#ccc 1px solid;margin-bottom:10px;padding-bottom:10px">\
                 <input class="bt-input-text" name="ruleValue" type="text" value="" style="width:470px;margin-right:12px;" placeholder="规则内容,请使用正则表达式">\
                 <input class="bt-input-text mr5" name="rulePs" type="text" style="width:120px;" placeholder="描述">\
-                <button class="btn btn-success btn-sm va0 pull-right" onclick="add_rule(\''+ ruleName + '\');">添加</button>\</div>\
+                <button class="btn btn-success btn-sm va0 pull-right" onclick="addRule(\''+ ruleName + '\');">添加</button>\</div>\
                 <div class="divtable">\
                 <div id="jc-file-table" class="table_head_fix" style="max-height:300px;overflow:auto;border:#ddd 1px solid">\
                 <table class="table table-hover" style="border:none">\
