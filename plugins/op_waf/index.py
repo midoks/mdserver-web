@@ -655,9 +655,9 @@ def setCcConf():
     tmp = cobj['cc']
 
 
-    tmp['cycle'] = args['cycle']
-    tmp['limit'] = args['limit']
-    tmp['endtime'] = args['endtime']
+    tmp['cycle'] = int(args['cycle'])
+    tmp['limit'] = int(args['limit'])
+    tmp['endtime'] = int(args['endtime'])
     tmp['is_open_global'] = args['is_open_global']
     tmp['increase'] = args['increase']
     cobj['cc'] = tmp
