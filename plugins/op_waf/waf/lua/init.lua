@@ -441,13 +441,13 @@ function waf()
 
     waf_url()
 
-    if method == "GET" then
+    if params["method"] == "GET" then
         -- waf_referer()  
         -- waf_cookie()
     end
 
 
-    if method == "POST" then
+    if params["method"] == "POST" then
         -- ngx.req.read_body()
         -- request_args111 = ngx.req.get_post_args()
         -- waf_cookie()
@@ -460,10 +460,7 @@ function waf()
     post_data_chekc()
 
     local server_name = params["server_name"]
-    ngx.say(json.encode(site_config))
     if site_config[server_name] then
-
-        ngx.say(server_name)
         X_Forwarded()
         post_X_Forwarded()
         php_path()
@@ -474,4 +471,5 @@ function waf()
         post_data()
     end
 end
+
 waf()
