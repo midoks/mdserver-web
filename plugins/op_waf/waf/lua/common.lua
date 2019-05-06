@@ -151,6 +151,10 @@ end
 function _M.write_drop_ip(self, is_drop, drop_time)
     local filename = self.cpath .. 'drop_ip.log'
     local fp = io.open(filename,'ab')
+    local server_name = self.params["server_name"]
+    local ip = self.params["server_name"]
+    local request_uri = self.params["request_uri"]
+
     if fp == nil then return false end
     local logtmp = {os.time(),ip,server_name,request_uri,drop_time,is_drop}
     local logstr = json.encode(logtmp) .. "\n"
