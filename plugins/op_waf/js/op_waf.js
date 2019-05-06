@@ -77,101 +77,104 @@ function setObjOpen(ruleName){
     });
 }
 
+
+//保存CC规则
+function saveCcRule(siteName,is_open_global, type) {
+    var increase = "0";
+    if(type == 2){
+        // set_aicc_open('start');
+        increase = "0";
+    }else{
+        // set_aicc_open('stop');
+        increase = type;
+    }
+    increase = "0";
+    var pdata = {
+        siteName:siteName,
+        cycle: $("input[name='cc_cycle']").val(),
+        limit: $("input[name='cc_limit']").val(),
+        endtime: $("input[name='cc_endtime']").val(),
+        is_open_global:is_open_global,
+        increase:increase
+    }
+    console.log(pdata);
+    var act = 'set_cc_conf';
+    if (siteName != 'undefined') act = 'set_site_cc_conf';
+
+    owPost(act, pdata, function(data){
+        var rdata = $.parseJSON(data.data);
+        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+        setTimeout(function(){
+            if (siteName != 'undefined') {
+                siteWafConfig(siteName, 1);
+            } else {
+                wafGloabl();
+            }
+        },1000);
+    });
+}
+
+
 function setCcRule(cycle, limit, endtime, siteName, increase){
     var incstr = '<li style="color:red;">此处设置仅对当前站点有效。</li>';
     if (siteName == 'undefined') {
         incstr = '<li style="color:red;">此处设置的是初始值，新添加站点时将继承，对现有站点无效。</li>';
     }
+    // <div class="line">\
+    //     <span class="tname">增强模式</span>\
+    //     <div class="info-r">\
+    //         <select class="bt-input-text mr5" style="width:80px" name="enhance_mode">\
+    //             <option value="0" '+ (enhance_mode == 0?'selected':'') +'>关闭</option>\
+    //             <option value="1" '+ (enhance_mode == 1?'selected':'') +'>开启</option>\
+    //         </select>\
+    //     </div>\
+    // </div>\
+    // <div class="line" style="display:'+ (siteName == 'undefined'?'block':'none') +'">\
+    //     <span class="tname">四层防御</span>\
+    //     <div class="info-r">\
+    //         <select class="bt-input-text mr5" style="width:80px" name="cc_four_defense">\
+    //             <option value="0">关闭</option>\
+    //             <option value="1">开启</option>\
+    //         </select>\
+    //     </div>\
+    // </div>\
+    //<li><font style="color:red;">增强模式:CC防御加强版，开启后可能会影响用户体验，建议在用户受到CC攻击时开启。</font></li>\
 
-    // get_aicc_config(function(res){
-        var enhance_mode = '';
-        // if(res.status){
-        //     enhance_mode = 2;
-        // }else{
-            if(increase){
-                enhance_mode = 1;
-            }else{
-                enhance_mode = 0;
+    create_l = layer.open({
+        type: 1,
+        title: "设置CC规则",
+        area: '540px',
+        closeBtn: 2,
+        shadeClose: false,
+        content: '<form class="bt-form pd20 pb70">\
+                <div class="line">\
+                    <span class="tname">周期</span>\
+                    <div class="info-r"><input class="bt-input-text" name="cc_cycle" type="number" value="'+ cycle + '" /> 秒</div>\
+                </div>\
+                <div class="line">\
+                    <span class="tname">频率</span>\
+                    <div class="info-r"><input class="bt-input-text" name="cc_limit" type="number" value="'+ limit + '" /> 次</div>\
+                </div>\
+                <div class="line">\
+                    <span class="tname">封锁时间</span>\
+                    <div class="info-r"><input class="bt-input-text" name="cc_endtime" type="number" value="'+ endtime + '" /> 秒</div>\
+                </div>\
+                <ul class="help-info-text c7 ptb10">'+ incstr + '\
+                    <li><font style="color:red;">'+ cycle + '</font> 秒内累计请求同一URL超过  <font style="color:red;">' + limit + '</font> 次,触发CC防御,封锁此IP <font style="color:red;">' + endtime + '</font> 秒</li>\
+                    <li>请不要设置过于严格的CC规则,以免影响正常用户体验</li>\
+                    <li><font style="color:red;display:'+ (siteName == 'undefined'?'display: inline-block;':'none') +';">全局应用:全局设置当前CC规则，且覆盖当前全部站点的CC规则</font></li>\
+                </ul>\
+                <div class="bt-form-submit-btn"><button type="button" class="btn btn-danger btn-sm btn_cc_all" style="margin-right:10px;display:'+ (siteName == 'undefined'?'display: inline-block;':'none') +';">全局应用</button><button type="button" class="btn btn-success btn-sm btn_cc_present">应用</button></div>\
+            </form>',
+            success:function(layero,index){
+                $('.btn_cc_all').click(function(){
+                    saveCcRule(siteName,1,$('[name="enhance_mode"]').val());
+                });
+                $('.btn_cc_present').click(function(){
+                    saveCcRule(siteName,0,$('[name="enhance_mode"]').val());
+                });
             }
-        // }
-        create_l = layer.open({
-            type: 1,
-            title: "设置CC规则",
-            area: '540px',
-            closeBtn: 2,
-            shadeClose: false,
-            content: '<form class="bt-form pd20 pb70">\
-                    <div class="line">\
-                        <span class="tname">周期</span>\
-                        <div class="info-r"><input class="bt-input-text" name="cc_cycle" type="number" value="'+ cycle + '" /> 秒</div>\
-                    </div>\
-                    <div class="line">\
-                        <span class="tname">频率</span>\
-                        <div class="info-r"><input class="bt-input-text" name="cc_limit" type="number" value="'+ limit + '" /> 次</div>\
-                    </div>\
-                    <div class="line">\
-                        <span class="tname">封锁时间</span>\
-                        <div class="info-r"><input class="bt-input-text" name="cc_endtime" type="number" value="'+ endtime + '" /> 秒</div>\
-                    </div>\
-                    <div class="line">\
-                        <span class="tname">增强模式</span>\
-                        <div class="info-r">\
-                            <select class="bt-input-text mr5" style="width:80px" name="enhance_mode">\
-                                <option value="0" '+ (enhance_mode == 0?'selected':'') +'>关闭</option>\
-                                <option value="1" '+ (enhance_mode == 1?'selected':'') +'>开启</option>\
-                            </select>\
-                        </div>\
-                    </div>\
-                    <div class="line" style="display:'+ (siteName == 'undefined'?'block':'none') +'">\
-                        <span class="tname">四层防御</span>\
-                        <div class="info-r">\
-                            <select class="bt-input-text mr5" style="width:80px" name="cc_four_defense">\
-                                <option value="0">关闭</option>\
-                                <option value="1">开启</option>\
-                            </select>\
-                        </div>\
-                    </div>\
-                    <ul class="help-info-text c7 ptb10">'+ incstr + '\
-                        <li><font style="color:red;">'+ cycle + '</font> 秒内累计请求同一URL超过  <font style="color:red;">' + limit + '</font> 次,触发CC防御,封锁此IP <font style="color:red;">' + endtime + '</font> 秒</li>\
-                        <li>请不要设置过于严格的CC规则,以免影响正常用户体验</li>\
-                        <li><font style="color:red;">增强模式:CC防御加强版，开启后可能会影响用户体验，建议在用户受到CC攻击时开启。</font></li>\
-                        <li><font style="color:red;display:'+ (siteName == 'undefined'?'display: inline-block;':'none') +';">全局应用:全局设置当前CC规则，且覆盖当前全部站点的CC规则</font></li>\
-                    </ul>\
-                    <div class="bt-form-submit-btn"><button type="button" class="btn btn-danger btn-sm btn_cc_all" style="margin-right:10px;display:'+ (siteName == 'undefined'?'display: inline-block;':'none') +';">全局应用</button><button type="button" class="btn btn-success btn-sm btn_cc_present">应用</button></div>\
-                </form>',
-                success:function(layero,index){
-                    // console.log(siteName == 'undefined');
-                    // //<option value="2" '+ (enhance_mode == 2?'selected':'') +' style="'+ (siteName != 'undefined' && enhance_mode != 2?'display:none;':'') +'">自动</option>\
-                    // if($('[name="enhance_mode"]').val() == 2 && siteName != 'undefined'){
-                    //     $('[name="enhance_mode"]').attr('disabled','disabled');
-                    // }
-                    // get_stop_ip(function(rdata){
-                    //     $('[name="cc_four_defense"]').val(rdata.status?'1':'0');
-                    // });
-                    // $('[name="cc_four_defense"]').change(function(){
-                    //     var _val = $(this).val();
-                    //     if(_val == '0'){
-                    //         set_stop_ip_stop(function(res){
-                    //             layer.msg(res.msg,{icon:res.status?1:2});
-                    //         });
-                    //     }else{
-                    //         set_stop_ip(function(res){
-                    //             layer.msg(res.msg,{icon:res.status?1:2});
-                    //         });
-                    //     }
-                    // });
-                    // $('.btn_cc_all').click(function(){
-                    //     save_cc_rule(siteName,1,$('[name="enhance_mode"]').val());
-                    //     layer.close(index);
-                    // });
-                    // $('.btn_cc_present').click(function(){
-                    //     save_cc_rule(siteName,0,$('[name="enhance_mode"]').val());
-                    //     layer.close(index);
-                    // });
-                }
-        });
-    // });
-
+    });
 }
 
 
