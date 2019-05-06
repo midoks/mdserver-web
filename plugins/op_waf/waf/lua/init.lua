@@ -21,6 +21,7 @@ function initParams()
     data['server_name'] = string.gsub(C:get_server_name(),'_','.')
     data['uri_request_args'] = ngx.req.get_uri_args()
     data['method'] = ngx.req.get_method()
+    data['request_uri'] = ngx.var.request_uri
     return data
 end
 
@@ -29,16 +30,99 @@ C:setParams(params)
 
 
 
--- function min_route()
---     if ngx.var.remote_addr ~= '127.0.0.1' then return false end
---     if uri == '/get_waf_drop_ip' then
---         return_message(200,get_waf_drop_ip())
---     elseif uri == '/remove_waf_drop_ip' then
---         return_message(200,remove_waf_drop_ip())
---     elseif uri == '/clean_waf_drop_ip' then
---         return_message(200,clean_waf_drop_ip())
---     end
--- end
+function get_return_state(rstate,rmsg)
+    result = {}
+    result['status'] = rstate
+    result['msg'] = rmsg
+    return result
+end
+
+function get_waf_drop_ip()
+    local data =  ngx.shared.drop_ip:get_keys(0)
+    return data
+end
+
+
+function is_chekc_table(data,strings)
+    if type(data) ~= 'table' then return 1 end 
+    if not data then return 1 end
+    data=chekc_ip_timeout(data)
+    for k,v in pairs(data)
+    do
+        if strings ==v['ip'] then
+            return 3
+        end
+    end
+    return 2
+end
+
+function save_ip_on(data)
+    locak_file=read_file_body(cpath2 .. 'stop_ip.lock')
+    if not locak_file then
+        C:write_file(cpath2 .. 'stop_ip.lock','1')
+    end
+    name='stop_ip'
+    local extime=18000
+    data=json.encode(data)
+    ngx.shared.btwaf:set(cpath2 .. name,data,extime)
+    if not ngx.shared.btwaf:get(cpath2 .. name .. '_lock') then
+        ngx.shared.btwaf:set(cpath2 .. name .. '_lock',1,0.5)
+        C:write_file(cpath2 .. name .. '.json',data)
+    end
+end
+
+function remove_btwaf_drop_ip()
+    if not uri_request_args['ip'] or not C:is_ipaddr(uri_request_args['ip']) then return get_return_state(true,'格式错误') end
+    if ngx.shared.btwaf:get(cpath2 .. 'stop_ip') then
+        ret=ngx.shared.btwaf:get(cpath2 .. 'stop_ip')
+        ip_data=json.decode(ret)
+        result=is_chekc_table(ip_data,uri_request_args['ip'])
+        os.execute("sleep " .. 0.6)
+        ret2=ngx.shared.btwaf:get(cpath2 .. 'stop_ip')
+        ip_data2=json.decode(ret2)
+        if result == 3 then
+            for k,v in pairs(ip_data2)
+            do
+                if uri_request_args['ip'] == v['ip'] then 
+                    v['time']=0
+                end
+            end
+        end
+        save_ip_on(ip_data2)
+    end
+    ngx.shared.drop_ip:delete(uri_request_args['ip'])
+    return get_return_state(true,uri_request_args['ip'] .. '已解封')
+end
+
+function clean_btwaf_drop_ip()
+    if ngx.shared.btwaf:get(cpath2 .. 'stop_ip') then
+        ret2=ngx.shared.btwaf:get(cpath2 .. 'stop_ip')
+        ip_data2=json.decode(ret2)
+        for k,v in pairs(ip_data2)
+        do
+                v['time']=0
+        end
+        save_ip_on(ip_data2)
+        os.execute("sleep " .. 2)
+    end
+    local data = get_btwaf_drop_ip()
+    for _,value in ipairs(data)
+    do
+        ngx.shared.drop_ip:delete(value)
+    end
+    return get_return_state(true,'已解封所有封锁IP')
+end
+
+function min_route()
+    if ngx.var.remote_addr ~= '127.0.0.1' then return false end
+    if uri == '/get_waf_drop_ip' then
+        return_message(200,get_waf_drop_ip())
+    elseif uri == '/remove_waf_drop_ip' then
+        return_message(200,remove_waf_drop_ip())
+    elseif uri == '/clean_waf_drop_ip' then
+        return_message(200,clean_waf_drop_ip())
+    end
+end
 
 local get_html = C:read_file_body(config["reqfile_path"] .. '/' .. config["get"]["reqfile"])
 local post_html = C:read_file_body(config["reqfile_path"] .. '/' .. config["post"]["reqfile"])
@@ -451,6 +535,7 @@ function waf_referer()
 end
 
 function waf()
+    min_route()
 
     if waf_ip_white() then return true end
     waf_ip_black()
