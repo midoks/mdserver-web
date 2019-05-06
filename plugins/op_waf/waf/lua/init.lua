@@ -46,8 +46,6 @@ local user_agent_html = C:read_file_body(config["reqfile_path"] .. '/' .. config
 local args_rules = C:read_file_table('args')
 local ip_white_rules = C:read_file('ip_white')
 local ip_black_rules = C:read_file('ip_black')
-local url_white_rules = C:read_file('url_white')
-local url_black_rules = C:read_file('url_black')
 local scan_black_rules = C:read_file('scan_black')
 
 function waf_args()
@@ -214,14 +212,13 @@ function waf_post()
     content_length = tonumber(params["request_header"]['content-length'])
     max_len = 640 * 1020000
     if content_length > max_len then return false end
-    if get_boundary() then return false end
+    if C:get_boundary() then return false end
     ngx.req.read_body()
     request_args = ngx.req.get_post_args()
     if not request_args then
         return false
     end
 
-    --return return_message(200,request_args)
     if C:is_ngx_match(post_rules,request_args,'post') then
         C:write_log('post','regular')
         C:return_html(config['post']['status'],post_html)
@@ -233,7 +230,7 @@ end
 
 function  post_data_chekc()
     if params['method'] =="POST" then
-        if return_post_data() then return false end
+        if C:return_post_data() then return false end
         request_args = ngx.req.get_post_args()
         if not request_args then return false end
         if not request_header['Content-Type'] then return false end
@@ -429,7 +426,30 @@ function post_data()
     return false
 end
 
-ngx.header.content_type = "text/html"
+function waf_cookie()
+    if not config['cookie']['open'] or not C:is_site_config('cookie') then return false end
+    if not params["request_header"]['cookie'] then return false end
+    if type(params["request_header"]['cookie']) ~= "string" then return false end
+    request_cookie = string.lower(params["request_header"]['cookie'])
+    if C:is_ngx_match(cookie_rules,request_cookie,'cookie') then
+        C:write_log('cookie','regular')
+        C:return_html(config['cookie']['status'],cookie_html)
+        return true
+    end
+    return false
+end
+
+function waf_referer()
+    if params["method"] ~= "GET" then return false end
+    if not config['get']['open'] or not C:is_site_config('get') then return false end
+    if C:is_ngx_match(referer_local,params["request_header"]['Referer'],'args') then
+        C:write_log('get_referer','regular')
+        C:return_html(config['get']['status'], get_html)
+        return true
+    end
+    return false
+end
+
 function waf()
 
     if waf_ip_white() then return true end
@@ -442,15 +462,13 @@ function waf()
     waf_url()
 
     if params["method"] == "GET" then
-        -- waf_referer()  
-        -- waf_cookie()
+        waf_referer()  
+        waf_cookie()
     end
 
-
     if params["method"] == "POST" then
-        -- ngx.req.read_body()
-        -- request_args111 = ngx.req.get_post_args()
-        -- waf_cookie()
+        waf_referer()
+        waf_cookie()
     end
 
     waf_args()
