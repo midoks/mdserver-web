@@ -811,7 +811,6 @@ function wafScreen(){
 
     owPost('waf_srceen', {}, function(data){
         var rdata = $.parseJSON(data.data);
-        console.log(rdata);
 
         var con = '<div class="wavbox alert alert-success" style="margin-right:16px">总拦截<span>'+rdata.total+'</span>次</div>';
         con += '<div class="wavbox alert alert-info" style="margin-right:16px">安全防护<span>0</span>天</div>';
@@ -1136,7 +1135,6 @@ function removeSiteRule(siteName, ruleName, index) {
     }
 
     owPost('remove_site_rule', pdata, function(data){
-        console.log(data);
         var rdata = $.parseJSON(data.data);
         layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
         if (rdata.status) {
