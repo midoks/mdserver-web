@@ -126,6 +126,17 @@ end
 
 
 function _M.write_file(self, filename, body)
+    fp = io.open(filename,'ab')
+    if fp == nil then
+        return nil
+    end
+    fp:write(body)
+    fp:flush()
+    fp:close()
+    return true
+end
+
+function _M.write_file_clear(self, filename, body)
     fp = io.open(filename,'w')
     if fp == nil then
         return nil
@@ -245,7 +256,7 @@ function _M.inc_log(self, name, rule)
     if not total_log then return false end
     ngx.shared.limit:set(total_path,total_log)
     if not ngx.shared.limit:get('mw_waf_timeout') then
-        self:write_file(total_path,total_log)
+        self:write_file_clear(total_path,total_log)
         ngx.shared.limit:set('mw_waf_timeout',1,5)
     end
 end
