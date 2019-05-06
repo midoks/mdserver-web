@@ -1,14 +1,14 @@
 
-local cpath = "{$WAF_PATH}/"
-local rpath = "{$WAF_PATH}/rule/"
-local logdir = "{$ROOT_PATH}/wwwlogs/waf/"
+local cpath = "/Users/midoks/Desktop/fwww/server/openresty/nginx/conf/waf/"
+local rpath = "/Users/midoks/Desktop/fwww/server/openresty/nginx/conf/waf/rule/"
+local logdir = "/Users/midoks/Desktop/fwww/wwwlogs/waf/"
 local json = require "cjson"
 local ngx_match = ngx.re.find
 
 local _C = require "common"
 local C = _C:new(cpath, rpath, logdir)
 
-local config = C:read_file_body_decode(cpath .. 'config.json')
+config = C:read_file_body_decode(cpath .. 'config.json')
 local site_config = C:read_file_body_decode(cpath .. 'site.json')
 C:setConfData(config, site_config)
 
@@ -20,6 +20,7 @@ function initParams()
     data['uri'] = ngx.unescape_uri(ngx.var.uri)
     data['server_name'] = string.gsub(C:get_server_name(),'_','.')
     data['uri_request_args'] = ngx.req.get_uri_args()
+    data['method'] = ngx.req.get_method()
     return data
 end
 
@@ -77,27 +78,6 @@ function waf_ip_black()
             ngx.exit(config['cc']['status'])
             return true 
         end
-    end
-    return false
-end
-
-function waf_url_white()
-    if C:is_ngx_match(url_white_rules,params['request_uri'],false) then
-        return true
-    end
-    if site_config[server_name] ~= nil then
-        if C:is_ngx_match(site_config[server_name]['url_white'], params['request_uri'],false) then
-            return true
-        end
-    end
-    return false
-end
-
-
-function waf_url_black()
-    if C:is_ngx_match(url_black_rules,params['request_uri'],false) then
-        ngx.exit(config['get']['status'])
-        return true
     end
     return false
 end
@@ -218,7 +198,7 @@ function waf_scan_black()
 end
 
 function waf_post_referer()
-    if method ~= "POST" then return false end
+    if params['method'] ~= "POST" then return false end
     if C:is_ngx_match(referer_local, params['request_header']['Referer'],'post') then
         C:write_log('post_referer','regular')
         C:return_html(config['post']['status'],post_html)
@@ -229,7 +209,7 @@ end
 
 function waf_post()
     if not config['post']['open'] or not C:is_site_config('post') then return false end   
-    if method ~= "POST" then return false end
+    if params['method'] ~= "POST" then return false end
     if waf_post_referer() then return true end
     content_length = tonumber(params["request_header"]['content-length'])
     max_len = 640 * 1020000
@@ -252,7 +232,7 @@ end
 
 
 function  post_data_chekc()
-    if method =="POST" then
+    if params['method'] =="POST" then
         if return_post_data() then return false end
         request_args = ngx.req.get_post_args()
         if not request_args then return false end
@@ -280,9 +260,9 @@ function  post_data_chekc()
         if not data_len then return false end
         if arrlen(data_len) ==0 then return false end
 
-        if is_ngx_match(post_rules,data_len,'post') then
-            write_log('post','regular')
-            return_html(config['post']['status'],post_html)
+        if C:is_ngx_match(post_rules,data_len,'post') then
+            C:write_log('post','regular')
+            C:return_html(config['post']['status'],post_html)
             return true
         end
 
@@ -291,9 +271,9 @@ end
 
 
 function X_Forwarded()
-    if method ~= "GET" then return false end
-    if not config['get']['open'] or not self:is_site_config('get') then return false end 
-    if C:is_ngx_match(args_rules,param["request_header"]['X-forwarded-For'],'args') then
+    if params['method'] ~= "GET" then return false end
+    if not config['get']['open'] or not C:is_site_config('get') then return false end 
+    if C:is_ngx_match(args_rules,params["request_header"]['X-forwarded-For'],'args') then
         C:write_log('args','regular')
         C:return_html(config['get']['status'],get_html)
         return true
@@ -303,9 +283,9 @@ end
 
 
 function post_X_Forwarded()
-    if not config['post']['open'] or not self:is_site_config('post') then return false end   
-    if method ~= "POST" then return false end
-    if C:is_ngx_match(post_rules,param["request_header"]['X-forwarded-For'],'post') then
+    if not config['post']['open'] or not C:is_site_config('post') then return false end   
+    if params['method'] ~= "POST" then return false end
+    if C:is_ngx_match(post_rules,params["request_header"]['X-forwarded-For'],'post') then
         C:write_log('post','regular')
         C:return_html(config['post']['status'],post_html)
         return true
@@ -318,24 +298,22 @@ function php_path()
     if site_config[server_name] == nil then return false end
     for _,rule in ipairs(site_config[server_name]['disable_php_path'])
     do
-        --if string.find(uri,rule .. "/.*\\.php$") then
         if ngx_match(uri,rule .. "/?.*\\.php$","isjo") then
-            write_log('php_path','regular')
-            return_html(config['other']['status'],other_html)
-            return return_message(200,uri)
+            C:write_log('php_path','regular')
+            C:return_html(config['other']['status'],other_html)
+            return C:return_message(200,uri)
         end
     end
     return false
 end
-
 
 function url_path()
     if site_config[server_name] == nil then return false end
     for _,rule in ipairs(site_config[server_name]['disable_path'])
     do
         if ngx_match(uri,rule,"isjo") then
-            write_log('path','regular')
-            return_html(config['other']['status'],other_html)
+            C:write_log('path','regular')
+            C:return_html(config['other']['status'],other_html)
             return true
         end
     end
@@ -347,8 +325,8 @@ function url_ext()
     for _,rule in ipairs(site_config[server_name]['disable_ext'])
     do
         if ngx_match(uri,"\\."..rule.."$","isjo") then
-            write_log('url_ext','regular')
-            return_html(config['other']['status'],other_html)
+            C:write_log('url_ext','regular')
+            C:return_html(config['other']['status'],other_html)
             return true
         end
     end
@@ -369,16 +347,16 @@ function url_rule_ex()
     for _,rule in ipairs(site_config[server_name]['url_rule'])
     do
         if ngx_match(uri,rule[1],"isjo") then
-            if is_ngx_match(rule[2],uri_request_args,false) then
-                write_log('url_rule','regular')
-                return_html(config['other']['status'],other_html)
+            if C:is_ngx_match(rule[2],uri_request_args,false) then
+                C:write_log('url_rule','regular')
+                C:return_html(config['other']['status'],other_html)
                 return true
             end
             
-            if method == "POST" and request_args ~= nil then 
-                if is_ngx_match(rule[2],request_args,'post') then
-                    write_log('post','regular')
-                    return_html(config['other']['status'],other_html)
+            if params['method'] == "POST" and request_args ~= nil then 
+                if C:is_ngx_match(rule[2],request_args,'post') then
+                    C:write_log('post','regular')
+                    C:return_html(config['other']['status'],other_html)
                     return true
                 end
             end
@@ -393,11 +371,60 @@ function url_tell()
     do
         if ngx_match(uri,rule[1],"isjo") then
             if uri_request_args[rule[2]] ~= rule[3] then
-                write_log('url_tell','regular')
-                return_html(config['other']['status'],other_html)
+                C:write_log('url_tell','regular')
+                C:return_html(config['other']['status'],other_html)
                 return true
             end
         end
+    end
+    return false
+end
+
+
+function disable_upload_ext(ext)
+    if not ext then return false end
+    ext = string.lower(ext)
+    if is_key(site_config[server_name]['disable_upload_ext'],ext) then
+        C:write_log('upload_ext','上传扩展名黑名单')
+        C:return_html(config['other']['status'],other_html)
+        return true
+    end
+end
+
+function data_in_php(data)
+    if not data then
+        return false
+    else
+        if C:is_ngx_match('php',data,'post') then
+            C:write_log('upload_ext','上传扩展名黑名单')
+            C:return_html(config['other']['status'],other_html)
+            return true
+        else
+            return false
+        end
+    end
+end
+
+function post_data()
+    if params["method"] ~= "POST" then return false end
+    content_length = tonumber(params["request_header"]['content-length'])
+    if not content_length then return false end
+    max_len = 2560 * 1024000
+    if content_length > max_len then return false end
+    local boundary = C:get_boundary()
+    if boundary then
+        ngx.req.read_body()
+        local data = ngx.req.get_body_data()
+        if not data then return false end
+        local tmp = ngx.re.match(data,[[filename=\"(.+)\.(.*)\"]])
+        if not tmp then return false end
+        if not tmp[2] then return false end
+        local tmp2=ngx.re.match(ngx.req.get_body_data(),[[Content-Type:[^\+]{45}]]) 
+        --return return_message(200,tmp2[0])
+        disable_upload_ext(tmp[2])
+        if tmp2 == nil then return false end 
+        data_in_php(tmp2[0])
+        
     end
     return false
 end
@@ -408,8 +435,6 @@ function waf()
     if waf_ip_white() then return true end
     waf_ip_black()
 
-    if waf_url_white() then return true end
-    waf_url_black()
 
     waf_drop()
     waf_user_agent()
@@ -428,8 +453,6 @@ function waf()
         -- waf_cookie()
     end
 
-
-
     waf_args()
     waf_scan_black()
 
@@ -437,8 +460,9 @@ function waf()
     post_data_chekc()
 
     local server_name = params["server_name"]
-    ngx.say(server_name)
+    ngx.say(json.encode(site_config))
     if site_config[server_name] then
+
         ngx.say(server_name)
         X_Forwarded()
         post_X_Forwarded()
@@ -450,5 +474,4 @@ function waf()
         post_data()
     end
 end
-
 waf()
