@@ -294,6 +294,40 @@ function modifyRuleSave(index, ruleName) {
     });
 }
 
+function removeRule(ruleName, index) {
+    var pdata = {
+        'index': index,
+        'ruleName': ruleName
+    }
+    safeMessage('删除规则', '您真的要删除这条过滤规则吗？', function () {
+        owPost('remove_rule', pdata, function(data){
+            var rdata = $.parseJSON(data.data);
+            layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+            if (rdata.status) {
+                setTimeout(function(){
+                    setObjConf(ruleName, 1);
+                },1000);
+            }
+        });
+    });
+}
+
+function setRuleState(ruleName, index) {
+    var pdata = {
+        'index': index,
+        'ruleName': ruleName
+    }
+    
+    owPost('set_rule_state', pdata, function(data){
+        var rdata = $.parseJSON(data.data);
+        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+        if (rdata.status) {
+            setTimeout(function(){
+                setObjConf(ruleName, 1);
+            },1000);
+        }
+    });
+}
 
 //设置规则
 function setObjConf(ruleName, type) {
@@ -339,7 +373,7 @@ function setObjConf(ruleName, type) {
         var tbody = ''
         for (var i = 0; i < rdata.length; i++) {
             var removeRule = ''
-            if (rdata[i][3] != 0) removeRule = ' | <a class="btlink" onclick="remove_rule(\'' + ruleName + '\',' + i + ')">删除</a>';
+            if (rdata[i][3] != 0) removeRule = ' | <a class="btlink" onclick="removeRule(\'' + ruleName + '\',' + i + ')">删除</a>';
             tbody += '<tr>\
                     <td class="rule_body_'+ i + '">' + rdata[i][1] + '</td>\
                     <td class="rule_ps_'+ i + '">' + rdata[i][2] + '</td>\
@@ -347,7 +381,7 @@ function setObjConf(ruleName, type) {
                     <td class="text-right">\
                         <div class="pull-right">\
                         <input class="btswitch btswitch-ios" id="closeua_'+ i + '" type="checkbox" ' + (rdata[i][0] ? 'checked' : '') + '>\
-                        <label class="btswitch-btn" style="width:2.0em;height:1.2em;margin-bottom: 0" for="closeua_'+ i + '" onclick="set_rule_state(\'' + ruleName + '\',' + i + ')"></label>\
+                        <label class="btswitch-btn" style="width:2.0em;height:1.2em;margin-bottom: 0" for="closeua_'+ i + '" onclick="setRuleState(\'' + ruleName + '\',' + i + ')"></label>\
                         </div>\
                     </td>\
                 </tr>'

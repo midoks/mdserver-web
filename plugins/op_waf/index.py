@@ -313,6 +313,52 @@ def addRule():
 
     return public.returnJson(True, '设置成功!', content)
 
+def removeRule():
+    args = getArgs()
+    data = checkArgs(args, ['ruleName', 'index'])
+    if not data[0]:
+        return data[1]
+
+    index = int(args['index'])
+    ruleName = args['ruleName']
+
+    fpath = getRuleJsonPath(ruleName)
+    content = public.readFile(fpath)
+    content = json.loads(content)
+
+    k = content[index]
+    content.remove(k)
+
+    cjson = public.getJson(content)
+    public.writeFile(fpath, cjson)
+
+    return public.returnJson(True, '设置成功!', content)
+
+def setRuleState():
+    args = getArgs()
+    data = checkArgs(args, ['ruleName', 'index'])
+    if not data[0]:
+        return data[1]
+
+    index = int(args['index'])
+    ruleName = args['ruleName']
+
+    fpath = getRuleJsonPath(ruleName)
+    content = public.readFile(fpath)
+    content = json.loads(content)
+
+    b = content[index][0]
+    if b == 1:
+        content[index][0] = 0
+    else:
+        content[index][0] = 1
+
+    cjson = public.getJson(content)
+    public.writeFile(fpath, cjson)
+
+    return public.returnJson(True, '设置成功!', content)
+
+
 
 def modifyRule():
     args = getArgs()
@@ -847,6 +893,10 @@ if __name__ == "__main__":
         print getRule()
     elif func == 'add_rule':
         print addRule()
+    elif func == 'remove_rule':
+        print removeRule()
+    elif func == 'set_rule_state':
+        print setRuleState()
     elif func == 'modify_rule':
         print modifyRule()
     elif func == 'get_site_rule':
