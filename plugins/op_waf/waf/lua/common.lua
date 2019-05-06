@@ -111,16 +111,16 @@ end
 
 function _M.read_file_body(self, filename)
     -- ngx.log(ngx.ERR,"read_file_body:"..filename)
-	fp = io.open(filename, 'r')
-	if fp == nil then
+    fp = io.open(filename, 'r')
+    if fp == nil then
         return nil
     end
-	fbody = fp:read("*a")
+    fbody = fp:read("*a")
     fp:close()
     if fbody == '' then
         return nil
     end
-	return fbody
+    return fbody
 end
 
 
@@ -327,9 +327,9 @@ end
 
 function _M.write_log(self, name, rule)
     local ip = self.params['ip']
-    local retry = self.config['retry']
-    local retry_time = self.config['retry_time']
-    local retry_cycle = self.config['retry_cycle']
+    local retry = self.config['retry']['retry']
+    local retry_time = self.config['retry']['retry_time']
+    local retry_cycle = self.config['retry']['retry_cycle']
     
     local count, _ = ngx.shared.drop_ip:get(ip)
     if count then
