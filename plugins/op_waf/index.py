@@ -639,8 +639,35 @@ def setRetry():
 
 
 def setSiteRetry():
+    return public.returnJson(True, '设置成功-?!', [])
+
+
+def setCcConf():
+    args = getArgs()
+    data = checkArgs(args, ['siteName', 'cycle', 'limit', 'endtime','is_open_global','increase'])
+    if not data[0]:
+        return data[1]
+
+    conf = getJsonPath('config')
+    content = public.readFile(conf)
+    cobj = json.loads(content)
+
+    tmp = cobj['cc']
+
+
+    tmp['cycle'] = args['cycle']
+    tmp['limit'] = args['limit']
+    tmp['endtime'] = args['endtime']
+    tmp['is_open_global'] = args['is_open_global']
+    tmp['increase'] = args['increase']
+    cobj['cc'] = tmp
+
+    cjson = public.getJson(cobj)
+    public.writeFile(conf, cjson)
     return public.returnJson(True, '设置成功!', [])
 
+def setSiteCcConf():
+    return public.returnJson(True, '设置成功-?!', [])
 
 def saveScanRule():
     args = getArgs()
@@ -861,6 +888,7 @@ def setSiteObjOpen():
     return public.returnJson(True, '设置成功!')
 
 
+
 def getWafSrceen():
     conf = getJsonPath('total')
     return public.readFile(conf)
@@ -923,6 +951,10 @@ if __name__ == "__main__":
         print setObjOpen()
     elif func == 'set_site_obj_open':
         print setSiteObjOpen()
+    elif func == 'set_cc_conf':
+        print setCcConf()
+    elif func == 'set_site_cc_conf':
+        print setSiteCcConf()
     elif func == 'set_retry':
         print setRetry()
     elif func == 'set_site_retry':
