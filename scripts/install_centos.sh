@@ -38,6 +38,9 @@ if [ -f "/etc/init.d/iptables" ];then
 	fi
 fi
 
+#安装时不开启
+service iptables stop
+
 if [ "${isVersion}" == '' ];then
 	if [ ! -f "/etc/init.d/iptables" ];then
 		yum install firewalld -y
