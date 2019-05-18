@@ -54,7 +54,7 @@ if [ "${isVersion}" == '' ];then
 fi
 
 #安装时不开启
-systemctl start firewalld
+systemctl stop firewalld
 
 
 yum install -y libevent libevent-devel libzip-devel mysql-devel libjpeg* libpng* freetype* gd* zip unzip
