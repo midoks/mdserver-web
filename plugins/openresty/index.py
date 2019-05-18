@@ -132,7 +132,9 @@ def confReplace():
     content = content.replace('{$OS_USER_GROUP}', user_group)
 
     nconf = getServerDir() + '/nginx/conf/nginx.conf'
-    if not os.path.exists(nconf):
+
+    __content = public.readFile(nconf)
+    if __content.find('#user'):
         public.writeFile(getServerDir() + '/nginx/conf/nginx.conf', content)
 
     # give nginx root permission
