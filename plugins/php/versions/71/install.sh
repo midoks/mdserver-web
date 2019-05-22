@@ -10,7 +10,7 @@ sourcePath=${serverPath}/source
 sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 
-version=7.1.27
+version=7.1.29
 Install_php()
 {
 #------------------------ install start ------------------------------------#
