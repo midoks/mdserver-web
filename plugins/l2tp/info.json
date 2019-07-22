@@ -1,0 +1,14 @@
+{
+	"title":"L2TP",
+	"tip":"soft",
+	"name":"l2tp",
+	"type":"运行环境",
+	"ps":"VPN网关",
+	"versions":"1.0",
+	"shell":"install.sh",
+	"checks":"server/l2tp",
+	"author":"teddysun",
+	"home":"https://github.com/teddysun/across/blob/master/l2tp.sh",
+	"date":"2019-02-27",
+	"pid": "4"
+}
