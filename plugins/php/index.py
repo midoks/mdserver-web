@@ -201,7 +201,7 @@ def initReplace(version):
     if not os.path.exists(session_path):
         os.mkdir(session_path)
         if not public.isAppleSystem():
-            public.execShell('chmod -R www:www' + session_path)
+            public.execShell('chown -R www:www' + session_path)
     return file_bin
 
 
