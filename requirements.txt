@@ -11,3 +11,4 @@ pillow
 chardet
 flask-sqlalchemy
 ConfigParser
+MySQL-python
