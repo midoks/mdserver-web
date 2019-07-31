@@ -19,9 +19,12 @@ fi
 setenforce 0
 sed -i 's#SELINUX=disabled#SELINUX=enforcing#g' /etc/selinux/config
 
-yum install -y wget curl curl-devel
+yum install -y wget curl curl-devel vixie-cron
 #https need
-curl  https://get.acme.sh | sh
+
+if [ ! -f /root/.acme.sh ];then	
+	curl  https://get.acme.sh | sh
+fi
 
 if [ -f "/etc/init.d/iptables" ];then
 
