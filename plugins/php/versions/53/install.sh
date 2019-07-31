@@ -18,7 +18,7 @@ mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
 if [ ! -f $sourcePath/php/php-5.3.29.tar.xz ];then
-	wget -O $sourcePath/php/php-5.3.29.tar.xz https://museum.php.net/php5/php-5.3.29.tar.xz
+	wget --no-check-certificate -O $sourcePath/php/php-5.3.29.tar.xz https://museum.php.net/php5/php-5.3.29.tar.xz
 fi
 
 if [ ! -d $sourcePath/php/php-5.3.29 ];then

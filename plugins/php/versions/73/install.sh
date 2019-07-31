@@ -20,7 +20,7 @@ mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
 if [ ! -f $sourcePath/php/php-${version}.tar.xz ];then
-	wget -O $sourcePath/php/php-${version}.tar.xz http://au1.php.net/distributions/php-${version}.tar.xz
+	wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz http://au1.php.net/distributions/php-${version}.tar.xz
 fi
 
 if [ ! -d $sourcePath/php/php-${version} ];then

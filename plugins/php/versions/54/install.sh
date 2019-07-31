@@ -20,7 +20,7 @@ mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
 if [ ! -f $sourcePath/php/php-5.4.45.tar.gz ];then
-	wget -O $sourcePath/php/php-5.4.45.tar.gz https://museum.php.net/php5/php-5.4.45.tar.gz
+	wget --no-check-certificate -O $sourcePath/php/php-5.4.45.tar.gz https://museum.php.net/php5/php-5.4.45.tar.gz
 fi
 
 if [ ! -d $sourcePath/php/php-5.4.45 ];then
