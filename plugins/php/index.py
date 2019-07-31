@@ -36,7 +36,7 @@ def getServerDir():
 def getInitDFile(version):
     if app_debug:
         return '/tmp/' + getPluginName()
-    return '/etc/init.d/' + getPluginName()+version
+    return '/etc/init.d/' + getPluginName() + version
 
 
 def getArgs():
@@ -112,9 +112,9 @@ def contentReplace(content, version):
 
 
 def makeOpenrestyConf():
-    phpversions = ['00','53','54','55','56','70','71','72','73','74']
+    phpversions = ['00', '53', '54', '55', '56', '70', '71', '72', '73', '74']
     if public.isInstalledWeb():
-        sdir =  public.getServerDir() 
+        sdir = public.getServerDir()
         d_pathinfo = sdir + '/openresty/nginx/conf/pathinfo.conf'
         if not os.path.exists(d_pathinfo):
             s_pathinfo = getPluginDir() + '/conf/pathinfo.conf'
@@ -135,7 +135,7 @@ def makeOpenrestyConf():
                     w_content = contentReplace(tpl_content, x)
                     public.writeFile(dfile, w_content)
 
-        #php-fpm status
+        # php-fpm status
         for version in phpversions:
             dfile = sdir + '/openresty/nginx/conf/php_status/phpfpm_status_' + version + '.conf'
             tpl = getPluginDir() + '/conf/phpfpm_status.conf'
@@ -144,6 +144,7 @@ def makeOpenrestyConf():
                 content = contentReplace(content, version)
                 public.writeFile(dfile, content)
         public.restartWeb()
+
 
 def phpFpmReplace(version):
     desc_php_fpm = getServerDir() + '/' + version + '/etc/php-fpm.conf'
@@ -201,7 +202,6 @@ def initReplace(version):
         os.mkdir(session_path)
         if not public.isAppleSystem():
             public.execShell('chmod -R www:www' + session_path)
-
     return file_bin
 
 
@@ -249,7 +249,7 @@ def initdInstall(version):
     initd_bin = getInitDFile(version)
     shutil.copyfile(source_bin, initd_bin)
     public.execShell('chmod +x ' + initd_bin)
-    public.execShell('chkconfig --add ' + getPluginName()+version)
+    public.execShell('chkconfig --add ' + getPluginName() + version)
     return 'ok'
 
 
@@ -257,7 +257,7 @@ def initdUinstall(version):
     if not app_debug:
         if public.isAppleSystem():
             return "Apple Computer does not support"
-    
+
     public.execShell('chkconfig --del ' + getPluginName())
     initd_bin = getInitDFile(version)
     os.remove(initd_bin)
@@ -397,7 +397,7 @@ def setMaxSize(version):
     conf = re.sub(rep, u'\npost_max_size = ' + max + 'M', conf)
     public.writeFile(path, conf)
 
-    msg = public.getInfo('设置PHP-{1}最大上传大小为[{2}MB]!',(version, max,))
+    msg = public.getInfo('设置PHP-{1}最大上传大小为[{2}MB]!', (version, max,))
     public.writeLog('插件管理[PHP]', msg)
     return public.returnJson(True, '设置成功!')
 
@@ -464,8 +464,8 @@ def setFpmConfig(version):
     public.writeFile(file, conf)
     reload(version)
 
-    msg = public.getInfo('设置PHP-{1}并发设置,max_children={2},start_servers={3},min_spare_servers={4},max_spare_servers={5}',(version, max_children,
-                                                 start_servers, min_spare_servers, max_spare_servers,))
+    msg = public.getInfo('设置PHP-{1}并发设置,max_children={2},start_servers={3},min_spare_servers={4},max_spare_servers={5}', (version, max_children,
+                                                                                                                          start_servers, min_spare_servers, max_spare_servers,))
     public.writeLog('插件管理[PHP]', msg)
     return public.returnJson(True, '设置成功!')
 
@@ -515,9 +515,10 @@ def setDisableFunc(version):
 
     phpini = public.readFile(filename)
     rep = "disable_functions\s*=\s*.*\n"
-    phpini = re.sub(rep, 'disable_functions = ' +disable_functions + "\n", phpini)
+    phpini = re.sub(rep, 'disable_functions = ' +
+                    disable_functions + "\n", phpini)
 
-    msg = public.getInfo('修改PHP-{1}的禁用函数为[{2}]',(version, disable_functions,))
+    msg = public.getInfo('修改PHP-{1}的禁用函数为[{2}]', (version, disable_functions,))
     public.writeLog('插件管理[PHP]', msg)
     public.writeFile(filename, phpini)
     reload(version)
