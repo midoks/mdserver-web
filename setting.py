@@ -28,7 +28,7 @@ else:
 if workers > 2:
     workers = 2
 
-threads = 4
+threads = workers * 1
 backlog = 512
 reload = False
 daemon = True
