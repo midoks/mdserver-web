@@ -19,7 +19,7 @@ mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
 if [ ! -f $sourcePath/php/php-7.0.30.tar.xz ];then
-	wget -O $sourcePath/php/php-7.0.30.tar.xz https://museum.php.net/php7/php-7.0.30.tar.xz
+	wget --no-check-certificate -O $sourcePath/php/php-7.0.30.tar.xz https://museum.php.net/php7/php-7.0.30.tar.xz
 fi
 
 if [ ! -d $sourcePath/php/php-7.0.30 ];then
