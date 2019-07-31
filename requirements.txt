@@ -10,5 +10,4 @@ psutil==5.4
 pillow
 chardet
 flask-sqlalchemy
-MySQL-python
 ConfigParser
