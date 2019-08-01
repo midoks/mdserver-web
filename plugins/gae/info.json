@@ -2,7 +2,7 @@
 	"title":"GAE",
 	"tip":"soft",
 	"name":"gae",
-	"ps":"GAE(Google App Engine)。它是Google管理的数据中心中用于WEB应用程序的开发和托管的平台",
+	"ps":"GAE,是Google用于WEB应用程序的开发和托管的平台",
 	"versions": "0.1",
 	"shell":"install.sh",
 	"checks":"server/gae",
