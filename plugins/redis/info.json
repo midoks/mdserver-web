@@ -1,6 +1,6 @@
 {
 	"sort": 7,
-	"ps": "Redis 是一个高性能的key-value数据库(要使用PHP连接redis，需在PHP设置中安装redis扩展)",
+	"ps": "Redis 是一个高性能的key-value数据库",
 	"name": "redis",
 	"title": "Redis",
 	"shell": "install.sh",
