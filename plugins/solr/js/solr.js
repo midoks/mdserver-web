@@ -59,8 +59,9 @@ function collectionManagement(){
             con += '<tr>'+
                 '<td>' + list[i]['name']+'</td>' +
                 '<td>\
-                	<a class="btlink" onclick="cmdReceive(\''+list[i]['name']+'\')">命令</a>\
-                	| <a class="btlink" onclick="removeCollection(\''+list[i]['name']+'\')">删除</a></td>\
+                    <a class="btlink" onclick="cmdReceive(\''+list[i]['name']+'\')">命令</a> \
+                	| <a class="btlink" onclick="confCollection(\''+list[i]['name']+'\')">配置</a> \
+                	| <a class="btlink" onclick="removeCollection(\''+list[i]['name']+'\')">删除</a></td> \
                 </tr>';
         }
 
@@ -136,7 +137,20 @@ function removeCollection(name){
             setTimeout(function(){collectionManagement();},2000);
         });
     });
+}
 
+
+function confCollection(name){
+    var html = '';
+    html += '<button onclick="projectScriptEdit(\''+name+'\')" class="btn btn-default btn-sm">solrconfig.xml</button>';
+    html += '<button onclick="projectScriptDebug(\''+name+'\')" class="btn btn-default btn-sm">managed-schema</button>';
+
+    var loadOpen = layer.open({
+        type: 1,
+        title: '['+name+']配置设置',
+        area: '240px',
+        content:'<div class="change-default pd20">'+html+'</div>'
+    });
 }
 
 
