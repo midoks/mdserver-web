@@ -60,7 +60,7 @@ function collectionManagement(){
                 '<td>' + list[i]['name']+'</td>' +
                 '<td>\
                 	<a class="btlink" onclick="cmdReceive(\''+list[i]['name']+'\')">命令</a>\
-                	| <a class="btlink" onclick="delReceive(\''+list[i]['name']+'\')">删除</a></td>\
+                	| <a class="btlink" onclick="removeCollection(\''+list[i]['name']+'\')">删除</a></td>\
                 </tr>';
         }
 
@@ -101,6 +101,42 @@ function addCollection(){
             setTimeout(function(){collectionManagement();},2000);
         });
     });
+}
+
+function removeCollection(name){
+    var loadOpen = layer.open({
+        type: 1,
+        title: '删除用户',
+        area: '350px',
+        content:"<div class='bt-form pd20 pb70 c6'>\
+            <div class='version line'>你要确认要删除collection["+ name + "]</div>\
+            <div class='bt-form-submit-btn'>\
+                <button type='button' id='solr_del_close' class='btn btn-danger btn-sm btn-title'>关闭</button>\
+                <button type='button' id='solr_del_ok' class='btn btn-success btn-sm btn-title bi-btn'>确认</button>\
+            </div>\
+        </div>"
+    });
+
+    $('#solr_del_close').click(function(){
+        layer.close(loadOpen);
+    });
+
+    $('#solr_del_ok').click(function(){
+        var _data = {};
+        _data['name'] = name;
+        var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
+        
+        _data = {};
+        _data['name'] = name;
+        var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
+        pPost('remove_collection', _data, function(data){
+            var rdata = $.parseJSON(data.data);
+            layer.close(loadOpen);
+            layer.msg(rdata.msg,{icon:rdata.status?1:2,time:2000,shade: [0.3, '#000']});
+            setTimeout(function(){collectionManagement();},2000);
+        });
+    });
+
 }
 
 
