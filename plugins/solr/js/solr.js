@@ -142,8 +142,8 @@ function removeCollection(name){
 
 function confCollection(name){
     var html = '';
-    html += '<button onclick="projectScriptEdit(\''+name+'\')" class="btn btn-default btn-sm">solrconfig.xml</button>';
-    html += '<button onclick="projectScriptDebug(\''+name+'\')" class="btn btn-default btn-sm">managed-schema</button>';
+    html += '<button onclick="confFileCollection(\''+name+'\',\'solrconfig.xml\')" class="btn btn-default btn-sm">solrconfig.xml</button>';
+    html += '<button onclick="confFileCollection(\''+name+'\',\'managed-schema\')" class="btn btn-default btn-sm">managed-schema</button>';
 
     var loadOpen = layer.open({
         type: 1,
@@ -152,6 +152,18 @@ function confCollection(name){
         content:'<div class="change-default pd20">'+html+'</div>'
     });
 }
+
+function confFileCollection(name, conf_file){
+    pPost('conf_file_collection', {'name':name, 'conf_file':conf_file}, function(data){
+        var rdata = $.parseJSON(data.data);
+        if (rdata['status']){
+            onlineEditFile(0, rdata['data']['path']);
+        } else {
+            layer.msg(rdata.msg,{icon:1,time:2000,shade: [0.3, '#000']});
+        }        
+    });
+}
+
 
 
 function pRead(){
