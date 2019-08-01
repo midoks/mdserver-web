@@ -1,6 +1,6 @@
 {
 	"sort": 7,
-	"ps": "Redis 是一个高性能的key-value数据库",
+	"ps": "Redis 是一个高性能的KV数据库",
 	"name": "redis",
 	"title": "Redis",
 	"shell": "install.sh",
