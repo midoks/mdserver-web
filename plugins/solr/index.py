@@ -36,8 +36,10 @@ def getInitDFile():
 def getInitDTpl():
     return getPluginDir() + "/init.d/" + getPluginName() + ".tpl"
 
+
 def getLog():
     return getServerDir() + "/server/logs/solr.log"
+
 
 def getArgs():
     args = sys.argv[2:]
@@ -64,8 +66,9 @@ def checkArgs(data, ck=[]):
 
 
 def status():
-    pn = getPluginName();
-    data = public.execShell("ps -ef|grep "+pn+" |grep -v grep | grep -v python | awk '{print $2}'")
+    pn = getPluginName()
+    data = public.execShell(
+        "ps -ef|grep " + pn + " |grep -v grep | grep -v python | awk '{print $2}'")
     if data[0] == '':
         return 'stop'
     return 'start'
@@ -80,10 +83,10 @@ def initDreplace():
     if not os.path.exists(initD_path):
         os.mkdir(initD_path)
 
-
     user = 'www'
     if public.getOs() == 'darwin':
-        user = public.execShell("who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
+        user = public.execShell(
+            "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
 
     file_bin = initD_path + '/' + getPluginName()
     if not os.path.exists(file_bin):
@@ -94,6 +97,7 @@ def initDreplace():
         public.execShell('chmod +x ' + file_bin)
 
     return file_bin
+
 
 def start():
     file = initDreplace()
@@ -133,6 +137,7 @@ def initdStatus():
         return 'ok'
     return 'fail'
 
+
 def initdInstall():
     import shutil
 
@@ -145,10 +150,11 @@ def initdInstall():
         public.execShell('chkconfig --add ' + getPluginName())
     return 'ok'
 
+
 def initdUinstall():
     if not app_debug:
         public.execShell('chkconfig --del ' + getPluginName())
-    
+
     initd_bin = getInitDFile()
 
     if os.path.exists(initd_bin):
@@ -157,11 +163,11 @@ def initdUinstall():
 
 
 def collectionList():
-    path = getServerDir()+'/server/solr'
-    listDir =  os.listdir(path)
+    path = getServerDir() + '/server/solr'
+    listDir = os.listdir(path)
     data = []
     for dirname in listDir:
-        dirpath = path+'/'+dirname
+        dirpath = path + '/' + dirname
         if not os.path.isdir(dirpath):
             continue
         if dirname == 'configsets':
@@ -172,6 +178,7 @@ def collectionList():
         data.append(tmp)
     return public.returnJson(True, 'OK', data)
 
+
 def addCollection():
     args = getArgs()
     data = checkArgs(args, ['name'])
@@ -181,10 +188,10 @@ def addCollection():
     name = args['name']
     solr_bin = getServerDir() + "/bin/solr"
 
-    retdata =  public.execShell(solr_bin + ' create -c ' + name)
+    retdata = public.execShell(solr_bin + ' create -c ' + name)
     if retdata[1] != "":
-        return public.returnJson(False, '添加失败!:'+retdata[0])
-    return public.returnJson(True, '添加成功!:'+retdata[0])
+        return public.returnJson(False, '添加失败!:' + retdata[0])
+    return public.returnJson(True, '添加成功!:' + retdata[0])
 
 
 def removeCollection():
@@ -196,10 +203,23 @@ def removeCollection():
     name = args['name']
     solr_bin = getServerDir() + "/bin/solr"
 
-    retdata =  public.execShell(solr_bin + ' delete -c ' + name)
+    retdata = public.execShell(solr_bin + ' delete -c ' + name)
     if retdata[1] != "":
-        return public.returnJson(False, '添加失败!:'+retdata[0])
-    return public.returnJson(True, '添加成功!:'+retdata[0])
+        return public.returnJson(False, '添加失败!:' + retdata[0])
+    return public.returnJson(True, '添加成功!:' + retdata[0])
+
+
+def confFileCollection():
+    args = getArgs()
+    data = checkArgs(args, ['name'])
+    if not data[0]:
+        return data[1]
+
+    conf_file = getServerDir() + "/server/solr/" + \
+        args['name'] + "/conf/" + args['conf_file']
+    # print conf_file
+    return public.returnJson(True, 'OK', {'path': conf_file})
+
 
 # rsyncdReceive
 if __name__ == "__main__":
@@ -228,5 +248,7 @@ if __name__ == "__main__":
         print addCollection()
     elif func == 'remove_collection':
         print removeCollection()
+    elif func == 'conf_file_collection':
+        print confFileCollection()
     else:
         print 'error'
