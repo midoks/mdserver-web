@@ -187,6 +187,20 @@ def addCollection():
     return public.returnJson(True, '添加成功!:'+retdata[0])
 
 
+def removeCollection():
+    args = getArgs()
+    data = checkArgs(args, ['name'])
+    if not data[0]:
+        return data[1]
+
+    name = args['name']
+    solr_bin = getServerDir() + "/bin/solr"
+
+    retdata =  public.execShell(solr_bin + ' delete -c ' + name)
+    if retdata[1] != "":
+        return public.returnJson(False, '添加失败!:'+retdata[0])
+    return public.returnJson(True, '添加成功!:'+retdata[0])
+
 # rsyncdReceive
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -212,5 +226,7 @@ if __name__ == "__main__":
         print collectionList()
     elif func == 'add_collection':
         print addCollection()
+    elif func == 'remove_collection':
+        print removeCollection()
     else:
         print 'error'
