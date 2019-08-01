@@ -172,6 +172,20 @@ def collectionList():
         data.append(tmp)
     return public.returnJson(True, 'OK', data)
 
+def addCollection():
+    args = getArgs()
+    data = checkArgs(args, ['name'])
+    if not data[0]:
+        return data[1]
+
+    name = args['name']
+    solr_bin = getServerDir() + "/bin/solr"
+
+    retdata =  public.execShell(solr_bin + ' create -c ' + name)
+    if retdata[1] != "":
+        return public.returnJson(False, '添加失败!:'+retdata[0])
+    return public.returnJson(True, '添加成功!:'+retdata[0])
+
 
 # rsyncdReceive
 if __name__ == "__main__":
@@ -196,5 +210,7 @@ if __name__ == "__main__":
         print getLog()
     elif func == 'collection_list':
         print collectionList()
+    elif func == 'add_collection':
+        print addCollection()
     else:
         print 'error'

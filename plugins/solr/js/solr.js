@@ -37,7 +37,7 @@ function pPost(method,args,callback, title){
 }
 
 
-function collection_management(){
+function collectionManagement(){
 	pPost('collection_list', '', function(data){
 		var rdata = $.parseJSON(data.data);
 		if (!rdata.status){
@@ -54,7 +54,7 @@ function collection_management(){
         con += '</tr></thead>';
 
         con += '<tbody>';
-        
+
         for (var i = 0; i < list.length; i++) {
             con += '<tr>'+
                 '<td>' + list[i]['name']+'</td>' +
@@ -71,8 +71,36 @@ function collection_management(){
 	});
 }
 
-function addCollection(){
 
+function addCollection(){
+    var loadOpen = layer.open({
+        type: 1,
+        title: '添加Collection',
+        area: '400px',
+        content:"<div class='bt-form pd20 pb70 c6'>\
+            <div class='line'>\
+                <span class='tname'>Collection</span>\
+                <div class='info-r c4'>\
+                    <input id='name' class='bt-input-text' type='text' name='name' placeholder='Collection' style='width:200px' />\
+                </div>\
+            </div>\
+            <div class='bt-form-submit-btn'>\
+                <button type='button' id='add_ok' class='btn btn-success btn-sm btn-title bi-btn'>确认</button>\
+            </div>\
+        </div>",
+    });
+
+    $('#add_ok').click(function(){
+        _data = {};
+        _data['name'] = $('#name').val();
+        var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
+        pPost('add_collection', _data, function(data){
+            var rdata = $.parseJSON(data.data);
+            layer.close(loadOpen);
+            layer.msg(rdata.msg,{icon:rdata.status?1:2,time:2000,shade: [0.3, '#000']});
+            setTimeout(function(){collectionManagement();},2000);
+        });
+    });
 }
 
 
