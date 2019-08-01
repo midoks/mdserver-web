@@ -2,7 +2,7 @@
 	"title":"PureFtpd",
 	"tip":"soft",
 	"name":"pureftp",
-	"ps":"PureFTPd是一款专注于程序健壮和软件安全的免费FTP服务器软件",
+	"ps":"PureFTPd是一款免费FTP服务器软件",
 	"versions": "1.0.47",
 	"shell":"install.sh",
 	"checks":"server/pureftp",
