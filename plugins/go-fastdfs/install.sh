@@ -15,19 +15,19 @@ version=$2
 Install_gf()
 {
 	echo '正在安装脚本文件...' > $install_tmp
-	mkdir -p $serverPath/go-fastfds
-	FF_DIR=${serverPath}/go-fastfds
+	mkdir -p $serverPath/go-fastdfs
+	FF_DIR=${serverPath}/go-fastdfs
 	cd $FF_DIR
 
 	if [ $sysName == 'Darwin' ]; then
-		FF_SS_DIR=${serverPath}/source/go-fastfds
+		FF_SS_DIR=${serverPath}/source/go-fastdfs
 		mkdir -p $FF_SS_DIR
-		if [ ! -f $FF_SS_DIR/go-fastdfs/v1.3.1.tar.gz ]; then
-			wget -O $FF_SS_DIR/go-fastdfs/v1.3.1.tar.gz   https://github.com/sjqzhang/go-fastdfs/archive/v1.3.1.tar.gz
+		if [ ! -f $FF_SS_DIR/v1.3.1.tar.gz ]; then
+			wget -O $FF_SS_DIR/v1.3.1.tar.gz https://github.com/sjqzhang/go-fastdfs/archive/v1.3.1.tar.gz
 		fi
 
-		if [ ! -d $FF_SS_DIR/go-fastdfs/go-fastdfs-1.3.1 ]; then
-			cd $FF_SS_DIR/go-fastdfs && tar -zxvf $FF_SS_DIR/go-fastdfs/v1.3.1.tar.gz
+		if [ ! -d $FF_SS_DIR/go-fastdfs-1.3.1 ]; then
+			cd $FF_SS_DIR && tar -zxvf $FF_SS_DIR/v1.3.1.tar.gz
 		fi
 
 
@@ -38,13 +38,13 @@ Install_gf()
 	fi
 
 	
-	echo "$version" > $serverPath/solr/version.pl
+	echo "$version" > $serverPath/go-fastdfs/version.pl
 	echo '安装完成' > $install_tmp
 }
 
 Uninstall_gf()
 {
-	rm -rf $serverPath/go-fastfds
+	rm -rf $serverPath/go-fastdfs
 	echo "卸载完成" > $install_tmp
 }
 
