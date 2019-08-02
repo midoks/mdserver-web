@@ -23,7 +23,7 @@ function pPost(method,args,callback, title){
     }
 
     var loadT = layer.msg(_title, { icon: 16, time: 0, shade: 0.3 });
-    $.post('/plugins/run', {name:'solr', func:method, args:_args}, function(data) {
+    $.post('/plugins/run', {name:'go-fastdfs', func:method, args:_args}, function(data) {
         layer.close(loadT);
         if (!data.status){
             layer.msg(data.msg,{icon:0,time:2000,shade: [0.3, '#000']});
