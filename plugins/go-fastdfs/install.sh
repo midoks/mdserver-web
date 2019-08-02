@@ -31,9 +31,31 @@ Install_gf()
 		fi
 
 
+		cd $FF_SS_DIR/go-fastdfs-1.3.1
+
+		if [ -d $FF_SS_DIR/go-fastdfs-1.3.1/vendor ];then
+			 mv vendor src
+		fi
+
+		if [ ! -f $FF_SS_DIR/go-fastdfs-1.3.1/fileserver ]; then
+			pwd=`pwd`
+			echo "$pwd go build -o fileserver fileserver.go"
+			GOPATH=$pwd go build -o fileserver fileserver.go
+		fi
+
+		if [ ! -f $FF_DIR/fileserver ];then
+			cp -f fileserver $FF_DIR
+
+			cd $FF_DIR
+		fi
+		
+
+
 	else
+		cd $FF_DIR
 		if [ ! -f ${FF_DIR}/fileserver ];then
 			wget --no-check-certificate  https://github.com/sjqzhang/go-fastdfs/releases/download/v1.3.1/fileserver -O fileserver
+			chmod +x fileserver
 		fi
 	fi
 
