@@ -165,7 +165,8 @@ def initdUinstall():
 def collectionList():
     path = getServerDir() + '/server/solr'
     listDir = os.listdir(path)
-    data = []
+    data = {}
+    dlist = []
     for dirname in listDir:
         dirpath = path + '/' + dirname
         if not os.path.isdir(dirpath):
@@ -175,7 +176,18 @@ def collectionList():
 
         tmp = {}
         tmp['name'] = dirname
-        data.append(tmp)
+        dlist.append(tmp)
+    data['list'] = dlist
+    data['ip'] = public.getLocalIp()
+    data['port'] = '8983'
+
+    content = public.readFile(path+'/solr.xml')
+
+    rep = "jetty.port:(.*)\}</int>"
+    tmp = re.search(rep, content)
+    port = tmp.groups()[0]
+    data['port'] = port
+
     return public.returnJson(True, 'OK', data)
 
 
