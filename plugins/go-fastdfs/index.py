@@ -7,6 +7,7 @@ import json
 import re
 import sys
 import subprocess
+import threading
 
 sys.path.append(os.getcwd() + "/class/core")
 import public
@@ -39,7 +40,7 @@ def getInitDTpl():
 
 
 def getLog():
-    return getServerDir() + "/server/logs/solr.log"
+    return getServerDir() + "/log/fileserver.log"
 
 
 def getArgs():
@@ -96,9 +97,10 @@ def initDreplace():
 
 def start():
     file = initDreplace()
-    # data = public.execShell(file + ' start')
-    subprocess.Popen(file + ' start', shell=True)
-    return 'ok'
+    data = public.execShell(file + ' start')
+    if data[1] == '':
+        return 'ok'
+    return 'fail'
 
 
 def stop():
@@ -155,7 +157,7 @@ def initdUinstall():
         os.remove(initd_bin)
     return 'ok'
 
-# rsyncdReceive
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
