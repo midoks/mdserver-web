@@ -12,7 +12,7 @@ install_tmp=${rootPath}/tmp/mw_install.pl
 
 action=$1
 version=$2
-Install_solr()
+Install_gf()
 {
 	echo '正在安装脚本文件...' > $install_tmp
 	mkdir -p $serverPath/go-fastfds
@@ -42,7 +42,7 @@ Install_solr()
 	echo '安装完成' > $install_tmp
 }
 
-Uninstall_solr()
+Uninstall_gf()
 {
 	rm -rf $serverPath/go-fastfds
 	echo "卸载完成" > $install_tmp
@@ -50,7 +50,7 @@ Uninstall_solr()
 
 
 if [ "${1}" == 'install' ];then
-	Install_solr $version
+	Install_gf $version
 else
-	Uninstall_solr $version
+	Uninstall_gf $version
 fi
