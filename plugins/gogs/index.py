@@ -14,7 +14,7 @@ import public
 
 
 app_debug = False
-if public.getOs() == 'darwin':
+if public.isAppleSystem():
     app_debug = True
 
 
