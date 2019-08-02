@@ -43,14 +43,11 @@ Install_gf()
 			GOPATH=$pwd go build -o fileserver fileserver.go
 		fi
 
-		if [ ! -f $FF_DIR/fileserver ];then
-			cp -f fileserver $FF_DIR
+		if [ ! -f $FF_DIR/go-fastdfs ];then
+			cp -f fileserver $FF_DIR/go-fastdfs
 
 			cd $FF_DIR
 		fi
-		
-
-
 	else
 		cd $FF_DIR
 		if [ ! -f ${FF_DIR}/fileserver ];then
@@ -60,7 +57,7 @@ Install_gf()
 	fi
 
 	
-	echo "$version" > $serverPath/go-fastdfs/version.pl
+	echo "$version" > $FF_DIR/version.pl
 	echo '安装完成' > $install_tmp
 }
 

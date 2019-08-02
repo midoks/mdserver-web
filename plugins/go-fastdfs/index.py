@@ -6,6 +6,7 @@ import os
 import json
 import re
 import sys
+import subprocess
 
 sys.path.append(os.getcwd() + "/class/core")
 import public
@@ -83,16 +84,10 @@ def initDreplace():
     if not os.path.exists(initD_path):
         os.mkdir(initD_path)
 
-    user = 'www'
-    if public.getOs() == 'darwin':
-        user = public.execShell(
-            "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
-
     file_bin = initD_path + '/' + getPluginName()
     if not os.path.exists(file_bin):
         content = public.readFile(file_tpl)
         content = content.replace('{$SERVER_PATH}', service_path)
-        content = content.replace('{$RUN_USER}', user)
         public.writeFile(file_bin, content)
         public.execShell('chmod +x ' + file_bin)
 
@@ -101,10 +96,9 @@ def initDreplace():
 
 def start():
     file = initDreplace()
-    data = public.execShell(file + ' start')
-    if data[1] == '':
-        return 'ok'
-    return 'fail'
+    # data = public.execShell(file + ' start')
+    subprocess.Popen(file + ' start', shell=True)
+    return 'ok'
 
 
 def stop():
@@ -161,78 +155,6 @@ def initdUinstall():
         os.remove(initd_bin)
     return 'ok'
 
-
-def collectionList():
-    path = getServerDir() + '/server/solr'
-    listDir = os.listdir(path)
-    data = {}
-    dlist = []
-    for dirname in listDir:
-        dirpath = path + '/' + dirname
-        if not os.path.isdir(dirpath):
-            continue
-        if dirname == 'configsets':
-            continue
-
-        tmp = {}
-        tmp['name'] = dirname
-        dlist.append(tmp)
-    data['list'] = dlist
-    data['ip'] = public.getLocalIp()
-    data['port'] = '8983'
-
-    content = public.readFile(path+'/solr.xml')
-
-    rep = "jetty.port:(.*)\}</int>"
-    tmp = re.search(rep, content)
-    port = tmp.groups()[0]
-    data['port'] = port
-
-    return public.returnJson(True, 'OK', data)
-
-
-def addCollection():
-    args = getArgs()
-    data = checkArgs(args, ['name'])
-    if not data[0]:
-        return data[1]
-
-    name = args['name']
-    solr_bin = getServerDir() + "/bin/solr"
-
-    retdata = public.execShell(solr_bin + ' create -c ' + name)
-    if retdata[1] != "":
-        return public.returnJson(False, '添加失败!:' + retdata[0])
-    return public.returnJson(True, '添加成功!:' + retdata[0])
-
-
-def removeCollection():
-    args = getArgs()
-    data = checkArgs(args, ['name'])
-    if not data[0]:
-        return data[1]
-
-    name = args['name']
-    solr_bin = getServerDir() + "/bin/solr"
-
-    retdata = public.execShell(solr_bin + ' delete -c ' + name)
-    if retdata[1] != "":
-        return public.returnJson(False, '添加失败!:' + retdata[0])
-    return public.returnJson(True, '添加成功!:' + retdata[0])
-
-
-def confFileCollection():
-    args = getArgs()
-    data = checkArgs(args, ['name'])
-    if not data[0]:
-        return data[1]
-
-    conf_file = getServerDir() + "/server/solr/" + \
-        args['name'] + "/conf/" + args['conf_file']
-    # print conf_file
-    return public.returnJson(True, 'OK', {'path': conf_file})
-
-
 # rsyncdReceive
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -254,13 +176,5 @@ if __name__ == "__main__":
         print initdUinstall()
     elif func == 'run_log':
         print getLog()
-    elif func == 'collection_list':
-        print collectionList()
-    elif func == 'add_collection':
-        print addCollection()
-    elif func == 'remove_collection':
-        print removeCollection()
-    elif func == 'conf_file_collection':
-        print confFileCollection()
     else:
         print 'error'
