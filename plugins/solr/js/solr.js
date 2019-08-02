@@ -182,8 +182,9 @@ function cmdCollection(name){
 
 function pRead(){
 	var readme = '<ul class="help-info-text c7">';
-    readme += '<li>使用默认solr端口,如有需要自行修改.</li>';
-    readme += '<li>如果开启防火墙,需要放行solr设置的端口,例如(8983)。</li>';
+    readme += '<li>使用默认solr端口,如有需要自行修改</li>';
+    readme += '<li>如果开启防火墙,需要放行solr设置的端口,例如(8983)</li>';
+    readme += '<li>数据源设置好后,需要在managed-schema中同时设置</li>';
     readme += '<li><a target="_blank" href="https://github.com/midoks/mdserver-web/wiki/插件管理%5Bsolr使用说明%5D">wiki说明</a></li>';
     readme += '</ul>';
 
