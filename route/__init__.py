@@ -310,7 +310,7 @@ def webssh(msg):
 @socketio.on('connect_event')
 def connected_msg(msg):
     if not isLogined():
-        emit(pdata.s_response, {'data': '会话丢失，请重新登陆面板!\r\n'})
+        emit('server_response', {'data': '会话丢失，请重新登陆面板!\r\n'})
         return None
     global shell, ssh
     ssh_success = True
