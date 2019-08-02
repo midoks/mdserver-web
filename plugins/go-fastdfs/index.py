@@ -16,7 +16,7 @@ if public.isAppleSystem():
 
 
 def getPluginName():
-    return 'solr'
+    return 'go-fastdfs'
 
 
 def getPluginDir():
