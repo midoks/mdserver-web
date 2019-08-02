@@ -18,7 +18,7 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 gf_path={$SERVER_PATH}/go-fastdfs
 
 gf_start(){
-isStart=`ps -ef| grep 'go-fastdfs'  | grep -v grep|awk '{print $2}'`
+isStart=`ps -ef| grep -v bash |grep 'go-fastdfs'  | grep -v grep|awk '{print $2}'`
 if [ "$isStart" == '' ];then
     echo -e "Starting go-fastdfs... \c"
     cd $gf_path && chmod +x go-fastdfs && ./go-fastdfs 1> /dev/null 2>/dev/null &
@@ -32,7 +32,7 @@ fi
 gf_stop()
 {
     echo -e "Stopping go-fastdfs... \c";
-    pids=$(ps aux|grep 'go-fastdfs'| grep -v grep | awk '{print $2}')
+    pids=$(ps aux| grep -v bash | grep 'go-fastdfs'| grep -v grep | awk '{print $2}')
     arr=($pids)
 
     for p in ${arr[@]}
@@ -44,7 +44,7 @@ gf_stop()
 
 gf_status()
 {
-    isStart=$(ps aux | grep 'go-fastdfs' | grep -v grep | awk '{print $2}')
+    isStart=$(ps aux | grep -v bash | grep go-fastdfs | grep -v grep | awk '{print $2}')
     if [ "$isStart" != '' ];then
         echo -e "\033[32mgo-fastdfs (pid $(echo $isStart)) already running\033[0m"
     else
