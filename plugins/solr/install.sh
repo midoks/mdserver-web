@@ -26,6 +26,11 @@ Install_solr()
 		cd ${SOLR_DIR} && tar -zxvf solr-8.2.0.tgz
 		cp -rf ${SOLR_DIR}/solr-8.2.0/ $serverPath/solr
 	fi
+
+	if [ -d $serverPath/solr/dist ]; then
+		wget -O $serverPath/solr/dist/mysql-connector-java-5.1.48.jar http://central.maven.org/maven2/mysql/mysql-connector-java/5.1.48/mysql-connector-java-5.1.48.jar
+		wget -O $serverPath/solr/dist/mysql-connector-java-8.0.17.jar http://central.maven.org/maven2/mysql/mysql-connector-java/8.0.17/mysql-connector-java-8.0.17.jar
+	fi
 	
 	echo "$version" > $serverPath/solr/version.pl
 	echo '安装完成' > $install_tmp
