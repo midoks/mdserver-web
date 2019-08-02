@@ -45,12 +45,12 @@ function collectionManagement(){
 			return;
 		}
 
-		var list = rdata.data;
+		var list = rdata.data.list;
 		var con = '';
         con += '<div class="divtable" style="margin-top:5px;"><table class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0">';
         con += '<thead><tr>';
         con += '<th>collection</th>';
-        con += '<th>操作(<a class="btlink" onclick="addCollection()">添加</a>)</th>';
+        con += '<th>操作(<a class="btlink" onclick="addCollection()">添加</a>)'+ '|'+ '<a class="btlink" target="_blank" href="http://'+rdata.data.ip+':'+rdata.data.port+'">WEB管理</a></th>';
         con += '</tr></thead>';
 
         con += '<tbody>';
@@ -170,6 +170,7 @@ function pRead(){
 	var readme = '<ul class="help-info-text c7">';
     readme += '<li>使用默认solr端口,如有需要自行修改.</li>';
     readme += '<li>如果开启防火墙,需要放行solr设置的端口,例如(8983)。</li>';
+    readme += '<li><a target="_blank" href="https://github.com/midoks/mdserver-web/wiki/插件管理%5Bsolr使用说明%5D">wiki说明</a></li>';
     readme += '</ul>';
 
     $('.soft-man-con').html(readme);   
