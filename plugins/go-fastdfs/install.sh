@@ -15,31 +15,36 @@ version=$2
 Install_solr()
 {
 	echo '正在安装脚本文件...' > $install_tmp
-	mkdir -p $serverPath/solr
-	SOLR_DIR=${serverPath}/source/solr
-	mkdir -p $SOLR_DIR
-	if [ ! -f ${SOLR_DIR}/solr-8.2.0.tgz ];then
-		wget -O ${SOLR_DIR}/solr-8.2.0.tgz http://mirror.bit.edu.cn/apache/lucene/solr/8.2.0/solr-8.2.0.tgz
+	mkdir -p $serverPath/go-fastfds
+	FF_DIR=${serverPath}/go-fastfds
+	cd $FF_DIR
+
+	if [ $sysName == 'Darwin' ]; then
+		FF_SS_DIR=${serverPath}/source/go-fastfds
+		mkdir -p $FF_SS_DIR
+		if [ ! -f $FF_SS_DIR/go-fastdfs/v1.3.1.tar.gz ]; then
+			wget -O $FF_SS_DIR/go-fastdfs/v1.3.1.tar.gz   https://github.com/sjqzhang/go-fastdfs/archive/v1.3.1.tar.gz
+		fi
+
+		if [ ! -d $FF_SS_DIR/go-fastdfs/go-fastdfs-1.3.1 ]; then
+			cd $FF_SS_DIR/go-fastdfs && tar -zxvf $FF_SS_DIR/go-fastdfs/v1.3.1.tar.gz
+		fi
+
+
+	else
+		if [ ! -f ${FF_DIR}/fileserver ];then
+			wget --no-check-certificate  https://github.com/sjqzhang/go-fastdfs/releases/download/v1.3.1/fileserver -O fileserver
+		fi
 	fi
 
-	if [ ! -d $serverPath/solr/bin ];then
-		cd ${SOLR_DIR} && tar -zxvf solr-8.2.0.tgz
-		cp -rf ${SOLR_DIR}/solr-8.2.0/ $serverPath/solr
-	fi
-
-	if [ -d $serverPath/solr/dist ]; then
-		wget -O $serverPath/solr/dist/mysql-connector-java-5.1.48.jar http://central.maven.org/maven2/mysql/mysql-connector-java/5.1.48/mysql-connector-java-5.1.48.jar
-		wget -O $serverPath/solr/dist/mysql-connector-java-8.0.17.jar http://central.maven.org/maven2/mysql/mysql-connector-java/8.0.17/mysql-connector-java-8.0.17.jar
-	fi
 	
 	echo "$version" > $serverPath/solr/version.pl
 	echo '安装完成' > $install_tmp
-
 }
 
 Uninstall_solr()
 {
-	rm -rf $serverPath/solr
+	rm -rf $serverPath/go-fastfds
 	echo "卸载完成" > $install_tmp
 }
 
