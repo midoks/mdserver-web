@@ -4,7 +4,7 @@
 	"tip":"soft",
 	"name":"solr",
 	"type":"软件",
-	"ps":"Solr是一个独立的企业级搜索应用服务器",
+	"ps":"一个独立的企业级搜索应用服务器",
 	"versions":"8.2.0",
 	"shell":"install.sh",
 	"checks":"server/solr",
