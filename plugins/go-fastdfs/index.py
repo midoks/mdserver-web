@@ -182,16 +182,17 @@ def gfConfSet():
         {'name': 'enable_cross_origin', 'type': 0, 'ps': '是否开启跨站访问'},
         {'name': 'enable_tus', 'type': 0, 'ps': '是否开启断点续传'}
     ]
-    data = public.readFile(gfConf())
-    result = json.loads(data)
+    file = public.readFile(gfConf())
+    data = json.loads(file)
 
-    ret = []
+    result = []
     for g in gets:
-        if g['name'] in result:
-            g['value'] = result[g['name']]
-            ret.append(g)
+        if g['name'] in data:
+            g['value'] = data[g['name']]
+            result.append(g)
 
-    return public.getJson(ret)
+    return public.getJson(result)
+
 
 if __name__ == "__main__":
     func = sys.argv[1]

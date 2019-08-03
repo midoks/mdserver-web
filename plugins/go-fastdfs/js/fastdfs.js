@@ -75,25 +75,18 @@ function gfConfigSet(){
         }
         var html = '<style>.conf_p p{margin-bottom: 2px}</style><div class="conf_p" style="margin-bottom:0">\
                         ' + mlist + '\
-                        <div style="margin-top:10px; padding-right:15px" class="text-right">\
-                        <button class="btn btn-success btn-sm mr5" onclick="gogsSetConfig()">刷新</button>\
-                        <button class="btn btn-success btn-sm" onclick="submitGogsConf()">保存</button></div>\
+                    <div style="margin-top:10px; padding-right:15px" class="text-right">\
                     </div>';
         $(".soft-man-con").html(html);
     });
 }
 
 
-
-
-
-
 function pRead(){
 	var readme = '<ul class="help-info-text c7">';
-    readme += '<li>使用默认solr端口,如有需要自行修改</li>';
-    readme += '<li>如果开启防火墙,需要放行solr设置的端口,例如(8983)</li>';
-    readme += '<li>数据源设置好后,需要在managed-schema中同时设置</li>';
-    readme += '<li><a target="_blank" href="https://github.com/midoks/mdserver-web/wiki/插件管理%5Bsolr使用说明%5D">wiki说明</a></li>';
+    readme += '<li>官方地址<a target="_blank" href="https://github.com/sjqzhang/go-fastdfs">查看</a></li>';
+    readme += '<li>如果开启防火墙,需要放行端口,例如(8080)</li>';
+    readme += '<li>要自行配置openresty</li>';
     readme += '</ul>';
 
     $('.soft-man-con').html(readme);   
