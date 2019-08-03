@@ -43,6 +43,10 @@ def getLog():
     return getServerDir() + "/log/fileserver.log"
 
 
+def gfBreakpointLog():
+    return getServerDir() + "/log/tusd.log"
+
+
 def getArgs():
     args = sys.argv[2:]
     tmp = {}
@@ -158,6 +162,37 @@ def initdUinstall():
     return 'ok'
 
 
+def gfConf():
+    return getServerDir() + "/conf/cfg.json"
+
+
+def gfConfSet():
+    gets = [
+        {'name': 'addr', 'type': -1, 'ps': '绑定端口'},
+        {'name': 'peer_id', 'type': -1, 'ps': '集群内唯一,请使用0-9的单字符'},
+        {'name': 'host', 'type': -1, 'ps': '本主机地址'},
+        {'name': 'group', 'type': -1, 'ps': '组号'},
+        {'name': 'support_group_manage', 'type': 0, 'ps': '是否支持按组（集群）管理'},
+        {'name': 'enable_merge_small_file', 'type': 0, 'ps': '是否合并小文件'},
+        {'name': 'refresh_interval', 'type': 1, 'ps': '重试同步失败文件的时间'},
+        {'name': 'rename_file', 'type': 0, 'ps': '是否自动重命名'},
+        {'name': 'enable_web_upload', 'type': 0, 'ps': '是否支持web上传,方便调试'},
+        {'name': 'enable_custom_path', 'type': 0, 'ps': '是否支持非日期路径'},
+        {'name': 'enable_migrate', 'type': 0, 'ps': '是否启用迁移'},
+        {'name': 'enable_cross_origin', 'type': 0, 'ps': '是否开启跨站访问'},
+        {'name': 'enable_tus', 'type': 0, 'ps': '是否开启断点续传'}
+    ]
+    data = public.readFile(gfConf())
+    result = json.loads(data)
+
+    ret = []
+    for g in gets:
+        if g['name'] in result:
+            g['value'] = result[g['name']]
+            ret.append(g)
+
+    return public.getJson(ret)
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -178,5 +213,9 @@ if __name__ == "__main__":
         print initdUinstall()
     elif func == 'run_log':
         print getLog()
+    elif func == 'conf':
+        print gfConf()
+    elif func == 'gf_conf_set':
+        print gfConfSet()
     else:
         print 'error'
