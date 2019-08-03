@@ -213,6 +213,8 @@ if __name__ == "__main__":
         print initdUinstall()
     elif func == 'run_log':
         print getLog()
+    elif func == 'breakpoint_log':
+        print gfBreakpointLog()
     elif func == 'conf':
         print gfConf()
     elif func == 'gf_conf_set':
