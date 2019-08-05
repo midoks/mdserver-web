@@ -10,6 +10,16 @@ sysName=`uname`
 
 install_tmp=${rootPath}/tmp/mw_install.pl
 
+
+
+if id solr &> /dev/null ;then 
+    echo "solr UID is `id -u solr`"
+    echo "solr Shell is `grep "^solr:" /etc/passwd |cut -d':' -f7 `"
+else
+    groupadd solr
+	useradd -g solr -s /sbin/nologin solr
+fi
+
 action=$1
 version=$2
 Install_solr()
@@ -25,7 +35,7 @@ Install_solr()
 	if [ ! -d $serverPath/solr/bin ];then
 		cd ${SOLR_DIR} && tar -zxvf solr-8.2.0.tgz
 		cp -rf ${SOLR_DIR}/solr-8.2.0/* $serverPath/solr/
-		chown -R www:www $serverPath/solr
+		chown -R solr:solr $serverPath/solr
 	fi
 
 	if [ -d $serverPath/solr/dist ]; then
