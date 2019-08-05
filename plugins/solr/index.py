@@ -103,7 +103,7 @@ def runShell(shell):
     if public.isAppleSystem():
         data = public.execShell(shell)
     else:
-        data = public.execShell('su - solr -c "/bin/sh ' + shell + '"')
+        data = public.execShell('su - solr -c "/bin/bash ' + shell + '"')
     return data
 
 
