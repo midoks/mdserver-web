@@ -99,9 +99,17 @@ def initDreplace():
     return file_bin
 
 
+def runShell(file, method):
+    if public.isAppleSystem():
+        data = public.execShell(file + ' ' + method)
+    else:
+        data = public.execShell('su - solr -s /bin/sh ' + file + ' ' + method)
+    return data
+
+
 def start():
     file = initDreplace()
-    data = public.execShell(file + ' start')
+    data = runShell(file, 'start')
     if data[1] == '':
         return 'ok'
     return 'fail'
@@ -109,7 +117,7 @@ def start():
 
 def stop():
     file = initDreplace()
-    data = public.execShell(file + ' stop')
+    data = runShell(file, 'stop')
     if data[1] == '':
         return 'ok'
     return 'fail'
@@ -117,7 +125,7 @@ def stop():
 
 def restart():
     file = initDreplace()
-    data = public.execShell(file + ' restart')
+    data = runShell(file, 'restart')
     if data[1] == '':
         return 'ok'
     return 'fail'
@@ -125,7 +133,7 @@ def restart():
 
 def reload():
     file = initDreplace()
-    data = public.execShell(file + ' reload')
+    data = runShell(file, 'reload')
     if data[1] == '':
         return 'ok'
     return 'fail'
