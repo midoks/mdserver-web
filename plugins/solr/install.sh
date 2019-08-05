@@ -25,6 +25,7 @@ Install_solr()
 	if [ ! -d $serverPath/solr/bin ];then
 		cd ${SOLR_DIR} && tar -zxvf solr-8.2.0.tgz
 		cp -rf ${SOLR_DIR}/solr-8.2.0/* $serverPath/solr/
+		chown -R www:www $serverPath/solr
 	fi
 
 	if [ -d $serverPath/solr/dist ]; then
