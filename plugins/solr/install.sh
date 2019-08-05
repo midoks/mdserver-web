@@ -39,8 +39,14 @@ Install_solr()
 	fi
 
 	if [ -d $serverPath/solr/dist ]; then
-		wget -O $serverPath/solr/dist/mysql-connector-java-5.1.48.jar http://central.maven.org/maven2/mysql/mysql-connector-java/5.1.48/mysql-connector-java-5.1.48.jar
-		wget -O $serverPath/solr/dist/mysql-connector-java-8.0.17.jar http://central.maven.org/maven2/mysql/mysql-connector-java/8.0.17/mysql-connector-java-8.0.17.jar
+
+		if [ ! -f $serverPath/solr/dist/mysql-connector-java-5.1.48.jar ];then
+			wget -O $serverPath/solr/dist/mysql-connector-java-5.1.48.jar http://central.maven.org/maven2/mysql/mysql-connector-java/5.1.48/mysql-connector-java-5.1.48.jar
+		fi
+
+		if [ ! -f $serverPath/solr/dist/mysql-connector-java-8.0.17.jar ];then
+			wget -O $serverPath/solr/dist/mysql-connector-java-8.0.17.jar http://central.maven.org/maven2/mysql/mysql-connector-java/8.0.17/mysql-connector-java-8.0.17.jar
+		fi
 	fi
 	
 	echo "$version" > $serverPath/solr/version.pl
