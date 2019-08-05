@@ -289,7 +289,7 @@ class firewall_api:
                 return
             if self.__isFirewalld:
                 public.execShell('systemctl stop firewalld.service')
-                public.execShell('systemctl disabled firewalld.service')
+                public.execShell('systemctl disable firewalld.service')
             elif self.__isMac:
                 pass
             else:
