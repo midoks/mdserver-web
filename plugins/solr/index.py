@@ -210,7 +210,7 @@ def addCollection():
 
     retdata = runShell(solr_bin + ' create -c ' + name)
     if retdata[1] != "":
-        return public.returnJson(False, '添加失败!:' + retdata[0])
+        return public.returnJson(False, '添加失败!:' + retdata[1])
     return public.returnJson(True, '添加成功!:' + retdata[0])
 
 
@@ -225,7 +225,7 @@ def removeCollection():
 
     retdata = runShell(solr_bin + ' delete -c ' + name)
     if retdata[1] != "":
-        return public.returnJson(False, '删除失败!:' + retdata[0])
+        return public.returnJson(False, '删除失败!:' + retdata[1])
     return public.returnJson(True, '删除成功!:' + retdata[0])
 
 
