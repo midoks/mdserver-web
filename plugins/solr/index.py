@@ -99,17 +99,17 @@ def initDreplace():
     return file_bin
 
 
-def runShell(file, method):
+def runShell(shell):
     if public.isAppleSystem():
-        data = public.execShell(file + ' ' + method)
+        data = public.execShell(shell)
     else:
-        data = public.execShell('su - solr -s /bin/sh ' + file + ' ' + method)
+        data = public.execShell('su - solr -s /bin/sh ' + shell)
     return data
 
 
 def start():
     file = initDreplace()
-    data = runShell(file, 'start')
+    data = runShell(file + ' start')
     if data[1] == '':
         return 'ok'
     return 'fail'
@@ -117,7 +117,7 @@ def start():
 
 def stop():
     file = initDreplace()
-    data = runShell(file, 'stop')
+    data = runShell(file + ' stop')
     if data[1] == '':
         return 'ok'
     return 'fail'
@@ -125,7 +125,7 @@ def stop():
 
 def restart():
     file = initDreplace()
-    data = runShell(file, 'restart')
+    data = runShell(file + ' restart')
     if data[1] == '':
         return 'ok'
     return 'fail'
@@ -133,7 +133,7 @@ def restart():
 
 def reload():
     file = initDreplace()
-    data = runShell(file, 'reload')
+    data = runShell(file + ' reload')
     if data[1] == '':
         return 'ok'
     return 'fail'
@@ -208,7 +208,7 @@ def addCollection():
     name = args['name']
     solr_bin = getServerDir() + "/bin/solr"
 
-    retdata = public.execShell(solr_bin + ' create -c ' + name)
+    retdata = runShell(solr_bin + ' create -c ' + name)
     if retdata[1] != "":
         return public.returnJson(False, '添加失败!:' + retdata[0])
     return public.returnJson(True, '添加成功!:' + retdata[0])
@@ -223,7 +223,7 @@ def removeCollection():
     name = args['name']
     solr_bin = getServerDir() + "/bin/solr"
 
-    retdata = public.execShell(solr_bin + ' delete -c ' + name)
+    retdata = runShell(solr_bin + ' delete -c ' + name)
     if retdata[1] != "":
         return public.returnJson(False, '添加失败!:' + retdata[0])
     return public.returnJson(True, '添加成功!:' + retdata[0])
