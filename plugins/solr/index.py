@@ -83,7 +83,7 @@ def initDreplace():
     if not os.path.exists(initD_path):
         os.mkdir(initD_path)
 
-    user = 'www'
+    user = 'solr'
     if public.getOs() == 'darwin':
         user = public.execShell(
             "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
@@ -181,7 +181,7 @@ def collectionList():
     data['ip'] = public.getLocalIp()
     data['port'] = '8983'
 
-    content = public.readFile(path+'/solr.xml')
+    content = public.readFile(path + '/solr.xml')
 
     rep = "jetty.port:(.*)\}</int>"
     tmp = re.search(rep, content)
