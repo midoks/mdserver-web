@@ -17,7 +17,7 @@ if id solr &> /dev/null ;then
     echo "solr Shell is `grep "^solr:" /etc/passwd |cut -d':' -f7 `"
 else
     groupadd solr
-	useradd -g solr -s /sbin/nologin solr
+	useradd -g solr -s /bin/bash solr
 fi
 
 action=$1
