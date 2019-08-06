@@ -168,7 +168,7 @@ function confFileCollection(name, conf_file){
 function cmdCollection(name){
     var cmd = '<div class="change-default pd20"><table class="table table-hover">';
     cmd += '<thead><tr><td>增量更新</td><td>curl "http://127.0.0.1:8983/solr/'+name+'/dataimport?command=delta-import&wt=json&clean=false&commit=true"</td></tr>';
-    cmd += '<tr><td>权限更新</td><td>curl "http://127.0.0.1:8983/solr/'+name+'/dataimport?command=full-import&wt=json&clean=false&commit=true"<td></tr>';
+    cmd += '<tr><td>增量更新</td><td>curl "http://127.0.0.1:8983/solr/'+name+'/dataimport?command=full-import&wt=json&clean=false&commit=true"<td></tr>';
     cmd += '<tr><td colspan="2">默认端口:8983(可修改),默认IP为本地,可修改。</td></tr></thead>';
     cmd += '</table></div>';
 
