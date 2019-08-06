@@ -9,21 +9,21 @@ import time
 
 sys.path.append("/usr/local/lib/python2.7/site-packages")
 
-conn = mdb.connect(host='0.0.0.0', 
-    port=3306, 
-    user='xxx', 
-    passwd='xxx', 
-    db='xxx', 
-    charset='utf8')
+conn = mdb.connect(host='0.0.0.0',
+                   port=3306,
+                   user='xxx',
+                   passwd='xxx',
+                   db='xxx',
+                   charset='utf8')
 conn.autocommit(True)
 cursor = conn.cursor()
 
 
-sql = 'select id from xxx order by id desc limit 1' 
+sql = 'select id from xxx order by id desc limit 1'
 r = cursor.execute(sql)
 
 count = 0
-for info in cursor.fetchall():  
+for info in cursor.fetchall():
     count = info[0]
 conn.close()
 
@@ -49,9 +49,8 @@ def execShell(cmdstring, cwd=None, timeout=None, shell=True):
     return sub.communicate()
 
 
-for x in xrange(1,count/10+1):
-	y =  x * 10
-	cmd = 'curl  --basic -u admin:admin "http://176.122.138.146:8983/solr/sodht/dataimport?command=full-import&wt=json&clean=false&commit=true&length=10&offset='+str(y)+'"'
-	print execShell(cmd)
-
-
+for x in xrange(1, count / 10 + 1):
+    y = x * 10
+    cmd = 'curl  --basic -u admin:admin "http://127.0.0.1:8983/solr/sodht/dataimport?command=full-import&wt=json&clean=false&commit=true&length=10&offset=' + \
+        str(y) + '"'
+    print execShell(cmd)
