@@ -96,6 +96,12 @@ def initDreplace():
         public.writeFile(file_bin, content)
         public.execShell('chmod +x ' + file_bin)
 
+    file_py = initD_path + '/' + getPluginName() + '.py'
+    if not os.path.exists(file_py):
+        content = public.readFile(getPluginDir() + '/script/full.py')
+        public.writeFile(file_py, content)
+        public.execShell('chmod +x ' + file_py)
+
     return file_bin
 
 
@@ -241,9 +247,8 @@ def confFileCollection():
     return public.returnJson(True, 'OK', {'path': conf_file})
 
 
-
 def scriptFull():
-    return  getPluginDir() + "/script/full.py"
+    return getServerDir() + "/init.d/solr.py"
 
 # rsyncdReceive
 if __name__ == "__main__":
