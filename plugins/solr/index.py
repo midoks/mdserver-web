@@ -241,6 +241,10 @@ def confFileCollection():
     return public.returnJson(True, 'OK', {'path': conf_file})
 
 
+
+def scriptFull():
+    return  getPluginDir() + "/script/full.py"
+
 # rsyncdReceive
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -270,5 +274,7 @@ if __name__ == "__main__":
         print removeCollection()
     elif func == 'conf_file_collection':
         print confFileCollection()
+    elif func == 'script_full':
+        print scriptFull()
     else:
         print 'error'
