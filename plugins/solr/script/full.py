@@ -50,7 +50,7 @@ def execShell(cmdstring, cwd=None, timeout=None, shell=True):
 
 
 for x in xrange(1, count / 100 + 1):
-    y = x * 10
+    y = x * 100
     cmd = 'curl  --basic -u admin:admin "http://127.0.0.1:8983/solr/sodht/dataimport?command=full-import&wt=json&clean=false&commit=true&length=100&offset=' + \
         str(y) + '"'
     print execShell(cmd)
