@@ -1,0 +1,16 @@
+{
+	"id":10,
+	"title":"go-fastdfs-web",
+	"tip":"soft",
+	"name":"go-fastdfs-web",
+	"type":"软件",
+	"ps":"Go-Fastdfs web管理平台",
+	"versions":"1.1.2",
+	"shell":"install.sh",
+	"checks":"server/go-fastdfs-web",
+	"path": "server/go-fastdfs-web",
+	"author":"midoks",
+	"home":"https://github.com/perfree/go-fastdfs-web",
+	"date":"2019-08-07",
+	"pid":"2"
+}

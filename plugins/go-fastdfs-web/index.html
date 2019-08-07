@@ -1,0 +1,21 @@
+<div class="bt-form">
+	<div class="bt-w-main">
+		<div class="bt-w-menu">
+			<p class="bgw" onclick="pluginService('go-fastdfs-web');">服务</p>
+			<p onclick="pluginInitD('go-fastdfs-web');">自启动</p>
+			<p onclick="pluginConfig('go-fastdfs-web');">配置</p>
+			<p onclick="pluginLogs('go-fastdfs-web','','run_log');">运行日志</p>
+			<p onclick="pRead()">说明</p>
+		</div>
+		<div class="bt-w-con pd15">
+			<div class="soft-man-con"></div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+resetPluginWinWidth(700);
+$.getScript( "/plugins/file?name=go-fastdfs-web&f=js/fastdfs.js", function() {
+	pluginService('go-fastdfs');
+});
+</script>
