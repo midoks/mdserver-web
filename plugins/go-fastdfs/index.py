@@ -74,7 +74,7 @@ def checkArgs(data, ck=[]):
 def status():
     pn = getPluginName()
     data = public.execShell(
-        "ps -ef|grep " + pn + " |grep -v grep | grep -v python | awk '{print $2}'")
+        "ps -ef|grep " + pn + " |grep -v grep |grep -v .jar | grep -v python | awk '{print $2}'")
     if data[0] == '':
         return 'stop'
     return 'start'
