@@ -102,6 +102,10 @@ def initDreplace():
         public.writeFile(file_py, content)
         public.execShell('chmod +x ' + file_py)
 
+    log_file = getLog()
+    if os.path.exists(log_file):
+        public.writeFile(log_file, '')
+
     return file_bin
 
 
@@ -116,6 +120,7 @@ def runShell(shell):
 def start():
     file = initDreplace()
     data = runShell(file + ' start')
+
     if data[1] == '':
         return 'ok'
     return 'fail'
