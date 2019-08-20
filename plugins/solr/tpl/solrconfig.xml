@@ -975,6 +975,12 @@
        See http://wiki.apache.org/solr/SpellCheckComponent for details
        on the request parameters.
     -->
+  <requestHandler name="/dataimport" class="solr.DataImportHandler">  
+     <lst name="defaults">  
+        <str name="config">db-data-config.xml</str>  
+     </lst>  
+  </requestHandler>
+
   <requestHandler name="/spell" class="solr.SearchHandler" startup="lazy">
     <lst name="defaults">
       <!-- Solr will use suggestions from both the 'default' spellchecker
