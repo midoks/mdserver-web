@@ -123,3 +123,4 @@ data/datadir.pl
 data/502Task.pl
 plugins/qbittorrent/
 data/default.pl
+data/backup.pl
