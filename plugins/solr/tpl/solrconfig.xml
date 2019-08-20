@@ -98,6 +98,12 @@
     <httpCaching never304="true" />
   </requestDispatcher>
 
+  <requestHandler name="/dataimport" class="solr.DataImportHandler">
+     <lst name="defaults">  
+        <str name="config">db-data-config.xml</str>  
+     </lst>  
+  </requestHandler>
+
   <requestHandler name="/select" class="solr.SearchHandler">
 
     <lst name="defaults">

@@ -222,6 +222,22 @@ def addCollection():
     retdata = runShell(solr_bin + ' create -c ' + name)
     if retdata[1] != "":
         return public.returnJson(False, '添加失败!:' + retdata[1])
+
+    sc_path = getServerDir() + "/server/solr/" + name + "/conf/solrconfig.xml"
+    sc_path_tpl = getPluginDir() + "/tpl/solrconfig.xml"
+    content = public.readFile(sc_path_tpl)
+    public.writeFile(sc_path, content)
+
+    sd_path = getServerDir() + "/server/solr/" + name + "/conf/db-data-config.xml"
+    sd_path_tpl = getPluginDir() + "/tpl/db-data-config.xml"
+    content = public.readFile(sd_path_tpl)
+    public.writeFile(sd_path, content)
+
+    sd_path = getServerDir() + "/server/solr/" + name + "/conf/managed-schema"
+    sd_path_tpl = getPluginDir() + "/tpl/managed-schema"
+    content = public.readFile(sd_path_tpl)
+    public.writeFile(sd_path, content)
+
     return public.returnJson(True, '添加成功!:' + retdata[0])
 
 
