@@ -145,6 +145,10 @@ def restart():
 def reload():
     file = initDreplace()
     data = runShell(file + ' reload')
+
+    solr_log = getServerDir() + "/server/logs/solr.log"
+    public.writeFile(solr_log, "")
+
     if data[1] == '':
         return 'ok'
     return 'fail'
