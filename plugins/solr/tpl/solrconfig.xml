@@ -83,7 +83,7 @@
 
   <lib dir="${solr.install.dir:../../../..}/contrib/velocity/lib" regex=".*\.jar" />
   <lib dir="${solr.install.dir:../../../..}/dist/" regex="solr-velocity-\d.*\.jar" />
-  <lib dir="${solr.install.dir:../../../..}/dist/" regex="mysql-connector-java-.*\.jar" />
+  <lib dir="${solr.install.dir:../../../..}/dist/" regex="mysql-connector-java-5.1.48.jar" />
   <lib dir="${solr.install.dir:../../../..}/dist/" regex="solr-dataimporthandler-.*\.jar" />
   <lib dir="${solr.install.dir:../../../..}/dist/" regex="mmseg4j-core-.*\.jar" />
   <lib dir="${solr.install.dir:../../../..}/dist/" regex="mmseg4j-solr-.*\.jar" />

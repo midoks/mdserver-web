@@ -106,6 +106,11 @@ def initDreplace():
     if os.path.exists(log_file):
         public.writeFile(log_file, '')
 
+    rp_path = getServerDir() + "/server/solr/server/conf/etc/realm.properties"
+    rp_path_tpl = getPluginDir() + "/tpl/realm.properties"
+    content = public.readFile(rp_path_tpl)
+    public.writeFile(rp_path, content)
+
     return file_bin
 
 
