@@ -77,11 +77,11 @@ Install_solr()
 		fi
 
 		if [ -f ${SOLR_DIR}/mmseg4j-2.4.0/mmseg4j-core-1.10.0.jar ];then
-			cp -rf ${SOLR_DIR}/mmseg4j-core-1.10.0.jar $serverPath/solr/dist/
+			cp -rf ${SOLR_DIR}/mmseg4j-2.4.0/mmseg4j-core-1.10.0.jar $serverPath/solr/dist/
 		fi
 
 		if [ -f ${SOLR_DIR}/mmseg4j-2.4.0/mmseg4j-solr-2.4.0.jar ];then
-			cp -rf ${SOLR_DIR}/mmseg4j-solr-2.4.0.jar $serverPath/solr/dist/
+			cp -rf ${SOLR_DIR}/mmseg4j-2.4.0/mmseg4j-solr-2.4.0.jar $serverPath/solr/dist/
 		fi
 	fi
 	
