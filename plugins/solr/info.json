@@ -5,7 +5,7 @@
 	"name":"solr",
 	"type":"软件",
 	"ps":"一个独立的企业级搜索应用服务器",
-	"versions":"8.2.0",
+	"versions":"6.3.0",
 	"shell":"install.sh",
 	"checks":"server/solr",
 	"path": "server/solr",
