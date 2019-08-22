@@ -144,7 +144,7 @@ function confCollection(name){
     var html = '';
     html += '<button onclick="confFileCollection(\''+name+'\',\'solrconfig.xml\')" class="btn btn-default btn-sm">solrconfig.xml</button>';
     html += '<button onclick="confFileCollection(\''+name+'\',\'managed-schema\')" class="btn btn-default btn-sm">managed-schema</button>';
-    html += '<button onclick="confFileCollection(\''+name+'\',\'db-data-config.xml\')" class="btn btn-default btn-sm">managed-schema</button>';
+    html += '<button onclick="confFileCollection(\''+name+'\',\'db-data-config.xml\')" class="btn btn-default btn-sm">db-data-config.xml</button>';
 
     var loadOpen = layer.open({
         type: 1,
