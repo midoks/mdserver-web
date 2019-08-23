@@ -106,10 +106,27 @@ def initDreplace():
     if os.path.exists(log_file):
         public.writeFile(log_file, '')
 
-    rp_path = getServerDir() + "/server/solr/server/conf/etc/realm.properties"
+    # realm.properties
+    rp_path = getServerDir() + "/server/etc/realm.properties"
     rp_path_tpl = getPluginDir() + "/tpl/realm.properties"
+    # print rp_path
+    # print rp_path_tpl
+
+    # if not os.path.exists(rp_path):
     content = public.readFile(rp_path_tpl)
     public.writeFile(rp_path, content)
+
+    # web.xml
+    web_xml = getServerDir() + "/server/solr-webapp/webapp/WEB-INF/web.xml"
+    web_xml_tpl = getPluginDir() + "/tpl/web.xml"
+    content = public.readFile(web_xml_tpl)
+    public.writeFile(web_xml, content)
+
+    # solr-jetty-context.xml
+    solr_jetty_context_xml = getServerDir() + "/server/contexts/solr-jetty-context.xml"
+    solr_jetty_context_xml_tpl = getPluginDir() + "/tpl/solr-jetty-context.xml"
+    content = public.readFile(solr_jetty_context_xml_tpl)
+    public.writeFile(solr_jetty_context_xml, content)
 
     return file_bin
 
