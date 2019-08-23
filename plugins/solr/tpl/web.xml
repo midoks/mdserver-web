@@ -181,6 +181,7 @@
     </web-resource-collection>
   </security-constraint>
 
+<!--   
   <security-constraint>
     <web-resource-collection>
       <web-resource-name>solr</web-resource-name>
@@ -195,6 +196,7 @@
   <login-config>  
       <auth-method>BASIC</auth-method>  
       <realm-name>Solr</realm-name>  
-  </login-config>
+  </login-config> 
+-->
 
 </web-app>
