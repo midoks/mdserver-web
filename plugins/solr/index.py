@@ -84,7 +84,7 @@ def initDreplace():
         os.mkdir(initD_path)
 
     user = 'solr'
-    if public.getOs() == 'darwin':
+    if public.isAppleSystem():
         user = public.execShell(
             "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
 
@@ -127,6 +127,9 @@ def initDreplace():
     solr_jetty_context_xml_tpl = getPluginDir() + "/tpl/solr-jetty-context.xml"
     content = public.readFile(solr_jetty_context_xml_tpl)
     public.writeFile(solr_jetty_context_xml, content)
+
+    if not public.isAppleSystem():
+        public.execShell('chown -R solr:solr ' + getServerDir())
 
     return file_bin
 
