@@ -11,6 +11,19 @@ sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 
 
+CheckJAVA()
+{
+	which "java" > /dev/null
+	if [ $? -eq 0 ]
+	then
+    	echo 'java is exist'
+	else
+    	echo 'java install...'
+    	yum install -y java
+	fi
+}
+
+
 
 if id solr &> /dev/null ;then 
     echo "solr UID is `id -u solr`"
@@ -30,6 +43,7 @@ action=$1
 version=$2
 Install_solr()
 {
+	CheckJAVA
 	echo '正在安装脚本文件...' > $install_tmp
 	mkdir -p $serverPath/solr
 	SOLR_DIR=${serverPath}/source/solr
