@@ -1,0 +1,18 @@
+{
+	"sort": 7,
+	"ps": "一个新的轻量级BitTorrent客户端",
+	"name": "qbittorrent",
+	"title": "qBittorrent",
+	"shell": "install.sh",
+	"versions":["4.1.5"],
+	"updates":["4.1.5"],
+	"tip": "soft",
+	"checks": "server/qbittorrent",
+	"path": "server/qbittorrent",
+	"display": 1,
+	"author": "Zend",
+	"date": "2017-04-01",
+	"home": "https://www.qbittorrent.org",
+	"type": 0,
+	"pid": "5"
+}
