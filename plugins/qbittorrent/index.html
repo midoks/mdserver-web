@@ -1,0 +1,23 @@
+<div class="bt-form">
+	<div class="bt-w-main">
+		<div class="bt-w-menu">
+			<p class="bgw" onclick="pluginService('qbittorrent');">服务</p>
+			<p onclick="pluginInitD('qbittorrent');">自启动</p>
+			<p onclick="pluginConfig('qbittorrent', '','get_sql');" title="手动导入SQL">导入SQL</p>
+			<p onclick="pluginConfig('qbittorrent');">配置</p>
+			<p onclick="pluginConfig('qbittorrent', '','rsync_shell');" title="异步脚本">异步脚本</p>
+			<p onclick="pluginLogs('qbittorrent','','get_run_Log', 25);">日志</p>
+			<p onclick="qbList();">列表</p>
+			
+		</div>
+		<div class="bt-w-con pd15">
+			<div class="soft-man-con">
+			</div>
+		</div>
+	</div>
+
+</div>
+<script type="text/javascript">
+pluginService('qbittorrent');
+$.getScript( "/plugins/file?name=qbittorrent&f=js/qbittorrent.js");
+</script>
