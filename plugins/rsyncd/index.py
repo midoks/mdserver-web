@@ -126,6 +126,9 @@ def initDreplace():
         public.writeFile(file_bin, content)
         public.execShell('chmod +x ' + file_bin)
 
+    if os.path.exists('/usr/lib/systemd/system/rsyncd.service'):
+        public.execShell('rm -rf /usr/lib/systemd/system/rsyncd*')
+
     return file_bin
 
 
