@@ -24,6 +24,9 @@ p_start(){
 p_stop(){
 	echo "Stopping ..."
 	ps -ef | grep rsync | grep -v grep | grep -v python | awk '{print $2}' | xargs kill -9
+	if [ -f /var/run/rsyncd.pid ]; then
+		rm -rf /var/run/rsyncd.pid
+	fi
 	echo "rsyncd stopped"
 }
 
