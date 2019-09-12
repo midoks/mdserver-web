@@ -19,6 +19,11 @@ def getPluginName():
     return 'rsyncd'
 
 
+def getInitDTpl():
+    path = getPluginDir() + "/init.d/" + getPluginName() + ".tpl"
+    return path
+
+
 def getPluginDir():
     return public.getPluginDir() + '/' + getPluginName()
 
@@ -55,6 +60,12 @@ def checkArgs(data, ck=[]):
         if not ck[i] in data:
             return (False, public.returnJson(False, '参数:(' + ck[i] + ')没有!'))
     return (True, public.returnJson(True, 'ok'))
+
+
+def contentReplace(content):
+    service_path = public.getServerDir()
+    content = content.replace('{$SERVER_PATH}', service_path)
+    return content
 
 
 def status():
@@ -102,43 +113,41 @@ def initConf():
         public.writeFile(confpwd_path, '')
         public.execShell('chmod 0600 ' + confpwd_path)
 
+    initD_path = getServerDir() + '/init.d'
+    if not os.path.exists(initD_path):
+        os.mkdir(initD_path)
+    file_bin = initD_path + '/' + getPluginName()
+
+    file_tpl = getInitDTpl()
+    # initd replace
+    if not os.path.exists(file_bin):
+        content = public.readFile(file_tpl)
+        content = contentReplace(content)
+        public.writeFile(file_bin, content)
+        public.execShell('chmod +x ' + file_bin)
+
+    return file_bin
+
 
 def start():
-    initConf()
-
-    if public.isAppleSystem():
-        return "Apple Computer does not support"
-
-    # data = public.execShell('systemctl start rsyncd.service')
-    # if data[1] == '':
-    #     return 'ok'
-    # return 'fail'
-
-    public.execShell('/usr/bin/rsync --daemon')
-    return 'ok'
+    file = initConf()
+    data = public.execShell(file + ' start')
+    if data[1] == '':
+        return 'ok'
+    return 'fail'
 
 
 def stop():
-    if public.isAppleSystem():
-        return "Apple Computer does not support"
-
-    # data = public.execShell('systemctl stop rsyncd.service')
-    # if data[1] == '':
-    #     return 'ok'
-    # return 'fail'
-
-    cmd = "ps -ef | grep rsync |grep -v grep | grep -v python |awk '{print $2}' | xargs kill"
-    public.execShell(cmd)
-    return 'ok'
+    file = initConf()
+    data = public.execShell(file + ' stop')
+    if data[1] == '':
+        return 'ok'
+    return 'fail'
 
 
 def restart():
     if public.isAppleSystem():
         return "Apple Computer does not support"
-    # data = public.execShell('systemctl restart rsyncd.service')
-    # if data[1] == '':
-    #     return 'ok'
-    # return 'fail'
     stop()
     start()
     return 'ok'
@@ -158,31 +167,38 @@ def reload():
 
 
 def initdStatus():
-    if public.isAppleSystem():
-        return "Apple Computer does not support"
+    if not app_debug:
+        if public.isAppleSystem():
+            return "Apple Computer does not support"
 
-    data = public.execShell('systemctl status rsyncd.service | grep enabled')
-    if data[0] == '':
-        return 'fail'
-    return 'ok'
+    initd_bin = getInitDFile()
+    if os.path.exists(initd_bin):
+        return 'ok'
+    return 'fail'
 
 
 def initdInstall():
-    if public.isAppleSystem():
-        return "Apple Computer does not support"
-    data = public.execShell('systemctl enable rsyncd.service')
-    if data[0] != '':
-        return 'fail'
+    import shutil
+    if not app_debug:
+        if public.isAppleSystem():
+            return "Apple Computer does not support"
+
+    mysql_bin = initDreplace()
+    initd_bin = getInitDFile()
+    shutil.copyfile(mysql_bin, initd_bin)
+    public.execShell('chmod +x ' + initd_bin)
+    public.execShell('chkconfig --add ' + getPluginName())
     return 'ok'
 
 
 def initdUinstall():
-    if public.isAppleSystem():
-        return "Apple Computer does not support"
-    data = public.execShell('systemctl disable rsyncd.service')
-    if data[0] == '':
-        return 'ok'
-    return 'fail'
+    if not app_debug:
+        if public.isAppleSystem():
+            return "Apple Computer does not support"
+    initd_bin = getInitDFile()
+    os.remove(initd_bin)
+    public.execShell('chkconfig --del ' + getPluginName())
+    return 'ok'
 
 
 def getRecListData():
