@@ -9,7 +9,7 @@
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 # Short-Description: starts rsyncd
-# Description:       starts the MDW-Web
+# Description:       starts the rsyncd
 ### END INIT INFO
 
 ROOT_PATH={$SERVER_PATH}
