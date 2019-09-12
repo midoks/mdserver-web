@@ -130,8 +130,8 @@ def initDreplace():
         public.execShell('rm -rf /usr/lib/systemd/system/rsyncd*')
 
     rlog = getLog()
-    public.writeFile(rlog, '')
-
+    if os.path.exists(rlog):
+        public.writeFile(rlog, '')
     return file_bin
 
 
