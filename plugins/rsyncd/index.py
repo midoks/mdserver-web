@@ -91,7 +91,7 @@ def initConf():
     conf_path = appConf()
     conf = public.readFile(conf_path)
 
-    compile_sub = re.compile('^#(.*)',re.M)
+    compile_sub = re.compile('^#(.*)', re.M)
     conf = compile_sub.sub('', conf)
     conf_tpl_path = getPluginDir() + '/conf/rsyncd.conf'
     if conf.strip() == '':
@@ -109,38 +109,52 @@ def start():
     if public.isAppleSystem():
         return "Apple Computer does not support"
 
-    data = public.execShell('systemctl start rsyncd.service')
-    if data[1] == '':
-        return 'ok'
-    return 'fail'
+    # data = public.execShell('systemctl start rsyncd.service')
+    # if data[1] == '':
+    #     return 'ok'
+    # return 'fail'
+
+    public.execShell('/usr/bin/rsync --daemon')
+    return 'ok'
 
 
 def stop():
     if public.isAppleSystem():
         return "Apple Computer does not support"
-    data = public.execShell('systemctl stop rsyncd.service')
-    if data[1] == '':
-        return 'ok'
-    return 'fail'
+
+    # data = public.execShell('systemctl stop rsyncd.service')
+    # if data[1] == '':
+    #     return 'ok'
+    # return 'fail'
+
+    cmd = "ps -ef | grep rsync |grep -v grep | grep -v python |awk '{print $2}' | xargs kill"
+    public.execShell(cmd)
+    return 'ok'
 
 
 def restart():
     if public.isAppleSystem():
         return "Apple Computer does not support"
-    data = public.execShell('systemctl restart rsyncd.service')
-    if data[1] == '':
-        return 'ok'
-    return 'fail'
+    # data = public.execShell('systemctl restart rsyncd.service')
+    # if data[1] == '':
+    #     return 'ok'
+    # return 'fail'
+    stop()
+    start()
+    return 'ok'
 
 
 def reload():
     if public.isAppleSystem():
         return "Apple Computer does not support"
 
-    data = public.execShell('systemctl reload rsyncd.service')
-    if data[1] == '':
-        return 'ok'
-    return 'fail'
+    # data = public.execShell('systemctl reload rsyncd.service')
+    # if data[1] == '':
+    #     return 'ok'
+    # return 'fail'
+    stop()
+    start()
+    return 'ok'
 
 
 def initdStatus():
@@ -151,6 +165,7 @@ def initdStatus():
     if data[0] == '':
         return 'fail'
     return 'ok'
+
 
 def initdInstall():
     if public.isAppleSystem():
