@@ -17,6 +17,9 @@ ROOT_PATH={$SERVER_PATH}
 p_start(){
 	echo "Starting ..."
 	cd $ROOT_PATH/rsyncd/init.d
+	if [ -f /var/run/rsyncd.pid ]; then
+		rm -rf /var/run/rsyncd.pid
+	fi
 	/usr/bin/rsync --daemon
 	echo "rsyncd started"
 }
