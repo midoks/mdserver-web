@@ -98,7 +98,7 @@ def getLog():
     return tmp.groups()[0]
 
 
-def initConf():
+def initDreplace():
     conf_path = appConf()
     conf = public.readFile(conf_path)
 
@@ -130,7 +130,7 @@ def initConf():
 
 
 def start():
-    file = initConf()
+    file = initDreplace()
     data = public.execShell(file + ' start')
     if data[1] == '':
         return 'ok'
@@ -138,7 +138,7 @@ def start():
 
 
 def stop():
-    file = initConf()
+    file = initDreplace()
     data = public.execShell(file + ' stop')
     if data[1] == '':
         return 'ok'
