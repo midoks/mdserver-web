@@ -15,22 +15,39 @@
 ROOT_PATH={$SERVER_PATH}
 
 p_start(){
-	echo "Starting ..."
-	cd $ROOT_PATH/rsyncd/init.d
-	if [ -f /var/run/rsyncd.pid ]; then
-		rm -rf /var/run/rsyncd.pid
-	fi
-	/usr/bin/rsync --daemon
-	echo "rsyncd started"
+	isStart=$(ps -ef | grep rsync | grep -v grep | grep -v python | awk '{print $2}')
+    if [ "$isStart" == '' ];then
+        echo -e "Starting rsync... \c"
+        if [ -f /var/run/rsyncd.pid ]; then
+			rm -rf /var/run/rsyncd.pid
+		fi
+        /usr/bin/rsync --daemon
+        sleep 0.3
+        isStart=$(ps -ef | grep rsync | grep -v grep | grep -v python | awk '{print $2}')
+        if [ "$isStart" == '' ];then
+                echo -e "\033[31mError: rsyncd service startup failed.\033[0m"
+                return;
+        fi
+        echo -e "\033[32mdone\033[0m"
+    else
+		echo "Starting rsyncd(pid $isStart) already running"
+    fi
 }
 
 p_stop(){
-	echo "Stopping ..."
-	ps -ef | grep rsync | grep -v grep | grep -v python | awk '{print $2}' | xargs kill -9
-	if [ -f /var/run/rsyncd.pid ]; then
+	echo -e "Stopping rsyncd... \c";
+    pids=$(ps -ef | grep rsync | grep -v grep | grep -v python | awk '{print $2}')
+    arr=($pids)
+
+    for p in ${arr[@]}
+    do
+            kill -9 $p
+    done
+
+    if [ -f /var/run/rsyncd.pid ]; then
 		rm -rf /var/run/rsyncd.pid
 	fi
-	echo "rsyncd stopped"
+    echo -e "\033[32mdone\033[0m"
 }
 
 
