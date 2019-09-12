@@ -129,6 +129,9 @@ def initDreplace():
     if os.path.exists('/usr/lib/systemd/system/rsyncd.service'):
         public.execShell('rm -rf /usr/lib/systemd/system/rsyncd*')
 
+    rlog = getLog()
+    public.writeFile(rlog, '')
+
     return file_bin
 
 
