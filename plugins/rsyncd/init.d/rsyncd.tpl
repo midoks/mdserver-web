@@ -21,7 +21,7 @@ p_start(){
         if [ -f /var/run/rsyncd.pid ]; then
 			rm -rf /var/run/rsyncd.pid
 		fi
-        /usr/bin/rsync --daemon
+        /usr/bin/rsync --daemon --config=/etc/rsyncd.conf
         sleep 0.3
         isStart=$(ps -ef | grep rsync | grep 'daemon' | grep -v grep | grep -v python | awk '{print $2}')
         if [ "$isStart" == '' ];then
