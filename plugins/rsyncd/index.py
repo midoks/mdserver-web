@@ -183,9 +183,9 @@ def initdInstall():
         if public.isAppleSystem():
             return "Apple Computer does not support"
 
-    mysql_bin = initDreplace()
+    p_bin = initDreplace()
     initd_bin = getInitDFile()
-    shutil.copyfile(mysql_bin, initd_bin)
+    shutil.copyfile(p_bin, initd_bin)
     public.execShell('chmod +x ' + initd_bin)
     public.execShell('chkconfig --add ' + getPluginName())
     return 'ok'
