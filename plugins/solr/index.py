@@ -102,6 +102,12 @@ def initDreplace():
         public.writeFile(file_py, content)
         public.execShell('chmod +x ' + file_py)
 
+    file_incr_py = initD_path + '/' + getPluginName() + '_incr.py'
+    if not os.path.exists(file_incr_py):
+        content = public.readFile(getPluginDir() + '/script/incr.py')
+        public.writeFile(file_incr_py, content)
+        public.execShell('chmod +x ' + file_incr_py)
+
     log_file = getLog()
     if os.path.exists(log_file):
         public.writeFile(log_file, '')
@@ -300,6 +306,10 @@ def confFileCollection():
 def scriptFull():
     return getServerDir() + "/init.d/solr.py"
 
+
+def scriptIncr():
+    return getServerDir() + "/init.d/solr_incr.py"
+
 # rsyncdReceive
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -331,5 +341,7 @@ if __name__ == "__main__":
         print confFileCollection()
     elif func == 'script_full':
         print scriptFull()
+    elif func == 'script_incr':
+        print scriptIncr()
     else:
         print 'error'
