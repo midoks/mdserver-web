@@ -17,7 +17,7 @@ fi
 
 
 setenforce 0
-sed -i 's#SELINUX=disabled#SELINUX=enforcing#g' /etc/selinux/config
+sed -i 's#SELINUX=enforcing#SELINUX=disabled#g' /etc/selinux/config
 
 yum install -y wget curl curl-devel vixie-cron lsof
 #https need
