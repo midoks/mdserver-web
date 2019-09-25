@@ -108,31 +108,29 @@ def initDreplace():
         public.writeFile(file_incr_py, content)
         public.execShell('chmod +x ' + file_incr_py)
 
+        # realm.properties
+        rp_path = getServerDir() + "/server/etc/realm.properties"
+        rp_path_tpl = getPluginDir() + "/tpl/realm.properties"
+
+        # if not os.path.exists(rp_path):
+        content = public.readFile(rp_path_tpl)
+        public.writeFile(rp_path, content)
+
+        # web.xml
+        web_xml = getServerDir() + "/server/solr-webapp/webapp/WEB-INF/web.xml"
+        web_xml_tpl = getPluginDir() + "/tpl/web.xml"
+        content = public.readFile(web_xml_tpl)
+        public.writeFile(web_xml, content)
+
+        # solr-jetty-context.xml
+        solr_jetty_context_xml = getServerDir() + "/server/contexts/solr-jetty-context.xml"
+        solr_jetty_context_xml_tpl = getPluginDir() + "/tpl/solr-jetty-context.xml"
+        content = public.readFile(solr_jetty_context_xml_tpl)
+        public.writeFile(solr_jetty_context_xml, content)
+
     log_file = getLog()
     if os.path.exists(log_file):
         public.writeFile(log_file, '')
-
-    # realm.properties
-    rp_path = getServerDir() + "/server/etc/realm.properties"
-    rp_path_tpl = getPluginDir() + "/tpl/realm.properties"
-    # print rp_path
-    # print rp_path_tpl
-
-    # if not os.path.exists(rp_path):
-    content = public.readFile(rp_path_tpl)
-    public.writeFile(rp_path, content)
-
-    # web.xml
-    web_xml = getServerDir() + "/server/solr-webapp/webapp/WEB-INF/web.xml"
-    web_xml_tpl = getPluginDir() + "/tpl/web.xml"
-    content = public.readFile(web_xml_tpl)
-    public.writeFile(web_xml, content)
-
-    # solr-jetty-context.xml
-    solr_jetty_context_xml = getServerDir() + "/server/contexts/solr-jetty-context.xml"
-    solr_jetty_context_xml_tpl = getPluginDir() + "/tpl/solr-jetty-context.xml"
-    content = public.readFile(solr_jetty_context_xml_tpl)
-    public.writeFile(solr_jetty_context_xml, content)
 
     if not public.isAppleSystem():
         public.execShell('chown -R solr:solr ' + getServerDir())
