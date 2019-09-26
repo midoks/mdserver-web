@@ -148,3 +148,11 @@ function modUser(username){
     });
 }
 
+
+function readme(){
+    var readme = '<ul class="help-info-text c7">';
+    readme += '<li>PPTP需开放端口：UDP:1723</li>';
+    readme += '<li>L2TP需开放端口：UDP:500,UDP:4500,UDP:1701</li>';
+    readme += '</ul>';
+    $('.soft-man-con').html(readme);   
+}
