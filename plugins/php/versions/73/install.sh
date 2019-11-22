@@ -42,7 +42,7 @@ else
 fi
 
 
-# --disable-fileinfo
+# 
 # 
 cd $sourcePath/php/php-${version} && ./configure \
 --prefix=$serverPath/php/73 \
@@ -63,6 +63,7 @@ cd $sourcePath/php/php-${version} && ./configure \
 --enable-sysvmsg \
 --enable-sysvsem \
 --enable-sysvshm \
+--disable-fileinfo \
 $OPTIONS \
 --enable-fpm \
 && make && make install && make clean

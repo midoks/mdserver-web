@@ -56,6 +56,7 @@ cd $sourcePath/php/php-5.5.38 && ./configure \
 --enable-sysvmsg \
 --enable-sysvsem \
 --enable-sysvshm \
+--disable-fileinfo \
 $OPTIONS \
 --enable-fpm \
 && make && make install && make clean
