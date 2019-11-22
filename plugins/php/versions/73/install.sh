@@ -42,6 +42,7 @@ else
 fi
 
 
+# --disable-fileinfo
 # 
 cd $sourcePath/php/php-${version} && ./configure \
 --prefix=$serverPath/php/73 \
