@@ -28,6 +28,7 @@ fi
 OPTIONS=''
 if [ $sysName == 'Darwin' ]; then
 	OPTIONS='--without-iconv'
+	OPTIONS="${OPTIONS} --with-freetype-dir=${serverPath}/lib/freetype"
 	OPTIONS="${OPTIONS} --with-curl=${serverPath}/lib/curl"
 else
 	OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
