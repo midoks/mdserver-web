@@ -59,6 +59,7 @@ cd $sourcePath/php/php-7.0.30 && ./configure \
 --enable-sysvmsg \
 --enable-sysvsem \
 --enable-sysvshm \
+--disable-fileinfo \
 $OPTIONS \
 --enable-fpm \
 && make && make install && make clean

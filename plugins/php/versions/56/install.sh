@@ -61,6 +61,7 @@ cd $sourcePath/php/php-5.6.36 && ./configure \
 --enable-sysvmsg \
 --enable-sysvsem \
 --enable-sysvshm \
+--disable-fileinfo \
 $OPTIONS \
 --enable-fpm \
 && make clean && make && make install && make clean
