@@ -64,7 +64,7 @@ echo -e "Install_Libmemcached" >> ${libPath}/lib.pl
 
 Install_Libiconv()
 {
-#----------------------------- libiconv end -------------------------#
+#----------------------------- libiconv start -------------------------#
 	cd ${sourcePath}
 	if [ ! -d ${libPath}/libiconv ];then
 		# wget -O libiconv-1.15.tar.gz  https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.15.tar.gz  -T 5
@@ -79,6 +79,24 @@ Install_Libiconv()
 	fi
 	echo -e "Install_Libiconv" >> ${libPath}/lib.pl
 #----------------------------- libiconv end -------------------------#
+}
+
+Install_Freetype()
+{
+#----------------------------- freetype start -------------------------#
+    cd ${sourcePath}
+    if [ ! -d ${libPath}/freetype ];then
+        wget -O freetype-2.10.0.tar.gz https://download.savannah.gnu.org/releases/freetype/freetype-2.10.0.tar.gz  -T 5
+        tar zxvf freetype-2.10.0.tar.gz
+        cd freetype-2.10.0
+        ./configure --prefix=${libPath}/freetype
+        make && make install
+        cd ${sourcePath}
+        rm -rf freetype-2.10.0.tar.gz
+        rm -f freetype-2.10.0.tar.gz
+    fi
+    echo -e "Install_Freetype" >> ${libPath}/lib.pl
+#----------------------------- freetype end -------------------------#
 }
 
 Install_Libmcrypt()
@@ -209,6 +227,7 @@ Install_Libzip
 Install_Libmemcached
 Install_OpenSSL	
 Install_Libiconv
+Install_Freetype
 Install_Curl
 
 
