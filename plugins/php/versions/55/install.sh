@@ -31,6 +31,7 @@ if [ $sysName == 'Darwin' ]; then
 	OPTIONS="${OPTIONS} --with-curl=${serverPath}/lib/curl"
 else
 	OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
+	OPTIONS="${OPTIONS} --with-freetype-dir=${serverPath}/lib/freetype"
 	OPTIONS="${OPTIONS} --with-gd --enable-gd-native-ttf"
 	OPTIONS="${OPTIONS} --with-curl"
 fi
