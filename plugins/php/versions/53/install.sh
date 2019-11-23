@@ -79,7 +79,7 @@ cd $sourcePath/php/php-5.3.29 && ./configure \
 --enable-sysvmsg \
 --enable-sysvsem \
 --enable-sysvshm \
---disable-fileinfo
+--disable-fileinfo \
 $OPTIONS \
 --enable-fpm \
 && make && make install && make clean
