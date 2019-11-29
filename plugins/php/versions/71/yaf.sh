@@ -11,8 +11,6 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
-
-
 actionType=$1
 version=$2
 
@@ -34,8 +32,6 @@ Install_lib()
 	
 	if [ ! -f "$extFile" ];then
 		
-		
-
 		php_lib=$sourcePath/php_lib
 
 		mkdir -p $php_lib
@@ -47,9 +43,7 @@ Install_lib()
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config
 		make && make install && make clean
-		cd ..
-		rm -rf ${LIBNAME}-*
-		rm -f package.xml
+		
 	fi
 	
 	if [ ! -f "$extFile" ];then

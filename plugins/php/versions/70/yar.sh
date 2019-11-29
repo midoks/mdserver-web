@@ -49,9 +49,7 @@ Install_lib()
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
 		--with-curl=$serverPath/lib/curl
 		make && make install && make clean
-		cd ..
-		rm -rf ${LIBNAME}-*
-		rm -f package.xml
+
 	fi
 	
 	if [ ! -f "$extFile" ];then

@@ -42,10 +42,7 @@ Install_lib()
 		--enable-memcache --with-zlib-dir=$serverPath/lib/zlib \
 		--with-libmemcached-dir=$serverPath/lib/libmemcached \
 		--disable-memcached-sasl && \
-		make && make install
-
-		cd $php_lib
-		rm -rf ${LIBNAME}-*
+		make && make install && make clean
 	fi
 	
 	if [ ! -f "$extFile" ];then

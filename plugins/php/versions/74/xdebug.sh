@@ -38,10 +38,8 @@ Install_lib()
 		cd ${LIBNAME}-${LIBV}
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config
-		make && make install
-
-		cd $php_lib
-		rm -rf ${LIBNAME}-*
+		make && make install && make clean
+		
 	fi
 	
 	if [ ! -f "$extFile" ];then

@@ -46,8 +46,6 @@ Install_lib()
 		--enable-eaccelerator=shared --with-eaccelerator-shared-memory
 		make && make install && make clean
 
-		cd $php_lib
-		rm -rf ${LIBNAME}-*
 	fi
 	
 	if [ ! -f "$extFile" ];then

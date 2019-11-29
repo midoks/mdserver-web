@@ -42,8 +42,6 @@ Install_lib()
 		--with-libmemcached-dir=$serverPath/lib/libmemcached
 		make && make install && make clean
 		
-		cd $php_lib
-		rm -rf ${LIBNAME}-*
 	fi
 	
 	if [ ! -f "$extFile" ];then

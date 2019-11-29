@@ -40,9 +40,8 @@ Install_lib()
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
 			--enable-openssl --with-openssl-dir=$serverPath/lib/openssl --enable-sockets
-		make && make install
-		cd ..
-		rm -rf ${LIBNAME}-*
+		make && make install && make clean
+		
 	fi
 	
 	while [[ ! -f "$extFile" ]];

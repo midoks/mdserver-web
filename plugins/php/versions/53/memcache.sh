@@ -38,8 +38,6 @@ Install_lib()
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config --enable-memcache --with-zlib-dir
 		make && make install && make clean
 
-		cd $php_lib
-		rm -rf ${LIBNAME}-*
 	fi
 	
 	if [ ! -f "$extFile" ];then
