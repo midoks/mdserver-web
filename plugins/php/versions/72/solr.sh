@@ -12,7 +12,7 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
 LIBNAME=solr
-LIBV=2.4.0
+LIBV=2.5.0
 sysName=`uname`
 actionType=$1
 version=$2
@@ -22,8 +22,8 @@ extDir=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20170718/
 Install_lib()
 {
 	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep "${LIBNAME}.so"`
-	if [ "${isInstall}" != "" ];then
-		echo "php$version 已安装${LIBNAME},请选择其它版本!"
+	if [ "$isInstall" != "" ];then
+		echo "php-$version 已安装${LIBNAME},请选择其它版本!"
 		return
 	fi
 	
