@@ -12,7 +12,7 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
 LIBNAME=memcached
-LIBV=3.1.3
+LIBV=3.1.4
 sysName=`uname`
 actionType=$1
 version=$2
@@ -35,6 +35,8 @@ Install_lib()
 
 		cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
 		cd ${LIBNAME}-${LIBV}
+
+		sed -i '_bak' "3237,3238s#ulong#zend_ulong#g" $php_lib/${LIBNAME}-${LIBV}/php_memcached.c
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
 		--enable-memcache --with-zlib-dir=$serverPath/lib/zlib \

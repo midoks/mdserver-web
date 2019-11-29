@@ -12,7 +12,7 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
 LIBNAME=xdebug
-LIBV=2.7.0
+LIBV=2.8.0
 sysName=`uname`
 actionType=$1
 version=$2
