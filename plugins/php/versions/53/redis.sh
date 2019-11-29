@@ -43,8 +43,6 @@ Install_lib()
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config
 		make && make install && make clean
 
-		cd $php_lib
-		rm -rf ${LIBNAME}-*
 	fi
 	sleep 1
 	if [ ! -f "$extFile" ];then

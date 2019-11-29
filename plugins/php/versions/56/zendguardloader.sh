@@ -37,12 +37,10 @@ Install_lib()
 			wget -O $php_lib/zend-loader-php5.6.tar.gz http://downloads.zend.com/guard/7.0.0/zend-loader-php5.6-linux-x86_64_update1.tar.gz
 		fi 
 
-
 		cd $php_lib && tar xvf zend-loader-php5.6.tar.gz
 		cd zend-loader-php5.6*
 		cp ZendGuardLoader.so $serverPath/php/$version/lib/php/extensions/no-debug-non-zts-20131226/
 
-		rm -rf $php_lib/zend-loader-php5.6*
 	fi
 	
 	if [ ! -f "$extFile" ];then

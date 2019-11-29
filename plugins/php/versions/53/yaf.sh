@@ -47,9 +47,7 @@ Install_lib()
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config
 		make && make install && make clean
-		cd ..
-		rm -rf yaf-*
-		rm -f package.xml
+
 	fi
 	
 	if [ ! -f "$extFile" ];then

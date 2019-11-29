@@ -20,7 +20,7 @@ version=$2
 extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20100525/${LIBNAME}.so
 
 if [ "$version" = '70' ] || [ "$version" = '71' ] || [ "$version" = '72' ] || [ "$version" = '73' ];then
-	LIBV='3.0.7';
+	LIBV='3.0.7'
 fi
 
 Install_lib()
@@ -47,9 +47,7 @@ Install_lib()
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config
 		make && make install && make clean
-		cd ..
-		rm -rf ${LIBNAME}-*
-		rm -f package.xml
+
 	fi
 	
 	if [ ! -f "$extFile" ];then

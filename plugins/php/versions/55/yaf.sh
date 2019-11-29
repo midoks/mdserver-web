@@ -49,9 +49,6 @@ Install_lib()
 		
 		make && make install && make clean
 
-		cd ..
-		rm -rf yaf-*
-		rm -f package.xml
 	fi
 	
 	if [ ! -f "$extFile" ];then
