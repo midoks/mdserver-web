@@ -38,31 +38,32 @@ else
 	OPTIONS="${OPTIONS} --with-curl"
 fi
 
-
-cd $sourcePath/php/php-7.0.30 && ./configure \
---prefix=$serverPath/php/70 \
---exec-prefix=$serverPath/php/70 \
---with-config-file-path=$serverPath/php/70/etc \
---with-zlib-dir=$serverPath/lib/zlib \
---enable-mysqlnd \
---with-mysqli=mysqlnd \
---with-pdo-mysql=mysqlnd \
---enable-zip \
---enable-mbstring \
---enable-simplexml \
---enable-ftp \
---enable-sockets \
---enable-intl \
---enable-wddx \
---enable-soap \
---enable-posix \
---enable-sysvmsg \
---enable-sysvsem \
---enable-sysvshm \
---disable-fileinfo \
-$OPTIONS \
---enable-fpm \
-&& make && make install && make clean
+if [ ! -d $serverPath/php/70 ];then
+	cd $sourcePath/php/php-7.0.30 && ./configure \
+	--prefix=$serverPath/php/70 \
+	--exec-prefix=$serverPath/php/70 \
+	--with-config-file-path=$serverPath/php/70/etc \
+	--with-zlib-dir=$serverPath/lib/zlib \
+	--enable-mysqlnd \
+	--with-mysqli=mysqlnd \
+	--with-pdo-mysql=mysqlnd \
+	--enable-zip \
+	--enable-mbstring \
+	--enable-simplexml \
+	--enable-ftp \
+	--enable-sockets \
+	--enable-intl \
+	--enable-wddx \
+	--enable-soap \
+	--enable-posix \
+	--enable-sysvmsg \
+	--enable-sysvsem \
+	--enable-sysvshm \
+	--disable-fileinfo \
+	$OPTIONS \
+	--enable-fpm \
+	&& make && make install && make clean
+fi
 
 #------------------------ install end ------------------------------------#
 }
