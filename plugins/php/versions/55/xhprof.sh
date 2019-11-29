@@ -27,13 +27,15 @@ Install_lib()
 	fi
 	
 	if [ ! -f "$extFile" ];then
+
 		php_lib=$sourcePath/php_lib
 		mkdir -p $php_lib
+		if [ ! -d $php_lib/${LIBNAME}-${LIBV}];then
+			wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
+			cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
+		fi 
+		cd $php_lib/${LIBNAME}-${LIBV}/extension
 
-		wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
-
-		cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
-		cd ${LIBNAME}-${LIBV}/extension
 		$serverPath/php/$version/bin/phpize
 		./configure --enable-xhprof --with-php-config=$serverPath/php/$version/bin/php-config
 		make && make install && make clean

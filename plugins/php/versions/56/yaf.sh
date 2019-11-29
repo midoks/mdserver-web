@@ -10,6 +10,7 @@ rootPath=$(dirname "$rootPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
+LIBV=2.3.5
 
 Install_lib()
 {
@@ -22,18 +23,14 @@ Install_lib()
 	fi
 	
 	if [ ! -f "$extFile" ];then
-		
-		wafV='2.3.5';
-		if [ "$version" = '70' ] || [ "$version" = '71' ] || [ "$version" = '72' ];then
-			wafV='3.0.7';
-		fi
 
 		php_lib=$sourcePath/php_lib
 		mkdir -p $php_lib
-		wget -O $php_lib/yaf-$wafV.tgz http://pecl.php.net/get/yaf-$wafV.tgz
-		cd $php_lib
-		tar xvf yaf-$wafV.tgz
-		cd yaf-$wafV
+		if [ ! -d $php_lib/${LIBNAME}-${LIBV}];then
+			wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
+			cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
+		fi 
+		cd $php_lib/${LIBNAME}-${LIBV}
 		
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config

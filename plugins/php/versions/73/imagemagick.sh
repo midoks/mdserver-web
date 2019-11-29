@@ -26,25 +26,24 @@ Install_lib()
 		return
 	fi
 	
-	
 	if [ ! -f "$extFile" ];then
 
 		php_lib=$sourcePath/php_lib
 		mkdir -p $php_lib
 
-		if [ ! -f $php_lib/${LIBNAME}-${LIBV} ];then
+		if [ ! -d $php_lib/${LIBNAME}-${LIBV} ];then
 			wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
 			cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
 		fi 
-		
 		cd $php_lib/${LIBNAME}-${LIBV}
 		$serverPath/php/$version/bin/phpize
-		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
-		--enable-memcache \
-		--with-zlib-dir=$serverPath/lib/zlib \
-		--with-libmemcached-dir=$serverPath/lib/libmemcached
-		make && make install && make clean
 
+
+		LIB_DEPEND_DIR=`brew info imagemagick | grep /usr/local/Cellar/imagemagick | cut -d \  -f 1 |  awk 'END {print}'`
+
+		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
+		--with-imagick=$LIB_DEPEND_DIR
+		make && make install && make clean
 	fi
 	
 	if [ ! -f "$extFile" ];then
