@@ -28,7 +28,7 @@ Install_lib()
 		return
 	fi
 	
-	if [ ! -f "$extFile" ];then
+	if [ ! -d "$extFile" ];then
 
 		php_lib=$sourcePath/php_lib
 		mkdir -p $php_lib

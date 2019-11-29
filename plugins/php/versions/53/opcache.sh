@@ -49,6 +49,12 @@ Install_lib()
 		return
 	fi
 
+	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep "${LIBNAME}.so"`
+	if [ "${isInstall}" != "" ];then
+		echo "php-$version 已安装${LIBNAME},请选择其它版本!"
+		return
+	fi
+
 	echo "" >> $serverPath/php/$version/etc/php.ini
 	echo "[${LIBNAME}]" >> $serverPath/php/$version/etc/php.ini
 	echo "zend_extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini

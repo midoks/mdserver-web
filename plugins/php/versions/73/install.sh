@@ -32,7 +32,8 @@ OPTIONS=''
 if [ $sysName == 'Darwin' ]; then
 	OPTIONS='--without-iconv'
 	OPTIONS="${OPTIONS} --with-curl=${serverPath}/lib/curl"
-	OPTIONS="${OPTIONS} --enable-zip"
+	# OPTIONS="${OPTIONS} --with-libzip=${serverPath}/lib/libzip"
+	# OPTIONS="${OPTIONS} --enable-zip"
 else
 	OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
 	OPTIONS="${OPTIONS} --with-freetype-dir=${serverPath}/lib/freetype"

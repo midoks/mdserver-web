@@ -32,7 +32,7 @@ Install_lib()
 
 		php_lib=$sourcePath/php_lib
 		mkdir -p $php_lib
-		if [ ! -f $php_lib/${LIBNAME}-${LIBV}.tgz ];then
+		if [ ! -d $php_lib/${LIBNAME}-${LIBV}.tgz ];then
 			wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
 			cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
 		fi
@@ -41,7 +41,6 @@ Install_lib()
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config
 		make && make install && make clean
-
 	fi
 
 	if [ ! -f "$extFile" ];then

@@ -13,15 +13,11 @@ sourcePath=${serverPath}/source/php
 
 
 LIBNAME=yar
-LIBV=1.2.5
+LIBV=2.0.5
 
 actionType=$1
 version=$2
 extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20180731/${LIBNAME}.so
-
-if [ "$version" = '70' ] || [ "$version" = '71' ] || [ "$version" = '72' ] || [ "$version" = '73' ];then
-	LIBV='2.0.5'
-fi
 
 Install_lib()
 {
@@ -37,19 +33,16 @@ Install_lib()
 		php_lib=$sourcePath/php_lib
 		mkdir -p $php_lib
 
-		if [ ! -f $php_lib/${LIBNAME}-${LIBV} ];then
+		if [ ! -d $php_lib/${LIBNAME}-${LIBV} ];then
 			wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
 			cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
 		fi
 		cd $php_lib/${LIBNAME}-${LIBV}
 
 		$serverPath/php/$version/bin/phpize
-		echo "./configure --with-php-config=$serverPath/php/$version/bin/php-config \
-		--with-curl=$serverPath/php/curl"
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
 		--with-curl=$serverPath/lib/curl
 		make && make install && make clean
-		
 	fi
 	
 	if [ ! -f "$extFile" ];then
