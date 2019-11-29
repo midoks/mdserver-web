@@ -16,7 +16,7 @@ version=$2
 
 
 LIBNAME=swoole
-LIBV=4.3.0
+LIBV=4.4.12
 extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20170718/${LIBNAME}.so
 
 Install_lib()
