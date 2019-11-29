@@ -28,7 +28,7 @@ Install_lib()
 			wafV='3.0.7';
 		fi
 
-		php_lib=$sourcePath/php_${version}_lib
+		php_lib=$sourcePath/php_lib
 		mkdir -p $php_lib
 		wget -O $php_lib/yaf-$wafV.tgz http://pecl.php.net/get/yaf-$wafV.tgz
 		cd $php_lib
@@ -37,7 +37,7 @@ Install_lib()
 		
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config
-		make && make install
+		make && make install && make clean
 		cd ..
 		rm -rf yaf-*
 		rm -f package.xml

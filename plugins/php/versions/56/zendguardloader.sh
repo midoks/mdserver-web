@@ -28,7 +28,7 @@ Install_lib()
 	extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20131226/${LIBNAME}.so
 	if [ ! -f "$extFile" ];then
 
-		php_lib=$sourcePath/php_${version}_lib
+		php_lib=$sourcePath/php_lib
 		mkdir -p $php_lib
 
 		if [ $sysName == 'Darwin' ]; then

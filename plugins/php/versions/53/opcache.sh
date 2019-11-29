@@ -37,7 +37,7 @@ Install_lib()
 		cd zendopcache-7.0.5
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config
-		make && make install
+		make && make install && make clean
 
 		cd $php_lib
 		rm -rf zendopcache-7.0.5
