@@ -15,10 +15,8 @@ actionType=$1
 version=$2
 
 LIBNAME=yaf
-LIBV='2.3.5'
-if [ "$version" = '70' ] || [ "$version" = '71' ] || [ "$version" = '72' ] || [ "$version" = '73' ];then
-	LIBV='3.0.7';
-fi
+LIBV=3.0.7
+
 extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20160303/${LIBNAME}.so
 
 Install_lib()
@@ -33,12 +31,13 @@ Install_lib()
 	if [ ! -f "$extFile" ];then
 		
 		php_lib=$sourcePath/php_lib
-
 		mkdir -p $php_lib
-		wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
-		cd $php_lib
-		tar xvf ${LIBNAME}-${LIBV}.tgz
-		cd ${LIBNAME}-${LIBV}
+		if [ ! -f $php_lib/${LIBNAME}-${LIBV} ];then
+			wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
+			cd $php_lib
+			tar xvf ${LIBNAME}-${LIBV}.tgz
+		fi 
+		cd $php_lib/${LIBNAME}-${LIBV}
 
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config

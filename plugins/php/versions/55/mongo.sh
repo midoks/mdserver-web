@@ -31,7 +31,8 @@ Install_lib()
 
 		OPTIONS=''
 		if [ $sysName == 'Darwin' ]; then
-			OPTIONS="--with-openssl-dir=/usr/local/Cellar/openssl/1.0.2q"
+			LIB_DEPEND_DIR=`brew info openssl | grep /usr/local/Cellar/openssl | cut -d \  -f 1 | awk 'END {print}'`
+			OPTIONS="--with-openssl-dir=${LIB_DEPEND_DIR}"
 		fi
 
 		php_lib=$sourcePath/php_lib
