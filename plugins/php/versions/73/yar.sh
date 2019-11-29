@@ -40,8 +40,7 @@ Install_lib()
 
 		if [ ! -f $php_lib/${LIBNAME}-${LIBV} ];then
 			wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
-			cd $php_lib
-			tar xvf ${LIBNAME}-${LIBV}.tgz
+			cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
 		fi
 		cd $php_lib/${LIBNAME}-${LIBV}
 
