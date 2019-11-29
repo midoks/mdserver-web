@@ -30,7 +30,7 @@ Install_lib()
 	
 	if [ ! -f "$extFile" ];then
 
-		php_lib=$sourcePath/php_${version}_lib
+		php_lib=$sourcePath/php_lib
 		mkdir -p $php_lib
 		wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
 		cd $php_lib
@@ -40,7 +40,7 @@ Install_lib()
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
 			--enable-openssl --with-openssl-dir=$serverPath/lib/openssl --enable-sockets
-		make && make install
+		make && make install && make clean
 		cd ..
 		rm -rf ${LIBNAME}-*
 	fi
