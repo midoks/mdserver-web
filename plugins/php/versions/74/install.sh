@@ -11,7 +11,7 @@ sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 
 
-version=7.2.25
+version=7.4.0
 Install_php()
 {
 #------------------------ install start ------------------------------------#
@@ -27,32 +27,36 @@ if [ ! -d $sourcePath/php/php-${version} ];then
 	cd $sourcePath/php && tar -Jxf $sourcePath/php/php-${version}.tar.xz
 fi
 
+
 OPTIONS=''
 if [ $sysName == 'Darwin' ]; then
 	OPTIONS='--without-iconv'
 	OPTIONS="${OPTIONS} --with-curl=${serverPath}/lib/curl"
+	OPTIONS="${OPTIONS} --enable-zip"
 else
 	OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
 	OPTIONS="${OPTIONS} --with-freetype-dir=${serverPath}/lib/freetype"
 	OPTIONS="${OPTIONS} --with-gd --enable-gd-native-ttf"
 	OPTIONS="${OPTIONS} --with-curl"
+	OPTIONS="${OPTIONS} --with-libzip=${serverPath}/lib/libzip"
 fi
 
 
+# 
+# 
 cd $sourcePath/php/php-${version} && ./configure \
---prefix=$serverPath/php/72 \
---exec-prefix=$serverPath/php/72 \
---with-config-file-path=$serverPath/php/72/etc \
---with-zlib-dir=$serverPath/lib/zlib \
+--prefix=$serverPath/php/74 \
+--exec-prefix=$serverPath/php/74 \
+--with-config-file-path=$serverPath/php/74/etc \
 --enable-mysqlnd \
 --with-mysqli=mysqlnd \
 --with-pdo-mysql=mysqlnd \
---enable-zip \
 --enable-mbstring \
---enable-simplexml \
---enable-sockets \
---enable-intl \
+--with-zlib-dir=$serverPath/lib/zlib \
 --enable-ftp \
+--enable-sockets \
+--enable-simplexml \
+--enable-intl \
 --enable-wddx \
 --enable-soap \
 --enable-posix \
@@ -69,8 +73,8 @@ $OPTIONS \
 
 Uninstall_php()
 {
-	$serverPath/php/init.d/php72 stop
-	rm -rf $serverPath/php/72
+	$serverPath/php/init.d/php74 stop
+	rm -rf $serverPath/php/74
 	echo "卸载php-${version}..." > $install_tmp
 }
 

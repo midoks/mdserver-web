@@ -11,7 +11,7 @@ sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 
 
-version=7.3.5
+version=7.3.12
 Install_php()
 {
 #------------------------ install start ------------------------------------#
