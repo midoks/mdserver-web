@@ -33,7 +33,7 @@ Install_lib()
 	
 	if [ ! -f "$extFile" ];then
 
-		php_lib=$sourcePath/php_${version}_lib
+		php_lib=$sourcePath/php_lib
 		mkdir -p $php_lib
 		#
 		# wget -O $php_lib/${LIBNAME}-${LIBV}.tgz https://github.com/eaccelerator/eaccelerator/archive/${LIBV}.tar.gz
@@ -44,7 +44,7 @@ Install_lib()
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
 		--enable-eaccelerator=shared --with-eaccelerator-shared-memory
-		make && make install
+		make && make install && make clean
 
 		cd $php_lib
 		rm -rf ${LIBNAME}-*

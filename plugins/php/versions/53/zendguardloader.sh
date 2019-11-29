@@ -30,7 +30,7 @@ Install_lib()
 	
 	if [ ! -f "$extFile" ];then
 
-		php_lib=$sourcePath/php_${version}_lib
+		php_lib=$sourcePath/php_lib
 		mkdir -p $php_lib
 
 		if [ $sysName == 'Darwin' ]; then
