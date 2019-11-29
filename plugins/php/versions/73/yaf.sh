@@ -11,8 +11,6 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
-
-
 actionType=$1
 version=$2
 
@@ -21,6 +19,7 @@ LIBV='2.3.5'
 if [ "$version" = '70' ] || [ "$version" = '71' ] || [ "$version" = '72' ] || [ "$version" = '73' ];then
 	LIBV='3.0.7';
 fi
+
 extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20180731/${LIBNAME}.so
 
 Install_lib()
