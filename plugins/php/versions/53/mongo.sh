@@ -39,9 +39,12 @@ Install_lib()
 		OPTIONS=''
 		if [ $sysName == 'Darwin' ]; then
 			OPTIONS="--with-openssl-dir=/usr/local/Cellar/openssl/1.0.2q"
-		fi 
+		fi
 
-		cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
+		if [ -f $php_lib/${LIBNAME}-${LIBV} ];then
+			cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
+		fi 
+		
 		cd ${LIBNAME}-${LIBV}
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config $OPTIONS
