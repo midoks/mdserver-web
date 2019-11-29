@@ -28,7 +28,7 @@ Install_lib()
 	
 	if [ ! -f "$extFile" ];then
 
-		php_lib=$sourcePath/php_${version}_lib
+		php_lib=$sourcePath/php_lib
 		mkdir -p $php_lib
 
 		_LIBNAME=$(echo $LIBNAME | tr '[a-z]' '[A-Z]')
@@ -38,7 +38,7 @@ Install_lib()
 		cd ${LIBNAME}-${LIBV}
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config
-		make && make install
+		make && make install && make clean
 
 		cd $php_lib
 
