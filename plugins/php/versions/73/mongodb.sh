@@ -25,21 +25,20 @@ Install_lib()
 		echo "php$version 已安装${LIBNAME},请选择其它版本!"
 		return
 	fi
-	
-	
+
 	if [ ! -f "$extFile" ];then
 
 		php_lib=$sourcePath/php_lib
 		mkdir -p $php_lib
+		if [ ! -f $php_lib/${LIBNAME}-${LIBV}.tgz ];then
+			wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
+			cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
+		fi
+		cd $php_lib/${LIBNAME}-${LIBV}
 
-		wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
-
-		cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
-		cd ${LIBNAME}-${LIBV}
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config
 		make && make install && make clean
-
 	fi
 	
 	if [ ! -f "$extFile" ];then

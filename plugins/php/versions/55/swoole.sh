@@ -13,13 +13,9 @@ sourcePath=${serverPath}/source/php
 
 actionType=$1
 version=$2
-
-
 LIBNAME=swoole
-LIBV='1.10.1';
-if [ "$version" = '70' ] || [ "$version" = '71' ] || [ "$version" = '72' ];then
-	LIBV='2.2.0'
-fi
+LIBV=1.10.1
+
 extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20121212/${LIBNAME}.so
 
 
@@ -45,7 +41,8 @@ Install_lib()
 		
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
-			--enable-openssl --with-openssl-dir=$serverPath/lib/openssl --enable-sockets
+			--enable-openssl --with-openssl-dir=$serverPath/lib/openssl \
+			--enable-sockets
 		make && make install && make clean
 
 

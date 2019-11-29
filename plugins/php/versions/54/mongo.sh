@@ -25,26 +25,26 @@ Install_lib()
 		echo "php$version 已安装${LIBNAME},请选择其它版本!"
 		return
 	fi
-	
-	
+
 	if [ ! -f "$extFile" ];then
-
-		php_lib=$sourcePath/php_lib
-		mkdir -p $php_lib
-
-		if [ ! -f $php_lib/${LIBNAME}-${LIBV}.tgz ];then
-			wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
-		fi
 
 		OPTIONS=''
 		if [ $sysName == 'Darwin' ]; then
-			OPTIONS="--with-openssl-dir=/usr/local/Cellar/openssl/1.0.2q"
+			LIB_DEPEND_DIR=`brew info openssl | grep /usr/local/Cellar/openssl | cut -d \  -f 1 | awk 'END {print}'`
+			OPTIONS="--with-openssl-dir=${LIB_DEPEND_DIR}"
 		fi 
 
-		cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
-		cd ${LIBNAME}-${LIBV}
+		php_lib=$sourcePath/php_lib
+		mkdir -p $php_lib
+		if [ ! -f $php_lib/${LIBNAME}-${LIBV} ];then
+			wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
+			cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
+		fi
+		cd $php_lib/${LIBNAME}-${LIBV}
+
 		$serverPath/php/$version/bin/phpize
-		./configure --with-php-config=$serverPath/php/$version/bin/php-config $OPTIONS
+		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
+		$OPTIONS
 		
 		make && make install && make clean
 
