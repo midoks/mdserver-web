@@ -33,8 +33,7 @@ Install_lib()
 	fi
 	
 	if [ ! -f "$extFile" ];then
-		
-	
+
 		php_lib=$sourcePath/php_lib
 		mkdir -p $php_lib
 

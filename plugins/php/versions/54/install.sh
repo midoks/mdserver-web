@@ -40,27 +40,29 @@ else
 	OPTIONS="${OPTIONS} --with-curl"
 fi
 
-cd $sourcePath/php/php-5.4.45 && ./configure \
---prefix=$serverPath/php/54 \
---exec-prefix=$serverPath/php/54 \
---with-config-file-path=$serverPath/php/54/etc \
---with-zlib-dir=$serverPath/lib/zlib \
---enable-mysqlnd \
---enable-zip \
---enable-mbstring \
---enable-sockets \
---enable-ftp \
---enable-simplexml \
---enable-wddx \
---enable-soap \
---enable-posix \
---enable-sysvmsg \
---enable-sysvsem \
---enable-sysvshm \
---disable-fileinfo \
-$OPTIONS \
---enable-fpm \
-&& make && make install && make clean
+if [ ! -d $serverPath/php/54 ];then
+	cd $sourcePath/php/php-5.4.45 && ./configure \
+	--prefix=$serverPath/php/54 \
+	--exec-prefix=$serverPath/php/54 \
+	--with-config-file-path=$serverPath/php/54/etc \
+	--with-zlib-dir=$serverPath/lib/zlib \
+	--enable-mysqlnd \
+	--enable-zip \
+	--enable-mbstring \
+	--enable-sockets \
+	--enable-ftp \
+	--enable-simplexml \
+	--enable-wddx \
+	--enable-soap \
+	--enable-posix \
+	--enable-sysvmsg \
+	--enable-sysvsem \
+	--enable-sysvshm \
+	--disable-fileinfo \
+	$OPTIONS \
+	--enable-fpm \
+	&& make && make install && make clean
+fi 
 
 #------------------------ install end ------------------------------------#
 }

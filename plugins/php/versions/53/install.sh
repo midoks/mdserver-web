@@ -28,7 +28,6 @@ if [ ! -d $sourcePath/php/php-5.3.29 ];then
 fi
 
 
-
 if [  -f $serverPath/php/53/bin/php.dSYM ];then
 	mv $serverPath/php/53/bin/php.dSYM $serverPath/php/53/bin/php
 fi
@@ -54,37 +53,40 @@ else
 	OPTIONS="${OPTIONS} --with-curl"
 fi
 
+
+if [ ! -d $serverPath/php/53 ];then
 # --enable-intl \
-cd $sourcePath/php/php-5.3.29 && ./configure \
---prefix=$serverPath/php/53 \
---exec-prefix=$serverPath/php/53 \
---with-config-file-path=$serverPath/php/53/etc \
---with-zlib-dir=$serverPath/lib/zlib \
---enable-zip \
---enable-exif \
---enable-hash \
---enable-libxml \
---enable-simplexml \
---enable-dom \
---enable-filter \
---enable-fileinfo \
---enable-pcntl \
---enable-bcmath \
---enable-xml \
---enable-ftp \
---enable-wddx \
---enable-soap \
---enable-posix \
---enable-sockets \
---enable-mbstring \
---enable-mysqlnd \
---enable-sysvmsg \
---enable-sysvsem \
---enable-sysvshm \
---disable-fileinfo \
-$OPTIONS \
---enable-fpm \
-&& make && make install && make clean
+	cd $sourcePath/php/php-5.3.29 && ./configure \
+	--prefix=$serverPath/php/53 \
+	--exec-prefix=$serverPath/php/53 \
+	--with-config-file-path=$serverPath/php/53/etc \
+	--with-zlib-dir=$serverPath/lib/zlib \
+	--enable-zip \
+	--enable-exif \
+	--enable-hash \
+	--enable-libxml \
+	--enable-simplexml \
+	--enable-dom \
+	--enable-filter \
+	--enable-fileinfo \
+	--enable-pcntl \
+	--enable-bcmath \
+	--enable-xml \
+	--enable-ftp \
+	--enable-wddx \
+	--enable-soap \
+	--enable-posix \
+	--enable-sockets \
+	--enable-mbstring \
+	--enable-mysqlnd \
+	--enable-sysvmsg \
+	--enable-sysvsem \
+	--enable-sysvshm \
+	--disable-fileinfo \
+	$OPTIONS \
+	--enable-fpm \
+	&& make && make install && make clean
+fi
 
 
 if [  -f $serverPath/php/53/bin/php.dSYM ];then

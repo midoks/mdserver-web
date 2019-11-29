@@ -38,33 +38,35 @@ else
 	OPTIONS="${OPTIONS} --with-curl"
 fi
 
-cd $sourcePath/php/php-5.6.36 && ./configure \
---prefix=$serverPath/php/56 \
---exec-prefix=$serverPath/php/56 \
---with-config-file-path=$serverPath/php/56/etc \
---with-zlib-dir=$serverPath/lib/zlib \
---with-mysql=mysqlnd \
---with-pdo-mysql=mysqlnd \
---with-mysqli=mysqlnd \
---enable-zip \
---enable-mbstring \
---enable-simplexml \
---enable-intl \
---enable-ftp \
---enable-sockets \
---enable-pcntl \
---enable-shmop \
---enable-intl \
---enable-wddx \
---enable-soap \
---enable-posix \
---enable-sysvmsg \
---enable-sysvsem \
---enable-sysvshm \
---disable-fileinfo \
-$OPTIONS \
---enable-fpm \
-&& make clean && make && make install && make clean
+if [ ! -d $serverPath/php/56 ];then
+	cd $sourcePath/php/php-5.6.36 && ./configure \
+	--prefix=$serverPath/php/56 \
+	--exec-prefix=$serverPath/php/56 \
+	--with-config-file-path=$serverPath/php/56/etc \
+	--with-zlib-dir=$serverPath/lib/zlib \
+	--with-mysql=mysqlnd \
+	--with-pdo-mysql=mysqlnd \
+	--with-mysqli=mysqlnd \
+	--enable-zip \
+	--enable-mbstring \
+	--enable-simplexml \
+	--enable-intl \
+	--enable-ftp \
+	--enable-sockets \
+	--enable-pcntl \
+	--enable-shmop \
+	--enable-intl \
+	--enable-wddx \
+	--enable-soap \
+	--enable-posix \
+	--enable-sysvmsg \
+	--enable-sysvsem \
+	--enable-sysvshm \
+	--disable-fileinfo \
+	$OPTIONS \
+	--enable-fpm \
+	&& make clean && make && make install && make clean
+fi 
 
 #------------------------ install end ------------------------------------#
 }
