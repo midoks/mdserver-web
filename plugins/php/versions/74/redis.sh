@@ -12,7 +12,7 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
 LIBNAME=redis
-LIBV=4.2.0
+LIBV=5.1.1
 sysName=`uname`
 actionType=$1
 version=$2
@@ -41,7 +41,7 @@ Install_lib()
 		cd ${LIBNAME}-${LIBV}
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config
-		make && make install
+		make && make install && make clean
 
 		# cd $php_lib
 		# rm -rf ${LIBNAME}-*
