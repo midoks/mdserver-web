@@ -18,7 +18,7 @@ version=$2
 
 LIBNAME=yac
 LIBV=2.0.2
-extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20170718/${LIBNAME}.so
+extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20190902/${LIBNAME}.so
 
 Install_lib()
 {
@@ -43,7 +43,7 @@ Install_lib()
 
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config
-		make && make install && make clean
+		make && make install
 		cd ..
 		rm -rf yaf-*
 		rm -f package.xml
