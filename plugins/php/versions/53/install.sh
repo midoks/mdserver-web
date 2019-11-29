@@ -10,6 +10,8 @@ sourcePath=${serverPath}/source
 sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 
+echo $rootPath
+
 Install_php()
 {
 #------------------------ install start ------------------------------------#
