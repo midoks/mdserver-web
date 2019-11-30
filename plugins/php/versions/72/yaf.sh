@@ -15,10 +15,7 @@ actionType=$1
 version=$2
 
 LIBNAME=yaf
-LIBV='2.3.5'
-if [ "$version" = '70' ] || [ "$version" = '71' ] || [ "$version" = '72' ] || [ "$version" = '73' ];then
-	LIBV='3.0.7'
-fi
+LIBV=3.0.8
 extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20170718/${LIBNAME}.so
 
 Install_lib()

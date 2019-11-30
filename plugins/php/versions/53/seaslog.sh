@@ -12,6 +12,7 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
 LIBNAME=SeasLog
+_LIBNAME=$(echo $LIBNAME | tr '[A-Z]' '[a-z]')
 LIBV=2.0.2
 sysName=`uname`
 actionType=$1
@@ -21,29 +22,29 @@ extDir=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20090626/
 
 Install_lib()
 {
-	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep "${LIBNAME}.so"`
+	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep "${_LIBNAME}.so"`
 	if [ "${isInstall}" != "" ];then
-		echo "php$version 已安装${LIBNAME},请选择其它版本!"
+		echo "php-$version 已安装${LIBNAME},请选择其它版本!"
 		return
 	fi
 	
 	extFile=$extDir${LIBNAME}.so
 	if [ ! -f "$extFile" ];then
 
+		OPTIONS=''
+		if [ $sysName == 'Darwin' ]; then
+			OPTIONS="${OPTIONS} --with-curl=${serverPath}/lib/curl"
+		fi
+
 		php_lib=$sourcePath/php_lib
 		mkdir -p $php_lib
 
 		if [ ! -f $php_lib/${LIBNAME}-${LIBV}.tgz ];then
 			wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
+			cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
 		fi
-
-		OPTIONS=''
-		if [ $sysName == 'Darwin' ]; then
-			OPTIONS="${OPTIONS} --with-curl=${serverPath}/lib/curl"
-		fi 
-
-		cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
-		cd ${LIBNAME}-${LIBV}
+		cd $php_lib/${LIBNAME}-${LIBV}
+		
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config
 		make && make install && make clean

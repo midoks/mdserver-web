@@ -21,8 +21,7 @@ extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20180731/
 
 Install_lib()
 {
-
-	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep '${LIBNAME}.so'`
+	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep "${LIBNAME}.so"`
 	if [ "${isInstall}" != "" ];then
 		echo "php-$version 已安装${LIBNAME},请选择其它版本!"
 		return

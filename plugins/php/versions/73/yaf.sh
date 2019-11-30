@@ -15,9 +15,7 @@ actionType=$1
 version=$2
 
 LIBNAME=yaf
-LIBV=3.0.7
-
-
+LIBV=3.0.8
 extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20180731/${LIBNAME}.so
 
 Install_lib()
@@ -35,8 +33,7 @@ Install_lib()
 		mkdir -p $php_lib
 		if [ ! -d $php_lib/${LIBNAME}-${LIBV} ];then
 			wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
-			cd $php_lib
-			tar xvf ${LIBNAME}-${LIBV}.tgz
+			cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
 		fi
 		cd $php_lib/${LIBNAME}-${LIBV}
 

@@ -12,6 +12,7 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
 LIBNAME=SeasLog
+_LIBNAME=$(echo $LIBNAME | tr '[A-Z]' '[a-z]')
 LIBV=2.0.2
 sysName=`uname`
 actionType=$1
@@ -21,9 +22,9 @@ extDir=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20180731/
 
 Install_lib()
 {
-	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep "${LIBNAME}.so"`
+	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep "${_LIBNAME}.so"`
 	if [ "${isInstall}" != "" ];then
-		echo "php$version 已安装${LIBNAME},请选择其它版本!"
+		echo "php-$version 已安装${LIBNAME},请选择其它版本!"
 		return
 	fi
 	

@@ -19,20 +19,23 @@ echo "安装php-${version} ..." > $install_tmp
 mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
-if [ ! -f $sourcePath/php/php-${version}.tar.xz ];then
-	wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz http://au1.php.net/distributions/php-${version}.tar.xz
+if [ ! -d $sourcePath/php/php-src-php-${version} ];then
+	wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.gz https://github.com/php/php-src/archive/php-${version}.tar.gz
+	cd $sourcePath/php && tar zxvf $sourcePath/php/php-${version}.tar.gz
 fi
 
-if [ ! -d $sourcePath/php/php-${version} ];then
-	cd $sourcePath/php && tar -Jxf $sourcePath/php/php-${version}.tar.xz
-fi
-
+cd $sourcePath/php/php-src-php-${version}
 
 OPTIONS=''
 if [ $sysName == 'Darwin' ]; then
 	OPTIONS='--without-iconv'
 	OPTIONS="${OPTIONS} --with-curl=${serverPath}/lib/curl"
 	# OPTIONS="${OPTIONS} --enable-zip"
+
+	export PATH="/usr/local/opt/bison/bin:$PATH"
+	export LDFLAGS="-L/usr/local/opt/bison/lib"
+	export PKG_CONFIG_PATH="/usr/local/opt/libxml2/lib/pkgconfig"
+	export LDFLAGS="-L/usr/local/opt/libxml2/lib"
 else
 	OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
 	OPTIONS="${OPTIONS} --with-freetype-dir=${serverPath}/lib/freetype"
@@ -42,8 +45,12 @@ else
 fi
 
 
+echo "$sourcePath/php/php-src-php-${version}"
+
 if [ ! -d $serverPath/php/74 ];then
-	cd $sourcePath/php/php-${version} && ./configure \
+	cd $sourcePath/php/php-src-php-${version}
+	./buildconf --force
+	./configure \
 	--prefix=$serverPath/php/74 \
 	--exec-prefix=$serverPath/php/74 \
 	--with-config-file-path=$serverPath/php/74/etc \
@@ -56,7 +63,6 @@ if [ ! -d $serverPath/php/74 ];then
 	--enable-sockets \
 	--enable-simplexml \
 	--enable-intl \
-	--enable-wddx \
 	--enable-soap \
 	--enable-posix \
 	--enable-sysvmsg \

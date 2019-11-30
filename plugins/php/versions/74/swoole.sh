@@ -22,7 +22,7 @@ extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20190902/
 Install_lib()
 {
 
-	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep '${LIBNAME}.so'`
+	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep "${LIBNAME}.so"`
 	if [ "${isInstall}" != "" ];then
 		echo "php-$version 已安装${LIBNAME},请选择其它版本!"
 		return
@@ -43,7 +43,7 @@ Install_lib()
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
 		--enable-openssl --with-openssl-dir=$serverPath/lib/openssl \
 		--enable-sockets
-		make && make install && make clean
+		make clean && make && make install && make clean
 		
 	fi
 	

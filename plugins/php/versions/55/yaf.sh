@@ -13,7 +13,7 @@ sourcePath=${serverPath}/source/php
 
 
 LIBNAME=yaf
-LIBV='2.3.5'
+LIBV=2.3.5
 
 actionType=$1
 version=$2
