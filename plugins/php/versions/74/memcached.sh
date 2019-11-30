@@ -22,7 +22,7 @@ Install_lib()
 {
 	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep "${LIBNAME}.so"`
 	if [ "${isInstall}" != "" ];then
-		echo "php$version 已安装${LIBNAME},请选择其它版本!"
+		echo "php-$version 已安装${LIBNAME},请选择其它版本!"
 		return
 	fi
 	
@@ -30,6 +30,8 @@ Install_lib()
 
 		php_lib=$sourcePath/php_lib
 		mkdir -p $php_lib
+
+		rm -rf $php_lib/${LIBNAME}-${LIBV}
 
 		if [ ! -d $php_lib/${LIBNAME}-${LIBV} ];then
 			wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
@@ -41,7 +43,8 @@ Install_lib()
 		$serverPath/php/$version/bin/phpize
 	
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
-		--enable-memcache --with-zlib-dir=$serverPath/lib/zlib \
+		--enable-memcached \
+		--with-zlib-dir=$serverPath/lib/zlib \
 		--with-libmemcached-dir=$serverPath/lib/libmemcached \
 		--disable-memcached-sasl && \
 		make && make install && make clean
