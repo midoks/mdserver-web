@@ -11,22 +11,20 @@ sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 
 
-
+version=5.4.45
+PHP_VER=54
 Install_php()
 {
 #------------------------ install start ------------------------------------#
-echo "安装php-5.4.45 ..." > $install_tmp
+echo "安装php-${version} ..." > $install_tmp
 mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
-if [ ! -f $sourcePath/php/php-5.4.45.tar.gz ];then
-	wget --no-check-certificate -O $sourcePath/php/php-5.4.45.tar.gz https://museum.php.net/php5/php-5.4.45.tar.gz
+if [ ! -d $sourcePath/php/php${PHP_VER} ];then
+	wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.gz http://au1.php.net/distributions/php-${version}.tar.gz
+	cd $sourcePath/php && tar -zxvf $sourcePath/php/php-${version}.tar.gz
+	mv $sourcePath/php/php-${version} $sourcePath/php/php${PHP_VER}
 fi
-
-if [ ! -d $sourcePath/php/php-5.4.45 ];then
-	cd $sourcePath/php && tar -zvxf $sourcePath/php/php-5.4.45.tar.gz
-fi
-
 
 OPTIONS=''
 if [ $sysName == 'Darwin' ]; then
@@ -41,7 +39,7 @@ else
 fi
 
 if [ ! -d $serverPath/php/54 ];then
-	cd $sourcePath/php/php-5.4.45 && ./configure \
+	cd $sourcePath/php/php${PHP_VER} && ./configure \
 	--prefix=$serverPath/php/54 \
 	--exec-prefix=$serverPath/php/54 \
 	--with-config-file-path=$serverPath/php/54/etc \

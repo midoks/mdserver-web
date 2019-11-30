@@ -20,10 +20,10 @@ echo "安装php-${version} ..." > $install_tmp
 mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
-if [ ! -f $sourcePath/php/${PHP_VER} ];then
+if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 	wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz http://au1.php.net/distributions/php-${version}.tar.xz
 	cd $sourcePath/php && tar -Jxf $sourcePath/php/php-${version}.tar.xz
-	mv $sourcePath/php/php-${version} $sourcePath/php/${PHP_VER}
+	mv $sourcePath/php/php-${version} $sourcePath/php/php${PHP_VER}
 fi
 
 OPTIONS=''
@@ -42,7 +42,7 @@ fi
 
 
 if [ ! -d $serverPath/php/73 ];then
-	cd $sourcePath/php/${PHP_VER} && ./configure \
+	cd $sourcePath/php/php${PHP_VER} && ./configure \
 	--prefix=$serverPath/php/73 \
 	--exec-prefix=$serverPath/php/73 \
 	--with-config-file-path=$serverPath/php/73/etc \

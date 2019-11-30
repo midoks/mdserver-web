@@ -10,8 +10,9 @@ sourcePath=${serverPath}/source
 sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 
-echo $rootPath
 
+version=5.3.29
+PHP_VER=53
 Install_php()
 {
 #------------------------ install start ------------------------------------#
@@ -19,12 +20,10 @@ echo "安装php-5.3.29 ..." > $install_tmp
 mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
-if [ ! -f $sourcePath/php/php-5.3.29.tar.xz ];then
-	wget --no-check-certificate -O $sourcePath/php/php-5.3.29.tar.xz https://museum.php.net/php5/php-5.3.29.tar.xz
-fi
-
-if [ ! -d $sourcePath/php/php-5.3.29 ];then
-	cd $sourcePath/php && tar -Jxf $sourcePath/php/php-5.3.29.tar.xz
+if [ ! -d $sourcePath/php/php${PHP_VER} ];then
+	wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz http://au1.php.net/distributions/php-${version}.tar.xz
+	cd $sourcePath/php && tar -Jxf $sourcePath/php/php-${version}.tar.xz
+	mv $sourcePath/php/php-${version} $sourcePath/php/php${PHP_VER}
 fi
 
 
@@ -55,8 +54,7 @@ fi
 
 
 if [ ! -d $serverPath/php/53 ];then
-# --enable-intl \
-	cd $sourcePath/php/php-5.3.29 && ./configure \
+	cd $sourcePath/php/php${PHP_VER} && ./configure \
 	--prefix=$serverPath/php/53 \
 	--exec-prefix=$serverPath/php/53 \
 	--with-config-file-path=$serverPath/php/53/etc \

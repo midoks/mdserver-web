@@ -12,6 +12,7 @@ install_tmp=${rootPath}/tmp/mw_install.pl
 
 
 version=7.2.25
+PHP_VER=72
 Install_php()
 {
 #------------------------ install start ------------------------------------#
@@ -19,12 +20,10 @@ echo "安装php-${version} ..." > $install_tmp
 mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
-if [ ! -f $sourcePath/php/php-${version}.tar.xz ];then
+if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 	wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz http://au1.php.net/distributions/php-${version}.tar.xz
-fi
-
-if [ ! -d $sourcePath/php/php-${version} ];then
 	cd $sourcePath/php && tar -Jxf $sourcePath/php/php-${version}.tar.xz
+	mv $sourcePath/php/php-${version} $sourcePath/php/php${PHP_VER}
 fi
 
 OPTIONS=''
@@ -39,7 +38,7 @@ else
 fi
 
 if [ ! -d $serverPath/php/72 ];then
-	cd $sourcePath/php/php-${version} && ./configure \
+	cd $sourcePath/php/php${PHP_VER} && ./configure \
 	--prefix=$serverPath/php/72 \
 	--exec-prefix=$serverPath/php/72 \
 	--with-config-file-path=$serverPath/php/72/etc \
