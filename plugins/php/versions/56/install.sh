@@ -56,7 +56,6 @@ if [ ! -d $serverPath/php/56 ];then
 	--enable-pcntl \
 	--enable-shmop \
 	--enable-intl \
-	--enable-wddx \
 	--enable-soap \
 	--enable-posix \
 	--enable-sysvmsg \

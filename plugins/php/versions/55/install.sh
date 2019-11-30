@@ -50,7 +50,6 @@ if [ ! -d $serverPath/php/55  ];then
 	--enable-mbstring \
 	--enable-sockets \
 	--enable-ftp \
-	--enable-wddx \
 	--enable-soap \
 	--enable-posix \
 	--enable-sysvmsg \

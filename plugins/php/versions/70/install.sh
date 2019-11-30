@@ -53,7 +53,6 @@ if [ ! -d $serverPath/php/70 ];then
 	--enable-ftp \
 	--enable-sockets \
 	--enable-intl \
-	--enable-wddx \
 	--enable-soap \
 	--enable-posix \
 	--enable-sysvmsg \
