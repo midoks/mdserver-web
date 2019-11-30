@@ -14,9 +14,8 @@ sourcePath=${serverPath}/source/php
 actionType=$1
 version=$2
 
-
 LIBNAME=swoole
-LIBV='1.10.1';
+LIBV='1.10.1'
 if [ "$version" = '70' ] || [ "$version" = '71' ] || [ "$version" = '72' ];then
 	LIBV='2.2.0'
 fi
@@ -26,7 +25,7 @@ extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20100525/
 Install_lib()
 {
 
-	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep '${LIBNAME}.so'`
+	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep "${LIBNAME}.so"`
 	if [ "${isInstall}" != "" ];then
 		echo "php-$version 已安装${LIBNAME},请选择其它版本!"
 		return
@@ -36,7 +35,7 @@ Install_lib()
 
 		php_lib=$sourcePath/php_lib
 		mkdir -p $php_lib
-		if [ -f  ${LIBNAME}-${LIBV} ];then
+		if [ ! -d ${LIBNAME}-${LIBV} ];then
 			wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
 			cd $php_lib
 			tar xvf ${LIBNAME}-${LIBV}.tgz
@@ -45,7 +44,9 @@ Install_lib()
 		
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
-			--enable-openssl --with-openssl-dir=$serverPath/lib/openssl --enable-sockets
+		--enable-openssl \
+		--with-openssl-dir=$serverPath/lib/openssl \
+		--enable-sockets
 		make && make install && make clean
 
 	fi

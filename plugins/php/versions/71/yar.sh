@@ -11,7 +11,6 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
-
 LIBNAME=yar
 LIBV=1.2.5
 
@@ -20,7 +19,7 @@ version=$2
 extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20160303/${LIBNAME}.so
 
 if [ "$version" = '70' ] || [ "$version" = '71' ] || [ "$version" = '72' ] || [ "$version" = '73' ];then
-	LIBV='2.0.5'
+	LIBV=2.0.5
 fi
 
 Install_lib()

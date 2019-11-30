@@ -10,13 +10,15 @@ rootPath=$(dirname "$rootPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
+
+LIBNAME=yaf
 LIBV=2.3.5
 
 Install_lib()
 {
 	extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20131226/yaf.so
 
-	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep 'yaf.so'`
+	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep "${LIBNAME}.so"`
 	if [ "${isInstall}" != "" ];then
 		echo "php-$version 已安装yaf,请选择其它版本!"
 		return

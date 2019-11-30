@@ -22,7 +22,7 @@ Install_lib()
 {
 	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep "${LIBNAME}.so"`
 	if [ "${isInstall}" != "" ];then
-		echo "php$version 已安装${LIBNAME},请选择其它版本!"
+		echo "php-$version 已安装${LIBNAME},请选择其它版本!"
 		return
 	fi
 	
@@ -31,17 +31,15 @@ Install_lib()
 		php_lib=$sourcePath/php_${version}_lib
 		mkdir -p $php_lib
 
-		wget -O $php_lib/zendopcache-7.0.5.tgz http://pecl.php.net/get/zendopcache-7.0.5.tgz
+		if [ ! -d  $php_lib/zendopcache-7.0.5 ];then
+			wget -O $php_lib/zendopcache-7.0.5.tgz http://pecl.php.net/get/zendopcache-7.0.5.tgz
+			cd $php_lib && tar xvf zendopcache-7.0.5.tgz
+		fi
+		cd $php_lib/zendopcache-7.0.5
 
-		cd $php_lib && tar xvf zendopcache-7.0.5.tgz
-		cd zendopcache-7.0.5
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config
 		make && make install && make clean
-
-		cd $php_lib
-		rm -rf zendopcache-7.0.5
-		rm -rf zendopcache-7.0.5.tgz
 	fi
 	
 	if [ ! -f "$extFile" ];then
