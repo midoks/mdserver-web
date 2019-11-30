@@ -17,7 +17,8 @@ class config_api:
 
     # 本版解决自启动问题
     # 文件管理重命名
-    __version = '0.7.3'
+    __version = '0.8.0'
+
     def __init__(self):
         pass
 
