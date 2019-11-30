@@ -12,6 +12,7 @@ install_tmp=${rootPath}/tmp/mw_install.pl
 
 
 version=7.3.12
+PHP_VER=73
 Install_php()
 {
 #------------------------ install start ------------------------------------#
@@ -19,14 +20,11 @@ echo "安装php-${version} ..." > $install_tmp
 mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
-if [ ! -f $sourcePath/php/php-${version}.tar.xz ];then
+if [ ! -f $sourcePath/php/${PHP_VER} ];then
 	wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz http://au1.php.net/distributions/php-${version}.tar.xz
-fi
-
-if [ ! -d $sourcePath/php/php-${version} ];then
 	cd $sourcePath/php && tar -Jxf $sourcePath/php/php-${version}.tar.xz
+	mv $sourcePath/php/php-${version} $sourcePath/php/${PHP_VER}
 fi
-
 
 OPTIONS=''
 if [ $sysName == 'Darwin' ]; then
@@ -44,7 +42,7 @@ fi
 
 
 if [ ! -d $serverPath/php/73 ];then
-	cd $sourcePath/php/php-${version} && ./configure \
+	cd $sourcePath/php/${PHP_VER} && ./configure \
 	--prefix=$serverPath/php/73 \
 	--exec-prefix=$serverPath/php/73 \
 	--with-config-file-path=$serverPath/php/73/etc \
@@ -57,7 +55,6 @@ if [ ! -d $serverPath/php/73 ];then
 	--enable-sockets \
 	--enable-simplexml \
 	--enable-intl \
-	--enable-wddx \
 	--enable-soap \
 	--enable-posix \
 	--enable-sysvmsg \

@@ -73,7 +73,6 @@ if [ ! -d $serverPath/php/53 ];then
 	--enable-bcmath \
 	--enable-xml \
 	--enable-ftp \
-	--enable-wddx \
 	--enable-soap \
 	--enable-posix \
 	--enable-sockets \

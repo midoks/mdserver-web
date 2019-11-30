@@ -19,12 +19,14 @@ echo "安装php-${version} ..." > $install_tmp
 mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
-if [ ! -d $sourcePath/php/php-src-php-${version} ];then
+if [ ! -d $sourcePath/php/php74 ];then
 	wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.gz https://github.com/php/php-src/archive/php-${version}.tar.gz
 	cd $sourcePath/php && tar zxvf $sourcePath/php/php-${version}.tar.gz
+
+	mv $sourcePath/php/php-src-php-${version} $sourcePath/php/php74
 fi
 
-cd $sourcePath/php/php-src-php-${version}
+cd $sourcePath/php/php74
 
 OPTIONS=''
 if [ $sysName == 'Darwin' ]; then
@@ -48,7 +50,7 @@ fi
 echo "$sourcePath/php/php-src-php-${version}"
 
 if [ ! -d $serverPath/php/74 ];then
-	cd $sourcePath/php/php-src-php-${version}
+	cd $sourcePath/php/php74
 	./buildconf --force
 	./configure \
 	--prefix=$serverPath/php/74 \
