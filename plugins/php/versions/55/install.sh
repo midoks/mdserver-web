@@ -10,6 +10,8 @@ sourcePath=${serverPath}/source
 sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 
+version=5.5.38
+PHP_VER=55
 Install_php()
 {
 #------------------------ install start ------------------------------------#
@@ -17,12 +19,10 @@ echo "安装php-5.5.38 ..." > $install_tmp
 mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
-if [ ! -f $sourcePath/php/php-5.5.38.tar.xz ];then
-	wget --no-check-certificate -O $sourcePath/php/php-5.5.38.tar.xz https://museum.php.net/php5/php-5.5.38.tar.xz
-fi
-
-if [ ! -d $sourcePath/php/php-5.5.38 ];then
-	cd $sourcePath/php && tar -Jxf $sourcePath/php/php-5.5.38.tar.xz
+if [ ! -d $sourcePath/php/php${PHP_VER} ];then
+	wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz http://au1.php.net/distributions/php-${version}.tar.xz
+	cd $sourcePath/php && tar -Jxf $sourcePath/php/php-${version}.tar.xz
+	mv $sourcePath/php/php-${version} $sourcePath/php/php${PHP_VER}
 fi
 
 OPTIONS=''
@@ -38,7 +38,7 @@ else
 fi
 
 if [ ! -d $serverPath/php/55  ];then
-	cd $sourcePath/php/php-5.5.38 && ./configure \
+	cd $sourcePath/php/php${PHP_VER} && ./configure \
 	--prefix=$serverPath/php/55 \
 	--exec-prefix=$serverPath/php/55 \
 	--with-config-file-path=$serverPath/php/55/etc \

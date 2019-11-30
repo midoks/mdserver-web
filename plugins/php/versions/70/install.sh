@@ -10,20 +10,19 @@ sourcePath=${serverPath}/source
 sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 
-
+version=7.0.30
+PHP_VER=70
 Install_php()
 {
 #------------------------ install start ------------------------------------#
-echo "安装php-7.0.30 ..." > $install_tmp
+echo "安装php-${version} ..." > $install_tmp
 mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
-if [ ! -f $sourcePath/php/php-7.0.30.tar.xz ];then
-	wget --no-check-certificate -O $sourcePath/php/php-7.0.30.tar.xz https://museum.php.net/php7/php-7.0.30.tar.xz
-fi
-
-if [ ! -d $sourcePath/php/php-7.0.30 ];then
-	cd $sourcePath/php && tar -Jxf $sourcePath/php/php-7.0.30.tar.xz
+if [ ! -d $sourcePath/php/php${PHP_VER} ];then
+	wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz http://au1.php.net/distributions/php-${version}.tar.xz
+	cd $sourcePath/php && tar -Jxf $sourcePath/php/php-${version}.tar.xz
+	mv $sourcePath/php/php-${version} $sourcePath/php/php${PHP_VER}
 fi
 
 OPTIONS=''
@@ -39,7 +38,7 @@ else
 fi
 
 if [ ! -d $serverPath/php/70 ];then
-	cd $sourcePath/php/php-7.0.30 && ./configure \
+	cd $sourcePath/php/php${PHP_VER} && ./configure \
 	--prefix=$serverPath/php/70 \
 	--exec-prefix=$serverPath/php/70 \
 	--with-config-file-path=$serverPath/php/70/etc \
