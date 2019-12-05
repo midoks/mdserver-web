@@ -28,7 +28,7 @@ Install_walle()
 
 	if [ ! -d $serverPath/walle/code ];then
 		mkdir -p $serverPath/walle/code
-		cp -rf $serverPath/source/walle-web-2.0.1/ $serverPath/walle/code/
+		cp -rf $serverPath/source/walle-web-2.0.1/* $serverPath/walle/code/
 	fi
 
 	cd $serverPath/walle/code && pip install -r $serverPath/walle/code/requirements/prod.txt
