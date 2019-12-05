@@ -31,7 +31,7 @@ Install_mysql()
 		wget -O ${mysqlDir}/mysql-boost-5.7.28.tar.gz https://cdn.mysql.com//Downloads/MySQL-5.7/mysql-boost-5.7.28.tar.gz
 	fi
 
-	if [ ! -d ${mysqlDir}/mysql-boost-5.7.28 ];then
+	if [ ! -d ${mysqlDir}/mysql-5.7.28 ];then
 		 cd ${mysqlDir} && tar -zxvf  ${mysqlDir}/mysql-boost-5.7.28.tar.gz
 	fi
 	
