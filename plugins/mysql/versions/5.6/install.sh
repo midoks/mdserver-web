@@ -31,7 +31,7 @@ Install_mysql()
 		wget -O ${mysqlDir}/mysql-5.6.46.tar.gz https://cdn.mysql.com//Downloads/MySQL-5.6/mysql-5.6.46.tar.gz
 	fi
 
-	if [ ! -f ${mysqlDir}/mysql-5.6.46 ];then
+	if [ ! -d ${mysqlDir}/mysql-5.6.46 ];then
 		 cd ${mysqlDir} && tar -zxvf  ${mysqlDir}/mysql-5.6.46.tar.gz
 	fi
 	
