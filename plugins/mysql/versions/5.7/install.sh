@@ -11,6 +11,7 @@ curPath=`pwd`
 rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
+# sysName=`uname`
 
 
 install_tmp=${rootPath}/tmp/mw_install.pl
@@ -34,7 +35,6 @@ Install_mysql()
 	if [ ! -d ${mysqlDir}/mysql-5.7.28 ];then
 		 cd ${mysqlDir} && tar -zxvf  ${mysqlDir}/mysql-boost-5.7.28.tar.gz
 	fi
-	
 
 	if [ ! -d $serverPath/mysql ];then
 		cd ${mysqlDir}/mysql-5.7.28 && cmake \
@@ -50,7 +50,9 @@ Install_mysql()
 		-DEXTRA_CHARSETS=all \
 		-DDEFAULT_CHARSET=utf8 \
 		-DDEFAULT_COLLATION=utf8_general_ci \
-		&& make && make install && make clean
+		-DDOWNLOAD_BOOST=1 \
+		-DWITH_BOOST=${mysqlDir}/mysql-5.7.28/boost/
+		make && make install && make clean
 		echo '5.7' > $serverPath/mysql/version.pl
 		echo '安装完成' > $install_tmp
 	fi
