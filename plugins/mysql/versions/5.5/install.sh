@@ -29,27 +29,29 @@ Install_mysql()
 		wget -O ${mysqlDir}/mysql-5.5.62.tar.gz https://dev.mysql.com/get/Downloads/MySQL-5.5/mysql-5.5.62.tar.gz
 	fi
 
-	if [ ! -f ${mysqlDir}/mysql-5.5.62 ];then
+	if [ ! -d ${mysqlDir}/mysql-5.5.62 ];then
 		 cd ${mysqlDir} && tar -zxvf  ${mysqlDir}/mysql-5.5.62.tar.gz
 	fi
 	
 
-	cd ${mysqlDir}/mysql-5.5.62 && cmake \
-	-DCMAKE_INSTALL_PREFIX=$serverPath/mysql \
-	-DMYSQL_USER=mysql \
-	-DMYSQL_TCP_PORT=3306 \
-	-DMYSQL_UNIX_ADDR=/var/tmp/mysql.sock \
-	-DWITH_MYISAM_STORAGE_ENGINE=1 \
-	-DWITH_INNOBASE_STORAGE_ENGINE=1 \
-	-DWITH_MEMORY_STORAGE_ENGINE=1 \
-	-DENABLED_LOCAL_INFILE=1 \
-	-DWITH_PARTITION_STORAGE_ENGINE=1 \
-	-DEXTRA_CHARSETS=all \
-	-DDEFAULT_CHARSET=utf8 \
-	-DDEFAULT_COLLATION=utf8_general_ci \
-	&& make && make install && make clean \
-	&& echo '5.5' > $serverPath/mysql/version.pl
-	echo '安装完成' > $install_tmp
+	if [ ! -d $serverPath/mysql ];then
+		cd ${mysqlDir}/mysql-5.5.62 && cmake \
+		-DCMAKE_INSTALL_PREFIX=$serverPath/mysql \
+		-DMYSQL_USER=mysql \
+		-DMYSQL_TCP_PORT=3306 \
+		-DMYSQL_UNIX_ADDR=/var/tmp/mysql.sock \
+		-DWITH_MYISAM_STORAGE_ENGINE=1 \
+		-DWITH_INNOBASE_STORAGE_ENGINE=1 \
+		-DWITH_MEMORY_STORAGE_ENGINE=1 \
+		-DENABLED_LOCAL_INFILE=1 \
+		-DWITH_PARTITION_STORAGE_ENGINE=1 \
+		-DEXTRA_CHARSETS=all \
+		-DDEFAULT_CHARSET=utf8 \
+		-DDEFAULT_COLLATION=utf8_general_ci \
+		&& make && make install && make clean \
+		&& echo '5.5' > $serverPath/mysql/version.pl
+		echo '安装完成' > $install_tmp
+	fi
 }
 
 Uninstall_mysql()
