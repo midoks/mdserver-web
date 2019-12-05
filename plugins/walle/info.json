@@ -1,0 +1,16 @@
+{
+	"id":12,
+	"title":"walle",
+	"tip":"soft",
+	"name":"walle",
+	"type":"扩展",
+	"ps":"一款开源的代码部署管理工具",
+	"versions":"1.0",
+	"shell":"install.sh",
+	"checks":"server/walle",
+	"path": "server/walle",
+	"author":"midoks",
+	"home":"",
+	"date":"2019-12-05",
+	"pid":"3"
+}
