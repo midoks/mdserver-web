@@ -65,6 +65,7 @@ function pPostCallbak(method, version, args,callback){
 function pRead(){
 	var readme = '<ul class="help-info-text c7">';
     readme += '<li>使用默认walle端口5000,如有需要自行修改</li>';
+    readme += '<li><a target="_blank" href="https://walle-web.io/docs/installation_docker.html">官方文档</a></li>';
     readme += '</ul>';
 
     $('.soft-man-con').html(readme);   
