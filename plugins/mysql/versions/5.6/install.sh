@@ -36,22 +36,24 @@ Install_mysql()
 	fi
 	
 
-	cd ${mysqlDir}/mysql-5.6.46 && cmake \
-	-DCMAKE_INSTALL_PREFIX=$serverPath/mysql \
-	-DMYSQL_USER=mysql \
-	-DMYSQL_TCP_PORT=3306 \
-	-DMYSQL_UNIX_ADDR=/var/tmp/mysql.sock \
-	-DWITH_MYISAM_STORAGE_ENGINE=1 \
-	-DWITH_INNOBASE_STORAGE_ENGINE=1 \
-	-DWITH_MEMORY_STORAGE_ENGINE=1 \
-	-DENABLED_LOCAL_INFILE=1 \
-	-DWITH_PARTITION_STORAGE_ENGINE=1 \
-	-DEXTRA_CHARSETS=all \
-	-DDEFAULT_CHARSET=utf8 \
-	-DDEFAULT_COLLATION=utf8_general_ci \
-	&& make && make install && make clean
-	echo '5.6' > $serverPath/mysql/version.pl
-	echo '安装完成' > $install_tmp
+	if [ ! -d $serverPath/mysql ];then
+		cd ${mysqlDir}/mysql-5.6.46 && cmake \
+		-DCMAKE_INSTALL_PREFIX=$serverPath/mysql \
+		-DMYSQL_USER=mysql \
+		-DMYSQL_TCP_PORT=3306 \
+		-DMYSQL_UNIX_ADDR=/var/tmp/mysql.sock \
+		-DWITH_MYISAM_STORAGE_ENGINE=1 \
+		-DWITH_INNOBASE_STORAGE_ENGINE=1 \
+		-DWITH_MEMORY_STORAGE_ENGINE=1 \
+		-DENABLED_LOCAL_INFILE=1 \
+		-DWITH_PARTITION_STORAGE_ENGINE=1 \
+		-DEXTRA_CHARSETS=all \
+		-DDEFAULT_CHARSET=utf8 \
+		-DDEFAULT_COLLATION=utf8_general_ci \
+		&& make && make install && make clean
+		echo '5.6' > $serverPath/mysql/version.pl
+		echo '安装完成' > $install_tmp
+	fi
 }
 
 Uninstall_mysql()
