@@ -16,36 +16,39 @@ def status():
 
 
 def start():
-	public.execShell('sysctl -p')
+    public.execShell('sysctl -p')
     return 'ok'
 
 
 def stop():
-	public.execShell('sysctl -p')
+    public.execShell('sysctl -p')
     return 'ok'
 
 
 def restart():
-	public.execShell('sysctl -p')
+    public.execShell('sysctl -p')
     return 'ok'
 
 
 def reload():
-	public.execShell('sysctl -p')
+    public.execShell('sysctl -p')
     return 'ok'
 
 
 def sysConf():
     return '/etc/sysctl.conf'
 
+
 def secRunLog():
-	return '/var/log/secure'
+    return '/var/log/secure'
+
 
 def msgRunLog():
-	return '/var/log/message'
+    return '/var/log/message'
+
 
 def cronRunLog():
-	return '/var/log/cron'
+    return '/var/log/cron'
 
 if __name__ == "__main__":
     func = sys.argv[1]
