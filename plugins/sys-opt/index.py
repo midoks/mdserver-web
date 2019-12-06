@@ -62,10 +62,10 @@ if __name__ == "__main__":
     elif func == 'conf':
         print sysConf()
     elif func == 'sec_run_log':
-    	print secRunLog()
+        print secRunLog()
     elif func == 'msg_run_log':
-    	print msgRunLog()
+        print msgRunLog()
     elif func == 'cron_run_log':
-    	print cronRunLog()
+        print cronRunLog()
     else:
-    	print 'err'
+        print 'err'
