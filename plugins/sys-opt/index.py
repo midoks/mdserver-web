@@ -41,6 +41,12 @@ def sysConf():
 def secRunLog():
 	return '/var/log/secure'
 
+def msgRunLog():
+	return '/var/log/message'
+
+def cronRunLog():
+	return '/var/log/cron'
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -57,5 +63,9 @@ if __name__ == "__main__":
         print sysConf()
     elif func == 'sec_run_log':
     	print secRunLog()
+    elif func == 'msg_run_log':
+    	print msgRunLog()
+    elif func == 'cron_run_log':
+    	print cronRunLog()
     else:
     	print 'err'
