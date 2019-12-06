@@ -165,6 +165,21 @@ def initdUinstall():
         os.remove(initd_bin)
     return 'ok'
 
+
+def prodConf():
+    return getServerDir() + "/code/walle/config/settings_prod.py"
+
+
+def initEnv():
+    cmd = "cd " + getServerDir() + "/code" + " && sh admin.sh init"
+    data = public.execShell(cmd)
+    return "shell:<br>" + data[0] + "<br>" + " error:<br>" + data[1]
+
+
+def initData():
+    cmd = "cd " + getServerDir() + "/code" + " && sh admin.sh migration"
+    data = public.execShell(cmd)
+    return "shell:<br>" + data[0] + "<br>" + " error:<br>" + data[1]
 # rsyncdReceive
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -186,5 +201,11 @@ if __name__ == "__main__":
         print initdUinstall()
     elif func == 'run_log':
         print getLog()
+    elif func == 'prod_conf':
+        print prodConf()
+    elif func == 'init_env':
+        print initEnv()
+    elif func == 'init_data':
+        print initData()
     else:
         print 'error'
