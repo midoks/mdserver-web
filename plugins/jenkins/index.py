@@ -39,7 +39,7 @@ def getInitDTpl():
 
 
 def getLog():
-    return getServerDir() + "/code/logs/error.log"
+    return "/var/log/jenkins/jenkins.log"
 
 
 def getArgs():
@@ -68,7 +68,7 @@ def checkArgs(data, ck=[]):
 
 def status():
     pn = getPluginName()
-    cmd = "ps -ef|grep 'waller.py' | grep -v grep | awk '{print $2}'"
+    cmd = "ps -ef|grep 'jenkins.war' | grep -v grep | awk '{print $2}'"
     data = public.execShell(cmd)
     if data[0] == '':
         return 'stop'
