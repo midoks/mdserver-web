@@ -44,7 +44,7 @@ def secRunLog():
 
 
 def msgRunLog():
-    return '/var/log/message'
+    return '/var/log/messages'
 
 
 def cronRunLog():
