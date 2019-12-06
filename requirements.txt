@@ -13,4 +13,4 @@ chardet
 flask-sqlalchemy
 ConfigParser
 MySQL-python
-pytest-shutil
+# pytest-shutil
