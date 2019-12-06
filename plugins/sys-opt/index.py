@@ -38,6 +38,9 @@ def reload():
 def sysConf():
     return '/etc/sysctl.conf'
 
+def secRunLog():
+	return '/var/log/secure'
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -52,3 +55,7 @@ if __name__ == "__main__":
         print reload()
     elif func == 'conf':
         print sysConf()
+    elif func == 'sec_run_log':
+    	print secRunLog()
+    else:
+    	print 'err'
