@@ -75,64 +75,38 @@ def status():
     return 'start'
 
 
-def initDreplace():
-
-    file_tpl = getInitDTpl()
-    service_path = os.path.dirname(os.getcwd())
-
-    initD_path = getServerDir() + '/init.d'
-    if not os.path.exists(initD_path):
-        os.mkdir(initD_path)
-
-    file_bin = initD_path + '/' + getPluginName()
-    if not os.path.exists(file_bin):
-        content = public.readFile(file_tpl)
-        content = content.replace('{$SERVER_PATH}', service_path)
-        public.writeFile(file_bin, content)
-        public.execShell('chmod +x ' + file_bin)
-
-    return file_bin
-
-
-def runShell(shell):
-    data = public.execShell(shell)
-    return data
-
-
 def start():
-    file = initDreplace()
-    cmd = file + ' start'
-    data = subprocess.Popen(
-        cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    return 'ok'
+    if public.isAppleSystem():
+        return "Apple Computer does not support"
+
+    data = public.execShell('service jenkins start')
+    if data[0] == '':
+        return 'ok'
+    return data[1]
 
 
 def stop():
-    file = initDreplace()
-    data = runShell(file + ' stop')
-    if data[1] == '':
+    if public.isAppleSystem():
+        return "Apple Computer does not support"
+
+    data = public.execShell('service jenkins stop')
+    if data[0] == '':
         return 'ok'
-    return 'fail'
+    return data[1]
 
 
 def restart():
-    file = initDreplace()
-    cmd = file + ' restart'
-    data = subprocess.Popen(
-        cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    return 'ok'
+    data = public.execShell('service jenkins restart')
+    if data[0] == '':
+        return 'ok'
+    return data[1]
 
 
 def reload():
-    file = initDreplace()
-    data = runShell(file + ' reload')
-
-    solr_log = getServerDir() + "/code/logs/walle.log"
-    public.writeFile(solr_log, "")
-
-    if data[1] == '':
+    data = public.execShell('service jenkins restart')
+    if data[0] == '':
         return 'ok'
-    return 'fail'
+    return data[1]
 
 
 def initdStatus():
@@ -143,12 +117,6 @@ def initdStatus():
 
 
 def initdInstall():
-    import shutil
-
-    source_bin = initDreplace()
-    initd_bin = getInitDFile()
-    shutil.copyfile(source_bin, initd_bin)
-    public.execShell('chmod +x ' + initd_bin)
 
     if not app_debug:
         public.execShell('chkconfig --add ' + getPluginName())
@@ -158,28 +126,9 @@ def initdInstall():
 def initdUinstall():
     if not app_debug:
         public.execShell('chkconfig --del ' + getPluginName())
-
-    initd_bin = getInitDFile()
-
-    if os.path.exists(initd_bin):
-        os.remove(initd_bin)
     return 'ok'
 
 
-def prodConf():
-    return getServerDir() + "/code/walle/config/settings_prod.py"
-
-
-def initEnv():
-    cmd = "cd " + getServerDir() + "/code" + " && sh admin.sh init"
-    data = public.execShell(cmd)
-    return "shell:<br>" + data[0] + "<br>" + " error:<br>" + data[1]
-
-
-def initData():
-    cmd = "cd " + getServerDir() + "/code" + " && sh admin.sh migration"
-    data = public.execShell(cmd)
-    return "shell:<br>" + data[0] + "<br>" + " error:<br>" + data[1]
 # rsyncdReceive
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -201,11 +150,5 @@ if __name__ == "__main__":
         print initdUinstall()
     elif func == 'run_log':
         print getLog()
-    elif func == 'prod_conf':
-        print prodConf()
-    elif func == 'init_env':
-        print initEnv()
-    elif func == 'init_data':
-        print initData()
     else:
         print 'error'
