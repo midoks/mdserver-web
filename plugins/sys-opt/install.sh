@@ -15,15 +15,15 @@ install_tmp=${rootPath}/tmp/mw_install.pl
 Install_sysopt()
 {
 	echo '正在安装脚本文件...' > $install_tmp
-	mkdir -p $serverPath/system-optimization
-	echo '1.0' > $serverPath/system-optimization/version.pl
+	mkdir -p $serverPath/sys-opt
+	echo '1.0' > $serverPath/sys-opt/version.pl
 	echo '安装完成' > $install_tmp
 
 }
 
 Uninstall_sysopt()
 {
-	rm -rf $serverPath/system-optimization
+	rm -rf $serverPath/sys-opt
 	echo "卸载完成" > $install_tmp
 }
 
