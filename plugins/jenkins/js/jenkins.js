@@ -61,29 +61,6 @@ function pPostCallbak(method, version, args,callback){
     },'json'); 
 }
 
-function initEnv(){
-    pPost('init_env', {}, function(data){
-        layer.msg(data.data,{icon:1,time:6000,shade: [0.3, '#000']});
-    },'初始化环境');
-}
-
-function initData(){
-    pPost('init_data', {}, function(data){
-        layer.msg(data.data,{icon:1,time:6000,shade: [0.3, '#000']});
-    },'初始化数据');
-}
-
-
-function pluginCmd(){
-    var serviceCon ='<p class="status">当前可以运行的命令：<span></span><span style="color: #20a53a;margin-left: 3px;" class="glyphicon"></span></p>\
-        <div class="sfm-opt">\
-            <button class="btn btn-default btn-sm" onclick="initEnv()">初始化环境</button>\
-            <button class="btn btn-default btn-sm" onclick="initData()">初始化数据</button>\
-        </div>'; 
-    $(".soft-man-con").html(serviceCon);
-}
-
-
 
 
 function pRead(){
