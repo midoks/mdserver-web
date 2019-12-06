@@ -17,7 +17,7 @@ def status():
 
 def start():
     public.execShell('sysctl -p')
-    return 'ok'
+    return "ok"
 
 
 def stop():
