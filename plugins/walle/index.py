@@ -117,10 +117,10 @@ def stop():
 
 def restart():
     file = initDreplace()
-    data = runShell(file + ' restart')
-    if data[1] == '':
-        return 'ok'
-    return 'fail'
+    cmd = file + ' restart'
+    data = subprocess.Popen(
+        cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    return 'ok'
 
 
 def reload():
