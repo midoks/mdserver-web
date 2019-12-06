@@ -61,10 +61,37 @@ function pPostCallbak(method, version, args,callback){
     },'json'); 
 }
 
+function initEnv(){
+    pPost('init_env', {}, function(data){
+        layer.msg(data.data,{icon:1,time:6000,shade: [0.3, '#000']});
+    },'初始化环境');
+}
+
+function initData(){
+    pPost('init_data', {}, function(data){
+        layer.msg(data.data,{icon:1,time:6000,shade: [0.3, '#000']});
+    },'初始化数据');
+}
+
+
+function pluginCmd(){
+    var serviceCon ='<p class="status">当前可以运行的命令：<span></span><span style="color: #20a53a;margin-left: 3px;" class="glyphicon"></span></p>\
+        <div class="sfm-opt">\
+            <button class="btn btn-default btn-sm" onclick="initEnv()">初始化环境</button>\
+            <button class="btn btn-default btn-sm" onclick="initData()">初始化数据</button>\
+        </div>'; 
+    $(".soft-man-con").html(serviceCon);
+}
+
+
+
 
 function pRead(){
 	var readme = '<ul class="help-info-text c7">';
     readme += '<li>使用默认walle端口5000,如有需要自行修改</li>';
+    readme += '<li>修改配置正确后:</li>';
+    readme += '<li>手动[初始化环境]:sh admin.sh init</li>';
+    readme += '<li>手动[初始化数据]:sh admin.sh migration</li>';
     readme += '<li><a target="_blank" href="https://walle-web.io/docs/installation_docker.html">官方文档</a></li>';
     readme += '</ul>';
 
