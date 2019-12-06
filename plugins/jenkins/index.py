@@ -80,9 +80,9 @@ def start():
         return "Apple Computer does not support"
 
     data = public.execShell('service jenkins start')
-    if data[0] == '':
+    if data[1] == '':
         return 'ok'
-    return data[1]
+    return 'fail'
 
 
 def stop():
@@ -90,23 +90,23 @@ def stop():
         return "Apple Computer does not support"
 
     data = public.execShell('service jenkins stop')
-    if data[0] == '':
+    if data[1] == '':
         return 'ok'
-    return data[1]
+    return 'fail'
 
 
 def restart():
     data = public.execShell('service jenkins restart')
-    if data[0] == '':
+    if data[1] == '':
         return 'ok'
-    return data[1]
+    return 'fail'
 
 
 def reload():
     data = public.execShell('service jenkins restart')
-    if data[0] == '':
+    if data[1] == '':
         return 'ok'
-    return data[1]
+    return 'fail'
 
 
 def initdStatus():
