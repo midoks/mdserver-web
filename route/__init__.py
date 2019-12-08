@@ -21,12 +21,12 @@ from flask import session
 from flask import request
 from flask import redirect
 from flask import url_for
-
+from flask_caching import Cache
 from flask_session import Session
-
 
 sys.path.append(os.getcwd() + "/class/core")
 sys.path.append("/usr/local/lib/python2.7/site-packages")
+
 import db
 import public
 import config_api
@@ -37,7 +37,8 @@ app.config.version = config_api.config_api().getVersion()
 # app.secret_key = uuid.UUID(int=uuid.getnode()).hex[-12:]
 app.config['SECRET_KEY'] = uuid.UUID(int=uuid.getnode()).hex[-12:]
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=31)
-
+cache = Cache(config={'CACHE_TYPE': 'simple'})
+cache.init_app(app, config={'CACHE_TYPE': 'simple'})
 
 try:
     from flask_sqlalchemy import SQLAlchemy
@@ -167,7 +168,7 @@ def doLogin():
     username = request.form.get('username', '').strip()
     password = request.form.get('password', '').strip()
     code = request.form.get('code', '').strip()
-    print session
+
     if session.has_key('code'):
         if session['code'] != public.md5(code):
             return public.returnJson(False, '验证码错误,请重新输入!')
@@ -176,11 +177,31 @@ def doLogin():
         "id=?", (1,)).field('id,username,password').find()
 
     password = public.md5(password)
-    if userInfo['username'] != username or userInfo['password'] != password:
-        public.writeLog('用户登录', public.getInfo(
-            "<a style='color: red'>密码错误</a>,帐号:{1},密码:{2},登录IP:{3}", (('****', '******', request.remote_addr))))
-        return public.returnJson(False, public.getInfo("用户名或密码错误,您还可以尝试[{1}]次!", ('1')))
+    login_cache_count = 5
+    login_cache_limit = cache.get('login_cache_limit')
+    filename = 'data/close.pl'
+    if os.path.exists(filename):
+        return public.returnJson(False, '面板已经关闭!')
 
+    if userInfo['username'] != username or userInfo['password'] != password:
+        msg = "<a style='color: red'>密码错误</a>,帐号:{1},密码:{2},登录IP:{3}", ((
+            '****', '******', request.remote_addr))
+
+        if login_cache_limit == None:
+            login_cache_limit = 1
+        else:
+            login_cache_limit = int(login_cache_limit) + 1
+
+        if login_cache_limit >= login_cache_count:
+            public.writeFile(filename, 'True')
+            return public.returnJson(False, '面板已经关闭!')
+
+        cache.set('login_cache_limit', login_cache_limit, timeout=10000)
+        login_cache_limit = cache.get('login_cache_limit')
+        public.writeLog('用户登录', public.getInfo(msg))
+        return public.returnJson(False, public.getInfo("用户名或密码错误,您还可以尝试[{1}]次!", (str(login_cache_count - login_cache_limit))))
+
+    cache.delete('login_cache_limit')
     session['login'] = True
     session['username'] = userInfo['username']
     return public.returnJson(True, '登录成功,正在跳转...')
