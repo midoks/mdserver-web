@@ -4,6 +4,10 @@ export PATH
 LANG=en_US.UTF-8
 is64bit=`getconf LONG_BIT`
 
+if [ -f /etc/motd ];then
+    echo "Welcome to mdserver-web panel" > /etc/motd
+fi
+
 startTime=`date +%s`
 
 _os=`uname`
