@@ -5,7 +5,8 @@ flask==1.0.2
 flask-session
 flask-socketio
 flask-helper==0.19
-flask-caching
+cache==1.0.3
+flask-caching==1.8.0
 gunicorn==19.9
 gevent
 gevent-websocket
