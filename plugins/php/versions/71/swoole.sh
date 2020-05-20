@@ -14,7 +14,7 @@ sourcePath=${serverPath}/source/php
 actionType=$1
 version=$2
 LIBNAME=swoole
-LIBV=4.3.0
+LIBV=4.5.1
 
 extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20160303/${LIBNAME}.so
 
