@@ -156,6 +156,12 @@ def initDreplace():
     service_path = os.path.dirname(os.getcwd())
 
     initD_path = getServerDir() + '/init.d'
+
+    # Openresty is not installed
+    if not os.path.exists(getServerDir()):
+        print "ok"
+        exit(0)
+
     if not os.path.exists(initD_path):
         os.mkdir(initD_path)
     file_bin = initD_path + '/' + getPluginName()
@@ -176,7 +182,8 @@ def initDreplace():
 
 
 def status():
-    data = public.execShell("ps -ef|grep nginx |grep -v grep | grep -v python | awk '{print $2}'")
+    data = public.execShell(
+        "ps -ef|grep nginx |grep -v grep | grep -v python | awk '{print $2}'")
     if data[0] == '':
         return 'stop'
     return 'start'
