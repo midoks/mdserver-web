@@ -1,0 +1,14 @@
+{
+	"title":"shadowsocks",
+	"tip":"soft",
+	"name":"shadowsocks",
+	"type":"运行环境",
+	"ps":"shadowsocks",
+	"versions":"1.0",
+	"shell":"install.sh",
+	"checks":"server/shadowsocks",
+	"author":"midoks",
+	"home":"https://github.com/shadowsocks/shadowsocks",
+	"date":"2020-06-02",
+	"pid": "4"
+}
