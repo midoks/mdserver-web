@@ -19,12 +19,15 @@ p_start(){
     if [ "$isStart" == "" ];then
         echo -e "Starting shadowsocks... \c"
         
+
+        ssserver -c $ROOT_PATH/shadowsocks/shadowsocks.json -d start
         sleep 0.3
         isStart=$(ps -ef | grep shadowsocks  | grep -v grep | awk '{print $2}')
         if [ "$isStart" == '' ];then
                 echo -e "\033[31mError: shadowsocks service startup failed.\033[0m"
                 return;
         fi
+
         echo -e "\033[32mdone\033[0m"
     else
 		echo "Starting shadowsocks(pid $isStart) already running"
