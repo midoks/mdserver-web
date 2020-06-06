@@ -165,6 +165,10 @@ def initdUinstall():
     os.remove(initd_bin)
     return 'ok'
 
+
+def getLog():
+    return '/var/log/shadowsocks.log'
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -185,5 +189,7 @@ if __name__ == "__main__":
         print initdInstall()
     elif func == 'initd_uninstall':
         print initdUinstall()
+    elif func == 'run_log':
+        print getLog()
     else:
         print 'error'
