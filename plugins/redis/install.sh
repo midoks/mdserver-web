@@ -10,20 +10,24 @@ serverPath=$(dirname "$rootPath")
 
 install_tmp=${rootPath}/tmp/mw_install.pl
 
+VERSION=$2
 
 Install_redis()
 {
-
 	echo '正在安装脚本文件...' > $install_tmp
+	mkdir -p $serverPath/source
 
-	wget -O $serverPath/source/redis.tar.gz http://download.redis.io/releases/redis-4.0.11.tar.gz
-	cd $serverPath/source && tar -zxvf redis.tar.gz
+	if [ ! -f $serverPath/source/redis-${VERSION}.tar.gz ];then
+		wget -O $serverPath/source/redis-${VERSION}.tar.gz http://download.redis.io/releases/redis-${VERSION}.tar.gz
+	fi
+	
+	cd $serverPath/source && tar -zxvf redis-${VERSION}.tar.gz
 
 	mkdir -p $serverPath/redis
-	cd redis* && make PREFIX=$serverPath/redis install
+	cd redis-${VERSION} && make PREFIX=$serverPath/redis install
 	sed '/^ *#/d' redis.conf > $serverPath/redis/redis.conf
 
-	echo '4.0' > $serverPath/redis/version.pl
+	echo "${VERSION}" > $serverPath/redis/version.pl
 
 	echo '安装完成' > $install_tmp
 }

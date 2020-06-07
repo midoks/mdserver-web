@@ -60,7 +60,8 @@ def getArgs():
 
 def status():
     data = public.execShell(
-        "ps -ef|grep redis |grep -v grep | grep -v python | awk '{print $2}'")
+        "ps -ef|grep redis |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'")
+
     if data[0] == '':
         return 'stop'
     return 'start'
