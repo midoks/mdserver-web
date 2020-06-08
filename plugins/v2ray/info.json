@@ -7,6 +7,7 @@
 	"versions":"1.0",
 	"shell":"install.sh",
 	"checks":"server/v2ray",
+	"path": "server/v2ray",
 	"author":"midoks",
 	"home":"https://github.com/v2ray/v2ray-core",
 	"date":"2020-06-08",
