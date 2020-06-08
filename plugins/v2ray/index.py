@@ -133,7 +133,11 @@ def initdUinstall():
 
 
 def getLog():
-    return '/var/log/shadowsocks.log'
+    return '/var/log/v2ray/access.log'
+
+
+def getErrLog():
+    return '/var/log/v2ray/error.log'
 
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -157,5 +161,7 @@ if __name__ == "__main__":
         print initdUinstall()
     elif func == 'run_log':
         print getLog()
+    elif func == 'error_log':
+        print getErrLog()
     else:
         print 'error'
