@@ -106,6 +106,10 @@ def getInitDFile():
 
 
 def initdStatus():
+    shell_cmd = 'systemctl status v2ray.service | grep running'
+    data = public.execShell(shell_cmd)
+    if data[0] == '':
+        return 'fail'
     return 'ok'
 
 
@@ -115,7 +119,7 @@ def initdInstall():
         if public.isAppleSystem():
             return "Apple Computer does not support"
 
-    public.execShell('chkconfig --add ' + getPluginName())
+    public.execShell('systemctl enable ' + getPluginName())
     return 'ok'
 
 
@@ -124,7 +128,7 @@ def initdUinstall():
         if public.isAppleSystem():
             return "Apple Computer does not support"
 
-    public.execShell('chkconfig --del ' + getPluginName())
+    public.execShell('systemctl disable ' + getPluginName())
     return 'ok'
 
 
