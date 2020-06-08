@@ -2,6 +2,8 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
+# case1 https://toutyrater.github.io/advanced/wss_and_web.html
+
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
