@@ -1,0 +1,14 @@
+{
+	"title":"v2ray",
+	"tip":"soft",
+	"name":"v2ray",
+	"type":"运行环境",
+	"ps":"v2ray",
+	"versions":"1.0",
+	"shell":"install.sh",
+	"checks":"server/v2ray",
+	"author":"midoks",
+	"home":"https://github.com/v2ray/v2ray-core",
+	"date":"2020-06-08",
+	"pid": "4"
+}
