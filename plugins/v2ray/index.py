@@ -51,7 +51,7 @@ def checkArgs(data, ck=[]):
 
 
 def status():
-    cmd = "ps -ef|grep v2ray |grep -v grep | awk '{print $2}'"
+    cmd = "ps -ef|grep v2ray |grep -v grep | grep -v 'mdserver-web'| awk '{print $2}'"
     data = public.execShell(cmd)
     if data[0] == '':
         return 'stop'
