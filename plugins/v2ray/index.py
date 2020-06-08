@@ -106,13 +106,7 @@ def getInitDFile():
 
 
 def initdStatus():
-    if not app_debug:
-        if public.isAppleSystem():
-            return "Apple Computer does not support"
-    initd_bin = getInitDFile()
-    if os.path.exists(initd_bin):
-        return 'ok'
-    return 'fail'
+    return 'ok'
 
 
 def initdInstall():
@@ -121,7 +115,6 @@ def initdInstall():
         if public.isAppleSystem():
             return "Apple Computer does not support"
 
-    public.execShell('chmod +x ' + initd_bin)
     public.execShell('chkconfig --add ' + getPluginName())
     return 'ok'
 
