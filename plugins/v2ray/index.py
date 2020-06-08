@@ -106,7 +106,7 @@ def getInitDFile():
 
 
 def initdStatus():
-    shell_cmd = 'systemctl status v2ray.service | grep running'
+    shell_cmd = 'systemctl status v2ray.service | grep loaded | grep "enabled;"'
     data = public.execShell(shell_cmd)
     if data[0] == '':
         return 'fail'
