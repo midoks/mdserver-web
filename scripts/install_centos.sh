@@ -30,6 +30,7 @@ if [ -f "/etc/init.d/iptables" ];then
 
 	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 22 -j ACCEPT
 	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
+	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 443 -j ACCEPT
 	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 888 -j ACCEPT
 	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 7200 -j ACCEPT
 	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 30000:40000 -j ACCEPT
@@ -52,6 +53,7 @@ if [ "${isVersion}" == '' ];then
 
 		firewall-cmd --permanent --zone=public --add-port=22/tcp
 		firewall-cmd --permanent --zone=public --add-port=80/tcp
+		firewall-cmd --permanent --zone=public --add-port=443/tcp
 		firewall-cmd --permanent --zone=public --add-port=888/tcp
 		firewall-cmd --permanent --zone=public --add-port=7200/tcp
 		firewall-cmd --permanent --zone=public --add-port=30000-40000/tcp
