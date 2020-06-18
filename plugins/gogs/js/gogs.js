@@ -227,7 +227,7 @@ function userProjectList(user, search){
         var loadOpen = layer.open({
             type: 1,
             title: '用户('+user+')项目列表',
-            area: '400px',
+            area: '500px',
             content:"<div class='bt-form pd20 c6'>\
                     <div>\
                             <div class='divtable' style='margin-top:5px;'>\
