@@ -6,16 +6,22 @@
   },
   "inbounds": [{
     "port": 34861,
+    "listen": "127.0.0.1",
     "protocol": "vmess",
     "settings": {
       "clients": [
         {
           "id": "6e1e5234-05ee-45fe-b28d-80e91edb7f30",
-          "level": 1,
           "alterId": 64
         }
       ]
-    }
+    },
+    "streamSettings":{
+        "network": "ws",
+        "wsSettings": {
+          "path": "/ws"
+        }
+     }
   }],
   "outbounds": [{
     "protocol": "freedom",
