@@ -80,6 +80,12 @@ def stop():
 def restart():
     shell_cmd = 'service  ' + getPluginName() + ' restart'
     data = public.execShell(shell_cmd)
+
+    log_file = getLog()
+    if os.path.exists(log_file):
+        clear_log_cmd = "echo '' > " + log_file
+        public.execShell(clear_log_cmd)
+
     if data[0] == '':
         return 'ok'
     return data[1]
