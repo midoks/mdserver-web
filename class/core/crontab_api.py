@@ -22,7 +22,7 @@ class crontab_api:
     ##### ----- start ----- ###
     def listApi(self):
         _list = public.M('crontab').where('', ()).field(self.field).limit(
-            '0,5').order('id desc').select()
+            '0,30').order('id desc').select()
 
         data = []
         for i in range(len(_list)):
