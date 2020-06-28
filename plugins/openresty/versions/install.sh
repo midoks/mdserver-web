@@ -19,7 +19,7 @@ Install_openresty()
 	echo '正在安装脚本文件...' > $install_tmp
 
 	if [ ! -f ${openrestyDir}/openresty-${VERSION}.tar.gz ];then
-		wget -O ${openrestyDir}/openresty-1.11.2.5.tar.gz https://openresty.org/download/openresty-${VERSION}.tar.gz
+		wget -O ${openrestyDir}/openresty-${VERSION}.tar.gz https://openresty.org/download/openresty-${VERSION}.tar.gz
 	fi
 
 
