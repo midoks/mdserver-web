@@ -29,4 +29,4 @@ if [ ! -d $curPath/versions/$2 ];then
 	exit 0
 fi
 
-sh -x $curPath/versions/$2/install.sh $1
+sh -x $curPath/versions/install.sh $1
