@@ -23,18 +23,6 @@ else
 	useradd -g www -s /sbin/nologin www
 fi
 
-if [ "${2}" == "" ];then
-	echo '缺少安装脚本...' > $install_tmp
-	exit 0
-fi 
-
-if [ ! -d $curPath/versions/$2 ];then
-	echo '缺少安装脚本2...' > $install_tmp
-	exit 0
-fi
-
-
-
 Install_openresty()
 {
 	mkdir -p ${openrestyDir}
