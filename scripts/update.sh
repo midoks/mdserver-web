@@ -31,6 +31,7 @@ else
 	OSNAME='unknow'
 fi
 
+pip uninstall public
 
 if [ "$OSNAME" == 'MAC' ];then
 	echo 'The development environment only needs to be downloaded again!'
