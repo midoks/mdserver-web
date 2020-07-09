@@ -81,6 +81,7 @@ yum -y install $paces
 yum -y lsof net-tools.x86_64
 yum -y install ncurses-devel mysql-dev locate cmake
 yum -y install python-devel.x86_64
+yum -y install MySQL-python 
 yum -y install epel-release
 
 if [ ! -f '/usr/bin/pip' ];then

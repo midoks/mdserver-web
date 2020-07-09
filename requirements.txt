@@ -15,5 +15,5 @@ pillow
 chardet
 flask-sqlalchemy
 ConfigParser
-MySQL-python
+MySQL-python==1.2.5
 # pytest-shutil
