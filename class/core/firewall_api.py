@@ -59,6 +59,10 @@ class firewall_api:
 
     # 添加放行端口
     def addAcceptPortApi(self):
+
+        if not self.getFwStatus():
+            return mw.returnJson(False, '防火墙启动时,才能添加规则!')
+
         import re
         import time
         port = request.form.get('port', '').strip()
@@ -83,6 +87,9 @@ class firewall_api:
 
     # 删除IP屏蔽
     def delDropAddressApi(self):
+        if not self.getFwStatus():
+            return mw.returnJson(False, '防火墙启动时,才能删除规则!')
+
         port = request.form.get('port', '').strip()
         ps = request.form.get('ps', '').strip()
         sid = request.form.get('id', '').strip()
