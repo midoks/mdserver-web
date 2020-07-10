@@ -28,7 +28,10 @@ PIDFILE={$SERVER_PATH}/redis/redis_6379.pid
 mkdir -p {$SERVER_PATH}/redis/data
 
 redis_start(){
-	kill -9 `cat $PIDFILE`
+	if [ -f $PIDFILE ];then
+		kill -9 `cat $PIDFILE`
+	fi
+	
 	echo "Starting Redis server..."
 	nohup $EXEC $CONF >> {$SERVER_PATH}/redis/logs.pl 2>&1 &
 }
@@ -46,6 +49,7 @@ redis_stop(){
 				sleep 1
 			done
 			echo "Redis stopped"
+			rm -rf $PIDFILE
 	fi
 }
 
