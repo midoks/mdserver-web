@@ -119,9 +119,9 @@ class firewall_api:
             else:
                 if self.__isFirewalld:
                     mw.execShell(
-                        'firewall-cmd --permanent --zone=mw --remove-port=' + port + '/tcp')
+                        'firewall-cmd --permanent --zone=public --remove-port=' + port + '/tcp')
                     mw.execShell(
-                        'firewall-cmd --permanent --zone=mw --remove-port=' + port + '/udp')
+                        'firewall-cmd --permanent --zone=public --remove-port=' + port + '/udp')
                 else:
                     mw.execShell(
                         'iptables -D INPUT -p tcp -m state --state NEW -m tcp --dport ' + port + ' -j ACCEPT')
