@@ -8,11 +8,11 @@ import re
 import sys
 
 sys.path.append(os.getcwd() + "/class/core")
-import public
+import mw
 
 
 app_debug = False
-if public.isAppleSystem():
+if mw.isAppleSystem():
     app_debug = True
 
 
@@ -21,14 +21,14 @@ def getPluginName():
 
 
 def getPluginDir():
-    return public.getPluginDir() + '/' + getPluginName()
+    return mw.getPluginDir() + '/' + getPluginName()
 
 sys.path.append(getPluginDir() + "/class")
 import mysql
 
 
 def getServerDir():
-    return public.getServerDir() + '/' + getPluginName()
+    return mw.getServerDir() + '/' + getPluginName()
 
 
 def getInitDFile():
@@ -57,8 +57,8 @@ def getArgs():
 def checkArgs(data, ck=[]):
     for i in range(len(ck)):
         if not ck[i] in data:
-            return (False, public.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-    return (True, public.returnJson(True, 'ok'))
+            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
+    return (True, mw.returnJson(True, 'ok'))
 
 
 def getInitDTpl():
@@ -80,9 +80,11 @@ def getCheckdbPos():
     file = getServerDir() + "/start_pos.pl"
     return file
 
+
 def getBlackList():
     file = getServerDir() + "/workers/black_list.txt"
     return file
+
 
 def getRunLog():
     file = getServerDir() + "/logs.pl"
@@ -94,13 +96,13 @@ def initDreplace():
     ddir = getServerDir() + '/workers'
     if not os.path.exists(ddir):
         sdir = getPluginDir() + '/workers'
-        public.execShell('cp -rf ' + sdir + ' ' + getServerDir())
+        mw.execShell('cp -rf ' + sdir + ' ' + getServerDir())
 
     cfg = getServerDir() + '/db.cfg'
     if not os.path.exists(cfg):
         cfg_tpl = getPluginDir() + '/workers/db.cfg'
-        content = public.readFile(cfg_tpl)
-        public.writeFile(cfg, content)
+        content = mw.readFile(cfg_tpl)
+        mw.writeFile(cfg, content)
 
     file_tpl = getInitDTpl()
     service_path = os.path.dirname(os.getcwd())
@@ -111,16 +113,16 @@ def initDreplace():
     file_bin = initD_path + '/' + getPluginName()
 
     # initd replace
-    content = public.readFile(file_tpl)
+    content = mw.readFile(file_tpl)
     content = content.replace('{$SERVER_PATH}', service_path)
-    public.writeFile(file_bin, content)
-    public.execShell('chmod +x ' + file_bin)
+    mw.writeFile(file_bin, content)
+    mw.execShell('chmod +x ' + file_bin)
 
     return file_bin
 
 
 def status():
-    data = public.execShell(
+    data = mw.execShell(
         "ps -ef|grep \"simdht_worker.py\" | grep -v grep | awk '{print $2}'")
     if data[0] == '':
         return 'stop'
@@ -130,7 +132,7 @@ def status():
 def start():
     file = initDreplace()
 
-    data = public.execShell(file + ' start')
+    data = mw.execShell(file + ' start')
     if data[1] == '':
         return 'ok'
     return data[1]
@@ -138,7 +140,7 @@ def start():
 
 def stop():
     file = initDreplace()
-    data = public.execShell(file + ' stop')
+    data = mw.execShell(file + ' stop')
     if data[1] == '':
         return 'ok'
     return data[1]
@@ -146,7 +148,7 @@ def stop():
 
 def restart():
     file = initDreplace()
-    data = public.execShell(file + ' restart')
+    data = mw.execShell(file + ' restart')
     if data[1] == '':
         return 'ok'
     return 'fail'
@@ -154,7 +156,7 @@ def restart():
 
 def reload():
     file = initDreplace()
-    data = public.execShell(file + ' reload')
+    data = mw.execShell(file + ' reload')
     if data[1] == '':
         return 'ok'
     return 'fail'
@@ -162,7 +164,7 @@ def reload():
 
 def initdStatus():
     if not app_debug:
-        if public.isAppleSystem():
+        if mw.isAppleSystem():
             return "Apple Computer does not support"
 
     initd_bin = getInitDFile()
@@ -174,24 +176,24 @@ def initdStatus():
 def initdInstall():
     import shutil
     if not app_debug:
-        if public.isAppleSystem():
+        if mw.isAppleSystem():
             return "Apple Computer does not support"
 
     mysql_bin = initDreplace()
     initd_bin = getInitDFile()
     shutil.copyfile(mysql_bin, initd_bin)
-    public.execShell('chmod +x ' + initd_bin)
-    public.execShell('chkconfig --add ' + getPluginName())
+    mw.execShell('chmod +x ' + initd_bin)
+    mw.execShell('chkconfig --add ' + getPluginName())
     return 'ok'
 
 
 def initdUinstall():
     if not app_debug:
-        if public.isAppleSystem():
+        if mw.isAppleSystem():
             return "Apple Computer does not support"
     initd_bin = getInitDFile()
     os.remove(initd_bin)
-    public.execShell('chkconfig --del ' + getPluginName())
+    mw.execShell('chkconfig --del ' + getPluginName())
     return 'ok'
 
 
@@ -202,7 +204,7 @@ def matchData(reg, content):
 
 def getDbConfInfo():
     cfg = getDbConf()
-    content = public.readFile(cfg)
+    content = mw.readFile(cfg)
     data = {}
     data['DB_HOST'] = matchData("DB_HOST\s*=\s(.*)", content)
     data['DB_USER'] = matchData("DB_USER\s*=\s(.*)", content)
@@ -227,23 +229,23 @@ def isSqlError(mysqlMsg):
     # 检测数据库执行错误
     mysqlMsg = str(mysqlMsg)
     if "MySQLdb" in mysqlMsg:
-        return public.returnJson(False, 'MySQLdb组件缺失! <br>进入SSH命令行输入： pip install mysql-python')
+        return mw.returnJson(False, 'MySQLdb组件缺失! <br>进入SSH命令行输入： pip install mysql-python')
     if "2002," in mysqlMsg:
-        return public.returnJson(False, '数据库连接失败,请检查数据库服务是否启动!')
+        return mw.returnJson(False, '数据库连接失败,请检查数据库服务是否启动!')
     if "using password:" in mysqlMsg:
-        return public.returnJson(False, '数据库管理密码错误!')
+        return mw.returnJson(False, '数据库管理密码错误!')
     if "Connection refused" in mysqlMsg:
-        return public.returnJson(False, '数据库连接失败,请检查数据库服务是否启动!')
+        return mw.returnJson(False, '数据库连接失败,请检查数据库服务是否启动!')
     if "1133" in mysqlMsg:
-        return public.returnJson(False, '数据库用户不存在!')
+        return mw.returnJson(False, '数据库用户不存在!')
     if "1007" in mysqlMsg:
-        return public.returnJson(False, '数据库已经存在!')
+        return mw.returnJson(False, '数据库已经存在!')
     return None
 
 
 def getMinData(conn, sec):
     time_diff = 0
-    if public.isAppleSystem():
+    if mw.isAppleSystem():
         time_diff = 3 * 60
     pre = time.strftime("%Y-%m-%d %H:%M:%S",
                         time.localtime(time.time() - sec - time_diff))
@@ -267,10 +269,10 @@ def getTrendData():
         one = getMinData(pdb, 2)
         two = getMinData(pdb, 5)
         three = getMinData(pdb, 10)
-        return public.getJson([one, two, three])
+        return mw.getJson([one, two, three])
     except Exception as e:
         print str(e)
-        return public.getJson([0, 0, 0])
+        return mw.getJson([0, 0, 0])
 
 
 def dhtCmd():

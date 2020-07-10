@@ -7,10 +7,10 @@ import time
 import shutil
 
 sys.path.append(os.getcwd() + "/class/core")
-import public
+import mw
 
 app_debug = False
-if public.isAppleSystem():
+if mw.isAppleSystem():
     app_debug = True
 
 
@@ -19,11 +19,11 @@ def getPluginName():
 
 
 def getPluginDir():
-    return public.getPluginDir() + '/' + getPluginName()
+    return mw.getPluginDir() + '/' + getPluginName()
 
 
 def getServerDir():
-    return public.getServerDir() + '/' + getPluginName()
+    return mw.getServerDir() + '/' + getPluginName()
 
 
 def getInitDFile():
@@ -61,15 +61,15 @@ def getArgs():
 
 def status():
     cmd = "ps -ef|grep pure-ftpd |grep -v grep | grep -v python | awk '{print $2}'"
-    data = public.execShell(cmd)
+    data = mw.execShell(cmd)
     if data[0] == '':
         return 'stop'
     return 'start'
 
 
 def contentReplace(content):
-    service_path = public.getServerDir()
-    content = content.replace('{$ROOT_PATH}', public.getRootDir())
+    service_path = mw.getServerDir()
+    content = content.replace('{$ROOT_PATH}', mw.getRootDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     return content
 
@@ -86,18 +86,18 @@ def initDreplace():
 
     # initd replace
     if not os.path.exists(file_bin):
-        content = public.readFile(file_tpl)
+        content = mw.readFile(file_tpl)
         content = contentReplace(content)
-        public.writeFile(file_bin, content)
-        public.execShell('chmod +x ' + file_bin)
+        mw.writeFile(file_bin, content)
+        mw.execShell('chmod +x ' + file_bin)
 
     pureSbinConfig = getServerDir() + "/sbin/pure-config.pl"
     if not os.path.exists(pureSbinConfig):
         pureTplConfig = getPluginDir() + "/init.d/pure-config.pl"
-        content = public.readFile(pureTplConfig)
+        content = mw.readFile(pureTplConfig)
         content = contentReplace(content)
-        public.writeFile(pureSbinConfig, content)
-        public.execShell('chmod +x ' + pureSbinConfig)
+        mw.writeFile(pureSbinConfig, content)
+        mw.execShell('chmod +x ' + pureSbinConfig)
 
     pureFtpdConfig = getServerDir() + "/etc/pure-ftpd.conf"
     pureFtpdConfigBak = getServerDir() + "/etc/pure-ftpd.bak.conf"
@@ -105,16 +105,16 @@ def initDreplace():
 
     if not os.path.exists(pureFtpdConfigBak):
         shutil.copyfile(pureFtpdConfig, pureFtpdConfigBak)
-        content = public.readFile(pureFtpdConfigTpl)
+        content = mw.readFile(pureFtpdConfigTpl)
         content = contentReplace(content)
-        public.writeFile(pureFtpdConfig, content)
+        mw.writeFile(pureFtpdConfig, content)
 
     return file_bin
 
 
 def start():
     file = initDreplace()
-    data = public.execShell(file + ' start')
+    data = mw.execShell(file + ' start')
     if data[1] == '':
         return 'ok'
     return data[1]
@@ -122,7 +122,7 @@ def start():
 
 def stop():
     file = initDreplace()
-    data = public.execShell(file + ' stop')
+    data = mw.execShell(file + ' stop')
     if data[1] == '':
         return 'ok'
     return data[1]
@@ -130,7 +130,7 @@ def stop():
 
 def restart():
     file = initDreplace()
-    data = public.execShell(file + ' restart')
+    data = mw.execShell(file + ' restart')
     if data[1] == '':
         return 'ok'
     return 'fail'
@@ -138,7 +138,7 @@ def restart():
 
 def reload():
     file = initDreplace()
-    data = public.execShell(file + ' reload')
+    data = mw.execShell(file + ' reload')
     if data[1] == '':
         return 'ok'
     return data[1]
@@ -146,7 +146,7 @@ def reload():
 
 def initdStatus():
     if not app_debug:
-        os_name = public.getOs()
+        os_name = mw.getOs()
         if os_name == 'darwin':
             return "Apple Computer does not support"
     initd_bin = getInitDFile()
@@ -158,45 +158,45 @@ def initdStatus():
 def initdInstall():
     import shutil
     if not app_debug:
-        os_name = public.getOs()
+        os_name = mw.getOs()
         if os_name == 'darwin':
             return "Apple Computer does not support"
 
     source_bin = initDreplace()
     initd_bin = getInitDFile()
     shutil.copyfile(source_bin, initd_bin)
-    public.execShell('chmod +x ' + initd_bin)
-    public.execShell('chkconfig --add ' + getPluginName())
+    mw.execShell('chmod +x ' + initd_bin)
+    mw.execShell('chkconfig --add ' + getPluginName())
     return 'ok'
 
 
 def initdUinstall():
     if not app_debug:
-        os_name = public.getOs()
+        os_name = mw.getOs()
         if os_name == 'darwin':
             return "Apple Computer does not support"
     initd_bin = getInitDFile()
     os.remove(initd_bin)
-    public.execShell('chkconfig --del ' + getPluginName())
+    mw.execShell('chkconfig --del ' + getPluginName())
     return 'ok'
 
 
 def pftpDB():
     file = getServerDir() + '/ftps.db'
     if not os.path.exists(file):
-        conn = public.M('ftps').dbPos(getServerDir(), 'ftps')
-        csql = public.readFile(getPluginDir() + '/conf/ftps.sql')
+        conn = mw.M('ftps').dbPos(getServerDir(), 'ftps')
+        csql = mw.readFile(getPluginDir() + '/conf/ftps.sql')
         csql_list = csql.split(';')
         for index in range(len(csql_list)):
             conn.execute(csql_list[index], ())
     else:
-        conn = public.M('ftps').dbPos(getServerDir(), 'ftps')
+        conn = mw.M('ftps').dbPos(getServerDir(), 'ftps')
     return conn
 
 
 def pftpUser():
-    if public.isAppleSystem():
-        user = public.execShell(
+    if mw.isAppleSystem():
+        user = mw.execShell(
             "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
         return user
     return 'www'
@@ -207,40 +207,40 @@ def pftpAdd(username, password, path):
 
     if not os.path.exists(path):
         os.makedirs(path)
-        if public.isAppleSystem():
+        if mw.isAppleSystem():
             os.system('chown ' + user + '.staff ' + path)
         else:
             os.system('chown www.www ' + path)
 
     cmd = getServerDir() + '/bin/pure-pw useradd ' + username + ' -u ' + user + ' -d ' + \
         path + '<<EOF \n' + password + '\n' + password + '\nEOF'
-    return public.execShell(cmd)
+    return mw.execShell(cmd)
 
 
 def pftpMod(username, password):
     user = pftpUser()
     cmd = getServerDir() + '/bin/pure-pw passwd ' + username + \
         '<<EOF \n' + password + '\n' + password + '\nEOF'
-    return public.execShell(cmd)
+    return mw.execShell(cmd)
 
 
 def pftpStop(username):
     cmd = getServerDir() + '/bin/pure-pw usermod ' + username + ' -r 1'
-    return public.execShell(cmd)
+    return mw.execShell(cmd)
 
 
 def pftpStart(username):
     cmd = getServerDir() + '/bin/pure-pw usermod ' + username + " -r ''"
-    return public.execShell(cmd)
+    return mw.execShell(cmd)
 
 
 def pftpReload():
-    public.execShell(getServerDir() + '/bin/pure-pw mkdb ' +
-                     getServerDir() + '/etc/pureftpd.pdb')
+    mw.execShell(getServerDir() + '/bin/pure-pw mkdb ' +
+                 getServerDir() + '/etc/pureftpd.pdb')
 
 
 def getWwwDir():
-    path = public.getWwwDir()
+    path = mw.getWwwDir()
     return path
 
 
@@ -248,7 +248,7 @@ def getFtpPort():
     import re
     try:
         file = getServerDir() + '/etc/pure-ftpd.conf'
-        conf = public.readFile(file)
+        conf = mw.readFile(file)
         rep = "\n#?\s*Bind\s+[0-9]+\.[0-9]+\.[0-9]+\.+[0-9]+,([0-9]+)"
         port = re.search(rep, conf).groups()[0]
     except:
@@ -287,15 +287,15 @@ def getFtpList():
     _page['p'] = page
     _page['row'] = page_size
     _page['tojs'] = 'ftpList'
-    data['page'] = public.getPage(_page)
+    data['page'] = mw.getPage(_page)
 
     info = {}
-    info['ip'] = public.getLocalIp()
+    info['ip'] = mw.getLocalIp()
     info['port'] = getFtpPort()
     data['info'] = info
     data['data'] = clist
 
-    return public.getJson(data)
+    return mw.getJson(data)
 
 
 def addFtp():
@@ -338,12 +338,12 @@ def delFtp():
     if not 'username' in args:
         return 'username missing'
 
-    public.execShell(getServerDir() +
-                     '/bin/pure-pw userdel ' + args['username'])
+    mw.execShell(getServerDir() +
+                 '/bin/pure-pw userdel ' + args['username'])
     pftpReload()
     conn = pftpDB()
     conn.where("id=?", (args['id'],)).delete()
-    public.writeLog('TYPE_FTP', 'FTP_DEL_SUCCESS', (args['username'],))
+    mw.writeLog('TYPE_FTP', 'FTP_DEL_SUCCESS', (args['username'],))
     return 'ok'
 
 
@@ -380,12 +380,12 @@ def modFtpPort():
         if int(port) < 1 or int(port) > 65535:
             return '端口范围不正确!'
         file = file = getServerDir() + '/etc/pure-ftpd.conf'
-        conf = public.readFile(file)
+        conf = mw.readFile(file)
         rep = u"\n#?\s*Bind\s+[0-9]+\.[0-9]+\.[0-9]+\.+[0-9]+,([0-9]+)"
         # preg_match(rep,conf,tmp)
         conf = re.sub(
             rep, "\nBind                         0.0.0.0," + port, conf)
-        public.writeFile(file, conf)
+        mw.writeFile(file, conf)
         restart()
         return 'ok'
     except Exception as ex:

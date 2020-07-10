@@ -6,10 +6,10 @@ import os
 import time
 
 sys.path.append(os.getcwd() + "/class/core")
-import public
+import mw
 
 app_debug = False
-if public.isAppleSystem():
+if mw.isAppleSystem():
     app_debug = True
 
 
@@ -18,11 +18,11 @@ def getPluginName():
 
 
 def getPluginDir():
-    return public.getPluginDir() + '/' + getPluginName()
+    return mw.getPluginDir() + '/' + getPluginName()
 
 
 def getServerDir():
-    return public.getServerDir() + '/' + getPluginName()
+    return mw.getServerDir() + '/' + getPluginName()
 
 
 def getInitDFile():
@@ -59,7 +59,7 @@ def getArgs():
 
 
 def status():
-    data = public.execShell(
+    data = mw.execShell(
         "ps -ef|grep redis |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'")
 
     if data[0] == '':
@@ -78,22 +78,22 @@ def initDreplace():
     file_bin = initD_path + '/' + getPluginName()
 
     # initd replace
-    content = public.readFile(file_tpl)
+    content = mw.readFile(file_tpl)
     content = content.replace('{$SERVER_PATH}', service_path)
-    public.writeFile(file_bin, content)
-    public.execShell('chmod +x ' + file_bin)
+    mw.writeFile(file_bin, content)
+    mw.execShell('chmod +x ' + file_bin)
 
     # config replace
-    conf_content = public.readFile(getConf())
+    conf_content = mw.readFile(getConf())
     conf_content = conf_content.replace('{$SERVER_PATH}', service_path)
-    public.writeFile(getServerDir() + '/redis.conf', conf_content)
+    mw.writeFile(getServerDir() + '/redis.conf', conf_content)
 
     return file_bin
 
 
 def start():
     file = initDreplace()
-    data = public.execShell(file + ' start')
+    data = mw.execShell(file + ' start')
     if data[1] == '':
         return 'ok'
     return 'fail'
@@ -101,7 +101,7 @@ def start():
 
 def stop():
     file = initDreplace()
-    data = public.execShell(file + ' stop')
+    data = mw.execShell(file + ' stop')
     if data[1] == '':
         return 'ok'
     return 'fail'
@@ -109,7 +109,7 @@ def stop():
 
 def restart():
     file = initDreplace()
-    data = public.execShell(file + ' restart')
+    data = mw.execShell(file + ' restart')
     if data[1] == '':
         return 'ok'
     return 'fail'
@@ -117,7 +117,7 @@ def restart():
 
 def reload():
     file = initDreplace()
-    data = public.execShell(file + ' reload')
+    data = mw.execShell(file + ' reload')
     if data[1] == '':
         return 'ok'
     return 'fail'
@@ -125,7 +125,7 @@ def reload():
 
 def runInfo():
     cmd = getServerDir() + "/bin/redis-cli info"
-    data = public.execShell(cmd)[0]
+    data = mw.execShell(cmd)[0]
     res = [
         'tcp_port',
         'uptime_in_days',  # 已运行天数
@@ -150,12 +150,12 @@ def runInfo():
         if not t[0] in res:
             continue
         result[t[0]] = t[1]
-    return public.getJson(result)
+    return mw.getJson(result)
 
 
 def initdStatus():
     if not app_debug:
-        if public.isAppleSystem():
+        if mw.isAppleSystem():
             return "Apple Computer does not support"
     initd_bin = getInitDFile()
     if os.path.exists(initd_bin):
@@ -166,23 +166,23 @@ def initdStatus():
 def initdInstall():
     import shutil
     if not app_debug:
-        if public.isAppleSystem():
+        if mw.isAppleSystem():
             return "Apple Computer does not support"
 
     source_bin = initDreplace()
     initd_bin = getInitDFile()
     shutil.copyfile(source_bin, initd_bin)
-    public.execShell('chmod +x ' + initd_bin)
-    public.execShell('chkconfig --add ' + getPluginName())
+    mw.execShell('chmod +x ' + initd_bin)
+    mw.execShell('chkconfig --add ' + getPluginName())
     return 'ok'
 
 
 def initdUinstall():
     if not app_debug:
-        if public.isAppleSystem():
+        if mw.isAppleSystem():
             return "Apple Computer does not support"
 
-    public.execShell('chkconfig --del ' + getPluginName())
+    mw.execShell('chkconfig --del ' + getPluginName())
     initd_bin = getInitDFile()
     os.remove(initd_bin)
     return 'ok'

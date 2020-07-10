@@ -8,10 +8,10 @@ import re
 import sys
 
 sys.path.append(os.getcwd() + "/class/core")
-import public
+import mw
 
 app_debug = False
-if public.isAppleSystem():
+if mw.isAppleSystem():
     app_debug = True
 
 
@@ -20,11 +20,11 @@ def getPluginName():
 
 
 def getPluginDir():
-    return public.getPluginDir() + '/' + getPluginName()
+    return mw.getPluginDir() + '/' + getPluginName()
 
 
 def getServerDir():
-    return public.getServerDir() + '/' + getPluginName()
+    return mw.getServerDir() + '/' + getPluginName()
 
 
 def getInitDFile():
@@ -61,13 +61,13 @@ def getArgs():
 def checkArgs(data, ck=[]):
     for i in range(len(ck)):
         if not ck[i] in data:
-            return (False, public.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-    return (True, public.returnJson(True, 'ok'))
+            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
+    return (True, mw.returnJson(True, 'ok'))
 
 
 def status():
     pn = getPluginName()
-    data = public.execShell(
+    data = mw.execShell(
         "ps -ef|grep " + pn + " |grep -v grep | grep -v python | awk '{print $2}'")
     if data[0] == '':
         return 'stop'
@@ -84,65 +84,65 @@ def initDreplace():
         os.mkdir(initD_path)
 
     user = 'solr'
-    if public.isAppleSystem():
-        user = public.execShell(
+    if mw.isAppleSystem():
+        user = mw.execShell(
             "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
 
     file_bin = initD_path + '/' + getPluginName()
     if not os.path.exists(file_bin):
-        content = public.readFile(file_tpl)
+        content = mw.readFile(file_tpl)
         content = content.replace('{$SERVER_PATH}', service_path)
         content = content.replace('{$RUN_USER}', user)
-        public.writeFile(file_bin, content)
-        public.execShell('chmod +x ' + file_bin)
+        mw.writeFile(file_bin, content)
+        mw.execShell('chmod +x ' + file_bin)
 
     file_py = initD_path + '/' + getPluginName() + '.py'
     if not os.path.exists(file_py):
-        content = public.readFile(getPluginDir() + '/script/full.py')
-        public.writeFile(file_py, content)
-        public.execShell('chmod +x ' + file_py)
+        content = mw.readFile(getPluginDir() + '/script/full.py')
+        mw.writeFile(file_py, content)
+        mw.execShell('chmod +x ' + file_py)
 
     file_incr_py = initD_path + '/' + getPluginName() + '_incr.py'
     if not os.path.exists(file_incr_py):
-        content = public.readFile(getPluginDir() + '/script/incr.py')
-        public.writeFile(file_incr_py, content)
-        public.execShell('chmod +x ' + file_incr_py)
+        content = mw.readFile(getPluginDir() + '/script/incr.py')
+        mw.writeFile(file_incr_py, content)
+        mw.execShell('chmod +x ' + file_incr_py)
 
         # realm.properties
         rp_path = getServerDir() + "/server/etc/realm.properties"
         rp_path_tpl = getPluginDir() + "/tpl/realm.properties"
 
         # if not os.path.exists(rp_path):
-        content = public.readFile(rp_path_tpl)
-        public.writeFile(rp_path, content)
+        content = mw.readFile(rp_path_tpl)
+        mw.writeFile(rp_path, content)
 
         # web.xml
         web_xml = getServerDir() + "/server/solr-webapp/webapp/WEB-INF/web.xml"
         web_xml_tpl = getPluginDir() + "/tpl/web.xml"
-        content = public.readFile(web_xml_tpl)
-        public.writeFile(web_xml, content)
+        content = mw.readFile(web_xml_tpl)
+        mw.writeFile(web_xml, content)
 
         # solr-jetty-context.xml
         solr_jetty_context_xml = getServerDir() + "/server/contexts/solr-jetty-context.xml"
         solr_jetty_context_xml_tpl = getPluginDir() + "/tpl/solr-jetty-context.xml"
-        content = public.readFile(solr_jetty_context_xml_tpl)
-        public.writeFile(solr_jetty_context_xml, content)
+        content = mw.readFile(solr_jetty_context_xml_tpl)
+        mw.writeFile(solr_jetty_context_xml, content)
 
     log_file = getLog()
     if os.path.exists(log_file):
-        public.writeFile(log_file, '')
+        mw.writeFile(log_file, '')
 
-    if not public.isAppleSystem():
-        public.execShell('chown -R solr:solr ' + getServerDir())
+    if not mw.isAppleSystem():
+        mw.execShell('chown -R solr:solr ' + getServerDir())
 
     return file_bin
 
 
 def runShell(shell):
-    if public.isAppleSystem():
-        data = public.execShell(shell)
+    if mw.isAppleSystem():
+        data = mw.execShell(shell)
     else:
-        data = public.execShell('su - solr -c "/bin/bash ' + shell + '"')
+        data = mw.execShell('su - solr -c "/bin/bash ' + shell + '"')
     return data
 
 
@@ -176,7 +176,7 @@ def reload():
     data = runShell(file + ' reload')
 
     solr_log = getServerDir() + "/server/logs/solr.log"
-    public.writeFile(solr_log, "")
+    mw.writeFile(solr_log, "")
 
     if data[1] == '':
         return 'ok'
@@ -196,16 +196,16 @@ def initdInstall():
     source_bin = initDreplace()
     initd_bin = getInitDFile()
     shutil.copyfile(source_bin, initd_bin)
-    public.execShell('chmod +x ' + initd_bin)
+    mw.execShell('chmod +x ' + initd_bin)
 
     if not app_debug:
-        public.execShell('chkconfig --add ' + getPluginName())
+        mw.execShell('chkconfig --add ' + getPluginName())
     return 'ok'
 
 
 def initdUinstall():
     if not app_debug:
-        public.execShell('chkconfig --del ' + getPluginName())
+        mw.execShell('chkconfig --del ' + getPluginName())
 
     initd_bin = getInitDFile()
 
@@ -230,17 +230,17 @@ def collectionList():
         tmp['name'] = dirname
         dlist.append(tmp)
     data['list'] = dlist
-    data['ip'] = public.getLocalIp()
+    data['ip'] = mw.getLocalIp()
     data['port'] = '8983'
 
-    content = public.readFile(path + '/solr.xml')
+    content = mw.readFile(path + '/solr.xml')
 
     rep = "jetty.port:(.*)\}</int>"
     tmp = re.search(rep, content)
     port = tmp.groups()[0]
     data['port'] = port
 
-    return public.returnJson(True, 'OK', data)
+    return mw.returnJson(True, 'OK', data)
 
 
 def addCollection():
@@ -254,24 +254,24 @@ def addCollection():
 
     retdata = runShell(solr_bin + ' create -c ' + name)
     if retdata[1] != "":
-        return public.returnJson(False, '添加失败!:' + retdata[1])
+        return mw.returnJson(False, '添加失败!:' + retdata[1])
 
     sc_path = getServerDir() + "/server/solr/" + name + "/conf/solrconfig.xml"
     sc_path_tpl = getPluginDir() + "/tpl/solrconfig.xml"
-    content = public.readFile(sc_path_tpl)
-    public.writeFile(sc_path, content)
+    content = mw.readFile(sc_path_tpl)
+    mw.writeFile(sc_path, content)
 
     sd_path = getServerDir() + "/server/solr/" + name + "/conf/db-data-config.xml"
     sd_path_tpl = getPluginDir() + "/tpl/db-data-config.xml"
-    content = public.readFile(sd_path_tpl)
-    public.writeFile(sd_path, content)
+    content = mw.readFile(sd_path_tpl)
+    mw.writeFile(sd_path, content)
 
     sd_path = getServerDir() + "/server/solr/" + name + "/conf/managed-schema"
     sd_path_tpl = getPluginDir() + "/tpl/managed-schema"
-    content = public.readFile(sd_path_tpl)
-    public.writeFile(sd_path, content)
+    content = mw.readFile(sd_path_tpl)
+    mw.writeFile(sd_path, content)
 
-    return public.returnJson(True, '添加成功!:' + retdata[0])
+    return mw.returnJson(True, '添加成功!:' + retdata[0])
 
 
 def removeCollection():
@@ -285,8 +285,8 @@ def removeCollection():
 
     retdata = runShell(solr_bin + ' delete -c ' + name)
     if retdata[1] != "":
-        return public.returnJson(False, '删除失败!:' + retdata[1])
-    return public.returnJson(True, '删除成功!:' + retdata[0])
+        return mw.returnJson(False, '删除失败!:' + retdata[1])
+    return mw.returnJson(True, '删除成功!:' + retdata[0])
 
 
 def confFileCollection():
@@ -298,7 +298,7 @@ def confFileCollection():
     conf_file = getServerDir() + "/server/solr/" + \
         args['name'] + "/conf/" + args['conf_file']
     # print conf_file
-    return public.returnJson(True, 'OK', {'path': conf_file})
+    return mw.returnJson(True, 'OK', {'path': conf_file})
 
 
 def scriptFull():

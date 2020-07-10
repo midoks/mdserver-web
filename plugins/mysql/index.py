@@ -12,11 +12,11 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 sys.path.append(os.getcwd() + "/class/core")
-import public
+import mw
 
 
 app_debug = False
-if public.isAppleSystem():
+if mw.isAppleSystem():
     app_debug = True
 
 
@@ -25,14 +25,14 @@ def getPluginName():
 
 
 def getPluginDir():
-    return public.getPluginDir() + '/' + getPluginName()
+    return mw.getPluginDir() + '/' + getPluginName()
 
 sys.path.append(getPluginDir() + "/class")
 import mysql
 
 
 def getServerDir():
-    return public.getServerDir() + '/' + getPluginName()
+    return mw.getServerDir() + '/' + getPluginName()
 
 
 def getInitDFile():
@@ -61,8 +61,8 @@ def getArgs():
 def checkArgs(data, ck=[]):
     for i in range(len(ck)):
         if not ck[i] in data:
-            return (False, public.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-    return (True, public.returnJson(True, 'ok'))
+            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
+    return (True, mw.returnJson(True, 'ok'))
 
 
 def getConf():
@@ -76,8 +76,8 @@ def getInitdTpl():
 
 
 def contentReplace(content):
-    service_path = public.getServerDir()
-    content = content.replace('{$ROOT_PATH}', public.getRootDir())
+    service_path = mw.getServerDir()
+    content = content.replace('{$ROOT_PATH}', mw.getRootDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$SERVER_APP_PATH}', service_path + '/mysql')
     return content
@@ -87,13 +87,13 @@ def pSqliteDb(dbname='databases'):
     file = getServerDir() + '/mysql.db'
     name = 'mysql'
     if not os.path.exists(file):
-        conn = public.M(dbname).dbPos(getServerDir(), name)
-        csql = public.readFile(getPluginDir() + '/conf/mysql.sql')
+        conn = mw.M(dbname).dbPos(getServerDir(), name)
+        csql = mw.readFile(getPluginDir() + '/conf/mysql.sql')
         csql_list = csql.split(';')
         for index in range(len(csql_list)):
             conn.execute(csql_list[index], ())
     else:
-        conn = public.M(dbname).dbPos(getServerDir(), name)
+        conn = mw.M(dbname).dbPos(getServerDir(), name)
     return conn
 
 
@@ -114,10 +114,10 @@ def initDreplace():
 
     file_bin = initD_path + '/' + getPluginName()
     if not os.path.exists(file_bin):
-        content = public.readFile(initd_tpl)
+        content = mw.readFile(initd_tpl)
         content = contentReplace(content)
-        public.writeFile(file_bin, content)
-        public.execShell('chmod +x ' + file_bin)
+        mw.writeFile(file_bin, content)
+        mw.execShell('chmod +x ' + file_bin)
 
     mysql_conf_dir = getServerDir() + '/etc'
     if not os.path.exists(mysql_conf_dir):
@@ -126,15 +126,15 @@ def initDreplace():
     mysql_conf = mysql_conf_dir + '/my.cnf'
     if not os.path.exists(mysql_conf):
         mysql_conf_tpl = getPluginDir() + '/conf/my.cnf'
-        content = public.readFile(mysql_conf_tpl)
+        content = mw.readFile(mysql_conf_tpl)
         content = contentReplace(content)
-        public.writeFile(mysql_conf, content)
+        mw.writeFile(mysql_conf, content)
 
     return file_bin
 
 
 def status():
-    data = public.execShell(
+    data = mw.execShell(
         "ps -ef|grep mysqld |grep -v grep | grep -v python | awk '{print $2}'")
     if data[0] == '':
         return 'stop'
@@ -143,7 +143,7 @@ def status():
 
 def getDataDir():
     file = getConf()
-    content = public.readFile(file)
+    content = mw.readFile(file)
     rep = 'datadir\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
@@ -152,14 +152,14 @@ def getDataDir():
 def binLog():
     args = getArgs()
     conf = getConf()
-    con = public.readFile(conf)
+    con = mw.readFile(conf)
 
     if con.find('#log-bin=mysql-bin') != -1:
         if args.has_key('status'):
-            return public.returnJson(False, '0')
+            return mw.returnJson(False, '0')
         con = con.replace('#log-bin=mysql-bin', 'log-bin=mysql-bin')
         con = con.replace('#binlog_format=mixed', 'binlog_format=mixed')
-        public.execShell('sync')
+        mw.execShell('sync')
         restart()
     else:
         path = getDataDir()
@@ -170,15 +170,15 @@ def binLog():
                     continue
                 if n[0:9] == 'mysql-bin':
                     dsize += os.path.getsize(path + '/' + n)
-            return public.returnJson(True, dsize)
+            return mw.returnJson(True, dsize)
         con = con.replace('log-bin=mysql-bin', '#log-bin=mysql-bin')
         con = con.replace('binlog_format=mixed', '#binlog_format=mixed')
-        public.execShell('sync')
+        mw.execShell('sync')
         restart()
-        public.execShell('rm -f ' + path + '/mysql-bin.*')
+        mw.execShell('rm -f ' + path + '/mysql-bin.*')
 
-    public.writeFile(conf, con)
-    return public.returnJson(True, '设置成功!')
+    mw.writeFile(conf, con)
+    return mw.returnJson(True, '设置成功!')
 
 
 def getErrorLog():
@@ -193,25 +193,25 @@ def getErrorLog():
             break
     print filename
     if not os.path.exists(filename):
-        return public.returnJson(False, '指定文件不存在!')
+        return mw.returnJson(False, '指定文件不存在!')
     if args.has_key('close'):
-        public.writeFile(filename, '')
-        return public.returnJson(False, '日志已清空')
-    info = public.getNumLines(filename, 1000)
-    return public.returnJson(True, 'OK', info)
+        mw.writeFile(filename, '')
+        return mw.returnJson(False, '日志已清空')
+    info = mw.getNumLines(filename, 1000)
+    return mw.returnJson(True, 'OK', info)
 
 
 def getShowLogFile():
     file = getConf()
-    content = public.readFile(file)
+    content = mw.readFile(file)
     rep = 'slow-query-log-file\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
 
 def pGetDbUser():
-    if public.isAppleSystem():
-        user = public.execShell(
+    if mw.isAppleSystem():
+        user = mw.execShell(
             "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
         return user
     return 'mysql'
@@ -224,7 +224,7 @@ def initMysqlData():
         user = pGetDbUser()
         cmd = 'cd ' + serverdir + ' && ./scripts/mysql_install_db --user=' + \
             user + ' --basedir=' + serverdir + ' --ldata=' + datadir
-        public.execShell(cmd)
+        mw.execShell(cmd)
         return 0
     return 1
 
@@ -234,10 +234,10 @@ def initMysqlPwd():
 
     serverdir = getServerDir()
 
-    pwd = public.getRandomString(16)
+    pwd = mw.getRandomString(16)
     cmd_pass = serverdir + '/bin/mysqladmin -uroot password ' + pwd
     pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
-    public.execShell(cmd_pass)
+    mw.execShell(cmd_pass)
     return True
 
 
@@ -274,7 +274,7 @@ def reload():
 
 def initdStatus():
     if not app_debug:
-        if public.isAppleSystem():
+        if mw.isAppleSystem():
             return "Apple Computer does not support"
 
     initd_bin = getInitDFile()
@@ -286,22 +286,22 @@ def initdStatus():
 def initdInstall():
     import shutil
     if not app_debug:
-        if public.isAppleSystem():
+        if mw.isAppleSystem():
             return "Apple Computer does not support"
 
     mysql_bin = initDreplace()
     initd_bin = getInitDFile()
     shutil.copyfile(mysql_bin, initd_bin)
-    public.execShell('chmod +x ' + initd_bin)
-    public.execShell('chkconfig --add ' + getPluginName())
+    mw.execShell('chmod +x ' + initd_bin)
+    mw.execShell('chkconfig --add ' + getPluginName())
     return 'ok'
 
 
 def initdUinstall():
     if not app_debug:
-        if public.isAppleSystem():
+        if mw.isAppleSystem():
             return "Apple Computer does not support"
-    public.execShell('chkconfig --del ' + getPluginName())
+    mw.execShell('chkconfig --del ' + getPluginName())
     initd_bin = getInitDFile()
     os.remove(initd_bin)
     return 'ok'
@@ -309,7 +309,7 @@ def initdUinstall():
 
 def getMyDbPos():
     file = getConf()
-    content = public.readFile(file)
+    content = mw.readFile(file)
     rep = 'datadir\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
@@ -324,43 +324,43 @@ def setMyDbPos():
     s_datadir = getMyDbPos()
     t_datadir = args['datadir']
     if t_datadir == s_datadir:
-        return public.returnJson(False, '与当前存储目录相同，无法迁移文件!')
+        return mw.returnJson(False, '与当前存储目录相同，无法迁移文件!')
 
     if not os.path.exists(t_datadir):
-        public.execShell('mkdir -p ' + t_datadir)
+        mw.execShell('mkdir -p ' + t_datadir)
 
-    # public.execShell('/etc/init.d/mysqld stop')
+    # mw.execShell('/etc/init.d/mysqld stop')
     stop()
-    public.execShell('cp -rf ' + s_datadir + '/* ' + t_datadir + '/')
-    public.execShell('chown -R mysql.mysql ' + t_datadir)
-    public.execShell('chmod -R 755 ' + t_datadir)
-    public.execShell('rm -f ' + t_datadir + '/*.pid')
-    public.execShell('rm -f ' + t_datadir + '/*.err')
+    mw.execShell('cp -rf ' + s_datadir + '/* ' + t_datadir + '/')
+    mw.execShell('chown -R mysql.mysql ' + t_datadir)
+    mw.execShell('chmod -R 755 ' + t_datadir)
+    mw.execShell('rm -f ' + t_datadir + '/*.pid')
+    mw.execShell('rm -f ' + t_datadir + '/*.err')
 
     path = getServerDir()
     myfile = path + '/etc/my.cnf'
-    mycnf = public.readFile(myfile)
-    public.writeFile(path + '/etc/my_backup.cnf', mycnf)
+    mycnf = mw.readFile(myfile)
+    mw.writeFile(path + '/etc/my_backup.cnf', mycnf)
 
     mycnf = mycnf.replace(s_datadir, t_datadir)
-    public.writeFile(myfile, mycnf)
+    mw.writeFile(myfile, mycnf)
     start()
 
-    result = public.execShell(
+    result = mw.execShell(
         'ps aux|grep mysqld| grep -v grep|grep -v python')
     if len(result[0]) > 10:
-        public.writeFile('data/datadir.pl', t_datadir)
-        return public.returnJson(True, '存储目录迁移成功!')
+        mw.writeFile('data/datadir.pl', t_datadir)
+        return mw.returnJson(True, '存储目录迁移成功!')
     else:
-        public.execShell('pkill -9 mysqld')
-        public.writeFile(myfile, public.readFile(path + '/etc/my_backup.cnf'))
+        mw.execShell('pkill -9 mysqld')
+        mw.writeFile(myfile, mw.readFile(path + '/etc/my_backup.cnf'))
         start()
-        return public.returnJson(False, '文件迁移失败!')
+        return mw.returnJson(False, '文件迁移失败!')
 
 
 def getMyPort():
     file = getConf()
-    content = public.readFile(file)
+    content = mw.readFile(file)
     rep = 'port\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
@@ -374,12 +374,12 @@ def setMyPort():
 
     port = args['port']
     file = getConf()
-    content = public.readFile(file)
+    content = mw.readFile(file)
     rep = "port\s*=\s*([0-9]+)\s*\n"
     content = re.sub(rep, 'port = ' + port + '\n', content)
-    public.writeFile(file, content)
+    mw.writeFile(file, content)
     restart()
-    return public.returnJson(True, '编辑成功!')
+    return mw.returnJson(True, '编辑成功!')
 
 
 def runInfo():
@@ -394,7 +394,7 @@ def runInfo():
         # print data
         if data[0] == 1045 or data[0] == 2003:
             pwd = db.getPwd()
-            return public.returnJson(False, 'mysql password error:' + pwd + '!')
+            return mw.returnJson(False, 'mysql password error:' + pwd + '!')
     except Exception as e:
         pass
 
@@ -411,7 +411,7 @@ def runInfo():
     except:
         result['File'] = 'OFF'
         result['Position'] = 'OFF'
-    return public.getJson(result)
+    return mw.getJson(result)
 
 
 def myDbStatus():
@@ -432,7 +432,7 @@ def myDbStatus():
     if result['mem']['query_cache_type'] != 'ON':
         result[
             'mem']['query_cache_size'] = '0'
-    return public.getJson(result)
+    return mw.getJson(result)
 
 
 def setDbStatus():
@@ -442,7 +442,7 @@ def setDbStatus():
               'thread_cache_size', 'table_open_cache']
     args = getArgs()
     conFile = getConf()
-    content = public.readFile(conFile)
+    content = mw.readFile(conFile)
     n = 0
     for g in gets:
         s = 'M'
@@ -457,25 +457,25 @@ def setDbStatus():
         else:
             content = content.replace('[mysqld]\n', '[mysqld]\n' + c)
         n += 1
-    public.writeFile(conFile, content)
-    return public.returnJson(True, '设置成功!')
+    mw.writeFile(conFile, content)
+    return mw.returnJson(True, '设置成功!')
 
 
 def isSqlError(mysqlMsg):
     # 检测数据库执行错误
     mysqlMsg = str(mysqlMsg)
     if "MySQLdb" in mysqlMsg:
-        return public.returnJson(False, 'MySQLdb组件缺失! <br>进入SSH命令行输入： pip install mysql-python')
+        return mw.returnJson(False, 'MySQLdb组件缺失! <br>进入SSH命令行输入： pip install mysql-python')
     if "2002," in mysqlMsg:
-        return public.returnJson(False, '数据库连接失败,请检查数据库服务是否启动!')
+        return mw.returnJson(False, '数据库连接失败,请检查数据库服务是否启动!')
     if "using password:" in mysqlMsg:
-        return public.returnJson(False, '数据库管理密码错误!')
+        return mw.returnJson(False, '数据库管理密码错误!')
     if "Connection refused" in mysqlMsg:
-        return public.returnJson(False, '数据库连接失败,请检查数据库服务是否启动!')
+        return mw.returnJson(False, '数据库连接失败,请检查数据库服务是否启动!')
     if "1133" in mysqlMsg:
-        return public.returnJson(False, '数据库用户不存在!')
+        return mw.returnJson(False, '数据库用户不存在!')
     if "1007" in mysqlMsg:
-        return public.returnJson(False, '数据库已经存在!')
+        return mw.returnJson(False, '数据库已经存在!')
     return None
 
 
@@ -532,7 +532,7 @@ def getDbList():
     _page['p'] = page
     _page['row'] = page_size
     _page['tojs'] = 'dbList'
-    data['page'] = public.getPage(_page)
+    data['page'] = mw.getPage(_page)
     data['data'] = clist
 
     info = {}
@@ -540,7 +540,7 @@ def getDbList():
         'id=?', (1,)).getField('mysql_root')
     data['info'] = info
 
-    return public.getJson(data)
+    return mw.getJson(data)
 
 
 def syncGetDatabases():
@@ -570,15 +570,15 @@ def syncGetDatabases():
                 host = user[1]
                 break
 
-        ps = public.getMsg('INPUT_PS')
+        ps = mw.getMsg('INPUT_PS')
         if value[0] == 'test':
-            ps = public.getMsg('DATABASE_TEST')
+            ps = mw.getMsg('DATABASE_TEST')
         addTime = time.strftime('%Y-%m-%d %X', time.localtime())
         if psdb.add('name,username,password,accept,ps,addtime', (value[0], value[0], '', host, ps, addTime)):
             n += 1
 
-    msg = public.getInfo('本次共从服务器获取了{1}个数据库!', (str(n),))
-    return public.returnJson(True, msg)
+    msg = mw.getInfo('本次共从服务器获取了{1}个数据库!', (str(n),))
+    return mw.returnJson(True, msg)
 
 
 def toDbBase(find):
@@ -586,7 +586,7 @@ def toDbBase(find):
     psdb = pSqliteDb('databases')
     if len(find['password']) < 3:
         find['username'] = find['name']
-        find['password'] = public.md5(str(time.time()) + find['name'])[0:10]
+        find['password'] = mw.md5(str(time.time()) + find['name'])[0:10]
         psdb.where("id=?", (find['id'],)).save(
             'password,username', (find['password'], find['username']))
 
@@ -632,8 +632,8 @@ def syncToDatabases():
             result = toDbBase(find)
             if result == 1:
                 n += 1
-    msg = public.getInfo('本次共同步了{1}个数据库!', (str(n),))
-    return public.returnJson(True, msg)
+    msg = mw.getInfo('本次共同步了{1}个数据库!', (str(n),))
+    return mw.returnJson(True, msg)
 
 
 def setRootPwd():
@@ -650,7 +650,7 @@ def setRootPwd():
         if isError != None:
             return isError
 
-        m_version = public.readFile(getServerDir() + '/version.pl')
+        m_version = mw.readFile(getServerDir() + '/version.pl')
         if m_version.find('5.7') == 0 or m_version.find('8.0') == 0:
             pdb.execute(
                 "UPDATE mysql.user SET authentication_string='' WHERE user='root'")
@@ -663,9 +663,9 @@ def setRootPwd():
                 "update mysql.user set Password=password('" + password + "') where User='root'")
         pdb.execute("flush privileges")
         pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (password,))
-        return public.returnJson(True, '数据库root密码修改成功!')
+        return mw.returnJson(True, '数据库root密码修改成功!')
     except Exception as ex:
-        return public.returnJson(False, '修改错误:' + str(ex))
+        return mw.returnJson(False, '修改错误:' + str(ex))
 
 
 def setUserPwd():
@@ -682,7 +682,7 @@ def setUserPwd():
         psdb = pSqliteDb('databases')
         name = psdb.where('id=?', (id,)).getField('name')
 
-        m_version = public.readFile(getServerDir() + '/version.pl')
+        m_version = mw.readFile(getServerDir() + '/version.pl')
         if m_version.find('5.7') == 0 or m_version.find('8.0') == 0:
             tmp = pdb.query(
                 "select Host from mysql.user where User='" + name + "' AND Host!='localhost'")
@@ -702,10 +702,10 @@ def setUserPwd():
             return isError
         pdb.execute("flush privileges")
         psdb.where("id=?", (id,)).setField('password', newpassword)
-        return public.returnJson(True, public.getInfo('修改数据库[{1}]密码成功!', (name,)))
+        return mw.returnJson(True, mw.getInfo('修改数据库[{1}]密码成功!', (name,)))
     except Exception as ex:
         # print str(ex)
-        return public.returnJson(False, public.getInfo('修改数据库[{1}]密码失败!', (name,)))
+        return mw.returnJson(False, mw.getInfo('修改数据库[{1}]密码失败!', (name,)))
 
 
 def setDbPs():
@@ -720,9 +720,9 @@ def setDbPs():
     try:
         psdb = pSqliteDb('databases')
         psdb.where("id=?", (sid,)).setField('ps', ps)
-        return public.returnJson(True, public.getInfo('修改数据库[{1}]备注成功!', (name,)))
+        return mw.returnJson(True, mw.getInfo('修改数据库[{1}]备注成功!', (name,)))
     except Exception as e:
-        return public.returnJson(True, public.getInfo('修改数据库[{1}]备注失败!', (name,)))
+        return mw.returnJson(True, mw.getInfo('修改数据库[{1}]备注失败!', (name,)))
 
 
 def addDb():
@@ -746,15 +746,15 @@ def addDb():
 
     reg = "^[\w\.-]+$"
     if not re.match(reg, args['name']):
-        return public.returnJson(False, '数据库名称不能带有特殊符号!')
+        return mw.returnJson(False, '数据库名称不能带有特殊符号!')
     checks = ['root', 'mysql', 'test', 'sys', 'panel_logs']
     if dbuser in checks or len(dbuser) < 1:
-        return public.returnJson(False, '数据库用户名不合法!')
+        return mw.returnJson(False, '数据库用户名不合法!')
     if dbname in checks or len(dbname) < 1:
-        return public.returnJson(False, '数据库名称不合法!')
+        return mw.returnJson(False, '数据库名称不合法!')
 
     if len(password) < 1:
-        password = public.md5(time.time())[0:8]
+        password = mw.md5(time.time())[0:8]
 
     wheres = {
         'utf8':   'utf8_general_ci',
@@ -768,7 +768,7 @@ def addDb():
     psdb = pSqliteDb('databases')
 
     if psdb.where("name=? or username=?", (dbname, dbuser)).count():
-        return public.returnJson(False, '数据库已存在!')
+        return mw.returnJson(False, '数据库已存在!')
 
     result = pdb.execute("create database `" + dbname +
                          "` DEFAULT CHARACTER SET " + codeing + " COLLATE " + codeStr)
@@ -786,7 +786,7 @@ def addDb():
     addTime = time.strftime('%Y-%m-%d %X', time.localtime())
     psdb.add('pid,name,username,password,accept,ps,addtime',
              (0, dbname, dbuser, password, address, ps, addTime))
-    return public.returnJson(True, '添加成功!')
+    return mw.returnJson(True, '添加成功!')
 
 
 def delDb():
@@ -819,9 +819,9 @@ def delDb():
 
         # 删除SQLITE
         psdb.where("id=?", (id,)).delete()
-        return public.returnJson(True, '删除成功!')
+        return mw.returnJson(True, '删除成功!')
     except Exception as ex:
-        return public.returnJson(False, '删除失败!' + str(ex))
+        return mw.returnJson(False, '删除失败!' + str(ex))
 
 
 def getDbAccess():
@@ -840,12 +840,12 @@ def getDbAccess():
 
     users = mapToList(users)
     if len(users) < 1:
-        return public.returnJson(True, "127.0.0.1")
+        return mw.returnJson(True, "127.0.0.1")
     accs = []
     for c in users:
         accs.append(c[0])
     userStr = ','.join(accs)
-    return public.returnJson(True, userStr)
+    return mw.returnJson(True, userStr)
 
 
 def toSize(size):
@@ -881,7 +881,7 @@ def setDbAccess():
     __createUser(dbname, name, password, access)
 
     psdb.where('username=?', (name,)).save('accept', (access,))
-    return public.returnJson(True, '设置成功!')
+    return mw.returnJson(True, '设置成功!')
 
 
 def getDbInfo():
@@ -910,7 +910,7 @@ def getDbInfo():
 
         if not data:
             data = 0
-        ret['data_size'] = public.toSize(data)
+        ret['data_size'] = mw.toSize(data)
         # print ret
         ret['database'] = db_name
 
@@ -918,7 +918,7 @@ def getDbInfo():
 
         for i in tables:
             if i == 1049:
-                return public.returnJson(False, '指定数据库不存在!')
+                return mw.returnJson(False, '指定数据库不存在!')
             table = mapToList(
                 pdb.query("show table status from `%s` where name = '%s'" % (db_name, i[0])))
             if not table:
@@ -930,14 +930,14 @@ def getDbInfo():
                 ret2['collation'] = table[0][14]
                 data_size = table[0][6] + table[0][8]
                 ret2['data_byte'] = data_size
-                ret2['data_size'] = public.toSize(data_size)
+                ret2['data_size'] = mw.toSize(data_size)
                 ret2['table_name'] = i[0]
                 ret3.append(ret2)
             except:
                 continue
         ret['tables'] = (ret3)
 
-    return public.getJson(ret)
+    return mw.getJson(ret)
 
 
 def repairTable():
@@ -960,8 +960,8 @@ def repairTable():
             if len(ret) > 0:
                 for i in ret:
                     pdb.execute('REPAIR TABLE `%s`.`%s`' % (db_name, i))
-                return public.returnJson(True, "修复完成!")
-    return public.returnJson(False, "修复失败!")
+                return mw.returnJson(True, "修复完成!")
+    return mw.returnJson(False, "修复失败!")
 
 
 def optTable():
@@ -984,8 +984,8 @@ def optTable():
             if len(ret) > 0:
                 for i in ret:
                     pdb.execute('OPTIMIZE TABLE `%s`.`%s`' % (db_name, i))
-                return public.returnJson(True, "优化成功!")
-    return public.returnJson(False, "优化失败或者已经优化过了!")
+                return mw.returnJson(True, "优化成功!")
+    return mw.returnJson(False, "优化失败或者已经优化过了!")
 
 
 def alterTable():
@@ -1010,8 +1010,8 @@ def alterTable():
                 for i in ret:
                     pdb.execute('alter table `%s`.`%s` ENGINE=`%s`' %
                                 (db_name, i, table_type))
-                return public.returnJson(True, "更改成功!")
-    return public.returnJson(False, "更改失败!")
+                return mw.returnJson(True, "更改成功!")
+    return mw.returnJson(False, "更改失败!")
 
 
 def getTotalStatistics():
@@ -1020,12 +1020,12 @@ def getTotalStatistics():
     if st == 'start':
         data['status'] = True
         data['count'] = pSqliteDb('databases').count()
-        data['ver'] = public.readFile(getServerDir() + '/version.pl').strip()
-        return public.returnJson(True, 'ok', data)
+        data['ver'] = mw.readFile(getServerDir() + '/version.pl').strip()
+        return mw.returnJson(True, 'ok', data)
     else:
         data['status'] = False
         data['count'] = 0
-        return public.returnJson(False, 'fail', data)
+        return mw.returnJson(False, 'fail', data)
 
 
 if __name__ == "__main__":

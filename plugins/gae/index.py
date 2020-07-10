@@ -8,7 +8,7 @@ import re
 import sys
 
 sys.path.append(os.getcwd() + "/class/core")
-import public
+import mw
 
 
 def getPluginName():
@@ -16,11 +16,11 @@ def getPluginName():
 
 
 def getPluginDir():
-    return public.getPluginDir() + '/' + getPluginName()
+    return mw.getPluginDir() + '/' + getPluginName()
 
 
 def getServerDir():
-    return public.getServerDir() + '/' + getPluginName()
+    return mw.getServerDir() + '/' + getPluginName()
 
 
 def getInitDFile():
@@ -51,7 +51,7 @@ def status():
 
 
 def getAllProjectList(search):
-    path = public.getWwwDir()
+    path = mw.getWwwDir()
     dlist = []
     if os.path.exists(path):
         for filename in os.listdir(path):
@@ -92,7 +92,7 @@ def projectListEdit():
 
     file = getServerDir() + '/' + args['name'] + '.json'
     if not os.path.exists(file):
-        public.execShell('touch ' + file)
+        mw.execShell('touch ' + file)
     return file
 
 
@@ -103,17 +103,17 @@ def projectListDel():
 
     file = getServerDir() + '/' + args['name'] + '.json'
     if os.path.exists(file):
-        content = public.readFile(file)
+        content = mw.readFile(file)
         contentObj = json.loads(content)
         asyncUser = contentObj['client_email']
         cmd = getServerDir() + '/google-cloud-sdk/bin/'
-        public.execShell(cmd + 'gcloud auth revoke ' + asyncUser)
-        public.execShell('rm -rf ' + file)
+        mw.execShell(cmd + 'gcloud auth revoke ' + asyncUser)
+        mw.execShell('rm -rf ' + file)
     return 'ok'
 
 
 def checkUserExist(cmd, user):
-    data = public.execShell(cmd + 'gcloud auth list | grep ' + user)
+    data = mw.execShell(cmd + 'gcloud auth list | grep ' + user)
     if data[0] == '':
         return False
     return True
@@ -129,14 +129,14 @@ def projectListAsync():
     if not os.path.exists(file):
         return 'not configured file!'
 
-    content = public.readFile(file)
+    content = mw.readFile(file)
     contentObj = json.loads(content)
     asyncUser = contentObj['client_email']
     cmd = getServerDir() + '/google-cloud-sdk/bin/'
-    projectDir = public.getWwwDir() + '/' + args['name']
+    projectDir = mw.getWwwDir() + '/' + args['name']
 
     if not checkUserExist(cmd, asyncUser):
-        public.execShell(
+        mw.execShell(
             cmd + 'gcloud auth activate-service-account --key-file ' + file)
 
     pName = contentObj['project_id']
@@ -147,7 +147,7 @@ def projectListAsync():
 
     taskAdd = (None,  'gae[async]',
                'execshell', '0', time.strftime('%Y-%m-%d %H:%M:%S'), asyncCmd)
-    public.M('tasks').add('id,name,type,status,addtime, execstr', taskAdd)
+    mw.M('tasks').add('id,name,type,status,addtime, execstr', taskAdd)
     return 'ok'
 
 
@@ -160,12 +160,12 @@ def projectListCmd():
     if not os.path.exists(file):
         return 'not configured file!'
 
-    content = public.readFile(file)
+    content = mw.readFile(file)
     contentObj = json.loads(content)
     asyncUser = contentObj['client_email']
     cmd = getServerDir() + '/google-cloud-sdk/bin/'
     pName = contentObj['project_id']
-    projectDir = public.getWwwDir() + '/' + args['name']
+    projectDir = mw.getWwwDir() + '/' + args['name']
 
     setUserCmd = 'sudo ' + cmd + 'gcloud config set account ' + asyncUser
     setUserCmd += ' && sudo ' + cmd + 'gcloud config set project ' + pName
@@ -183,7 +183,7 @@ def projectListUrl():
     if not os.path.exists(file):
         return 'not configured file!'
 
-    content = public.readFile(file)
+    content = mw.readFile(file)
     contentObj = json.loads(content)
     asyncUser = contentObj['client_email']
     plist = asyncUser.split('@')
@@ -216,9 +216,9 @@ def projectList():
 
     data = {}
     data['data'] = ret_data
-    data['list'] = public.getPage(
+    data['list'] = mw.getPage(
         {'count': dlist_sum, 'p': page, 'row': 10, 'tojs': 'projectList'})
-    return public.getJson(data)
+    return mw.getJson(data)
 
 if __name__ == "__main__":
     func = sys.argv[1]

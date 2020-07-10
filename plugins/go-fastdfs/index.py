@@ -10,10 +10,10 @@ import subprocess
 import threading
 
 sys.path.append(os.getcwd() + "/class/core")
-import public
+import mw
 
 app_debug = False
-if public.isAppleSystem():
+if mw.isAppleSystem():
     app_debug = True
 
 
@@ -22,11 +22,11 @@ def getPluginName():
 
 
 def getPluginDir():
-    return public.getPluginDir() + '/' + getPluginName()
+    return mw.getPluginDir() + '/' + getPluginName()
 
 
 def getServerDir():
-    return public.getServerDir() + '/' + getPluginName()
+    return mw.getServerDir() + '/' + getPluginName()
 
 
 def getInitDFile():
@@ -67,13 +67,13 @@ def getArgs():
 def checkArgs(data, ck=[]):
     for i in range(len(ck)):
         if not ck[i] in data:
-            return (False, public.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-    return (True, public.returnJson(True, 'ok'))
+            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
+    return (True, mw.returnJson(True, 'ok'))
 
 
 def status():
     pn = getPluginName()
-    data = public.execShell(
+    data = mw.execShell(
         "ps -ef|grep " + pn + " |grep -v grep |grep -v .jar | grep -v python | awk '{print $2}'")
     if data[0] == '':
         return 'stop'
@@ -91,17 +91,17 @@ def initDreplace():
 
     file_bin = initD_path + '/' + getPluginName()
     if not os.path.exists(file_bin):
-        content = public.readFile(file_tpl)
+        content = mw.readFile(file_tpl)
         content = content.replace('{$SERVER_PATH}', service_path)
-        public.writeFile(file_bin, content)
-        public.execShell('chmod +x ' + file_bin)
+        mw.writeFile(file_bin, content)
+        mw.execShell('chmod +x ' + file_bin)
 
     return file_bin
 
 
 def start():
     file = initDreplace()
-    data = public.execShell(file + ' start')
+    data = mw.execShell(file + ' start')
     if data[1] == '':
         return 'ok'
     return 'fail'
@@ -109,7 +109,7 @@ def start():
 
 def stop():
     file = initDreplace()
-    data = public.execShell(file + ' stop')
+    data = mw.execShell(file + ' stop')
     if data[1] == '':
         return 'ok'
     return 'fail'
@@ -117,7 +117,7 @@ def stop():
 
 def restart():
     file = initDreplace()
-    data = public.execShell(file + ' restart')
+    data = mw.execShell(file + ' restart')
     if data[1] == '':
         return 'ok'
     return 'fail'
@@ -125,7 +125,7 @@ def restart():
 
 def reload():
     file = initDreplace()
-    data = public.execShell(file + ' reload')
+    data = mw.execShell(file + ' reload')
     if data[1] == '':
         return 'ok'
     return 'fail'
@@ -144,16 +144,16 @@ def initdInstall():
     source_bin = initDreplace()
     initd_bin = getInitDFile()
     shutil.copyfile(source_bin, initd_bin)
-    public.execShell('chmod +x ' + initd_bin)
+    mw.execShell('chmod +x ' + initd_bin)
 
     if not app_debug:
-        public.execShell('chkconfig --add ' + getPluginName())
+        mw.execShell('chkconfig --add ' + getPluginName())
     return 'ok'
 
 
 def initdUinstall():
     if not app_debug:
-        public.execShell('chkconfig --del ' + getPluginName())
+        mw.execShell('chkconfig --del ' + getPluginName())
 
     initd_bin = getInitDFile()
 
@@ -182,7 +182,7 @@ def gfConfSet():
         {'name': 'enable_cross_origin', 'type': 0, 'ps': '是否开启跨站访问'},
         {'name': 'enable_tus', 'type': 0, 'ps': '是否开启断点续传'}
     ]
-    file = public.readFile(gfConf())
+    file = mw.readFile(gfConf())
     data = json.loads(file)
 
     result = []
@@ -191,7 +191,7 @@ def gfConfSet():
             g['value'] = data[g['name']]
             result.append(g)
 
-    return public.getJson(result)
+    return mw.getJson(result)
 
 
 if __name__ == "__main__":

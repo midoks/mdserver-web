@@ -4,7 +4,7 @@ import psutil
 import time
 import os
 import sys
-import public
+import mw
 import re
 import json
 import pwd
@@ -19,7 +19,7 @@ class task_api:
         pass
 
     def countApi(self):
-        c = public.M('tasks').where("status!=?", ('1',)).count()
+        c = mw.M('tasks').where("status!=?", ('1',)).count()
         return str(c)
 
     def listApi(self):
@@ -31,36 +31,36 @@ class task_api:
         start = (int(p) - 1) * int(limit)
         limit_str = str(start) + ',' + str(limit)
 
-        _list = public.M('tasks').where('', ()).field(
+        _list = mw.M('tasks').where('', ()).field(
             'id,name,type,status,addtime,start,end').limit(limit_str).order('id desc').select()
         _ret = {}
         _ret['data'] = _list
 
-        count = public.M('tasks').where('', ()).count()
+        count = mw.M('tasks').where('', ()).count()
         _page = {}
         _page['count'] = count
         _page['tojs'] = 'remind'
         _page['p'] = p
 
-        _ret['page'] = public.getPage(_page)
-        return public.getJson(_ret)
+        _ret['page'] = mw.getPage(_page)
+        return mw.getJson(_ret)
 
     def getExecLogApi(self):
         file = os.getcwd() + "/tmp/panelExec.log"
-        v = public.getLastLine(file, 100)
+        v = mw.getLastLine(file, 100)
         return v
 
     def getTaskSpeedApi(self):
         tempFile = os.getcwd() + '/tmp/panelExec.log'
         freshFile = os.getcwd() + '/tmp/panelFresh'
 
-        find = public.M('tasks').where('status=? OR status=?',
-                                       ('-1', '0')).field('id,type,name,execstr').find()
+        find = mw.M('tasks').where('status=? OR status=?',
+                                   ('-1', '0')).field('id,type,name,execstr').find()
         if not len(find):
-            return public.returnJson(False, '当前没有任务队列在执行-2!')
+            return mw.returnJson(False, '当前没有任务队列在执行-2!')
 
         isTask = os.getcwd() + '/tmp/panelTask.pl'
-        public.writeFile(isTask, 'True')
+        mw.writeFile(isTask, 'True')
 
         echoMsg = {}
         echoMsg['name'] = find['name']
@@ -68,19 +68,19 @@ class task_api:
         if find['type'] == 'download':
             import json
             try:
-                tmp = public.readFile(tempFile)
+                tmp = mw.readFile(tempFile)
                 if len(tmp) < 10:
-                    return public.returnJson(False, '当前没有任务队列在执行-3!')
+                    return mw.returnJson(False, '当前没有任务队列在执行-3!')
                 echoMsg['msg'] = json.loads(tmp)
                 echoMsg['isDownload'] = True
             except:
-                public.M('tasks').where(
+                mw.M('tasks').where(
                     "id=?", (find['id'],)).save('status', ('0',))
-                return public.returnJson(False, '当前没有任务队列在执行-4!')
+                return mw.returnJson(False, '当前没有任务队列在执行-4!')
         else:
-            echoMsg['msg'] = public.getLastLine(tempFile, 10)
+            echoMsg['msg'] = mw.getLastLine(tempFile, 10)
             echoMsg['isDownload'] = False
 
-        echoMsg['task'] = public.M('tasks').where("status!=?", ('1',)).field(
+        echoMsg['task'] = mw.M('tasks').where("status!=?", ('1',)).field(
             'id,status,name,type').order("id asc").select()
-        return public.getJson(echoMsg)
+        return mw.getJson(echoMsg)

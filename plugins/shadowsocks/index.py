@@ -7,10 +7,10 @@ import time
 import shutil
 
 sys.path.append(os.getcwd() + "/class/core")
-import public
+import mw
 
 app_debug = False
-if public.isAppleSystem():
+if mw.isAppleSystem():
     app_debug = True
 
 
@@ -19,11 +19,11 @@ def getPluginName():
 
 
 def getPluginDir():
-    return public.getPluginDir() + '/' + getPluginName()
+    return mw.getPluginDir() + '/' + getPluginName()
 
 
 def getServerDir():
-    return public.getServerDir() + '/' + getPluginName()
+    return mw.getServerDir() + '/' + getPluginName()
 
 
 def getArgs():
@@ -46,13 +46,13 @@ def getArgs():
 def checkArgs(data, ck=[]):
     for i in range(len(ck)):
         if not ck[i] in data:
-            return (False, public.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-    return (True, public.returnJson(True, 'ok'))
+            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
+    return (True, mw.returnJson(True, 'ok'))
 
 
 def status():
     cmd = "ps -ef|grep ssserver |grep -v grep | awk '{print $2}'"
-    data = public.execShell(cmd)
+    data = mw.execShell(cmd)
     if data[0] == '':
         return 'stop'
     return 'start'
@@ -62,7 +62,7 @@ def start():
     path = getPathFile()
     shell_cmd = 'ssserver -c ' + path + ' -d start'
 
-    data = public.execShell(shell_cmd)
+    data = mw.execShell(shell_cmd)
 
     if data[0] == '':
         return 'ok'
@@ -73,7 +73,7 @@ def stop():
     path = getPathFile()
     shell_cmd = 'ssserver -c ' + path + ' -d stop'
 
-    data = public.execShell(shell_cmd)
+    data = mw.execShell(shell_cmd)
     if data[0] == '':
         return 'ok'
     return data[1]
@@ -82,7 +82,7 @@ def stop():
 def restart():
     path = getPathFile()
     shell_cmd = 'ssserver -c ' + path + ' -d restart'
-    data = public.execShell(shell_cmd)
+    data = mw.execShell(shell_cmd)
     if data[0] == '':
         return 'ok'
     return data[1]
@@ -91,7 +91,7 @@ def restart():
 def reload():
     path = getPathFile()
     shell_cmd = 'ssserver -c ' + path + ' -d restart'
-    data = public.execShell(shell_cmd)
+    data = mw.execShell(shell_cmd)
     if data[0] == '':
         return 'ok'
     return data[1]
@@ -117,10 +117,10 @@ def initDreplace():
     file_bin = initD_path + '/' + getPluginName()
 
     # initd replace
-    content = public.readFile(file_tpl)
+    content = mw.readFile(file_tpl)
     content = content.replace('{$SERVER_PATH}', service_path)
-    public.writeFile(file_bin, content)
-    public.execShell('chmod +x ' + file_bin)
+    mw.writeFile(file_bin, content)
+    mw.execShell('chmod +x ' + file_bin)
 
     return file_bin
 
@@ -133,7 +133,7 @@ def getInitDFile():
 
 def initdStatus():
     if not app_debug:
-        if public.isAppleSystem():
+        if mw.isAppleSystem():
             return "Apple Computer does not support"
     initd_bin = getInitDFile()
     if os.path.exists(initd_bin):
@@ -144,23 +144,23 @@ def initdStatus():
 def initdInstall():
     import shutil
     if not app_debug:
-        if public.isAppleSystem():
+        if mw.isAppleSystem():
             return "Apple Computer does not support"
 
     source_bin = initDreplace()
     initd_bin = getInitDFile()
     shutil.copyfile(source_bin, initd_bin)
-    public.execShell('chmod +x ' + initd_bin)
-    public.execShell('chkconfig --add ' + getPluginName())
+    mw.execShell('chmod +x ' + initd_bin)
+    mw.execShell('chkconfig --add ' + getPluginName())
     return 'ok'
 
 
 def initdUinstall():
     if not app_debug:
-        if public.isAppleSystem():
+        if mw.isAppleSystem():
             return "Apple Computer does not support"
 
-    public.execShell('chkconfig --del ' + getPluginName())
+    mw.execShell('chkconfig --del ' + getPluginName())
     initd_bin = getInitDFile()
     os.remove(initd_bin)
     return 'ok'

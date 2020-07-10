@@ -17,7 +17,7 @@ sys.path.append(os.getcwd() + "/class/core")
 reload(sys)
 sys.setdefaultencoding('utf-8')
 import db
-import public
+import mw
 
 
 global pre, timeoutCount, logPath, isTask, oldEdate, isCheck
@@ -49,8 +49,8 @@ def async(f):
 @async
 def restartMw():
     time.sleep(1)
-    cmd = public.getRunDir() + '/scripts/init.d/mw restart'
-    public.execShell(cmd)
+    cmd = mw.getRunDir() + '/scripts/init.d/mw restart'
+    mw.execShell(cmd)
 
 
 class MyBad():
@@ -171,13 +171,13 @@ def mainSafe():
             isCheck += 1
             return True
         isCheck = 0
-        isStart = public.execShell(
+        isStart = mw.execShell(
             "ps aux |grep 'python main.py'|grep -v grep|awk '{print $2}'")[0]
         if not isStart:
             os.system('/etc/init.d/bt start')
-            isStart = public.execShell(
+            isStart = mw.execShell(
                 "ps aux |grep 'python main.py'|grep -v grep|awk '{print $2}'")[0]
-            public.writeLog('守护程序', '面板服务程序启动成功 -> PID: ' + isStart)
+            mw.writeLog('守护程序', '面板服务程序启动成功 -> PID: ' + isStart)
     except:
         time.sleep(30)
         mainSafe()
@@ -188,14 +188,14 @@ def siteEdate():
     global oldEdate
     try:
         if not oldEdate:
-            oldEdate = public.readFile('data/edate.pl')
+            oldEdate = mw.readFile('data/edate.pl')
         if not oldEdate:
             oldEdate = '0000-00-00'
         mEdate = time.strftime('%Y-%m-%d', time.localtime())
         if oldEdate == mEdate:
             return False
-        edateSites = public.M('sites').where('edate>? AND edate<? AND (status=? OR status=?)',
-                                             ('0000-00-00', mEdate, 1, u'正在运行')).field('id,name').select()
+        edateSites = mw.M('sites').where('edate>? AND edate<? AND (status=? OR status=?)',
+                                         ('0000-00-00', mEdate, 1, u'正在运行')).field('id,name').select()
         import panelSite
         siteObject = panelSite.panelSite()
         for site in edateSites:
@@ -204,7 +204,7 @@ def siteEdate():
             get.name = site['name']
             siteObject.SiteStop(get)
         oldEdate = mEdate
-        public.writeFile('data/edate.pl', mEdate)
+        mw.writeFile('data/edate.pl', mEdate)
     except:
         pass
 
@@ -219,7 +219,7 @@ def systemTask():
         filename = 'data/control.conf'
 
         sql = db.Sql().dbfile('system')
-        csql = public.readFile('data/sql/system.sql')
+        csql = mw.readFile('data/sql/system.sql')
         csql_list = csql.split(';')
         for index in range(len(csql_list)):
             sql.execute(csql_list[index], ())
@@ -236,7 +236,7 @@ def systemTask():
 
             day = 30
             try:
-                day = int(public.readFile(filename))
+                day = int(mw.readFile(filename))
                 if day < 1:
                     time.sleep(10)
                     continue
@@ -360,7 +360,7 @@ def systemTask():
 def check502Task():
     try:
         while True:
-            if os.path.exists(public.getRunDir() + '/data/502Task.pl'):
+            if os.path.exists(mw.getRunDir() + '/data/502Task.pl'):
                 check502()
             time.sleep(30)
     except:
@@ -372,7 +372,7 @@ def check502():
     try:
         phpversions = ['53', '54', '55', '56', '70', '71', '72', '73', '74']
         for version in phpversions:
-            sdir = public.getServerDir()
+            sdir = mw.getServerDir()
             php_path = sdir + '/php/' + version + '/sbin/php-fpm'
             if not os.path.exists(php_path):
                 continue
@@ -380,14 +380,14 @@ def check502():
                 continue
             if startPHPVersion(version):
                 print '检测到PHP-' + version + '处理异常,已自动修复!'
-                public.writeLog('PHP守护程序', '检测到PHP-' + version + '处理异常,已自动修复!')
+                mw.writeLog('PHP守护程序', '检测到PHP-' + version + '处理异常,已自动修复!')
     except Exception as e:
         print str(e)
 
 
 # 处理指定PHP版本
 def startPHPVersion(version):
-    sdir = public.getServerDir()
+    sdir = mw.getServerDir()
     try:
         fpm = sdir + '/php/init.d/php' + version
         php_path = sdir + '/php/' + version + '/sbin/php-fpm'
@@ -404,8 +404,8 @@ def startPHPVersion(version):
         # 尝试重启服务
         cgi = '/tmp/php-cgi-' + version + '.sock'
         pid = sdir + '/php/' + version + '/var/run/php-fpm.pid'
-        data = public.execShell("ps -ef | grep php/" + version +
-                                " | grep -v grep|grep -v python |awk '{print $2}'")
+        data = mw.execShell("ps -ef | grep php/" + version +
+                            " | grep -v grep|grep -v python |awk '{print $2}'")
         if data[0] != '':
             os.system("ps -ef | grep php/" + version +
                       " | grep -v grep|grep -v python |awk '{print $2}' | xargs kill ")
@@ -430,7 +430,7 @@ def startPHPVersion(version):
 def checkPHPVersion(version):
     try:
         url = 'http://127.0.0.1/phpfpm_status_' + version
-        result = public.httpGet(url)
+        result = mw.httpGet(url)
         # print version,result
         # 检查nginx
         if result.find('Bad Gateway') != -1:
@@ -442,7 +442,7 @@ def checkPHPVersion(version):
         if result.find('Connection refused') != -1:
             global isTask
             if os.path.exists(isTask):
-                isStatus = public.readFile(isTask)
+                isStatus = mw.readFile(isTask)
                 if isStatus == 'True':
                     return True
             filename = '/etc/init.d/openresty'

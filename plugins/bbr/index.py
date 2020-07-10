@@ -8,11 +8,11 @@ import re
 import sys
 
 sys.path.append(os.getcwd() + "/class/core")
-import public
+import mw
 
 
 app_debug = False
-if public.isAppleSystem():
+if mw.isAppleSystem():
     app_debug = True
 
 
@@ -21,11 +21,11 @@ def getPluginName():
 
 
 def getPluginDir():
-    return public.getPluginDir() + '/' + getPluginName()
+    return mw.getPluginDir() + '/' + getPluginName()
 
 
 def getServerDir():
-    return public.getServerDir() + '/' + getPluginName()
+    return mw.getServerDir() + '/' + getPluginName()
 
 
 def getInitDFile():
@@ -53,10 +53,10 @@ def getArgs():
 
 def status():
     if not app_debug:
-        if public.isAppleSystem():
+        if mw.isAppleSystem():
             return "stop"
 
-    data = public.execShell('sudo sysctl -n net.ipv4.tcp_congestion_control')
+    data = mw.execShell('sudo sysctl -n net.ipv4.tcp_congestion_control')
     r = data[0].strip()
     if r == 'bbr':
         return 'start'
@@ -65,26 +65,26 @@ def status():
 
 def start():
     if not app_debug:
-        if public.isAppleSystem():
+        if mw.isAppleSystem():
             return "Apple Computer does not support"
 
-    public.execShell('echo "net.core.default_qdisc=fq" >> /etc/sysctl.conf')
+    mw.execShell('echo "net.core.default_qdisc=fq" >> /etc/sysctl.conf')
     cmd = 'echo "net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf'
-    public.execShell(cmd)
-    public.execShell('sysctl -p')
+    mw.execShell(cmd)
+    mw.execShell('sysctl -p')
     return '执行成功!重启系统生效'
 
 
 def stop():
     if not app_debug:
-        if public.isAppleSystem():
+        if mw.isAppleSystem():
             return "Apple Computer does not support"
 
     cmd1 = "sed -i '/net\.core\.default_qdisc/d' /etc/sysctl.conf"
-    public.execShell(cmd1)
+    mw.execShell(cmd1)
     cmd2 = "sed -i '/net\.ipv4\.tcp_congestion_control/d' /etc/sysctl.conf"
-    public.execShell(cmd2)
-    public.execShell("sysctl -p")
+    mw.execShell(cmd2)
+    mw.execShell("sysctl -p")
     return '执行成功!重启系统生效'
 
 

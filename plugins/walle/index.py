@@ -9,10 +9,10 @@ import sys
 import subprocess
 
 sys.path.append(os.getcwd() + "/class/core")
-import public
+import mw
 
 app_debug = False
-if public.isAppleSystem():
+if mw.isAppleSystem():
     app_debug = True
 
 
@@ -21,11 +21,11 @@ def getPluginName():
 
 
 def getPluginDir():
-    return public.getPluginDir() + '/' + getPluginName()
+    return mw.getPluginDir() + '/' + getPluginName()
 
 
 def getServerDir():
-    return public.getServerDir() + '/' + getPluginName()
+    return mw.getServerDir() + '/' + getPluginName()
 
 
 def getInitDFile():
@@ -62,14 +62,14 @@ def getArgs():
 def checkArgs(data, ck=[]):
     for i in range(len(ck)):
         if not ck[i] in data:
-            return (False, public.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-    return (True, public.returnJson(True, 'ok'))
+            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
+    return (True, mw.returnJson(True, 'ok'))
 
 
 def status():
     pn = getPluginName()
     cmd = "ps -ef|grep 'waller.py' | grep -v grep | awk '{print $2}'"
-    data = public.execShell(cmd)
+    data = mw.execShell(cmd)
     if data[0] == '':
         return 'stop'
     return 'start'
@@ -86,16 +86,16 @@ def initDreplace():
 
     file_bin = initD_path + '/' + getPluginName()
     if not os.path.exists(file_bin):
-        content = public.readFile(file_tpl)
+        content = mw.readFile(file_tpl)
         content = content.replace('{$SERVER_PATH}', service_path)
-        public.writeFile(file_bin, content)
-        public.execShell('chmod +x ' + file_bin)
+        mw.writeFile(file_bin, content)
+        mw.execShell('chmod +x ' + file_bin)
 
     return file_bin
 
 
 def runShell(shell):
-    data = public.execShell(shell)
+    data = mw.execShell(shell)
     return data
 
 
@@ -128,7 +128,7 @@ def reload():
     data = runShell(file + ' reload')
 
     solr_log = getServerDir() + "/code/logs/walle.log"
-    public.writeFile(solr_log, "")
+    mw.writeFile(solr_log, "")
 
     if data[1] == '':
         return 'ok'
@@ -148,16 +148,16 @@ def initdInstall():
     source_bin = initDreplace()
     initd_bin = getInitDFile()
     shutil.copyfile(source_bin, initd_bin)
-    public.execShell('chmod +x ' + initd_bin)
+    mw.execShell('chmod +x ' + initd_bin)
 
     if not app_debug:
-        public.execShell('chkconfig --add ' + getPluginName())
+        mw.execShell('chkconfig --add ' + getPluginName())
     return 'ok'
 
 
 def initdUinstall():
     if not app_debug:
-        public.execShell('chkconfig --del ' + getPluginName())
+        mw.execShell('chkconfig --del ' + getPluginName())
 
     initd_bin = getInitDFile()
 
@@ -172,13 +172,13 @@ def prodConf():
 
 def initEnv():
     cmd = "cd " + getServerDir() + "/code" + " && sh admin.sh init"
-    data = public.execShell(cmd)
+    data = mw.execShell(cmd)
     return "shell:<br>" + data[0] + "<br>" + " error:<br>" + data[1]
 
 
 def initData():
     cmd = "cd " + getServerDir() + "/code" + " && sh admin.sh migration"
-    data = public.execShell(cmd)
+    data = mw.execShell(cmd)
     return "shell:<br>" + data[0] + "<br>" + " error:<br>" + data[1]
 # rsyncdReceive
 if __name__ == "__main__":

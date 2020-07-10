@@ -18,12 +18,12 @@ sys.path.append(chdir + '/class/core')
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-import public
+import mw
 print('==================================================================')
 print('★[' + time.strftime("%Y/%m/%d %H:%M:%S") + ']，切割日志')
 print('==================================================================')
 print('|--当前保留最新的[' + sys.argv[2] + ']份')
-logsPath = public.getLogsDir()
+logsPath = mw.getLogsDir()
 px = '.log'
 
 
@@ -49,7 +49,7 @@ def split_logs(oldFileName, num):
 
 
 def split_all(save):
-    sites = public.M('sites').field('name').select()
+    sites = mw.M('sites').field('name').select()
     for site in sites:
         oldFileName = logsPath + site['name'] + px
         split_logs(oldFileName, save)
@@ -66,5 +66,5 @@ if __name__ == '__main__':
             siteName = siteName.replace("-access_log", '')
         oldFileName = logsPath + '/' + sys.argv[1]
         split_logs(oldFileName, num)
-    path = public.getServerDir()
+    path = mw.getServerDir()
     os.system("kill -USR1 `cat " + path + "/openresty/nginx/logs/nginx.pid`")

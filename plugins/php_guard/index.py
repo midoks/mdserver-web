@@ -14,10 +14,10 @@ sys.setdefaultencoding('utf8')
 sys.path.append(os.getcwd() + "/class/core")
 sys.path.append("/usr/local/lib/python2.7/site-packages")
 
-import public
+import mw
 
 app_debug = False
-if public.isAppleSystem():
+if mw.isAppleSystem():
     app_debug = True
 
 
@@ -26,17 +26,17 @@ def getPluginName():
 
 
 def getPluginDir():
-    return public.getPluginDir() + '/' + getPluginName()
+    return mw.getPluginDir() + '/' + getPluginName()
 
 
 def getServerDir():
-    return public.getServerDir() + '/' + getPluginName()
+    return mw.getServerDir() + '/' + getPluginName()
 
 
 def getInitDFile(version):
     if app_debug:
         return '/tmp/' + getPluginName()
-    return '/etc/init.d/' + getPluginName()+version
+    return '/etc/init.d/' + getPluginName() + version
 
 
 def getArgs():
@@ -59,8 +59,8 @@ def getArgs():
 def checkArgs(data, ck=[]):
     for i in range(len(ck)):
         if not ck[i] in data:
-            return (False, public.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-    return (True, public.returnJson(True, 'ok'))
+            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
+    return (True, mw.returnJson(True, 'ok'))
 
 
 if __name__ == "__main__":

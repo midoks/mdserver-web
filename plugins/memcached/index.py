@@ -7,10 +7,10 @@ import time
 import re
 
 sys.path.append(os.getcwd() + "/class/core")
-import public
+import mw
 
 app_debug = False
-if public.isAppleSystem():
+if mw.isAppleSystem():
     app_debug = True
 
 
@@ -19,11 +19,11 @@ def getPluginName():
 
 
 def getPluginDir():
-    return public.getPluginDir() + '/' + getPluginName()
+    return mw.getPluginDir() + '/' + getPluginName()
 
 
 def getServerDir():
-    return public.getServerDir() + '/' + getPluginName()
+    return mw.getServerDir() + '/' + getPluginName()
 
 
 def getInitDFile():
@@ -44,7 +44,7 @@ def getConfTpl():
 
 def getMemPort():
     path = getConf()
-    content = public.readFile(path)
+    content = mw.readFile(path)
     rep = 'PORT\s*=\s*(\d*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0]
@@ -68,7 +68,7 @@ def getArgs():
 
 
 def status():
-    data = public.execShell(
+    data = mw.execShell(
         "ps -ef|grep " + getPluginName() + " |grep -v grep | grep -v python | awk '{print $2}'")
     if data[0] == '':
         return 'stop'
@@ -78,7 +78,7 @@ def status():
 def initDreplace():
 
     file_tpl = getConfTpl()
-    service_path = public.getServerDir()
+    service_path = mw.getServerDir()
 
     initD_path = getServerDir() + '/init.d'
     if not os.path.exists(initD_path):
@@ -86,17 +86,17 @@ def initDreplace():
     file_bin = initD_path + '/memcached'
 
     if not os.path.exists(file_bin):
-        content = public.readFile(file_tpl)
+        content = mw.readFile(file_tpl)
         content = content.replace('{$SERVER_PATH}', service_path)
-        public.writeFile(file_bin, content)
-        public.execShell('chmod +x ' + file_bin)
+        mw.writeFile(file_bin, content)
+        mw.execShell('chmod +x ' + file_bin)
 
     return file_bin
 
 
 def memOp(method):
     file = initDreplace()
-    data = public.execShell(file + ' ' + method)
+    data = mw.execShell(file + ' ' + method)
     if data[1] == '':
         return 'ok'
     return data[1]
@@ -146,15 +146,15 @@ def runInfo():
             result['hit'] = float(result['get_hits']) / \
                 float(result['cmd_get']) * 100
 
-        conf = public.readFile(getConf())
+        conf = mw.readFile(getConf())
         result['bind'] = re.search('IP=(.+)', conf).groups()[0]
         result['port'] = int(re.search('PORT=(\d+)', conf).groups()[0])
         result['maxconn'] = int(re.search('MAXCONN=(\d+)', conf).groups()[0])
         result['cachesize'] = int(
             re.search('CACHESIZE=(\d+)', conf).groups()[0])
-        return public.getJson(result)
+        return mw.getJson(result)
     except Exception, e:
-        return public.getJson({})
+        return mw.getJson({})
 
 
 def saveConf():
@@ -164,13 +164,13 @@ def saveConf():
     print confFile
     try:
         args = getArgs()
-        content = public.readFile(confFile)
+        content = mw.readFile(confFile)
         content = re.sub('IP=.+', 'IP=' + args['ip'], content)
         content = re.sub('PORT=\d+', 'PORT=' + args['port'], content)
         content = re.sub('MAXCONN=\d+', 'MAXCONN=' + args['maxconn'], content)
         content = re.sub('CACHESIZE=\d+', 'CACHESIZE=' +
                          args['cachesize'], content)
-        public.writeFile(confFile, content)
+        mw.writeFile(confFile, content)
         restart()
         return 'save ok'
     except Exception as e:
@@ -180,7 +180,7 @@ def saveConf():
 
 def initdStatus():
     if not app_debug:
-        if public.isAppleSystem():
+        if mw.isAppleSystem():
             return "Apple Computer does not support"
     initd_bin = getInitDFile()
     if os.path.exists(initd_bin):
@@ -191,24 +191,23 @@ def initdStatus():
 def initdInstall():
     import shutil
     if not app_debug:
-        if public.isAppleSystem():
+        if mw.isAppleSystem():
             return "Apple Computer does not support"
-
 
     mem_bin = initDreplace()
     initd_bin = getInitDFile()
     shutil.copyfile(mem_bin, initd_bin)
-    public.execShell('chmod +x ' + initd_bin)
-    public.execShell('chkconfig --add ' + getPluginName())
+    mw.execShell('chmod +x ' + initd_bin)
+    mw.execShell('chkconfig --add ' + getPluginName())
     return 'ok'
 
 
 def initdUinstall():
     if not app_debug:
-        if public.isAppleSystem():
+        if mw.isAppleSystem():
             return "Apple Computer does not support"
 
-    public.execShell('chkconfig --del ' + getPluginName())
+    mw.execShell('chkconfig --del ' + getPluginName())
     initd_bin = getInitDFile()
     os.remove(initd_bin)
     return 'ok'
