@@ -110,6 +110,8 @@ def stop():
 def restart():
     file = initDreplace()
     data = mw.execShell(file + ' restart')
+    log_file = getServerDir() + "/data/redis.log"
+    mw.execShell("echo '' > " + log_file)
     if data[1] == '':
         return 'ok'
     return 'fail'
