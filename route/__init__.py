@@ -61,7 +61,7 @@ app.config['SESSION_PERMANENT'] = True
 app.config['SESSION_USE_SIGNER'] = True
 app.config['SESSION_KEY_PREFIX'] = 'MW_:'
 app.config['SESSION_COOKIE_NAME'] = "MW_VER_1"
-Session(app)
+# Session(app)
 
 # socketio
 from flask_socketio import SocketIO, emit, send
