@@ -363,7 +363,7 @@ class firewall_api:
         else:
             if self.__isFirewalld:
                 port = port.replace(':', '-')
-                cmd = 'firewall-cmd --permanent --zone=mw --add-port=' + port + '/tcp'
+                cmd = 'firewall-cmd --permanent --zone=public --add-port=' + port + '/tcp'
                 mw.execShell(cmd)
             elif self.__isMac:
                 pass
