@@ -9,10 +9,10 @@ import string
 import subprocess
 
 sys.path.append(os.getcwd() + "/class/core")
-import public
+import mw
 
 app_debug = False
-if public.isAppleSystem():
+if mw.isAppleSystem():
     app_debug = True
 
 
@@ -21,11 +21,11 @@ def getPluginName():
 
 
 def getPluginDir():
-    return public.getPluginDir() + '/' + getPluginName()
+    return mw.getPluginDir() + '/' + getPluginName()
 
 
 def getServerDir():
-    return public.getServerDir() + '/' + getPluginName()
+    return mw.getServerDir() + '/' + getPluginName()
 
 
 def getInitDFile():
@@ -68,8 +68,8 @@ def getArgs():
 def checkArgs(data, ck=[]):
     for i in range(len(ck)):
         if not ck[i] in data:
-            return (False, public.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-    return (True, public.returnJson(True, 'ok'))
+            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
+    return (True, mw.returnJson(True, 'ok'))
 
 
 def configTpl():
@@ -79,7 +79,7 @@ def configTpl():
     for one in pathFile:
         file = path + '/' + one
         tmp.append(file)
-    return public.getJson(tmp)
+    return mw.getJson(tmp)
 
 
 def readConfigTpl():
@@ -88,21 +88,21 @@ def readConfigTpl():
     if not data[0]:
         return data[1]
 
-    content = public.readFile(args['file'])
+    content = mw.readFile(args['file'])
     content = contentReplace(content)
-    return public.returnJson(True, 'ok', content)
+    return mw.returnJson(True, 'ok', content)
 
 
 def contentReplace(content):
-    service_path = public.getServerDir()
-    content = content.replace('{$ROOT_PATH}', public.getRootDir())
+    service_path = mw.getServerDir()
+    content = content.replace('{$ROOT_PATH}', mw.getRootDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$SERVER_APP}', service_path + '/sphinx')
     return content
 
 
 def status():
-    data = public.execShell(
+    data = mw.execShell(
         "ps -ef|grep sphinx |grep -v grep | grep -v python | awk '{print $2}'")
     if data[0] == '':
         return 'stop'
@@ -110,16 +110,16 @@ def status():
 
 
 def mkdirAll():
-    content = public.readFile(getConf())
+    content = mw.readFile(getConf())
     rep = 'path\s*=\s*(.*)'
     p = re.compile(rep)
     tmp = p.findall(content)
 
     for x in tmp:
         if x.find('binlog') != -1:
-            public.execShell('mkdir -p ' + x)
+            mw.execShell('mkdir -p ' + x)
         else:
-            public.execShell('mkdir -p ' + os.path.dirname(x))
+            mw.execShell('mkdir -p ' + os.path.dirname(x))
 
 
 def initDreplace():
@@ -134,24 +134,24 @@ def initDreplace():
 
     # initd replace
     if not os.path.exists(file_bin):
-        content = public.readFile(file_tpl)
+        content = mw.readFile(file_tpl)
         content = contentReplace(content)
-        public.writeFile(file_bin, content)
-        public.execShell('chmod +x ' + file_bin)
+        mw.writeFile(file_bin, content)
+        mw.execShell('chmod +x ' + file_bin)
 
     # config replace
     conf_bin = getConf()
     if not os.path.exists(conf_bin):
-        conf_content = public.readFile(getConfTpl())
+        conf_content = mw.readFile(getConfTpl())
         conf_content = contentReplace(conf_content)
-        public.writeFile(getServerDir() + '/sphinx.conf', conf_content)
+        mw.writeFile(getServerDir() + '/sphinx.conf', conf_content)
 
     mkdirAll()
     return file_bin
 
 
 def checkIndexSph():
-    content = public.readFile(getConf())
+    content = mw.readFile(getConf())
     rep = 'path\s*=\s*(.*)'
     p = re.compile(rep)
     tmp = p.findall(content)
@@ -159,23 +159,24 @@ def checkIndexSph():
         if x.find('binlog') != -1:
             continue
         else:
-             p = x+'.sph'
-             if os.path.exists(p):
+            p = x + '.sph'
+            if os.path.exists(p):
                 return False
     return True
+
 
 def start():
     file = initDreplace()
 
     data = sphinxConfParse()
-    if 'index' in data :
+    if 'index' in data:
         if checkIndexSph():
             rebuild()
             time.sleep(5)
     else:
         return '配置不正确!'
 
-    data = public.execShell(file + ' start')
+    data = mw.execShell(file + ' start')
     if data[1] == '':
         return 'ok'
     return data[1]
@@ -183,7 +184,7 @@ def start():
 
 def stop():
     file = initDreplace()
-    data = public.execShell(file + ' stop')
+    data = mw.execShell(file + ' stop')
     if data[1] == '':
         return 'ok'
     return data[1]
@@ -191,7 +192,7 @@ def stop():
 
 def restart():
     file = initDreplace()
-    data = public.execShell(file + ' restart')
+    data = mw.execShell(file + ' restart')
     if data[1] == '':
         return 'ok'
     return data[1]
@@ -199,7 +200,7 @@ def restart():
 
 def reload():
     file = initDreplace()
-    data = public.execShell(file + ' reload')
+    data = mw.execShell(file + ' reload')
     if data[1] == '':
         return 'ok'
     return 'fail'
@@ -209,13 +210,13 @@ def rebuild():
     file = initDreplace()
     subprocess.Popen(file + ' rebuild &',
                      stdout=subprocess.PIPE, shell=True)
-    # data = public.execShell(file + ' rebuild')
+    # data = mw.execShell(file + ' rebuild')
     return 'ok'
 
 
 def initdStatus():
     if not app_debug:
-        if public.isAppleSystem():
+        if mw.isAppleSystem():
             return "Apple Computer does not support"
     initd_bin = getInitDFile()
     if os.path.exists(initd_bin):
@@ -226,30 +227,30 @@ def initdStatus():
 def initdInstall():
     import shutil
     if not app_debug:
-        if public.isAppleSystem():
+        if mw.isAppleSystem():
             return "Apple Computer does not support"
 
     source_bin = initDreplace()
     initd_bin = getInitDFile()
     shutil.copyfile(source_bin, initd_bin)
-    public.execShell('chmod +x ' + initd_bin)
-    public.execShell('chkconfig --add ' + getPluginName())
+    mw.execShell('chmod +x ' + initd_bin)
+    mw.execShell('chkconfig --add ' + getPluginName())
     return 'ok'
 
 
 def initdUinstall():
     if not app_debug:
-        if public.isAppleSystem():
+        if mw.isAppleSystem():
             return "Apple Computer does not support"
     initd_bin = getInitDFile()
     os.remove(initd_bin)
-    public.execShell('chkconfig --del ' + getPluginName())
+    mw.execShell('chkconfig --del ' + getPluginName())
     return 'ok'
 
 
 def runLog():
     path = getConf()
-    content = public.readFile(path)
+    content = mw.readFile(path)
     rep = 'log\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0]
@@ -257,7 +258,7 @@ def runLog():
 
 def getPort():
     path = getConf()
-    content = public.readFile(path)
+    content = mw.readFile(path)
     rep = 'listen\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0]
@@ -265,7 +266,7 @@ def getPort():
 
 def queryLog():
     path = getConf()
-    content = public.readFile(path)
+    content = mw.readFile(path)
     rep = 'query_log\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0]
@@ -274,7 +275,7 @@ def queryLog():
 def runStatus():
     s = status()
     if s != 'start':
-        return public.returnJson(False, '没有启动程序')
+        return mw.returnJson(False, '没有启动程序')
 
     sys.path.append(getPluginDir() + "/class")
     import sphinxapi
@@ -288,13 +289,13 @@ def runStatus():
     for x in range(len(info_status)):
         rData[info_status[x][0]] = info_status[x][1]
 
-    return public.returnJson(True, 'ok', rData)
+    return mw.returnJson(True, 'ok', rData)
 
 
 def sphinxConfParse():
     file = getConf()
     bin_dir = getServerDir()
-    content = public.readFile(file)
+    content = mw.readFile(file)
     rep = 'index\s(.*)'
     sindex = re.findall(rep, content)
     indexlen = len(sindex)
@@ -313,12 +314,13 @@ def sphinxConfParse():
         cmd['cmd'] = bin_dir + '/bin/bin/indexer -c ' + bin_dir + '/sphinx.conf'
     return cmd
 
+
 def sphinxCmd():
     data = sphinxConfParse()
     if 'index' in data:
-        return public.returnJson(True, 'ok', data)
+        return mw.returnJson(True, 'ok', data)
     else:
-        return public.returnJson(False, 'no index')
+        return mw.returnJson(False, 'no index')
 
 
 if __name__ == "__main__":

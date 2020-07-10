@@ -7,7 +7,7 @@ import os
 chdir = os.getcwd()
 sys.path.append(chdir + '/class/core')
 sys.path.append("/usr/local/lib/python2.7/site-packages")
-import public
+import mw
 import system_api
 cpu_info = system_api.system_api().getCpuInfo()
 workers = cpu_info[1]
@@ -16,7 +16,7 @@ workers = cpu_info[1]
 if not os.path.exists(os.getcwd() + '/logs'):
     os.mkdir(os.getcwd() + '/logs')
 
-mw_port = public.readFile('data/port.pl')
+mw_port = mw.readFile('data/port.pl')
 if mw_port:
     mw_port.strip()
 bind = []

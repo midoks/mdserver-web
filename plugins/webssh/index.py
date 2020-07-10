@@ -8,7 +8,7 @@ import re
 import sys
 
 sys.path.append(os.getcwd() + "/class/core")
-import public
+import mw
 
 
 def status():

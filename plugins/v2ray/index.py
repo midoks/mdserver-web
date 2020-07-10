@@ -7,10 +7,10 @@ import time
 import shutil
 
 sys.path.append(os.getcwd() + "/class/core")
-import public
+import mw
 
 app_debug = False
-if public.isAppleSystem():
+if mw.isAppleSystem():
     app_debug = True
 
 
@@ -19,11 +19,11 @@ def getPluginName():
 
 
 def getPluginDir():
-    return public.getPluginDir() + '/' + getPluginName()
+    return mw.getPluginDir() + '/' + getPluginName()
 
 
 def getServerDir():
-    return public.getServerDir() + '/' + getPluginName()
+    return mw.getServerDir() + '/' + getPluginName()
 
 
 def getArgs():
@@ -46,13 +46,13 @@ def getArgs():
 def checkArgs(data, ck=[]):
     for i in range(len(ck)):
         if not ck[i] in data:
-            return (False, public.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-    return (True, public.returnJson(True, 'ok'))
+            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
+    return (True, mw.returnJson(True, 'ok'))
 
 
 def status():
     cmd = "ps -ef|grep v2ray |grep -v grep | grep -v 'mdserver-web'| awk '{print $2}'"
-    data = public.execShell(cmd)
+    data = mw.execShell(cmd)
     if data[0] == '':
         return 'stop'
     return 'start'
@@ -61,7 +61,7 @@ def status():
 def start():
 
     shell_cmd = 'service  ' + getPluginName() + ' start'
-    data = public.execShell(shell_cmd)
+    data = mw.execShell(shell_cmd)
 
     if data[0] == '':
         return 'ok'
@@ -71,7 +71,7 @@ def start():
 def stop():
     shell_cmd = 'service  ' + getPluginName() + ' stop'
 
-    data = public.execShell(shell_cmd)
+    data = mw.execShell(shell_cmd)
     if data[0] == '':
         return 'ok'
     return data[1]
@@ -79,12 +79,12 @@ def stop():
 
 def restart():
     shell_cmd = 'service  ' + getPluginName() + ' restart'
-    data = public.execShell(shell_cmd)
+    data = mw.execShell(shell_cmd)
 
     log_file = getLog()
     if os.path.exists(log_file):
         clear_log_cmd = "echo '' > " + log_file
-        public.execShell(clear_log_cmd)
+        mw.execShell(clear_log_cmd)
 
     if data[0] == '':
         return 'ok'
@@ -93,14 +93,14 @@ def restart():
 
 def reload():
     shell_cmd = 'service  ' + getPluginName() + ' reload'
-    data = public.execShell(shell_cmd)
+    data = mw.execShell(shell_cmd)
     if data[0] == '':
         return 'ok'
     return data[1]
 
 
 def getPathFile():
-    if public.isAppleSystem():
+    if mw.isAppleSystem():
         return getServerDir() + '/config.json'
     return '/etc/v2ray/config.json'
 
@@ -113,7 +113,7 @@ def getInitDFile():
 
 def initdStatus():
     shell_cmd = 'systemctl status v2ray.service | grep loaded | grep "enabled;"'
-    data = public.execShell(shell_cmd)
+    data = mw.execShell(shell_cmd)
     if data[0] == '':
         return 'fail'
     return 'ok'
@@ -122,19 +122,19 @@ def initdStatus():
 def initdInstall():
     import shutil
     if not app_debug:
-        if public.isAppleSystem():
+        if mw.isAppleSystem():
             return "Apple Computer does not support"
 
-    public.execShell('systemctl enable ' + getPluginName())
+    mw.execShell('systemctl enable ' + getPluginName())
     return 'ok'
 
 
 def initdUinstall():
     if not app_debug:
-        if public.isAppleSystem():
+        if mw.isAppleSystem():
             return "Apple Computer does not support"
 
-    public.execShell('systemctl disable ' + getPluginName())
+    mw.execShell('systemctl disable ' + getPluginName())
     return 'ok'
 
 

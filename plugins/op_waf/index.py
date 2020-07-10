@@ -8,11 +8,11 @@ import subprocess
 import json
 
 sys.path.append(os.getcwd() + "/class/core")
-import public
+import mw
 
 
 app_debug = False
-if public.isAppleSystem():
+if mw.isAppleSystem():
     app_debug = True
 
 
@@ -21,11 +21,11 @@ def getPluginName():
 
 
 def getPluginDir():
-    return public.getPluginDir() + '/' + getPluginName()
+    return mw.getPluginDir() + '/' + getPluginName()
 
 
 def getServerDir():
-    return public.getServerDir() + '/' + getPluginName()
+    return mw.getServerDir() + '/' + getPluginName()
 
 
 def getArgs():
@@ -48,12 +48,12 @@ def getArgs():
 def checkArgs(data, ck=[]):
     for i in range(len(ck)):
         if not ck[i] in data:
-            return (False, public.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-    return (True, public.returnJson(True, 'ok'))
+            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
+    return (True, mw.returnJson(True, 'ok'))
 
 
 def getConf():
-    path = public.getServerDir() + "/openresty/nginx/conf/nginx.conf"
+    path = mw.getServerDir() + "/openresty/nginx/conf/nginx.conf"
     return path
 
 
@@ -61,7 +61,7 @@ def initDomainInfo():
     data = []
     path_domains = getJsonPath('domains')
 
-    _list = public.M('sites').field('id,name,path').where(
+    _list = mw.M('sites').field('id,name,path').where(
         'status=?', ('1',)).order('id desc').select()
 
     for i in range(len(_list)):
@@ -69,7 +69,7 @@ def initDomainInfo():
         tmp['name'] = _list[i]['name']
         tmp['path'] = _list[i]['path']
 
-        _list_domain = public.M('domain').field('name').where(
+        _list_domain = mw.M('domain').field('name').where(
             'pid=?', (_list[i]['id'],)).order('id desc').select()
 
         tmp_j = []
@@ -78,8 +78,8 @@ def initDomainInfo():
 
         tmp['domains'] = tmp_j
         data.append(tmp)
-    cjson = public.getJson(data)
-    public.writeFile(path_domains, cjson)
+    cjson = mw.getJson(data)
+    mw.writeFile(path_domains, cjson)
 
 
 def initSiteInfo():
@@ -88,14 +88,14 @@ def initSiteInfo():
     path_config = getJsonPath('config')
     path_site = getJsonPath('site')
 
-    config_contents = public.readFile(path_config)
+    config_contents = mw.readFile(path_config)
     config_contents = json.loads(config_contents)
 
-    domain_contents = public.readFile(path_domains)
+    domain_contents = mw.readFile(path_domains)
     domain_contents = json.loads(domain_contents)
 
     try:
-        site_contents = public.readFile(path_site)
+        site_contents = mw.readFile(path_site)
     except Exception as e:
         site_contents = "{}"
 
@@ -133,8 +133,8 @@ def initSiteInfo():
 
             site_contents_new[name] = tmp
 
-    cjson = public.getJson(site_contents_new)
-    public.writeFile(path_site, cjson)
+    cjson = mw.getJson(site_contents_new)
+    mw.writeFile(path_site, cjson)
 
 
 def initTotalInfo():
@@ -142,11 +142,11 @@ def initTotalInfo():
     path_domains = getJsonPath('domains')
     path_total = getJsonPath('total')
 
-    domain_contents = public.readFile(path_domains)
+    domain_contents = mw.readFile(path_domains)
     domain_contents = json.loads(domain_contents)
 
     try:
-        total_contents = public.readFile(path_total)
+        total_contents = mw.readFile(path_total)
     except Exception as e:
         total_contents = "{}"
 
@@ -167,8 +167,8 @@ def initTotalInfo():
             _name[name] = tmp
             total_contents['sites'] = _name
 
-    cjson = public.getJson(total_contents)
-    public.writeFile(path_total, cjson)
+    cjson = mw.getJson(total_contents)
+    mw.writeFile(path_total, cjson)
 
 
 def status():
@@ -180,7 +180,7 @@ def status():
     if not os.path.exists(path):
         return 'stop'
 
-    conf = public.readFile(path)
+    conf = mw.readFile(path)
     if conf.find("#include luawaf.conf;") != -1:
         return 'stop'
     if conf.find("luawaf.conf;") == -1:
@@ -189,9 +189,9 @@ def status():
 
 
 def contentReplace(content):
-    service_path = public.getServerDir()
-    waf_path = public.getServerDir() + "/openresty/nginx/conf/waf"
-    content = content.replace('{$ROOT_PATH}', public.getRootDir())
+    service_path = mw.getServerDir()
+    waf_path = mw.getServerDir() + "/openresty/nginx/conf/waf"
+    content = content.replace('{$ROOT_PATH}', mw.getRootDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$WAF_PATH}', waf_path)
     return content
@@ -200,77 +200,77 @@ def contentReplace(content):
 def initDreplace():
 
     config = getPluginDir() + '/waf/config.json'
-    content = public.readFile(config)
+    content = mw.readFile(config)
     content = json.loads(content)
-    content['reqfile_path'] = public.getServerDir(
+    content['reqfile_path'] = mw.getServerDir(
     ) + "/openresty/nginx/conf/waf/html"
-    public.writeFile(config, public.getJson(content))
+    mw.writeFile(config, mw.getJson(content))
 
-    path = public.getServerDir() + "/openresty/nginx/conf"
+    path = mw.getServerDir() + "/openresty/nginx/conf"
     if not os.path.exists(path + '/waf'):
         sdir = getPluginDir() + '/waf'
         cmd = 'cp -rf ' + sdir + ' ' + path
-        public.execShell(cmd)
+        mw.execShell(cmd)
 
-    config = public.getServerDir() + "/openresty/nginx/conf/waf/lua/init.lua"
-    content = public.readFile(config)
+    config = mw.getServerDir() + "/openresty/nginx/conf/waf/lua/init.lua"
+    content = mw.readFile(config)
     content = contentReplace(content)
-    public.writeFile(config, content)
+    mw.writeFile(config, content)
 
-    waf_conf = public.getServerDir() + "/openresty/nginx/conf/luawaf.conf"
+    waf_conf = mw.getServerDir() + "/openresty/nginx/conf/luawaf.conf"
     waf_tpl = getPluginDir() + "/conf/luawaf.conf"
-    content = public.readFile(waf_tpl)
+    content = mw.readFile(waf_tpl)
     content = contentReplace(content)
-    public.writeFile(waf_conf, content)
+    mw.writeFile(waf_conf, content)
 
 
 def start():
     initDreplace()
 
     path = getConf()
-    conf = public.readFile(path)
+    conf = mw.readFile(path)
     conf = conf.replace('#include luawaf.conf;', "include luawaf.conf;")
 
-    public.writeFile(path, conf)
-    public.restartWeb()
+    mw.writeFile(path, conf)
+    mw.restartWeb()
     return 'ok'
 
 
 def stop():
-    path = public.getServerDir() + "/openresty/nginx/conf/waf"
+    path = mw.getServerDir() + "/openresty/nginx/conf/waf"
     if os.path.exists(path):
         cmd = 'rm -rf ' + path
-        public.execShell(cmd)
+        mw.execShell(cmd)
 
     path = getConf()
-    conf = public.readFile(path)
+    conf = mw.readFile(path)
     conf = conf.replace('include luawaf.conf;', "#include luawaf.conf;")
 
-    public.writeFile(path, conf)
-    public.restartWeb()
+    mw.writeFile(path, conf)
+    mw.restartWeb()
     return 'ok'
 
 
 def restart():
-    public.restartWeb()
+    mw.restartWeb()
     return 'ok'
 
 
 def reload():
     stop()
-    public.execShell('rm -rf ' + public.getServerDir() +
-                     "/openresty/nginx/logs/error.log")
+    mw.execShell('rm -rf ' + mw.getServerDir() +
+                 "/openresty/nginx/logs/error.log")
     start()
     return 'ok'
 
 
 def getJsonPath(name):
-    path = public.getServerDir() + "/openresty/nginx/conf/waf/" + name + ".json"
+    path = mw.getServerDir() + "/openresty/nginx/conf/waf/" + name + ".json"
     return path
 
 
 def getRuleJsonPath(name):
-    path = public.getServerDir() + "/openresty/nginx/conf/waf/rule/" + name + ".json"
+    path = mw.getServerDir() + "/openresty/nginx/conf/waf/rule/" + name + ".json"
     return path
 
 
@@ -282,8 +282,8 @@ def getRule():
 
     rule_name = args['rule_name']
     fpath = getRuleJsonPath(rule_name)
-    content = public.readFile(fpath)
-    return public.returnJson(True, 'ok', content)
+    content = mw.readFile(fpath)
+    return mw.returnJson(True, 'ok', content)
 
 
 def addRule():
@@ -297,7 +297,7 @@ def addRule():
     ps = args['ps']
 
     fpath = getRuleJsonPath(ruleName)
-    content = public.readFile(fpath)
+    content = mw.readFile(fpath)
     content = json.loads(content)
 
     tmp_k = []
@@ -308,10 +308,11 @@ def addRule():
 
     content.append(tmp_k)
 
-    cjson = public.getJson(content)
-    public.writeFile(fpath, cjson)
+    cjson = mw.getJson(content)
+    mw.writeFile(fpath, cjson)
 
-    return public.returnJson(True, '设置成功!', content)
+    return mw.returnJson(True, '设置成功!', content)
+
 
 def removeRule():
     args = getArgs()
@@ -323,16 +324,17 @@ def removeRule():
     ruleName = args['ruleName']
 
     fpath = getRuleJsonPath(ruleName)
-    content = public.readFile(fpath)
+    content = mw.readFile(fpath)
     content = json.loads(content)
 
     k = content[index]
     content.remove(k)
 
-    cjson = public.getJson(content)
-    public.writeFile(fpath, cjson)
+    cjson = mw.getJson(content)
+    mw.writeFile(fpath, cjson)
 
-    return public.returnJson(True, '设置成功!', content)
+    return mw.returnJson(True, '设置成功!', content)
+
 
 def setRuleState():
     args = getArgs()
@@ -344,7 +346,7 @@ def setRuleState():
     ruleName = args['ruleName']
 
     fpath = getRuleJsonPath(ruleName)
-    content = public.readFile(fpath)
+    content = mw.readFile(fpath)
     content = json.loads(content)
 
     b = content[index][0]
@@ -353,11 +355,10 @@ def setRuleState():
     else:
         content[index][0] = 1
 
-    cjson = public.getJson(content)
-    public.writeFile(fpath, cjson)
+    cjson = mw.getJson(content)
+    mw.writeFile(fpath, cjson)
 
-    return public.returnJson(True, '设置成功!', content)
-
+    return mw.returnJson(True, '设置成功!', content)
 
 
 def modifyRule():
@@ -372,7 +373,7 @@ def modifyRule():
     rulePs = args['rulePs']
 
     fpath = getRuleJsonPath(ruleName)
-    content = public.readFile(fpath)
+    content = mw.readFile(fpath)
     content = json.loads(content)
 
     tmp = content[index]
@@ -385,10 +386,10 @@ def modifyRule():
 
     content[index] = tmp_k
 
-    cjson = public.getJson(content)
-    public.writeFile(fpath, cjson)
+    cjson = mw.getJson(content)
+    mw.writeFile(fpath, cjson)
 
-    return public.returnJson(True, '设置成功!', content)
+    return mw.returnJson(True, '设置成功!', content)
 
 
 def getSiteRule():
@@ -401,13 +402,13 @@ def getSiteRule():
     siteRule = args['ruleName']
 
     path = getJsonPath('site')
-    content = public.readFile(path)
+    content = mw.readFile(path)
     content = json.loads(content)
 
     r = content[siteName][siteRule]
 
-    cjson = public.getJson(r)
-    return public.returnJson(True, 'ok!', cjson)
+    cjson = mw.getJson(r)
+    return mw.returnJson(True, 'ok!', cjson)
 
 
 def addSiteRule():
@@ -421,14 +422,14 @@ def addSiteRule():
     ruleValue = args['ruleValue']
 
     path = getJsonPath('site')
-    content = public.readFile(path)
+    content = mw.readFile(path)
     content = json.loads(content)
 
     content[siteName][siteRule].append(ruleValue)
 
-    cjson = public.getJson(content)
-    public.writeFile(path, cjson)
-    return public.returnJson(True, '设置成功!')
+    cjson = mw.getJson(content)
+    mw.writeFile(path, cjson)
+    return mw.returnJson(True, '设置成功!')
 
 
 def addIpWhite():
@@ -441,7 +442,7 @@ def addIpWhite():
     end_ip = args['end_ip']
 
     path = getRuleJsonPath('ip_white')
-    content = public.readFile(path)
+    content = mw.readFile(path)
     content = json.loads(content)
 
     data = []
@@ -461,9 +462,9 @@ def addIpWhite():
 
     content.append(data)
 
-    cjson = public.getJson(content)
-    public.writeFile(path, cjson)
-    return public.returnJson(True, '设置成功!')
+    cjson = mw.getJson(content)
+    mw.writeFile(path, cjson)
+    return mw.returnJson(True, '设置成功!')
 
 
 def removeIpWhite():
@@ -475,15 +476,15 @@ def removeIpWhite():
     index = args['index']
 
     path = getRuleJsonPath('ip_white')
-    content = public.readFile(path)
+    content = mw.readFile(path)
     content = json.loads(content)
 
     k = content[int(index)]
     content.remove(k)
 
-    cjson = public.getJson(content)
-    public.writeFile(path, cjson)
-    return public.returnJson(True, '设置成功!')
+    cjson = mw.getJson(content)
+    mw.writeFile(path, cjson)
+    return mw.returnJson(True, '设置成功!')
 
 
 def addIpBlack():
@@ -496,7 +497,7 @@ def addIpBlack():
     end_ip = args['end_ip']
 
     path = getRuleJsonPath('ip_black')
-    content = public.readFile(path)
+    content = mw.readFile(path)
     content = json.loads(content)
 
     data = []
@@ -516,9 +517,9 @@ def addIpBlack():
 
     content.append(data)
 
-    cjson = public.getJson(content)
-    public.writeFile(path, cjson)
-    return public.returnJson(True, '设置成功!')
+    cjson = mw.getJson(content)
+    mw.writeFile(path, cjson)
+    return mw.returnJson(True, '设置成功!')
 
 
 def removeIpBlack():
@@ -530,15 +531,15 @@ def removeIpBlack():
     index = args['index']
 
     path = getRuleJsonPath('ip_black')
-    content = public.readFile(path)
+    content = mw.readFile(path)
     content = json.loads(content)
 
     k = content[int(index)]
     content.remove(k)
 
-    cjson = public.getJson(content)
-    public.writeFile(path, cjson)
-    return public.returnJson(True, '设置成功!')
+    cjson = mw.getJson(content)
+    mw.writeFile(path, cjson)
+    return mw.returnJson(True, '设置成功!')
 
 
 def setIpv6Black():
@@ -550,13 +551,13 @@ def setIpv6Black():
     addr = args['addr'].replace('_', ':')
     path = getRuleJsonPath('ipv6_black')
 
-    content = public.readFile(path)
+    content = mw.readFile(path)
     content = json.loads(content)
     content.append(addr)
 
-    cjson = public.getJson(content)
-    public.writeFile(path, cjson)
-    return public.returnJson(True, '设置成功!')
+    cjson = mw.getJson(content)
+    mw.writeFile(path, cjson)
+    return mw.returnJson(True, '设置成功!')
 
 
 def delIpv6Black():
@@ -568,14 +569,14 @@ def delIpv6Black():
     addr = args['addr'].replace('_', ':')
     path = getRuleJsonPath('ipv6_black')
 
-    content = public.readFile(path)
+    content = mw.readFile(path)
     content = json.loads(content)
 
     content.remove(addr)
 
-    cjson = public.getJson(content)
-    public.writeFile(path, cjson)
-    return public.returnJson(True, '设置成功!')
+    cjson = mw.getJson(content)
+    mw.writeFile(path, cjson)
+    return mw.returnJson(True, '设置成功!')
 
 
 def removeSiteRule():
@@ -589,15 +590,15 @@ def removeSiteRule():
     index = args['index']
 
     path = getJsonPath('site')
-    content = public.readFile(path)
+    content = mw.readFile(path)
     content = json.loads(content)
 
     ruleValue = content[siteName][siteRule][int(index)]
     content[siteName][siteRule].remove(ruleValue)
 
-    cjson = public.getJson(content)
-    public.writeFile(path, cjson)
-    return public.returnJson(True, '设置成功!')
+    cjson = mw.getJson(content)
+    mw.writeFile(path, cjson)
+    return mw.returnJson(True, '设置成功!')
 
 
 def setObjStatus():
@@ -607,16 +608,16 @@ def setObjStatus():
         return data[1]
 
     conf = getJsonPath('config')
-    content = public.readFile(conf)
+    content = mw.readFile(conf)
     cobj = json.loads(content)
 
     o = args['obj']
     status = args['statusCode']
     cobj[o]['status'] = status
 
-    cjson = public.getJson(cobj)
-    public.writeFile(conf, cjson)
-    return public.returnJson(True, '设置成功!')
+    cjson = mw.getJson(cobj)
+    mw.writeFile(conf, cjson)
+    return mw.returnJson(True, '设置成功!')
 
 
 def setRetry():
@@ -627,33 +628,33 @@ def setRetry():
         return data[1]
 
     conf = getJsonPath('config')
-    content = public.readFile(conf)
+    content = mw.readFile(conf)
     cobj = json.loads(content)
 
     cobj['retry'] = args
 
-    cjson = public.getJson(cobj)
-    public.writeFile(conf, cjson)
+    cjson = mw.getJson(cobj)
+    mw.writeFile(conf, cjson)
 
-    return public.returnJson(True, '设置成功!', [])
+    return mw.returnJson(True, '设置成功!', [])
 
 
 def setSiteRetry():
-    return public.returnJson(True, '设置成功-?!', [])
+    return mw.returnJson(True, '设置成功-?!', [])
 
 
 def setCcConf():
     args = getArgs()
-    data = checkArgs(args, ['siteName', 'cycle', 'limit', 'endtime','is_open_global','increase'])
+    data = checkArgs(args, ['siteName', 'cycle', 'limit',
+                            'endtime', 'is_open_global', 'increase'])
     if not data[0]:
         return data[1]
 
     conf = getJsonPath('config')
-    content = public.readFile(conf)
+    content = mw.readFile(conf)
     cobj = json.loads(content)
 
     tmp = cobj['cc']
-
 
     tmp['cycle'] = int(args['cycle'])
     tmp['limit'] = int(args['limit'])
@@ -662,12 +663,14 @@ def setCcConf():
     tmp['increase'] = args['increase']
     cobj['cc'] = tmp
 
-    cjson = public.getJson(cobj)
-    public.writeFile(conf, cjson)
-    return public.returnJson(True, '设置成功!', [])
+    cjson = mw.getJson(cobj)
+    mw.writeFile(conf, cjson)
+    return mw.returnJson(True, '设置成功!', [])
+
 
 def setSiteCcConf():
-    return public.returnJson(True, '设置成功-?!', [])
+    return mw.returnJson(True, '设置成功-?!', [])
+
 
 def saveScanRule():
     args = getArgs()
@@ -676,19 +679,19 @@ def saveScanRule():
         return data[1]
 
     path = getRuleJsonPath('scan_black')
-    cjson = public.getJson(args)
-    public.writeFile(path, cjson)
-    return public.returnJson(True, '设置成功!', [])
+    cjson = mw.getJson(args)
+    mw.writeFile(path, cjson)
+    return mw.returnJson(True, '设置成功!', [])
 
 
 def getSiteConfig():
     path = getJsonPath('site')
-    content = public.readFile(path)
+    content = mw.readFile(path)
 
     content = json.loads(content)
 
     total = getJsonPath('total')
-    total_content = public.readFile(total)
+    total_content = mw.readFile(total)
     total_content = json.loads(total_content)
 
     # print total_content
@@ -713,8 +716,8 @@ def getSiteConfig():
         # print tmp
         content[x]['total'] = tmp
 
-    content = public.getJson(content)
-    return public.returnJson(True, 'ok!', content)
+    content = mw.getJson(content)
+    return mw.returnJson(True, 'ok!', content)
 
 
 def getSiteConfigByName():
@@ -723,7 +726,7 @@ def getSiteConfigByName():
     if not data[0]:
         return data[1]
     path = getJsonPath('site')
-    content = public.readFile(path)
+    content = mw.readFile(path)
     content = json.loads(content)
 
     siteName = args['siteName']
@@ -731,7 +734,7 @@ def getSiteConfigByName():
     if siteName in content:
         retData = content[siteName]
 
-    return public.returnJson(True, 'ok!', retData)
+    return mw.returnJson(True, 'ok!', retData)
 
 
 def addSiteCdnHeader():
@@ -740,7 +743,7 @@ def addSiteCdnHeader():
     if not data[0]:
         return data[1]
     path = getJsonPath('site')
-    content = public.readFile(path)
+    content = mw.readFile(path)
     content = json.loads(content)
 
     siteName = args['siteName']
@@ -748,9 +751,9 @@ def addSiteCdnHeader():
     if siteName in content:
         content[siteName]['cdn_header'].append(args['cdn_header'])
 
-    cjson = public.getJson(content)
-    public.writeFile(path, cjson)
-    return public.returnJson(True, '添加成功!')
+    cjson = mw.getJson(content)
+    mw.writeFile(path, cjson)
+    return mw.returnJson(True, '添加成功!')
 
 
 def removeSiteCdnHeader():
@@ -759,7 +762,7 @@ def removeSiteCdnHeader():
     if not data[0]:
         return data[1]
     path = getJsonPath('site')
-    content = public.readFile(path)
+    content = mw.readFile(path)
     content = json.loads(content)
 
     siteName = args['siteName']
@@ -767,9 +770,9 @@ def removeSiteCdnHeader():
     if siteName in content:
         content[siteName]['cdn_header'].remove(args['cdn_header'])
 
-    cjson = public.getJson(content)
-    public.writeFile(path, cjson)
-    return public.returnJson(True, '删除成功!')
+    cjson = mw.getJson(content)
+    mw.writeFile(path, cjson)
+    return mw.returnJson(True, '删除成功!')
 
 
 def outputData():
@@ -779,8 +782,8 @@ def outputData():
         return data[1]
 
     path = getRuleJsonPath(args['s_Name'])
-    content = public.readFile(path)
-    return public.returnJson(True, 'ok', content)
+    content = mw.readFile(path)
+    return mw.returnJson(True, 'ok', content)
 
 
 def importData():
@@ -790,8 +793,8 @@ def importData():
         return data[1]
 
     path = getRuleJsonPath(args['s_Name'])
-    public.writeFile(path, args['pdata'])
-    return public.returnJson(True, '设置成功!')
+    mw.writeFile(path, args['pdata'])
+    return mw.returnJson(True, '设置成功!')
 
 
 def getLogsList():
@@ -801,7 +804,7 @@ def getLogsList():
         return data[1]
 
     data = []
-    path = public.getLogsDir() + '/waf'
+    path = mw.getLogsDir() + '/waf'
     files = os.listdir(path)
     for f in files:
         if f == '.DS_Store':
@@ -811,7 +814,7 @@ def getLogsList():
             fl = f[1].split('.')
             data.append(fl[0])
 
-    return public.returnJson(True, 'ok!', data)
+    return mw.returnJson(True, 'ok!', data)
 
 
 def getSafeLogs():
@@ -820,10 +823,10 @@ def getSafeLogs():
     if not data[0]:
         return data[1]
 
-    path = public.getLogsDir() + '/waf'
+    path = mw.getLogsDir() + '/waf'
     file = path + '/' + args['siteName'] + '_' + args['toDate'] + '.log'
     if not os.path.exists(file):
-        return public.returnJson(False, "文件不存在!")
+        return mw.returnJson(False, "文件不存在!")
 
     retData = []
     file = open(file)
@@ -835,7 +838,7 @@ def getSafeLogs():
 
             retData.append(json.loads(line))
 
-    return public.returnJson(True, '设置成功!', retData)
+    return mw.returnJson(True, '设置成功!', retData)
 
 
 def setObjOpen():
@@ -845,7 +848,7 @@ def setObjOpen():
         return data[1]
 
     conf = getJsonPath('config')
-    content = public.readFile(conf)
+    content = mw.readFile(conf)
     cobj = json.loads(content)
 
     o = args['obj']
@@ -854,9 +857,9 @@ def setObjOpen():
     else:
         cobj[o]["open"] = True
 
-    cjson = public.getJson(cobj)
-    public.writeFile(conf, cjson)
-    return public.returnJson(True, '设置成功!')
+    cjson = mw.getJson(cobj)
+    mw.writeFile(conf, cjson)
+    return mw.returnJson(True, '设置成功!')
 
 
 def setSiteObjOpen():
@@ -869,7 +872,7 @@ def setSiteObjOpen():
     obj = args['obj']
 
     path = getJsonPath('site')
-    content = public.readFile(path)
+    content = mw.readFile(path)
     content = json.loads(content)
 
     if type(content[siteName][obj]) == bool:
@@ -883,20 +886,19 @@ def setSiteObjOpen():
         else:
             content[siteName][obj]['open'] = True
 
-    cjson = public.getJson(content)
-    public.writeFile(path, cjson)
-    return public.returnJson(True, '设置成功!')
-
+    cjson = mw.getJson(content)
+    mw.writeFile(path, cjson)
+    return mw.returnJson(True, '设置成功!')
 
 
 def getWafSrceen():
     conf = getJsonPath('total')
-    return public.readFile(conf)
+    return mw.readFile(conf)
 
 
 def getWafConf():
     conf = getJsonPath('config')
-    return public.readFile(conf)
+    return mw.readFile(conf)
 
 
 def getWafSite():

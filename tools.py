@@ -13,7 +13,7 @@ sys.path.append(os.getcwd() + "/class/core")
 reload(sys)
 sys.setdefaultencoding('utf-8')
 import db
-import public
+import mw
 
 
 def set_mysql_root(password):
@@ -51,13 +51,13 @@ echo '==========================================='
 echo "root密码成功修改为: ${pwd}"
 echo "The root password set ${pwd}  successuful"'''
 
-    server = public.getServerDir() + '/mysql'
+    server = mw.getServerDir() + '/mysql'
     root_mysql = root_mysql.replace('${server}', server)
-    public.writeFile('mysql_root.sh', root_mysql)
+    mw.writeFile('mysql_root.sh', root_mysql)
     os.system("/bin/bash mysql_root.sh " + password)
     os.system("rm -f mysql_root.sh")
 
-    pos = public.getServerDir() + '/mysql'
+    pos = mw.getServerDir() + '/mysql'
     result = sql.table('config').dbPos(pos, 'mysql').where(
         'id=?', (1,)).setField('mysql_root', password)
 
@@ -67,7 +67,7 @@ def set_panel_pwd(password, ncli=False):
     import db
     sql = db.Sql()
     result = sql.table('users').where('id=?', (1,)).setField(
-        'password', public.md5(password))
+        'password', mw.md5(password))
     username = sql.table('users').where('id=?', (1,)).getField('username')
     if ncli:
         print("|-用户名: " + username)
@@ -94,7 +94,7 @@ def set_panel_username(username=None):
 
     username = sql.table('users').where('id=?', (1,)).getField('username')
     if username == 'admin':
-        username = public.getRandomString(8).lower()
+        username = mw.getRandomString(8).lower()
         sql.table('users').where('id=?', (1,)).setField('username', username)
     print('username: ' + username)
 

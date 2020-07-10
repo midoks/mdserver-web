@@ -9,10 +9,10 @@ import sys
 import subprocess
 
 sys.path.append(os.getcwd() + "/class/core")
-import public
+import mw
 
 app_debug = False
-if public.isAppleSystem():
+if mw.isAppleSystem():
     app_debug = True
 
 
@@ -21,11 +21,11 @@ def getPluginName():
 
 
 def getPluginDir():
-    return public.getPluginDir() + '/' + getPluginName()
+    return mw.getPluginDir() + '/' + getPluginName()
 
 
 def getServerDir():
-    return public.getServerDir() + '/' + getPluginName()
+    return mw.getServerDir() + '/' + getPluginName()
 
 
 def getInitDFile():
@@ -62,48 +62,48 @@ def getArgs():
 def checkArgs(data, ck=[]):
     for i in range(len(ck)):
         if not ck[i] in data:
-            return (False, public.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-    return (True, public.returnJson(True, 'ok'))
+            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
+    return (True, mw.returnJson(True, 'ok'))
 
 
 def status():
     pn = getPluginName()
     cmd = "ps -ef|grep 'jenkins.war' | grep -v grep | awk '{print $2}'"
-    data = public.execShell(cmd)
+    data = mw.execShell(cmd)
     if data[0] == '':
         return 'stop'
     return 'start'
 
 
 def start():
-    if public.isAppleSystem():
+    if mw.isAppleSystem():
         return "Apple Computer does not support"
 
-    data = public.execShell('service jenkins start')
+    data = mw.execShell('service jenkins start')
     if data[1] == '':
         return 'ok'
     return 'fail'
 
 
 def stop():
-    if public.isAppleSystem():
+    if mw.isAppleSystem():
         return "Apple Computer does not support"
 
-    data = public.execShell('service jenkins stop')
+    data = mw.execShell('service jenkins stop')
     if data[1] == '':
         return 'ok'
     return 'fail'
 
 
 def restart():
-    data = public.execShell('service jenkins restart')
+    data = mw.execShell('service jenkins restart')
     if data[1] == '':
         return 'ok'
     return 'fail'
 
 
 def reload():
-    data = public.execShell('service jenkins restart')
+    data = mw.execShell('service jenkins restart')
     if data[1] == '':
         return 'ok'
     return 'fail'
@@ -119,13 +119,13 @@ def initdStatus():
 def initdInstall():
 
     if not app_debug:
-        public.execShell('chkconfig --add ' + getPluginName())
+        mw.execShell('chkconfig --add ' + getPluginName())
     return 'ok'
 
 
 def initdUinstall():
     if not app_debug:
-        public.execShell('chkconfig --del ' + getPluginName())
+        mw.execShell('chkconfig --del ' + getPluginName())
     return 'ok'
 
 

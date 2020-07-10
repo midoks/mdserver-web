@@ -7,10 +7,10 @@ import time
 import shutil
 
 sys.path.append(os.getcwd() + "/class/core")
-import public
+import mw
 
 app_debug = False
-if public.isAppleSystem():
+if mw.isAppleSystem():
     app_debug = True
 
 
@@ -19,11 +19,11 @@ def getPluginName():
 
 
 def getPluginDir():
-    return public.getPluginDir() + '/' + getPluginName()
+    return mw.getPluginDir() + '/' + getPluginName()
 
 
 def getServerDir():
-    return public.getServerDir() + '/' + getPluginName()
+    return mw.getServerDir() + '/' + getPluginName()
 
 
 def getInitDFile():
@@ -52,13 +52,13 @@ def getArgs():
 def checkArgs(data, ck=[]):
     for i in range(len(ck)):
         if not ck[i] in data:
-            return (False, public.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-    return (True, public.returnJson(True, 'ok'))
+            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
+    return (True, mw.returnJson(True, 'ok'))
 
 
 def status():
     cmd = "ps -ef|grep pm2 |grep -v grep | grep -v python | awk '{print $2}'"
-    data = public.execShell(cmd)
+    data = mw.execShell(cmd)
     if data[0] == '':
         return 'stop'
     return 'start'
@@ -66,8 +66,8 @@ def status():
 
 def rootDir():
     path = '/root'
-    if public.isAppleSystem():
-        user = public.execShell(
+    if mw.isAppleSystem():
+        user = mw.execShell(
             "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
         path = '/Users/' + user
     return path
@@ -97,7 +97,7 @@ def pm2Log():
 
 def pm2GetList():
     try:
-        tmp = public.execShell(__SR + "pm2 list|grep -v 'pm2 show'")
+        tmp = mw.execShell(__SR + "pm2 list|grep -v 'pm2 show'")
         t2 = tmp[0].replace("│", "").replace("└", "").replace(
             "─", "").replace("┴", "").replace("┘", "").strip().split("┤")
         if len(t2) == 1:
@@ -107,7 +107,7 @@ def pm2GetList():
             tmpArr = t2[2].strip()
         appList = tmpArr.split('\n')
         result = []
-        tmp = public.execShell('lsof -c node -P|grep LISTEN')
+        tmp = mw.execShell('lsof -c node -P|grep LISTEN')
         plist = tmp[0].split('\n')
         for app in appList:
             if not app:
@@ -135,7 +135,7 @@ def pm2GetList():
                 if ptmp[1] == appInfo['pid']:
                     appInfo['port'] = ptmp[8].split(':')[1].split('->')[0]
             if os.path.exists(__path + '/' + appInfo['name']):
-                appInfo['path'] = public.readFile(
+                appInfo['path'] = mw.readFile(
                     __path + '/' + appInfo['name'])
             result.append(appInfo)
         return result
@@ -145,7 +145,7 @@ def pm2GetList():
 
 def pm2List():
     result = pm2GetList()
-    return public.returnJson(True, 'ok', result)
+    return mw.returnJson(True, 'ok', result)
 
 
 def pm2Add():
@@ -160,21 +160,21 @@ def pm2Add():
 
     runFile = (path + '/' + run).replace('//', '/')
     if not os.path.exists(runFile):
-        return public.returnJson(False, '指定文件不存在!')
+        return mw.returnJson(False, '指定文件不存在!')
 
     nlist = pm2GetList()
     for node in nlist:
         if pname == node['name']:
-            return public.returnJson(False, '指定项目名称已经存在!')
+            return mw.returnJson(False, '指定项目名称已经存在!')
     if os.path.exists(path + '/package.json') and not os.path.exists(path + '/package-lock.json'):
-        public.execShell(__SR + "cd " + path + ' && npm install -s')
-    public.execShell(__SR + 'cd ' + path + ' && pm2 start ' +
-                     runFile + ' --name "' + pname + '"|grep ' + pname)
-    public.execShell(__SR + 'pm2 save && pm2 startup')
+        mw.execShell(__SR + "cd " + path + ' && npm install -s')
+    mw.execShell(__SR + 'cd ' + path + ' && pm2 start ' +
+                 runFile + ' --name "' + pname + '"|grep ' + pname)
+    mw.execShell(__SR + 'pm2 save && pm2 startup')
     if not os.path.exists(__path):
-        public.execShell('mkdir -p ' + __path)
-    public.writeFile(__path + '/' + pname, path)
-    return public.returnJson(True, '添加成功!')
+        mw.execShell('mkdir -p ' + __path)
+    mw.writeFile(__path + '/' + pname, path)
+    return mw.returnJson(True, '添加成功!')
 
 
 def pm2Delete():
@@ -186,13 +186,13 @@ def pm2Delete():
     pname = args['pname']
     cmd = 'pm2 stop "' + pname + '" && pm2 delete "' + \
         pname + '" | grep "' + pname + '"'
-    result = public.execShell(__SR + cmd)[0]
+    result = mw.execShell(__SR + cmd)[0]
     if result.find('✓') != -1:
-        public.execShell(__SR + 'pm2 save && pm2 startup')
+        mw.execShell(__SR + 'pm2 save && pm2 startup')
         if os.path.exists(__path + '/' + pname):
             os.remove(__path + '/' + pname)
-        return public.returnJson(True, '删除成功!')
-    return public.returnJson(False, '删除失败!')
+        return mw.returnJson(True, '删除成功!')
+    return mw.returnJson(False, '删除失败!')
 
 
 def pm2Stop():
@@ -202,11 +202,11 @@ def pm2Stop():
         return data[1]
 
     pname = args['pname']
-    result = public.execShell(__SR + 'pm2 stop "' +
-                              pname + '"|grep ' + pname)[0]
+    result = mw.execShell(__SR + 'pm2 stop "' +
+                          pname + '"|grep ' + pname)[0]
     if result.find('stoped') != -1:
-        return public.returnJson(True, '项目[' + pname + ']已停止!')
-    return public.returnJson(True, '项目[' + pname + ']停止失败!')
+        return mw.returnJson(True, '项目[' + pname + ']已停止!')
+    return mw.returnJson(True, '项目[' + pname + ']停止失败!')
 
 
 def pm2Start():
@@ -216,11 +216,11 @@ def pm2Start():
         return data[1]
 
     pname = args['pname']
-    result = public.execShell(
+    result = mw.execShell(
         __SR + 'pm2 start "' + pname + '"|grep ' + pname)[0]
     if result.find('online') != -1:
-        return public.returnJson(True, '项目[' + pname + ']已启动!')
-    return public.returnJson(False, '项目[' + pname + ']启动失败!')
+        return mw.returnJson(True, '项目[' + pname + ']已启动!')
+    return mw.returnJson(False, '项目[' + pname + ']启动失败!')
 
 
 def pm2VerList():
@@ -231,11 +231,11 @@ def pm2VerList():
 
     cmd = __SR + ' nvm ls-remote|grep -v v0|grep -v iojs'
     # print cmd
-    tmp = public.execShell(cmd)
+    tmp = mw.execShell(cmd)
     result['list'] = re.findall(rep, tmp[0])
-    tmp = public.execShell(__SR + "nvm version")
+    tmp = mw.execShell(__SR + "nvm version")
     result['version'] = tmp[0].strip()
-    return public.returnJson(True, 'ok', result)
+    return mw.returnJson(True, 'ok', result)
 
 
 def setNodeVersion():
@@ -255,13 +255,13 @@ npm install pm2 -g
 npm config set registry $oldreg 
 ''' % (version, version, version)
     cmd = __SR + estr
-    public.execShell(cmd)
-    return public.returnJson(True, '已切换至[' + version + ']')
+    mw.execShell(cmd)
+    return mw.returnJson(True, '已切换至[' + version + ']')
 
 
 def getMod():
     cmd = __SR + "npm list --depth=0 -global"
-    tmp = public.execShell(cmd)
+    tmp = mw.execShell(cmd)
     modList = tmp[0].replace("│", "").replace("└", "").replace(
         "─", "").replace("┴", "").replace("┘", "").strip().split()
     result = []
@@ -274,7 +274,7 @@ def getMod():
         mod['version'] = tmp[1]
         result.append(mod)
 
-    return public.returnJson(True, 'OK', result)
+    return mw.returnJson(True, 'OK', result)
 
 
 # 安装库
@@ -285,8 +285,8 @@ def installMod():
         return data[1]
 
     mname = args['mname']
-    public.execShell(__SR + 'npm install ' + mname + ' -g')
-    return public.returnJson(True, '安装成功!')
+    mw.execShell(__SR + 'npm install ' + mname + ' -g')
+    return mw.returnJson(True, '安装成功!')
 
 
 def uninstallMod():
@@ -298,9 +298,9 @@ def uninstallMod():
     mname = args['mname']
     myNot = ['pm2', 'npm']
     if mname in myNot:
-        return public.returnJson(False, '不能卸载[' + mname + ']')
-    public.execShell(__SR + 'npm uninstall ' + mname + ' -g')
-    return public.returnJson(True, '卸载成功!')
+        return mw.returnJson(False, '不能卸载[' + mname + ']')
+    mw.execShell(__SR + 'npm uninstall ' + mname + ' -g')
+    return mw.returnJson(True, '卸载成功!')
 
 
 def nodeLogRun():
@@ -331,8 +331,8 @@ def nodeLogClearRun():
 
     pname = args['pname']
     path = pm2LogDir() + '/logs/' + pname + '-out.log'
-    public.execShell('rm -rf ' + path + '&& touch ' + path)
-    return public.returnJson(True, '清空运行成功')
+    mw.execShell('rm -rf ' + path + '&& touch ' + path)
+    return mw.returnJson(True, '清空运行成功')
 
 
 def nodeLogClearErr():
@@ -342,8 +342,8 @@ def nodeLogClearErr():
         return data[1]
     pname = args['pname']
     path = pm2LogDir() + '/logs/' + pname + '-error.log'
-    public.execShell('rm -rf ' + path + '&& touch ' + path)
-    return public.returnJson(True, '清空错误成功')
+    mw.execShell('rm -rf ' + path + '&& touch ' + path)
+    return mw.returnJson(True, '清空错误成功')
 
 if __name__ == "__main__":
     func = sys.argv[1]

@@ -7,11 +7,11 @@ import time
 import re
 
 sys.path.append(os.getcwd() + "/class/core")
-import public
+import mw
 import site_api
 
 app_debug = False
-if public.isAppleSystem():
+if mw.isAppleSystem():
     app_debug = True
 
 
@@ -20,11 +20,11 @@ def getPluginName():
 
 
 def getPluginDir():
-    return public.getPluginDir() + '/' + getPluginName()
+    return mw.getPluginDir() + '/' + getPluginName()
 
 
 def getServerDir():
-    return public.getServerDir() + '/' + getPluginName()
+    return mw.getServerDir() + '/' + getPluginName()
 
 
 def getArgs():
@@ -45,12 +45,12 @@ def getArgs():
 
 
 def getConf():
-    return public.getServerDir() + '/web_conf/nginx/vhost/phpmyadmin.conf'
+    return mw.getServerDir() + '/web_conf/nginx/vhost/phpmyadmin.conf'
 
 
 def getPort():
     file = getConf()
-    content = public.readFile(file)
+    content = mw.readFile(file)
     rep = 'listen\s*(.*);'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
@@ -60,12 +60,12 @@ def getHomePage():
     try:
         port = getPort()
         ip = '127.0.0.1'
-        if not public.isAppleSystem():
-            ip = public.getLocalIp()
+        if not mw.isAppleSystem():
+            ip = mw.getLocalIp()
         url = 'http://' + ip + ':' + port + '/phpmyadmin/index.php'
-        return public.returnJson(True, 'OK', url)
+        return mw.returnJson(True, 'OK', url)
     except Exception as e:
-        return public.returnJson(False, '插件未启动!')
+        return mw.returnJson(False, '插件未启动!')
 
 
 def getPhpVer(expect=55):
@@ -83,18 +83,18 @@ def getCachePhpVer():
     cacheFile = getServerDir() + '/php.pl'
     v = ''
     if os.path.exists(cacheFile):
-        v = public.readFile(cacheFile)
+        v = mw.readFile(cacheFile)
     else:
         v = getPhpVer()
-        public.writeFile(cacheFile, v)
+        mw.writeFile(cacheFile, v)
     return v
 
 
 def contentReplace(content):
-    service_path = public.getServerDir()
+    service_path = mw.getServerDir()
     php_ver = getCachePhpVer()
     # print php_ver
-    content = content.replace('{$ROOT_PATH}', public.getRootDir())
+    content = content.replace('{$ROOT_PATH}', mw.getRootDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$PHP_VER}', php_ver)
     return content
@@ -112,18 +112,18 @@ def start():
     file_run = getConf()
 
     if not os.path.exists(file_run):
-        centent = public.readFile(file_tpl)
+        centent = mw.readFile(file_tpl)
         centent = contentReplace(centent)
-        public.writeFile(file_run, centent)
+        mw.writeFile(file_run, centent)
 
     conf_run = getServerDir() + '/phpmyadmin/config.inc.php'
     if not os.path.exists(conf_run):
         conf_tpl = getPluginDir() + '/conf/config.inc.php'
-        centent = public.readFile(conf_tpl)
+        centent = mw.readFile(conf_tpl)
         # centent = contentReplace(centent)
-        print public.writeFile(conf_run, centent)
+        print mw.writeFile(conf_run, centent)
 
-    public.restartWeb()
+    mw.restartWeb()
     return 'ok'
 
 
@@ -131,7 +131,7 @@ def stop():
     conf = getConf()
     if os.path.exists(conf):
         os.remove(conf)
-    public.restartWeb()
+    mw.restartWeb()
     return 'ok'
 
 
@@ -150,7 +150,7 @@ def setPhpVer():
         return 'phpver missing'
 
     cacheFile = getServerDir() + '/php.pl'
-    public.writeFile(cacheFile, args['phpver'])
+    mw.writeFile(cacheFile, args['phpver'])
     restart()
 
     return 'ok'
@@ -159,37 +159,37 @@ def setPhpVer():
 def getSetPhpVer():
     cacheFile = getServerDir() + '/php.pl'
     if os.path.exists(cacheFile):
-        return public.readFile(cacheFile).strip()
+        return mw.readFile(cacheFile).strip()
     return ''
 
 
 def getPmaPort():
     try:
         port = getPort()
-        return public.returnJson(True, 'OK', port)
+        return mw.returnJson(True, 'OK', port)
     except Exception as e:
         print e
-        return public.returnJson(False, '插件未启动!')
+        return mw.returnJson(False, '插件未启动!')
 
 
 def setPmaPort():
     args = getArgs()
     if not 'port' in args:
-        return public.returnJson(False, 'port missing!')
+        return mw.returnJson(False, 'port missing!')
 
     port = args['port']
     if port == '80':
-        return public.returnJson(False, '80端不能使用!')
+        return mw.returnJson(False, '80端不能使用!')
 
     file = getConf()
     if not os.path.exists(file):
-        return public.returnJson(False, '插件未启动!')
-    content = public.readFile(file)
+        return mw.returnJson(False, '插件未启动!')
+    content = mw.readFile(file)
     rep = 'listen\s*(.*);'
     content = re.sub(rep, "listen " + port + ';', content)
-    public.writeFile(file, content)
-    public.restartWeb()
-    return public.returnJson(True, '修改成功!')
+    mw.writeFile(file, content)
+    mw.restartWeb()
+    return mw.returnJson(True, '修改成功!')
 
 
 if __name__ == "__main__":

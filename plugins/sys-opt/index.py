@@ -8,7 +8,7 @@ import re
 import sys
 
 sys.path.append(os.getcwd() + "/class/core")
-import public
+import mw
 
 
 def status():
@@ -16,22 +16,22 @@ def status():
 
 
 def start():
-    public.execShell('sysctl -p')
+    mw.execShell('sysctl -p')
     return "ok"
 
 
 def stop():
-    public.execShell('sysctl -p')
+    mw.execShell('sysctl -p')
     return 'ok'
 
 
 def restart():
-    public.execShell('sysctl -p')
+    mw.execShell('sysctl -p')
     return 'ok'
 
 
 def reload():
-    public.execShell('sysctl -p')
+    mw.execShell('sysctl -p')
     return 'ok'
 
 

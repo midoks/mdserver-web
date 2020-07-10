@@ -7,12 +7,12 @@ import time
 import subprocess
 
 sys.path.append(os.getcwd() + "/class/core")
-import public
+import mw
 
 
 app_debug = False
 
-if public.isAppleSystem():
+if mw.isAppleSystem():
     app_debug = True
 
 
@@ -21,11 +21,11 @@ def getPluginName():
 
 
 def getPluginDir():
-    return public.getPluginDir() + '/' + getPluginName()
+    return mw.getPluginDir() + '/' + getPluginName()
 
 
 def getServerDir():
-    return public.getServerDir() + '/' + getPluginName()
+    return mw.getServerDir() + '/' + getPluginName()
 
 
 def getInitDFile():
@@ -53,11 +53,11 @@ def getArgs():
 
 def clearTemp():
     path_bin = getServerDir() + "/nginx"
-    public.execShell('rm -rf ' + path_bin + '/client_body_temp')
-    public.execShell('rm -rf ' + path_bin + '/fastcgi_temp')
-    public.execShell('rm -rf ' + path_bin + '/proxy_temp')
-    public.execShell('rm -rf ' + path_bin + '/scgi_temp')
-    public.execShell('rm -rf ' + path_bin + '/uwsgi_temp')
+    mw.execShell('rm -rf ' + path_bin + '/client_body_temp')
+    mw.execShell('rm -rf ' + path_bin + '/fastcgi_temp')
+    mw.execShell('rm -rf ' + path_bin + '/proxy_temp')
+    mw.execShell('rm -rf ' + path_bin + '/scgi_temp')
+    mw.execShell('rm -rf ' + path_bin + '/uwsgi_temp')
 
 
 def getConf():
@@ -72,13 +72,13 @@ def getConfTpl():
 
 def getOs():
     data = {}
-    data['os'] = public.getOs()
+    data['os'] = mw.getOs()
     ng_exe_bin = getServerDir() + "/nginx/sbin/nginx"
     if checkAuthEq(ng_exe_bin, 'root'):
         data['auth'] = True
     else:
         data['auth'] = False
-    return public.getJson(data)
+    return mw.getJson(data)
 
 
 def getInitDTpl():
@@ -112,15 +112,15 @@ def checkAuthEq(file, owner='root'):
 
 def confReplace():
     service_path = os.path.dirname(os.getcwd())
-    content = public.readFile(getConfTpl())
+    content = mw.readFile(getConfTpl())
     content = content.replace('{$SERVER_PATH}', service_path)
 
     user = 'www'
     user_group = 'www'
 
-    if public.getOs() == 'darwin':
+    if mw.getOs() == 'darwin':
         # macosx do
-        user = public.execShell(
+        user = mw.execShell(
             "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
         # user = 'root'
         user_group = 'staff'
@@ -133,9 +133,9 @@ def confReplace():
 
     nconf = getServerDir() + '/nginx/conf/nginx.conf'
 
-    __content = public.readFile(nconf)
+    __content = mw.readFile(nconf)
     if __content.find('#user'):
-        public.writeFile(getServerDir() + '/nginx/conf/nginx.conf', content)
+        mw.writeFile(getServerDir() + '/nginx/conf/nginx.conf', content)
 
     # give nginx root permission
     ng_exe_bin = getServerDir() + "/nginx/sbin/nginx"
@@ -167,10 +167,10 @@ def initDreplace():
     file_bin = initD_path + '/' + getPluginName()
 
     # initd replace
-    content = public.readFile(file_tpl)
+    content = mw.readFile(file_tpl)
     content = content.replace('{$SERVER_PATH}', service_path)
-    public.writeFile(file_bin, content)
-    public.execShell('chmod +x ' + file_bin)
+    mw.writeFile(file_bin, content)
+    mw.execShell('chmod +x ' + file_bin)
 
     # config replace
     confReplace()
@@ -182,7 +182,7 @@ def initDreplace():
 
 
 def status():
-    data = public.execShell(
+    data = mw.execShell(
         "ps -ef|grep nginx |grep -v grep | grep -v python | awk '{print $2}'")
     if data[0] == '':
         return 'stop'
@@ -191,7 +191,7 @@ def status():
 
 def start():
     file = initDreplace()
-    data = public.execShell(file + ' start')
+    data = mw.execShell(file + ' start')
     if data[1] == '':
         return 'ok'
     return data[1]
@@ -199,7 +199,7 @@ def start():
 
 def stop():
     file = initDreplace()
-    data = public.execShell(file + ' stop')
+    data = mw.execShell(file + ' stop')
     clearTemp()
     if data[1] == '':
         return 'ok'
@@ -208,7 +208,7 @@ def stop():
 
 def restart():
     file = initDreplace()
-    data = public.execShell(file + ' restart')
+    data = mw.execShell(file + ' restart')
     if data[1] == '':
         return 'ok'
     return data[1]
@@ -216,7 +216,7 @@ def restart():
 
 def reload():
     file = initDreplace()
-    data = public.execShell(file + ' reload')
+    data = mw.execShell(file + ' reload')
     if data[1] == '':
         return 'ok'
     return data[1]
@@ -224,7 +224,7 @@ def reload():
 
 def initdStatus():
     if not app_debug:
-        if public.isAppleSystem():
+        if mw.isAppleSystem():
             return "Apple Computer does not support"
     initd_bin = getInitDFile()
     if os.path.exists(initd_bin):
@@ -235,23 +235,23 @@ def initdStatus():
 def initdInstall():
     import shutil
     if not app_debug:
-        if public.isAppleSystem():
+        if mw.isAppleSystem():
             return "Apple Computer does not support"
 
     source_bin = initDreplace()
     initd_bin = getInitDFile()
     shutil.copyfile(source_bin, initd_bin)
-    public.execShell('chmod +x ' + initd_bin)
-    public.execShell('chkconfig --add ' + getPluginName())
+    mw.execShell('chmod +x ' + initd_bin)
+    mw.execShell('chkconfig --add ' + getPluginName())
     return 'ok'
 
 
 def initdUinstall():
     if not app_debug:
-        if public.isAppleSystem():
+        if mw.isAppleSystem():
             return "Apple Computer does not support"
 
-    public.execShell('chkconfig --del ' + getPluginName())
+    mw.execShell('chkconfig --del ' + getPluginName())
     initd_bin = getInitDFile()
     os.remove(initd_bin)
     return 'ok'
@@ -260,7 +260,7 @@ def initdUinstall():
 def runInfo():
     # 取Openresty负载状态
     try:
-        result = public.httpGet('http://127.0.0.1/nginx_status')
+        result = mw.httpGet('http://127.0.0.1/nginx_status')
         tmp = result.split()
         data = {}
         data['active'] = tmp[2]
@@ -270,7 +270,7 @@ def runInfo():
         data['Reading'] = tmp[11]
         data['Writing'] = tmp[13]
         data['Waiting'] = tmp[15]
-        return public.getJson(data)
+        return mw.getJson(data)
     except Exception as e:
         return 'oprenresty not started'
 

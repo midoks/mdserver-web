@@ -7,10 +7,10 @@ import time
 import shutil
 
 sys.path.append(os.getcwd() + "/class/core")
-import public
+import mw
 
 app_debug = False
-if public.isAppleSystem():
+if mw.isAppleSystem():
     app_debug = True
 
 
@@ -19,11 +19,11 @@ def getPluginName():
 
 
 def getPluginDir():
-    return public.getPluginDir() + '/' + getPluginName()
+    return mw.getPluginDir() + '/' + getPluginName()
 
 
 def getServerDir():
-    return public.getServerDir() + '/' + getPluginName()
+    return mw.getServerDir() + '/' + getPluginName()
 
 
 def getArgs():
@@ -46,13 +46,13 @@ def getArgs():
 def checkArgs(data, ck=[]):
     for i in range(len(ck)):
         if not ck[i] in data:
-            return (False, public.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-    return (True, public.returnJson(True, 'ok'))
+            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
+    return (True, mw.returnJson(True, 'ok'))
 
 
 def status():
     cmd = "ps -ef|grep xl2tpd |grep -v grep | grep -v python | awk '{print $2}'"
-    data = public.execShell(cmd)
+    data = mw.execShell(cmd)
     if data[0] == '':
         return 'stop'
     return 'start'
@@ -61,62 +61,62 @@ def status():
 def initConf():
     l2tp_cs = getServerDir() + '/chap-secrets'
     if not os.path.exists(l2tp_cs):
-        public.execShell('cp -rf ' + getPluginDir() +
-                         '/tmp/chap-secrets' + ' ' + getServerDir())
+        mw.execShell('cp -rf ' + getPluginDir() +
+                     '/tmp/chap-secrets' + ' ' + getServerDir())
 
     l2tp_is = getServerDir() + '/ipsec.secrets'
     if not os.path.exists(l2tp_is):
-        public.execShell('cp -rf ' + getPluginDir() +
-                         '/tmp/ipsec.secrets' + ' ' + getServerDir())
+        mw.execShell('cp -rf ' + getPluginDir() +
+                     '/tmp/ipsec.secrets' + ' ' + getServerDir())
 
 
 def start():
     initConf()
 
-    if public.isAppleSystem():
+    if mw.isAppleSystem():
         return "Apple Computer does not support"
 
-    data = public.execShell('service xl2tpd start')
+    data = mw.execShell('service xl2tpd start')
     if data[0] == '':
         return 'ok'
     return data[1]
 
 
 def stop():
-    if public.isAppleSystem():
+    if mw.isAppleSystem():
         return "Apple Computer does not support"
 
-    data = public.execShell('service xl2tpd stop')
+    data = mw.execShell('service xl2tpd stop')
     if data[0] == '':
         return 'ok'
     return data[1]
 
 
 def restart():
-    if public.isAppleSystem():
+    if mw.isAppleSystem():
         return "Apple Computer does not support"
 
-    data = public.execShell('service xl2tpd restart')
+    data = mw.execShell('service xl2tpd restart')
     if data[0] == '':
         return 'ok'
     return data[1]
 
 
 def reload():
-    data = public.execShell('service xl2tpd reload')
+    data = mw.execShell('service xl2tpd reload')
     if data[0] == '':
         return 'ok'
     return data[1]
 
 
 def getPathFile():
-    if public.isAppleSystem():
+    if mw.isAppleSystem():
         return getServerDir() + '/chap-secrets'
     return '/etc/ppp/chap-secrets'
 
 
 def getPathFilePsk():
-    if public.isAppleSystem():
+    if mw.isAppleSystem():
         return getServerDir() + '/ipsec.secrets'
     return '/etc/ipsec.secrets'
 
@@ -125,13 +125,13 @@ def getUserList():
     import re
     path = getPathFile()
     if not os.path.exists(path):
-        return public.returnJson(False, '密码配置文件不存在!')
-    conf = public.readFile(path)
+        return mw.returnJson(False, '密码配置文件不存在!')
+    conf = mw.readFile(path)
 
     conf = re.sub('#(.*)\n', '', conf)
 
     if conf.strip() == '':
-        return public.returnJson(True, 'ok', [])
+        return mw.returnJson(True, 'ok', [])
 
     ulist = conf.strip().split('\n')
 
@@ -146,36 +146,36 @@ def getUserList():
         line_info['ip'] = line[3]
         user.append(line_info)
 
-    return public.returnJson(True, 'ok', user)
+    return mw.returnJson(True, 'ok', user)
 
 
 def addUser():
-    if public.isAppleSystem():
-        return public.returnJson(False, "Apple Computer does not support")
+    if mw.isAppleSystem():
+        return mw.returnJson(False, "Apple Computer does not support")
 
     args = getArgs()
     data = checkArgs(args, ['username'])
     if not data[0]:
         return data[1]
-    ret = public.execShell('echo ' + args['username'] + '|l2tp -a')
+    ret = mw.execShell('echo ' + args['username'] + '|l2tp -a')
     if ret[1] == '':
-        return public.returnJson(True, '添加成功!:' + ret[0])
-    return public.returnJson(False, '添加失败:' + ret[0])
+        return mw.returnJson(True, '添加成功!:' + ret[0])
+    return mw.returnJson(False, '添加失败:' + ret[0])
 
 
 def delUser():
-    if public.isAppleSystem():
-        return public.returnJson(False, "Apple Computer does not support")
+    if mw.isAppleSystem():
+        return mw.returnJson(False, "Apple Computer does not support")
 
     args = getArgs()
     data = checkArgs(args, ['username'])
     if not data[0]:
         return data[1]
 
-    ret = public.execShell('echo ' + args['username'] + '|l2tp -d')
+    ret = mw.execShell('echo ' + args['username'] + '|l2tp -d')
     if ret[1] == '':
-        return public.returnJson(True, '删除成功!:' + ret[0])
-    return public.returnJson(False, '删除失败:' + ret[0])
+        return mw.returnJson(True, '删除成功!:' + ret[0])
+    return mw.returnJson(False, '删除失败:' + ret[0])
 
 
 def modUser():
@@ -192,17 +192,17 @@ def modUser():
     # sed -i "/^\<${user}\>/d" /etc/ppp/chap-secrets
     # echo "${user}    l2tpd    ${pass}       *" >> /etc/ppp/chap-secrets
 
-    if public.isAppleSystem():
-        public.execShell("sed -i .bak '/^\(" + username + "\)/d' " + path)
+    if mw.isAppleSystem():
+        mw.execShell("sed -i .bak '/^\(" + username + "\)/d' " + path)
     else:
-        public.execShell("sed -i '/^\(" + username + "\)/d' " + path)
+        mw.execShell("sed -i '/^\(" + username + "\)/d' " + path)
     # print 'echo "' + username + "    l2tpd    " + password + "      *\" >>"
     # + path
-    ret = public.execShell("echo \"" + username +
-                           "    l2tpd    " + password + "       *\" >>" + path)
+    ret = mw.execShell("echo \"" + username +
+                       "    l2tpd    " + password + "       *\" >>" + path)
     if ret[1] == '':
-        return public.returnJson(True, '修改成功!')
-    return public.returnJson(False, '修改失败')
+        return mw.returnJson(True, '修改成功!')
+    return mw.returnJson(False, '修改失败')
 
 
 if __name__ == "__main__":

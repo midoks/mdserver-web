@@ -8,7 +8,7 @@ import re
 import sys
 
 sys.path.append(os.getcwd() + "/class/core")
-import public
+import mw
 
 reload(sys)
 sys.setdefaultencoding('utf8')
@@ -17,7 +17,7 @@ sys.path.append('/usr/local/lib/python2.7/site-packages')
 
 
 app_debug = False
-if public.isAppleSystem():
+if mw.isAppleSystem():
     app_debug = True
 
 
@@ -26,11 +26,11 @@ def getPluginName():
 
 
 def getPluginDir():
-    return public.getPluginDir() + '/' + getPluginName()
+    return mw.getPluginDir() + '/' + getPluginName()
 
 
 def getServerDir():
-    return public.getServerDir() + '/' + getPluginName()
+    return mw.getServerDir() + '/' + getPluginName()
 
 
 def getInitDFile():
@@ -59,8 +59,8 @@ def getArgs():
 def checkArgs(data, ck=[]):
     for i in range(len(ck)):
         if not ck[i] in data:
-            return (False, public.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-    return (True, public.returnJson(True, 'ok'))
+            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
+    return (True, mw.returnJson(True, 'ok'))
 
 
 def getInitDTpl():
@@ -89,7 +89,7 @@ def getRunLog():
 
 
 def contentReplace(content):
-    service_path = public.getServerDir()
+    service_path = mw.getServerDir()
     content = content.replace('{$SERVER_PATH}', service_path)
     return content
 
@@ -99,14 +99,14 @@ def initDreplace():
     ddir = getServerDir() + '/workers'
     if not os.path.exists(ddir):
         sdir = getPluginDir() + '/workers'
-        public.execShell('cp -rf ' + sdir + ' ' + getServerDir())
+        mw.execShell('cp -rf ' + sdir + ' ' + getServerDir())
 
     cfg = getServerDir() + '/qb.conf'
     if not os.path.exists(cfg):
         cfg_tpl = getPluginDir() + '/conf/qb.conf'
-        content = public.readFile(cfg_tpl)
+        content = mw.readFile(cfg_tpl)
         content = contentReplace(content)
-        public.writeFile(cfg, content)
+        mw.writeFile(cfg, content)
 
     file_tpl = getInitDTpl()
     service_path = os.path.dirname(os.getcwd())
@@ -118,16 +118,16 @@ def initDreplace():
 
     # initd replace
     if not os.path.exists(file_bin):
-        content = public.readFile(file_tpl)
+        content = mw.readFile(file_tpl)
         content = contentReplace(content)
-        public.writeFile(file_bin, content)
-        public.execShell('chmod +x ' + file_bin)
+        mw.writeFile(file_bin, content)
+        mw.execShell('chmod +x ' + file_bin)
 
     return file_bin
 
 
 def status():
-    data = public.execShell(
+    data = mw.execShell(
         "ps -ef|grep qbittorrent_worker | grep -v grep | awk '{print $2}'")
     if data[0] == '':
         return 'stop'
@@ -137,13 +137,13 @@ def status():
 def start():
 
     cmd = "ps -ef | grep qbittorrent-nox |grep -v grep |awk '{print $2}'"
-    ret = public.execShell(cmd)
+    ret = mw.execShell(cmd)
     if ret[0] == '':
-        public.execShell('qbittorrent-nox -d')
+        mw.execShell('qbittorrent-nox -d')
 
     file = initDreplace()
 
-    data = public.execShell(file + ' start')
+    data = mw.execShell(file + ' start')
     if data[1] == '':
         return 'ok'
     return data[1]
@@ -151,9 +151,9 @@ def start():
 
 def stop():
     file = initDreplace()
-    data = public.execShell(file + ' stop')
+    data = mw.execShell(file + ' stop')
     # cmd = "ps -ef | grep qbittorrent-nox |grep -v grep |awk '{print $2}' | xargs kill"
-    # public.execShell(cmd)
+    # mw.execShell(cmd)
     if data[1] == '':
         return 'ok'
     return data[1]
@@ -161,7 +161,7 @@ def stop():
 
 def restart():
     file = initDreplace()
-    data = public.execShell(file + ' restart')
+    data = mw.execShell(file + ' restart')
     if data[1] == '':
         return 'ok'
     return data[1]
@@ -169,7 +169,7 @@ def restart():
 
 def reload():
     file = initDreplace()
-    data = public.execShell(file + ' reload')
+    data = mw.execShell(file + ' reload')
     if data[1] == '':
         return 'ok'
     return data[1]
@@ -177,7 +177,7 @@ def reload():
 
 def initdStatus():
     if not app_debug:
-        if public.isAppleSystem():
+        if mw.isAppleSystem():
             return "Apple Computer does not support"
 
     initd_bin = getInitDFile()
@@ -189,24 +189,24 @@ def initdStatus():
 def initdInstall():
     import shutil
     if not app_debug:
-        if public.isAppleSystem():
+        if mw.isAppleSystem():
             return "Apple Computer does not support"
 
     mysql_bin = initDreplace()
     initd_bin = getInitDFile()
     shutil.copyfile(mysql_bin, initd_bin)
-    public.execShell('chmod +x ' + initd_bin)
-    public.execShell('chkconfig --add ' + getPluginName())
+    mw.execShell('chmod +x ' + initd_bin)
+    mw.execShell('chkconfig --add ' + getPluginName())
     return 'ok'
 
 
 def initdUinstall():
     if not app_debug:
-        if public.isAppleSystem():
+        if mw.isAppleSystem():
             return "Apple Computer does not support"
     initd_bin = getInitDFile()
     os.remove(initd_bin)
-    public.execShell('chkconfig --del ' + getPluginName())
+    mw.execShell('chkconfig --del ' + getPluginName())
     return 'ok'
 
 
@@ -217,7 +217,7 @@ def matchData(reg, content):
 
 def getDbConfInfo():
     cfg = getConf()
-    content = public.readFile(cfg)
+    content = mw.readFile(cfg)
     data = {}
     data['DB_HOST'] = matchData("DB_HOST\s*=\s(.*)", content)
     data['DB_USER'] = matchData("DB_USER\s*=\s(.*)", content)
@@ -229,7 +229,7 @@ def getDbConfInfo():
 
 def getQbConf():
     cfg = getConf()
-    content = public.readFile(cfg)
+    content = mw.readFile(cfg)
     data = {}
     data['QB_HOST'] = matchData("QB_HOST\s*=\s(.*)", content)
     data['QB_PORT'] = matchData("QB_PORT\s*=\s(.*)", content)
@@ -261,7 +261,7 @@ def pQbClient():
 def getQbUrl():
     info = getQbConf()
     url = 'http://' + info['QB_HOST'] + ':' + info['QB_PORT'] + '/'
-    return public.returnJson(True, 'ok', url)
+    return mw.returnJson(True, 'ok', url)
 
 
 def qbList():
@@ -283,9 +283,9 @@ def qbList():
         data = {}
         data['type'] = tfilter
         data['torrents'] = torrents
-        return public.returnJson(True, 'ok', data)
+        return mw.returnJson(True, 'ok', data)
     except Exception as e:
-        return public.returnJson(False, str(e))
+        return mw.returnJson(False, str(e))
 
 
 def qbDel():
@@ -295,7 +295,7 @@ def qbDel():
         return data[1]
     qb = pQbClient()
     data = qb.delete(args['hash'])
-    return public.returnJson(True, '操作成功!', data)
+    return mw.returnJson(True, '操作成功!', data)
 
 
 def qbAdd():
@@ -306,7 +306,7 @@ def qbAdd():
     url = 'magnet:?xt=urn:btih:' + args['hash']
     qb = pQbClient()
     data = qb.download_from_link(url)
-    return public.returnJson(True, '操作成功!', data)
+    return mw.returnJson(True, '操作成功!', data)
 
 
 def test():
@@ -315,7 +315,7 @@ def test():
     # print qb.download_from_link(magnet_link)
     torrents = qb.torrents(filter='downloading')
     for torrent in torrents:
-        print public.returnJson(False, torrent)
+        print mw.returnJson(False, torrent)
 
 if __name__ == "__main__":
     func = sys.argv[1]

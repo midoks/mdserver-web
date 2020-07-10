@@ -8,10 +8,10 @@ import re
 import sys
 
 sys.path.append(os.getcwd() + "/class/core")
-import public
+import mw
 
 app_debug = False
-if public.isAppleSystem():
+if mw.isAppleSystem():
     app_debug = True
 
 
@@ -25,11 +25,11 @@ def getInitDTpl():
 
 
 def getPluginDir():
-    return public.getPluginDir() + '/' + getPluginName()
+    return mw.getPluginDir() + '/' + getPluginName()
 
 
 def getServerDir():
-    return public.getServerDir() + '/' + getPluginName()
+    return mw.getServerDir() + '/' + getPluginName()
 
 
 def getInitDFile():
@@ -58,18 +58,18 @@ def getArgs():
 def checkArgs(data, ck=[]):
     for i in range(len(ck)):
         if not ck[i] in data:
-            return (False, public.returnJson(False, '参数:(' + ck[i] + ')没有!'))
-    return (True, public.returnJson(True, 'ok'))
+            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
+    return (True, mw.returnJson(True, 'ok'))
 
 
 def contentReplace(content):
-    service_path = public.getServerDir()
+    service_path = mw.getServerDir()
     content = content.replace('{$SERVER_PATH}', service_path)
     return content
 
 
 def status():
-    data = public.execShell(
+    data = mw.execShell(
         "ps -ef|grep rsync |grep -v grep | grep -v python | awk '{print $2}'")
     if data[0] == '':
         return 'stop'
@@ -77,20 +77,20 @@ def status():
 
 
 def appConf():
-    if public.isAppleSystem():
+    if mw.isAppleSystem():
         return getServerDir() + '/rsyncd.conf'
     return '/etc/rsyncd.conf'
 
 
 def appConfPwd():
-    if public.isAppleSystem():
+    if mw.isAppleSystem():
         return getServerDir() + '/rsyncd.passwd'
     return '/etc/rsyncd.passwd'
 
 
 def getLog():
     conf_path = appConf()
-    conf = public.readFile(conf_path)
+    conf = mw.readFile(conf_path)
     rep = 'log file\s*=\s*(.*)'
     tmp = re.search(rep, conf)
     if not tmp:
@@ -100,18 +100,18 @@ def getLog():
 
 def initDreplace():
     conf_path = appConf()
-    conf = public.readFile(conf_path)
+    conf = mw.readFile(conf_path)
 
     compile_sub = re.compile('^#(.*)', re.M)
     conf = compile_sub.sub('', conf)
     conf_tpl_path = getPluginDir() + '/conf/rsyncd.conf'
     if conf.strip() == '':
-        content = public.readFile(conf_tpl_path)
-        public.writeFile(conf_path, content)
+        content = mw.readFile(conf_tpl_path)
+        mw.writeFile(conf_path, content)
     confpwd_path = appConfPwd()
     if not os.path.exists(confpwd_path):
-        public.writeFile(confpwd_path, '')
-        public.execShell('chmod 0600 ' + confpwd_path)
+        mw.writeFile(confpwd_path, '')
+        mw.execShell('chmod 0600 ' + confpwd_path)
 
     initD_path = getServerDir() + '/init.d'
     if not os.path.exists(initD_path):
@@ -121,23 +121,23 @@ def initDreplace():
     file_tpl = getInitDTpl()
     # initd replace
     if not os.path.exists(file_bin):
-        content = public.readFile(file_tpl)
+        content = mw.readFile(file_tpl)
         content = contentReplace(content)
-        public.writeFile(file_bin, content)
-        public.execShell('chmod +x ' + file_bin)
+        mw.writeFile(file_bin, content)
+        mw.execShell('chmod +x ' + file_bin)
 
     if os.path.exists('/usr/lib/systemd/system/rsyncd.service'):
-        public.execShell('rm -rf /usr/lib/systemd/system/rsyncd*')
+        mw.execShell('rm -rf /usr/lib/systemd/system/rsyncd*')
 
     rlog = getLog()
     if os.path.exists(rlog):
-        public.writeFile(rlog, '')
+        mw.writeFile(rlog, '')
     return file_bin
 
 
 def start():
     file = initDreplace()
-    data = public.execShell(file + ' start')
+    data = mw.execShell(file + ' start')
     if data[1] == '':
         return 'ok'
     return 'fail'
@@ -145,14 +145,14 @@ def start():
 
 def stop():
     file = initDreplace()
-    data = public.execShell(file + ' stop')
+    data = mw.execShell(file + ' stop')
     if data[1] == '':
         return 'ok'
     return 'fail'
 
 
 def restart():
-    if public.isAppleSystem():
+    if mw.isAppleSystem():
         return "Apple Computer does not support"
     stop()
     start()
@@ -160,10 +160,10 @@ def restart():
 
 
 def reload():
-    if public.isAppleSystem():
+    if mw.isAppleSystem():
         return "Apple Computer does not support"
 
-    # data = public.execShell('systemctl reload rsyncd.service')
+    # data = mw.execShell('systemctl reload rsyncd.service')
     # if data[1] == '':
     #     return 'ok'
     # return 'fail'
@@ -174,7 +174,7 @@ def reload():
 
 def initdStatus():
     if not app_debug:
-        if public.isAppleSystem():
+        if mw.isAppleSystem():
             return "Apple Computer does not support"
 
     initd_bin = getInitDFile()
@@ -186,30 +186,30 @@ def initdStatus():
 def initdInstall():
     import shutil
     if not app_debug:
-        if public.isAppleSystem():
+        if mw.isAppleSystem():
             return "Apple Computer does not support"
 
     p_bin = initDreplace()
     initd_bin = getInitDFile()
     shutil.copyfile(p_bin, initd_bin)
-    public.execShell('chmod +x ' + initd_bin)
-    public.execShell('chkconfig --add ' + getPluginName())
+    mw.execShell('chmod +x ' + initd_bin)
+    mw.execShell('chkconfig --add ' + getPluginName())
     return 'ok'
 
 
 def initdUinstall():
     if not app_debug:
-        if public.isAppleSystem():
+        if mw.isAppleSystem():
             return "Apple Computer does not support"
     initd_bin = getInitDFile()
     os.remove(initd_bin)
-    public.execShell('chkconfig --del ' + getPluginName())
+    mw.execShell('chkconfig --del ' + getPluginName())
     return 'ok'
 
 
 def getRecListData():
     path = appConf()
-    content = public.readFile(path)
+    content = mw.readFile(path)
 
     flist = re.findall("\[(.*)\]", content)
     flist_len = len(flist)
@@ -237,12 +237,12 @@ def getRecListData():
 
 def getRecList():
     ret_list = getRecListData()
-    return public.returnJson(True, 'ok', ret_list)
+    return mw.returnJson(True, 'ok', ret_list)
 
 
 def getUPwdList():
     pwd_path = appConfPwd()
-    pwd_content = public.readFile(pwd_path)
+    pwd_content = mw.readFile(pwd_path)
     plist = pwd_content.strip().split('\n')
     plist_len = len(plist)
     data = {}
@@ -264,12 +264,12 @@ def addRec():
     args_ps = args['ps']
 
     pwd_path = appConfPwd()
-    pwd_content = public.readFile(pwd_path)
+    pwd_content = mw.readFile(pwd_path)
     pwd_content += args_name + ':' + args_pwd + "\n"
-    public.writeFile(pwd_path, pwd_content)
+    mw.writeFile(pwd_path, pwd_content)
 
     path = appConf()
-    content = public.readFile(path)
+    content = mw.readFile(path)
 
     con = "\n\n" + '[' + args_name + ']' + "\n"
     con += 'path = ' + args_path + "\n"
@@ -278,8 +278,8 @@ def addRec():
     con += 'read only = false'
 
     content = content + con
-    public.writeFile(path, content)
-    return public.returnJson(True, '添加成功')
+    mw.writeFile(path, content)
+    return mw.returnJson(True, '添加成功')
 
 
 def delRec():
@@ -290,12 +290,12 @@ def delRec():
     args_name = args['name']
 
     cmd = "sed -i '_bak' '/" + args_name + "/d' " + appConfPwd()
-    public.execShell(cmd)
+    mw.execShell(cmd)
 
     try:
 
         path = appConf()
-        content = public.readFile(path)
+        content = mw.readFile(path)
 
         ret_list = getRecListData()
         ret_list_len = len(ret_list)
@@ -317,10 +317,10 @@ def delRec():
         conre = re.search(reg,  content, re.S)
         content = content.replace(
             "[" + args_name + "]\n" + conre.groups()[0], '')
-        public.writeFile(path, content)
-        return public.returnJson(True, '删除成功!')
+        mw.writeFile(path, content)
+        return mw.returnJson(True, '删除成功!')
     except Exception as e:
-        return public.returnJson(False, '删除失败!')
+        return mw.returnJson(False, '删除失败!')
 
 
 def cmdRec():
@@ -331,13 +331,13 @@ def cmdRec():
 
     an = args['name']
     pwd_list = getUPwdList()
-    ip = public.getLocalIp()
+    ip = mw.getLocalIp()
 
     cmd = 'echo "' + pwd_list[an] + '" > /tmp/p.pass' + "<br>"
     cmd += 'chmod 600 /tmp/p.pass' + "<br>"
     cmd += 'rsync -arv --password-file=/tmp/p.pass --progress --delete  /project  ' + \
         an + '@' + ip + '::' + an
-    return public.returnJson(True, 'OK!', cmd)
+    return mw.returnJson(True, 'OK!', cmd)
 
 # rsyncdReceive
 if __name__ == "__main__":

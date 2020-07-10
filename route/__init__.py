@@ -28,7 +28,7 @@ sys.path.append(os.getcwd() + "/class/core")
 sys.path.append("/usr/local/lib/python2.7/site-packages")
 
 import db
-import public
+import mw
 import config_api
 
 app = Flask(__name__, template_folder='templates/default')
@@ -55,7 +55,7 @@ except:
         str(sys.version_info[0])
     app.config['SESSION_FILE_THRESHOLD'] = 1024
     app.config['SESSION_FILE_MODE'] = 384
-    public.execShell("pip install flask_sqlalchemy &")
+    mw.execShell("pip install flask_sqlalchemy &")
 
 app.config['SESSION_PERMANENT'] = True
 app.config['SESSION_USE_SIGNER'] = True
@@ -70,7 +70,7 @@ socketio.init_app(app)
 
 
 # debug macosx dev
-if public.isAppleSystem():
+if mw.isAppleSystem():
     app.debug = True
     app.config.version = app.config.version + str(time.time())
 
@@ -103,16 +103,16 @@ def publicObject(toObject, func, action=None, get=None):
             return data
     except Exception as e:
         data = {'msg': '访问异常:' + str(e) + '!', "status": False}
-        return public.getJson(data)
+        return mw.getJson(data)
 
 
 @app.route("/test")
 def test():
     print sys.version_info
     print session
-    os = public.getOs()
+    os = mw.getOs()
     print os
-    return public.getLocalIp()
+    return mw.getLocalIp()
 
 
 @app.route('/close')
@@ -120,7 +120,7 @@ def close():
     if not os.path.exists('data/close.pl'):
         return redirect('/')
     data = {}
-    data['cmd'] = 'rm -rf ' + public.getRunDir() + '/data/close.pl'
+    data['cmd'] = 'rm -rf ' + mw.getRunDir() + '/data/close.pl'
     return render_template('close.html', data=data)
 
 
@@ -137,7 +137,7 @@ def code():
     out = StringIO()
     codeImage[0].save(out, "png")
 
-    session['code'] = public.md5(''.join(codeImage[1]).lower())
+    session['code'] = mw.md5(''.join(codeImage[1]).lower())
 
     img = Response(out.getvalue(), headers={'Content-Type': 'image/png'})
     return make_response(img)
@@ -170,18 +170,18 @@ def doLogin():
     code = request.form.get('code', '').strip()
 
     if session.has_key('code'):
-        if session['code'] != public.md5(code):
-            return public.returnJson(False, '验证码错误,请重新输入!')
+        if session['code'] != mw.md5(code):
+            return mw.returnJson(False, '验证码错误,请重新输入!')
 
-    userInfo = public.M('users').where(
+    userInfo = mw.M('users').where(
         "id=?", (1,)).field('id,username,password').find()
 
-    password = public.md5(password)
+    password = mw.md5(password)
     login_cache_count = 5
     login_cache_limit = cache.get('login_cache_limit')
     filename = 'data/close.pl'
     if os.path.exists(filename):
-        return public.returnJson(False, '面板已经关闭!')
+        return mw.returnJson(False, '面板已经关闭!')
 
     if userInfo['username'] != username or userInfo['password'] != password:
         msg = "<a style='color: red'>密码错误</a>,帐号:{1},密码:{2},登录IP:{3}", ((
@@ -193,18 +193,18 @@ def doLogin():
             login_cache_limit = int(login_cache_limit) + 1
 
         if login_cache_limit >= login_cache_count:
-            public.writeFile(filename, 'True')
-            return public.returnJson(False, '面板已经关闭!')
+            mw.writeFile(filename, 'True')
+            return mw.returnJson(False, '面板已经关闭!')
 
         cache.set('login_cache_limit', login_cache_limit, timeout=10000)
         login_cache_limit = cache.get('login_cache_limit')
-        public.writeLog('用户登录', public.getInfo(msg))
-        return public.returnJson(False, public.getInfo("用户名或密码错误,您还可以尝试[{1}]次!", (str(login_cache_count - login_cache_limit))))
+        mw.writeLog('用户登录', mw.getInfo(msg))
+        return mw.returnJson(False, mw.getInfo("用户名或密码错误,您还可以尝试[{1}]次!", (str(login_cache_count - login_cache_limit))))
 
     cache.delete('login_cache_limit')
     session['login'] = True
     session['username'] = userInfo['username']
-    return public.returnJson(True, '登录成功,正在跳转...')
+    return mw.returnJson(True, '登录成功,正在跳转...')
 
 
 @app.route('/<reqClass>/<reqAction>', methods=['POST', 'GET'])
@@ -246,14 +246,14 @@ try:
     import paramiko
     ssh = paramiko.SSHClient()
 except:
-    public.execShell('pip install paramiko==2.0.2 &')
+    mw.execShell('pip install paramiko==2.0.2 &')
 
 
 def create_rsa():
-    public.execShell("rm -f /root/.ssh/*")
-    public.execShell('ssh-keygen -q -t rsa -P "" -f /root/.ssh/id_rsa')
-    public.execShell('cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys')
-    public.execShell('chmod 600 /root/.ssh/authorized_keys')
+    mw.execShell("rm -f /root/.ssh/*")
+    mw.execShell('ssh-keygen -q -t rsa -P "" -f /root/.ssh/id_rsa')
+    mw.execShell('cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys')
+    mw.execShell('chmod 600 /root/.ssh/authorized_keys')
 
 
 def clear_ssh():
@@ -265,8 +265,8 @@ do
     ps -t /dev/$i |grep -v TTY |awk '{print $1}' | xargs kill -9
 done
 '''
-    if not public.isAppleSystem():
-        info = public.execShell(sh)
+    if not mw.isAppleSystem():
+        info = mw.execShell(sh)
         print info[0], info[1]
 
 
@@ -279,14 +279,14 @@ def connect_ssh():
 
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     try:
-        ssh.connect('localhost', public.getSSHPort())
+        ssh.connect('localhost', mw.getSSHPort())
     except Exception as e:
-        if public.getSSHStatus():
+        if mw.getSSHStatus():
             try:
-                ssh.connect('127.0.0.1', public.getSSHPort())
+                ssh.connect('127.0.0.1', mw.getSSHPort())
             except:
                 return False
-        ssh.connect('127.0.0.1', public.getSSHPort())
+        ssh.connect('127.0.0.1', mw.getSSHPort())
     shell = ssh.invoke_shell(term='xterm', width=83, height=21)
     shell.setblocking(0)
     return True
@@ -354,7 +354,7 @@ def connected_msg(msg):
 #     pdata = get_input_data(data)
 #     if not isLogined():
 #         emit(pdata.s_response, {
-#              'data': public.returnData(-1, '会话丢失，请重新登陆面板!\r\n')})
+#              'data': mw.returnData(-1, '会话丢失，请重新登陆面板!\r\n')})
 #         return None
 #     mods = ['site', 'ftp', 'database', 'ajax', 'system', 'crontab', 'files',
 #             'config', 'panel_data', 'plugin', 'ssl', 'auth', 'firewall', 'panel_wxapp']

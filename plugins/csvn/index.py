@@ -11,11 +11,11 @@ import sys
 import subprocess
 
 sys.path.append(os.getcwd() + "/class/core")
-import public
+import mw
 
 
 app_debug = False
-if public.isAppleSystem():
+if mw.isAppleSystem():
     app_debug = True
 
 
@@ -24,11 +24,11 @@ def getPluginName():
 
 
 def getPluginDir():
-    return public.getPluginDir() + '/' + getPluginName()
+    return mw.getPluginDir() + '/' + getPluginName()
 
 
 def getServerDir():
-    return public.getServerDir() + '/' + getPluginName()
+    return mw.getServerDir() + '/' + getPluginName()
 
 
 def getInitDFile():
@@ -64,7 +64,7 @@ def initDreplace():
 
 
 def status():
-    data = public.execShell(
+    data = mw.execShell(
         "ps -ef|grep " + getPluginName() + " |grep -v grep | grep -v python | awk '{print $2}'")
     if data[0] == '':
         return 'stop'
@@ -74,7 +74,7 @@ def status():
 def csvnOp(method):
 
     if app_debug:
-        os_name = public.getOs()
+        os_name = mw.getOs()
         if os_name == 'darwin':
             return "Apple Computer does not support"
 
@@ -83,8 +83,8 @@ def csvnOp(method):
     #_csvn = getServerDir() + '/bin/csvn'
     #_csvn_httpd = getServerDir() + '/bin/csvn-httpd'
 
-    ret_csvn_httpd = public.execShell(_initd_csvn_httpd + ' ' + method)
-    # ret_csvn = public.execShell(_initd_csvn + ' ' + method)
+    ret_csvn_httpd = mw.execShell(_initd_csvn_httpd + ' ' + method)
+    # ret_csvn = mw.execShell(_initd_csvn + ' ' + method)
     subprocess.Popen(_initd_csvn + ' ' + method,
                      stdout=subprocess.PIPE, shell=True)
     if ret_csvn_httpd[1] == '':
@@ -110,7 +110,7 @@ def reload():
 
 def initdStatus():
     if not app_debug:
-        if public.isAppleSystem():
+        if mw.isAppleSystem():
             return "Apple Computer does not support"
 
     _initd_csvn = '/etc/init.d/csvn'
@@ -124,14 +124,14 @@ def initdStatus():
 def initdInstall():
     import shutil
     if not app_debug:
-        if public.isAppleSystem():
+        if mw.isAppleSystem():
             return "Apple Computer does not support"
 
     _csvn = getServerDir() + '/bin/csvn'
     _csvn_httpd = getServerDir() + '/bin/csvn-httpd'
 
-    ret_csvn = public.execShell(_csvn + ' install')
-    ret_csvn_httpd = public.execShell(_csvn_httpd + ' install')
+    ret_csvn = mw.execShell(_csvn + ' install')
+    ret_csvn_httpd = mw.execShell(_csvn_httpd + ' install')
     if ret_csvn[1] == '' and ret_csvn_httpd[1] == '':
         return 'ok'
     return 'fail'
@@ -139,14 +139,14 @@ def initdInstall():
 
 def initdUinstall():
     if not app_debug:
-        if public.isAppleSystem():
+        if mw.isAppleSystem():
             return "Apple Computer does not support"
 
     _csvn = getServerDir() + '/bin/csvn'
     _csvn_httpd = getServerDir() + '/bin/csvn-httpd'
 
-    ret_csvn = public.execShell(_csvn + ' remove')
-    ret_csvn_httpd = public.execShell(_csvn_httpd + ' remove')
+    ret_csvn = mw.execShell(_csvn + ' remove')
+    ret_csvn_httpd = mw.execShell(_csvn_httpd + ' remove')
     return 'ok'
 
 
@@ -155,7 +155,7 @@ def csvnEdit():
     data['svn_access_file'] = getServerDir() + '/data/conf/svn_access_file'
     data['commit_tpl'] = getPluginDir() + '/hook/commit.tpl'
     data['post_commit_tpl'] = getPluginDir() + '/hook/post-commit.tpl'
-    return public.getJson(data)
+    return mw.getJson(data)
 
 
 def userAdd():
@@ -170,7 +170,7 @@ def userAdd():
     svn_auth_file = getServerDir() + "/data/conf/svn_auth_file"
     cmd = htpasswd + ' -b ' + svn_auth_file + ' ' + \
         args['username'] + ' ' + args['password']
-    data = public.execShell(cmd)
+    data = mw.execShell(cmd)
     # print data
     if data[0] == '':
         return 'ok'
@@ -185,7 +185,7 @@ def userDel():
     htpasswd = getServerDir() + "/bin/htpasswd"
     svn_auth_file = getServerDir() + "/data/conf/svn_auth_file"
     cmd = htpasswd + ' -D ' + svn_auth_file + ' ' + args['username']
-    data = public.execShell(cmd)
+    data = mw.execShell(cmd)
     if data[0] == '':
         return 'ok'
     return 'fail'
@@ -194,8 +194,8 @@ def userDel():
 def getAllUser(search=''):
     svn_auth_file = getServerDir() + '/data/conf/svn_auth_file'
     if not os.path.exists(svn_auth_file):
-        return public.getJson([])
-    auth = public.readFile(svn_auth_file)
+        return mw.getJson([])
+    auth = mw.readFile(svn_auth_file)
     auth = auth.strip()
     auth_list = auth.split("\n")
 
@@ -232,14 +232,14 @@ def userList():
     page_info = {'count': ulist_sum, 'p': page,
                  'row': 10, 'tojs': 'csvnUserList'}
     data = {}
-    data['list'] = public.getPage(page_info)
+    data['list'] = mw.getPage(page_info)
     data['page'] = page
     data['page_size'] = page_size
     data['page_count'] = int(math.ceil(ulist_sum / page_size))
     start = (page - 1) * page_size
 
     data['data'] = ulist[start:start + page_size]
-    return public.getJson(data)
+    return mw.getJson(data)
 
 
 def projectAdd():
@@ -249,9 +249,9 @@ def projectAdd():
     path = getServerDir() + '/bin/svnadmin'
     dest = getServerDir() + '/data/repositories/' + args['name']
     cmd = path + ' create ' + dest
-    data = public.execShell(cmd)
+    data = mw.execShell(cmd)
     if data[1] == '':
-        public.execShell('chown -R csvn:csvn ' + dest)
+        mw.execShell('chown -R csvn:csvn ' + dest)
         return 'ok'
     return 'fail'
 
@@ -263,7 +263,7 @@ def projectDel():
 
     dest = getServerDir() + '/data/repositories/' + args['name']
     cmd = 'rm -rf ' + dest
-    data = public.execShell(cmd)
+    data = mw.execShell(cmd)
     if data[0] == '':
         return 'ok'
     return 'fail'
@@ -273,7 +273,7 @@ def getHttpPort():
     http_main_conf = getServerDir() + '/data/conf/csvn_main_httpd.conf'
     try:
         if os.path.exists(http_main_conf):
-            content = public.readFile(http_main_conf)
+            content = mw.readFile(http_main_conf)
             return re.search('Listen\s(\d+)', content).groups()[0]
     except Exception as e:
         pass   # print e
@@ -284,7 +284,7 @@ def getCsvnPort():
     http_main_conf = getServerDir() + '/data/conf/csvn-wrapper.conf'
     try:
         if os.path.exists(http_main_conf):
-            content = public.readFile(http_main_conf)
+            content = mw.readFile(http_main_conf)
             return re.search('wrapper.java.additional.3=-Djetty.port=(\d+)', content).groups()[0]
     except Exception as e:
         pass   # print e
@@ -347,18 +347,18 @@ def projectList():
 
     data = {}
     data['data'] = ret_data
-    data['list'] = public.getPage(
+    data['list'] = mw.getPage(
         {'count': dlist_sum, 'p': page, 'row': 10, 'tojs': 'csvnProjectList'})
-    data['ip'] = public.getLocalIp()
+    data['ip'] = mw.getLocalIp()
     data['port'] = getHttpPort()
     data['csvn_port'] = getCsvnPort()
 
-    return public.getJson(data)
+    return mw.getJson(data)
 
 
 def getAllAclList():
     svn_access_file = getServerDir() + '/data/conf/svn_access_file'
-    aData = public.readFile(svn_access_file)
+    aData = mw.readFile(svn_access_file)
     aData = re.sub('#.*', '', aData)
     aData = aData.strip().split('[')[1:]
     allAcl = {}
@@ -394,7 +394,7 @@ def makeAclFile(content):
             tmp += v[iv]['user'] + ' = ' + v[iv]['acl'] + "\n"
         tmp += "\n"
     # svn_tmp_path = getServerDir() + '/data/conf/svn_access_file.log'
-    return public.writeFile(svn_access_file, tmp)
+    return mw.writeFile(svn_access_file, tmp)
 
 
 def projectAclList():
@@ -405,7 +405,7 @@ def projectAclList():
     acl = getAllAclList()
 
     if name in acl:
-        return public.getJson(acl[name])
+        return mw.getJson(acl[name])
     else:
         return 'fail'
 
@@ -543,19 +543,19 @@ def getCsvnPwd(user):
     pwd_file = 'data/csvn_sync.pl'
 
     if os.path.exists(pwd_file):
-        return public.readFile(pwd_file).strip()
+        return mw.readFile(pwd_file).strip()
 
     import time
     cur_time = time.time()
-    rand_pwd = public.md5(str(cur_time))
+    rand_pwd = mw.md5(str(cur_time))
     pwd = user + rand_pwd[:5]
 
     htpasswd = getServerDir() + "/bin/htpasswd"
     svn_auth_file = getServerDir() + "/data/conf/svn_auth_file"
     cmd = htpasswd + ' -b ' + svn_auth_file + ' ' + user + ' ' + pwd
-    data = public.execShell(cmd)
+    data = mw.execShell(cmd)
 
-    public.writeFile(pwd_file, pwd)
+    mw.writeFile(pwd_file, pwd)
     return pwd
 
 
@@ -570,21 +570,21 @@ def projectScriptLoad():
         args['pname'] + '/hooks'
     post_commit_file = hook_path + '/post-commit'
 
-    pct_content = public.readFile(post_commit_tpl)
-    public.writeFile(post_commit_file, pct_content)
-    public.execShell('chmod 777 ' + post_commit_file)
+    pct_content = mw.readFile(post_commit_tpl)
+    mw.writeFile(post_commit_file, pct_content)
+    mw.execShell('chmod 777 ' + post_commit_file)
 
     commit_tpl = getPluginDir() + '/hook/commit.tpl'
     commit_file = hook_path + '/commit'
 
-    ct_content = public.readFile(commit_tpl)
-    ct_content = ct_content.replace('{$PROJECT_DIR}', public.getRootDir())
+    ct_content = mw.readFile(commit_tpl)
+    ct_content = ct_content.replace('{$PROJECT_DIR}', mw.getRootDir())
     ct_content = ct_content.replace('{$PORT}', getHttpPort())
     ct_content = ct_content.replace('{$CSVN_USER}', getCsvnUser())
     ct_content = ct_content.replace('{$CSVN_PWD}', getCsvnPwd(getCsvnUser()))
 
-    public.writeFile(commit_file, ct_content)
-    public.execShell('chmod 777 ' + commit_file)
+    mw.writeFile(commit_file, ct_content)
+    mw.execShell('chmod 777 ' + commit_file)
 
     return 'ok'
 
@@ -596,11 +596,11 @@ def projectScriptUnload():
 
     post_commit_file = getServerDir() + '/data/repositories/' + '/' + \
         args['pname'] + '/hooks/post-commit'
-    public.execShell('rm -f ' + post_commit_file)
+    mw.execShell('rm -f ' + post_commit_file)
 
     commit_file = getServerDir() + '/data/repositories/' + '/' + \
         args['pname'] + '/hooks/commit'
-    public.execShell('rm -f ' + commit_file)
+    mw.execShell('rm -f ' + commit_file)
     return 'ok'
 
 
@@ -619,7 +619,7 @@ def projectScriptEdit():
         data['status'] = False
         data['msg'] = 'file does not exist'
 
-    return public.getJson(data)
+    return mw.getJson(data)
 
 
 def projectScriptDebug():
@@ -637,7 +637,7 @@ def projectScriptDebug():
         data['status'] = False
         data['msg'] = 'file does not exist'
 
-    return public.getJson(data)
+    return mw.getJson(data)
 
 
 def getTotalStatistics():
@@ -647,12 +647,12 @@ def getTotalStatistics():
         svn_path = getServerDir() + '/data/repositories'
         data['status'] = True
         data['count'] = len(os.listdir(svn_path))
-        data['ver'] = public.readFile(getServerDir() + '/version.pl').strip()
-        return public.returnJson(True, 'ok', data)
+        data['ver'] = mw.readFile(getServerDir() + '/version.pl').strip()
+        return mw.returnJson(True, 'ok', data)
     else:
         data['status'] = False
         data['count'] = 0
-        return public.returnJson(False, 'fail', data)
+        return mw.returnJson(False, 'fail', data)
 
 
 if __name__ == "__main__":
