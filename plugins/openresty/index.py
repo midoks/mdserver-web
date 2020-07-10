@@ -162,18 +162,18 @@ def initDreplace():
         print "ok"
         exit(0)
 
+    file_bin = initD_path + '/' + getPluginName()
     if not os.path.exists(initD_path):
         os.mkdir(initD_path)
-    file_bin = initD_path + '/' + getPluginName()
 
-    # initd replace
-    content = mw.readFile(file_tpl)
-    content = content.replace('{$SERVER_PATH}', service_path)
-    mw.writeFile(file_bin, content)
-    mw.execShell('chmod +x ' + file_bin)
+        # initd replace
+        content = mw.readFile(file_tpl)
+        content = content.replace('{$SERVER_PATH}', service_path)
+        mw.writeFile(file_bin, content)
+        mw.execShell('chmod +x ' + file_bin)
 
-    # config replace
-    confReplace()
+        # config replace
+        confReplace()
 
     # make nginx vhost or other
     makeConf()
