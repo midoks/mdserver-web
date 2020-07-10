@@ -2,7 +2,7 @@ werkzeug==0.16.1
 setuptools==33.1.1
 wheel
 flask==1.0.2
-flask-session==1.0.2
+flask-session==0.3.2
 flask-socketio
 flask-helper==0.19
 cache==1.0.3
