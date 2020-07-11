@@ -38,9 +38,9 @@ Install_lib()
 
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
-		--enable-memcache \
-		--with-zlib-dir=$serverPath/lib/zlib \
-		--with-libmemcached-dir=$serverPath/lib/libmemcached
+		--enable-memcached \
+		--with-zlib-dir=$serverPath/lib/zlib
+		#--with-libmemcached-dir=$serverPath/lib/libmemcached
 		
 		make && make install && make clean
 
