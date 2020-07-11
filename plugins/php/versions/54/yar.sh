@@ -23,6 +23,13 @@ if [ "$version" = '70' ] || [ "$version" = '71' ] || [ "$version" = '72' ] || [ 
 	LIBV='2.0.5'
 fi
 
+sysName=`uname`
+if [ "$sysName" == "Darwin" ];then
+	BAK='_bak'
+else
+	BAK=''
+fi
+
 Install_lib()
 {
 	

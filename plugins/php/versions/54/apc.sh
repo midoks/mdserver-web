@@ -18,6 +18,12 @@ actionType=$1
 version=$2
 extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20100525/${LIBNAME}.so
 
+if [ "$sysName" == "Darwin" ];then
+	BAK='_bak'
+else
+	BAK=''
+fi
+
 Install_lib()
 {
 	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep "${LIBNAME}.so"`
