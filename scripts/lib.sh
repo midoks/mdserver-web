@@ -55,7 +55,7 @@ if [ ! -d ${libPath}/libmemcached ];then
     fi 
     tar -zxf libmemcached-1.0.4.tar.gz
     cd libmemcached-1.0.4
-    ./configure --prefix=${libPath}/libmemcached && make && make install
+    ./configure --prefix=${libPath}/libmemcached -with-memcached && make && make install
 fi
 echo -e "Install_Libmemcached" >> ${libPath}/lib.pl
 #----------------------------- libmemcached end -------------------------#
@@ -224,10 +224,12 @@ echo -e "Install_Curl" >> ${libPath}/lib.pl
 
 Install_Zlib
 Install_Libzip
-Install_Libmemcached
 Install_OpenSSL	
 Install_Libiconv
 Install_Freetype
 Install_Curl
+
+# Install_Libmemcached
+yum -y install libmemcached-devel
 
 
