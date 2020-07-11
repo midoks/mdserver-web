@@ -19,7 +19,7 @@ fi
 setenforce 0
 sed -i 's#SELINUX=enforcing#SELINUX=disabled#g' /etc/selinux/config
 
-yum install -y wget curl curl-devel vixie-cron lsof
+yum install -y wget curl vixie-cron lsof
 #https need
 
 if [ ! -f /root/.acme.sh ];then	
