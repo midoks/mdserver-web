@@ -23,6 +23,14 @@ if [ "$version" = '70' ] || [ "$version" = '71' ] || [ "$version" = '72' ] || [ 
 	LIBV='2.0.5'
 fi
 
+sysName=`uname`
+if [ "$sysName" == "Darwin" ];then
+	BAK='_bak'
+else
+	BAK=''
+fi
+
+
 Install_lib()
 {
 	
@@ -82,9 +90,9 @@ Uninstall_lib()
 	fi
 	
 	echo $serverPath/php/$version/etc/php.ini
-	sed -i '_bak' "/${LIBNAME}.so/d" $serverPath/php/$version/etc/php.ini
-	sed -i '_bak' "/${LIBNAME}.use_namespace/d" $serverPath/php/$version/etc/php.ini
-	sed -i '_bak' "/\[${LIBNAME}\]/d"  $serverPath/php/$version/etc/php.ini
+	sed -i $BAK "/${LIBNAME}.so/d" $serverPath/php/$version/etc/php.ini
+	sed -i $BAK "/${LIBNAME}.use_namespace/d" $serverPath/php/$version/etc/php.ini
+	sed -i $BAK "/\[${LIBNAME}\]/d"  $serverPath/php/$version/etc/php.ini
 		
 	rm -f $extFile
 	$serverPath/php/init.d/php$version reload
