@@ -38,11 +38,9 @@ Install_lib()
 
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
-		--enable-memcached
+		--enable-memcached && make && make install && make clean
 		#--with-zlib-dir=$serverPath/lib/zlib
 		#--with-libmemcached-dir=$serverPath/lib/libmemcached
-		
-		make && make install && make clean
 
 	fi
 	
@@ -75,8 +73,8 @@ Uninstall_lib()
 		return
 	fi
 	
-	sed -i '_bak' '/${LIBNAME}.so/d' $serverPath/php/$version/etc/php.ini
-	sed -i '_bak' '/${LIBNAME}/d' $serverPath/php/$version/etc/php.ini
+	sed -i '_bak' "/${LIBNAME}.so/d" $serverPath/php/$version/etc/php.ini
+	sed -i '_bak' "/${LIBNAME}/d" $serverPath/php/$version/etc/php.ini
 		
 	rm -f $extFile
 	$serverPath/php/init.d/php$version reload
