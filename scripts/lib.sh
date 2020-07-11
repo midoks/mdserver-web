@@ -227,9 +227,11 @@ Install_Libzip
 Install_OpenSSL	
 Install_Libiconv
 Install_Freetype
-Install_Curl
 
 # Install_Libmemcached
 yum -y install libmemcached-devel
+
+#Install_Curl
+yum -y install curl-devel
 
 
