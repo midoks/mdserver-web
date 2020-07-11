@@ -19,6 +19,12 @@ version=$2
 
 extDir=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20180731/
 
+if [ "$sysName" == "Darwin" ];then
+	BAK='_bak'
+else
+	BAK=''
+fi
+
 Install_lib()
 {
 	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep "${LIBNAME}.so"`
@@ -79,8 +85,8 @@ Uninstall_lib()
 		return
 	fi
 	
-	sed -i '_bak' "/${LIBNAME}.so/d" $serverPath/php/$version/etc/php.ini
-	sed -i '_bak' "/${LIBNAME}/d" $serverPath/php/$version/etc/php.ini
+	sed -i $BAK "/${LIBNAME}.so/d" $serverPath/php/$version/etc/php.ini
+	sed -i $BAK "/${LIBNAME}/d" $serverPath/php/$version/etc/php.ini
 		
 	rm -f $extFile
 	$serverPath/php/init.d/php$version reload
