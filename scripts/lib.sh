@@ -229,9 +229,9 @@ Install_Libiconv
 Install_Freetype
 
 # Install_Libmemcached
-yum -y install libmemcached-devel
+yum -y install libmemcached libmemcached-devel
 
 #Install_Curl
-yum -y install curl-devel
+yum -y install curl curl-devel
 
 
