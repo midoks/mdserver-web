@@ -18,6 +18,12 @@ actionType=$1
 version=$2
 extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20090626/${LIBNAME}.so
 
+if [ "$sysName" == "Darwin" ];then
+	BAK='_bak'
+else
+	BAK=''
+fi
+
 Install_lib()
 {
 	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep "${LIBNAME}.so"`
@@ -77,17 +83,14 @@ Uninstall_lib()
 		return
 	fi
 	
-	sed -i '_bak' "/${LIBNAME}.so/d" $serverPath/php/$version/etc/php.ini
-	sed -i '_bak' "/${LIBNAME}/d" $serverPath/php/$version/etc/php.ini
-
 	if [ ! -f "$extFile" ];then
 		echo "php-$version 未安装${LIBNAME},请选择其它版本!"
 		echo "php-$version not install ${LIBNAME}, Plese select other version!"
 		return
 	fi
 	
-	sed -i '_bak' "/${LIBNAME}.so/d" $serverPath/php/$version/etc/php.ini
-	sed -i '_bak' "/${LIBNAME}/d" $serverPath/php/$version/etc/php.ini
+	sed -i $BAK "/${LIBNAME}.so/d" $serverPath/php/$version/etc/php.ini
+	sed -i $BAK "/${LIBNAME}/d" $serverPath/php/$version/etc/php.ini
 		
 	rm -f $extFile
 

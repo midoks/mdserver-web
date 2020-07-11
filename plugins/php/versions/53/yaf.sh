@@ -23,6 +23,12 @@ if [ "$version" = '70' ] || [ "$version" = '71' ] || [ "$version" = '72' ] || [ 
 	LIBV='3.0.7';
 fi
 
+if [ "$sysName" == "Darwin" ];then
+	BAK='_bak'
+else
+	BAK=''
+fi
+
 Install_lib()
 {
 	
@@ -79,9 +85,9 @@ Uninstall_lib()
 	fi
 	
 	echo $serverPath/php/$version/etc/php.ini
-	sed -i '_bak' "/yaf.so/d" $serverPath/php/$version/etc/php.ini
-	sed -i '_bak' "/yaf.use_namespace/d" $serverPath/php/$version/etc/php.ini
-	sed -i '_bak' "/\[yaf\]/d"  $serverPath/php/$version/etc/php.ini
+	sed -i $BAK "/yaf.so/d" $serverPath/php/$version/etc/php.ini
+	sed -i $BAK "/yaf.use_namespace/d" $serverPath/php/$version/etc/php.ini
+	sed -i $BAK "/\[yaf\]/d"  $serverPath/php/$version/etc/php.ini
 		
 	rm -f $extFile
 	$serverPath/php/init.d/php$version reload

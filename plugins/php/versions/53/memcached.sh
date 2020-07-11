@@ -18,6 +18,12 @@ actionType=$1
 version=$2
 extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20090626/${LIBNAME}.so
 
+if [ "$sysName" == "Darwin" ];then
+	BAK='_bak'
+else
+	BAK=''
+fi
+
 Install_lib()
 {
 	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep "${LIBNAME}.so"`
@@ -37,12 +43,10 @@ Install_lib()
 			cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
 		fi 
 		cd $php_lib/${LIBNAME}-${LIBV}
-		
+
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
-		--enable-memcached \
-		--with-zlib-dir=$serverPath/lib/zlib
-		make && make install && make clean
+		--enable-memcached && make && make install && make clean
 
 	fi
 	
@@ -74,8 +78,8 @@ Uninstall_lib()
 		return
 	fi
 	
-	sed -i '_bak' '/${LIBNAME}.so/d' $serverPath/php/$version/etc/php.ini
-	sed -i '_bak' '/${LIBNAME}/d' $serverPath/php/$version/etc/php.ini
+	sed -i $BAK "/${LIBNAME}.so/d" $serverPath/php/$version/etc/php.ini
+	sed -i $BAK "/${LIBNAME}/d" $serverPath/php/$version/etc/php.ini
 		
 	rm -f $extFile
 	$serverPath/php/init.d/php$version reload

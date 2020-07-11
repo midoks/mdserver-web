@@ -14,6 +14,14 @@ sourcePath=${serverPath}/source/php
 LIBNAME=yaf
 LIBV=2.3.5
 
+sysName=`uname`
+if [ "$sysName" == "Darwin" ];then
+	BAK='_bak'
+else
+	BAK=''
+fi
+
+
 Install_lib()
 {
 	extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20131226/yaf.so
@@ -67,9 +75,9 @@ Uninstall_lib()
 	fi
 	
 	echo $serverPath/php/$version/etc/php.ini
-	sed -i '_bak' '/yaf.so/d' $serverPath/php/$version/etc/php.ini
-	sed -i '_bak' '/yaf.use_namespace/d' $serverPath/php/$version/etc/php.ini
-	sed -i '_bak' '/\[yaf\]/d'  $serverPath/php/$version/etc/php.ini
+	sed -i $BAK '/yaf.so/d' $serverPath/php/$version/etc/php.ini
+	sed -i $BAK '/yaf.use_namespace/d' $serverPath/php/$version/etc/php.ini
+	sed -i $BAK '/\[yaf\]/d'  $serverPath/php/$version/etc/php.ini
 		
 	rm -f $extFile
 	$serverPath/php/init.d/php$version reload
