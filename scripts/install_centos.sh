@@ -65,7 +65,7 @@ fi
 systemctl stop firewalld
 
 
-yum install -y libevent libevent-devel libzip-devel mysql-devel libjpeg* libpng* freetype* gd* zip unzip
+yum install -y libevent libevent-devel mysql-devel libjpeg* libpng* gd* zip unzip
 
 if [ ! -d /www/server/mdserver-web ];then
 	wget -O /tmp/master.zip https://codeload.github.com/midoks/mdserver-web/zip/master
@@ -76,7 +76,7 @@ if [ ! -d /www/server/mdserver-web ];then
 fi 
 
 yum groupinstall -y "Development Tools"
-paces="wget python-devel python-imaging libicu-devel zip unzip bzip2-devel openssl openssl-devel gcc libxml2 libxml2-dev libxslt* zlib zlib-devel libjpeg-devel libpng-devel libwebp libwebp-devel freetype freetype-devel lsof pcre pcre-devel vixie-cron crontabs"
+paces="wget python-devel python-imaging libicu-devel zip unzip bzip2-devel gcc libxml2 libxml2-dev libxslt* libjpeg-devel libpng-devel libwebp libwebp-devel lsof pcre pcre-devel vixie-cron crontabs"
 yum -y install $paces
 yum -y lsof net-tools.x86_64
 yum -y install ncurses-devel mysql-dev locate cmake

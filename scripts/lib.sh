@@ -222,16 +222,23 @@ echo -e "Install_Curl" >> ${libPath}/lib.pl
 #----------------------------- curl end -------------------------#
 }
 
-Install_Zlib
-Install_Libzip
-Install_OpenSSL	
+
 Install_Libiconv
-Install_Freetype
 
 # Install_Libmemcached
 yum -y install libmemcached libmemcached-devel
 
-#Install_Curl
+# Install_Curl
 yum -y install curl curl-devel
 
+# Install_Zlib
+yum -y install zlib zlib-devel
 
+# Install_Freetype
+yum -y install freetype freetype-devel
+
+#Install_OpenSSL
+yum -y install openssl openssl-devel
+
+#Install_Libzip
+yum -y install libzip-devel
