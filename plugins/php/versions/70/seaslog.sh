@@ -20,6 +20,12 @@ version=$2
 
 extDir=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20151012/
 
+if [ "$sysName" == "Darwin" ];then
+	BAK='_bak'
+else
+	BAK=''
+fi
+
 Install_lib()
 {
 	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep "${_LIBNAME}.so"`
@@ -38,7 +44,7 @@ Install_lib()
 
 		php_lib=$sourcePath/php_lib
 		mkdir -p $php_lib
-		if [ ! -d $php_lib/${LIBNAME}-${LIBV}];then
+		if [ ! -d $php_lib/${LIBNAME}-${LIBV} ];then
 			wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
 			cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
 		fi 
@@ -80,8 +86,8 @@ Uninstall_lib()
 		return
 	fi
 	_LIBNAME=$(echo $LIBNAME | tr '[A-Z]' '[a-z]')
-	sed -i '_bak' "/${_LIBNAME}.so/d" $serverPath/php/$version/etc/php.ini
-	sed -i '_bak' "/${_LIBNAME}/d" $serverPath/php/$version/etc/php.ini
+	sed -i $BAK "/${_LIBNAME}.so/d" $serverPath/php/$version/etc/php.ini
+	sed -i $BAK "/${_LIBNAME}/d" $serverPath/php/$version/etc/php.ini
 		
 	rm -f $extFile
 	$serverPath/php/init.d/php$version reload
