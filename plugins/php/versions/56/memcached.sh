@@ -81,8 +81,8 @@ Uninstall_lib()
 		return
 	fi
 	
-	sed -i BAK "/${LIBNAME}.so/d" $serverPath/php/$version/etc/php.ini
-	sed -i BAK "/${LIBNAME}/d" $serverPath/php/$version/etc/php.ini
+	sed -i $BAK "/${LIBNAME}.so/d" $serverPath/php/$version/etc/php.ini
+	sed -i $BAK "/${LIBNAME}/d" $serverPath/php/$version/etc/php.ini
 		
 	rm -f $extFile
 	$serverPath/php/init.d/php$version reload
