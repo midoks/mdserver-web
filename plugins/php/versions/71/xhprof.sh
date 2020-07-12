@@ -56,6 +56,7 @@ Install_lib()
 
 	if [ ! -f /tmp/xhprof ];then
 		mkdir -p /tmp/xhprof
+		chown -R www:www /tmp/xhprof
 	fi
 
 
