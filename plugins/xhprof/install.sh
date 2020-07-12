@@ -14,7 +14,7 @@ Install_xh()
 	mkdir -p ${serverPath}/xhprof
 
 	if [ ! -d ${serverPath}/xhprof/xhprof_lib ];then
-		cp -rf $curPath/lib/ ${serverPath}/xhprof
+		cp -rf $curPath/lib/* ${serverPath}/xhprof
 	fi
 
 	echo "${1}" > ${serverPath}/xhprof/version.pl
