@@ -158,7 +158,7 @@ def setPhpVer():
     file_run = getConf()
 
     centent = mw.readFile(file_tpl)
-    centent = contentReplace(centent, args['phpver'])
+    centent = contentReplacePHP(centent, args['phpver'])
     mw.writeFile(file_run, centent)
 
     mw.restartWeb()
