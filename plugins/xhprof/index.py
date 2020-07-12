@@ -100,6 +100,15 @@ def contentReplace(content):
     return content
 
 
+def contentReplacePHP(content, version):
+    service_path = mw.getServerDir()
+    # print php_ver
+    content = content.replace('{$ROOT_PATH}', mw.getRootDir())
+    content = content.replace('{$SERVER_PATH}', service_path)
+    content = content.replace('{$PHP_VER}', version)
+    return content
+
+
 def status():
     conf = getConf()
     if os.path.exists(conf):
@@ -144,6 +153,17 @@ def setPhpVer():
 
     cacheFile = getServerDir() + '/php.pl'
     mw.writeFile(cacheFile, args['phpver'])
+
+    file_tpl = getPluginDir() + '/conf/xhprof.conf'
+    file_run = getConf()
+
+    if not os.path.exists(file_run):
+        centent = mw.readFile(file_tpl)
+        centent = contentReplace(centent, args['phpver'])
+        mw.writeFile(file_run, centent)
+
+    mw.restartWeb()
+
     restart()
 
     return 'ok'
