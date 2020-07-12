@@ -12,11 +12,11 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
 LIBNAME=xhprof
-LIBV=0.9.4
+LIBV=2.2.0
 sysName=`uname`
 actionType=$1
 version=$2
-extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20131226/${LIBNAME}.so
+extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20170718/${LIBNAME}.so
 
 if [ "$sysName" == "Darwin" ];then
 	BAK='_bak'
