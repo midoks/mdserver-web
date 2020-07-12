@@ -11,7 +11,7 @@ sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 
 
-version=7.2.31
+version=7.2.32
 PHP_VER=72
 Install_php()
 {
