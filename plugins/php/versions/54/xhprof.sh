@@ -51,6 +51,10 @@ Install_lib()
 		return
 	fi
 
+	if [ ! -f /tmp/xhprof ];then
+		mkdir -p /tmp/xhprof
+	fi
+
 
 	echo "" >> $serverPath/php/$version/etc/php.ini
 	echo "[${LIBNAME}]" >> $serverPath/php/$version/etc/php.ini
@@ -80,7 +84,6 @@ Uninstall_lib()
 	sed -i '_bak' "/${LIBNAME}/d" $serverPath/php/$version/etc/php.ini
 		
 	rm -f $extFile
-	rm -rf /tmp/xhprof
 	
 	$serverPath/php/init.d/php$version reload
 	echo '==============================================='
