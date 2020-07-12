@@ -146,6 +146,15 @@ def makeOpenrestyConf():
         mw.restartWeb()
 
 
+def phpPrependFile(version):
+    app_start = getServerDir() + '/app_start.php'
+    if not os.path.exists(app_start):
+        tpl = getPluginDir() + '/conf/app_start.php'
+        content = mw.readFile(tpl)
+        content = contentReplace(content, version)
+        mw.writeFile(app_start, content)
+
+
 def phpFpmReplace(version):
     desc_php_fpm = getServerDir() + '/' + version + '/etc/php-fpm.conf'
     if not os.path.exists(desc_php_fpm):
@@ -194,6 +203,7 @@ def initReplace(version):
         mw.writeFile(file_bin, content)
         mw.execShell('chmod +x ' + file_bin)
 
+    phpPrependFile(version)
     phpFpmWwwReplace(version)
     phpFpmReplace(version)
 
@@ -619,6 +629,10 @@ def uninstallLib(version):
         return mw.returnJson(False, '卸载信息![通道0]:' + data[0] + "[通道0]:" + data[1])
 
 
+def getConfAppStart():
+    pstart = mw.getServerDir() + '/php/app_start.php'
+    return pstart
+
 if __name__ == "__main__":
 
     if len(sys.argv) < 3:
@@ -650,6 +664,8 @@ if __name__ == "__main__":
         print fpmSlowLog(version)
     elif func == 'conf':
         print getConf(version)
+    elif func == 'app_start':
+        print getConfAppStart()
     elif func == 'get_php_conf':
         print getPhpConf(version)
     elif func == 'submit_php_conf':
