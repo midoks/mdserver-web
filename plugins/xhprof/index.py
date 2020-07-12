@@ -164,8 +164,6 @@ def setPhpVer():
 
     mw.restartWeb()
 
-    restart()
-
     return 'ok'
 
 
