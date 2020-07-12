@@ -157,10 +157,9 @@ def setPhpVer():
     file_tpl = getPluginDir() + '/conf/xhprof.conf'
     file_run = getConf()
 
-    if not os.path.exists(file_run):
-        centent = mw.readFile(file_tpl)
-        centent = contentReplace(centent, args['phpver'])
-        mw.writeFile(file_run, centent)
+    centent = mw.readFile(file_tpl)
+    centent = contentReplace(centent, args['phpver'])
+    mw.writeFile(file_run, centent)
 
     mw.restartWeb()
 
