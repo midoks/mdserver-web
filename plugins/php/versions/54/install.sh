@@ -21,8 +21,11 @@ mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
 if [ ! -d $sourcePath/php/php${PHP_VER} ];then
-	wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.gz http://au1.php.net/distributions/php-${version}.tar.gz
-	cd $sourcePath/php && tar -zxvf $sourcePath/php/php-${version}.tar.gz
+	if [ ! -f $sourcePath/php/php-${version}.tar.xz ];then
+		wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz http://au1.php.net/distributions/php-${version}.tar.xz
+	fi
+	
+	cd $sourcePath/php && tar -Jxf $sourcePath/php/php-${version}.tar.xz
 	mv $sourcePath/php/php-${version} $sourcePath/php/php${PHP_VER}
 fi
 
