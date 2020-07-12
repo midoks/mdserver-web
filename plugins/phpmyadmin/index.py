@@ -151,7 +151,15 @@ def setPhpVer():
 
     cacheFile = getServerDir() + '/php.pl'
     mw.writeFile(cacheFile, args['phpver'])
-    restart()
+
+    file_tpl = getPluginDir() + '/conf/phpmyadmin.conf'
+    file_run = getConf()
+
+    centent = mw.readFile(file_tpl)
+    centent = contentReplace(centent)
+    mw.writeFile(file_run, centent)
+
+    mw.restartWeb()
 
     return 'ok'
 
