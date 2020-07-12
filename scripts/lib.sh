@@ -247,4 +247,5 @@ else
     yum -y install freetype freetype-devel
     yum -y install openssl openssl-devel
     yum -y install libzip libzip-devel
+    yum -y install graphviz
 fi
