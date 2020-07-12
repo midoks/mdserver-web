@@ -25,6 +25,7 @@ Install_xh()
 Uninstall_xh()
 {
 	rm -rf ${serverPath}/xhprof
+	rm -rf /tmp/xhprof
 	echo '卸载完成' > $install_tmp
 }
 
