@@ -226,19 +226,25 @@ echo -e "Install_Curl" >> ${libPath}/lib.pl
 Install_Libiconv
 
 # Install_Libmemcached
-yum -y install libmemcached libmemcached-devel
-
 # Install_Curl
-yum -y install curl curl-devel
-
 # Install_Zlib
-yum -y install zlib zlib-devel
-
 # Install_Freetype
-yum -y install freetype freetype-devel
+# Install_OpenSSL
+# Install_Libzip
 
-#Install_OpenSSL
-yum -y install openssl openssl-devel
-
-#Install_Libzip
-yum -y install libzip-devel
+sysName=`uname`
+if [ "$sysName" == "Darwin" ];then
+    brew install libmemcached
+    brew install curl
+    brew install zlib
+    brew install freetype
+    brew install openssl
+    brew install libzip
+else
+    yum -y install libmemcached libmemcached-devel
+    yum -y install curl curl-devel
+    yum -y install zlib zlib-devel
+    yum -y install freetype freetype-devel
+    yum -y install openssl openssl-devel
+    yum -y install libzip libzip-devel
+fi
