@@ -43,13 +43,8 @@ Install_lib()
 		fi 
 		cd $php_lib/${LIBNAME}-${LIBV}
 		$serverPath/php/$version/bin/phpize
-
-
-		LIB_DEPEND_DIR=`brew info imagemagick | grep /usr/local/Cellar/imagemagick | cut -d \  -f 1 |  awk 'END {print}'`
-
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
-		--with-imagick=$LIB_DEPEND_DIR
-		make && make install && make clean
+		&& make clean && make && make install && make clean
 	fi
 	
 	if [ ! -f "$extFile" ];then
