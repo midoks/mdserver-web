@@ -51,7 +51,7 @@ else
 fi
 
 
-echo "$sourcePath/php/php-src-php-${version}"
+echo "$sourcePath/php/php${PHP_VER}"
 
 if [ ! -d $serverPath/php/${PHP_VER} ];then
 	cd $sourcePath/php/php${PHP_VER}
