@@ -53,6 +53,7 @@ Install_lib()
 		return
 	fi
 
+	echo "" >> $serverPath/php/$version/etc/php.ini
 	echo -e "[Zend ZendGuard Loader]\nzend_extension=ZendGuardLoader.so\nzend_loader.enable=1\nzend_loader.disable_licensing=0\nzend_loader.obfuscation_level_support=3\nzend_loader.license_path=" >> $serverPath/php/$version/etc/php.ini
 	
 	$serverPath/php/init.d/php$version reload
