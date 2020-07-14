@@ -11,7 +11,7 @@ sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 
 
-version=8.0.0
+version=8.0.0alpha2
 PHP_VER=80
 Install_php()
 {
@@ -23,7 +23,7 @@ mkdir -p $serverPath/php
 if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 
 	if [ ! -f $sourcePath/php/php-${version}.tar.xz ];then
-		wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz https://downloads.php.net/~carusogabriel/php-${version}alpha2.tar.xz
+		wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz https://downloads.php.net/~carusogabriel/php-${version}.tar.xz
 	fi
 	
 	cd $sourcePath/php && tar -Jxf $sourcePath/php/php-${version}.tar.xz
