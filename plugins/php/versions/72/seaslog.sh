@@ -79,7 +79,7 @@ Uninstall_lib()
 		return
 	fi
 	
-	extFile=$extDir${LIBNAME}.so
+	extFile=$extDir${_LIBNAME}.so
 	if [ ! -f "$extFile" ];then
 		echo "php-$version 未安装${LIBNAME},请选择其它版本!"
 		echo "php-$version not install ${LIBNAME}, Plese select other version!"
