@@ -251,5 +251,5 @@ else
 
     yum -y install sqlite-devel
     yum -y install oniguruma oniguruma-devel
-    yum -y ImageMagick
+    yum -y ImageMagick ImageMagick-devel
 fi
