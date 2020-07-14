@@ -52,7 +52,7 @@ Install_lib()
 		--enable-memcached \
 		--with-zlib-dir=$serverPath/lib/zlib \
 		--disable-memcached-sasl && \
-		make && make install && make clean
+		make clean && make && make install && make clean
 	fi
 	
 	if [ ! -f "$extFile" ];then
