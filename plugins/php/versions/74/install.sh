@@ -84,8 +84,8 @@ fi
 
 Uninstall_php()
 {
-	$serverPath/php/init.d/php74 stop
-	rm -rf $serverPath/php/74
+	$serverPath/php/init.d/php${PHP_VER} stop
+	rm -rf $serverPath/php/${PHP_VER}
 	echo "卸载php-${version}..." > $install_tmp
 }
 
