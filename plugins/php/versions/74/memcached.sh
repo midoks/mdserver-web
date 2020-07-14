@@ -50,7 +50,6 @@ Install_lib()
 	
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
 		--enable-memcached \
-		--with-zlib-dir=$serverPath/lib/zlib \
 		--disable-memcached-sasl && \
 		make clean && make && make install && make clean
 	fi
