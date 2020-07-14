@@ -30,7 +30,7 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 	mv $sourcePath/php/php-${version} $sourcePath/php/php${PHP_VER}
 fi
 
-cd $sourcePath/php/php74
+cd $sourcePath/php/php${PHP_VER}
 
 OPTIONS=''
 if [ $sysName == 'Darwin' ]; then
@@ -51,7 +51,7 @@ else
 fi
 
 
-echo "$sourcePath/php/php-src-php-${version}"
+echo "$sourcePath/php/php${PHP_VER}"
 
 if [ ! -d $serverPath/php/${PHP_VER} ];then
 	cd $sourcePath/php/php${PHP_VER}
