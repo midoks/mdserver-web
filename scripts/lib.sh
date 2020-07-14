@@ -248,5 +248,5 @@ else
     yum -y install openssl openssl-devel
     yum -y install libzip libzip-devel
     yum -y install graphviz
-    yum -y install sqlite3
+    yum -y install sqlite-devel
 fi
