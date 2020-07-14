@@ -53,13 +53,13 @@ fi
 
 echo "$sourcePath/php/php-src-php-${version}"
 
-if [ ! -d $serverPath/php/74 ];then
-	cd $sourcePath/php/php74
+if [ ! -d $serverPath/php/${PHP_VER} ];then
+	cd $sourcePath/php/php${PHP_VER}
 	./buildconf --force
 	./configure \
-	--prefix=$serverPath/php/74 \
-	--exec-prefix=$serverPath/php/74 \
-	--with-config-file-path=$serverPath/php/74/etc \
+	--prefix=$serverPath/php/${PHP_VER} \
+	--exec-prefix=$serverPath/php/${PHP_VER} \
+	--with-config-file-path=$serverPath/php/${PHP_VER}/etc \
 	--enable-mysqlnd \
 	--with-mysqli=mysqlnd \
 	--with-pdo-mysql=mysqlnd \
