@@ -37,7 +37,7 @@ Install_lib()
 	
 	if [ ! -f "$extFile" ];then
 
-		cd $sourcePath/php74/ext/${LIBNAME}
+		cd $sourcePath/php${version}/ext/${LIBNAME}
 		
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config
