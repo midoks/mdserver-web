@@ -605,11 +605,9 @@ class system_api:
         old_list = old.split('.')
         ret = 'none'
 
-        # t = [0] * 3
         isHasNew = True
-        for i in range(3):
-            if int(new_list[i]) == int(old_list[i]):
-                isHasNew = False
+        if int(new_list[0]) == int(old_list[0]) and int(new_list[1]) == int(old_list[1]) and int(new_list[2]) == int(old_list[2]):
+            isHasNew = False
 
         if isHasNew:
             return 'new'
