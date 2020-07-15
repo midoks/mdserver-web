@@ -104,9 +104,9 @@ class system_api:
     @async
     def restartMw(self):
         sleep(0.3)
-        cmd = mw.getRunDir() + '/scripts/init.d/mw restart'
+        # cmd = mw.getRunDir() + '/scripts/init.d/mw restart'
         # print cmd
-        mw.execShell(cmd)
+        mw.execShell('service mw restart')
 
     @async
     def restartServer(self):
