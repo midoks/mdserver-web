@@ -12,7 +12,6 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
 LIBNAME=opcache
-LIBV=7.0.5
 sysName=`uname`
 actionType=$1
 version=$2
