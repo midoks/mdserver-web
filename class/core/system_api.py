@@ -12,6 +12,7 @@ from flask import request
 
 import db
 import mw
+import requests
 import config_api
 
 
@@ -619,8 +620,9 @@ class system_api:
     def getServerInfo(self):
         upAddr = 'https://raw.githubusercontent.com/midoks/mdserver-web/master/version/info.json'
         try:
-            version = mw.httpGet(upAddr)
-            version = json.loads(version)
+            requests.adapters.DEFAULT_RETRIES = 2
+            r = requests.get(upAddr, verify=False)
+            version = json.loads(r.content)
             return version[0]
         except Exception as e:
             print 'getServerInfo', e
@@ -640,7 +642,6 @@ class system_api:
 
                 diff = self.versionDiff(
                     version_now, version_new_info['version'])
-                print diff
                 if diff == 'new':
                     return mw.returnJson(True, '有新版本!', version_new_info['version'])
                 elif diff == 'test':
