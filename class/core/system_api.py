@@ -103,7 +103,7 @@ class system_api:
 
     @async
     def restartMw(self):
-        sleep(1)
+        sleep(0.3)
         cmd = mw.getRunDir() + '/scripts/init.d/mw restart'
         # print cmd
         mw.execShell(cmd)
