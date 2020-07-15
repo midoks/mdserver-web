@@ -1,5 +1,10 @@
 [
     {
+        "version": "0.8.5",
+        "content": "* 添加PHP80版本-Alpha <br/> * 自动识别IP地址 <br/> * 增加xhprof插件",
+        "path": "https://github.com/midoks/mdserver-web/releases/download/0.8.5/mdserver-web.zip"
+    },
+    {
         "version": "0.7.3",
         "content": "* 修复自动更新错误 <br/> * 优化文件批量处理 <br/> * 添加PHP守护插件",
         "path": "https://github.com/midoks/mdserver-web/releases/download/0.7.3/mdserver-web.zip"
