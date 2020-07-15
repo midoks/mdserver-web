@@ -15,7 +15,7 @@ LIBNAME=opcache
 sysName=`uname`
 actionType=$1
 version=$2
-extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20180731/${LIBNAME}.so
+extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20190128/${LIBNAME}.so
 
 if [ "$sysName" == "Darwin" ];then
 	BAK='_bak'
@@ -30,7 +30,7 @@ Install_lib()
 		echo "php-$version 已安装${LIBNAME},请选择其它版本!"
 		return
 	fi
-
+	
 	echo "" >> $serverPath/php/$version/etc/php.ini
 	echo "[opcache]" >> $serverPath/php/$version/etc/php.ini
 	echo "zend_extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
@@ -41,6 +41,9 @@ Install_lib()
 	echo "opcache.revalidate_freq=60" >> $serverPath/php/$version/etc/php.ini
 	echo "opcache.fast_shutdown=1" >> $serverPath/php/$version/etc/php.ini
 	echo "opcache.enable_cli=1" >> $serverPath/php/$version/etc/php.ini
+	echo "opcache.jit=1205" >> $serverPath/php/$version/etc/php.ini
+	echo "opcache.jit_buffer_size=64M" >> $serverPath/php/$version/etc/php.ini
+
 
 	$serverPath/php/init.d/php$version reload
 	echo '==========================================================='
