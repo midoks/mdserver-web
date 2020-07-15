@@ -671,8 +671,7 @@ class system_api:
                 if not os.path.exists(toPath):
                     mw.execShell('mkdir -p ' + toPath)
 
-                if not os.path.exists(toPath + '/mw.zip'):
-                    mw.execShell('wget -O ' + toPath + '/mw.zip ' + newUrl)
+                mw.execShell('wget -O ' + toPath + '/mw.zip ' + newUrl)
 
                 mw.execShell('unzip -o ' + toPath + '/mw.zip' + ' -d ./')
                 mw.execShell('unzip -o mdserver-web.zip -d ./')
