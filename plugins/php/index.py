@@ -82,6 +82,7 @@ def contentReplace(content, version):
     content = content.replace('{$ROOT_PATH}', mw.getRootDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$PHP_VERSION}', version)
+    content = content.replace('{$LOCAL_IP}', mw.getLocalIp())
 
     if mw.isAppleSystem():
         # user = mw.execShell(
