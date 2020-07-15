@@ -16,7 +16,7 @@ version=$2
 
 
 LIBNAME=swoole
-LIBV=4.5.1
+LIBV=4.5.2
 extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20190902/${LIBNAME}.so
 
 sysName=`uname`
