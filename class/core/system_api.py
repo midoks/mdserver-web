@@ -608,9 +608,7 @@ class system_api:
         # t = [0] * 3
         isHasNew = True
         for i in range(3):
-            if int(new_list[i]) > int(old_list[i]):
-                pass
-            else:
+            if int(new_list[i]) == int(old_list[i]):
                 isHasNew = False
 
         if isHasNew:
@@ -638,7 +636,7 @@ class system_api:
                 version_now = config_api.config_api().getVersion()
                 version_new_info = self.getServerInfo()
                 if not 'version' in version_new_info:
-                    return mw.returnJson(False, '服务器数据有问题!')
+                    return mw.returnJson(False, '服务器数据或网络有问题!')
 
                 diff = self.versionDiff(
                     version_now, version_new_info['version'])
