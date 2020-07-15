@@ -674,8 +674,8 @@ class system_api:
                 mw.execShell('wget -O ' + toPath + '/mw.zip ' + newUrl)
 
                 mw.execShell('unzip -o ' + toPath + '/mw.zip' + ' -d ./')
-                mw.execShell('unzip -o mdserver-web.zip -d ./')
-                mw.execShell('rm -f mdserver-web.zip')
+                mw.execShell('unzip -o mw.zip -d ./')
+                mw.execShell('rm -f mw.zip')
                 return mw.returnJson(True, '安装更新成功!')
 
             return mw.returnJson(False, '已经是最新,无需更新!')
