@@ -264,7 +264,7 @@ class config_api:
         key.generate_key(OpenSSL.crypto.TYPE_RSA, 2048)
         cert = OpenSSL.crypto.X509()
         cert.set_serial_number(0)
-        cert.get_subject().CN = '120.27.27.98'
+        cert.get_subject().CN = mw.getLocalIp()
         cert.set_issuer(cert.get_subject())
         cert.gmtime_adj_notBefore(0)
         cert.gmtime_adj_notAfter(86400 * 3650)
