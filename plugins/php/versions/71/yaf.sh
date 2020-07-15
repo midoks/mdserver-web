@@ -15,7 +15,7 @@ actionType=$1
 version=$2
 
 LIBNAME=yaf
-LIBV=3.2.5
+LIBV=3.0.7
 extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20160303/${LIBNAME}.so
 
 sysName=`uname`
