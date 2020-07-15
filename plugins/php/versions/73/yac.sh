@@ -12,25 +12,25 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
 
+
 actionType=$1
 version=$2
-sysName=`uname`
 
 LIBNAME=yac
 LIBV=2.2.1
-extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20151012/${LIBNAME}.so
-
+extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20180731/${LIBNAME}.so
+sysName=`uname`
 if [ "$sysName" == "Darwin" ];then
 	BAK='_bak'
 else
 	BAK=''
 fi
 
+
 Install_lib()
 {
-	
 	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep "${LIBNAME}.so"`
-	if [ "${isInstall}" != "" ];then
+	if [ "$isInstall" != "" ];then
 		echo "php-$version 已安装${LIBNAME},请选择其它版本!"
 		return
 	fi
@@ -39,17 +39,18 @@ Install_lib()
 
 		php_lib=$sourcePath/php_lib
 		mkdir -p $php_lib
-		if [ ! -d $php_lib/${LIBNAME}-${LIBV} ];then
+
+		if [ ! -f $php_lib/${LIBNAME}-${LIBV} ];then
 			wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
-			cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
+			cd $php_lib
+			tar xvf ${LIBNAME}-${LIBV}.tgz
 		fi 
 		cd $php_lib/${LIBNAME}-${LIBV}
-		
 
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config
 		make && make install && make clean
-
+		cd ..
 	fi
 	
 	if [ ! -f "$extFile" ];then
