@@ -62,6 +62,8 @@ def initInitD():
     mw.writeFile(script_bin, content)
     mw.execShell('chmod +x ' + script_bin)
 
+    mw.setHostAddr(mw.getLocalIp())
+
     if not mw.isAppleSystem():
         initd_bin = '/etc/init.d/mw'
         if not os.path.exists(initd_bin):
