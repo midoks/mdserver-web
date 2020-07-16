@@ -214,6 +214,12 @@ def initReplace(version):
         os.mkdir(session_path)
         if not mw.isAppleSystem():
             mw.execShell('chown -R www:www ' + session_path)
+
+    upload_path = '/tmp/upload'
+    if not os.path.exists(upload_path):
+        os.mkdir(upload_path)
+        if not mw.isAppleSystem():
+            mw.execShell('chown -R www:www ' + upload_path)
     return file_bin
 
 
