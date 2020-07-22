@@ -430,11 +430,11 @@ class downloadBT(Thread):
         info = self.query(
             "select id from pl_hash_list where info_hash='" + shash + "'")
         if len(info) > 0:
-            pid = str(info[0][0])
+            pid = info[0][0]
         else:
             print 'insert into pl_hash_list data'
             pid = self.execute("insert into pl_hash_list (`name`,`info_hash`,`length`,`create_time`) values('" +
-                               sname + "','" + shash + "','" + total_size + "','" + ct + "')")
+                               sname + "','" + shash + "','" + total_size + "','" + str(ct) + "')")
         return pid
 
     def set_hashlist_status(self, torrent, status):
@@ -461,11 +461,11 @@ class downloadBT(Thread):
         ct = formatTime()
 
         info = self.query(
-            "select id from pl_hash_file where name='" + fname + "' and pid='" + pid + "'")
+            "select id from pl_hash_file where name='" + fname + "' and pid='" + str(pid) + "'")
         if len(info) == 0:
             print 'insert into pl_hash_file data !'
             fid = self.execute("insert into pl_hash_file (`pid`,`name`,`m3u8`,`create_time`) values('" +
-                               pid + "','" + fname + "','" + m3u8_name + "','" + ct + "')")
+                               str(pid) + "','" + fname + "','" + m3u8_name + "','" + ct + "')")
         else:
             print fname, ':', m3u8_name, 'already is exists!'
             fid = str(info[0][0])
