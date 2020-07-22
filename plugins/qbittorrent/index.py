@@ -91,6 +91,7 @@ def getRunLog():
 def contentReplace(content):
     service_path = mw.getServerDir()
     content = content.replace('{$SERVER_PATH}', service_path)
+    content = content.replace('{$WWW_PATH}', mw.getRootDir() + "/wwwroot")
     return content
 
 
