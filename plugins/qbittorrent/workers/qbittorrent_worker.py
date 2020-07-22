@@ -387,7 +387,6 @@ class downloadBT(Thread):
 
             if os.path.exists(m3u8_file):
                 print self.debug('m3u8 exists:' + tofile)
-                self.ffmpeg_file_sync()
                 if TASK_DEBUG == 0:
                     self.ffmpeg_file_sync()
                     self.ffmpeg_del_file(mp4file, tsfile, m3u8_dir)
