@@ -49,8 +49,8 @@ Install_qbittorrent()
 		Install_linux_ffmpeg
 	fi
 
-	pip install python-qbittorrent==0.4.2
-	# pip install python-qbittorrent==0.3
+	# pip install python-qbittorrent==0.4.2
+	pip install python-qbittorrent==0.3
 
 	echo '正在安装脚本文件...' > $install_tmp
 	mkdir -p $serverPath/qbittorrent
