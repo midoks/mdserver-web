@@ -101,9 +101,11 @@ MAX_ACTIVE_TORRENTS = cp.getint(section_setting, "MAX_ACTIVE_TORRENTS")
 MAX_ACTIVE_DOWNLOADS = cp.getint(section_setting, "MAX_ACTIVE_DOWNLOADS")
 
 rooDir = getRootDir()
-ffmpeg_cmd = rooDir + "/lib/ffmpeg/ffmpeg"
-if not os.path.exists(ffmpeg_cmd):
-    ffmpeg_cmd = rooDir + "/lib/ffmpeg/bin/ffmpeg"
+tmp_cmd = rooDir + "/lib/ffmpeg/bin/ffmpeg"
+if os.path.exists(tmp_cmd):
+    ffmpeg_cmd = tmp_cmd
+else:
+    ffmpeg_cmd = "/usr/local/bin/ffmpeg"
 
 
 class downloadBT(Thread):
