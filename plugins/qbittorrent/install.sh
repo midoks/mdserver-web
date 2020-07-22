@@ -14,13 +14,14 @@ install_tmp=${rootPath}/tmp/bt_install.pl
 
 Install_mac_ffmpeg()
 {
-	if [ ! -f $serverPath/source/ffmpeg-20180702-3c4af57-macos64-static.zip ];then
-		wget -O $serverPath/source/ffmpeg-20180702-3c4af57-macos64-static.zip https://ffmpeg.zeranoe.com/builds/macos64/static/ffmpeg-20180702-3c4af57-macos64-static.zip
+	macVer='ffmpeg-20200721-b5f1e05-macos64-static'
+	if [ ! -f $serverPath/source/${macVer}.zip ];then
+		wget -O $serverPath/source/${macVer}.zip https://ffmpeg.zeranoe.com/builds/macos64/static/${macVer}.zip
 	fi
 
 	if [ ! -d $serverPath/lib/ffmpeg ];then
-		cd $serverPath/source && tar -xvf $serverPath/source/ffmpeg-20180702-3c4af57-macos64-static.zip
-		mv ffmpeg-20180702-3c4af57-macos64-static $serverPath/lib/ffmpeg
+		cd $serverPath/source && unzip $serverPath/source/${macVer}.zip
+		mv ${macVer} $serverPath/lib/ffmpeg
 	fi
 }
 
