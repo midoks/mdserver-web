@@ -388,7 +388,9 @@ class downloadBT(Thread):
             if os.path.exists(m3u8_file):
                 print self.debug('m3u8 exists:' + tofile)
                 self.ffmpeg_file_sync()
-                self.ffmpeg_del_file(mp4file, tsfile, m3u8_dir)
+                if TASK_DEBUG == 0:
+                    self.ffmpeg_file_sync()
+                    self.ffmpeg_del_file(mp4file, tsfile, m3u8_dir)
                 return
 
             cmd_m3u8 = self.fg_m3u8_cmd(tsfile, m3u8_file, tofile)
@@ -404,8 +406,9 @@ class downloadBT(Thread):
                        FILE_GROUP + ' ' + m3u8_dir)
         self.execShell('chmod -R 755 ' + m3u8_dir)
 
-        self.ffmpeg_file_sync()
-        self.ffmpeg_del_file(mp4file, tsfile, m3u8_dir)
+        if TASK_DEBUG == 0:
+            self.ffmpeg_file_sync()
+            self.ffmpeg_del_file(mp4file, tsfile, m3u8_dir)
 
     def get_bt_size(self, torrent):
         total_size = '0'
@@ -633,8 +636,9 @@ class downloadBT(Thread):
 
     def completed(self):
         while True:
-
             torrents = self.qb.torrents(filter='completed')
+            if not torrents:
+                continue
             tlen = len(torrents)
             print "completed torrents count:", tlen
             if tlen > 0:
@@ -646,8 +650,8 @@ class downloadBT(Thread):
                         self.video_do(path)
 
                         hash_dir = self.get_transfer_hash_dir(torrent['hash'])
-                        self.ffmpeg_del_hfile(hash_dir)
                         if TASK_DEBUG == 0:
+                            self.ffmpeg_del_hfile(hash_dir)
                             self.qb.delete_permanently(torrent['hash'])
                     except Exception as e:
                         print formatTime(), str(e)
