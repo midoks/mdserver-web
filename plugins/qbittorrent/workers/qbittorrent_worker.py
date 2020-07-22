@@ -491,10 +491,11 @@ class downloadBT(Thread):
         print '-------------------------add_hash---start-----------------------'
 
         pid = self.get_hashlist_id()
-        fid = self.get_hashfile_id(fname, m3u8_name, pid)
+        fid = 0
+        if pid:
+            fid = self.get_hashfile_id(fname, m3u8_name, pid)
 
         print '-------------------------add_hash---end--------------------------'
-
         return fid
 
     def file_arr(self, path, filters=['.DS_Store']):
