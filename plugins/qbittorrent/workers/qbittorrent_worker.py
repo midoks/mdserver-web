@@ -101,7 +101,7 @@ MAX_ACTIVE_TORRENTS = cp.getint(section_setting, "MAX_ACTIVE_TORRENTS")
 MAX_ACTIVE_DOWNLOADS = cp.getint(section_setting, "MAX_ACTIVE_DOWNLOADS")
 
 rooDir = getRootDir()
-tmp_cmd = rooDir + "/lib/ffmpeg/bin/ffmpeg"
+tmp_cmd = rooDir + "/lib/ffmpeg/ffmpeg"
 if os.path.exists(tmp_cmd):
     ffmpeg_cmd = tmp_cmd
 else:
