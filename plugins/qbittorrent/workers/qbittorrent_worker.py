@@ -288,21 +288,22 @@ class downloadBT(Thread):
             print 'file_sync... end'
 
     def ffmpeg_del_file(self, mp4, ts, m3u8_dir):
-        print self.debug('delete middle file ... start' + mp4)
+        print self.debug('delete middle file ... start ' + mp4)
         self.execShell('rm -rf ' + mp4)
         self.execShell('rm -rf ' + ts)
+        print self.debug('delete middle file ... end ' + ts)
 
-        if os.path.exists(m3u8_dir):
-            self.execShell('rm -rf ' + m3u8_dir)
-
-        print self.debug('delete middle file ... end' + ts)
+        # if os.path.exists(m3u8_dir):
+        #     self.execShell('rm -rf ' + m3u8_dir)
 
     def ffmpeg_del_hfile(self, shash_dir):
-        print self.debug('delete middle hash dir ... start' + shash_dir)
-        if os.path.exists(shash_dir):
-            self.execShell('rm -rf ' + shash_dir)
+        pass
+        # print self.debug('delete middle hash dir ... start ' + shash_dir)
 
-        print self.debug('delete middle hash dir ... end' + shash_dir)
+        # if os.path.exists(shash_dir):
+        #     self.execShell('rm -rf ' + shash_dir)
+
+        # print self.debug('delete middle hash dir ... end ' + shash_dir)
 
     def ffmpeg(self, file=''):
         if not os.path.exists(FILE_TRANSFER_TO):
