@@ -164,7 +164,9 @@ class downloadBT(Thread):
         if not self.__conn():
             return self.__db_err
         try:
-            result = self.dbcurr.execute(sql)
+            self.dbcurr.execute(sql)
+            self.dbcurr.execute('SELECT LAST_INSERT_ID();')
+            result = self.dbcurr.fetchone()
             self.dbconn.commit()
             self.__close()
             return result
