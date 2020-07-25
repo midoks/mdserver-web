@@ -128,6 +128,7 @@ class downloadBT(Thread):
             has_suffix.append('.' + _has_suffix[x])
             has_suffix.append('.' + _has_suffix[x].upper())
         self.has_suffix = has_suffix
+        self.__conn()
 
     def __conn(self):
         try:
@@ -139,6 +140,7 @@ class downloadBT(Thread):
             return True
         except Exception as e:
             self.__db_err = e
+            os.exit('未连接数据库!')
             return False
 
     def __close(self):
@@ -617,6 +619,7 @@ class downloadBT(Thread):
 
     def check_task(self):
         while True:
+            self.__conn()
             torrents = self.qb.torrents(filter='downloading')
             tlen = len(torrents)
             if tlen > 0:
@@ -639,6 +642,7 @@ class downloadBT(Thread):
 
     def completed(self):
         while True:
+            self.__conn()
             torrents = self.qb.torrents(filter='completed')
             if not torrents:
                 continue
