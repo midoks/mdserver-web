@@ -169,7 +169,7 @@ class downloadBT(Thread):
             result = self.dbcurr.fetchone()
             self.dbconn.commit()
             self.__close()
-            return result
+            return result[0]
         except Exception, ex:
             return ex
 
