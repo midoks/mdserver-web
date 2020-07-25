@@ -140,8 +140,11 @@ class downloadBT(Thread):
             return True
         except Exception as e:
             self.__db_err = e
-            sys.exit('未连接数据库!')
             return False
+
+    def __check(self):
+        if not __db_err:
+            sys.exit('未连接数据库!')
 
     def __close(self):
         self.dbcurr.close()
@@ -619,7 +622,7 @@ class downloadBT(Thread):
 
     def check_task(self):
         while True:
-            self.__conn()
+            self.__check()
             torrents = self.qb.torrents(filter='downloading')
             tlen = len(torrents)
             if tlen > 0:
@@ -642,7 +645,7 @@ class downloadBT(Thread):
 
     def completed(self):
         while True:
-            self.__conn()
+            self.__check()
             torrents = self.qb.torrents(filter='completed')
             if not torrents:
                 continue
