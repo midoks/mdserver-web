@@ -398,11 +398,10 @@ class downloadBT(Thread):
                 if TASK_DEBUG == 0:
                     self.ffmpeg_file_sync()
                     self.ffmpeg_del_file(mp4file, tsfile, m3u8_dir)
-                return
-
-            cmd_m3u8 = self.fg_m3u8_cmd(tsfile, m3u8_file, tofile)
-            print self.debug('cmd_m3u8:' + cmd_m3u8)
-            os.system(cmd_m3u8)
+            else:
+                cmd_m3u8 = self.fg_m3u8_cmd(tsfile, m3u8_file, tofile)
+                print self.debug('cmd_m3u8:' + cmd_m3u8)
+                os.system(cmd_m3u8)
 
             try:
                 self.add_hash(fname, md5Fname)
