@@ -143,7 +143,7 @@ class downloadBT(Thread):
             return False
 
     def __check(self):
-        if not __db_err:
+        if self.__db_err:
             sys.exit('未连接数据库!')
 
     def __close(self):
