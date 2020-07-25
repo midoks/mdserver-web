@@ -3,7 +3,7 @@ CREATE TABLE `pl_hash_list` (
   `name` text NOT NULL,
   `info_hash` varchar(40) NOT NULL,
   `length` bigint(20) NOT NULL,
-  `status` char(10) NOT NULL DEFAULT '0',
+  `status` int(10) NOT NULL DEFAULT '0',
   `create_time` datetime NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `info_hash` (`info_hash`),
