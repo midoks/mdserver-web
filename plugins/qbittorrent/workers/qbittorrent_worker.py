@@ -140,7 +140,7 @@ class downloadBT(Thread):
             return True
         except Exception as e:
             self.__db_err = e
-            os.exit('未连接数据库!')
+            sys.exit('未连接数据库!')
             return False
 
     def __close(self):
