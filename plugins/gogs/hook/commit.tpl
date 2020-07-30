@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo `date`
+
 GITADDR="{$GITROOTURL}/{$USERNAME}/{$PROJECT}"
 GIT_SDIR="{$CODE_DIR}"
 
