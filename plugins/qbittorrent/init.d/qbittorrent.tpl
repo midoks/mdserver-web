@@ -27,6 +27,7 @@ qb_start(){
 
 qb_stop(){
 	isStartFF=`ps -ef | grep 'ffmpeg' | grep -v grep |awk '{print $2}'`
+	echo `ps -ef | grep 'ffmpeg'`
 	if [ "$isStartFF" != '' ];then
 		echo "qbittorrent ffmpeg is running! can\`t stop!!!"
 		return 1
