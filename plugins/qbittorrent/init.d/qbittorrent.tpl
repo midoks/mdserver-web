@@ -14,12 +14,24 @@
 
 
 qb_start(){
+	isStartFF=`ps -ef | grep 'ffmpeg' | grep -v grep |awk '{print $2}'`
+	if [ "$isStartFF" == '' ];then
+		echo "qbittorrent ffmpeg is running! can\`t start!!!"
+		return 1
+	fi
+
 	cd {$SERVER_PATH}/qbittorrent/workers
 	nohup python qbittorrent_worker.py > {$SERVER_PATH}/qbittorrent/logs.pl  2>&1 &
 	echo "qbittorrent started"
 }
 
 qb_stop(){
+	isStartFF=`ps -ef | grep 'ffmpeg' | grep -v grep |awk '{print $2}'`
+	if [ "$isStartFF" == '' ];then
+		echo "qbittorrent ffmpeg is running! can\`t stop!!!"
+		return 1
+	fi
+
 	echo "Stopping ..."
 	#ps -ef | grep qbittorrent-nox-bin | grep -v grep | awk '{print $2}' | xargs kill -9
 	ps -ef | grep "qbittorrent_worker.py" | grep -v grep | awk '{print $2}' | xargs kill -9
