@@ -118,11 +118,10 @@ def initDreplace():
     file_bin = initD_path + '/' + getPluginName()
 
     # initd replace
-    if not os.path.exists(file_bin):
-        content = mw.readFile(file_tpl)
-        content = contentReplace(content)
-        mw.writeFile(file_bin, content)
-        mw.execShell('chmod +x ' + file_bin)
+    content = mw.readFile(file_tpl)
+    content = contentReplace(content)
+    mw.writeFile(file_bin, content)
+    mw.execShell('chmod +x ' + file_bin)
 
     return file_bin
 
