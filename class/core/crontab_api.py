@@ -21,11 +21,10 @@ class crontab_api:
 
     ##### ----- start ----- ###
     def listApi(self):
-        p = request.form.get('p', 1)
+        p = request.args.get('p', 1)
         psize = 3
 
-        startPage = (p - 1) * psize
-
+        startPage = (int(p) - 1) * psize
         pageInfo = str(startPage) + ',' + str(psize)
 
         _list = mw.M('crontab').where('', ()).field(
@@ -80,6 +79,7 @@ class crontab_api:
         _page['tojs'] = "getCronData"
 
         _ret['list'] = mw.getPage(_page)
+        _ret['p'] = p
         return mw.getJson(_ret)
 
     # 设置计划任务状态
