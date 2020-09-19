@@ -21,8 +21,15 @@ class crontab_api:
 
     ##### ----- start ----- ###
     def listApi(self):
-        _list = mw.M('crontab').where('', ()).field(self.field).limit(
-            '0,30').order('id desc').select()
+        p = request.form.get('p', 1)
+        psize = 3
+
+        startPage = (p - 1) * psize
+
+        pageInfo = str(startPage) + ',' + str(psize)
+
+        _list = mw.M('crontab').where('', ()).field(
+            self.field).limit(pageInfo).order('id desc').select()
 
         data = []
         for i in range(len(_list)):
@@ -68,9 +75,11 @@ class crontab_api:
         count = mw.M('crontab').where('', ()).count()
         _page = {}
         _page['count'] = count
-        _page['tojs'] = 'remind'
+        _page['p'] = p
+        _page['row'] = psize
+        _page['tojs'] = "getCronData"
 
-        _ret['page'] = mw.getPage(_page)
+        _ret['list'] = mw.getPage(_page)
         return mw.getJson(_ret)
 
     # 设置计划任务状态
@@ -194,25 +203,26 @@ class crontab_api:
         }
 
         # print params
-        cuonConfig, get, name = self.getCrondCycle(params)
+        cronConfig, get, name = self.getCrondCycle(params)
         cronPath = mw.getServerDir() + '/cron'
 
         cronName = self.getShell(params)
-        # print cuonConfig, _params, name
-        # print cronPath, cronName
-        # print stype
+        # print cronConfig, _params, name
+        # print 'vv', cronPath, cronName
+        # print 'stype', stype
 
         if type(cronName) == dict:
             return cronName
 
-        cuonConfig += ' ' + cronPath + '/' + cronName + \
+        cronConfig += ' ' + cronPath + '/' + cronName + \
             ' >> ' + cronPath + '/' + cronName + '.log 2>&1'
-        wRes = self.writeShell(cuonConfig)
 
-        if type(wRes) != bool:
-            return wRes
+        if not mw.isAppleSystem():
+            wRes = self.writeShell(cronConfig)
+            if type(wRes) != bool:
+                return wRes
+            self.crondReload()
 
-        self.crondReload()
         addData = mw.M('crontab').add('name,type,where1,where_hour,where_minute,echo,addtime,status,save,backup_to,stype,sname,sbody,urladdress', (iname, field_type, where1, hour, minute, cronName, time.strftime(
             '%Y-%m-%d %X', time.localtime()), 1, save, backup_to, stype, sname, sbody, urladdress))
 
@@ -451,7 +461,7 @@ echo "--------------------------------------------------------------------------
         if not os.path.exists(file):
             mw.writeFile(file, '')
         conf = mw.readFile(file)
-        conf += config + "\n"
+        conf += str(config) + "\n"
         if mw.writeFile(file, conf):
             if not os.path.exists(u_file):
                 mw.execShell("chmod 600 '" + file +

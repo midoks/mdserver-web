@@ -40,14 +40,14 @@ function getLogs(id){
 	},'json');
 }
 
-function getCronData(){
+function getCronData(page){
 	var load = layer.msg(lan.public.the,{icon:16,time:0,shade: [0.3, '#000']});
-	$.post('/crontab/list', '', function(rdata){
+	$.post('/crontab/list?p='+str(page),'', function(rdata){
 		layer.close(load);
 		var cbody = "";
 		if(rdata == ""){
 			cbody="<tr><td colspan='6'>"+lan.crontab.task_empty+"</td></tr>";
-		}else{
+		} else {
 			for(var i=0;i<rdata.data.length;i++){
 				//状态
 				var status = rdata.data[i]['status'] == '1' ?
@@ -73,6 +73,7 @@ function getCronData(){
 			}
 		}
 		$('#cronbody').html(cbody);
+		$('#softPage').html(rdata.list)
 	},'json');
 }
 
@@ -86,7 +87,7 @@ function setTaskStatus(id,status){
 				layer.close(confirm);
 				layer.msg(rdata.data,{icon:rdata.status?1:2});
 				if(rdata.status) {
-					getCronData();
+					getCronData(1);
 				}
 			},'json');
 		}
@@ -123,7 +124,7 @@ function planDel(id,name){
 		$.post('/crontab/del',data,function(rdata){
 			layer.close(load);
 			showMsg(rdata.msg, function(){
-				getCronData();
+				getCronData(1);
 			},{icon:rdata.status?1:2,time:2000});
 		},'json');
 	});
@@ -312,7 +313,7 @@ function planAdd(){
 		}
 		layer.closeAll();
 		layer.msg(rdata.msg,{icon:rdata.status?1:2});
-		getCronData();
+		getCronData(1);
 	},'json');
 }
 
@@ -347,7 +348,7 @@ function allAddCrontab(dataList,successCount,errorMsg){
 				layer.close(loadT);
 				if(frdata.status){
 					successCount++;
-					getCronData();
+					getCronData(1);
 				}else{
 					if(!errorMsg){
 						errorMsg = '<br><p>'+lan.crontab.backup_all_err+'</p>';
@@ -802,7 +803,7 @@ function editTaskInfo(id){
 					layer.msg('正在保存编辑内容，请稍后...',{icon:16,time:0,shade: [0.3, '#000']});
 					$.post('/crontab/modify_crond',obj.from,function(rdata){
 						layer.closeAll();
-						getCronData();
+						getCronData(1);
 						layer.msg(rdata.msg,{icon:rdata.status?1:2});
 					},'json');
 				});
