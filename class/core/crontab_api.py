@@ -22,7 +22,7 @@ class crontab_api:
     ##### ----- start ----- ###
     def listApi(self):
         p = request.args.get('p', 1)
-        psize = 3
+        psize = 10
 
         startPage = (int(p) - 1) * psize
         pageInfo = str(startPage) + ',' + str(psize)
