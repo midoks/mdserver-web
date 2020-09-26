@@ -164,6 +164,11 @@ def phpFpmReplace(version):
         content = mw.readFile(tpl_php_fpm)
         content = contentReplace(content, version)
         mw.writeFile(desc_php_fpm, content)
+    else:
+        if version == '52':
+            content = mw.readFile(desc_php_fpm)
+            content = content.replace('127.0.0.1:9000', '/tmp/php-cgi-52.sock')
+            mw.writeFile(desc_php_fpm, content)
 
 
 def phpFpmWwwReplace(version):
