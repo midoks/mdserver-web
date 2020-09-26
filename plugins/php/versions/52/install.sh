@@ -111,7 +111,6 @@ if [ "$?" != "0" ];then
 fi
 
 
-
 if [  -f $serverPath/php/${PHP_VER}/bin/php.dSYM ];then
 	mv $serverPath/php/${PHP_VER}/bin/php.dSYM $serverPath/php/${PHP_VER}/bin/php
 fi
