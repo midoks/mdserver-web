@@ -82,6 +82,7 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	ln -s /usr/lib64/libjpeg.so /usr/lib/libjpeg.so
 	ln -s /usr/lib64/libpng.so /usr/lib/
 	cp -frp /usr/lib64/libldap* /usr/lib/
+	export MYSQL_LIB_DIR=/usr/lib64/mysql
 
 	cd $sourcePath/php/php${PHP_VER} && ./configure \
 	--prefix=$serverPath/php/${PHP_VER} \
