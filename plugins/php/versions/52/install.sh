@@ -41,7 +41,7 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 
 	cd $sourcePath/php
 	gzip -cd php-5.2.17-fpm-0.5.14.diff.gz | patch -d php${PHP_VER} -p1
-	cd $sourcePath/php/php${PHP_M_VER}
+	cd $sourcePath/php/php${PHP_VER}
 	patch -p1 < ../php-5.2.17-max-input-vars.patch
 fi
 
