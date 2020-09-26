@@ -84,6 +84,7 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--enable-sysvshm \
 	--disable-fileinfo \
 	$OPTIONS \
+	--enable-fastcgi \
 	--enable-fpm \
 	&& make && make install && make clean
 fi
