@@ -35,7 +35,7 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 	fi
 
 
-	cd $sourcePath/php && tar -zxvf $sourcePath/php/php-${version}.tar.xz
+	cd $sourcePath/php && tar -zxvf $sourcePath/php/php-${version}.tar.gz
 	mv $sourcePath/php/php-${version} $sourcePath/php/php${PHP_VER}
 
 
