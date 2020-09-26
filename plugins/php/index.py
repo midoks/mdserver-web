@@ -166,8 +166,8 @@ def phpFpmReplace(version):
         mw.writeFile(desc_php_fpm, content)
     else:
         if version == '52':
-            desc_php_fpm52 = getServerDir() + '/' + version + '/etc/php-fpm-52.conf'
-            content = mw.readFile(desc_php_fpm52)
+            tpl_php_fpm = tpl_php_fpm = getPluginDir() + '/conf/php-fpm-52.conf'
+            content = mw.readFile(tpl_php_fpm)
             mw.writeFile(desc_php_fpm, content)
 
 
