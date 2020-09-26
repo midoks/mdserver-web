@@ -21,12 +21,28 @@ mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
 if [ ! -d $sourcePath/php/php${PHP_VER} ];then
-	if [ ! -f $sourcePath/php/php-${version}.tar.xz ];then
-		wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz http://au1.php.net/distributions/php-${version}.tar.xz
+	if [ ! -f $sourcePath/php/php-${version}.tar.gz ];then
+		wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.gz http://au1.php.net/distributions/php-${version}.tar.gz
 	fi
 	
-	cd $sourcePath/php && tar -Jxf $sourcePath/php/php-${version}.tar.xz
+	if [ ! -f $sourcePath/php/php-5.2.17-fpm-0.5.14.diff.gz ]; then
+		wget -O $sourcePath/php/php-5.2.17-fpm-0.5.14.diff.gz http://php-fpm.org/downloads/php-5.2.17-fpm-0.5.14.diff.gz
+	fi
+
+
+	if [ ! -f $sourcePath/php/php-5.2.17-max-input-vars.patch ]; then
+		wget -O $sourcePath/php/php-5.2.17-max-input-vars.patch https://raw.github.com/laruence/laruence.github.com/master/php-5.2-max-input-vars/php-5.2.17-max-input-vars.patch
+	fi
+
+
+	cd $sourcePath/php && tar -zxvf $sourcePath/php/php-${version}.tar.xz
 	mv $sourcePath/php/php-${version} $sourcePath/php/php${PHP_VER}
+
+
+	cd $sourcePath/php
+	gzip -cd php-5.2.17-fpm-0.5.14.diff.gz | patch -d php${PHP_VER} -p1
+	cd $sourcePath/php/php${PHP_M_VER}
+	patch -p1 < ../php-5.2.17-max-input-vars.patch
 fi
 
 
