@@ -73,6 +73,9 @@ fi
 
 
 if [ ! -d $serverPath/php/${PHP_VER} ];then
+	ln -s /usr/lib64/libjpeg.so /usr/lib/libjpeg.so
+	ln -s /usr/lib64/libpng.so /usr/lib/
+
 	cd $sourcePath/php/php${PHP_VER} && ./configure \
 	--prefix=$serverPath/php/${PHP_VER} \
 	--exec-prefix=$serverPath/php/${PHP_VER} \
