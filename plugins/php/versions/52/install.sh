@@ -30,16 +30,16 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 fi
 
 
-if [  -f $serverPath/php/53/bin/php.dSYM ];then
-	mv $serverPath/php/53/bin/php.dSYM $serverPath/php/53/bin/php
+if [  -f $serverPath/php/${PHP_VER}/bin/php.dSYM ];then
+	mv $serverPath/php/${PHP_VER}/bin/php.dSYM $serverPath/php/${PHP_VER}/bin/php
 fi
 
-if [  -f $serverPath/php/53/sbin/php-fpm.dSYM ];then
-	mv $serverPath/php/53/sbin/php-fpm.dSYM $serverPath/php/53/sbin/php-fpm
+if [  -f $serverPath/php/${PHP_VER}/sbin/php-fpm.dSYM ];then
+	mv $serverPath/php/${PHP_VER}/sbin/php-fpm.dSYM $serverPath/php/${PHP_VER}/sbin/php-fpm
 fi
 
 
-if [ -f $serverPath/php/53/bin/php ];then
+if [ -f $serverPath/php/${PHP_VER}/bin/php ];then
 	return
 fi
 
@@ -56,11 +56,11 @@ else
 fi
 
 
-if [ ! -d $serverPath/php/53 ];then
+if [ ! -d $serverPath/php/${PHP_VER} ];then
 	cd $sourcePath/php/php${PHP_VER} && ./configure \
-	--prefix=$serverPath/php/53 \
-	--exec-prefix=$serverPath/php/53 \
-	--with-config-file-path=$serverPath/php/53/etc \
+	--prefix=$serverPath/php/${PHP_VER} \
+	--exec-prefix=$serverPath/php/${PHP_VER} \
+	--with-config-file-path=$serverPath/php/${PHP_VER}/etc \
 	--with-zlib-dir=$serverPath/lib/zlib \
 	--enable-zip \
 	--enable-exif \
@@ -89,12 +89,16 @@ if [ ! -d $serverPath/php/53 ];then
 fi
 
 
-if [  -f $serverPath/php/53/bin/php.dSYM ];then
-	mv $serverPath/php/53/bin/php.dSYM $serverPath/php/53/bin/php
+if [  -f $serverPath/php/${PHP_VER}/bin/php.dSYM ];then
+	mv $serverPath/php/${PHP_VER}/bin/php.dSYM $serverPath/php/${PHP_VER}/bin/php
 fi
 
-if [  -f $serverPath/php/53/sbin/php-fpm.dSYM ];then
-	mv $serverPath/php/53/sbin/php-fpm.dSYM $serverPath/php/53/sbin/php-fpm
+if [  -f $serverPath/php/${PHP_VER}/sbin/php-fpm.dSYM ];then
+	mv $serverPath/php/${PHP_VER}/sbin/php-fpm.dSYM $serverPath/php/${PHP_VER}/sbin/php-fpm
+fi
+
+if [ ! -d $serverPath/php/${PHP_VER}/lib/php/extensions/no-debug-non-zts-20060613 ]; then
+	mkdir -p $serverPath/php/${PHP_VER}/lib/php/extensions/no-debug-non-zts-20060613
 fi
 
 #------------------------ install end ------------------------------------#
@@ -104,9 +108,9 @@ fi
 
 Uninstall_php()
 {
-	$serverPath/php/init.d/php53 stop
-	rm -rf $serverPath/php/53
-	echo "uninstall php-5.3.29 ..." > $install_tmp
+	$serverPath/php/init.d/php${PHP_VER} stop
+	rm -rf $serverPath/php/${PHP_VER}
+	echo "uninstall php-${version} ..." > $install_tmp
 }
 
 action=${1}
