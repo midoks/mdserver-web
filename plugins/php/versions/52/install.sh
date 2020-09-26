@@ -77,9 +77,6 @@ else
 	OPTIONS="${OPTIONS} --with-curl"
 fi
 
-#\cp -rf ${curPath}/lib/node.c $sourcePath/php/php${PHP_VER}/ext/dom/node.c
-#\cp -rf ${curPath}/lib/documenttype.c $sourcePath/php/php${PHP_VER}/ext/dom/documenttype.c
-
 
 if [ ! -d $serverPath/php/${PHP_VER} ];then
 	ln -s /usr/lib64/libjpeg.so /usr/lib/libjpeg.so
