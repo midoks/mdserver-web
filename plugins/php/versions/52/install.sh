@@ -95,8 +95,8 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--enable-sysvshm \
 	$OPTIONS \
 	--enable-fastcgi \
-	--enable-fpm \
-	&& make ZEND_EXTRA_LIBS='-liconv' && make install && make clean
+	--enable-fpm
+	make ZEND_EXTRA_LIBS='-liconv' && make install && make clean
 fi
 
 if [ "$?" != "0" ];then
