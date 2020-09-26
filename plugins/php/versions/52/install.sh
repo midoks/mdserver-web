@@ -90,6 +90,9 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--with-zlib-dir=$serverPath/lib/zlib \
 	--enable-xml \
 	--enable-mysqlnd \
+	--with-mysql=mysqlnd \
+	--with-pdo-mysql=mysqlnd \
+	--with-mysqli=mysqlnd \
 	--enable-sysvmsg \
 	--enable-sysvsem \
 	--enable-sysvshm \
