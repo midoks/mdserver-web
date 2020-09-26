@@ -166,8 +166,8 @@ def phpFpmReplace(version):
         mw.writeFile(desc_php_fpm, content)
     else:
         if version == '52':
-            content = mw.readFile(desc_php_fpm)
-            content = content.replace('127.0.0.1:9000', '/tmp/php-cgi-52.sock')
+            desc_php_fpm52 = getServerDir() + '/' + version + '/etc/php-fpm-52.conf'
+            content = mw.readFile(desc_php_fpm52)
             mw.writeFile(desc_php_fpm, content)
 
 
