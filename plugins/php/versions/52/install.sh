@@ -11,12 +11,12 @@ sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 
 
-version=5.3.29
-PHP_VER=53
+version=5.2.17
+PHP_VER=52
 Install_php()
 {
 #------------------------ install start ------------------------------------#
-echo "安装php-5.3.29 ..." > $install_tmp
+echo "安装php-${version} ..." > $install_tmp
 mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
@@ -95,11 +95,6 @@ fi
 
 if [  -f $serverPath/php/53/sbin/php-fpm.dSYM ];then
 	mv $serverPath/php/53/sbin/php-fpm.dSYM $serverPath/php/53/sbin/php-fpm
-fi
-
-
-if [ ! -d $serverPath/php/53/lib/php/extensions/no-debug-non-zts-20090626 ]; then
-	mkdir -p $serverPath/php/53/lib/php/extensions/no-debug-non-zts-20090626
 fi
 
 #------------------------ install end ------------------------------------#
