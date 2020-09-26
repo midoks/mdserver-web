@@ -16,7 +16,7 @@ LIBNAME=ZendGuardLoader
 sysName=`uname`
 actionType=$1
 version=$2
-extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20090626/${LIBNAME}.so
+extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20060613/ZendOptimizer.so
 
 if [ "$sysName" == "Darwin" ];then
 	BAK='_bak'
@@ -28,7 +28,7 @@ Install_lib()
 {
 	
 
-	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep "${LIBNAME}.so"`
+	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep "ZendOptimizer.so"`
 	if [ "${isInstall}" != "" ];then
 		echo "php-$version 已安装${LIBNAME},请选择其它版本!"
 		return
@@ -42,12 +42,12 @@ Install_lib()
 		if [ $sysName == 'Darwin' ]; then
 			wget -O $php_lib/zend-loader-php5.3.tar.gz http://downloads.zend.com/guard/5.5.0/ZendGuardLoader-php-5.3-darwin-i386.tar.gz
 		else
-			wget -O $php_lib/zend-loader-php5.3.tar.gz http://downloads.zend.com/guard/5.5.0/ZendGuardLoader-php-5.3-linux-glibc23-x86_64.tar.gz
+			wget -O $php_lib/ZendOptimizer-3.3.3-linux-glibc23-x86_64.tar.gz http://downloads.zend.com/optimizer/3.3.3/ZendOptimizer-3.3.3-linux-glibc23-x86_64.tar.gz
 		fi 
 
-		cd $php_lib && tar xvf zend-loader-php5.3.tar.gz
-		cd ZendGuardLoader-php* && cd php-5.3.x
-		cp ZendGuardLoader.so $serverPath/php/$version/lib/php/extensions/no-debug-non-zts-20090626/
+		cd $php_lib && tar zxvf ZendOptimizer-3.3.3-linux-glibc23-x86_64.tar.gz
+		cd $php_lib/ZendOptimizer-3.3.3-linux-glibc23-x86_64
+		cp $php_lib/ZendOptimizer-3.3.3-linux-glibc23-x86_64/data/5_2_x_comp/ZendOptimizer.so $serverPath/php/$version/lib/php/extensions/no-debug-non-zts-20060613/
 
 	fi
 	
@@ -58,7 +58,7 @@ Install_lib()
 
 	echo  "" >> $serverPath/php/$version/etc/php.ini
 	echo  "[Zend ZendGuard Loader]" >> $serverPath/php/$version/etc/php.ini
-	echo  "zend_extension=ZendGuardLoader.so" >> $serverPath/php/$version/etc/php.ini
+	echo  "zend_extension=ZendOptimizer.so" >> $serverPath/php/$version/etc/php.ini
 	echo  "zend_loader.enable=1" >> $serverPath/php/$version/etc/php.ini
 	echo  "zend_loader.disable_licensing=0" >> $serverPath/php/$version/etc/php.ini
 	echo  "zend_loader.obfuscation_level_support=3" >> $serverPath/php/$version/etc/php.ini
