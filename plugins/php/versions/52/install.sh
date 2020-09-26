@@ -87,7 +87,9 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--prefix=$serverPath/php/${PHP_VER} \
 	--exec-prefix=$serverPath/php/${PHP_VER} \
 	--with-config-file-path=$serverPath/php/${PHP_VER}/etc \
+	--with-zlib-dir=$serverPath/lib/zlib \
 	--enable-xml \
+	--enable-mysqlnd \
 	--enable-sysvmsg \
 	--enable-sysvsem \
 	--enable-sysvshm \
