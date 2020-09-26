@@ -105,6 +105,12 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	&& make && make install && make clean
 fi
 
+if [ "$?" != "0" ];then
+	echo "install fail!!"
+	exit 2
+fi
+
+
 
 if [  -f $serverPath/php/${PHP_VER}/bin/php.dSYM ];then
 	mv $serverPath/php/${PHP_VER}/bin/php.dSYM $serverPath/php/${PHP_VER}/bin/php
