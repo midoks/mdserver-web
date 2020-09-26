@@ -96,6 +96,7 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--enable-sysvmsg \
 	--enable-sysvsem \
 	--enable-sysvshm \
+	--disable-fileinfo \
 	$OPTIONS \
 	--enable-fastcgi \
 	--enable-fpm
