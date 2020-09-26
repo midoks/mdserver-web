@@ -58,7 +58,7 @@ Install_lib()
 
 	echo  "" >> $serverPath/php/$version/etc/php.ini
 	echo  "[Zend ZendGuard Loader]" >> $serverPath/php/$version/etc/php.ini
-	echo  "zend_extension=ZendGuardLoader.so" >> $serverPath/php/$version/etc/php.ini
+	echo  "zend_extension=$serverPath/php/$version/lib/php/extensions/no-debug-non-zts-20090626/ZendGuardLoader.so" >> $serverPath/php/$version/etc/php.ini
 	echo  "zend_loader.enable=1" >> $serverPath/php/$version/etc/php.ini
 	echo  "zend_loader.disable_licensing=0" >> $serverPath/php/$version/etc/php.ini
 	echo  "zend_loader.obfuscation_level_support=3" >> $serverPath/php/$version/etc/php.ini
