@@ -58,7 +58,7 @@ Install_lib()
 
 	echo  "" >> $serverPath/php/$version/etc/php.ini
 	echo  "[Zend ZendGuard Loader]" >> $serverPath/php/$version/etc/php.ini
-	echo  "zend_extension=ZendOptimizer.so" >> $serverPath/php/$version/etc/php.ini
+	echo  "zend_extension=$serverPath/php/$version/lib/php/extensions/no-debug-non-zts-20060613/ZendOptimizer.so" >> $serverPath/php/$version/etc/php.ini
 	echo  "zend_loader.enable=1" >> $serverPath/php/$version/etc/php.ini
 	echo  "zend_loader.disable_licensing=0" >> $serverPath/php/$version/etc/php.ini
 	echo  "zend_loader.obfuscation_level_support=3" >> $serverPath/php/$version/etc/php.ini
@@ -82,7 +82,7 @@ Uninstall_lib()
 		return
 	fi
 	
-	sed -i $BAK "/ZendGuardLoader.so/d"  $serverPath/php/$version/etc/php.ini
+	sed -i $BAK "/ZendOptimizer.so/d"  $serverPath/php/$version/etc/php.ini
 	sed -i $BAK "/zend_loader/d"  $serverPath/php/$version/etc/php.ini
 	sed -i $BAK "/\[Zend ZendGuard Loader\]/d"  $serverPath/php/$version/etc/php.ini
 		
