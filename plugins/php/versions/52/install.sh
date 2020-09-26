@@ -43,6 +43,7 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 	gzip -cd php-5.2.17-fpm-0.5.14.diff.gz | patch -d php${PHP_VER} -p1
 	cd $sourcePath/php/php${PHP_VER}
 	patch -p1 < ../php-5.2.17-max-input-vars.patch
+	sed -i "s/\!png_check_sig (sig, 8)/png_sig_cmp (sig, 0, 8)/" ext/gd/libgd/gd_png.c
 fi
 
 
@@ -71,29 +72,32 @@ else
 	OPTIONS="${OPTIONS} --with-curl"
 fi
 
-\cp -rf ${curPath}/lib/node.c $sourcePath/php/php${PHP_VER}/ext/dom/node.c
-\cp -rf ${curPath}/lib/documenttype.c $sourcePath/php/php${PHP_VER}/ext/dom/documenttype.c
+#\cp -rf ${curPath}/lib/node.c $sourcePath/php/php${PHP_VER}/ext/dom/node.c
+#\cp -rf ${curPath}/lib/documenttype.c $sourcePath/php/php${PHP_VER}/ext/dom/documenttype.c
 
 
 if [ ! -d $serverPath/php/${PHP_VER} ];then
 	ln -s /usr/lib64/libjpeg.so /usr/lib/libjpeg.so
 	ln -s /usr/lib64/libpng.so /usr/lib/
+	cp -frp /usr/lib64/libldap* /usr/lib/
 
 	cd $sourcePath/php/php${PHP_VER} && ./configure \
 	--prefix=$serverPath/php/${PHP_VER} \
 	--exec-prefix=$serverPath/php/${PHP_VER} \
 	--with-config-file-path=$serverPath/php/${PHP_VER}/etc \
+	--enable-xml \
 	--enable-sysvmsg \
 	--enable-sysvsem \
 	--enable-sysvshm \
 	$OPTIONS \
 	--enable-fastcgi \
 	--enable-fpm \
-	&& make && make install && make clean
+	&& make ZEND_EXTRA_LIBS='-liconv' && make install && make clean
 fi
 
 if [ "$?" != "0" ];then
 	echo "install fail!!"
+	rm -rf $sourcePath/php/php${PHP_VER}
 	exit 2
 fi
 
