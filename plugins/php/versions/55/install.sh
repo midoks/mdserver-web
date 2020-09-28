@@ -47,6 +47,9 @@ if [ ! -d $serverPath/php/55  ];then
 	--with-config-file-path=$serverPath/php/55/etc \
 	--with-zlib-dir=$serverPath/lib/zlib \
 	--enable-mysqlnd \
+	--with-mysql=mysqlnd \
+	--with-pdo-mysql=mysqlnd \
+	--with-mysqli=mysqlnd \
 	--enable-zip \
 	--enable-simplexml \
 	--enable-intl \

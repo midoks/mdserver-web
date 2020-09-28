@@ -62,6 +62,10 @@ if [ ! -d $serverPath/php/53 ];then
 	--exec-prefix=$serverPath/php/53 \
 	--with-config-file-path=$serverPath/php/53/etc \
 	--with-zlib-dir=$serverPath/lib/zlib \
+	--enable-mysqlnd \
+	--with-mysql=mysqlnd \
+	--with-pdo-mysql=mysqlnd \
+	--with-mysqli=mysqlnd \
 	--enable-zip \
 	--enable-exif \
 	--enable-hash \
