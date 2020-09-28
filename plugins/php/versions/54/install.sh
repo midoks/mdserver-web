@@ -48,6 +48,9 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--with-config-file-path=$serverPath/php/${PHP_VER}/etc \
 	--with-zlib-dir=$serverPath/lib/zlib \
 	--enable-mysqlnd \
+	--with-mysql=mysqlnd \
+	--with-pdo-mysql=mysqlnd \
+	--with-mysqli=mysqlnd \
 	--enable-zip \
 	--enable-mbstring \
 	--enable-sockets \

@@ -46,6 +46,7 @@ if [ ! -d $serverPath/php/56 ];then
 	--exec-prefix=$serverPath/php/56 \
 	--with-config-file-path=$serverPath/php/56/etc \
 	--with-zlib-dir=$serverPath/lib/zlib \
+	--enable-mysqlnd \
 	--with-mysql=mysqlnd \
 	--with-pdo-mysql=mysqlnd \
 	--with-mysqli=mysqlnd \
