@@ -20,7 +20,8 @@ if id www &> /dev/null ;then
     echo "www Shell is `grep "^www:" /etc/passwd |cut -d':' -f7 `"
 else
     groupadd www
-	useradd -g www -s /sbin/nologin www
+	# useradd -g www -s /sbin/nologin www
+	useradd -g www -s /bin/bash www
 fi
 
 Install_openresty()
