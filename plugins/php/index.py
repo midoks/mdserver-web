@@ -190,11 +190,11 @@ def makePhpIni(version):
     if not os.path.exists(d_ini):
         s_ini = getPluginDir() + '/conf/php' + version[0:1] + '.ini'
         # shutil.copyfile(s_ini, d_ini)
-        content = mw.readFile(d_ini)
+        content = mw.readFile(s_ini)
         if version == '52':
             content = content.replace(
                 '[PHP]', "[PHP]\nauto_prepend_file=\"/www/server/php/app_start.php\"")
-        mw.writeFile(s_ini, content)
+        mw.writeFile(d_ini, content)
 
 
 def initReplace(version):
