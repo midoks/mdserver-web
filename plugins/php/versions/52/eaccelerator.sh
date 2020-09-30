@@ -61,9 +61,18 @@ Install_lib()
 		return
 	fi
 
+	EA_DIR=/tmp/eaccelerator
+	mkdir -p $EA_DIR
+	chmod 777 -R $EA_DIR
 	echo "" >> $serverPath/php/$version/etc/php.ini
 	echo "[${LIBNAME}]" >> $serverPath/php/$version/etc/php.ini
 	echo "extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
+	echo "${LIBNAME}.enable=1" >> $serverPath/php/$version/etc/php.ini
+	echo "${LIBNAME}.optimizer=1" >> $serverPath/php/$version/etc/php.ini
+	echo "${LIBNAME}.shm_size=64" >> $serverPath/php/$version/etc/php.ini
+	echo "${LIBNAME}.cache_dir=${EA_DIR}" >> $serverPath/php/$version/etc/php.ini
+	echo "${LIBNAME}.allowed_admin_path=/www/wwwroot/you_project_dir" >> $serverPath/php/$version/etc/php.ini
+
 
 	$serverPath/php/init.d/php$version reload
 	echo '==========================================================='
