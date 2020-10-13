@@ -19,18 +19,17 @@ Install_v2ray()
 {
 	isStart=""
 	echo '正在安装脚本文件...' > $install_tmp
-	mkdir -p $serverPath/v2ray
+	mkdir -p /usr/local/etc/v2ray
 	echo '1.0' > $serverPath/v2ray/version.pl
-	touch /etc/v2ray/config.json
 
 	if [ "Darwin" == "$SYSOS" ];then
 		echo 'macosx unavailable' > $install_tmp
-		cat $curPath/tmp/v2ray.json > $serverPath/v2ray/config.json
+		cat $curPath/tmp/v2ray.json > /usr/local/etc/v2ray/config.json
 		exit 0 
 	fi
 
 	bash <(curl -L https://raw.githubusercontent.com/v2fly/fhs-install-v2ray/master/install-release.sh)
-	cat $curPath/tmp/v2ray.json > /etc/v2ray/config.json
+	cat $curPath/tmp/v2ray.json > /usr/local/etc/v2ray/config.json
 
 	echo 'install complete' > $install_tmp
 }
