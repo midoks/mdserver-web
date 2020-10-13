@@ -19,7 +19,7 @@ Install_v2ray()
 {
 	isStart=""
 	echo '正在安装脚本文件...' > $install_tmp
-	mkdir -p /usr/local/etc/v2ray
+	mkdir -p $serverPath/v2ray
 	echo '1.0' > $serverPath/v2ray/version.pl
 
 	if [ "Darwin" == "$SYSOS" ];then
