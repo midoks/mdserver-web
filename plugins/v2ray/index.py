@@ -102,7 +102,7 @@ def reload():
 def getPathFile():
     if mw.isAppleSystem():
         return getServerDir() + '/config.json'
-    return '/etc/v2ray/config.json'
+    return '/usr/local/etc/v2ray/config.json'
 
 
 def getInitDFile():
