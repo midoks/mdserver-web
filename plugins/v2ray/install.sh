@@ -28,7 +28,7 @@ Install_v2ray()
 		exit 0 
 	fi
 
-	bash <(curl -L -s https://install.direct/go.sh)
+	bash <(curl -L https://raw.githubusercontent.com/v2fly/fhs-install-v2ray/master/install-release.sh)
 	cat $curPath/tmp/v2ray.json > /etc/v2ray/config.json
 
 	echo 'install complete' > $install_tmp
