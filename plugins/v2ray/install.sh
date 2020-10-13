@@ -21,6 +21,7 @@ Install_v2ray()
 	echo '正在安装脚本文件...' > $install_tmp
 	mkdir -p $serverPath/v2ray
 	echo '1.0' > $serverPath/v2ray/version.pl
+	touch /etc/v2ray/config.json
 
 	if [ "Darwin" == "$SYSOS" ];then
 		echo 'macosx unavailable' > $install_tmp
