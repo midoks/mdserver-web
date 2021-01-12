@@ -40,6 +40,7 @@ Install_openresty()
 	cd ${openrestyDir}/openresty-${VERSION} && ./configure --prefix=$serverPath/openresty \
 	--with-http_v2_module \
 	--with-http_ssl_module  \
+	--with-http_slice_module \
 	--with-http_stub_status_module && make && make install && \
 	echo "${VERSION}" > $serverPath/openresty/version.pl
 	
