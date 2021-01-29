@@ -51,6 +51,7 @@ function lpAsyncPost(method,args){
 function readme(){
     var readme = '<ul class="help-info-text c7">';
     readme += '<li>默认需开放端口：UDP:1080</li>';
+    readme += '<li><a href="https://github.com/midoks/mdserver-web/wiki/%E6%8F%92%E4%BB%B6%E7%AE%A1%E7%90%86%5BSOCK5%5D">参考</a></li>';
     readme += '</ul>';
     $('.soft-man-con').html(readme);   
 }
