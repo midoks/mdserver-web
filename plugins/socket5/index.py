@@ -15,7 +15,7 @@ if mw.isAppleSystem():
 
 
 def getPluginName():
-    return 'l2tp'
+    return 'socket5'
 
 
 def getPluginDir():
@@ -111,14 +111,14 @@ def reload():
 
 def getPathFile():
     if mw.isAppleSystem():
-        return getServerDir() + '/chap-secrets'
-    return '/etc/ppp/chap-secrets'
+        return getServerDir() + '/ss5.conf'
+    return '/etc/opt/ss5/ss5.conf'
 
 
-def getPathFilePsk():
+def getPathFilePwd():
     if mw.isAppleSystem():
-        return getServerDir() + '/ipsec.secrets'
-    return '/etc/ipsec.secrets'
+        return getServerDir() + '/ss5.passwd'
+    return '/etc/opt/ss5/ss5.passwd'
 
 
 def getUserList():
@@ -220,7 +220,7 @@ if __name__ == "__main__":
     elif func == 'conf':
         print getPathFile()
     elif func == 'conf_psk':
-        print getPathFilePsk()
+        print getPathFilePwd()
     elif func == 'user_list':
         print getUserList()
     elif func == 'add_user':
