@@ -88,8 +88,7 @@ def start():
         return "Apple Computer does not support"
 
     data = mw.execShell('service ss5 start')
-    print(data)
-    if data[0] == '':
+    if data[1] == '':
         return 'ok'
     return data[1]
 
@@ -99,7 +98,7 @@ def stop():
         return "Apple Computer does not support"
 
     data = mw.execShell('service ss5 stop')
-    if data[0] == '':
+    if data[1] == '':
         return 'ok'
     return data[1]
 
@@ -109,14 +108,14 @@ def restart():
         return "Apple Computer does not support"
 
     data = mw.execShell('service ss5 restart')
-    if data[0] == '':
+    if data[1] == '':
         return 'ok'
     return data[1]
 
 
 def reload():
     data = mw.execShell('service ss5 reload')
-    if data[0] == '':
+    if data[1] == '':
         return 'ok'
     return data[1]
 
