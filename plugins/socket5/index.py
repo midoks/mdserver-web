@@ -26,6 +26,12 @@ def getServerDir():
     return mw.getServerDir() + '/' + getPluginName()
 
 
+def getInitDFile():
+    if app_debug:
+        return '/tmp/' + getPluginName()
+    return '/etc/init.d/ss5'
+
+
 def getArgs():
     args = sys.argv[2:]
     tmp = {}
@@ -127,6 +133,41 @@ def getPathFilePwd():
     return '/etc/opt/ss5/ss5.passwd'
 
 
+def initdStatus():
+    if not app_debug:
+        if mw.isAppleSystem():
+            return "Apple Computer does not support"
+    initd_bin = getInitDFile()
+    if os.path.exists(initd_bin):
+        return 'ok'
+    return 'fail'
+
+
+def initdInstall():
+    import shutil
+    if not app_debug:
+        if mw.isAppleSystem():
+            return "Apple Computer does not support"
+
+    source_bin = initDreplace()
+    initd_bin = getInitDFile()
+    shutil.copyfile(source_bin, initd_bin)
+    mw.execShell('chmod +x ' + initd_bin)
+    mw.execShell('chkconfig --add ' + getPluginName())
+    return 'ok'
+
+
+def initdUinstall():
+    if not app_debug:
+        if mw.isAppleSystem():
+            return "Apple Computer does not support"
+
+    mw.execShell('chkconfig --del ' + getPluginName())
+    initd_bin = getInitDFile()
+    os.remove(initd_bin)
+    return 'ok'
+
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -143,5 +184,11 @@ if __name__ == "__main__":
         print getPathFile()
     elif func == 'conf_pwd':
         print getPathFilePwd()
+    elif func == 'initd_status':
+        print initdStatus()
+    elif func == 'initd_install':
+        print initdInstall()
+    elif func == 'initd_uninstall':
+        print initdUinstall()
     else:
         print 'error'
