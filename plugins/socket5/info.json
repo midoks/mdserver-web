@@ -1,0 +1,14 @@
+{
+	"title":"socket5",
+	"tip":"soft",
+	"name":"socket5",
+	"type":"运行环境",
+	"ps":"socket5",
+	"versions":"1.0",
+	"shell":"install.sh",
+	"checks":"server/socket5",
+	"author":"midoks",
+	"home":"https://github.com/teddysun/across/blob/master/socket5.sh",
+	"date":"2021-01-29",
+	"pid": "4"
+}
