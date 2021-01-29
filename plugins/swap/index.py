@@ -86,11 +86,6 @@ def initDreplace():
     mw.writeFile(file_bin, content)
     mw.execShell('chmod +x ' + file_bin)
 
-    # config replace
-    conf_content = mw.readFile(getConf())
-    conf_content = conf_content.replace('{$SERVER_PATH}', service_path)
-    mw.writeFile(getServerDir() + '/redis.conf', conf_content)
-
     return file_bin
 
 
