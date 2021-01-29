@@ -1,73 +1,57 @@
-#!/bin/sh
+#!/bin/bash
 # chkconfig: 2345 55 25
-# description: Redis Service
+# description: MW Cloud Service
 
 ### BEGIN INIT INFO
-# Provides:          Redis
+# Provides:          bt
 # Required-Start:    $all
 # Required-Stop:     $all
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: starts Redis
-# Description:       starts the MDW-Web
+# Short-Description: starts mw
+# Description:       starts the mw
 ### END INIT INFO
 
-# Simple Redis init.d script conceived to work on Linux systems
-# as it does use of the /proc filesystem.
 
-CONF="{$SERVER_PATH}/redis/redis.conf"
-REDISPORT=$(cat $CONF |grep port|grep -v '#'|awk '{print $2}')
-REDISPASS=$(cat $CONF |grep requirepass|grep -v '#'|awk '{print $2}')
-if [ "$REDISPASS" != "" ];then
-	REDISPASS=" -a $REDISPASS"
-fi
-EXEC={$SERVER_PATH}/redis/bin/redis-server
-CLIEXEC="{$SERVER_PATH}/redis/bin/redis-cli -p $REDISPORT$REDISPASS"
-PIDFILE={$SERVER_PATH}/redis/redis_6379.pid
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 
-mkdir -p {$SERVER_PATH}/redis/data
+app_file={$SERVER_PATH}
 
 app_start(){
-	if [ -f $PIDFILE ];then
-		kill -9 `cat $PIDFILE`
-	fi
-	
-	echo "Starting Redis server..."
-	nohup $EXEC $CONF >> {$SERVER_PATH}/redis/logs.pl 2>&1 &
-}
-app_stop(){
-	if [ ! -f $PIDFILE ]
-	then
-			echo "$PIDFILE does not exist, process is not running"
-	else
-			PID=$(cat $PIDFILE)
-			echo "Stopping ..."
-			$CLIEXEC shutdown
-			while [ -x /proc/${PID} ]
-			do
-				echo "Waiting for Redis to shutdown ..."
-				sleep 1
-			done
-			echo "Redis stopped"
-			rm -rf $PIDFILE
-	fi
+	isStart=`free -m|grep Swap|awk '{print $2}'`
+	if [ "$isStart" == '0' ];then
+            echo -e "Starting swap... \c"
+            swapon $app_file
+            echo -e "\033[32mdone\033[0m"
+    else
+            echo "Starting swap already running"
+    fi
 }
 
+app_stop()
+{
+
+    echo -e "Stopping swap... \c";
+    swapoff $app_file
+    echo -e "\033[32mdone\033[0m"
+}
+
+app_status()
+{
+    isStart=`free -m|grep Swap|awk '{print $2}'`
+    if [ "$isStart" == '0' ];then
+            echo -e "\033[32mswap already running\033[0m"
+    else
+            echo -e "\033[31mswap not running\033[0m"
+    fi
+}
 
 case "$1" in
-    start)
-		app_start
-        ;;
-    stop)
+    'start') app_start;;
+    'stop') app_stop;;
+    'reload')
+    'restart') 
         app_stop
-        ;;
-	restart|reload)
-		app_stop
-		sleep 0.3
-		app_start
-		;;
-    *)
-        echo "Please use start or stop as first argument"
-        ;;
+        app_start;;
+    'status') app_status;;
 esac
-
