@@ -92,7 +92,7 @@ def initDreplace():
 def start():
     file = initDreplace()
     data = mw.execShell(file + ' start')
-    if data[0] == '':
+    if data[1] == '':
         return 'ok'
     return 'fail'
 
@@ -100,17 +100,25 @@ def start():
 def stop():
     file = initDreplace()
     data = mw.execShell(file + ' stop')
-    if data[0] == '':
+    if data[1] == '':
         return 'ok'
     return 'fail'
 
 
 def restart():
-    return 'ok'
+    file = initDreplace()
+    data = mw.execShell(file + ' restart')
+    if data[1] == '':
+        return 'ok'
+    return 'fail'
 
 
 def reload():
-    return 'ok'
+    file = initDreplace()
+    data = mw.execShell(file + ' reload')
+    if data[1] == '':
+        return 'ok'
+    return 'fail'
 
 
 def initdStatus():
