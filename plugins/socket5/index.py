@@ -32,6 +32,10 @@ def getInitDFile():
     return '/etc/init.d/ss5'
 
 
+def initDreplace():
+    return getPluginDir() + '/init.d/ss5'
+
+
 def getArgs():
     args = sys.argv[2:]
     tmp = {}
@@ -74,7 +78,7 @@ def initConf():
 
     ss5_pwd = getServerDir() + '/ss5.passwd'
     if not os.path.exists(ss5_pwd):
-        tmp = getPluginDir() + '/tmp/ss5.conf'
+        tmp = getPluginDir() + '/tmp/ss5.passwd'
 
         if not os.path.exists(tmp):
             mw.execShell('cp -rf ' + tmp + ' /etc/opt/ss5')

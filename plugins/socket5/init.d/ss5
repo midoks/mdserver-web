@@ -1,0 +1,83 @@
+#!/bin/sh
+#
+# chkconfig: 345 20 80
+# description: This script takes care of starting \
+#              and stopping ss5
+#
+
+OS=`uname -s`
+if [ $OS = "Linux" ] || [ $OS = "SunOS" ]; then
+ 
+# Source function library.
+ . /etc/rc.d/init.d/functions
+
+# Source networking configuration.
+ . /etc/sysconfig/network
+
+# Check that networking is up.
+ [ ${NETWORKING} = "no" ] && exit 0
+
+ [ -f /usr/sbin/ss5 ] || exit 0
+fi
+
+# Test custom variables
+test -f /etc/sysconfig/ss5 && . /etc/sysconfig/ss5
+
+# See how we were called.
+case "$1" in
+  start)
+        # Start daemon.
+        echo -n "Starting ss5... "
+	if [ $OS = "Linux" ]; then
+            daemon /usr/sbin/ss5 -t $SS5_OPTS
+            touch /var/lock/subsys/ss5
+	else
+	  if [ $OS = "SunOS" ]; then
+              /usr/sbin/ss5 -t 
+              touch /var/lock/subsys/ss5
+	  else
+              /usr/local/sbin/ss5 -t 
+	  fi
+	fi
+	echo "done"
+        ;;
+  stop)
+        # Stop daemon.
+        echo "Shutting down ss5... "
+	if [ $OS = "Linux" ] || [ $OS = "SunOS" ]; then
+	killproc ss5
+        rm -f /var/lock/subsys/ss5
+	else
+		killall ss5
+	fi
+        rm -f /var/run/ss5/ss5.pid
+	echo "done"
+        ;;
+  reload)
+        # Reload configuration
+	if [ $OS = "Linux" ] || [ $OS = "SunOS" ]; then
+        echo -n "Reloading ss5... "
+	killproc ss5 -1
+	else
+		pkill -HUP ss5
+	fi
+	echo "done reload"
+	;;
+  restart)
+        # Restart daemon
+        echo -n "Restarting ss5... "
+	$0 stop
+	$0 start
+	;;
+  status)
+	if [ $OS = "Linux" ] || [ $OS = "SunOS" ]; then
+	  status ss5
+	fi
+	;;
+  *)
+        echo "Usage: ss5 {start|stop|status|restart|reload}"
+        exit 1
+	;;
+esac
+
+exit 0
