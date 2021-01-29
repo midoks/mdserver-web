@@ -19,13 +19,15 @@ Install_socket5()
 	isStart=""
 	echo '正在安装脚本文件...' > $install_tmp
 	mkdir -p $serverPath/source
+	mkdir -p $serverPath/socket5
 
 	if [ ! -f $serverPath/source/ss5-3.8.9-8.tar.gz ];then
 		wget -O $serverPath/source/ss5-3.8.9-8.tar.gz http://downloads.sourceforge.net/project/ss5/ss5/3.8.9-8/ss5-3.8.9-8.tar.gz
 	fi
 	echo '1.0' > $serverPath/socket5/version.pl
 
-	
+	cd $serverPath/source && tar -xzvf ss5-3.8.9-8.tar.gz
+	cd $serverPath/source/ss5-3.8.9 && ./configure && make && make install
 
 	echo 'install complete' > $install_tmp
 }
