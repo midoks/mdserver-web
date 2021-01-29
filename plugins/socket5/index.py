@@ -76,6 +76,10 @@ def initConf():
             mw.execShell('cp -rf ' + tmp + ' /etc/opt/ss5')
         mw.execShell('cp -rf ' + tmp + ' ' + getServerDir())
 
+        init_file = '/etc/init.d/ss5'
+        if os.path.exists(init_file):
+            mw.execShell('chmod +x' + init_file)
+
     ss5_pwd = getServerDir() + '/ss5.passwd'
     if not os.path.exists(ss5_pwd):
         tmp = getPluginDir() + '/tmp/ss5.passwd'
