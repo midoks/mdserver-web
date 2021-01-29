@@ -66,32 +66,12 @@ def status():
 
 
 def initDreplace():
-
-    file_tpl = getInitDTpl()
-    service_path = os.path.dirname(os.getcwd())
-
-    initD_path = getServerDir() + '/init.d'
-    if not os.path.exists(initD_path):
-        os.mkdir(initD_path)
-    file_bin = initD_path + '/' + getPluginName()
-
-    # initd replace
-    content = mw.readFile(file_tpl)
-    content = content.replace('{$SERVER_PATH}', service_path)
-    mw.writeFile(file_bin, content)
-    mw.execShell('chmod +x ' + file_bin)
-
-    # config replace
-    conf_content = mw.readFile(getConf())
-    conf_content = conf_content.replace('{$SERVER_PATH}', service_path)
-    mw.writeFile(getServerDir() + '/redis.conf', conf_content)
-
-    return file_bin
+    return '/swapfile'
 
 
 def start():
     file = initDreplace()
-    data = mw.execShell(file + ' start')
+    data = mw.execShell('swapon ' + file)
     if data[1] == '':
         return 'ok'
     return 'fail'
@@ -99,28 +79,18 @@ def start():
 
 def stop():
     file = initDreplace()
-    data = mw.execShell(file + ' stop')
+    data = mw.execShell('swapoff ' + file)
     if data[1] == '':
         return 'ok'
     return 'fail'
 
 
 def restart():
-    file = initDreplace()
-    data = mw.execShell(file + ' restart')
-    log_file = getServerDir() + "/data/redis.log"
-    mw.execShell("echo '' > " + log_file)
-    if data[1] == '':
-        return 'ok'
-    return 'fail'
+    return 'ok'
 
 
 def reload():
-    file = initDreplace()
-    data = mw.execShell(file + ' reload')
-    if data[1] == '':
-        return 'ok'
-    return 'fail'
+    return 'ok'
 
 
 def initdStatus():
