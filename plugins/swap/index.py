@@ -60,7 +60,7 @@ def getArgs():
 
 def status():
     data = mw.execShell("free -m|grep Swap|awk '{print $2}'")
-    if data[0] == '0':
+    if data[0].strip() == '0':
         return 'stop'
     return 'start'
 
