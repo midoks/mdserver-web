@@ -82,6 +82,7 @@ def start():
         return "Apple Computer does not support"
 
     data = mw.execShell('service ss5 start')
+    print(data)
     if data[0] == '':
         return 'ok'
     return data[1]
