@@ -61,13 +61,18 @@ def status():
 def initConf():
     ss5_conf = getServerDir() + '/ss5.conf'
     if not os.path.exists(ss5_conf):
-        mw.execShell('cp -rf ' + getPluginDir() +
-                     '/tmp/ss5.conf' + ' ' + getServerDir())
+        tmp = getPluginDir() + '/tmp/ss5.conf'
+        if not os.path.exists(tmp):
+            mw.execShell('cp -rf ' + tmp + ' /etc/opt/ss5')
+        mw.execShell('cp -rf ' + tmp + ' ' + getServerDir())
 
     ss5_pwd = getServerDir() + '/ss5.passwd'
     if not os.path.exists(ss5_pwd):
-        mw.execShell('cp -rf ' + getPluginDir() +
-                     '/tmp/ss5.passwd' + ' ' + getServerDir())
+        tmp = getPluginDir() + '/tmp/ss5.conf'
+
+        if not os.path.exists(tmp):
+            mw.execShell('cp -rf ' + tmp + ' /etc/opt/ss5')
+        mw.execShell('cp -rf ' + tmp + ' ' + getServerDir())
 
 
 def start():
