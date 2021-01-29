@@ -20,17 +20,16 @@ app_file={$SERVER_PATH}
 app_start(){
 	isStart=`free -m|grep Swap|awk '{print $2}'`
 	if [ "$isStart" == '0' ];then
-            echo -e "Starting swap... \c"
-            swapon $app_file
-            echo -e "\033[32mdone\033[0m"
+        echo -e "Starting swap... \c"
+        swapon $app_file
+        echo -e "\033[32mdone\033[0m"
     else
-            echo "Starting swap already running"
+        echo "Starting swap already running"
     fi
 }
 
 app_stop()
 {
-
     echo -e "Stopping swap... \c";
     swapoff $app_file
     echo -e "\033[32mdone\033[0m"
@@ -40,17 +39,16 @@ app_status()
 {
     isStart=`free -m|grep Swap|awk '{print $2}'`
     if [ "$isStart" == '0' ];then
-            echo -e "\033[32mswap already running\033[0m"
+        echo -e "\033[32mswap already running\033[0m"
     else
-            echo -e "\033[31mswap not running\033[0m"
+        echo -e "\033[31mswap not running\033[0m"
     fi
 }
 
 case "$1" in
     'start') app_start;;
     'stop') app_stop;;
-    'reload')
-    'restart') 
+    'restart'|'reload') 
         app_stop
         app_start;;
     'status') app_status;;
