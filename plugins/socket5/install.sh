@@ -35,6 +35,7 @@ Install_socket5()
 Uninstall_socket5()
 {
 	rm -rf $serverPath/socket5
+	rm -rf /usr/sbin/ss5
 	echo "Uninstall completed" > $install_tmp
 }
 
