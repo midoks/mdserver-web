@@ -136,6 +136,10 @@ def getPathFilePwd():
     return '/etc/opt/ss5/ss5.passwd'
 
 
+def getPathFilePort():
+    return '/etc/sysconfig/ss5'
+
+
 def initdStatus():
     if not app_debug:
         if mw.isAppleSystem():
@@ -187,6 +191,8 @@ if __name__ == "__main__":
         print getPathFile()
     elif func == 'conf_pwd':
         print getPathFilePwd()
+    elif func == 'conf_port':
+        print getPathFilePort()
     elif func == 'initd_status':
         print initdStatus()
     elif func == 'initd_install':
