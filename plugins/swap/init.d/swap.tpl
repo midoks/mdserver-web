@@ -27,7 +27,7 @@ PIDFILE={$SERVER_PATH}/redis/redis_6379.pid
 
 mkdir -p {$SERVER_PATH}/redis/data
 
-redis_start(){
+app_start(){
 	if [ -f $PIDFILE ];then
 		kill -9 `cat $PIDFILE`
 	fi
@@ -35,7 +35,7 @@ redis_start(){
 	echo "Starting Redis server..."
 	nohup $EXEC $CONF >> {$SERVER_PATH}/redis/logs.pl 2>&1 &
 }
-redis_stop(){
+app_stop(){
 	if [ ! -f $PIDFILE ]
 	then
 			echo "$PIDFILE does not exist, process is not running"
@@ -56,15 +56,15 @@ redis_stop(){
 
 case "$1" in
     start)
-		redis_start
+		app_start
         ;;
     stop)
-        redis_stop
+        app_stop
         ;;
 	restart|reload)
-		redis_stop
+		app_stop
 		sleep 0.3
-		redis_start
+		app_start
 		;;
     *)
         echo "Please use start or stop as first argument"
