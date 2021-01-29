@@ -59,10 +59,8 @@ def getArgs():
 
 
 def status():
-    data = mw.execShell(
-        "ps -ef|grep swap |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'")
-
-    if data[0] == '':
+    data = mw.execShell("free -m|grep Swap|awk '{print $2}'")
+    if data[0] == '0':
         return 'stop'
     return 'start'
 
