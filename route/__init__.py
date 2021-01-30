@@ -34,9 +34,8 @@ import config_api
 app = Flask(__name__, template_folder='templates/default')
 app.config.version = config_api.config_api().getVersion()
 # app.config['SECRET_KEY'] = os.urandom(24)
-# app.secret_key = uuid.UUID(int=uuid.getnode()).hex[-12:]
-app.config['SECRET_KEY'] = uuid.UUID(int=uuid.getnode()).hex[-12:]
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=31)
+
+
 cache = Cache(config={'CACHE_TYPE': 'simple'})
 cache.init_app(app, config={'CACHE_TYPE': 'simple'})
 
@@ -57,10 +56,12 @@ except:
     app.config['SESSION_FILE_MODE'] = 384
     mw.execShell("pip install flask_sqlalchemy &")
 
+app.secret_key = uuid.UUID(int=uuid.getnode()).hex[-12:]
 app.config['SESSION_PERMANENT'] = True
 app.config['SESSION_USE_SIGNER'] = True
 app.config['SESSION_KEY_PREFIX'] = 'MW_:'
 app.config['SESSION_COOKIE_NAME'] = "MW_VER_1"
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=31)
 Session(app)
 
 # socketio
