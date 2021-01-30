@@ -33,8 +33,6 @@ import config_api
 
 app = Flask(__name__, template_folder='templates/default')
 app.config.version = config_api.config_api().getVersion()
-# app.config['SECRET_KEY'] = os.urandom(24)
-
 
 cache = Cache(config={'CACHE_TYPE': 'simple'})
 cache.init_app(app, config={'CACHE_TYPE': 'simple'})
