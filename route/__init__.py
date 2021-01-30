@@ -88,6 +88,7 @@ def funConvert(fun):
 
 
 def isLogined():
+    # print('isLogined', session)
     if 'login' in session and 'username' in session and session['login'] == True:
         return True
     return False
@@ -203,6 +204,7 @@ def doLogin():
     cache.delete('login_cache_limit')
     session['login'] = True
     session['username'] = userInfo['username']
+    #print('do_login', session)
     return mw.returnJson(True, '登录成功,正在跳转...')
 
 
