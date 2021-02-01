@@ -11,14 +11,13 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
+LIBNAME=memcached
+LIBV=3.1.5
+sysName=`uname`
 actionType=$1
 version=$2
+extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20200930/${LIBNAME}.so
 
-LIBNAME=yaf
-LIBV=3.3.0
-extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20190128/${LIBNAME}.so
-
-sysName=`uname`
 if [ "$sysName" == "Darwin" ];then
 	BAK='_bak'
 else
@@ -27,7 +26,6 @@ fi
 
 Install_lib()
 {
-	
 	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep "${LIBNAME}.so"`
 	if [ "${isInstall}" != "" ];then
 		echo "php-$version 已安装${LIBNAME},请选择其它版本!"
@@ -38,27 +36,33 @@ Install_lib()
 
 		php_lib=$sourcePath/php_lib
 		mkdir -p $php_lib
+
+		rm -rf $php_lib/${LIBNAME}-${LIBV}
+
 		if [ ! -d $php_lib/${LIBNAME}-${LIBV} ];then
 			wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
 			cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
-		fi
+		fi 
 		cd $php_lib/${LIBNAME}-${LIBV}
 
+		sed -i '_bak' "3237,3238s#ulong#zend_ulong#g" $php_lib/${LIBNAME}-${LIBV}/php_memcached.c
 		$serverPath/php/$version/bin/phpize
-		./configure --with-php-config=$serverPath/php/$version/bin/php-config
-		make && make install && make clean
+	
+		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
+		--enable-memcached \
+		--disable-memcached-sasl && \
+		make clean && make && make install && make clean
 	fi
 	
 	if [ ! -f "$extFile" ];then
 		echo "ERROR!"
-		return;
+		return
 	fi
-	
-	echo  "" >> $serverPath/php/$version/etc/php.ini
-	echo  "[${LIBNAME}]" >> $serverPath/php/$version/etc/php.ini
-	echo  "extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
-	echo  "${LIBNAME}.use_namespace=1" >> $serverPath/php/$version/etc/php.ini
-	
+
+	echo "" >> $serverPath/php/$version/etc/php.ini
+	echo "[${LIBNAME}]" >> $serverPath/php/$version/etc/php.ini
+	echo "extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
+
 	$serverPath/php/init.d/php$version reload
 	echo '==========================================================='
 	echo 'successful!'
@@ -71,16 +75,15 @@ Uninstall_lib()
 		echo "php-$version 未安装,请选择其它版本!"
 		return
 	fi
-
+	
 	if [ ! -f "$extFile" ];then
 		echo "php-$version 未安装${LIBNAME},请选择其它版本!"
+		echo "php-$version not install ${LIBNAME}, Plese select other version!"
 		return
 	fi
 	
-	echo $serverPath/php/$version/etc/php.ini
 	sed -i $BAK "/${LIBNAME}.so/d" $serverPath/php/$version/etc/php.ini
-	sed -i $BAK "/${LIBNAME}.use_namespace/d" $serverPath/php/$version/etc/php.ini
-	sed -i $BAK "/\[${LIBNAME}\]/d"  $serverPath/php/$version/etc/php.ini
+	sed -i $BAK "/${LIBNAME}/d" $serverPath/php/$version/etc/php.ini
 		
 	rm -f $extFile
 	$serverPath/php/init.d/php$version reload
