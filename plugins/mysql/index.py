@@ -70,8 +70,8 @@ def getConf():
     return path
 
 
-def getInitdTpl():
-    path = getPluginDir() + '/init.d/mysql.tpl'
+def getInitdTpl(version=''):
+    path = getPluginDir() + '/init.d/mysql' + version + '.tpl'
     return path
 
 
@@ -105,8 +105,8 @@ def pMysqlDb():
     return db
 
 
-def initDreplace():
-    initd_tpl = getInitdTpl()
+def initDreplace(version=''):
+    initd_tpl = getInitdTpl(version)
 
     initD_path = getServerDir() + '/init.d'
     if not os.path.exists(initD_path):
@@ -125,7 +125,7 @@ def initDreplace():
 
     mysql_conf = mysql_conf_dir + '/my.cnf'
     if not os.path.exists(mysql_conf):
-        mysql_conf_tpl = getPluginDir() + '/conf/my.cnf'
+        mysql_conf_tpl = getPluginDir() + '/conf/my' + version + '.cnf'
         content = mw.readFile(mysql_conf_tpl)
         content = contentReplace(content)
         mw.writeFile(mysql_conf, content)
@@ -133,7 +133,7 @@ def initDreplace():
     return file_bin
 
 
-def status():
+def status(version=''):
     data = mw.execShell(
         "ps -ef|grep mysqld |grep -v grep | grep -v python | awk '{print $2}'")
     if data[0] == '':
@@ -229,6 +229,18 @@ def initMysqlData():
     return 1
 
 
+def initMysql8Data():
+    datadir = getDataDir()
+    if not os.path.exists(datadir + '/mysql'):
+        serverdir = getServerDir()
+        user = pGetDbUser()
+        cmd = 'cd ' + serverdir + ' && ./bin/mysqld --basedir=' + serverdir + ' --datadir=' + \
+            datadir + ' --initialize'
+        mw.execShell(cmd)
+        return 0
+    return 1
+
+
 def initMysqlPwd():
     time.sleep(5)
 
@@ -241,6 +253,18 @@ def initMysqlPwd():
     return True
 
 
+def initMysql8Pwd():
+    time.sleep(2)
+
+    serverdir = getServerDir()
+
+    pwd = mw.getRandomString(16)
+    cmd_pass = serverdir + '/bin/mysql -uroot password ' + pwd
+    pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
+    print mw.execShell(cmd_pass)
+    return True
+
+
 def myOp(method):
     import commands
     init_file = initDreplace()
@@ -249,27 +273,50 @@ def myOp(method):
         initData = initMysqlData()
         subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True,
                          bufsize=4096, stderr=subprocess.PIPE)
-        if (initData == 0):
+        if initData == 0:
             initMysqlPwd()
         return 'ok'
     except Exception as e:
         return str(e)
 
 
-def start():
-    return myOp('start')
+def my8cmd(version, method):
+    init_file = initDreplace(version)
+    cmd = init_file + ' ' + method
+    try:
+        print(cmd)
+        initData = initMysql8Data()
+        subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True,
+                         bufsize=4096, stderr=subprocess.PIPE)
+        if initData == 0:
+            initMysql8Pwd()
+        return 'ok'
+    except Exception as e:
+        print(e)
+
+    return 'fail'
 
 
-def stop():
-    return myOp('stop')
+def appCMD(version, action):
+    if version == '8.0':
+        return my8cmd(version, action)
+    return myOp(action)
 
 
-def restart():
-    return myOp('restart')
+def start(version):
+    return appCMD(version, 'start')
 
 
-def reload():
-    return myOp('reload')
+def stop(version):
+    return appCMD(version, 'stop')
+
+
+def restart(version):
+    return appCMD(version, 'restart')
+
+
+def reload(version):
+    return appCMD(version, 'reload')
 
 
 def initdStatus():
@@ -1030,16 +1077,17 @@ def getTotalStatistics():
 
 if __name__ == "__main__":
     func = sys.argv[1]
+    version = sys.argv[2]
     if func == 'status':
-        print status()
+        print status(version)
     elif func == 'start':
-        print start()
+        print start(version)
     elif func == 'stop':
-        print stop()
+        print stop(version)
     elif func == 'restart':
-        print restart()
+        print restart(version)
     elif func == 'reload':
-        print reload()
+        print reload(version)
     elif func == 'initd_status':
         print initdStatus()
     elif func == 'initd_install':
