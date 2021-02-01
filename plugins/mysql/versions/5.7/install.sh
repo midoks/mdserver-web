@@ -11,7 +11,7 @@ curPath=`pwd`
 rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
-# sysName=`uname`
+sysName=`uname`
 
 
 install_tmp=${rootPath}/tmp/mw_install.pl
@@ -22,11 +22,12 @@ Install_mysql()
 	mkdir -p ${mysqlDir}
 	echo '正在安装脚本文件...' > $install_tmp
 
-	mkdir -p /var/log/mariadb
-	touch /var/log/mariadb/mariadb.log
-
-	groupadd mysql
-	useradd -g mysql mysql
+	if [ "$sysName" != "Darwin" ];then
+		mkdir -p /var/log/mariadb
+		touch /var/log/mariadb/mariadb.log
+		groupadd mysql
+		useradd -g mysql mysql
+	fi 
 
 	if [ ! -f ${mysqlDir}/mysql-boost-5.7.28.tar.gz ];then
 		wget -O ${mysqlDir}/mysql-boost-5.7.28.tar.gz https://cdn.mysql.com//Downloads/MySQL-5.7/mysql-boost-5.7.28.tar.gz
