@@ -882,7 +882,7 @@ def get_string_arr(t):
 def getSSHPort():
     try:
         file = '/etc/ssh/sshd_config'
-        conf = ReadFile(file)
+        conf = readFile(file)
         rep = "#*Port\s+([0-9]+)\s*\n"
         port = re.search(rep, conf).groups(0)[0]
         return int(port)
