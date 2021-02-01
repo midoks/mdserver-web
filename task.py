@@ -397,7 +397,7 @@ def startPHPVersion(version):
             return False
 
         if not os.path.exists(fpm):
-            return True
+            return False
 
         # 尝试重载服务
         os.system(fpm + ' reload')
