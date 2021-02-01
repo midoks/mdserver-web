@@ -7,7 +7,7 @@ function web_shell2() {
 
     term.open();
     term.setOption('cursorBlink', true);
-    term.setOption('fontSize', 10);
+    term.setOption('fontSize', 14);
     gterm = term
 
     socket.on('server_response', function (data) {
@@ -39,7 +39,7 @@ function web_shell2() {
     var term_box = layer.open({
         type: 1,
         title: "本地终端",
-        area: ['600px','400px'],
+        area: ['750px','435px'],
         closeBtn: 2,
         shadeClose: false,
         content: '<div class="term-box"><div id="term"></div></div>\
