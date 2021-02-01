@@ -29,16 +29,16 @@ Install_mysql()
 		useradd -g mysql mysql
 	fi 
 
-	if [ ! -f ${mysqlDir}/mysql-boost-5.7.28.tar.gz ];then
-		wget -O ${mysqlDir}/mysql-boost-5.7.28.tar.gz https://cdn.mysql.com//Downloads/MySQL-5.7/mysql-boost-5.7.28.tar.gz
+	if [ ! -f ${mysqlDir}/mysql-boost-5.7.32.tar.gz ];then
+		wget -O ${mysqlDir}/mysql-boost-5.7.32.tar.gz https://cdn.mysql.com//Downloads/MySQL-5.7/mysql-boost-5.7.32.tar.gz
 	fi
 
-	if [ ! -d ${mysqlDir}/mysql-5.7.28 ];then
-		 cd ${mysqlDir} && tar -zxvf  ${mysqlDir}/mysql-boost-5.7.28.tar.gz
+	if [ ! -d ${mysqlDir}/mysql-5.7.32 ];then
+		 cd ${mysqlDir} && tar -zxvf  ${mysqlDir}/mysql-boost-5.7.32.tar.gz
 	fi
 
 	if [ ! -d $serverPath/mysql ];then
-		cd ${mysqlDir}/mysql-5.7.28 && cmake \
+		cd ${mysqlDir}/mysql-5.7.32 && cmake \
 		-DCMAKE_INSTALL_PREFIX=$serverPath/mysql \
 		-DMYSQL_USER=mysql \
 		-DMYSQL_TCP_PORT=3306 \
