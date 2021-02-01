@@ -26,7 +26,7 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 		wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz https://www.php.net/distributions/php-${version}.tar.xz
 	fi
 	
-	cd $sourcePath/php && tar -zxvf $sourcePath/php/php-${version}.tar.xz
+	cd $sourcePath/php && tar -Jxf $sourcePath/php/php-${version}.tar.xz
 	mv $sourcePath/php/php-${version} $sourcePath/php/php${PHP_VER}
 fi
 
