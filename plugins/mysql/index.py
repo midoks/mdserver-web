@@ -345,19 +345,19 @@ def appCMD(version, action):
     return myOp(action)
 
 
-def start(version):
+def start(version=''):
     return appCMD(version, 'start')
 
 
-def stop(version):
+def stop(version=''):
     return appCMD(version, 'stop')
 
 
-def restart(version):
+def restart(version=''):
     return appCMD(version, 'restart')
 
 
-def reload(version):
+def reload(version=''):
     return appCMD(version, 'reload')
 
 
