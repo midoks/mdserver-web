@@ -961,7 +961,12 @@ def setDbAccess():
     psdb = pSqliteDb('databases')
 
     dbname = psdb.where('username=?', (name,)).getField('name')
-    password = psdb.where("username=?", (name,)).getField('password')
+
+    if name == 'root':
+        password = pSqliteDb('config').where(
+            'id=?', (1,)).getField('mysql_root')
+    else:
+        password = psdb.where("username=?", (name,)).getField('password')
     users = pdb.query("select Host from mysql.user where User='" +
                       name + "' AND Host!='localhost'")
     for us in users:
