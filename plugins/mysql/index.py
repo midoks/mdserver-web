@@ -181,6 +181,21 @@ def binLog():
     return mw.returnJson(True, '设置成功!')
 
 
+def setSkipGrantTables(v):
+    '''
+    设置是否密码验证
+    '''
+    conf = getConf()
+    con = mw.readFile(conf)
+    if v:
+        if con.find('#skip-grant-tables') != -1:
+            con = con.replace('#skip-grant-tables', 'skip-grant-tables')
+    else:
+        con = con.replace('skip-grant-tables', '#skip-grant-tables')
+    mw.writeFile(conf, con)
+    return True
+
+
 def getErrorLog():
     args = getArgs()
     path = getDataDir()
@@ -254,14 +269,29 @@ def initMysqlPwd():
 
 
 def initMysql8Pwd():
-    time.sleep(2)
+    time.sleep(6)
+
+    import MySQLdb as mdb
+    dbconn = mdb.connect('localhost', 'root', '', '')
+    dbconn.autocommit(True)
+    dbcurr = dbconn.cursor()
+    dbcurr.execute('SET NAMES UTF8MB4')
 
     serverdir = getServerDir()
-
     pwd = mw.getRandomString(16)
-    cmd_pass = serverdir + '/bin/mysql -uroot password ' + pwd
+
+    # with mysql_native_password
+    alter_root_pwd = "flush privileges;\n"
+    alter_root_pwd = alter_root_pwd + \
+        "alter user 'root'@'localhost' identified by '" + pwd + "';"
+
+    r = dbcurr.execute(alter_root_pwd)
+
+    # mw.writeFile(tmp_file, alter_root_pwd)
+    # cmd_pass = serverdir + '/bin/mysql -uroot -p < ' + tmp_file
+    # print mw.execShell(cmd_pass)
     pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
-    print mw.execShell(cmd_pass)
+
     return True
 
 
@@ -284,12 +314,23 @@ def my8cmd(version, method):
     init_file = initDreplace(version)
     cmd = init_file + ' ' + method
     try:
-        print(cmd)
         initData = initMysql8Data()
-        subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True,
-                         bufsize=4096, stderr=subprocess.PIPE)
         if initData == 0:
+            setSkipGrantTables(True)
+            cmd_init_start = init_file + ' start'
+            subprocess.Popen(cmd_init_start, stdout=subprocess.PIPE, shell=True,
+                             bufsize=4096, stderr=subprocess.PIPE)
             initMysql8Pwd()
+
+            cmd_init_stop = init_file + ' stop'
+            subprocess.Popen(cmd_init_stop, stdout=subprocess.PIPE, shell=True,
+                             bufsize=4096, stderr=subprocess.PIPE)
+            setSkipGrantTables(False)
+
+            my8cmd(version, method)
+        else:
+            subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True,
+                             bufsize=4096, stderr=subprocess.PIPE)
         return 'ok'
     except Exception as e:
         print(e)
@@ -469,24 +510,22 @@ def myDbStatus():
     if isError != None:
         return isError
 
-    gets = ['table_open_cache', 'thread_cache_size', 'query_cache_type', 'key_buffer_size', 'query_cache_size', 'tmp_table_size', 'max_heap_table_size', 'innodb_buffer_pool_size',
+    gets = ['table_open_cache', 'thread_cache_size', 'key_buffer_size', 'tmp_table_size', 'max_heap_table_size', 'innodb_buffer_pool_size',
             'innodb_additional_mem_pool_size', 'innodb_log_buffer_size', 'max_connections', 'sort_buffer_size', 'read_buffer_size', 'read_rnd_buffer_size', 'join_buffer_size', 'thread_stack', 'binlog_cache_size']
     result['mem'] = {}
     for d in data:
         for g in gets:
             if d[0] == g:
                 result['mem'][g] = d[1]
-    if result['mem']['query_cache_type'] != 'ON':
-        result[
-            'mem']['query_cache_size'] = '0'
+    # if result['mem']['query_cache_type'] != 'ON':
+    #     result['mem']['query_cache_size'] = '0'
     return mw.getJson(result)
 
 
 def setDbStatus():
-    gets = ['key_buffer_size', 'query_cache_size', 'tmp_table_size', 'max_heap_table_size', 'innodb_buffer_pool_size', 'innodb_log_buffer_size', 'max_connections', 'query_cache_type',
+    gets = ['key_buffer_size', 'tmp_table_size', 'max_heap_table_size', 'innodb_buffer_pool_size', 'innodb_log_buffer_size', 'max_connections',
             'table_open_cache', 'thread_cache_size', 'sort_buffer_size', 'read_buffer_size', 'read_rnd_buffer_size', 'join_buffer_size', 'thread_stack', 'binlog_cache_size']
-    emptys = ['max_connections', 'query_cache_type',
-              'thread_cache_size', 'table_open_cache']
+    emptys = ['max_connections', 'thread_cache_size', 'table_open_cache']
     args = getArgs()
     conFile = getConf()
     content = mw.readFile(conFile)
