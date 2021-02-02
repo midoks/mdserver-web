@@ -1100,3 +1100,66 @@ function repTools(db_name, res){
         tableFixed('database_fix');
     });
 }
+
+
+function masterOrSlaveConf(version){
+
+    var _data = {};
+    if (typeof(page) =='undefined'){
+        var page = 1;
+    }
+    
+    _data['page'] = page;
+    _data['page_size'] = 10;
+    if(typeof(search) != 'undefined'){
+        _data['search'] = search;
+    }
+    myPost('get_db_list', _data, function(data){
+        var rdata = $.parseJSON(data.data);
+        var list = '';
+        for(i in rdata.data){
+            list += '<tr>';
+            list += '<td>' + rdata.data[i]['name'] +'</td>';
+            list += '<td>' + rdata.data[i]['username'] +'</td>';
+            list += '<td>' + 
+                        '<span class="password" data-pw="'+rdata.data[i]['password']+'">***</span>' +
+                        '<span onclick="showHidePass(this)" class="glyphicon glyphicon-eye-open cursor pw-ico" style="margin-left:10px"></span>'+
+                        '<span class="ico-copy cursor btcopy" style="margin-left:10px" title="复制密码" onclick="copyPass(\''+rdata.data[i]['password']+'\')"></span>'+
+                    '</td>';
+            list += '<td style="text-align:right">' + 
+                        '<a href="javascript:;" class="btlink" onclick="setDbAccess(\''+rdata.data[i]['username']+'\')" title="设置数据库权限">权限</a> | ' +
+                        '<a href="javascript:;" class="btlink" onclick="setDbPass('+rdata.data[i]['id']+',\''+ rdata.data[i]['username'] +'\',\'' + rdata.data[i]['password'] + '\')">改密</a> | ' +
+                        '<a href="javascript:;" class="btlink" onclick="delDb(\''+rdata.data[i]['id']+'\',\''+rdata.data[i]['name']+'\')" title="删除数据库">删除</a>' +
+                    '</td>';
+            list += '</tr>';
+        }
+
+        //<button onclick="" id="dataRecycle" title="删除选中项" class="btn btn-default btn-sm" style="margin-left: 5px;"><span class="glyphicon glyphicon-trash" style="margin-right: 5px;"></span>回收站</button>
+        var con = '<div class="safe bgw">\
+            <div class="divtable mtb10">\
+                <div class="tablescroll">\
+                    <table id="DataBody" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
+                    <thead><tr>\
+                    <th>数据库名</th>\
+                    <th>用户名</th>\
+                    <th>密码</th>\
+                    <th style="text-align:right;">操作</th></tr></thead>\
+                    <tbody>\
+                    '+ list +'\
+                    </tbody></table>\
+                </div>\
+                 <div id="databasePage" class="dataTables_paginate paging_bootstrap page"></div>\
+            </div>\
+        </div>';
+
+
+        var limitCon = '<p class="conf_p">\
+            <span class="f14 c6 mr20">Master[主]配置</span><span class="f14 c6 mr20"></span>\
+            <button class="btn btn-success btn-xs btn-bin va0">开启</button><hr/>\
+        </p>';
+
+        $(".soft-man-con").html(limitCon+con);
+        $('#databasePage').html(rdata.page);
+    });
+
+}
