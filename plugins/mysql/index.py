@@ -580,6 +580,10 @@ def mapToList(map_obj):
 
 def __createUser(dbname, username, password, address):
     pdb = pMysqlDb()
+
+    if username == 'root':
+        dbname = '*'
+
     pdb.execute(
         "CREATE USER `%s`@`localhost` IDENTIFIED BY '%s'" % (username, password))
     pdb.execute(
