@@ -1,12 +1,12 @@
 [client]
 #password	= your_password
 port		= 3306
-socket		= /tmp/mysql.sock
+socket		= {$SERVER_APP_PATH}/mysql.sock
 default-character-set = UTF8MB4
 
 [mysqld]
 port		= 3306
-socket		= /tmp/mysql.sock
+socket		= {$SERVER_APP_PATH}/mysql.sock
 datadir = {$SERVER_APP_PATH}/data
 log-error =  {$SERVER_APP_PATH}/data/error.log
 default_storage_engine = MyISAM
