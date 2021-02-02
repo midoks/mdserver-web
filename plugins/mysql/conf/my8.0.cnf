@@ -10,8 +10,7 @@ socket		= /tmp/mysql.sock
 datadir = {$SERVER_APP_PATH}/data
 log-error =  {$SERVER_APP_PATH}/data/error.log
 default_storage_engine = MyISAM
-#skip-external-locking
-#loose-skip-innodb
+
 key_buffer_size = 8M
 table_open_cache = 32
 sort_buffer_size = 256K
@@ -24,12 +23,16 @@ lower_case_table_names=2
 tmp_table_size = 8M
 character-set-server = UTF8MB4
 
-#skip-networking
-#skip-name-resolve
 max_connections = 500
 max_connect_errors = 100
 open_files_limit = 2560
 max_allowed_packet = 128M
+
+#skip-external-locking
+#skip-grant-tables
+#loose-skip-innodb
+#skip-networking
+#skip-name-resolve
 
 log-bin=mysql-bin
 binlog_format=mixed
