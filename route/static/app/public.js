@@ -1379,7 +1379,7 @@ function webShell() {
     var term_box = layer.open({
         type: 1,
         title: "本地终端",
-        area: ['750px','435px'],
+        area: ['685px','435px'],
         closeBtn: 2,
         shadeClose: false,
         content: '<div class="term-box"><div id="term"></div></div>\
