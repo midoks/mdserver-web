@@ -206,7 +206,7 @@ def getErrorLog():
         if n == 'error.log':
             filename = path + '/' + n
             break
-    print filename
+    # print filename
     if not os.path.exists(filename):
         return mw.returnJson(False, '指定文件不存在!')
     if args.has_key('close'):
