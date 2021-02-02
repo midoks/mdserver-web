@@ -48,6 +48,9 @@ class mysql:
             self.__DB_ERR = e
             return False
 
+    def setDbConf(self, conf):
+        self.__DB_CNF = conf
+
     def setPwd(self, pwd):
         self.__DB_PASS = pwd
 
