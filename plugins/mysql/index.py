@@ -1255,7 +1255,7 @@ def getMasterStatus(version=''):
 
     db = pMysqlDb()
     dlist = db.query('show slave status')
-    if len(dlist) > 0 and dlist[0][10] == 'Yes' and dlist[0][11] == 'Yes':
+    if len(dlist) > 0 and (dlist[0][10] == 'Yes' or dlist[0][11] == 'Yes'):
         data['slave_status'] = True
 
     return mw.returnJson(master_status, '设置成功', data)
@@ -1465,7 +1465,7 @@ def setSlaveStatus(version=''):
     db = pMysqlDb()
     dlist = db.query('show slave status')
 
-    if len(dlist) > 0 and dlist[0][10] == 'Yes' and dlist[0][11] == 'Yes':
+    if len(dlist) > 0 and (dlist[0][10] == 'Yes' or dlist[0][11] == 'Yes'):
         db.query('stop slave')
     else:
         db.query('start slave')
