@@ -1394,6 +1394,25 @@ def delMasterRepSlaveUser(version=''):
 
     return mw.returnJson(True, '删除成功!')
 
+
+def updateMasterRepSlaveUser(version=''):
+    args = getArgs()
+    data = checkArgs(args, ['username', 'password'])
+    if not data[0]:
+        return data[1]
+
+    pdb = pMysqlDb()
+    psdb = pSqliteDb('master_replication_user')
+    pdb.execute("drop user '" + args['username'] + "'@'%'")
+
+    pdb.execute("GRANT REPLICATION SLAVE ON *.* TO  '" +
+                args['username'] + "'@'%' identified by '" + args['password'] + "'")
+
+    psdb.where("username=?", (args['username'],)).save(
+        'password', args['password'])
+
+    return mw.returnJson(True, '更新成功!')
+
 if __name__ == "__main__":
     func = sys.argv[1]
     version = sys.argv[2]
@@ -1481,6 +1500,8 @@ if __name__ == "__main__":
         print(addMasterRepSlaveUser(version))
     elif func == 'del_master_rep_slave_user':
         print(delMasterRepSlaveUser(version))
+    elif func == 'update_master_rep_slave_user':
+        print(updateMasterRepSlaveUser(version))
     elif func == 'get_master_rep_slave_user_cmd':
         print(getMasterRepSlaveUserCmd(version))
     else:
