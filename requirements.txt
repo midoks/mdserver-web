@@ -17,4 +17,5 @@ flask-sqlalchemy
 requests
 ConfigParser
 MySQL-python==1.2.5
+mysql-connector-python
 # pytest-shutil
