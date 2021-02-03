@@ -41,8 +41,31 @@ def getInitDFile():
     return '/etc/init.d/' + getPluginName()
 
 
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        pass
+
+    try:
+        import unicodedata
+        unicodedata.numeric(s)
+        return True
+    except (TypeError, ValueError):
+        pass
+
+    return False
+
+
 def getArgs():
     args = sys.argv[2:]
+
+    # print(args)
+
+    # if is_number(args):
+    #     args = sys.argv[3:]
+
     tmp = {}
     args_len = len(args)
 
@@ -1126,6 +1149,94 @@ def getTotalStatistics():
         return mw.returnJson(False, 'fail', data)
 
 
+def findBinlogDoDb():
+    conf = getConf()
+    con = mw.readFile(conf)
+    rep = 'binlog-do-db\s*=\s*(.*)'
+    tmp = re.search(rep, con)
+    dlist = tmp.groups()[0].strip()
+    return dlist.split(',')
+
+
+def getMasterDbList(version=''):
+    args = getArgs()
+    page = 1
+    page_size = 10
+    search = ''
+    data = {}
+    if 'page' in args:
+        page = int(args['page'])
+
+    if 'page_size' in args:
+        page_size = int(args['page_size'])
+
+    if 'search' in args:
+        search = args['search']
+
+    conn = pSqliteDb('databases')
+    limit = str((page - 1) * page_size) + ',' + str(page_size)
+    condition = ''
+    dodb = findBinlogDoDb()
+    data['dodb'] = dodb
+
+    if not search == '':
+        condition = "name like '%" + search + "%'"
+    field = 'id,pid,name,username,password,accept,ps,addtime'
+    clist = conn.where(condition, ()).field(
+        field).limit(limit).order('id desc').select()
+    count = conn.where(condition, ()).count()
+
+    for x in xrange(0, len(clist)):
+        if clist[x]['name'] in dodb:
+            clist[x]['master'] = 1
+        else:
+            clist[x]['master'] = 0
+
+    _page = {}
+    _page['count'] = count
+    _page['p'] = page
+    _page['row'] = page_size
+    _page['tojs'] = 'dbList'
+    data['page'] = mw.getPage(_page)
+    data['data'] = clist
+
+    return mw.getJson(data)
+
+
+def setDbMaster(version):
+    args = getArgs()
+    data = checkArgs(args, ['name'])
+    if not data[0]:
+        return data[1]
+
+    conf = getConf()
+    con = mw.readFile(conf)
+    rep = 'binlog-do-db\s*=\s*(.*)'
+    tmp = re.search(rep, con)
+    dlist = tmp.groups()[0].strip()
+    dodb = dlist.split(',')
+
+    if not args['name'] in dodb:
+        dlist = dlist + ',' + args['name']
+        rep = "binlog-do-db\s*=\s*(.*)"
+        con = re.sub(rep, 'binlog-do-db=' + dlist, con)
+        mw.writeFile(conf, con)
+
+    else:
+        new_dodb_str = ''
+        for x in dodb:
+            if x != args['name']:
+                new_dodb_str = x + ','
+        new_dodb_str_len = len(new_dodb_str)
+        new_dodb_str = new_dodb_str[0:new_dodb_str_len - 1]
+        rep = "binlog-do-db\s*=\s*(.*)"
+        con = re.sub(rep, 'binlog-do-db=' + new_dodb_str, con)
+        mw.writeFile(conf, con)
+
+    restart(version)
+    return mw.returnJson(True, '设置成功', [args, dodb])
+
+
 def getMasterStatus(version=''):
     conf = getConf()
     con = mw.readFile(conf)
@@ -1143,6 +1254,9 @@ def setMasterStatus(version=''):
     conf = getConf()
     con = mw.readFile(conf)
 
+    if con.find('#log-bin') != -1:
+        return mw.returnJson(False, '必须开启二进制日志')
+
     if con.find('#binlog-do-db') != -1:
         con = con.replace('#binlog-do-db', 'binlog-do-db')
         con = con.replace('#binlog-ignore-db', 'binlog-ignore-db')
@@ -1153,6 +1267,132 @@ def setMasterStatus(version=''):
         restart(version)
     mw.writeFile(conf, con)
     return mw.returnJson(True, '设置成功')
+
+
+def getMasterRepSlaveList(version=''):
+    args = getArgs()
+    page = 1
+    page_size = 10
+    search = ''
+    data = {}
+    if 'page' in args:
+        page = int(args['page'])
+
+    if 'page_size' in args:
+        page_size = int(args['page_size'])
+
+    if 'search' in args:
+        search = args['search']
+
+    conn = pSqliteDb('master_replication_user')
+    limit = str((page - 1) * page_size) + ',' + str(page_size)
+    condition = ''
+
+    if not search == '':
+        condition = "name like '%" + search + "%'"
+    field = 'id,username,password,accept,ps,addtime'
+    clist = conn.where(condition, ()).field(
+        field).limit(limit).order('id desc').select()
+    count = conn.where(condition, ()).count()
+
+    _page = {}
+    _page['count'] = count
+    _page['p'] = page
+    _page['row'] = page_size
+    _page['tojs'] = 'getMasterRepSlaveList'
+    data['page'] = mw.getPage(_page)
+    data['data'] = clist
+
+    return mw.getJson(data)
+
+
+def addMasterRepSlaveUser(version=''):
+    args = getArgs()
+    data = checkArgs(args,
+                     ['username', 'password'])
+    if not data[0]:
+        return data[1]
+
+    if not 'address' in args:
+        address = ''
+    else:
+        address = args['address'].strip()
+
+    username = args['username'].strip()
+    password = args['password'].strip()
+    # ps = args['ps'].strip()
+    # address = args['address'].strip()
+    # dataAccess = args['dataAccess'].strip()
+
+    reg = "^[\w\.-]+$"
+    if not re.match(reg, username):
+        return mw.returnJson(False, '用户名不能带有特殊符号!')
+    checks = ['root', 'mysql', 'test', 'sys', 'panel_logs']
+    if username in checks or len(username) < 1:
+        return mw.returnJson(False, '用户名不合法!')
+    if password in checks or len(password) < 1:
+        return mw.returnJson(False, '密码不合法!')
+
+    if len(password) < 1:
+        password = mw.md5(time.time())[0:8]
+
+    pdb = pMysqlDb()
+    psdb = pSqliteDb('master_replication_user')
+
+    if psdb.where("username=?", (username)).count():
+        return mw.returnJson(False, '用户已存在!')
+
+    result = pdb.execute("GRANT REPLICATION SLAVE ON *.* TO  '" +
+                         username + "'@'%' identified by '" + password + "'")
+    # print result
+    isError = isSqlError(result)
+    if isError != None:
+        return isError
+
+    addTime = time.strftime('%Y-%m-%d %X', time.localtime())
+    psdb.add('username,password,accept,ps,addtime',
+             (username, password, '%', '', addTime))
+    return mw.returnJson(True, '添加成功!')
+
+
+def getMasterRepSlaveUserCmd(version):
+    args = getArgs()
+    data = checkArgs(args, ['username'])
+    if not data[0]:
+        return data[1]
+
+    psdb = pSqliteDb('master_replication_user')
+    f = 'username,password'
+    clist = psdb.field(f).where("username=?", (args['username'],)).limit(
+        '1').order('id desc').select()
+    # print(clist[0])
+
+    ip = mw.getLocalIp()
+    port = getMyPort()
+
+    db = pMysqlDb()
+    tmp = db.query('show master status')
+
+    sql = "CHANGE MASTER TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
+        args['username'] + "', MASTER_PASSWORD='" + \
+        clist[0]['password'] + \
+        "', MASTER_LOG_FILE='" + tmp[0][0] + \
+        "',MASTER_LOG_POS=" + str(tmp[0][1]) + ";"
+    return mw.returnJson(True, '添加成功!', sql)
+
+
+def delMasterRepSlaveUser(version=''):
+    args = getArgs()
+    data = checkArgs(args, ['username'])
+    if not data[0]:
+        return data[1]
+
+    pdb = pMysqlDb()
+    psdb = pSqliteDb('master_replication_user')
+    pdb.execute("drop user '" + args['username'] + "'@'%'")
+    psdb.where("username=?", (args['username'],)).delete()
+
+    return mw.returnJson(True, '删除成功!')
 
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -1227,9 +1467,21 @@ if __name__ == "__main__":
         print(alterTable())
     elif func == 'get_total_statistics':
         print(getTotalStatistics())
+    elif func == 'get_masterdb_list':
+        print(getMasterDbList(version))
     elif func == 'get_master_status':
         print(getMasterStatus(version))
     elif func == 'set_master_status':
         print(setMasterStatus(version))
+    elif func == 'set_db_master':
+        print(setDbMaster(version))
+    elif func == 'get_master_rep_slave_list':
+        print(getMasterRepSlaveList(version))
+    elif func == 'add_master_rep_slave_user':
+        print(addMasterRepSlaveUser(version))
+    elif func == 'del_master_rep_slave_user':
+        print(delMasterRepSlaveUser(version))
+    elif func == 'get_master_rep_slave_user_cmd':
+        print(getMasterRepSlaveUserCmd(version))
     else:
         print('error')
