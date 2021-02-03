@@ -116,6 +116,12 @@ def pSqliteDb(dbname='databases'):
         for index in range(len(csql_list)):
             conn.execute(csql_list[index], ())
     else:
+        # 现有run
+        conn = mw.M(dbname).dbPos(getServerDir(), name)
+        csql = mw.readFile(getPluginDir() + '/conf/mysql.sql')
+        csql_list = csql.split(';')
+        for index in range(len(csql_list)):
+            conn.execute(csql_list[index], ())
         conn = mw.M(dbname).dbPos(getServerDir(), name)
     return conn
 
