@@ -242,7 +242,7 @@ def getErrorLog():
     if args.has_key('close'):
         mw.writeFile(filename, '')
         return mw.returnJson(False, '日志已清空')
-    info = mw.getNumLines(filename, 1000)
+    info = mw.getNumLines(filename, 18)
     return mw.returnJson(True, 'OK', info)
 
 
