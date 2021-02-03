@@ -42,6 +42,14 @@ slow-query-log-file={$SERVER_APP_PATH}/data/mysql-slow.log
 long_query_time=3
 #log_queries_not_using_indexes=on
 
+
+#master config
+#binlog-do-db = demo
+#binlog-ignore-db = test
+#binlog-ignore-db = mysql
+#binlog-ignore-db = information_schema
+#binlog-ignore-db = performance_schema
+
 default_storage_engine = InnoDB
 innodb_data_home_dir = {$SERVER_APP_PATH}/data
 innodb_data_file_path = ibdata1:10M:autoextend
