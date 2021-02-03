@@ -22,6 +22,7 @@ Install_mysql()
 	mkdir -p ${mysqlDir}
 	echo '正在安装脚本文件...' > $install_tmp
 
+	INSTALL_CMD=cmake
 	if [ "$sysName" != "Darwin" ];then
 		mkdir -p /var/log/mariadb
 		touch /var/log/mariadb/mariadb.log
@@ -29,6 +30,7 @@ Install_mysql()
 		useradd -g mysql mysql
 
 		yum install -y cmake3
+		INSTALL_CMD=cmake3
 	fi 
 
 	if [ ! -f ${mysqlDir}/mysql-boost-8.0.22.tar.gz ];then
@@ -40,7 +42,7 @@ Install_mysql()
 	fi
 
 	if [ ! -d $serverPath/mysql ];then
-		cd ${mysqlDir}/mysql-8.0.22 && cmake \
+		cd ${mysqlDir}/mysql-8.0.22 && ${INSTALL_CMD} \
 		-DCMAKE_INSTALL_PREFIX=$serverPath/mysql \
 		-DMYSQL_USER=mysql \
 		-DMYSQL_TCP_PORT=3306 \
