@@ -1146,11 +1146,11 @@ def setMasterStatus(version=''):
     if con.find('#binlog-do-db') != -1:
         con = con.replace('#binlog-do-db', 'binlog-do-db')
         con = con.replace('#binlog-ignore-db', 'binlog-ignore-db')
-        restart()
+        restart(version)
     else:
         con = con.replace('binlog-do-db', '#binlog-do-db')
         con = con.replace('binlog-ignore-db', '#binlog-ignore-db')
-        restart()
+        restart(version)
     mw.writeFile(conf, con)
     return mw.returnJson(True, '设置成功')
 
