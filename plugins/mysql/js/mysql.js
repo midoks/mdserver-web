@@ -1231,8 +1231,8 @@ function updateMasterRepSlaveUser(username){
     });
 }
 
-function getMasterRepSlaveUserCmd(username){
-    myPost('get_master_rep_slave_user_cmd', {username:username}, function(data){
+function getMasterRepSlaveUserCmd(username, db=''){
+    myPost('get_master_rep_slave_user_cmd', {username:username,db:db}, function(data){
         var rdata = $.parseJSON(data.data);
         var loadOpen = layer.open({
             type: 1,
@@ -1325,7 +1325,7 @@ function getMasterRepSlaveList(){
 
 function masterOrSlaveConf(version=''){
 
-    function getDbList(){
+    function getMasterDbList(){
         var _data = {};
         if (typeof(page) =='undefined'){
             var page = 1;
@@ -1345,7 +1345,8 @@ function masterOrSlaveConf(version=''){
                 list += '<td>' + rdata.data[i]['name'] +'</td>';
                 list += '<td>' + (rdata.data[i]['master']?'是':'否') +'</td>';
                 list += '<td style="text-align:right">' + 
-                    '<a href="javascript:;" class="btlink" onclick="setDbMaster(\''+rdata.data[i]['name']+'\')" title="设置数据库权限">'+(rdata.data[i]['master']?'退出':'加入')+'</a>' +
+                    '<a href="javascript:;" class="btlink" onclick="setDbMaster(\''+rdata.data[i]['name']+'\')" title="加入或退出">'+(rdata.data[i]['master']?'退出':'加入')+'</a> | ' +
+                    '<a href="javascript:;" class="btlink" onclick="getMasterRepSlaveUserCmd(\'\',\''+rdata.data[i]['name']+'\')" title="同步命令">同步命令</a>' +
                 '</td>';
                 list += '</tr>';
             }
@@ -1371,28 +1372,80 @@ function masterOrSlaveConf(version=''){
             $('#databasePage').html(rdata.page);
         });
     }
+
+    function getAsyncMasterDbList(){
+        var _data = {};
+        if (typeof(page) =='undefined'){
+            var page = 1;
+        }
+        
+        _data['page'] = page;
+        _data['page_size'] = 10;
+
+        myPost('get_slave_list', _data, function(data){
+            var rdata = $.parseJSON(data.data);
+            var list = '';
+            for(i in rdata.data){
+                list += '<tr>';
+                list += '<td>' + rdata.data[i]['Master_Host'] +'</td>';
+                list += '<td>' + rdata.data[i]['Master_Port'] +'</td>';
+                list += '<td>' + rdata.data[i]['Master_User'] +'</td>';
+                list += '<td>' + rdata.data[i]['Master_Log_File'] +'</td>';
+                list += '<td>' + rdata.data[i]['Slave_IO_Running'] +'</td>';
+                list += '<td>' + rdata.data[i]['Slave_SQL_Running'] +'</td>';
+                // list += '<td style="text-align:right">' + 
+                //     '<a href="javascript:;" class="btlink" onclick="" title="待定">待定</a>' +
+                // '</td>';
+                list += '</tr>';
+            }
+
+             // <th style="text-align:right;">操作</th></tr></thead>\
+            var con = '<div class="divtable mtb10">\
+                    <div class="tablescroll">\
+                        <table id="DataBody" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
+                        <thead><tr>\
+                        <th>主[服务]</th>\
+                        <th>端口</th>\
+                        <th>用户</th>\
+                        <th>日志</th>\
+                        <th>IO</th>\
+                        <th>SQL</th></thead>\
+                        <tbody>\
+                        '+ list +'\
+                        </tbody></table>\
+                    </div>\
+                </div>';
+
+            // <div id="databasePage_slave" class="dataTables_paginate paging_bootstrap page"></div>\
+            // <div class="table_toolbar">\
+            //     <span class="sync btn btn-default btn-sm" onclick="getMasterRepSlaveList()" title="">添加</span>\
+            // </div>\
+
+            $(".table_slave_list").html(con);
+            $('#databasePage_slave').html(rdata.page);
+        });
+    }
     function getMasterStatus(){
         myPost('get_master_status', '', function(data){
             var rdata = $.parseJSON(data.data);
             var limitCon = '<p class="conf_p">\
                     <span class="f14 c6 mr20">Master[主]配置</span><span class="f14 c6 mr20"></span>\
-                    <button class="btn btn-success btn-xs btn-master va0">'+(!rdata.status ? '未开启' : '已开启') +'</button><hr/>\
+                    <button class="btn '+(!rdata.status ? 'btn-danger' : 'btn-success')+' btn-xs btn-master va0">'+(!rdata.status ? '未开启' : '已开启') +'</button><hr/>\
                 </p>\
                 <!-- master list -->\
                 <div class="safe bgw table_master_list"></div>\
                 <hr/>\
                 <p class="conf_p">\
                     <span class="f14 c6 mr20">Slave[从]配置</span><span class="f14 c6 mr20"></span>\
-                    <button class="btn btn-success btn-xs btn-slave va0">'+(!rdata.status ? '未开启' : '已开启') +'</button><hr/>\
+                    <button class="btn '+(!rdata.data.slave_status ? 'btn-danger' : 'btn-success')+' btn-xs btn-slave va0">'+(!rdata.data.slave_status ? '未启动' : '已启动') +'</button><hr/>\
                 </p>\
                 <!-- slave list -->\
+                <div class="safe bgw table_slave_list"></div>\
                 ';
-
             $(".soft-man-con").html(limitCon);
 
             //设置主服务器配置
             $(".btn-master").click(function () {
-                // console.log('.....');
                 myPost('set_master_status', 'close=change', function(data){
                     var rdata = $.parseJSON(data.data);
                     layer.msg(rdata.msg, { icon: rdata.status ? 1 : 5 });
@@ -1401,7 +1454,18 @@ function masterOrSlaveConf(version=''){
                     }, 2000);
                 });
             });
-            getDbList();
+
+            $(".btn-slave").click(function () {
+                myPost('set_slave_status', 'close=change', function(data){
+                    var rdata = $.parseJSON(data.data);
+                    layer.msg(rdata.msg, { icon: rdata.status ? 1 : 5 });
+                    setTimeout(function(){
+                        getMasterStatus();
+                    }, 2000);
+                });
+            });
+            getMasterDbList();
+            getAsyncMasterDbList();
         });
     }
     getMasterStatus();
