@@ -28,7 +28,7 @@ def getPluginDir():
     return mw.getPluginDir() + '/' + getPluginName()
 
 sys.path.append(getPluginDir() + "/class")
-import mysql
+import mysqlDb
 
 
 def getServerDir():
@@ -127,7 +127,7 @@ def pSqliteDb(dbname='databases'):
 
 
 def pMysqlDb():
-    db = mysql.mysql()
+    db = mysqlDb.mysqlDb()
     db.__DB_CNF = getConf()
     db.setDbConf(getConf())
     db.setPwd(pSqliteDb('config').where(
