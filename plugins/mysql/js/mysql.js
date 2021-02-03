@@ -1102,7 +1102,186 @@ function repTools(db_name, res){
 }
 
 
-function masterOrSlaveConf(version){
+function setDbMaster(name){
+    myPost('set_db_master', {name:name}, function(data){
+        var rdata = $.parseJSON(data.data);
+        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 5 });
+        setTimeout(function(){
+            masterOrSlaveConf();
+        }, 2000);
+    });
+}
+
+
+function addMasterRepSlaveUser(){
+
+        
+    var index = layer.open({
+        type: 1,
+        skin: 'demo-class',
+        area: '500px',
+        title: '添加同步账户',
+        closeBtn: 1,
+        shift: 5,
+        shadeClose: true,
+        content: "<form class='bt-form pd20 pb70' id='add_master'>\
+            <div class='line'><span class='tname'>用户名</span><div class='info-r'><input name='username' class='bt-input-text mr5' placeholder='用户名' type='text' style='width:330px;' value='"+(randomStrPwd(6))+"'></div></div>\
+            <div class='line'>\
+            <span class='tname'>密码</span>\
+            <div class='info-r'><input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:330px' value='"+(randomStrPwd(16))+"' /><span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatPwd(16)'></span></div>\
+            </div>\
+            <input type='hidden' name='ps' value='' />\
+            <div class='bt-form-submit-btn'>\
+                <button id='my_mod_close' type='button' class='btn btn-danger btn-sm btn-title'>关闭</button>\
+                <button type='button' class='btn btn-success btn-sm btn-title' id='submit_add_master' >提交</button>\
+            </div>\
+          </form>",
+    });
+
+    // <div class='line'>\
+    //             <span class='tname'>访问权限</span>\
+    //             <div class='info-r '>\
+    //                 <select class='bt-input-text mr5' name='dataAccess' style='width:100px'>\
+    //                 <option value='127.0.0.1'>本地服务器</option>\
+    //                 <option value=\"%\">所有人</option>\
+    //                 <option value='ip'>指定IP</option>\
+    //                 </select>\
+    //             </div>\
+    //         </div>\
+
+    $("input[name='name']").keyup(function(){
+        var v = $(this).val();
+        $("input[name='db_user']").val(v);
+        $("input[name='ps']").val(v);
+    });
+
+    $('#my_mod_close').click(function(){
+        $('.layui-layer-close1').click();
+    });
+    $('select[name="dataAccess"]').change(function(){
+        var v = $(this).val();
+        if (v == 'ip'){
+            $(this).after("<input id='dataAccess_subid' class='bt-input-text mr5' type='text' name='address' placeholder='多个IP使用逗号(,)分隔' style='width: 230px; display: inline-block;'>");
+        } else {
+            $('#dataAccess_subid').remove();
+        }
+    });
+
+    $('#submit_add_master').click(function(){
+
+        var data = $("#add_master").serialize();
+        data = decodeURIComponent(data);
+        var dataObj = str2Obj(data);
+        if(!dataObj['address']){
+            dataObj['address'] = dataObj['dataAccess'];
+        }
+        // console.log(dataObj);
+        myPost('add_master_rep_slave_user', dataObj, function(data){
+            var rdata = $.parseJSON(data.data);
+            showMsg(rdata.msg,function(){
+                if (rdata.status){
+                    getMasterRepSlaveList();
+                }
+                $('.layui-layer-close1').click();
+            },{icon: rdata.status ? 1 : 2},600);
+        });
+    });
+}
+
+function getMasterRepSlaveUserCmd(username){
+    myPost('get_master_rep_slave_user_cmd', {username:username}, function(data){
+        var rdata = $.parseJSON(data.data);
+        var loadOpen = layer.open({
+            type: 1,
+            title: '同步命令',
+            area: '500px',
+            content:"<form class='bt-form pd20 pb70' id='add_master'>\
+            <div class='line'>"+rdata.data+"</div>\
+            <div class='bt-form-submit-btn'>\
+                <button type='button' class='btn btn-success btn-sm btn-title class-copy-cmd'>复制</button>\
+            </div>\
+          </form>",
+        });
+
+        copyPass(rdata.data);
+        $('.class-copy-cmd').click(function(){
+            copyPass(rdata.data);
+        });
+    });
+}
+
+function delMasterRepSlaveUser(username){
+    myPost('del_master_rep_slave_user', {username:username}, function(data){
+        var rdata = $.parseJSON(data.data);
+        layer.msg(rdata.msg);
+
+        $('.layui-layer-close1').click();
+
+        setTimeout(function(){
+            getMasterRepSlaveList();
+        },1000);
+    });
+}
+
+function getMasterRepSlaveList(){
+    var _data = {};
+    if (typeof(page) =='undefined'){
+        var page = 1;
+    }
+    
+    _data['page'] = page;
+    _data['page_size'] = 10;
+    myPost('get_master_rep_slave_list', _data, function(data){
+        // console.log(data);
+        var rdata = [];
+        try {
+            rdata = $.parseJSON(data.data);
+        } catch(e){
+            console.log(e);
+        }
+        var list = '';
+        // console.log(rdata['data']);
+        var user_list = rdata['data'];
+        for (i in user_list) {
+            // console.log(i);
+            var name = user_list[i]['username'];
+            list += '<tr><td>'+name+'</td>\
+                <td>'+user_list[i]['password']+'</td>\
+                <td>'+user_list[i]['accept']+'</td>\
+                <td>\
+                    <a class="btlink" target="_blank" href="'+'.'+'/'+name+'">修改</a> | \
+                    <a class="btlink" onclick="delMasterRepSlaveUser(\''+name+'\');">删除</a> | \
+                    <a class="btlink" onclick="getMasterRepSlaveUserCmd(\''+name+'\');">从库同步命令</a>\
+                </td>\
+            </tr>';
+        }
+
+        var page = '<div class="dataTables_paginate_4 dataTables_paginate paging_bootstrap page" style="margin-top:0px;"></div>';
+        page += '<div class="table_toolbar"><span class="sync btn btn-default btn-sm" onclick="addMasterRepSlaveUser()" title="">添加同步账户</span></div>';
+
+        
+
+        var loadOpen = layer.open({
+            type: 1,
+            title: '同步账户列表',
+            area: '500px',
+            content:"<div class='bt-form pd20 c6'>\
+                     <div class='divtable mtb10'>\
+                        <div><table class='table table-hover'>\
+                            <thead><tr><th>用户民</th><th>密码</th><th>权限</th><th>操作</th></tr></thead>\
+                            <tbody>" + list + "</tbody>\
+                        </table></div>\
+                        "+page +"\
+                    </div>\
+                </div>"
+        });
+
+        $('.dataTables_paginate_4').html(rdata['page']);
+    });
+}
+
+
+function masterOrSlaveConf(version=''){
 
     function getDbList(){
         var _data = {};
@@ -1116,23 +1295,16 @@ function masterOrSlaveConf(version){
             _data['search'] = search;
         }
 
-        myPost('get_db_list', _data, function(data){
+        myPost('get_masterdb_list', _data, function(data){
             var rdata = $.parseJSON(data.data);
             var list = '';
             for(i in rdata.data){
                 list += '<tr>';
                 list += '<td>' + rdata.data[i]['name'] +'</td>';
-                list += '<td>' + rdata.data[i]['username'] +'</td>';
-                list += '<td>' + 
-                            '<span class="password" data-pw="'+rdata.data[i]['password']+'">***</span>' +
-                            '<span onclick="showHidePass(this)" class="glyphicon glyphicon-eye-open cursor pw-ico" style="margin-left:10px"></span>'+
-                            '<span class="ico-copy cursor btcopy" style="margin-left:10px" title="复制密码" onclick="copyPass(\''+rdata.data[i]['password']+'\')"></span>'+
-                        '</td>';
+                list += '<td>' + (rdata.data[i]['master']?'是':'否') +'</td>';
                 list += '<td style="text-align:right">' + 
-                            '<a href="javascript:;" class="btlink" onclick="setDbAccess(\''+rdata.data[i]['username']+'\')" title="设置数据库权限">权限</a> | ' +
-                            '<a href="javascript:;" class="btlink" onclick="setDbPass('+rdata.data[i]['id']+',\''+ rdata.data[i]['username'] +'\',\'' + rdata.data[i]['password'] + '\')">改密</a> | ' +
-                            '<a href="javascript:;" class="btlink" onclick="delDb(\''+rdata.data[i]['id']+'\',\''+rdata.data[i]['name']+'\')" title="删除数据库">删除</a>' +
-                        '</td>';
+                    '<a href="javascript:;" class="btlink" onclick="setDbMaster(\''+rdata.data[i]['name']+'\')" title="设置数据库权限">'+(rdata.data[i]['master']?'退出':'加入')+'</a>' +
+                '</td>';
                 list += '</tr>';
             }
 
@@ -1141,14 +1313,16 @@ function masterOrSlaveConf(version){
                         <table id="DataBody" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
                         <thead><tr>\
                         <th>数据库名</th>\
-                        <th>用户名</th>\
-                        <th>密码</th>\
+                        <th>同步</th>\
                         <th style="text-align:right;">操作</th></tr></thead>\
                         <tbody>\
                         '+ list +'\
                         </tbody></table>\
                     </div>\
-                     <div id="databasePage" class="dataTables_paginate paging_bootstrap page"></div>\
+                    <div id="databasePage" class="dataTables_paginate paging_bootstrap page"></div>\
+                    <div class="table_toolbar">\
+                        <span class="sync btn btn-default btn-sm" onclick="getMasterRepSlaveList()" title="">同步账户列表</span>\
+                    </div>\
                 </div>';
 
             $(".table_master_list").html(con);

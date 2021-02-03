@@ -15,3 +15,14 @@ CREATE TABLE IF NOT EXISTS `databases` (
   `ps` TEXT,
   `addtime` TEXT
 );
+
+CREATE TABLE IF NOT EXISTS `master_replication_user` (
+  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+  `username` TEXT,
+  `password` TEXT,
+  `accept` TEXT,
+  `ps` TEXT,
+  `addtime` TEXT
+);
+
+
