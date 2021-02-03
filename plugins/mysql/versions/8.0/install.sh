@@ -22,13 +22,13 @@ Install_mysql()
 	mkdir -p ${mysqlDir}
 	echo '正在安装脚本文件...' > $install_tmp
 
-	yum install -y cmake3
-
 	if [ "$sysName" != "Darwin" ];then
 		mkdir -p /var/log/mariadb
 		touch /var/log/mariadb/mariadb.log
 		groupadd mysql
 		useradd -g mysql mysql
+
+		yum install -y cmake3
 	fi 
 
 	if [ ! -f ${mysqlDir}/mysql-boost-8.0.22.tar.gz ];then
