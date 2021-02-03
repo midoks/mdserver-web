@@ -1188,6 +1188,49 @@ function addMasterRepSlaveUser(){
     });
 }
 
+
+
+function updateMasterRepSlaveUser(username){
+
+        
+    var index = layer.open({
+        type: 1,
+        skin: 'demo-class',
+        area: '500px',
+        title: '更新账户',
+        closeBtn: 1,
+        shift: 5,
+        shadeClose: true,
+        content: "<form class='bt-form pd20 pb70' id='update_master'>\
+            <div class='line'><span class='tname'>用户名</span><div class='info-r'><input name='username' readonly='readonly' class='bt-input-text mr5' placeholder='用户名' type='text' style='width:330px;' value='"+username+"'></div></div>\
+            <div class='line'>\
+            <span class='tname'>密码</span>\
+            <div class='info-r'><input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:330px' value='"+(randomStrPwd(16))+"' /><span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatPwd(16)'></span></div>\
+            </div>\
+            <input type='hidden' name='ps' value='' />\
+            <div class='bt-form-submit-btn'>\
+                <button type='button' class='btn btn-success btn-sm btn-title' id='submit_update_master' >提交</button>\
+            </div>\
+          </form>",
+    });
+
+    $('#submit_update_master').click(function(){
+        var data = $("#update_master").serialize();
+        data = decodeURIComponent(data);
+        var dataObj = str2Obj(data);
+        // console.log(dataObj);
+        myPost('update_master_rep_slave_user', data, function(data){
+            var rdata = $.parseJSON(data.data);
+            showMsg(rdata.msg,function(){
+                if (rdata.status){
+                    getMasterRepSlaveList();
+                }
+                $('.layui-layer-close1').click();
+            },{icon: rdata.status ? 1 : 2},600);
+        });
+    });
+}
+
 function getMasterRepSlaveUserCmd(username){
     myPost('get_master_rep_slave_user_cmd', {username:username}, function(data){
         var rdata = $.parseJSON(data.data);
@@ -1247,9 +1290,8 @@ function getMasterRepSlaveList(){
             var name = user_list[i]['username'];
             list += '<tr><td>'+name+'</td>\
                 <td>'+user_list[i]['password']+'</td>\
-                <td>'+user_list[i]['accept']+'</td>\
                 <td>\
-                    <a class="btlink" target="_blank" href="'+'.'+'/'+name+'">修改</a> | \
+                    <a class="btlink" onclick="updateMasterRepSlaveUser(\''+name+'\');">修改</a> | \
                     <a class="btlink" onclick="delMasterRepSlaveUser(\''+name+'\');">删除</a> | \
                     <a class="btlink" onclick="getMasterRepSlaveUserCmd(\''+name+'\');">从库同步命令</a>\
                 </td>\
@@ -1268,7 +1310,7 @@ function getMasterRepSlaveList(){
             content:"<div class='bt-form pd20 c6'>\
                      <div class='divtable mtb10'>\
                         <div><table class='table table-hover'>\
-                            <thead><tr><th>用户民</th><th>密码</th><th>权限</th><th>操作</th></tr></thead>\
+                            <thead><tr><th>用户民</th><th>密码</th><th>操作</th></tr></thead>\
                             <tbody>" + list + "</tbody>\
                         </table></div>\
                         "+page +"\
@@ -1338,6 +1380,12 @@ function masterOrSlaveConf(version=''){
                 </p>\
                 <!-- master list -->\
                 <div class="safe bgw table_master_list"></div>\
+                <hr/>\
+                <p class="conf_p">\
+                    <span class="f14 c6 mr20">Slave[从]配置</span><span class="f14 c6 mr20"></span>\
+                    <button class="btn btn-success btn-xs btn-slave va0">'+(!rdata.status ? '未开启' : '已开启') +'</button><hr/>\
+                </p>\
+                <!-- slave list -->\
                 ';
 
             $(".soft-man-con").html(limitCon);
