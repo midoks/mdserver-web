@@ -54,7 +54,7 @@ Install_mysql()
 		-DDEFAULT_CHARSET=utf8 \
 		-DDEFAULT_COLLATION=utf8_general_ci \
 		-DDOWNLOAD_BOOST=1 \
-		-DFORCE_INSOURCE_BUILD=1
+		-DFORCE_INSOURCE_BUILD=1 \
 		-DWITH_BOOST=${mysqlDir}/mysql-8.0.22/boost/
 		make && make install && make clean
 		echo '8.0' > $serverPath/mysql/version.pl
