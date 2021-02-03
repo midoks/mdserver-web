@@ -1126,78 +1126,110 @@ def getTotalStatistics():
         return mw.returnJson(False, 'fail', data)
 
 
+def getMasterStatus(version=''):
+    conf = getConf()
+    con = mw.readFile(conf)
+    master_status = False
+    if con.find('#log-bin') == -1 and con.find('log-bin') > 1:
+        if con.find('#binlog-do-db') == -1 and con.find('binlog-do-db') > 1:
+            master_status = True
+    data = {}
+    data['status'] = master_status
+    return mw.returnJson(master_status, '设置成功')
+
+
+def setMasterStatus(version=''):
+
+    conf = getConf()
+    con = mw.readFile(conf)
+
+    if con.find('#binlog-do-db') != -1:
+        con = con.replace('#binlog-do-db', 'binlog-do-db')
+        con = con.replace('#binlog-ignore-db', 'binlog-ignore-db')
+        restart()
+    else:
+        con = con.replace('binlog-do-db', '#binlog-do-db')
+        con = con.replace('binlog-ignore-db', '#binlog-ignore-db')
+        restart()
+    mw.writeFile(conf, con)
+    return mw.returnJson(True, '设置成功')
+
 if __name__ == "__main__":
     func = sys.argv[1]
     version = sys.argv[2]
     if func == 'status':
-        print status(version)
+        print(status(version))
     elif func == 'start':
-        print start(version)
+        print(start(version))
     elif func == 'stop':
-        print stop(version)
+        print(top(version))
     elif func == 'restart':
-        print restart(version)
+        print(restart(version))
     elif func == 'reload':
-        print reload(version)
+        print(reload(version))
     elif func == 'initd_status':
-        print initdStatus()
+        print(initdStatus())
     elif func == 'initd_install':
-        print initdInstall()
+        print(initdInstall())
     elif func == 'initd_uninstall':
-        print initdUinstall()
+        print(initdUinstall())
     elif func == 'run_info':
-        print runInfo()
+        print(runInfo())
     elif func == 'db_status':
-        print myDbStatus()
+        print(myDbStatus())
     elif func == 'set_db_status':
-        print setDbStatus()
+        print(setDbStatus())
     elif func == 'conf':
-        print getConf()
+        print(getConf())
     elif func == 'bin_log':
-        print binLog()
+        print(binLog())
     elif func == 'error_log':
-        print getErrorLog()
+        print(getErrorLog())
     elif func == 'show_log':
-        print getShowLogFile()
+        print(getShowLogFile())
     elif func == 'my_db_pos':
-        print getMyDbPos()
+        print(getMyDbPos())
     elif func == 'set_db_pos':
-        print setMyDbPos()
+        print(setMyDbPos())
     elif func == 'my_port':
-        print getMyPort()
+        print(getMyPort())
     elif func == 'set_my_port':
-        print setMyPort()
+        print(setMyPort())
     elif func == 'init_pwd':
-        print initMysqlPwd()
+        print(initMysqlPwd())
     elif func == 'get_db_list':
-        print getDbList()
+        print(getDbList())
     elif func == 'add_db':
-        print addDb()
+        print(addDb())
     elif func == 'del_db':
-        print delDb()
+        print(delDb())
     elif func == 'sync_get_databases':
-        print syncGetDatabases()
+        print(syncGetDatabases())
     elif func == 'sync_to_databases':
-        print syncToDatabases()
+        print(syncToDatabases())
     elif func == 'set_root_pwd':
-        print setRootPwd()
+        print(setRootPwd())
     elif func == 'set_user_pwd':
-        print setUserPwd()
+        print(setUserPwd())
     elif func == 'get_db_access':
-        print getDbAccess()
+        print(getDbAccess())
     elif func == 'set_db_access':
-        print setDbAccess()
+        print(setDbAccess())
     elif func == 'set_db_ps':
-        print setDbPs()
+        print(setDbPs())
     elif func == 'get_db_info':
-        print getDbInfo()
+        print(getDbInfo())
     elif func == 'repair_table':
-        print repairTable()
+        print(repairTable())
     elif func == 'opt_table':
-        print optTable()
+        print(optTable())
     elif func == 'alter_table':
-        print alterTable()
+        print(alterTable())
     elif func == 'get_total_statistics':
-        print getTotalStatistics()
+        print(getTotalStatistics())
+    elif func == 'get_master_status':
+        print(getMasterStatus(version))
+    elif func == 'set_master_status':
+        print(setMasterStatus(version))
     else:
-        print 'error'
+        print('error')
