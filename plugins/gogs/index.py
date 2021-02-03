@@ -26,7 +26,7 @@ def getPluginDir():
     return mw.getPluginDir() + '/' + getPluginName()
 
 sys.path.append(getPluginDir() + "/class")
-import mysql
+import mysqlDb
 
 
 def getServerDir():
@@ -197,7 +197,7 @@ def pMysqlDb():
     conf = getDbConfValue()
 
     host = conf['HOST'].split(':')
-    conn = mysql.mysql()
+    conn = mysqlDb.mysqlDb()
 
     conn.setHost(host[0])
     conn.setUser(conf['USER'])
