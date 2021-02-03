@@ -1395,7 +1395,7 @@ def getMasterRepSlaveUserCmd(version):
     tmp = db.query('show master status')
 
     sql = "CHANGE MASTER TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
-        args['username'] + "', MASTER_PASSWORD='" + \
+        clist[0]['username']  + "', MASTER_PASSWORD='" + \
         clist[0]['password'] + \
         "', MASTER_LOG_FILE='" + tmp[0][0] + \
         "',MASTER_LOG_POS=" + str(tmp[0][1]) + ""
