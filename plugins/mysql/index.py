@@ -1252,7 +1252,13 @@ def getMasterStatus(version=''):
             master_status = True
     data = {}
     data['status'] = master_status
-    return mw.returnJson(master_status, '设置成功')
+
+    db = pMysqlDb()
+    dlist = db.query('show slave status')
+    if len(dlist) > 0 and dlist[0][10] == 'Yes' and dlist[0][11] == 'Yes':
+        data['slave_status'] = True
+
+    return mw.returnJson(master_status, '设置成功', data)
 
 
 def setMasterStatus(version=''):
@@ -1272,6 +1278,7 @@ def setMasterStatus(version=''):
         con = con.replace('binlog-ignore-db', '#binlog-ignore-db')
         restart(version)
     mw.writeFile(conf, con)
+    time.sleep(4)
     return mw.returnJson(True, '设置成功')
 
 
@@ -1363,15 +1370,23 @@ def addMasterRepSlaveUser(version=''):
 
 def getMasterRepSlaveUserCmd(version):
     args = getArgs()
-    data = checkArgs(args, ['username'])
+    data = checkArgs(args, ['username', 'db'])
     if not data[0]:
         return data[1]
 
     psdb = pSqliteDb('master_replication_user')
     f = 'username,password'
-    clist = psdb.field(f).where("username=?", (args['username'],)).limit(
-        '1').order('id desc').select()
-    # print(clist[0])
+    if args['username'] == '':
+
+        count = psdb.count()
+
+        if count == 0:
+            return mw.returnJson(False, '请添加同步账户!')
+
+        clist = psdb.field(f).limit('1').order('id desc').select()
+    else:
+        clist = psdb.field(f).where("username=?", (args['username'],)).limit(
+            '1').order('id desc').select()
 
     ip = mw.getLocalIp()
     port = getMyPort()
@@ -1383,8 +1398,12 @@ def getMasterRepSlaveUserCmd(version):
         args['username'] + "', MASTER_PASSWORD='" + \
         clist[0]['password'] + \
         "', MASTER_LOG_FILE='" + tmp[0][0] + \
-        "',MASTER_LOG_POS=" + str(tmp[0][1]) + ";"
-    return mw.returnJson(True, '添加成功!', sql)
+        "',MASTER_LOG_POS=" + str(tmp[0][1]) + ""
+
+    # if args['db'] != '':
+    #     replicate-do-table
+
+    return mw.returnJson(True, 'OK!', sql)
 
 
 def delMasterRepSlaveUser(version=''):
@@ -1418,6 +1437,39 @@ def updateMasterRepSlaveUser(version=''):
         'password', args['password'])
 
     return mw.returnJson(True, '更新成功!')
+
+
+def getSlaveList(version=''):
+
+    db = pMysqlDb()
+    dlist = db.query('show slave status')
+
+    # print(dlist)
+    ret = []
+    for x in xrange(0, len(dlist)):
+        tmp = {}
+        tmp['Master_User'] = dlist[x][2]
+        tmp['Master_Host'] = dlist[x][1]
+        tmp['Master_Port'] = dlist[x][3]
+        tmp['Master_Log_File'] = dlist[x][5]
+        tmp['Slave_IO_Running'] = dlist[x][10]
+        tmp['Slave_SQL_Running'] = dlist[x][11]
+        ret.append(tmp)
+    data = {}
+    data['data'] = ret
+
+    return mw.getJson(data)
+
+
+def setSlaveStatus(version=''):
+    db = pMysqlDb()
+    dlist = db.query('show slave status')
+
+    if len(dlist) > 0 and dlist[0][10] == 'Yes' and dlist[0][11] == 'Yes':
+        db.query('stop slave')
+    else:
+        db.query('start slave')
+    return mw.returnJson(True, '设置成功!')
 
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -1510,5 +1562,9 @@ if __name__ == "__main__":
         print(updateMasterRepSlaveUser(version))
     elif func == 'get_master_rep_slave_user_cmd':
         print(getMasterRepSlaveUserCmd(version))
+    elif func == 'get_slave_list':
+        print(getSlaveList(version))
+    elif func == 'set_slave_status':
+        print(setSlaveStatus(version))
     else:
         print('error')
