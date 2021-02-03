@@ -7,7 +7,7 @@ import sys
 sys.path.append("/usr/local/lib/python2.7/site-packages")
 
 
-class mysql:
+class mysqlDb:
     __DB_PASS = None
     __DB_USER = 'root'
     __DB_PORT = 3306
