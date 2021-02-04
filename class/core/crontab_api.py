@@ -167,7 +167,7 @@ class crontab_api:
         logFile = mw.getServerDir() + '/cron/' + echo['echo'] + '.log'
         if not os.path.exists(logFile):
             return mw.returnJson(False, '当前日志为空!')
-        log = mw.getNumLines(logFile, 2000)
+        log = mw.getNumLines(logFile, 500)
         return mw.returnJson(True, log)
 
     def addApi(self):
