@@ -1458,7 +1458,7 @@ function masterOrSlaveConf(version=''){
                     layer.msg(rdata.msg, { icon: rdata.status ? 1 : 5 });
                     setTimeout(function(){
                         getMasterStatus();
-                    }, 2000);
+                    }, 3000);
                 });
             });
 
@@ -1468,10 +1468,14 @@ function masterOrSlaveConf(version=''){
                     layer.msg(rdata.msg, { icon: rdata.status ? 1 : 5 });
                     setTimeout(function(){
                         getMasterStatus();
-                    }, 2000);
+                    }, 3000);
                 });
             });
-            getMasterDbList();
+
+            if (rdata.status){
+                getMasterDbList();
+            }
+            
             getAsyncMasterDbList();
         });
     }
