@@ -1396,6 +1396,9 @@ def getMasterRepSlaveUserCmd(version):
     db = pMysqlDb()
     tmp = db.query('show master status')
 
+    if len(tmp) == 0:
+        return mw.returnJson(False, '未开启!')
+
     sql = "CHANGE MASTER TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
         clist[0]['username']  + "', MASTER_PASSWORD='" + \
         clist[0]['password'] + \
