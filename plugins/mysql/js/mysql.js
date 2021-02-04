@@ -1234,6 +1234,13 @@ function updateMasterRepSlaveUser(username){
 function getMasterRepSlaveUserCmd(username, db=''){
     myPost('get_master_rep_slave_user_cmd', {username:username,db:db}, function(data){
         var rdata = $.parseJSON(data.data);
+
+        if (!rdata['status']){
+            layer.msg(rdata['msg']);
+            return;
+        }
+
+
         var loadOpen = layer.open({
             type: 1,
             title: '同步命令',
