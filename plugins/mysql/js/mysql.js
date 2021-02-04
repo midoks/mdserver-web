@@ -1429,7 +1429,6 @@ function masterOrSlaveConf(version=''){
             // </div>\
 
             $(".table_slave_list").html(con);
-            $('#databasePage_slave').html(rdata.page);
         });
     }
     function getMasterStatus(){
@@ -1476,7 +1475,10 @@ function masterOrSlaveConf(version=''){
                 getMasterDbList();
             }
             
-            getAsyncMasterDbList();
+            if (rdata.data.slave_status){
+                getAsyncMasterDbList();
+            }
+            
         });
     }
     getMasterStatus();
