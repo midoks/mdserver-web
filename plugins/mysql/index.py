@@ -160,7 +160,8 @@ def initDreplace(version=''):
         content = contentReplace(content)
         mw.writeFile(mysql_conf, content)
 
-    mw.execShell('chown -R mysql mysql ' + getServerDir())
+    if mw.getOs() != 'darwin':
+        mw.execShell('chown -R mysql mysql ' + getServerDir())
     return file_bin
 
 
