@@ -160,6 +160,7 @@ def initDreplace(version=''):
         content = contentReplace(content)
         mw.writeFile(mysql_conf, content)
 
+    mw.execShell('chown -R mysql mysql ' + getServerDir())
     return file_bin
 
 
@@ -450,7 +451,7 @@ def setMyDbPos():
     # mw.execShell('/etc/init.d/mysqld stop')
     stop()
     mw.execShell('cp -rf ' + s_datadir + '/* ' + t_datadir + '/')
-    mw.execShell('chown -R mysql.mysql ' + t_datadir)
+    mw.execShell('chown -R mysql mysql ' + t_datadir)
     mw.execShell('chmod -R 755 ' + t_datadir)
     mw.execShell('rm -f ' + t_datadir + '/*.pid')
     mw.execShell('rm -f ' + t_datadir + '/*.err')
