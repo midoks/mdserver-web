@@ -1536,7 +1536,7 @@ def doFullSync(db):
     if result == 'ok':
         mw.writeFile(status_file, '1')
 
-    r = mw.execShell('scp root@8.210.55.220:/tmp/' + db + '.sql /tmp')
+    r = mw.execShell('scp root@8.210.55.220:/tmp/dump.sql /tmp')
     if r[0] == '':
         mw.writeFile(status_file, '2')
 
@@ -1544,7 +1544,7 @@ def doFullSync(db):
     mw.writeFile(status_file, '3')
 
     pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
-    cmd = getServerDir() + "/bin/mysql -uroot -p" + pwd + " < /tmp/" + db + ".sql"
+    cmd = getServerDir() + "/bin/mysql -uroot -p" + pwd + " < /tmp/dump.sql"
     mw.execShell(cmd)
     mw.writeFile(status_file, '4')
     mw.execShell('start slave')
