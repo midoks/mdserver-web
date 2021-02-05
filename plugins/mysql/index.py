@@ -1560,6 +1560,7 @@ def fullSync(version=''):
 
     doFullSync(args['db'])
 
+    restart(version)
     return mw.returnJson(True, '同步成功!')
 
 if __name__ == "__main__":
