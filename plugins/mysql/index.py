@@ -1470,11 +1470,22 @@ def setSlaveStatus(version=''):
     db = pMysqlDb()
     dlist = db.query('show slave status')
 
+    if len(dlist) == 0:
+        return mw.returnJson(False, '需要手动添加主服务同步命令!')
+
     if len(dlist) > 0 and (dlist[0][10] == 'Yes' or dlist[0][11] == 'Yes'):
         db.query('stop slave')
     else:
         db.query('start slave')
+
     return mw.returnJson(True, '设置成功!')
+
+
+def deleteSlave(version=''):
+    db = pMysqlDb()
+    dlist = db.query('stop slave;reset slave all')
+    # print(dlist)
+    return mw.returnJson(True, '删除成功!')
 
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -1571,5 +1582,7 @@ if __name__ == "__main__":
         print(getSlaveList(version))
     elif func == 'set_slave_status':
         print(setSlaveStatus(version))
+    elif func == 'delete_slave':
+        print(deleteSlave(version))
     else:
         print('error')
