@@ -1549,8 +1549,9 @@ def doFullSync():
     if mw.getOs() == 'darwin':
         user = mw.execShell(
             "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
-        SSH_PRIVATE_KEY = '/User/' + user + '/.ssh/id_rsa'
+        SSH_PRIVATE_KEY = '/Users/' + user + '/.ssh/id_rsa'
 
+    print(SSH_PRIVATE_KEY)
     if not os.path.exists(SSH_PRIVATE_KEY):
         status_data['code'] = 0
         status_data['msg'] = '需要配置免登录...'
