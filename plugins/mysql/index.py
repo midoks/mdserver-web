@@ -1519,8 +1519,9 @@ def fullSync(version=''):
     key = paramiko.RSAKey.from_private_key_file(SSH_PRIVATE_KEY)
     ssh.load_system_host_keys()
     ssh.connect(hostname='8.210.55.220', port=22, username='root', pkey=key)
-    stdin, stdout, stderr = ssh.exec_command(
-        "/www/server/mdserver-web/plugins/mysql/index.py dump_mysql_data {\"db\":'stock'} ")
+    cmd = "/www/server/mdserver-web/plugins/mysql/index.py dump_mysql_data {\"db\":'" + args[
+        'db'] + "'} "
+    stdin, stdout, stderr = ssh.exec_command(cmd)
     result = stdout.read()
     result_err = stderr.read()
     # 打印输出
