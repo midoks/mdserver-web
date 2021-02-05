@@ -1493,6 +1493,10 @@ def dumpMysqlData(version):
     if not data[0]:
         return data[1]
 
+    dlist = findBinlogDoDb()
+    if not args['db'] in dlist:
+        return 'fail'
+
     pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
 
     # print getServerDir()
@@ -1511,21 +1515,27 @@ def fullSync(version=''):
     if not data[0]:
         return data[1]
 
-    import paramiko
-    paramiko.util.log_to_file('paramiko.log')
-    ssh = paramiko.SSHClient()
+    # import paramiko
+    # paramiko.util.log_to_file('paramiko.log')
+    # ssh = paramiko.SSHClient()
 
-    SSH_PRIVATE_KEY = '/Users/midoks/.ssh/id_rsa'
-    key = paramiko.RSAKey.from_private_key_file(SSH_PRIVATE_KEY)
-    ssh.load_system_host_keys()
-    ssh.connect(hostname='8.210.55.220', port=22, username='root', pkey=key)
-    cmd = "/www/server/mdserver-web/plugins/mysql/index.py dump_mysql_data {\"db\":'" + args[
-        'db'] + "'} "
-    stdin, stdout, stderr = ssh.exec_command(cmd)
-    result = stdout.read()
-    result_err = stderr.read()
-    # 打印输出
-    print(result.decode(), result_err.decode())
+    # SSH_PRIVATE_KEY = '/Users/midoks/.ssh/id_rsa'
+    # key = paramiko.RSAKey.from_private_key_file(SSH_PRIVATE_KEY)
+    # ssh.load_system_host_keys()
+    # ssh.connect(hostname='8.210.55.220', port=22, username='root', pkey=key)
+    # cmd = "cd /www/server/mdserver-web && python /www/server/mdserver-web/plugins/mysql/index.py dump_mysql_data {\"db\":'" + args[
+    #     'db'] + "'} "
+    # stdin, stdout, stderr = ssh.exec_command(cmd)
+    # result = stdout.read()
+    # result_err = stderr.read()
+    # print(result.decode(), result_err.decode())
+
+    print mw.execShell('scp root@8.210.55.220:/tmp/dump.sql /tmp')
+
+    pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
+    cmd = getServerDir() + "/bin/mysql -uroot -p" + pwd + " < /tmp/dump.sql"
+    print cmd
+    print mw.execShell(cmd)
 
     return mw.returnJson(True, '同步成功!')
 
