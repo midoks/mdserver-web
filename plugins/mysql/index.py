@@ -1488,21 +1488,15 @@ def deleteSlave(version=''):
 
 
 def dumpMysqlData(version):
-    args = getArgs()
-    data = checkArgs(args, ['db'])
-    if not data[0]:
-        return data[1]
 
     dlist = findBinlogDoDb()
-    if not args['db'] in dlist:
-        return 'fail'
 
     pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
 
     # print getServerDir()
     cmd = getServerDir() + "/bin/mysqldump -uroot -p" + \
-        pwd + " --databases " + args['db'] + \
-        " > /tmp/" + args['db'] + ".sql"
+        pwd + " --databases " + dlist.join(',') + \
+        " > /tmp/dump.sql"
     ret = mw.execShell(cmd)
 
     if ret[0] == '':
@@ -1524,6 +1518,8 @@ def async(f):
 @async
 def doFullSync(db):
 
+    status_file = '/tmp/db_async_status.txt'
+
     import paramiko
     paramiko.util.log_to_file('paramiko.log')
     ssh = paramiko.SSHClient()
@@ -1536,18 +1532,23 @@ def doFullSync(db):
     stdin, stdout, stderr = ssh.exec_command(cmd)
     result = stdout.read()
     result_err = stderr.read()
-    print(result.decode(), result_err.decode())
 
-    print mw.execShell('scp root@8.210.55.220:/tmp/' + db + '.sql /tmp')
+    if result == 'ok':
+        mw.writeFile(status_file, '1')
+
+    r = mw.execShell('scp root@8.210.55.220:/tmp/' + db + '.sql /tmp')
+    if r[0] == '':
+        mw.writeFile(status_file, '2')
 
     mw.execShell('stop slave')
+    mw.writeFile(status_file, '3')
 
     pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
     cmd = getServerDir() + "/bin/mysql -uroot -p" + pwd + " < /tmp/" + db + ".sql"
-    print cmd
-    print mw.execShell(cmd)
-
+    mw.execShell(cmd)
+    mw.writeFile(status_file, '4')
     mw.execShell('start slave')
+    mw.writeFile(status_file, '5')
 
     return True
 
