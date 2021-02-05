@@ -1544,10 +1544,30 @@ def doFullSync():
     paramiko.util.log_to_file('paramiko.log')
     ssh = paramiko.SSHClient()
 
-    SSH_PRIVATE_KEY = '/Users/midoks/.ssh/id_rsa'
-    key = paramiko.RSAKey.from_private_key_file(SSH_PRIVATE_KEY)
-    ssh.load_system_host_keys()
-    ssh.connect(hostname=ip, port=22, username='root', pkey=key)
+    SSH_PRIVATE_KEY = '/root/.ssh/id_rsa'
+
+    if mw.getOs() == 'darwin':
+        user = mw.execShell(
+            "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
+        SSH_PRIVATE_KEY = '/User/' + user + '/.ssh/id_rsa'
+
+    if not os.path.exists(SSH_PRIVATE_KEY):
+        status_data['code'] = 0
+        status_data['msg'] = '需要配置免登录...'
+        mw.writeFile(status_file, json.dumps(status_data))
+        return
+
+    try:
+        key = paramiko.RSAKey.from_private_key_file(SSH_PRIVATE_KEY)
+        # ssh.load_system_host_keys()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.connect(hostname=ip, port=22, username='root', pkey=key)
+    except Exception as e:
+        status_data['code'] = 0
+        status_data['msg'] = '需要配置免登录....'
+        mw.writeFile(status_file, json.dumps(status_data))
+        return
+
     cmd = "cd /www/server/mdserver-web && python /www/server/mdserver-web/plugins/mysql/index.py dump_mysql_data {\"db\":'" + args[
         'db'] + "'}"
     stdin, stdout, stderr = ssh.exec_command(cmd)

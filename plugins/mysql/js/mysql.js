@@ -1411,6 +1411,25 @@ function getFullSyncStatus(db){
     });
 }
 
+function handlerRun(){
+    cmd = 'cd /www/server/mdserver-web && python /www/server/mdserver-web/plugins/mysql/index.py do_full_sync {"db":"all"}';
+    var loadOpen = layer.open({
+        type: 1,
+        title: '手动执行',
+        area: '500px',
+        content:"<form class='bt-form pd20 pb70' id='add_master'>\
+        <div class='line'>"+cmd+"</div>\
+        <div class='bt-form-submit-btn'>\
+            <button type='button' class='btn btn-success btn-sm btn-title class-copy-cmd'>复制</button>\
+        </div>\
+      </form>",
+    });
+    copyPass(cmd);
+    $('.class-copy-cmd').click(function(){
+        copyPass(cmd);
+    });
+}
+
 function masterOrSlaveConf(version=''){
 
     function getMasterDbList(){
@@ -1541,7 +1560,7 @@ function masterOrSlaveConf(version=''){
                     </div>\
                     <div id="databasePage" class="dataTables_paginate paging_bootstrap page"></div>\
                     <div class="table_toolbar">\
-                        <span class="sync btn btn-default btn-sm" onclick="getMasterRepSlaveList()" title="设置主服务器密钥">设置主服务器密钥</span>\
+                        <span class="sync btn btn-default btn-sm" onclick="handlerRun()" title="免登录设置后,需要手动执行一下!">手动命令</span>\
                         <span class="sync btn btn-default btn-sm" onclick="getFullSyncStatus(\'test\')" title="全量同步">全量同步</span>\
                     </div>\
                 </div>';
