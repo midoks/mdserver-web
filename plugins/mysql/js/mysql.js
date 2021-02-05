@@ -1342,9 +1342,7 @@ function deleteSlave(){
 
 function getFullSyncStatus(db){
 
-    console.log(db);
-
-    myPost('full_sync', {}, function(data){
+    myPost('full_sync', {db:db}, function(data){
         var rdata = $.parseJSON(data.data);
         layer.msg(rdata['msg']);
         setTimeout(function(){

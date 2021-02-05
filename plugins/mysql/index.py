@@ -1484,11 +1484,15 @@ def setSlaveStatus(version=''):
 def deleteSlave(version=''):
     db = pMysqlDb()
     dlist = db.query('stop slave;reset slave all')
-    # print(dlist)
     return mw.returnJson(True, '删除成功!')
 
 
 def fullSync(version=''):
+    args = getArgs()
+    data = checkArgs(args, ['db'])
+    if not data[0]:
+        return data[1]
+
     return mw.returnJson(True, '同步成功!')
 
 if __name__ == "__main__":
