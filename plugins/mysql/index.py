@@ -1494,7 +1494,7 @@ def dumpMysqlData(version):
     pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
 
     cmd = getServerDir() + "/bin/mysqldump -uroot -p" + \
-        pwd + " --databases " + ','.join(dlist) + \
+        pwd + " --databases " + ' '.join(dlist) + \
         " > /tmp/dump.sql"
     ret = mw.execShell(cmd)
 
@@ -1514,8 +1514,9 @@ def async(f):
     return wrapper
 
 
-def doFullSync(db):
+def doFullSync(dbname):
 
+    db = pMysqlDb()
     status_file = '/tmp/db_async_status.txt'
 
     import paramiko
@@ -1526,8 +1527,7 @@ def doFullSync(db):
     key = paramiko.RSAKey.from_private_key_file(SSH_PRIVATE_KEY)
     ssh.load_system_host_keys()
     ssh.connect(hostname='8.210.55.220', port=22, username='root', pkey=key)
-    cmd = "cd /www/server/mdserver-web && python /www/server/mdserver-web/plugins/mysql/index.py dump_mysql_data {\"db\":'" + db + "'} "
-    print cmd
+    cmd = "cd /www/server/mdserver-web && python /www/server/mdserver-web/plugins/mysql/index.py dump_mysql_data {\"db\":'" + dbname + "'}"
     stdin, stdout, stderr = ssh.exec_command(cmd)
     result = stdout.read()
     result_err = stderr.read()
@@ -1539,14 +1539,24 @@ def doFullSync(db):
     if r[0] == '':
         mw.writeFile(status_file, '2')
 
-    mw.execShell('stop slave')
+    cmd = 'cd /www/server/mdserver-web && python /www/server/mdserver-web/plugins/mysql/index.py get_master_rep_slave_user_cmd {"username":"","db":""}'
+    stdin, stdout, stderr = ssh.exec_command(cmd)
+    result = stdout.read()
+    result_err = stderr.read()
+
+    cmd_data = json.loads(result)
+
+    db.query('stop slave')
     mw.writeFile(status_file, '3')
+
+    dlist = db.query(cmd_data['data'])
+    print(cmd_data['data'], dlist)
 
     pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
     cmd = getServerDir() + "/bin/mysql -uroot -p" + pwd + " < /tmp/dump.sql"
-    mw.execShell(cmd)
+    print mw.execShell(cmd)
     mw.writeFile(status_file, '4')
-    mw.execShell('start slave')
+    db.query('start slave')
     mw.writeFile(status_file, '5')
 
     return True
@@ -1560,7 +1570,7 @@ def fullSync(version=''):
 
     doFullSync(args['db'])
 
-    restart(version)
+    # restart(version)
     return mw.returnJson(True, '同步成功!')
 
 if __name__ == "__main__":
