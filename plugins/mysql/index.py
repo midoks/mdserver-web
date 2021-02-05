@@ -1608,6 +1608,7 @@ def doFullSync():
 
     pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
     cmd = getServerDir() + "/bin/mysql -uroot -p" + pwd + " < /tmp/dump.sql"
+    print(mw.execShell(cmd))
     status_data['code'] = 5
     status_data['msg'] = '同步数据完成...'
     status_data['progress'] = 90
