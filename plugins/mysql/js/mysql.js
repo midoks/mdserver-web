@@ -36,6 +36,26 @@ function myPost(method,args,callback, title){
     },'json'); 
 }
 
+function myPostN(method,args,callback, title){
+
+    var _args = null; 
+    if (typeof(args) == 'string'){
+        _args = JSON.stringify(str2Obj(args));
+    } else {
+        _args = JSON.stringify(args);
+    }
+
+    var _title = '正在获取...';
+    if (typeof(title) != 'undefined'){
+        _title = title;
+    }
+    $.post('/plugins/run', {name:'mysql', func:method, args:_args}, function(data) {
+        if(typeof(callback) == 'function'){
+            callback(data);
+        }
+    },'json'); 
+}
+
 function myAsyncPost(method,args){
     var _args = null; 
     if (typeof(args) == 'string'){
@@ -1345,10 +1365,11 @@ function getFullSyncStatus(db){
     var btn = '<div class="table_toolbar"><span class="sync btn btn-default btn-sm" id="begin_full_sync" title="">开始</span></div>';
     var loadOpen = layer.open({
         type: 1,
-        title: '全量同步['+db+']',
+        title: '全量同步',
         area: '500px',
         content:"<div class='bt-form pd20 c6'>\
                  <div class='divtable mtb10'>\
+                    <span id='full_msg'></span>\
                     <div class='progress'>\
                         <div class='progress-bar' role='progressbar' aria-valuenow='0' aria-valuemin='0' aria-valuemax='100' style='min-width: 2em;'>0%</div>\
                     </div>\
@@ -1357,20 +1378,36 @@ function getFullSyncStatus(db){
             </div>"
     });
 
+    var timeId = setInterval(function(){
+        fullSync(db,0);
+    }, 1000);
 
-    function fullSync(db){
-        myPost('full_sync', {db:db}, function(data){
+    function fullSync(db,begin){
+       
+        myPostN('full_sync', {db:db,begin:begin}, function(data){
             var rdata = $.parseJSON(data.data);
-            layer.msg(rdata['msg']);
-            setTimeout(function(){
-                masterOrSlaveConf();
-            }, 3000);
+            $('#full_msg').text(rdata['msg']);
+            $('.progress-bar').css('width',rdata['progress']+'%');
+            $('.progress-bar').text(rdata['progress']+'%');
+
+            if (rdata['code']==6 ||rdata['code']<0){
+                layer.msg(rdata['msg']);
+                clearInterval(timeId);
+            }
         });
     }
 
-    fullSync(db);
+    fullSync(db,0);
     $('#begin_full_sync').click(function(){
-        fullSync(db);
+        fullSync(db,1);
+
+        timeId= setTimeout(function(){
+            fullSync(db,0);
+        }, 1000);
+    });
+
+    $('.layui-layer-close1').click(function(){
+        clearInterval(timeId);
     });
 }
 
@@ -1487,7 +1524,7 @@ function masterOrSlaveConf(version=''){
                 list += '<tr>';
                 list += '<td>' + rdata.data[i]['name'] +'</td>';
                 list += '<td style="text-align:right">' + 
-                    '<a href="javascript:;" class="btlink" onclick="getFullSyncStatus(\''+rdata.data[i]['name']+'\')" title="全量同步">全量同步</a>' +
+                    '<a href="javascript:;" class="btlink" onclick="alert(\'dev\');" title="修复">修复</a>' +
                 '</td>';
                 list += '</tr>';
             }
@@ -1504,7 +1541,8 @@ function masterOrSlaveConf(version=''){
                     </div>\
                     <div id="databasePage" class="dataTables_paginate paging_bootstrap page"></div>\
                     <div class="table_toolbar">\
-                        <span class="sync btn btn-default btn-sm" onclick="getMasterRepSlaveList()" title="">设置主服务器密钥</span>\
+                        <span class="sync btn btn-default btn-sm" onclick="getMasterRepSlaveList()" title="设置主服务器密钥">设置主服务器密钥</span>\
+                        <span class="sync btn btn-default btn-sm" onclick="getFullSyncStatus(\'test\')" title="全量同步">全量同步</span>\
                     </div>\
                 </div>';
 
