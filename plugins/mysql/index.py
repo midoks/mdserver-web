@@ -1514,10 +1514,31 @@ def async(f):
     return wrapper
 
 
-def doFullSync(dbname):
+def doFullSync():
+
+    args = getArgs()
+    data = checkArgs(args, ['db'])
+    if not data[0]:
+        return data[1]
+
+    status_data = {}
+    status_data['progress'] = 5
 
     db = pMysqlDb()
+
+    dlist = db.query('show slave status')
+    if len(dlist) == 0:
+        status_data['code'] = -1
+        status_data['msg'] = '没有启动...'
+
+    ip = dlist[0][1]
+    print(ip)
+
     status_file = '/tmp/db_async_status.txt'
+
+    status_data['code'] = 0
+    status_data['msg'] = '运行中...'
+    mw.writeFile(status_file, json.dumps(status_data))
 
     import paramiko
     paramiko.util.log_to_file('paramiko.log')
@@ -1526,52 +1547,79 @@ def doFullSync(dbname):
     SSH_PRIVATE_KEY = '/Users/midoks/.ssh/id_rsa'
     key = paramiko.RSAKey.from_private_key_file(SSH_PRIVATE_KEY)
     ssh.load_system_host_keys()
-    ssh.connect(hostname='8.210.55.220', port=22, username='root', pkey=key)
-    cmd = "cd /www/server/mdserver-web && python /www/server/mdserver-web/plugins/mysql/index.py dump_mysql_data {\"db\":'" + dbname + "'}"
+    ssh.connect(hostname=ip, port=22, username='root', pkey=key)
+    cmd = "cd /www/server/mdserver-web && python /www/server/mdserver-web/plugins/mysql/index.py dump_mysql_data {\"db\":'" + args[
+        'db'] + "'}"
     stdin, stdout, stderr = ssh.exec_command(cmd)
     result = stdout.read()
     result_err = stderr.read()
 
     if result == 'ok':
-        mw.writeFile(status_file, '1')
+        status_data['code'] = 1
+        status_data['msg'] = '主服务器备份完成...'
+        status_data['progress'] = 30
+        mw.writeFile(status_file, json.dumps(status_data))
 
-    r = mw.execShell('scp root@8.210.55.220:/tmp/dump.sql /tmp')
+    r = mw.execShell('scp root@' + ip + ':/tmp/dump.sql /tmp')
     if r[0] == '':
-        mw.writeFile(status_file, '2')
+        status_data['code'] = 2
+        status_data['msg'] = '数据同步本地完成...'
+        status_data['progress'] = 40
+        mw.writeFile(status_file, json.dumps(status_data))
 
     cmd = 'cd /www/server/mdserver-web && python /www/server/mdserver-web/plugins/mysql/index.py get_master_rep_slave_user_cmd {"username":"","db":""}'
     stdin, stdout, stderr = ssh.exec_command(cmd)
     result = stdout.read()
     result_err = stderr.read()
-
     cmd_data = json.loads(result)
 
     db.query('stop slave')
-    mw.writeFile(status_file, '3')
+    status_data['code'] = 3
+    status_data['msg'] = '停止从库完成...'
+    status_data['progress'] = 45
+    mw.writeFile(status_file, json.dumps(status_data))
 
     dlist = db.query(cmd_data['data'])
-    print(cmd_data['data'], dlist)
+    status_data['code'] = 4
+    status_data['msg'] = '刷新库信息完成...'
+    status_data['progress'] = 50
+    mw.writeFile(status_file, json.dumps(status_data))
 
     pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
     cmd = getServerDir() + "/bin/mysql -uroot -p" + pwd + " < /tmp/dump.sql"
-    print mw.execShell(cmd)
-    mw.writeFile(status_file, '4')
+    status_data['code'] = 5
+    status_data['msg'] = '同步数据完成...'
+    status_data['progress'] = 90
+    mw.writeFile(status_file, json.dumps(status_data))
+
     db.query('start slave')
-    mw.writeFile(status_file, '5')
+    status_data['code'] = 6
+    status_data['msg'] = '从库重启完成...'
+    status_data['progress'] = 100
+    mw.writeFile(status_file, json.dumps(status_data))
 
     return True
 
 
 def fullSync(version=''):
     args = getArgs()
-    data = checkArgs(args, ['db'])
+    data = checkArgs(args, ['db', 'begin'])
     if not data[0]:
         return data[1]
 
-    doFullSync(args['db'])
+    status_file = '/tmp/db_async_status.txt'
+    if args['begin'] == '1':
+        if not os.path.exists(status_file):
+            cmd = 'cd ' + mw.getRunDir() + ' && python ' + \
+                getPluginDir() + '/index.py do_full_sync {"db":""} &'
+            mw.execShell(cmd)
 
-    # restart(version)
-    return mw.returnJson(True, '同步成功!')
+    if os.path.exists(status_file):
+        c = mw.readFile(status_file)
+        d = json.loads(c)
+        return c
+
+    return json.dumps({'code': 0, 'msg': '点击开始,开始导入!', 'progress': 0})
 
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -1672,6 +1720,8 @@ if __name__ == "__main__":
         print(deleteSlave(version))
     elif func == 'full_sync':
         print(fullSync(version))
+    elif func == 'do_full_sync':
+        print(doFullSync())
     elif func == 'dump_mysql_data':
         print(dumpMysqlData(version))
     else:
