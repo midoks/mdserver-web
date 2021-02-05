@@ -1493,9 +1493,8 @@ def dumpMysqlData(version):
 
     pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
 
-    # print getServerDir()
     cmd = getServerDir() + "/bin/mysqldump -uroot -p" + \
-        pwd + " --databases " + dlist.join(',') + \
+        pwd + " --databases " + ','.join(dlist) + \
         " > /tmp/dump.sql"
     ret = mw.execShell(cmd)
 
@@ -1515,7 +1514,6 @@ def async(f):
     return wrapper
 
 
-@async
 def doFullSync(db):
 
     status_file = '/tmp/db_async_status.txt'
@@ -1529,6 +1527,7 @@ def doFullSync(db):
     ssh.load_system_host_keys()
     ssh.connect(hostname='8.210.55.220', port=22, username='root', pkey=key)
     cmd = "cd /www/server/mdserver-web && python /www/server/mdserver-web/plugins/mysql/index.py dump_mysql_data {\"db\":'" + db + "'} "
+    print cmd
     stdin, stdout, stderr = ssh.exec_command(cmd)
     result = stdout.read()
     result_err = stderr.read()
