@@ -1340,9 +1340,6 @@ function masterOrSlaveConf(version=''){
         
         _data['page'] = page;
         _data['page_size'] = 10;
-        if(typeof(search) != 'undefined'){
-            _data['search'] = search;
-        }
 
         myPost('get_masterdb_list', _data, function(data){
             var rdata = $.parseJSON(data.data);
@@ -1400,9 +1397,9 @@ function masterOrSlaveConf(version=''){
                 list += '<td>' + rdata.data[i]['Master_Log_File'] +'</td>';
                 list += '<td>' + rdata.data[i]['Slave_IO_Running'] +'</td>';
                 list += '<td>' + rdata.data[i]['Slave_SQL_Running'] +'</td>';
-                // list += '<td style="text-align:right">' + 
-                //     '<a href="javascript:;" class="btlink" onclick="" title="待定">待定</a>' +
-                // '</td>';
+                list += '<td style="text-align:right">' + 
+                    '<a href="javascript:;" class="btlink" onclick="" title="删除">删除</a>' +
+                '</td>';
                 list += '</tr>';
             }
 
@@ -1416,7 +1413,8 @@ function masterOrSlaveConf(version=''){
                         <th>用户</th>\
                         <th>日志</th>\
                         <th>IO</th>\
-                        <th>SQL</th></thead>\
+                        <th>SQL</th>\
+                        <th style="text-align:right;">操作</th></tr></thead>\
                         <tbody>\
                         '+ list +'\
                         </tbody></table>\
@@ -1428,9 +1426,51 @@ function masterOrSlaveConf(version=''){
             //     <span class="sync btn btn-default btn-sm" onclick="getMasterRepSlaveList()" title="">添加</span>\
             // </div>\
 
-            $(".table_slave_list").html(con);
+            $(".table_slave_status_list").html(con);
         });
     }
+
+    function getAsyncDataList(){
+        var _data = {};
+        if (typeof(page) =='undefined'){
+            var page = 1;
+        }
+        
+        _data['page'] = page;
+        _data['page_size'] = 10;
+        myPost('get_masterdb_list', _data, function(data){
+            var rdata = $.parseJSON(data.data);
+            var list = '';
+            for(i in rdata.data){
+                list += '<tr>';
+                list += '<td>' + rdata.data[i]['name'] +'</td>';
+                list += '<td style="text-align:right">' + 
+                    '<a href="javascript:;" class="btlink" onclick="getMasterRepSlaveUserCmd(\'\',\''+rdata.data[i]['name']+'\')" title="全量同步">全量同步</a>' +
+                '</td>';
+                list += '</tr>';
+            }
+
+            var con = '<div class="divtable mtb10">\
+                    <div class="tablescroll">\
+                        <table id="DataBody" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
+                        <thead><tr>\
+                        <th>本地库名</th>\
+                        <th style="text-align:right;">操作</th></tr></thead>\
+                        <tbody>\
+                        '+ list +'\
+                        </tbody></table>\
+                    </div>\
+                    <div id="databasePage" class="dataTables_paginate paging_bootstrap page"></div>\
+                    <div class="table_toolbar">\
+                        <span class="sync btn btn-default btn-sm" onclick="getMasterRepSlaveList()" title="">设置主服务器密钥</span>\
+                    </div>\
+                </div>';
+
+            $(".table_slave_list").html(con);
+            $('#databasePage').html(rdata.page);
+        });
+    }
+
     function getMasterStatus(){
         myPost('get_master_status', '', function(data){
             var rdata = $.parseJSON(data.data);
@@ -1445,6 +1485,8 @@ function masterOrSlaveConf(version=''){
                     <span class="f14 c6 mr20">Slave[从]配置</span><span class="f14 c6 mr20"></span>\
                     <button class="btn '+(!rdata.data.slave_status ? 'btn-danger' : 'btn-success')+' btn-xs btn-slave va0">'+(!rdata.data.slave_status ? '未启动' : '已启动') +'</button><hr/>\
                 </p>\
+                <!-- slave status list -->\
+                <div class="safe bgw table_slave_status_list"></div>\
                 <!-- slave list -->\
                 <div class="safe bgw table_slave_list"></div>\
                 ';
@@ -1477,6 +1519,7 @@ function masterOrSlaveConf(version=''){
             
             if (rdata.data.slave_status){
                 getAsyncMasterDbList();
+                getAsyncDataList()
             }
             
         });
