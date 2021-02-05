@@ -1344,7 +1344,14 @@ function getFullSyncStatus(db){
 
     console.log(db);
 
+    myPost('full_sync', {}, function(data){
+        var rdata = $.parseJSON(data.data);
+        layer.msg(rdata['msg']);
+        setTimeout(function(){
+            masterOrSlaveConf();
+        }, 3000);
 
+    });
 
 }
 
