@@ -1342,15 +1342,30 @@ function deleteSlave(){
 
 function getFullSyncStatus(db){
 
-    myPost('full_sync', {db:db}, function(data){
-        var rdata = $.parseJSON(data.data);
-        layer.msg(rdata['msg']);
-        setTimeout(function(){
-            masterOrSlaveConf();
-        }, 3000);
-
+    var btn = '<div class="table_toolbar"><span class="sync btn btn-default btn-sm" id="begin_full_sync" title="">开始</span></div>';
+    var loadOpen = layer.open({
+        type: 1,
+        title: '全量同步'+db,
+        area: '500px',
+        content:"<div class='bt-form pd20 c6'>\
+                 <div class='divtable mtb10'>\
+                    <div class='progress'>\
+                        <div class='progress-bar' role='progressbar' aria-valuenow='0' aria-valuemin='0' aria-valuemax='100' style='min-width: 2em;'>0%</div>\
+                    </div>\
+                </div>\
+                "+btn+"\
+            </div>"
     });
 
+    $('#begin_full_sync').click(function(){
+        myPost('full_sync', {db:db}, function(data){
+            var rdata = $.parseJSON(data.data);
+            layer.msg(rdata['msg']);
+            setTimeout(function(){
+                masterOrSlaveConf();
+            }, 3000);
+        });
+    });
 }
 
 function masterOrSlaveConf(version=''){
