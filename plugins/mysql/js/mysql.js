@@ -1345,7 +1345,7 @@ function getFullSyncStatus(db){
     var btn = '<div class="table_toolbar"><span class="sync btn btn-default btn-sm" id="begin_full_sync" title="">开始</span></div>';
     var loadOpen = layer.open({
         type: 1,
-        title: '全量同步'+db,
+        title: '全量同步['+db+']',
         area: '500px',
         content:"<div class='bt-form pd20 c6'>\
                  <div class='divtable mtb10'>\
@@ -1357,7 +1357,8 @@ function getFullSyncStatus(db){
             </div>"
     });
 
-    $('#begin_full_sync').click(function(){
+
+    function fullSync(db){
         myPost('full_sync', {db:db}, function(data){
             var rdata = $.parseJSON(data.data);
             layer.msg(rdata['msg']);
@@ -1365,6 +1366,11 @@ function getFullSyncStatus(db){
                 masterOrSlaveConf();
             }, 3000);
         });
+    }
+
+    fullSync(db);
+    $('#begin_full_sync').click(function(){
+        fullSync(db);
     });
 }
 
@@ -1481,7 +1487,7 @@ function masterOrSlaveConf(version=''){
                 list += '<tr>';
                 list += '<td>' + rdata.data[i]['name'] +'</td>';
                 list += '<td style="text-align:right">' + 
-                    '<a href="javascript:;" class="btlink" onclick="getFullSyncStatus(\'\',\''+rdata.data[i]['name']+'\')" title="全量同步">全量同步</a>' +
+                    '<a href="javascript:;" class="btlink" onclick="getFullSyncStatus(\''+rdata.data[i]['name']+'\')" title="全量同步">全量同步</a>' +
                 '</td>';
                 list += '</tr>';
             }

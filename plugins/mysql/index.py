@@ -1501,12 +1501,55 @@ def dumpMysqlData(version):
 
     # print getServerDir()
     cmd = getServerDir() + "/bin/mysqldump -uroot -p" + \
-        pwd + " --databases " + args['db'] + " > /tmp/dump.sql"
+        pwd + " --databases " + args['db'] + \
+        " > /tmp/" + args['db'] + ".sql"
     ret = mw.execShell(cmd)
 
     if ret[0] == '':
         return 'ok'
     return 'fail'
+
+
+from threading import Thread
+from time import sleep
+
+
+def async(f):
+    def wrapper(*args, **kwargs):
+        thr = Thread(target=f, args=args, kwargs=kwargs)
+        thr.start()
+    return wrapper
+
+
+@async
+def doFullSync(db):
+
+    import paramiko
+    paramiko.util.log_to_file('paramiko.log')
+    ssh = paramiko.SSHClient()
+
+    SSH_PRIVATE_KEY = '/Users/midoks/.ssh/id_rsa'
+    key = paramiko.RSAKey.from_private_key_file(SSH_PRIVATE_KEY)
+    ssh.load_system_host_keys()
+    ssh.connect(hostname='8.210.55.220', port=22, username='root', pkey=key)
+    cmd = "cd /www/server/mdserver-web && python /www/server/mdserver-web/plugins/mysql/index.py dump_mysql_data {\"db\":'" + db + "'} "
+    stdin, stdout, stderr = ssh.exec_command(cmd)
+    result = stdout.read()
+    result_err = stderr.read()
+    print(result.decode(), result_err.decode())
+
+    print mw.execShell('scp root@8.210.55.220:/tmp/' + db + '.sql /tmp')
+
+    mw.execShell('stop slave')
+
+    pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
+    cmd = getServerDir() + "/bin/mysql -uroot -p" + pwd + " < /tmp/" + db + ".sql"
+    print cmd
+    print mw.execShell(cmd)
+
+    mw.execShell('start slave')
+
+    return True
 
 
 def fullSync(version=''):
@@ -1515,27 +1558,7 @@ def fullSync(version=''):
     if not data[0]:
         return data[1]
 
-    # import paramiko
-    # paramiko.util.log_to_file('paramiko.log')
-    # ssh = paramiko.SSHClient()
-
-    # SSH_PRIVATE_KEY = '/Users/midoks/.ssh/id_rsa'
-    # key = paramiko.RSAKey.from_private_key_file(SSH_PRIVATE_KEY)
-    # ssh.load_system_host_keys()
-    # ssh.connect(hostname='8.210.55.220', port=22, username='root', pkey=key)
-    # cmd = "cd /www/server/mdserver-web && python /www/server/mdserver-web/plugins/mysql/index.py dump_mysql_data {\"db\":'" + args[
-    #     'db'] + "'} "
-    # stdin, stdout, stderr = ssh.exec_command(cmd)
-    # result = stdout.read()
-    # result_err = stderr.read()
-    # print(result.decode(), result_err.decode())
-
-    print mw.execShell('scp root@8.210.55.220:/tmp/dump.sql /tmp')
-
-    pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
-    cmd = getServerDir() + "/bin/mysql -uroot -p" + pwd + " < /tmp/dump.sql"
-    print cmd
-    print mw.execShell(cmd)
+    doFullSync(args['db'])
 
     return mw.returnJson(True, '同步成功!')
 
