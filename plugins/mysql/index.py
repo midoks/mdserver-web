@@ -1487,11 +1487,44 @@ def deleteSlave(version=''):
     return mw.returnJson(True, '删除成功!')
 
 
+def dumpMysqlData(version):
+    args = getArgs()
+    data = checkArgs(args, ['db'])
+    if not data[0]:
+        return data[1]
+
+    pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
+
+    # print getServerDir()
+    cmd = getServerDir() + "/bin/mysqldump -uroot -p" + \
+        pwd + " --databases " + args['db'] + " > /tmp/dump.sql"
+    ret = mw.execShell(cmd)
+
+    if ret[0] == '':
+        return 'ok'
+    return 'fail'
+
+
 def fullSync(version=''):
     args = getArgs()
     data = checkArgs(args, ['db'])
     if not data[0]:
         return data[1]
+
+    import paramiko
+    paramiko.util.log_to_file('paramiko.log')
+    ssh = paramiko.SSHClient()
+
+    SSH_PRIVATE_KEY = '/Users/midoks/.ssh/id_rsa'
+    key = paramiko.RSAKey.from_private_key_file(SSH_PRIVATE_KEY)
+    ssh.load_system_host_keys()
+    ssh.connect(hostname='8.210.55.220', port=22, username='root', pkey=key)
+    stdin, stdout, stderr = ssh.exec_command(
+        "/www/server/mdserver-web/plugins/mysql/index.py dump_mysql_data {\"db\":'stock'} ")
+    result = stdout.read()
+    result_err = stderr.read()
+    # 打印输出
+    print(result.decode(), result_err.decode())
 
     return mw.returnJson(True, '同步成功!')
 
@@ -1594,5 +1627,7 @@ if __name__ == "__main__":
         print(deleteSlave(version))
     elif func == 'full_sync':
         print(fullSync(version))
+    elif func == 'dump_mysql_data':
+        print(dumpMysqlData(version))
     else:
         print('error')
