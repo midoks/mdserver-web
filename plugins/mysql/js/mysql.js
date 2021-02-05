@@ -1308,8 +1308,6 @@ function getMasterRepSlaveList(){
         var page = '<div class="dataTables_paginate_4 dataTables_paginate paging_bootstrap page" style="margin-top:0px;"></div>';
         page += '<div class="table_toolbar"><span class="sync btn btn-default btn-sm" onclick="addMasterRepSlaveUser()" title="">添加同步账户</span></div>';
 
-        
-
         var loadOpen = layer.open({
             type: 1,
             title: '同步账户列表',
@@ -1329,6 +1327,19 @@ function getMasterRepSlaveList(){
     });
 }
 
+
+function deleteSlave(){
+    myPost('delete_slave', {}, function(data){
+        var rdata = $.parseJSON(data.data);
+
+        layer.msg(rdata['msg']);
+
+        setTimeout(function(){
+            masterOrSlaveConf();
+        }, 3000);
+
+    });
+}
 
 function masterOrSlaveConf(version=''){
 
@@ -1398,12 +1409,11 @@ function masterOrSlaveConf(version=''){
                 list += '<td>' + rdata.data[i]['Slave_IO_Running'] +'</td>';
                 list += '<td>' + rdata.data[i]['Slave_SQL_Running'] +'</td>';
                 list += '<td style="text-align:right">' + 
-                    '<a href="javascript:;" class="btlink" onclick="" title="删除">删除</a>' +
+                    '<a href="javascript:;" class="btlink" onclick="deleteSlave()" title="删除">删除</a>' +
                 '</td>';
                 list += '</tr>';
             }
 
-             // <th style="text-align:right;">操作</th></tr></thead>\
             var con = '<div class="divtable mtb10">\
                     <div class="tablescroll">\
                         <table id="DataBody" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
@@ -1424,8 +1434,7 @@ function masterOrSlaveConf(version=''){
             // <div id="databasePage_slave" class="dataTables_paginate paging_bootstrap page"></div>\
             // <div class="table_toolbar">\
             //     <span class="sync btn btn-default btn-sm" onclick="getMasterRepSlaveList()" title="">添加</span>\
-            // </div>\
-
+            // </div>
             $(".table_slave_status_list").html(con);
         });
     }
