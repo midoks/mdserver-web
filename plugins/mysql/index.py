@@ -1487,6 +1487,10 @@ def deleteSlave(version=''):
     # print(dlist)
     return mw.returnJson(True, '删除成功!')
 
+
+def fullSync(version=''):
+    pass
+
 if __name__ == "__main__":
     func = sys.argv[1]
     version = sys.argv[2]
@@ -1584,5 +1588,7 @@ if __name__ == "__main__":
         print(setSlaveStatus(version))
     elif func == 'delete_slave':
         print(deleteSlave(version))
+    else func == 'fullSync':
+        print(fullSync(version))
     else:
         print('error')

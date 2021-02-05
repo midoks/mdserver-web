@@ -1331,14 +1331,21 @@ function getMasterRepSlaveList(){
 function deleteSlave(){
     myPost('delete_slave', {}, function(data){
         var rdata = $.parseJSON(data.data);
-
         layer.msg(rdata['msg']);
-
         setTimeout(function(){
             masterOrSlaveConf();
         }, 3000);
 
     });
+}
+
+
+function getFullSyncStatus(db){
+
+    console.log(db);
+
+
+
 }
 
 function masterOrSlaveConf(version=''){
@@ -1454,7 +1461,7 @@ function masterOrSlaveConf(version=''){
                 list += '<tr>';
                 list += '<td>' + rdata.data[i]['name'] +'</td>';
                 list += '<td style="text-align:right">' + 
-                    '<a href="javascript:;" class="btlink" onclick="getMasterRepSlaveUserCmd(\'\',\''+rdata.data[i]['name']+'\')" title="全量同步">全量同步</a>' +
+                    '<a href="javascript:;" class="btlink" onclick="getFullSyncStatus(\'\',\''+rdata.data[i]['name']+'\')" title="全量同步">全量同步</a>' +
                 '</td>';
                 list += '</tr>';
             }
