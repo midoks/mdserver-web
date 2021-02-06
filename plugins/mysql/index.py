@@ -1639,6 +1639,9 @@ def fullSync(version=''):
     if os.path.exists(status_file):
         c = mw.readFile(status_file)
         d = json.loads(c)
+
+        if d['code'] == '6':
+            os.remove(status_file)
         return c
 
     return json.dumps({'code': 0, 'msg': '点击开始,开始导入!', 'progress': 0})
