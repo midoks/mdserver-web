@@ -1242,6 +1242,7 @@ def setDbMaster(version):
         mw.writeFile(conf, con)
 
     restart(version)
+    time.sleep(4)
     return mw.returnJson(True, '设置成功', [args, dodb])
 
 
@@ -1274,12 +1275,12 @@ def setMasterStatus(version=''):
     if con.find('#binlog-do-db') != -1:
         con = con.replace('#binlog-do-db', 'binlog-do-db')
         con = con.replace('#binlog-ignore-db', 'binlog-ignore-db')
-        restart(version)
     else:
         con = con.replace('binlog-do-db', '#binlog-do-db')
         con = con.replace('binlog-ignore-db', '#binlog-ignore-db')
-        restart(version)
+
     mw.writeFile(conf, con)
+    restart(version)
     time.sleep(4)
     return mw.returnJson(True, '设置成功')
 
@@ -1631,20 +1632,20 @@ def fullSync(version=''):
 
     status_file = '/tmp/db_async_status.txt'
     if args['begin'] == '1':
-        if not os.path.exists(status_file):
-            cmd = 'cd ' + mw.getRunDir() + ' && python ' + \
-                getPluginDir() + '/index.py do_full_sync {"db":""} &'
-            mw.execShell(cmd)
+        cmd = 'cd ' + mw.getRunDir() + ' && python ' + \
+            getPluginDir() + '/index.py do_full_sync {"db":""} &'
+        mw.execShell(cmd)
+        return json.dumps({'code': 0, 'msg': '同步数据中!', 'progress': 0})
 
     if os.path.exists(status_file):
         c = mw.readFile(status_file)
         d = json.loads(c)
 
-        if d['code'] == '6':
+        if d['code'] == 6:
             os.remove(status_file)
         return c
 
-    return json.dumps({'code': 0, 'msg': '点击开始,开始导入!', 'progress': 0})
+    return json.dumps({'code': 0, 'msg': '点击开始,开始同步!', 'progress': 0})
 
 if __name__ == "__main__":
     func = sys.argv[1]
