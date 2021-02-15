@@ -641,7 +641,32 @@ def getDbBackupListFunc(dbname=''):
     return r
 
 
-def getDbBackupList(dbname=''):
+def setDbBackup():
+    args = getArgs()
+    data = checkArgs(args, ['name'])
+    if not data[0]:
+        return data[1]
+
+    scDir = mw.getRunDir() + '/scripts/backup.py'
+
+    cmd = 'python ' + scDir + ' database ' + args['name'] + ' 3'
+    os.system(cmd)
+    return mw.returnJson(True, 'ok')
+
+
+def deleteDbBackup():
+    args = getArgs()
+    data = checkArgs(args, ['filename'])
+    if not data[0]:
+        return data[1]
+
+    bkDir = mw.getRootDir() + '/backup/database'
+
+    os.remove(bkDir + '/' + args['filename'])
+    return mw.returnJson(True, 'ok')
+
+
+def getDbBackupList():
     args = getArgs()
     data = checkArgs(args, ['name'])
     if not data[0]:
@@ -1741,6 +1766,10 @@ if __name__ == "__main__":
         print(initMysqlPwd())
     elif func == 'get_db_list':
         print(getDbList())
+    elif func == 'set_db_backup':
+        print(setDbBackup())
+    elif func == 'delete_db_backup':
+        print(deleteDbBackup())
     elif func == 'get_db_backup_list':
         print(getDbBackupList())
     elif func == 'add_db':
