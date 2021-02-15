@@ -852,6 +852,10 @@ function delBackup(filename,name){
     });
 }
 
+function downloadBackup(file){
+    window.open('/files/download?filename='+encodeURIComponent(file));
+}
+
 function setBackup(db_name,obj){
      myPost('get_db_backup_list', {name:db_name}, function(data){
 
@@ -863,6 +867,7 @@ function setBackup(db_name,obj){
                     <td><span style="width:220px;"> ' + rdata.data[i]['size'] + '</span></td>\
                     <td><span style="width:220px;"> ' + rdata.data[i]['time'] + '</span></td>\
                     <td style="text-align: right;">\
+                        <a class="btlink" onclick="downloadBackup(\'' + rdata.data[i]['file'] + '\')">下载</a> | \
                         <a class="btlink" onclick="delBackup(\'' + rdata.data[i]['name'] + '\',\'' +db_name+ '\')">删除</a>\
                     </td>\
                 </tr> ';
