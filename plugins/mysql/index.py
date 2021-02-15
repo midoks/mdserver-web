@@ -689,6 +689,8 @@ def getDbBackupList():
         data['time'] = time.strftime('%Y-%m-%d %H:%M:%S', t)
         rr.append(data)
 
+        data['file'] = p
+
     return mw.returnJson(True, 'ok', rr)
 
 
