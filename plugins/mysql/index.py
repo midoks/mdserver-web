@@ -1461,7 +1461,7 @@ def addMasterRepSlaveUser(version=''):
         return mw.returnJson(False, '用户已存在!')
 
     result = pdb.execute("GRANT REPLICATION SLAVE ON *.* TO  '" +
-                         username + "'@'%' identified by '" + password + "'")
+                         username + "'@'%' identified by '" + password + "';FLUSH PRIVILEGES;")
     # print result
     isError = isSqlError(result)
     if isError != None:
