@@ -842,6 +842,52 @@ function openPhpmyadmin(name,username,password){
     },200);
 }
 
+function setBackup(db_name){
+     myPost('get_db_backup_list', {name:db_name}, function(data){
+
+        var rdata = $.parseJSON(data.data);
+        var tbody = '';
+        for (var i = 0; i < rdata.data.length; i++) {
+            tbody += '<tr>\
+                    <td><span style="width:220px;"> ' + rdata.data[i]['name'] + '</span></td>\
+                    <td><span style="width:220px;"> ' + rdata.data[i]['size'] + '</span></td>\
+                    <td><span style="width:220px;"> ' + rdata.data[i]['time'] + '</span></td>\
+                    <td style="text-align: right;">\
+                        <a class="btlink" onclick="repDatabase(\''+ db_name + '\',\'' + rdata.data[i]['name'] + '\')">删除</a>\
+                    </td>\
+                </tr> ';
+        }
+
+        layer.open({
+            type: 1,
+            title: "数据库备份详情",
+            area: ['600px', '280px'],
+            closeBtn: 2,
+            shadeClose: false,
+            content: '<div class="pd15">\
+                        <div class="db_list">\
+                            <button class="btn btn-success btn-sm" type="button">备份</button>\
+                        </div >\
+                        <div class="divtable">\
+                        <div  id="database_fix"  style="height:150px;overflow:auto;border:#ddd 1px solid">\
+                        <table class="table table-hover "style="border:none">\
+                            <thead>\
+                                <tr>\
+                                    <th>文件名称</th>\
+                                    <th>文件大小</th>\
+                                    <th>备份时间</th>\
+                                    <th style="text-align: right;">操作</th>\
+                                </tr>\
+                            </thead>\
+                            <tbody class="gztr">' + tbody + '</tbody>\
+                        </table>\
+                        </div>\
+                    </div>\
+            </div>'
+        });
+    });
+}
+
 
 function dbList(page, search){
     var _data = {};
@@ -867,10 +913,14 @@ function dbList(page, search){
                         '<span onclick="showHidePass(this)" class="glyphicon glyphicon-eye-open cursor pw-ico" style="margin-left:10px"></span>'+
                         '<span class="ico-copy cursor btcopy" style="margin-left:10px" title="复制密码" onclick="copyPass(\''+rdata.data[i]['password']+'\')"></span>'+
                     '</td>';
-            // list += '<td>备份</td>';
+        
+
             list += '<td><span class="c9 input-edit" onclick="setDbPs(\''+rdata.data[i]['id']+'\',\''+rdata.data[i]['name']+'\',this)" style="display: inline-block;">'+rdata.data[i]['ps']+'</span></td>';
-            list += '<td style="text-align:right">' + 
-                        '<a href="javascript:;" class="btlink" onclick="openPhpmyadmin(\''+rdata.data[i]['name']+'\',\''+rdata.data[i]['username']+'\',\''+rdata.data[i]['password']+'\')" title="数据库管理">管理</a> | ' +
+            list += '<td style="text-align:right">';
+
+            list += '<a href="javascript:;" class="btlink" class="btlink" onclick="setBackup(\''+rdata.data[i]['name']+'\')" title="数据库备份">'+(rdata.data[i]['is_backup']?'备份':'未备份') +'</a> | ';
+
+            list += '<a href="javascript:;" class="btlink" onclick="openPhpmyadmin(\''+rdata.data[i]['name']+'\',\''+rdata.data[i]['username']+'\',\''+rdata.data[i]['password']+'\')" title="数据库管理">管理</a> | ' +
                         '<a href="javascript:;" class="btlink" onclick="repTools(\''+rdata.data[i]['name']+'\')" title="MySQL优化修复工具">工具</a> | ' +
                         '<a href="javascript:;" class="btlink" onclick="setDbAccess(\''+rdata.data[i]['username']+'\')" title="设置数据库权限">权限</a> | ' +
                         '<a href="javascript:;" class="btlink" onclick="setDbPass('+rdata.data[i]['id']+',\''+ rdata.data[i]['username'] +'\',\'' + rdata.data[i]['password'] + '\')">改密</a> | ' +
@@ -1620,7 +1670,6 @@ function masterOrSlaveConf(version=''){
                 getAsyncMasterDbList();
                 getAsyncDataList()
             }
-            
         });
     }
     getMasterStatus();

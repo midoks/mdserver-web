@@ -627,6 +627,46 @@ def __createUser(dbname, username, password, address):
     pdb.execute("flush privileges")
 
 
+def getDbBackupListFunc(dbname=''):
+    bkDir = mw.getRootDir() + '/backup/database'
+    blist = os.listdir(bkDir)
+    r = []
+
+    bname = 'db_' + dbname
+    blen = len(bname)
+    for x in blist:
+        fbstr = x[0:blen]
+        if fbstr == bname:
+            r.append(x)
+    return r
+
+
+def getDbBackupList(dbname=''):
+    args = getArgs()
+    data = checkArgs(args, ['name'])
+    if not data[0]:
+        return data[1]
+
+    r = getDbBackupListFunc(args['name'])
+    bkDir = mw.getRootDir() + '/backup/database'
+    rr = []
+    for x in xrange(0, len(r)):
+        p = bkDir + '/' + r[x]
+        data = {}
+        data['name'] = r[x]
+
+        rsize = os.path.getsize(p)
+        data['size'] = mw.toSize(rsize)
+
+        t = os.path.getctime(p)
+        t = time.localtime(t)
+
+        data['time'] = time.strftime('%Y-%m-%d %H:%M:%S', t)
+        rr.append(data)
+
+    return mw.returnJson(True, 'ok', rr)
+
+
 def getDbList():
     args = getArgs()
     page = 1
@@ -650,6 +690,15 @@ def getDbList():
     field = 'id,pid,name,username,password,accept,ps,addtime'
     clist = conn.where(condition, ()).field(
         field).limit(limit).order('id desc').select()
+
+    for x in xrange(0, len(clist)):
+        dbname = clist[x]['name']
+        blist = getDbBackupListFunc(dbname)
+        # print(blist)
+        clist[x]['is_backup'] = False
+        if len(blist) > 0:
+            clist[x]['is_backup'] = True
+
     count = conn.where(condition, ()).count()
     _page = {}
     _page['count'] = count
@@ -1692,6 +1741,8 @@ if __name__ == "__main__":
         print(initMysqlPwd())
     elif func == 'get_db_list':
         print(getDbList())
+    elif func == 'get_db_backup_list':
+        print(getDbBackupList())
     elif func == 'add_db':
         print(addDb())
     elif func == 'del_db':
