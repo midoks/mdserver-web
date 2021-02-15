@@ -842,6 +842,7 @@ function openPhpmyadmin(name,username,password){
     },200);
 }
 
+
 function setBackup(db_name){
      myPost('get_db_backup_list', {name:db_name}, function(data){
 
@@ -853,7 +854,7 @@ function setBackup(db_name){
                     <td><span style="width:220px;"> ' + rdata.data[i]['size'] + '</span></td>\
                     <td><span style="width:220px;"> ' + rdata.data[i]['time'] + '</span></td>\
                     <td style="text-align: right;">\
-                        <a class="btlink" onclick="repDatabase(\''+ db_name + '\',\'' + rdata.data[i]['name'] + '\')">删除</a>\
+                        <a class="btlink" onclick="e(\''+ db_name + '\',\'' + rdata.data[i]['name'] + '\')">删除</a>\
                     </td>\
                 </tr> ';
         }
@@ -866,7 +867,7 @@ function setBackup(db_name){
             shadeClose: false,
             content: '<div class="pd15">\
                         <div class="db_list">\
-                            <button class="btn btn-success btn-sm" type="button">备份</button>\
+                            <button id="btn_backup" class="btn btn-success btn-sm" type="button">备份</button>\
                         </div >\
                         <div class="divtable">\
                         <div  id="database_fix"  style="height:150px;overflow:auto;border:#ddd 1px solid">\
@@ -885,6 +886,8 @@ function setBackup(db_name){
                     </div>\
             </div>'
         });
+
+
     });
 }
 
