@@ -863,9 +863,9 @@ function setBackup(db_name,obj){
         var tbody = '';
         for (var i = 0; i < rdata.data.length; i++) {
             tbody += '<tr>\
-                    <td><span style="width:220px;"> ' + rdata.data[i]['name'] + '</span></td>\
-                    <td><span style="width:220px;"> ' + rdata.data[i]['size'] + '</span></td>\
-                    <td><span style="width:220px;"> ' + rdata.data[i]['time'] + '</span></td>\
+                    <td><span> ' + rdata.data[i]['name'] + '</span></td>\
+                    <td><span> ' + rdata.data[i]['size'] + '</span></td>\
+                    <td><span> ' + rdata.data[i]['time'] + '</span></td>\
                     <td style="text-align: right;">\
                         <a class="btlink" onclick="downloadBackup(\'' + rdata.data[i]['file'] + '\')">下载</a> | \
                         <a class="btlink" onclick="delBackup(\'' + rdata.data[i]['name'] + '\',\'' +db_name+ '\')">删除</a>\
