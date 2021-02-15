@@ -654,6 +654,32 @@ def setDbBackup():
     return mw.returnJson(True, 'ok')
 
 
+def importDbBackup():
+    args = getArgs()
+    data = checkArgs(args, ['file', 'name'])
+    if not data[0]:
+        return data[1]
+
+    file = args['file']
+    name = args['name']
+
+    file_path = mw.getRootDir() + '/backup/database/' + file
+    file_path_sql = mw.getRootDir() + '/backup/database/' + file.replace('.gz', '')
+
+    if not os.path.exists(file_path_sql):
+        cmd = 'cd ' + mw.getRootDir() + '/backup/database && gzip -d ' + file
+        mw.execShell(cmd)
+
+    pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
+
+    mysql_cmd = mw.getRootDir() + '/server/mysql/bin/mysql -uroot -p' + pwd + \
+        ' ' + name + ' < ' + file_path_sql
+
+    # print(mysql_cmd)
+    os.system(mysql_cmd)
+    return mw.returnJson(True, 'ok')
+
+
 def deleteDbBackup():
     args = getArgs()
     data = checkArgs(args, ['filename'])
@@ -1770,6 +1796,8 @@ if __name__ == "__main__":
         print(getDbList())
     elif func == 'set_db_backup':
         print(setDbBackup())
+    elif func == 'import_db_backup':
+        print(importDbBackup())
     elif func == 'delete_db_backup':
         print(deleteDbBackup())
     elif func == 'get_db_backup_list':
