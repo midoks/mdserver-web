@@ -1267,6 +1267,14 @@ def findBinlogDoDb():
     return dodb
 
 
+def findBinlogSlaveDoDb():
+    conf = getConf()
+    con = mw.readFile(conf)
+    rep = r"replicate-do-db\s*?=\s*?(.*)"
+    dodb = re.findall(rep, con, re.M)
+    return dodb
+
+
 def getMasterDbList(version=''):
     args = getArgs()
     page = 1
@@ -1288,6 +1296,8 @@ def getMasterDbList(version=''):
     dodb = findBinlogDoDb()
     data['dodb'] = dodb
 
+    slave_dodb = findBinlogSlaveDoDb()
+
     if not search == '':
         condition = "name like '%" + search + "%'"
     field = 'id,pid,name,username,password,accept,ps,addtime'
@@ -1300,6 +1310,11 @@ def getMasterDbList(version=''):
             clist[x]['master'] = 1
         else:
             clist[x]['master'] = 0
+
+        if clist[x]['name'] in slave_dodb:
+            clist[x]['slave'] = 1
+        else:
+            clist[x]['slave'] = 0
 
     _page = {}
     _page['count'] = count
@@ -1336,6 +1351,37 @@ def setDbMaster(version):
         prefix = '#binlog-do-db'
         con = con.replace(
             prefix, prefix + "\nbinlog-do-db=" + args['name'])
+        mw.writeFile(conf, con)
+
+    restart(version)
+    time.sleep(4)
+    return mw.returnJson(True, '设置成功', [args, dodb])
+
+
+def setDbSlave(version):
+    args = getArgs()
+    data = checkArgs(args, ['name'])
+    if not data[0]:
+        return data[1]
+
+    conf = getConf()
+    con = mw.readFile(conf)
+    rep = r"(replicate-do-db\s*?=\s*?(.*))"
+    dodb = re.findall(rep, con, re.M)
+
+    isHas = False
+    for x in xrange(0, len(dodb)):
+
+        if dodb[x][1] == args['name']:
+            isHas = True
+
+            con = con.replace(dodb[x][0] + "\n", '')
+            mw.writeFile(conf, con)
+
+    if not isHas:
+        prefix = '#replicate-do-db'
+        con = con.replace(
+            prefix, prefix + "\nreplicate-do-db=" + args['name'])
         mw.writeFile(conf, con)
 
     restart(version)
@@ -1833,6 +1879,8 @@ if __name__ == "__main__":
         print(setMasterStatus(version))
     elif func == 'set_db_master':
         print(setDbMaster(version))
+    elif func == 'set_db_slave':
+        print(setDbSlave(version))
     elif func == 'get_master_rep_slave_list':
         print(getMasterRepSlaveList(version))
     elif func == 'add_master_rep_slave_user':
