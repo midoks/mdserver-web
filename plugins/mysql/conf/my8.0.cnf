@@ -45,7 +45,7 @@ long_query_time=3
 relay-log=mdserver
 relay-log-index=mdserver
 
-#master config
+#master
 #binlog-do-db
 binlog-ignore-db = test
 binlog-ignore-db = mysql
