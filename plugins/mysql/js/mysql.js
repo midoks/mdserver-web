@@ -1688,15 +1688,15 @@ function masterOrSlaveConf(version=''){
             $(".soft-man-con").html(limitCon);
 
             //设置主服务器配置
-            $(".btn-master").click(function () {
-                myPost('set_master_status', 'close=change', function(data){
-                    var rdata = $.parseJSON(data.data);
-                    layer.msg(rdata.msg, { icon: rdata.status ? 1 : 5 });
-                    setTimeout(function(){
-                        getMasterStatus();
-                    }, 3000);
-                });
-            });
+            // $(".btn-master").click(function () {
+            //     myPost('set_master_status', 'close=change', function(data){
+            //         var rdata = $.parseJSON(data.data);
+            //         layer.msg(rdata.msg, { icon: rdata.status ? 1 : 5 });
+            //         setTimeout(function(){
+            //             getMasterStatus();
+            //         }, 3000);
+            //     });
+            // });
 
             $(".btn-slave").click(function () {
                 myPost('set_slave_status', 'close=change', function(data){
@@ -1708,9 +1708,9 @@ function masterOrSlaveConf(version=''){
                 });
             });
 
-            if (rdata.status){
-                getMasterDbList();
-            }
+            // if (rdata.status){
+            getMasterDbList();
+            // }
             
             if (rdata.data.slave_status){
                 getAsyncMasterDbList();
