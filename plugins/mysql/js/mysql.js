@@ -1217,6 +1217,17 @@ function setDbMaster(name){
 }
 
 
+function setDbSlave(name){
+    myPost('set_db_slave', {name:name}, function(data){
+        var rdata = $.parseJSON(data.data);
+        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 5 });
+        setTimeout(function(){
+            masterOrSlaveConf();
+        }, 2000);
+    });
+}
+
+
 function addMasterRepSlaveUser(){
 
         
@@ -1449,7 +1460,7 @@ function getFullSyncStatus(db){
     var btn = '<div class="table_toolbar"><span class="sync btn btn-default btn-sm" id="begin_full_sync" title="">开始</span></div>';
     var loadOpen = layer.open({
         type: 1,
-        title: '全量同步',
+        title: '全量同步['+db+']',
         area: '500px',
         content:"<div class='bt-form pd20 c6'>\
                  <div class='divtable mtb10'>\
@@ -1627,7 +1638,8 @@ function masterOrSlaveConf(version=''){
                 list += '<tr>';
                 list += '<td>' + rdata.data[i]['name'] +'</td>';
                 list += '<td style="text-align:right">' + 
-                    '<a href="javascript:;" class="btlink" onclick="alert(\'dev\');" title="修复">修复</a>' +
+                    '<a href="javascript:;" class="btlink" onclick="setDbSlave(\''+rdata.data[i]['name']+'\')"  title="加入|退出">'+(rdata.data[i]['slave']?'退出':'加入')+'</a> | ' +
+                    '<a href="javascript:;" class="btlink" onclick="getFullSyncStatus(\''+rdata.data[i]['name']+'\')" title="修复">修复</a>' +
                 '</td>';
                 list += '</tr>';
             }
@@ -1645,7 +1657,7 @@ function masterOrSlaveConf(version=''){
                     <div id="databasePage" class="dataTables_paginate paging_bootstrap page"></div>\
                     <div class="table_toolbar">\
                         <span class="sync btn btn-default btn-sm" onclick="handlerRun()" title="免登录设置后,需要手动执行一下!">手动命令</span>\
-                        <span class="sync btn btn-default btn-sm" onclick="getFullSyncStatus(\'test\')" title="全量同步">全量同步</span>\
+                        <span class="sync btn btn-default btn-sm" onclick="getFullSyncStatus(\'ALL\')" title="全量同步">全量同步</span>\
                     </div>\
                 </div>';
 
