@@ -1623,13 +1623,21 @@ def deleteSlave(version=''):
 
 def dumpMysqlData(version):
 
-    dlist = findBinlogDoDb()
+    args = getArgs()
+    data = checkArgs(args, ['db'])
+    if not data[0]:
+        return data[1]
 
     pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
+    if args['db'] == 'all' or args['db'] == 'ALL':
+        dlist = findBinlogDoDb()
+        cmd = getServerDir() + "/bin/mysqldump -uroot -p" + \
+            pwd + " --databases " + ' '.join(dlist) + \
+            " > /tmp/dump.sql"
+    else:
+        cmd = getServerDir() + "/bin/mysqldump -uroot -p" + pwd + \
+            " --databases " + args['db'] + " > /tmp/dump.sql"
 
-    cmd = getServerDir() + "/bin/mysqldump -uroot -p" + \
-        pwd + " --databases " + ' '.join(dlist) + \
-        " > /tmp/dump.sql"
     ret = mw.execShell(cmd)
 
     if ret[0] == '':
@@ -1766,7 +1774,8 @@ def fullSync(version=''):
     status_file = '/tmp/db_async_status.txt'
     if args['begin'] == '1':
         cmd = 'cd ' + mw.getRunDir() + ' && python ' + \
-            getPluginDir() + '/index.py do_full_sync {"db":""} &'
+            getPluginDir() + \
+            '/index.py do_full_sync {"db":"' + args['db'] + '"} &'
         mw.execShell(cmd)
         return json.dumps({'code': 0, 'msg': '同步数据中!', 'progress': 0})
 
