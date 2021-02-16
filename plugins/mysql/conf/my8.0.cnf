@@ -78,7 +78,6 @@ binlog_expire_logs_seconds=2592000
 [mysqldump]
 quick
 
-
 [mysql]
 no-auto-rehash
 
