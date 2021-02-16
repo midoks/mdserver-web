@@ -1394,7 +1394,8 @@ def getMasterStatus(version=''):
     con = mw.readFile(conf)
     master_status = False
     if con.find('#log-bin') == -1 and con.find('log-bin') > 1:
-        if con.find('binlog-do-db') > 1:
+        dodb = findBinlogDoDb()
+        if len(dodb) > 0:
             master_status = True
     data = {}
     data['status'] = master_status
@@ -1414,17 +1415,6 @@ def setMasterStatus(version=''):
 
     if con.find('#log-bin') != -1:
         return mw.returnJson(False, '必须开启二进制日志')
-
-    if con.find('#binlog-do-db') != -1:
-        con = con.replace('#binlog-do-db', 'binlog-do-db')
-        con = con.replace('#binlog-ignore-db', 'binlog-ignore-db')
-    else:
-        con = con.replace('binlog-do-db', '#binlog-do-db')
-        con = con.replace('binlog-ignore-db', '#binlog-ignore-db')
-
-    mw.writeFile(conf, con)
-    restart(version)
-    time.sleep(4)
     return mw.returnJson(True, '设置成功')
 
 
