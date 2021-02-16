@@ -1262,10 +1262,9 @@ def getTotalStatistics():
 def findBinlogDoDb():
     conf = getConf()
     con = mw.readFile(conf)
-    rep = 'binlog-do-db\s*=\s*(.*)'
-    tmp = re.search(rep, con)
-    dlist = tmp.groups()[0].strip()
-    return dlist.split(',')
+    rep = r"binlog-do-db\s*?=\s*?(.*)"
+    dodb = re.findall(rep, con, re.M)
+    return dodb
 
 
 def getMasterDbList(version=''):
@@ -1321,26 +1320,22 @@ def setDbMaster(version):
 
     conf = getConf()
     con = mw.readFile(conf)
-    rep = 'binlog-do-db\s*=\s*(.*)'
-    tmp = re.search(rep, con)
-    dlist = tmp.groups()[0].strip()
-    dodb = dlist.split(',')
+    rep = r"(binlog-do-db\s*?=\s*?(.*))"
+    dodb = re.findall(rep, con, re.M)
 
-    if not args['name'] in dodb:
-        dlist = dlist + ',' + args['name']
-        rep = "binlog-do-db\s*=\s*(.*)"
-        con = re.sub(rep, 'binlog-do-db=' + dlist, con)
-        mw.writeFile(conf, con)
+    isHas = False
+    for x in xrange(0, len(dodb)):
 
-    else:
-        new_dodb_str = ''
-        for x in dodb:
-            if x != args['name']:
-                new_dodb_str = x + ','
-        new_dodb_str_len = len(new_dodb_str)
-        new_dodb_str = new_dodb_str[0:new_dodb_str_len - 1]
-        rep = "binlog-do-db\s*=\s*(.*)"
-        con = re.sub(rep, 'binlog-do-db=' + new_dodb_str, con)
+        if dodb[x][1] == args['name']:
+            isHas = True
+
+            con = con.replace(dodb[x][0] + "\n", '')
+            mw.writeFile(conf, con)
+
+    if not isHas:
+        prefix = '#binlog-do-db'
+        con = con.replace(
+            prefix, prefix + "\nbinlog-do-db=" + args['name'])
         mw.writeFile(conf, con)
 
     restart(version)
@@ -1353,7 +1348,7 @@ def getMasterStatus(version=''):
     con = mw.readFile(conf)
     master_status = False
     if con.find('#log-bin') == -1 and con.find('log-bin') > 1:
-        if con.find('#binlog-do-db') == -1 and con.find('binlog-do-db') > 1:
+        if con.find('binlog-do-db') > 1:
             master_status = True
     data = {}
     data['status'] = master_status
