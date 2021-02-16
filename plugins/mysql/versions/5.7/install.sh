@@ -30,7 +30,7 @@ Install_mysql()
 	fi 
 
 	if [ ! -f ${mysqlDir}/mysql-boost-5.7.32.tar.gz ];then
-		wget -O ${mysqlDir}/mysql-boost-5.7.32.tar.gz https://cdn.mysql.com//Downloads/MySQL-5.7/mysql-boost-5.7.32.tar.gz
+		wget -O ${mysqlDir}/mysql-boost-5.7.32.tar.gz https://cdn.mysql.com/Downloads/MySQL-5.7/mysql-boost-5.7.32.tar.gz
 	fi
 
 	if [ ! -d ${mysqlDir}/mysql-5.7.32 ];then
