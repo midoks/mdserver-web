@@ -1,5 +1,10 @@
 [
     {
+        "version": "0.8.6",
+        "content": "* mysql主从配置。<br/> * swap插件[虚拟内存]。",
+        "path": "https://github.com/midoks/mdserver-web/releases/download/0.8.6/mdserver-web.zip"
+    },
+    {
         "version": "0.8.5",
         "content": "* 添加PHP80版本-Alpha <br/> * 自动识别IP地址 <br/> * 增加xhprof插件",
         "path": "https://github.com/midoks/mdserver-web/releases/download/0.8.5/mdserver-web.zip"
