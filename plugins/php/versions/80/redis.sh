@@ -75,7 +75,7 @@ Uninstall_lib()
 	extFile=$extDir${LIBNAME}.so
 	if [ ! -f "$extFile" ];then
 		echo "php-$version 未安装${LIBNAME},请选择其它版本!"
-		echo "php-$version not install redis, Plese select other version!"
+		echo "php-$version not install ${LIBNAME}, Plese select other version!"
 		return
 	fi
 	
