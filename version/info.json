@@ -1,7 +1,7 @@
 [
     {
         "version": "0.8.6",
-        "content": "* mysql主从配置。<br/> * swap插件[虚拟内存]。<br/> 部分优化。",
+        "content": "* mysql主从配置。<br/> * swap插件[虚拟内存]。<br/> * 部分优化。",
         "path": "https://github.com/midoks/mdserver-web/releases/download/0.8.6/mdserver-web.zip"
     },
     {
