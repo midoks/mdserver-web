@@ -12,12 +12,12 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
 LIBNAME=solr
-LIBV=2.5.0
+LIBV=2.5.1
 sysName=`uname`
 actionType=$1
 version=$2
 
-extDir=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20180731/
+extDir=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20200930/
 
 if [ "$sysName" == "Darwin" ];then
 	BAK='_bak'
@@ -28,32 +28,31 @@ fi
 Install_lib()
 {
 	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep "${LIBNAME}.so"`
-	if [ "${isInstall}" != "" ];then
+	if [ "$isInstall" != "" ];then
 		echo "php-$version 已安装${LIBNAME},请选择其它版本!"
 		return
 	fi
 	
 	extFile=$extDir${LIBNAME}.so
 	if [ ! -f "$extFile" ];then
-
+		
 		OPTIONS=''
 		if [ $sysName == 'Darwin' ]; then
 			OPTIONS="${OPTIONS} --with-curl=${serverPath}/lib/curl"
-		fi 
+		fi
 
 		php_lib=$sourcePath/php_lib
 		mkdir -p $php_lib
-		
-		if [ ! -d $php_lib/${LIBNAME}-${LIBV}.tgz ];then
+
+		if [ ! -f $php_lib/${LIBNAME}-${LIBV}.tgz ];then
 			wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
 			cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
 		fi
-
-		cd $php_lib/${LIBNAME}-${LIBV}
+		
+		cd  $php_lib/${LIBNAME}-${LIBV}
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config $OPTIONS
 		make && make install && make clean
-
 	fi
 	sleep 1
 	if [ ! -f "$extFile" ];then
