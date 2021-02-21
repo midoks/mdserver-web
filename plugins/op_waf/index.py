@@ -172,10 +172,6 @@ def initTotalInfo():
 
 
 def status():
-    initDomainInfo()
-    initSiteInfo()
-    initTotalInfo()
-
     path = getConf()
     if not os.path.exists(path):
         return 'stop'
@@ -222,6 +218,10 @@ def initDreplace():
     content = mw.readFile(waf_tpl)
     content = contentReplace(content)
     mw.writeFile(waf_conf, content)
+
+    initDomainInfo()
+    initSiteInfo()
+    initTotalInfo()
 
 
 def start():
@@ -986,4 +986,4 @@ if __name__ == "__main__":
     elif func == 'waf_site':
         print getWafSite()
     else:
-        print 'error'
+        print('error')
