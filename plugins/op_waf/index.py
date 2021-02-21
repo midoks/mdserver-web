@@ -195,18 +195,18 @@ def contentReplace(content):
 
 def initDreplace():
 
-    config = getPluginDir() + '/waf/config.json'
-    content = mw.readFile(config)
-    content = json.loads(content)
-    content['reqfile_path'] = mw.getServerDir(
-    ) + "/openresty/nginx/conf/waf/html"
-    mw.writeFile(config, mw.getJson(content))
-
     path = mw.getServerDir() + "/openresty/nginx/conf"
     if not os.path.exists(path + '/waf'):
         sdir = getPluginDir() + '/waf'
         cmd = 'cp -rf ' + sdir + ' ' + path
         mw.execShell(cmd)
+
+    config = mw.getServerDir() + '/openresty/nginx/conf/waf/config.json'
+    content = mw.readFile(config)
+    content = json.loads(content)
+    content['reqfile_path'] = mw.getServerDir(
+    ) + "/openresty/nginx/conf/waf/html"
+    mw.writeFile(config, mw.getJson(content))
 
     config = mw.getServerDir() + "/openresty/nginx/conf/waf/lua/init.lua"
     content = mw.readFile(config)
@@ -669,7 +669,7 @@ def setCcConf():
 
 
 def setSiteCcConf():
-    return mw.returnJson(True, '设置成功-?!', [])
+    return mw.returnJson(False, '暂未开发!', [])
 
 
 def saveScanRule():
