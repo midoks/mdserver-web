@@ -1,7 +1,7 @@
 
-local cpath = "/Users/midoks/Desktop/fwww/server/openresty/nginx/conf/waf/"
-local rpath = "/Users/midoks/Desktop/fwww/server/openresty/nginx/conf/waf/rule/"
-local logdir = "/Users/midoks/Desktop/fwww/wwwlogs/waf/"
+local cpath = "{$WAF_PATH}"
+local rpath = "{$WAF_PATH}/rule/"
+local logdir = "{$WAF_PATH}"
 local json = require "cjson"
 local ngx_match = ngx.re.find
 
