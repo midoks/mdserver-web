@@ -1,0 +1,15 @@
+{
+	"title":"aria2",
+	"tip":"soft",
+	"name":"aria2",
+	"type":"其他插件",
+	"ps":"一款下载神器",
+	"versions":"1.0",
+	"shell":"install.sh",
+	"checks":"server/aria2",
+	"path": "server/aria2",
+	"author":"midoks",
+	"home":"https://github.com/aria2/aria2",
+	"date":"2020-06-08",
+	"pid": "5"
+}
