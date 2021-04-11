@@ -22,12 +22,12 @@ Install_aria2()
 	if [ "Darwin" == "$SYSOS" ];then
 		echo 'macosx unavailable' > $install_tmp
 		find_sh=`which aria2c`
-		if [ ! -f $find_sh ];then
+		if [ "$?" != "0" ];then
 			brew install aria2
 		fi
 	else
 		find_sh=`which aria2c`
-		if [ ! -f $find_sh ];then
+		if [ "$?" != "0" ];then
 			yum install aria2 -y
 		fi
 	fi
