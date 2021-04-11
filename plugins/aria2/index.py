@@ -71,10 +71,10 @@ def initDreplace():
         mw.execShell('touch ' + aria2_path + '/aria2.session')
 
         path = getPluginDir() + "/conf/aria2.conf"
-        content = mw.readFile(file_tpl)
+        content = mw.readFile(path)
         content = content.replace('{$SERVER_PATH}', aria2_path)
 
-        mw.writeFile(aria2_path + '/aria2.config', content)
+        mw.writeFile(aria2_path + '/aria2.conf', content)
 
     return file_bin
 
@@ -98,6 +98,8 @@ def start():
 
     file = initDreplace()
     data = mw.execShell(file + ' start')
+
+    print data
     if data[1] == '':
         return 'ok'
     return data[1]
