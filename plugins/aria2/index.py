@@ -66,7 +66,9 @@ def initDreplace():
     mw.execShell('chmod +x ' + file_bin)
 
     aria2_path = getServerDir() + '/aria2'
+    mw.execShell('mkdir -p /tmp/download')
     if not os.path.exists(aria2_path):
+
         mw.execShell('mkdir -p ' + aria2_path)
         mw.execShell('touch ' + aria2_path + '/aria2.session')
 
