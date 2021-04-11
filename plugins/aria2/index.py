@@ -70,7 +70,7 @@ def initDreplace():
         mw.execShell('mkdir -p ' + aria2_path)
         mw.execShell('touch ' + aria2_path + '/aria2.session')
 
-        path = getPluginDir() + "/init.d/aria2.tpl"
+        path = getPluginDir() + "/conf/aria2.conf"
         content = mw.readFile(file_tpl)
         content = content.replace('{$SERVER_PATH}', aria2_path)
 
