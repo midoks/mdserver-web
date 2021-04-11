@@ -14,7 +14,8 @@
 
 
 app_start(){
-	aria2c -D
+	# aria2c -D
+	aria2c --daemon --enable-rpc --rpc-listen-all -c -D --conf-path={$SERVER_PATH}/aria2/aria2.conf
 	echo "aria2 started"
 }
 app_stop(){
