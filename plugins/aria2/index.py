@@ -156,21 +156,24 @@ def initdStatus():
 
 
 def initdInstall():
-    import shutil
-    if not app_debug:
-        if mw.isAppleSystem():
-            return "Apple Computer does not support"
+    source_bin = initDreplace()
+    initd_bin = getInitDFile()
+    shutil.copyfile(source_bin, initd_bin)
+    mw.execShell('chmod +x ' + initd_bin)
 
-    mw.execShell('systemctl enable ' + getPluginName())
+    if not app_debug:
+        mw.execShell('chkconfig --add ' + getPluginName())
     return 'ok'
 
 
 def initdUinstall():
     if not app_debug:
-        if mw.isAppleSystem():
-            return "Apple Computer does not support"
+        mw.execShell('chkconfig --del ' + getPluginName())
 
-    mw.execShell('systemctl disable ' + getPluginName())
+    initd_bin = getInitDFile()
+
+    if os.path.exists(initd_bin):
+        os.remove(initd_bin)
     return 'ok'
 
 
