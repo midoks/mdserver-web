@@ -59,11 +59,22 @@ def initDreplace():
     if not os.path.exists(initD_path):
         os.mkdir(initD_path)
 
-    # initd replace
-    content = mw.readFile(file_tpl)
-    content = content.replace('{$SERVER_PATH}', service_path)
-    mw.writeFile(file_bin, content)
-    mw.execShell('chmod +x ' + file_bin)
+        # initd replace
+        content = mw.readFile(file_tpl)
+        content = content.replace('{$SERVER_PATH}', service_path)
+        mw.writeFile(file_bin, content)
+        mw.execShell('chmod +x ' + file_bin)
+
+    aria2_path = '/root/.config/aria2'
+    if not os.path.exists(initD_path):
+        mw.execShell('mkdir -p ' + aria2_path)
+        mw.execShell('touch ' + aria2_path + '/aria2.session')
+
+        path = getPluginDir() + "/init.d/aria2.tpl"
+        content = mw.readFile(file_tpl)
+        content = content.replace('{$SERVER_PATH}', aria2_path)
+
+        mw.writeFile(aria2_path + '/aria2.config', content)
 
     return file_bin
 
