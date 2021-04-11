@@ -65,7 +65,7 @@ def initDreplace():
         mw.writeFile(file_bin, content)
         mw.execShell('chmod +x ' + file_bin)
 
-    aria2_path = '/root/.config/aria2'
+    aria2_path = getServerDir() + '/aria2'
     if not os.path.exists(aria2_path):
         mw.execShell('mkdir -p ' + aria2_path)
         mw.execShell('touch ' + aria2_path + '/aria2.session')
@@ -132,7 +132,7 @@ def getPathFile():
         user = mw.execShell(
             "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
         return '/Users/' + user + '/.aria2/aria2.conf'
-    return '/root/.config/aria2/aria2.conf'
+    return getServerDir() + '/aria2/aria2.conf'
 
 
 def getInitDFile():
@@ -175,7 +175,7 @@ def getLog():
         user = mw.execShell(
             "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
         return '/Users/' + user + '/.aria2/aria2.log'
-    return '/root/.config/aria2/aria2.log'
+    return getServerDir() + '/aria2/aria2.log'
 
 
 if __name__ == "__main__":
