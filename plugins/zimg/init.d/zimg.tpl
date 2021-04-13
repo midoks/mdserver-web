@@ -16,7 +16,7 @@
 app_start(){
 	# aria2c -D
 	cd {$SERVER_PATH}/zimg/bin
-	./zimg -d --conf={$SERVER_PATH}/zimg/bin/conf/zimg.lua &
+	./zimg -d --conf={$SERVER_PATH}/zimg/bin/conf/zimg.lua </dev/null &>/dev/null
 	echo "zimg started"
 }
 app_stop(){
