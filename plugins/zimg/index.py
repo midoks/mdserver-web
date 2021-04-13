@@ -85,15 +85,11 @@ def status():
 
 
 def start():
-
     file = initDreplace()
-    subprocess.Popen(file + ' start',
-                     stdout=subprocess.PIPE, shell=True)
-    return 'ok'
-    # data = mw.execShell(file + ' start')
-    # if data[1] == '':
-    #     return 'ok'
-    # return data[1]
+    data = mw.execShell(file + ' start')
+    if data[1] == '':
+        return 'ok'
+    return data[1]
 
 
 def stop():
