@@ -1,21 +1,22 @@
 #!/bin/sh
 # chkconfig: 2345 55 25
-# description: aria2 Service
+# description: zimg Service
 
 ### BEGIN INIT INFO
-# Provides:          aria2
+# Provides:          zimg
 # Required-Start:    $all
 # Required-Stop:     $all
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: starts aria2
+# Short-Description: starts zimg
 # Description:       starts the MDW-Web
 ### END INIT INFO
 
 
 app_start(){
 	# aria2c -D
-	aria2c --daemon --enable-rpc --rpc-listen-all -c -D --conf-path={$SERVER_PATH}/aria2/aria2/aria2.conf
+	cd {$SERVER_PATH}/zimg
+	./zimg -d --conf={$SERVER_PATH}/conf/zimg.lua
 	echo "zimg started"
 }
 app_stop(){

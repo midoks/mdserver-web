@@ -132,7 +132,7 @@ def getPathFile():
         user = mw.execShell(
             "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
         return '/Users/' + user + '/.aria2/aria2.conf'
-    return getServerDir() + '/aria2/aria2.conf'
+    return getServerDir() + '/conf/zimg.lua'
 
 
 def getInitDFile():
