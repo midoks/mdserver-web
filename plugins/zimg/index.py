@@ -113,11 +113,7 @@ def reload():
 
 
 def getPathFile():
-    if mw.isAppleSystem():
-        user = mw.execShell(
-            "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
-        return '/Users/' + user + '/.aria2/aria2.conf'
-    return getServerDir() + '/conf/zimg.lua'
+    return getServerDir() + '/bin/conf/zimg.lua'
 
 
 def getInitDFile():
@@ -159,11 +155,7 @@ def initdUinstall():
 
 
 def getLog():
-    if mw.isAppleSystem():
-        user = mw.execShell(
-            "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
-        return '/Users/' + user + '/.zimg/zimg.log'
-    return getServerDir() + '/zimg/zimg.log'
+    return getServerDir() + '/bin/log/zimg.log'
 
 
 if __name__ == "__main__":
