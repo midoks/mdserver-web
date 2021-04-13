@@ -59,21 +59,6 @@ def initDreplace():
     if not os.path.exists(initD_path):
         os.mkdir(initD_path)
 
-    # initd replace
-    content = mw.readFile(file_tpl)
-    content = content.replace('{$SERVER_PATH}', service_path)
-    mw.writeFile(file_bin, content)
-    mw.execShell('chmod +x ' + file_bin)
-
-    aria2_path = getServerDir() + '/zimg'
-    mw.execShell('mkdir -p /tmp/download')
-    if not os.path.exists(aria2_path):
-        path = getPluginDir() + "/conf/zimg.conf"
-        content = mw.readFile(path)
-        content = content.replace('{$SERVER_PATH}', aria2_path)
-
-        mw.writeFile(aria2_path + '/zimg.conf', content)
-
     return file_bin
 
 
