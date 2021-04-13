@@ -30,6 +30,10 @@ Install_zimg_source(){
 	git clone https://github.com/buaazp/zimg -b master --depth=1
 	cd zimg
 	make
+
+	if [ -f $zimgSourceDir/zimg/bin/zimg ];then
+		mv $zimgSourceDir/zimg/bin $serverPath/zimg
+	fi
 }
 
 Install_zimg()
