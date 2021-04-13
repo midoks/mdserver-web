@@ -17,22 +17,25 @@ SYSOS=`uname`
 Install_libjpeg_turbo(){
 	mkdir -p $zimgSourceDir/libjpeg-turbo
 	cd $zimgSourceDir/libjpeg-turbo
-	wget https://downloads.sourceforge.net/project/libjpeg-turbo/1.3.1/libjpeg-turbo-1.3.1.tar.gz
-	tar zxvf libjpeg-turbo-1.3.1.tar.gz
-	cd libjpeg-turbo-1.3.1
-	./configure --prefix=/usr/local --with-jpeg8
-	make && make install
+	if [ ! -d $zimgSourceDir/libjpeg-turbo ];then
+		wget https://downloads.sourceforge.net/project/libjpeg-turbo/1.3.1/libjpeg-turbo-1.3.1.tar.gz
+		tar zxvf libjpeg-turbo-1.3.1.tar.gz
+		cd libjpeg-turbo-1.3.1
+		./configure --prefix=/usr/local --with-jpeg8
+		make && make install
+	fi 
 }
 
 Install_zimg_source(){
 	mkdir -p $zimgSourceDir
 	cd $zimgSourceDir
-	git clone https://github.com/buaazp/zimg -b master --depth=1
-	cd zimg
-	make
-
+	if [ ! -d $zimgSourceDir/zimg ];then
+		git clone https://github.com/buaazp/zimg -b master --depth=1
+		cd zimg
+		make
+	fi
 	if [ -f $zimgSourceDir/zimg/bin/zimg ];then
-		mv $zimgSourceDir/zimg/bin $serverPath/zimg
+		cp -r $zimgSourceDir/zimg/bin $serverPath/zimg
 	fi
 }
 
