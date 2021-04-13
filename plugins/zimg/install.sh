@@ -15,8 +15,8 @@ install_tmp=${rootPath}/tmp/mw_install.pl
 SYSOS=`uname`
 
 Install_libjpeg_turbo(){
-	mkdir -p $zimgSourceDir/zimg/libjpeg-turbo
-	cd $zimgSourceDir/zimg/libjpeg-turbo
+	mkdir -p $zimgSourceDir/libjpeg-turbo
+	cd $zimgSourceDir/libjpeg-turbo
 	wget https://downloads.sourceforge.net/project/libjpeg-turbo/1.3.1/libjpeg-turbo-1.3.1.tar.gz
 	tar zxvf libjpeg-turbo-1.3.1.tar.gz
 	cd libjpeg-turbo-1.3.1
@@ -25,8 +25,8 @@ Install_libjpeg_turbo(){
 }
 
 Install_zimg_source(){
-	mkdir -p $zimgSourceDir/zimg
-	cd $zimgSourceDir/zimg
+	mkdir -p $zimgSourceDir
+	cd $zimgSourceDir
 	git clone https://github.com/buaazp/zimg -b master --depth=1
 	cd zimg
 	make
@@ -42,7 +42,7 @@ Install_zimg()
 	if [ "Darwin" == "$SYSOS" ];then
 		echo 'macosx unavailable' > $install_tmp
 	else
-		if [ ! -f $serverPath/zimg/zimg ];then
+		if [ ! -f $serverPath/zimg/bin ];then
 			yum install nasm -y
 			Install_libjpeg_turbo
 			Install_zimg_source
