@@ -17,7 +17,7 @@ rm -rf /tmp/master.zip
 rm -rf /tmp/mdserver-web-master
 
 
-yum install -y curl-devel
+yum install -y curl-devel libmcrypt libmcrypt-devel
 
 cd /www/server/mdserver-web/scripts && sh lib.sh
 pip install -r /www/server/mdserver-web/requirements.txt
