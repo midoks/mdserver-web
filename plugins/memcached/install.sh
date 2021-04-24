@@ -25,7 +25,7 @@ Install_mem(){
 	cd $serverPath/source/memcached*
 	./configure --prefix=$serverPath/memcached && make && make install
 
-	echo '1.5' > $serverPath/memcached/version.pl
+	echo '1.6' > $serverPath/memcached/version.pl
 	echo 'install ok' > $install_tmp
 }
 
