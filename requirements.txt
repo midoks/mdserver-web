@@ -3,7 +3,6 @@ setuptools==33.1.1
 wheel
 flask==1.0.2
 flask-session==0.3.2
-flask-socketio
 flask-helper==0.19
 cache==1.0.3
 flask-caching==1.8.0
@@ -18,4 +17,5 @@ requests
 ConfigParser
 MySQL-python==1.2.5
 mysql-connector-python
+flask-socketio
 # pytest-shutil
