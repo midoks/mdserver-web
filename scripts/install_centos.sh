@@ -87,7 +87,7 @@ yum -y install MySQL-python
 yum -y install epel-release
 
 if [ ! -f '/usr/bin/pip' ];then
-	wget https://bootstrap.pypa.io/get-pip.py
+	wget https://bootstrap.pypa.io/pip/2.7/get-pip.py
 	python get-pip.py
 	pip install --upgrade pip
 fi 
