@@ -12,7 +12,7 @@ gevent-websocket
 psutil==5.4.7
 pillow==5.3.0
 chardet==3.0.4
-flask-sqlalchemy
+flask-sqlalchemy==2.3.2
 requests==2.20.0
 ConfigParser==3.5.0
 MySQL-python==1.2.5
