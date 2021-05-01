@@ -46,8 +46,8 @@ def initDB():
         for index in range(len(csql_list)):
             sql.execute(csql_list[index], ())
 
-    except Exception, ex:
-        print str(ex)
+    except Exception as ex:
+        print(str(ex))
 
 
 def initInitD():
