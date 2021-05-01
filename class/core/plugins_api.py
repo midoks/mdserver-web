@@ -210,8 +210,6 @@ class plugins_api:
             r = mw.returnJson(True, "OK", data[0].strip())
         else:
             r = mw.returnJson(False, data[1].strip())
-
-        print('runApi', r)
         return r
 
     def callbackApi(self):
