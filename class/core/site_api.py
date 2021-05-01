@@ -648,8 +648,8 @@ class site_api:
 
         # print home_cert
         cmd = 'export ACCOUNT_EMAIL=' + email + ' && ' + execStr
-        print domains
-        print cmd
+        print(domains)
+        print(cmd)
         result = mw.execShell(cmd)
 
         if not os.path.exists(home_cert.replace("\*", "*")):
@@ -1064,7 +1064,7 @@ class site_api:
 
         # self.closeHasPwd(get)
         filename = self.passPath + '/' + siteName + '.pass'
-        print filename
+        print(filename)
         passconf = username + ':' + mw.hasPwd(password)
 
         if siteName == 'phpmyadmin':
@@ -1266,7 +1266,7 @@ class site_api:
         mid = request.form.get('id', '').encode('utf-8')
         site_ids = json.loads(site_ids)
         for sid in site_ids:
-            print mw.M('sites').where('id=?', (sid,)).setField('type_id', mid)
+            print(mw.M('sites').where('id=?', (sid,)).setField('type_id', mid))
         return mw.returnJson(True, "设置成功!")
 
     ##### ----- end   ----- ###

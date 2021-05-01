@@ -10,7 +10,6 @@ import shlex
 import datetime
 import subprocess
 import re
-import hashlib
 
 import db
 
@@ -143,19 +142,19 @@ def getPageObject(args, result='1,2,3,4,5,8'):
     info = {}
 
     info['count'] = 0
-    if args.has_key('count'):
+    if 'count' in args:
         info['count'] = int(args['count'])
 
     info['row'] = 10
-    if args.has_key('row'):
+    if 'row' in args:
         info['row'] = int(args['row'])
 
     info['p'] = 1
-    if args.has_key('p'):
+    if 'p' in args:
         info['p'] = int(args['p'])
     info['uri'] = {}
     info['return_js'] = ''
-    if args.has_key('tojs'):
+    if 'tojs' in args:
         info['return_js'] = args['tojs']
 
     return (page.GetPage(info, result), page)
@@ -165,9 +164,10 @@ def md5(str):
     # 生成MD5
     try:
         m = hashlib.md5()
-        m.update(str)
+        m.update(str.encode("utf-8"))
         return m.hexdigest()
-    except:
+    except Exception as ex:
+        print(ex)
         return False
 
 
@@ -273,7 +273,8 @@ def readFile(filename):
         fBody = fp.read()
         fp.close()
         return fBody
-    except:
+    except Exception as e:
+        # print('readFile:', e)
         return False
 
 
