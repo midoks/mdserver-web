@@ -208,8 +208,10 @@ class plugins_api:
         data = self.run(name, func, version, args, script)
         if data[1] == '':
             r = mw.returnJson(True, "OK", data[0].strip())
-        r = mw.returnJson(False, data[1].strip())
+        else:
+            r = mw.returnJson(False, data[1].strip())
 
+        print('runApi', r)
         return r
 
     def callbackApi(self):
@@ -794,17 +796,10 @@ class plugins_api:
 
         if mw.isAppleSystem():
             print('run', py_cmd)
+            print(data)
         # print os.path.exists(py_cmd)
 
-        t1 = ''
-        t2 = ''
-        if isinstance(data[1], bytes):
-            t1 = str(data[1], encoding='utf-8')
-
-        if isinstance(data[0], bytes):
-            t2 = str(data[0], encoding='utf-8')
-
-        return (t1.strip(), t2.strip())
+        return (data[0].strip(), data[1].strip())
 
     # 映射包调用
     def callback(self, name, func, args='', script='index'):
