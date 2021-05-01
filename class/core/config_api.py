@@ -278,7 +278,7 @@ class config_api:
         if len(cert_ca) > 100 and len(private_key) > 100:
             mw.writeFile('ssl/certificate.pem', cert_ca)
             mw.writeFile('ssl/privateKey.pem', private_key)
-            print cert_ca, private_key
+            print(cert_ca, private_key)
             return True
         return False
 

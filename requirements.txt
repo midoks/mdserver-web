@@ -1,11 +1,11 @@
-werkzeug==0.16.1
+werkzeug==1.0.1
 setuptools==33.1.1
 wheel==0.33.6
 flask==1.0.2
 flask-session==0.3.2
 flask-helper==0.19
 cache==1.0.3
-flask-caching==1.8.0
+flask-caching==1.10.1
 gunicorn==19.9
 gevent==21.1.2
 gevent-websocket
@@ -20,4 +20,5 @@ MySQL-python==1.2.5
 mysql-connector-python
 flask-socketio==3.0.1
 python-engineio==3.9.0
+zmq==0.0.0
 # pytest-shutil

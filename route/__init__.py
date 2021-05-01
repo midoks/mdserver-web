@@ -7,8 +7,8 @@ import time
 import shutil
 import uuid
 
-reload(sys)
-sys.setdefaultencoding('utf-8')
+# reload(sys)
+#  sys.setdefaultencoding('utf-8')
 
 
 from datetime import timedelta
@@ -277,7 +277,7 @@ done
 '''
     if not mw.isAppleSystem():
         info = mw.execShell(sh)
-        print info[0], info[1]
+        print(info[0], info[1])
 
 
 def connect_ssh():
