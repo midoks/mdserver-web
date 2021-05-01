@@ -90,6 +90,7 @@ if [ ! -f '/usr/bin/pip' ];then
 	wget https://bootstrap.pypa.io/pip/2.7/get-pip.py
 	python get-pip.py
 	pip install --upgrade pip
+	pip install pillow==6.2.2
 fi 
 
 
