@@ -637,50 +637,50 @@ def getTotalStatistics():
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
-        print status()
+        print(status())
     elif func == 'start':
-        print start()
+        print(start())
     elif func == 'stop':
-        print stop()
+        print(stop())
     elif func == 'restart':
-        print restart()
+        print(restart())
     elif func == 'reload':
-        print reload()
+        print(reload())
     elif func == 'initd_status':
-        print initdStatus()
+        print(initdStatus())
     elif func == 'initd_install':
-        print initdInstall()
+        print(initdInstall())
     elif func == 'initd_uninstall':
-        print initdUinstall()
+        print(initdUinstall())
     elif func == 'run_log':
-        print runLog()
+        print(runLog())
     elif func == 'post_receive_log':
-        print postReceiveLog()
+        print(postReceiveLog())
     elif func == 'conf':
-        print getConf()
+        print(getConf())
     elif func == 'init_conf':
-        print getInitdConf()
+        print(getInitdConf())
     elif func == 'get_gogs_conf':
-        print getGogsConf()
+        print(getGogsConf())
     elif func == 'submit_gogs_conf':
-        print submitGogsConf()
+        print(submitGogsConf())
     elif func == 'user_list':
-        print userList()
+        print(userList())
     elif func == 'user_project_list':
-        print userProjectList()
+        print(userProjectList())
     elif func == 'project_script_edit':
-        print projectScriptEdit()
+        print(projectScriptEdit())
     elif func == 'project_script_load':
-        print projectScriptLoad()
+        print(projectScriptLoad())
     elif func == 'project_script_unload':
-        print projectScriptUnload()
+        print(projectScriptUnload())
     elif func == 'project_script_debug':
-        print projectScriptDebug()
+        print(projectScriptDebug())
     elif func == 'gogs_edit':
-        print gogsEdit()
+        print(gogsEdit())
     elif func == 'get_rsa_public':
-        print getRsaPublic()
+        print(getRsaPublic())
     elif func == 'get_total_statistics':
-        print getTotalStatistics()
+        print(getTotalStatistics())
     else:
-        print 'fail'
+        print('fail')

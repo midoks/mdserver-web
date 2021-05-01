@@ -8,8 +8,9 @@ import re
 import json
 
 import sys
-reload(sys)
-sys.setdefaultencoding('utf8')
+
+# reload(sys)
+# sys.setdefaultencoding('utf8')
 
 import threading
 import multiprocessing
@@ -61,11 +62,11 @@ class plugins_api:
         if f.strip() == '':
             return ''
 
-        file = self.__plugin_dir + '/' + name + '/' + f
+        file = mw.getPluginDir() + '/' + name + '/' + f
         if not os.path.exists(file):
             return ''
 
-        c = mw.readFile(file)
+        c = open(file, 'rb').read()
         return c
 
     def indexListApi(self):
@@ -166,8 +167,8 @@ class plugins_api:
 
         data = mw.execShell(execstr)
         if mw.isAppleSystem():
-            print execstr
-            print data[0], data[1]
+            print(execstr)
+            print(data[0], data[1])
         return mw.returnJson(True, '卸载执行成功!')
         # if data[1] == '':
         #     return mw.returnJson(True, '已将卸载成功!')
@@ -206,8 +207,10 @@ class plugins_api:
 
         data = self.run(name, func, version, args, script)
         if data[1] == '':
-            return mw.returnJson(True, "OK", data[0].strip())
-        return mw.returnJson(False, data[1].strip())
+            r = mw.returnJson(True, "OK", data[0].strip())
+        r = mw.returnJson(False, data[1].strip())
+
+        return r
 
     def callbackApi(self):
         name = request.form.get('name', '')
@@ -284,7 +287,7 @@ class plugins_api:
             return mw.returnJson(False, '临时文件不存在,请重新上传!')
         plugin_path = mw.getPluginDir() + '/' + plugin_name
         if not os.path.exists(plugin_path):
-            print mw.execShell('mkdir -p ' + plugin_path)
+            print(mw.execShell('mkdir -p ' + plugin_path))
         mw.execShell("\cp -rf " + tmp_path + '/* ' + plugin_path + '/')
         mw.execShell('chmod -R 755 ' + plugin_path)
         p_info = mw.readFile(plugin_path + '/info.json')
@@ -382,7 +385,7 @@ class plugins_api:
                 t = threads[i].getResult()
                 plugins_info[i]['status'] = t
         except Exception as e:
-            print 'checkStatusMThreads:', str(e)
+            print('checkStatusMThreads:', str(e))
 
         return plugins_info
 
@@ -438,13 +441,13 @@ class plugins_api:
         else:
             checks = mw.getRootDir() + '/' + info['checks']
 
-        if info.has_key('path'):
+        if 'path' in info:
             path = info['path']
 
         if path[0:1] != '/':
             path = mw.getRootDir() + '/' + path
 
-        if info.has_key('coexist') and info['coexist']:
+        if 'coexist' in info and info['coexist']:
             coexist = True
 
         pInfo = {
@@ -507,7 +510,7 @@ class plugins_api:
         plugins_info = []
 
         if (data['pid'] == sType):
-            if type(data['versions']) == list and data.has_key('coexist') and data['coexist']:
+            if type(data['versions']) == list and 'coexist' in data and data['coexist']:
                 tmp_data = self.makeCoexist(data)
                 for index in range(len(tmp_data)):
                     plugins_info.append(tmp_data[index])
@@ -517,7 +520,7 @@ class plugins_api:
             return plugins_info
 
         if sType == '0':
-            if type(data['versions']) == list and data.has_key('coexist') and data['coexist']:
+            if type(data['versions']) == list and 'coexist' in data and data['coexist']:
                 tmp_data = self.makeCoexist(data)
                 for index in range(len(tmp_data)):
                     plugins_info.append(tmp_data[index])
@@ -542,8 +545,8 @@ class plugins_api:
                         tmp_data = self.makeList(data, sType)
                         for index in range(len(tmp_data)):
                             plugins_info.append(tmp_data[index])
-                    except Exception, e:
-                        print e
+                    except Exception as e:
+                        print(e)
         return plugins_info
 
     def getAllListPage(self, sType='0', page=1, pageSize=10):
@@ -560,8 +563,8 @@ class plugins_api:
                         tmp_data = self.makeList(data, sType)
                         for index in range(len(tmp_data)):
                             plugins_info.append(tmp_data[index])
-                    except Exception, e:
-                        print e
+                    except Exception as e:
+                        print(e)
 
         start = (page - 1) * pageSize
         end = start + pageSize
@@ -733,8 +736,8 @@ class plugins_api:
                                 tmp_data[index]['display'] = True
                                 plist.append(tmp_data[index])
                                 continue
-                    except Exception, e:
-                        print 'getIndexList:', e
+                    except Exception as e:
+                        print('getIndexList:', e)
 
         # 使用gevent模式时,无法使用多进程
         # plist = self.checkStatusMProcess(plist)
@@ -788,12 +791,20 @@ class plugins_api:
         if not os.path.exists(path):
             return ('', '')
         data = mw.execShell(py_cmd)
-        # data = os.popen(py_cmd).read()
 
         if mw.isAppleSystem():
-            print 'run', py_cmd
+            print('run', py_cmd)
         # print os.path.exists(py_cmd)
-        return (data[0].strip(), data[1].strip())
+
+        t1 = ''
+        t2 = ''
+        if isinstance(data[1], bytes):
+            t1 = str(data[1], encoding='utf-8')
+
+        if isinstance(data[0], bytes):
+            t2 = str(data[0], encoding='utf-8')
+
+        return (t1.strip(), t2.strip())
 
     # 映射包调用
     def callback(self, name, func, args='', script='index'):
@@ -805,6 +816,6 @@ class plugins_api:
         eval_str = "__import__('" + script + "')." + func + '(' + args + ')'
         newRet = eval(eval_str)
         if mw.isAppleSystem():
-            print 'callback', eval_str
+            print('callback', eval_str)
 
         return (True, newRet)

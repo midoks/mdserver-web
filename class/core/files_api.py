@@ -272,7 +272,8 @@ done
                     data['dirs'].append(tmp)
                 else:
                     data['files'].append(tmp)
-            except:
+            except Exception as e:
+                print(e)
                 continue
         return mw.returnJson(True, 'OK', data)
 
@@ -451,7 +452,7 @@ done
         else:
             filesx.append(filename)
 
-        print filesx
+        # print(filesx)
 
         for fn in filesx:
             if fn == '.':
@@ -795,6 +796,8 @@ done
         pageObj = mw.getPageObject(info, '1,2,3,4,5,6,7,8')
         data['PAGE'] = pageObj[0]
 
+        print('....eeee.11..')
+
         i = 0
         n = 0
         for filename in os.listdir(path):
@@ -834,7 +837,8 @@ done
                     filenames.append(filename + ';' + size + ';' +
                                      mtime + ';' + accept + ';' + user + ';' + link)
                 n += 1
-            except:
+            except Exception as e:
+                print(e)
                 continue
 
         data['DIR'] = sorted(dirnames)
