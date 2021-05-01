@@ -34,6 +34,9 @@ def execShell(cmdstring, cwd=None, timeout=None, shell=True):
             if end_time <= datetime.datetime.now():
                 raise Exception("Timeout：%s" % cmdstring)
 
+    if sys.version_info[0] == 2:
+        return sub.communicate()
+
     data = sub.communicate()
     # python3 fix 返回byte数据
     if isinstance(data[0], bytes):
