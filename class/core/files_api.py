@@ -121,6 +121,7 @@ class files_api:
     def getDirSizeApi(self):
         path = request.form.get('path', '').encode('utf-8')
         tmp = self.getDirSize(path)
+        print(tmp)
         return mw.returnJson(True, tmp[0].split()[0])
 
     def getDirApi(self):
@@ -796,8 +797,6 @@ done
         pageObj = mw.getPageObject(info, '1,2,3,4,5,6,7,8')
         data['PAGE'] = pageObj[0]
 
-        print('....eeee.11..')
-
         i = 0
         n = 0
         for filename in os.listdir(path):
@@ -810,14 +809,17 @@ done
             if i < pageObj[1].SHIFT:
                 continue
 
+            # print(path, filename)
             try:
-                filePath = (path + '/' + filename).encode('utf8')
+                filePath = str(path, encoding='utf-8') + '/' + \
+                    str(filename, encoding='utf-8')
                 link = ''
                 if os.path.islink(filePath):
                     filePath = os.readlink(filePath)
-                    link = ' -> ' + filePath
+                    link = ' -> ' + str(filePath, encoding='utf-8')
                     if not os.path.exists(filePath):
-                        filePath = path + '/' + filePath
+                        filePath = str(path, encoding='utf-8') + \
+                            '/' + str(filePath, encoding='utf-8')
                     if not os.path.exists(filePath):
                         continue
 
@@ -827,21 +829,22 @@ done
                 user = ''
                 try:
                     user = pwd.getpwuid(stat.st_uid).pw_name
-                except:
+                except Exception as ee:
                     user = str(stat.st_uid)
+
                 size = str(stat.st_size)
                 if os.path.isdir(filePath):
-                    dirnames.append(filename + ';' + size + ';' +
-                                    mtime + ';' + accept + ';' + user + ';' + link)
+                    dirnames.append(str(filename, encoding='utf-8') + ';' + str(size, encoding='utf-8') + ';' +
+                                    str(mtime, encoding='utf-8') + ';' + accept + ';' + user + ';' + link)
                 else:
-                    filenames.append(filename + ';' + size + ';' +
-                                     mtime + ';' + accept + ';' + user + ';' + link)
+                    filenames.append(str(filename, encoding='utf-8') + ';' + str(size, encoding='utf-8') + ';' +
+                                     str(mtime, encoding='utf-8') + ';' + accept + ';' + user + ';' + link)
                 n += 1
             except Exception as e:
-                print(e)
+                print('getdir:dd.', e)
                 continue
-
         data['DIR'] = sorted(dirnames)
         data['FILES'] = sorted(filenames)
-        data['PATH'] = path.replace('//', '/')
+        data['PATH'] = str(path, encoding='utf-8').replace('//', '/')
+
         return mw.getJson(data)
