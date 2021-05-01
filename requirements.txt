@@ -9,15 +9,15 @@ flask-caching==1.8.0
 gunicorn==19.9
 gevent==1.3.7
 gevent-websocket
-psutil==5.4.7
-pillow==5.3.0
+psutil==5.6.6
+pillow==6.2.2
 chardet==3.0.4
 flask-sqlalchemy==2.3.2
-cryptography==2.9.2
+cryptography==3.3.2
 requests==2.20.0
 ConfigParser==3.5.0
 MySQL-python==1.2.5
 mysql-connector-python
 flask-socketio==3.0.1
-python-engineio==3.4.1
+python-engineio==3.8.2
 # pytest-shutil
