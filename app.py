@@ -11,4 +11,4 @@ try:
         HOST = '0.0.0.0'
         socketio.run(app, host=HOST, port=PORT)
 except Exception as ex:
-    print ex
+    print(ex)

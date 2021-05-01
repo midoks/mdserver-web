@@ -114,10 +114,10 @@ def publicObject(toObject, func, action=None, get=None):
 
 @app.route("/test")
 def test():
-    print sys.version_info
-    print session
+    print(sys.version_info)
+    print(session)
     os = mw.getOs()
-    print os
+    print(os)
     return mw.getLocalIp()
 
 
