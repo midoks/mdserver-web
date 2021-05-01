@@ -80,8 +80,15 @@ def execShell(cmdstring, cwd=None, timeout=None, shell=True):
         while sub.poll() is None:
             time.sleep(0.1)
 
-        return sub.returncode
-    except:
+        data = sub.communicate()
+        # python3 fix 返回byte数据
+        if isinstance(data[0], bytes):
+            t1 = str(data[0], encoding='utf-8')
+
+        if isinstance(data[1], bytes):
+            t2 = str(data[1], encoding='utf-8')
+        return (t1, t2)
+    except Exception as e:
         return None
 
 
