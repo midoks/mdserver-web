@@ -34,7 +34,14 @@ def execShell(cmdstring, cwd=None, timeout=None, shell=True):
             if end_time <= datetime.datetime.now():
                 raise Exception("Timeout：%s" % cmdstring)
 
-    return sub.communicate()
+    data = sub.communicate()
+    # python3 fix 返回byte数据
+    if isinstance(data[0], bytes):
+        t1 = str(data[0], encoding='utf-8')
+
+    if isinstance(data[1], bytes):
+        t2 = str(data[1], encoding='utf-8')
+    return (t1, t2)
 
 
 def getRunDir():
