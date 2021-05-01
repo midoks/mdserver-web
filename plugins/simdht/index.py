@@ -24,7 +24,7 @@ def getPluginDir():
     return mw.getPluginDir() + '/' + getPluginName()
 
 sys.path.append(getPluginDir() + "/class")
-import mysql
+import simdht_mysql
 
 
 def getServerDir():
@@ -216,7 +216,7 @@ def getDbConfInfo():
 
 def pMysqlDb():
     data = getDbConfInfo()
-    conn = mysql.mysql()
+    conn = simdht_mysql.simdht_mysql()
     conn.setHost(data['DB_HOST'])
     conn.setUser(data['DB_USER'])
     conn.setPwd(data['DB_PASS'])
@@ -271,7 +271,7 @@ def getTrendData():
         three = getMinData(pdb, 10)
         return mw.getJson([one, two, three])
     except Exception as e:
-        print str(e)
+        # print str(e)
         return mw.getJson([0, 0, 0])
 
 

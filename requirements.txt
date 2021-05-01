@@ -18,6 +18,6 @@ requests==2.20.0
 ConfigParser==3.5.0
 MySQL-python==1.2.5
 mysql-connector-python
-flask-socketio==3.0.2
+flask-socketio==3.0.1
 python-engineio==3.4.1
 # pytest-shutil
