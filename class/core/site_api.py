@@ -15,6 +15,8 @@ import psutil
 
 from flask import request
 
+# request.packages.urllib3.disable_warnings()
+
 
 class site_api:
     siteName = None  # 网站名称
@@ -51,9 +53,9 @@ class site_api:
 
     ##### ----- start ----- ###
     def listApi(self):
-        limit = request.form.get('limit', '').encode('utf-8')
-        p = request.form.get('p', '').encode('utf-8')
-        type_id = request.form.get('type_id', '').encode('utf-8')
+        limit = request.form.get('limit', '10')
+        p = request.form.get('p', '1')
+        type_id = request.form.get('type_id', '')
 
         start = (int(p) - 1) * (int(limit))
 
@@ -82,7 +84,7 @@ class site_api:
         return mw.getJson(_ret)
 
     def setDefaultSiteApi(self):
-        name = request.form.get('name', '').encode('utf-8')
+        name = request.form.get('name', '')
         import time
         # 清理旧的
         defaultSite = mw.readFile('data/defaultSite.pl')
@@ -117,15 +119,15 @@ class site_api:
         return mw.getJson(data)
 
     def setPsApi(self):
-        mid = request.form.get('id', '').encode('utf-8')
-        ps = request.form.get('ps', '').encode('utf-8')
+        mid = request.form.get('id', '')
+        ps = request.form.get('ps', '')
         if mw.M('sites').where("id=?", (mid,)).setField('ps', ps):
             return mw.returnJson(True, '修改成功!')
         return mw.returnJson(False, '修改失败!')
 
     def stopApi(self):
-        mid = request.form.get('id', '').encode('utf-8')
-        name = request.form.get('name', '').encode('utf-8')
+        mid = request.form.get('id', '')
+        name = request.form.get('name', '')
         path = self.setupPath + '/stop'
 
         if not os.path.exists(path):
@@ -158,8 +160,8 @@ class site_api:
         return mw.returnJson(True, '站点已停用!')
 
     def startApi(self):
-        mid = request.form.get('id', '').encode('utf-8')
-        name = request.form.get('name', '').encode('utf-8')
+        mid = request.form.get('id', '')
+        name = request.form.get('name', '')
         path = self.setupPath + '/stop'
         sitePath = mw.M('sites').where("id=?", (mid,)).getField('path')
 
@@ -177,9 +179,9 @@ class site_api:
         return mw.returnJson(True, '站点已启用!')
 
     def getBackupApi(self):
-        limit = request.form.get('limit', '').encode('utf-8')
-        p = request.form.get('p', '').encode('utf-8')
-        mid = request.form.get('search', '').encode('utf-8')
+        limit = request.form.get('limit', '')
+        p = request.form.get('p', '')
+        mid = request.form.get('search', '')
 
         find = mw.M('sites').where("id=?", (mid,)).field(
             "id,name,path,status,ps,addtime,edate").find()
@@ -201,7 +203,7 @@ class site_api:
         return mw.getJson(_ret)
 
     def toBackupApi(self):
-        mid = request.form.get('id', '').encode('utf-8')
+        mid = request.form.get('id', '')
         find = mw.M('sites').where(
             "id=?", (mid,)).field('name,path,id').find()
         fileName = find['name'] + '_' + \
@@ -228,7 +230,7 @@ class site_api:
         return mw.returnJson(True, '备份成功!')
 
     def delBackupApi(self):
-        mid = request.form.get('id', '').encode('utf-8')
+        mid = request.form.get('id', '')
         filename = mw.M('backup').where(
             "id=?", (mid,)).getField('filename')
         if os.path.exists(filename):
@@ -243,8 +245,8 @@ class site_api:
         return self.getPhpVersion()
 
     def setPhpVersionApi(self):
-        siteName = request.form.get('siteName', '').encode('utf-8')
-        version = request.form.get('version', '').encode('utf-8')
+        siteName = request.form.get('siteName', '')
+        version = request.form.get('version', '')
 
         # nginx
         file = self.getHostConf(siteName)
@@ -261,12 +263,12 @@ class site_api:
         return mw.returnJson(True, msg)
 
     def getDomainApi(self):
-        pid = request.form.get('pid', '').encode('utf-8')
+        pid = request.form.get('pid', '')
         return self.getDomain(pid)
 
     # 获取站点所有域名
     def getSiteDomainsApi(self):
-        pid = request.form.get('id', '').encode('utf-8')
+        pid = request.form.get('id', '')
 
         data = {}
         domains = mw.M('domain').where(
@@ -287,7 +289,7 @@ class site_api:
         return mw.returnJson(True, 'OK', data)
 
     def getDirBindingApi(self):
-        mid = request.form.get('id', '').encode('utf-8')
+        mid = request.form.get('id', '')
 
         path = mw.M('sites').where('id=?', (mid,)).getField('path')
         if not os.path.exists(path):
@@ -323,7 +325,7 @@ class site_api:
         return mw.returnJson(True, 'OK', data)
 
     def getDirUserIniApi(self):
-        mid = request.form.get('id', '').encode('utf-8')
+        mid = request.form.get('id', '')
 
         path = mw.M('sites').where('id=?', (mid,)).getField('path')
         name = mw.M('sites').where("id=?", (mid,)).getField('name')
@@ -338,7 +340,7 @@ class site_api:
         return mw.returnJson(True, 'OK', data)
 
     def setDirUserIniApi(self):
-        path = request.form.get('path', '').encode('utf-8')
+        path = request.form.get('path', '')
         filename = path + '/.user.ini'
         self.delUserInI(path)
         if os.path.exists(filename):
@@ -350,7 +352,7 @@ class site_api:
         return mw.returnJson(True, '已打开防跨站设置!')
 
     def logsOpenApi(self):
-        mid = request.form.get('id', '').encode('utf-8')
+        mid = request.form.get('id', '')
         name = mw.M('sites').where("id=?", (mid,)).getField('name')
 
         # NGINX
@@ -387,7 +389,7 @@ class site_api:
             return mw.returnJson(True, 'OK', [])
 
     def getSslApi(self):
-        siteName = request.form.get('siteName', '').encode('utf-8')
+        siteName = request.form.get('siteName', '')
 
         path = self.sslDir + siteName
         csrpath = path + "/fullchain.pem"  # 生成证书路径
@@ -414,9 +416,9 @@ class site_api:
         return mw.returnJson(True, 'OK', data)
 
     def setSslApi(self):
-        siteName = request.form.get('siteName', '').encode('utf-8')
-        key = request.form.get('key', '').encode('utf-8')
-        csr = request.form.get('csr', '').encode('utf-8')
+        siteName = request.form.get('siteName', '')
+        key = request.form.get('key', '')
+        csr = request.form.get('csr', '')
 
         path = self.sslDir + siteName
         if not os.path.exists(path):
@@ -471,8 +473,8 @@ class site_api:
         return mw.returnJson(True, '证书已保存!')
 
     def setCertToSiteApi(self):
-        certName = request.form.get('certName', '').encode('utf-8')
-        siteName = request.form.get('siteName', '').encode('utf-8')
+        certName = request.form.get('certName', '')
+        siteName = request.form.get('siteName', '')
         try:
             path = self.sslDir + siteName
             if not os.path.exists(path):
@@ -489,7 +491,7 @@ class site_api:
             return mw.returnJson(False, '设置错误,' + str(ex))
 
     def removeCertApi(self):
-        certName = request.form.get('certName', '').encode('utf-8')
+        certName = request.form.get('certName', '')
         try:
             path = self.sslDir + certName
             if not os.path.exists(path):
@@ -500,7 +502,7 @@ class site_api:
             return mw.returnJson(False, '删除失败!')
 
     def closeSslConfApi(self):
-        siteName = request.form.get('siteName', '').encode('utf-8')
+        siteName = request.form.get('siteName', '')
 
         file = self.getHostConf(siteName)
         conf = mw.readFile(file)
@@ -548,12 +550,12 @@ class site_api:
         return mw.returnJson(True, 'SSL已关闭!')
 
     def createLetApi(self):
-        siteName = request.form.get('siteName', '').encode('utf-8')
+        siteName = request.form.get('siteName', '')
         updateOf = request.form.get('updateOf', '')
-        domains = request.form.get('domains', '').encode('utf-8')
-        force = request.form.get('force', '').encode('utf-8')
-        renew = request.form.get('renew', '').encode('utf-8')
-        email_args = request.form.get('email', '').encode('utf-8')
+        domains = request.form.get('domains', '')
+        force = request.form.get('force', '')
+        renew = request.form.get('renew', '')
+        email_args = request.form.get('email', '')
 
         domains = json.loads(domains)
         email = mw.M('users').getField('email')
@@ -693,7 +695,7 @@ class site_api:
         return mw.returnJson(True, 'OK', result)
 
     def httpToHttpsApi(self):
-        siteName = request.form.get('siteName', '').encode('utf-8')
+        siteName = request.form.get('siteName', '')
         file = self.getHostConf(siteName)
         conf = mw.readFile(file)
         if conf:
@@ -712,7 +714,7 @@ class site_api:
         return mw.returnJson(True, '设置成功!证书也要设置好哟!')
 
     def closeToHttpsApi(self):
-        siteName = request.form.get('siteName', '').encode('utf-8')
+        siteName = request.form.get('siteName', '')
         file = self.getHostConf(siteName)
         conf = mw.readFile(file)
         if conf:
@@ -726,65 +728,65 @@ class site_api:
         return mw.returnJson(True, '关闭HTTPS跳转成功!')
 
     def getIndexApi(self):
-        sid = request.form.get('id', '').encode('utf-8')
+        sid = request.form.get('id', '')
         data = {}
         index = self.getIndex(sid)
         data['index'] = index
         return mw.getJson(data)
 
     def setIndexApi(self):
-        sid = request.form.get('id', '').encode('utf-8')
-        index = request.form.get('index', '').encode('utf-8')
+        sid = request.form.get('id', '')
+        index = request.form.get('index', '')
         return self.setIndex(sid, index)
 
     def getLimitNetApi(self):
-        sid = request.form.get('id', '').encode('utf-8')
+        sid = request.form.get('id', '')
         return self.getLimitNet(sid)
 
     def saveLimitNetApi(self):
-        sid = request.form.get('id', '').encode('utf-8')
-        perserver = request.form.get('perserver', '').encode('utf-8')
-        perip = request.form.get('perip', '').encode('utf-8')
-        limit_rate = request.form.get('limit_rate', '').encode('utf-8')
+        sid = request.form.get('id', '')
+        perserver = request.form.get('perserver', '')
+        perip = request.form.get('perip', '')
+        limit_rate = request.form.get('limit_rate', '')
         return self.saveLimitNet(sid, perserver, perip, limit_rate)
 
     def closeLimitNetApi(self):
-        sid = request.form.get('id', '').encode('utf-8')
+        sid = request.form.get('id', '')
         return self.closeLimitNet(sid)
 
     def getSecurityApi(self):
-        sid = request.form.get('id', '').encode('utf-8')
-        name = request.form.get('name', '').encode('utf-8')
+        sid = request.form.get('id', '')
+        name = request.form.get('name', '')
         return self.getSecurity(sid, name)
 
     def setSecurityApi(self):
-        fix = request.form.get('fix', '').encode('utf-8')
-        domains = request.form.get('domains', '').encode('utf-8')
-        status = request.form.get('status', '').encode('utf-8')
-        name = request.form.get('name', '').encode('utf-8')
-        sid = request.form.get('id', '').encode('utf-8')
+        fix = request.form.get('fix', '')
+        domains = request.form.get('domains', '')
+        status = request.form.get('status', '')
+        name = request.form.get('name', '')
+        sid = request.form.get('id', '')
         return self.setSecurity(sid, name, fix, domains, status)
 
     def getLogsApi(self):
-        siteName = request.form.get('siteName', '').encode('utf-8')
+        siteName = request.form.get('siteName', '')
         return self.getLogs(siteName)
 
     def getSitePhpVersionApi(self):
-        siteName = request.form.get('siteName', '').encode('utf-8')
+        siteName = request.form.get('siteName', '')
         return self.getSitePhpVersion(siteName)
 
     def getHostConfApi(self):
-        siteName = request.form.get('siteName', '').encode('utf-8')
+        siteName = request.form.get('siteName', '')
         host = self.getHostConf(siteName)
         return mw.getJson({'host': host})
 
     def getRewriteConfApi(self):
-        siteName = request.form.get('siteName', '').encode('utf-8')
+        siteName = request.form.get('siteName', '')
         rewrite = self.getRewriteConf(siteName)
         return mw.getJson({'rewrite': rewrite})
 
     def getRewriteTplApi(self):
-        tplname = request.form.get('tplname', '').encode('utf-8')
+        tplname = request.form.get('tplname', '')
         file = mw.getRunDir() + '/rewrite/nginx/' + tplname + '.conf'
         if not os.path.exists(file):
             return mw.returnJson(False, '模版不存在!')
@@ -800,16 +802,16 @@ class site_api:
         return mw.getJson(data)
 
     def setEndDateApi(self):
-        sid = request.form.get('id', '').encode('utf-8')
-        edate = request.form.get('edate', '').encode('utf-8')
+        sid = request.form.get('id', '')
+        edate = request.form.get('edate', '')
         return self.setEndDate(sid, edate)
 
     def addApi(self):
-        webname = request.form.get('webinfo', '').encode('utf-8')
-        ps = request.form.get('ps', '').encode('utf-8')
-        path = request.form.get('path', '').encode('utf-8')
-        version = request.form.get('version', '').encode('utf-8')
-        port = request.form.get('port', '').encode('utf-8')
+        webname = request.form.get('webinfo', '')
+        ps = request.form.get('ps', '')
+        path = request.form.get('path', '')
+        version = request.form.get('version', '')
+        port = request.form.get('port', '').decode('utf-8')
         return self.add(webname, port, ps, path, version)
 
     def addDomainApi(self):
@@ -817,8 +819,8 @@ class site_api:
         if isError != True:
             return mw.returnJson(False, 'ERROR: 检测到配置文件有错误,请先排除后再操作<br><br><a style="color:red;">' + isError.replace("\n", '<br>') + '</a>')
 
-        domain = request.form.get('domain', '').encode('utf-8')
-        webname = request.form.get('webname', '').encode('utf-8')
+        domain = request.form.get('domain', '')
+        webname = request.form.get('webname', '')
         pid = request.form.get('id', '').encode('utf-8')
         if len(domain) < 3:
             return mw.returnJson(False, '域名不能为空!')
@@ -864,9 +866,9 @@ class site_api:
         return mw.returnJson(True, '域名添加成功!')
 
     def addDirBindApi(self):
-        pid = request.form.get('id', '').encode('utf-8')
-        domain = request.form.get('domain', '').encode('utf-8')
-        dirName = request.form.get('dirName', '').encode('utf-8')
+        pid = request.form.get('id', '')
+        domain = request.form.get('domain', '')
+        dirName = request.form.get('dirName', '')
         tmp = domain.split(':')
         domain = tmp[0]
         port = '80'
@@ -926,7 +928,7 @@ class site_api:
         return mw.returnJson(True, '添加成功!')
 
     def delDirBindApi(self):
-        mid = request.form.get('id', '').encode('utf-8')
+        mid = request.form.get('id', '')
         binding = mw.M('binding').where(
             "id=?", (mid,)).field('id,pid,domain,path').find()
         siteName = mw.M('sites').where(
@@ -954,8 +956,8 @@ class site_api:
 
         # 取子目录Rewrite
     def getDirBindRewriteApi(self):
-        mid = request.form.get('id', '').encode('utf-8')
-        add = request.form.get('add', '0').encode('utf-8')
+        mid = request.form.get('id', '')
+        add = request.form.get('add', '0')
         find = mw.M('binding').where(
             "id=?", (mid,)).field('id,pid,domain,path').find()
         site = mw.M('sites').where(
@@ -990,8 +992,8 @@ class site_api:
 
         # 修改物理路径
     def setPathApi(self):
-        mid = request.form.get('id', '').encode('utf-8')
-        path = request.form.get('path', '').encode('utf-8')
+        mid = request.form.get('id', '')
+        path = request.form.get('path', '')
 
         path = self.getPath(path)
         if path == "" or mid == '0':
@@ -1028,8 +1030,8 @@ class site_api:
 
     # 设置当前站点运行目录
     def setSiteRunPathApi(self):
-        mid = request.form.get('id', '').encode('utf-8')
-        runPath = request.form.get('runPath', '').encode('utf-8')
+        mid = request.form.get('id', '')
+        runPath = request.form.get('runPath', '')
         siteName = mw.M('sites').where('id=?', (mid,)).getField('name')
         sitePath = mw.M('sites').where('id=?', (mid,)).getField('path')
 
@@ -1051,9 +1053,9 @@ class site_api:
 
     # 设置目录加密
     def setHasPwdApi(self):
-        username = request.form.get('username', '').encode('utf-8')
-        password = request.form.get('password', '').encode('utf-8')
-        siteName = request.form.get('siteName', '').encode('utf-8')
+        username = request.form.get('username', '')
+        password = request.form.get('password', '')
+        siteName = request.form.get('siteName', '')
         mid = request.form.get('id', '')
 
         if len(username.strip()) == 0 or len(password.strip()) == 0:
@@ -1098,7 +1100,7 @@ class site_api:
 
     # 取消目录加密
     def closeHasPwdApi(self):
-        siteName = request.form.get('siteName', '').encode('utf-8')
+        siteName = request.form.get('siteName', '')
         mid = request.form.get('id', '')
         if siteName == '':
             siteName = mw.M('sites').where('id=?', (mid,)).getField('name')
@@ -1120,9 +1122,9 @@ class site_api:
         return mw.returnJson(True, '设置成功!')
 
     def delDomainApi(self):
-        domain = request.form.get('domain', '').encode('utf-8')
-        webname = request.form.get('webname', '').encode('utf-8')
-        port = request.form.get('port', '').encode('utf-8')
+        domain = request.form.get('domain', '')
+        webname = request.form.get('webname', '')
+        port = request.form.get('port', '')
         pid = request.form.get('id', '')
 
         find = mw.M('domain').where("pid=? AND name=?",
@@ -1160,13 +1162,13 @@ class site_api:
         return mw.returnJson(True, '站点删除成功!')
 
     def deleteApi(self):
-        sid = request.form.get('id', '').encode('utf-8')
-        webname = request.form.get('webname', '').encode('utf-8')
-        path = request.form.get('path', '0').encode('utf-8')
+        sid = request.form.get('id', '')
+        webname = request.form.get('webname', '')
+        path = request.form.get('path', '0')
         return self.delete(sid, webname, path)
 
     def getProxyListApi(self):
-        siteName = request.form.get('siteName', '').encode('utf-8')
+        siteName = request.form.get('siteName', '')
         conf_path = self.getHostConf(siteName)
         old_conf = mw.readFile(conf_path)
         rep = "(#PROXY-START(\n|.)+#PROXY-END)"
@@ -1213,7 +1215,7 @@ class site_api:
         return mw.getJson(data)
 
     def getSiteDocApi(self):
-        stype = request.form.get('type', '0').strip().encode('utf-8')
+        stype = request.form.get('type', '0').strip()
         vlist = []
         vlist.append('')
         vlist.append(mw.getServerDir() +
@@ -1227,7 +1229,7 @@ class site_api:
         return mw.returnJson(True, 'ok', data)
 
     def addSiteTypeApi(self):
-        name = request.form.get('name', '').strip().encode('utf-8')
+        name = request.form.get('name', '').strip()
         if not name:
             return mw.returnJson(False, "分类名称不能为空")
         if len(name) > 18:
@@ -1240,7 +1242,7 @@ class site_api:
         return mw.returnJson(True, '添加成功!')
 
     def removeSiteTypeApi(self):
-        mid = request.form.get('id', '').encode('utf-8')
+        mid = request.form.get('id', '')
         if mw.M('site_types').where('id=?', (mid,)).count() == 0:
             return mw.returnJson(False, "指定分类不存在!")
         mw.M('site_types').where('id=?', (mid,)).delete()
@@ -1249,8 +1251,8 @@ class site_api:
 
     def modifySiteTypeNameApi(self):
         # 修改网站分类名称
-        name = request.form.get('name', '').strip().encode('utf-8')
-        mid = request.form.get('id', '').encode('utf-8')
+        name = request.form.get('name', '').strip()
+        mid = request.form.get('id', '')
         if not name:
             return mw.returnJson(False, "分类名称不能为空")
         if len(name) > 18:
@@ -1262,8 +1264,8 @@ class site_api:
 
     def setSiteTypeApi(self):
         # 设置指定站点的分类
-        site_ids = request.form.get('site_ids', '').encode('utf-8')
-        mid = request.form.get('id', '').encode('utf-8')
+        site_ids = request.form.get('site_ids', '')
+        mid = request.form.get('id', '')
         site_ids = json.loads(site_ids)
         for sid in site_ids:
             print(mw.M('sites').where('id=?', (sid,)).setField('type_id', mid))
@@ -1667,7 +1669,6 @@ location /{
         mw.writeFile(rewrite_file, rewrite_content)
 
     def add(self, webname, port, ps, path, version):
-
         siteMenu = json.loads(webname)
         self.siteName = self.toPunycode(
             siteMenu['domain'].strip().split(':')[0]).strip()
