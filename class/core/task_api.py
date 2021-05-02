@@ -24,7 +24,7 @@ class task_api:
 
     def listApi(self):
 
-        p = request.form.get('p', '1').encode('utf-8')
+        p = request.form.get('p', '1')
         limit = request.form.get('limit', '10').strip()
         search = request.form.get('search', '').strip()
 
