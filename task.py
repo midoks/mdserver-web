@@ -431,7 +431,7 @@ def startPHPVersion(version):
         if os.path.exists(cgi):
             return True
     except Exception as e:
-        print str(e)
+        print(str(e))
         return True
 
 
