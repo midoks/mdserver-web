@@ -172,24 +172,24 @@ def getLog():
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
-        print status()
+        print(status())
     elif func == 'start':
-        print start()
+        print(start())
     elif func == 'stop':
-        print stop()
+        print(stop())
     elif func == 'restart':
-        print restart()
+        print(restart())
     elif func == 'reload':
-        print reload()
+        print(reload())
     elif func == 'conf':
-        print getPathFile()
+        print(getPathFile())
     elif func == 'initd_status':
-        print initdStatus()
+        print(initdStatus())
     elif func == 'initd_install':
-        print initdInstall()
+        print(initdInstall())
     elif func == 'initd_uninstall':
-        print initdUinstall()
+        print(initdUinstall())
     elif func == 'run_log':
-        print getLog()
+        print(getLog())
     else:
-        print 'error'
+        print('error')

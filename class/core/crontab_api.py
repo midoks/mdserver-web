@@ -274,7 +274,7 @@ class crontab_api:
 
     # 取数据列表
     def getDataListApi(self):
-        stype = request.form.get('type', '').encode('utf-8')
+        stype = request.form.get('type', '')
         if stype == 'databases':
             db_list = {}
             db_list['orderOpt'] = []

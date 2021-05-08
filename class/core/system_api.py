@@ -20,7 +20,7 @@ from threading import Thread
 from time import sleep
 
 
-def async(f):
+def mw_async(f):
     def wrapper(*args, **kwargs):
         thr = Thread(target=f, args=args, kwargs=kwargs)
         thr.start()
@@ -101,14 +101,14 @@ class system_api:
         return mw.returnJson(True, '正在重启服务器!')
     ##### ----- end ----- ###
 
-    @async
+    @mw_async
     def restartMw(self):
         sleep(0.3)
         # cmd = mw.getRunDir() + '/scripts/init.d/mw restart'
         # print cmd
         mw.execShell('service mw restart')
 
-    @async
+    @mw_async
     def restartServer(self):
         if not mw.isRestart():
             return mw.returnJson(False, '请等待所有安装任务完成再执行!')
@@ -302,7 +302,7 @@ class system_api:
                 memInfo['memBuffers'] - memInfo['memCached']
             tmp1 = memInfo['memTotal'] / 100
             return (tmp / tmp1)
-        except Exception, ex:
+        except Exception as ex:
             return 1
 
     def getDiskInfo(self, get=None):
@@ -396,7 +396,7 @@ class system_api:
                     shutil.rmtree(filename)
                 else:
                     os.remove(filename)
-                print '\t\033[1;32m[OK]\033[0m'
+                print('\t\033[1;32m[OK]\033[0m')
                 num += 1
             total += size
             count += num
@@ -460,8 +460,8 @@ class system_api:
             networkInfo['mem'] = self.getMemInfo()
 
             return networkInfo
-        except Exception, e:
-            print e
+        except Exception as e:
+            print(e)
             return None
 
     def getNetWorkApi(self):
@@ -621,7 +621,7 @@ class system_api:
             version = json.loads(r.content)
             return version[0]
         except Exception as e:
-            print 'getServerInfo', e
+            print('getServerInfo', e)
         return {}
 
     def updateServer(self, stype, version=''):
@@ -680,7 +680,7 @@ class system_api:
 
             return mw.returnJson(False, '已经是最新,无需更新!')
         except Exception as ex:
-            print 'updateServer', ex
+            print('updateServer', ex)
             return mw.returnJson(False, "连接服务器失败!")
 
     # 修复面板

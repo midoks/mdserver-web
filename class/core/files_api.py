@@ -25,11 +25,11 @@ class files_api:
 
     ##### ----- start ----- ###
     def getBodyApi(self):
-        path = request.form.get('path', '').encode('utf-8')
+        path = request.form.get('path', '')
         return self.getBody(path)
 
     def getLastBodyApi(self):
-        path = request.form.get('path', '').encode('utf-8')
+        path = request.form.get('path', '')
         line = request.form.get('line', '100')
 
         if not os.path.exists(path):
@@ -42,30 +42,30 @@ class files_api:
             return mw.returnJson(False, u'无法正确读取文件!' + str(ex))
 
     def saveBodyApi(self):
-        path = request.form.get('path', '').encode('utf-8')
-        data = request.form.get('data', '').encode('utf-8')
-        encoding = request.form.get('encoding', '').encode('utf-8')
+        path = request.form.get('path', '')
+        data = request.form.get('data', '')
+        encoding = request.form.get('encoding', '')
         return self.saveBody(path, data, encoding)
 
     def downloadApi(self):
-        filename = request.args.get('filename', '').encode('utf-8')
+        filename = request.args.get('filename', '')
         if not os.path.exists(filename):
             return ''
         response = make_response(send_from_directory(
-            os.path.dirname(filename).encode('utf-8'), os.path.basename(filename).encode('utf-8'), as_attachment=True))
+            os.path.dirname(filename), os.path.basename(filename), as_attachment=True))
         return response
 
     def zipApi(self):
-        sfile = request.form.get('sfile', '').encode('utf-8')
-        dfile = request.form.get('dfile', '').encode('utf-8')
-        stype = request.form.get('type', '').encode('utf-8')
-        path = request.form.get('path', '').encode('utf-8')
+        sfile = request.form.get('sfile', '')
+        dfile = request.form.get('dfile', '')
+        stype = request.form.get('type', '')
+        path = request.form.get('path', '')
         return self.zip(sfile, dfile, stype, path)
 
     # 移动文件或目录
     def mvFileApi(self):
-        sfile = request.form.get('sfile', '').encode('utf-8')
-        dfile = request.form.get('dfile', '').encode('utf-8')
+        sfile = request.form.get('sfile', '')
+        dfile = request.form.get('dfile', '')
         if not self.checkFileName(dfile):
             return mw.returnJson(False, '文件名中不能包含特殊字符!')
         if not os.path.exists(sfile):
@@ -84,11 +84,11 @@ class files_api:
             return mw.returnJson(False, '移动文件或目录失败!')
 
     def deleteApi(self):
-        path = request.form.get('path', '').encode('utf-8')
+        path = request.form.get('path', '')
         return self.delete(path)
 
     def fileAccessApi(self):
-        filename = request.form.get('filename', '').encode('utf-8')
+        filename = request.form.get('filename', '')
         data = self.getAccess(filename)
         return mw.getJson(data)
 
@@ -97,8 +97,8 @@ class files_api:
         if mw.isAppleSystem():
             return mw.returnJson(True, '开发机不设置!')
 
-        filename = request.form.get('filename', '').encode('utf-8')
-        user = request.form.get('user', '').encode('utf-8')
+        filename = request.form.get('filename', '')
+        user = request.form.get('user', '')
         access = request.form.get('access', '755')
         sall = '-R'
         try:
@@ -119,12 +119,13 @@ class files_api:
             return mw.returnJson(False, '设置失败!')
 
     def getDirSizeApi(self):
-        path = request.form.get('path', '').encode('utf-8')
+        path = request.form.get('path', '')
         tmp = self.getDirSize(path)
+        print(tmp)
         return mw.returnJson(True, tmp[0].split()[0])
 
     def getDirApi(self):
-        path = request.form.get('path', '').encode('utf-8')
+        path = request.form.get('path', '')
         if not os.path.exists(path):
             path = mw.getRootDir() + "/wwwroot"
         search = request.args.get('search', '').strip().lower()
@@ -137,7 +138,7 @@ class files_api:
         return self.getDir(path, int(page), int(row), search)
 
     def createFileApi(self):
-        file = request.form.get('path', '').encode('utf-8')
+        file = request.form.get('path', '')
         try:
             if not self.checkFileName(file):
                 return mw.returnJson(False, '文件名中不能包含特殊字符!')
@@ -156,7 +157,7 @@ class files_api:
             return mw.returnJson(True, '文件创建失败!')
 
     def createDirApi(self):
-        path = request.form.get('path', '').encode('utf-8')
+        path = request.form.get('path', '')
         try:
             if not self.checkFileName(path):
                 return mw.returnJson(False, '目录名中不能包含特殊字符!')
@@ -173,9 +174,9 @@ class files_api:
     def downloadFileApi(self):
         import db
         import time
-        url = request.form.get('url', '').encode('utf-8')
-        path = request.form.get('path', '').encode('utf-8')
-        filename = request.form.get('filename', '').encode('utf-8')
+        url = request.form.get('url', '')
+        path = request.form.get('path', '')
+        filename = request.form.get('filename', '')
 
         isTask = mw.getRootDir() + '/tmp/panelTask.pl'
         execstr = url + '|mw|' + path + '/' + filename
@@ -186,7 +187,7 @@ class files_api:
         return mw.returnJson(True, '已将下载任务添加到队列!')
 
     def removeTaskApi(self):
-        mid = request.form.get('id', '').encode('utf-8')
+        mid = request.form.get('id', '')
         try:
             name = mw.M('tasks').where('id=?', (mid,)).getField('name')
             status = mw.M('tasks').where('id=?', (mid,)).getField('status')
@@ -220,14 +221,13 @@ done
         from werkzeug.utils import secure_filename
         from flask import request
 
-        path = request.args.get('path', '').encode('utf-8')
+        path = request.args.get('path', '')
 
         if not os.path.exists(path):
             os.makedirs(path)
         f = request.files['zunfile']
         filename = os.path.join(path, f.filename)
-        if sys.version_info[0] == 2:
-            filename = filename.encode('utf-8')
+
         s_path = path
         if os.path.exists(filename):
             s_path = filename
@@ -272,14 +272,15 @@ done
                     data['dirs'].append(tmp)
                 else:
                     data['files'].append(tmp)
-            except:
+            except Exception as e:
+                print(e)
                 continue
         return mw.returnJson(True, 'OK', data)
 
     # 回收站开关
     def recycleBinApi(self):
         c = 'data/recycle_bin.pl'
-        db = request.form.get('db', '').encode('utf-8')
+        db = request.form.get('db', '')
         if db != '':
             c = 'data/recycle_bin_db.pl'
         if os.path.exists(c):
@@ -293,7 +294,7 @@ done
 
     def reRecycleBinApi(self):
         rPath = self.rPath
-        path = request.form.get('path', '').encode('utf-8')
+        path = request.form.get('path', '')
         dFile = path.replace('_mw_', '/').split('_t_')[0]
         try:
             import shutil
@@ -308,8 +309,8 @@ done
 
     def delRecycleBinApi(self):
         rPath = self.rPath
-        path = request.form.get('path', '').encode('utf-8')
-        empty = request.form.get('empty', '').encode('utf-8')
+        path = request.form.get('path', '')
+        empty = request.form.get('empty', '')
         dFile = path.split('_t_')[0]
 
         if not self.checkDir(path):
@@ -351,7 +352,7 @@ done
         return mw.returnJson(True, '已清空回收站!')
 
     def deleteDirApi(self):
-        path = request.form.get('path', '').encode('utf-8')
+        path = request.form.get('path', '')
         if not os.path.exists(path):
             return mw.returnJson(False, '指定文件不存在!')
 
@@ -378,10 +379,10 @@ done
         return mw.returnJson(True, tmp[0].split()[0])
 
     def setBatchDataApi(self):
-        path = request.form.get('path', '').encode('utf-8')
-        stype = request.form.get('type', '').encode('utf-8')
-        access = request.form.get('access', '').encode('utf-8')
-        user = request.form.get('user', '').encode('utf-8')
+        path = request.form.get('path', '')
+        stype = request.form.get('type', '')
+        access = request.form.get('access', '')
+        user = request.form.get('user', '')
         data = request.form.get('data')
         if stype == '1' or stype == '2':
             session['selected'] = {
@@ -395,7 +396,6 @@ done
         elif stype == '3':
             for key in json.loads(data):
                 try:
-                    key = key.encode('utf-8')
                     filename = path + '/' + key
                     if not self.checkDir(filename):
                         return mw.returnJson(False, 'FILE_DANGER')
@@ -414,7 +414,7 @@ done
             i = 0
             for key in data:
                 try:
-                    filename = path + '/' + key.encode('utf-8')
+                    filename = path + '/' + key
                     topath = filename
                     if not os.path.exists(filename):
                         continue
@@ -442,8 +442,8 @@ done
             return mw.returnJson(True, '批量删除成功！')
 
     def checkExistsFilesApi(self):
-        dfile = request.form.get('dfile', '').encode('utf-8')
-        filename = request.form.get('filename', '').encode('utf-8')
+        dfile = request.form.get('dfile', '')
+        filename = request.form.get('filename', '')
         data = []
         filesx = []
         if filename == '':
@@ -451,7 +451,7 @@ done
         else:
             filesx.append(filename)
 
-        print filesx
+        # print(filesx)
 
         for fn in filesx:
             if fn == '.':
@@ -467,9 +467,9 @@ done
         return mw.returnJson(True, 'ok', data)
 
     def batchPasteApi(self):
-        path = request.form.get('path', '').encode('utf-8')
-        stype = request.form.get('type', '').encode('utf-8')
-        # filename = request.form.get('filename', '').encode('utf-8')
+        path = request.form.get('path', '')
+        stype = request.form.get('type', '')
+        # filename = request.form.get('filename', '')
         import shutil
         if not self.checkDir(path):
             return mw.returnJson(False, '请不要花样作死!')
@@ -483,8 +483,8 @@ done
                 try:
 
                     sfile = session['selected'][
-                        'path'] + '/' + key.encode('utf-8')
-                    dfile = path + '/' + key.encode('utf-8')
+                        'path'] + '/' + key
+                    dfile = path + '/' + key
 
                     if os.path.isdir(sfile):
                         shutil.copytree(sfile, dfile)
@@ -504,8 +504,8 @@ done
                     mw.writeSpeed(key, i, l)
 
                     sfile = session['selected'][
-                        'path'] + '/' + key.encode('utf-8')
-                    dfile = path + '/' + key.encode('utf-8')
+                        'path'] + '/' + key
+                    dfile = path + '/' + key
 
                     shutil.move(sfile, dfile)
                 except:
@@ -520,8 +520,8 @@ done
         return mw.returnJson(True, msg)
 
     def copyFileApi(self):
-        sfile = request.form.get('sfile', '').encode('utf-8')
-        dfile = request.form.get('dfile', '').encode('utf-8')
+        sfile = request.form.get('sfile', '')
+        dfile = request.form.get('dfile', '')
 
         if not os.path.exists(sfile):
             return mw.returnJson(False, '指定文件不存在!')
@@ -562,6 +562,7 @@ done
 
     # 检查敏感目录
     def checkDir(self, path):
+        path = str(path, encoding='utf-8')
         path = path.replace('//', '/')
         if path[-1:] == '/':
             path = path[:-1]
@@ -806,9 +807,8 @@ done
                 break
             if i < pageObj[1].SHIFT:
                 continue
-
             try:
-                filePath = (path + '/' + filename).encode('utf8')
+                filePath = path + '/' + filename
                 link = ''
                 if os.path.islink(filePath):
                     filePath = os.readlink(filePath)
@@ -824,8 +824,9 @@ done
                 user = ''
                 try:
                     user = pwd.getpwuid(stat.st_uid).pw_name
-                except:
+                except Exception as ee:
                     user = str(stat.st_uid)
+
                 size = str(stat.st_size)
                 if os.path.isdir(filePath):
                     dirnames.append(filename + ';' + size + ';' +
@@ -834,10 +835,11 @@ done
                     filenames.append(filename + ';' + size + ';' +
                                      mtime + ';' + accept + ';' + user + ';' + link)
                 n += 1
-            except:
+            except Exception as e:
+                print('getdir:dd.', e)
                 continue
-
         data['DIR'] = sorted(dirnames)
         data['FILES'] = sorted(filenames)
         data['PATH'] = path.replace('//', '/')
+
         return mw.getJson(data)

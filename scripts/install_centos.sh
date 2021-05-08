@@ -96,7 +96,8 @@ fi
 
 cd /www/server/mdserver-web/scripts && ./lib.sh
 
-pip install -r /www/server/mdserver-web/requirements.txt
+pip install -r /www/server/mdserver-web/requirements27.txt
+pip3 install -r /www/server/mdserver-web/requirements.txt
 
 
 cd /www/server/mdserver-web && ./cli.sh start
