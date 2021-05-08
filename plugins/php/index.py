@@ -663,56 +663,56 @@ if __name__ == "__main__":
     version = sys.argv[2]
 
     if func == 'status':
-        print status(version)
+        print(status(version))
     elif func == 'start':
-        print start(version)
+        print(start(version))
     elif func == 'stop':
-        print stop(version)
+        print(stop(version))
     elif func == 'restart':
-        print restart(version)
+        print(restart(version))
     elif func == 'reload':
-        print reload(version)
+        print(reload(version))
     elif func == 'initd_status':
-        print initdStatus(version)
+        print(initdStatus(version))
     elif func == 'initd_install':
-        print initdInstall(version)
+        print(initdInstall(version))
     elif func == 'initd_uninstall':
-        print initdUinstall(version)
+        print(initdUinstall(version))
     elif func == 'fpm_log':
-        print fpmLog(version)
+        print(fpmLog(version))
     elif func == 'fpm_slow_log':
-        print fpmSlowLog(version)
+        print(fpmSlowLog(version))
     elif func == 'conf':
-        print getConf(version)
+        print(getConf(version))
     elif func == 'app_start':
-        print getConfAppStart()
+        print(getConfAppStart())
     elif func == 'get_php_conf':
-        print getPhpConf(version)
+        print(getPhpConf(version))
     elif func == 'submit_php_conf':
-        print submitPhpConf(version)
+        print(submitPhpConf(version))
     elif func == 'get_limit_conf':
-        print getLimitConf(version)
+        print(getLimitConf(version))
     elif func == 'set_max_time':
-        print setMaxTime(version)
+        print(setMaxTime(version))
     elif func == 'set_max_size':
-        print setMaxSize(version)
+        print(setMaxSize(version))
     elif func == 'get_fpm_conf':
-        print getFpmConfig(version)
+        print(getFpmConfig(version))
     elif func == 'set_fpm_conf':
-        print setFpmConfig(version)
+        print(setFpmConfig(version))
     elif func == 'get_fpm_status':
-        print getFpmStatus(version)
+        print(getFpmStatus(version))
     elif func == 'get_disable_func':
-        print getDisableFunc(version)
+        print(getDisableFunc(version))
     elif func == 'set_disable_func':
-        print setDisableFunc(version)
+        print(setDisableFunc(version))
     elif func == 'get_phpinfo':
-        print getPhpinfo(version)
+        print(getPhpinfo(version))
     elif func == 'get_lib_conf':
-        print getLibConf(version)
+        print(getLibConf(version))
     elif func == 'install_lib':
-        print installLib(version)
+        print(installLib(version))
     elif func == 'uninstall_lib':
-        print uninstallLib(version)
+        print(uninstallLib(version))
     else:
-        print "fail"
+        print("fail")

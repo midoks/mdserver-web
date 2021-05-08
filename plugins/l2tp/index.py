@@ -208,26 +208,26 @@ def modUser():
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
-        print status()
+        print(status())
     elif func == 'start':
-        print start()
+        print(start())
     elif func == 'stop':
-        print stop()
+        print(stop())
     elif func == 'restart':
-        print restart()
+        print(restart())
     elif func == 'reload':
-        print reload()
+        print(reload())
     elif func == 'conf':
-        print getPathFile()
+        print(getPathFile())
     elif func == 'conf_psk':
-        print getPathFilePsk()
+        print(getPathFilePsk())
     elif func == 'user_list':
-        print getUserList()
+        print(getUserList())
     elif func == 'add_user':
-        print addUser()
+        print(addUser())
     elif func == 'del_user':
-        print delUser()
+        print(delUser())
     elif func == 'mod_user':
-        print modUser()
+        print(modUser())
     else:
-        print 'error'
+        print('error')

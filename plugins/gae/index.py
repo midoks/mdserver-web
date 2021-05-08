@@ -223,18 +223,18 @@ def projectList():
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
-        print status()
+        print(status())
     elif func == 'project_list':
-        print projectList()
+        print(projectList())
     elif func == 'project_list_edit':
-        print projectListEdit()
+        print(projectListEdit())
     elif func == 'project_list_del':
-        print projectListDel()
+        print(projectListDel())
     elif func == 'project_list_async':
-        print projectListAsync()
+        print(projectListAsync())
     elif func == 'project_list_cmd':
-        print projectListCmd()
+        print(projectListCmd())
     elif func == 'project_list_url':
-        print projectListUrl()
+        print(projectListUrl())
     else:
-        print 'error'
+        print('error')
