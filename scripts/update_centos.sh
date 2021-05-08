@@ -20,7 +20,9 @@ rm -rf /tmp/mdserver-web-master
 yum install -y curl-devel libmcrypt libmcrypt-devel
 
 cd /www/server/mdserver-web/scripts && sh lib.sh
-pip install -r /www/server/mdserver-web/requirements.txt
+
+pip3 install -r /www/server/mdserver-web/requirements.txt
+pip install -r /www/server/mdserver-web/requirements27.txt
 
 
 sh /etc/init.d/mw stop && rm -rf  /www/server/mdserver-web/scripts/init.d/mw && rm -rf  /etc/init.d/mw
