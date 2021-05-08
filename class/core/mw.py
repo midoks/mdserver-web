@@ -554,8 +554,8 @@ def getLocalIp():
             import urllib2
             url = 'http://pv.sohu.com/cityjson?ie=utf-8'
             opener = urllib2.urlopen(url)
-            str = opener.read()
-            ipaddress = re.search('\d+.\d+.\d+.\d+', str).group(0)
+            content = opener.read()
+            ipaddress = re.search('\d+.\d+.\d+.\d+', content).group(0)
             writeFile(filename, ipaddress)
 
         ipaddress = re.search('\d+.\d+.\d+.\d+', ipaddress).group(0)
