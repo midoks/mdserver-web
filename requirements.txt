@@ -18,5 +18,6 @@ ConfigParser==3.5.0
 MySQL-python==1.2.5
 mysql-connector-python
 python-engineio==3.9.0
+gunicorn==19.10.0
 flask-socketio==3.0.1
 # pytest-shutil
