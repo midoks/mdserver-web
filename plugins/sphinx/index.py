@@ -326,36 +326,36 @@ def sphinxCmd():
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
-        print status()
+        print(status())
     elif func == 'start':
-        print start()
+        print(start())
     elif func == 'stop':
-        print stop()
+        print(stop())
     elif func == 'restart':
-        print restart()
+        print(restart())
     elif func == 'reload':
-        print reload()
+        print(reload())
     elif func == 'rebuild':
-        print rebuild()
+        print(rebuild())
     elif func == 'initd_status':
-        print initdStatus()
+        print(initdStatus())
     elif func == 'initd_install':
-        print initdInstall()
+        print(initdInstall())
     elif func == 'initd_uninstall':
-        print initdUinstall()
+        print(initdUinstall())
     elif func == 'conf':
-        print getConf()
+        print(getConf())
     elif func == 'config_tpl':
-        print configTpl()
+        print(configTpl())
     elif func == 'read_config_tpl':
-        print readConfigTpl()
+        print(readConfigTpl())
     elif func == 'run_log':
-        print runLog()
+        print(runLog())
     elif func == 'query_log':
-        print queryLog()
+        print(queryLog())
     elif func == 'run_status':
-        print runStatus()
+        print(runStatus())
     elif func == 'sphinx_cmd':
-        print sphinxCmd()
+        print(sphinxCmd())
     else:
-        print 'error'
+        print('error')

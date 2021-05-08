@@ -209,28 +209,28 @@ def getConfAppStart():
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
-        print status()
+        print(status())
     elif func == 'start':
-        print start()
+        print(start())
     elif func == 'stop':
-        print stop()
+        print(stop())
     elif func == 'restart':
-        print restart()
+        print(restart())
     elif func == 'reload':
-        print reload()
+        print(reload())
     elif func == 'conf':
-        print getConf()
+        print(getConf())
     elif func == 'get_home_page':
-        print getHomePage()
+        print(getHomePage())
     elif func == 'set_php_ver':
-        print setPhpVer()
+        print(setPhpVer())
     elif func == 'get_set_php_ver':
-        print getSetPhpVer()
+        print(getSetPhpVer())
     elif func == 'get_xhprof_port':
-        print getXhPort()
+        print(getXhPort())
     elif func == 'set_xhprof_port':
-        print setXhPort()
+        print(setXhPort())
     elif func == 'app_start':
-        print getConfAppStart()
+        print(getConfAppStart())
     else:
-        print 'error'
+        print('error')

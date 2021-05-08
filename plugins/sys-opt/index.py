@@ -53,22 +53,22 @@ def cronRunLog():
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
-        print status()
+        print(status())
     elif func == 'start':
-        print start()
+        print(start())
     elif func == 'stop':
-        print stop()
+        print(stop())
     elif func == 'restart':
-        print restart()
+        print(restart())
     elif func == 'reload':
-        print reload()
+        print(reload())
     elif func == 'conf':
-        print sysConf()
+        print(sysConf())
     elif func == 'sec_run_log':
-        print secRunLog()
+        print(secRunLog())
     elif func == 'msg_run_log':
-        print msgRunLog()
+        print(msgRunLog())
     elif func == 'cron_run_log':
-        print cronRunLog()
+        print(cronRunLog())
     else:
-        print 'err'
+        print('err')
