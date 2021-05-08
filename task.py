@@ -348,13 +348,13 @@ def systemTask():
                     if reloadNum > 1440:
                         reloadNum = 0
                         restartMw()
-                except Exception, ex:
+                except Exception as ex:
                     print(str(ex))
 
             del(tmp)
             time.sleep(5)
             count += 1
-    except Exception, ex:
+    except Exception as ex:
         print(str(ex))
         import time
         time.sleep(30)
