@@ -172,7 +172,7 @@ case "$1" in
         echo -e "\033[32mMW-Panel default info!\033[0m"
         echo -e "=================================================================="
         echo  "MW-Panel-URL: http://$address:$port$auth_path"
-        echo -e `python $mw_path/tools.py username`
+        echo -e `python3 $mw_path/tools.py username`
         echo -e "password: $password"
         echo -e "\033[33mWarning:\033[0m"
         echo -e "\033[33mIf you cannot access the panel, \033[0m"
