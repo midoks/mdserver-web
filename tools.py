@@ -6,7 +6,7 @@ import json
 import time
 # print sys.path
 
-sys.path.append("/usr/local/lib/python2.7/site-packages")
+sys.path.append("/usr/local/lib/python3.6/site-packages")
 import psutil
 
 sys.path.append(os.getcwd() + "/class/core")
