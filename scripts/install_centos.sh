@@ -85,6 +85,7 @@ yum -y install ncurses-devel mysql-dev locate cmake
 yum -y install python-devel.x86_64
 yum -y install MySQL-python 
 yum -y install epel-release
+yum -y install python36-devel
 
 if [ ! -f '/usr/bin/pip' ];then
 	wget https://bootstrap.pypa.io/pip/2.7/get-pip.py
