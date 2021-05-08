@@ -16,7 +16,7 @@ cryptography==3.3.2
 requests==2.20.0
 ConfigParser==3.5.0
 mysql-connector-python
-python-engineio==3.9.0
+python-engineio==4.1.0
 flask-socketio==3.0.1
 zmq==0.0.0
 # pytest-shutil
