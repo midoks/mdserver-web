@@ -166,7 +166,6 @@ def startTask():
             # mainSafe()
             time.sleep(2)
     except:
-        print "ff"
         time.sleep(60)
         startTask()
 
@@ -350,13 +349,13 @@ def systemTask():
                         reloadNum = 0
                         restartMw()
                 except Exception, ex:
-                    print str(ex)
+                    print(str(ex))
 
             del(tmp)
             time.sleep(5)
             count += 1
     except Exception, ex:
-        print str(ex)
+        print(str(ex))
         import time
         time.sleep(30)
         systemTask()
@@ -386,10 +385,10 @@ def check502():
             if checkPHPVersion(version):
                 continue
             if startPHPVersion(version):
-                print '检测到PHP-' + version + '处理异常,已自动修复!'
+                print('检测到PHP-' + version + '处理异常,已自动修复!')
                 mw.writeLog('PHP守护程序', '检测到PHP-' + version + '处理异常,已自动修复!')
     except Exception as e:
-        print str(e)
+        print(str(e))
 
 
 # 处理指定PHP版本
