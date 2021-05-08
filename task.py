@@ -14,8 +14,8 @@ sys.path.append("/usr/local/lib/python2.7/site-packages")
 import psutil
 
 sys.path.append(os.getcwd() + "/class/core")
-reload(sys)
-sys.setdefaultencoding('utf-8')
+# reload(sys)
+# sys.setdefaultencoding('utf-8')
 import db
 import mw
 
