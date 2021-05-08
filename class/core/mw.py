@@ -10,7 +10,6 @@ import shlex
 import datetime
 import subprocess
 import re
-import hashlib
 
 import db
 
@@ -35,7 +34,17 @@ def execShell(cmdstring, cwd=None, timeout=None, shell=True):
             if end_time <= datetime.datetime.now():
                 raise Exception("Timeout：%s" % cmdstring)
 
-    return sub.communicate()
+    if sys.version_info[0] == 2:
+        return sub.communicate()
+
+    data = sub.communicate()
+    # python3 fix 返回byte数据
+    if isinstance(data[0], bytes):
+        t1 = str(data[0], encoding='utf-8')
+
+    if isinstance(data[1], bytes):
+        t2 = str(data[1], encoding='utf-8')
+    return (t1, t2)
 
 
 def getRunDir():
@@ -143,19 +152,19 @@ def getPageObject(args, result='1,2,3,4,5,8'):
     info = {}
 
     info['count'] = 0
-    if args.has_key('count'):
+    if 'count' in args:
         info['count'] = int(args['count'])
 
     info['row'] = 10
-    if args.has_key('row'):
+    if 'row' in args:
         info['row'] = int(args['row'])
 
     info['p'] = 1
-    if args.has_key('p'):
+    if 'p' in args:
         info['p'] = int(args['p'])
     info['uri'] = {}
     info['return_js'] = ''
-    if args.has_key('tojs'):
+    if 'tojs' in args:
         info['return_js'] = args['tojs']
 
     return (page.GetPage(info, result), page)
@@ -165,9 +174,10 @@ def md5(str):
     # 生成MD5
     try:
         m = hashlib.md5()
-        m.update(str)
+        m.update(str.encode("utf-8"))
         return m.hexdigest()
-    except:
+    except Exception as ex:
+        print(ex)
         return False
 
 
@@ -273,7 +283,8 @@ def readFile(filename):
         fBody = fp.read()
         fp.close()
         return fBody
-    except:
+    except Exception as e:
+        # print('readFile:', e)
         return False
 
 
@@ -301,7 +312,7 @@ def writeLog(type, logMsg, args=()):
         data = (type, logMsg, mDate)
         result = sql.table('logs').add('type,log,addtime', data)
     except Exception as e:
-        print e
+        print(e)
 
 
 def writeFile(filename, str):
@@ -529,8 +540,8 @@ def downloadFile(url, filename):
 
 def downloadHook(count, blockSize, totalSize):
     speed = {'total': totalSize, 'block': blockSize, 'count': count}
-    print speed
-    print '%02d%%' % (100.0 * count * blockSize / totalSize)
+    print(speed)
+    print('%02d%%' % (100.0 * count * blockSize / totalSize))
 
 
 def getLocalIp():

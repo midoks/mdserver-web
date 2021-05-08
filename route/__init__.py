@@ -7,8 +7,8 @@ import time
 import shutil
 import uuid
 
-reload(sys)
-sys.setdefaultencoding('utf-8')
+# reload(sys)
+#  sys.setdefaultencoding('utf-8')
 
 
 from datetime import timedelta
@@ -114,10 +114,10 @@ def publicObject(toObject, func, action=None, get=None):
 
 @app.route("/test")
 def test():
-    print sys.version_info
-    print session
+    print(sys.version_info)
+    print(session)
     os = mw.getOs()
-    print os
+    print(os)
     return mw.getLocalIp()
 
 
@@ -135,13 +135,15 @@ def code():
     import vilidate
     vie = vilidate.vieCode()
     codeImage = vie.GetCodeImage(80, 4)
-    try:
-        from cStringIO import StringIO
-    except:
-        from StringIO import StringIO
+    # try:
+    #     from cStringIO import StringIO
+    # except:
+    #     from StringIO import StringIO
 
-    out = StringIO()
+    out = io.BytesIO()
     codeImage[0].save(out, "png")
+
+    print(codeImage[1])
 
     session['code'] = mw.md5(''.join(codeImage[1]).lower())
 
@@ -174,15 +176,21 @@ def doLogin():
     username = request.form.get('username', '').strip()
     password = request.form.get('password', '').strip()
     code = request.form.get('code', '').strip()
-
-    if session.has_key('code'):
-        if session['code'] != mw.md5(code):
-            return mw.returnJson(False, '验证码错误,请重新输入!')
+    print(session)
+    # if 'code' in session:
+    #     if session['code'] != mw.md5(code):
+    #         return mw.returnJson(False, '验证码错误,请重新输入!')
 
     userInfo = mw.M('users').where(
         "id=?", (1,)).field('id,username,password').find()
 
+    print(userInfo)
+    print(password)
+
     password = mw.md5(password)
+
+    print('md5-pass', password)
+
     login_cache_count = 5
     login_cache_limit = cache.get('login_cache_limit')
     filename = 'data/close.pl'
@@ -277,7 +285,7 @@ done
 '''
     if not mw.isAppleSystem():
         info = mw.execShell(sh)
-        print info[0], info[1]
+        print(info[0], info[1])
 
 
 def connect_ssh():

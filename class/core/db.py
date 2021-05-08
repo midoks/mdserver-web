@@ -26,7 +26,7 @@ class Sql():
         try:
             if self.__DB_CONN == None:
                 self.__DB_CONN = sqlite3.connect(self.__DB_FILE)
-        except Exception, ex:
+        except Exception as ex:
             return "error: " + str(ex)
 
     def dbfile(self, name):
@@ -96,7 +96,7 @@ class Sql():
                 del(tmp)
             self.__close()
             return data
-        except Exception, ex:
+        except Exception as ex:
             return "error: " + str(ex)
 
     def getField(self, keyName):
@@ -142,7 +142,7 @@ class Sql():
             self.__close()
             self.__DB_CONN.commit()
             return id
-        except Exception, ex:
+        except Exception as ex:
             return "error: " + str(ex)
 
     def checkInput(self, data):
@@ -176,7 +176,7 @@ class Sql():
                 "(" + keys + ") " + "VALUES(" + values + ")"
             result = self.__DB_CONN.execute(sql, param)
             return True
-        except Exception, ex:
+        except Exception as ex:
             return "error: " + str(ex)
 
     def commit(self):
@@ -206,7 +206,7 @@ class Sql():
             self.__close()
             self.__DB_CONN.commit()
             return result.rowcount
-        except Exception, ex:
+        except Exception as ex:
             return "error: " + str(ex)
 
     def delete(self, id=None):
@@ -221,7 +221,7 @@ class Sql():
             self.__close()
             self.__DB_CONN.commit()
             return result.rowcount
-        except Exception, ex:
+        except Exception as ex:
             return "error: " + str(ex)
 
     def execute(self, sql, param):
@@ -232,7 +232,7 @@ class Sql():
             result = self.__DB_CONN.execute(sql, param)
             self.__DB_CONN.commit()
             return result.rowcount
-        except Exception, ex:
+        except Exception as ex:
             return "error: " + str(ex)
 
     def query(self, sql, param):
@@ -243,7 +243,7 @@ class Sql():
             # 将元组转换成列表
             data = map(list, result)
             return data
-        except Exception, ex:
+        except Exception as ex:
             return "error: " + str(ex)
 
     def create(self, name):
