@@ -66,6 +66,6 @@ def checkArgs(data, ck=[]):
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
-        print 'start'
+        print('start')
     else:
-        print "fail"
+        print("fail")

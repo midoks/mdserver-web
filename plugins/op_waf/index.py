@@ -908,21 +908,21 @@ def getWafSite():
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
-        print status()
+        print(status())
     elif func == 'start':
-        print start()
+        print(start())
     elif func == 'stop':
-        print stop()
+        print(stop())
     elif func == 'restart':
-        print restart()
+        print(restart())
     elif func == 'reload':
-        print reload()
+        print(reload())
     elif func == 'conf':
-        print getConf()
+        print(getConf())
     elif func == 'get_rule':
-        print getRule()
+        print(getRule())
     elif func == 'add_rule':
-        print addRule()
+        print(addRule())
     elif func == 'remove_rule':
         print removeRule()
     elif func == 'set_rule_state':

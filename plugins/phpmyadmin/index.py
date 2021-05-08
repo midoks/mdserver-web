@@ -203,26 +203,26 @@ def setPmaPort():
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
-        print status()
+        print(status())
     elif func == 'start':
-        print start()
+        print(start())
     elif func == 'stop':
-        print stop()
+        print(stop())
     elif func == 'restart':
-        print restart()
+        print(restart())
     elif func == 'reload':
-        print reload()
+        print(reload())
     elif func == 'conf':
-        print getConf()
+        print(getConf())
     elif func == 'get_home_page':
-        print getHomePage()
+        print(getHomePage())
     elif func == 'set_php_ver':
-        print setPhpVer()
+        print(setPhpVer())
     elif func == 'get_set_php_ver':
-        print getSetPhpVer()
+        print(getSetPhpVer())
     elif func == 'get_pma_port':
-        print getPmaPort()
+        print(getPmaPort())
     elif func == 'set_pma_port':
-        print setPmaPort()
+        print(setPmaPort())
     else:
-        print 'error'
+        print('error')
