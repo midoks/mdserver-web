@@ -25,7 +25,7 @@ from flask_caching import Cache
 from flask_session import Session
 
 sys.path.append(os.getcwd() + "/class/core")
-sys.path.append("/usr/local/lib/python2.7/site-packages")
+# sys.path.append("/usr/local/lib/python3.6/site-packages")
 
 import db
 import mw
