@@ -4,10 +4,11 @@ import sys
 import os
 import json
 import time
+import psutil
 # print sys.path
 
 sys.path.append("/usr/local/lib/python3.6/site-packages")
-import psutil
+
 
 sys.path.append(os.getcwd() + "/class/core")
 # reload(sys)
