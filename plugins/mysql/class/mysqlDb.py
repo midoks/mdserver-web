@@ -66,7 +66,7 @@ class mysqlDb:
             self.__DB_CONN.commit()
             self.__Close()
             return result
-        except Exception, ex:
+        except Exception as ex:
             return ex
 
     def query(self, sql):
