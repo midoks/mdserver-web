@@ -121,7 +121,7 @@ def start():
         conf_tpl = getPluginDir() + '/conf/config.inc.php'
         centent = mw.readFile(conf_tpl)
         # centent = contentReplace(centent)
-        print mw.writeFile(conf_run, centent)
+        print(mw.writeFile(conf_run, centent))
 
     mw.restartWeb()
     return 'ok'
