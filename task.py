@@ -10,7 +10,7 @@ import time
 import threading
 # print sys.path
 
-# sys.path.append("/usr/local/lib/python3.6/site-packages")
+sys.path.append("/usr/local/lib/python3.6/site-packages")
 import psutil
 
 sys.path.append(os.getcwd() + "/class/core")
