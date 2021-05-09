@@ -656,7 +656,7 @@ def getConfAppStart():
 if __name__ == "__main__":
 
     if len(sys.argv) < 3:
-        print 'missing parameters'
+        print('missing parameters')
         exit(0)
 
     func = sys.argv[1]
