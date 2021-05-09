@@ -159,7 +159,7 @@ def initDreplace():
 
     # Openresty is not installed
     if not os.path.exists(getServerDir()):
-        print "ok"
+        print("ok")
         exit(0)
 
     file_bin = initD_path + '/' + getPluginName()
