@@ -24,7 +24,7 @@ class mysqlDb:
             socket = '/tmp/mysql.sock'
             try:
                 import MySQLdb
-            except Exception, ex:
+            except Exception as ex:
                 self.__DB_ERR = ex
                 return False
             try:
@@ -44,7 +44,7 @@ class mysqlDb:
                                                  port=self.__DB_PORT, charset="utf8", connect_timeout=1, unix_socket=socket)
             self.__DB_CUR = self.__DB_CONN.cursor()
             return True
-        except MySQLdb.Error, e:
+        except MySQLdb.Error as e:
             self.__DB_ERR = e
             return False
 
@@ -80,7 +80,7 @@ class mysqlDb:
             data = map(list, result)
             self.__Close()
             return data
-        except Exception, ex:
+        except Exception as ex:
             return ex
 
     # 关闭连接
