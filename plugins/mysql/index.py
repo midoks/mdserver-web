@@ -1083,7 +1083,7 @@ def toSize(size):
         size = size / 1024
         s = b
     _size = round(size, 2)
-    print size, _size
+    # print(size, _size)
     return str(size) + ' ' + b
 
 
