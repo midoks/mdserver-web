@@ -744,7 +744,7 @@ def getDbList():
     clist = conn.where(condition, ()).field(
         field).limit(limit).order('id desc').select()
 
-    for x in xrange(0, len(clist)):
+    for x in range(0, len(clist)):
         dbname = clist[x]['name']
         blist = getDbBackupListFunc(dbname)
         # print(blist)
