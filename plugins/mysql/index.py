@@ -195,7 +195,7 @@ def binLog():
         restart()
     else:
         path = getDataDir()
-        if args.has_key('status'):
+        if 'status' in args:
             dsize = 0
             for n in os.listdir(path):
                 if len(n) < 9:
