@@ -701,7 +701,7 @@ def getDbBackupList():
     r = getDbBackupListFunc(args['name'])
     bkDir = mw.getRootDir() + '/backup/database'
     rr = []
-    for x in xrange(0, len(r)):
+    for x in range(0, len(r)):
         p = bkDir + '/' + r[x]
         data = {}
         data['name'] = r[x]
@@ -1305,7 +1305,7 @@ def getMasterDbList(version=''):
         field).limit(limit).order('id desc').select()
     count = conn.where(condition, ()).count()
 
-    for x in xrange(0, len(clist)):
+    for x in range(0, len(clist)):
         if clist[x]['name'] in dodb:
             clist[x]['master'] = 1
         else:
@@ -1339,7 +1339,7 @@ def setDbMaster(version):
     dodb = re.findall(rep, con, re.M)
 
     isHas = False
-    for x in xrange(0, len(dodb)):
+    for x in range(0, len(dodb)):
 
         if dodb[x][1] == args['name']:
             isHas = True
@@ -1370,7 +1370,7 @@ def setDbSlave(version):
     dodb = re.findall(rep, con, re.M)
 
     isHas = False
-    for x in xrange(0, len(dodb)):
+    for x in range(0, len(dodb)):
         if dodb[x][1] == args['name']:
             isHas = True
 
@@ -1426,7 +1426,7 @@ def setMasterStatus(version=''):
         con = con.replace("binlog-do-db=" + sign + "\n", '')
         rep = r"(binlog-do-db\s*?=\s*?(.*))"
         dodb = re.findall(rep, con, re.M)
-        for x in xrange(0, len(dodb)):
+        for x in range(0, len(dodb)):
             con = con.replace(dodb[x][0] + "\n", '')
         mw.writeFile(conf, con)
 
@@ -1602,7 +1602,7 @@ def getSlaveList(version=''):
 
     # print(dlist)
     ret = []
-    for x in xrange(0, len(dlist)):
+    for x in range(0, len(dlist)):
         tmp = {}
         tmp['Master_User'] = dlist[x][2]
         tmp['Master_Host'] = dlist[x][1]
