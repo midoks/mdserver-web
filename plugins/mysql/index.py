@@ -519,10 +519,14 @@ def runInfo():
         pass
 
     result = {}
+
+    # print(data)
     for d in data:
         for g in gets:
             if d[0] == g:
                 result[g] = d[1]
+
+    # print(result, int(result['Uptime']))
     result['Run'] = int(time.time()) - int(result['Uptime'])
     tmp = db.query('show master status')
     try:
@@ -1666,7 +1670,7 @@ from threading import Thread
 from time import sleep
 
 
-def async(f):
+def mw_async(f):
     def wrapper(*args, **kwargs):
         thr = Thread(target=f, args=args, kwargs=kwargs)
         thr.start()
