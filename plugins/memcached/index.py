@@ -161,7 +161,7 @@ def saveConf():
      # 设置memcached缓存大小
     import re
     confFile = getConf()
-    print confFile
+    # print confFile
     try:
         args = getArgs()
         content = mw.readFile(confFile)
