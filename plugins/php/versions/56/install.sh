@@ -10,18 +10,18 @@ sourcePath=${serverPath}/source
 sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 
-version=5.6.36
+version=5.6.40
 PHP_VER=56
 Install_php()
 {
 #------------------------ install start ------------------------------------#
-echo "安装php-5.6.36 ..." > $install_tmp
+echo "安装php-5.6.40 ..." > $install_tmp
 mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
 if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 	if [ ! -f $sourcePath/php/php-${version}.tar.xz ];then
-		wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz http://au1.php.net/distributions/php-${version}.tar.xz
+		wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz https://museum.php.net/php5/php-${version}.tar.xz
 	fi
 	
 	cd $sourcePath/php && tar -Jxf $sourcePath/php/php-${version}.tar.xz

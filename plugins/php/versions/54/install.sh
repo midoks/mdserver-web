@@ -22,7 +22,7 @@ mkdir -p $serverPath/php
 
 if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 	if [ ! -f $sourcePath/php/php-${version}.tar.gz ];then
-		wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.gz http://au1.php.net/distributions/php-${version}.tar.gz
+		wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.gz https://museum.php.net/php5/php-${version}.tar.gz
 	fi
 	
 	cd $sourcePath/php && tar -zxvf $sourcePath/php/php-${version}.tar.gz
