@@ -282,34 +282,34 @@ def dhtCmd():
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
-        print status()
+        print(status())
     elif func == 'start':
-        print start()
+        print(start())
     elif func == 'stop':
-        print stop()
+        print(stop())
     elif func == 'restart':
-        print restart()
+        print(restart())
     elif func == 'reload':
-        print reload()
+        print(reload())
     elif func == 'initd_status':
-        print initdStatus()
+        print(initdStatus())
     elif func == 'initd_install':
-        print initdInstall()
+        print(initdInstall())
     elif func == 'initd_uninstall':
-        print initdUinstall()
+        print(initdUinstall())
     elif func == 'get_sql':
-        print getSqlFile()
+        print(getSqlFile())
     elif func == 'get_db_conf':
-        print getDbConf()
+        print(getDbConf())
     elif func == 'get_checkdb_pos':
-        print getCheckdbPos()
+        print(getCheckdbPos())
     elif func == 'get_black_list':
-        print getBlackList()
+        print(getBlackList())
     elif func == 'get_run_Log':
-        print getRunLog()
+        print(getRunLog())
     elif func == 'get_trend_data':
-        print getTrendData()
+        print(getTrendData())
     elif func == 'dht_cmd':
-        print dhtCmd()
+        print(dhtCmd())
     else:
-        print 'error'
+        print('error')
