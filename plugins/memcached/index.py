@@ -153,7 +153,7 @@ def runInfo():
         result['cachesize'] = int(
             re.search('CACHESIZE=(\d+)', conf).groups()[0])
         return mw.getJson(result)
-    except Exception, e:
+    except Exception as e:
         return mw.getJson({})
 
 
