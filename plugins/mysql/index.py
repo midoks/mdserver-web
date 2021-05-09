@@ -187,7 +187,7 @@ def binLog():
     con = mw.readFile(conf)
 
     if con.find('#log-bin=mysql-bin') != -1:
-        if args.has_key('status'):
+        if 'status' in args:
             return mw.returnJson(False, '0')
         con = con.replace('#log-bin=mysql-bin', 'log-bin=mysql-bin')
         con = con.replace('#binlog_format=mixed', 'binlog_format=mixed')
@@ -241,7 +241,7 @@ def getErrorLog():
     # print filename
     if not os.path.exists(filename):
         return mw.returnJson(False, '指定文件不存在!')
-    if args.has_key('close'):
+    if 'close' in args:
         mw.writeFile(filename, '')
         return mw.returnJson(False, '日志已清空')
     info = mw.getNumLines(filename, 18)
