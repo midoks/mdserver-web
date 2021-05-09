@@ -781,7 +781,7 @@ class plugins_api:
     def run(self, name, func, version, args='', script='index'):
         path = mw.getRunDir() + '/' + self.__plugin_dir + \
             '/' + name + '/' + script + '.py'
-        py = 'python ' + path
+        py = 'python3 ' + path
 
         if args == '':
             py_cmd = py + ' ' + func + ' ' + version
