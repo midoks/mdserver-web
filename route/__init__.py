@@ -176,20 +176,20 @@ def doLogin():
     username = request.form.get('username', '').strip()
     password = request.form.get('password', '').strip()
     code = request.form.get('code', '').strip()
-    print(session)
-    # if 'code' in session:
-    #     if session['code'] != mw.md5(code):
-    #         return mw.returnJson(False, '验证码错误,请重新输入!')
+    # print(session)
+    if 'code' in session:
+        if session['code'] != mw.md5(code):
+            return mw.returnJson(False, '验证码错误,请重新输入!')
 
     userInfo = mw.M('users').where(
         "id=?", (1,)).field('id,username,password').find()
 
-    print(userInfo)
-    print(password)
+    # print(userInfo)
+    # print(password)
 
     password = mw.md5(password)
 
-    print('md5-pass', password)
+    # print('md5-pass', password)
 
     login_cache_count = 5
     login_cache_limit = cache.get('login_cache_limit')
@@ -264,7 +264,7 @@ try:
     import paramiko
     ssh = paramiko.SSHClient()
 except:
-    mw.execShell('pip install paramiko==2.0.2 &')
+    mw.execShell('pip3 install paramiko &')
 
 
 def create_rsa():
