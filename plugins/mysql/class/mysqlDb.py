@@ -38,7 +38,7 @@ class mysqlDb:
             try:
                 self.__DB_CONN = MySQLdb.connect(host=self.__DB_HOST, user=self.__DB_USER, passwd=self.__DB_PASS,
                                                  port=self.__DB_PORT, charset="utf8", connect_timeout=1, unix_socket=socket)
-            except MySQLdb.Error, e:
+            except MySQLdb.Error as e:
                 self.__DB_HOST = '127.0.0.1'
                 self.__DB_CONN = MySQLdb.connect(host=self.__DB_HOST, user=self.__DB_USER, passwd=self.__DB_PASS,
                                                  port=self.__DB_PORT, charset="utf8", connect_timeout=1, unix_socket=socket)
