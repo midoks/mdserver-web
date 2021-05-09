@@ -8,8 +8,8 @@ import subprocess
 import re
 import json
 
-reload(sys)
-sys.setdefaultencoding('utf-8')
+# reload(sys)
+# sys.setdefaultencoding('utf-8')
 
 sys.path.append(os.getcwd() + "/class/core")
 import mw
