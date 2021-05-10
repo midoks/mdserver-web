@@ -11,6 +11,12 @@ import threading
 # print sys.path
 
 
+sys.path.append(os.getcwd() + "/class/core")
+# reload(sys)
+# sys.setdefaultencoding('utf-8')
+import db
+import mw
+
 if mw.isAppleSystem():
     cmd = 'ls /usr/local/lib/ | grep python  | cut -d \\  -f 1 | awk \'END {print}\''
     info = mw.execShell(cmd)
@@ -19,12 +25,6 @@ if mw.isAppleSystem():
 
 
 import psutil
-
-sys.path.append(os.getcwd() + "/class/core")
-# reload(sys)
-# sys.setdefaultencoding('utf-8')
-import db
-import mw
 
 
 global pre, timeoutCount, logPath, isTask, oldEdate, isCheck
