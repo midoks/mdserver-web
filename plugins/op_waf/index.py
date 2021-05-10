@@ -924,66 +924,66 @@ if __name__ == "__main__":
     elif func == 'add_rule':
         print(addRule())
     elif func == 'remove_rule':
-        print removeRule()
+        print(removeRule())
     elif func == 'set_rule_state':
-        print setRuleState()
+        print(setRuleState())
     elif func == 'modify_rule':
-        print modifyRule()
+        print(modifyRule())
     elif func == 'get_site_rule':
-        print getSiteRule()
+        print(getSiteRule())
     elif func == 'add_site_rule':
-        print addSiteRule()
+        print(addSiteRule())
     elif func == 'add_ip_white':
-        print addIpWhite()
+        print(addIpWhite())
     elif func == 'remove_ip_white':
-        print removeIpWhite()
+        print(removeIpWhite())
     elif func == 'add_ip_black':
-        print addIpBlack()
+        print(addIpBlack())
     elif func == 'remove_ip_black':
-        print removeIpBlack()
+        print(removeIpBlack())
     elif func == 'set_ipv6_black':
-        print setIpv6Black()
+        print(setIpv6Black())
     elif func == 'del_ipv6_black':
-        print delIpv6Black()
+        print(delIpv6Black())
     elif func == 'remove_site_rule':
-        print removeSiteRule()
+        print(removeSiteRule())
     elif func == 'set_obj_status':
-        print setObjStatus()
+        print(setObjStatus())
     elif func == 'set_obj_open':
-        print setObjOpen()
+        print(setObjOpen())
     elif func == 'set_site_obj_open':
-        print setSiteObjOpen()
+        print(setSiteObjOpen())
     elif func == 'set_cc_conf':
-        print setCcConf()
+        print(setCcConf())
     elif func == 'set_site_cc_conf':
-        print setSiteCcConf()
+        print(setSiteCcConf())
     elif func == 'set_retry':
-        print setRetry()
+        print(setRetry())
     elif func == 'set_site_retry':
-        print setSiteRetry()
+        print(setSiteRetry())
     elif func == 'save_scan_rule':
-        print saveScanRule()
+        print(saveScanRule())
     elif func == 'get_site_config':
-        print getSiteConfig()
+        print(getSiteConfig())
     elif func == 'get_site_config_byname':
-        print getSiteConfigByName()
+        print(getSiteConfigByName())
     elif func == 'add_site_cdn_header':
-        print addSiteCdnHeader()
+        print(addSiteCdnHeader())
     elif func == 'remove_site_cdn_header':
-        print removeSiteCdnHeader()
+        print(removeSiteCdnHeader())
     elif func == 'get_logs_list':
-        print getLogsList()
+        print(getLogsList())
     elif func == 'get_safe_logs':
-        print getSafeLogs()
+        print(getSafeLogs())
     elif func == 'output_data':
-        print outputData()
+        print(outputData())
     elif func == 'import_data':
-        print importData()
+        print(importData())
     elif func == 'waf_srceen':
-        print getWafSrceen()
+        print(getWafSrceen())
     elif func == 'waf_conf':
-        print getWafConf()
+        print(getWafConf())
     elif func == 'waf_site':
-        print getWafSite()
+        print(getWafSite())
     else:
         print('error')
