@@ -8,11 +8,19 @@ import subprocess
 import re
 import json
 
+
 # reload(sys)
 # sys.setdefaultencoding('utf-8')
 
 sys.path.append(os.getcwd() + "/class/core")
 import mw
+
+
+if mw.isAppleSystem():
+    cmd = 'ls /usr/local/lib/ | grep python  | cut -d \\  -f 1 | awk \'END {print}\''
+    info = mw.execShell(cmd)
+    p = "/usr/local/lib/" + info[0].strip() + "/site-packages"
+    sys.path.append(p)
 
 
 app_debug = False
@@ -521,6 +529,7 @@ def runInfo():
     result = {}
 
     # print(data)
+
     for d in data:
         for g in gets:
             if d[0] == g:
