@@ -10,7 +10,14 @@ import time
 import threading
 # print sys.path
 
-sys.path.append("/usr/local/lib/python3.6/site-packages")
+
+if mw.isAppleSystem():
+    cmd = 'ls /usr/local/lib/ | grep python  | cut -d \\  -f 1 | awk \'END {print}\''
+    info = mw.execShell(cmd)
+    p = "/usr/local/lib/" + info[0].strip() + "/site-packages"
+    sys.path.append(p)
+
+
 import psutil
 
 sys.path.append(os.getcwd() + "/class/core")
@@ -39,14 +46,14 @@ if not os.path.exists(isTask):
     os.system("touch " + isTask)
 
 
-def async(f):
+def mw_async(f):
     def wrapper(*args, **kwargs):
         thr = threading.Thread(target=f, args=args, kwargs=kwargs)
         thr.start()
     return wrapper
 
 
-@async
+@mw_async
 def restartMw():
     time.sleep(1)
     cmd = mw.getRunDir() + '/scripts/init.d/mw restart'
