@@ -4,7 +4,16 @@ import re
 import os
 import sys
 
-# sys.path.append("/usr/local/lib/python3.6/site-packages")
+# sys.path.append("/usr/local/lib/python3.9/site-packages")
+
+sys.path.append(os.getcwd() + "/class/core")
+import mw
+
+# if mw.isAppleSystem():
+#     cmd = 'ls /usr/local/lib/ | grep python  | cut -d \\  -f 1 | awk \'END {print}\''
+#     info = mw.execShell(cmd)
+#     p = "/usr/local/lib/" + info[0].strip() + "/site-packages"
+#     sys.path.append(p)
 
 
 class mysqlDb:
@@ -25,6 +34,7 @@ class mysqlDb:
             try:
                 import MySQLdb
             except Exception as ex:
+                # print('dd')
                 self.__DB_ERR = ex
                 return False
             try:
