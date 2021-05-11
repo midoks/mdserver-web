@@ -51,7 +51,7 @@ mw_start(){
     isStart=$(ps aux |grep 'task.py'|grep -v grep|awk '{print $2}')
     if [ "$isStart" == '' ];then
             echo -e "Starting mw-tasks... \c"
-            cd $mw_path && nohup python task.py >> $mw_path/logs/task.log 2>&1 &
+            cd $mw_path && nohup python3 task.py >> $mw_path/logs/task.log 2>&1 &
             sleep 0.3
             isStart=$(ps aux |grep 'task.py'|grep -v grep|awk '{print $2}')
             if [ "$isStart" == '' ];then
