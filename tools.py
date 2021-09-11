@@ -4,18 +4,16 @@ import sys
 import os
 import json
 import time
-import psutil
-# print sys.path
-
-sys.path.append("/usr/local/lib/python3.6/site-packages")
-
 
 sys.path.append(os.getcwd() + "/class/core")
-# reload(sys)
-# sys.setdefaultencoding('utf-8')
-
-import db
 import mw
+import db
+
+cmd = 'ls /usr/local/lib/ | grep python  | cut -d \\  -f 1 | awk \'END {print}\''
+info = mw.execShell(cmd)
+p = "/usr/local/lib/" + info[0].strip() + "/site-packages"
+sys.path.append(p)
+import psutil
 
 
 def set_mysql_root(password):
