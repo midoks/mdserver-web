@@ -6,8 +6,14 @@ import sys
 import os
 chdir = os.getcwd()
 sys.path.append(chdir + '/class/core')
-sys.path.append("/usr/local/lib/python3.6/site-packages")
+
 import mw
+
+cmd = 'ls /usr/local/lib/ | grep python  | cut -d \\  -f 1 | awk \'END {print}\''
+info = mw.execShell(cmd)
+p = "/usr/local/lib/" + info[0].strip() + "/site-packages"
+sys.path.append(p)
+
 import system_api
 cpu_info = system_api.system_api().getCpuInfo()
 workers = cpu_info[1]
