@@ -45,7 +45,7 @@
       "protocol": "shadowsocks",
       "port": 30008, 
       "settings": {
-        "method": "aes-256-cfb", 
+        "method": "aes-128-gcm", 
         "password": "123123123",
         "udp": false
       }
