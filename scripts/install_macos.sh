@@ -37,8 +37,10 @@ if [ ! -d $DEV/server/lib ]; then
 fi  
 
 
-cd /www/server/mdserver-web && python3 -m venv /www/server/mdserver-web \
-source /www/server/mdserver-web/bin/activate && pip install -r $DEV/server/mdserver-web/requirements.txt
+chmod 755 $DEV/server/mdserver-web/data
+
+cd $DEV/server/mdserver-web && python3 -m venv $DEV/server/mdserver-web \
+source $DEV/server/mdserver-web/bin/activate && pip install -r $DEV/server/mdserver-web/requirements.txt
 
 cd $DEV/server/mdserver-web && ./cli.sh start
 cd $DEV/server/mdserver-web && ./cli.sh stop
