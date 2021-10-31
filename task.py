@@ -12,10 +12,11 @@ import threading
 
 
 sys.path.append(os.getcwd() + "/class/core")
+import mw
+
 # reload(sys)
 # sys.setdefaultencoding('utf-8')
 import db
-import mw
 
 
 cmd = 'ls /usr/local/lib/ | grep python  | cut -d \\  -f 1 | awk \'END {print}\''
