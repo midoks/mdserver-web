@@ -343,34 +343,34 @@ def cmdRec():
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
-        print status()
+        print(status())
     elif func == 'start':
-        print start()
+        print(start())
     elif func == 'stop':
-        print stop()
+        print(stop())
     elif func == 'restart':
-        print restart()
+        print(restart())
     elif func == 'reload':
-        print reload()
+        print(reload())
     elif func == 'initd_status':
-        print initdStatus()
+        print(initdStatus())
     elif func == 'initd_install':
-        print initdInstall()
+        print(initdInstall())
     elif func == 'initd_uninstall':
-        print initdUinstall()
+        print(initdUinstall())
     elif func == 'conf':
-        print appConf()
+        print(appConf())
     elif func == 'conf_pwd':
-        print appConfPwd()
+        print(appConfPwd())
     elif func == 'run_log':
-        print getLog()
+        print(getLog())
     elif func == 'rec_list':
-        print getRecList()
+        print(getRecList())
     elif func == 'add_rec':
-        print addRec()
+        print(addRec())
     elif func == 'del_rec':
-        print delRec()
+        print(delRec())
     elif func == 'cmd_rec':
-        print cmdRec()
+        print(cmdRec())
     else:
-        print 'error'
+        print('error')
