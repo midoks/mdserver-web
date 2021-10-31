@@ -100,7 +100,7 @@ cd /www/server/mdserver-web/scripts && ./lib.sh
 chmod 755 /www/server/mdserver-web/data
 #venv
 cd /www/server/mdserver-web && python3 -m venv /www/server/mdserver-web
-cd /www/server/mdserver-web && source bin/activate && pip3 install -r /www/server/mdserver-web/requirements.txt
+cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate && pip3 install -r /www/server/mdserver-web/requirements.txt
 
 cd /www/server/mdserver-web && ./cli.sh start
 sleep 5
