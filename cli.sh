@@ -1,7 +1,11 @@
 #!/bin/bash
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/usr/local/lib/python2.7/bin
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 
+DIR=$(cd "$(dirname "$0")"; pwd)
+MDIR=$(dirname "$DIR")
 
+PATH=$PATH:$DIR/bin
+source bin/activate
 
 mw_start(){
 	gunicorn -c setting.py app:app
