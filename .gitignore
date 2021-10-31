@@ -123,3 +123,8 @@ data/datadir.pl
 data/502Task.pl
 data/default.pl
 data/backup.pl
+lib/python*
+bin
+pyvenv.cfg
+include
+data/api_login.txt
