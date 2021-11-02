@@ -17,7 +17,11 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 
 mw_path={$SERVER_PATH}
 PATH=$PATH:$mw_path/bin
-source $mw_path/bin/activate
+
+if [ -f $mw_path/bin/activate ];then
+    source $mw_path/bin/activate
+fi
+
 
 mw_start(){
 	isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`

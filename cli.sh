@@ -4,7 +4,10 @@ DIR=$(cd "$(dirname "$0")"; pwd)
 MDIR=$(dirname "$DIR")
 
 PATH=$PATH:$DIR/bin
-source bin/activate
+
+if [ -f bin/activate ];then
+	source bin/activate
+fi
 
 mw_start(){
 	gunicorn -c setting.py app:app
