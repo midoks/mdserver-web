@@ -98,10 +98,12 @@ yum -y install python36-devel
 cd /www/server/mdserver-web/scripts && ./lib.sh
 
 chmod 755 /www/server/mdserver-web/data
-#venv
-cd /www/server/mdserver-web && python3 -m venv .
-cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate && pip3 install -r /www/server/mdserver-web/requirements.txt
 
+if [ -f /www/server/mdserver-web/bin/activate ];then
+    cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate && pip3 install -r /www/server/mdserver-web/requirements.txt
+else
+    cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
+fi
 cd /www/server/mdserver-web && ./cli.sh start
 sleep 5
 
