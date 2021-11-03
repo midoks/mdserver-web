@@ -25,7 +25,12 @@ chmod 755 /www/server/mdserver-web/data
 
 #venv
 cd /www/server/mdserver-web && python3 -m venv .
-cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate && pip3 install -r /www/server/mdserver-web/requirements.txt
+
+if [ -f /www/server/mdserver-web/bin/activate ];then
+    cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate && pip3 install -r /www/server/mdserver-web/requirements.txt
+else
+    cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
+fi
 
 sh /etc/init.d/mw stop && rm -rf  /www/server/mdserver-web/scripts/init.d/mw && rm -rf  /etc/init.d/mw
 
