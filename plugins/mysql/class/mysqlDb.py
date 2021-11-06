@@ -87,9 +87,9 @@ class mysqlDb:
             self.__DB_CUR.execute(sql)
             result = self.__DB_CUR.fetchall()
             # 将元组转换成列表
-            data = list(map(list, result))
+            # data = list(map(list, result))
             self.__Close()
-            return data
+            return result
         except Exception as ex:
             return ex
 
