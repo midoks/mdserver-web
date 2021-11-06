@@ -178,7 +178,6 @@ def getXhPort():
         port = getPort()
         return mw.returnJson(True, 'OK', port)
     except Exception as e:
-        print e
         return mw.returnJson(False, '插件未启动!')
 
 
