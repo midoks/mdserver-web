@@ -226,7 +226,7 @@ def isSqlError(mysqlMsg):
     if "1044," in _mysqlMsg:
         return mw.returnData(False, mysqlMsg[1])
     if "2003," in _mysqlMsg:
-        return mw.returnData(False, mysqlMsg[1])
+        return mw.returnData(False, "Can't connect to MySQL server on '127.0.0.1' (61)")
     return mw.returnData(True, 'OK')
 
 

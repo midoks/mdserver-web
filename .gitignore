@@ -128,3 +128,4 @@ bin
 pyvenv.cfg
 include
 data/api_login.txt
+data/sessions
