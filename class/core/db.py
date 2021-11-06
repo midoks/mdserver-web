@@ -241,8 +241,8 @@ class Sql():
         try:
             result = self.__DB_CONN.execute(sql, param)
             # 将元组转换成列表
-            data = map(list, result)
-            return data
+            # data = map(list, result)
+            return result
         except Exception as ex:
             return "error: " + str(ex)
 
