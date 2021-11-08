@@ -9,10 +9,10 @@ sys.path.append(chdir + '/class/core')
 
 import mw
 
-cmd = 'ls /usr/local/lib/ | grep python  | cut -d \\  -f 1 | awk \'END {print}\''
-info = mw.execShell(cmd)
-p = "/usr/local/lib/" + info[0].strip() + "/site-packages"
-sys.path.append(p)
+# cmd = 'ls /usr/local/lib/ | grep python  | cut -d \\  -f 1 | awk \'END {print}\''
+# info = mw.execShell(cmd)
+# p = "/usr/local/lib/" + info[0].strip() + "/site-packages"
+# sys.path.append(p)
 
 import system_api
 cpu_info = system_api.system_api().getCpuInfo()
@@ -38,7 +38,7 @@ threads = workers * 1
 backlog = 512
 reload = False
 daemon = True
-#worker_class = 'geventwebsocket.gunicorn.workers.GeventWebSocketWorker'
+worker_class = 'geventwebsocket.gunicorn.workers.GeventWebSocketWorker'
 timeout = 7200
 keepalive = 60
 preload_app = True

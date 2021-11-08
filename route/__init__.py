@@ -67,6 +67,11 @@ from flask_socketio import SocketIO, emit, send
 socketio = SocketIO()
 socketio.init_app(app)
 
+# from gevent.pywsgi import WSGIServer
+# from geventwebsocket.handler import WebSocketHandler
+# http_server = WSGIServer(('0.0.0.0', '7200'), app,
+#                          handler_class=WebSocketHandler)
+# http_server.serve_forever()
 
 # debug macosx dev
 if mw.isAppleSystem():
@@ -319,7 +324,7 @@ def get_input_data(data):
 
 @socketio.on('webssh')
 def webssh(msg):
-    # print 'webssh ...'
+    print('webssh ...')
     if not isLogined():
         emit('server_response', {'data': '会话丢失，请重新登陆面板!\r\n'})
         return None
