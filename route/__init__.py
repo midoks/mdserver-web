@@ -324,7 +324,7 @@ def get_input_data(data):
 
 @socketio.on('webssh')
 def webssh(msg):
-    print('webssh ...')
+    # print('webssh ...')
     if not isLogined():
         emit('server_response', {'data': '会话丢失，请重新登陆面板!\r\n'})
         return None
