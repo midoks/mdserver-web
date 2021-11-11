@@ -8,6 +8,9 @@ GIT_SDIR="{$CODE_DIR}"
 GIT_USER_DIR="${GIT_SDIR}/{$USERNAME}"
 GIT_PROJECT_DIR="${GIT_USER_DIR}/{$PROJECT}"
 
+
+git config --global credential.helper store
+
 # echo $GIT_PROJECT_DIR
 if [ ! -d $GIT_PROJECT_DIR ];then
 	mkdir -p $GIT_USER_DIR && cd $GIT_USER_DIR
