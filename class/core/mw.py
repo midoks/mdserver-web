@@ -113,7 +113,7 @@ def isInstalledWeb():
 def restartWeb():
     if isInstalledWeb():
         initd = getServerDir() + '/openresty/init.d/openresty'
-        execShell(initd + ' ' + 'reload')
+        execShell(initd + ' ' + 'restart')
 
 
 def restartMw():

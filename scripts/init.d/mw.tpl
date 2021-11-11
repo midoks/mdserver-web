@@ -20,6 +20,8 @@ PATH=$PATH:$mw_path/bin
 
 if [ -f $mw_path/bin/activate ];then
     source $mw_path/bin/activate
+else 
+    echo ""
 fi
 
 
