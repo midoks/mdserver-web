@@ -13,7 +13,7 @@
 ### END INIT INFO
 
 
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+PATH=/usr/local/bin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 
 mw_path={$SERVER_PATH}
 PATH=$PATH:$mw_path/bin
