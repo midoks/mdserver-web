@@ -168,6 +168,15 @@ def getSshPort():
     return tmp.groups()[0]
 
 
+def getHttpPort():
+    content = mw.readFile(getConf())
+    rep = 'HTTP_PORT\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    if not tmp:
+        return ''
+    return tmp.groups()[0]
+
+
 def getRootPath():
     content = mw.readFile(getConf())
     rep = 'ROOT\s*=\s*(.*)'
@@ -542,7 +551,7 @@ def projectScriptLoad():
 
     cc_content = mw.readFile(commit_tpl)
 
-    sshUrl = 'ssh://127.0.0.1:' + getSshPort()
+    sshUrl = 'http://127.0.0.1:' + getHttpPort()
     cc_content = cc_content.replace('{$GITROOTURL}', sshUrl)
     cc_content = cc_content.replace('{$CODE_DIR}', codeDir)
     cc_content = cc_content.replace('{$USERNAME}', user)
