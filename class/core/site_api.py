@@ -809,7 +809,7 @@ class site_api:
         ps = request.form.get('ps', '')
         path = request.form.get('path', '')
         version = request.form.get('version', '')
-        port = request.form.get('port', '').decode('utf-8')
+        port = request.form.get('port', '')
         return self.add(webname, port, ps, path, version)
 
     def addDomainApi(self):
@@ -819,7 +819,7 @@ class site_api:
 
         domain = request.form.get('domain', '')
         webname = request.form.get('webname', '')
-        pid = request.form.get('id', '').encode('utf-8')
+        pid = request.form.get('id', '')
         if len(domain) < 3:
             return mw.returnJson(False, '域名不能为空!')
         domains = domain.split(',')
