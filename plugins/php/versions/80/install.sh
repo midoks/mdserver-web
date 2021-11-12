@@ -11,7 +11,7 @@ sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 
 
-version=8.0.6
+version=8.0.12
 PHP_VER=80
 Install_php()
 {

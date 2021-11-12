@@ -166,8 +166,8 @@ function clearSystem() {
 }
 
 function setMemImg(info){
-    setCookie("memRealUsed", parseInt((info.memRealUsed)));
-    $("#memory").html(parseInt((info.memRealUsed)) + '/' + info.memTotal + ' (MB)');
+    setCookie("memRealUsed", parseInt(info.memRealUsed));
+    $("#memory").html(parseInt(info.memRealUsed) + '/' + parseInt(info.memTotal) + ' (MB)');
     setCookie("mem-before", $("#memory").text());
     if (!getCookie('memSize')) setCookie('memSize', parseInt(info.memTotal));
     var memPre = Math.floor(info.memRealUsed / (info.memTotal / 100));
@@ -180,8 +180,8 @@ function setMemImg(info){
 
 function getInfo() {
     $.get("/system/system_total", function(info) {
-        setCookie("memRealUsed", parseInt((info.memRealUsed)));
-        $("#memory").html(parseInt((info.memRealUsed)) + '/' + info.memTotal + ' (MB)');
+        setCookie("memRealUsed", parseInt(info.memRealUsed));
+        $("#memory").html(parseInt(info.memRealUsed) + '/' + parseInt(info.memTotal) + ' (MB)');
         setCookie("mem-before", $("#memory").text());
         if (!getCookie('memSize')) setCookie('memSize', parseInt(info.memTotal));
         var memPre = Math.floor(info.memRealUsed / (info.memTotal / 100));
