@@ -624,6 +624,7 @@ class system_api:
             result = req.read().decode('utf-8')
             print(result)
             version = json.loads(result)
+            print(version)
             return version[0]
         except Exception as e:
             print('getServerInfo', e)
