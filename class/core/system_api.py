@@ -619,7 +619,7 @@ class system_api:
             # requests.adapters.DEFAULT_RETRIES = 2
             # r = requests.get(upAddr, verify=False)
 
-            req = urllib.request.urlopen(upAddr, timeout=timeout)
+            req = urllib.request.urlopen(upAddr, 3)
             result = req.read().decode('utf-8')
             version = json.loads(result)
             return version[0]
