@@ -698,8 +698,6 @@ class plugins_api:
         # print sType, sPage, sPageSize
 
         ret = {}
-
-        print(mw.readFile(self.__type))
         ret['type'] = json.loads(mw.readFile(self.__type))
         # plugins_info = self.getAllListThread(sType)
         # plugins_info = self.getAllListProcess(sType)
