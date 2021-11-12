@@ -24,6 +24,8 @@ else
     echo ""
 fi
 
+export LC_ALL="en_US.UTF-8"
+
 
 mw_start(){
 	isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`
