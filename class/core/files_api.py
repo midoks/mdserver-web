@@ -711,6 +711,9 @@ done
             fp.write(data)
             fp.close()
 
+            if path.find("web_conf") > 0:
+                mw.restartWeb()
+
             mw.writeLog('文件管理', '文件保存成功', (path,))
             return mw.returnJson(True, '文件保存成功')
         except Exception as ex:
