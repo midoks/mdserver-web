@@ -614,6 +614,7 @@ class system_api:
         return ret
 
     def getServerInfo(self):
+        import urllib.request
         upAddr = 'https://raw.githubusercontent.com/midoks/mdserver-web/master/version/info.json'
         try:
             # requests.adapters.DEFAULT_RETRIES = 2
