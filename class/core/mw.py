@@ -366,12 +366,11 @@ def HttpGet(url, timeout=10):
 
 
 def HttpGet2(url, timeout):
-    import urllib2
+    import urllib.request
 
     try:
-        req = urllib2.Request(url)
-        res = urllib2.urlopen(req, timeout=timeout)
-        result = res.read()
+        req = urllib.request.urlopen(url, timeout=timeout)
+        result = req.read().decode('utf-8')
         return result
 
     except Exception as e:
