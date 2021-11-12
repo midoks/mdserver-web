@@ -304,7 +304,7 @@ def sphinxConfParse():
         cmd_index = []
         cmd_delta = []
         for x in range(indexlen):
-            if string.find(sindex[x], ':') != -1:
+            if sindex[x].find(':') != -1:
                 cmd_delta.append(sindex[x])
             else:
                 cmd_index.append(sindex[x])
