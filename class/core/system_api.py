@@ -616,9 +616,12 @@ class system_api:
     def getServerInfo(self):
         upAddr = 'https://raw.githubusercontent.com/midoks/mdserver-web/master/version/info.json'
         try:
-            requests.adapters.DEFAULT_RETRIES = 2
-            r = requests.get(upAddr, verify=False)
-            version = json.loads(r.content)
+            # requests.adapters.DEFAULT_RETRIES = 2
+            # r = requests.get(upAddr, verify=False)
+
+            req = urllib.request.urlopen(upAddr, timeout=timeout)
+            result = req.read().decode('utf-8')
+            version = json.loads(result)
             return version[0]
         except Exception as e:
             print('getServerInfo', e)
