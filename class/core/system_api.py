@@ -618,15 +618,10 @@ class system_api:
         import ssl
         upAddr = 'https://raw.githubusercontent.com/midoks/mdserver-web/master/version/info.json'
         try:
-            # requests.adapters.DEFAULT_RETRIES = 2
-            # r = requests.get(upAddr, verify=False)
             context = ssl._create_unverified_context()
-            # ssl._create_default_https_context = ssl._create_unverified_context
             req = urllib.request.urlopen(upAddr, context=context, timeout=3)
             result = req.read().decode('utf-8')
-            print(result)
             version = json.loads(result)
-            print(version)
             return version[0]
         except Exception as e:
             print('getServerInfo', e)
