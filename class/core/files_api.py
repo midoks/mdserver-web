@@ -712,6 +712,7 @@ done
             fp.close()
 
             if path.find("web_conf") > 0:
+                print("web_conf")
                 mw.restartWeb()
 
             mw.writeLog('文件管理', '文件保存成功', (path,))
