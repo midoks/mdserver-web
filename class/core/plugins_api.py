@@ -729,18 +729,21 @@ class plugins_api:
                 json_file = path + '/info.json'
                 if os.path.exists(json_file):
                     try:
-                        data = json.loads(mw.readFile(json_file))
-                        tmp_data = self.makeList(data)
-                        for index in range(len(tmp_data)):
-                            if tmp_data[index]['versions'] == info[1] or info[1] in tmp_data[index]['versions']:
-                                tmp_data[index]['display'] = True
-                                plist.append(tmp_data[index])
-                                continue
+                        content = mw.readFile(json_file)
+                        if content:
+                            data = json.loads(content)
+                            tmp_data = self.makeList(data)
+                            for index in range(len(tmp_data)):
+                                if tmp_data[index]['versions'] == info[1] or info[1] in tmp_data[index]['versions']:
+                                    tmp_data[index]['display'] = True
+                                    plist.append(tmp_data[index])
+                                    continue
                     except Exception as e:
+                        # raise e
                         print('getIndexList:', e)
 
         # 使用gevent模式时,无法使用多进程
-        # plist = self.checkStatusMProcess(plist)
+        #plist = self.checkStatusMProcess(plist)
         plist = self.checkStatusMThreads(plist)
         return plist
 
