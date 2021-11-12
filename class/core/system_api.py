@@ -620,7 +620,7 @@ class system_api:
         try:
             # requests.adapters.DEFAULT_RETRIES = 2
             # r = requests.get(upAddr, verify=False)
-
+            ssl._create_default_https_context = ssl._create_unverified_context
             req = urllib.request.urlopen(upAddr, 3)
             result = req.read().decode('utf-8')
             print(result)
