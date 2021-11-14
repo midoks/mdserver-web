@@ -240,26 +240,28 @@ def index(reqClass=None, reqAction=None, reqData=None):
 
     if (reqClass == None):
         reqClass = 'index'
-    classFile = ('config', 'control', 'crontab', 'files', 'firewall',
-                 'index', 'plugins', 'login', 'system', 'site', 'ssl', 'task', 'soft')
-    if not reqClass in classFile:
+    pageFile = ('config', 'control', 'crontab', 'files', 'firewall',
+                'index', 'plugins', 'login', 'system', 'site', 'ssl', 'task', 'soft')
+    if not reqClass in pageFile:
         return redirect('/')
 
     if reqAction == None:
         if not isLogined():
             return redirect('/login')
 
-        # if reqClass == 'config':
         import config_api
         data = config_api.config_api().get()
         return render_template(reqClass + '.html', data=data)
-        # else:
-        #     return render_template(reqClass + '.html')
 
+    classFile = ('config_api', 'crontab_api', 'files_api', 'firewall_api',
+                 'plugins_api', 'system_api', 'site_api', 'task_api')
     className = reqClass + '_api'
+    if not className in classFile:
+        return "error"
 
     eval_str = "__import__('" + className + "')." + className + '()'
     newInstance = eval(eval_str)
+
     return publicObject(newInstance, reqAction)
 
 ssh = None
