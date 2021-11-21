@@ -511,6 +511,10 @@ def setMyPort():
 
 
 def runInfo():
+
+    if status(version) == 'stop':
+        return mw.returnJson(false, 'MySQL未启动', [])
+
     db = pMysqlDb()
     data = db.query('show global status')
     gets = ['Max_used_connections', 'Com_commit', 'Com_rollback', 'Questions', 'Innodb_buffer_pool_reads', 'Innodb_buffer_pool_read_requests', 'Key_reads', 'Key_read_requests', 'Key_writes',
@@ -1402,6 +1406,10 @@ def setDbSlave(version):
 
 
 def getMasterStatus(version=''):
+
+    if status(version) == 'stop':
+        return mw.returnJson(false, 'MySQL未启动', [])
+
     conf = getConf()
     con = mw.readFile(conf)
     master_status = False
@@ -1414,6 +1422,7 @@ def getMasterStatus(version=''):
 
     db = pMysqlDb()
     dlist = db.query('show slave status')
+    #print(dlist, len(dlist))
     if len(dlist) > 0 and (dlist[0][10] == 'Yes' or dlist[0][11] == 'Yes'):
         data['slave_status'] = True
 
