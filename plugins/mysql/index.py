@@ -1821,7 +1821,11 @@ def fullSync(version=''):
 
 if __name__ == "__main__":
     func = sys.argv[1]
-    version = sys.argv[2]
+
+    version = "5.6"
+    if (len(sys.argv) > 2):
+        version = sys.argv[2]
+
     if func == 'status':
         print(status(version))
     elif func == 'start':
