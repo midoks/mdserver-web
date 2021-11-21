@@ -1408,7 +1408,7 @@ def setDbSlave(version):
 def getMasterStatus(version=''):
 
     if status(version) == 'stop':
-        return mw.returnJson(false, 'MySQL未启动', [])
+        return mw.returnJson(false, 'MySQL未启动,或正在启动中...!', [])
 
     conf = getConf()
     con = mw.readFile(conf)
