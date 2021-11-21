@@ -336,7 +336,7 @@ def initMysql8Pwd():
 
 
 def myOp(method):
-    import commands
+    # import commands
     init_file = initDreplace()
     cmd = init_file + ' ' + method
     try:
