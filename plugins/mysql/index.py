@@ -1453,7 +1453,6 @@ def setMasterStatus(version=''):
         mw.writeFile(conf, con)
 
     restart(version)
-    time.sleep(2)
     return mw.returnJson(True, '设置成功')
 
 
