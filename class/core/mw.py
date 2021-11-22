@@ -482,7 +482,7 @@ def getLastLine(inputfile, lineNum):
 def getNumLines(path, num, p=1):
     pyVersion = sys.version_info[0]
     try:
-        import cgi
+        import html
         if not os.path.exists(path):
             return ""
         start_line = (p - 1) * num
@@ -503,8 +503,8 @@ def getNumLines(path, num, p=1):
                     if n >= start_line:
                         line = buf[newline_pos + 1:]
                         try:
-                            data.insert(0, cgi.escape(line))
-                        except:
+                            data.insert(0, html.escape(line))
+                        except Exception as e:
                             pass
                     buf = buf[:newline_pos]
                     n += 1
