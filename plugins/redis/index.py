@@ -32,6 +32,11 @@ def getInitDFile():
 
 
 def getConf():
+    path = getServerDir() + "/redis.conf"
+    return path
+
+
+def getConfTpl():
     path = getPluginDir() + "/config/redis.conf"
     return path
 
@@ -84,7 +89,7 @@ def initDreplace():
     mw.execShell('chmod +x ' + file_bin)
 
     # config replace
-    conf_content = mw.readFile(getConf())
+    conf_content = mw.readFile(getConfTpl())
     conf_content = conf_content.replace('{$SERVER_PATH}', service_path)
     mw.writeFile(getServerDir() + '/redis.conf', conf_content)
 

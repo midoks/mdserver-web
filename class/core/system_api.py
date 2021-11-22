@@ -616,7 +616,7 @@ class system_api:
     def getServerInfo(self):
         import urllib.request
         import ssl
-        upAddr = 'https://raw.githubusercontent.com/midoks/mdserver-web/master/version/info.json'
+        upAddr = 'https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/version/info.json'
         try:
             context = ssl._create_unverified_context()
             req = urllib.request.urlopen(upAddr, context=context, timeout=3)
