@@ -161,10 +161,18 @@ def initdStatus():
     if not app_debug:
         if mw.isAppleSystem():
             return "Apple Computer does not support"
-    initd_bin = getInitDFile()
-    if os.path.exists(initd_bin):
-        return 'ok'
-    return 'fail'
+
+    if mw.isAppleSystem():
+        initd_bin = getInitDFile()
+        if os.path.exists(initd_bin):
+            return 'ok'
+        return 'fail'
+
+    shell_cmd = 'systemctl status mongod | grep loaded | grep "enabled;"'
+    data = mw.execShell(shell_cmd)
+    if data[0] == '':
+        return 'fail'
+    return 'ok'
 
 
 def initdInstall():
@@ -173,11 +181,14 @@ def initdInstall():
         if mw.isAppleSystem():
             return "Apple Computer does not support"
 
-    source_bin = initDreplace()
-    initd_bin = getInitDFile()
-    shutil.copyfile(source_bin, initd_bin)
-    mw.execShell('chmod +x ' + initd_bin)
-    mw.execShell('chkconfig --add ' + getPluginName())
+    if mw.isAppleSystem():
+        source_bin = initDreplace()
+        initd_bin = getInitDFile()
+        shutil.copyfile(source_bin, initd_bin)
+        mw.execShell('chmod +x ' + initd_bin)
+        mw.execShell('chkconfig --add ' + getPluginName())
+
+    mw.execShell('systemctl enable mongod')
     return 'ok'
 
 
@@ -185,10 +196,12 @@ def initdUinstall():
     if not app_debug:
         if mw.isAppleSystem():
             return "Apple Computer does not support"
+    if mw.isAppleSystem():
+        mw.execShell('chkconfig --del ' + getPluginName())
+        initd_bin = getInitDFile()
+        os.remove(initd_bin)
 
-    mw.execShell('chkconfig --del ' + getPluginName())
-    initd_bin = getInitDFile()
-    os.remove(initd_bin)
+    mw.execShell('systemctl disable mongod')
     return 'ok'
 
 
