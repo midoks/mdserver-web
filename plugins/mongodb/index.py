@@ -13,6 +13,9 @@ if mw.isAppleSystem():
     app_debug = True
 
 
+# /usr/lib/systemd/system/mongod.service
+# /var/lib/mongo
+
 def getPluginName():
     return 'mongodb'
 
@@ -151,6 +154,11 @@ def runInfo():
     result = {}
     result["version"] = serverStatus['version']
     result["uptime"] = serverStatus['uptime']
+
+    result['db_path'] = '/var/lib/mongo'
+    if mw.isAppleSystem():
+        result['db_path'] = getServerDir() + "/data"
+
     result["connections"] = serverStatus['connections']['current']
     result["collections"] = serverStatus['catalogStats']['collections']
 

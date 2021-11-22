@@ -32,6 +32,7 @@ function redisStatus() {
 						<thead><th>字段</th><th>当前值</th><th>说明</th></thead>\
 						<tbody>\
 							<tr><th>version</th><td>' + rdata.version + '</td><td>版本</td></tr>\
+							<tr><th>db_path</th><td>' + rdata.db_path + '</td><td>数据路径</td></tr>\
 							<tr><th>uptime</th><td>' + rdata.uptime + '</td><td>已运行秒</td></tr>\
 							<tr><th>connections</th><td>' + rdata.connections + '</td><td>当前链接数</td></tr>\
 							<tr><th>collections</th><td>' + rdata.collections + '</td><td>文档数</td></tr>\
