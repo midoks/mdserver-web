@@ -22,7 +22,7 @@ Install_app_mac()
 	fi
 
 	cd $serverPath/source && tar -zxvf mongodb-macos-x86_64-${VERSION}.tgz
-	mkdir -p $serverPath/mongodb
+	
 	cd  mongodb-macos-x86_64-${VERSION} && mv  ./* $serverPath/mongodb
 }
 
@@ -44,16 +44,13 @@ Install_app()
 	echo "sys:$sysName"
 	echo '正在安装脚本文件...' > $install_tmp
 	mkdir -p $serverPath/source
+	mkdir -p $serverPath/mongodb
 	# echo $sysName
 	if [ "Darwin" == "$sysName" ];then
 		Install_app_mac
 	else
 		Install_app_linux
 	fi
-	
-	# cd $serverPath/source && tar -zxvf mongodb-${VERSION}.tar.gz
-
-
 
 	echo "${VERSION}" > $serverPath/mongodb/version.pl
 	echo '安装完成' > $install_tmp
