@@ -109,6 +109,9 @@ class plugins_api:
             name + " && /bin/bash " + pluginInfo["shell"] \
             + " install " + version
 
+        if mw.isAppleSystem():
+            print(execstr)
+
         taskAdd = (None, mmsg + '[' + name + '-' + version + ']',
                    'execshell', '0', time.strftime('%Y-%m-%d %H:%M:%S'), execstr)
 
