@@ -1,0 +1,18 @@
+{
+	"sort": 7,
+	"ps": "一个高性能的NOSQL数据库",
+	"name": "mongodb",
+	"title": "Mongodb",
+	"shell": "install.sh",
+	"versions":["5.0.4"],
+	"updates":["5.0.4"],
+	"tip": "soft",
+	"checks": "server/mongodb",
+	"path": "server/mongodb",
+	"display": 1,
+	"author": "mongodb",
+	"date": "2021-11-23",
+	"home": "https://www.mongodb.com/",
+	"type": 0,
+	"pid": "2"
+}
