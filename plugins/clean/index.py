@@ -124,6 +124,7 @@ def cleanLog():
         "rm -rf /var/log/rhsm/rhsm.log-*",
         "rm -rf /var/log/rhsm/rhsmcertd.log-*",
         "rm -rf /tmp/yum_save_*",
+        "rm -rf /tmp/tmp.*",
     ]
 
     for i in clog:
