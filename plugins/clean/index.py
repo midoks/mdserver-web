@@ -90,9 +90,9 @@ def get_filePath_fileName_fileExt(filename):
 
 
 def cleanFileLog(path):
-    filepath, shotname, extension = get_filePath_fileName_fileExt(abspath)
+    filepath, shotname, extension = get_filePath_fileName_fileExt(path)
     if extension == ".log":
-        cmd = "echo \"\" >> " + abspath
+        cmd = "echo \"\" >> " + path
         print(cmd)
         mw.execShell(cmd)
 
@@ -120,11 +120,14 @@ def cleanLog():
         "rm -rf /var/log/yum.log-*",
         "rm -rf /var/log/messages-*",
         "rm -rf /var/log/btmp-*",
+        "rm -rf /var/log/audit/audit.log.*",
+        "rm -rf /var/log/rhsm/rhsm.log-*",
+        "rm -rf /var/log/rhsm/rhsmcertd.log-*",
     ]
 
     for i in clog:
         print(i)
-        mw.execShell(clog[i])
+        mw.execShell(i)
 
     l = os.listdir(rootDir)
     # print(l)
