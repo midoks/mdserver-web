@@ -39,7 +39,7 @@ app_stop(){
 	else
 			PID=$(cat $PIDFILE)
 			echo "Stopping ..."
-			$CLIEXEC shutdown
+			kill -9 $PID
 			while [ -x /proc/${PID} ]
 			do
 				echo "Waiting for Redis to shutdown ..."
