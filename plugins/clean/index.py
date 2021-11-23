@@ -83,6 +83,12 @@ def reload():
     return 'fail'
 
 
+def get_filePath_fileName_fileExt(filename):
+    (filepath, tempfilename) = os.path.split(filename)
+    (shotname, extension) = os.path.splitext(tempfilename)
+    return filepath, shotname, extension
+
+
 def cleanLog():
     # 清理日志
     rootDir = "/var/log"
@@ -95,15 +101,24 @@ def cleanLog():
         "rm -rf /var/log/spooler-*",
         "rm -rf /var/log/yum.log-*",
         "rm -rf /var/log/btmp-*",
+
     ]
 
     for i in clog:
         print(i)
+        mw.execShell("rm -rf /var/log/cron-*")
 
-    # mw.execShell("rm -rf /var/log/cron-*")
-    # mw.execShell("rm -rf /var/log/maillog-*")
-    # mw.execShell("rm -rf /var/log/secure-*")
-    # mw.execShell("rm -rf /var/log/spooler-*")
+    l = os.listdir(rootDir)
+    # print(l)
+    for x in range(len(l)):
+        abspath = rootDir + "/" + l[x]
+        filepath, shotname, extension = get_filePath_fileName_fileExt(abspath)
+        if extension == ".log":
+            cmd = "echo \"\" >> " + abspath
+            print(cmd)
+            print(mw.execShell(cmd))
+        print(filepath, shotname, extension)
+
     print("clean end")
 
 if __name__ == "__main__":
