@@ -92,9 +92,9 @@ def get_filePath_fileName_fileExt(filename):
 def cleanFileLog(path):
     filepath, shotname, extension = get_filePath_fileName_fileExt(path)
     if extension == ".log":
-        cmd = "echo \"\" >> " + path
+        cmd = "echo \"\" > " + path
         print(cmd)
-        mw.execShell(cmd)
+        print(mw.execShell(cmd))
 
 
 def cleanDirLog(path):
@@ -130,7 +130,6 @@ def cleanLog():
         mw.execShell(i)
 
     l = os.listdir(rootDir)
-    # print(l)
     for x in range(len(l)):
         abspath = rootDir + "/" + l[x]
         if os.path.isfile(abspath):
