@@ -129,13 +129,15 @@ def cleanLog():
         print(i)
         mw.execShell(i)
 
+    # 常用日志
     clogcom = [
         "/var/log/messages",
+        "/var/log/btmp",
+        "/var/log/wtmp",
     ]
-
     for i in clogcom:
-        print(i)
-        mw.execShell("echo \"\" > " + i)
+        if os.path.exists(i)
+            mw.execShell("echo \"\" > " + i)
 
     l = os.listdir(rootDir)
     for x in range(len(l)):
