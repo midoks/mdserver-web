@@ -134,6 +134,9 @@ def cleanLog():
         "/var/log/messages",
         "/var/log/btmp",
         "/var/log/wtmp",
+        "/var/log/secure",
+        "/var/log/lastlog",
+        "/var/log/cron",
     ]
     for i in clogcom:
         if os.path.exists(i)
