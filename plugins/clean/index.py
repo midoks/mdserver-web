@@ -120,12 +120,11 @@ def cleanLog():
         "rm -rf /var/log/yum.log-*",
         "rm -rf /var/log/messages-*",
         "rm -rf /var/log/btmp-*",
-
     ]
 
     for i in clog:
         print(i)
-        mw.execShell("rm -rf /var/log/cron-*")
+        mw.execShell(clog[i])
 
     l = os.listdir(rootDir)
     # print(l)
