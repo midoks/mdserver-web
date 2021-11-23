@@ -21,7 +21,7 @@ class files_api:
     rPath = None
 
     def __init__(self):
-        self.rPath = mw.getRootDir() + '/recycle_bin'
+        self.rPath = mw.getRootDir() + '/recycle_bin/'
 
     ##### ----- start ----- ###
     def getBodyApi(self):
