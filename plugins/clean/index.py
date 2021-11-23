@@ -87,10 +87,22 @@ def cleanLog():
     # 清理日志
     rootDir = "/var/log"
     print("clean start")
-    mw.execShell("rm -rf /var/log/cron-*")
-    mw.execShell("rm -rf /var/log/maillog-*")
-    mw.execShell("rm -rf /var/log/secure-*")
-    mw.execShell("rm -rf /var/log/spooler-*")
+
+    clog = [
+        "rm -rf /var/log/cron-*",
+        "rm -rf /var/log/maillog-*",
+        "rm -rf /var/log/secure-*",
+        "rm -rf /var/log/spooler-*",
+        "rm -rf /var/log/yum.log-*",
+    ]
+
+    for i in clog:
+        print(i)
+
+    # mw.execShell("rm -rf /var/log/cron-*")
+    # mw.execShell("rm -rf /var/log/maillog-*")
+    # mw.execShell("rm -rf /var/log/secure-*")
+    # mw.execShell("rm -rf /var/log/spooler-*")
     print("clean end")
 
 if __name__ == "__main__":
