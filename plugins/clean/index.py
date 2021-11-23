@@ -89,6 +89,20 @@ def get_filePath_fileName_fileExt(filename):
     return filepath, shotname, extension
 
 
+def cleanFileLog(path):
+    filepath, shotname, extension = get_filePath_fileName_fileExt(abspath)
+    if extension == ".log":
+        cmd = "echo \"\" >> " + abspath
+        print(cmd)
+        mw.execShell(cmd)
+
+
+def cleanDirLog(path):
+    l = os.listdir(path)
+
+    print(l)
+
+
 def cleanLog():
     # 清理日志
     rootDir = "/var/log"
@@ -100,6 +114,7 @@ def cleanLog():
         "rm -rf /var/log/secure-*",
         "rm -rf /var/log/spooler-*",
         "rm -rf /var/log/yum.log-*",
+        "rm -rf /var/log/messages-*",
         "rm -rf /var/log/btmp-*",
 
     ]
@@ -112,12 +127,11 @@ def cleanLog():
     # print(l)
     for x in range(len(l)):
         abspath = rootDir + "/" + l[x]
-        filepath, shotname, extension = get_filePath_fileName_fileExt(abspath)
-        if extension == ".log":
-            cmd = "echo \"\" >> " + abspath
-            print(cmd)
-            print(mw.execShell(cmd))
-        print(filepath, shotname, extension)
+        if os.path.isfile(abspath):
+            cleanFileLog(abspath)
+
+        if os.path.isdir(abspath):
+            cleanDirLog(abspath)
 
     print("clean end")
 
