@@ -139,7 +139,7 @@ def cleanLog():
         "/var/log/cron",
     ]
     for i in clogcom:
-        if os.path.exists(i)
+        if os.path.exists(i):
             mw.execShell("echo \"\" > " + i)
 
     l = os.listdir(rootDir)
