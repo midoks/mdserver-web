@@ -129,6 +129,14 @@ def cleanLog():
         print(i)
         mw.execShell(i)
 
+    clogcom = [
+        "/var/log/messages",
+    ]
+
+    for i in clogcom:
+        print(i)
+        mw.execShell("echo \"\" > " + i)
+
     l = os.listdir(rootDir)
     for x in range(len(l)):
         abspath = rootDir + "/" + l[x]
