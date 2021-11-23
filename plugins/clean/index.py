@@ -123,6 +123,7 @@ def cleanLog():
         "rm -rf /var/log/audit/audit.log.*",
         "rm -rf /var/log/rhsm/rhsm.log-*",
         "rm -rf /var/log/rhsm/rhsmcertd.log-*",
+        "rm -rf /tmp/yum_save_*",
     ]
 
     for i in clog:
