@@ -99,8 +99,12 @@ def cleanFileLog(path):
 
 def cleanDirLog(path):
     l = os.listdir(path)
-
-    print(l)
+    for x in range(len(l)):
+        abspath = path + "/" + l[x]
+        if os.path.isfile(abspath):
+            cleanFileLog(abspath)
+        if os.path.isdir(abspath):
+            cleanDirLog(abspath)
 
 
 def cleanLog():
