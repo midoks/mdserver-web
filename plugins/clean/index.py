@@ -94,6 +94,7 @@ def cleanLog():
         "rm -rf /var/log/secure-*",
         "rm -rf /var/log/spooler-*",
         "rm -rf /var/log/yum.log-*",
+        "rm -rf /var/log/btmp-*",
     ]
 
     for i in clog:
