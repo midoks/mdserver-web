@@ -148,9 +148,18 @@ def runInfo():
     client = pymongo.MongoClient(host='127.0.0.1', port=27017)
     db = client.admin
     serverStatus = db.command('serverStatus')
+
+    listDbs = client.list_database_names()
+
+    showDbList = []
+    for x in range(len(listDbs)):
+        mongd = client[listDbs[x]]
+        stats = mongd.command({"dbstats": 1})
+        showDbList.append(stats)
+    # print(showDbList)
     # print(serverStatus)
     # for key, value in serverStatus.items():
-    # print(key, value)
+    #     print(key, value)
     result = {}
     result["version"] = serverStatus['version']
     result["uptime"] = serverStatus['uptime']
@@ -162,6 +171,7 @@ def runInfo():
     result["connections"] = serverStatus['connections']['current']
     result["collections"] = serverStatus['catalogStats']['collections']
 
+    result["dbs"] = showDbList
     return mw.getJson(result)
 
 
