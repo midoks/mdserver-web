@@ -37,7 +37,29 @@ function redisStatus() {
 							<tr><th>connections</th><td>' + rdata.connections + '</td><td>当前链接数</td></tr>\
 							<tr><th>collections</th><td>' + rdata.collections + '</td><td>文档数</td></tr>\
 						<tbody>\
-				</table></div>'
+				</table></div><hr/>';
+
+		var t = '';
+		for(var i=0; i<rdata.dbs.length;i++){
+			t += '<tr>';
+			t += '<th>'+rdata.dbs[i]["db"]+'</th>';
+			t += '<th>'+toSize(rdata.dbs[i]["totalSize"])+'</th>';
+			t += '<th>'+toSize(rdata.dbs[i]["storageSize"])+'</th>';
+			t += '<th>'+toSize(rdata.dbs[i]["dataSize"])+'</th>';
+			t += '<th>'+toSize(rdata.dbs[i]["indexSize"])+'</th>';
+			t += '<th>'+rdata.dbs[i]["indexes"]+'</th>';
+			t += '<th>'+rdata.dbs[i]["objects"]+'</th>';
+			t += '</tr>';
+		}
+		// console.log(t);
+
+		Con += '<div class="divtable">\
+						<table class="table table-hover table-bordered" style="width: 490px;">\
+						<thead><th>库名</th><th>大小</th><th>存储大小</th><th>数据</th><th>索引</th><th>文档数据</th><th>对象</th></thead>\
+						<tbody>'+t+'<tbody>\
+				</table></div>';
+		// console.log(rdata.dbs);
+
         $(".soft-man-con").html(Con);
     },'json');
 }
