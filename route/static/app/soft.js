@@ -252,6 +252,8 @@ function toIndexDisplay(name, version, coexist) {
     $.post("/plugins/set_index", data, function(rdata) {
         if (rdata.status) {
             layer.msg(rdata.msg, { icon: 1 })
+        } else {
+            layer.msg(rdata.msg, { icon: 2 })
         }
     },'json');
 }
