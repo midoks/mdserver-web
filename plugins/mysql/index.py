@@ -1265,7 +1265,10 @@ def alterTable():
 def getTotalStatistics():
     st = status()
     data = {}
-    if st == 'start':
+
+    isInstall = os.path.exists(getServerDir() + '/version.pl')
+
+    if st == 'start' and isInstall:
         data['status'] = True
         data['count'] = pSqliteDb('databases').count()
         data['ver'] = mw.readFile(getServerDir() + '/version.pl').strip()
