@@ -763,7 +763,7 @@ class plugins_api:
 
         if vname in indexList:
             return mw.returnJson(False, '请不要重复添加!')
-        if len(indexList) >= 12:
+        if len(indexList) > 12:
             return mw.returnJson(False, '首页最多只能显示12个软件!')
 
         indexList.append(vname)
