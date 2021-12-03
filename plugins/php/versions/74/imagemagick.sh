@@ -12,7 +12,7 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
 LIBNAME=imagick
-LIBV=3.4.3
+LIBV=3.6.0
 sysName=`uname`
 actionType=$1
 version=$2
@@ -39,7 +39,7 @@ Install_lib()
 		php_lib=$sourcePath/php_lib
 		mkdir -p $php_lib
 
-		if [ -d $php_lib/${LIBNAME}-${LIBV} ];then
+		if [ ! -d $php_lib/${LIBNAME}-${LIBV} ];then
 			wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
 			cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
 		fi

@@ -12,7 +12,7 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
 LIBNAME=imagick
-LIBV=3.4.3
+LIBV=3.6.0
 sysName=`uname`
 actionType=$1
 version=$2
@@ -44,9 +44,11 @@ Install_lib()
 			cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
 		fi
 		cd $php_lib/${LIBNAME}-${LIBV}
+
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
 		&& make clean && make && make install && make clean
+		
 	fi
 	
 	if [ ! -f "$extFile" ];then

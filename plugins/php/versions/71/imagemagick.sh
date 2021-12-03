@@ -12,7 +12,7 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
 LIBNAME=imagick
-LIBV=3.4.3
+LIBV=3.6.0
 sysName=`uname`
 actionType=$1
 version=$2
@@ -33,12 +33,12 @@ Install_lib()
 		echo "php-$version 已安装${LIBNAME},请选择其它版本!"
 		return
 	fi
-	
+
 	if [ ! -f "$extFile" ];then
 
 		php_lib=$sourcePath/php_lib
 		mkdir -p $php_lib
-		
+
 		if [ ! -d $php_lib/${LIBNAME}-${LIBV} ];then
 			wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
 			cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
@@ -47,7 +47,8 @@ Install_lib()
 
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
-		&& make && make install && make clean
+		&& make clean && make && make install && make clean
+		
 	fi
 	
 	if [ ! -f "$extFile" ];then
