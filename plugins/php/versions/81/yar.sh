@@ -13,7 +13,7 @@ sourcePath=${serverPath}/source/php
 
 
 LIBNAME=yar
-LIBV=2.1.2
+LIBV=2.2.0
 
 actionType=$1
 version=$2
