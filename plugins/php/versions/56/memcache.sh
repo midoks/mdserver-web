@@ -45,8 +45,8 @@ Install_lib()
 		cd $php_lib/${LIBNAME}-${LIBV}
 
 		$serverPath/php/$version/bin/phpize
-		./configure --with-php-config=$serverPath/php/$version/bin/php-config --enable-memcache --with-zlib-dir
-		make && make install && make clean
+		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
+		--enable-memcache && make && make install && make clean
 
 	fi
 	
@@ -54,8 +54,10 @@ Install_lib()
 		echo "ERROR!"
 		return
 	fi
+
+	echo "" >> $serverPath/php/$version/etc/php.ini
+	echo "[${LIBNAME}]" >> $serverPath/php/$version/etc/php.ini
 	echo "extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
-	echo "extension=${LIBNAME}" >> $serverPath/php/$version/etc/php.ini
 
 	$serverPath/php/init.d/php$version reload
 	echo '==========================================================='
