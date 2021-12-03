@@ -20,7 +20,8 @@ sysName=`uname`
 LIBNAME=yaf
 LIBV=3.2.5
 
-extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20151012/${LIBNAME}.so
+NON_ZTS_FILENAME=`ls $serverPath/php/${version}/lib/php/extensions | grep no-debug-non-zts`
+extFile=$serverPath/php/${version}/lib/php/extensions/${NON_ZTS_FILENAME}/${LIBNAME}.so
 
 if [ "$sysName" == "Darwin" ];then
 	BAK='_bak'

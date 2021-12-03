@@ -24,7 +24,8 @@ fi
 
 Install_lib()
 {
-	extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20131226/yaf.so
+	NON_ZTS_FILENAME=`ls $serverPath/php/${version}/lib/php/extensions | grep no-debug-non-zts`
+	extFile=$serverPath/php/${version}/lib/php/extensions/${NON_ZTS_FILENAME}/${LIBNAME}.so
 
 	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep "${LIBNAME}.so"`
 	if [ "${isInstall}" != "" ];then

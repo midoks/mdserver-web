@@ -15,7 +15,9 @@ LIBNAME=xdebug
 LIBV=2.7.0
 actionType=$1
 version=$2
-extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20160303/${LIBNAME}.so
+
+NON_ZTS_FILENAME=`ls $serverPath/php/${version}/lib/php/extensions | grep no-debug-non-zts`
+extFile=$serverPath/php/${version}/lib/php/extensions/${NON_ZTS_FILENAME}/${LIBNAME}.so
 
 sysName=`uname`
 if [ "$sysName" == "Darwin" ];then

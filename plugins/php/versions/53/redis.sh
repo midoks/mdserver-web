@@ -17,7 +17,9 @@ sysName=`uname`
 actionType=$1
 version=$2
 
-extDir=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20090626/
+
+NON_ZTS_FILENAME=`ls $serverPath/php/${version}/lib/php/extensions | grep no-debug-non-zts`
+extDir=$serverPath/php/${version}/lib/php/extensions/${NON_ZTS_FILENAME}/
 
 if [ "$sysName" == "Darwin" ];then
 	BAK='_bak'
