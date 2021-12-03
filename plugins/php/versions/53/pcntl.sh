@@ -50,6 +50,11 @@ Install_lib()
 		
 	fi
 
+	if [ ! -f "$extFile" ];then
+		echo "ERROR!"
+		return
+	fi
+
     echo "" >> $serverPath/php/$version/etc/php.ini
 	echo "[${LIBNAME}]" >> $serverPath/php/$version/etc/php.ini
 	echo "extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
