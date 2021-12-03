@@ -45,7 +45,7 @@ Install_lib()
 		cd $sourcePath/php${version}/ext/${LIBNAME}
 
 
-		#fuck,what error? fix it
+		#o my god. fuck,what error? fix it 
 		FIND_undef=`cat Makefile|grep '#undef strndup'`
 		if [ "$FIND_undef" == "" ];then
 			sed -i $BAK "s/char \*strndup/\#undef strndup\nchar \*strndup/g" libmagic/softmagic.c
