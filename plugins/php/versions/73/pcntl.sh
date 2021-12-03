@@ -38,6 +38,10 @@ Install_lib()
 	
 	if [ ! -f "$extFile" ];then
 
+		if [ ! -d $sourcePath/php${version}/ext ];then
+			cd $serverPath/mdserver-web/plugins/php && /bin/bash install.sh install ${version}
+		fi
+		
 		cd $sourcePath/php${version}/ext/${LIBNAME}
 		
 		$serverPath/php/$version/bin/phpize

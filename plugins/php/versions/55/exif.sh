@@ -4,6 +4,8 @@ export PATH
 
 curPath=`pwd`
 
+appPath=$(dirname "$curPath")
+
 rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 rootPath=$(dirname "$rootPath")
@@ -37,6 +39,11 @@ Install_lib()
 	fi
 	
 	if [ ! -f "$extFile" ];then
+
+		if [ ! -d $sourcePath/php${version}/ext ];then
+			cd $serverPath/mdserver-web/plugins/php && /bin/bash install.sh install ${version}
+		fi
+
 
 		cd $sourcePath/php${version}/ext/${LIBNAME}
 		
