@@ -3,7 +3,6 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
 curPath=`pwd`
-
 rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 rootPath=$(dirname "$rootPath")
@@ -11,11 +10,13 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
+
 actionType=$1
 version=$2
 
 LIBNAME=mcrypt
-LIBV=0
+LIBV=1.0.4
+
 
 NON_ZTS_FILENAME=`ls $serverPath/php/${version}/lib/php/extensions | grep no-debug-non-zts`
 extFile=$serverPath/php/${version}/lib/php/extensions/${NON_ZTS_FILENAME}/${LIBNAME}.so
@@ -29,7 +30,7 @@ fi
 
 Install_lib()
 {
-
+	
 	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep "${LIBNAME}.so"`
 	if [ "${isInstall}" != "" ];then
 		echo "php-$version 已安装${LIBNAME},请选择其它版本!"
@@ -38,27 +39,29 @@ Install_lib()
 	
 	if [ ! -f "$extFile" ];then
 
-		if [ ! -d $sourcePath/php${version}/ext ];then
-			cd $serverPath/mdserver-web/plugins/php && /bin/bash install.sh install ${version}
-		fi
-
-		cd $sourcePath/php${version}/ext/${LIBNAME}
-
+		php_lib=$sourcePath/php_lib
+		mkdir -p $php_lib
+		if [ ! -f $php_lib/${LIBNAME}-${LIBV} ];then
+			wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
+			cd $php_lib
+			tar xvf ${LIBNAME}-${LIBV}.tgz
+		fi 
+		cd $php_lib/${LIBNAME}-${LIBV}
 
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config
-		make clean && make && make install && make clean
-		
+		make && make install && make clean
+	
 	fi
-
+	
 	if [ ! -f "$extFile" ];then
 		echo "ERROR!"
-		return
+		return;
 	fi
-
-    echo "" >> $serverPath/php/$version/etc/php.ini
-	echo "[${LIBNAME}]" >> $serverPath/php/$version/etc/php.ini
-	echo "extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
+	
+	echo  "" >> $serverPath/php/$version/etc/php.ini
+	echo  "[${LIBNAME}]" >> $serverPath/php/$version/etc/php.ini
+	echo  "extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
 	
 	$serverPath/php/init.d/php$version reload
 	echo '==========================================================='
@@ -72,7 +75,7 @@ Uninstall_lib()
 		echo "php-$version 未安装,请选择其它版本!"
 		return
 	fi
-	
+
 	if [ ! -f "$extFile" ];then
 		echo "php-$version 未安装${LIBNAME},请选择其它版本!"
 		return
@@ -80,14 +83,14 @@ Uninstall_lib()
 	
 	echo $serverPath/php/$version/etc/php.ini
 	sed -i $BAK "/${LIBNAME}.so/d" $serverPath/php/$version/etc/php.ini
-	sed -i $BAK "/${LIBNAME}/d" $serverPath/php/$version/etc/php.ini
+	sed -i $BAK "/${LIBNAME}.use_namespace/d" $serverPath/php/$version/etc/php.ini
+	sed -i $BAK "/\[${LIBNAME}\]/d"  $serverPath/php/$version/etc/php.ini
 		
 	rm -f $extFile
 	$serverPath/php/init.d/php$version reload
 	echo '==============================================='
 	echo 'successful!'
 }
-
 
 
 if [ "$actionType" == 'install' ];then
