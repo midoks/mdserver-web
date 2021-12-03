@@ -17,7 +17,7 @@ version=$2
 
 LIBNAME=swoole
 LIBV=4.6.3
-extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20200930/${LIBNAME}.so
+extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20210902/${LIBNAME}.so
 
 sysName=`uname`
 if [ "$sysName" == "Darwin" ];then
