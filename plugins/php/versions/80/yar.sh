@@ -11,15 +11,16 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
+
+LIBNAME=yar
+LIBV=2.2.0
+
 actionType=$1
 version=$2
 
-LIBNAME=yaf
-LIBV=3.3.0
-
-
 NON_ZTS_FILENAME=`ls $serverPath/php/${version}/lib/php/extensions | grep no-debug-non-zts`
 extFile=$serverPath/php/${version}/lib/php/extensions/${NON_ZTS_FILENAME}/${LIBNAME}.so
+
 
 sysName=`uname`
 if [ "$sysName" == "Darwin" ];then
@@ -41,6 +42,7 @@ Install_lib()
 
 		php_lib=$sourcePath/php_lib
 		mkdir -p $php_lib
+
 		if [ ! -d $php_lib/${LIBNAME}-${LIBV} ];then
 			wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
 			cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
@@ -48,7 +50,8 @@ Install_lib()
 		cd $php_lib/${LIBNAME}-${LIBV}
 
 		$serverPath/php/$version/bin/phpize
-		./configure --with-php-config=$serverPath/php/$version/bin/php-config
+		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
+		--with-curl=$serverPath/lib/curl
 		make && make install && make clean
 	fi
 	
@@ -60,7 +63,7 @@ Install_lib()
 	echo  "" >> $serverPath/php/$version/etc/php.ini
 	echo  "[${LIBNAME}]" >> $serverPath/php/$version/etc/php.ini
 	echo  "extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
-	echo  "${LIBNAME}.use_namespace=1" >> $serverPath/php/$version/etc/php.ini
+	echo  "${LIBNAME}.expose_info=false" >> $serverPath/php/$version/etc/php.ini
 	
 	$serverPath/php/init.d/php$version reload
 	echo '==========================================================='
@@ -71,12 +74,13 @@ Install_lib()
 Uninstall_lib()
 {
 	if [ ! -f "$serverPath/php/$version/bin/php-config" ];then
-		echo "php-$version 未安装,请选择其它版本!"
+		echo "php$version 未安装,请选择其它版本!"
 		return
 	fi
 
 	if [ ! -f "$extFile" ];then
 		echo "php-$version 未安装${LIBNAME},请选择其它版本!"
+		echo "php-$version not install ${LIBNAME}, Plese select other version!"
 		return
 	fi
 	
