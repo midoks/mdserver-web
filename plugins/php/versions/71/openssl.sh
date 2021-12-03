@@ -38,6 +38,10 @@ Install_lib()
 	
 	if [ ! -f "$extFile" ];then
 
+		if [ ! -d $sourcePath/php${version}/ext ];then
+			cd $serverPath/mdserver-web/plugins/php && /bin/bash install.sh install ${version}
+		fi
+
 		cd $sourcePath/php${version}/ext/${LIBNAME}
 
 		if [ ! -f "config.m4" ];then
@@ -48,6 +52,11 @@ Install_lib()
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config
 		make clean && make && make install && make clean
 		
+	fi
+
+	if [ ! -f "$extFile" ];then
+		echo "ERROR!"
+		return
 	fi
 
     echo "" >> $serverPath/php/$version/etc/php.ini
