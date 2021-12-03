@@ -39,7 +39,9 @@ Install_lib()
 	if [ ! -f "$extFile" ];then
 
 		if [ ! -d $sourcePath/php${version}/ext ];then
-			sh $curPath/install.sh
+			sh $curPath/install.sh 
+			echo $curPath
+			/bin/bash $curPath/install.sh  install ${version}
 		fi
 
 
