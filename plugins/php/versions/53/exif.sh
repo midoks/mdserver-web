@@ -44,8 +44,12 @@ Install_lib()
 			cd $serverPath/mdserver-web/plugins/php && /bin/bash install.sh install ${version}
 		fi
 
-
 		cd $sourcePath/php${version}/ext/${LIBNAME}
+
+		FIND_C99=`cat Makefile|grep c99`
+		if [ "$FIND_C99" == "" ];then
+			sed -i $BAK 's/CFLAGS \=/CFLAGS \= -std=c99/g' Makefile
+		fi
 		
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config
