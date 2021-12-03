@@ -12,7 +12,7 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
 LIBNAME=mongodb
-LIBV=1.7.5
+LIBV=1.7.4
 sysName=`uname`
 actionType=$1
 version=$2
