@@ -16,7 +16,7 @@ LIBV=1.9.0
 sysName=`uname`
 actionType=$1
 version=$2
-extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20200930/${LIBNAME}.so
+extFile=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20210902/${LIBNAME}.so
 
 if [ "$sysName" == "Darwin" ];then
 	BAK='_bak'

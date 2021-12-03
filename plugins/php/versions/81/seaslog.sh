@@ -18,7 +18,7 @@ sysName=`uname`
 actionType=$1
 version=$2
 
-extDir=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20200930/
+extDir=$serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20210902/
 
 if [ "$sysName" == "Darwin" ];then
 	BAK='_bak'
