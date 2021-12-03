@@ -43,6 +43,13 @@ Install_lib()
 		fi
 
 		cd $sourcePath/php${version}/ext/${LIBNAME}
+
+
+		#fuck,what error? fix it
+		FIND_undef=`cat Makefile|grep '#undef strndup'`
+		if [ "$FIND_undef" == "" ];then
+			sed -i $BAK "s/char \*strndup/\#undef strndup\nchar \*strndup/g" libmagic/softmagic.c
+		fi
 		
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config
