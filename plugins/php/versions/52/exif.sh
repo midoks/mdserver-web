@@ -38,6 +38,11 @@ Install_lib()
 	
 	if [ ! -f "$extFile" ];then
 
+		if [ ! -d $sourcePath/php${version}/ext ];then
+			sh $curPath/install.sh
+		fi
+
+
 		cd $sourcePath/php${version}/ext/${LIBNAME}
 		
 		$serverPath/php/$version/bin/phpize
