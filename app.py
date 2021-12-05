@@ -13,8 +13,10 @@ from geventwebsocket.handler import WebSocketHandler
 
 try:
     if __name__ == "__main__":
-        PORT = 7200
+        f = open('data/port.pl')
+        PORT = int(f.read())
         HOST = '0.0.0.0'
+
         http_server = WSGIServer(
             (HOST, PORT), app, handler_class=WebSocketHandler)
         http_server.serve_forever()
