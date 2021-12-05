@@ -5,6 +5,9 @@ import io
 import os
 from route import app, socketio
 
+from gevent import monkey
+monkey.patch_all()
+
 from gevent.pywsgi import WSGIServer
 from geventwebsocket.handler import WebSocketHandler
 
