@@ -153,6 +153,24 @@ def cleanLog():
         if os.path.isdir(abspath):
             cleanDirLog(abspath)
 
+    print("conf clean")
+
+    confFile = getServerDir()
+    # mw.readFile()
+    confFile = confFile + "/clean.conf"
+    clist = mw.readFile(confFile).strip()
+    clist = clist.split("\n")
+
+    for x in clist:
+        abspath = x.strip()
+        if os.path.exists(abspath):
+            if os.path.isfile(abspath):
+                cleanFileLog(abspath)
+
+            if os.path.isdir(abspath):
+                cleanDirLog(abspath)
+    print("conf clean end")
+
     print("clean end")
 
 if __name__ == "__main__":
