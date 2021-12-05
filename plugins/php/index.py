@@ -314,6 +314,7 @@ def getPhpConf(version):
         {'name': 'asp_tags', 'type': 1, 'ps': 'ASP标签支持'},
         {'name': 'max_execution_time', 'type': 2, 'ps': '最大脚本运行时间'},
         {'name': 'max_input_time', 'type': 2, 'ps': '最大输入时间'},
+        {'name': 'max_input_var', 'type': 2, 'ps': '最大输入数量'},
         {'name': 'memory_limit', 'type': 2, 'ps': '脚本内存限制'},
         {'name': 'post_max_size', 'type': 2, 'ps': 'POST数据最大尺寸'},
         {'name': 'file_uploads', 'type': 1, 'ps': '是否允许上传文件'},
