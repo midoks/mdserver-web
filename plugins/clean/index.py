@@ -97,6 +97,13 @@ def cleanFileLog(path):
         print(mw.execShell(cmd))
 
 
+def cleanSelfFileLog(path):
+    filepath, shotname, extension = get_filePath_fileName_fileExt(path)
+    cmd = "echo \"\" > " + path
+    print(cmd)
+    print(mw.execShell(cmd))
+
+
 def cleanDirLog(path):
     l = os.listdir(path)
     for x in range(len(l)):
@@ -165,7 +172,7 @@ def cleanLog():
         abspath = x.strip()
         if os.path.exists(abspath):
             if os.path.isfile(abspath):
-                cleanFileLog(abspath)
+                cleanSelfFileLog(abspath)
 
             if os.path.isdir(abspath):
                 cleanDirLog(abspath)
