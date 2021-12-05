@@ -15,7 +15,7 @@ actionType=$1
 version=$2
 
 LIBNAME=yaf
-LIBV=3.3.3
+LIBV=3.3.0
 
 
 NON_ZTS_FILENAME=`ls $serverPath/php/${version}/lib/php/extensions | grep no-debug-non-zts`
