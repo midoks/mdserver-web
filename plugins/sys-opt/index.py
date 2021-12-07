@@ -11,6 +11,18 @@ sys.path.append(os.getcwd() + "/class/core")
 import mw
 
 
+def getPluginName():
+    return 'sys-opt'
+
+
+def getPluginDir():
+    return mw.getPluginDir() + '/' + getPluginName()
+
+
+def getServerDir():
+    return mw.getServerDir() + '/' + getPluginName()
+
+
 def status():
     return 'start'
 
@@ -33,6 +45,27 @@ def restart():
 def reload():
     mw.execShell('sysctl -p')
     return 'ok'
+
+
+def configTpl():
+    path = getPluginDir() + '/tpl'
+    pathFile = os.listdir(path)
+    tmp = []
+    for one in pathFile:
+        file = path + '/' + one
+        tmp.append(file)
+    return mw.getJson(tmp)
+
+
+def readConfigTpl():
+    args = getArgs()
+    data = checkArgs(args, ['file'])
+    if not data[0]:
+        return data[1]
+
+    content = mw.readFile(args['file'])
+    content = contentReplace(content)
+    return mw.returnJson(True, 'ok', content)
 
 
 def sysConf():
@@ -64,6 +97,10 @@ if __name__ == "__main__":
         print(reload())
     elif func == 'conf':
         print(sysConf())
+    elif func == 'config_tpl':
+        print(configTpl())
+    elif func == 'read_config_tpl':
+        print(readConfigTpl())
     elif func == 'sec_run_log':
         print(secRunLog())
     elif func == 'msg_run_log':
