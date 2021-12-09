@@ -34,7 +34,7 @@ Install_Libzip()
 if [ ! -d ${libPath}/libzip ];then
     cd ${sourcePath}
     if [ ! -f ${sourcePath}/libzip-1.3.2.tar.gz ];then
-    	wget -O libzip-1.3.2.tar.gz https://nih.at/libzip/libzip-1.3.2.tar.gz -T 20
+    	wget -O libzip-1.3.2.tar.gz --no-check-certificate https://nih.at/libzip/libzip-1.3.2.tar.gz -T 20
     fi 
     tar -zxf libzip-1.3.2.tar.gz
     cd libzip-1.3.2
