@@ -33,11 +33,11 @@ Install_Libzip()
 #----------------------------- libzip start -------------------------#
 if [ ! -d ${libPath}/libzip ];then
     cd ${sourcePath}
-    if [ ! -f ${sourcePath}/libzip-1.2.0.tar.gz ];then
-    	wget -O libzip-1.2.0.tar.gz https://nih.at/libzip/libzip-1.2.0.tar.gz -T 20
+    if [ ! -f ${sourcePath}/libzip-1.3.2.tar.gz ];then
+    	wget -O libzip-1.3.2.tar.gz https://nih.at/libzip/libzip-1.3.2.tar.gz -T 20
     fi 
-    tar -zxf libzip-1.2.0.tar.gz
-    cd libzip-1.2.0
+    tar -zxf libzip-1.3.2.tar.gz
+    cd libzip-1.3.2
     ./configure --prefix=${libPath}/libzip && make && make install
 fi
 echo -e "Install_Libzip" >> ${libPath}/lib.pl
@@ -230,7 +230,7 @@ Install_Libiconv
 # Install_Zlib
 # Install_Freetype
 # Install_OpenSSL
-# Install_Libzip
+Install_Libzip
 
 sysName=`uname`
 if [ "$sysName" == "Darwin" ];then
