@@ -46,6 +46,10 @@ Install_lib()
 
 		cd $sourcePath/php${version}/ext/${LIBNAME}
 		
+		if [ ! -f "config.m4" ];then
+			mv config0.m4 config.m4
+		fi
+
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config
 		make && make install && make clean
