@@ -39,7 +39,7 @@ Install_lib()
 	echo "opcache.enable=1" >> $serverPath/php/$version/etc/php.ini
 	echo "opcache.memory_consumption=128" >> $serverPath/php/$version/etc/php.ini
 	echo "opcache.interned_strings_buffer=8" >> $serverPath/php/$version/etc/php.ini
-	echo "opcache.max_accelerated_files=4000" >> $serverPath/php/$version/etc/php.ini
+	echo "opcache.max_accelerated_files=400000" >> $serverPath/php/$version/etc/php.ini
 	echo "opcache.revalidate_freq=60" >> $serverPath/php/$version/etc/php.ini
 	echo "opcache.fast_shutdown=1" >> $serverPath/php/$version/etc/php.ini
 	echo "opcache.enable_cli=1" >> $serverPath/php/$version/etc/php.ini
