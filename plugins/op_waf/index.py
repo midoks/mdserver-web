@@ -805,6 +805,10 @@ def getLogsList():
 
     data = []
     path = mw.getLogsDir() + '/waf'
+
+    if not os.path.exists(path):
+        return mw.returnJson(False, '还未生成!', [])
+
     files = os.listdir(path)
     for f in files:
         if f == '.DS_Store':
