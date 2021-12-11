@@ -47,7 +47,8 @@ Install_lib()
 		cd $sourcePath/php${version}/ext/${LIBNAME}
 		
 		$serverPath/php/$version/bin/phpize
-		./configure --with-php-config=$serverPath/php/$version/bin/php-config
+		./configure --with-php-config=$serverPath/php/$version/bin/php-config\
+		--with-zip
 
 		make && make install && make clean
 		
