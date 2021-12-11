@@ -29,6 +29,8 @@ else
 	BAK=''
 fi
 
+export PKG_CONFIG_PATH=/www/server/lib/libzip/lib/pkgconfig
+
 Install_lib()
 {
 
