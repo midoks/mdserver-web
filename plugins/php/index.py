@@ -120,7 +120,7 @@ def contentReplace(content, version):
 
 def makeOpenrestyConf():
     phpversions = ['00', '52', '53', '54', '55', '56',
-                   '70', '71', '72', '73', '74', '80']
+                   '70', '71', '72', '73', '74', '80', '81']
     if mw.isInstalledWeb():
         sdir = mw.getServerDir()
         d_pathinfo = sdir + '/openresty/nginx/conf/pathinfo.conf'
