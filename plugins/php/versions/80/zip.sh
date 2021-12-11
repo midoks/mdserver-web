@@ -29,6 +29,8 @@ else
 	BAK=''
 fi
 
+export PKG_CONFIG_PATH=/www/server/lib/libzip/lib/pkgconfig
+
 Install_lib()
 {
 
@@ -47,7 +49,8 @@ Install_lib()
 		cd $sourcePath/php${version}/ext/${LIBNAME}
 		
 		$serverPath/php/$version/bin/phpize
-		./configure --with-php-config=$serverPath/php/$version/bin/php-config
+		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
+		--with-zip
 
 		make && make install && make clean
 		
