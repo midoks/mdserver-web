@@ -177,7 +177,6 @@ def md5(str):
         m.update(str.encode("utf-8"))
         return m.hexdigest()
     except Exception as ex:
-        print(ex)
         return False
 
 
@@ -284,7 +283,6 @@ def readFile(filename):
         fp.close()
         return fBody
     except Exception as e:
-        #print('readFile:', e)
         return False
 
 
@@ -312,7 +310,7 @@ def writeLog(type, logMsg, args=()):
         data = (type, logMsg, mDate)
         result = sql.table('logs').add('type,log,addtime', data)
     except Exception as e:
-        print(e)
+        pass
 
 
 def writeFile(filename, str):
@@ -539,7 +537,6 @@ def downloadFile(url, filename):
 
 def downloadHook(count, blockSize, totalSize):
     speed = {'total': totalSize, 'block': blockSize, 'count': count}
-    print(speed)
     print('%02d%%' % (100.0 * count * blockSize / totalSize))
 
 

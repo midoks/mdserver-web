@@ -648,8 +648,8 @@ class site_api:
 
         # print home_cert
         cmd = 'export ACCOUNT_EMAIL=' + email + ' && ' + execStr
-        print(domains)
-        print(cmd)
+        # print(domains)
+        # print(cmd)
         result = mw.execShell(cmd)
 
         if not os.path.exists(home_cert.replace("\*", "*")):
