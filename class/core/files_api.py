@@ -273,7 +273,7 @@ done
                 else:
                     data['files'].append(tmp)
             except Exception as e:
-                print(e)
+                # print(e)
                 continue
         return mw.returnJson(True, 'OK', data)
 
@@ -839,7 +839,7 @@ done
                                      mtime + ';' + accept + ';' + user + ';' + link)
                 n += 1
             except Exception as e:
-                print('getdir:dd.', e)
+                #print('getdir:dd.', e)
                 continue
         data['DIR'] = sorted(dirnames)
         data['FILES'] = sorted(filenames)
