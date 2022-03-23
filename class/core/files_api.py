@@ -121,7 +121,6 @@ class files_api:
     def getDirSizeApi(self):
         path = request.form.get('path', '')
         tmp = self.getDirSize(path)
-        print(tmp)
         return mw.returnJson(True, tmp[0].split()[0])
 
     def getDirApi(self):
