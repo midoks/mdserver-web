@@ -21,6 +21,7 @@ from flask import session
 from flask import request
 from flask import redirect
 from flask import url_for
+from flask import render_template_string, abort
 from flask_caching import Cache
 from flask_session import Session
 
@@ -229,6 +230,11 @@ def doLogin():
     return mw.returnJson(True, '登录成功,正在跳转...')
 
 
+@app.errorhandler(401)
+def page_unauthorized(error):
+    return render_template_string('<h1> Unauthorized </h1><h2>{{ error_info }}</h2>', error_info=error), 401
+
+
 @app.route('/<reqClass>/<reqAction>', methods=['POST', 'GET'])
 @app.route('/<reqClass>/', methods=['POST', 'GET'])
 @app.route('/<reqClass>', methods=['POST', 'GET'])
@@ -243,7 +249,8 @@ def index(reqClass=None, reqAction=None, reqData=None):
     pageFile = ('config', 'control', 'crontab', 'files', 'firewall',
                 'index', 'plugins', 'login', 'system', 'site', 'ssl', 'task', 'soft')
     if not reqClass in pageFile:
-        return redirect('/')
+        abort(401)
+        # return redirect('/')
 
     if reqAction == None:
         if not isLogined():
