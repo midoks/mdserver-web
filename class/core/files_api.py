@@ -121,7 +121,6 @@ class files_api:
     def getDirSizeApi(self):
         path = request.form.get('path', '')
         tmp = self.getDirSize(path)
-        # print(tmp)
         return mw.returnJson(True, tmp[0].split()[0])
 
     def getDirApi(self):
@@ -153,7 +152,6 @@ class files_api:
             mw.writeLog('文件管理', msg)
             return mw.returnJson(True, '文件创建成功!')
         except Exception as e:
-            # print str(e)
             return mw.returnJson(True, '文件创建失败!')
 
     def createDirApi(self):
@@ -273,7 +271,6 @@ done
                 else:
                     data['files'].append(tmp)
             except Exception as e:
-                # print(e)
                 continue
         return mw.returnJson(True, 'OK', data)
 
@@ -450,8 +447,6 @@ done
             filesx = json.loads(session['selected']['data'])
         else:
             filesx.append(filename)
-
-        # print(filesx)
 
         for fn in filesx:
             if fn == '.':
@@ -839,7 +834,6 @@ done
                                      mtime + ';' + accept + ';' + user + ';' + link)
                 n += 1
             except Exception as e:
-                #print('getdir:dd.', e)
                 continue
         data['DIR'] = sorted(dirnames)
         data['FILES'] = sorted(filenames)
