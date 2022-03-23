@@ -396,7 +396,7 @@ class system_api:
                     shutil.rmtree(filename)
                 else:
                     os.remove(filename)
-                print('\t\033[1;32m[OK]\033[0m')
+                print('mail clear ok')
                 num += 1
             total += size
             count += num
@@ -461,7 +461,7 @@ class system_api:
 
             return networkInfo
         except Exception as e:
-            print(e)
+            # print(e)
             return None
 
     def getNetWorkApi(self):
