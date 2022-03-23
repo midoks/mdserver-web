@@ -112,6 +112,8 @@ def publicObject(toObject, func, action=None, get=None):
             efunc = 'toObject.' + name + '()'
             data = eval(efunc)
             return data
+        data = {'msg': '404,not find api[' + name + ']', "status": False}
+        return mw.getJson(data)
     except Exception as e:
         data = {'msg': '访问异常:' + str(e) + '!', "status": False}
         return mw.getJson(data)
@@ -230,9 +232,9 @@ def doLogin():
     return mw.returnJson(True, '登录成功,正在跳转...')
 
 
-@app.errorhandler(401)
+@app.errorhandler(404)
 def page_unauthorized(error):
-    return render_template_string('<h1> Unauthorized </h1><h2>{{ error_info }}</h2>', error_info=error), 401
+    return render_template_string('404 not found', error_info=error), 404
 
 
 @app.route('/<reqClass>/<reqAction>', methods=['POST', 'GET'])
@@ -249,8 +251,7 @@ def index(reqClass=None, reqAction=None, reqData=None):
     pageFile = ('config', 'control', 'crontab', 'files', 'firewall',
                 'index', 'plugins', 'login', 'system', 'site', 'ssl', 'task', 'soft')
     if not reqClass in pageFile:
-        abort(401)
-        # return redirect('/')
+        return redirect('/')
 
     if reqAction == None:
         if not isLogined():
