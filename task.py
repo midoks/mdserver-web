@@ -354,15 +354,21 @@ def systemTask():
                     reloadNum += 1
                     if reloadNum > 1440:
                         reloadNum = 0
+                        mw.writeFile('log/sys_interrupt.pl',
+                                     "reload num:" + str(reloadNum))
                         restartMw()
                 except Exception as ex:
                     print(str(ex))
+                    mw.writeFile('log/sys_interrupt.pl', str(ex))
 
             del(tmp)
             time.sleep(5)
             count += 1
     except Exception as ex:
         print(str(ex))
+        mw.writeFile('log/sys_interrupt.pl', str(ex))
+
+        restartMw()
         import time
         time.sleep(30)
         systemTask()
