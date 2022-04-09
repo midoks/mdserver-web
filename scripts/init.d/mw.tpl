@@ -31,7 +31,7 @@ mw_start(){
 	isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`
 	if [ "$isStart" == '' ];then
             echo -e "Starting mw... \c"
-            cd $mw_path && gunicorn -c setting.py app:app
+            cd $mw_path && daemon "gunicorn -c setting.py app:app"
             port=$(cat ${mw_path}/data/port.pl)
             isStart=""
             while [[ "$isStart" == "" ]];
@@ -61,7 +61,7 @@ mw_start(){
     isStart=$(ps aux |grep 'task.py'|grep -v grep|awk '{print $2}')
     if [ "$isStart" == '' ];then
             echo -e "Starting mw-tasks... \c"
-            cd $mw_path && nohup python3 task.py >> $mw_path/logs/task.log 2>&1 &
+            cd $mw_path && daemon "python3 task.py >> ${mw_path}/logs/task.log 2>&1 &"
             sleep 0.3
             isStart=$(ps aux |grep 'task.py'|grep -v grep|awk '{print $2}')
             if [ "$isStart" == '' ];then
