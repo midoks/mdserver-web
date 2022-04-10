@@ -26,7 +26,7 @@ if [ ! -f /root/.acme.sh ];then
 	curl  https://get.acme.sh | sh
 fi
 
-if [ -f "/etc/init.d/iptables" ];then
+if [ -f /etc/init.d/iptables ];then
 
 	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 22 -j ACCEPT
 	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
