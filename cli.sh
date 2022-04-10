@@ -21,8 +21,13 @@ mw_start_debug(){
 	python3 task.py &
 	gunicorn -b :7200 -k gevent -w 1 app:app
 	# gunicorn -b :7200 -k eventlet -w 1 app:app 
-	# gunicorn -c setting.py app:app
 }
+
+mw_start_debug2(){
+	python3 task.py &
+	gunicorn -c setting.py app:app
+}
+
 
 mw_stop()
 {
@@ -44,5 +49,9 @@ case "$1" in
 	'debug') 
 		mw_stop 
 		mw_start_debug
+		;;
+	'debug2') 
+		mw_stop 
+		mw_start_debug2
 		;;
 esac
