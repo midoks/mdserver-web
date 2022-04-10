@@ -40,7 +40,7 @@ mw_start(){
 	isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`
 	if [ "$isStart" == '' ];then
             echo -e "Starting mw... \c"
-            cd $mw_path && daemon "gunicorn -c setting.py app:app"
+            cd $mw_path &&  gunicorn -c setting.py app:app
             port=$(cat ${mw_path}/data/port.pl)
             isStart=""
             while [[ "$isStart" == "" ]];
