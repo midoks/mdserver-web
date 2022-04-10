@@ -7,14 +7,15 @@ import sys
 import re
 
 
+sys.path.append(os.getcwd() + "/class/core")
+import mw
+
+
 cmd = 'ls /usr/local/lib/ | grep python  | cut -d \\  -f 1 | awk \'END {print}\''
 info = mw.execShell(cmd)
 p = "/usr/local/lib/" + info[0].strip() + "/site-packages"
 sys.path.append(p)
 import psutil
-
-sys.path.append(os.getcwd() + "/class/core")
-import mw
 
 
 app_debug = False
