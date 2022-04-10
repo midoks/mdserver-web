@@ -348,40 +348,40 @@ def nodeLogClearErr():
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
-        print status()
+        print(status())
     elif func == 'restart':
-        print restart()
+        print(restart())
     elif func == 'reload':
-        print reload()
+        print(reload())
     elif func == 'list':
-        print pm2List()
+        print(pm2List())
     elif func == 'add':
-        print pm2Add()
+        print(pm2Add())
     elif func == 'delete':
-        print pm2Delete()
+        print(pm2Delete())
     elif func == 'stop':
-        print pm2Stop()
+        print(pm2Stop())
     elif func == 'start':
-        print pm2Start()
+        print(pm2Start())
     elif func == 'get_logs':
-        print pm2Log()
+        print(pm2Log())
     elif func == 'node_log_run':
-        print nodeLogRun()
+        print(nodeLogRun())
     elif func == 'node_log_err':
-        print nodeLogErr()
+        print(nodeLogErr())
     elif func == 'node_log_clear_run':
-        print nodeLogClearRun()
+        print(nodeLogClearRun())
     elif func == 'node_log_clear_err':
-        print nodeLogClearErr()
+        print(nodeLogClearErr())
     elif func == 'versions':
-        print pm2VerList()
+        print(pm2VerList())
     elif func == 'set_node_version':
-        print setNodeVersion()
+        print(setNodeVersion())
     elif func == 'mod_list':
-        print getMod()
+        print(getMod())
     elif func == 'install_mod':
-        print installMod()
+        print(installMod())
     elif func == 'uninstall_mod':
-        print uninstallMod()
+        print(uninstallMod())
     else:
-        print 'error'
+        print('error')
