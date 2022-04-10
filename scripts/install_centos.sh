@@ -95,6 +95,11 @@ yum -y install python36-devel
 #fi 
 
 
+if [ ! -f /usr/local/bin/pip3 ];then
+    python3 -m pip install --upgrade pip setuptools wheel -i https://mirrors.aliyun.com/pypi/simple
+fi
+
+
 cd /www/server/mdserver-web/scripts && ./lib.sh
 
 chmod 755 /www/server/mdserver-web/data
