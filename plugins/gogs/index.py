@@ -628,19 +628,23 @@ def getRsaPublic():
 def getTotalStatistics():
     st = status()
     data = {}
-    if st == 'start':
+    if st.strip() == 'start':
         pm = pMysqlDb()
         list_count = pm.query('select count(id) as num from repository')
-        count = list_count[0][0]
+
+        if list_count.find("error") > -1:
+            data['status'] = False
+            data['count'] = 0
+            return mw.returnJson(False, 'fail', data)
 
         data['status'] = True
         data['count'] = count
         data['ver'] = mw.readFile(getServerDir() + '/version.pl').strip()
         return mw.returnJson(True, 'ok', data)
-    else:
-        data['status'] = False
-        data['count'] = 0
-        return mw.returnJson(False, 'fail', data)
+
+    data['status'] = False
+    data['count'] = 0
+    return mw.returnJson(False, 'fail', data)
 
 
 if __name__ == "__main__":

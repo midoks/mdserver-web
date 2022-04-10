@@ -83,7 +83,7 @@ class mysqlDb:
             self.__Close()
             return result
         except Exception as ex:
-            return ex
+            return "error: " + str(ex)
 
     # 关闭连接
     def __Close(self):
