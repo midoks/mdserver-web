@@ -24,6 +24,15 @@ else
     echo ""
 fi
 
+# Source function library.
+if [ -f /etc/init.d/functions ];then
+  . /etc/init.d/functions
+fi
+
+if [ -f /etc/rc.d/init.d/functions ];then
+  . /etc/rc.d/init.d/functions
+fi
+
 export LC_ALL="en_US.UTF-8"
 
 
