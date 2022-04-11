@@ -24,15 +24,6 @@ else
     echo ""
 fi
 
-# Source function library.
-if [ -f /etc/init.d/functions ];then
-  . /etc/init.d/functions
-fi
-
-if [ -f /etc/rc.d/init.d/functions ];then
-  . /etc/rc.d/init.d/functions
-fi
-
 export LC_ALL="en_US.UTF-8"
 
 
@@ -70,7 +61,7 @@ mw_start(){
     isStart=$(ps aux |grep 'task.py'|grep -v grep|awk '{print $2}')
     if [ "$isStart" == '' ];then
             echo -e "Starting mw-tasks... \c"
-            cd $mw_path && daemon "python3 task.py >> ${mw_path}/logs/task.log 2>&1 &"
+            cd $mw_path && python3 task.py >> ${mw_path}/logs/task.log 2>&1 &
             sleep 0.3
             isStart=$(ps aux |grep 'task.py'|grep -v grep|awk '{print $2}')
             if [ "$isStart" == '' ];then
