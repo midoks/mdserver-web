@@ -56,7 +56,7 @@ def mw_async(f):
 @mw_async
 def restartMw():
     time.sleep(1)
-    cmd = mw.getRunDir() + '/scripts/init.d/mw restart'
+    cmd = mw.getRunDir() + '/scripts/init.d/mw reload &'
     mw.execShell(cmd)
 
 
