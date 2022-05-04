@@ -130,6 +130,24 @@ def stop():
 
 
 def reload():
+    if os.path.exists("/tmp/mongodb-27017.sock"):
+        mw.execShell('rm -rf ' + "/tmp/mongodb-27017.sock")
+    if mw.isAppleSystem():
+        file = initDreplace()
+        data = mw.execShell(file + ' reload')
+        if data[1] == '':
+            return 'ok'
+        return 'fail'
+
+    data = mw.execShell('systemctl reload mongod')
+    if data[1] == '':
+        return 'ok'
+    return 'fail'
+
+
+def restart():
+    if os.path.exists("/tmp/mongodb-27017.sock"):
+        mw.execShell('rm -rf ' + "/tmp/mongodb-27017.sock")
     if mw.isAppleSystem():
         file = initDreplace()
         data = mw.execShell(file + ' reload')
