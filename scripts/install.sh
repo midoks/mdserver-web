@@ -23,14 +23,8 @@ if [ ${_os} == "Darwin" ]; then
 	OSNAME='macos'
 elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
 	OSNAME='centos'
-elif grep -Eqi "Red Hat Enterprise Linux Server" /etc/issue || grep -Eq "Red Hat Enterprise Linux Server" /etc/*-release; then
-	OSNAME='rhel'
-elif grep -Eqi "Aliyun" /etc/issue || grep -Eq "Aliyun" /etc/*-release; then
-	OSNAME='aliyun'
 elif grep -Eqi "Fedora" /etc/issue || grep -Eq "Fedora" /etc/*-release; then
 	OSNAME='fedora'
-elif grep -Eqi "Amazon Linux AMI" /etc/issue || grep -Eq "Amazon Linux AMI" /etc/*-release; then
-	OSNAME='amazon'
 elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
 	OSNAME='debian'
 elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
