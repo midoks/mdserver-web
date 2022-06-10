@@ -31,7 +31,7 @@ else
 fi
 
 pip3 install  gevent flask gunicorn flask_caching flask_session
-pip3 install flask_socketio gevent-websocket
+pip3 install flask_socketio gevent-websocket libsqlite3-dev
 
 sh /etc/init.d/mw stop && rm -rf  /www/server/mdserver-web/scripts/init.d/mw && rm -rf  /etc/init.d/mw
 
