@@ -71,7 +71,8 @@ if [ ! -d /www/server/mdserver-web ];then
 	rm -rf /tmp/mdserver-web-master
 fi 
 
-apt install python3-pip
+apt install -y python3-pip
+apt-get install -y python3-venv
 
 if [ ! -f /usr/local/bin/pip3 ];then
     python3 -m pip install --upgrade pip setuptools wheel -i https://mirrors.aliyun.com/pypi/simple
@@ -87,6 +88,8 @@ if [ -f /www/server/mdserver-web/bin/activate ];then
 else
     cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
 fi
+
+
 
 cd /www/server/mdserver-web && ./cli.sh start
 sleep 5
