@@ -28,6 +28,7 @@ elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
 	OSNAME='debian'
 elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
 	OSNAME='ubuntu'
+	sudo ln -sf /bin/bash /bin/sh
 elif grep -Eqi "Raspbian" /etc/issue || grep -Eq "Raspbian" /etc/*-release; then
 	OSNAME='raspbian'
 elif grep -Eqi "Deepin" /etc/issue || grep -Eq "Deepin" /etc/*-release; then
