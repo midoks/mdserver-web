@@ -7,6 +7,8 @@ is64bit=`getconf LONG_BIT`
 startTime=`date +%s`
 
 _os=`uname`
+
+echo "use system:${_os}"
 if [ "$_os" == "Darwin" ] ; then
 	OSNAME='MAC'
 elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
