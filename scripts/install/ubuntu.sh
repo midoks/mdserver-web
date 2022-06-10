@@ -39,7 +39,7 @@ fi
 
 if [ "${isVersion}" == '' ];then
 	if [ ! -f "/etc/init.d/iptables" ];then
-		yum install firewalld -y
+		apt install firewalld
 		systemctl enable firewalld
 		systemctl start firewalld
 
