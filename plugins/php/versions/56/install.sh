@@ -15,7 +15,7 @@ PHP_VER=56
 Install_php()
 {
 #------------------------ install start ------------------------------------#
-echo "安装php-5.6.40 ..." > $install_tmp
+echo "安装php-${version} ..." > $install_tmp
 mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
@@ -79,7 +79,7 @@ Uninstall_php()
 {
 	$serverPath/php/init.d/php56 stop
 	rm -rf $serverPath/php/56
-	echo "卸载php-5.6.36 ..." > $install_tmp
+	echo "卸载php-${version} ..." > $install_tmp
 }
 
 action=${1}
