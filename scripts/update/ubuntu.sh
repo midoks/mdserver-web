@@ -35,8 +35,6 @@ pip3 install flask_socketio gevent-websocket
 
 sh /etc/init.d/mw stop && rm -rf  /www/server/mdserver-web/scripts/init.d/mw && rm -rf  /etc/init.d/mw
 
-
-
 echo -e "stop mw"
 isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`
 port=$(cat /www/server/mdserver-web/data/port.pl)
