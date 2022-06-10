@@ -4,6 +4,7 @@ export PATH
 LANG=en_US.UTF-8
 
 
+
 mkdir -p /www/server
 mkdir -p /www/wwwroot
 mkdir -p /www/wwwlogs
@@ -59,6 +60,8 @@ service iptables stop
 
 
 # apt install -y libevent libevent-devel mysql-devel libjpeg* libpng* gd* zip unzip libmcrypt libmcrypt-devel
+apt install unzip
+
 
 if [ ! -d /www/server/mdserver-web ];then
 	wget -O /tmp/master.zip https://codeload.github.com/midoks/mdserver-web/zip/master
