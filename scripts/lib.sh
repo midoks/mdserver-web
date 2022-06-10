@@ -260,7 +260,7 @@ Install_Libiconv
 # Install_Libmemcached
 # Install_Curl
 # Install_Zlib
-# Install_Freetype
+Install_Freetype
 # Install_OpenSSL
 Install_Libzip
 
