@@ -24,8 +24,9 @@ mw_start_debug(){
 }
 
 mw_start_debug2(){
-	python3 task.py &
 	gunicorn -c setting.py app:app
+	python3 task.py &
+	
 }
 
 

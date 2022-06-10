@@ -9,13 +9,13 @@ sys.path.append(chdir + '/class/core')
 
 import mw
 
-cmd = 'ls /usr/local/lib/ | grep python  | cut -d \\  -f 1 | awk \'END {print}\''
-info = mw.execShell(cmd)
-p = "/usr/local/lib/" + info[0].strip() + "/site-packages"
-p_debain = "/usr/local/lib/" + info[0].strip() + "/dist-packages"
+# cmd = 'ls /usr/local/lib/ | grep python  | cut -d \\  -f 1 | awk \'END {print}\''
+# info = mw.execShell(cmd)
+# p = "/usr/local/lib/" + info[0].strip() + "/site-packages"
+# p_debain = "/usr/local/lib/" + info[0].strip() + "/dist-packages"
 
-sys.path.append(p)
-sys.path.append(p_debain)
+# sys.path.append(p)
+# sys.path.append(p_debain)
 
 import system_api
 cpu_info = system_api.system_api().getCpuInfo()

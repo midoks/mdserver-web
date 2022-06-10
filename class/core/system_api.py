@@ -15,15 +15,6 @@ import db
 import mw
 
 import config_api
-
-cmd = 'ls /usr/local/lib/ | grep python  | cut -d \\  -f 1 | awk \'END {print}\''
-info = mw.execShell(cmd)
-p = "/usr/local/lib/" + info[0].strip() + "/site-packages"
-p_debain = "/usr/local/lib/" + info[0].strip() + "/dist-packages"
-
-sys.path.append(p)
-sys.path.append(p_debain)
-
 import requests
 
 from threading import Thread
