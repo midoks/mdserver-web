@@ -22,7 +22,7 @@ sed -i 's#SELINUX=enforcing#SELINUX=disabled#g' /etc/selinux/config
 yum install -y wget curl vixie-cron lsof
 #https need
 
-if [ ! -f /root/.acme.sh ];then	
+if [ ! -d /root/.acme.sh ];then	
 	curl  https://get.acme.sh | sh
 fi
 
