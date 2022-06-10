@@ -58,7 +58,7 @@ fi
 service iptables stop
 
 
-apt install -y libevent libevent-devel mysql-devel libjpeg* libpng* gd* zip unzip libmcrypt libmcrypt-devel
+# apt install -y libevent libevent-devel mysql-devel libjpeg* libpng* gd* zip unzip libmcrypt libmcrypt-devel
 
 if [ ! -d /www/server/mdserver-web ];then
 	wget -O /tmp/master.zip https://codeload.github.com/midoks/mdserver-web/zip/master
@@ -91,11 +91,6 @@ sleep 5
 cd /www/server/mdserver-web && ./cli.sh stop
 cd /www/server/mdserver-web && ./scripts/init.d/mw default
 cd /www/server/mdserver-web && ./cli.sh start
-
-
-
-
-
 
 
 
