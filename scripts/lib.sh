@@ -285,6 +285,8 @@ elif [ "$OSNAME" == "ubuntu" ]; then
     apt-get install -y perl g++ make automake libtool unzip
     apt-get install -y libevent-dev libncurses5-dev
 
+    apt install -y libjpeg62-dev libpng-dev zlib1g-dev dia pkg-config
+
 
 else
     yum -y install libmemcached libmemcached-devel
