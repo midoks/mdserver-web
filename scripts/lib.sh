@@ -274,9 +274,11 @@ if [ "$OSNAME" == "macos" ]; then
 
 elif [ "$OSNAME" == "ubuntu" ]; then
     
+    apt-get install -y libxml2-dev gcc build-essential openssl make libssl-dev curl libcurl4-gnutls-dev libjpeg-dev libpng-dev libmcrypt-dev
     apt install -y libxml2-dev libxml2
     apt install -y graphviz
     apt install -y mysql-server
+    apt install -y libsqlite3-dev curl
 
 else
     yum -y install libmemcached libmemcached-devel
