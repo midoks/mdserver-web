@@ -282,6 +282,8 @@ elif [ "$OSNAME" == "ubuntu" ]; then
     apt install -y libonig-dev
 
     apt install -y cmake
+    apt-get install -y perl g++ make automake libtool unzip
+    apt-get install -y libevent-dev
 
 else
     yum -y install libmemcached libmemcached-devel
