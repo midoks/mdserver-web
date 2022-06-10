@@ -275,6 +275,7 @@ if [ "$OSNAME" == "macos" ]; then
 elif [ "$OSNAME" == "ubuntu" ]; then
     
     apt install -y graphviz
+    apt install -y mysql-server
 
 else
     yum -y install libmemcached libmemcached-devel
