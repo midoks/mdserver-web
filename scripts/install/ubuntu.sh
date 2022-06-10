@@ -68,13 +68,35 @@ if [ ! -d /www/server/mdserver-web ];then
 	rm -rf /tmp/mdserver-web-master
 fi 
 
-apt groupinstall "Development Tools"
-paces="wget python-devel python-imaging libicu-devel zip unzip bzip2-devel gcc libxml2 libxml2-dev libxslt* libjpeg-devel libpng-devel libwebp libwebp-devel lsof pcre pcre-devel vixie-cron crontabs"
-apt install $paces
-apt lsof net-tools.x86_64
-apt  install ncurses-devel mysql-dev locate cmake
-apt install python-devel.x86_64
-apt install MySQL-python 
-apt install epel-release
-apt install  python36-devel
-echo "ubuntu dev ..."
+apt install python3-pip
+
+if [ ! -f /usr/local/bin/pip3 ];then
+    python3 -m pip install --upgrade pip setuptools wheel -i https://mirrors.aliyun.com/pypi/simple
+fi
+
+
+cd /www/server/mdserver-web/scripts && ./lib.sh
+chmod 755 /www/server/mdserver-web/data
+
+
+if [ -f /www/server/mdserver-web/bin/activate ];then
+    cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate && pip3 install -r /www/server/mdserver-web/requirements.txt
+else
+    cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
+fi
+
+cd /www/server/mdserver-web && ./cli.sh start
+sleep 5
+
+cd /www/server/mdserver-web && ./cli.sh stop
+cd /www/server/mdserver-web && ./scripts/init.d/mw default
+cd /www/server/mdserver-web && ./cli.sh start
+
+
+
+
+
+
+
+
+
