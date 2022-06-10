@@ -35,8 +35,6 @@ elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
 	OSNAME='ubuntu'
 elif grep -Eqi "Raspbian" /etc/issue || grep -Eq "Raspbian" /etc/*-release; then
 	OSNAME='raspbian'
-elif grep -Eqi "Deepin" /etc/issue || grep -Eq "Deepin" /etc/*-release; then
-	OSNAME='deepin'
 else
 	OSNAME='unknow'
 fi
