@@ -92,7 +92,7 @@ else
 fi
 
 pip3 install gevent flask gunicorn flask_caching flask_session
-pip3 install flask_socketio gevent-websocket
+pip3 install flask_socketio gevent-websocket psutil
 
 
 cd /www/server/mdserver-web && ./cli.sh start
