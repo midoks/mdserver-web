@@ -277,14 +277,16 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     apt-get install -y libxml2-dev gcc build-essential openssl make libssl-dev curl libcurl4-gnutls-dev libjpeg-dev libpng-dev libmcrypt-dev
     apt install -y libxml2-dev libxml2
     apt install -y graphviz
-    apt install -y libsqlite3-dev curl
+    apt install -y libsqlite3-dev curl libcurl4-openssl-dev
     apt install -y libonig-dev
 
-    apt install -y cmake lsof
+    apt install -y cmake lsof libcurl4-gnutls-dev
+    cd /usr/include && ln -s x86_64-linux-gnu/curl
+    
     apt-get install -y perl g++ make automake libtool unzip
     apt-get install -y libevent-dev libncurses5-dev
 
-    apt install -y libjpeg62-turbo-dev libpng-dev zlib1g-dev dia pkg-config libfreetype6-dev
+    apt install -y libjpeg62-turbo-dev libpng-dev zlib1g-dev dia pkg-config libfreetype-dev libfreetype6 libfreetype6-dev
 
     apt install -y libmariadbd18 libmariadbd-dev mysql-community-client
 
