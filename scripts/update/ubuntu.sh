@@ -20,6 +20,10 @@ chmod 755 /www/server/mdserver-web/data
 #venv
 cd /www/server/mdserver-web && python3 -m venv .
 
+
+pip3 install gevent flask gunicorn flask_caching flask_session
+pip3 install flask_socketio gevent-websocket psutil
+
 if [ ! -f /usr/local/bin/pip3 ];then
     python3 -m pip install --upgrade pip setuptools wheel -i https://mirrors.aliyun.com/pypi/simple
 fi
@@ -31,8 +35,7 @@ else
     cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
 fi
 
-# pip3 install gevent flask gunicorn flask_caching flask_session
-# pip3 install flask_socketio gevent-websocket psutil
+
 
 sh /etc/init.d/mw stop && rm -rf  /www/server/mdserver-web/scripts/init.d/mw && rm -rf  /etc/init.d/mw
 
