@@ -14,7 +14,7 @@ mkdir -p /www/backup/site
 
 apt install -y wget curl vixie-cron lsof iptables
 
-if [ ! -f /root/.acme.sh ];then	
+if [ ! -d /root/.acme.sh ];then	
 	curl  https://get.acme.sh | sh
 fi
 
