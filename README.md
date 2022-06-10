@@ -46,3 +46,10 @@ curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts
 ### wiki
 [了解更多...](https://github.com/midoks/mdserver-web/wiki)
 
+
+### 感谢
+
+- 开发赞助
+
+[digitalvirt](https://digitalvirt.com/)
+
