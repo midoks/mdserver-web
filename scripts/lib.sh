@@ -255,14 +255,7 @@ else
     OSNAME='unknow'
 fi
 
-Install_Libiconv
 
-# Install_Libmemcached
-# Install_Curl
-# Install_Zlib
-Install_Freetype
-# Install_OpenSSL
-Install_Libzip
 
 if [ "$OSNAME" == "macos" ]; then
     brew install libmemcached
@@ -291,6 +284,15 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     apt install -y libmariadbd18 libmariadbd-dev mysql-community-client
 
 else
+    Install_Libiconv
+
+    # Install_Libmemcached
+    # Install_Curl
+    # Install_Zlib
+    Install_Freetype
+    # Install_OpenSSL
+    Install_Libzip
+
     yum -y install libmemcached libmemcached-devel
     yum -y install curl curl-devel
     yum -y install zlib zlib-devel
