@@ -281,6 +281,8 @@ elif [ "$OSNAME" == "ubuntu" ]; then
     apt install -y libsqlite3-dev curl
     apt install -y libonig-dev
 
+    apt install -y cmake
+
 else
     yum -y install libmemcached libmemcached-devel
     yum -y install curl curl-devel
