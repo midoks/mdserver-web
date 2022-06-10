@@ -287,6 +287,8 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
 
     apt install -y libjpeg62-turbo-dev libpng-dev zlib1g-dev dia pkg-config libfreetype6-dev
 
+    apt install -y libmariadbd18 libmariadbd-dev mysql-community-client
+
 else
     yum -y install libmemcached libmemcached-devel
     yum -y install curl curl-devel
