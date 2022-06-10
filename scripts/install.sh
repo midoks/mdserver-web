@@ -38,9 +38,9 @@ fi
 
 echo "use system version: ${OSNAME}"
 
-if [ "$OSNAME" == 'MAC' ];then
+if [ "$OSNAME" == 'MAC' ]; then
 	curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/install_macos.sh | sh
-elif [ "$OSNAME" == 'Ubuntu' ];then
+elif [ "$OSNAME" == 'Ubuntu' ]; then
 	curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/install_ubuntu.sh | sh
 else
 	curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/install_centos.sh | sh
