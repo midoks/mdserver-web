@@ -37,7 +37,7 @@ else
 fi
 
 echo "use system version: ${OSNAME}"
-curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/install/${$OSNAME}.sh | sh
+curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/install/${OSNAME}.sh | sh
 
 
 endTime=`date +%s`
