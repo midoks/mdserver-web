@@ -281,7 +281,7 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     apt install -y libsqlite3-dev curl
     apt install -y libonig-dev
 
-    apt install -y cmake
+    apt install -y cmake lsof
     apt-get install -y perl g++ make automake libtool unzip
     apt-get install -y libevent-dev libncurses5-dev
 
