@@ -274,6 +274,7 @@ if [ "$OSNAME" == "macos" ]; then
 
 elif [ "$OSNAME" == "ubuntu" ]; then
     
+    apt install -y libxml2-dev libxml2
     apt install -y graphviz
     apt install -y mysql-server
 
