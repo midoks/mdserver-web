@@ -15,6 +15,11 @@ else
     cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
 fi
 
+pip3 install  gevent flask gunicorn flask_caching flask_session
+pip3 install flask_socketio
+
+
+
 cd /www/server/mdserver-web && ./cli.sh start
 sleep 5
 
