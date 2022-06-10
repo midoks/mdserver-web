@@ -29,8 +29,7 @@ Install_mysql()
 		groupadd mysql
 		useradd -g mysql mysql
 
-		yum install -y cmake3
-		INSTALL_CMD=cmake3
+		INSTALL_CMD=cmake
 	fi 
 
 	if [ ! -f ${mysqlDir}/mysql-boost-8.0.22.tar.gz ];then
