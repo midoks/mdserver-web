@@ -277,7 +277,6 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     apt-get install -y libxml2-dev gcc build-essential openssl make libssl-dev curl libcurl4-gnutls-dev libjpeg-dev libpng-dev libmcrypt-dev
     apt install -y libxml2-dev libxml2
     apt install -y graphviz
-    apt install -y mysql-server
     apt install -y libsqlite3-dev curl
     apt install -y libonig-dev
 
