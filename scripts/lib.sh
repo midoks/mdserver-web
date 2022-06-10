@@ -279,6 +279,7 @@ elif [ "$OSNAME" == "ubuntu" ]; then
     apt install -y graphviz
     apt install -y mysql-server
     apt install -y libsqlite3-dev curl
+    apt install -y libonig-dev
 
 else
     yum -y install libmemcached libmemcached-devel
