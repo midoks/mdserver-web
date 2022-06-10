@@ -1,4 +1,4 @@
-werkzeug==1.0.1
+werkzeug==2.0.3
 setuptools==33.1.1
 wheel==0.33.6
 flask==2.0.3
