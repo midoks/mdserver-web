@@ -93,14 +93,11 @@ pip3 install gevent flask gunicorn flask_caching flask_session
 pip3 install flask_socketio gevent-websocket
 
 
-
 cd /www/server/mdserver-web && ./cli.sh start
 sleep 5
 
 cd /www/server/mdserver-web && ./cli.sh stop
 cd /www/server/mdserver-web && ./scripts/init.d/mw default
 cd /www/server/mdserver-web && ./cli.sh start
-
-
 
 
