@@ -94,8 +94,7 @@ pip3 install flask_socketio gevent-websocket psutil
 
 
 cd /www/server/mdserver-web && ./cli.sh start
-
-sleep 10
+sleep 5
 
 cd /www/server/mdserver-web && ./cli.sh stop
 cd /www/server/mdserver-web && ./cli.sh start
