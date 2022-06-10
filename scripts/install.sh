@@ -5,13 +5,13 @@ LANG=en_US.UTF-8
 is64bit=`getconf LONG_BIT`
 
 if [ -f /etc/motd ];then
-    echo "Welcome to mdserver-web panel" > /etc/motd
+    echo "welcome to mdserver-web panel" > /etc/motd
 fi
 
 startTime=`date +%s`
 
 _os=`uname`
-echo "use system:${_os}"
+echo "use system: ${_os}"
 if [ "$_os" == "Darwin" ] ; then
 	OSNAME='MAC'
 elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
@@ -35,6 +35,8 @@ elif grep -Eqi "Deepin" /etc/issue || grep -Eq "Deepin" /etc/*-release; then
 else
 	OSNAME='unknow'
 fi
+
+echo "use system version: ${OSNAME}"
 
 
 if [ "$OSNAME" == 'MAC' ];then

@@ -8,7 +8,7 @@ startTime=`date +%s`
 
 _os=`uname`
 
-echo "use system:${_os}"
+echo "use system: ${_os}"
 if [ "$_os" == "Darwin" ] ; then
 	OSNAME='MAC'
 elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
@@ -34,6 +34,7 @@ else
 fi
 
 #pip uninstall public
+echo "use system version: ${OSNAME}"
 
 if [ "$OSNAME" == 'MAC' ];then
 	echo 'The development environment only needs to be downloaded again!'
