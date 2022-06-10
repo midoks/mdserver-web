@@ -19,6 +19,7 @@ python-engineio==3.13.2
 python-socketio==4.2.0
 Flask-SocketIO==3.0.2
 zmq==0.0.0
+itsdangerous==2.0.1
 Jinja2==2.10.1
 MarkupSafe==1.1.1
 mysqlclient==2.0.3
