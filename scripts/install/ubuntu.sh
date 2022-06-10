@@ -11,8 +11,11 @@ mkdir -p /www/wwwlogs
 mkdir -p /www/backup/database
 mkdir -p /www/backup/site
 
+apt update -y
 
 apt install -y wget curl vixie-cron lsof iptables
+apt install -y python3-pip
+apt install -y python3-venv
 
 if [ ! -d /root/.acme.sh ];then	
 	curl  https://get.acme.sh | sh
@@ -71,8 +74,7 @@ if [ ! -d /www/server/mdserver-web ];then
 	rm -rf /tmp/mdserver-web-master
 fi 
 
-apt install -y python3-pip
-apt-get install -y python3-venv
+
 
 if [ ! -f /usr/local/bin/pip3 ];then
     python3 -m pip install --upgrade pip setuptools wheel -i https://mirrors.aliyun.com/pypi/simple
