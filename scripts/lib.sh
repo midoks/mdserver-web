@@ -263,7 +263,6 @@ Install_Curl
 # Install_OpenSSL
 Install_Libzip
 
-OSNAME=`uname`
 if [ "$OSNAME" == "macos" ]; then
     brew install libmemcached
     brew install curl
