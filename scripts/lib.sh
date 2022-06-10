@@ -257,7 +257,7 @@ fi
 Install_Libiconv
 
 # Install_Libmemcached
-# Install_Curl
+Install_Curl
 # Install_Zlib
 # Install_Freetype
 # Install_OpenSSL
@@ -285,7 +285,7 @@ elif [ "$OSNAME" == "ubuntu" ]; then
     apt-get install -y perl g++ make automake libtool unzip
     apt-get install -y libevent-dev libncurses5-dev
 
-    apt install -y libjpeg62-dev libpng-dev zlib1g-dev dia pkg-config
+    apt install -y libjpeg62-dev libpng-dev zlib1g-dev dia pkg-config libfreetype6-dev
 
 
 else
