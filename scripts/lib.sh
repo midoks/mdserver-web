@@ -271,7 +271,7 @@ if [ "$OSNAME" == "macos" ]; then
     brew install openssl
     brew install libzip
 
-elif [ "$OSNAME" == "ubuntu" ]; then
+elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     
     apt-get install -y libxml2-dev gcc build-essential openssl make libssl-dev curl libcurl4-gnutls-dev libjpeg-dev libpng-dev libmcrypt-dev
     apt install -y libxml2-dev libxml2
@@ -285,7 +285,6 @@ elif [ "$OSNAME" == "ubuntu" ]; then
     apt-get install -y libevent-dev libncurses5-dev
 
     apt install -y libjpeg62-dev libpng-dev zlib1g-dev dia pkg-config libfreetype6-dev
-
 
 else
     yum -y install libmemcached libmemcached-devel
