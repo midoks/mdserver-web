@@ -18,6 +18,10 @@ if grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
 	#sudo dpkg-reconfigure dash
 fi
 
+if grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
+	sudo ln -sf /bin/bash /bin/sh
+fi
+
 
 if [ ${_os} == "Darwin" ]; then
 	OSNAME='macos'
