@@ -9,7 +9,7 @@ cache==1.0.3
 flask-caching==1.11.1
 gevent==21.1.2
 gevent-websocket==0.10.1
-psutil==5.8.0
+psutil==5.9.1
 chardet==3.0.4
 flask-sqlalchemy==2.3.2
 cryptography==3.3.2
