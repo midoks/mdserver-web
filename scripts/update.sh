@@ -24,7 +24,11 @@ elif grep -Eqi "Amazon Linux AMI" /etc/issue || grep -Eq "Amazon Linux AMI" /etc
 elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
 	OSNAME='debian'
 elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
+
 	OSNAME='ubuntu'
+	sudo ln -sf /bin/bash /bin/sh
+	# sudo dpkg-reconfigure dash
+	
 elif grep -Eqi "Raspbian" /etc/issue || grep -Eq "Raspbian" /etc/*-release; then
 	OSNAME='raspbian'
 elif grep -Eqi "Deepin" /etc/issue || grep -Eq "Deepin" /etc/*-release; then
@@ -35,14 +39,8 @@ fi
 
 #pip uninstall public
 echo "use system version: ${OSNAME}"
-
-if [ "$OSNAME" == 'macos' ]; then
-	echo 'The development environment only needs to be downloaded again!'
-	exit 0
-else
-	curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/update/${OSNAME}.sh | sh
-fi
+curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/update/${OSNAME}.sh | sh
 
 endTime=`date +%s`
-outTime=($endTime-$startTime)/60
+((outTime=($endTime-$startTime)/60))
 echo -e "Time consumed:\033[32m $outTime \033[0mMinute!"
