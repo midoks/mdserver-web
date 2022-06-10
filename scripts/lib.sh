@@ -208,6 +208,7 @@ Install_Lib()
 Install_Curl()
 {
 #----------------------------- curl start -------------------------#
+
 if [ ! -d ${libPath}/curl ];then
     cd ${sourcePath}
     if [ ! -f ${sourcePath}/curl-7.64.0.tar.gz ];then
@@ -284,7 +285,7 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     apt-get install -y perl g++ make automake libtool unzip
     apt-get install -y libevent-dev libncurses5-dev
 
-    apt install -y libjpeg62-dev libpng-dev zlib1g-dev dia pkg-config libfreetype6-dev
+    apt install -y libjpeg62-turbo-dev libpng-dev zlib1g-dev dia pkg-config libfreetype6-dev
 
 else
     yum -y install libmemcached libmemcached-devel
