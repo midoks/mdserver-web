@@ -335,7 +335,6 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     apt install -y libmariadb-dev-compat
     apt install -y libmariadbclient-dev 
 else
-    Install_Lib
 
     yum -y install libmemcached libmemcached-devel
     yum -y install curl curl-devel
@@ -343,13 +342,14 @@ else
     yum -y install freetype freetype-devel
     yum -y install openssl openssl-devel
     yum -y install libzip libzip-devel
-    yum -y install graphviz libxml2
+    yum -y install graphviz libxml2 libxml2-devel
 
     yum -y install sqlite-devel
     yum -y install oniguruma oniguruma-devel
     yum -y install ImageMagick ImageMagick-devel
 
-    if [ "$OSNAME" == "ubuntu"  ]; then
-        dnf install libxml2
+    if [ "$OSNAME" == "fedora"  ]; then
+        dnf install libxml2 libxml2-devel -y
+
     fi
 fi
