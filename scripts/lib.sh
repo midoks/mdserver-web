@@ -287,7 +287,9 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     apt-get install -y perl g++ make automake libtool unzip
     apt-get install -y libevent-dev libncurses5-dev
 
-    apt install -y libjpeg62-turbo-dev libpng-dev zlib1g-dev dia pkg-config libfreetype-dev libfreetype6 libfreetype6-dev
+    apt install -y libpng-dev zlib1g-dev dia pkg-config libfreetype6 libfreetype6-dev
+
+    apt install -y libjpeg62-turbo-dev libfreetype-dev
 
     apt install -y libmariadbd18 libmariadbd-dev mysql-community-client
 
