@@ -85,6 +85,24 @@ Install_Freetype()
 {
 #----------------------------- freetype start -------------------------#
     cd ${sourcePath}
+    if [ ! -d ${libPath}/freetype_old ];then
+        wget -O freetype-2.7.1.tar.gz https://download.savannah.gnu.org/releases/freetype/freetype-2.7.1.tar.gz  -T 5
+        tar zxvf freetype-2.7.1.tar.gz
+        cd freetype-2.7.1
+        ./configure --prefix=${libPath}/freetype_old
+        make && make install
+        cd ${sourcePath}
+        rm -rf freetype-2.7.1.tar.gz
+        rm -f freetype-2.7.1.tar.gz
+    fi
+    echo -e "Install_Freetype_Old" >> ${libPath}/lib.pl
+#----------------------------- freetype end -------------------------#
+}
+
+Install_Freetype_New()
+{
+#----------------------------- freetype start -------------------------#
+    cd ${sourcePath}
     if [ ! -d ${libPath}/freetype ];then
         wget -O freetype-2.12.1.tar.gz https://download.savannah.gnu.org/releases/freetype/freetype-2.12.1.tar.gz  -T 5
         tar zxvf freetype-2.12.1.tar.gz
@@ -261,7 +279,10 @@ Install_Libiconv
 # Install_Libmemcached
 # Install_Curl
 # Install_Zlib
+
 Install_Freetype
+Install_Freetype_New
+
 # Install_OpenSSL
 Install_Libzip
 
