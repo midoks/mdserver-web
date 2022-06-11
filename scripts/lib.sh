@@ -283,6 +283,9 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
 
     apt install -y libmariadbd18 libmariadbd-dev mysql-community-client
 
+    apt install -y libmysqlclient-dev   
+    apt install -y libmariadb-dev-compat
+    apt install -y libmariadbclient-dev 
 else
     Install_Libiconv
 
