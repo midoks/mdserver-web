@@ -31,23 +31,25 @@
 * swap插件[虚拟内存]。
 
 
-
 ### 自动安装
 
 ```
 curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/install.sh | bash
 ```
 
-### 更新
+### 脚本更新
 
 ```
 curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/update.sh | bash
 ```
 
 ### 无图不真相
+
 [![截图](/route/static/mdw.jpg)](/route/static/mdw.jpg)
 
+
 ### wiki
+
 [了解更多...](https://github.com/midoks/mdserver-web/wiki)
 
 
