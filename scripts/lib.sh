@@ -290,7 +290,9 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     apt install -y libfreetype-dev
     apt install -y libfreetype6
     apt install -y libfreetype6-dev
-    apt install -y libevent-dev libncurses5-dev
+    apt install -y libevent-dev libncurses5-dev libldap2-dev
+
+    apt install -y  libicu-dev
 
     apt install -y gcc build-essential openssl make libssl-dev 
     apt install -y curl libcurl4-gnutls-dev libjpeg-dev libpng-dev libmcrypt-dev
