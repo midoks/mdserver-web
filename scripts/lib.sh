@@ -335,7 +335,7 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     apt install -y libmariadb-dev-compat
     apt install -y libmariadbclient-dev 
 else
-   
+    Install_Lib
 
     yum -y install libmemcached libmemcached-devel
     yum -y install curl curl-devel
@@ -348,4 +348,8 @@ else
     yum -y install sqlite-devel
     yum -y install oniguruma oniguruma-devel
     yum -y install ImageMagick ImageMagick-devel
+
+    if [ "$OSNAME" == "ubuntu"  ]; then
+        dnf install libxml2
+    fi
 fi
