@@ -278,7 +278,7 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     apt-get install -y libpcre3 libpcre3-dev 
     apt-get install -y openssl libssl-dev
 
-    apt-get install libxml2 libxml2-dev libssl-dev libbz2-dev libjpeg-dev libpng-dev libxpm-dev libfreetype6-dev libgmp-dev libgmp3-dev libmcrypt-dev libpspell-dev librecode-dev
+    apt-get install -y libxml2 libxml2-dev libssl-dev libbz2-dev libjpeg-dev libpng-dev libxpm-dev libfreetype6-dev libgmp-dev libgmp3-dev libmcrypt-dev libpspell-dev librecode-dev
 
     apt install -y gcc build-essential openssl make libssl-dev 
     apt install -y  curl libcurl4-gnutls-dev libjpeg-dev libpng-dev libmcrypt-dev
