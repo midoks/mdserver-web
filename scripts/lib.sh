@@ -339,6 +339,8 @@ else
     yum -y install libmemcached libmemcached-devel
     yum -y install curl curl-devel
     yum -y install zlib zlib-devel
+    yum -y install zlib zlib-devel
+    yum -y install icu
     yum -y install freetype freetype-devel
     yum -y install openssl openssl-devel
     yum -y install libzip libzip-devel
