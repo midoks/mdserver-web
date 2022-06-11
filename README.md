@@ -10,6 +10,8 @@
 * 自动更新优化
 * 插件方式管理
 
+[![CentOS](https://img.shields.io/badge/LINUX-CentOS-blue?style=for-the-badge&logo=c)]()
+
 基本上可以使用,后续会继续优化!欢迎提供意见！
 
 
