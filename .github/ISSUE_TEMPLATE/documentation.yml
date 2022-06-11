@@ -7,7 +7,7 @@ body:
       value: |
         感谢您花时间填写此错误报告！
         
-        - 如有疑问，请讨论[Discussions](https://github.com/gogs/gogs/discussions).
+        - 如有疑问，请讨论[Discussions](https://github.com/midoks/mdserver-web/discussions).
         - 检查以确保尚未有人打开类似的[issue](https://github.com/midoks/mdserver-web/issues).
   - type: input
     attributes:
