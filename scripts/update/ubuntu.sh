@@ -70,6 +70,7 @@ do
 done
 echo -e "start mw success"
 
+systemctl daemon-reload
 /etc/init.d/mw default
 
 
