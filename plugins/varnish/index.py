@@ -65,39 +65,14 @@ def getArgs():
 
 def status():
     data = mw.execShell(
-        "ps -ef|grep redis |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'")
+        "ps -ef|grep varnish |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'")
 
     if data[0] == '':
         return 'stop'
     return 'start'
 
 
-def initDreplace():
-
-    file_tpl = getInitDTpl()
-    service_path = os.path.dirname(os.getcwd())
-
-    initD_path = getServerDir() + '/init.d'
-    if not os.path.exists(initD_path):
-        os.mkdir(initD_path)
-    file_bin = initD_path + '/' + getPluginName()
-
-    # initd replace
-    content = mw.readFile(file_tpl)
-    content = content.replace('{$SERVER_PATH}', service_path)
-    mw.writeFile(file_bin, content)
-    mw.execShell('chmod +x ' + file_bin)
-
-    # config replace
-    conf_content = mw.readFile(getConfTpl())
-    conf_content = conf_content.replace('{$SERVER_PATH}', service_path)
-    mw.writeFile(getServerDir() + '/redis.conf', conf_content)
-
-    return file_bin
-
-
 def start():
-    #file = initDreplace()
     data = mw.execShell('systemctl start ' + getPluginName())
     if data[1] == '':
         return 'ok'
@@ -105,7 +80,6 @@ def start():
 
 
 def stop():
-    # file = initDreplace()
     data = mw.execShell('systemctl stop ' + getPluginName())
     if data[1] == '':
         return 'ok'
@@ -113,7 +87,6 @@ def stop():
 
 
 def restart():
-    # file = initDreplace()
     data = mw.execShell('systemctl restart ' + getPluginName())
     log_file = getServerDir() + "/data/redis.log"
     mw.execShell("echo '' > " + log_file)
