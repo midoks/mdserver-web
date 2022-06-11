@@ -61,10 +61,6 @@ fi
 #安装时不开启
 service iptables stop
 
-
-# apt install -y libevent libevent-devel mysql-devel libjpeg* libpng* gd* zip unzip libmcrypt libmcrypt-devel
-
-
 if [ ! -d /www/server/mdserver-web ];then
 	wget -O /tmp/master.zip https://codeload.github.com/midoks/mdserver-web/zip/master
 	cd /tmp && unzip /tmp/master.zip
