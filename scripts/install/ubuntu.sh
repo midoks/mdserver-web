@@ -13,10 +13,11 @@ mkdir -p /www/backup/site
 
 apt update -y
 
-apt install -y lsof iptables unzip
-apt install -y wget curl vixie-cron 
+apt install -y wget curl lsof iptables unzip
 apt install -y python3-pip
 apt install -y python3-venv
+
+apt install -y cron vixie-cron 
 
 if [ ! -d /root/.acme.sh ];then	
 	curl  https://get.acme.sh | sh
