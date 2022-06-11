@@ -1,6 +1,6 @@
 {
 	"sort": 7,
-	"ps": "varnish是一款高性能的开源HTTP加速器",
+	"ps": "一款高性能的开源HTTP加速器",
 	"name": "varnish",
 	"title": "varnish",
 	"shell": "install.sh",
