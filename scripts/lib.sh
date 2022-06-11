@@ -297,7 +297,7 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
 
     apt install -y libjpeg62-turbo-dev libfreetype-dev
 
-    apt install -y libmariadbd18 libmariadbd-dev mysql-community-client
+    apt install -y libmariadb-dev-compat libmariadb-dev mysql-community-client
 
     apt install -y libmysqlclient-dev   
     apt install -y libmariadb-dev-compat
