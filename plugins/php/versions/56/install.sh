@@ -57,12 +57,12 @@ if [ ! -d $serverPath/php/56 ];then
 	--enable-sockets \
 	--enable-pcntl \
 	--enable-shmop \
-	--enable-intl \
 	--enable-soap \
 	--enable-posix \
 	--enable-sysvmsg \
 	--enable-sysvsem \
 	--enable-sysvshm \
+	--disable-intl \
 	--disable-fileinfo \
 	$OPTIONS \
 	--enable-fpm \

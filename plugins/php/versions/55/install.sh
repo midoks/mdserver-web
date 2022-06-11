@@ -52,7 +52,6 @@ if [ ! -d $serverPath/php/55  ];then
 	--with-mysqli=mysqlnd \
 	--enable-zip \
 	--enable-simplexml \
-	--enable-intl \
 	--enable-mbstring \
 	--enable-sockets \
 	--enable-ftp \
@@ -61,6 +60,7 @@ if [ ! -d $serverPath/php/55  ];then
 	--enable-sysvmsg \
 	--enable-sysvsem \
 	--enable-sysvshm \
+	--disable-intl \
 	--disable-fileinfo \
 	$OPTIONS \
 	--enable-fpm \
