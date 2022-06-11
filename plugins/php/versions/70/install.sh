@@ -54,12 +54,12 @@ if [ ! -d $serverPath/php/70 ];then
 	--enable-simplexml \
 	--enable-ftp \
 	--enable-sockets \
-	--enable-intl \
 	--enable-soap \
 	--enable-posix \
 	--enable-sysvmsg \
 	--enable-sysvsem \
 	--enable-sysvshm \
+	--disable-intl \
 	--disable-fileinfo \
 	$OPTIONS \
 	--enable-fpm \
