@@ -32,7 +32,7 @@ def getInitDFile():
 
 
 def getConf():
-    path = getServerDir() + "/redis.conf"
+    path = "/etc/varnish/default.vcl"
     return path
 
 
@@ -166,7 +166,7 @@ def initdUinstall():
 
 
 def runLog():
-    return getServerDir() + '/data/redis.log'
+    return "/var/log/varnish/varnishncsa.log"
 
 if __name__ == "__main__":
     func = sys.argv[1]
