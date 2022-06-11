@@ -275,13 +275,17 @@ if [ "$OSNAME" == "macos" ]; then
 
 elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     
-    apt-get install -y libpcre3 libpcre3-dev 
-    apt-get install -y openssl libssl-dev
 
-    apt-get install -y libxml2 libxml2-dev libssl-dev libbz2-dev libjpeg-dev libpng-dev libxpm-dev libfreetype6-dev libgmp-dev libgmp3-dev libmcrypt-dev libpspell-dev librecode-dev
+    aptitude install -y libcurl4-gnutls-dev
+
+    apt install -y libpcre3 libpcre3-dev 
+    apt install -y openssl libssl-dev
+
+    apt install -y libxml2 libxml2-dev libssl-dev libbz2-dev libjpeg-dev libpng-dev libxpm-dev libfreetype6-dev  libmcrypt-dev libpspell-dev librecode-dev
+    apt install -y libgmp-dev libgmp3-dev libreadline-dev libxpm-dev
 
     apt install -y gcc build-essential openssl make libssl-dev 
-    apt install -y  curl libcurl4-gnutls-dev libjpeg-dev libpng-dev libmcrypt-dev
+    apt install -y curl libcurl4-gnutls-dev libjpeg-dev libpng-dev libmcrypt-dev
     apt install -y graphviz bison re2c flex
     apt install -y libsqlite3-dev libcurl4-openssl-dev curl
     apt install -y libonig-dev
@@ -292,8 +296,8 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     apt install -y perl g++ make automake libtool unzip
     apt install -y libevent-dev libncurses5-dev
 
-    apt-get install -y libgmp-dev libreadline-dev libxpm-dev
-    apt-get install -y libmysql++-dev libxslt1-dev
+    
+    apt install -y libmysql++-dev libxslt1-dev
 
     apt install -y libpng-dev zlib1g-dev dia pkg-config libfreetype6 libfreetype6-dev
 
@@ -301,6 +305,7 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
 
     apt install -y libmariadb-dev-compat libmariadb-dev mysql-community-client
 
+    apt install -y libmysqlclient15-dev
     apt install -y libmysqlclient-dev   
     apt install -y libmariadb-dev-compat
     apt install -y libmariadbclient-dev 
