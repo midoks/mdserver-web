@@ -59,3 +59,7 @@ curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts
 
 [digitalvirt](https://digitalvirt.com/)
 
+## 授权许可
+
+本项目采用 Apache 开源授权许可证，完整的授权说明已放置在 [LICENSE](https://github.com/midoks/mdserver-web/blob/master/LICENSE) 文件中。
+
