@@ -83,7 +83,7 @@ yum groupinstall -y "Development Tools"
 paces="wget python-devel python-imaging libicu-devel zip unzip bzip2-devel gcc libxml2 libxml2-dev libxslt* libjpeg-devel libpng-devel libwebp libwebp-devel lsof pcre pcre-devel vixie-cron crontabs"
 yum -y install $paces
 yum -y lsof net-tools.x86_64
-yum -y install ncurses-devel mysql-dev locate cmake
+yum -y install ncurses-devel mysql-devel cmake
 yum -y install python-devel.x86_64
 yum -y install MySQL-python 
 yum -y install epel-release
