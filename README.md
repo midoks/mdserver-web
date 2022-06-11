@@ -2,7 +2,12 @@
 简单的Linux面板,感谢BT.CN写出如此好的web管理软件。我一看到，就知道这是我一直想要的页面化管理方式。
 复制了后台管理界面，按照自己想要的方式写了一版。
 
+[![CentOS](https://img.shields.io/badge/LINUX-CentOS-blue?style=for-the-badge&logo=c)]
+[![Ubuntu](https://img.shields.io/badge/LINUX-Ubuntu-blue?style=for-the-badge&logo=c)]
+[![Debian](https://img.shields.io/badge/LINUX-Debian-blue?style=for-the-badge&logo=c)]
+[![Fedora](https://img.shields.io/badge/LINUX-Fedora-blue?style=for-the-badge&logo=c)]
 
+>
 * ssh工具优化
 * 面板收藏功能完成
 * 网站子目录绑定
@@ -10,10 +15,6 @@
 * 自动更新优化
 * 插件方式管理
 
-[![CentOS](https://img.shields.io/badge/LINUX-CentOS-blue?style=for-the-badge&logo=c)]
-[![Ubuntu](https://img.shields.io/badge/LINUX-Ubuntu-blue?style=for-the-badge&logo=c)]
-[![Debian](https://img.shields.io/badge/LINUX-Debian-blue?style=for-the-badge&logo=c)]
-[![Fedora](https://img.shields.io/badge/LINUX-Fedora-blue?style=for-the-badge&logo=c)]
 
 基本上可以使用,后续会继续优化!欢迎提供意见！
 
