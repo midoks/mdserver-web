@@ -25,11 +25,15 @@
 * Gogs - 一款极易搭建的自助Git服务。
 * Rsyncd - 通用同步服务。
 
+
 ### 版本更新 0.8.6
 * mysql主从配置。
 * swap插件[虚拟内存]。
 
+
+
 ### 自动安装
+
 ```
 curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/install.sh | bash
 ```
