@@ -70,6 +70,7 @@ systemctl stop firewalld
 
 
 yum install -y libevent libevent-devel mysql-devel libjpeg* libpng* gd* zip unzip libmcrypt libmcrypt-devel
+yum install gcc libffi-devel python-devel openssl-devel -y
 
 if [ ! -d /www/server/mdserver-web ];then
 	wget -O /tmp/master.zip https://codeload.github.com/midoks/mdserver-web/zip/master
