@@ -10,7 +10,10 @@
 * 自动更新优化
 * 插件方式管理
 
-[![CentOS](https://img.shields.io/badge/LINUX-CentOS-blue?style=for-the-badge&logo=c)]()
+[![CentOS](https://img.shields.io/badge/LINUX-CentOS-blue?style=for-the-badge&logo=c)]
+[![Ubuntu](https://img.shields.io/badge/LINUX-Ubuntu-blue?style=for-the-badge&logo=c)]
+[![Debian](https://img.shields.io/badge/LINUX-Debian-blue?style=for-the-badge&logo=c)]
+[![Fedora](https://img.shields.io/badge/LINUX-Fedora-blue?style=for-the-badge&logo=c)]
 
 基本上可以使用,后续会继续优化!欢迎提供意见！
 
