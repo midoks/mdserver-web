@@ -100,6 +100,13 @@ def isLogined():
         if userInfo['username'] != session['username']:
             return False
 
+        now_time = int(time.time())
+
+        if now_time > session['overdue']:
+            # 自动续期
+            session['overdue'] = int(time.time()) + 7 * 24 * 60 * 60
+            return False
+
         return True
 
     if os.path.exists('data/api_login.txt'):
@@ -172,7 +179,6 @@ def checkLogin():
 
 @app.route("/login")
 def login():
-    # print session
     dologin = request.args.get('dologin', '')
     if dologin == 'True':
         session.clear()
@@ -230,6 +236,8 @@ def doLogin():
     cache.delete('login_cache_limit')
     session['login'] = True
     session['username'] = userInfo['username']
+    session['overdue'] = int(time.time()) + 7 * 24 * 60 * 60
+    # session['overdue'] = int(time.time()) + 7
 
     # fix 跳转时,数据消失，可能是跨域问题
     mw.writeFile('data/api_login.txt', userInfo['username'])
