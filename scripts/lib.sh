@@ -283,8 +283,11 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
 
     apt install -y libxml2 libxml2-dev libssl-dev libbz2-dev libjpeg-dev libpng-dev libxpm-dev libmcrypt-dev libpspell-dev librecode-dev
     apt install -y libgmp-dev libgmp3-dev libreadline-dev libxpm-dev
-    apt install -y libpng-dev zlib1g-dev dia pkg-config libfreetype6 libfreetype6-dev
-    apt install -y libjpeg62-turbo-dev libfreetype-dev
+    apt install -y libpng-dev zlib1g-dev dia pkg-config  
+    apt install -y libjpeg62-turbo-dev
+    apt install -y libfreetype-dev
+    apt install -y libfreetype6
+    apt install -y libfreetype6-dev
     apt install -y libevent-dev libncurses5-dev
 
     apt install -y gcc build-essential openssl make libssl-dev 
