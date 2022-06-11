@@ -17,8 +17,7 @@ apt install -y wget curl lsof iptables unzip
 apt install -y python3-pip
 apt install -y python3-venv
 
-apt install -y cron 
-apt install -y vixie-cron
+apt install -y cron
 
 if [ ! -d /root/.acme.sh ];then	
 	curl  https://get.acme.sh | sh
