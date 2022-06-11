@@ -275,13 +275,16 @@ if [ "$OSNAME" == "macos" ]; then
 
 elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     
+    apt-get install -y libpcre3 libpcre3-dev 
+    apt-get install -y openssl libssl-dev
+
     apt install -y libxml2-dev gcc build-essential openssl make libssl-dev 
     apt install -y libxml2 curl libcurl4-gnutls-dev libjpeg-dev libpng-dev libmcrypt-dev
     apt install -y graphviz bison re2c
-    apt install -y libsqlite3-dev curl libcurl4-openssl-dev
+    apt install -y libsqlite3-dev libcurl4-openssl-dev curl
     apt install -y libonig-dev
 
-    apt install -y cmake lsof libcurl4-gnutls-dev
+    apt install -y cmake lsof
     cd /usr/include && ln -s x86_64-linux-gnu/curl
     
     apt install -y perl g++ make automake libtool unzip
