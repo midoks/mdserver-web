@@ -132,4 +132,5 @@ do
 done
 echo -e "start mw success"
 
+systemctl daemon-reload
 cd /www/server/mdserver-web && ./scripts/init.d/mw default

@@ -98,4 +98,4 @@ cd /www/server/mdserver-web && ./cli.sh stop
 cd /www/server/mdserver-web && ./scripts/init.d/mw default
 cd /www/server/mdserver-web && ./cli.sh start
 
-
+systemctl daemon-reload
