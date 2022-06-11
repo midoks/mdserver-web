@@ -284,8 +284,11 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     apt install -y cmake lsof libcurl4-gnutls-dev
     cd /usr/include && ln -s x86_64-linux-gnu/curl
     
-    apt-get install -y perl g++ make automake libtool unzip
-    apt-get install -y libevent-dev libncurses5-dev
+    apt install -y perl g++ make automake libtool unzip
+    apt install -y libevent-dev libncurses5-dev
+
+    apt-get install -y libgmp-dev libreadline-dev libxpm-dev
+    apt-get install -y libmysql++-dev libxslt1-dev
 
     apt install -y libpng-dev zlib1g-dev dia pkg-config libfreetype6 libfreetype6-dev
 
