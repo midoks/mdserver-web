@@ -13,7 +13,8 @@ mkdir -p /www/backup/site
 
 apt update -y
 
-apt install -y wget curl vixie-cron lsof iptables unzip
+apt install -y lsof iptables unzip
+apt install -y wget curl vixie-cron 
 apt install -y python3-pip
 apt install -y python3-venv
 
