@@ -97,24 +97,24 @@ def initDreplace():
 
 
 def start():
-    file = initDreplace()
-    data = mw.execShell(file + ' start')
+    #file = initDreplace()
+    data = mw.execShell('systemctl start ' + getPluginName())
     if data[1] == '':
         return 'ok'
     return 'fail'
 
 
 def stop():
-    file = initDreplace()
-    data = mw.execShell(file + ' stop')
+    # file = initDreplace()
+    data = mw.execShell('systemctl stop ' + getPluginName())
     if data[1] == '':
         return 'ok'
     return 'fail'
 
 
 def restart():
-    file = initDreplace()
-    data = mw.execShell(file + ' restart')
+    # file = initDreplace()
+    data = mw.execShell('systemctl restart ' + getPluginName())
     log_file = getServerDir() + "/data/redis.log"
     mw.execShell("echo '' > " + log_file)
     if data[1] == '':
@@ -123,8 +123,8 @@ def restart():
 
 
 def reload():
-    file = initDreplace()
-    data = mw.execShell(file + ' reload')
+    # file = initDreplace()
+    data = mw.execShell('systemctl restart ' + getPluginName())
     if data[1] == '':
         return 'ok'
     return 'fail'
@@ -164,10 +164,13 @@ def initdStatus():
     if not app_debug:
         if mw.isAppleSystem():
             return "Apple Computer does not support"
-    initd_bin = getInitDFile()
-    if os.path.exists(initd_bin):
-        return 'ok'
-    return 'fail'
+
+    shell_cmd = 'systemctl status ' + \
+        getPluginName() + ' | grep loaded | grep "enabled;"'
+    data = mw.execShell(shell_cmd)
+    if data[0] == '':
+        return 'fail'
+    return 'ok'
 
 
 def initdInstall():
@@ -176,11 +179,7 @@ def initdInstall():
         if mw.isAppleSystem():
             return "Apple Computer does not support"
 
-    source_bin = initDreplace()
-    initd_bin = getInitDFile()
-    shutil.copyfile(source_bin, initd_bin)
-    mw.execShell('chmod +x ' + initd_bin)
-    mw.execShell('chkconfig --add ' + getPluginName())
+    mw.execShell('systemctl enable ' + getPluginName())
     return 'ok'
 
 
@@ -189,9 +188,7 @@ def initdUinstall():
         if mw.isAppleSystem():
             return "Apple Computer does not support"
 
-    mw.execShell('chkconfig --del ' + getPluginName())
-    initd_bin = getInitDFile()
-    os.remove(initd_bin)
+    mw.execShell('systemctl disable ' + getPluginName())
     return 'ok'
 
 
