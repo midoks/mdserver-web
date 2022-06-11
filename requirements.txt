@@ -20,6 +20,6 @@ Flask-SocketIO==3.0.2
 zmq==0.0.0
 Jinja2
 mysqlclient==2.0.3
-mysql-connector-python
 requests==2.20.0
 flask-caching>=1.10.1
+mysql-connector-python
