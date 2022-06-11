@@ -34,7 +34,9 @@ Install_varnish()
 	echo '正在安装脚本文件...' > $install_tmp
 	mkdir -p $serverPath/source
 
-	if [ ${OSNAME} == "centos" ]; then
+	if [ ${OSNAME} == "macos" ]; then
+		brew install varnish
+	elif [ ${OSNAME} == "centos" ]; then
 		yum install varnish -y
 	elif [ ${OSNAME} == "debian" ] || [ ${OSNAME} == "ubuntu" ]; then
 		apt-get install varnish -y
