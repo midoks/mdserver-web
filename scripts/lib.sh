@@ -278,12 +278,12 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
 
     aptitude install -y libcurl4-gnutls-dev
 
-    apt install -y php-common
+    apt install -y php-common webp
 
     apt install -y libpcre3 libpcre3-dev 
     apt install -y openssl libssl-dev
 
-    apt install -y libxml2 libxml2-dev libssl-dev libbz2-dev libjpeg-dev libpng-dev libxpm-dev libmcrypt-dev libpspell-dev librecode-dev
+    apt install -y libxml2 libxml2-dev libssl-dev libbz2-dev libjpeg-dev libpng-dev libmcrypt-dev libpspell-dev librecode-dev
     apt install -y libgmp-dev libgmp3-dev libreadline-dev libxpm-dev
     apt install -y libpng-dev zlib1g-dev dia pkg-config  
     apt install -y libjpeg62-turbo-dev
