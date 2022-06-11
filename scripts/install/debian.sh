@@ -12,7 +12,7 @@ mkdir -p /www/backup/site
 
 apt update -y
 
-apt install -y wget curl vixie-cron lsof iptables
+apt install -y wget curl vixie-cron lsof iptables unzip
 apt install -y python3-pip
 apt install -y python3-venv
 
@@ -58,10 +58,6 @@ fi
 
 #安装时不开启
 service iptables stop
-
-
-# apt install -y libevent libevent-devel mysql-devel libjpeg* libpng* gd* zip unzip libmcrypt libmcrypt-devel
-apt install unzip
 
 
 if [ ! -d /www/server/mdserver-web ];then
