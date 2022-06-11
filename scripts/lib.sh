@@ -86,14 +86,14 @@ Install_Freetype()
 #----------------------------- freetype start -------------------------#
     cd ${sourcePath}
     if [ ! -d ${libPath}/freetype ];then
-        wget -O freetype-2.10.0.tar.gz https://download.savannah.gnu.org/releases/freetype/freetype-2.10.0.tar.gz  -T 5
-        tar zxvf freetype-2.10.0.tar.gz
-        cd freetype-2.10.0
+        wget -O freetype-2.12.1.tar.gz https://download.savannah.gnu.org/releases/freetype/freetype-2.12.1.tar.gz  -T 5
+        tar zxvf freetype-2.12.1.tar.gz
+        cd freetype-2.12.1
         ./configure --prefix=${libPath}/freetype
         make && make install
         cd ${sourcePath}
-        rm -rf freetype-2.10.0.tar.gz
-        rm -f freetype-2.10.0.tar.gz
+        rm -rf freetype-2.12.1.tar.gz
+        rm -f freetype-2.12.1.tar.gz
     fi
     echo -e "Install_Freetype" >> ${libPath}/lib.pl
 #----------------------------- freetype end -------------------------#
