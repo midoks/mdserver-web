@@ -53,7 +53,6 @@ if [ ! -d $serverPath/php/56 ];then
 	--enable-zip \
 	--enable-mbstring \
 	--enable-simplexml \
-	--enable-intl \
 	--enable-ftp \
 	--enable-sockets \
 	--enable-pcntl \
