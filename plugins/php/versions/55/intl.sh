@@ -42,6 +42,8 @@ Install_lib()
 			cd $serverPath/mdserver-web/plugins/php && /bin/bash install.sh install ${version}
 		fi
 
+		cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash icu.sh
+
 		cd $sourcePath/php${version}/ext/${LIBNAME}
 		
 		$serverPath/php/$version/bin/phpize
