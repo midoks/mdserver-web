@@ -40,6 +40,8 @@ Install_lib()
 		php_lib=$sourcePath/php_lib
 		mkdir -p $php_lib
 
+		cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash icu.sh
+
 		wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
 
 		cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
@@ -47,7 +49,7 @@ Install_lib()
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
 		--with-icu-dir=${serverPath}/lib/icu
-		
+
 		make && make install && make clean
 		
 	fi
