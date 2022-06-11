@@ -95,6 +95,11 @@ def funConvert(fun):
 def isLogined():
     # print('isLogined', session)
     if 'login' in session and 'username' in session and session['login'] == True:
+        userInfo = mw.M('users').where(
+            "id=?", (1,)).field('id,username,password').find()
+        if userInfo['username'] != session['username']:
+            return False
+
         return True
 
     if os.path.exists('data/api_login.txt'):
@@ -225,7 +230,6 @@ def doLogin():
     cache.delete('login_cache_limit')
     session['login'] = True
     session['username'] = userInfo['username']
-    #print('do_login', session)
 
     # fix 跳转时,数据消失，可能是跨域问题
     mw.writeFile('data/api_login.txt', userInfo['username'])
