@@ -343,7 +343,7 @@ else
     yum -y install freetype freetype-devel
     yum -y install openssl openssl-devel
     yum -y install libzip libzip-devel
-    yum -y install graphviz
+    yum -y install graphviz libxml2
 
     yum -y install sqlite-devel
     yum -y install oniguruma oniguruma-devel
