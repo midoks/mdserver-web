@@ -336,6 +336,8 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     apt install -y libmariadbclient-dev 
 else
 
+    yum install -y openldap openldap-devel libtirpc libtirpc-devel
+
     yum -y install libmemcached libmemcached-devel
     yum -y install curl curl-devel
     yum -y install zlib zlib-devel
