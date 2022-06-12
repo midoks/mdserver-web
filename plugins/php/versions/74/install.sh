@@ -73,7 +73,7 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--enable-sysvmsg \
 	--enable-sysvsem \
 	--enable-sysvshm \
-	--enable-intl \
+	--disable-intl \
 	--disable-fileinfo \
 	$OPTIONS \
 	--enable-fpm \
