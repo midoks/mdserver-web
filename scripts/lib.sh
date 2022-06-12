@@ -344,7 +344,7 @@ else
     yum install -y curl curl-devel
     yum install -y zlib zlib-devel
     yum install -y pcre pcre-devel
-    yum install -y icu autoconf
+    yum install -y icu libicu-devel autoconf
     yum install -y freetype freetype-devel
     yum install -y openssl openssl-devel
     yum install -y libzip libzip-devel
