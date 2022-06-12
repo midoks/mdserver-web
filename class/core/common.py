@@ -72,6 +72,7 @@ def initInitD():
             mw.execShell('chmod +x ' + initd_bin)
         # 加入自启动
         mw.execShell('chkconfig --add mw')
+        mw.execShell('systemctl enable mw')
 
 
 def initUserInfo():
