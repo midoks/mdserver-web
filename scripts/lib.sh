@@ -336,21 +336,23 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     apt install -y libmariadbclient-dev 
 else
 
-    yum install -y openldap openldap-devel libtirpc libtirpc-devel
+    yum install -y openldap openldap-devel libtirpc libtirpc-devel rpcgen
 
-    yum -y install libmemcached libmemcached-devel
-    yum -y install curl curl-devel
-    yum -y install zlib zlib-devel
-    yum -y install pcre pcre-devel
-    yum -y install icu autoconf
-    yum -y install freetype freetype-devel
-    yum -y install openssl openssl-devel
-    yum -y install libzip libzip-devel
-    yum -y install graphviz libxml2 libxml2-devel
+    yum install -y bison re2c
 
-    yum -y install sqlite-devel
-    yum -y install oniguruma oniguruma-devel
-    yum -y install ImageMagick ImageMagick-devel
+    yum install -y libmemcached libmemcached-devel
+    yum install -y curl curl-devel
+    yum install -y zlib zlib-devel
+    yum install -y pcre pcre-devel
+    yum install -y icu autoconf
+    yum install -y freetype freetype-devel
+    yum install -y openssl openssl-devel
+    yum install -y libzip libzip-devel
+    yum install -y graphviz libxml2 libxml2-devel
+
+    yum install -y sqlite-devel
+    yum install -y oniguruma oniguruma-devel
+    yum install -y ImageMagick ImageMagick-devel
 
     if [ "$OSNAME" == "fedora"  ]; then
         dnf install libxml2 libxml2-devel -y
