@@ -333,7 +333,8 @@ def initMysql8Pwd():
     # r = dbcurr.execute(alter_root_pwd)
     tmp_file = "/tmp/mysql_init_tmp.log"
     mw.writeFile(tmp_file, alter_root_pwd)
-    cmd_pass = serverdir + '/bin/mysql -uroot -p"' + password + '" < ' + tmp_file
+    cmd_pass = serverdir + '/bin/mysql --connect-expired-password -uroot -p"' + \
+        password + '" < ' + tmp_file
     print(cmd_pass)
     print(mw.execShell(cmd_pass))
     pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
