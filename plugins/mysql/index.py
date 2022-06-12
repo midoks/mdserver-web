@@ -379,7 +379,7 @@ def my8cmd(version, method):
                 mw.execShell(cmd)
                 return "ok"
             subprocess.run(cmd, stdout=subprocess.PIPE, shell=True,
-                           bufsize=4096, stderr=subprocess.PIPE)
+                           bufsize=4096, stderr=subprocess.PIPE, timeout=5)
         return 'ok'
     except Exception as e:
         print(e)
