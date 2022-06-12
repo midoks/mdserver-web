@@ -309,19 +309,32 @@ def initMysqlPwd():
     return True
 
 
-def initMysql8Pwd():
+def mysql8IsInitedPasswd():
 
+    serverdir = getServerDir()
+    pass_cmd = "cat " + serverdir + \
+        "/data/error.log | grep root@localhost | awk -F 'root@localhost:' '{print $2}'"
+    passdata = mw.execShell(pass_cmd)
+    password = passdata[0].strip()
+
+    if len(password) == 0:
+        return True
+    return False
+
+
+def initMysql8Pwd():
     is_start = False
     for x in range(60):
         data = mw.execShell(
             "ps -ef|grep mysql|grep -v grep|grep -v py|grep -v init.d|awk '{print $2}'")
         if data[0] != "":
-            print("mysql start ok!")
+            #print("mysql start ok!")
             is_start = True
+            break
         time.sleep(0.5)
 
     if not is_start:
-        print("mysql start fail!")
+        #print("mysql start fail!")
         return False
 
     serverdir = getServerDir()
@@ -332,30 +345,36 @@ def initMysql8Pwd():
     passdata = mw.execShell(pass_cmd)
     password = passdata[0].strip()
 
-    print('localhost', 3306, 'root', password, "/www/server/mysql/mysql.sock")
+    if len(password) == 0:
+        return True
 
-    import MySQLdb as mdb
-    dbconn = mdb.connect(host='localhost', port=3306, user='root',
-                         passwd=password, unix_socket="/www/server/mysql/mysql.sock")
-    dbconn.autocommit(True)
-    dbcurr = dbconn.cursor()
-    dbcurr.execute('SET NAMES UTF8MB4')
+    #print('localhost', 3306, 'root', password, "/www/server/mysql/mysql.sock")
 
-    # with mysql_native_password
-    alter_root_pwd = "flush privileges;"
-    # alter_root_pwd = alter_root_pwd + "set password='" + pwd + "';"
-    alter_root_pwd = alter_root_pwd + \
-        "alter user 'root'@'localhost' IDENTIFIED WITH mysql_native_password by '" + pwd + "';"
+    # import MySQLdb as mdb
+    # dbconn = mdb.connect(host='localhost', port=3306, user='root',
+    #                      passwd=password, unix_socket="/www/server/mysql/mysql.sock")
+    # dbconn.autocommit(True)
+    # dbcurr = dbconn.cursor()
+    # dbcurr.execute('SET NAMES UTF8MB4')
+
+    # # with mysql_native_password
+    alter_root_pwd = "flush privileges;alter user 'root'@'localhost' IDENTIFIED WITH mysql_native_password by '" + pwd + "';"
     alter_root_pwd = alter_root_pwd + "flush privileges;"
-
-    dbcurr.execute(alter_root_pwd)
+    # dbcurr.execute(alter_root_pwd)
 
     tmp_file = "/tmp/mysql_init_tmp.log"
     mw.writeFile(tmp_file, alter_root_pwd)
     cmd_pass = serverdir + '/bin/mysql --connect-expired-password -uroot -p"' + \
         password + '" < ' + tmp_file
-    print(cmd_pass)
-    # print(mw.execShell(cmd_pass))
+    # print(cmd_pass)
+    data = mw.execShell(cmd_pass)
+    if data[1].find("ERROR") != -1:
+        # print(data[1])
+        pass
+    else:
+        mw.writeFile(serverdir + "/data/error.log", "")
+        os.remove(tmp_file)
+
     pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
 
     return True
@@ -380,13 +399,14 @@ def my8cmd(version, method):
     init_file = initDreplace(version)
     cmd = init_file + ' ' + method
     try:
-        initData = initMysql8Data()
-        if initData == 0:
+        initMysql8Data()
+        if not mysql8IsInitedPasswd():
             setSkipGrantTables(True)
             cmd_init_start = init_file + ' start'
-            sub = subprocess.Popen(cmd_init_start, stdout=subprocess.PIPE, shell=True,
-                                   bufsize=4096, stderr=subprocess.PIPE)
-            sub.wait(5)
+            subprocess.Popen(cmd_init_start, stdout=subprocess.PIPE, shell=True,
+                             bufsize=4096, stderr=subprocess.PIPE)
+
+            time.sleep(6)
             initMysql8Pwd()
 
             cmd_init_stop = init_file + ' stop'
@@ -394,6 +414,7 @@ def my8cmd(version, method):
                              bufsize=4096, stderr=subprocess.PIPE)
             setSkipGrantTables(False)
 
+            time.sleep(3)
             my8cmd(version, method)
         else:
             if method == "stop":
@@ -401,6 +422,7 @@ def my8cmd(version, method):
                 mw.execShell(
                     "ps -ef|grep mysql|grep -v grep|grep -v py|awk '{print $2}'|xargs kill")
                 return "ok"
+
             sub = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True,
                                    bufsize=4096, stderr=subprocess.PIPE)
             sub.wait(5)
