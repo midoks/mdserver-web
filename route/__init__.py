@@ -102,7 +102,7 @@ def isLogined():
 
         now_time = int(time.time())
 
-        if now_time > session['overdue']:
+        if 'overdue' in session and now_time > session['overdue']:
             # 自动续期
             session['overdue'] = int(time.time()) + 7 * 24 * 60 * 60
             return False
