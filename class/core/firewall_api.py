@@ -390,9 +390,9 @@ class firewall_api:
 
     def getFwStatus(self):
         if self.__isUfw:
-            cmd = "/usr/sbin/ufw status | grep inactive"
+            cmd = "/usr/sbin/ufw status | awk -F ':' '{print $2}'"
             data = mw.execShell(cmd)
-            if data[0] == '':
+            if data[0].strip() == 'inactive':
                 return False
             return True
         if self.__isFirewalld:
