@@ -293,7 +293,6 @@ class firewall_api:
         if status == '1':
             if self.__isUfw:
                 mw.execShell('/usr/sbin/ufw stop')
-                return
             if self.__isFirewalld:
                 mw.execShell('systemctl stop firewalld.service')
                 mw.execShell('systemctl disable firewalld.service')
@@ -305,7 +304,6 @@ class firewall_api:
         else:
             if self.__isUfw:
                 mw.execShell('/usr/sbin/ufw start')
-                return
             if self.__isFirewalld:
                 mw.execShell('systemctl start firewalld.service')
                 mw.execShell('systemctl enable firewalld.service')
