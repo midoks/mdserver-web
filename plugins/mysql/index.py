@@ -324,6 +324,7 @@ def initMysql8Pwd():
         "/data/error.log | grep root@localhost | awk -F 'root@localhost:' '{print $2}'"
     passdata = mw.execShell(pass_cmd)
     password = passdata[0].strip()
+
     # with mysql_native_password
     alter_root_pwd = "flush privileges;"
     alter_root_pwd = alter_root_pwd + \
