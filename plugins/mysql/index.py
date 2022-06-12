@@ -330,7 +330,7 @@ def initMysql8Pwd():
     alter_root_pwd = alter_root_pwd + \
         "alter user 'root'@'localhost' identified by '" + pwd + "';"
     alter_root_pwd = alter_root_pwd + "flush privileges;"
-    r = dbcurr.execute(alter_root_pwd)
+    # r = dbcurr.execute(alter_root_pwd)
     tmp_file = "/tmp/mysql_init_tmp.log"
     mw.writeFile(tmp_file, alter_root_pwd)
     cmd_pass = serverdir + '/bin/mysql -uroot -p"' + password + '" < ' + tmp_file
