@@ -7,6 +7,8 @@
 [![Debian](https://img.shields.io/badge/LINUX-Debian-blue?style=for-the-badge&logo=Debian)]()
 [![Fedora](https://img.shields.io/badge/LINUX-Fedora-blue?style=for-the-badge&logo=Fedora)]()
 
+[![Wiki](https://img.shields.io/badge/MW-Wiki-red?style=for-the-badge&logo=wiki)](https://github.com/midoks/mdserver-web/wiki)
+
 * SSH工具
 * 面板收藏功能
 * 网站子目录绑定
@@ -51,11 +53,6 @@ curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts
 ### 无图不真相
 
 [![截图](/route/static/mdw.jpg)](/route/static/mdw.jpg)
-
-
-### wiki
-
-[了解更多...](https://github.com/midoks/mdserver-web/wiki)
 
 
 ### 感谢
