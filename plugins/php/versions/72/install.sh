@@ -53,13 +53,13 @@ if [ ! -d $serverPath/php/72 ];then
 	--enable-mbstring \
 	--enable-simplexml \
 	--enable-sockets \
-	--enable-intl \
 	--enable-ftp \
 	--enable-soap \
 	--enable-posix \
 	--enable-sysvmsg \
 	--enable-sysvsem \
 	--enable-sysvshm \
+	--disable-intl \
 	--disable-fileinfo \
 	$OPTIONS \
 	--enable-fpm \
