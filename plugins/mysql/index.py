@@ -380,7 +380,7 @@ def my8cmd(version, method):
             if method == "stop":
                 mw.execShell(cmd)
                 mw.execShell(
-                    "ps -ef|grep mysql|grep -v grep|awk '{print $2}'|xargs kill")
+                    "ps -ef|grep mysql|grep -v grep|grep -v /www/server|awk '{print $2}'|xargs kill")
                 return "ok"
             sub = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True,
                                    bufsize=4096, stderr=subprocess.PIPE)
