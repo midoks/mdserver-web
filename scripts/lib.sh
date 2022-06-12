@@ -339,7 +339,7 @@ else
     yum -y install libmemcached libmemcached-devel
     yum -y install curl curl-devel
     yum -y install zlib zlib-devel
-    yum -y install zlib zlib-devel
+    yum -y install pcre pcre-devel
     yum -y install icu autoconf
     yum -y install freetype freetype-devel
     yum -y install openssl openssl-devel
