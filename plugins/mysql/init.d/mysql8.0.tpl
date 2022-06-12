@@ -63,14 +63,14 @@ lock_file_path="$lockdir/mysql"
 mysqld_pid_file_path=
 if test -z "$basedir"
 then
-  basedir=/Users/midoks/Desktop/fwww/server/mysql
-  bindir=/Users/midoks/Desktop/fwww/server/mysql/bin
+  basedir={$SERVER_APP_PATH}
+  bindir={$SERVER_APP_PATH}/bin
   if test -z "$datadir"
   then
-    datadir=/Users/midoks/Desktop/fwww/server/mysql/data
+    datadir={$SERVER_APP_PATH}/data
   fi
-  sbindir=/Users/midoks/Desktop/fwww/server/mysql/bin
-  libexecdir=/Users/midoks/Desktop/fwww/server/mysql/bin
+  sbindir={$SERVER_APP_PATH}/bin
+  libexecdir={$SERVER_APP_PATH}/bin
 else
   bindir="$basedir/bin"
   if test -z "$datadir"
