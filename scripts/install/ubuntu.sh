@@ -24,44 +24,38 @@ if [ ! -d /root/.acme.sh ];then
 fi
 
 
-if [ -f /etc/init.d/iptables ];then
+if [ -f /usr/sbin/ufw ];then
 
-	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 22 -j ACCEPT
-	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
-	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 443 -j ACCEPT
-	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 888 -j ACCEPT
-	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 7200 -j ACCEPT
-	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 3306 -j ACCEPT
-	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 30000:40000 -j ACCEPT
-	service iptables save
+	ufw allow 22/tcp
+	ufw allow 80/tcp
+	ufw allow 443/tcp
+	ufw allow 888/tcp
+	ufw allow 7200/tcp
+	ufw allow 3306/tcp
+	ufw allow 30000:40000/tcp
 
-	iptables_status=`service iptables status | grep 'not running'`
-	if [ "${iptables_status}" == '' ];then
-		service iptables restart
-	fi
 fi
 
+ufw disable
 
-if [ "${isVersion}" == '' ];then
-	if [ ! -f "/etc/init.d/iptables" ];then
-		apt install -y firewalld
-		systemctl enable firewalld
-		systemctl start firewalld
+if [ ! -f /usr/sbin/ufw ];then
+	apt install -y firewalld
+	systemctl enable firewalld
+	systemctl start firewalld
 
-		firewall-cmd --permanent --zone=public --add-port=22/tcp
-		firewall-cmd --permanent --zone=public --add-port=80/tcp
-		firewall-cmd --permanent --zone=public --add-port=443/tcp
-		firewall-cmd --permanent --zone=public --add-port=888/tcp
-		firewall-cmd --permanent --zone=public --add-port=7200/tcp
-		firewall-cmd --permanent --zone=public --add-port=3306/tcp
-		firewall-cmd --permanent --zone=public --add-port=30000-40000/tcp
-		firewall-cmd --reload
-	fi
+	firewall-cmd --permanent --zone=public --add-port=22/tcp
+	firewall-cmd --permanent --zone=public --add-port=80/tcp
+	firewall-cmd --permanent --zone=public --add-port=443/tcp
+	firewall-cmd --permanent --zone=public --add-port=888/tcp
+	firewall-cmd --permanent --zone=public --add-port=7200/tcp
+	firewall-cmd --permanent --zone=public --add-port=3306/tcp
+	firewall-cmd --permanent --zone=public --add-port=30000-40000/tcp
+	firewall-cmd --reload
 fi
 
 
 #安装时不开启
-service iptables stop
+systemctl stop firewalld
 
 if [ ! -d /www/server/mdserver-web ];then
 	wget -O /tmp/master.zip https://codeload.github.com/midoks/mdserver-web/zip/master
