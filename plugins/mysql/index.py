@@ -322,7 +322,7 @@ def initMysql8Pwd():
 
     if not is_start:
         print("mysql start fail!")
-        return
+        return False
 
     serverdir = getServerDir()
     pwd = mw.getRandomString(16)
