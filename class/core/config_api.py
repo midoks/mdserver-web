@@ -144,7 +144,7 @@ class config_api:
             msg = mw.getInfo('放行端口[{1}]成功', (port,))
             mw.writeLog("防火墙管理", msg)
             addtime = time.strftime('%Y-%m-%d %X', time.localtime())
-            mw.M('firewall').add('port,ps,addtime', (port, ps, addtime))
+            mw.M('firewall').add('port,ps,addtime', (port, "配置修改", addtime))
 
             firewall_api.firewall_api().addAcceptPort(port)
             firewall_api.firewall_api().firewallReload()
