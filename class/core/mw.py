@@ -546,17 +546,18 @@ def getLocalIp():
         import re
         filename = 'data/iplist.txt'
         ipaddress = readFile(filename)
-        if not ipaddress:
-            import urllib2
+        if not ipaddress or ipaddress == '127.0.0.1':
+            import urllib
             url = 'http://pv.sohu.com/cityjson?ie=utf-8'
-            opener = urllib2.urlopen(url)
-            content = opener.read()
+            req = urllib.request.urlopen(url, timeout=10)
+            content = req.read().decode('utf-8')
             ipaddress = re.search('\d+.\d+.\d+.\d+', content).group(0)
             writeFile(filename, ipaddress)
 
         ipaddress = re.search('\d+.\d+.\d+.\d+', ipaddress).group(0)
         return ipaddress
-    except:
+    except Exception as ex:
+        # print(ex)
         return '127.0.0.1'
 
 
