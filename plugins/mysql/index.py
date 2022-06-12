@@ -291,6 +291,7 @@ def initMysql8Data():
         user = pGetDbUser()
         cmd = 'cd ' + serverdir + ' && ./bin/mysqld --basedir=' + serverdir + ' --datadir=' + \
             datadir + ' --initialize'
+        # print(cmd)
         mw.execShell(cmd)
         return 0
     return 1
@@ -309,7 +310,19 @@ def initMysqlPwd():
 
 
 def initMysql8Pwd():
-    time.sleep(6)
+
+    is_start = False
+    for x in range(60):
+        data = mw.execShell(
+            "ps -ef|grep mysql|grep -v grep|grep -v py|grep -v init.d|awk '{print $2}'")
+        if data[0] != "":
+            print("mysql start ok!")
+            is_start = True
+        time.sleep(0.5)
+
+    if not is_start:
+        print("mysql start fail!")
+        return
 
     serverdir = getServerDir()
     pwd = mw.getRandomString(16)
@@ -318,6 +331,8 @@ def initMysql8Pwd():
         "/data/error.log | grep root@localhost | awk -F 'root@localhost:' '{print $2}'"
     passdata = mw.execShell(pass_cmd)
     password = passdata[0].strip()
+
+    print('localhost', 3306, 'root', password, "/www/server/mysql/mysql.sock")
 
     import MySQLdb as mdb
     dbconn = mdb.connect(host='localhost', port=3306, user='root',
@@ -335,11 +350,11 @@ def initMysql8Pwd():
 
     dbcurr.execute(alter_root_pwd)
 
-    # tmp_file = "/tmp/mysql_init_tmp.log"
-    # mw.writeFile(tmp_file, alter_root_pwd)
-    # cmd_pass = serverdir + '/bin/mysql --connect-expired-password -uroot -p"' + \
-    #     password + '" < ' + tmp_file
-    # print(cmd_pass)
+    tmp_file = "/tmp/mysql_init_tmp.log"
+    mw.writeFile(tmp_file, alter_root_pwd)
+    cmd_pass = serverdir + '/bin/mysql --connect-expired-password -uroot -p"' + \
+        password + '" < ' + tmp_file
+    print(cmd_pass)
     # print(mw.execShell(cmd_pass))
     pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
 
@@ -369,8 +384,9 @@ def my8cmd(version, method):
         if initData == 0:
             setSkipGrantTables(True)
             cmd_init_start = init_file + ' start'
-            subprocess.Popen(cmd_init_start, stdout=subprocess.PIPE, shell=True,
-                             bufsize=4096, stderr=subprocess.PIPE)
+            sub = subprocess.Popen(cmd_init_start, stdout=subprocess.PIPE, shell=True,
+                                   bufsize=4096, stderr=subprocess.PIPE)
+            sub.wait(5)
             initMysql8Pwd()
 
             cmd_init_stop = init_file + ' stop'
