@@ -335,7 +335,7 @@ def initMysql8Pwd():
     mw.writeFile(tmp_file, alter_root_pwd)
     cmd_pass = serverdir + '/bin/mysql -uroot -p"' + password + '" < ' + tmp_file
     print(cmd_pass)
-    mw.execShell(cmd_pass)
+    print(mw.execShell(cmd_pass))
     pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
 
     return True
@@ -377,6 +377,8 @@ def my8cmd(version, method):
         else:
             if method == "stop":
                 mw.execShell(cmd)
+                mw.execShell(
+                    "ps -ef|grep mysql|grep -v grep|awk '{print $2}'|xargs kill")
                 return "ok"
             sub = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True,
                                    bufsize=4096, stderr=subprocess.PIPE)
