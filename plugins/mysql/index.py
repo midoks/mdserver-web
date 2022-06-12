@@ -327,8 +327,9 @@ def initMysql8Pwd():
 
     # with mysql_native_password
     alter_root_pwd = "flush privileges;"
-    alter_root_pwd = alter_root_pwd + \
-        "alter user 'root'@'localhost' IDENTIFIED WITH mysql_native_password by '" + pwd + "';"
+    alter_root_pwd = alter_root_pwd + "set password='" + pwd + "';"
+    # alter_root_pwd = alter_root_pwd + \
+    #     "alter user 'root'@'localhost' IDENTIFIED WITH mysql_native_password by '" + pwd + "';"
     alter_root_pwd = alter_root_pwd + "flush privileges;"
     # r = dbcurr.execute(alter_root_pwd)
     tmp_file = "/tmp/mysql_init_tmp.log"
