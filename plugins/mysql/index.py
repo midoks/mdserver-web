@@ -375,6 +375,8 @@ def my8cmd(version, method):
 
             my8cmd(version, method)
         else:
+            if method == "stop":
+                mw.execShell(cmd)
             subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True,
                              bufsize=4096, stderr=subprocess.PIPE)
         return 'ok'
