@@ -378,8 +378,9 @@ def my8cmd(version, method):
             if method == "stop":
                 mw.execShell(cmd)
                 return "ok"
-            subprocess.run(cmd, stdout=subprocess.PIPE, shell=True,
-                           bufsize=4096, stderr=subprocess.PIPE, timeout=5)
+            sub = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True,
+                                   bufsize=4096, stderr=subprocess.PIPE)
+            sub.wait(5)
         return 'ok'
     except Exception as e:
         print(e)
