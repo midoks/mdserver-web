@@ -32,16 +32,16 @@ Install_mysql()
 		INSTALL_CMD=cmake
 	fi 
 
-	if [ ! -f ${mysqlDir}/mysql-boost-8.0.22.tar.gz ];then
-		wget -O ${mysqlDir}/mysql-boost-8.0.22.tar.gz https://cdn.mysql.com/archives/mysql-8.0/mysql-boost-8.0.22.tar.gz
+	if [ ! -f ${mysqlDir}/mysql-boost-8.0.25.tar.gz ];then
+		wget -O ${mysqlDir}/mysql-boost-8.0.25.tar.gz https://cdn.mysql.com/archives/mysql-8.0/mysql-boost-8.0.25.tar.gz
 	fi
 
-	if [ ! -d ${mysqlDir}/mysql-8.0.22 ];then
-		 cd ${mysqlDir} && tar -zxvf  ${mysqlDir}/mysql-boost-8.0.22.tar.gz
+	if [ ! -d ${mysqlDir}/mysql-8.0.25 ];then
+		 cd ${mysqlDir} && tar -zxvf  ${mysqlDir}/mysql-boost-8.0.25.tar.gz
 	fi
 
 	if [ ! -d $serverPath/mysql ];then
-		cd ${mysqlDir}/mysql-8.0.22 && ${INSTALL_CMD} \
+		cd ${mysqlDir}/mysql-8.0.25 && ${INSTALL_CMD} \
 		-DCMAKE_INSTALL_PREFIX=$serverPath/mysql \
 		-DMYSQL_USER=mysql \
 		-DMYSQL_TCP_PORT=3306 \
@@ -56,7 +56,7 @@ Install_mysql()
 		-DDEFAULT_COLLATION=utf8_general_ci \
 		-DDOWNLOAD_BOOST=1 \
 		-DFORCE_INSOURCE_BUILD=1 \
-		-DWITH_BOOST=${mysqlDir}/mysql-8.0.22/boost/
+		-DWITH_BOOST=${mysqlDir}/mysql-8.0.25/boost/
 		make && make install && make clean
 		echo '8.0' > $serverPath/mysql/version.pl
 		echo '安装完成' > $install_tmp
