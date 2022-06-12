@@ -311,25 +311,30 @@ def initMysqlPwd():
 def initMysql8Pwd():
     time.sleep(6)
 
-    import MySQLdb as mdb
-    dbconn = mdb.connect('localhost', 'root', '', '')
-    dbconn.autocommit(True)
-    dbcurr = dbconn.cursor()
-    dbcurr.execute('SET NAMES UTF8MB4')
+    # import MySQLdb as mdb
+    # dbconn = mdb.connect('localhost', 'root', '', '')
+    # dbconn.autocommit(True)
+    # dbcurr = dbconn.cursor()
+    # dbcurr.execute('SET NAMES UTF8MB4')
 
     serverdir = getServerDir()
     pwd = mw.getRandomString(16)
 
+    pass_cmd = "cat " + serverdir + \
+        "/data/error.log | grep root@localhost | awk -F 'root@localhost:' '{print $2}'"
+    passdata = mw.execShell(pass_cmd)
+    password = passdata[0].strip()
     # with mysql_native_password
-    alter_root_pwd = "flush privileges;\n"
+    alter_root_pwd = "flush privileges;"
     alter_root_pwd = alter_root_pwd + \
         "alter user 'root'@'localhost' identified by '" + pwd + "';"
-
+    alter_root_pwd = alter_root_pwd + "flush privileges;"
     r = dbcurr.execute(alter_root_pwd)
-
-    # mw.writeFile(tmp_file, alter_root_pwd)
-    # cmd_pass = serverdir + '/bin/mysql -uroot -p < ' + tmp_file
-    # print mw.execShell(cmd_pass)
+    tmp_file = "/tmp/mysql_init_tmp.log"
+    mw.writeFile(tmp_file, alter_root_pwd)
+    cmd_pass = serverdir + '/bin/mysql -uroot -p"' + password + '" < ' + tmp_file
+    print(cmd_pass)
+    mw.execShell(cmd_pass)
     pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
 
     return True
@@ -1842,7 +1847,7 @@ if __name__ == "__main__":
     elif func == 'start':
         print(start(version))
     elif func == 'stop':
-        print(top(version))
+        print(stop(version))
     elif func == 'restart':
         print(restart(version))
     elif func == 'reload':
