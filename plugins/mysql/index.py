@@ -396,6 +396,7 @@ def myOp(method):
 
 
 def my8cmd(version, method):
+    # mysql 8.0 ok
     init_file = initDreplace(version)
     cmd = init_file + ' ' + method
     try:
