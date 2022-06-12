@@ -311,12 +311,6 @@ def initMysqlPwd():
 def initMysql8Pwd():
     time.sleep(6)
 
-    # import MySQLdb as mdb
-    # dbconn = mdb.connect('localhost', 'root', '', '')
-    # dbconn.autocommit(True)
-    # dbcurr = dbconn.cursor()
-    # dbcurr.execute('SET NAMES UTF8MB4')
-
     serverdir = getServerDir()
     pwd = mw.getRandomString(16)
 
@@ -325,13 +319,21 @@ def initMysql8Pwd():
     passdata = mw.execShell(pass_cmd)
     password = passdata[0].strip()
 
+    import MySQLdb as mdb
+    dbconn = mdb.connect('localhost', 'root', password, '')
+    dbconn.autocommit(True)
+    dbcurr = dbconn.cursor()
+    dbcurr.execute('SET NAMES UTF8MB4')
+
     # with mysql_native_password
     alter_root_pwd = "flush privileges;"
     alter_root_pwd = alter_root_pwd + "set password='" + pwd + "';"
     # alter_root_pwd = alter_root_pwd + \
     #     "alter user 'root'@'localhost' IDENTIFIED WITH mysql_native_password by '" + pwd + "';"
     alter_root_pwd = alter_root_pwd + "flush privileges;"
-    # r = dbcurr.execute(alter_root_pwd)
+
+    r = dbcurr.execute(alter_root_pwd)
+
     tmp_file = "/tmp/mysql_init_tmp.log"
     mw.writeFile(tmp_file, alter_root_pwd)
     cmd_pass = serverdir + '/bin/mysql --connect-expired-password -uroot -p"' + \
