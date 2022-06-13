@@ -92,9 +92,6 @@ fi
 
 
 
-
-
-
 cd /www/server/mdserver-web && ./cli.sh start
 sleep 5
 
