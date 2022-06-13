@@ -30,6 +30,8 @@ mw_port = 7200
 if os.path.exists("data/port.pl"):
     mw_port = mw.readFile('data/port.pl')
     mw_port.strip()
+else:
+    mw.writeFile('data/port.pl', mw_port)
 
 bind = []
 if os.path.exists('data/ipv6.pl'):
