@@ -72,6 +72,10 @@ if [ ! -f /usr/local/bin/pip3 ];then
 fi
 
 
+# pip3 install gevent flask gunicorn flask_caching flask_session
+# pip3 install flask_socketio gevent-websocket psutil requests
+pip3 install pymongo
+
 cd /www/server/mdserver-web/scripts && ./lib.sh
 chmod 755 /www/server/mdserver-web/data
 
@@ -82,8 +86,7 @@ else
     cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
 fi
 
-# pip3 install gevent flask gunicorn flask_caching flask_session
-# pip3 install flask_socketio gevent-websocket psutil requests
+
 
 
 
