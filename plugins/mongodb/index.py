@@ -38,8 +38,9 @@ def getConf():
     if mw.isAppleSystem():
         path = getServerDir() + "/mongodb.conf"
         return path
-    osInfo = mw.getOs()
-    print(osInfo)
+
+    if os.path.exists("/etc/mongodb.conf"):
+        return "/etc/mongodb.conf"
     return "/etc/mongod.conf"
 
 
@@ -111,7 +112,11 @@ def start():
             return 'ok'
         return 'fail'
 
-    data = mw.execShell('systemctl start mongod')
+    cmd = 'systemctl start mongod'
+    if os.path.exists("/usr/lib/systemd/system/mongodb.service"):
+        cmd = 'systemctl start mongodb'
+
+    data = mw.execShell(cmd)
     if data[1] == '':
         return 'ok'
     return 'fail'
@@ -125,7 +130,11 @@ def stop():
             return 'ok'
         return 'fail'
 
-    data = mw.execShell('systemctl stop mongod')
+    cmd = 'systemctl stop mongod'
+    if os.path.exists("/usr/lib/systemd/system/mongodb.service"):
+        cmd = 'systemctl stop mongodb'
+
+    data = mw.execShell(cmd)
     if data[1] == '':
         return 'ok'
     return 'fail'
@@ -141,7 +150,11 @@ def reload():
             return 'ok'
         return 'fail'
 
-    data = mw.execShell('systemctl reload mongod')
+    cmd = 'systemctl reload mongod'
+    if os.path.exists("/usr/lib/systemd/system/mongodb.service"):
+        cmd = 'systemctl reload mongodb'
+
+    data = mw.execShell(cmd)
     if data[1] == '':
         return 'ok'
     return 'fail'
@@ -157,7 +170,11 @@ def restart():
             return 'ok'
         return 'fail'
 
-    data = mw.execShell('systemctl reload mongod')
+    cmd = 'systemctl reload mongod'
+    if os.path.exists("/usr/lib/systemd/system/mongodb.service"):
+        cmd = 'systemctl reload mongodb'
+
+    data = mw.execShell(cmd)
     if data[1] == '':
         return 'ok'
     return 'fail'
@@ -207,6 +224,10 @@ def initdStatus():
         return 'fail'
 
     shell_cmd = 'systemctl status mongod | grep loaded | grep "enabled;"'
+
+    if os.path.exists("/usr/lib/systemd/system/mongodb.service"):
+        shell_cmd = 'systemctl status mongodb | grep loaded | grep "enabled;"'
+
     data = mw.execShell(shell_cmd)
     if data[0] == '':
         return 'fail'
@@ -226,7 +247,10 @@ def initdInstall():
         mw.execShell('chmod +x ' + initd_bin)
         mw.execShell('chkconfig --add ' + getPluginName())
 
-    mw.execShell('systemctl enable mongod')
+    if os.path.exists("/usr/lib/systemd/system/mongodb.service"):
+        mw.execShell('systemctl enable mongodb')
+    else:
+        mw.execShell('systemctl enable mongod')
     return 'ok'
 
 
@@ -239,14 +263,21 @@ def initdUinstall():
         initd_bin = getInitDFile()
         os.remove(initd_bin)
 
-    mw.execShell('systemctl disable mongod')
+    if os.path.exists("/usr/lib/systemd/system/mongodb.service"):
+        mw.execShell('systemctl disable mongodb')
+    else:
+        mw.execShell('systemctl disable mongod')
     return 'ok'
 
 
 def runLog():
     if mw.isAppleSystem():
         return getServerDir() + '/logs/mongodb.log'
-    return "/var/log/mongodb/mongodb.log"
+
+    if os.path.exists("/var/log/mongodb/mongodb.log"):
+        return "/var/log/mongodb/mongodb.log"
+
+    return "/var/log/mongodb/mongod.log"
 
 if __name__ == "__main__":
     func = sys.argv[1]
