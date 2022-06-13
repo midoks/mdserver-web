@@ -78,6 +78,7 @@ Install_app()
 
 Uninstall_app()
 {
+	# apt remove mongodb -y
 	rm -rf $serverPath/mongodb
 	echo "Uninstall_mongodb" > $install_tmp
 }
