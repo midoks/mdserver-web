@@ -21,6 +21,8 @@ sed -i 's#SELINUX=enforcing#SELINUX=disabled#g' /etc/selinux/config
 
 yum install -y wget lsof crontabs
 yum install -y vixie-cron
+yum install -y python36-devel
+yum install -y python-devel
 #https need
 
 if [ ! -d /root/.acme.sh ];then	
@@ -72,13 +74,11 @@ systemctl stop firewalld
 yum groupinstall -y "Development Tools"
 
 yum install -y libevent libevent-devel libjpeg* libpng* gd* libxslt* unzip libmcrypt libmcrypt-devel
-yum -y install wget python-devel python-imaging libicu-devel zip bzip2-devel gcc libxml2 libxml2-dev  libjpeg-devel libpng-devel libwebp libwebp-devel pcre pcre-devel
-yum -y install lsof net-tools
-yum -y install ncurses-devel mysql-devel cmake
-yum -y install python-devel
-yum -y install MySQL-python 
-yum -y install epel-release
-yum -y install python36-devel
+yum install -y wget python-devel python-imaging libicu-devel zip bzip2-devel gcc libxml2 libxml2-dev  libjpeg-devel libpng-devel libwebp libwebp-devel pcre pcre-devel
+yum install -y lsof net-tools
+yum install -y ncurses-devel mysql-devel cmake
+yum install -y MySQL-python 
+yum install -y epel-release
 
 if [ ! -d /www/server/mdserver-web ];then
 	wget -O /tmp/master.zip https://codeload.github.com/midoks/mdserver-web/zip/master
