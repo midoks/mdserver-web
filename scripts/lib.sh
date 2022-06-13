@@ -330,7 +330,7 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     apt install -y libxslt1-dev
 
     apt install -y libmariadb-dev
-    apt install -y libmysqlclient-dev   
+    #apt install -y libmysqlclient-dev   
     apt install -y libmariadb-dev-compat
     apt install -y libmariadbclient-dev 
 else
