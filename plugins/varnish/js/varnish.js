@@ -26,7 +26,7 @@ function varnishStatus() {
         for (let i in rdata) {
             // console.log(i,rdata[i]);
             if (i == 'timestamp'){
-                tmp += "<tr><th>"+i+"</th><td>"+rdata[i]+"</td><td>查询时间</td></tr>"
+                tmp += "<tr><th>"+i+"</th><td colspan='2'>"+rdata[i]+"</td></tr>"
             } else{
                 tmp += "<tr><th>"+i+"</th><td>"+rdata[i]['value']+"</td><td>"+rdata[i]['description']+"</td></tr>"
             }
