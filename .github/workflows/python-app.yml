@@ -33,7 +33,4 @@ jobs:
     - name: Start DEBUG
       run: |
         gunicorn -c setting.py app:app
-        python3 task.py &
-    - name: Test with pytest
-      run: |
-        pytest
+        python3 task.py
