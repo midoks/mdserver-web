@@ -358,7 +358,11 @@ def initMysql8Pwd():
     # dbcurr.execute('SET NAMES UTF8MB4')
 
     # # with mysql_native_password
-    alter_root_pwd = "flush privileges;alter user 'root'@'localhost' IDENTIFIED WITH mysql_native_password by '" + pwd + "';"
+    alter_root_pwd = 'flush privileges;'
+    alter_root_pwd = alter_root_pwd + \
+        "alter user 'root'@'localhost' IDENTIFIED by '" + pwd + "';"
+    alter_root_pwd = alter_root_pwd + \
+        "alter user 'root'@'localhost' IDENTIFIED WITH mysql_native_password by '" + pwd + "';"
     alter_root_pwd = alter_root_pwd + "flush privileges;"
     # dbcurr.execute(alter_root_pwd)
 
