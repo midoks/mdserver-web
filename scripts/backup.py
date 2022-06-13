@@ -47,7 +47,7 @@ class backupTools:
 
         endDate = time.strftime('%Y/%m/%d %X', time.localtime())
 
-        print filename
+        print(filename)
         if not os.path.exists(filename):
             log = u"网站[" + name + u"]备份失败!"
             print(u"★[" + endDate + "] " + log)
