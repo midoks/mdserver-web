@@ -139,6 +139,10 @@ class config_api:
             import system_api
             import firewall_api
 
+            if firewall_api.__isFirewalld:
+                mw.execShell('systemctl start firewalld')
+                time.sleep(1)
+
             mw.setHostPort(port)
 
             msg = mw.getInfo('放行端口[{1}]成功', (port,))
