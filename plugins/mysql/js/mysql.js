@@ -839,7 +839,7 @@ function openPhpmyadmin(name,username,password){
 
     setTimeout(function(){
         $("#toPHPMyAdmin").submit();
-    },200);
+    },2000);
 }
 
 function delBackup(filename,name){
