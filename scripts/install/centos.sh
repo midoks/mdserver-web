@@ -71,8 +71,16 @@ if [ "${isVersion}" == '' ];then
 	systemctl stop firewalld
 fi
 
+yum groupinstall -y "Development Tools"
+yum install -y libevent libevent-devel libjpeg* libpng* gd* zip unzip libmcrypt libmcrypt-devel
 
-yum install -y libevent libevent-devel mysql-devel libjpeg* libpng* gd* zip unzip libmcrypt libmcrypt-devel
+yum -y install wget python-devel python-imaging libicu-devel zip bzip2-devel gcc libxml2 libxml2-dev libxslt* libjpeg-devel libpng-devel libwebp libwebp-devel pcre pcre-devel vixie-cron crontabs
+yum -y install lsof net-tools
+yum -y install ncurses-devel mysql-devel locate cmake
+yum -y install python-devel
+yum -y install MySQL-python 
+yum -y install epel-release
+yum -y install python36-devel
 
 if [ ! -d /www/server/mdserver-web ];then
 	wget -O /tmp/master.zip https://codeload.github.com/midoks/mdserver-web/zip/master
@@ -80,17 +88,7 @@ if [ ! -d /www/server/mdserver-web ];then
 	mv /tmp/mdserver-web-master /www/server/mdserver-web
 	rm -rf /tmp/master.zip
 	rm -rf /tmp/mdserver-web-master
-fi 
-
-yum groupinstall -y "Development Tools"
-paces="wget python-devel python-imaging libicu-devel zip unzip bzip2-devel gcc libxml2 libxml2-dev libxslt* libjpeg-devel libpng-devel libwebp libwebp-devel lsof pcre pcre-devel vixie-cron crontabs"
-yum -y install $paces
-yum -y lsof net-tools.x86_64
-yum -y install ncurses-devel mysql-dev locate cmake
-yum -y install python-devel.x86_64
-yum -y install MySQL-python 
-yum -y install epel-release
-yum -y install python36-devel
+fi
 
 #if [ ! -f '/usr/bin/pip' ];then
 #	wget https://bootstrap.pypa.io/pip/2.7/get-pip.py

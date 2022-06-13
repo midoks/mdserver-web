@@ -37,11 +37,18 @@ else
     cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
 fi
 
-sh /etc/init.d/mw stop && rm -rf  /www/server/mdserver-web/scripts/init.d/mw && rm -rf  /etc/init.d/mw
+if [ -f /etc/init.d/mw ]; then
+    sh /etc/init.d/mw stop && rm -rf  /www/server/mdserver-web/scripts/init.d/mw && rm -rf  /etc/init.d/mw
+fi
 
 echo -e "stop mw"
 isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`
-port=$(cat /www/server/mdserver-web/data/port.pl)
+
+port=7200
+if [ -f /www/server/mdserver-web/data/port.pl ]; then
+    port=$(cat /www/server/mdserver-web/data/port.pl)
+fi
+
 n=0
 while [[ "$isStart" != "" ]];
 do
