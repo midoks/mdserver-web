@@ -53,7 +53,7 @@ if [ ! -f /usr/sbin/ufw ];then
 	firewall-cmd --reload
 fi
 
-
+systemctl restart firewalld
 #安装时不开启
 systemctl stop firewalld
 
@@ -74,7 +74,8 @@ fi
 pip3 install gevent flask gunicorn flask_caching flask_session
 pip3 install flask_socketio gevent-websocket psutil pymongo
 
-cd /www/server/mdserver-web/scripts && ./lib.sh
+cd /www/server/mdserver-web/scripts && sh lib.sh
+
 chmod 755 /www/server/mdserver-web/data
 
 
