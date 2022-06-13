@@ -210,7 +210,6 @@ def runInfo():
         result['db_path'] = getServerDir() + "/data"
 
     result["connections"] = serverStatus['connections']['current']
-
     if 'catalogStats' in serverStatus:
         result["collections"] = serverStatus['catalogStats']['collections']
 
