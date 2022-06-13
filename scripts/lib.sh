@@ -301,6 +301,7 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     apt-get install -y devscripts
 
     apt install -y libffi-dev
+    apt install -y cmake automake make
 
     apt install -y php-common webp scons
     apt install -y lzma lzma-dev libunwind-dev
@@ -317,18 +318,18 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     apt install -y libfreetype6-dev
     apt install -y libevent-dev libncurses5-dev libldap2-dev
 
-    apt install -y  libicu-dev
+    apt install -y libicu-dev
 
-    apt install -y gcc build-essential openssl make libssl-dev 
+    apt install -y gcc build-essential libssl-dev 
     apt install -y curl libcurl4-gnutls-dev libjpeg-dev libpng-dev
     apt install -y graphviz bison re2c flex
     apt install -y libsqlite3-dev
     apt install -y libonig-dev
 
-    apt install -y cmake lsof
+    apt install -y lsof
     cd /usr/include && ln -s x86_64-linux-gnu/curl
     
-    apt install -y perl g++ make automake libtool unzip    
+    apt install -y perl g++ libtool unzip    
     apt install -y libxslt1-dev
 
     apt install -y libmariadb-dev
