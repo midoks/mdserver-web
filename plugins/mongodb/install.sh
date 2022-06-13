@@ -59,11 +59,10 @@ Install_app()
 {
 	pip3 install pymongo
 
-	echo "sys:$sysName"
 	echo '正在安装脚本文件...' > $install_tmp
 	mkdir -p $serverPath/source
 	mkdir -p $serverPath/mongodb
-	# echo $sysName
+
 	if [ "macos" == "$OSNAME" ];then
 		Install_app_mac
 	if [ "ubuntu" == "$OSNAME" ] || [ "ubuntu" == "$OSNAME" ] ;then
