@@ -41,10 +41,12 @@ if [ -f /etc/init.d/iptables ];then
 	if [ "${iptables_status}" == '' ];then
 		service iptables restart
 	fi
+
+	#安装时不开启
+	service iptables stop
 fi
 
-#安装时不开启
-service iptables stop
+
 
 if [ "${isVersion}" == '' ];then
 	if [ ! -f "/etc/init.d/iptables" ];then
@@ -61,10 +63,13 @@ if [ "${isVersion}" == '' ];then
 		firewall-cmd --permanent --zone=public --add-port=30000-40000/tcp
 		firewall-cmd --reload
 	fi
-fi
 
-#安装时不开启
-systemctl stop firewalld
+	sed -i 's#AllowZoneDrifting=yes#AllowZoneDrifting=no#g' /etc/firewalld/firewalld.conf
+
+	systemctl restart firewalld
+	#安装时不开启
+	systemctl stop firewalld
+fi
 
 
 yum install -y libevent libevent-devel mysql-devel libjpeg* libpng* gd* zip unzip libmcrypt libmcrypt-devel
