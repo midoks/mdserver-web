@@ -35,8 +35,8 @@ jobs:
         if [ -f requirements.txt ]; then pip3 install -r requirements.txt; fi
     - name: Start DEBUG
       run: |
+        gunicorn -c setting.py app:app
         python3 task.py &
-        gunicorn -b :7200 -k gevent -w 1 app:app
     - name: Test with pytest
       run: |
         pytest
