@@ -65,7 +65,7 @@ Install_app()
 
 	if [ "macos" == "$OSNAME" ];then
 		Install_app_mac
-	if [ "ubuntu" == "$OSNAME" ] || [ "ubuntu" == "$OSNAME" ] ;then
+	elif [ "ubuntu" == "$OSNAME" ] || [ "ubuntu" == "$OSNAME" ] ;then
 		apt install -y mongodb
 	else
 		Install_app_linux
