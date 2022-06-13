@@ -306,11 +306,11 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     apt install -y lzma lzma-dev libunwind-dev
 
     apt install -y libpcre3 libpcre3-dev 
-    apt install -y openssl libssl-dev
+    apt install -y openssl
 
-    apt install -y libxml2 libxml2-dev libssl-dev libbz2-dev libjpeg-dev libpng-dev libmcrypt-dev libpspell-dev librecode-dev
+    apt install -y libxml2 libxml2-dev libbz2-dev libmcrypt-dev libpspell-dev librecode-dev
     apt install -y libgmp-dev libgmp3-dev libreadline-dev libxpm-dev
-    apt install -y libpng-dev zlib1g-dev dia pkg-config  
+    apt install -y zlib1g-dev dia pkg-config  
     apt install -y libjpeg62-turbo-dev
     apt install -y libfreetype-dev
     apt install -y libfreetype6
@@ -320,7 +320,7 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     apt install -y  libicu-dev
 
     apt install -y gcc build-essential openssl make libssl-dev 
-    apt install -y curl libcurl4-gnutls-dev libjpeg-dev libpng-dev libmcrypt-dev
+    apt install -y curl libcurl4-gnutls-dev libjpeg-dev libpng-dev
     apt install -y graphviz bison re2c flex
     apt install -y libsqlite3-dev
     apt install -y libonig-dev
