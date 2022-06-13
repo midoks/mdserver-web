@@ -114,9 +114,10 @@ fi
 
 pip3 install gevent==21.1.2
 pip3 install gevent-websocket==0.10.1
+pip3 install requests==2.20.0
 pip3 install flask_caching flask_session
 pip3 install flask_socketio psutil pymongo
-pip3 install requests
+
 
 
 
