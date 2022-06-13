@@ -23,6 +23,7 @@ Install_mem(){
 
 	mkdir -p $serverPath/memcached
 	cd $serverPath/source/memcached*
+	echo "./configure --prefix=${serverPath}/memcached && make && make install"
 	./configure --prefix=$serverPath/memcached && make && make install
 
 	echo '1.6' > $serverPath/memcached/version.pl
