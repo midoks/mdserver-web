@@ -300,7 +300,7 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     aptitude install -y libcurl4-gnutls-dev
     apt-get install -y devscripts
 
-    apt install -y php-common webp
+    apt install -y php-common webp lzma
 
     apt install -y libpcre3 libpcre3-dev 
     apt install -y openssl libssl-dev
