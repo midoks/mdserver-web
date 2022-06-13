@@ -53,7 +53,7 @@ Install_app_linux(){
 
 
 	cd $serverPath/source/mongodb-src-r${VERSION}
-	cd build && ../configure --prefix=$serverPath/mongodb && make -j4 && make install
+	cd build && ./configure --prefix=$serverPath/mongodb && make -j4 && make install
 }
 
 
