@@ -53,7 +53,7 @@ if [ ! -f /usr/sbin/ufw ];then
 
 	# fix:debian10 firewalld faq
 	# https://kawsing.gitbook.io/opensystem/andoid-shou-ji/untitled/fang-huo-qiang#debian-10-firewalld-0.6.3-error-commandfailed-usrsbinip6tablesrestorewn-failed-ip6tablesrestore-v1.8
-	sed -i 's#InvividualCalls=no#InvividualCalls=yes#g' /etc/firewalld/firewalld.conf 
+	sed -i 's#IndividualCalls=no#IndividualCalls=yes#g' /etc/firewalld/firewalld.conf 
 fi
 
 
