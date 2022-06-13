@@ -10,7 +10,7 @@ on:
     branches: [ "master" ]
 
 permissions:
-  contents: [read,write]
+  contents: read
 
 jobs:
   build:
