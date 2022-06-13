@@ -20,9 +20,10 @@ setenforce 0
 sed -i 's#SELINUX=enforcing#SELINUX=disabled#g' /etc/selinux/config
 
 yum install -y wget lsof crontabs
-yum install -y vixie-cron
-yum install -y python36-devel
+yum install -y python3-devel
 yum install -y python-devel
+yum install -y vixie-cron
+
 #https need
 
 if [ ! -d /root/.acme.sh ];then	
@@ -74,7 +75,7 @@ systemctl stop firewalld
 yum groupinstall -y "Development Tools"
 
 yum install -y libevent libevent-devel libjpeg* libpng* gd* libxslt* unzip libmcrypt libmcrypt-devel
-yum install -y wget python-devel python-imaging libicu-devel zip bzip2-devel gcc libxml2 libxml2-dev  libjpeg-devel libpng-devel libwebp libwebp-devel pcre pcre-devel
+yum install -y wget python-imaging libicu-devel zip bzip2-devel gcc libxml2 libxml2-dev  libjpeg-devel libpng-devel libwebp libwebp-devel pcre pcre-devel
 yum install -y lsof net-tools
 yum install -y ncurses-devel mysql-devel cmake
 yum install -y MySQL-python 
