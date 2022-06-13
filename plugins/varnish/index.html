@@ -13,5 +13,8 @@
 	</div>
 </div>
 <script type="text/javascript">
-pluginService('varnish');
+$.getScript( "/plugins/file?name=sys-opt&f=js/varnish.js",
+function() {
+	pluginService('varnish');
+});
 </script>

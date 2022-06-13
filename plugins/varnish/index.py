@@ -133,6 +133,27 @@ def runInfo():
     return mw.getJson(result)
 
 
+def configTpl():
+    path = getPluginDir() + '/tpl'
+    pathFile = os.listdir(path)
+    tmp = []
+    for one in pathFile:
+        file = path + '/' + one
+        tmp.append(file)
+    return mw.getJson(tmp)
+
+
+def readConfigTpl():
+    args = getArgs()
+    data = checkArgs(args, ['file'])
+    if not data[0]:
+        return data[1]
+
+    content = mw.readFile(args['file'])
+    content = contentReplace(content)
+    return mw.returnJson(True, 'ok', content)
+
+
 def initdStatus():
     if not app_debug:
         if mw.isAppleSystem():
@@ -192,5 +213,9 @@ if __name__ == "__main__":
         print(getConf())
     elif func == 'run_log':
         print(runLog())
+    elif func == 'config_tpl':
+        print(configTpl())
+    elif func == 'read_config_tpl':
+        print(readConfigTpl())
     else:
         print('error')
