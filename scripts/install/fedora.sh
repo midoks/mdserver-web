@@ -43,10 +43,12 @@ if [ -f /etc/init.d/iptables ];then
 	if [ "${iptables_status}" == '' ];then
 		service iptables restart
 	fi
+
+	#安装时不开启
+	service iptables stop
 fi
 
-#安装时不开启
-service iptables stop
+
 
 if [ "${isVersion}" == '' ];then
 	if [ ! -f "/etc/init.d/iptables" ];then
@@ -69,8 +71,18 @@ fi
 systemctl stop firewalld
 
 
-yum install -y libevent libevent-devel mysql-devel libjpeg* libpng* gd* zip unzip libmcrypt libmcrypt-devel
-yum install gcc libffi-devel python-devel openssl-devel -y
+yum groupinstall -y "Development Tools"
+
+yum install -y libevent libevent-devel libxslt* libjpeg* libpng* gd* zip libmcrypt libmcrypt-devel
+yum install -y gcc libffi-devel python-devel openssl-devel 
+
+yum -y install wget python-devel python-imaging libicu-devel unzip bzip2-devel gcc libxml2 libxml2-dev libjpeg-devel libpng-devel libwebp libwebp-devel lsof pcre pcre-devel vixie-cron crontabs
+yum -y install net-tools
+yum -y install ncurses-devel mysql-devel cmake
+yum -y install python-devel
+yum -y install MySQL-python 
+yum -y install epel-release
+yum -y install python36-devel
 
 if [ ! -d /www/server/mdserver-web ];then
 	wget -O /tmp/master.zip https://codeload.github.com/midoks/mdserver-web/zip/master
@@ -80,15 +92,7 @@ if [ ! -d /www/server/mdserver-web ];then
 	rm -rf /tmp/mdserver-web-master
 fi 
 
-yum groupinstall -y "Development Tools"
-paces="wget python-devel python-imaging libicu-devel zip unzip bzip2-devel gcc libxml2 libxml2-dev libxslt* libjpeg-devel libpng-devel libwebp libwebp-devel lsof pcre pcre-devel vixie-cron crontabs"
-yum -y install $paces
-yum -y lsof net-tools.x86_64
-yum -y install ncurses-devel mysql-devel cmake
-yum -y install python-devel.x86_64
-yum -y install MySQL-python 
-yum -y install epel-release
-yum -y install python36-devel
+
 
 #if [ ! -f '/usr/bin/pip' ];then
 #	wget https://bootstrap.pypa.io/pip/2.7/get-pip.py
