@@ -38,6 +38,8 @@ def getConf():
     if mw.isAppleSystem():
         path = getServerDir() + "/mongodb.conf"
         return path
+    osInfo = mw.getOs()
+    print(osInfo)
     return "/etc/mongod.conf"
 
 
@@ -244,7 +246,7 @@ def initdUinstall():
 def runLog():
     if mw.isAppleSystem():
         return getServerDir() + '/logs/mongodb.log'
-    return "/var/log/mongodb/mongod.log"
+    return "/var/log/mongodb/mongodb.log"
 
 if __name__ == "__main__":
     func = sys.argv[1]
