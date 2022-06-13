@@ -26,7 +26,7 @@ if not os.path.exists(os.getcwd() + '/logs'):
     os.mkdir(os.getcwd() + '/logs')
 
 # default port
-mw_port = 7200
+mw_port = "7200"
 if os.path.exists("data/port.pl"):
     mw_port = mw.readFile('data/port.pl')
     mw_port.strip()
