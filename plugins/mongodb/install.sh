@@ -14,6 +14,24 @@ install_tmp=${rootPath}/tmp/mw_install.pl
 VERSION=$2
 sysName=`uname`
 
+echo "use system: ${sysName}"
+
+if [ ${sysName} == "Darwin" ]; then
+	OSNAME='macos'
+elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
+	OSNAME='centos'
+elif grep -Eqi "Fedora" /etc/issue || grep -Eq "Fedora" /etc/*-release; then
+	OSNAME='fedora'
+elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
+	OSNAME='debian'
+elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
+	OSNAME='ubuntu'
+elif grep -Eqi "Raspbian" /etc/issue || grep -Eq "Raspbian" /etc/*-release; then
+	OSNAME='raspbian'
+else
+	OSNAME='unknow'
+fi
+
 Install_app_mac()
 {
 
@@ -29,12 +47,16 @@ Install_app_mac()
 
 # https://repo.mongodb.org/yum/redhat/7/mongodb-org/5.0/x86_64/RPMS/mongodb-org-server-5.0.4-1.el7.x86_64.rpm
 Install_app_linux(){
-	if [ ! -f $serverPath/source/mongodb-org-server-${VERSION}-1.el7.x86_64.rpm ];then
-		wget -O $serverPath/source/mongodb-org-server-${VERSION}-1.el7.x86_64.rpm https://repo.mongodb.org/yum/redhat/7/mongodb-org/5.0/x86_64/RPMS/mongodb-org-server-${VERSION}-1.el7.x86_64.rpm
+	if [ ! -f $serverPath/source/mongodb-src-r${VERSION}.tar.gz ];then
+		wget -O $serverPath/source/mongodb-src-r${VERSION}.tar.gz https://fastdl.mongodb.org/src/mongodb-src-r${VERSION}.tar.gz
 	fi
-	
-	rpm -ivh $serverPath/source/mongodb-org-server-${VERSION}-1.el7.x86_64.rpm 
+
+
+	cd $serverPath/source/mongodb-src-r${VERSION}
+	cd build && ../configure --prefix=$serverPath/mongodb && make -j4 && make install
 }
+
+
 
 
 Install_app()
@@ -46,7 +68,7 @@ Install_app()
 	mkdir -p $serverPath/source
 	mkdir -p $serverPath/mongodb
 	# echo $sysName
-	if [ "Darwin" == "$sysName" ];then
+	if [ "macos" == "$OSNAME" ]; then
 		Install_app_mac
 	else
 		Install_app_linux
