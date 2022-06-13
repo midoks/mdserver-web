@@ -1,5 +1,5 @@
-werkzeug==2.0.3
 setuptools==33.1.1
+werkzeug==2.0.3
 wheel==0.33.6
 gunicorn==20.1.0
 flask==2.0.3

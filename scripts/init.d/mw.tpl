@@ -167,7 +167,12 @@ case "$1" in
     'logs') error_logs;;
     'default')
         cd $mw_path
-        port=$(cat $mw_path/data/port.pl)
+        port=7200
+        
+        if [ -f $mw_path/data/port.pl ];then
+            port=$(cat $mw_path/data/port.pl)
+        fi
+
         password=$(cat $mw_path/data/default.pl)
         if [ -f $mw_path/data/domain.conf ];then
             address=$(cat $mw_path/data/domain.conf)
