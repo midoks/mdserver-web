@@ -51,7 +51,7 @@ Install_app_linux(){
 		wget -O $serverPath/source/mongodb-src-r${VERSION}.tar.gz https://fastdl.mongodb.org/src/mongodb-src-r${VERSION}.tar.gz
 	fi
 
-
+	cd $serverPath/source && tar -zxvf mongodb-src-r${VERSION}.tar.gz
 	cd $serverPath/source/mongodb-src-r${VERSION}
 	cd build && ./configure --prefix=$serverPath/mongodb && make -j4 && make install
 }
