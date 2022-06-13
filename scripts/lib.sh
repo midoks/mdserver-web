@@ -320,7 +320,7 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     apt install -y gcc build-essential openssl make libssl-dev 
     apt install -y curl libcurl4-gnutls-dev libjpeg-dev libpng-dev libmcrypt-dev
     apt install -y graphviz bison re2c flex
-    apt install -y libsqlite3-dev libcurl4-openssl-dev curl
+    apt install -y libsqlite3-dev
     apt install -y libonig-dev
 
     apt install -y cmake lsof
