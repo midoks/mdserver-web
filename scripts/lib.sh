@@ -340,7 +340,7 @@ else
     yum install -y bison re2c
 
     yum install -y libmemcached libmemcached-devel
-    yum install -y curl curl-devel
+    yum install -y curl-devel
     yum install -y zlib zlib-devel
     yum install -y pcre pcre-devel
     yum install -y icu libicu-devel autoconf
