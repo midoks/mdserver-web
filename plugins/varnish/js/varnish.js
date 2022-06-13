@@ -20,6 +20,7 @@ function varnishStatus() {
         }
 
         var rdata = $.parseJSON(data.data);
+        console.log(rdata);
         hit = (parseInt(rdata.keyspace_hits) / (parseInt(rdata.keyspace_hits) + parseInt(rdata.keyspace_misses)) * 100).toFixed(2);
         var Con = '<div class="divtable">\
                         <table class="table table-hover table-bordered" style="width: 490px;">\
