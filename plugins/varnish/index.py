@@ -118,19 +118,9 @@ def reload():
 
 
 def runInfo():
-    cmd = getServerDir() + "/usr/bin/varnishstat -j"
+    cmd = "/usr/bin/varnishstat -j"
     data = mw.execShell(cmd)[0].strip()
     return data
-    # print(data)
-    # result = {}
-    # for d in data:
-    #     if len(d) < 3:
-    #         continue
-    #     t = d.strip().split(':')
-    #     if not t[0] in res:
-    #         continue
-    #     result[t[0]] = t[1]
-    # return mw.getJson(result)
 
 
 def configTpl():
