@@ -327,11 +327,9 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     cd /usr/include && ln -s x86_64-linux-gnu/curl
     
     apt install -y perl g++ make automake libtool unzip    
-    apt install -y libmysql++-dev libxslt1-dev
+    apt install -y libxslt1-dev
 
-    apt install -y libmariadb-dev-compat libmariadb-dev mysql-community-client
-
-    apt install -y libmysqlclient15-dev
+    apt install -y libmariadb-dev
     apt install -y libmysqlclient-dev   
     apt install -y libmariadb-dev-compat
     apt install -y libmariadbclient-dev 
