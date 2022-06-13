@@ -71,8 +71,6 @@ if [ ! -f /usr/local/bin/pip3 ];then
     python3 -m pip install --upgrade pip setuptools wheel -i https://mirrors.aliyun.com/pypi/simple
 fi
 
-pip3 install gevent flask gunicorn flask_caching flask_session
-pip3 install flask_socketio gevent-websocket psutil pymongo
 
 cd /www/server/mdserver-web/scripts && sh lib.sh
 
@@ -84,6 +82,9 @@ if [ -f /www/server/mdserver-web/bin/activate ];then
 else
     cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
 fi
+
+pip3 install gevent flask gunicorn flask_caching flask_session
+pip3 install flask_socketio gevent-websocket psutil pymongo
 
 
 cd /www/server/mdserver-web && ./cli.sh start
