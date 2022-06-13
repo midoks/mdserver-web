@@ -12,7 +12,7 @@ function pRead(){
 //redis负载状态  start
 function varnishStatus() {
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
-    $.post('/plugins/run', {name:'redis', func:'run_info'}, function(data) {
+    $.post('/plugins/run', {name:'varnish', func:'run_info'}, function(data) {
         layer.close(loadT);
         if (!data.status){
             layer.msg(data.msg,{icon:0,time:2000,shade: [0.3, '#000']});
