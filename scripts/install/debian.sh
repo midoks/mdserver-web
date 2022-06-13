@@ -56,7 +56,7 @@ if [ ! -f /usr/sbin/ufw ];then
 	sed -i 's#IndividualCalls=no#IndividualCalls=yes#g' /etc/firewalld/firewalld.conf 
 fi
 
-
+systemctl restart firewalld
 #安装时不开启
 systemctl stop firewalld
 
@@ -80,7 +80,7 @@ fi
 pip3 install pymongo
 
 
-cd /www/server/mdserver-web/scripts && ./lib.sh
+cd /www/server/mdserver-web/scripts && sh lib.sh
 chmod 755 /www/server/mdserver-web/data
 
 
