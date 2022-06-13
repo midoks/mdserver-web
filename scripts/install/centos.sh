@@ -19,11 +19,12 @@ fi
 setenforce 0
 sed -i 's#SELINUX=enforcing#SELINUX=disabled#g' /etc/selinux/config
 
-yum install -y wget curl vixie-cron lsof
+yum install -y wget lsof crontabs
+yum install -y vixie-cron
 #https need
 
 if [ ! -d /root/.acme.sh ];then	
-	curl  https://get.acme.sh | sh
+	curl https://get.acme.sh | sh
 fi
 
 if [ -f /etc/init.d/iptables ];then
@@ -47,36 +48,33 @@ if [ -f /etc/init.d/iptables ];then
 fi
 
 
+if [ ! -f /etc/init.d/iptables ];then
+	yum install firewalld -y
+	systemctl enable firewalld
+	systemctl start firewalld
 
-if [ "${isVersion}" == '' ];then
-	if [ ! -f "/etc/init.d/iptables" ];then
-		yum install firewalld -y
-		systemctl enable firewalld
-		systemctl start firewalld
-
-		firewall-cmd --permanent --zone=public --add-port=22/tcp
-		firewall-cmd --permanent --zone=public --add-port=80/tcp
-		firewall-cmd --permanent --zone=public --add-port=443/tcp
-		firewall-cmd --permanent --zone=public --add-port=888/tcp
-		firewall-cmd --permanent --zone=public --add-port=7200/tcp
-		firewall-cmd --permanent --zone=public --add-port=3306/tcp
-		firewall-cmd --permanent --zone=public --add-port=30000-40000/tcp
-		firewall-cmd --reload
-	fi
-
-	sed -i 's#AllowZoneDrifting=yes#AllowZoneDrifting=no#g' /etc/firewalld/firewalld.conf
-
-	systemctl restart firewalld
-	#安装时不开启
-	systemctl stop firewalld
+	firewall-cmd --permanent --zone=public --add-port=22/tcp
+	firewall-cmd --permanent --zone=public --add-port=80/tcp
+	firewall-cmd --permanent --zone=public --add-port=443/tcp
+	firewall-cmd --permanent --zone=public --add-port=888/tcp
+	firewall-cmd --permanent --zone=public --add-port=7200/tcp
+	firewall-cmd --permanent --zone=public --add-port=3306/tcp
+	firewall-cmd --permanent --zone=public --add-port=30000-40000/tcp
+	firewall-cmd --reload
 fi
 
-yum groupinstall -y "Development Tools"
-yum install -y libevent libevent-devel libjpeg* libpng* gd* zip unzip libmcrypt libmcrypt-devel
+sed -i 's#AllowZoneDrifting=yes#AllowZoneDrifting=no#g' /etc/firewalld/firewalld.conf
 
-yum -y install wget python-devel python-imaging libicu-devel zip bzip2-devel gcc libxml2 libxml2-dev libxslt* libjpeg-devel libpng-devel libwebp libwebp-devel pcre pcre-devel vixie-cron crontabs
+systemctl restart firewalld
+#安装时不开启
+systemctl stop firewalld
+
+yum groupinstall -y "Development Tools"
+
+yum install -y libevent libevent-devel libjpeg* libpng* gd* libxslt* unzip libmcrypt libmcrypt-devel
+yum -y install wget python-devel python-imaging libicu-devel zip bzip2-devel gcc libxml2 libxml2-dev  libjpeg-devel libpng-devel libwebp libwebp-devel pcre pcre-devel
 yum -y install lsof net-tools
-yum -y install ncurses-devel mysql-devel locate cmake
+yum -y install ncurses-devel mysql-devel cmake
 yum -y install python-devel
 yum -y install MySQL-python 
 yum -y install epel-release
