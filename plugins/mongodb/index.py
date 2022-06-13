@@ -202,11 +202,17 @@ def runInfo():
     result["uptime"] = serverStatus['uptime']
 
     result['db_path'] = '/var/lib/mongo'
+
+    if os.path.exists("/var/lib/mongodb"):
+        result['db_path'] = '/var/lib/mongodb'
+
     if mw.isAppleSystem():
         result['db_path'] = getServerDir() + "/data"
 
     result["connections"] = serverStatus['connections']['current']
-    result["collections"] = serverStatus['catalogStats']['collections']
+
+    if 'catalogStats' in serverStatus:
+        result["collections"] = serverStatus['catalogStats']['collections']
 
     result["dbs"] = showDbList
     return mw.getJson(result)
