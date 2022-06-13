@@ -66,7 +66,7 @@ if [ ! -d /www/server/mdserver-web ];then
 fi 
 
 
-
+cd /www/server/mdserver-web && python3 -m venv .
 if [ ! -f /usr/local/bin/pip3 ];then
     python3 -m pip install --upgrade pip setuptools wheel -i https://mirrors.aliyun.com/pypi/simple
 fi

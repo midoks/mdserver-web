@@ -69,8 +69,7 @@ if [ ! -d /www/server/mdserver-web ];then
 	rm -rf /tmp/mdserver-web-master
 fi 
 
-
-
+cd /www/server/mdserver-web && python3 -m venv .
 if [ ! -f /usr/local/bin/pip3 ];then
     python3 -m pip install --upgrade pip setuptools wheel -i https://mirrors.aliyun.com/pypi/simple
 fi
@@ -79,6 +78,7 @@ fi
 # pip3 install gevent flask gunicorn flask_caching flask_session
 # pip3 install flask_socketio gevent-websocket psutil requests
 pip3 install pymongo
+
 
 cd /www/server/mdserver-web/scripts && ./lib.sh
 chmod 755 /www/server/mdserver-web/data
