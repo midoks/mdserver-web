@@ -37,6 +37,13 @@ else
     cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
 fi
 
+
+
+pip3 install gevent flask gunicorn flask_caching flask_session
+pip3 install flask_socketio gevent-websocket psutil pymongo
+pip3 install requests
+
+
 if [ -f /etc/init.d/mw ]; then
     sh /etc/init.d/mw stop && rm -rf  /www/server/mdserver-web/scripts/init.d/mw && rm -rf  /etc/init.d/mw
 fi
