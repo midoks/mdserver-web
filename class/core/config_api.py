@@ -139,9 +139,9 @@ class config_api:
             import system_api
             import firewall_api
 
-            if firewall_api.__isFirewalld:
-                mw.execShell('systemctl start firewalld')
-                time.sleep(1)
+            if os.path.exists("/lib/systemd/system/firewalld.service"):
+                if not firewall_api.getFwStatus():
+                    return mw.returnJson(False, 'firewalld必须先启动!')
 
             mw.setHostPort(port)
 
