@@ -297,8 +297,8 @@ if [ "$OSNAME" == "macos" ]; then
 elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     
 
-    aptitude install -y libcurl4-gnutls-dev
-    apt-get install -y devscripts
+    apt install -y libcurl4-gnutls-dev
+    apt install -y devscripts
 
     apt install -y libffi-dev
     apt install -y cmake automake make
@@ -335,7 +335,7 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     apt install -y libmariadb-dev
     #apt install -y libmysqlclient-dev   
     apt install -y libmariadb-dev-compat
-    apt install -y libmariadbclient-dev 
+    #apt install -y libmariadbclient-dev 
 else
 
     yum install -y openldap openldap-devel libtirpc libtirpc-devel rpcgen
