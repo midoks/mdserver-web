@@ -72,7 +72,7 @@ if [ ! -f /usr/local/bin/pip3 ];then
 fi
 
 
-cd /www/server/mdserver-web/scripts && sh lib.sh
+cd /www/server/mdserver-web/scripts && bash lib.sh
 
 chmod 755 /www/server/mdserver-web/data
 

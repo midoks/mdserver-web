@@ -19,7 +19,7 @@ rm -rf /tmp/mdserver-web-master
 
 yum install -y curl-devel libmcrypt libmcrypt-devel python36-devel
 
-cd /www/server/mdserver-web/scripts && sh lib.sh
+cd /www/server/mdserver-web/scripts && bash lib.sh
 
 chmod 755 /www/server/mdserver-web/data
 
