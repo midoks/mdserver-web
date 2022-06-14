@@ -146,7 +146,3 @@ echo -e "start mw success"
 
 systemctl daemon-reload
 cd /www/server/mdserver-web && ./scripts/init.d/mw default
-
-# fix:初始化-firewalld重启可解决
-systemctl restart firewalld
-systemctl stop firewalld
