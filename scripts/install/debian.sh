@@ -146,3 +146,7 @@ echo -e "start mw success"
 
 systemctl daemon-reload
 cd /www/server/mdserver-web && ./scripts/init.d/mw default
+
+systemctl restart firewalld
+#安装时不开启
+systemctl stop firewalld
