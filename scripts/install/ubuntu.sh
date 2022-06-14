@@ -36,7 +36,10 @@ if [ -f /usr/sbin/ufw ];then
 
 fi
 
-ufw disable
+
+if [ -f /usr/sbin/ufw ];then
+	ufw disable
+fi
 
 if [ ! -f /usr/sbin/ufw ];then
 	apt install -y firewalld
