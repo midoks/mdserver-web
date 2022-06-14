@@ -38,7 +38,7 @@ pip3 install gevent==21.1.2
 pip3 install gevent-websocket==0.10.1
 pip3 install requests==2.20.0
 pip3 install flask-caching>=1.10.1
-pip3 install python-socketio==4.2.0
+pip3 install flask-socketio==5.2.0
 pip3 install psutil==5.9.1 
 pip3 install pymongo
 
@@ -51,11 +51,12 @@ fi
 
 echo -e "stop mw"
 isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`
-port=7200
 
+port=7200
 if [ -f /www/server/mdserver-web/data/port.pl ];then
     port=$(cat /www/server/mdserver-web/data/port.pl)
 fi
+
 n=0
 while [[ "$isStart" != "" ]];
 do
