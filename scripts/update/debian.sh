@@ -51,11 +51,12 @@ fi
 
 echo -e "stop mw"
 isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`
-port=7200
 
+port=7200
 if [ -f /www/server/mdserver-web/data/port.pl ];then
     port=$(cat /www/server/mdserver-web/data/port.pl)
 fi
+
 n=0
 while [[ "$isStart" != "" ]];
 do
