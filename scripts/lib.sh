@@ -65,85 +65,87 @@ echo -e "Install_Libmemcached" >> ${libPath}/lib.pl
 Install_Libiconv()
 {
 #----------------------------- libiconv start -------------------------#
-	cd ${sourcePath}
-	if [ ! -d ${libPath}/libiconv ];then
-		# wget -O libiconv-1.15.tar.gz  https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.15.tar.gz  -T 5
-		wget -O libiconv-1.15.tar.gz  https://github.com/midoks/mdserver-web/releases/download/init/libiconv-1.15.tar.gz  -T 5
-		tar zxvf libiconv-1.15.tar.gz
-		cd libiconv-1.15
-	    ./configure --prefix=${libPath}/libiconv --enable-static
-	    make && make install
-	    cd ${sourcePath}
-	    rm -rf libiconv-1.15
-		rm -f libiconv-1.15.tar.gz
-	fi
-	echo -e "Install_Libiconv" >> ${libPath}/lib.pl
+cd ${sourcePath}
+if [ ! -d ${libPath}/libiconv ];then
+	# wget -O libiconv-1.15.tar.gz  https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.15.tar.gz  -T 5
+	wget -O libiconv-1.15.tar.gz  https://github.com/midoks/mdserver-web/releases/download/init/libiconv-1.15.tar.gz  -T 5
+	tar zxvf libiconv-1.15.tar.gz
+	cd libiconv-1.15
+    ./configure --prefix=${libPath}/libiconv --enable-static
+    make && make install
+    cd ${sourcePath}
+    rm -rf libiconv-1.15
+	rm -f libiconv-1.15.tar.gz
+fi
+echo -e "Install_Libiconv" >> ${libPath}/lib.pl
 #----------------------------- libiconv end -------------------------#
 }
 
 Install_Freetype()
 {
 #----------------------------- freetype start -------------------------#
+cd ${sourcePath}
+if [ ! -d ${libPath}/freetype_old ];then
+    wget -O freetype-2.7.1.tar.gz --no-check-certificate https://download.savannah.gnu.org/releases/freetype/freetype-2.7.1.tar.gz  -T 5
+    tar zxvf freetype-2.7.1.tar.gz
+    cd freetype-2.7.1
+    ./configure --prefix=${libPath}/freetype_old
+    make && make install
     cd ${sourcePath}
-    if [ ! -d ${libPath}/freetype_old ];then
-        wget -O freetype-2.7.1.tar.gz --no-check-certificate https://download.savannah.gnu.org/releases/freetype/freetype-2.7.1.tar.gz  -T 5
-        tar zxvf freetype-2.7.1.tar.gz
-        cd freetype-2.7.1
-        ./configure --prefix=${libPath}/freetype_old
-        make && make install
-        cd ${sourcePath}
-        rm -rf freetype-2.7.1.tar.gz
-        rm -f freetype-2.7.1.tar.gz
-    fi
-    echo -e "Install_Freetype_Old" >> ${libPath}/lib.pl
+    rm -rf freetype-2.7.1.tar.gz
+    rm -f freetype-2.7.1.tar.gz
+fi
+echo -e "Install_Freetype_Old" >> ${libPath}/lib.pl
 #----------------------------- freetype end -------------------------#
 }
 
 Install_Freetype_New()
 {
 #----------------------------- freetype start -------------------------#
+cd ${sourcePath}
+if [ ! -d ${libPath}/freetype ];then
+    wget -O freetype-2.12.1.tar.gz --no-check-certificate https://download.savannah.gnu.org/releases/freetype/freetype-2.12.1.tar.gz  -T 5
+    tar zxvf freetype-2.12.1.tar.gz
+    cd freetype-2.12.1
+    ./configure --prefix=${libPath}/freetype
+    make && make install
     cd ${sourcePath}
-    if [ ! -d ${libPath}/freetype ];then
-        wget -O freetype-2.12.1.tar.gz --no-check-certificate https://download.savannah.gnu.org/releases/freetype/freetype-2.12.1.tar.gz  -T 5
-        tar zxvf freetype-2.12.1.tar.gz
-        cd freetype-2.12.1
-        ./configure --prefix=${libPath}/freetype
-        make && make install
-        cd ${sourcePath}
-        rm -rf freetype-2.12.1.tar.gz
-        rm -f freetype-2.12.1.tar.gz
-    fi
-    echo -e "Install_Freetype" >> ${libPath}/lib.pl
+    rm -rf freetype-2.12.1.tar.gz
+    rm -f freetype-2.12.1.tar.gz
+fi
+echo -e "Install_Freetype" >> ${libPath}/lib.pl
 #----------------------------- freetype end -------------------------#
 }
 
 Install_Libmcrypt()
 {
-	if [ -f '/usr/local/lib/libmcrypt.so' ];then
-		return;
-	fi
-	cd ${run_path}
-	if [ ! -f "libmcrypt-2.5.8.tar.gz" ];then
-		wget -O libmcrypt-2.5.8.tar.gz ${download_Url}/src/libmcrypt-2.5.8.tar.gz -T 5
-	fi
-	tar zxf libmcrypt-2.5.8.tar.gz
-	cd libmcrypt-2.5.8
-	
-    ./configure
-    make && make install
-    /sbin/ldconfig
-    cd libltdl/
-    ./configure --enable-ltdl-install
-    make && make install
-    ln -sf /usr/local/lib/libmcrypt.la /usr/lib/libmcrypt.la
-    ln -sf /usr/local/lib/libmcrypt.so /usr/lib/libmcrypt.so
-    ln -sf /usr/local/lib/libmcrypt.so.4 /usr/lib/libmcrypt.so.4
-    ln -sf /usr/local/lib/libmcrypt.so.4.4.8 /usr/lib/libmcrypt.so.4.4.8
-    ldconfig
-    cd ${run_path}
-    rm -rf libmcrypt-2.5.8
-	rm -f libmcrypt-2.5.8.tar.gz
-	echo -e "Install_Libmcrypt" >> /www/server/lib.pl
+#----------------------------- libmcrypt start -------------------------#
+if [ -f '/usr/local/lib/libmcrypt.so' ];then
+	return;
+fi
+cd ${run_path}
+if [ ! -f "libmcrypt-2.5.8.tar.gz" ];then
+	wget -O libmcrypt-2.5.8.tar.gz ${download_Url}/src/libmcrypt-2.5.8.tar.gz -T 5
+fi
+tar zxf libmcrypt-2.5.8.tar.gz
+cd libmcrypt-2.5.8
+
+./configure
+make && make install
+/sbin/ldconfig
+cd libltdl/
+./configure --enable-ltdl-install
+make && make install
+ln -sf /usr/local/lib/libmcrypt.la /usr/lib/libmcrypt.la
+ln -sf /usr/local/lib/libmcrypt.so /usr/lib/libmcrypt.so
+ln -sf /usr/local/lib/libmcrypt.so.4 /usr/lib/libmcrypt.so.4
+ln -sf /usr/local/lib/libmcrypt.so.4.4.8 /usr/lib/libmcrypt.so.4.4.8
+ldconfig
+cd ${run_path}
+rm -rf libmcrypt-2.5.8
+rm -f libmcrypt-2.5.8.tar.gz
+echo -e "Install_Libmcrypt" >> /www/server/lib.pl
+#----------------------------- libmcrypt start -------------------------#
 }
 
 Install_Mcrypt()
