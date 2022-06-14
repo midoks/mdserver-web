@@ -108,8 +108,12 @@ fi
 
 
 cd /www/server/mdserver-web/scripts && bash lib.sh
-
 chmod 755 /www/server/mdserver-web/data
+
+if [ ! -f /www/server/mdserver-web/bin/activate ];then
+    cd /www/server/mdserver-web && python3 -m venv .
+fi
+
 
 if [ -f /www/server/mdserver-web/bin/activate ];then
     cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate && pip3 install -r /www/server/mdserver-web/requirements.txt
