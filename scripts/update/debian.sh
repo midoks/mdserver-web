@@ -25,6 +25,8 @@ if [ ! -f /usr/local/bin/pip3 ];then
 fi
 
 if [ -f /www/server/mdserver-web/bin/activate ];then
+    pip install --upgrade pip
+    pip install --upgrade setuptools
     cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate && pip3 install -r /www/server/mdserver-web/requirements.txt
 else
 
@@ -32,7 +34,7 @@ else
 fi
 
 
-pip install --upgrade pip
+
 pip3 install gunicorn==20.1.0
 pip3 install gevent==21.1.2
 pip3 install gevent-websocket==0.10.1
