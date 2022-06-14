@@ -21,9 +21,6 @@ chmod 755 /www/server/mdserver-web/data
 cd /www/server/mdserver-web && python3 -m venv .
 
 
-pip3 install gevent flask gunicorn flask_caching flask_session
-pip3 install flask_socketio gevent-websocket psutil
-
 if [ ! -f /usr/local/bin/pip3 ];then
     python3 -m pip install --upgrade pip setuptools wheel -i https://mirrors.aliyun.com/pypi/simple
 fi
