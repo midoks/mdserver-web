@@ -82,6 +82,8 @@ chmod 755 /www/server/mdserver-web/data
 
 
 if [ -f /www/server/mdserver-web/bin/activate ];then
+	pip install --upgrade pip
+    pip install --upgrade setuptools
     cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate && pip3 install -r /www/server/mdserver-web/requirements.txt
 else
     cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
@@ -91,7 +93,7 @@ if [ ! -f /usr/local/bin/pip3 ];then
     python3 -m pip install --upgrade pip setuptools wheel -i https://mirrors.aliyun.com/pypi/simple
 fi
 
-pip install --upgrade pip
+
 pip3 install gunicorn==20.1.0
 pip3 install gevent==21.1.2
 pip3 install gevent-websocket==0.10.1
