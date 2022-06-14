@@ -40,7 +40,7 @@ if [ ! -f /www/server/mdserver-web/bin/activate ];then
 fi
 
 if [ -f /www/server/mdserver-web/bin/activate ];then
-    python -m pip install --upgrade pip
+    pip install --upgrade pip
     cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate && pip3 install -r /www/server/mdserver-web/requirements.txt
 else
     cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
