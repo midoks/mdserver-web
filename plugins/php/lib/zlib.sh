@@ -16,16 +16,16 @@ SOURCE_ROOT=$rootPath/source/lib
 if [ ! -d ${SERVER_ROOT}/libiconv ];then
 
     cd $SOURCE_ROOT
-    if [ ! -f ${SOURCE_ROOT}/libzip-1.3.2.tar.gz ];then
-        wget -O libzip-1.3.2.tar.gz --no-check-certificate https://nih.at/libzip/libzip-1.3.2.tar.gz -T 20
+    if [ ! -f ${SOURCE_ROOT}/zlib-1.2.11.tar.gz ];then
+        wget -O zlib-1.2.11.tar.gz --no-check-certificate https://github.com/madler/zlib/archive/v1.2.11.tar.gz -T 20
     fi
 
-    tar -zxvf libzip-1.3.2.tar.gz
-    cd libzip-1.3.2
+    tar -zxvf zlib-1.2.11.tar.gz
+    cd zlib-1.2.11
 
-    ./configure --prefix=${SERVER_ROOT}/libzip && make && make install
+    ./configure --prefix=${SERVER_ROOT}/zlib && make && make install
 
     #cd $SOURCE_ROOT
-    #rm -rf libzip-1.3.2
-    #rm -rf libzip-1.3.2.tar.gz
+    #rm -rf zlib-1.2.11
+    #rm -rf zlib-1.2.11.tar.gz
 fi

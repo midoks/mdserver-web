@@ -20,6 +20,6 @@ if [ ! -d ${SERVER_ROOT}/freetype ];then
     cd freetype-2.12.1
     ./configure --prefix=${SERVER_ROOT}/freetype_old && make && make install
     cd $SOURCE_ROOT
-    rm -rf freetype-2.12.1.tar.gz
-    rm -rf freetype-2.12.1
+    #rm -rf freetype-2.12.1.tar.gz
+    #rm -rf freetype-2.12.1
 fi

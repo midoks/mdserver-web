@@ -22,6 +22,7 @@ mkdir -p $serverPath/php
 
 cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash freetype_old.sh
 cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash libiconv.sh
+cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash zlib.sh
 
 if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 	if [ ! -f $sourcePath/php/php-${version}.tar.xz ];then

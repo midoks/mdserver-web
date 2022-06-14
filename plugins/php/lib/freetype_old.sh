@@ -19,7 +19,7 @@ if [ ! -d ${SERVER_ROOT}/freetype_old ];then
     tar zxvf freetype-2.7.1.tar.gz
     cd freetype-2.7.1
     ./configure --prefix=${SERVER_ROOT}/freetype_old && make && make install
-    cd $SOURCE_ROOT
-    rm -rf freetype-2.7.1.tar.gz
-    rm -rf freetype-2.7.1
+    #cd $SOURCE_ROOT
+    #rm -rf freetype-2.7.1.tar.gz
+    #rm -rf freetype-2.7.1
 fi
