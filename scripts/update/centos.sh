@@ -72,10 +72,6 @@ do
     fi
 done
 
-cd /www/server/mdserver-web && ./cli.sh start
-sleep 5
-cd /www/server/mdserver-web && ./cli.sh stop
-
 
 echo -e "start mw"
 cd /www/server/mdserver-web && sh cli.sh start
