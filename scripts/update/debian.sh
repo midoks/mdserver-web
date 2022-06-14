@@ -14,7 +14,6 @@ rm -rf /tmp/mdserver-web-master
 
 
 cd /www/server/mdserver-web/scripts && bash lib.sh
-
 chmod 755 /www/server/mdserver-web/data
 
 #venv
