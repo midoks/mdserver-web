@@ -100,6 +100,7 @@ pip3 install flask-caching>=1.10.1
 pip3 install python-socketio==5.2.0
 pip3 install psutil==5.9.1 
 pip3 install pymongo
+pip3 install psutil
 
 
 cd /www/server/mdserver-web && ./cli.sh start
