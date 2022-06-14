@@ -13,7 +13,7 @@ rootPath=$(dirname "$rootPath")
 SERVER_ROOT=$rootPath/lib
 SOURCE_ROOT=$rootPath/source/lib
 
-if [ ! -d ${SERVER_ROOT}/libiconv ];then
+if [ ! -d ${SERVER_ROOT}/libzip ];then
 
     cd $SOURCE_ROOT
     if [ ! -f ${SOURCE_ROOT}/libzip-1.3.2.tar.gz ];then
