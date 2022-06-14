@@ -276,18 +276,6 @@ else
 fi
 
 
-Install_Libiconv
-
-# Install_Libmemcached
-# Install_Curl
-# Install_Zlib
-
-Install_Freetype
-Install_Freetype_New
-
-# Install_OpenSSL
-Install_Libzip
-
 if [ "$OSNAME" == "macos" ]; then
     brew install libmemcached
     brew install curl
@@ -360,3 +348,17 @@ else
 
     fi
 fi
+
+
+Install_Libiconv
+
+# Install_Libmemcached
+# Install_Curl
+# Install_Zlib
+
+Install_Freetype
+Install_Freetype_New
+
+# Install_OpenSSL
+Install_Libzip
+
