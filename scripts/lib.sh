@@ -276,6 +276,7 @@ else
 fi
 
 
+# system judge
 if [ "$OSNAME" == "macos" ]; then
     brew install libmemcached
     brew install curl
@@ -349,6 +350,7 @@ else
     fi
 fi
 
+##### common start #####
 
 Install_Libiconv
 
@@ -361,4 +363,6 @@ Install_Freetype_New
 
 # Install_OpenSSL
 Install_Libzip
+
+##### common end #####
 
