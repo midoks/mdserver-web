@@ -75,7 +75,7 @@ if [ ! -d ${libPath}/libiconv ];then
     make && make install
     cd ${sourcePath}
     rm -rf libiconv-1.15
-	rm -f libiconv-1.15.tar.gz
+	rm -rf libiconv-1.15.tar.gz
 fi
 echo -e "Install_Libiconv" >> ${libPath}/lib.pl
 #----------------------------- libiconv end -------------------------#
@@ -93,7 +93,7 @@ if [ ! -d ${libPath}/freetype_old ];then
     make && make install
     cd ${sourcePath}
     rm -rf freetype-2.7.1.tar.gz
-    rm -f freetype-2.7.1.tar.gz
+    rm -rf freetype-2.7.1
 fi
 echo -e "Install_Freetype_Old" >> ${libPath}/lib.pl
 #----------------------------- freetype end -------------------------#
@@ -352,17 +352,17 @@ fi
 
 ##### common start #####
 
-Install_Libiconv
+# Install_Libiconv
 
 # Install_Libmemcached
 # Install_Curl
 # Install_Zlib
 
-Install_Freetype
-Install_Freetype_New
+# Install_Freetype
+# Install_Freetype_New
 
 # Install_OpenSSL
-Install_Libzip
+# Install_Libzip
 
 ##### common end #####
 

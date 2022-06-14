@@ -20,6 +20,9 @@ echo "安装php-5.3.29 ..." > $install_tmp
 mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
+cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash freetype_old.sh
+cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash libiconv.sh
+
 if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 	if [ ! -f $sourcePath/php/php-${version}.tar.xz ];then
 		wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz https://museum.php.net/php5/php-${version}.tar.xz
