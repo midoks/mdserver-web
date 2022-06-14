@@ -65,17 +65,15 @@ if [ ! -d /www/server/mdserver-web ];then
 	rm -rf /tmp/mdserver-web-master
 fi 
 
-
-cd /www/server/mdserver-web && python3 -m venv .
 if [ ! -f /usr/local/bin/pip3 ];then
     python3 -m pip install --upgrade pip setuptools wheel -i https://mirrors.aliyun.com/pypi/simple
 fi
 
-
 cd /www/server/mdserver-web/scripts && bash lib.sh
-
 chmod 755 /www/server/mdserver-web/data
 
+
+cd /www/server/mdserver-web && python3 -m venv .
 
 if [ -f /www/server/mdserver-web/bin/activate ];then
 	pip install --upgrade pip
@@ -87,6 +85,7 @@ fi
 
 pip3 install gunicorn==20.1.0
 pip3 install gevent==21.1.2
+pip3 install gevent-websocket==0.10.1
 pip3 install gevent-websocket==0.10.1
 pip3 install requests==2.20.0
 pip3 install flask-caching>=1.10.1

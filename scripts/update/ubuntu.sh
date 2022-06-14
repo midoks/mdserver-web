@@ -17,13 +17,15 @@ cd /www/server/mdserver-web/scripts && bash lib.sh
 
 chmod 755 /www/server/mdserver-web/data
 
-#venv
-cd /www/server/mdserver-web && python3 -m venv .
+
 
 
 if [ ! -f /usr/local/bin/pip3 ];then
     python3 -m pip install --upgrade pip setuptools wheel -i https://mirrors.aliyun.com/pypi/simple
 fi
+
+#venv
+cd /www/server/mdserver-web && python3 -m venv .
 
 if [ -f /www/server/mdserver-web/bin/activate ];then
     pip install --upgrade pip
