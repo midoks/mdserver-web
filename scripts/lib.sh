@@ -326,9 +326,6 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     apt install -y libsqlite3-dev
     apt install -y libonig-dev
 
-    apt install -y lsof
-    cd /usr/include && ln -s x86_64-linux-gnu/curl
-    
     apt install -y perl g++ libtool unzip    
     apt install -y libxslt1-dev
 
