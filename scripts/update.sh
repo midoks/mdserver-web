@@ -36,7 +36,7 @@ fi
 
 #pip uninstall public
 echo "use system version: ${OSNAME}"
-curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/update/${OSNAME}.sh | sh
+curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/update/${OSNAME}.sh | bash
 
 endTime=`date +%s`
 ((outTime=($endTime-$startTime)/60))
