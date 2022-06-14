@@ -20,24 +20,24 @@ if [ ! -f /usr/local/bin/pip3 ];then
     python3 -m pip install --upgrade pip setuptools wheel -i https://mirrors.aliyun.com/pypi/simple
 fi
 
-cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
+# cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
 
-pip install --upgrade pip
-pip install --upgrade setuptools
-pip3 install gunicorn==20.1.0
-pip3 install gevent==21.1.2
-pip3 install gevent-websocket==0.10.1
-pip3 install requests==2.20.0
-pip3 install flask-caching==1.10.1
-pip3 install flask-socketio==5.2.0
-pip3 install flask-session==0.3.2
-pip3 install pymongo
-pip3 install psutil
+# pip install --upgrade pip
+# pip install --upgrade setuptools
+# pip3 install gunicorn==20.1.0
+# pip3 install gevent==21.1.2
+# pip3 install gevent-websocket==0.10.1
+# pip3 install requests==2.20.0
+# pip3 install flask-caching==1.10.1
+# pip3 install flask-socketio==5.2.0
+# pip3 install flask-session==0.3.2
+# pip3 install pymongo
+# pip3 install psutil
 
 #venv
-if [ ! -f /www/server/mdserver-web/bin/activate ];then
-    cd /www/server/mdserver-web && python3 -m venv .
-fi
+# if [ ! -f /www/server/mdserver-web/bin/activate ];then
+#     cd /www/server/mdserver-web && python3 -m venv .
+# fi
 
 if [ -f /www/server/mdserver-web/bin/activate ];then
     pip install --upgrade pip
