@@ -20,6 +20,6 @@ if [ ! -d ${SERVER_ROOT}/libiconv ];then
     cd libiconv-1.15
     ./configure --prefix=${SERVER_ROOT}/libiconv --enable-static
     cd $SOURCE_ROOT
-    rm -rf libiconv-1.15
-    rm -rf libiconv-1.15.tar.gz
+    #rm -rf libiconv-1.15
+    #rm -rf libiconv-1.15.tar.gz
 fi
