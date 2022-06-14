@@ -4,7 +4,6 @@ export PATH
 LANG=en_US.UTF-8
 
 
-
 wget -O /tmp/master.zip https://codeload.github.com/midoks/mdserver-web/zip/master
 rm -rf /tmp/mdserver-web-master
 cd /tmp && unzip  /tmp/master.zip
@@ -14,16 +13,12 @@ rm -rf /tmp/mdserver-web-master
 
 
 cd /www/server/mdserver-web/scripts && bash lib.sh
-
 chmod 755 /www/server/mdserver-web/data
-
-
 
 
 if [ ! -f /usr/local/bin/pip3 ];then
     python3 -m pip install --upgrade pip setuptools wheel -i https://mirrors.aliyun.com/pypi/simple
 fi
-
 
 cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
 
