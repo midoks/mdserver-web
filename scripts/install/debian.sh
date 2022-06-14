@@ -1,6 +1,6 @@
 #!/bin/bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
-export PATH
+export $PATH
 LANG=en_US.UTF-8
 
 
@@ -75,9 +75,6 @@ if [ ! -d /www/server/mdserver-web ];then
 fi 
 
 cd /www/server/mdserver-web && python3 -m venv .
-if [ ! -f /usr/local/bin/pip3 ];then
-    python3 -m pip install --upgrade pip setuptools wheel -i https://mirrors.aliyun.com/pypi/simple
-fi
 
 
 cd /www/server/mdserver-web/scripts && bash lib.sh
@@ -88,6 +85,10 @@ if [ -f /www/server/mdserver-web/bin/activate ];then
     cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate && pip3 install -r /www/server/mdserver-web/requirements.txt
 else
     cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
+fi
+
+if [ ! -f /usr/local/bin/pip3 ];then
+    python3 -m pip install --upgrade pip setuptools wheel -i https://mirrors.aliyun.com/pypi/simple
 fi
 
 pip install --upgrade pip
