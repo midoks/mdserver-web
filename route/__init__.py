@@ -391,21 +391,3 @@ def connected_msg(msg):
     except Exception as e:
         pass
         # print 'connected_msg:' + str(e)
-
-
-# @socketio.on('panel')
-# def websocket_test(data):
-#     pdata = get_input_data(data)
-#     if not isLogined():
-#         emit(pdata.s_response, {
-#              'data': mw.returnData(-1, '会话丢失，请重新登陆面板!\r\n')})
-#         return None
-#     mods = ['site', 'ftp', 'database', 'ajax', 'system', 'crontab', 'files',
-#             'config', 'panel_data', 'plugin', 'ssl', 'auth', 'firewall', 'panel_wxapp']
-#     if not pdata['s_module'] in mods:
-#         result = '指定模块不存在!'
-#     else:
-#         result = eval("%s(pdata)" % pdata['s_module'])
-#     if not hasattr(pdata, 's_response'):
-#         pdata.s_response = 'response'
-#     emit(pdata.s_response, {'data': result})
