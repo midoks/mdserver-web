@@ -13,13 +13,18 @@ startTime=`date +%s`
 _os=`uname`
 echo "use system: ${_os}"
 
+if [ "$EUID" -ne 0 ]
+  then echo "Please run as root!"
+  exit
+fi
+
 if grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
-	sudo ln -sf /bin/bash /bin/sh
+	ln -sf /bin/bash /bin/sh
 	#sudo dpkg-reconfigure dash
 fi
 
 if grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
-	sudo ln -sf /bin/bash /bin/sh
+	ln -sf /bin/bash /bin/sh
 fi
 
 
