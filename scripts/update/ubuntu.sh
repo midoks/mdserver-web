@@ -28,7 +28,9 @@ fi
 cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
 
 #venv
-cd /www/server/mdserver-web && python3 -m venv .
+if [ ! -f /www/server/mdserver-web/bin/activate ];then
+    cd /www/server/mdserver-web && python3 -m venv .
+fi
 
 if [ -f /www/server/mdserver-web/bin/activate ];then
     pip install --upgrade pip
