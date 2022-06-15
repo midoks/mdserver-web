@@ -1182,7 +1182,7 @@ function unZip(fileName,type) {
 		coding = $("select[name='coding']").val();
 		layer.closeAll();
 		layer.msg(lan.files.unzip_the, {icon: 16,time: 0,shade: [0.3, '#000']});
-		$.post('/files/unzip', 'sfile=' + sfile + '&dfile=' + dfile +'&type=' + type + '&coding=' + coding + '&password=' + password, function(rdata) {
+		$.post('/files/unzip', 'sfile=' + sfile + '&dfile=' + dfile +'&type=' + type + '&path='+encodeURIComponent(path), function(rdata) {
 			layer.closeAll();
 			layer.msg(rdata.msg, {icon: rdata.status ? 1 : 2});
 			getFiles(path);
