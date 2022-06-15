@@ -62,7 +62,6 @@ if [ ! -f /usr/sbin/ufw ];then
 	firewall-cmd --reload
 fi
 
-systemctl restart firewalld
 #安装时不开启
 systemctl stop firewalld
 

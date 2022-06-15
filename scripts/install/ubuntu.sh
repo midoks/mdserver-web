@@ -53,10 +53,14 @@ if [ ! -f /usr/sbin/ufw ];then
 	firewall-cmd --permanent --zone=public --add-port=7200/tcp
 	firewall-cmd --permanent --zone=public --add-port=3306/tcp
 	firewall-cmd --permanent --zone=public --add-port=30000-40000/tcp
+
+	# fix:debian10 firewalld faq
+	# https://kawsing.gitbook.io/opensystem/andoid-shou-ji/untitled/fang-huo-qiang#debian-10-firewalld-0.6.3-error-commandfailed-usrsbinip6tablesrestorewn-failed-ip6tablesrestore-v1.8
+	sed -i 's#IndividualCalls=no#IndividualCalls=yes#g' /etc/firewalld/firewalld.conf
+
 	firewall-cmd --reload
 fi
 
-systemctl restart firewalld
 #安装时不开启
 systemctl stop firewalld
 
