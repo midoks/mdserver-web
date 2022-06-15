@@ -63,12 +63,13 @@ if [ ! -f /etc/init.d/iptables ];then
 	firewall-cmd --permanent --zone=public --add-port=7200/tcp
 	firewall-cmd --permanent --zone=public --add-port=3306/tcp
 	firewall-cmd --permanent --zone=public --add-port=30000-40000/tcp
+
+
+	sed -i 's#AllowZoneDrifting=yes#AllowZoneDrifting=no#g' /etc/firewalld/firewalld.conf
 	firewall-cmd --reload
 fi
 
-sed -i 's#AllowZoneDrifting=yes#AllowZoneDrifting=no#g' /etc/firewalld/firewalld.conf
 
-systemctl restart firewalld
 #安装时不开启
 systemctl stop firewalld
 
