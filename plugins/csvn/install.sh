@@ -29,7 +29,6 @@ else
 	OSNAME='unknow'
 fi
 
-CSVN_SOURCE='https://github.com/midoks/mdserver-web/releases/download/init/CollabNetSubversionEdge-5.1.4_linux-x86_64.tar.xz'
 
 CheckJAVA()
 {
@@ -46,6 +45,12 @@ CheckJAVA()
 	fi
 }
 
+export JAVA_HOME=/usr/lib/jvm/default-java
+#JAVA_BIN=/usr/lib/jvm/default-java/bin
+#JRE_HOME=/usr/lib/jvm/default-java/jre
+#PATH=$PATH:/usr/lib/jvm/default-java/bin:/usr/lib/jvm/default-java/jre/bin
+#CLASSPATH=/usr/lib/jvm/default-java/jre/lib:/usr/lib/jvm/default-java/lib:/usr/lib/jvm/default-java/jre/lib/charsets.jar
+
 
 Install_csvn()
 {
@@ -54,6 +59,8 @@ Install_csvn()
 
 	echo '正在安装脚本文件...' > $install_tmp
 
+	CSVN_SOURCE='https://github.com/midoks/mdserver-web/releases/download/init/CollabNetSubversionEdge-5.1.4_linux-x86_64.tar.xz'
+	
 	if [ ! -f $serverPath/source/csvn.tar.xz ];then
 		wget -O $serverPath/source/csvn.tar.xz ${CSVN_SOURCE}
 	fi
