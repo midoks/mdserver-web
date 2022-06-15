@@ -2265,7 +2265,7 @@ function tryRestartPHP(siteName){
 		var loadT = layer.msg('尝试自动重启PHP['+data.phpversion+']...', { icon: 16, time: 0, shade: 0.3 });
 		$.post('/plugins/run', reqData, function(data) {
 			layer.close(loadT);
-	        if(!data.status){
+	        if(data.status){
 	            layer.msg(data.msg,{icon:0,time:3000,shade: [0.3, '#000']});
 	            return;
 	        }
