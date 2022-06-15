@@ -66,7 +66,7 @@ Install_csvn()
 	if id -u csvn > /dev/null 2>&1; then
         echo "csvn user exists"
 	else
-		groups csvn
+		groupadd csvn
 		useradd -g csvn csvn
 		cp /etc/sudoers{,.`date +"%Y-%m-%d_%H-%M-%S"`}
 		echo "csvn ALL=(ALL)    NOPASSWD: ALL" >> /etc/sudoers
