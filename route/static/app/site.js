@@ -2252,16 +2252,18 @@ function setSizeClassType(){
 
 // 尝试重启PHP
 function tryRestartPHP(siteName){
-	$.post('/site/get_site_php_version','siteName='+siteName,function(version){
-		if(version.status === false){
-			layer.msg(version.msg,{icon:5});
-			return;
-		}
+	$.post('/site/get_site_php_version','siteName='+siteName,function(data){
 
-		console.log(version);
-		var data = {name:'php', func:'restart'}
-		var loadT = layer.msg('尝试自动重启PHP['+version+']获取...', { icon: 16, time: 0, shade: 0.3 });
-		$.post('/plugins/run', data, function(data) {
+		if (data.phpversion == "00"){
+			return
+		}
+		
+		var reqData = {name:'php', func:'restart'}
+		reqData['version'] = data.phpversion;
+
+		console.log(reqData);
+		var loadT = layer.msg('尝试自动重启PHP['+data.phpversion+']...', { icon: 16, time: 0, shade: 0.3 });
+		$.post('/plugins/run', reqData, function(data) {
 			layer.close(loadT);
 	        if(!data.status){
 	            layer.msg(data.msg,{icon:0,time:3000,shade: [0.3, '#000']});
