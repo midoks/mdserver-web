@@ -93,6 +93,8 @@ def csvnOp(method):
 
 
 def start():
+    if not os.path.exists("/etc/init.d/csvn"):
+        return "先在自启动安装。"
     return csvnOp('start')
 
 
