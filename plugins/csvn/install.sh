@@ -10,6 +10,25 @@ serverPath=$(dirname "$rootPath")
 install_tmp=${rootPath}/tmp/mw_install.pl
 
 
+sysName=`uname`
+echo "use system: ${sysName}"
+
+if [ ${sysName} == "Darwin" ]; then
+	OSNAME='macos'
+elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
+	OSNAME='centos'
+elif grep -Eqi "Fedora" /etc/issue || grep -Eq "Fedora" /etc/*-release; then
+	OSNAME='fedora'
+elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
+	OSNAME='debian'
+elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
+	OSNAME='ubuntu'
+elif grep -Eqi "Raspbian" /etc/issue || grep -Eq "Raspbian" /etc/*-release; then
+	OSNAME='raspbian'
+else
+	OSNAME='unknow'
+fi
+
 CSVN_SOURCE='https://github.com/midoks/mdserver-web/releases/download/init/CollabNetSubversionEdge-5.1.4_linux-x86_64.tar.xz'
 
 CheckJAVA()
@@ -18,6 +37,9 @@ CheckJAVA()
 	if [ $? -eq 0 ]
 	then
     	echo 'java is exist'
+    elif [ "ubuntu" == "$OSNAME" ] || [ "debian" == "$OSNAME" ] ;then
+    	echo 'java install...'
+    	apt install -y default-jdk
 	else
     	echo 'java install...'
     	yum install -y java
