@@ -2,6 +2,9 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
+# https://blog.csdn.net/akipa11/article/details/103455298
+# https://blog.csdn.net/bbj12345678/article/details/122941395
+
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
@@ -60,7 +63,7 @@ Install_csvn()
 	echo '正在安装脚本文件...' > $install_tmp
 
 	CSVN_SOURCE='https://github.com/midoks/mdserver-web/releases/download/init/CollabNetSubversionEdge-5.1.4_linux-x86_64.tar.xz'
-	
+
 	if [ ! -f $serverPath/source/csvn.tar.xz ];then
 		wget -O $serverPath/source/csvn.tar.xz ${CSVN_SOURCE}
 	fi
