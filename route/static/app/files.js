@@ -1178,7 +1178,6 @@ function unZip(fileName,type) {
 	if(type.length ==3){
 		var sfile = encodeURIComponent($("#sfile").val());
 		var dfile = encodeURIComponent($("#dfile").val());
-		var password = encodeURIComponent($("#unpass").val());
 		coding = $("select[name='coding']").val();
 		layer.closeAll();
 		layer.msg(lan.files.unzip_the, {icon: 16,time: 0,shade: [0.3, '#000']});
@@ -1186,7 +1185,7 @@ function unZip(fileName,type) {
 			layer.closeAll();
 			layer.msg(rdata.msg, {icon: rdata.status ? 1 : 2});
 			getFiles(path);
-		});
+		},'json');
 		return
 	}
 	
