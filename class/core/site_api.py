@@ -346,7 +346,8 @@ class site_api:
             mw.execShell("which chattr && chattr -i " + filename)
             os.remove(filename)
             return mw.returnJson(True, '已清除防跨站设置!')
-        mw.writeFile(filename, 'open_basedir=' + path + '/:/tmp/:/proc/')
+        mw.writeFile(filename, 'open_basedir=' + path +
+                     '/:/www/server/php:/tmp/:/proc/')
         mw.execShell("which chattr && chattr +i " + filename)
         return mw.returnJson(True, '已打开防跨站设置!')
 
