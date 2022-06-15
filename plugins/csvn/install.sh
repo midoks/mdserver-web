@@ -42,13 +42,15 @@ CheckJAVA()
     elif [ "ubuntu" == "$OSNAME" ] || [ "debian" == "$OSNAME" ] ;then
     	echo 'java install...'
     	apt install -y default-jdk
+
+    	export JAVA_HOME=/usr/lib/jvm/default-java
 	else
     	echo 'java install...'
     	yum install -y java
 	fi
 }
 
-export JAVA_HOME=/usr/lib/jvm/default-java
+# export JAVA_HOME=/usr/lib/jvm/default-java
 #JAVA_BIN=/usr/lib/jvm/default-java/bin
 #JRE_HOME=/usr/lib/jvm/default-java/jre
 #PATH=$PATH:/usr/lib/jvm/default-java/bin:/usr/lib/jvm/default-java/jre/bin
