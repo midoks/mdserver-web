@@ -362,7 +362,7 @@ done
 
         # 检查是否为.user.ini
         if path.find('.user.ini'):
-            os.system("chattr -i '" + path + "'")
+            os.system("which chattr && chattr -i '" + path + "'")
         try:
             if os.path.exists('data/recycle_bin.pl'):
                 if self.mvRecycleBin(path):
@@ -746,9 +746,9 @@ done
             return mw.returnJson(False, '文件压缩失败!')
 
     def unzip(self, sfile, dfile, stype, path):
-        if sfile.find(',') == -1:
-            if not os.path.exists(path + '/' + sfile):
-                return mw.returnMsg(False, '指定文件不存在!')
+
+        if not os.path.exists(sfile):
+            return mw.returnMsg(False, '指定文件不存在!')
 
         try:
             tmps = mw.getRunDir() + '/tmp/panelExec.log'
@@ -761,8 +761,8 @@ done
                     if not sfile:
                         continue
                     sfiles += " '" + sfile + "'"
-                os.system("cd " + path + " && tar -zxvf '" + sfiles +
-                          "' -C " + dfile + " " + " > " + tmps + " 2>&1")
+                os.system("cd " + path + " && tar -zxvf " + sfiles +
+                          " -C " + dfile + " > " + tmps + " 2>&1")
             self.setFileAccept(dfile)
             mw.writeLog("文件管理", '文件解压成功!', (sfile, dfile))
             return mw.returnJson(True, '文件解压成功!')
@@ -776,7 +776,7 @@ done
 
         # 检查是否为.user.ini
         if path.find('.user.ini') >= 0:
-            os.system("chattr -i '" + path + "'")
+            os.system("which chattr && chattr -i '" + path + "'")
 
         try:
             if os.path.exists('data/recycle_bin.pl'):
