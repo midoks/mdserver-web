@@ -62,6 +62,13 @@ class files_api:
         path = request.form.get('path', '')
         return self.zip(sfile, dfile, stype, path)
 
+    def unzipApi(self):
+        sfile = request.form.get('sfile', '')
+        dfile = request.form.get('dfile', '')
+        stype = request.form.get('type', '')
+        path = request.form.get('path', '')
+        return self.unzip(sfile, dfile, stype, path)
+
     # 移动文件或目录
     def mvFileApi(self):
         sfile = request.form.get('sfile', '')
@@ -737,6 +744,30 @@ done
             return mw.returnJson(True, '文件压缩成功!')
         except:
             return mw.returnJson(False, '文件压缩失败!')
+
+    def unzip(self, sfile, dfile, stype, path):
+        if sfile.find(',') == -1:
+            if not os.path.exists(path + '/' + sfile):
+                return mw.returnMsg(False, '指定文件不存在!')
+
+        try:
+            tmps = mw.getRunDir() + '/tmp/panelExec.log'
+            if stype == 'zip':
+                os.system("cd '" + path + "' && unzip -d '" + dfile +
+                          "' '" + sfile + "' > " + tmps + " 2>&1")
+            else:
+                sfiles = ''
+                for sfile in sfile.split(','):
+                    if not sfile:
+                        continue
+                    sfiles += " '" + sfile + "'"
+                os.system("cd '" + path + "' && tar -zxvf '" + sfiles +
+                          "' -C " + dfile + "' " + " > " + tmps + " 2>&1")
+            self.setFileAccept(dfile)
+            mw.writeLog("文件管理", '文件解压成功!', (sfile, dfile))
+            return mw.returnJson(True, '文件解压成功!')
+        except:
+            return mw.returnJson(False, '文件解压失败!')
 
     def delete(self, path):
 
