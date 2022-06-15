@@ -2257,7 +2257,17 @@ function tryRestartPHP(siteName){
 			layer.msg(version.msg,{icon:5});
 			return;
 		}
-		pluginService("php",version.name);
+
+		console.log(version);
+		var data = {name:'php', func:'restart'}
+		var loadT = layer.msg('尝试自动重启PHP['+version+']获取...', { icon: 16, time: 0, shade: 0.3 });
+		$.post('/plugins/run', data, function(data) {
+			layer.close(loadT);
+	        if(!data.status){
+	            layer.msg(data.msg,{icon:0,time:3000,shade: [0.3, '#000']});
+	            return;
+	        }
+	    },'json');
 	},'json');
 }
 
