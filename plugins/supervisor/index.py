@@ -405,7 +405,7 @@ def updateJob():
     w_body += "stdout_logfile_maxbytes=2MB" + "\n"
     w_body += "stderr_logfile_maxbytes=2MB" + "\n"
     w_body += "user=" + user + "\n"
-    w_body += "priority=999" + "\n"
+    w_body += "priority=" + priority + "\n"
     w_body += "numprocs={0}".format(numprocs) + "\n"
     w_body += "process_name=%(program_name)s_%(process_num)02d"
 
