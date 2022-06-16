@@ -364,6 +364,21 @@ function supConfigTpl(_name, version, func, config_tpl_func, read_config_tpl_fun
     		$('#config_tpl').append('<option value="'+rdata[i]+'"">'+getFileName(rdata[i])+'</option>');
     	}
 
+
+    	$("#textBody").empty().text('');
+		$(".CodeMirror").remove();
+        var editor = CodeMirror.fromTextArea(document.getElementById("textBody"), {
+            extraKeys: {
+                "Ctrl-Space": "autocomplete",
+                "Ctrl-F": "findPersistent",
+                "Ctrl-H": "replaceAll",
+                "Ctrl-S": function() {}
+            },
+            lineNumbers: true,
+            matchBrackets:true,
+        });
+        editor.focus();
+
     	$('#config_tpl').change(function(){
     		var selected = $(this).val();
     		if (selected != '0'){
@@ -407,41 +422,6 @@ function supConfigTpl(_name, version, func, config_tpl_func, read_config_tpl_fun
 
     },'json');
 
-    var loadT = layer.msg('配置文件路径获取中...',{icon:16,time:0,shade: [0.3, '#000']});
-    $.post('/plugins/run', {name:_name, func:func_name,version:version}, function (data) {
-        layer.close(loadT);
-
-        var loadT2 = layer.msg('文件内容获取中...',{icon:16,time:0,shade: [0.3, '#000']});
-        fileName = data.data;
-        $.post('/files/get_body', 'path=' + fileName, function(rdata) {
-            layer.close(loadT2);
-            if (!rdata.status){
-                layer.msg(rdata.msg,{icon:0,time:2000,shade: [0.3, '#000']});
-                return;
-            }
-            $("#textBody").empty().text(rdata.data.data);
-            $(".CodeMirror").remove();
-            var editor = CodeMirror.fromTextArea(document.getElementById("textBody"), {
-                extraKeys: {
-                    "Ctrl-Space": "autocomplete",
-                    "Ctrl-F": "findPersistent",
-                    "Ctrl-H": "replaceAll",
-                    "Ctrl-S": function() {
-                    	$("#textBody").text(editor.getValue());
-                        supConfigSave(fileName);
-                    }
-                },
-                lineNumbers: true,
-                matchBrackets:true,
-            });
-            editor.focus();
-            $(".CodeMirror-scroll").css({"height":"300px","margin":0,"padding":0});
-            $("#onlineEditFileBtn").click(function(){
-                $("#textBody").text(editor.getValue());
-                supConfigSave(fileName);
-            });
-        },'json');
-    },'json');
 }
 
 
