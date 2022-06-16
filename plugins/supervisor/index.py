@@ -121,8 +121,6 @@ def start():
         return 'ok'
     return 'fail'
 
-#| awk '{print $2}'|xargs kill
-
 
 def stop():
     initDreplace()
@@ -153,36 +151,6 @@ def reload():
     if data[1] == '':
         return 'ok'
     return 'fail'
-
-
-def runInfo():
-    cmd = getServerDir() + "/bin/redis-cli info"
-    data = mw.execShell(cmd)[0]
-    res = [
-        'tcp_port',
-        'uptime_in_days',  # 已运行天数
-        'connected_clients',  # 连接的客户端数量
-        'used_memory',  # Redis已分配的内存总量
-        'used_memory_rss',  # Redis占用的系统内存总量
-        'used_memory_peak',  # Redis所用内存的高峰值
-        'mem_fragmentation_ratio',  # 内存碎片比率
-        'total_connections_received',  # 运行以来连接过的客户端的总数量
-        'total_commands_processed',  # 运行以来执行过的命令的总数量
-        'instantaneous_ops_per_sec',  # 服务器每秒钟执行的命令数量
-        'keyspace_hits',  # 查找数据库键成功的次数
-        'keyspace_misses',  # 查找数据库键失败的次数
-        'latest_fork_usec'  # 最近一次 fork() 操作耗费的毫秒数
-    ]
-    data = data.split("\n")
-    result = {}
-    for d in data:
-        if len(d) < 3:
-            continue
-        t = d.strip().split(':')
-        if not t[0] in res:
-            continue
-        result[t[0]] = t[1]
-    return mw.getJson(result)
 
 
 def initdStatus():
@@ -336,6 +304,30 @@ def addJob():
     return mw.returnJson(True, '增加守护进程成功!')
 
 
+def startJob():
+    args = getArgs()
+    data = checkArgs(args, ['name', 'status'])
+    if not data[0]:
+        return data[1]
+
+    supCtl = 'supervisorctl -c ' + getServerDir() + "/supervisor.conf"
+
+    name = args['name']
+    status = args['status']
+
+    action = "启动"
+    cmd = supCtl + " start " + name
+    if status == 'RUNNING':
+        action = "停止"
+        cmd = supCtl + " stop " + name
+
+    data = mw.execShell(cmd)
+
+    if data[0] != '':
+        return mw.returnJson(False, action + '[' + name + ']失败!')
+    return mw.returnJson(True, action + '[' + name + ']成功!')
+
+
 def delJob():
     args = getArgs()
     data = checkArgs(args, ['name'])
@@ -380,17 +372,18 @@ def updateJob():
     name = args['name']
     programFile = getServerDir() + "/conf.d/" + name + ".ini"
 
+    mess = {}
+    infos = []
     with open(programFile, "r") as fr:
         infos = fr.readlines()
 
-    mess = {}
-    infos = []
     for line in infos:
         if "command=" in line.strip():
             mess["command"] = line.strip().split('=')[1]
-        if "path=" in line.strip():
+        if "directory=" in line.strip():
             mess["path"] = line.strip().split('=')[1]
 
+    # print(mess)
     log_file_name = getServerDir() + '/log/' + name
 
     w_body = ""
@@ -462,8 +455,6 @@ if __name__ == "__main__":
         print(initdInstall())
     elif func == 'initd_uninstall':
         print(initdUinstall())
-    elif func == 'run_info':
-        print(runInfo())
     elif func == 'conf':
         print(getConf())
     elif func == 'run_log':
@@ -474,6 +465,8 @@ if __name__ == "__main__":
         print(getSupList())
     elif func == 'add_job':
         print(addJob())
+    elif func == 'start_job':
+        print(startJob())
     elif func == 'del_job':
         print(delJob())
     elif func == 'update_job':
