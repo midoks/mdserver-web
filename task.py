@@ -478,14 +478,14 @@ def checkPHPVersion(version):
 if __name__ == "__main__":
 
     t = threading.Thread(target=systemTask)
-    if sys.version_info.major == '3' and sys.version_info.minor >= '10':
+    if sys.version_info.major == 3 and sys.version_info.minor >= 10:
         t.daemon = True
     else:
         t.setDaemon(True)
     t.start()
 
     p = threading.Thread(target=check502Task)
-    if sys.version_info.major == '3' and sys.version_info.minor >= '10':
+    if sys.version_info.major == 3 and sys.version_info.minor >= 10:
         p.daemon = True
     else:
         p.setDaemon(True)
