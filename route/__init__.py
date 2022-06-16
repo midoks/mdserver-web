@@ -182,6 +182,8 @@ def login():
     dologin = request.args.get('dologin', '')
     if dologin == 'True':
         session.clear()
+        session['login'] = False
+        session['overdue'] = 0
         return redirect('/login')
 
     if isLogined():
