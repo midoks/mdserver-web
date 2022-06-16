@@ -434,6 +434,26 @@ def getJobInfo():
     return mw.getJson(info)
 
 
+def configTpl():
+    path = getServerDir() + '/conf.d'
+    pathFile = os.listdir(path)
+    tmp = []
+    for one in pathFile:
+        file = path + '/' + one
+        tmp.append(file)
+    return mw.getJson(tmp)
+
+
+def readConfigTpl():
+    args = getArgs()
+    data = checkArgs(args, ['file'])
+    if not data[0]:
+        return data[1]
+
+    content = mw.readFile(args['file'])
+    return mw.returnJson(True, 'ok', content)
+
+
 def runLog():
     return getServerDir() + '/log/supervisor.log'
 
@@ -455,6 +475,10 @@ if __name__ == "__main__":
         print(initdInstall())
     elif func == 'initd_uninstall':
         print(initdUinstall())
+    elif func == 'config_tpl':
+        print(configTpl())
+    elif func == 'read_config_tpl':
+        print(readConfigTpl())
     elif func == 'conf':
         print(getConf())
     elif func == 'run_log':
