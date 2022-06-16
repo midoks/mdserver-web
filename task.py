@@ -18,7 +18,6 @@ import mw
 # sys.setdefaultencoding('utf-8')
 import db
 
-
 # cmd = 'ls /usr/local/lib/ | grep python  | cut -d \\  -f 1 | awk \'END {print}\''
 # info = mw.execShell(cmd)
 # p = "/usr/local/lib/" + info[0].strip() + "/site-packages"
@@ -479,11 +478,18 @@ def checkPHPVersion(version):
 if __name__ == "__main__":
 
     t = threading.Thread(target=systemTask)
-    t.setDaemon(True)
+    if sys.version_info.major == '3' and sys.version_info.minor >= '10':
+        t.daemon = True
+    else:
+        t.setDaemon(True)
     t.start()
 
     p = threading.Thread(target=check502Task)
-    p.setDaemon(True)
+    if sys.version_info.major == '3' and sys.version_info.minor >= '10':
+        p.daemon = True
+    else:
+        p.setDaemon(True)
+
     p.start()
 
     startTask()
