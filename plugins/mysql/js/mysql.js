@@ -999,7 +999,6 @@ function dbList(page, search){
         con += '<form id="toPHPMyAdmin" action="" method="post" style="display: none;" target="_blank">\
             <input type="text" name="pma_username" id="pma_username" value="">\
             <input type="password" name="pma_password" id="pma_password" value="">\
-            <input type="hidden" name="set_session" value="b51baf64e882129013382bc3ea38d2aa">\
             <input type="text" name="server" value="1">\
             <input type="text" name="target" value="index.php">\
             <input type="text" name="db" id="db" value="">\
