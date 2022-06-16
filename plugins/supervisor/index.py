@@ -391,7 +391,7 @@ def updateJob():
         if "path=" in line.strip():
             mess["path"] = line.strip().split('=')[1]
 
-    log_dir = getServerDir() + '/log/'
+    log_file_name = getServerDir() + '/log/' + name
 
     w_body = ""
     w_body += "[program:" + name + "]" + "\n"
@@ -400,8 +400,8 @@ def updateJob():
     w_body += "autorestart=true" + "\n"
     w_body += "startsecs=3" + "\n"
     w_body += "startretries=3" + "\n"
-    w_body += "stdout_logfile=" + log_dir + name + ".out.log" + "\n"
-    w_body += "stderr_logfile=" + log_dir + name + ".err.log" + "\n"
+    w_body += "stdout_logfile=" + log_file_name + ".out.log" + "\n"
+    w_body += "stderr_logfile=" + log_file_name + ".err.log" + "\n"
     w_body += "stdout_logfile_maxbytes=2MB" + "\n"
     w_body += "stderr_logfile_maxbytes=2MB" + "\n"
     w_body += "user=" + user + "\n"
