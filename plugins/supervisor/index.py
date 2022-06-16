@@ -271,7 +271,7 @@ def getSupList():
     return mw.getJson(data)
 
 
-def getUserList():
+def getUserListData():
     user = getServerDir() + "/user.txt"
     if not os.path.isfile(user):
         os.system(r"touch {}".format(user))
@@ -291,6 +291,11 @@ def getUserList():
         if user in special:
             continue
         user_list.append(user)
+    return user_list
+
+
+def getUserList():
+    user_list = getUserListData()
     return mw.getJson(user_list)
 
 
@@ -366,10 +371,47 @@ def delJob():
 
 def updateJob():
     args = getArgs()
-    data = checkArgs(args, ['name'])
+    data = checkArgs(args, ["name", 'user', 'numprocs', 'priority'])
     if not data[0]:
         return data[1]
+    user = args['user']
+    numprocs = args['numprocs']
+    priority = args['priority']
     name = args['name']
+    programFile = getServerDir() + "/conf.d/" + name + ".ini"
+
+    with open(programFile, "r") as fr:
+        infos = fr.readlines()
+
+    mess = {}
+    infos = []
+    for line in infos:
+        if "command=" in line.strip():
+            mess["command"] = line.strip().split('=')[1]
+        if "path=" in line.strip():
+            mess["path"] = line.strip().split('=')[1]
+
+    log_dir = getServerDir() + '/log/'
+
+    w_body = ""
+    w_body += "[program:" + name + "]" + "\n"
+    w_body += "command=" + mess["command"] + "\n"
+    w_body += "directory=" + mess["path"] + "\n"
+    w_body += "autorestart=true" + "\n"
+    w_body += "startsecs=3" + "\n"
+    w_body += "startretries=3" + "\n"
+    w_body += "stdout_logfile=" + log_dir + name + ".out.log" + "\n"
+    w_body += "stderr_logfile=" + log_dir + name + ".err.log" + "\n"
+    w_body += "stdout_logfile_maxbytes=2MB" + "\n"
+    w_body += "stderr_logfile_maxbytes=2MB" + "\n"
+    w_body += "user=" + user + "\n"
+    w_body += "priority=999" + "\n"
+    w_body += "numprocs={0}".format(numprocs) + "\n"
+    w_body += "process_name=%(program_name)s_%(process_num)02d"
+
+    mw.writeFile(programFile, w_body)
+
+    return mw.returnJson(True, '修改守护进程成功!')
 
 
 def getJobInfo():
@@ -379,10 +421,13 @@ def getJobInfo():
         return data[1]
     name = args['name']
 
+    mess = {}
+    infos = []
+    info = {}
     program = getServerDir() + "/conf.d/" + name + ".ini"
     with open(program, "r") as fr:
         infos = fr.readlines()
-
+    mess = {}
     for line in infos:
         if "user=" in line.strip():
             mess["user"] = line.strip().split('=')[1]
@@ -390,7 +435,7 @@ def getJobInfo():
             mess["numprocs"] = line.strip().split('=')[1]
         if "priority=" in line.strip():
             mess["priority"] = line.strip().split('=')[1]
-    userlist = getUserList()
+    userlist = getUserListData()
     info["userlist"] = userlist
     info["daemoninfo"] = mess
     return mw.getJson(info)
