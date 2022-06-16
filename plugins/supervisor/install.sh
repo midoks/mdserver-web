@@ -35,16 +35,22 @@ Install_app()
 	echo '正在安装脚本文件...' > $install_tmp
 	mkdir -p $serverPath/source
 	mkdir -p $serverPath/supervisor
+	mkdir -p $serverPath/supervisor/log
+	mkdir -p $serverPath/supervisor/run
 
 	echo 'supervisor install...'
 	if [ "centos" == "$OSNAME" ] || [ "fedora" == "$OSNAME" ];then
-    	yum install supervisor -y 
+    	# yum install supervisor -y
+    	pip install  supervisor
     elif [ "ubuntu" == "$OSNAME" ] || [ "debian" == "$OSNAME" ] ;then
-    	apt install supervisor -y 
+    	# apt install supervisor -y 
+    	pip install  supervisor
 	else
-    	brew install supervisor
+		pip install  supervisor
+    	# brew install supervisor
 	fi
 
+	echo "${VERSION}" > $serverPath/supervisor/version.pl
 	echo '安装完成' > $install_tmp
 }
 
