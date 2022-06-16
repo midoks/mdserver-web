@@ -43,7 +43,7 @@ function supList(page, search){
 
     myPost('get_sup_list', _data, function(data){
         var rdata = $.parseJSON(data.data);
-        console.log(rdata.data);
+        // console.log(rdata.data);
         var list = '';
         for(i in rdata.data){
             list += '<tr>';
@@ -57,8 +57,8 @@ function supList(page, search){
 			list += '<td>' + rdata.data[i]['runStatus'] +'</td>';
 
             list += '<td style="text-align:right">\
-            			<a href="javascript:;" class="btlink" onclick="openPhpmyadmin(\''+rdata.data[i]['name']+'\',\''+rdata.data[i]['username']+'\',\''+rdata.data[i]['password']+'\')" title="启动|停止">启动</a> | ' +
-                        '<a href="javascript:;" class="btlink" onclick="setDbPass('+rdata.data[i]['id']+',\''+ rdata.data[i]['username'] +'\',\'' + rdata.data[i]['password'] + '\')">改密</a> | ' +
+            			<a href="javascript:;" class="btlink" onclick="startOrStop(\''+rdata.data[i]['name']+'\',\''+rdata.data[i]['username']+'\',\''+rdata.data[i]['password']+'\')" title="启动|停止">启动</a> | ' +
+                        '<a href="javascript:;" class="btlink" onclick="updateJob(\''+rdata.data[i]['program']+'\')">修改</a> | ' +
                         '<a href="javascript:;" class="btlink" onclick="delJob(\''+rdata.data[i]['program']+'\')" title="删除">删除</a>' +
                     '</td>';
 
@@ -103,6 +103,11 @@ function supList(page, search){
         $(".soft-man-con").html(con);
         $('#databasePage').html(rdata.page);
     });
+}
+
+
+function updateJob(name){
+
 }
 
 

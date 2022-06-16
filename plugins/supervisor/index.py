@@ -224,7 +224,7 @@ def getSupList():
     data = {}
 
     statusFile = getServerDir() + "/status.txt"
-    supCtl = 'supervisorctl'
+    supCtl = 'supervisorctl -c ' + getServerDir() + "/supervisor.conf"
     cmd = "%s update; %s status > %s" % (supCtl, supCtl, statusFile)
     mw.execShell(cmd)
 
@@ -378,6 +378,22 @@ def getJobInfo():
     if not data[0]:
         return data[1]
     name = args['name']
+
+    program = getServerDir() + "/conf.d/" + name + ".ini"
+    with open(program, "r") as fr:
+        infos = fr.readlines()
+
+    for line in infos:
+        if "user=" in line.strip():
+            mess["user"] = line.strip().split('=')[1]
+        if "numprocs=" in line.strip():
+            mess["numprocs"] = line.strip().split('=')[1]
+        if "priority=" in line.strip():
+            mess["priority"] = line.strip().split('=')[1]
+    userlist = getUserList()
+    info["userlist"] = userlist
+    info["daemoninfo"] = mess
+    return mw.getJson(info)
 
 
 def runLog():
