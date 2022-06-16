@@ -107,7 +107,86 @@ function supList(page, search){
 
 
 function updateJob(name){
+	myPost('get_job_info',{'name':name},function(data){
+		var rdata = $.parseJSON(data.data);
+		// console.log(rdata);
+		var defaultPath = $("#defaultPath").html();
+		var ulist = "<div class='line'><span class='tname'>启动用户</span><select class='bt-input-text' name='user' id='c_k3' style='width:270px'>";
+		for (var i=0;i<rdata['userlist'].length;i++) {
+			if (rdata['userlist'][i] == rdata['daemoninfo']['user']){
+				ulist += "<option value='"+rdata['userlist'][i]+"' selected>"+rdata['userlist'][i]+"</option>";
+			} else {
+				ulist += "<option value='"+rdata['userlist'][i]+"'>"+rdata['userlist'][i]+"</option>";
+			}
+        }
 
+		ulist += "</select><span style='color:red;margin-left: 10px;width:270px;'></span></div>";
+		layer.open({
+			type: 1,
+			area: '500px',
+			title: '修改守护进程',
+			closeBtn: 2,
+			shift: 0,
+			shadeClose: false,
+			btn: ['确定', '取消'],
+			content: "<div class='bt_conter bt-form pd15' style='height:auto;width:100%;'>\
+						<div class='line'>\
+		                    <span class='tname'>名称</span>\
+		                    <div class='info-r c4'>\
+		                    	<input id='name' class='bt-input-text' type='text' name='name' value='"+name+"' placeholder='请输入名称' style='width:270px' readonly/>\
+		                    </div>\
+	                    </div>\
+	                    "+ulist+"\
+	                    <div class='line'>\
+		                    <span class='tname'>进程数量</span>\
+		                    <div class='info-r c4'>\
+		                    	<input id='numprocs' class='bt-input-text' type='text' name='numprocs' value='"+rdata['daemoninfo']['numprocs']+"' style='width:270px' />\
+		                    </div>\
+	                    </div>\
+	                    <div class='line'>\
+		                    <span class='tname'>启动优先级</span>\
+		                    <div class='info-r c4'>\
+		                    	<input id='priority' class='bt-input-text' type='text' name='priority' value='"+rdata['daemoninfo']['priority']+"' style='width:270px' />\
+		                    </div>\
+	                    </div>\
+	                   </div>",
+	        yes: function(index, layero){
+	        	// console.log(index,layero);
+
+	        	var options =  ['name','user','numprocs','priority'];
+				var opval = {};
+				for(var i in options){
+		            opval[options[i]] = $('[name="'+ options[i] +'"]').val();
+		            if(opval[options[i]] == ''){
+		                if(options[i] == 'user'){
+		                    layer.msg('启动用户不能为空');
+		                    return false;
+		                }else if(options[i] == 'priority'){
+		                    layer.msg('启动优先级不能为空');
+		                    return false;
+		                }else if(options[i] == 'numprocs'){
+		                    layer.msg('进程数量不能为空！');
+		                    return false;
+		                }
+		            }
+		        }
+
+		        var numprocs = $('[name=numprocs]').val();
+			    if (!(/(^[1-9]\d*$)/.test(numprocs))) {
+		            layer.msg('进程数量请输入正整数')
+		            return false;
+			　　}
+
+				myPost("update_job", opval, function(data){
+					rdata = $.parseJSON(data.data);
+					layer.msg(rdata.msg,{icon:rdata.status?1:2});
+					rdata.status ? layer.close(index):'';
+					supList(1,10);
+				})
+				return;
+	        }
+		});
+	});
 }
 
 
@@ -136,7 +215,7 @@ function supAdd() {
 
 		var defaultPath = $("#defaultPath").html();
 		var ulist = "<div class='line'><span class='tname'>启动用户</span><select class='bt-input-text' name='user' id='c_k3' style='width:270px'>";
-		for (var i=rdata.length-1;i>=0;i--) {
+		for (var i=0;i<rdata.length;i++) {
             ulist += "<option value='"+rdata[i]+"'>"+rdata[i]+"</option>";
         }
 
