@@ -1,6 +1,6 @@
 {
 	"sort": 7,
-	"ps": "[开发中...]一个Python开发的通用的进程管理程序",
+	"ps": "一个Python开发的通用的进程管理程序",
 	"name": "supervisor",
 	"title": "supervisor",
 	"shell": "install.sh",
