@@ -5,8 +5,8 @@ After=network.target
 [Service]
 Type=forking
 ExecStart=supervisord -c {$SERVER_PATH}/supervisor/supervisor.conf
-ExecStop=supervisorctl -c {$SERVER_PATH}/supervisor/supervisor.conf $OPTIONS shutdown
-ExecReload=supervisorctl -c {$SERVER_PATH}/supervisor/supervisor.conf $OPTIONS reload
+ExecStop=/bin/kill -s TERM $MAINPID
+ExecReload=/bin/kill -s HUP $MAINPID
 KillMode=process
 Restart=on-failure
 
