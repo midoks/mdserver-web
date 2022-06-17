@@ -304,7 +304,7 @@ function indexListHtml(callback){
             con += '<div class="col-sm-3 col-md-3 col-lg-3" data-id="' + data_id + '">\
                 <span class="spanmove"></span>\
                 <div onclick="softMain(\'' + plugin.name + '\',\'' + plugin.setup_version + '\')">\
-                <div class="image"><img src="/plugins/file?name=' + plugin.name + '&f=ico.png"></div>\
+                <div class="image"><img src="/plugins/file?name=' + plugin.name + '&f=ico.png" width="48px;"></div>\
                 <div class="sname">' +  name + state + '</div>\
                 </div>\
             </div>';
