@@ -79,8 +79,8 @@ def status():
 
 def initDreplace():
 
-    confD = etServerDir() + "/conf.d"
-    conf = etServerDir() + "//supervisor.conf"
+    confD = getServerDir() + "/conf.d"
+    conf = getServerDir() + "/supervisor.conf"
     systemDir = '/lib/systemd/system'
     systemService = systemDir + '/supervisor.service'
     systemServiceTpl = getPluginDir() + '/init.d/supervisor.service'
