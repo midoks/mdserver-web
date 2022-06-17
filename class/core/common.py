@@ -91,7 +91,7 @@ def initInitD():
             mw.execShell('chmod +x ' + initd_bin)
         # 加入自启动
         mw.execShell('which chkconfig && chkconfig --add mw')
-        # update-rc.d -f mw defaults
+        mw.execShell('which update-rc.d && update-rc.d -f mw defaults')
 
 
 def initUserInfo():
