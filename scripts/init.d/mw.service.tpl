@@ -3,8 +3,9 @@ Description=mw server daemon
 After=network.target
 
 [Service]
-Type=forking
-ExecStart=cd {$SERVER_PATH} &&  gunicorn -c setting.py app:app
+Type=simple
+WorkingDirectory={$SERVER_PATH}
+ExecStart=gunicorn -c setting.py app:app
 ExecStop=kill -HUP $MAINID
 ExecReload=kill -HUP $MAINID
 KillMode=process
