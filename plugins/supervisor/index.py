@@ -103,8 +103,10 @@ def initDreplace():
         mw.writeFile(conf, conf_content)
 
     if os.path.exists(systemDir) and not os.path.exists(systemService):
+        supervisord_bin = mw.execShell('which supervisord')[0].strip()
         se_content = mw.readFile(systemServiceTpl)
         se_content = se_content.replace('{$SERVER_PATH}', service_path)
+        se_content = se_content.replace('{$SUP_BIN}', supervisord_bin)
         mw.writeFile(systemService, se_content)
         mw.execShell('systemctl daemon-reload')
 
