@@ -439,38 +439,38 @@ def startPort():
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
-        print status()
+        print(status())
     elif func == 'start':
-        print start()
+        print(start())
     elif func == 'stop':
-        print stop()
+        print(stop())
     elif func == 'restart':
-        print restart()
+        print(restart())
     elif func == 'reload':
-        print reload()
+        print(reload())
     elif func == 'initd_status':
-        print initdStatus()
+        print(initdStatus())
     elif func == 'initd_install':
-        print initdInstall()
+        print(initdInstall())
     elif func == 'initd_uninstall':
-        print initdUinstall()
+        print(initdUinstall())
     elif func == 'conf':
-        print getConf()
+        print(getConf())
     elif func == 'get_www_dir':
-        print getWwwDir()
+        print(getWwwDir())
     elif func == 'get_ftp_list':
-        print getFtpList()
+        print(getFtpList())
     elif func == 'add_ftp':
-        print addFtp()
+        print(addFtp())
     elif func == 'del_ftp':
-        print delFtp()
+        print(delFtp())
     elif func == 'mod_ftp':
-        print modFtp()
+        print(modFtp())
     elif func == 'mod_ftp_port':
-        print modFtpPort()
+        print(modFtpPort())
     elif func == 'stop_ftp':
-        print stopPort()
+        print(stopPort())
     elif func == 'start_ftp':
-        print startPort()
+        print(startPort())
     else:
         print 'error'
