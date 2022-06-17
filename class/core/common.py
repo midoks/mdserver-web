@@ -50,30 +50,44 @@ def initDB():
         print(str(ex))
 
 
-def initInitD():
-    script = mw.getRunDir() + '/scripts/init.d/mw.tpl'
-    script_bin = mw.getRunDir() + '/scripts/init.d/mw'
-    # if os.path.exists(script_bin):
-    #     return
-
-    content = mw.readFile(script)
+def doContentReplace(src, dst):
+    content = mw.readFile(src)
     content = content.replace("{$SERVER_PATH}", mw.getRunDir())
+    mw.writeFile(dst, content)
 
-    mw.writeFile(script_bin, content)
-    mw.execShell('chmod +x ' + script_bin)
 
+def initInitD():
     mw.setHostAddr(mw.getLocalIp())
 
-    if not mw.isAppleSystem():
+    # systemctl
+    if os.path.exists('/lib/systemd/system'):
+        systemd_mw = '/lib/systemd/system/mw-task.service'
+        systemd_mw_task = '/lib/systemd/system/mw-task.service'
+
+        systemd_mw_tpl = mw.getRunDir() + '/scripts/init.d/mw.service.tpl'
+        systemd_mw_task_tpl = mw.getRunDir() + '/scripts/init.d/mw-task.service.tpl'
+
+        doContentReplace(systemd_mw_tpl, systemd_mw)
+        doContentReplace(systemd_mw_task_tpl, systemd_mw_task)
+
+        mw.execShell('systemctl enable mw')
+        mw.execShell('systemctl enable mw-task')
+        mw.execShell('systemctl daemon-reload')
+
+    script = mw.getRunDir() + '/scripts/init.d/mw.tpl'
+    script_bin = mw.getRunDir() + '/scripts/init.d/mw'
+    doContentReplace(script, script_bin)
+    mw.execShell('chmod +x ' + script_bin)
+
+    # initd
+    if os.path.exists("/etc/init.d"):
         initd_bin = '/etc/init.d/mw'
         if not os.path.exists(initd_bin):
             import shutil
             shutil.copyfile(script_bin, initd_bin)
             mw.execShell('chmod +x ' + initd_bin)
         # 加入自启动
-        mw.execShell('chkconfig --add mw')
-        mw.execShell('systemctl enable mw')
-        mw.execShell('systemctl daemon-reload')
+        mw.execShell('which chkconfig && chkconfig --add mw')
 
 
 def initUserInfo():
