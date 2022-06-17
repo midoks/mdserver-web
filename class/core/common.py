@@ -73,6 +73,7 @@ def initInitD():
         # 加入自启动
         mw.execShell('chkconfig --add mw')
         mw.execShell('systemctl enable mw')
+        mw.execShell('systemctl daemon-reload')
 
 
 def initUserInfo():

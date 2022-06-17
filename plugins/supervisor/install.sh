@@ -51,13 +51,18 @@ Install_app()
 	fi
 
 	echo "${VERSION}" > $serverPath/supervisor/version.pl
-	echo '安装完成' > $install_tmp
+	echo '安装完成[supervisor]' > $install_tmp
 }
 
 Uninstall_app()
 {
 	rm -rf $serverPath/supervisor
-	echo "Uninstall_redis" > $install_tmp
+
+	if [ -f /lib/systemd/system/supervisor.service ];then
+		rm -rf /lib/systemd/system/supervisor.service
+	fi
+
+	echo "卸载完成[supervisor]" > $install_tmp
 }
 
 action=$1

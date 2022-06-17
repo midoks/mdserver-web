@@ -26,12 +26,6 @@ def getServerDir():
     return mw.getServerDir() + '/' + getPluginName()
 
 
-def getInitDFile():
-    if app_debug:
-        return '/tmp/' + getPluginName()
-    return '/etc/init.d/' + getPluginName()
-
-
 def getConf():
     path = getServerDir() + "/supervisor.conf"
     return path
@@ -76,7 +70,6 @@ def checkArgs(data, ck=[]):
 
 
 def status():
-
     data = mw.execShell(
         "ps -ef|grep supervisor | grep -v grep | grep -v index.py | awk '{print $2}'")
     if data[0] == '':
@@ -86,33 +79,49 @@ def status():
 
 def initDreplace():
 
-    # initD_path = getServerDir() + '/init.d'
-    # if not os.path.exists(initD_path):
-    #     os.mkdir(initD_path)
-    # file_bin = initD_path + '/' + getPluginName()
+    confD = etServerDir() + "/conf.d"
+    conf = etServerDir() + "//supervisor.conf"
+    systemDir = '/lib/systemd/system'
+    systemService = systemDir + '/supervisor.service'
+    systemServiceTpl = getPluginDir() + '/init.d/supervisor.service'
 
-    # file_tpl = getInitDTpl()
-    # initd replace
-    # content = mw.readFile(file_tpl)
-    # content = content.replace('{$SERVER_PATH}', service_path)
-    # mw.writeFile(file_bin, content)
-    # mw.execShell('chmod +x ' + file_bin)
+    service_path = os.path.dirname(os.getcwd())
 
-    if not os.path.exists(getServerDir() + "/conf.d"):
-        os.mkdir(getServerDir() + "/conf.d")
+    if not os.path.exists(confD):
+        os.mkdir(confD)
 
-    if not os.path.exists(getServerDir() + '/supervisor.conf'):
+    if not os.path.exists(conf):
         # config replace
-        service_path = os.path.dirname(os.getcwd())
+        user = 'root'
+        if mw.isAppleSystem():
+            cmd = "who | sed -n '2, 1p' |awk '{print $1}'"
+            user = mw.execShell(cmd)[0].strip()
+
         conf_content = mw.readFile(getConfTpl())
         conf_content = conf_content.replace('{$SERVER_PATH}', service_path)
-        mw.writeFile(getServerDir() + '/supervisor.conf', conf_content)
+        conf_content = conf_content.replace('{$OS_USER}', user)
+        mw.writeFile(conf, conf_content)
+
+    if os.path.exists(systemDir) and not os.path.exists(systemService):
+        se_content = mw.readFile(systemServiceTpl)
+        se_content = conf_content.replace('{$SERVER_PATH}', service_path)
+        mw.writeFile(systemService, se_content)
+        mw.execShell('systemctl daemon-reload')
 
     return True
 
 
 def start():
     initDreplace()
+
+    systemDir = '/lib/systemd/system'
+    systemService = systemDir + '/supervisor.service'
+    if os.path.exists(systemService):
+        data = mw.execShell('systemctl start supervisor')
+        if data[1] == '':
+            return 'ok'
+        return 'fail'
+
     cmd = 'supervisord -c ' + getServerDir() + '/supervisor.conf'
     # print(cmd)
     data = mw.execShell(cmd)
@@ -124,7 +133,15 @@ def start():
 
 def stop():
     initDreplace()
-    data = mw.execShell('supervisorctl shutdown')
+
+    systemDir = '/lib/systemd/system'
+    systemService = systemDir + '/supervisor.service'
+    if os.path.exists(systemService):
+        data = mw.execShell('systemctl stop supervisor')
+        if data[1] == '':
+            return 'ok'
+        return 'fail'
+
     mw.execShell(
         "ps -ef|grep supervisor | grep -v grep | grep -v index.py | awk '{print $2}'|xargs kill")
     if data[1] == '':
@@ -133,47 +150,51 @@ def stop():
 
 
 def restart():
+    systemDir = '/lib/systemd/system'
+    systemService = systemDir + '/supervisor.service'
+    if os.path.exists(systemService):
+        data = mw.execShell('systemctl restart supervisor')
+        if data[1] == '':
+            return 'ok'
+        return 'fail'
 
     mw.execShell(
         "ps -ef|grep supervisor | grep -v grep | grep -v index.py | awk '{print $2}'|xargs kill")
-
     return start()
-    initDreplace()
-    data = mw.execShell('supervisorctl reload')
-    if data[1] == '':
-        return 'ok'
-    return 'fail'
 
 
 def reload():
-    initDreplace()
-    data = mw.execShell('supervisorctl reload')
-    if data[1] == '':
-        return 'ok'
-    return 'fail'
+
+    systemDir = '/lib/systemd/system'
+    systemService = systemDir + '/supervisor.service'
+    if os.path.exists(systemService):
+        data = mw.execShell('systemctl reload supervisor')
+        if data[1] == '':
+            return 'ok'
+        return 'fail'
+
+    mw.execShell(
+        "ps -ef|grep supervisor | grep -v grep | grep -v index.py | awk '{print $2}'|xargs kill")
+    return start()
 
 
 def initdStatus():
     if not app_debug:
         if mw.isAppleSystem():
             return "Apple Computer does not support"
-    initd_bin = getInitDFile()
-    if os.path.exists(initd_bin):
-        return 'ok'
-    return 'fail'
+
+    shell_cmd = 'systemctl status supervisor | grep loaded | grep "enabled;"'
+    data = mw.execShell(shell_cmd)
+    if data[0] == '':
+        return 'fail'
+    return 'ok'
 
 
 def initdInstall():
-    import shutil
-    if not app_debug:
-        if mw.isAppleSystem():
-            return "Apple Computer does not support"
+    if mw.isAppleSystem():
+        return "Apple Computer does not support"
 
-    source_bin = initDreplace()
-    initd_bin = getInitDFile()
-    shutil.copyfile(source_bin, initd_bin)
-    mw.execShell('chmod +x ' + initd_bin)
-    mw.execShell('chkconfig --add ' + getPluginName())
+    mw.execShell('systemctl enable supervisor')
     return 'ok'
 
 
@@ -182,9 +203,7 @@ def initdUinstall():
         if mw.isAppleSystem():
             return "Apple Computer does not support"
 
-    mw.execShell('chkconfig --del ' + getPluginName())
-    initd_bin = getInitDFile()
-    os.remove(initd_bin)
+    mw.execShell('systemctl diable supervisor')
     return 'ok'
 
 
@@ -258,6 +277,11 @@ def getUserListData():
             continue
         if user in special:
             continue
+        user_list.append(user)
+
+    if mw.isAppleSystem():
+        cmd = "who | sed -n '2, 1p' |awk '{print $1}'"
+        user = mw.execShell(cmd)[0].strip()
         user_list.append(user)
     return user_list
 

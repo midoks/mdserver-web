@@ -1,0 +1,14 @@
+[Unit]
+Description=supervisor server daemon
+After=network.target
+
+[Service]
+Type=forking
+ExecStart=supervisord -c {$SERVER_PATH}/supervisor/supervisor.conf
+ExecStop=supervisorctl -c {$SERVER_PATH}/supervisor/supervisor.conf $OPTIONS shutdown
+ExecReload=supervisorctl -c {$SERVER_PATH}/supervisor/supervisor.conf $OPTIONS reload
+KillMode=process
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
