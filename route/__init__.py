@@ -53,7 +53,7 @@ except:
         str(sys.version_info[0])
     app.config['SESSION_FILE_THRESHOLD'] = 1024
     app.config['SESSION_FILE_MODE'] = 384
-    mw.execShell("pip install flask_sqlalchemy &")
+    # mw.execShell("pip install flask_sqlalchemy &")
 
 app.secret_key = uuid.UUID(int=uuid.getnode()).hex[-12:]
 app.config['SESSION_PERMANENT'] = True
