@@ -525,14 +525,17 @@ done
         sfile = request.form.get('sfile', '')
         dfile = request.form.get('dfile', '')
 
+        if sfile == dfile:
+            return mw.returnJson(False, '源与目的一致!')
+
         if not os.path.exists(sfile):
             return mw.returnJson(False, '指定文件不存在!')
 
         if os.path.isdir(sfile):
             return self.copyDir(sfile, dfile)
 
-        import shutil
         try:
+            import shutil
             shutil.copyfile(sfile, dfile)
             msg = mw.getInfo('复制文件[{1}]到[{2}]成功!', (sfile, dfile,))
             mw.writeLog('文件管理', msg)
@@ -564,7 +567,7 @@ done
 
     # 检查敏感目录
     def checkDir(self, path):
-        path = str(path, encoding='utf-8')
+        # path = str(path, encoding='utf-8')
         path = path.replace('//', '/')
         if path[-1:] == '/':
             path = path[:-1]
