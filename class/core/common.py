@@ -61,7 +61,7 @@ def initInitD():
 
     # systemctl
     if os.path.exists('/lib/systemd/system'):
-        systemd_mw = '/lib/systemd/system/mw-task.service'
+        systemd_mw = '/lib/systemd/system/mw.service'
         systemd_mw_task = '/lib/systemd/system/mw-task.service'
 
         systemd_mw_tpl = mw.getRunDir() + '/scripts/init.d/mw.service.tpl'
