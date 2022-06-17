@@ -295,7 +295,7 @@ def addJob():
     w_body += "user=" + user + "\n"
     w_body += "priority=999" + "\n"
     w_body += "numprocs={0}".format(numprocs) + "\n"
-    w_body += "process_name=%(program_name)s_%(process_num)02d"
+    w_body += "process_name=%(program_name)s"
 
     dstFile = getSubConfDir() + "/" + program + '.ini'
 
@@ -317,7 +317,7 @@ def startJob():
 
     action = "启动"
     cmd = supCtl + " start " + name
-    if status == 'RUNNING':
+    if status == 'start':
         action = "停止"
         cmd = supCtl + " stop " + name
 
@@ -400,7 +400,7 @@ def updateJob():
     w_body += "user=" + user + "\n"
     w_body += "priority=" + priority + "\n"
     w_body += "numprocs={0}".format(numprocs) + "\n"
-    w_body += "process_name=%(program_name)s_%(process_num)02d"
+    w_body += "process_name=%(program_name)s%"
 
     mw.writeFile(programFile, w_body)
 
@@ -454,6 +454,53 @@ def readConfigTpl():
     return mw.returnJson(True, 'ok', content)
 
 
+def readConfigLogTpl():
+    args = getArgs()
+    data = checkArgs(args, ['file'])
+    if not data[0]:
+        return data[1]
+    file_log = args['file']
+    line_log = args['line']
+
+    with open(file_log, "r") as fr:
+        infos = fr.readlines()
+
+    stdout_logfile = ''
+    for line in infos:
+        if "stdout_logfile=" in line.strip():
+            stdout_logfile = line.strip().split('=')[1]
+
+    if stdout_logfile != '':
+        data = mw.getNumLines(stdout_logfile, int(line_log))
+        return mw.returnJson(True, 'OK', data)
+    return mw.returnJson(False, 'OK', '')
+
+
+def supClearLog():
+    args = getArgs()
+    data = checkArgs(args, ['file'])
+    if not data[0]:
+        return data[1]
+    file_log = args['file']
+
+    with open(file_log, "r") as fr:
+        infos = fr.readlines()
+
+    stdout_logfile = ''
+    stderr_logfile = ''
+    for line in infos:
+        if "stdout_logfile=" in line.strip():
+            stdout_logfile = line.strip().split('=')[1]
+        if "stderr_logfile=" in line.strip():
+            stderr_logfile = line.strip().split('=')[1]
+
+    cmd_stdout = "echo '' > " + stdout_logfile
+    cmd_stderr = "echo '' > " + stderr_logfile
+    mw.execShell(cmd_stdout)
+    mw.execShell(cmd_stderr)
+    return mw.returnJson(True, '清空成功')
+
+
 def runLog():
     return getServerDir() + '/log/supervisor.log'
 
@@ -479,6 +526,10 @@ if __name__ == "__main__":
         print(configTpl())
     elif func == 'read_config_tpl':
         print(readConfigTpl())
+    elif func == 'read_config_log_tpl':
+        print(readConfigLogTpl())
+    elif func == 'sup_clear_log':
+        print(supClearLog())
     elif func == 'conf':
         print(getConf())
     elif func == 'run_log':

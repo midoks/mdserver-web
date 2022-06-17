@@ -53,11 +53,23 @@ function supList(page, search){
             list += '<td>' + rdata.data[i]['pid'] +'</td>';
             list += '<td>' + rdata.data[i]['numprocs'] +'</td>';
             list += '<td>' + rdata.data[i]['priority'] +'</td>';
-			list += '<td>' + rdata.data[i]['runStatus'] +'</td>';
+			
+			sup_status = 'start'
+			sup_status_desc = 'start'
+            if (rdata.data[i]['runStatus'] == 'RUNNING' ){
+            	sup_status = 'start'
+            	sup_status_desc = '已启动'
+            } else{
+            	sup_status = 'stop'
+            	sup_status_desc = '已停止'
+            }
+
+            list += '<td>'+sup_status_desc+'</td>';
+
 			list += '<td>' + rdata.data[i]['runStatus'] +'</td>';
 
             list += '<td style="text-align:right">\
-            			<a href="javascript:;" class="btlink" onclick="startOrStop(\''+rdata.data[i]['program']+'\',\''+rdata.data[i]['runStatus']+'\')" title="启动|停止">启动</a> | ' +
+            			<a href="javascript:;" class="btlink" onclick="startOrStop(\''+rdata.data[i]['program']+'\',\''+sup_status+'\')" title="启动|停止">'+sup_status_desc+'</a> | ' +
                         '<a href="javascript:;" class="btlink" onclick="updateJob(\''+rdata.data[i]['program']+'\')">修改</a> | ' +
                         '<a href="javascript:;" class="btlink" onclick="delJob(\''+rdata.data[i]['program']+'\')" title="删除">删除</a>' +
                     '</td>';
@@ -109,7 +121,6 @@ function supList(page, search){
 function startOrStop(name,status){
 	myPost('start_job',{'name':name,'status':status}, function(data){
 		var rdata = $.parseJSON(data.data);
-		// console.log(data);
 		layer.msg(rdata.msg,{icon:rdata.status?1:2});
 		setTimeout(function(){
 			supList(1,10);
@@ -435,4 +446,85 @@ function supConfigSave(fileName) {
         layer.msg(rdata.msg, {icon: rdata.status ? 1 : 2});
     },'json');
 }
+
+
+
+function supLogs(_name, config_tpl_func, read_config_tpl_func,line){
+
+    var file_line = 100;
+    if ( typeof(line) != 'undefined' ){
+        file_line = line;
+    }
+
+    var _config_tpl_func = 'config_tpl';
+    if ( typeof(config_tpl_func) != 'undefined' ){
+        _config_tpl_func = config_tpl_func;
+    }
+
+    var _read_config_tpl_func = 'read_config_tpl';
+    if ( typeof(read_config_tpl_func) != 'undefined' ){
+        _read_config_tpl_func = read_config_tpl_func;
+    }
+
+    function getFileName(file){
+    	var list = file.split('/');
+    	var f = list[list.length-1];
+    	return f 
+    }
+
+    var con = '<div><select id="config_tpl" class="bt-input-text mr20" style="width:30%;margin-bottom: 3px;"><option value="0">请选择</option></select>\
+    			<button id="sup_clear_log" class="btn btn-success btn-sm clear_logs mr5">清理日志</button>\
+    		</div>';
+    con += '<textarea readonly="" style="margin: 0px;width: 100%;height: 520px;background-color: #333;color:#fff; padding:0 5px" id="info_log"></textarea>';
+    $(".soft-man-con").html(con);
+    var ob = document.getElementById('info_log');
+    ob.scrollTop = ob.scrollHeight;
+
+    function clearLog(file){
+    	$('#sup_clear_log').click(function(){
+    		myPost('sup_clear_log', {'file':file}, function (data) {
+    			var rdata = $.parseJSON(data.data);
+    			layer.msg(rdata.msg,{icon:rdata.status?1:2,time:2000,shade: [0.3, '#000']});
+    		});
+    	});
+    }
+
+    var loadT = layer.msg('日志路径获取中...',{icon:16,time:0,shade: [0.3, '#000']});
+    $.post('/plugins/run', {name:_name, func:_config_tpl_func},function (data) {
+        layer.close(loadT);
+
+        var rdata = $.parseJSON(data.data);
+    	for (var i = 0; i < rdata.length; i++) {
+    		$('#config_tpl').append('<option value="'+rdata[i]+'"">'+getFileName(rdata[i])+'</option>');
+    	}
+
+    	$('#config_tpl').change(function(){
+    	///
+    		var selected = $(this).val();
+    		if (selected == '0'){
+    			return;
+    		}
+    	
+			fileName = selected;
+			var loadT = layer.msg('日志获取中...',{icon:16,time:0,shade: [0.3, '#000']});
+
+			var _args = JSON.stringify({file:selected,line:file_line});
+			$.post('/plugins/run', {name:_name, func:_read_config_tpl_func,args:_args}, function(data){
+				layer.close(loadT);
+				var rdata = $.parseJSON(data.data);
+				if (!rdata.status){
+	                layer.msg(rdata.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+	                return;
+	            }
+
+				$("#info_log").empty().text(rdata.data);
+			},'json');
+
+			clearLog(selected);
+    	///
+    	});
+
+    },'json');
+}
+
 
