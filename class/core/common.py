@@ -60,21 +60,22 @@ def initInitD():
     mw.setHostAddr(mw.getLocalIp())
 
     # systemctl
-    if os.path.exists('/lib/systemd/system'):
-        systemd_mw = '/lib/systemd/system/mw.service'
-        systemd_mw_task = '/lib/systemd/system/mw-task.service'
+    # 有问题
+    # if os.path.exists('/lib/systemd/system'):
+    #     systemd_mw = '/lib/systemd/system/mw.service'
+    #     systemd_mw_task = '/lib/systemd/system/mw-task.service'
 
-        systemd_mw_tpl = mw.getRunDir() + '/scripts/init.d/mw.service.tpl'
-        systemd_mw_task_tpl = mw.getRunDir() + '/scripts/init.d/mw-task.service.tpl'
+    #     systemd_mw_tpl = mw.getRunDir() + '/scripts/init.d/mw.service.tpl'
+    #     systemd_mw_task_tpl = mw.getRunDir() + '/scripts/init.d/mw-task.service.tpl'
 
-        os.remove(systemd_mw)
-        os.remove(systemd_mw_task)
-        doContentReplace(systemd_mw_tpl, systemd_mw)
-        doContentReplace(systemd_mw_task_tpl, systemd_mw_task)
+    #     os.remove(systemd_mw)
+    #     os.remove(systemd_mw_task)
+    #     doContentReplace(systemd_mw_tpl, systemd_mw)
+    #     doContentReplace(systemd_mw_task_tpl, systemd_mw_task)
 
-        mw.execShell('systemctl enable mw')
-        mw.execShell('systemctl enable mw-task')
-        mw.execShell('systemctl daemon-reload')
+    #     mw.execShell('systemctl enable mw')
+    #     mw.execShell('systemctl enable mw-task')
+    #     mw.execShell('systemctl daemon-reload')
 
     script = mw.getRunDir() + '/scripts/init.d/mw.tpl'
     script_bin = mw.getRunDir() + '/scripts/init.d/mw'
@@ -90,6 +91,7 @@ def initInitD():
             mw.execShell('chmod +x ' + initd_bin)
         # 加入自启动
         mw.execShell('which chkconfig && chkconfig --add mw')
+        # update-rc.d -f mw defaults
 
 
 def initUserInfo():
