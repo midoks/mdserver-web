@@ -271,4 +271,4 @@ if __name__ == "__main__":
     elif func == 'save_conf':
         print(saveConf())
     else:
-        print('fail')
+        print('error')
