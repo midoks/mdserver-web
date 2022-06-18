@@ -421,7 +421,7 @@ def my57cmd(version, method):
 
     try:
         initData = initMysql57Data()
-
+        # if not mysql8IsInitedPasswd():
         cmd_start1 = gsDir + '/bin/mysqld_safe --defaults-file=' + \
             gsDir + '/etc/my.cnf --skip-grant-tables &'
         subprocess.Popen(cmd_start1, stdout=subprocess.PIPE, shell=True,
@@ -438,8 +438,7 @@ def my57cmd(version, method):
         cmd_init_one = gsDir + "/bin/mysql --defaults-file=" + \
             gsDir + "/etc/my.cnf -uroot -p' ' < " + sql_file_path
 
-        subprocess.Popen(cmd_init_one, stdout=subprocess.PIPE, shell=True,
-                         bufsize=4096, stderr=subprocess.PIPE)
+        print(mw.execShell(cmd_init_one))
 
         cmd_kill = "ps -ef|grep mysql |grep -v grep|grep -v py|awk '{print $2}'|xargs kill"
         mw.execShell(cmd_kill)
