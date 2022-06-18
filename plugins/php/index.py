@@ -302,6 +302,8 @@ def initdInstall(version):
         return "Apple Computer does not support"
 
     mw.execShell('systemctl enable php' + version)
+    if data[0] == '':
+        return 'fail'
     return 'ok'
 
 
@@ -310,6 +312,8 @@ def initdUinstall(version):
         return "Apple Computer does not support"
 
     mw.execShell('systemctl disable php' + version)
+    if data[0] == '':
+        return 'fail'
     return 'ok'
 
 
