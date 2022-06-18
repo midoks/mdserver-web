@@ -126,8 +126,8 @@ def initDreplace():
         mw.writeFile(file_bin, content)
         mw.execShell('chmod +x ' + file_bin)
 
-    if os.path.exists('/usr/lib/systemd/system/rsyncd.service'):
-        mw.execShell('rm -rf /usr/lib/systemd/system/rsyncd*')
+    # if os.path.exists('/usr/lib/systemd/system/rsyncd.service'):
+    #     mw.execShell('rm -rf /usr/lib/systemd/system/rsyncd*')
 
     rlog = getLog()
     if os.path.exists(rlog):
