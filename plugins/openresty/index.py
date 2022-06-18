@@ -200,65 +200,35 @@ def status():
     return 'start'
 
 
-def start():
-    file = initDreplace()
+def restyOp(version, method):
+    file = initReplace(version)
 
     if not mw.isAppleSystem():
-        data = mw.execShell('systemctl start openresty')
+        data = mw.execShell('systemctl ' + method + ' openresty')
         if data[1] == '':
             return 'ok'
         return 'fail'
 
-    data = mw.execShell(file + ' start')
+    data = mw.execShell(file + ' ' + method)
     if data[1] == '':
         return 'ok'
     return data[1]
+
+
+def start():
+    return restyOp(version, 'start')
 
 
 def stop():
-    file = initDreplace()
-
-    if not mw.isAppleSystem():
-        data = mw.execShell('systemctl stop openresty')
-        if data[1] == '':
-            return 'ok'
-        return 'fail'
-
-    data = mw.execShell(file + ' stop')
-    clearTemp()
-    if data[1] == '':
-        return 'ok'
-    return data[1]
+    return restyOp(version, 'stop')
 
 
 def restart():
-    file = initDreplace()
-
-    if not mw.isAppleSystem():
-        data = mw.execShell('systemctl restart openresty')
-        if data[1] == '':
-            return 'ok'
-        return 'fail'
-
-    data = mw.execShell(file + ' restart')
-    if data[1] == '':
-        return 'ok'
-    return data[1]
+    return restyOp(version, 'restart')
 
 
 def reload():
-    file = initDreplace()
-
-    if not mw.isAppleSystem():
-        data = mw.execShell('systemctl reload openresty')
-        if data[1] == '':
-            return 'ok'
-        return 'fail'
-
-    data = mw.execShell(file + ' reload')
-    if data[1] == '':
-        return 'ok'
-    return data[1]
+    return restyOp(version, 'reload')
 
 
 def initdStatus():
