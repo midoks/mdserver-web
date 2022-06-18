@@ -473,4 +473,4 @@ if __name__ == "__main__":
     elif func == 'start_ftp':
         print(startPort())
     else:
-        print 'error'
+        print('error')
