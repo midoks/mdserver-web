@@ -147,9 +147,7 @@ def initdInstall():
     if mw.isAppleSystem():
         return "Apple Computer does not support"
 
-    data = mw.execShell('systemctl enable swap')
-    if data[0] == '':
-        return 'fail'
+    mw.execShell('systemctl enable swap')
     return 'ok'
 
 
@@ -157,9 +155,7 @@ def initdUinstall():
     if mw.isAppleSystem():
         return "Apple Computer does not support"
 
-    data = mw.execShell('systemctl disable swap')
-    if data[0] == '':
-        return 'fail'
+    mw.execShell('systemctl disable swap')
     return 'ok'
 
 if __name__ == "__main__":
