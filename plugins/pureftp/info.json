@@ -3,12 +3,13 @@
 	"tip":"soft",
 	"name":"pureftp",
 	"ps":"一款免费FTP服务器软件",
-	"versions": "1.0.47",
+	"versions": "1.0.51",
 	"shell":"install.sh",
 	"checks":"server/pureftp",
 	"path":"server/pureftp",
 	"author":"mdserver-web",
 	"home":"https://github.com/midoks/mdserver-web",
 	"date":"2018-11-30",
+	"dev_update":"2022-6-18",
 	"pid":"3"
 }
