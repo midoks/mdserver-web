@@ -414,7 +414,7 @@ def myOp(version, method):
 
 
 def my57cmd(version, method):
-    init_file = initDreplace()
+    init_file = initDreplace(version)
     cmd = init_file + ' ' + method
     gsDir = getServerDir()
     sql_file_path = "/tmp/tmp_sql57.sql"
