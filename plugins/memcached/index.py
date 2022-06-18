@@ -43,7 +43,7 @@ def getConfTpl():
 
 
 def getMemPort():
-    path = getConf()
+    path = getServerDir() + '/memcached.env'
     content = mw.readFile(path)
     rep = 'PORT\s*=\s*(\d*)'
     tmp = re.search(rep, content)
