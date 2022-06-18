@@ -36,11 +36,6 @@ def getConf():
     return path
 
 
-def getConfTpl():
-    path = getPluginDir() + "/config/redis.conf"
-    return path
-
-
 def getInitDTpl():
     path = getPluginDir() + "/init.d/" + getPluginName() + ".tpl"
     return path
@@ -102,8 +97,6 @@ def stop():
 
 def restart():
     data = mw.execShell('systemctl restart ' + getPluginName())
-    log_file = getServerDir() + "/data/redis.log"
-    mw.execShell("echo '' > " + log_file)
     if data[1] == '':
         return 'ok'
     return 'fail'
@@ -111,7 +104,7 @@ def restart():
 
 def reload():
     # file = initDreplace()
-    data = mw.execShell('systemctl restart ' + getPluginName())
+    data = mw.execShell('systemctl reload ' + getPluginName())
     if data[1] == '':
         return 'ok'
     return 'fail'

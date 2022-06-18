@@ -17,8 +17,8 @@ pluginService('swap');
 
 function readme(){
     var readme = '<ul class="help-info-text c7">';
-    readme += '<li>dd if=/dev/zero of=/swapfile bs=1M count=2048</li>';
-    readme += '<li>mkswap /swapfile</li>';
+    readme += '<li>dd if=/dev/zero of=/www/server/swap/swapfile bs=1M count=2048</li>';
+    readme += '<li>mkswap /www/server/swap/swapfile</li>';
     readme += '</ul>';
     $('.soft-man-con').html(readme);
 }

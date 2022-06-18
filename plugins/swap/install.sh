@@ -22,10 +22,10 @@ Install_swap()
 	if [ "$sysName" == "Darwin" ];then
 		pass
 	else
-		dd if=/dev/zero of=/swapfile bs=1M count=2048
-		chmod 600 /swapfile
-		mkswap /swapfile
-		swapon /swapfile
+		dd if=/dev/zero of=$serverPath/swap/swapfile bs=1M count=2048
+		chmod 600 $serverPath/swap/swapfile
+		mkswap $serverPath/swap/swapfile
+		swapon $serverPath/swap/swapfile
 	fi 
 
 	echo '安装完成' > $install_tmp
@@ -33,7 +33,13 @@ Install_swap()
 
 Uninstall_swap()
 {
+	swapoff $serverPath/swap/swapfile
 	rm -rf $serverPath/swap
+
+	if [ -f /lib/systemd/system/swap.service ];then
+		rm -rf /lib/systemd/system/swap.service
+	fi
+	
 	echo "Uninstall_swap" > $install_tmp
 }
 
