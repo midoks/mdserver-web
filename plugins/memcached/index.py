@@ -37,6 +37,11 @@ def getConf():
     return path
 
 
+def getConfEnv():
+    path = getServerDir() + "/memcached.env"
+    return path
+
+
 def getConfTpl():
     path = getPluginDir() + "/init.d/memcached.tpl"
     return path
@@ -261,10 +266,8 @@ if __name__ == "__main__":
         print(initdUinstall())
     elif func == 'run_info':
         print(runInfo())
-    elif func == 'conf':
-        print(getConf())
-    elif func == 'conf_tpl':
-        print(getConfTpl())
+    elif func == 'conf_env':
+        print(getConfEnv())
     elif func == 'save_conf':
         print(saveConf())
     else:
