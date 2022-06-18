@@ -424,29 +424,35 @@ def my57cmd(version, method):
         # if not mysql8IsInitedPasswd():
         cmd_start1 = gsDir + '/bin/mysqld_safe --defaults-file=' + \
             gsDir + '/etc/my.cnf --skip-grant-tables &'
-        subprocess.Popen(cmd_start1, stdout=subprocess.PIPE, shell=True,
-                         bufsize=4096, stderr=subprocess.PIPE)
-        time.sleep(2)
+        sub = subprocess.Popen(cmd_start1, stdout=subprocess.PIPE, shell=True,
+                               bufsize=4096, stderr=subprocess.PIPE)
+        sub.wait(5)
 
         sql = "use mysql;\
             flush privileges;\
             ALTER USER 'root'@'localhost' PASSWORD EXPIRE NEVER;\
             update user set authentication_string = password('root123') where user = 'root';\
-            flush privileges ;"
+            flush privileges;"
         mw.writeFile(sql_file_path, sql)
 
         cmd_init_one = gsDir + "/bin/mysql --defaults-file=" + \
             gsDir + "/etc/my.cnf -uroot -p' ' < " + sql_file_path
 
-        print(mw.execShell(cmd_init_one))
+        data = mw.execShell(cmd_init_one)
+        if data[1].find("ERROR") != -1:
+            return 'init[1] passowrd error!'
+
+        # mw.writeFile(serverdir + "/data/error.log", "")
+        # os.remove(tmp_file)
 
         cmd_kill = "ps -ef|grep mysql |grep -v grep|grep -v py|awk '{print $2}'|xargs kill"
         mw.execShell(cmd_kill)
 
         cmd_start2 = gsDir + '/bin/mysqld_safe --defaults-file=' + gsDir + '/etc/my.cnf &'
         print(cmd_start2)
-        subprocess.Popen(cmd_start2, stdout=subprocess.PIPE, shell=True,
-                         bufsize=4096, stderr=subprocess.PIPE)
+        sub = subprocess.Popen(cmd_start2, stdout=subprocess.PIPE, shell=True,
+                               bufsize=4096, stderr=subprocess.PIPE)
+        sub.wait(5)
 
         sql = "SET PASSWORD = PASSWORD('root'); use mysql; flush privileges;\
 ALTER USER 'root'@'localhost' PASSWORD EXPIRE NEVER ;\
@@ -459,13 +465,10 @@ flush privileges;"
             "/etc/my.cnf --connect-expired-password -uroot -proot123 < " + sql_file_path
         mw.execShell(cmd_init_two)
 
-        # cmd_init_stop = gsDir + \
-        #     "/bin/mysqladmin --defaults-file=" + gsDir + "/etc/my.cnf -uroot -proot shutdown"
+        cmd_init_stop = gsDir + \
+            "/bin/mysqladmin --defaults-file=" + gsDir + "/etc/my.cnf -uroot -proot shutdown"
 
-        # subprocess.Popen(cmd_init_stop, stdout=subprocess.PIPE, shell=True,
-        #                  bufsize=4096, stderr=subprocess.PIPE)
-        # if initData == 0:
-        #     initMysqlPwd()
+        print(mw.execShell(cmd_init_stop))
         return 'ok'
     except Exception as e:
         return str(e)
