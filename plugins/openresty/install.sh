@@ -51,6 +51,10 @@ Install_openresty()
 Uninstall_openresty()
 {
 	rm -rf $serverPath/openresty
+	
+	if [ -f /lib/systemd/system/openresty.service ];then
+		rm -rf /lib/systemd/system/openresty.service
+	fi
 	echo '卸载完成' > $install_tmp
 }
 
