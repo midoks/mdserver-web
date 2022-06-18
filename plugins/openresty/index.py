@@ -202,6 +202,13 @@ def status():
 
 def start():
     file = initDreplace()
+
+    if not mw.isAppleSystem():
+        data = mw.execShell('systemctl start openresty')
+        if data[1] == '':
+            return 'ok'
+        return 'fail'
+
     data = mw.execShell(file + ' start')
     if data[1] == '':
         return 'ok'
@@ -210,6 +217,13 @@ def start():
 
 def stop():
     file = initDreplace()
+
+    if not mw.isAppleSystem():
+        data = mw.execShell('systemctl stop openresty')
+        if data[1] == '':
+            return 'ok'
+        return 'fail'
+
     data = mw.execShell(file + ' stop')
     clearTemp()
     if data[1] == '':
@@ -219,6 +233,13 @@ def stop():
 
 def restart():
     file = initDreplace()
+
+    if not mw.isAppleSystem():
+        data = mw.execShell('systemctl restart openresty')
+        if data[1] == '':
+            return 'ok'
+        return 'fail'
+
     data = mw.execShell(file + ' restart')
     if data[1] == '':
         return 'ok'
@@ -227,6 +248,13 @@ def restart():
 
 def reload():
     file = initDreplace()
+
+    if not mw.isAppleSystem():
+        data = mw.execShell('systemctl reload openresty')
+        if data[1] == '':
+            return 'ok'
+        return 'fail'
+
     data = mw.execShell(file + ' reload')
     if data[1] == '':
         return 'ok'
