@@ -444,6 +444,7 @@ def my57cmd(version, method):
         mw.execShell(cmd_kill)
 
         cmd_start2 = gsDir + '/bin/mysqld_safe --defaults-file=' + gsDir + '/etc/my.cnf &'
+        print(cmd_start2)
         subprocess.Popen(cmd_start2, stdout=subprocess.PIPE, shell=True,
                          bufsize=4096, stderr=subprocess.PIPE)
 
