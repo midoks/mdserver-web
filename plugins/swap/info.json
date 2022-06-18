@@ -4,7 +4,7 @@
 	"name": "swap",
 	"title": "swap",
 	"shell": "install.sh",
-	"versions":"1.0",
+	"versions":"1.1",
 	"tip": "soft",
 	"checks": "server/swap",
 	"path": "server/swap",

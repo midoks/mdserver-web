@@ -31,11 +31,6 @@ def getInitDFile():
     return '/etc/init.d/' + getPluginName()
 
 
-def getConf():
-    path = getPluginDir() + "/config/redis.conf"
-    return path
-
-
 def getInitDTpl():
     path = getPluginDir() + "/init.d/" + getPluginName() + ".tpl"
     return path
@@ -81,10 +76,25 @@ def initDreplace():
     file_bin = initD_path + '/' + getPluginName()
 
     # initd replace
-    content = mw.readFile(file_tpl)
-    content = content.replace('{$SERVER_PATH}', '/swapfile')
-    mw.writeFile(file_bin, content)
-    mw.execShell('chmod +x ' + file_bin)
+    if not os.path.exists(file_bin):
+        content = mw.readFile(file_tpl)
+        content = content.replace(
+            '{$SERVER_PATH}', getServerDir() + '/swap/swapfile')
+        mw.writeFile(file_bin, content)
+        mw.execShell('chmod +x ' + file_bin)
+
+    # systemd
+    systemDir = '/lib/systemd/system'
+    systemService = systemDir + '/swap.service'
+    systemServiceTpl = getPluginDir() + '/init.d/swap.service.tpl'
+    if os.path.exists(systemDir) and not os.path.exists(systemService):
+        swapon_bin = mw.execShell('which swapon')[0].strip()
+        service_path = mw.getServerDir()
+        se_content = mw.readFile(systemServiceTpl)
+        se_content = se_content.replace('{$SERVER_PATH}', service_path)
+        se_content = se_content.replace('{$SWAPON_BIN}', swapon_bin)
+        mw.writeFile(systemService, se_content)
+        mw.execShell('systemctl daemon-reload')
 
     return file_bin
 
