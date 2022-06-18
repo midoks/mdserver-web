@@ -101,70 +101,65 @@ def initDreplace():
     return file_bin
 
 
-def start():
+def swapOp(method):
     file = initDreplace()
+
+    if not mw.isAppleSystem():
+        data = mw.execShell('systemctl ' + method + ' swap')
+        if data[1] == '':
+            return 'ok'
+        return 'fail'
+
     data = mw.execShell(file + ' start')
     if data[1] == '':
         return 'ok'
     return 'fail'
 
 
+def start():
+    return swapOp('start')
+
+
 def stop():
-    file = initDreplace()
-    data = mw.execShell(file + ' stop')
-    if data[1] == '':
-        return 'ok'
-    return 'fail'
+    return swapOp('stop')
 
 
 def restart():
-    file = initDreplace()
-    data = mw.execShell(file + ' restart')
-    if data[1] == '':
-        return 'ok'
-    return 'fail'
+    return swapOp('restart')
 
 
 def reload():
-    file = initDreplace()
-    data = mw.execShell(file + ' reload')
-    if data[1] == '':
-        return 'ok'
-    return 'fail'
+    return swapOp('reload')
 
 
 def initdStatus():
-    if not app_debug:
-        if mw.isAppleSystem():
-            return "Apple Computer does not support"
-    initd_bin = getInitDFile()
-    if os.path.exists(initd_bin):
-        return 'ok'
-    return 'fail'
+    if mw.isAppleSystem():
+        return "Apple Computer does not support"
+
+    shell_cmd = 'systemctl status swap | grep loaded | grep "enabled;"'
+    data = mw.execShell(shell_cmd)
+    if data[0] == '':
+        return 'fail'
+    return 'ok'
 
 
 def initdInstall():
-    import shutil
-    if not app_debug:
-        if mw.isAppleSystem():
-            return "Apple Computer does not support"
+    if mw.isAppleSystem():
+        return "Apple Computer does not support"
 
-    source_bin = initDreplace()
-    initd_bin = getInitDFile()
-    shutil.copyfile(source_bin, initd_bin)
-    mw.execShell('chmod +x ' + initd_bin)
-    mw.execShell('chkconfig --add ' + getPluginName())
+    data = mw.execShell('systemctl enable swap')
+    if data[0] == '':
+        return 'fail'
     return 'ok'
 
 
 def initdUinstall():
-    if not app_debug:
-        if mw.isAppleSystem():
-            return "Apple Computer does not support"
+    if mw.isAppleSystem():
+        return "Apple Computer does not support"
 
-    mw.execShell('chkconfig --del ' + getPluginName())
-    initd_bin = getInitDFile()
-    os.remove(initd_bin)
+    data = mw.execShell('systemctl disable swap')
+    if data[0] == '':
+        return 'fail'
     return 'ok'
 
 if __name__ == "__main__":
