@@ -288,7 +288,7 @@ def initMysql57Data():
     datadir = getDataDir()
     if not os.path.exists(datadir + '/mysql'):
         serverdir = getServerDir()
-        myconf = serverdir + "/my.cnf"
+        myconf = serverdir + "/etc/my.cnf"
         user = pGetDbUser()
         cmd = 'cd ' + serverdir + ' && ./bin/mysqld --defaults-file=' + myconf + \
             ' --initialize --explicit_defaults_for_timestamp'
@@ -423,7 +423,7 @@ def my57cmd(version, method):
         initData = initMysql57Data()
 
         cmd_start1 = gsDir + '/bin/mysqld_safe --defaults-file=' + \
-            gsDir + '/my.cnf --skip-grant-tables &'
+            gsDir + '/etc/my.cnf --skip-grant-tables &'
         subprocess.Popen(cmd_start1, stdout=subprocess.PIPE, shell=True,
                          bufsize=4096, stderr=subprocess.PIPE)
         time.sleep(2)
@@ -436,7 +436,7 @@ def my57cmd(version, method):
         mw.writeFile(sql_file_path, sql)
 
         cmd_init_one = gsDir + "/bin/mysql --defaults-file=" + \
-            gsDir + "/my.cnf -uroot -p' ' < " + sql_file_path
+            gsDir + "/etc/my.cnf -uroot -p' ' < " + sql_file_path
 
         subprocess.Popen(cmd_init_one, stdout=subprocess.PIPE, shell=True,
                          bufsize=4096, stderr=subprocess.PIPE)
@@ -444,7 +444,7 @@ def my57cmd(version, method):
         cmd_kill = "ps -ef|grep mysql |grep -v grep|awk '{print $2}'|xargs kill"
         mw.execShell(cmd_kill)
 
-        cmd_start2 = gsDir + '/bin/mysqld_safe --defaults-file=' + gsDir + '/my.cnf &'
+        cmd_start2 = gsDir + '/bin/mysqld_safe --defaults-file=' + gsDir + '/etc/my.cnf &'
         subprocess.Popen(cmd_start2, stdout=subprocess.PIPE, shell=True,
                          bufsize=4096, stderr=subprocess.PIPE)
 
@@ -455,12 +455,12 @@ flush privileges;"
         mw.writeFile(sql_file_path, sql)
 
         cmd_init_two = gsDir + "/bin/mysql --defaults-file=" + gsDir + \
-            "/my.cnf --connect-expired-password -uroot -proot123 < " + sql_file_path
+            "/etc/my.cnf --connect-expired-password -uroot -proot123 < " + sql_file_path
         subprocess.Popen(cmd_init_two, stdout=subprocess.PIPE, shell=True,
                          bufsize=4096, stderr=subprocess.PIPE)
 
         cmd_init_stop = gsDir + \
-            "/bin/mysqladmin --defaults-file=" + gsDir + "/my.cnf -uroot -proot shutdown"
+            "/bin/mysqladmin --defaults-file=" + gsDir + "/etc/my.cnf -uroot -proot shutdown"
 
         subprocess.Popen(cmd_init_stop, stdout=subprocess.PIPE, shell=True,
                          bufsize=4096, stderr=subprocess.PIPE)
