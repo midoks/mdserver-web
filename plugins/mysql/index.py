@@ -284,6 +284,19 @@ def initMysqlData():
     return 1
 
 
+def initMysql57Data():
+    datadir = getDataDir()
+    if not os.path.exists(datadir + '/mysql'):
+        serverdir = getServerDir()
+        myconf = serverdir + "/my.cnf"
+        user = pGetDbUser()
+        cmd = 'cd ' + serverdir + ' && ./bin/mysqld --defaults-file=' + myconf + \
+            ' --initialize --explicit_defaults_for_timestamp'
+        mw.execShell(cmd)
+        return 0
+    return 1
+
+
 def initMysql8Data():
     datadir = getDataDir()
     if not os.path.exists(datadir + '/mysql'):
@@ -328,13 +341,13 @@ def initMysql8Pwd():
         data = mw.execShell(
             "ps -ef|grep mysql|grep -v grep|grep -v py|grep -v init.d|awk '{print $2}'")
         if data[0] != "":
-            #print("mysql start ok!")
+            # print("mysql start ok!")
             is_start = True
             break
         time.sleep(0.5)
 
     if not is_start:
-        #print("mysql start fail!")
+        # print("mysql start fail!")
         return False
 
     serverdir = getServerDir()
@@ -348,7 +361,8 @@ def initMysql8Pwd():
     if len(password) == 0:
         return True
 
-    #print('localhost', 3306, 'root', password, "/www/server/mysql/mysql.sock")
+    # print('localhost', 3306, 'root', password,
+    # "/www/server/mysql/mysql.sock")
 
     # import MySQLdb as mdb
     # dbconn = mdb.connect(host='localhost', port=3306, user='root',
@@ -399,6 +413,64 @@ def myOp(version, method):
         return str(e)
 
 
+def my57cmd(version, method):
+    init_file = initDreplace()
+    cmd = init_file + ' ' + method
+    gsDir = getServerDir()
+    sql_file_path = "/tmp/tmp_sql57.sql"
+
+    try:
+        initData = initMysql57Data()
+
+        cmd_start1 = gsDir + '/bin/mysqld_safe --defaults-file=' + \
+            gsDir + '/my.cnf --skip-grant-tables &'
+        subprocess.Popen(cmd_start1, stdout=subprocess.PIPE, shell=True,
+                         bufsize=4096, stderr=subprocess.PIPE)
+        time.sleep(2)
+
+        sql = "use mysql;\
+            flush privileges;\
+            ALTER USER 'root'@'localhost' PASSWORD EXPIRE NEVER;\
+            update user set authentication_string = password('root123') where user = 'root';\
+            flush privileges ;"
+        mw.writeFile(sql_file_path, sql)
+
+        cmd_init_one = gsDir + "/bin/mysql --defaults-file=" + \
+            gsDir + "/my.cnf -uroot -p' ' < " + sql_file_path
+
+        subprocess.Popen(cmd_init_one, stdout=subprocess.PIPE, shell=True,
+                         bufsize=4096, stderr=subprocess.PIPE)
+
+        cmd_kill = "ps -ef|grep mysql |grep -v grep|awk '{print $2}'|xargs kill"
+        mw.execShell(cmd_kill)
+
+        cmd_start2 = gsDir + '/bin/mysqld_safe --defaults-file=' + gsDir + '/my.cnf &'
+        subprocess.Popen(cmd_start2, stdout=subprocess.PIPE, shell=True,
+                         bufsize=4096, stderr=subprocess.PIPE)
+
+        sql = "SET PASSWORD = PASSWORD('root'); use mysql; flush privileges;\
+ALTER USER 'root'@'localhost' PASSWORD EXPIRE NEVER ;\
+update user set authentication_string = password('root') where user = 'root' ;\
+flush privileges;"
+        mw.writeFile(sql_file_path, sql)
+
+        cmd_init_two = gsDir + "/bin/mysql --defaults-file=" + gsDir + \
+            "/my.cnf --connect-expired-password -uroot -proot123 < " + sql_file_path
+        subprocess.Popen(cmd_init_two, stdout=subprocess.PIPE, shell=True,
+                         bufsize=4096, stderr=subprocess.PIPE)
+
+        cmd_init_stop = gsDir + \
+            "/bin/mysqladmin --defaults-file=" + gsDir + "/my.cnf -uroot -proot shutdown"
+
+        subprocess.Popen(cmd_init_stop, stdout=subprocess.PIPE, shell=True,
+                         bufsize=4096, stderr=subprocess.PIPE)
+        # if initData == 0:
+        #     initMysqlPwd()
+        return 'ok'
+    except Exception as e:
+        return str(e)
+
+
 def my8cmd(version, method):
     # mysql 8.0 ok
     init_file = initDreplace(version)
@@ -439,8 +511,10 @@ def my8cmd(version, method):
 
 
 def appCMD(version, action):
-    if version == '8.0' or version == '5.7':
+    if version == '8.0':
         return my8cmd(version, action)
+    if version == '5.7':
+        return my57cmd(version, action)
     return myOp(version, action)
 
 
@@ -1485,7 +1559,7 @@ def getMasterStatus(version=''):
 
     db = pMysqlDb()
     dlist = db.query('show slave status')
-    #print(dlist, len(dlist))
+    # print(dlist, len(dlist))
     if len(dlist) > 0 and (dlist[0][10] == 'Yes' or dlist[0][11] == 'Yes'):
         data['slave_status'] = True
 
