@@ -451,18 +451,18 @@ def my57cmd(version, method):
 ALTER USER 'root'@'localhost' PASSWORD EXPIRE NEVER ;\
 update user set authentication_string = password('root') where user = 'root' ;\
 flush privileges;"
+        print(sql)
         mw.writeFile(sql_file_path, sql)
 
         cmd_init_two = gsDir + "/bin/mysql --defaults-file=" + gsDir + \
             "/etc/my.cnf --connect-expired-password -uroot -proot123 < " + sql_file_path
-        subprocess.Popen(cmd_init_two, stdout=subprocess.PIPE, shell=True,
-                         bufsize=4096, stderr=subprocess.PIPE)
+        mw.execShell(cmd_init_two)
 
-        cmd_init_stop = gsDir + \
-            "/bin/mysqladmin --defaults-file=" + gsDir + "/etc/my.cnf -uroot -proot shutdown"
+        # cmd_init_stop = gsDir + \
+        #     "/bin/mysqladmin --defaults-file=" + gsDir + "/etc/my.cnf -uroot -proot shutdown"
 
-        subprocess.Popen(cmd_init_stop, stdout=subprocess.PIPE, shell=True,
-                         bufsize=4096, stderr=subprocess.PIPE)
+        # subprocess.Popen(cmd_init_stop, stdout=subprocess.PIPE, shell=True,
+        #                  bufsize=4096, stderr=subprocess.PIPE)
         # if initData == 0:
         #     initMysqlPwd()
         return 'ok'
