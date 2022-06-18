@@ -441,7 +441,7 @@ def my57cmd(version, method):
         subprocess.Popen(cmd_init_one, stdout=subprocess.PIPE, shell=True,
                          bufsize=4096, stderr=subprocess.PIPE)
 
-        cmd_kill = "ps -ef|grep mysql |grep -v grep|awk '{print $2}'|xargs kill"
+        cmd_kill = "ps -ef|grep mysql |grep -v grep|grep -v py|awk '{print $2}'|xargs kill"
         mw.execShell(cmd_kill)
 
         cmd_start2 = gsDir + '/bin/mysqld_safe --defaults-file=' + gsDir + '/etc/my.cnf &'
