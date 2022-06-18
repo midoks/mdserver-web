@@ -80,9 +80,9 @@ def execShell(cmdstring, cwd=None, timeout=None, shell=True):
         if timeout:
             end_time = datetime.datetime.now() + datetime.timedelta(seconds=timeout)
 
-        sub = subprocess.Popen(cmdstring + ' > ' + logPath + ' 2>&1',
-                               cwd=cwd, stdin=subprocess.PIPE, shell=shell, bufsize=4096)
-
+        cmd = cmdstring + ' > ' + logPath + ' 2>&1'
+        sub = subprocess.Popen(
+            cmd, cwd=cwd, stdin=subprocess.PIPE, shell=shell, bufsize=4096)
         while sub.poll() is None:
             time.sleep(0.1)
 

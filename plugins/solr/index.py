@@ -312,34 +312,34 @@ def scriptIncr():
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
-        print status()
+        print(status())
     elif func == 'start':
-        print start()
+        print(start())
     elif func == 'stop':
-        print stop()
+        print(stop())
     elif func == 'restart':
-        print restart()
+        print(restart())
     elif func == 'reload':
-        print reload()
+        print(reload())
     elif func == 'initd_status':
-        print initdStatus()
+        print(initdStatus())
     elif func == 'initd_install':
-        print initdInstall()
+        print(initdInstall())
     elif func == 'initd_uninstall':
-        print initdUinstall()
+        print(initdUinstall())
     elif func == 'run_log':
-        print getLog()
+        print(getLog())
     elif func == 'collection_list':
-        print collectionList()
+        print(collectionList())
     elif func == 'add_collection':
-        print addCollection()
+        print(addCollection())
     elif func == 'remove_collection':
-        print removeCollection()
+        print(removeCollection())
     elif func == 'conf_file_collection':
-        print confFileCollection()
+        print(confFileCollection())
     elif func == 'script_full':
-        print scriptFull()
+        print(scriptFull())
     elif func == 'script_incr':
-        print scriptIncr()
+        print(scriptIncr())
     else:
         print 'error'
