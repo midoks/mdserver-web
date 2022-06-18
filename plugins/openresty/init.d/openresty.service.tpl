@@ -3,10 +3,12 @@ Description=OpenResty is a dynamic web platform based on NGINX and LuaJIT.
 After=network.target
 
 [Service]
+
+{$SERVER_PATH}
 Type=forking
-ExecStart=/usr/local/open/sbin/nginx -c /usr/local/nginx/conf/nginx.conf
-ExecStop=/usr/local/nginx/sbin/nginx -s stop
-ExecReload=/usr/local/nginx/sbin/nginx -s reload
+ExecStart={$SERVER_PATH}/openresty/bin/openresty -c {$SERVER_PATH}/openresty/nginx/conf/nginx.conf
+ExecStop={$SERVER_PATH}/openresty/bin/openresty -s stop
+ExecReload={$SERVER_PATH}/openresty/bin/openresty -s reload
 KillMode=process
 Restart=on-failure
 
