@@ -413,7 +413,7 @@ def myOp(version, method):
         return str(e)
 
 
-def my57cmd(version, method):
+def my57_bb_cmd(version, method):
     init_file = initDreplace(version)
     cmd = init_file + ' ' + method
     gsDir = getServerDir()
@@ -474,6 +474,45 @@ flush privileges;"
         return str(e)
 
 
+def my57cmd(version, method):
+    # mysql 5.7 ok
+    init_file = initDreplace(version)
+    cmd = init_file + ' ' + method
+    try:
+        initMysql57Data()
+        if not mysql8IsInitedPasswd():
+            setSkipGrantTables(True)
+            cmd_init_start = init_file + ' start'
+            subprocess.Popen(cmd_init_start, stdout=subprocess.PIPE, shell=True,
+                             bufsize=4096, stderr=subprocess.PIPE)
+
+            time.sleep(6)
+            initMysql8Pwd()
+
+            cmd_init_stop = init_file + ' stop'
+            subprocess.Popen(cmd_init_stop, stdout=subprocess.PIPE, shell=True,
+                             bufsize=4096, stderr=subprocess.PIPE)
+            setSkipGrantTables(False)
+
+            time.sleep(3)
+            my8cmd(version, method)
+        else:
+            if method == "stop":
+                mw.execShell(cmd)
+                mw.execShell(
+                    "ps -ef|grep mysql|grep -v grep|grep -v py|awk '{print $2}'|xargs kill")
+                return "ok"
+
+            sub = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True,
+                                   bufsize=4096, stderr=subprocess.PIPE)
+            sub.wait(5)
+        return 'ok'
+    except Exception as e:
+        return str(e)
+
+    return 'fail'
+
+
 def my8cmd(version, method):
     # mysql 8.0 ok
     init_file = initDreplace(version)
@@ -508,7 +547,7 @@ def my8cmd(version, method):
             sub.wait(5)
         return 'ok'
     except Exception as e:
-        print(e)
+        return str(e)
 
     return 'fail'
 
