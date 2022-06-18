@@ -6,7 +6,7 @@
 为了兼容CentOS,Ubuntu,Debian,Fedora, 由chkconfig改systemd管理。原来都要重新安装。还在进行修改..
 
 chkconfig 支持 Fedora,CentOS
-systemd 支持 CentOS,Ubuntu,Debian,Fedora.
+systemd 支持 CentOS,Ubuntu,Debian,Fedora...
 
 ```
 
