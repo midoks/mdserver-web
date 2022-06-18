@@ -287,8 +287,6 @@ if [ "$OSNAME" == "macos" ]; then
 
 elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     
-
-    apt install -y libcurl4-gnutls-dev
     apt install -y devscripts
 
     apt install -y libffi-dev
@@ -313,7 +311,6 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     apt install -y gcc build-essential libssl-dev 
     
     apt install -y curl libcurl4-gnutls-dev
-    
     #https://blog.csdn.net/qq_36228377/article/details/123154344
     ln -s  /usr/include/x86_64-linux-gnu/curl  /usr/include/curl
 
@@ -321,7 +318,7 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     apt install -y libsqlite3-dev
     apt install -y libonig-dev
 
-    apt install -y perl g++ libtool unzip    
+    apt install -y perl g++ libtool    
     apt install -y libxslt1-dev
 
     apt install -y libmariadb-dev
