@@ -3,7 +3,7 @@ Description=Redis In-Memory Data Store
 After=network.target
 
 [Service]
-ExecStart={$SERVER_PATH}/redis/redis-server {$SERVER_PATH}/redis/redis.conf
+ExecStart={$SERVER_PATH}/redis/bin/redis-server {$SERVER_PATH}/redis/redis.conf
 ExecStop={$SERVER_PATH}/redis/redis-cli shutdown
 Restart=always
 
