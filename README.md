@@ -2,6 +2,14 @@
 简单的Linux面板,感谢BT.CN写出如此好的web管理软件。我一看到，就知道这是我一直想要的页面化管理方式。
 复制了后台管理界面，按照自己想要的方式写了一版。
 
+```
+为了兼容CentOS,Ubuntu,Debian,Fedora, 由chkconfig改systemd管理。原来都要重新安装。还在进行修改..
+
+chkconfig 支持 Fedora,CentOS
+systemd 支持 CentOS,Ubuntu,Debian,Fedora.
+
+```
+
 ![CentOS](https://img.shields.io/badge/LINUX-CentOS-blue?style=for-the-badge&logo=CentOS)
 ![Ubuntu](https://img.shields.io/badge/LINUX-Ubuntu-blue?style=for-the-badge&logo=Ubuntu)
 ![Debian](https://img.shields.io/badge/LINUX-Debian-blue?style=for-the-badge&logo=Debian)
