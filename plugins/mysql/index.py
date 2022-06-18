@@ -384,7 +384,7 @@ def initMysql8Pwd():
     return True
 
 
-def myOp(method):
+def myOp(version, method):
     # import commands
     init_file = initDreplace()
     cmd = init_file + ' ' + method
@@ -439,9 +439,9 @@ def my8cmd(version, method):
 
 
 def appCMD(version, action):
-    if version == '8.0':
+    if version == '8.0' or version == '5.7':
         return my8cmd(version, action)
-    return myOp(action)
+    return myOp(version, action)
 
 
 def start(version=''):
