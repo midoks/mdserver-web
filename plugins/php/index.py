@@ -290,7 +290,7 @@ def initdStatus(version):
     if mw.isAppleSystem():
         return "Apple Computer does not support"
 
-    shell_cmd = 'systemctl status ' + version + ' | grep loaded | grep "enabled;"'
+    shell_cmd = 'systemctl status php' + version + ' | grep loaded | grep "enabled;"'
     data = mw.execShell(shell_cmd)
     if data[0] == '':
         return 'fail'
