@@ -304,7 +304,6 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     apt install -y libgmp-dev libgmp3-dev libreadline-dev libxpm-dev
     apt install -y zlib1g-dev dia pkg-config  
     apt install -y libjpeg62-turbo-dev libjpeg-dev libpng-dev
-    apt install -y libfreetype-dev
     apt install -y libfreetype6
     apt install -y libfreetype6-dev
     apt install -y libevent-dev libncurses5-dev libldap2-dev
