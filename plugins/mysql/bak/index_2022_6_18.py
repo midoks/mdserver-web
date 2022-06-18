@@ -284,6 +284,19 @@ def initMysqlData():
     return 1
 
 
+def initMysql57Data():
+    datadir = getDataDir()
+    if not os.path.exists(datadir + '/mysql'):
+        serverdir = getServerDir()
+        myconf = serverdir + "/etc/my.cnf"
+        user = pGetDbUser()
+        cmd = 'cd ' + serverdir + ' && ./bin/mysqld --defaults-file=' + myconf + \
+            ' --initialize --explicit_defaults_for_timestamp'
+        mw.execShell(cmd)
+        return 0
+    return 1
+
+
 def initMysql8Data():
     datadir = getDataDir()
     if not os.path.exists(datadir + '/mysql'):
@@ -328,13 +341,13 @@ def initMysql8Pwd():
         data = mw.execShell(
             "ps -ef|grep mysql|grep -v grep|grep -v py|grep -v init.d|awk '{print $2}'")
         if data[0] != "":
-            #print("mysql start ok!")
+            # print("mysql start ok!")
             is_start = True
             break
         time.sleep(0.5)
 
     if not is_start:
-        #print("mysql start fail!")
+        # print("mysql start fail!")
         return False
 
     serverdir = getServerDir()
@@ -348,7 +361,8 @@ def initMysql8Pwd():
     if len(password) == 0:
         return True
 
-    #print('localhost', 3306, 'root', password, "/www/server/mysql/mysql.sock")
+    # print('localhost', 3306, 'root', password,
+    # "/www/server/mysql/mysql.sock")
 
     # import MySQLdb as mdb
     # dbconn = mdb.connect(host='localhost', port=3306, user='root',
@@ -400,11 +414,16 @@ def myOp(version, method):
 
 
 def my8cmd(version, method):
-    # mysql 8.0 ok
+    # mysql 8.0  and 5.7 ok
     init_file = initDreplace(version)
     cmd = init_file + ' ' + method
-    try:
+
+    if version == '5.7':
+        initMysql57Data()
+    elif version == '8.0':
         initMysql8Data()
+    try:
+
         if not mysql8IsInitedPasswd():
             setSkipGrantTables(True)
             cmd_init_start = init_file + ' start'
@@ -433,13 +452,13 @@ def my8cmd(version, method):
             sub.wait(5)
         return 'ok'
     except Exception as e:
-        print(e)
+        return str(e)
 
     return 'fail'
 
 
 def appCMD(version, action):
-    if version == '8.0':
+    if version == '8.0' or version == '5.7':
         return my8cmd(version, action)
     return myOp(version, action)
 
@@ -1485,7 +1504,7 @@ def getMasterStatus(version=''):
 
     db = pMysqlDb()
     dlist = db.query('show slave status')
-    #print(dlist, len(dlist))
+    # print(dlist, len(dlist))
     if len(dlist) > 0 and (dlist[0][10] == 'Yes' or dlist[0][11] == 'Yes'):
         data['slave_status'] = True
 

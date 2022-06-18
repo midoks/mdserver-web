@@ -168,6 +168,17 @@ def initDreplace(version=''):
         content = contentReplace(content)
         mw.writeFile(mysql_conf, content)
 
+    # systemd
+    systemDir = '/lib/systemd/system'
+    systemService = systemDir + '/mysql.service'
+    systemServiceTpl = getPluginDir() + '/init.d/mysql.service.tpl'
+    if os.path.exists(systemDir) and not os.path.exists(systemService):
+        service_path = mw.getServerDir()
+        se_content = mw.readFile(systemServiceTpl)
+        se_content = se_content.replace('{$SERVER_PATH}', service_path)
+        mw.writeFile(systemService, se_content)
+        mw.execShell('systemctl daemon-reload')
+
     if mw.getOs() != 'darwin':
         mw.execShell('chown -R mysql mysql ' + getServerDir())
     return file_bin
@@ -484,33 +495,26 @@ def initdStatus():
         if mw.isAppleSystem():
             return "Apple Computer does not support"
 
-    initd_bin = getInitDFile()
-    if os.path.exists(initd_bin):
-        return 'ok'
-    return 'fail'
+    shell_cmd = 'systemctl status mysql | grep loaded | grep "enabled;"'
+    data = mw.execShell(shell_cmd)
+    if data[0] == '':
+        return 'fail'
+    return 'ok'
 
 
 def initdInstall():
-    import shutil
-    if not app_debug:
-        if mw.isAppleSystem():
-            return "Apple Computer does not support"
+    if mw.isAppleSystem():
+        return "Apple Computer does not support"
 
-    mysql_bin = initDreplace()
-    initd_bin = getInitDFile()
-    shutil.copyfile(mysql_bin, initd_bin)
-    mw.execShell('chmod +x ' + initd_bin)
-    mw.execShell('chkconfig --add ' + getPluginName())
+    mw.execShell('systemctl enable mysql')
     return 'ok'
 
 
 def initdUinstall():
-    if not app_debug:
-        if mw.isAppleSystem():
-            return "Apple Computer does not support"
-    mw.execShell('chkconfig --del ' + getPluginName())
-    initd_bin = getInitDFile()
-    os.remove(initd_bin)
+    if mw.isAppleSystem():
+        return "Apple Computer does not support"
+
+    mw.execShell('systemctl disable mysql')
     return 'ok'
 
 
