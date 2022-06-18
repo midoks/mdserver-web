@@ -1,5 +1,5 @@
 [Unit]
-Description=MySQL Server
+Description=MySQL Community Server
 Documentation=man:mysqld(8)
 Documentation=http://dev.mysql.com/doc/refman/en/using-systemd.html
 After=network.service
