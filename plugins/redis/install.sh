@@ -35,6 +35,10 @@ Install_redis()
 Uninstall_redis()
 {
 	rm -rf $serverPath/redis
+
+	if [ -f /lib/systemd/system/redis.service ];then
+		rm -rf /lib/systemd/system/redis.service
+	fi
 	echo "Uninstall_redis" > $install_tmp
 }
 
