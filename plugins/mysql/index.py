@@ -413,112 +413,17 @@ def myOp(version, method):
         return str(e)
 
 
-def my57_bb_cmd(version, method):
-    init_file = initDreplace(version)
-    cmd = init_file + ' ' + method
-    gsDir = getServerDir()
-    sql_file_path = "/tmp/tmp_sql57.sql"
-
-    try:
-        initData = initMysql57Data()
-        # if not mysql8IsInitedPasswd():
-        cmd_start1 = gsDir + '/bin/mysqld_safe --defaults-file=' + \
-            gsDir + '/etc/my.cnf --skip-grant-tables &'
-        sub = subprocess.Popen(cmd_start1, stdout=subprocess.PIPE, shell=True,
-                               bufsize=4096, stderr=subprocess.PIPE)
-        sub.wait(5)
-
-        sql = "use mysql;\
-            flush privileges;\
-            ALTER USER 'root'@'localhost' PASSWORD EXPIRE NEVER;\
-            update user set authentication_string = password('root123') where user = 'root';\
-            flush privileges;"
-        mw.writeFile(sql_file_path, sql)
-
-        cmd_init_one = gsDir + "/bin/mysql --defaults-file=" + \
-            gsDir + "/etc/my.cnf -uroot -p' ' < " + sql_file_path
-
-        data = mw.execShell(cmd_init_one)
-        if data[1].find("ERROR") != -1:
-            return 'init[1] passowrd error!'
-
-        # mw.writeFile(serverdir + "/data/error.log", "")
-        # os.remove(tmp_file)
-
-        cmd_kill = "ps -ef|grep mysql |grep -v grep|grep -v py|awk '{print $2}'|xargs kill"
-        mw.execShell(cmd_kill)
-
-        cmd_start2 = gsDir + '/bin/mysqld_safe --defaults-file=' + gsDir + '/etc/my.cnf &'
-        print(cmd_start2)
-        sub = subprocess.Popen(cmd_start2, stdout=subprocess.PIPE, shell=True,
-                               bufsize=4096, stderr=subprocess.PIPE)
-        sub.wait(5)
-
-        sql = "SET PASSWORD = PASSWORD('root'); use mysql; flush privileges;\
-ALTER USER 'root'@'localhost' PASSWORD EXPIRE NEVER ;\
-update user set authentication_string = password('root') where user = 'root' ;\
-flush privileges;"
-        print(sql)
-        mw.writeFile(sql_file_path, sql)
-
-        cmd_init_two = gsDir + "/bin/mysql --defaults-file=" + gsDir + \
-            "/etc/my.cnf --connect-expired-password -uroot -proot123 < " + sql_file_path
-        mw.execShell(cmd_init_two)
-
-        cmd_init_stop = gsDir + \
-            "/bin/mysqladmin --defaults-file=" + gsDir + "/etc/my.cnf -uroot -proot shutdown"
-
-        print(mw.execShell(cmd_init_stop))
-        return 'ok'
-    except Exception as e:
-        return str(e)
-
-
-def my57cmd(version, method):
-    # mysql 5.7 ok
-    init_file = initDreplace(version)
-    cmd = init_file + ' ' + method
-    try:
-        initMysql57Data()
-        if not mysql8IsInitedPasswd():
-            setSkipGrantTables(True)
-            cmd_init_start = init_file + ' start'
-            subprocess.Popen(cmd_init_start, stdout=subprocess.PIPE, shell=True,
-                             bufsize=4096, stderr=subprocess.PIPE)
-
-            time.sleep(6)
-            initMysql8Pwd()
-
-            cmd_init_stop = init_file + ' stop'
-            subprocess.Popen(cmd_init_stop, stdout=subprocess.PIPE, shell=True,
-                             bufsize=4096, stderr=subprocess.PIPE)
-            setSkipGrantTables(False)
-
-            time.sleep(3)
-            my8cmd(version, method)
-        else:
-            if method == "stop":
-                mw.execShell(cmd)
-                mw.execShell(
-                    "ps -ef|grep mysql|grep -v grep|grep -v py|awk '{print $2}'|xargs kill")
-                return "ok"
-
-            sub = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True,
-                                   bufsize=4096, stderr=subprocess.PIPE)
-            sub.wait(5)
-        return 'ok'
-    except Exception as e:
-        return str(e)
-
-    return 'fail'
-
-
 def my8cmd(version, method):
-    # mysql 8.0 ok
+    # mysql 8.0  and 5.7 ok
     init_file = initDreplace(version)
     cmd = init_file + ' ' + method
-    try:
+
+    if version == '5.7':
+        initMysql57Data()
+    elif version == '8.0':
         initMysql8Data()
+    try:
+
         if not mysql8IsInitedPasswd():
             setSkipGrantTables(True)
             cmd_init_start = init_file + ' start'
@@ -553,10 +458,8 @@ def my8cmd(version, method):
 
 
 def appCMD(version, action):
-    if version == '8.0':
+    if version == '8.0' or version == '5.7':
         return my8cmd(version, action)
-    if version == '5.7':
-        return my57cmd(version, action)
     return myOp(version, action)
 
 
