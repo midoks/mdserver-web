@@ -83,51 +83,66 @@ def initDreplace():
     file_bin = initD_path + '/' + getPluginName()
 
     # initd replace
-    content = mw.readFile(file_tpl)
-    content = content.replace('{$SERVER_PATH}', service_path)
-    mw.writeFile(file_bin, content)
-    mw.execShell('chmod +x ' + file_bin)
+    if not os.path.exists(file_bin):
+        content = mw.readFile(file_tpl)
+        content = content.replace('{$SERVER_PATH}', service_path)
+        mw.writeFile(file_bin, content)
+        mw.execShell('chmod +x ' + file_bin)
 
     # config replace
-    conf_content = mw.readFile(getConfTpl())
-    conf_content = conf_content.replace('{$SERVER_PATH}', service_path)
-    mw.writeFile(getServerDir() + '/redis.conf', conf_content)
+    dst_conf = getServerDir() + '/redis.conf'
+    if not os.path.exists(dst_conf):
+        conf_content = mw.readFile(getConfTpl())
+        conf_content = conf_content.replace('{$SERVER_PATH}', service_path)
+        mw.writeFile(dst_conf, conf_content)
+
+    # systemd
+    systemDir = '/lib/systemd/system'
+    systemService = systemDir + '/redis.service'
+    systemServiceTpl = getPluginDir() + '/init.d/redis.service.tpl'
+    if os.path.exists(systemDir) and not os.path.exists(systemService):
+        service_path = mw.getServerDir()
+        se_content = mw.readFile(systemServiceTpl)
+        se_content = se_content.replace('{$SERVER_PATH}', service_path)
+        mw.writeFile(systemService, se_content)
+        mw.execShell('systemctl daemon-reload')
 
     return file_bin
 
 
-def start():
+def redisOp(method):
     file = initDreplace()
+
+    if not mw.isAppleSystem():
+        data = mw.execShell('systemctl ' + method + ' redis')
+        if data[1] == '':
+            return 'ok'
+        return 'fail'
+
     data = mw.execShell(file + ' start')
     if data[1] == '':
         return 'ok'
     return 'fail'
 
 
+def start():
+    return redisOp('start')
+
+
 def stop():
-    file = initDreplace()
-    data = mw.execShell(file + ' stop')
-    if data[1] == '':
-        return 'ok'
-    return 'fail'
+    return redisOp('stop')
 
 
 def restart():
-    file = initDreplace()
-    data = mw.execShell(file + ' restart')
-    log_file = getServerDir() + "/data/redis.log"
+    status = redisOp('restart')
+
+    log_file = runLog()
     mw.execShell("echo '' > " + log_file)
-    if data[1] == '':
-        return 'ok'
-    return 'fail'
+    return status
 
 
 def reload():
-    file = initDreplace()
-    data = mw.execShell(file + ' reload')
-    if data[1] == '':
-        return 'ok'
-    return 'fail'
+    return redisOp('reload')
 
 
 def runInfo():
@@ -161,37 +176,30 @@ def runInfo():
 
 
 def initdStatus():
-    if not app_debug:
-        if mw.isAppleSystem():
-            return "Apple Computer does not support"
-    initd_bin = getInitDFile()
-    if os.path.exists(initd_bin):
-        return 'ok'
-    return 'fail'
+    if mw.isAppleSystem():
+        return "Apple Computer does not support"
+
+    shell_cmd = 'systemctl status redis | grep loaded | grep "enabled;"'
+    data = mw.execShell(shell_cmd)
+    if data[0] == '':
+        return 'fail'
+    return 'ok'
 
 
 def initdInstall():
-    import shutil
-    if not app_debug:
-        if mw.isAppleSystem():
-            return "Apple Computer does not support"
+    if mw.isAppleSystem():
+        return "Apple Computer does not support"
 
-    source_bin = initDreplace()
-    initd_bin = getInitDFile()
-    shutil.copyfile(source_bin, initd_bin)
-    mw.execShell('chmod +x ' + initd_bin)
-    mw.execShell('chkconfig --add ' + getPluginName())
+    mw.execShell('systemctl enable redis')
     return 'ok'
 
 
 def initdUinstall():
-    if not app_debug:
-        if mw.isAppleSystem():
-            return "Apple Computer does not support"
 
-    mw.execShell('chkconfig --del ' + getPluginName())
-    initd_bin = getInitDFile()
-    os.remove(initd_bin)
+    if mw.isAppleSystem():
+        return "Apple Computer does not support"
+
+    mw.execShell('systemctl disable redis')
     return 'ok'
 
 
