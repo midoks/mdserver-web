@@ -79,7 +79,7 @@ def initDreplace():
     if not os.path.exists(file_bin):
         content = mw.readFile(file_tpl)
         content = content.replace(
-            '{$SERVER_PATH}', getServerDir() + '/swap/swapfile')
+            '{$SERVER_PATH}', getServerDir() + '/swapfile')
         mw.writeFile(file_bin, content)
         mw.execShell('chmod +x ' + file_bin)
 
@@ -89,10 +89,12 @@ def initDreplace():
     systemServiceTpl = getPluginDir() + '/init.d/swap.service.tpl'
     if os.path.exists(systemDir) and not os.path.exists(systemService):
         swapon_bin = mw.execShell('which swapon')[0].strip()
+        swapoff_bin = mw.execShell('which swapoff')[0].strip()
         service_path = mw.getServerDir()
         se_content = mw.readFile(systemServiceTpl)
         se_content = se_content.replace('{$SERVER_PATH}', service_path)
         se_content = se_content.replace('{$SWAPON_BIN}', swapon_bin)
+        se_content = se_content.replace('{$SWAPOFF_BIN}', swapoff_bin)
         mw.writeFile(systemService, se_content)
         mw.execShell('systemctl daemon-reload')
 

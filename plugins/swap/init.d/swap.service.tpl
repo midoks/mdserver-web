@@ -5,8 +5,10 @@ After=network.target
 
 [Service]
 Type=forking
-ExecStart={$SWAPON_BIN} {$SERVER_PATH}/swap/swapfile
-ExecReload=/bin/kill -USR2 $MAINPID
+ExecStart={$SERVER_PATH}/swap/init.d/swap start
+ExecStop={$SERVER_PATH}/swap/init.d/swap stop
+RemainAfterExit=yes
+
 
 [Install]
 WantedBy=multi-user.target
