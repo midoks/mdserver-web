@@ -362,76 +362,79 @@ function allAddCrontab(dataList,successCount,errorMsg){
 	});
 }
 
-$(".dropdown ul li a").click(function(){
-	var txt = $(this).text();
-	var type = $(this).attr("value");
-	$(this).parents(".dropdown").find("button b").text(txt).attr("val",type);
-	switch(type){
-		case 'day':
-			closeOpt();
-			toHour();
-			toMinute();
-			break;
-		case 'day-n':
-			closeOpt();
-			toWhere1('天');
-			toHour();
-			toMinute();
-			break;
-		case 'hour':
-			closeOpt();
-			toMinute();
-			break;
-		case 'hour-n':
-			closeOpt();
-			toWhere1('小时');
-			toMinute();
-			break;
-		case 'minute-n':
-			closeOpt();
-			toWhere1('分钟');
-			break;
-		case 'week':
-			closeOpt();
-			toWeek();
-			toHour();
-			toMinute();
-			break;
-		case 'month':
-			closeOpt();
-			toWhere1('日');
-			toHour();
-			toMinute();
-			break;
-		case 'toFile':
-			toFile();
-			break;
-		case 'toShell':
-			toShell();
-			$(".controls").html('脚本内容');
-			break;
-		case 'rememory':
-			rememory();
-			$(".controls").html('提示');
-			break;
-		case 'site':
-			toBackup('sites');
-			$(".controls").html('备份网站');
-			break;
-		case 'database':
-			toBackup('databases');
-			$(".controls").html('备份数据库');
-			break;
-		case 'logs':
-			toBackup('logs');
-			$(".controls").html('切割网站');
-			break;
-		case 'toUrl':
-			toUrl();
-			$(".controls").html('URL地址');
-			break;
-	}
-})
+initDropdownMenu();
+function initDropdownMenu(){
+	$(".dropdown ul li a").click(function(){
+		var txt = $(this).text();
+		var type = $(this).attr("value");
+		$(this).parents(".dropdown").find("button b").text(txt).attr("val",type);
+		switch(type){
+			case 'day':
+				closeOpt();
+				toHour();
+				toMinute();
+				break;
+			case 'day-n':
+				closeOpt();
+				toWhere1('天');
+				toHour();
+				toMinute();
+				break;
+			case 'hour':
+				closeOpt();
+				toMinute();
+				break;
+			case 'hour-n':
+				closeOpt();
+				toWhere1('小时');
+				toMinute();
+				break;
+			case 'minute-n':
+				closeOpt();
+				toWhere1('分钟');
+				break;
+			case 'week':
+				closeOpt();
+				toWeek();
+				toHour();
+				toMinute();
+				break;
+			case 'month':
+				closeOpt();
+				toWhere1('日');
+				toHour();
+				toMinute();
+				break;
+			case 'toFile':
+				toFile();
+				break;
+			case 'toShell':
+				toShell();
+				$(".controls").html('脚本内容');
+				break;
+			case 'rememory':
+				rememory();
+				$(".controls").html('提示');
+				break;
+			case 'site':
+				toBackup('sites');
+				$(".controls").html('备份网站');
+				break;
+			case 'database':
+				toBackup('databases');
+				$(".controls").html('备份数据库');
+				break;
+			case 'logs':
+				toBackup('logs');
+				$(".controls").html('切割网站');
+				break;
+			case 'toUrl':
+				toUrl();
+				$(".controls").html('URL地址');
+				break;
+		}
+	});
+}
 
 
 //备份
@@ -586,84 +589,87 @@ function editTaskInfo(id){
 				shadeClose:false,
 				closeBtn:2,
 				content:'<div class="setting-con ptb20">\
-								<div class="clearfix plan ptb10">\
-									<span class="typename c4 pull-left f14 text-right mr20">任务类型</span>\
-									<div class="dropdown stype_list pull-left mr20">\
-										<button class="btn btn-default dropdown-toggle" type="button" id="excode" data-toggle="dropdown" style="width:auto" disabled="disabled">\
-											<b val="'+ obj.from.type +'">'+ sTypeName +'</b>\
+							<div class="clearfix plan ptb10">\
+								<span class="typename c4 pull-left f14 text-right mr20">任务类型</span>\
+								<div class="dropdown stype_list pull-left mr20">\
+									<button class="btn btn-default dropdown-toggle" type="button" id="excode" data-toggle="dropdown" style="width:auto" disabled="disabled">\
+										<b val="'+ obj.from.type +'">'+ sTypeName +'</b>\
+										<span class="caret"></span>\
+									</button>\
+									<ul class="dropdown-menu" role="menu" aria-labelledby="sType">'+ sTypeDom +'</ul>\
+								</div>\
+							</div>\
+							<div class="clearfix plan ptb10">\
+								<span class="typename c4 pull-left f14 text-right mr20">任务名称</span>\
+								<div class="planname pull-left"><input type="text" name="name" class="bt-input-text sName_create" value="'+ obj.from.name +'"></div>\
+							</div>\
+							<div class="clearfix plan ptb10">\
+								<span class="typename c4 pull-left f14 text-right mr20">执行周期</span>\
+								<div class="dropdown  pull-left mr20">\
+									<button class="btn btn-default dropdown-toggle cycle_btn" type="button" data-toggle="dropdown" style="width:94px">\
+										<b val="'+ obj.from.stype +'">'+ cycleName +'</b>\
+										<span class="caret"></span>\
+									</button>\
+									<ul class="dropdown-menu" role="menu" aria-labelledby="cycle">'+ cycleDom +'</ul>\
+								</div>\
+								<div class="pull-left optional_week">\
+									<div class="dropdown week_btn pull-left mr20" style="display:'+ (obj.from.type == "week"  ?'block;':'none') +'">\
+										<button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" >\
+											<b val="'+ obj.from.week +'">'+ weekName +'</b> \
 											<span class="caret"></span>\
 										</button>\
-										<ul class="dropdown-menu" role="menu" aria-labelledby="sType">'+ sTypeDom +'</ul>\
+										<ul class="dropdown-menu" role="menu" aria-labelledby="week">'+ weekDom +'</ul>\
 									</div>\
+									<div class="plan_hms pull-left mr20 bt-input-text where1_input" style="display:'+ (obj.from.type == "day-n" || obj.from.type == 'month' ?'block;':'none') +'"><span><input type="number" name="where1" class="where1_create" value="'+obj.from.where1 +'" maxlength="2" max="23" min="0"></span> <span class="name">日</span> </div>\
+									<div class="plan_hms pull-left mr20 bt-input-text hour_input" style="display:'+ (obj.from.type == "day" || obj.from.type == 'day-n' || obj.from.type == 'hour-n' || obj.from.type == 'week' || obj.from.type == 'month'?'block;':'none') +'"><span><input type="number" name="hour" class="hour_create" value="'+ ( obj.from.type == 'hour-n' ? obj.from.where1 : obj.from.hour ) +'" maxlength="2" max="23" min="0"></span> <span class="name">时</span> </div>\
+									<div class="plan_hms pull-left mr20 bt-input-text minute_input"><span><input type="number" name="minute" class="minute_create" value="'+ (obj.from.type == 'minute-n' ? obj.from.where1 : obj.from.minute)+'" maxlength="2" max="59" min="0"></span> <span class="name">分</span> </div>\
 								</div>\
-								<div class="clearfix plan ptb10">\
-									<span class="typename c4 pull-left f14 text-right mr20">任务名称</span>\
-									<div class="planname pull-left"><input type="text" name="name" class="bt-input-text sName_create" value="'+ obj.from.name +'"></div>\
+							</div>\
+							<div class="clearfix plan ptb10 site_list" style="display:none">\
+								<span class="typename controls c4 pull-left f14 text-right mr20">'+ sTypeName  +'</span>\
+								<div style="line-height:34px"><div class="dropdown pull-left mr20 sName_btn" style="display:'+ (obj.from.sType != "path"?'block;':'none') +'">\
+									<button class="btn btn-default dropdown-toggle" type="button"  data-toggle="dropdown" style="width:auto" disabled="disabled">\
+										<b id="sName" val="'+ obj.from.sname +'">'+ sNameName +'</b>\
+										<span class="caret"></span>\
+									</button>\
+									<ul class="dropdown-menu" role="menu" aria-labelledby="sName">'+ sNameDom +'</ul>\
 								</div>\
-								<div class="clearfix plan ptb10">\
-									<span class="typename c4 pull-left f14 text-right mr20">执行周期</span>\
+								<div class="info-r" style="float: left;margin-right: 25px;display:'+ (obj.from.sType == "path"?'block;':'none') +'">\
+									<input id="inputPath" class="bt-input-text mr5 " type="text" name="path" value="'+ obj.from.sName +'" placeholder="备份目录" style="width:208px;height:33px;" disabled="disabled">\
+								</div>\
+								<div class="textname pull-left mr20">备份到</div>\
 									<div class="dropdown  pull-left mr20">\
-										<button class="btn btn-default dropdown-toggle cycle_btn" type="button" data-toggle="dropdown" style="width:94px">\
-											<b val="'+ obj.from.stype +'">'+ cycleName +'</b>\
+										<button class="btn btn-default dropdown-toggle backup_btn" type="button"  data-toggle="dropdown" style="width:auto;">\
+											<b val="'+ obj.from.backup_to +'">'+ backupsName +'</b>\
 											<span class="caret"></span>\
 										</button>\
-										<ul class="dropdown-menu" role="menu" aria-labelledby="cycle">'+ cycleDom +'</ul>\
+										<ul class="dropdown-menu" role="menu" aria-labelledby="backupTo">'+ backupsDom +'</ul>\
 									</div>\
-									<div class="pull-left optional_week">\
-										<div class="dropdown week_btn pull-left mr20" style="display:'+ (obj.from.type == "week"  ?'block;':'none') +'">\
-											<button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" >\
-												<b val="'+ obj.from.week +'">'+ weekName +'</b> \
-												<span class="caret"></span>\
-											</button>\
-											<ul class="dropdown-menu" role="menu" aria-labelledby="week">'+ weekDom +'</ul>\
-										</div>\
-										<div class="plan_hms pull-left mr20 bt-input-text where1_input" style="display:'+ (obj.from.type == "day-n" || obj.from.type == 'month' ?'block;':'none') +'"><span><input type="number" name="where1" class="where1_create" value="'+obj.from.where1 +'" maxlength="2" max="23" min="0"></span> <span class="name">日</span> </div>\
-										<div class="plan_hms pull-left mr20 bt-input-text hour_input" style="display:'+ (obj.from.type == "day" || obj.from.type == 'day-n' || obj.from.type == 'hour-n' || obj.from.type == 'week' || obj.from.type == 'month'?'block;':'none') +'"><span><input type="number" name="hour" class="hour_create" value="'+ ( obj.from.type == 'hour-n' ? obj.from.where1 : obj.from.hour ) +'" maxlength="2" max="23" min="0"></span> <span class="name">时</span> </div>\
-										<div class="plan_hms pull-left mr20 bt-input-text minute_input"><span><input type="number" name="minute" class="minute_create" value="'+ (obj.from.type == 'minute-n' ? obj.from.where1 : obj.from.minute)+'" maxlength="2" max="59" min="0"></span> <span class="name">分</span> </div>\
+									<div class="textname pull-left mr20">保留最新</div>\
+									<div class="plan_hms pull-left mr20 bt-input-text">\
+										<span><input type="number" name="save" class="save_create" value="'+ obj.from.save +'" maxlength="4" max="100" min="1"></span><span class="name">份</span>\
 									</div>\
 								</div>\
-								<div class="clearfix plan ptb10 site_list" style="display:none">\
-									<span class="typename controls c4 pull-left f14 text-right mr20">'+ sTypeName  +'</span>\
-									<div style="line-height:34px"><div class="dropdown pull-left mr20 sName_btn" style="display:'+ (obj.from.sType != "path"?'block;':'none') +'">\
-										<button class="btn btn-default dropdown-toggle" type="button"  data-toggle="dropdown" style="width:auto" disabled="disabled">\
-											<b id="sName" val="'+ obj.from.sname +'">'+ sNameName +'</b>\
-											<span class="caret"></span>\
-										</button>\
-										<ul class="dropdown-menu" role="menu" aria-labelledby="sName">'+ sNameDom +'</ul>\
-									</div>\
-									<div class="info-r" style="float: left;margin-right: 25px;display:'+ (obj.from.sType == "path"?'block;':'none') +'">\
-										<input id="inputPath" class="bt-input-text mr5 " type="text" name="path" value="'+ obj.from.sName +'" placeholder="备份目录" style="width:208px;height:33px;" disabled="disabled">\
-									</div>\
-									<div class="textname pull-left mr20">备份到</div>\
-										<div class="dropdown  pull-left mr20">\
-											<button class="btn btn-default dropdown-toggle backup_btn" type="button"  data-toggle="dropdown" style="width:auto;">\
-												<b val="'+ obj.from.backup_to +'">'+ backupsName +'</b>\
-												<span class="caret"></span>\
-											</button>\
-											<ul class="dropdown-menu" role="menu" aria-labelledby="backupTo">'+ backupsDom +'</ul>\
-										</div>\
-										<div class="textname pull-left mr20">保留最新</div>\
-										<div class="plan_hms pull-left mr20 bt-input-text">\
-											<span><input type="number" name="save" class="save_create" value="'+ obj.from.save +'" maxlength="4" max="100" min="1"></span><span class="name">份</span>\
-										</div>\
-									</div>\
-								</div>\
-								<div class="clearfix plan ptb10"  style="display:'+ (obj.from.stype == "toShell"?'block;':'none') +'">\
-									<span class="typename controls c4 pull-left f14 text-right mr20">脚本内容</span>\
-									<div style="line-height:34px"><textarea class="txtsjs bt-input-text sBody_create" name="sbody">'+ obj.from.sbody +'</textarea></div>\
-								</div>\
-								<div class="clearfix plan ptb10" style="display:'+ (obj.from.stype == "rememory"?'block;':'none') +'">\
-									<span class="typename controls c4 pull-left f14 text-right mr20">提示</span>\
-									<div style="line-height:34px">释放PHP、MYSQL、PURE-FTPD、APACHE、NGINX的内存占用,建议在每天半夜执行!</div>\
-								</div>\
-								<div class="clearfix plan ptb10" style="display:'+ (obj.from.stype == "toUrl"?'block;':'none') +'">\
-									<span class="typename controls c4 pull-left f14 text-right mr20">URL地址</span>\
-									<div style="line-height:34px"><input type="text" style="width:400px; height:34px" class="bt-input-text url_create" name="urladdress"  placeholder="URL地址" value="'+ obj.from.urladdress +'"></div>\
-								</div>\
-								<div class="clearfix plan ptb10">\
-									<div class="bt-submit plan-submits " style="margin-left: 141px;">保存编辑</div>\
-								</div>\
-							</div>'
+							</div>\
+							<div class="clearfix plan ptb10"  style="display:'+ (obj.from.stype == "toShell"?'block;':'none') +'">\
+								<span class="typename controls c4 pull-left f14 text-right mr20">脚本内容</span>\
+								<div style="line-height:34px"><textarea class="txtsjs bt-input-text sBody_create" name="sbody">'+ obj.from.sbody +'</textarea></div>\
+							</div>\
+							<div class="clearfix plan ptb10" style="display:'+ (obj.from.stype == "rememory"?'block;':'none') +'">\
+								<span class="typename controls c4 pull-left f14 text-right mr20">提示</span>\
+								<div style="line-height:34px">释放PHP、MYSQL、PURE-FTPD、APACHE、NGINX的内存占用,建议在每天半夜执行!</div>\
+							</div>\
+							<div class="clearfix plan ptb10" style="display:'+ (obj.from.stype == "toUrl"?'block;':'none') +'">\
+								<span class="typename controls c4 pull-left f14 text-right mr20">URL地址</span>\
+								<div style="line-height:34px"><input type="text" style="width:400px; height:34px" class="bt-input-text url_create" name="urladdress"  placeholder="URL地址" value="'+ obj.from.urladdress +'"></div>\
+							</div>\
+							<div class="clearfix plan ptb10">\
+								<div class="bt-submit plan-submits " style="margin-left: 141px;">保存编辑</div>\
+							</div>\
+						</div>'
+				,cancel: function(){ 
+				    initDropdownMenu();
+				}
 			});
 			setTimeout(function(){
 				if(obj.from.stype == 'toShell'){
@@ -805,6 +811,7 @@ function editTaskInfo(id){
 						layer.closeAll();
 						getCronData(1);
 						layer.msg(rdata.msg,{icon:rdata.status?1:2});
+						initDropdownMenu();
 					},'json');
 				});
 			},100);
