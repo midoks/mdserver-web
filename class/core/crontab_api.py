@@ -493,6 +493,9 @@ echo "--------------------------------------------------------------------------
             file = '/var/spool/cron/root'
             if mw.isAppleSystem():
                 file = '/etc/crontab'
+
+            if not os.path.exists(file):
+                return False
         else:
             file = u_file
         conf = mw.readFile(file)
