@@ -113,6 +113,10 @@ def initDreplace():
     return True
 
 
+def supOp(method):
+    pass
+
+
 def start():
     initDreplace()
 
@@ -181,9 +185,8 @@ def reload():
 
 
 def initdStatus():
-    if not app_debug:
-        if mw.isAppleSystem():
-            return "Apple Computer does not support"
+    if mw.isAppleSystem():
+        return "Apple Computer does not support"
 
     shell_cmd = 'systemctl status supervisor | grep loaded | grep "enabled;"'
     data = mw.execShell(shell_cmd)

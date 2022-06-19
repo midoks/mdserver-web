@@ -126,8 +126,18 @@ def initDreplace():
         mw.writeFile(file_bin, content)
         mw.execShell('chmod +x ' + file_bin)
 
-    # if os.path.exists('/usr/lib/systemd/system/rsyncd.service'):
-    #     mw.execShell('rm -rf /usr/lib/systemd/system/rsyncd*')
+    # systemd
+    systemDir = '/lib/systemd/system'
+    systemService = systemDir + '/rsyncd.service'
+    systemServiceTpl = getPluginDir() + '/init.d/rsyncd.service.tpl'
+    if os.path.exists(systemDir) and not os.path.exists(systemService):
+        rsync_bin = mw.execShell('which rsync')[0].strip()
+        service_path = mw.getServerDir()
+        se_content = mw.readFile(systemServiceTpl)
+        se_content = se_content.replace('{$SERVER_PATH}', service_path)
+        se_content = se_content.replace('{$RSYNC_BIN}', rsync_bin)
+        mw.writeFile(systemService, se_content)
+        mw.execShell('systemctl daemon-reload')
 
     rlog = getLog()
     if os.path.exists(rlog):
@@ -135,65 +145,53 @@ def initDreplace():
     return file_bin
 
 
-def start():
+def rsyncOp(method)
+
     file = initDreplace()
-    data = mw.execShell(file + ' start')
+    if not mw.isAppleSystem():
+        data = mw.execShell('systemctl ' + method + ' rsyncd')
+        if data[1] == '':
+            return 'ok'
+        return 'fail'
+
+    data = mw.execShell(file + ' ' + method)
     if data[1] == '':
         return 'ok'
     return 'fail'
+
+
+def start():
+    return rsyncOp('start')
 
 
 def stop():
-    file = initDreplace()
-    data = mw.execShell(file + ' stop')
-    if data[1] == '':
-        return 'ok'
-    return 'fail'
+    return rsyncOp('stop')
 
 
 def restart():
-    if mw.isAppleSystem():
-        return "Apple Computer does not support"
-    stop()
-    start()
-    return 'ok'
+    return rsyncOp('restart')
 
 
 def reload():
-    if mw.isAppleSystem():
-        return "Apple Computer does not support"
-
-    # data = mw.execShell('systemctl reload rsyncd.service')
-    # if data[1] == '':
-    #     return 'ok'
-    # return 'fail'
-    stop()
-    start()
-    return 'ok'
+    return rsyncOp('reload')
 
 
 def initdStatus():
-    if not app_debug:
-        if mw.isAppleSystem():
-            return "Apple Computer does not support"
+    if mw.isAppleSystem():
+        return "Apple Computer does not support"
 
-    initd_bin = getInitDFile()
-    if os.path.exists(initd_bin):
-        return 'ok'
-    return 'fail'
+    shell_cmd = 'systemctl status rsyncd | grep loaded | grep "enabled;"'
+    data = mw.execShell(shell_cmd)
+    if data[0] == '':
+        return 'fail'
+    return 'ok'
 
 
 def initdInstall():
-    import shutil
-    if not app_debug:
-        if mw.isAppleSystem():
-            return "Apple Computer does not support"
+    if mw.isAppleSystem():
+        return "Apple Computer does not support"
 
-    p_bin = initDreplace()
-    initd_bin = getInitDFile()
-    shutil.copyfile(p_bin, initd_bin)
-    mw.execShell('chmod +x ' + initd_bin)
-    mw.execShell('chkconfig --add ' + getPluginName())
+    mw.execShell('systemctl enable rsyncd')
     return 'ok'
 
 
@@ -201,9 +199,8 @@ def initdUinstall():
     if not app_debug:
         if mw.isAppleSystem():
             return "Apple Computer does not support"
-    initd_bin = getInitDFile()
-    os.remove(initd_bin)
-    mw.execShell('chkconfig --del ' + getPluginName())
+
+    mw.execShell('systemctl diable rsyncd')
     return 'ok'
 
 
