@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 Type=forking
-ExecStart={$SERVER_PATH}/bin/bin/searchd -c {$SERVER_APP}/sphinx.conf
+ExecStart={$SERVER_PATH}/sphinx/bin/bin/searchd -c {$SERVER_PATH}/sphinx/sphinx.conf
 ExecReload=/bin/kill -USR2 $MAINPID
 Restart=on-failure
 
