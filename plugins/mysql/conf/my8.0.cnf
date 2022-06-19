@@ -77,6 +77,8 @@ innodb_write_io_threads = 1
 innodb_file_per_table=1
 binlog_expire_logs_seconds=2592000
 
+secure-file-priv=/tmp
+
 [mysqldump]
 quick
 

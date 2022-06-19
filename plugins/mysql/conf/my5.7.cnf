@@ -76,6 +76,8 @@ innodb_read_io_threads = 1
 innodb_write_io_threads = 1
 innodb_file_per_table=1
 
+secure-file-priv=/tmp
+
 [mysqldump]
 quick
 
