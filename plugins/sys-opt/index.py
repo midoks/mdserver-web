@@ -104,6 +104,8 @@ def sysConf():
 
 
 def secRunLog():
+    if os.path.exists('/var/log/auth.log'):
+        return '/var/log/auth.log'
     return '/var/log/secure'
 
 
