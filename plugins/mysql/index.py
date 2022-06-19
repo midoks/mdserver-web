@@ -418,7 +418,7 @@ def myOp(version, method):
         if initData == 0:
             initMysqlPwd()
 
-        data = mw.execShell('systemctl ' + method + ' mysql')
+        mw.execShell('systemctl ' + method + ' mysql')
         return 'ok'
     except Exception as e:
         return str(e)
@@ -452,7 +452,7 @@ def my8cmd(version, method):
             time.sleep(3)
             my8cmd(version, method)
         else:
-            data = mw.execShell('systemctl ' + method + ' mysql')
+            mw.execShell('systemctl ' + method + ' mysql')
 
         return 'ok'
     except Exception as e:
