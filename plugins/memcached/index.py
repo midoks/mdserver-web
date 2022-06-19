@@ -135,7 +135,7 @@ def memOp(method):
         data = mw.execShell('systemctl ' + method + ' ' + getPluginName())
         if data[1] == '':
             return 'ok'
-        return 'fail'
+        return data[1]
 
     if data[1] == '':
         return 'ok'
