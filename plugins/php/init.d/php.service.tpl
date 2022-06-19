@@ -9,6 +9,7 @@ After=network.target
 [Service]
 Type=forking
 ExecStart={$SERVER_PATH}/php/{$VERSION}/sbin/php-fpm --daemonize --fpm-config {$SERVER_PATH}/php/{$VERSION}/etc/php-fpm.conf
+ExecStop=/bin/kill -INT $MAINPID
 ExecReload=/bin/kill -USR2 $MAINPID
 PrivateTmp=false
 
