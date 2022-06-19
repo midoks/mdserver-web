@@ -11,15 +11,39 @@ sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 
 
+sysName=`uname`
+echo "use system: ${sysName}"
+
+if [ ${sysName} == "Darwin" ]; then
+	OSNAME='macos'
+elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
+	OSNAME='centos'
+elif grep -Eqi "Fedora" /etc/issue || grep -Eq "Fedora" /etc/*-release; then
+	OSNAME='fedora'
+elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
+	OSNAME='debian'
+elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
+	OSNAME='ubuntu'
+elif grep -Eqi "Raspbian" /etc/issue || grep -Eq "Raspbian" /etc/*-release; then
+	OSNAME='raspbian'
+else
+	OSNAME='unknow'
+fi
+
 CheckJAVA()
 {
-	which "java" > /dev/null
-	if [ $? -eq 0 ]
-	then
+	which java > /dev/null
+	if [ $? -eq 0 ];then
     	echo 'java is exist'
 	else
-    	echo 'java install...'
-    	yum install -y java
+		echo 'java install...'
+		if [ "centos" == "$OSNAME" ] || [ "fedora" == "$OSNAME" ];then
+	    	yum install -y java
+	    elif [ "ubuntu" == "$OSNAME" ] || [ "debian" == "$OSNAME" ] ;then
+	    	snap install openjdk
+		else
+			yum install -y java
+		fi
 	fi
 }
 
@@ -29,7 +53,7 @@ if id solr &> /dev/null ;then
     echo "solr UID is `id -u solr`"
     echo "solr Shell is `grep "^solr:" /etc/passwd |cut -d':' -f7 `"
 else
-	if [ "$sysName" == "Darwin" ];then
+	if [ "$OSNAME" == "macos" ];then
 		echo "mac ..."
 		echo "groupadd solr"
 		echo "useradd -g solr -s /bin/bash solr"
@@ -57,7 +81,7 @@ Install_solr()
 		wget -O ${SOLR_DIR}/mmseg4j-${mmseg_version}.zip https://github.com/midoks/mdserver-web/releases/download/init/mmseg4j-${mmseg_version}.zip
 	fi
 
-	if [ ! -d ${SOLR_DIR}/mmseg4j-2.4.0 ];then
+	if [ ! -d ${SOLR_DIR}/mmseg4j-${mmseg_version} ];then
 		cd ${SOLR_DIR}/ && unzip mmseg4j-${mmseg_version}.zip
 	fi
 
