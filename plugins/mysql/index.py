@@ -419,6 +419,8 @@ def myOp(version, method):
                          bufsize=4096, stderr=subprocess.PIPE)
         if initData == 0:
             initMysqlPwd()
+
+        data = mw.execShell('systemctl ' + method + ' mysql')
         return 'ok'
     except Exception as e:
         return str(e)
@@ -452,15 +454,8 @@ def my8cmd(version, method):
             time.sleep(3)
             my8cmd(version, method)
         else:
-            if method == "stop":
-                mw.execShell(cmd)
-                mw.execShell(
-                    "ps -ef|grep mysql|grep -v grep|grep -v py|awk '{print $2}'|xargs kill")
-                return "ok"
+            data = mw.execShell('systemctl ' + method + ' mysql')
 
-            sub = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True,
-                                   bufsize=4096, stderr=subprocess.PIPE)
-            sub.wait(5)
         return 'ok'
     except Exception as e:
         return str(e)
