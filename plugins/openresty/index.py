@@ -200,7 +200,7 @@ def status():
     return 'start'
 
 
-def restyOp(version, method):
+def restyOp(method):
     file = initReplace()
 
     if not mw.isAppleSystem():
