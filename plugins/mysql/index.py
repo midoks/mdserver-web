@@ -415,8 +415,6 @@ def myOp(version, method):
     cmd = init_file + ' ' + method
     try:
         initData = initMysqlData()
-        subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True,
-                         bufsize=4096, stderr=subprocess.PIPE)
         if initData == 0:
             initMysqlPwd()
 
