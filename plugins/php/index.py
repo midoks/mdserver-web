@@ -230,15 +230,13 @@ def initReplace(version):
 
     session_path = getServerDir() + '/tmp/session'
     if not os.path.exists(session_path):
-        os.mkdir(session_path)
-        if not mw.isAppleSystem():
-            mw.execShell('chown -R www:www ' + session_path)
+        mw.execShell('mkdir -p ' + session_path)
+        mw.execShell('chown -R www:www ' + session_path)
 
     upload_path = getServerDir() + '/tmp/upload'
     if not os.path.exists(upload_path):
-        os.mkdir(upload_path)
-        if not mw.isAppleSystem():
-            mw.execShell('chown -R www:www ' + upload_path)
+        mw.execShell('mkdir -p ' + upload_path)
+        mw.execShell('chown -R www:www ' + upload_path)
 
     # systemd
     systemDir = '/lib/systemd/system'
