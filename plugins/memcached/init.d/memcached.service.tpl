@@ -5,7 +5,7 @@ After=network.target
 [Service]
 Type=forking
 EnvironmentFile=-{$SERVER_PATH}/memcached/memcached.env
-ExecStart={$SERVER_PATH}/memcached/bin/memcached -d -l $IP -p $PORT -u $USER -m $CACHESIZE -c $MAXCONN -P $OPTIONS
+ExecStart={$SERVER_PATH}/memcached/bin/memcached -d -p $PORT -u $USER -m $CACHESIZE -c $MAXCONN $OPTIONS
 ExecReload=/bin/kill -USR2 $MAINPID
 Restart=on-failure
 
