@@ -177,20 +177,6 @@ def checkLogin():
     return "false"
 
 
-@app.route("/login")
-def login():
-    dologin = request.args.get('dologin', '')
-    if dologin == 'True':
-        session.clear()
-        session['login'] = False
-        session['overdue'] = 0
-        return redirect('/login')
-
-    if isLogined():
-        return redirect('/')
-    return render_template('login.html')
-
-
 @app.route("/do_login", methods=['POST'])
 def doLogin():
     username = request.form.get('username', '').strip()
@@ -251,30 +237,77 @@ def page_unauthorized(error):
     return render_template_string('404 not found', error_info=error), 404
 
 
+def get_admin_safe():
+    path = 'data/admin_path.pl'
+    if os.path.exists(path):
+        cont = mw.readFile(path)
+        cont = cont.strip().strip('/')
+        return (True, cont)
+    return (False, '')
+
+
+def admin_safe_path(path, req, data):
+    if path != req and not isLogined():
+        return render_template('path.html')
+
+    if not isLogined():
+        return render_template('login.html', data=data)
+
+    return render_template(req + '.html', data=data)
+
+
 @app.route('/<reqClass>/<reqAction>', methods=['POST', 'GET'])
 @app.route('/<reqClass>/', methods=['POST', 'GET'])
 @app.route('/<reqClass>', methods=['POST', 'GET'])
 @app.route('/', methods=['POST', 'GET'])
 def index(reqClass=None, reqAction=None, reqData=None):
+
     comReturn = common.local()
     if comReturn:
         return comReturn
 
-    if (reqClass == None):
-        reqClass = 'index'
-    pageFile = ('config', 'control', 'crontab', 'files', 'firewall',
-                'index', 'plugins', 'login', 'system', 'site', 'ssl', 'task', 'soft')
-    if not reqClass in pageFile:
-        return redirect('/')
-
+    # 页面请求
     if reqAction == None:
+        import config_api
+        data = config_api.config_api().get()
+
+        if reqClass == None:
+            reqClass = 'index'
+
+        pageFile = ('config', 'control', 'crontab', 'files', 'firewall',
+                    'index', 'plugins', 'login', 'system', 'site', 'ssl', 'task', 'soft')
+
+        # 设置了安全路径
+        ainfo = get_admin_safe()
+
+        # 登录页
+        if reqClass == 'login':
+            dologin = request.args.get('dologin', '')
+            if dologin == 'True':
+                session.clear()
+                session['login'] = False
+                session['overdue'] = 0
+
+            if ainfo[0]:
+                return admin_safe_path(ainfo[1], reqClass, data)
+
+            return render_template('login.html', data=data)
+
+        if ainfo[0]:
+            return admin_safe_path(ainfo[1], reqClass, data)
+
+        if not reqClass in pageFile:
+            return redirect('/')
+
         if not isLogined():
             return redirect('/login')
 
-        import config_api
-        data = config_api.config_api().get()
         return render_template(reqClass + '.html', data=data)
 
+    if not isLogined():
+        return 'request error!'
+
+    # API请求
     classFile = ('config_api', 'crontab_api', 'files_api', 'firewall_api',
                  'plugins_api', 'system_api', 'site_api', 'task_api')
     className = reqClass + '_api'
@@ -285,6 +318,7 @@ def index(reqClass=None, reqAction=None, reqData=None):
     newInstance = eval(eval_str)
 
     return publicObject(newInstance, reqAction)
+
 
 ssh = None
 shell = None
