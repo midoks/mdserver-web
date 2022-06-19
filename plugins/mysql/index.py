@@ -412,7 +412,6 @@ def initMysql8Pwd():
 def myOp(version, method):
     # import commands
     init_file = initDreplace()
-    cmd = init_file + ' ' + method
     try:
         initData = initMysqlData()
         if initData == 0:
@@ -427,8 +426,6 @@ def myOp(version, method):
 def my8cmd(version, method):
     # mysql 8.0  and 5.7 ok
     init_file = initDreplace(version)
-    cmd = init_file + ' ' + method
-
     if version == '5.7':
         initMysql57Data()
     elif version == '8.0':
