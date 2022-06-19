@@ -246,12 +246,15 @@ def get_admin_safe():
     return (False, '')
 
 
-def admin_safe_path(path, req, data):
+def admin_safe_path(path, req, data, pageFile):
     if path != req and not isLogined():
         return render_template('path.html')
 
     if not isLogined():
         return render_template('login.html', data=data)
+
+    if not req in pageFile:
+        return redirect('/')
 
     return render_template(req + '.html', data=data)
 
@@ -289,12 +292,12 @@ def index(reqClass=None, reqAction=None, reqData=None):
                 session['overdue'] = 0
 
             if ainfo[0]:
-                return admin_safe_path(ainfo[1], reqClass, data)
+                return admin_safe_path(ainfo[1], reqClass, data, pageFile)
 
             return render_template('login.html', data=data)
 
         if ainfo[0]:
-            return admin_safe_path(ainfo[1], reqClass, data)
+            return admin_safe_path(ainfo[1], reqClass, data, pageFile)
 
         if not reqClass in pageFile:
             return redirect('/')
