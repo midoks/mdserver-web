@@ -7,19 +7,11 @@ Description=The PHP {$VERSION} FastCGI Process Manager
 After=network.target
 
 [Service]
-Type=simple
+Type=forking
 PIDFile={$SERVER_PATH}/php/{$VERSION}/var/run/php-fpm.pid
-ExecStart={$SERVER_PATH}/php/{$VERSION}/sbin/php-fpm --nodaemonize --fpm-config {$SERVER_PATH}/php/{$VERSION}/etc/php-fpm.conf
+ExecStart={$SERVER_PATH}/php/{$VERSION}/sbin/php-fpm --daemonize --fpm-config {$SERVER_PATH}/php/{$VERSION}/etc/php-fpm.conf
 ExecReload=/bin/kill -USR2 $MAINPID
-PrivateTmp=true
-ProtectSystem=full
-PrivateDevices=true
-ProtectKernelModules=true
-ProtectKernelTunables=true
-ProtectControlGroups=true
-RestrictRealtime=true
-RestrictAddressFamilies=AF_INET AF_INET6 AF_NETLINK AF_UNIX
-RestrictNamespaces=true
+PrivateTmp=false
 
 [Install]
 WantedBy=multi-user.target
