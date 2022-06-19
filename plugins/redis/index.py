@@ -91,10 +91,9 @@ def initDreplace():
 
     # config replace
     dst_conf = getServerDir() + '/redis.conf'
-    if not os.path.exists(dst_conf):
-        conf_content = mw.readFile(getConfTpl())
-        conf_content = conf_content.replace('{$SERVER_PATH}', service_path)
-        mw.writeFile(dst_conf, conf_content)
+    conf_content = mw.readFile(getConfTpl())
+    conf_content = conf_content.replace('{$SERVER_PATH}', service_path)
+    mw.writeFile(dst_conf, conf_content)
 
     # systemd
     systemDir = '/lib/systemd/system'
