@@ -8,8 +8,8 @@ After=syslog.target
 [Service]
 User=mysql
 Group=mysql
-Type=forking
-ExecStart={$SERVER_PATH}/mysql/bin/mysqld --defaults-file={$SERVER_PATH}/mysql/etc/my.cnf --daemonize
+Type=simple
+ExecStart={$SERVER_PATH}/mysql/bin/mysqld --defaults-file={$SERVER_PATH}/mysql/etc/my.cnf
 ExecReload=/bin/kill -USR2 $MAINPID
 TimeoutSec=0
 PermissionsStartOnly=true
