@@ -200,6 +200,8 @@ def makePhpIni(version):
         content = mw.readFile(src_ini)
         if version == '52':
             content = content + "auto_prepend_file=/www/server/php/app_start.php"
+
+        content = contentReplace(content, version)
         mw.writeFile(dst_ini, content)
 
 
