@@ -342,4 +342,4 @@ if __name__ == "__main__":
     elif func == 'script_incr':
         print(scriptIncr())
     else:
-        print 'error'
+        print('error')
