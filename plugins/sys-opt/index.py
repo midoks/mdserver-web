@@ -110,10 +110,14 @@ def secRunLog():
 
 
 def msgRunLog():
+    if os.path.exists('/var/log/kern.log'):
+        return '/var/log/kern.log'
     return '/var/log/messages'
 
 
 def cronRunLog():
+    if os.path.exists('/var/log/syslog.log'):
+        return '/var/log/syslog.log'
     return '/var/log/cron'
 
 
