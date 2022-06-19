@@ -129,7 +129,6 @@ def initDreplace():
 
 def memOp(method):
     file = initDreplace()
-    data = mw.execShell(file + ' ' + method)
 
     if not mw.isAppleSystem():
         data = mw.execShell('systemctl ' + method + ' ' + getPluginName())
@@ -137,6 +136,7 @@ def memOp(method):
             return 'ok'
         return data[1]
 
+    data = mw.execShell(file + ' ' + method)
     if data[1] == '':
         return 'ok'
     return data[1]
