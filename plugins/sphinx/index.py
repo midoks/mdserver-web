@@ -146,6 +146,17 @@ def initDreplace():
         conf_content = contentReplace(conf_content)
         mw.writeFile(getServerDir() + '/sphinx.conf', conf_content)
 
+    # systemd
+    systemDir = '/lib/systemd/system'
+    systemService = systemDir + '/sphinx.service'
+    systemServiceTpl = getPluginDir() + '/init.d/sphinx.service.tpl'
+    if os.path.exists(systemDir) and not os.path.exists(systemService):
+        service_path = mw.getServerDir()
+        se_content = mw.readFile(systemServiceTpl)
+        se_content = se_content.replace('{$SERVER_PATH}', service_path)
+        mw.writeFile(systemService, se_content)
+        mw.execShell('systemctl daemon-reload')
+
     mkdirAll()
     return file_bin
 
@@ -165,45 +176,35 @@ def checkIndexSph():
     return True
 
 
-def start():
+def sphOp(method):
     file = initDreplace()
 
-    data = sphinxConfParse()
-    if 'index' in data:
-        if checkIndexSph():
-            rebuild()
-            time.sleep(5)
-    else:
-        return '配置不正确!'
+    if not mw.isAppleSystem():
+        data = mw.execShell('systemctl ' + method + ' sphinx')
+        if data[1] == '':
+            return 'ok'
+        return 'fail'
 
-    data = mw.execShell(file + ' start')
+    data = mw.execShell(file + ' ' + method)
     if data[1] == '':
         return 'ok'
     return data[1]
+
+
+def start():
+    return sphOp('start')
 
 
 def stop():
-    file = initDreplace()
-    data = mw.execShell(file + ' stop')
-    if data[1] == '':
-        return 'ok'
-    return data[1]
+    return sphOp('stop')
 
 
 def restart():
-    file = initDreplace()
-    data = mw.execShell(file + ' restart')
-    if data[1] == '':
-        return 'ok'
-    return data[1]
+    return sphOp('restart')
 
 
 def reload():
-    file = initDreplace()
-    data = mw.execShell(file + ' reload')
-    if data[1] == '':
-        return 'ok'
-    return 'fail'
+    return sphOp('reload')
 
 
 def rebuild():
@@ -215,36 +216,29 @@ def rebuild():
 
 
 def initdStatus():
-    if not app_debug:
-        if mw.isAppleSystem():
-            return "Apple Computer does not support"
-    initd_bin = getInitDFile()
-    if os.path.exists(initd_bin):
-        return 'ok'
-    return 'fail'
+    if mw.isAppleSystem():
+        return "Apple Computer does not support"
+
+    shell_cmd = 'systemctl status sphinx | grep loaded | grep "enabled;"'
+    data = mw.execShell(shell_cmd)
+    if data[0] == '':
+        return 'fail'
+    return 'ok'
 
 
 def initdInstall():
-    import shutil
-    if not app_debug:
-        if mw.isAppleSystem():
-            return "Apple Computer does not support"
+    if mw.isAppleSystem():
+        return "Apple Computer does not support"
 
-    source_bin = initDreplace()
-    initd_bin = getInitDFile()
-    shutil.copyfile(source_bin, initd_bin)
-    mw.execShell('chmod +x ' + initd_bin)
-    mw.execShell('chkconfig --add ' + getPluginName())
+    mw.execShell('systemctl enable sphinx')
     return 'ok'
 
 
 def initdUinstall():
-    if not app_debug:
-        if mw.isAppleSystem():
-            return "Apple Computer does not support"
-    initd_bin = getInitDFile()
-    os.remove(initd_bin)
-    mw.execShell('chkconfig --del ' + getPluginName())
+    if mw.isAppleSystem():
+        return "Apple Computer does not support"
+
+    mw.execShell('systemctl disable sphinx')
     return 'ok'
 
 
