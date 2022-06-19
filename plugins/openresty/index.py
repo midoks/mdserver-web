@@ -201,7 +201,7 @@ def status():
 
 
 def restyOp(version, method):
-    file = initReplace(version)
+    file = initReplace()
 
     if not mw.isAppleSystem():
         data = mw.execShell('systemctl ' + method + ' openresty')
