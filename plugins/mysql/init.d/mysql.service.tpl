@@ -10,7 +10,7 @@ User=mysql
 Group=mysql
 Type=forking
 ExecStart={$SERVER_PATH}/mysql/bin/mysqld --defaults-file={$SERVER_PATH}/mysql/etc/my.cnf --daemonize
-#ExecReload=/bin/kill -USR2 $MAINPID
+ExecReload=/bin/kill -USR2 $MAINPID
 TimeoutSec=0
 PermissionsStartOnly=true
 LimitNOFILE=5000
