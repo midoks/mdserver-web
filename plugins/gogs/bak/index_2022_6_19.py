@@ -140,24 +140,13 @@ def initDreplace():
         mw.writeFile(file_bin, content)
         mw.execShell('chmod +x ' + file_bin)
 
-    # conf_bin = getConf()
-    # if not os.path.exists(conf_bin):
-    #     mw.execShell('mkdir -p ' + getServerDir() + '/custom/conf')
-    #     conf_tpl = getConfTpl()
-    #     content = mw.readFile(conf_tpl)
-    #     content = contentReplace(content)
-    #     mw.writeFile(conf_bin, content)
-
-    # systemd
-    systemDir = '/lib/systemd/system'
-    systemService = systemDir + '/gogs.service'
-    systemServiceTpl = getPluginDir() + '/init.d/gogs.service.tpl'
-    if os.path.exists(systemDir) and not os.path.exists(systemService):
-        service_path = mw.getServerDir()
-        se_content = mw.readFile(systemServiceTpl)
-        se_content = se_content.replace('{$SERVER_PATH}', service_path)
-        mw.writeFile(systemService, se_content)
-        mw.execShell('systemctl daemon-reload')
+    conf_bin = getConf()
+    if not os.path.exists(conf_bin):
+        mw.execShell('mkdir -p ' + getServerDir() + '/custom/conf')
+        conf_tpl = getConfTpl()
+        content = mw.readFile(conf_tpl)
+        content = contentReplace(content)
+        mw.writeFile(conf_bin, content)
 
     log_path = getServerDir() + '/log'
     if not os.path.exists(log_path):
@@ -257,7 +246,22 @@ def isSqlError(mysqlMsg):
 
 def start():
 
+    is_frist = True
+    conf_bin = getConf()
+    if os.path.exists(conf_bin):
+        is_frist = False
+
     file = initDreplace()
+
+    if is_frist:
+        return "第一次启动Gogs,默认使用MySQL连接!<br>可以在配置文件中重新设置,再启动!"
+
+    conn = pMysqlDb()
+    list_table = conn.query('show tables')
+    data = isSqlError(list_table)
+    if not data['status']:
+        return data['msg']
+
     data = mw.execShell(__SR + file + ' start')
     if data[1] == '':
         return 'ok'
@@ -289,29 +293,39 @@ def reload():
 
 
 def initdStatus():
-    if mw.isAppleSystem():
-        return "Apple Computer does not support"
-
-    shell_cmd = 'systemctl status gogs | grep loaded | grep "enabled;"'
-    data = mw.execShell(shell_cmd)
-    if data[0] == '':
-        return 'fail'
-    return 'ok'
+    if not app_debug:
+        os_name = mw.getOs()
+        if os_name == 'darwin':
+            return "Apple Computer does not support"
+    initd_bin = getInitDFile()
+    if os.path.exists(initd_bin):
+        return 'ok'
+    return 'fail'
 
 
 def initdInstall():
-    if mw.isAppleSystem():
-        return "Apple Computer does not support"
+    import shutil
+    if not app_debug:
+        os_name = mw.getOs()
+        if os_name == 'darwin':
+            return "Apple Computer does not support"
 
-    mw.execShell('systemctl enable gogs')
+    mem_bin = initDreplace()
+    initd_bin = getInitDFile()
+    shutil.copyfile(mem_bin, initd_bin)
+    mw.execShell('chmod +x ' + initd_bin)
+    mw.execShell('chkconfig --add ' + getPluginName())
     return 'ok'
 
 
 def initdUinstall():
-    if mw.isAppleSystem():
-        return "Apple Computer does not support"
-
-    mw.execShell('systemctl disable gogs')
+    if not app_debug:
+        os_name = mw.getOs()
+        if os_name == 'darwin':
+            return "Apple Computer does not support"
+    initd_bin = getInitDFile()
+    os.remove(initd_bin)
+    mw.execShell('chkconfig --del ' + getPluginName())
     return 'ok'
 
 
