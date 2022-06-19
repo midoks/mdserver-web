@@ -114,6 +114,10 @@ def msgRunLog():
 def cronRunLog():
     return '/var/log/cron'
 
+
+def systemRunLog():
+    return '/var/log/syslog'
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -138,5 +142,7 @@ if __name__ == "__main__":
         print(msgRunLog())
     elif func == 'cron_run_log':
         print(cronRunLog())
+    elif func == 'sys_run_log':
+        print(systemRunLog())
     else:
         print('err')
