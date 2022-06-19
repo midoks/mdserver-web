@@ -120,8 +120,8 @@ def start():
     if not os.path.exists(conf_run):
         conf_tpl = getPluginDir() + '/conf/config.inc.php'
         centent = mw.readFile(conf_tpl)
-        # centent = contentReplace(centent)
-        # print(mw.writeFile(conf_run, centent))
+        centent = contentReplace(centent)
+        mw.writeFile(conf_run, centent)
 
     mw.restartWeb()
     return 'ok'
