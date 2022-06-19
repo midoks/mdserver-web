@@ -145,8 +145,7 @@ def initDreplace():
     return file_bin
 
 
-def rsyncOp(method)
-
+def rsyncOp(method):
     file = initDreplace()
     if not mw.isAppleSystem():
         data = mw.execShell('systemctl ' + method + ' rsyncd')
