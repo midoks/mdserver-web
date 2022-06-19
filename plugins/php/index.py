@@ -228,13 +228,13 @@ def initReplace(version):
     phpFpmWwwReplace(version)
     phpFpmReplace(version)
 
-    session_path = '/tmp/session'
+    session_path = getServerDir() + '/tmp/session'
     if not os.path.exists(session_path):
         os.mkdir(session_path)
         if not mw.isAppleSystem():
             mw.execShell('chown -R www:www ' + session_path)
 
-    upload_path = '/tmp/upload'
+    upload_path = getServerDir() + '/tmp/upload'
     if not os.path.exists(upload_path):
         os.mkdir(upload_path)
         if not mw.isAppleSystem():
