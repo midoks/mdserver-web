@@ -89,6 +89,11 @@ def initDreplace():
         mw.writeFile(file_bin, content)
         mw.execShell('chmod +x ' + file_bin)
 
+    # log
+    dataLog = getServerDir() + '/data'
+    if not os.path.exists(dataLog):
+        mw.execShell('chmod +x ' + file_bin)
+
     # config replace
     dst_conf = getServerDir() + '/redis.conf'
     conf_content = mw.readFile(getConfTpl())
