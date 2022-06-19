@@ -17,7 +17,7 @@ Install_pureftp()
 	VER=$1
 	FILE=pure-ftpd-${VER}.tar.gz
 	FDIR=pure-ftpd-${VER}
-	DOWNLOAD=https://download.pureftpd.org/pub/pure-ftpd/releases/pure-ftpd-${VER}.tar.gz
+	DOWNLOAD=https://download.pureftpd.org/pub/pure-ftpd/releases/$FILE
 	
 
 	if [ ! -f $serverPath/source/pureftp/$FILE ];then
