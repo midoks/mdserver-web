@@ -216,19 +216,19 @@ def restyOp(version, method):
 
 
 def start():
-    return restyOp(version, 'start')
+    return restyOp('start')
 
 
 def stop():
-    return restyOp(version, 'stop')
+    return restyOp('stop')
 
 
 def restart():
-    return restyOp(version, 'restart')
+    return restyOp('restart')
 
 
 def reload():
-    return restyOp(version, 'reload')
+    return restyOp('reload')
 
 
 def initdStatus():
