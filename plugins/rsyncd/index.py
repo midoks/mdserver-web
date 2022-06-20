@@ -102,8 +102,7 @@ def initDreplace():
     # conf
     conf_path = appConf()
     conf_tpl_path = getPluginDir() + '/conf/rsyncd.conf'
-    if conf.strip() == '':
-    of not os.path.exists(conf_path):
+    if not os.path.exists(conf_path):
         content = mw.readFile(conf_tpl_path)
         mw.writeFile(conf_path, content)
 
