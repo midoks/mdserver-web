@@ -24,6 +24,7 @@ Install_redis()
 	cd $serverPath/source && tar -zxvf redis-${VERSION}.tar.gz
 
 	mkdir -p $serverPath/redis
+	mkdir -p $serverPath/redis/data
 	cd redis-${VERSION} && make PREFIX=$serverPath/redis install
 	sed '/^ *#/d' redis.conf > $serverPath/redis/redis.conf
 
