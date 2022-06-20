@@ -171,6 +171,7 @@ class plugins_api:
         if mw.isAppleSystem():
             print(execstr)
             print(data[0], data[1])
+        self.removeIndex(name, version)
         return mw.returnJson(True, '卸载执行成功!')
         # if data[1] == '':
         #     return mw.returnJson(True, '已将卸载成功!')
