@@ -77,15 +77,14 @@ def status():
 
 
 def appConf():
-    if mw.isAppleSystem():
-        return getServerDir() + '/rsyncd.conf'
-    return '/etc/rsyncd.conf'
+    return getServerDir() + '/rsyncd.conf'
+    # return '/etc/rsyncd.conf'
 
 
 def appConfPwd():
-    if mw.isAppleSystem():
-        return getServerDir() + '/rsyncd.passwd'
-    return '/etc/rsyncd.passwd'
+    # if mw.isAppleSystem():
+    return getServerDir() + '/rsyncd.passwd'
+    # return '/etc/rsyncd.passwd'
 
 
 def getLog():
@@ -99,15 +98,16 @@ def getLog():
 
 
 def initDreplace():
-    conf_path = appConf()
-    conf = mw.readFile(conf_path)
 
-    compile_sub = re.compile('^#(.*)', re.M)
-    conf = compile_sub.sub('', conf)
+    # conf
+    conf_path = appConf()
     conf_tpl_path = getPluginDir() + '/conf/rsyncd.conf'
     if conf.strip() == '':
+    of not os.path.exists(conf_path):
         content = mw.readFile(conf_tpl_path)
         mw.writeFile(conf_path, content)
+
+    # pwd
     confpwd_path = appConfPwd()
     if not os.path.exists(confpwd_path):
         mw.writeFile(confpwd_path, '')
