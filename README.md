@@ -49,7 +49,7 @@ systemd 支持 CentOS,Ubuntu,Debian,Fedora...
 
 ### 问题
 - Ubuntu 20 无法安装mysql5.7 && mysql 80.
-- Ftp 无法安装成功。
+- Ftp debian无法安装成功。
 - php52,在debian无法安装成功。
 
 ### 自动安装
