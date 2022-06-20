@@ -12,7 +12,35 @@ zimgSourceDir=${serverPath}/source/zimg
 
 install_tmp=${rootPath}/tmp/mw_install.pl
 
-SYSOS=`uname`
+
+sysName=`uname`
+echo "use system: ${sysName}"
+if [ ${sysName} == "Darwin" ]; then
+	OSNAME='macos'
+elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
+	OSNAME='centos'
+elif grep -Eqi "Fedora" /etc/issue || grep -Eq "Fedora" /etc/*-release; then
+	OSNAME='fedora'
+elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
+	OSNAME='debian'
+elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
+	OSNAME='ubuntu'
+elif grep -Eqi "Raspbian" /etc/issue || grep -Eq "Raspbian" /etc/*-release; then
+	OSNAME='raspbian'
+else
+	OSNAME='unknow'
+fi
+
+
+
+# install package
+if [ "${OSNAME}" == "centos" ] || [ "${OSNAME}" == "fedora" ]; then
+	yum install nasm -y
+fi
+
+if [ "${OSNAME}" == "debian" ] || [ "${OSNAME}" == "ubuntu" ]; then
+	apt install nasm -y
+fi
 
 Install_libjpeg_turbo(){
 	mkdir -p $zimgSourceDir/libjpeg-turbo
@@ -46,11 +74,10 @@ Install_zimg()
 	mkdir -p $serverPath/zimg
 	echo '1.0' > $serverPath/zimg/version.pl
 
-	if [ "Darwin" == "$SYSOS" ];then
+	if [ "macos" == "${OSNAME}" ];then
 		echo 'macosx unavailable' > $install_tmp
 	else
 		if [ ! -f $serverPath/zimg/bin ];then
-			yum install nasm -y
 			Install_libjpeg_turbo
 			Install_zimg_source
 		fi
