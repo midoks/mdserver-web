@@ -329,7 +329,7 @@ else
 
     yum install -y openldap openldap-devel libtirpc libtirpc-devel rpcgen
 
-    yum install -y bison re2c
+    yum install -y bison re2c cmake
 
     yum install -y libmemcached libmemcached-devel
     yum install -y curl-devel
