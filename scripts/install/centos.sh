@@ -3,13 +3,6 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 LANG=en_US.UTF-8
 
-mkdir -p /www/server
-mkdir -p /www/wwwroot
-mkdir -p /www/wwwlogs
-mkdir -p /www/backup/database
-mkdir -p /www/backup/site
-
-
 if [ ! -f /usr/bin/applydeltarpm ];then
 	yum -y provides '*/applydeltarpm'
 	yum -y install deltarpm
@@ -26,7 +19,6 @@ yum install -y vixie-cron
 yum install -y curl-devel libmcrypt libmcrypt-devel
 
 #https need
-
 if [ ! -d /root/.acme.sh ];then	
 	curl https://get.acme.sh | sh
 fi
@@ -83,25 +75,12 @@ yum install -y ncurses-devel mysql-devel cmake
 yum install -y MySQL-python 
 yum install -y epel-release
 
-if [ ! -d /www/server/mdserver-web ];then
-	wget -O /tmp/master.zip https://codeload.github.com/midoks/mdserver-web/zip/master
-	cd /tmp && unzip /tmp/master.zip
-	mv /tmp/mdserver-web-master /www/server/mdserver-web
-	rm -rf /tmp/master.zip
-	rm -rf /tmp/mdserver-web-master
-fi
-
-#if [ ! -f '/usr/bin/pip' ];then
-#	wget https://bootstrap.pypa.io/pip/2.7/get-pip.py
-#	python get-pip.py
-#	pip install --upgrade pip
-#	pip install pillow==6.2.2
-#fi 
-
 
 if [ ! -f /usr/local/bin/pip3 ];then
     python3 -m pip install --upgrade pip setuptools wheel -i https://mirrors.aliyun.com/pypi/simple
 fi
+
+
 
 
 cd /www/server/mdserver-web/scripts && bash lib.sh

@@ -3,12 +3,6 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 LANG=en_US.UTF-8
 
-mkdir -p /www/server
-mkdir -p /www/wwwroot
-mkdir -p /www/wwwlogs
-mkdir -p /www/backup/database
-mkdir -p /www/backup/site
-
 
 if [ ! -f /usr/bin/applydeltarpm ];then
 	yum -y provides '*/applydeltarpm'
@@ -82,15 +76,7 @@ yum -y install ncurses-devel mysql-devel cmake
 yum -y install python-devel
 yum -y install MySQL-python 
 yum -y install epel-release
-yum -y install python36-devel
-
-if [ ! -d /www/server/mdserver-web ];then
-	wget -O /tmp/master.zip https://codeload.github.com/midoks/mdserver-web/zip/master
-	cd /tmp && unzip /tmp/master.zip
-	mv /tmp/mdserver-web-master /www/server/mdserver-web
-	rm -rf /tmp/master.zip
-	rm -rf /tmp/mdserver-web-master
-fi 
+yum -y install python3-devel
 
 
 
