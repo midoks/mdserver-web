@@ -1,5 +1,5 @@
 #!/bin/bash
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
 export PATH
 
 curPath=`pwd`
@@ -8,6 +8,25 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
 install_tmp=${rootPath}/tmp/mw_install.pl
+
+sysName=`uname`
+echo "use system: ${sysName}"
+
+if [ ${sysName} == "Darwin" ]; then
+	OSNAME='macos'
+elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
+	OSNAME='centos'
+elif grep -Eqi "Fedora" /etc/issue || grep -Eq "Fedora" /etc/*-release; then
+	OSNAME='fedora'
+elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
+	OSNAME='debian'
+elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
+	OSNAME='ubuntu'
+elif grep -Eqi "Raspbian" /etc/issue || grep -Eq "Raspbian" /etc/*-release; then
+	OSNAME='raspbian'
+else
+	OSNAME='unknow'
+fi
 
 Install_pureftp()
 {
@@ -33,9 +52,6 @@ Install_pureftp()
 	
 	echo "${1}" > ${serverPath}/pureftp/version.pl
 	echo '安装完成' > $install_tmp
-	
-
-	
 }
 
 Uninstall_pureftp()
