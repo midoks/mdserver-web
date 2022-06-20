@@ -1,7 +1,0 @@
-runtime: php55
-api_version: 1
-threadsafe: true
-
-handlers:
-- url: /.*
-  script: helloworld.php
