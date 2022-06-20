@@ -36,6 +36,8 @@ elif grep -Eqi "Fedora" /etc/issue || grep -Eq "Fedora" /etc/*-release; then
 	OSNAME='fedora'
 elif grep -Eqi "Rocky" /etc/issue || grep -Eq "Rocky" /etc/*-release; then
 	OSNAME='rocky'
+elif grep -Eqi "AlmaLinux" /etc/issue || grep -Eq "AlmaLinux" /etc/*-release; then
+	OSNAME='alma'
 elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
 	OSNAME='debian'
 elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
