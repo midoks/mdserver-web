@@ -32,7 +32,7 @@ if [ -f /etc/init.d/iptables ];then
 	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 888 -j ACCEPT
 	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 7200 -j ACCEPT
 	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 3306 -j ACCEPT
-	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 30000:40000 -j ACCEPT
+	# iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 30000:40000 -j ACCEPT
 	service iptables save
 
 	iptables_status=`service iptables status | grep 'not running'`
@@ -56,7 +56,7 @@ if [ ! -f /etc/init.d/iptables ];then
 	firewall-cmd --permanent --zone=public --add-port=888/tcp
 	firewall-cmd --permanent --zone=public --add-port=7200/tcp
 	firewall-cmd --permanent --zone=public --add-port=3306/tcp
-	firewall-cmd --permanent --zone=public --add-port=30000-40000/tcp
+	# firewall-cmd --permanent --zone=public --add-port=30000-40000/tcp
 
 
 	sed -i 's#AllowZoneDrifting=yes#AllowZoneDrifting=no#g' /etc/firewalld/firewalld.conf
