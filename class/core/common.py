@@ -82,6 +82,10 @@ def initInitD():
     doContentReplace(script, script_bin)
     mw.execShell('chmod +x ' + script_bin)
 
+    # 在linux系统中,确保/etc/init.d存在
+    if not mw.isAppleSystem() and not os.path.exists("/etc/init.d"):
+        mw.execShell('mkdir -p /etc/init.d')
+
     # initd
     if os.path.exists("/etc/init.d"):
         initd_bin = '/etc/init.d/mw'
