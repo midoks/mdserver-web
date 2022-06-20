@@ -28,9 +28,9 @@ if [ ! -f /usr/local/bin/pip3 ];then
 fi
 
 #venv
-if [ ! -f /www/server/mdserver-web/bin/activate ];then
-    cd /www/server/mdserver-web && python3 -m venv .
-fi
+# if [ ! -f /www/server/mdserver-web/bin/activate ];then
+#     cd /www/server/mdserver-web && python3 -m venv .
+# fi
 
 
 if [ -f /www/server/mdserver-web/bin/activate ];then
