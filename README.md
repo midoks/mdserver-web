@@ -64,6 +64,18 @@ curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts
 [![截图](/route/static/mdw.jpg)](/route/static/mdw.jpg)
 
 
+### 插件开发相关
+
+```
+插件文档还不完善，如果有不明白的地方提Issue! 我会尽力完善。
+如果你自己写了插件，想分享出来，也可以提Issue。
+```
+
+- 开发文档 - https://github.com/midoks/mdserver-web/wiki/%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91
+- 插件地址 - https://github.com/mw-plugin
+- 例子 - https://github.com/mw-plugin/simple-plugin 
+
+
 ### 感谢
 
 - 开发赞助
