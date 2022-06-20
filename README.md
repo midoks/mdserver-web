@@ -76,6 +76,12 @@ curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts
 - 例子 - https://github.com/mw-plugin/simple-plugin 
 
 
+
+## Stargazers over time
+
+[![Stargazers over time](https://starchart.cc/midoks/mdserver-web.svg)](https://starchart.cc/midoks/mdserver-web)
+
+
 ### 感谢
 
 - 开发赞助
