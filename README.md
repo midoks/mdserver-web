@@ -52,16 +52,33 @@ systemd 支持 CentOS,Ubuntu,Debian,Fedora...
 - Ftp debian无法安装成功。
 - php52,在debian无法安装成功。
 
-### 自动安装
+
+### GW使用
+
+- 自动安装
 
 ```
 curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/install.sh | bash
 ```
 
-### 脚本更新
+- 脚本更新
 
 ```
 curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/update.sh | bash
+```
+
+### GN使用[DEBUG...]
+
+- 自动安装
+
+```
+curl -fsSL  https://gitee.com/midoks/mdserver-web/raw/master/scripts/install_cn.sh | bash
+```
+
+- 脚本更新
+
+```
+curl -fsSL  https://gitee.com/midoks/mdserver-web/raw/master/scripts/update_cn.sh | bash
 ```
 
 ### 无图不真相
