@@ -103,16 +103,13 @@ pip3 install pymongo
 
 cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
 
-if [ ! -f /www/server/mdserver-web/bin/activate ];then
-	cd /www/server/mdserver-web && python3 -m venv .
-	sleep 5
-fi
 
 echo  "start install python env lib"
-if [ -f /www/server/mdserver-web/bin/activate ];then
-    cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate && pip3 install -r /www/server/mdserver-web/requirements.txt
-    
-    pip install --upgrade pip
+if [ ! -f /www/server/mdserver-web/bin/activate ];then
+	cd /www/server/mdserver-web && python3 -m venv .
+	source /www/server/mdserver-web/bin/activate
+	pip3 install -r /www/server/mdserver-web/requirements.txt
+	pip install --upgrade pip
 	pip3 install gunicorn==20.1.0
 	pip3 install gevent==21.1.2
 	pip3 install gevent-websocket==0.10.1
@@ -122,6 +119,7 @@ if [ -f /www/server/mdserver-web/bin/activate ];then
 	pip3 install psutil==5.9.1
 	pip3 install pymongo
 fi
+
 echo  "end install python env lib"
 echo  "end install python lib"
 
