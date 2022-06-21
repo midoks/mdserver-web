@@ -72,7 +72,7 @@ if [ $OSNAME != "macos" ];then
 fi
 
 echo "use system version: ${OSNAME}"
-curl -fsSL  https://gitee.com/midoks/mdserver-web/raw/master/scripts/install/${OSNAME}.sh | bash
+curl -fsSL  https://gitee.com/midoks/mdserver-web/raw/dev/scripts/install/${OSNAME}.sh | bash
 
 
 endTime=`date +%s`
