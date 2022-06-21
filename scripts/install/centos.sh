@@ -86,13 +86,13 @@ cd /www/server/mdserver-web/scripts && bash lib.sh
 chmod 755 /www/server/mdserver-web/data
 
 
+pip install --upgrade pip
 if [ ! -f /www/server/mdserver-web/bin/activate ];then
     cd /www/server/mdserver-web && python3 -m venv .
 fi
 
 if [ -f /www/server/mdserver-web/bin/activate ];then
     cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate && pip3 install -r /www/server/mdserver-web/requirements.txt
-    pip install --upgrade pip
     pip3 install gunicorn==20.1.0
 	pip3 install gevent==21.1.2
 	pip3 install gevent-websocket==0.10.1
@@ -102,7 +102,6 @@ if [ -f /www/server/mdserver-web/bin/activate ];then
 	pip3 install psutil==5.9.1 
 	pip3 install pymongo
 else
-	pip install --upgrade pip
     cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
     pip3 install gunicorn==20.1.0
 	pip3 install gevent==21.1.2
