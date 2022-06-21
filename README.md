@@ -81,6 +81,22 @@ curl -fsSL  https://gitee.com/midoks/mdserver-web/raw/master/scripts/install_cn.
 curl -fsSL  https://gitee.com/midoks/mdserver-web/raw/master/scripts/update_cn.sh | bash
 ```
 
+
+### DEV使用
+
+- 自动安装
+
+```
+curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/install_dev.sh | bash
+```
+
+- 脚本更新
+
+```
+curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/update_dev.sh | bash
+```
+
+
 ### 无图不真相
 
 [![截图](/route/static/mdw.jpg)](/route/static/mdw.jpg)
