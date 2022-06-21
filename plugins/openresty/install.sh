@@ -43,8 +43,7 @@ Install_openresty()
 	--with-http_slice_module \
 	--with-http_stub_status_module && make && make install && \
 	echo "${VERSION}" > $serverPath/openresty/version.pl
-	
-
+	echo "" > $serverPath/web_conf/nginx/enable-php-00.conf
 	echo '安装完成' > $install_tmp
 }
 
