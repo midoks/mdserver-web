@@ -66,7 +66,7 @@ fi
 #安装时不开启
 systemctl stop firewalld
 
-# yum groupinstall -y "Development Tools"
+yum groupinstall -y "Development Tools"
 yum install -y libevent libevent-devel libjpeg* libpng* gd* libxslt* unzip
 yum install -y python-imaging libicu-devel zip bzip2-devel gcc libxml2 libxml2-dev  pcre pcre-devel
 yum install -y libjpeg-devel libpng-devel libwebp libwebp-devel
@@ -81,15 +81,15 @@ if [ ! -f /usr/local/bin/pip3 ];then
 fi
 
 
-echo  "start install lib"
+# echo  "start install lib"
 cd /www/server/mdserver-web/scripts && bash lib.sh
-echo  "end install lib"
+# echo  "end install lib"
 
 
 chmod 755 /www/server/mdserver-web/data
 
 
-echo  "start install python lib"
+# echo  "start install python lib"
 
 pip install --upgrade pip
 pip3 install gunicorn==20.1.0
@@ -104,7 +104,7 @@ pip3 install pymongo
 cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
 
 
-echo  "start install python env lib"
+# echo  "start install python env lib"
 
 if [ ! -f /www/server/mdserver-web/bin/activate ];then
 	cd /www/server/mdserver-web && python3 -m venv .
@@ -123,8 +123,8 @@ if [ ! -f /www/server/mdserver-web/bin/activate ];then
 	pip3 install pymongo
 fi
 
-echo  "end install python env lib"
-echo  "end install python lib"
+# echo  "end install python env lib"
+# echo  "end install python lib"
 
 
 cd /www/server/mdserver-web && ./cli.sh start
