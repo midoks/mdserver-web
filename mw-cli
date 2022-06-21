@@ -1,30 +1,33 @@
 #!/www/server/mdserver-web/bin/python
 # description: mdserver-web cli tools
-# ln -s /www/server/mdserver-web/mds-cli /usr/bin/mds-cli
+# ln -s /www/server/mdserver-web/mw-cli /usr/bin/mw-cli
 import os
 import sys
+
 
 def mw_start():
     """
     Start mdserver-web
     """
-    os.system('bash cli.sh start')
+    os.system('systemctl start mw')
     print("服务已启动")
-    
-    
+
+
 def mw_stop():
     """
     stop mdserver-web
     """
-    os.system('bash cli.sh stop')
+    os.system('systemctl stop mw')
     print("服务已停止")
+
 
 def mw_restart():
     """
     restart mdserver-web
     """
-    os.system('bash cli.sh stop && bash cli.sh start')
+    os.system('systemctl restart mw')
     print("服务已重启")
+
 
 def mw_reset_username():
     """
@@ -33,7 +36,8 @@ def mw_reset_username():
     from tools import set_panel_username
     user_name = input("请输入新的用户名: ")
     set_panel_username(user_name)
-    
+
+
 def mw_reset_pwd():
     """
     reset mdserver-web password
@@ -44,9 +48,9 @@ def mw_reset_pwd():
 
 
 if __name__ == '__main__':
-    os.chdir("/www/server/mdserver-web") 
+    os.chdir("/www/server/mdserver-web")
     sys.path.append(os.getcwd() + "/class/core")
-    
+
     try:
         str = '''
         ====  mdserver-web cli tools ====
@@ -55,8 +59,11 @@ if __name__ == '__main__':
         5. 修改密码
         =================================
         '''
-        print(str)
-        sw = input("请输入您要进行的操作: ")
+        if len(sys.argv) == 2:
+            sw = sys.argv[1]
+        else:
+            print(str)
+            sw = input("请输入您要进行的操作: ")
 
         if sw == '1':
             mw_start()
