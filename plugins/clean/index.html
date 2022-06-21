@@ -1,0 +1,24 @@
+<div class="bt-form">
+	<div class="bt-w-main">
+		<div class="bt-w-menu">
+			<p class="bgw" onclick="pluginService('clean');">服务</p>
+			<p onclick="pluginConfig('clean');">配置修改</p>
+			<p onclick="pRead()">说明</p>
+		</div>
+		<div class="bt-w-con pd15">
+			<div class="soft-man-con"></div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+pluginService('clean');
+
+
+function pRead(){
+	var readme = '<ul class="help-info-text c7">';
+    readme += '<li>cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/clean/index.py clean</li>';
+    readme += '</ul>';
+
+    $('.soft-man-con').html(readme);   
+}
+</script>

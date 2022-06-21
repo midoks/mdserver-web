@@ -8,7 +8,6 @@ __pycache__/
 
 # Distribution / packaging
 .Python
-build/
 develop-eggs/
 dist/
 downloads/
@@ -115,3 +114,19 @@ data/*.db
 data/control.conf
 data/iplist.txt
 data/json/index.json
+data/json/config.json
+data/site.pl
+data/admin_path.pl
+data/close.pl
+ssl/input.pl
+data/datadir.pl
+data/502Task.pl
+data/default.pl
+data/backup.pl
+lib/python*
+bin
+pyvenv.cfg
+include
+data/api_login.txt
+data/sessions
+data/ssl.pl

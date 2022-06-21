@@ -1,4 +1,6 @@
 #! /bin/sh
+# chkconfig: 2345 55 25
+# description: PHP Service
 
 ### BEGIN INIT INFO
 # Provides:          php-fpm

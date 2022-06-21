@@ -7,12 +7,12 @@ import time
 import subprocess
 
 sys.path.append(os.getcwd() + "/class/core")
-import public
+import mw
 
 
 app_debug = False
 
-if public.isAppleSystem():
+if mw.isAppleSystem():
     app_debug = True
 
 
@@ -21,11 +21,11 @@ def getPluginName():
 
 
 def getPluginDir():
-    return public.getPluginDir() + '/' + getPluginName()
+    return mw.getPluginDir() + '/' + getPluginName()
 
 
 def getServerDir():
-    return public.getServerDir() + '/' + getPluginName()
+    return mw.getServerDir() + '/' + getPluginName()
 
 
 def getInitDFile():
@@ -53,27 +53,32 @@ def getArgs():
 
 def clearTemp():
     path_bin = getServerDir() + "/nginx"
-    public.execShell('rm -rf ' + path_bin + '/client_body_temp')
-    public.execShell('rm -rf ' + path_bin + '/fastcgi_temp')
-    public.execShell('rm -rf ' + path_bin + '/proxy_temp')
-    public.execShell('rm -rf ' + path_bin + '/scgi_temp')
-    public.execShell('rm -rf ' + path_bin + '/uwsgi_temp')
+    mw.execShell('rm -rf ' + path_bin + '/client_body_temp')
+    mw.execShell('rm -rf ' + path_bin + '/fastcgi_temp')
+    mw.execShell('rm -rf ' + path_bin + '/proxy_temp')
+    mw.execShell('rm -rf ' + path_bin + '/scgi_temp')
+    mw.execShell('rm -rf ' + path_bin + '/uwsgi_temp')
 
 
 def getConf():
-    path = getPluginDir() + "/conf/nginx.conf"
+    path = getServerDir() + "/nginx/conf/nginx.conf"
+    return path
+
+
+def getConfTpl():
+    path = getPluginDir() + '/conf/nginx.conf'
     return path
 
 
 def getOs():
     data = {}
-    data['os'] = public.getOs()
+    data['os'] = mw.getOs()
     ng_exe_bin = getServerDir() + "/nginx/sbin/nginx"
     if checkAuthEq(ng_exe_bin, 'root'):
         data['auth'] = True
     else:
         data['auth'] = False
-    return public.getJson(data)
+    return mw.getJson(data)
 
 
 def getInitDTpl():
@@ -107,28 +112,30 @@ def checkAuthEq(file, owner='root'):
 
 def confReplace():
     service_path = os.path.dirname(os.getcwd())
-    content = public.readFile(getConf())
+    content = mw.readFile(getConfTpl())
     content = content.replace('{$SERVER_PATH}', service_path)
 
     user = 'www'
     user_group = 'www'
 
-    if public.getOs() == 'darwin':
+    if mw.getOs() == 'darwin':
         # macosx do
-        user = public.execShell(
+        user = mw.execShell(
             "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
         # user = 'root'
         user_group = 'staff'
         content = content.replace('{$EVENT_MODEL}', 'kqueue')
     else:
-        user = 'www'
-        user_group = 'www'
         content = content.replace('{$EVENT_MODEL}', 'epoll')
 
     content = content.replace('{$OS_USER}', user)
     content = content.replace('{$OS_USER_GROUP}', user_group)
 
-    public.writeFile(getServerDir() + '/nginx/conf/nginx.conf', content)
+    nconf = getServerDir() + '/nginx/conf/nginx.conf'
+
+    __content = mw.readFile(nconf)
+    if __content.find('#user'):
+        mw.writeFile(getServerDir() + '/nginx/conf/nginx.conf', content)
 
     # give nginx root permission
     ng_exe_bin = getServerDir() + "/nginx/sbin/nginx"
@@ -149,18 +156,35 @@ def initDreplace():
     service_path = os.path.dirname(os.getcwd())
 
     initD_path = getServerDir() + '/init.d'
+
+    # OpenResty is not installed
+    if not os.path.exists(getServerDir()):
+        print("ok")
+        exit(0)
+
+    # init.d
+    file_bin = initD_path + '/' + getPluginName()
     if not os.path.exists(initD_path):
         os.mkdir(initD_path)
-    file_bin = initD_path + '/' + getPluginName()
 
-    # initd replace
-    content = public.readFile(file_tpl)
-    content = content.replace('{$SERVER_PATH}', service_path)
-    public.writeFile(file_bin, content)
-    public.execShell('chmod +x ' + file_bin)
+        # initd replace
+        content = mw.readFile(file_tpl)
+        content = content.replace('{$SERVER_PATH}', service_path)
+        mw.writeFile(file_bin, content)
+        mw.execShell('chmod +x ' + file_bin)
 
-    # config replace
-    confReplace()
+        # config replace
+        confReplace()
+
+    # systemd
+    systemDir = '/lib/systemd/system'
+    systemService = systemDir + '/openresty.service'
+    systemServiceTpl = getPluginDir() + '/init.d/openresty.service.tpl'
+    if os.path.exists(systemDir) and not os.path.exists(systemService):
+        se_content = mw.readFile(systemServiceTpl)
+        se_content = se_content.replace('{$SERVER_PATH}', service_path)
+        mw.writeFile(systemService, se_content)
+        mw.execShell('systemctl daemon-reload')
 
     # make nginx vhost or other
     makeConf()
@@ -169,82 +193,76 @@ def initDreplace():
 
 
 def status():
-    data = public.execShell(
+    data = mw.execShell(
         "ps -ef|grep nginx |grep -v grep | grep -v python | awk '{print $2}'")
     if data[0] == '':
         return 'stop'
     return 'start'
 
 
-def start():
+def restyOp(method):
     file = initDreplace()
-    data = public.execShell(file + ' start')
+
+    if not mw.isAppleSystem():
+        data = mw.execShell('systemctl ' + method + ' openresty')
+        if data[1] == '':
+            return 'ok'
+        return 'fail'
+
+    data = mw.execShell(file + ' ' + method)
     if data[1] == '':
         return 'ok'
     return data[1]
+
+
+def start():
+    return restyOp('start')
 
 
 def stop():
-    file = initDreplace()
-    data = public.execShell(file + ' stop')
-    clearTemp()
-    if data[1] == '':
-        return 'ok'
-    return data[1]
+    return restyOp('stop')
 
 
 def restart():
-    file = initDreplace()
-    data = public.execShell(file + ' restart')
-    if data[1] == '':
-        return 'ok'
-    return data[1]
+    return restyOp('restart')
 
 
 def reload():
-    file = initDreplace()
-    data = public.execShell(file + ' reload')
-    if data[1] == '':
-        return 'ok'
-    return data[1]
+    return restyOp('reload')
 
 
 def initdStatus():
-    if not app_debug:
-        if public.isAppleSystem():
-            return "Apple Computer does not support"
-    initd_bin = getInitDFile()
-    if os.path.exists(initd_bin):
-        return 'ok'
-    return 'fail'
+
+    if mw.isAppleSystem():
+        return "Apple Computer does not support"
+
+    shell_cmd = 'systemctl status openresty | grep loaded | grep "enabled;"'
+    data = mw.execShell(shell_cmd)
+    if data[0] == '':
+        return 'fail'
+    return 'ok'
 
 
 def initdInstall():
-    import shutil
-    if not app_debug:
-        if public.isAppleSystem():
-            return "Apple Computer does not support"
+    if mw.isAppleSystem():
+        return "Apple Computer does not support"
 
-    source_bin = initDreplace()
-    initd_bin = getInitDFile()
-    shutil.copyfile(source_bin, initd_bin)
-    public.execShell('chmod +x ' + initd_bin)
+    mw.execShell('systemctl enable openresty')
     return 'ok'
 
 
 def initdUinstall():
-    if not app_debug:
-        if public.isAppleSystem():
-            return "Apple Computer does not support"
-    initd_bin = getInitDFile()
-    os.remove(initd_bin)
+    if mw.isAppleSystem():
+        return "Apple Computer does not support"
+
+    mw.execShell('systemctl disable openresty')
     return 'ok'
 
 
 def runInfo():
     # 取Openresty负载状态
     try:
-        result = public.httpGet('http://127.0.0.1/nginx_status')
+        result = mw.httpGet('http://127.0.0.1/nginx_status')
         tmp = result.split()
         data = {}
         data['active'] = tmp[2]
@@ -254,7 +272,7 @@ def runInfo():
         data['Reading'] = tmp[11]
         data['Writing'] = tmp[13]
         data['Waiting'] = tmp[15]
-        return public.getJson(data)
+        return mw.getJson(data)
     except Exception as e:
         return 'oprenresty not started'
 
@@ -266,28 +284,28 @@ def errorLogPath():
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
-        print status()
+        print(status())
     elif func == 'start':
-        print start()
+        print(start())
     elif func == 'stop':
-        print stop()
+        print(stop())
     elif func == 'restart':
-        print restart()
+        print(restart())
     elif func == 'reload':
-        print reload()
+        print(reload())
     elif func == 'initd_status':
-        print initdStatus()
+        print(initdStatus())
     elif func == 'initd_install':
-        print initdInstall()
+        print(initdInstall())
     elif func == 'initd_uninstall':
-        print initdUinstall()
+        print(initdUinstall())
     elif func == 'conf':
-        print getConf()
+        print(getConf())
     elif func == 'get_os':
-        print getOs()
+        print(getOs())
     elif func == 'run_info':
-        print runInfo()
+        print(runInfo())
     elif func == 'error_log':
-        print errorLogPath()
+        print(errorLogPath())
     else:
-        print 'error'
+        print('error')

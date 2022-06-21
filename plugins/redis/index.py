@@ -6,10 +6,10 @@ import os
 import time
 
 sys.path.append(os.getcwd() + "/class/core")
-import public
+import mw
 
 app_debug = False
-if public.getOs() == 'darwin':
+if mw.isAppleSystem():
     app_debug = True
 
 
@@ -18,11 +18,11 @@ def getPluginName():
 
 
 def getPluginDir():
-    return public.getPluginDir() + '/' + getPluginName()
+    return mw.getPluginDir() + '/' + getPluginName()
 
 
 def getServerDir():
-    return public.getServerDir() + '/' + getPluginName()
+    return mw.getServerDir() + '/' + getPluginName()
 
 
 def getInitDFile():
@@ -32,27 +32,41 @@ def getInitDFile():
 
 
 def getConf():
+    path = getServerDir() + "/redis.conf"
+    return path
+
+
+def getConfTpl():
     path = getPluginDir() + "/config/redis.conf"
     return path
 
 
 def getInitDTpl():
-    path = getPluginDir() + "/init.d/redis.tpl"
+    path = getPluginDir() + "/init.d/" + getPluginName() + ".tpl"
     return path
 
 
 def getArgs():
     args = sys.argv[2:]
     tmp = {}
-    for i in range(len(args)):
-        t = args[i].split(':')
+    args_len = len(args)
+
+    if args_len == 1:
+        t = args[0].strip('{').strip('}')
+        t = t.split(':')
         tmp[t[0]] = t[1]
+    elif args_len > 1:
+        for i in range(len(args)):
+            t = args[i].split(':')
+            tmp[t[0]] = t[1]
+
     return tmp
 
 
 def status():
-    data = public.execShell(
-        "ps -ef|grep redis |grep -v grep | grep -v python | awk '{print $2}'")
+    data = mw.execShell(
+        "ps -ef|grep redis |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'")
+
     if data[0] == '':
         return 'stop'
     return 'start'
@@ -69,54 +83,75 @@ def initDreplace():
     file_bin = initD_path + '/' + getPluginName()
 
     # initd replace
-    content = public.readFile(file_tpl)
-    content = content.replace('{$SERVER_PATH}', service_path)
-    public.writeFile(file_bin, content)
-    public.execShell('chmod +x ' + file_bin)
+    if not os.path.exists(file_bin):
+        content = mw.readFile(file_tpl)
+        content = content.replace('{$SERVER_PATH}', service_path)
+        mw.writeFile(file_bin, content)
+        mw.execShell('chmod +x ' + file_bin)
+
+    # log
+    dataLog = getServerDir() + '/data'
+    if not os.path.exists(dataLog):
+        mw.execShell('chmod +x ' + file_bin)
 
     # config replace
-    conf_content = public.readFile(getConf())
+    dst_conf = getServerDir() + '/redis.conf'
+    conf_content = mw.readFile(getConfTpl())
     conf_content = conf_content.replace('{$SERVER_PATH}', service_path)
-    public.writeFile(getServerDir() + '/redis.conf', conf_content)
+    mw.writeFile(dst_conf, conf_content)
+
+    # systemd
+    systemDir = '/lib/systemd/system'
+    systemService = systemDir + '/redis.service'
+    systemServiceTpl = getPluginDir() + '/init.d/redis.service.tpl'
+    if os.path.exists(systemDir) and not os.path.exists(systemService):
+        service_path = mw.getServerDir()
+        se_content = mw.readFile(systemServiceTpl)
+        se_content = se_content.replace('{$SERVER_PATH}', service_path)
+        mw.writeFile(systemService, se_content)
+        mw.execShell('systemctl daemon-reload')
 
     return file_bin
 
 
-def start():
+def redisOp(method):
     file = initDreplace()
-    data = public.execShell(file + ' start')
+
+    if not mw.isAppleSystem():
+        data = mw.execShell('systemctl ' + method + ' redis')
+        if data[1] == '':
+            return 'ok'
+        return 'fail'
+
+    data = mw.execShell(file + ' start')
     if data[1] == '':
         return 'ok'
     return 'fail'
+
+
+def start():
+    return redisOp('start')
 
 
 def stop():
-    file = initDreplace()
-    data = public.execShell(file + ' stop')
-    if data[1] == '':
-        return 'ok'
-    return 'fail'
+    return redisOp('stop')
 
 
 def restart():
-    file = initDreplace()
-    data = public.execShell(file + ' restart')
-    if data[1] == '':
-        return 'ok'
-    return 'fail'
+    status = redisOp('restart')
+
+    log_file = runLog()
+    mw.execShell("echo '' > " + log_file)
+    return status
 
 
 def reload():
-    file = initDreplace()
-    data = public.execShell(file + ' reload')
-    if data[1] == '':
-        return 'ok'
-    return 'fail'
+    return redisOp('reload')
 
 
 def runInfo():
     cmd = getServerDir() + "/bin/redis-cli info"
-    data = public.execShell(cmd)[0]
+    data = mw.execShell(cmd)[0]
     res = [
         'tcp_port',
         'uptime_in_days',  # 已运行天数
@@ -141,64 +176,63 @@ def runInfo():
         if not t[0] in res:
             continue
         result[t[0]] = t[1]
-    return public.getJson(result)
+    return mw.getJson(result)
 
 
 def initdStatus():
-    if not app_debug:
-        os_name = public.getOs()
-        if os_name == 'darwin':
-            return "Apple Computer does not support"
-    initd_bin = getInitDFile()
-    if os.path.exists(initd_bin):
-        return 'ok'
-    return 'fail'
+    if mw.isAppleSystem():
+        return "Apple Computer does not support"
+
+    shell_cmd = 'systemctl status redis | grep loaded | grep "enabled;"'
+    data = mw.execShell(shell_cmd)
+    if data[0] == '':
+        return 'fail'
+    return 'ok'
 
 
 def initdInstall():
-    import shutil
-    if not app_debug:
-        os_name = public.getOs()
-        if os_name == 'darwin':
-            return "Apple Computer does not support"
+    if mw.isAppleSystem():
+        return "Apple Computer does not support"
 
-    source_bin = initDreplace()
-    initd_bin = getInitDFile()
-    shutil.copyfile(source_bin, initd_bin)
-    public.execShell('chmod +x ' + initd_bin)
+    mw.execShell('systemctl enable redis')
     return 'ok'
 
 
 def initdUinstall():
-    if not app_debug:
-        os_name = public.getOs()
-        if os_name == 'darwin':
-            return "Apple Computer does not support"
-    initd_bin = getInitDFile()
-    os.remove(initd_bin)
+
+    if mw.isAppleSystem():
+        return "Apple Computer does not support"
+
+    mw.execShell('systemctl disable redis')
     return 'ok'
+
+
+def runLog():
+    return getServerDir() + '/data/redis.log'
 
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
-        print status()
+        print(status())
     elif func == 'start':
-        print start()
+        print(start())
     elif func == 'stop':
-        print stop()
+        print(stop())
     elif func == 'restart':
-        print restart()
+        print(restart())
     elif func == 'reload':
-        print reload()
+        print(reload())
     elif func == 'initd_status':
-        print initdStatus()
+        print(initdStatus())
     elif func == 'initd_install':
-        print initdInstall()
+        print(initdInstall())
     elif func == 'initd_uninstall':
-        print initdUinstall()
+        print(initdUinstall())
     elif func == 'run_info':
-        print runInfo()
+        print(runInfo())
     elif func == 'conf':
-        print getConf()
+        print(getConf())
+    elif func == 'run_log':
+        print(runLog())
     else:
-        print 'error'
+        print('error')

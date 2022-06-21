@@ -1,5 +1,40 @@
 [
     {
+        "version": "0.8.6",
+        "content": "* mysql主从配置。<br/> * swap插件[虚拟内存]。<br/> * 部分优化。",
+        "path": "https://github.com/midoks/mdserver-web/releases/download/0.8.6/mdserver-web.zip"
+    },
+    {
+        "version": "0.8.5",
+        "content": "* 添加PHP80版本-Alpha <br/> * 自动识别IP地址 <br/> * 增加xhprof插件",
+        "path": "https://github.com/midoks/mdserver-web/releases/download/0.8.5/mdserver-web.zip"
+    },
+    {
+        "version": "0.7.3",
+        "content": "* 修复自动更新错误 <br/> * 优化文件批量处理 <br/> * 添加PHP守护插件",
+        "path": "https://github.com/midoks/mdserver-web/releases/download/0.7.3/mdserver-web.zip"
+    },
+    {
+        "version": "0.5.6",
+        "content": "* openresty,php,mysql,memcached,redis,pureftp,sphinx自启动添加 <br/> * 修复rsync自启动问题",
+        "path": "https://github.com/midoks/mdserver-web/releases/download/0.5.6/mdserver-web.zip"
+    },
+    {
+        "version": "0.4.2",
+        "content": "* ssh工具优化<br/>* 面板收藏功能完成<br/>* 网站子目录绑定<br/>* 网站备份<br/>* 自动更新优化",
+        "path": "https://github.com/midoks/mdserver-web/releases/download/0.4.2/mdserver-web.zip"
+    },
+	{
+        "version": "0.0.6",
+        "content": "1.修复重复js方法",
+        "path": "https://github.com//midoks/mdserver-web/archive/0.0.6.zip"
+    },
+	{
+        "version": "0.0.5",
+        "content": "1.基本功能OK<br/>,2.网站HTTPS功能验证!",
+        "path": "https://github.com//midoks/mdserver-web/archive/0.0.5.zip"
+    },
+    {
         "version": "0.0.1.2",
         "content": "1.项目初建!<br/>2.面板更新功能!",
         "path": "https://github.com/midoks/mdserver-web/releases/download/0.0.1/mdserver-web.zip"

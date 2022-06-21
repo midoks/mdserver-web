@@ -4,12 +4,13 @@ import sys
 import io
 import os
 import time
+import re
 
 sys.path.append(os.getcwd() + "/class/core")
-import public
+import mw
 
 app_debug = False
-if public.getOs() == 'darwin':
+if mw.isAppleSystem():
     app_debug = True
 
 
@@ -18,11 +19,11 @@ def getPluginName():
 
 
 def getPluginDir():
-    return public.getPluginDir() + '/' + getPluginName()
+    return mw.getPluginDir() + '/' + getPluginName()
 
 
 def getServerDir():
-    return public.getServerDir() + '/' + getPluginName()
+    return mw.getServerDir() + '/' + getPluginName()
 
 
 def getInitDFile():
@@ -32,21 +33,54 @@ def getInitDFile():
 
 
 def getConf():
+    path = getServerDir() + "/init.d/memcached"
+    return path
+
+
+def getConfEnv():
+    path = getServerDir() + "/memcached.env"
+    return path
+
+
+def getConfTpl():
     path = getPluginDir() + "/init.d/memcached.tpl"
     return path
+
+
+def getMemPort():
+    path = getServerDir() + '/memcached.env'
+    content = mw.readFile(path)
+    rep = 'PORT\s*=\s*(\d*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0]
 
 
 def getArgs():
     args = sys.argv[2:]
     tmp = {}
-    for i in range(len(args)):
-        t = args[i].split(':')
+    args_len = len(args)
+
+    if args_len == 1:
+        t = args[0].strip('{').strip('}')
+        t = t.split(':')
         tmp[t[0]] = t[1]
+    elif args_len > 1:
+        for i in range(len(args)):
+            t = args[i].split(':')
+            tmp[t[0]] = t[1]
+
     return tmp
 
 
+def checkArgs(data, ck=[]):
+    for i in range(len(ck)):
+        if not ck[i] in data:
+            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
+    return (True, mw.returnJson(True, 'ok'))
+
+
 def status():
-    data = public.execShell(
+    data = mw.execShell(
         "ps -ef|grep " + getPluginName() + " |grep -v grep | grep -v python | awk '{print $2}'")
     if data[0] == '':
         return 'stop'
@@ -55,64 +89,82 @@ def status():
 
 def initDreplace():
 
-    file_tpl = getConf()
-    service_path = public.getServerDir()
+    file_tpl = getConfTpl()
+    service_path = mw.getServerDir()
 
     initD_path = getServerDir() + '/init.d'
     if not os.path.exists(initD_path):
         os.mkdir(initD_path)
     file_bin = initD_path + '/memcached'
 
-    # if os.path.exists(file_bin):
-    #     return file_bin
+    if not os.path.exists(file_bin):
+        content = mw.readFile(file_tpl)
+        content = content.replace('{$SERVER_PATH}', service_path)
+        mw.writeFile(file_bin, content)
+        mw.execShell('chmod +x ' + file_bin)
 
-    content = public.readFile(file_tpl)
-    content = content.replace('{$SERVER_PATH}', service_path)
+    # systemd
+    systemDir = '/lib/systemd/system'
+    systemService = systemDir + '/memcached.service'
+    systemServiceTpl = getPluginDir() + '/init.d/memcached.service.tpl'
+    if os.path.exists(systemDir) and not os.path.exists(systemService):
+        service_path = mw.getServerDir()
+        se_content = mw.readFile(systemServiceTpl)
+        se_content = se_content.replace('{$SERVER_PATH}', service_path)
+        mw.writeFile(systemService, se_content)
+        mw.execShell('systemctl daemon-reload')
 
-    public.writeFile(file_bin, content)
-    public.execShell('chmod +x ' + file_bin)
+    envFile = getServerDir() + '/memcached.env'
+    if not os.path.exists(envFile):
+        wbody = "IP=127.0.0.1\n"
+        wbody = wbody + "PORT=11211\n"
+        wbody = wbody + "USER=root\n"
+        wbody = wbody + "MAXCONN=1024\n"
+        wbody = wbody + "CACHESIZE=1024\n"
+        wbody = wbody + "OPTIONS=''\n"
+        mw.writeFile(envFile, wbody)
+
     return file_bin
 
 
-def start():
+def memOp(method):
     file = initDreplace()
-    data = public.execShell(file + ' start')
+
+    if not mw.isAppleSystem():
+        data = mw.execShell('systemctl ' + method + ' ' + getPluginName())
+        if data[1] == '':
+            return 'ok'
+        return data[1]
+
+    data = mw.execShell(file + ' ' + method)
     if data[1] == '':
         return 'ok'
-    return 'fail'
+    return data[1]
+
+
+def start():
+    return memOp('start')
 
 
 def stop():
-    file = initDreplace()
-    data = public.execShell(file + ' stop')
-    if data[1] == '':
-        return 'ok'
-    return 'fail'
+    return memOp('stop')
 
 
 def restart():
-    file = initDreplace()
-    data = public.execShell(file + ' reload')
-    if data[1] == '':
-        return 'ok'
-    return 'fail'
+    return memOp('restart')
 
 
 def reload():
-    file = initDreplace()
-    data = public.execShell(file + ' reload')
-    if data[1] == '':
-        return 'ok'
-    return 'fail'
+    return memOp('reload')
 
 
 def runInfo():
     # 获取memcached状态
     import telnetlib
     import re
-
+    port = getMemPort()
     try:
-        tn = telnetlib.Telnet('127.0.0.1', 11211)
+        tn = telnetlib.Telnet('127.0.0.1', int(port))
         tn.write(b"stats\n")
         tn.write(b"quit\n")
         data = tn.read_all()
@@ -134,94 +186,89 @@ def runInfo():
             result['hit'] = float(result['get_hits']) / \
                 float(result['cmd_get']) * 100
 
-        conf = public.readFile(getConf())
+        conf = mw.readFile(getServerDir() + '/memcached.env')
         result['bind'] = re.search('IP=(.+)', conf).groups()[0]
         result['port'] = int(re.search('PORT=(\d+)', conf).groups()[0])
         result['maxconn'] = int(re.search('MAXCONN=(\d+)', conf).groups()[0])
         result['cachesize'] = int(
             re.search('CACHESIZE=(\d+)', conf).groups()[0])
-        return public.getJson(result)
-    except Exception, e:
-        return public.getJson({})
+        return mw.getJson(result)
+    except Exception as e:
+        return mw.getJson({})
 
 
 def saveConf():
-     # 设置memcached缓存大小
-    import re
-    confFile = getConf()
-    try:
-        args = getArgs()
-        content = public.readFile(confFile)
-        content = re.sub('IP=.+', 'IP=' + args['ip'], content)
-        content = re.sub('PORT=\d+', 'PORT=' + args['port'], content)
-        content = re.sub('MAXCONN=\d+', 'MAXCONN=' + args['maxconn'], content)
-        content = re.sub('CACHESIZE=\d+', 'CACHESIZE=' +
-                         args['cachesize'], content)
-        public.writeFile(confFile, content)
-        reload()
-        return 'ok'
-    except Exception as e:
-        pass
-    return 'fail'
+
+    args = getArgs()
+    data = checkArgs(args, ['ip', 'port', 'maxconn', 'maxsize'])
+    if not data[0]:
+        return data[1]
+
+    envFile = getServerDir() + '/memcached.env'
+
+    wbody = "IP=" + args['ip'] + "\n"
+    wbody = wbody + "PORT=" + args['port'] + "\n"
+    wbody = wbody + "USER=root\n"
+    wbody = wbody + "MAXCONN=" + args['maxconn'] + "\n"
+    wbody = wbody + "CACHESIZE=" + args['maxconn'] + "\n"
+    wbody = wbody + "OPTIONS=''\n"
+    mw.writeFile(envFile, wbody)
+
+    restart()
+    return 'save ok'
 
 
 def initdStatus():
-    if not app_debug:
-        os_name = public.getOs()
-        if os_name == 'darwin':
-            return "Apple Computer does not support"
-    initd_bin = getInitDFile()
-    if os.path.exists(initd_bin):
-        return 'ok'
-    return 'fail'
+    if mw.isAppleSystem():
+        return "Apple Computer does not support"
+
+    shell_cmd = 'systemctl status ' + \
+        getPluginName() + ' | grep loaded | grep "enabled;"'
+    data = mw.execShell(shell_cmd)
+    if data[0] == '':
+        return 'fail'
+    return 'ok'
 
 
 def initdInstall():
-    import shutil
-    if not app_debug:
-        os_name = public.getOs()
-        if os_name == 'darwin':
-            return "Apple Computer does not support"
+    if mw.isAppleSystem():
+        return "Apple Computer does not support"
 
-    mem_bin = initDreplace()
-    initd_bin = getInitDFile()
-    shutil.copyfile(mem_bin, initd_bin)
-    public.execShell('chmod +x ' + initd_bin)
+    mw.execShell('systemctl enable ' + getPluginName())
     return 'ok'
 
 
 def initdUinstall():
     if not app_debug:
-        os_name = public.getOs()
-        if os_name == 'darwin':
+        if mw.isAppleSystem():
             return "Apple Computer does not support"
-    initd_bin = getInitDFile()
-    os.remove(initd_bin)
+
+    mw.execShell('systemctl disable ' + getPluginName())
     return 'ok'
 
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
-        print status()
+        print(status())
     elif func == 'start':
-        print start()
+        print(start())
     elif func == 'stop':
-        print stop()
+        print(stop())
     elif func == 'restart':
-        print restart()
+        print(restart())
     elif func == 'reload':
-        print reload()
+        print(reload())
     elif func == 'initd_status':
-        print initdStatus()
+        print(initdStatus())
     elif func == 'initd_install':
-        print initdInstall()
+        print(initdInstall())
     elif func == 'initd_uninstall':
-        print initdUinstall()
+        print(initdUinstall())
     elif func == 'run_info':
-        print runInfo()
-    elif func == 'conf':
-        print getConf()
+        print(runInfo())
+    elif func == 'conf_env':
+        print(getConfEnv())
     elif func == 'save_conf':
-        print saveConf()
+        print(saveConf())
     else:
-        print 'fail'
+        print('error')

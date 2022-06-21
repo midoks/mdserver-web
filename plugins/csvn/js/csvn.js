@@ -369,7 +369,6 @@ function csvnProjectScriptLoad(pname){
 
         layer.msg('加载成功!',{icon:1,time:2000,shade: [0.3, '#000']});
         setTimeout(function(){
-            $('.layui-layer-close1').click();
             csvnProjectList();
         },2000);
     });
@@ -384,7 +383,6 @@ function csvnProjectScriptUnload(pname){
 
         layer.msg('卸载成功!',{icon:1,time:2000,shade: [0.3, '#000']});
         setTimeout(function(){
-            $('.layui-layer-close1').click();
             csvnProjectList();
         },2000);
     });
@@ -395,7 +393,6 @@ function csvnProjectScriptEdit(pname){
         var rdata = $.parseJSON(data.data);
         if (rdata['status']){
             onlineEditFile(0, rdata['path']);
-            $('.layui-layer-close1').click();
             csvnProjectList();
         } else {
             layer.msg(rdata.msg,{icon:1,time:2000,shade: [0.3, '#000']});
@@ -408,7 +405,6 @@ function csvnProjectScriptDebug(pname){
         var rdata = $.parseJSON(data.data);
         if (rdata['status']){
             onlineEditFile(0, rdata['path']);
-            $('.layui-layer-close1').click();
             csvnProjectList();
         } else {
             layer.msg(rdata.msg,{icon:1,time:2000,shade: [0.3, '#000']});

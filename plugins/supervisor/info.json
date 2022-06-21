@@ -1,0 +1,18 @@
+{
+	"sort": 7,
+	"ps": "一个Python开发的通用的进程管理程序",
+	"name": "supervisor",
+	"title": "supervisor",
+	"shell": "install.sh",
+	"versions":["1.0"],
+	"updates":["1.0"],
+	"tip": "soft",
+	"checks": "server/supervisor",
+	"path": "server/supervisor",
+	"display": 1,
+	"author": "python",
+	"date": "2022-06-15",
+	"home": "https://pypi.org/project/supervisor/",
+	"type": 0,
+	"pid": "4"
+}

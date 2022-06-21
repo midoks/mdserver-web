@@ -26,11 +26,15 @@ class Sql():
         try:
             if self.__DB_CONN == None:
                 self.__DB_CONN = sqlite3.connect(self.__DB_FILE)
-        except Exception, ex:
+        except Exception as ex:
             return "error: " + str(ex)
 
     def dbfile(self, name):
         self.__DB_FILE = 'data/' + name + '.db'
+        return self
+
+    def dbPos(self, path, name):
+        self.__DB_FILE = path + '/' + name + '.db'
         return self
 
     def table(self, table):
@@ -92,7 +96,7 @@ class Sql():
                 del(tmp)
             self.__close()
             return data
-        except Exception, ex:
+        except Exception as ex:
             return "error: " + str(ex)
 
     def getField(self, keyName):
@@ -138,7 +142,7 @@ class Sql():
             self.__close()
             self.__DB_CONN.commit()
             return id
-        except Exception, ex:
+        except Exception as ex:
             return "error: " + str(ex)
 
     def checkInput(self, data):
@@ -172,7 +176,7 @@ class Sql():
                 "(" + keys + ") " + "VALUES(" + values + ")"
             result = self.__DB_CONN.execute(sql, param)
             return True
-        except Exception, ex:
+        except Exception as ex:
             return "error: " + str(ex)
 
     def commit(self):
@@ -190,8 +194,8 @@ class Sql():
             opt = opt[0:len(opt) - 1]
             sql = "UPDATE " + self.__DB_TABLE + " SET " + opt + self.__OPT_WHERE
 
-            import public
-            public.writeFile('/tmp/test.pl', sql)
+            import mw
+            mw.writeFile('/tmp/test.pl', sql)
 
             # 处理拼接WHERE与UPDATE参数
             tmp = list(param)
@@ -202,7 +206,7 @@ class Sql():
             self.__close()
             self.__DB_CONN.commit()
             return result.rowcount
-        except Exception, ex:
+        except Exception as ex:
             return "error: " + str(ex)
 
     def delete(self, id=None):
@@ -217,17 +221,18 @@ class Sql():
             self.__close()
             self.__DB_CONN.commit()
             return result.rowcount
-        except Exception, ex:
+        except Exception as ex:
             return "error: " + str(ex)
 
     def execute(self, sql, param):
         # 执行SQL语句返回受影响行
         self.__GetConn()
+        # print sql, param
         try:
             result = self.__DB_CONN.execute(sql, param)
             self.__DB_CONN.commit()
             return result.rowcount
-        except Exception, ex:
+        except Exception as ex:
             return "error: " + str(ex)
 
     def query(self, sql, param):
@@ -236,16 +241,16 @@ class Sql():
         try:
             result = self.__DB_CONN.execute(sql, param)
             # 将元组转换成列表
-            data = map(list, result)
-            return data
-        except Exception, ex:
+            # data = map(list, result)
+            return result
+        except Exception as ex:
             return "error: " + str(ex)
 
     def create(self, name):
         # 创建数据表
         self.__GetConn()
-        import public
-        script = public.readFile('data/' + name + '.sql')
+        import mw
+        script = mw.readFile('data/' + name + '.sql')
         result = self.__DB_CONN.executescript(script)
         self.__DB_CONN.commit()
         return result.rowcount
@@ -253,8 +258,8 @@ class Sql():
     def fofile(self, filename):
         # 执行脚本
         self.__GetConn()
-        import public
-        script = public.readFile(filename)
+        import mw
+        script = mw.readFile(filename)
         result = self.__DB_CONN.executescript(script)
         self.__DB_CONN.commit()
         return result.rowcount

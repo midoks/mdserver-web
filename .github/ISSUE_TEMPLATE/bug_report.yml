@@ -1,0 +1,24 @@
+name: Bug提交
+description: 提交错误报告以帮助我们改进
+labels: ["\U0001F48A bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢您花时间填写此错误报告！
+        
+        - 如有疑问，请讨论[Discussions](https://github.com/midoks/mdserver-web/discussions).
+        - 检查以确保尚未有人打开类似的[issue](https://github.com/midoks/mdserver-web/issues).
+  - type: input
+    attributes:
+      label: 操作系统
+      description: |
+       请指定您报告的确切操作系统名称和版本，例如"CentOS 7"、"Ubuntu 20.04"。
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 描述错误
+      description: 对bug的清晰而简洁的描述。
+    validations:
+      required: true

@@ -8,6 +8,7 @@
 	"updates":"5.1.4",
 	"tip": "soft",
 	"checks": "server/csvn",
+	"path":"server/csvn",
 	"author": "midoks",
 	"date": "2017-04-01",
 	"home": "https://www.collab.net",

@@ -8,22 +8,27 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
 
-install_tmp=${rootPath}/tmp/bt_install.pl
+install_tmp=${rootPath}/tmp/mw_install.pl
 
+VERSION=$2
 
 Install_redis()
 {
-
 	echo '正在安装脚本文件...' > $install_tmp
+	mkdir -p $serverPath/source
 
-	wget -O $serverPath/source/redis.tar.gz http://download.redis.io/releases/redis-4.0.11.tar.gz
-	cd $serverPath/source && tar -zxvf redis.tar.gz
+	if [ ! -f $serverPath/source/redis-${VERSION}.tar.gz ];then
+		wget -O $serverPath/source/redis-${VERSION}.tar.gz http://download.redis.io/releases/redis-${VERSION}.tar.gz
+	fi
+	
+	cd $serverPath/source && tar -zxvf redis-${VERSION}.tar.gz
 
 	mkdir -p $serverPath/redis
-	cd redis* && make PREFIX=$serverPath/redis install
+	mkdir -p $serverPath/redis/data
+	cd redis-${VERSION} && make PREFIX=$serverPath/redis install
 	sed '/^ *#/d' redis.conf > $serverPath/redis/redis.conf
 
-	echo '4.0' > $serverPath/redis/version.pl
+	echo "${VERSION}" > $serverPath/redis/version.pl
 
 	echo '安装完成' > $install_tmp
 }
@@ -31,6 +36,10 @@ Install_redis()
 Uninstall_redis()
 {
 	rm -rf $serverPath/redis
+
+	if [ -f /lib/systemd/system/redis.service ];then
+		rm -rf /lib/systemd/system/redis.service
+	fi
 	echo "Uninstall_redis" > $install_tmp
 }
 

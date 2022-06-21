@@ -1,0 +1,30 @@
+<div class="bt-form">
+	<div class='plugin_version'></div>
+	<div class="bt-w-main">
+		<div class="bt-w-menu">
+			<p class="bgw" onclick="pluginService('supervisor');">服务</p>
+			<p onclick="pluginInitD('supervisor');">自启动</p>
+			<p onclick="supList();">进程管理</p>
+			<p onclick="pluginConfig('supervisor');">主配置</p>
+			<p onclick="pluginLogs('supervisor','','run_log', 10);">主日志</p>
+			<p onclick="supConfigTpl('supervisor');">子配置</p>
+			<p onclick="supLogs('supervisor','config_tpl','read_config_log_tpl');">子日志</p>
+		</div>
+		<div class="bt-w-con pd15">
+			<div class="soft-man-con"></div>
+		</div>
+	</div>
+
+</div>
+
+
+<style>
+.code{padding: 20px 5px;border: 1px solid #e1e1e1;background: #fcfcfc;border-radius: 4px;line-height: 24px;}
+.code span {display: block;margin-left: 15px;margin-bottom: 0;}
+</style>
+<script type="text/javascript">
+resetPluginWinWidth(800);
+$.getScript( "/plugins/file?name=supervisor&f=js/supervisor.js", function(){
+	pluginService('supervisor');
+});
+</script>

@@ -27,47 +27,10 @@ function softMain(name, version) {
     });
 }
 
-
-//插件设置菜单
-function pluginMan(name, title) {
-    loadT = layer.msg(lan.soft.menu_temp, { icon: 16, time: 0, shade: [0.3, '#000'] });
-    $.get('/plugins/setting?name=' + name, function(rhtml) {
-        layer.close(loadT);
-        if (rhtml.status === false) {
-            if (name == "phpguard") {
-                layer.msg(lan.soft.menu_phpsafe, { icon: 1 })
-            } else {
-                layer.msg(rhtml.msg, { icon: 2 });
-            }
-            return;
-        }
-        layer.open({
-            type: 1,
-            shift: 5,
-            offset: '20%',
-            closeBtn: 2,
-            area: '700px',
-            title: '' + title,
-            content: rhtml
-        });
-        rcode = rhtml.split('<script type="javascript/text">')[1]
-        if (!rcode) rcode = rhtml.split('<script type="text/javascript">')[1]
-        rcode = rcode.replace('</script>', '');
-        setTimeout(function() {
-            if (!!(window.attachEvent && !window.opera)) {
-                execScript(rcode);
-            } else {
-                window.eval(rcode);
-            }
-        }, 200)
-
-    });
-}
-
 //取软件列表
 function getSList(isdisplay) {
     if (isdisplay !== true) {
-        var loadT = layer.msg(lan.soft.get_list, { icon: 16, time: 0, shade: [0.3, '#000'] })
+        var loadT = layer.msg('正在获取列表...', { icon: 16, time: 0, shade: [0.3, '#000'] })
     }
     if (!isdisplay || isdisplay === true)
         isdisplay = getCookie('p' + getCookie('softType'));
@@ -159,12 +122,11 @@ function getSList(isdisplay) {
                 }
             }
 
-            var isTask = plugin.task;
             if (plugin.task == '-2') {
                 handle = '<a style="color:green;" href="javascript:task();">正在卸载...</a>';
             } else if (plugin.task == '-1') {
                 handle = '<a style="color:green;" href="javascript:task();">正在安装...</a>';
-            } else if (isTask == '0') {
+            } else if (plugin.task == '0') {
                 handle = '<a style="color:#C0C0C0;" href="javascript:task();">等待中...</a>';
             }
 
@@ -252,14 +214,14 @@ function addVersion(name, ver, type, obj, title) {
         var type = $('.fangshi input').prop("checked") ? '1' : '0';
         var data = "name=" + name + "&version=" + version + "&type=" + type;
 
-        var loadT = layer.msg(lan.soft.add_install, { icon: 16, time: 0, shade: [0.3, '#000'] });
+        var loadT = layer.msg('正在添加到安装器...', { icon: 16, time: 0, shade: [0.3, '#000'] });
         $.post("/plugins/install", data, function(rdata) {
             layer.closeAll();
             layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
             getSList();
-        });
+        },'json');
     });
-    InstallTips();
+    installTips();
     fly("bi-btn");
 }
 
@@ -267,7 +229,7 @@ function addVersion(name, ver, type, obj, title) {
 function uninstallVersion(name, version) {
     layer.confirm(msgTpl('您真的要卸载[{1}-{2}]吗?', [name, version]), { icon: 3, closeBtn: 2 }, function() {
         var data = 'name=' + name + '&version=' + version;
-        var loadT = layer.msg(lan.public.the, { icon: 16, time: 0, shade: [0.3, '#000'] });
+        var loadT = layer.msg('正在处理,请稍候...', { icon: 16, time: 0, shade: [0.3, '#000'] });
         $.post('/plugins/uninstall', data, function(rdata) {
             layer.close(loadT)
             getSList();
@@ -290,6 +252,8 @@ function toIndexDisplay(name, version, coexist) {
     $.post("/plugins/set_index", data, function(rdata) {
         if (rdata.status) {
             layer.msg(rdata.msg, { icon: 1 })
+        } else {
+            layer.msg(rdata.msg, { icon: 2 })
         }
     },'json');
 }
@@ -340,7 +304,7 @@ function indexListHtml(callback){
             con += '<div class="col-sm-3 col-md-3 col-lg-3" data-id="' + data_id + '">\
                 <span class="spanmove"></span>\
                 <div onclick="softMain(\'' + plugin.name + '\',\'' + plugin.setup_version + '\')">\
-                <div class="image"><img src="/plugins/file?name=' + plugin.name + '&f=ico.png"></div>\
+                <div class="image"><img src="/plugins/file?name=' + plugin.name + '&f=ico.png" style="max-width:48px;"></div>\
                 <div class="sname">' +  name + state + '</div>\
                 </div>\
             </div>';
@@ -379,7 +343,7 @@ function indexSoft() {
         var data = $("#indexsoft > div").map(function() { return $(this).attr("data-id"); }).get();
         tmp = [];
         for(i in data){
-            console.log(data[i]);
+            // console.log(data[i]);
             if (data[i] != ''){
                 tmp.push($.trim(data[i]));
             }
@@ -396,8 +360,86 @@ function indexSoft() {
     };
 }
 
-// $(function() {
-//     if (window.document.location.pathname == '/soft/') {
-//         setInterval(function() { getSList(); }, 10000);
-//     }
-// });
+
+function importPluginOpen(){
+    $("#update_zip").on("change", function () {
+        var files = $("#update_zip")[0].files;
+        if (files.length == 0) {
+            return;
+        }
+        importPlugin(files[0]);
+        $("#update_zip").val('')
+    });
+    $("#update_zip").click();
+}
+
+
+function importPlugin(file){
+    var formData = new FormData();
+    formData.append("plugin_zip", file);
+    $.ajax({
+        url: "/plugins/update_zip",
+        type: "POST",
+        data: formData,
+        processData: false,
+        dataType:'json',
+        contentType: false,
+        success: function (data) {
+            if (data.status === false) {
+                layer.msg(data.msg, { icon: 2 });
+                return;
+            }
+            var loadT = layer.open({
+                type: 1,
+                area: "500px",
+                title: "安装第三方插件包",
+                closeBtn: 2,
+                shift: 5,
+                shadeClose: false,
+                content: '<style>\
+                    .install_three_plugin{padding:25px;padding-bottom:70px}\
+                    .plugin_user_info p { font-size: 14px;}\
+                    .plugin_user_info {padding: 15px 30px;line-height: 26px;background: #f5f6fa;border-radius: 5px;border: 1px solid #efefef;}\
+                    .btn-content{text-align: center;margin-top: 25px;}\
+                </style>\
+                <div class="bt-form c7  install_three_plugin pb70">\
+                    <div class="plugin_user_info">\
+                        <p><b>名称：</b>'+ data.title + '</p>\
+                        <p><b>版本：</b>' + data.versions +'</p>\
+                        <p><b>描述：</b>' + data.ps + '</p>\
+                        <p><b>大小：</b>' + toSize(data.size) + '</p>\
+                        <p><b>作者：</b>' + data.author + '</p>\
+                        <p><b>来源：</b><a class="btlink" href="'+data.home+'" target="_blank">' + data.home + '</a></p>\
+                    </div>\
+                    <ul class="help-info-text c7">\
+                        <li style="color:red;">此为第三方开发的插件，无法验证其可靠性!</li>\
+                        <li>安装过程可能需要几分钟时间，请耐心等候!</li>\
+                        <li>如果已存在此插件，将被替换!</li>\
+                    </ul>\
+                    <div class="bt-form-submit-btn"><button type="button" class="btn btn-sm btn-danger mr5" onclick="layer.closeAll()">取消</button><button type="button" class="btn btn-sm btn-success" onclick="importPluginInstall(\''+ data.name + '\',\'' + data.tmp_path +'\')">确定安装</button></div>\
+                </div>'
+            });
+
+        },error: function (responseStr) {
+            layer.msg('上传失败2!:' + responseStr, { icon: 2 });
+        }
+    });
+}
+
+
+function importPluginInstall(plugin_name, tmp_path) {
+    layer.msg('正在安装,这可能需要几分钟时间...', { icon: 16, time: 0, shade: [0.3, '#000'] });
+    $.post('/plugins/input_zip', { plugin_name: plugin_name, tmp_path: tmp_path }, function (rdata) {
+        layer.closeAll()
+        if (rdata.status) {
+            getSList(true);
+        }
+        setTimeout(function () { layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 }) }, 1000);
+    },'json');
+}
+
+$(function() {
+    if (window.document.location.pathname == '/soft/') {
+        setInterval(function() { getSList(); }, 8000);
+    }
+});

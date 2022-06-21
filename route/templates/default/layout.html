@@ -21,8 +21,8 @@
         <div id="container" class="container-fluid">
             <div class="sidebar-scroll">
                 <div class="sidebar-auto">
-                    <div id="task" class="task cw" onclick="messagebox()"></div>
-                    <h3 class="mypcip"><span class="f14 cw">127.0.0.1</span></h3>
+                    <div id="task" class="task cw" onclick="messageBox();"></div>
+                    <h3 class="mypcip"><span class="f14 cw">{{data['ip']}}</span></h3>
                     <ul class="menu">
                         <li id="memuA"> <a class="menu_home" href="/">首页</a></li>
                         <li id="memuAsite"><a class="menu_web" href="/site">网站</a></li>
@@ -35,22 +35,34 @@
                         <li><a class="menu_exit" href="javascript:;" id="dologin">退出</a></li>
                     </ul>
                     <div id="newbtpc"></div>
-                    <div class="btpc-plus" onclick="bindBTPanel(0,'b')">+</div>
+                    <div class="btpc-plus" onclick="bindPanel(0,'b')">+</div>
                 </div>
             </div>
             <button style="display: none;" id="bt_copys" class="bt_copy" data-clipboard-text=""></button>
+            <link rel="stylesheet" href="/static/build/xterm.css?v={{config.version}}">
+            <link rel="stylesheet" href="/static/build/addons/fullscreen/fullscreen.css?v={{config.version}}">
             <script src="/static/js/jquery-1.10.2.min.js?v={{config.version}}"></script>
             <script src="/static/js/bootstrap.min.js?v={{config.version}}"></script>
             <script src="/static/layer/layer.js?v={{config.version}}"></script>
             <script src="/static/js/jquery.fly.min.js?v={{config.version}}"></script>
             <script src="/static/js/clipboard.min.js?v={{config.version}}"></script>
+            <script src="/static/build/xterm.js?v={{config.version}}"></script>
+            <script src="/static/build/addons/attach/attach.js?v={{config.version}}"></script>
+            <script src="/static/build/addons/fit/fit.js?v={{config.version}}"></script>
+            <script src="/static/build/addons/fullscreen/fullscreen.js?v={{config.version}}"></script>
+            <script src="/static/js/socket.io.min.js?v={{config.version}}"></script>
+            <script src="/static/build/addons/winptyCompat/winptyCompat.js?v={{config.version}}"></script>
             <script src="/static/app/public.js?v={{config.version}}"></script>
+            <script src="/static/js/echarts.min.js?v={{config.version}}"></script>
+            <script src="/static/js/jquery.dragsort-0.5.2.min.js?v={{config.version}}"></script>
+            
             {% block content %}{% endblock %}
-            <div class="footer bgw">mdserver-web &copy;2018-∞ 面板 (<a style="color:#20a53a;" target="_blank" href="//github.com/midoks/mdserver-web">源码</a>)<a style="margin-left:20px;color:#20a53a;" href="//github.com/midoks/mdserver-web/wiki/mdserver-web" target="_blank">wiki</a>
+            <div class="footer bgw">mdserver-web &copy;2018-∞ 面板 (<a style="color:#20a53a;" target="_blank" href="//github.com/midoks/mdserver-web">源码</a>)<a style="margin-left:20px;color:#20a53a;" href="//github.com/midoks/mdserver-web/wiki" target="_blank">wiki</a>
         </div>
     </div>
     </div>
 </body>
+
 <script src="/static/codemirror/lib/codemirror.js?v={{config.version}}"></script>
 <script src="/static/codemirror/addon/edit/editAll.js?v={{config.version}}"></script>
 <script src="/static/codemirror/mode/modeAll.js?v={{config.version}}"></script>
@@ -58,15 +70,5 @@
 <script src="/static/codemirror/addon/search/search.js?v={{config.version}}"></script>
 <script src="/static/codemirror/addon/scroll/annotatescrollbar.js?v={{config.version}}"></script>
 <script src="/static/laydate/laydate.js?v={{config.version}}"></script>
-<script type="text/javascript">
-// $$("#setBox").click(function() {
-//     if ($$(this).prop("checked")) {
-//         $$("input[name=id]").prop("checked", true)
-//     } else {
-//         $$("input[name=id]").prop("checked", false)
-//     }
-// });
-// setCookie('order', 'id desc');
-</script>
 
 </html>

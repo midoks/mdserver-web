@@ -3,6 +3,7 @@
 	<div class="bt-w-main">
 		<div class="bt-w-menu">
 			<p class="bgw" onclick="pluginService('php', $('.plugin_version').attr('version'));">服务</p>
+			<p onclick="pluginInitD('php', $('.plugin_version').attr('version'));">自启动</p>
 			<p onclick="phpLibConfig($('.plugin_version').attr('version'));">安装扩展</p>
 			<p onclick="phpSetConfig($('.plugin_version').attr('version'));">配置修改</p>
 			<p onclick="phpUploadLimitReq($('.plugin_version').attr('version'));">上传限制</p>
@@ -14,6 +15,7 @@
 			<p onclick="pluginLogs('php',$('.plugin_version').attr('version'),'fpm_log');">FPM日志</p>
 			<p onclick="pluginLogs('php',$('.plugin_version').attr('version'),'fpm_slow_log');">慢日志</p>
 			<p onclick="getPhpinfo($('.plugin_version').attr('version'));">PHPIFNO</p>
+			<p onclick="pluginConfig('php',$('.plugin_version').attr('version'),'app_start');">预加载脚本</p>
 		</div>
 		<div class="bt-w-con pd15">
 			<div class="soft-man-con"></div>
@@ -25,5 +27,4 @@
 $.getScript( "/plugins/file?name=php&f=js/php.js", function(){
 	pluginService('php', $('.plugin_version').attr('version'));
 });
-
 </script>

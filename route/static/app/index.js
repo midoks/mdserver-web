@@ -86,8 +86,8 @@ function rocket(sum, m) {
 function reMemory() {
     setTimeout(function() {
         $(".mem-release").find('.mask').css({ 'color': '#20a53a', 'font-size': '14px' }).html('<span style="display:none">1</span>' + lan.index.memre_ok_0 + ' <img src="/static/img/ings.gif">');
-        $.post('/system?action=ReMemory', '', function(rdata) {
-            var percent = GetPercent(rdata.memRealUsed, rdata.memTotal);
+        $.post('/system/rememory', '', function(rdata) {
+            var percent = getPercent(rdata.memRealUsed, rdata.memTotal);
             var memText = rdata.memRealUsed + "/" + rdata.memTotal + " (MB)";
             percent = Math.round(percent);
             $(".mem-release").find('.mask').css({ 'color': '#20a53a', 'font-size': '14px' }).html("<span style='display:none'>" + percent + "</span>" + lan.index.memre_ok);
@@ -107,7 +107,7 @@ function reMemory() {
                 $(".mem-release").find('.mask').removeAttr("style").html("<span>" + percent + "</span>%");
                 $(".mem-release").find(".mem-re-min").show();
             }, 2000)
-        });
+        },'json');
     }, 2000);
 }
 
@@ -166,8 +166,8 @@ function clearSystem() {
 }
 
 function setMemImg(info){
-    setCookie("memRealUsed", parseInt((info.memRealUsed)));
-    $("#memory").html(parseInt((info.memRealUsed)) + '/' + info.memTotal + ' (MB)');
+    setCookie("memRealUsed", parseInt(info.memRealUsed));
+    $("#memory").html(parseInt(info.memRealUsed) + '/' + parseInt(info.memTotal) + ' (MB)');
     setCookie("mem-before", $("#memory").text());
     if (!getCookie('memSize')) setCookie('memSize', parseInt(info.memTotal));
     var memPre = Math.floor(info.memRealUsed / (info.memTotal / 100));
@@ -180,8 +180,8 @@ function setMemImg(info){
 
 function getInfo() {
     $.get("/system/system_total", function(info) {
-        setCookie("memRealUsed", parseInt((info.memRealUsed)));
-        $("#memory").html(parseInt((info.memRealUsed)) + '/' + info.memTotal + ' (MB)');
+        setCookie("memRealUsed", parseInt(info.memRealUsed));
+        $("#memory").html(parseInt(info.memRealUsed) + '/' + parseInt(info.memTotal) + ' (MB)');
         setCookie("mem-before", $("#memory").text());
         if (!getCookie('memSize')) setCookie('memSize', parseInt(info.memTotal));
         var memPre = Math.floor(info.memRealUsed / (info.memTotal / 100));
@@ -543,10 +543,6 @@ function updateVersion(version) {
     var loadT = layer.msg('正在升级面板..', { icon: 16, time: 0, shade: [0.3, '#000'] });
     $.get('/system/update_server?type=update&version='+version, function(rdata) {
 
-        if (rdata.data == 'download'){
-            updateStatus();return;
-        }
-
         layer.closeAll();
         if (rdata.status === false) {
             layer.msg(rdata.msg, { icon: 5, time: 5000 });
@@ -557,14 +553,6 @@ function updateVersion(version) {
             $("#btversion").html(version);
             $("#toUpdate").html('');
         }
-
-        updateStatus();
-        // layer.msg(lan.index.update_ok, { icon: 1 });
-        // $.get('/system?action=ReWeb', function() {});
-        // setTimeout(function() {
-        //     window.location.reload();
-        // }, 3000);
-
     },'json').error(function() {
         layer.msg('更新失败,请重试!', { icon: 2 });
         setTimeout(function() {
@@ -573,120 +561,102 @@ function updateVersion(version) {
     });
 }
 
-function updateStatus(){
-    layer.open({
-            type:1,
-            title:'<span class="badge badge-inverse">软件下载中...</span>',
-            area: '400px', 
-            shadeClose:false,
-            closeBtn:2,
-            content:'<div class="setchmod bt-form pd20 pb70">'
-                +'<div class="progress"><div id="up_download_progress" class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"><span class="sr-only">40% 完成</span></div></div>'
-                +'<div class="bt-form-submit-btn">'
-                +'<button type="button" class="btn btn-danger btn-sm btn-title" onclick="layer.closeAll()">取消</button>'
-                +'<button type="button" class="btn btn-success btn-sm btn-title" onclick="updateInstall()" >确认安装</button>'
-                +'</div>'
-                +'</div>'
-        });
+function pluginIndexService(pname,pfunc, callback){
+    $.post('/plugins/run', {name:'openresty', func:pfunc}, function(data) {
+        if (!data.status){
+            layer.msg(data.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+            return;
+        }
 
-    var t = setInterval(function(){
-        $.get('/system/update_server?type=update_status', function(rdata) {
-            console.log(rdata);
-            $('#up_download_progress').css('width',rdata.data+"%");
-            if (rdata.data ==100){
-                clearInterval(t);
-            }
-            
-        },'json');
-    },1000);
-}
-
-function updateInstall(){
-
+        if(typeof(callback) == 'function'){
+            callback(data);
+        }
+    },'json'); 
 }
 
 //重启服务器
-function ReBoot() {
+function reBoot() {
     layer.open({
         type: 1,
-        title: lan.index.reboot_title,
-        area: ['500px', '280px'],
+        title: '重启服务器或者面板',
+        area: '330px',
         closeBtn: 2,
         shadeClose: false,
-        content: "<div class='bt-form bt-window-restart'>\
-			<div class='pd15'>\
-			<p style='color:red; margin-bottom:10px; font-size:15px;'>" + lan.index.reboot_warning + "</p>\
-			<div class='SafeRestart' style='line-height:26px'>\
-				<p>" + lan.index.reboot_ps + "</p>\
-				<p>" + lan.index.reboot_ps_1 + "</p>\
-				<p>" + lan.index.reboot_ps_2 + "</p>\
-				<p>" + lan.index.reboot_ps_3 + "</p>\
-				<p>" + lan.index.reboot_ps_4 + "</p>\
-			</div>\
-			</div>\
-			<div class='bt-form-submit-btn'>\
-				<button type='button' id='web_end_time' class='btn btn-danger btn-sm btn-title' onclick='layer.closeAll()'>" + lan.public.cancel + "</button>\
-				<button type='button' id='web_del_send' class='btn btn-success btn-sm btn-title'  onclick='WSafeRestart()'>" + lan.public.ok + "</button>\
-			</div>\
-		</div>"
-    })
-}
-
-//重启服务器
-function WSafeRestart() {
-    var body = '<div class="SafeRestartCode pd15" style="line-height:26px"></div>';
-    $(".bt-window-restart").html(body);
-    var data = "name=" + serverType + "&type=stop";
-    $(".SafeRestartCode").html("<p>" + lan.index.reboot_msg_1 + "</p>");
-    $.post('/system?action=ServiceAdmin', data, function(r1) {
-        data = "name=mysqld&type=stop";
-        $(".SafeRestartCode").html("<p class='c9'>" + lan.index.reboot_msg_1 + "</p><p>" + lan.index.reboot_msg_2 + "...</p>");
-        $.post('/system?action=ServiceAdmin', data, function(r2) {
-            $(".SafeRestartCode").html("<p class='c9'>正在停止" + serverType + "服务</p><p class='c9'>" + lan.index.reboot_msg_2 + "</p><p>" + lan.index.reboot_msg_3 + "...</p>");
-            $.post('/system?action=RestartServer', '', function(rdata) {
-                $(".SafeRestartCode").html("<p class='c9'>" + lan.index.reboot_msg_1 + "</p><p class='c9'>" + lan.index.reboot_msg_2 + "</p><p class='c9'>" + lan.index.reboot_msg_3 + "</p><p>" + lan.index.reboot_msg_4 + "...</p>");
-                var sEver = setInterval(function() {
-                    $.get("/system/system_total", function(info) {
-                        clearInterval(sEver);
-                        $(".SafeRestartCode").html("<p class='c9'>" + lan.index.reboot_msg_1 + "</p><p class='c9'>" + lan.index.reboot_msg_2 + "</p><p class='c9'>" + lan.index.reboot_msg_3 + "</p><p class='c9'>" + lan.index.reboot_msg_4 + "</p><p>" + lan.index.reboot_msg_5 + "</p>");
-                        setTimeout(function() {
-                            layer.closeAll();
-                        }, 3000);
-                    },'json').error(function() {
-
-                    });
-                }, 3000);
-            }).error(function() {
-                $(".SafeRestartCode").html("<p class='c9'>" + lan.index.reboot_msg_1 + "</p><p class='c9'>" + lan.index.reboot_msg_2 + "</p><p class='c9'>" + lan.index.reboot_msg_3 + "</p><p>" + lan.index.reboot_msg_4 + "...</p>");
-                var sEver = setInterval(function() {
-                    $.get("/system/system_total", function(info) {
-                        clearInterval(sEver);
-                        $(".SafeRestartCode").html("<p class='c9'>" + lan.index.reboot_msg_1 + "</p><p class='c9'>" + lan.index.reboot_msg_2 + "</p><p class='c9'>" + lan.index.reboot_msg_3 + "</p><p class='c9'>" + lan.index.reboot_msg_4 + "</p><p>" + lan.index.reboot_msg_5 + "</p>");
-                        setTimeout(function() {
-                            layer.closeAll();
-                            window.location.reload();
-                        }, 3000);
-
-                    },'json').error(function() {
-
-                    });
-                }, 3000);
-            });
-        });
+        content: '<div class="rebt-con"><div class="rebt-li"><a data-id="server" href="javascript:;">重启服务器</a></div><div class="rebt-li"><a data-id="panel" href="javascript:;">重启面板</a></div></div>'
     });
-    $(".layui-layer-close").unbind("click");
-}
 
 
-
-//屏蔽指定IP
-function dropAddress(address) {
-    layer.confirm(lan.index.net_doup_ip_msg, { icon: 3, closeBtn: 2 }, function() {
-        loadT = layer.msg(lan.index.net_doup_ip_to, { icon: 16, time: 0, shade: [0.3, '#000'] });
-        $.post('/firewall?action=AddDropAddress', 'port=' + address + '&ps=' + lan.index.net_doup_ip_ps, function(rdata) {
-            layer.close(loadT);
-            layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
-        });
+    $('.rebt-con a').click(function () {
+        var type = $(this).attr('data-id');
+        switch (type) {
+            case 'panel':
+                layer.confirm('即将重启面板服务，继续吗？', { title: '重启面板服务', closeBtn: 2, icon: 3 }, function () {
+                    var loadT = layer.load();
+                    $.post('/system/restart','',function (rdata) {
+                        layer.close(loadT);
+                        layer.msg(rdata.msg);
+                        setTimeout(function () { window.location.reload(); }, 3000);
+                    },'json');
+                });
+                break;
+            case 'server':
+                var rebootbox = layer.open({
+                    type: 1,
+                    title: '安全重启服务器',
+                    area: ['500px', '280px'],
+                    closeBtn: 2,
+                    shadeClose: false,
+                    content: "<div class='bt-form bt-window-restart'>\
+                            <div class='pd15'>\
+                            <p style='color:red; margin-bottom:10px; font-size:15px;'>注意，若您的服务器是一个容器，请取消。</p>\
+                            <div class='SafeRestart' style='line-height:26px'>\
+                                <p>安全重启有利于保障文件安全，将执行以下操作：</p>\
+                                <p>1.停止Web服务</p>\
+                                <p>2.停止MySQL服务</p>\
+                                <p>3.开始重启服务器</p>\
+                                <p>4.等待服务器启动</p>\
+                            </div>\
+                            </div>\
+                            <div class='bt-form-submit-btn'>\
+                                <button type='button' class='btn btn-danger btn-sm btn-reboot'>取消</button>\
+                                <button type='button' class='btn btn-success btn-sm WSafeRestart' >确定</button>\
+                            </div>\
+                        </div>"
+                });
+                setTimeout(function () {
+                    $(".btn-reboot").click(function () {
+                        rebootbox.close();
+                    })
+                    $(".WSafeRestart").click(function () {
+                        var body = '<div class="SafeRestartCode pd15" style="line-height:26px"></div>';
+                        $(".bt-window-restart").html(body);
+                        $(".SafeRestartCode").append("<p>正在停止Web服务</p>");
+                        pluginIndexService('openresty', 'stop', function (r1) {
+                            $(".SafeRestartCode p").addClass('c9');
+                            $(".SafeRestartCode").append("<p>正在停止MySQL服务...</p>");
+                            pluginIndexService('mysql','stop', function (r2) {
+                                $(".SafeRestartCode p").addClass('c9');
+                                $(".SafeRestartCode").append("<p>开始重启服务器...</p>");
+                                $.post('/system/restart_server', '',function (rdata) {
+                                    $(".SafeRestartCode p").addClass('c9');
+                                    $(".SafeRestartCode").append("<p>等待服务器启动...</p>");
+                                    var sEver = setInterval(function () {
+                                       $.get("/system/system_total", function(info) {
+                                            clearInterval(sEver);
+                                            $(".SafeRestartCode p").addClass('c9');
+                                            $(".SafeRestartCode").append("<p>服务器重启成功!...</p>");
+                                            setTimeout(function () {
+                                                layer.closeAll();
+                                            }, 3000);
+                                        })
+                                    }, 3000);
+                                })
+                            })
+                        })
+                    })
+                }, 100);
+                break;
+        }
     });
 }
 
@@ -705,7 +675,7 @@ function repPanel() {
 }
 
 //获取警告信息
-function GetWarning() {
+function getWarning() {
     $.get('/ajax?action=GetWarning', function(wlist) {
         var num = 0;
         for (var i = 0; i < wlist.data.length; i++) {
@@ -727,7 +697,7 @@ function GetWarning() {
 }
 
 //按钮调用
-function WarningTo(to_url, def) {
+function warningTo(to_url, def) {
     var loadT = layer.msg(lan.public.the_get, { icon: 16, time: 0, shade: [0.3, '#000'] });
     $.post(to_url, {}, function(rdata) {
         layer.close(loadT);
@@ -736,7 +706,7 @@ function WarningTo(to_url, def) {
     });
 }
 
-function SetSafeHide() {
+function setSafeHide() {
     setCookie('safeMsg', '1');
     $("#safeMsg").remove();
 }
@@ -764,4 +734,30 @@ function showDanger(num, port) {
 				</div>'
     });
     $(".showDanger td").css("padding", "8px")
+}
+
+//加载关键数据总数
+loadKeyDataCount();
+function loadKeyDataCount(){
+    var plist = ['mysql', 'csvn', 'gogs'];
+    for (var i = 0; i < plist.length; i++) {
+        pname = plist[i];
+        function call(pname){
+            $.post('/plugins/run', {name:pname, func:'get_total_statistics'}, function(data) {
+                try {
+                    var rdata = $.parseJSON(data['data']);
+                } catch(e){
+                    return;
+                }
+                if (!rdata['status']){
+                    return;
+                }
+                var html = '<li class="sys-li-box col-xs-3 col-sm-3 col-md-3 col-lg-3">\
+                            <p class="name f15 c9">'+pname+'</p>\
+                            <div class="val"><a class="btlink" onclick="softMain(\''+pname+'\',\''+rdata['data']['ver']+'\')">'+rdata['data']['count']+'</a></div></li>';
+                $('#index_overview').append(html);
+            },'json');
+        }
+        call(pname);
+    }
 }
