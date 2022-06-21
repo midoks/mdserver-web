@@ -82,9 +82,15 @@ if [ ! -f /usr/local/bin/pip3 ];then
 fi
 
 
+echo  "start install lib"
 cd /www/server/mdserver-web/scripts && bash lib.sh
+echo  "end install lib"
+
+
 chmod 755 /www/server/mdserver-web/data
 
+
+echo  "start install python lib"
 
 pip install --upgrade pip
 if [ ! -f /www/server/mdserver-web/bin/activate ];then
@@ -114,6 +120,8 @@ else
 	pip3 install psutil==5.9.1 
 	pip3 install pymongo
 fi
+
+echo  "end install python lib"
 
 
 cd /www/server/mdserver-web && ./cli.sh start
