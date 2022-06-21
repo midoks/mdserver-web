@@ -21,7 +21,6 @@ if [ ! -f /usr/local/bin/pip3 ];then
 fi
 
 
-sed -i  "/mysqlclient/d" /www/server/mdserver-web/requirements.txt
 pip install --upgrade pip
 cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
 pip3 install flask-socketio==5.2.0
