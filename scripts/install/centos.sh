@@ -108,6 +108,7 @@ if [ ! -f /www/server/mdserver-web/bin/activate ];then
 	sleep 5
 fi
 
+echo  "start install python env lib"
 if [ -f /www/server/mdserver-web/bin/activate ];then
     cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate && pip3 install -r /www/server/mdserver-web/requirements.txt
     
@@ -122,7 +123,7 @@ if [ -f /www/server/mdserver-web/bin/activate ];then
 	pip3 install Jinja==2.11.2
 	pip3 install pymongo
 fi
-
+echo  "end install python env lib"
 echo  "end install python lib"
 
 
