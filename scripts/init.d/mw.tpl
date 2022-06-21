@@ -185,13 +185,11 @@ case "$1" in
         if [ -f $mw_path/data/admin_path.pl ];then
             auth_path=$(cat $mw_path/data/admin_path.pl)
         fi
-        if [ "$address" = "" ];then
-            address=$(curl -sS --connect-timeout 10 -m 60 https://www.bt.cn/Api/getIpAddress)
-        fi
+
         echo -e "=================================================================="
         echo -e "\033[32mMW-Panel default info!\033[0m"
         echo -e "=================================================================="
-        echo  "MW-Panel-URL: http://$address:$port$auth_path"
+        echo -e "MW-Panel-URL: http://$address:$port$auth_path"
         echo -e `python3 $mw_path/tools.py username`
         echo -e "password: $password"
         echo -e "\033[33mWarning:\033[0m"
