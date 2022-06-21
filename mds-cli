@@ -44,6 +44,7 @@ def mw_reset_pwd():
 
 
 if __name__ == '__main__':
+    os.chdir("/www/server/mdserver-web") 
     sys.path.append(os.getcwd() + "/class/core")
     
     try:
