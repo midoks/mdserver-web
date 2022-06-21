@@ -10,24 +10,18 @@ cd /www/server/mdserver-web/scripts && bash lib.sh
 chmod 755 /www/server/mdserver-web/data
 
 #venv
-# if [ ! -f /www/server/mdserver-web/bin/activate ];then
-#     cd /www/server/mdserver-web && python3 -m venv .
-# fi
+if [ ! -f /www/server/mdserver-web/bin/activate ];then
+    cd /www/server/mdserver-web && python3 -m venv .
+fi
 
 if [ ! -f /usr/local/bin/pip3 ];then
     python3 -m pip install --upgrade pip setuptools wheel -i https://mirrors.aliyun.com/pypi/simple
 fi
 
-if [ -f /www/server/mdserver-web/bin/activate ];then
-    pip install --upgrade pip
-    pip install --upgrade setuptools
-    cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate && pip3 install -r /www/server/mdserver-web/requirements.txt
-else
+pip install --upgrade pip
+pip install --upgrade setuptools
 
-    cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
-fi
-
-
+cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
 
 pip3 install gunicorn==20.1.0
 pip3 install gevent==21.1.2
@@ -35,9 +29,27 @@ pip3 install gevent-websocket==0.10.1
 pip3 install requests==2.20.0
 pip3 install flask-caching==1.10.1
 pip3 install flask-socketio==5.2.0
-pip3 install psutil
 pip3 install pymongo
+pip3 install psutil
 
+
+if [ ! -f /www/server/mdserver-web/bin/activate ];then
+    cd /www/server/mdserver-web && python3 -m venv .
+fi
+
+if [ -f /www/server/mdserver-web/bin/activate ];then
+    cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate && pip3 install -r /www/server/mdserver-web/requirements.txt
+    pip install --upgrade pip
+    pip install --upgrade setuptools
+    pip3 install gunicorn==20.1.0
+    pip3 install gevent==21.1.2
+    pip3 install gevent-websocket==0.10.1
+    pip3 install requests==2.20.0
+    pip3 install flask-caching==1.10.1
+    pip3 install flask-socketio==5.2.0
+    pip3 install pymongo
+    pip3 install psutil 
+fi
 
 if [ -f /etc/init.d/mw ];then 
     sh /etc/init.d/mw stop && rm -rf  /www/server/mdserver-web/scripts/init.d/mw && rm -rf  /etc/init.d/mw
