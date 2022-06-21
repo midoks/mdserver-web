@@ -1,7 +1,7 @@
 #!/bin/bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
-LANG=en_US.UTF-8
+# LANG=en_US.UTF-8
 is64bit=`getconf LONG_BIT`
 
 startTime=`date +%s`
@@ -52,7 +52,7 @@ rm -rf /tmp/mdserver-web-dev
 
 #pip uninstall public
 echo "use system version: ${OSNAME}"
-curl -fsSL  https://gitee.com/midoks/mdserver-web/raw/master/scripts/update/${OSNAME}.sh | bash
+curl -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update/${OSNAME}.sh | bash
 
 endTime=`date +%s`
 ((outTime=($endTime-$startTime)/60))
