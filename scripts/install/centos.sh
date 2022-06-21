@@ -66,8 +66,7 @@ fi
 #安装时不开启
 systemctl stop firewalld
 
-yum groupinstall -y "Development Tools"
-
+# yum groupinstall -y "Development Tools"
 yum install -y libevent libevent-devel libjpeg* libpng* gd* libxslt* unzip
 yum install -y python-imaging libicu-devel zip bzip2-devel gcc libxml2 libxml2-dev  pcre pcre-devel
 yum install -y libjpeg-devel libpng-devel libwebp libwebp-devel
