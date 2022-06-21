@@ -87,13 +87,13 @@ curl -fsSL  https://gitee.com/midoks/mdserver-web/raw/master/scripts/update_cn.s
 - 自动安装
 
 ```
-curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/install_dev.sh | bash
+curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/install_dev.sh | bash
 ```
 
 - 脚本更新
 
 ```
-curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/update_dev.sh | bash
+curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update_dev.sh | bash
 ```
 
 
