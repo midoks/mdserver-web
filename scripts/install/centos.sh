@@ -67,13 +67,23 @@ fi
 systemctl stop firewalld
 
 yum groupinstall -y "Development Tools"
+yum install -y epel-release
+
+yum install -y oniguruma oniguruma-devel
+#centos8 stream | use dnf
+if [ "$?" != "0" ];then
+	yum install -y dnf dnf-plugins-core
+	dnf config-manager --set-enabled powertools
+	yum install -y oniguruma oniguruma-devel
+fi
+
 yum install -y libevent libevent-devel libjpeg* libpng* gd* libxslt* unzip
 yum install -y python-imaging libicu-devel zip bzip2-devel gcc libxml2 libxml2-dev  pcre pcre-devel
 yum install -y libjpeg-devel libpng-devel libwebp libwebp-devel
 yum install -y lsof net-tools
 yum install -y ncurses-devel mysql-devel cmake
 yum install -y MySQL-python 
-yum install -y epel-release
+
 
 
 if [ ! -f /usr/local/bin/pip3 ];then
