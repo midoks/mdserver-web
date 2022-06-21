@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 提出问题
+    url: https://github.com/midoks/mdserver-web/discussions
+    about: 请在讨论中提出问题。
+  - name: 提出建议
+    url: https://github.com/midoks/mdserver-web/discussions/categories/proposal
+    about: 请在讨论中提出建议。

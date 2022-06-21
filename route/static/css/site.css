@@ -1083,10 +1083,11 @@ html .menu .menu_exit:hover {
 .dataTables_paginate {
     display: block;
     height: 30px;
-    margin-bottom: 10px;
-    margin-top: 15px;
+    margin-bottom: 0px;
+    margin-top: 0px;
     position:relative;
 }
+
 #filePage{
     margin-bottom: 10px;
 }
@@ -1100,10 +1101,11 @@ html .menu .menu_exit:hover {
     border-top: none;
     margin: 0;
 }
-.site_type{
+
+.site_type {
     height: 30px;
     line-height: 30px;
-    bottom: 8px;
+    bottom: -9px;
     position: absolute;
 }
 
@@ -1120,6 +1122,7 @@ html .menu .menu_exit:hover {
     border-right: none;
     /* border: 1px solid #ececec; */
 }
+
 .site_type select{
     border-radius: 0px;
 }
@@ -1883,8 +1886,8 @@ html .menu .menu_exit:hover {
 }
 
 .txtsjs {
-    width: 260px;
-    height: 80px
+    width: 450px;
+    height: 80px;
 }
 
 .sl-s-info {
@@ -3452,8 +3455,8 @@ html .menu .menu_exit:hover {
     margin: 0;
     padding: 10px;
     clear: both;
-    height: 360px;
-    overflow: auto
+    height: 160px;
+    overflow: auto;
 }
 
 #up_box li {
@@ -4647,3 +4650,33 @@ select[disabled]{
 .btswitch-btn.bt-waf-firewall{
     width:2.4em;height:1.4em;margin-bottom: 0
 }
+
+
+/*6.0终端样式*/
+.term-box{
+    padding:0 10px 10px;
+    background-color:#333333;
+}
+.shell-text-input .bt-input-text-shell{
+    width:100%;
+    padding:10px 10px 0;
+    border:0 none;
+    height:60px;
+    overflow:auto;
+    resize:none;
+}
+.shell-text-input .bt-input-text-shell:focus,.shell-text-input .bt-input-text-shell:active{
+    border:0 none;
+    outline:none;
+}
+.shell-btn-group{
+    height:30px;
+    position:absolute;
+    bottom:10px;
+    right:10px;
+}
+.shell_btn_close{
+    margin-right:8px;
+}
+
+

@@ -1,0 +1,14 @@
+[Unit]
+Description=supervisor server daemon
+After=network.target
+
+[Service]
+Type=forking
+ExecStart={$SUP_BIN} -c {$SERVER_PATH}/supervisor/supervisor.conf
+ExecStop=/bin/kill -s TERM $MAINPID
+ExecReload=/bin/kill -s HUP $MAINPID
+KillMode=process
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

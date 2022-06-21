@@ -3,17 +3,25 @@
  * @param {Number} page   当前页
  * @param {String} search 搜索条件
  */
-function getWeb(page, search) {
+function getWeb(page, search, type_id) {
 	search = $("#SearchValue").prop("value");
 	page = page == undefined ? '1':page;
-	order = getCookie('order');
+	var order = getCookie('order');
 	if(order){
 		order = '&order=' + order;
-	}else{
+	} else {
 		order = '';
 	}
+
+	var type = '';
+	if ( typeof(type_id) == 'undefined' ){
+		type = '&type_id=0';
+	} else {
+		type = '&type_id='+type_id;
+	}
+
 	var sUrl = '/site/list';
-	var pdata = 'tojs=getWeb&table=sites&limit=15&p=' + page + '&search=' + search + order;
+	var pdata = 'limit=10&p=' + page + '&search=' + search + order + type;
 	var loadT = layer.load();
 	//取回数据
 	$.post(sUrl, pdata, function(data) {
@@ -23,20 +31,20 @@ function getWeb(page, search) {
 		$("#webBody").html(body);
 		for (var i = 0; i < data.data.length; i++) {
 			//当前站点状态
-			if (data.data[i].status == lan.site.running || data.data[i].status == '1') {
-				var status = "<a href='javascript:;' title='"+lan.site.running_title+"' onclick=\"webStop(" + data.data[i].id + ",'" + data.data[i].name + "')\" class='btn-defsult'><span style='color:rgb(92, 184, 92)'>"+lan.site.running_text+"    </span><span style='color:rgb(92, 184, 92)' class='glyphicon glyphicon-play'></span></a>";
+			if (data.data[i].status == '正在运行' || data.data[i].status == '1') {
+				var status = "<a href='javascript:;' title='停用这个站点' onclick=\"webStop(" + data.data[i].id + ",'" + data.data[i].name + "')\" class='btn-defsult'><span style='color:rgb(92, 184, 92)'>运行中</span><span style='color:rgb(92, 184, 92)' class='glyphicon glyphicon-play'></span></a>";
 			} else {
-				var status = "<a href='javascript:;' title='"+lan.site.stopped_title+"' onclick=\"webStart(" + data.data[i].id + ",'" + data.data[i].name + "')\" class='btn-defsult'><span style='color:red'>"+lan.site.stopped+"    </span><span style='color:rgb(255, 0, 0);' class='glyphicon glyphicon-pause'></span></a>";
+				var status = "<a href='javascript:;' title='启用这个站点' onclick=\"webStart(" + data.data[i].id + ",'" + data.data[i].name + "')\" class='btn-defsult'><span style='color:red'>已停止</span><span style='color:rgb(255, 0, 0);' class='glyphicon glyphicon-pause'></span></a>";
 			}
 
 			//是否有备份
 			if (data.data[i].backup_count > 0) {
-				var backup = "<a href='javascript:;' class='btlink' onclick=\"getBackup(" + data.data[i].id + ",'" + data.data[i].name + "')\">"+lan.site.backup_yes+"</a>";
+				var backup = "<a href='javascript:;' class='btlink' onclick=\"getBackup(" + data.data[i].id + ")\">有备份</a>";
 			} else {
-				var backup = "<a href='javascript:;' class='btlink' onclick=\"getBackup(" + data.data[i].id + ",'" + data.data[i].name + "')\">"+lan.site.backup_no+"</a>";
+				var backup = "<a href='javascript:;' class='btlink' onclick=\"getBackup(" + data.data[i].id + ")\">无备份</a>";
 			}
 			//是否设置有效期
-			var web_end_time = (data.data[i].edate == "0000-00-00") ? lan.site.web_end_time : data.data[i].edate;
+			var web_end_time = (data.data[i].edate == "0000-00-00") ? '永久': data.data[i].edate;
 			//表格主体
 			var shortwebname = data.data[i].name;
 			var shortpath = data.data[i].path;
@@ -52,56 +60,55 @@ function getWeb(page, search) {
 					<td><a class='btlink webtips' href='javascript:;' onclick=\"webEdit(" + data.data[i].id + ",'" + data.data[i].name + "','" + data.data[i].edate + "','" + data.data[i].addtime + "')\" title='"+data.data[i].name+"'>" + shortwebname + "</td>\
 					<td>" + status + "</td>\
 					<td>" + backup + "</td>\
-					<td><a class='btlink' title='"+lan.site.open_path_txt+data.data[i].path+"' href=\"javascript:openPath('"+data.data[i].path+"');\">" + shortpath + "</a></td>\
+					<td><a class='btlink' title='打开目录"+data.data[i].path+"' href=\"javascript:openPath('"+data.data[i].path+"');\">" + shortpath + "</a></td>\
 					<td><a class='btlink setTimes' id='site_"+data.data[i].id+"' data-ids='"+data.data[i].id+"'>" + web_end_time + "</a></td>\
 					<td><a class='btlinkbed' href='javascript:;' data-id='"+data.data[i].id+"'>" + data.data[i].ps + "</a></td>\
-					<td><input class='btswitch btswitch-ios' id='closewaf_"+idname+"' type='checkbox'><label class='btswitch-btn' for='closewaf_"+idname+"' onclick=\"set_site_obj_state('" + data.data[i].name + "','open')\" style='width:2.4em;height:1.4em;margin-bottom: 0'></label></td>\
 					<td style='text-align:right; color:#bbb'>\
-					<a href='javascript:;' class='btlink' onclick=\"webEdit(" + data.data[i].id + ",'" + data.data[i].name + "','" + data.data[i].edate + "','" + data.data[i].addtime + "')\">"+lan.site.set+" </a>\
-                        | <a href='javascript:;' class='btlink' onclick=\"webDelete('" + data.data[i].id + "','" + data.data[i].name + "')\" title='"+lan.site.site_del_title+"'>"+lan.public.del+"</a>\
+					<a href='javascript:;' class='btlink' onclick=\"webEdit(" + data.data[i].id + ",'" + data.data[i].name + "','" + data.data[i].edate + "','" + data.data[i].addtime + "')\">设置</a>\
+                        | <a href='javascript:;' class='btlink' onclick=\"webDelete('" + data.data[i].id + "','" + data.data[i].name + "')\" title='删除站点'>删除</a>\
 					</td></tr>"
 			
 			$("#webBody").append(body);
 			//setEdate(data.data[i].id,data.data[i].edate);
          	//设置到期日期
-            function getDate(a) {
-              var dd = new Date();
-              dd.setTime(dd.getTime() + (a == undefined || isNaN(parseInt(a)) ? 0 : parseInt(a)) * 86400000);
-              var y = dd.getFullYear();
-              var m = dd.getMonth() + 1;
-              var d = dd.getDate();
-              return y + "-" + (m < 10 ? ('0' + m) : m) + "-" + (d < 10 ? ('0' + d) : d);
-            }
+			function getDate(a) {
+				var dd = new Date();
+				dd.setTime(dd.getTime() + (a == undefined || isNaN(parseInt(a)) ? 0 : parseInt(a)) * 86400000);
+				var y = dd.getFullYear();
+				var m = dd.getMonth() + 1;
+				var d = dd.getDate();
+				return y + "-" + (m < 10 ? ('0' + m) : m) + "-" + (d < 10 ? ('0' + d) : d);
+			}
             $('#webBody').on('click','#site_'+ data.data[i].id,function(){
-              var _this = $(this);
-              var id = $(this).attr('data-ids');
-              laydate.render({
-                elem: '#site_'+ id //指定元素
-                ,min:getDate(1)
-                ,max:'2099-12-31'
-                ,vlue:getDate(365)
-                ,type:'date'
-                ,format :'yyyy-MM-dd'
-                ,trigger:'click'
-                ,btns:['perpetual', 'confirm']
-                ,theme:'#20a53a'
-                ,done:function(dates){
-					if(_this.html() == '永久'){
-                      dates = '0000-00-00';
-                    }
-                    var loadT = layer.msg(lan.site.saving_txt, { icon: 16, time: 0, shade: [0.3, "#000"]}); 
-                    $.post('/site/set_end_date','id='+id+'&edate='+dates,function(rdata){
-                      layer.close(loadT);
-                      layer.msg(rdata.msg,{icon:rdata.status?1:5});
-                    },'json');
-				}
-              });
-             this.click();
+				var _this = $(this);
+				var id = $(this).attr('data-ids');
+				laydate.render({
+					elem: '#site_'+ id //指定元素
+					,min:getDate(1)
+					,max:'2099-12-31'
+					,vlue:getDate(365)
+					,type:'date'
+					,format :'yyyy-MM-dd'
+					,trigger:'click'
+					,btns:['perpetual', 'confirm']
+					,theme:'#20a53a'
+					,done:function(dates){
+						if(_this.html() == '永久'){
+						 	dates = '0000-00-00';
+						}
+						var loadT = layer.msg(lan.site.saving_txt, { icon: 16, time: 0, shade: [0.3, "#000"]}); 
+						$.post('/site/set_end_date','id='+id+'&edate='+dates,function(rdata){
+							layer.close(loadT);
+							layer.msg(rdata.msg,{icon:rdata.status?1:5});
+						},'json');
+					}
+				});
+            	this.click();
             });
 		}
 		if(body.length < 10){
-			body = "<tr><td colspan='8'>"+lan.site.site_no_data+"</td></tr>";
-			$(".dataTables_paginate").hide();
+			body = "<tr><td colspan='9'>当前没有站点数据</td></tr>";
+			// $(".dataTables_paginate").hide();
 			$("#webBody").html(body);
 		}
 		//输出数据列表
@@ -112,16 +119,47 @@ function getWeb(page, search) {
 		});
 		//输出分页
 		$("#webPage").html(data.page);
+		// $("#webPage").html('<div class="site_type"><span>站点分类:</span><select class="bt-input-text mr5" style="width:100px"><option value="-1">全部分类</option><option value="0">默认分类</option></select></div>');
 		
 		$(".btlinkbed").click(function(){
 			var dataid = $(this).attr("data-id");
 			var databak = $(this).text();
-			if(databak==lan.site.site_null){
-				databak='';
+			if(databak == null){
+				databak = '';
 			}
-			$(this).hide().after("<input class='baktext' type='text' data-id='"+dataid+"' name='bak' value='" + databak + "' placeholder='"+lan.site.site_bak+"' onblur='GetBakPost(\"sites\")' />");
+			$(this).hide().after("<input class='baktext' type='text' data-id='"+dataid+"' name='bak' value='" + databak + "' placeholder='备注信息' onblur='getBakPost(\"sites\")' />");
 			$(".baktext").focus();
 		});
+
+		readerTableChecked();
+	},'json');
+}
+
+
+function getBakPost(b) {
+	$(".baktext").hide().prev().show();
+	var c = $(".baktext").attr("data-id");
+	var a = $(".baktext").val();
+	if(a == "") {
+		a = '空';
+	}
+	setWebPs(b, c, a);
+	$("a[data-id='" + c + "']").html(a);
+	$(".baktext").remove();
+}
+
+function setWebPs(b, e, a) {
+	var d = layer.load({shade: true,shadeClose: false});
+	var c = 'ps=' + a;
+	$.post('/site/set_ps', 'id=' + e + "&" + c, function(data) {
+		if(data['status']) {
+			getWeb(1);
+			layer.closeAll();
+			layer.msg('修改成功!', {icon: 1});
+		} else {
+			layer.closeAll();
+			layer.msg('修改失败!', {icon: 2});
+		}
 	},'json');
 }
 
@@ -153,12 +191,7 @@ function webAdd(type) {
 		var data = $("#addweb").serialize()+"&port="+webport+"&webinfo="+domain;
 
 		$.post('/site/add', data, function(ret) {
-			if(ret.status === false){
-				layer.msg(ret.msg,{icon:ret.status?1:2})
-				return;
-			}
-			
-			if (ret.siteStatus == true) {
+			if (ret.status == true) {
 				getWeb(1);
 				layer.closeAll();
 				layer.msg('成功创建站点',{icon:1})
@@ -174,7 +207,7 @@ function webAdd(type) {
 	
 		var defaultPath = $("#defaultPath").html();
 		var php_version = "<div class='line'><span class='tname'>"+lan.site.php_ver+"</span><select class='bt-input-text' name='version' id='c_k3' style='width:100px'>";
-		for(var i=rdata.length-1;i>=0;i--){
+		for (var i=rdata.length-1;i>=0;i--) {
             php_version += "<option value='"+rdata[i].version+"'>"+rdata[i].name+"</option>";
         }
 
@@ -199,7 +232,7 @@ function webAdd(type) {
 	                    <div class='line'>\
 	                    <span class='tname'>备注</span>\
 	                    <div class='info-r c4'>\
-	                    	<input id='Wbeizhu' class='bt-input-text' type='text' name='ps' placeholder='"+lan.site.note_ph+"' style='width:458px' />\
+	                    	<input id='Wbeizhu' class='bt-input-text' type='text' name='ps' placeholder='网站备注' style='width:458px' />\
 	                    </div>\
 	                    </div>\
 	                    <div class='line'>\
@@ -287,66 +320,70 @@ function webAdd(type) {
 
 //修改网站目录
 function webPathEdit(id){
-	$.post("/data?action=getKey","table=sites&key=path&id="+id,function(rdata){
-		$.post('/site?action=GetDirUserINI','path='+rdata+'&id='+id,function(userini){
-			var userinicheckeds = userini.userini?'checked':'';
-			var logscheckeds = userini.logs?'checked':'';
-			var opt = ''
-			var selected = '';
-			for(var i=0;i<userini.runPath.dirs.length;i++){
-				selected = '';
-				if(userini.runPath.dirs[i] == userini.runPath.runPath) selected = 'selected';
-				opt += '<option value="'+ userini.runPath.dirs[i] +'" '+selected+'>'+ userini.runPath.dirs[i] +'</option>'
+	$.post('/site/get_dir_user_ini','&id='+id, function(data){
+		var userini = data['data'];
+		var webpath = userini['path'];
+		var siteName = userini['name'];
+		var userinicheckeds = userini.userini?'checked':'';
+		var logscheckeds = userini.logs?'checked':'';
+		var opt = ''
+		var selected = '';
+		for(var i=0;i<userini.runPath.dirs.length;i++){
+			selected = '';
+			if(userini.runPath.dirs[i] == userini.runPath.runPath){ 
+				selected = 'selected';
 			}
-			var webPathHtml = "<div class='webedit-box soft-man-con'>\
-						<div class='label-input-group ptb10'>\
-							<input type='checkbox' name='userini' id='userini'"+userinicheckeds+" /><label class='mr20' for='userini' style='font-weight:normal'>"+lan.site.anti_XSS_attack+"(open_basedir)</label>\
-							<input type='checkbox' name='logs' id='logs'"+logscheckeds+" /><label for='logs' style='font-weight:normal'>"+lan.site.write_access_log+"</label>\
-						</div>\
-						<div class='line mt10'>\
-							<span class='mr5'>"+lan.site.web_dir+"</span>\
-							<input class='bt-input-text mr5' type='text' style='width:50%' placeholder='"+lan.site.web_root_dir+"' value='"+rdata+"' name='webdir' id='inputPath'>\
-							<span onclick='changePath(&quot;inputPath&quot;)' class='glyphicon glyphicon-folder-open cursor mr20'></span>\
-							<button class='btn btn-success btn-sm' onclick='SetSitePath("+id+")'>"+lan.public.save+"</button>\
-						</div>\
-						<div class='line mtb15'>\
-							<span class='mr5'>"+lan.site.run_dir+"</span>\
-							<select class='bt-input-text' type='text' style='width:50%; margin-right:41px' name='runPath' id='runPath'>"+opt+"</select>\
-							<button class='btn btn-success btn-sm' onclick='SetSiteRunPath("+id+")' style='margin-top: -1px;'>"+lan.public.save+"</button>\
-						</div>\
-						<ul class='help-info-text c7 ptb10'>\
-							<li>"+lan.site.site_help_1+"</li>\
-							<li>"+lan.site.site_help_2+"</li>\
-						</ul>"
-						+'<div class="user_pw_tit" style="margin-top: -8px;padding-top: 11px;">'
-							+'<span class="tit">'+lan.soft.pma_pass+'</span>'
-							+'<span class="btswitch-p"><input '+(userini.pass?'checked':'')+' class="btswitch btswitch-ios" id="pathSafe" type="checkbox">'
-								+'<label class="btswitch-btn phpmyadmin-btn" for="pathSafe" onclick="pathSafe('+id+')"></label>'
-							+'</span>'
-						+'</div>'
-						+'<div class="user_pw" style="margin-top: 10px;display:'+(userini.pass?'block;':'none;')+'">'
-							+'<p><span>'+lan.soft.pma_user+'</span><input id="username_get" class="bt-input-text" name="username_get" value="" type="text" placeholder="'+lan.soft.edit_empty+'"></p>'
-							+'<p><span>'+lan.soft.pma_pass1+'</span><input id="password_get_1" class="bt-input-text" name="password_get_1" value="" type="password" placeholder="'+lan.soft.edit_empty+'"></p>'
-							+'<p><span>'+lan.soft.pma_pass2+'</span><input id="password_get_2" class="bt-input-text" name="password_get_1" value="" type="password" placeholder="'+lan.soft.edit_empty+'"></p>'
-							+'<p><button class="btn btn-success btn-sm" onclick="SetPathSafe('+id+')">'+lan.public.save+'</button></p>'
-						+'</div>'
-					+'</div>';
-			$("#webedit-con").html(webPathHtml);
-			
-			$("#userini").change(function(){
-				$.post('/site?action=SetDirUserINI','path='+rdata,function(userini){
-					layer.msg(userini.msg+'<p style="color:red;">注意：设置防跨站需要重启PHP才能生效!</p>',{icon:userini.status?1:2});
-				});
-			});
-			
-			$("#logs").change(function(){
-				$.post('/site?action=logsOpen','id='+id,function(userini){
-					layer.msg(userini.msg,{icon:userini.status?1:2});
-				});
-			});
-			
+			opt += '<option value="'+ userini.runPath.dirs[i] +'" '+selected+'>'+ userini.runPath.dirs[i] +'</option>'
+		}
+		var webPathHtml = "<div class='webedit-box soft-man-con'>\
+					<div class='label-input-group ptb10'>\
+						<input type='checkbox' name='userini' id='userini'"+userinicheckeds+" /><label class='mr20' for='userini' style='font-weight:normal'>防跨站攻击(open_basedir)</label>\
+						<input type='checkbox' name='logs' id='logs'"+logscheckeds+" /><label for='logs' style='font-weight:normal'>写访问日志</label>\
+					</div>\
+					<div class='line mt10'>\
+						<span class='mr5'>网站目录</span>\
+						<input class='bt-input-text mr5' type='text' style='width:50%' placeholder='网站根目录' value='"+webpath+"' name='webdir' id='inputPath'>\
+						<span onclick='changePath(&quot;inputPath&quot;)' class='glyphicon glyphicon-folder-open cursor mr20'></span>\
+						<button class='btn btn-success btn-sm' onclick='setSitePath("+id+")'>保存</button>\
+					</div>\
+					<div class='line mtb15'>\
+						<span class='mr5'>运行目录</span>\
+						<select class='bt-input-text' type='text' style='width:50%; margin-right:41px' name='runPath' id='runPath'>"+opt+"</select>\
+						<button class='btn btn-success btn-sm' onclick='setSiteRunPath("+id+")' style='margin-top: -1px;'>保存</button>\
+					</div>\
+					<ul class='help-info-text c7 ptb10'>\
+						<li>部分程序需要指定二级目录作为运行目录，如ThinkPHP5，Laravel</li>\
+						<li>选择您的运行目录，点保存即可</li>\
+					</ul>"
+					+'<div class="user_pw_tit" style="margin-top: -8px;padding-top: 11px;">'
+						+'<span class="tit">密码访问</span>'
+						+'<span class="btswitch-p"><input '+(userini.pass?'checked':'')+' class="btswitch btswitch-ios" id="pathSafe" type="checkbox">'
+							+'<label class="btswitch-btn phpmyadmin-btn" for="pathSafe" onclick="pathSafe('+id+')"></label>'
+						+'</span>'
+					+'</div>'
+					+'<div class="user_pw" style="margin-top: 10px;display:'+(userini.pass?'block;':'none;')+'">'
+						+'<p><span>授权账号</span><input id="username_get" class="bt-input-text" name="username_get" value="" type="text" placeholder="不修改请留空"></p>'
+						+'<p><span>访问密码</span><input id="password_get_1" class="bt-input-text" name="password_get_1" value="" type="password" placeholder="不修改请留空"></p>'
+						+'<p><span>重复密码</span><input id="password_get_2" class="bt-input-text" name="password_get_1" value="" type="password" placeholder="不修改请留空"></p>'
+						+'<p><button class="btn btn-success btn-sm" onclick="setPathSafe('+id+')">保存</button></p>'
+					+'</div>'
+				+'</div>';
+
+		$("#webedit-con").html(webPathHtml);		
+		$("#userini").change(function(){
+			$.post('/site/set_dir_user_ini','path='+webpath,function(userini){
+				layer.msg(userini.msg+'<p style="color:red;">注意：设置防跨站需要重启PHP才能生效!</p>',{icon:userini.status?1:2});
+				tryRestartPHP(siteName);
+			},'json');
 		});
-	});
+		
+		$("#logs").change(function(){
+			$.post('/site/logs_open','id='+id,function(userini){
+				layer.msg(userini.msg,{icon:userini.status?1:2});
+			},'josn');
+		});
+		
+	},'json');
 }
 
 //是否设置访问密码
@@ -354,54 +391,51 @@ function pathSafe(id){
 	var isPass = $('#pathSafe').prop('checked');
 	if(!isPass){
 		$(".user_pw").show();
-	}else{
+	} else {
 		var loadT = layer.msg(lan.public.the,{icon:16,time:10000,shade: [0.3, '#000']});
-		$.post('/site?action=CloseHasPwd',{id:id},function(rdata){
+		$.post('/site/close_has_pwd',{id:id},function(rdata){
 			layer.close(loadT);
-			var ico = rdata.status?1:2;
-			layer.msg(rdata.msg,{icon:ico});
+			layer.msg(rdata.msg,{icon:rdata.status?1:2});
 			$(".user_pw").hide();
-		});
+		},'json');
 	}
 }
 
 //设置访问密码
-function SetPathSafe(id){
+function setPathSafe(id){
 	var username = $("#username_get").val();
 	var pass1 = $("#password_get_1").val();
 	var pass2 = $("#password_get_2").val();
 	if(pass1 != pass2){
-		layer.msg(lan.bt.pass_err_re,{icon:2});
+		layer.msg('两次输入的密码不一致!',{icon:2});
 		return;
 	}
-	var loadT = layer.msg(lan.public.the,{icon:16,time:10000,shade: [0.3, '#000']});
-	$.post('/site?action=SetHasPwd',{id:id,username:username,password:pass1},function(rdata){
+	var loadT = layer.msg('正在处理,请稍候...',{icon:16,time:10000,shade: [0.3, '#000']});
+	$.post('/site/set_has_pwd',{id:id,username:username,password:pass1},function(rdata){
 		layer.close(loadT);
-		var ico = rdata.status?1:2;
-		layer.msg(rdata.msg,{icon:ico});
-	});
+		layer.msg(rdata.msg,{icon:rdata.status?1:2});
+	},'json');
 }
 
 //提交运行目录
-function SetSiteRunPath(id){
+function setSiteRunPath(id){
 	var NewPath = $("#runPath").val();
 	var loadT = layer.msg(lan.public.the,{icon:16,time:10000,shade: [0.3, '#000']});
-	$.post('/site?action=SetSiteRunPath','id='+id+'&runPath='+NewPath,function(rdata){
+	$.post('/site/set_site_run_path','id='+id+'&runPath='+NewPath,function(rdata){
 		layer.close(loadT);
 		var ico = rdata.status?1:2;
 		layer.msg(rdata.msg,{icon:ico});
-	});
+	},'json');
 }
 
 //提交网站目录
-function SetSitePath(id){
+function setSitePath(id){
 	var NewPath = $("#inputPath").val();
-	var loadT = layer.msg(lan.public.the,{icon:16,time:10000,shade: [0.3, '#000']});
-	$.post('/site?action=SetPath','id='+id+'&path='+NewPath,function(rdata){
+	var loadT = layer.msg('正在处理,请稍候...',{icon:16,time:10000,shade: [0.3, '#000']});
+	$.post('/site/set_path','id='+id+'&path='+NewPath,function(rdata){
 		layer.close(loadT);
-		var ico = rdata.status?1:2;
-		layer.msg(rdata.msg,{icon:ico});
-	});
+		layer.msg(rdata.msg,{icon:rdata.status?1:2});
+	},'json');
 }
 
 //修改网站备注
@@ -412,18 +446,10 @@ function webBakEdit(id){
 					<label><span>"+lan.site.note_ph+"</span></label>\
 					<div class='info-r'>\
 					<textarea name='beizhu' id='webbeizhu' col='5' style='width:96%'>"+rdata+"</textarea>\
-					<br><br><button class='btn btn-success btn-sm' onclick='SetSitePs("+id+")'>"+lan.public.save+"</button>\
+					<br><br><button class='btn btn-success btn-sm' onclick='SetSitePs("+id+")'>保存</button>\
 					</div>\
 					</div>";
-		$("#webedit-con").html(webBakHtml)
-	});
-}
-
-//提交网站备注
-function SetSitePs(id){
-	var myPs = $("#webbeizhu").val();
-	$.post('/data?action=setPs','table=sites&id='+id+'&ps='+myPs,function(rdata){
-		layer.msg(rdata?lan.public.edit_ok:lan.public.edit_err,{icon:rdata?1:2});
+		$("#webedit-con").html(webBakHtml);
 	});
 }
 
@@ -452,15 +478,14 @@ function setIndexEdit(id){
  * @param {String} wname 网站名称
  */
 function webStop(wid, wname) {
-	layer.confirm(lan.site.site_stop_txt, {icon:3,closeBtn:2},function(index) {
+	layer.confirm('站点停用后将无法访问，您真的要停用这个站点吗？', {icon:3,closeBtn:2},function(index) {
 		if (index > 0) {
-			var loadT = layer.load()
-			$.post("/site?action=SiteStop","id=" + wid + "&name=" + wname, function(ret) {
+			var loadT = layer.load();
+			$.post("/site/stop","id=" + wid + "&name=" + wname, function(ret) {
 				layer.msg(ret.msg,{icon:ret.status?1:2})
 				layer.close(loadT);
 				getWeb(1);
-				
-			});
+			},'json');
 		}
 	});
 }
@@ -471,14 +496,14 @@ function webStop(wid, wname) {
  * @param {String} wname 网站名称
  */
 function webStart(wid, wname) {
-	layer.confirm(lan.site.site_start_txt,{icon:3,closeBtn:2}, function(index) {
+	layer.confirm('即将启动站点，您真的要启用这个站点吗？',{icon:3,closeBtn:2}, function(index) {
 		if (index > 0) {
 			var loadT = layer.load()
-			$.post("/site?action=SiteStart","id=" + wid + "&name=" + wname, function(ret) {
+			$.post("/site/start","id=" + wid + "&name=" + wname, function(ret) {
 				layer.msg(ret.msg,{icon:ret.status?1:2})
 				layer.close(loadT);
 				getWeb(1);
-			});
+			},'json');
 		}
 	});
 }
@@ -490,7 +515,7 @@ function webStart(wid, wname) {
  */
 function webDelete(wid, wname){
 	var thtml = "<div class='options'>\
-	    	<label><input type='checkbox' id='delpath' name='path'><span>"+lan.site.root_dir+"</span></label>\
+	    	<label><input type='checkbox' id='delpath' name='path'><span>根目录</span></label>\
 	    	</div>";
 	var info = '是否要删除同名根目录';
 	safeMessage('删除站点'+"["+wname+"]",info, function(){
@@ -498,7 +523,7 @@ function webDelete(wid, wname){
 		if($("#delpath").is(":checked")){
 			path='&path=1';
 		}
-		var loadT = layer.msg(lan.public.the,{icon:16,time:10000,shade: [0.3, '#000']});
+		var loadT = layer.msg('正在处理,请稍候...',{icon:16,time:10000,shade: [0.3, '#000']});
 		$.post("/site/delete","id=" + wid + "&webname=" + wname + path, function(ret){
 			layer.closeAll();
 			layer.msg(ret.msg,{icon:ret.status?1:2})
@@ -573,14 +598,18 @@ function domainEdit(id, name, msg, status) {
 
 		var echoHtml = "";
 		for (var i = 0; i < domain.length; i++) {
-			echoHtml += "<tr><td><a title='"+lan.site.click_access+"' target='_blank' href='http://" + domain[i].name + ":" + domain[i].port + "' class='btlinkbed'>" + domain[i].name + "</a></td><td><a class='btlinkbed'>" + domain[i].port + "</a></td><td class='text-center'><a class='table-btn-del' href='javascript:;' onclick=\"delDomain(" + id + ",'" + name + "','" + domain[i].name + "','" + domain[i].port + "',1)\"><span class='glyphicon glyphicon-trash'></span></a></td></tr>";
+			echoHtml += "<tr>\
+				<td><a title='"+lan.site.click_access+"' target='_blank' href='http://" + domain[i].name + ":" + domain[i].port + "' class='btlinkbed'>" + domain[i].name + "</a></td>\
+				<td><a class='btlinkbed'>" + domain[i].port + "</a></td>\
+				<td class='text-center'><a class='table-btn-del' href='javascript:;' onclick=\"delDomain(" + id + ",'" + name + "','" + domain[i].name + "','" + domain[i].port + "',1)\"><span class='glyphicon glyphicon-trash'></span></a></td>\
+				</tr>";
 		}
 		var bodyHtml = "<textarea id='newdomain' class='bt-input-text' style='height: 100px; width: 340px;padding:5px 10px;line-height:20px'></textarea>\
 								<input type='hidden' id='newport' value='80' />\
-								<button type='button' class='btn btn-success btn-sm pull-right' style='margin:30px 35px 0 0' onclick=\"domainAdd(" + id + ",'" + name + "',1)\">"+lan.public.add+"</button>\
+								<button type='button' class='btn btn-success btn-sm pull-right' style='margin:30px 35px 0 0' onclick=\"domainAdd(" + id + ",'" + name + "',1)\">添加</button>\
 							<div class='divtable mtb15' style='height:350px;overflow:auto'>\
 								<table class='table table-hover' width='100%'>\
-								<thead><tr><th>"+lan.site.domain+"</th><th width='70px'>"+lan.site.port+"</th><th width='50px' class='text-center'>"+lan.site.operate+"</th></tr></thead>\
+								<thead><tr><th>"+lan.site.domain+"</th><th width='70px'>端口</th><th width='50px' class='text-center'>操作</th></tr></thead>\
 								<tbody id='checkDomain'>" + echoHtml + "</tbody>\
 								</table>\
 							</div>";
@@ -588,7 +617,7 @@ function domainEdit(id, name, msg, status) {
 		if(msg != undefined){
 			layer.msg(msg,{icon:status?1:5});
 		}
-		var placeholder = "<div class='placeholder c9' style='left:28px;width:330px;top:16px;'>"+lan.site.domain_help+"</div>";
+		var placeholder = "<div class='placeholder c9' style='left:28px;width:330px;top:16px;'>每行填写一个域名，默认为80端口<br>泛解析添加方法 *.domain.com<br>如另加端口格式为 www.domain.com:88</div>";
 		$('#newdomain').after(placeholder);
 		$(".placeholder").click(function(){
 			$(this).hide();
@@ -675,33 +704,7 @@ function checkDomain() {
 		var $this = $(this);
 		var domain = $(this).find("td:first-child").text();
 		$(this).find("td:first-child").append("<i class='lading'></i>");
-		checkDomainWebsize($this,domain);
-	})
-}
-//检查域名是否解析备案
-function checkDomainWebsize(obj,domain){
-	var gurl = "http://api.bt.cn/ipaddess";
-	var ip = getCookie('iplist');
-	var data = "domain=" + domain+"&ip="+ip;
-	$.ajax({ url: gurl,data:data,type:"get",dataType:"jsonp",async:true ,success: function(rdata){
-		obj.find("td:first-child").find(".lading").remove();
-		if (rdata.code == -1) {
-			obj.find("td:first-child").append("<i class='yf' data-title='"+lan.site.this_domain_un+"'>"+lan.site.unresolved+"</i>");
-		} else {
-			obj.find("td:first-child").append("<i class='f' data-title='"+lan.site.analytic_ip+"：" + rdata.data.ip + "<br>"+lan.site.current_server_ip+"：" + rdata.data.main_ip + "("+lan.site.parsed_info+")'>"+lan.site.parsed+"</i>");
-		}
-
-		obj.find("i").mouseover(function() {
-			var tipsTitle = $(this).attr("data-title");
-			layer.tips(tipsTitle, this, {
-				tips: [1, '#3c8dbc'],
-				time: 0
-			})
-		})
-		obj.find("i").mouseout(function() {
-			$(".layui-layer-tips").remove();
-		})
-	}})
+	});
 }
 
 /**
@@ -711,23 +714,24 @@ function checkDomainWebsize(obj,domain){
  */
 function domainAdd(id, webname,type) {
 	var Domain = $("#newdomain").val().split("\n");
-	
-	var domainlist="";
+
+	var domainlist = '';
 	for(var i=0; i<Domain.length; i++){
-		domainlist += Domain[i]+",";
+		domainlist += Domain[i]+ ',';
 	}
 	
 	if(domainlist.length < 3){
 		layer.msg(lan.site.domain_empty,{icon:5});
 		return;
 	}
+
 	domainlist = domainlist.substring(0,domainlist.length-1);
 	var loadT = layer.load();
 	var data = "domain=" + domainlist + "&webname=" + webname + "&id=" + id;
-	$.post('/site?action=AddDomain', data, function(retuls) {
+	$.post('/site/add_domain', data, function(retuls) {
 		layer.close(loadT);
-		domainEdit(id,webname,retuls.msg,retuls.status);
-	});
+		domainEdit(id, webname, retuls.msg, retuls.status);
+	},'json');
 }
 
 /**
@@ -743,20 +747,20 @@ function delDomain(wid, wname, domain, port,type) {
 		layer.msg(lan.site.domain_last_cannot);
 	}
 	layer.confirm(lan.site.domain_del_confirm,{icon:3,closeBtn:2}, function(index) {
-			var url = "/site?action=DelDomain"
-			var data = "id=" + wid + "&webname=" + wname + "&domain=" + domain + "&port=" + port;
-			var loadT = layer.msg(lan.public.the_del,{time:0,icon:16});
-			$.post(url,data, function(ret) {
+		var url = "/site/del_domain"
+		var data = "id=" + wid + "&webname=" + wname + "&domain=" + domain + "&port=" + port;
+		var loadT = layer.msg(lan.public.the_del,{time:0,icon:16});
+		$.post(url,data, function(ret) {
+			layer.close(loadT);
+			layer.msg(ret.msg,{icon:ret.status?1:2})
+			if(type == 1){
 				layer.close(loadT);
-				layer.msg(ret.msg,{icon:ret.status?1:2})
-				if(type == 1){
-					layer.close(loadT);
-					domainEdit(wid,wname)
-				}else{
-					layer.closeAll();
-					DomainRoot(wid, wname);
-				}
-			});
+				domainEdit(wid,wname)
+			}else{
+				layer.closeAll();
+				DomainRoot(wid, wname);
+			}
+		},'json');
 	});
 }
 
@@ -783,14 +787,14 @@ function isDomain(domain) {
  * @param {Number} id	编号
  * @param {String} name	主域名
  */
-function WebBackup(id, name) {
-	var loadT =layer.msg(lan.database.backup_the, {icon:16,time:0,shade: [0.3, '#000']});
-	var data = "id="+id;
-	$.post('/site?action=ToBackup', data, function(rdata) {
+function webBackup(id, name) {
+	var loadT =layer.msg('正在备份,请稍候...', {icon:16,time:0,shade: [0.3, '#000']});
+	$.post('/site/to_backup', "id="+id, function(rdata) {
 		layer.closeAll();
-		layer.msg(rdata.msg,{icon:rdata.status?1:2})
+		layer.msg(rdata.msg,{icon:rdata.status?1:2});
+
 		getBackup(id);
-	});
+	},'json');
 }
 
 /**
@@ -799,69 +803,65 @@ function WebBackup(id, name) {
  * @param {Number} id	文件编号
  * @param {String} name	主域名
  */
-function WebBackupDelete(id,pid){
-	layer.confirm(lan.site.webback_del_confirm,{title:lan.site.del_bak_file,icon:3,closeBtn:2},function(index){
-		var loadT =layer.msg(lan.public.the_del, {icon:16,time:0,shade: [0.3, '#000']});
-		$.post('/site?action=DelBackup','id='+id, function(rdata){
+function webBackupDelete(id,pid){
+	layer.confirm('真的要删除备份包吗?',{title:'删除备份文件!',icon:3,closeBtn:2},function(index){
+		var loadT =layer.msg('正在删除,请稍候...', {icon:16,time:0,shade: [0.3, '#000']});
+		$.post('/site/del_backup','id='+id, function(rdata){
 			layer.closeAll();
 			layer.msg(rdata.msg,{icon:rdata.status?1:2});
 			getBackup(pid);
-		});
+		},'json');
 	})
 }
 
 function getBackup(id,name,page) {
+
 	if(page == undefined){
 		page = '1';
-	} 
-	$.post('/data?action=getFind','table=sites&id=' + id, function(rdata) {
-		$.post('/data?action=getData','table=backup&search=' + id + '&limit=5&p='+page+'&type=0&tojs=getBackup',function(frdata){
-			
-			var body = '';
-				for (var i = 0; i < frdata.data.length; i++) {
-					if(frdata.data[i].type == '1') continue;
-					if(frdata.data[i].filename.length < 15){
-						var ftpdown = "<a class='btlink' href='/cloud?filename="+frdata.data[i].filename+"&name="+ frdata.data[i].name+"' target='_blank'>下载</a> | ";
-					}else{
-						var ftpdown = "<a class='btlink' href='/download?filename="+frdata.data[i].filename+"&name="+frdata.data[i].name+"' target='_blank'>下载</a> | ";
-					}
-					body += "<tr><td><span class='glyphicon glyphicon-file'></span>"+frdata.data[i].name+"</td>\
-							<td>" + (ToSize(frdata.data[i].size)) + "</td>\
-							<td>" + frdata.data[i].addtime + "</td>\
-							<td class='text-right' style='color:#ccc'>"+ ftpdown + "<a class='btlink' href='javascript:;' onclick=\"WebBackupDelete('" + frdata.data[i].id + "',"+id+")\">"+lan.public.del+"</a></td>\
-						</tr>"
+	}
+	$.post('/site/get_backup','search=' + id + '&limit=5&p='+page, function(frdata){		
+		var body = '';
+			for (var i = 0; i < frdata.data.length; i++) {
+				if(frdata.data[i].type == '1') {
+					continue;
 				}
-			var ftpdown = '';
-			frdata.page = frdata.page.replace(/'/g,'"').replace(/getBackup\(/g,"getBackup(" + id + ",0,");
-			
-			if(name == 0){
-				var sBody = "<table width='100%' id='WebBackupList' class='table table-hover'>\
-							<thead><tr><th>"+lan.site.filename+"</th><th>"+lan.site.filesize+"</th><th>"+lan.site.backuptime+"</th><th width='140px' class='text-right'>"+lan.site.operate+"</th></tr></thead>\
-							<tbody id='WebBackupBody' class='list-list'>"+body+"</tbody>\
-							</table>"
-				$("#WebBackupList").html(sBody);
-				$(".page").html(frdata.page);
-				return;
+				
+				var ftpdown = "<a class='btlink' href='/files/download?filename="+frdata.data[i].filename+"&name="+frdata.data[i].name+"' target='_blank'>下载</a> | ";
+				body += "<tr><td><span class='glyphicon glyphicon-file'></span>"+frdata.data[i].name+"</td>\
+						<td>" + (toSize(frdata.data[i].size)) + "</td>\
+						<td>" + frdata.data[i].addtime + "</td>\
+						<td class='text-right' style='color:#ccc'>"+ ftpdown + "<a class='btlink' href='javascript:;' onclick=\"webBackupDelete('" + frdata.data[i].id + "',"+id+")\">删除</a></td>\
+					</tr>"
 			}
-			layer.closeAll();
-			layer.open({
-				type: 1,
-				skin: 'demo-class',
-				area: '700px',
-				title: lan.site.backup_title,
-				closeBtn: 2,
-				shift: 0,
-				shadeClose: false,
-				content: "<div class='bt-form ptb15 mlr15' id='WebBackup'>\
-							<button class='btn btn-default btn-sm' style='margin-right:10px' type='button' onclick=\"WebBackup('" + rdata.id + "','" + rdata.name + "')\">"+lan.site.backup_title+"</button>\
-							<div class='divtable mtb15' style='margin-bottom:0'><table width='100%' id='WebBackupList' class='table table-hover'>\
-							<thead><tr><th>"+lan.site.filename+"</th><th>"+lan.site.filesize+"</th><th>"+lan.site.backuptime+"</th><th width='140px' class='text-right'>"+lan.site.operate+"</th></tr></thead>\
-							<tbody id='WebBackupBody' class='list-list'>"+body+"</tbody>\
-							</table><div class='page'>"+frdata.page+"</div></div></div>"
-			});
-		});
+		var ftpdown = '';
+		frdata.page = frdata.page.replace(/'/g,'"').replace(/getBackup\(/g,"getBackup(" + id + ",0,");
 		
-	});
+		if(name == 0){
+			var sBody = "<table width='100%' id='webBackupList' class='table table-hover'>\
+						<thead><tr><th>文件名称</th><th>文件大小</th><th>打包时间</th><th width='140px' class='text-right'>操作</th></tr></thead>\
+						<tbody id='webBackupBody' class='list-list'>"+body+"</tbody>\
+						</table>"
+			$("#webBackupList").html(sBody);
+			$(".page").html(frdata.page);
+			return;
+		}
+		layer.closeAll();
+		layer.open({
+			type: 1,
+			skin: 'demo-class',
+			area: '700px',
+			title: '打包备份',
+			closeBtn: 2,
+			shift: 0,
+			shadeClose: false,
+			content: "<div class='bt-form ptb15 mlr15' id='webBackup'>\
+						<button class='btn btn-default btn-sm' style='margin-right:10px' type='button' onclick=\"webBackup('" + frdata['site']['id'] + "','" +  frdata['site']['name'] + "')\">打包备份</button>\
+						<div class='divtable mtb15' style='margin-bottom:0'><table width='100%' id='webBackupList' class='table table-hover'>\
+						<thead><tr><th>文件名称</th><th>文件大小</th><th>打包时间</th><th width='140px' class='text-right'>操作</th></tr></thead>\
+						<tbody id='webBackupBody' class='list-list'>"+body+"</tbody>\
+						</table><div class='page'>"+frdata.page+"</div></div></div>"
+		});
+	},'json');
 
 }
 
@@ -921,20 +921,20 @@ function setIndex(id){
 }
 
 //设置默认站点
-function SetDefaultSite(){
+function setDefaultSite(){
 	var name = $("#defaultSite").val();
-	var loadT = layer.msg(lan.public.the,{icon:16,time:0,shade: [0.3, '#000']});
-	$.post('/site?action=SetDefaultSite','name='+name,function(rdata){
+	var loadT = layer.msg('正在处理,请稍候...',{icon:16,time:0,shade: [0.3, '#000']});
+	$.post('/site/set_default_site','name='+name,function(rdata){
 		layer.closeAll();
 		layer.msg(rdata.msg,{icon:rdata.status?1:5});
-	});
+	},'json');
 }
 
 
 //默认站点
-function GetDefaultSite(){
-	$.post('/site?action=GetDefaultSite','',function(rdata){
-		var opt = '<option value="off">'+lan.site.default_site_no+'</option>';
+function getDefaultSite(){
+	$.post('/site/get_default_site','',function(rdata){
+		var opt = '<option value="off">未设置默认站点</option>';
 		var selected = '';
 		for(var i=0;i<rdata.sites.length;i++){
 			selected = '';
@@ -944,27 +944,27 @@ function GetDefaultSite(){
 		
 		layer.open({
 				type: 1,
-				area: '430px',
-				title: lan.site.default_site_yes,
+				area: '530px',
+				title: '设置默认站点',
 				closeBtn: 2,
 				shift: 5,
 				shadeClose: true,
 				content:'<div class="bt-form ptb15 pb70">\
 							<p class="line">\
-								<span class="tname text-right">'+lan.site.default_site+'</span>\
+								<span class="tname text-right">默认站点</span>\
 								<select id="defaultSite" class="bt-input-text" style="width: 300px;">'+opt+'</select>\
 							</p>\
 							<ul class="help-info-text c6 plr20">\
-							    <li>'+lan.site.default_site_help_1+'</li>\
-							    <li>'+lan.site.default_site_help_2+'</li>\
+							    <li>设置默认站点后,所有未绑定的域名和IP都被定向到默认站点</li>\
+							    <li>可有效防止恶意解析</li>\
 						    </ul>\
 							<div class="bt-form-submit-btn">\
-								<button type="button" class="btn btn-danger btn-sm btn-title" onclick="layer.closeAll()">'+lan.public.cancel+'</button>\
-								<button class="btn btn-success btn-sm btn-title" onclick="SetDefaultSite()">'+lan.public.ok+'</button>\
+								<button type="button" class="btn btn-danger btn-sm btn-title" onclick="layer.closeAll()">取消</button>\
+								<button class="btn btn-success btn-sm btn-title" onclick="setDefaultSite()">确定</button>\
 							</div>\
 						</div>'
 		});
-	});
+	},'json');
 }
 
 function setIndexList(id){
@@ -985,24 +985,22 @@ function setIndexList(id){
 
 /*站点修改*/
 function webEdit(id,website,endTime,addtime){
-	var system = "{$Think.session.system}";
-	var eMenu = '';
-	eMenu = "<p onclick='DirBinding("+id+")' title='"+lan.site.site_menu_1+"'>"+lan.site.site_menu_1+"</p>"
-	+"<p onclick='webPathEdit("+id+")' title='"+lan.site.site_menu_2+"'>"+lan.site.site_menu_2+"</p>"
+	var eMenu = "<p onclick='dirBinding("+id+")' title='子目录绑定'>子目录绑定</p>"
+	+"<p onclick='webPathEdit("+id+")' title='网站目录'>网站目录</p>"
 	+"<p onclick='limitNet("+id+")' title='流量限制'>流量限制</p>"
 	+"<p onclick=\"rewrite('"+website+"')\" title='伪静态'>伪静态</p>"
 	+"<p onclick='setIndexEdit("+id+")' title='默认文档'>默认文档</p>"
 	+"<p onclick=\"configFile('"+website+"')\" title='配置文件'>配置文件</p>"
-	+"<p onclick=\"setSSL("+id+",'"+website+"')\" title='"+lan.site.site_menu_7+"'>"+lan.site.site_menu_7+"</p>"
+	+"<p onclick=\"setSSL("+id+",'"+website+"')\" title='SSL'>SSL</p>"
 	+"<p onclick=\"phpVersion('"+website+"')\" title='PHP版本'>PHP版本</p>"
-	+"<p onclick=\"To301('"+website+"')\" title='"+lan.site.site_menu_10+"'>"+lan.site.site_menu_10+"</p>"
-	+"<p onclick=\"Proxy('"+website+"')\" title='"+lan.site.site_menu_12+"'>"+lan.site.site_menu_11+"</p>"
-	+"<p id='site_"+id+"' onclick=\"security('"+id+"','"+website+"')\" title='"+lan.site.site_menu_12+"'>"+lan.site.site_menu_12+"</p>"
+	// +"<p onclick=\"to301('"+website+"')\" title='重定向'>重定向</p>"
+	// +"<p onclick=\"proxyList('"+website+"')\" title='反向代理'>反向代理</p>"
+	+"<p id='site_"+id+"' onclick=\"security('"+id+"','"+website+"')\" title='防盗链'>防盗链</p>"
 	+"<p id='site_"+id+"' onclick=\"getSiteLogs('"+website+"')\" title='查看站点请求日志'>响应日志</p>";
 	layer.open({
 		type: 1,
 		area: '640px',
-		title: lan.site.website_change+'['+website+']  --  '+lan.site.addtime+'['+addtime+']',
+		title: '站点修改['+website+']  --  添加时间['+addtime+']',
 		closeBtn: 2,
 		shift: 0,
 		content: "<div class='bt-form'>"
@@ -1015,7 +1013,7 @@ function webEdit(id,website,endTime,addtime){
 	});
 	domainEdit(id,website);
 	//域名输入提示
-	var placeholder = "<div class='placeholder'>"+lan.site.domain_help+"</div>";
+	var placeholder = "<div class='placeholder'>每行填写一个域名，默认为80端口<br>泛解析添加方法 *.domain.com<br>如另加端口格式为 www.domain.com:88</div>";
 	$('#newdomain').after(placeholder);
 	$(".placeholder").click(function(){
 		$(this).hide();
@@ -1189,56 +1187,55 @@ function limitNet(id){
 			    +"<button class='btn btn-success btn-sm mt10' onclick='saveLimitNet("+id+",1)'>"+lan.public.save+"</button>"
 			    +"</div>"
 				+"<ul class='help-info-text c7 mtb15'><li>"+lan.site.limit_net_11+"</li><li>"+lan.site.limit_net_13+"</li><li>"+lan.site.limit_net_15+"</li></ul>"
-			$("#webedit-con").html(body);
+		$("#webedit-con").html(body);
 			
-			$("select[name='limit']").change(function(){
-				var type = $(this).val();
-				perserver = 300;
-				perip = 25;
-				limit_rate = 512;
-				switch(type){
-					case '1':
-						perserver = 300;
-						perip = 25;
-						limit_rate = 512;
-						break;
-					case '2':
-						perserver = 200;
-						perip = 10;
-						limit_rate = 1024;
-						break;
-					case '3':
-						perserver = 50;
-						perip = 3;
-						limit_rate = 2048;
-						break;
-					case '4':
-						perserver = 500;
-						perip = 10;
-						limit_rate = 2048;
-						break;
-					case '5':
-						perserver = 400;
-						perip = 15;
-						limit_rate = 1024;
-						break;
-					case '6':
-						perserver = 60;
-						perip = 10;
-						limit_rate = 512;
-						break;
-					case '7':
-						perserver = 150;
-						perip = 4;
-						limit_rate = 1024;
-						break;
-				}
-				
-				
-				$("input[name='perserver']").val(perserver);
-				$("input[name='perip']").val(perip);
-				$("input[name='limit_rate']").val(limit_rate);
-			});
+		$("select[name='limit']").change(function(){
+			var type = $(this).val();
+			perserver = 300;
+			perip = 25;
+			limit_rate = 512;
+			switch(type){
+				case '1':
+					perserver = 300;
+					perip = 25;
+					limit_rate = 512;
+					break;
+				case '2':
+					perserver = 200;
+					perip = 10;
+					limit_rate = 1024;
+					break;
+				case '3':
+					perserver = 50;
+					perip = 3;
+					limit_rate = 2048;
+					break;
+				case '4':
+					perserver = 500;
+					perip = 10;
+					limit_rate = 2048;
+					break;
+				case '5':
+					perserver = 400;
+					perip = 15;
+					limit_rate = 1024;
+					break;
+				case '6':
+					perserver = 60;
+					perip = 10;
+					limit_rate = 512;
+					break;
+				case '7':
+					perserver = 150;
+					perip = 4;
+					limit_rate = 1024;
+					break;
+			}
+			
+			$("input[name='perserver']").val(perserver);
+			$("input[name='perip']").val(perip);
+			$("input[name='limit_rate']").val(limit_rate);
+		});
 	},'json');
 }
 
@@ -1266,11 +1263,12 @@ function saveLimitNet(id, type){
 
 
 //子目录绑定
-function DirBinding(id){
-	$.post('/site?action=GetDirBinding&id='+id,function(rdata){
+function dirBinding(id){
+	$.post('/site/get_dir_binding',{'id':id},function(data){
+		var rdata = data['data'];
 		var echoHtml = '';
 		for(var i=0;i<rdata.binding.length;i++){
-			echoHtml += "<tr><td>"+rdata.binding[i].domain+"</td><td>"+rdata.binding[i].port+"</td><td>"+rdata.binding[i].path+"</td><td class='text-right'><a class='btlink' href='javascript:SetDirRewrite("+rdata.binding[i].id+");'>"+lan.site.site_menu_4+"</a> | <a class='btlink' href='javascript:DelBinding("+rdata.binding[i].id+","+id+");'>"+lan.public.del+"</a></td></tr>";
+			echoHtml += "<tr><td>"+rdata.binding[i].domain+"</td><td>"+rdata.binding[i].port+"</td><td>"+rdata.binding[i].path+"</td><td class='text-right'><a class='btlink' href='javascript:setDirRewrite("+rdata.binding[i].id+");'>伪静态</a> | <a class='btlink' href='javascript:delDirBind("+rdata.binding[i].id+","+id+");'>删除</a></td></tr>";
 		}
 		
 		var dirList = '';
@@ -1279,38 +1277,37 @@ function DirBinding(id){
 		}
 		
 		var body = "<div class='dirBinding c5'>"
-			   +lan.site.domain+"：<input class='bt-input-text mr20' type='text' name='domain' />"
-			   +lan.site.subdirectories+"：<select class='bt-input-text mr20' name='dirName'>"+dirList+"</select>"
-			   +"<button class='btn btn-success btn-sm' onclick='AddDirBinding("+id+")'>"+lan.public.add+"</button>"
-			   +"</div>"
-			   +"<div class='divtable mtb15' style='height:470px;overflow:auto'><table class='table table-hover' width='100%' style='margin-bottom:0'>"
-			   +"<thead><tr><th>"+lan.site.domain+"</th><th width='70'>"+lan.site.port+"</th><th width='100'>"+lan.site.subdirectories+"</th><th width='100' class='text-right'>"+lan.site.operate+"</th></tr></thead>"
-			   +"<tbody id='checkDomain'>" + echoHtml + "</tbody>"
-			   +"</table></div>"
+			   + "域名：<input class='bt-input-text mr20' type='text' name='domain' />"
+			   + "子目录：<select class='bt-input-text mr20' name='dirName'>"+dirList+"</select>"
+			   + "<button class='btn btn-success btn-sm' onclick='addDirBinding("+id+")'>添加</button>"
+			   + "</div>"
+			   + "<div class='divtable mtb15' style='height:470px;overflow:auto'><table class='table table-hover' width='100%' style='margin-bottom:0'>"
+			   + "<thead><tr><th>域名</th><th width='70'>端口</th><th width='100'>子目录</th><th width='100' class='text-right'>操作</th></tr></thead>"
+			   + "<tbody id='checkDomain'>" + echoHtml + "</tbody>"
+			   + "</table></div>";
 		
 		$("#webedit-con").html(body);
-	})
-	
+	},'json');
 }
 
 //子目录伪静态
-function SetDirRewrite(id){
-	$.post('/site?action=GetDirRewrite&id='+id,function(rdata){
+function setDirRewrite(id){
+	$.post('/site/get_dir_bind_rewrite','id='+id,function(rdata){
 		if(!rdata.status){
-			var confirmObj = layer.confirm(lan.site.url_rewrite_alter,{icon:3,closeBtn:2},function(){
-				$.post('/site?action=GetDirRewrite&id='+id+'&add=1',function(rdata){
+			var confirmObj = layer.confirm('你真的要为这个子目录创建独立的伪静态规则吗？',{icon:3,closeBtn:2},function(){
+				$.post('/site/get_dir_bind_rewrite','id='+id+'&add=1',function(rdata){
 					layer.close(confirmObj);
-					ShowRewrite(rdata);
-				});
+					showRewrite(rdata);
+				},'json');
 			});
 			return;
 		}
-		ShowRewrite(rdata);
-	});
+		showRewrite(rdata);
+	},'json');
 }
 
 //显示伪静态
-function ShowRewrite(rdata){
+function showRewrite(rdata){
 	var rList = ''; 
 	for(var i=0;i<rdata.rlist.length;i++){
 		rList += "<option value='"+rdata.rlist[i]+"'>"+rdata.rlist[i]+"</option>";
@@ -1318,18 +1315,17 @@ function ShowRewrite(rdata){
 	var webBakHtml = "<div class='c5 plr15'>\
 						<div class='line'>\
 						<select class='bt-input-text mr20' id='myRewrite' name='rewrite' style='width:30%;'>"+rList+"</select>\
-						<span>"+lan.site.rule_cov_tool+"：<a class='btlink' href='https://www.bt.cn/Tools' target='_blank'>"+lan.site.a_c_n+"</a>\</span>\
 						<textarea class='bt-input-text mtb15' style='height: 260px; width: 470px; line-height:18px;padding:5px;' id='rewriteBody'>"+rdata.data+"</textarea></div>\
-						<button id='SetRewriteBtn' class='btn btn-success btn-sm' onclick=\"SetRewrite('"+rdata.filename+"')\">"+lan.public.save+"</button>\
+						<button id='SetRewriteBtn' class='btn btn-success btn-sm' onclick=\"SetRewrite('"+rdata.filename+"')\">保存</button>\
 						<ul class='help-info-text c7 ptb10'>\
-							<li>"+lan.site.url_rw_help_1+"</li>\
-							<li>"+lan.site.url_rw_help_2+"</li>\
+							<li>请选择您的应用，若设置伪静态后，网站无法正常访问，请尝试设置回default</li>\
+							<li>您可以对伪静态规则进行修改，修改完后保存即可。</li>\
 						</ul>\
 						</div>";
 	layer.open({
 		type: 1,
 		area: '500px',
-		title: lan.site.config_url,
+		title: '配置伪静态规则',
 		closeBtn: 2,
 		shift: 5,
 		shadeClose: true,
@@ -1338,14 +1334,14 @@ function ShowRewrite(rdata){
 	
 	$("#myRewrite").change(function(){
 		var rewriteName = $(this).val();
-		$.post('/files?action=GetFileBody','path=/www/server/panel/rewrite/'+getCookie('serverType')+'/'+rewriteName+'.conf',function(fileBody){
-			 $("#rewriteBody").val(fileBody.data);
-		});
+		$.post('/files/get_body','path='+rdata['rewrite_dir']+'/'+rewriteName+'.conf',function(fileBody){
+			 $("#rewriteBody").val(fileBody.data.data);
+		},'json');
 	});
 }
 
 //添加子目录绑定
-function AddDirBinding(id){
+function addDirBinding(id){
 	var domain = $("input[name='domain']").val();
 	var dirName = $("select[name='dirName']").val();
 	if(domain == '' || dirName == '' || dirName == null){
@@ -1354,26 +1350,24 @@ function AddDirBinding(id){
 	}
 	
 	var data = 'id='+id+'&domain='+domain+'&dirName='+dirName
-	$.post('site?action=AddDirBinding',data,function(rdata){
-		DirBinding(id);
+	$.post('/site/add_dir_bind',data,function(rdata){
+		dirBinding(id);
 		layer.msg(rdata.msg,{icon:rdata.status?1:2});
-	});
-	
+	},'json');
 }
 
 //删除子目录绑定
-function DelBinding(id,siteId){
+function delDirBind(id,siteId){
 	layer.confirm(lan.site.s_bin_del,{icon:3,closeBtn:2},function(){
-		$.post('site?action=DelDirBinding','id='+id,function(rdata){
-			DirBinding(siteId);
+		$.post('/site/del_dir_bind','id='+id,function(rdata){
+			dirBinding(siteId);
 			layer.msg(rdata.msg,{icon:rdata.status?1:2});
-		});
+		},'json');
 	});
 }
 
-
 //反向代理
-function Proxy(siteName,type){
+function proxyList(siteName,type){
 	if(type == 1){
 		type = $("input[name='status']").attr('checked')?'0':'1';
 		toUrl = encodeURIComponent($("input[name='toUrl']").val());
@@ -1418,7 +1412,7 @@ function Proxy(siteName,type){
 }
 
 //开启缓存
-function OpenCache(siteName){
+function openCache(siteName){
 	var loadT = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});
 	$.post('/site?action=ProxyCache',{siteName:siteName},function(rdata){
 		layer.close(loadT);
@@ -1427,7 +1421,7 @@ function OpenCache(siteName){
 }
 		
 //301重定向
-function To301(siteName,type){
+function to301(siteName,type){
 	if(type == 1){
 		type = $("input[name='status']").attr('checked')?'0':'1';
 		toUrl = encodeURIComponent($("input[name='toUrl']").val());
@@ -1467,22 +1461,28 @@ function To301(siteName,type){
 	});
 }
 
-//验证IP地址
-function isValidIP(ip) {
-    var reg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
-    return reg.test(ip);
-}
-function isContains(str, substr) {
-    return str.indexOf(substr) >= 0;
-}
+
+//文件验证
+// function file_check(){
+// 	$(".check_message").html('<div style="margin-left:100px">\
+// 			<input type="checkbox" name="checkDomain" id="checkDomain" checked="">\
+// 			<label class="mr20" for="checkDomain" style="font-weight:normal">提前校验域名(提前发现问题,减少失败率)</label>\
+// 		</div>');
+// 	$("#lets_help").html('<li>申请之前，请确保域名已解析，如未解析会导致审核失败</li>\
+// 		<li>Let\'s Encrypt免费证书，有效期3个月，支持多域名。默认会自动续签</li>\
+// 		<li>若您的站点使用了CDN或301重定向会导致续签失败</li>\
+// 		<li>在未指定SSL默认站点时,未开启SSL的站点使用HTTPS会直接访问到已开启SSL的站点</li>');
+// }
+
 //证书夹
-function ssl_admin(siteName){
-	var loadT = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});
-	$.get('/ssl?action=GetCertList',function(rdata){
+function sslAdmin(siteName){
+	var loadT = layer.msg('正在提交任务...',{icon:16,time:0,shade: [0.3, '#000']});
+	$.get('/site/get_cert_list',function(data){
 		layer.close(loadT);
+		var rdata = data['data'];
 		var tbody = '';
 		for(var i=0;i<rdata.length;i++){
-			tbody += '<tr><td>'+rdata[i].subject+'</td><td>'+rdata[i].dns.join('<br>')+'</td><td>'+rdata[i].notAfter+'</td><td>'+rdata[i].issuer+'</td><td style="text-align: right;"><a onclick="set_cert_ssl(\''+rdata[i].subject+'\',\''+siteName+'\')" class="btlink">部署</a> | <a onclick="remove_ssl(\''+rdata[i].subject+'\')" class="btlink">删除</a></td></tr>'
+			tbody += '<tr><td>'+rdata[i].subject+'</td><td>'+rdata[i].dns.join('<br>')+'</td><td>'+rdata[i].notAfter+'</td><td>'+rdata[i].issuer+'</td><td style="text-align: right;"><a onclick="setCertSsl(\''+rdata[i].subject+'\',\''+siteName+'\')" class="btlink">部署</a> | <a onclick="removeSsl(\''+rdata[i].subject+'\')" class="btlink">删除</a></td></tr>'
 		}
 		var txt = '<div class="mtb15" style="line-height:30px">\
 		<button style="margin-bottom: 7px;display:none;" class="btn btn-success btn-sm">添加</button>\
@@ -1490,38 +1490,37 @@ function ssl_admin(siteName){
 		<tbody>'+tbody+'</tbody>\
 		</table></div></div>';
 		$(".tab-con").html(txt);
-	});
+	},'json');
 }
 
 //删除证书
-function remove_ssl(certName){
-	SafeMessage('删除证书','您真的要从证书夹删除证书吗?',function(){
+function removeSsl(certName){
+	safeMessage('删除证书','您真的要从证书夹删除证书吗?',function(){
 		var loadT = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});
-		$.post('/ssl?action=RemoveCert',{certName:certName},function(rdata){
+		$.post('/site/remove_cert',{certName:certName},function(rdata){
 			layer.close(loadT);
 			layer.msg(rdata.msg,{icon:rdata.status?1:2});
 			$("#ssl_admin").click();
-		});
+		},'json');
 	});
 }
 
 //从证书夹部署
-function set_cert_ssl(certName,siteName){
+function setCertSsl(certName,siteName){
 	var loadT = layer.msg('正在部署证书...',{icon:16,time:0,shade: [0.3, '#000']});
-	$.post('/ssl?action=SetCertToSite',{certName:certName,siteName:siteName},function(rdata){
+	$.post('/site/set_cert_to_site',{certName:certName,siteName:siteName},function(rdata){
 		layer.close(loadT);
 		layer.msg(rdata.msg,{icon:rdata.status?1:2});
-	});
+	},'json');
 }
 
-//宝塔ssl
+//ssl
 function setSSL(id,siteName){
 	var mBody = '<div class="tab-nav">\
-					<span  onclick="BTssl(\'a\','+id+',\''+siteName+'\')">'+lan.site.bt_ssl+'</span>\
-					<span class="on" onclick="BTssl(\'lets\','+id+',\''+siteName+'\')">Let\'s Encrypt</span>\
-					<span onclick="BTssl(\'other\','+id+',\''+siteName+'\')">'+lan.site.other_ssl+'</span>\
-					<span class="sslclose" onclick="closeSSL(\''+siteName+'\')">'+lan.public.close+'</span>\
-					<span id="ssl_admin" onclick="ssl_admin(\''+siteName+'\')">证书夹</span>'
+					<span class="on" onclick="opSSL(\'lets\','+id+',\''+siteName+'\')">Let\'s Encrypt</span>\
+					<span onclick="opSSL(\'other\','+id+',\''+siteName+'\')">其他证书</span>\
+					<span class="sslclose" onclick="closeSSL(\''+siteName+'\')">关闭</span>\
+					<span id="ssl_admin" onclick="sslAdmin(\''+siteName+'\')">证书夹</span>'
 					+ '<div class="ss-text pull-right mr30" style="position: relative;top:-4px">\
 	                    <em>强制HTTPS</em>\
 	                    <div class="ssh-item">\
@@ -1532,267 +1531,145 @@ function setSSL(id,siteName){
 			  + '<div class="tab-con" style="padding: 0px;"></div>'
 			  
 	$("#webedit-con").html(mBody);
-	//BTssl('a',id,siteName);
+	opSSL('lets',id,siteName);
 	$(".tab-nav span").click(function(){
 		$(this).addClass("on").siblings().removeClass("on");
 	});
-	// var loadT = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});
-	// $.post('/site?action=GetSSL','siteName='+siteName,function(rdata){
-	// 	layer.close(loadT);
-	// 	$("#toHttps").attr('checked',rdata.httpTohttps);
-	// 	switch(rdata.type){
-	// 		case -1:
-	// 			$(".tab-nav span").eq(3).addClass("on").siblings().removeClass("on");
-	// 			var txt = "<div class='mtb15'  style='line-height:30px'>"+lan.site.ssl_help_1+"</div>";
-	// 			$(".tab-con").html(txt);
-	// 			break;
-	// 		case 1:
-	// 			$(".tab-nav span").eq(1).addClass("on").siblings().removeClass("on");
-	// 			setCookie('letssl',1);
-	// 			var lets = '<div class="myKeyCon ptb15"><div class="ssl-con-key pull-left mr20">'+lan.site.ssl_key+'<br><textarea id="key" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.key+'</textarea></div>'
-	// 				+ '<div class="ssl-con-key pull-left">'+lan.site.ssl_crt+'<br><textarea id="csr" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.csr+'</textarea></div>'
-	// 				+ '</div>'
-	// 				+ '<ul class="help-info-text c7 pull-left"><li>'+lan.site.ssl_help_2+'</li><li>'+lan.site.ssl_help_3+'</li></ul>'
-	// 			$(".tab-con").html(lets);
-	// 			$(".help-info-text").after("<div class='line mtb15'><button class='btn btn-default btn-sm' onclick=\"OcSSL('CloseSSLConf','"+siteName+"')\" style='margin-left:10px'>"+lan.site.ssl_close+"</button></div>");
-	// 			break;
-	// 		case 0:
-	// 			$(".tab-nav span").eq(2).addClass("on").siblings().removeClass("on");
-	// 			BTssl('other',id,siteName);
-	// 			break;
-	// 		case 2:
-	// 			$(".tab-nav span").eq(0).addClass("on").siblings().removeClass("on");
-	// 			BTssl('a',id,siteName);
-	// 			break;
-	// 	}
-	// });
+	var loadT = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});
+	$.post('/site/get_ssl','siteName='+siteName,function(rdata){
+		layer.close(loadT);
+		$("#toHttps").attr('checked',rdata.data.httpTohttps);
+		switch(rdata.data.type){
+			case 1:
+				$(".tab-nav span").eq(1).addClass("on").siblings().removeClass("on");
+				setCookie('letssl',1);
+				var lets = '<div class="myKeyCon ptb15"><div class="ssl-con-key pull-left mr20">密钥(KEY)<br><textarea id="key" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.data.key+'</textarea></div>'
+					+ '<div class="ssl-con-key pull-left">证书(PEM格式)<br><textarea id="csr" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.data.csr+'</textarea></div>'
+					+ '</div>'
+					+ '<ul class="help-info-text c7 pull-left"><li>已为您自动生成Let\'s Encrypt免费证书；</li>\
+						<li>如需使用其他SSL,请切换其他证书后粘贴您的KEY以及PEM内容，然后保存即可。</li></ul>'
+				$(".tab-con").html(lets);
+				$(".help-info-text").after("<div class='line mtb15'><button class='btn btn-default btn-sm' onclick=\"ocSSL('close_ssl_conf','"+siteName+"')\" style='margin-left:10px'>关闭SSL</button></div>");
+				break;
+			case 0:
+			case 3:
+				$(".tab-nav span").eq(1).addClass("on").siblings().removeClass("on");
+				opSSL('other',id,siteName);
+				break;
+			case 2:
+				$(".tab-nav span").eq(0).addClass("on").siblings().removeClass("on");
+				opSSL('a',id,siteName);
+				break;
+		}
+	},'json');
 }
-//关闭SSL
+
+
+
+
 function closeSSL(siteName){
 	var loadT = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});
-	$.post('site?action=GetSSL','siteName='+siteName,function(rdata){
+	$.post('/site/get_ssl','siteName='+siteName,function(rdata){
 		layer.close(loadT);
-		switch(rdata.type){
+		switch(rdata.data.type){
 			case -1:
-				var txt = "<div class='mtb15' style='line-height:30px'>"+lan.site.ssl_help_1+"</div>";
+				var txt = "<div class='mtb15' style='line-height:30px'>本站点未设置SSL，如需设置SSL，请选择切换类目申请开启SSL<br>\
+					<p style='color:red;'>关闭SSL以后,请务必清除浏览器缓存再访问站点</p></div>";
 				setCookie('letssl',0);
 				$(".tab-con").html(txt);
 				break;
-			case 1:
+			case 0:
 				var txt = "Let's Encrypt";
 				closeSSLHTML(txt,siteName);
 				break;
-			case 0:
-				var txt = lan.site.other;
+			case 1:
+				var txt = '其它';
 				closeSSLHTML(txt,siteName);
 				break;
 			case 2:
-				var txt = lan.site.bt_ssl;
+				var txt = 'SSL';
 				closeSSLHTML(txt,siteName);
 				break;
 		}
-	})
-}
-
-//设置httpToHttps
-function httpToHttps(siteName){
-	var isHttps = $("#toHttps").attr('checked');
-	if(isHttps){
-		layer.confirm('关闭强制HTTPS后需要清空浏览器缓存才能看到效果,继续吗?',{icon:3,title:"关闭强制HTTPS"},function(){
-			$.post('site?action=CloseToHttps','siteName='+siteName,function(rdata){
-				layer.msg(rdata.msg,{icon:rdata.status?1:2});
-			});
-		});
-	}else{
-		$.post('site?action=HttpToHttps','siteName='+siteName,function(rdata){
-			layer.msg(rdata.msg,{icon:rdata.status?1:2});
-		});
-	}
+	},'json');
 }
 
 //关闭SSL内容
 function closeSSLHTML(txt,siteName){
-	$(".tab-con").html("<div class='line mtb15'>"+lan.get('ssl_enable',[txt])+"</div><div class='line mtb15'><button class='btn btn-success btn-sm' onclick=\"OcSSL('CloseSSLConf','"+siteName+"')\">"+lan.site.ssl_close+"</button></div>");
+	$(".tab-con").html("<div class='line mtb15'>"+lan.get('ssl_enable',[txt])+"</div><div class='line mtb15'><button class='btn btn-success btn-sm' onclick=\"ocSSL('close_ssl_conf','"+siteName+"')\">关闭SSL</button></div>");
 }
 
-//宝塔SSL
-function BTssl(type,id,siteName){
-	var a = '<div class="btssl"><div class="alert alert-warning" style="padding:10px">'+lan.site.bt_bind_no+'</div>'
-			+ '<div class="line mtb10"><span class="tname text-right mr20">'+lan.site.bt_user+'</span><input id="btusername" class="bt-input-text" type="text" name="bt_panel_username" maxlength="11" style="width:200px" ><i style="font-style:normal;margin-left:10px;color:#999"></i></div>'
-			+ '<div class="line mtb10"><span class="tname text-right mr20">'+lan.site.password+'</span><input id="btpassword" class="bt-input-text" type="password" name="bt_panel_password" style="width:200px" ></div>'
-			+ '<div class="line mtb15" style="margin-left:100px"><button class="btn btn-success btn-sm mr20 btlogin">'+lan.site.login+'</button><button class="btn btn-success btn-sm" onclick="javascript:window.open(\'https://www.bt.cn/register.html\')">'+lan.site.bt_reg+'</button></div>'
-			+ '<ul class="help-info-text c7 ptb15"><li style="color:red">'+lan.site.bt_ssl_help_1+'</li><li>'+lan.site.bt_ssl_help_2+'</li><li>'+lan.site.bt_ssl_help_3+'</li><li>'+lan.site.bt_ssl_help_4+'</li></ul>'
-			+ '</div>';
-	var b = '<div class="btssl"><div class="line mtb15"><span class="tname text-center">'+lan.site.domain+'</span><select id="domainlist" class="bt-input-text" style="width:220px"></select></div>'
-		  + '<div class="line mtb15" style="margin-left:80px"><button class="btn btn-success btn-sm btsslApply">'+lan.site.btapply+'</button></div>'
-		  + '<div class="btssllist mtb15"><div class="divtable"><div id="btssl_table_list" style="max-height:205px;border:#ddd 1px solid;overflow:auto"><table class="table table-hover" style="border:none"><thead><tr><th>'+lan.site.domain+'</th><th>'+lan.site.endtime+'</th><th>'+lan.site.status+'<a href="https://www.bt.cn/bbs/thread-7860-1-1.html" class="bt-ico-ask" title="查看说明" target="_blank">?</a></th><th class="text-right" width="120">'+lan.site.operate+'</th></tr></thead><tbody id="ssllist"></tbody></table></div></div></div>'
-		  + '<ul class="help-info-text c7 ptb15"><li>'+lan.site.bt_ssl_help_5+'(包括根域名)</li><li>'+lan.site.bt_ssl_help_6+'</li><li>'+lan.site.bt_ssl_help_7+'</li><li>建议使用二级域名为www的域名申请证书,此时系统会默认赠送顶级域名为可选名称</li><li>在未指定SSL默认站点时,未开启SSL的站点使用HTTPS会直接访问到已开启SSL的站点</li></ul>'
-		  + '</div>';
-	
-	var lets =  '<div class="btssl"><div class="label-input-group" style="margin-left: 110px;margin-top: 10px;"><input type="checkbox" name="checkDomain" id="checkDomain" checked=""><label class="mr20" for="checkDomain" style="font-weight:normal">提前校验域名(提前发现问题,减少失败率)</label></div><div class="line mtb15"><span class="tname text-center">管理员邮箱</span><input class="bt-input-text" style="width:240px;" type="text" name="admin_email" /></div><div class="line mtb15"><span class="tname text-center">'+lan.site.domain+'</span><ul id="ymlist" style="padding: 5px 10px;max-height:180px;overflow:auto; width:240px;border:#ccc 1px solid;border-radius:3px"></ul></div>'
-			  + '<div class="line mtb15" style="margin-left:80px"><button class="btn btn-success btn-sm letsApply">'+lan.site.btapply+'</button></div>'
-			  + '<ul class="help-info-text c7 ptb15"><li>'+lan.site.bt_ssl_help_5+'</li><li>'+lan.site.bt_ssl_help_8+'</li><li>'+lan.site.bt_ssl_help_9+'</li><li>在未指定SSL默认站点时,未开启SSL的站点使用HTTPS会直接访问到已开启SSL的站点</li></ul>'
+//设置httpToHttps
+function httpToHttps(siteName){
+	var isHttps = $("#toHttps").prop('checked');
+	if(isHttps){
+		layer.confirm('关闭强制HTTPS后需要清空浏览器缓存才能看到效果,继续吗?',{icon:3,title:"关闭强制HTTPS"},function(){
+			$.post('/site/close_to_https','siteName='+siteName,function(rdata){
+				layer.msg(rdata.msg,{icon:rdata.status?1:2});
+			},'json');
+		});
+	}else{
+		$.post('/site/http_to_https','siteName='+siteName,function(rdata){
+			layer.msg(rdata.msg,{icon:rdata.status?1:2});
+		},'json');
+	}
+}
+
+
+
+//SSL
+function opSSL(type,id,siteName){
+	var lets =  '<div class="btssl"><div class="label-input-group">'
+			  + '<div class="line mtb10"><form><span class="tname text-center">验证方式</span><div style="margin-top:7px;display:inline-block"><input type="radio" name="c_type" onclick="file_check()" id="check_file" checked="checked" />\
+			  	<label class="mr20" for="check_file" style="font-weight:normal">文件验证</label></label></div></form></div>'
+			  + '<div class="check_message line"><div style="margin-left:100px"><input type="checkbox" name="checkDomain" id="checkDomain" checked=""><label class="mr20" for="checkDomain" style="font-weight:normal">提前校验域名(提前发现问题,减少失败率)</label></div></div>'
+			  + '</div><div class="line mtb10"><span class="tname text-center">管理员邮箱</span><input class="bt-input-text" style="width:240px;" type="text" name="admin_email" /></div>'
+			  + '<div class="line mtb10"><span class="tname text-center">域名</span><ul id="ymlist" style="padding: 5px 10px;max-height:180px;overflow:auto; width:240px;border:#ccc 1px solid;border-radius:3px"></ul></div>'
+			  + '<div class="line mtb10" style="margin-left:100px"><button class="btn btn-success btn-sm letsApply">申请</button></div>'
+			  + '<ul class="help-info-text c7" id="lets_help"><li>申请之前，请确保域名已解析，如未解析会导致审核失败</li>\
+			  	<li>Let\'s Encrypt免费证书，有效期3个月，支持多域名。默认会自动续签</li>\
+			  	<li>若您的站点使用了CDN或301重定向会导致续签失败</li>\
+			  	<li>在未指定SSL默认站点时,未开启SSL的站点使用HTTPS会直接访问到已开启SSL的站点</li></ul>'
 			  + '</div>';
 	
-	var other = '<div class="myKeyCon ptb15"><div class="ssl-con-key pull-left mr20">'+lan.site.ssl_key+'<br><textarea id="key" class="bt-input-text"></textarea></div>'
-					+ '<div class="ssl-con-key pull-left">'+lan.site.ssl_crt+'<br><textarea id="csr" class="bt-input-text"></textarea></div>'
-					+ '<div class="ssl-btn pull-left mtb15" style="width:100%"><button class="btn btn-success btn-sm" onclick="SaveSSL(\''+siteName+'\')">'+lan.public.save+'</button></div></div>'
-					+ '<ul class="help-info-text c7 pull-left"><li>'+lan.site.bt_ssl_help_10+'</li><li>如果浏览器提示证书链不完整,请检查是否正确拼接PEM证书</li><li>PEM格式证书 = 域名证书.crt + 根证书(root_bundle).crt</li><li>在未指定SSL默认站点时,未开启SSL的站点使用HTTPS会直接访问到已开启SSL的站点</li></ul>';
-					
+	var other = '<div class="myKeyCon ptb15"><div class="ssl-con-key pull-left mr20">密钥(KEY)<br><textarea id="key" class="bt-input-text"></textarea></div>'
+					+ '<div class="ssl-con-key pull-left">证书(PEM格式)<br><textarea id="csr" class="bt-input-text"></textarea></div>'
+					+ '<div class="ssl-btn pull-left mtb15" style="width:100%"><button class="btn btn-success btn-sm" onclick="saveSSL(\''+siteName+'\')">保存</button></div></div>'
+					+ '<ul class="help-info-text c7 pull-left"><li>粘贴您的*.key以及*.pem内容，然后保存即可<a href=\'http://www.bt.cn/bbs/thread-704-1-1.html\' class=\'btlink\' target=\'_blank\'>[帮助]</a>。</li>\
+					<li>如果浏览器提示证书链不完整,请检查是否正确拼接PEM证书</li><li>PEM格式证书 = 域名证书.crt + 根证书(root_bundle).crt</li>\
+					<li>在未指定SSL默认站点时,未开启SSL的站点使用HTTPS会直接访问到已开启SSL的站点</li></ul>';			
 	switch(type){
-		case 'a':
-			$.get("/ssl?action=GetUserInfo",function(rdata){
-				if(rdata.status){
-					BTssl('b',id,siteName);
-				}
-				else{
-					$(".tab-con").html(a);
-					$("#btusername").blur(function(){
-						if(!(/^1(3|4|5|7|8)\d{9}$/.test($(this).val()))){ 
-							$("#btusername").css("border","1px solid #e53451");
-							$("#btusername").next("i").html(lan.site.phone_input);
-						}
-						else{
-							$("#btusername").removeAttr("style").css("width","200px");
-							$("#btusername").next("i").empty();
-						}
-					});
-					$(".btlogin").click(function(){
-						var data = "username="+$("#btusername").val()+"&password="+$("#btpassword").val();
-						$.post("/ssl?action=GetToken",data,function(tdata){
-							if(tdata.status){
-								layer.msg(tdata.msg,{icon:1});
-								BTssl('b',id,siteName);
-							}
-							else{
-								layer.msg(tdata.msg,{icon:2})
-							}
-						})
-					})
-				}
-			});
-			break;
-		case 'b':
-			$(".tab-con").html(b);
-			var opt = '';
-			$.get('/data?action=getData&table=domain&list=True&search=' + id, function(rdata) {
-				for(var i=0;i<rdata.length;i++){
-					var isIP = isValidIP(rdata[i].name);
-					var x = isContains(rdata[i].name, '*');
-					if(!isIP && !x){
-						opt+='<option>'+rdata[i].name+'</option>'
-					}
-				}
-				$("#domainlist").html(opt);
-			})
-			getSSLlist(siteName);
-			$(".btsslApply").click(function(){
-				var ym = $("#domainlist").val();
-				if(ym.indexOf('www.') != -1){
-					var len = $("#domainlist")[0].length;
-					var rootDomain = ym.split(/www\./)[1];
-					var mn = 0;
-					for(var i=0;i<len;i++){
-						if($("#domainlist")[0][i].innerText == rootDomain) mn++;
-					}
-					if(mn < 1){
-						layer.msg('您为域名['+ym+']申请证书，但程序检测到您没有将其根域名['+rootDomain+']绑定并解析到站点，这会导致证书签发失败!',{icon:2,time:5000});
-						return;
-					}
-				}
-				
-				$.post("/data?action=getKey","table=sites&key=path&id="+id,function(rdata){
-					//第一步
-					var loadT = layer.msg(lan.site.ssl_apply_1,{icon:16,time:0,shade:0.3});
-					$.post("/ssl?action=GetDVSSL","domain="+ym+"&path="+rdata,function(tdata){
-						layer.close(loadT);
-						if(tdata.status){
-							layer.msg(tdata.msg,{icon:1});
-							var partnerOrderId = tdata.data.partnerOrderId;
-							//第二步
-							var loadT = layer.msg(lan.site.ssl_apply_2,{icon:16,time:0,shade:0.3});
-							$.post("/ssl?action=Completed","partnerOrderId="+partnerOrderId+"&siteName="+siteName,function(ydata){
-								layer.close(loadT);
-								if(!ydata.status){
-									layer.msg(ydata.msg,{icon:2});
-									getSSLlist(siteName);
-									return;
-								}
-								//第三步
-								var loadT = layer.msg(lan.site.ssl_apply_3,{icon:16,time:0,shade:0.3});
-								$.post("/ssl?action=GetSSLInfo","partnerOrderId="+partnerOrderId+"&siteName="+siteName,function(zdata){
-									layer.close(loadT);
-									layer.msg(zdata.msg,{icon:zdata.status?1:2});
-									getSSLlist(siteName);
-								});
-							});
-							
-						}
-						else{
-							layer.msg(tdata.msg,{icon:2})
-						}
-					})
-				})
-			});
-			break;
 		case 'lets':
-			/*
-			$.get("/ssl?action=GetUserInfo",function(sdata){
-				if(!sdata.status){
-					$(".tab-con").html(a);
-					$(".help-info-text").html("<li>"+lan.site.+"</li><li>let's Encrypt证书有效期为3个月</li><li>3个月有效期后自动续签</li>");
-					$("#btusername").blur(function(){
-						if(!(/^1(3|4|5|7|8)\d{9}$/.test($(this).val()))){ 
-							$("#btusername").css("border","1px solid #e53451");
-							$("#btusername").next("i").html(lan.site.phone_input);
-						}
-						else{
-							$("#btusername").removeAttr("style").css("width","200px");
-							$("#btusername").next("i").empty();
-						}
-					});
-					$(".btlogin").click(function(){
-						var data = "username="+$("#btusername").val()+"&password="+$("#btpassword").val();
-						$.post("/ssl?action=GetToken",data,function(tdata){
-							if(tdata.status){
-								layer.msg(tdata.msg,{icon:1});
-								BTssl('lets',id,siteName);
-							}
-							else{
-								layer.msg(tdata.msg,{icon:2})
-							}
-						})
-					})
-				}
-				else{}
-			});*/
 			if(getCookie('letssl') == 1){
-				$.post('site?action=GetSSL','siteName='+siteName,function(rdata){
+				$.post('/site/get_ssl','siteName='+siteName,function(data){
+					var rdata = data['data'];
 					if(rdata.csr === false){
 						setCookie('letssl',0);
-						BTssl(type,id,siteName);
+						opSSL(type,id,siteName);
 						return;
 					}
-					var lets = '<div class="myKeyCon ptb15"><div class="ssl-con-key pull-left mr20">'+lan.site.ssl_key+'<br><textarea id="key" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.key+'</textarea></div>'
-						+ '<div class="ssl-con-key pull-left">'+lan.site.ssl_crt+'<br><textarea id="csr" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.csr+'</textarea></div>'
+					var lets = '<div class="myKeyCon ptb15"><div class="ssl-con-key pull-left mr20">密钥(KEY)<br><textarea id="key" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.key+'</textarea></div>'
+						+ '<div class="ssl-con-key pull-left">证书(PEM格式)<br><textarea id="csr" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.csr+'</textarea></div>'
 						+ '</div>'
-						+ '<ul class="help-info-text c7 pull-left"><li>'+lan.site.ssl_help_2+'</li><li>'+lan.site.ssl_help_3+'</li></ul>';
+						+ '<ul class="help-info-text c7 pull-left"><li>已为您自动生成Let\'s Encrypt免费证书</li>\
+						<li>如需使用其他SSL,请切换其他证书后粘贴您的KEY以及PEM内容，然后保存即可。</li></ul>';
 					$(".tab-con").html(lets);
-					$(".help-info-text").after("<div class='line mtb15'><button class='btn btn-default btn-sm' onclick=\"OcSSL('CloseSSLConf','"+siteName+"')\" style='margin-left:10px'>"+lan.site.ssl_close+"</button></div>");
-				});
+					$(".help-info-text").after("<div class='line mtb15'><button class='btn btn-default btn-sm' onclick=\"ocSSL('close_ssl_conf','"+siteName+"')\" style='margin-left:10px'>关闭SSL</button></div>");
+				},'json');
 				return;
 			}
 			$(".tab-con").html(lets);
 			var opt='';
-			$.post('/site?action=GetSiteDomains',{id:id}, function(rdata) {
-				for(var i=0;i<rdata.domains.length;i++){
-					var isIP = isValidIP(rdata.domains[i].name);
-					var x = isContains(rdata.domains[i].name, '*');
+			$.post('/site/get_site_domains',{id:id}, function(rdata) {
+				var data = rdata['data'];
+				for(var i=0;i<data.domains.length;i++){
+					var isIP = isValidIP(data.domains[i].name);
+					var x = isContains(data.domains[i].name, '*');
 					if(!isIP && !x){
-						opt+='<li style="line-height:26px"><input type="checkbox" style="margin-right:5px; vertical-align:-2px" value="'+rdata.domains[i].name+'">'+rdata.domains[i].name+'</li>'
+						opt+='<li style="line-height:26px"><input type="checkbox" style="margin-right:5px; vertical-align:-2px" value="'+data.domains[i].name+'">'+data.domains[i].name+'</li>'
 					}
 				}
-				$("input[name='admin_email']").val(rdata.email);
+				$("input[name='admin_email']").val(data.email);
 				$("#ymlist").html(opt);
 				$("#ymlist li input").click(function(e){
 					e.stopPropagation();
@@ -1819,55 +1696,31 @@ function BTssl(type,id,siteName){
 					newSSL(siteName,domains);
 					
 				})
-			});
+			},'json');
 			break;
 		case 'other':
 			$(".tab-con").html(other);
 			var key = '';
 			var csr = '';
-			var loadT = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});
-			$.post('site?action=GetSSL','siteName='+siteName,function(rdata){
+			var loadT = layer.msg('正在提交任务...',{icon:16,time:0,shade: [0.3, '#000']});
+			$.post('site/get_ssl','siteName='+siteName,function(data){
 				layer.close(loadT);
+				var rdata = data['data'];
+				if (rdata.type == 0){
+					setCookie('letssl', 1);
+				}
 				if(rdata.status){
-					$(".ssl-btn").append("<button class='btn btn-default btn-sm' onclick=\"OcSSL('CloseSSLConf','"+siteName+"')\" style='margin-left:10px'>"+lan.site.ssl_close+"</button>");
+					$(".ssl-btn").append("<button class='btn btn-default btn-sm' onclick=\"ocSSL('close_ssl_conf','"+siteName+"')\" style='margin-left:10px'>关闭SSL</button>");
 				}
 				if(rdata.key == false) rdata.key = '';
 				if(rdata.csr == false) rdata.csr = '';
 				$("#key").val(rdata.key);
 				$("#csr").val(rdata.csr);
-			});
+			},'json');
 			break;
 	}
-	table_fixed("btssl_table_list")
 }
 
-//取证书列表
-function getSSLlist(siteName){
-	var tr='';
-	var loadT = layer.msg(lan.site.get_ssl_list,{icon:16,time:0,shade:0.3});
-	$.get("/ssl?action=GetOrderList&siteName="+siteName,function(rdata){
-		layer.close(loadT);
-		if(rdata.status){
-			for(var i=0;i<rdata.data.length;i++){
-				var txt = '';
-				var tips = '';
-				var icoask = '';
-				txt = (rdata.data[i].stateName == lan.site.order_success) ? '<a href="javascript:onekeySSl(\''+rdata.data[i].partnerOrderId+'\',\''+siteName+'\');" class="btlink">'+lan.site.deploy+'</a>' : '';
-				if(rdata.data[i].stateName == lan.site.domain_wait) {
-					txt = '<a href="javascript:VerifyDomain(\''+rdata.data[i].partnerOrderId+'\',\''+siteName+'\');" class="btlink">'+lan.site.domain_validate+'</a>';
-					//tips = lan.site.domain_check;
-					//icoask = '<i class="ico-font-ask" title="'+tips+'">?</i>';
-				}
-				if(rdata.data[i].setup){
-					txt = lan.site.deployed+' | <a class="btlink" href="javascript:OcSSL(\'CloseSSLConf\',\''+siteName+'\')">'+lan.public.close+'</a></div>';
-				}
-				
-				tr += '<tr><td>'+rdata.data[i].commonName+'</td><td>'+getLocalTime(rdata.data[i].endtime).split(" ")[0]+'</td><td title='+tips+'>'+rdata.data[i].stateName+icoask+'</td><td class="text-right">'+txt+'</td></tr>'
-			}
-			$("#ssllist").html(tr);
-		}
-	});
-}
 
 //一键部署证书
 function onekeySSl(partnerOrderId,siteName){
@@ -1880,7 +1733,7 @@ function onekeySSl(partnerOrderId,siteName){
 }
 
 //验证域名
-function VerifyDomain(partnerOrderId,siteName){
+function verifyDomain(partnerOrderId,siteName){
 	var loadT = layer.msg(lan.site.ssl_apply_2,{icon:16,time:0,shade:0.3});
 	$.post("/ssl?action=Completed","partnerOrderId="+partnerOrderId+'&siteName='+siteName,function(ydata){
 		layer.close(loadT);
@@ -1899,100 +1752,77 @@ function VerifyDomain(partnerOrderId,siteName){
 }
 
 //开启与关闭SSL
-function OcSSL(action,siteName){
-	var loadT = layer.msg(lan.site.get_ssl_list,{icon:16,time:0,shade: [0.3, '#000']});
-	$.post("site?action="+action,'siteName='+siteName+'&updateOf=1',function(rdata){
+function ocSSL(action,siteName){
+	var loadT = layer.msg('正在获取证书列表，请稍后..',{icon:16,time:0,shade: [0.3, '#000']});
+	$.post("/site/"+action,'siteName='+siteName+'&updateOf=1',function(rdata){
 		layer.close(loadT)
 		
 		if(!rdata.status){
 			if(!rdata.out){
 				layer.msg(rdata.msg,{icon:rdata.status?1:2});
-				//setSSL(siteName);
+				setSSL(siteName);
 				return;
 			}
-			
-			data = "<p>"+lan.site.get_ssl_err+"：</p><hr />"
+			data = "<p>证书获取失败：</p><hr />"
 			for(var i=0;i<rdata.out.length;i++){
-				data += "<p>"+lan.site.domain+": "+rdata.out[i].Domain+"</p>"
-					  + "<p>"+lan.site.err_type+": "+rdata.out[i].Type+"</p>"
-					  + "<p>"+lan.site.details+": "+rdata.out[i].Detail+"</p>"
-					  + "<hr />"
+				data += "<p>域名: "+rdata.out[i].Domain+"</p>"
+					  + "<p>错误类型: "+rdata.out[i].Type+"</p>"
+					  + "<p>详情: "+rdata.out[i].Detail+"</p>"
+					  + "<hr />";
 			}
-			
 			layer.msg(data,{icon:2,time:0,shade:0.3,shadeClose:true});
 			return;
 		}
-		
+
 		setCookie('letssl',0);
-		$.post('/system?action=ServiceAdmin','name='+getCookie('serverType')+'&type=reload',function(result){
-			//setSSL(siteName);
-			if(!result.status) layer.msg(result.msg,{icon:2});
-		});
 		layer.msg(rdata.msg,{icon:rdata.status?1:2});
-		if(action == 'CloseSSLConf'){
-			layer.msg(lan.site.ssl_close_info,{icon:1,time:5000});
+		if(action == 'close_ssl_conf'){
+			layer.msg('已关闭SSL,请务必清除浏览器缓存后再访问站点!',{icon:1,time:5000});
 		}
-		$(".bt-w-menu .bgw").click();
-	})
+		$(".tab-nav .on").click();
+	},'json');
 }
 
 //生成SSL
 function newSSL(siteName,domains){
-	var loadT = layer.msg(lan.site.ssl_apply_2,{icon:16,time:0,shade: [0.3, '#000']});
+	var loadT = layer.msg('正在校验域名，请稍后...',{icon:16,time:0,shade: [0.3, '#000']});
 	var force = '';
 	if($("#checkDomain").prop("checked")) force = '&force=true';
 	var email = $("input[name='admin_email']").val();
-	$.post('site?action=CreateLet','siteName='+siteName+'&domains='+domains+'&updateOf=1&email='+email + force,function(rdata){
-		layer.close(loadT)
+	$.post('/site/create_let','siteName='+siteName+'&domains='+domains+'&updateOf=1&email='+email + force,function(rdata){
+		layer.close(loadT);
 		if(rdata.status){
-			var mykeyhtml = '<div class="myKeyCon ptb15"><div class="ssl-con-key pull-left mr20">'+lan.site.ssl_key+'<br><textarea id="key" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.key+'</textarea></div>'
-					+ '<div class="ssl-con-key pull-left">'+lan.site.ssl_crt+'<br><textarea id="csr" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.csr+'</textarea></div>'
+			var mykeyhtml = '<div class="myKeyCon ptb15"><div class="ssl-con-key pull-left mr20">密钥(KEY)<br><textarea id="key" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.data.key+'</textarea></div>'
+					+ '<div class="ssl-con-key pull-left">证书(PEM格式)<br><textarea id="csr" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.data.csr+'</textarea></div>'
 					+ '</div>'
-					+ '<ul class="help-info-text c7 pull-left"><li>'+lan.site.ssl_help_2+'</li><li>'+lan.site.ssl_help_3+'</li></ul>';
+					+ '<ul class="help-info-text c7 pull-left"><li>已为您自动生成Let\'s Encrypt免费证书；</li>\
+						<li>如需使用其他SSL,请切换其他证书后粘贴您的KEY以及PEM内容，然后保存即可。</li></ul>';
 			$(".btssl").html(mykeyhtml);
-			layer.msg(rdata.msg,{icon:rdata.status?1:2});
+			layer.msg(rdata.data.msg,{icon:rdata.status?1:2});
 			setCookie('letssl',1);
 			return;
 		}
 		
-		if(!rdata.out){
-			layer.msg(rdata.msg,{icon:rdata.status?1:2});
-			//setSSL(siteName);
-			return;
-		}
-		
-		data = "<p>"+rdata.msg+"</p><hr />"
-		if(rdata.err[0].length > 10) data += '<p style="color:red;">' + rdata.err[0].replace(/\n/g,'<br>') + '</p>';
-		if(rdata.err[1].length > 10) data += '<p style="color:red;">' + rdata.err[1].replace(/\n/g,'<br>') + '</p>';
 		setCookie('letssl',0);
-		layer.msg(data,{icon:2,area:'500px',time:0,shade:0.3,shadeClose:true});
+		layer.msg(rdata.msg,{icon:2,area:'500px',time:0,shade:0.3,shadeClose:true});
 		
-	});
+	},'json');
 }
 
 //保存SSL
-function SaveSSL(siteName){
+function saveSSL(siteName){
 	var data = 'type=1&siteName='+siteName+'&key='+encodeURIComponent($("#key").val())+'&csr='+encodeURIComponent($("#csr").val());
 	var loadT = layer.msg(lan.site.saving_txt,{icon:16,time:20000,shade: [0.3, '#000']})
-	$.post('site?action=setSSL',data,function(rdata){
+	$.post('/site/set_ssl',data,function(rdata){
 		layer.close(loadT);
 		if(rdata.status){
 			layer.msg(rdata.msg,{icon:1});
 			$(".ssl-btn").find(".btn-default").remove();
-			$(".ssl-btn").append("<button class='btn btn-default btn-sm' onclick=\"OcSSL('CloseSSLConf','"+siteName+"')\" style='margin-left:10px'>"+lan.site.ssl_close+"</button>");
+			$(".ssl-btn").append("<button class='btn btn-default btn-sm' onclick=\"ocSSL('close_ssl_conf','"+siteName+"')\" style='margin-left:10px'>"+lan.site.ssl_close+"</button>");
 		}else{
 			layer.msg(rdata.msg,{icon:2,time:0,shade:0.3,shadeClose:true});
 		}
-	});
-}
-
-//更新SSL
-function ChangeSaveSSL(siteName){
-	var loadT = layer.msg(lan.site.ssl_apply_4,{icon:16,time:0,shade: [0.3, '#000']});
-	$.post('site?action=CreateLet','siteName='+siteName+'&updateOf=2',function(rdata){
-		layer.close(loadT);
-		layer.msg(rdata.msg,{icon:rdata.status?1:2});
-	});
+	},'json');
 }
 
 //PHP版本
@@ -2006,7 +1836,7 @@ function phpVersion(siteName){
 		$.post('/site/get_php_version',function(rdata){
 			var versionSelect = "<div class='webEdit-box'>\
 									<div class='line'>\
-										<span class='tname' style='width:100px'>"+lan.site.php_ver+"</span>\
+										<span class='tname' style='width:100px'>PHP版本</span>\
 										<div class='info-r'>\
 											<select id='phpVersion' class='bt-input-text mr5' name='phpVersion' style='width:110px'>";
 			var optionSelect = '';
@@ -2015,33 +1845,17 @@ function phpVersion(siteName){
 				versionSelect += "<option value='"+ rdata[i].version +"' "+ optionSelect +">"+ rdata[i].name +"</option>"
 			}
 			versionSelect += "</select>\
-							<button class='btn btn-success btn-sm' onclick=\"SetPHPVersion('"+siteName+"')\">"+lan.site.switch+"</button>\
+							<button class='btn btn-success btn-sm' onclick=\"setPHPVersion('"+siteName+"')\">"+lan.site.switch+"</button>\
 							</div>\
 							<span id='php_w' style='color:red;margin-left: 32px;'></span>\
 						</div>\
 							<ul class='help-info-text c7 ptb10'>\
-								<li>"+lan.site.switch_php_help1+"</li>\
-								<li>"+lan.site.switch_php_help2+"</li>\
-								<li>"+lan.site.switch_php_help3+"</li>\
+								<li>请根据您的程序需求选择版本</li>\
+								<li>若非必要,请尽量不要使用PHP5.2,这会降低您的服务器安全性；</li>\
+								<li>PHP7不支持mysql扩展，默认安装mysqli以及mysql-pdo。</li>\
 							</ul>\
 						</div>\
 					</div>";
-			if(version.nodejsversion){
-				var nodejs_checked = '';
-				if(version.nodejs != -1) nodejs_checked = 'checked';
-				versionSelect += '<div class="webEdit-box padding-10">\
-									<div class="linex">\
-										<label style="font-weight:normal">\
-											<input type="checkbox" name="status"  onclick="Nodejs(\''+siteName+'\')" style="width:15px;height:15px;" '+nodejs_checked+' />'+lan.site.enable_nodejs+'\
-										</label>\
-									</div>\
-									<ul class="help-info-text c7 ptb10">\
-									<li>'+lan.site.nodejs_help1+' '+version.nodejsversion+'；</li>\
-									<li>'+lan.site.nodejs_help2+'</li>\
-									<li>'+lan.site.nodejs_help3+'</li>\
-								</ul>\
-								</div>'
-			}
 			$("#webedit-con").html(versionSelect);
 			//验证PHP版本
 			$("select[name='phpVersion']").change(function(){
@@ -2058,13 +1872,13 @@ function phpVersion(siteName){
 
 
 //设置PHP版本
-function SetPHPVersion(siteName){
+function setPHPVersion(siteName){
 	var data = 'version='+$("#phpVersion").val()+'&siteName='+siteName;
-	var loadT = layer.msg(lan.site.saving_txt,{icon:16,time:0,shade: [0.3, '#000']});
-	$.post('/site?action=SetPHPVersion',data,function(rdata){
+	var loadT = layer.msg('正在保存...',{icon:16,time:0,shade: [0.3, '#000']});
+	$.post('/site/set_php_version',data,function(rdata){
 		layer.close(loadT);
 		layer.msg(rdata.msg,{icon:rdata.status?1:2});
-	});
+	},'json');
 }
 
 //配置文件
@@ -2115,20 +1929,24 @@ function rewrite(siteName){
 		var info = syncPost('/site/get_rewrite_conf', {siteName:siteName});
 		var filename = info['rewrite'];
 		$.post('/files/get_body','path='+filename,function(fileBody){
+			var centent = fileBody['data']['data'];
 			var rList = ''; 
 			for(var i=0;i<rdata.rewrite.length;i++){
-				rList += "<option value='"+rdata.rewrite[i]+"'>"+rdata.rewrite[i]+"</option>";
+				if (i==0){
+					rList += "<option value='0'>"+rdata.rewrite[i]+"</option>";	
+				} else {
+					rList += "<option value='"+rdata.rewrite[i]+"'>"+rdata.rewrite[i]+"</option>";		
+				}
 			}
 			var webBakHtml = "<div class='bt-form'>\
 						<div class='line'>\
 						<select id='myRewrite' class='bt-input-text mr20' name='rewrite' style='width:30%;'>"+rList+"</select>\
-						<span>"+lan.site.rule_cov_tool+"：<a href='https://www.bt.cn/Tools' target='_blank' style='color:#20a53a'>"+lan.site.a_c_n+"</a>\</span></div><div class='line'>\
-						<textarea class='bt-input-text' style='height: 260px; width: 480px; line-height:18px;margin-top:10px;padding:5px;' id='rewriteBody'>"+fileBody.data+"</textarea></div>\
-						<button id='SetRewriteBtn' class='btn btn-success btn-sm'>"+lan.public.save+"</button>\
-						<button id='SetRewriteBtnTel' class='btn btn-success btn-sm'>"+lan.site.save_as_template+"</button>\
+						<textarea class='bt-input-text' style='height: 260px; width: 480px; line-height:18px;margin-top:10px;padding:5px;' id='rewriteBody'>"+centent+"</textarea></div>\
+						<button id='SetRewriteBtn' class='btn btn-success btn-sm'>保存</button>\
+						<button id='SetRewriteBtnTel' class='btn btn-success btn-sm'>另存为模板</button>\
 						<ul class='help-info-text c7 ptb15'>\
-							<li>"+lan.site.url_rw_help_1+"</li>\
-							<li>"+lan.site.url_rw_help_2+"</li>\
+							<li>请选择您的应用，若设置伪静态后，网站无法正常访问，请尝试设置回default</li>\
+							<li>您可以对伪静态规则进行修改，修改完后保存即可。</li>\
 						</ul>\
 						</div>";
 			$("#webedit-con").html(webBakHtml);
@@ -2143,35 +1961,39 @@ function rewrite(siteName){
 			$("#SetRewriteBtn").click(function(){
 				$("#rewriteBody").empty();
 				$("#rewriteBody").text(editor.getValue());
-				SetRewrite(filename);
+				setRewrite(filename);
 			});
 			$("#SetRewriteBtnTel").click(function(){
 				$("#rewriteBody").empty();
 				$("#rewriteBody").text(editor.getValue());
-				SetRewriteTel();
+				setRewriteTel();
 			});
 			
 			$("#myRewrite").change(function(){
 				var rewriteName = $(this).val();
-				// var info = syncPost('/site/get_rewrite_conf', {siteName:siteName});
-				if(rewriteName == lan.site.rewritename){
+				if(rewriteName == '0'){
 					rpath = filename;
 				}else{
-					rpath = '/www/server/panel/rewrite/' + getCookie('serverType')+'/' + rewriteName + '.conf';
+					var info = syncPost('/site/get_rewrite_tpl', {tplname:rewriteName});
+					if (!info['status']){
+						layer.msg(info['msg']);
+						return;
+					}
+					rpath = info['data'];
 				}
-				rpath = '/www/server/panel/vhost/rewrite/'+siteName+'.conf';
+				
 				$.post('/files/get_body','path='+rpath,function(fileBody){
-					 $("#rewriteBody").val(fileBody.data);
-					 editor.setValue(fileBody.data);
-				});
+					$("#rewriteBody").val(fileBody['data']['data']);
+					editor.setValue(fileBody['data']['data']);
+				},'json');
 			});
-		});
+		},'json');
 	},'json');
 }
 
 
 //设置伪静态
-function SetRewrite(filename){
+function setRewrite(filename){
 	var data = 'data='+encodeURIComponent($("#rewriteBody").val())+'&path='+filename+'&encoding=utf-8';
 	var loadT = layer.msg(lan.site.saving_txt,{icon:16,time:0,shade: [0.3, '#000']});
 	$.post('/files/save_body',data,function(rdata){
@@ -2184,8 +2006,9 @@ function SetRewrite(filename){
 	},'json');
 }
 var aindex = null;
+
 //保存为模板
-function SetRewriteTel(act){
+function setRewriteTel(act){
 	if(act != undefined){
 		name = $("#rewriteName").val();
 		if(name == ''){
@@ -2208,7 +2031,7 @@ function SetRewriteTel(act){
 		shift: 5,
 		closeBtn: 2,
 		area: '320px', //宽高
-		title: lan.site.save_rewrite_temp,
+		title: '保存为Rewrite模板',
 		content: '<div class="bt-form pd20 pb70">\
 					<div class="line">\
 						<input type="text" class="bt-input-text" name="rewriteName" id="rewriteName" value="" placeholder="'+lan.site.template_name+'" style="width:100%" />\
@@ -2232,36 +2055,226 @@ function siteDefaultPage(){
 	layer.open({
 		type: 1,
 		area: '460px',
-		title: lan.site.change_defalut_page,
+		title: '修改默认页',
 		closeBtn: 2,
 		shift: 0,
 		content: '<div class="changeDefault pd20">\
-						<button class="btn btn-default btn-sm mg10" style="width:188px" onclick="changeDefault(1)">'+lan.site.default_doc+'</button>\
-						<button class="btn btn-default btn-sm mg10" style="width:188px" onclick="changeDefault(2)">'+lan.site.err_404+'</button>\
-							<button class="btn btn-default btn-sm mg10" style="width:188px" onclick="changeDefault('+(stype=='nginx'?3:4)+')">'+(stype=='nginx'?'Nginx':'Apache')+lan.site.empty_page+'</button>\
-						<button class="btn btn-default btn-sm mg10" style="width:188px" onclick="changeDefault(5)">'+lan.site.default_page_stop+'</button>\
+						<button class="btn btn-default btn-sm mg10" style="width:188px" onclick="changeDefault(1)">默认文档</button>\
+						<button class="btn btn-default btn-sm mg10" style="width:188px" onclick="changeDefault(2)">404错误页</button>\
+						<button class="btn btn-default btn-sm mg10" style="width:188px" onclick="changeDefault(3)">空白页</button>\
+						<button class="btn btn-default btn-sm mg10" style="width:188px" onclick="changeDefault(4)">默认站点停止页</button>\
 				</div>'
 	});
 }
 
 function changeDefault(type){
-	var vhref='';
-	switch(type){
-		case 1:
-			vhref = '/www/server/panel/data/defaultDoc.html';
-			break;
-		case 2:
-			vhref = '/www/server/panel/data/404.html';
-			break;
-		case 3:
-			vhref = '/www/server/nginx/html/index.html';
-			break;
-		case 4:
-			vhref = '/www/server/apache/htdocs/index.html';
-			break;
-		case 5:
-			vhref = '/www/server/stop/index.html';
-			break;
-	}
-	onlineEditFile(0,vhref);
+	$.post('/site/get_site_doc','type='+type, function(rdata){
+		showMsg('操作成功!',function(){
+			if (rdata.status){
+				vhref = rdata.data.path;
+				onlineEditFile(0,vhref);
+			}
+		},{icon:rdata.status?1:2});
+	},'json');
 }
+
+
+function getClassType(){
+	var select = $('.site_type > select');
+	$.post('/site/get_site_types',function(rdata){
+		$(select).html('');
+		$(select).append('<option value="-1">全部分类</option>');
+		for (var i = 0; i<rdata.length; i++) {
+			$(select).append('<option value="'+rdata[i]['id']+'">'+rdata[i]['name']+'</option>');
+		}
+
+		$(select).bind('change',function(){
+			var select_id = $(this).val();
+			// console.log(select_id);
+			getWeb(1,'',select_id);
+		})
+	},'json');
+}
+getClassType();
+
+
+
+
+function setClassType(){
+	$.post('/site/get_site_types',function(rdata){
+		var list = '';
+		for (var i = 0; i<rdata.length; i++) {
+			list +='<tr><td>' + rdata[i]['name'] + '</td>\
+				<td><a class="btlink edit_type" onclick="editClassType(\''+rdata[i]['id']+'\',\''+rdata[i]['name']+'\')">编辑</a> | <a class="btlink del_type" onclick="removeClassType(\''+rdata[i]['id']+'\',\''+rdata[i]['name']+'\')">删除</a>\
+				</td></tr>';
+		}
+
+		layer.open({
+			type: 1,
+			area: '350px',
+			title: '网站分类管理',
+			closeBtn: 2,
+			shift: 0,
+			content: '<div class="bt-form edit_site_type">\
+					<div class="divtable mtb15" style="overflow:auto">\
+						<div class="line "><div class="info-r  ml0">\
+							<input name="type_name" class="bt-input-text mr5 type_name" placeholder="请填写分类名称" type="text" style="width:50%" value=""><button name="btn_submit" class="btn btn-success btn-sm mr5 ml5 btn_submit" onclick="addClassType();">添加</button></div>\
+						</div>\
+						<table id="type_table" class="table table-hover" width="100%">\
+							<thead><tr><th>名称</th><th width="80px">操作</th></tr></thead>\
+							<tbody>'+list+'</tbody>\
+						</table>\
+					</div>\
+				</div>'
+		});
+	},'json');
+}
+
+function addClassType(){
+	var name = $("input[name=type_name]").val();
+	$.post('/site/add_site_type','name='+name, function(rdata){
+		showMsg(rdata.msg,function(){
+			if (rdata.status){
+				layer.closeAll();
+				setClassType();
+				getClassType();
+			}
+		},{icon:rdata.status?1:2});
+	},'json');
+}
+
+function removeClassType(id,name){
+	if (id == 0){
+		layer.msg('默认分类不可删除/不可编辑!',{icon:2});
+		return;
+	}
+	layer.confirm('是否确定删除分类？',{title: '删除分类【'+ name +'】' }, function(){
+		$.post('/site/remove_site_type','id='+id, function(rdata){
+			showMsg(rdata.msg,function(){
+				if (rdata.status){
+					layer.closeAll();
+					setClassType();
+					getClassType();
+				}
+			},{icon:rdata.status?1:2});
+		},'json');
+	});
+}
+
+function editClassType(id,name){
+	if (id == 0){
+		layer.msg('默认分类不可删除/不可编辑!',{icon:2});
+		return;
+	}
+
+	layer.open({
+		type: 1,
+		area: '350px',
+		title: '修改分类管理【' + name + '】',
+		closeBtn: 2,
+		shift: 0,
+		content: "<form class='bt-form bt-form pd20 pb70' id='mod_pwd'>\
+                    <div class='line'>\
+                        <span class='tname'>分类名称</span>\
+                        <div class='info-r'><input name=\"site_type_mod\" class='bt-input-text mr5' type='text' value='"+name+"' /></div>\
+                    </div>\
+                    <div class='bt-form-submit-btn'>\
+                        <button id='site_type_mod' type='button' class='btn btn-success btn-sm btn-title'>提交</button>\
+                    </div>\
+                  </form>"
+	});
+
+	$('#site_type_mod').unbind().click(function(){
+		var _name = $('input[name=site_type_mod]').val();
+		$.post('/site/modify_site_type_name','id='+id+'&name='+_name, function(rdata){
+			showMsg(rdata.msg,function(){
+				if (rdata.status){
+					layer.closeAll();
+					setClassType();
+					getClassType();
+				}
+			},{icon:rdata.status?1:2});
+		},'json');
+
+	});
+}
+
+
+function moveClassTYpe(){
+	$.post('/site/get_site_types',function(rdata){
+		var option = '';
+		for (var i = 0; i<rdata.length; i++) {
+			option +='<option value="'+rdata[i]['id']+'">'+rdata[i]['name']+'</option>';
+		}
+
+		layer.open({
+			type: 1,
+			area: '350px',
+			title: '设置站点分类',
+			closeBtn: 2,
+			shift: 0,
+			content: '<div class="bt-form edit_site_type">\
+					<div class="divtable mtb15" style="overflow:auto;height:80px;">\
+						<div class="line"><span class="tname">默认站点</span>\
+							<div class="info-r">\
+							<select class="bt-input-text mr5" name="type_id" style="width:200px">'+option+'\
+							</select>\
+							</div>\
+						</div>\
+					</div>\
+					<div class="bt-form-submit-btn"><button onclick="setSizeClassType();" type="button" class="btn btn-sm btn-success">提交</button></div>\
+				</div>'
+		});
+	},'json');
+}
+
+
+function setSizeClassType(){
+	var data = {};
+	data['id'] = $('select[name=type_id]').val();
+	var ids = [];
+    $('table').find('td').find('input').each(function(i,obj){
+        checked = $(this).prop('checked');
+        if (checked) {
+        	ids.push($(this).val());
+        }
+    });
+	data['site_ids'] = JSON.stringify(ids);
+	$.post('/site/set_site_type',data, function(rdata){
+		showMsg(rdata.msg,function(){
+			if (rdata.status){
+				layer.closeAll();
+			}
+		},{icon:rdata.status?1:2});
+	},'json');
+}
+
+
+// 尝试重启PHP
+function tryRestartPHP(siteName){
+	$.post('/site/get_site_php_version','siteName='+siteName,function(data){
+
+		if (data.phpversion == "00"){
+			return
+		}
+		
+		var reqData = {name:'php', func:'restart'}
+		reqData['version'] = data.phpversion;
+
+		// console.log(reqData);
+		var loadT = layer.msg('尝试自动重启PHP['+data.phpversion+']...', { icon: 16, time: 0, shade: 0.3 });
+		$.post('/plugins/run', reqData, function(data) {
+			layer.close(loadT);
+	        layer.msg(data.msg,{icon:data.status?1:2,time:3000,shade: [0.3, '#000']});
+	    },'json');
+	},'json');
+}
+
+
+
+
+
+
+
+
+

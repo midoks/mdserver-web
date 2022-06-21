@@ -119,13 +119,11 @@ function GetToday(){
    return str;
 }
 
-
-
 //取监控状态
 function getStatus(){
-	loadT = layer.msg(lan.public.read,{icon:16,time:0})
+	loadT = layer.msg('正在读取,请稍候...',{icon:16,time:0})
 	$.post('/system/set_control','type=-1',function(rdata){
-		console.log(rdata);
+		// console.log(rdata);
 		layer.close(loadT);
 		if(rdata.status){
 			$("#openJK").html("<input class='btswitch btswitch-ios' id='ctswitch' type='checkbox' checked><label class='btswitch-btn' for='ctswitch' onclick='setControl()'></label>")
@@ -136,14 +134,13 @@ function getStatus(){
 		$("#saveDay").val(rdata.day)
 	},'json');
 }
-
-getStatus()
+getStatus();
 
 //设置监控状态
 function setControl(act){
 	var day = $("#saveDay").val()
 	if(day < 1){
-		layer.msg(lan.control.save_day_err,{icon:2});
+		layer.msg('保存天数不合法!',{icon:2});
 		return;
 	}
 	if(act){
@@ -152,7 +149,7 @@ function setControl(act){
 		var type = $("#ctswitch").prop('checked')?'0':'1';
 	}
 	
-	loadT = layer.msg(lan.public.the,{icon:16,time:0})
+	loadT = layer.msg('正在处理,请稍候...',{icon:16,time:0})
 	$.post('/system/set_control','type='+type+'&day='+day,function(rdata){
 		layer.close(loadT);
 		layer.msg(rdata.msg,{icon:rdata.status?1:2});
@@ -161,8 +158,8 @@ function setControl(act){
 
 //清理记录
 function closeControl(){
-	layer.confirm(lan.control.close_log_msg,{title:lan.control.close_log,icon:3,closeBtn:2}, function() {
-		loadT = layer.msg(lan.public.the,{icon:16,time:0})
+	layer.confirm('您真的清空所有监控记录吗？',{title:'清空记录',icon:3,closeBtn:2}, function() {
+		loadT = layer.msg('正在处理,请稍候...',{icon:16,time:0})
 		$.post('/system/set_control','type=del',function(rdata){
 			layer.close(loadT);
 			// $.get('/system?action=ReWeb',function(){});
@@ -172,16 +169,6 @@ function closeControl(){
 }
 
 
-
-//字节单位转换MB
-function ToSizeG(bytes){
-	var c = 1024 * 1024;
-	var b = 0;
-	if(bytes > 0){
-		var b = (bytes/c).toFixed(2);
-	}
-	return b;
-}
 //定义周期时间
 function getBeforeDate(n){
     var n = n;
@@ -409,7 +396,7 @@ function disk(b,e){
 				formatter:"时间：{b0}<br />{a0}: {c0} Kb/s<br />{a1}: {c1} Kb/s", 
 			},
 			legend: {
-				data:[lan.control.disk_read_bytes,lan.control.disk_write_bytes]
+				data:['读取字节数','写入字节数']
 			},
 			xAxis: {
 				type: 'category',
@@ -423,7 +410,7 @@ function disk(b,e){
 			},
 			yAxis: {
 				type: 'value',
-				name: lan.index.unit+':KB/s',
+				name: '单位:KB/s',
 				boundaryGap: [0, '100%'],
 				splitLine:{
 					lineStyle:{
@@ -456,7 +443,7 @@ function disk(b,e){
 			}],
 			series: [
 				{
-					name:lan.control.disk_read_bytes,
+					name:'读取字节数',
 					type:'line',
 					smooth:true,
 					symbol: 'none',
@@ -469,7 +456,7 @@ function disk(b,e){
 					data: rData
 				},
 				{
-					name:lan.control.disk_write_bytes,
+					name:'写入字节数',
 					type:'line',
 					smooth:true,
 					symbol: 'none',

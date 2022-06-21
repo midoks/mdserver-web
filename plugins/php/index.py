@@ -8,14 +8,22 @@ import re
 import json
 import shutil
 
-reload(sys)
-sys.setdefaultencoding('utf8')
+# reload(sys)
+# sys.setdefaultencoding('utf8')
 
 sys.path.append(os.getcwd() + "/class/core")
-import public
+# sys.path.append("/usr/local/lib/python3.6/site-packages")
+
+import mw
+
+if mw.isAppleSystem():
+    cmd = 'ls /usr/local/lib/ | grep python  | cut -d \\  -f 1 | awk \'END {print}\''
+    info = mw.execShell(cmd)
+    p = "/usr/local/lib/" + info[0].strip() + "/site-packages"
+    sys.path.append(p)
 
 app_debug = False
-if public.isAppleSystem():
+if mw.isAppleSystem():
     app_debug = True
 
 
@@ -24,17 +32,17 @@ def getPluginName():
 
 
 def getPluginDir():
-    return public.getPluginDir() + '/' + getPluginName()
+    return mw.getPluginDir() + '/' + getPluginName()
 
 
 def getServerDir():
-    return public.getServerDir() + '/' + getPluginName()
+    return mw.getServerDir() + '/' + getPluginName()
 
 
-def getInitDFile():
+def getInitDFile(version):
     if app_debug:
         return '/tmp/' + getPluginName()
-    return '/etc/init.d/' + getPluginName()
+    return '/etc/init.d/' + getPluginName() + version
 
 
 def getArgs():
@@ -54,39 +62,57 @@ def getArgs():
     return tmp
 
 
+def checkArgs(data, ck=[]):
+    for i in range(len(ck)):
+        if not ck[i] in data:
+            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
+    return (True, mw.returnJson(True, 'ok'))
+
+
 def getConf(version):
     path = getServerDir() + '/' + version + '/etc/php.ini'
     return path
 
 
 def status(version):
+    # ps -ef|grep 'php/81' |grep -v grep | grep -v python | awk '{print $2}
     cmd = "ps -ef|grep 'php/" + version + \
         "' |grep -v grep | grep -v python | awk '{print $2}'"
-    data = public.execShell(cmd)
+    data = mw.execShell(cmd)
     if data[0] == '':
         return 'stop'
     return 'start'
 
 
 def contentReplace(content, version):
-    service_path = public.getServerDir()
-    content = content.replace('{$ROOT_PATH}', public.getRootDir())
+    service_path = mw.getServerDir()
+    content = content.replace('{$ROOT_PATH}', mw.getRootDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$PHP_VERSION}', version)
+    content = content.replace('{$LOCAL_IP}', mw.getLocalIp())
 
-    if public.isAppleSystem():
-        # user = public.execShell(
+    if mw.isAppleSystem():
+        # user = mw.execShell(
         #     "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
         content = content.replace('{$PHP_USER}', 'nobody')
         content = content.replace('{$PHP_GROUP}', 'nobody')
+
+        rep = 'listen.owner\s*=\s*(.+)\r?\n'
+        val = ';listen.owner = nobody\n'
+        content = re.sub(rep, val, content)
+
+        rep = 'listen.group\s*=\s*(.+)\r?\n'
+        val = ';listen.group = nobody\n'
+        content = re.sub(rep, val, content)
 
         rep = 'user\s*=\s*(.+)\r?\n'
         val = ';user = nobody\n'
         content = re.sub(rep, val, content)
 
-        rep = 'group\s*=\s*(.+)\r?\n'
+        rep = r'[^\.]group\s*=\s*(.+)\r?\n'
         val = ';group = nobody\n'
         content = re.sub(rep, val, content)
+
     else:
         content = content.replace('{$PHP_USER}', 'www')
         content = content.replace('{$PHP_GROUP}', 'www')
@@ -94,33 +120,62 @@ def contentReplace(content, version):
 
 
 def makeOpenrestyConf():
-    if public.isInstalledWeb():
-        d_pathinfo = public.getServerDir() + '/openresty/nginx/conf/pathinfo.conf'
+    phpversions = ['00', '52', '53', '54', '55', '56',
+                   '70', '71', '72', '73', '74', '80', '81']
+    if mw.isInstalledWeb():
+        sdir = mw.getServerDir()
+        d_pathinfo = sdir + '/openresty/nginx/conf/pathinfo.conf'
         if not os.path.exists(d_pathinfo):
             s_pathinfo = getPluginDir() + '/conf/pathinfo.conf'
             shutil.copyfile(s_pathinfo, d_pathinfo)
 
         info = getPluginDir() + '/info.json'
-        content = public.readFile(info)
+        content = mw.readFile(info)
         content = json.loads(content)
         versions = content['versions']
         tpl = getPluginDir() + '/conf/enable-php.conf'
-        tpl_content = public.readFile(tpl)
-        for x in range(len(versions)):
-            desc_file = public.getServerDir() + '/openresty/nginx/conf/enable-php-' + \
-                versions[x] + '.conf'
-            if not os.path.exists(desc_file):
-                w_content = contentReplace(tpl_content, versions[x])
-                public.writeFile(desc_file, w_content)
+        tpl_content = mw.readFile(tpl)
+        for x in phpversions:
+            dfile = sdir + '/openresty/nginx/conf/enable-php-' + x + '.conf'
+            if not os.path.exists(dfile):
+                if x == '00':
+                    mw.writeFile(dfile, '')
+                else:
+                    w_content = contentReplace(tpl_content, x)
+                    mw.writeFile(dfile, w_content)
+
+        # php-fpm status
+        for version in phpversions:
+            dfile = sdir + '/openresty/nginx/conf/php_status/phpfpm_status_' + version + '.conf'
+            tpl = getPluginDir() + '/conf/phpfpm_status.conf'
+            if not os.path.exists(dfile):
+                content = mw.readFile(tpl)
+                content = contentReplace(content, version)
+                mw.writeFile(dfile, content)
+        mw.restartWeb()
+
+
+def phpPrependFile(version):
+    app_start = getServerDir() + '/app_start.php'
+    if not os.path.exists(app_start):
+        tpl = getPluginDir() + '/conf/app_start.php'
+        content = mw.readFile(tpl)
+        content = contentReplace(content, version)
+        mw.writeFile(app_start, content)
 
 
 def phpFpmReplace(version):
     desc_php_fpm = getServerDir() + '/' + version + '/etc/php-fpm.conf'
     if not os.path.exists(desc_php_fpm):
         tpl_php_fpm = getPluginDir() + '/conf/php-fpm.conf'
-        content = public.readFile(tpl_php_fpm)
+        content = mw.readFile(tpl_php_fpm)
         content = contentReplace(content, version)
-        public.writeFile(desc_php_fpm, content)
+        mw.writeFile(desc_php_fpm, content)
+    else:
+        if version == '52':
+            tpl_php_fpm = tpl_php_fpm = getPluginDir() + '/conf/php-fpm-52.conf'
+            content = mw.readFile(tpl_php_fpm)
+            mw.writeFile(desc_php_fpm, content)
 
 
 def phpFpmWwwReplace(version):
@@ -132,16 +187,22 @@ def phpFpmWwwReplace(version):
     service_php_fpmwww = service_php_fpm_dir + '/www.conf'
     if not os.path.exists(service_php_fpmwww):
         tpl_php_fpmwww = getPluginDir() + '/conf/www.conf'
-        content = public.readFile(tpl_php_fpmwww)
+        content = mw.readFile(tpl_php_fpmwww)
         content = contentReplace(content, version)
-        public.writeFile(service_php_fpmwww, content)
+        mw.writeFile(service_php_fpmwww, content)
 
 
 def makePhpIni(version):
-    d_ini = public.getServerDir() + '/php/' + version + '/etc/php.ini'
-    if not os.path.exists(d_ini):
-        s_ini = getPluginDir() + '/conf/php' + version + '.ini'
-        shutil.copyfile(s_ini, d_ini)
+    dst_ini = mw.getServerDir() + '/php/' + version + '/etc/php.ini'
+    if not os.path.exists(dst_ini):
+        src_ini = getPluginDir() + '/conf/php' + version[0:1] + '.ini'
+        # shutil.copyfile(s_ini, d_ini)
+        content = mw.readFile(src_ini)
+        if version == '52':
+            content = content + "auto_prepend_file=/www/server/php/app_start.php"
+
+        content = contentReplace(content, version)
+        mw.writeFile(dst_ini, content)
 
 
 def initReplace(version):
@@ -156,21 +217,54 @@ def initReplace(version):
     if not os.path.exists(file_bin):
         file_tpl = getPluginDir() + '/init.d/php.tpl'
 
-        content = public.readFile(file_tpl)
+        if version == '52':
+            file_tpl = getPluginDir() + '/init.d/php52.tpl'
+
+        content = mw.readFile(file_tpl)
         content = contentReplace(content, version)
 
-        public.writeFile(file_bin, content)
-        public.execShell('chmod +x ' + file_bin)
+        mw.writeFile(file_bin, content)
+        mw.execShell('chmod +x ' + file_bin)
 
+    phpPrependFile(version)
     phpFpmWwwReplace(version)
     phpFpmReplace(version)
+
+    session_path = getServerDir() + '/tmp/session'
+    if not os.path.exists(session_path):
+        mw.execShell('mkdir -p ' + session_path)
+        mw.execShell('chown -R www:www ' + session_path)
+
+    upload_path = getServerDir() + '/tmp/upload'
+    if not os.path.exists(upload_path):
+        mw.execShell('mkdir -p ' + upload_path)
+        mw.execShell('chown -R www:www ' + upload_path)
+
+    # systemd
+    systemDir = '/lib/systemd/system'
+    systemService = systemDir + '/php' + version + '.service'
+    systemServiceTpl = getPluginDir() + '/init.d/php.service.tpl'
+    if os.path.exists(systemDir) and not os.path.exists(systemService):
+        service_path = mw.getServerDir()
+        se_content = mw.readFile(systemServiceTpl)
+        se_content = se_content.replace('{$VERSION}', version)
+        se_content = se_content.replace('{$SERVER_PATH}', service_path)
+        mw.writeFile(systemService, se_content)
+        mw.execShell('systemctl daemon-reload')
 
     return file_bin
 
 
 def phpOp(version, method):
     file = initReplace(version)
-    data = public.execShell(file + ' ' + method)
+
+    if not mw.isAppleSystem():
+        data = mw.execShell('systemctl ' + method + ' php' + version)
+        if data[1] == '':
+            return 'ok'
+        return 'fail'
+
+    data = mw.execShell(file + ' ' + method)
     if data[1] == '':
         return 'ok'
     return data[1]
@@ -192,6 +286,33 @@ def reload(version):
     return phpOp(version, 'reload')
 
 
+def initdStatus(version):
+    if mw.isAppleSystem():
+        return "Apple Computer does not support"
+
+    shell_cmd = 'systemctl status php' + version + ' | grep loaded | grep "enabled;"'
+    data = mw.execShell(shell_cmd)
+    if data[0] == '':
+        return 'fail'
+    return 'ok'
+
+
+def initdInstall(version):
+    if mw.isAppleSystem():
+        return "Apple Computer does not support"
+
+    mw.execShell('systemctl enable php' + version)
+    return 'ok'
+
+
+def initdUinstall(version):
+    if mw.isAppleSystem():
+        return "Apple Computer does not support"
+
+    mw.execShell('systemctl disable php' + version)
+    return 'ok'
+
+
 def fpmLog(version):
     return getServerDir() + '/' + version + '/var/log/php-fpm.log'
 
@@ -206,6 +327,7 @@ def getPhpConf(version):
         {'name': 'asp_tags', 'type': 1, 'ps': 'ASP标签支持'},
         {'name': 'max_execution_time', 'type': 2, 'ps': '最大脚本运行时间'},
         {'name': 'max_input_time', 'type': 2, 'ps': '最大输入时间'},
+        {'name': 'max_input_var', 'type': 2, 'ps': '最大输入数量'},
         {'name': 'memory_limit', 'type': 2, 'ps': '脚本内存限制'},
         {'name': 'post_max_size', 'type': 2, 'ps': 'POST数据最大尺寸'},
         {'name': 'file_uploads', 'type': 1, 'ps': '是否允许上传文件'},
@@ -217,7 +339,7 @@ def getPhpConf(version):
         {'name': 'cgi.fix_pathinfo', 'type': 0, 'ps': '是否开启pathinfo'},
         {'name': 'date.timezone', 'type': 3, 'ps': '时区'}
     ]
-    phpini = public.readFile(getServerDir() + '/' + version + '/etc/php.ini')
+    phpini = mw.readFile(getServerDir() + '/' + version + '/etc/php.ini')
     result = []
     for g in gets:
         rep = g['name'] + '\s*=\s*([0-9A-Za-z_& ~]+)(\s*;?|\r?\n)'
@@ -226,7 +348,7 @@ def getPhpConf(version):
             continue
         g['value'] = tmp.groups()[0]
         result.append(g)
-    return public.getJson(result)
+    return mw.getJson(result)
 
 
 def submitPhpConf(version):
@@ -236,22 +358,22 @@ def submitPhpConf(version):
             'default_socket_timeout', 'error_reporting']
     args = getArgs()
     filename = getServerDir() + '/' + version + '/etc/php.ini'
-    phpini = public.readFile(filename)
+    phpini = mw.readFile(filename)
     for g in gets:
         if g in args:
             rep = g + '\s*=\s*(.+)\r?\n'
             val = g + ' = ' + args[g] + '\n'
             phpini = re.sub(rep, val, phpini)
-    public.writeFile(filename, phpini)
-    public.execShell(getServerDir() + '/init.d/php' + version + ' reload')
-    return public.returnJson(True, '设置成功')
+    mw.writeFile(filename, phpini)
+    mw.execShell(getServerDir() + '/init.d/php' + version + ' reload')
+    return mw.returnJson(True, '设置成功')
 
 
 def getLimitConf(version):
     fileini = getServerDir() + "/" + version + "/etc/php.ini"
-    phpini = public.readFile(fileini)
+    phpini = mw.readFile(fileini)
     filefpm = getServerDir() + "/" + version + "/etc/php-fpm.conf"
-    phpfpm = public.readFile(filefpm)
+    phpfpm = mw.readFile(filefpm)
 
     # print fileini, filefpm
     data = {}
@@ -280,31 +402,33 @@ def getLimitConf(version):
     except:
         data['pathinfo'] = False
 
-    return public.getJson(data)
+    return mw.getJson(data)
 
 
 def setMaxTime(version):
     args = getArgs()
-    if not 'time' in args:
-        return 'missing time args!'
+    data = checkArgs(args, ['time'])
+    if not data[0]:
+        return data[1]
+
     time = args['time']
     if int(time) < 30 or int(time) > 86400:
-        return public.returnJson(False, '请填写30-86400间的值!')
+        return mw.returnJson(False, '请填写30-86400间的值!')
 
     filefpm = getServerDir() + "/" + version + "/etc/php-fpm.conf"
-    conf = public.readFile(filefpm)
+    conf = mw.readFile(filefpm)
     rep = "request_terminate_timeout\s*=\s*([0-9]+)\n"
     conf = re.sub(rep, "request_terminate_timeout = " + time + "\n", conf)
-    public.writeFile(filefpm, conf)
+    mw.writeFile(filefpm, conf)
 
     fileini = getServerDir() + "/" + version + "/etc/php.ini"
-    phpini = public.readFile(fileini)
+    phpini = mw.readFile(fileini)
     rep = "max_execution_time\s*=\s*([0-9]+)\r?\n"
     phpini = re.sub(rep, "max_execution_time = " + time + "\n", phpini)
     rep = "max_input_time\s*=\s*([0-9]+)\r?\n"
     phpini = re.sub(rep, "max_input_time = " + time + "\n", phpini)
-    public.writeFile(fileini, phpini)
-    return public.returnJson(True, '设置成功!')
+    mw.writeFile(fileini, phpini)
+    return mw.returnJson(True, '设置成功!')
 
 
 def setMaxSize(version):
@@ -313,33 +437,25 @@ def setMaxSize(version):
         return 'missing time args!'
     max = args['max']
     if int(max) < 2:
-        return public.returnJson(False, '上传大小限制不能小于2MB!')
+        return mw.returnJson(False, '上传大小限制不能小于2MB!')
 
     path = getServerDir() + '/' + version + '/etc/php.ini'
-    conf = public.readFile(path)
+    conf = mw.readFile(path)
     rep = u"\nupload_max_filesize\s*=\s*[0-9]+M"
     conf = re.sub(rep, u'\nupload_max_filesize = ' + max + 'M', conf)
     rep = u"\npost_max_size\s*=\s*[0-9]+M"
     conf = re.sub(rep, u'\npost_max_size = ' + max + 'M', conf)
-    public.writeFile(path, conf)
+    mw.writeFile(path, conf)
 
-    # if public.get_webserver() == 'nginx':
-    #     path = web.ctx.session.setupPath + '/nginx/conf/nginx.conf'
-    #     conf = public.readFile(path)
-    #     rep = "client_max_body_size\s+([0-9]+)m"
-    #     tmp = re.search(rep, conf).groups()
-    #     if int(tmp[0]) < int(max):
-    #         conf = re.sub(rep, 'client_max_body_size ' + max + 'm', conf)
-    #         public.writeFile(path, conf)
-
-    public.writeLog("TYPE_PHP", "PHP_UPLOAD_MAX", (version, max))
-    return public.returnJson(True, '设置成功!')
+    msg = mw.getInfo('设置PHP-{1}最大上传大小为[{2}MB]!', (version, max,))
+    mw.writeLog('插件管理[PHP]', msg)
+    return mw.returnJson(True, '设置成功!')
 
 
 def getFpmConfig(version):
 
     filefpm = getServerDir() + '/' + version + '/etc/php-fpm.d/www.conf'
-    conf = public.readFile(filefpm)
+    conf = mw.readFile(filefpm)
     data = {}
     rep = "\s*pm.max_children\s*=\s*([0-9]+)\s*"
     tmp = re.search(rep, conf).groups()
@@ -360,7 +476,7 @@ def getFpmConfig(version):
     rep = "\s*pm\s*=\s*(\w+)\s*"
     tmp = re.search(rep, conf).groups()
     data['pm'] = tmp[0]
-    return public.getJson(data)
+    return mw.getJson(data)
 
 
 def setFpmConfig(version):
@@ -376,7 +492,7 @@ def setFpmConfig(version):
     pm = args['pm']
 
     file = getServerDir() + '/' + version + '/etc/php-fpm.d/www.conf'
-    conf = public.readFile(file)
+    conf = mw.readFile(file)
 
     rep = "\s*pm.max_children\s*=\s*([0-9]+)\s*"
     conf = re.sub(rep, "\npm.max_children = " + max_children, conf)
@@ -395,160 +511,228 @@ def setFpmConfig(version):
     rep = "\s*pm\s*=\s*(\w+)\s*"
     conf = re.sub(rep, "\npm = " + pm + "\n", conf)
 
-    public.writeFile(file, conf)
+    mw.writeFile(file, conf)
     reload(version)
-    public.writeLog("TYPE_PHP", 'PHP_CHILDREN', (version, max_children,
-                                                 start_servers, min_spare_servers, max_spare_servers))
-    return public.returnJson(True, '设置成功')
+
+    msg = mw.getInfo('设置PHP-{1}并发设置,max_children={2},start_servers={3},min_spare_servers={4},max_spare_servers={5}', (version, max_children,
+                                                                                                                      start_servers, min_spare_servers, max_spare_servers,))
+    mw.writeLog('插件管理[PHP]', msg)
+    return mw.returnJson(True, '设置成功!')
 
 
 def checkFpmStatusFile(version):
-    if public.isInstalledWeb():
-        desc_file = public.getServerDir(
-        ) + '/openresty/nginx/conf/php_status/phpfpm_status_' + version + '.conf'
-        if not os.path.exists(desc_file):
+    if mw.isInstalledWeb():
+        sdir = mw.getServerDir()
+        dfile = sdir + '/openresty/nginx/conf/php_status/phpfpm_status_' + version + '.conf'
+        if not os.path.exists(dfile):
             tpl = getPluginDir() + '/conf/phpfpm_status.conf'
-            content = public.readFile(tpl)
+            content = mw.readFile(tpl)
             content = contentReplace(content, version)
-            public.writeFile(desc_file, content)
-            public.restartWeb()
+            mw.writeFile(dfile, content)
+            mw.restartWeb()
 
 
 def getFpmStatus(version):
     checkFpmStatusFile(version)
-    result = public.httpGet(
+    result = mw.httpGet(
         'http://127.0.0.1/phpfpm_status_' + version + '?json')
     tmp = json.loads(result)
     fTime = time.localtime(int(tmp['start time']))
     tmp['start time'] = time.strftime('%Y-%m-%d %H:%M:%S', fTime)
-    return public.getJson(tmp)
+    return mw.getJson(tmp)
 
 
 def getDisableFunc(version):
-    filename = public.getServerDir() + '/php/' + version + '/etc/php.ini'
+    filename = mw.getServerDir() + '/php/' + version + '/etc/php.ini'
     if not os.path.exists(filename):
-        return public.returnJson(False, '指定PHP版本不存在!')
+        return mw.returnJson(False, '指定PHP版本不存在!')
 
-    phpini = public.readFile(filename)
+    phpini = mw.readFile(filename)
     data = {}
     rep = "disable_functions\s*=\s{0,1}(.*)\n"
     tmp = re.search(rep, phpini).groups()
     data['disable_functions'] = tmp[0]
-    return public.getJson(data)
+    return mw.getJson(data)
 
 
 def setDisableFunc(version):
-    filename = public.getServerDir() + '/php/' + version + '/etc/php.ini'
+    filename = mw.getServerDir() + '/php/' + version + '/etc/php.ini'
     if not os.path.exists(filename):
-        return public.returnJson(False, '指定PHP版本不存在!')
+        return mw.returnJson(False, '指定PHP版本不存在!')
 
     args = getArgs()
     disable_functions = args['disable_functions']
 
-    phpini = public.readFile(filename)
+    phpini = mw.readFile(filename)
     rep = "disable_functions\s*=\s*.*\n"
     phpini = re.sub(rep, 'disable_functions = ' +
                     disable_functions + "\n", phpini)
-    public.writeLog('TYPE_PHP', 'PHP_DISABLE_FUNCTION',
-                    (version, disable_functions))
-    public.writeFile(filename, phpini)
+
+    msg = mw.getInfo('修改PHP-{1}的禁用函数为[{2}]', (version, disable_functions,))
+    mw.writeLog('插件管理[PHP]', msg)
+    mw.writeFile(filename, phpini)
     reload(version)
-    return public.returnJson(True, '设置成功!')
+    return mw.returnJson(True, '设置成功!')
 
 
-def checkPhpinfoFile(version):
-    if public.isInstalledWeb():
-        desc_file = public.getServerDir(
-        ) + '/openresty/nginx/conf/php_status/phpinfo_' + version + '.conf'
-        if not os.path.exists(desc_file):
+def checkPhpinfoFile(v):
+    if mw.isInstalledWeb():
+        sdir = mw.getServerDir()
+        dfile = sdir + '/openresty/nginx/conf/php_status/phpinfo_' + v + '.conf'
+        if not os.path.exists(dfile):
             tpl = getPluginDir() + '/conf/phpinfo.conf'
-            content = public.readFile(tpl)
-            content = contentReplace(content, version)
-            public.writeFile(desc_file, content)
-            public.restartWeb()
+            content = mw.readFile(tpl)
+            content = contentReplace(content, v)
+            mw.writeFile(dfile, content)
+            mw.restartWeb()
 
 
-def getPhpinfo(version):
-    checkPhpinfoFile(version)
-    sPath = public.getRootDir() + '/phpinfo/' + version
-    public.execShell("rm -rf " + public.getRootDir() + '/phpinfo')
-    public.execShell("mkdir -p " + sPath)
-    public.writeFile(sPath + '/phpinfo.php', '<?php phpinfo(); ?>')
-    phpinfo = public.httpGet('http://127.0.0.1/' + version + '/phpinfo.php')
-    os.system("rm -rf " + public.getRootDir() + '/phpinfo')
+def getPhpinfo(v):
+    checkPhpinfoFile(v)
+    sPath = mw.getRootDir() + '/phpinfo/' + v
+    mw.execShell("rm -rf " + mw.getRootDir() + '/phpinfo')
+    mw.execShell("mkdir -p " + sPath)
+    mw.writeFile(sPath + '/phpinfo.php', '<?php phpinfo(); ?>')
+    url = 'http://127.0.0.1/' + v + '/phpinfo.php'
+    phpinfo = mw.httpGet(url)
+    os.system("rm -rf " + mw.getRootDir() + '/phpinfo')
     return phpinfo
 
 
+def get_php_info(args):
+    return getPhpinfo(args['version'])
+
+
 def getLibConf(version):
-    fname = public.getServerDir() + '/php/' + version + '/etc/php.ini'
-    if not os.path.exists(filename):
-        return public.returnJson(False, '指定PHP版本不存在!')
+    fname = mw.getServerDir() + '/php/' + version + '/etc/php.ini'
+    if not os.path.exists(fname):
+        return mw.returnJson(False, '指定PHP版本不存在!')
 
-    data = {}
-    rep = "disable_functions\s*=\s{0,1}(.*)\n"
-    tmp = re.search(rep, phpini).groups()
-    data['disable_functions'] = tmp[0]
+    phpini = mw.readFile(fname)
 
-    rep = "upload_max_filesize\s*=\s*([0-9]+)(M|m|K|k)"
-    tmp = re.search(rep, phpini).groups()
-    data['max'] = tmp[0]
+    libpath = getPluginDir() + '/versions/phplib.conf'
+    phplib = json.loads(mw.readFile(libpath))
 
-    rep = ur"\n;*\s*cgi\.fix_pathinfo\s*=\s*([0-9]+)\s*\n"
-    tmp = re.search(rep, phpini).groups()
-    if tmp[0] == '0':
-        data['pathinfo'] = False
+    libs = []
+    tasks = mw.M('tasks').where(
+        "status!=?", ('1',)).field('status,name').select()
+    for lib in phplib:
+        lib['task'] = '1'
+        for task in tasks:
+            tmp = mw.getStrBetween('[', ']', task['name'])
+            if not tmp:
+                continue
+            tmp1 = tmp.split('-')
+            if tmp1[0].lower() == lib['name'].lower():
+                lib['task'] = task['status']
+                lib['phpversions'] = []
+                lib['phpversions'].append(tmp1[1])
+        if phpini.find(lib['check']) == -1:
+            lib['status'] = False
+        else:
+            lib['status'] = True
+        libs.append(lib)
+    return mw.returnJson(True, 'OK!', libs)
+
+
+def installLib(version):
+    args = getArgs()
+    data = checkArgs(args, ['name'])
+    if not data[0]:
+        return data[1]
+
+    name = args['name']
+    execstr = "cd " + getPluginDir() + '/versions/' + version + " && /bin/bash " + \
+        name + '.sh' + ' install ' + version
+
+    rettime = time.strftime('%Y-%m-%d %H:%M:%S')
+    insert_info = (None, '安装[' + name + '-' + version + ']',
+                   'execshell', '0', rettime, execstr)
+    mw.M('tasks').add('id,name,type,status,addtime,execstr', insert_info)
+    return mw.returnJson(True, '已将下载任务添加到队列!')
+
+
+def uninstallLib(version):
+    args = getArgs()
+    data = checkArgs(args, ['name'])
+    if not data[0]:
+        return data[1]
+
+    name = args['name']
+    execstr = "cd " + getPluginDir() + '/versions/' + version + " && /bin/bash " + \
+        name + '.sh' + ' uninstall ' + version
+
+    data = mw.execShell(execstr)
+    if data[0] == '' and data[1] == '':
+        return mw.returnJson(True, '已经卸载成功!')
     else:
-        data['pathinfo'] = True
-    return public.getJson(data)
+        return mw.returnJson(False, '卸载信息![通道0]:' + data[0] + "[通道0]:" + data[1])
+
+
+def getConfAppStart():
+    pstart = mw.getServerDir() + '/php/app_start.php'
+    return pstart
 
 if __name__ == "__main__":
 
     if len(sys.argv) < 3:
-        print 'missing parameters'
+        print('missing parameters')
         exit(0)
 
     func = sys.argv[1]
     version = sys.argv[2]
 
     if func == 'status':
-        print status(version)
+        print(status(version))
     elif func == 'start':
-        print start(version)
+        print(start(version))
     elif func == 'stop':
-        print stop(version)
+        print(stop(version))
     elif func == 'restart':
-        print restart(version)
+        print(restart(version))
     elif func == 'reload':
-        print reload(version)
+        print(reload(version))
+    elif func == 'initd_status':
+        print(initdStatus(version))
+    elif func == 'initd_install':
+        print(initdInstall(version))
+    elif func == 'initd_uninstall':
+        print(initdUinstall(version))
     elif func == 'fpm_log':
-        print fpmLog(version)
+        print(fpmLog(version))
     elif func == 'fpm_slow_log':
-        print fpmSlowLog(version)
+        print(fpmSlowLog(version))
     elif func == 'conf':
-        print getConf(version)
+        print(getConf(version))
+    elif func == 'app_start':
+        print(getConfAppStart())
     elif func == 'get_php_conf':
-        print getPhpConf(version)
+        print(getPhpConf(version))
     elif func == 'submit_php_conf':
-        print submitPhpConf(version)
+        print(submitPhpConf(version))
     elif func == 'get_limit_conf':
-        print getLimitConf(version)
+        print(getLimitConf(version))
     elif func == 'set_max_time':
-        print setMaxTime(version)
+        print(setMaxTime(version))
     elif func == 'set_max_size':
-        print setMaxSize(version)
+        print(setMaxSize(version))
     elif func == 'get_fpm_conf':
-        print getFpmConfig(version)
+        print(getFpmConfig(version))
     elif func == 'set_fpm_conf':
-        print setFpmConfig(version)
+        print(setFpmConfig(version))
     elif func == 'get_fpm_status':
-        print getFpmStatus(version)
+        print(getFpmStatus(version))
     elif func == 'get_disable_func':
-        print getDisableFunc(version)
+        print(getDisableFunc(version))
     elif func == 'set_disable_func':
-        print setDisableFunc(version)
+        print(setDisableFunc(version))
     elif func == 'get_phpinfo':
-        print getPhpinfo(version)
+        print(getPhpinfo(version))
     elif func == 'get_lib_conf':
-        print getLibConf(version)
+        print(getLibConf(version))
+    elif func == 'install_lib':
+        print(installLib(version))
+    elif func == 'uninstall_lib':
+        print(uninstallLib(version))
     else:
-        print "fail"
+        print("fail")

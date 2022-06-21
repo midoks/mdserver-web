@@ -25,12 +25,17 @@ if [ -f /etc/init.d/functions ];then
   . /etc/init.d/functions
 fi
 
-# Default values
+if [ -f /etc/rc.d/init.d/functions ];then
+  . /etc/rc.d/init.d/functions
+fi
 
+# Default values
+export HOME={$HOME_DIR}
+export USER={$RUN_USER}
 NAME=gogs
 GOGS_HOME={$SERVER_PATH}/gogs
 GOGS_PATH=${GOGS_HOME}/$NAME
-GOGS_USER=midoks
+GOGS_USER={$RUN_USER}
 SERVICENAME="Gogs"
 LOCKFILE=/tmp/gogs.lock
 LOGPATH=${GOGS_HOME}/log
@@ -38,12 +43,17 @@ LOGFILE=${LOGPATH}/gogs.log
 RETVAL=0
 
 
+[ -r /etc/sysconfig/$NAME ] && . /etc/sysconfig/$NAME
+DAEMON_OPTS="--check $NAME"
+[ ! -z "$GOGS_USER" ] && DAEMON_OPTS="$DAEMON_OPTS --user=${GOGS_USER}"
+
+
 status(){
   isStart=`ps -ef|grep 'gogs web' |grep -v grep|awk '{print $2}'`
   if [ "$isStart" == '' ];then
-      echo "${SERVICENAME} not running"
+      echo -e "${SERVICENAME} not running"
   else
-      echo "${SERVICENAME}(pid $(echo $isStart)) already running"
+      echo -e "${SERVICENAME}(pid $(echo $isStart)) already running"
   fi
 }
 
@@ -55,19 +65,23 @@ start() {
     fi
 
     cd ${GOGS_HOME}
-    echo "Starting ${SERVICENAME}: \c"
+    echo -e "Starting ${SERVICENAME}: \c"
     ${GOGS_PATH} web > ${LOGFILE} 2>&1 &
     RETVAL=$?
-    [ $RETVAL = 0 ] && touch ${LOCKFILE} && echo "\033[32mdone\033[0m"
+    [ $RETVAL = 0 ] && touch ${LOCKFILE} && echo -e "\033[32mdone\033[0m"
     return $RETVAL
 }
 
 stop() {
-    cd ${GOGS_HOME}
-    echo "Shutting down ${SERVICENAME}: \c"
-    pkill ${NAME}
-    RETVAL=$?
-    [ $RETVAL = 0 ] && rm -f ${LOCKFILE}  && echo "\033[32mdone\033[0m"
+
+    pids=`ps -ef|grep 'gogs web' |grep -v grep|awk '{print $2}'`
+    arr=($pids)
+    echo -e "Stopping gogs... \c"
+    for p in ${arr[@]}
+    do
+            kill -9 $p
+    done
+    echo -e "\033[32mdone\033[0m"
 }
 
 case "$1" in

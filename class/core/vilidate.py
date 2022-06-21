@@ -75,7 +75,7 @@ class vieCode:
         if not self.__inNoise:
             return
         font = ImageFont.truetype(self.__fontPatn, int(self.__fontSize / 1.5))
-        for i in xrange(5):
+        for i in range(5):
             # 杂点颜色
             noiseColor = (random.randint(150, 200), random.randint(
                 150, 200), random.randint(150, 200))
@@ -104,9 +104,9 @@ class vieCode:
         # 画曲线
         color = (random.randint(30, 150), random.randint(
             30, 150), random.randint(30, 150))
-        for x in xrange(xend):
+        for x in range(xend):
             if w != 0:
-                for k in xrange(int(self.__heigth / 10)):
+                for k in range(int(self.__heigth / 10)):
                     y = a * math.sin(w * x + f) + b + self.__heigth / 2
                     i = int(self.__fontSize / 5)
                     while i > 0:
@@ -120,7 +120,7 @@ class vieCode:
         font = ImageFont.truetype(self.__fontPatn, self.__fontSize)
         x = 0
         # 打印字符到画板
-        for i in xrange(self.__length):
+        for i in range(self.__length):
             # 设置字体随机颜色
             color = (random.randint(30, 150), random.randint(
                 30, 150), random.randint(30, 150))

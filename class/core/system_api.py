@@ -5,14 +5,27 @@ import time
 import os
 import re
 import math
+import sys
 import json
 
 from flask import Flask, session
 from flask import request
 
 import db
-import public
-import config
+import mw
+
+import config_api
+import requests
+
+from threading import Thread
+from time import sleep
+
+
+def mw_async(f):
+    def wrapper(*args, **kwargs):
+        thr = Thread(target=f, args=args, kwargs=kwargs)
+        thr.start()
+    return wrapper
 
 
 class system_api:
@@ -20,12 +33,12 @@ class system_api:
     pids = None
 
     def __init__(self):
-        self.setupPath = public.getServerDir()
+        self.setupPath = mw.getServerDir()
 
     ##### ----- start ----- ###
     def networkApi(self):
         data = self.getNetWork()
-        return public.getJson(data)
+        return mw.getJson(data)
 
     def updateServerApi(self):
         stype = request.args.get('type', 'check')
@@ -34,11 +47,11 @@ class system_api:
 
     def systemTotalApi(self):
         data = self.getSystemTotal()
-        return public.getJson(data)
+        return mw.getJson(data)
 
     def diskInfoApi(self):
         diskInfo = self.getDiskInfo()
-        return public.getJson(diskInfo)
+        return mw.getJson(diskInfo)
 
     def setControlApi(self):
         stype = request.form.get('type', '')
@@ -50,28 +63,60 @@ class system_api:
         start = request.args.get('start', '')
         end = request.args.get('end', '')
         data = self.getLoadAverageData(start, end)
-        return public.getJson(data)
+        return mw.getJson(data)
 
     def getCpuIoApi(self):
         start = request.args.get('start', '')
         end = request.args.get('end', '')
         data = self.getCpuIoData(start, end)
-        return public.getJson(data)
+        return mw.getJson(data)
 
     def getDiskIoApi(self):
         start = request.args.get('start', '')
         end = request.args.get('end', '')
         data = self.getDiskIoData(start, end)
-        return public.getJson(data)
+        return mw.getJson(data)
 
     def getNetworkIoApi(self):
         start = request.args.get('start', '')
         end = request.args.get('end', '')
         data = self.getNetWorkIoData(start, end)
-        return public.getJson(data)
+        return mw.getJson(data)
+
+    def rememoryApi(self):
+        os.system('sync')
+        scriptFile = mw.getRunDir() + '/script/rememory.sh'
+        mw.execShell("/bin/bash " + scriptFile)
+        data = self.getMemInfo()
+        return mw.getJson(data)
+
+    # 重启面板
+    def restartApi(self):
+        self.restartMw()
+        return mw.returnJson(True, '面板已重启!')
+
+    def restartServerApi(self):
+        if mw.isAppleSystem():
+            return mw.returnJson(False, "开发环境不可重起")
+        self.restartServer()
+        return mw.returnJson(True, '正在重启服务器!')
     ##### ----- end ----- ###
 
-    # 名取PID
+    @mw_async
+    def restartMw(self):
+        sleep(0.3)
+        # cmd = mw.getRunDir() + '/scripts/init.d/mw restart'
+        # print cmd
+        mw.execShell('service mw restart')
+
+    @mw_async
+    def restartServer(self):
+        if not mw.isRestart():
+            return mw.returnJson(False, '请等待所有安装任务完成再执行!')
+        mw.execShell("sync && init 6 &")
+        return mw.returnJson(True, '命令发送成功!')
+
+        # 名取PID
     def getPid(self, pname):
         try:
             if not self.pids:
@@ -107,30 +152,30 @@ class system_api:
 
     def getPanelInfo(self, get=None):
         # 取面板配置
-        address = public.GetLocalIp()
+        address = mw.GetLocalIp()
         try:
             try:
                 port = web.ctx.host.split(':')[1]
             except:
-                port = public.readFile('data/port.pl')
+                port = mw.readFile('data/port.pl')
         except:
             port = '8888'
         domain = ''
         if os.path.exists('data/domain.conf'):
-            domain = public.readFile('data/domain.conf')
+            domain = mw.readFile('data/domain.conf')
 
         autoUpdate = ''
         if os.path.exists('data/autoUpdate.pl'):
             autoUpdate = 'checked'
         limitip = ''
         if os.path.exists('data/limitip.conf'):
-            limitip = public.readFile('data/limitip.conf')
+            limitip = mw.readFile('data/limitip.conf')
 
         templates = []
         for template in os.listdir('templates/'):
             if os.path.isdir('templates/' + template):
                 templates.append(template)
-        template = public.readFile('data/templates.pl')
+        template = mw.readFile('data/templates.pl')
 
         check502 = ''
         if os.path.exists('data/502Task.pl'):
@@ -145,12 +190,12 @@ class system_api:
         data['cpuRealUsed'] = cpu[0]
         data['time'] = self.getBootTime()
         data['system'] = self.getSystemVersion()
-        data['isuser'] = public.M('users').where(
+        data['isuser'] = mw.M('users').where(
             'username=?', ('admin',)).count()
         data['version'] = '0.0.1'
         return data
 
-    def getLoadAverage(self, get=None):
+    def getLoadAverage(self):
         c = os.getloadavg()
         data = {}
         data['one'] = float(c[0])
@@ -167,7 +212,7 @@ class system_api:
         data['title'] = self.GetTitle()
         data['network'] = self.GetNetWorkApi(get)
         data['panel_status'] = not os.path.exists(
-            '/www/server/panel/data/close.pl')
+            '/www/server/mdserver-web/data/close.pl')
         import firewalls
         ssh_info = firewalls.firewalls().GetSshInfo(None)
         data['enable_ssh_status'] = ssh_info['status']
@@ -180,25 +225,24 @@ class system_api:
 
     def getTitle(self):
         titlePl = 'data/title.pl'
-        title = '宝塔Linux面板'
+        title = 'Linux面板'
         if os.path.exists(titlePl):
-            title = public.readFile(titlePl).strip()
+            title = mw.readFile(titlePl).strip()
         return title
 
     def getSystemVersion(self):
         # 取操作系统版本
-        os = public.getOs()
-        if os == 'darwin':
-            data = public.execShell('sw_vers')[0]
+        if mw.getOs() == 'darwin':
+            data = mw.execShell('sw_vers')[0]
             data_list = data.strip().split("\n")
             mac_version = ''
             for x in data_list:
                 mac_version += x.split("\t")[1] + ' '
             return mac_version
 
-        version = public.readFile('/etc/redhat-release')
+        version = mw.readFile('/etc/redhat-release')
         if not version:
-            version = public.readFile(
+            version = mw.readFile(
                 '/etc/issue').strip().split("\n")[0].replace('\\n', '').replace('\l', '').strip()
         else:
             version = version.replace('release ', '').strip()
@@ -206,16 +250,19 @@ class system_api:
 
     def getBootTime(self):
         # 取系统启动时间
-        start_time = psutil.boot_time()
-        run_time = time.time() - start_time
-        # conf = public.readFile('/proc/uptime').split()
+        uptime = mw.readFile('/proc/uptime')
+        if uptime == False:
+            start_time = psutil.boot_time()
+            run_time = time.time() - start_time
+        else:
+            run_time = uptime.split()[0]
         tStr = float(run_time)
         min = tStr / 60
         hours = min / 60
         days = math.floor(hours / 24)
         hours = math.floor(hours - (days * 24))
         min = math.floor(min - (days * 60 * 24) - (hours * 60))
-        return public.getInfo('已不间断运行: {1}天{2}小时{3}分钟', (str(int(days)), str(int(hours)), str(int(min))))
+        return mw.getInfo('已不间断运行: {1}天{2}小时{3}分钟', (str(int(days)), str(int(hours)), str(int(min))))
 
     def getCpuInfo(self, interval=1):
         # 取CPU信息
@@ -223,10 +270,10 @@ class system_api:
         used = psutil.cpu_percent(interval=interval)
         return used, cpuCount
 
-    def getMemInfo(self, get=None):
+    def getMemInfo(self):
         # 取内存信息
         mem = psutil.virtual_memory()
-        if public.getOs() == 'darwin':
+        if mw.getOs() == 'darwin':
             memInfo = {
                 'memTotal': mem.total / 1024 / 1024
             }
@@ -250,7 +297,7 @@ class system_api:
             import psutil
             mem = psutil.virtual_memory()
 
-            if public.getOs() == 'darwin':
+            if mw.getOs() == 'darwin':
                 return mem.percent
 
             memInfo = {'memTotal': mem.total / 1024 / 1024, 'memFree': mem.free / 1024 / 1024,
@@ -259,7 +306,7 @@ class system_api:
                 memInfo['memBuffers'] - memInfo['memCached']
             tmp1 = memInfo['memTotal'] / 100
             return (tmp / tmp1)
-        except Exception, ex:
+        except Exception as ex:
             return 1
 
     def getDiskInfo(self, get=None):
@@ -281,9 +328,9 @@ class system_api:
 
     def getDiskInfo2(self):
         # 取磁盘分区信息
-        temp = public.execShell(
+        temp = mw.execShell(
             "df -h -P|grep '/'|grep -v tmpfs | grep -v devfs")[0]
-        tempInodes = public.execShell(
+        tempInodes = mw.execShell(
             "df -i -P|grep '/'|grep -v tmpfs | grep -v devfs")[0]
         temp1 = temp.split('\n')
         tempInodes1 = tempInodes.split('\n')
@@ -353,7 +400,7 @@ class system_api:
                     shutil.rmtree(filename)
                 else:
                     os.remove(filename)
-                print '\t\033[1;32m[OK]\033[0m'
+                print('mail clear ok')
                 num += 1
             total += size
             count += num
@@ -362,10 +409,10 @@ class system_api:
     # 清理其它
     def clearOther(self):
         clearPath = [
-            {'path': '/www/server/panel', 'find': 'testDisk_'},
+            {'path': '/www/server/mdserver-web', 'find': 'testDisk_'},
             {'path': '/www/wwwlogs', 'find': 'log'},
             {'path': '/tmp', 'find': 'panelBoot.pl'},
-            {'path': '/www/server/panel/install', 'find': '.rpm'}
+            {'path': '/www/server/mdserver-web/install', 'find': '.rpm'}
         ]
 
         total = count = 0
@@ -381,11 +428,11 @@ class system_api:
                 else:
                     os.remove(filename)
                 count += 1
-        public.serviceReload()
+        mw.serviceReload()
         os.system('echo > /tmp/panelBoot.pl')
         return total, count
 
-    def getNetWork(self, get=None):
+    def getNetWork(self):
         # return self.GetNetWorkApi(get);
         # 取网络流量信息
         try:
@@ -413,25 +460,25 @@ class system_api:
             session['otime'] = time.time()
 
             networkInfo['cpu'] = self.getCpuInfo()
-            networkInfo['load'] = self.getLoadAverage(get)
-            networkInfo['mem'] = self.getMemInfo(get)
+            networkInfo['load'] = self.getLoadAverage()
+            networkInfo['mem'] = self.getMemInfo()
 
             return networkInfo
-        except Exception, e:
-            print e
+        except Exception as e:
+            # print(e)
             return None
 
-    def getNetWorkApi(self, get=None):
+    def getNetWorkApi(self):
         # 取网络流量信息
         try:
             tmpfile = 'data/network.temp'
             networkIo = psutil.net_io_counters()[:4]
 
             if not os.path.exists(tmpfile):
-                public.writeFile(tmpfile, str(
+                mw.writeFile(tmpfile, str(
                     networkIo[0]) + '|' + str(networkIo[1]) + '|' + str(int(time.time())))
 
-            lastValue = public.readFile(tmpfile).split('|')
+            lastValue = mw.readFile(tmpfile).split('|')
 
             ntime = time.time()
             networkInfo = {}
@@ -444,7 +491,7 @@ class system_api:
             networkInfo['downPackets'] = networkIo[3]
             networkInfo['upPackets'] = networkIo[2]
 
-            public.writeFile(tmpfile, str(
+            mw.writeFile(tmpfile, str(
                 networkIo[0]) + '|' + str(networkIo[1]) + '|' + str(int(time.time())))
 
             # networkInfo['cpu'] = self.GetCpuInfo(0.1)
@@ -452,43 +499,26 @@ class system_api:
         except:
             return None
 
-    def restartServer(self, get):
-        if not public.isRestart():
-            return public.returnMsg(False, 'EXEC_ERR_TASK')
-        public.ExecShell("sync && /etc/init.d/bt stop && init 6 &")
-        return public.returnMsg(True, 'SYS_REBOOT')
-
-    # 释放内存
-    def reMemory(self, get):
-        os.system('sync')
-        scriptFile = 'script/rememory.sh'
-        if not os.path.exists(scriptFile):
-            public.downloadFile(web.ctx.session.home +
-                                '/script/rememory.sh', scriptFile)
-        public.ExecShell("/bin/bash " + self.setupPath +
-                         '/panel/' + scriptFile)
-        return self.GetMemInfo()
-
     def getNetWorkIoData(self, start, end):
         # 取指定时间段的网络Io
-        data = public.M('network').dbfile('system').where("addtime>=? AND addtime<=?", (start, end)).field(
+        data = mw.M('network').dbfile('system').where("addtime>=? AND addtime<=?", (start, end)).field(
             'id,up,down,total_up,total_down,down_packets,up_packets,addtime').order('id asc').select()
         return self.toAddtime(data)
 
     def getDiskIoData(self, start, end):
         # 取指定时间段的磁盘Io
-        data = public.M('diskio').dbfile('system').where("addtime>=? AND addtime<=?", (start, end)).field(
+        data = mw.M('diskio').dbfile('system').where("addtime>=? AND addtime<=?", (start, end)).field(
             'id,read_count,write_count,read_bytes,write_bytes,read_time,write_time,addtime').order('id asc').select()
         return self.toAddtime(data)
 
     def getCpuIoData(self, start, end):
         # 取指定时间段的CpuIo
-        data = public.M('cpuio').dbfile('system').where("addtime>=? AND addtime<=?",
-                                                        (start, end)).field('id,pro,mem,addtime').order('id asc').select()
+        data = mw.M('cpuio').dbfile('system').where("addtime>=? AND addtime<=?",
+                                                    (start, end)).field('id,pro,mem,addtime').order('id asc').select()
         return self.toAddtime(data, True)
 
     def getLoadAverageData(self, start, end):
-        data = public.M('load_average').dbfile('system').where("addtime>=? AND addtime<=?", (
+        data = mw.M('load_average').dbfile('system').where("addtime>=? AND addtime<=?", (
             start, end)).field('id,pro,one,five,fifteen,addtime').order('id asc').select()
         return self.toAddtime(data)
 
@@ -534,37 +564,37 @@ class system_api:
         filename = 'data/control.conf'
 
         if stype == '0':
-            public.execShell("rm -f " + filename)
+            mw.execShell("rm -f " + filename)
         elif stype == '1':
             _day = int(day)
             if _day < 1:
-                return public.returnJson(False, "设置失败!")
-            public.writeFile(filename, day)
+                return mw.returnJson(False, "设置失败!")
+            mw.writeFile(filename, day)
         elif stype == 'del':
-            if not public.isRestart():
-                return public.returnJson(False, '请等待所有安装任务完成再执行')
+            if not mw.isRestart():
+                return mw.returnJson(False, '请等待所有安装任务完成再执行')
             os.remove("data/system.db")
 
             sql = db.Sql().dbfile('system')
-            csql = public.readFile('data/sql/system.sql')
+            csql = mw.readFile('data/sql/system.sql')
             csql_list = csql.split(';')
             for index in range(len(csql_list)):
                 sql.execute(csql_list[index], ())
-            return public.returnJson(True, "监控服务已关闭")
+            return mw.returnJson(True, "监控服务已关闭")
         else:
             data = {}
             if os.path.exists(filename):
                 try:
-                    data['day'] = int(public.readFile(filename))
+                    data['day'] = int(mw.readFile(filename))
                 except:
                     data['day'] = 30
                 data['status'] = True
             else:
                 data['day'] = 30
                 data['status'] = False
-            return public.getJson(data)
+            return mw.getJson(data)
 
-        return public.returnJson(True, "设置成功!")
+        return mw.returnJson(True, "设置成功!")
 
     def versionDiff(self, old, new):
         '''
@@ -577,117 +607,96 @@ class system_api:
             return 'test'
 
         old_list = old.split('.')
-
         ret = 'none'
-        for i in range(len(old_list)):
-            tm_new = int(new_list[i])
-            tm_old = int(new_list[i])
-            if tm_new > tm_old:
-                return 'new'
+
+        isHasNew = True
+        if int(new_list[0]) == int(old_list[0]) and int(new_list[1]) == int(old_list[1]) and int(new_list[2]) == int(old_list[2]):
+            isHasNew = False
+
+        if isHasNew:
+            return 'new'
         return ret
 
     def getServerInfo(self):
-
-        upAddr = 'https://raw.githubusercontent.com/midoks/mdserver-web/master/version'
+        import urllib.request
+        import ssl
+        upAddr = 'https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/version/info.json'
         try:
-            version = public.httpGet(
-                upAddr + '/info.json')
-            version = json.loads(version)
+            context = ssl._create_unverified_context()
+            req = urllib.request.urlopen(upAddr, context=context, timeout=3)
+            result = req.read().decode('utf-8')
+            version = json.loads(result)
             return version[0]
         except Exception as e:
-            print e
+            print('getServerInfo', e)
         return {}
 
     def updateServer(self, stype, version=''):
         # 更新服务
         try:
+            if not mw.isRestart():
+                return mw.returnJson(False, '请等待所有安装任务完成再执行!')
 
-            if public.isUpdateLocalSoft():
-                if stype == 'check' or stype == 'info' or stype == 'update':
-                    return public.returnJson(True, '正在安装中...', 'download')
-                if stype == 'update_status':
-
-                    data = public.readFile('tmp/panelExec.log')
-                    if data == 'done':
-                        return public.returnJson(True, '进度!', 100)
-                    else:
-                        _data = json.loads(data)
-                        return public.returnJson(True, '进度!', _data['pre'])
-
-                    if os.path.exists('mdserver-web.zip'):
-                        return public.returnJson(True, '进度!', 100)
-
-            if not public.isRestart():
-                return public.returnJson(False, '请等待所有安装任务完成再执行!')
             if stype == 'check':
-                version_now = config.config().getVersion()
+                version_now = config_api.config_api().getVersion()
                 version_new_info = self.getServerInfo()
                 if not 'version' in version_new_info:
-                    return public.returnJson(False, '服务器数据有问题!')
+                    return mw.returnJson(False, '服务器数据或网络有问题!')
 
                 diff = self.versionDiff(
                     version_now, version_new_info['version'])
                 if diff == 'new':
-                    return public.returnJson(True, '有新版本!', version_new_info['version'])
+                    return mw.returnJson(True, '有新版本!', version_new_info['version'])
                 elif diff == 'test':
-                    return public.returnJson(True, '有测试版本!', version_new_info['version'])
+                    return mw.returnJson(True, '有测试版本!', version_new_info['version'])
                 else:
-                    return public.returnJson(False, '已经是最新,无需更新!')
+                    return mw.returnJson(False, '已经是最新,无需更新!')
 
             if stype == 'info':
                 version_new_info = self.getServerInfo()
-                version_now = config.config().getVersion()
+                version_now = config_api.config_api().getVersion()
 
                 if not 'version' in version_new_info:
-                    return public.returnJson(False, '服务器数据有问题!')
+                    return mw.returnJson(False, '服务器数据有问题!')
                 diff = self.versionDiff(
                     version_now, version_new_info['version'])
-                return public.returnJson(True, '更新信息!', version_new_info)
+                return mw.returnJson(True, '更新信息!', version_new_info)
 
             if stype == 'update':
                 if version == '':
-                    return public.returnJson(False, '缺少版本信息!')
+                    return mw.returnJson(False, '缺少版本信息!')
 
                 v_new_info = self.getServerInfo()
                 if v_new_info['version'] != version:
-                    return public.returnJson(False, '更新失败,请重试!')
+                    return mw.returnJson(False, '更新失败,请重试!')
 
                 if not 'path' in v_new_info or v_new_info['path'] == '':
-                    return public.returnJson(False, '下载地址不存在!')
+                    return mw.returnJson(False, '下载地址不存在!')
 
-                execstr = v_new_info['path'] + '|dl|mdserver-web.zip'
-                taskAdd = (None,  '下载[mdserver-web-' + v_new_info['version'] + ']',
-                           'download', '0', time.strftime('%Y-%m-%d %H:%M:%S'), execstr)
+                newUrl = v_new_info['path']
+                toPath = mw.getRootDir() + '/temp'
+                if not os.path.exists(toPath):
+                    mw.execShell('mkdir -p ' + toPath)
 
-                public.M('tasks').add(
-                    'id,name,type,status,addtime, execstr', taskAdd)
-                return public.returnJson(True, '下载中...')
+                mw.execShell('wget -O ' + toPath + '/mw.zip ' + newUrl)
 
-            if stype == 'update_install':
-                public.execShell('unzip -o mdserver-web.zip -d ./')
-                public.execShell('rm -f mdserver-web.zip')
-                return public.returnJson(True, '安装更新成功!')
+                mw.execShell('unzip -o ' + toPath + '/mw.zip' + ' -d ./')
+                mw.execShell('unzip -o mw.zip -d ./')
+                mw.execShell('rm -f mw.zip')
+                return mw.returnJson(True, '安装更新成功,需自己重启!')
 
-            return public.returnJson(False, '已经是最新,无需更新!')
+            return mw.returnJson(False, '已经是最新,无需更新!')
         except Exception as ex:
-            print ex
-            return public.returnJson(False, "连接服务器失败!")
-
-    # 重启面板
-    def reWeb(self, get):
-        if not public.isRestart():
-            public.returnMsg(False, '请等待所有安装任务完成再执行!')
-
-        # public.ExecShell('/etc/init.d/bt restart &')
-        public.returnMsg(True, '执行成功!')
+            print('updateServer', ex)
+            return mw.returnJson(False, "连接服务器失败!")
 
     # 修复面板
     def repPanel(self, get):
         vp = ''
-        if public.readFile('/www/server/panel/class/common.py').find('checkSafe') != -1:
+        if mw.readFile('/www/server/mdserver-web/class/common.py').find('checkSafe') != -1:
             vp = '_pro'
-        public.ExecShell("wget -O update.sh " + public.get_url() +
-                         "/install/update" + vp + ".sh && bash update.sh")
+        mw.ExecShell("wget -O update.sh " + mw.get_url() +
+                     "/install/update" + vp + ".sh && bash update.sh")
         if hasattr(web.ctx.session, 'getCloudPlugin'):
             del(web.ctx.session['getCloudPlugin'])
         return True

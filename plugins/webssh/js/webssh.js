@@ -1,19 +1,25 @@
-function web_shell() {
-    var termCols = 100;
-    var termRows = 29;
+function web_shell2() {
+    var termCols = 83;
+    var termRows = 21;
     var sendTotal = 0;
     if(!socket)socket = io.connect();
     var term = new Terminal({ cols: termCols, rows: termRows, screenKeys: true, useStyle: true});
+
     term.open();
-    gterm = term
     term.setOption('cursorBlink', true);
+    term.setOption('fontSize', 14);
+    gterm = term
 
     socket.on('server_response', function (data) {
         term.write(data.data);
-
-        if (data.data == '\r\n登出\r\n' || data.data == '登出\r\n' || data.data == '\r\nlogout\r\n' || data.data == 'logout\r\n') {
+        if (data.data == '\r\n登出\r\n' || 
+            data.data == '登出\r\n' || 
+            data.data == '\r\nlogout\r\n' || 
+            data.data == 'logout\r\n') {
             setTimeout(function () {
                 layer.closeAll();
+                term.destroy();
+                clearInterval(interval);
             }, 500);
         }
     });
@@ -32,8 +38,8 @@ function web_shell() {
 
     var term_box = layer.open({
         type: 1,
-        title: "宝塔终端",
-        area: ['920px','640px'],
+        title: "本地终端",
+        area: ['685px','435px'],
         closeBtn: 2,
         shadeClose: false,
         content: '<div class="term-box"><div id="term"></div></div>\
@@ -46,13 +52,13 @@ function web_shell() {
                 </div>',
         cancel: function () {
             term.destroy();
-            clearInterval(interval)
+            clearInterval(interval);
         }
     });
 	$(".shell_btn_close").click(function(){
 		layer.close(term_box);
 		term.destroy();
-        clearInterval(interval)
+        clearInterval(interval);
 	})
 	
     setTimeout(function () {
@@ -103,18 +109,9 @@ function web_shell() {
 
 
             var menudiv = '<ul class="contextmenu">\
-                        <li>\
-                            <a class="shell_copy_btn menu_ssh" data-clipboard-text="'+ selectText + '" ' + style_str + '>复制到剪切板</a>\
-                        </li>\
-                        <li>\
-                            <a  onclick="shell_paste_text()" '+ paste_str+'>粘贴选中项</a>\
-                        </li>\
-                        <li>\
-                            <a onclick="shell_translate_text()" ' + style_str + '>翻译</a>\
-                        </li>\
-                        <li>\
-                            <a onclick="shell_to_baidu()" ' + style_str + '>百度搜索</a>\
-                        </li>\
+                        <li><a class="shell_copy_btn menu_ssh" data-clipboard-text="'+ selectText + '" ' + style_str + '>复制到剪切板</a></li>\
+                        <li><a  onclick="shell_paste_text()" '+ paste_str+'>粘贴选中项</a></li>\
+                        <li><a onclick="shell_to_baidu()" ' + style_str + '>百度搜索</a></li>\
                     </ul>';
             $("body").append(menudiv);
             $(".contextmenu").css({
@@ -161,20 +158,7 @@ function web_shell() {
             }
         });
 
-    }, 100)
-
-    
-}
-
-function shell_translate_text() {
-    remove_ssh_menu();
-    var selectText = getCookie('ssh_selection');
-    var loadT = layer.msg('正在翻译...', { icon: 16, time: 1000 * 60, });
-    $.get('https://www.bt.cn/api/index/fanyi', { query: selectText }, function (rdata) {
-        layer.close(loadT);
-        layer.msg("原文: " + rdata.src + '<br>译文: ' + rdata.dst, { time: 1000 * 10, shadeClose: true, shade: 0.01 });
-    }, 'JSONP');
-    gterm.focus();
+    }, 100);
 }
 
 function shell_to_baidu() {
@@ -183,7 +167,6 @@ function shell_to_baidu() {
     window.open('https://www.baidu.com/s?wd=' + selectText)
     gterm.focus();
 }
-
 
 function shell_paste_text(){
     socket.emit('webssh', getCookie('ssh_selection'));

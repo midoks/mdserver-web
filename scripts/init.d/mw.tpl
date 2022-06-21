@@ -1,16 +1,49 @@
 #!/bin/bash
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+# chkconfig: 2345 55 25
+# description: MW Cloud Service
+
+### BEGIN INIT INFO
+# Provides:          bt
+# Required-Start:    $all
+# Required-Stop:     $all
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: starts mw
+# Description:       starts the mw
+### END INIT INFO
+
+
+PATH=/usr/local/bin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+# export LC_ALL="en_US.UTF-8"
 
 mw_path={$SERVER_PATH}
+PATH=$PATH:$mw_path/bin
+
+
+if [ -f $mw_path/bin/activate ];then
+    source $mw_path/bin/activate
+else 
+    echo ""
+fi
+
 
 mw_start(){
 	isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`
 	if [ "$isStart" == '' ];then
             echo -e "Starting mw... \c"
-            cd $mw_path && gunicorn -c setting.py app:app
-            sleep 0.6
+            cd $mw_path &&  gunicorn -c setting.py app:app
             port=$(cat ${mw_path}/data/port.pl)
-            isStart=$(lsof -i :$port|grep LISTEN)
+            isStart=""
+            while [[ "$isStart" == "" ]];
+            do
+                echo -e ".\c"
+                sleep 0.5
+                isStart=$(lsof -n -P -i:$port|grep LISTEN|grep -v grep|awk '{print $2}'|xargs)
+                let n+=1
+                if [ $n -gt 15 ];then
+                    break;
+                fi
+            done
             if [ "$isStart" == '' ];then
                     echo -e "\033[31mfailed\033[0m"
                     echo '------------------------------------------------------'
@@ -28,7 +61,7 @@ mw_start(){
     isStart=$(ps aux |grep 'task.py'|grep -v grep|awk '{print $2}')
     if [ "$isStart" == '' ];then
             echo -e "Starting mw-tasks... \c"
-            cd $mw_path && nohup python task.py >> $mw_path/logs/task.log 2>&1 &
+            cd $mw_path && python3 task.py >> ${mw_path}/logs/task.log 2>&1 &
             sleep 0.3
             isStart=$(ps aux |grep 'task.py'|grep -v grep|awk '{print $2}')
             if [ "$isStart" == '' ];then
@@ -129,8 +162,41 @@ case "$1" in
     'reload') mw_reload;;
     'restart') 
         mw_stop
-        sleep 0.3
         mw_start;;
     'status') mw_status;;
     'logs') error_logs;;
+    'default')
+        cd $mw_path
+        port=7200
+        
+        if [ -f $mw_path/data/port.pl ];then
+            port=$(cat $mw_path/data/port.pl)
+        fi
+
+        if [ ! -f $mw_path/data/default.pl ];then
+            echo -e "\033[33mInstall Failed\033[0m"
+            exit 0
+        fi
+
+        password=$(cat $mw_path/data/default.pl)
+        if [ -f $mw_path/data/domain.conf ];then
+            address=$(cat $mw_path/data/domain.conf)
+        fi
+        if [ -f $mw_path/data/admin_path.pl ];then
+            auth_path=$(cat $mw_path/data/admin_path.pl)
+        fi
+        if [ "$address" = "" ];then
+            address=$(curl -sS --connect-timeout 10 -m 60 https://www.bt.cn/Api/getIpAddress)
+        fi
+        echo -e "=================================================================="
+        echo -e "\033[32mMW-Panel default info!\033[0m"
+        echo -e "=================================================================="
+        echo  "MW-Panel-URL: http://$address:$port$auth_path"
+        echo -e `python3 $mw_path/tools.py username`
+        echo -e "password: $password"
+        echo -e "\033[33mWarning:\033[0m"
+        echo -e "\033[33mIf you cannot access the panel, \033[0m"
+        echo -e "\033[33mrelease the following port (7200|888|80|443|20|21) in the security group\033[0m"
+        echo -e "=================================================================="
+        ;;
 esac

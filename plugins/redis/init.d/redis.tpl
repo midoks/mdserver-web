@@ -28,13 +28,12 @@ PIDFILE={$SERVER_PATH}/redis/redis_6379.pid
 mkdir -p {$SERVER_PATH}/redis/data
 
 redis_start(){
-	if [ -f $PIDFILE ]
-	then
-			echo "$PIDFILE exists, process is already running or crashed"
-	else
-			echo "Starting Redis server..."
-			nohup $EXEC $CONF >> {$SERVER_PATH}/redis/logs.pl 2>&1 &
+	if [ -f $PIDFILE ];then
+		kill -9 `cat $PIDFILE`
 	fi
+	
+	echo "Starting Redis server..."
+	nohup $EXEC $CONF >> {$SERVER_PATH}/redis/logs.pl 2>&1 &
 }
 redis_stop(){
 	if [ ! -f $PIDFILE ]
@@ -50,6 +49,7 @@ redis_stop(){
 				sleep 1
 			done
 			echo "Redis stopped"
+			rm -rf $PIDFILE
 	fi
 }
 

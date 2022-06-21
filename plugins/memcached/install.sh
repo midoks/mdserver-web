@@ -1,4 +1,5 @@
 #!/bin/bash
+
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
@@ -7,35 +8,32 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
+install_tmp=${rootPath}/tmp/mw_install.pl
 
-install_tmp=${rootPath}/tmp/bt_install.pl
+VERSION=1.6.15
 
-
-Install_mem()
-{
+Install_mem(){
 	mkdir -p $serverPath/source
-
 	echo '正在安装脚本文件...' > $install_tmp
 
 	if [ ! -f $serverPath/source/memcached.tar.gz ];then
-		wget -O $serverPath/source/memcached.tar.gz http://www.memcached.org/files/memcached-1.5.12.tar.gz
-	if
+		wget -O $serverPath/source/memcached.tar.gz http://www.memcached.org/files/memcached-${VERSION}.tar.gz
+	fi
 	
 	cd $serverPath/source && tar -zxvf memcached.tar.gz
 
 	mkdir -p $serverPath/memcached
-	cd memcached* && ./configure --prefix=$serverPath/memcached && make && make install
+	echo "./configure --prefix=${serverPath}/memcached && make && make install"
+	cd $serverPath/source/memcached-${VERSION} && ./configure --prefix=$serverPath/memcached && make && make install
 
-	echo '1.5' > $serverPath/memcached/version.pl
-
-	echo '安装完成' > $install_tmp
-
+	echo '1.6' > $serverPath/memcached/version.pl
+	echo 'install ok' > $install_tmp
 }
 
 Uninstall_mem()
 {
-	$serverPath/memcached/init.d/memcached stop
-	rm -rf mkdir -p $serverPath/memcached
+	${serverPath}/memcached/init.d/memcached stop
+	rm -rf $serverPath/memcached
 }
 
 

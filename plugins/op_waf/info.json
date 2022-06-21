@@ -1,0 +1,15 @@
+{
+	"title":"OP防火墙",
+	"tip":"soft",
+	"name":"op_waf",
+	"type":"其他插件",
+	"ps":"有效防止sql注入/xss/一句话木马等常见渗透攻击",
+	"shell":"install.sh",
+	"checks":"server/op_waf",
+	"path":"server/op_waf",
+	"author":"loveshell",
+	"home":"https://github.com/loveshell/ngx_lua_waf",
+	"date":"2019-04-21",
+	"pid": "1",
+	"versions": ["0.1"]
+}

@@ -19,19 +19,6 @@ CREATE TABLE IF NOT EXISTS `binding` (
 );
 
 
-CREATE TABLE IF NOT EXISTS `config` (
-  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
-  `webserver` TEXT,
-  `backup_path` TEXT,
-  `sites_path` TEXT,
-  `status` INTEGER,
-  `mysql_root` TEXT
-);
-
-INSERT INTO `config` (`id`, `webserver`, `backup_path`, `sites_path`, `status`, `mysql_root`) VALUES
-(1, 'nginx', '/www/backup', '/www/wwwroot', 0, 'admin');
-
-
 CREATE TABLE IF NOT EXISTS `crontab` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT,
   `name` TEXT,
@@ -40,18 +27,14 @@ CREATE TABLE IF NOT EXISTS `crontab` (
   `where_hour` INTEGER,
   `where_minute` INTEGER,
   `echo` TEXT,
-  `addtime` TEXT
-);
-
-CREATE TABLE IF NOT EXISTS `databases` (
-  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
-  `pid` INTEGER,
-  `name` TEXT,
-  `username` TEXT,
-  `password` TEXT,
-  `accept` TEXT,
-  `ps` TEXT,
-  `addtime` TEXT
+  `addtime` TEXT,
+  `status` INTEGER DEFAULT '1',
+  `save` INTEGER DEFAULT '3',
+  `backup_to` TEXT DEFAULT 'off', 
+  `sname` TEXT,
+  `sbody` TEXT,
+  'stype' TEXT,
+  `urladdress` TEXT
 );
 
 CREATE TABLE IF NOT EXISTS `firewall` (
@@ -62,22 +45,12 @@ CREATE TABLE IF NOT EXISTS `firewall` (
 );
 
 INSERT INTO `firewall` (`id`, `port`, `ps`, `addtime`) VALUES
-(2, '80', '网站默认端口', '0000-00-00 00:00:00'),
-(3, '8888', 'WEB面板', '0000-00-00 00:00:00'),
-(4, '21', 'FTP服务', '0000-00-00 00:00:00'),
-(5, '22', 'SSH远程管理服务', '0000-00-00 00:00:00');
+(1, '80', '网站默认端口', '0000-00-00 00:00:00'),
+(2, '7200', 'WEB面板', '0000-00-00 00:00:00'),
+(3, '22', 'SSH远程管理服务', '0000-00-00 00:00:00'),
+(4, '888', 'phpMyAdmin默认端口', '0000-00-00 00:00:00'),
+(5, '3306', 'MySQL端口', '0000-00-00 00:00:00');
 
-
-CREATE TABLE IF NOT EXISTS `ftps` (
-  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
-  `pid` INTEGER,
-  `name` TEXT,
-  `password` TEXT,
-  `path` TEXT,
-  `status` TEXT,
-  `ps` TEXT,
-  `addtime` TEXT
-);
 
 
 CREATE TABLE IF NOT EXISTS `logs` (
@@ -93,9 +66,15 @@ CREATE TABLE IF NOT EXISTS `sites` (
   `path` TEXT,
   `status` TEXT,
   `index` TEXT,
+  `type_id` INTEGER,
   `ps` TEXT,
   `edate` TEXT,
   `addtime` TEXT
+);
+
+CREATE TABLE IF NOT EXISTS `site_types` (
+  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+  `name` TEXT
 );
 
 CREATE TABLE IF NOT EXISTS `domain` (
@@ -129,4 +108,14 @@ CREATE TABLE IF NOT EXISTS `tasks` (
   `start` 	  INTEGER,
   `end` 	    INTEGER,
   `execstr` 	TEXT
+);
+
+CREATE TABLE IF NOT EXISTS `panel` (
+  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+  `title` TEXT,
+  `url` TEXT,
+  `username` TEXT,
+  `password` TEXT,
+  `click` INTEGER,
+  `addtime` INTEGER
 );

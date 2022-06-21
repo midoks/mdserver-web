@@ -16,10 +16,41 @@ function toSize(a) {
 	}
 }
 
+//表格头固定
+function tableFixed(name) {
+    var tableName = document.querySelector('#' + name);
+    tableName.addEventListener('scroll', scrollHandle);
+}
+
+function escapeHTML(a){
+    a = "" + a;
+    return a.replace(/&/g, "&amp;").replace(/</g, "&lt;").
+    replace(/>/g, "&gt;").replace(/"/g, '&quot;').
+    replace(/'/g,"‘").replace(/\(/g,"&#40;").replace(/\&#60;/g,"&lt;").
+    replace(/\&#62;/g,"&gt;").replace(/`/g,"&#96;").replace(/=/g,"＝");
+}
+
+function scrollHandle(e) {
+    var scrollTop = this.scrollTop;
+    //this.querySelector('thead').style.transform = 'translateY(' + scrollTop + 'px)';
+    $(this).find("thead").css({ "transform": "translateY(" + scrollTop + "px)", "position": "relative", "z-index": "1" });
+}
+
+
 //转换单们到MB
 function toSizeM(byteLen) {
     var a = parseInt(byteLen) / 1024 / 1024;
     return a || 0;
+}
+
+//字节单位转换MB
+function toSizeG(bytes){
+	var c = 1024 * 1024;
+	var b = 0;
+	if(bytes > 0){
+		var b = (bytes/c).toFixed(2);
+	}
+	return b;
 }
 
 function randomStrPwd(b) {
@@ -35,13 +66,23 @@ function randomStrPwd(b) {
 
 function getRandomString(len) {
 	len = len || 32;
-	var $chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678'; // 默认去掉了容易混淆的字符oOLl,9gq,Vv,Uu,I1  
-	var maxPos = $chars.length;
+	var chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678'; // 默认去掉了容易混淆的字符oOLl,9gq,Vv,Uu,I1  
+	var maxPos = chars.length;
 	var pwd = '';
 	for (i = 0; i < len; i++) {
-		pwd += $chars.charAt(Math.floor(Math.random() * maxPos));
+		pwd += chars.charAt(Math.floor(Math.random() * maxPos));
 	}
 	return pwd;
+}
+
+//验证IP地址
+function isValidIP(ip) {
+    var reg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
+    return reg.test(ip);
+}
+
+function isContains(str, substr) {
+    return str.indexOf(substr) >= 0;
 }
 
 function msgTpl(msg, args){
@@ -84,21 +125,7 @@ function syncPost(path, args){
 }
 
 function repeatPwd(a) {
-	$("#MyPassword").val(RandomStrPwd(a))
-}
-
-
-
-function GetBakPost(b) {
-	$(".baktext").hide().prev().show();
-	var c = $(".baktext").attr("data-id");
-	var a = $(".baktext").val();
-	if(a == "") {
-		a = lan.bt.empty;
-	}
-	setWebPs(b, c, a);
-	$("a[data-id='" + c + "']").html(a);
-	$(".baktext").remove()
+	$("#MyPassword").val(randomStrPwd(a))
 }
 
 $(".menu-icon").click(function() {
@@ -141,16 +168,25 @@ function getLocalTime(a) {
 
 
 function changePath(d) {
-	setCookie("SetId", d);
-	setCookie("SetName", "");
+	setCookie('SetId', d);
+	setCookie('SetName', '');
 	var c = layer.open({
 		type: 1,
 		area: "650px",
-		title: lan.bt.dir,
+		title: '选择目录',
 		closeBtn: 2,
 		shift: 5,
 		shadeClose: false,
-		content: "<div class='changepath'><div class='path-top'><button type='button' class='btn btn-default btn-sm' onclick='BackFile()'><span class='glyphicon glyphicon-share-alt'></span> "+lan.public.return+"</button><div class='place' id='PathPlace'>"+lan.bt.path+"：<span></span></div></div><div class='path-con'><div class='path-con-left'><dl><dt id='changecomlist' onclick='BackMyComputer()'>"+lan.bt.comp+"</dt></dl></div><div class='path-con-right'><ul class='default' id='computerDefautl'></ul><div class='file-list divtable'><table class='table table-hover' style='border:0 none'><thead><tr class='file-list-head'><th width='40%'>"+lan.bt.filename+"</th><th width='20%'>"+lan.bt.etime+"</th><th width='10%'>"+lan.bt.access+"</th><th width='10%'>"+lan.bt.own+"</th><th width='10%'></th></tr></thead><tbody id='tbody' class='list-list'></tbody></table></div></div></div></div><div class='getfile-btn' style='margin-top:0'><button type='button' class='btn btn-default btn-sm pull-left' onclick='CreateFolder()'>"+lan.bt.adddir+"</button><button type='button' class='btn btn-danger btn-sm mr5' onclick=\"layer.close(getCookie('ChangePath'))\">"+lan.public.close+"</button> <button type='button' class='btn btn-success btn-sm' onclick='GetfilePath()'>"+lan.bt.path_ok+"</button></div>"
+		content: "<div class='changepath'><div class='path-top'><button type='button' class='btn btn-default btn-sm' onclick='backFile()'><span class='glyphicon glyphicon-share-alt'></span>返回</button>\
+		<div class='place' id='PathPlace'>当前路径：<span></span></div></div><div class='path-con'><div class='path-con-left'><dl><dt id='changecomlist' onclick='backMyComputer()'>计算机</dt></dl></div>\
+		<div class='path-con-right'><ul class='default' id='computerDefautl'></ul><div class='file-list divtable'>\
+			<table class='table table-hover' style='border:0 none'>\
+				<thead><tr class='file-list-head'><th width='40%'>文件名</th><th width='20%'>修改时间</th><th width='10%'>权限</th><th width='10%'>所有者</th><th width='10%'></th></tr></thead>\
+				<tbody id='tbody' class='list-list'></tbody></table></div></div></div></div><div class='getfile-btn' style='margin-top:0'>\
+				<button type='button' class='btn btn-default btn-sm pull-left' onclick='createFolder()'>新建文件夹</button>\
+				<button type='button' class='btn btn-danger btn-sm mr5' onclick=\"layer.close(getCookie('ChangePath'))\">关闭</button>\
+				<button type='button' class='btn btn-success btn-sm' onclick='getfilePath()'>选择</button>\
+		</div>"
 	});
 	setCookie("ChangePath", c);
 	var b = $("#" + d).val();
@@ -215,12 +251,16 @@ function getDiskList(b) {
 		}
 		$("#PathPlace").find("span").html(h.PATH);
 		activeDisk();
-		return
+		return;
 	},'json');
 }
 
-function CreateFolder() {
-	var a = "<tr><td colspan='2'><span class='glyphicon glyphicon-folder-open'></span> <input id='newFolderName' class='newFolderName' type='text' value=''></td><td colspan='3'><button id='nameOk' type='button' class='btn btn-success btn-sm'>"+lan.public.ok+"</button>&nbsp;&nbsp;<button id='nameNOk' type='button' class='btn btn-default btn-sm'>"+lan.public.cancel+"</button></td></tr>";
+function createFolder() {
+	var a = "<tr>\
+		<td colspan='2'><span class='glyphicon glyphicon-folder-open'></span><input id='newFolderName' class='newFolderName' type='text' value=''></td>\
+		<td colspan='3'><button id='nameOk' type='button' class='btn btn-success btn-sm'>确定</button>\
+			&nbsp;&nbsp;<button id='nameNOk' type='button' class='btn btn-default btn-sm'>取消</button></td>\
+		</tr>";
 	if($("#tbody tr").length == 0) {
 		$("#tbody").append(a)
 	} else {
@@ -232,7 +272,7 @@ function CreateFolder() {
 		var b = $("#PathPlace").find("span").text();
 		newTxt = b.replace(new RegExp(/(\/\/)/g), "/") + c;
 		var d = "path=" + newTxt;
-		$.post("/files?action=CreateDir", d, function(e) {
+		$.post("/files/create_dir", d, function(e) {
 			if(e.status == true) {
 				layer.msg(e.msg, {
 					icon: 1
@@ -242,8 +282,8 @@ function CreateFolder() {
 					icon: 2
 				})
 			}
-			getDiskList(b)
-		})
+			getDiskList(b);
+		},'json');
 	});
 	$("#nameNOk").click(function() {
 		$(this).parents("tr").remove()
@@ -254,7 +294,7 @@ function NewDelFile(c) {
 	var a = $("#PathPlace").find("span").text();
 	newTxt = c.replace(new RegExp(/(\/\/)/g), "/");
 	var b = "path=" + newTxt + "&empty=True";
-	$.post("/files?action=DeleteDir", b, function(d) {
+	$.post("/files/delete_dir", b, function(d) {
 		if(d.status == true) {
 			layer.msg(d.msg, {
 				icon: 1
@@ -264,8 +304,8 @@ function NewDelFile(c) {
 				icon: 2
 			})
 		}
-		getDiskList(a)
-	})
+		getDiskList(a);
+	},'json');
 }
 
 function activeDisk() {
@@ -294,14 +334,14 @@ function activeDisk() {
 	}
 }
 
-function BackMyComputer() {
+function backMyComputer() {
 	$(".default").show();
 	$(".file-list").hide();
 	$("#PathPlace").find("span").html("");
-	activeDisk()
+	activeDisk();
 }
 
-function BackFile() {
+function backFile() {
 	var c = $("#PathPlace").find("span").text();
 	if(c.substr(c.length - 1, 1) == "/") {
 		c = c.substr(0, c.length - 1)
@@ -320,18 +360,23 @@ function BackFile() {
 	if(d.length == 1) {}
 }
 
-function GetfilePath() {
+function getfilePath() {
 	var a = $("#PathPlace").find("span").text();
 	a = a.replace(new RegExp(/(\\)/g), "/");
+	a_len = a.length;
+	if (a[a_len-1] == '/'){
+		a = a.substr(0,a_len-1);
+	}
+
 	$("#" + getCookie("SetId")).val(a + getCookie("SetName"));
-	layer.close(getCookie("ChangePath"))
+	layer.close(getCookie("ChangePath"));
 }
 
 function setCookie(a, c) {
 	var b = 30;
 	var d = new Date();
 	d.setTime(d.getTime() + b * 24 * 60 * 60 * 1000);
-	document.cookie = a + "=" + escape(c) + ";expires=" + d.toGMTString()
+	document.cookie = a + "=" + escape(c) + ";path=/;expires=" + d.toGMTString();
 }
 
 function getCookie(b) {
@@ -346,36 +391,6 @@ function getCookie(b) {
 function aotuHeight() {
 	var a = $("body").height() - 40;
 	$(".main-content").css("min-height", a)
-}
-$(function() {
-	aotuHeight()
-});
-$(window).resize(function() {
-	aotuHeight()
-});
-
-function showHidePwd() {
-	var a = "glyphicon-eye-open",
-		b = "glyphicon-eye-close";
-	$(".pw-ico").click(function() {
-		var g = $(this).attr("class"),
-			e = $(this).prev();
-		if(g.indexOf(a) > 0) {
-			var h = e.attr("data-pw");
-			$(this).removeClass(a).addClass(b);
-			e.text(h)
-		} else {
-			$(this).removeClass(b).addClass(a);
-			e.text("**********")
-		}
-		var d = $(this).next().position().left;
-		var f = $(this).next().position().top;
-		var c = $(this).next().width();
-		$(this).next().next().css({
-			left: d + c + "px",
-			top: f + "px"
-		})
-	})
 }
 
 function showMsg(msg, callback ,icon, time){
@@ -671,134 +686,21 @@ $(function() {
 		$(this).addClass("fb-selected").siblings().removeClass("fb-selected")
 	})
 });
+
 $("#dologin").click(function() {
-	layer.confirm(lan.bt.loginout, {icon:3,
-		closeBtn: 2
-	}, function() {
+	layer.confirm('您真的要退出面板吗?', {icon:3,closeBtn: 2}, function() {
 		window.location.href = "/login?dologin=True"
 	});
 	return false
 });
 
-function setPassword(a) {
-	if(a == 1) {
-		p1 = $("#p1").val();
-		p2 = $("#p2").val();
-		if(p1 == "" || p1.length < 8) {
-			layer.msg(lan.bt.pass_err_len, {
-				icon: 2
-			});
-			return
-		}
-		
-		//准备弱口令匹配元素
-		var checks = ['admin888','123123123','12345678','45678910','87654321','asdfghjkl','password','qwerqwer'];
-		pchecks = 'abcdefghijklmnopqrstuvwxyz1234567890';
-		for(var i=0;i<pchecks.length;i++){
-			checks.push(pchecks[i]+pchecks[i]+pchecks[i]+pchecks[i]+pchecks[i]+pchecks[i]+pchecks[i]+pchecks[i]);
-		}
-		
-		//检查弱口令
-		cps = p1.toLowerCase();
-		var isError = "";
-		for(var i=0;i<checks.length;i++){
-			if(cps == checks[i]){
-				isError += '['+checks[i]+'] ';
-			}
-		}
-		
-		if(isError != ""){
-			layer.msg(lan.bt.pass_err+isError,{icon:5});
-			return;
-		}
-		
-		
-		if(p1 != p2) {
-			layer.msg(lan.bt.pass_err_re, {
-				icon: 2
-			});
-			return
-		}
-		$.post("/config?action=setPassword", "password1=" + encodeURIComponent(p1) + "&password2=" + encodeURIComponent(p2), function(b) {
-			if(b.status) {
-				layer.closeAll();
-				layer.msg(b.msg, {
-					icon: 1
-				})
-			} else {
-				layer.msg(b.msg, {
-					icon: 2
-				})
-			}
-		});
-		return
-	}
-	layer.open({
-		type: 1,
-		area: "290px",
-		title: lan.bt.pass_title,
-		closeBtn: 2,
-		shift: 5,
-		shadeClose: false,
-		content: "<div class='bt-form pd20 pb70'><div class='line'><span class='tname'>"+lan.public.pass+"</span><div class='info-r'><input class='bt-input-text' type='text' name='password1' id='p1' value='' placeholder='"+lan.bt.pass_new_title+"' style='width:100%'/></div></div><div class='line'><span class='tname'>"+lan.bt.pass_re+"</span><div class='info-r'><input class='bt-input-text' type='text' name='password2' id='p2' value='' placeholder='"+lan.bt.pass_re_title+"' style='width:100%' /></div></div><div class='bt-form-submit-btn'><span style='float: left;' title='"+lan.bt.pass_rep+"' class='btn btn-default btn-sm' onclick='randPwd(10)'>"+lan.bt.pass_rep_btn+"</span><button type='button' class='btn btn-danger btn-sm' onclick=\"layer.closeAll()\">"+lan.public.close+"</button> <button type='button' class='btn btn-success btn-sm' onclick=\"setPassword(1)\">"+lan.public.edit+"</button></div></div>"
-	});
-}
 
-
-function randPwd(){
-	var pwd = RandomStrPwd(12);
-	$("#p1").val(pwd);
-	$("#p2").val(pwd);
-	layer.msg(lan.bt.pass_rep_ps,{time:2000})
-}
-
-function setUserName(a) {
-	if(a == 1) {
-		p1 = $("#p1").val();
-		p2 = $("#p2").val();
-		if(p1 == "" || p1.length < 3) {
-			layer.msg(lan.bt.user_len, {
-				icon: 2
-			});
-			return
-		}
-		if(p1 != p2) {
-			layer.msg(lan.bt.user_err_re, {
-				icon: 2
-			});
-			return
-		}
-		$.post("/config?action=setUsername", "username1=" + encodeURIComponent(p1) + "&username2=" + encodeURIComponent(p2), function(b) {
-			if(b.status) {
-				layer.closeAll();
-				layer.msg(b.msg, {
-					icon: 1
-				});
-				$("input[name='username_']").val(p1)
-			} else {
-				layer.msg(b.msg, {
-					icon: 2
-				})
-			}
-		});
-		return
-	}
-	layer.open({
-		type: 1,
-		area: "290px",
-		title: lan.bt.user_title,
-		closeBtn: 2,
-		shift: 5,
-		shadeClose: false,
-		content: "<div class='bt-form pd20 pb70'><div class='line'><span class='tname'>"+lan.bt.user+"</span><div class='info-r'><input class='bt-input-text' type='text' name='password1' id='p1' value='' placeholder='"+lan.bt.user_new+"' style='width:100%'/></div></div><div class='line'><span class='tname'>"+lan.bt.pass_re+"</span><div class='info-r'><input class='bt-input-text' type='text' name='password2' id='p2' value='' placeholder='"+lan.bt.pass_re_title+"' style='width:100%'/></div></div><div class='bt-form-submit-btn'><button type='button' class='btn btn-danger btn-sm' onclick=\"layer.closeAll()\">"+lan.public.close+"</button> <button type='button' class='btn btn-success btn-sm' onclick=\"setUserName(1)\">"+lan.public.edit+"</button></div></div>"
-	})
-}
 var openWindow = null;
 var downLoad = null;
 var speed = null;
 
 function task() {
-	messagebox();
+	messageBox();
 }
 
 function ActionTask() {
@@ -815,18 +717,18 @@ function ActionTask() {
 	})
 }
 
-function RemoveTask(b) {
-	var a = layer.msg(lan.public.the_del, {
+function removeTask(b) {
+	var a = layer.msg('正在删除,请稍候...', {
 		icon: 16,
 		time: 0,
 		shade: [0.3, "#000"]
 	});
-	$.post("/files?action=RemoveTask", "id=" + b, function(c) {
+	$.post("/files/remove_task", "id=" + b, function(c) {
 		layer.close(a);
 		layer.msg(c.msg, {
 			icon: c.status ? 1 : 5
 		});
-	}).error(function(){
+	},'json').error(function(){
 		layer.msg(lan.bt.task_close,{icon:1});
 	});
 }
@@ -844,16 +746,16 @@ function GetTaskList(a) {
 				case "-1":
 					f = true;
 					if(g.data[d].type != "download") {
-						b = "<li><span class='titlename'>" + g.data[d].name + "</span><span class='state'>"+lan.bt.task_install+" <img src='/static/img/ing.gif'> | <a href=\"javascript:RemoveTask(" + g.data[d].id + ")\">"+lan.public.close+"</a></span><span class='opencmd'></span><pre class='cmd'></pre></li>"
+						b = "<li><span class='titlename'>" + g.data[d].name + "</span><span class='state'>正在安装 <img src='/static/img/ing.gif'> | <a href=\"javascript:removeTask(" + g.data[d].id + ")\">关闭</a></span><span class='opencmd'></span><pre class='cmd'></pre></li>"
 					} else {
-						b = "<li><div class='line-progress' style='width:0%'></div><span class='titlename'>" + g.data[d].name + "<a id='speed' style='margin-left:130px;'>0.0M/12.5M</a></span><span class='com-progress'>0%</span><span class='state'>"+lan.bt.task_downloading+" <img src='/static/img/ing.gif'> | <a href=\"javascript:RemoveTask(" + g.data[d].id + ")\">"+lan.public.close+"</a></span></li>"
+						b = "<li><div class='line-progress' style='width:0%'></div><span class='titlename'>" + g.data[d].name + "<a id='speed' style='margin-left:130px;'>0.0M/12.5M</a></span><span class='com-progress'>0%</span><span class='state'>下载中 <img src='/static/img/ing.gif'> | <a href=\"javascript:removeTask(" + g.data[d].id + ")\">"+lan.public.close+"</a></span></li>"
 					}
 					break;
 				case "0":
-					c += "<li><span class='titlename'>" + g.data[d].name + "</span><span class='state'>"+lan.bt.task_sleep+"</span> | <a href=\"javascript:RemoveTask(" + g.data[d].id + ")\">"+lan.public.del+"</a></li>";
+					c += "<li><span class='titlename'>" + g.data[d].name + "</span><span class='state'>等待</span> | <a href=\"javascript:removeTask(" + g.data[d].id + ")\">删除</a></li>";
 					break;
 				case "1":
-					e += "<li><span class='titlename'>" + g.data[d].name + "</span><span class='state'>" + g.data[d].addtime + "  "+lan.bt.task_ok+"  "+ lan.bt.time + (g.data[d].end - g.data[d].start) + lan.bt.s+"</span></li>"
+					e += "<li><span class='titlename'>" + g.data[d].name + "</span><span class='state'>" + g.data[d].addtime + "  "+'已完成'+"  "+ '耗时' + (g.data[d].end - g.data[d].start)+"秒</span></li>"
 			}
 		}
 		$("#srunning").html(b + c);
@@ -862,11 +764,17 @@ function GetTaskList(a) {
 	})
 }
 
+
+//获取任务总数
 function getTaskCount() {
 	$.get("/task/count", "", function(a) {
-		$(".task").text(a)
-	})
+		$(".task").text(a);
+	});
 }
+getTaskCount();
+setInterval(function(){
+	getTaskCount();
+},6000);
 
 function setSelectChecked(c, d) {
 	var a = document.getElementById(c);
@@ -877,216 +785,13 @@ function setSelectChecked(c, d) {
 		}
 	}
 }
-getTaskCount();
-function RecInstall() {
-	$.post("/ajax?action=GetSoftList", "", function(l){
-		var c = "";
-		var g = "";
-		var e = "";
-		for(var h = 0; h < l.length; h++) {
-			if(l[h].name == "Tomcat") {
-				continue
-			}
-			var o = "";
-			var m = "<input id='data_" + l[h].name + "' data-info='" + l[h].name + " " + l[h].versions[0].version + "' type='checkbox' checked>";
-			for(var b = 0; b < l[h].versions.length; b++) {
-				var d = "";
-				if((l[h].name == "PHP" && (l[h].versions[b].version == "5.4" || l[h].versions[b].version == "54")) || (l[h].name == "MySQL" && l[h].versions[b].version == "5.5") || (l[h].name == "phpMyAdmin" && l[h].versions[b].version == "4.4")) {
-					d = "selected";
-					m = "<input id='data_" + l[h].name + "' data-info='" + l[h].name + " " + l[h].versions[b].version + "' type='checkbox' checked>"
-				}
-				o += "<option value='" + l[h].versions[b].version + "' " + d + ">" + l[h].name + " " + l[h].versions[b].version + "</option>"
-			}
-			var f = "<li><span class='ico'><img src='/static/img/" + l[h].name.toLowerCase() + ".png'></span><span class='name'><select id='select_" + l[h].name + "' class='sl-s-info'>" + o + "</select></span><span class='pull-right'>" + m + "</span></li>";
-			if(l[h].name == "Nginx") {
-				c = f
-			} else {
-				if(l[h].name == "Apache") {
-					g = f
-				} else {
-					e += f
-				}
-			}
-		}
-		c += e;
-		g += e;
-		g = g.replace(new RegExp(/(data_)/g), "apache_").replace(new RegExp(/(select_)/g), "apache_select_");
-		var k = layer.open({
-			type: 1,
-			title: lan.bt.install_title,
-			area: ["658px", "423px"],
-			closeBtn: 2,
-			shadeClose: false,
-			content: "<div class='rec-install'><div class='important-title'><p><span class='glyphicon glyphicon-alert' style='color: #f39c12; margin-right: 10px;'></span>"+lan.bt.install_ps+" <a href='javascript:jump()' style='color:#20a53a'>"+lan.bt.install_s+"</a> "+lan.bt.install_s1+"</p></div><div class='rec-box'><h3>"+lan.bt.install_lnmp+"</h3><div class='rec-box-con'><ul class='rec-list'>" + c + "</ul><p class='fangshi'>"+lan.bt.install_type+"：<label data-title='"+lan.bt.install_rpm_title+"' style='margin-right:0'>"+lan.bt.install_rpm+"<input type='checkbox' checked></label><label data-title='"+lan.bt.install_src_title+"'>"+lan.bt.install_src+"<input type='checkbox'></label></p><div class='onekey'>"+lan.bt.install_key+"</div></div></div><div class='rec-box' style='margin-left:16px'><h3>LAMP</h3><div class='rec-box-con'><ul class='rec-list'>" + g + "</ul><p class='fangshi'>"+lan.bt.install_type+"：<label data-title='"+lan.bt.install_rpm_title+"' style='margin-right:0'>"+lan.bt.install_rpm+"<input type='checkbox' checked></label><label data-title='"+lan.bt.install_src_title+"'>"+lan.bt.install_src+"<input type='checkbox'></label></p><div class='onekey'>一键安装</div></div></div></div>"
-		});
-		$(".fangshi input").click(function() {
-			$(this).attr("checked", "checked").parent().siblings().find("input").removeAttr("checked")
-		});
-		$(".sl-s-info").change(function() {
-			var p = $(this).find("option:selected").text();
-			var n = $(this).attr("id");
-			p = p.toLowerCase();
-			$(this).parents("li").find("input").attr("data-info", p)
-		});
-		$("#apache_select_PHP").change(function() {
-			var n = $(this).val();
-			j(n, "apache_select_", "apache_")
-		});
-		$("#select_PHP").change(function() {
-			var n = $(this).val();
-			j(n, "select_", "data_")
-		});
-
-		function j(p, r, q) {
-			var n = "4.4";
-			switch(p) {
-				case "5.2":
-					n = "4.0";
-					break;
-				case "5.3":
-					n = "4.0";
-					break;
-				case "5.4":
-					n = "4.4";
-					break;
-				case "5.5":
-					n = "4.4";
-					break;
-				default:
-					n = "4.7"
-			}
-			$("#" + r + "phpMyAdmin option[value='" + n + "']").attr("selected", "selected").siblings().removeAttr("selected");
-			$("#" + r + "_phpMyAdmin").attr("data-info", "phpmyadmin " + n)
-		}
-		$("#select_MySQL,#apache_select_MySQL").change(function() {
-			var n = $(this).val();
-			a(n)
-		});
-		
-		$("#apache_select_Apache").change(function(){
-			var apacheVersion = $(this).val();
-			if(apacheVersion == '2.2'){
-				layer.msg(lan.bt.install_apache22);
-			}else{
-				layer.msg(lan.bt.install_apache24);
-			}
-		});
-		
-		$("#apache_select_PHP").change(function(){
-			var apacheVersion = $("#apache_select_Apache").val();
-			var phpVersion = $(this).val();
-			if(apacheVersion == '2.2'){
-				if(phpVersion != '5.2' && phpVersion != '5.3' && phpVersion != '5.4'){
-					layer.msg(lan.bt.insatll_s22+'PHP-' + phpVersion,{icon:5});
-					$(this).val("5.4");
-					$("#apache_PHP").attr('data-info','php 5.4');
-					return false;
-				}
-			}else{
-				if(phpVersion == '5.2'){
-					layer.msg(lan.bt.insatll_s24+'PHP-' + phpVersion,{icon:5});
-					$(this).val("5.4");
-					$("#apache_PHP").attr('data-info','php 5.4');
-					return false;
-				}
-			}
-		});
-
-		function a(n) {
-			memSize = getCookie("memSize");
-			max = 64;
-			msg = "64M";
-			switch(n) {
-				case "5.1":
-					max = 256;
-					msg = "256M";
-					break;
-				case "5.7":
-					max = 1500;
-					msg = "2GB";
-					break;
-				case "5.6":
-					max = 800;
-					msg = "1GB";
-					break;
-				case "AliSQL":
-					max = 800;
-					msg = "1GB";
-					break;
-				case "mariadb_10.0":
-					max = 800;
-					msg = "1GB";
-					break;
-				case "mariadb_10.1":
-					max = 1500;
-					msg = "2GB";
-					break
-			}
-			if(memSize < max) {
-				layer.msg( lan.bt.insatll_mem.replace("{1}",msg).replace("{2}",n), {
-					icon: 5
-				})
-			}
-		}
-		var de = null;
-		$(".onekey").click(function() {
-			if(de) return;
-			var v = $(this).prev().find("input").eq(0).prop("checked") ? "1" : "0";
-			var r = $(this).parents(".rec-box-con").find(".rec-list li").length;
-			var n = "";
-			var q = "";
-			var p = "";
-			var x = "";
-			var s = "";
-			de = true;
-			for(var t = 0; t < r; t++) {
-				var w = $(this).parents(".rec-box-con").find("ul li").eq(t);
-				var u = w.find("input");
-				if(u.prop("checked")) {
-					n += u.attr("data-info") + ","
-				}
-			}
-			q = n.split(",");
-			loadT = layer.msg(lan.bt.install_to, {
-				icon: 16,
-				time: 0,
-				shade: [0.3, "#000"]
-			});
-			for(var t = 0; t < q.length - 1; t++) {
-				p = q[t].split(" ")[0].toLowerCase();
-				x = q[t].split(" ")[1];
-				s = "name=" + p + "&version=" + x + "&type=" + v + "&id=" + (t + 1);
-				$.ajax({
-					url: "/files?action=InstallSoft",
-					data: s,
-					type: "POST",
-					async: false,
-					success: function(y) {}
-				});
-			}
-			layer.close(loadT);
-			layer.close(k);
-			setTimeout(function() {
-				getTaskCount()
-			}, 2000);
-			layer.msg(lan.bt.install_ok, {
-				icon: 1
-			});
-			setTimeout(function() {
-				task()
-			}, 1000)
-		});
-		InstallTips();
-		fly("onekey")
-	})
-}
 
 function jump() {
 	layer.closeAll();
 	window.location.href = "/soft"
 }
 
-function InstallTips() {
+function installTips() {
 	$(".fangshi label").mouseover(function() {
 		var a = $(this).attr("data-title");
 		layer.tips(a, this, {
@@ -1119,25 +824,35 @@ function fly(a) {
 				layer.msg(lan.bt.task_add, {
 					icon: 1
 				});
-				getTaskCount()
+				getTaskCount();
 			}
 		});
 	});
 };
 
+function readerTableChecked(){
+    $('thead').find('input').bind('click',function(){
+        $('tbody').find('tr').each(function(i,obj){
+        	var fin = $(this).find('td')[0];
+        	checked = $(fin).find('input').prop('checked');
+        	$(fin).find('input').prop('checked',!checked);
+        });
+    });    
+}
 
 //检查选中项
 function checkSelect(){
 	setTimeout(function(){
-		var checkList = $("input[name=id]");
-		var count = 0;
-		for(var i=0;i<checkList.length;i++){
-			if(checkList[i].checked) count++;
-		}
-		if(count > 0){
-			$("#allDelete").show();
+		var num = $('tbody').find('input[type="checkbox"]:checked').length;
+        if (num == 1) {
+            $('button[batch="true"]').hide();
+            $('button[batch="false"]').show();
+        }else if (num>1){
+            $('button[batch="true"]').show();
+            $('button[batch="false"]').show();
 		}else{
-			$("#allDelete").hide();
+            $('button[batch="true"]').hide();
+            $('button[batch="false"]').hide();
 		}
 	},5);
 }
@@ -1151,20 +866,8 @@ function listOrder(skey,type,obj){
 			orderType = 'asc';
 		}
 	}
-	
 	setCookie('order',skey + ' ' + orderType);
-	
-	switch(type){
-		case 'site':
-			getWeb(1);
-			break;
-		case 'database':
-			getData(1);
-			break;
-		case 'ftp':
-			getFtp(1);
-			break;
-	}
+	getWeb(1);
 	$(obj).find(".glyphicon-triangle-bottom").remove();
 	$(obj).find(".glyphicon-triangle-top").remove();
 	if(orderType == 'asc'){
@@ -1174,25 +877,78 @@ function listOrder(skey,type,obj){
 	}
 }
 
+
+//获取关联列表
+function getPanelList(){
+	var con ='';
+	$.post("/config/get_panel_list",function(rdata){
+		for(var i=0; i<rdata.length; i++){
+			con +='<h3 class="mypcip mypcipnew" style="opacity:.6" data-url="'+rdata[i].url+'" data-user="'+rdata[i].username+'" data-pw="'+rdata[i].password+'">\
+				<span class="f14 cw">'+rdata[i].title+'</span>\
+				<em class="btedit" onclick="bindPanel(0,\'c\',\''+rdata[i].title+'\',\''+rdata[i].id+'\',\''+rdata[i].url+'\',\''+rdata[i].username+'\',\''+rdata[i].password+'\')"></em>\
+				</h3>';
+		}
+
+		$("#newbtpc").html(con);
+		$(".mypcipnew").hover(function(){
+			$(this).css("opacity","1");
+		},function(){
+			$(this).css("opacity",".6");
+		}).click(function(){
+			$("#btpanelform").remove();
+			var murl = $(this).attr("data-url");
+			var user = $(this).attr("data-user");
+			var pw = $(this).attr("data-pw");
+			layer.open({
+			  type: 2,
+			  title: false,
+			  closeBtn: 0, //不显示关闭按钮
+			  shade: [0],
+			  area: ['340px', '215px'],
+			  offset: 'rb', //右下角弹出
+			  time: 5, //2秒后自动关闭
+			  anim: 2,
+			  content: [murl+'/login', 'no']
+			});
+			var loginForm ='<div id="btpanelform" style="display:none"><form id="toBtpanel" action="'+murl+'/do_login" method="post" target="btpfrom">\
+				<input name="username" id="btp_username" value="'+user+'" type="text">\
+				<input name="password" id="btp_password" value="'+pw+'" type="password">\
+				<input name="code" id="bt_code" value="12345" type="text">\
+			</form><iframe name="btpfrom" src=""></iframe></div>';
+			$("body").append(loginForm);
+			layer.msg('正在打开面板...',{icon:16,shade: [0.3, '#000'],time:1000});
+			setTimeout(function(){
+				$("#toBtpanel").submit();
+			},500);
+			setTimeout(function(){
+				window.open(murl);
+			},1000);
+		});
+		$(".btedit").click(function(e){
+			e.stopPropagation();
+		});
+	},'json');
+}
+getPanelList();
+
 //添加面板快捷登录
-function bindBTPanel(a,type,ip,btid,url,user,pw){
-	var titleName = lan.bt.panel_add;
+function bindPanel(a,type,ip,btid,url,user,pw){
+	var titleName = '关联面板';
 	if(type == "b"){
-		btn = "<button type='button' class='btn btn-success btn-sm' onclick=\"bindBTPanel(1,'b')\">"+lan.public.add+"</button>";
-	}
-	else{
-		titleName = lan.bt.panel_edit+ip;
-		btn = "<button type='button' class='btn btn-default btn-sm' onclick=\"bindBTPaneldel('"+btid+"')\">"+lan.public.del+"</button><button type='button' class='btn btn-success btn-sm' onclick=\"bindBTPanel(1,'c','"+ip+"','"+btid+"')\" style='margin-left:7px'>"+lan.public.edit+"</button>";
+		btn = "<button type='button' class='btn btn-success btn-sm' onclick=\"bindPanel(1,'b')\">添加</button>";
+	} else {
+		titleName = '修改关联' + ip;
+		btn = "<button type='button' class='btn btn-default btn-sm' onclick=\"bindPaneldel('"+btid+"')\">删除</button><button type='button' class='btn btn-success btn-sm' onclick=\"bindPanel(1,'c','"+ip+"','"+btid+"')\" style='margin-left:7px'>修改</button>";
 	}
 	if(url == undefined) url="http://";
 	if(user == undefined) user="";
 	if(pw == undefined) pw="";
 	if(ip == undefined) ip="";
 	if(a == 1) {
-		var gurl = "/config?action=AddPanelInfo";
+		var gurl = "/config/add_panel_info";
 		var btaddress = $("#btaddress").val();
 		if(!btaddress.match(/^(http|https)+:\/\/([\w-]+\.)+[\w-]+:\d+/)){
-			layer.msg(lan.bt.panel_err_format+'<p>http://192.168.0.1:8888</p>',{icon:5,time:5000});
+			layer.msg('面板地址格式不正确，示例：<p>http://192.168.0.1:8888</p>',{icon:5,time:5000});
 			return;
 		}
 		var btuser = encodeURIComponent($("#btuser").val());
@@ -1204,18 +960,18 @@ function bindBTPanel(a,type,ip,btid,url,user,pw){
 			return;
 		}
 		if(type=="c"){
-			gurl = "/config?action=SetPanelInfo";
+			gurl = "/config/set_panel_info";
 			data = data+"&id="+btid;
 		}
 		$.post(gurl, data, function(b) {
 			if(b.status) {
 				layer.closeAll();
 				layer.msg(b.msg, {icon: 1});
-				GetBtpanelList();
+				getPanelList();
 			} else {
 				layer.msg(b.msg, {icon: 2})
 			}
-		});
+		},'json');
 		return
 	}
 	layer.open({
@@ -1226,20 +982,24 @@ function bindBTPanel(a,type,ip,btid,url,user,pw){
 		shift: 5,
 		shadeClose: false,
 		content: "<div class='bt-form pd20 pb70'>\
-		<div class='line'><span class='tname'>"+lan.bt.panel_address+"</span>\
-		<div class='info-r'><input class='bt-input-text' type='text' name='btaddress' id='btaddress' value='"+url+"' placeholder='"+lan.bt.panel_address+"' style='width:100%'/></div>\
-		</div>\
-		<div class='line'><span class='tname'>"+lan.bt.panel_user+"</span>\
-		<div class='info-r'><input class='bt-input-text' type='text' name='btuser' id='btuser' value='"+user+"' placeholder='"+lan.bt.panel_user+"' style='width:100%'/></div>\
-		</div>\
-		<div class='line'><span class='tname'>"+lan.bt.panel_pass+"</span>\
-		<div class='info-r'><input class='bt-input-text' type='password' name='btpassword' id='btpassword' value='"+pw+"' placeholder='"+lan.bt.panel_pass+"' style='width:100%'/></div>\
-		</div>\
-		<div class='line'><span class='tname'>"+lan.bt.panel_ps+"</span>\
-		<div class='info-r'><input class='bt-input-text' type='text' name='bttitle' id='bttitle' value='"+ip+"' placeholder='"+lan.bt.panel_ps+"' style='width:100%'/></div>\
-		</div>\
-		<div class='line'><ul class='help-info-text c7'><li>"+lan.bt.panel_ps_1+"</li><li>"+lan.bt.panel_ps_2+"</li><li>"+lan.bt.panel_ps_3+"</li></ul></div>\
-		<div class='bt-form-submit-btn'><button type='button' class='btn btn-danger btn-sm' onclick=\"layer.closeAll()\">"+lan.public.close+"</button> "+btn+"</div></div>"
+				<div class='line'><span class='tname'>面板地址</span>\
+				<div class='info-r'><input class='bt-input-text' type='text' name='btaddress' id='btaddress' value='"+url+"' placeholder='面板地址' style='width:100%'/></div>\
+				</div>\
+				<div class='line'><span class='tname'>用户名</span>\
+				<div class='info-r'><input class='bt-input-text' type='text' name='btuser' id='btuser' value='"+user+"' placeholder='用户名' style='width:100%'/></div>\
+				</div>\
+				<div class='line'><span class='tname'>密码</span>\
+				<div class='info-r'><input class='bt-input-text' type='password' name='btpassword' id='btpassword' value='"+pw+"' placeholder='密码' style='width:100%'/></div>\
+				</div>\
+				<div class='line'><span class='tname'>备注</span>\
+				<div class='info-r'><input class='bt-input-text' type='text' name='bttitle' id='bttitle' value='"+ip+"' placeholder='备注' style='width:100%'/></div>\
+				</div>\
+				<div class='line'><ul class='help-info-text c7'>\
+					<li>收藏其它服务器面板资料，实现一键登录面板功能</li><li>面板备注不可重复</li>\
+					<li><font style='color:red'>注意，开启广告拦截会导致无法快捷登录。</font></li></ul>\
+				</div>\
+				<div class='bt-form-submit-btn'><button type='button' class='btn btn-danger btn-sm' onclick=\"layer.closeAll()\">关闭</button> "+btn+"</div>\
+			</div>"
 	});
 	$("#btaddress").on("input",function(){
 		var str =$(this).val();
@@ -1254,23 +1014,28 @@ function bindBTPanel(a,type,ip,btid,url,user,pw){
 	});
 }
 //删除快捷登录
-function bindBTPaneldel(id){
-	$.post("/config?action=DelPanelInfo","id="+id,function(rdata){
+function bindPaneldel(id){
+	$.post("/config/del_panel_info","id="+id,function(rdata){
 		layer.closeAll();
 		layer.msg(rdata.msg,{icon:rdata.status?1:2});
-		GetBtpanelList();
-	})
+		getPanelList();
+	},'json');
 }
 
 function getSpeed(sele){
-	if(!$(sele)) return;
-	$.get('/ajax?action=GetSpeed',function(speed){
-		if(speed.title === null) return;
-		mspeed = '';
-		if(speed.speed > 0){
-			mspeed = '<span class="pull-right">'+ToSize(speed.speed)+'/s</span>';
+	if(!$(sele)) {
+		return;
+	}
+	$.get('/files/get_speed',function(data){
+		var speed = data['data'];
+		if(speed.title === null){
+			return;
 		}
-		body = '<p>'+speed.title+' <img src="/static/img/ing.gif"></p>\
+		var mspeed = '';
+		if(speed.speed > 0){
+			mspeed = '<span class="pull-right">'+toSize(speed.speed)+'/s</span>';
+		}
+		var body = '<p>'+speed.title+' <img src="/static/img/ing.gif"></p>\
 		<div class="bt-progress"><div class="bt-progress-bar" style="width:'+speed.progress+'%"><span class="bt-progress-text">'+speed.progress+'%</span></div></div>\
 		<p class="f12 c9"><span class="pull-left">'+speed.used+'/'+speed.total+'</span>'+mspeed+'</p>';
 		$(sele).prev().hide();
@@ -1281,21 +1046,21 @@ function getSpeed(sele){
 		setTimeout(function(){
 			getSpeed(sele);
 		},1000);
-	});
+	},'json');
 }
 //消息盒子
-function messagebox() {
+function messageBox() {
 	layer.open({
 		type: 1,
-		title: lan.bt.task_title,
+		title: '消息盒子',
 		area: "640px",
 		closeBtn: 2,
 		shadeClose: false,
 		content: '<div class="bt-form">\
 					<div class="bt-w-main">\
 						<div class="bt-w-menu">\
-							<p class="bgw" id="taskList" onclick="tasklist()">'+lan.bt.task_list+'(<span class="task_count">0</span>)</p>\
-							<p onclick="remind()">'+lan.bt.task_msg+'(<span class="msg_count">0</span>)</p>\
+							<p class="bgw" id="taskList" onclick="tasklist()">任务列表(<span class="task_count">0</span>)</p>\
+							<p onclick="remind()">消息列表(<span class="msg_count">0</span>)</p>\
 							<p onclick="execLog()">执行日志</p>\
 						</div>\
 						<div class="bt-w-con pd15">\
@@ -1322,7 +1087,7 @@ function execLog(){
 
 function remind(a){
 	a = a == undefined ? 1 : a;
-	$.post("/task/list", "tojs=remind&table=tasks&result=2,4,6,8&limit=8&p=" + a, function(g) {
+	$.post("/task/list", "table=tasks&result=2,4,6,8&limit=10&p=" + a, function(g) {
 		var e = "";
 		var f = false;
 		var task_count = 0;
@@ -1338,7 +1103,11 @@ function remind(a){
 					<tbody id="remind">'+e+'</tbody>\
 					</table></div>\
 					<div class="mtb15" style="height:32px">\
-						<div class="pull-left buttongroup" style="display:none;"><button class="btn btn-default btn-sm mr5 rs-del" disabled="disabled">'+lan.public.del+'</button><button class="btn btn-default btn-sm mr5 rs-read" disabled="disabled">'+lan.bt.task_tip_read+'</button><button class="btn btn-default btn-sm">'+lan.bt.task_tip_all+'</button></div>\
+						<div class="pull-left buttongroup" style="display:none;">\
+							<button class="btn btn-default btn-sm mr5 rs-del" disabled="disabled">'+lan.public.del+'</button>\
+							<button class="btn btn-default btn-sm mr5 rs-read" disabled="disabled">'+lan.bt.task_tip_read+'</button>\
+							<button class="btn btn-default btn-sm">'+lan.bt.task_tip_all+'</button>\
+						</div>\
 						<div id="taskPage" class="page"></div>\
 					</div>';
 		
@@ -1346,20 +1115,18 @@ function remind(a){
 		$(".msg_count").text(g.data.length);
 		$(".taskcon").html(con);
 		$("#taskPage").html(g.page);
+
 		$("#Rs-checkAll").click(function(){
 			if($(this).prop("checked")){
 				$("#remind").find("input").prop("checked",true)
-			}
-			else{
+			} else {
 				$("#remind").find("input").prop("checked",false)
 			}
 		});
-
 	},'json');
 }
 
-
-function GetReloads() {
+function getReloads() {
 	var a = 0;
 	var mm = $(".bt-w-menu .bgw").html()
 	if(mm == undefined || mm.indexOf(lan.bt.task_list) == -1) {
@@ -1368,7 +1135,7 @@ function GetReloads() {
 		speed = null;
 		return
 	}
-	if(speed) return;
+	if(speed) {return;}
 	speed = setInterval(function() {
 		var mm = $(".bt-w-menu .bgw").html()
 		if(mm == undefined || mm.indexOf(lan.bt.task_list) == -1) {
@@ -1378,10 +1145,10 @@ function GetReloads() {
 			return
 		}
 		a++;
-		$.post("/task/get_task_speed", "", function(h) {
+		$.post('/task/get_task_speed', '', function(h) {
 			if(h.task == undefined) {
 				$(".cmdlist").html(lan.bt.task_not_list);
-				return
+				return;
 			}
 			var b = "";
 			var d = "";
@@ -1396,15 +1163,15 @@ function GetReloads() {
 							c += f[e] + "<br>"
 						}
 						if(h.task[g].name.indexOf("扫描") != -1) {
-							b = "<li><span class='titlename'>" + h.task[g].name + "</span><span class='state'>"+lan.bt.task_scan+" <img src='/static/img/ing.gif'> | <a href=\"javascript:RemoveTask(" + h.task[g].id + ")\">"+lan.public.close+"</a></span><span class='opencmd'></span><div class='cmd'>" + c + "</div></li>"
+							b = "<li><span class='titlename'>" + h.task[g].name + "</span><span class='state'>正在扫描<img src='/static/img/ing.gif'> | <a href=\"javascript:removeTask(" + h.task[g].id + ")\">关闭</a></span><span class='opencmd'></span><div class='cmd'>" + c + "</div></li>"
 						} else {
-							b = "<li><span class='titlename'>" + h.task[g].name + "</span><span class='state'>"+lan.bt.task_install+" <img src='/static/img/ing.gif'> | <a href=\"javascript:RemoveTask(" + h.task[g].id + ")\">"+lan.public.close+"</a></span><div class='cmd'>" + c + "</div></li>"
+							b = "<li><span class='titlename'>" + h.task[g].name + "</span><span class='state'>正在安装<img src='/static/img/ing.gif'> | <a href=\"javascript:removeTask(" + h.task[g].id + ")\">关闭</a></span><div class='cmd'>" + c + "</div></li>"
 						}
 					} else {
-						b = "<li><div class='line-progress' style='width:" + h.msg.pre + "%'></div><span class='titlename'>" + h.task[g].name + "<a style='margin-left:130px;'>" + (ToSize(h.msg.used) + "/" + ToSize(h.msg.total)) + "</a></span><span class='com-progress'>" + h.msg.pre + "%</span><span class='state'>"+lan.bt.task_downloading+" <img src='/static/img/ing.gif'> | <a href=\"javascript:RemoveTask(" + h.task[g].id + ")\">"+lan.public.close+"</a></span></li>"
+						b = "<li><div class='line-progress' style='width:" + h.msg.pre + "%'></div><span class='titlename'>" + h.task[g].name + "<a style='margin-left:130px;'>" + (toSize(h.msg.used) + "/" + toSize(h.msg.total)) + "</a></span><span class='com-progress'>" + h.msg.pre + "%</span><span class='state'>"+lan.bt.task_downloading+" <img src='/static/img/ing.gif'> | <a href=\"javascript:removeTask(" + h.task[g].id + ")\">"+lan.public.close+"</a></span></li>"
 					}
 				} else {
-					d += "<li><span class='titlename'>" + h.task[g].name + "</span><span class='state'>"+lan.bt.task_sleep+" | <a style='color:green' href=\"javascript:RemoveTask(" + h.task[g].id + ')">'+lan.public.del+'</a></span></li>'
+					d += "<li><span class='titlename'>" + h.task[g].name + "</span><span class='state'>等待 | <a style='color:green' href=\"javascript:removeTask(" + h.task[g].id + ')">删除</a></span></li>'
 				}
 			}
 			$(".cmdlist").html(b + d);
@@ -1436,10 +1203,11 @@ function RscheckSelect(){
 
 
 function tasklist(a){
-	var con='<ul class="cmdlist"></ul><span style="position:  fixed;bottom: 13px;">若任务长时间未执行，请尝试在首页点【重启面板】来重置任务队列</span>';
+	var con='<ul class="cmdlist"></ul>\
+		<span style="position:  fixed;bottom: 13px;">若任务长时间未执行，请尝试在首页点【重启面板】来重置任务队列</span>';
 	$(".taskcon").html(con);
 	a = a == undefined ? 1 : a;
-	$.post("/task/list", "tojs=GetTaskList&table=tasks&limit=10&p=" + a, function(g) {
+	$.post("/task/list", "tojs=getTaskList&table=tasks&limit=10&p=" + a, function(g) {
 		var e = "";
 		var b = "";
 		var c = "";
@@ -1450,14 +1218,14 @@ function tasklist(a){
 				case "-1":
 					f = true;
 					if(g.data[d].type != "download") {
-						b = "<li><span class='titlename'>" + g.data[d].name + "</span><span class='state pull-right c6'>"+lan.bt.task_install+" <img src='/static/img/ing.gif'> | <a class='btlink' href=\"javascript:RemoveTask(" + g.data[d].id + ")\">"+lan.public.close+"</a></span><span class='opencmd'></span><pre class='cmd'></pre></li>"
+						b = "<li><span class='titlename'>" + g.data[d].name + "</span><span class='state pull-right c6'>正在安装<img src='/static/img/ing.gif'> | <a class='btlink' href=\"javascript:removeTask(" + g.data[d].id + ")\">关闭</a></span><span class='opencmd'></span><pre class='cmd'></pre></li>"
 					} else {
-						b = "<li><div class='line-progress' style='width:0%'></div><span class='titlename'>" + g.data[d].name + "<a id='speed' style='margin-left:130px;'>0.0M/12.5M</a></span><span class='com-progress'>0%</span><span class='state'>"+lan.bt.task_downloading+" <img src='/static/img/ing.gif'> | <a href=\"javascript:RemoveTask(" + g.data[d].id + ")\">"+lan.public.close+"</a></span></li>"
+						b = "<li><div class='line-progress' style='width:0%'></div><span class='titlename'>" + g.data[d].name + "<a id='speed' style='margin-left:130px;'>0.0M/12.5M</a></span><span class='com-progress'>0%</span><span class='state'>下载中 <img src='/static/img/ing.gif'> | <a href=\"javascript:removeTask(" + g.data[d].id + ")\">关闭</a></span></li>"
 					}
 					task_count++;
 					break;
 				case "0":
-					c += "<li><span class='titlename'>" + g.data[d].name + "</span><span class='state pull-right c6'>"+lan.bt.task_sleep+"</span> | <a href=\"javascript:RemoveTask(" + g.data[d].id + ")\" class='btlink'>"+lan.public.del+"</a></li>";
+					c += "<li><span class='titlename'>" + g.data[d].name + "</span><span class='state pull-right c6'>等待</span> | <a href=\"javascript:removeTask(" + g.data[d].id + ")\" class='btlink'>"+lan.public.del+"</a></li>";
 					task_count++;
 					break;
 			}
@@ -1466,9 +1234,43 @@ function tasklist(a){
 		
 		$(".task_count").text(task_count);
 		$(".cmdlist").html(b + c);
-		GetReloads();
+		getReloads();
 		return f
-	},'json')
+	},'json');
+}
+
+function activeDisk() {
+	var a = $("#PathPlace").find("span").text().substring(0, 1);
+	switch(a) {
+		case "C":
+			$(".path-con-left dd:nth-of-type(1)").css("background", "#eee").siblings().removeAttr("style");
+			break;
+		case "D":
+			$(".path-con-left dd:nth-of-type(2)").css("background", "#eee").siblings().removeAttr("style");
+			break;
+		case "E":
+			$(".path-con-left dd:nth-of-type(3)").css("background", "#eee").siblings().removeAttr("style");
+			break;
+		case "F":
+			$(".path-con-left dd:nth-of-type(4)").css("background", "#eee").siblings().removeAttr("style");
+			break;
+		case "G":
+			$(".path-con-left dd:nth-of-type(5)").css("background", "#eee").siblings().removeAttr("style");
+			break;
+		case "H":
+			$(".path-con-left dd:nth-of-type(6)").css("background", "#eee").siblings().removeAttr("style");
+			break;
+		default:
+			$(".path-con-left dd").removeAttr("style");
+	}
+}
+
+
+function backMyComputer() {
+	$(".default").show();
+	$(".file-list").hide();
+	$("#PathPlace").find("span").html("");
+	activeDisk();
 }
 
 //检查登陆状态
@@ -1477,8 +1279,6 @@ function check_login(){
 		if(rdata === true) return;
 	});
 }
-
-
 
 //登陆跳转
 function to_login(){
@@ -1503,13 +1303,11 @@ $(function(){
 	},60000);
 });
 
-
 function asyncLoadImage(obj, url){
 	
 	if (typeof(url) == 'undefined'){
 		return;
 	}
-	loadImage(obj, url, showImage);
 
 	function loadImage(obj,url,callback){
 	    var img = new Image();
@@ -1527,6 +1325,7 @@ function asyncLoadImage(obj, url){
 	function showImage(obj){
 	    obj.src = this.src;
 	}
+	loadImage(obj, url, showImage);
 }
 
 function loadImage(){
@@ -1536,6 +1335,187 @@ function loadImage(){
 			asyncLoadImage(this, $(this).attr('data-src'));
 		} 
     });
+}
+
+var socket, gterm;
+function webShell() {
+    var termCols = 83;
+    var termRows = 21;
+    var sendTotal = 0;
+    if(!socket)socket = io.connect();
+    var term = new Terminal({ cols: termCols, rows: termRows, screenKeys: true, useStyle: true});
+
+    term.open();
+    term.setOption('cursorBlink', true);
+    term.setOption('fontSize', 14);
+    gterm = term
+
+    socket.on('server_response', function (data) {
+        term.write(data.data);
+        if (data.data == '\r\n登出\r\n' || 
+            data.data == '登出\r\n' || 
+            data.data == '\r\nlogout\r\n' || 
+            data.data == 'logout\r\n') {
+            setTimeout(function () {
+                layer.closeAll();
+                term.destroy();
+                clearInterval(interval);
+            }, 500);
+        }
+    });
+
+    if (socket) {
+        socket.emit('connect_event', '');
+        interval = setInterval(function () {
+            socket.emit('connect_event', '');
+        }, 1000);
+    }
+    
+    term.on('data', function (data) {
+        socket.emit('webssh', data);
+    });
+
+
+    var term_box = layer.open({
+        type: 1,
+        title: "本地终端",
+        area: ['685px','435px'],
+        closeBtn: 2,
+        shadeClose: false,
+        content: '<div class="term-box"><div id="term"></div></div>\
+					<div class="shell-text-input">\
+                    <textarea type="text" class="bt-input-text-shell" placeholder="请将命令粘贴到此处.." value="" name="ssh_copy" />\
+					<div class="shell-btn-group">\
+                    <button class="shellbutton btn btn-success btn-sm pull-right shell_btn_1">发送(Ctrl+Enter)</button>\
+					<button class="shellbutton btn btn-default btn-sm pull-right shell_btn_close">关闭</button>\
+					</div>\
+                </div>',
+        cancel: function () {
+            term.destroy();
+            clearInterval(interval);
+        }
+    });
+	$(".shell_btn_close").click(function(){
+		layer.close(term_box);
+		term.destroy();
+        clearInterval(interval);
+	})
+	
+    setTimeout(function () {
+        $('.terminal').detach().appendTo('#term');
+        $("#term").show();
+        socket.emit('webssh', "\n");
+        term.focus();
+
+        // 鼠标右键事件
+        var can = $("#term");
+        can.contextmenu(function (e) {
+            var winWidth = can.width();
+            var winHeight = can.height();
+            var mouseX = e.pageX;
+            var mouseY = e.pageY;
+            var menuWidth = $(".contextmenu").width();
+            var menuHeight = $(".contextmenu").height();
+            var minEdgeMargin = 10;
+            if (mouseX + menuWidth + minEdgeMargin >= winWidth &&
+                mouseY + menuHeight + minEdgeMargin >= winHeight) {
+                menuLeft = mouseX - menuWidth - minEdgeMargin + "px";
+                menuTop = mouseY - menuHeight - minEdgeMargin + "px";
+            }
+            else if (mouseX + menuWidth + minEdgeMargin >= winWidth) {
+                menuLeft = mouseX - menuWidth - minEdgeMargin + "px";
+                menuTop = mouseY + minEdgeMargin + "px";
+            }
+            else if (mouseY + menuHeight + minEdgeMargin >= winHeight) {
+                menuLeft = mouseX + minEdgeMargin + "px";
+                menuTop = mouseY - menuHeight - minEdgeMargin + "px";
+            }
+            else {
+                menuLeft = mouseX + minEdgeMargin + "px";
+                menuTop = mouseY + minEdgeMargin + "px";
+            };
+
+            var selectText = term.getSelection()
+            var style_str = '';
+            var paste_str = '';
+            if (!selectText) {
+                if (!getCookie('shell_copy_body')) {
+                    paste_str = 'style="color: #bbb;" disable';
+                }
+                style_str = 'style="color: #bbb;" disable';
+            } else {
+                setCookie('ssh_selection', selectText);
+            }
+
+
+            var menudiv = '<ul class="contextmenu">\
+                        <li><a class="shell_copy_btn menu_ssh" data-clipboard-text="'+ selectText + '" ' + style_str + '>复制到剪切板</a></li>\
+                        <li><a  onclick="shell_paste_text()" '+ paste_str+'>粘贴选中项</a></li>\
+                        <li><a onclick="shell_to_baidu()" ' + style_str + '>百度搜索</a></li>\
+                    </ul>';
+            $("body").append(menudiv);
+            $(".contextmenu").css({
+                "left": menuLeft,
+                "top": menuTop
+            });
+            return false;
+        });
+        can.click(function () {
+            remove_ssh_menu();
+        });
+
+        clipboard = new ClipboardJS('.shell_copy_btn');
+        clipboard.on('success', function (e) {
+            layer.msg('复制成功!');
+            setCookie('shell_copy_body', e.text)
+            remove_ssh_menu();
+            term.focus();
+        });
+
+        clipboard.on('error', function (e) {
+            layer.msg('复制失败，浏览器不兼容!');
+            setCookie('shell_copy_body', e.text)
+            remove_ssh_menu();
+            term.focus();
+        });
+
+        $(".shellbutton").click(function () {
+            var tobj = $("textarea[name='ssh_copy']");
+            var ptext = tobj.val();
+            tobj.val('');
+            if ($(this).text().indexOf('Alt') != -1) {
+                ptext +="\n";
+            }
+            socket.emit('webssh', ptext);
+            term.focus();
+        })
+        $("textarea[name='ssh_copy']").keydown(function (e) {
+
+            if (e.ctrlKey && e.keyCode == 13) {
+                $(".shell_btn_1").click();
+            } else if (e.altKey && e.keyCode == 13) {
+                $(".shell_btn_1").click();
+            }
+        });
+
+    }, 100);
+}
+
+function shell_to_baidu() {
+    var selectText = getCookie('ssh_selection');
+    remove_ssh_menu();
+    window.open('https://www.baidu.com/s?wd=' + selectText)
+    gterm.focus();
+}
+
+function shell_paste_text(){
+    socket.emit('webssh', getCookie('ssh_selection'));
+    remove_ssh_menu();
+    gterm.focus();
+}
+
+function remove_ssh_menu() {
+    $(".contextmenu").remove();
 }
 
 /*** 其中功能,针对插件通过库使用 start ***/
@@ -1584,7 +1564,6 @@ function pluginOpService(a, b, v) {
     }
 
     var d = "";
-
     switch(b) {
         case "stop":d = '停止';break;
         case "start":d = '启动';break;
@@ -1595,6 +1574,7 @@ function pluginOpService(a, b, v) {
         var e = layer.msg(msgTpl('正在{1}{2}{3}服务,请稍候...',[d,a,v]), {icon: 16,time: 0});
         $.post("/plugins/run", c, function(g) {
             layer.close(e);
+            
             
             var f = g.data == 'ok' ? msgTpl('{1}{2}服务已{3}',[a,v,d]) : msgTpl('{1}{2}服务{3}失败!',[a,v,d]);
             layer.msg(f, {icon: g.data == 'ok' ? 1 : 2});
@@ -1610,14 +1590,16 @@ function pluginOpService(a, b, v) {
             if( g.status && g.data != 'ok' ) {
                 layer.msg(g.data, {icon: 2,time: 3000,shade: 0.3,shadeClose: true});
             }
-   
+
+            setTimeout(function(){
+            	location.reload();
+            },2000);
         },'json').error(function() {
             layer.close(e);
             layer.msg('操作异常!', {icon: 1});
         });
     })
 }
-
 
 //配置修改 --- start
 function pluginConfig(_name, version, func){
@@ -1658,6 +1640,131 @@ function pluginConfig(_name, version, func){
                     "Ctrl-F": "findPersistent",
                     "Ctrl-H": "replaceAll",
                     "Ctrl-S": function() {
+                    	$("#textBody").text(editor.getValue());
+                        pluginConfigSave(fileName);
+                    }
+                },
+                lineNumbers: true,
+                matchBrackets:true,
+            });
+            editor.focus();
+            $(".CodeMirror-scroll").css({"height":"300px","margin":0,"padding":0});
+            $("#onlineEditFileBtn").click(function(){
+                $("#textBody").text(editor.getValue());
+                pluginConfigSave(fileName);
+            });
+        },'json');
+    },'json');
+}
+
+
+//配置修改模版 --- start
+function pluginConfigTpl(_name, version, func, config_tpl_func, read_config_tpl_func){
+	if ( typeof(version) == 'undefined' ){
+		version = '';
+	}
+
+	var func_name = 'conf';
+    if ( typeof(func) != 'undefined' ){
+        func_name = func;
+    }
+
+    var _config_tpl_func = 'config_tpl';
+    if ( typeof(config_tpl_func) != 'undefined' ){
+        _config_tpl_func = config_tpl_func;
+    }
+
+    var _read_config_tpl_func = 'read_config_tpl';
+    if ( typeof(read_config_tpl_func) != 'undefined' ){
+        _read_config_tpl_func = read_config_tpl_func;
+    }
+
+
+    var con = '<p style="color: #666; margin-bottom: 7px">提示：Ctrl+F 搜索关键字，Ctrl+G 查找下一个，Ctrl+S 保存，Ctrl+Shift+R 查找替换!</p>\
+    			<select id="config_tpl" class="bt-input-text mr20" style="width:30%;margin-bottom: 3px;"><option value="0">请选择</option></select>\
+    			<textarea class="bt-input-text" style="height: 320px; line-height:18px;" id="textBody"></textarea>\
+                <button id="onlineEditFileBtn" class="btn btn-success btn-sm" style="margin-top:10px;">保存</button>\
+                <ul class="help-info-text c7 ptb15">\
+                    <li>此处为'+ _name + version +'主配置文件,若您不了解配置规则,请勿随意修改。</li>\
+                </ul>';
+    $(".soft-man-con").html(con);
+
+    function getFileName(file){
+    	var list = file.split('/');
+    	var f = list[list.length-1];
+    	return f 
+    }
+
+    var fileName = '';
+    $.post('/plugins/run',{name:_name, func:_config_tpl_func,version:version}, function(data){
+    	var rdata = $.parseJSON(data.data);
+    	for (var i = 0; i < rdata.length; i++) {
+    		$('#config_tpl').append('<option value="'+rdata[i]+'"">'+getFileName(rdata[i])+'</option>');
+    	}
+
+    	$('#config_tpl').change(function(){
+    		var selected = $(this).val();
+    		if (selected != '0'){
+    			var loadT = layer.msg('配置模版获取中...',{icon:16,time:0,shade: [0.3, '#000']});
+
+    			var _args = JSON.stringify({file:selected});
+    			$.post('/plugins/run', {name:_name, func:_read_config_tpl_func,version:version,args:_args}, function(data){
+    				layer.close(loadT);
+    				var rdata = $.parseJSON(data.data);
+    				if (!rdata.status){
+		                layer.msg(rdata.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+		                return;
+		            }
+
+    				$("#textBody").empty().text(rdata.data);
+    				$(".CodeMirror").remove();
+		            var editor = CodeMirror.fromTextArea(document.getElementById("textBody"), {
+		                extraKeys: {
+		                    "Ctrl-Space": "autocomplete",
+		                    "Ctrl-F": "findPersistent",
+		                    "Ctrl-H": "replaceAll",
+		                    "Ctrl-S": function() {
+		                    	$("#textBody").text(editor.getValue());
+		                        pluginConfigSave(fileName);
+		                    }
+		                },
+		                lineNumbers: true,
+		                matchBrackets:true,
+		            });
+		            editor.focus();
+		            $(".CodeMirror-scroll").css({"height":"300px","margin":0,"padding":0});
+		            $("#onlineEditFileBtn").unbind('click');
+		            $("#onlineEditFileBtn").click(function(){
+		                $("#textBody").text(editor.getValue());
+		                pluginConfigSave(fileName);
+		            });
+    			},'json');
+    		}
+    	});
+
+    },'json');
+
+    var loadT = layer.msg('配置文件路径获取中...',{icon:16,time:0,shade: [0.3, '#000']});
+    $.post('/plugins/run', {name:_name, func:func_name,version:version}, function (data) {
+        layer.close(loadT);
+
+        var loadT2 = layer.msg('文件内容获取中...',{icon:16,time:0,shade: [0.3, '#000']});
+        fileName = data.data;
+        $.post('/files/get_body', 'path=' + fileName, function(rdata) {
+            layer.close(loadT2);
+            if (!rdata.status){
+                layer.msg(rdata.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+                return;
+            }
+            $("#textBody").empty().text(rdata.data.data);
+            $(".CodeMirror").remove();
+            var editor = CodeMirror.fromTextArea(document.getElementById("textBody"), {
+                extraKeys: {
+                    "Ctrl-Space": "autocomplete",
+                    "Ctrl-F": "findPersistent",
+                    "Ctrl-H": "replaceAll",
+                    "Ctrl-S": function() {
+                    	$("#textBody").text(editor.getValue());
                         pluginConfigSave(fileName);
                     }
                 },
@@ -1679,22 +1786,21 @@ function pluginConfig(_name, version, func){
 function pluginConfigSave(fileName) {
     var data = encodeURIComponent($("#textBody").val());
     var encoding = 'utf-8';
-    var loadT = layer.msg('保存中...', {
-        icon: 16,
-        time: 0
-    });
+    var loadT = layer.msg('保存中...', {icon: 16,time: 0});
     $.post('/files/save_body', 'data=' + data + '&path=' + fileName + '&encoding=' + encoding, function(rdata) {
         layer.close(loadT);
-        layer.msg(rdata.msg, {
-            icon: rdata.status ? 1 : 2
-        });
+        layer.msg(rdata.msg, {icon: rdata.status ? 1 : 2});
     },'json');
 }
 
 
-function pluginInitD(_name){
+
+function pluginInitD(_name,_version){
+	if (typeof _version == 'undefined'){
+    	_version = '';
+    }
 	var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
-	$.post('/plugins/run', {name:_name, func:'initd_status'}, function(data) {
+	$.post('/plugins/run', {name:_name, func:'initd_status',version : _version}, function(data) {
 		layer.close(loadT);
         if( !data.status ){
             layer.msg(data.msg,{icon:0,time:3000,shade: [0.3, '#000']});
@@ -1705,41 +1811,41 @@ function pluginInitD(_name){
             return;
         }
         if (data.data == 'ok'){
-            pluginSetInitD(_name, true);
+            pluginSetInitD(_name, _version, true);
         } else {
-            pluginSetInitD(_name, false);
+            pluginSetInitD(_name, _version, false);
         }
     },'json');
 }
 
-function pluginSetInitD(_name, status){
+function pluginSetInitD(_name, _version, status){
 	var serviceCon ='<p class="status">当前状态：<span>'+(status ? '已加载' : '未加载' )+
         '</span><span style="color: '+
         (status?'#20a53a;':'red;')+
         ' margin-left: 3px;" class="glyphicon ' + (status?'glyphicon glyphicon-play':'glyphicon-pause')+'"></span></p><div class="sfm-opt">\
-            <button class="btn btn-default btn-sm" onclick="pluginOpInitD(\''+_name+'\',\''+(status?'initd_uninstall':'initd_install')+'\')">'+(status?'卸载':'加载')+'</button>\
+            <button class="btn btn-default btn-sm" onclick="pluginOpInitD(\''+_name+'\',\''+_version+'\',\''+(status?'initd_uninstall':'initd_install')+'\')">'+(status?'卸载':'加载')+'</button>\
         </div>'; 
     $(".soft-man-con").html(serviceCon);
 }
 
-function pluginOpInitD(a, b) {
-    var c = "name=" + a + "&func=" + b;
+function pluginOpInitD(a, _version, b) {
+    var c = "name=" + a + "&func=" + b + "&version="+_version;
     var d = "";
     switch(b) {
         case "initd_install":d = '加载';break;
         case "initd_uninstall":d = '卸载';break;
     }
-    layer.confirm( msgTpl('您真的要{1}{2}服务吗？', [d,a]), {icon:3,closeBtn: 2}, function() {
-        var e = layer.msg(msgTpl('正在{1}{2}服务,请稍候...',[d,a]), {icon: 16,time: 0});
+    layer.confirm( msgTpl('您真的要{1}{2}{3}服务吗？', [d,a,_version]), {icon:3,closeBtn: 2}, function() {
+        var e = layer.msg(msgTpl('正在{1}{2}{3}服务,请稍候...',[d,a,_version]), {icon: 16,time: 0});
         $.post("/plugins/run", c, function(g) {
             layer.close(e);
-            var f = g.data == 'ok' ? msgTpl('{1}服务已{2}',[a,d]) : msgTpl('{1}服务{2}失败!',[a,d]);
+            var f = g.data == 'ok' ? msgTpl('{1}{3}服务已{2}',[a,d,_version]) : msgTpl('{1}{3}服务{2}失败!',[a,d,_version]);
             layer.msg(f, {icon: g.data == 'ok' ? 1 : 2});
             
             if ( b == 'initd_install' && g.data == 'ok' ) {
-                pluginSetInitD(a, true);
+                pluginSetInitD(a, _version, true);
             }else{
-                pluginSetInitD(a, false);
+                pluginSetInitD(a, _version, false);
             }
             if(g.data != 'ok') {
                 layer.msg(g.data, {icon: 2,time: 0,shade: 0.3,shadeClose: true});
@@ -1751,7 +1857,7 @@ function pluginOpInitD(a, b) {
     })
 }
 
-function pluginLogs(_name, version, func){
+function pluginLogs(_name, version, func, line){
     if ( typeof(version) == 'undefined' ){
         version = '';
     }
@@ -1761,26 +1867,96 @@ function pluginLogs(_name, version, func){
         func_name = func;
     }
 
+    var file_line = 100;
+    if ( typeof(line) != 'undefined' ){
+        file_line = line;
+    }
 
-    var loadT = layer.msg('错误日志路径获取中...',{icon:16,time:0,shade: [0.3, '#000']});
+
+    var loadT = layer.msg('日志路径获取中...',{icon:16,time:0,shade: [0.3, '#000']});
     $.post('/plugins/run', {name:_name, func:func_name, version:version},function (data) {
         layer.close(loadT);
 
         var loadT2 = layer.msg('文件内容获取中...',{icon:16,time:0,shade: [0.3, '#000']});
         var fileName = data.data;
-        $.post('/files/get_body', 'path=' + fileName, function(rdata) {
+        $.post('/files/get_last_body', 'path=' + fileName+'&line='+file_line, function(rdata) {
             layer.close(loadT2);
             if (!rdata.status){
                 layer.msg(rdata.msg,{icon:0,time:2000,shade: [0.3, '#000']});
                 return;
             }
             
-            if(rdata.data.data == '') rdata.data.data = '当前没有日志!';
-            var ebody = '<div class="soft-man-con"><textarea readonly="" style="margin: 0px;width: 500px;height: 520px;background-color: #333;color:#fff; padding:0 5px" id="error_log">'+rdata.data.data+'</textarea></div>';
+            if(rdata.data == '') {
+            	rdata.data = '当前没有日志!';
+            }
+            var ebody = '<div class="soft-man-con">\
+            	<textarea readonly="" style="margin: 0px;width: 100%;height: 520px;background-color: #333;color:#fff; padding:0 5px" id="info_log">'+rdata.data+'</textarea>\
+            	</div>';
             $(".soft-man-con").html(ebody);
-            var ob = document.getElementById('error_log');
+            var ob = document.getElementById('info_log');
             ob.scrollTop = ob.scrollHeight; 
         },'json');
     },'json');
 }
+
+
+function pluginRollingLogs(_name, version, func, _args, line){
+	if ( typeof(version) == 'undefined' ){
+        version = '';
+    }
+
+    var func_name = 'error_log';
+    if ( typeof(func) != 'undefined' ){
+        func_name = func;
+    }
+
+    var file_line = 100;
+    if ( typeof(line) != 'undefined' ){
+        file_line = line;
+    }
+
+    var reqTimer = null;
+
+    layer.open({
+        type: 1,
+        title: _name + '日志',
+        area: '640px',
+        end: function(){
+        	// console.log('end!!!');
+        	if (reqTimer){
+        		clearInterval(reqTimer);
+        	}
+        },
+        content:'<div class="change-default pd20" id="plugins_rolling_logs">\
+        	<textarea readonly="readonly" style="margin: 0px;width: 100%;height: 360px;background-color: #333;color:#fff; padding:0 5px" id="roll_info_log"></textarea>\
+        	</div>'
+    });
+
+    $.post('/plugins/run', {name:_name, func:func_name, version:version,args:_args},function (data) {
+    	var fileName = data.data;
+    	reqTimer = setInterval(function(){
+    		$.post('/files/get_last_body', 'path=' + fileName+'&line='+file_line, function(rdata) {
+	            if (!rdata.status){   
+	                return;
+	            }
+	            
+	            if(rdata.data == '') {
+	            	rdata.data = '当前没有日志!';
+	            }
+	            var ebody = '<textarea readonly="" style="margin: 0px;width: 100%;height: 360px;background-color: #333;color:#fff; padding:0 5px" id="roll_info_log">'+rdata.data+'</textarea>';
+	            $("#plugins_rolling_logs").html(ebody);
+	            var ob = document.getElementById('roll_info_log');
+	            ob.scrollTop = ob.scrollHeight; 
+	        },'json');
+    	},1000);
+    },'json');
+}
 /*** 其中功能,针对插件通过库使用 end ***/
+
+
+$(function() {
+	aotuHeight();
+});
+$(window).resize(function() {
+	aotuHeight();
+});

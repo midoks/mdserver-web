@@ -7,7 +7,7 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
-install_tmp=${rootPath}/tmp/bt_install.pl
+install_tmp=${rootPath}/tmp/mw_install.pl
 
 
 GOGS_DOWNLOAD='https://dl.gogs.io'
@@ -49,12 +49,21 @@ Install_gogs()
 	mv $serverPath/source/gogs/gogs_${version}/gogs/ $serverPath/gogs
 	echo $version > $serverPath/gogs/version.pl
 
-	echo '安装完成' > $install_tmp
+	# if id -u gogs > /dev/null 2>&1; then
+ #        echo "gogs user exists"
+	# else
+	# 	useradd gogs
+	# 	cp /etc/sudoers{,.`date +"%Y-%m-%d_%H-%M-%S"`}
+	# 	echo "gogs ALL=(ALL)    NOPASSWD: ALL" >> /etc/sudoers
+	# fi
+
+	echo 'install success' > $install_tmp
 }
 
 Uninstall_gogs()
 {
 	rm -rf $serverPath/gogs
+	echo 'uninstall success' > $install_tmp
 }
 
 

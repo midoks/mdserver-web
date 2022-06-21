@@ -1,6 +1,6 @@
 {
 	"id":3,
-	"title":"宝塔SSH终端",
+	"title":"SSH终端",
 	"tip":"lib",
 	"name":"webssh",
 	"type":"扩展",
@@ -8,6 +8,7 @@
 	"versions":"1.0",
 	"shell":"install.sh",
 	"checks":"server/webssh",
+	"path": "server/webssh",
 	"author":"midoks",
 	"home":"",
 	"date":"2018-12-20",
