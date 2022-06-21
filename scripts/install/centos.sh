@@ -102,6 +102,8 @@ pip3 install python-socketio==4.2.0
 pip3 install psutil==5.9.1 
 pip3 install pymongo
 
+cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
+
 if [ ! -f /www/server/mdserver-web/bin/activate ];then
     cd /www/server/mdserver-web && python3 -m venv .
 fi
@@ -117,8 +119,6 @@ if [ -f /www/server/mdserver-web/bin/activate ];then
 	pip3 install python-socketio==4.2.0
 	pip3 install psutil==5.9.1 
 	pip3 install pymongo
-else
-    cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
 fi
 
 echo  "end install python lib"
