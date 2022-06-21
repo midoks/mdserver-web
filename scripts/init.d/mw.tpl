@@ -185,6 +185,9 @@ case "$1" in
         if [ -f $mw_path/data/admin_path.pl ];then
             auth_path=$(cat $mw_path/data/admin_path.pl)
         fi
+	if [ "$address" = "" ];then
+            address=$(curl -sS --connect-timeout 10 -m 60 https://v6r.ipip.net/?format=text)
+        fi
 
         echo -e "=================================================================="
         echo -e "\033[32mMW-Panel default info!\033[0m"
