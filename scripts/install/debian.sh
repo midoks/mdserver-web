@@ -4,12 +4,6 @@ export PATH
 LANG=en_US.UTF-8
 
 
-mkdir -p /www/server
-mkdir -p /www/wwwroot
-mkdir -p /www/wwwlogs
-mkdir -p /www/backup/database
-mkdir -p /www/backup/site
-
 apt update -y
 
 
@@ -31,7 +25,7 @@ if [ -f /usr/sbin/ufw ];then
 	ufw allow 888/tcp
 	ufw allow 7200/tcp
 	ufw allow 3306/tcp
-	ufw allow 30000:40000/tcp
+	# ufw allow 30000:40000/tcp
 
 fi
 
@@ -53,7 +47,7 @@ if [ ! -f /usr/sbin/ufw ];then
 	firewall-cmd --permanent --zone=public --add-port=888/tcp
 	firewall-cmd --permanent --zone=public --add-port=7200/tcp
 	firewall-cmd --permanent --zone=public --add-port=3306/tcp
-	firewall-cmd --permanent --zone=public --add-port=30000-40000/tcp
+	# firewall-cmd --permanent --zone=public --add-port=30000-40000/tcp
 
 	# fix:debian10 firewalld faq
 	# https://kawsing.gitbook.io/opensystem/andoid-shou-ji/untitled/fang-huo-qiang#debian-10-firewalld-0.6.3-error-commandfailed-usrsbinip6tablesrestorewn-failed-ip6tablesrestore-v1.8
@@ -64,15 +58,6 @@ fi
 
 #安装时不开启
 systemctl stop firewalld
-
-
-if [ ! -d /www/server/mdserver-web ];then
-	wget -O /tmp/master.zip https://codeload.github.com/midoks/mdserver-web/zip/master
-	cd /tmp && unzip /tmp/master.zip
-	mv /tmp/mdserver-web-master /www/server/mdserver-web
-	rm -rf /tmp/master.zip
-	rm -rf /tmp/mdserver-web-master
-fi 
 
 
 cd /www/server/mdserver-web/scripts && bash lib.sh

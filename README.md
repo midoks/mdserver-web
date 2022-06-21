@@ -52,17 +52,50 @@ systemd 支持 CentOS,Ubuntu,Debian,Fedora...
 - Ftp debian无法安装成功。
 - php52,在debian无法安装成功。
 
-### 自动安装
+
+### GW使用
+
+- 自动安装
 
 ```
 curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/install.sh | bash
 ```
 
-### 脚本更新
+- 脚本更新
 
 ```
 curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/update.sh | bash
 ```
+
+### GN使用
+
+- 自动安装
+
+```
+curl -fsSL  https://gitee.com/midoks/mdserver-web/raw/master/scripts/install_cn.sh | bash
+```
+
+- 脚本更新
+
+```
+curl -fsSL  https://gitee.com/midoks/mdserver-web/raw/master/scripts/update_cn.sh | bash
+```
+
+
+### DEV使用
+
+- 自动安装
+
+```
+curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/install_dev.sh | bash
+```
+
+- 脚本更新
+
+```
+curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update_dev.sh | bash
+```
+
 
 ### 无图不真相
 
@@ -82,7 +115,7 @@ curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts
 
 
 
-## Stargazers over time
+### Stargazers over time
 
 [![Stargazers over time](https://starchart.cc/midoks/mdserver-web.svg)](https://starchart.cc/midoks/mdserver-web)
 
@@ -93,7 +126,7 @@ curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts
 
 [digitalvirt](https://digitalvirt.com/)
 
-## 授权许可
+### 授权许可
 
 本项目采用 Apache 开源授权许可证，完整的授权说明已放置在 [LICENSE](https://github.com/midoks/mdserver-web/blob/master/LICENSE) 文件中。
 

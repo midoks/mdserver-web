@@ -44,15 +44,15 @@ else
 	OSNAME='unknow'
 fi
 
-wget -O /tmp/master.zip https://codeload.github.com/midoks/mdserver-web/zip/master
-cd /tmp && unzip /tmp/master.zip
-/usr/bin/cp -rf  /tmp/mdserver-web-master/* /www/server/mdserver-web
-rm -rf /tmp/master.zip
-rm -rf /tmp/mdserver-web-master
+wget -O /tmp/dev.zip https://github.com/midoks/mdserver-web/archive/refs/heads/dev.zip
+cd /tmp && unzip /tmp/dev.zip
+mv /tmp/mdserver-web-dev /www/server/mdserver-web
+rm -rf /tmp/dev.zip
+rm -rf /tmp/mdserver-web-dev
 
 #pip uninstall public
 echo "use system version: ${OSNAME}"
-curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/update/${OSNAME}.sh | bash
+curl -fsSL  https://gitee.com/midoks/mdserver-web/raw/master/scripts/update/${OSNAME}.sh | bash
 
 endTime=`date +%s`
 ((outTime=($endTime-$startTime)/60))

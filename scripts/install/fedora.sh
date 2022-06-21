@@ -3,12 +3,6 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 LANG=en_US.UTF-8
 
-mkdir -p /www/server
-mkdir -p /www/wwwroot
-mkdir -p /www/wwwlogs
-mkdir -p /www/backup/database
-mkdir -p /www/backup/site
-
 
 if [ ! -f /usr/bin/applydeltarpm ];then
 	yum -y provides '*/applydeltarpm'
@@ -36,7 +30,7 @@ if [ -f /etc/init.d/iptables ];then
 	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 888 -j ACCEPT
 	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 7200 -j ACCEPT
 	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 3306 -j ACCEPT
-	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 30000:40000 -j ACCEPT
+	# iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 30000:40000 -j ACCEPT
 	service iptables save
 
 	iptables_status=`service iptables status | grep 'not running'`
@@ -62,7 +56,7 @@ if [ "${isVersion}" == '' ];then
 		firewall-cmd --permanent --zone=public --add-port=888/tcp
 		firewall-cmd --permanent --zone=public --add-port=7200/tcp
 		firewall-cmd --permanent --zone=public --add-port=3306/tcp
-		firewall-cmd --permanent --zone=public --add-port=30000-40000/tcp
+		# firewall-cmd --permanent --zone=public --add-port=30000-40000/tcp
 		firewall-cmd --reload
 	fi
 fi
@@ -82,15 +76,7 @@ yum -y install ncurses-devel mysql-devel cmake
 yum -y install python-devel
 yum -y install MySQL-python 
 yum -y install epel-release
-yum -y install python36-devel
-
-if [ ! -d /www/server/mdserver-web ];then
-	wget -O /tmp/master.zip https://codeload.github.com/midoks/mdserver-web/zip/master
-	cd /tmp && unzip /tmp/master.zip
-	mv /tmp/mdserver-web-master /www/server/mdserver-web
-	rm -rf /tmp/master.zip
-	rm -rf /tmp/mdserver-web-master
-fi 
+yum -y install python3-devel
 
 
 
