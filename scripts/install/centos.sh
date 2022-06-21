@@ -119,7 +119,6 @@ if [ -f /www/server/mdserver-web/bin/activate ];then
 	pip3 install pymongo
 else
     cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
-    
 fi
 
 echo  "end install python lib"
