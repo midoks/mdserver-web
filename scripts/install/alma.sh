@@ -71,6 +71,14 @@ systemctl stop firewalld
 yum groupinstall -y "Development Tools"
 yum install -y epel-release
 
+yum install -y oniguruma oniguruma-devel
+#use dnf
+if [ "$?" != "0" ];then
+	yum install -y dnf dnf-plugins-core
+	dnf config-manager --set-enabled powertools
+	yum install -y oniguruma oniguruma-devel
+fi
+
 yum install -y libevent libevent-devel libjpeg* libpng* gd* libxslt* unzip libmcrypt libmcrypt-devel
 yum install -y wget python-imaging libicu-devel zip bzip2-devel gcc libxml2 libxml2-dev  libjpeg-devel libpng-devel libwebp libwebp-devel pcre pcre-devel
 yum install -y lsof net-tools
