@@ -244,17 +244,19 @@ echo -e "Install_Curl" >> ${libPath}/lib.pl
 }
 
 
-_os=`uname`
 
 if grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
     sudo ln -sf /bin/bash /bin/sh
     #sudo dpkg-reconfigure dash
 fi
 
+_os=`uname`
 if [ ${_os} == "Darwin" ]; then
     OSNAME='macos'
 elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
     OSNAME='centos'
+elif grep -Eqi "Rocky" /etc/issue || grep -Eq "Rocky" /etc/*-release; then
+    OSNAME='rocky'
 elif grep -Eqi "Red Hat Enterprise Linux Server" /etc/issue || grep -Eq "Red Hat Enterprise Linux Server" /etc/*-release; then
     OSNAME='rhel'
 elif grep -Eqi "Aliyun" /etc/issue || grep -Eq "Aliyun" /etc/*-release; then
@@ -292,7 +294,7 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     apt install -y libffi-dev
     apt install -y cmake automake make
 
-    apt install -y php-common webp scons
+    apt install -y webp scons
     apt install -y lzma lzma-dev libunwind-dev
 
     apt install -y libpcre3 libpcre3-dev 
@@ -328,19 +330,17 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
 else
 
     yum install -y openldap openldap-devel libtirpc libtirpc-devel rpcgen
-
     yum install -y bison re2c cmake
 
     yum install -y libmemcached libmemcached-devel
     yum install -y curl-devel
     yum install -y zlib zlib-devel
+    yum install -y libzip libzip-devel
     yum install -y pcre pcre-devel
     yum install -y icu libicu-devel autoconf
     yum install -y freetype freetype-devel
     yum install -y openssl openssl-devel
-    yum install -y libzip libzip-devel
     yum install -y graphviz libxml2 libxml2-devel
-
     yum install -y sqlite-devel
     yum install -y oniguruma oniguruma-devel
     yum install -y ImageMagick ImageMagick-devel
