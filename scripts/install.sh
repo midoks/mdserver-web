@@ -74,6 +74,7 @@ fi
 echo "use system version: ${OSNAME}"
 curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/install/${OSNAME}.sh | bash
 
+ln -s /www/server/mdserver-web/mds-cli /usr/bin/mds-cli
 
 endTime=`date +%s`
 ((outTime=(${endTime}-${startTime})/60))
