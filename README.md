@@ -96,6 +96,8 @@ curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/in
 curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update_dev.sh | bash
 ```
 
+### 微信赞助
+- [![截图](/route/static/wx_zz.jpg)](/route/static/wx_zz.jpg)
 
 ### 无图不真相
 
