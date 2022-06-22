@@ -78,6 +78,7 @@ Install_TmpFile=/tmp/debian-fix-zlib1g-dev.txt
 apt install -y zlib1g-dev > ${Install_TmpFile}
 if [ "$?" != "0" ];then
 	ZLIB1G_BASE_VER=$(cat ${Install_TmpFile} | grep zlib1g | awk -F "=" '{print $2}' | awk -F ")" '{print $1}')
+	ZLIB1G_BASE_VER=`echo ${ZLIB1G_BASE_VER} | sed "s/^[ \s]\{1,\}//g;s/[ \s]\{1,\}$//g"`
 	echo "1${ZLIB1G_BASE_VER}1"
 # apt install zlib1g=1:1.2.11.dfsg-2  zlib1g-dev
 fi
