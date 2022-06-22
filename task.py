@@ -75,7 +75,6 @@ def execShell(cmdstring, cwd=None, timeout=None, shell=True):
         import shlex
         import datetime
         import subprocess
-        import time
 
         if timeout:
             end_time = datetime.datetime.now() + datetime.timedelta(seconds=timeout)
@@ -226,7 +225,6 @@ def systemTask():
     try:
         import system_api
         import psutil
-        import time
         sm = system_api.system_api()
         filename = 'data/control.conf'
 
@@ -368,7 +366,7 @@ def systemTask():
         mw.writeFile('logs/sys_interrupt.pl', str(ex))
 
         restartMw()
-        import time
+
         time.sleep(30)
         systemTask()
 
@@ -483,8 +481,35 @@ def checkPHPVersion(version):
 
 # --------------------------------------PHP监控 end--------------------------------------------- #
 
+
+# --------------------------------------OpenResty Auto Restart Start --------------------------------------------- #
+# 解决acme.sh续签后,未起效。
+def openrestyAutoRestart():
+    try:
+        while True:
+            # 检查是否安装
+            odir = mw.getServerDir() + '/openresty'
+            if os.path.exists(odir):
+                continue
+
+            # systemd
+            systemd = '/lib/systemd/system/openresty.service'
+            initd = '/etc/init.d/openresty'
+            if os.path.exists(systemd):
+                execShell('systemctl reload openresty')
+            elif os.path.exists(initd):
+                os.system(initd + ' reload')
+        time.sleep(86400)
+    except Exception as e:
+        print(str(e))
+        time.sleep(86400)
+
+# --------------------------------------OpenResty Auto Restart End   --------------------------------------------- #
+
+
 if __name__ == "__main__":
 
+    # 系统监控
     t = threading.Thread(target=systemTask)
     if sys.version_info.major == 3 and sys.version_info.minor >= 10:
         t.daemon = True
@@ -492,12 +517,20 @@ if __name__ == "__main__":
         t.setDaemon(True)
     t.start()
 
+    # PHP 502错误检查线程
     p = threading.Thread(target=check502Task)
     if sys.version_info.major == 3 and sys.version_info.minor >= 10:
         p.daemon = True
     else:
         p.setDaemon(True)
-
     p.start()
+
+    # OpenResty Auto Restart Start
+    oar = threading.Thread(target=openrestyAutoRestart)
+    if sys.version_info.major == 3 and sys.version_info.minor >= 10:
+        oar.daemon = True
+    else:
+        oar.setDaemon(True)
+    oar.start()
 
     startTask()
