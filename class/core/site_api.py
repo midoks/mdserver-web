@@ -599,7 +599,11 @@ class site_api:
         if not os.path.exists(acem):
             return mw.returnJson(False, '尝试自动安装ACME失败,请通过以下命令尝试手动安装<p>安装命令: curl https://get.acme.sh | sh</p>' + acem)
 
-        force_bool = False
+        # 避免频繁执行
+        checkAcmeRun = mw.execShell('ps -ef|grep acme.sh |grep -v grep')
+        if checkAcmeRun[0] != '':
+            return mw.returnJson(False, '正在申请或更新SSL中...')
+
         if force == 'true':
             force_bool = True
 
@@ -973,7 +977,7 @@ class site_api:
                 "-START(.|\n)+BINDING-" + domain + "-END"
             tmp = re.search(rep, conf).group()
             dirConf = tmp.replace('rewrite/' + site['name'] + '.conf;', 'rewrite/' + site[
-                                  'name'] + '_' + find['path'] + '.conf;')
+                'name'] + '_' + find['path'] + '.conf;')
             conf = conf.replace(tmp, dirConf)
             mw.writeFile(file, conf)
         data = {}
