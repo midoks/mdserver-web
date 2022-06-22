@@ -69,7 +69,7 @@ systemctl stop firewalld
 
 
 #fix zlib1g-dev fail
-echo -e "\e[0;32mfix zlib1g-dev install question\e[0m"
+echo -e "\e[0;32mfix zlib1g-dev install question start\e[0m"
 Install_TmpFile=/tmp/debian-fix-zlib1g-dev.txt
 apt install -y zlib1g-dev > ${Install_TmpFile}
 if [ "$?" != "0" ];then
@@ -79,7 +79,7 @@ if [ "$?" != "0" ];then
 	apt install -y zlib1g=${ZLIB1G_BASE_VER}  zlib1g-dev
 fi
 rm -rf ${Install_TmpFile}
-echo -e "\e[0;32mfix zlib1g-dev install question\e[0m"
+echo -e "\e[0;32mfix zlib1g-dev install question end\e[0m"
 
 
 cd /www/server/mdserver-web/scripts && bash lib.sh
