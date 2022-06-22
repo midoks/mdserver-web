@@ -81,7 +81,7 @@ if [ "$?" != "0" ];then
 	echo "1${ZLIB1G_BASE_VER}1"
 # apt install zlib1g=1:1.2.11.dfsg-2  zlib1g-dev
 fi
-echo "\e[0;32mfix zlib1g-dev install question\e[0m"
+echo -e "\e[0;32mfix zlib1g-dev install question\e[0m"
 
 
 
