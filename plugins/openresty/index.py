@@ -294,7 +294,7 @@ def runInfo():
         data['Writing'] = tmp[13]
         data['Waiting'] = tmp[15]
         return mw.getJson(data)
-    else
+    else:
         return 'oprenresty not started'
 
 
