@@ -531,6 +531,7 @@ def checkFpmStatusFile(version):
         content = contentReplace(content, version)
         mw.writeFile(dfile, content)
         mw.restartWeb()
+    return True
 
 
 def getFpmStatus(version):
