@@ -390,16 +390,16 @@ def check502():
     try:
         verlist = ['52', '53', '54', '55', '56', '70',
                    '71', '72', '73', '74', '80', '81']
-        for version in verlist:
+        for ver in verlist:
             sdir = mw.getServerDir()
-            php_path = sdir + '/php/' + version + '/sbin/php-fpm'
+            php_path = sdir + '/php/' + ver + '/sbin/php-fpm'
             if not os.path.exists(php_path):
                 continue
-            if checkPHPVersion(version):
+            if checkPHPVersion(ver):
                 continue
-            if startPHPVersion(version):
-                print('检测到PHP-' + version + '处理异常,已自动修复!')
-                mw.writeLog('PHP守护程序', '检测到PHP-' + version + '处理异常,已自动修复!')
+            if startPHPVersion(ver):
+                print('检测到PHP-' + ver + '处理异常,已自动修复!')
+                mw.writeLog('PHP守护程序', '检测到PHP-' + ver + '处理异常,已自动修复!')
     except Exception as e:
         print(str(e))
 
