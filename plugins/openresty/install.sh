@@ -30,8 +30,6 @@ Install_openresty()
 	mkdir -p ${openrestyDir}
 	echo '正在安装脚本文件...' > $install_tmp
 
-	cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash zlib.sh
-
 	if [ ! -f ${openrestyDir}/openresty-${VERSION}.tar.gz ];then
 		wget -O ${openrestyDir}/openresty-${VERSION}.tar.gz https://openresty.org/download/openresty-${VERSION}.tar.gz
 	fi
@@ -40,19 +38,19 @@ Install_openresty()
 	cd ${openrestyDir} && tar -zxvf openresty-${VERSION}.tar.gz
 
 	# --with-openssl=$serverPath/source/lib/openssl-1.0.2q
-	cd ${openrestyDir}/openresty-${VERSION} && ./configure --prefix=$serverPath/openresty \
+	cd ${openrestyDir}/openresty-${VERSION} && ./configure \
+	--prefix=$serverPath/openresty \
 	--with-http_v2_module \
 	--with-http_ssl_module  \
 	--with-http_slice_module \
-	--with-http_stub_status_module \
-	--with-zlib=$serverPath/lib/zlib
+	--with-http_stub_status_module
 
-	make && make install && make clean
-	echo "${VERSION}" > $serverPath/openresty/version.pl
+	gmake && gmake install && make clean
 
-	if [ -d $serverPath/openresty/nginx/conf ];then
+	if [ -d $serverPath/openresty ];then
+		echo "${VERSION}" > $serverPath/openresty/version.pl
 		echo "" > $serverPath/openresty/nginx/conf/enable-php-00.conf
-	fi
+    fi
 	echo '安装完成' > $install_tmp
 }
 

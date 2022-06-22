@@ -3,6 +3,14 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 LANG=en_US.UTF-8
 
+# RED='\e[1;31m'    # 红色
+# GREEN='\e[1;32m'  # 绿色
+# YELLOW='\e[1;33m' # 黄色
+# BLUE='\e[1;34m'   # 蓝色
+# PURPLE='\e[1;35m' # 紫色
+# CYAN='\e[1;36m'   # 蓝绿色
+# WHITE='\e[1;37m'  # 白色
+# NC='\e[0m' # 没有颜色
 
 apt update -y
 
@@ -62,6 +70,20 @@ systemctl stop firewalld
 
 cd /www/server/mdserver-web/scripts && bash lib.sh
 chmod 755 /www/server/mdserver-web/data
+
+
+#fix zlib1g-dev fail
+echo -e "\e[0;32mfix zlib1g-dev install question\e[0m"
+Install_TmpFile=/tmp/debian-fix-zlib1g-dev.txt
+apt install -y zlib1g-dev > ${Install_TmpFile}
+if [ "$?" != "0" ];then
+	ZLIB1G_BASE_VER=$(cat ${Install_TmpFile} | grep zlib1g | awk -F "=" '{print $2}' | awk -F ")" '{print $1}')
+	echo "1${ZLIB1G_BASE_VER}1"
+# apt install zlib1g=1:1.2.11.dfsg-2  zlib1g-dev
+fi
+echo "\e[0;32mfix zlib1g-dev install question\e[0m"
+
+
 
 if [ ! -f /usr/local/bin/pip3 ];then
     python3 -m pip install --upgrade pip setuptools wheel -i https://mirrors.aliyun.com/pypi/simple
