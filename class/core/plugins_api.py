@@ -48,6 +48,13 @@ class plugins_api:
     def listApi(self):
         sType = request.args.get('type', '0')
         sPage = request.args.get('p', '1')
+
+        if not mw.isNumber(sPage):
+            sPage = 1
+
+        if not mw.isNumber(sType):
+            sType = 0
+
         # print sPage
         data = self.getPluginList(sType, int(sPage))
         return mw.getJson(data)
