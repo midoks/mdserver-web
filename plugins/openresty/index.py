@@ -139,7 +139,7 @@ def confReplace():
 
     # 静态配置
     static_conf = getServerDir() + '/nginx/conf/enable-php-00.conf'
-    if os.path.exists(static_conf):
+    if not os.path.exists(static_conf):
         mw.writeFile(static_conf, '')
 
     # give nginx root permission
