@@ -542,9 +542,7 @@ def getFpmStatus(version):
         url = 'http://127.0.0.1/phpfpm_status_' + version + '?json'
         result = mw.httpGet(url)
     else:
-        tmp = {}
-        tmp['start time'] = time.strftime('%Y-%m-%d %H:%M:%S', fTime)
-        return mw.getJson(tmp)
+        return mw.getJson({})
 
     tmp = json.loads(result)
     fTime = time.localtime(int(tmp['start time']))
