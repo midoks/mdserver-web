@@ -265,9 +265,7 @@ def initdUinstall():
 
 
 def runInfo():
-
     # 取Openresty负载状态
-
     try:
         url = 'http://' + mw.getHostAddr() + '/nginx_status'
         result = mw.httpGet(url)
@@ -294,7 +292,7 @@ def runInfo():
         data['Writing'] = tmp[13]
         data['Waiting'] = tmp[15]
         return mw.getJson(data)
-    else:
+    except Exception as e:
         return 'oprenresty not started'
 
 

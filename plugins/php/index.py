@@ -549,7 +549,7 @@ def getFpmStatus(version):
         data = json.loads(result)
         fTime = time.localtime(int(data['start time']))
         data['start time'] = time.strftime('%Y-%m-%d %H:%M:%S', fTime)
-    else:
+    except Exception as e:
         data = {}
 
     return mw.getJson(data)
