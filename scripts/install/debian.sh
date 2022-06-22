@@ -84,6 +84,20 @@ rm -rf ${Install_TmpFile}
 echo -e "\e[0;32mfix zlib1g-dev install question end\e[0m"
 
 
+#fix libunwind-dev fail
+echo -e "\e[0;32mfix libunwind-dev install question start\e[0m"
+Install_TmpFile=/tmp/debian-fix-libunwind-dev.txt
+apt install -y zlib1g-dev > ${Install_TmpFile}
+if [ "$?" != "0" ];then
+	liblzma5_BASE_VER=$(cat ${Install_TmpFile} | grep liblzma-dev | awk -F "=" '{print $2}' | awk -F ")" '{print $1}')
+	liblzma5_BASE_VER=`echo ${liblzma5_BASE_VER} | sed "s/^[ \s]\{1,\}//g;s/[ \s]\{1,\}$//g"`
+	echo -e "\e[1;31mapt install liblzma5=${liblzma5_BASE_VER} libunwind-dev\e[0m"
+	echo "Y" | apt install liblzma5=${liblzma5_BASE_VER} libunwind-dev
+fi
+rm -rf ${Install_TmpFile}
+echo -e "\e[0;32mfix libunwind-dev install question end\e[0m"
+
+
 cd /www/server/mdserver-web/scripts && bash lib.sh
 chmod 755 /www/server/mdserver-web/data
 
@@ -103,7 +117,6 @@ pip3 install gevent==21.1.2
 pip3 install gevent-websocket==0.10.1
 pip3 install requests==2.20.0
 pip3 install flask-caching==1.10.1
-pip3 install mysqlclient==2.0.3
 pip3 install pymongo
 pip3 install psutil
 pip3 install flask-socketio==5.2.0
@@ -118,7 +131,6 @@ if [ ! -f /www/server/mdserver-web/bin/activate ];then
 	pip3 install gevent-websocket==0.10.1
 	pip3 install requests==2.20.0
 	pip3 install flask-caching==1.10.1
-	pip3 install mysqlclient==2.0.3
 	pip3 install pymongo
 	pip3 install psutil
 	pip3 install flask-socketio==5.2.0
