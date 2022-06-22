@@ -131,11 +131,16 @@ def confReplace():
     content = content.replace('{$OS_USER}', user)
     content = content.replace('{$OS_USER_GROUP}', user_group)
 
+    # 主配置文件
     nconf = getServerDir() + '/nginx/conf/nginx.conf'
-
     __content = mw.readFile(nconf)
     if __content.find('#user'):
-        mw.writeFile(getServerDir() + '/nginx/conf/nginx.conf', content)
+        mw.writeFile(nconf, content)
+
+    # 静态配置
+    static_conf = getServerDir() + '/nginx/conf/enable-php-00.conf'
+    if os.path.exists(static_conf):
+        mw.writeFile(static_conf, '')
 
     # give nginx root permission
     ng_exe_bin = getServerDir() + "/nginx/sbin/nginx"
