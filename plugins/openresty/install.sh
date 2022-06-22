@@ -46,10 +46,13 @@ Install_openresty()
 	--with-http_slice_module \
 	--with-http_stub_status_module \
 	--with-zlib=$serverPath/lib/zlib
-	
+
 	make && make install && make clean
 	echo "${VERSION}" > $serverPath/openresty/version.pl
-	echo "" > $serverPath/openresty/nginx/conf/enable-php-00.conf
+
+	if [ -d $serverPath/openresty/nginx/conf ];then
+		echo "" > $serverPath/openresty/nginx/conf/enable-php-00.conf
+	fi
 	echo '安装完成' > $install_tmp
 }
 
