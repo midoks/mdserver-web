@@ -295,7 +295,8 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     apt install -y cmake automake make
 
     apt install -y webp scons
-    apt install -y lzma lzma-dev libunwind-dev
+    apt install -y lzma lzma-dev
+    apt install -y libunwind-dev
 
     apt install -y libpcre3 libpcre3-dev 
     apt install -y openssl
