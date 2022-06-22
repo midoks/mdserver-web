@@ -452,8 +452,8 @@ def checkPHPVersion(version):
     try:
         url = 'http://127.0.0.1/phpfpm_status_' + version
         result = mw.httpGet(url)
-        # print version,result
-        # 检查nginx
+        # print(version,result)
+        # 检查openresty
         if result.find('Bad Gateway') != -1:
             return False
         if result.find('HTTP Error 404: Not Found') != -1:
@@ -466,9 +466,16 @@ def checkPHPVersion(version):
                 isStatus = mw.readFile(isTask)
                 if isStatus == 'True':
                     return True
-            filename = '/etc/init.d/openresty'
-            if os.path.exists(filename):
-                os.system(filename + ' start')
+
+            # systemd
+            systemd = '/lib/systemd/system/openresty.service'
+            if os.path.exists(systemd):
+                execShell('systemctl reload openresty')
+                return True
+            # initd
+            initd = '/etc/init.d/openresty'
+            if os.path.exists(initd):
+                os.system(initd + ' reload')
         return True
     except:
         return True
