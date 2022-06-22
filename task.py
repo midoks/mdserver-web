@@ -388,7 +388,8 @@ def check502Task():
 
 def check502():
     try:
-        phpversions = ['53', '54', '55', '56', '70', '71', '72', '73', '74']
+        phpversions = ['52', '53', '54', '55', '56', '70',
+                       '71', '72', '73', '74', '80', '81']
         for version in phpversions:
             sdir = mw.getServerDir()
             php_path = sdir + '/php/' + version + '/sbin/php-fpm'
