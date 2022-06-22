@@ -489,7 +489,8 @@ def openrestyAutoRestart():
         while True:
             # 检查是否安装
             odir = mw.getServerDir() + '/openresty'
-            if os.path.exists(odir):
+            if not os.path.exists(odir):
+                time.sleep(86400)
                 continue
 
             # systemd
@@ -499,7 +500,7 @@ def openrestyAutoRestart():
                 execShell('systemctl reload openresty')
             elif os.path.exists(initd):
                 os.system(initd + ' reload')
-        time.sleep(86400)
+            time.sleep(86400)
     except Exception as e:
         print(str(e))
         time.sleep(86400)
