@@ -24,4 +24,3 @@ pillow
 Jinja2>=2.11.2
 flask-caching>=1.10.1
 mysql-connector-python
-mysqlclient>=2.0.3
