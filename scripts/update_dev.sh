@@ -46,7 +46,7 @@ fi
 
 wget -O /tmp/dev.zip https://github.com/midoks/mdserver-web/archive/refs/heads/dev.zip
 cd /tmp && unzip /tmp/dev.zip
-mv /tmp/mdserver-web-dev /www/server/mdserver-web
+cp -rf /tmp/mdserver-web-dev/* /www/server/mdserver-web
 rm -rf /tmp/dev.zip
 rm -rf /tmp/mdserver-web-dev
 
