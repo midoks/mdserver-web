@@ -66,6 +66,7 @@ systemctl stop firewalld
 
 
 yum groupinstall -y "Development Tools"
+yum -y install epel-release
 
 yum install -y libevent libevent-devel libxslt* libjpeg* libpng* gd* zip libmcrypt libmcrypt-devel
 yum install -y gcc libffi-devel python-devel openssl-devel 
@@ -74,38 +75,29 @@ yum -y install wget python-devel python-imaging libicu-devel unzip bzip2-devel g
 yum -y install net-tools
 yum -y install ncurses-devel mysql-devel cmake
 yum -y install python-devel
-yum -y install MySQL-python 
-yum -y install epel-release
+yum -y install MySQL-python
 yum -y install python3-devel
 
 
-
-#if [ ! -f '/usr/bin/pip' ];then
-#	wget https://bootstrap.pypa.io/pip/2.7/get-pip.py
-#	python get-pip.py
-#	pip install --upgrade pip
-#	pip install pillow==6.2.2
-#fi 
-
+cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
+cd /www/server/mdserver-web/scripts && bash lib.sh
+chmod 755 /www/server/mdserver-web/data
 
 if [ ! -f /usr/local/bin/pip3 ];then
     python3 -m pip install --upgrade pip setuptools wheel -i https://mirrors.aliyun.com/pypi/simple
 fi
 
-
-cd /www/server/mdserver-web/scripts && bash lib.sh
-chmod 755 /www/server/mdserver-web/data
+pip install --upgrade pip
+cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
 
 if [ ! -f /www/server/mdserver-web/bin/activate ];then
     cd /www/server/mdserver-web && python3 -m venv .
+    cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate
+    pip install --upgrade pip
+    pip3 install -r /www/server/mdserver-web/requirements.txt
 fi
+    
 
-
-if [ -f /www/server/mdserver-web/bin/activate ];then
-    cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate && pip3 install -r /www/server/mdserver-web/requirements.txt
-else
-    cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
-fi
 cd /www/server/mdserver-web && ./cli.sh start
 sleep 5
 

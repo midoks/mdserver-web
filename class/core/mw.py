@@ -111,9 +111,22 @@ def isInstalledWeb():
 
 
 def restartWeb():
-    if isInstalledWeb():
-        initd = getServerDir() + '/openresty/init.d/openresty'
+    if not isInstalledWeb():
+        return False
+
+    # systemd
+    systemd = '/lib/systemd/system/openresty.service'
+    if os.path.exists(systemd):
+        execShell('systemctl restart openresty')
+        return True
+
+    # initd
+    initd = getServerDir() + '/openresty/init.d/openresty'
+    if os.path.exists(initd):
         execShell(initd + ' ' + 'restart')
+        return True
+
+    return False
 
 
 def restartMw():

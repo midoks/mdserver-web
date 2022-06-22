@@ -1,7 +1,7 @@
 #!/bin/bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
-LANG=en_US.UTF-8
+# LANG=en_US.UTF-8
 is64bit=`getconf LONG_BIT`
 
 startTime=`date +%s`
@@ -46,7 +46,7 @@ fi
 
 wget -O /tmp/master.zip https://gitee.com/midoks/mdserver-web/repository/archive/master.zip
 cd /tmp && unzip /tmp/master.zip
-mv /tmp/mdserver-web-master /www/server/mdserver-web
+cp -rf /tmp/mdserver-web-master/* /www/server/mdserver-web
 rm -rf /tmp/master.zip
 rm -rf /tmp/mdserver-web-master
 
