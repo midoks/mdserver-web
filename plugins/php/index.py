@@ -538,15 +538,18 @@ def getFpmStatus(version):
     try:
         url = 'http://' + mw.getHostAddr() + '/phpfpm_status_' + version + '?json'
         result = mw.httpGet(url)
+        tmp = json.loads(result)
+        fTime = time.localtime(int(tmp['start time']))
+        tmp['start time'] = time.strftime('%Y-%m-%d %H:%M:%S', fTime)
     except Exception as e:
         url = 'http://127.0.0.1/phpfpm_status_' + version + '?json'
         result = mw.httpGet(url)
+        tmp = json.loads(result)
+        fTime = time.localtime(int(tmp['start time']))
+        tmp['start time'] = time.strftime('%Y-%m-%d %H:%M:%S', fTime)
     else:
-        return mw.getJson({})
+        tmp = {}
 
-    tmp = json.loads(result)
-    fTime = time.localtime(int(tmp['start time']))
-    tmp['start time'] = time.strftime('%Y-%m-%d %H:%M:%S', fTime)
     return mw.getJson(tmp)
 
 
