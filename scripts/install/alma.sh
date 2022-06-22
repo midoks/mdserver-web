@@ -5,19 +5,13 @@ LANG=C.UTF-8
 
 
 
-if [ ! -f /usr/bin/applydeltarpm ];then
-	yum -y provides '*/applydeltarpm'
-	yum -y install deltarpm
-fi
-
-
 setenforce 0
 sed -i 's#SELINUX=enforcing#SELINUX=disabled#g' /etc/selinux/config
 
-yum install -y wget lsof crontabs
-yum install -y python3-devel
-yum install -y python-devel
-yum install -y vixie-cron
+dnf install -y wget lsof
+dnf install -y python3-devel
+dnf install -y python-devel
+dnf install -y crontabs
 
 #https need
 
@@ -68,29 +62,25 @@ fi
 #安装时不开启
 systemctl stop firewalld
 
-yum groupinstall -y "Development Tools"
+dnf upgrade -y
+dnf autoremove -y
 
-yum install -y libevent libevent-devel libjpeg* libpng* gd* libxslt* unzip libmcrypt libmcrypt-devel
-yum install -y wget python-imaging libicu-devel zip bzip2-devel gcc libxml2 libxml2-dev  libjpeg-devel libpng-devel libwebp libwebp-devel pcre pcre-devel
-yum install -y lsof net-tools
-yum install -y ncurses-devel mysql-devel cmake
-yum install -y MySQL-python 
-yum install -y epel-release
+dnf groupinstall -y "Development Tools"
+dnf install -y epel-release
 
-if [ ! -d /www/server/mdserver-web ];then
-	wget -O /tmp/master.zip https://codeload.github.com/midoks/mdserver-web/zip/master
-	cd /tmp && unzip /tmp/master.zip
-	mv /tmp/mdserver-web-master /www/server/mdserver-web
-	rm -rf /tmp/master.zip
-	rm -rf /tmp/mdserver-web-master
-fi
+dnf install -y oniguruma
+dnf --enablerepo=crb install oniguruma-devel
 
-#if [ ! -f '/usr/bin/pip' ];then
-#	wget https://bootstrap.pypa.io/pip/2.7/get-pip.py
-#	python get-pip.py
-#	pip install --upgrade pip
-#	pip install pillow==6.2.2
-#fi 
+dnf install -y libevent libevent-devel libjpeg* libpng* gd* libxslt* unzip libmcrypt libmcrypt-devel
+dnf install -y wget libicu-devel zip bzip2-devel gcc libxml2 libxml2-devel libjpeg-devel libpng-devel libwebp libwebp-devel pcre pcre-devel
+dnf install -y lsof net-tools
+dnf install -y ncurses-devel cmake
+dnf --enablerepo=crb install mysql-devel
+
+
+
+cd /www/server/mdserver-web/scripts && bash lib.sh
+chmod 755 /www/server/mdserver-web/data
 
 
 if [ ! -f /usr/local/bin/pip3 ];then
@@ -98,21 +88,8 @@ if [ ! -f /usr/local/bin/pip3 ];then
 fi
 
 
-cd /www/server/mdserver-web/scripts && bash lib.sh
-chmod 755 /www/server/mdserver-web/data
-
-
-# if [ ! -f /www/server/mdserver-web/bin/activate ];then
-#     cd /www/server/mdserver-web && python3 -m venv .
-# fi
-
-if [ -f /www/server/mdserver-web/bin/activate ];then
-    cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate && pip3 install -r /www/server/mdserver-web/requirements.txt
-else
-    cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
-fi
-
 pip install --upgrade pip
+cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
 pip3 install gunicorn==20.1.0
 pip3 install gevent==21.1.2
 pip3 install gevent-websocket==0.10.1
@@ -122,6 +99,21 @@ pip3 install flask-socketio==5.2.0
 pip3 install psutil==5.9.1 
 pip3 install pymongo
 
+
+if [ ! -f /www/server/mdserver-web/bin/activate ];then
+    cd /www/server/mdserver-web && python3 -m venv .
+    cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate
+    pip install --upgrade pip
+    pip3 install -r /www/server/mdserver-web/requirements.txt
+	pip3 install gunicorn==20.1.0
+	pip3 install gevent==21.1.2
+	pip3 install gevent-websocket==0.10.1
+	pip3 install requests==2.20.0
+	pip3 install flask-caching==1.10.1
+	pip3 install flask-socketio==5.2.0
+	pip3 install psutil==5.9.1 
+	pip3 install pymongo
+fi
 
 
 cd /www/server/mdserver-web && ./cli.sh start

@@ -68,20 +68,17 @@ fi
 systemctl stop firewalld
 
 yum groupinstall -y "Development Tools"
+yum install -y epel-release
 
 yum install -y libevent libevent-devel libjpeg* libpng* gd* libxslt* unzip libmcrypt libmcrypt-devel
 yum install -y wget python-imaging libicu-devel zip bzip2-devel gcc libxml2 libxml2-dev  libjpeg-devel libpng-devel libwebp libwebp-devel pcre pcre-devel
 yum install -y lsof net-tools
 yum install -y ncurses-devel mysql-devel cmake
 yum install -y MySQL-python 
-yum install -y epel-release
 
-#if [ ! -f '/usr/bin/pip' ];then
-#	wget https://bootstrap.pypa.io/pip/2.7/get-pip.py
-#	python get-pip.py
-#	pip install --upgrade pip
-#	pip install pillow==6.2.2
-#fi 
+
+cd /www/server/mdserver-web/scripts && bash lib.sh
+chmod 755 /www/server/mdserver-web/data
 
 
 if [ ! -f /usr/local/bin/pip3 ];then
@@ -89,21 +86,8 @@ if [ ! -f /usr/local/bin/pip3 ];then
 fi
 
 
-cd /www/server/mdserver-web/scripts && bash lib.sh
-chmod 755 /www/server/mdserver-web/data
-
-
-if [ ! -f /www/server/mdserver-web/bin/activate ];then
-    cd /www/server/mdserver-web && python3 -m venv .
-fi
-
-if [ -f /www/server/mdserver-web/bin/activate ];then
-    cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate && pip3 install -r /www/server/mdserver-web/requirements.txt
-else
-    cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
-fi
-
 pip install --upgrade pip
+cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
 pip3 install gunicorn==20.1.0
 pip3 install gevent==21.1.2
 pip3 install gevent-websocket==0.10.1
@@ -113,6 +97,21 @@ pip3 install python-socketio==4.2.0
 pip3 install psutil==5.9.1 
 pip3 install pymongo
 
+
+if [ ! -f /www/server/mdserver-web/bin/activate ];then
+    cd /www/server/mdserver-web && python3 -m venv .
+    cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate
+    pip install --upgrade pip
+    pip3 install -r /www/server/mdserver-web/requirements.txt
+    pip3 install gunicorn==20.1.0
+	pip3 install gevent==21.1.2
+	pip3 install gevent-websocket==0.10.1
+	pip3 install requests==2.20.0
+	pip3 install flask-caching==1.10.1
+	pip3 install python-socketio==4.2.0
+	pip3 install psutil==5.9.1 
+	pip3 install pymongo
+fi
 
 
 cd /www/server/mdserver-web && ./cli.sh start
