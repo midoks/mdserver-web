@@ -76,6 +76,7 @@ if [ "$?" != "0" ];then
 	ZLIB1G_BASE_VER=$(cat ${Install_TmpFile} | grep zlib1g | awk -F "=" '{print $2}' | awk -F ")" '{print $1}')
 	ZLIB1G_BASE_VER=`echo ${ZLIB1G_BASE_VER} | sed "s/^[ \s]\{1,\}//g;s/[ \s]\{1,\}$//g"`
 	# echo "1${ZLIB1G_BASE_VER}1"
+	echo -e "\e[1;31mapt install -y zlib1g=${ZLIB1G_BASE_VER} zlib1g-dev\e[0m"
 	apt install -y zlib1g=${ZLIB1G_BASE_VER}  zlib1g-dev
 fi
 rm -rf ${Install_TmpFile}
