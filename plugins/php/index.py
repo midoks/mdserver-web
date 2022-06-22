@@ -536,7 +536,7 @@ def getFpmStatus(version):
     checkFpmStatusFile(version)
 
     try:
-        url = 'http://' + mw.getLocalIp() + '/phpfpm_status_' + version + '?json'
+        url = 'http://' + mw.getHostAddr() + '/phpfpm_status_' + version + '?json'
         result = mw.httpGet(url)
     except Exception as e:
         url = 'http://127.0.0.1/phpfpm_status_' + version + '?json'

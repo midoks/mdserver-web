@@ -269,7 +269,7 @@ def runInfo():
     # 取Openresty负载状态
 
     try:
-        url = 'http://' + mw.GetLocalIp() + '/nginx_status'
+        url = 'http://' + mw.getHostAddr() + '/nginx_status'
         result = mw.httpGet(url)
         tmp = result.split()
         data = {}
