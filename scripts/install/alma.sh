@@ -5,19 +5,13 @@ LANG=C.UTF-8
 
 
 
-if [ ! -f /usr/bin/applydeltarpm ];then
-	yum -y provides '*/applydeltarpm'
-	yum -y install deltarpm
-fi
-
-
 setenforce 0
 sed -i 's#SELINUX=enforcing#SELINUX=disabled#g' /etc/selinux/config
 
-yum install -y wget lsof crontabs
-yum install -y python3-devel
-yum install -y python-devel
-yum install -y vixie-cron
+dnf install -y wget lsof
+dnf install -y python3-devel
+dnf install -y python-devel
+dnf install -y crontabs
 
 #https need
 
@@ -68,14 +62,20 @@ fi
 #安装时不开启
 systemctl stop firewalld
 
-yum groupinstall -y "Development Tools"
-yum install -y epel-release
+dnf upgrade -y
+dnf autoremove -y
 
-yum install -y libevent libevent-devel libjpeg* libpng* gd* libxslt* unzip libmcrypt libmcrypt-devel
-yum install -y wget python-imaging libicu-devel zip bzip2-devel gcc libxml2 libxml2-dev  libjpeg-devel libpng-devel libwebp libwebp-devel pcre pcre-devel
-yum install -y lsof net-tools
-yum install -y ncurses-devel mysql-devel cmake
-yum install -y MySQL-python 
+dnf groupinstall -y "Development Tools"
+dnf install -y epel-release
+
+dnf install -y oniguruma
+dnf --enablerepo=crb install oniguruma-devel
+
+dnf install -y libevent libevent-devel libjpeg* libpng* gd* libxslt* unzip libmcrypt libmcrypt-devel
+dnf install -y wget libicu-devel zip bzip2-devel gcc libxml2 libxml2-devel libjpeg-devel libpng-devel libwebp libwebp-devel pcre pcre-devel
+dnf install -y lsof net-tools
+dnf install -y ncurses-devel cmake
+dnf --enablerepo=crb install mysql-devel
 
 
 
@@ -87,7 +87,7 @@ if [ ! -f /usr/local/bin/pip3 ];then
     python3 -m pip install --upgrade pip setuptools wheel -i https://mirrors.aliyun.com/pypi/simple
 fi
 
-sed -i  "/mysqlclient/d" /www/server/mdserver-web/requirements.txt
+
 pip install --upgrade pip
 cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
 pip3 install gunicorn==20.1.0

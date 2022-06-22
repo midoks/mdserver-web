@@ -96,6 +96,8 @@ curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/in
 curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update_dev.sh | bash
 ```
 
+### 微信赞助
+- [![截图](/route/static/img/weixin_zz.jpg)](/route/static/img/weixin_zz.jpg)
 
 ### 无图不真相
 
@@ -109,7 +111,7 @@ curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/up
 如果你自己写了插件，想分享出来，也可以提Issue。
 ```
 
-- 开发文档 - https://github.com/midoks/mdserver-web/wiki/%E6%8F%92%E4%BB%B6%E5%BC%80%E5%8F%91
+- 开发文档 - https://github.com/midoks/mdserver-web/wiki/插件开发
 - 插件地址 - https://github.com/mw-plugin
 - 例子 - https://github.com/mw-plugin/simple-plugin 
 
