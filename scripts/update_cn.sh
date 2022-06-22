@@ -46,7 +46,7 @@ fi
 
 wget -O /tmp/master.zip https://gitee.com/midoks/mdserver-web/repository/archive/master.zip
 cd /tmp && unzip /tmp/master.zip
-mv /tmp/mdserver-web-master /www/server/mdserver-web
+cp -rf /tmp/mdserver-web-master/* /www/server/mdserver-web
 rm -rf /tmp/master.zip
 rm -rf /tmp/mdserver-web-master
 
