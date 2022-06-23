@@ -51,8 +51,8 @@ Install_mysql()
 		-DENABLED_LOCAL_INFILE=1 \
 		-DWITH_PARTITION_STORAGE_ENGINE=1 \
 		-DEXTRA_CHARSETS=all \
-		-DDEFAULT_CHARSET=utf8 \
-		-DDEFAULT_COLLATION=utf8_general_ci \
+		-DDEFAULT_CHARSET=utf8mb4 \
+		-DDEFAULT_COLLATION=utf8mb4_general_ci \
 		&& make && make install && make clean
 		echo '5.6' > $serverPath/mysql/version.pl
 		echo '安装完成' > $install_tmp
