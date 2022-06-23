@@ -45,7 +45,7 @@ Install_openresty()
 	--with-http_slice_module \
 	--with-http_stub_status_module
 
-	gmake && gmake install && make clean
+	make && make install && make clean
 
 	if [ -d $serverPath/openresty ];then
 		echo "${VERSION}" > $serverPath/openresty/version.pl
