@@ -164,7 +164,7 @@ def initDreplace(version=''):
     mysql_tmp = getServerDir() + '/tmp'
     if not os.path.exists(mysql_tmp):
         os.mkdir(mysql_tmp)
-        mw.execShell("chown mysql:mysql " + mysql_tmp)
+        mw.execShell("chown -R mysql:mysql " + mysql_tmp)
 
     mysql_conf = mysql_conf_dir + '/my.cnf'
     if not os.path.exists(mysql_conf):
@@ -296,8 +296,8 @@ def initMysqlData():
         cmd = 'cd ' + serverdir + ' && ./scripts/mysql_install_db --user=' + \
             user + ' --basedir=' + serverdir + ' --ldata=' + datadir
         mw.execShell(cmd)
-        return 0
-    return 1
+        return False
+    return True
 
 
 def initMysql57Data():
@@ -307,10 +307,10 @@ def initMysql57Data():
         myconf = serverdir + "/etc/my.cnf"
         user = pGetDbUser()
         cmd = 'cd ' + serverdir + ' && ./bin/mysqld --defaults-file=' + myconf + \
-            ' --initialize --explicit_defaults_for_timestamp'
+            ' --initialize-insecure --explicit_defaults_for_timestamp'
         mw.execShell(cmd)
-        return 0
-    return 1
+        return False
+    return True
 
 
 def initMysql8Data():
@@ -318,12 +318,16 @@ def initMysql8Data():
     if not os.path.exists(datadir + '/mysql'):
         serverdir = getServerDir()
         user = pGetDbUser()
+        # cmd = 'cd ' + serverdir + ' && ./bin/mysqld --basedir=' + serverdir + ' --datadir=' + \
+        #     datadir + ' --initialize'
+
         cmd = 'cd ' + serverdir + ' && ./bin/mysqld --basedir=' + serverdir + ' --datadir=' + \
-            datadir + ' --initialize'
+            datadir + ' --initialize-insecure'
+
         # print(cmd)
         mw.execShell(cmd)
-        return 0
-    return 1
+        return False
+    return True
 
 
 def initMysqlPwd():
@@ -352,65 +356,13 @@ def mysql8IsInitedPasswd():
 
 
 def initMysql8Pwd():
-    is_start = False
-    for x in range(60):
-        data = mw.execShell(
-            "ps -ef|grep mysql|grep -v grep|grep -v py|grep -v init.d|awk '{print $2}'")
-        if data[0] != "":
-            # print("mysql start ok!")
-            is_start = True
-            break
-        time.sleep(0.5)
-
-    if not is_start:
-        # print("mysql start fail!")
-        return False
+    time.sleep(5)
 
     serverdir = getServerDir()
     pwd = mw.getRandomString(16)
-
-    pass_cmd = "cat " + serverdir + \
-        "/data/error.log | grep root@localhost | awk -F 'root@localhost:' '{print $2}'"
-    passdata = mw.execShell(pass_cmd)
-    password = passdata[0].strip()
-
-    if len(password) == 0:
-        return True
-
-    # print('localhost', 3306, 'root', password,
-    # "/www/server/mysql/mysql.sock")
-
-    # import MySQLdb as mdb
-    # dbconn = mdb.connect(host='localhost', port=3306, user='root',
-    #                      passwd=password, unix_socket="/www/server/mysql/mysql.sock")
-    # dbconn.autocommit(True)
-    # dbcurr = dbconn.cursor()
-    # dbcurr.execute('SET NAMES UTF8MB4')
-
-    # # with mysql_native_password
-    alter_root_pwd = 'flush privileges;'
-    alter_root_pwd = alter_root_pwd + \
-        "alter user 'root'@'localhost' IDENTIFIED by '" + pwd + "';"
-    alter_root_pwd = alter_root_pwd + \
-        "alter user 'root'@'localhost' IDENTIFIED WITH mysql_native_password by '" + pwd + "';"
-    alter_root_pwd = alter_root_pwd + "flush privileges;"
-    # dbcurr.execute(alter_root_pwd)
-
-    tmp_file = "/tmp/mysql_init_tmp.log"
-    mw.writeFile(tmp_file, alter_root_pwd)
-    cmd_pass = serverdir + '/bin/mysql --connect-expired-password -uroot -p"' + \
-        password + '" < ' + tmp_file
-    # print(cmd_pass)
-    data = mw.execShell(cmd_pass)
-    if data[1].find("ERROR") != -1:
-        # print(data[1])
-        pass
-    else:
-        mw.writeFile(serverdir + "/data/error.log", "")
-        os.remove(tmp_file)
-
+    cmd_pass = serverdir + '/bin/mysqladmin -uroot password ' + pwd
     pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
-
+    mw.execShell(cmd_pass)
     return True
 
 
@@ -419,7 +371,7 @@ def myOp(version, method):
     init_file = initDreplace()
     try:
         initData = initMysqlData()
-        if initData == 0:
+        if not initData:
             initMysqlPwd()
 
         mw.execShell('systemctl ' + method + ' mysql')
@@ -431,34 +383,16 @@ def myOp(version, method):
 def my8cmd(version, method):
     # mysql 8.0  and 5.7 ok
     init_file = initDreplace(version)
+    isInited = 0
     if version == '5.7':
-        initMysql57Data()
+        isInited = initMysql57Data()
     elif version == '8.0':
-        initMysql8Data()
-    try:
+        isInited = initMysql8Data()
 
-        if not mysql8IsInitedPasswd():
-            setSkipGrantTables(True)
-            cmd_init_start = init_file + ' start'
-            subprocess.Popen(cmd_init_start, stdout=subprocess.PIPE, shell=True,
-                             bufsize=4096, stderr=subprocess.PIPE)
+    if not isInited:
+        initMysql8Pwd()
 
-            time.sleep(6)
-            initMysql8Pwd()
-
-            cmd_init_stop = init_file + ' stop'
-            subprocess.Popen(cmd_init_stop, stdout=subprocess.PIPE, shell=True,
-                             bufsize=4096, stderr=subprocess.PIPE)
-            setSkipGrantTables(False)
-
-            time.sleep(3)
-            my8cmd(version, method)
-        else:
-            mw.execShell('systemctl ' + method + ' mysql')
-
-        return 'ok'
-    except Exception as e:
-        return str(e)
+    mw.execShell('systemctl ' + method + ' mysql')
 
     return 'fail'
 
