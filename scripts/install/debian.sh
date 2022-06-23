@@ -87,7 +87,7 @@ echo -e "\e[0;32mfix zlib1g-dev install question end\e[0m"
 #fix libunwind-dev fail
 echo -e "\e[0;32mfix libunwind-dev install question start\e[0m"
 Install_TmpFile=/tmp/debian-fix-libunwind-dev.txt
-apt install -y zlib1g-dev > ${Install_TmpFile}
+apt install -y libunwind-dev > ${Install_TmpFile}
 if [ "$?" != "0" ];then
 	liblzma5_BASE_VER=$(cat ${Install_TmpFile} | grep liblzma-dev | awk -F "=" '{print $2}' | awk -F ")" '{print $1}')
 	liblzma5_BASE_VER=`echo ${liblzma5_BASE_VER} | sed "s/^[ \s]\{1,\}//g;s/[ \s]\{1,\}$//g"`
