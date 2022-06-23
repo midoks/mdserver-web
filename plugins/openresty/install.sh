@@ -24,6 +24,7 @@ else
 	useradd -g www -s /bin/bash www
 fi
 
+# cd /www/server/mdserver-web/plugins/openresty && /bin/bash install.sh install 1.21.4.1
 Install_openresty()
 {
 	mkdir -p ${openrestyDir}
@@ -37,13 +38,19 @@ Install_openresty()
 	cd ${openrestyDir} && tar -zxvf openresty-${VERSION}.tar.gz
 
 	# --with-openssl=$serverPath/source/lib/openssl-1.0.2q
-	cd ${openrestyDir}/openresty-${VERSION} && ./configure --prefix=$serverPath/openresty \
+	cd ${openrestyDir}/openresty-${VERSION} && ./configure \
+	--prefix=$serverPath/openresty \
 	--with-http_v2_module \
 	--with-http_ssl_module  \
 	--with-http_slice_module \
-	--with-http_stub_status_module && make && make install && \
-	echo "${VERSION}" > $serverPath/openresty/version.pl
-	echo "" > $serverPath/web_conf/nginx/enable-php-00.conf
+	--with-http_stub_status_module
+
+	gmake && gmake install && make clean
+
+	if [ -d $serverPath/openresty ];then
+		echo "${VERSION}" > $serverPath/openresty/version.pl
+		echo "" > $serverPath/openresty/nginx/conf/enable-php-00.conf
+    fi
 	echo '安装完成' > $install_tmp
 }
 

@@ -521,25 +521,38 @@ def setFpmConfig(version):
 
 
 def checkFpmStatusFile(version):
-    if mw.isInstalledWeb():
-        sdir = mw.getServerDir()
-        dfile = sdir + '/openresty/nginx/conf/php_status/phpfpm_status_' + version + '.conf'
-        if not os.path.exists(dfile):
-            tpl = getPluginDir() + '/conf/phpfpm_status.conf'
-            content = mw.readFile(tpl)
-            content = contentReplace(content, version)
-            mw.writeFile(dfile, content)
-            mw.restartWeb()
+    if not mw.isInstalledWeb():
+        return False
+
+    dfile = getServerDir() + '/nginx/conf/php_status/phpfpm_status_' + version + '.conf'
+    if not os.path.exists(dfile):
+        tpl = getPluginDir() + '/conf/phpfpm_status.conf'
+        content = mw.readFile(tpl)
+        content = contentReplace(content, version)
+        mw.writeFile(dfile, content)
+        mw.restartWeb()
+    return True
 
 
 def getFpmStatus(version):
     checkFpmStatusFile(version)
-    result = mw.httpGet(
-        'http://127.0.0.1/phpfpm_status_' + version + '?json')
-    tmp = json.loads(result)
-    fTime = time.localtime(int(tmp['start time']))
-    tmp['start time'] = time.strftime('%Y-%m-%d %H:%M:%S', fTime)
-    return mw.getJson(tmp)
+
+    try:
+        url = 'http://' + mw.getHostAddr() + '/phpfpm_status_' + version + '?json'
+        result = mw.httpGet(url)
+        data = json.loads(result)
+        fTime = time.localtime(int(data['start time']))
+        data['start time'] = time.strftime('%Y-%m-%d %H:%M:%S', fTime)
+    except Exception as e:
+        url = 'http://127.0.0.1/phpfpm_status_' + version + '?json'
+        result = mw.httpGet(url)
+        data = json.loads(result)
+        fTime = time.localtime(int(data['start time']))
+        data['start time'] = time.strftime('%Y-%m-%d %H:%M:%S', fTime)
+    except Exception as e:
+        data = {}
+
+    return mw.getJson(data)
 
 
 def getDisableFunc(version):

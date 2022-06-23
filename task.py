@@ -75,7 +75,6 @@ def execShell(cmdstring, cwd=None, timeout=None, shell=True):
         import shlex
         import datetime
         import subprocess
-        import time
 
         if timeout:
             end_time = datetime.datetime.now() + datetime.timedelta(seconds=timeout)
@@ -226,7 +225,6 @@ def systemTask():
     try:
         import system_api
         import psutil
-        import time
         sm = system_api.system_api()
         filename = 'data/control.conf'
 
@@ -368,7 +366,7 @@ def systemTask():
         mw.writeFile('logs/sys_interrupt.pl', str(ex))
 
         restartMw()
-        import time
+
         time.sleep(30)
         systemTask()
 
@@ -388,17 +386,18 @@ def check502Task():
 
 def check502():
     try:
-        phpversions = ['53', '54', '55', '56', '70', '71', '72', '73', '74']
-        for version in phpversions:
+        verlist = ['52', '53', '54', '55', '56', '70',
+                   '71', '72', '73', '74', '80', '81']
+        for ver in verlist:
             sdir = mw.getServerDir()
-            php_path = sdir + '/php/' + version + '/sbin/php-fpm'
+            php_path = sdir + '/php/' + ver + '/sbin/php-fpm'
             if not os.path.exists(php_path):
                 continue
-            if checkPHPVersion(version):
+            if checkPHPVersion(ver):
                 continue
-            if startPHPVersion(version):
-                print('检测到PHP-' + version + '处理异常,已自动修复!')
-                mw.writeLog('PHP守护程序', '检测到PHP-' + version + '处理异常,已自动修复!')
+            if startPHPVersion(ver):
+                print('检测到PHP-' + ver + '处理异常,已自动修复!')
+                mw.writeLog('PHP守护程序', '检测到PHP-' + ver + '处理异常,已自动修复!')
     except Exception as e:
         print(str(e))
 
@@ -452,8 +451,8 @@ def checkPHPVersion(version):
     try:
         url = 'http://127.0.0.1/phpfpm_status_' + version
         result = mw.httpGet(url)
-        # print version,result
-        # 检查nginx
+        # print(version,result)
+        # 检查openresty
         if result.find('Bad Gateway') != -1:
             return False
         if result.find('HTTP Error 404: Not Found') != -1:
@@ -466,17 +465,52 @@ def checkPHPVersion(version):
                 isStatus = mw.readFile(isTask)
                 if isStatus == 'True':
                     return True
-            filename = '/etc/init.d/openresty'
-            if os.path.exists(filename):
-                os.system(filename + ' start')
+
+            # systemd
+            systemd = '/lib/systemd/system/openresty.service'
+            if os.path.exists(systemd):
+                execShell('systemctl reload openresty')
+                return True
+            # initd
+            initd = '/etc/init.d/openresty'
+            if os.path.exists(initd):
+                os.system(initd + ' reload')
         return True
     except:
         return True
 
 # --------------------------------------PHP监控 end--------------------------------------------- #
 
+
+# --------------------------------------OpenResty Auto Restart Start --------------------------------------------- #
+# 解决acme.sh续签后,未起效。
+def openrestyAutoRestart():
+    try:
+        while True:
+            # 检查是否安装
+            odir = mw.getServerDir() + '/openresty'
+            if not os.path.exists(odir):
+                time.sleep(86400)
+                continue
+
+            # systemd
+            systemd = '/lib/systemd/system/openresty.service'
+            initd = '/etc/init.d/openresty'
+            if os.path.exists(systemd):
+                execShell('systemctl reload openresty')
+            elif os.path.exists(initd):
+                os.system(initd + ' reload')
+            time.sleep(86400)
+    except Exception as e:
+        print(str(e))
+        time.sleep(86400)
+
+# --------------------------------------OpenResty Auto Restart End   --------------------------------------------- #
+
+
 if __name__ == "__main__":
 
+    # 系统监控
     t = threading.Thread(target=systemTask)
     if sys.version_info.major == 3 and sys.version_info.minor >= 10:
         t.daemon = True
@@ -484,12 +518,20 @@ if __name__ == "__main__":
         t.setDaemon(True)
     t.start()
 
+    # PHP 502错误检查线程
     p = threading.Thread(target=check502Task)
     if sys.version_info.major == 3 and sys.version_info.minor >= 10:
         p.daemon = True
     else:
         p.setDaemon(True)
-
     p.start()
+
+    # OpenResty Auto Restart Start
+    oar = threading.Thread(target=openrestyAutoRestart)
+    if sys.version_info.major == 3 and sys.version_info.minor >= 10:
+        oar.daemon = True
+    else:
+        oar.setDaemon(True)
+    oar.start()
 
     startTask()
