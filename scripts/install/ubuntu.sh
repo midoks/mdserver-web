@@ -9,6 +9,8 @@ apt update -y
 apt install -y wget curl lsof unzip
 apt install -y python3-pip
 apt install -y python3-venv
+apt install -y python3-dev
+
 
 apt install -y cron
 
@@ -24,7 +26,7 @@ if [ -f /usr/sbin/ufw ];then
 	ufw allow 443/tcp
 	ufw allow 888/tcp
 	ufw allow 7200/tcp
-	ufw allow 3306/tcp
+	# ufw allow 3306/tcp
 	# ufw allow 30000:40000/tcp
 
 fi
@@ -44,7 +46,7 @@ if [ ! -f /usr/sbin/ufw ];then
 	firewall-cmd --permanent --zone=public --add-port=443/tcp
 	firewall-cmd --permanent --zone=public --add-port=888/tcp
 	firewall-cmd --permanent --zone=public --add-port=7200/tcp
-	firewall-cmd --permanent --zone=public --add-port=3306/tcp
+	# firewall-cmd --permanent --zone=public --add-port=3306/tcp
 	# firewall-cmd --permanent --zone=public --add-port=30000-40000/tcp
 
 	# fix:debian10 firewalld faq

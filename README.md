@@ -50,7 +50,6 @@ systemd 支持 CentOS,Ubuntu,Debian,Fedora...
 ### 问题
 - Ubuntu 20 无法安装mysql5.7 && mysql 80.
 - Ftp debian无法安装成功。
-- php52,在debian无法安装成功。
 
 
 ### GW使用
@@ -79,6 +78,14 @@ curl -fsSL  https://gitee.com/midoks/mdserver-web/raw/master/scripts/install_cn.
 
 ```
 curl -fsSL  https://gitee.com/midoks/mdserver-web/raw/master/scripts/update_cn.sh | bash
+```
+
+
+
+### 通用安装
+
+```
+curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/quick/app.sh | bash
 ```
 
 
@@ -122,11 +129,9 @@ curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/up
 [![Stargazers over time](https://starchart.cc/midoks/mdserver-web.svg)](https://starchart.cc/midoks/mdserver-web)
 
 
-### 感谢
+### 感谢开发赞助
 
-- 开发赞助
-
-[digitalvirt](https://digitalvirt.com/)
+[![digitalvirt](https://digitalvirt.com/templates/BlueWhite/img/logo-dark.svg)](https://digitalvirt.com/)
 
 ### 授权许可
 
