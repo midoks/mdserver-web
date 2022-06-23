@@ -122,11 +122,9 @@ curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/up
 [![Stargazers over time](https://starchart.cc/midoks/mdserver-web.svg)](https://starchart.cc/midoks/mdserver-web)
 
 
-### 感谢
+### 感谢开发赞助
 
-- 开发赞助
-
-[digitalvirt](https://digitalvirt.com/)
+[![digitalvirt](https://digitalvirt.com/templates/BlueWhite/img/logo-dark.svg)](https://digitalvirt.com/)
 
 ### 授权许可
 
