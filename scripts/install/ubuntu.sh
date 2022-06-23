@@ -9,6 +9,8 @@ apt update -y
 apt install -y wget curl lsof unzip
 apt install -y python3-pip
 apt install -y python3-venv
+apt install -y python3-dev
+
 
 apt install -y cron
 

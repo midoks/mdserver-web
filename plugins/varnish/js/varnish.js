@@ -9,7 +9,7 @@ function pRead(){
 }
 
 
-//redis负载状态  start
+//varnish负载状态  start
 function varnishStatus() {
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
     $.post('/plugins/run', {name:'varnish', func:'run_info'}, function(data) {
@@ -41,4 +41,61 @@ function varnishStatus() {
         $(".soft-man-con").html(Con);
     },'json');
 }
-//redis负载状态 end
+//varnish负载状态 end
+
+
+//varnish service --- 
+function varnishPluginConfig(_name, version, func){
+    if ( typeof(version) == 'undefined' ){
+        version = '';
+    }
+
+    var func_name = 'conf';
+    if ( typeof(func) != 'undefined' ){
+        func_name = func;
+    }
+
+    var con = '<p style="color: #666; margin-bottom: 7px">提示：Ctrl+F 搜索关键字，Ctrl+G 查找下一个，Ctrl+S 保存，Ctrl+Shift+R 查找替换!</p>\
+                <textarea class="bt-input-text" style="height: 320px; line-height:18px;" id="textBody"></textarea>\
+                <button id="onlineEditFileBtn" class="btn btn-success btn-sm" style="margin-top:10px;">保存</button>\
+                <ul class="help-info-text c7 ptb15">\
+                    <li>此处为'+ _name + version +'主配置文件,若您不了解配置规则,请勿随意修改。</li>\
+                </ul>';
+    $(".soft-man-con").html(con);
+
+    var loadT = layer.msg('配置文件路径获取中...',{icon:16,time:0,shade: [0.3, '#000']});
+    $.post('/plugins/run', {name:_name, func:func_name,version:version},function (data) {
+        layer.close(loadT);
+
+        var loadT2 = layer.msg('文件内容获取中...',{icon:16,time:0,shade: [0.3, '#000']});
+        var fileName = data.data;
+        $.post('/files/get_body', 'path=' + fileName, function(rdata) {
+            layer.close(loadT2);
+            if (!rdata.status){
+                layer.msg(rdata.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+                return;
+            }
+            $("#textBody").empty().text(rdata.data.data);
+            $(".CodeMirror").remove();
+            var editor = CodeMirror.fromTextArea(document.getElementById("textBody"), {
+                extraKeys: {
+                    "Ctrl-Space": "autocomplete",
+                    "Ctrl-F": "findPersistent",
+                    "Ctrl-H": "replaceAll",
+                    "Ctrl-S": function() {
+                        $("#textBody").text(editor.getValue());
+                        pluginConfigSave(fileName);
+                    }
+                },
+                lineNumbers: true,
+                matchBrackets:true,
+            });
+            editor.focus();
+            $(".CodeMirror-scroll").css({"height":"300px","margin":0,"padding":0});
+            $("#onlineEditFileBtn").click(function(){
+                $("#textBody").text(editor.getValue());
+                pluginConfigSave(fileName);
+            });
+        },'json');
+    },'json');
+}

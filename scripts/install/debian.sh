@@ -3,12 +3,21 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 LANG=en_US.UTF-8
 
+# RED='\e[1;31m'    # 红色
+# GREEN='\e[1;32m'  # 绿色
+# YELLOW='\e[1;33m' # 黄色
+# BLUE='\e[1;34m'   # 蓝色
+# PURPLE='\e[1;35m' # 紫色
+# CYAN='\e[1;36m'   # 蓝绿色
+# WHITE='\e[1;37m'  # 白色
+# NC='\e[0m' # 没有颜色
 
 apt update -y
 
 
 apt install -y wget curl lsof unzip
 apt install -y python3-pip
+apt install -y python3-dev
 apt install -y python3-venv
 
 apt install -y cron
@@ -60,16 +69,47 @@ fi
 systemctl stop firewalld
 
 
+#fix zlib1g-dev fail
+echo -e "\e[0;32mfix zlib1g-dev install question start\e[0m"
+Install_TmpFile=/tmp/debian-fix-zlib1g-dev.txt
+apt install -y zlib1g-dev > ${Install_TmpFile}
+if [ "$?" != "0" ];then
+	ZLIB1G_BASE_VER=$(cat ${Install_TmpFile} | grep zlib1g | awk -F "=" '{print $2}' | awk -F ")" '{print $1}')
+	ZLIB1G_BASE_VER=`echo ${ZLIB1G_BASE_VER} | sed "s/^[ \s]\{1,\}//g;s/[ \s]\{1,\}$//g"`
+	# echo "1${ZLIB1G_BASE_VER}1"
+	echo -e "\e[1;31mapt install zlib1g=${ZLIB1G_BASE_VER} zlib1g-dev\e[0m"
+	echo "Y" | apt install zlib1g=${ZLIB1G_BASE_VER}  zlib1g-dev
+fi
+rm -rf ${Install_TmpFile}
+echo -e "\e[0;32mfix zlib1g-dev install question end\e[0m"
+
+
+#fix libunwind-dev fail
+echo -e "\e[0;32mfix libunwind-dev install question start\e[0m"
+Install_TmpFile=/tmp/debian-fix-libunwind-dev.txt
+apt install -y zlib1g-dev > ${Install_TmpFile}
+if [ "$?" != "0" ];then
+	liblzma5_BASE_VER=$(cat ${Install_TmpFile} | grep liblzma-dev | awk -F "=" '{print $2}' | awk -F ")" '{print $1}')
+	liblzma5_BASE_VER=`echo ${liblzma5_BASE_VER} | sed "s/^[ \s]\{1,\}//g;s/[ \s]\{1,\}$//g"`
+	echo -e "\e[1;31mapt install liblzma5=${liblzma5_BASE_VER} libunwind-dev\e[0m"
+	echo "Y" | apt install liblzma5=${liblzma5_BASE_VER} libunwind-dev
+fi
+rm -rf ${Install_TmpFile}
+echo -e "\e[0;32mfix libunwind-dev install question end\e[0m"
+
+
 cd /www/server/mdserver-web/scripts && bash lib.sh
 chmod 755 /www/server/mdserver-web/data
+
+
 
 if [ ! -f /usr/local/bin/pip3 ];then
     python3 -m pip install --upgrade pip setuptools wheel -i https://mirrors.aliyun.com/pypi/simple
 fi
 
 pip install --upgrade pip
-pip install --upgrade setuptools
 
+sed -i  "/mysqlclient/d" /www/server/mdserver-web/requirements.txt
 cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
 
 pip3 install gunicorn==20.1.0
@@ -77,24 +117,23 @@ pip3 install gevent==21.1.2
 pip3 install gevent-websocket==0.10.1
 pip3 install requests==2.20.0
 pip3 install flask-caching==1.10.1
-pip3 install flask-socketio==5.2.0
 pip3 install pymongo
 pip3 install psutil
+pip3 install flask-socketio==5.2.0
 
 if [ ! -f /www/server/mdserver-web/bin/activate ];then
     cd /www/server/mdserver-web && python3 -m venv .
     cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate
     pip install --upgrade pip
     pip3 install -r /www/server/mdserver-web/requirements.txt
-    pip install --upgrade setuptools
     pip3 install gunicorn==20.1.0
 	pip3 install gevent==21.1.2
 	pip3 install gevent-websocket==0.10.1
 	pip3 install requests==2.20.0
 	pip3 install flask-caching==1.10.1
-	pip3 install flask-socketio==5.2.0
 	pip3 install pymongo
-	pip3 install psutil  
+	pip3 install psutil
+	pip3 install flask-socketio==5.2.0
 fi
 
 

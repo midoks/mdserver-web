@@ -13,7 +13,7 @@ rootPath=$(dirname "$rootPath")
 SERVER_ROOT=$rootPath/lib
 SOURCE_ROOT=$rootPath/source/lib
 
-if [ ! -d ${SERVER_ROOT}/libiconv ];then
+if [ ! -d ${SERVER_ROOT}/zlib ];then
 
     cd $SOURCE_ROOT
     if [ ! -f ${SOURCE_ROOT}/zlib-1.2.11.tar.gz ];then

@@ -172,6 +172,10 @@ def initdUinstall():
 def runLog():
     return "/var/log/varnish/varnishncsa.log"
 
+
+def confService():
+    return '/lib/systemd/system/varnish.service'
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -194,6 +198,8 @@ if __name__ == "__main__":
         print(runInfo())
     elif func == 'conf':
         print(getConf())
+    elif func == 'conf_service':
+        print(confService())
     elif func == 'run_log':
         print(runLog())
     elif func == 'config_tpl':
