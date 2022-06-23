@@ -356,13 +356,32 @@ def mysql8IsInitedPasswd():
 
 
 def initMysql8Pwd():
-    time.sleep(5)
+    time.sleep(2)
 
     serverdir = getServerDir()
     pwd = mw.getRandomString(16)
-    cmd_pass = serverdir + '/bin/mysqladmin -uroot password ' + pwd
+
+    alter_root_pwd = 'flush privileges;'
+    alter_root_pwd = alter_root_pwd + \
+        "alter user 'root'@'localhost' IDENTIFIED by '" + pwd + "';"
+    alter_root_pwd = alter_root_pwd + \
+        "alter user 'root'@'localhost' IDENTIFIED WITH mysql_native_password by '" + pwd + "';"
+    alter_root_pwd = alter_root_pwd + "flush privileges;"
+
+    cmd_pass = serverdir + '/bin/mysqladmin -uroot password root'
+    data = mw.execShell(cmd_pass)
+    # print(data)
+
+    tmp_file = "/tmp/mysql_init_tmp.log"
+    mw.writeFile(tmp_file, alter_root_pwd)
+    cmd_pass = serverdir + '/bin/mysql -uroot -p"' + \
+        password + '" < ' + tmp_file
+
+    data = mw.execShell(cmd_pass)
+    # print(data)
+
     pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
-    mw.execShell(cmd_pass)
+
     return True
 
 
