@@ -378,6 +378,7 @@ def initMysql8Pwd():
 
     data = mw.execShell(cmd_pass)
     # print(data)
+    os.remove(tmp_file)
 
     pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
 
