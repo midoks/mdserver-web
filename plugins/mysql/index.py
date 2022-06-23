@@ -381,7 +381,7 @@ def myOp(version, method):
 
 
 def my8cmd(version, method):
-    # mysql 8.0  and 5.7 ok
+    # mysql 8.0  and 5.7
     init_file = initDreplace(version)
     isInited = 0
     if version == '5.7':
@@ -390,6 +390,7 @@ def my8cmd(version, method):
         isInited = initMysql8Data()
 
     if not isInited:
+        mw.execShell('systemctl start mysql')
         initMysql8Pwd()
 
     mw.execShell('systemctl ' + method + ' mysql')
