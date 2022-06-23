@@ -161,6 +161,10 @@ def initDreplace(version=''):
     if not os.path.exists(mysql_conf_dir):
         os.mkdir(mysql_conf_dir)
 
+    mysql_tmp = getServerDir() + '/tmp'
+    if not os.path.exists(mysql_tmp):
+        os.mkdir(mysql_tmp)
+
     mysql_conf = mysql_conf_dir + '/my.cnf'
     if not os.path.exists(mysql_conf):
         mysql_conf_tpl = getPluginDir() + '/conf/my' + version + '.cnf'
