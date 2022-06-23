@@ -185,14 +185,38 @@ case "$1" in
         if [ -f $mw_path/data/admin_path.pl ];then
             auth_path=$(cat $mw_path/data/admin_path.pl)
         fi
-	if [ "$address" = "" ];then
-            address=$(curl -sS --connect-timeout 10 -m 60 https://v6r.ipip.net/?format=text)
+	    
+        if [ "$address" = "" ];then
+            v4_available=true
+            v6_available=true
+            {
+                v4=$(curl -4 -sS --connect-timeout 5 -m 60 https://v6r.ipip.net/?format=text)
+            } || { 
+                v4_available=false
+            }
+            {
+                v6=$(curl -6 -sS --connect-timeout 5 -m 60 https://v6r.ipip.net/?format=text)
+            } || { 
+                v6_available=false
+            }
+
+            if [ $v4_available = true ] && [ $v6_available = true ]; then
+                address="MW-Panel-Url: http://$v4:$port$auth_path \nMW-Panel-Url: http://[$v6]:$port$auth_path"
+            elif [ $v4_available = true ]; then
+                address="MW-Panel-Url: http://$v4:$port$auth_path"
+            elif [ $v6_available = true ]; then
+                address="MW-Panel-Url: http://[$v6]:$port$auth_path"
+            else
+                address="No v4 or v6 available"
+            fi
+        else
+            address="MW-Panel-Url: http://$address:$port$auth_path"
         fi
 
         echo -e "=================================================================="
         echo -e "\033[32mMW-Panel default info!\033[0m"
         echo -e "=================================================================="
-        echo -e "MW-Panel-URL: http://$address:$port$auth_path"
+        echo -e "$address"
         echo -e `python3 $mw_path/tools.py username`
         echo -e "password: $password"
         echo -e "\033[33mWarning:\033[0m"
