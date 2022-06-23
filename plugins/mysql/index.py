@@ -164,6 +164,7 @@ def initDreplace(version=''):
     mysql_tmp = getServerDir() + '/tmp'
     if not os.path.exists(mysql_tmp):
         os.mkdir(mysql_tmp)
+        mw.execShell("chown mysql:mysql " + mysql_tmp)
 
     mysql_conf = mysql_conf_dir + '/my.cnf'
     if not os.path.exists(mysql_conf):
@@ -485,9 +486,8 @@ def reload(version=''):
 
 
 def initdStatus():
-    if not app_debug:
-        if mw.isAppleSystem():
-            return "Apple Computer does not support"
+    if mw.isAppleSystem():
+        return "Apple Computer does not support"
 
     shell_cmd = 'systemctl status mysql | grep loaded | grep "enabled;"'
     data = mw.execShell(shell_cmd)
