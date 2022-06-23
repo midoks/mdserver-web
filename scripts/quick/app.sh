@@ -12,19 +12,23 @@ if [ ! -d /www/server/mdserver-web ];then
 fi
 
 # openresty
-cd /www/server/mdserver-web/plugins/openresty && bash install.sh install 1.21.4.1
-cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/openresty/index.py start
-
+if [ ! -d /www/server/openresty ];then
+	cd /www/server/mdserver-web/plugins/openresty && bash install.sh install 1.21.4.1
+	cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/openresty/index.py start
+fi
 
 
 # php
-cd /www/server/mdserver-web/plugins/php && bash install.sh install 71
-cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/php/index.py start 71
+if [ ! -d /www/server/php/71 ];then
+	cd /www/server/mdserver-web/plugins/php && bash install.sh install 71
+	cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/php/index.py start 71
+fi
 
 # mysql
-cd /www/server/mdserver-web/plugins/mysql && bash install.sh install 5.5
-cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mysql/index.py start 5.5
-
+if [ ! -d /www/server/mysql ];then
+	cd /www/server/mdserver-web/plugins/mysql && bash install.sh install 5.5
+	cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mysql/index.py start 5.5
+fi
 
 endTime=`date +%s`
 ((outTime=(${endTime}-${startTime})/60))
