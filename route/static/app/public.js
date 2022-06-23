@@ -1088,15 +1088,17 @@ function execLog(){
 function remind(a){
 	a = a == undefined ? 1 : a;
 	$.post("/task/list", "table=tasks&result=2,4,6,8&limit=10&p=" + a, function(g) {
+		// console.log(g);
 		var e = "";
 		var f = false;
 		var task_count = 0;
 		for(var d = 0; d < g.data.length; d++) {
 			if(g.data[d].status != '1'){
 				task_count++;
-				continue;
+				e += '<tr><td><input type="checkbox"></td><td><div class="titlename c3">'+g.data[d].name+'</span><span class="rs-status">【'+lan.bt.task_the+'】<span><span class="rs-time">'+ lan.bt.time + (g.data[d].end - g.data[d].start) + lan.bt.s+'</span></div></td><td class="text-right c3">'+g.data[d].addtime+'</td></tr>'
+			} else{
+				e += '<tr><td><input type="checkbox"></td><td><div class="titlename c3">'+g.data[d].name+'</span><span class="rs-status">【'+lan.bt.task_ok+'】<span><span class="rs-time">'+ lan.bt.time + (g.data[d].end - g.data[d].start) + lan.bt.s+'</span></div></td><td class="text-right c3">'+g.data[d].addtime+'</td></tr>';
 			}
-			e += '<tr><td><input type="checkbox"></td><td><div class="titlename c3">'+g.data[d].name+'</span><span class="rs-status">【'+lan.bt.task_ok+'】<span><span class="rs-time">'+ lan.bt.time + (g.data[d].end - g.data[d].start) + lan.bt.s+'</span></div></td><td class="text-right c3">'+g.data[d].addtime+'</td></tr>'
 		}
 		var con = '<div class="divtable"><table class="table table-hover">\
 					<thead><tr><th width="20"><input id="Rs-checkAll" type="checkbox" onclick="RscheckSelect()"></th><th>'+lan.bt.task_name+'</th><th class="text-right">'+lan.bt.task_time+'</th></tr></thead>\
@@ -1112,7 +1114,7 @@ function remind(a){
 					</div>';
 		
 		$(".task_count").text(task_count);
-		$(".msg_count").text(g.data.length);
+		$(".msg_count").text(g.count);
 		$(".taskcon").html(con);
 		$("#taskPage").html(g.page);
 
