@@ -403,7 +403,6 @@ def my8cmd(version, method):
     # mysql 8.0  and 5.7
     init_file = initDreplace(version)
     isInited = 0
-
     try:
         if version == '5.7':
             isInited = initMysql57Data()
