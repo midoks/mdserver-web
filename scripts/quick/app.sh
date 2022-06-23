@@ -6,7 +6,7 @@ echo "welcome to mdserver-web panel"
 
 startTime=`date +%s`
 
-if [ ! -f /www/server/mdserver-web ];then
+if [ ! -d /www/server/mdserver-web ];then
 	echo "mdserver-web not exist!"
 	exit 1
 fi
