@@ -34,15 +34,6 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 fi
 
 
-if [  -f $serverPath/php/53/bin/php.dSYM ];then
-	mv $serverPath/php/53/bin/php.dSYM $serverPath/php/53/bin/php
-fi
-
-if [  -f $serverPath/php/53/sbin/php-fpm.dSYM ];then
-	mv $serverPath/php/53/sbin/php-fpm.dSYM $serverPath/php/53/sbin/php-fpm
-fi
-
-
 if [ -f $serverPath/php/53/bin/php ];then
 	return
 fi
