@@ -17,7 +17,7 @@ cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/openrest
 
 # php
 cd /www/server/mdserver-web/plugins/php && bash install.sh 71
-cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/php/index.py start
+cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/php/index.py start 71
 
 # mysql
 cd /www/server/mdserver-web/plugins/mysql && bash install.sh 5.5
