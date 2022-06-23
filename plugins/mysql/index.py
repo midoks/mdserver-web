@@ -415,7 +415,7 @@ def my8cmd(version, method):
 
     mw.execShell('systemctl ' + method + ' mysql')
 
-    return 'fail'
+    return 'ok'
 
 
 def appCMD(version, action):
