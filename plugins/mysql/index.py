@@ -403,19 +403,22 @@ def my8cmd(version, method):
     # mysql 8.0  and 5.7
     init_file = initDreplace(version)
     isInited = 0
-    if version == '5.7':
-        isInited = initMysql57Data()
-    elif version == '8.0':
-        isInited = initMysql8Data()
 
-    if not isInited:
-        mw.execShell('systemctl start mysql')
-        initMysql8Pwd()
-        mw.execShell('systemctl stop mysql')
+    try:
+        if version == '5.7':
+            isInited = initMysql57Data()
+        elif version == '8.0':
+            isInited = initMysql8Data()
 
-    mw.execShell('systemctl ' + method + ' mysql')
+        if not isInited:
+            mw.execShell('systemctl start mysql')
+            initMysql8Pwd()
+            mw.execShell('systemctl stop mysql')
 
-    return 'ok'
+        mw.execShell('systemctl ' + method + ' mysql')
+        return 'ok'
+    except Exception as e:
+        return str(e)
 
 
 def appCMD(version, action):
