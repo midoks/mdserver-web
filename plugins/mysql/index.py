@@ -374,8 +374,7 @@ def initMysql8Pwd():
 
     tmp_file = "/tmp/mysql_init_tmp.log"
     mw.writeFile(tmp_file, alter_root_pwd)
-    cmd_pass = serverdir + '/bin/mysql -uroot -p"' + \
-        password + '" < ' + tmp_file
+    cmd_pass = serverdir + '/bin/mysql -uroot -proot < ' + tmp_file
 
     data = mw.execShell(cmd_pass)
     # print(data)
