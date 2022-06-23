@@ -58,7 +58,10 @@ Install_mysql()
 		-DFORCE_INSOURCE_BUILD=1 \
 		-DWITH_BOOST=${mysqlDir}/mysql-8.0.25/boost/
 		make && make install && make clean
-		echo '8.0' > $serverPath/mysql/version.pl
+
+		if [ -d  $serverPath/mysql ];then
+			echo '8.0' > $serverPath/mysql/version.pl
+		fi
 		echo '安装完成' > $install_tmp
 	fi
 }
