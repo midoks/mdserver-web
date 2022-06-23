@@ -21,7 +21,7 @@ class mysqlDb:
     def __Conn(self):
         '''连接MYSQL数据库'''
         try:
-            socket = '/tmp/mysql.sock'
+            socket = '/www/server/mysql/mysql.sock'
             try:
                 import MySQLdb
             except Exception as ex:
