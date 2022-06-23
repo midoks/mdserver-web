@@ -175,7 +175,7 @@ case "$1" in
 
         if [ ! -f $mw_path/data/default.pl ];then
             echo -e "\033[33mInstall Failed\033[0m"
-            exit 0
+            exit 1
         fi
 
         password=$(cat $mw_path/data/default.pl)
