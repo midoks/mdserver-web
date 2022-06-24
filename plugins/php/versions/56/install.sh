@@ -69,8 +69,8 @@ if [ ! -d $serverPath/php/56 ];then
 	--disable-intl \
 	--disable-fileinfo \
 	$OPTIONS \
-	--enable-fpm \
-	&& make clean && make && make install && make clean
+	--enable-fpm
+	make clean && make && make install && make clean
 fi 
 
 #------------------------ install end ------------------------------------#
