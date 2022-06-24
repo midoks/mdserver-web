@@ -351,7 +351,7 @@ do
 done
 
 #getHostAddr
-PLIST=`who | grep ${ip} | awk '{print $2}'`
+PLIST=`who | grep "${ip}" | awk '{print $2}'`
 for i in $PLIST
 do
     ps -t /dev/$i |grep -v TTY | awk '{print $1}' | xargs kill -9
