@@ -290,6 +290,7 @@ if [ "$OSNAME" == "macos" ]; then
 elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     
     apt install -y devscripts
+    apt install -y net-tools
 
     apt install -y libffi-dev
     apt install -y cmake automake make
