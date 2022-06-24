@@ -58,6 +58,8 @@ Install_mysql()
 		-DWITH_PARTITION_STORAGE_ENGINE=1 \
 		-DEXTRA_CHARSETS=all \
 		-DDEFAULT_CHARSET=utf8mb4 \
+		-DCMAKE_C_COMPILER=/usr/bin/gcc \
+		-DCMAKE_CXX_COMPILER=/usr/bin/g++ \
 		-DDEFAULT_COLLATION=utf8mb4_general_ci \
 		&& make && make install && make clean
 

@@ -76,6 +76,8 @@ Install_mysql()
 		-DDEFAULT_COLLATION=utf8mb4_general_ci \
 		-DDOWNLOAD_BOOST=1 \
 		-DFORCE_INSOURCE_BUILD=1 \
+		-DCMAKE_C_COMPILER=/usr/bin/gcc \
+		-DCMAKE_CXX_COMPILER=/usr/bin/g++ \
 		-DWITH_BOOST=${mysqlDir}/mysql-8.0.25/boost/
 		make && make install && make clean
 
