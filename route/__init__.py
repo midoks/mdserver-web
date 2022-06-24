@@ -448,14 +448,16 @@ def connected_msg(msg):
         pass
         # print 'connected_msg:' + str(e)
 
-try:
-    import paramiko
-    ssh = paramiko.SSHClient()
 
-    # 启动尝试时连接
-    connect_ssh()
-except Exception as e:
-    print("本地终端无法使用")
+if not mw.isAppleSystem():
+    try:
+        import paramiko
+        ssh = paramiko.SSHClient()
+
+        # 启动尝试时连接
+        connect_ssh()
+    except Exception as e:
+        print("本地终端无法使用")
 
 
 ##################### ssh  end ###########################
