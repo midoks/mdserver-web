@@ -24,12 +24,19 @@ Install_mysql()
 	mkdir -p ${mysqlDir}
 	echo '正在安装脚本文件...' > $install_tmp
 
+	if id mysql &> /dev/null ;then 
+	    echo "mysql UID is `id -u www`"
+	    echo "mysql Shell is `grep "^www:" /etc/passwd |cut -d':' -f7 `"
+	else
+	    groupadd mysql
+		useradd -g mysql mysql
+	fi
+
 	if [ "$sysName" != "Darwin" ];then
 		mkdir -p /var/log/mariadb
 		touch /var/log/mariadb/mariadb.log
-		groupadd mysql
-		useradd -g mysql mysql
-	fi 
+	fi
+
 
 	if [ ! -f ${mysqlDir}/mysql-boost-${VERSION}.tar.gz ];then
 		wget -O ${mysqlDir}/mysql-boost-${VERSION}.tar.gz https://cdn.mysql.com/Downloads/MySQL-5.7/mysql-boost-${VERSION}.tar.gz
@@ -37,8 +44,8 @@ Install_mysql()
 
 	#检测文件是否损坏.
 	md5_mysql_ok=d0489fc3880248a58759c50bfb286dbb
-	if [ -f ${mysqlDir}/mysql-boost-${VERSION}.tar.gz; ];then
-		md5_mysql=`md5sum mysql-boost-${VERSION}.tar.gz  | awk '{print $1}'`
+	if [ -f ${mysqlDir}/mysql-boost-${VERSION}.tar.gz ];then
+		md5_mysql=`md5sum ${mysqlDir}/mysql-boost-${VERSION}.tar.gz  | awk '{print $1}'`
 		if [ "${md5_mysql_ok}" == "${md5_mysql}" ]; then
 			echo "mysql5.7 file check ok"
 		else
