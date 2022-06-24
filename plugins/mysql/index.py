@@ -103,6 +103,8 @@ def getConf():
 
 def getInitdTpl(version=''):
     path = getPluginDir() + '/init.d/mysql' + version + '.tpl'
+    if not os.path.exists(path):
+        path = getPluginDir() + '/init.d/mysql.tpl'
     return path
 
 
