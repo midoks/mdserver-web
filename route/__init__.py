@@ -360,7 +360,7 @@ done
 
 def connect_ssh():
     # print 'connect_ssh ....'
-    clear_ssh()
+    # clear_ssh()
     global shell, ssh
     if not os.path.exists('/root/.ssh/authorized_keys') or not os.path.exists('/root/.ssh/id_rsa') or not os.path.exists('/root/.ssh/id_rsa.pub'):
         create_rsa()
