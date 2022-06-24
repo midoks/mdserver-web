@@ -371,10 +371,10 @@ def connect_ssh():
 
     # 检查是否写入authorized_keys
     data = mw.execShell("cat /root/.ssh/id_rsa.pub | awk '{print $3}'")
-    if data[1] != "":
+    if data[0] != "":
         ak_data = mw.execShell(
-            "cat /root/.ssh/authorized_keys | grep " + data[1])
-        if ak_data[1] == "":
+            "cat /root/.ssh/authorized_keys | grep " + data[0])
+        if ak_data[0] == "":
             mw.execShell(
                 'cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys')
             mw.execShell('chmod 600 /root/.ssh/authorized_keys')
