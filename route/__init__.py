@@ -448,16 +448,14 @@ def connected_msg(msg):
         pass
         # print 'connected_msg:' + str(e)
 
-
 try:
     import paramiko
     ssh = paramiko.SSHClient()
 
-    # 尝试启动时连接
+    # 启动尝试时连接
     connect_ssh()
-except:
-    print("本地终端可能无法使用")
-    mw.execShell('pip3 install paramiko &')
+except Exception as e:
+    print("本地终端无法使用")
 
 
 ##################### ssh  end ###########################
