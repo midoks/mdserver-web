@@ -24,7 +24,7 @@ mw_start_debug(){
 }
 
 mw_start_debug2(){
-	gunicorn -b -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1  app:app
+	gunicorn -b :7200 -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1  app:app
 	python3 task.py &
 	
 }
