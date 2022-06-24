@@ -389,8 +389,6 @@ def connect_ssh():
         ssh.connect('127.0.0.1', mw.getSSHPort())
     except Exception as e:
         return False
-    else:
-        return False
 
     shell = ssh.invoke_shell(term='xterm', width=83, height=21)
     shell.setblocking(0)
