@@ -60,8 +60,14 @@ Install_mysql()
 		-DDEFAULT_CHARSET=utf8mb4 \
 		-DDEFAULT_COLLATION=utf8mb4_general_ci \
 		&& make && make install && make clean
-		echo '5.6' > $serverPath/mysql/version.pl
-		echo '安装完成' > $install_tmp
+
+
+		if [ -d $serverPath/mysql ];then
+			echo '5.6' > $serverPath/mysql/version.pl
+			echo '安装完成' > $install_tmp
+		else
+			echo '安装失败' > $install_tmp
+		fi
 	fi
 }
 
