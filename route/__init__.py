@@ -456,6 +456,7 @@ try:
     # 尝试启动时连接
     connect_ssh()
 except:
+    print("本地终端可能无法使用")
     mw.execShell('pip3 install paramiko &')
 
 
