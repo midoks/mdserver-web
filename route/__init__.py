@@ -378,11 +378,11 @@ def connect_ssh():
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
     try:
-        ssh.connect(mw.getHostAddr(), mw.getSSHPort(), timeout=10)
+        ssh.connect(mw.getHostAddr(), mw.getSSHPort(), timeout=3)
     except Exception as e:
-        ssh.connect('127.0.0.1', mw.getSSHPort())
+        ssh.connect('127.0.0.1', mw.getSSHPort(), timeout=3)
     except Exception as e:
-        ssh.connect('localhost', mw.getSSHPort())
+        ssh.connect('localhost', mw.getSSHPort(), timeout=3)
     except Exception as e:
         return False
 
