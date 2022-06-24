@@ -42,7 +42,7 @@ Install_pureftp()
 
 
 	if [ ! -f $serverPath/source/pureftp/pure-ftpd-${VER}.tar.gz ];then
-		wget -O $serverPath/source/pureftp/pure-ftpd-${VER}.tar.gz $DOWNLOAD
+		wget --no-check-certificate -O $serverPath/source/pureftp/pure-ftpd-${VER}.tar.gz $DOWNLOAD
 	fi
 
 	
