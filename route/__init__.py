@@ -323,13 +323,9 @@ def index(reqClass=None, reqAction=None, reqData=None):
     return publicObject(newInstance, reqAction)
 
 
+##################### ssh  start ###########################
 ssh = None
 shell = None
-try:
-    import paramiko
-    ssh = paramiko.SSHClient()
-except:
-    mw.execShell('pip3 install paramiko &')
 
 
 def create_rsa():
@@ -451,3 +447,16 @@ def connected_msg(msg):
     except Exception as e:
         pass
         # print 'connected_msg:' + str(e)
+
+
+try:
+    import paramiko
+    ssh = paramiko.SSHClient()
+
+    # 尝试启动时连接
+    connect_ssh()
+except:
+    mw.execShell('pip3 install paramiko &')
+
+
+##################### ssh  end ###########################
