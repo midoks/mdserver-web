@@ -109,10 +109,9 @@ curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/up
 如果你自己写了插件，想分享出来，也可以提Issue。
 ```
 
-- 开发文档 - https://github.com/midoks/mdserver-web/wiki/插件开发
-- 插件地址 - https://github.com/mw-plugin
 - 简单例子 - https://github.com/mw-plugin/simple-plugin 
-
+- 插件地址 - https://github.com/mw-plugin
+- 开发文档 - https://github.com/midoks/mdserver-web/wiki/插件开发
 
 
 ### Stargazers over time
