@@ -340,12 +340,21 @@ def create_rsa():
 
 
 def clear_ssh():
+    # 服务器IP
+    ip = mw.getHostAddr()
     sh = '''
 #!/bin/bash
 PLIST=`who | grep localhost | awk '{print $2}'`
 for i in $PLIST
 do
-    ps -t /dev/$i |grep -v TTY |awk '{print $1}' | xargs kill -9
+    ps -t /dev/$i |grep -v TTY | awk '{print $1}' | xargs kill -9
+done
+
+#getHostAddr
+PLIST=`who | grep ${ip} | awk '{print $2}'`
+for i in $PLIST
+do
+    ps -t /dev/$i |grep -v TTY | awk '{print $1}' | xargs kill -9
 done
 '''
     if not mw.isAppleSystem():
@@ -360,16 +369,29 @@ def connect_ssh():
     if not os.path.exists('/root/.ssh/authorized_keys') or not os.path.exists('/root/.ssh/id_rsa') or not os.path.exists('/root/.ssh/id_rsa.pub'):
         create_rsa()
 
+    # 检查是否写入authorized_keys
+    data = mw.execShell("cat /root/.ssh/id_rsa.pub | awk '{print $3}'")
+    if data[1] != "":
+        ak_data = mw.execShell(
+            "cat /root/.ssh/authorized_keys | grep " + data[1])
+        if ak_data[1] == "":
+            mw.execShell(
+                'cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys')
+            mw.execShell('chmod 600 /root/.ssh/authorized_keys')
+
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
     try:
+        ssh.connect(mw.getHostAddr(), mw.getSSHPort())
+    except Exception as e:
         ssh.connect('localhost', mw.getSSHPort())
     except Exception as e:
-        if mw.getSSHStatus():
-            try:
-                ssh.connect('127.0.0.1', mw.getSSHPort())
-            except:
-                return False
         ssh.connect('127.0.0.1', mw.getSSHPort())
+    except Exception as e:
+        return False
+    else:
+        return False
+
     shell = ssh.invoke_shell(term='xterm', width=83, height=21)
     shell.setblocking(0)
     return True
@@ -420,6 +442,7 @@ def connected_msg(msg):
     ssh_success = True
     if not shell:
         ssh_success = connect_ssh()
+        # print(ssh_success)
     if not ssh_success:
         emit('server_response', {'data': '连接SSH服务失败!\r\n'})
         return
