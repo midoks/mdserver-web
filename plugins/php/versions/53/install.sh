@@ -84,8 +84,8 @@ if [ ! -d $serverPath/php/53 ];then
 	--enable-sysvshm \
 	--disable-fileinfo \
 	$OPTIONS \
-	--enable-fpm \
-	&& make && make install && make clean
+	--enable-fpm
+	make clean && make && make install && make clean
 fi
 
 
