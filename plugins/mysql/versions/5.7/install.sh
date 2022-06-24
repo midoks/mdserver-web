@@ -35,6 +35,23 @@ Install_mysql()
 		wget -O ${mysqlDir}/mysql-boost-${VERSION}.tar.gz https://cdn.mysql.com/Downloads/MySQL-5.7/mysql-boost-${VERSION}.tar.gz
 	fi
 
+	#检测文件是否损坏.
+	md5_mysql_ok=d0489fc3880248a58759c50bfb286dbb
+	if [ -f ${mysqlDir}/mysql-boost-${VERSION}.tar.gz; ];then
+		md5_mysql=`md5sum mysql-boost-${VERSION}.tar.gz  | awk '{print $1}'`
+		if [ "${md5_mysql_ok}" == "${md5_mysql}" ]; then
+			echo "mysql5.7 file check ok"
+		else
+			# 重新下载
+			rm -rf ${mysqlDir}/mysql-${VERSION}
+			wget -O ${mysqlDir}/mysql-boost-${VERSION}.tar.gz https://cdn.mysql.com/Downloads/MySQL-5.7/mysql-boost-${VERSION}.tar.gz
+		fi
+	fi
+
+	if [ ! -d ${mysqlDir}/mysql-${VERSION} ];then
+		 cd ${mysqlDir} && tar -zxvf  ${mysqlDir}/mysql-boost-8.0.25.tar.gz
+	fi
+
 	if [ ! -d ${mysqlDir}/mysql-${VERSION} ];then
 		 cd ${mysqlDir} && tar -zxvf  ${mysqlDir}/mysql-boost-${VERSION}.tar.gz
 	fi
