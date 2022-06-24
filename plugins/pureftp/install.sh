@@ -30,7 +30,7 @@ fi
 
 Install_pureftp()
 {
-	mkdir -p ${serverPath}/pureftp
+	# mkdir -p ${serverPath}/pureftp
 	mkdir -p ${serverPath}/source/pureftp
 
 	# https://github.com/jedisct1/pure-ftpd/releases/download/1.0.49/pure-ftpd-1.0.49.tar.gz
@@ -38,20 +38,33 @@ Install_pureftp()
 	# DOWNLOAD=https://github.com/jedisct1/pure-ftpd/releases/download/${VER}/pure-ftpd-${VER}.tar.gz
 
 	VER=$1
-	FILE=pure-ftpd-${VER}.tar.gz
-	FDIR=pure-ftpd-${VER}
-	DOWNLOAD=https://download.pureftpd.org/pub/pure-ftpd/releases/$FILE
+	DOWNLOAD=https://download.pureftpd.org/pub/pure-ftpd/releases/pure-ftpd-${VER}.tar.gz
 
 
-	if [ ! -f $serverPath/source/pureftp/$FILE ];then
-		wget -O $serverPath/source/pureftp/$FILE $DOWNLOAD
+	if [ ! -f $serverPath/source/pureftp/pure-ftpd-${VER}.tar.gz ];then
+		wget -O $serverPath/source/pureftp/pure-ftpd-${VER}.tar.gz $DOWNLOAD
 	fi
 
-	if [ ! -d $serverPath/source/pureftp/$FDIR ];then
-		cd $serverPath/source/pureftp  && tar zxvf $FILE
+	
+
+	#检测文件是否损坏.
+	md5_ok=451879495ba61c1d7dcfca8dd231119f
+	if [ -f $serverPath/source/pureftp/pure-ftpd-${VER}.tar.gz ];then
+		md5_check=`md5sum $serverPath/source/pureftp/pure-ftpd-${VER}.tar.gz  | awk '{print $1}'`
+		if [ "${md5_ok}" == "${md5_check}" ]; then
+			echo "pure-ftpd file  check ok"
+		else
+			# 重新下载
+			rm -rf $serverPath/source/pureftp/pure-ftpd-${VER}
+			wget -O $serverPath/source/pureftp/pure-ftpd-${VER}.tar.gz $DOWNLOAD
+		fi
 	fi
 
-	cd $serverPath/source/pureftp/$FDIR &&  ./configure --prefix=${serverPath}/pureftp \
+	if [ ! -d $serverPath/source/pureftp/pure-ftpd-${VER} ];then
+		cd $serverPath/source/pureftp  && tar zxvf pure-ftpd-${VER}.tar.gz
+	fi
+
+	cd $serverPath/source/pureftp/pure-ftpd-${VER} &&  ./configure --prefix=${serverPath}/pureftp \
 　　 	--with-everything && make && make install && make clean
 	
 	if [ -d ${serverPath}/pureftp ];then 
