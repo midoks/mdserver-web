@@ -339,8 +339,8 @@ def initMysqlPwd():
 
     pwd = mw.getRandomString(16)
     cmd_pass = serverdir + '/bin/mysqladmin -uroot password ' + pwd
-    pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
     mw.execShell(cmd_pass)
+    pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
     return True
 
 
@@ -391,9 +391,11 @@ def myOp(version, method):
     # import commands
     init_file = initDreplace()
     try:
-        initData = initMysqlData()
-        if not initData:
+        isInited = initMysqlData()
+        if not isInited:
+            mw.execShell('systemctl start mysql')
             initMysqlPwd()
+            mw.execShell('systemctl stop mysql')
 
         mw.execShell('systemctl ' + method + ' mysql')
         return 'ok'
@@ -404,7 +406,6 @@ def myOp(version, method):
 def my8cmd(version, method):
     # mysql 8.0  and 5.7
     init_file = initDreplace(version)
-    isInited = 0
     try:
         if version == '5.7':
             isInited = initMysql57Data()
