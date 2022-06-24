@@ -56,7 +56,7 @@ Install_pureftp()
 		else
 			# 重新下载
 			rm -rf $serverPath/source/pureftp/pure-ftpd-${VER}
-			wget -O $serverPath/source/pureftp/pure-ftpd-${VER}.tar.gz $DOWNLOAD
+			wget --no-check-certificate -O $serverPath/source/pureftp/pure-ftpd-${VER}.tar.gz $DOWNLOAD
 		fi
 	fi
 
