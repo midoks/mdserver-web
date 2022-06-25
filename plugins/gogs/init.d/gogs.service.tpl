@@ -16,6 +16,7 @@ User=root
 Group=root
 WorkingDirectory={$SERVER_PATH}/gogs
 ExecStart={$SERVER_PATH}/gogs/gogs web
+ExecReload=/bin/kill -USR2 $MAINPID
 Restart=always
 Environment=USER=git HOME=/usr/bin/git
 
