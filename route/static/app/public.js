@@ -1594,7 +1594,8 @@ function pluginOpService(a, b, v) {
             }
 
             setTimeout(function(){
-            	location.reload();
+            	// location.reload();
+            	getSList();
             },2000);
         },'json').error(function() {
             layer.close(e);
