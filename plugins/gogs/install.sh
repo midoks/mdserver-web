@@ -47,8 +47,11 @@ Install_gogs()
 
 	cd $serverPath/source/gogs && unzip -o $file -d gogs_${version}
 	mv $serverPath/source/gogs/gogs_${version}/gogs/ $serverPath/gogs
-	echo $version > $serverPath/gogs/version.pl
 
+
+	if [ -d $serverPath/gogs ];then
+		echo $version > $serverPath/gogs/version.pl
+	fi
 	# if id -u gogs > /dev/null 2>&1; then
  #        echo "gogs user exists"
 	# else

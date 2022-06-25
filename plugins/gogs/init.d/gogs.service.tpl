@@ -1,8 +1,6 @@
 [Unit]
 Description=Gogs
-After=syslog.target
 After=network.target
-After=mariadb.service mysqld.service postgresql.service memcached.service redis.service
 
 [Service]
 # Modify these two values and uncomment them if you have
@@ -18,7 +16,7 @@ WorkingDirectory={$SERVER_PATH}/gogs
 ExecStart={$SERVER_PATH}/gogs/gogs web
 ExecReload=/bin/kill -USR2 $MAINPID
 Restart=always
-Environment=USER=git HOME=/usr/bin/git
+Environment=USER=root HOME=/root
 
 # Some distributions may not support these hardening directives. If you cannot start the service due
 # to an unknown option, comment out the ones not supported by your version of systemd.
