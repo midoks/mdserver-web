@@ -20,7 +20,7 @@ function varnishStatus() {
         }
 
         var rdata = $.parseJSON(data.data);
-        // console.log(rdata);
+        console.log(rdata);
 
         var tmp = "";
         for (let i in rdata) {
