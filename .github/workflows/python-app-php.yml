@@ -5,9 +5,9 @@ name: MW APP PHP53
 
 on:
   push:
-    branches: [ "dev" ]
+    branches: [ "master","dev" ]
   pull_request:
-    branches: [ "dev" ]
+    branches: [ "master","dev" ]
 
 permissions:
   contents: read
