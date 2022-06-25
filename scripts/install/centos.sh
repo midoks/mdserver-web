@@ -81,7 +81,7 @@ yum install -y libevent libevent-devel libjpeg* libpng* gd* libxslt* unzip
 yum install -y python-imaging libicu-devel zip bzip2-devel gcc libxml2 libxml2-devel  pcre pcre-devel
 yum install -y libjpeg-devel libpng-devel libwebp libwebp-devel
 yum install -y lsof net-tools
-yum install -y ncurses-devel mysql-devel cmake
+yum install -y ncurses-devel cmake
 yum install -y MySQL-python 
 
 
