@@ -78,8 +78,9 @@ echo "use system version: ${OSNAME}"
 curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/install/${OSNAME}.sh | bash
 
 chmod +x /www/server/mdserver-web/mw-cli
-ln -s /www/server/mdserver-web/mw-cli /usr/bin/mw-cli
-
+if [ ! -e /usr/bin/mw-cli ]; then 
+	ln -s /www/server/mdserver-web/mw-cli /usr/bin/mw-cli
+fi
 endTime=`date +%s`
 ((outTime=(${endTime}-${startTime})/60))
 echo -e "Time consumed:\033[32m $outTime \033[0mMinute!"
