@@ -178,9 +178,14 @@ def getRootUrl():
     content = mw.readFile(getConf())
     rep = 'ROOT_URL\s*=\s*(.*)'
     tmp = re.search(rep, content)
-    if not tmp:
-        return ''
-    return tmp.groups()[0]
+    if tmp:
+        return tmp.groups()[0]
+
+    rep = 'EXTERNAL_URL\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    if tmp:
+        return tmp.groups()[0]
+    return ''
 
 
 def getSshPort():
