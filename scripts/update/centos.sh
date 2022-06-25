@@ -23,8 +23,6 @@ if [ ! -f /usr/local/bin/pip3 ];then
 fi
 
 
-
-
 pip install --upgrade pip
 cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
 pip3 install gunicorn==20.1.0
