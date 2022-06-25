@@ -48,6 +48,10 @@ def getConf():
     return mw.getServerDir() + '/web_conf/nginx/vhost/phpmyadmin.conf'
 
 
+def getConfInc():
+    return getServerDir() + '/phpmyadmin/config.inc.conf'
+
+
 def getPort():
     file = getConf()
     content = mw.readFile(file)
@@ -226,6 +230,8 @@ if __name__ == "__main__":
         print(reload())
     elif func == 'conf':
         print(getConf())
+    elif func == 'config_inc':
+        print(getConfInc())
     elif func == 'get_home_page':
         print(getHomePage())
     elif func == 'set_php_ver':
