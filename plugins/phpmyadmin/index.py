@@ -49,7 +49,7 @@ def getConf():
 
 
 def getConfInc():
-    return getServerDir() + '/phpmyadmin/config.inc.conf'
+    return getServerDir() + '/phpmyadmin/config.inc.php'
 
 
 def getPort():
