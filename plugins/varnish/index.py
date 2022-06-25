@@ -81,33 +81,29 @@ def status():
     return 'start'
 
 
-def start():
-    data = mw.execShell('systemctl start ' + getPluginName())
+def vaOp(method):
+    mw.execShell("systemctl daemon-reload")
+    data = mw.execShell('systemctl ' + method + ' ' + getPluginName())
     if data[1] == '':
         return 'ok'
     return 'fail'
+
+
+def start():
+    return vaOp('start')
 
 
 def stop():
-    data = mw.execShell('systemctl stop ' + getPluginName())
-    if data[1] == '':
-        return 'ok'
-    return 'fail'
+    return vaOp('stop')
 
 
 def restart():
-    data = mw.execShell('systemctl restart ' + getPluginName())
-    if data[1] == '':
-        return 'ok'
-    return 'fail'
+    return vaOp('restart')
 
 
 def reload():
     # file = initDreplace()
-    data = mw.execShell('systemctl reload ' + getPluginName())
-    if data[1] == '':
-        return 'ok'
-    return 'fail'
+    return vaOp('reload')
 
 
 def runInfo():
@@ -138,9 +134,8 @@ def readConfigTpl():
 
 
 def initdStatus():
-    if not app_debug:
-        if mw.isAppleSystem():
-            return "Apple Computer does not support"
+    if mw.isAppleSystem():
+        return "Apple Computer does not support"
 
     shell_cmd = 'systemctl status ' + \
         getPluginName() + ' | grep loaded | grep "enabled;"'
@@ -151,19 +146,16 @@ def initdStatus():
 
 
 def initdInstall():
-    import shutil
-    if not app_debug:
-        if mw.isAppleSystem():
-            return "Apple Computer does not support"
+    if mw.isAppleSystem():
+        return "Apple Computer does not support"
 
     mw.execShell('systemctl enable ' + getPluginName())
     return 'ok'
 
 
 def initdUinstall():
-    if not app_debug:
-        if mw.isAppleSystem():
-            return "Apple Computer does not support"
+    if mw.isAppleSystem():
+        return "Apple Computer does not support"
 
     mw.execShell('systemctl disable ' + getPluginName())
     return 'ok'
