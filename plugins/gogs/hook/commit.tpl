@@ -2,7 +2,7 @@
 
 echo `date`
 
-GITADDR="{$GITROOTURL}/{$USERNAME}/{$PROJECT}"
+GITADDR="{$GITROOTURL}/{$USERNAME}/{$PROJECT}.git"
 GIT_SDIR="{$CODE_DIR}"
 
 GIT_USER_DIR="${GIT_SDIR}/{$USERNAME}"
@@ -24,7 +24,7 @@ cd $GIT_PROJECT_DIR && git pull
 # cd $GIT_PROJECT_DIR && env -i git pull origin master
 
 
-
+#更新的目的地址
 WEB_PATH={$WEB_ROOT}/{$USERNAME}/{$PROJECT}
 mkdir -p $WEB_PATH
 
