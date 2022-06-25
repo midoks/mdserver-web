@@ -593,8 +593,8 @@ def projectScriptLoad():
 
     cc_content = mw.readFile(commit_tpl)
 
-    sshUrl = 'http://127.0.0.1:' + getHttpPort()
-    cc_content = cc_content.replace('{$GITROOTURL}', sshUrl)
+    gitPath = getRootPath()
+    cc_content = cc_content.replace('{$GITROOTURL}', gitPath)
     cc_content = cc_content.replace('{$CODE_DIR}', codeDir)
     cc_content = cc_content.replace('{$USERNAME}', user)
     cc_content = cc_content.replace('{$PROJECT}', args['name'])
