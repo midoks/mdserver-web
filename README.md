@@ -39,8 +39,8 @@
 
 
 ### 问题
-- Ubuntu 20 无法安装mysql5.7 && mysql 80.
-- Ftp debian无法安装成功。
+- OP防火墙，暂不要开启。
+
 
 
 ### GW使用
