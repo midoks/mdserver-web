@@ -260,13 +260,25 @@ def pSqliteDb(conf):
     return psDb
 
 
+def getGogsDbType(conf):
+
+    if 'DB_TYPE' in conf:
+        return conf['DB_TYPE']
+
+    if 'TYPE' in conf:
+        return conf['TYPE']
+
+    return 'NONE'
+
+
 def pQuery(sql):
     conf = getDbConfValue()
-    if conf['DB_TYPE'] == 'sqlite3':
+    gtype = getGogsDbType(conf)
+    if gtype == 'sqlite3':
         db = pSqliteDb(conf)
         data = db.query(sql, []).fetchall()
         return data
-    elif conf['DB_TYPE'] == 'mysql':
+    elif gtype == 'mysql':
         db = pMysqlDb(conf)
         return db.query(sql)
 
