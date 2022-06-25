@@ -116,6 +116,10 @@ def start():
         centent = contentReplace(centent)
         mw.writeFile(file_run, centent)
 
+    tmp = getServerDir() + '/phpmyadmin/tmp'
+    if not os.path.exists(tmp):
+        os.mkdir(tmp)
+
     conf_run = getServerDir() + '/phpmyadmin/config.inc.php'
     if not os.path.exists(conf_run):
         conf_tpl = getPluginDir() + '/conf/config.inc.php'
