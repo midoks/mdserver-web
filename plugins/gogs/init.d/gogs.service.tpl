@@ -10,13 +10,13 @@ After=network.target
 #LimitMEMLOCK=infinity
 #LimitNOFILE=65535
 Type=simple
-User=root
-Group=root
+User=git
+Group=git
 WorkingDirectory={$SERVER_PATH}/gogs
 ExecStart={$SERVER_PATH}/gogs/gogs web
 ExecReload=/bin/kill -USR2 $MAINPID
 Restart=always
-Environment=USER=root HOME=/root
+Environment=USER=git HOME=/home/git
 
 # Some distributions may not support these hardening directives. If you cannot start the service due
 # to an unknown option, comment out the ones not supported by your version of systemd.
