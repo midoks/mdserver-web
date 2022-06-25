@@ -11,10 +11,11 @@ sys.path.append(os.getcwd() + "/class/core")
 import mw
 
 
-cmd = 'ls /usr/local/lib/ | grep python  | cut -d \\  -f 1 | awk \'END {print}\''
-info = mw.execShell(cmd)
-p = "/usr/local/lib/" + info[0].strip() + "/site-packages"
-sys.path.append(p)
+# cmd = 'ls /usr/local/lib/ | grep python  | cut -d \\  -f 1 | awk \'END {print}\''
+# info = mw.execShell(cmd)
+# p = "/usr/local/lib/" + info[0].strip() + "/site-packages"
+# sys.path.append(p)
+
 import psutil
 
 
@@ -59,6 +60,13 @@ def getArgs():
             tmp[t[0]] = t[1]
 
     return tmp
+
+
+def checkArgs(data, ck=[]):
+    for i in range(len(ck)):
+        if not ck[i] in data:
+            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
+    return (True, mw.returnJson(True, 'ok'))
 
 
 def getInitdConfTpl():
@@ -218,8 +226,7 @@ def getDbConfValue():
     return r
 
 
-def pMysqlDb():
-    conf = getDbConfValue()
+def pMysqlDb(conf):
 
     host = conf['HOST'].split(':')
     conn = mysqlDb.mysqlDb()
@@ -230,6 +237,41 @@ def pMysqlDb():
     conn.setPort(int(host[1]))
     conn.setDb(conf['NAME'])
     return conn
+
+
+def pSqliteDb(conf):
+    # print(conf)
+    import db
+    psDb = db.Sql()
+
+    # 默认
+    gsdir = getServerDir() + '/data'
+    dbname = 'gogs'
+    if conf['PATH'][0] == '/':
+        # 绝对路径
+        pass
+    else:
+        path = conf['PATH'].split('/')
+        gsdir = getServerDir() + '/' + path[0]
+        dbname = path[1].split('.')[0]
+
+    # print(gsdir, dbname)
+    psDb.dbPos(gsdir, dbname)
+    return psDb
+
+
+def pQuery(sql):
+    conf = getDbConfValue()
+    if conf['DB_TYPE'] == 'sqlite3':
+        db = pSqliteDb(conf)
+        data = db.query(sql, []).fetchall()
+        return data
+    elif conf['DB_TYPE'] == 'mysql':
+        db = pMysqlDb(conf)
+        return db.query(sql)
+
+    print("仅支持mysql|sqlite3配置")
+    exit(0)
 
 
 def isSqlError(mysqlMsg):
@@ -255,37 +297,35 @@ def isSqlError(mysqlMsg):
     return mw.returnData(True, 'OK')
 
 
-def start():
-
+def gogsOp(method):
     file = initDreplace()
-    data = mw.execShell(__SR + file + ' start')
+
+    if not mw.isAppleSystem():
+        data = mw.execShell('systemctl ' + method + ' gogs')
+        if data[1] == '':
+            return 'ok'
+        return 'fail'
+
+    data = mw.execShell(__SR + file + ' ' + method)
     if data[1] == '':
         return 'ok'
     return data[0]
 
 
+def start():
+    return gogsOp('start')
+
+
 def stop():
-    file = initDreplace()
-    data = mw.execShell(__SR + file + ' stop')
-    if data[1] == '':
-        return 'ok'
-    return data[1]
+    return gogsOp('stop')
 
 
 def restart():
-    file = initDreplace()
-    data = mw.execShell(__SR + file + ' restart')
-    if data[1] == '':
-        return 'ok'
-    return data[1]
+    return gogsOp('restart')
 
 
 def reload():
-    file = initDreplace()
-    data = mw.execShell(__SR + file + ' reload')
-    if data[1] == '':
-        return 'ok'
-    return data[1]
+    return gogsOp('reload')
 
 
 def initdStatus():
@@ -391,15 +431,13 @@ def userList():
     import math
     args = getArgs()
 
-    page = 1
-    page_size = 10
+    data = checkArgs(args, ['page', 'page_size'])
+    if not data[0]:
+        return data[1]
+
+    page = int(args['page'])
+    page_size = int(args['page_size'])
     search = ''
-    if 'page' in args:
-        page = int(args['page'])
-
-    if 'page_size' in args:
-        page_size = int(args['page_size'])
-
     if 'search' in args:
         search = args['search']
 
@@ -407,17 +445,13 @@ def userList():
 
     data['root_url'] = getRootUrl()
 
-    pm = pMysqlDb()
     start = (page - 1) * page_size
-    list_count = pm.query('select count(id) as num from user')
+    list_count = pQuery('select count(id) as num from user')
     count = list_count[0][0]
-
-    list_data = pm.query(
+    list_data = pQuery(
         'select id,name,email from user order by id desc limit ' + str(start) + ',' + str(page_size))
-
-    page_info = {'count': count, 'p': page,
-                 'row': page_size, 'tojs': 'gogsUserList'}
-    data['list'] = mw.getPage(page_info)
+    data['list'] = mw.getPage({'count': count, 'p': page,
+                               'row': page_size, 'tojs': 'gogsUserList'})
     data['page'] = page
     data['page_size'] = page_size
     data['page_count'] = int(math.ceil(count / page_size))
@@ -620,8 +654,7 @@ def getTotalStatistics():
     st = status()
     data = {}
     if st.strip() == 'start':
-        pm = pMysqlDb()
-        list_count = pm.query('select count(id) as num from repository')
+        list_count = pQuery('select count(id) as num from repository')
 
         if list_count.find("error") > -1:
             data['status'] = False
