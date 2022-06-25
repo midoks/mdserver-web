@@ -22,10 +22,7 @@ if [ ! -f /usr/local/bin/pip3 ];then
     python3 -m pip install --upgrade pip setuptools wheel -i https://mirrors.aliyun.com/pypi/simple
 fi
 
-#venv
-if [ ! -f /www/server/mdserver-web/bin/activate ];then
-    cd /www/server/mdserver-web && python3 -m venv .
-fi
+
 
 
 pip install --upgrade pip
@@ -38,7 +35,9 @@ pip3 install flask-caching==1.10.1
 pip3 install psutil==5.9.1 
 pip3 install pymongo
 
-if [ -f /www/server/mdserver-web/bin/activate ];then
+#venv
+if [ ! -f /www/server/mdserver-web/bin/activate ];then
+    cd /www/server/mdserver-web && python3 -m venv .
     cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate
     pip install --upgrade pip
     pip3 install -r /www/server/mdserver-web/requirements.txt
