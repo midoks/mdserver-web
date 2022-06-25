@@ -35,13 +35,15 @@ Install_gogs()
 	version=$1
 	os=`getOs`
 
-	if id git &> /dev/null ;then 
-	    echo "git uid is `id -u git`"
-	    echo "git shell is `grep "^git:" /etc/passwd |cut -d':' -f7 `"
-	else
-	    groupadd git
-		useradd -g git git
-	fi
+	# if id git &> /dev/null ;then 
+	#     echo "git uid is `id -u git`"
+	#     echo "git shell is `grep "^git:" /etc/passwd |cut -d':' -f7 `"
+	# else
+	#     groupadd git
+	# 	useradd -g git git
+	# fi
+
+	# git config --global push.default simple
 
 	if [ "darwin" == "$os" ];then
 		file=gogs_${version}_darwin_amd64.zip
