@@ -20,10 +20,9 @@ from flask import redirect
 
 
 def init():
-
     initDB()
-    initInitD()
     initUserInfo()
+    initInitD()
 
 
 def local():
@@ -57,7 +56,6 @@ def doContentReplace(src, dst):
 
 
 def initInitD():
-    mw.setHostAddr(mw.getLocalIp())
 
     # systemctl
     # 有问题
@@ -96,6 +94,9 @@ def initInitD():
         # 加入自启动
         mw.execShell('which chkconfig && chkconfig --add mw')
         mw.execShell('which update-rc.d && update-rc.d -f mw defaults')
+
+    # 获取系统IPV4
+    mw.setHostAddr(mw.getLocalIp())
 
 
 def initUserInfo():
