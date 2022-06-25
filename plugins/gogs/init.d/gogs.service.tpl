@@ -17,7 +17,7 @@ Group=root
 WorkingDirectory={$SERVER_PATH}/gogs
 ExecStart={$SERVER_PATH}/gogs/gogs web
 Restart=always
-Environment=USER=git HOME=/home/git
+Environment=USER=git HOME=/usr/bin/git
 
 # Some distributions may not support these hardening directives. If you cannot start the service due
 # to an unknown option, comment out the ones not supported by your version of systemd.
