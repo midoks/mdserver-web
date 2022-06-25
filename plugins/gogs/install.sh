@@ -63,6 +63,10 @@ Install_gogs()
 Uninstall_gogs()
 {
 	rm -rf $serverPath/gogs
+	if [ -f /usr/lib/systemd/system/gogs.service ];then
+		systemctl stop gogs
+		rm -rf /usr/lib/systemd/system/gogs.service
+	fi
 	echo 'uninstall success' > $install_tmp
 }
 
