@@ -56,7 +56,7 @@ fi
 echo "$sourcePath/php/php${PHP_VER}"
 
 if [ ! -d $serverPath/php/${PHP_VER} ];then
-	cd $sourcePath/php/php${PHP_VER} && make clean
+	cd $sourcePath/php/php${PHP_VER}
 	./buildconf --force
 	./configure \
 	--prefix=$serverPath/php/${PHP_VER} \
@@ -79,7 +79,7 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--disable-fileinfo \
 	$OPTIONS \
 	--enable-fpm
-	make && make install && make clean
+	make && make install
 fi 
 #------------------------ install end ------------------------------------#
 }
