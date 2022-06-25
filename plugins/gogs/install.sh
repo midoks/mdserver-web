@@ -43,7 +43,7 @@ Install_gogs()
 	# 	useradd -g git git
 	# fi
 
-	# git config --global push.default simple
+	git config --global push.default simple
 
 	if [ "darwin" == "$os" ];then
 		file=gogs_${version}_darwin_amd64.zip
