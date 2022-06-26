@@ -30,7 +30,7 @@ mw_start_panel()
 {
     isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`
     if [ "$isStart" == '' ];then
-        echo -e "Starting mw Panel... \c"
+        echo -e "Starting mw-panel... \c"
         cd $mw_path &&  gunicorn -c setting.py app:app
         port=$(cat ${mw_path}/data/port.pl)
         isStart=""
@@ -49,12 +49,12 @@ mw_start_panel()
                 echo '------------------------------------------------------'
                 tail -n 20 ${mw_path}/logs/error.log
                 echo '------------------------------------------------------'
-                echo -e "\033[31mError: mw Panel service startup failed.\033[0m"
+                echo -e "\033[31mError: mw-panel service startup failed.\033[0m"
                 return;
         fi
         echo -e "\033[32mdone\033[0m"
     else
-        echo "Starting mw Panel... mw(pid $(echo $isStart)) already running"
+        echo "Starting mw-panel... mw(pid $(echo $isStart)) already running"
     fi
 }
 
@@ -103,7 +103,7 @@ mw_stop_task()
 
 mw_stop_panel()
 {
-    echo -e "Stopping mw Panel... \c";
+    echo -e "Stopping mw-panel... \c";
     arr=`ps aux|grep 'gunicorn -c setting.py app:app'|grep -v grep|awk '{print $2}'`
     for p in ${arr[@]}
     do
