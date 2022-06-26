@@ -31,6 +31,8 @@ jobs:
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip3 install -r requirements.txt; fi
 
+    - name: Install LIB
+      run: |
         bash scripts/install.sh
     - name: Start DEBUG
       run: |
