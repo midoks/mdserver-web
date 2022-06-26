@@ -19,7 +19,6 @@ apt install -y wget curl lsof unzip
 apt install -y python3-pip
 apt install -y python3-dev
 apt install -y python3-venv
-
 apt install -y cron
 
 if [ ! -d /root/.acme.sh ];then	
@@ -120,6 +119,7 @@ pip3 install flask-caching==1.10.1
 pip3 install pymongo
 pip3 install psutil
 pip3 install flask-socketio==5.2.0
+pip3 install mysqlclient
 
 if [ ! -f /www/server/mdserver-web/bin/activate ];then
     cd /www/server/mdserver-web && python3 -m venv .
@@ -133,6 +133,7 @@ if [ ! -f /www/server/mdserver-web/bin/activate ];then
 	pip3 install flask-caching==1.10.1
 	pip3 install pymongo
 	pip3 install psutil
+	pip3 install mysqlclient
 	pip3 install flask-socketio==5.2.0
 fi
 
