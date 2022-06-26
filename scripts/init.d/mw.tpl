@@ -190,11 +190,11 @@ case "$1" in
             v4=$(python3 /www/server/mdserver-web/tools.py getServerIp 4)
             v6=$(python3 /www/server/mdserver-web/tools.py getServerIp 6)
 
-            if [ $v4 != "" ] && [ $v6 != "" ]; then
+            if [ "$v4" != "" ] && [ "$v6" != "" ]; then
                 address="MW-Panel-Url-Ipv4: http://$v4:$port$auth_path \nMW-Panel-Url-Ipv6: http://[$v6]:$port$auth_path"
-            elif [ $v4 != "" ]; then
+            elif [ "$v4" != "" ]; then
                 address="MW-Panel-Url: http://$v4:$port$auth_path"
-            elif [ $v6 != "" ]; then
+            elif [ "$v6" != "" ]; then
                 address="MW-Panel-Url: http://[$v6]:$port$auth_path"
             else
                 address="No v4 or v6 available"
