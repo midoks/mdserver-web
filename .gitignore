@@ -132,3 +132,4 @@ data/sessions
 data/ssl.pl
 data/port.pl
 plugins/openlitespeed
+plugins/gdrive/
