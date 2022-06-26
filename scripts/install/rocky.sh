@@ -74,7 +74,7 @@ yum install -y libevent libevent-devel libjpeg* libpng* gd* libxslt* unzip libmc
 yum install -y wget python-imaging libicu-devel zip bzip2-devel gcc libxml2 libxml2-dev  libjpeg-devel libpng-devel libwebp libwebp-devel pcre pcre-devel
 yum install -y lsof net-tools
 yum install -y ncurses-devel mysql-devel cmake
-yum install -y MySQL-python 
+yum install -y MySQL-python
 
 
 cd /www/server/mdserver-web/scripts && bash lib.sh
@@ -96,6 +96,7 @@ pip3 install flask-caching==1.10.1
 pip3 install python-socketio==4.2.0
 pip3 install psutil==5.9.1 
 pip3 install pymongo
+pip3 install mysqlclient
 
 
 if [ ! -f /www/server/mdserver-web/bin/activate ];then
