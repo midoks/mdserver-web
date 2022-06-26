@@ -24,7 +24,7 @@ fi
 pip install --upgrade pip
 cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
 pip3 install flask-socketio==5.2.0
-
+pip3 install mysqlclient
 #venv
 if [ ! -f /www/server/mdserver-web/bin/activate ];then
     cd /www/server/mdserver-web && python3 -m venv .
@@ -43,7 +43,7 @@ pip3 install flask-caching==1.10.1
 pip3 install flask-socketio==5.2.0
 pip3 install psutil==5.9.1 
 pip3 install pymongo
-
+pip3 install mysqlclient
 
 
 if [ -f /etc/init.d/mw ]; then
