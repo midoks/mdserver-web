@@ -187,8 +187,8 @@ case "$1" in
         fi
 	    
         if [ "$address" = "" ];then
-            v4=$(python3 /www/server/mdserver-web/tools.py getServerIp 4)
-            v6=$(python3 /www/server/mdserver-web/tools.py getServerIp 6)
+            v4=$(python3 $mw_path/tools.py getServerIp 4)
+            v6=$(python3 $mw_path/tools.py getServerIp 6)
 
             if [ "$v4" != "" ] && [ "$v6" != "" ]; then
                 address="MW-Panel-Url-Ipv4: http://$v4:$port$auth_path \nMW-Panel-Url-Ipv6: http://[$v6]:$port$auth_path"
