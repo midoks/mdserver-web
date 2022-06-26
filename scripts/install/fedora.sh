@@ -79,26 +79,9 @@ yum -y install MySQL-python
 yum -y install python3-devel
 
 
-cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
+
 cd /www/server/mdserver-web/scripts && bash lib.sh
 chmod 755 /www/server/mdserver-web/data
-
-if [ ! -f /usr/local/bin/pip3 ];then
-    python3 -m pip install --upgrade pip setuptools wheel -i https://mirrors.aliyun.com/pypi/simple
-fi
-
-pip install --upgrade pip
-cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
-pip3 install mysqlclient
-
-if [ ! -f /www/server/mdserver-web/bin/activate ];then
-    cd /www/server/mdserver-web && python3 -m venv .
-    cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate
-    pip install --upgrade pip
-    pip3 install -r /www/server/mdserver-web/requirements.txt
-    pip3 install mysqlclient
-fi
-
 
     
 
