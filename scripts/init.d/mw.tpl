@@ -187,24 +187,14 @@ case "$1" in
         fi
 	    
         if [ "$address" = "" ];then
-            v4_available=true
-            v6_available=true
-            {
-                v4=$(curl -4 -sS --connect-timeout 5 -m 60 https://v6r.ipip.net/?format=text)
-            } || { 
-                v4_available=false
-            }
-            {
-                v6=$(curl -6 -sS --connect-timeout 5 -m 60 https://v6r.ipip.net/?format=text)
-            } || { 
-                v6_available=false
-            }
+            v4=$(python3 /www/server/mdserver-web/tools.py getServerIp 4)
+            v6=$(python3 /www/server/mdserver-web/tools.py getServerIp 6)
 
-            if [ $v4_available = true ] && [ $v6_available = true ]; then
-                address="MW-Panel-Url: http://$v4:$port$auth_path \nMW-Panel-Url: http://[$v6]:$port$auth_path"
-            elif [ $v4_available = true ]; then
+            if [ $v4 != "" ] && [ $v6 != "" ]; then
+                address="MW-Panel-Url-Ipv4: http://$v4:$port$auth_path \nMW-Panel-Url-Ipv6: http://[$v6]:$port$auth_path"
+            elif [ $v4 != "" ]; then
                 address="MW-Panel-Url: http://$v4:$port$auth_path"
-            elif [ $v6_available = true ]; then
+            elif [ $v6 != "" ]; then
                 address="MW-Panel-Url: http://[$v6]:$port$auth_path"
             else
                 address="No v4 or v6 available"
