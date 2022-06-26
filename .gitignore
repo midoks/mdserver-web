@@ -133,3 +133,5 @@ data/ssl.pl
 data/port.pl
 plugins/openlitespeed
 plugins/gdrive/
+data/ipv6.pl
+data/restart.pl

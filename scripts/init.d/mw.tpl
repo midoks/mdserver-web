@@ -26,62 +26,71 @@ else
     echo ""
 fi
 
-
-mw_start(){
-	isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`
-	if [ "$isStart" == '' ];then
-            echo -e "Starting mw... \c"
-            cd $mw_path &&  gunicorn -c setting.py app:app
-            port=$(cat ${mw_path}/data/port.pl)
-            isStart=""
-            while [[ "$isStart" == "" ]];
-            do
-                echo -e ".\c"
-                sleep 0.5
-                isStart=$(lsof -n -P -i:$port|grep LISTEN|grep -v grep|awk '{print $2}'|xargs)
-                let n+=1
-                if [ $n -gt 15 ];then
-                    break;
-                fi
-            done
-            if [ "$isStart" == '' ];then
-                    echo -e "\033[31mfailed\033[0m"
-                    echo '------------------------------------------------------'
-                    tail -n 20 ${mw_path}/logs/error.log
-                    echo '------------------------------------------------------'
-                    echo -e "\033[31mError: mw service startup failed.\033[0m"
-                    return;
-            fi
-            echo -e "\033[32mdone\033[0m"
-    else
-            echo "Starting mw... mw(pid $(echo $isStart)) already running"
-    fi
-
-
-    isStart=$(ps aux |grep 'task.py'|grep -v grep|awk '{print $2}')
+mw_start_panel()
+{
+    isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`
     if [ "$isStart" == '' ];then
-            echo -e "Starting mw-tasks... \c"
-            cd $mw_path && python3 task.py >> ${mw_path}/logs/task.log 2>&1 &
-            sleep 0.3
-            isStart=$(ps aux |grep 'task.py'|grep -v grep|awk '{print $2}')
-            if [ "$isStart" == '' ];then
-                    echo -e "\033[31mfailed\033[0m"
-                    echo '------------------------------------------------------'
-                    tail -n 20 $mw_path/logs/task.log
-                    echo '------------------------------------------------------'
-                    echo -e "\033[31mError: mw-tasks service startup failed.\033[0m"
-                    return;
+        echo -e "Starting mw Panel... \c"
+        cd $mw_path &&  gunicorn -c setting.py app:app
+        port=$(cat ${mw_path}/data/port.pl)
+        isStart=""
+        while [[ "$isStart" == "" ]];
+        do
+            echo -e ".\c"
+            sleep 0.5
+            isStart=$(lsof -n -P -i:$port|grep LISTEN|grep -v grep|awk '{print $2}'|xargs)
+            let n+=1
+            if [ $n -gt 15 ];then
+                break;
             fi
-            echo -e "\033[32mdone\033[0m"
+        done
+        if [ "$isStart" == '' ];then
+                echo -e "\033[31mfailed\033[0m"
+                echo '------------------------------------------------------'
+                tail -n 20 ${mw_path}/logs/error.log
+                echo '------------------------------------------------------'
+                echo -e "\033[31mError: mw Panel service startup failed.\033[0m"
+                return;
+        fi
+        echo -e "\033[32mdone\033[0m"
     else
-            echo "Starting mw-tasks... mw-tasks (pid $isStart) already running"
+        echo "Starting mw Panel... mw(pid $(echo $isStart)) already running"
     fi
 }
 
 
-mw_stop()
+mw_start_task()
 {
-	echo -e "Stopping mw-tasks... \c";
+    isStart=$(ps aux |grep 'task.py'|grep -v grep|awk '{print $2}')
+    if [ "$isStart" == '' ];then
+        echo -e "Starting mw-tasks... \c"
+        cd $mw_path && python3 task.py >> ${mw_path}/logs/task.log 2>&1 &
+        sleep 0.3
+        isStart=$(ps aux |grep 'task.py'|grep -v grep|awk '{print $2}')
+        if [ "$isStart" == '' ];then
+                echo -e "\033[31mfailed\033[0m"
+                echo '------------------------------------------------------'
+                tail -n 20 $mw_path/logs/task.log
+                echo '------------------------------------------------------'
+                echo -e "\033[31mError: mw-tasks service startup failed.\033[0m"
+                return;
+        fi
+        echo -e "\033[32mdone\033[0m"
+    else
+        echo "Starting mw-tasks... mw-tasks (pid $isStart) already running"
+    fi
+}
+
+mw_start()
+{
+	mw_start_panel
+    mw_start_task
+}
+
+
+mw_stop_task()
+{
+    echo -e "Stopping mw-tasks... \c";
     pids=$(ps aux | grep 'task.py'|grep -v grep|awk '{print $2}')
     arr=($pids)
 
@@ -90,18 +99,27 @@ mw_stop()
             kill -9 $p
     done
     echo -e "\033[32mdone\033[0m"
+}
 
-    echo -e "Stopping mw... \c";
+mw_stop_panel()
+{
+    echo -e "Stopping mw Panel... \c";
     arr=`ps aux|grep 'gunicorn -c setting.py app:app'|grep -v grep|awk '{print $2}'`
-	for p in ${arr[@]}
+    for p in ${arr[@]}
     do
             kill -9 $p &>/dev/null
     done
     
     if [ -f $pidfile ];then
-    	rm -f $pidfile
+        rm -f $pidfile
     fi
     echo -e "\033[32mdone\033[0m"
+}
+
+mw_stop()
+{
+    mw_stop_panel
+    mw_stop_task
 }
 
 mw_status()
@@ -163,6 +181,9 @@ case "$1" in
     'restart') 
         mw_stop
         mw_start;;
+    'restart_panel')
+        mw_stop_panel
+        mw_start_panel;;
     'status') mw_status;;
     'logs') error_logs;;
     'default')

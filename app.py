@@ -14,13 +14,22 @@ from geventwebsocket.handler import WebSocketHandler
 
 try:
     if __name__ == "__main__":
-        f = open('data/port.pl')
-        PORT = int(f.read())
+
+        PORT = 7200
+        if os.path.exists('data/port.pl'):
+            f = open('data/port.pl')
+            PORT = int(f.read())
+            f.close()
+
         HOST = '0.0.0.0'
+        if os.path.exists('data/ipv6.pl'):
+            HOST = "::1"
 
         http_server = WSGIServer(
             (HOST, PORT), app, handler_class=WebSocketHandler)
+
         http_server.serve_forever()
+
         socketio.run(app, host=HOST, port=PORT)
 except Exception as ex:
     print(ex)
