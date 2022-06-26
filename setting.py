@@ -37,7 +37,7 @@ bind = []
 
 bind.append('0.0.0.0:%s' % mw_port)
 if os.path.exists('data/ipv6.pl'):
-    bind.append('[::1]:%s' % mw_port)
+    bind.append('[0:0:0:0:0:0:0:0]:%s' % mw_port)
 
 if workers > 2:
     workers = 2

@@ -22,8 +22,8 @@ try:
             f.close()
 
         HOST = '0.0.0.0'
-        if os.path.exists('data/ipv6.pl'):
-            HOST = "::1"
+        # if os.path.exists('data/ipv6.pl'):
+        #     HOST = "::1"
 
         http_server = WSGIServer(
             (HOST, PORT), app, handler_class=WebSocketHandler)
