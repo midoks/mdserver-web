@@ -33,7 +33,7 @@ jobs:
 
     - name: Install LIB
       run: |
-        bash scripts/install.sh
+        bash -x scripts/install.sh
     - name: Start DEBUG
       run: |
         gunicorn -c setting.py app:app
