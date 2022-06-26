@@ -216,6 +216,7 @@ case "$1" in
             elif [ "$v4" != "" ]; then
                 address="MW-Panel-Url: http://$v4:$port$auth_path"
             elif [ "$v6" != "" ]; then
+                echo 'True' > $mw_path/data/ipv6.pl
                 address="MW-Panel-Url: http://[$v6]:$port$auth_path"
             else
                 address="No v4 or v6 available"
