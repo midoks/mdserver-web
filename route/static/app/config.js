@@ -209,7 +209,7 @@ function setIPv6() {
     $.post('/config/set_ipv6_status', {}, function (rdata) {
         layer.close(loadT);
         layer.msg(rdata.msg, {icon:rdata.status?1:2});
-        setTimeout(function(){window.location.reload();},1500);
+        setTimeout(function(){window.location.reload();},5000);
     },'json');
 }
 
