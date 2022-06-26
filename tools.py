@@ -96,11 +96,13 @@ def set_panel_username(username=None):
         username = mw.getRandomString(8).lower()
         sql.table('users').where('id=?', (1,)).setField('username', username)
     print('username: ' + username)
-    
+
+
 def getServerIp():
     version = sys.argv[2]
-    ip = mw.execShell("curl -{} -sS --connect-timeout 5 -m 60 https://v6r.ipip.net/?format=text".format(version))
-    return ip[0]
+    ip = mw.execShell(
+        "curl -{} -sS --connect-timeout 5 -m 60 https://v6r.ipip.net/?format=text".format(version))
+    print(ip[0])
 
 
 if __name__ == "__main__":
