@@ -110,6 +110,7 @@ pip3 install requests==2.20.0
 pip3 install flask-caching==1.10.1
 pip3 install psutil==5.9.1 
 pip3 install pymongo
+pip3 install mysqlclient
 
 cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
 
@@ -130,6 +131,7 @@ if [ ! -f /www/server/mdserver-web/bin/activate ];then
 	pip3 install flask-sqlalchemy==2.3.2
 	pip3 install psutil==5.9.1
 	pip3 install pymongo
+	pip3 install mysqlclient
 fi
 
 # echo  "end install python env lib"
