@@ -133,9 +133,7 @@ def confReplace():
 
     # 主配置文件
     nconf = getServerDir() + '/nginx/conf/nginx.conf'
-    __content = mw.readFile(nconf)
-    if __content.find('#user'):
-        mw.writeFile(nconf, content)
+    mw.writeFile(nconf, content)
 
     # 静态配置
     static_conf = getServerDir() + '/nginx/conf/enable-php-00.conf'
