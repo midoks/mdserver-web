@@ -1,0 +1,38 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: MW APP PHP53
+
+on:
+  push:
+    branches: [ "master","dev" ]
+  pull_request:
+    branches: [ "master","dev" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    #runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.10"
+    - name: Install MW
+      run: |
+        sudo bash scripts/install_dev.sh
+    - name: Install PHP53
+      run: |
+        cd /www/server/mdserver-web/plugins/php && sudo bash install.sh install 53
+    - name: Start DEBUG
+      run: |
+        gunicorn -c setting.py app:app
+        python3 task.py &
