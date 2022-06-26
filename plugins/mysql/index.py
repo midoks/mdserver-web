@@ -406,6 +406,7 @@ def myOp(version, method):
 def my8cmd(version, method):
     # mysql 8.0  and 5.7
     init_file = initDreplace(version)
+    cmd = init_file + ' ' + method
     try:
         if version == '5.7':
             isInited = initMysql57Data()
@@ -413,11 +414,32 @@ def my8cmd(version, method):
             isInited = initMysql8Data()
 
         if not isInited:
-            mw.execShell('systemctl start mysql')
-            initMysql8Pwd()
-            mw.execShell('systemctl stop mysql')
 
-        mw.execShell('systemctl ' + method + ' mysql')
+            if mw.isAppleSystem():
+                cmd_init_start = init_file + ' start'
+                subprocess.Popen(cmd_init_start, stdout=subprocess.PIPE, shell=True,
+                                 bufsize=4096, stderr=subprocess.PIPE)
+
+                time.sleep(6)
+            else:
+                mw.execShell('systemctl start mysql')
+
+            initMysql8Pwd()
+
+            if mw.isAppleSystem():
+                cmd_init_stop = init_file + ' stop'
+                subprocess.Popen(cmd_init_stop, stdout=subprocess.PIPE, shell=True,
+                                 bufsize=4096, stderr=subprocess.PIPE)
+                time.sleep(3)
+            else:
+                mw.execShell('systemctl stop mysql')
+
+        if mw.isAppleSystem():
+            sub = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True,
+                                   bufsize=4096, stderr=subprocess.PIPE)
+            sub.wait(5)
+        else:
+            mw.execShell('systemctl ' + method + ' mysql')
         return 'ok'
     except Exception as e:
         return str(e)
