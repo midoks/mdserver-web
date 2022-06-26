@@ -13,10 +13,10 @@ startTime=`date +%s`
 _os=`uname`
 echo "use system: ${_os}"
 
-# if [ "$EUID" -ne 0 ]
-#   then echo "Please run as root!"
-#   exit
-# fi
+if [ "$EUID" -ne 0 ]
+  then echo "Please run as root!"
+  exit
+fi
 
 if grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
 	ln -sf /bin/bash /bin/sh
