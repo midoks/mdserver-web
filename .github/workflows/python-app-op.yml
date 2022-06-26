@@ -29,7 +29,7 @@ jobs:
     - name: Install MW
       run: |
         sudo bash scripts/install_dev.sh
-    - name: Install PHP53
+    - name: Install OpenResty
       run: |
         cd /www/server/mdserver-web/plugins/openresty && sudo bash install.sh install 1.21.4.1
     - name: Start DEBUG
