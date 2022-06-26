@@ -346,6 +346,7 @@ else
     yum install -y openssl openssl-devel
     yum install -y graphviz libxml2 libxml2-devel
     yum install -y sqlite-devel
+    yum install -y mysql-devel
     yum install -y oniguruma oniguruma-devel
     yum install -y ImageMagick ImageMagick-devel
 
