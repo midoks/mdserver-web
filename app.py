@@ -22,7 +22,6 @@ try:
             f.close()
 
         HOST = '0.0.0.0'
-
         http_server = WSGIServer(
             (HOST, PORT), app, handler_class=WebSocketHandler)
 
