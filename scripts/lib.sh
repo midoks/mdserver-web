@@ -380,6 +380,7 @@ pip3 install mysqlclient
 
 if [ ! -f /www/server/mdserver-web/bin/activate ];then
     cd /www/server/mdserver-web && python3 -m venv .
+    cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate
 else
     cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate
 fi
