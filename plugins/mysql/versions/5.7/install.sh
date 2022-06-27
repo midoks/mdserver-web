@@ -20,7 +20,7 @@ mysqlDir=${serverPath}/source/mysql
 VERSION="5.7.37"
 
 # 加快测试速度 For Github Action
-MAKEJN="${SYS_MAKEJN:+'-j2'}"
+MAKEJN="${SYS_MAKEJN:-'-j2'}"
 echo "SYS_MAKEJN:$MAKEJN"
 
 Install_mysql()
