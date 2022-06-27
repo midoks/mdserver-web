@@ -31,10 +31,10 @@ jobs:
         sudo bash scripts/install_dev.sh
     - name: Install MySQL80
       run: |
-        
-        # sudo cat /www/server/mdserver-web/plugins/mysql/versions/8.0/install.sh > /tmp/t.log
+        sudo mkdir -p /tmp
+        sudo cat /www/server/mdserver-web/plugins/mysql/versions/8.0/install.sh > /tmp/t.log
         sudo echo "export MAKEJN=-j12\n" >> /www/server/mdserver-web/plugins/mysql/versions/8.0/install.sh
-        # sudo cat /tmp/t.log >> /www/server/mdserver-web/plugins/mysql/versions/8.0/install.sh
+        sudo cat /tmp/t.log >> /www/server/mdserver-web/plugins/mysql/versions/8.0/install.sh
 
         cd /www/server/mdserver-web/plugins/mysql && sudo bash install.sh install 8.0
     - name: Start DEBUG
