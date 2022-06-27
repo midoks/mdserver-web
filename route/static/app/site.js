@@ -1085,7 +1085,7 @@ function setSecurity(name,id){
 	$.post('/site/set_security',data,function(rdata){
 		layer.close(loadT);
 		layer.msg(rdata.msg,{icon:rdata.status?1:2});
-		if(rdata.status) setTimeout(function(){Security(id,name);},1000);
+		if(rdata.status) setTimeout(function(){security(id,name);},1000);
 	},'json');
 }
 

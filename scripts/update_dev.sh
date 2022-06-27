@@ -9,13 +9,18 @@ startTime=`date +%s`
 _os=`uname`
 echo "use system: ${_os}"
 
+if [ "$EUID" -ne 0 ]
+  then echo "Please run as root!"
+  exit
+fi
+
 if grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
-	sudo ln -sf /bin/bash /bin/sh
+	ln -sf /bin/bash /bin/sh
 	#sudo dpkg-reconfigure dash
 fi
 
 if grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
-	sudo ln -sf /bin/bash /bin/sh
+	ln -sf /bin/bash /bin/sh
 fi
 
 if [ ${_os} == "Darwin" ]; then
@@ -52,7 +57,10 @@ rm -rf /tmp/mdserver-web-dev
 
 #pip uninstall public
 echo "use system version: ${OSNAME}"
-curl -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update/${OSNAME}.sh | bash
+
+# cd /www/server/mdserver-web && bash ./scripts/install/debian.sh
+cd /www/server/mdserver-web && bash scripts/update/${OSNAME}.sh
+# curl -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update/${OSNAME}.sh | bash
 
 endTime=`date +%s`
 ((outTime=($endTime-$startTime)/60))

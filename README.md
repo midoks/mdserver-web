@@ -2,14 +2,6 @@
 简单的Linux面板,感谢BT.CN写出如此好的web管理软件。我一看到，就知道这是我一直想要的页面化管理方式。
 复制了后台管理界面，按照自己想要的方式写了一版。
 
-```
-为了兼容CentOS,Ubuntu,Debian,Fedora, 由chkconfig改systemd管理。原来都要重新安装。还在进行修改..
-
-chkconfig 支持 Fedora,CentOS
-update-rc.d 支持 Ubuntu,Debian | 功能不够
-systemd 支持 CentOS,Ubuntu,Debian,Fedora...
-
-```
 
 ![CentOS](https://img.shields.io/badge/LINUX-CentOS-blue?style=for-the-badge&logo=CentOS)
 ![Ubuntu](https://img.shields.io/badge/LINUX-Ubuntu-blue?style=for-the-badge&logo=Ubuntu)
@@ -22,7 +14,6 @@ systemd 支持 CentOS,Ubuntu,Debian,Fedora...
 * 面板收藏功能
 * 网站子目录绑定
 * 网站备份功能
-* 自动更新优化
 * 插件方式管理
 
 基本上可以使用,后续会继续优化!欢迎提供意见！
@@ -48,9 +39,8 @@ systemd 支持 CentOS,Ubuntu,Debian,Fedora...
 
 
 ### 问题
-- Ubuntu 20 无法安装mysql5.7 && mysql 80.
-- Ftp debian无法安装成功。
-- php52,在debian无法安装成功。
+- OP防火墙，暂不要开启。
+
 
 
 ### GW使用
@@ -79,6 +69,14 @@ curl -fsSL  https://gitee.com/midoks/mdserver-web/raw/master/scripts/install_cn.
 
 ```
 curl -fsSL  https://gitee.com/midoks/mdserver-web/raw/master/scripts/update_cn.sh | bash
+```
+
+
+
+### 通用安装
+
+```
+curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/quick/app.sh | bash
 ```
 
 
@@ -111,10 +109,9 @@ curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/up
 如果你自己写了插件，想分享出来，也可以提Issue。
 ```
 
-- 开发文档 - https://github.com/midoks/mdserver-web/wiki/插件开发
+- 简单例子 - https://github.com/mw-plugin/simple-plugin 
 - 插件地址 - https://github.com/mw-plugin
-- 例子 - https://github.com/mw-plugin/simple-plugin 
-
+- 开发文档 - https://github.com/midoks/mdserver-web/wiki/插件开发
 
 
 ### Stargazers over time
@@ -122,11 +119,9 @@ curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/up
 [![Stargazers over time](https://starchart.cc/midoks/mdserver-web.svg)](https://starchart.cc/midoks/mdserver-web)
 
 
-### 感谢
+### 感谢开发赞助
 
-- 开发赞助
-
-[digitalvirt](https://digitalvirt.com/)
+[![digitalvirt](https://digitalvirt.com/templates/BlueWhite/img/logo-dark.svg)](https://digitalvirt.com/)
 
 ### 授权许可
 

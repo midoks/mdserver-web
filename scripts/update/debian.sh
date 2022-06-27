@@ -4,58 +4,13 @@ export PATH
 LANG=en_US.UTF-8
 
 
-
-
 cd /www/server/mdserver-web/scripts && bash lib.sh
 chmod 755 /www/server/mdserver-web/data
 
-#venv
-if [ ! -f /www/server/mdserver-web/bin/activate ];then
-    cd /www/server/mdserver-web && python3 -m venv .
-fi
-
-if [ ! -f /usr/local/bin/pip3 ];then
-    python3 -m pip install --upgrade pip setuptools wheel -i https://mirrors.aliyun.com/pypi/simple
-fi
-
-pip install --upgrade pip
-pip install --upgrade setuptools
-
-sed -i  "/mysqlclient/d" /www/server/mdserver-web/requirements.txt
-cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
-
-pip3 install gunicorn==20.1.0
-pip3 install gevent==21.1.2
-pip3 install gevent-websocket==0.10.1
-pip3 install requests==2.20.0
-pip3 install flask-caching==1.10.1
-pip3 install flask-socketio==5.2.0
-pip3 install pymongo
-pip3 install psutil
-
-
-if [ ! -f /www/server/mdserver-web/bin/activate ];then
-    cd /www/server/mdserver-web && python3 -m venv .
-    cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate
-
-    pip install --upgrade pip
-    pip3 install -r /www/server/mdserver-web/requirements.txt
-    pip install --upgrade setuptools
-    pip3 install gunicorn==20.1.0
-    pip3 install gevent==21.1.2
-    pip3 install gevent-websocket==0.10.1
-    pip3 install requests==2.20.0
-    pip3 install flask-caching==1.10.1
-    pip3 install flask-socketio==5.2.0
-    pip3 install pymongo
-    pip3 install psutil 
-fi
 
 if [ -f /etc/init.d/mw ];then 
     sh /etc/init.d/mw stop && rm -rf  /www/server/mdserver-web/scripts/init.d/mw && rm -rf  /etc/init.d/mw
 fi
-
-
 
 echo -e "stop mw"
 isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`

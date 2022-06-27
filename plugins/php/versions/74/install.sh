@@ -11,7 +11,7 @@ sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 
 
-version=7.4.30
+version=7.4.26
 PHP_VER=74
 Install_php()
 {
@@ -28,7 +28,7 @@ cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash libzip.sh
 if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 
 	if [ ! -f $sourcePath/php/php-${version}.tar.xz ];then
-		wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz http://au1.php.net/distributions/php-${version}.tar.xz
+		wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz https://museum.php.net/php7/php-${version}.tar.xz
 	fi
 	
 	cd $sourcePath/php && tar -Jxf $sourcePath/php/php-${version}.tar.xz
@@ -49,11 +49,9 @@ if [ $sysName == 'Darwin' ]; then
 	export LDFLAGS="-L/usr/local/opt/libxml2/lib"
 else
 	OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
-	OPTIONS="${OPTIONS} --with-freetype-dir=${serverPath}/lib/freetype"
-	OPTIONS="${OPTIONS} --with-gd --enable-gd-native-ttf"
 	OPTIONS="${OPTIONS} --with-curl"
-	OPTIONS="${OPTIONS} --with-libzip=${serverPath}/lib/libzip"
 fi
+
 
 
 echo "$sourcePath/php/php${PHP_VER}"
@@ -81,8 +79,8 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--disable-intl \
 	--disable-fileinfo \
 	$OPTIONS \
-	--enable-fpm \
-	&& make && make install && make clean
+	--enable-fpm
+	make ${MAKEJN:--j2} && make install && make clean
 fi 
 #------------------------ install end ------------------------------------#
 }

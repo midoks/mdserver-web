@@ -25,7 +25,6 @@ import db
 
 import psutil
 
-
 global pre, timeoutCount, logPath, isTask, oldEdate, isCheck
 pre = 0
 timeoutCount = 0
@@ -43,6 +42,18 @@ if not os.path.exists(logPath):
 
 if not os.path.exists(isTask):
     os.system("touch " + isTask)
+
+
+def service_cmd(method):
+    cmd = '/etc/init.d/mw'
+    if os.path.exists(cmd):
+        execShell(cmd + ' ' + method)
+        return
+
+    cmd = mw.getRunDir() + '/scripts/init.d/mw'
+    if os.path.exists(cmd):
+        execShell(cmd + ' ' + method)
+        return
 
 
 def mw_async(f):
@@ -94,7 +105,7 @@ def execShell(cmdstring, cwd=None, timeout=None, shell=True):
             t2 = str(data[1], encoding='utf-8')
         return (t1, t2)
     except Exception as e:
-        return None
+        return (None, None)
 
 
 def downloadFile(url, filename):
@@ -168,30 +179,10 @@ def startTask():
             except:
                 pass
             # siteEdate()
-            # mainSafe()
             time.sleep(2)
     except:
         time.sleep(60)
         startTask()
-
-
-def mainSafe():
-    global isCheck
-    try:
-        if isCheck < 100:
-            isCheck += 1
-            return True
-        isCheck = 0
-        isStart = mw.execShell(
-            "ps aux |grep 'python3 main.py'|grep -v grep|awk '{print $2}'")[0]
-        if not isStart:
-            os.system('/etc/init.d/mw start')
-            isStart = mw.execShell(
-                "ps aux |grep 'python main.py'|grep -v grep|awk '{print $2}'")[0]
-            mw.writeLog('守护程序', '面板服务程序启动成功 -> PID: ' + isStart)
-    except:
-        time.sleep(30)
-        mainSafe()
 
 
 def siteEdate():
@@ -508,30 +499,44 @@ def openrestyAutoRestart():
 # --------------------------------------OpenResty Auto Restart End   --------------------------------------------- #
 
 
-if __name__ == "__main__":
+# --------------------------------------Panel Restart Start   --------------------------------------------- #
+def restartPanelService():
+    restartTip = 'data/restart.pl'
+    while True:
+        if os.path.exists(restartTip):
+            os.remove(restartTip)
+            service_cmd('restart_panel')
+        time.sleep(1)
+# --------------------------------------Panel Restart End   --------------------------------------------- #
 
-    # 系统监控
-    t = threading.Thread(target=systemTask)
+
+def setDaemon(t):
     if sys.version_info.major == 3 and sys.version_info.minor >= 10:
         t.daemon = True
     else:
         t.setDaemon(True)
-    t.start()
+    return t
+
+if __name__ == "__main__":
+
+    # 系统监控
+    sysTask = threading.Thread(target=systemTask)
+    sysTask = setDaemon(sysTask)
+    sysTask.start()
 
     # PHP 502错误检查线程
-    p = threading.Thread(target=check502Task)
-    if sys.version_info.major == 3 and sys.version_info.minor >= 10:
-        p.daemon = True
-    else:
-        p.setDaemon(True)
-    p.start()
+    php502 = threading.Thread(target=check502Task)
+    php502 = setDaemon(php502)
+    php502.start()
 
     # OpenResty Auto Restart Start
     oar = threading.Thread(target=openrestyAutoRestart)
-    if sys.version_info.major == 3 and sys.version_info.minor >= 10:
-        oar.daemon = True
-    else:
-        oar.setDaemon(True)
+    oar = setDaemon(oar)
     oar.start()
+
+    # OpenResty Auto Restart Start
+    rps = threading.Thread(target=restartPanelService)
+    rps = setDaemon(rps)
+    rps.start()
 
     startTask()

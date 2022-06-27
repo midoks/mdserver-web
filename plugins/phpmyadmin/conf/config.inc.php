@@ -7,6 +7,7 @@ $cfg['Servers'][$i]['host']            = '127.0.0.1';
 $cfg['Servers'][$i]['connect_type']    = 'tcp';
 $cfg['Servers'][$i]['compress']        = false;
 $cfg['Servers'][$i]['AllowNoPassword'] = false;
+$cfg['TempDir']                        = '/www/server/phpmyadmin/tmp';
 $cfg['UploadDir']                      = '';
 $cfg['SaveDir']                        = '';
 ?>

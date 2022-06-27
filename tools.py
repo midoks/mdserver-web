@@ -98,6 +98,13 @@ def set_panel_username(username=None):
     print('username: ' + username)
 
 
+def getServerIp():
+    version = sys.argv[2]
+    ip = mw.execShell(
+        "curl -{} -sS --connect-timeout 5 -m 60 https://v6r.ipip.net/?format=text".format(version))
+    print(ip[0])
+
+
 if __name__ == "__main__":
     type = sys.argv[1]
     if type == 'root':
@@ -106,5 +113,7 @@ if __name__ == "__main__":
         set_panel_pwd(sys.argv[2])
     elif type == 'username':
         set_panel_username()
+    elif type == 'getServerIp':
+        getServerIp()
     else:
         print('ERROR: Parameter error')

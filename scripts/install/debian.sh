@@ -19,7 +19,6 @@ apt install -y wget curl lsof unzip
 apt install -y python3-pip
 apt install -y python3-dev
 apt install -y python3-venv
-
 apt install -y cron
 
 if [ ! -d /root/.acme.sh ];then	
@@ -33,7 +32,7 @@ if [ -f /usr/sbin/ufw ];then
 	ufw allow 443/tcp
 	ufw allow 888/tcp
 	ufw allow 7200/tcp
-	ufw allow 3306/tcp
+	# ufw allow 3306/tcp
 	# ufw allow 30000:40000/tcp
 
 fi
@@ -55,7 +54,7 @@ if [ ! -f /usr/sbin/ufw ];then
 	firewall-cmd --permanent --zone=public --add-port=443/tcp
 	firewall-cmd --permanent --zone=public --add-port=888/tcp
 	firewall-cmd --permanent --zone=public --add-port=7200/tcp
-	firewall-cmd --permanent --zone=public --add-port=3306/tcp
+	# firewall-cmd --permanent --zone=public --add-port=3306/tcp
 	# firewall-cmd --permanent --zone=public --add-port=30000-40000/tcp
 
 	# fix:debian10 firewalld faq
@@ -87,7 +86,7 @@ echo -e "\e[0;32mfix zlib1g-dev install question end\e[0m"
 #fix libunwind-dev fail
 echo -e "\e[0;32mfix libunwind-dev install question start\e[0m"
 Install_TmpFile=/tmp/debian-fix-libunwind-dev.txt
-apt install -y zlib1g-dev > ${Install_TmpFile}
+apt install -y libunwind-dev > ${Install_TmpFile}
 if [ "$?" != "0" ];then
 	liblzma5_BASE_VER=$(cat ${Install_TmpFile} | grep liblzma-dev | awk -F "=" '{print $2}' | awk -F ")" '{print $1}')
 	liblzma5_BASE_VER=`echo ${liblzma5_BASE_VER} | sed "s/^[ \s]\{1,\}//g;s/[ \s]\{1,\}$//g"`
@@ -98,43 +97,10 @@ rm -rf ${Install_TmpFile}
 echo -e "\e[0;32mfix libunwind-dev install question end\e[0m"
 
 
+
 cd /www/server/mdserver-web/scripts && bash lib.sh
 chmod 755 /www/server/mdserver-web/data
 
-
-
-if [ ! -f /usr/local/bin/pip3 ];then
-    python3 -m pip install --upgrade pip setuptools wheel -i https://mirrors.aliyun.com/pypi/simple
-fi
-
-pip install --upgrade pip
-
-sed -i  "/mysqlclient/d" /www/server/mdserver-web/requirements.txt
-cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
-
-pip3 install gunicorn==20.1.0
-pip3 install gevent==21.1.2
-pip3 install gevent-websocket==0.10.1
-pip3 install requests==2.20.0
-pip3 install flask-caching==1.10.1
-pip3 install pymongo
-pip3 install psutil
-pip3 install flask-socketio==5.2.0
-
-if [ ! -f /www/server/mdserver-web/bin/activate ];then
-    cd /www/server/mdserver-web && python3 -m venv .
-    cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate
-    pip install --upgrade pip
-    pip3 install -r /www/server/mdserver-web/requirements.txt
-    pip3 install gunicorn==20.1.0
-	pip3 install gevent==21.1.2
-	pip3 install gevent-websocket==0.10.1
-	pip3 install requests==2.20.0
-	pip3 install flask-caching==1.10.1
-	pip3 install pymongo
-	pip3 install psutil
-	pip3 install flask-socketio==5.2.0
-fi
 
 
 cd /www/server/mdserver-web && ./cli.sh start

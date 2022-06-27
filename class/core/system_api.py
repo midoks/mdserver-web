@@ -102,12 +102,9 @@ class system_api:
         return mw.returnJson(True, '正在重启服务器!')
     ##### ----- end ----- ###
 
-    @mw_async
     def restartMw(self):
-        sleep(0.3)
-        # cmd = mw.getRunDir() + '/scripts/init.d/mw restart'
-        # print cmd
-        mw.execShell('service mw restart')
+        mw.writeFile('data/restart.pl', 'True')
+        return True
 
     @mw_async
     def restartServer(self):

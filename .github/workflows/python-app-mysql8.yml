@@ -1,13 +1,13 @@
 # This workflow will install Python dependencies, run tests and lint with a single version of Python
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-name: MW APP
+name: MW APP MySQL80
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "master","dev" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "master","dev" ]
 
 permissions:
   contents: read
@@ -26,10 +26,17 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: "3.10"
-    - name: Install dependencies
+    - name: Install MW
       run: |
-        python -m pip install --upgrade pip
-        if [ -f requirements.txt ]; then pip3 install -r requirements.txt; fi
+        sudo bash scripts/install_dev.sh
+    - name: Install MySQL80
+      run: |
+        sudo mkdir -p /tmp
+        sudo cat /www/server/mdserver-web/plugins/mysql/versions/8.0/install.sh > /tmp/t.log
+        sudo echo "export MAKEJN=-j12\n" >> /www/server/mdserver-web/plugins/mysql/versions/8.0/install.sh
+        sudo cat /tmp/t.log >> /www/server/mdserver-web/plugins/mysql/versions/8.0/install.sh
+
+        cd /www/server/mdserver-web/plugins/mysql && sudo bash install.sh install 8.0
     - name: Start DEBUG
       run: |
         gunicorn -c setting.py app:app

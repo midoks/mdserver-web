@@ -11,6 +11,7 @@ sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 
 
+
 version=5.3.29
 PHP_VER=53
 Install_php()
@@ -31,15 +32,6 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 	
 	cd $sourcePath/php && tar -Jxf $sourcePath/php/php-${version}.tar.xz
 	mv $sourcePath/php/php-${version} $sourcePath/php/php${PHP_VER}
-fi
-
-
-if [  -f $serverPath/php/53/bin/php.dSYM ];then
-	mv $serverPath/php/53/bin/php.dSYM $serverPath/php/53/bin/php
-fi
-
-if [  -f $serverPath/php/53/sbin/php-fpm.dSYM ];then
-	mv $serverPath/php/53/sbin/php-fpm.dSYM $serverPath/php/53/sbin/php-fpm
 fi
 
 
@@ -92,8 +84,8 @@ if [ ! -d $serverPath/php/53 ];then
 	--enable-sysvshm \
 	--disable-fileinfo \
 	$OPTIONS \
-	--enable-fpm \
-	&& make && make install && make clean
+	--enable-fpm
+	make clean && make ${MAKEJN:--j2} && make install && make clean
 fi
 
 

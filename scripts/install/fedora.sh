@@ -29,7 +29,7 @@ if [ -f /etc/init.d/iptables ];then
 	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 443 -j ACCEPT
 	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 888 -j ACCEPT
 	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 7200 -j ACCEPT
-	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 3306 -j ACCEPT
+	# iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 3306 -j ACCEPT
 	# iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 30000:40000 -j ACCEPT
 	service iptables save
 
@@ -55,7 +55,7 @@ if [ "${isVersion}" == '' ];then
 		firewall-cmd --permanent --zone=public --add-port=443/tcp
 		firewall-cmd --permanent --zone=public --add-port=888/tcp
 		firewall-cmd --permanent --zone=public --add-port=7200/tcp
-		firewall-cmd --permanent --zone=public --add-port=3306/tcp
+		# firewall-cmd --permanent --zone=public --add-port=3306/tcp
 		# firewall-cmd --permanent --zone=public --add-port=30000-40000/tcp
 		firewall-cmd --reload
 	fi
@@ -79,23 +79,10 @@ yum -y install MySQL-python
 yum -y install python3-devel
 
 
-cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
+
 cd /www/server/mdserver-web/scripts && bash lib.sh
 chmod 755 /www/server/mdserver-web/data
 
-if [ ! -f /usr/local/bin/pip3 ];then
-    python3 -m pip install --upgrade pip setuptools wheel -i https://mirrors.aliyun.com/pypi/simple
-fi
-
-pip install --upgrade pip
-cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
-
-if [ ! -f /www/server/mdserver-web/bin/activate ];then
-    cd /www/server/mdserver-web && python3 -m venv .
-    cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate
-    pip install --upgrade pip
-    pip3 install -r /www/server/mdserver-web/requirements.txt
-fi
     
 
 cd /www/server/mdserver-web && ./cli.sh start

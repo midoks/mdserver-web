@@ -1310,7 +1310,7 @@ function setChmod(action,fileName){
 		var chown = $("#chown").val();
 		var data = 'filename='+ encodeURIComponent(fileName)+'&user='+chown+'&access='+chmod;
 		var loadT = layer.msg('正在设置...',{icon:16,time:0,shade: [0.3, '#000']});
-		$.post('files/set_file_access',data,function(rdata){
+		$.post('/files/set_file_access',data,function(rdata){
 			layer.close(loadT);
 			if(rdata.status) layer.closeAll();
 			layer.msg(rdata.msg,{icon:rdata.status?1:2});

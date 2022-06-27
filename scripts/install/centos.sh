@@ -17,6 +17,7 @@ yum install -y python3-devel
 yum install -y python-devel
 yum install -y vixie-cron
 yum install -y curl-devel libmcrypt libmcrypt-devel
+yum install -y mysql-devel
 
 #https need
 if [ ! -d /root/.acme.sh ];then	
@@ -30,7 +31,7 @@ if [ -f /etc/init.d/iptables ];then
 	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 443 -j ACCEPT
 	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 888 -j ACCEPT
 	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 7200 -j ACCEPT
-	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 3306 -j ACCEPT
+	# iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 3306 -j ACCEPT
 	# iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 30000:40000 -j ACCEPT
 	service iptables save
 
@@ -54,7 +55,7 @@ if [ ! -f /etc/init.d/iptables ];then
 	firewall-cmd --permanent --zone=public --add-port=443/tcp
 	firewall-cmd --permanent --zone=public --add-port=888/tcp
 	firewall-cmd --permanent --zone=public --add-port=7200/tcp
-	firewall-cmd --permanent --zone=public --add-port=3306/tcp
+	# firewall-cmd --permanent --zone=public --add-port=3306/tcp
 	# firewall-cmd --permanent --zone=public --add-port=30000-40000/tcp
 
 
@@ -81,60 +82,12 @@ yum install -y libevent libevent-devel libjpeg* libpng* gd* libxslt* unzip
 yum install -y python-imaging libicu-devel zip bzip2-devel gcc libxml2 libxml2-devel  pcre pcre-devel
 yum install -y libjpeg-devel libpng-devel libwebp libwebp-devel
 yum install -y lsof net-tools
-yum install -y ncurses-devel mysql-devel cmake
+yum install -y ncurses-devel cmake
 yum install -y MySQL-python 
 
 
-
-if [ ! -f /usr/local/bin/pip3 ];then
-    python3 -m pip install --upgrade pip setuptools wheel -i https://mirrors.aliyun.com/pypi/simple
-fi
-
-
-# echo  "start install lib"
 cd /www/server/mdserver-web/scripts && bash lib.sh
-# echo  "end install lib"
-
-
 chmod 755 /www/server/mdserver-web/data
-
-
-# echo  "start install python lib"
-
-pip install --upgrade pip
-pip3 install gunicorn==20.1.0
-pip3 install gevent==21.1.2
-pip3 install gevent-websocket==0.10.1
-pip3 install requests==2.20.0
-pip3 install flask-caching==1.10.1
-pip3 install python-socketio==4.2.0
-pip3 install psutil==5.9.1 
-pip3 install pymongo
-
-cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
-
-
-# echo  "start install python env lib"
-
-if [ ! -f /www/server/mdserver-web/bin/activate ];then
-	cd /www/server/mdserver-web && python3 -m venv .
-	source /www/server/mdserver-web/bin/activate
-	pip install --upgrade pip
-	pip3 install -r /www/server/mdserver-web/requirements.txt
-	pip3 install gunicorn==20.1.0
-	pip3 install gevent==21.1.2
-	pip3 install gevent-websocket==0.10.1
-	pip3 install requests==2.20.0
-	pip3 install flask-caching==1.10.1
-	pip3 install flask-session==0.3.2
-	pip3 install flask-sqlalchemy==2.3.2
-	pip3 install python-socketio==4.2.0
-	pip3 install psutil==5.9.1
-	pip3 install pymongo
-fi
-
-# echo  "end install python env lib"
-# echo  "end install python lib"
 
 
 cd /www/server/mdserver-web && ./cli.sh start

@@ -44,6 +44,7 @@ elif grep -Eqi "AlmaLinux" /etc/issue || grep -Eq "AlmaLinux" /etc/*-release; th
 	yum install -y wget zip unzip
 elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
 	OSNAME='debian'
+	apt update -y
 	apt install -y devscripts
 	apt install -y wget zip unzip
 elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
@@ -73,7 +74,11 @@ if [ $OSNAME != "macos" ];then
 fi
 
 echo "use system version: ${OSNAME}"
-curl -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/install/${OSNAME}.sh | bash
+
+
+# cd /www/server/mdserver-web && bash ./scripts/install/debian.sh
+cd /www/server/mdserver-web && bash scripts/install/${OSNAME}.sh
+# curl -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/install/${OSNAME}.sh | bash
 
 chmod +x /www/server/mdserver-web/mw-cli
 if [ ! -e /usr/bin/mw-cli ]; then 

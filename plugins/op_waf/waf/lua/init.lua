@@ -317,26 +317,35 @@ function  post_data_chekc()
         if C:return_post_data() then return false end
         request_args = ngx.req.get_post_args()
         if not request_args then return false end
-        if not request_header['Content-Type'] then return false end
-        av=string.match(request_header['Content-Type'],"=.+")
+
+        if request_header then
+            if not request_header['Content-Type'] then return false end
+            av = string.match(request_header['Content-Type'],"=.+")
+        end
+
         if not av then return false end
-        ac=split(av,'=')
+        ac = split(av,'=')
+
         if not ac then return false end 
+
         list_list=nil
         for i,v in ipairs(ac)
         do
              list_list='--'..v
         end
+        
         if not list_list then return false end 
         aaa=nil
         for k,v in pairs(request_args)
         do
             aaa=v
         end
+
         if not aaa then return false end 
         if tostring(aaa) == 'true' then return false end
         if type(aaa) ~= "string" then return false end
         data_len=split(aaa,list_list)
+        
         --return return_message(200,data_len)
         if not data_len then return false end
         if arrlen(data_len) ==0 then return false end
