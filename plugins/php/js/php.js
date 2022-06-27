@@ -26,7 +26,8 @@ function phpPost(method, version, args,callback){
     $.post('/plugins/run', req_data, function(data) {
         layer.close(loadT);
         if (!data.status){
-            layer.msg(data.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+            //错误展示10S
+            layer.msg(data.msg,{icon:0,time:2000,shade: [10, '#000']});
             return;
         }
 
