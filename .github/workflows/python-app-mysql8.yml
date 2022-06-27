@@ -31,7 +31,7 @@ jobs:
         sudo bash scripts/install_dev.sh
     - name: Install MySQL80
       run: |
-        SYS_MAKEJN=-j12
+        MAKEJN=-j12
         cd /www/server/mdserver-web/plugins/mysql && sudo bash install.sh install 8.0
     - name: Start DEBUG
       run: |
