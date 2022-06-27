@@ -92,6 +92,11 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 		cp -rf ext/phar/phar.1.in ext/phar/phar.1
 	fi
 
+	if [ ! -f ext/phar/phar.phar.1 ];then
+		cp -rf ext/phar/phar.phar.1.in ext/phar/phar.phar.1
+	fi
+
+
 	make install && make clean
 fi 
 
