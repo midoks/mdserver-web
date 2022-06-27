@@ -37,6 +37,18 @@ jobs:
       run: |
         SYS_MAKEJN="-j8"
         cd /www/server/mdserver-web/plugins/php && sudo bash install.sh install 54
+    - name: Install PHP55
+      run: |
+        SYS_MAKEJN="-j8"
+        cd /www/server/mdserver-web/plugins/php && sudo bash install.sh install 55
+    - name: Install PHP56
+      run: |
+        SYS_MAKEJN="-j8"
+        cd /www/server/mdserver-web/plugins/php && sudo bash install.sh install 56
+    - name: Install PHP70
+      run: |
+        SYS_MAKEJN="-j8"
+        cd /www/server/mdserver-web/plugins/php && sudo bash install.sh install 70
     - name: Start DEBUG
       run: |
         gunicorn -c setting.py app:app
