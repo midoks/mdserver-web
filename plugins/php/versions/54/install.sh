@@ -88,6 +88,10 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 		cp -rf scripts/man1/php-config.1.in scripts/man1/php-config.1
 	fi
 
+	if [ ! -f ext/phar/phar.1 ];then
+		cp -rf ext/phar/phar.1.in ext/phar/phar.1
+	fi
+
 	make install && make clean
 fi 
 
