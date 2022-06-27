@@ -1526,9 +1526,13 @@ class site_api:
     def getSecurity(self, sid, name):
         filename = self.getHostConf(name)
         conf = mw.readFile(filename)
+
+        if type(conf) == bool:
+            return mw.returnJson(False, '读取配置文件失败!')
+
         data = {}
         if conf.find('SECURITY-START') != -1:
-            rep = "#SECURITY-START(\n|.){1,500}#SECURITY-END"
+            rep = "#SECURITY-START(.|\n)*#SECURITY-END"
             tmp = re.search(rep, conf).group()
             data['fix'] = re.search(
                 "\(.+\)\$", tmp).group().replace('(', '').replace(')$', '').replace('|', ',')
@@ -1553,22 +1557,22 @@ class site_api:
         if os.path.exists(file):
             conf = mw.readFile(file)
             if conf.find('SECURITY-START') != -1:
-                rep = "\s{0,4}#SECURITY-START(\n|.){1,500}#SECURITY-END\n?"
+                rep = "\s{0,4}#SECURITY-START(\n|.)*#SECURITY-END\n?"
                 conf = re.sub(rep, '', conf)
                 mw.writeLog('网站管理', '站点[' + name + ']已关闭防盗链设置!')
             else:
                 rconf = '''#SECURITY-START 防盗链配置
-location ~ .*\.(%s)$
-{
-    expires      30d;
-    access_log /dev/null;
-    valid_referers none blocked %s;
-    if ($invalid_referer){
-       return 404;
+    location ~ .*\.(%s)$
+    {
+        expires      30d;
+        access_log /dev/null;
+        valid_referers none blocked %s;
+        if ($invalid_referer){
+           return 404;
+        }
     }
-}
-# SECURITY-END
-include enable-php-''' % (fix.strip().replace(',', '|'), domains.strip().replace(',', ' '))
+    #SECURITY-END
+    include enable-php-''' % (fix.strip().replace(',', '|'), domains.strip().replace(',', ' '))
                 conf = re.sub("include\s+enable-php-", rconf, conf)
                 mw.writeLog('网站管理', '站点[' + name + ']已开启防盗链!')
             mw.writeFile(file, conf)
