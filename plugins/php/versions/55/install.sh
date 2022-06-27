@@ -45,7 +45,7 @@ else
 fi
 
 # 加快测试速度 For Github Action
-MAKEJN='${SYS_MAKEJN:+"-j1"}'
+MAKEJN="${SYS_MAKEJN:+'-j1'}"
 echo "SYS_MAKEJN:$MAKEJN"
 
 

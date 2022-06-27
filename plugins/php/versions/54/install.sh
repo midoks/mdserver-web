@@ -46,7 +46,7 @@ else
 fi
 
 # 加快测试速度 For Github Action
-MAKEJN='${SYS_MAKEJN:+"-j1"}'
+MAKEJN="${SYS_MAKEJN:+'-j2'}"
 echo "SYS_MAKEJN:$MAKEJN"
 
 if [ ! -d $serverPath/php/${PHP_VER} ];then
