@@ -805,6 +805,8 @@ function setDbPs(id, name, obj) {
 function openPhpmyadmin(name,username,password){
 
     data = syncPost('/plugins/check',{'name':'phpmyadmin'});
+
+
     if (!data.status){
         layer.msg(data.msg,{icon:2,shade: [0.3, '#000']});
         return;
@@ -815,7 +817,7 @@ function openPhpmyadmin(name,username,password){
         layer.msg('phpMyAdmin未启动',{icon:2,shade: [0.3, '#000']});
         return;
     }
-
+    // console.log(data);
     data = syncPost('/plugins/run',{'name':'phpmyadmin','func':'get_home_page'});
     var rdata = $.parseJSON(data.data);
     if (!rdata.status){
@@ -830,16 +832,28 @@ function openPhpmyadmin(name,username,password){
         return;
     }
 
-    var murl = $("#toPHPMyAdmin").attr('action');
-    $("#pma_username").val(username);
-    $("#pma_password").val(password);
-    $("#db").val(name);
+    //检查版本
+    data = syncPost('/plugins/run',{'name':'phpmyadmin','func':'version'});
+    bigVer = data.data.split('.')[0]
+    if (bigVer>=5){
 
-    layer.msg('正在打开phpMyAdmin',{icon:16,shade: [0.3, '#000'],time:1000});
+        setTimeout(function(){
+            $("#toPHPMyAdmin").submit();
+        },3000);
+        layer.msg('phpMyAdmin['+data.data+']需要手动登录😭',{icon:16,shade: [0.3, '#000'],time:4000});
+        
+    } else{
+        var murl = $("#toPHPMyAdmin").attr('action');
+        $("#pma_username").val(username);
+        $("#pma_password").val(password);
+        $("#db").val(name);
 
-    setTimeout(function(){
-        $("#toPHPMyAdmin").submit();
-    },2000);
+        layer.msg('正在打开phpMyAdmin',{icon:16,shade: [0.3, '#000'],time:2000});
+
+        setTimeout(function(){
+            $("#toPHPMyAdmin").submit();
+        },3000);
+    }    
 }
 
 function delBackup(filename,name){

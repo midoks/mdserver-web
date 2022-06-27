@@ -216,6 +216,10 @@ def errorLog():
     return '/www/server/phpmyadmin/error.log'
 
 
+def Version():
+    return mw.readFile(getServerDir() + '/version.pl')
+
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -230,6 +234,8 @@ if __name__ == "__main__":
         print(reload())
     elif func == 'conf':
         print(getConf())
+    elif func == 'version':
+        print(Version())
     elif func == 'config_inc':
         print(getConfInc())
     elif func == 'get_home_page':
