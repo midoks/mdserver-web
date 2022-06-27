@@ -45,6 +45,10 @@ else
 	OPTIONS="${OPTIONS} --with-curl"
 fi
 
+# 加快测试速度 For Github Action
+MAKEJN='${SYS_MAKEJN:+"-j1"}'
+echo "SYS_MAKEJN:$MAKEJN"
+
 if [ ! -d $serverPath/php/${PHP_VER} ];then
 	cd $sourcePath/php/php${PHP_VER} && ./configure \
 	--prefix=$serverPath/php/${PHP_VER} \
@@ -69,7 +73,7 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	$OPTIONS \
 	--enable-fpm
 
-	make clean && make
+	make clean && make $MAKEJN
 
 	#debian11,没有生成php54 man
 	if [ ! -f sapi/cli/php.1 ];then

@@ -31,8 +31,12 @@ jobs:
         sudo bash scripts/install_dev.sh
     - name: Install PHP53
       run: |
-        SYS_MAKEJN="-j4"
+        SYS_MAKEJN="-j8"
         cd /www/server/mdserver-web/plugins/php && sudo bash install.sh install 53
+    - name: Install PHP54
+      run: |
+        SYS_MAKEJN="-j8"
+        cd /www/server/mdserver-web/plugins/php && sudo bash install.sh install 54
     - name: Start DEBUG
       run: |
         gunicorn -c setting.py app:app
