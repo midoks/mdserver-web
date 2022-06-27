@@ -13,7 +13,6 @@ cmd = 'ls /usr/local/lib/ | grep python  | cut -d \\  -f 1 | awk \'END {print}\'
 info = mw.execShell(cmd)
 p = "/usr/local/lib/" + info[0].strip() + "/site-packages"
 sys.path.append(p)
-import psutil
 
 
 def set_mysql_root(password):
@@ -99,6 +98,13 @@ def set_panel_username(username=None):
     print('username: ' + username)
 
 
+def getServerIp():
+    version = sys.argv[2]
+    ip = mw.execShell(
+        "curl -{} -sS --connect-timeout 5 -m 60 https://v6r.ipip.net/?format=text".format(version))
+    print(ip[0])
+
+
 if __name__ == "__main__":
     type = sys.argv[1]
     if type == 'root':
@@ -107,5 +113,7 @@ if __name__ == "__main__":
         set_panel_pwd(sys.argv[2])
     elif type == 'username':
         set_panel_username()
+    elif type == 'getServerIp':
+        getServerIp()
     else:
         print('ERROR: Parameter error')

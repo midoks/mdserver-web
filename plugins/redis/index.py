@@ -96,9 +96,12 @@ def initDreplace():
 
     # config replace
     dst_conf = getServerDir() + '/redis.conf'
-    conf_content = mw.readFile(getConfTpl())
-    conf_content = conf_content.replace('{$SERVER_PATH}', service_path)
-    mw.writeFile(dst_conf, conf_content)
+    dst_conf_init = getServerDir() + '/init.pl'
+    if not os.path.exists(dst_conf_init):
+        conf_content = mw.readFile(getConfTpl())
+        conf_content = conf_content.replace('{$SERVER_PATH}', service_path)
+        mw.writeFile(dst_conf, conf_content)
+        mw.writeFile(dst_conf_init, 'ok')
 
     # systemd
     systemDir = '/lib/systemd/system'

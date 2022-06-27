@@ -19,20 +19,41 @@ mysqlDir=${serverPath}/source/mysql
 
 VERSION="5.7.37"
 
+
 Install_mysql()
 {
 	mkdir -p ${mysqlDir}
 	echo '正在安装脚本文件...' > $install_tmp
 
+	if id mysql &> /dev/null ;then 
+	    echo "mysql UID is `id -u www`"
+	    echo "mysql Shell is `grep "^www:" /etc/passwd |cut -d':' -f7 `"
+	else
+	    groupadd mysql
+		useradd -g mysql mysql
+	fi
+
 	if [ "$sysName" != "Darwin" ];then
 		mkdir -p /var/log/mariadb
 		touch /var/log/mariadb/mariadb.log
-		groupadd mysql
-		useradd -g mysql mysql
-	fi 
+	fi
+
 
 	if [ ! -f ${mysqlDir}/mysql-boost-${VERSION}.tar.gz ];then
 		wget -O ${mysqlDir}/mysql-boost-${VERSION}.tar.gz https://cdn.mysql.com/Downloads/MySQL-5.7/mysql-boost-${VERSION}.tar.gz
+	fi
+
+	#检测文件是否损坏.
+	md5_mysql_ok=d0489fc3880248a58759c50bfb286dbb
+	if [ -f ${mysqlDir}/mysql-boost-${VERSION}.tar.gz ];then
+		md5_mysql=`md5sum ${mysqlDir}/mysql-boost-${VERSION}.tar.gz  | awk '{print $1}'`
+		if [ "${md5_mysql_ok}" == "${md5_mysql}" ]; then
+			echo "mysql5.7 file check ok"
+		else
+			# 重新下载
+			rm -rf ${mysqlDir}/mysql-${VERSION}
+			wget -O ${mysqlDir}/mysql-boost-${VERSION}.tar.gz https://cdn.mysql.com/Downloads/MySQL-5.7/mysql-boost-${VERSION}.tar.gz
+		fi
 	fi
 
 	if [ ! -d ${mysqlDir}/mysql-${VERSION} ];then
@@ -51,11 +72,13 @@ Install_mysql()
 		-DENABLED_LOCAL_INFILE=1 \
 		-DWITH_PARTITION_STORAGE_ENGINE=1 \
 		-DEXTRA_CHARSETS=all \
-		-DDEFAULT_CHARSET=utf8 \
-		-DDEFAULT_COLLATION=utf8_general_ci \
+		-DDEFAULT_CHARSET=utf8mb4 \
+		-DDEFAULT_COLLATION=utf8mb4_general_ci \
 		-DDOWNLOAD_BOOST=1 \
+		-DCMAKE_C_COMPILER=/usr/bin/gcc \
+		-DCMAKE_CXX_COMPILER=/usr/bin/g++ \
 		-DWITH_BOOST=${mysqlDir}/mysql-${VERSION}/boost/
-		make && make install && make clean
+		make ${MAKEJN:--j2} && make install && make clean
 		echo '5.7' > $serverPath/mysql/version.pl
 		echo '安装完成' > $install_tmp
 	fi

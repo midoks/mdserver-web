@@ -131,11 +131,14 @@ def confReplace():
     content = content.replace('{$OS_USER}', user)
     content = content.replace('{$OS_USER_GROUP}', user_group)
 
+    # 主配置文件
     nconf = getServerDir() + '/nginx/conf/nginx.conf'
+    mw.writeFile(nconf, content)
 
-    __content = mw.readFile(nconf)
-    if __content.find('#user'):
-        mw.writeFile(getServerDir() + '/nginx/conf/nginx.conf', content)
+    # 静态配置
+    static_conf = getServerDir() + '/nginx/conf/enable-php-00.conf'
+    if not os.path.exists(static_conf):
+        mw.writeFile(static_conf, '')
 
     # give nginx root permission
     ng_exe_bin = getServerDir() + "/nginx/sbin/nginx"
@@ -262,7 +265,21 @@ def initdUinstall():
 def runInfo():
     # 取Openresty负载状态
     try:
-        result = mw.httpGet('http://127.0.0.1/nginx_status')
+        url = 'http://' + mw.getHostAddr() + '/nginx_status'
+        result = mw.httpGet(url)
+        tmp = result.split()
+        data = {}
+        data['active'] = tmp[2]
+        data['accepts'] = tmp[9]
+        data['handled'] = tmp[7]
+        data['requests'] = tmp[8]
+        data['Reading'] = tmp[11]
+        data['Writing'] = tmp[13]
+        data['Waiting'] = tmp[15]
+        return mw.getJson(data)
+    except Exception as e:
+        url = 'http://127.0.0.1/nginx_status'
+        result = mw.httpGet(url)
         tmp = result.split()
         data = {}
         data['active'] = tmp[2]

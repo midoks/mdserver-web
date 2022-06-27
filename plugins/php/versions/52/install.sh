@@ -11,6 +11,46 @@ sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 
 
+
+_os=`uname`
+echo "use system: ${_os}"
+
+if [ ${_os} == "Darwin" ]; then
+	OSNAME='macos'
+elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
+	OSNAME='centos'
+elif grep -Eqi "Fedora" /etc/issue || grep -Eq "Fedora" /etc/*-release; then
+	OSNAME='fedora'
+elif grep -Eqi "Rocky" /etc/issue || grep -Eq "Rocky" /etc/*-release; then
+	OSNAME='rocky'
+elif grep -Eqi "AlmaLinux" /etc/issue || grep -Eq "AlmaLinux" /etc/*-release; then
+	OSNAME='alma'
+elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
+	OSNAME='debian'
+elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
+	OSNAME='ubuntu'
+elif grep -Eqi "Raspbian" /etc/issue || grep -Eq "Raspbian" /etc/*-release; then
+	OSNAME='raspbian'
+else
+	OSNAME='unknow'
+fi
+
+
+if [ "$OSNAME" == 'ubuntu' ] || [ "$OSNAME" == 'debian' ] ;then
+	apt install bison=2.4.1
+	if [ "$?" != "0" ]; then
+		echo 'The system version is too high to install'
+		exit 1
+	fi
+
+	apt install flex=2.5.4
+	if [ "$?" != "0" ]; then
+		echo 'The system version is too high to install'
+		exit 1
+	fi
+fi
+
+
 version=5.2.17
 PHP_VER=52
 Install_php()
@@ -30,16 +70,16 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 	fi
 	
 	if [ ! -f $sourcePath/php/php-5.2.17-fpm-0.5.14.diff.gz ]; then
-		wget -O $sourcePath/php/php-5.2.17-fpm-0.5.14.diff.gz http://php-fpm.org/downloads/php-5.2.17-fpm-0.5.14.diff.gz
+		wget --no-check-certificate -O $sourcePath/php/php-5.2.17-fpm-0.5.14.diff.gz http://php-fpm.org/downloads/php-5.2.17-fpm-0.5.14.diff.gz
 	fi
 
 
 	if [ ! -f $sourcePath/php/php-5.2.17-max-input-vars.patch ]; then
-		wget -O $sourcePath/php/php-5.2.17-max-input-vars.patch https://raw.github.com/laruence/laruence.github.com/master/php-5.2-max-input-vars/php-5.2.17-max-input-vars.patch
+		wget --no-check-certificate -O $sourcePath/php/php-5.2.17-max-input-vars.patch https://raw.github.com/laruence/laruence.github.com/master/php-5.2-max-input-vars/php-5.2.17-max-input-vars.patch
 	fi
 
 	if [ ! -f $sourcePath/php/php-5.x.x.patch ]; then
-		wget -O $sourcePath/php/php-5.x.x.patch https://mail.gnome.org/archives/xml/2012-August/txtbgxGXAvz4N.txt
+		wget --no-check-certificate -O $sourcePath/php/php-5.x.x.patch https://mail.gnome.org/archives/xml/2012-August/txtbgxGXAvz4N.txt
 	fi
 
 

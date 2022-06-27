@@ -36,6 +36,7 @@ if [ ! -d $DEV/server/lib ]; then
 	cd $DEV/server/mdserver-web/scripts && ./lib.sh
 fi  
 
+pip3 install mysqlclient
 
 chmod 755 $DEV/server/mdserver-web/data
 if [ -f $DEV/server/mdserver-web/bin/activate ];then
@@ -43,6 +44,8 @@ if [ -f $DEV/server/mdserver-web/bin/activate ];then
 else
 	cd $DEV/server/mdserver-web && pip3 install -r $DEV/server/mdserver-web/requirements.txt
 fi
+
+pip3 install mysqlclient
 
 
 cd $DEV/server/mdserver-web && ./cli.sh start

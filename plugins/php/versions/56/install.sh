@@ -44,6 +44,7 @@ else
 	OPTIONS="${OPTIONS} --with-curl"
 fi
 
+
 if [ ! -d $serverPath/php/56 ];then
 	cd $sourcePath/php/php${PHP_VER} && ./configure \
 	--prefix=$serverPath/php/56 \
@@ -69,8 +70,8 @@ if [ ! -d $serverPath/php/56 ];then
 	--disable-intl \
 	--disable-fileinfo \
 	$OPTIONS \
-	--enable-fpm \
-	&& make clean && make && make install && make clean
+	--enable-fpm
+	make clean && make ${MAKEJN:--j2} && make install && make clean
 fi 
 
 #------------------------ install end ------------------------------------#
