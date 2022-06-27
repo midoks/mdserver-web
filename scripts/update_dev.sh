@@ -57,7 +57,10 @@ rm -rf /tmp/mdserver-web-dev
 
 #pip uninstall public
 echo "use system version: ${OSNAME}"
-curl -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update/${OSNAME}.sh | bash
+
+# cd /www/server/mdserver-web && bash ./scripts/install/debian.sh
+cd /www/server/mdserver-web && bash scripts/update/${OSNAME}.sh
+# curl -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update/${OSNAME}.sh | bash
 
 endTime=`date +%s`
 ((outTime=($endTime-$startTime)/60))

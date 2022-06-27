@@ -74,7 +74,11 @@ if [ $OSNAME != "macos" ];then
 fi
 
 echo "use system version: ${OSNAME}"
-curl -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/install/${OSNAME}.sh | bash
+
+
+# cd /www/server/mdserver-web && bash ./scripts/install/debian.sh
+cd /www/server/mdserver-web && bash scripts/install/${OSNAME}.sh
+# curl -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/install/${OSNAME}.sh | bash
 
 chmod +x /www/server/mdserver-web/mw-cli
 if [ ! -e /usr/bin/mw-cli ]; then 

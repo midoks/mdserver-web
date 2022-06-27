@@ -57,7 +57,7 @@ rm -rf /tmp/mdserver-web-master
 
 #pip uninstall public
 echo "use system version: ${OSNAME}"
-curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/update/${OSNAME}.sh | bash
+cd /www/server/mdserver-web && bash scripts/update/${OSNAME}.sh
 
 endTime=`date +%s`
 ((outTime=($endTime-$startTime)/60))
