@@ -1619,6 +1619,8 @@ include enable-php-''' % (fix.strip().replace(',', '|'), domains.strip().replace
             os.makedirs(path)
             if not mw.isAppleSystem():
                 mw.execShell('chown -R www:www ' + path)
+
+            mw.writeFile(path + '/index.html', '已经开始工作!!!')
             mw.execShell('chmod -R 755 ' + path)
 
     def nginxAddDomain(self, webname, domain, port):
