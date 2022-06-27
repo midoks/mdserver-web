@@ -1174,7 +1174,7 @@ class site_api:
     
     
     ## get_redirect_status
-    def getRedirectStatusApi(self):
+    def getRedirectApi(self):
         _siteName = request.form.get("siteName",'')
         
         # read data base
@@ -1198,12 +1198,13 @@ class site_api:
     
     
     # get redirect status    
-    def setRedirectStatusApi(self):
+    def setRedirectApi(self):
         _siteName = request.form.get("siteName",'')
         _from = request.form.get("from",'')          # from (example.com / /test/)
         _to = request.form.get("to",'')              # redirect to
         _type = request.form.get("type",'')          # path / domain
         _rType = request.form.get("r_type",'')       # redirect type   
+        _keepPath = request.form.get("keep_path",'') # keep path
         
         if _siteName == '' or _from == '' or _to == '' or _type == '' or _rType == '':
             return mw.returnJson(False, "必填项不能为空!")
@@ -1212,18 +1213,36 @@ class site_api:
         data_content = mw.readFile(data_path) if os.path.exists(data_path) else ""
         data = json.loads(data_content) if data_content != "" else {}
         
-        if _rType == "301":
-            _rType = 0
+        _rTypeCode = 0 if _rType == "301" else 1
+        _typeCode = 0 if _type == "path" else 1
+        _keepPath = 1 if _keepPath == "true" else 0
+        
+        redirect_type = "permanent" if _rType == 0 else "temporary"
+        pathQuery = ""
+        if _keepPath == 1:
+            # path
+            if _rTypeCode == 0:
+                pathQuery = "$1"
+                _from = "{}(.*)".format(_from)
+            #domain
+            else:
+                pathQuery = "$request_uri"
+        
+        file_content = ""
+        # path
+        if _typeCode == 0:
+            file_content = """if ($host ~ '^{}'){
+            return {} {}{};
+        }""".format(_from, _rType ,_to, pathQuery)
         else:
-            _rType = 1
+            file_content = "rewrite ^{} {}{} {};".format(_from, _to, pathQuery, redirect_type)
             
-        if _type == "path":
-            _type = 0
-        else:
-            _type = 1
-            
-        data.append({"from": _from, "type": _type, "r_type": _rType, "r_to": _to})
+        _hash = mw.md5("{}+{}".format(file_content, time.time()))
+        
+        # write data json file
+        data.append({"from": _from, "type": _typeCode, "r_type": _rTypeCode, "r_to": _to, 'keep_path': _keepPath, 'id': _hash})
         mw.writeFile(data_path, json.dumps(data))
+        mw.writeFile("{}/{}.conf".format(self.getRedirectPath(_siteName), _hash), file_content)
         return mw.returnJson(True, "ok")
 
 
@@ -1396,6 +1415,9 @@ class site_api:
 
     def getRedirectDataPath(self, siteName):
         return "{}/{}/data.json".format(self.redirectPath, siteName)
+
+    def getRedirectPath(self, siteName):
+        return "{}/{}/".format(self.redirectPath, siteName)
 
     def getDirBindRewrite(self, siteName, dirname):
         return self.rewritePath + '/' + siteName + '_' + dirname + '.conf'

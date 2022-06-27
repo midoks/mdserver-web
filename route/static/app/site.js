@@ -1518,7 +1518,7 @@ function to301(siteName, type, obj){
 	
 	var loadT = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});
 
-	$.post('/site/get_redirect_status','siteName='+siteName, function(response) {
+	$.post('/site/get_redirect','siteName='+siteName, function(response) {
 		layer.close(loadT);
 		$("#md-301-loading").remove();
 		let res = JSON.parse(response);
