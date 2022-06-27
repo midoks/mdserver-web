@@ -17,6 +17,10 @@ sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 mysqlDir=${serverPath}/source/mysql
 
+# 加快测试速度 For Github Action
+MAKEJN='${SYS_MAKEJN:+"-j2"}'
+echo "SYS_MAKEJN:$MAKEJN"
+
 Install_mysql()
 {
 	mkdir -p ${mysqlDir}
@@ -79,7 +83,7 @@ Install_mysql()
 		-DCMAKE_C_COMPILER=/usr/bin/gcc \
 		-DCMAKE_CXX_COMPILER=/usr/bin/g++ \
 		-DWITH_BOOST=${mysqlDir}/mysql-8.0.25/boost/
-		make && make install && make clean
+		make $MAKEJN && make install && make clean
 
 		if [ -d $serverPath/mysql ];then
 			echo '8.0' > $serverPath/mysql/version.pl

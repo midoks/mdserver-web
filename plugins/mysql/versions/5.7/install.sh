@@ -19,6 +19,10 @@ mysqlDir=${serverPath}/source/mysql
 
 VERSION="5.7.37"
 
+# 加快测试速度 For Github Action
+MAKEJN='${SYS_MAKEJN:+"-j2"}'
+echo "SYS_MAKEJN:$MAKEJN"
+
 Install_mysql()
 {
 	mkdir -p ${mysqlDir}
@@ -77,7 +81,7 @@ Install_mysql()
 		-DCMAKE_C_COMPILER=/usr/bin/gcc \
 		-DCMAKE_CXX_COMPILER=/usr/bin/g++ \
 		-DWITH_BOOST=${mysqlDir}/mysql-${VERSION}/boost/
-		make && make install && make clean
+		make $MAKEJN && make install && make clean
 		echo '5.7' > $serverPath/mysql/version.pl
 		echo '安装完成' > $install_tmp
 	fi
