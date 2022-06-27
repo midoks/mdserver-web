@@ -44,9 +44,6 @@ else
 	OPTIONS="${OPTIONS} --with-curl"
 fi
 
-# 加快测试速度 For Github Action
-MAKEJN="${MAKEJN:--j2}"
-echo "MAKEJN:$MAKEJN"
 
 if [ ! -d $serverPath/php/72 ];then
 	cd $sourcePath/php/php${PHP_VER} && ./configure \
@@ -71,7 +68,7 @@ if [ ! -d $serverPath/php/72 ];then
 	--disable-fileinfo \
 	$OPTIONS \
 	--enable-fpm
-	make clean && make $MAKEJN && make install && make clean
+	make clean && make ${MAKEJN:--j2} && make install && make clean
 fi
 
 #------------------------ install end ------------------------------------#

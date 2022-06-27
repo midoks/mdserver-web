@@ -53,9 +53,6 @@ else
 fi
 
 
-# 加快测试速度 For Github Action
-MAKEJN="${SYS_MAKEJN:-'-j2'}"
-echo "SYS_MAKEJN:$MAKEJN"
 
 echo "$sourcePath/php/php${PHP_VER}"
 
@@ -83,7 +80,7 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--disable-fileinfo \
 	$OPTIONS \
 	--enable-fpm
-	make $MAKEJN && make install && make clean
+	make ${MAKEJN:--j2} && make install && make clean
 fi 
 #------------------------ install end ------------------------------------#
 }
