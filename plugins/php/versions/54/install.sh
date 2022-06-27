@@ -68,7 +68,27 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--disable-fileinfo \
 	$OPTIONS \
 	--enable-fpm
-	make clean && make && make install && make clean
+
+	make clean && make
+
+	#debian11,没有生成php54 man
+	if [ ! -f sapi/cli/php.1 ];then
+		cp -rf sapi/cli/php.1.in sapi/cli/php.1
+	fi
+
+	if [ ! -f sapi/cgi/php-cgi.1 ];then
+		cp -rf sapi/cgi/php-cgi.1.in sapi/cgi/php-cgi.1
+	fi
+
+	if [ ! -f scripts/man1/phpize.1 ];then
+		cp -rf scripts/man1/phpize.1.in scripts/man1/phpize.1
+	fi
+
+	if [ ! -f scripts/man1/php-config.1 ];then
+		cp -rf scripts/man1/php-config.1.in scripts/man1/php-config.1
+	fi
+
+	make install && make clean
 fi 
 
 #------------------------ install end ------------------------------------#
