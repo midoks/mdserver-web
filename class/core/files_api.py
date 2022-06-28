@@ -191,34 +191,40 @@ class files_api:
         # self.setFileAccept(path + '/' + filename)
         return mw.returnJson(True, '已将下载任务添加到队列!')
 
+    # 删除进程下的所有进程
+    def removeTaskRecursion(self, pid):
+        cmd = "ps -ef|grep " + pid + \
+            " | grep -v grep |sed -n '2,1p' | awk '{print $2}'"
+        sub_pid = mw.execShell(cmd)
+
+        if sub_pid[0].strip() == '':
+            return 'ok'
+
+        self.removeTaskRecursion(sub_pid[0].strip())
+        mw.execShell('kill -9 ' + sub_pid[0].strip())
+        return sub_pid[0].strip()
+
     def removeTaskApi(self):
+        import system_api
         mid = request.form.get('id', '')
         try:
             name = mw.M('tasks').where('id=?', (mid,)).getField('name')
             status = mw.M('tasks').where('id=?', (mid,)).getField('status')
+            # print(name, status)
             mw.M('tasks').delete(mid)
             if status == '-1':
-                os.system(
-                    "kill `ps -ef |grep 'python panelSafe.pyc'|grep -v grep|grep -v panelExec|awk '{print $2}'`")
-                os.system(
-                    "kill `ps aux | grep 'python task.pyc$'|awk '{print $2}'`")
-                os.system('''
-pids=`ps aux | grep 'sh'|grep -v grep|grep install|awk '{print $2}'`
-arr=($pids)
+                task_pid = mw.execShell(
+                    "ps aux | grep 'task.py' | grep -v grep |awk '{print $2}'")
 
-for p in ${arr[@]}
-do
-    kill -9 $p
-done
-            ''')
+                task_list = task_pid[0].strip().split("\n")
+                for i in range(len(task_list)):
+                    self.removeTaskRecursion(task_list[i])
 
-                os.system(
-                    'rm -f ' + name.replace('扫描目录[', '').replace(']', '') + '/scan.pl')
                 isTask = mw.getRootDir() + '/tmp/panelTask.pl'
                 mw.writeFile(isTask, 'True')
-                os.system('/etc/init.d/mw start')
+                system_api.system_api().restartTask()
         except:
-            os.system('/etc/init.d/mw start')
+            system_api.system_api().restartTask()
         return mw.returnJson(True, '任务已删除!')
 
     # 上传文件

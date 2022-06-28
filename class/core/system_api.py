@@ -102,6 +102,12 @@ class system_api:
         return mw.returnJson(True, '正在重启服务器!')
     ##### ----- end ----- ###
 
+    def restartTask(self):
+        initd = mw.getRunDir() + '/scripts/init.d/mw'
+        if os.path.exists(initd):
+            os.system(initd + ' ' + 'restart_task')
+        return True
+
     def restartMw(self):
         mw.writeFile('data/restart.pl', 'True')
         return True
