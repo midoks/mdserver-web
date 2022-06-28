@@ -1,7 +1,7 @@
 # This workflow will install Python dependencies, run tests and lint with a single version of Python
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-name: MW APP MySQL80
+name: MW APP OpenResty
 
 on:
   push:
@@ -29,16 +29,9 @@ jobs:
     - name: Install MW
       run: |
         sudo bash scripts/install_dev.sh
-    - name: Install MySQL80
+    - name: Install OpenResty
       run: |
-        sudo mkdir -p /tmp
-        sudo echo '' >  /tmp/t.log
-        sudo chmod 777 /www/server/mdserver-web/plugins/mysql/versions/8.0/install.sh
-        sudo cat /www/server/mdserver-web/plugins/mysql/versions/8.0/install.sh > /tmp/t.log
-        sudo echo "export MAKEJN=-j12\n" >> /www/server/mdserver-web/plugins/mysql/versions/8.0/install.sh
-        sudo cat /tmp/t.log >> /www/server/mdserver-web/plugins/mysql/versions/8.0/install.sh
-
-        cd /www/server/mdserver-web/plugins/mysql && sudo bash install.sh install 8.0
+        cd /www/server/mdserver-web/plugins/openresty && sudo bash install.sh install 1.21.4.1
     - name: Start DEBUG
       run: |
         gunicorn -c setting.py app:app
