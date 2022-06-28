@@ -130,5 +130,11 @@ include
 data/api_login.txt
 data/sessions
 data/ssl.pl
+data/port.pl
+plugins/openlitespeed
 plugins/gdrive/
-plugins/openlitespeed/
+data/ipv6.pl
+data/restart.pl
+pip-selfcheck.json
+data/ssl.pl
+
