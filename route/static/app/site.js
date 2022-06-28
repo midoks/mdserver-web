@@ -1490,9 +1490,6 @@ function to301(siteName, type, obj){
 					res = JSON.parse(res);
 					if (res.status) {
 						layer.close(redirect_form);
-						setTimeout(function() {
-							location.reload();
-						}, 1000);
 						to301(siteName)
 					} else {
 						layer.msg(res.msg);

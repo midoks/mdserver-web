@@ -1216,7 +1216,7 @@ class site_api:
         
         _rTypeCode = 0 if _rType == "301" else 1
         _typeCode = 0 if _type == "path" else 1
-    
+        _keepPath = 1 if _keepPath == "1" else 0
     
         file_content = ""
         # path
