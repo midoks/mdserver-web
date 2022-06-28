@@ -49,6 +49,10 @@ if [ $sysName == 'Darwin' ]; then
 	export LDFLAGS="-L/usr/local/opt/libxml2/lib"
 else
 	OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
+	OPTIONS="${OPTIONS} --enable-gd"
+	OPTIONS="${OPTIONS} --enable-gd-jis-conv"
+	OPTIONS="${OPTIONS} --with-webp --with-webp-dir=/usr/lib"
+	OPTIONS="${OPTIONS} --with-jpeg --with-jpeg-dir=/usr/lib"
 	OPTIONS="${OPTIONS} --with-curl"
 fi
 
