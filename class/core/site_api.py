@@ -1660,6 +1660,7 @@ class site_api:
         content = content.replace('{$PORT}', self.sitePort)
         content = content.replace('{$SERVER_NAME}', self.siteName)
         content = content.replace('{$ROOT_DIR}', self.sitePath)
+        content = content.replace('{$PHP_DIR}', self.setupPath + '/php')
         content = content.replace('{$PHPVER}', self.phpVersion)
         content = content.replace('{$OR_REWRITE}', self.rewritePath)
 
