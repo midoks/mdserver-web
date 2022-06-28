@@ -31,4 +31,18 @@ if [ ! -d $curPath/versions/$2 ];then
 	exit 0
 fi
 
+if [ "${action}" == "uninstall" ];then
+	#初始化 
+	cd ${rootPath} && python3 ${rootPath}/plugins/php/index.py stop ${type}
+	cd ${rootPath} && python3 ${rootPath}/plugins/php/index.py initd_uninstall ${type}
+fi
+
 sh -x $curPath/versions/$2/install.sh $1
+
+if [ "${action}" =="install" ];then
+	#初始化 
+	cd ${rootPath} && python3 ${rootPath}/plugins/php/index.py start ${type}
+	cd ${rootPath} && python3 ${rootPath}/plugins/php/index.py initd_install ${type}
+fi
+
+
