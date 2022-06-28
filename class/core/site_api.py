@@ -85,9 +85,9 @@ class site_api:
         name = request.form.get('name', '')
         import time
         # 清理旧的
-        defaultSite = mw.readFile('data/defaultSite.pl')
-        if defaultSite:
-            path = self.getHostConf(defaultSite)
+        default_site = mw.readFile('data/default_site.pl')
+        if default_site:
+            path = self.getHostConf(default_site)
             if os.path.exists(path):
                 conf = mw.readFile(path)
                 rep = "listen\s+80.+;"
@@ -105,7 +105,7 @@ class site_api:
             conf = re.sub(rep, 'listen 443 ssl default_server;', conf, 1)
             mw.writeFile(path, conf)
 
-        mw.writeFile('data/defaultSite.pl', name)
+        mw.writeFile('data/default_site.pl', name)
         mw.restartWeb()
         return mw.returnJson(True, '设置成功!')
 
@@ -113,7 +113,7 @@ class site_api:
         data = {}
         data['sites'] = mw.M('sites').field(
             'name').order('id desc').select()
-        data['defaultSite'] = mw.readFile('data/defaultSite.pl')
+        data['default_site'] = mw.readFile('data/default_site.pl')
         return mw.getJson(data)
 
     def setPsApi(self):
