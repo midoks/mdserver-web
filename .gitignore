@@ -136,3 +136,5 @@ plugins/gdrive/
 data/ipv6.pl
 data/restart.pl
 pip-selfcheck.json
+data/ssl.pl
+

@@ -1,3 +1,5 @@
+export MAKEJN=-j12
+
 # -*- coding: utf-8 -*-
 #!/bin/bash
 
