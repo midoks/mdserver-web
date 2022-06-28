@@ -116,19 +116,14 @@ if [ $sysName == 'Darwin' ]; then
 	OPTIONS="${OPTIONS} --with-curl=${serverPath}/lib/curl"
 else
 	OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
-	OPTIONS="${OPTIONS} --with-freetype-dir=${serverPath}/lib/freetype_old"
-	OPTIONS="${OPTIONS} --with-gd --enable-gd-native-ttf"
-	OPTIONS="${OPTIONS} --with-jpeg-dir=/usr/lib"
 	OPTIONS="${OPTIONS} --with-curl"
 fi
 
 
 if [ ! -d $serverPath/php/${PHP_VER} ];then
-	ln -s /usr/lib64/libjpeg.so /usr/lib/libjpeg.so
-	ln -s /usr/lib64/libpng.so /usr/lib/
-	cp -frp /usr/lib64/libldap* /usr/lib/
-	export MYSQL_LIB_DIR=/usr/lib64/mysql
 
+	export MYSQL_LIB_DIR=/usr/lib64/mysql
+	
 	cd $sourcePath/php/php${PHP_VER} && ./configure \
 	--prefix=$serverPath/php/${PHP_VER} \
 	--exec-prefix=$serverPath/php/${PHP_VER} \
