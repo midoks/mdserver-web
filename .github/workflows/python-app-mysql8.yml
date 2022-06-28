@@ -33,6 +33,7 @@ jobs:
       run: |
         sudo mkdir -p /tmp
         sudo echo '' >  /tmp/t.log
+        sudo chmod 777 /www/server/mdserver-web/plugins/mysql/versions/8.0/install.sh
         sudo cat /www/server/mdserver-web/plugins/mysql/versions/8.0/install.sh > /tmp/t.log
         sudo echo "export MAKEJN=-j12\n" >> /www/server/mdserver-web/plugins/mysql/versions/8.0/install.sh
         sudo cat /tmp/t.log >> /www/server/mdserver-web/plugins/mysql/versions/8.0/install.sh
