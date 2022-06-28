@@ -32,12 +32,10 @@ if [ ! -d $curPath/versions/$2 ];then
 fi
 
 if [ "${action}" == "uninstall" ];then
-	#初始化 
-	cd ${rootPath} && python3 ${rootPath}/plugins/php/index.py stop ${type}
-	cd ${rootPath} && python3 ${rootPath}/plugins/php/index.py initd_uninstall ${type}
-
+	
 	if [ -f /lib/systemd/system/php${type}.service ];then
 		systemctl stop php${type}
+		systemctl disable php${type}
 		rm -rf /lib/systemd/system/php${type}.service
 		systemctl daemon-reload
 	fi
