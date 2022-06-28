@@ -1714,21 +1714,14 @@ include enable-php-''' % (fix.strip().replace(',', '|'), domains.strip().replace
         content = content.replace('{$ROOT_DIR}', self.sitePath)
         content = content.replace('{$PHPVER}', self.phpVersion)
         content = content.replace('{$OR_REWRITE}', self.rewritePath)
+        content = content.replace('{$OR_REDIRECT}', self.redirectPath)
 
         logsPath = mw.getLogsDir()
         content = content.replace('{$LOGPATH}', logsPath)
         mw.writeFile(vhost_file, content)
-
-        rewrite_content = '''
-location /{
-    if (!-e $request_filename) {
-       rewrite  ^(.*)$  /index.php/$1  last;
-       break;
-    }
-}
-        '''
+        
         rewrite_file = self.rewritePath + '/' + self.siteName + '.conf'
-        mw.writeFile(rewrite_file, rewrite_content)
+        mw.writeFile(rewrite_file, "")
 
     def add(self, webname, port, ps, path, version):
         siteMenu = json.loads(webname)
