@@ -18,7 +18,7 @@
 
 基本上可以使用,后续会继续优化!欢迎提供意见！
 
-- https://t.me/+ZYXZ20VaKVQxYzM1
+- https://t.me/mdserver_web
 
 
 ### 主要插件介绍
