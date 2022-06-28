@@ -1181,6 +1181,7 @@ class site_api:
         data_path =  self.getRedirectDataPath(_siteName)
         data_content = mw.readFile(data_path)
         if data_content == False:
+            mw.execShell("mkdir {}/{}".format(self.redirectPath, _siteName))
             return mw.returnJson(True, "", {"result": [], "count": 0})
         # get  
         # conf_path = "{}/{}/*.conf".format(self.redirectPath, siteName)
@@ -1211,13 +1212,11 @@ class site_api:
         
         data_path =  self.getRedirectDataPath(_siteName)
         data_content = mw.readFile(data_path) if os.path.exists(data_path) else ""
-        data = json.loads(data_content) if data_content != "" else {}
+        data = json.loads(data_content) if data_content != "" else []
         
         _rTypeCode = 0 if _rType == "301" else 1
         _typeCode = 0 if _type == "path" else 1
-        _keepPath = 1 if _keepPath == "true" else 0
         
-        redirect_type = "permanent" if _rType == 0 else "temporary"
         pathQuery = ""
         if _keepPath == 1:
             # path
@@ -1231,11 +1230,14 @@ class site_api:
         file_content = ""
         # path
         if _typeCode == 0:
-            file_content = """if ($host ~ '^{}'){
-            return {} {}{};
-        }""".format(_from, _rType ,_to, pathQuery)
-        else:
+            redirect_type = "permanent" if _rTypeCode == 0 else "temporary"
             file_content = "rewrite ^{} {}{} {};".format(_from, _to, pathQuery, redirect_type)
+        else:
+            redirect_type = "301" if _rTypeCode == 0 else "302"
+            _if = "if ($host ~ '^{}')".format(_from)
+            _return = "return {} {}{}; ".format(redirect_type, _to, pathQuery)
+            file_content = _if + "{\r\n    " + _return + "\r\n}"
+            
             
         _hash = mw.md5("{}+{}".format(file_content, time.time()))
         

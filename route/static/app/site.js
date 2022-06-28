@@ -1427,16 +1427,14 @@ function to301(siteName, type, obj){
 	// 设置 更新展示
 	if(type == 1 || type == 3){
 		obj = {
-			redirectname: (new Date()).valueOf(),
-			tourl: 'http://',
-			redirectdomain: [],
-			redirectpath: '',
-			redirecttype: '',
+			to: 'http://',
+			from: '',
+			r_type: '',
 			type: 1,
-			domainorpath: 'domain',
-			holdpath: 1
+			type: 'domain',
+			keep_path: 1
 		}
-		layer.open({
+		var redirect_form = layer.open({
 			type: 1,
 			skin: 'demo-class',
 			area: '650px',
@@ -1448,26 +1446,22 @@ function to301(siteName, type, obj){
 				"<div class='line' style='overflow:hidden;height: 40px;'>" +
 				"<div style='display: inline-block;'>" +
 				"<span class='tname' style='margin-left:10px;position: relative;top: -5px;'>保留URI参数</span>" +
-				"<input class='btswitch btswitch-ios' id='holdpath' type='checkbox' name='holdpath' " + (obj.holdpath == 1 ? 'checked="checked"' : '') + " /><label class='btswitch-btn phpmyadmin-btn' for='holdpath' style='float:left'></label>" +
+				"<input class='btswitch btswitch-ios' id='keep_path' type='checkbox' name='keep_path' " + (obj.keep_path == 1 ? 'checked="checked"' : '') + " /><label class='btswitch-btn phpmyadmin-btn' for='keep_path' style='float:left'></label>" +
 				"</div>" +
-				"</div>" +
-				"<div class='line' style='clear:both;display:none;'>" +
-				"<span class='tname'>重定向名称</span>" +
-				"<div class='info-r  ml0'><input name='redirectname' class='bt-input-text mr5' " + (type == 1 ? '' : 'disabled="disabled"') + " type='text' style='width:300px' value='" + obj.redirectname + "'></div>" +
 				"</div>" +
 				"<div class='line' style='clear:both;'>" +
 				"<span class='tname'>重定向类型</span>" +
 				"<div class='info-r  ml0'>" +
-				"<select class='bt-input-text mr5' name='type' style='width:100px'><option value='domain' " + (obj.domainorpath == 'domain' ? 'selected ="selected"' : "") + ">域名</option><option value='path'  " + (obj.domainorpath == 'path' ? 'selected ="selected"' : "") + ">路径</option></select>" +
+				"<select class='bt-input-text mr5' name='type' style='width:100px'><option value='domain' " + (obj.type == 'domain' ? 'selected ="selected"' : "") + ">域名</option><option value='path'  " + (obj.type == 'path' ? 'selected ="selected"' : "") + ">路径</option></select>" +
 				"<span class='mlr15'>重定向方式</span>" +
-				"<select class='bt-input-text ml10' name='redirecttype' style='width:100px'><option value='301' " + (obj.redirecttype == '301' ? 'selected ="selected"' : "") + " >301</option><option value='302' " + (obj.redirecttype == '302' ? 'selected ="selected"' : "") + ">302</option></select></div>" +
+				"<select class='bt-input-text ml10' name='r_type' style='width:100px'><option value='301' " + (obj.r_type == '301' ? 'selected ="selected"' : "") + " >301</option><option value='302' " + (obj.r_type == '302' ? 'selected ="selected"' : "") + ">302</option></select></div>" +
 				"</div>" +
 				"<div class='line redirectdomain'>" +
 				"<span class='tname'>重定向源</span>" +
 				"<div class='info-r  ml0'>" +
-				"<input  name='redirectpath' placeholder='域名或路径' class='bt-input-text mr5' type='text' style='width:200px;float: left;margin-right:0px' value='" + obj.redirectpath + "'>" +
+				"<input  name='from' placeholder='域名或路径' class='bt-input-text mr5' type='text' style='width:200px;float: left;margin-right:0px' value='" + obj.from + "'>" +
 				"<span class='tname' style='width:90px'>目标URL</span>" +
-				"<input  name='tourl' class='bt-input-text mr5' type='text' style='width:200px' value='" + obj.tourl + "'>" +
+				"<input  name='to' class='bt-input-text mr5' type='text' style='width:200px' value='" + obj.to + "'>" +
 				"</div>" +
 				"</div>" +
 				"</div>" +
@@ -1476,17 +1470,27 @@ function to301(siteName, type, obj){
 		});
 		setTimeout(function() {
 			$('.btn-colse-prosy').click(function() {
-				form_redirect.close();
+				layer.close(redirect_form);
 			});
 			$('.btn-submit-redirect').click(function() {
-				var holdpath = $('[name="holdpath"]').prop('checked') ? 1 : 0;
-				var redirectname = $('[name="redirectname"]').val();
-				var redirecttype = $('[name="redirecttype"]').val();
+				var keep_path = $('[name="keep_path"]').prop('checked') ? 1 : 0;
+				var r_type = $('[name="r_type"]').val();
 				var type = $('[name="type"]').val();
-				var redirectpath = $('[name="redirectpath"]').val();
-				var redirectdomain = JSON.stringify($('.selectpicker').val() || []);
-				var tourl = $(domainorpath == 'path' ? '[name="tourl1"]' : '[name="tourl"]').val();
-				console.log(type, holdpath, redirectname, redirecttype, domainorpath, redirectpath, redirectdomain, tourl);
+				var from = $('[name="from"]').val();
+				var to = $('[name="to"]').val();
+				
+				$.post('/site/set_redirect', {
+					siteName: siteName,
+					type: type,
+					r_type: r_type,
+					from: from,
+					to: to,
+					keep_path: keep_path
+				}, function(res) {
+					res = JSON.parse(res);
+					console.log(res)
+					to301(siteName)
+				});
 			});
 		}, 100);
 	}
@@ -1526,11 +1530,12 @@ function to301(siteName, type, obj){
 			let data = res.data.result;
 			data.forEach(function(item){
 				lan_r_type = item.r_type == 0 ? "永久重定向" : "临时重定向"
+				keep_path = item.keep_path == 0 ? "不保留" : "保留"
 				let tmp = '<tr>\
 					<td><span data-index="1"><span>'+item.from+'</span></span></td>\
 					<td><span data-index="2"><span>'+lan_r_type+'</span></span></td>\
-					<td><span data-index="2"><span>'+lan_r_type+'</span></span></td>\
-					<td><span data-index="4">编辑</span></td>\
+					<td><span data-index="2"><span>'+keep_path+'</span></span></td>\
+					<td><span data-index="4" class="btlink">编辑</span></td>\
 				</tr>';
 				$("#md-301-body").append(tmp);
 			})
