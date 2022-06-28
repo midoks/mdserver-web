@@ -71,7 +71,7 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	$OPTIONS \
 	--enable-fpm
 
-	make clean && make ${MAKEJN:--j2}
+	make clean && make
 
 	#debian11,没有生成php54 man
 	if [ ! -f sapi/cli/php.1 ];then

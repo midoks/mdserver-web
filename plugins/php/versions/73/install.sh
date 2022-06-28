@@ -73,7 +73,7 @@ if [ ! -d $serverPath/php/73 ];then
 	--disable-fileinfo \
 	$OPTIONS \
 	--enable-fpm
-	make clean && make ${MAKEJN:--j2} && make install && make clean
+	make clean && make && make install && make clean
 fi
 
 #------------------------ install end ------------------------------------#

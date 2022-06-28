@@ -85,7 +85,7 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--disable-fileinfo \
 	$OPTIONS \
 	--enable-fpm
-	make ${MAKEJN:--j2} && make install && make clean
+	make  && make install && make clean
 fi 
 #------------------------ install end ------------------------------------#
 }
