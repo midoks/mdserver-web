@@ -136,7 +136,10 @@ def confReplace():
     mw.writeFile(nconf, content)
 
     # 静态配置
-    static_conf = getServerDir() + '/nginx/conf/enable-php-00.conf'
+    php_conf = mw.getServerDir() + '/web_conf/php/conf'
+    if not os.path.exists(php_conf):
+        mw.execShell('mkdir -p ' + php_conf)
+    static_conf = mw.getServerDir() + '/web_conf/php/conf/enable-php-00.conf'
     if not os.path.exists(static_conf):
         mw.writeFile(static_conf, '')
 

@@ -49,7 +49,7 @@ Install_openresty()
 
 	if [ -d $serverPath/openresty ];then
 		echo "${VERSION}" > $serverPath/openresty/version.pl
-		echo "" > $serverPath/openresty/nginx/conf/enable-php-00.conf
+		echo "" > $serverPath/web_conf/php/conf/enable-php-00.conf
     fi
 	echo '安装完成' > $install_tmp
 }
