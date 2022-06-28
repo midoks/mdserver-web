@@ -244,17 +244,19 @@ echo -e "Install_Curl" >> ${libPath}/lib.pl
 }
 
 
-_os=`uname`
 
 if grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
     sudo ln -sf /bin/bash /bin/sh
     #sudo dpkg-reconfigure dash
 fi
 
+_os=`uname`
 if [ ${_os} == "Darwin" ]; then
     OSNAME='macos'
 elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
     OSNAME='centos'
+elif grep -Eqi "Rocky" /etc/issue || grep -Eq "Rocky" /etc/*-release; then
+    OSNAME='rocky'
 elif grep -Eqi "Red Hat Enterprise Linux Server" /etc/issue || grep -Eq "Red Hat Enterprise Linux Server" /etc/*-release; then
     OSNAME='rhel'
 elif grep -Eqi "Aliyun" /etc/issue || grep -Eq "Aliyun" /etc/*-release; then
@@ -288,21 +290,25 @@ if [ "$OSNAME" == "macos" ]; then
 elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     
     apt install -y devscripts
+    apt install -y net-tools
 
     apt install -y libffi-dev
     apt install -y cmake automake make
 
-    apt install -y php-common webp scons
-    apt install -y lzma lzma-dev libunwind-dev
+    apt install -y webp scons
+    apt install -y lzma lzma-dev
+    apt install -y libunwind-dev
 
     apt install -y libpcre3 libpcre3-dev 
     apt install -y openssl
 
     apt install -y libxml2 libxml2-dev libbz2-dev libmcrypt-dev libpspell-dev librecode-dev
     apt install -y libgmp-dev libgmp3-dev libreadline-dev libxpm-dev
-    apt install -y zlib1g-dev dia pkg-config  
-    apt install -y libjpeg62-turbo-dev libjpeg-dev libpng-dev
+    apt install -y dia pkg-config
+    apt install -y zlib1g-dev
+    apt install -y libjpeg-dev libpng-dev
     apt install -y libfreetype6
+    apt install -y libjpeg62-turbo-dev
     apt install -y libfreetype6-dev
     apt install -y libevent-dev libncurses5-dev libldap2-dev
 
@@ -328,20 +334,19 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
 else
 
     yum install -y openldap openldap-devel libtirpc libtirpc-devel rpcgen
-
     yum install -y bison re2c cmake
 
     yum install -y libmemcached libmemcached-devel
     yum install -y curl-devel
     yum install -y zlib zlib-devel
+    yum install -y libzip libzip-devel
     yum install -y pcre pcre-devel
     yum install -y icu libicu-devel autoconf
     yum install -y freetype freetype-devel
     yum install -y openssl openssl-devel
-    yum install -y libzip libzip-devel
     yum install -y graphviz libxml2 libxml2-devel
-
     yum install -y sqlite-devel
+    yum install -y mysql-devel
     yum install -y oniguruma oniguruma-devel
     yum install -y ImageMagick ImageMagick-devel
 
@@ -350,6 +355,52 @@ else
 
     fi
 fi
+
+
+#面板需要的库
+
+if [ ! -f /usr/local/bin/pip3 ];then
+    python3 -m pip install --upgrade pip setuptools wheel -i https://mirrors.aliyun.com/pypi/simple
+fi
+
+pip install --upgrade pip
+pip3 install --upgrade setuptools
+cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
+
+pip3 install gunicorn==20.1.0
+pip3 install gevent==21.1.2
+pip3 install gevent-websocket==0.10.1
+pip3 install requests==2.20.0
+pip3 install flask-caching==1.10.1
+pip3 install flask-session==0.3.2
+pip3 install pymongo
+pip3 install psutil
+pip3 install flask-socketio==5.2.0
+pip3 install mysqlclient
+
+if [ ! -f /www/server/mdserver-web/bin/activate ];then
+    cd /www/server/mdserver-web && python3 -m venv .
+    cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate
+else
+    cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate
+fi
+
+pip install --upgrade pip
+pip3 install --upgrade setuptools
+pip3 install -r /www/server/mdserver-web/requirements.txt
+
+pip3 install gunicorn==20.1.0
+pip3 install gevent==21.1.2
+pip3 install gevent-websocket==0.10.1
+pip3 install requests==2.20.0
+pip3 install flask-caching==1.10.1
+pip3 install flask-session==0.3.2
+pip3 install pymongo
+pip3 install psutil
+pip3 install flask-socketio==5.2.0
+pip3 install mysqlclient
+
+
 
 ##### common start #####
 

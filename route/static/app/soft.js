@@ -33,7 +33,7 @@ function getSList(isdisplay) {
         var loadT = layer.msg('正在获取列表...', { icon: 16, time: 0, shade: [0.3, '#000'] })
     }
     if (!isdisplay || isdisplay === true)
-        isdisplay = getCookie('p' + getCookie('softType'));
+        isdisplay = getCookie('p' + getCookie('soft_type'));
     if (isdisplay == true || isdisplay == 'true') isdisplay = 1;
 
     var search = $("#SearchValue").val();
@@ -41,7 +41,7 @@ function getSList(isdisplay) {
         search = '&search=' + search;
     }
     var type = '';
-    var istype = getCookie('softType');
+    var istype = getCookie('soft_type');
     if (istype == 'undefined' || istype == 'null' || !istype) {
         istype = '0';
     }
@@ -50,7 +50,7 @@ function getSList(isdisplay) {
     var page = '';
     if (isdisplay) {
         page = '&p=' + isdisplay;
-        setCookie('p' + getCookie('softType'), isdisplay);
+        setCookie('p' + getCookie('soft_type'), isdisplay);
     }
 
     var condition = (search + type + page).slice(1);
@@ -106,7 +106,7 @@ function getSList(isdisplay) {
                 var mupdate = '';//(plugin.versions[n] == plugin.updates[n]) '' : '<a class="btlink" onclick="SoftUpdate(\'' + plugin.name + '\',\'' + plugin.versions[n].version + '\',\'' + plugin.updates[n] + '\')">更新</a> | ';
                 // if (plugin.versions[n] == '') mupdate = '';
                 handle = mupdate + '<a class="btlink" onclick="softMain(\'' + plugin.name + '\',\'' + plugin.setup_version + '\')">设置</a> | <a class="btlink" onclick="uninstallVersion(\'' + plugin.name + '\',\'' + plugin.setup_version + '\')">卸载</a>';
-                titleClick = 'onclick="softMain(\'' + plugin.name + '\',\'' + version_info + '\')" style="cursor:pointer"';
+                titleClick = 'onclick="softMain(\'' + plugin.name + '\',\'' + plugin.setup_version + '\')" style="cursor:pointer"';
              
                 softPath = '<span class="glyphicon glyphicon-folder-open" title="' + plugin.path + '" onclick="openPath(\'' + plugin.path + '\')"></span>';
                 if (plugin.coexist){
@@ -162,7 +162,7 @@ function getSList(isdisplay) {
         sBody += pBody;
         $("#softList").html(sBody);
         $(".menu-sub span").click(function() {
-            setCookie('softType', $(this).attr('typeid'));
+            setCookie('soft_type', $(this).attr('typeid'));
             $(this).addClass("on").siblings().removeClass("on");
             getSList();
         });

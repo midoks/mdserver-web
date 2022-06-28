@@ -1,7 +1,7 @@
 #!/bin/bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
-LANG=en_US.UTF-8
+# LANG=en_US.UTF-8
 is64bit=`getconf LONG_BIT`
 
 if [ -f /etc/motd ];then
@@ -44,6 +44,9 @@ elif grep -Eqi "AlmaLinux" /etc/issue || grep -Eq "AlmaLinux" /etc/*-release; th
 	yum install -y wget zip unzip
 elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
 	OSNAME='debian'
+	apt update -y
+	apt install -y devscripts
+	apt install -y wget zip unzip
 	apt install -y wget zip unzip
 elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
 	OSNAME='ubuntu'
@@ -72,8 +75,12 @@ if [ $OSNAME != "macos" ];then
 fi
 
 echo "use system version: ${OSNAME}"
-curl -fsSL  https://gitee.com/midoks/mdserver-web/raw/master/scripts/install/${OSNAME}.sh | bash
+cd /www/server/mdserver-web && bash scripts/install/${OSNAME}.sh
 
+chmod +x /www/server/mdserver-web/mw-cli
+if [ ! -e /usr/bin/mw-cli ]; then 
+	ln -s /www/server/mdserver-web/mw-cli /usr/bin/mw-cli
+fi
 
 endTime=`date +%s`
 ((outTime=(${endTime}-${startTime})/60))

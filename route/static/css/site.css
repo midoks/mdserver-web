@@ -331,7 +331,7 @@ html {
     cursor: pointer;
     border:transparent 1px solid;
     min-height: 20px;
-    min-width: 150px;
+    /*min-width: 150px;*/
     display: inline-block;
 }
 .input-edit:hover{

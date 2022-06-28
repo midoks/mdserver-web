@@ -1,7 +1,7 @@
 #!/bin/bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
-LANG=en_US.UTF-8
+# LANG=en_US.UTF-8
 is64bit=`getconf LONG_BIT`
 
 startTime=`date +%s`
@@ -9,13 +9,18 @@ startTime=`date +%s`
 _os=`uname`
 echo "use system: ${_os}"
 
+if [ "$EUID" -ne 0 ]
+  then echo "Please run as root!"
+  exit
+fi
+
 if grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
-	sudo ln -sf /bin/bash /bin/sh
+	ln -sf /bin/bash /bin/sh
 	#sudo dpkg-reconfigure dash
 fi
 
 if grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
-	sudo ln -sf /bin/bash /bin/sh
+	ln -sf /bin/bash /bin/sh
 fi
 
 if [ ${_os} == "Darwin" ]; then
@@ -46,13 +51,13 @@ fi
 
 wget -O /tmp/master.zip https://gitee.com/midoks/mdserver-web/repository/archive/master.zip
 cd /tmp && unzip /tmp/master.zip
-mv /tmp/mdserver-web-master /www/server/mdserver-web
+cp -rf /tmp/mdserver-web-master/* /www/server/mdserver-web
 rm -rf /tmp/master.zip
 rm -rf /tmp/mdserver-web-master
 
 #pip uninstall public
 echo "use system version: ${OSNAME}"
-curl -fsSL  https://gitee.com/midoks/mdserver-web/raw/master/scripts/update/${OSNAME}.sh | bash
+cd /www/server/mdserver-web && bash scripts/update/${OSNAME}.sh
 
 endTime=`date +%s`
 ((outTime=($endTime-$startTime)/60))

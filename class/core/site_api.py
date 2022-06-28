@@ -599,7 +599,11 @@ class site_api:
         if not os.path.exists(acem):
             return mw.returnJson(False, '尝试自动安装ACME失败,请通过以下命令尝试手动安装<p>安装命令: curl https://get.acme.sh | sh</p>' + acem)
 
-        force_bool = False
+        # 避免频繁执行
+        checkAcmeRun = mw.execShell('ps -ef|grep acme.sh |grep -v grep')
+        if checkAcmeRun[0] != '':
+            return mw.returnJson(False, '正在申请或更新SSL中...')
+
         if force == 'true':
             force_bool = True
 
@@ -973,7 +977,7 @@ class site_api:
                 "-START(.|\n)+BINDING-" + domain + "-END"
             tmp = re.search(rep, conf).group()
             dirConf = tmp.replace('rewrite/' + site['name'] + '.conf;', 'rewrite/' + site[
-                                  'name'] + '_' + find['path'] + '.conf;')
+                'name'] + '_' + find['path'] + '.conf;')
             conf = conf.replace(tmp, dirConf)
             mw.writeFile(file, conf)
         data = {}
@@ -1522,9 +1526,13 @@ class site_api:
     def getSecurity(self, sid, name):
         filename = self.getHostConf(name)
         conf = mw.readFile(filename)
+
+        if type(conf) == bool:
+            return mw.returnJson(False, '读取配置文件失败!')
+
         data = {}
         if conf.find('SECURITY-START') != -1:
-            rep = "#SECURITY-START(\n|.){1,500}#SECURITY-END"
+            rep = "#SECURITY-START(.|\n)*#SECURITY-END"
             tmp = re.search(rep, conf).group()
             data['fix'] = re.search(
                 "\(.+\)\$", tmp).group().replace('(', '').replace(')$', '').replace('|', ',')
@@ -1549,22 +1557,22 @@ class site_api:
         if os.path.exists(file):
             conf = mw.readFile(file)
             if conf.find('SECURITY-START') != -1:
-                rep = "\s{0,4}#SECURITY-START(\n|.){1,500}#SECURITY-END\n?"
+                rep = "\s{0,4}#SECURITY-START(\n|.)*#SECURITY-END\n?"
                 conf = re.sub(rep, '', conf)
                 mw.writeLog('网站管理', '站点[' + name + ']已关闭防盗链设置!')
             else:
                 rconf = '''#SECURITY-START 防盗链配置
-location ~ .*\.(%s)$
-{
-    expires      30d;
-    access_log /dev/null;
-    valid_referers none blocked %s;
-    if ($invalid_referer){
-       return 404;
+    location ~ .*\.(%s)$
+    {
+        expires      30d;
+        access_log /dev/null;
+        valid_referers none blocked %s;
+        if ($invalid_referer){
+           return 404;
+        }
     }
-}
-# SECURITY-END
-include enable-php-''' % (fix.strip().replace(',', '|'), domains.strip().replace(',', ' '))
+    #SECURITY-END
+    include enable-php-''' % (fix.strip().replace(',', '|'), domains.strip().replace(',', ' '))
                 conf = re.sub("include\s+enable-php-", rconf, conf)
                 mw.writeLog('网站管理', '站点[' + name + ']已开启防盗链!')
             mw.writeFile(file, conf)
@@ -1615,6 +1623,8 @@ include enable-php-''' % (fix.strip().replace(',', '|'), domains.strip().replace
             os.makedirs(path)
             if not mw.isAppleSystem():
                 mw.execShell('chown -R www:www ' + path)
+
+            mw.writeFile(path + '/index.html', '已经开始工作!!!')
             mw.execShell('chmod -R 755 ' + path)
 
     def nginxAddDomain(self, webname, domain, port):

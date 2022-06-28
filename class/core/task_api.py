@@ -42,6 +42,8 @@ class task_api:
         _page['tojs'] = 'remind'
         _page['p'] = p
 
+        # return data
+        _ret['count'] = count
         _ret['page'] = mw.getPage(_page)
         return mw.getJson(_ret)
 

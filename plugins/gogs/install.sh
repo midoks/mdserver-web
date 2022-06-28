@@ -35,6 +35,16 @@ Install_gogs()
 	version=$1
 	os=`getOs`
 
+	# if id git &> /dev/null ;then 
+	#     echo "git uid is `id -u git`"
+	#     echo "git shell is `grep "^git:" /etc/passwd |cut -d':' -f7 `"
+	# else
+	#     groupadd git
+	# 	useradd -g git git
+	# fi
+
+	git config --global push.default simple
+
 	if [ "darwin" == "$os" ];then
 		file=gogs_${version}_darwin_amd64.zip
 	else
@@ -47,8 +57,11 @@ Install_gogs()
 
 	cd $serverPath/source/gogs && unzip -o $file -d gogs_${version}
 	mv $serverPath/source/gogs/gogs_${version}/gogs/ $serverPath/gogs
-	echo $version > $serverPath/gogs/version.pl
 
+
+	if [ -d $serverPath/gogs ];then
+		echo $version > $serverPath/gogs/version.pl
+	fi
 	# if id -u gogs > /dev/null 2>&1; then
  #        echo "gogs user exists"
 	# else
@@ -63,6 +76,10 @@ Install_gogs()
 Uninstall_gogs()
 {
 	rm -rf $serverPath/gogs
+	if [ -f /usr/lib/systemd/system/gogs.service ];then
+		systemctl stop gogs
+		rm -rf /usr/lib/systemd/system/gogs.service
+	fi
 	echo 'uninstall success' > $install_tmp
 }
 

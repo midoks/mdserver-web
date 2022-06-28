@@ -17,6 +17,7 @@ yum install -y python3-devel
 yum install -y python-devel
 yum install -y vixie-cron
 yum install -y curl-devel libmcrypt libmcrypt-devel
+yum install -y mysql-devel
 
 #https need
 if [ ! -d /root/.acme.sh ];then	
@@ -30,7 +31,7 @@ if [ -f /etc/init.d/iptables ];then
 	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 443 -j ACCEPT
 	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 888 -j ACCEPT
 	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 7200 -j ACCEPT
-	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 3306 -j ACCEPT
+	# iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 3306 -j ACCEPT
 	# iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 30000:40000 -j ACCEPT
 	service iptables save
 
@@ -54,7 +55,8 @@ if [ ! -f /etc/init.d/iptables ];then
 	firewall-cmd --permanent --zone=public --add-port=443/tcp
 	firewall-cmd --permanent --zone=public --add-port=888/tcp
 	firewall-cmd --permanent --zone=public --add-port=7200/tcp
-	firewall-cmd --permanent --zone=public --add-port=3306/tcp
+	# firewall-cmd --permanent --zone=public --add-port=3306/tcp
+	# firewall-cmd --permanent --zone=public --add-port=1723/tcp
 	# firewall-cmd --permanent --zone=public --add-port=30000-40000/tcp
 
 
@@ -67,52 +69,26 @@ fi
 systemctl stop firewalld
 
 yum groupinstall -y "Development Tools"
-
-yum install -y libevent libevent-devel libjpeg* libpng* gd* libxslt* unzip libmcrypt libmcrypt-devel
-yum install -y python-imaging libicu-devel zip bzip2-devel gcc libxml2 libxml2-dev  pcre pcre-devel
-yum install -y libjpeg-devel libpng-devel libwebp libwebp-devel
-yum install -y lsof net-tools
-yum install -y ncurses-devel mysql-devel cmake
-yum install -y MySQL-python 
 yum install -y epel-release
 
-
-if [ ! -f /usr/local/bin/pip3 ];then
-    python3 -m pip install --upgrade pip setuptools wheel -i https://mirrors.aliyun.com/pypi/simple
+yum install -y oniguruma oniguruma-devel
+#centos8 stream | use dnf
+if [ "$?" != "0" ];then
+	yum install -y dnf dnf-plugins-core
+	dnf config-manager --set-enabled powertools
+	yum install -y oniguruma oniguruma-devel
 fi
+
+yum install -y libevent libevent-devel libjpeg* libpng* gd* libxslt* unzip
+yum install -y python-imaging libicu-devel zip bzip2-devel gcc libxml2 libxml2-devel  pcre pcre-devel
+yum install -y libjpeg-devel libpng-devel libwebp libwebp-devel
+yum install -y lsof net-tools
+yum install -y ncurses-devel cmake
+yum install -y MySQL-python 
 
 
 cd /www/server/mdserver-web/scripts && bash lib.sh
 chmod 755 /www/server/mdserver-web/data
-
-
-if [ ! -f /www/server/mdserver-web/bin/activate ];then
-    cd /www/server/mdserver-web && python3 -m venv .
-fi
-
-if [ -f /www/server/mdserver-web/bin/activate ];then
-    cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate && pip3 install -r /www/server/mdserver-web/requirements.txt
-    pip install --upgrade pip
-    pip3 install gunicorn==20.1.0
-	pip3 install gevent==21.1.2
-	pip3 install gevent-websocket==0.10.1
-	pip3 install requests==2.20.0
-	pip3 install flask-caching==1.10.1
-	pip3 install python-socketio==4.2.0
-	pip3 install psutil==5.9.1 
-	pip3 install pymongo
-else
-	pip install --upgrade pip
-    cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
-    pip3 install gunicorn==20.1.0
-	pip3 install gevent==21.1.2
-	pip3 install gevent-websocket==0.10.1
-	pip3 install requests==2.20.0
-	pip3 install flask-caching==1.10.1
-	pip3 install python-socketio==4.2.0
-	pip3 install psutil==5.9.1 
-	pip3 install pymongo
-fi
 
 
 cd /www/server/mdserver-web && ./cli.sh start

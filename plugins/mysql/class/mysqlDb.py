@@ -30,7 +30,7 @@ class mysqlDb:
         '''连接MYSQL数据库'''
         try:
             import mw
-            socket = '/tmp/mysql.sock'
+            socket = '/www/server/mysql/mysql.sock'
             try:
                 import MySQLdb
             except Exception as ex:

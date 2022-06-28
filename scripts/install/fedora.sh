@@ -29,7 +29,7 @@ if [ -f /etc/init.d/iptables ];then
 	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 443 -j ACCEPT
 	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 888 -j ACCEPT
 	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 7200 -j ACCEPT
-	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 3306 -j ACCEPT
+	# iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 3306 -j ACCEPT
 	# iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 30000:40000 -j ACCEPT
 	service iptables save
 
@@ -55,7 +55,7 @@ if [ "${isVersion}" == '' ];then
 		firewall-cmd --permanent --zone=public --add-port=443/tcp
 		firewall-cmd --permanent --zone=public --add-port=888/tcp
 		firewall-cmd --permanent --zone=public --add-port=7200/tcp
-		firewall-cmd --permanent --zone=public --add-port=3306/tcp
+		# firewall-cmd --permanent --zone=public --add-port=3306/tcp
 		# firewall-cmd --permanent --zone=public --add-port=30000-40000/tcp
 		firewall-cmd --reload
 	fi
@@ -66,6 +66,7 @@ systemctl stop firewalld
 
 
 yum groupinstall -y "Development Tools"
+yum -y install epel-release
 
 yum install -y libevent libevent-devel libxslt* libjpeg* libpng* gd* zip libmcrypt libmcrypt-devel
 yum install -y gcc libffi-devel python-devel openssl-devel 
@@ -74,38 +75,16 @@ yum -y install wget python-devel python-imaging libicu-devel unzip bzip2-devel g
 yum -y install net-tools
 yum -y install ncurses-devel mysql-devel cmake
 yum -y install python-devel
-yum -y install MySQL-python 
-yum -y install epel-release
+yum -y install MySQL-python
 yum -y install python3-devel
 
-
-
-#if [ ! -f '/usr/bin/pip' ];then
-#	wget https://bootstrap.pypa.io/pip/2.7/get-pip.py
-#	python get-pip.py
-#	pip install --upgrade pip
-#	pip install pillow==6.2.2
-#fi 
-
-
-if [ ! -f /usr/local/bin/pip3 ];then
-    python3 -m pip install --upgrade pip setuptools wheel -i https://mirrors.aliyun.com/pypi/simple
-fi
 
 
 cd /www/server/mdserver-web/scripts && bash lib.sh
 chmod 755 /www/server/mdserver-web/data
 
-if [ ! -f /www/server/mdserver-web/bin/activate ];then
-    cd /www/server/mdserver-web && python3 -m venv .
-fi
+    
 
-
-if [ -f /www/server/mdserver-web/bin/activate ];then
-    cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate && pip3 install -r /www/server/mdserver-web/requirements.txt
-else
-    cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
-fi
 cd /www/server/mdserver-web && ./cli.sh start
 sleep 5
 

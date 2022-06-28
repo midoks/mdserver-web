@@ -130,3 +130,5 @@ include
 data/api_login.txt
 data/sessions
 data/ssl.pl
+plugins/gdrive/
+plugins/openlitespeed/

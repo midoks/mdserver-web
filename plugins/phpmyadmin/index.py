@@ -48,6 +48,10 @@ def getConf():
     return mw.getServerDir() + '/web_conf/nginx/vhost/phpmyadmin.conf'
 
 
+def getConfInc():
+    return getServerDir() + '/phpmyadmin/config.inc.php'
+
+
 def getPort():
     file = getConf()
     content = mw.readFile(file)
@@ -115,6 +119,10 @@ def start():
         centent = mw.readFile(file_tpl)
         centent = contentReplace(centent)
         mw.writeFile(file_run, centent)
+
+    tmp = getServerDir() + '/phpmyadmin/tmp'
+    if not os.path.exists(tmp):
+        os.mkdir(tmp)
 
     conf_run = getServerDir() + '/phpmyadmin/config.inc.php'
     if not os.path.exists(conf_run):
@@ -208,6 +216,10 @@ def errorLog():
     return '/www/server/phpmyadmin/error.log'
 
 
+def Version():
+    return mw.readFile(getServerDir() + '/version.pl')
+
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -222,6 +234,10 @@ if __name__ == "__main__":
         print(reload())
     elif func == 'conf':
         print(getConf())
+    elif func == 'version':
+        print(Version())
+    elif func == 'config_inc':
+        print(getConfInc())
     elif func == 'get_home_page':
         print(getHomePage())
     elif func == 'set_php_ver':

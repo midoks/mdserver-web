@@ -61,6 +61,14 @@ if [ -f $rootPath"/php/init.d/php74" ];then
 	$rootPath"/php/init.d/php74" reload
 fi
 
+if [ -f $rootPath"/php/init.d/php80" ];then
+	$rootPath"/php/init.d/php74" reload
+fi
+
+if [ -f $rootPath"/php/init.d/php81" ];then
+	$rootPath"/php/init.d/php74" reload
+fi
+
 if [ -f $rootPath"/openresty/nginx/sbin/nginx" ];then
 	$rootPath"/openresty/nginx/sbin/nginx" -s reload
 fi

@@ -98,6 +98,23 @@ def isAppleSystem():
     return False
 
 
+def isNumber(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        pass
+
+    try:
+        import unicodedata
+        unicodedata.numeric(s)
+        return True
+    except (TypeError, ValueError):
+        pass
+
+    return False
+
+
 def deleteFile(file):
     if os.path.exists(file):
         os.remove(file)
@@ -111,9 +128,22 @@ def isInstalledWeb():
 
 
 def restartWeb():
-    if isInstalledWeb():
-        initd = getServerDir() + '/openresty/init.d/openresty'
+    if not isInstalledWeb():
+        return False
+
+    # systemd
+    systemd = '/lib/systemd/system/openresty.service'
+    if os.path.exists(systemd):
+        execShell('systemctl restart openresty')
+        return True
+
+    # initd
+    initd = getServerDir() + '/openresty/init.d/openresty'
+    if os.path.exists(initd):
         execShell(initd + ' ' + 'restart')
+        return True
+
+    return False
 
 
 def restartMw():
@@ -540,7 +570,7 @@ def downloadHook(count, blockSize, totalSize):
     print('%02d%%' % (100.0 * count * blockSize / totalSize))
 
 
-def getLocalIp():
+def getLocalIpBack():
     # 取本地外网IP
     try:
         import re
@@ -558,6 +588,23 @@ def getLocalIp():
         return ipaddress
     except Exception as ex:
         # print(ex)
+        return '127.0.0.1'
+
+
+def getLocalIp():
+    # 取本地外网IP
+    try:
+        import re
+        filename = 'data/iplist.txt'
+        ipaddress = readFile(filename)
+        if not ipaddress or ipaddress == '127.0.0.1':
+            import urllib
+            url = 'https://v6r.ipip.net/?format=text'
+            req = urllib.request.urlopen(url, timeout=10)
+            ipaddress = req.read().decode('utf-8')
+            writeFile(filename, ipaddress)
+        return ipaddress
+    except Exception as ex:
         return '127.0.0.1'
 
 

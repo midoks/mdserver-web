@@ -45,6 +45,7 @@ else
 	OPTIONS="${OPTIONS} --with-curl"
 fi
 
+
 if [ ! -d $serverPath/php/${PHP_VER} ];then
 	cd $sourcePath/php/php${PHP_VER} && ./configure \
 	--prefix=$serverPath/php/${PHP_VER} \
@@ -67,8 +68,37 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--enable-sysvshm \
 	--disable-fileinfo \
 	$OPTIONS \
-	--enable-fpm \
-	&& make && make install && make clean
+	--enable-fpm
+
+	make clean && make ${MAKEJN:--j2}
+
+	#debian11,没有生成php54 man
+	if [ ! -f sapi/cli/php.1 ];then
+		cp -rf sapi/cli/php.1.in sapi/cli/php.1
+	fi
+
+	if [ ! -f sapi/cgi/php-cgi.1 ];then
+		cp -rf sapi/cgi/php-cgi.1.in sapi/cgi/php-cgi.1
+	fi
+
+	if [ ! -f scripts/man1/phpize.1 ];then
+		cp -rf scripts/man1/phpize.1.in scripts/man1/phpize.1
+	fi
+
+	if [ ! -f scripts/man1/php-config.1 ];then
+		cp -rf scripts/man1/php-config.1.in scripts/man1/php-config.1
+	fi
+
+	if [ ! -f ext/phar/phar.1 ];then
+		cp -rf ext/phar/phar.1.in ext/phar/phar.1
+	fi
+
+	if [ ! -f ext/phar/phar.phar.1 ];then
+		cp -rf ext/phar/phar.phar.1.in ext/phar/phar.phar.1
+	fi
+
+
+	make install && make clean
 fi 
 
 #------------------------ install end ------------------------------------#

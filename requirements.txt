@@ -15,13 +15,13 @@ flask-sqlalchemy==2.3.2
 cryptography==3.3.2
 requests==2.20.0
 ConfigParser==5.2.0
-python-engineio==3.13.2
-python-socketio==4.2.0
-Flask-SocketIO==3.0.2
+python-engineio==4.3.2
+python-socketio>=4.2.0
+flask-socketio==5.2.0
 zmq==0.0.0
+paramiko>=2.8.0
 pymongo
 pillow
 Jinja2>=2.11.2
-mysqlclient>=2.0.3
 flask-caching>=1.10.1
 mysql-connector-python
