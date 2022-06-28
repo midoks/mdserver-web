@@ -209,6 +209,12 @@ def status():
 def restyOp(method):
     file = initDreplace()
 
+    # 启动时,先检查一下配置文件
+    check = getServerDir() + "/bin/openresty -t"
+    check_data = mw.execShell(check)
+    if check_data[1].find('test failed') != -1:
+        return check_data[1]
+
     if not mw.isAppleSystem():
         data = mw.execShell('systemctl ' + method + ' openresty')
         if data[1] == '':
