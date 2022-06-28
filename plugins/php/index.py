@@ -537,6 +537,10 @@ def checkFpmStatusFile(version):
 def getFpmStatus(version):
     checkFpmStatusFile(version)
 
+    stat = status(version)
+    if stat == 'stop':
+        return mw.returnJson(False, 'PHP[' + version + ']未启动!!!')
+
     try:
         url = 'http://' + mw.getHostAddr() + '/phpfpm_status_' + version + '?json'
         result = mw.httpGet(url)
@@ -552,7 +556,7 @@ def getFpmStatus(version):
     except Exception as e:
         data = {}
 
-    return mw.getJson(data)
+    return mw.returnJson(True, "OK", data)
 
 
 def getDisableFunc(version):
