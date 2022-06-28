@@ -49,9 +49,10 @@ Install_lib()
 		--enable-gd \
 		--with-webp \
 		--with-xpm \
+		--with-jpeg \
 		--with-freetype \
 		--enable-gd-jis-conv
-		
+
 		make clean && make && make install && make clean
 		
 	fi
@@ -65,7 +66,7 @@ Install_lib()
 	echo "[${LIBNAME}]" >> $serverPath/php/$version/etc/php.ini
 	echo "extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
 	
-	$serverPath/php/init.d/php$version reload
+	$serverPath/php/init.d/php${version} restart
 	echo '==========================================================='
 	echo 'successful!'
 }
