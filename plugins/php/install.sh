@@ -43,9 +43,9 @@ if [ "${action}" == "uninstall" ];then
 	fi
 fi
 
-sh -x $curPath/versions/$2/install.sh $1
+cd ${curPath} && sh -x $curPath/versions/$2/install.sh $1
 
-if [ "${action}" =="install" ];then
+if [ "${action}" == "install" ];then
 	#初始化 
 	cd ${rootPath} && python3 ${rootPath}/plugins/php/index.py start ${type}
 	cd ${rootPath} && python3 ${rootPath}/plugins/php/index.py initd_install ${type}
