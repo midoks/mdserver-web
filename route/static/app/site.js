@@ -1425,7 +1425,7 @@ function to301(siteName, type, obj){
 	
 	// 设置 页面展示
 	// 设置 更新展示
-	if(type == 1 || type == 3){
+	if(type == 1 || type == 2){
 		obj = {
 			to: 'http://',
 			from: '',
@@ -1488,11 +1488,40 @@ function to301(siteName, type, obj){
 					keep_path: keep_path
 				}, function(res) {
 					res = JSON.parse(res);
-					console.log(res)
-					to301(siteName)
+					if (res.status) {
+						layer.close(redirect_form);
+						setTimeout(function() {
+							location.reload();
+						}, 1000);
+						to301(siteName)
+					} else {
+						layer.msg(res.msg);
+					}
 				});
 			});
 		}, 100);
+	}
+
+	if (type == 3) {
+		$.post('/site/del_redirect', {
+			siteName: siteName,
+			id: obj,
+		}, function(res) {
+			res = JSON.parse(res);
+			if (res.status == true) {
+				layer.msg('删除成功', {
+					time: 1000,
+					icon: 1
+				});
+				to301(siteName)
+			} else {
+				layer.msg(res.msg, {
+					time: 1000,
+					icon: 2
+				});
+			}
+		});
+		return
 	}
 
 	// 设置 提交
@@ -1532,10 +1561,10 @@ function to301(siteName, type, obj){
 				lan_r_type = item.r_type == 0 ? "永久重定向" : "临时重定向"
 				keep_path = item.keep_path == 0 ? "不保留" : "保留"
 				let tmp = '<tr>\
-					<td><span data-index="1"><span>'+item.from+'</span></span></td>\
+					<td><span data-index="1"><span>'+item.r_from+'</span></span></td>\
 					<td><span data-index="2"><span>'+lan_r_type+'</span></span></td>\
 					<td><span data-index="2"><span>'+keep_path+'</span></span></td>\
-					<td><span data-index="4" class="btlink">编辑</span></td>\
+					<td><span data-index="4" class="btlink">编辑</span> | <span data-index="5" onclick="to301(\''+siteName+'\', 3, \''+ item.id +'\')" class="btlink">删除</span></td>\
 				</tr>';
 				$("#md-301-body").append(tmp);
 			})

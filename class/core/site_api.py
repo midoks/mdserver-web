@@ -1216,36 +1216,70 @@ class site_api:
         
         _rTypeCode = 0 if _rType == "301" else 1
         _typeCode = 0 if _type == "path" else 1
-        
-        pathQuery = ""
-        if _keepPath == 1:
-            # path
-            if _rTypeCode == 0:
-                pathQuery = "$1"
-                _from = "{}(.*)".format(_from)
-            #domain
-            else:
-                pathQuery = "$request_uri"
-        
+    
+    
         file_content = ""
         # path
         if _typeCode == 0:
             redirect_type = "permanent" if _rTypeCode == 0 else "temporary"
-            file_content = "rewrite ^{} {}{} {};".format(_from, _to, pathQuery, redirect_type)
+            if not _from.startswith("/"):
+                _from = "/{}".format(_from)
+            if _keepPath == 1:
+                _to = "{}$1".format(_to)
+                _from = "{}(.*)".format(_from)
+            file_content = "rewrite ^{} {} {};".format(_from, _to, redirect_type)
+        # domain
         else:
+            if _keepPath == 1:
+                _to = "{}$request_uri".format(_to)
+                
             redirect_type = "301" if _rTypeCode == 0 else "302"
             _if = "if ($host ~ '^{}')".format(_from)
-            _return = "return {} {}{}; ".format(redirect_type, _to, pathQuery)
+            _return = "return {} {}; ".format(redirect_type, _to)
             file_content = _if + "{\r\n    " + _return + "\r\n}"
             
             
-        _hash = mw.md5("{}+{}".format(file_content, time.time()))
+        _id = mw.md5("{}+{}".format(file_content, _siteName))
         
+        # 防止规则重复
+        for item in data:
+            if item["r_from"] == _from:
+                return mw.returnJson(False, "重复的规则!")
+            
+        rep = "http(s)?\:\/\/([a-zA-Z0-9][-a-zA-Z0-9]{0,62}\.)+([a-zA-Z0-9][a-zA-Z0-9]{0,62})+.?"
+        if not re.match(rep, _to):
+            return mw.returnJson(False, "错误的目标地址")
+            
         # write data json file
-        data.append({"from": _from, "type": _typeCode, "r_type": _rTypeCode, "r_to": _to, 'keep_path': _keepPath, 'id': _hash})
+        data.append({"r_from": _from, "type": _typeCode, "r_type": _rTypeCode, "r_to": _to, 'keep_path': _keepPath, 'id': _id})
         mw.writeFile(data_path, json.dumps(data))
-        mw.writeFile("{}/{}.conf".format(self.getRedirectPath(_siteName), _hash), file_content)
+        mw.writeFile("{}/{}.conf".format(self.getRedirectPath(_siteName), _id), file_content)
+        mw.restartWeb()
         return mw.returnJson(True, "ok")
+    
+    
+    # 删除指定重定向
+    def delRedirectApi(self):
+        _siteName = request.form.get("siteName",'')
+        _id = request.form.get("id",'')
+        if _id == '' or _siteName == '':
+            return mw.returnJson(False, "必填项不能为空!")
+        
+        try:
+            data_path =  self.getRedirectDataPath(_siteName)
+            data_content = mw.readFile(data_path) if os.path.exists(data_path) else ""
+            data = json.loads(data_content) if data_content != "" else []
+            for item in data:
+                if item["id"] == _id:
+                    data.remove(item)
+                    break
+            # write database
+            mw.writeFile(data_path, json.dumps(data))
+            # remove conf file
+            mw.execShell("rm -rf {}/{}.conf".format(self.getRedirectPath(_siteName), _id))
+        except:
+            return mw.returnJson(False, "删除失败!")
+        return mw.returnJson(True, "删除成功!")
 
 
     def getProxyListApi(self):
