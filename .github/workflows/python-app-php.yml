@@ -5,9 +5,9 @@ name: MW APP PHP
 
 on:
   push:
-    branches: [ "master","dev" ]
+    branches: [ "master" ]
   pull_request:
-    branches: [ "master","dev" ]
+    branches: [ "master" ]
 
 permissions:
   contents: read
