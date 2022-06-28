@@ -36,19 +36,19 @@ else
 fi
 
 
-if [ "$OSNAME" == 'ubuntu' ] || [ "$OSNAME" == 'debian' ] ;then
-	apt install bison=2.4.1
-	if [ "$?" != "0" ]; then
-		echo 'The system version is too high to install'
-		exit 1
-	fi
+# if [ "$OSNAME" == 'ubuntu' ] || [ "$OSNAME" == 'debian' ] ;then
+# 	apt install bison=2.4.1
+# 	if [ "$?" != "0" ]; then
+# 		echo 'The system version is too high to install'
+# 		exit 1
+# 	fi
 
-	apt install flex=2.5.4
-	if [ "$?" != "0" ]; then
-		echo 'The system version is too high to install'
-		exit 1
-	fi
-fi
+# 	apt install flex=2.5.4
+# 	if [ "$?" != "0" ]; then
+# 		echo 'The system version is too high to install'
+# 		exit 1
+# 	fi
+# fi
 
 
 version=5.2.17
