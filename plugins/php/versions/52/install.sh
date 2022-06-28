@@ -36,19 +36,19 @@ else
 fi
 
 
-if [ "$OSNAME" == 'ubuntu' ] || [ "$OSNAME" == 'debian' ] ;then
-	apt install bison=2.4.1
-	if [ "$?" != "0" ]; then
-		echo 'The system version is too high to install'
-		exit 1
-	fi
+# if [ "$OSNAME" == 'ubuntu' ] || [ "$OSNAME" == 'debian' ] ;then
+# 	apt install bison=2.4.1
+# 	if [ "$?" != "0" ]; then
+# 		echo 'The system version is too high to install'
+# 		exit 1
+# 	fi
 
-	apt install flex=2.5.4
-	if [ "$?" != "0" ]; then
-		echo 'The system version is too high to install'
-		exit 1
-	fi
-fi
+# 	apt install flex=2.5.4
+# 	if [ "$?" != "0" ]; then
+# 		echo 'The system version is too high to install'
+# 		exit 1
+# 	fi
+# fi
 
 
 version=5.2.17
@@ -116,32 +116,26 @@ if [ $sysName == 'Darwin' ]; then
 	OPTIONS="${OPTIONS} --with-curl=${serverPath}/lib/curl"
 else
 	OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
-	OPTIONS="${OPTIONS} --with-freetype-dir=${serverPath}/lib/freetype_old"
-	OPTIONS="${OPTIONS} --with-gd --enable-gd-native-ttf"
 	OPTIONS="${OPTIONS} --with-curl"
 fi
 
 
 if [ ! -d $serverPath/php/${PHP_VER} ];then
-	ln -s /usr/lib64/libjpeg.so /usr/lib/libjpeg.so
-	ln -s /usr/lib64/libpng.so /usr/lib/
-	cp -frp /usr/lib64/libldap* /usr/lib/
-	export MYSQL_LIB_DIR=/usr/lib64/mysql
 
+	export MYSQL_LIB_DIR=/usr/lib64/mysql
+	
 	cd $sourcePath/php/php${PHP_VER} && ./configure \
 	--prefix=$serverPath/php/${PHP_VER} \
 	--exec-prefix=$serverPath/php/${PHP_VER} \
 	--with-config-file-path=$serverPath/php/${PHP_VER}/etc \
 	--with-zlib-dir=$serverPath/lib/zlib \
 	--enable-xml \
-	--enable-mysqlnd \
 	--enable-shared \
 	--with-mysql=mysqlnd \
 	--enable-embedded-mysqli=shared \
 	--enable-sysvmsg \
 	--enable-sysvsem \
 	--enable-sysvshm \
-	--disable-fileinfo \
 	$OPTIONS \
 	--enable-fastcgi \
 	--enable-fpm

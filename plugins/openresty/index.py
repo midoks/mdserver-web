@@ -136,7 +136,10 @@ def confReplace():
     mw.writeFile(nconf, content)
 
     # 静态配置
-    static_conf = getServerDir() + '/nginx/conf/enable-php-00.conf'
+    php_conf = mw.getServerDir() + '/web_conf/php/conf'
+    if not os.path.exists(php_conf):
+        mw.execShell('mkdir -p ' + php_conf)
+    static_conf = mw.getServerDir() + '/web_conf/php/conf/enable-php-00.conf'
     if not os.path.exists(static_conf):
         mw.writeFile(static_conf, '')
 
@@ -205,6 +208,12 @@ def status():
 
 def restyOp(method):
     file = initDreplace()
+
+    # 启动时,先检查一下配置文件
+    check = getServerDir() + "/bin/openresty -t"
+    check_data = mw.execShell(check)
+    if check_data[1].find('test failed') != -1:
+        return check_data[1]
 
     if not mw.isAppleSystem():
         data = mw.execShell('systemctl ' + method + ' openresty')

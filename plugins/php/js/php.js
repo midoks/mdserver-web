@@ -312,7 +312,13 @@ function setFpmConfig(version){
 
 function getFpmStatus(version){
     phpPost('get_fpm_status', version, '', function(ret_data){
-        var rdata = $.parseJSON(ret_data.data);
+        var tmp_data = $.parseJSON(ret_data.data);
+        if(!tmp_data.status){
+            layer.msg(tmp_data.msg, { icon: tmp_data.status ? 1 : 2 });
+            return;
+        }
+
+        var rdata = tmp_data.data;
         var con = "<div style='height:420px;overflow:hidden;'><table class='table table-hover table-bordered GetPHPStatus' style='margin:0;padding:0'>\
                         <tr><th>应用池(pool)</th><td>" + rdata.pool + "</td></tr>\
                         <tr><th>进程管理方式(process manager)</th><td>" + ((rdata['process manager'] == 'dynamic') ? '动态' : '静态') + "</td></tr>\
