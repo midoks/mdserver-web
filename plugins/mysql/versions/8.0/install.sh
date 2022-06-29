@@ -39,7 +39,7 @@ Install_mysql()
 	fi 
 
 	if [ ! -f ${mysqlDir}/mysql-boost-8.0.25.tar.gz ];then
-		wget -O ${mysqlDir}/mysql-boost-8.0.25.tar.gz https://cdn.mysql.com/archives/mysql-8.0/mysql-boost-8.0.25.tar.gz
+		wget -O ${mysqlDir}/mysql-boost-8.0.25.tar.gz --tries=3 https://cdn.mysql.com/archives/mysql-8.0/mysql-boost-8.0.25.tar.gz
 	fi
 
 	#检测文件是否损坏.
@@ -51,7 +51,7 @@ Install_mysql()
 		else
 			# 重新下载
 			rm -rf ${mysqlDir}/mysql-8.0.25
-			wget -O ${mysqlDir}/mysql-boost-8.0.25.tar.gz https://cdn.mysql.com/archives/mysql-8.0/mysql-boost-8.0.25.tar.gz
+			wget -O ${mysqlDir}/mysql-boost-8.0.25.tar.gz --tries=3 https://cdn.mysql.com/archives/mysql-8.0/mysql-boost-8.0.25.tar.gz
 		fi
 	fi
 

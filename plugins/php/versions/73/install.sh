@@ -44,7 +44,8 @@ if [ $sysName == 'Darwin' ]; then
 else
 	OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
 	OPTIONS="${OPTIONS} --with-freetype-dir=${serverPath}/lib/freetype_old"
-	OPTIONS="${OPTIONS} --with-gd"
+	OPTIONS="${OPTIONS} --with-gd --enable-gd-native-ttf"
+	OPTIONS="${OPTIONS} --with-jpeg --with-jpeg-dir=/usr/lib"
 	OPTIONS="${OPTIONS} --with-curl"
 	OPTIONS="${OPTIONS} --with-libzip=${serverPath}/lib/libzip"
 fi
@@ -72,7 +73,7 @@ if [ ! -d $serverPath/php/73 ];then
 	--disable-fileinfo \
 	$OPTIONS \
 	--enable-fpm
-	make clean && make ${MAKEJN:--j2} && make install && make clean
+	make clean && make && make install && make clean
 fi
 
 #------------------------ install end ------------------------------------#

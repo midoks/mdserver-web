@@ -49,18 +49,29 @@ Install_openresty()
 
 	if [ -d $serverPath/openresty ];then
 		echo "${VERSION}" > $serverPath/openresty/version.pl
-		echo "" > $serverPath/openresty/nginx/conf/enable-php-00.conf
+		echo "" > $serverPath/web_conf/php/conf/enable-php-00.conf
+
+		#初始化 
+		cd ${rootPath} && python3 ${rootPath}/plugins/openresty/index.py start
+		cd ${rootPath} && python3 ${rootPath}/plugins/openresty/index.py initd_install
     fi
 	echo '安装完成' > $install_tmp
 }
 
 Uninstall_openresty()
 {
-	rm -rf $serverPath/openresty
-	
+
 	if [ -f /lib/systemd/system/openresty.service ];then
+		systemctl stop openresty
 		rm -rf /lib/systemd/system/openresty.service
+		systemctl daemon-reload
 	fi
+
+	if [ -f $serverPath/openresty/init.d/openresty ];then
+		$serverPath/openresty/init.d/openresty stop
+	fi
+
+	rm -rf $serverPath/openresty
 	echo '卸载完成' > $install_tmp
 }
 

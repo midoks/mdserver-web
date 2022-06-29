@@ -5,9 +5,9 @@ name: MW APP MySQL80
 
 on:
   push:
-    branches: [ "master","dev" ]
+    branches: [ "master" ]
   pull_request:
-    branches: [ "master","dev" ]
+    branches: [ "master" ]
 
 permissions:
   contents: read
@@ -31,11 +31,6 @@ jobs:
         sudo bash scripts/install_dev.sh
     - name: Install MySQL80
       run: |
-        sudo mkdir -p /tmp
-        sudo cat /www/server/mdserver-web/plugins/mysql/versions/8.0/install.sh > /tmp/t.log
-        sudo echo "export MAKEJN=-j12\n" >> /www/server/mdserver-web/plugins/mysql/versions/8.0/install.sh
-        sudo cat /tmp/t.log >> /www/server/mdserver-web/plugins/mysql/versions/8.0/install.sh
-
         cd /www/server/mdserver-web/plugins/mysql && sudo bash install.sh install 8.0
     - name: Start DEBUG
       run: |

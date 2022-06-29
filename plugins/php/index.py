@@ -122,37 +122,49 @@ def contentReplace(content, version):
 def makeOpenrestyConf():
     phpversions = ['00', '52', '53', '54', '55', '56',
                    '70', '71', '72', '73', '74', '80', '81']
-    if mw.isInstalledWeb():
-        sdir = mw.getServerDir()
-        d_pathinfo = sdir + '/openresty/nginx/conf/pathinfo.conf'
-        if not os.path.exists(d_pathinfo):
-            s_pathinfo = getPluginDir() + '/conf/pathinfo.conf'
-            shutil.copyfile(s_pathinfo, d_pathinfo)
 
-        info = getPluginDir() + '/info.json'
-        content = mw.readFile(info)
-        content = json.loads(content)
-        versions = content['versions']
-        tpl = getPluginDir() + '/conf/enable-php.conf'
-        tpl_content = mw.readFile(tpl)
-        for x in phpversions:
-            dfile = sdir + '/openresty/nginx/conf/enable-php-' + x + '.conf'
-            if not os.path.exists(dfile):
-                if x == '00':
-                    mw.writeFile(dfile, '')
-                else:
-                    w_content = contentReplace(tpl_content, x)
-                    mw.writeFile(dfile, w_content)
+    sdir = mw.getServerDir()
 
-        # php-fpm status
-        for version in phpversions:
-            dfile = sdir + '/openresty/nginx/conf/php_status/phpfpm_status_' + version + '.conf'
-            tpl = getPluginDir() + '/conf/phpfpm_status.conf'
-            if not os.path.exists(dfile):
-                content = mw.readFile(tpl)
-                content = contentReplace(content, version)
-                mw.writeFile(dfile, content)
-        mw.restartWeb()
+    dst_dir = sdir + '/web_conf/php'
+    dst_dir_conf = sdir + '/web_conf/php/conf'
+    dst_dir_status = sdir + '/web_conf/php/status'
+    if not os.path.exists(dst_dir):
+        mw.execShell('mkdir -p ' + dst_dir)
+
+    if not os.path.exists(dst_dir_conf):
+        mw.execShell('mkdir -p ' + dst_dir_conf)
+
+    if not os.path.exists(dst_dir_status):
+        mw.execShell('mkdir -p ' + dst_dir_status)
+
+    d_pathinfo = sdir + '/web_conf/php/pathinfo.conf'
+    if not os.path.exists(d_pathinfo):
+        s_pathinfo = getPluginDir() + '/conf/pathinfo.conf'
+        shutil.copyfile(s_pathinfo, d_pathinfo)
+
+    info = getPluginDir() + '/info.json'
+    content = mw.readFile(info)
+    content = json.loads(content)
+    versions = content['versions']
+    tpl = getPluginDir() + '/conf/enable-php.conf'
+    tpl_content = mw.readFile(tpl)
+    for x in phpversions:
+        dfile = sdir + '/web_conf/php/conf/enable-php-' + x + '.conf'
+        if not os.path.exists(dfile):
+            if x == '00':
+                mw.writeFile(dfile, '')
+            else:
+                w_content = contentReplace(tpl_content, x)
+                mw.writeFile(dfile, w_content)
+
+    # php-fpm status
+    for version in phpversions:
+        dfile = sdir + '/web_conf/php/status/phpfpm_status_' + version + '.conf'
+        tpl = getPluginDir() + '/conf/phpfpm_status.conf'
+        if not os.path.exists(dfile):
+            content = mw.readFile(tpl)
+            content = contentReplace(content, version)
+            mw.writeFile(dfile, content)
 
 
 def phpPrependFile(version):
@@ -537,6 +549,10 @@ def checkFpmStatusFile(version):
 def getFpmStatus(version):
     checkFpmStatusFile(version)
 
+    stat = status(version)
+    if stat == 'stop':
+        return mw.returnJson(False, 'PHP[' + version + ']未启动!!!')
+
     try:
         url = 'http://' + mw.getHostAddr() + '/phpfpm_status_' + version + '?json'
         result = mw.httpGet(url)
@@ -552,7 +568,7 @@ def getFpmStatus(version):
     except Exception as e:
         data = {}
 
-    return mw.getJson(data)
+    return mw.returnJson(True, "OK", data)
 
 
 def getDisableFunc(version):

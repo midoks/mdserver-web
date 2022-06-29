@@ -184,6 +184,9 @@ case "$1" in
     'restart_panel')
         mw_stop_panel
         mw_start_panel;;
+    'restart_task')
+        mw_stop_task
+        mw_start_task;;
     'status') mw_status;;
     'logs') error_logs;;
     'default')

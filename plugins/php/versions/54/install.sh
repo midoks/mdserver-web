@@ -42,6 +42,7 @@ else
 	OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
 	OPTIONS="${OPTIONS} --with-freetype-dir=${serverPath}/lib/freetype_old"
 	OPTIONS="${OPTIONS} --with-gd --enable-gd-native-ttf"
+	OPTIONS="${OPTIONS} --with-jpeg --with-jpeg-dir=/usr/lib"
 	OPTIONS="${OPTIONS} --with-curl"
 fi
 
@@ -70,7 +71,7 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	$OPTIONS \
 	--enable-fpm
 
-	make clean && make ${MAKEJN:--j2}
+	make clean && make
 
 	#debian11,没有生成php54 man
 	if [ ! -f sapi/cli/php.1 ];then
