@@ -26,13 +26,28 @@ Install_mem(){
 	echo "./configure --prefix=${serverPath}/memcached && make && make install"
 	cd $serverPath/source/memcached-${VERSION} && ./configure --prefix=$serverPath/memcached && make && make install
 
-	echo '1.6' > $serverPath/memcached/version.pl
-	echo 'install ok' > $install_tmp
+	if [ -d $serverPath/memcached ];then
+		echo '1.6' > $serverPath/memcached/version.pl
+		echo 'install ok' > $install_tmp
+
+		cd ${rootPath} && python3 ${rootPath}/plugins/memcached/index.py start
+		cd ${rootPath} && python3 ${rootPath}/plugins/memcached/index.py initd_install
+	fi
 }
 
 Uninstall_mem()
 {
-	${serverPath}/memcached/init.d/memcached stop
+
+	if [ -f /lib/systemd/system/memcached.service ];then
+		systemctl stop memcached
+		systemctl disable memcached
+		rm -rf /lib/systemd/system/memcached.service
+		systemctl daemon-reload
+	fi
+
+	if [ -f $serverPath/memcached/initd/memcached ];then
+		$serverPath/memcached/initd/memcached stop
+	fi
 	rm -rf $serverPath/memcached
 }
 
