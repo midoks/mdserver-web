@@ -6,14 +6,10 @@ import sys
 import mw
 import re
 import json
-import pwd
 import shutil
 
-import psutil
 
 from flask import request
-
-# request.urllib3.disable_warnings()
 
 
 class site_api:
@@ -27,6 +23,7 @@ class site_api:
     logsPath = None
     passPath = None
     rewritePath = None
+    redirectPath = None
     sslDir = None  # ssl目录
 
     def __init__(self):
@@ -41,6 +38,10 @@ class site_api:
         self.passPath = self.setupPath + '/nginx/pass'
         # if not os.path.exists(pp):
         #     mw.execShell("mkdir -p " + rw + " && chmod -R 755 " + rw)
+        
+        self.redirectPath = self.setupPath + '/nginx/redirect'
+        if not os.path.exists(self.redirectPath):
+            mw.execShell("mkdir -p " + self.redirectPath + " && chmod -R 755 " + self.redirectPath)
 
         self.logsPath = mw.getRootDir() + '/wwwlogs'
         # ssl conf
@@ -1170,6 +1171,61 @@ class site_api:
         webname = request.form.get('webname', '')
         path = request.form.get('path', '0')
         return self.delete(sid, webname, path)
+    
+    
+    ## get_redirect_status
+    def getRedirectStatusApi(self):
+        _siteName = request.form.get("siteName",'')
+        
+        # read data base
+        data_path =  self.getRedirectDataPath(_siteName)
+        data_content = mw.readFile(data_path)
+        if data_content == False:
+            return mw.returnJson(True, "", {"result": [], "count": 0})
+        # get  
+        # conf_path = "{}/{}/*.conf".format(self.redirectPath, siteName)
+        # conf_list = glob.glob(conf_path)
+        # if conf_list == []:
+        #     return mw.returnJson(True, "", {"result": [], "count": 0})
+        try:
+            data = json.loads(data_content)
+        except:
+            mw.execShell("rm -rf {}/{}".format(self.redirectPath, _siteName))
+            return mw.returnJson(True, "", {"result": [], "count": 0})
+        
+        # 处理301信息
+        return mw.returnJson(True, "ok", {"result": data, "count": len(data)})
+    
+    
+    # get redirect status    
+    def setRedirectStatusApi(self):
+        _siteName = request.form.get("siteName",'')
+        _from = request.form.get("from",'')          # from (example.com / /test/)
+        _to = request.form.get("to",'')              # redirect to
+        _type = request.form.get("type",'')          # path / domain
+        _rType = request.form.get("r_type",'')       # redirect type   
+        
+        if _siteName == '' or _from == '' or _to == '' or _type == '' or _rType == '':
+            return mw.returnJson(False, "必填项不能为空!")
+        
+        data_path =  self.getRedirectDataPath(_siteName)
+        data_content = mw.readFile(data_path) if os.path.exists(data_path) else ""
+        data = json.loads(data_content) if data_content != "" else {}
+        
+        if _rType == "301":
+            _rType = 0
+        else:
+            _rType = 1
+            
+        if _type == "path":
+            _type = 0
+        else:
+            _type = 1
+            
+        data.append({"from": _from, "type": _type, "r_type": _rType, "r_to": _to})
+        mw.writeFile(data_path, json.dumps(data))
+        return mw.returnJson(True, "ok")
+
 
     def getProxyListApi(self):
         siteName = request.form.get('siteName', '')
@@ -1178,31 +1234,6 @@ class site_api:
         rep = "(#PROXY-START(\n|.)+#PROXY-END)"
         url_rep = "proxy_pass (.*);|ProxyPass\s/\s(.*)|Host\s(.*);"
         host_rep = "Host\s(.*);"
-
-        if re.search(rep, old_conf):
-            # 构造代理配置
-            if w == "nginx":
-                get.todomain = str(re.search(host_rep, old_conf).group(1))
-                get.proxysite = str(re.search(url_rep, old_conf).group(1))
-            else:
-                get.todomain = ""
-                get.proxysite = str(re.search(url_rep, old_conf).group(2))
-            get.proxyname = "旧代理"
-            get.type = 1
-            get.proxydir = "/"
-            get.advanced = 0
-            get.cachetime = 1
-            get.cache = 0
-            get.subfilter = "[{\"sub1\":\"\",\"sub2\":\"\"},{\"sub1\":\"\",\"sub2\":\"\"},{\"sub1\":\"\",\"sub2\":\"\"}]"
-
-            # proxyname_md5 = self.__calc_md5(get.proxyname)
-            # 备份并替换老虚拟主机配置文件
-            os.system("cp %s %s_bak" % (conf_path, conf_path))
-            conf = re.sub(rep, "", old_conf)
-            mw.writeFile(conf_path, conf)
-
-            # self.createProxy(get)
-            mw.restartWeb()
 
         proxyUrl = self.__read_config(self.__proxyfile)
         sitename = sitename
@@ -1362,6 +1393,9 @@ class site_api:
 
     def getRewriteConf(self, siteName):
         return self.rewritePath + '/' + siteName + '.conf'
+
+    def getRedirectDataPath(self, siteName):
+        return "{}/{}/data.json".format(self.redirectPath, siteName)
 
     def getDirBindRewrite(self, siteName, dirname):
         return self.rewritePath + '/' + siteName + '_' + dirname + '.conf'
@@ -1526,13 +1560,9 @@ class site_api:
     def getSecurity(self, sid, name):
         filename = self.getHostConf(name)
         conf = mw.readFile(filename)
-
-        if type(conf) == bool:
-            return mw.returnJson(False, '读取配置文件失败!')
-
         data = {}
         if conf.find('SECURITY-START') != -1:
-            rep = "#SECURITY-START(.|\n)*#SECURITY-END"
+            rep = "#SECURITY-START(\n|.){1,500}#SECURITY-END"
             tmp = re.search(rep, conf).group()
             data['fix'] = re.search(
                 "\(.+\)\$", tmp).group().replace('(', '').replace(')$', '').replace('|', ',')
@@ -1557,22 +1587,22 @@ class site_api:
         if os.path.exists(file):
             conf = mw.readFile(file)
             if conf.find('SECURITY-START') != -1:
-                rep = "\s{0,4}#SECURITY-START(\n|.)*#SECURITY-END\n?"
+                rep = "\s{0,4}#SECURITY-START(\n|.){1,500}#SECURITY-END\n?"
                 conf = re.sub(rep, '', conf)
                 mw.writeLog('网站管理', '站点[' + name + ']已关闭防盗链设置!')
             else:
                 rconf = '''#SECURITY-START 防盗链配置
-    location ~ .*\.(%s)$
-    {
-        expires      30d;
-        access_log /dev/null;
-        valid_referers none blocked %s;
-        if ($invalid_referer){
-           return 404;
-        }
+location ~ .*\.(%s)$
+{
+    expires      30d;
+    access_log /dev/null;
+    valid_referers none blocked %s;
+    if ($invalid_referer){
+       return 404;
     }
-    #SECURITY-END
-    include enable-php-''' % (fix.strip().replace(',', '|'), domains.strip().replace(',', ' '))
+}
+# SECURITY-END
+include enable-php-''' % (fix.strip().replace(',', '|'), domains.strip().replace(',', ' '))
                 conf = re.sub("include\s+enable-php-", rconf, conf)
                 mw.writeLog('网站管理', '站点[' + name + ']已开启防盗链!')
             mw.writeFile(file, conf)
@@ -1623,7 +1653,6 @@ class site_api:
             os.makedirs(path)
             if not mw.isAppleSystem():
                 mw.execShell('chown -R www:www ' + path)
-
             mw.writeFile(path + '/index.html', 'Work has started!!!')
             mw.execShell('chmod -R 755 ' + path)
 
