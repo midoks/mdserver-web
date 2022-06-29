@@ -28,10 +28,19 @@ else
 	echo "php71 alreay exist!"
 fi
 
+
+# php
+if [ ! -d /www/server/php/74 ];then
+	cd /www/server/mdserver-web/plugins/php && bash install.sh install 74
+	cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/php/index.py start 74
+else
+	echo "php71 alreay exist!"
+fi
+
 # mysql
 if [ ! -d /www/server/mysql ];then
-	cd /www/server/mdserver-web/plugins/mysql && bash install.sh install 5.5
-	cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mysql/index.py start 5.5
+	cd /www/server/mdserver-web/plugins/mysql && bash install.sh install 5.6
+	cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mysql/index.py start 5.6
 else
 	echo "mysql alreay exist!"
 fi
