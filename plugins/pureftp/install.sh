@@ -70,6 +70,9 @@ Install_pureftp()
 	if [ -d ${serverPath}/pureftp ];then 
 		echo "${1}" > ${serverPath}/pureftp/version.pl
 		echo '安装完成' > $install_tmp
+
+		cd ${rootPath} && python3 ${rootPath}/plugins/pureftp/index.py start
+		cd ${rootPath} && python3 ${rootPath}/plugins/pureftp/index.py initd_install
 	else
 		echo '安装失败' > $install_tmp
 	fi
@@ -77,6 +80,17 @@ Install_pureftp()
 
 Uninstall_pureftp()
 {
+	if [ -f /lib/systemd/system/pureftp.service ];then
+		systemctl stop pureftp
+		systemctl disable pureftp
+		rm -rf /lib/systemd/system/pureftp.service
+		systemctl daemon-reload
+	fi
+
+	if [ -f $serverPath/pureftp/initd/pureftp ];then
+		$serverPath/pureftp/initd/pureftp stop
+	fi
+
 	rm -rf ${serverPath}/pureftp
 	echo '卸载完成' > $install_tmp
 }
