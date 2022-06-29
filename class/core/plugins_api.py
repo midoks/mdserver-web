@@ -123,6 +123,10 @@ class plugins_api:
                    'execshell', '0', time.strftime('%Y-%m-%d %H:%M:%S'), execstr)
 
         mw.M('tasks').add('id,name,type,status,addtime, execstr', taskAdd)
+
+        # 任务执行相关
+        isTask = mw.getRootDir() + '/tmp/panelTask.pl'
+        mw.writeFile(isTask, 'True')
         return mw.returnJson(True, '已将安装任务添加到队列!')
 
     def uninstallOldApi(self):

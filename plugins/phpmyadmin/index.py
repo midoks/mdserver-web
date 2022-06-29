@@ -108,7 +108,9 @@ def contentReplace(content):
 
 def status():
     conf = getConf()
-    if os.path.exists(conf):
+    conf_inc = getServerDir() + '/phpmyadmin/config.inc.php'
+    # 两个文件都在，才算启动成功
+    if os.path.exists(conf) and os.path.exists(conf_inc):
         return 'start'
     return 'stop'
 
@@ -211,11 +213,11 @@ def setPmaPort():
 
 
 def accessLog():
-    return '/www/server/phpmyadmin/access.log'
+    return getServerDir() + '/phpmyadmin/access.log'
 
 
 def errorLog():
-    return '/www/server/phpmyadmin/error.log'
+    return getServerDir() + '/phpmyadmin/error.log'
 
 
 def Version():

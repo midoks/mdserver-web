@@ -6,14 +6,10 @@ import sys
 import mw
 import re
 import json
-import pwd
 import shutil
 
-import psutil
 
 from flask import request
-
-# request.urllib3.disable_warnings()
 
 
 class site_api:
@@ -27,6 +23,7 @@ class site_api:
     logsPath = None
     passPath = None
     rewritePath = None
+    redirectPath = None
     sslDir = None  # ssl目录
 
     def __init__(self):
@@ -41,6 +38,11 @@ class site_api:
         self.passPath = self.setupPath + '/nginx/pass'
         # if not os.path.exists(pp):
         #     mw.execShell("mkdir -p " + rw + " && chmod -R 755 " + rw)
+
+        self.redirectPath = self.setupPath + '/nginx/redirect'
+        if not os.path.exists(self.redirectPath):
+            mw.execShell("mkdir -p " + self.redirectPath +
+                         " && chmod -R 755 " + self.redirectPath)
 
         self.logsPath = mw.getRootDir() + '/wwwlogs'
         # ssl conf
@@ -126,8 +128,11 @@ class site_api:
     def stopApi(self):
         mid = request.form.get('id', '')
         name = request.form.get('name', '')
-        path = self.setupPath + '/stop'
 
+        return self.stop(self, mid, name)
+
+    def stop(self, mid, name):
+        path = self.setupPath + '/stop'
         if not os.path.exists(path):
             os.makedirs(path)
             mw.writeFile(path + '/index.html',
@@ -1171,6 +1176,167 @@ class site_api:
         path = request.form.get('path', '0')
         return self.delete(sid, webname, path)
 
+    # get_redirect_status
+    def getRedirectApi(self):
+        _siteName = request.form.get("siteName", '')
+
+        # read data base
+        data_path = self.getRedirectDataPath(_siteName)
+        data_content = mw.readFile(data_path)
+        if data_content == False:
+            mw.execShell("mkdir {}/{}".format(self.redirectPath, _siteName))
+            return mw.returnJson(True, "", {"result": [], "count": 0})
+        # get
+        # conf_path = "{}/{}/*.conf".format(self.redirectPath, siteName)
+        # conf_list = glob.glob(conf_path)
+        # if conf_list == []:
+        #     return mw.returnJson(True, "", {"result": [], "count": 0})
+        try:
+            data = json.loads(data_content)
+        except:
+            mw.execShell("rm -rf {}/{}".format(self.redirectPath, _siteName))
+            return mw.returnJson(True, "", {"result": [], "count": 0})
+
+        # 处理301信息
+        return mw.returnJson(True, "ok", {"result": data, "count": len(data)})
+
+    def getRedirectConfApi(self):
+        _siteName = request.form.get("siteName", '')
+        _id = request.form.get("id", '')
+        if _id == '' or _siteName == '':
+            return mw.returnJson(False, "必填项不能为空!")
+
+        data = mw.readFile(
+            "{}/{}/{}.conf".format(self.redirectPath, _siteName, _id))
+        if data == False:
+            return mw.returnJson(False, "获取失败!")
+        return mw.returnJson(True, "ok", {"result": data})
+
+    def saveRedirectConfApi(self):
+        _siteName = request.form.get("siteName", '')
+        _id = request.form.get("id", '')
+        _config = request.form.get("config", "")
+        if _id == '' or _siteName == '':
+            return mw.returnJson(False, "必填项不能为空!")
+
+        _old_config = mw.readFile(
+            "{}/{}/{}.conf".format(self.redirectPath, _siteName, _id))
+        if _old_config == False:
+            return mw.returnJson(False, "非法操作")
+
+        mw.writeFile("{}/{}/{}.conf".format(self.redirectPath,
+                                            _siteName, _id), _config)
+        rule_test = mw.checkWebConfig()
+        if rule_test != True:
+            mw.writeFile("{}/{}/{}.conf".format(self.redirectPath,
+                                                _siteName, _id), _old_config)
+            return mw.returnJson(False, "Nginx 配置测试不通过, 请重试: {}".format(rule_test))
+
+        mw.restartWeb()
+        return mw.returnJson(True, "ok")
+
+    # get redirect status
+    def setRedirectApi(self):
+        _siteName = request.form.get("siteName", '')
+        # from (example.com / /test/)
+        _from = request.form.get("from", '')
+        _to = request.form.get("to", '')              # redirect to
+        _type = request.form.get("type", '')          # path / domain
+        _rType = request.form.get("r_type", '')       # redirect type
+        _keepPath = request.form.get("keep_path", '')  # keep path
+
+        if _siteName == '' or _from == '' or _to == '' or _type == '' or _rType == '':
+            return mw.returnJson(False, "必填项不能为空!")
+
+        data_path = self.getRedirectDataPath(_siteName)
+        data_content = mw.readFile(
+            data_path) if os.path.exists(data_path) else ""
+        data = json.loads(data_content) if data_content != "" else []
+
+        _rTypeCode = 0 if _rType == "301" else 1
+        _typeCode = 0 if _type == "path" else 1
+        _keepPath = 1 if _keepPath == "1" else 0
+
+        # check if domain exists in site
+        if _typeCode == 1:
+            pid = mw.M('domain').where("name=?", (_siteName,)).field(
+                'id,pid,name,port,addtime').select()
+            site_domain_lists = mw.M('domain').where("pid=?", (pid[0]['pid'],)).field(
+                'name').select()
+            found = False
+            for item in site_domain_lists:
+                if item['name'] == _from:
+                    found = True
+                    break
+            if found == False:
+                return mw.returnJson(False, "域名不存在!")
+
+        file_content = ""
+        # path
+        if _typeCode == 0:
+            redirect_type = "permanent" if _rTypeCode == 0 else "redirect"
+            if not _from.startswith("/"):
+                _from = "/{}".format(_from)
+            if _keepPath == 1:
+                _to = "{}$1".format(_to)
+                _from = "{}(.*)".format(_from)
+            file_content = "rewrite ^{} {} {};".format(
+                _from, _to, redirect_type)
+        # domain
+        else:
+            if _keepPath == 1:
+                _to = "{}$request_uri".format(_to)
+
+            redirect_type = "301" if _rTypeCode == 0 else "302"
+            _if = "if ($host ~ '^{}')".format(_from)
+            _return = "return {} {}; ".format(redirect_type, _to)
+            file_content = _if + "{\r\n    " + _return + "\r\n}"
+
+        _id = mw.md5("{}+{}".format(file_content, _siteName))
+
+        # 防止规则重复
+        for item in data:
+            if item["r_from"] == _from:
+                return mw.returnJson(False, "重复的规则!")
+
+        rep = "http(s)?\:\/\/([a-zA-Z0-9][-a-zA-Z0-9]{0,62}\.)+([a-zA-Z0-9][a-zA-Z0-9]{0,62})+.?"
+        if not re.match(rep, _to):
+            return mw.returnJson(False, "错误的目标地址")
+
+        # write data json file
+        data.append({"r_from": _from, "type": _typeCode, "r_type": _rTypeCode,
+                     "r_to": _to, 'keep_path': _keepPath, 'id': _id})
+        mw.writeFile(data_path, json.dumps(data))
+        mw.writeFile(
+            "{}/{}.conf".format(self.getRedirectPath(_siteName), _id), file_content)
+        mw.restartWeb()
+        return mw.returnJson(True, "ok")
+
+    # 删除指定重定向
+    def delRedirectApi(self):
+        _siteName = request.form.get("siteName", '')
+        _id = request.form.get("id", '')
+        if _id == '' or _siteName == '':
+            return mw.returnJson(False, "必填项不能为空!")
+
+        try:
+            data_path = self.getRedirectDataPath(_siteName)
+            data_content = mw.readFile(
+                data_path) if os.path.exists(data_path) else ""
+            data = json.loads(data_content) if data_content != "" else []
+            for item in data:
+                if item["id"] == _id:
+                    data.remove(item)
+                    break
+            # write database
+            mw.writeFile(data_path, json.dumps(data))
+            # remove conf file
+            mw.execShell(
+                "rm -rf {}/{}.conf".format(self.getRedirectPath(_siteName), _id))
+        except:
+            return mw.returnJson(False, "删除失败!")
+        return mw.returnJson(True, "删除成功!")
+
     def getProxyListApi(self):
         siteName = request.form.get('siteName', '')
         conf_path = self.getHostConf(siteName)
@@ -1178,31 +1344,6 @@ class site_api:
         rep = "(#PROXY-START(\n|.)+#PROXY-END)"
         url_rep = "proxy_pass (.*);|ProxyPass\s/\s(.*)|Host\s(.*);"
         host_rep = "Host\s(.*);"
-
-        if re.search(rep, old_conf):
-            # 构造代理配置
-            if w == "nginx":
-                get.todomain = str(re.search(host_rep, old_conf).group(1))
-                get.proxysite = str(re.search(url_rep, old_conf).group(1))
-            else:
-                get.todomain = ""
-                get.proxysite = str(re.search(url_rep, old_conf).group(2))
-            get.proxyname = "旧代理"
-            get.type = 1
-            get.proxydir = "/"
-            get.advanced = 0
-            get.cachetime = 1
-            get.cache = 0
-            get.subfilter = "[{\"sub1\":\"\",\"sub2\":\"\"},{\"sub1\":\"\",\"sub2\":\"\"},{\"sub1\":\"\",\"sub2\":\"\"}]"
-
-            # proxyname_md5 = self.__calc_md5(get.proxyname)
-            # 备份并替换老虚拟主机配置文件
-            os.system("cp %s %s_bak" % (conf_path, conf_path))
-            conf = re.sub(rep, "", old_conf)
-            mw.writeFile(conf_path, conf)
-
-            # self.createProxy(get)
-            mw.restartWeb()
 
         proxyUrl = self.__read_config(self.__proxyfile)
         sitename = sitename
@@ -1362,6 +1503,12 @@ class site_api:
 
     def getRewriteConf(self, siteName):
         return self.rewritePath + '/' + siteName + '.conf'
+
+    def getRedirectDataPath(self, siteName):
+        return "{}/{}/data.json".format(self.redirectPath, siteName)
+
+    def getRedirectPath(self, siteName):
+        return "{}/{}/".format(self.redirectPath, siteName)
 
     def getDirBindRewrite(self, siteName, dirname):
         return self.rewritePath + '/' + siteName + '_' + dirname + '.conf'
@@ -1526,13 +1673,9 @@ class site_api:
     def getSecurity(self, sid, name):
         filename = self.getHostConf(name)
         conf = mw.readFile(filename)
-
-        if type(conf) == bool:
-            return mw.returnJson(False, '读取配置文件失败!')
-
         data = {}
         if conf.find('SECURITY-START') != -1:
-            rep = "#SECURITY-START(.|\n)*#SECURITY-END"
+            rep = "#SECURITY-START(\n|.){1,500}#SECURITY-END"
             tmp = re.search(rep, conf).group()
             data['fix'] = re.search(
                 "\(.+\)\$", tmp).group().replace('(', '').replace(')$', '').replace('|', ',')
@@ -1557,10 +1700,12 @@ class site_api:
         if os.path.exists(file):
             conf = mw.readFile(file)
             if conf.find('SECURITY-START') != -1:
-                rep = "\s{0,4}#SECURITY-START(\n|.)*#SECURITY-END\n?"
+                rep = "\s{0,4}#SECURITY-START(\n|.){1,500}#SECURITY-END\n?"
                 conf = re.sub(rep, '', conf)
                 mw.writeLog('网站管理', '站点[' + name + ']已关闭防盗链设置!')
             else:
+                pre_path = self.setupPath + "/php/conf"
+                re_path = "include\s+" + pre_path + "/enable-php-"
                 rconf = '''#SECURITY-START 防盗链配置
     location ~ .*\.(%s)$
     {
@@ -1572,8 +1717,8 @@ class site_api:
         }
     }
     #SECURITY-END
-    include enable-php-''' % (fix.strip().replace(',', '|'), domains.strip().replace(',', ' '))
-                conf = re.sub("include\s+enable-php-", rconf, conf)
+    include %s/enable-php-''' % (fix.strip().replace(',', '|'), domains.strip().replace(',', ' '), pre_path)
+                conf = re.sub(re_path, rconf, conf)
                 mw.writeLog('网站管理', '站点[' + name + ']已开启防盗链!')
             mw.writeFile(file, conf)
         mw.restartWeb()
@@ -1623,7 +1768,6 @@ class site_api:
             os.makedirs(path)
             if not mw.isAppleSystem():
                 mw.execShell('chown -R www:www ' + path)
-
             mw.writeFile(path + '/index.html', 'Work has started!!!')
             mw.execShell('chmod -R 755 ' + path)
 
@@ -1663,6 +1807,7 @@ class site_api:
         content = content.replace('{$PHP_DIR}', self.setupPath + '/php')
         content = content.replace('{$PHPVER}', self.phpVersion)
         content = content.replace('{$OR_REWRITE}', self.rewritePath)
+        content = content.replace('{$OR_REDIRECT}', self.redirectPath)
 
         logsPath = mw.getLogsDir()
         content = content.replace('{$LOGPATH}', logsPath)
@@ -1675,7 +1820,7 @@ location /{
        break;
     }
 }
-        '''
+'''
         rewrite_file = self.rewritePath + '/' + self.siteName + '.conf'
         mw.writeFile(rewrite_file, rewrite_content)
 

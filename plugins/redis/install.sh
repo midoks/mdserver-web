@@ -28,18 +28,30 @@ Install_redis()
 	cd redis-${VERSION} && make PREFIX=$serverPath/redis install
 	sed '/^ *#/d' redis.conf > $serverPath/redis/redis.conf
 
-	echo "${VERSION}" > $serverPath/redis/version.pl
+	if [ -d $serverPath/redis ];then
+		echo "${VERSION}" > $serverPath/redis/version.pl
+		echo '安装完成' > $install_tmp
 
-	echo '安装完成' > $install_tmp
+
+		cd ${rootPath} && python3 ${rootPath}/plugins/redis/index.py start
+		cd ${rootPath} && python3 ${rootPath}/plugins/redis/index.py initd_install
+	fi
 }
 
 Uninstall_redis()
 {
-	rm -rf $serverPath/redis
-
 	if [ -f /lib/systemd/system/redis.service ];then
+		systemctl stop redis
+		systemctl disable redis
 		rm -rf /lib/systemd/system/redis.service
+		systemctl daemon-reload
 	fi
+
+	if [ -f $serverPath/redis/initd/redis ];then
+		$serverPath/redis/initd/redis stop
+	fi
+
+	rm -rf $serverPath/redis
 	echo "Uninstall_redis" > $install_tmp
 }
 

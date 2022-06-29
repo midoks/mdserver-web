@@ -86,15 +86,6 @@ def getInitDTpl():
     return path
 
 
-def makeConf():
-    vhost = getServerDir() + '/nginx/conf/vhost'
-    if not os.path.exists(vhost):
-        os.mkdir(vhost)
-    php_status = getServerDir() + '/nginx/conf/php_status'
-    if not os.path.exists(php_status):
-        os.mkdir(php_status)
-
-
 def getFileOwner(filename):
     import pwd
     stat = os.lstat(filename)
@@ -192,9 +183,6 @@ def initDreplace():
         mw.writeFile(systemService, se_content)
         mw.execShell('systemctl daemon-reload')
 
-    # make nginx vhost or other
-    makeConf()
-
     return file_bin
 
 
@@ -212,7 +200,7 @@ def restyOp(method):
     # 启动时,先检查一下配置文件
     check = getServerDir() + "/bin/openresty -t"
     check_data = mw.execShell(check)
-    if check_data[1].find('test failed') != -1:
+    if not check_data[1].find('test is successful'):
         return check_data[1]
 
     if not mw.isAppleSystem():

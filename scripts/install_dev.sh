@@ -67,7 +67,7 @@ if [ $OSNAME != "macos" ];then
 	if [ ! -d /www/server/mdserver-web ];then
 		wget -O /tmp/dev.zip https://github.com/midoks/mdserver-web/archive/refs/heads/dev.zip
 		cd /tmp && unzip /tmp/dev.zip
-		mv /tmp/mdserver-web-dev /www/server/mdserver-web
+		mv -f /tmp/mdserver-web-master /www/server/mdserver-web
 		rm -rf /tmp/dev.zip
 		rm -rf /tmp/mdserver-web-dev
 	fi
@@ -88,3 +88,6 @@ fi
 endTime=`date +%s`
 ((outTime=(${endTime}-${startTime})/60))
 echo -e "Time consumed:\033[32m $outTime \033[0mMinute!"
+
+systemctl daemon-reload
+

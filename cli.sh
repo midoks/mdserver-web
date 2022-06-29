@@ -3,6 +3,7 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 DIR=$(cd "$(dirname "$0")"; pwd)
 MDIR=$(dirname "$DIR")
 
+
 PATH=$PATH:$DIR/bin
 if [ -f bin/activate ];then
 	source bin/activate
@@ -12,21 +13,19 @@ fi
 
 mw_start(){
 	gunicorn -c setting.py app:app
-	python3 task.py &
+	python3 task.py >> $DIR/logs/task.log 2>&1 &
 }
 
 
 mw_start_debug(){
 	
-	python3 task.py &
+	python3 task.py >> $DIR/logs/task.log 2>&1 &
 	gunicorn -b :7200 -k gevent -w 1 app:app
-	# gunicorn -b :7200 -k eventlet -w 1 app:app 
 }
 
 mw_start_debug2(){
-	python3 task.py &
+	python3 task.py >> $DIR/logs/task.log 2>&1 &
 	gunicorn -b :7200 -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1  app:app
-	
 }
 
 

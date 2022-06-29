@@ -9,6 +9,26 @@ serverPath=$(dirname "$rootPath")
 
 install_tmp=${rootPath}/tmp/mw_install.pl
 
+
+sysName=`uname`
+echo "use system: ${sysName}"
+
+if [ ${sysName} == "Darwin" ]; then
+	OSNAME='macos'
+elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
+	OSNAME='centos'
+elif grep -Eqi "Fedora" /etc/issue || grep -Eq "Fedora" /etc/*-release; then
+	OSNAME='fedora'
+elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
+	OSNAME='debian'
+elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
+	OSNAME='ubuntu'
+elif grep -Eqi "Raspbian" /etc/issue || grep -Eq "Raspbian" /etc/*-release; then
+	OSNAME='raspbian'
+else
+	OSNAME='unknow'
+fi
+
 Install_phpmyadmin()
 {
 	mkdir -p ${serverPath}/phpmyadmin
@@ -32,15 +52,22 @@ Install_phpmyadmin()
 	cd $serverPath/phpmyadmin/ && mv $FDIR phpmyadmin
 	
 	mkdir -p  $serverPath/phpmyadmin/tmp
-	chown -R www:www $serverPath/phpmyadmin/tmp
+
+	if [ "$OSNAME" == 'macosx' ];then
+		chown -R www:www $serverPath/phpmyadmin/tmp
+	fi
 
 	echo "${1}" > ${serverPath}/phpmyadmin/version.pl
 	echo '安装完成' > $install_tmp
+
+	cd ${rootPath} && python3 ${rootPath}/plugins/phpmyadmin/index.py start
 		
 }
 
 Uninstall_phpmyadmin()
 {
+	cd ${rootPath} && python3 ${rootPath}/plugins/phpmyadmin/index.py stop
+	
 	rm -rf ${serverPath}/phpmyadmin
 	echo '卸载完成' > $install_tmp
 }
