@@ -3,6 +3,9 @@
 import time
 import os
 import sys
+from unicodedata import name
+
+from sqlalchemy import false
 import mw
 import re
 import json
@@ -1174,13 +1177,14 @@ class site_api:
     
     
     ## get_redirect_status
-    def getRedirectStatusApi(self):
+    def getRedirectApi(self):
         _siteName = request.form.get("siteName",'')
         
         # read data base
         data_path =  self.getRedirectDataPath(_siteName)
         data_content = mw.readFile(data_path)
         if data_content == False:
+            mw.execShell("mkdir {}/{}".format(self.redirectPath, _siteName))
             return mw.returnJson(True, "", {"result": [], "count": 0})
         # get  
         # conf_path = "{}/{}/*.conf".format(self.redirectPath, siteName)
@@ -1197,34 +1201,136 @@ class site_api:
         return mw.returnJson(True, "ok", {"result": data, "count": len(data)})
     
     
+    def getRedirectConfApi(self):
+        _siteName = request.form.get("siteName",'')
+        _id = request.form.get("id",'')
+        if _id == '' or _siteName == '':
+            return mw.returnJson(False, "必填项不能为空!")
+        
+        data = mw.readFile("{}/{}/{}.conf".format(self.redirectPath, _siteName, _id))
+        if data == False:
+            return mw.returnJson(False, "获取失败!")
+        return mw.returnJson(True, "ok", {"result": data})
+
+
+    def saveRedirectConfApi(self):
+        _siteName = request.form.get("siteName",'')
+        _id = request.form.get("id",'')
+        _config = request.form.get("config", "")
+        if _id == '' or _siteName == '':
+            return mw.returnJson(False, "必填项不能为空!")
+        
+        _old_config = mw.readFile("{}/{}/{}.conf".format(self.redirectPath, _siteName, _id))
+        if _old_config == False:
+            return mw.returnJson(False, "非法操作")
+        
+        mw.writeFile("{}/{}/{}.conf".format(self.redirectPath, _siteName, _id), _config)
+        rule_test = mw.checkWebConfig()
+        if rule_test != True:
+            mw.writeFile("{}/{}/{}.conf".format(self.redirectPath, _siteName, _id), _old_config)
+            return mw.returnJson(False, "Nginx 配置测试不通过, 请重试: {}".format(rule_test))
+        
+        mw.restartWeb()
+        return mw.returnJson(True, "ok")
+
+    
     # get redirect status    
-    def setRedirectStatusApi(self):
+    def setRedirectApi(self):
         _siteName = request.form.get("siteName",'')
         _from = request.form.get("from",'')          # from (example.com / /test/)
         _to = request.form.get("to",'')              # redirect to
         _type = request.form.get("type",'')          # path / domain
         _rType = request.form.get("r_type",'')       # redirect type   
+        _keepPath = request.form.get("keep_path",'') # keep path
         
         if _siteName == '' or _from == '' or _to == '' or _type == '' or _rType == '':
             return mw.returnJson(False, "必填项不能为空!")
         
         data_path =  self.getRedirectDataPath(_siteName)
         data_content = mw.readFile(data_path) if os.path.exists(data_path) else ""
-        data = json.loads(data_content) if data_content != "" else {}
+        data = json.loads(data_content) if data_content != "" else []
         
-        if _rType == "301":
-            _rType = 0
+        _rTypeCode = 0 if _rType == "301" else 1
+        _typeCode = 0 if _type == "path" else 1
+        _keepPath = 1 if _keepPath == "1" else 0
+        
+        # check if domain exists in site
+        if _typeCode == 1:
+            pid = mw.M('domain').where("name=?", (_siteName,)).field(
+                'id,pid,name,port,addtime').select()
+            site_domain_lists = mw.M('domain').where("pid=?", (pid[0]['pid'],)).field(
+                'name').select()
+            found = False
+            for item in site_domain_lists:
+                if item['name'] == _from:
+                    found = True
+                    break
+            if found == False:
+                return mw.returnJson(False, "域名不存在!")
+        
+        
+        file_content = ""
+        # path
+        if _typeCode == 0:
+            redirect_type = "permanent" if _rTypeCode == 0 else "redirect"
+            if not _from.startswith("/"):
+                _from = "/{}".format(_from)
+            if _keepPath == 1:
+                _to = "{}$1".format(_to)
+                _from = "{}(.*)".format(_from)
+            file_content = "rewrite ^{} {} {};".format(_from, _to, redirect_type)
+        # domain
         else:
-            _rType = 1
+            if _keepPath == 1:
+                _to = "{}$request_uri".format(_to)
+                
+            redirect_type = "301" if _rTypeCode == 0 else "302"
+            _if = "if ($host ~ '^{}')".format(_from)
+            _return = "return {} {}; ".format(redirect_type, _to)
+            file_content = _if + "{\r\n    " + _return + "\r\n}"
             
-        if _type == "path":
-            _type = 0
-        else:
-            _type = 1
             
-        data.append({"from": _from, "type": _type, "r_type": _rType, "r_to": _to})
+        _id = mw.md5("{}+{}".format(file_content, _siteName))
+        
+        # 防止规则重复
+        for item in data:
+            if item["r_from"] == _from:
+                return mw.returnJson(False, "重复的规则!")
+            
+        rep = "http(s)?\:\/\/([a-zA-Z0-9][-a-zA-Z0-9]{0,62}\.)+([a-zA-Z0-9][a-zA-Z0-9]{0,62})+.?"
+        if not re.match(rep, _to):
+            return mw.returnJson(False, "错误的目标地址")
+            
+        # write data json file
+        data.append({"r_from": _from, "type": _typeCode, "r_type": _rTypeCode, "r_to": _to, 'keep_path': _keepPath, 'id': _id})
         mw.writeFile(data_path, json.dumps(data))
+        mw.writeFile("{}/{}.conf".format(self.getRedirectPath(_siteName), _id), file_content)
+        mw.restartWeb()
         return mw.returnJson(True, "ok")
+    
+    
+    # 删除指定重定向
+    def delRedirectApi(self):
+        _siteName = request.form.get("siteName",'')
+        _id = request.form.get("id",'')
+        if _id == '' or _siteName == '':
+            return mw.returnJson(False, "必填项不能为空!")
+        
+        try:
+            data_path =  self.getRedirectDataPath(_siteName)
+            data_content = mw.readFile(data_path) if os.path.exists(data_path) else ""
+            data = json.loads(data_content) if data_content != "" else []
+            for item in data:
+                if item["id"] == _id:
+                    data.remove(item)
+                    break
+            # write database
+            mw.writeFile(data_path, json.dumps(data))
+            # remove conf file
+            mw.execShell("rm -rf {}/{}.conf".format(self.getRedirectPath(_siteName), _id))
+        except:
+            return mw.returnJson(False, "删除失败!")
+        return mw.returnJson(True, "删除成功!")
 
 
     def getProxyListApi(self):
@@ -1396,6 +1502,9 @@ class site_api:
 
     def getRedirectDataPath(self, siteName):
         return "{}/{}/data.json".format(self.redirectPath, siteName)
+
+    def getRedirectPath(self, siteName):
+        return "{}/{}/".format(self.redirectPath, siteName)
 
     def getDirBindRewrite(self, siteName, dirname):
         return self.rewritePath + '/' + siteName + '_' + dirname + '.conf'
@@ -1692,21 +1801,14 @@ include enable-php-''' % (fix.strip().replace(',', '|'), domains.strip().replace
         content = content.replace('{$PHP_DIR}', self.setupPath + '/php')
         content = content.replace('{$PHPVER}', self.phpVersion)
         content = content.replace('{$OR_REWRITE}', self.rewritePath)
+        content = content.replace('{$OR_REDIRECT}', self.redirectPath)
 
         logsPath = mw.getLogsDir()
         content = content.replace('{$LOGPATH}', logsPath)
         mw.writeFile(vhost_file, content)
-
-        rewrite_content = '''
-location /{
-    if (!-e $request_filename) {
-       rewrite  ^(.*)$  /index.php/$1  last;
-       break;
-    }
-}
-        '''
+        
         rewrite_file = self.rewritePath + '/' + self.siteName + '.conf'
-        mw.writeFile(rewrite_file, rewrite_content)
+        mw.writeFile(rewrite_file, "")
 
     def add(self, webname, port, ps, path, version):
         siteMenu = json.loads(webname)
