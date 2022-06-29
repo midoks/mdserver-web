@@ -35,6 +35,15 @@
 * Gogs - 一款极易搭建的自助Git服务。
 * Rsyncd - 通用同步服务。
 
+# Note
+
+phpMyAdmin[4.4.15]支持MySQL[5.5-5.7]
+phpMyAdmin[5.2.0]支持MySQL[8.0]
+
+PHP[53-72]支持phpMyAdmin[4.4.15]
+PHP[72-81]支持phpMyAdmin[5.2.0]
+
+
 
 ### 版本更新 0.8.6
 * mysql主从配置。
