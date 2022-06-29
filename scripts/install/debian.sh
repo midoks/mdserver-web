@@ -106,42 +106,6 @@ chmod 755 /www/server/mdserver-web/data
 cd /www/server/mdserver-web && ./cli.sh start
 sleep 5
 
-
-echo -e "stop mw"
-isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`
-
-port=7200
-if [ -f /www/server/mdserver-web/data/port.pl ];then
-    port=$(cat /www/server/mdserver-web/data/port.pl)
-fi
-
-n=0
-while [[ "$isStart" != "" ]];
-do
-    echo -e ".\c"
-    sleep 0.5
-    isStart=$(lsof -n -P -i:$port|grep LISTEN|grep -v grep|awk '{print $2}'|xargs)
-    let n+=1
-    if [ $n -gt 15 ];then
-        break;
-    fi
-done
-
-
-echo -e "start mw"
-cd /www/server/mdserver-web && sh cli.sh start
-isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`
-n=0
-while [[ ! -f /etc/init.d/mw ]];
-do
-    echo -e ".\c"
-    sleep 0.5
-    let n+=1
-    if [ $n -gt 15 ];then
-        break;
-    fi
-done
-echo -e "start mw success"
-
-systemctl daemon-reload
+cd /www/server/mdserver-web && ./cli.sh stop
 cd /www/server/mdserver-web && ./scripts/init.d/mw default
+cd /www/server/mdserver-web && ./cli.sh start
