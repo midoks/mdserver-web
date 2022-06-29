@@ -18,9 +18,9 @@ fi
 
 
 # php
-if [ ! -d /www/server/php/71 ];then
-	cd /www/server/mdserver-web/plugins/php && bash install.sh install 71
-fi
+# if [ ! -d /www/server/php/71 ];then
+# 	cd /www/server/mdserver-web/plugins/php && bash install.sh install 71
+# fi
 
 
 
@@ -36,11 +36,9 @@ done
 # mysql
 if [ ! -d /www/server/mysql ];then
 	# cd /www/server/mdserver-web/plugins/mysql && bash install.sh install 5.7
-	# cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mysql/index.py start 5.7
 
 
 	# cd /www/server/mdserver-web/plugins/mysql && bash install.sh install 5.6
-	# cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mysql/index.py start 5.6
 	cd /www/server/mdserver-web/plugins/mysql && bash install.sh install 8.0
 fi
 
