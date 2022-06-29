@@ -534,7 +534,7 @@ if __name__ == "__main__":
     oar = setDaemon(oar)
     oar.start()
 
-    # OpenResty Auto Restart Start
+    # Panel Restart Start
     rps = threading.Thread(target=restartPanelService)
     rps = setDaemon(rps)
     rps.start()

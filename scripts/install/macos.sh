@@ -40,7 +40,9 @@ pip3 install mysqlclient
 
 chmod 755 $DEV/server/mdserver-web/data
 if [ -f $DEV/server/mdserver-web/bin/activate ];then
-    cd $DEV/server/mdserver-web && python3 -m venv $DEV/server/mdserver-web && source $DEV/server/mdserver-web/bin/activate && pip3 install -r $DEV/server/mdserver-web/requirements.txt
+    cd $DEV/server/mdserver-web && python3 -m venv $DEV/server/mdserver-web
+    source $DEV/server/mdserver-web/bin/activate
+    pip3 install -r $DEV/server/mdserver-web/requirements.txt
 else
 	cd $DEV/server/mdserver-web && pip3 install -r $DEV/server/mdserver-web/requirements.txt
 fi

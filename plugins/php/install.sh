@@ -31,4 +31,22 @@ if [ ! -d $curPath/versions/$2 ];then
 	exit 0
 fi
 
-sh -x $curPath/versions/$2/install.sh $1
+if [ "${action}" == "uninstall" ];then
+	
+	if [ -f /lib/systemd/system/php${type}.service ];then
+		systemctl stop php${type}
+		systemctl disable php${type}
+		rm -rf /lib/systemd/system/php${type}.service
+		systemctl daemon-reload
+	fi
+fi
+
+cd ${curPath} && sh -x $curPath/versions/$2/install.sh $1
+
+if [ "${action}" == "install" ];then
+	#初始化 
+	cd ${rootPath} && python3 ${rootPath}/plugins/php/index.py start ${type}
+	cd ${rootPath} && python3 ${rootPath}/plugins/php/index.py initd_install ${type}
+fi
+
+

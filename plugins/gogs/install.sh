@@ -61,6 +61,9 @@ Install_gogs()
 
 	if [ -d $serverPath/gogs ];then
 		echo $version > $serverPath/gogs/version.pl
+
+		cd ${rootPath} && python3 ${rootPath}/plugins/gogs/index.py start
+		cd ${rootPath} && python3 ${rootPath}/plugins/gogs/index.py initd_install
 	fi
 	# if id -u gogs > /dev/null 2>&1; then
  #        echo "gogs user exists"
@@ -75,11 +78,19 @@ Install_gogs()
 
 Uninstall_gogs()
 {
-	rm -rf $serverPath/gogs
-	if [ -f /usr/lib/systemd/system/gogs.service ];then
+
+	if [ -f /lib/systemd/system/gogs.service ];then
 		systemctl stop gogs
-		rm -rf /usr/lib/systemd/system/gogs.service
+		systemctl disable gogs
+		rm -rf /lib/systemd/system/gogs.service
+		systemctl daemon-reload
 	fi
+
+	if [ -f $serverPath/gogs/initd/gogs ];then
+		$serverPath/gogs/initd/gogs stop
+	fi
+
+	rm -rf $serverPath/gogs
 	echo 'uninstall success' > $install_tmp
 }
 

@@ -922,7 +922,7 @@ function setIndex(id){
 
 //设置默认站点
 function setDefaultSite(){
-	var name = $("#defaultSite").val();
+	var name = $("#default_site").val();
 	var loadT = layer.msg('正在处理,请稍候...',{icon:16,time:0,shade: [0.3, '#000']});
 	$.post('/site/set_default_site','name='+name,function(rdata){
 		layer.closeAll();
@@ -938,7 +938,7 @@ function getDefaultSite(){
 		var selected = '';
 		for(var i=0;i<rdata.sites.length;i++){
 			selected = '';
-			if(rdata.defaultSite == rdata.sites[i].name) selected = 'selected';
+			if(rdata.default_site == rdata.sites[i].name) selected = 'selected';
 			opt += '<option value="' + rdata.sites[i].name + '" ' + selected + '>' + rdata.sites[i].name + '</option>';
 		}
 		
@@ -952,7 +952,7 @@ function getDefaultSite(){
 				content:'<div class="bt-form ptb15 pb70">\
 							<p class="line">\
 								<span class="tname text-right">默认站点</span>\
-								<select id="defaultSite" class="bt-input-text" style="width: 300px;">'+opt+'</select>\
+								<select id="default_site" class="bt-input-text" style="width: 300px;">'+opt+'</select>\
 							</p>\
 							<ul class="help-info-text c6 plr20">\
 							    <li>设置默认站点后,所有未绑定的域名和IP都被定向到默认站点</li>\
