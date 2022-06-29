@@ -54,15 +54,29 @@ Install_sphinx()
 	fi
 
 	cd ${SPHINX_DIR} && tar -zxvf sphinx-3.1.1.tar.gz
-
 	cp -rf ${SPHINX_DIR}/sphinx-3.1.1/ $serverPath/sphinx/bin
 
-	echo '3.1.1' > $serverPath/sphinx/version.pl
-	echo '安装完成' > $install_tmp
+	if [ -d $serverPath/sphinx ];then
+		echo '3.1.1' > $serverPath/sphinx/version.pl
+		echo '安装完成' > $install_tmp
+		cd ${rootPath} && python3 ${rootPath}/plugins/sphinx/index.py start
+		cd ${rootPath} && python3 ${rootPath}/plugins/sphinx/index.py initd_install
+	fi
 }
 
 Uninstall_sphinx()
 {
+	if [ -f /lib/systemd/system/sphinx.service ];then
+		systemctl stop sphinx
+		systemctl disable sphinx
+		rm -rf /lib/systemd/system/sphinx.service
+		systemctl daemon-reload
+	fi
+
+	if [ -f $serverPath/sphinx/initd/sphinx ];then
+		$serverPath/sphinx/initd/sphinx stop
+	fi
+
 	rm -rf $serverPath/sphinx
 	echo "Uninstall_sphinx" > $install_tmp
 }
