@@ -1424,14 +1424,13 @@ function openCache(siteName){
 function to301(siteName, type, obj){
 	
 	// 设置 页面展示
-	// 设置 更新展示
-	if(type == 1 || type == 2){
+	if(type == 1) {
 		obj = {
 			to: 'http://',
 			from: '',
 			r_type: '',
 			type: 1,
-			type: 'domain',
+			type: 'path',
 			keep_path: 1
 		}
 		var redirect_form = layer.open({
@@ -1492,14 +1491,16 @@ function to301(siteName, type, obj){
 						layer.close(redirect_form);
 						to301(siteName)
 					} else {
-						layer.msg(res.msg);
+						layer.msg(res.msg, {
+							icon: 2
+						});
 					}
 				});
 			});
 		}, 100);
 	}
 
-	if (type == 3) {
+	if (type == 2) {
 		$.post('/site/del_redirect', {
 			siteName: siteName,
 			id: obj,
@@ -1521,9 +1522,70 @@ function to301(siteName, type, obj){
 		return
 	}
 
-	// 设置 提交
-
-	// 设置 更新 提交
+	if (type == 3) {
+		var laoding = layer.load();
+		$.post('/site/get_redirect_conf', {
+			siteName: siteName,
+			id: obj,
+		}, function(res) {
+			layer.close(laoding);
+			res = JSON.parse(res);
+			if (res.status == true) {
+				var mBody = "<div class='webEdit-box' style='padding: 20px'>\
+				<textarea style='height: 320px; width: 445px; margin-left: 20px; line-height:18px' id='configBody'>"+res.data.result+"</textarea>\
+					<div class='info-r'>\
+						<button id='SaveRedirectConfigFileBtn' class='btn btn-success btn-sm' style='margin-top:15px;'>保存</button>\
+						<ul class='help-info-text c7 ptb10'>\
+							<li>此处为重定向配置文件,若您不了解配置规则,请勿随意修改.</li>\
+						</ul>\
+					</div>\
+				</div>";
+				var index = layer.open({
+					type: 1,
+					title: '编辑配置文件',
+					closeBtn: 1,
+					shadeClose: false,
+					area: ['500px', '500px'],
+					content: mBody,
+					success: function () {
+						$("#SaveRedirectConfigFileBtn").click(function(){
+							$("#configBody").empty();
+							$("#configBody").text(editor.getValue());
+							var load = layer.load()
+							$.post('/site/save_redirect_conf', {
+								siteName: siteName,
+								id: obj,
+								config: editor.getValue()
+							}, function(res) {
+								layer.close(load)
+								var res = JSON.parse(res);
+								if (res.status == true) {
+									layer.msg('保存成功', {
+										icon: 1
+									});
+									layer.close(index);
+								} else {
+									layer.msg(res.msg, {
+										time: 1000,
+										icon: 2
+									});
+								}
+							});
+						})
+					}
+				});
+				var editor = CodeMirror.fromTextArea(document.getElementById("configBody"), {
+					extraKeys: {"Ctrl-Space": "autocomplete"},
+					lineNumbers: true,
+					matchBrackets:true,
+				});
+				$(".CodeMirror-scroll").css({"height":"300px","margin":0,"padding":0});
+			} else {
+				
+			}
+		});
+		return
+	}
 
 	var body = '<div id="redirect_list" class="bt_table">\
 					<div style="padding-bottom: 10px">\
@@ -1561,7 +1623,7 @@ function to301(siteName, type, obj){
 					<td><span data-index="1"><span>'+item.r_from+'</span></span></td>\
 					<td><span data-index="2"><span>'+lan_r_type+'</span></span></td>\
 					<td><span data-index="2"><span>'+keep_path+'</span></span></td>\
-					<td><span data-index="4" class="btlink">编辑</span> | <span data-index="5" onclick="to301(\''+siteName+'\', 3, \''+ item.id +'\')" class="btlink">删除</span></td>\
+					<td><span data-index="4"  onclick="to301(\''+siteName+'\', 3, \''+ item.id +'\')"  class="btlink">详细</span> | <span data-index="5" onclick="to301(\''+siteName+'\', 2, \''+ item.id +'\')" class="btlink">删除</span></td>\
 				</tr>';
 				$("#md-301-body").append(tmp);
 			})
