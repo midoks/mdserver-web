@@ -52,15 +52,23 @@ Install_app()
 
 	echo "${VERSION}" > $serverPath/supervisor/version.pl
 	echo '安装完成[supervisor]' > $install_tmp
+
+	cd ${rootPath} && python3 ${rootPath}/plugins/supervisor/index.py start
+	cd ${rootPath} && python3 ${rootPath}/plugins/supervisor/index.py initd_install
 }
 
 Uninstall_app()
 {
-	rm -rf $serverPath/supervisor
+	
 
 	if [ -f /lib/systemd/system/supervisor.service ];then
+		systemctl stop supervisor
+		systemctl disable supervisor
 		rm -rf /lib/systemd/system/supervisor.service
+		systemctl daemon-reload
 	fi
+
+	rm -rf $serverPath/supervisor
 
 	echo "卸载完成[supervisor]" > $install_tmp
 }
