@@ -88,4 +88,4 @@ sleep 5
 
 cd /www/server/mdserver-web && ./cli.sh stop
 cd /www/server/mdserver-web && ./scripts/init.d/mw default
-cd /www/server/mdserver-web && ./cli.sh start
+cd /www/server/mdserver-web && /etc/init.d/mw restart
