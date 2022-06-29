@@ -86,15 +86,6 @@ def getInitDTpl():
     return path
 
 
-def makeConf():
-    vhost = getServerDir() + '/nginx/conf/vhost'
-    if not os.path.exists(vhost):
-        os.mkdir(vhost)
-    php_status = getServerDir() + '/nginx/conf/php_status'
-    if not os.path.exists(php_status):
-        os.mkdir(php_status)
-
-
 def getFileOwner(filename):
     import pwd
     stat = os.lstat(filename)
@@ -191,9 +182,6 @@ def initDreplace():
         se_content = se_content.replace('{$SERVER_PATH}', service_path)
         mw.writeFile(systemService, se_content)
         mw.execShell('systemctl daemon-reload')
-
-    # make nginx vhost or other
-    makeConf()
 
     return file_bin
 
