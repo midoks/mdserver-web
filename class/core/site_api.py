@@ -3,6 +3,9 @@
 import time
 import os
 import sys
+from unicodedata import name
+
+from sqlalchemy import false
 import mw
 import re
 import json
@@ -1217,11 +1220,26 @@ class site_api:
         _rTypeCode = 0 if _rType == "301" else 1
         _typeCode = 0 if _type == "path" else 1
         _keepPath = 1 if _keepPath == "1" else 0
-    
+        
+        # check if domain exists in site
+        if _typeCode == 1:
+            pid = mw.M('domain').where("name=?", (_siteName,)).field(
+                'id,pid,name,port,addtime').select()
+            site_domain_lists = mw.M('domain').where("pid=?", (pid[0]['pid'],)).field(
+                'name').select()
+            found = False
+            for item in site_domain_lists:
+                if item['name'] == _from:
+                    found = True
+                    break
+            if found == False:
+                return mw.returnJson(False, "域名不存在!")
+        
+        
         file_content = ""
         # path
         if _typeCode == 0:
-            redirect_type = "permanent" if _rTypeCode == 0 else "temporary"
+            redirect_type = "permanent" if _rTypeCode == 0 else "redirect"
             if not _from.startswith("/"):
                 _from = "/{}".format(_from)
             if _keepPath == 1:
