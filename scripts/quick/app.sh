@@ -41,6 +41,13 @@ else
 	echo "mysql alreay exist!"
 fi
 
+# phpmyadmin
+if [ ! -d /www/server/phpmyadmin ];then
+	cd /www/server/mdserver-web/plugins/phpmyadmin && bash install.sh install 4.4.15
+else
+	echo "phpmyadmin alreay exist!"
+fi
+
 endTime=`date +%s`
 ((outTime=(${endTime}-${startTime})/60))
 echo -e "Time consumed:\033[32m $outTime \033[0mMinute!"
