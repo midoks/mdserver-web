@@ -3,7 +3,7 @@
  * @param {Number} page   当前页
  * @param {String} search 搜索条件
  */
-function getWeb(page, search, type_id) {
+ function getWeb(page, search, type_id) {
 	search = $("#SearchValue").prop("value");
 	page = page == undefined ? '1':page;
 	var order = getCookie('order');
@@ -993,8 +993,8 @@ function webEdit(id,website,endTime,addtime){
 	+"<p onclick=\"configFile('"+website+"')\" title='配置文件'>配置文件</p>"
 	+"<p onclick=\"setSSL("+id+",'"+website+"')\" title='SSL'>SSL</p>"
 	+"<p onclick=\"phpVersion('"+website+"')\" title='PHP版本'>PHP版本</p>"
-	// +"<p onclick=\"to301('"+website+"')\" title='重定向'>重定向</p>"
-	// +"<p onclick=\"proxyList('"+website+"')\" title='反向代理'>反向代理</p>"
+	+"<p onclick=\"to301('"+website+"')\" title='重定向'>重定向</p>"
+	+"<p onclick=\"proxyList('"+website+"')\" title='反向代理'>反向代理</p>"
 	+"<p id='site_"+id+"' onclick=\"security('"+id+"','"+website+"')\" title='防盗链'>防盗链</p>"
 	+"<p id='site_"+id+"' onclick=\"getSiteLogs('"+website+"')\" title='查看站点请求日志'>响应日志</p>";
 	layer.open({
@@ -1085,7 +1085,7 @@ function setSecurity(name,id){
 	$.post('/site/set_security',data,function(rdata){
 		layer.close(loadT);
 		layer.msg(rdata.msg,{icon:rdata.status?1:2});
-		if(rdata.status) setTimeout(function(){security(id,name);},1000);
+		if(rdata.status) setTimeout(function(){Security(id,name);},1000);
 	},'json');
 }
 
@@ -1421,46 +1421,124 @@ function openCache(siteName){
 }
 		
 //301重定向
-function to301(siteName,type){
-	if(type == 1){
-		type = $("input[name='status']").attr('checked')?'0':'1';
-		toUrl = encodeURIComponent($("input[name='toUrl']").val());
-		srcDomain = encodeURIComponent($("select[name='srcDomain']").val());
-		var data = 'siteName='+siteName+'&type='+type+'&toDomain='+toUrl+'&srcDomain='+srcDomain;
-		$.post('site?action=Set301Status',data,function(rdata){
-			To301(siteName);
-			layer.msg(rdata.msg,{icon:rdata.status?1:2});
-		});
-		return;
-	}
-	var loadT = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});
-	$.post('/site?action=Get301Status','siteName='+siteName,function(rdata){
-		layer.close(loadT);
-		var domain_tmp = rdata.domain.split(',');
-		var domains = '';
-		var selected = '';
-		for(var i=0;i<domain_tmp.length;i++){
-			selected = '';
-			if(domain_tmp[i] == rdata.src) selected = 'selected';
-			domains += "<option value='"+domain_tmp[i]+"' "+selected+">"+domain_tmp[i]+"</option>";
+function to301(siteName, type, obj){
+	
+	// 设置 页面展示
+	// 设置 更新展示
+	if(type == 1 || type == 3){
+		obj = {
+			redirectname: (new Date()).valueOf(),
+			tourl: 'http://',
+			redirectdomain: [],
+			redirectpath: '',
+			redirecttype: '',
+			type: 1,
+			domainorpath: 'domain',
+			holdpath: 1
 		}
-		
-		if(rdata.url == null) rdata.url = '';
-		var status_selected = rdata.status?'checked':'';
-		var isRead = rdata.status?'readonly':'';
-		var body = "<div>"
-			   +"<p style='margin-bottom:8px'><span style='display: inline-block; width: 90px;'>"+lan.site.access_domain+"</span><select class='bt-input-text' name='srcDomain' style='margin-left: 5px;width: 380px;height: 30px;margin-right:10px;"+(rdata.status?'background-color: #eee;':'')+"' "+(rdata.status?'disabled':'')+"><option value='all'>"+lan.site.all_site+"</option>"+domains+"</select></p>"
-			   +"<p style='margin-bottom:8px'><span style='display: inline-block; width: 90px;'>"+lan.site.target_url+"</span><input class='bt-input-text' type='text' name='toUrl' value='"+rdata.url+"' style='margin-left: 5px;width: 380px;height: 30px;margin-right:10px;"+(rdata.status?'background-color: #eee;':'')+"' placeholder='"+lan.site.eg_url+"' "+isRead+" /></p>"
-			   +'<div class="label-input-group ptb10"><label style="font-weight:normal"><input type="checkbox" name="status" '+status_selected+' onclick="To301(\''+siteName+'\',1)" />'+lan.site.enable_301+'</label></div>'
-			   +'<ul class="help-info-text c7 ptb10">'
-			   +'<li>'+lan.site.to301_help_1+'</li>'
-			   +'<li>'+lan.site.to301_help_2+'</li>'
-			   +'</ul>'
-			   +"</div>";
-			$("#webedit-con").html(body);
+		layer.open({
+			type: 1,
+			skin: 'demo-class',
+			area: '650px',
+			title: type == 1 ? '创建重定向' : '修改重定向[' + obj.redirectname + ']',
+			closeBtn: 2,
+			shift: 5,
+			shadeClose: false,
+			content: "<form id='form_redirect' class='divtable pd20' style='padding-bottom: 60px'>" +
+				"<div class='line' style='overflow:hidden;height: 40px;'>" +
+				"<div style='display: inline-block;'>" +
+				"<span class='tname' style='margin-left:10px;position: relative;top: -5px;'>保留URI参数</span>" +
+				"<input class='btswitch btswitch-ios' id='holdpath' type='checkbox' name='holdpath' " + (obj.holdpath == 1 ? 'checked="checked"' : '') + " /><label class='btswitch-btn phpmyadmin-btn' for='holdpath' style='float:left'></label>" +
+				"</div>" +
+				"</div>" +
+				"<div class='line' style='clear:both;display:none;'>" +
+				"<span class='tname'>重定向名称</span>" +
+				"<div class='info-r  ml0'><input name='redirectname' class='bt-input-text mr5' " + (type == 1 ? '' : 'disabled="disabled"') + " type='text' style='width:300px' value='" + obj.redirectname + "'></div>" +
+				"</div>" +
+				"<div class='line' style='clear:both;'>" +
+				"<span class='tname'>重定向类型</span>" +
+				"<div class='info-r  ml0'>" +
+				"<select class='bt-input-text mr5' name='type' style='width:100px'><option value='domain' " + (obj.domainorpath == 'domain' ? 'selected ="selected"' : "") + ">域名</option><option value='path'  " + (obj.domainorpath == 'path' ? 'selected ="selected"' : "") + ">路径</option></select>" +
+				"<span class='mlr15'>重定向方式</span>" +
+				"<select class='bt-input-text ml10' name='redirecttype' style='width:100px'><option value='301' " + (obj.redirecttype == '301' ? 'selected ="selected"' : "") + " >301</option><option value='302' " + (obj.redirecttype == '302' ? 'selected ="selected"' : "") + ">302</option></select></div>" +
+				"</div>" +
+				"<div class='line redirectdomain'>" +
+				"<span class='tname'>重定向源</span>" +
+				"<div class='info-r  ml0'>" +
+				"<input  name='redirectpath' placeholder='域名或路径' class='bt-input-text mr5' type='text' style='width:200px;float: left;margin-right:0px' value='" + obj.redirectpath + "'>" +
+				"<span class='tname' style='width:90px'>目标URL</span>" +
+				"<input  name='tourl' class='bt-input-text mr5' type='text' style='width:200px' value='" + obj.tourl + "'>" +
+				"</div>" +
+				"</div>" +
+				"</div>" +
+				"<div class='bt-form-submit-btn'><button type='button' class='btn btn-sm btn-danger btn-colse-prosy'>关闭</button><button type='button' class='btn btn-sm btn-success btn-submit-redirect'>" + (type == 1 ? " 提交" : "保存") + "</button></div>" +
+				"</form>"
+		});
+		setTimeout(function() {
+			$('.btn-colse-prosy').click(function() {
+				form_redirect.close();
+			});
+			$('.btn-submit-redirect').click(function() {
+				var holdpath = $('[name="holdpath"]').prop('checked') ? 1 : 0;
+				var redirectname = $('[name="redirectname"]').val();
+				var redirecttype = $('[name="redirecttype"]').val();
+				var type = $('[name="type"]').val();
+				var redirectpath = $('[name="redirectpath"]').val();
+				var redirectdomain = JSON.stringify($('.selectpicker').val() || []);
+				var tourl = $(domainorpath == 'path' ? '[name="tourl1"]' : '[name="tourl"]').val();
+				console.log(type, holdpath, redirectname, redirecttype, domainorpath, redirectpath, redirectdomain, tourl);
+			});
+		}, 100);
+	}
+
+	// 设置 提交
+
+	// 设置 更新 提交
+
+	var body = '<div id="redirect_list" class="bt_table">\
+					<div style="padding-bottom: 10px">\
+						<button type="button" title="添加重定向" class="btn btn-success btn-sm mr5" onclick="to301(\''+siteName+'\',1)" ><span>添加重定向</span></button>\
+					</div>\
+					<div class="divtable" style="max-height:200px;">\
+						<table class="table table-hover" >\
+							<thead style="position: relative;z-index: 1;">\
+								<tr>\
+									<th><span data-index="1"><span>重定向类型</span></span></th>\
+									<th><span data-index="2"><span>重定向方式</span></span></th>\
+									<th><span data-index="3"><span>保留URL参数</span></span></th>\
+									<th><span data-index="4"><span>操作</span></span></th>\
+								</tr>\
+							</thead>\
+							<tbody id="md-301-body">\
+							</tbody>\
+						</table>\
+					</div>\
+				</div>';
+	$("#webedit-con").html(body);
+	
+	var loadT = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});
+
+	$.post('/site/get_redirect_status','siteName='+siteName, function(response) {
+		layer.close(loadT);
+		$("#md-301-loading").remove();
+		let res = JSON.parse(response);
+		if (res.status === true) {
+			let data = res.data.result;
+			data.forEach(function(item){
+				lan_r_type = item.r_type == 0 ? "永久重定向" : "临时重定向"
+				let tmp = '<tr>\
+					<td><span data-index="1"><span>'+item.from+'</span></span></td>\
+					<td><span data-index="2"><span>'+lan_r_type+'</span></span></td>\
+					<td><span data-index="2"><span>'+lan_r_type+'</span></span></td>\
+					<td><span data-index="4">编辑</span></td>\
+				</tr>';
+				$("#md-301-body").append(tmp);
+			})
+		} else {
+			layer.msg(res.msg, {icon:2});
+		}
 	});
 }
-
 
 //文件验证
 // function file_check(){
@@ -2269,12 +2347,3 @@ function tryRestartPHP(siteName){
 	    },'json');
 	},'json');
 }
-
-
-
-
-
-
-
-
-
