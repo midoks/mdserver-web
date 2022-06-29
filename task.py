@@ -70,16 +70,6 @@ def restartMw():
     mw.execShell(cmd)
 
 
-class MyBad():
-    _msg = None
-
-    def __init__(self, msg):
-        self._msg = msg
-
-    def __repr__(self):
-        return self._msg
-
-
 def execShell(cmdstring, cwd=None, timeout=None, shell=True):
     try:
         global logPath
@@ -145,42 +135,47 @@ def writeLogs(logMsg):
         pass
 
 
-def startTask():
-    # 任务队列
+def runTask():
     global isTask
     try:
+        if os.path.exists(isTask):
+            sql = db.Sql()
+            sql.table('tasks').where(
+                "status=?", ('-1',)).setField('status', '0')
+            taskArr = sql.table('tasks').where("status=?", ('0',)).field(
+                'id,type,execstr').order("id asc").select()
+
+            for value in taskArr:
+                start = int(time.time())
+                if not sql.table('tasks').where("id=?", (value['id'],)).count():
+                    continue
+                sql.table('tasks').where("id=?", (value['id'],)).save(
+                    'status,start', ('-1', start))
+                if value['type'] == 'download':
+                    argv = value['execstr'].split('|mw|')
+                    downloadFile(argv[0], argv[1])
+                elif value['type'] == 'execshell':
+                    data = execShell(value['execstr'])
+                end = int(time.time())
+                sql.table('tasks').where("id=?", (value['id'],)).save(
+                    'status,end', ('1', end))
+
+            if(sql.table('tasks').where("status=?", ('0')).count() < 1):
+                os.system('rm -f ' + isTask)
+    except Exception as e:
+        print(str(e))
+
+    # 站点过期检查
+    siteEdate()
+
+
+def startTask():
+    # 任务队列
+    try:
         while True:
-            try:
-                if os.path.exists(isTask):
-                    # print "run --- !"
-                    sql = db.Sql()
-                    sql.table('tasks').where(
-                        "status=?", ('-1',)).setField('status', '0')
-                    taskArr = sql.table('tasks').where("status=?", ('0',)).field(
-                        'id,type,execstr').order("id asc").select()
-                    # print sql
-                    for value in taskArr:
-                        # print value
-                        start = int(time.time())
-                        if not sql.table('tasks').where("id=?", (value['id'],)).count():
-                            continue
-                        sql.table('tasks').where("id=?", (value['id'],)).save(
-                            'status,start', ('-1', start))
-                        if value['type'] == 'download':
-                            argv = value['execstr'].split('|mw|')
-                            downloadFile(argv[0], argv[1])
-                        elif value['type'] == 'execshell':
-                            execShell(value['execstr'])
-                        end = int(time.time())
-                        sql.table('tasks').where("id=?", (value['id'],)).save(
-                            'status,end', ('1', end))
-                        # if(sql.table('tasks').where("status=?", ('0')).count() < 1):
-                        #     os.system('rm -f ' + isTask)
-            except:
-                pass
-            # siteEdate()
+            runTask()
             time.sleep(2)
-    except:
+    except Exception as e:
         time.sleep(60)
         startTask()
 
@@ -197,18 +192,14 @@ def siteEdate():
         if oldEdate == mEdate:
             return False
         edateSites = mw.M('sites').where('edate>? AND edate<? AND (status=? OR status=?)',
-                                         ('0000-00-00', mEdate, 1, u'正在运行')).field('id,name').select()
-        import panelSite
-        siteObject = panelSite.panelSite()
+                                         ('0000-00-00', mEdate, 1, '正在运行')).field('id,name').select()
+        import site_api
         for site in edateSites:
-            get = MyBad('')
-            get.id = site['id']
-            get.name = site['name']
-            siteObject.SiteStop(get)
+            site_api.site_api().stop(site['id'], site['name'])
         oldEdate = mEdate
         mw.writeFile('data/edate.pl', mEdate)
-    except:
-        pass
+    except Exception as e:
+        print(str(e))
 
 
 def systemTask():
@@ -311,14 +302,14 @@ def systemTask():
                     sql.table('cpuio').where("addtime<?", (deltime,)).delete()
 
                     data = (networkInfo['up'] / 5, networkInfo['down'] / 5, networkInfo['upTotal'], networkInfo[
-                            'downTotal'], networkInfo['downPackets'], networkInfo['upPackets'], addtime)
+                        'downTotal'], networkInfo['downPackets'], networkInfo['upPackets'], addtime)
                     sql.table('network').add(
                         'up,down,total_up,total_down,down_packets,up_packets,addtime', data)
                     sql.table('network').where(
                         "addtime<?", (deltime,)).delete()
                     # if os.path.exists('/proc/diskstats'):
                     data = (diskInfo['read_count'], diskInfo['write_count'], diskInfo['read_bytes'], diskInfo[
-                            'write_bytes'], diskInfo['read_time'], diskInfo['write_time'], addtime)
+                        'write_bytes'], diskInfo['read_time'], diskInfo['write_time'], addtime)
                     sql.table('diskio').add(
                         'read_count,write_count,read_bytes,write_bytes,read_time,write_time,addtime', data)
                     sql.table('diskio').where(

@@ -128,8 +128,11 @@ class site_api:
     def stopApi(self):
         mid = request.form.get('id', '')
         name = request.form.get('name', '')
-        path = self.setupPath + '/stop'
 
+        return self.stop(self, mid, name)
+
+    def stop(self, mid, name):
+        path = self.setupPath + '/stop'
         if not os.path.exists(path):
             os.makedirs(path)
             mw.writeFile(path + '/index.html',
