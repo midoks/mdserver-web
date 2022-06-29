@@ -329,8 +329,16 @@ shell = None
 
 
 def create_rsa():
-    mw.execShell("rm -f /root/.ssh/*")
-    mw.execShell('ssh-keygen -q -t rsa -P "" -f /root/.ssh/id_rsa')
+    # mw.execShell("rm -f /root/.ssh/*")
+    if not os.path.exists('/root/.ssh/authorized_keys'):
+        mw.execShell('touch /root/.ssh/authorized_keys')
+
+    if not os.path.exists('/root/.ssh/id_rsa.pub') and os.path.exists('/root/.ssh/id_rsa'):
+        mw.execShell(
+            'echo y | ssh-keygen -q -t rsa -P "" -f /root/.ssh/id_rsa')
+    else:
+        mw.execShell('ssh-keygen -q -t rsa -P "" -f /root/.ssh/id_rsa')
+
     mw.execShell('cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys')
     mw.execShell('chmod 600 /root/.ssh/authorized_keys')
 
@@ -362,7 +370,7 @@ def connect_ssh():
     # print 'connect_ssh ....'
     # clear_ssh()
     global shell, ssh
-    if not os.path.exists('/root/.ssh/authorized_keys') or not os.path.exists('/root/.ssh/id_rsa') or not os.path.exists('/root/.ssh/id_rsa.pub'):
+    if not os.path.exists('/root/.ssh/id_rsa') or not os.path.exists('/root/.ssh/id_rsa.pub'):
         create_rsa()
 
     # 检查是否写入authorized_keys
