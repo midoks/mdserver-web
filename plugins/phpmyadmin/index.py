@@ -211,11 +211,11 @@ def setPmaPort():
 
 
 def accessLog():
-    return '/www/server/phpmyadmin/access.log'
+    return getServerDir() + '/phpmyadmin/access.log'
 
 
 def errorLog():
-    return '/www/server/phpmyadmin/error.log'
+    return getServerDir() + '/phpmyadmin/error.log'
 
 
 def Version():
