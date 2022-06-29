@@ -29,16 +29,31 @@ Install_swap()
 	fi 
 
 	echo '安装完成' > $install_tmp
+
+	cd ${rootPath} && python3 ${rootPath}/plugins/swap/index.py start
+	cd ${rootPath} && python3 ${rootPath}/plugins/swap/index.py initd_install
 }
 
 Uninstall_swap()
 {
 	swapoff $serverPath/swap/swapfile
-	rm -rf $serverPath/swap
 
 	if [ -f /lib/systemd/system/swap.service ];then
 		rm -rf /lib/systemd/system/swap.service
 	fi
+
+	if [ -f /lib/systemd/system/swap.service ];then
+		systemctl stop swap
+		systemctl disable swap
+		rm -rf /lib/systemd/system/swap.service
+		systemctl daemon-reload
+	fi
+
+	if [ -f $serverPath/swap/initd/swap ];then
+		$serverPath/swap/initd/swap stop
+	fi
+
+	rm -rf $serverPath/swap
 	
 	echo "Uninstall_swap" > $install_tmp
 }
