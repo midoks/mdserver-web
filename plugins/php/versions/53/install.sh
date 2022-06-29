@@ -53,7 +53,7 @@ else
 fi
 
 
-if [ ! -d $serverPath/php/53 ];then
+if [ ! -d $serverPath/php/53/bin ];then
 	cd $sourcePath/php/php${PHP_VER} && ./configure \
 	--prefix=$serverPath/php/53 \
 	--exec-prefix=$serverPath/php/53 \
@@ -99,7 +99,7 @@ if [  -f $serverPath/php/53/sbin/php-fpm.dSYM ];then
 fi
 
 
-if [ ! -d $serverPath/php/53/lib/php/extensions/no-debug-non-zts-20090626 ]; then
+if [ -d $serverPath/php/53 ] && [ ! -d $serverPath/php/53/lib/php/extensions/no-debug-non-zts-20090626 ]; then
 	mkdir -p $serverPath/php/53/lib/php/extensions/no-debug-non-zts-20090626
 fi
 
