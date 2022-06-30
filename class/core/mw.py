@@ -89,8 +89,8 @@ def setBackupDir(bdir):
 
 
 def triggerTask():
-    isTask = mw.getRunDir() + '/tmp/panelTask.pl'
-    mw.writeFile(isTask, 'True')
+    isTask = getRunDir() + '/tmp/panelTask.pl'
+    writeFile(isTask, 'True')
 
 
 def getOs():
