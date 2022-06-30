@@ -15,7 +15,7 @@ actionType=$1
 version=$2
 
 LIBNAME=swoole
-LIBV=4.5.2
+LIBV=4.8.10
 
 NON_ZTS_FILENAME=`ls $serverPath/php/${version}/lib/php/extensions | grep no-debug-non-zts`
 extFile=$serverPath/php/${version}/lib/php/extensions/${NON_ZTS_FILENAME}/${LIBNAME}.so
