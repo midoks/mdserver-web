@@ -10,6 +10,8 @@ rootPath=$(dirname "$rootPath")
 
 # echo $rootPath
 
+# cd /www/server/mdserver-web/plugins/php/lib && /bin/bash libmemcached.sh
+
 SERVER_ROOT=$rootPath/lib
 SOURCE_ROOT=$rootPath/source/lib
 
