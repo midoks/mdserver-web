@@ -61,8 +61,8 @@ Install_mysql()
 		-DDEFAULT_CHARSET=utf8mb4 \
 		-DCMAKE_C_COMPILER=/usr/bin/gcc \
 		-DCMAKE_CXX_COMPILER=/usr/bin/g++ \
-		-DDEFAULT_COLLATION=utf8mb4_general_ci \
-		&& make ${MAKEJN:--j2} && make install && make clean
+		-DDEFAULT_COLLATION=utf8mb4_general_ci
+		make clean && make && make install && make clean
 
 
 		if [ -d $serverPath/mysql ];then
