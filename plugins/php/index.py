@@ -678,6 +678,8 @@ def installLib(version):
     insert_info = (None, '安装[' + name + '-' + version + ']',
                    'execshell', '0', rettime, execstr)
     mw.M('tasks').add('id,name,type,status,addtime,execstr', insert_info)
+
+    mw.triggerTask()
     return mw.returnJson(True, '已将下载任务添加到队列!')
 
 
