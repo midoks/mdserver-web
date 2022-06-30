@@ -64,18 +64,6 @@ cd /www/server/mdserver-web/scripts && bash lib.sh
 chmod 755 /www/server/mdserver-web/data
 
 
-pip3 install -U --force-reinstall --no-binary :all: gevent
-
-if [ ! -f /www/server/mdserver-web/bin/activate ];then
-    cd /www/server/mdserver-web && python3 -m venv .
-    cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate
-else
-    cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate
-fi
-
-pip3 install -U --force-reinstall --no-binary :all: gevent
-
-
 
 cd /www/server/mdserver-web && ./cli.sh start
 sleep 5

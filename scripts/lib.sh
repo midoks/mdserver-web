@@ -255,6 +255,8 @@ else
     OSNAME='unknow'
 fi
 
+VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
+echo "${OSNAME}:${VERSION_ID}"
 
 # system judge
 if [ "$OSNAME" == "macos" ]; then
@@ -347,7 +349,6 @@ pip3 install --upgrade setuptools
 cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
 
 pip3 install gunicorn==20.1.0
-pip3 install gevent==21.1.2
 pip3 install gevent-websocket==0.10.1
 pip3 install requests==2.20.0
 pip3 install flask-caching==1.10.1
@@ -356,6 +357,10 @@ pip3 install pymongo
 pip3 install psutil
 pip3 install flask-socketio==5.2.0
 pip3 install mysqlclient
+
+if [ "${OSNAME}" == "ubuntu"  ]  && [ "${VERSION_ID}" == "22.04" ];then
+    pip3 install -U --force-reinstall --no-binary :all: gevent
+fi
 
 if [ ! -f /www/server/mdserver-web/bin/activate ];then
     cd /www/server/mdserver-web && python3 -m venv .
@@ -369,7 +374,6 @@ pip3 install --upgrade setuptools
 pip3 install -r /www/server/mdserver-web/requirements.txt
 
 pip3 install gunicorn==20.1.0
-pip3 install gevent==21.1.2
 pip3 install gevent-websocket==0.10.1
 pip3 install requests==2.20.0
 pip3 install flask-caching==1.10.1
@@ -379,7 +383,9 @@ pip3 install psutil
 pip3 install flask-socketio==5.2.0
 pip3 install mysqlclient
 
-
+if [ "${OSNAME}" == "ubuntu"  ]  && [ "${VERSION_ID}" == "22.04" ];then
+    pip3 install -U --force-reinstall --no-binary :all: gevent
+fi
 
 ##### common start #####
 
