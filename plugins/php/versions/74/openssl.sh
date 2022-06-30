@@ -52,7 +52,7 @@ Install_lib()
 		
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
-		--with-openssl=${serverPath}/lib/openssl
+		--with-openssl
 		make clean && make && make install && make clean
 		
 	fi
