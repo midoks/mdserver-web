@@ -994,7 +994,7 @@ function webEdit(id,website,endTime,addtime){
 	+"<p onclick=\"setSSL("+id+",'"+website+"')\" title='SSL'>SSL</p>"
 	+"<p onclick=\"phpVersion('"+website+"')\" title='PHP版本'>PHP版本</p>"
 	+"<p onclick=\"to301('"+website+"')\" title='重定向'>重定向</p>"
-	+"<p onclick=\"proxyList('"+website+"')\" title='反向代理'>反向代理</p>"
+	+"<p onclick=\"toProxy('"+website+"')\" title='反向代理'>反向代理</p>"
 	+"<p id='site_"+id+"' onclick=\"security('"+id+"','"+website+"')\" title='防盗链'>防盗链</p>"
 	+"<p id='site_"+id+"' onclick=\"getSiteLogs('"+website+"')\" title='查看站点请求日志'>响应日志</p>";
 	layer.open({
@@ -1367,48 +1367,38 @@ function delDirBind(id,siteId){
 }
 
 //反向代理
-function proxyList(siteName,type){
-	if(type == 1){
-		type = $("input[name='status']").attr('checked')?'0':'1';
-		toUrl = encodeURIComponent($("input[name='toUrl']").val());
-		toDomain = encodeURIComponent($("input[name='toDomain']").val());
-		var sub1 = encodeURIComponent($("input[name='sub1']").val());
-		var sub2 = encodeURIComponent($("input[name='sub2']").val());
-		var data = 'name='+siteName+'&type='+type+'&proxyUrl='+toUrl+'&toDomain=' + toDomain + '&sub1=' + sub1 + '&sub2=' + sub2;
-		var loadT = layer.msg(lan.public.the,{icon:16,time:0,shade: [0.3, '#000']});
-		$.post('/site?action=SetProxy',data,function(rdata){
-			layer.close(loadT);
-			if(rdata.status) {
-				Proxy(siteName);
-			}else{
-				$("input[name='status']").attr('checked',false)
-			}
-			layer.msg(rdata.msg,{icon:rdata.status?1:2});
-		});
+function toProxy(siteName, type, obj) {
+	if (type == 1) {
+
 		return;
 	}
-	var loadT = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});
-	$.post('/site?action=GetProxy','name='+siteName,function(rdata){
-		layer.close(loadT);
-		if(rdata.proxyUrl == null) rdata.proxyUrl = '';
-		var status_selected = rdata.status?'checked':'';
-		var disabled = rdata.status?'disabled':'';
-		var body = "<div>"
-			   +"<p style='margin-bottom:8px'><span style='display: inline-block; width: 104px;'>"+lan.site.proxy_url+"</span><input "+disabled+" class='bt-input-text' type='text' name='toUrl' value='"+rdata.proxyUrl+"' style='margin-left: 5px;width: 380px;height: 30px;margin-right:10px;' placeholder='"+lan.site.proxy_url_info+"' /></p>"
-			   +"<p style='margin-bottom:8px'><span style='display: inline-block; width: 104px;'>"+lan.site.proxy_domain+"</span><input "+disabled+" class='bt-input-text' type='text' name='toDomain' value='"+rdata.toDomain+"' style='margin-left: 5px;width: 380px;height: 30px;margin-right:10px;' placeholder='"+lan.site.proxy_domian_info+"' /></p>"
-			   +"<p style='margin-bottom:8px'><span style='display: inline-block; width: 104px;'>"+lan.site.con_rep+"</span><input "+disabled+" class='bt-input-text' type='text' name='sub1' value='"+rdata.sub1+"' style='margin-left: 5px;width: 182px;height: 30px;margin-right:10px;' placeholder='"+lan.site.con_rep_info+"' />"
-			   +"<input class='bt-input-text' type='text' name='sub2' "+disabled+" value='"+rdata.sub2+"' style='margin-left: 5px;width: 183px;height: 30px;margin-right:10px;' placeholder='"+lan.site.to_con+"' /></p>"
-			   +'<div class="label-input-group ptb10"><label style="font-weight:normal"><input type="checkbox" name="status" '+status_selected+' onclick="Proxy(\''+siteName+'\',1)" />'+lan.site.proxy_enable+'</label><label style="margin-left: 18px;"><input '+(rdata.cache?'checked':'')+' type="checkbox" name="status" onclick="OpenCache(\''+siteName+'\',1)" />'+lan.site.proxy_cache+'</label></div>'
-			   +'<ul class="help-info-text c7 ptb10">'
-			   +'<li>'+lan.site.proxy_help_1+'</li>'
-			   +'<li>'+lan.site.proxy_help_2+'</li>'
-			   +'<li>'+lan.site.proxy_help_3+'</li>'
-			   +'<li>'+lan.site.proxy_help_4+'</li>'
-			   +'<li>'+lan.site.proxy_help_5+'</li>'
-			   +'</ul>'
-			   +"</div>";
-			$("#webedit-con").html(body);
-	});
+
+	var body = '<div id="redirect_list" class="bt_table">\
+					<div style="padding-bottom: 10px">\
+						<button type="button" title="添加反向代理" class="btn btn-success btn-sm mr5" onclick="toProxy(\''+siteName+'\',1)" ><span>添加反向代理</span></button>\
+					</div>\
+					<div class="divtable" style="max-height:200px;">\
+						<table class="table table-hover" >\
+							<thead style="position: relative;z-index: 1;">\
+								<tr>\
+									<th><span data-index="1"><span>代理目录</span></span></th>\
+									<th><span data-index="2"><span>目标地址</span></span></th>\
+									<th><span data-index="3"><span>操作</span></span></th>\
+								</tr>\
+							</thead>\
+							<tbody id="md-301-body">\
+							</tbody>\
+						</table>\
+					</div>\
+				</div>';
+	$("#webedit-con").html(body);
+	var loading = layer.load()
+	$.post("/site/get_proxy_list", {
+		siteName: siteName
+	},function (res) {
+		var res = JSON.parse(res)
+		console.log(res)
+	})
 }
 
 //开启缓存

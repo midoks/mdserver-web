@@ -43,6 +43,11 @@ class site_api:
         if not os.path.exists(self.redirectPath):
             mw.execShell("mkdir -p " + self.redirectPath +
                          " && chmod -R 755 " + self.redirectPath)
+        
+        self.proxyPath = self.setupPath + '/nginx/proxy'
+        if not os.path.exists(self.proxyPath):
+            mw.execShell("mkdir -p " + self.proxyPath +
+                         " && chmod -R 755 " + self.proxyPath)
 
         self.logsPath = mw.getRootDir() + '/wwwlogs'
         # ssl conf
@@ -1337,21 +1342,15 @@ class site_api:
             return mw.returnJson(False, "删除失败!")
         return mw.returnJson(True, "删除成功!")
 
+    # 读取 网站 反向代理列表
     def getProxyListApi(self):
         siteName = request.form.get('siteName', '')
         conf_path = self.getHostConf(siteName)
         old_conf = mw.readFile(conf_path)
-        rep = "(#PROXY-START(\n|.)+#PROXY-END)"
-        url_rep = "proxy_pass (.*);|ProxyPass\s/\s(.*)|Host\s(.*);"
-        host_rep = "Host\s(.*);"
-
-        proxyUrl = self.__read_config(self.__proxyfile)
-        sitename = sitename
-        proxylist = []
-        for i in proxyUrl:
-            if i["sitename"] == sitename:
-                proxylist.append(i)
-        return mw.getJson(proxylist)
+        
+        return mw.returnJson(True, "ok", {
+            "conf_content": old_conf
+        })
 
     def getSiteTypesApi(self):
         # 取网站分类
@@ -1509,6 +1508,12 @@ class site_api:
 
     def getRedirectPath(self, siteName):
         return "{}/{}/".format(self.redirectPath, siteName)
+    
+    def getProxytDataPath(self, siteName):
+        return "{}/{}/data.json".format(self.proxyPath, siteName)
+    
+    def getProxyDataPath(self, siteName):
+        return "{}/{}/data.json".format(self.proxyPath, siteName)
 
     def getDirBindRewrite(self, siteName, dirname):
         return self.rewritePath + '/' + siteName + '_' + dirname + '.conf'
@@ -1808,6 +1813,7 @@ class site_api:
         content = content.replace('{$PHPVER}', self.phpVersion)
         content = content.replace('{$OR_REWRITE}', self.rewritePath)
         content = content.replace('{$OR_REDIRECT}', self.redirectPath)
+        content = content.replace('{$OR_PROXY}', self.proxyPath)
 
         logsPath = mw.getLogsDir()
         content = content.replace('{$LOGPATH}', logsPath)
