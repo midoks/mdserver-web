@@ -6,6 +6,7 @@ DIR=$(cd "$(dirname "$0")"; pwd)
 # cd /www/server/mdserver-web/plugins/php && bash all_test.sh
 
 # cd /www/server/mdserver-web/plugins/php/versions/71/ && bash openssl.sh install 71
+# cd /www/server/mdserver-web/plugins/php/versions/81/ && bash imagemagick.sh install 81
 
 PHP_VER=53
 echo "php${PHP_VER} -- start"

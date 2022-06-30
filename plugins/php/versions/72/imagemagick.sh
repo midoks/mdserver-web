@@ -12,7 +12,7 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
 LIBNAME=imagick
-LIBV=3.6.0
+LIBV=3.7.0
 sysName=`uname`
 actionType=$1
 version=$2

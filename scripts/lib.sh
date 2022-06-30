@@ -283,7 +283,9 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
 
     apt install -y libpcre3 libpcre3-dev 
     apt install -y openssl
-    apt install -y imagemagick
+    apt install -y libmemcached-dev
+    #apt install -y imagemagick libmagickwand-dev
+    # apt install -y php-imagick php-imagick-all-dev
 
     apt install -y libxml2 libxml2-dev libbz2-dev libmcrypt-dev libpspell-dev librecode-dev
     apt install -y libgmp-dev libgmp3-dev libreadline-dev libxpm-dev
