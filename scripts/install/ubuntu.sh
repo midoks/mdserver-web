@@ -66,9 +66,22 @@ chmod 755 /www/server/mdserver-web/data
 
 
 cd /www/server/mdserver-web && ./cli.sh start
-sleep 5
+isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`
+n=0
+while [[ ! -f /etc/init.d/mw ]];
+do
+    echo -e ".\c"
+    sleep 1
+    let n+=1
+    if [ $n -gt 20 ];then
+    	echo -e "start mw fail"
+        exit 1
+    fi
+done
 
-cd /www/server/mdserver-web && ./cli.sh stop
-cd /www/server/mdserver-web && ./scripts/init.d/mw default
+cd /www/server/mdserver-web && /etc/init.d/mw stop
 cd /www/server/mdserver-web && /etc/init.d/mw start
+cd /www/server/mdserver-web && /etc/init.d/mw default
+
+
 

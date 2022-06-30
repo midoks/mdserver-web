@@ -18,7 +18,6 @@ mw_start(){
 
 
 mw_start_debug(){
-	
 	python3 task.py >> $DIR/logs/task.log 2>&1 &
 	gunicorn -b :7200 -k gevent -w 1 app:app
 }
@@ -36,7 +35,13 @@ mw_stop()
 	do
 	    kill -9 $i
 	done
-	ps -ef|grep task.py |grep -v grep|awk '{print $2}'|xargs kill -9
+
+	pids=`ps -ef|grep task.py | grep -v grep |awk '{print $2}'`
+	arr=($pids)
+    for p in ${arr[@]}
+    do
+    	kill -9 $p
+    done
 }
 
 case "$1" in
