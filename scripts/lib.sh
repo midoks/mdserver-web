@@ -360,9 +360,9 @@ pip3 install psutil
 pip3 install flask-socketio==5.2.0
 pip3 install mysqlclient
 
-if [ "${OSNAME}" == "ubuntu"  ]  && [ "${VERSION_ID}" == "22.04" ];then
-    pip3 install -U --force-reinstall --no-binary :all: gevent
-fi
+# if [ "${OSNAME}" == "ubuntu"  ]  && [ "${VERSION_ID}" == "22.04" ];then
+#     pip3 install -U --force-reinstall --no-binary :all: gevent
+# fi
 
 if [ ! -f /www/server/mdserver-web/bin/activate ];then
     cd /www/server/mdserver-web && python3 -m venv .
@@ -384,9 +384,9 @@ pip3 install psutil
 pip3 install flask-socketio==5.2.0
 pip3 install mysqlclient
 
-if [ "${OSNAME}" == "ubuntu"  ]  && [ "${VERSION_ID}" == "22.04" ];then
-    pip3 install -U --force-reinstall --no-binary :all: gevent
-fi
+# if [ "${OSNAME}" == "ubuntu"  ]  && [ "${VERSION_ID}" == "22.04" ];then
+#     pip3 install -U --force-reinstall --no-binary :all: gevent
+# fi
 
 ##### common start #####
 

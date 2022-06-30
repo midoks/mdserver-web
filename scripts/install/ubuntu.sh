@@ -64,6 +64,25 @@ cd /www/server/mdserver-web/scripts && bash lib.sh
 chmod 755 /www/server/mdserver-web/data
 
 
+VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
+
+
+if [ "${VERSION_ID}" == "22.04" ];then
+    pip3 install -U --force-reinstall --no-binary :all: gevent
+fi
+
+if [ ! -f /www/server/mdserver-web/bin/activate ];then
+    cd /www/server/mdserver-web && python3 -m venv .
+    cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate
+else
+    cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate
+fi
+
+if [ "${VERSION_ID}" == "22.04" ];then
+    pip3 install -U --force-reinstall --no-binary :all: gevent
+fi
+
+
 
 cd /www/server/mdserver-web && ./cli.sh start
 isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`
