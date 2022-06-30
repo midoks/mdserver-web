@@ -295,6 +295,7 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     apt install -y libjpeg62-turbo-dev
     apt install -y libfreetype6-dev
     apt install -y libevent-dev libncurses5-dev libldap2-dev
+    apt install -y libzip-dev
 
     apt install -y libicu-dev
 
