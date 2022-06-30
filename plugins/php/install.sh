@@ -43,7 +43,7 @@ fi
 
 cd ${curPath} && sh -x $curPath/versions/$2/install.sh $1
 
-if [ "${action}" == "install" ];then
+if [ "${action}" == "install" ] && [ -d ${serverPath}/php/${type} ];then
 	#初始化 
 	cd ${rootPath} && python3 ${rootPath}/plugins/php/index.py start ${type}
 	cd ${rootPath} && python3 ${rootPath}/plugins/php/index.py initd_install ${type}
