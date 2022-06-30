@@ -36,6 +36,8 @@ Install_lib()
 		return
 	fi
 	
+	cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash openssl.sh
+
 	if [ ! -f "$extFile" ];then
 
 		if [ ! -d $sourcePath/php${version}/ext ];then
@@ -49,7 +51,8 @@ Install_lib()
 		fi
 		
 		$serverPath/php/$version/bin/phpize
-		./configure --with-php-config=$serverPath/php/$version/bin/php-config
+		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
+		--with-openssl=${serverPath}/lib/openssl
 		make clean && make && make install && make clean
 		
 	fi
