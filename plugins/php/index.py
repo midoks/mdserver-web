@@ -619,14 +619,12 @@ def getPhpinfo(v):
     checkPhpinfoFile(v)
     sPath = mw.getRootDir() + '/phpinfo/' + v
 
-    # mw.execShell("rm -rf " + mw.getRootDir() + '/phpinfo')
+    mw.execShell("rm -rf " + mw.getRootDir() + '/phpinfo')
     mw.execShell("mkdir -p " + sPath)
     mw.writeFile(sPath + '/phpinfo.php', '<?php phpinfo(); ?>')
     url = 'http://127.0.0.1/' + v + '/phpinfo.php'
     phpinfo = mw.httpGet(url)
-    # os.system("rm -rf " + mw.getRootDir() + '/phpinfo')
-
-    print(mw.getRootDir() + '/phpinfo', sPath, url)
+    os.system("rm -rf " + mw.getRootDir() + '/phpinfo')
     return phpinfo
 
 
