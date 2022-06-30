@@ -20,19 +20,19 @@ done
 echo "php${PHP_VER} -- end"
 
 
-
 PHP_VER_LIST=(54 55 56 71 72 73 74 80 81)
 # PHP_VER_LIST=(81)
 for PHP_VER in ${PHP_VER_LIST[@]}; do
 	echo "php${PHP_VER} -- start"
 	if [ -d  /www/server/php/${PHP_VER} ];then
 		cmd_ext=$(ls -l $DIR/versions/$PHP_VER/ |awk '{print $9}')
-		for ii in cmd_ext
+		for ii in $cmd_ext
 		do
+			echo "${ii}"
 			if [ "install.sh" == "$ii" ];then
 				echo '' > /tmp/t.log
 			else
-				cd $DIR/versions/$PHP_VER && bash $ii install ${PHP_VER}
+				cd $DIR/versions/$PHP_VER/ && bash $ii install ${PHP_VER}
 			fi 
 		done
 	fi
