@@ -22,6 +22,7 @@ NON_ZTS_FILENAME=`ls $serverPath/php/${version}/lib/php/extensions | grep no-deb
 extDir=$serverPath/php/${version}/lib/php/extensions/${NON_ZTS_FILENAME}
 extFile=${extDir}/${LIBNAME}.so
 
+if [ "$sysName" == "Darwin" ];then
 	BAK='_bak'
 else
 	BAK=''
