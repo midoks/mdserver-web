@@ -49,6 +49,8 @@ Install_openresty()
 
 	if [ -d $serverPath/openresty ];then
 		echo "${VERSION}" > $serverPath/openresty/version.pl
+
+		mkdir -p $serverPath/web_conf/php/conf
 		echo "" > $serverPath/web_conf/php/conf/enable-php-00.conf
 
 		#初始化 

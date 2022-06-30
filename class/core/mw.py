@@ -88,6 +88,11 @@ def setBackupDir(bdir):
     return writeFile(file, bdir)
 
 
+def triggerTask():
+    isTask = getRunDir() + '/tmp/panelTask.pl'
+    writeFile(isTask, 'True')
+
+
 def getOs():
     return sys.platform
 

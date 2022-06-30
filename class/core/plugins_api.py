@@ -125,8 +125,7 @@ class plugins_api:
         mw.M('tasks').add('id,name,type,status,addtime, execstr', taskAdd)
 
         # 任务执行相关
-        isTask = mw.getRootDir() + '/tmp/panelTask.pl'
-        mw.writeFile(isTask, 'True')
+        mw.triggerTask()
         return mw.returnJson(True, '已将安装任务添加到队列!')
 
     def uninstallOldApi(self):

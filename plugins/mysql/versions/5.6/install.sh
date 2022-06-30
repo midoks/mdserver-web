@@ -61,14 +61,15 @@ Install_mysql()
 		-DDEFAULT_CHARSET=utf8mb4 \
 		-DCMAKE_C_COMPILER=/usr/bin/gcc \
 		-DCMAKE_CXX_COMPILER=/usr/bin/g++ \
-		-DDEFAULT_COLLATION=utf8mb4_general_ci \
-		&& make ${MAKEJN:--j2} && make install && make clean
+		-DDEFAULT_COLLATION=utf8mb4_general_ci
+		make clean && make && make install && make clean
 
 
 		if [ -d $serverPath/mysql ];then
 			echo '5.6' > $serverPath/mysql/version.pl
 			echo '安装完成' > $install_tmp
 		else
+			rm -rf ${mysqlDir}/mysql-5.6.50
 			echo '安装失败' > $install_tmp
 		fi
 	fi
