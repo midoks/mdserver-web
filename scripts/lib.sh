@@ -357,6 +357,10 @@ pip3 install psutil
 pip3 install flask-socketio==5.2.0
 pip3 install mysqlclient
 
+if [ "$OSNAME" == "ubuntu"  ];then
+    pip3 install -U --force-reinstall --no-binary :all: gevent
+fi
+
 if [ ! -f /www/server/mdserver-web/bin/activate ];then
     cd /www/server/mdserver-web && python3 -m venv .
     cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate
@@ -378,6 +382,11 @@ pip3 install pymongo
 pip3 install psutil
 pip3 install flask-socketio==5.2.0
 pip3 install mysqlclient
+
+
+if [ "$OSNAME" == "ubuntu" ];then
+    pip3 install -U --force-reinstall --no-binary :all: gevent
+fi
 
 
 
