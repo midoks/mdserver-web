@@ -605,30 +605,34 @@ def setDisableFunc(version):
 
 
 def checkPhpinfoFile(v):
-    if mw.isInstalledWeb():
-        sdir = mw.getServerDir()
-        dfile = sdir + '/openresty/nginx/conf/php_status/phpinfo_' + v + '.conf'
-        if not os.path.exists(dfile):
-            tpl = getPluginDir() + '/conf/phpinfo.conf'
-            content = mw.readFile(tpl)
-            content = contentReplace(content, v)
-            mw.writeFile(dfile, content)
-            mw.restartWeb()
+    sdir = mw.getServerDir()
+    dfile = sdir + '/web_conf/php/status/phpinfo_' + v + '.conf'
+    if not os.path.exists(dfile):
+        tpl = getPluginDir() + '/conf/phpinfo.conf'
+        content = mw.readFile(tpl)
+        content = contentReplace(content, v)
+        mw.writeFile(dfile, content)
+        mw.restartWeb()
 
 
 def getPhpinfo(v):
     checkPhpinfoFile(v)
     sPath = mw.getRootDir() + '/phpinfo/' + v
-    mw.execShell("rm -rf " + mw.getRootDir() + '/phpinfo')
+
+    # mw.execShell("rm -rf " + mw.getRootDir() + '/phpinfo')
     mw.execShell("mkdir -p " + sPath)
     mw.writeFile(sPath + '/phpinfo.php', '<?php phpinfo(); ?>')
     url = 'http://127.0.0.1/' + v + '/phpinfo.php'
     phpinfo = mw.httpGet(url)
-    os.system("rm -rf " + mw.getRootDir() + '/phpinfo')
+    # os.system("rm -rf " + mw.getRootDir() + '/phpinfo')
+
+    print(mw.getRootDir() + '/phpinfo', sPath, url)
     return phpinfo
 
 
 def get_php_info(args):
+    if not mw.isInstalledWeb():
+        return "openresty is not running!!!"
     return getPhpinfo(args['version'])
 
 
