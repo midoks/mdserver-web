@@ -83,8 +83,11 @@ Install_mysql()
 
 		if [ -d $serverPath/mysql ];then
 			echo '8.0' > $serverPath/mysql/version.pl
+			echo '安装完成' > $install_tmp
+		else
+			rm -rf ${mysqlDir}/mysql-8.0.25
+			echo '安装失败' > $install_tmp
 		fi
-		echo '安装完成' > $install_tmp
 	fi
 }
 
