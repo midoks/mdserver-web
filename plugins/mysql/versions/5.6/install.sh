@@ -38,7 +38,7 @@ Install_mysql()
 	
 
 	if [ ! -f ${mysqlDir}/mysql-5.6.50.tar.gz ];then
-		wget -O ${mysqlDir}/mysql-5.6.50.tar.gz https://cdn.mysql.com/Downloads/MySQL-5.6/mysql-5.6.50.tar.gz
+		wget -O ${mysqlDir}/mysql-5.6.50.tar.gz --tries=3 https://cdn.mysql.com/Downloads/MySQL-5.6/mysql-5.6.50.tar.gz
 	fi
 
 	if [ ! -d ${mysqlDir}/mysql-5.6.50 ];then
