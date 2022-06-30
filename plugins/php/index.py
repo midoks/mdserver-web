@@ -675,7 +675,7 @@ def installLib(version):
         name + '.sh' + ' install ' + version
 
     rettime = time.strftime('%Y-%m-%d %H:%M:%S')
-    insert_info = (None, '安装[' + name + '-' + version + ']',
+    insert_info = (None, '安装[' + name + '-PHP' + version + ']',
                    'execshell', '0', rettime, execstr)
     mw.M('tasks').add('id,name,type,status,addtime,execstr', insert_info)
 
