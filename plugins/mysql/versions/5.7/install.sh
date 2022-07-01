@@ -60,6 +60,16 @@ Install_mysql()
 		 cd ${mysqlDir} && tar -zxvf  ${mysqlDir}/mysql-boost-${VERSION}.tar.gz
 	fi
 
+	OPTIONS=''
+	##check openssl version
+	OPENSSL_VERSION=`openssl version|awk '{print $2}'|awk -F '.' '{print $1}'`
+	if [ "${OPENSSL_VERSION}" -ge "3" ];then
+		#openssl version to high
+		cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash openssl.sh
+		export PKG_CONFIG_PATH=$serverPath/lib/openssl/lib/pkgconfig
+		OPTIONS="-DWITH_SSL=${serverPath}/lib/openssl"
+	fi
+
 	if [ ! -d $serverPath/mysql ];then
 		cd ${mysqlDir}/mysql-${VERSION} && cmake \
 		-DCMAKE_INSTALL_PREFIX=$serverPath/mysql \
@@ -75,6 +85,7 @@ Install_mysql()
 		-DDEFAULT_CHARSET=utf8mb4 \
 		-DDEFAULT_COLLATION=utf8mb4_general_ci \
 		-DDOWNLOAD_BOOST=1 \
+		$OPTIONS \
 		-DCMAKE_C_COMPILER=/usr/bin/gcc \
 		-DCMAKE_CXX_COMPILER=/usr/bin/g++ \
 		-DWITH_BOOST=${mysqlDir}/mysql-${VERSION}/boost/
