@@ -65,7 +65,7 @@ chmod 755 /www/server/mdserver-web/data
 
 
 
-# mysql8.0 在ubuntu需要的库
+# mysql8.0 在ubuntu22需要的库
 apt install -y patchelf
 
 VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
