@@ -1216,7 +1216,7 @@ class site_api:
 
         cnf_301 = '''
     #301-START
-    include %s;
+    include %s/*.conf;
     #301-END
 ''' % (self.getRedirectPath( siteName))
 
@@ -1408,7 +1408,7 @@ class site_api:
 
         proxy_cnf = '''
     #PROXY-START
-    include %s;
+    include %s/*.conf;
     #PROXY-END
 ''' % (self.getProxyPath(siteName))
 
