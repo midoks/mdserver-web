@@ -3,6 +3,7 @@
 import time
 import os
 import sys
+from urllib.parse import urlparse
 import mw
 import re
 import json
@@ -1344,13 +1345,129 @@ class site_api:
 
     # 读取 网站 反向代理列表
     def getProxyListApi(self):
-        siteName = request.form.get('siteName', '')
-        conf_path = self.getHostConf(siteName)
-        old_conf = mw.readFile(conf_path)
+        _siteName = request.form.get('siteName', '')
         
-        return mw.returnJson(True, "ok", {
-            "conf_content": old_conf
+        data_path = self.getProxytDataPath(_siteName)
+        data_content = mw.readFile(data_path)
+        
+        # not exists
+        if data_content == False:
+            mw.execShell("mkdir {}/{}".format(self.proxyPath, _siteName))
+            return mw.returnJson(True, "", {"result": [], "count": 0})
+        
+        try:
+            data = json.loads(data_content)
+        except:
+            mw.execShell("rm -rf {}/{}".format(self.proxyPath, _siteName))
+            return mw.returnJson(True, "", {"result": [], "count": 0})
+
+        return mw.returnJson(True, "ok", {"result": data, "count": len(data)})
+    
+
+     # 设置 网站 反向代理列表
+    def setProxyApi(self):
+        _siteName   = request.form.get('siteName', '')
+        _from     = request.form.get('from', '')
+        _to       = request.form.get('to', '')
+        _host       = request.form.get('host', '')
+        
+        if _siteName == "" or _from == "" or _to == "" or _host == "":
+            return mw.returnJson(False, "必填项不能为空")
+        
+        data_path = self.getProxytDataPath(_siteName)
+        data_content = mw.readFile(
+            data_path) if os.path.exists(data_path) else ""
+        data = json.loads(data_content) if data_content != "" else []
+            
+        rep = "http(s)?\:\/\/([a-zA-Z0-9][-a-zA-Z0-9]{0,62}\.)+([a-zA-Z0-9][a-zA-Z0-9]{0,62})+.?"
+        if not re.match(rep, _to):
+            return mw.returnJson(False, "错误的目标地址!")
+        
+        # get host from url
+        try:
+            if _host == "$host":
+                host_tmp = urlparse(_to)
+                _host = host_tmp.netloc
+        except:
+            return mw.returnJson(False, "错误的目标地址")
+        
+        tpl = """
+#PROXY-START/
+location ~* \.(gif|png|jpg|css|js|woff|woff2)$
+{
+	proxy_pass {to};
+    proxy_set_header Host {host};
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header REMOTE-HOST $remote_addr;
+    expires 12h;
+}
+location ~* ^{from}(.*)$ {
+    proxy_pass {to};
+    proxy_set_header Host {host};
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header REMOTE-HOST $remote_addr;
+    
+    add_header X-Cache $upstream_cache_status;
+    proxy_ignore_headers Set-Cookie Cache-Control expires;
+    add_header Cache-Control no-cache;
+}
+#PROXY-END/
+        """
+        
+        # replace
+        if _from[0] != '/':
+            _from = '/' + _from
+        tpl = tpl.replace("{from}", _from, 999)
+        tpl = tpl.replace("{to}", _to)
+        tpl = tpl.replace("{host}", _host, 999)
+
+        _id = mw.md5("{}+{}+{}".format(_from, _to, _siteName))
+        for item in data:
+            if item["id"] == _id:
+                return mw.returnJson(False, "已存在该规则!")
+            if item["from"] == _from:
+                return mw.returnJson(False, "已存在该规则!")
+        data.append({
+            "from": _from,
+            "to": _to,
+            "host": _host,
+            "id": _id
         })
+        mw.writeFile(data_path, json.dumps(data))
+        mw.writeFile(
+            "{}/{}.conf".format(self.getProxyPath(_siteName), _id), tpl)
+        mw.restartWeb()
+        return mw.returnJson(True, "ok", {
+            "hash": _id
+        })
+    
+    
+    def delProxyApi(self):
+        _siteName = request.form.get("siteName", '')
+        _id = request.form.get("id", '')
+        if _id == '' or _siteName == '':
+            return mw.returnJson(False, "必填项不能为空!")
+
+        try:
+            data_path = self.getProxytDataPath(_siteName)
+            data_content = mw.readFile(
+                data_path) if os.path.exists(data_path) else ""
+            data = json.loads(data_content) if data_content != "" else []
+            for item in data:
+                if item["id"] == _id:
+                    data.remove(item)
+                    break
+            # write database
+            mw.writeFile(data_path, json.dumps(data))
+            # remove conf file
+            mw.execShell(
+                "rm -rf {}/{}.conf".format(self.getProxyPath(_siteName), _id))
+        except:
+            return mw.returnJson(False, "删除失败!")
+        return mw.returnJson(True, "删除成功!")
+
 
     def getSiteTypesApi(self):
         # 取网站分类
@@ -1507,13 +1624,13 @@ class site_api:
         return "{}/{}/data.json".format(self.redirectPath, siteName)
 
     def getRedirectPath(self, siteName):
-        return "{}/{}/".format(self.redirectPath, siteName)
+        return "{}/{}".format(self.redirectPath, siteName)
     
     def getProxytDataPath(self, siteName):
         return "{}/{}/data.json".format(self.proxyPath, siteName)
     
-    def getProxyDataPath(self, siteName):
-        return "{}/{}/data.json".format(self.proxyPath, siteName)
+    def getProxyPath(self, siteName):
+        return "{}/{}".format(self.proxyPath, siteName)
 
     def getDirBindRewrite(self, siteName, dirname):
         return self.rewritePath + '/' + siteName + '_' + dirname + '.conf'
