@@ -1218,7 +1218,7 @@ class site_api:
     #301-START
     include %s;
     #301-END
-''' % (self.getRewriteConf( siteName))
+''' % (self.getRedirectPath( siteName))
 
         cnf_301_source = '''
     #301-START
