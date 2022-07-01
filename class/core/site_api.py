@@ -287,7 +287,7 @@ class site_api:
             domains.append(tmp)
         data['domains'] = domains
         data['email'] = mw.M('users').getField('email')
-        if data['email'] == '287962566@qq.com':
+        if data['email'] == 'midoks@163.com':
             data['email'] = ''
         return mw.returnJson(True, 'OK', data)
 
