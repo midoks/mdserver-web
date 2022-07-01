@@ -50,9 +50,10 @@ Install_lib()
 			mv config0.m4 config.m4
 		fi
 		
+		export PKG_CONFIG_PATH=$serverPath/lib/openssl/lib/pkgconfig
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
-		--with-openssl=${serverPath}/lib/openssl
+		--with-openssl
 		make clean && make && make install && make clean
 		
 	fi
