@@ -44,7 +44,7 @@ class site_api:
         if not os.path.exists(self.redirectPath):
             mw.execShell("mkdir -p " + self.redirectPath +
                          " && chmod -R 755 " + self.redirectPath)
-        
+
         self.proxyPath = self.setupPath + '/nginx/proxy'
         if not os.path.exists(self.proxyPath):
             mw.execShell("mkdir -p " + self.proxyPath +
@@ -1370,15 +1370,15 @@ class site_api:
     # 读取 网站 反向代理列表
     def getProxyListApi(self):
         _siteName = request.form.get('siteName', '')
-        
+
         data_path = self.getProxytDataPath(_siteName)
         data_content = mw.readFile(data_path)
-        
+
         # not exists
         if data_content == False:
             mw.execShell("mkdir {}/{}".format(self.proxyPath, _siteName))
             return mw.returnJson(True, "", {"result": [], "count": 0})
-        
+
         try:
             data = json.loads(data_content)
         except:
@@ -1386,27 +1386,26 @@ class site_api:
             return mw.returnJson(True, "", {"result": [], "count": 0})
 
         return mw.returnJson(True, "ok", {"result": data, "count": len(data)})
-    
 
      # 设置 网站 反向代理列表
     def setProxyApi(self):
-        _siteName   = request.form.get('siteName', '')
-        _from     = request.form.get('from', '')
-        _to       = request.form.get('to', '')
-        _host       = request.form.get('host', '')
-        
+        _siteName = request.form.get('siteName', '')
+        _from = request.form.get('from', '')
+        _to = request.form.get('to', '')
+        _host = request.form.get('host', '')
+
         if _siteName == "" or _from == "" or _to == "" or _host == "":
             return mw.returnJson(False, "必填项不能为空")
-        
+
         data_path = self.getProxytDataPath(_siteName)
         data_content = mw.readFile(
             data_path) if os.path.exists(data_path) else ""
         data = json.loads(data_content) if data_content != "" else []
-            
+
         rep = "http(s)?\:\/\/([a-zA-Z0-9][-a-zA-Z0-9]{0,62}\.)+([a-zA-Z0-9][a-zA-Z0-9]{0,62})+.?"
         if not re.match(rep, _to):
             return mw.returnJson(False, "错误的目标地址!")
-        
+
         # get host from url
         try:
             if _host == "$host":
@@ -1414,7 +1413,7 @@ class site_api:
                 _host = host_tmp.netloc
         except:
             return mw.returnJson(False, "错误的目标地址")
-        
+
         tpl = """
 #PROXY-START/
 location ~* \.(gif|png|jpg|css|js|woff|woff2)$
@@ -1439,7 +1438,7 @@ location ~* ^{from}(.*)$ {
 }
 #PROXY-END/
         """
-        
+
         # replace
         if _from[0] != '/':
             _from = '/' + _from
@@ -1466,8 +1465,7 @@ location ~* ^{from}(.*)$ {
         return mw.returnJson(True, "ok", {
             "hash": _id
         })
-    
-    
+
     def delProxyApi(self):
         _siteName = request.form.get("siteName", '')
         _id = request.form.get("id", '')
@@ -1491,7 +1489,6 @@ location ~* ^{from}(.*)$ {
         except:
             return mw.returnJson(False, "删除失败!")
         return mw.returnJson(True, "删除成功!")
-
 
     def getSiteTypesApi(self):
         # 取网站分类
@@ -1649,10 +1646,10 @@ location ~* ^{from}(.*)$ {
 
     def getRedirectPath(self, siteName):
         return "{}/{}".format(self.redirectPath, siteName)
-    
+
     def getProxytDataPath(self, siteName):
         return "{}/{}/data.json".format(self.proxyPath, siteName)
-    
+
     def getProxyPath(self, siteName):
         return "{}/{}".format(self.proxyPath, siteName)
 
@@ -2016,17 +2013,27 @@ location /{
         errLogPath = mw.getLogsDir() + '/' + webname + '.error.log'
         confFile = self.setupPath + '/nginx/vhost/' + webname + '.conf'
         rewriteFile = self.setupPath + '/nginx/rewrite/' + webname + '.conf'
-        rewriteFile = self.setupPath + '/nginx/pass/' + webname + '.conf'
+        passFile = self.setupPath + '/nginx/pass/' + webname + '.conf'
         keyPath = self.sslDir + webname + '/privkey.pem'
         certPath = self.sslDir + webname + '/fullchain.pem'
         logs = [assLogPath,
                 errLogPath,
                 confFile,
                 rewriteFile,
+                passFile,
                 keyPath,
                 certPath]
         for i in logs:
             mw.deleteFile(i)
+
+        # 重定向目录
+        redirectDir = self.setupPath + '/nginx/redirect/' + webname
+        if os.path.exists(redirectDir):
+            mw.execShell('rm -rf ' + redirectDir)
+        # 代理目录
+        proxyDir = self.setupPath + '/nginx/proxy/' + webname
+        if os.path.exists(proxyDir):
+            mw.execShell('rm -rf ' + proxyDir)
 
     def delete(self, sid, webname, path):
         self.deleteWSLogs(webname)
