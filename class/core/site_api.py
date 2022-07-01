@@ -830,10 +830,15 @@ class site_api:
         if not mw.isInstalledWeb():
             return mw.returnJson(False, '请安装并启动OpenResty服务!')
 
-        path = mw.getServerDir() + '/openresty/init.d/openresty'
-        data = mw.execShell(path + " status")
-        if data[0].strip().find('stopped') != -1:
+        # 这个快点
+        pid = mw.getServerDir() + '/openresty/nginx/logs/nginx.pid'
+        if not os.path.exists(pid):
             return mw.returnJson(False, '请启动OpenResty服务!')
+
+        # path = mw.getServerDir() + '/openresty/init.d/openresty'
+        # data = mw.execShell(path + " status")
+        # if data[0].strip().find('stopped') != -1:
+        #     return mw.returnJson(False, '请启动OpenResty服务!')
 
         # import plugins_api
         # data = plugins_api.plugins_api().run('openresty', 'status')
