@@ -131,8 +131,8 @@ def publicObject(toObject, func, action=None, get=None):
         return mw.getJson(data)
 
 
-@app.route("/test")
-def test():
+@app.route("/debug")
+def debug():
     print(sys.version_info)
     print(session)
     os = mw.getOs()
