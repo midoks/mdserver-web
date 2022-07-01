@@ -163,8 +163,23 @@ function setWebPs(b, e, a) {
 	},'json');
 }
 
+function checkWebStatus(){
+	data = syncPost('/site/check_web_status')
+	if (data.status){
+		return true
+	}
+	layer.msg(data.msg,{icon:0,time:3000,shade: [0.3, "#000"]})
+	return false
+}
+
 //添加站点
 function webAdd(type) {
+	checkPass = checkWebStatus()
+	//未开启openresty,不能继续
+	if (!checkPass){
+		return
+	}
+
 	if (type == 1) {
 		var array;
 		var str="";

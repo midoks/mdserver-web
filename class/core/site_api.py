@@ -823,6 +823,25 @@ class site_api:
         port = request.form.get('port', '')
         return self.add(webname, port, ps, path, version)
 
+    def checkWebStatusApi(self):
+        '''
+        创建站点检查web服务
+        '''
+        if not mw.isInstalledWeb():
+            return mw.returnJson(False, '请安装并启动OpenResty服务!')
+
+        path = mw.getServerDir() + '/openresty/init.d/openresty'
+        data = mw.execShell(path + " status")
+        if data[0].strip().find('stopped') != -1:
+            return mw.returnJson(False, '请启动OpenResty服务!')
+
+        # import plugins_api
+        # data = plugins_api.plugins_api().run('openresty', 'status')
+        # if data[0].strip() == 'stop':
+        #     return mw.returnJson(False, '请启动OpenResty服务!')
+
+        return mw.returnJson(True, 'OK')
+
     def addDomainApi(self):
         isError = mw.checkWebConfig()
         if isError != True:
@@ -1075,7 +1094,7 @@ class site_api:
 
         # self.closeHasPwd(get)
         filename = self.passPath + '/' + siteName + '.pass'
-        print(filename)
+        # print(filename)
         passconf = username + ':' + mw.hasPwd(password)
 
         if siteName == 'phpmyadmin':
