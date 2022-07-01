@@ -163,22 +163,21 @@ function setWebPs(b, e, a) {
 	},'json');
 }
 
-function checkWebStatus(){
-	data = syncPost('/site/check_web_status')
-	if (data.status){
-		return true
-	}
-	layer.msg(data.msg,{icon:0,time:3000,shade: [0.3, "#000"]})
-	return false
+//创建站点前,检查服务是否开启
+function webAdd(type){
+	loading = layer.msg('正在检查是否开启OpenResty服务!',{icon:16,time:0,shade: [0.3, "#000"]})
+	$.post('/site/check_web_status', function(data){
+		layer.close(loading);
+		if (data.status){
+			webAddPage(type)
+		} else {
+			layer.msg(data.msg,{icon:0,time:3000,shade: [0.3, "#000"]})
+		}
+	},'json');
 }
 
 //添加站点
-function webAdd(type) {
-	checkPass = checkWebStatus()
-	//未开启openresty,不能继续
-	if (!checkPass){
-		return
-	}
+function webAddPage(type) {
 
 	if (type == 1) {
 		var array;
