@@ -1216,9 +1216,9 @@ class site_api:
 
         cnf_301 = '''
     #301-START
-    include %s/%s/*.conf
+    include %s
     #301-END
-''' % (self.proxyPath, siteName)
+''' % (self.getRewriteConf( siteName))
 
         cnf_301_source = '''
     #301-START
@@ -1408,9 +1408,9 @@ class site_api:
 
         proxy_cnf = '''
     #PROXY-START
-    include %s/%s/*.conf
+    include %s
     #PROXY-END
-''' % (self.proxyPath, siteName)
+''' % (self.getProxyPath(siteName))
 
         proxy_cnf_source = '''
     #PROXY-START
