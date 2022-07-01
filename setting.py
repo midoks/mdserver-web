@@ -40,7 +40,7 @@ else:
     bind.append('0.0.0.0:%s' % mw_port)
 
 if workers > 2:
-    workers = 1
+    workers = 2
 
 threads = workers * 1
 backlog = 512
