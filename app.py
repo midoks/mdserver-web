@@ -17,12 +17,6 @@ from route import app, socketio
 from gevent.pywsgi import WSGIServer
 from geventwebsocket.handler import WebSocketHandler
 
-
-from pyinstrument import Profiler
-profiler = Profiler()
-profiler.start()
-
-
 try:
     if __name__ == "__main__":
 
