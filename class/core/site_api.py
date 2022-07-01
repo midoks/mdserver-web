@@ -1214,23 +1214,23 @@ class site_api:
         vhost_file = self.vhostPath + '/' + siteName + '.conf'
         content = mw.readFile(vhost_file)
 
-        proxy_cnf = '''
+        cnf_301 = '''
     #301-START
     include %s/%s/*.conf
     #301-END
 ''' % (self.proxyPath, siteName)
 
-        proxy_cnf_source = '''
+        cnf_301_source = '''
     #301-START
 '''
-
+        # print('operateRedirectConf', content.find('#301-END'))
         if content.find('#301-END') != -1:
             if method == 'stop':
                 rep = '#301-START(\n|.){1,500}#301-END'
                 content = re.sub(rep, '#301-START', content)
         else:
             if method == 'start':
-                content = re.sub(proxy_cnf_source, proxy_cnf, content)
+                content = re.sub(cnf_301_source, cnf_301, content)
 
         mw.writeFile(vhost_file, content)
 
@@ -1290,7 +1290,7 @@ class site_api:
                                                 _siteName, _id), _old_config)
             return mw.returnJson(False, "OpenResty 配置测试不通过, 请重试: {}".format(rule_test))
 
-        self.operateRedirectConf(siteName, 'start')
+        self.operateRedirectConf(_siteName, 'start')
         mw.restartWeb()
         return mw.returnJson(True, "ok")
 
@@ -1368,6 +1368,8 @@ class site_api:
         mw.writeFile(data_path, json.dumps(data))
         mw.writeFile(
             "{}/{}.conf".format(self.getRedirectPath(_siteName), _id), file_content)
+
+        self.operateRedirectConf(_siteName, 'start')
         mw.restartWeb()
         return mw.returnJson(True, "ok")
 
@@ -1391,7 +1393,7 @@ class site_api:
             mw.writeFile(data_path, json.dumps(data))
             # data is empty ,should stop
             if len(data) == 0:
-                self.operateRedirectConf(siteName, 'stop')
+                self.operateRedirectConf(_siteName, 'stop')
             # remove conf file
             mw.execShell(
                 "rm -rf {}/{}.conf".format(self.getRedirectPath(_siteName), _id))
