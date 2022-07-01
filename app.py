@@ -1,5 +1,10 @@
 # coding:utf-8
 
+# pip install profiler_online
+# 性能测试
+# from profiler_online import run_profiler
+# run_profiler()
+
 from gevent import monkey
 monkey.patch_all()
 
@@ -11,6 +16,12 @@ from route import app, socketio
 
 from gevent.pywsgi import WSGIServer
 from geventwebsocket.handler import WebSocketHandler
+
+
+from pyinstrument import Profiler
+profiler = Profiler()
+profiler.start()
+
 
 try:
     if __name__ == "__main__":
