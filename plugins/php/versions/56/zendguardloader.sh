@@ -31,7 +31,8 @@ Install_lib()
 	fi
 	
 	NON_ZTS_FILENAME=`ls $serverPath/php/${version}/lib/php/extensions | grep no-debug-non-zts`
-	extFile=$serverPath/php/${version}/lib/php/extensions/${NON_ZTS_FILENAME}/${LIBNAME}.so
+	extDir=$serverPath/php/${version}/lib/php/extensions/${NON_ZTS_FILENAME}
+	extFile=${extDir}/${LIBNAME}.so
 
 	if [ ! -f "$extFile" ];then
 
@@ -45,8 +46,8 @@ Install_lib()
 		fi 
 
 		cd $php_lib && tar xvf zend-loader-php5.6.tar.gz
-		cd zend-loader-php5.6*
-		cp ZendGuardLoader.so $serverPath/php/$version/lib/php/extensions/no-debug-non-zts-20131226/
+		cd zend-loader-php5.6-*
+		cp ZendGuardLoader.so ${extDir}
 
 	fi
 	

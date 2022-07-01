@@ -210,7 +210,6 @@ class files_api:
         try:
             name = mw.M('tasks').where('id=?', (mid,)).getField('name')
             status = mw.M('tasks').where('id=?', (mid,)).getField('status')
-            # print(name, status)
             mw.M('tasks').delete(mid)
             if status == '-1':
                 task_pid = mw.execShell(
@@ -220,8 +219,7 @@ class files_api:
                 for i in range(len(task_list)):
                     self.removeTaskRecursion(task_list[i])
 
-                isTask = mw.getRootDir() + '/tmp/panelTask.pl'
-                mw.writeFile(isTask, 'True')
+                mw.triggerTask()
                 system_api.system_api().restartTask()
         except:
             system_api.system_api().restartTask()

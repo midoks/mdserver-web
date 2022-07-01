@@ -32,6 +32,11 @@ else
 	OSNAME='unknow'
 fi
 
+
+SYS_VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
+
+
+
 Install_app_mac()
 {
 
@@ -45,13 +50,59 @@ Install_app_mac()
 }
 
 
+
+
+Install_Linux_Ubuntu()
+{
+##################### Ubuntu start #####################
+	if [ "$SYS_VERSION_ID" == "22" ]; then
+		echo "Not yet supported"
+		exit 1
+	fi
+
+
+	wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
+	sudo apt install gnupg
+	touch /etc/apt/sources.list.d/mongodb-org-4.4.list
+	lsb_release -dc
+
+	echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
+##################### Ubuntu  end #####################
+}
+
+Install_Linux_Debian()
+{
+##################### debian start #####################
+
+##################### debian end #####################
+}
+
+
 # https://repo.mongodb.org/yum/redhat/7/mongodb-org/5.0/x86_64/RPMS/mongodb-org-server-5.0.4-1.el7.x86_64.rpm
-Install_app_linux(){
+Install_Linux_CentOS()
+{
+##################### centos start #####################
 	if [ ! -f $serverPath/source/mongodb-org-server-${VERSION}-1.el7.x86_64.rpm ];then
 		wget -O $serverPath/source/mongodb-org-server-${VERSION}-1.el7.x86_64.rpm https://repo.mongodb.org/yum/redhat/7/mongodb-org/5.0/x86_64/RPMS/mongodb-org-server-${VERSION}-1.el7.x86_64.rpm
 	fi
-	
+
 	rpm -ivh $serverPath/source/mongodb-org-server-${VERSION}-1.el7.x86_64.rpm 
+##################### centos end #####################
+}
+
+
+Install_app_linux()
+{
+	if [ "$OSNAME" == "ubuntu" ];then
+		Install_Linux_Ubuntu
+	elif [ "$OSNAME" == "debian" ];then
+		Install_Linux_Debian
+	elif [ "$OSNAME" == "centos" ];then
+		Install_Linux_CentOS
+	else 
+		echo "Not yet supported"
+		exit 1
+	fi
 }
 
 

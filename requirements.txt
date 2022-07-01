@@ -7,7 +7,7 @@ flask==2.0.3
 flask-session==0.3.2
 flask-helper==0.19
 cache==1.0.3
-gevent==21.1.2
+gevent==21.12.0
 gevent-websocket==0.10.1
 psutil==5.9.1
 chardet==3.0.4

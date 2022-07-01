@@ -794,7 +794,7 @@ class plugins_api:
         return mw.returnJson(True, '删除成功!')
 
     # shell 调用
-    def run(self, name, func, version, args='', script='index'):
+    def run(self, name, func, version='', args='', script='index'):
         path = mw.getRunDir() + '/' + self.__plugin_dir + \
             '/' + name + '/' + script + '.py'
         py = 'python3 ' + path

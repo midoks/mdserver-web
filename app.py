@@ -1,5 +1,10 @@
 # coding:utf-8
 
+# pip install profiler_online
+# 性能测试
+# from profiler_online import run_profiler
+# run_profiler()
+
 from gevent import monkey
 monkey.patch_all()
 

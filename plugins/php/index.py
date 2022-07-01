@@ -605,20 +605,20 @@ def setDisableFunc(version):
 
 
 def checkPhpinfoFile(v):
-    if mw.isInstalledWeb():
-        sdir = mw.getServerDir()
-        dfile = sdir + '/openresty/nginx/conf/php_status/phpinfo_' + v + '.conf'
-        if not os.path.exists(dfile):
-            tpl = getPluginDir() + '/conf/phpinfo.conf'
-            content = mw.readFile(tpl)
-            content = contentReplace(content, v)
-            mw.writeFile(dfile, content)
-            mw.restartWeb()
+    sdir = mw.getServerDir()
+    dfile = sdir + '/web_conf/php/status/phpinfo_' + v + '.conf'
+    if not os.path.exists(dfile):
+        tpl = getPluginDir() + '/conf/phpinfo.conf'
+        content = mw.readFile(tpl)
+        content = contentReplace(content, v)
+        mw.writeFile(dfile, content)
+        mw.restartWeb()
 
 
 def getPhpinfo(v):
     checkPhpinfoFile(v)
     sPath = mw.getRootDir() + '/phpinfo/' + v
+
     mw.execShell("rm -rf " + mw.getRootDir() + '/phpinfo')
     mw.execShell("mkdir -p " + sPath)
     mw.writeFile(sPath + '/phpinfo.php', '<?php phpinfo(); ?>')
@@ -629,6 +629,8 @@ def getPhpinfo(v):
 
 
 def get_php_info(args):
+    if not mw.isInstalledWeb():
+        return "openresty is not running!!!"
     return getPhpinfo(args['version'])
 
 
@@ -675,7 +677,7 @@ def installLib(version):
         name + '.sh' + ' install ' + version
 
     rettime = time.strftime('%Y-%m-%d %H:%M:%S')
-    insert_info = (None, '安装[' + name + '-' + version + ']',
+    insert_info = (None, '安装[' + name + '-PHP' + version + ']',
                    'execshell', '0', rettime, execstr)
     mw.M('tasks').add('id,name,type,status,addtime,execstr', insert_info)
 

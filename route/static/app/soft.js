@@ -146,17 +146,6 @@ function getSList(isdisplay) {
                 '<td>' + indexshow + '</td>' +
                 '<td style="text-align: right;">' + handle + '</td>' +
                 '</tr>';
-
-            // sBody += '<tr>' +
-            //     '<td><span ' + titleClick + 
-            //     '><img onclick="asyncLoadImage(this,\'/plugins/file?name='+plugin.name+'&f=ico.png\')"src="/plugins/file?name=' + plugin.name + 
-            //     '&f=ico.png' + '">' + plugin_title + '</span></td>' +
-            //     '<td>' + plugin.ps + '</td>' +
-            //     '<td>' + softPath + '</td>' +
-            //     '<td>' + state + '</td>' +
-            //     '<td>' + indexshow + '</td>' +
-            //     '<td style="text-align: right;">' + handle + '</td>' +
-            //     '</tr>';
         }
 
         sBody += pBody;

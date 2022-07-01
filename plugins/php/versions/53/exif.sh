@@ -4,6 +4,8 @@ export PATH
 
 curPath=`pwd`
 
+appPath=$(dirname "$curPath")
+
 rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 rootPath=$(dirname "$rootPath")
@@ -14,7 +16,7 @@ sourcePath=${serverPath}/source/php
 actionType=$1
 version=$2
 
-LIBNAME=openssl
+LIBNAME=exif
 LIBV=0
 
 NON_ZTS_FILENAME=`ls $serverPath/php/${version}/lib/php/extensions | grep no-debug-non-zts`
@@ -36,8 +38,6 @@ Install_lib()
 		return
 	fi
 	
-	cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash openssl.sh
-
 	if [ ! -f "$extFile" ];then
 
 		if [ ! -d $sourcePath/php${version}/ext ];then
@@ -45,16 +45,17 @@ Install_lib()
 		fi
 
 		cd $sourcePath/php${version}/ext/${LIBNAME}
-
-		if [ ! -f "config.m4" ];then
-			mv config0.m4 config.m4
-		fi
 		
-		export PKG_CONFIG_PATH=$serverPath/lib/openssl/lib/pkgconfig
 		$serverPath/php/$version/bin/phpize
-		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
-		--with-openssl
-		make clean && make && make install && make clean
+		./configure --with-php-config=$serverPath/php/$version/bin/php-config
+
+		FIND_C99=`cat Makefile|grep c99`
+		if [ "$FIND_C99" == "" ];then
+			sed -i $BAK 's/CFLAGS \=/CFLAGS \= -std=c99/g' Makefile
+		fi
+
+
+		make && make install && make clean
 		
 	fi
 
