@@ -306,13 +306,13 @@ def getFtpList():
 
 
 def addFtp():
-    import urllib
+    import urllib.parse
     args = getArgs()
     data = checkArgs(args, ['ftp_username', 'ftp_password', 'path', 'ps'])
     if not data[0]:
         return data[1]
 
-    path = urllib.request.unquote(args['path'])
+    path = urllib.parse.unquote(args['path'])
     user = args['ftp_username']
     pwd = args['ftp_password']
     ps = args['ps']
