@@ -308,6 +308,10 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     apt install -y curl libcurl4-gnutls-dev
     #https://blog.csdn.net/qq_36228377/article/details/123154344
     # ln -s  /usr/include/x86_64-linux-gnu/curl  /usr/include/curl
+    if [ ! -d /usr/include/curl ];then
+        ln -s  /usr/include/x86_64-linux-gnu/curl  /usr/include/curl
+    fi
+   
 
     apt install -y graphviz bison re2c flex
     apt install -y libsqlite3-dev
