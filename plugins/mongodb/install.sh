@@ -39,17 +39,13 @@ SYS_VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | a
 
 Install_app_mac()
 {
-
 	if [ ! -f $serverPath/source/mongodb-macos-x86_64-${VERSION}.tgz ];then
 		wget -O $serverPath/source/mongodb-macos-x86_64-${VERSION}.tgz https://fastdl.mongodb.org/osx/mongodb-macos-x86_64-${VERSION}.tgz
 	fi
 
 	cd $serverPath/source && tar -zxvf mongodb-macos-x86_64-${VERSION}.tgz
-	
 	cd  mongodb-macos-x86_64-${VERSION} && mv  ./* $serverPath/mongodb
 }
-
-
 
 
 Install_Linux_Ubuntu()
@@ -81,6 +77,7 @@ apt install -y mongodb-org
 
 Uninstall_Linux_Ubuntu()
 {
+systemctl stop mongod
 apt purge -y mongodb-org*
 apt autoremove -y
 rm -r /var/log/mongodb
@@ -138,6 +135,10 @@ Install_app()
 
 	echo "${VERSION}" > $serverPath/mongodb/version.pl
 	echo '安装完成' > $install_tmp
+
+	#初始化 
+	cd ${rootPath} && python3 ${rootPath}/plugins/mongodb/index.py start
+	cd ${rootPath} && python3 ${rootPath}/plugins/mongodb/index.py initd_install
 }
 
 
