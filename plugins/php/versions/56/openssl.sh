@@ -36,7 +36,7 @@ Install_lib()
 		return
 	fi
 	
-	cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash openssl.sh
+	cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash openssl_10.sh
 
 	if [ ! -f "$extFile" ];then
 
@@ -50,7 +50,7 @@ Install_lib()
 			mv config0.m4 config.m4
 		fi
 		
-		export PKG_CONFIG_PATH=$serverPath/lib/openssl/lib/pkgconfig
+		export PKG_CONFIG_PATH=$serverPath/lib/openssl10/lib/pkgconfig
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
 		--with-openssl
