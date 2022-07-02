@@ -426,7 +426,7 @@ class site_api:
                 'csr': csr, 'type': stype, 'httpTohttps': toHttps}
         return mw.returnJson(True, 'OK', data)
 
-    def create_let(self):
+    def setSslApi(self):
         siteName = request.form.get('siteName', '')
         key = request.form.get('key', '')
         csr = request.form.get('csr', '')
