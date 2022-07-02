@@ -789,6 +789,10 @@ class site_api:
         siteName = request.form.get('siteName', '')
         return self.getLogs(siteName)
 
+    def getErrorLogsApi(self):
+        siteName = request.form.get('siteName', '')
+        return self.getErrorLogs(siteName)
+
     def getSitePhpVersionApi(self):
         siteName = request.form.get('siteName', '')
         return self.getSitePhpVersion(siteName)
@@ -1733,6 +1737,12 @@ location ~* ^{from}(.*)$ {
 
     def getLogs(self, siteName):
         logPath = mw.getLogsDir() + '/' + siteName + '.log'
+        if not os.path.exists(logPath):
+            return mw.returnJson(False, '日志为空')
+        return mw.returnJson(True, mw.getNumLines(logPath, 100))
+
+    def getErrorLogs(self, siteName):
+        logPath = mw.getLogsDir() + '/' + siteName + '.error.log'
         if not os.path.exists(logPath):
             return mw.returnJson(False, '日志为空')
         return mw.returnJson(True, mw.getNumLines(logPath, 100))

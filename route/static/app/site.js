@@ -1010,7 +1010,9 @@ function webEdit(id,website,endTime,addtime){
 	+"<p onclick=\"to301('"+website+"')\" title='重定向'>重定向</p>"
 	+"<p onclick=\"toProxy('"+website+"')\" title='反向代理'>反向代理</p>"
 	+"<p id='site_"+id+"' onclick=\"security('"+id+"','"+website+"')\" title='防盗链'>防盗链</p>"
-	+"<p id='site_"+id+"' onclick=\"getSiteLogs('"+website+"')\" title='查看站点请求日志'>响应日志</p>";
+	+"<p id='site_"+id+"' onclick=\"getSiteLogs('"+website+"')\" title='查看站点请求日志'>响应日志</p>"
+	+"<p id='site_"+id+"' onclick=\"getSiteErrorLogs('"+website+"')\" title='查看站点错误日志'>错误日志</p>";
+
 	layer.open({
 		type: 1,
 		area: '640px',
@@ -1053,7 +1055,24 @@ function webEdit(id,website,endTime,addtime){
 function getSiteLogs(siteName){
 	var loadT = layer.msg('正在处理,请稍候...',{icon:16,time:0,shade: [0.3, '#000']});
 	$.post('/site/get_logs',{siteName:siteName},function(logs){
-		console.log(logs);
+		// console.log(logs);
+		layer.close(loadT);
+		if(logs.status !== true){
+			logs.msg = '';
+		}
+		if (logs.msg == '') logs.msg = '当前没有日志.';
+		var phpCon = '<textarea wrap="off" readonly="" style="white-space: pre;margin: 0px;width: 500px;height: 520px;background-color: #333;color:#fff; padding:0 5px" id="error_log">'+logs.msg+'</textarea>';
+		$("#webedit-con").html(phpCon);
+		var ob = document.getElementById('error_log');
+		ob.scrollTop = ob.scrollHeight;		
+	},'json');
+}
+
+//取网站错误日志
+function getSiteErrorLogs(siteName){
+	var loadT = layer.msg('正在处理,请稍候...',{icon:16,time:0,shade: [0.3, '#000']});
+	$.post('/site/get_error_logs',{siteName:siteName},function(logs){
+		// console.log(logs);
 		layer.close(loadT);
 		if(logs.status !== true){
 			logs.msg = '';
