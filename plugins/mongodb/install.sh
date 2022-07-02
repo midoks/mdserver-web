@@ -55,18 +55,26 @@ Install_app_mac()
 Install_Linux_Ubuntu()
 {
 ##################### Ubuntu start #####################
-	if [ "$SYS_VERSION_ID" == "22" ]; then
-		echo "Not yet supported"
-		exit 1
-	fi
+if [ "$SYS_VERSION_ID" == "22" ]; then
+	echo "Not yet supported"
+	exit 1
+fi
 
 
-	wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
-	sudo apt install gnupg
-	touch /etc/apt/sources.list.d/mongodb-org-4.4.list
-	lsb_release -dc
+if [ -f /lib/systemd/system/mongod.service ];then
+	echo 'alreay exist!'
+	exit 0
+fi
 
-	echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
+wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
+sudo apt install gnupg
+touch /etc/apt/sources.list.d/mongodb-org-4.4.list
+lsb_release -dc
+
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
+
+apt update -y
+apt install -y mongodb-org
 ##################### Ubuntu  end #####################
 }
 
@@ -116,8 +124,6 @@ Install_app()
 
 	if [ "macos" == "$OSNAME" ];then
 		Install_app_mac
-	elif [ "ubuntu" == "$OSNAME" ] || [ "debian" == "$OSNAME" ] ;then
-		apt install -y mongodb
 	else
 		Install_app_linux
 	fi
@@ -128,7 +134,6 @@ Install_app()
 
 Uninstall_app()
 {
-	# apt remove mongodb -y
 	rm -rf $serverPath/mongodb
 	echo "Uninstall_mongodb" > $install_tmp
 }
