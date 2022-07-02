@@ -29,16 +29,18 @@ else
 fi
 
 
-if id ftp &> /dev/null ;then 
-    echo "ftp UID is `id -u ftp`"
-    echo "ftp Shell is `grep "^ftp:" /etc/passwd |cut -d':' -f7 `"
-else
-    groupadd ftp
-	useradd -g ftp -s /sbin/nologin ftp
-fi
+
 
 Install_pureftp()
 {
+	if id ftp &> /dev/null ;then 
+	    echo "ftp UID is `id -u ftp`"
+	    echo "ftp Shell is `grep "^ftp:" /etc/passwd |cut -d':' -f7 `"
+	else
+	    groupadd ftp
+		useradd -g ftp -s /sbin/nologin ftp
+	fi
+
 	# mkdir -p ${serverPath}/pureftp
 	mkdir -p ${serverPath}/source/pureftp
 
@@ -98,6 +100,8 @@ Uninstall_pureftp()
 	fi
 
 	rm -rf ${serverPath}/pureftp
+	userdel ftp
+	groupdel ftp
 	echo '卸载完成' > $install_tmp
 }
 
