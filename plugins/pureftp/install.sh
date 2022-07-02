@@ -28,6 +28,15 @@ else
 	OSNAME='unknow'
 fi
 
+
+if id ftp &> /dev/null ;then 
+    echo "ftp UID is `id -u ftp`"
+    echo "ftp Shell is `grep "^ftp:" /etc/passwd |cut -d':' -f7 `"
+else
+    groupadd ftp
+	useradd -g ftp -s /sbin/nologin ftp
+fi
+
 Install_pureftp()
 {
 	# mkdir -p ${serverPath}/pureftp
@@ -40,12 +49,9 @@ Install_pureftp()
 	VER=$1
 	DOWNLOAD=https://download.pureftpd.org/pub/pure-ftpd/releases/pure-ftpd-${VER}.tar.gz
 
-
 	if [ ! -f $serverPath/source/pureftp/pure-ftpd-${VER}.tar.gz ];then
 		wget --no-check-certificate -O $serverPath/source/pureftp/pure-ftpd-${VER}.tar.gz $DOWNLOAD
 	fi
-
-	
 
 	#检测文件是否损坏.
 	md5_ok=451879495ba61c1d7dcfca8dd231119f
