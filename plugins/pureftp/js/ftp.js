@@ -119,9 +119,9 @@ function addFtp(type) {
 		var data = $("#ftpAdd").serialize();
 		ftpPost('add_ftp', data, function(data){
 			if (data.data == 'ok'){
-				layer.msg('添加成功!', {icon: 1});
+				layer.msg('添加成功!', {icon: 1,time:3000});
 			} else {
-				layer.msg(rdata.data, {icon: 5});
+				layer.msg(rdata.data, {icon: 5,time:3000});
 			}
 			ftpList();
 			layer.close(loadT);
