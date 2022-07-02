@@ -24,7 +24,6 @@ function ftpPost(method,args,callback){
             layer.msg(data.msg,{icon:0,time:2000,shade: [0.3, '#000']});
             return;
         }
-
         if(typeof(callback) == 'function'){
             callback(data);
         }
@@ -74,7 +73,7 @@ function ftpList(page, search){
         content += '<th style="width:10%;">状态</th>';
         content += '<th>根目录</th>';
         content += '<th>备注</th>';
-        content += '<th>操作(<a class="btlink" onclick="addFtp(0);">添加</a>|<a class="btlink" onclick="modFtpPort(0,\''+rdata['info']['port']+'\')">端口</a>)</th>';
+        content += '<th>操作(<a class="btlink" onclick="addFtp();">添加</a>|<a class="btlink" onclick="modFtpPort(0,\''+rdata['info']['port']+'\')">端口</a>)</th>';
         content += '</tr></thead>';
 
         content += '<tbody>';
@@ -111,35 +110,20 @@ function ftpList(page, search){
 
 /**
  *添加FTP帐户
- * @param {Number} type	添加类型
  */
-function addFtp(type) {
-	if (type == 1) {
-		var loadT = layer.load({shade: true,shadeClose: false});
-		var data = $("#ftpAdd").serialize();
-		ftpPost('add_ftp', data, function(data){
-			if (data.data == 'ok'){
-				layer.msg('添加成功!', {icon: 1,time:3000});
-			} else {
-				layer.msg(rdata.data, {icon: 5,time:3000});
-			}
-			ftpList();
-			layer.close(loadT);
-		});
-		return true;
-	}
+function addFtp() {
 
 	var data = ftpAsyncPost('get_www_dir');
 	var defaultPath = data.data;
-	var index = layer.open({
+	var indexFtp = layer.open({
 		type: 1,
-		skin: 'demo-class',
 		area: '500px',
 		title: '添加FTP帐户',
 		closeBtn: 2,
 		shift: 5,
 		shadeClose: false,
-		content: "<form class='bt-form pd20 pb70' id='ftpAdd'>\
+		btn: ['提交','关闭'],
+		content: "<form class='form pd20' id='ftpAdd'>\
 					<div class='line'>\
 					<span class='tname'>用户名</span>\
 					<div class='info-r'><input class='bt-input-text' type='text' id='ftpUser' name='ftp_username' style='width:330px' /></div>\
@@ -157,11 +141,23 @@ function addFtp(type) {
 					<div class='info-r'>\
 					<input id='ftp_ps' class='bt-input-text' type='text' name='ps' value='' placeholder='备注' />\
 					</div></div>\
-					<div class='bt-form-submit-btn'>\
-						<button type='button' class='btn btn-danger btn-sm btn-title' onclick='layer.closeAll()'>关闭</button>\
-				        <button type='button' class='btn btn-success btn-sm btn-title' onclick=\"addFtp(1)\" >提交</button>\
-			        </div>\
 			      </form>",
+		yes:function(index,layero){
+			var loadT = layer.load({shade: true,shadeClose: false});
+			var data = $("#ftpAdd").serialize();
+			ftpPost('add_ftp', data, function(rdata){
+				layer.close(loadT);
+				layer.close(indexFtp);
+				if (rdata.data == 'ok'){
+					layer.msg('添加成功!', {icon: 1,time:3000});
+				} else {
+					layer.msg(rdata.data, {icon: 5,time:3000});
+				}
+
+				setTimeout(function(){ftpList();},2000);
+			});
+			return true;
+        },
 	});
 	
 	$("#ftpUser").keyup(function(){

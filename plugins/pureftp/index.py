@@ -214,6 +214,7 @@ def pftpAdd(username, password, path):
     if not os.path.exists(path):
         os.makedirs(path)
         if mw.isAppleSystem():
+            # pass
             os.system('chown ' + user + '.staff ' + path)
         else:
             os.system('chown www.www ' + path)
