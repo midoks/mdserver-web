@@ -2036,6 +2036,10 @@ location ~* ^{from}(.*)$ {
 
         rewrite_content = '''
 location /{
+    if ($PHP_ENV != "1"){
+        break;
+    }
+
     if (!-e $request_filename) {
        rewrite  ^(.*)$  /index.php/$1  last;
        break;
