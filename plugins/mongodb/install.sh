@@ -88,9 +88,48 @@ rm -r /var/lib/mongodb
 Install_Linux_Debian()
 {
 ##################### debian start #####################
-echo 'mac'
+if [ "$SYS_VERSION_ID" -ge "11" ]; then
+	echo "Not yet supported"
+	exit 1
+fi
+
+
+if [ -f /lib/systemd/system/mongod.service ];then
+	echo 'alreay exist!'
+	exit 0
+fi
+
+wget -qO - https://www.mongodb.org/static/pgp/server-${VERSION}.asc | sudo apt-key add -
+apt install -y gnupg
+wget -qO - https://www.mongodb.org/static/pgp/server-${VERSION}.asc | sudo apt-key add -
+
+echo "deb http://repo.mongodb.org/apt/debian buster/mongodb-org/${VERSION} main" | sudo tee /etc/apt/sources.list.d/mongodb-org-${VERSION}.list
+
+apt update -y
+apt install -y mongodb-org
+
+
+echo "mongodb-org hold" | sudo dpkg --set-selections
+echo "mongodb-org-server hold" | sudo dpkg --set-selections
+echo "mongodb-org-shell hold" | sudo dpkg --set-selections
+echo "mongodb-org-mongos hold" | sudo dpkg --set-selections
+echo "mongodb-org-tools hold" | sudo dpkg --set-selections
+
 ##################### debian end #####################
 }
+
+
+
+Uninstall_Linux_Debian()
+{
+systemctl stop mongod
+apt purge -y mongodb-org*
+apt autoremove -y
+rm -r /var/log/mongodb
+rm -r /var/lib/mongodb
+}
+
+
 
 
 # https://repo.mongodb.org/yum/redhat/7/mongodb-org/5.0/x86_64/RPMS/mongodb-org-server-5.0.4-1.el7.x86_64.rpm
