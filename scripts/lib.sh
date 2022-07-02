@@ -273,6 +273,7 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     apt install -y net-tools
     apt install -y python3-dev
     apt install -y autoconf
+    apt install -y gcc
 
     apt install -y libffi-dev
     apt install -y cmake automake make
@@ -285,7 +286,7 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     apt install -y libpcre3 libpcre3-dev 
     apt install -y openssl
     apt install -y libssl-dev
-    apt install -y libcurl4-openssl-dev
+    
     apt install -y libmemcached-dev
     apt install -y libsasl2-dev
     apt install -y imagemagick libmagickwand-dev
@@ -300,11 +301,11 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     apt install -y libfreetype6-dev
     apt install -y libevent-dev libncurses5-dev libldap2-dev
     apt install -y libzip-dev
-
     apt install -y libicu-dev
 
-    apt install -y gcc build-essential
+    apt install -y build-essential
     
+    apt install -y libcurl4-openssl-dev
     apt install -y curl libcurl4-gnutls-dev
     #https://blog.csdn.net/qq_36228377/article/details/123154344
     # ln -s  /usr/include/x86_64-linux-gnu/curl  /usr/include/curl
