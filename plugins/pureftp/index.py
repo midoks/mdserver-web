@@ -120,7 +120,9 @@ def initDreplace():
     systemDir = '/lib/systemd/system'
     systemService = systemDir + '/pureftp.service'
     systemServiceTpl = getPluginDir() + '/init.d/pureftp.service.tpl'
-    if os.path.exists(systemDir) and not os.path.exists(systemService):
+
+    if os.path.exists(systemDir):
+        # and not os.path.exists(systemService)
         se_content = mw.readFile(systemServiceTpl)
         se_content = se_content.replace('{$SERVER_PATH}', service_path)
         mw.writeFile(systemService, se_content)
