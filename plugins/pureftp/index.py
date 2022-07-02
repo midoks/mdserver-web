@@ -241,7 +241,7 @@ def pftpStart(username):
 
 
 def pftpReload():
-    cmd = getServerDir() + '/bin/pure-pw mkdb ' +
+    cmd = getServerDir() + '/bin/pure-pw mkdb ' + \
         getServerDir() + '/etc/pureftpd.pdb'
     mw.execShell(cmd)
 
