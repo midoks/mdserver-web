@@ -66,22 +66,32 @@ if [ -f /lib/systemd/system/mongod.service ];then
 	exit 0
 fi
 
-wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
+wget -qO - https://www.mongodb.org/static/pgp/server-${VERSION}.asc | sudo apt-key add -
 sudo apt install gnupg
-touch /etc/apt/sources.list.d/mongodb-org-4.4.list
+touch /etc/apt/sources.list.d/mongodb-org-${VERSION}.list
 lsb_release -dc
 
-echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/${VERSION} multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-${VERSION}.list
 
 apt update -y
 apt install -y mongodb-org
 ##################### Ubuntu  end #####################
 }
 
+
+Uninstall_Linux_Ubuntu()
+{
+apt purge -y mongodb-org*
+apt autoremove -y
+rm -r /var/log/mongodb
+rm -r /var/lib/mongodb
+}
+
+
 Install_Linux_Debian()
 {
 ##################### debian start #####################
-
+echo 'mac'
 ##################### debian end #####################
 }
 
@@ -116,8 +126,6 @@ Install_app_linux()
 
 Install_app()
 {
-	pip3 install pymongo
-
 	echo '正在安装脚本文件...' > $install_tmp
 	mkdir -p $serverPath/source
 	mkdir -p $serverPath/mongodb
@@ -132,8 +140,31 @@ Install_app()
 	echo '安装完成' > $install_tmp
 }
 
+
+
+Uninstall_app_linux()
+{
+##################
+if [ "$OSNAME" == "ubuntu" ];then
+	Uninstall_Linux_Ubuntu
+elif [ "$OSNAME" == "debian" ];then
+	Unstall_Linux_Debian
+elif [ "$OSNAME" == "centos" ];then
+	Install_Linux_CentOS
+else 
+	echo "ok"
+fi
+##################
+}
+
 Uninstall_app()
 {
+	if [ "macos" == "$OSNAME" ];then
+		echo 'mac'
+	else
+		Uninstall_app_linux
+	fi
+
 	rm -rf $serverPath/mongodb
 	echo "Uninstall_mongodb" > $install_tmp
 }
