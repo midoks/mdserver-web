@@ -22,8 +22,9 @@ zypper install -y graphviz libxml2 libxml2-devel
 zypper install -y curl curl-devel
 zypper install -y freetype freetype-devel
 zypper install -y mysql-devel
-
 zypper install -y ImageMagick ImageMagick-devel
+zypper install -y libjpeg-devel libpng-devel
+
 
 cd /www/server/mdserver-web/scripts && bash lib.sh
 chmod 755 /www/server/mdserver-web/data
