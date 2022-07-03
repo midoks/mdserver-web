@@ -28,6 +28,11 @@ zypper install -y libevent-devel
 zypper install -y libtirpc-devel
 zypper install -y rpcgen
 
+zypper install -y libmemcached libmemcached-devel
+
+
+# zypper install -y protobuf
+# zypper install -y zlib-devel
 
 zypper install -y python3-devel
 zypper install -y python-devel
