@@ -30,6 +30,9 @@ fi
 
 if [ ${_os} == "Darwin" ]; then
 	OSNAME='macos'
+elif grep -Eq "openSUSE" /etc/*-release; then
+	OSNAME='opensuse'
+	zypper refresh
 elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
 	OSNAME='centos'
 	yum install -y wget zip unzip
@@ -50,9 +53,6 @@ elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
 elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
 	OSNAME='ubuntu'
 	apt install -y wget zip unzip
-elif grep -Eq "openSUSE" /etc/*-release; then
-	OSNAME='opensuse'
-	zypper refresh
 else
 	OSNAME='unknow'
 fi
