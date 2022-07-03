@@ -35,6 +35,7 @@ elif grep -Eq "openSUSE" /etc/*-release; then
 	zypper refresh
 elif grep -Eqi "Arch" /etc/issue || grep -Eq "Arch" /etc/*-release; then
 	OSNAME='arch'
+	echo y | pacman -Sy unzip
 elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
 	OSNAME='centos'
 	yum install -y wget zip unzip
