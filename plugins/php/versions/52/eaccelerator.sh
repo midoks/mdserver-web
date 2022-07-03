@@ -77,7 +77,9 @@ Install_lib()
 	echo "${LIBNAME}.allowed_admin_path=/www/wwwroot/you_project_dir" >> $serverPath/php/$version/etc/php.ini
 
 
-	$serverPath/php/init.d/php$version reload
+
+	${rootPath}/plugins/php/version/lib.sh $version restart
+	# $serverPath/php/init.d/php$version reload
 	echo '==========================================================='
 	echo 'successful!'
 }
@@ -100,7 +102,8 @@ Uninstall_lib()
 	sed -i $BAK "/${LIBNAME}/d" $serverPath/php/$version/etc/php.ini
 		
 	rm -f $extFile
-	$serverPath/php/init.d/php$version reload
+	
+	${rootPath}/plugins/php/version/lib.sh $version restart
 	echo '==============================================='
 	echo 'successful!'
 }
