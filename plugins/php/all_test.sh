@@ -3,9 +3,13 @@ export PATH=$PATH:/opt/local/bin:/opt/local/sbin:/opt/local/share/man:/usr/local
 DIR=$(cd "$(dirname "$0")"; pwd)
 
 
+
+# cd /www/server/mdserver-web/scripts/quick && bash app.sh
 # cd /www/server/mdserver-web/plugins/php && bash all_test.sh
 
-# cd /www/server/mdserver-web/plugins/php/versions/53/ && bash openssl.sh install 53
+# cd /www/server/mdserver-web/plugins/php/versions/52/ && bash gd.sh install 52
+
+# cd /www/server/mdserver-web/plugins/php/versions/52/ && bash openssl.sh install 52
 # cd /www/server/mdserver-web/plugins/php/versions/81/ && bash imagemagick.sh install 81
 # cd /www/server/mdserver-web/plugins/php/versions/70/ && bash imagemagick.sh install 70
 
