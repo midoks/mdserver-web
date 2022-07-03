@@ -14,12 +14,12 @@ if [ "$EUID" -ne 0 ]
   exit
 fi
 
-if grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
+if grep -Eq "Ubuntu" /etc/*-release; then
 	ln -sf /bin/bash /bin/sh
 	#sudo dpkg-reconfigure dash
 fi
 
-if grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
+if grep -Eq "Debian" /etc/*-release; then
 	ln -sf /bin/bash /bin/sh
 fi
 
