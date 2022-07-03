@@ -292,8 +292,8 @@ def stop(version):
     if version == '52':
         file = initReplace(version)
         data = mw.execShell(file + ' ' + 'stop')
-            if data[1] == '':
-        return 'ok'
+        if data[1] == '':
+            return 'ok'
     return status
 
 
