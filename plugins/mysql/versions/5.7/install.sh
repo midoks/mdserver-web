@@ -97,6 +97,7 @@ Install_mysql()
 		else
 			rm -rf ${mysqlDir}/mysql-${VERSION}
 			echo '安装失败' > $install_tmp
+			exit 1
 		fi
 	fi
 }

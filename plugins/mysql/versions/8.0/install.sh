@@ -97,6 +97,7 @@ Install_mysql()
 		else
 			rm -rf ${mysqlDir}/mysql-8.0.25
 			echo '安装失败' > $install_tmp
+			exit 1
 		fi
 	fi
 }
