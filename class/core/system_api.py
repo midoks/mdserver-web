@@ -243,13 +243,19 @@ class system_api:
                 mac_version += x.split("\t")[1] + ' '
             return mac_version
 
-        version = mw.readFile('/etc/redhat-release')
-        if not version:
-            version = mw.readFile(
-                '/etc/issue').strip().split("\n")[0].replace('\\n', '').replace('\l', '').strip()
-        else:
+        redhat_series = '/etc/redhat-release'
+        if os.path.exists(redhat_series):
+            version = mw.readFile('/etc/redhat-release')
             version = version.replace('release ', '').strip()
-        return version
+            return version
+
+        os_series = '/etc/os-release'
+        if os.path.exists(os_series):
+            version = mw.execShell(
+                "cat /etc/*-release | grep PRETTY_NAME | awk -F = '{print $2}' | awk -F '\"' '{print $2}'")
+            return version[0].strip()
+
+        return '未识别系统信息'
 
     def getBootTime(self):
         # 取系统启动时间
