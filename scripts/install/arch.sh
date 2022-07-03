@@ -8,11 +8,12 @@ LANG=en_US.UTF-8
 echo y | pacman -Sy yaourt
 
 echo y | pacman -Sy gcc make cmake autoconf
+echo y | pacman -Sy pkg-config
 echo y | pacman -Sy python3
 echo y | pacman -Sy lsof
 echo y | pacman -Sy python-pip
 echo y | pacman -Sy curl
-echo y | pacman -Sy libevent-devel
+echo y | pacman -Sy libevent
 echo y | pacman -Sy libjpeg
 echo y | pacman -Sy libpng
 echo y | pacman -Sy libwebp
@@ -22,6 +23,7 @@ echo y | pacman -Sy vi
 echo y | pacman -Sy openssl
 echo y | pacman -Sy pcre
 echo y | pacman -Sy libmcrypt
+echo y | pacman -Sy oniguruma
 
 # zypper install -y freetype freetype-devel
 # zypper install -y libjpeg-devel libpng-devel
