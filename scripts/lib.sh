@@ -327,7 +327,9 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     apt install -y libmariadb-dev
     #apt install -y libmysqlclient-dev   
     apt install -y libmariadb-dev-compat
-    #apt install -y libmariadbclient-dev 
+    #apt install -y libmariadbclient-dev
+elif [ "$OSNAME" == "opensuse" ];then
+    echo "opensuse lib"
 else
 
     yum install -y openldap openldap-devel libtirpc libtirpc-devel rpcgen

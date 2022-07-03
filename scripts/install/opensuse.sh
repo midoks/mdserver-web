@@ -9,6 +9,10 @@ LANG=en_US.UTF-8
 # systemctl stop SuSEfirewall2
 
 
+zypper install -y openssl openssl-devel
+zypper install -y make cmake gcc
+zypper install -y python3-pip
+
 
 cd /www/server/mdserver-web/scripts && bash lib.sh
 chmod 755 /www/server/mdserver-web/data
