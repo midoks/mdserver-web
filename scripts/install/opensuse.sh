@@ -24,7 +24,8 @@ zypper install -y freetype freetype-devel
 zypper install -y mysql-devel
 zypper install -y ImageMagick ImageMagick-devel
 zypper install -y libjpeg-devel libpng-devel
-
+zypper install -y libevent-devel
+zypper install -y libtirpc-devel
 
 zypper install -y python3-devel
 zypper install -y python-devel
