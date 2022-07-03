@@ -275,7 +275,7 @@ def phpOp(version, method):
         data = mw.execShell('systemctl ' + method + ' php' + version)
         if data[1] == '':
             return 'ok'
-        return 'fail'
+        return data[1]
 
     data = mw.execShell(file + ' ' + method)
     if data[1] == '':
@@ -556,13 +556,13 @@ def getFpmStatus(version):
 
     try:
         url = 'http://' + mw.getHostAddr() + '/phpfpm_status_' + version + '?json'
-        result = mw.httpGet(url)
+        result = mw.httpGet(url, 1)
         data = json.loads(result)
         fTime = time.localtime(int(data['start time']))
         data['start time'] = time.strftime('%Y-%m-%d %H:%M:%S', fTime)
     except Exception as e:
         url = 'http://127.0.0.1/phpfpm_status_' + version + '?json'
-        result = mw.httpGet(url)
+        result = mw.httpGet(url, 1)
         data = json.loads(result)
         fTime = time.localtime(int(data['start time']))
         data['start time'] = time.strftime('%Y-%m-%d %H:%M:%S', fTime)
