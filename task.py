@@ -388,6 +388,15 @@ def check502():
 def startPHPVersion(version):
     sdir = mw.getServerDir()
     try:
+
+        # system
+        phpService = '/lib/systemd/system/php' + version + '.service'
+        if os.path.exists(phpService):
+            mw.execShell("systemctl reload php" + version)
+            if checkPHPVersion(version):
+                return True
+
+        # initd
         fpm = sdir + '/php/init.d/php' + version
         php_path = sdir + '/php/' + version + '/sbin/php-fpm'
         if not os.path.exists(php_path):
