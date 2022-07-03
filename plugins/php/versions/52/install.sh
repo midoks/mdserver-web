@@ -161,6 +161,9 @@ if [ ! -d $serverPath/php/${PHP_VER}/lib/php/extensions/no-debug-non-zts-2006061
 	mkdir -p $serverPath/php/${PHP_VER}/lib/php/extensions/no-debug-non-zts-20060613
 fi
 
+
+mkdir -p $serverPath/php/${PHP_VER}/var/log
+
 #------------------------ install end ------------------------------------#
 }
 

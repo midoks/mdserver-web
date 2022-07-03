@@ -4,7 +4,7 @@ DIR=$(cd "$(dirname "$0")"; pwd)
 
 
 
-# cd /www/server/mdserver-web/scripts/quick && bash app.sh
+# cd /www/server/mdserver-web/scripts/quick && bash debug.sh
 # cd /www/server/mdserver-web/plugins/php && bash all_test.sh
 
 # cd /www/server/mdserver-web/plugins/php/versions/52/ && bash gd.sh install 52
