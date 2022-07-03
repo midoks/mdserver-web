@@ -25,6 +25,9 @@ fi
 
 if [ ${_os} == "Darwin" ]; then
 	OSNAME='macos'
+elif grep -Eq "openSUSE" /etc/*-release; then
+	OSNAME='opensuse'
+	zypper refresh
 elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
 	OSNAME='centos'
 	yum install -y wget zip unzip
