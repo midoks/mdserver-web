@@ -174,7 +174,7 @@ def initDreplace():
         confReplace()
 
     # systemd
-    systemDir = '/lib/systemd/system'
+    systemDir = '/usr/lib/systemd/system'
     systemService = systemDir + '/openresty.service'
     systemServiceTpl = getPluginDir() + '/init.d/openresty.service.tpl'
     if os.path.exists(systemDir) and not os.path.exists(systemService):
@@ -188,7 +188,7 @@ def initDreplace():
 
 def status():
     data = mw.execShell(
-        "ps -ef|grep nginx |grep -v grep | grep -v python | awk '{print $2}'")
+        "ps -ef|grep openresty |grep -v grep | grep -v python | awk '{print $2}'")
     if data[0] == '':
         return 'stop'
     return 'start'
