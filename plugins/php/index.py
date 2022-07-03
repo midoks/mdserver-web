@@ -253,7 +253,7 @@ def initReplace(version):
         mw.execShell('chown -R www:www ' + upload_path)
 
     # systemd
-    systemDir = '/lib/systemd/system'
+    systemDir = '/usr/lib/systemd/system'
     systemService = systemDir + '/php' + version + '.service'
     systemServiceTpl = getPluginDir() + '/init.d/php.service.tpl'
     if os.path.exists(systemDir) and not os.path.exists(systemService):
