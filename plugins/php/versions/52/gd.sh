@@ -27,6 +27,26 @@ else
 	BAK=''
 fi
 
+
+sysName=`uname`
+echo "use system: ${sysName}"
+
+if [ ${sysName} == "Darwin" ]; then
+	OSNAME='macos'
+elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
+	OSNAME='centos'
+elif grep -Eqi "Fedora" /etc/issue || grep -Eq "Fedora" /etc/*-release; then
+	OSNAME='fedora'
+elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
+	OSNAME='debian'
+elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
+	OSNAME='ubuntu'
+elif grep -Eqi "Raspbian" /etc/issue || grep -Eq "Raspbian" /etc/*-release; then
+	OSNAME='raspbian'
+else
+	OSNAME='unknow'
+fi
+
 Install_lib()
 {
 
@@ -36,9 +56,12 @@ Install_lib()
 		return
 	fi
 
-	ln -s /usr/lib64/libjpeg.so /usr/lib/libjpeg.so
-	ln -s /usr/lib64/libpng.so /usr/lib/
-	cp -frp /usr/lib64/libldap* /usr/lib/
+
+	if [ "$OSNAME" == "debian" ] &&  [ "$OSNAME" == "ubuntu" ];then
+		ln -s /usr/lib64/libjpeg.so /usr/lib/libjpeg.so
+		ln -s /usr/lib64/libpng.so /usr/lib/
+		cp -frp /usr/lib64/libldap* /usr/lib/
+	fi
 	
 	
 	if [ ! -f "$extFile" ];then
