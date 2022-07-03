@@ -22,6 +22,8 @@ zypper install -y curl curl-devel
 zypper install -y freetype freetype-devel
 zypper install -y mysql-devel
 
+zypper install -y ImageMagick ImageMagick-devel
+
 cd /www/server/mdserver-web/scripts && bash lib.sh
 chmod 755 /www/server/mdserver-web/data
 
