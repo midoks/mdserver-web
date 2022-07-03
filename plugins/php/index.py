@@ -287,7 +287,14 @@ def start(version):
 
 
 def stop(version):
-    return phpOp(version, 'stop')
+    status = phpOp(version, 'stop')
+
+    if version == '52':
+        file = initReplace(version)
+        data = mw.execShell(file + ' ' + 'stop')
+            if data[1] == '':
+        return 'ok'
+    return status
 
 
 def restart(version):
