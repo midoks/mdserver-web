@@ -432,34 +432,40 @@ def startPHPVersion(version):
 def checkPHPVersion(version):
     try:
         url = 'http://127.0.0.1/phpfpm_status_' + version
-        result = mw.httpGet(url)
-        # print(version,result)
-        # 检查openresty
-        if result.find('Bad Gateway') != -1:
-            return False
-        if result.find('HTTP Error 404: Not Found') != -1:
-            return False
+        result = mw.httpGet(url, 1)
+        if result.find('timed out'):
+            raise
+    except Exception as e:
+        url = 'http://' + mw.getLocalIp() + '/phpfpm_status_' + version
+        result = mw.httpGet(url, 1)
+    else:
+        result = 'Bad Gateway'
 
-        # 检查Web服务是否启动
-        if result.find('Connection refused') != -1:
-            global isTask
-            if os.path.exists(isTask):
-                isStatus = mw.readFile(isTask)
-                if isStatus == 'True':
-                    return True
+    # print(version,result)
+    # 检查openresty
+    if result.find('Bad Gateway') != -1:
+        return False
+    if result.find('HTTP Error 404: Not Found') != -1:
+        return False
 
-            # systemd
-            systemd = '/lib/systemd/system/openresty.service'
-            if os.path.exists(systemd):
-                execShell('systemctl reload openresty')
+    # 检查Web服务是否启动
+    if result.find('Connection refused') != -1:
+        global isTask
+        if os.path.exists(isTask):
+            isStatus = mw.readFile(isTask)
+            if isStatus == 'True':
                 return True
-            # initd
-            initd = '/etc/init.d/openresty'
-            if os.path.exists(initd):
-                os.system(initd + ' reload')
-        return True
-    except:
-        return True
+
+        # systemd
+        systemd = '/lib/systemd/system/openresty.service'
+        if os.path.exists(systemd):
+            execShell('systemctl reload openresty')
+            return True
+        # initd
+        initd = '/etc/init.d/openresty'
+        if os.path.exists(initd):
+            os.system(initd + ' reload')
+    return True
 
 # --------------------------------------PHP监控 end--------------------------------------------- #
 
