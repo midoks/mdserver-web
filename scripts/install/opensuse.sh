@@ -13,7 +13,8 @@ zypper install -y htop
 # for debug end
 
 zypper install -y openssl openssl-devel
-zypper install -y bison re2c make cmake gcc 
+zypper install -y bison re2c make cmake gcc
+zypper install -y gcc-c++
 zypper install -y autoconf
 zypper install -y python3-pip
 zypper install -y pcre pcre-devel
