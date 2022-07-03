@@ -446,21 +446,23 @@ def setMaxTime(version):
 
 def setMaxSize(version):
     args = getArgs()
-    if not 'max' in args:
-        return 'missing time args!'
-    max = args['max']
-    if int(max) < 2:
+    data = checkArgs(args, ['max'])
+    if not data[0]:
+        return data[1]
+
+    maxVal = args['max']
+    if int(maxVal) < 2:
         return mw.returnJson(False, '上传大小限制不能小于2MB!')
 
     path = getServerDir() + '/' + version + '/etc/php.ini'
     conf = mw.readFile(path)
     rep = u"\nupload_max_filesize\s*=\s*[0-9]+M"
-    conf = re.sub(rep, u'\nupload_max_filesize = ' + max + 'M', conf)
+    conf = re.sub(rep, u'\nupload_max_filesize = ' + maxVal + 'M', conf)
     rep = u"\npost_max_size\s*=\s*[0-9]+M"
-    conf = re.sub(rep, u'\npost_max_size = ' + max + 'M', conf)
+    conf = re.sub(rep, u'\npost_max_size = ' + maxVal + 'M', conf)
     mw.writeFile(path, conf)
 
-    msg = mw.getInfo('设置PHP-{1}最大上传大小为[{2}MB]!', (version, max,))
+    msg = mw.getInfo('设置PHP-{1}最大上传大小为[{2}MB]!', (version, maxVal,))
     mw.writeLog('插件管理[PHP]', msg)
     return mw.returnJson(True, '设置成功!')
 
