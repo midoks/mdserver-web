@@ -231,6 +231,8 @@ fi
 _os=`uname`
 if [ ${_os} == "Darwin" ]; then
     OSNAME='macos'
+elif grep -Eq "openSUSE" /etc/*-release; then
+    OSNAME='opensuse'
 elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
     OSNAME='centos'
 elif grep -Eqi "Rocky" /etc/issue || grep -Eq "Rocky" /etc/*-release; then
