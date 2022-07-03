@@ -67,7 +67,7 @@ Install_lib()
 	echo  "extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
 	echo  "yaf.use_namespace=1" >> $serverPath/php/$version/etc/php.ini
 	
-	$serverPath/php/init.d/php$version reload
+	bash ${rootPath}/plugins/php/versions/lib.sh $version restart
 	echo '==========================================================='
 	echo 'successful!'
 }
@@ -92,7 +92,7 @@ Uninstall_lib()
 	sed -i $BAK "/\[yaf\]/d"  $serverPath/php/$version/etc/php.ini
 		
 	rm -f $extFile
-	$serverPath/php/init.d/php$version reload
+	bash ${rootPath}/plugins/php/versions/lib.sh $version restart
 	echo '==============================================='
 	echo 'successful!'
 }
