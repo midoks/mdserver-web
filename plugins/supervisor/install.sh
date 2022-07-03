@@ -61,10 +61,10 @@ Uninstall_app()
 {
 	
 
-	if [ -f /lib/systemd/system/supervisor.service ];then
+	if [ -f /usr/lib/systemd/system/supervisor.service ];then
 		systemctl stop supervisor
 		systemctl disable supervisor
-		rm -rf /lib/systemd/system/supervisor.service
+		rm -rf /usr/lib/systemd/system/supervisor.service
 		systemctl daemon-reload
 	fi
 

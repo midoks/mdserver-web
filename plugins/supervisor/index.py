@@ -171,7 +171,7 @@ def restart():
 
 def reload():
 
-    systemDir = '/lib/systemd/system'
+    systemDir = '/usr/lib/systemd/system'
     systemService = systemDir + '/supervisor.service'
     if os.path.exists(systemService):
         data = mw.execShell('systemctl reload supervisor')
