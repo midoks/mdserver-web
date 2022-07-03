@@ -8,11 +8,19 @@ LANG=en_US.UTF-8
 
 # systemctl stop SuSEfirewall2
 
+# for debug
+zypper install -y htop
+# for debug end
 
 zypper install -y openssl openssl-devel
-zypper install -y make cmake gcc
+zypper install -y bison re2c make cmake gcc 
+zypper install -y autoconf
 zypper install -y python3-pip
-
+zypper install -y pcre pcre-devel
+zypper install -y graphviz libxml2 libxml2-devel
+zypper install -y curl curl-devel
+zypper install -y freetype freetype-devel
+zypper install -y mysql-devel
 
 cd /www/server/mdserver-web/scripts && bash lib.sh
 chmod 755 /www/server/mdserver-web/data
