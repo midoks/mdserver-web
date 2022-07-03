@@ -6,11 +6,13 @@ LANG=en_US.UTF-8
 
 
 echo y | pacman -Sy yaourt
+
+echo y | pacman -Sy gcc make cmake autoconf
 echo y | pacman -Sy python3
 echo y | pacman -Sy lsof
 echo y | pacman -Sy python-pip
 
-
+echo y | pacman -Sy mysql-dev
 
 
 
