@@ -65,7 +65,7 @@ fi
 
 
 if [ ! -f /etc/init.d/iptables ];then
-	yum install firewalld -y
+	zypper install -y firewalld 
 	systemctl enable firewalld
 	systemctl start firewalld
 
