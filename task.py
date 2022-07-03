@@ -392,7 +392,7 @@ def startPHPVersion(version):
         # system
         phpService = '/lib/systemd/system/php' + version + '.service'
         if os.path.exists(phpService):
-            mw.execShell("systemctl reload php" + version)
+            mw.execShell("systemctl restart php" + version)
             if checkPHPVersion(version):
                 return True
 
