@@ -17,6 +17,8 @@ echo y | pacman -Sy libevent
 echo y | pacman -Sy libjpeg
 echo y | pacman -Sy libpng
 echo y | pacman -Sy libwebp
+echo y | pacman -Sy libxml2
+echo y | pacman -Sy libtirpc
 echo y | pacman -Sy gd
 echo y | pacman -Sy cronie
 echo y | pacman -Sy vi
@@ -24,6 +26,10 @@ echo y | pacman -Sy openssl
 echo y | pacman -Sy pcre
 echo y | pacman -Sy libmcrypt
 echo y | pacman -Sy oniguruma
+echo y | pacman -Sy libmemcached
+echo y | pacman -Sy bison re2c 
+echo y | pacman -Sy graphviz
+# echo y | pacman -Sy ImageMagick ImageMagick-devel
 
 # zypper install -y freetype freetype-devel
 # zypper install -y libjpeg-devel libpng-devel
