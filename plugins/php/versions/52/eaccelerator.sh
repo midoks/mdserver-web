@@ -78,8 +78,7 @@ Install_lib()
 
 
 
-	${rootPath}/plugins/php/versions/lib.sh $version restart
-	# $serverPath/php/init.d/php$version reload
+	bash ${rootPath}/plugins/php/versions/lib.sh $version restart
 	echo '==========================================================='
 	echo 'successful!'
 }
@@ -103,7 +102,7 @@ Uninstall_lib()
 		
 	rm -f $extFile
 
-	${rootPath}/plugins/php/versions/lib.sh $version restart
+	bash ${rootPath}/plugins/php/versions/lib.sh $version restart
 	echo '==============================================='
 	echo 'successful!'
 }
