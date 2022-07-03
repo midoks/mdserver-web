@@ -25,6 +25,11 @@ zypper install -y mysql-devel
 zypper install -y ImageMagick ImageMagick-devel
 zypper install -y libjpeg-devel libpng-devel
 
+
+zypper install -y python3-devel
+zypper install -y python-devel
+
+
 #https need
 if [ ! -d /root/.acme.sh ];then	
 	curl https://get.acme.sh | sh
