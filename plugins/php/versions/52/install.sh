@@ -161,10 +161,8 @@ if [ ! -d $serverPath/php/${PHP_VER}/lib/php/extensions/no-debug-non-zts-2006061
 	mkdir -p $serverPath/php/${PHP_VER}/lib/php/extensions/no-debug-non-zts-20060613
 fi
 
-# ps -ef|grep php/52 |grep -v grep |awk '{print $2}'|xargs kill
-# /www/server/php/init.d/php52 start
+
 mkdir -p $serverPath/php/${PHP_VER}/var/log
-mkdir -p $serverPath/php/${PHP_VER}/var/run
 
 #------------------------ install end ------------------------------------#
 }

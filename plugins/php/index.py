@@ -228,6 +228,10 @@ def initReplace(version):
     file_bin = initD_path + '/php' + version
     if not os.path.exists(file_bin):
         file_tpl = getPluginDir() + '/init.d/php.tpl'
+
+        if version == '52':
+            file_tpl = getPluginDir() + '/init.d/php52.tpl'
+
         content = mw.readFile(file_tpl)
         content = contentReplace(content, version)
 
