@@ -34,7 +34,7 @@ Install_mysql()
 	fi 
 
 	if [ ! -f ${mysqlDir}/mysql-5.5.62.tar.gz ];then
-		wget -O ${mysqlDir}/mysql-5.5.62.tar.gz https://dev.mysql.com/get/Downloads/MySQL-5.5/mysql-5.5.62.tar.gz
+		wget -O ${mysqlDir}/mysql-5.5.62.tar.gz --tries=3 https://dev.mysql.com/get/Downloads/MySQL-5.5/mysql-5.5.62.tar.gz
 	fi
 
 	if [ ! -d ${mysqlDir}/mysql-5.5.62 ];then
@@ -57,13 +57,14 @@ Install_mysql()
 		-DDEFAULT_CHARSET=utf8mb4 \
 		-DDEFAULT_COLLATION=utf8mb4_general_ci \
 		-DCMAKE_C_COMPILER=/usr/bin/gcc \
-		-DCMAKE_CXX_COMPILER=/usr/bin/g++ \
-		&& make ${MAKEJN:--j2} && make install && make clean
+		-DCMAKE_CXX_COMPILER=/usr/bin/g++
+		make clean && make && make install && make clean
 
 		if [ -d $serverPath/mysql ];then
 			echo '5.5' > $serverPath/mysql/version.pl
 			echo '安装完成' > $install_tmp
 		else
+			rm -rf ${mysqlDir}/mysql-5.5.62
 			echo '安装失败' > $install_tmp
 		fi
 	fi

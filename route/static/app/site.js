@@ -163,8 +163,22 @@ function setWebPs(b, e, a) {
 	},'json');
 }
 
+//创建站点前,检查服务是否开启
+function webAdd(type){
+	loading = layer.msg('正在检查是否开启OpenResty服务!',{icon:16,time:0,shade: [0.3, "#000"]})
+	$.post('/site/check_web_status', function(data){
+		layer.close(loading);
+		if (data.status){
+			webAddPage(type)
+		} else {
+			layer.msg(data.msg,{icon:0,time:3000,shade: [0.3, "#000"]})
+		}
+	},'json');
+}
+
 //添加站点
-function webAdd(type) {
+function webAddPage(type) {
+
 	if (type == 1) {
 		var array;
 		var str="";
@@ -994,9 +1008,11 @@ function webEdit(id,website,endTime,addtime){
 	+"<p onclick=\"setSSL("+id+",'"+website+"')\" title='SSL'>SSL</p>"
 	+"<p onclick=\"phpVersion('"+website+"')\" title='PHP版本'>PHP版本</p>"
 	+"<p onclick=\"to301('"+website+"')\" title='重定向'>重定向</p>"
-	+"<p onclick=\"proxyList('"+website+"')\" title='反向代理'>反向代理</p>"
+	+"<p onclick=\"toProxy('"+website+"')\" title='反向代理'>反向代理</p>"
 	+"<p id='site_"+id+"' onclick=\"security('"+id+"','"+website+"')\" title='防盗链'>防盗链</p>"
-	+"<p id='site_"+id+"' onclick=\"getSiteLogs('"+website+"')\" title='查看站点请求日志'>响应日志</p>";
+	+"<p id='site_"+id+"' onclick=\"getSiteLogs('"+website+"')\" title='查看站点请求日志'>响应日志</p>"
+	+"<p id='site_"+id+"' onclick=\"getSiteErrorLogs('"+website+"')\" title='查看站点错误日志'>错误日志</p>";
+
 	layer.open({
 		type: 1,
 		area: '640px',
@@ -1039,7 +1055,24 @@ function webEdit(id,website,endTime,addtime){
 function getSiteLogs(siteName){
 	var loadT = layer.msg('正在处理,请稍候...',{icon:16,time:0,shade: [0.3, '#000']});
 	$.post('/site/get_logs',{siteName:siteName},function(logs){
-		console.log(logs);
+		// console.log(logs);
+		layer.close(loadT);
+		if(logs.status !== true){
+			logs.msg = '';
+		}
+		if (logs.msg == '') logs.msg = '当前没有日志.';
+		var phpCon = '<textarea wrap="off" readonly="" style="white-space: pre;margin: 0px;width: 500px;height: 520px;background-color: #333;color:#fff; padding:0 5px" id="error_log">'+logs.msg+'</textarea>';
+		$("#webedit-con").html(phpCon);
+		var ob = document.getElementById('error_log');
+		ob.scrollTop = ob.scrollHeight;		
+	},'json');
+}
+
+//取网站错误日志
+function getSiteErrorLogs(siteName){
+	var loadT = layer.msg('正在处理,请稍候...',{icon:16,time:0,shade: [0.3, '#000']});
+	$.post('/site/get_error_logs',{siteName:siteName},function(logs){
+		// console.log(logs);
 		layer.close(loadT);
 		if(logs.status !== true){
 			logs.msg = '';
@@ -1366,51 +1399,6 @@ function delDirBind(id,siteId){
 	});
 }
 
-//反向代理
-function proxyList(siteName,type){
-	if(type == 1){
-		type = $("input[name='status']").attr('checked')?'0':'1';
-		toUrl = encodeURIComponent($("input[name='toUrl']").val());
-		toDomain = encodeURIComponent($("input[name='toDomain']").val());
-		var sub1 = encodeURIComponent($("input[name='sub1']").val());
-		var sub2 = encodeURIComponent($("input[name='sub2']").val());
-		var data = 'name='+siteName+'&type='+type+'&proxyUrl='+toUrl+'&toDomain=' + toDomain + '&sub1=' + sub1 + '&sub2=' + sub2;
-		var loadT = layer.msg(lan.public.the,{icon:16,time:0,shade: [0.3, '#000']});
-		$.post('/site?action=SetProxy',data,function(rdata){
-			layer.close(loadT);
-			if(rdata.status) {
-				Proxy(siteName);
-			}else{
-				$("input[name='status']").attr('checked',false)
-			}
-			layer.msg(rdata.msg,{icon:rdata.status?1:2});
-		});
-		return;
-	}
-	var loadT = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});
-	$.post('/site?action=GetProxy','name='+siteName,function(rdata){
-		layer.close(loadT);
-		if(rdata.proxyUrl == null) rdata.proxyUrl = '';
-		var status_selected = rdata.status?'checked':'';
-		var disabled = rdata.status?'disabled':'';
-		var body = "<div>"
-			   +"<p style='margin-bottom:8px'><span style='display: inline-block; width: 104px;'>"+lan.site.proxy_url+"</span><input "+disabled+" class='bt-input-text' type='text' name='toUrl' value='"+rdata.proxyUrl+"' style='margin-left: 5px;width: 380px;height: 30px;margin-right:10px;' placeholder='"+lan.site.proxy_url_info+"' /></p>"
-			   +"<p style='margin-bottom:8px'><span style='display: inline-block; width: 104px;'>"+lan.site.proxy_domain+"</span><input "+disabled+" class='bt-input-text' type='text' name='toDomain' value='"+rdata.toDomain+"' style='margin-left: 5px;width: 380px;height: 30px;margin-right:10px;' placeholder='"+lan.site.proxy_domian_info+"' /></p>"
-			   +"<p style='margin-bottom:8px'><span style='display: inline-block; width: 104px;'>"+lan.site.con_rep+"</span><input "+disabled+" class='bt-input-text' type='text' name='sub1' value='"+rdata.sub1+"' style='margin-left: 5px;width: 182px;height: 30px;margin-right:10px;' placeholder='"+lan.site.con_rep_info+"' />"
-			   +"<input class='bt-input-text' type='text' name='sub2' "+disabled+" value='"+rdata.sub2+"' style='margin-left: 5px;width: 183px;height: 30px;margin-right:10px;' placeholder='"+lan.site.to_con+"' /></p>"
-			   +'<div class="label-input-group ptb10"><label style="font-weight:normal"><input type="checkbox" name="status" '+status_selected+' onclick="Proxy(\''+siteName+'\',1)" />'+lan.site.proxy_enable+'</label><label style="margin-left: 18px;"><input '+(rdata.cache?'checked':'')+' type="checkbox" name="status" onclick="OpenCache(\''+siteName+'\',1)" />'+lan.site.proxy_cache+'</label></div>'
-			   +'<ul class="help-info-text c7 ptb10">'
-			   +'<li>'+lan.site.proxy_help_1+'</li>'
-			   +'<li>'+lan.site.proxy_help_2+'</li>'
-			   +'<li>'+lan.site.proxy_help_3+'</li>'
-			   +'<li>'+lan.site.proxy_help_4+'</li>'
-			   +'<li>'+lan.site.proxy_help_5+'</li>'
-			   +'</ul>'
-			   +"</div>";
-			$("#webedit-con").html(body);
-	});
-}
-
 //开启缓存
 function openCache(siteName){
 	var loadT = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});
@@ -1631,6 +1619,134 @@ function to301(siteName, type, obj){
 			layer.msg(res.msg, {icon:2});
 		}
 	});
+}
+
+
+//反向代理
+function toProxy(siteName, type, obj) {
+	
+	
+	// 设置 页面展示
+	if(type == 1) {
+		var proxy_form = layer.open({
+			type: 1,
+			skin: 'demo-class',
+			area: '650px',
+			title: "创建反向代理",
+			closeBtn: 2,
+			shift: 5,
+			shadeClose: false,
+			content: "<form id='form_redirect' class='divtable pd20' style='padding-bottom: 60px'>" +
+				"<div class='line'>"+
+				"<span class='tname'>目标URL</span>" +
+				"<div class='info-r ml0'>" +
+				"<input name='to' class='bt-input-text mr5' type='text' style='width:200px''>" +
+				"</div>" +
+				"</div>" +
+				"<div class='line'>" +
+				"<span class='tname'>代理目录</span>" +
+				"<div class='info-r ml0'>" +
+				"<input name='from' value='/' placeholder='/' class='bt-input-text mr5' type='text' style='width:200px;float: left;margin-right:0px''>" +
+				"<span class='tname' style='width:90px'>发送域名</span>" +
+				"<input name='host' value='$host' class='bt-input-text mr5' type='text' style='width:200px'>" +
+				"</div>" +
+				"</div>" +
+				"<div class='bt-form-submit-btn'><button type='button' class='btn btn-sm btn-danger btn-colse-proxy'>关闭</button><button type='button' class='btn btn-sm btn-success btn-submit-proxy'>提交</button></div>" +
+				"</form>"
+		});
+		setTimeout(function() {
+			$('.btn-colse-proxy').click(function() {
+				layer.close(proxy_form);
+			});
+			$('.btn-submit-proxy').click(function() {
+				var to = $('[name="to"]').val();
+				var from = $('[name="from"]').val();
+				var host = $('[name="host"]').val();
+				
+				$.post('/site/set_proxy', {
+					siteName: siteName,
+					from: from,
+					to: to,
+					host: host,
+				}, function(res) {
+					res = JSON.parse(res);
+					if (res.status) {
+						layer.close(proxy_form);
+						toProxy(siteName)
+					} else {
+						layer.msg(res.msg, {
+							icon: 2
+						});
+					}
+				});
+			});
+		}, 100);
+	}
+
+	if (type == 2) {
+		$.post('/site/del_proxy', {
+			siteName: siteName,
+			id: obj,
+		}, function(res) {
+			res = JSON.parse(res);
+			if (res.status == true) {
+				layer.msg('删除成功', {
+					time: 1000,
+					icon: 1
+				});
+				toProxy(siteName)
+			} else {
+				layer.msg(res.msg, {
+					time: 1000,
+					icon: 2
+				});
+			}
+		});
+		return
+	}
+
+
+	var body = '<div id="proxy_list" class="bt_table">\
+					<div style="padding-bottom: 10px">\
+						<button type="button" title="添加反向代理" class="btn btn-success btn-sm mr5" onclick="toProxy(\''+siteName+'\',1)" ><span>添加反向代理</span></button>\
+					</div>\
+					<div class="divtable" style="max-height:200px;">\
+						<table class="table table-hover" >\
+							<thead style="position: relative;z-index: 1;">\
+								<tr>\
+									<th><span data-index="1"><span>代理目录</span></span></th>\
+									<th><span data-index="2"><span>目标地址</span></span></th>\
+									<th><span data-index="3"><span>操作</span></span></th>\
+								</tr>\
+							</thead>\
+							<tbody id="md-301-body">\
+							</tbody>\
+						</table>\
+					</div>\
+				</div>';
+	$("#webedit-con").html(body);
+	
+	var loadT = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});
+	$.post("/site/get_proxy_list", {
+		siteName: siteName
+	},function (response) {
+		layer.close(loadT);
+		$("#md-301-loading").remove();
+		let res = JSON.parse(response);
+		if (res.status === true) {
+			let data = res.data.result;
+			data.forEach(function(item){
+				let tmp = '<tr>\
+					<td><span data-index="1"><span>'+item.from+'</span></span></td>\
+					<td><span data-index="2"><span>'+item.to+'</span></span></td>\
+					<td><span data-index="4" onclick="toProxy(\''+siteName+'\', 2, \''+ item.id +'\')" class="btlink">删除</span></td>\
+				</tr>';
+				$("#md-301-body").append(tmp);
+			})
+		} else {
+			layer.msg(res.msg, {icon:2});
+		}
+})
 }
 
 //文件验证

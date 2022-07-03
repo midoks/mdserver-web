@@ -104,80 +104,41 @@ def initDreplace():
     return file_bin
 
 
-def start():
+def mgOp(method):
+    file = initDreplace()
     if mw.isAppleSystem():
-        file = initDreplace()
-        data = mw.execShell(file + ' start')
+        data = mw.execShell(file + ' ' + method)
         if data[1] == '':
             return 'ok'
-        return 'fail'
+        return data[1]
 
-    cmd = 'systemctl start mongod'
+    cmd = 'systemctl ' + method + ' mongod'
     if os.path.exists("/usr/lib/systemd/system/mongodb.service"):
-        cmd = 'systemctl start mongodb'
+        cmd = 'systemctl ' + start + ' mongodb'
 
     data = mw.execShell(cmd)
     if data[1] == '':
         return 'ok'
-    return 'fail'
+    return data[1]
+
+
+def start():
+    return mgOp('start')
 
 
 def stop():
-    if mw.isAppleSystem():
-        file = initDreplace()
-        data = mw.execShell(file + ' stop')
-        if data[1] == '':
-            return 'ok'
-        return 'fail'
-
-    cmd = 'systemctl stop mongod'
-    if os.path.exists("/usr/lib/systemd/system/mongodb.service"):
-        cmd = 'systemctl stop mongodb'
-
-    data = mw.execShell(cmd)
-    if data[1] == '':
-        return 'ok'
-    return 'fail'
+    return mgOp('stop')
 
 
 def reload():
-    if os.path.exists("/tmp/mongodb-27017.sock"):
-        mw.execShell('rm -rf ' + "/tmp/mongodb-27017.sock")
-    if mw.isAppleSystem():
-        file = initDreplace()
-        data = mw.execShell(file + ' reload')
-        if data[1] == '':
-            return 'ok'
-        return 'fail'
-
-    cmd = 'systemctl reload mongod'
-    if os.path.exists("/usr/lib/systemd/system/mongodb.service"):
-        cmd = 'systemctl reload mongodb'
-
-    data = mw.execShell(cmd)
-    if data[1] == '':
-        return 'ok'
-    return 'fail'
+    return mgOp('reload')
 
 
 def restart():
     if os.path.exists("/tmp/mongodb-27017.sock"):
         mw.execShell('rm -rf ' + "/tmp/mongodb-27017.sock")
-    if mw.isAppleSystem():
-        file = initDreplace()
-        data = mw.execShell(file + ' reload')
-        if data[1] == '':
-            return 'ok'
-        return 'fail'
 
-    cmd = 'systemctl reload mongod'
-    if os.path.exists("/usr/lib/systemd/system/mongodb.service"):
-        cmd = 'systemctl reload mongodb'
-
-    data = mw.execShell(cmd)
-    if data[1] == '':
-        return 'ok'
-    return 'fail'
+    return mgOp('restart')
 
 
 def runInfo():
@@ -218,15 +179,8 @@ def runInfo():
 
 
 def initdStatus():
-    if not app_debug:
-        if mw.isAppleSystem():
-            return "Apple Computer does not support"
-
     if mw.isAppleSystem():
-        initd_bin = getInitDFile()
-        if os.path.exists(initd_bin):
-            return 'ok'
-        return 'fail'
+        return "Apple Computer does not support"
 
     shell_cmd = 'systemctl status mongod | grep loaded | grep "enabled;"'
 
@@ -240,17 +194,8 @@ def initdStatus():
 
 
 def initdInstall():
-    import shutil
-    if not app_debug:
-        if mw.isAppleSystem():
-            return "Apple Computer does not support"
-
     if mw.isAppleSystem():
-        source_bin = initDreplace()
-        initd_bin = getInitDFile()
-        shutil.copyfile(source_bin, initd_bin)
-        mw.execShell('chmod +x ' + initd_bin)
-        mw.execShell('chkconfig --add ' + getPluginName())
+        return "Apple Computer does not support"
 
     if os.path.exists("/usr/lib/systemd/system/mongodb.service"):
         mw.execShell('systemctl enable mongodb')
@@ -260,13 +205,8 @@ def initdInstall():
 
 
 def initdUinstall():
-    if not app_debug:
-        if mw.isAppleSystem():
-            return "Apple Computer does not support"
     if mw.isAppleSystem():
-        mw.execShell('chkconfig --del ' + getPluginName())
-        initd_bin = getInitDFile()
-        os.remove(initd_bin)
+        return "Apple Computer does not support"
 
     if os.path.exists("/usr/lib/systemd/system/mongodb.service"):
         mw.execShell('systemctl disable mongodb')

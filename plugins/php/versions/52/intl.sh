@@ -35,19 +35,21 @@ Install_lib()
 		return
 	fi
 	
-	
+	cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash icu.sh
+
 	if [ ! -f "$extFile" ];then
 
 		php_lib=$sourcePath/php_lib
 		mkdir -p $php_lib
-
+		
 		wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
 
 		cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
 		cd ${LIBNAME}-${LIBV}
 		$serverPath/php/$version/bin/phpize
-		./configure --with-php-config=$serverPath/php/$version/bin/php-config
-		make && make install && make clean
+		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
+		--with-icu-dir=${serverPath}/lib/icu
+		make clean && make && make install && make clean
 		
 	fi
 	
@@ -60,7 +62,7 @@ Install_lib()
 	echo "[${LIBNAME}]" >> $serverPath/php/$version/etc/php.ini
 	echo "extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
 
-	$serverPath/php/init.d/php$version reload
+	bash ${rootPath}/plugins/php/versions/lib.sh $version restart
 	echo '==========================================================='
 	echo 'successful!'
 }
@@ -83,7 +85,8 @@ Uninstall_lib()
 	sed -i $BAK "/${LIBNAME}/d" $serverPath/php/$version/etc/php.ini
 		
 	rm -f $extFile
-	$serverPath/php/init.d/php$version reload
+	
+	bash ${rootPath}/plugins/php/versions/lib.sh $version restart
 	echo '==============================================='
 	echo 'successful!'
 }

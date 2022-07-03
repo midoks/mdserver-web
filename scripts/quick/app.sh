@@ -14,7 +14,6 @@ fi
 # openresty
 if [ ! -d /www/server/openresty ];then
 	cd /www/server/mdserver-web/plugins/openresty && bash install.sh install 1.21.4.1
-	cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/openresty/index.py start
 else
 	echo "openresty alreay exist!"
 fi
@@ -23,17 +22,30 @@ fi
 # php
 if [ ! -d /www/server/php/71 ];then
 	cd /www/server/mdserver-web/plugins/php && bash install.sh install 71
-	cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/php/index.py start 71
 else
 	echo "php71 alreay exist!"
 fi
 
+
+# php
+if [ ! -d /www/server/php/74 ];then
+	cd /www/server/mdserver-web/plugins/php && bash install.sh install 74
+else
+	echo "php74 alreay exist!"
+fi
+
 # mysql
 if [ ! -d /www/server/mysql ];then
-	cd /www/server/mdserver-web/plugins/mysql && bash install.sh install 5.5
-	cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mysql/index.py start 5.5
+	cd /www/server/mdserver-web/plugins/mysql && bash install.sh install 5.6
 else
 	echo "mysql alreay exist!"
+fi
+
+# phpmyadmin
+if [ ! -d /www/server/phpmyadmin ];then
+	cd /www/server/mdserver-web/plugins/phpmyadmin && bash install.sh install 4.4.15
+else
+	echo "phpmyadmin alreay exist!"
 fi
 
 endTime=`date +%s`

@@ -66,7 +66,7 @@ Install_lib()
 	echo  "zend_loader.obfuscation_level_support=3" >> $serverPath/php/$version/etc/php.ini
 	echo  "zend_loader.license_path=" >> $serverPath/php/$version/etc/php.ini
 	
-	$serverPath/php/init.d/php$version reload
+	bash ${rootPath}/plugins/php/versions/lib.sh $version restart
 	echo '==========================================================='
 	echo 'successful!'
 }
@@ -89,7 +89,7 @@ Uninstall_lib()
 	sed -i $BAK "/\[Zend ZendGuard Loader\]/d"  $serverPath/php/$version/etc/php.ini
 		
 	rm -f $extFile
-	$serverPath/php/init.d/php$version reload
+	bash ${rootPath}/plugins/php/versions/lib.sh $version restart
 	echo '==============================================='
 	echo 'successful!'
 }

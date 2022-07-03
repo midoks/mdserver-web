@@ -88,6 +88,11 @@ def setBackupDir(bdir):
     return writeFile(file, bdir)
 
 
+def triggerTask():
+    isTask = getRunDir() + '/tmp/panelTask.pl'
+    writeFile(isTask, 'True')
+
+
 def getOs():
     return sys.platform
 
@@ -592,20 +597,29 @@ def getLocalIpBack():
 
 
 def getLocalIp():
-    # 取本地外网IP
+    filename = 'data/iplist.txt'
     try:
-        import re
-        filename = 'data/iplist.txt'
         ipaddress = readFile(filename)
         if not ipaddress or ipaddress == '127.0.0.1':
-            import urllib
-            url = 'https://v6r.ipip.net/?format=text'
-            req = urllib.request.urlopen(url, timeout=10)
-            ipaddress = req.read().decode('utf-8')
-            writeFile(filename, ipaddress)
+            raise
         return ipaddress
-    except Exception as ex:
-        return '127.0.0.1'
+    except Exception as e:
+        cmd = "curl -4 -sS --connect-timeout 5 -m 60 https://v6r.ipip.net/?format=text"
+        ip = execShell(cmd)
+        result = ip[0].strip()
+        if result == '':
+            raise
+        writeFile(filename, result)
+        return result
+    except Exception as e:
+        cmd = "curl -6 -sS --connect-timeout 5 -m 60 https://v6r.ipip.net/?format=text"
+        ip = execShell(cmd)
+        result = ip[0].strip()
+        if result == '':
+            return '127.0.0.1'
+        writeFile(filename, result)
+        return result
+    return '127.0.0.1'
 
 
 def inArray(arrays, searchStr):

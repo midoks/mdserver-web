@@ -37,11 +37,13 @@
 
 # Note
 
+```
 phpMyAdmin[4.4.15]支持MySQL[5.5-5.7]
 phpMyAdmin[5.2.0]支持MySQL[8.0]
 
 PHP[53-72]支持phpMyAdmin[4.4.15]
 PHP[72-81]支持phpMyAdmin[5.2.0]
+```
 
 
 
@@ -83,7 +85,7 @@ curl -fsSL  https://gitee.com/midoks/mdserver-web/raw/master/scripts/update_cn.s
 ### 通用安装
 
 ```
-curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/quick/app.sh | bash
+curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/quick/app.sh | bash
 ```
 
 

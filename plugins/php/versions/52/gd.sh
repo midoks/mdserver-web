@@ -27,6 +27,26 @@ else
 	BAK=''
 fi
 
+
+sysName=`uname`
+echo "use system: ${sysName}"
+
+if [ ${sysName} == "Darwin" ]; then
+	OSNAME='macos'
+elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
+	OSNAME='centos'
+elif grep -Eqi "Fedora" /etc/issue || grep -Eq "Fedora" /etc/*-release; then
+	OSNAME='fedora'
+elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
+	OSNAME='debian'
+elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
+	OSNAME='ubuntu'
+elif grep -Eqi "Raspbian" /etc/issue || grep -Eq "Raspbian" /etc/*-release; then
+	OSNAME='raspbian'
+else
+	OSNAME='unknow'
+fi
+
 Install_lib()
 {
 
@@ -36,9 +56,12 @@ Install_lib()
 		return
 	fi
 
-	ln -s /usr/lib64/libjpeg.so /usr/lib/libjpeg.so
-	ln -s /usr/lib64/libpng.so /usr/lib/
-	cp -frp /usr/lib64/libldap* /usr/lib/
+
+	if [ "$OSNAME" == "debian" ] &&  [ "$OSNAME" == "ubuntu" ];then
+		ln -s /usr/lib64/libjpeg.so /usr/lib/libjpeg.so
+		ln -s /usr/lib64/libpng.so /usr/lib/
+		cp -frp /usr/lib64/libldap* /usr/lib/
+	fi
 	
 	
 	if [ ! -f "$extFile" ];then
@@ -54,8 +77,7 @@ Install_lib()
 		--with-gd \
 		--with-jpeg-dir=/usr/lib \
 		--with-freetype-dir=${serverPath}/lib/freetype_old \
-		--enable-gd-native-ttf \ 
-		--enable-gd-jis-conv
+		--enable-gd-native-ttf
 
 		make clean && make && make install && make clean
 		
@@ -70,7 +92,7 @@ Install_lib()
 	echo "[${LIBNAME}]" >> $serverPath/php/$version/etc/php.ini
 	echo "extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
 	
-	$serverPath/php/init.d/php${version} restart
+	bash ${rootPath}/plugins/php/versions/lib.sh $version restart
 	echo '==========================================================='
 	echo 'successful!'
 }
@@ -93,7 +115,8 @@ Uninstall_lib()
 	sed -i $BAK "/${LIBNAME}/d" $serverPath/php/$version/etc/php.ini
 		
 	rm -f $extFile
-	$serverPath/php/init.d/php$version reload
+	
+	bash ${rootPath}/plugins/php/versions/lib.sh $version restart
 	echo '==============================================='
 	echo 'successful!'
 }

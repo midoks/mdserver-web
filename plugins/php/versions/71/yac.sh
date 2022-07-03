@@ -16,7 +16,7 @@ actionType=$1
 version=$2
 
 LIBNAME=yac
-LIBV=2.3.0
+LIBV=2.3.1
 
 NON_ZTS_FILENAME=`ls $serverPath/php/${version}/lib/php/extensions | grep no-debug-non-zts`
 extFile=$serverPath/php/${version}/lib/php/extensions/${NON_ZTS_FILENAME}/${LIBNAME}.so
@@ -67,7 +67,7 @@ Install_lib()
 	echo  "extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
 	echo  "${LIBNAME}.use_namespace=1" >> $serverPath/php/$version/etc/php.ini
 	
-	$serverPath/php/init.d/php$version reload
+	bash ${rootPath}/plugins/php/versions/lib.sh $version restart
 	echo '==========================================================='
 	echo 'successful!'
 }
@@ -89,7 +89,7 @@ Uninstall_lib()
 	sed -i $BAK "/\[${LIBNAME}\]/d"  $serverPath/php/$version/etc/php.ini
 		
 	rm -f $extFile
-	$serverPath/php/init.d/php$version reload
+	bash ${rootPath}/plugins/php/versions/lib.sh $version restart
 	echo '==============================================='
 	echo 'successful!'
 }

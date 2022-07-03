@@ -255,6 +255,8 @@ else
     OSNAME='unknow'
 fi
 
+VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
+echo "${OSNAME}:${VERSION_ID}"
 
 # system judge
 if [ "$OSNAME" == "macos" ]; then
@@ -270,16 +272,25 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     apt install -y devscripts
     apt install -y net-tools
     apt install -y python3-dev
+    apt install -y autoconf
+    apt install -y gcc
 
     apt install -y libffi-dev
     apt install -y cmake automake make
 
     apt install -y webp scons
+    apt install -y libwebp-dev
     apt install -y lzma lzma-dev
     apt install -y libunwind-dev
 
     apt install -y libpcre3 libpcre3-dev 
     apt install -y openssl
+    apt install -y libssl-dev
+    
+    apt install -y libmemcached-dev
+    apt install -y libsasl2-dev
+    apt install -y imagemagick 
+    apt install -y libmagickwand-dev
 
     apt install -y libxml2 libxml2-dev libbz2-dev libmcrypt-dev libpspell-dev librecode-dev
     apt install -y libgmp-dev libgmp3-dev libreadline-dev libxpm-dev
@@ -290,14 +301,19 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     apt install -y libjpeg62-turbo-dev
     apt install -y libfreetype6-dev
     apt install -y libevent-dev libncurses5-dev libldap2-dev
-
+    apt install -y libzip-dev
     apt install -y libicu-dev
 
-    apt install -y gcc build-essential libssl-dev 
+    apt install -y build-essential
     
+    apt install -y libcurl4-openssl-dev
     apt install -y curl libcurl4-gnutls-dev
     #https://blog.csdn.net/qq_36228377/article/details/123154344
-    ln -s  /usr/include/x86_64-linux-gnu/curl  /usr/include/curl
+    # ln -s  /usr/include/x86_64-linux-gnu/curl  /usr/include/curl
+    if [ ! -d /usr/include/curl ];then
+        ln -s  /usr/include/x86_64-linux-gnu/curl  /usr/include/curl
+    fi
+   
 
     apt install -y graphviz bison re2c flex
     apt install -y libsqlite3-dev
@@ -346,8 +362,6 @@ pip install --upgrade pip
 pip3 install --upgrade setuptools
 cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
 
-pip3 install gunicorn==20.1.0
-pip3 install gevent==21.1.2
 pip3 install gevent-websocket==0.10.1
 pip3 install requests==2.20.0
 pip3 install flask-caching==1.10.1
@@ -356,6 +370,10 @@ pip3 install pymongo
 pip3 install psutil
 pip3 install flask-socketio==5.2.0
 pip3 install mysqlclient
+
+# if [ "${OSNAME}" == "ubuntu"  ]  && [ "${VERSION_ID}" == "22.04" ];then
+#     pip3 install -U --force-reinstall --no-binary :all: gevent
+# fi
 
 if [ ! -f /www/server/mdserver-web/bin/activate ];then
     cd /www/server/mdserver-web && python3 -m venv .
@@ -368,8 +386,6 @@ pip install --upgrade pip
 pip3 install --upgrade setuptools
 pip3 install -r /www/server/mdserver-web/requirements.txt
 
-pip3 install gunicorn==20.1.0
-pip3 install gevent==21.1.2
 pip3 install gevent-websocket==0.10.1
 pip3 install requests==2.20.0
 pip3 install flask-caching==1.10.1
@@ -379,7 +395,9 @@ pip3 install psutil
 pip3 install flask-socketio==5.2.0
 pip3 install mysqlclient
 
-
+# if [ "${OSNAME}" == "ubuntu"  ]  && [ "${VERSION_ID}" == "22.04" ];then
+#     pip3 install -U --force-reinstall --no-binary :all: gevent
+# fi
 
 ##### common start #####
 

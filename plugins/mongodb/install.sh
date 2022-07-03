@@ -32,52 +32,179 @@ else
 	OSNAME='unknow'
 fi
 
+
+SYS_VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
+
+
+
 Install_app_mac()
 {
-
 	if [ ! -f $serverPath/source/mongodb-macos-x86_64-${VERSION}.tgz ];then
 		wget -O $serverPath/source/mongodb-macos-x86_64-${VERSION}.tgz https://fastdl.mongodb.org/osx/mongodb-macos-x86_64-${VERSION}.tgz
 	fi
 
 	cd $serverPath/source && tar -zxvf mongodb-macos-x86_64-${VERSION}.tgz
-	
 	cd  mongodb-macos-x86_64-${VERSION} && mv  ./* $serverPath/mongodb
 }
 
 
+Install_Linux_Ubuntu()
+{
+##################### Ubuntu start #####################
+if [ "$SYS_VERSION_ID" == "22" ]; then
+	echo "Not yet supported"
+	exit 1
+fi
+
+
+if [ -f /lib/systemd/system/mongod.service ];then
+	echo 'alreay exist!'
+	exit 0
+fi
+
+wget -qO - https://www.mongodb.org/static/pgp/server-${VERSION}.asc | sudo apt-key add -
+sudo apt install gnupg
+touch /etc/apt/sources.list.d/mongodb-org-${VERSION}.list
+lsb_release -dc
+
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/${VERSION} multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-${VERSION}.list
+
+apt update -y
+apt install -y mongodb-org
+##################### Ubuntu  end #####################
+}
+
+
+Uninstall_Linux_Ubuntu()
+{
+systemctl stop mongod
+apt purge -y mongodb-org*
+apt autoremove -y
+rm -r /var/log/mongodb
+rm -r /var/lib/mongodb
+}
+
+
+Install_Linux_Debian()
+{
+##################### debian start #####################
+if [ "$SYS_VERSION_ID" -ge "11" ]; then
+	echo "Not yet supported"
+	exit 1
+fi
+
+
+if [ -f /lib/systemd/system/mongod.service ];then
+	echo 'alreay exist!'
+	exit 0
+fi
+
+wget -qO - https://www.mongodb.org/static/pgp/server-${VERSION}.asc | sudo apt-key add -
+apt install -y gnupg
+wget -qO - https://www.mongodb.org/static/pgp/server-${VERSION}.asc | sudo apt-key add -
+
+echo "deb http://repo.mongodb.org/apt/debian buster/mongodb-org/${VERSION} main" | sudo tee /etc/apt/sources.list.d/mongodb-org-${VERSION}.list
+
+apt update -y
+apt install -y mongodb-org
+
+
+echo "mongodb-org hold" | sudo dpkg --set-selections
+echo "mongodb-org-server hold" | sudo dpkg --set-selections
+echo "mongodb-org-shell hold" | sudo dpkg --set-selections
+echo "mongodb-org-mongos hold" | sudo dpkg --set-selections
+echo "mongodb-org-tools hold" | sudo dpkg --set-selections
+
+##################### debian end #####################
+}
+
+
+
+Uninstall_Linux_Debian()
+{
+systemctl stop mongod
+apt purge -y mongodb-org*
+apt autoremove -y
+rm -r /var/log/mongodb
+rm -r /var/lib/mongodb
+}
+
+
+
+
 # https://repo.mongodb.org/yum/redhat/7/mongodb-org/5.0/x86_64/RPMS/mongodb-org-server-5.0.4-1.el7.x86_64.rpm
-Install_app_linux(){
+Install_Linux_CentOS()
+{
+##################### centos start #####################
 	if [ ! -f $serverPath/source/mongodb-org-server-${VERSION}-1.el7.x86_64.rpm ];then
 		wget -O $serverPath/source/mongodb-org-server-${VERSION}-1.el7.x86_64.rpm https://repo.mongodb.org/yum/redhat/7/mongodb-org/5.0/x86_64/RPMS/mongodb-org-server-${VERSION}-1.el7.x86_64.rpm
 	fi
-	
+
 	rpm -ivh $serverPath/source/mongodb-org-server-${VERSION}-1.el7.x86_64.rpm 
+##################### centos end #####################
+}
+
+
+Install_app_linux()
+{
+	if [ "$OSNAME" == "ubuntu" ];then
+		Install_Linux_Ubuntu
+	elif [ "$OSNAME" == "debian" ];then
+		Install_Linux_Debian
+	elif [ "$OSNAME" == "centos" ];then
+		Install_Linux_CentOS
+	else 
+		echo "Not yet supported"
+		exit 1
+	fi
 }
 
 
 Install_app()
 {
-	pip3 install pymongo
-
 	echo '正在安装脚本文件...' > $install_tmp
 	mkdir -p $serverPath/source
 	mkdir -p $serverPath/mongodb
 
 	if [ "macos" == "$OSNAME" ];then
 		Install_app_mac
-	elif [ "ubuntu" == "$OSNAME" ] || [ "debian" == "$OSNAME" ] ;then
-		apt install -y mongodb
 	else
 		Install_app_linux
 	fi
 
 	echo "${VERSION}" > $serverPath/mongodb/version.pl
 	echo '安装完成' > $install_tmp
+
+	#初始化 
+	cd ${rootPath} && python3 ${rootPath}/plugins/mongodb/index.py start
+	cd ${rootPath} && python3 ${rootPath}/plugins/mongodb/index.py initd_install
+}
+
+
+
+Uninstall_app_linux()
+{
+##################
+if [ "$OSNAME" == "ubuntu" ];then
+	Uninstall_Linux_Ubuntu
+elif [ "$OSNAME" == "debian" ];then
+	Unstall_Linux_Debian
+elif [ "$OSNAME" == "centos" ];then
+	Install_Linux_CentOS
+else 
+	echo "ok"
+fi
+##################
 }
 
 Uninstall_app()
 {
-	# apt remove mongodb -y
+	if [ "macos" == "$OSNAME" ];then
+		echo 'mac'
+	else
+		Uninstall_app_linux
+	fi
+
 	rm -rf $serverPath/mongodb
 	echo "Uninstall_mongodb" > $install_tmp
 }

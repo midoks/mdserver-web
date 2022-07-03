@@ -38,13 +38,23 @@ Install_mysql()
 	
 
 	if [ ! -f ${mysqlDir}/mysql-5.6.50.tar.gz ];then
-		wget -O ${mysqlDir}/mysql-5.6.50.tar.gz https://cdn.mysql.com/Downloads/MySQL-5.6/mysql-5.6.50.tar.gz
+		wget -O ${mysqlDir}/mysql-5.6.50.tar.gz --tries=3 https://cdn.mysql.com/Downloads/MySQL-5.6/mysql-5.6.50.tar.gz
 	fi
 
 	if [ ! -d ${mysqlDir}/mysql-5.6.50 ];then
 		 cd ${mysqlDir} && tar -zxvf  ${mysqlDir}/mysql-5.6.50.tar.gz
 	fi
-	
+
+
+	OPTIONS=''
+	##check openssl version
+	OPENSSL_VERSION=`openssl version|awk '{print $2}'|awk -F '.' '{print $1}'`
+	if [ "${OPENSSL_VERSION}" -ge "3" ];then
+		#openssl version to high
+		cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash openssl.sh
+		export PKG_CONFIG_PATH=$serverPath/lib/openssl/lib/pkgconfig
+		OPTIONS="-DWITH_SSL=${serverPath}/lib/openssl"
+	fi
 
 	if [ ! -d $serverPath/mysql ];then
 		cd ${mysqlDir}/mysql-5.6.50 && cmake \
@@ -59,16 +69,19 @@ Install_mysql()
 		-DWITH_PARTITION_STORAGE_ENGINE=1 \
 		-DEXTRA_CHARSETS=all \
 		-DDEFAULT_CHARSET=utf8mb4 \
-		-DCMAKE_C_COMPILER=/usr/bin/gcc \
-		-DCMAKE_CXX_COMPILER=/usr/bin/g++ \
 		-DDEFAULT_COLLATION=utf8mb4_general_ci \
-		&& make ${MAKEJN:--j2} && make install && make clean
+		$OPTIONS \
+		-DCMAKE_C_COMPILER=/usr/bin/gcc \
+		-DCMAKE_CXX_COMPILER=/usr/bin/g++
+		
+		make clean && make && make install && make clean
 
 
 		if [ -d $serverPath/mysql ];then
 			echo '5.6' > $serverPath/mysql/version.pl
 			echo '安装完成' > $install_tmp
 		else
+			rm -rf ${mysqlDir}/mysql-5.6.50
 			echo '安装失败' > $install_tmp
 		fi
 	fi

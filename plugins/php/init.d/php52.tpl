@@ -2,7 +2,7 @@
 
 php_fpm_BIN=/www/server/php/52/bin/php-cgi
 php_fpm_CONF=/www/server/php/52/etc/php-fpm.conf
-php_fpm_PID=/www/server/php/52/logs/php-fpm.pid
+php_fpm_PID=/www/server/php/52/var/run/php-fpm.pid
 
 
 php_opts="--fpm-config $php_fpm_CONF"

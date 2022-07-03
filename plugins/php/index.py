@@ -274,7 +274,7 @@ def phpOp(version, method):
         data = mw.execShell('systemctl ' + method + ' php' + version)
         if data[1] == '':
             return 'ok'
-        return 'fail'
+        return data[1]
 
     data = mw.execShell(file + ' ' + method)
     if data[1] == '':
@@ -287,7 +287,14 @@ def start(version):
 
 
 def stop(version):
-    return phpOp(version, 'stop')
+    status = phpOp(version, 'stop')
+
+    if version == '52':
+        file = initReplace(version)
+        data = mw.execShell(file + ' ' + 'stop')
+        if data[1] == '':
+            return 'ok'
+    return status
 
 
 def restart(version):
@@ -445,21 +452,23 @@ def setMaxTime(version):
 
 def setMaxSize(version):
     args = getArgs()
-    if not 'max' in args:
-        return 'missing time args!'
-    max = args['max']
-    if int(max) < 2:
+    data = checkArgs(args, ['max'])
+    if not data[0]:
+        return data[1]
+
+    maxVal = args['max']
+    if int(maxVal) < 2:
         return mw.returnJson(False, '上传大小限制不能小于2MB!')
 
     path = getServerDir() + '/' + version + '/etc/php.ini'
     conf = mw.readFile(path)
     rep = u"\nupload_max_filesize\s*=\s*[0-9]+M"
-    conf = re.sub(rep, u'\nupload_max_filesize = ' + max + 'M', conf)
+    conf = re.sub(rep, u'\nupload_max_filesize = ' + maxVal + 'M', conf)
     rep = u"\npost_max_size\s*=\s*[0-9]+M"
-    conf = re.sub(rep, u'\npost_max_size = ' + max + 'M', conf)
+    conf = re.sub(rep, u'\npost_max_size = ' + maxVal + 'M', conf)
     mw.writeFile(path, conf)
 
-    msg = mw.getInfo('设置PHP-{1}最大上传大小为[{2}MB]!', (version, max,))
+    msg = mw.getInfo('设置PHP-{1}最大上传大小为[{2}MB]!', (version, maxVal,))
     mw.writeLog('插件管理[PHP]', msg)
     return mw.returnJson(True, '设置成功!')
 
@@ -555,13 +564,13 @@ def getFpmStatus(version):
 
     try:
         url = 'http://' + mw.getHostAddr() + '/phpfpm_status_' + version + '?json'
-        result = mw.httpGet(url)
+        result = mw.httpGet(url, 1)
         data = json.loads(result)
         fTime = time.localtime(int(data['start time']))
         data['start time'] = time.strftime('%Y-%m-%d %H:%M:%S', fTime)
     except Exception as e:
         url = 'http://127.0.0.1/phpfpm_status_' + version + '?json'
-        result = mw.httpGet(url)
+        result = mw.httpGet(url, 1)
         data = json.loads(result)
         fTime = time.localtime(int(data['start time']))
         data['start time'] = time.strftime('%Y-%m-%d %H:%M:%S', fTime)
@@ -605,20 +614,20 @@ def setDisableFunc(version):
 
 
 def checkPhpinfoFile(v):
-    if mw.isInstalledWeb():
-        sdir = mw.getServerDir()
-        dfile = sdir + '/openresty/nginx/conf/php_status/phpinfo_' + v + '.conf'
-        if not os.path.exists(dfile):
-            tpl = getPluginDir() + '/conf/phpinfo.conf'
-            content = mw.readFile(tpl)
-            content = contentReplace(content, v)
-            mw.writeFile(dfile, content)
-            mw.restartWeb()
+    sdir = mw.getServerDir()
+    dfile = sdir + '/web_conf/php/status/phpinfo_' + v + '.conf'
+    if not os.path.exists(dfile):
+        tpl = getPluginDir() + '/conf/phpinfo.conf'
+        content = mw.readFile(tpl)
+        content = contentReplace(content, v)
+        mw.writeFile(dfile, content)
+        mw.restartWeb()
 
 
 def getPhpinfo(v):
     checkPhpinfoFile(v)
     sPath = mw.getRootDir() + '/phpinfo/' + v
+
     mw.execShell("rm -rf " + mw.getRootDir() + '/phpinfo')
     mw.execShell("mkdir -p " + sPath)
     mw.writeFile(sPath + '/phpinfo.php', '<?php phpinfo(); ?>')
@@ -629,6 +638,8 @@ def getPhpinfo(v):
 
 
 def get_php_info(args):
+    if not mw.isInstalledWeb():
+        return "openresty is not running!!!"
     return getPhpinfo(args['version'])
 
 
@@ -675,9 +686,11 @@ def installLib(version):
         name + '.sh' + ' install ' + version
 
     rettime = time.strftime('%Y-%m-%d %H:%M:%S')
-    insert_info = (None, '安装[' + name + '-' + version + ']',
+    insert_info = (None, '安装[' + name + '-PHP' + version + ']',
                    'execshell', '0', rettime, execstr)
     mw.M('tasks').add('id,name,type,status,addtime,execstr', insert_info)
+
+    mw.triggerTask()
     return mw.returnJson(True, '已将下载任务添加到队列!')
 
 
