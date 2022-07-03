@@ -40,10 +40,10 @@ Install_redis()
 
 Uninstall_redis()
 {
-	if [ -f /lib/systemd/system/redis.service ];then
+	if [ -f /usr/lib/systemd/system/redis.service ];then
 		systemctl stop redis
 		systemctl disable redis
-		rm -rf /lib/systemd/system/redis.service
+		rm -rf /usr/lib/systemd/system/redis.service
 		systemctl daemon-reload
 	fi
 

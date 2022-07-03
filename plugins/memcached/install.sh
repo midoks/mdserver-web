@@ -38,10 +38,10 @@ Install_mem(){
 Uninstall_mem()
 {
 
-	if [ -f /lib/systemd/system/memcached.service ];then
+	if [ -f /usr/lib/systemd/system/memcached.service ];then
 		systemctl stop memcached
 		systemctl disable memcached
-		rm -rf /lib/systemd/system/memcached.service
+		rm -rf /usr/lib/systemd/system/memcached.service
 		systemctl daemon-reload
 	fi
 
