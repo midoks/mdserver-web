@@ -16,6 +16,7 @@ pkg install -y lsof
 pkg install -y sqlite3
 pkg install -y py38-sqlite3
 pkg install -y py38-mysqlclient
+pkg install -y py38-cffi
 
 pkg install -y gcc
 pkg install -y autoconf
@@ -33,7 +34,7 @@ pkg install -y oniguruma
 pkg install -y brotli
 pkg install -y harfbuzz
 
-pkg install -y mysql-devel
+# pkg install -y py38-cffi
 
 
 pkg autoremove -y
