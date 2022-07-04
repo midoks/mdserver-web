@@ -40,6 +40,8 @@ echo y | pacman -Sy rpcsvc-proto
 echo y | pacman -Sy lemon
 echo y | pacman -Sy which
 
+# echo y | pacman -Sy chkconfig
+
 # zypper install -y freetype freetype-devel
 # zypper install -y libjpeg-devel libpng-devel
 # echo y | pacman -Sy rpcgen

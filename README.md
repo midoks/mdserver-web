@@ -106,6 +106,15 @@ curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/up
 ### 微信赞助
 [![截图](/route/static/img/weixin_zz.jpg)](/route/static/img/weixin_zz.jpg)
 
+
+
+### 兼容性测试报告
+
+| 软件 | CentOS [7.9, 8.4] | CentOS Stream [8, 9]|
+| 面板[MW] | ✅ |:x:| ✅ |
+
+
+
 ### 无图不真相
 
 [![截图](/route/static/mdw.jpg)](/route/static/mdw.jpg)
