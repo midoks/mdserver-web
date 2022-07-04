@@ -319,7 +319,10 @@ class system_api:
             return 1
 
     def getDiskInfo(self, get=None):
-        return self.getDiskInfo2()
+        info = self.getDiskInfo2()
+        if len(info) != 0:
+            return info
+
         # 取磁盘分区信息
         diskIo = psutil.disk_partitions()
         diskInfo = []
