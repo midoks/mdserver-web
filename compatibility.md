@@ -4,7 +4,7 @@
 
 | 系统名称 			| 	面板 		|	OpenResty 	|
 | ----------------- |---------------|---------------|
-| CentOS 7.9 		|:white_check_mark:|✅			|
+| CentOS 7.9 		|✅				|✅				|
 | CentOS 8.4 		|:x:			|✅				|
 | CentOS 8 Stream 	|✅				|✅				|
 | CentOS 9 Stream 	|✅				|✅				|
