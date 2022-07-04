@@ -350,8 +350,8 @@ class system_api:
         tempInodes1 = tempInodes.split('\n')
         diskInfo = []
         n = 0
-        cuts = ['/mnt/cdrom', '/boot', '/boot/efi', '/dev',
-                '/dev/shm', '/run/lock', '/run', '/run/shm', '/run/user']
+        cuts = ['/mnt/cdrom', '/boot', '/boot/efi', '/dev/shm',
+                '/run/lock', '/run', '/run/shm', '/run/user']
         for tmp in temp1:
             n += 1
             inodes = tempInodes1[n - 1].split()
