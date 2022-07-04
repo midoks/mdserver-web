@@ -16,6 +16,7 @@ echo y | pacman -Sy curl
 echo y | pacman -Sy libevent
 echo y | pacman -Sy libjpeg
 echo y | pacman -Sy libpng
+echo y | pacman -Sy libzip
 echo y | pacman -Sy libwebp
 echo y | pacman -Sy libxml2
 echo y | pacman -Sy libtirpc
@@ -35,11 +36,14 @@ echo y | pacman -Sy sqlite
 echo y | pacman -Sy libtool
 echo y | pacman -Sy imagemagick
 echo y | pacman -Sy mariadb-clients
+echo y | pacman -Sy rpcsvc-proto
 
 # zypper install -y freetype freetype-devel
 # zypper install -y libjpeg-devel libpng-devel
 # echo y | pacman -Sy rpcgen
 # ln -s /usr/local/mysql/lib/libmysqlclient.so.18 /usr/lib64
+
+hwclock --systohc
 
 #https need
 if [ ! -d /root/.acme.sh ];then	
