@@ -1696,6 +1696,69 @@ function toProxy(siteName, type, obj) {
 	}
 
 
+	if (type == 3) {
+		var laoding = layer.load();
+		var data = {siteName: siteName,id: obj};
+		$.post('/site/get_proxy_conf', data, function(res) {
+			layer.close(laoding);
+			res = JSON.parse(res);
+			if (res.status == true) {
+				var mBody = "<div class='webEdit-box' style='padding: 20px'>\
+				<textarea style='height: 320px; width: 445px; margin-left: 20px; line-height:18px' id='configRedirectBody'>"+res.data.result+"</textarea>\
+					<div class='info-r'>\
+						<ul class='help-info-text c7 ptb10'>\
+							<li>此处为反向代理配置文件,若您不了解配置规则,请勿随意修改.</li>\
+						</ul>\
+					</div>\
+				</div>";
+				var editor;
+				var index = layer.open({
+					type: 1,
+					title: '编辑配置文件',
+					closeBtn: 1,
+					shadeClose: true,
+					area: ['500px', '500px'],
+					btn: ['提交','关闭'],
+					content: mBody,
+					success: function () {
+						editor = CodeMirror.fromTextArea(document.getElementById("configRedirectBody"), {
+							extraKeys: {"Ctrl-Space": "autocomplete"},
+							lineNumbers: true,
+							matchBrackets:true,
+						});
+						editor.focus();
+						$(".CodeMirror-scroll").css({"height":"300px","margin":0,"padding":0});
+						$("#onlineEditFileBtn").unbind('click');
+					},
+					yes:function(index,layero){
+						$("#configRedirectBody").empty().text(editor.getValue());
+						var load = layer.load();
+						var data = {
+							siteName: siteName,
+							id: obj,
+							config: editor.getValue(),
+						};
+						$.post('/site/save_proxy_conf', data, function(res) {
+							layer.close(load)
+							var res = JSON.parse(res);
+							if (res.status == true) {
+								layer.msg('保存成功', {icon: 1});
+								layer.close(index);
+							} else {
+								layer.msg(res.msg, {time: 3000,icon: 2});
+							}
+						});
+						return true;
+			        },
+				});
+			} else {
+				layer.msg('请求错误!!', {time: 3000,icon: 2});
+			}
+		});
+		return
+	}
+
+
 	var body = '<div id="proxy_list" class="bt_table">\
 					<div style="padding-bottom: 10px">\
 						<button type="button" title="添加反向代理" class="btn btn-success btn-sm mr5" onclick="toProxy(\''+siteName+'\',1)" ><span>添加反向代理</span></button>\
@@ -1729,7 +1792,10 @@ function toProxy(siteName, type, obj) {
 				let tmp = '<tr>\
 					<td><span data-index="1"><span>'+item.from+'</span></span></td>\
 					<td><span data-index="2"><span>'+item.to+'</span></span></td>\
-					<td><span data-index="4" onclick="toProxy(\''+siteName+'\', 2, \''+ item.id +'\')" class="btlink">删除</span></td>\
+					<td>\
+					   <span data-index="4" onclick="toProxy(\''+siteName+'\', 3, \''+ item.id +'\')" class="btlink">详情</span> |\
+					   <span data-index="4" onclick="toProxy(\''+siteName+'\', 2, \''+ item.id +'\')" class="btlink">删除</span>\
+					</td>\
 				</tr>';
 				$("#md-301-body").append(tmp);
 			})

@@ -1430,6 +1430,42 @@ class site_api:
 
         mw.writeFile(vhost_file, content)
 
+    def getProxyConfApi(self):
+        _siteName = request.form.get("siteName", '')
+        _id = request.form.get("id", '')
+        if _id == '' or _siteName == '':
+            return mw.returnJson(False, "必填项不能为空!")
+
+        data = mw.readFile(
+            "{}/{}/{}.conf".format(self.proxyPath, _siteName, _id))
+        if data == False:
+            return mw.returnJson(False, "获取失败!")
+        return mw.returnJson(True, "ok", {"result": data})
+
+    def saveProxyConfApi(self):
+        _siteName = request.form.get("siteName", '')
+        _id = request.form.get("id", '')
+        _config = request.form.get("config", "")
+        if _id == '' or _siteName == '':
+            return mw.returnJson(False, "必填项不能为空!")
+
+        _old_config = mw.readFile(
+            "{}/{}/{}.conf".format(self.proxyPath, _siteName, _id))
+        if _old_config == False:
+            return mw.returnJson(False, "非法操作")
+
+        mw.writeFile("{}/{}/{}.conf".format(self.proxyPath,
+                                            _siteName, _id), _config)
+        rule_test = mw.checkWebConfig()
+        if rule_test != True:
+            mw.writeFile("{}/{}/{}.conf".format(self.proxyPath,
+                                                _siteName, _id), _old_config)
+            return mw.returnJson(False, "OpenResty 配置测试不通过, 请重试: {}".format(rule_test))
+
+        self.operateRedirectConf(_siteName, 'start')
+        mw.restartWeb()
+        return mw.returnJson(True, "ok")
+
     # 读取 网站 反向代理列表
     def getProxyListApi(self):
         _siteName = request.form.get('siteName', '')
@@ -1527,9 +1563,7 @@ location ~* ^{from}(.*)$ {
 
         self.operateProxyConf(_siteName, 'start')
         mw.restartWeb()
-        return mw.returnJson(True, "ok", {
-            "hash": _id
-        })
+        return mw.returnJson(True, "ok", {"hash": _id})
 
     def delProxyApi(self):
         _siteName = request.form.get("siteName", '')
