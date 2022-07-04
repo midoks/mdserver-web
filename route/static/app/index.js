@@ -126,7 +126,7 @@ function getDiskInfo() {
         for (var i = 0; i < rdata.length; i++) {
             var LoadColor = setcolor(parseInt(rdata[i].size[3].replace('%', '')), false, 75, 90, 95);
 
-            //判断linode信息是否存在
+            //判断inode信息是否存在
             var inodes = '';
             if ( typeof(rdata[i]['inodes']) !=='undefined' ){
                 inodes = '<div class="mask" style="color:' + LoadColor + '" data="Inode信息<br>总数：' + rdata[i].inodes[0] + '<br>已使用：' + rdata[i].inodes[1] + '<br>可用：' + rdata[i].inodes[2] + '<br>Inode使用率：' + rdata[i].inodes[3] + '"><span>' + rdata[i].size[3].replace('%', '') + '</span>%</div>';
