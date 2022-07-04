@@ -5,6 +5,7 @@ LANG=en_US.UTF-8
 
 
 pkg install -y python3
+pkg install -y python3-pip
 
 
 #https need
