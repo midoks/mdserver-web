@@ -92,7 +92,7 @@ mw_stop_task()
 {
     if [ -f $mw_path/tmp/panelTask.pl ];then
         echo -e "\033[32mThe task is running and cannot be stopped\033[0m"
-        return
+        exit 0
     fi
 
     echo -e "Stopping mw-tasks... \c";
