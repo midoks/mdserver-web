@@ -29,13 +29,18 @@ echo y | pacman -Sy oniguruma
 echo y | pacman -Sy libmemcached
 echo y | pacman -Sy bison re2c 
 echo y | pacman -Sy graphviz
-# echo y | pacman -Sy ImageMagick ImageMagick-devel
+echo y | pacman -Sy mhash
+echo y | pacman -Sy ncurses
+echo y | pacman -Sy sqlite
+echo y | pacman -Sy libtool
+echo y | pacman -Sy imagemagick
+echo y | pacman -Sy mariadb-clients
 
 # zypper install -y freetype freetype-devel
 # zypper install -y libjpeg-devel libpng-devel
 
 # echo y | pacman -Sy rpcgen
-# echo y | pacman -Sy mysql-dev
+
 
 
 ln -s /usr/local/mysql/lib/libmysqlclient.so.18 /usr/lib64
