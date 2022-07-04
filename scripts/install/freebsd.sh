@@ -6,6 +6,7 @@ LANG=en_US.UTF-8
 pkg update -y
 pkg install -y python3
 python3 -m ensurepip
+pip3 install --upgrade setuptools
 
 
 pkg autoremove -y
