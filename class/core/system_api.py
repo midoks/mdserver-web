@@ -371,16 +371,7 @@ class system_api:
             tmp1 = [disk[1], disk[2], disk[3], disk[4]]
             arr['size'] = tmp1
             arr['inodes'] = [inodes[1], inodes[2], inodes[3], inodes[4]]
-            if disk[5] == '/':
-                bootLog = os.getcwd() + '/tmp/panelBoot.pl'
-                if disk[2].find('M') != -1:
-                    if os.path.exists(bootLog):
-                        os.system('rm -f ' + bootLog)
-                else:
-                    if not os.path.exists(bootLog):
-                        pass
-            if inodes[2] != '0':
-                diskInfo.append(arr)
+            diskInfo.append(arr)
         return diskInfo
 
     # 清理系统垃圾
