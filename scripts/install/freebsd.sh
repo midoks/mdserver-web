@@ -18,6 +18,8 @@ pkg install -y make cmake
 pkg install -y libxslt
 pkg install -y libunwind
 
+pkg install -y mysql-devel
+
 
 pkg autoremove -y
 
@@ -88,7 +90,7 @@ do
     fi
 done
 
-cd /www/server/mdserver-web && /etc/init.d/mw stop
-cd /www/server/mdserver-web && /etc/init.d/mw start
-cd /www/server/mdserver-web && /etc/init.d/mw default
+cd /www/server/mdserver-web && bash /etc/init.d/mw stop
+cd /www/server/mdserver-web && bash /etc/init.d/mw start
+cd /www/server/mdserver-web && bash /etc/init.d/mw default
 
