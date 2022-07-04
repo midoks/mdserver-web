@@ -20,7 +20,7 @@
 基本上可以使用,后续会继续优化!欢迎提供意见！
 
 - 吹水组 - https://t.me/mdserver_web
-
+- [兼容性测试报告](/compatibility.md)
 
 ### 主要插件介绍
 * OpenResty - 轻量级，占有内存少，并发能力强。
@@ -105,15 +105,6 @@ curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/up
 
 ### 微信赞助
 [![截图](/route/static/img/weixin_zz.jpg)](/route/static/img/weixin_zz.jpg)
-
-
-
-### 兼容性测试报告
-
-| 软件       | CentOS [7.9, 8.4] | CentOS Stream [8, 9]|
-| --------  | ------------------ | -------- |
-| 面板[MW] | ✅ | :x:  |  ✅  |
-
 
 
 ### 无图不真相
