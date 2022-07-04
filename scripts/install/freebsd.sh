@@ -20,9 +20,14 @@ pkg install -y gmake
 pkg install -y cmake
 pkg install -y libxslt
 pkg install -y libunwind
+pkg install -y influxpkg-config
 
 pkg install -y pcre
 pkg install -y webp
+pkg install -y freetype
+pkg install -y oniguruma
+pkg install -y brotli
+pkg install -y harfbuzz
 
 pkg install -y mysql-devel
 
