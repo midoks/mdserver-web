@@ -11,7 +11,6 @@
 | Debian 10.3 		|✅				|✅				|
 | Debian 11.3 		|✅				|✅				|
 | Ubuntu 10.04 		|✅				|✅				|
-| Ubuntu 11.3 		|✅				|✅				|
 | Ubuntu 11.3 		|✅				|✅				|	
 | Fedora 31 		|✅				|✅				|
 | Fedora 32 		|✅				|✅				|
