@@ -1793,7 +1793,7 @@ function toProxy(siteName, type, obj) {
 					<td><span data-index="1"><span>'+item.from+'</span></span></td>\
 					<td><span data-index="2"><span>'+item.to+'</span></span></td>\
 					<td>\
-					   <span data-index="4" onclick="toProxy(\''+siteName+'\', 3, \''+ item.id +'\')" class="btlink">详情</span> |\
+					   <span data-index="4" onclick="toProxy(\''+siteName+'\', 3, \''+ item.id +'\')" class="btlink">详细</span> |\
 					   <span data-index="4" onclick="toProxy(\''+siteName+'\', 2, \''+ item.id +'\')" class="btlink">删除</span>\
 					</td>\
 				</tr>';
