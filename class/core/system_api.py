@@ -318,7 +318,7 @@ class system_api:
         except Exception as ex:
             return 1
 
-    def getDiskInfo(self, get=None):
+    def getDiskInfo(self):
         info = self.getDiskInfo2()
         if len(info) != 0:
             return info
