@@ -98,7 +98,6 @@ mw_stop_task()
     echo -e "Stopping mw-tasks... \c";
     pids=$(ps aux | grep 'task.py'|grep -v grep|awk '{print $2}')
     arr=($pids)
-
     for p in ${arr[@]}
     do
             kill -9 $p
