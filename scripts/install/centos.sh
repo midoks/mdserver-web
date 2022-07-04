@@ -14,6 +14,7 @@ sed -i 's#SELINUX=enforcing#SELINUX=disabled#g' /etc/selinux/config
 
 yum install -y wget lsof crontabs
 yum install -y python3-devel
+yum install -y python3-pip
 yum install -y python-devel
 yum install -y vixie-cron
 yum install -y curl-devel libmcrypt libmcrypt-devel
@@ -48,6 +49,8 @@ fi
 if [ ! -f /etc/init.d/iptables ];then
 	yum install firewalld -y
 	systemctl enable firewalld
+	#取消服务锁定
+	systemctl unmask firewalld
 	systemctl start firewalld
 
 	firewall-cmd --permanent --zone=public --add-port=22/tcp
