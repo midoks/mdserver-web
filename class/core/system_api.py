@@ -334,7 +334,9 @@ class system_api:
                 continue
             tmp = {}
             tmp['path'] = disk[1]
-            tmp['size'] = psutil.disk_usage(disk[1])
+            size_tmp = psutil.disk_usage(disk[1])
+            tmp['size'] = [mw.toSize(size_tmp[0]), mw.toSize(
+                size_tmp[1]), mw.toSize(size_tmp[2]), str(size_tmp[2]) + '%']
             diskInfo.append(tmp)
         return diskInfo
 
