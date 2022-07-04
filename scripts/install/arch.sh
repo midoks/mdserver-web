@@ -38,12 +38,8 @@ echo y | pacman -Sy mariadb-clients
 
 # zypper install -y freetype freetype-devel
 # zypper install -y libjpeg-devel libpng-devel
-
 # echo y | pacman -Sy rpcgen
-
-
-
-ln -s /usr/local/mysql/lib/libmysqlclient.so.18 /usr/lib64
+# ln -s /usr/local/mysql/lib/libmysqlclient.so.18 /usr/lib64
 
 #https need
 if [ ! -d /root/.acme.sh ];then	
