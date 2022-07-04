@@ -33,6 +33,8 @@ if [ ${_os} == "Darwin" ]; then
 elif grep -Eq "openSUSE" /etc/*-release; then
 	OSNAME='opensuse'
 	zypper refresh
+elif grep -Eq "FreeBSD" /etc/*-release; then
+	OSNAME='freebsd'
 elif grep -Eqi "Arch" /etc/issue || grep -Eq "Arch" /etc/*-release; then
 	OSNAME='arch'
 	echo y | pacman -Sy unzip
