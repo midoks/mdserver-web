@@ -15,7 +15,7 @@ pkg install -y py38-mysqlclient
 
 pkg install -y gcc
 pkg install -y autoconf
-pkg install -y make cmake
+pkg install -y make cmake gmake
 pkg install -y libxslt
 pkg install -y libunwind
 
