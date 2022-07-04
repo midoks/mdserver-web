@@ -8,6 +8,7 @@ pkg install -y python3
 python3 -m ensurepip
 pip3 install --upgrade setuptools
 pkg install -y lsof
+pkg install -y mysql-devel
 
 
 pkg autoremove -y
@@ -65,7 +66,7 @@ cd /www/server/mdserver-web/scripts && bash lib.sh
 chmod 755 /www/server/mdserver-web/data
 
 
-cd /www/server/mdserver-web && ./cli.sh start
+cd /www/server/mdserver-web && bash cli.sh start
 isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`
 n=0
 while [[ ! -f /etc/init.d/mw ]];
