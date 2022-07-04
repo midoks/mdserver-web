@@ -1495,16 +1495,10 @@ function to301(siteName, type, obj){
 		}, function(res) {
 			res = JSON.parse(res);
 			if (res.status == true) {
-				layer.msg('删除成功', {
-					time: 1000,
-					icon: 1
-				});
-				to301(siteName)
+				layer.msg('删除成功', {time: 1000,icon: 1});
+				to301(siteName);
 			} else {
-				layer.msg(res.msg, {
-					time: 1000,
-					icon: 2
-				});
+				layer.msg(res.msg, {time: 1000,icon: 2});
 			}
 		});
 		return
@@ -1512,64 +1506,62 @@ function to301(siteName, type, obj){
 
 	if (type == 3) {
 		var laoding = layer.load();
-		$.post('/site/get_redirect_conf', {
-			siteName: siteName,
-			id: obj,
-		}, function(res) {
+		var data = {siteName: siteName,id: obj};
+		$.post('/site/get_redirect_conf', data, function(res) {
 			layer.close(laoding);
 			res = JSON.parse(res);
 			if (res.status == true) {
 				var mBody = "<div class='webEdit-box' style='padding: 20px'>\
-				<textarea style='height: 320px; width: 445px; margin-left: 20px; line-height:18px' id='configBody'>"+res.data.result+"</textarea>\
+				<textarea style='height: 320px; width: 445px; margin-left: 20px; line-height:18px' id='configRedirectBody'>"+res.data.result+"</textarea>\
 					<div class='info-r'>\
-						<button id='SaveRedirectConfigFileBtn' class='btn btn-success btn-sm' style='margin-top:15px;'>保存</button>\
 						<ul class='help-info-text c7 ptb10'>\
 							<li>此处为重定向配置文件,若您不了解配置规则,请勿随意修改.</li>\
 						</ul>\
 					</div>\
 				</div>";
+				var editor;
 				var index = layer.open({
 					type: 1,
 					title: '编辑配置文件',
 					closeBtn: 1,
-					shadeClose: false,
+					shadeClose: true,
 					area: ['500px', '500px'],
+					btn: ['提交','关闭'],
 					content: mBody,
 					success: function () {
-						$("#SaveRedirectConfigFileBtn").click(function(){
-							$("#configBody").empty();
-							$("#configBody").text(editor.getValue());
-							var load = layer.load()
-							$.post('/site/save_redirect_conf', {
-								siteName: siteName,
-								id: obj,
-								config: editor.getValue()
-							}, function(res) {
-								layer.close(load)
-								var res = JSON.parse(res);
-								if (res.status == true) {
-									layer.msg('保存成功', {
-										icon: 1
-									});
-									layer.close(index);
-								} else {
-									layer.msg(res.msg, {
-										time: 1000,
-										icon: 2
-									});
-								}
-							});
-						})
-					}
+						editor = CodeMirror.fromTextArea(document.getElementById("configRedirectBody"), {
+							extraKeys: {"Ctrl-Space": "autocomplete"},
+							lineNumbers: true,
+							matchBrackets:true,
+						});
+						editor.focus();
+						$(".CodeMirror-scroll").css({"height":"300px","margin":0,"padding":0});
+						$("#onlineEditFileBtn").unbind('click');
+					},
+					yes:function(index,layero){
+						$("#configRedirectBody").empty().text(editor.getValue());
+						var load = layer.load();
+						var data = {
+							siteName: siteName,
+							id: obj,
+							config: editor.getValue(),
+						};
+						$.post('/site/save_redirect_conf', data, function(res) {
+							layer.close(load)
+							var res = JSON.parse(res);
+							if (res.status == true) {
+								layer.msg('保存成功', {icon: 1});
+								layer.close(index);
+							} else {
+								layer.msg(res.msg, {time: 3000,icon: 2});
+							}
+						});
+						return true;
+			        },
 				});
-				var editor = CodeMirror.fromTextArea(document.getElementById("configBody"), {
-					extraKeys: {"Ctrl-Space": "autocomplete"},
-					lineNumbers: true,
-					matchBrackets:true,
-				});
-				$(".CodeMirror-scroll").css({"height":"300px","margin":0,"padding":0});
-			} else {
 				
+			} else {
+				layer.msg('请求错误!!', {time: 3000,icon: 2});
 			}
 		});
 		return
@@ -1597,7 +1589,6 @@ function to301(siteName, type, obj){
 	$("#webedit-con").html(body);
 	
 	var loadT = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});
-
 	$.post('/site/get_redirect','siteName='+siteName, function(response) {
 		layer.close(loadT);
 		$("#md-301-loading").remove();
@@ -1624,7 +1615,6 @@ function to301(siteName, type, obj){
 
 //反向代理
 function toProxy(siteName, type, obj) {
-	
 	
 	// 设置 页面展示
 	if(type == 1) {
