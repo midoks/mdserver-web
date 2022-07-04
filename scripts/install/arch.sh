@@ -38,7 +38,7 @@ echo y | pacman -Sy imagemagick
 echo y | pacman -Sy mariadb-clients
 echo y | pacman -Sy rpcsvc-proto
 echo y | pacman -Sy lemon
-
+echo y | pacman -Sy which
 
 # zypper install -y freetype freetype-devel
 # zypper install -y libjpeg-devel libpng-devel
