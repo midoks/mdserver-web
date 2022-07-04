@@ -8,7 +8,8 @@ pkg install -y python3
 python3 -m ensurepip
 pip3 install --upgrade setuptools
 pkg install -y lsof
-pkg install -y mysql-devel
+pkg install -y sqlite3
+
 
 
 pkg autoremove -y
