@@ -10,6 +10,12 @@ pip3 install --upgrade setuptools
 pkg install -y lsof
 pkg install -y sqlite3
 
+pkg install -y gcc
+pkg install -y autoconf
+pkg install -y make cmake
+
+
+pkg install -y libsqlite3-devel
 
 
 pkg autoremove -y
