@@ -11,10 +11,12 @@ python3 -m pip install --upgrade pip
 pkg install -y lsof
 pkg install -y sqlite3
 
+pkg install py38-sqlite3
+
 pkg install -y gcc
 pkg install -y autoconf
 pkg install -y make cmake
-
+pkg install -y libxslt
 
 pkg install -y libsqlite3-devel
 
