@@ -17,7 +17,7 @@
 | Fedora 32 		|✅				|✅				|
 | AlmaLinix 9 		|✅				|✅				|
 | RockyLinux 8.6 	|✅				|✅				|
-| openSUSE 15.4 	|✅				|✅				|
+| openSUSE 15.4 	|:x:			|:x:			|
 
 
 
@@ -35,7 +35,7 @@
 | Fedora 32 		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
 | AlmaLinix 9 		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
 | RockyLinux 8.6 	|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
-| openSUSE 15.4 	|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
+| openSUSE 15.4 	|:x:	|:x:	|:x:	|:x:	|:x:	|:x:	|:x:	|:x:	|:x:	|:x:	|:x:	|:x:	|
 
 
 
@@ -53,5 +53,5 @@
 | Fedora 32 		|✅			|✅			|✅			|✅			|	
 | AlmaLinix 9 		|✅			|✅			|✅			|✅			|	
 | RockyLinux 8.6 	|✅			|✅			|✅			|✅			|	
-| openSUSE 15.4 	|✅			|✅			|✅			|✅			|
+| openSUSE 15.4 	|:x:		|:x:		|:x:		|:x:		|
 
