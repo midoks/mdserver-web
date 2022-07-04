@@ -31,7 +31,7 @@ fi
 
 
 if [ ! -f /etc/init.d/iptables ];then
-	zypper install -y firewalld 
+	pkg install -y firewalld 
 	systemctl enable firewalld
 	systemctl start firewalld
 
