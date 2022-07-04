@@ -8,6 +8,8 @@ pkg install -y python3
 pkg install -y python3-pip
 
 
+pkg autoremove -y
+
 #https need
 if [ ! -d /root/.acme.sh ];then	
 	curl https://get.acme.sh | sh
