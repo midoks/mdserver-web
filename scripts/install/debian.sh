@@ -12,6 +12,10 @@ LANG=en_US.UTF-8
 # WHITE='\e[1;37m'  # 白色
 # NC='\e[0m' # 没有颜色
 
+if grep -Eq "Debian" /etc/*-release && [ ! -f /bin/sh ]; then
+    ln -sf /bin/bash /bin/sh
+fi
+
 apt update -y
 
 

@@ -222,14 +222,6 @@ echo -e "Install_Curl" >> ${libPath}/lib.pl
 }
 
 
-if grep -Eq "Ubuntu" /etc/*-release && [ ! -f /bin/sh ]; then
-    sudo ln -sf /bin/bash /bin/sh
-    #sudo dpkg-reconfigure dash
-fi
-
-if grep -Eq "Debian" /etc/*-release && [ ! -f /bin/sh ]; then
-    ln -sf /bin/bash /bin/sh
-fi
 
 _os=`uname`
 if [ ${_os} == "Darwin" ]; then
