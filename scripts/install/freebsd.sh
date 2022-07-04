@@ -11,6 +11,7 @@ python3 -m pip install --upgrade pip
 pkg install -y lsof
 pkg install -y sqlite3
 pkg install -y py38-sqlite3
+pkg install -y py38-mysqlclient
 
 pkg install -y gcc
 pkg install -y autoconf
