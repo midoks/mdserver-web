@@ -83,8 +83,8 @@ mw_start_task()
 
 mw_start()
 {
-	mw_start_panel
     mw_start_task
+	mw_start_panel
 }
 
 
@@ -123,8 +123,8 @@ mw_stop_panel()
 
 mw_stop()
 {
-    mw_stop_panel
     mw_stop_task
+    mw_stop_panel
 }
 
 mw_status()
