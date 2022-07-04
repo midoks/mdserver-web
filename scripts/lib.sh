@@ -232,6 +232,8 @@ if [ ${_os} == "Darwin" ]; then
     OSNAME='macos'
 elif grep -Eq "openSUSE" /etc/*-release; then
     OSNAME='opensuse'
+elif grep -Eq "FreeBSD" /etc/*-release; then
+    OSNAME='freebsd'
 elif grep -Eqi "Arch" /etc/issue || grep -Eq "Arch" /etc/*-release; then
     OSNAME='arch'
 elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
@@ -273,6 +275,8 @@ elif [ "$OSNAME" == "opensuse" ];then
     echo "opensuse lib"
 elif [ "$OSNAME" == "arch" ];then
     echo "arch lib"
+elif [ "$OSNAME" == "freebsd" ];then
+    echo "freebsd lib"
 elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     
     apt install -y devscripts
