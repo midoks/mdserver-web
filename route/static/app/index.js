@@ -142,10 +142,8 @@ function getDiskInfo() {
                 if (rdata[i].size[2].indexOf('M') != -1) {
                     $("#messageError").show();
                     $("#messageError").append('<p><span class="glyphicon glyphicon-alert" style="color: #ff4040; margin-right: 10px;"></span> ' + lan.get('diskinfo_span_1', [rdata[i].path]) + '<a class="btlink" href="javascript:ClearSystem();">[清理垃圾]</a></p>');
-                }
-                
+                } 
             }
-
            
             dBody = '<li class="col-xs-6 col-sm-3 col-md-3 col-lg-2 mtb20 circle-box text-center diskbox">' +
                 '<h3 class="c5 f15">' + rdata[i].path + '</h3>' +
