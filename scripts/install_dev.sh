@@ -35,7 +35,7 @@ elif grep -Eq "openSUSE" /etc/*-release; then
 	zypper refresh
 elif grep -Eq "FreeBSD" /etc/*-release; then
 	OSNAME='freebsd'
-	pkg install -u wget unzip
+	pkg install -y wget unzip
 elif grep -Eqi "Arch" /etc/issue || grep -Eq "Arch" /etc/*-release; then
 	OSNAME='arch'
 	echo y | pacman -Sy unzip
