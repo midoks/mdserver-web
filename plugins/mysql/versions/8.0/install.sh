@@ -58,7 +58,7 @@ VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -
 
 
 
-VERSION=8.0.25
+VERSION=8.0.29
 
 
 Install_mysql()
