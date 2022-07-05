@@ -30,7 +30,6 @@
 * phpMyAdmin - 著名Web端MySQL管理工具。
 * Memcached - 一个高性能的分布式内存对象缓存系统。
 * Redis - 一个高性能的KV数据库。
-* CSVN - 最流行的SVN代码共享管理软件。
 * PureFtpd - 一款专注于程序健壮和软件安全的免费FTP服务器软件。
 * Gogs - 一款极易搭建的自助Git服务。
 * Rsyncd - 通用同步服务。
