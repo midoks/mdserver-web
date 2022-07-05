@@ -3,6 +3,14 @@
 - 暂时不具有指导意见
 
 
+快速测试命令
+
+```
+cd /www/server/mdserver-web/scripts/quick && bash debug.sh
+cd /www/server/mdserver-web/plugins/php && bash all_test.sh
+```
+
+
 | 系统名称 			| 	面板 		|	OpenResty 	|
 | ----------------- |---------------|---------------|
 | CentOS 7.9 		|✅				|✅				|
