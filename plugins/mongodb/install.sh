@@ -176,7 +176,7 @@ baseurl=https://repo.mongodb.org/yum/redhat/\$releasever/mongodb-org/${VERSION}/
 gpgcheck=1
 enabled=1
 gpgkey=https://www.mongodb.org/static/pgp/server-${VERSION}.asc
-" > /etc/yum.repos.d/mongodb-org-${VERSION}.rep
+" > /etc/yum.repos.d/mongodb-org-${VERSION}.repo
 
 yum install -y mongodb-org
 ##################### centos end #####################
