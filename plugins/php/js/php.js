@@ -501,6 +501,7 @@ function phpLibConfig(version){
                 <li>请按实际需求安装扩展,不要安装不必要的PHP扩展,这会影响PHP执行效率,甚至出现异常</li>\
                 <li>Redis扩展只允许在1个PHP版本中使用,安装到其它PHP版本请在[软件管理]重装Redis</li>\
                 <li>opcache/xcache/apc等脚本缓存扩展,请只安装其中1个,否则可能导致您的站点程序异常</li>\
+                <li>ioncube要在ZendGuardLoader获取opcache前安装,否则可能导致您的站点程序异常</li>\
             </ul>';
         $('.soft-man-con').html(con);
     });
