@@ -798,7 +798,7 @@ class plugins_api:
 
     # shell 调用
     def run(self, name, func, version='', args='', script='index'):
-        path = mw.getRunDir() + '/' + self.__plugin_dir + \
+        path = self.__plugin_dir + \
             '/' + name + '/' + script + '.py'
         py = 'python3 ' + path
 
