@@ -132,7 +132,7 @@ def confReplace():
         mw.execShell('mkdir -p ' + php_conf)
     static_conf = mw.getServerDir() + '/web_conf/php/conf/enable-php-00.conf'
     if not os.path.exists(static_conf):
-        mw.writeFile(static_conf, '')
+        mw.writeFile(static_conf, 'set $PHP_ENV 0;')
 
     # give nginx root permission
     ng_exe_bin = getServerDir() + "/nginx/sbin/nginx"
