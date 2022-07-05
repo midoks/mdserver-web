@@ -32,11 +32,11 @@ Install_mysql()
 	fi
 
 	INSTALL_CMD=cmake
-	if [ "$sysName" != "Darwin" ];then
-		mkdir -p /var/log/mariadb
-		touch /var/log/mariadb/mariadb.log
-		INSTALL_CMD=cmake
-	fi 
+	# check cmake version
+	CMAKE_VERSION=`cmake -version | grep version | awk '{print $3}' | awk -F '.' '{print $1}'`
+	if [ "$CMAKE_VERSION" -eq "2" ];then
+		INSTALL_CMD=cmake3
+	fi
 
 	if [ ! -f ${mysqlDir}/mysql-boost-8.0.25.tar.gz ];then
 		wget -O ${mysqlDir}/mysql-boost-8.0.25.tar.gz --tries=3 https://cdn.mysql.com/archives/mysql-8.0/mysql-boost-8.0.25.tar.gz
