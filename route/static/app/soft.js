@@ -210,9 +210,6 @@ function addVersion(name, ver, type, obj, title, install_pre_inspection) {
     });
     $("#bi-btn").click(function() {
 
-
-
-
         var info = $("#SelectVersion").val().toLowerCase();
         if (info == ''){
             info = $("#SelectVersion").text().toLowerCase();
