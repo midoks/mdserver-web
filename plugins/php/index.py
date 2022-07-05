@@ -556,8 +556,10 @@ def checkFpmStatusFile(version):
 
 
 def getFpmStatus(version):
-    checkFpmStatusFile(version)
+    if version == '52':
+        return mw.returnJson(False, 'PHP[' + version + ']不支持!!!')
 
+    checkFpmStatusFile(version)
     stat = status(version)
     if stat == 'stop':
         return mw.returnJson(False, 'PHP[' + version + ']未启动!!!')
