@@ -1626,6 +1626,7 @@ function toProxy(siteName, type, obj) {
 			closeBtn: 2,
 			shift: 5,
 			shadeClose: false,
+			btn: ['提交','关闭'],
 			content: "<form id='form_redirect' class='divtable pd20' style='padding-bottom: 60px'>" +
 				"<div class='line'>"+
 				"<span class='tname'>目标URL</span>" +
@@ -1641,57 +1642,34 @@ function toProxy(siteName, type, obj) {
 				"<input name='host' value='$host' class='bt-input-text mr5' type='text' style='width:200px'>" +
 				"</div>" +
 				"</div>" +
-				"<div class='bt-form-submit-btn'><button type='button' class='btn btn-sm btn-danger btn-colse-proxy'>关闭</button><button type='button' class='btn btn-sm btn-success btn-submit-proxy'>提交</button></div>" +
-				"</form>"
-		});
-		setTimeout(function() {
-			$('.btn-colse-proxy').click(function() {
-				layer.close(proxy_form);
-			});
-			$('.btn-submit-proxy').click(function() {
+				"</form>",
+			yes:function(){
+				
 				var to = $('[name="to"]').val();
 				var from = $('[name="from"]').val();
 				var host = $('[name="host"]').val();
-				
-				$.post('/site/set_proxy', {
-					siteName: siteName,
-					from: from,
-					to: to,
-					host: host,
-				}, function(res) {
-					res = JSON.parse(res);
+				$.post('/site/set_proxy', {siteName: siteName,from: from,to: to,host: host}, function(res) {
 					if (res.status) {
 						layer.close(proxy_form);
 						toProxy(siteName)
 					} else {
-						layer.msg(res.msg, {
-							icon: 2
-						});
+						layer.msg(res.msg, {icon: 2});
 					}
-				});
-			});
-		}, 100);
+				},'json');
+				
+			}
+		});
 	}
 
 	if (type == 2) {
-		$.post('/site/del_proxy', {
-			siteName: siteName,
-			id: obj,
-		}, function(res) {
-			res = JSON.parse(res);
+		$.post('/site/del_proxy', {siteName: siteName,id: obj,}, function(res) {
 			if (res.status == true) {
-				layer.msg('删除成功', {
-					time: 1000,
-					icon: 1
-				});
+				layer.msg('删除成功', {time: 1000,icon: 1});
 				toProxy(siteName)
 			} else {
-				layer.msg(res.msg, {
-					time: 1000,
-					icon: 2
-				});
+				layer.msg(res.msg, {time: 1000,icon: 2});
 			}
-		});
+		},'json');
 		return
 	}
 
@@ -1704,7 +1682,7 @@ function toProxy(siteName, type, obj) {
 			res = JSON.parse(res);
 			if (res.status == true) {
 				var mBody = "<div class='webEdit-box' style='padding: 20px'>\
-				<textarea style='height: 320px; width: 445px; margin-left: 20px; line-height:18px' id='configRedirectBody'>"+res.data.result+"</textarea>\
+				<textarea style='height: 320px; width: 445px; margin-left: 20px; line-height:18px' id='configProxyBody'>"+res.data.result+"</textarea>\
 					<div class='info-r'>\
 						<ul class='help-info-text c7 ptb10'>\
 							<li>此处为反向代理配置文件,若您不了解配置规则,请勿随意修改.</li>\
@@ -1721,7 +1699,7 @@ function toProxy(siteName, type, obj) {
 					btn: ['提交','关闭'],
 					content: mBody,
 					success: function () {
-						editor = CodeMirror.fromTextArea(document.getElementById("configRedirectBody"), {
+						editor = CodeMirror.fromTextArea(document.getElementById("configProxyBody"), {
 							extraKeys: {"Ctrl-Space": "autocomplete"},
 							lineNumbers: true,
 							matchBrackets:true,
@@ -1731,7 +1709,7 @@ function toProxy(siteName, type, obj) {
 						$("#onlineEditFileBtn").unbind('click');
 					},
 					yes:function(index,layero){
-						$("#configRedirectBody").empty().text(editor.getValue());
+						$("#configProxyBody").empty().text(editor.getValue());
 						var load = layer.load();
 						var data = {
 							siteName: siteName,
@@ -1780,12 +1758,9 @@ function toProxy(siteName, type, obj) {
 	$("#webedit-con").html(body);
 	
 	var loadT = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});
-	$.post("/site/get_proxy_list", {
-		siteName: siteName
-	},function (response) {
+	$.post("/site/get_proxy_list", {siteName: siteName},function (res) {
 		layer.close(loadT);
 		$("#md-301-loading").remove();
-		let res = JSON.parse(response);
 		if (res.status === true) {
 			let data = res.data.result;
 			data.forEach(function(item){
@@ -1802,7 +1777,8 @@ function toProxy(siteName, type, obj) {
 		} else {
 			layer.msg(res.msg, {icon:2});
 		}
-})
+	},'json');
+/////////
 }
 
 //文件验证
