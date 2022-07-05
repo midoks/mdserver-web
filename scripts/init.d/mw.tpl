@@ -77,7 +77,7 @@ mw_start_task()
         fi
         echo -e "\033[32mdone\033[0m"
     else
-        echo "Starting mw-tasks... mw-tasks (pid $isStart) already running"
+        echo "Starting mw-tasks... mw-tasks (pid $(echo $isStart)) already running"
     fi
 }
 
