@@ -346,7 +346,7 @@ def getPhpConf(version):
         {'name': 'asp_tags', 'type': 1, 'ps': 'ASP标签支持'},
         {'name': 'max_execution_time', 'type': 2, 'ps': '最大脚本运行时间'},
         {'name': 'max_input_time', 'type': 2, 'ps': '最大输入时间'},
-        {'name': 'max_input_var', 'type': 2, 'ps': '最大输入数量'},
+        {'name': 'max_input_vars', 'type': 2, 'ps': '最大输入数量'},
         {'name': 'memory_limit', 'type': 2, 'ps': '脚本内存限制'},
         {'name': 'post_max_size', 'type': 2, 'ps': 'POST数据最大尺寸'},
         {'name': 'file_uploads', 'type': 1, 'ps': '是否允许上传文件'},
@@ -372,7 +372,7 @@ def getPhpConf(version):
 
 def submitPhpConf(version):
     gets = ['display_errors', 'cgi.fix_pathinfo', 'date.timezone', 'short_open_tag',
-            'asp_tags', 'max_execution_time', 'max_input_time', 'memory_limit',
+            'asp_tags', 'max_execution_time', 'max_input_time', 'max_input_vars', 'memory_limit',
             'post_max_size', 'file_uploads', 'upload_max_filesize', 'max_file_uploads',
             'default_socket_timeout', 'error_reporting']
     args = getArgs()
@@ -384,7 +384,8 @@ def submitPhpConf(version):
             val = g + ' = ' + args[g] + '\n'
             phpini = re.sub(rep, val, phpini)
     mw.writeFile(filename, phpini)
-    mw.execShell(getServerDir() + '/init.d/php' + version + ' reload')
+    # mw.execShell(getServerDir() + '/init.d/php' + version + ' reload')
+    reload(version)
     return mw.returnJson(True, '设置成功')
 
 

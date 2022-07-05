@@ -111,6 +111,7 @@ function submitConf(version) {
         safe_mode: $("select[name='safe_mode']").val(),
         max_execution_time: $("input[name='max_execution_time']").val(),
         max_input_time: $("input[name='max_input_time']").val(),
+        max_input_vars: $("input[name='max_input_vars']").val(),
         memory_limit: $("input[name='memory_limit']").val(),
         post_max_size: $("input[name='post_max_size']").val(),
         file_uploads: $("select[name='file_uploads']").val(),
