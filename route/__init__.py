@@ -6,6 +6,7 @@ import os
 import time
 import shutil
 import uuid
+import traceback
 
 # reload(sys)
 #  sys.setdefaultencoding('utf-8')
@@ -127,6 +128,8 @@ def publicObject(toObject, func, action=None, get=None):
         data = {'msg': '404,not find api[' + name + ']', "status": False}
         return mw.getJson(data)
     except Exception as e:
+        # API发生错误记录
+        print(traceback.print_exc())
         data = {'msg': '访问异常:' + str(e) + '!', "status": False}
         return mw.getJson(data)
 
