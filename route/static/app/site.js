@@ -1548,14 +1548,13 @@ function to301(siteName, type, obj){
 						};
 						$.post('/site/save_redirect_conf', data, function(res) {
 							layer.close(load)
-							var res = JSON.parse(res);
 							if (res.status == true) {
 								layer.msg('保存成功', {icon: 1});
 								layer.close(index);
 							} else {
 								layer.msg(res.msg, {time: 3000,icon: 2});
 							}
-						});
+						},'json');
 						return true;
 			        },
 				});
@@ -1589,10 +1588,9 @@ function to301(siteName, type, obj){
 	$("#webedit-con").html(body);
 	
 	var loadT = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});
-	$.post('/site/get_redirect','siteName='+siteName, function(response) {
+	$.post('/site/get_redirect','siteName='+siteName, function(res) {
 		layer.close(loadT);
 		$("#md-301-loading").remove();
-		let res = JSON.parse(response);
 		if (res.status === true) {
 			let data = res.data.result;
 			data.forEach(function(item){
@@ -1609,7 +1607,7 @@ function to301(siteName, type, obj){
 		} else {
 			layer.msg(res.msg, {icon:2});
 		}
-	});
+	},'json');
 }
 
 
@@ -1620,27 +1618,33 @@ function toProxy(siteName, type, obj) {
 	if(type == 1) {
 		var proxy_form = layer.open({
 			type: 1,
-			skin: 'demo-class',
 			area: '650px',
 			title: "创建反向代理",
 			closeBtn: 2,
 			shift: 5,
 			shadeClose: false,
 			btn: ['提交','关闭'],
-			content: "<form id='form_redirect' class='divtable pd20' style='padding-bottom: 60px'>" +
+			content: "<form id='form_redirect' class='divtable pd15' style='padding-bottom: 10px'>" +
 				"<div class='line'>"+
-				"<span class='tname'>目标URL</span>" +
-				"<div class='info-r ml0'>" +
-				"<input name='to' class='bt-input-text mr5' type='text' style='width:200px''>" +
-				"</div>" +
+					"<span class='tname'>目标URL</span>" +
+					"<div class='info-r ml0'>" +
+					"<input name='to' class='bt-input-text mr5' type='text' style='width:200px''>" +
+					"</div>" +
 				"</div>" +
 				"<div class='line'>" +
-				"<span class='tname'>代理目录</span>" +
-				"<div class='info-r ml0'>" +
-				"<input name='from' value='/' placeholder='/' class='bt-input-text mr5' type='text' style='width:200px;float: left;margin-right:0px''>" +
-				"<span class='tname' style='width:90px'>发送域名</span>" +
-				"<input name='host' value='$host' class='bt-input-text mr5' type='text' style='width:200px'>" +
+					"<span class='tname'>代理目录</span>" +
+					"<div class='info-r ml0'>" +
+					"<input name='from' value='/' placeholder='/' class='bt-input-text mr5' type='text' style='width:200px;float: left;margin-right:0px''>" +
+					"<span class='tname' style='width:90px'>发送域名</span>" +
+					"<input name='host' value='$host' class='bt-input-text mr5' type='text' style='width:200px'>" +
+					"</div>" +
 				"</div>" +
+				"<div class='help-info-text c7'>" +
+					"<ul class='help-info-text c7'>" +
+					"<li>代理目录：访问这个目录时将会把目标URL的内容返回并显示(需要开启高级功能)</li>" +
+					"<li>目标URL：可以填写你需要代理的站点，目标URL必须为可正常访问的URL，否则将返回错误</li>" +
+					"<li>发送域名：将域名添加到请求头传递到代理服务器，默认为目标URL域名，若设置不当可能导致代理无法正常运行</li>" +
+					"</ul>" +
 				"</div>" +
 				"</form>",
 			yes:function(){
@@ -1718,14 +1722,13 @@ function toProxy(siteName, type, obj) {
 						};
 						$.post('/site/save_proxy_conf', data, function(res) {
 							layer.close(load)
-							var res = JSON.parse(res);
 							if (res.status == true) {
 								layer.msg('保存成功', {icon: 1});
 								layer.close(index);
 							} else {
 								layer.msg(res.msg, {time: 3000,icon: 2});
 							}
-						});
+						},'json');
 						return true;
 			        },
 				});
@@ -1735,7 +1738,6 @@ function toProxy(siteName, type, obj) {
 		});
 		return
 	}
-
 
 	var body = '<div id="proxy_list" class="bt_table">\
 					<div style="padding-bottom: 10px">\
@@ -1750,8 +1752,7 @@ function toProxy(siteName, type, obj) {
 									<th><span data-index="3"><span>操作</span></span></th>\
 								</tr>\
 							</thead>\
-							<tbody id="md-301-body">\
-							</tbody>\
+							<tbody id="md-301-body"></tbody>\
 						</table>\
 					</div>\
 				</div>';
@@ -1780,18 +1781,6 @@ function toProxy(siteName, type, obj) {
 	},'json');
 /////////
 }
-
-//文件验证
-// function file_check(){
-// 	$(".check_message").html('<div style="margin-left:100px">\
-// 			<input type="checkbox" name="checkDomain" id="checkDomain" checked="">\
-// 			<label class="mr20" for="checkDomain" style="font-weight:normal">提前校验域名(提前发现问题,减少失败率)</label>\
-// 		</div>');
-// 	$("#lets_help").html('<li>申请之前，请确保域名已解析，如未解析会导致审核失败</li>\
-// 		<li>Let\'s Encrypt免费证书，有效期3个月，支持多域名。默认会自动续签</li>\
-// 		<li>若您的站点使用了CDN或301重定向会导致续签失败</li>\
-// 		<li>在未指定SSL默认站点时,未开启SSL的站点使用HTTPS会直接访问到已开启SSL的站点</li>');
-// }
 
 //证书夹
 function sslAdmin(siteName){
