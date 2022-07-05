@@ -28,8 +28,6 @@ elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
 	OSNAME='debian'
 elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
 	OSNAME='ubuntu'
-elif grep -Eqi "Raspbian" /etc/issue || grep -Eq "Raspbian" /etc/*-release; then
-	OSNAME='raspbian'
 else
 	OSNAME='unknow'
 fi
@@ -171,12 +169,25 @@ rm -r /var/lib/mongo
 Install_Linux_CentOS()
 {
 ##################### centos start #####################
-	if [ ! -f $serverPath/source/mongodb-org-server-${VERSION}-1.el7.x86_64.rpm ];then
-		wget -O $serverPath/source/mongodb-org-server-${VERSION}-1.el7.x86_64.rpm https://repo.mongodb.org/yum/redhat/7/mongodb-org/5.0/x86_64/RPMS/mongodb-org-server-${VERSION}-1.el7.x86_64.rpm
-	fi
+echo "
+[mongodb-org-${VERSION}]
+name=MongoDB Repository
+baseurl=https://repo.mongodb.org/yum/redhat/\$releasever/mongodb-org/${VERSION}/x86_64/
+gpgcheck=1
+enabled=1
+gpgkey=https://www.mongodb.org/static/pgp/server-${VERSION}.asc
+" > /etc/yum.repos.d/mongodb-org-${VERSION}.rep
 
-	rpm -ivh $serverPath/source/mongodb-org-server-${VERSION}-1.el7.x86_64.rpm 
+yum install -y mongodb-org
 ##################### centos end #####################
+}
+
+Uninstall_Linux_CentOS()
+{
+systemctl stop mongod
+yum erase -y $(rpm -qa | grep mongodb-org)
+rm -r /var/log/mongodb
+rm -r /var/lib/mongo
 }
 
 
@@ -225,9 +236,9 @@ Uninstall_app_linux()
 if [ "$OSNAME" == "ubuntu" ];then
 	Uninstall_Linux_Ubuntu
 elif [ "$OSNAME" == "debian" ];then
-	Unstall_Linux_Debian
+	Uninstall_Linux_Debian
 elif [ "$OSNAME" == "centos" ];then
-	Install_Linux_CentOS
+	Uninstall_Linux_CentOS
 elif [ "$OSNAME" == "opensuse" ];then
 	Uninstall_Linux_Opensuse
 else 
