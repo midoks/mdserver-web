@@ -707,7 +707,8 @@ def uninstallLib(version):
         name + '.sh' + ' uninstall ' + version
 
     data = mw.execShell(execstr)
-    if data[0] == '' and data[1] == '':
+    # data[0] == '' and
+    if data[1] == '':
         return mw.returnJson(True, '已经卸载成功!')
     else:
         return mw.returnJson(False, '卸载信息![通道0]:' + data[0] + "[通道0]:" + data[1])
