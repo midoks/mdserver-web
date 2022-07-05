@@ -1764,12 +1764,13 @@ function toProxy(siteName, type, obj) {
 		$.post('/site/set_proxy_status', {siteName: siteName,'status':status,'id':obj}, function(res) {
 			layer.close(loading);
 			if (res.status == true) {
-				layer.msg('设置成功', {icon: 1,time: 1000});
-				setTimeout(function(){toProxy(siteName);},1000);
+				layer.msg('设置成功', {icon: 1});
+				toProxy(siteName);
 			} else {
 				layer.msg(res.msg, {time: 3000,icon: 2});
 			}
 		},'json');
+		return;
 	}
 
 	var body = '<div id="proxy_list" class="bt_table">\
@@ -1792,13 +1793,12 @@ function toProxy(siteName, type, obj) {
 				</div>';
 	$("#webedit-con").html(body);
 	
-	var loadT = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});
+	var loading = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});
 	$.post("/site/get_proxy_list", {siteName: siteName},function (res) {
-		layer.close(loadT);
+		layer.close(loading);
 		if (res.status === true) {
 			let data = res.data.result;
 			data.forEach(function(item){
-				// console.log(item);
 				var switchProxy  = '<span onclick="toProxy(\''+siteName+'\', 10, \''+ item.id +'\')" style="color:rgb(92, 184, 92);" class="btlink glyphicon glyphicon-play"></span>';
 				if (!item['status']){
 					switchProxy = '<span onclick="toProxy(\''+siteName+'\', 11, \''+ item.id +'\')" style="color:rgb(255, 0, 0);" class="btlink glyphicon glyphicon-pause"></span>';
