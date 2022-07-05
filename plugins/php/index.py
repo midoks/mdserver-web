@@ -302,7 +302,7 @@ def restart(version):
 
 
 def reload(version):
-    return phpOp(version, 'reload')
+    return phpOp(version, 'restart')
 
 
 def initdStatus(version):
