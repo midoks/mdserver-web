@@ -43,6 +43,9 @@ class plugins_api:
 
     def __init__(self):
         self.setupPath = 'server'
+        self.__plugin_dir = mw.getRunDir() + '/plugins'
+        self.__type = mw.getRunDir() + 'data/json/type.json'
+        self.__index = mw.getRunDir() + 'data/json/index.json'
 
     ##### ----- start ----- ###
     def listApi(self):
