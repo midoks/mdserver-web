@@ -79,6 +79,7 @@ if [ "$?" != "0" ];then
 	yum install -y oniguruma oniguruma-devel
 fi
 
+yum install -y libzstd-devel
 yum install -y libevent libevent-devel libjpeg* libpng* gd* libxslt* unzip
 yum install -y python-imaging libicu-devel zip bzip2-devel gcc libxml2 libxml2-devel  pcre pcre-devel
 yum install -y libjpeg-devel libpng-devel libwebp libwebp-devel
