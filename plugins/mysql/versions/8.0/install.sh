@@ -17,6 +17,50 @@ sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 mysqlDir=${serverPath}/source/mysql
 
+_os=`uname`
+echo "use system: ${_os}"
+if [ ${_os} == "Darwin" ]; then
+	OSNAME='macos'
+elif grep -Eq "openSUSE" /etc/*-release; then
+	OSNAME='opensuse'
+	zypper refresh
+elif grep -Eq "FreeBSD" /etc/*-release; then
+	OSNAME='freebsd'
+	pkg install -y wget unzip
+elif grep -Eqi "Arch" /etc/issue || grep -Eq "Arch" /etc/*-release; then
+	OSNAME='arch'
+	echo y | pacman -Sy unzip
+elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
+	OSNAME='centos'
+	yum install -y wget zip unzip
+elif grep -Eqi "Fedora" /etc/issue || grep -Eq "Fedora" /etc/*-release; then
+	OSNAME='fedora'
+	yum install -y wget zip unzip
+elif grep -Eqi "Rocky" /etc/issue || grep -Eq "Rocky" /etc/*-release; then
+	OSNAME='rocky'
+	yum install -y wget zip unzip
+elif grep -Eqi "AlmaLinux" /etc/issue || grep -Eq "AlmaLinux" /etc/*-release; then
+	OSNAME='alma'
+	yum install -y wget zip unzip
+elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
+	OSNAME='debian'
+	apt update -y
+	apt install -y devscripts
+	apt install -y wget zip unzip
+elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
+	OSNAME='ubuntu'
+	apt install -y wget zip unzip
+else
+	OSNAME='unknow'
+fi
+
+VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
+
+
+
+
+
+
 Install_mysql()
 {
 	mkdir -p ${mysqlDir}
@@ -71,6 +115,21 @@ Install_mysql()
 		OPTIONS="-DWITH_SSL=${serverPath}/lib/openssl"
 	fi
 
+	WHERE_DIR_GCC=/usr/bin/gcc
+	WHERE_DIR_GPP=/usr/bin/g++
+	if [ "$OSNAME" == "centos" ] && [ "$VERSION_ID" == "7" ];then
+		yum install centos-release-scl -y
+		yum install devtoolset-9 -y
+		scl enable devtoolset-9 bash
+		gcc --version
+
+		WHERE_DIR_GCC=`which gcc`
+		WHERE_DIR_GPP=`which g++`
+		echo $WHERE_DIR_GCC
+		echo $WHERE_DIR_GPP
+		exit 1
+	fi
+
 	if [ ! -d $serverPath/mysql ];then
 		cd ${mysqlDir}/mysql-8.0.25 && ${INSTALL_CMD} \
 		-DCMAKE_INSTALL_PREFIX=$serverPath/mysql \
@@ -88,8 +147,8 @@ Install_mysql()
 		-DDOWNLOAD_BOOST=1 \
 		-DFORCE_INSOURCE_BUILD=1 \
 		$OPTIONS \
-		-DCMAKE_C_COMPILER=/usr/bin/gcc \
-		-DCMAKE_CXX_COMPILER=/usr/bin/g++ \
+		-DCMAKE_C_COMPILER=$WHERE_DIR_GCC \
+		-DCMAKE_CXX_COMPILER=$WHERE_DIR_GPP \
 		-DWITH_BOOST=${mysqlDir}/mysql-8.0.25/boost/
 		make clean && make && make install && make clean
 
