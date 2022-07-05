@@ -119,11 +119,11 @@ Install_mysql()
 	WHERE_DIR_GPP=/usr/bin/g++
 	if [ "$OSNAME" == "centos" ] && [ "$VERSION_ID" == "7" ];then
 		yum install centos-release-scl -y
-		yum install devtoolset-9 -y
-		# scl enable devtoolset-9 bash
+		yum install devtoolset-7 -y
+		# scl enable devtoolset-7 bash
 		gcc --version
-		WHERE_DIR_GCC=/opt/rh/devtoolset-9/root/usr/bin/gcc
-		WHERE_DIR_GPP=/opt/rh/devtoolset-9/root/usr/bin/g++
+		WHERE_DIR_GCC=/opt/rh/devtoolset-7/root/usr/bin/gcc
+		WHERE_DIR_GPP=/opt/rh/devtoolset-7/root/usr/bin/g++
 		echo $WHERE_DIR_GCC
 		echo $WHERE_DIR_GPP
 	fi
