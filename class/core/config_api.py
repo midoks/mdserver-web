@@ -15,9 +15,8 @@ from flask import request
 
 class config_api:
 
-    # 本版解决自启动问题
-    # 文件管理重命名
-    # 优化计划任务管理
+    # 进行中.
+    # 兼容主流Linux系统
     __version = '0.8.6.3'
 
     def __init__(self):
