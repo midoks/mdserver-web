@@ -51,7 +51,7 @@ Install_openresty()
 		echo "${VERSION}" > $serverPath/openresty/version.pl
 
 		mkdir -p $serverPath/web_conf/php/conf
-		echo "" > $serverPath/web_conf/php/conf/enable-php-00.conf
+		echo 'set $PHP_ENV 0;' > $serverPath/web_conf/php/conf/enable-php-00.conf
 
 		#初始化 
 		cd ${rootPath} && python3 ${rootPath}/plugins/openresty/index.py start

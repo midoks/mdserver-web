@@ -152,7 +152,7 @@ def makeOpenrestyConf():
         dfile = sdir + '/web_conf/php/conf/enable-php-' + x + '.conf'
         if not os.path.exists(dfile):
             if x == '00':
-                mw.writeFile(dfile, '')
+                mw.writeFile(dfile, 'set $PHP_ENV 0;')
             else:
                 w_content = contentReplace(tpl_content, x)
                 mw.writeFile(dfile, w_content)
