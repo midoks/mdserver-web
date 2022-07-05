@@ -820,7 +820,7 @@ class plugins_api:
 
     # 映射包调用
     def callback(self, name, func, args='', script='index'):
-        package = mw.getRunDir() + '/plugins/' + name
+        package = self.__plugin_dir + '/' + name
         if not os.path.exists(package):
             return (False, "插件不存在!")
 
