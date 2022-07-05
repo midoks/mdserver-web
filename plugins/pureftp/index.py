@@ -177,7 +177,7 @@ def initdInstall():
     if mw.isAppleSystem():
         return "Apple Computer does not support"
 
-    mw.execShell('systemctl start pureftp')
+    mw.execShell('systemctl enable pureftp')
     return 'ok'
 
 
@@ -185,7 +185,7 @@ def initdUinstall():
     if mw.isAppleSystem():
         return "Apple Computer does not support"
 
-    mw.execShell('systemctl stop pureftp')
+    mw.execShell('systemctl disable pureftp')
     return 'ok'
 
 
