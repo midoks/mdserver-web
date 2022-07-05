@@ -485,6 +485,7 @@ class plugins_api:
             "setup": False,
             "setup_version": "",
             "status": False,
+            "install_pre_inspection": False,
         }
 
         if checks.find('VERSION') > -1:
@@ -507,6 +508,9 @@ class plugins_api:
         else:
             pInfo['setup_version'] = self.getVersion(pInfo['install_checks'])
         # pluginInfo['status'] = self.checkStatus(pluginInfo)
+
+        if 'install_pre_inspection' in info:
+            pInfo['install_pre_inspection'] = info['install_pre_inspection']
         pInfo['status'] = False
         return pInfo
 

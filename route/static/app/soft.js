@@ -98,12 +98,11 @@ function getSList(isdisplay) {
             }
 
 
-            var handle = '<a class="btlink" onclick="addVersion(\'' + plugin.name + '\',\'' + version_info + '\',\'' + plugin.tip + '\',this,\'' + plugin.title + '\')">安装</a>';
-
+            var handle = '<a class="btlink" onclick="addVersion(\'' + plugin.name + '\',\'' + version_info + '\',\'' + plugin.tip + '\',this,\'' + plugin.title + '\',' + plugin.install_pre_inspection + ')">安装</a>';
             
             if (plugin.setup == true) {
 
-                var mupdate = '';//(plugin.versions[n] == plugin.updates[n]) '' : '<a class="btlink" onclick="SoftUpdate(\'' + plugin.name + '\',\'' + plugin.versions[n].version + '\',\'' + plugin.updates[n] + '\')">更新</a> | ';
+                var mupdate = '';//(plugin.versions[n] == plugin.updates[n]) '' : '<a class="btlink" onclick="softUpdate(\'' + plugin.name + '\',\'' + plugin.versions[n].version + '\',\'' + plugin.updates[n] + '\')">更新</a> | ';
                 // if (plugin.versions[n] == '') mupdate = '';
                 handle = mupdate + '<a class="btlink" onclick="softMain(\'' + plugin.name + '\',\'' + plugin.setup_version + '\')">设置</a> | <a class="btlink" onclick="uninstallVersion(\'' + plugin.name + '\',\'' + plugin.setup_version + '\')">卸载</a>';
                 titleClick = 'onclick="softMain(\'' + plugin.name + '\',\'' + plugin.setup_version + '\')" style="cursor:pointer"';
@@ -160,7 +159,24 @@ function getSList(isdisplay) {
     },'json');
 }
 
-function addVersion(name, ver, type, obj, title) {
+function installPreInspection(name, ver, callback){
+    var loading = layer.msg('正在检查安装环境...', { icon: 16, time: 0, shade: [0.3, '#000'] });
+     $.post("/plugins/run", {'name':name,'version':ver,'func':'install_pre_inspection'}, function(rdata) {
+        layer.close(loading);
+        if (rdata.status){
+            if (rdata.data == 'ok'){
+                callback();
+            } else {
+                layer.msg(rdata.data, { icon: 2 });
+            }
+        } else {
+            layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+        }
+    },'json');
+    
+}
+
+function addVersion(name, ver, type, obj, title, install_pre_inspection) {
     var option = '';
     var titlename = name;
     if (ver.indexOf('|') >= 0){
@@ -194,6 +210,9 @@ function addVersion(name, ver, type, obj, title) {
     });
     $("#bi-btn").click(function() {
 
+
+
+
         var info = $("#SelectVersion").val().toLowerCase();
         if (info == ''){
             info = $("#SelectVersion").text().toLowerCase();
@@ -203,15 +222,33 @@ function addVersion(name, ver, type, obj, title) {
         var type = $('.fangshi input').prop("checked") ? '1' : '0';
         var data = "name=" + name + "&version=" + version + "&type=" + type;
 
+        if (install_pre_inspection){
+            //安装检查
+            installPreInspection(name,version, function(){
+                var loadT = layer.msg('正在添加到安装器...', { icon: 16, time: 0, shade: [0.3, '#000'] });
+                $.post("/plugins/install", data, function(rdata) {
+                    layer.closeAll();
+                    layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+                    getSList();
+                },'json');
+
+                installTips();
+                fly("bi-btn");
+            });            
+            return;
+        }
+
         var loadT = layer.msg('正在添加到安装器...', { icon: 16, time: 0, shade: [0.3, '#000'] });
         $.post("/plugins/install", data, function(rdata) {
             layer.closeAll();
             layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
             getSList();
         },'json');
+
+        installTips();
+        fly("bi-btn");
     });
-    installTips();
-    fly("bi-btn");
+    
 }
 
 //卸载软件
