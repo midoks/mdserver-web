@@ -58,7 +58,7 @@ VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -
 
 
 
-
+VERSION=8.0.25
 
 
 Install_mysql()
@@ -84,25 +84,25 @@ Install_mysql()
 		INSTALL_CMD=cmake3
 	fi
 
-	if [ ! -f ${mysqlDir}/mysql-boost-8.0.25.tar.gz ];then
-		wget -O ${mysqlDir}/mysql-boost-8.0.25.tar.gz --tries=3 https://cdn.mysql.com/archives/mysql-8.0/mysql-boost-8.0.25.tar.gz
+	if [ ! -f ${mysqlDir}/mysql-boost-${VERSION}.tar.gz ];then
+		wget -O ${mysqlDir}/mysql-boost-${VERSION}.tar.gz --tries=3 https://cdn.mysql.com/archives/mysql-8.0/mysql-boost-${VERSION}.tar.gz
 	fi
 
 	#检测文件是否损坏.
 	md5_mysql_ok=e142c2058313b4646c36fa9bb1b38493
-	if [ -f ${mysqlDir}/mysql-boost-8.0.25.tar.gz ];then
-		md5_mysql=`md5sum ${mysqlDir}/mysql-boost-8.0.25.tar.gz  | awk '{print $1}'`
+	if [ -f ${mysqlDir}/mysql-boost-${VERSION}.tar.gz ];then
+		md5_mysql=`md5sum ${mysqlDir}/mysql-boost-${VERSION}.tar.gz  | awk '{print $1}'`
 		if [ "${md5_mysql_ok}" == "${md5_mysql}" ]; then
 			echo "mysql8.0 file  check ok"
 		else
 			# 重新下载
-			rm -rf ${mysqlDir}/mysql-8.0.25
-			wget -O ${mysqlDir}/mysql-boost-8.0.25.tar.gz --tries=3 https://cdn.mysql.com/archives/mysql-8.0/mysql-boost-8.0.25.tar.gz
+			rm -rf ${mysqlDir}/mysql-${VERSION}
+			wget -O ${mysqlDir}/mysql-boost-${VERSION}.tar.gz --tries=3 https://cdn.mysql.com/archives/mysql-8.0/mysql-boost-${VERSION}.tar.gz
 		fi
 	fi
 
-	if [ ! -d ${mysqlDir}/mysql-8.0.25 ];then
-		 cd ${mysqlDir} && tar -zxvf  ${mysqlDir}/mysql-boost-8.0.25.tar.gz
+	if [ ! -d ${mysqlDir}/mysql-${VERSION} ];then
+		 cd ${mysqlDir} && tar -zxvf  ${mysqlDir}/mysql-boost-${VERSION}.tar.gz
 	fi
 
 	OPTIONS=''
@@ -129,7 +129,7 @@ Install_mysql()
 	fi
 
 	if [ ! -d $serverPath/mysql ];then
-		cd ${mysqlDir}/mysql-8.0.25 && ${INSTALL_CMD} \
+		cd ${mysqlDir}/mysql-${VERSION} && ${INSTALL_CMD} \
 		-DCMAKE_INSTALL_PREFIX=$serverPath/mysql \
 		-DMYSQL_USER=mysql \
 		-DMYSQL_TCP_PORT=3306 \
@@ -147,14 +147,14 @@ Install_mysql()
 		$OPTIONS \
 		-DCMAKE_C_COMPILER=$WHERE_DIR_GCC \
 		-DCMAKE_CXX_COMPILER=$WHERE_DIR_GPP \
-		-DWITH_BOOST=${mysqlDir}/mysql-8.0.25/boost/
+		-DWITH_BOOST=${mysqlDir}/mysql-${VERSION}/boost/
 		make clean && make && make install && make clean
 
 		if [ -d $serverPath/mysql ];then
 			echo '8.0' > $serverPath/mysql/version.pl
 			echo '安装完成' > $install_tmp
 		else
-			rm -rf ${mysqlDir}/mysql-8.0.25
+			rm -rf ${mysqlDir}/mysql-${VERSION}
 			echo '安装失败' > $install_tmp
 			exit 1
 		fi
