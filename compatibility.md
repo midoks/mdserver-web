@@ -49,7 +49,7 @@ cd /www/server/mdserver-web/plugins/php && bash all_test.sh
 
 | 系统名称 			| MySQL55	|MySQL56	|MySQL57	|MySQL80	|
 | ----------------- |-----------|-----------|-----------|-----------|
-| CentOS 7.9 		|✅			|✅			|✅			|✅			|
+| CentOS 7.9 		|✅			|✅			|✅			|:x:		|
 | CentOS 8.4 		|:x:		|✅			|✅			|✅			|	
 | CentOS 8 Stream 	|✅			|✅			|✅			|✅			|		
 | CentOS 9 Stream 	|✅			|✅			|✅			|✅			|
