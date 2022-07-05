@@ -168,6 +168,8 @@ rm -r /var/lib/mongo
 # https://repo.mongodb.org/yum/redhat/7/mongodb-org/5.0/x86_64/RPMS/mongodb-org-server-5.0.4-1.el7.x86_64.rpm
 Install_Linux_CentOS()
 {
+#清空mongo的repo源
+rm -rf /etc/yum.repos.d/mongodb-org-*
 ##################### centos start #####################
 echo "
 [mongodb-org-${VERSION}]
