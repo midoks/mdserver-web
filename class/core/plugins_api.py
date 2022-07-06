@@ -346,13 +346,20 @@ class plugins_api:
             tmpt = mw.getStrBetween('[', ']', task['name'])
             if not tmpt:
                 continue
-            tmp1 = tmpt.split('-')
-            name1 = tmp1[0].lower()
+            task_sign = tmpt.split('-')
+            task_len = len(task_sign)
+
+            task_name = tmp1[0].lower()
+            task_ver = tmp1[1]
+            if task_len > 2:
+                nameArr = task_sign[0:tmplen - 1]
+                task_name = nameArr.join('-').lower()
+                task_ver = task_sign[tmplen - 1]
             if sCoexist:
-                if name1 == sName and tmp1[1] == sVer:
+                if task_name == sName and task_ver == sVer:
                     isTask = task['status']
             else:
-                if name1 == sName:
+                if task_name == sName:
                     isTask = task['status']
         return isTask
 
