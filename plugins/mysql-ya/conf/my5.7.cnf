@@ -1,14 +1,14 @@
 [client]
 user = root
 #password	= your_password
-port		= 3306
+port		= 3376
 socket		= {$SERVER_APP_PATH}/mysql.sock
 default-character-set = UTF8MB4
 
 [mysqld]
 pid-file = {$SERVER_APP_PATH}/data/mysql.pid
 user = mysql
-port		= 3306
+port		= 3376
 socket		= {$SERVER_APP_PATH}/mysql.sock
 datadir = {$SERVER_APP_PATH}/data
 log-error =  {$SERVER_APP_PATH}/data/error.log
