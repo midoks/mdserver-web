@@ -101,13 +101,6 @@ def getConf():
     return path
 
 
-def getInitdTpl(version=''):
-    path = getPluginDir() + '/init.d/mysql' + version + '.tpl'
-    if not os.path.exists(path):
-        path = getPluginDir() + '/init.d/mysql.tpl'
-    return path
-
-
 def contentReplace(content):
     service_path = mw.getServerDir()
     content = content.replace('{$ROOT_PATH}', mw.getRootDir())
@@ -146,18 +139,6 @@ def pMysqlDb():
 
 
 def initDreplace(version=''):
-    initd_tpl = getInitdTpl(version)
-
-    initD_path = getServerDir() + '/init.d'
-    if not os.path.exists(initD_path):
-        os.mkdir(initD_path)
-
-    file_bin = initD_path + '/' + getPluginName()
-    if not os.path.exists(file_bin):
-        content = mw.readFile(initd_tpl)
-        content = contentReplace(content)
-        mw.writeFile(file_bin, content)
-        mw.execShell('chmod +x ' + file_bin)
 
     mysql_conf_dir = getServerDir() + '/etc'
     if not os.path.exists(mysql_conf_dir):
