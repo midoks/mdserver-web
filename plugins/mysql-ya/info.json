@@ -9,6 +9,7 @@
 	"versions":["8.0"],
 	"updates":["8.0.22"],
 	"shell":"install.sh",
+	"install_pre_inspection":true,
 	"checks":"server/mysql-ya",
 	"path":"server/mysql-ya",
 	"author":"mysql",

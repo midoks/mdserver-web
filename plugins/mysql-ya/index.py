@@ -1889,6 +1889,11 @@ def fullSync(version=''):
 
     return json.dumps({'code': 0, 'msg': '点击开始,开始同步!', 'progress': 0})
 
+
+# 安装预检查
+def installPreInspection(version):
+    return '系统暂时不支持'
+
 if __name__ == "__main__":
     func = sys.argv[1]
 
@@ -1906,6 +1911,8 @@ if __name__ == "__main__":
         print(restart(version))
     elif func == 'reload':
         print(reload(version))
+    elif func == 'install_pre_inspection':
+        print(installPreInspection(version))
     elif func == 'initd_status':
         print(initdStatus())
     elif func == 'initd_install':
