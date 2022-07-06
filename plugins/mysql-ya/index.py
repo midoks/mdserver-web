@@ -144,6 +144,10 @@ def initDreplace(version=''):
     if not os.path.exists(mysql_conf_dir):
         os.mkdir(mysql_conf_dir)
 
+    mysql_data_dir = getServerDir() + '/data'
+    if not os.path.exists(mysql_data_dir):
+        os.mkdir(mysql_data_dir)
+
     mysql_tmp = getServerDir() + '/tmp'
     if not os.path.exists(mysql_tmp):
         os.mkdir(mysql_tmp)
