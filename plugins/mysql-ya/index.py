@@ -285,6 +285,7 @@ def initMysql8Data():
         user = pGetDbUser()
         cmd = 'mysqld --basedir=/usr --datadir=' + datadir + ' --initialize-insecure'
         mw.execShell(cmd)
+        mw.execShell('chown -R mysql mysql ' + getServerDir())
         return False
     return True
 
