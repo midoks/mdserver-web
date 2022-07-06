@@ -310,7 +310,7 @@ def initMysql8Pwd():
     tmp_file = "/tmp/mysql_ya_init_tmp.log"
     mw.writeFile(tmp_file, alter_root_pwd)
     cmd_pass = 'mysql --defaults-file=' + \
-        getServerDir() + ' -uroot -proot < ' + tmp_file
+        getServerDir() + '/etc/my.cnf -uroot -proot < ' + tmp_file
 
     data = mw.execShell(cmd_pass)
     # print(data)
