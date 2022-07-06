@@ -81,8 +81,8 @@ Install_mysql()
 	echo '正在安装脚本文件...' > $install_tmp
 
 	if id mysql &> /dev/null ;then 
-	    echo "mysql UID is `id -u www`"
-	    echo "mysql Shell is `grep "^www:" /etc/passwd |cut -d':' -f7 `"
+	    echo "mysql UID is `id -u mysql`"
+	    echo "mysql Shell is `grep "^mysql:" /etc/passwd |cut -d':' -f7 `"
 	else
 	    groupadd mysql
 		useradd -g mysql mysql
