@@ -54,7 +54,7 @@ YUM_INSTALL()
 #######
 #http://repo.mysql.com/
 
-if [ "${OSNAME}" == "centos" ] && [ "${VERSION_ID}" -lt "7" ]  ;then
+if [ "${OSNAME}" == "centos" ] && [ "${VERSION_ID}" -le "7" ]  ;then
 	wget -O /tmp/mysql57-community-release-el${VERSION_ID}.rpm http://repo.mysql.com/mysql57-community-release-el${VERSION_ID}.rpm
 	rpm -ivh /tmp/mysql57-community-release-el${VERSION_ID}.rpm
 	yum -y install mysql-server
