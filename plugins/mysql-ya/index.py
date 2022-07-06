@@ -99,7 +99,8 @@ def contentReplace(content):
     service_path = mw.getServerDir()
     content = content.replace('{$ROOT_PATH}', mw.getRootDir())
     content = content.replace('{$SERVER_PATH}', service_path)
-    content = content.replace('{$SERVER_APP_PATH}', service_path + '/mysql')
+    content = content.replace('{$SERVER_APP_PATH}',
+                              service_path + '/' + getPluginName())
     return content
 
 
@@ -151,7 +152,7 @@ def initDreplace(version=''):
         mw.writeFile(mysql_conf, content)
 
     # systemd
-    systemDir = '/lib/systemd/system'
+    systemDir = '/usr/lib/systemd/system'
     systemService = systemDir + '/mysql-ya.service'
     systemServiceTpl = getPluginDir() + '/init.d/mysql.service.tpl'
     if os.path.exists(systemDir) and not os.path.exists(systemService):
