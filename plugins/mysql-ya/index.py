@@ -1892,7 +1892,7 @@ def fullSync(version=''):
 
 # 安装预检查
 def installPreInspection(version):
-    return '系统暂时不支持'
+    return 'ok'
 
 if __name__ == "__main__":
     func = sys.argv[1]
