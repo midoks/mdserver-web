@@ -388,9 +388,9 @@ function getCookie(b) {
 	}
 }
 
-function aotuHeight() {
+function autoHeight() {
 	var a = $("body").height() - 40;
-	$(".main-content").css("min-height", a)
+	$(".main-content").css("min-height", a);
 }
 
 function showMsg(msg, callback ,icon, time){
@@ -1298,9 +1298,9 @@ function scroll_handle(e){
 
 
 $(function(){
-	setInterval(function(){
-		check_login();
-	},60000);
+///
+setInterval(function(){check_login();},6000);
+///
 });
 
 function asyncLoadImage(obj, url){
@@ -1956,8 +1956,8 @@ function pluginRollingLogs(_name, version, func, _args, line){
 
 
 $(function() {
-	aotuHeight();
+	autoHeight();
 });
 $(window).resize(function() {
-	aotuHeight();
+	autoHeight();
 });
