@@ -565,16 +565,15 @@ class plugins_api:
             if dirinfo[0:1] == '.':
                 continue
             path = self.__plugin_dir + '/' + dirinfo
-            if os.path.isdir(path):
-                json_file = path + '/info.json'
-                if os.path.exists(json_file):
-                    try:
-                        data = json.loads(mw.readFile(json_file))
-                        tmp_data = self.makeList(data, sType)
-                        for index in range(len(tmp_data)):
-                            plugins_info.append(tmp_data[index])
-                    except Exception as e:
-                        print(e)
+            json_file = path + '/info.json'
+            if os.path.exists(json_file):
+                try:
+                    data = json.loads(mw.readFile(json_file))
+                    tmp_data = self.makeList(data, sType)
+                    for index in range(len(tmp_data)):
+                        plugins_info.append(tmp_data[index])
+                except Exception as e:
+                    print(e)
         return plugins_info
 
     def getAllListPage(self, sType='0', page=1, pageSize=10):
@@ -747,28 +746,29 @@ class plugins_api:
 
         indexList = json.loads(mw.readFile(self.__index))
         plist = []
-        app = []
         for i in indexList:
-            info = i.split('-')
-            if not info[0] in app:
-                app.append(info[0])
-            path = self.__plugin_dir + '/' + info[0]
-            if os.path.isdir(path):
-                json_file = path + '/info.json'
-                if os.path.exists(json_file):
-                    try:
-                        content = mw.readFile(json_file)
-                        if content:
-                            data = json.loads(content)
-                            tmp_data = self.makeList(data)
-                            for index in range(len(tmp_data)):
-                                if tmp_data[index]['versions'] == info[1] or info[1] in tmp_data[index]['versions']:
-                                    tmp_data[index]['display'] = True
-                                    plist.append(tmp_data[index])
-                                    continue
-                    except Exception as e:
-                        # raise e
-                        print('getIndexList:', e)
+            tmp = i.split('-')
+            tmp_len = len(tmp)
+            plugin_name = tmp[0]
+            plugin_ver = tmp[1]
+            if tmp_len > 2:
+                tmpArr = tmp[0:tmp_len - 1]
+                plugin_name = '-'.join(tmpArr)
+                plugin_ver = tmp[tmp_len - 1]
+
+            json_file = self.__plugin_dir + '/' + plugin_name + '/info.json'
+            if os.path.exists(json_file):
+                content = mw.readFile(json_file)
+                try:
+                    data = json.loads(content)
+                    data = self.makeList(data)
+                    for index in range(len(data)):
+                        if data[index]['versions'] == plugin_ver or plugin_ver in data[index]['versions']:
+                            data[index]['display'] = True
+                            plist.append(data[index])
+                            continue
+                except Exception as e:
+                    print('getIndexList:', e)
 
         # 使用gevent模式时,无法使用多进程
         #plist = self.checkStatusMProcess(plist)
