@@ -168,11 +168,6 @@ def initDreplace(version=''):
 
 
 def status(version=''):
-    data = mw.execShell(
-        "ps -ef|grep mysqld |grep -v grep | grep -v python | awk '{print $2}'")
-    if data[0] == '':
-        return 'stop'
-
     pid = getServerDir() + '/data/mysql.pid'
     if not os.path.exists(pid):
         return 'stop'
