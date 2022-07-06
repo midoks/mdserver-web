@@ -117,7 +117,7 @@ Install_mysql()
 
 	if [ "$?" == "0" ];then
 		mkdir -p $serverPath/mysql-ya
-		echo '8.0' > $serverPath/mysql-ya/version.pl
+		echo '5.7' > $serverPath/mysql-ya/version.pl
 		echo '安装完成' > $install_tmp
 	else
 		echo "暂时不支持该系统" > $install_tmp
