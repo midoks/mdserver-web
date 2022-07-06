@@ -43,12 +43,6 @@ def getServerDir():
     return mw.getServerDir() + '/' + getPluginName()
 
 
-def getInitDFile():
-    if app_debug:
-        return '/tmp/' + getPluginName()
-    return '/etc/init.d/' + getPluginName()
-
-
 def is_number(s):
     try:
         float(s)
@@ -279,18 +273,6 @@ def pGetDbUser():
     return 'mysql'
 
 
-def initMysqlData():
-    datadir = getDataDir()
-    if not os.path.exists(datadir + '/mysql'):
-        serverdir = getServerDir()
-        user = pGetDbUser()
-        cmd = 'cd ' + serverdir + ' && ./scripts/mysql_install_db --user=' + \
-            user + ' --basedir=' + serverdir + ' --ldata=' + datadir
-        mw.execShell(cmd)
-        return False
-    return True
-
-
 def initMysql57Data():
     datadir = getDataDir()
     if not os.path.exists(datadir + '/mysql'):
@@ -309,13 +291,8 @@ def initMysql8Data():
     if not os.path.exists(datadir + '/mysql'):
         serverdir = getServerDir()
         user = pGetDbUser()
-        # cmd = 'cd ' + serverdir + ' && ./bin/mysqld --basedir=' + serverdir + ' --datadir=' + \
-        #     datadir + ' --initialize'
-
-        cmd = 'cd ' + serverdir + ' && ./bin/mysqld --basedir=' + serverdir + ' --datadir=' + \
+        cmd = 'cd ' + serverdir + ' && /usr/sbin/mysqld --basedir=' + serverdir + ' --datadir=' + \
             datadir + ' --initialize-insecure'
-
-        # print(cmd)
         mw.execShell(cmd)
         return False
     return True
@@ -331,19 +308,6 @@ def initMysqlPwd():
     mw.execShell(cmd_pass)
     pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
     return True
-
-
-def mysql8IsInitedPasswd():
-
-    serverdir = getServerDir()
-    pass_cmd = "cat " + serverdir + \
-        "/data/error.log | grep root@localhost | awk -F 'root@localhost:' '{print $2}'"
-    passdata = mw.execShell(pass_cmd)
-    password = passdata[0].strip()
-
-    if len(password) == 0:
-        return True
-    return False
 
 
 def initMysql8Pwd():
@@ -376,22 +340,6 @@ def initMysql8Pwd():
     return True
 
 
-def myOp(version, method):
-    # import commands
-    init_file = initDreplace()
-    try:
-        isInited = initMysqlData()
-        if not isInited:
-            mw.execShell('systemctl start mysql')
-            initMysqlPwd()
-            mw.execShell('systemctl stop mysql')
-
-        mw.execShell('systemctl ' + method + ' mysql')
-        return 'ok'
-    except Exception as e:
-        return str(e)
-
-
 def my8cmd(version, method):
     # mysql 8.0  and 5.7
     init_file = initDreplace(version)
@@ -403,41 +351,18 @@ def my8cmd(version, method):
             isInited = initMysql8Data()
 
         if not isInited:
-
-            if mw.isAppleSystem():
-                cmd_init_start = init_file + ' start'
-                subprocess.Popen(cmd_init_start, stdout=subprocess.PIPE, shell=True,
-                                 bufsize=4096, stderr=subprocess.PIPE)
-
-                time.sleep(6)
-            else:
-                mw.execShell('systemctl start mysql')
-
+            mw.execShell('systemctl start ' + getPluginName())
             initMysql8Pwd()
+            mw.execShell('systemctl stop ' + getPluginName())
 
-            if mw.isAppleSystem():
-                cmd_init_stop = init_file + ' stop'
-                subprocess.Popen(cmd_init_stop, stdout=subprocess.PIPE, shell=True,
-                                 bufsize=4096, stderr=subprocess.PIPE)
-                time.sleep(3)
-            else:
-                mw.execShell('systemctl stop mysql')
-
-        if mw.isAppleSystem():
-            sub = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True,
-                                   bufsize=4096, stderr=subprocess.PIPE)
-            sub.wait(5)
-        else:
-            mw.execShell('systemctl ' + method + ' mysql')
+        mw.execShell('systemctl ' + method + ' ' + getPluginName())
         return 'ok'
     except Exception as e:
         return str(e)
 
 
 def appCMD(version, action):
-    if version == '8.0' or version == '5.7':
-        return my8cmd(version, action)
-    return myOp(version, action)
+    return my8cmd(version, action)
 
 
 def start(version=''):
