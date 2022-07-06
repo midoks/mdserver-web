@@ -256,6 +256,9 @@ def initReplace(version):
     systemDir = '/usr/lib/systemd/system'
     systemService = systemDir + '/php' + version + '.service'
     systemServiceTpl = getPluginDir() + '/init.d/php.service.tpl'
+    if version == '52':
+        systemServiceTpl = getPluginDir() + '/init.d/php.service.52.tpl'
+
     if os.path.exists(systemDir) and not os.path.exists(systemService):
         service_path = mw.getServerDir()
         se_content = mw.readFile(systemServiceTpl)

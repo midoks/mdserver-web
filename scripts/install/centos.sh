@@ -77,6 +77,7 @@ if [ "$?" != "0" ];then
 	yum install -y dnf dnf-plugins-core
 	dnf config-manager --set-enabled powertools
 	yum install -y oniguruma oniguruma-devel
+	dnf upgrade -y libmodulemd
 fi
 
 yum install -y libzstd-devel
