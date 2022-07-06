@@ -32,8 +32,8 @@ fi
 
 sh -x $curPath/versions/$2/install.sh $1
 
-# if [ "${action}" == "install" ];then
+if [ "${action}" == "install" ];then
 # 	#初始化 
-# 	cd ${rootPath} && python3 ${rootPath}/plugins/mysql-ya/index.py start ${type}
-# 	cd ${rootPath} && python3 ${rootPath}/plugins/mysql-ya/index.py initd_install ${type}
-# fi
+	cd ${rootPath} && python3 ${rootPath}/plugins/mysql-ya/index.py start ${type}
+	cd ${rootPath} && python3 ${rootPath}/plugins/mysql-ya/index.py initd_install ${type}
+fi
