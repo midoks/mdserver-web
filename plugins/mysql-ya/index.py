@@ -29,7 +29,7 @@ if mw.isAppleSystem():
 
 
 def getPluginName():
-    return 'mysql'
+    return 'mysql-ya'
 
 
 def getPluginDir():
