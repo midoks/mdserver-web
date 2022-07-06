@@ -111,6 +111,7 @@ function submitConf(version) {
         safe_mode: $("select[name='safe_mode']").val(),
         max_execution_time: $("input[name='max_execution_time']").val(),
         max_input_time: $("input[name='max_input_time']").val(),
+        max_input_vars: $("input[name='max_input_vars']").val(),
         memory_limit: $("input[name='memory_limit']").val(),
         post_max_size: $("input[name='post_max_size']").val(),
         file_uploads: $("select[name='file_uploads']").val(),
@@ -501,6 +502,7 @@ function phpLibConfig(version){
                 <li>请按实际需求安装扩展,不要安装不必要的PHP扩展,这会影响PHP执行效率,甚至出现异常</li>\
                 <li>Redis扩展只允许在1个PHP版本中使用,安装到其它PHP版本请在[软件管理]重装Redis</li>\
                 <li>opcache/xcache/apc等脚本缓存扩展,请只安装其中1个,否则可能导致您的站点程序异常</li>\
+                <li>ioncube要在ZendGuardLoader/opcache前安装,否则可能导致您的站点程序异常</li>\
             </ul>';
         $('.soft-man-con').html(con);
     });

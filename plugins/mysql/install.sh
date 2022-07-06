@@ -26,10 +26,10 @@ fi
 
 if [ "${action}" == "uninstall" ];then
 	
-	if [ -f /lib/systemd/system/mysql.service ];then
+	if [ -f /usr/lib/systemd/system/mysql.service ];then
 		systemctl stop mysql
 		systemctl disable mysql
-		rm -rf /lib/systemd/system/mysql.service
+		rm -rf /usr/lib/systemd/system/mysql.service
 		systemctl daemon-reload
 	fi
 fi

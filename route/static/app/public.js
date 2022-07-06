@@ -821,9 +821,7 @@ function fly(a) {
 			},
 			onEnd: function() {
 				layer.closeAll();
-				layer.msg(lan.bt.task_add, {
-					icon: 1
-				});
+				layer.msg(lan.bt.task_add, {icon: 1});
 				getTaskCount();
 			}
 		});
@@ -1350,7 +1348,7 @@ function webShell() {
     term.open();
     term.setOption('cursorBlink', true);
     term.setOption('fontSize', 14);
-    gterm = term
+    gterm = term;
 
     socket.on('server_response', function (data) {
         term.write(data.data);

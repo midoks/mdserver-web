@@ -38,11 +38,11 @@ Uninstall_swap()
 {
 	swapoff $serverPath/swap/swapfile
 
-	if [ -f /lib/systemd/system/swap.service ];then
+	if [ -f /usr/lib/systemd/system/swap.service ];then
 		rm -rf /lib/systemd/system/swap.service
 	fi
 
-	if [ -f /lib/systemd/system/swap.service ];then
+	if [ -f /usr/lib/systemd/system/swap.service ];then
 		systemctl stop swap
 		systemctl disable swap
 		rm -rf /lib/systemd/system/swap.service

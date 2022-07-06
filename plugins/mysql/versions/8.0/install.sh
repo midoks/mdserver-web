@@ -17,6 +17,50 @@ sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 mysqlDir=${serverPath}/source/mysql
 
+_os=`uname`
+echo "use system: ${_os}"
+if [ ${_os} == "Darwin" ]; then
+	OSNAME='macos'
+elif grep -Eq "openSUSE" /etc/*-release; then
+	OSNAME='opensuse'
+	zypper refresh
+elif grep -Eq "FreeBSD" /etc/*-release; then
+	OSNAME='freebsd'
+	pkg install -y wget unzip
+elif grep -Eqi "Arch" /etc/issue || grep -Eq "Arch" /etc/*-release; then
+	OSNAME='arch'
+	echo y | pacman -Sy unzip
+elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
+	OSNAME='centos'
+	yum install -y wget zip unzip
+elif grep -Eqi "Fedora" /etc/issue || grep -Eq "Fedora" /etc/*-release; then
+	OSNAME='fedora'
+	yum install -y wget zip unzip
+elif grep -Eqi "Rocky" /etc/issue || grep -Eq "Rocky" /etc/*-release; then
+	OSNAME='rocky'
+	yum install -y wget zip unzip
+elif grep -Eqi "AlmaLinux" /etc/issue || grep -Eq "AlmaLinux" /etc/*-release; then
+	OSNAME='alma'
+	yum install -y wget zip unzip
+elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
+	OSNAME='debian'
+	apt update -y
+	apt install -y devscripts
+	apt install -y wget zip unzip
+elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
+	OSNAME='ubuntu'
+	apt install -y wget zip unzip
+else
+	OSNAME='unknow'
+fi
+
+VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
+
+
+
+VERSION=8.0.29
+
+
 Install_mysql()
 {
 	mkdir -p ${mysqlDir}
@@ -32,36 +76,60 @@ Install_mysql()
 	fi
 
 	INSTALL_CMD=cmake
-	if [ "$sysName" != "Darwin" ];then
+	# check cmake version
+	CMAKE_VERSION=`cmake -version | grep version | awk '{print $3}' | awk -F '.' '{print $1}'`
+	if [ "$CMAKE_VERSION" -eq "2" ];then
 		mkdir -p /var/log/mariadb
 		touch /var/log/mariadb/mariadb.log
-		INSTALL_CMD=cmake
-	fi 
+		INSTALL_CMD=cmake3
+	fi
 
-	if [ ! -f ${mysqlDir}/mysql-boost-8.0.25.tar.gz ];then
-		wget -O ${mysqlDir}/mysql-boost-8.0.25.tar.gz --tries=3 https://cdn.mysql.com/archives/mysql-8.0/mysql-boost-8.0.25.tar.gz
+	if [ ! -f ${mysqlDir}/mysql-boost-${VERSION}.tar.gz ];then
+		wget -O ${mysqlDir}/mysql-boost-${VERSION}.tar.gz --tries=3 https://cdn.mysql.com/Downloads/MySQL-8.0/mysql-boost-${VERSION}.tar.gz
 	fi
 
 	#检测文件是否损坏.
-	md5_mysql_ok=e142c2058313b4646c36fa9bb1b38493
-	if [ -f ${mysqlDir}/mysql-boost-8.0.25.tar.gz ];then
-		md5_mysql=`md5sum ${mysqlDir}/mysql-boost-8.0.25.tar.gz  | awk '{print $1}'`
+	md5_mysql_ok=42fbfe0569089c20f9aa457b3f367d50
+	if [ -f ${mysqlDir}/mysql-boost-${VERSION}.tar.gz ];then
+		md5_mysql=`md5sum ${mysqlDir}/mysql-boost-${VERSION}.tar.gz  | awk '{print $1}'`
 		if [ "${md5_mysql_ok}" == "${md5_mysql}" ]; then
 			echo "mysql8.0 file  check ok"
 		else
 			# 重新下载
-			rm -rf ${mysqlDir}/mysql-8.0.25
-			wget -O ${mysqlDir}/mysql-boost-8.0.25.tar.gz --tries=3 https://cdn.mysql.com/archives/mysql-8.0/mysql-boost-8.0.25.tar.gz
+			rm -rf ${mysqlDir}/mysql-${VERSION}
+			wget -O ${mysqlDir}/mysql-boost-${VERSION}.tar.gz --tries=3 https://cdn.mysql.com/Downloads/MySQL-8.0/mysql-boost-${VERSION}.tar.gz
 		fi
 	fi
 
-	if [ ! -d ${mysqlDir}/mysql-8.0.25 ];then
-		 cd ${mysqlDir} && tar -zxvf  ${mysqlDir}/mysql-boost-8.0.25.tar.gz
+	if [ ! -d ${mysqlDir}/mysql-${VERSION} ];then
+		 cd ${mysqlDir} && tar -zxvf  ${mysqlDir}/mysql-boost-${VERSION}.tar.gz
 	fi
 
+	OPTIONS=''
+	##check openssl version
+	OPENSSL_VERSION=`openssl version|awk '{print $2}'|awk -F '.' '{print $1}'`
+	if [ "${OPENSSL_VERSION}" -ge "3" ];then
+		#openssl version to high
+		cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash openssl.sh
+		export PKG_CONFIG_PATH=$serverPath/lib/openssl/lib/pkgconfig
+		OPTIONS="-DWITH_SSL=${serverPath}/lib/openssl"
+	fi
+
+	WHERE_DIR_GCC=/usr/bin/gcc
+	WHERE_DIR_GPP=/usr/bin/g++
+	if [ "$OSNAME" == "centos" ] && [ "$VERSION_ID" == "7" ];then
+		yum install centos-release-scl -y
+		yum install devtoolset-7 -y
+		# scl enable devtoolset-7 bash
+		gcc --version
+		WHERE_DIR_GCC=/opt/rh/devtoolset-7/root/usr/bin/gcc
+		WHERE_DIR_GPP=/opt/rh/devtoolset-7/root/usr/bin/g++
+		echo $WHERE_DIR_GCC
+		echo $WHERE_DIR_GPP
+	fi
 
 	if [ ! -d $serverPath/mysql ];then
-		cd ${mysqlDir}/mysql-8.0.25 && ${INSTALL_CMD} \
+		cd ${mysqlDir}/mysql-${VERSION} && ${INSTALL_CMD} \
 		-DCMAKE_INSTALL_PREFIX=$serverPath/mysql \
 		-DMYSQL_USER=mysql \
 		-DMYSQL_TCP_PORT=3306 \
@@ -76,17 +144,19 @@ Install_mysql()
 		-DDEFAULT_COLLATION=utf8mb4_general_ci \
 		-DDOWNLOAD_BOOST=1 \
 		-DFORCE_INSOURCE_BUILD=1 \
-		-DCMAKE_C_COMPILER=/usr/bin/gcc \
-		-DCMAKE_CXX_COMPILER=/usr/bin/g++ \
-		-DWITH_BOOST=${mysqlDir}/mysql-8.0.25/boost/
+		$OPTIONS \
+		-DCMAKE_C_COMPILER=$WHERE_DIR_GCC \
+		-DCMAKE_CXX_COMPILER=$WHERE_DIR_GPP \
+		-DWITH_BOOST=${mysqlDir}/mysql-${VERSION}/boost/
 		make clean && make && make install && make clean
 
 		if [ -d $serverPath/mysql ];then
 			echo '8.0' > $serverPath/mysql/version.pl
 			echo '安装完成' > $install_tmp
 		else
-			rm -rf ${mysqlDir}/mysql-8.0.25
+			rm -rf ${mysqlDir}/mysql-${VERSION}
 			echo '安装失败' > $install_tmp
+			exit 1
 		fi
 	fi
 }

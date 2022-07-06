@@ -24,10 +24,10 @@ Install_rsyncd()
 
 Uninstall_rsyncd()
 {
-	if [ -f /lib/systemd/system/rsyncd.service ];then
+	if [ -f /usr/lib/systemd/system/rsyncd.service ];then
 		systemctl stop rsyncd
 		systemctl disable rsyncd
-		rm -rf /lib/systemd/system/rsyncd.service
+		rm -rf /usr/lib/systemd/system/rsyncd.service
 		systemctl daemon-reload
 	fi
 

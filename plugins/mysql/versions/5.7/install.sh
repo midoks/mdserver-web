@@ -40,7 +40,7 @@ Install_mysql()
 
 
 	if [ ! -f ${mysqlDir}/mysql-boost-${VERSION}.tar.gz ];then
-		wget -O ${mysqlDir}/mysql-boost-${VERSION}.tar.gz https://cdn.mysql.com/Downloads/MySQL-5.7/mysql-boost-${VERSION}.tar.gz
+		wget -O ${mysqlDir}/mysql-boost-${VERSION}.tar.gz --tries=3 https://cdn.mysql.com/Downloads/MySQL-5.7/mysql-boost-${VERSION}.tar.gz
 	fi
 
 	#检测文件是否损坏.
@@ -52,12 +52,22 @@ Install_mysql()
 		else
 			# 重新下载
 			rm -rf ${mysqlDir}/mysql-${VERSION}
-			wget -O ${mysqlDir}/mysql-boost-${VERSION}.tar.gz https://cdn.mysql.com/Downloads/MySQL-5.7/mysql-boost-${VERSION}.tar.gz
+			wget -O ${mysqlDir}/mysql-boost-${VERSION}.tar.gz --tries=3 https://cdn.mysql.com/Downloads/MySQL-5.7/mysql-boost-${VERSION}.tar.gz
 		fi
 	fi
 
 	if [ ! -d ${mysqlDir}/mysql-${VERSION} ];then
 		 cd ${mysqlDir} && tar -zxvf  ${mysqlDir}/mysql-boost-${VERSION}.tar.gz
+	fi
+
+	OPTIONS=''
+	##check openssl version
+	OPENSSL_VERSION=`openssl version|awk '{print $2}'|awk -F '.' '{print $1}'`
+	if [ "${OPENSSL_VERSION}" -ge "3" ];then
+		#openssl version to high
+		cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash openssl.sh
+		export PKG_CONFIG_PATH=$serverPath/lib/openssl/lib/pkgconfig
+		OPTIONS="-DWITH_SSL=${serverPath}/lib/openssl"
 	fi
 
 	if [ ! -d $serverPath/mysql ];then
@@ -75,6 +85,7 @@ Install_mysql()
 		-DDEFAULT_CHARSET=utf8mb4 \
 		-DDEFAULT_COLLATION=utf8mb4_general_ci \
 		-DDOWNLOAD_BOOST=1 \
+		$OPTIONS \
 		-DCMAKE_C_COMPILER=/usr/bin/gcc \
 		-DCMAKE_CXX_COMPILER=/usr/bin/g++ \
 		-DWITH_BOOST=${mysqlDir}/mysql-${VERSION}/boost/
@@ -86,6 +97,7 @@ Install_mysql()
 		else
 			rm -rf ${mysqlDir}/mysql-${VERSION}
 			echo '安装失败' > $install_tmp
+			exit 1
 		fi
 	fi
 }

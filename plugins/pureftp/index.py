@@ -59,6 +59,13 @@ def getArgs():
     return tmp
 
 
+def checkArgs(data, ck=[]):
+    for i in range(len(ck)):
+        if not ck[i] in data:
+            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
+    return (True, mw.returnJson(True, 'ok'))
+
+
 def status():
     cmd = "ps -ef|grep pure-ftpd |grep -v grep | grep -v python | awk '{print $2}'"
     data = mw.execShell(cmd)
@@ -110,10 +117,12 @@ def initDreplace():
         mw.writeFile(pureFtpdConfig, content)
 
      # systemd
-    systemDir = '/lib/systemd/system'
+    systemDir = '/usr/lib/systemd/system'
     systemService = systemDir + '/pureftp.service'
     systemServiceTpl = getPluginDir() + '/init.d/pureftp.service.tpl'
-    if os.path.exists(systemDir) and not os.path.exists(systemService):
+
+    if os.path.exists(systemDir):
+        # and not os.path.exists(systemService)
         se_content = mw.readFile(systemServiceTpl)
         se_content = se_content.replace('{$SERVER_PATH}', service_path)
         mw.writeFile(systemService, se_content)
@@ -122,72 +131,61 @@ def initDreplace():
     return file_bin
 
 
-def start():
+def pfOp(method):
     file = initDreplace()
-    data = mw.execShell(file + ' start')
+
+    if not mw.isAppleSystem():
+        data = mw.execShell('systemctl ' + method + ' pureftp')
+        if data[1] == '':
+            return 'ok'
+        return 'fail'
+
+    data = mw.execShell(file + ' ' + method)
     if data[1] == '':
         return 'ok'
     return data[1]
+
+
+def start():
+    return pfOp('start')
 
 
 def stop():
-    file = initDreplace()
-    data = mw.execShell(file + ' stop')
-    if data[1] == '':
-        return 'ok'
-    return data[1]
+    return pfOp('stop')
 
 
 def restart():
-    file = initDreplace()
-    data = mw.execShell(file + ' restart')
-    if data[1] == '':
-        return 'ok'
-    return 'fail'
+    return pfOp('restart')
 
 
 def reload():
-    file = initDreplace()
-    data = mw.execShell(file + ' reload')
-    if data[1] == '':
-        return 'ok'
-    return data[1]
+    return pfOp('reload')
 
 
 def initdStatus():
-    if not app_debug:
-        os_name = mw.getOs()
-        if os_name == 'darwin':
-            return "Apple Computer does not support"
-    initd_bin = getInitDFile()
-    if os.path.exists(initd_bin):
-        return 'ok'
-    return 'fail'
+    if mw.isAppleSystem():
+        return "Apple Computer does not support"
+
+    shell_cmd = 'systemctl status pureftp | grep loaded | grep "enabled;"'
+    data = mw.execShell(shell_cmd)
+    if data[0] == '':
+        return 'fail'
+    return 'ok'
 
 
 def initdInstall():
-    import shutil
-    if not app_debug:
-        os_name = mw.getOs()
-        if os_name == 'darwin':
-            return "Apple Computer does not support"
+    if mw.isAppleSystem():
+        return "Apple Computer does not support"
 
-    source_bin = initDreplace()
-    initd_bin = getInitDFile()
-    shutil.copyfile(source_bin, initd_bin)
-    mw.execShell('chmod +x ' + initd_bin)
-    mw.execShell('chkconfig --add ' + getPluginName())
+    mw.execShell('systemctl enable pureftp')
     return 'ok'
 
 
 def initdUinstall():
-    if not app_debug:
-        os_name = mw.getOs()
-        if os_name == 'darwin':
-            return "Apple Computer does not support"
-    initd_bin = getInitDFile()
-    os.remove(initd_bin)
-    mw.execShell('chkconfig --del ' + getPluginName())
+    if mw.isAppleSystem():
+        return "Apple Computer does not support"
+
+    mw.execShell('systemctl disable pureftp')
     return 'ok'
 
 
@@ -218,6 +216,7 @@ def pftpAdd(username, password, path):
     if not os.path.exists(path):
         os.makedirs(path)
         if mw.isAppleSystem():
+            # pass
             os.system('chown ' + user + '.staff ' + path)
         else:
             os.system('chown www.www ' + path)
@@ -245,8 +244,9 @@ def pftpStart(username):
 
 
 def pftpReload():
-    mw.execShell(getServerDir() + '/bin/pure-pw mkdb ' +
-                 getServerDir() + '/etc/pureftpd.pdb')
+    cmd = getServerDir() + '/bin/pure-pw mkdb ' + \
+        getServerDir() + '/etc/pureftpd.pdb'
+    mw.execShell(cmd)
 
 
 def getWwwDir():
@@ -309,21 +309,13 @@ def getFtpList():
 
 
 def addFtp():
-    import urllib
+    import urllib.parse
     args = getArgs()
-    if not 'ftp_username' in args:
-        return 'ftp_username missing'
+    data = checkArgs(args, ['ftp_username', 'ftp_password', 'path', 'ps'])
+    if not data[0]:
+        return data[1]
 
-    if not 'ftp_password' in args:
-        return 'ftp_password missing'
-
-    if not 'path' in args:
-        return 'path missing'
-
-    if not 'ps' in args:
-        return 'ps missing'
-
-    path = urllib.unquote(args['path'])
+    path = urllib.parse.unquote(args['path'])
     user = args['ftp_username']
     pwd = args['ftp_password']
     ps = args['ps']
@@ -342,11 +334,9 @@ def addFtp():
 
 def delFtp():
     args = getArgs()
-    if not 'id' in args:
-        return 'ftp_username missing'
-
-    if not 'username' in args:
-        return 'username missing'
+    data = checkArgs(args, ['id', 'username'])
+    if not data[0]:
+        return data[1]
 
     mw.execShell(getServerDir() +
                  '/bin/pure-pw userdel ' + args['username'])
@@ -359,14 +349,9 @@ def delFtp():
 
 def modFtp():
     args = getArgs()
-    if not 'id' in args:
-        return 'id missing'
-
-    if not 'name' in args:
-        return 'name missing'
-
-    if not 'password' in args:
-        return 'password missing'
+    data = checkArgs(args, ['id', 'name', 'password'])
+    if not data[0]:
+        return data[1]
 
     conn = pftpDB()
     data = pftpMod(args['name'], args['password'])

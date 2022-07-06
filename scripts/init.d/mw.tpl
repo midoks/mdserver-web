@@ -14,7 +14,7 @@
 
 
 PATH=/usr/local/bin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
-# export LC_ALL="en_US.UTF-8"
+export LC_ALL="en_US.UTF-8"
 
 mw_path={$SERVER_PATH}
 PATH=$PATH:$mw_path/bin
@@ -77,14 +77,14 @@ mw_start_task()
         fi
         echo -e "\033[32mdone\033[0m"
     else
-        echo "Starting mw-tasks... mw-tasks (pid $isStart) already running"
+        echo "Starting mw-tasks... mw-tasks (pid $(echo $isStart)) already running"
     fi
 }
 
 mw_start()
 {
-	mw_start_panel
     mw_start_task
+	mw_start_panel
 }
 
 
@@ -92,13 +92,12 @@ mw_stop_task()
 {
     if [ -f $mw_path/tmp/panelTask.pl ];then
         echo -e "\033[32mThe task is running and cannot be stopped\033[0m"
-        return
+        exit 0
     fi
 
     echo -e "Stopping mw-tasks... \c";
     pids=$(ps aux | grep 'task.py'|grep -v grep|awk '{print $2}')
     arr=($pids)
-
     for p in ${arr[@]}
     do
             kill -9 $p
@@ -123,8 +122,8 @@ mw_stop_panel()
 
 mw_stop()
 {
-    mw_stop_panel
     mw_stop_task
+    mw_stop_panel
 }
 
 mw_status()

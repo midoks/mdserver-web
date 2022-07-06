@@ -44,7 +44,7 @@ Install_lib()
 	echo "opcache.fast_shutdown=1" >> $serverPath/php/$version/etc/php.ini
 	echo "opcache.enable_cli=1" >> $serverPath/php/$version/etc/php.ini
 
-	$serverPath/php/init.d/php$version reload
+	bash ${rootPath}/plugins/php/versions/lib.sh $version restart
 	echo '==========================================================='
 	echo 'successful!'
 }
@@ -55,7 +55,7 @@ Uninstall_lib()
 	sed -i $BAK "/${LIBNAME}.so/d" $serverPath/php/$version/etc/php.ini
 	sed -i $BAK "/${LIBNAME}/d" $serverPath/php/$version/etc/php.ini
 		
-	$serverPath/php/init.d/php$version reload
+	bash ${rootPath}/plugins/php/versions/lib.sh $version restart
 	echo '==============================================='
 	echo 'successful!'
 }

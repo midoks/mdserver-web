@@ -28,8 +28,19 @@ else
 	OSNAME='unknow'
 fi
 
+
+
+
 Install_pureftp()
 {
+	if id ftp &> /dev/null ;then 
+	    echo "ftp UID is `id -u ftp`"
+	    echo "ftp Shell is `grep "^ftp:" /etc/passwd |cut -d':' -f7 `"
+	else
+	    groupadd ftp
+		useradd -g ftp -s /sbin/nologin ftp
+	fi
+
 	# mkdir -p ${serverPath}/pureftp
 	mkdir -p ${serverPath}/source/pureftp
 
@@ -40,12 +51,9 @@ Install_pureftp()
 	VER=$1
 	DOWNLOAD=https://download.pureftpd.org/pub/pure-ftpd/releases/pure-ftpd-${VER}.tar.gz
 
-
 	if [ ! -f $serverPath/source/pureftp/pure-ftpd-${VER}.tar.gz ];then
 		wget --no-check-certificate -O $serverPath/source/pureftp/pure-ftpd-${VER}.tar.gz $DOWNLOAD
 	fi
-
-	
 
 	#检测文件是否损坏.
 	md5_ok=451879495ba61c1d7dcfca8dd231119f
@@ -80,10 +88,10 @@ Install_pureftp()
 
 Uninstall_pureftp()
 {
-	if [ -f /lib/systemd/system/pureftp.service ];then
+	if [ -f /usr/lib/systemd/system/pureftp.service ];then
 		systemctl stop pureftp
 		systemctl disable pureftp
-		rm -rf /lib/systemd/system/pureftp.service
+		rm -rf /usr/lib/systemd/system/pureftp.service
 		systemctl daemon-reload
 	fi
 
@@ -92,6 +100,8 @@ Uninstall_pureftp()
 	fi
 
 	rm -rf ${serverPath}/pureftp
+	userdel ftp
+	groupdel ftp
 	echo '卸载完成' > $install_tmp
 }
 

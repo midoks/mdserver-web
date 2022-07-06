@@ -43,6 +43,9 @@ class plugins_api:
 
     def __init__(self):
         self.setupPath = 'server'
+        self.__plugin_dir = mw.getRunDir() + '/plugins'
+        self.__type = mw.getRunDir() + '/data/json/type.json'
+        self.__index = mw.getRunDir() + '/data/json/index.json'
 
     ##### ----- start ----- ###
     def listApi(self):
@@ -482,6 +485,7 @@ class plugins_api:
             "setup": False,
             "setup_version": "",
             "status": False,
+            "install_pre_inspection": False,
         }
 
         if checks.find('VERSION') > -1:
@@ -504,6 +508,9 @@ class plugins_api:
         else:
             pInfo['setup_version'] = self.getVersion(pInfo['install_checks'])
         # pluginInfo['status'] = self.checkStatus(pluginInfo)
+
+        if 'install_pre_inspection' in info:
+            pInfo['install_pre_inspection'] = info['install_pre_inspection']
         pInfo['status'] = False
         return pInfo
 
@@ -794,8 +801,8 @@ class plugins_api:
         return mw.returnJson(True, '删除成功!')
 
     # shell 调用
-    def run(self, name, func, version, args='', script='index'):
-        path = mw.getRunDir() + '/' + self.__plugin_dir + \
+    def run(self, name, func, version='', args='', script='index'):
+        path = self.__plugin_dir + \
             '/' + name + '/' + script + '.py'
         py = 'python3 ' + path
 
@@ -817,7 +824,7 @@ class plugins_api:
 
     # 映射包调用
     def callback(self, name, func, args='', script='index'):
-        package = mw.getRunDir() + '/plugins/' + name
+        package = self.__plugin_dir + '/' + name
         if not os.path.exists(package):
             return (False, "插件不存在!")
 

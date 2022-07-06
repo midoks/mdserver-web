@@ -79,10 +79,10 @@ Install_gogs()
 Uninstall_gogs()
 {
 
-	if [ -f /lib/systemd/system/gogs.service ];then
+	if [ -f /usr/lib/systemd/system/gogs.service ];then
 		systemctl stop gogs
 		systemctl disable gogs
-		rm -rf /lib/systemd/system/gogs.service
+		rm -rf /usr/lib/systemd/system/gogs.service
 		systemctl daemon-reload
 	fi
 

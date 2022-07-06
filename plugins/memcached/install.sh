@@ -14,6 +14,7 @@ VERSION=1.6.15
 
 Install_mem(){
 	mkdir -p $serverPath/source
+	# mkdir -p $serverPath/memcached
 	echo '正在安装脚本文件...' > $install_tmp
 
 	if [ ! -f $serverPath/source/memcached.tar.gz ];then
@@ -22,7 +23,7 @@ Install_mem(){
 	
 	cd $serverPath/source && tar -zxvf memcached.tar.gz
 
-	mkdir -p $serverPath/memcached
+	
 	echo "./configure --prefix=${serverPath}/memcached && make && make install"
 	cd $serverPath/source/memcached-${VERSION} && ./configure --prefix=$serverPath/memcached && make && make install
 
@@ -38,10 +39,10 @@ Install_mem(){
 Uninstall_mem()
 {
 
-	if [ -f /lib/systemd/system/memcached.service ];then
+	if [ -f /usr/lib/systemd/system/memcached.service ];then
 		systemctl stop memcached
 		systemctl disable memcached
-		rm -rf /lib/systemd/system/memcached.service
+		rm -rf /usr/lib/systemd/system/memcached.service
 		systemctl daemon-reload
 	fi
 
@@ -51,6 +52,8 @@ Uninstall_mem()
 	rm -rf $serverPath/memcached
 }
 
+
+# /www/server/memcached/bin/memcached -d -p 11211 -u root  -m 100 -c 100
 
 action=$1
 if [ "${1}" == 'install' ];then

@@ -398,20 +398,20 @@ html {
 }
 
 .cursor {
-    cursor: pointer
+    cursor: pointer;
 }
 
 .help-info-text {
-    margin-top: 15px
+    margin-top: 15px;
 }
 
 .help-info-text>li {
     list-style: inside disc;
-    line-height: 24px
+    line-height: 24px;
 }
 
 .relative {
-    position: relative
+    position: relative;
 }
 
 .ico-copy {
@@ -423,11 +423,11 @@ html {
 }
 
 .zclip embed {
-    vertical-align: top
+    vertical-align: top;
 }
 
 .webDelete .options {
-    padding: 20px 0
+    padding: 20px 0;
 }
 
 .webDelete .options label {

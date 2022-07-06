@@ -14,6 +14,7 @@ sed -i 's#SELINUX=enforcing#SELINUX=disabled#g' /etc/selinux/config
 
 yum install -y wget lsof crontabs
 yum install -y python3-devel
+yum install -y python3-pip
 yum install -y python-devel
 yum install -y vixie-cron
 yum install -y curl-devel libmcrypt libmcrypt-devel
@@ -48,6 +49,8 @@ fi
 if [ ! -f /etc/init.d/iptables ];then
 	yum install firewalld -y
 	systemctl enable firewalld
+	#取消服务锁定
+	systemctl unmask firewalld
 	systemctl start firewalld
 
 	firewall-cmd --permanent --zone=public --add-port=22/tcp
@@ -61,11 +64,9 @@ if [ ! -f /etc/init.d/iptables ];then
 
 	sed -i 's#AllowZoneDrifting=yes#AllowZoneDrifting=no#g' /etc/firewalld/firewalld.conf
 	firewall-cmd --reload
+	#安装时不开启
+	systemctl stop firewalld
 fi
-
-
-#安装时不开启
-systemctl stop firewalld
 
 yum groupinstall -y "Development Tools"
 yum install -y epel-release
@@ -78,6 +79,7 @@ if [ "$?" != "0" ];then
 	yum install -y oniguruma oniguruma-devel
 fi
 
+yum install -y libzstd-devel
 yum install -y libevent libevent-devel libjpeg* libpng* gd* libxslt* unzip
 yum install -y python-imaging libicu-devel zip bzip2-devel gcc libxml2 libxml2-devel  pcre pcre-devel
 yum install -y libjpeg-devel libpng-devel libwebp libwebp-devel
@@ -95,10 +97,22 @@ chmod 755 /www/server/mdserver-web/data
 
 
 cd /www/server/mdserver-web && ./cli.sh start
-sleep 5
+isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`
+n=0
+while [[ ! -f /etc/init.d/mw ]];
+do
+    echo -e ".\c"
+    sleep 1
+    let n+=1
+    if [ $n -gt 20 ];then
+    	echo -e "start mw fail"
+        exit 1
+    fi
+done
 
-cd /www/server/mdserver-web && ./cli.sh stop
-cd /www/server/mdserver-web && ./scripts/init.d/mw default
+cd /www/server/mdserver-web && /etc/init.d/mw stop
 cd /www/server/mdserver-web && /etc/init.d/mw start
+cd /www/server/mdserver-web && /etc/init.d/mw default
+
 
 
