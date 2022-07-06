@@ -63,6 +63,14 @@ yum -y install mysql-server
 #######
 }
 
+YUM_UNINSTALL()
+{
+### YUM卸载 START ########
+yum -y remove mysql-server
+### YUM卸载 END   ########
+}
+
+
 APT_INSTALL()
 {
 ########
@@ -72,6 +80,13 @@ dpkg -i /tmp/mysql-apt-config_0.8.22-1_all.deb
 apt update -y
 apt install -y mysql-server
 #######
+}
+
+APT_UNINSTALL()
+{
+###
+apt remove -y mysql-server
+###
 }
 
 
@@ -109,6 +124,16 @@ Install_mysql()
 
 Uninstall_mysql()
 {
+	isYum=`which yum`
+	if [ "$isYum" != "" ];then
+		YUM_UNINSTALL
+	fi
+
+	isApt=`which apt`
+	if [ "$isApt" != "" ];then
+		APT_UNINSTALL
+	fi
+
 	rm -rf $serverPath/mysql-ya
 	echo '卸载完成' > $install_tmp
 }
