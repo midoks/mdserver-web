@@ -57,4 +57,4 @@ do
 done
 echo -e "start mw success"
 
-/etc/init.d/mw default
+bash /etc/init.d/mw default
