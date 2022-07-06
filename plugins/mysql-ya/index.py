@@ -291,8 +291,7 @@ def initMysql8Data():
 
 
 def initMysql8Pwd():
-    time.sleep(2)
-
+    time.sleep(5)
     pwd = mw.getRandomString(16)
 
     alter_root_pwd = 'flush privileges;'
@@ -332,6 +331,7 @@ def my8cmd(version, method):
 
         if not isInited:
             mw.execShell('systemctl start ' + getPluginName())
+
             initMysql8Pwd()
             mw.execShell('systemctl stop ' + getPluginName())
 
