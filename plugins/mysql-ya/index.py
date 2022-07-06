@@ -163,7 +163,7 @@ def initDreplace(version=''):
 
     if mw.getOs() != 'darwin':
         mw.execShell('chown -R mysql mysql ' + getServerDir())
-    return file_bin
+    return 'ok'
 
 
 def status(version=''):
@@ -324,8 +324,6 @@ def initMysql8Pwd():
 
 def my8cmd(version, method):
     # mysql 8.0  and 5.7
-    init_file = initDreplace(version)
-    cmd = init_file + ' ' + method
     try:
         if version == '5.7':
             isInited = initMysql57Data()
