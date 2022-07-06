@@ -8,7 +8,7 @@ After=network.target
 
 [Service]
 PIDFile={$SERVER_PATH}/php/{$VERSION}/var/run/php-fpm.pid
-ExecStart={$SERVER_PATH}/php/{$VERSION}/sbin/php-fpm --nondaemonize --fpm-config {$SERVER_PATH}/php/{$VERSION}/etc/php-fpm.conf
+ExecStart={$SERVER_PATH}/php/{$VERSION}/sbin/php-fpm --nodaemonize --fpm-config {$SERVER_PATH}/php/{$VERSION}/etc/php-fpm.conf
 ExecReload=/bin/kill -USR2 $MAINPID
 PrivateTmp=false
 
