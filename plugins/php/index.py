@@ -308,7 +308,9 @@ def restart(version):
 
 
 def reload(version):
-    return phpOp(version, 'restart')
+    if version == '52':
+        return phpOp(version, 'restart')
+    return phpOp(version, 'reload')
 
 
 def initdStatus(version):
