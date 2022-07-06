@@ -243,13 +243,19 @@ class system_api:
                 mac_version += x.split("\t")[1] + ' '
             return mac_version
 
-        version = mw.readFile('/etc/redhat-release')
-        if not version:
-            version = mw.readFile(
-                '/etc/issue').strip().split("\n")[0].replace('\\n', '').replace('\l', '').strip()
-        else:
+        redhat_series = '/etc/redhat-release'
+        if os.path.exists(redhat_series):
+            version = mw.readFile('/etc/redhat-release')
             version = version.replace('release ', '').strip()
-        return version
+            return version
+
+        os_series = '/etc/os-release'
+        if os.path.exists(os_series):
+            version = mw.execShell(
+                "cat /etc/*-release | grep PRETTY_NAME | awk -F = '{print $2}' | awk -F '\"' '{print $2}'")
+            return version[0].strip()
+
+        return '未识别系统信息'
 
     def getBootTime(self):
         # 取系统启动时间
@@ -312,8 +318,11 @@ class system_api:
         except Exception as ex:
             return 1
 
-    def getDiskInfo(self, get=None):
-        return self.getDiskInfo2()
+    def getDiskInfo(self):
+        info = self.getDiskInfo2()
+        if len(info) != 0:
+            return info
+
         # 取磁盘分区信息
         diskIo = psutil.disk_partitions()
         diskInfo = []
@@ -325,7 +334,9 @@ class system_api:
                 continue
             tmp = {}
             tmp['path'] = disk[1]
-            tmp['size'] = psutil.disk_usage(disk[1])
+            size_tmp = psutil.disk_usage(disk[1])
+            tmp['size'] = [mw.toSize(size_tmp[0]), mw.toSize(
+                size_tmp[1]), mw.toSize(size_tmp[2]), str(size_tmp[3]) + '%']
             diskInfo.append(tmp)
         return diskInfo
 
@@ -340,7 +351,7 @@ class system_api:
         diskInfo = []
         n = 0
         cuts = ['/mnt/cdrom', '/boot', '/boot/efi', '/dev',
-                '/dev/shm', '/run/lock', '/run', '/run/shm', '/run/user']
+                '/dev/shm', '/zroot', '/run/lock', '/run', '/run/shm', '/run/user']
         for tmp in temp1:
             n += 1
             inodes = tempInodes1[n - 1].split()
@@ -360,16 +371,7 @@ class system_api:
             tmp1 = [disk[1], disk[2], disk[3], disk[4]]
             arr['size'] = tmp1
             arr['inodes'] = [inodes[1], inodes[2], inodes[3], inodes[4]]
-            if disk[5] == '/':
-                bootLog = os.getcwd() + '/tmp/panelBoot.pl'
-                if disk[2].find('M') != -1:
-                    if os.path.exists(bootLog):
-                        os.system('rm -f ' + bootLog)
-                else:
-                    if not os.path.exists(bootLog):
-                        pass
-            if inodes[2] != '0':
-                diskInfo.append(arr)
+            diskInfo.append(arr)
         return diskInfo
 
     # 清理系统垃圾

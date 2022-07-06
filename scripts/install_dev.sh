@@ -18,18 +18,19 @@ if [ "$EUID" -ne 0 ]
   exit
 fi
 
-if grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
-	ln -sf /bin/bash /bin/sh
-	#sudo dpkg-reconfigure dash
-fi
-
-if grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
-	ln -sf /bin/bash /bin/sh
-fi
 
 
 if [ ${_os} == "Darwin" ]; then
 	OSNAME='macos'
+elif grep -Eq "openSUSE" /etc/*-release; then
+	OSNAME='opensuse'
+	zypper refresh
+elif grep -Eq "FreeBSD" /etc/*-release; then
+	OSNAME='freebsd'
+	pkg install -y wget unzip
+elif grep -Eqi "Arch" /etc/issue || grep -Eq "Arch" /etc/*-release; then
+	OSNAME='arch'
+	echo y | pacman -Sy unzip
 elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
 	OSNAME='centos'
 	yum install -y wget zip unzip
@@ -50,8 +51,6 @@ elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
 elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
 	OSNAME='ubuntu'
 	apt install -y wget zip unzip
-elif grep -Eqi "Raspbian" /etc/issue || grep -Eq "Raspbian" /etc/*-release; then
-	OSNAME='raspbian'
 else
 	OSNAME='unknow'
 fi

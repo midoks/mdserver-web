@@ -132,7 +132,7 @@ def confReplace():
         mw.execShell('mkdir -p ' + php_conf)
     static_conf = mw.getServerDir() + '/web_conf/php/conf/enable-php-00.conf'
     if not os.path.exists(static_conf):
-        mw.writeFile(static_conf, '')
+        mw.writeFile(static_conf, 'set $PHP_ENV 0;')
 
     # give nginx root permission
     ng_exe_bin = getServerDir() + "/nginx/sbin/nginx"
@@ -174,7 +174,7 @@ def initDreplace():
         confReplace()
 
     # systemd
-    systemDir = '/lib/systemd/system'
+    systemDir = '/usr/lib/systemd/system'
     systemService = systemDir + '/openresty.service'
     systemServiceTpl = getPluginDir() + '/init.d/openresty.service.tpl'
     if os.path.exists(systemDir) and not os.path.exists(systemService):
@@ -188,7 +188,7 @@ def initDreplace():
 
 def status():
     data = mw.execShell(
-        "ps -ef|grep nginx |grep -v grep | grep -v python | awk '{print $2}'")
+        "ps -ef|grep openresty |grep -v grep | grep -v python | awk '{print $2}'")
     if data[0] == '':
         return 'stop'
     return 'start'
@@ -207,7 +207,7 @@ def restyOp(method):
         data = mw.execShell('systemctl ' + method + ' openresty')
         if data[1] == '':
             return 'ok'
-        return 'fail'
+        return data[1]
 
     data = mw.execShell(file + ' ' + method)
     if data[1] == '':

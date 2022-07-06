@@ -223,14 +223,15 @@ echo -e "Install_Curl" >> ${libPath}/lib.pl
 
 
 
-if grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
-    sudo ln -sf /bin/bash /bin/sh
-    #sudo dpkg-reconfigure dash
-fi
-
 _os=`uname`
 if [ ${_os} == "Darwin" ]; then
     OSNAME='macos'
+elif grep -Eq "openSUSE" /etc/*-release; then
+    OSNAME='opensuse'
+elif grep -Eq "FreeBSD" /etc/*-release; then
+    OSNAME='freebsd'
+elif grep -Eqi "Arch" /etc/issue || grep -Eq "Arch" /etc/*-release; then
+    OSNAME='arch'
 elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
     OSNAME='centos'
 elif grep -Eqi "Rocky" /etc/issue || grep -Eq "Rocky" /etc/*-release; then
@@ -266,7 +267,12 @@ if [ "$OSNAME" == "macos" ]; then
     brew install freetype
     brew install openssl
     brew install libzip
-
+elif [ "$OSNAME" == "opensuse" ];then
+    echo "opensuse lib"
+elif [ "$OSNAME" == "arch" ];then
+    echo "arch lib"
+elif [ "$OSNAME" == "freebsd" ];then
+    echo "freebsd lib"
 elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     
     apt install -y devscripts
@@ -325,11 +331,12 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     apt install -y libmariadb-dev
     #apt install -y libmysqlclient-dev   
     apt install -y libmariadb-dev-compat
-    #apt install -y libmariadbclient-dev 
+    #apt install -y libmariadbclient-dev
 else
 
     yum install -y openldap openldap-devel libtirpc libtirpc-devel rpcgen
     yum install -y bison re2c cmake
+    yum install -y cmake3
 
     yum install -y libmemcached libmemcached-devel
     yum install -y curl curl-devel

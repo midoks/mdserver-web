@@ -152,7 +152,7 @@ def makeOpenrestyConf():
         dfile = sdir + '/web_conf/php/conf/enable-php-' + x + '.conf'
         if not os.path.exists(dfile):
             if x == '00':
-                mw.writeFile(dfile, '')
+                mw.writeFile(dfile, 'set $PHP_ENV 0;')
             else:
                 w_content = contentReplace(tpl_content, x)
                 mw.writeFile(dfile, w_content)
@@ -253,9 +253,12 @@ def initReplace(version):
         mw.execShell('chown -R www:www ' + upload_path)
 
     # systemd
-    systemDir = '/lib/systemd/system'
+    systemDir = '/usr/lib/systemd/system'
     systemService = systemDir + '/php' + version + '.service'
     systemServiceTpl = getPluginDir() + '/init.d/php.service.tpl'
+    if version == '52':
+        systemServiceTpl = getPluginDir() + '/init.d/php.service.52.tpl'
+
     if os.path.exists(systemDir) and not os.path.exists(systemService):
         service_path = mw.getServerDir()
         se_content = mw.readFile(systemServiceTpl)
@@ -271,6 +274,9 @@ def phpOp(version, method):
     file = initReplace(version)
 
     if not mw.isAppleSystem():
+        if method == 'stop' or method == 'restart':
+            mw.execShell(file + ' ' + 'stop')
+
         data = mw.execShell('systemctl ' + method + ' php' + version)
         if data[1] == '':
             return 'ok'
@@ -302,6 +308,8 @@ def restart(version):
 
 
 def reload(version):
+    if version == '52':
+        return phpOp(version, 'restart')
     return phpOp(version, 'reload')
 
 
@@ -346,7 +354,7 @@ def getPhpConf(version):
         {'name': 'asp_tags', 'type': 1, 'ps': 'ASP标签支持'},
         {'name': 'max_execution_time', 'type': 2, 'ps': '最大脚本运行时间'},
         {'name': 'max_input_time', 'type': 2, 'ps': '最大输入时间'},
-        {'name': 'max_input_var', 'type': 2, 'ps': '最大输入数量'},
+        {'name': 'max_input_vars', 'type': 2, 'ps': '最大输入数量'},
         {'name': 'memory_limit', 'type': 2, 'ps': '脚本内存限制'},
         {'name': 'post_max_size', 'type': 2, 'ps': 'POST数据最大尺寸'},
         {'name': 'file_uploads', 'type': 1, 'ps': '是否允许上传文件'},
@@ -372,7 +380,7 @@ def getPhpConf(version):
 
 def submitPhpConf(version):
     gets = ['display_errors', 'cgi.fix_pathinfo', 'date.timezone', 'short_open_tag',
-            'asp_tags', 'max_execution_time', 'max_input_time', 'memory_limit',
+            'asp_tags', 'max_execution_time', 'max_input_time', 'max_input_vars', 'memory_limit',
             'post_max_size', 'file_uploads', 'upload_max_filesize', 'max_file_uploads',
             'default_socket_timeout', 'error_reporting']
     args = getArgs()
@@ -384,7 +392,8 @@ def submitPhpConf(version):
             val = g + ' = ' + args[g] + '\n'
             phpini = re.sub(rep, val, phpini)
     mw.writeFile(filename, phpini)
-    mw.execShell(getServerDir() + '/init.d/php' + version + ' reload')
+    # mw.execShell(getServerDir() + '/init.d/php' + version + ' reload')
+    reload(version)
     return mw.returnJson(True, '设置成功')
 
 
@@ -556,8 +565,10 @@ def checkFpmStatusFile(version):
 
 
 def getFpmStatus(version):
-    checkFpmStatusFile(version)
+    if version == '52':
+        return mw.returnJson(False, 'PHP[' + version + ']不支持!!!')
 
+    checkFpmStatusFile(version)
     stat = status(version)
     if stat == 'stop':
         return mw.returnJson(False, 'PHP[' + version + ']未启动!!!')
@@ -705,7 +716,8 @@ def uninstallLib(version):
         name + '.sh' + ' uninstall ' + version
 
     data = mw.execShell(execstr)
-    if data[0] == '' and data[1] == '':
+    # data[0] == '' and
+    if data[1] == '':
         return mw.returnJson(True, '已经卸载成功!')
     else:
         return mw.returnJson(False, '卸载信息![通道0]:' + data[0] + "[通道0]:" + data[1])

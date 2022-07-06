@@ -84,7 +84,7 @@ def initDreplace():
         mw.execShell('chmod +x ' + file_bin)
 
     # systemd
-    systemDir = '/lib/systemd/system'
+    systemDir = '/usr/lib/systemd/system'
     systemService = systemDir + '/swap.service'
     systemServiceTpl = getPluginDir() + '/init.d/swap.service.tpl'
     if os.path.exists(systemDir) and not os.path.exists(systemService):

@@ -14,17 +14,15 @@ if [ "$EUID" -ne 0 ]
   exit
 fi
 
-if grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
-	ln -sf /bin/bash /bin/sh
-	#sudo dpkg-reconfigure dash
-fi
 
-if grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
-	ln -sf /bin/bash /bin/sh
-fi
 
 if [ ${_os} == "Darwin" ]; then
 	OSNAME='macos'
+elif grep -Eq "openSUSE" /etc/*-release; then
+	OSNAME='opensuse'
+	zypper refresh
+elif grep -Eq "FreeBSD" /etc/*-release; then
+	OSNAME='freebsd'
 elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
 	OSNAME='centos'
 	yum install -y wget zip unzip

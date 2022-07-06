@@ -157,7 +157,7 @@ def initDreplace():
     #     mw.writeFile(conf_bin, content)
 
     # systemd
-    systemDir = '/lib/systemd/system'
+    systemDir = '/usr/lib/systemd/system'
     systemService = systemDir + '/gogs.service'
     systemServiceTpl = getPluginDir() + '/init.d/gogs.service.tpl'
     if os.path.exists(systemDir) and not os.path.exists(systemService):

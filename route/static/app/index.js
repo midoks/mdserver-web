@@ -124,11 +124,13 @@ function getDiskInfo() {
     $.get('/system/disk_info', function(rdata) {
         var dBody;
         for (var i = 0; i < rdata.length; i++) {
-            if (rdata[i].path == '/' || rdata[i].path == '/www') {
-                if (rdata[i].size[2].indexOf('M') != -1) {
-                    $("#messageError").show();
-                    $("#messageError").append('<p><span class="glyphicon glyphicon-alert" style="color: #ff4040; margin-right: 10px;"></span> ' + lan.get('diskinfo_span_1', [rdata[i].path]) + '<a class="btlink" href="javascript:ClearSystem();">[清理垃圾]</a></p>');
-                }
+            var LoadColor = setcolor(parseInt(rdata[i].size[3].replace('%', '')), false, 75, 90, 95);
+
+            //判断inode信息是否存在
+            var inodes = '';
+            if ( typeof(rdata[i]['inodes']) !=='undefined' ){
+                inodes = '<div class="mask" style="color:' + LoadColor + '" data="Inode信息<br>总数：' + rdata[i].inodes[0] + '<br>已使用：' + rdata[i].inodes[1] + '<br>可用：' + rdata[i].inodes[2] + '<br>Inode使用率：' + rdata[i].inodes[3] + '"><span>' + rdata[i].size[3].replace('%', '') + '</span>%</div>';
+
                 var ipre = parseInt(rdata[i].inodes[3].replace('%', ''));
                 if (ipre > 95) {
                     $("#messageError").show();
@@ -136,7 +138,13 @@ function getDiskInfo() {
                 }
             }
 
-            var LoadColor = setcolor(parseInt(rdata[i].size[3].replace('%', '')), false, 75, 90, 95);
+            if (rdata[i].path == '/' || rdata[i].path == '/www') {
+                if (rdata[i].size[2].indexOf('M') != -1) {
+                    $("#messageError").show();
+                    $("#messageError").append('<p><span class="glyphicon glyphicon-alert" style="color: #ff4040; margin-right: 10px;"></span> ' + lan.get('diskinfo_span_1', [rdata[i].path]) + '<a class="btlink" href="javascript:ClearSystem();">[清理垃圾]</a></p>');
+                } 
+            }
+           
             dBody = '<li class="col-xs-6 col-sm-3 col-md-3 col-lg-2 mtb20 circle-box text-center diskbox">' +
                 '<h3 class="c5 f15">' + rdata[i].path + '</h3>' +
                 '<div class="circle" style="background:' + LoadColor + '">' +
@@ -145,9 +153,7 @@ function getDiskInfo() {
                 '</div>' +
                 '<div class="pie_right">' +
                 '<div class="right"></div>' +
-                '</div>' +
-                '<div class="mask" style="color:' + LoadColor + '" data="Inode信息<br>总数：' + rdata[i].inodes[0] + '<br>已使用：' + rdata[i].inodes[1] + '<br>可用：' + rdata[i].inodes[2] + '<br>Inode使用率：' + rdata[i].inodes[3] + '"><span>' + rdata[i].size[3].replace('%', '') + '</span>%</div>' +
-                '</div>' +
+                '</div>'+ inodes +'</div>' +
                 '<h4 class="c5 f15">' + rdata[i].size[1] + '/' + rdata[i].size[0] + '</h4>' +
                 '</li>'
             $("#systemInfoList").append(dBody);

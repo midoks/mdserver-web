@@ -135,7 +135,7 @@ class site_api:
         mid = request.form.get('id', '')
         name = request.form.get('name', '')
 
-        return self.stop(self, mid, name)
+        return self.stop(mid, name)
 
     def stop(self, mid, name):
         path = self.setupPath + '/stop'
@@ -1219,13 +1219,13 @@ class site_api:
         content = mw.readFile(vhost_file)
 
         cnf_301 = '''
-    #301-START
+    # 301-START
     include %s/*.conf;
-    #301-END
+    # 301-END
 ''' % (self.getRedirectPath( siteName))
 
         cnf_301_source = '''
-    #301-START
+    # 301-START
 '''
         # print('operateRedirectConf', content.find('#301-END'))
         if content.find('#301-END') != -1:
@@ -1411,13 +1411,13 @@ class site_api:
         content = mw.readFile(vhost_file)
 
         proxy_cnf = '''
-    #PROXY-START
+    # PROXY-START
     include %s/*.conf;
-    #PROXY-END
+    # PROXY-END
 ''' % (self.getProxyPath(siteName))
 
         proxy_cnf_source = '''
-    #PROXY-START
+    # PROXY-START
 '''
 
         if content.find('#PROXY-END') != -1:
@@ -1429,6 +1429,64 @@ class site_api:
                 content = re.sub(proxy_cnf_source, proxy_cnf, content)
 
         mw.writeFile(vhost_file, content)
+
+    def getProxyConfApi(self):
+        _siteName = request.form.get("siteName", '')
+        _id = request.form.get("id", '')
+        if _id == '' or _siteName == '':
+            return mw.returnJson(False, "必填项不能为空!")
+
+        conf_file = "{}/{}/{}.conf".format(self.proxyPath, _siteName, _id)
+        if not os.path.exists(conf_file):
+            conf_file = "{}/{}/{}.conf.txt".format(
+                self.proxyPath, _siteName, _id)
+
+        data = mw.readFile(conf_file)
+        if data == False:
+            return mw.returnJson(False, "获取失败!")
+        return mw.returnJson(True, "ok", {"result": data})
+
+    def setProxyStatusApi(self):
+        _siteName = request.form.get("siteName", '')
+        _status = request.form.get("status", '')
+        _id = request.form.get("id", '')
+        if _status == '' or _siteName == '' or _id == '':
+            return mw.returnJson(False, "必填项不能为空!")
+
+        conf_file = "{}/{}/{}.conf".format(self.proxyPath, _siteName, _id)
+        conf_txt = "{}/{}/{}.conf.txt".format(self.proxyPath, _siteName, _id)
+
+        if _status == '1':
+            mw.execShell('mv ' + conf_txt + ' ' + conf_file)
+        else:
+            mw.execShell('mv ' + conf_file + ' ' + conf_txt)
+
+        mw.restartWeb()
+        return mw.returnJson(True, "OK")
+
+    def saveProxyConfApi(self):
+        _siteName = request.form.get("siteName", '')
+        _id = request.form.get("id", '')
+        _config = request.form.get("config", "")
+        if _id == '' or _siteName == '':
+            return mw.returnJson(False, "必填项不能为空!")
+
+        _old_config = mw.readFile(
+            "{}/{}/{}.conf".format(self.proxyPath, _siteName, _id))
+        if _old_config == False:
+            return mw.returnJson(False, "非法操作")
+
+        mw.writeFile("{}/{}/{}.conf".format(self.proxyPath,
+                                            _siteName, _id), _config)
+        rule_test = mw.checkWebConfig()
+        if rule_test != True:
+            mw.writeFile("{}/{}/{}.conf".format(self.proxyPath,
+                                                _siteName, _id), _old_config)
+            return mw.returnJson(False, "OpenResty 配置测试不通过, 请重试: {}".format(rule_test))
+
+        self.operateRedirectConf(_siteName, 'start')
+        mw.restartWeb()
+        return mw.returnJson(True, "ok")
 
     # 读取 网站 反向代理列表
     def getProxyListApi(self):
@@ -1448,6 +1506,16 @@ class site_api:
             mw.execShell("rm -rf {}/{}".format(self.proxyPath, _siteName))
             return mw.returnJson(True, "", {"result": [], "count": 0})
 
+        tmp = []
+        for proxy in data:
+            proxy_dir = "{}/{}".format(self.proxyPath, _siteName)
+            proxy_dir_file = proxy_dir + '/' + proxy['id'] + '.conf'
+            if os.path.exists(proxy_dir_file):
+                proxy['status'] = True
+            else:
+                proxy['status'] = False
+            tmp.append(proxy)
+
         return mw.returnJson(True, "ok", {"result": data, "count": len(data)})
 
     # 设置 网站 反向代理列表
@@ -1456,6 +1524,7 @@ class site_api:
         _from = request.form.get('from', '')
         _to = request.form.get('to', '')
         _host = request.form.get('host', '')
+        _open_proxy = request.form.get('open_proxy', '')
 
         if _siteName == "" or _from == "" or _to == "" or _host == "":
             return mw.returnJson(False, "必填项不能为空")
@@ -1478,7 +1547,7 @@ class site_api:
             return mw.returnJson(False, "错误的目标地址")
 
         tpl = """
-#PROXY-START/
+# PROXY-START/
 location ~* \.(gif|png|jpg|css|js|woff|woff2)$
 {
 	proxy_pass {to};
@@ -1499,7 +1568,7 @@ location ~* ^{from}(.*)$ {
     proxy_ignore_headers Set-Cookie Cache-Control expires;
     add_header Cache-Control no-cache;
 }
-#PROXY-END/
+# PROXY-END/
         """
 
         # replace
@@ -1514,22 +1583,25 @@ location ~* ^{from}(.*)$ {
             if item["id"] == _id:
                 return mw.returnJson(False, "已存在该规则!")
             if item["from"] == _from:
-                return mw.returnJson(False, "已存在该规则!")
+                return mw.returnJson(False, "代理目录已存在!")
         data.append({
             "from": _from,
             "to": _to,
             "host": _host,
             "id": _id
         })
+
+        conf_file = "{}/{}.conf".format(self.getProxyPath(_siteName), _id)
+        if _open_proxy != 'on':
+            conf_file = "{}/{}.conf.txt".format(
+                self.getProxyPath(_siteName), _id)
+
         mw.writeFile(data_path, json.dumps(data))
-        mw.writeFile(
-            "{}/{}.conf".format(self.getProxyPath(_siteName), _id), tpl)
+        mw.writeFile(conf_file, tpl)
 
         self.operateProxyConf(_siteName, 'start')
         mw.restartWeb()
-        return mw.returnJson(True, "ok", {
-            "hash": _id
-        })
+        return mw.returnJson(True, "ok", {"hash": _id})
 
     def delProxyApi(self):
         _siteName = request.form.get("siteName", '')
@@ -1553,8 +1625,9 @@ location ~* ^{from}(.*)$ {
             if len(data) == 0:
                 self.operateProxyConf(_siteName, 'stop')
             # remove conf file
-            mw.execShell(
-                "rm -rf {}/{}.conf".format(self.getProxyPath(_siteName), _id))
+            cmd = "rm -rf {}/{}.conf*".format(
+                self.getProxyPath(_siteName), _id)
+            mw.execShell(cmd)
         except:
             return mw.returnJson(False, "删除失败!")
 
@@ -1936,7 +2009,7 @@ location ~* ^{from}(.*)$ {
            return 404;
         }
     }
-    #SECURITY-END
+    # SECURITY-END
     include %s/enable-php-''' % (fix.strip().replace(',', '|'), domains.strip().replace(',', ' '), pre_path)
                 conf = re.sub(re_path, rconf, conf)
                 mw.writeLog('网站管理', '站点[' + name + ']已开启防盗链!')

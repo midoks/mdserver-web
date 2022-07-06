@@ -88,10 +88,10 @@ Install_pureftp()
 
 Uninstall_pureftp()
 {
-	if [ -f /lib/systemd/system/pureftp.service ];then
+	if [ -f /usr/lib/systemd/system/pureftp.service ];then
 		systemctl stop pureftp
 		systemctl disable pureftp
-		rm -rf /lib/systemd/system/pureftp.service
+		rm -rf /usr/lib/systemd/system/pureftp.service
 		systemctl daemon-reload
 	fi
 
