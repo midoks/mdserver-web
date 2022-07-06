@@ -1798,6 +1798,7 @@ def installPreInspection(version):
     sys_id = mw.execShell(
         "cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F '\"' '{print $2}'")
 
+    print(sys, sys_id)
     return 'ok'
 
 if __name__ == "__main__":
