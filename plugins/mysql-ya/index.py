@@ -331,7 +331,6 @@ def my8cmd(version, method):
 
         if not isInited:
             mw.execShell('systemctl start ' + getPluginName())
-
             initMysql8Pwd()
             mw.execShell('systemctl stop ' + getPluginName())
 
