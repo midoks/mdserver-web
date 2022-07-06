@@ -271,6 +271,9 @@ def phpOp(version, method):
     file = initReplace(version)
 
     if not mw.isAppleSystem():
+        if method == 'stop' or method == 'restart':
+            mw.execShell(file + ' ' + 'stop')
+
         data = mw.execShell('systemctl ' + method + ' php' + version)
         if data[1] == '':
             return 'ok'
