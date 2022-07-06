@@ -39,7 +39,7 @@ ExecStartPre=/usr/libexec/mysql-check-socket
 ExecStartPre=/usr/libexec/mysql-prepare-db-dir %n
 # Note: we set --basedir to prevent probes that might trigger SELinux alarms,
 # per bug #547485
-ExecStart=/usr/libexec/mysqld --basedir=/usr --defaults-file={$SERVER_PATH}/mysql-ya/etc/my.cnf
+ExecStart=/usr/libexec/mysqld --defaults-file={$SERVER_PATH}/mysql-ya/etc/my.cnf --basedir=/usr --user=mysql
 ExecStartPost=/usr/libexec/mysql-check-upgrade
 ExecStopPost=/usr/libexec/mysql-wait-stop
 

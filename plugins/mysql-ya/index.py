@@ -319,6 +319,7 @@ def initMysql8Pwd():
 
 
 def my8cmd(version, method):
+    initDreplace(version)
     # mysql 8.0  and 5.7
     try:
         if version == '5.7':
