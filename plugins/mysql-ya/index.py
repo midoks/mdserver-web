@@ -177,7 +177,7 @@ def initDreplace(version=''):
 
     # systemd
     systemDir = '/lib/systemd/system'
-    systemService = systemDir + '/mysql.service'
+    systemService = systemDir + '/mysql-ya.service'
     systemServiceTpl = getPluginDir() + '/init.d/mysql.service.tpl'
     if os.path.exists(systemDir) and not os.path.exists(systemService):
         service_path = mw.getServerDir()
@@ -195,6 +195,10 @@ def status(version=''):
     data = mw.execShell(
         "ps -ef|grep mysqld |grep -v grep | grep -v python | awk '{print $2}'")
     if data[0] == '':
+        return 'stop'
+
+    pid = getServerDir() + '/data/mysql.pid'
+    if not os.path.exists(pid):
         return 'stop'
     return 'start'
 
