@@ -34,6 +34,7 @@ if [ "${action}" == "uninstall" ];then
 	
 	cd ${rootPath} && python3 ${rootPath}/plugins/mysql-ya/index.py stop ${type}
 	cd ${rootPath} && python3 ${rootPath}/plugins/mysql-ya/index.py initd_uninstall ${type}
+	cd $curPath
 fi
 
 sh -x $curPath/versions/$2/install.sh $1
