@@ -353,7 +353,7 @@ class plugins_api:
             task_ver = task_sign[1]
             if task_len > 2:
                 nameArr = task_sign[0:task_len - 1]
-                task_name = nameArr.join('-').lower()
+                task_name = '-'.join(nameArr).lower()
                 task_ver = task_sign[task_len - 1]
             if sCoexist:
                 if task_name == sName and task_ver == sVer:
