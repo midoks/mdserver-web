@@ -277,7 +277,7 @@ class plugins_api:
             if not 'author' in data:
                 data['author'] = '未知'
             if not 'home' in data:
-                data['home'] = 'https://www.bt.cn/bbs/forum-40-1.html'
+                data['home'] = 'https://github.com/midoks/mdserver-web'
             plugin_path = mw.getPluginDir() + data['name'] + '/info.json'
             data['old_version'] = '0'
             data['tmp_path'] = tmp_path
@@ -290,7 +290,8 @@ class plugins_api:
         except:
             mw.execShell("rm -rf " + tmp_path)
             return mw.returnJson(False, '在压缩包中没有找到插件信息,请检查插件包!')
-        protectPlist = ('openresty', 'mysql', 'php', 'csvn', 'gogs', 'pureftp')
+        protectPlist = ('openresty', 'mysql', 'php', 'redis',
+                        'mongodb', 'swap', 'gogs', 'pureftp')
         if data['name'] in protectPlist:
             return mw.returnJson(False, '[' + data['name'] + '],重要插件不可修改!')
         return mw.getJson(data)
