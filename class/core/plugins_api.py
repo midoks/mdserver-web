@@ -349,8 +349,8 @@ class plugins_api:
             task_sign = tmpt.split('-')
             task_len = len(task_sign)
 
-            task_name = tmp1[0].lower()
-            task_ver = tmp1[1]
+            task_name = task_sign[0].lower()
+            task_ver = task_sign[1]
             if task_len > 2:
                 nameArr = task_sign[0:tmplen - 1]
                 task_name = nameArr.join('-').lower()
