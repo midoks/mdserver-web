@@ -256,6 +256,9 @@ def initReplace(version):
     systemDir = '/usr/lib/systemd/system'
     systemService = systemDir + '/php' + version + '.service'
     systemServiceTpl = getPluginDir() + '/init.d/php.service.tpl'
+    if version == '52':
+        systemServiceTpl = getPluginDir() + '/init.d/php.service.52.tpl'
+
     if os.path.exists(systemDir) and not os.path.exists(systemService):
         service_path = mw.getServerDir()
         se_content = mw.readFile(systemServiceTpl)
@@ -271,6 +274,9 @@ def phpOp(version, method):
     file = initReplace(version)
 
     if not mw.isAppleSystem():
+        if method == 'stop' or method == 'restart':
+            mw.execShell(file + ' ' + 'stop')
+
         data = mw.execShell('systemctl ' + method + ' php' + version)
         if data[1] == '':
             return 'ok'
@@ -302,7 +308,9 @@ def restart(version):
 
 
 def reload(version):
-    return phpOp(version, 'restart')
+    if version == '52':
+        return phpOp(version, 'restart')
+    return phpOp(version, 'reload')
 
 
 def initdStatus(version):

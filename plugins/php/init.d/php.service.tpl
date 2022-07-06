@@ -7,10 +7,9 @@ Description=The PHP {$VERSION} FastCGI Process Manager
 After=network.target
 
 [Service]
-Type=forking
-ExecStart={$SERVER_PATH}/php/init.d/php{$VERSION} start
-ExecStop={$SERVER_PATH}/php/init.d/php{$VERSION} stop
-ExecReload={$SERVER_PATH}/php/init.d/php{$VERSION} reload
+PIDFile={$SERVER_PATH}/php/{$VERSION}/var/run/php-fpm.pid
+ExecStart={$SERVER_PATH}/php/{$VERSION}/sbin/php-fpm --nodaemonize --fpm-config {$SERVER_PATH}/php/{$VERSION}/etc/php-fpm.conf
+ExecReload=/bin/kill -USR2 $MAINPID
 PrivateTmp=false
 
 [Install]
