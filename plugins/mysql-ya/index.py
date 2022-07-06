@@ -1807,9 +1807,9 @@ def installPreInspection(version):
 
     if sysName == 'centos':
         if version == '5.7' and int(sysId) > 7:
-            return 'mysql5.7不支持安装安装在ceonts[' + sysId + ']'
+            return 'MySQL[' + version + ']不支持安装安装在ceonts[' + sysId + ']'
         if version == '8.0' and int(sysId) < 6:
-            return 'mysql[' + version + ']不支持安装安装在ceonts[' + sysId + ']'
+            return 'MySQL[' + version + ']不支持安装安装在ceonts[' + sysId + ']'
     return 'ok'
 
 if __name__ == "__main__":
