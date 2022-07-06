@@ -7,6 +7,7 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
+
 # cd /www/server/mdserver-web/plugins/mysql-ya && bash install.sh install 8.0
 
 install_tmp=${rootPath}/tmp/mw_install.pl
