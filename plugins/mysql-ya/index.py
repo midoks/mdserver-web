@@ -251,7 +251,7 @@ def setSkipGrantTables(v):
 def getErrorLog():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'slow-query-log-file\s*=\s*(.*)'
+    rep = 'log-error\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -259,7 +259,7 @@ def getErrorLog():
 def getShowLogFile():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'log-error\s*=\s*(.*)'
+    rep = 'slow-query-log-file\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
