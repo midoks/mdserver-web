@@ -302,16 +302,17 @@ def initMysql8Pwd():
         "alter user 'root'@'localhost' IDENTIFIED WITH mysql_native_password by '" + pwd + "';"
     alter_root_pwd = alter_root_pwd + "flush privileges;"
 
-    cmd_pass = 'mysqladmin -uroot password root'
+    cmd_pass = 'mysqladmin --defaults-file=' + \
+        getServerDir() + '/etc/my.cnf -uroot password root'
     data = mw.execShell(cmd_pass)
-    # print(data)
+    print(data)
 
     tmp_file = "/tmp/mysql_ya_init_tmp.log"
     mw.writeFile(tmp_file, alter_root_pwd)
     cmd_pass = 'mysql -uroot -proot < ' + tmp_file
 
     data = mw.execShell(cmd_pass)
-    # print(data)
+    print(data)
     os.remove(tmp_file)
 
     pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
