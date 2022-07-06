@@ -52,22 +52,21 @@ VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -
 YUM_INSTALL()
 {
 #######
+#http://repo.mysql.com/
 
-
-wget -O /tmp/mysql-community-server-5.7.37-1.el7.x86_64.rpm https://cdn.mysql.com/archives/mysql-5.7/mysql-community-server-5.7.37-1.el7.x86_64.rpm
-
-rpm -ivh /tmp/mysql-community-server-5.7.37-1.el7.x86_64.rpm
-
-yum -y install mysql-server
-
-rm -rf  /tmp/mysql-community-server-5.7.37-1.el7.x86_64.rpm
+if [ "${OSNAME}" == "centos" ] && [ "${VERSION_ID}" -eq "7" ]  ;then
+	wget -O /tmp/mysql57-community-release-el7.rpm http://repo.mysql.com/mysql57-community-release-el7.rpm
+	rpm -ivh /tmp/mysql57-community-release-el7.rpm
+	yum -y install mysql-server
+	rm -rf  /tmp/mysql57-community-release-el7.rpm
+fi
 #######
 }
 
 YUM_UNINSTALL()
 {
 ### YUM卸载 START ########
-yum -y remove mysql-server
+yum  remove -y mysql-server
 ### YUM卸载 END   ########
 }
 
