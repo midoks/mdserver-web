@@ -138,10 +138,6 @@ def initDreplace(version=''):
     if not os.path.exists(mysql_conf_dir):
         os.mkdir(mysql_conf_dir)
 
-    mysql_data_dir = getServerDir() + '/data'
-    if not os.path.exists(mysql_data_dir):
-        os.mkdir(mysql_data_dir)
-
     mysql_tmp = getServerDir() + '/tmp'
     if not os.path.exists(mysql_tmp):
         os.mkdir(mysql_tmp)
@@ -279,7 +275,7 @@ def initMysql57Data():
         serverdir = getServerDir()
         myconf = serverdir + "/etc/my.cnf"
         user = pGetDbUser()
-        cmd = 'cd ' + serverdir + ' && ./bin/mysqld --defaults-file=' + myconf + \
+        cmd = 'mysqld --defaults-file=' + myconf + \
             ' --initialize-insecure --explicit_defaults_for_timestamp'
         mw.execShell(cmd)
         return False
@@ -291,29 +287,15 @@ def initMysql8Data():
     if not os.path.exists(datadir + '/mysql'):
         serverdir = getServerDir()
         user = pGetDbUser()
-        cmd = 'cd ' + serverdir + ' && /usr/sbin/mysqld --basedir=' + serverdir + ' --datadir=' + \
-            datadir + ' --initialize-insecure'
+        cmd = 'mysqld --basedir=/usr --datadir=' + datadir + ' --initialize-insecure'
         mw.execShell(cmd)
         return False
-    return True
-
-
-def initMysqlPwd():
-    time.sleep(5)
-
-    serverdir = getServerDir()
-
-    pwd = mw.getRandomString(16)
-    cmd_pass = serverdir + '/bin/mysqladmin -uroot password ' + pwd
-    mw.execShell(cmd_pass)
-    pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
     return True
 
 
 def initMysql8Pwd():
     time.sleep(2)
 
-    serverdir = getServerDir()
     pwd = mw.getRandomString(16)
 
     alter_root_pwd = 'flush privileges;'
@@ -327,7 +309,7 @@ def initMysql8Pwd():
     data = mw.execShell(cmd_pass)
     # print(data)
 
-    tmp_file = "/tmp/mysql_init_tmp.log"
+    tmp_file = "/tmp/mysql_ya_init_tmp.log"
     mw.writeFile(tmp_file, alter_root_pwd)
     cmd_pass = 'mysql -uroot -proot < ' + tmp_file
 
