@@ -365,7 +365,8 @@ def initdStatus():
     if mw.isAppleSystem():
         return "Apple Computer does not support"
 
-    shell_cmd = 'systemctl status mysql | grep loaded | grep "enabled;"'
+    shell_cmd = 'systemctl status ' + \
+        getPluginName() + ' | grep loaded | grep "enabled;"'
     data = mw.execShell(shell_cmd)
     if data[0] == '':
         return 'fail'
@@ -376,7 +377,7 @@ def initdInstall():
     if mw.isAppleSystem():
         return "Apple Computer does not support"
 
-    mw.execShell('systemctl enable mysql')
+    mw.execShell('systemctl enable ' + getPluginName())
     return 'ok'
 
 
@@ -384,7 +385,7 @@ def initdUinstall():
     if mw.isAppleSystem():
         return "Apple Computer does not support"
 
-    mw.execShell('systemctl disable mysql')
+    mw.execShell('systemctl disable ' + getPluginName())
     return 'ok'
 
 
