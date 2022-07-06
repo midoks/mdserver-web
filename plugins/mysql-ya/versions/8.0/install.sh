@@ -60,6 +60,8 @@ else
 fi
 rpm -ivh /tmp/mysql80-community-release.rpm
 yum -y install mysql-server
+
+rm -rf  /tmp/mysql80-community-release.rpm
 #######
 }
 
@@ -79,6 +81,8 @@ dpkg -i /tmp/mysql-apt-config_0.8.22-1_all.deb
 
 apt update -y
 apt install -y mysql-server
+
+rm -rf  /tmp/mysql-apt-config_0.8.22-1_all.deb
 #######
 }
 
