@@ -194,6 +194,7 @@ systemctl stop mongod
 yum erase -y $(rpm -qa | grep mongodb-org)
 rm -r /var/log/mongodb
 rm -r /var/lib/mongo
+rm -rf /etc/yum.repos.d/mongodb-org-${VERSION}.repo
 }
 
 
