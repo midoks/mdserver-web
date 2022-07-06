@@ -53,15 +53,14 @@ YUM_INSTALL()
 {
 #######
 
-if [ "${OSNAME}" == "centos" ];then
-	wget -O /tmp/mysql80-community-release.rpm http://repo.mysql.com/mysql80-community-release-el${VERSION}.rpm
-else
-	wget -O /tmp/mysql80-community-release.rpm http://repo.mysql.com/mysql80-community-release-el8.rpm
-fi
-rpm -ivh /tmp/mysql80-community-release.rpm
+
+wget -O /tmp/mysql-community-server-5.7.37-1.el7.x86_64.rpm https://cdn.mysql.com/archives/mysql-5.7/mysql-community-server-5.7.37-1.el7.x86_64.rpm
+
+rpm -ivh /tmp/mysql-community-server-5.7.37-1.el7.x86_64.rpm
+
 yum -y install mysql-server
 
-rm -rf  /tmp/mysql80-community-release.rpm
+rm -rf  /tmp/mysql-community-server-5.7.37-1.el7.x86_64.rpm
 #######
 }
 
