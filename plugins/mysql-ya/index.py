@@ -229,30 +229,37 @@ def setSkipGrantTables(v):
     return True
 
 
+# def getErrorLog():
+#     args = getArgs()
+#     path = getDataDir()
+#     filename = ''
+#     for n in os.listdir(path):
+#         if len(n) < 5:
+#             continue
+#         if n == 'error.log':
+#             filename = path + '/' + n
+#             break
+#     # print filename
+#     if not os.path.exists(filename):
+#         return mw.returnJson(False, '指定文件不存在!')
+#     if 'close' in args:
+#         mw.writeFile(filename, '')
+#         return mw.returnJson(False, '日志已清空')
+#     info = mw.getNumLines(filename, 18)
+#     return mw.returnJson(True, 'OK', info)
+
 def getErrorLog():
-    args = getArgs()
-    path = getDataDir()
-    filename = ''
-    for n in os.listdir(path):
-        if len(n) < 5:
-            continue
-        if n == 'error.log':
-            filename = path + '/' + n
-            break
-    # print filename
-    if not os.path.exists(filename):
-        return mw.returnJson(False, '指定文件不存在!')
-    if 'close' in args:
-        mw.writeFile(filename, '')
-        return mw.returnJson(False, '日志已清空')
-    info = mw.getNumLines(filename, 18)
-    return mw.returnJson(True, 'OK', info)
+    file = getConf()
+    content = mw.readFile(file)
+    rep = 'slow-query-log-file\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
 
 
 def getShowLogFile():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'slow-query-log-file\s*=\s*(.*)'
+    rep = 'log-error\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
