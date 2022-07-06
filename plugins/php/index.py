@@ -204,6 +204,10 @@ def phpFpmWwwReplace(version):
         mw.writeFile(service_php_fpmwww, content)
 
 
+def getFpmConf(version):
+    return getServerDir() + '/' + version + '/etc/php-fpm.d/www.conf'
+
+
 def makePhpIni(version):
     dst_ini = mw.getServerDir() + '/php/' + version + '/etc/php.ini'
     if not os.path.exists(dst_ini):
@@ -400,7 +404,7 @@ def submitPhpConf(version):
 def getLimitConf(version):
     fileini = getServerDir() + "/" + version + "/etc/php.ini"
     phpini = mw.readFile(fileini)
-    filefpm = getServerDir() + "/" + version + "/etc/php-fpm.conf"
+    filefpm = getFpmConf(version)
     phpfpm = mw.readFile(filefpm)
 
     # print fileini, filefpm
@@ -443,7 +447,7 @@ def setMaxTime(version):
     if int(time) < 30 or int(time) > 86400:
         return mw.returnJson(False, '请填写30-86400间的值!')
 
-    filefpm = getServerDir() + "/" + version + "/etc/php-fpm.conf"
+    filefpm = getFpmConf(version)
     conf = mw.readFile(filefpm)
     rep = "request_terminate_timeout\s*=\s*([0-9]+)\n"
     conf = re.sub(rep, "request_terminate_timeout = " + time + "\n", conf)
@@ -762,6 +766,8 @@ if __name__ == "__main__":
         print(getConfAppStart())
     elif func == 'get_php_conf':
         print(getPhpConf(version))
+    elif func == 'get_fpm_conf':
+        print(getFpmConf(version))
     elif func == 'submit_php_conf':
         print(submitPhpConf(version))
     elif func == 'get_limit_conf':
