@@ -14,7 +14,7 @@ cd /www/server/mdserver-web/plugins/php && bash all_test.sh
 | 系统名称 			| 	面板 		|	OpenResty 	|
 | ----------------- |---------------|---------------|
 | CentOS 7.9 		|✅				|✅				|
-| CentOS 8.4 		|:x:			|✅				|
+| CentOS 8.4 		|✅				|✅				|
 | CentOS 8 Stream 	|✅				|✅				|
 | CentOS 9 Stream 	|✅				|✅				|
 | Debian 10.3 		|✅				|✅				|
@@ -32,7 +32,7 @@ cd /www/server/mdserver-web/plugins/php && bash all_test.sh
 | 系统名称 			| PHP52 |PHP53	|PHP54	|PHP55	|PHP56	|PHP70	|PHP71	|PHP72	|PHP73	|PHP74	|PHP80	|PHP81	|
 | ----------------- |-------|-------|-------|-------|-------|-------|-------|-------|-------|-------|-------|-------|
 | CentOS 7.9 		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
-| CentOS 8.4 		|:x:	|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
+| CentOS 8.4 		|✅ 	|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
 | CentOS 8 Stream 	|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
 | CentOS 9 Stream 	|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
 | Debian 10.3 		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
