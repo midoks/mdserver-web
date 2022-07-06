@@ -482,12 +482,10 @@ def runInfo():
             pwd = db.getPwd()
             return mw.returnJson(False, 'mysql password error:' + pwd + '!')
     except Exception as e:
-        pass
+        return mw.returnJson(False, str(e))
 
     result = {}
-
     # print(data)
-
     for d in data:
         for g in gets:
             if d[0] == g:
@@ -567,6 +565,8 @@ def isSqlError(mysqlMsg):
         return mw.returnJson(False, '数据库用户不存在!')
     if "1007" in mysqlMsg:
         return mw.returnJson(False, '数据库已经存在!')
+    if "1045" in mysqlMsg:
+        return mw.returnJson(False, '数据库管理密码错误!')
     return None
 
 
