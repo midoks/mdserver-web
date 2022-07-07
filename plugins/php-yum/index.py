@@ -189,7 +189,7 @@ def phpFpmWwwReplace(version):
 
 
 def getFpmConfFile(version):
-    return getServerDir() + '/php' + version + '/php-fpm.d/www.conf'
+    return getServerDir() + '/php' + version + '/php-fpm.d/mw.conf'
 
 
 def initReplace(version):
