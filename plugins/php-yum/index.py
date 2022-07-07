@@ -329,7 +329,7 @@ def getPhpConf(version):
         {'name': 'cgi.fix_pathinfo', 'type': 0, 'ps': '是否开启pathinfo'},
         {'name': 'date.timezone', 'type': 3, 'ps': '时区'}
     ]
-    phpini = mw.readFile(getConf())
+    phpini = mw.readFile(getConf(version))
     result = []
     for g in gets:
         rep = g['name'] + '\s*=\s*([0-9A-Za-z_& ~]+)(\s*;?|\r?\n)'
@@ -347,7 +347,7 @@ def submitPhpConf(version):
             'post_max_size', 'file_uploads', 'upload_max_filesize', 'max_file_uploads',
             'default_socket_timeout', 'error_reporting']
     args = getArgs()
-    filename = getConf()
+    filename = getConf(version)
     phpini = mw.readFile(filename)
     for g in gets:
         if g in args:
