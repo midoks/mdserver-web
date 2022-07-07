@@ -216,16 +216,12 @@ def makePhpIni(version):
 
 
 def initReplace(version):
-    makeOpenrestyConf()
-    makePhpIni(version)
+    # makeOpenrestyConf()
+    # makePhpIni(version)
 
-    initD_path = getServerDir() + '/init.d'
-    if not os.path.exists(initD_path):
-        os.mkdir(initD_path)
-
-    phpPrependFile(version)
-    phpFpmWwwReplace(version)
-    phpFpmReplace(version)
+    # phpPrependFile(version)
+    # phpFpmWwwReplace(version)
+    # phpFpmReplace(version)
 
     # systemd
     # mw.execShell('systemctl daemon-reload')
@@ -342,7 +338,6 @@ def submitPhpConf(version):
             val = g + ' = ' + args[g] + '\n'
             phpini = re.sub(rep, val, phpini)
     mw.writeFile(filename, phpini)
-    # mw.execShell(getServerDir() + '/init.d/php' + version + ' reload')
     reload(version)
     return mw.returnJson(True, '设置成功')
 
