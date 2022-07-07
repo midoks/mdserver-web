@@ -33,7 +33,7 @@ def getPluginDir():
 
 
 def getServerDir():
-    return mw.getServerDir() + '/' + getPluginName()
+    return '/etc/opt/remi'
 
 
 def getInitDFile(version):
@@ -67,13 +67,13 @@ def checkArgs(data, ck=[]):
 
 
 def getConf(version):
-    path = getServerDir() + '/' + version + '/etc/php.ini'
+    path = getServerDir() + '/php' + version + '/etc/php.ini'
     return path
 
 
 def status(version):
     # ps -ef|grep 'php/81' |grep -v grep | grep -v python | awk '{print $2}
-    cmd = "ps -ef|grep 'php/" + version + \
+    cmd = "ps -ef|grep 'remi/php" + version + \
         "' |grep -v grep | grep -v python | awk '{print $2}'"
     data = mw.execShell(cmd)
     if data[0] == '':
@@ -226,19 +226,6 @@ def initReplace(version):
     if not os.path.exists(initD_path):
         os.mkdir(initD_path)
 
-    file_bin = initD_path + '/php' + version
-    if not os.path.exists(file_bin):
-        file_tpl = getPluginDir() + '/init.d/php.tpl'
-
-        if version == '52':
-            file_tpl = getPluginDir() + '/init.d/php52.tpl'
-
-        content = mw.readFile(file_tpl)
-        content = contentReplace(content, version)
-
-        mw.writeFile(file_bin, content)
-        mw.execShell('chmod +x ' + file_bin)
-
     phpPrependFile(version)
     phpFpmWwwReplace(version)
     phpFpmReplace(version)
@@ -254,36 +241,17 @@ def initReplace(version):
         mw.execShell('chown -R www:www ' + upload_path)
 
     # systemd
-    systemDir = '/usr/lib/systemd/system'
-    systemService = systemDir + '/php' + version + '.service'
-    systemServiceTpl = getPluginDir() + '/init.d/php.service.tpl'
-    if version == '52':
-        systemServiceTpl = getPluginDir() + '/init.d/php.service.52.tpl'
+    # mw.execShell('systemctl daemon-reload')
 
-    if os.path.exists(systemDir) and not os.path.exists(systemService):
-        service_path = mw.getServerDir()
-        se_content = mw.readFile(systemServiceTpl)
-        se_content = se_content.replace('{$VERSION}', version)
-        se_content = se_content.replace('{$SERVER_PATH}', service_path)
-        mw.writeFile(systemService, se_content)
-        mw.execShell('systemctl daemon-reload')
-
-    return file_bin
+    return 'ok'
 
 
 def phpOp(version, method):
-    file = initReplace(version)
-
-    if not mw.isAppleSystem():
-        if method == 'stop' or method == 'restart':
-            mw.execShell(file + ' ' + 'stop')
-
-        data = mw.execShell('systemctl ' + method + ' php' + version)
-        if data[1] == '':
-            return 'ok'
-        return data[1]
-
-    data = mw.execShell(file + ' ' + method)
+    initReplace(version)
+    if mw.isAppleSystem():
+        return 'fail'
+    data = mw.execShell('systemctl ' + method + ' ' +
+                        'php' + version + '-php-fpm')
     if data[1] == '':
         return 'ok'
     return data[1]
@@ -294,14 +262,7 @@ def start(version):
 
 
 def stop(version):
-    status = phpOp(version, 'stop')
-
-    if version == '52':
-        file = initReplace(version)
-        data = mw.execShell(file + ' ' + 'stop')
-        if data[1] == '':
-            return 'ok'
-    return status
+    return phpOp(version, 'stop')
 
 
 def restart(version):
@@ -318,7 +279,8 @@ def initdStatus(version):
     if mw.isAppleSystem():
         return "Apple Computer does not support"
 
-    shell_cmd = 'systemctl status php' + version + ' | grep loaded | grep "enabled;"'
+    shell_cmd = 'systemctl status php' + version + \
+        '-php-fpm | grep loaded | grep "enabled;"'
     data = mw.execShell(shell_cmd)
     if data[0] == '':
         return 'fail'
@@ -329,7 +291,7 @@ def initdInstall(version):
     if mw.isAppleSystem():
         return "Apple Computer does not support"
 
-    mw.execShell('systemctl enable php' + version)
+    mw.execShell('systemctl enable php' + version + '-php-fpm')
     return 'ok'
 
 
@@ -337,7 +299,7 @@ def initdUinstall(version):
     if mw.isAppleSystem():
         return "Apple Computer does not support"
 
-    mw.execShell('systemctl disable php' + version)
+    mw.execShell('systemctl disable php' + version + '-php-fpm')
     return 'ok'
 
 
