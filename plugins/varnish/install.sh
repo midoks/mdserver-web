@@ -44,15 +44,22 @@ Install_varnish()
 		zypper install -y varnish
 	else
 		echo "I won't support it"
+		exit 1
 	fi
 
 	mkdir -p $serverPath/varnish
 	echo "1.0" > $serverPath/varnish/version.pl
 	echo '安装完成' > $install_tmp
+
+	cd ${rootPath} && python3 ${rootPath}/plugins/varnish/index.py start
+	cd ${rootPath} && python3 ${rootPath}/plugins/varnish/index.py initd_install
 }
 
 Uninstall_varnish()
 {
+	cd ${rootPath} && python3 ${rootPath}/plugins/varnish/index.py stop
+	cd ${rootPath} && python3 ${rootPath}/plugins/varnish/index.py initd_uninstall
+
 	rm -rf $serverPath/varnish
 	echo "uninstall varnish" > $install_tmp
 }
