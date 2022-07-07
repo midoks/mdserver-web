@@ -20,58 +20,53 @@ else
 	echo 'do start!'
 fi
 
-if [ -f $rootPath"/php/init.d/php52" ];then
-	$rootPath"/php/init.d/php52" reload
-fi
+
+echo "OpenResty -- START"
+if [ -f /usr/lib/systemd/system/openresty.service ];then
+	systemctl reload openresty
+elif [ -f $rootPath/openresty/nginx/sbin/nginx ];then
+	$rootPath/openresty/nginx/sbin/nginx -s reload
+else
+	echo "..."
+fi	
+echo "OpenResty -- END"
 
 
-if [ -f $rootPath"/php/init.d/php53" ];then
-	$rootPath"/php/init.d/php53" reload
+PHP_VER_LIST=(53 54 55 56 70 71 72 73 74 80 81)
+for PHP_VER in ${PHP_VER_LIST[@]}; do
+echo "PHP${PHP_VER} -- START"
+if [ -f /usr/lib/systemd/system/php${PHP_VER}.service ];then
+	systemctl reload php${PHP_VER}
+elif [ -f ${rootPath}/php/init.d/php${PHP_VER} ];then
+	${rootPath}/php/init.d/php${PHP_VER} reload
+else
+	echo "..."
 fi
+echo "PHP${PHP_VER} -- END"
+done
 
-if [ -f $rootPath"/php/init.d/php54" ];then
-	$rootPath"/php/init.d/php54" reload
+echo "MySQL -- START"
+if [ -f /usr/lib/systemd/system/mysql.service ];then
+	systemctl reload mysql
+elif [ -f ${rootPath}/php/init.d/mysql ];then
+	${rootPath}/mysql/init.d/mysql reload
+else
+	echo "..."
 fi
+echo "MySQL -- END"
 
-if [ -f $rootPath"/php/init.d/php55" ];then
-	$rootPath"/php/init.d/php55" reload
-fi
 
-if [ -f $rootPath"/php/init.d/php56" ];then
-	$rootPath"/php/init.d/php56" reload
-fi
 
-if [ -f $rootPath"/php/init.d/php70" ];then
-	$rootPath"/php/init.d/php70" reload
+echo "PureFTPD -- START"
+if [ -f /usr/lib/systemd/system/pureftp.service ];then
+	systemctl reload pureftp
+elif [ -f ${rootPath}/pureftp/init.d/pureftp ];then
+	${rootPath}/pureftp/init.d/pureftp reload
+else
+	echo "..."
 fi
+echo "PureFTPD -- END"
 
-if [ -f $rootPath"/php/init.d/php71" ];then
-	$rootPath"/php/init.d/php71" reload
-fi
-
-if [ -f $rootPath"/php/init.d/php72" ];then
-	$rootPath"/php/init.d/php72" reload
-fi
-
-if [ -f $rootPath"/php/init.d/php73" ];then
-	$rootPath"/php/init.d/php73" reload
-fi
-
-if [ -f $rootPath"/php/init.d/php74" ];then
-	$rootPath"/php/init.d/php74" reload
-fi
-
-if [ -f $rootPath"/php/init.d/php80" ];then
-	$rootPath"/php/init.d/php74" reload
-fi
-
-if [ -f $rootPath"/php/init.d/php81" ];then
-	$rootPath"/php/init.d/php74" reload
-fi
-
-if [ -f $rootPath"/openresty/nginx/sbin/nginx" ];then
-	$rootPath"/openresty/nginx/sbin/nginx" -s reload
-fi
 
 sync
 sleep 2
