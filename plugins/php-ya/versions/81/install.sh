@@ -29,7 +29,7 @@ rpm -Uvh http://rpms.remirepo.net/enterprise/remi-release-#{VERSION_ID}.rpm
 
 Uninstall_php_CentOS(){
 ### centos start ################
-
+echo "uninstall centos"
 ### centos start ################
 }
 
