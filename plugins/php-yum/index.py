@@ -177,7 +177,7 @@ def phpFpmWwwReplace(version):
     service_php_fpmwww = service_php_fpm_dir + '/www.conf'
     if os.path.exists(service_php_fpmwww):
         # 原来文件备份
-        mw.execShell('mw ' + service_php_fpmwww +
+        mw.execShell('mv ' + service_php_fpmwww +
                      ' ' + service_php_fpmwww + '.bak')
 
     service_php_fpm_mw = service_php_fpm_dir + '/mw.conf'
