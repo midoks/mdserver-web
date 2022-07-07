@@ -154,7 +154,7 @@ def makeOpenrestyConf(version):
 
 
 def phpFpmWwwReplace(version):
-    service_php_fpm_dir = getServerDir() + '/php/' + version + '/fpm/pool.d'
+    service_php_fpm_dir = getServerDir() + '/' + version + '/fpm/pool.d'
     if not os.path.exists(service_php_fpm_dir):
         os.mkdir(service_php_fpm_dir)
 
