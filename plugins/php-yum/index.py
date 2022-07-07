@@ -563,7 +563,7 @@ def setDisableFunc(version):
                     disable_functions + "\n", phpini)
 
     msg = mw.getInfo('修改PHP-{1}的禁用函数为[{2}]', (version, disable_functions,))
-    mw.writeLog('插件管理[PHP]', msg)
+    mw.writeLog('插件管理[PHP-YUM]', msg)
     mw.writeFile(filename, phpini)
     reload(version)
     return mw.returnJson(True, '设置成功!')
