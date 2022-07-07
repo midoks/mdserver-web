@@ -228,15 +228,16 @@ function addVersion(name, ver, type, obj, title, install_pre_inspection) {
                 //安装检查
                 installPreInspection(name, version, function(){
                     runInstall(data);
+                    fly("layui-layer-btn0");
                 });      
                 return;
             }
             runInstall(data);
+            fly("layui-layer-btn0");
         }
     });
 
     installTips();
-    fly("layui-layer-btn0");
 }
 
 //卸载软件
