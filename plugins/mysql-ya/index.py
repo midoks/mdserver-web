@@ -168,7 +168,7 @@ def initDreplace(version=''):
 
 
 def status(version=''):
-    pid = getServerDir() + '/data/mysql.pid'
+    pid = getPidFile()
     if not os.path.exists(pid):
         return 'stop'
     return 'start'
@@ -178,6 +178,14 @@ def getDataDir():
     file = getConf()
     content = mw.readFile(file)
     rep = 'datadir\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
+
+
+def getPidFile():
+    file = getConf()
+    content = mw.readFile(file)
+    rep = 'pid-file\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
