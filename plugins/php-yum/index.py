@@ -524,12 +524,11 @@ def setDisableFunc(version):
 def checkPhpinfoFile(v):
     sdir = mw.getServerDir()
     dfile = sdir + '/web_conf/php/status/phpinfo_' + v + '.conf'
-    if not os.path.exists(dfile):
-        tpl = getPluginDir() + '/conf/phpinfo.conf'
-        content = mw.readFile(tpl)
-        content = contentReplace(content, v)
-        mw.writeFile(dfile, content)
-        mw.restartWeb()
+    tpl = getPluginDir() + '/conf/phpinfo.conf'
+    content = mw.readFile(tpl)
+    content = contentReplace(content, v)
+    mw.writeFile(dfile, content)
+    mw.restartWeb()
 
 
 def getPhpinfo(v):
