@@ -345,7 +345,7 @@ def submitPhpConf(version):
 def getLimitConf(version):
     fileini = getConf(version)
     phpini = mw.readFile(fileini)
-    filefpm = getFpmConf(version)
+    filefpm = getFpmConfFile(version)
     phpfpm = mw.readFile(filefpm)
 
     # print fileini, filefpm
@@ -388,7 +388,7 @@ def setMaxTime(version):
     if int(time) < 30 or int(time) > 86400:
         return mw.returnJson(False, '请填写30-86400间的值!')
 
-    filefpm = getFpmConf(version)
+    filefpm = getFpmConfFile(version)
     conf = mw.readFile(filefpm)
     rep = "request_terminate_timeout\s*=\s*([0-9]+)\n"
     conf = re.sub(rep, "request_terminate_timeout = " + time + "\n", conf)
