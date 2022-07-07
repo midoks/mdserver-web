@@ -591,7 +591,7 @@ def installLib(version):
         return data[1]
 
     name = args['name']
-    execstr = "cd " + getPluginDir() + '/versions/' + version + \
+    execstr = "cd " + getPluginDir() + '/versions/' + \
         " && /bin/bash common.sh " + version + ' install ' + name
 
     rettime = time.strftime('%Y-%m-%d %H:%M:%S')
@@ -610,7 +610,7 @@ def uninstallLib(version):
         return data[1]
 
     name = args['name']
-    execstr = "cd " + getPluginDir() + '/versions/' + version + \
+    execstr = "cd " + getPluginDir() + '/versions/' + \
         " && /bin/bash common.sh " + version + ' uninstall ' + name
 
     data = mw.execShell(execstr)
