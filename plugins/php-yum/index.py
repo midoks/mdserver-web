@@ -67,7 +67,7 @@ def checkArgs(data, ck=[]):
 
 
 def getConf(version):
-    path = getServerDir() + '/php' + version + '/etc/php.ini'
+    path = getServerDir() + '/php' + version + '/php.ini'
     return path
 
 
@@ -202,11 +202,11 @@ def phpFpmWwwReplace(version):
 
 
 def getFpmConf(version):
-    return getServerDir() + '/' + version + '/etc/php-fpm.d/www.conf'
+    return getServerDir() + '/' + version + '/php-fpm.d/www.conf'
 
 
 def makePhpIni(version):
-    dst_ini = mw.getServerDir() + '/php/' + version + '/etc/php.ini'
+    dst_ini = mw.getServerDir() + '/php/' + version + '/php.ini'
     if not os.path.exists(dst_ini):
         src_ini = getPluginDir() + '/conf/php' + version[0:1] + '.ini'
         # shutil.copyfile(s_ini, d_ini)
