@@ -555,7 +555,9 @@ def getLibConf(version):
     if not os.path.exists(fname):
         return mw.returnJson(False, '指定PHP版本不存在!')
 
-    phpini = mw.readFile(fname)
+    # phpini = mw.readFile(fname)
+    content = mw.execShell('cat /etc/opt/remi/php' + version + '/php.d/*')
+    content = content[0]
 
     libpath = getPluginDir() + '/versions/phplib.conf'
     phplib = json.loads(mw.readFile(libpath))
@@ -574,7 +576,7 @@ def getLibConf(version):
                 lib['task'] = task['status']
                 lib['phpversions'] = []
                 lib['phpversions'].append(tmp1[1])
-        if phpini.find(lib['check']) == -1:
+        if content.find(lib['check']) == -1:
             lib['status'] = False
         else:
             lib['status'] = True
