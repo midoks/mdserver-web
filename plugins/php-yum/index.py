@@ -343,7 +343,7 @@ def submitPhpConf(version):
 
 
 def getLimitConf(version):
-    fileini = getServerDir() + "/" + version + "/etc/php.ini"
+    fileini = getConf(version)
     phpini = mw.readFile(fileini)
     filefpm = getFpmConf(version)
     phpfpm = mw.readFile(filefpm)
@@ -394,7 +394,7 @@ def setMaxTime(version):
     conf = re.sub(rep, "request_terminate_timeout = " + time + "\n", conf)
     mw.writeFile(filefpm, conf)
 
-    fileini = getServerDir() + "/" + version + "/etc/php.ini"
+    fileini = getConf(version)
     phpini = mw.readFile(fileini)
     rep = "max_execution_time\s*=\s*([0-9]+)\r?\n"
     phpini = re.sub(rep, "max_execution_time = " + time + "\n", phpini)
@@ -414,7 +414,7 @@ def setMaxSize(version):
     if int(maxVal) < 2:
         return mw.returnJson(False, '上传大小限制不能小于2MB!')
 
-    path = getServerDir() + '/' + version + '/etc/php.ini'
+    path = getConf(version)
     conf = mw.readFile(path)
     rep = u"\nupload_max_filesize\s*=\s*[0-9]+M"
     conf = re.sub(rep, u'\nupload_max_filesize = ' + maxVal + 'M', conf)
@@ -429,7 +429,7 @@ def setMaxSize(version):
 
 def getFpmConfig(version):
 
-    filefpm = getServerDir() + '/' + version + '/etc/php-fpm.d/www.conf'
+    filefpm = getServerDir() + '/php' + version + '/php-fpm.d/www.conf'
     conf = mw.readFile(filefpm)
     data = {}
     rep = "\s*pm.max_children\s*=\s*([0-9]+)\s*"
@@ -466,7 +466,7 @@ def setFpmConfig(version):
     max_spare_servers = args['max_spare_servers']
     pm = args['pm']
 
-    file = getServerDir() + '/' + version + '/etc/php-fpm.d/www.conf'
+    file = getServerDir() + '/php' + version + '/php-fpm.d/www.conf'
     conf = mw.readFile(file)
 
     rep = "\s*pm.max_children\s*=\s*([0-9]+)\s*"
@@ -510,8 +510,6 @@ def checkFpmStatusFile(version):
 
 
 def getFpmStatus(version):
-    if version == '52':
-        return mw.returnJson(False, 'PHP[' + version + ']不支持!!!')
 
     checkFpmStatusFile(version)
     stat = status(version)
