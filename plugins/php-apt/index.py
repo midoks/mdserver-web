@@ -228,7 +228,7 @@ def initdStatus(version):
         return "Apple Computer does not support"
 
     shell_cmd = 'systemctl status php' + version + \
-        '-php-fpm | grep loaded | grep "enabled;"'
+        '-fpm | grep loaded | grep "enabled;"'
     data = mw.execShell(shell_cmd)
     if data[0] == '':
         return 'fail'
@@ -239,7 +239,7 @@ def initdInstall(version):
     if mw.isAppleSystem():
         return "Apple Computer does not support"
 
-    mw.execShell('systemctl enable php' + version + '-php-fpm')
+    mw.execShell('systemctl enable php' + version + '-fpm')
     return 'ok'
 
 
@@ -247,7 +247,7 @@ def initdUinstall(version):
     if mw.isAppleSystem():
         return "Apple Computer does not support"
 
-    mw.execShell('systemctl disable php' + version + '-php-fpm')
+    mw.execShell('systemctl disable php' + version + '-fpm')
     return 'ok'
 
 
