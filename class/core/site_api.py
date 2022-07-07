@@ -261,7 +261,7 @@ class site_api:
         file = self.getHostConf(siteName)
         conf = mw.readFile(file)
         if conf:
-            rep = "enable-php-([0-9]{2,3})\.conf"
+            rep = "enable-php-(.*)\.conf"
             tmp = re.search(rep, conf).group()
             conf = conf.replace(tmp, 'enable-php-' + version + '.conf')
             mw.writeFile(file, conf)
