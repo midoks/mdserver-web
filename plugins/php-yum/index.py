@@ -568,7 +568,7 @@ def getLibConf(version):
 
     # phpini = mw.readFile(fname)
     content = mw.execShell('cat /etc/opt/remi/php' +
-                           version + '/php.d/* | grep -v "^;"')
+                           version + "/php.d/* | grep -v '^;' |tr -s '\n'")
     content = content[0]
 
     libpath = getPluginDir() + '/versions/phplib.conf'
