@@ -567,7 +567,8 @@ def getLibConf(version):
         return mw.returnJson(False, '指定PHP版本不存在!')
 
     # phpini = mw.readFile(fname)
-    content = mw.execShell('cat /etc/opt/remi/php' + version + '/php.d/*')
+    content = mw.execShell('cat /etc/opt/remi/php' +
+                           version + '/php.d/* | grep -v "^;"')
     content = content[0]
 
     libpath = getPluginDir() + '/versions/phplib.conf'
