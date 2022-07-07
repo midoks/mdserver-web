@@ -23,7 +23,7 @@ PHP_VER=81
 Install_php_CentOS(){
 ### centos start ################
 rpm -Uvh http://rpms.remirepo.net/enterprise/remi-release-#{VERSION_ID}.rpm
-
+yum install php81
 ### centos start ################
 }
 
