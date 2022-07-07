@@ -32,6 +32,12 @@ if [ ! -d $curPath/versions/$2 ];then
 fi
 
 
+if [ "${action}" == "uninstall" ] && [ -d ${serverPath}/php-yum/${type} ];then
+	#初始化 
+	cd ${rootPath} && python3 ${rootPath}/plugins/php-yum/index.py stop ${type}
+	cd ${rootPath} && python3 ${rootPath}/plugins/php-yum/index.py initd_uninstall ${type}
+fi
+
 cd ${curPath} && sh -x $curPath/versions/$2/install.sh $1
 
 if [ "${action}" == "install" ] && [ -d ${serverPath}/php-yum/${type} ];then
