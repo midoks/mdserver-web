@@ -117,7 +117,7 @@ class backupTools:
 
         if not os.path.exists(filename):
             endDate = time.strftime('%Y/%m/%d %X', time.localtime())
-            log = "数据库[" + name + u"]备份失败!"
+            log = "数据库[" + name + "]备份失败!"
             print("★[" + endDate + "] " + log)
             print(
                 "----------------------------------------------------------------------------")
