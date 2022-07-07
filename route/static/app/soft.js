@@ -183,9 +183,6 @@ function runInstall(data){
         layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
         getSList();
     },'json');
-
-    installTips();
-    fly("bi-btn");
 }
 
 function addVersion(name, ver, type, obj, title, install_pre_inspection) {
@@ -213,7 +210,7 @@ function addVersion(name, ver, type, obj, title, install_pre_inspection) {
 			<div class='version line'>安装版本：" + option + "</div>\
 	    </div>",
         success:function(){
-            $('.fangshi input').click(function() {
+             $('.fangshi input').click(function() {
                 $(this).attr('checked', 'checked').parent().siblings().find("input").removeAttr('checked');
             });
         },
@@ -224,7 +221,7 @@ function addVersion(name, ver, type, obj, title, install_pre_inspection) {
             }
             var name = info.split(" ")[0];
             var version = info.split(" ")[1];
-            var type = $('.fangshi input').prop("checked") ? '1' : '0';
+            var type = $('.fangshi').prop("checked") ? '1' : '0';
             var data = "name=" + name + "&version=" + version + "&type=" + type;
             // console.log(data);
             if (install_pre_inspection){
@@ -235,11 +232,11 @@ function addVersion(name, ver, type, obj, title, install_pre_inspection) {
                 return;
             }
             runInstall(data);
-
-            // installTips();
-            // fly("bi-btn");
         }
     });
+
+    installTips();
+    fly("layui-layer-btn0");
 }
 
 //卸载软件
