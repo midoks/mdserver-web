@@ -619,11 +619,6 @@ def uninstallLib(version):
         return mw.returnJson(False, '卸载信息![通道0]:' + data[0] + "[通道0]:" + data[1])
 
 
-def getConfAppStart():
-    pstart = mw.getServerDir() + '/php/app_start.php'
-    return pstart
-
-
 def installPreInspection(version):
     sys = mw.execShell(
         "cat /etc/*-release | grep PRETTY_NAME |awk -F = '{print $2}' | awk -F '\"' '{print $2}'| awk '{print $1}'")
@@ -671,8 +666,6 @@ if __name__ == "__main__":
         print(fpmSlowLog(version))
     elif func == 'conf':
         print(getConf(version))
-    elif func == 'app_start':
-        print(getConfAppStart())
     elif func == 'get_php_conf':
         print(getPhpConf(version))
     elif func == 'get_fpm_conf_file':
