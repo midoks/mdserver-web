@@ -25,7 +25,7 @@ import time
 class backupTools:
 
     def backupDatabase(self, name, count):
-        db_path = mw.getServerDir() + '/mysql'
+        db_path = getServerDir() + '/mysql'
         db_name = 'mysql'
         name = mw.M('databases').dbPos(db_path, 'mysql').where(
             'name=?', (name,)).getField('name')
@@ -101,7 +101,7 @@ class backupTools:
                     break
 
     def backupDatabaseAll(self, save):
-        db_path = mw.getServerDir() + '/mysql'
+        db_path = getServerDir() + '/mysql'
         db_name = 'mysql'
         databases = mw.M('databases').dbPos(
             db_path, db_name).field('name').select()
