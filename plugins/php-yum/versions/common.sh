@@ -17,3 +17,16 @@ echo $1,$2,$3
 echo $curPath
 echo $rootPath
 echo $serverPath
+
+# yum install -y php81-php-yar
+if [ "$action" == 'install' ];then
+	yum install -y php$1-php-$2
+fi
+
+
+# yum remove -y php81-php-yar
+if [ "$action" == 'uninstall' ];then
+	yum remove -y php$1-php-$2
+fi
+
+
