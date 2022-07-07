@@ -173,6 +173,7 @@ def getFpmConfFile(version):
 
 
 def deleteConfList(version):
+    sdir = mw.getServerDir()
     enable_conf = sdir + '/web_conf/php/conf/enable-php-yum' + version + '.conf'
     status_conf = sdir + '/web_conf/php/status/phpfpm_status_yum' + version + '.conf'
 
