@@ -13,7 +13,7 @@ function phpPost(method, version, args,callback){
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
 
     var req_data = {};
-    req_data['name'] = 'php-ya';
+    req_data['name'] = 'php-yum';
     req_data['func'] = method;
     req_data['version'] = version;
  
@@ -41,7 +41,7 @@ function phpPostCallbak(method, version, args,callback){
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
 
     var req_data = {};
-    req_data['name'] = 'php-ya';
+    req_data['name'] = 'php-yum';
     req_data['func'] = method;
     args['version'] = version;
  

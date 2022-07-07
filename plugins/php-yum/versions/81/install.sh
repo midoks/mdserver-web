@@ -20,27 +20,18 @@ VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -
 version=8.1.x
 PHP_VER=81
 
-Install_php_CentOS(){
-### centos start ################
-rpm -Uvh http://rpms.remirepo.net/enterprise/remi-release-#{VERSION_ID}.rpm
-yum install php81 php81-php-fpm 
-### centos start ################
-}
-
-Uninstall_php_CentOS(){
-### centos start ################
-echo "uninstall centos"
-### centos start ################
-}
-
 
 Install_php()
 {
 #------------------------ install start ------------------------------------#
 
+### centos start ################
+rpm -Uvh http://rpms.remirepo.net/enterprise/remi-release-${VERSION_ID}.rpm
+yum install php81 php81-php-fpm 
+### centos start ################
 
-if [ "$OSNAME" == 'centos' ];then
-	Install_php_CentOS
+if [ "$?" == "0" ];then
+	mkdir -p $serverPath/php-yum/${PHP_VER}
 fi
 
 #------------------------ install end ------------------------------------#
@@ -48,12 +39,8 @@ fi
 
 Uninstall_php()
 {
-	if [ "$OSNAME" == 'centos' ];then
-		Uninstall_php_CentOS
-	fi
-
 	# $serverPath/php-ya/init.d/php${PHP_VER} stop
-	rm -rf $serverPath/php-ya/${PHP_VER}
+	rm -rf $serverPath/php-yum/${PHP_VER}
 	echo "卸载php-${version}..." > $install_tmp
 }
 

@@ -31,22 +31,13 @@ if [ ! -d $curPath/versions/$2 ];then
 	exit 0
 fi
 
-if [ "${action}" == "uninstall" ];then
-	
-	if [ -f /usr/lib/systemd/system/php-ya${type}.service ];then
-		systemctl stop php${type}
-		systemctl disable php${type}
-		rm -rf /usr/lib/systemd/system/php-ya${type}.service
-		systemctl daemon-reload
-	fi
-fi
 
 cd ${curPath} && sh -x $curPath/versions/$2/install.sh $1
 
-if [ "${action}" == "install" ] && [ -d ${serverPath}/php-ya/${type} ];then
+if [ "${action}" == "install" ] && [ -d ${serverPath}/php-yum/${type} ];then
 	#初始化 
-	cd ${rootPath} && python3 ${rootPath}/plugins/php-ya/index.py start ${type}
-	cd ${rootPath} && python3 ${rootPath}/plugins/php-ya/index.py initd_install ${type}
+	cd ${rootPath} && python3 ${rootPath}/plugins/php-yum/index.py start ${type}
+	cd ${rootPath} && python3 ${rootPath}/plugins/php-yum/index.py initd_install ${type}
 fi
 
 
