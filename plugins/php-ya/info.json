@@ -1,0 +1,19 @@
+{
+	"sort": 7,
+	"ps": "PHP是世界上最好的编程语言[YUM|APT]",
+	"shell": "install.sh",
+	"name": "php-ya",
+	"title": "PHP[YA]",
+	"coexist": true,
+	"versions": ["81"],
+	"install_pre_inspection":true,
+	"tip": "soft",
+	"checks": "server/php-ya/VERSION/bin/php",
+	"path": "server/php-ya/VERSION",
+	"display": 1,
+	"author": "Zend",
+	"date": "2022-07-07",
+	"home": "https://www.php.net",
+	"type": "PHP语言解释器",
+	"pid": "1"
+}

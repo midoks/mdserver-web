@@ -1,26 +1,39 @@
 #!/bin/bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
-if grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
-	OSNAME='CentOS'
+
+#获取信息和版本
+_os=`uname`
+if [ ${_os} == "Darwin" ]; then
+    OSNAME='macos'
+elif grep -Eq "openSUSE" /etc/*-release; then
+    OSNAME='opensuse'
+elif grep -Eq "FreeBSD" /etc/*-release; then
+    OSNAME='freebsd'
+elif grep -Eqi "Arch" /etc/issue || grep -Eq "Arch" /etc/*-release; then
+    OSNAME='arch'
+elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
+    OSNAME='centos'
+elif grep -Eqi "Rocky" /etc/issue || grep -Eq "Rocky" /etc/*-release; then
+    OSNAME='rocky'
 elif grep -Eqi "Red Hat Enterprise Linux Server" /etc/issue || grep -Eq "Red Hat Enterprise Linux Server" /etc/*-release; then
-	OSNAME='RHEL'
+    OSNAME='rhel'
 elif grep -Eqi "Aliyun" /etc/issue || grep -Eq "Aliyun" /etc/*-release; then
-	OSNAME='Aliyun'
+    OSNAME='aliyun'
 elif grep -Eqi "Fedora" /etc/issue || grep -Eq "Fedora" /etc/*-release; then
-	OSNAME='Fedora'
+    OSNAME='fedora'
 elif grep -Eqi "Amazon Linux AMI" /etc/issue || grep -Eq "Amazon Linux AMI" /etc/*-release; then
-	OSNAME='Amazon'
+    OSNAME='amazon'
 elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
-	OSNAME='Debian'
+    OSNAME='debian'
 elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
-	OSNAME='Ubuntu'
+    OSNAME='ubuntu'
 elif grep -Eqi "Raspbian" /etc/issue || grep -Eq "Raspbian" /etc/*-release; then
-	OSNAME='Raspbian'
+    OSNAME='raspbian'
 elif grep -Eqi "Deepin" /etc/issue || grep -Eq "Deepin" /etc/*-release; then
-	OSNAME='Deepin'
+    OSNAME='deepin'
 else
-	OSNAME='unknow'
+    OSNAME='unknow'
 fi
 
-echo "$OSNAME" > /www/server/panel/data/osname.pl
+echo "$OSNAME" > /www/server/mdserver-web/data/osname.pl
