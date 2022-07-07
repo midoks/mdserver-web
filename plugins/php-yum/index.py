@@ -591,11 +591,11 @@ def installLib(version):
         return data[1]
 
     name = args['name']
-    execstr = "cd " + getPluginDir() + '/versions/' + version + " && /bin/bash " + \
-        name + '.sh' + ' install ' + version
+    execstr = "cd " + getPluginDir() + '/versions/' + version + \
+        " && /bin/bash common.sh " + version + ' install ' + name
 
     rettime = time.strftime('%Y-%m-%d %H:%M:%S')
-    insert_info = (None, '安装[' + name + '-' + version + ']',
+    insert_info = (None, '安装PHPYUM[' + name + '-' + version + ']',
                    'execshell', '0', rettime, execstr)
     mw.M('tasks').add('id,name,type,status,addtime,execstr', insert_info)
 
@@ -610,15 +610,15 @@ def uninstallLib(version):
         return data[1]
 
     name = args['name']
-    execstr = "cd " + getPluginDir() + '/versions/' + version + " && /bin/bash " + \
-        name + '.sh' + ' uninstall ' + version
+    execstr = "cd " + getPluginDir() + '/versions/' + version + \
+        " && /bin/bash common.sh " + version + ' uninstall ' + name
 
     data = mw.execShell(execstr)
     # data[0] == '' and
     if data[1] == '':
         return mw.returnJson(True, '已经卸载成功!')
     else:
-        return mw.returnJson(False, '卸载信息![通道0]:' + data[0] + "[通道0]:" + data[1])
+        return mw.returnJson(False, '卸载错误信息!:' + data[1])
 
 
 def installPreInspection(version):
