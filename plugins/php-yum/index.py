@@ -28,18 +28,12 @@ def getPluginName():
     return 'php-yum'
 
 
-def getPluginDir():
-    return mw.getPluginDir() + '/' + getPluginName()
-
-
 def getServerDir():
     return '/etc/opt/remi'
 
 
-def getInitDFile(version):
-    if app_debug:
-        return '/tmp/' + getPluginName()
-    return '/etc/init.d/' + getPluginName() + version
+def getPluginDir():
+    return mw.getPluginDir() + '/' + getPluginName()
 
 
 def getArgs():
@@ -148,11 +142,8 @@ def makeOpenrestyConf():
     for x in phpversions:
         dfile = sdir + '/web_conf/php/conf/enable-php-' + x + '.conf'
         if not os.path.exists(dfile):
-            if x == '00':
-                mw.writeFile(dfile, 'set $PHP_ENV 0;')
-            else:
-                w_content = contentReplace(tpl_content, x)
-                mw.writeFile(dfile, w_content)
+            w_content = contentReplace(tpl_content, x)
+            mw.writeFile(dfile, w_content)
 
     # php-fpm status
     for version in phpversions:
@@ -162,15 +153,6 @@ def makeOpenrestyConf():
             content = mw.readFile(tpl)
             content = contentReplace(content, version)
             mw.writeFile(dfile, content)
-
-
-def phpPrependFile(version):
-    app_start = getServerDir() + '/app_start.php'
-    if not os.path.exists(app_start):
-        tpl = getPluginDir() + '/conf/app_start.php'
-        content = mw.readFile(tpl)
-        content = contentReplace(content, version)
-        mw.writeFile(app_start, content)
 
 
 def phpFpmReplace(version):
@@ -188,31 +170,26 @@ def phpFpmReplace(version):
 
 
 def phpFpmWwwReplace(version):
-    service_php_fpm_dir = getServerDir() + '/' + version + '/etc/php-fpm.d/'
-
+    service_php_fpm_dir = getServerDir() + '/php' + version + '/php-fpm.d/'
     if not os.path.exists(service_php_fpm_dir):
         os.mkdir(service_php_fpm_dir)
 
     service_php_fpmwww = service_php_fpm_dir + '/www.conf'
-    if not os.path.exists(service_php_fpmwww):
+    if os.path.exists(service_php_fpmwww):
+        # 原来文件备份
+        mw.execShell('mw ' + service_php_fpmwww +
+                     ' ' + service_php_fpmwww + '.bak')
+
+    service_php_fpm_mw = service_php_fpm_dir + '/mw.conf'
+    if not os.path.exists(service_php_fpm_mw):
         tpl_php_fpmwww = getPluginDir() + '/conf/www.conf'
         content = mw.readFile(tpl_php_fpmwww)
         content = contentReplace(content, version)
-        mw.writeFile(service_php_fpmwww, content)
+        mw.writeFile(service_php_fpm_mw, content)
 
 
 def getFpmConfFile(version):
     return getServerDir() + '/php' + version + '/php-fpm.d/www.conf'
-
-
-def makePhpIni(version):
-    dst_ini = mw.getServerDir() + '/php/' + version + '/php.ini'
-    if not os.path.exists(dst_ini):
-        src_ini = getPluginDir() + '/conf/php' + version[0:1] + '.ini'
-        # shutil.copyfile(s_ini, d_ini)
-        content = mw.readFile(src_ini)
-        content = contentReplace(content, version)
-        mw.writeFile(dst_ini, content)
 
 
 def initReplace(version):
@@ -220,7 +197,7 @@ def initReplace(version):
     # makePhpIni(version)
 
     # phpPrependFile(version)
-    # phpFpmWwwReplace(version)
+    phpFpmWwwReplace(version)
     # phpFpmReplace(version)
 
     # systemd
@@ -429,7 +406,7 @@ def setMaxSize(version):
 
 def getFpmConfig(version):
 
-    filefpm = getServerDir() + '/php' + version + '/php-fpm.d/www.conf'
+    filefpm = getFpmConfFile(version)
     conf = mw.readFile(filefpm)
     data = {}
     rep = "\s*pm.max_children\s*=\s*([0-9]+)\s*"
