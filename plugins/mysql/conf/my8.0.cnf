@@ -6,6 +6,7 @@ socket		= {$SERVER_APP_PATH}/mysql.sock
 default-character-set = UTF8MB4
 
 [mysqld]
+default_authentication_plugin=mysql_native_password
 pid-file = {$SERVER_APP_PATH}/data/mysql.pid
 user = mysql
 port		= 3306
@@ -56,7 +57,7 @@ binlog-ignore-db = information_schema
 binlog-ignore-db = performance_schema
 
 #slave
-log-slave-updates
+log_replica_updates
 #replicate-do-db
 replicate-ignore-db = information_schema
 replicate-ignore-db = performance_schema

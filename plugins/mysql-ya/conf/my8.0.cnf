@@ -57,7 +57,7 @@ binlog-ignore-db = information_schema
 binlog-ignore-db = performance_schema
 
 #slave
-log-slave-updates
+log_replica_updates
 #replicate-do-db
 replicate-ignore-db = information_schema
 replicate-ignore-db = performance_schema
