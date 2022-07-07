@@ -264,11 +264,11 @@ def initdUinstall(version):
 
 
 def fpmLog(version):
-    return getServerDir() + '/' + version + '/var/log/php-fpm.log'
+    return getServerDir() + '/php' + version + '/log/php-fpm/error.log'
 
 
 def fpmSlowLog(version):
-    return getServerDir() + '/' + version + '/var/log/www-slow.log'
+    return getServerDir() + '/php' + version + '/log/php-fpm/www-slow.log'
 
 
 def getPhpConf(version):
