@@ -9,6 +9,7 @@ default-character-set = UTF8MB4
 pid-file = {$SERVER_APP_PATH}/data/mysql.pid
 user = mysql
 port		= 3376
+mysqlx_port = 33760
 socket		= {$SERVER_APP_PATH}/mysql.sock
 datadir = {$SERVER_APP_PATH}/data
 log-error =  {$SERVER_APP_PATH}/data/error.log
