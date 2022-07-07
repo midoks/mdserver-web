@@ -52,7 +52,7 @@ cd /www/server/mdserver-web/plugins/php && bash all_test.sh
 | CentOS 7.9 		|✅			|✅			|✅			|:x:		|
 | CentOS 8.4 		|:x:		|✅			|✅			|✅			|	
 | CentOS 8 Stream 	|✅			|✅			|✅			|✅			|		
-| CentOS 9 Stream 	|✅			|✅			|✅			|:x:		|
+| CentOS 9 Stream 	|✅			|✅			|:x:		|:x:		|
 | Debian 10.3 		|✅			|✅			|✅			|✅			|	
 | Debian 11.3 		|✅			|✅			|✅			|✅			|
 | Ubuntu 10.04 		|✅			|✅			|✅			|✅			|	
