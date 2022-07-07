@@ -22,13 +22,13 @@ FILE=${curPath}/${version}/${extName}.sh
 
 # yum install -y php81-php-yar
 
-echo "action php${version}-php-${extName}"
+
 if [ "$action" == 'install' ];then
 	
 	if [ -f $FILE ];then
 		bash ${curPath}/${version}/${extName}.sh install
 	else
-		yum install -y php${version}-php-${extName}
+		yum install -y php${version}-php*-${extName}
 	fi
 fi
 
@@ -39,8 +39,12 @@ if [ "$action" == 'uninstall' ];then
 	if [ -f $FILE ];then
 		bash ${curPath}/${version}/${extName}.sh uninstall
 	else
-		yum remove -y php${version}-php-${extName}
+		yum remove -y php${version}-php*-${extName}
 	fi
 fi
+
+echo "yum install -y php${version}-php-${extName}"
+echo "yum remove -y php${version}-php-${extName}"
+
 
 
