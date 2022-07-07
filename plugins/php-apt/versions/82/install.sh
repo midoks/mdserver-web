@@ -25,10 +25,7 @@ Install_php()
 {
 #------------------------ install start ------------------------------------#
 
-### centos start ################
-rpm -Uvh http://rpms.remirepo.net/enterprise/remi-release-${VERSION_ID}.rpm
-yum install -y php82 php82-php-fpm 
-### centos start ################
+apt -y install php8.2 php8.2-fpm
 
 if [ "$?" == "0" ];then
 	mkdir -p $serverPath/php-apt/${PHP_VER}
@@ -39,9 +36,11 @@ fi
 
 Uninstall_php()
 {
-	# $serverPath/php-ya/init.d/php${PHP_VER} stop
-	rm -rf $serverPath/php-apt/${PHP_VER}
-	echo "卸载php-${version}..." > $install_tmp
+#------------------------ uninstall start ------------------------------------#
+apt -y remove php8.2 php8.2-fpm
+rm -rf $serverPath/php-apt/${PHP_VER}
+echo "卸载php-${version}..." > $install_tmp
+#------------------------ uninstall start ------------------------------------#
 }
 
 action=${1}

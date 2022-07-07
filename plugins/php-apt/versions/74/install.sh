@@ -24,14 +24,9 @@ PHP_VER=74
 Install_php()
 {
 #------------------------ install start ------------------------------------#
-
-### centos start ################
-rpm -Uvh http://rpms.remirepo.net/enterprise/remi-release-${VERSION_ID}.rpm
-yum install -y php74 php74-php-fpm 
-### centos start ################
-
+apt -y install php7.4 php7.4-fpm
 if [ "$?" == "0" ];then
-	mkdir -p $serverPath/php-yum/${PHP_VER}
+	mkdir -p $serverPath/php-apt/${PHP_VER}
 fi
 
 #------------------------ install end ------------------------------------#
@@ -39,9 +34,11 @@ fi
 
 Uninstall_php()
 {
-	# $serverPath/php-ya/init.d/php${PHP_VER} stop
-	rm -rf $serverPath/php-yum/${PHP_VER}
-	echo "卸载php-${version}..." > $install_tmp
+#------------------------ uninstall start ------------------------------------#
+apt -y remove php7.4 ph7.4-fpm
+rm -rf $serverPath/php-apt/${PHP_VER}
+echo "卸载php-${version}..." > $install_tmp
+#------------------------ uninstall start ------------------------------------#
 }
 
 action=${1}
