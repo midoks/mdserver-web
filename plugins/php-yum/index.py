@@ -600,7 +600,7 @@ def get_php_info(args):
 
 
 def getLibConf(version):
-    fname = mw.getServerDir() + '/php/' + version + '/etc/php.ini'
+    fname = getConf(version)
     if not os.path.exists(fname):
         return mw.returnJson(False, '指定PHP版本不存在!')
 
