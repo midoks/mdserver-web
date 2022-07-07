@@ -10,5 +10,10 @@ serverPath=$(dirname "$rootPath")
 
 version=$1
 action=$2
+extName=$3
 
-echo $1,$2
+echo $1,$2,$3
+
+echo $curPath
+echo $rootPath
+echo $serverPath
