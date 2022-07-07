@@ -1840,7 +1840,7 @@ location ~* ^{from}(.*)$ {
 
     def getSitePhpVersion(self, siteName):
         conf = mw.readFile(self.getHostConf(siteName))
-        rep = "enable-php-([0-9]{2,3})\.conf"
+        rep = "enable-php-(.*)\.conf"
         tmp = re.search(rep, conf).groups()
         data = {}
         data['phpversion'] = tmp[0]
