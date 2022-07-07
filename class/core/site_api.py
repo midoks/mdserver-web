@@ -2036,6 +2036,13 @@ location ~* ^{from}(.*)$ {
                 data.append(tmp)
 
         # 其他PHP安装类型
+        conf_dir = mw.getServerDir() + "/web_conf/php/conf"
+        rlist = os.listdir(rPath)
+        l = len(rlist)
+        for name in rlist:
+            path = conf_dir + name
+            print(name)
+            print(path)
 
         return mw.getJson(data)
 
