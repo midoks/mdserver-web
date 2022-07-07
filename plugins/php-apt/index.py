@@ -607,7 +607,7 @@ def installLib(version):
         " && /bin/bash common.sh " + version + ' install ' + name
 
     rettime = time.strftime('%Y-%m-%d %H:%M:%S')
-    insert_info = (None, '安装PHPYUM[' + name + '-' + version + ']',
+    insert_info = (None, '安装PHPAPT[' + name + '-' + version + ']',
                    'execshell', '0', rettime, execstr)
     mw.M('tasks').add('id,name,type,status,addtime,execstr', insert_info)
 
