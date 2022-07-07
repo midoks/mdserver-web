@@ -10,7 +10,6 @@ import shutil
 
 
 sys.path.append(os.getcwd() + "/class/core")
-
 import mw
 
 if mw.isAppleSystem():
@@ -111,10 +110,13 @@ def contentReplace(content, version):
 
 
 def makeOpenrestyConf():
-    phpversions = ['00', '52', '53', '54', '55', '56',
-                   '70', '71', '72', '73', '74', '80', '81']
+    phpversions = ['00', '74', '80', '81']
 
     sdir = mw.getServerDir()
+    d_pathinfo = sdir + '/web_conf/php/pathinfo.conf'
+    if not os.path.exists(d_pathinfo):
+        s_pathinfo = getPluginDir() + '/conf/pathinfo.conf'
+        shutil.copyfile(s_pathinfo, d_pathinfo)
 
     dst_dir = sdir + '/web_conf/php'
     dst_dir_conf = sdir + '/web_conf/php/conf'
@@ -128,11 +130,6 @@ def makeOpenrestyConf():
     if not os.path.exists(dst_dir_status):
         mw.execShell('mkdir -p ' + dst_dir_status)
 
-    d_pathinfo = sdir + '/web_conf/php/pathinfo.conf'
-    if not os.path.exists(d_pathinfo):
-        s_pathinfo = getPluginDir() + '/conf/pathinfo.conf'
-        shutil.copyfile(s_pathinfo, d_pathinfo)
-
     info = getPluginDir() + '/info.json'
     content = mw.readFile(info)
     content = json.loads(content)
@@ -140,33 +137,19 @@ def makeOpenrestyConf():
     tpl = getPluginDir() + '/conf/enable-php.conf'
     tpl_content = mw.readFile(tpl)
     for x in phpversions:
-        dfile = sdir + '/web_conf/php/conf/enable-php-' + x + '.conf'
+        dfile = sdir + '/web_conf/php/conf/enable-php-yum' + x + '.conf'
         if not os.path.exists(dfile):
             w_content = contentReplace(tpl_content, x)
             mw.writeFile(dfile, w_content)
 
     # php-fpm status
     for version in phpversions:
-        dfile = sdir + '/web_conf/php/status/phpfpm_status_' + version + '.conf'
+        dfile = sdir + '/web_conf/php/status/phpfpm_status_yum' + version + '.conf'
         tpl = getPluginDir() + '/conf/phpfpm_status.conf'
         if not os.path.exists(dfile):
             content = mw.readFile(tpl)
             content = contentReplace(content, version)
             mw.writeFile(dfile, content)
-
-
-def phpFpmReplace(version):
-    desc_php_fpm = getServerDir() + '/' + version + '/etc/php-fpm.conf'
-    if not os.path.exists(desc_php_fpm):
-        tpl_php_fpm = getPluginDir() + '/conf/php-fpm.conf'
-        content = mw.readFile(tpl_php_fpm)
-        content = contentReplace(content, version)
-        mw.writeFile(desc_php_fpm, content)
-    else:
-        if version == '52':
-            tpl_php_fpm = tpl_php_fpm = getPluginDir() + '/conf/php-fpm-52.conf'
-            content = mw.readFile(tpl_php_fpm)
-            mw.writeFile(desc_php_fpm, content)
 
 
 def phpFpmWwwReplace(version):
@@ -193,12 +176,8 @@ def getFpmConfFile(version):
 
 
 def initReplace(version):
-    # makeOpenrestyConf()
-    # makePhpIni(version)
-
-    # phpPrependFile(version)
+    makeOpenrestyConf()
     phpFpmWwwReplace(version)
-    # phpFpmReplace(version)
 
     # systemd
     # mw.execShell('systemctl daemon-reload')
