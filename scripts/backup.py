@@ -135,10 +135,10 @@ class backupTools:
 
         mw.M('backup').add('type,name,pid,filename,addtime,size', (1, os.path.basename(
             filename), pid, filename, endDate, os.path.getsize(filename)))
-        log = "数据库[" + name + u"]备份成功,用时[" + str(round(outTime, 2)) + u"]秒"
-        mw.writeLog(u'计划任务', log)
+        log = "数据库[" + name + "]备份成功,用时[" + str(round(outTime, 2)) + u"]秒"
+        mw.writeLog('计划任务', log)
         print("★[" + endDate + "] " + log)
-        print("|---保留最新的[" + count + u"]份备份")
+        print("|---保留最新的[" + count + "]份备份")
         print("|---文件名:" + filename)
 
         # 清理多余备份
@@ -151,7 +151,7 @@ class backupTools:
                 mw.execShell("rm -f " + backup['filename'])
                 mw.M('backup').where('id=?', (backup['id'],)).delete()
                 num -= 1
-                print(u"|---已清理过期备份文件：" + backup['filename'])
+                print("|---已清理过期备份文件：" + backup['filename'])
                 if num < 1:
                     break
 
