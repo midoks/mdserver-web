@@ -739,14 +739,8 @@ def installPreInspection(version):
     sysName = sys[0].strip().lower()
     sysId = sys_id[0].strip()
 
-    if not sysName in ('centos', 'ubuntu', 'debian'):
-        return '暂时仅支持centos,ubuntu,debian'
-
-    # if sysName == 'centos':
-    #     if version == '5.7' and int(sysId) > 7:
-    #         return 'MySQL[' + version + ']不支持安装在ceonts[' + sysId + ']'
-    #     if version == '8.0' and int(sysId) < 6:
-    #         return 'MySQL[' + version + ']不支持安装在ceonts[' + sysId + ']'
+    if not sysName in ('centos'):
+        return '暂时仅支持centos'
     return 'ok'
 
 if __name__ == "__main__":
