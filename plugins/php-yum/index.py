@@ -109,8 +109,7 @@ def contentReplace(content, version):
     return content
 
 
-def makeOpenrestyConf():
-    phpversions = ['74', '80', '81']
+def makeOpenrestyConf(version):
 
     sdir = mw.getServerDir()
     d_pathinfo = sdir + '/web_conf/php/pathinfo.conf'
@@ -136,20 +135,18 @@ def makeOpenrestyConf():
     versions = content['versions']
     tpl = getPluginDir() + '/conf/enable-php.conf'
     tpl_content = mw.readFile(tpl)
-    for x in phpversions:
-        dfile = sdir + '/web_conf/php/conf/enable-php-yum' + x + '.conf'
-        if not os.path.exists(dfile):
-            w_content = contentReplace(tpl_content, x)
-            mw.writeFile(dfile, w_content)
+    dfile = sdir + '/web_conf/php/conf/enable-php-yum' + version + '.conf'
+    if not os.path.exists(dfile):
+        w_content = contentReplace(tpl_content, x)
+        mw.writeFile(dfile, w_content)
 
     # php-fpm status
-    for version in phpversions:
-        dfile = sdir + '/web_conf/php/status/phpfpm_status_yum' + version + '.conf'
-        tpl = getPluginDir() + '/conf/phpfpm_status.conf'
-        if not os.path.exists(dfile):
-            content = mw.readFile(tpl)
-            content = contentReplace(content, version)
-            mw.writeFile(dfile, content)
+    dfile = sdir + '/web_conf/php/status/phpfpm_status_yum' + version + '.conf'
+    tpl = getPluginDir() + '/conf/phpfpm_status.conf'
+    if not os.path.exists(dfile):
+        content = mw.readFile(tpl)
+        content = contentReplace(content, version)
+        mw.writeFile(dfile, content)
 
 
 def phpFpmWwwReplace(version):
@@ -175,18 +172,29 @@ def getFpmConfFile(version):
     return getServerDir() + '/php' + version + '/php-fpm.d/mw.conf'
 
 
+def deleteConfList(version):
+    enable_conf = sdir + '/web_conf/php/conf/enable-php-yum' + version + '.conf'
+    status_conf = sdir + '/web_conf/php/status/phpfpm_status_yum' + version + '.conf'
+
+    clist = (status_conf, enable_conf)
+    for f in clist:
+        if os.path.exists(f):
+            os.remove(f)
+
+
 def initReplace(version):
-    makeOpenrestyConf()
+    makeOpenrestyConf(version)
     phpFpmWwwReplace(version)
 
     # systemd
     # mw.execShell('systemctl daemon-reload')
-
     return 'ok'
 
 
 def phpOp(version, method):
-    initReplace(version)
+    if method == 'start':
+        initReplace(version)
+
     if mw.isAppleSystem():
         return 'fail'
     data = mw.execShell('systemctl ' + method + ' ' +
@@ -201,7 +209,9 @@ def start(version):
 
 
 def stop(version):
-    return phpOp(version, 'stop')
+    status = phpOp(version, 'stop')
+    deleteConfList(version)
+    return status
 
 
 def restart(version):
