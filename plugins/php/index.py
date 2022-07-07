@@ -204,7 +204,7 @@ def phpFpmWwwReplace(version):
         mw.writeFile(service_php_fpmwww, content)
 
 
-def getFpmConf(version):
+def getFpmConfFile(version):
     return getServerDir() + '/' + version + '/etc/php-fpm.d/www.conf'
 
 
@@ -766,8 +766,8 @@ if __name__ == "__main__":
         print(getConfAppStart())
     elif func == 'get_php_conf':
         print(getPhpConf(version))
-    elif func == 'get_fpm_conf':
-        print(getFpmConf(version))
+    elif func == 'get_fpm_conf_file':
+        print(getFpmConfFile(version))
     elif func == 'submit_php_conf':
         print(submitPhpConf(version))
     elif func == 'get_limit_conf':
