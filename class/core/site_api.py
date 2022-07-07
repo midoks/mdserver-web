@@ -266,9 +266,9 @@ class site_api:
             conf = conf.replace(tmp, 'enable-php-' + version + '.conf')
             mw.writeFile(file, conf)
 
-        mw.restartWeb()
         msg = mw.getInfo('成功切换网站[{1}]的PHP版本为PHP-{2}', (siteName, version))
         mw.writeLog("网站管理", msg)
+        mw.restartWeb()
         return mw.returnJson(True, msg)
 
     def getDomainApi(self):
