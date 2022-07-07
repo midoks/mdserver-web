@@ -2028,11 +2028,14 @@ location ~* ^{from}(.*)$ {
                 tmp['name'] = '纯静态'
                 data.append(tmp)
 
+            # 标准判断
             checkPath = mw.getServerDir() + '/php/' + val + '/bin/php'
             if os.path.exists(checkPath):
                 tmp['version'] = val
                 tmp['name'] = 'PHP-' + val
                 data.append(tmp)
+
+        # 其他PHP安装类型
 
         return mw.getJson(data)
 

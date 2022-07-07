@@ -27,7 +27,7 @@ Install_php()
 
 ### centos start ################
 rpm -Uvh http://rpms.remirepo.net/enterprise/remi-release-${VERSION_ID}.rpm
-yum install php80 php80-php-fpm 
+yum install -y php80 php80-php-fpm 
 ### centos start ################
 
 if [ "$?" == "0" ];then
