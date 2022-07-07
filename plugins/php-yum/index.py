@@ -201,8 +201,8 @@ def phpFpmWwwReplace(version):
         mw.writeFile(service_php_fpmwww, content)
 
 
-def getFpmConf(version):
-    return getServerDir() + '/' + version + '/php-fpm.d/www.conf'
+def getFpmConfFile(version):
+    return getServerDir() + '/php' + version + '/php-fpm.d/www.conf'
 
 
 def makePhpIni(version):
@@ -211,9 +211,6 @@ def makePhpIni(version):
         src_ini = getPluginDir() + '/conf/php' + version[0:1] + '.ini'
         # shutil.copyfile(s_ini, d_ini)
         content = mw.readFile(src_ini)
-        if version == '52':
-            content = content + "auto_prepend_file=/www/server/php/app_start.php"
-
         content = contentReplace(content, version)
         mw.writeFile(dst_ini, content)
 
@@ -229,16 +226,6 @@ def initReplace(version):
     phpPrependFile(version)
     phpFpmWwwReplace(version)
     phpFpmReplace(version)
-
-    session_path = getServerDir() + '/tmp/session'
-    if not os.path.exists(session_path):
-        mw.execShell('mkdir -p ' + session_path)
-        mw.execShell('chown -R www:www ' + session_path)
-
-    upload_path = getServerDir() + '/tmp/upload'
-    if not os.path.exists(upload_path):
-        mw.execShell('mkdir -p ' + upload_path)
-        mw.execShell('chown -R www:www ' + upload_path)
 
     # systemd
     # mw.execShell('systemctl daemon-reload')
@@ -742,8 +729,8 @@ if __name__ == "__main__":
         print(getConfAppStart())
     elif func == 'get_php_conf':
         print(getPhpConf(version))
-    elif func == 'get_fpm_conf':
-        print(getFpmConf(version))
+    elif func == 'get_fpm_conf_file':
+        print(getFpmConfFile(version))
     elif func == 'submit_php_conf':
         print(submitPhpConf(version))
     elif func == 'get_limit_conf':
