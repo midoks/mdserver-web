@@ -794,10 +794,7 @@ function jump() {
 function installTips() {
 	$(".fangshi label").mouseover(function() {
 		var a = $(this).attr("data-title");
-		layer.tips(a, this, {
-			tips: [1, "#787878"],
-			time: 0
-		})
+		layer.tips(a, this, {tips: [1, "#787878"],time: 0});
 	}).mouseout(function() {
 		$(".layui-layer-tips").remove()
 	})
