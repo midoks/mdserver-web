@@ -21,6 +21,8 @@ extName=$3
 FILE=${curPath}/${version}/${extName}.sh
 
 # yum install -y php81-php-yar
+
+echo "action php${version}-php-${extName}"
 if [ "$action" == 'install' ];then
 	
 	if [ -f $FILE ];then
