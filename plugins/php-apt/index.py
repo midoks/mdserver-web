@@ -28,7 +28,7 @@ def getPluginName():
 
 
 def getServerDir():
-    return '/etc/opt/remi'
+    return '/etc/php'
 
 
 def getPluginDir():
@@ -62,6 +62,10 @@ def checkArgs(data, ck=[]):
 def getConf(version):
     path = getServerDir() + '/php' + version + '/php.ini'
     return path
+
+
+def getFpmConfFile(version):
+    return getServerDir() + '/php/' + version + '/fpm/pool.d/mw.conf'
 
 
 def status(version):
@@ -135,13 +139,13 @@ def makeOpenrestyConf(version):
     versions = content['versions']
     tpl = getPluginDir() + '/conf/enable-php.conf'
     tpl_content = mw.readFile(tpl)
-    dfile = sdir + '/web_conf/php/conf/enable-php-yum' + version + '.conf'
+    dfile = sdir + '/web_conf/php/conf/enable-php-apt' + version + '.conf'
     if not os.path.exists(dfile):
         w_content = contentReplace(tpl_content, version)
         mw.writeFile(dfile, w_content)
 
     # php-fpm status
-    dfile = sdir + '/web_conf/php/status/phpfpm_status_yum' + version + '.conf'
+    dfile = sdir + '/web_conf/php/status/phpfpm_status_apt' + version + '.conf'
     tpl = getPluginDir() + '/conf/phpfpm_status.conf'
     if not os.path.exists(dfile):
         content = mw.readFile(tpl)
@@ -150,7 +154,7 @@ def makeOpenrestyConf(version):
 
 
 def phpFpmWwwReplace(version):
-    service_php_fpm_dir = getServerDir() + '/php' + version + '/php-fpm.d/'
+    service_php_fpm_dir = getServerDir() + '/php/' + version + '/fpm/pool.d'
     if not os.path.exists(service_php_fpm_dir):
         os.mkdir(service_php_fpm_dir)
 
@@ -168,14 +172,10 @@ def phpFpmWwwReplace(version):
         mw.writeFile(service_php_fpm_mw, content)
 
 
-def getFpmConfFile(version):
-    return getServerDir() + '/php' + version + '/php-fpm.d/mw.conf'
-
-
 def deleteConfList(version):
     sdir = mw.getServerDir()
-    enable_conf = sdir + '/web_conf/php/conf/enable-php-yum' + version + '.conf'
-    status_conf = sdir + '/web_conf/php/status/phpfpm_status_yum' + version + '.conf'
+    enable_conf = sdir + '/web_conf/php/conf/enable-php-apt' + version + '.conf'
+    status_conf = sdir + '/web_conf/php/status/phpfpm_status_apt' + version + '.conf'
 
     clist = (status_conf, enable_conf)
     for f in clist:
@@ -654,7 +654,9 @@ if __name__ == "__main__":
         exit(0)
 
     func = sys.argv[1]
-    version = sys.argv[2]
+
+    inputVer = sys.argv[2]
+    version = inputVer[0] + '.' + inputVer[1]
 
     if func == 'status':
         print(status(version))
