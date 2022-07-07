@@ -8,7 +8,7 @@
 	"versions": ["81"],
 	"install_pre_inspection":true,
 	"tip": "soft",
-	"checks": "server/php-yum/VERSION/bin/php",
+	"checks": "server/php-yum/VERSION",
 	"path": "server/php-yum/VERSION",
 	"display": 1,
 	"author": "Zend",
