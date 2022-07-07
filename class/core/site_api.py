@@ -2037,12 +2037,22 @@ location ~* ^{from}(.*)$ {
 
         # 其他PHP安装类型
         conf_dir = mw.getServerDir() + "/web_conf/php/conf"
-        rlist = os.listdir(rPath)
-        l = len(rlist)
-        for name in rlist:
-            path = conf_dir + name
-            print(name)
-            print(path)
+        conf_list = os.listdir(conf_dir)
+        l = len(conf_list)
+        rep = "enable-php-(.*?)\.conf"
+        for name in conf_list:
+            tmp = {}
+            try:
+                matchVer = re.search(rep, name).groups()[0]
+            except Exception as e:
+                continue
+
+            if matchVer in phpVersions:
+                continue
+
+            tmp['version'] = matchVer
+            tmp['name'] = 'PHP-' + matchVer
+            data.append(tmp)
 
         return mw.getJson(data)
 
