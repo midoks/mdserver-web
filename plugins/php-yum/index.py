@@ -137,7 +137,7 @@ def makeOpenrestyConf(version):
     tpl_content = mw.readFile(tpl)
     dfile = sdir + '/web_conf/php/conf/enable-php-yum' + version + '.conf'
     if not os.path.exists(dfile):
-        w_content = contentReplace(tpl_content, x)
+        w_content = contentReplace(tpl_content, version)
         mw.writeFile(dfile, w_content)
 
     # php-fpm status
