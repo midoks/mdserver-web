@@ -60,7 +60,7 @@ def checkArgs(data, ck=[]):
 
 
 def getConf(version):
-    path = getServerDir() + '/php' + version + '/php.ini'
+    path = getServerDir() + '/' + version + '/fpm/php.ini'
     return path
 
 
