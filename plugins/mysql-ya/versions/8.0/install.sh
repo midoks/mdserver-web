@@ -77,7 +77,7 @@ APT_INSTALL()
 {
 ########
 wget -O /tmp/mysql-apt-config_0.8.22-1_all.deb https://repo.mysql.com/mysql-apt-config_0.8.22-1_all.deb
-dpkg -i /tmp/mysql-apt-config_0.8.22-1_all.deb
+apt install /tmp/mysql-apt-config_0.8.22-1_all.deb
 
 apt update -y
 apt install -y mysql-server

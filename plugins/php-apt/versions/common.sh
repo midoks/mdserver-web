@@ -19,6 +19,7 @@ extName=$3
 # echo $serverPath
 
 FILE=${curPath}/${version}/${extName}.sh
+FILE_COMMON=${curPath}/common/${extName}.sh
 
 # apt install -y php81-php-yar
 
@@ -27,6 +28,8 @@ if [ "$action" == 'install' ];then
 	
 	if [ -f $FILE ];then
 		bash ${curPath}/${version}/${extName}.sh install
+	elif [ -f $FILE_COMMON ];then
+		bash ${FILE_COMMON} install ${version}
 	else
 		apt install -y php${version}-${extName}
 	fi
@@ -35,9 +38,10 @@ fi
 
 # apt remove -y php81-php-yar
 if [ "$action" == 'uninstall' ];then
-
 	if [ -f $FILE ];then
 		bash ${curPath}/${version}/${extName}.sh uninstall
+	elif [ -f $FILE_COMMON ];then
+		bash ${FILE_COMMON} uninstall ${version}
 	else
 		apt remove -y php${version}-${extName}
 	fi
