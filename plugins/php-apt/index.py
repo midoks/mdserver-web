@@ -113,7 +113,7 @@ def contentReplace(content, version):
     return content
 
 
-def makeOpenrestyConf(version):
+def makeOpConf(version):
 
     sdir = mw.getServerDir()
     d_pathinfo = sdir + '/web_conf/php/pathinfo.conf'
@@ -184,7 +184,7 @@ def deleteConfList(version):
 
 
 def initReplace(version):
-    makeOpenrestyConf(version)
+    makeOpConf(version)
     phpFpmWwwReplace(version)
 
     # systemd
