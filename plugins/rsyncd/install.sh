@@ -9,11 +9,23 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sysName=`uname`
 
+
+#获取信息和版本
+# bash /www/server/mdsever-web/scripts/getos.sh
+bash ${rootPath}/scripts/getos.sh
+OSNAME=`cat ${rootPath}/data/osname.pl`
+VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
+
+
 install_tmp=${rootPath}/tmp/mw_install.pl
 Install_rsyncd()
 {
 	echo '正在安装脚本文件...' > $install_tmp
 	mkdir -p $serverPath/rsyncd
+
+	if [ $OSNAME == 'debian' ];then
+		apt install -y rsync
+	fi
 
 	
 	echo '1.0' > $serverPath/rsyncd/version.pl
