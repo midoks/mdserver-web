@@ -559,7 +559,10 @@ def getPhpinfo(v):
 def get_php_info(args):
     if not mw.isInstalledWeb():
         return "openresty is not running!!!"
-    return getPhpinfo(args['version'])
+
+    inputVer = args['version']
+    version = inputVer[0] + '.' + inputVer[1]
+    return getPhpinfo(version)
 
 
 def getLibConf(version):
