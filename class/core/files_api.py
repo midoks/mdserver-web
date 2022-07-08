@@ -182,13 +182,13 @@ class files_api:
         url = request.form.get('url', '')
         path = request.form.get('path', '')
         filename = request.form.get('filename', '')
-
-        isTask = mw.getRootDir() + '/tmp/panelTask.pl'
         execstr = url + '|mw|' + path + '/' + filename
+        execstr = execstr.strip()
         mw.M('tasks').add('name,type,status,addtime,execstr',
-                          ('下载文件[' + filename + ']', 'download', '0', time.strftime('%Y-%m-%d %H:%M:%S'), execstr))
-        mw.writeFile(isTask, 'True')
+                          ('下载文件[' + filename + ']', 'download', '-1', time.strftime('%Y-%m-%d %H:%M:%S'), execstr))
+
         # self.setFileAccept(path + '/' + filename)
+        mw.triggerTask()
         return mw.returnJson(True, '已将下载任务添加到队列!')
 
     # 删除进程下的所有进程
@@ -599,7 +599,6 @@ class files_api:
                  '/srv',
                  '/selinux',
                  '/www/server',
-                 '/www/server/data',
                  mw.getRootDir())
 
         return not path in nDirs
