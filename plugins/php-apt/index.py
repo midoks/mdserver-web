@@ -252,7 +252,7 @@ def initdUinstall(version):
 
 
 def fpmLog(version):
-    return '/var/log/fpm-php' + version + '.www.log'
+    return '/var/log/php' + version + '-fpm.log'
 
 
 def fpmSlowLog(version):
