@@ -199,7 +199,7 @@ def phpOp(version, method):
     if mw.isAppleSystem():
         return 'fail'
     data = mw.execShell('systemctl ' + method + ' ' +
-                        'php' + version + '-php-fpm')
+                        'php' + version + '-fpm')
     if data[1] == '':
         return 'ok'
     return data[1]
