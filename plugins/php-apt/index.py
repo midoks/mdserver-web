@@ -252,11 +252,11 @@ def initdUinstall(version):
 
 
 def fpmLog(version):
-    return '/var/opt/remi/php' + version + '/log/php-fpm/error.log'
+    return '/var/log/fpm-php' + version + '.www.log'
 
 
 def fpmSlowLog(version):
-    return '/var/opt/remi/php' + version + '/log/php-fpm/www-slow.log'
+    return '/var/log/fpm-php' + version + '.www.slow.log'
 
 
 def getPhpConf(version):
