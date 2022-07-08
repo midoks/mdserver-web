@@ -464,7 +464,8 @@ def checkFpmStatusFile(version):
     if not mw.isInstalledWeb():
         return False
 
-    dfile = getServerDir() + '/nginx/conf/php_status/phpfpm_status_apt' + version + '.conf'
+    dfile = mw.getServerDir() + '/web_conf/php/status/phpfpm_status_apt' + \
+        version + '.conf'
     if not os.path.exists(dfile):
         tpl = getPluginDir() + '/conf/phpfpm_status.conf'
         content = mw.readFile(tpl)
