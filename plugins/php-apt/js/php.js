@@ -431,18 +431,20 @@ function getPHPInfo(version) {
     phpPostCallbak('get_php_info', version, {}, function(data){
         if (!data.status){
             layer.msg(rdata.msg, { icon: 2 });
+            return;
         }
 
         layer.open({
             type: 1,
             title: "PHP-" + version + "-PHPINFO",
-            area: ['90%', '90%'],
+            area: ['70%', '90%'],
             closeBtn: 2,
             shadeClose: true,
-            content: data.data
+            content: data.data.replace('a:link {color: #009; text-decoration: none; background-color: #fff;}', '').replace('a:link {color: #000099; text-decoration: none; background-color: #ffffff;}', '')
         });
     })
 }
+
 
 
 function phpLibConfig(version){
