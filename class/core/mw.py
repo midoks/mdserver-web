@@ -10,9 +10,7 @@ import shlex
 import datetime
 import subprocess
 import re
-
 import db
-
 from random import Random
 
 
@@ -644,7 +642,7 @@ def checkIp(ip):
 
 def checkPort(port):
     # 检查端口是否合法
-    ports = ['21', '25', '443', '7200', '8080', '888', '8888', '8443']
+    ports = ['21', '25', '80', '443', '7200', '888']
     if port in ports:
         return False
     intport = int(port)
@@ -977,3 +975,21 @@ def getSSHStatus():
     else:
         status = True
     return status
+
+
+def requestFcgiPHP(sock, uri, document_root='/tmp', method='GET', pdata=b''):
+    # 直接请求到PHP-FPM
+    # version php版本
+    # uri 请求uri
+    # filename 要执行的php文件
+    # args 请求参数
+    # method 请求方式
+    sys.path.append(os.getcwd() + "/class/plugin")
+
+    import fpm
+    p = fpm.fpm(sock, document_root)
+
+    if type(pdata) == dict:
+        pdata = url_encode(pdata)
+    result = p.load_url_public(uri, pdata, method)
+    return result
