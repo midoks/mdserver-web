@@ -307,9 +307,9 @@ def initMysqlData():
     datadir = getDataDir()
     if not os.path.exists(datadir + '/mysql'):
         serverdir = getServerDir()
+        myconf = serverdir + "/etc/my.cnf"
         user = pGetDbUser()
-        cmd = 'cd ' + serverdir + ' && ./scripts/mysql_install_db --user=' + \
-            user + ' --basedir=' + serverdir + ' --ldata=' + datadir
+        cmd = 'cd ' + serverdir + ' && ./scripts/mysql_install_db --defaults-file=' + myconf
         mw.execShell(cmd)
         return False
     return True
