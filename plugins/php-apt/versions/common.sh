@@ -20,7 +20,7 @@ extName=$3
 
 FILE=${curPath}/${version}/${extName}.sh
 
-# yum install -y php81-php-yar
+# apt install -y php81-php-yar
 
 
 if [ "$action" == 'install' ];then
@@ -28,23 +28,23 @@ if [ "$action" == 'install' ];then
 	if [ -f $FILE ];then
 		bash ${curPath}/${version}/${extName}.sh install
 	else
-		yum install -y php${version}-php*-${extName}
+		apt install -y php${version}-${extName}
 	fi
 fi
 
 
-# yum remove -y php81-php-yar
+# apt remove -y php81-php-yar
 if [ "$action" == 'uninstall' ];then
 
 	if [ -f $FILE ];then
 		bash ${curPath}/${version}/${extName}.sh uninstall
 	else
-		yum remove -y php${version}-php*-${extName}
+		apt remove -y php${version}-${extName}
 	fi
 fi
 
-echo "yum install -y php${version}-php-${extName}"
-echo "yum remove -y php${version}-php-${extName}"
+echo "apt install -y php${version}-${extName}"
+echo "apt remove -y php${version}-${extName}"
 
 
 

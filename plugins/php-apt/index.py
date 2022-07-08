@@ -603,8 +603,8 @@ def installLib(version):
         return data[1]
 
     name = args['name']
-    execstr = "cd " + getPluginDir() + '/versions/' + \
-        " && /bin/bash common.sh " + version + ' install ' + name
+    execstr = "cd " + getPluginDir() + "/versions  && /bin/bash common.sh " + \
+        version + ' install ' + name
 
     rettime = time.strftime('%Y-%m-%d %H:%M:%S')
     insert_info = (None, '安装PHPAPT[' + name + '-' + version + ']',
@@ -622,8 +622,8 @@ def uninstallLib(version):
         return data[1]
 
     name = args['name']
-    execstr = "cd " + getPluginDir() + '/versions/' + \
-        " && /bin/bash common.sh " + version + ' uninstall ' + name
+    execstr = "cd " + getPluginDir() + "/versions && /bin/bash common.sh " + \
+        version + ' uninstall ' + name
 
     data = mw.execShell(execstr)
     # data[0] == '' and
