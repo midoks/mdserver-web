@@ -131,6 +131,10 @@ def initDreplace():
     systemServiceTpl = getPluginDir() + '/init.d/rsyncd.service.tpl'
     if os.path.exists(systemDir) and not os.path.exists(systemService):
         rsync_bin = mw.execShell('which rsync')[0].strip()
+        if rsync_bin == '':
+            print('rsync缺失!')
+            exit(0)
+
         service_path = mw.getServerDir()
         se_content = mw.readFile(systemServiceTpl)
         se_content = se_content.replace('{$SERVER_PATH}', service_path)
