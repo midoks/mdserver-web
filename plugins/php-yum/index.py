@@ -480,14 +480,15 @@ def getFpmStatus(version):
     try:
         sock_data = mw.requestFcgiPHP(
             sock_file, '/phpfpm_status_yum' + version + '?json')
+
+        result = str(sock_data, encoding='utf-8')
+        data = json.loads(result)
+        fTime = time.localtime(int(data['start time']))
+        data['start time'] = time.strftime('%Y-%m-%d %H:%M:%S', fTime)
     except Exception as e:
         return mw.returnJson(False, str(e))
 
     # print(data)
-    result = str(sock_data, encoding='utf-8')
-    data = json.loads(result)
-    fTime = time.localtime(int(data['start time']))
-    data['start time'] = time.strftime('%Y-%m-%d %H:%M:%S', fTime)
     return mw.returnJson(True, "OK", data)
 
 

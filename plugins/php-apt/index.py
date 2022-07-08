@@ -489,8 +489,6 @@ def getFpmStatus(version):
     except Exception as e:
         return mw.returnJson(False, str(e))
 
-    # print(data)
-
     return mw.returnJson(True, "OK", data)
 
 
