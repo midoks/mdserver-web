@@ -1048,7 +1048,7 @@ function messageBox() {
 	layer.open({
 		type: 1,
 		title: '消息盒子',
-		area: "640px",
+		area: "670px",
 		closeBtn: 2,
 		shadeClose: false,
 		content: '<div class="bt-form">\
@@ -1073,7 +1073,7 @@ function messageBox() {
 //取执行日志
 function execLog(){
 	$.post('/task/get_exec_log',{},function(logs){
-		var lbody = '<textarea readonly="" style="margin: 0px;width: 500px;height: 520px;background-color: #333;color:#fff; padding:0 5px" id="exec_log">'+logs+'</textarea>';
+		var lbody = '<textarea readonly="" style="margin: 0px;width: 530px;height: 520px;background-color: #333;color:#fff; padding:0 5px" id="exec_log">'+logs+'</textarea>';
 		$(".taskcon").html(lbody);
 		var ob = document.getElementById('exec_log');
 		ob.scrollTop = ob.scrollHeight;
