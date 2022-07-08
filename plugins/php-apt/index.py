@@ -454,8 +454,8 @@ def setFpmConfig(version):
     mw.writeFile(file, conf)
     reload(version)
 
-    msg = mw.getInfo('设置PHP-{1}并发设置,max_children={2},start_servers={3},min_spare_servers={4},max_spare_servers={5}', (version, max_children,
-                                                                                                                      start_servers, min_spare_servers, max_spare_servers,))
+    msg = mw.getInfo('设置PHP-{1}并发设置,max_children={2},start_servers={3},min_spare_servers={4},max_spare_servers={5}',
+                     (version, max_children, start_servers, min_spare_servers, max_spare_servers,))
     mw.writeLog('插件管理[PHP]', msg)
     return mw.returnJson(True, '设置成功!')
 
