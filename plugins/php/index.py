@@ -74,6 +74,10 @@ def getConf(version):
     return path
 
 
+def getFpmConfFile(version):
+    return getServerDir() + '/' + version + '/etc/php-fpm.d/www.conf'
+
+
 def status(version):
     # ps -ef|grep 'php/81' |grep -v grep | grep -v python | awk '{print $2}
     cmd = "ps -ef|grep 'php/" + version + \
@@ -204,12 +208,8 @@ def phpFpmWwwReplace(version):
         mw.writeFile(service_php_fpmwww, content)
 
 
-def getFpmConfFile(version):
-    return getServerDir() + '/' + version + '/etc/php-fpm.d/www.conf'
-
-
 def makePhpIni(version):
-    dst_ini = mw.getServerDir() + '/php/' + version + '/etc/php.ini'
+    dst_ini = getConf(version)
     if not os.path.exists(dst_ini):
         src_ini = getPluginDir() + '/conf/php' + version[0:1] + '.ini'
         # shutil.copyfile(s_ini, d_ini)
@@ -370,7 +370,7 @@ def getPhpConf(version):
         {'name': 'cgi.fix_pathinfo', 'type': 0, 'ps': '是否开启pathinfo'},
         {'name': 'date.timezone', 'type': 3, 'ps': '时区'}
     ]
-    phpini = mw.readFile(getConf())
+    phpini = mw.readFile(getConf(version))
     result = []
     for g in gets:
         rep = g['name'] + '\s*=\s*([0-9A-Za-z_& ~]+)(\s*;?|\r?\n)'
@@ -402,9 +402,9 @@ def submitPhpConf(version):
 
 
 def getLimitConf(version):
-    fileini = getServerDir() + "/" + version + "/etc/php.ini"
+    fileini = getConf(version)
     phpini = mw.readFile(fileini)
-    filefpm = getFpmConf(version)
+    filefpm = getFpmConfFile(version)
     phpfpm = mw.readFile(filefpm)
 
     # print fileini, filefpm
@@ -447,7 +447,7 @@ def setMaxTime(version):
     if int(time) < 30 or int(time) > 86400:
         return mw.returnJson(False, '请填写30-86400间的值!')
 
-    filefpm = getFpmConf(version)
+    filefpm = getFpmConfFile(version)
     conf = mw.readFile(filefpm)
     rep = "request_terminate_timeout\s*=\s*([0-9]+)\n"
     conf = re.sub(rep, "request_terminate_timeout = " + time + "\n", conf)
@@ -473,7 +473,7 @@ def setMaxSize(version):
     if int(maxVal) < 2:
         return mw.returnJson(False, '上传大小限制不能小于2MB!')
 
-    path = getServerDir() + '/' + version + '/etc/php.ini'
+    path = getConf(version)
     conf = mw.readFile(path)
     rep = u"\nupload_max_filesize\s*=\s*[0-9]+M"
     conf = re.sub(rep, u'\nupload_max_filesize = ' + maxVal + 'M', conf)
@@ -596,7 +596,7 @@ def getFpmStatus(version):
 
 
 def getDisableFunc(version):
-    filename = mw.getServerDir() + '/php/' + version + '/etc/php.ini'
+    filename = getConf(version)
     if not os.path.exists(filename):
         return mw.returnJson(False, '指定PHP版本不存在!')
 
@@ -609,7 +609,7 @@ def getDisableFunc(version):
 
 
 def setDisableFunc(version):
-    filename = mw.getServerDir() + '/php/' + version + '/etc/php.ini'
+    filename = getConf(version)
     if not os.path.exists(filename):
         return mw.returnJson(False, '指定PHP版本不存在!')
 
@@ -659,7 +659,7 @@ def get_php_info(args):
 
 
 def getLibConf(version):
-    fname = mw.getServerDir() + '/php/' + version + '/etc/php.ini'
+    fname = getConf(version)
     if not os.path.exists(fname):
         return mw.returnJson(False, '指定PHP版本不存在!')
 
