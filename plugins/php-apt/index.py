@@ -482,13 +482,13 @@ def getFpmStatus(version):
         return mw.returnJson(False, 'PHP[' + version + ']未启动!!!')
 
     try:
-        url = 'http://' + mw.getHostAddr() + '/phpfpm_status_yum' + version + '?json'
+        url = 'http://' + mw.getHostAddr() + '/phpfpm_status_apt' + version + '?json'
         result = mw.httpGet(url, 1)
         data = json.loads(result)
         fTime = time.localtime(int(data['start time']))
         data['start time'] = time.strftime('%Y-%m-%d %H:%M:%S', fTime)
     except Exception as e:
-        url = 'http://127.0.0.1/phpfpm_status_yum' + version + '?json'
+        url = 'http://127.0.0.1/phpfpm_status_apt' + version + '?json'
         result = mw.httpGet(url, 1)
         data = json.loads(result)
         fTime = time.localtime(int(data['start time']))
