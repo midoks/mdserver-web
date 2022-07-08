@@ -17,14 +17,14 @@ bash ${rootPath}/scripts/getos.sh
 OSNAME=`cat ${rootPath}/data/osname.pl`
 VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
-version=8.0.x
+version=8.0
 PHP_VER=80
 
 
 Install_php()
 {
 #------------------------ install start ------------------------------------#
-apt -y install php8.0 php8.0-fpm
+apt -y install php${version} php${version}-fpm
 if [ "$?" == "0" ];then
 	mkdir -p $serverPath/php-apt/${PHP_VER}
 fi
@@ -35,7 +35,7 @@ fi
 Uninstall_php()
 {
 #------------------------ uninstall start ------------------------------------#
-apt -y remove php8.0 php8.0-fpm
+apt -y remove php${version} php${version}-fpm
 rm -rf $serverPath/php-apt/${PHP_VER}
 echo "卸载php-${version}..." > $install_tmp
 #------------------------ uninstall start ------------------------------------#
