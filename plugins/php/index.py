@@ -131,15 +131,11 @@ def makeOpenrestyConf():
 
     dst_dir = sdir + '/web_conf/php'
     dst_dir_conf = sdir + '/web_conf/php/conf'
-    dst_dir_status = sdir + '/web_conf/php/status'
     if not os.path.exists(dst_dir):
         mw.execShell('mkdir -p ' + dst_dir)
 
     if not os.path.exists(dst_dir_conf):
         mw.execShell('mkdir -p ' + dst_dir_conf)
-
-    if not os.path.exists(dst_dir_status):
-        mw.execShell('mkdir -p ' + dst_dir_status)
 
     d_pathinfo = sdir + '/web_conf/php/pathinfo.conf'
     if not os.path.exists(d_pathinfo):
@@ -651,7 +647,7 @@ def setDisableFunc(version):
 def getPhpinfo(version):
     stat = status(version)
     if stat == 'stop':
-        return mw.returnJson(False, 'PHP[' + version + ']未启动!!!')
+        return 'PHP[' + version + ']未启动,不可访问!!!'
 
     sock_file = getFpmAddress(version)
     root_dir = mw.getRootDir() + '/phpinfo'

@@ -124,11 +124,11 @@ def makeOpConf(version):
     dst_dir = sdir + '/web_conf/php'
     dst_dir_conf = sdir + '/web_conf/php/conf'
 
+    if not os.path.exists(dst_dir):
+        mw.execShell('mkdir -p ' + dst_dir)
+
     if not os.path.exists(dst_dir_conf):
         mw.execShell('mkdir -p ' + dst_dir_conf)
-
-    if not os.path.exists(dst_dir_status):
-        mw.execShell('mkdir -p ' + dst_dir_status)
 
     info = getPluginDir() + '/info.json'
     content = mw.readFile(info)
@@ -164,7 +164,6 @@ def phpFpmWwwReplace(version):
 def deleteConfList(version):
     sdir = mw.getServerDir()
     enable_conf = sdir + '/web_conf/php/conf/enable-php-apt' + version + '.conf'
-    status_conf = sdir + '/web_conf/php/status/phpfpm_status_apt' + version + '.conf'
 
     clist = (status_conf, enable_conf)
     for f in clist:
@@ -529,7 +528,7 @@ def setDisableFunc(version):
 def getPhpinfo(version):
     stat = status(version)
     if stat == 'stop':
-        return mw.returnJson(False, 'PHP[' + version + ']未启动!!!')
+        return 'PHP[' + version + ']未启动,不可访问!!!'
 
     sock_file = getFpmAddress(version)
     root_dir = mw.getRootDir() + '/phpinfo'
