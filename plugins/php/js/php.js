@@ -431,6 +431,7 @@ function getPHPInfo(version) {
     phpPostCallbak('get_php_info', version, {}, function(data){
         if (!data.status){
             layer.msg(rdata.msg, { icon: 2 });
+            return;
         }
 
         layer.open({
