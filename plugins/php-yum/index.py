@@ -536,7 +536,7 @@ def getPhpinfo(version):
     mw.execShell("mkdir -p " + root_dir)
     mw.writeFile(root_dir + '/phpinfo.php', '<?php phpinfo(); ?>')
     sock_data = mw.requestFcgiPHP(sock_file, '/phpinfo.php', root_dir)
-    os.system("rm -rf " + mw.getRootDir() + '/phpinfo')
+    os.system("rm -rf " + root_dir)
     phpinfo = str(sock_data, encoding='utf-8')
     return phpinfo
 
