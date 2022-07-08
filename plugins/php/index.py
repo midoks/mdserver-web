@@ -162,13 +162,13 @@ def makeOpenrestyConf():
                 mw.writeFile(dfile, w_content)
 
     # php-fpm status
-    for version in phpversions:
-        dfile = sdir + '/web_conf/php/status/phpfpm_status_' + version + '.conf'
-        tpl = getPluginDir() + '/conf/phpfpm_status.conf'
-        if not os.path.exists(dfile):
-            content = mw.readFile(tpl)
-            content = contentReplace(content, version)
-            mw.writeFile(dfile, content)
+    # for version in phpversions:
+    #     dfile = sdir + '/web_conf/php/status/phpfpm_status_' + version + '.conf'
+    #     tpl = getPluginDir() + '/conf/phpfpm_status.conf'
+    #     if not os.path.exists(dfile):
+    #         content = mw.readFile(tpl)
+    #         content = contentReplace(content, version)
+    #         mw.writeFile(dfile, content)
 
 
 def phpPrependFile(version):
@@ -554,44 +554,64 @@ def setFpmConfig(version):
     return mw.returnJson(True, '设置成功!')
 
 
-def checkFpmStatusFile(version):
-    if not mw.isInstalledWeb():
-        return False
+# def checkFpmStatusFile(version):
+#     if not mw.isInstalledWeb():
+#         return False
 
-    dfile = getServerDir() + '/nginx/conf/php_status/phpfpm_status_' + version + '.conf'
-    if not os.path.exists(dfile):
-        tpl = getPluginDir() + '/conf/phpfpm_status.conf'
-        content = mw.readFile(tpl)
-        content = contentReplace(content, version)
-        mw.writeFile(dfile, content)
-        mw.restartWeb()
-    return True
+#     dfile = getServerDir() + '/nginx/conf/php_status/phpfpm_status_' + version + '.conf'
+#     if not os.path.exists(dfile):
+#         tpl = getPluginDir() + '/conf/phpfpm_status.conf'
+#         content = mw.readFile(tpl)
+#         content = contentReplace(content, version)
+#         mw.writeFile(dfile, content)
+#         mw.restartWeb()
+#     return True
+
+
+def getFpmAddress(version):
+    fpm_address = '/tmp/php-cgi-{}.sock'.format(version)
+    php_fpm_file = getFpmConfFile(version)
+    try:
+        content = readFile(php_fpm_file)
+        tmp = re.findall(r"listen\s*=\s*(.+)", content)
+        if not tmp:
+            return fpm_address
+        if tmp[0].find('sock') != -1:
+            return fpm_address
+        if tmp[0].find(':') != -1:
+            listen_tmp = tmp[0].split(':')
+            if bind:
+                fpm_address = (listen_tmp[0], int(listen_tmp[1]))
+            else:
+                fpm_address = ('127.0.0.1', int(listen_tmp[1]))
+        else:
+            fpm_address = ('127.0.0.1', int(tmp[0]))
+        return fpm_address
+    except:
+        return fpm_address
 
 
 def getFpmStatus(version):
+
     if version == '52':
         return mw.returnJson(False, 'PHP[' + version + ']不支持!!!')
 
-    checkFpmStatusFile(version)
     stat = status(version)
     if stat == 'stop':
         return mw.returnJson(False, 'PHP[' + version + ']未启动!!!')
 
+    sock_file = getFpmAddress(version)
     try:
-        url = 'http://' + mw.getHostAddr() + '/phpfpm_status_' + version + '?json'
-        result = mw.httpGet(url, 1)
-        data = json.loads(result)
-        fTime = time.localtime(int(data['start time']))
-        data['start time'] = time.strftime('%Y-%m-%d %H:%M:%S', fTime)
+        sock_data = mw.requestFcgiPHP(
+            sock_file, '/phpfpm_status_' + version + '?json')
     except Exception as e:
-        url = 'http://127.0.0.1/phpfpm_status_' + version + '?json'
-        result = mw.httpGet(url, 1)
-        data = json.loads(result)
-        fTime = time.localtime(int(data['start time']))
-        data['start time'] = time.strftime('%Y-%m-%d %H:%M:%S', fTime)
-    except Exception as e:
-        data = {}
+        return mw.returnJson(False, str(e))
 
+    # print(data)
+    result = str(sock_data, encoding='utf-8')
+    data = json.loads(result)
+    fTime = time.localtime(int(data['start time']))
+    data['start time'] = time.strftime('%Y-%m-%d %H:%M:%S', fTime)
     return mw.returnJson(True, "OK", data)
 
 
@@ -628,33 +648,24 @@ def setDisableFunc(version):
     return mw.returnJson(True, '设置成功!')
 
 
-def checkPhpinfoFile(v):
-    sdir = mw.getServerDir()
-    dfile = sdir + '/web_conf/php/status/phpinfo_' + v + '.conf'
+def getPhpinfo(version):
+    stat = status(version)
+    if stat == 'stop':
+        return mw.returnJson(False, 'PHP[' + version + ']未启动!!!')
 
-    tpl = getPluginDir() + '/conf/phpinfo.conf'
-    content = mw.readFile(tpl)
-    content = contentReplace(content, v)
-    mw.writeFile(dfile, content)
-    mw.restartWeb()
+    sock_file = getFpmAddress(version)
+    root_dir = mw.getRootDir() + '/phpinfo'
 
-
-def getPhpinfo(v):
-    checkPhpinfoFile(v)
-    sPath = mw.getRootDir() + '/phpinfo/' + v
-
-    mw.execShell("rm -rf " + mw.getRootDir() + '/phpinfo')
-    mw.execShell("mkdir -p " + sPath)
-    mw.writeFile(sPath + '/phpinfo.php', '<?php phpinfo(); ?>')
-    url = 'http://127.0.0.1/' + v + '/phpinfo.php'
-    phpinfo = mw.httpGet(url)
+    mw.execShell("rm -rf " + root_dir)
+    mw.execShell("mkdir -p " + root_dir)
+    mw.writeFile(root_dir + '/phpinfo.php', '<?php phpinfo(); ?>')
+    sock_data = mw.requestFcgiPHP(sock_file, '/phpinfo.php', root_dir)
     os.system("rm -rf " + mw.getRootDir() + '/phpinfo')
+    phpinfo = str(sock_data, encoding='utf-8')
     return phpinfo
 
 
 def get_php_info(args):
-    if not mw.isInstalledWeb():
-        return "openresty is not running!!!"
     return getPhpinfo(args['version'])
 
 

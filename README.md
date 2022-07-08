@@ -11,7 +11,7 @@
 
 [![Wiki](https://img.shields.io/badge/MW-Wiki-red?style=for-the-badge&logo=wiki)](https://github.com/midoks/mdserver-web/wiki)
 
-* SSH工具
+* SSH终端工具
 * 面板收藏功能
 * 网站子目录绑定
 * 网站备份功能
@@ -23,6 +23,7 @@
 - [兼容性测试报告](/compatibility.md)
 
 ### 主要插件介绍
+
 * OpenResty - 轻量级，占有内存少，并发能力强。
 * PHP[52-81] - PHP是世界上最好的编程语言。
 * MySQL - 一种关系数据库管理系统。
@@ -43,7 +44,6 @@ phpMyAdmin[5.2.0]支持MySQL[8.0]
 PHP[53-72]支持phpMyAdmin[4.4.15]
 PHP[72-81]支持phpMyAdmin[5.2.0]
 ```
-
 
 
 ### 版本更新 0.8.6
