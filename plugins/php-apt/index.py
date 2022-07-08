@@ -65,7 +65,7 @@ def getConf(version):
 
 
 def getFpmConfFile(version):
-    return getServerDir() + '/php/' + version + '/fpm/pool.d/mw.conf'
+    return getServerDir() + '/' + version + '/fpm/pool.d/mw.conf'
 
 
 def status(version):
