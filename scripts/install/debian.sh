@@ -25,6 +25,10 @@ apt install -y python3-dev
 apt install -y python3-venv
 apt install -y cron
 
+apt install -y locate
+locale-gen en_US.UTF-8
+# localedef -v -c -i en_US -f UTF-8 en_US.UTF-8
+
 if [ ! -d /root/.acme.sh ];then	
 	curl  https://get.acme.sh | sh
 fi
