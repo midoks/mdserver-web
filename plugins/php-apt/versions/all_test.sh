@@ -25,11 +25,11 @@ for PHP_VER in ${PHP_VER_LIST[@]}; do
 	echo "php${PHP_VER} -- end"
 done
 
-PHP_VER_LIST=(56 70 71 72 73 74 80 81)
+PHP_VER_LIST_EXT=(56 70 71 72 73 74 80 81)
 PHP_EXT_LIST=('yaf')
-for PHP_VER in ${PHP_VER_LIST[@]}; do
-	echo "php${PHP_VER} -- start"
-	version=${PHP_VER:0}.${PHP_VER:1}
+for PHP_VER in ${PHP_VER_LIST_EXT[@]}; do
+	echo "php${PHP_VER} EXT -- start"
+	version=${PHP_VER:0:1}.${PHP_VER:1:2}
 	extVer=`bash $curPath/lib.sh $version`
 	
 	for EXT in ${PHP_EXT_LIST[@]}; do
@@ -39,5 +39,5 @@ for PHP_VER in ${PHP_VER_LIST[@]}; do
 		fi
 	done
 
-	echo "php${PHP_VER} -- end"
+	echo "php${PHP_VER} EXT -- end"
 done
