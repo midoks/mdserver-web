@@ -26,7 +26,7 @@ for PHP_VER in ${PHP_VER_LIST[@]}; do
 done
 
 PHP_VER_LIST_EXT=(56 70 71 72 73 74 80 81)
-PHP_EXT_LIST=(yaf)
+PHP_EXT_LIST=(yaf pdo mysqlnd)
 for PHP_VER in ${PHP_VER_LIST_EXT[@]}; do
 	echo "php${PHP_VER} EXT -- start"
 	version=${PHP_VER:0:1}.${PHP_VER:1:2}
