@@ -17,6 +17,10 @@ version=$2
 LIBNAME=yar
 LIBV=2.3.2
 
+if [ "$version" -lt "70" ];then
+	LIBV=1.2.5
+fi
+
 
 NON_ZTS_FILENAME=`ls $serverPath/php/${version}/lib/php/extensions | grep no-debug-non-zts`
 extFile=$serverPath/php/${version}/lib/php/extensions/${NON_ZTS_FILENAME}/${LIBNAME}.so

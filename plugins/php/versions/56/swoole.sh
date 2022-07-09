@@ -16,10 +16,7 @@ version=$2
 
 
 LIBNAME=swoole
-LIBV='1.10.1';
-if [ "$version" = '70' ] || [ "$version" = '71' ] || [ "$version" = '72' ];then
-	LIBV='2.2.0'
-fi
+LIBV=1.10.1
 
 NON_ZTS_FILENAME=`ls $serverPath/php/${version}/lib/php/extensions | grep no-debug-non-zts`
 extFile=$serverPath/php/${version}/lib/php/extensions/${NON_ZTS_FILENAME}/${LIBNAME}.so
