@@ -27,7 +27,7 @@ FILE_COMMON=${curPath}/common/${extName}.sh
 if [ "$action" == 'install' ];then
 	
 	if [ -f $FILE ];then
-		bash ${curPath}/${version}/${extName}.sh install
+		bash ${curPath}/${version}/${extName}.sh install $version
 	elif [ -f $FILE_COMMON ];then
 		bash ${FILE_COMMON} install ${version}
 	else
@@ -39,7 +39,7 @@ fi
 # apt remove -y php81-php-yar
 if [ "$action" == 'uninstall' ];then
 	if [ -f $FILE ];then
-		bash ${curPath}/${version}/${extName}.sh uninstall
+		bash ${curPath}/${version}/${extName}.sh uninstall $version
 	elif [ -f $FILE_COMMON ];then
 		bash ${FILE_COMMON} uninstall ${version}
 	else
