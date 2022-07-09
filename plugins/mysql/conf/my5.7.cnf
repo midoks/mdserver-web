@@ -10,6 +10,7 @@ pid-file = {$SERVER_APP_PATH}/data/mysql.pid
 user = mysql
 port		= 3306
 socket		= {$SERVER_APP_PATH}/mysql.sock
+basedir = {$SERVER_APP_PATH}
 datadir = {$SERVER_APP_PATH}/data
 log-error =  {$SERVER_APP_PATH}/data/error.log
 default_storage_engine = MyISAM
