@@ -1,0 +1,19 @@
+{
+	"sort": 7,
+	"ps": "PHP是世界上最好的编程语言[APT]",
+	"shell": "install.sh",
+	"name": "php-apt",
+	"title": "PHP[APT]",
+	"coexist": true,
+	"versions": ["56","70","71","72","73","74","80","81"],
+	"install_pre_inspection":true,
+	"tip": "soft",
+	"checks": "server/php-apt/VERSION",
+	"path": "server/php-apt/VERSION",
+	"display": 1,
+	"author": "Zend",
+	"date": "2022-07-07",
+	"home": "https://www.php.net",
+	"type": "PHP语言解释器",
+	"pid": "6"
+}

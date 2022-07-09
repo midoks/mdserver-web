@@ -11,6 +11,9 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
+actionType=$1
+version=$2
+
 LIBNAME=yaf
 LIBV=2.3.5
 
@@ -87,8 +90,7 @@ Uninstall_lib()
 }
 
 
-actionType=$1
-version=$2
+
 if [ "$actionType" == 'install' ];then
 	Install_lib
 elif [ "$actionType" == 'uninstall' ];then

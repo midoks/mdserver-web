@@ -8,22 +8,24 @@ import os
 import json
 import time
 import threading
-# print sys.path
+import psutil
+
+if sys.version_info[0] == 2:
+    reload(sys)
+    sys.setdefaultencoding('utf-8')
 
 
 sys.path.append(os.getcwd() + "/class/core")
 import mw
-
-# reload(sys)
-# sys.setdefaultencoding('utf-8')
 import db
+
+# print sys.path
 
 # cmd = 'ls /usr/local/lib/ | grep python  | cut -d \\  -f 1 | awk \'END {print}\''
 # info = mw.execShell(cmd)
 # p = "/usr/local/lib/" + info[0].strip() + "/site-packages"
 # sys.path.append(p)
 
-import psutil
 
 global pre, timeoutCount, logPath, isTask, oldEdate, isCheck
 pre = 0
@@ -39,9 +41,6 @@ if not os.path.exists(os.getcwd() + "/tmp"):
 
 if not os.path.exists(logPath):
     os.system("touch " + logPath)
-
-if not os.path.exists(isTask):
-    os.system("touch " + isTask)
 
 
 def service_cmd(method):
@@ -103,12 +102,16 @@ def downloadFile(url, filename):
     try:
         import urllib
         import socket
-        socket.setdefaulttimeout(10)
-        urllib.urlretrieve(url, filename=filename, reporthook=downloadHook)
-        os.system('chown www.www ' + filename)
+        socket.setdefaulttimeout(60)
+        urllib.request.urlretrieve(
+            url, filename=filename, reporthook=downloadHook)
+
+        if not mw.isAppleSystem():
+            os.system('chown www.www ' + filename)
+
         writeLogs('done')
-    except:
-        writeLogs('done')
+    except Exception as e:
+        writeLogs(str(e))
 
 
 def downloadHook(count, blockSize, totalSize):
@@ -116,12 +119,10 @@ def downloadHook(count, blockSize, totalSize):
     global pre
     used = count * blockSize
     pre1 = int((100.0 * used / totalSize))
-    if pre == pre1:
+    if pre == (100 - pre1):
         return
-    speed = {'total': totalSize, 'used': used, 'pre': pre}
-    # print 'task downloadHook', speed
+    speed = {'total': totalSize, 'used': used, 'pre': pre1}
     writeLogs(json.dumps(speed))
-    pre = pre1
 
 
 def writeLogs(logMsg):
@@ -144,7 +145,6 @@ def runTask():
                 "status=?", ('-1',)).setField('status', '0')
             taskArr = sql.table('tasks').where("status=?", ('0',)).field(
                 'id,type,execstr').order("id asc").select()
-
             for value in taskArr:
                 start = int(time.time())
                 if not sql.table('tasks').where("id=?", (value['id'],)).count():
@@ -155,13 +155,15 @@ def runTask():
                     argv = value['execstr'].split('|mw|')
                     downloadFile(argv[0], argv[1])
                 elif value['type'] == 'execshell':
-                    data = execShell(value['execstr'])
+                    execShell(value['execstr'])
                 end = int(time.time())
                 sql.table('tasks').where("id=?", (value['id'],)).save(
                     'status,end', ('1', end))
 
-            if(sql.table('tasks').where("status=?", ('0')).count() < 1):
-                os.system('rm -f ' + isTask)
+                if(sql.table('tasks').where("status=?", ('0')).count() < 1):
+                    os.system('rm -f ' + isTask)
+
+            sql.close()
     except Exception as e:
         print(str(e))
 

@@ -657,7 +657,7 @@ function editTaskInfo(id){
 							</div>\
 							<div class="clearfix plan ptb10" style="display:'+ (obj.from.stype == "rememory"?'block;':'none') +'">\
 								<span class="typename controls c4 pull-left f14 text-right mr20">提示</span>\
-								<div style="line-height:34px">释放PHP、MYSQL、PURE-FTPD、APACHE、NGINX的内存占用,建议在每天半夜执行!</div>\
+								<div style="line-height:34px">释放PHP、MYSQL、PURE-FTPD、OpenResty的内存占用,建议在每天半夜执行!</div>\
 							</div>\
 							<div class="clearfix plan ptb10" style="display:'+ (obj.from.stype == "toUrl"?'block;':'none') +'">\
 								<span class="typename controls c4 pull-left f14 text-right mr20">URL地址</span>\

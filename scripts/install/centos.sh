@@ -8,6 +8,7 @@ if [ ! -f /usr/bin/applydeltarpm ];then
 	yum -y install deltarpm
 fi
 
+VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
 setenforce 0
 sed -i 's#SELINUX=enforcing#SELINUX=disabled#g' /etc/selinux/config
@@ -19,6 +20,8 @@ yum install -y python-devel
 yum install -y vixie-cron
 yum install -y curl-devel libmcrypt libmcrypt-devel
 yum install -y mysql-devel
+
+
 
 #https need
 if [ ! -d /root/.acme.sh ];then	
@@ -80,6 +83,9 @@ if [ "$?" != "0" ];then
 	dnf upgrade -y libmodulemd
 fi
 
+
+
+
 yum install -y libzstd-devel
 yum install -y libevent libevent-devel libjpeg* libpng* gd* libxslt* unzip
 yum install -y python-imaging libicu-devel zip bzip2-devel gcc libxml2 libxml2-devel  pcre pcre-devel
@@ -95,6 +101,11 @@ do yum -y install $yumPack;done
 
 cd /www/server/mdserver-web/scripts && bash lib.sh
 chmod 755 /www/server/mdserver-web/data
+
+
+if [ "$VERSION_ID" -eq "9" ];then
+	yum install -y patchelf
+fi
 
 
 cd /www/server/mdserver-web && ./cli.sh start

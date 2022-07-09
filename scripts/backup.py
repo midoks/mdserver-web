@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # coding: utf-8
 #-----------------------------
 # 网站备份工具
@@ -13,8 +12,9 @@ if sys.platform != 'darwin':
 
 chdir = os.getcwd()
 sys.path.append(chdir + '/class/core')
-reload(sys)
-sys.setdefaultencoding('utf-8')
+
+# reload(sys)
+# sys.setdefaultencoding('utf-8')
 
 
 import mw
@@ -30,8 +30,8 @@ class backupTools:
         startTime = time.time()
         if not path:
             endDate = time.strftime('%Y/%m/%d %X', time.localtime())
-            log = u"网站[" + name + "]不存在!"
-            print(u"★[" + endDate + "] " + log)
+            log = "网站[" + name + "]不存在!"
+            print("★[" + endDate + "] " + log)
             print(
                 "----------------------------------------------------------------------------")
             return
@@ -49,21 +49,21 @@ class backupTools:
 
         print(filename)
         if not os.path.exists(filename):
-            log = u"网站[" + name + u"]备份失败!"
-            print(u"★[" + endDate + "] " + log)
+            log = "网站[" + name + u"]备份失败!"
+            print("★[" + endDate + "] " + log)
             print(
-                u"----------------------------------------------------------------------------")
+                "----------------------------------------------------------------------------")
             return
 
         outTime = time.time() - startTime
         pid = sql.table('sites').where('name=?', (name,)).getField('id')
         sql.table('backup').add('type,name,pid,filename,addtime,size', ('0', os.path.basename(
             filename), pid, filename, endDate, os.path.getsize(filename)))
-        log = u"网站[" + name + u"]备份成功,用时[" + str(round(outTime, 2)) + u"]秒"
+        log = "网站[" + name + "]备份成功,用时[" + str(round(outTime, 2)) + "]秒"
         mw.writeLog(u'计划任务', log)
-        print(u"★[" + endDate + "] " + log)
-        print(u"|---保留最新的[" + count + u"]份备份")
-        print(u"|---文件名:" + filename)
+        print("★[" + endDate + "] " + log)
+        print("|---保留最新的[" + count + "]份备份")
+        print("|---文件名:" + filename)
 
         # 清理多余备份
         backups = sql.table('backup').where(
@@ -75,7 +75,7 @@ class backupTools:
                 mw.execShell("rm -f " + backup['filename'])
                 sql.table('backup').where('id=?', (backup['id'],)).delete()
                 num -= 1
-                print(u"|---已清理过期备份文件：" + backup['filename'])
+                print("|---已清理过期备份文件：" + backup['filename'])
                 if num < 1:
                     break
 
@@ -87,10 +87,10 @@ class backupTools:
         startTime = time.time()
         if not name:
             endDate = time.strftime('%Y/%m/%d %X', time.localtime())
-            log = u"数据库[" + name + u"]不存在!"
-            print(u"★[" + endDate + "] " + log)
+            log = "数据库[" + name + "]不存在!"
+            print("★[" + endDate + "] " + log)
             print(
-                u"----------------------------------------------------------------------------")
+                "----------------------------------------------------------------------------")
             return
 
         backup_path = mw.getRootDir() + '/backup/database'
@@ -117,10 +117,10 @@ class backupTools:
 
         if not os.path.exists(filename):
             endDate = time.strftime('%Y/%m/%d %X', time.localtime())
-            log = u"数据库[" + name + u"]备份失败!"
-            print(u"★[" + endDate + "] " + log)
+            log = "数据库[" + name + "]备份失败!"
+            print("★[" + endDate + "] " + log)
             print(
-                u"----------------------------------------------------------------------------")
+                "----------------------------------------------------------------------------")
             return
 
         mycnf = mw.readFile(db_path + '/etc/my.cnf')
@@ -135,11 +135,11 @@ class backupTools:
 
         mw.M('backup').add('type,name,pid,filename,addtime,size', (1, os.path.basename(
             filename), pid, filename, endDate, os.path.getsize(filename)))
-        log = u"数据库[" + name + u"]备份成功,用时[" + str(round(outTime, 2)) + u"]秒"
-        mw.writeLog(u'计划任务', log)
+        log = "数据库[" + name + "]备份成功,用时[" + str(round(outTime, 2)) + u"]秒"
+        mw.writeLog('计划任务', log)
         print("★[" + endDate + "] " + log)
-        print(u"|---保留最新的[" + count + u"]份备份")
-        print(u"|---文件名:" + filename)
+        print("|---保留最新的[" + count + "]份备份")
+        print("|---文件名:" + filename)
 
         # 清理多余备份
         backups = mw.M('backup').where(
@@ -151,7 +151,7 @@ class backupTools:
                 mw.execShell("rm -f " + backup['filename'])
                 mw.M('backup').where('id=?', (backup['id'],)).delete()
                 num -= 1
-                print(u"|---已清理过期备份文件：" + backup['filename'])
+                print("|---已清理过期备份文件：" + backup['filename'])
                 if num < 1:
                     break
 

@@ -110,9 +110,15 @@ def getInitdTpl(version=''):
 
 def contentReplace(content):
     service_path = mw.getServerDir()
-    content = content.replace('{$ROOT_PATH}', mw.getRootDir())
-    content = content.replace('{$SERVER_PATH}', service_path)
-    content = content.replace('{$SERVER_APP_PATH}', service_path + '/mysql')
+    if content.find('{$ROOT_PATH}') != -1:
+        content = content.replace('{$ROOT_PATH}', mw.getRootDir())
+
+    if content.find('{$SERVER_PATH}') != -1:
+        content = content.replace('{$SERVER_PATH}', service_path)
+
+    if content.find('{$SERVER_APP_PATH}') != -1:
+        content = content.replace(
+            '{$SERVER_APP_PATH}', service_path + '/mysql')
     return content
 
 
@@ -196,6 +202,11 @@ def status(version=''):
         "ps -ef|grep mysqld |grep -v grep | grep -v python | awk '{print $2}'")
     if data[0] == '':
         return 'stop'
+
+    pid = getPidFile()
+    if not os.path.exists(pid):
+        return 'stop'
+
     return 'start'
 
 
@@ -203,6 +214,14 @@ def getDataDir():
     file = getConf()
     content = mw.readFile(file)
     rep = 'datadir\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
+
+
+def getPidFile():
+    file = getConf()
+    content = mw.readFile(file)
+    rep = 'pid-file\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -294,9 +313,9 @@ def initMysqlData():
     datadir = getDataDir()
     if not os.path.exists(datadir + '/mysql'):
         serverdir = getServerDir()
+        myconf = serverdir + "/etc/my.cnf"
         user = pGetDbUser()
-        cmd = 'cd ' + serverdir + ' && ./scripts/mysql_install_db --user=' + \
-            user + ' --basedir=' + serverdir + ' --ldata=' + datadir
+        cmd = 'cd ' + serverdir + ' && ./scripts/mysql_install_db --defaults-file=' + myconf
         mw.execShell(cmd)
         return False
     return True
@@ -310,7 +329,8 @@ def initMysql57Data():
         user = pGetDbUser()
         cmd = 'cd ' + serverdir + ' && ./bin/mysqld --defaults-file=' + myconf + \
             ' --initialize-insecure --explicit_defaults_for_timestamp'
-        mw.execShell(cmd)
+        # print(mw.execShell(cmd))
+
         return False
     return True
 
@@ -342,19 +362,6 @@ def initMysqlPwd():
     mw.execShell(cmd_pass)
     pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
     return True
-
-
-def mysql8IsInitedPasswd():
-
-    serverdir = getServerDir()
-    pass_cmd = "cat " + serverdir + \
-        "/data/error.log | grep root@localhost | awk -F 'root@localhost:' '{print $2}'"
-    passdata = mw.execShell(pass_cmd)
-    password = passdata[0].strip()
-
-    if len(password) == 0:
-        return True
-    return False
 
 
 def initMysql8Pwd():

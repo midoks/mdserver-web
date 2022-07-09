@@ -261,14 +261,14 @@ class site_api:
         file = self.getHostConf(siteName)
         conf = mw.readFile(file)
         if conf:
-            rep = "enable-php-([0-9]{2,3})\.conf"
+            rep = "enable-php-(.*)\.conf"
             tmp = re.search(rep, conf).group()
             conf = conf.replace(tmp, 'enable-php-' + version + '.conf')
             mw.writeFile(file, conf)
 
-        mw.restartWeb()
         msg = mw.getInfo('成功切换网站[{1}]的PHP版本为PHP-{2}', (siteName, version))
         mw.writeLog("网站管理", msg)
+        mw.restartWeb()
         return mw.returnJson(True, msg)
 
     def getDomainApi(self):
@@ -1219,13 +1219,13 @@ class site_api:
         content = mw.readFile(vhost_file)
 
         cnf_301 = '''
-    # 301-START
+    #301-START
     include %s/*.conf;
-    # 301-END
+    #301-END
 ''' % (self.getRedirectPath( siteName))
 
         cnf_301_source = '''
-    # 301-START
+    #301-START
 '''
         # print('operateRedirectConf', content.find('#301-END'))
         if content.find('#301-END') != -1:
@@ -1411,13 +1411,13 @@ class site_api:
         content = mw.readFile(vhost_file)
 
         proxy_cnf = '''
-    # PROXY-START
+    #PROXY-START
     include %s/*.conf;
-    # PROXY-END
+    #PROXY-END
 ''' % (self.getProxyPath(siteName))
 
         proxy_cnf_source = '''
-    # PROXY-START
+    #PROXY-START
 '''
 
         if content.find('#PROXY-END') != -1:
@@ -1840,7 +1840,7 @@ location ~* ^{from}(.*)$ {
 
     def getSitePhpVersion(self, siteName):
         conf = mw.readFile(self.getHostConf(siteName))
-        rep = "enable-php-([0-9]{2,3})\.conf"
+        rep = "enable-php-(.*)\.conf"
         tmp = re.search(rep, conf).groups()
         data = {}
         data['phpversion'] = tmp[0]
@@ -2028,11 +2028,31 @@ location ~* ^{from}(.*)$ {
                 tmp['name'] = '纯静态'
                 data.append(tmp)
 
+            # 标准判断
             checkPath = mw.getServerDir() + '/php/' + val + '/bin/php'
             if os.path.exists(checkPath):
                 tmp['version'] = val
                 tmp['name'] = 'PHP-' + val
                 data.append(tmp)
+
+        # 其他PHP安装类型
+        conf_dir = mw.getServerDir() + "/web_conf/php/conf"
+        conf_list = os.listdir(conf_dir)
+        l = len(conf_list)
+        rep = "enable-php-(.*?)\.conf"
+        for name in conf_list:
+            tmp = {}
+            try:
+                matchVer = re.search(rep, name).groups()[0]
+            except Exception as e:
+                continue
+
+            if matchVer in phpVersions:
+                continue
+
+            tmp['version'] = matchVer
+            tmp['name'] = 'PHP-' + matchVer
+            data.append(tmp)
 
         return mw.getJson(data)
 

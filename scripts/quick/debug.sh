@@ -40,8 +40,8 @@ if [ ! -d /www/server/mysql ];then
 	# cd /www/server/mdserver-web/plugins/mysql && bash install.sh install 5.7
 
 
-	# cd /www/server/mdserver-web/plugins/mysql && bash install.sh install 5.6
-	cd /www/server/mdserver-web/plugins/mysql && bash install.sh install 8.0
+	cd /www/server/mdserver-web/plugins/mysql && bash install.sh install 5.6
+	# cd /www/server/mdserver-web/plugins/mysql && bash install.sh install 8.0
 fi
 
 endTime=`date +%s`

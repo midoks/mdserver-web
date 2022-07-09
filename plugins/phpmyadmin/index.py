@@ -97,12 +97,16 @@ def getCachePhpVer():
 def contentReplace(content):
     service_path = mw.getServerDir()
     php_ver = getCachePhpVer()
+    tmp = mw.execShell(
+        'cat /dev/urandom | head -n 32 | md5sum | head -c 16')
+    blowfish_secret = tmp[0].strip()
     # print php_ver
     php_conf_dir = mw.getServerDir() + '/web_conf/php/conf'
     content = content.replace('{$ROOT_PATH}', mw.getRootDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$PHP_CONF_PATH}', php_conf_dir)
     content = content.replace('{$PHP_VER}', php_ver)
+    content = content.replace('{$BLOWFISH_SECRET}', blowfish_secret)
     return content
 
 

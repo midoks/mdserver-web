@@ -194,6 +194,7 @@ systemctl stop mongod
 yum erase -y $(rpm -qa | grep mongodb-org)
 rm -r /var/log/mongodb
 rm -r /var/lib/mongo
+rm -rf /etc/yum.repos.d/mongodb-org-${VERSION}.repo
 }
 
 
@@ -226,12 +227,14 @@ Install_app()
 		Install_app_linux
 	fi
 
-	echo "${VERSION}" > $serverPath/mongodb/version.pl
-	echo '安装完成' > $install_tmp
+	if [ "$?" == "0" ];then
+		echo "${VERSION}" > $serverPath/mongodb/version.pl
+		echo '安装完成' > $install_tmp
 
-	#初始化 
-	cd ${rootPath} && python3 ${rootPath}/plugins/mongodb/index.py start
-	cd ${rootPath} && python3 ${rootPath}/plugins/mongodb/index.py initd_install
+		#初始化 
+		cd ${rootPath} && python3 ${rootPath}/plugins/mongodb/index.py start
+		cd ${rootPath} && python3 ${rootPath}/plugins/mongodb/index.py initd_install
+	fi
 }
 
 

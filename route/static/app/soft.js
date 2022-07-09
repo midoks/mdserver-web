@@ -170,10 +170,19 @@ function installPreInspection(name, ver, callback){
                 layer.msg(rdata.data, { icon: 2 });
             }
         } else {
-            layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+            layer.msg(rdata.data, { icon: rdata.status ? 1 : 2 });
         }
     },'json');
     
+}
+
+function runInstall(data){
+    var loadT = layer.msg('正在添加到安装器...', { icon: 16, time: 0, shade: [0.3, '#000'] });
+    $.post("/plugins/install", data, function(rdata) {
+        layer.closeAll();
+        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+        getSList();
+    },'json');
 }
 
 function addVersion(name, ver, type, obj, title, install_pre_inspection) {
@@ -181,13 +190,13 @@ function addVersion(name, ver, type, obj, title, install_pre_inspection) {
     var titlename = name;
     if (ver.indexOf('|') >= 0){
         var veropt = ver.split("|");
-        var SelectVersion = '';
+        var selectVersion = '';
         for (var i = 0; i < veropt.length; i++) {
-            SelectVersion += '<option>' + name + ' ' + veropt[i] + '</option>';
+            selectVersion += '<option>' + name + ' ' + veropt[i] + '</option>';
         }
-        option = "<select id='SelectVersion' class='bt-input-text' style='margin-left:30px'>" + SelectVersion + "</select>";
+        option = "<select id='selectVersion' class='bt-input-text' style='margin-left:30px'>" + selectVersion + "</select>";
     } else {
-        option = '<span id="SelectVersion">' + name + ' ' + ver + '</span>';
+        option = '<span id="selectVersion">' + name + ' ' + ver + '</span>';
     }
 
     layer.open({
@@ -196,56 +205,39 @@ function addVersion(name, ver, type, obj, title, install_pre_inspection) {
         area: '350px',
         closeBtn: 2,
         shadeClose: true,
-        content: "<div class='bt-form pd20 pb70 c6'>\
+        btn: ['提交','关闭'],
+        content: "<div class='bt-form pd20 c6'>\
 			<div class='version line'>安装版本：" + option + "</div>\
-	    	<div class='bt-form-submit-btn'>\
-				<button type='button' class='btn btn-danger btn-sm btn-title' onclick='layer.closeAll()'>关闭</button>\
-		        <button type='button' id='bi-btn' class='btn btn-success btn-sm btn-title bi-btn'>提交</button>\
-	        </div>\
-	    </div>"
-    });
-
-    $('.fangshi input').click(function() {
-        $(this).attr('checked', 'checked').parent().siblings().find("input").removeAttr('checked');
-    });
-    $("#bi-btn").click(function() {
-
-        var info = $("#SelectVersion").val().toLowerCase();
-        if (info == ''){
-            info = $("#SelectVersion").text().toLowerCase();
+	    </div>",
+        success:function(){
+            $('.fangshi input').click(function() {
+                $(this).attr('checked', 'checked').parent().siblings().find("input").removeAttr('checked');
+            });
+            installTips();
+            // fly("layui-layer-btn0");
+        },
+        yes:function(e){
+            var info = $("#selectVersion").val().toLowerCase();
+            if (info == ''){
+                info = $("#selectVersion").text().toLowerCase();
+            }
+            var name = info.split(" ")[0];
+            var version = info.split(" ")[1];
+            var type = $('.fangshi').prop("checked") ? '1' : '0';
+            var data = "name=" + name + "&version=" + version + "&type=" + type;
+            // console.log(data);
+            if (install_pre_inspection){
+                //安装检查
+                installPreInspection(name, version, function(){
+                    runInstall(data);
+                    fly("layui-layer-btn0",e);
+                });      
+                return;
+            }
+            runInstall(data);
+            fly("layui-layer-btn0",e);
         }
-        var name = info.split(" ")[0];
-        var version = info.split(" ")[1];
-        var type = $('.fangshi input').prop("checked") ? '1' : '0';
-        var data = "name=" + name + "&version=" + version + "&type=" + type;
-
-        if (install_pre_inspection){
-            //安装检查
-            installPreInspection(name,version, function(){
-                var loadT = layer.msg('正在添加到安装器...', { icon: 16, time: 0, shade: [0.3, '#000'] });
-                $.post("/plugins/install", data, function(rdata) {
-                    layer.closeAll();
-                    layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
-                    getSList();
-                },'json');
-
-                installTips();
-                fly("bi-btn");
-            });            
-            return;
-        }
-
-        var loadT = layer.msg('正在添加到安装器...', { icon: 16, time: 0, shade: [0.3, '#000'] });
-        $.post("/plugins/install", data, function(rdata) {
-            layer.closeAll();
-            layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
-            getSList();
-        },'json');
-
-        installTips();
-        fly("bi-btn");
     });
-    
 }
 
 //卸载软件

@@ -226,6 +226,11 @@ def runLog():
 
 if __name__ == "__main__":
     func = sys.argv[1]
+
+    version = "4.4"
+    if (len(sys.argv) > 2):
+        version = sys.argv[2]
+
     if func == 'status':
         print(status())
     elif func == 'start':
@@ -236,6 +241,8 @@ if __name__ == "__main__":
         print(restart())
     elif func == 'reload':
         print(reload())
+    elif func == 'install_pre_inspection':
+        print(installPreInspection(version))
     elif func == 'initd_status':
         print(initdStatus())
     elif func == 'initd_install':

@@ -388,9 +388,9 @@ function getCookie(b) {
 	}
 }
 
-function aotuHeight() {
+function autoHeight() {
 	var a = $("body").height() - 40;
-	$(".main-content").css("min-height", a)
+	$(".main-content").css("min-height", a);
 }
 
 function showMsg(msg, callback ,icon, time){
@@ -794,38 +794,61 @@ function jump() {
 function installTips() {
 	$(".fangshi label").mouseover(function() {
 		var a = $(this).attr("data-title");
-		layer.tips(a, this, {
-			tips: [1, "#787878"],
-			time: 0
-		})
+		layer.tips(a, this, {tips: [1, "#787878"],time: 0});
 	}).mouseout(function() {
 		$(".layui-layer-tips").remove()
 	})
 }
 
-function fly(a) {
+
+// function fly(a) {
+// 	var b = $("#task").offset();
+// 	$("." + a).click(function(d) {
+// 		var e = $(this);
+// 		var c = $('<span class="yuandian"></span>');
+// 		c.fly({
+// 			start: {
+// 				left: d.pageX,
+// 				top: d.pageY
+// 			},
+// 			end: {
+// 				left: b.left + 10,
+// 				top: b.top + 10,
+// 				width: 0,
+// 				height: 0
+// 			},
+// 			onEnd: function() {
+// 				layer.closeAll();
+// 				layer.msg(lan.bt.task_add, {icon: 1});
+// 				getTaskCount();
+// 			}
+// 		});
+// 	});
+// };
+
+function fly(a,e) {
 	var b = $("#task").offset();
-	$("." + a).click(function(d) {
-		var e = $(this);
-		var c = $('<span class="yuandian"></span>');
-		c.fly({
-			start: {
-				left: d.pageX,
-				top: d.pageY
-			},
-			end: {
-				left: b.left + 10,
-				top: b.top + 10,
-				width: 0,
-				height: 0
-			},
-			onEnd: function() {
-				layer.closeAll();
-				layer.msg(lan.bt.task_add, {icon: 1});
-				getTaskCount();
-			}
-		});
+	var e = $("." + a);
+	var d = e;
+	var c = $('<span class="yuandian"></span>');
+	c.fly({
+		start: {
+			left: d.pageX,
+			top: d.pageY
+		},
+		end: {
+			left: b.left + 10,
+			top: b.top + 10,
+			width: 0,
+			height: 0
+		},
+		onEnd: function() {
+			layer.closeAll();
+			layer.msg(lan.bt.task_add, {icon: 1});
+			getTaskCount();
+		}
 	});
+	
 };
 
 function readerTableChecked(){
@@ -1051,7 +1074,7 @@ function messageBox() {
 	layer.open({
 		type: 1,
 		title: '消息盒子',
-		area: "640px",
+		area: "670px",
 		closeBtn: 2,
 		shadeClose: false,
 		content: '<div class="bt-form">\
@@ -1076,7 +1099,7 @@ function messageBox() {
 //取执行日志
 function execLog(){
 	$.post('/task/get_exec_log',{},function(logs){
-		var lbody = '<textarea readonly="" style="margin: 0px;width: 500px;height: 520px;background-color: #333;color:#fff; padding:0 5px" id="exec_log">'+logs+'</textarea>';
+		var lbody = '<textarea readonly="" style="margin: 0px;width: 530px;height: 520px;background-color: #333;color:#fff; padding:0 5px" id="exec_log">'+logs+'</textarea>';
 		$(".taskcon").html(lbody);
 		var ob = document.getElementById('exec_log');
 		ob.scrollTop = ob.scrollHeight;
@@ -1298,9 +1321,9 @@ function scroll_handle(e){
 
 
 $(function(){
-	setInterval(function(){
-		check_login();
-	},60000);
+///
+setInterval(function(){check_login();},6000);
+///
 });
 
 function asyncLoadImage(obj, url){
@@ -1956,8 +1979,8 @@ function pluginRollingLogs(_name, version, func, _args, line){
 
 
 $(function() {
-	aotuHeight();
+	autoHeight();
 });
 $(window).resize(function() {
-	aotuHeight();
+	autoHeight();
 });
