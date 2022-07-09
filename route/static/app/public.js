@@ -800,29 +800,55 @@ function installTips() {
 	})
 }
 
-function fly(a) {
+
+// function fly(a) {
+// 	var b = $("#task").offset();
+// 	$("." + a).click(function(d) {
+// 		var e = $(this);
+// 		var c = $('<span class="yuandian"></span>');
+// 		c.fly({
+// 			start: {
+// 				left: d.pageX,
+// 				top: d.pageY
+// 			},
+// 			end: {
+// 				left: b.left + 10,
+// 				top: b.top + 10,
+// 				width: 0,
+// 				height: 0
+// 			},
+// 			onEnd: function() {
+// 				layer.closeAll();
+// 				layer.msg(lan.bt.task_add, {icon: 1});
+// 				getTaskCount();
+// 			}
+// 		});
+// 	});
+// };
+
+function fly(a,e) {
 	var b = $("#task").offset();
-	$("." + a).click(function(d) {
-		var e = $(this);
-		var c = $('<span class="yuandian"></span>');
-		c.fly({
-			start: {
-				left: d.pageX,
-				top: d.pageY
-			},
-			end: {
-				left: b.left + 10,
-				top: b.top + 10,
-				width: 0,
-				height: 0
-			},
-			onEnd: function() {
-				layer.closeAll();
-				layer.msg(lan.bt.task_add, {icon: 1});
-				getTaskCount();
-			}
-		});
+	var e = $("." + a);
+	var d = e;
+	var c = $('<span class="yuandian"></span>');
+	c.fly({
+		start: {
+			left: d.pageX,
+			top: d.pageY
+		},
+		end: {
+			left: b.left + 10,
+			top: b.top + 10,
+			width: 0,
+			height: 0
+		},
+		onEnd: function() {
+			layer.closeAll();
+			layer.msg(lan.bt.task_add, {icon: 1});
+			getTaskCount();
+		}
 	});
+	
 };
 
 function readerTableChecked(){

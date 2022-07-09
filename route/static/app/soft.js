@@ -170,7 +170,7 @@ function installPreInspection(name, ver, callback){
                 layer.msg(rdata.data, { icon: 2 });
             }
         } else {
-            layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+            layer.msg(rdata.data, { icon: rdata.status ? 1 : 2 });
         }
     },'json');
     
@@ -210,11 +210,13 @@ function addVersion(name, ver, type, obj, title, install_pre_inspection) {
 			<div class='version line'>安装版本：" + option + "</div>\
 	    </div>",
         success:function(){
-             $('.fangshi input').click(function() {
+            $('.fangshi input').click(function() {
                 $(this).attr('checked', 'checked').parent().siblings().find("input").removeAttr('checked');
             });
+            installTips();
+            // fly("layui-layer-btn0");
         },
-        yes:function(){
+        yes:function(e){
             var info = $("#selectVersion").val().toLowerCase();
             if (info == ''){
                 info = $("#selectVersion").text().toLowerCase();
@@ -228,17 +230,14 @@ function addVersion(name, ver, type, obj, title, install_pre_inspection) {
                 //安装检查
                 installPreInspection(name, version, function(){
                     runInstall(data);
-                    fly("layui-layer-btn0");
+                    fly("layui-layer-btn0",e);
                 });      
                 return;
             }
             runInstall(data);
-            fly("layui-layer-btn0");
+            fly("layui-layer-btn0",e);
         }
     });
-
-    installTips();
-    fly("layui-layer-btn0");
 }
 
 //卸载软件

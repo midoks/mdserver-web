@@ -624,6 +624,9 @@ def installPreInspection(version):
     sys = mw.execShell(
         "cat /etc/*-release | grep PRETTY_NAME |awk -F = '{print $2}' | awk -F '\"' '{print $2}'| awk '{print $1}'")
 
+    if sys[1] != '':
+        return '不支持改系统'
+
     sys_id = mw.execShell(
         "cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F '\"' '{print $2}'")
 
