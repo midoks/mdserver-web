@@ -16,7 +16,6 @@ serverPath=$(dirname "$rootPath")
 
 
 PHP_VER_LIST=(56 70 71 72 73 74 80 81)
-# PHP_VER_LIST=(81)
 for PHP_VER in ${PHP_VER_LIST[@]}; do
 	echo "php${PHP_VER} -- start"
 	if [ ! -d  /www/server/php-apt/${PHP_VER} ];then
@@ -35,7 +34,7 @@ for PHP_VER in ${PHP_VER_LIST_EXT[@]}; do
 	for EXT in ${PHP_EXT_LIST[@]}; do
 		extFile=/usr/lib/php/${extVer}/${EXT}.so
 		echo "${EXT} start"
-		if [ -f $extFile ];then
+		if [ ! -f $extFile ];then
 			cd $curPath && /bin/bash common.sh  $version  install ${EXT}
 		fi
 		echo "${EXT} end"
