@@ -49,7 +49,7 @@ Install_lib()
 		fi 
 		cd $php_lib/${LIBNAME}-${LIBV}
 
-		$serverPath/php/$version/bin/phpize
+		/usr/bin/phpize$version
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config
 		make && make install && make clean
 

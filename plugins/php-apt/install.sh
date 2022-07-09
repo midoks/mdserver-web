@@ -32,6 +32,8 @@ if [ ! -d $curPath/versions/$2 ];then
 fi
 
 
+# apt install $(grep-aptavail -S PHP-defaults -s Package -n)
+
 if [ ! -f /etc/apt/sources.list.d/php.list ];then
 # install php source
 
