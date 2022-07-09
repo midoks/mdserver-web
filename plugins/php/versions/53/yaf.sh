@@ -11,19 +11,16 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
+actionType=$1
+version=$2
 
 LIBNAME=yaf
 LIBV='2.3.5'
 
-actionType=$1
-version=$2
 
 NON_ZTS_FILENAME=`ls $serverPath/php/${version}/lib/php/extensions | grep no-debug-non-zts`
 extFile=$serverPath/php/${version}/lib/php/extensions/${NON_ZTS_FILENAME}/${LIBNAME}.so
 
-if [ "$version" = '70' ] || [ "$version" = '71' ] || [ "$version" = '72' ] || [ "$version" = '73' ];then
-	LIBV='3.0.7';
-fi
 
 if [ "$sysName" == "Darwin" ];then
 	BAK='_bak'
