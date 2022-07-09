@@ -26,17 +26,19 @@ for PHP_VER in ${PHP_VER_LIST[@]}; do
 done
 
 PHP_VER_LIST_EXT=(56 70 71 72 73 74 80 81)
-PHP_EXT_LIST=('yaf')
+PHP_EXT_LIST=(yaf)
 for PHP_VER in ${PHP_VER_LIST_EXT[@]}; do
 	echo "php${PHP_VER} EXT -- start"
 	version=${PHP_VER:0:1}.${PHP_VER:1:2}
 	extVer=`bash $curPath/lib.sh $version`
 	
 	for EXT in ${PHP_EXT_LIST[@]}; do
-		extFile=/usr/lib/php/${extVer}/${LIBNAME}.so
+		extFile=/usr/lib/php/${extVer}/${EXT}.so
+		echo "${EXT} start"
 		if [ -f $extFile ];then
 			cd $curPath && /bin/bash common.sh  $version  install ${EXT}
 		fi
+		echo "${EXT} end"
 	done
 
 	echo "php${PHP_VER} EXT -- end"
