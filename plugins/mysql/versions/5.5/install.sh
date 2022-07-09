@@ -58,7 +58,7 @@ Install_mysql()
 		-DDEFAULT_COLLATION=utf8mb4_general_ci \
 		-DCMAKE_C_COMPILER=/usr/bin/gcc \
 		-DCMAKE_CXX_COMPILER=/usr/bin/g++
-		make clean && make && make install && make clean
+		make && make install && make clean
 
 		if [ -d $serverPath/mysql ];then
 			echo '5.5' > $serverPath/mysql/version.pl
