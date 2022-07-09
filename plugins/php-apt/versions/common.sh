@@ -12,6 +12,12 @@ version=$1
 action=$2
 extName=$3
 
+which bc
+if [ "$?" != "0" ];then
+	apt install -y bc
+fi
+
+
 # echo $1,$2,$3
 
 # echo $curPath
@@ -22,6 +28,7 @@ FILE=${curPath}/${version}/${extName}.sh
 FILE_COMMON=${curPath}/common/${extName}.sh
 
 # apt install -y php81-php-yar
+
 
 
 if [ "$action" == 'install' ];then

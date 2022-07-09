@@ -3,14 +3,7 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
 curPath=`pwd`
-
 rootPath=$(dirname "$curPath")
-rootPath=$(dirname "$rootPath")
-rootPath=$(dirname "$rootPath")
-rootPath=$(dirname "$rootPath")
-serverPath=$(dirname "$rootPath")
-sourcePath=${serverPath}/source/php
-
 
 actionType=$1
 version=$2
@@ -20,9 +13,13 @@ LIBNAME=yaf
 LIBV=3.3.5
 
 
+if [ `echo "$version < 7.0"|bc` -eq 1 ];then
+	LIBV=2.3.5
+fi
 
-NON_ZTS_FILENAME=`ls $serverPath/php/${version}/lib/php/extensions | grep no-debug-non-zts`
-extFile=$serverPath/php/${version}/lib/php/extensions/${NON_ZTS_FILENAME}/${LIBNAME}.so
+
+extVer=`bash $rootPath/lib.sh $version`
+extFile=/usr/lib/php/${extVer}/${LIBNAME}.so
 
 if [ "$sysName" == "Darwin" ];then
 	BAK='_bak'
@@ -32,8 +29,9 @@ fi
 
 Install_lib()
 {
-	
-	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep "${LIBNAME}.so"`
+
+	#cat /etc/php/${version}/fpm/conf.d/* | grep -v '^;' |tr -s '\n'
+	isInstall=`cat /etc/php/${version}/fpm/conf.d/* | grep -v '^;' |tr -s '\n' |grep "${LIBNAME}.so"`
 	if [ "${isInstall}" != "" ];then
 		echo "php-$version 已安装${LIBNAME},请选择其它版本!"
 		return
@@ -59,13 +57,14 @@ Install_lib()
 		echo "ERROR!"
 		return;
 	fi
+
 	
-	echo  "" >> $serverPath/php/$version/etc/php.ini
-	echo  "[${LIBNAME}]" >> $serverPath/php/$version/etc/php.ini
-	echo  "extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
-	echo  "${LIBNAME}.use_namespace=1" >> $serverPath/php/$version/etc/php.ini
+	echo  "" >> /etc/php/${version}/fpm/conf.d/${LIBNAME}.ini
+	echo  "[${LIBNAME}]" >> /etc/php/${version}/fpm/conf.d/${LIBNAME}.ini
+	echo  "extension=${LIBNAME}.so" >> /etc/php/${version}/fpm/conf.d/${LIBNAME}.ini
+	echo  "${LIBNAME}.use_namespace=1" >> /etc/php/${version}/fpm/conf.d/${LIBNAME}.ini
 	
-	bash ${rootPath}/plugins/php/versions/lib.sh $version restart
+	systemctl restart php${version}-fpm 
 	echo '==========================================================='
 	echo 'successful!'
 }
@@ -73,7 +72,7 @@ Install_lib()
 
 Uninstall_lib()
 {
-	if [ ! -f "$serverPath/php/$version/bin/php-config" ];then
+	if [ ! -f "/usr/bin/php-config${version}" ];then
 		echo "php-$version 未安装,请选择其它版本!"
 		return
 	fi
@@ -83,13 +82,10 @@ Uninstall_lib()
 		return
 	fi
 	
-	echo $serverPath/php/$version/etc/php.ini
-	sed -i $BAK "/${LIBNAME}.so/d" $serverPath/php/$version/etc/php.ini
-	sed -i $BAK "/${LIBNAME}.use_namespace/d" $serverPath/php/$version/etc/php.ini
-	sed -i $BAK "/\[${LIBNAME}\]/d"  $serverPath/php/$version/etc/php.ini
-		
-	rm -f $extFile
-	bash ${rootPath}/plugins/php/versions/lib.sh $version restart
+	rm -rf /etc/php/${version}/fpm/conf.d/${LIBNAME}.ini
+	rm -rf $extFile
+
+	systemctl restart php${version}-fpm 
 	echo '==============================================='
 	echo 'successful!'
 }
