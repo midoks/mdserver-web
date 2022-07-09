@@ -704,8 +704,8 @@ def installLib(version):
         return data[1]
 
     name = args['name']
-    execstr = "cd " + getPluginDir() + '/versions/' + version + " && /bin/bash " + \
-        name + '.sh' + ' install ' + version
+    execstr = "cd " + getPluginDir() + "/versions && /bin/bash  common.sh " + \
+        name + ' install ' + version
 
     rettime = time.strftime('%Y-%m-%d %H:%M:%S')
     insert_info = (None, '安装[' + name + '-' + version + ']',
