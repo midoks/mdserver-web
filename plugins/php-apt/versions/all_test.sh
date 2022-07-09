@@ -35,7 +35,7 @@ for PHP_VER in ${PHP_VER_LIST_EXT[@]}; do
 		extFile=/usr/lib/php/${extVer}/${EXT}.so
 		echo "${EXT} start"
 		if [ ! -f $extFile ];then
-			cd $curPath && /bin/bash common.sh  $version  install ${EXT}
+			/bin/bash common.sh  $version  install ${EXT}
 		fi
 		echo "${EXT} end"
 	done
