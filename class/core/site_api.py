@@ -1219,13 +1219,13 @@ class site_api:
         content = mw.readFile(vhost_file)
 
         cnf_301 = '''
-    # 301-START
+    #301-START
     include %s/*.conf;
-    # 301-END
+    #301-END
 ''' % (self.getRedirectPath( siteName))
 
         cnf_301_source = '''
-    # 301-START
+    #301-START
 '''
         # print('operateRedirectConf', content.find('#301-END'))
         if content.find('#301-END') != -1:
@@ -1411,13 +1411,13 @@ class site_api:
         content = mw.readFile(vhost_file)
 
         proxy_cnf = '''
-    # PROXY-START
+    #PROXY-START
     include %s/*.conf;
-    # PROXY-END
+    #PROXY-END
 ''' % (self.getProxyPath(siteName))
 
         proxy_cnf_source = '''
-    # PROXY-START
+    #PROXY-START
 '''
 
         if content.find('#PROXY-END') != -1:
