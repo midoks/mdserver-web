@@ -19,7 +19,7 @@ PHP_VER_LIST=(56 70 71 72 73 74 80 81)
 # PHP_VER_LIST=(81)
 for PHP_VER in ${PHP_VER_LIST[@]}; do
 	echo "php${PHP_VER} -- start"
-	if [ -d  /www/server/php-apt/${PHP_VER} ];then
+	if [ ! -d  /www/server/php-apt/${PHP_VER} ];then
 		cd /www/server/mdserver-web/plugins/php-apt && bash install.sh install ${PHP_VER}
 	fi
 	echo "php${PHP_VER} -- end"
