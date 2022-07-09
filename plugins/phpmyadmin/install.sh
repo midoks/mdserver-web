@@ -54,7 +54,7 @@ Install_phpmyadmin()
 	mkdir -p  $serverPath/phpmyadmin/tmp
 	chown -R www:www $serverPath/phpmyadmin/tmp
 
-	if [ "$OSNAME" != 'macosx' ];then
+	if [ "$OSNAME" != 'macos' ];then
 		chown -R www:www $serverPath/phpmyadmin/tmp
 	fi
 
