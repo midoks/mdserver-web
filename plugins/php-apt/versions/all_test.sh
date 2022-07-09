@@ -25,7 +25,7 @@ for PHP_VER in ${PHP_VER_LIST[@]}; do
 	echo "php${PHP_VER} -- end"
 done
 
-
+PHP_VER_LIST=(56 70 71 72 73 74 80 81)
 PHP_EXT_LIST=('yaf')
 for PHP_VER in ${PHP_VER_LIST[@]}; do
 	echo "php${PHP_VER} -- start"
