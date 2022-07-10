@@ -56,7 +56,7 @@ for PHP_VER in ${PHP_VER_LIST[@]}; do
 			bash common.sh  $version  install ${EXT}
 		fi
 		echo "${PHP_VER} ${EXT} end"
-	do
+	done
 	
 	echo "php${PHP_VER} -- end"
 done
