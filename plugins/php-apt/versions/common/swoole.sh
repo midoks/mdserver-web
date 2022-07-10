@@ -18,8 +18,26 @@ LIBNAME=swoole
 LIBV=4.8.10
 
 
+APT_INSTALL=0
+
 if [ `echo "$version < 7.0"|bc` -eq 1 ];then
 	LIBV=1.10.1
+elif [ `echo "$version < 7.2"|bc` -eq 1 ];then
+	LIBV=4.5.2
+else
+	echo 'ok'
+	APT_INSTALL=1
+fi
+
+
+# to Apt
+if [ "$APT_INSTALL" == "1" ];then
+	if [ "$actionType" == 'install' ];then
+		apt install -y php${version}-${LIBNAME}
+	elif [ "$actionType" == 'uninstall' ];then
+		apt remove -y php${version}-${LIBNAME}
+	fi
+	exit 0
 fi
 
 
