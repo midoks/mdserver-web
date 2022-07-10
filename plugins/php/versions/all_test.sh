@@ -40,25 +40,25 @@ for PHP_VER in ${PHP_VER_LIST[@]}; do
 	echo "php${PHP_VER} -- end"
 done
 
-cd $DIR
-PHP_VER_LIST=(53 54 55 56 70 71 72 73 74 80 81)
-PHP_EXT_LIST=(ioncube pdo mysqlnd sqlite3 odbc opcache mcrypt fileinfo \
-	exif gd intl memcache memcached redis imagick xdebug xhprof \
-	swoole yaf yar yac mongodb solr seaslog mbstring zip zstd)
+# cd $DIR
+# PHP_VER_LIST=(53 54 55 56 70 71 72 73 74 80 81)
+# PHP_EXT_LIST=(ioncube pdo mysqlnd sqlite3 odbc opcache mcrypt fileinfo \
+# 	exif gd intl memcache memcached redis imagick xdebug xhprof \
+# 	swoole yaf yar yac mongodb solr seaslog mbstring zip zstd)
 
-for PHP_VER in ${PHP_VER_LIST[@]}; do
-	echo "php${PHP_VER} -- start"
+# for PHP_VER in ${PHP_VER_LIST[@]}; do
+# 	echo "php${PHP_VER} -- start"
 
-	NON_ZTS_FILENAME=`ls /www/server/php/${PHP_VER}/lib/php/extensions | grep no-debug-non-zts`
-	for EXT in ${PHP_EXT_LIST[@]}; do
-		extFile=/www/server/php/${PHP_VER}/lib/php/extensions/${NON_ZTS_FILENAME}/${EXT}.so
-		echo "${PHP_VER} ${EXT} start"
-		if [ ! -f $extFile ];then
-			bash common.sh  $PHP_VER  install ${EXT}
-		fi
-		echo "${PHP_VER} ${EXT} end"
-	done
+# 	NON_ZTS_FILENAME=`ls /www/server/php/${PHP_VER}/lib/php/extensions | grep no-debug-non-zts`
+# 	for EXT in ${PHP_EXT_LIST[@]}; do
+# 		extFile=/www/server/php/${PHP_VER}/lib/php/extensions/${NON_ZTS_FILENAME}/${EXT}.so
+# 		echo "${PHP_VER} ${EXT} start"
+# 		if [ ! -f $extFile ];then
+# 			bash common.sh  $PHP_VER  install ${EXT}
+# 		fi
+# 		echo "${PHP_VER} ${EXT} end"
+# 	done
 	
-	echo "php${PHP_VER} -- end"
-done
+# 	echo "php${PHP_VER} -- end"
+# done
 
