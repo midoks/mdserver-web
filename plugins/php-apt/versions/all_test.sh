@@ -25,7 +25,9 @@ for PHP_VER in ${PHP_VER_LIST[@]}; do
 done
 
 PHP_VER_LIST_EXT=(56 70 71 72 73 74 80 81)
-PHP_EXT_LIST=(yaf pdo mysqlnd sqlite3 oci8 odbc opcache mcrypt fileinfo exif gd intl memcache memcached)
+PHP_EXT_LIST=(pdo mysqlnd sqlite3 odbc opcache mcrypt fileinfo \
+	exif gd intl memcache memcached redis imagick xdebug xhprof \
+	swoole yaf phalcon yar mongodb yac solr seaslog mbstring zip zstd)
 for PHP_VER in ${PHP_VER_LIST_EXT[@]}; do
 	echo "php${PHP_VER} EXT -- start"
 	version=${PHP_VER:0:1}.${PHP_VER:1:2}
@@ -33,11 +35,11 @@ for PHP_VER in ${PHP_VER_LIST_EXT[@]}; do
 	
 	for EXT in ${PHP_EXT_LIST[@]}; do
 		extFile=/usr/lib/php/${extVer}/${EXT}.so
-		echo "${EXT} start"
+		echo "${PHP_VER} ${EXT} start"
 		if [ ! -f $extFile ];then
 			/bin/bash common.sh  $version  install ${EXT}
 		fi
-		echo "${EXT} end"
+		echo "${PHP_VER} ${EXT} end"
 	done
 
 	echo "php${PHP_VER} EXT -- end"
