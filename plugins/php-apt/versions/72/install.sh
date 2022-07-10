@@ -21,6 +21,7 @@ version=7.2
 PHP_VER=72
 
 
+# apt -y install php7.2 php7.2-fpm php7.2-dev
 Install_php()
 {
 #------------------------ install start ------------------------------------#
@@ -32,6 +33,8 @@ fi
 #------------------------ install end ------------------------------------#
 }
 
+# systemctl status php7.2-fpm
+# apt -y remove php7.2 php7.2-fpm php7.2-dev
 Uninstall_php()
 {
 #------------------------ uninstall start ------------------------------------#
