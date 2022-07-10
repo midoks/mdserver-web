@@ -164,8 +164,7 @@ def phpFpmWwwReplace(version):
 def deleteConfList(version):
     sdir = mw.getServerDir()
     enable_conf = sdir + '/web_conf/php/conf/enable-php-apt' + version + '.conf'
-
-    clist = (status_conf, enable_conf)
+    clist = (enable_conf)
     for f in clist:
         if os.path.exists(f):
             os.remove(f)
