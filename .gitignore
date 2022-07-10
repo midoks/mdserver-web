@@ -104,8 +104,7 @@ venv.bak/
 .DS_Store
 .idea/*.xml
 .idea/*.iml
-tmp/*.pl
-tmp/*.log
+tmp/*
 *.swp
 *.zip
 scripts/init.d/mw

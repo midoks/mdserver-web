@@ -19,6 +19,6 @@ LIBNAME=opcache
 if [ "$actionType" == 'install' ];then
 	apt install -y php${version}-${LIBNAME}
 elif [ "$actionType" == 'uninstall' ];then
-	echo 'cannot uninstall'
+	echo 'cannot uninstall'>&2
 	exit 1
 fi
