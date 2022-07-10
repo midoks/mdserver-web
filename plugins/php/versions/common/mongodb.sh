@@ -25,6 +25,19 @@ if [ "$version" == '70' ];then
 	LIBV=1.7.5
 fi
 
+if [ "$version" == '56' ];then
+	LIBV=1.7.4
+fi
+
+if [ "$version" == '55' ];then
+	LIBV=1.5.3
+fi
+
+if [ "$version" -lt '55' ];then
+	echo "not need"
+	exit 1
+fi
+
 NON_ZTS_FILENAME=`ls $serverPath/php/${version}/lib/php/extensions | grep no-debug-non-zts`
 extFile=$serverPath/php/${version}/lib/php/extensions/${NON_ZTS_FILENAME}/${LIBNAME}.so
 
