@@ -53,7 +53,7 @@ for PHP_VER in ${PHP_VER_LIST[@]}; do
 		extFile=/www/server/php/${PHP_VER}/lib/php/extensions/${NON_ZTS_FILENAME}/${EXT}.so
 		echo "${PHP_VER} ${EXT} start"
 		if [ ! -f $extFile ];then
-			bash common.sh  $version  install ${EXT}
+			bash common.sh  $PHP_VER  install ${EXT}
 		fi
 		echo "${PHP_VER} ${EXT} end"
 	done
