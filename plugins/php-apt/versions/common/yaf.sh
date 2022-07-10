@@ -18,8 +18,10 @@ if [ `echo "$version < 7.0"|bc` -eq 1 ];then
 fi
 
 
-extVer=`bash $rootPath/lib.sh $version`
+extVer=`bash $curPath/lib.sh $version`
 extFile=/usr/lib/php/${extVer}/${LIBNAME}.so
+
+
 
 if [ "$sysName" == "Darwin" ];then
 	BAK='_bak'
@@ -52,7 +54,7 @@ Install_lib()
 		make && make install && make clean
 
 	fi
-	
+	echo "$extFile checking ..."
 	if [ ! -f "$extFile" ];then
 		echo "ERROR!"
 		return;
