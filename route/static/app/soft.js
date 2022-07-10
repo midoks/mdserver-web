@@ -214,9 +214,9 @@ function addVersion(name, ver, type, obj, title, install_pre_inspection) {
                 $(this).attr('checked', 'checked').parent().siblings().find("input").removeAttr('checked');
             });
             installTips();
-            // fly("layui-layer-btn0");
         },
-        yes:function(e){
+        yes:function(index,layero){
+            // console.log(index,layero)
             var info = $("#selectVersion").val().toLowerCase();
             if (info == ''){
                 info = $("#selectVersion").text().toLowerCase();
@@ -230,12 +230,13 @@ function addVersion(name, ver, type, obj, title, install_pre_inspection) {
                 //安装检查
                 installPreInspection(name, version, function(){
                     runInstall(data);
-                    fly("layui-layer-btn0",e);
+                    flySlow('layui-layer-btn0');
                 });      
                 return;
             }
             runInstall(data);
-            fly("layui-layer-btn0",e);
+            flySlow('layui-layer-btn0');
+            
         }
     });
 }
