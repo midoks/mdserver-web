@@ -17,6 +17,12 @@ sysName=`uname`
 actionType=$1
 version=$2
 
+if [ "$version" -gt "56" ];then
+	echo "not need"
+	exit 1
+fi 
+
+
 NON_ZTS_FILENAME=`ls $serverPath/php/${version}/lib/php/extensions | grep no-debug-non-zts`
 extFile=$serverPath/php/${version}/lib/php/extensions/${NON_ZTS_FILENAME}/${LIBNAME}.so
 
@@ -35,19 +41,15 @@ Install_lib()
 	fi
 	
 	if [ ! -f "$extFile" ];then
-
 		php_lib=$sourcePath/php_lib
 		mkdir -p $php_lib
-		if [ ! -f $php_lib/${LIBNAME}-${LIBV} ];then
-			wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
-			cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
-		fi 
-		cd $php_lib/${LIBNAME}-${LIBV}
 
+		wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
+
+		cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
+		cd ${LIBNAME}-${LIBV}
 		$serverPath/php/$version/bin/phpize
-		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
-		--enable-memcache \
-		--with-zlib-dir
+		./configure --with-php-config=$serverPath/php/$version/bin/php-config --enable-memcache --with-zlib-dir
 		make && make install && make clean
 
 	fi
@@ -56,10 +58,10 @@ Install_lib()
 		echo "ERROR!"
 		return
 	fi
-	
 	echo "" >> $serverPath/php/$version/etc/php.ini
 	echo "[${LIBNAME}]" >> $serverPath/php/$version/etc/php.ini
 	echo "extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
+	
 
 	bash ${rootPath}/plugins/php/versions/lib.sh $version restart
 	echo '==========================================================='
