@@ -17,6 +17,12 @@ sysName=`uname`
 LIBNAME=phalcon
 LIBV=0
 
+
+if [ `echo "$version > 7.4"|bc` -eq 1 ];then
+	echo "I won't support it"
+	exit 0
+fi
+
 CMD='apt '
 if [ "$actionType" == 'install' ];then
 	CMD="$CMD install -y php${version}-"
