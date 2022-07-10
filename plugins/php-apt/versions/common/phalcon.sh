@@ -19,27 +19,28 @@ LIBV=0
 
 CMD='apt '
 if [ "$actionType" == 'install' ];then
-	CMD="$CMD install -y "
+	CMD="$CMD install -y php${version}-"
 elif [ "$actionType" == 'uninstall' ];then
-	CMD="$CMD uninstall -y "
+	CMD="$CMD uninstall -y php${version}-"
 fi
 
 if [ "$version" == '5.6' ];then
-	CMD="$CMD phalcon3"
+	CMD="${CMD}phalcon3"
 elif [[ "$version" == '7.0' ]]; then
-	CMD="$CMD phalcon3"
+	CMD="${CMD}phalcon3"
 elif [[ "$version" == '7.1' ]]; then
-	CMD="$CMD phalcon3"
+	CMD="${CMD}phalcon3"
 elif [[ "$version" == '7.2' ]]; then
-	CMD="$CMD phalcon3"
+	CMD="${CMD}phalcon4"
 elif [[ "$version" == '7.3' ]]; then
-	CMD="$CMD phalcon4"
+	CMD="${CMD}phalcon3"
 elif [[ "$version" == '7.4' ]]; then
-	CMD="$CMD phalcon4"
+	CMD="${CMD}phalcon4"
 elif [[ "$version" == '8.0' ]]; then
-	CMD="$CMD phalcon4"
+	CMD="${CMD}phalcon4"
 elif [[ "$version" == '8.1' ]]; then
-	CMD="$CMD phalcon4"
+	CMD="${CMD}phalcon4"
 fi
 
 $CMD
+echo "$CMD"
