@@ -22,7 +22,9 @@ APT_INSTALL=0
 
 if [ `echo "$version < 7.0"|bc` -eq 1 ];then
 	LIBV=1.10.1
-elif [ `echo "$version < 7.2"|bc` -eq 1 ];then
+elif [ "$version" == "7.1" ];then
+	LIBV=4.5.2
+elif [ "$version" == "7.0" ];then
 	LIBV=4.3.0
 else
 	echo 'ok'
