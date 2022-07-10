@@ -29,7 +29,7 @@ if mw.isAppleSystem():
 
 
 def getPluginName():
-    return 'mysql-ya'
+    return 'mysql-yum'
 
 
 def getPluginDir():
@@ -153,7 +153,7 @@ def initDreplace(version=''):
 
     # systemd
     systemDir = '/usr/lib/systemd/system'
-    systemService = systemDir + '/mysql-ya.service'
+    systemService = systemDir + '/mysql-yum.service'
     systemServiceTpl = getPluginDir() + '/init.d/mysql.service.tpl'
     if os.path.exists(systemDir) and not os.path.exists(systemService):
         service_path = mw.getServerDir()

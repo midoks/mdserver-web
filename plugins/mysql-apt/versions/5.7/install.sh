@@ -49,35 +49,12 @@ VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -
 
 
 
-YUM_INSTALL()
-{
-#######
-
-if [ "${OSNAME}" == "centos" ];then
-	wget -O /tmp/mysql80-community-release.rpm http://repo.mysql.com/mysql80-community-release-el${VERSION}.rpm
-else
-	wget -O /tmp/mysql80-community-release.rpm http://repo.mysql.com/mysql80-community-release-el8.rpm
-fi
-rpm -ivh /tmp/mysql80-community-release.rpm
-yum -y install mysql-server
-
-rm -rf  /tmp/mysql80-community-release.rpm
-#######
-}
-
-YUM_UNINSTALL()
-{
-### YUM卸载 START ########
-yum -y remove mysql-server
-### YUM卸载 END   ########
-}
-
 
 APT_INSTALL()
 {
 ########
 wget -O /tmp/mysql-apt-config_0.8.22-1_all.deb https://repo.mysql.com/mysql-apt-config_0.8.22-1_all.deb
-apt install /tmp/mysql-apt-config_0.8.22-1_all.deb
+dpkg -i /tmp/mysql-apt-config_0.8.22-1_all.deb
 
 apt update -y
 apt install -y mysql-server
@@ -107,19 +84,14 @@ Install_mysql()
 		useradd -g mysql mysql
 	fi
 
-	isYum=`which yum`
-	if [ "$isYum" != "" ];then
-		YUM_INSTALL
-	fi
-
 	isApt=`which apt`
 	if [ "$isApt" != "" ];then
 		APT_INSTALL
 	fi
 
 	if [ "$?" == "0" ];then
-		mkdir -p $serverPath/mysql-ya
-		echo '8.0' > $serverPath/mysql-ya/version.pl
+		mkdir -p $serverPath/mysql-apt
+		echo '5.7' > $serverPath/mysql-apt/version.pl
 		echo '安装完成' > $install_tmp
 	else
 		echo "暂时不支持该系统" > $install_tmp
@@ -128,17 +100,13 @@ Install_mysql()
 
 Uninstall_mysql()
 {
-	isYum=`which yum`
-	if [ "$isYum" != "" ];then
-		YUM_UNINSTALL
-	fi
 
 	isApt=`which apt`
 	if [ "$isApt" != "" ];then
 		APT_UNINSTALL
 	fi
 
-	rm -rf $serverPath/mysql-ya
+	rm -rf $serverPath/mysql-apt
 	echo '卸载完成' > $install_tmp
 }
 
