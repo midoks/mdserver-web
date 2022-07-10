@@ -113,6 +113,12 @@ def contentReplace(content, version):
     return content
 
 
+def getDstEnablePHP(version):
+    sdir = mw.getServerDir()
+    dfile = sdir + '/web_conf/php/conf/enable-php-apt' + version + '.conf'
+    return dfile
+
+
 def makeOpConf(version):
 
     sdir = mw.getServerDir()
@@ -132,7 +138,7 @@ def makeOpConf(version):
     versions = content['versions']
     tpl = getPluginDir() + '/conf/enable-php.conf'
     tpl_content = mw.readFile(tpl)
-    dfile = sdir + '/web_conf/php/conf/enable-php-apt' + version + '.conf'
+    dfile = getDstEnablePHP(version)
     if not os.path.exists(dfile):
         w_content = contentReplace(tpl_content, version)
         mw.writeFile(dfile, w_content)
@@ -158,12 +164,9 @@ def phpFpmWwwReplace(version):
 
 
 def deleteConfList(version):
-    sdir = mw.getServerDir()
-    enable_conf = sdir + '/web_conf/php/conf/enable-php-apt' + version + '.conf'
-    clist = (enable_conf)
-    for f in clist:
-        if os.path.exists(f):
-            os.remove(f)
+    enable_conf = getDstEnablePHP(version)
+    if os.path.exists(enable_conf):
+        os.remove(enable_conf)
 
 
 def initReplace(version):
