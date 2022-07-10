@@ -17,7 +17,7 @@ sysName=`uname`
 actionType=$1
 version=$2
 
-if [ "$version" -gt "70" ];then
+if [ "$version" -ge "70" ];then
 	echo "not need"
 	exit 1
 fi
