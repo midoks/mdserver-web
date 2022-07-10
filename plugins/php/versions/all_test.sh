@@ -1,6 +1,7 @@
 #! /bin/sh
 export PATH=$PATH:/opt/local/bin:/opt/local/sbin:/opt/local/share/man:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin
 DIR=$(cd "$(dirname "$0")"; pwd)
+ROOT_DIR=$(cd "$(dirname "$0")"; pwd)
 
 # cd /www/server/mdserver-web/scripts/quick && bash debug.sh
 # cd /www/server/mdserver-web/plugins/php/versions && /bin/bash all_test.sh
@@ -34,7 +35,7 @@ PHP_VER_LIST=(53 54 55 56 70 71 72 73 74 80 81)
 for PHP_VER in ${PHP_VER_LIST[@]}; do
 	echo "php${PHP_VER} -- start"
 	if [ -d  /www/server/php/${PHP_VER} ];then
-		cd $DIR/$PHP_VER && bash install.sh install
+		cd /www/server/mdserver-web/plugins/php && bash install.sh install
 	fi
 	echo "php${PHP_VER} -- end"
 done
