@@ -13,6 +13,7 @@ serverPath=$(dirname "$rootPath")
 
 # cd /www/server/mdserver-web
 # cd /www/server/mdserver-web/plugins/php-apt/versions && /bin/bash common.sh  5.6  install yaf
+# cd /www/server/mdserver-web/plugins/php-apt/versions && /bin/bash common.sh  7.1  install swoole
 
 
 PHP_VER_LIST=(56 70 71 72 73 74 80 81)
