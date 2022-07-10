@@ -219,8 +219,7 @@ Install_app()
 {
 	echo '正在安装脚本文件...' > $install_tmp
 	mkdir -p $serverPath/source
-	mkdir -p $serverPath/mongodb
-
+	
 	if [ "macos" == "$OSNAME" ];then
 		Install_app_mac
 	else
@@ -228,6 +227,7 @@ Install_app()
 	fi
 
 	if [ "$?" == "0" ];then
+		mkdir -p $serverPath/mongodb
 		echo "${VERSION}" > $serverPath/mongodb/version.pl
 		echo '安装完成' > $install_tmp
 
