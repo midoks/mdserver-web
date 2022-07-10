@@ -13,14 +13,18 @@ sourcePath=${serverPath}/source/php
 actionType=$1
 version=$2
 
-LIBNAME=SeasLog
-_LIBNAME=$(echo $LIBNAME | tr '[A-Z]' '[a-z]')
-
 sysName=`uname`
-LIBV=2.2.0
+LIBNAME=yaf
+LIBV=4.8.10
+
+
+if [ `echo "$version < 7.0"|bc` -eq 1 ];then
+	LIBV=1.10.1
+fi
+
 
 extVer=`bash $curPath/lib.sh $version`
-extFile=/usr/lib/php/${extVer}/${_LIBNAME}.so
+extFile=/usr/lib/php/${extVer}/${LIBNAME}.so
 
 
 
@@ -34,9 +38,9 @@ Install_lib()
 {
 
 	#cat /etc/php/${version}/fpm/conf.d/* | grep -v '^;' |tr -s '\n'
-	isInstall=`cat /etc/php/${version}/fpm/conf.d/* | grep -v '^;' |tr -s '\n' |grep "${_LIBNAME}.so"`
+	isInstall=`cat /etc/php/${version}/fpm/conf.d/* | grep -v '^;' |tr -s '\n' |grep "${LIBNAME}.so"`
 	if [ "${isInstall}" != "" ];then
-		echo "php-$version 已安装${_LIBNAME},请选择其它版本!"
+		echo "php-$version 已安装${LIBNAME},请选择其它版本!"
 		return
 	fi
 	
@@ -61,10 +65,10 @@ Install_lib()
 		return;
 	fi
 
-	_LIBNAME=$(echo $LIBNAME | tr '[A-Z]' '[a-z]')
-	echo  "" >> /etc/php/${version}/fpm/conf.d/${_LIBNAME}.ini
-	echo  "[${_LIBNAME}]" >> /etc/php/${version}/fpm/conf.d/${_LIBNAME}.ini
-	echo  "extension=${_LIBNAME}.so" >> /etc/php/${version}/fpm/conf.d/${_LIBNAME}.ini
+	
+	echo  "" >> /etc/php/${version}/fpm/conf.d/${LIBNAME}.ini
+	echo  "[${LIBNAME}]" >> /etc/php/${version}/fpm/conf.d/${LIBNAME}.ini
+	echo  "extension=${LIBNAME}.so" >> /etc/php/${version}/fpm/conf.d/${LIBNAME}.ini
 	
 	systemctl restart php${version}-fpm 
 	echo '==========================================================='
@@ -78,6 +82,7 @@ Uninstall_lib()
 		echo "php-$version 未安装,请选择其它版本!"
 		return
 	fi
+
 	
 	if [ -f /etc/php/${version}/fpm/conf.d/${_LIBNAME}.ini ];then
 		rm -rf /etc/php/${version}/fpm/conf.d/${_LIBNAME}.ini

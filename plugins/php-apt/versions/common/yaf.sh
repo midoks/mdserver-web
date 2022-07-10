@@ -4,6 +4,11 @@ export PATH
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
+rootPath=$(dirname "$rootPath")
+rootPath=$(dirname "$rootPath")
+rootPath=$(dirname "$rootPath")
+serverPath=$(dirname "$rootPath")
+sourcePath=${serverPath}/source/php
 
 actionType=$1
 version=$2
@@ -79,13 +84,11 @@ Uninstall_lib()
 		return
 	fi
 
-	if [ ! -f "$extFile" ];then
-		echo "php-$version 未安装${LIBNAME},请选择其它版本!"
-		return
-	fi
 	
-	rm -rf /etc/php/${version}/fpm/conf.d/${LIBNAME}.ini
-	rm -rf $extFile
+	if [ -f /etc/php/${version}/fpm/conf.d/${_LIBNAME}.ini ];then
+		rm -rf /etc/php/${version}/fpm/conf.d/${_LIBNAME}.ini
+		rm -rf $extFile
+	fi
 
 	systemctl restart php${version}-fpm 
 	echo '==============================================='
