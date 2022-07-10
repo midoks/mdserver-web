@@ -32,6 +32,8 @@ else
 	BAK=''
 fi
 
+SORT_LIBNAME="9-${LIBNAME}"
+
 Install_lib()
 {
 
@@ -61,9 +63,9 @@ Install_lib()
 		return;
 	fi
 	
-	echo  "" >> /etc/php/${version}/fpm/conf.d/${LIBNAME}.ini
-	echo  "[${LIBNAME}]" >> /etc/php/${version}/fpm/conf.d/${LIBNAME}.ini
-	echo "zend_extension=${LIBNAME}.so" >> /etc/php/${version}/fpm/conf.d/${LIBNAME}.ini
+	echo  "" >> /etc/php/${version}/fpm/conf.d/${SORT_LIBNAME}.ini
+	echo  "[${LIBNAME}]" >> /etc/php/${version}/fpm/conf.d/${SORT_LIBNAME}.ini
+	echo "zend_extension=${LIBNAME}.so" >> /etc/php/${version}/fpm/conf.d/${SORT_LIBNAME}.ini
 	
 	systemctl restart php${version}-fpm 
 	echo '==========================================================='
@@ -79,8 +81,8 @@ Uninstall_lib()
 	fi
 
 	
-	if [ -f /etc/php/${version}/fpm/conf.d/${LIBNAME}.ini ];then
-		rm -rf /etc/php/${version}/fpm/conf.d/${LIBNAME}.ini
+	if [ -f /etc/php/${version}/fpm/conf.d/${SORT_LIBNAME}.ini ];then
+		rm -rf /etc/php/${version}/fpm/conf.d/${SORT_LIBNAME}.ini
 		rm -rf $extFile
 	fi
 
