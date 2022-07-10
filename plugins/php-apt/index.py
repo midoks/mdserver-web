@@ -116,12 +116,8 @@ def contentReplace(content, version):
 def makeOpConf(version):
 
     sdir = mw.getServerDir()
-    dst_dir = sdir + '/web_conf/php'
+
     dst_dir_conf = sdir + '/web_conf/php/conf'
-
-    if not os.path.exists(dst_dir):
-        mw.execShell('mkdir -p ' + dst_dir)
-
     if not os.path.exists(dst_dir_conf):
         mw.execShell('mkdir -p ' + dst_dir_conf)
 
