@@ -22,6 +22,7 @@ IC_VERSION=${version:0:1}.${version:1:2}
 
 if [ "$version" -gt "74" ];then
 	echo "not need"
+	exit 1
 fi
 
 
