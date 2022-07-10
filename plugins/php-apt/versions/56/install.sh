@@ -33,11 +33,11 @@ fi
 }
 
 
-# apt -y remove php5.6 php5.6-fpm php5.6-dev
+# apt -y remove php5.6 php5.6-*
 Uninstall_php()
 {
 #------------------------ uninstall start ------------------------------------#
-apt -y remove php${version} php${version}-fpm php${version}-dev
+apt -y remove php${version} php${version}-*
 rm -rf $serverPath/php-apt/${PHP_VER}
 echo "卸载php-${version}..." > $install_tmp
 #------------------------ uninstall start ------------------------------------#
