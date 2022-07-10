@@ -14,7 +14,7 @@ actionType=$1
 version=$2
 
 sysName=`uname`
-LIBNAME=yaf
+LIBNAME=swoole
 LIBV=4.8.10
 
 
