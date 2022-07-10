@@ -17,6 +17,10 @@ sysName=`uname`
 actionType=$1
 version=$2
 
+if [ "$version" -lt "70" ];then
+	LIBV=2.4.0
+fi
+
 NON_ZTS_FILENAME=`ls $serverPath/php/${version}/lib/php/extensions | grep no-debug-non-zts`
 extDir=$serverPath/php/${version}/lib/php/extensions/${NON_ZTS_FILENAME}/
 

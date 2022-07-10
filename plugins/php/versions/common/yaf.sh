@@ -19,6 +19,9 @@ sysName=`uname`
 LIBNAME=yaf
 LIBV=3.3.5
 
+if [ "$version" -lt "70" ];then
+	LIBV=2.3.5
+fi
 
 
 NON_ZTS_FILENAME=`ls $serverPath/php/${version}/lib/php/extensions | grep no-debug-non-zts`
