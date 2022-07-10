@@ -53,10 +53,6 @@ Install_lib()
 		
 		cp -rf $php_lib/ioncube/ioncube_loader_lin_${version}.so $extFile
 
-		/usr/bin/phpize${version}
-		./configure --with-php-config=/usr/bin/php-config${version}
-		make && make install && make clean
-
 	fi
 
 	echo "$extFile checking ..."
