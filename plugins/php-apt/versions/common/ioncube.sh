@@ -32,7 +32,7 @@ else
 	BAK=''
 fi
 
-SORT_LIBNAME="9-${LIBNAME}"
+SORT_LIBNAME="10-${LIBNAME}"
 
 Install_lib()
 {
