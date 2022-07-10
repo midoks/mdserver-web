@@ -67,7 +67,7 @@ Install_lib()
 	
 	echo  "" >> /etc/php/${version}/fpm/conf.d/${LIBNAME}.ini
 	echo  "[${LIBNAME}]" >> /etc/php/${version}/fpm/conf.d/${LIBNAME}.ini
-	echo "zend_extension=${LIBNAME}.so" /etc/php/${version}/fpm/conf.d/${LIBNAME}.ini
+	echo "zend_extension=${LIBNAME}.so" >> /etc/php/${version}/fpm/conf.d/${LIBNAME}.ini
 	
 	systemctl restart php${version}-fpm 
 	echo '==========================================================='
