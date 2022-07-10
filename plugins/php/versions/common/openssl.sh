@@ -39,7 +39,7 @@ Install_lib()
 	if [ "$version" -ge "70" ];then
 		cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash openssl.sh
 	else
-		cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash openssl10.sh
+		cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash openssl_10.sh
 	fi
 
 	if [ ! -f "$extFile" ];then
@@ -59,7 +59,7 @@ Install_lib()
 		else
 			export PKG_CONFIG_PATH=$serverPath/lib/openssl10/lib/pkgconfig
 		fi
-		
+
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
 		--with-openssl
