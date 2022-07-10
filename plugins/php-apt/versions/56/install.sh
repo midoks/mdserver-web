@@ -20,7 +20,7 @@ VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -
 version=5.6
 PHP_VER=56
 
-
+# apt -y install php5.6 php5.6-fpm php5.6-dev
 Install_php()
 {
 #------------------------ install start ------------------------------------#
