@@ -25,6 +25,9 @@ for PHP_VER in ${PHP_VER_LIST[@]}; do
 	echo "php${PHP_VER} -- end"
 done
 
+
+cd $curPath
+
 PHP_VER_LIST_EXT=(56 70 71 72 73 74 80 81)
 PHP_EXT_LIST=(pdo mysqlnd sqlite3 odbc opcache mcrypt fileinfo \
 	exif gd intl memcache memcached redis imagick xdebug xhprof \
