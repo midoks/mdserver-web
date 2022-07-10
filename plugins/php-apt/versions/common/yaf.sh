@@ -85,8 +85,8 @@ Uninstall_lib()
 	fi
 
 	
-	if [ -f /etc/php/${version}/fpm/conf.d/${_LIBNAME}.ini ];then
-		rm -rf /etc/php/${version}/fpm/conf.d/${_LIBNAME}.ini
+	if [ -f /etc/php/${version}/fpm/conf.d/${LIBNAME}.ini ];then
+		rm -rf /etc/php/${version}/fpm/conf.d/${LIBNAME}.ini
 		rm -rf $extFile
 	fi
 
