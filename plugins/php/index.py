@@ -738,6 +738,10 @@ def getConfAppStart():
     pstart = mw.getServerDir() + '/php/app_start.php'
     return pstart
 
+
+def installPreInspection(version):
+    return "ok"
+
 if __name__ == "__main__":
 
     if len(sys.argv) < 3:
@@ -757,6 +761,8 @@ if __name__ == "__main__":
         print(restart(version))
     elif func == 'reload':
         print(reload(version))
+    elif func == 'install_pre_inspection':
+        print(installPreInspection(version))
     elif func == 'initd_status':
         print(initdStatus(version))
     elif func == 'initd_install':
