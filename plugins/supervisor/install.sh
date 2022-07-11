@@ -16,6 +16,9 @@ OSNAME=`cat ${rootPath}/data/osname.pl`
 OSNAME_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
 
+
+source ${rootPath}/bin/activate
+
 Install_app()
 {
 	echo '正在安装脚本文件...' > $install_tmp
@@ -28,7 +31,6 @@ Install_app()
 	if [ "centos" == "$OSNAME" ] || [ "fedora" == "$OSNAME" ];then
     	pip install  supervisor
     elif [ "ubuntu" == "$OSNAME" ] || [ "debian" == "$OSNAME" ] ;then
-    	pip install supervisor
     	pip install supervisor
 	else
 		pip install supervisor
