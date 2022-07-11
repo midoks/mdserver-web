@@ -245,6 +245,10 @@ def installPreInspection(version):
         if version > 10:
             return 'mongodb[' + version + ']不支持安装在debian[' + sysId + ']'
 
+    if sysName == 'ubuntu':
+        if version < 16:
+            return 'mongodb[' + version + ']不支持安装在ubuntu[' + sysId + ']'
+
     return 'ok'
 
 if __name__ == "__main__":
