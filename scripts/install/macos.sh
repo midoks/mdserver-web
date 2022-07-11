@@ -33,7 +33,7 @@ if [ ! -d $DEV/server/mdserver-web ]; then
 fi
 
 if [ ! -d $DEV/server/lib ]; then
-	cd $DEV/server/mdserver-web/scripts && ./lib.sh
+	cd $DEV/server/mdserver-web/scripts && bash lib.sh
 fi  
 
 pip3 install mysqlclient
