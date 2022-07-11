@@ -1810,7 +1810,7 @@ def installPreInspection(version):
     sysName = sys[0].strip().lower()
     sysId = sys_id[0].strip()
 
-    if not sysName in ('centos', 'ubuntu', 'debian'):
+    if not sysName in ('centos'):
         return '暂时仅支持centos'
 
     if version == '5.7' and int(sysId) > 7:
