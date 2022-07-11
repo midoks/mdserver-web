@@ -55,7 +55,7 @@ Uninstall_app()
 		systemctl daemon-reload
 	fi
 
-	pip uninstall supervisor
+	pip uninstall supervisor -y
 
 	rm -rf $serverPath/supervisor
 
