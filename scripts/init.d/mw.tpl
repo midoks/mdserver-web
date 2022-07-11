@@ -87,7 +87,7 @@ mw_start()
 	mw_start_panel
 }
 
-
+# /www/server/mdserver-web/tmp/panelTask.pl && service mw restart_task
 mw_stop_task()
 {
     if [ -f $mw_path/tmp/panelTask.pl ];then
