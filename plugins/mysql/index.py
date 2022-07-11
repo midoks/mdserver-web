@@ -356,7 +356,6 @@ def initMysqlPwd():
     time.sleep(5)
 
     serverdir = getServerDir()
-
     pwd = mw.getRandomString(16)
     # cmd_pass = serverdir + '/bin/mysqladmin -uroot password ' + pwd
 
