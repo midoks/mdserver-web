@@ -56,7 +56,7 @@ Uninstall_app()
 
 	if [ "centos" == "$OSNAME" ] || [ "fedora" == "$OSNAME" ];then
     	yum remove supervisor -y
-    	pip uninstall  supervisor
+    	pip uninstall  supervisor -y
     elif [ "ubuntu" == "$OSNAME" ] || [ "debian" == "$OSNAME" ] ;then
     	apt remove supervisor -y 
     	pip uninstall supervisor -y
