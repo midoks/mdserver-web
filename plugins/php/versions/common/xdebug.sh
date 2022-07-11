@@ -18,7 +18,7 @@ actionType=$1
 version=$2
 
 
-if [ "$version" -lt "71" ];then
+if [ "$version" -le "71" ];then
 	LIBV=2.2.7
 fi
 
