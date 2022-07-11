@@ -41,21 +41,21 @@ apt install libnuma1
 dpkg -i mysql-common_${SUFFIX_NAME}.deb
 # dpkg-preconfigure mysql-community-server_8.0.29-1debian11_amd64.deb
 
-dpkg -i mysql-client_${SUFFIX_NAME}.deb
-dpkg -i mysql-common_${SUFFIX_NAME}.deb
-dpkg -i mysql-community-client-core_${SUFFIX_NAME}.deb
-dpkg -i mysql-community-client-plugins_${SUFFIX_NAME}.deb
-dpkg -i mysql-community-client_${SUFFIX_NAME}.deb
+# dpkg -i mysql-client_${SUFFIX_NAME}.deb
+# dpkg -i mysql-common_${SUFFIX_NAME}.deb
+# dpkg -i mysql-community-client-core_${SUFFIX_NAME}.deb
+# dpkg -i mysql-community-client-plugins_${SUFFIX_NAME}.deb
+# dpkg -i mysql-community-client_${SUFFIX_NAME}.deb
 
-dpkg -i mysql-client_${SUFFIX_NAME}.deb
-dpkg -i libmysqlclient-dev_${SUFFIX_NAME}.deb
-dpkg -i libmysqld-dev_${SUFFIX_NAME}.deb
-dpkg -i mysql-community-${SUFFIX_NAME}.deb
-dpkg -i mysql-client_${SUFFIX_NAME}.deb
-dpkg -i mysql-common_${SUFFIX_NAME}.deb
+# dpkg -i mysql-client_${SUFFIX_NAME}.deb
+# dpkg -i libmysqlclient-dev_${SUFFIX_NAME}.deb
+# dpkg -i libmysqld-dev_${SUFFIX_NAME}.deb
+# dpkg -i mysql-community-${SUFFIX_NAME}.deb
+# dpkg -i mysql-client_${SUFFIX_NAME}.deb
+# dpkg -i mysql-common_${SUFFIX_NAME}.deb
 
-apt -f install
-apt -f install libmecab2
+# apt -f install
+# apt -f install libmecab2
 
 dpkg -i mysql-community-server-core_${SUFFIX_NAME}.deb \
 mysql-community-server_${SUFFIX_NAME}.deb \
