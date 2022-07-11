@@ -28,6 +28,7 @@ VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -
 MYSQL_VER=8.0.29
 
 #exp 8.0.29-1debian11_amd64.deb
+# 8.0.29-1ubuntu18.04_amd64
 SUFFIX_NAME=${MYSQL_VER}-1${OSNAME}${VERSION_ID}_amd64
 
 APT_INSTALL()
@@ -41,12 +42,21 @@ apt update -y
 # apt upgrade -y
 apt install libnuma1
 
+# dpkg -i mysql-common_8.0.29-1ubuntu18.04_amd64.deb
+# dpkg -i mysql-community-client-plugins_8.0.29-1ubuntu18.04_amd64.deb
+# dpkg -i mysql-community-client-core_8.0.29-1ubuntu18.04_amd64.deb
+# dpkg -i mysql-community-client_8.0.29-1ubuntu18.04_amd64.deb
+# dpkg -i mysql-client_8.0.29-1ubuntu18.04_amd64.deb
+
+
 dpkg -i mysql-common_${SUFFIX_NAME}.deb
 # dpkg-preconfigure mysql-community-server_8.0.29-1debian11_amd64.deb
 
-# dpkg -i mysql-client_${SUFFIX_NAME}.deb
-# dpkg -i mysql-common_${SUFFIX_NAME}.deb
+dpkg -i mysql-community-client-plugins_${SUFFIX_NAME}.deb
 dpkg -i mysql-community-client-core_${SUFFIX_NAME}.deb
+dpkg -i mysql-community-client_${SUFFIX_NAME}.deb
+dpkg -i mysql-client_${SUFFIX_NAME}.deb
+
 # dpkg -i mysql-community-client-plugins_${SUFFIX_NAME}.deb
 # dpkg -i mysql-community-client_${SUFFIX_NAME}.deb
 
