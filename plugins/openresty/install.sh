@@ -63,9 +63,10 @@ Install_openresty()
 Uninstall_openresty()
 {
 
-	if [ -f /usr/lib/systemd/system/openresty.service ];then
+	if [ -f /usr/lib/systemd/system/openresty.service ] || [ -f /lib/systemd/system/openresty.service ];then
 		systemctl stop openresty
 		rm -rf /usr/systemd/system/openresty.service
+		rm -rf /lib/systemd/system/openresty.service
 		systemctl daemon-reload
 	fi
 
