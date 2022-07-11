@@ -7,6 +7,7 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
+# curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update_dev.sh | bash
 
 # cd /www/server/mdserver-web/plugins/mysql-apt && bash install.sh install 8.0
 # cd /www/server/mdserver-web/plugins/mysql-apt && bash install.sh uninstall 8.0

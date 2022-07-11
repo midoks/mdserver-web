@@ -25,7 +25,7 @@ VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -
 MYSQL_VER=8.0.29
 
 #exp 8.0.29-1debian11_amd64.deb
-SUFFIX_NAME=${MYSQL_VER}-1${OSNAME}{$VERSION_ID}_amd64
+SUFFIX_NAME=${MYSQL_VER}-1${OSNAME}${VERSION_ID}_amd64
 
 APT_INSTALL()
 {
