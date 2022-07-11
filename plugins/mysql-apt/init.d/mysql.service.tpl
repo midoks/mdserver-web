@@ -1,63 +1,50 @@
-# It's not recommended to modify this file in-place, because it will be
-# overwritten during package upgrades.  If you want to customize, the
-# best way is to use systemctl edit:
+# Copyright (c) 2015, 2022, Oracle and/or its affiliates.
 #
-# $ systemctl edit mysqld.service
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License, version 2.0,
+# as published by the Free Software Foundation.
 #
-# this will create file
+# This program is also distributed with certain software (including
+# but not limited to OpenSSL) that is licensed under separate terms,
+# as designated in a particular file or component or in included license
+# documentation.  The authors of MySQL hereby grant you an additional
+# permission to link the program and your derivative works with the
+# separately licensed software that they have included with MySQL.
 #
-#  /etc/systemd/system/mysqld.service.d/override.conf
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License, version 2.0, for more details.
 #
-# which be parsed after the file mysqld.service itself is parsed.
-#
-# For example, if you want to increase mysql's open-files-limit to 20000
-# add following when editing with command above:
-#
-#	[Service]
-#	LimitNOFILE=20000
-#
-# Or if you require to execute pre and post scripts in the unit file as root, set
-#       PermissionsStartOnly=true
-#
-# For more info about custom unit files, see systemd.unit(5) or
-# http://fedoraproject.org/wiki/Systemd#How_do_I_customize_a_unit_file.2F_add_a_custom_unit_file.3F
-#
-# Don't forget to reload systemd daemon after you change unit configuration:
-# root> systemctl --system daemon-reload
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA
+
+# MySQL systemd service file
 
 [Unit]
-Description=MySQL 8.0 database server
-After=syslog.target
+Description=MySQL Community Server
+Documentation=man:mysqld(8)
+Documentation=http://dev.mysql.com/doc/refman/en/using-systemd.html
 After=network.target
-
-[Service]
-Type=notify
-User=mysql
-Group=mysql
-
-ExecStartPre=/usr/libexec/mysql-check-socket
-ExecStartPre=/usr/libexec/mysql-prepare-db-dir %n
-# Note: we set --basedir to prevent probes that might trigger SELinux alarms,
-# per bug #547485
-ExecStart=/usr/libexec/mysqld --defaults-file={$SERVER_PATH}/mysql-ya/etc/my.cnf --basedir=/usr --user=mysql
-ExecStartPost=/usr/libexec/mysql-check-upgrade
-ExecStopPost=/usr/libexec/mysql-wait-stop
-
-# Give a reasonable amount of time for the server to start up/shut down
-TimeoutSec=300
-
-# Place temp files in a secure directory, not /tmp
-PrivateTmp=false
-
-Restart=on-failure
-
-RestartPreventExitStatus=1
-
-# Sets open_files_limit
-LimitNOFILE = 10000
-
-# Set enviroment variable MYSQLD_PARENT_PID. This is required for SQL restart command.
-Environment=MYSQLD_PARENT_PID=1
 
 [Install]
 WantedBy=multi-user.target
+
+[Service]
+User=mysql
+Group=mysql
+Type=notify
+ExecStartPre=+/usr/share/mysql-8.0/mysql-systemd-start pre
+ExecStart=/usr/sbin/mysqld
+TimeoutSec=0
+LimitNOFILE = 10000
+Restart=on-failure
+RestartPreventExitStatus=1
+
+# Always restart when mysqld exits with exit code of 16. This special exit code
+# is used by mysqld for RESTART SQL.
+RestartForceExitStatus=16
+
+# Set enviroment variable MYSQLD_PARENT_PID. This is required for restart.
+Environment=MYSQLD_PARENT_PID=1

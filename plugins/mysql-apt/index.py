@@ -262,6 +262,7 @@ def initMysql57Data():
         serverdir = getServerDir()
         myconf = serverdir + "/etc/my.cnf"
         user = pGetDbUser()
+
         cmd = 'mysqld --defaults-file=' + myconf + \
             ' --initialize-insecure --explicit_defaults_for_timestamp'
         mw.execShell(cmd)
@@ -270,12 +271,23 @@ def initMysql57Data():
 
 
 def initMysql8Data():
+    '''
+    chmod 644 /www/server/mysql-apt/etc/my.cnf
+    try:
+    mysqld --basedir=/usr  --datadir=/www/server/mysql-apt/data --initialize-insecure
+    mysqld --defaults-file=/www/server/mysql-apt/etc/my.cnf --initialize-insecure
+    mysqld --initialize-insecure
+    '''
     datadir = getDataDir()
     if not os.path.exists(datadir + '/mysql'):
         serverdir = getServerDir()
         user = pGetDbUser()
+
         cmd = 'mysqld --basedir=/usr --datadir=' + datadir + ' --initialize-insecure'
-        mw.execShell(cmd)
+        data = mw.execShell(cmd)
+        if data[1].find('ERROR') != -1:
+            exit("Init MySQL{} Data Error".format(8))
+
         mw.execShell('chown -R mysql mysql ' + getServerDir())
         return False
     return True
