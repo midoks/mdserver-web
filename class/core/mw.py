@@ -92,9 +92,12 @@ def triggerTask():
 
 
 def systemdCfgDir():
+    # ubuntu
     cfg_dir = '/lib/systemd/system'
     if os.path.exists(cfg_dir):
         return cfg_dir
+
+    # debian,centos
     return "/usr/lib/systemd/system"
 
 
