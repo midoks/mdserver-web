@@ -370,7 +370,7 @@ def initMysqlPwd():
         pwd + "') WHERE user='root';"
     cmd_pass = cmd_pass + "flush privileges;\""
     data = mw.execShell(cmd_pass)
-    print(data)
+    # print(data)
     pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
     return True
 
@@ -388,13 +388,13 @@ def initMysql8Pwd():
         "alter user 'root'@'localhost' IDENTIFIED WITH mysql_native_password by '" + pwd + "';"
     alter_root_pwd = alter_root_pwd + "flush privileges;"
 
-    cmd_pass = serverdir + '/bin/mysqladmin -uroot password root'
-    data = mw.execShell(cmd_pass)
+    # cmd_pass = serverdir + '/bin/mysqladmin -uroot password root'
+    # data = mw.execShell(cmd_pass)
     # print(data)
 
     tmp_file = "/tmp/mysql_init_tmp.log"
     mw.writeFile(tmp_file, alter_root_pwd)
-    cmd_pass = serverdir + '/bin/mysql -uroot -proot < ' + tmp_file
+    cmd_pass = serverdir + '/bin/mysql -uroot -p < ' + tmp_file
 
     data = mw.execShell(cmd_pass)
     # print(data)
