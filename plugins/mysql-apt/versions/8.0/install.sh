@@ -13,85 +13,57 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sysName=`uname`
 
-
 install_tmp=${rootPath}/tmp/mw_install.pl
 mysqlDir=${serverPath}/source/mysql
 
-
-_os=`uname`
-if [ ${_os} == "Darwin" ]; then
-    OSNAME='macos'
-elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
-    OSNAME='centos'
-elif grep -Eqi "Rocky" /etc/issue || grep -Eq "Rocky" /etc/*-release; then
-    OSNAME='rocky'
-elif grep -Eqi "Red Hat Enterprise Linux Server" /etc/issue || grep -Eq "Red Hat Enterprise Linux Server" /etc/*-release; then
-    OSNAME='rhel'
-elif grep -Eqi "Aliyun" /etc/issue || grep -Eq "Aliyun" /etc/*-release; then
-    OSNAME='aliyun'
-elif grep -Eqi "Fedora" /etc/issue || grep -Eq "Fedora" /etc/*-release; then
-    OSNAME='fedora'
-elif grep -Eqi "Amazon Linux AMI" /etc/issue || grep -Eq "Amazon Linux AMI" /etc/*-release; then
-    OSNAME='amazon'
-elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
-    OSNAME='debian'
-elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
-    OSNAME='ubuntu'
-elif grep -Eqi "Raspbian" /etc/issue || grep -Eq "Raspbian" /etc/*-release; then
-    OSNAME='raspbian'
-elif grep -Eqi "Deepin" /etc/issue || grep -Eq "Deepin" /etc/*-release; then
-    OSNAME='deepin'
-else
-    OSNAME='unknow'
-fi
-
+bash ${rootPath}/scripts/getos.sh
+OSNAME=`cat ${rootPath}/data/osname.pl`
 VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
 
 
+MYSQL_VER=8.0.29
+
+#exp 8.0.29-1debian11_amd64.deb
+SUFFIX_NAME=${MYSQL_VER}-1${OSNAME}{$VERSION_ID}_amd64
+
 APT_INSTALL()
 {
 ########
-wget -O /tmp/mysql-server_8.0.29-1debian11_amd64.deb-bundle.tar https://cdn.mysql.com//Downloads/MySQL-8.0/mysql-server_8.0.29-1debian11_amd64.deb-bundle.tar
-chmod +x /tmp/mysql-server_8.0.29-1debian11_amd64.deb-bundle.tar
-tar vxf /tmp/mysql-server_8.0.29-1debian11_amd64.deb-bundle.tar
+wget -O /tmp/mysql-server_${SUFFIX_NAME}.deb-bundle.tar https://cdn.mysql.com//Downloads/MySQL-8.0/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
+chmod +x /tmp/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
+tar vxf /tmp/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
 
 apt update -y
 apt upgrade -y
 apt install libnuma1
 
-dpkg -i mysql-common_8.0.29-1debian11_amd64.deb
+dpkg -i mysql-common_${SUFFIX_NAME}.deb
 # dpkg-preconfigure mysql-community-server_8.0.29-1debian11_amd64.deb
 
+dpkg -i mysql-client_${SUFFIX_NAME}.deb
+dpkg -i mysql-common_${SUFFIX_NAME}.deb
+dpkg -i mysql-community-client-core_${SUFFIX_NAME}.deb
+dpkg -i mysql-community-client-plugins_${SUFFIX_NAME}.deb
+dpkg -i mysql-community-client_${SUFFIX_NAME}.deb
 
-dpkg -i mysql-client_8.0.29-1debian11_amd64.deb
-dpkg -i mysql-common_8.0.29-1debian11_amd64.deb
-dpkg -i mysql-community-client-core_8.0.29-1debian11_amd64.deb
-dpkg -i mysql-community-client-plugins_8.0.29-1debian11_amd64.deb
-dpkg -i mysql-community-client_8.0.29-1debian11_amd64.deb
-
-dpkg -i mysql-client_8.0.29-1debian11_amd64.deb
-dpkg -i libmysqlclient-dev_8.0.29-1debian11_amd64.deb
-dpkg -i libmysqld-dev_8.0.29-1debian11_amd64.deb
-dpkg -i mysql-community-client_8.0.29-1debian11_amd64.deb
-dpkg -i mysql-client_8.0.29-1debian11_amd64.deb
-dpkg -i mysql-common_8.0.29-1debian11_amd64.deb
-
+dpkg -i mysql-client_${SUFFIX_NAME}.deb
+dpkg -i libmysqlclient-dev_${SUFFIX_NAME}.deb
+dpkg -i libmysqld-dev_${SUFFIX_NAME}.deb
+dpkg -i mysql-community-${SUFFIX_NAME}.deb
+dpkg -i mysql-client_${SUFFIX_NAME}.deb
+dpkg -i mysql-common_${SUFFIX_NAME}.deb
 
 apt -f install
 apt -f install libmecab2
 
+dpkg -i mysql-community-server-core_${SUFFIX_NAME}.deb \
+mysql-community-server_${SUFFIX_NAME}.deb \
+mysql-server_${SUFFIX_NAME}.deb
 
-dpkg -i mysql-community-server-core_8.0.29-1debian11_amd64.deb \
-mysql-community-server_8.0.29-1debian11_amd64.deb \
-mysql-server_8.0.29-1debian11_amd64.deb
-dpkg -i mysql-server_8.0.29-1debian11_amd64.deb
-
-
-apt -f install
-
-apt install -y mysql-server
-
+# dpkg -i mysql-server_${SUFFIX_NAME}.deb
+# apt -f install
+# apt install -y mysql-server
 # rm -rf /tmp/mysql-server_8.0.29-1debian11_amd64.deb-bundle.tar
 #######
 }
