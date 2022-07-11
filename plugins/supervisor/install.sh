@@ -26,10 +26,8 @@ Install_app()
 
 	echo 'supervisor install...'
 	if [ "centos" == "$OSNAME" ] || [ "fedora" == "$OSNAME" ];then
-    	yum install supervisor -y
     	pip install  supervisor
     elif [ "ubuntu" == "$OSNAME" ] || [ "debian" == "$OSNAME" ] ;then
-    	apt install supervisor -y 
     	pip install supervisor
 	else
 		pip install supervisor
@@ -54,16 +52,7 @@ Uninstall_app()
 		systemctl daemon-reload
 	fi
 
-	if [ "centos" == "$OSNAME" ] || [ "fedora" == "$OSNAME" ];then
-    	yum remove supervisor -y
-    	pip uninstall  supervisor -y
-    elif [ "ubuntu" == "$OSNAME" ] || [ "debian" == "$OSNAME" ] ;then
-    	apt remove supervisor -y 
-    	pip uninstall supervisor -y
-	else
-		pip uninstall supervisor -y
-    	# brew install supervisor
-	fi
+	pip uninstall supervisor -y
 
 	rm -rf $serverPath/supervisor
 
