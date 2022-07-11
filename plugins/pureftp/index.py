@@ -117,7 +117,7 @@ def initDreplace():
         mw.writeFile(pureFtpdConfig, content)
 
      # systemd
-    systemDir = '/usr/lib/systemd/system'
+    systemDir = mw.systemdCfgDir()
     systemService = systemDir + '/pureftp.service'
     systemServiceTpl = getPluginDir() + '/init.d/pureftp.service.tpl'
 

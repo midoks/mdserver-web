@@ -104,7 +104,7 @@ def initDreplace():
         mw.writeFile(dst_conf_init, 'ok')
 
     # systemd
-    systemDir = '/usr/lib/systemd/system'
+    systemDir = mw.systemdCfgDir()
     systemService = systemDir + '/redis.service'
     systemServiceTpl = getPluginDir() + '/init.d/redis.service.tpl'
     if os.path.exists(systemDir) and not os.path.exists(systemService):

@@ -147,7 +147,7 @@ def initDreplace():
         mw.writeFile(getServerDir() + '/sphinx.conf', conf_content)
 
     # systemd
-    systemDir = '/usr/lib/systemd/system'
+    systemDir = mw.systemdCfgDir()
     systemService = systemDir + '/sphinx.service'
     systemServiceTpl = getPluginDir() + '/init.d/sphinx.service.tpl'
     if os.path.exists(systemDir) and not os.path.exists(systemService):

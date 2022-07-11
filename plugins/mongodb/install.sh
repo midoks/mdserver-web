@@ -63,7 +63,7 @@ if [ -f /usr/lib/systemd/system/mongod.service ];then
 fi
 
 wget -qO - https://www.mongodb.org/static/pgp/server-${VERSION}.asc | sudo apt-key add -
-sudo apt install gnupg
+apt install -y gnupg
 touch /etc/apt/sources.list.d/mongodb-org-${VERSION}.list
 lsb_release -dc
 

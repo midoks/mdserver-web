@@ -81,7 +81,7 @@ def initDreplace():
 
     confD = getServerDir() + "/conf.d"
     conf = getServerDir() + "/supervisor.conf"
-    systemDir = '/lib/systemd/system'
+    systemDir = mw.systemdCfgDir()
     systemService = systemDir + '/supervisor.service'
     systemServiceTpl = getPluginDir() + '/init.d/supervisor.service'
 

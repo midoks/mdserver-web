@@ -91,6 +91,13 @@ def triggerTask():
     writeFile(isTask, 'True')
 
 
+def systemdCfgDir():
+    cfg_dir = '/usr/lib/systemd/user'
+    if os.path.exists(cfg_dir):
+        return cfg_dir
+    return "/usr/lib/systemd/system"
+
+
 def getOs():
     return sys.platform
 

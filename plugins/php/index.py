@@ -253,7 +253,7 @@ def initReplace(version):
         mw.execShell('chown -R www:www ' + upload_path)
 
     # systemd
-    systemDir = '/usr/lib/systemd/system'
+    systemDir = mw.systemdCfgDir()
     systemService = systemDir + '/php' + version + '.service'
     systemServiceTpl = getPluginDir() + '/init.d/php.service.tpl'
     if version == '52':

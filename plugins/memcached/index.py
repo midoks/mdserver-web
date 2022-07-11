@@ -104,7 +104,7 @@ def initDreplace():
         mw.execShell('chmod +x ' + file_bin)
 
     # systemd
-    systemDir = '/usr/lib/systemd/system'
+    systemDir = mw.systemdCfgDir()
     systemService = systemDir + '/memcached.service'
     systemServiceTpl = getPluginDir() + '/init.d/memcached.service.tpl'
     if os.path.exists(systemDir) and not os.path.exists(systemService):
