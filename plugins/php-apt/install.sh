@@ -18,6 +18,17 @@ else
 	useradd -g www -s /bin/bash www
 fi
 
+_os=`uname`
+if [ ${_os} == "Darwin" ]; then
+    OSNAME='macos'
+elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
+    OSNAME='debian'
+elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
+    OSNAME='ubuntu'
+else
+    OSNAME='unknow'
+fi
+
 action=$1
 type=$2
 
@@ -32,9 +43,13 @@ if [ ! -d $curPath/versions/$2 ];then
 fi
 
 
+
+if [ "$OSNAME" == "ubuntu" ];then
+	echo "y" | add-apt-repository ppa:ondrej/php && apt update -y
+fi
 # apt install $(grep-aptavail -S PHP-defaults -s Package -n)
 
-if [ ! -f /etc/apt/sources.list.d/php.list ];then
+if [ ! -f /etc/apt/sources.list.d/php.list ] && [ "$OSNAME" == "debian" ];then
 # install php source
 
 apt update -y
@@ -44,7 +59,6 @@ sh -c 'echo "deb [signed-by=/usr/share/keyrings/deb.sury.org-php.gpg] https://pa
 apt update -y
 
 fi 
-
 
 
 if [ "${action}" == "uninstall" ] && [ -d ${serverPath}/php-apt/${type} ];then
