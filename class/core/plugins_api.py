@@ -511,6 +511,7 @@ class plugins_api:
             "setup_version": "",
             "status": False,
             "install_pre_inspection": False,
+            "uninstall_pre_inspection": False,
         }
 
         if checks.find('VERSION') > -1:
@@ -536,6 +537,10 @@ class plugins_api:
 
         if 'install_pre_inspection' in info:
             pInfo['install_pre_inspection'] = info['install_pre_inspection']
+        if 'uninstall_pre_inspection' in info:
+            pInfo['uninstall_pre_inspection'] = info[
+                'uninstall_pre_inspection']
+
         pInfo['status'] = False
         return pInfo
 

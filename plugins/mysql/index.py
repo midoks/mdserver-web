@@ -1896,6 +1896,11 @@ def fullSync(version=''):
 
     return json.dumps({'code': 0, 'msg': '点击开始,开始同步!', 'progress': 0})
 
+
+def uninstallPreInspection(version):
+    # return "请手动删除MySQL[{}]".format(version)
+    return 'ok'
+
 if __name__ == "__main__":
     func = sys.argv[1]
 
@@ -1919,6 +1924,8 @@ if __name__ == "__main__":
         print(initdInstall())
     elif func == 'initd_uninstall':
         print(initdUinstall())
+    elif func == 'uninstall_pre_inspection':
+        print(uninstallPreInspection(version))
     elif func == 'run_info':
         print(runInfo())
     elif func == 'db_status':
