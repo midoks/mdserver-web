@@ -89,7 +89,7 @@ Install_mysql()
 		-DCMAKE_C_COMPILER=/usr/bin/gcc \
 		-DCMAKE_CXX_COMPILER=/usr/bin/g++ \
 		-DWITH_BOOST=${mysqlDir}/mysql-${VERSION}/boost/
-		make clean && make && make install && make clean
+		make && make install && make clean
 
 		if [ -d $serverPath/mysql ];then
 			echo '5.7' > $serverPath/mysql/version.pl

@@ -21,10 +21,11 @@ version=7.2
 PHP_VER=72
 
 
+# apt -y install php7.2 php7.2-fpm php7.2-dev
 Install_php()
 {
 #------------------------ install start ------------------------------------#
-apt -y install php${version} php${version}-fpm
+apt -y install php${version} php${version}-fpm php${version}-dev
 if [ "$?" == "0" ];then
 	mkdir -p $serverPath/php-apt/${PHP_VER}
 fi
@@ -32,10 +33,12 @@ fi
 #------------------------ install end ------------------------------------#
 }
 
+# systemctl status php7.2-fpm
+# apt -y remove php7.2 php7.2-fpm php7.2-dev
 Uninstall_php()
 {
 #------------------------ uninstall start ------------------------------------#
-apt -y remove php${version} php${version}-fpm
+apt -y remove php${version} php${version}-*
 rm -rf $serverPath/php-apt/${PHP_VER}
 echo "卸载php-${version}..." > $install_tmp
 #------------------------ uninstall start ------------------------------------#

@@ -104,7 +104,7 @@ function getSList(isdisplay) {
 
                 var mupdate = '';//(plugin.versions[n] == plugin.updates[n]) '' : '<a class="btlink" onclick="softUpdate(\'' + plugin.name + '\',\'' + plugin.versions[n].version + '\',\'' + plugin.updates[n] + '\')">更新</a> | ';
                 // if (plugin.versions[n] == '') mupdate = '';
-                handle = mupdate + '<a class="btlink" onclick="softMain(\'' + plugin.name + '\',\'' + plugin.setup_version + '\')">设置</a> | <a class="btlink" onclick="uninstallVersion(\'' + plugin.name + '\',\'' + plugin.setup_version + '\')">卸载</a>';
+                handle = mupdate + '<a class="btlink" onclick="softMain(\'' + plugin.name + '\',\'' + plugin.setup_version + '\')">设置</a> | <a class="btlink" onclick="uninstallVersion(\'' + plugin.name + '\',\'' + plugin.setup_version + '\',' + plugin.uninstall_pre_inspection +')">卸载</a>';
                 titleClick = 'onclick="softMain(\'' + plugin.name + '\',\'' + plugin.setup_version + '\')" style="cursor:pointer"';
              
                 softPath = '<span class="glyphicon glyphicon-folder-open" title="' + plugin.path + '" onclick="openPath(\'' + plugin.path + '\')"></span>';
@@ -173,7 +173,6 @@ function installPreInspection(name, ver, callback){
             layer.msg(rdata.data, { icon: rdata.status ? 1 : 2 });
         }
     },'json');
-    
 }
 
 function runInstall(data){
@@ -214,9 +213,9 @@ function addVersion(name, ver, type, obj, title, install_pre_inspection) {
                 $(this).attr('checked', 'checked').parent().siblings().find("input").removeAttr('checked');
             });
             installTips();
-            // fly("layui-layer-btn0");
         },
-        yes:function(e){
+        yes:function(index,layero){
+            // console.log(index,layero)
             var info = $("#selectVersion").val().toLowerCase();
             if (info == ''){
                 info = $("#selectVersion").text().toLowerCase();
@@ -230,18 +229,36 @@ function addVersion(name, ver, type, obj, title, install_pre_inspection) {
                 //安装检查
                 installPreInspection(name, version, function(){
                     runInstall(data);
-                    fly("layui-layer-btn0",e);
+                    flySlow('layui-layer-btn0');
                 });      
                 return;
             }
             runInstall(data);
-            fly("layui-layer-btn0",e);
+            flySlow('layui-layer-btn0');
+            
         }
     });
 }
 
 //卸载软件
-function uninstallVersion(name, version) {
+function uninstallPreInspection(name, ver, callback){
+    var loading = layer.msg('正在检查卸载环境...', { icon: 16, time: 0, shade: [0.3, '#000'] });
+     $.post("/plugins/run", {'name':name,'version':ver,'func':'uninstall_pre_inspection'}, function(rdata) {
+        layer.close(loading);
+        if (rdata.status){
+            if (rdata.data == 'ok'){
+                callback();
+            } else {
+                layer.msg(rdata.data, { icon: 2 });
+            }
+        } else {
+            layer.msg(rdata.data, { icon: rdata.status ? 1 : 2 });
+        }
+    },'json');
+}
+
+
+function runUninstallVersion(name, version){
     layer.confirm(msgTpl('您真的要卸载[{1}-{2}]吗?', [name, version]), { icon: 3, closeBtn: 2 }, function() {
         var data = 'name=' + name + '&version=' + version;
         var loadT = layer.msg('正在处理,请稍候...', { icon: 16, time: 0, shade: [0.3, '#000'] });
@@ -251,6 +268,17 @@ function uninstallVersion(name, version) {
             layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
         },'json');
     });
+}
+
+
+function uninstallVersion(name, version,uninstall_pre_inspection) {
+    if (uninstall_pre_inspection) {
+        uninstallPreInspection(name,version,function(){
+            runUninstallVersion(name,version);
+        });
+        return;
+    }
+    runUninstallVersion(name,version);
 }
 
 

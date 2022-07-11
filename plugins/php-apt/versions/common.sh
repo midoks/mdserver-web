@@ -12,6 +12,12 @@ version=$1
 action=$2
 extName=$3
 
+which bc
+if [ "$?" != "0" ];then
+	apt install -y bc
+fi
+
+
 # echo $1,$2,$3
 
 # echo $curPath
@@ -24,10 +30,11 @@ FILE_COMMON=${curPath}/common/${extName}.sh
 # apt install -y php81-php-yar
 
 
+
 if [ "$action" == 'install' ];then
 	
 	if [ -f $FILE ];then
-		bash ${curPath}/${version}/${extName}.sh install
+		bash ${curPath}/${version}/${extName}.sh install $version
 	elif [ -f $FILE_COMMON ];then
 		bash ${FILE_COMMON} install ${version}
 	else
@@ -39,7 +46,7 @@ fi
 # apt remove -y php81-php-yar
 if [ "$action" == 'uninstall' ];then
 	if [ -f $FILE ];then
-		bash ${curPath}/${version}/${extName}.sh uninstall
+		bash ${curPath}/${version}/${extName}.sh uninstall $version
 	elif [ -f $FILE_COMMON ];then
 		bash ${FILE_COMMON} uninstall ${version}
 	else

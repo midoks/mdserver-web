@@ -20,11 +20,11 @@ VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -
 version=5.6
 PHP_VER=56
 
-
+# apt -y install php5.6 php5.6-fpm php5.6-dev
 Install_php()
 {
 #------------------------ install start ------------------------------------#
-apt -y install php${version} php${version}-fpm
+apt -y install php${version} php${version}-fpm php${version}-dev
 if [ "$?" == "0" ];then
 	mkdir -p $serverPath/php-apt/${PHP_VER}
 fi
@@ -32,10 +32,12 @@ fi
 #------------------------ install end ------------------------------------#
 }
 
+
+# apt -y remove php5.6 php5.6-*
 Uninstall_php()
 {
 #------------------------ uninstall start ------------------------------------#
-apt -y remove php${version} php${version}-fpm
+apt -y remove php${version} php${version}-*
 rm -rf $serverPath/php-apt/${PHP_VER}
 echo "卸载php-${version}..." > $install_tmp
 #------------------------ uninstall start ------------------------------------#

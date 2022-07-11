@@ -34,13 +34,13 @@ Install_varnish()
 	echo '正在安装脚本文件...' > $install_tmp
 	mkdir -p $serverPath/source
 
-	if [ ${OSNAME} == "macos" ]; then
+	if [ "${OSNAME}" == "macos" ]; then
 		brew install varnish
-	elif [ ${OSNAME} == "centos" ]; then
+	elif [ "${OSNAME}" == "centos" ]; then
 		yum install varnish -y
-	elif [ ${OSNAME} == "debian" ] || [ ${OSNAME} == "ubuntu" ]; then
+	elif [ "${OSNAME}" == "debian" ] || [ "${OSNAME}" == "ubuntu" ]; then
 		apt install varnish -y
-	elif [ ${OSNAME} == "opensuse" ];then
+	elif [ "${OSNAME}" == "opensuse" ];then
 		zypper install -y varnish
 	else
 		echo "I won't support it"
@@ -60,13 +60,13 @@ Uninstall_varnish()
 	cd ${rootPath} && python3 ${rootPath}/plugins/varnish/index.py stop
 	cd ${rootPath} && python3 ${rootPath}/plugins/varnish/index.py initd_uninstall
 
-	if [ ${OSNAME} == "macos" ]; then
+	if [ "${OSNAME}" == "macos" ]; then
 		brew uninstall varnish
-	elif [ ${OSNAME} == "centos" ]; then
+	elif [ "${OSNAME}" == "centos" ]; then
 		yum remove varnish -y
-	elif [ ${OSNAME} == "debian" ] || [ ${OSNAME} == "ubuntu" ]; then
+	elif [ "${OSNAME}" == "debian" ] || [ "${OSNAME}" == "ubuntu" ]; then
 		apt remove varnish -y
-	elif [ ${OSNAME} == "opensuse" ];then
+	elif [ "${OSNAME}" == "opensuse" ];then
 		zypper remove -y varnish
 	else
 		echo "I won't support it"

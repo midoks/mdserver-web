@@ -16,25 +16,9 @@ VERSION=$2
 sysName=`uname`
 echo "use system: ${sysName}"
 
-if [ ${sysName} == "Darwin" ]; then
-	OSNAME='macos'
-elif grep -Eq "openSUSE" /etc/*-release; then
-	OSNAME='opensuse'
-elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
-	OSNAME='centos'
-elif grep -Eqi "Fedora" /etc/issue || grep -Eq "Fedora" /etc/*-release; then
-	OSNAME='fedora'
-elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
-	OSNAME='debian'
-elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
-	OSNAME='ubuntu'
-else
-	OSNAME='unknow'
-fi
-
-
+bash ${rootPath}/scripts/getos.sh
+OSNAME=`cat ${rootPath}/data/osname.pl`
 SYS_VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
-
 
 
 Install_app_mac()
@@ -57,17 +41,31 @@ if [ "$SYS_VERSION_ID" == "22" ]; then
 fi
 
 
-if [ -f /usr/lib/systemd/system/mongod.service ];then
-	echo 'alreay exist!'
-	exit 0
+
+
+echo $SYS_VERSION_ID
+
+SOURCE_NAME=bionic
+if [ "$SYS_VERSION_ID" == "18.04" ];then
+	SOURCE_NAME=bionic
+elif [ "$SYS_VERSION_ID" == "16.04" ];then
+	SOURCE_NAME=xenial
+elif [ "$SYS_VERSION_ID" == "20.04" ];then
+	SOURCE_NAME=focal
 fi
 
+# wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
+# apt install -y gnupg
+# touch /etc/apt/sources.list.d/mongodb-org-4.4.list
+# echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
+
+
 wget -qO - https://www.mongodb.org/static/pgp/server-${VERSION}.asc | sudo apt-key add -
-sudo apt install gnupg
+apt install -y gnupg
 touch /etc/apt/sources.list.d/mongodb-org-${VERSION}.list
 lsb_release -dc
 
-echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/${VERSION} multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-${VERSION}.list
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu ${SOURCE_NAME}/mongodb-org/${VERSION} multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-${VERSION}.list
 
 apt update -y
 apt install -y mongodb-org
@@ -77,7 +75,13 @@ apt install -y mongodb-org
 
 Uninstall_Linux_Ubuntu()
 {
-systemctl stop mongod
+	
+if [ -f /lib/systemd/system/mongod.service ] || [ -f /usr/lib/systemd/system/mongod.service ] ;then
+	systemctl stop mongod
+fi
+
+
+
 apt purge -y mongodb-org*
 apt autoremove -y
 rm -r /var/log/mongodb
@@ -219,8 +223,7 @@ Install_app()
 {
 	echo '正在安装脚本文件...' > $install_tmp
 	mkdir -p $serverPath/source
-	mkdir -p $serverPath/mongodb
-
+	
 	if [ "macos" == "$OSNAME" ];then
 		Install_app_mac
 	else
@@ -228,6 +231,7 @@ Install_app()
 	fi
 
 	if [ "$?" == "0" ];then
+		mkdir -p $serverPath/mongodb
 		echo "${VERSION}" > $serverPath/mongodb/version.pl
 		echo '安装完成' > $install_tmp
 

@@ -1,6 +1,3 @@
-orPluginService('openresty');
-
-
 function orPost(method, args, callback){
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
     $.post('/plugins/run', {name:'openresty', func:method, args:JSON.stringify(args)}, function(data) {

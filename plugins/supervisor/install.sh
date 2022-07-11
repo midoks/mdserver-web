@@ -11,24 +11,13 @@ install_tmp=${rootPath}/tmp/mw_install.pl
 VERSION=$2
 
 
-sysName=`uname`
-echo "use system: ${sysName}"
+bash ${rootPath}/scripts/getos.sh
+OSNAME=`cat ${rootPath}/data/osname.pl`
+OSNAME_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
-if [ ${sysName} == "Darwin" ]; then
-	OSNAME='macos'
-elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
-	OSNAME='centos'
-elif grep -Eqi "Fedora" /etc/issue || grep -Eq "Fedora" /etc/*-release; then
-	OSNAME='fedora'
-elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
-	OSNAME='debian'
-elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
-	OSNAME='ubuntu'
-elif grep -Eqi "Raspbian" /etc/issue || grep -Eq "Raspbian" /etc/*-release; then
-	OSNAME='raspbian'
-else
-	OSNAME='unknow'
-fi
+
+
+source ${rootPath}/bin/activate
 
 Install_app()
 {
@@ -40,13 +29,11 @@ Install_app()
 
 	echo 'supervisor install...'
 	if [ "centos" == "$OSNAME" ] || [ "fedora" == "$OSNAME" ];then
-    	# yum install supervisor -y
     	pip install  supervisor
     elif [ "ubuntu" == "$OSNAME" ] || [ "debian" == "$OSNAME" ] ;then
-    	# apt install supervisor -y 
-    	pip install  supervisor
+    	pip install supervisor
 	else
-		pip install  supervisor
+		pip install supervisor
     	# brew install supervisor
 	fi
 
@@ -59,14 +46,16 @@ Install_app()
 
 Uninstall_app()
 {
-	
 
-	if [ -f /usr/lib/systemd/system/supervisor.service ];then
+	if [ -f /usr/lib/systemd/system/supervisor.service ] || [ -f /lib/systemd/system/supervisor.service ];then
 		systemctl stop supervisor
 		systemctl disable supervisor
 		rm -rf /usr/lib/systemd/system/supervisor.service
+		rm -rf /lib/systemd/system/supervisor.service
 		systemctl daemon-reload
 	fi
+
+	pip uninstall supervisor -y
 
 	rm -rf $serverPath/supervisor
 

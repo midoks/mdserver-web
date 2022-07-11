@@ -14,5 +14,7 @@
 
 </div>
 <script type="text/javascript">
-$.getScript( "/plugins/file?name=openresty&f=js/openresty.js");
+$.getScript( "/plugins/file?name=openresty&f=js/openresty.js", function(){
+	orPluginService('openresty');
+});
 </script>

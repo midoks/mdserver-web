@@ -27,6 +27,13 @@ else
 	BAK=''
 fi
 
+OPTIONS=''
+if [ "$version" -lt "71" ];then
+	cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash icu.sh
+	OPTIONS="--with-icu-dir=${serverPath}/lib/icu"
+fi
+
+
 Install_lib()
 {
 
@@ -45,7 +52,7 @@ Install_lib()
 		cd $sourcePath/php${version}/ext/${LIBNAME}
 		
 		$serverPath/php/$version/bin/phpize
-		./configure --with-php-config=$serverPath/php/$version/bin/php-config
+		./configure --with-php-config=$serverPath/php/$version/bin/php-config $OPTIONS
 
 		make && make install && make clean
 		

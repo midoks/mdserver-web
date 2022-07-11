@@ -21,6 +21,10 @@ if [ "$version" -lt "70" ];then
 	LIBV=2.2.7
 fi
 
+if [ "$version" -eq "70" ] || [ "$version" -eq "71" ];then
+	LIBV=2.7.0
+fi
+
 NON_ZTS_FILENAME=`ls $serverPath/php/${version}/lib/php/extensions | grep no-debug-non-zts`
 extFile=$serverPath/php/${version}/lib/php/extensions/${NON_ZTS_FILENAME}/${LIBNAME}.so
 

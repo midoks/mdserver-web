@@ -19,6 +19,11 @@ version=$2
 LIBNAME=exif
 LIBV=0
 
+if [ "$version" == "53" ];then
+	echo "i wont support it"
+	exit
+fi
+
 NON_ZTS_FILENAME=`ls $serverPath/php/${version}/lib/php/extensions | grep no-debug-non-zts`
 extFile=$serverPath/php/${version}/lib/php/extensions/${NON_ZTS_FILENAME}/${LIBNAME}.so
 

@@ -253,7 +253,7 @@ def initReplace(version):
         mw.execShell('chown -R www:www ' + upload_path)
 
     # systemd
-    systemDir = '/usr/lib/systemd/system'
+    systemDir = mw.systemdCfgDir()
     systemService = systemDir + '/php' + version + '.service'
     systemServiceTpl = getPluginDir() + '/init.d/php.service.tpl'
     if version == '52':
@@ -738,6 +738,31 @@ def getConfAppStart():
     pstart = mw.getServerDir() + '/php/app_start.php'
     return pstart
 
+
+def installPreInspection(version):
+    # 仅对PHP52检查
+    if version != '52':
+        return 'ok'
+
+    sys = mw.execShell(
+        "cat /etc/*-release | grep PRETTY_NAME |awk -F = '{print $2}' | awk -F '\"' '{print $2}'| awk '{print $1}'")
+
+    if sys[1] != '':
+        return '不支持改系统'
+
+    sys_id = mw.execShell(
+        "cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F '\"' '{print $2}'")
+
+    sysName = sys[0].strip().lower()
+    sysId = sys_id[0].strip()
+
+    if sysName == 'ubuntu':
+        return 'ubuntu已经安装不了'
+
+    if sysName == 'debian' and sys_id > 10:
+        return 'debian10可以安装'
+    return 'ok'
+
 if __name__ == "__main__":
 
     if len(sys.argv) < 3:
@@ -757,6 +782,8 @@ if __name__ == "__main__":
         print(restart(version))
     elif func == 'reload':
         print(reload(version))
+    elif func == 'install_pre_inspection':
+        print(installPreInspection(version))
     elif func == 'initd_status':
         print(initdStatus(version))
     elif func == 'initd_install':

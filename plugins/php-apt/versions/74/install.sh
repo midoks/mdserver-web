@@ -24,7 +24,7 @@ PHP_VER=74
 Install_php()
 {
 #------------------------ install start ------------------------------------#
-apt -y install php${version} php${version}-fpm
+apt -y install php${version} php${version}-fpm php${version}-dev
 if [ "$?" == "0" ];then
 	mkdir -p $serverPath/php-apt/${PHP_VER}
 fi
@@ -35,7 +35,7 @@ fi
 Uninstall_php()
 {
 #------------------------ uninstall start ------------------------------------#
-apt -y remove php${version} php${version}-fpm
+apt -y remove php${version} php${version}-*
 rm -rf $serverPath/php-apt/${PHP_VER}
 echo "卸载php-${version}..." > $install_tmp
 #------------------------ uninstall start ------------------------------------#

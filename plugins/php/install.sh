@@ -33,10 +33,11 @@ fi
 
 if [ "${action}" == "uninstall" ];then
 	
-	if [ -f /usr/lib/systemd/system/php${type}.service ];then
+	if [ -f /usr/lib/systemd/system/php${type}.service ] || [ -f /lib/systemd/system/php${type}.service ] ;then
 		systemctl stop php${type}
 		systemctl disable php${type}
 		rm -rf /usr/lib/systemd/system/php${type}.service
+		rm -rf /lib/systemd/system/php${type}.service
 		systemctl daemon-reload
 	fi
 fi

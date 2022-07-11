@@ -224,6 +224,33 @@ def runLog():
 
     return "/var/log/mongodb/mongod.log"
 
+
+def installPreInspection(version):
+    sys = mw.execShell(
+        "cat /etc/*-release | grep PRETTY_NAME |awk -F = '{print $2}' | awk -F '\"' '{print $2}'| awk '{print $1}'")
+
+    if sys[1] != '':
+        return '暂时不支持该系统'
+
+    sys_id = mw.execShell(
+        "cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F '\"' '{print $2}'")
+
+    sysName = sys[0].strip().lower()
+    sysId = sys_id[0].strip()
+
+    if not sysName in ('centos', 'ubuntu', 'debian'):
+        return '暂时仅支持centos,ubuntu,debian'
+
+    if sysName == 'debian':
+        if version > 10:
+            return 'mongodb[' + version + ']不支持安装在debian[' + sysId + ']'
+
+    if sysName == 'ubuntu':
+        if version < 16:
+            return 'mongodb[' + version + ']不支持安装在ubuntu[' + sysId + ']'
+
+    return 'ok'
+
 if __name__ == "__main__":
     func = sys.argv[1]
 

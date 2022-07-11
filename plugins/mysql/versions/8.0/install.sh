@@ -148,7 +148,7 @@ Install_mysql()
 		-DCMAKE_C_COMPILER=$WHERE_DIR_GCC \
 		-DCMAKE_CXX_COMPILER=$WHERE_DIR_GPP \
 		-DWITH_BOOST=${mysqlDir}/mysql-${VERSION}/boost/
-		make clean && make && make install && make clean
+		make && make install && make clean
 
 		if [ -d $serverPath/mysql ];then
 			echo '8.0' > $serverPath/mysql/version.pl

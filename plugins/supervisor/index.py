@@ -81,7 +81,7 @@ def initDreplace():
 
     confD = getServerDir() + "/conf.d"
     conf = getServerDir() + "/supervisor.conf"
-    systemDir = '/lib/systemd/system'
+    systemDir = mw.systemdCfgDir()
     systemService = systemDir + '/supervisor.service'
     systemServiceTpl = getPluginDir() + '/init.d/supervisor.service'
 
@@ -103,7 +103,8 @@ def initDreplace():
         mw.writeFile(conf, conf_content)
 
     if os.path.exists(systemDir) and not os.path.exists(systemService):
-        supervisord_bin = mw.execShell('which supervisord')[0].strip()
+        supervisord_bin = mw.execShell(
+            'source ' + mw.getServerDir() + '/mdserver-web/bin/activate' + '&& which supervisord')[0].strip()
         se_content = mw.readFile(systemServiceTpl)
         se_content = se_content.replace('{$SERVER_PATH}', service_path)
         se_content = se_content.replace('{$SUP_BIN}', supervisord_bin)
@@ -114,74 +115,40 @@ def initDreplace():
 
 
 def supOp(method):
-    pass
+    initDreplace()
+
+    if not mw.isAppleSystem():
+        data = mw.execShell('systemctl ' + method + ' supervisor')
+        if data[1] == '':
+            return 'ok'
+        return data[1]
+
+    if method in ('reload', 'restart'):
+        return ok
+
+    cmd = 'supervisord -c ' + getServerDir() + '/supervisor.conf'
+    if method == 'stop':
+        cmd = "ps -ef|grep supervisor | grep -v grep | grep -v index.py | awk '{print $2}'|xargs kill"
+    data = mw.execShell(cmd)
+    if data[1] == '':
+        return 'ok'
+    return data[1]
 
 
 def start():
-    initDreplace()
-
-    systemDir = '/lib/systemd/system'
-    systemService = systemDir + '/supervisor.service'
-    if os.path.exists(systemService):
-        data = mw.execShell('systemctl start supervisor')
-        if data[1] == '':
-            return 'ok'
-        return 'fail'
-
-    cmd = 'supervisord -c ' + getServerDir() + '/supervisor.conf'
-    # print(cmd)
-    data = mw.execShell(cmd)
-    # print(data)
-    if data[1] == '':
-        return 'ok'
-    return 'fail'
+    return supOp('start')
 
 
 def stop():
-    initDreplace()
-
-    systemDir = '/lib/systemd/system'
-    systemService = systemDir + '/supervisor.service'
-    if os.path.exists(systemService):
-        data = mw.execShell('systemctl stop supervisor')
-        if data[1] == '':
-            return 'ok'
-        return 'fail'
-
-    mw.execShell(
-        "ps -ef|grep supervisor | grep -v grep | grep -v index.py | awk '{print $2}'|xargs kill")
-    if data[1] == '':
-        return 'ok'
-    return 'fail'
+    return supOp('stop')
 
 
 def restart():
-    systemDir = '/lib/systemd/system'
-    systemService = systemDir + '/supervisor.service'
-    if os.path.exists(systemService):
-        data = mw.execShell('systemctl restart supervisor')
-        if data[1] == '':
-            return 'ok'
-        return 'fail'
-
-    mw.execShell(
-        "ps -ef|grep supervisor | grep -v grep | grep -v index.py | awk '{print $2}'|xargs kill")
-    return start()
+    return supOp('restart')
 
 
 def reload():
-
-    systemDir = '/usr/lib/systemd/system'
-    systemService = systemDir + '/supervisor.service'
-    if os.path.exists(systemService):
-        data = mw.execShell('systemctl reload supervisor')
-        if data[1] == '':
-            return 'ok'
-        return 'fail'
-
-    mw.execShell(
-        "ps -ef|grep supervisor | grep -v grep | grep -v index.py | awk '{print $2}'|xargs kill")
-    return start()
+    return supOp('reload')
 
 
 def initdStatus():

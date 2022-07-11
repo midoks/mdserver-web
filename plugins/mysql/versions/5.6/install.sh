@@ -73,8 +73,7 @@ Install_mysql()
 		$OPTIONS \
 		-DCMAKE_C_COMPILER=/usr/bin/gcc \
 		-DCMAKE_CXX_COMPILER=/usr/bin/g++
-		
-		make clean && make && make install && make clean
+		make && make install && make clean
 
 
 		if [ -d $serverPath/mysql ];then

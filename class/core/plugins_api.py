@@ -392,12 +392,29 @@ class plugins_api:
         else:
             return False
 
+    # 还无法正常运行,先保留
+    def checkStatusThreadsCallback(self, info, i):
+        if not info['setup']:
+            return False
+
+        try:
+            data = self.callback(info['name'], 'status', info['setup_version'])
+        except Exception as e:
+            data = self.callback(info['name'], 'status')
+
+        # data = self.run(info['name'], 'status', info['setup_version'])
+        if data[0] == 'start':
+            return True
+        else:
+            return False
+
     def checkStatusMThreads(self, plugins_info):
         try:
             threads = []
             ntmp_list = range(len(plugins_info))
             for i in ntmp_list:
-                t = pa_thread(self.checkStatusThreads, (plugins_info[i], i))
+                t = pa_thread(self.checkStatusThreads,
+                              (plugins_info[i], i))
                 threads.append(t)
 
             for i in ntmp_list:
@@ -494,6 +511,7 @@ class plugins_api:
             "setup_version": "",
             "status": False,
             "install_pre_inspection": False,
+            "uninstall_pre_inspection": False,
         }
 
         if checks.find('VERSION') > -1:
@@ -519,6 +537,10 @@ class plugins_api:
 
         if 'install_pre_inspection' in info:
             pInfo['install_pre_inspection'] = info['install_pre_inspection']
+        if 'uninstall_pre_inspection' in info:
+            pInfo['uninstall_pre_inspection'] = info[
+                'uninstall_pre_inspection']
+
         pInfo['status'] = False
         return pInfo
 

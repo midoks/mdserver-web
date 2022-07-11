@@ -20,6 +20,12 @@ actionType=$1
 version=$2
 IC_VERSION=${version:0:1}.${version:1:2}
 
+if [ "$version" -gt "74" ];then
+	echo "not need"
+	exit 1
+fi
+
+
 NON_ZTS_FILENAME=`ls $serverPath/php/${version}/lib/php/extensions | grep no-debug-non-zts`
 extDir=$serverPath/php/${version}/lib/php/extensions/${NON_ZTS_FILENAME}
 extFile=${extDir}/${LIBNAME}.so

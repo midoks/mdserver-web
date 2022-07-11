@@ -826,15 +826,14 @@ function installTips() {
 // 	});
 // };
 
-function fly(a,e) {
+function flySlow(a) {
 	var b = $("#task").offset();
-	var e = $("." + a);
-	var d = e;
 	var c = $('<span class="yuandian"></span>');
+	var d = $("." + a);
 	c.fly({
 		start: {
-			left: d.pageX,
-			top: d.pageY
+			left: d.offset().left,
+			top: d.offset().top,
 		},
 		end: {
 			left: b.left + 10,
@@ -842,10 +841,12 @@ function fly(a,e) {
 			width: 0,
 			height: 0
 		},
+		speed: 0.65,
 		onEnd: function() {
 			layer.closeAll();
 			layer.msg(lan.bt.task_add, {icon: 1});
 			getTaskCount();
+			$('.yuandian').remove();
 		}
 	});
 	
