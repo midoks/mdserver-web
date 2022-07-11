@@ -146,7 +146,7 @@ def stop():
         data = mw.execShell('systemctl stop supervisor')
         if data[1] == '':
             return 'ok'
-        return 'fail'
+        return data[1]
 
     mw.execShell(
         "ps -ef|grep supervisor | grep -v grep | grep -v index.py | awk '{print $2}'|xargs kill")
