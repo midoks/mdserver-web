@@ -16,25 +16,9 @@ VERSION=$2
 sysName=`uname`
 echo "use system: ${sysName}"
 
-if [ ${sysName} == "Darwin" ]; then
-	OSNAME='macos'
-elif grep -Eq "openSUSE" /etc/*-release; then
-	OSNAME='opensuse'
-elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
-	OSNAME='centos'
-elif grep -Eqi "Fedora" /etc/issue || grep -Eq "Fedora" /etc/*-release; then
-	OSNAME='fedora'
-elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
-	OSNAME='debian'
-elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
-	OSNAME='ubuntu'
-else
-	OSNAME='unknow'
-fi
-
-
+bash ${rootPath}/scripts/getos.sh
+OSNAME=`cat ${rootPath}/data/osname.pl`
 SYS_VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
-
 
 
 Install_app_mac()
@@ -61,6 +45,11 @@ if [ -f /usr/lib/systemd/system/mongod.service ];then
 	echo 'alreay exist!'
 	exit 0
 fi
+# wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
+# apt install -y gnupg
+# touch /etc/apt/sources.list.d/mongodb-org-4.4.list
+# echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
+
 
 wget -qO - https://www.mongodb.org/static/pgp/server-${VERSION}.asc | sudo apt-key add -
 apt install -y gnupg
