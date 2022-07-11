@@ -92,7 +92,7 @@ def triggerTask():
 
 
 def systemdCfgDir():
-    cfg_dir = '/usr/lib/systemd/user'
+    cfg_dir = '/lib/systemd/system'
     if os.path.exists(cfg_dir):
         return cfg_dir
     return "/usr/lib/systemd/system"

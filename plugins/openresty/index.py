@@ -174,6 +174,7 @@ def initDreplace():
         confReplace()
 
     # systemd
+    # /usr/lib/systemd/system
     systemDir = mw.systemdCfgDir()
     systemService = systemDir + '/openresty.service'
     systemServiceTpl = getPluginDir() + '/init.d/openresty.service.tpl'
