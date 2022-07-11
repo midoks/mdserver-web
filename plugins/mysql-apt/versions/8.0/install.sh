@@ -54,7 +54,7 @@ apt install -y libnuma1 libaio1 libmecab2
 dpkg -i mysql-common_${SUFFIX_NAME}.deb
 
 # dpkg-preconfigure mysql-community-server_8.0.29-1ubuntu18.04_amd64.deb
-
+export DEBIAN_FRONTEND=noninteractive
 dpkg -i mysql-community-client-plugins_${SUFFIX_NAME}.deb
 dpkg -i mysql-community-client-core_${SUFFIX_NAME}.deb
 dpkg -i mysql-community-client_${SUFFIX_NAME}.deb
