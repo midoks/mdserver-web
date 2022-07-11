@@ -120,9 +120,7 @@ def supOp(method):
 def start():
     initDreplace()
 
-    systemDir = mw.systemdCfgDir()
-    systemService = systemDir + '/supervisor.service'
-    if os.path.exists(systemService):
+    if not mw.isAppleSystem():
         data = mw.execShell('systemctl start supervisor')
         if data[1] == '':
             return 'ok'
