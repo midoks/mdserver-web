@@ -7,7 +7,7 @@
 
 ```
 cd /www/server/mdserver-web/scripts/quick && bash debug.sh
-cd /www/server/mdserver-web/plugins/php && bash all_test.sh
+cd /www/server/mdserver-web/plugins/php/versions && bash all_test.sh
 ```
 
 
