@@ -120,7 +120,7 @@ def supOp(method):
 def start():
     initDreplace()
 
-    systemDir = '/lib/systemd/system'
+    systemDir = mw.systemdCfgDir()
     systemService = systemDir + '/supervisor.service'
     if os.path.exists(systemService):
         data = mw.execShell('systemctl start supervisor')
