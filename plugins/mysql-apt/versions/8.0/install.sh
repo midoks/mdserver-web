@@ -35,7 +35,7 @@ chmod +x /tmp/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
 tar vxf /tmp/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
 
 apt update -y
-apt upgrade -y
+# apt upgrade -y
 apt install libnuma1
 
 dpkg -i mysql-common_${SUFFIX_NAME}.deb
