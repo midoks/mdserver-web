@@ -21,6 +21,9 @@ OSNAME=`cat ${rootPath}/data/osname.pl`
 VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
 
+# curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update_dev.sh | bash
+
+# cd /www/server/mdserver-web/plugins/mysql-apt && bash install.sh install 8.0
 
 MYSQL_VER=8.0.29
 
@@ -43,7 +46,7 @@ dpkg -i mysql-common_${SUFFIX_NAME}.deb
 
 # dpkg -i mysql-client_${SUFFIX_NAME}.deb
 # dpkg -i mysql-common_${SUFFIX_NAME}.deb
-# dpkg -i mysql-community-client-core_${SUFFIX_NAME}.deb
+dpkg -i mysql-community-client-core_${SUFFIX_NAME}.deb
 # dpkg -i mysql-community-client-plugins_${SUFFIX_NAME}.deb
 # dpkg -i mysql-community-client_${SUFFIX_NAME}.deb
 
@@ -57,9 +60,9 @@ dpkg -i mysql-common_${SUFFIX_NAME}.deb
 # apt -f install
 # apt -f install libmecab2
 
-dpkg -i mysql-community-server-core_${SUFFIX_NAME}.deb \
-mysql-community-server_${SUFFIX_NAME}.deb \
-mysql-server_${SUFFIX_NAME}.deb
+dpkg -i mysql-community-server-core_${SUFFIX_NAME}.deb
+dpkg -i mysql-community-server_${SUFFIX_NAME}.deb
+dpkg -i mysql-server_${SUFFIX_NAME}.deb
 
 # dpkg -i mysql-server_${SUFFIX_NAME}.deb
 # apt -f install
