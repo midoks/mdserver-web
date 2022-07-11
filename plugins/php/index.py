@@ -757,7 +757,7 @@ def installPreInspection(version):
     sysId = sys_id[0].strip()
 
     if sysName == 'ubuntu':
-        return '已经安装不了'
+        return 'ubuntu已经安装不了'
 
     if sysName == 'debian' and sys_id > 10:
         return 'debian10可以安装'
