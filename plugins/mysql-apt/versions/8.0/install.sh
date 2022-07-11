@@ -21,6 +21,7 @@ OSNAME=`cat ${rootPath}/data/osname.pl`
 VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
 
+# curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/install_dev.sh | bash
 # curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update_dev.sh | bash
 
 # cd /www/server/mdserver-web/plugins/mysql-apt && bash install.sh install 8.0
@@ -40,8 +41,9 @@ tar vxf /tmp/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
 
 apt update -y
 # apt upgrade -y
-apt install libnuma1
+apt install -y libnuma1 libaio1 libmecab2
 
+# 手动调试
 # dpkg -i mysql-common_8.0.29-1ubuntu18.04_amd64.deb
 # dpkg -i mysql-community-client-plugins_8.0.29-1ubuntu18.04_amd64.deb
 # dpkg -i mysql-community-client-core_8.0.29-1ubuntu18.04_amd64.deb
@@ -50,7 +52,8 @@ apt install libnuma1
 
 
 dpkg -i mysql-common_${SUFFIX_NAME}.deb
-# dpkg-preconfigure mysql-community-server_8.0.29-1debian11_amd64.deb
+
+# dpkg-preconfigure mysql-community-server_8.0.29-1ubuntu18.04_amd64.deb
 
 dpkg -i mysql-community-client-plugins_${SUFFIX_NAME}.deb
 dpkg -i mysql-community-client-core_${SUFFIX_NAME}.deb
