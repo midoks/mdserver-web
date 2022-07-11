@@ -41,10 +41,7 @@ if [ "$SYS_VERSION_ID" == "22" ]; then
 fi
 
 
-if [ -f /usr/lib/systemd/system/mongod.service ];then
-	echo 'alreay exist!'
-	exit 0
-fi
+
 
 echo $SYS_VERSION_ID
 
@@ -78,7 +75,13 @@ apt install -y mongodb-org
 
 Uninstall_Linux_Ubuntu()
 {
-systemctl stop mongod
+	
+if [ -f /lib/systemd/system/mongod.service ] || [ -f /usr/lib/systemd/system/mongod.service ] ;then
+	systemctl stop mongod
+fi
+
+
+
 apt purge -y mongodb-org*
 apt autoremove -y
 rm -r /var/log/mongodb
