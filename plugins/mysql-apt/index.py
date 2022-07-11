@@ -147,7 +147,7 @@ def initDreplace(version=''):
         mw.writeFile(mysql_conf, content)
 
     # systemd
-    systemDir = '/usr/lib/systemd/system'
+    systemDir = mw.systemdCfgDir()
     systemService = systemDir + '/mysql-apt.service'
     systemServiceTpl = getPluginDir() + '/init.d/mysql.service.tpl'
     if os.path.exists(systemDir) and not os.path.exists(systemService):
