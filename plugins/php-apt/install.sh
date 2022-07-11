@@ -45,7 +45,7 @@ fi
 
 
 if [ "$OSNAME" == "ubuntu" ];then
-	echo "y" | add-apt-repository ppa:ondrej/php && apt update -y
+	echo "y" | LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php && apt update -y
 fi
 # apt install $(grep-aptavail -S PHP-defaults -s Package -n)
 
