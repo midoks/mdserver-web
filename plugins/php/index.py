@@ -740,7 +740,28 @@ def getConfAppStart():
 
 
 def installPreInspection(version):
-    return "ok"
+    # 仅对PHP52检查
+    if version != '52':
+        return 'ok'
+
+    sys = mw.execShell(
+        "cat /etc/*-release | grep PRETTY_NAME |awk -F = '{print $2}' | awk -F '\"' '{print $2}'| awk '{print $1}'")
+
+    if sys[1] != '':
+        return '不支持改系统'
+
+    sys_id = mw.execShell(
+        "cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F '\"' '{print $2}'")
+
+    sysName = sys[0].strip().lower()
+    sysId = sys_id[0].strip()
+
+    if sysName == 'ubuntu':
+        return '已经安装不了'
+
+    if sysName == 'debian' and sys_id > 10:
+        return 'debian10可以安装'
+    return 'ok'
 
 if __name__ == "__main__":
 
