@@ -114,72 +114,40 @@ def initDreplace():
 
 
 def supOp(method):
-    pass
-
-
-def start():
     initDreplace()
 
     if not mw.isAppleSystem():
-        data = mw.execShell('systemctl start supervisor')
+        data = mw.execShell('systemctl ' + method + ' supervisor')
         if data[1] == '':
             return 'ok'
         return data[1]
 
+    if method in ('reload', 'restart'):
+        return ok
+
     cmd = 'supervisord -c ' + getServerDir() + '/supervisor.conf'
-    # print(cmd)
+    if method == 'stop':
+        cmd = "ps -ef|grep supervisor | grep -v grep | grep -v index.py | awk '{print $2}'|xargs kill"
     data = mw.execShell(cmd)
-    # print(data)
     if data[1] == '':
         return 'ok'
-    return 'fail'
+    return data[1]
+
+
+def start():
+    return supOp('start')
 
 
 def stop():
-    initDreplace()
-
-    systemDir = '/lib/systemd/system'
-    systemService = systemDir + '/supervisor.service'
-    if os.path.exists(systemService):
-        data = mw.execShell('systemctl stop supervisor')
-        if data[1] == '':
-            return 'ok'
-        return data[1]
-
-    mw.execShell(
-        "ps -ef|grep supervisor | grep -v grep | grep -v index.py | awk '{print $2}'|xargs kill")
-    if data[1] == '':
-        return 'ok'
-    return 'fail'
+    return supOp('stop')
 
 
 def restart():
-    systemDir = '/lib/systemd/system'
-    systemService = systemDir + '/supervisor.service'
-    if os.path.exists(systemService):
-        data = mw.execShell('systemctl restart supervisor')
-        if data[1] == '':
-            return 'ok'
-        return 'fail'
-
-    mw.execShell(
-        "ps -ef|grep supervisor | grep -v grep | grep -v index.py | awk '{print $2}'|xargs kill")
-    return start()
+    return supOp('restart')
 
 
 def reload():
-
-    systemDir = '/usr/lib/systemd/system'
-    systemService = systemDir + '/supervisor.service'
-    if os.path.exists(systemService):
-        data = mw.execShell('systemctl reload supervisor')
-        if data[1] == '':
-            return 'ok'
-        return 'fail'
-
-    mw.execShell(
-        "ps -ef|grep supervisor | grep -v grep | grep -v index.py | awk '{print $2}'|xargs kill")
-    return start()
+    return supOp('reload')
 
 
 def initdStatus():
