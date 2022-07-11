@@ -54,15 +54,14 @@ Uninstall_app()
 		systemctl daemon-reload
 	fi
 
-	pip uninstall supervisor -y
 	if [ "centos" == "$OSNAME" ] || [ "fedora" == "$OSNAME" ];then
     	yum remove supervisor -y
     	pip uninstall  supervisor
     elif [ "ubuntu" == "$OSNAME" ] || [ "debian" == "$OSNAME" ] ;then
     	apt remove supervisor -y 
-    	pip uninstall supervisor
+    	pip uninstall supervisor -y
 	else
-		pip uninstall supervisor
+		pip uninstall supervisor -y
     	# brew install supervisor
 	fi
 
