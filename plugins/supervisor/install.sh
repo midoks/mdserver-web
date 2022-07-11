@@ -45,7 +45,6 @@ Install_app()
 
 Uninstall_app()
 {
-	
 
 	if [ -f /usr/lib/systemd/system/supervisor.service ] || [ -f /lib/systemd/system/supervisor.service ];then
 		systemctl stop supervisor
