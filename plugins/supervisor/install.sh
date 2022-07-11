@@ -29,6 +29,7 @@ Install_app()
     	pip install  supervisor
     elif [ "ubuntu" == "$OSNAME" ] || [ "debian" == "$OSNAME" ] ;then
     	pip install supervisor
+    	pip install supervisor
 	else
 		pip install supervisor
     	# brew install supervisor
