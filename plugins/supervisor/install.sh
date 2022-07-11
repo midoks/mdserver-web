@@ -30,9 +30,9 @@ Install_app()
     	pip install  supervisor
     elif [ "ubuntu" == "$OSNAME" ] || [ "debian" == "$OSNAME" ] ;then
     	# apt install supervisor -y 
-    	pip install  supervisor
+    	pip install supervisor
 	else
-		pip install  supervisor
+		pip install supervisor
     	# brew install supervisor
 	fi
 
@@ -54,6 +54,8 @@ Uninstall_app()
 		rm -rf /lib/systemd/system/supervisor.service
 		systemctl daemon-reload
 	fi
+
+	pip uninstall supervisor
 
 	rm -rf $serverPath/supervisor
 
