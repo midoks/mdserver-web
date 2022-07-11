@@ -45,6 +45,18 @@ if [ -f /usr/lib/systemd/system/mongod.service ];then
 	echo 'alreay exist!'
 	exit 0
 fi
+
+echo $SYS_VERSION_ID
+
+SOURCE_NAME=bionic
+if [ "$SYS_VERSION_ID" == "18.04" ];then
+	SOURCE_NAME=bionic
+elif [ "$SYS_VERSION_ID" == "16.04" ];then
+	SOURCE_NAME=xenial
+elif [ "$SYS_VERSION_ID" == "20.04" ];then
+	SOURCE_NAME=focal
+fi
+
 # wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
 # apt install -y gnupg
 # touch /etc/apt/sources.list.d/mongodb-org-4.4.list
@@ -56,7 +68,7 @@ apt install -y gnupg
 touch /etc/apt/sources.list.d/mongodb-org-${VERSION}.list
 lsb_release -dc
 
-echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/${VERSION} multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-${VERSION}.list
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu ${SOURCE_NAME}/mongodb-org/${VERSION} multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-${VERSION}.list
 
 apt update -y
 apt install -y mongodb-org
