@@ -78,12 +78,33 @@ def getFpmConfFile(version):
     return getServerDir() + '/' + version + '/etc/php-fpm.d/www.conf'
 
 
-def status(version):
+def status_progress(version):
     # ps -ef|grep 'php/81' |grep -v grep | grep -v python | awk '{print $2}
     cmd = "ps -ef|grep 'php/" + version + \
         "' |grep -v grep | grep -v python | awk '{print $2}'"
     data = mw.execShell(cmd)
     if data[0] == '':
+        return 'stop'
+    return 'start'
+
+
+def getPhpSocket(version):
+    path = getFpmConfFile(version)
+    content = mw.readFile(path)
+    rep = 'listen\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
+
+
+def status(version):
+    '''
+    sock文件判断是否启动
+    '''
+    sock = getPhpSocket(version)
+    if sock.find(':'):
+        return status_progress(version)
+
+    if not os.path.exists(sock):
         return 'stop'
     return 'start'
 
