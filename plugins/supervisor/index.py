@@ -126,7 +126,7 @@ def start():
         data = mw.execShell('systemctl start supervisor')
         if data[1] == '':
             return 'ok'
-        return 'fail'
+        return data[1]
 
     cmd = 'supervisord -c ' + getServerDir() + '/supervisor.conf'
     # print(cmd)
