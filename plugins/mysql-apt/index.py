@@ -63,11 +63,6 @@ def is_number(s):
 def getArgs():
     args = sys.argv[2:]
 
-    # print(args)
-
-    # if is_number(args):
-    #     args = sys.argv[3:]
-
     tmp = {}
     args_len = len(args)
 
@@ -236,25 +231,6 @@ def setSkipGrantTables(v):
     mw.writeFile(conf, con)
     return True
 
-
-# def getErrorLog():
-#     args = getArgs()
-#     path = getDataDir()
-#     filename = ''
-#     for n in os.listdir(path):
-#         if len(n) < 5:
-#             continue
-#         if n == 'error.log':
-#             filename = path + '/' + n
-#             break
-#     # print filename
-#     if not os.path.exists(filename):
-#         return mw.returnJson(False, '指定文件不存在!')
-#     if 'close' in args:
-#         mw.writeFile(filename, '')
-#         return mw.returnJson(False, '日志已清空')
-#     info = mw.getNumLines(filename, 18)
-#     return mw.returnJson(True, 'OK', info)
 
 def getErrorLog():
     file = getConf()
