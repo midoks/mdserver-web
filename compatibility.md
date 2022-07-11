@@ -19,8 +19,9 @@ cd /www/server/mdserver-web/plugins/php/versions && bash all_test.sh
 | CentOS 9 Stream 	|✅				|✅				|
 | Debian 10.3 		|✅				|✅				|
 | Debian 11.3 		|✅				|✅				|
-| Ubuntu 10.04 		|✅				|✅				|
-| Ubuntu 11.3 		|✅				|✅				|	
+| Ubuntu 18.04 		|✅				|✅				|
+| Ubuntu 20.04 		|✅				|✅				|
+| Ubuntu 22.04 		|✅				|✅				|	
 | Fedora 31 		|✅				|✅				|
 | Fedora 32 		|✅				|✅				|
 | AlmaLinix 9 		|✅				|✅				|
@@ -37,8 +38,9 @@ cd /www/server/mdserver-web/plugins/php/versions && bash all_test.sh
 | CentOS 9 Stream 	|:x:	|:x:	|:x:	|:x:	|:x:	|:x:	|:x:	|:x:	|:x:	|:x:	|:x:	|:x:	|
 | Debian 10.3 		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
 | Debian 11.3 		|:x:	|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
-| Ubuntu 10.04 		|:x:	|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
-| Ubuntu 11.3 		|:x:	|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
+| Ubuntu 18.04 		|:x:	|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
+| Ubuntu 20.04 		|:x:	|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
+| Ubuntu 22.04 		|:x:	|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
 | Fedora 31 		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
 | Fedora 32 		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
 | AlmaLinix 9 		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
@@ -55,8 +57,9 @@ cd /www/server/mdserver-web/plugins/php/versions && bash all_test.sh
 | CentOS 9 Stream 	|✅			|:x:		|:x:		|:x:		|
 | Debian 10.3 		|✅			|✅			|✅			|:x:		|	
 | Debian 11.3 		|✅			|✅			|✅			|✅			|
-| Ubuntu 10.04 		|✅			|✅			|✅			|✅			|	
-| Ubuntu 11.3 		|✅			|✅			|✅			|✅			|
+| Ubuntu 18.04 		|✅			|✅			|✅			|✅			|	
+| Ubuntu 20.04 		|✅			|✅			|✅			|✅			|
+| Ubuntu 22.04 		|✅			|✅			|✅			|✅			|
 | Fedora 31 		|✅			|✅			|✅			|✅			|	
 | Fedora 32 		|✅			|✅			|✅			|✅			|	
 | AlmaLinix 9 		|✅			|✅			|✅			|✅			|	
