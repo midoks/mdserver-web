@@ -567,20 +567,22 @@ def setDbStatus():
 
 def isSqlError(mysqlMsg):
     # 检测数据库执行错误
-    mysqlMsg = str(mysqlMsg)
-    if "MySQLdb" in mysqlMsg:
+    errMsg = str(mysqlMsg)
+    if "MySQLdb" in errMsg:
         return mw.returnJson(False, 'MySQLdb组件缺失! <br>进入SSH命令行输入: pip install mysql-python | pip install mysqlclient==2.0.3')
-    if "2002," in mysqlMsg:
+    if "2002," in errMsg:
         return mw.returnJson(False, '数据库连接失败,请检查数据库服务是否启动!')
-    if "2003," in mysqlMsg:
+    if "2003," in errMsg:
         return mw.returnJson(False, "Can't connect to MySQL server on '127.0.0.1' (61)")
-    if "using password:" in mysqlMsg:
+    if "1698," in errMsg:
+        return mw.returnJson(False, data[1])
+    if "using password:" in errMsg:
         return mw.returnJson(False, '数据库管理密码错误!')
-    if "Connection refused" in mysqlMsg:
+    if "Connection refused" in errMsg:
         return mw.returnJson(False, '数据库连接失败,请检查数据库服务是否启动!')
-    if "1133" in mysqlMsg:
+    if "1133" in errMsg:
         return mw.returnJson(False, '数据库用户不存在!')
-    if "1007" in mysqlMsg:
+    if "1007" in errMsg:
         return mw.returnJson(False, '数据库已经存在!')
     return None
 
