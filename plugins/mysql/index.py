@@ -386,6 +386,9 @@ def initMysql8Pwd():
     pwd = mw.getRandomString(16)
 
     alter_root_pwd = 'flush privileges;'
+
+    alter_root_pwd = alter_root_pwd + \
+        "UPDATE mysql.user SET authentication_string='' WHERE user='root';"
     alter_root_pwd = alter_root_pwd + \
         "alter user 'root'@'localhost' IDENTIFIED by '" + pwd + "';"
     alter_root_pwd = alter_root_pwd + \
