@@ -238,8 +238,8 @@ def installPreInspection(version):
     sysName = sys[0].strip().lower()
     sysId = sys_id[0].strip()
 
-    if not sysName in ('centos', 'ubuntu', 'debian'):
-        return '暂时仅支持centos,ubuntu,debian'
+    if not sysName in ('centos', 'fedora', 'ubuntu', 'debian'):
+        return '暂时仅不支持{}'.format(sysName)
 
     if sysName == 'debian':
         if version > 10:

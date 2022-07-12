@@ -208,7 +208,7 @@ Install_app_linux()
 		Install_Linux_Ubuntu
 	elif [ "$OSNAME" == "debian" ];then
 		Install_Linux_Debian
-	elif [ "$OSNAME" == "centos" ];then
+	elif [ "$OSNAME" == "centos" ] || [ "$OSNAME" == "fedora" ];then
 		Install_Linux_CentOS
 	elif [ "$OSNAME" == "opensuse" ];then
 		Install_Linux_Opensuse
@@ -250,7 +250,7 @@ if [ "$OSNAME" == "ubuntu" ];then
 	Uninstall_Linux_Ubuntu
 elif [ "$OSNAME" == "debian" ];then
 	Uninstall_Linux_Debian
-elif [ "$OSNAME" == "centos" ];then
+elif [ "$OSNAME" == "centos" ] || [ "$OSNAME" == "fedora" ];then
 	Uninstall_Linux_CentOS
 elif [ "$OSNAME" == "opensuse" ];then
 	Uninstall_Linux_Opensuse
