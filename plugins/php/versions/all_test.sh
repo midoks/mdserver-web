@@ -6,7 +6,7 @@ ROOT_DIR=$(cd "$(dirname "$0")"; pwd)
 # cd /www/server/mdserver-web/scripts/quick && bash debug.sh
 # cd /www/server/mdserver-web/plugins/php/versions && /bin/bash all_test.sh
 
-# cd /www/server/mdserver-web/plugins/php/versions/common && bash swoole.sh install 72
+# cd /www/server/mdserver-web/plugins/php/versions/common && bash swoole.sh install 81
 
 
 # PHP_VER=52
