@@ -333,6 +333,7 @@ def initMysql57Data():
         cmd = 'cd ' + serverdir + ' && ./bin/mysqld --defaults-file=' + myconf + \
             ' --initialize-insecure --explicit_defaults_for_timestamp'
         data = mw.execShell(cmd)
+        # print(data)
         return False
     return True
 
@@ -349,7 +350,8 @@ def initMysql8Data():
             datadir + ' --initialize-insecure'
 
         # print(cmd)
-        mw.execShell(cmd)
+        data = mw.execShell(cmd)
+        # print(data)
         return False
     return True
 
@@ -396,7 +398,7 @@ def initMysql8Pwd():
 
     tmp_file = "/tmp/mysql_init_tmp.log"
     mw.writeFile(tmp_file, alter_root_pwd)
-    cmd_pass = serverdir + '/bin/mysql -uroot -p < ' + tmp_file
+    cmd_pass = serverdir + '/bin/mysql -uroot -p ""< ' + tmp_file
 
     data = mw.execShell(cmd_pass)
     # print(data)
