@@ -121,7 +121,7 @@ def pSqliteDb(dbname='databases'):
 
 
 def pMysqlDb():
-    db = mysqlDb.mysqlDb()
+    db = orm.ORM()
     db.__DB_CNF = getConf()
     db.setDbConf(getConf())
     db.setPwd(pSqliteDb('config').where(

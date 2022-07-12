@@ -4,7 +4,8 @@ import re
 import os
 import sys
 
-# sys.path.append("/usr/local/lib/python3.9/site-packages")
+
+from mysql import connector
 
 sys.path.append(os.getcwd() + "/class/core")
 import mw
@@ -16,7 +17,7 @@ import mw
 #     sys.path.append(p)
 
 
-class mysqlDb:
+class ORM:
     __DB_PASS = None
     __DB_USER = 'root'
     __DB_PORT = 3306
@@ -29,32 +30,20 @@ class mysqlDb:
     def __Conn(self):
         '''连接MYSQL数据库'''
         try:
-            import mw
-            socket = '/www/server/mysql/mysql.sock'
-            try:
-                import MySQLdb
-            except Exception as ex:
-                # print('dd')
-                self.__DB_ERR = ex
-                return False
+            socket = '/www/server/mariadb/mysql.sock'
             try:
                 myconf = mw.readFile(self.__DB_CNF)
                 rep = "port\s*=\s*([0-9]+)"
                 self.__DB_PORT = int(re.search(rep, myconf).groups()[0])
             except:
                 self.__DB_PORT = 3306
-            # print self.__DB_PASS
-            #self.__DB_PASS = mw.M('config').where('id=?', (1,)).getField('mysql_root')
-            try:
-                self.__DB_CONN = MySQLdb.connect(host=self.__DB_HOST, user=self.__DB_USER, passwd=self.__DB_PASS,
-                                                 port=self.__DB_PORT, charset="utf8", connect_timeout=1, unix_socket=socket)
-            except MySQLdb.Error as e:
-                self.__DB_HOST = '127.0.0.1'
-                self.__DB_CONN = MySQLdb.connect(host=self.__DB_HOST, user=self.__DB_USER, passwd=self.__DB_PASS,
-                                                 port=self.__DB_PORT, charset="utf8", connect_timeout=1, unix_socket=socket)
+
+            self.__DB_CONN = connector.connect(host=self.__DB_HOST, user=self.__DB_USER, passwd=self.__DB_PASS,
+                                               port=self.__DB_PORT, charset="utf8", connect_timeout=1, unix_socket=socket)
+
             self.__DB_CUR = self.__DB_CONN.cursor()
             return True
-        except MySQLdb.Error as e:
+        except Exception as e:
             self.__DB_ERR = e
             return False
 
