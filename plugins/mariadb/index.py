@@ -315,39 +315,10 @@ def initMysqlData():
         serverdir = getServerDir()
         myconf = serverdir + "/etc/my.cnf"
         user = pGetDbUser()
-        cmd = 'cd ' + serverdir + ' && ./scripts/mariadb-install-db --defaults-file=' + myconf
+        cmd = 'cd ' + serverdir + ' && ./scripts/mariadb-install-db ' + \
+            ' --defaults-file=' + myconf
         data = mw.execShell(cmd)
         # print(data)
-        return False
-    return True
-
-
-def initMysql57Data():
-    datadir = getDataDir()
-    if not os.path.exists(datadir + '/mysql'):
-        serverdir = getServerDir()
-        myconf = serverdir + "/etc/my.cnf"
-        user = pGetDbUser()
-        cmd = 'cd ' + serverdir + ' && ./bin/mysqld --defaults-file=' + myconf + \
-            ' --initialize-insecure --explicit_defaults_for_timestamp'
-        mw.execShell(cmd)
-        return False
-    return True
-
-
-def initMysql8Data():
-    datadir = getDataDir()
-    if not os.path.exists(datadir + '/mysql'):
-        serverdir = getServerDir()
-        user = pGetDbUser()
-        # cmd = 'cd ' + serverdir + ' && ./bin/mysqld --basedir=' + serverdir + ' --datadir=' + \
-        #     datadir + ' --initialize'
-
-        cmd = 'cd ' + serverdir + ' && ./bin/mysqld --basedir=' + serverdir + ' --datadir=' + \
-            datadir + ' --initialize-insecure'
-
-        # print(cmd)
-        mw.execShell(cmd)
         return False
     return True
 
@@ -375,36 +346,6 @@ def initMysqlPwd():
     return True
 
 
-def initMysql8Pwd():
-    time.sleep(2)
-
-    serverdir = getServerDir()
-    pwd = mw.getRandomString(16)
-
-    alter_root_pwd = 'flush privileges;'
-    alter_root_pwd = alter_root_pwd + \
-        "alter user 'root'@'localhost' IDENTIFIED by '" + pwd + "';"
-    alter_root_pwd = alter_root_pwd + \
-        "alter user 'root'@'localhost' IDENTIFIED WITH mysql_native_password by '" + pwd + "';"
-    alter_root_pwd = alter_root_pwd + "flush privileges;"
-
-    cmd_pass = serverdir + '/bin/mysqladmin -uroot password root'
-    data = mw.execShell(cmd_pass)
-    # print(data)
-
-    tmp_file = "/tmp/mysql_init_tmp.log"
-    mw.writeFile(tmp_file, alter_root_pwd)
-    cmd_pass = serverdir + '/bin/mysql -uroot -proot < ' + tmp_file
-
-    data = mw.execShell(cmd_pass)
-    # print(data)
-    os.remove(tmp_file)
-
-    pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
-
-    return True
-
-
 def myOp(version, method):
     # import commands
     init_file = initDreplace()
@@ -421,51 +362,7 @@ def myOp(version, method):
         return str(e)
 
 
-def my8cmd(version, method):
-    # mysql 8.0  and 5.7
-    init_file = initDreplace(version)
-    cmd = init_file + ' ' + method
-    try:
-        if version == '5.7':
-            isInited = initMysql57Data()
-        elif version == '8.0':
-            isInited = initMysql8Data()
-
-        if not isInited:
-
-            if mw.isAppleSystem():
-                cmd_init_start = init_file + ' start'
-                subprocess.Popen(cmd_init_start, stdout=subprocess.PIPE, shell=True,
-                                 bufsize=4096, stderr=subprocess.PIPE)
-
-                time.sleep(6)
-            else:
-                mw.execShell('systemctl start mariadb')
-
-            initMysql8Pwd()
-
-            if mw.isAppleSystem():
-                cmd_init_stop = init_file + ' stop'
-                subprocess.Popen(cmd_init_stop, stdout=subprocess.PIPE, shell=True,
-                                 bufsize=4096, stderr=subprocess.PIPE)
-                time.sleep(3)
-            else:
-                mw.execShell('systemctl stop mariadb')
-
-        if mw.isAppleSystem():
-            sub = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True,
-                                   bufsize=4096, stderr=subprocess.PIPE)
-            sub.wait(5)
-        else:
-            mw.execShell('systemctl ' + method + ' mariadb')
-        return 'ok'
-    except Exception as e:
-        return str(e)
-
-
 def appCMD(version, action):
-    # if version == '8.0' or version == '5.7':
-    #     return my8cmd(version, action)
     return myOp(version, action)
 
 

@@ -1,7 +1,6 @@
 [Unit]
-Description=MySQL Community Server
-Documentation=man:mysqld(8)
-Documentation=http://dev.mysql.com/doc/refman/en/using-systemd.html
+Description=MariaDB Server: The open source relational database
+Documentation=https://mariadb.org/download/?t=mariadb
 After=network.service
 After=syslog.target
 
@@ -11,7 +10,6 @@ Group=mysql
 Type=simple
 ExecStart={$SERVER_PATH}/mariadb/bin/mysqld --defaults-file={$SERVER_PATH}/mariadb/etc/my.cnf
 ExecReload=/bin/kill -USR2 $MAINPID
-TimeoutSec=0
 PermissionsStartOnly=true
 LimitNOFILE=5000
 Restart=on-failure

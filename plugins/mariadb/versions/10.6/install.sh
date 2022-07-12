@@ -46,6 +46,7 @@ Install_app()
 	if [ ! -d $serverPath/mariadb ];then
 		cd ${mariadbDir}/mariadb-${MY_VER} && cmake \
 		-DCMAKE_INSTALL_PREFIX=$serverPath/mariadb \
+		-DMYSQL_DATADIR=$serverPath/mariadb/data/
 		-DMYSQL_USER=mysql \
 		-DMYSQL_UNIX_ADDR=/var/tmp/mysql.sock \
 		-DWITH_MYISAM_STORAGE_ENGINE=1 \
