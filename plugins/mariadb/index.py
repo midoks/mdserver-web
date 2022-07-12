@@ -123,11 +123,11 @@ def contentReplace(content):
 
 
 def pSqliteDb(dbname='databases'):
-    file = getServerDir() + '/mysql.db'
+    file = getServerDir() + '/mariadb.db'
     name = 'mysql'
     if not os.path.exists(file):
         conn = mw.M(dbname).dbPos(getServerDir(), name)
-        csql = mw.readFile(getPluginDir() + '/conf/mysql.sql')
+        csql = mw.readFile(getPluginDir() + '/conf/mariadb.sql')
         csql_list = csql.split(';')
         for index in range(len(csql_list)):
             conn.execute(csql_list[index], ())
@@ -183,8 +183,8 @@ def initDreplace(version=''):
 
     # systemd
     systemDir = mw.systemdCfgDir()
-    systemService = systemDir + '/mysql.service'
-    systemServiceTpl = getPluginDir() + '/init.d/mysql.service.tpl'
+    systemService = systemDir + '/mariadb.service'
+    systemServiceTpl = getPluginDir() + '/init.d/mariadb.service.tpl'
     if os.path.exists(systemDir) and not os.path.exists(systemService):
         service_path = mw.getServerDir()
         se_content = mw.readFile(systemServiceTpl)
@@ -329,8 +329,7 @@ def initMysql57Data():
         user = pGetDbUser()
         cmd = 'cd ' + serverdir + ' && ./bin/mysqld --defaults-file=' + myconf + \
             ' --initialize-insecure --explicit_defaults_for_timestamp'
-        # print(mw.execShell(cmd))
-
+        mw.execShell(cmd)
         return False
     return True
 
@@ -388,13 +387,13 @@ def initMysql8Pwd():
         "alter user 'root'@'localhost' IDENTIFIED WITH mysql_native_password by '" + pwd + "';"
     alter_root_pwd = alter_root_pwd + "flush privileges;"
 
-    # cmd_pass = serverdir + '/bin/mysqladmin -uroot password root'
-    # data = mw.execShell(cmd_pass)
+    cmd_pass = serverdir + '/bin/mysqladmin -uroot password root'
+    data = mw.execShell(cmd_pass)
     # print(data)
 
     tmp_file = "/tmp/mysql_init_tmp.log"
     mw.writeFile(tmp_file, alter_root_pwd)
-    cmd_pass = serverdir + '/bin/mysql -uroot -p < ' + tmp_file
+    cmd_pass = serverdir + '/bin/mysql -uroot -proot < ' + tmp_file
 
     data = mw.execShell(cmd_pass)
     # print(data)
@@ -411,9 +410,9 @@ def myOp(version, method):
     try:
         isInited = initMysqlData()
         if not isInited:
-            mw.execShell('systemctl start mysql')
+            mw.execShell('systemctl start mariadb')
             initMysqlPwd()
-            mw.execShell('systemctl stop mysql')
+            mw.execShell('systemctl stop mariadb')
 
         mw.execShell('systemctl ' + method + ' mysql')
         return 'ok'
@@ -440,7 +439,7 @@ def my8cmd(version, method):
 
                 time.sleep(6)
             else:
-                mw.execShell('systemctl start mysql')
+                mw.execShell('systemctl start mariadb')
 
             initMysql8Pwd()
 
@@ -450,14 +449,14 @@ def my8cmd(version, method):
                                  bufsize=4096, stderr=subprocess.PIPE)
                 time.sleep(3)
             else:
-                mw.execShell('systemctl stop mysql')
+                mw.execShell('systemctl stop mariadb')
 
         if mw.isAppleSystem():
             sub = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True,
                                    bufsize=4096, stderr=subprocess.PIPE)
             sub.wait(5)
         else:
-            mw.execShell('systemctl ' + method + ' mysql')
+            mw.execShell('systemctl ' + method + ' mariadb')
         return 'ok'
     except Exception as e:
         return str(e)
@@ -489,7 +488,7 @@ def initdStatus():
     if mw.isAppleSystem():
         return "Apple Computer does not support"
 
-    shell_cmd = 'systemctl status mysql | grep loaded | grep "enabled;"'
+    shell_cmd = 'systemctl status mariadb | grep loaded | grep "enabled;"'
     data = mw.execShell(shell_cmd)
     if data[0] == '':
         return 'fail'
@@ -500,7 +499,7 @@ def initdInstall():
     if mw.isAppleSystem():
         return "Apple Computer does not support"
 
-    mw.execShell('systemctl enable mysql')
+    mw.execShell('systemctl enable mariadb')
     return 'ok'
 
 
@@ -508,7 +507,7 @@ def initdUinstall():
     if mw.isAppleSystem():
         return "Apple Computer does not support"
 
-    mw.execShell('systemctl disable mysql')
+    mw.execShell('systemctl disable mariadb')
     return 'ok'
 
 
