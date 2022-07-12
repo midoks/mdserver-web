@@ -322,6 +322,9 @@ def initMysqlData():
 
 
 def initMysql57Data():
+    '''
+    cd /www/server/mysql && /www/server/mysql/bin/mysqld --defaults-file=/www/server/mysql/etc/my.cnf  --initialize-insecure --explicit_defaults_for_timestamp
+    '''
     datadir = getDataDir()
     if not os.path.exists(datadir + '/mysql'):
         serverdir = getServerDir()
@@ -329,8 +332,7 @@ def initMysql57Data():
         user = pGetDbUser()
         cmd = 'cd ' + serverdir + ' && ./bin/mysqld --defaults-file=' + myconf + \
             ' --initialize-insecure --explicit_defaults_for_timestamp'
-        # print(mw.execShell(cmd))
-
+        data = mw.execShell(cmd)
         return False
     return True
 
