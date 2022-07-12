@@ -45,6 +45,7 @@ if [ "$OSNAME" == "centos" ];then
 fi
 
 
+# rpm -Uvh http://rpms.remirepo.net/fedora/remi-release-31.rpm
 if [ "$OSNAME" == "fedora" ];then
 	rpm -Uvh http://rpms.remirepo.net/fedora/remi-release-${VERSION_ID}.rpm
 fi
