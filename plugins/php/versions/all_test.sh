@@ -49,6 +49,11 @@ PHP_EXT_LIST=(ioncube ZendGuardLoader pdo mysqlnd sqlite3 openssl pcntl opcache 
 for PHP_VER in ${PHP_VER_LIST[@]}; do
 	echo "php${PHP_VER} -- start"
 
+	if [ ! -d /www/server/php/${PHP_VER} ];then
+		echo "php{$PHP_VER} is not install!"
+		break;
+	fi
+
 	NON_ZTS_FILENAME=`ls /www/server/php/${PHP_VER}/lib/php/extensions | grep no-debug-non-zts`
 	for EXT in ${PHP_EXT_LIST[@]}; do
 		extFile=/www/server/php/${PHP_VER}/lib/php/extensions/${NON_ZTS_FILENAME}/${EXT}.so
