@@ -43,9 +43,6 @@ if [ $sysName == 'Darwin' ]; then
 	# OPTIONS="${OPTIONS} --enable-zip"
 else
 	OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
-	OPTIONS="${OPTIONS} --with-freetype-dir=${serverPath}/lib/freetype_old"
-	OPTIONS="${OPTIONS} --with-gd --enable-gd-native-ttf"
-	OPTIONS="${OPTIONS} --with-jpeg --with-jpeg-dir=/usr/lib"
 	OPTIONS="${OPTIONS} --with-curl"
 	OPTIONS="${OPTIONS} --with-libzip=${serverPath}/lib/libzip"
 fi
