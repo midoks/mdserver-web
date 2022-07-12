@@ -316,7 +316,8 @@ def initMysqlData():
         myconf = serverdir + "/etc/my.cnf"
         user = pGetDbUser()
         cmd = 'cd ' + serverdir + ' && ./scripts/mysql_install_db --defaults-file=' + myconf
-        mw.execShell(cmd)
+        data = mw.execShell(cmd)
+        # print(data)
         return False
     return True
 
