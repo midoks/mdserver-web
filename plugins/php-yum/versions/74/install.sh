@@ -25,11 +25,7 @@ Install_php()
 {
 #------------------------ install start ------------------------------------#
 
-### centos start ################
-rpm -Uvh http://rpms.remirepo.net/enterprise/remi-release-${VERSION_ID}.rpm
-yum install -y php74 php74-php-fpm 
-### centos start ################
-
+yum install -y php74 php74-php-fpm
 if [ "$?" == "0" ];then
 	mkdir -p $serverPath/php-yum/${PHP_VER}
 fi
