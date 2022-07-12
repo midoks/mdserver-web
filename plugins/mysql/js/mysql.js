@@ -835,7 +835,7 @@ function openPhpmyadmin(name,username,password){
     //检查版本
     data = syncPost('/plugins/run',{'name':'phpmyadmin','func':'version'});
     bigVer = data.data.split('.')[0]
-    if (bigVer>=4.9){
+    if (bigVer>=4.4){
 
         setTimeout(function(){
             $("#toPHPMyAdmin").submit();
