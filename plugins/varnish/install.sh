@@ -51,7 +51,7 @@ Uninstall_varnish()
 		brew uninstall varnish
 	elif [ "${OSNAME}" == "centos" ]; then
 		yum remove varnish -y
-	elif [ "${OSNAME}" == "debian" ] || [ "${OSNAME}" == "ubuntu" ]; then
+	elif [ "${OSNAME}" == "centos" ] || [ "${OSNAME}" == "fedora" ]; then
 		apt remove varnish -y
 	elif [ "${OSNAME}" == "opensuse" ];then
 		zypper remove -y varnish
