@@ -154,7 +154,7 @@ def initDreplace(version=''):
 
     mysql_conf = mysql_conf_dir + '/my.cnf'
     if not os.path.exists(mysql_conf):
-        mysql_conf_tpl = getPluginDir() + '/conf/my' + version + '.cnf'
+        mysql_conf_tpl = getPluginDir() + '/conf/my.cnf'
         content = mw.readFile(mysql_conf_tpl)
         content = contentReplace(content)
         mw.writeFile(mysql_conf, content)
