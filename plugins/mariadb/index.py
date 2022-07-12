@@ -315,7 +315,7 @@ def initMysqlData():
         serverdir = getServerDir()
         myconf = serverdir + "/etc/my.cnf"
         user = pGetDbUser()
-        cmd = 'cd ' + serverdir + ' && ./scripts/mysql_install_db --defaults-file=' + myconf
+        cmd = 'cd ' + serverdir + ' && ./scripts/mariadb-install-db --defaults-file=' + myconf
         data = mw.execShell(cmd)
         # print(data)
         return False
