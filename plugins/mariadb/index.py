@@ -1914,7 +1914,7 @@ def uninstallPreInspection(version):
 if __name__ == "__main__":
     func = sys.argv[1]
 
-    version = "5.6"
+    version = "10.6"
     if (len(sys.argv) > 2):
         version = sys.argv[2]
 
