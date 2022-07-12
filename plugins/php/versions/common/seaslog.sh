@@ -24,8 +24,7 @@ if [ "$version" -lt "72" ];then
 fi
 
 NON_ZTS_FILENAME=`ls $serverPath/php/${version}/lib/php/extensions | grep no-debug-non-zts`
-extDir=$serverPath/php/${version}/lib/php/extensions/${NON_ZTS_FILENAME}
-extFile=$extDir/${_LIBNAME}.so
+extFile=$serverPath/php/${version}/lib/php/extensions/${NON_ZTS_FILENAME}/${_LIBNAME}.so
 
 if [ "$sysName" == "Darwin" ];then
 	BAK='_bak'
@@ -91,7 +90,7 @@ Uninstall_lib()
 		echo "php-$version not install ${LIBNAME}, Plese select other version!"
 		return
 	fi
-	
+
 	_LIBNAME=$(echo $LIBNAME | tr '[A-Z]' '[a-z]')
 	sed -i $BAK "/${_LIBNAME}.so/d" $serverPath/php/$version/etc/php.ini
 	sed -i $BAK "/${_LIBNAME}/d" $serverPath/php/$version/etc/php.ini
