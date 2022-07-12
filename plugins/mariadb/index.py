@@ -575,7 +575,7 @@ def isSqlError(data):
     if "2003," in errMsg:
         return mw.returnJson(False, "Can't connect to MySQL server on '127.0.0.1' (61)")
     if "1698," in errMsg:
-        return mw.returnJson(False, data[1])
+        return mw.returnJson(False, "Access denied for user 'root'@'localhost'")
     if "using password:" in errMsg:
         return mw.returnJson(False, '数据库管理密码错误!')
     if "Connection refused" in errMsg:
