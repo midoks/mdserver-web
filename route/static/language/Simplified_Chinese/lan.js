@@ -917,7 +917,7 @@ var lan = {
 		"bt_ssl_help_7":"有效期1年，不支持续签，到期后需要重新申请",
 		"bt_ssl_help_8":"Let\'s Encrypt免费证书，有效期3个月，支持多域名。默认会自动续签",
 		"bt_ssl_help_9":"若您的站点使用了CDN或301重定向会导致续签失败",
-		"bt_ssl_help_10":"粘贴您的*.key以及*.pem内容，然后保存即可<a href='http://www.bt.cn/bbs/thread-704-1-1.html' class='btlink' target='_blank'>[帮助]</a>。",
+		"bt_ssl_help_10":"粘贴您的*.key以及*.pem内容，然后保存即可。",
 		"phone_input":"请输入手机号码",
 		"ssl_apply_1":"正在提交订单，请稍后..",
 		"ssl_apply_2":"正在校验域名，请稍后..",
