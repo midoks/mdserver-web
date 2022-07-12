@@ -118,7 +118,7 @@ def contentReplace(content):
 
     if content.find('{$SERVER_APP_PATH}') != -1:
         content = content.replace(
-            '{$SERVER_APP_PATH}', service_path + '/mysql')
+            '{$SERVER_APP_PATH}', service_path + '/mariadb')
     return content
 
 
