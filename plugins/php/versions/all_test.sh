@@ -6,13 +6,7 @@ ROOT_DIR=$(cd "$(dirname "$0")"; pwd)
 # cd /www/server/mdserver-web/scripts/quick && bash debug.sh
 # cd /www/server/mdserver-web/plugins/php/versions && /bin/bash all_test.sh
 
-
-# cd /www/server/mdserver-web/plugins/php && bash install.sh install 71
-# cd /www/server/mdserver-web/plugins/php/versions/52/ && bash gd.sh install 52
-
-# cd /www/server/mdserver-web/plugins/php/versions/52/ && bash openssl.sh install 52
-# cd /www/server/mdserver-web/plugins/php/versions/81/ && bash imagemagick.sh install 81
-# cd /www/server/mdserver-web/plugins/php/versions/70/ && bash imagemagick.sh install 70
+# cd /www/server/mdserver-web/plugins/php/versions/common && bash swoole.sh install 72
 
 
 # PHP_VER=52
