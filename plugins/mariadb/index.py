@@ -310,9 +310,10 @@ def initMysqlPwd():
     #     "UPDATE mysql.user SET password=PASSWORD('" + \
     #     pwd + "') WHERE user='root'"
     cmd_pass = serverdir + '/bin/mysql -uroot -e'
-    cmd_pass = cmd_pass + "\"UPDATE mysql.user SET password=PASSWORD('" + \
-        pwd + "') WHERE user='root';"
+    cmd_pass = cmd_pass + \
+        "\"grant all privileges on *.* to 'root'@'localhost' identified by '" + pwd + "';"
     cmd_pass = cmd_pass + "flush privileges;\""
+
     data = mw.execShell(cmd_pass)
     # print(data)
     pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
