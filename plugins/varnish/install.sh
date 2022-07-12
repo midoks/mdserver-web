@@ -7,27 +7,14 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
-
 install_tmp=${rootPath}/tmp/mw_install.pl
-
 VERSION=$2
 
-_os=`uname`
-if [ ${_os} == "Darwin" ]; then
-	OSNAME='macos'
-elif grep -Eq "openSUSE" /etc/*-release; then
-	OSNAME='opensuse'
-elif grep -Eq "CentOS" /etc/*-release; then
-	OSNAME='centos'
-elif grep -Eq "Fedora" /etc/*-release; then
-	OSNAME='fedora'
-elif grep -Eq "Debian" /etc/*-release; then
-	OSNAME='debian'
-elif grep -Eq "Ubuntu" /etc/*-release; then
-	OSNAME='ubuntu'
-else
-	OSNAME='unknow'
-fi
+
+bash ${rootPath}/scripts/getos.sh
+OSNAME=`cat ${rootPath}/data/osname.pl`
+OSNAME_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
+
 
 Install_varnish()
 {
