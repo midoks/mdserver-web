@@ -48,7 +48,7 @@ Install_app()
 		-DCMAKE_INSTALL_PREFIX=$serverPath/mariadb \
 		-DMYSQL_DATADIR=$serverPath/mariadb/data/ \
 		-DMYSQL_USER=mysql \
-		-DMYSQL_UNIX_ADDR=/var/tmp/mysql.sock \
+		-DMYSQL_UNIX_ADDR=$serverPath/mariadb/mysql.sock \
 		-DWITH_MYISAM_STORAGE_ENGINE=1 \
 		-DWITH_INNOBASE_STORAGE_ENGINE=1 \
 		-DWITH_MEMORY_STORAGE_ENGINE=1 \
