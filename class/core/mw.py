@@ -516,8 +516,9 @@ def getLastLine(inputfile, lineNum):
             result += lastre[num] + "\n"
             num -= 1
         return result
-    except:
-        return getMsg('TASK_SLEEP')
+    except Exception as e:
+        return str(e)
+        # return getMsg('TASK_SLEEP')
 
 
 def getNumLines(path, num, p=1):
