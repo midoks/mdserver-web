@@ -1107,6 +1107,31 @@ function execLog(){
 	});
 }
 
+/**
+ * 获取时分秒
+ * @param {Number} seconds 总秒数
+ * @param {String} dateFormat 返回的日期格式，默认为'H:i:s'
+ */
+function getSFM(seconds, dateFormat = 'H:i:s') {
+  var obj = {};
+  obj.H = Number.parseInt(seconds / 3600);
+  obj.i = Number.parseInt((seconds - obj.H * 3600) / 60);
+  obj.s = Number.parseInt(seconds - obj.H * 3600 - obj.i * 60);
+  if (obj.H < 10) {
+    obj.H = '0' + obj.H;
+  }
+  if (obj.i < 10) {
+    obj.i = '0' + obj.i;
+  }
+  if (obj.s < 10) {
+    obj.s = '0' + obj.s;
+  }
+ 
+  // 3.解析
+  var rs = dateFormat.replace('H', obj.H).replace('i', obj.i).replace('s', obj.s);
+  return rs;
+}
+
 function remind(a){
 	a = a == undefined ? 1 : a;
 	$.post("/task/list", "table=tasks&result=2,4,6,8&limit=10&p=" + a, function(g) {
@@ -1117,9 +1142,9 @@ function remind(a){
 		for(var d = 0; d < g.data.length; d++) {
 			if(g.data[d].status != '1'){
 				task_count++;
-				e += '<tr><td><input type="checkbox"></td><td><div class="titlename c3">'+g.data[d].name+'</span><span class="rs-status">【'+lan.bt.task_the+'】<span><span class="rs-time">'+ lan.bt.time + (g.data[d].end - g.data[d].start) + lan.bt.s+'</span></div></td><td class="text-right c3">'+g.data[d].addtime+'</td></tr>'
+				e += '<tr><td><input type="checkbox"></td><td><div class="titlename c3">'+g.data[d].name+'</span><span class="rs-status">【'+lan.bt.task_the+'】<span><span class="rs-time">耗时['+ getSFM(g.data[d].end - g.data[d].start) +']</span></div></td><td class="text-right c3">'+g.data[d].addtime+'</td></tr>'
 			} else{
-				e += '<tr><td><input type="checkbox"></td><td><div class="titlename c3">'+g.data[d].name+'</span><span class="rs-status">【'+lan.bt.task_ok+'】<span><span class="rs-time">'+ lan.bt.time + (g.data[d].end - g.data[d].start) + lan.bt.s+'</span></div></td><td class="text-right c3">'+g.data[d].addtime+'</td></tr>';
+				e += '<tr><td><input type="checkbox"></td><td><div class="titlename c3">'+g.data[d].name+'</span><span class="rs-status">【'+lan.bt.task_ok+'】<span><span class="rs-time">耗时['+ getSFM(g.data[d].end - g.data[d].start) +']</span></div></td><td class="text-right c3">'+g.data[d].addtime+'</td></tr>';
 			}
 		}
 		var con = '<div class="divtable"><table class="table table-hover">\
