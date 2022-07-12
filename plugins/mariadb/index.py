@@ -414,7 +414,7 @@ def myOp(version, method):
             initMysqlPwd()
             mw.execShell('systemctl stop mariadb')
 
-        mw.execShell('systemctl ' + method + ' mysql')
+        mw.execShell('systemctl ' + method + ' mariadb')
         return 'ok'
     except Exception as e:
         return str(e)
