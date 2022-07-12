@@ -64,7 +64,7 @@ Install_app()
 			echo '10.6' > $serverPath/mariadb/version.pl
 			echo '安装完成' > $install_tmp
 		else
-			rm -rf ${mariadbDir}/mariadb-${MY_VER}
+			# rm -rf ${mariadbDir}/mariadb-${MY_VER}
 			echo '安装失败' > $install_tmp
 			echo 'install fail'>&2
 			exit 1
