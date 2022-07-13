@@ -87,7 +87,7 @@ class ORM:
         except Exception as ex:
             return ex
 
-    # 关闭连接
     def __Close(self):
+        # 关闭连接
         self.__DB_CUR.close()
         self.__DB_CONN.close()
