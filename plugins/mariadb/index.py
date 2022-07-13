@@ -180,17 +180,17 @@ def initDreplace(version=''):
     if not os.path.exists(mysql_conf_dir):
         os.mkdir(mysql_conf_dir)
 
-    mysql_tmp = getServerDir() + '/tmp'
-    if not os.path.exists(mysql_tmp):
-        os.mkdir(mysql_tmp)
-        mw.execShell("chown -R mysql:mysql " + mysql_tmp)
-
     mysql_conf = mysql_conf_dir + '/my.cnf'
     if not os.path.exists(mysql_conf):
         mysql_conf_tpl = getPluginDir() + '/conf/my.cnf'
         content = mw.readFile(mysql_conf_tpl)
         content = contentReplace(content)
         mw.writeFile(mysql_conf, content)
+
+    mysql_tmp = getServerDir() + '/tmp'
+    if not os.path.exists(mysql_tmp):
+        os.mkdir(mysql_tmp)
+        mw.execShell("chown -R mysql:mysql " + mysql_tmp)
 
     # systemd
     systemDir = mw.systemdCfgDir()
