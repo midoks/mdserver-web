@@ -18,8 +18,7 @@ root_dir = os.path.dirname(os.path.dirname(plugin_dir))
 sys.path.append(root_dir + "/class/core")
 import mw
 
-sys.path.append(plugin_dir + "/class")
-import orm
+os.chdir(root_dir)
 
 
 def getPluginName():
@@ -54,8 +53,11 @@ def getConf():
 
 
 def pMysqlDb():
-    db = orm.ORM()
+    db = mw.getMyORM()
     db.setDbConf(getConf())
+    db.__DB_SOCKET = mw.getServerDir() + '/mysql/mysql.socket'
+
+    print(mw.getServerDir() + '/mysql/mysql.socket')
     db.setPwd(pSqliteDb('config').where('id=?', (1,)).getField('mysql_root'))
     return db
 
