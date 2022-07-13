@@ -80,9 +80,9 @@ def getConf():
 
 
 def getInitdTpl(version=''):
-    path = getPluginDir() + '/init.d/mysql' + version + '.tpl'
+    path = getPluginDir() + '/init.d/mariadb' + version + '.tpl'
     if not os.path.exists(path):
-        path = getPluginDir() + '/init.d/mysql.tpl'
+        path = getPluginDir() + '/init.d/mariadb.tpl'
     return path
 
 
@@ -121,6 +121,9 @@ def pSqliteDb(dbname='databases'):
 
 
 def pMysqlDb():
+    sys.path.append(getPluginDir() + "/class")
+    import orm
+
     db = orm.ORM()
     db.setDbConf(getConf())
     db.setPwd(pSqliteDb('config').where(
