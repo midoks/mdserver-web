@@ -122,7 +122,6 @@ def pSqliteDb(dbname='databases'):
 
 def pMysqlDb():
     db = orm.ORM()
-    db.__DB_CNF = getConf()
     db.setDbConf(getConf())
     db.setPwd(pSqliteDb('config').where(
         'id=?', (1,)).getField('mysql_root'))
@@ -176,11 +175,13 @@ def initDreplace(version=''):
 
 
 def status(version=''):
-    pid = getPidFile()
-    if not os.path.exists(pid):
+    try:
+        pid = getPidFile()
+        if os.path.exists(pid):
+            return 'start'
+    except Exception as e:
         return 'stop'
-
-    return 'start'
+    return 'stop'
 
 
 def getDataDir():
