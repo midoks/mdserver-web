@@ -35,6 +35,7 @@ else
 fi
 
 
+# cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash freetype_old.sh
 # OPTIONS="${OPTIONS} --with-freetype-dir=${serverPath}/lib/freetype_old"
 # OPTIONS="${OPTIONS} --with-gd --enable-gd-native-ttf"
 # OPTIONS="${OPTIONS} --with-jpeg --with-jpeg-dir=/usr/lib"
@@ -42,7 +43,6 @@ fi
 
 Install_lib()
 {
-	cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash freetype_old.sh
 
 	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep "${LIBNAME}.so"`
 	if [ "${isInstall}" != "" ];then
@@ -62,12 +62,12 @@ Install_lib()
 
 		#--with-xpm
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
-		--enable-gd --enable-gd-native-ttf \
+		--with-gd \
 		--with-webp \
 		--with-jpeg \
-		--with-jpeg-dir=/usr/lib \
-		--with-freetype-dir=${serverPath}/lib/freetype_old \
-		--with-freetype
+		--with-freetype \
+		--enable-gd-jis-conv \
+		--enable-gd-native-ttf
 		make clean && make && make install && make clean
 		
 	fi
