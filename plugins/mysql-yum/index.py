@@ -125,11 +125,13 @@ def pSqliteDb(dbname='databases'):
 
 
 def pMysqlDb():
-    db = mysqlDb.mysqlDb()
+    sys.path.append(getPluginDir() + "/class")
+    import orm
+
+    db = orm.ORM()
     db.__DB_CNF = getConf()
     db.setDbConf(getConf())
-    db.setPwd(pSqliteDb('config').where(
-        'id=?', (1,)).getField('mysql_root'))
+    db.setPwd(pSqliteDb('config').where('id=?', (1,)).getField('mysql_root'))
     return db
 
 
