@@ -38,8 +38,13 @@ class ORM:
             except:
                 self.__DB_PORT = 3306
 
-            self.__DB_CONN = connector.connect(host=self.__DB_HOST, user=self.__DB_USER, passwd=self.__DB_PASS,
-                                               port=self.__DB_PORT, charset="utf8", connect_timeout=1, unix_socket=socket)
+            try:
+                self.__DB_CONN = connector.connect(host=self.__DB_HOST, user=self.__DB_USER, passwd=self.__DB_PASS,
+                                                   port=self.__DB_PORT, charset="utf8", connect_timeout=1, unix_socket=socket)
+            except Exception as e:
+                self.__DB_HOST = '127.0.0.1'
+                self.__DB_CONN = connector.connect(host=self.__DB_HOST, user=self.__DB_USER, passwd=self.__DB_PASS,
+                                                   port=self.__DB_PORT, charset="utf8", connect_timeout=1, unix_socket=socket)
 
             self.__DB_CUR = self.__DB_CONN.cursor()
             return True
