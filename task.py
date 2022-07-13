@@ -465,11 +465,9 @@ def getFpmAddress(version):
     except:
         return fpm_address
 
-# 检查指定PHP版本
-
 
 def checkPHPVersion(version):
-
+    # 检查指定PHP版本
     try:
         sock = getFpmAddress(version)
         data = mw.requestFcgiPHP(sock, '/phpfpm_status_' + version + '?json')
