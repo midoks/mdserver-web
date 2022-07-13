@@ -726,7 +726,7 @@ def installLib(version):
 
     name = args['name']
     execstr = "cd " + getPluginDir() + "/versions && /bin/bash  common.sh " + \
-        version + ' install ' + ' ' + name
+        version + ' install ' + name
 
     rettime = time.strftime('%Y-%m-%d %H:%M:%S')
     insert_info = (None, '安装[' + name + '-' + version + ']',
@@ -745,8 +745,9 @@ def uninstallLib(version):
 
     name = args['name']
     execstr = "cd " + getPluginDir() + "/versions && /bin/bash  common.sh " + \
-        version + ' uninstall ' + ' ' + name
+        version + ' uninstall ' + name
 
+    return mw.returnJson(False, execstr)
     data = mw.execShell(execstr)
     # data[0] == '' and
     if data[1] == '':
