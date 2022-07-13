@@ -16,9 +16,6 @@ Install_of(){
 	echo '正在安装脚本文件...' > $install_tmp
 	mkdir -p $serverPath/op_waf
 
-	if [ -f $serverPath/openresty ];then
-		mkdir -p $serverPath/openresty/nginx/conf/waf
-	fi
 	echo '0.1' > $serverPath/op_waf/version.pl
 	echo 'install ok' > $install_tmp
 }

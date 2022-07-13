@@ -186,7 +186,7 @@ def status():
 
 def contentReplace(content):
     service_path = mw.getServerDir()
-    waf_path = mw.getServerDir() + "/openresty/nginx/conf/waf"
+    waf_path = getServerDir() + "/waf"
     content = content.replace('{$ROOT_PATH}', mw.getRootDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$WAF_PATH}', waf_path)
@@ -195,20 +195,21 @@ def contentReplace(content):
 
 def initDreplace():
 
-    path = mw.getServerDir() + "/openresty/nginx/conf"
+    path = getServerDir()
     if not os.path.exists(path + '/waf'):
         sdir = getPluginDir() + '/waf'
         cmd = 'cp -rf ' + sdir + ' ' + path
         mw.execShell(cmd)
 
-    config = mw.getServerDir() + '/openresty/nginx/conf/waf/config.json'
+    config = path + '/waf/config.json'
     content = mw.readFile(config)
     content = json.loads(content)
-    content['reqfile_path'] = mw.getServerDir(
-    ) + "/openresty/nginx/conf/waf/html"
+
+    wfDir = path + "/waf/html"
+    content['reqfile_path'] = wfDir
     mw.writeFile(config, mw.getJson(content))
 
-    config = mw.getServerDir() + "/openresty/nginx/conf/waf/lua/init.lua"
+    config = path + "/waf/lua/init.lua"
     content = mw.readFile(config)
     content = contentReplace(content)
     mw.writeFile(config, content)
@@ -230,18 +231,13 @@ def start():
     path = getConf()
     conf = mw.readFile(path)
     conf = conf.replace('#include luawaf.conf;', "include luawaf.conf;")
-
     mw.writeFile(path, conf)
+
     mw.restartWeb()
     return 'ok'
 
 
 def stop():
-    path = mw.getServerDir() + "/openresty/nginx/conf/waf"
-    if os.path.exists(path):
-        cmd = 'rm -rf ' + path
-        mw.execShell(cmd)
-
     path = getConf()
     conf = mw.readFile(path)
     conf = conf.replace('include luawaf.conf;', "#include luawaf.conf;")
@@ -265,12 +261,12 @@ def reload():
 
 
 def getJsonPath(name):
-    path = mw.getServerDir() + "/openresty/nginx/conf/waf/" + name + ".json"
+    path = getServerDir() + "/waf/" + name + ".json"
     return path
 
 
 def getRuleJsonPath(name):
-    path = mw.getServerDir() + "/openresty/nginx/conf/waf/rule/" + name + ".json"
+    path = getServerDir() + "/waf/rule/" + name + ".json"
     return path
 
 
