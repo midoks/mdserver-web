@@ -79,6 +79,38 @@ def getConf():
     return path
 
 
+def getDataDir():
+    file = getConf()
+    content = mw.readFile(file)
+    rep = 'datadir\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
+
+
+def getPidFile():
+    file = getConf()
+    content = mw.readFile(file)
+    rep = 'pid-file\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
+
+
+def getDbPort():
+    file = getConf()
+    content = mw.readFile(file)
+    rep = 'port\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
+
+
+def getSocketFile():
+    file = getConf()
+    content = mw.readFile(file)
+    rep = 'socket\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
+
+
 def getInitdTpl(version=''):
     path = getPluginDir() + '/init.d/mariadb' + version + '.tpl'
     if not os.path.exists(path):
@@ -121,13 +153,15 @@ def pSqliteDb(dbname='databases'):
 
 
 def pMysqlDb():
-    sys.path.append(getPluginDir() + "/class")
-    import orm
+    db = mw.getMyORM()
 
-    db = orm.ORM()
     db.setDbConf(getConf())
-    db.setPwd(pSqliteDb('config').where(
-        'id=?', (1,)).getField('mysql_root'))
+
+    db.__DB_PORT = getDbPort()
+    db.__DB_SOCKET = getSocketFile()
+
+    pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
+    db.setPwd(pwd)
     return db
 
 
@@ -185,22 +219,6 @@ def status(version=''):
     except Exception as e:
         return 'stop'
     return 'stop'
-
-
-def getDataDir():
-    file = getConf()
-    content = mw.readFile(file)
-    rep = 'datadir\s*=\s*(.*)'
-    tmp = re.search(rep, content)
-    return tmp.groups()[0].strip()
-
-
-def getPidFile():
-    file = getConf()
-    content = mw.readFile(file)
-    rep = 'pid-file\s*=\s*(.*)'
-    tmp = re.search(rep, content)
-    return tmp.groups()[0].strip()
 
 
 def binLog():

@@ -1004,3 +1004,13 @@ def requestFcgiPHP(sock, uri, document_root='/tmp', method='GET', pdata=b''):
         pdata = url_encode(pdata)
     result = p.load_url_public(uri, pdata, method)
     return result
+
+
+def getMyORM():
+    '''
+    获取MySQL资源的ORM
+    '''
+    sys.path.append(os.getcwd() + "/class/plugin")
+    import orm
+    o = orm.ORM()
+    return o
