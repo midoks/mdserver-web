@@ -399,7 +399,6 @@ def setMyDbPos():
     if not os.path.exists(t_datadir):
         mw.execShell('mkdir -p ' + t_datadir)
 
-    # mw.execShell('/etc/init.d/mysqld stop')
     stop()
     mw.execShell('cp -rf ' + s_datadir + '/* ' + t_datadir + '/')
     mw.execShell('chown -R mysql mysql ' + t_datadir)
@@ -468,7 +467,7 @@ def runInfo():
         # print data
         if data[0] == 1045 or data[0] == 2003:
             pwd = db.getPwd()
-            return mw.returnJson(False, 'mysql password error:' + pwd + '!')
+            return mw.returnJson(False, 'mariadb password error:' + pwd + '!')
     except Exception as e:
         pass
 
