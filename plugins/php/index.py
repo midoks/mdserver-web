@@ -783,8 +783,12 @@ def installPreInspection(version):
     if sysName == 'debian' and sys_id > 10:
         return 'debian10可以安装'
 
-    if sysName == 'fedora' and sys_id > 31:
-        return 'fedora[31]可以安装'
+    if sysName == 'fedora':
+        sys_id = mw.execShell(
+            "cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}'")
+        sysId = sys_id[0].strip()
+        if int(sysId) > 31:
+            return 'fedora[{}]不可安装'.format(sysId)
     return 'ok'
 
 if __name__ == "__main__":
