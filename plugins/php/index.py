@@ -780,7 +780,7 @@ def installPreInspection(version):
     if sysName == 'ubuntu':
         return 'ubuntu已经安装不了'
 
-    if sysName == 'debian' and sys_id > 10:
+    if sysName == 'debian' and sysId > 10:
         return 'debian10可以安装'
 
     if sysName == 'fedora':
