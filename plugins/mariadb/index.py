@@ -35,9 +35,6 @@ def getPluginName():
 def getPluginDir():
     return mw.getPluginDir() + '/' + getPluginName()
 
-sys.path.append(getPluginDir() + "/class")
-import mysqlDb
-
 
 def getServerDir():
     return mw.getServerDir() + '/' + getPluginName()
