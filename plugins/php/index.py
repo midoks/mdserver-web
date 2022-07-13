@@ -782,6 +782,9 @@ def installPreInspection(version):
 
     if sysName == 'debian' and sys_id > 10:
         return 'debian10可以安装'
+
+    if sysName == 'fedora' and sys_id > 31:
+        return 'fedora[31]可以安装'
     return 'ok'
 
 if __name__ == "__main__":
