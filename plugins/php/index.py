@@ -747,7 +747,6 @@ def uninstallLib(version):
     execstr = "cd " + getPluginDir() + "/versions && /bin/bash  common.sh " + \
         version + ' uninstall ' + name
 
-    return mw.returnJson(False, execstr)
     data = mw.execShell(execstr)
     # data[0] == '' and
     if data[1] == '':
