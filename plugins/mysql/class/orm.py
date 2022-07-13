@@ -30,13 +30,17 @@ class ORM:
     def __Conn(self):
         '''连接MYSQL数据库'''
         try:
-            socket = '/www/server/mariadb/mysql.sock'
+
             try:
                 myconf = mw.readFile(self.__DB_CNF)
                 rep = "port\s*=\s*([0-9]+)"
                 self.__DB_PORT = int(re.search(rep, myconf).groups()[0])
+
+                rep = "socket\s*=\s*(.*)"
+                socket = re.search(rep, myconf).groups()[0]
             except:
                 self.__DB_PORT = 3306
+                socket = '/www/server/mysql/mysql.sock'
 
             try:
                 self.__DB_CONN = connector.connect(host=self.__DB_HOST, user=self.__DB_USER, passwd=self.__DB_PASS,
