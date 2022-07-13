@@ -49,30 +49,8 @@ def getInitDFile():
     return '/etc/init.d/' + getPluginName()
 
 
-def is_number(s):
-    try:
-        float(s)
-        return True
-    except ValueError:
-        pass
-
-    try:
-        import unicodedata
-        unicodedata.numeric(s)
-        return True
-    except (TypeError, ValueError):
-        pass
-
-    return False
-
-
 def getArgs():
     args = sys.argv[2:]
-
-    # print(args)
-
-    # if is_number(args):
-    #     args = sys.argv[3:]
 
     tmp = {}
     args_len = len(args)
@@ -143,11 +121,13 @@ def pSqliteDb(dbname='databases'):
 
 
 def pMysqlDb():
-    db = mysqlDb.mysqlDb()
+    sys.path.append(getPluginDir() + "/class")
+    import orm
+
+    db = orm.ORM()
     db.__DB_CNF = getConf()
     db.setDbConf(getConf())
-    db.setPwd(pSqliteDb('config').where(
-        'id=?', (1,)).getField('mysql_root'))
+    db.setPwd(pSqliteDb('config').where('id=?', (1,)).getField('mysql_root'))
     return db
 
 
