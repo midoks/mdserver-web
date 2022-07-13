@@ -148,8 +148,8 @@ def pMysqlDb():
 
     db.setDbConf(getConf())
 
-    db.__DB_PORT = getDbPort()
-    db.__DB_SOCKET = getSocketFile()
+    db.setPort(getDbPort())
+    db.setSocket(getSocketFile())
 
     pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
     db.setPwd(pwd)

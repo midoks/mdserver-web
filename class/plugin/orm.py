@@ -48,6 +48,12 @@ class ORM:
     def setDbConf(self, conf):
         self.__DB_CNF = conf
 
+    def setSocket(self, sock):
+        self.__DB_SOCKET = sock
+
+    def setPort(self, port):
+        self.__DB_PORT = port
+
     def setPwd(self, pwd):
         self.__DB_PASS = pwd
 
