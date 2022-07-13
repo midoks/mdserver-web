@@ -21,13 +21,23 @@ class ORM:
     def __Conn(self):
         '''连接MYSQL数据库'''
         try:
-            try:
-                self.__DB_CONN = connector.connect(host=self.__DB_HOST, user=self.__DB_USER, passwd=self.__DB_PASS,
-                                                   port=self.__DB_PORT, charset="utf8", connect_timeout=1, unix_socket=self.__DB_SOCKET)
-            except Exception as e:
-                self.__DB_HOST = '127.0.0.1'
-                self.__DB_CONN = connector.connect(host=self.__DB_HOST, user=self.__DB_USER, passwd=self.__DB_PASS,
-                                                   port=self.__DB_PORT, charset="utf8", connect_timeout=1, unix_socket=self.__DB_SOCKET)
+
+            if os.path.exists(self.__DB_SOCKET):
+                try:
+                    self.__DB_CONN = connector.connect(host=self.__DB_HOST, user=self.__DB_USER, passwd=self.__DB_PASS,
+                                                       port=self.__DB_PORT, charset="utf8", connect_timeout=1, unix_socket=self.__DB_SOCKET)
+                except Exception as e:
+                    self.__DB_HOST = '127.0.0.1'
+                    self.__DB_CONN = connector.connect(host=self.__DB_HOST, user=self.__DB_USER, passwd=self.__DB_PASS,
+                                                       port=self.__DB_PORT, charset="utf8", connect_timeout=1, unix_socket=self.__DB_SOCKET)
+            else:
+                try:
+                    self.__DB_CONN = connector.connect(host=self.__DB_HOST, user=self.__DB_USER, passwd=self.__DB_PASS,
+                                                       port=self.__DB_PORT, charset="utf8", connect_timeout=1)
+                except Exception as e:
+                    self.__DB_HOST = '127.0.0.1'
+                    self.__DB_CONN = connector.connect(host=self.__DB_HOST, user=self.__DB_USER, passwd=self.__DB_PASS,
+                                                       port=self.__DB_PORT, charset="utf8", connect_timeout=1)
 
             self.__DB_CUR = self.__DB_CONN.cursor()
             return True

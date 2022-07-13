@@ -35,9 +35,6 @@ def getPluginName():
 def getPluginDir():
     return mw.getPluginDir() + '/' + getPluginName()
 
-sys.path.append(getPluginDir() + "/class")
-import mysqlDb
-
 
 def getServerDir():
     return mw.getServerDir() + '/' + getPluginName()
@@ -77,6 +74,22 @@ def checkArgs(data, ck=[]):
 def getConf():
     path = getServerDir() + '/etc/my.cnf'
     return path
+
+
+def getDbPort():
+    file = getConf()
+    content = mw.readFile(file)
+    rep = 'port\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
+
+
+def getSocketFile():
+    file = getConf()
+    content = mw.readFile(file)
+    rep = 'socket\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
 
 
 def getInitdTpl(version=''):
@@ -121,12 +134,10 @@ def pSqliteDb(dbname='databases'):
 
 
 def pMysqlDb():
-    sys.path.append(getPluginDir() + "/class")
-    import orm
-
-    db = orm.ORM()
+    db = mw.getMyORM()
     db.__DB_CNF = getConf()
-    db.setDbConf(getConf())
+    db.__DB_PORT = getDbPort()
+    db.__DB_SOCKET = getSocketFile()
     db.setPwd(pSqliteDb('config').where('id=?', (1,)).getField('mysql_root'))
     return db
 
