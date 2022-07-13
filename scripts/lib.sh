@@ -134,7 +134,7 @@ pip3 install flask-session==0.3.2
 pip3 install pymongo
 pip3 install psutil
 pip3 install flask-socketio==5.2.0
-pip3 install mysqlclient
+# pip3 install mysqlclient
 
 
 if [ ! -f /www/server/mdserver-web/bin/activate ];then
@@ -155,5 +155,5 @@ pip3 install flask-session==0.3.2
 pip3 install pymongo
 pip3 install psutil
 pip3 install flask-socketio==5.2.0
-pip3 install mysqlclient
+# pip3 install mysqlclient
 
