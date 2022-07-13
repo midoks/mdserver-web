@@ -607,9 +607,9 @@ def setDbBackup():
     if not data[0]:
         return data[1]
 
-    scDir = mw.getRunDir() + '/scripts/backup.py'
+    scDir = getPluginDir() + '/scripts/backup.py'
 
-    cmd = 'python ' + scDir + ' database ' + args['name'] + ' 3'
+    cmd = 'python3 ' + scDir + ' database ' + args['name'] + ' 3'
     os.system(cmd)
     return mw.returnJson(True, 'ok')
 
@@ -632,7 +632,7 @@ def importDbBackup():
 
     pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
 
-    mysql_cmd = mw.getRootDir() + '/server/mysql/bin/mysql -uroot -p' + pwd + \
+    mysql_cmd = mw.getRootDir() + '/server/mariadb/bin/mysql -uroot -p' + pwd + \
         ' ' + name + ' < ' + file_path_sql
 
     # print(mysql_cmd)
@@ -1032,19 +1032,6 @@ def getDbAccess():
         accs.append(c[0])
     userStr = ','.join(accs)
     return mw.returnJson(True, userStr)
-
-
-def toSize(size):
-    d = ('b', 'KB', 'MB', 'GB', 'TB')
-    s = d[0]
-    for b in d:
-        if size < 1024:
-            return str(size) + ' ' + b
-        size = size / 1024
-        s = b
-    _size = round(size, 2)
-    # print(size, _size)
-    return str(size) + ' ' + b
 
 
 def setDbAccess():
@@ -1865,37 +1852,5 @@ if __name__ == "__main__":
         print(alterTable())
     elif func == 'get_total_statistics':
         print(getTotalStatistics())
-    elif func == 'get_masterdb_list':
-        print(getMasterDbList(version))
-    elif func == 'get_master_status':
-        print(getMasterStatus(version))
-    elif func == 'set_master_status':
-        print(setMasterStatus(version))
-    elif func == 'set_db_master':
-        print(setDbMaster(version))
-    elif func == 'set_db_slave':
-        print(setDbSlave(version))
-    elif func == 'get_master_rep_slave_list':
-        print(getMasterRepSlaveList(version))
-    elif func == 'add_master_rep_slave_user':
-        print(addMasterRepSlaveUser(version))
-    elif func == 'del_master_rep_slave_user':
-        print(delMasterRepSlaveUser(version))
-    elif func == 'update_master_rep_slave_user':
-        print(updateMasterRepSlaveUser(version))
-    elif func == 'get_master_rep_slave_user_cmd':
-        print(getMasterRepSlaveUserCmd(version))
-    elif func == 'get_slave_list':
-        print(getSlaveList(version))
-    elif func == 'set_slave_status':
-        print(setSlaveStatus(version))
-    elif func == 'delete_slave':
-        print(deleteSlave(version))
-    elif func == 'full_sync':
-        print(fullSync(version))
-    elif func == 'do_full_sync':
-        print(doFullSync())
-    elif func == 'dump_mysql_data':
-        print(dumpMysqlData(version))
     else:
         print('error')
