@@ -57,10 +57,17 @@ Install_lib()
 	fi
 
 
-	if [ "$OSNAME" == "debian" ] &&  [ "$OSNAME" == "ubuntu" ];then
+	# cp -frp /usr/lib64/libldap* /usr/lib/
+
+	# ln -s /usr/lib64/libjpeg.so /usr/lib/libjpeg.so
+	# ln -s /usr/lib64/libpng.so /usr/lib/libpng.so
+
+	if [ ! -f /usr/lib/libjpeg.so ];then
 		ln -s /usr/lib64/libjpeg.so /usr/lib/libjpeg.so
-		ln -s /usr/lib64/libpng.so /usr/lib/
-		cp -frp /usr/lib64/libldap* /usr/lib/
+	fi
+
+	if [ ! -f /usr/lib/libpng.so ];then
+		ln -s /usr/lib64/libpng.so /usr/lib/libpng.so
 	fi
 	
 	
