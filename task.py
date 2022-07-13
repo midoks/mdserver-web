@@ -392,7 +392,7 @@ def startPHPVersion(version):
     try:
 
         # system
-        phpService = '/lib/systemd/system/php' + version + '.service'
+        phpService = mw.systemdCfgDir() + '/php' + version + '.service'
         if os.path.exists(phpService):
             mw.execShell("systemctl restart php" + version)
             if checkPHPVersion(version):
@@ -439,17 +439,42 @@ def startPHPVersion(version):
         return True
 
 
-# 检查指定PHP版本
-def checkPHPVersion(version):
+def getFpmConfFile(version):
+    return mw.getServerDir() + '/php/' + version + '/etc/php-fpm.d/www.conf'
+
+
+def getFpmAddress(version):
+    fpm_address = '/tmp/php-cgi-{}.sock'.format(version)
+    php_fpm_file = getFpmConfFile(version)
     try:
-        url = 'http://127.0.0.1/phpfpm_status_' + version
-        result = mw.httpGet(url, 1)
-        if result.find('timed out'):
-            raise
+        content = readFile(php_fpm_file)
+        tmp = re.findall(r"listen\s*=\s*(.+)", content)
+        if not tmp:
+            return fpm_address
+        if tmp[0].find('sock') != -1:
+            return fpm_address
+        if tmp[0].find(':') != -1:
+            listen_tmp = tmp[0].split(':')
+            if bind:
+                fpm_address = (listen_tmp[0], int(listen_tmp[1]))
+            else:
+                fpm_address = ('127.0.0.1', int(listen_tmp[1]))
+        else:
+            fpm_address = ('127.0.0.1', int(tmp[0]))
+        return fpm_address
+    except:
+        return fpm_address
+
+# 检查指定PHP版本
+
+
+def checkPHPVersion(version):
+
+    try:
+        sock = getFpmAddress(version)
+        data = mw.requestFcgiPHP(sock, '/phpfpm_status_' + version + '?json')
+        result = str(data, encoding='utf-8')
     except Exception as e:
-        url = 'http://' + mw.getLocalIp() + '/phpfpm_status_' + version
-        result = mw.httpGet(url, 1)
-    else:
         result = 'Bad Gateway'
 
     # print(version,result)
@@ -468,7 +493,7 @@ def checkPHPVersion(version):
                 return True
 
         # systemd
-        systemd = '/lib/systemd/system/openresty.service'
+        systemd = mw.systemdCfgDir() + '/openresty.service'
         if os.path.exists(systemd):
             execShell('systemctl reload openresty')
             return True
