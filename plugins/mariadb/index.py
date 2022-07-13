@@ -117,15 +117,9 @@ def getInitdTpl(version=''):
 
 def contentReplace(content):
     service_path = mw.getServerDir()
-    if content.find('{$ROOT_PATH}') != -1:
-        content = content.replace('{$ROOT_PATH}', mw.getRootDir())
-
-    if content.find('{$SERVER_PATH}') != -1:
-        content = content.replace('{$SERVER_PATH}', service_path)
-
-    if content.find('{$SERVER_APP_PATH}') != -1:
-        content = content.replace(
-            '{$SERVER_APP_PATH}', service_path + '/mariadb')
+    content = content.replace('{$ROOT_PATH}', mw.getRootDir())
+    content = content.replace('{$SERVER_PATH}', service_path)
+    content = content.replace('{$SERVER_APP_PATH}', service_path + '/mariadb')
     return content
 
 
