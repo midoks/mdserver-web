@@ -321,6 +321,10 @@ def initMysqlPwd():
     cmd_pass = cmd_pass + "flush privileges;\""
 
     data = mw.execShell(cmd_pass)
+    if data[1].find("ERROR"):
+        print("init mariadb db fail")
+        exit(1)
+
     # print(data)
     pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
     return True
@@ -552,8 +556,6 @@ def setDbStatus():
 def isSqlError(data):
     # 检测数据库执行错误
     errMsg = str(data)
-    if "MySQLdb" in errMsg:
-        return mw.returnJson(False, 'MySQLdb组件缺失! <br>进入SSH命令行输入: pip install mysql-python | pip install mysqlclient==2.0.3')
     if "2002," in errMsg:
         return mw.returnJson(False, '数据库连接失败,请检查数据库服务是否启动!')
     if "2003," in errMsg:
