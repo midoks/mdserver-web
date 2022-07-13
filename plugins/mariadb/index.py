@@ -165,10 +165,6 @@ def pMysqlDb():
 def initDreplace(version=''):
     initd_tpl = getInitdTpl(version)
 
-    initD_path = getServerDir() + '/init.d'
-    if not os.path.exists(initD_path):
-        os.mkdir(initD_path)
-
     mysql_conf_dir = getServerDir() + '/etc'
     if not os.path.exists(mysql_conf_dir):
         os.mkdir(mysql_conf_dir)
@@ -179,6 +175,10 @@ def initDreplace(version=''):
         content = mw.readFile(mysql_conf_tpl)
         content = contentReplace(content)
         mw.writeFile(mysql_conf, content)
+
+    initD_path = getServerDir() + '/init.d'
+    if not os.path.exists(initD_path):
+        os.mkdir(initD_path)
 
     file_bin = initD_path + '/' + getPluginName()
     if not os.path.exists(file_bin):
