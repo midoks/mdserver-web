@@ -169,13 +169,6 @@ def initDreplace(version=''):
     if not os.path.exists(initD_path):
         os.mkdir(initD_path)
 
-    file_bin = initD_path + '/' + getPluginName()
-    if not os.path.exists(file_bin):
-        content = mw.readFile(initd_tpl)
-        content = contentReplace(content)
-        mw.writeFile(file_bin, content)
-        mw.execShell('chmod +x ' + file_bin)
-
     mysql_conf_dir = getServerDir() + '/etc'
     if not os.path.exists(mysql_conf_dir):
         os.mkdir(mysql_conf_dir)
@@ -186,6 +179,13 @@ def initDreplace(version=''):
         content = mw.readFile(mysql_conf_tpl)
         content = contentReplace(content)
         mw.writeFile(mysql_conf, content)
+
+    file_bin = initD_path + '/' + getPluginName()
+    if not os.path.exists(file_bin):
+        content = mw.readFile(initd_tpl)
+        content = contentReplace(content)
+        mw.writeFile(file_bin, content)
+        mw.execShell('chmod +x ' + file_bin)
 
     mysql_tmp = getServerDir() + '/tmp'
     if not os.path.exists(mysql_tmp):
