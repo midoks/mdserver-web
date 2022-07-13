@@ -556,12 +556,14 @@ def setDbStatus():
 def isSqlError(data):
     # 检测数据库执行错误
     errMsg = str(data)
-    if "2002," in errMsg:
+    if "2002" in errMsg:
         return mw.returnJson(False, '数据库连接失败,请检查数据库服务是否启动!')
-    if "2003," in errMsg:
+    if "2003" in errMsg:
         return mw.returnJson(False, "Can't connect to MySQL server on '127.0.0.1' (61)")
-    if "1698," in errMsg:
+    if "1698" in errMsg:
         return mw.returnJson(False, "Access denied for user 'root'@'localhost'")
+    if "1045" in errMsg:
+        return mw.returnJson(False, "Access denied for user 'root'@'localhost' (using password: YES)")
     if "using password:" in errMsg:
         return mw.returnJson(False, '数据库管理密码错误!')
     if "Connection refused" in errMsg:
