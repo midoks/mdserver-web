@@ -63,7 +63,6 @@ Install_lib()
 		#--with-xpm
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
 		--with-gd \
-		--with-webp \
 		--with-jpeg \
 		--with-freetype \
 		--enable-gd-jis-conv \
