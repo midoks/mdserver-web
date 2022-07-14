@@ -23,7 +23,7 @@ Install_varnish()
 
 	if [ "${OSNAME}" == "macos" ]; then
 		brew install varnish
-	elif [ "${OSNAME}" == "centos" ] || [ "${OSNAME}" == "fedora" ] || [ "${OSNAME}" == "alma" ]; then
+	elif [ "${OSNAME}" == "centos" ] || [ "${OSNAME}" == "fedora" ] || [ "${OSNAME}" == "alma" ] || [ "${OSNAME}" == "rocky" ]; then
 		yum install varnish -y
 	elif [ "${OSNAME}" == "debian" ] || [ "${OSNAME}" == "ubuntu" ]; then
 		apt install varnish -y
