@@ -50,10 +50,11 @@ Install_sphinx()
 
 Uninstall_sphinx()
 {
-	if [ -f /usr/lib/systemd/system/sphinx.service ];then
+	if [ -f /usr/lib/systemd/system/sphinx.service ] || [ -f /lib/systemd/system/sphinx.service ];then
 		systemctl stop sphinx
 		systemctl disable sphinx
 		rm -rf /usr/lib/systemd/system/sphinx.service
+		rm -rf /lib/systemd/system/sphinx.service
 		systemctl daemon-reload
 	fi
 
