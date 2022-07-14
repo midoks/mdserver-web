@@ -62,7 +62,7 @@ Install_lib()
 		--enable-openssl \
 		--with-openssl-dir=$serverPath/lib/openssl \
 		--enable-sockets
-		make && make install && make clean
+		make clean && make && make install && make clean
 	fi
 	
 	while [[ ! -f "$extFile" ]];

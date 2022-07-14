@@ -59,8 +59,7 @@ Install_lib()
 			sed -i $BAK 's/CFLAGS \=/CFLAGS \= -std=c99/g' Makefile
 		fi
 
-
-		make && make install && make clean
+		make clean && make && make install && make clean
 		
 	fi
 
