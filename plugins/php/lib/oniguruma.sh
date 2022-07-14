@@ -20,7 +20,6 @@ if [ "$?" != "0" ];then
         wget -O ${SOURCE_ROOT}/oniguruma-6.9.4.tar.gz https://github.com/kkos/oniguruma/archive/v6.9.4.tar.gz
     fi 
     cd ${SOURCE_ROOT} && tar -zxvf oniguruma-6.9.4.tar.gz
-    cd oniguruma-6.9.4/
-    ./autogen.sh && ./configure --prefix=/usr && make && make install
+    cd ${SOURCE_ROOT}/oniguruma-6.9.4 && ./autogen.sh && ./configure --prefix=/usr && make && make install
 fi
 
