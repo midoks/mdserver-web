@@ -24,6 +24,7 @@ cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash freetype_new.sh
 cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash libiconv.sh
 cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash zlib.sh
 cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash libzip.sh
+cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash oniguruma.sh
 
 
 if [ ! -d $sourcePath/php/php${PHP_VER} ];then
