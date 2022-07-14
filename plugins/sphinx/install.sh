@@ -36,6 +36,11 @@ Install_sphinx()
 		fi
 	fi
 
+	if [ ! -f ${SPHINX_DIR}/sphinx-3.1.1.tar.gz ];then
+		curl -sSLo ${SPHINX_DIR}/sphinx-3.1.1.tar.gz https://github.com/midoks/mdserver-web/releases/download/init/sphinx-3.1.1.tar.gz
+	fi
+
+
 	cd ${SPHINX_DIR} && tar -zxvf sphinx-3.1.1.tar.gz
 	
 	if [ "$?" == "0" ];then
