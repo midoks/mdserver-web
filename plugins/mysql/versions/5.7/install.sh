@@ -38,6 +38,7 @@ Install_mysql()
 		touch /var/log/mariadb/mariadb.log
 	fi
 
+	cd $serverPath/mdserver-web/plugins/mysql/lib && /bin/bash rpcgen.sh
 
 	if [ ! -f ${mysqlDir}/mysql-boost-${VERSION}.tar.gz ];then
 		wget -O ${mysqlDir}/mysql-boost-${VERSION}.tar.gz --tries=3 https://cdn.mysql.com/Downloads/MySQL-5.7/mysql-boost-${VERSION}.tar.gz
@@ -95,7 +96,7 @@ Install_mysql()
 			echo '5.7' > $serverPath/mysql/version.pl
 			echo '安装完成' > $install_tmp
 		else
-			rm -rf ${mysqlDir}/mysql-${VERSION}
+			# rm -rf ${mysqlDir}/mysql-${VERSION}
 			echo '安装失败' > $install_tmp
 			echo 'install fail'>&2
 			exit 1
