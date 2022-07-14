@@ -81,6 +81,8 @@ do dnf --enablerepo=powertools install -y $yumPack;done
 
 yum install -y libtirpc libtirpc-devel
 
+dnf install boost-locale
+
 dnf --enablerepo=powertools install -y libmemcached libmemcached-devel
 dnf --enablerepo=powertools install -y rpcgen
 dnf --enablerepo=powertools install -y oniguruma oniguruma-devel
