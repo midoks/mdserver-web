@@ -616,11 +616,9 @@ def projectScriptLoad():
 
 def projectScriptUnload():
     args = getArgs()
-    if not 'user' in args:
-        return mw.returnJson(True, 'username missing')
-
-    if not 'name' in args:
-        return mw.returnJson(True, 'project name missing')
+    data = checkArgs(args, ['user', 'name'])
+    if not data[0]:
+        return data[1]
 
     user = args['user']
     name = args['name'] + '.git'
@@ -637,11 +635,10 @@ def projectScriptUnload():
 
 def projectScriptDebug():
     args = getArgs()
-    if not 'user' in args:
-        return mw.returnJson(True, 'username missing')
+    data = checkArgs(args, ['user', 'name'])
+    if not data[0]:
+        return data[1]
 
-    if not 'name' in args:
-        return mw.returnJson(True, 'project name missing')
     user = args['user']
     name = args['name'] + '.git'
     commit_log = getRootPath() + '/' + user + '/' + name + \
