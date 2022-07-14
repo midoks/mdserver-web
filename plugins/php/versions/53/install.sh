@@ -78,7 +78,6 @@ if [ ! -d $serverPath/php/53/bin ];then
 	--enable-posix \
 	--enable-sockets \
 	--enable-mbstring \
-	--enable-mysqlnd \
 	--enable-sysvmsg \
 	--enable-sysvsem \
 	--enable-sysvshm \
