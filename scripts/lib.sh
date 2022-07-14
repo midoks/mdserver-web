@@ -109,11 +109,6 @@ else
     yum install -y mysql-devel
     yum install -y oniguruma oniguruma-devel
     yum install -y ImageMagick ImageMagick-devel
-
-    if [ "$OSNAME" == "fedora"  ]; then
-        dnf install libxml2 libxml2-devel -y
-
-    fi
 fi
 
 
