@@ -17,7 +17,7 @@ yum install -y wget lsof crontabs
 yum install -y python3-devel
 yum install -y python-devel
 yum install -y vixie-cron
-
+yum install -y curl curl-devel libcurl libcurl-devel
 #https need
 
 if [ ! -d /root/.acme.sh ];then	
