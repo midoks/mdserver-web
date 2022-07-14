@@ -38,7 +38,7 @@ Install_lib()
 		return
 	fi
 
-	cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash libmemcached.sh
+	# cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash libmemcached.sh
 	
 	if [ ! -f "$extFile" ];then
 
