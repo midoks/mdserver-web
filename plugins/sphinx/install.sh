@@ -28,7 +28,6 @@ Install_sphinx()
 	mkdir -p $serverPath/sphinx
 
 	SPHINX_DIR=${serverPath}/source/sphinx
-	mkdir -p $SPHINX_DIR
 	if [ ! -f ${SPHINX_DIR}/sphinx-3.1.1.tar.gz ];then
 		if [ $sysName == 'Darwin' ]; then
 			wget -O ${SPHINX_DIR}/sphinx-3.1.1.tar.gz http://sphinxsearch.com/files/sphinx-3.1.1-612d99f-darwin-amd64.tar.gz
@@ -38,8 +37,12 @@ Install_sphinx()
 	fi
 
 	cd ${SPHINX_DIR} && tar -zxvf sphinx-3.1.1.tar.gz
-	cp -rf ${SPHINX_DIR}/sphinx-3.1.1/ $serverPath/sphinx/bin
-
+	
+	if [ "$?" == "0" ];then
+		mkdir -p $SPHINX_DIR
+		cp -rf ${SPHINX_DIR}/sphinx-3.1.1/ $serverPath/sphinx/bin
+	fi
+	
 	if [ -d $serverPath/sphinx ];then
 		echo '3.1.1' > $serverPath/sphinx/version.pl
 		echo '安装完成' > $install_tmp
