@@ -51,7 +51,7 @@ Install_lib()
 		fi 
 		cd $php_lib/${LIBNAME}-${LIBV}
 
-		sed -i '_bak' "3237,3238s#ulong#zend_ulong#g" $php_lib/${LIBNAME}-${LIBV}/php_memcached.c
+		# sed -i '_bak' "3237,3238s#ulong#zend_ulong#g" $php_lib/${LIBNAME}-${LIBV}/php_memcached.c
 		$serverPath/php/$version/bin/phpize
 	
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
