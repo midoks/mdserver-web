@@ -23,7 +23,7 @@ Install_varnish()
 
 	if [ "${OSNAME}" == "macos" ]; then
 		brew install varnish
-	elif [ "${OSNAME}" == "centos" ] || [ "${OSNAME}" == "fedora" ]; then
+	elif [ "${OSNAME}" == "centos" ] || [ "${OSNAME}" == "fedora" ] || [ "${OSNAME}" == "alma" ]; then
 		yum install varnish -y
 	elif [ "${OSNAME}" == "debian" ] || [ "${OSNAME}" == "ubuntu" ]; then
 		apt install varnish -y
@@ -49,9 +49,9 @@ Uninstall_varnish()
 
 	if [ "${OSNAME}" == "macos" ]; then
 		brew uninstall varnish
-	elif [ "${OSNAME}" == "centos" ]; then
+	elif [ "${OSNAME}" == "centos" ] || [ "${OSNAME}" == "fedora" ] || [ "${OSNAME}" == "alma" ]; then
 		yum remove varnish -y
-	elif [ "${OSNAME}" == "centos" ] || [ "${OSNAME}" == "fedora" ]; then
+	elif [ "${OSNAME}" == "debian" ] || [ "${OSNAME}" == "ubuntu" ]; then
 		apt remove varnish -y
 	elif [ "${OSNAME}" == "opensuse" ];then
 		zypper remove -y varnish
