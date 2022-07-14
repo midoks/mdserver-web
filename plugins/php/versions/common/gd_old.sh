@@ -63,8 +63,8 @@ Install_lib()
 		#--with-xpm
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
 		--with-gd \
-		--with-jpeg \
-		--with-freetype \
+		--with-jpeg-dir=/usr/lib \
+		--with-freetype-dir=${serverPath}/lib/freetype_old \
 		--enable-gd-jis-conv \
 		--enable-gd-native-ttf
 		make clean && make && make install && make clean
