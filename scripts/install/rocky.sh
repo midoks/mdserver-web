@@ -81,6 +81,8 @@ do yum -y install $yumPack;done
 
 yum install -y libtirpc libtirpc-devel
 
+dnf --enablerepo=powertools install -y libmemcached libmemcached-devel
+
 cd /www/server/mdserver-web/scripts && bash lib.sh
 chmod 755 /www/server/mdserver-web/data
 
