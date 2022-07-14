@@ -11,31 +11,15 @@ sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 
 
-sysName=`uname`
-echo "use system: ${sysName}"
+bash ${rootPath}/scripts/getos.sh
+OSNAME=`cat ${rootPath}/data/osname.pl`
+OSNAME_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
-if [ ${sysName} == "Darwin" ]; then
-	OSNAME='macos'
-elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
-	OSNAME='centos'
-elif grep -Eqi "Fedora" /etc/issue || grep -Eq "Fedora" /etc/*-release; then
-	OSNAME='fedora'
-elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
-	OSNAME='debian'
-elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
-	OSNAME='ubuntu'
-elif grep -Eqi "Raspbian" /etc/issue || grep -Eq "Raspbian" /etc/*-release; then
-	OSNAME='raspbian'
-else
-	OSNAME='unknow'
-fi
-
-if [ ${OSNAME} == "centos" ] || [ ${OSNAME} == "fedora" ]; then
+if [ ${OSNAME} == "centos" ] || 
+	[ ${OSNAME} == "fedora" ] ||
+	[ ${OSNAME} == "alma" ]; then
 	yum install -y postgresql-libs unixODBC
 fi
-
-
-
 
 Install_sphinx()
 {
@@ -49,7 +33,7 @@ Install_sphinx()
 		if [ $sysName == 'Darwin' ]; then
 			wget -O ${SPHINX_DIR}/sphinx-3.1.1.tar.gz http://sphinxsearch.com/files/sphinx-3.1.1-612d99f-darwin-amd64.tar.gz
 		else
-			wget -O ${SPHINX_DIR}/sphinx-3.1.1.tar.gz http://sphinxsearch.com/files/sphinx-3.1.1-612d99f-linux-amd64.tar.gz
+			curl -sSLo ${SPHINX_DIR}/sphinx-3.1.1.tar.gz http://sphinxsearch.com/files/sphinx-3.1.1-612d99f-linux-amd64.tar.gz
 		fi
 	fi
 
