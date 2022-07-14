@@ -23,8 +23,10 @@ Install_rsyncd()
 	echo '正在安装脚本文件...' > $install_tmp
 	mkdir -p $serverPath/rsyncd
 
-	if [ $OSNAME == 'debian' ];then
+	if [ "$OSNAME" == "debian'" ] || [ "$OSNAME" == "ubuntu'" ];then
 		apt install -y rsync
+	else
+		yum install -y rsync
 	fi
 
 	
@@ -36,10 +38,11 @@ Install_rsyncd()
 
 Uninstall_rsyncd()
 {
-	if [ -f /usr/lib/systemd/system/rsyncd.service ];then
+	if [ -f /usr/lib/systemd/system/rsyncd.service ] || [ -f /lib/systemd/system/rsyncd.service ];then
 		systemctl stop rsyncd
 		systemctl disable rsyncd
 		rm -rf /usr/lib/systemd/system/rsyncd.service
+		rm -rf /lib/systemd/system/rsyncd.service
 		systemctl daemon-reload
 	fi
 

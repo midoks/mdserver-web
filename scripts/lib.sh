@@ -109,11 +109,6 @@ else
     yum install -y mysql-devel
     yum install -y oniguruma oniguruma-devel
     yum install -y ImageMagick ImageMagick-devel
-
-    if [ "$OSNAME" == "fedora"  ]; then
-        dnf install libxml2 libxml2-devel -y
-
-    fi
 fi
 
 
@@ -128,13 +123,10 @@ pip3 install --upgrade setuptools
 cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
 
 pip3 install gevent-websocket==0.10.1
-pip3 install requests==2.20.0
 pip3 install flask-caching==1.10.1
 pip3 install flask-session==0.3.2
-pip3 install pymongo
-pip3 install psutil
 pip3 install flask-socketio==5.2.0
-pip3 install mysqlclient
+# pip3 install mysqlclient
 
 
 if [ ! -f /www/server/mdserver-web/bin/activate ];then
@@ -149,11 +141,8 @@ pip3 install --upgrade setuptools
 pip3 install -r /www/server/mdserver-web/requirements.txt
 
 pip3 install gevent-websocket==0.10.1
-pip3 install requests==2.20.0
 pip3 install flask-caching==1.10.1
 pip3 install flask-session==0.3.2
-pip3 install pymongo
-pip3 install psutil
 pip3 install flask-socketio==5.2.0
-pip3 install mysqlclient
+# pip3 install mysqlclient
 

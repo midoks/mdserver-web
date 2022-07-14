@@ -25,6 +25,11 @@ if [ "$version" -eq "70" ] || [ "$version" -eq "71" ];then
 	LIBV=2.7.0
 fi
 
+if [ "$version" -eq "82" ];then
+	echo "not need"
+	exit 1
+fi
+
 NON_ZTS_FILENAME=`ls $serverPath/php/${version}/lib/php/extensions | grep no-debug-non-zts`
 extFile=$serverPath/php/${version}/lib/php/extensions/${NON_ZTS_FILENAME}/${LIBNAME}.so
 
@@ -36,7 +41,7 @@ fi
 
 Install_lib()
 {
-	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep "${LIBNAME}.so"`
+	isInstall=`cat $serverPath/php/${version}/etc/php.ini|grep "${LIBNAME}.so"`
 	if [ "${isInstall}" != "" ];then
 		echo "php-$version 已安装${LIBNAME},请选择其它版本!"
 		return
@@ -56,7 +61,7 @@ Install_lib()
 		
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config
-		make && make install && make clean
+		make clean && make && make install && make clean
 		
 	fi
 	

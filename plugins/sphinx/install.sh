@@ -11,31 +11,15 @@ sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 
 
-sysName=`uname`
-echo "use system: ${sysName}"
+bash ${rootPath}/scripts/getos.sh
+OSNAME=`cat ${rootPath}/data/osname.pl`
+OSNAME_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
-if [ ${sysName} == "Darwin" ]; then
-	OSNAME='macos'
-elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
-	OSNAME='centos'
-elif grep -Eqi "Fedora" /etc/issue || grep -Eq "Fedora" /etc/*-release; then
-	OSNAME='fedora'
-elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
-	OSNAME='debian'
-elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
-	OSNAME='ubuntu'
-elif grep -Eqi "Raspbian" /etc/issue || grep -Eq "Raspbian" /etc/*-release; then
-	OSNAME='raspbian'
-else
-	OSNAME='unknow'
-fi
-
-if [ ${OSNAME} == "centos" ] || [ ${OSNAME} == "fedora" ]; then
+if [ ${OSNAME} == "centos" ] || 
+	[ ${OSNAME} == "fedora" ] ||
+	[ ${OSNAME} == "alma" ]; then
 	yum install -y postgresql-libs unixODBC
 fi
-
-
-
 
 Install_sphinx()
 {
@@ -44,18 +28,26 @@ Install_sphinx()
 	mkdir -p $serverPath/sphinx
 
 	SPHINX_DIR=${serverPath}/source/sphinx
-	mkdir -p $SPHINX_DIR
 	if [ ! -f ${SPHINX_DIR}/sphinx-3.1.1.tar.gz ];then
 		if [ $sysName == 'Darwin' ]; then
 			wget -O ${SPHINX_DIR}/sphinx-3.1.1.tar.gz http://sphinxsearch.com/files/sphinx-3.1.1-612d99f-darwin-amd64.tar.gz
 		else
-			wget -O ${SPHINX_DIR}/sphinx-3.1.1.tar.gz http://sphinxsearch.com/files/sphinx-3.1.1-612d99f-linux-amd64.tar.gz
+			curl -sSLo ${SPHINX_DIR}/sphinx-3.1.1.tar.gz http://sphinxsearch.com/files/sphinx-3.1.1-612d99f-linux-amd64.tar.gz
 		fi
 	fi
 
-	cd ${SPHINX_DIR} && tar -zxvf sphinx-3.1.1.tar.gz
-	cp -rf ${SPHINX_DIR}/sphinx-3.1.1/ $serverPath/sphinx/bin
+	if [ ! -f ${SPHINX_DIR}/sphinx-3.1.1.tar.gz ];then
+		curl -sSLo ${SPHINX_DIR}/sphinx-3.1.1.tar.gz https://github.com/midoks/mdserver-web/releases/download/init/sphinx-3.1.1.tar.gz
+	fi
 
+
+	cd ${SPHINX_DIR} && tar -zxvf sphinx-3.1.1.tar.gz
+	
+	if [ "$?" == "0" ];then
+		mkdir -p $SPHINX_DIR
+		cp -rf ${SPHINX_DIR}/sphinx-3.1.1/ $serverPath/sphinx/bin
+	fi
+	
 	if [ -d $serverPath/sphinx ];then
 		echo '3.1.1' > $serverPath/sphinx/version.pl
 		echo '安装完成' > $install_tmp
@@ -66,10 +58,11 @@ Install_sphinx()
 
 Uninstall_sphinx()
 {
-	if [ -f /usr/lib/systemd/system/sphinx.service ];then
+	if [ -f /usr/lib/systemd/system/sphinx.service ] || [ -f /lib/systemd/system/sphinx.service ];then
 		systemctl stop sphinx
 		systemctl disable sphinx
 		rm -rf /usr/lib/systemd/system/sphinx.service
+		rm -rf /lib/systemd/system/sphinx.service
 		systemctl daemon-reload
 	fi
 

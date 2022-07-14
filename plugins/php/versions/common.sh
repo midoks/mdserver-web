@@ -36,9 +36,9 @@ fi
 
 if [ "$action" == 'uninstall' ];then
 		if [ -f $FILE ];then
-		cd ${curPath}/${version} && bash ${extName}.sh install ${version}
+		cd ${curPath}/${version} && bash ${extName}.sh uninstall ${version}
 	elif [ -f $FILE_COMMON ];then
-		cd ${curPath}/common && bash ${extName}.sh install ${version}
+		cd ${curPath}/common && bash ${extName}.sh uninstall ${version}
 	else
 		echo 'no such extension'
 	fi
@@ -46,5 +46,5 @@ fi
 
 echo "cd ${curPath}/common && bash ${extName}.sh install ${version}"
 echo "cd ${curPath}/${version} && bash ${extName}.sh install ${version}"
-echo "cd ${curPath}/common && bash ${extName}.sh uinstall ${version}"
-echo "cd ${curPath}/${version} && bash ${extName}.sh uinstall ${version}"
+echo "cd ${curPath}/common && bash ${extName}.sh uninstall ${version}"
+echo "cd ${curPath}/${version} && bash ${extName}.sh uninstall ${version}"

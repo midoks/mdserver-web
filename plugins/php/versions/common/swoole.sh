@@ -27,6 +27,11 @@ else
 	echo '72+'
 fi
 
+if [ "$version" -eq "82" ];then
+	echo "not need"
+	exit 1
+fi
+
 NON_ZTS_FILENAME=`ls $serverPath/php/${version}/lib/php/extensions | grep no-debug-non-zts`
 extFile=$serverPath/php/${version}/lib/php/extensions/${NON_ZTS_FILENAME}/${LIBNAME}.so
 
@@ -62,7 +67,7 @@ Install_lib()
 		--enable-openssl \
 		--with-openssl-dir=$serverPath/lib/openssl \
 		--enable-sockets
-		make && make install && make clean
+		make clean && make && make install && make clean
 	fi
 	
 	while [[ ! -f "$extFile" ]];

@@ -21,7 +21,6 @@ echo "安装php-5.3.29 ..." > $install_tmp
 mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
-cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash freetype_old.sh
 cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash libiconv.sh
 cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash zlib.sh
 
@@ -39,6 +38,9 @@ if [ -f $serverPath/php/53/bin/php ];then
 	return
 fi
 
+# OPTIONS="${OPTIONS} --with-freetype-dir=${serverPath}/lib/freetype_old"
+# OPTIONS="${OPTIONS} --with-gd --enable-gd-native-ttf"
+# OPTIONS="${OPTIONS} --with-jpeg --with-jpeg-dir=/usr/lib"
 OPTIONS=''
 if [ $sysName == 'Darwin' ]; then
 	OPTIONS='--without-iconv'
@@ -46,9 +48,6 @@ if [ $sysName == 'Darwin' ]; then
 	OPTIONS="${OPTIONS} --with-curl=${serverPath}/lib/curl"
 else
 	OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
-	OPTIONS="${OPTIONS} --with-freetype-dir=${serverPath}/lib/freetype_old"
-	OPTIONS="${OPTIONS} --with-gd --enable-gd-native-ttf"
-	OPTIONS="${OPTIONS} --with-jpeg --with-jpeg-dir=/usr/lib"
 	OPTIONS="${OPTIONS} --with-curl"
 fi
 

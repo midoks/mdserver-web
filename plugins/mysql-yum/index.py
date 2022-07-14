@@ -35,38 +35,13 @@ def getPluginName():
 def getPluginDir():
     return mw.getPluginDir() + '/' + getPluginName()
 
-sys.path.append(getPluginDir() + "/class")
-import mysqlDb
-
 
 def getServerDir():
     return mw.getServerDir() + '/' + getPluginName()
 
 
-def is_number(s):
-    try:
-        float(s)
-        return True
-    except ValueError:
-        pass
-
-    try:
-        import unicodedata
-        unicodedata.numeric(s)
-        return True
-    except (TypeError, ValueError):
-        pass
-
-    return False
-
-
 def getArgs():
     args = sys.argv[2:]
-
-    # print(args)
-
-    # if is_number(args):
-    #     args = sys.argv[3:]
 
     tmp = {}
     args_len = len(args)
@@ -93,6 +68,38 @@ def checkArgs(data, ck=[]):
 def getConf():
     path = getServerDir() + '/etc/my.cnf'
     return path
+
+
+def getDataDir():
+    file = getConf()
+    content = mw.readFile(file)
+    rep = 'datadir\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
+
+
+def getPidFile():
+    file = getConf()
+    content = mw.readFile(file)
+    rep = 'pid-file\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
+
+
+def getDbPort():
+    file = getConf()
+    content = mw.readFile(file)
+    rep = 'port\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
+
+
+def getSocketFile():
+    file = getConf()
+    content = mw.readFile(file)
+    rep = 'socket\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
 
 
 def contentReplace(content):
@@ -125,11 +132,11 @@ def pSqliteDb(dbname='databases'):
 
 
 def pMysqlDb():
-    db = mysqlDb.mysqlDb()
+    db = mw.getMyORM()
     db.__DB_CNF = getConf()
-    db.setDbConf(getConf())
-    db.setPwd(pSqliteDb('config').where(
-        'id=?', (1,)).getField('mysql_root'))
+    db.setPort(getDbPort())
+    db.setSocket(getSocketFile())
+    db.setPwd(pSqliteDb('config').where('id=?', (1,)).getField('mysql_root'))
     return db
 
 
@@ -172,22 +179,6 @@ def status(version=''):
     if not os.path.exists(pid):
         return 'stop'
     return 'start'
-
-
-def getDataDir():
-    file = getConf()
-    content = mw.readFile(file)
-    rep = 'datadir\s*=\s*(.*)'
-    tmp = re.search(rep, content)
-    return tmp.groups()[0].strip()
-
-
-def getPidFile():
-    file = getConf()
-    content = mw.readFile(file)
-    rep = 'pid-file\s*=\s*(.*)'
-    tmp = re.search(rep, content)
-    return tmp.groups()[0].strip()
 
 
 def binLog():

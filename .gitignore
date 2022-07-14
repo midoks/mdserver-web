@@ -122,6 +122,7 @@ data/datadir.pl
 data/502Task.pl
 data/default.pl
 data/backup.pl
+data/default_site.pl
 lib/python*
 
 bin
@@ -143,4 +144,5 @@ plugins/openlitespeed
 plugins/gdrive
 plugins/mtproxy
 debug.out
+
 

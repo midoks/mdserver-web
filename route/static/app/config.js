@@ -281,7 +281,7 @@ function getPanelSSL(){
 				</div>\
 			</div>\
 			<ul class="help-info-text c7 pull-left">\
-				<li>粘贴您的*.key以及*.pem内容，然后保存即可<a href="http://www.bt.cn/bbs/thread-704-1-1.html" class="btlink" target="_blank">[帮助]</a>。</li>\
+				<li>粘贴您的*.key以及*.pem内容，然后保存即可。</li>\
 				<li>如果浏览器提示证书链不完整,请检查是否正确拼接PEM证书</li><li>PEM格式证书 = 域名证书.crt + 根证书(root_bundle).crt</li>\
 			</ul>\
 		</div>'

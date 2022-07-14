@@ -82,6 +82,7 @@ Install_mysql()
 		else
 			rm -rf ${mysqlDir}/mysql-5.6.50
 			echo '安装失败' > $install_tmp
+			echo 'install fail'>&2
 			exit 1
 		fi
 	fi

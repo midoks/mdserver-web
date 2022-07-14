@@ -78,12 +78,33 @@ def getFpmConfFile(version):
     return getServerDir() + '/' + version + '/etc/php-fpm.d/www.conf'
 
 
-def status(version):
+def status_progress(version):
     # ps -ef|grep 'php/81' |grep -v grep | grep -v python | awk '{print $2}
     cmd = "ps -ef|grep 'php/" + version + \
         "' |grep -v grep | grep -v python | awk '{print $2}'"
     data = mw.execShell(cmd)
     if data[0] == '':
+        return 'stop'
+    return 'start'
+
+
+def getPhpSocket(version):
+    path = getFpmConfFile(version)
+    content = mw.readFile(path)
+    rep = 'listen\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
+
+
+def status(version):
+    '''
+    sock文件判断是否启动
+    '''
+    sock = getPhpSocket(version)
+    if sock.find(':'):
+        return status_progress(version)
+
+    if not os.path.exists(sock):
         return 'stop'
     return 'start'
 
@@ -705,7 +726,7 @@ def installLib(version):
 
     name = args['name']
     execstr = "cd " + getPluginDir() + "/versions && /bin/bash  common.sh " + \
-        version + ' install ' + ' ' + name
+        version + ' install ' + name
 
     rettime = time.strftime('%Y-%m-%d %H:%M:%S')
     insert_info = (None, '安装[' + name + '-' + version + ']',
@@ -724,7 +745,7 @@ def uninstallLib(version):
 
     name = args['name']
     execstr = "cd " + getPluginDir() + "/versions && /bin/bash  common.sh " + \
-        version + ' uninstall ' + ' ' + name
+        version + ' uninstall ' + name
 
     data = mw.execShell(execstr)
     # data[0] == '' and
@@ -759,8 +780,15 @@ def installPreInspection(version):
     if sysName == 'ubuntu':
         return 'ubuntu已经安装不了'
 
-    if sysName == 'debian' and sys_id > 10:
+    if sysName == 'debian' and sysId > 10:
         return 'debian10可以安装'
+
+    if sysName == 'fedora':
+        sys_id = mw.execShell(
+            "cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}'")
+        sysId = sys_id[0].strip()
+        if int(sysId) > 31:
+            return 'fedora[{}]不可安装'.format(sysId)
     return 'ok'
 
 if __name__ == "__main__":

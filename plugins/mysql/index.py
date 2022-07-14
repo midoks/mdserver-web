@@ -35,9 +35,6 @@ def getPluginName():
 def getPluginDir():
     return mw.getPluginDir() + '/' + getPluginName()
 
-sys.path.append(getPluginDir() + "/class")
-import mysqlDb
-
 
 def getServerDir():
     return mw.getServerDir() + '/' + getPluginName()
@@ -49,30 +46,8 @@ def getInitDFile():
     return '/etc/init.d/' + getPluginName()
 
 
-def is_number(s):
-    try:
-        float(s)
-        return True
-    except ValueError:
-        pass
-
-    try:
-        import unicodedata
-        unicodedata.numeric(s)
-        return True
-    except (TypeError, ValueError):
-        pass
-
-    return False
-
-
 def getArgs():
     args = sys.argv[2:]
-
-    # print(args)
-
-    # if is_number(args):
-    #     args = sys.argv[3:]
 
     tmp = {}
     args_len = len(args)
@@ -99,6 +74,22 @@ def checkArgs(data, ck=[]):
 def getConf():
     path = getServerDir() + '/etc/my.cnf'
     return path
+
+
+def getDbPort():
+    file = getConf()
+    content = mw.readFile(file)
+    rep = 'port\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
+
+
+def getSocketFile():
+    file = getConf()
+    content = mw.readFile(file)
+    rep = 'socket\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
 
 
 def getInitdTpl(version=''):
@@ -143,11 +134,10 @@ def pSqliteDb(dbname='databases'):
 
 
 def pMysqlDb():
-    db = mysqlDb.mysqlDb()
-    db.__DB_CNF = getConf()
-    db.setDbConf(getConf())
-    db.setPwd(pSqliteDb('config').where(
-        'id=?', (1,)).getField('mysql_root'))
+    db = mw.getMyORM()
+    db.setPort(getDbPort())
+    db.setSocket(getSocketFile())
+    db.setPwd(pSqliteDb('config').where('id=?', (1,)).getField('mysql_root'))
     return db
 
 
@@ -198,11 +188,6 @@ def initDreplace(version=''):
 
 
 def status(version=''):
-    data = mw.execShell(
-        "ps -ef|grep mysqld |grep -v grep | grep -v python | awk '{print $2}'")
-    if data[0] == '':
-        return 'stop'
-
     pid = getPidFile()
     if not os.path.exists(pid):
         return 'stop'
@@ -322,6 +307,9 @@ def initMysqlData():
 
 
 def initMysql57Data():
+    '''
+    cd /www/server/mysql && /www/server/mysql/bin/mysqld --defaults-file=/www/server/mysql/etc/my.cnf  --initialize-insecure --explicit_defaults_for_timestamp
+    '''
     datadir = getDataDir()
     if not os.path.exists(datadir + '/mysql'):
         serverdir = getServerDir()
@@ -329,8 +317,8 @@ def initMysql57Data():
         user = pGetDbUser()
         cmd = 'cd ' + serverdir + ' && ./bin/mysqld --defaults-file=' + myconf + \
             ' --initialize-insecure --explicit_defaults_for_timestamp'
-        # print(mw.execShell(cmd))
-
+        data = mw.execShell(cmd)
+        # print(data)
         return False
     return True
 
@@ -347,7 +335,8 @@ def initMysql8Data():
             datadir + ' --initialize-insecure'
 
         # print(cmd)
-        mw.execShell(cmd)
+        data = mw.execShell(cmd)
+        # print(data)
         return False
     return True
 
@@ -356,10 +345,21 @@ def initMysqlPwd():
     time.sleep(5)
 
     serverdir = getServerDir()
-
     pwd = mw.getRandomString(16)
-    cmd_pass = serverdir + '/bin/mysqladmin -uroot password ' + pwd
-    mw.execShell(cmd_pass)
+    # cmd_pass = serverdir + '/bin/mysqladmin -uroot password ' + pwd
+
+    # cmd_pass = "insert into mysql.user(Select_priv,Insert_priv,Update_priv,Delete_priv,Create_priv,Drop_priv,Reload_priv,Shutdown_priv,Process_priv,File_priv,Grant_priv,References_priv,Index_priv,Alter_priv,Show_db_priv,Super_priv,Create_tmp_table_priv,Lock_tables_priv,Execute_priv,Repl_slave_priv,Repl_client_priv,Create_view_priv,Show_view_priv,Create_routine_priv,Alter_routine_priv,Create_user_priv,Event_priv,Trigger_priv,Create_tablespace_priv,User,Password,host)values('Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','root',password('" + pwd + "'),'127.0.0.1')"
+    # cmd_pass = cmd_pass + \
+    #     "insert into mysql.user(Select_priv,Insert_priv,Update_priv,Delete_priv,Create_priv,Drop_priv,Reload_priv,Shutdown_priv,Process_priv,File_priv,Grant_priv,References_priv,Index_priv,Alter_priv,Show_db_priv,Super_priv,Create_tmp_table_priv,Lock_tables_priv,Execute_priv,Repl_slave_priv,Repl_client_priv,Create_view_priv,Show_view_priv,Create_routine_priv,Alter_routine_priv,Create_user_priv,Event_priv,Trigger_priv,Create_tablespace_priv,User,Password,host)values('Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','root',password('" + pwd + "'),'localhost')"
+    # cmd_pass = cmd_pass + \
+    #     "UPDATE mysql.user SET password=PASSWORD('" + \
+    #     pwd + "') WHERE user='root'"
+    cmd_pass = serverdir + '/bin/mysql -uroot -e'
+    cmd_pass = cmd_pass + "\"UPDATE mysql.user SET password=PASSWORD('" + \
+        pwd + "') WHERE user='root';"
+    cmd_pass = cmd_pass + "flush privileges;\""
+    data = mw.execShell(cmd_pass)
+    # print(data)
     pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
     return True
 
@@ -371,6 +371,10 @@ def initMysql8Pwd():
     pwd = mw.getRandomString(16)
 
     alter_root_pwd = 'flush privileges;'
+
+    alter_root_pwd = alter_root_pwd + \
+        "UPDATE mysql.user SET authentication_string='' WHERE user='root';"
+    alter_root_pwd = alter_root_pwd + "flush privileges;"
     alter_root_pwd = alter_root_pwd + \
         "alter user 'root'@'localhost' IDENTIFIED by '" + pwd + "';"
     alter_root_pwd = alter_root_pwd + \

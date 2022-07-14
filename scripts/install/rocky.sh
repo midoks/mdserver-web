@@ -13,11 +13,11 @@ fi
 setenforce 0
 sed -i 's#SELINUX=enforcing#SELINUX=disabled#g' /etc/selinux/config
 
-yum install -y wget lsof crontabs
+yum install -y wget lsof 
 yum install -y python3-devel
 yum install -y python-devel
-yum install -y vixie-cron
-
+yum install -y crontabs
+yum install -y curl curl-devel libcurl libcurl-devel
 #https need
 
 if [ ! -d /root/.acme.sh ];then	
@@ -76,8 +76,17 @@ yum install -y lsof net-tools
 yum install -y ncurses-devel mysql-devel cmake
 yum install -y MySQL-python
 
-for yumPack in make cmake gcc gcc-c++ gcc-g77 flex bison file libtool libtool-libs autoconf kernel-devel patch wget libjpeg libjpeg-devel libpng libpng-devel libpng10 libpng10-devel gd gd-devel libxml2 libxml2-devel zlib zlib-devel glib2 glib2-devel tar bzip2 bzip2-devel libevent libevent-devel ncurses ncurses-devel curl curl-devel libcurl libcurl-devel e2fsprogs e2fsprogs-devel krb5 krb5-devel libidn libidn-devel vim-minimal gettext gettext-devel ncurses-devel gmp-devel pspell-devel libcap diffutils ca-certificates net-tools libc-client-devel psmisc libXpm-devel git-core c-ares-devel libicu-devel libxslt libxslt-devel zip unzip glibc.i686 libstdc++.so.6 cairo-devel bison-devel ncurses-devel libaio-devel perl perl-devel perl-Data-Dumper lsof vixie-cron crontabs expat-devel readline-devel;
-do yum -y install $yumPack;done
+for yumPack in make cmake gcc gcc-c++ flex bison file libtool libtool-libs autoconf kernel-devel patch wget libjpeg libjpeg-devel libpng libpng-devel gd gd-devel libxml2 libxml2-devel zlib zlib-devel glib2 glib2-devel tar bzip2 bzip2-devel libevent libevent-devel ncurses ncurses-devel curl curl-devel libcurl libcurl-devel e2fsprogs e2fsprogs-devel libidn libidn-devel vim-minimal gettext gettext-devel ncurses-devel gmp-devel libcap diffutils ca-certificates net-tools libc-client-devel psmisc libXpm-devel git-core c-ares-devel libicu-devel libxslt libxslt-devel zip unzip glibc.i686 libstdc++.so.6 cairo-devel bison-devel ncurses-devel libaio-devel perl perl-devel perl-Data-Dumper lsof crontabs expat-devel readline-devel;
+do dnf --enablerepo=powertools install -y $yumPack;done
+
+yum install -y libtirpc libtirpc-devel
+
+dnf install boost-locale
+
+dnf --enablerepo=powertools install -y libmemcached libmemcached-devel
+dnf --enablerepo=powertools install -y rpcgen
+dnf --enablerepo=powertools install -y oniguruma oniguruma-devel
+dnf --enablerepo=powertools install -y re2c bison
 
 cd /www/server/mdserver-web/scripts && bash lib.sh
 chmod 755 /www/server/mdserver-web/data

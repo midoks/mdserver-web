@@ -32,6 +32,26 @@ if [ ! -d $curPath/versions/$2 ];then
 fi
 
 
+
+#获取信息和版本
+# bash /www/server/mdsever-web/scripts/getos.sh
+bash ${rootPath}/scripts/getos.sh
+OSNAME=`cat ${rootPath}/data/osname.pl`
+VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
+
+
+if [ "$OSNAME" == "centos" ];then
+	rpm -Uvh http://rpms.remirepo.net/enterprise/remi-release-${VERSION_ID}.rpm
+fi
+
+
+# rpm -Uvh http://rpms.remirepo.net/fedora/remi-release-31.rpm
+if [ "$OSNAME" == "fedora" ];then
+	rpm -Uvh http://rpms.remirepo.net/fedora/remi-release-${VERSION_ID}.rpm
+fi
+
+
+
 if [ "${action}" == "uninstall" ] && [ -d ${serverPath}/php-yum/${type} ];then
 	#初始化 
 	cd ${rootPath} && python3 ${rootPath}/plugins/php-yum/index.py stop ${type}

@@ -21,6 +21,10 @@ if [ "$version" -lt "70" ];then
 	LIBV=2.2.0
 fi
 
+if [ "$version" -eq "70" ] || [ "$version" -eq "71" ];then
+	LIBV=3.1.5
+fi
+
 
 NON_ZTS_FILENAME=`ls $serverPath/php/${version}/lib/php/extensions | grep no-debug-non-zts`
 extFile=$serverPath/php/${version}/lib/php/extensions/${NON_ZTS_FILENAME}/${LIBNAME}.so
@@ -37,26 +41,24 @@ Install_lib()
 		echo "php-$version 已安装${LIBNAME},请选择其它版本!"
 		return
 	fi
-	
+
 	if [ ! -f "$extFile" ];then
 
 		php_lib=$sourcePath/php_lib
 		mkdir -p $php_lib
 
-		rm -rf $php_lib/${LIBNAME}-${LIBV}
-
-		if [ ! -d $php_lib/${LIBNAME}-${LIBV} ];then
+		if [ ! -f $php_lib/${LIBNAME}-${LIBV}.tgz ];then
 			wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
 			cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
 		fi 
 		cd $php_lib/${LIBNAME}-${LIBV}
 
-		sed -i '_bak' "3237,3238s#ulong#zend_ulong#g" $php_lib/${LIBNAME}-${LIBV}/php_memcached.c
+		# sed -i '_bak' "3237,3238s#ulong#zend_ulong#g" $php_lib/${LIBNAME}-${LIBV}/php_memcached.c
 		$serverPath/php/$version/bin/phpize
 	
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
 		--enable-memcached \
-		--disable-memcached-sasl && \
+		--disable-memcached-sasl
 		make clean && make && make install && make clean
 	fi
 	

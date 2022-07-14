@@ -61,8 +61,7 @@ class task_api:
         if not len(find):
             return mw.returnJson(False, '当前没有任务队列在执行-2!')
 
-        isTask = os.getcwd() + '/tmp/panelTask.pl'
-        mw.writeFile(isTask, 'True')
+        mw.triggerTask()
 
         echoMsg = {}
         echoMsg['name'] = find['name']

@@ -23,6 +23,19 @@ if [ "$version" -lt "70" ];then
 	LIBV=2.3.5
 fi
 
+if [ "$version" -eq "70" ] || [ "$version" -eq "71" ];then
+	LIBV=3.2.5
+fi
+
+if [ "$version" -eq "72" ] || [ "$version" -eq "73" ];then
+	LIBV=3.2.5
+fi
+
+if [ "$version" -eq "82" ];then
+	echo "not need"
+	exit 1
+fi
+
 
 NON_ZTS_FILENAME=`ls $serverPath/php/${version}/lib/php/extensions | grep no-debug-non-zts`
 extFile=$serverPath/php/${version}/lib/php/extensions/${NON_ZTS_FILENAME}/${LIBNAME}.so
@@ -54,7 +67,7 @@ Install_lib()
 
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config
-		make && make install && make clean
+		make clean && make && make install && make clean
 
 	fi
 	

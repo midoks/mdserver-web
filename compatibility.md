@@ -42,8 +42,8 @@ cd /www/server/mdserver-web/plugins/php/versions && bash all_test.sh
 | Ubuntu 20.04 		|:x:	|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
 | Ubuntu 22.04 		|:x:	|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
 | Fedora 31 		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
-| Fedora 32 		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
-| AlmaLinix 9 		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
+| Fedora 32 		|:x:	|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
+| AlmaLinix 9 		|:x:	|✅		|✅		|:x:	|:x:	|:x:	|:x:	|:x:	|✅		|:x:	|:x:	|:x:	|
 | RockyLinux 8.6 	|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
 | openSUSE 15.4 	|:x:	|:x:	|:x:	|:x:	|:x:	|:x:	|:x:	|:x:	|:x:	|:x:	|:x:	|:x:	|
 
@@ -57,12 +57,12 @@ cd /www/server/mdserver-web/plugins/php/versions && bash all_test.sh
 | CentOS 9 Stream 	|✅			|:x:		|:x:		|:x:		|
 | Debian 10.3 		|✅			|✅			|✅			|:x:		|	
 | Debian 11.3 		|✅			|✅			|✅			|✅			|
-| Ubuntu 18.04 		|✅			|✅			|✅			|✅			|	
-| Ubuntu 20.04 		|✅			|✅			|✅			|✅			|
+| Ubuntu 18.04 		|✅			|✅			|✅			|:x:		|	
+| Ubuntu 20.04 		|✅			|✅			|✅			|:x:		|
 | Ubuntu 22.04 		|✅			|✅			|✅			|✅			|
 | Fedora 31 		|✅			|✅			|✅			|✅			|	
 | Fedora 32 		|✅			|✅			|✅			|✅			|	
-| AlmaLinix 9 		|✅			|✅			|✅			|✅			|	
+| AlmaLinix 9 		|✅			|:x:		|:x:		|:x:		|	
 | RockyLinux 8.6 	|✅			|✅			|✅			|✅			|	
 | openSUSE 15.4 	|:x:		|:x:		|:x:		|:x:		|
 

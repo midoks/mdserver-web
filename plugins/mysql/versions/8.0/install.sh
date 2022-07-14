@@ -75,6 +75,8 @@ Install_mysql()
 		useradd -g mysql mysql
 	fi
 
+	cd $serverPath/mdserver-web/plugins/mysql/lib && /bin/bash rpcgen.sh
+
 	INSTALL_CMD=cmake
 	# check cmake version
 	CMAKE_VERSION=`cmake -version | grep version | awk '{print $3}' | awk -F '.' '{print $1}'`
@@ -154,8 +156,9 @@ Install_mysql()
 			echo '8.0' > $serverPath/mysql/version.pl
 			echo '安装完成' > $install_tmp
 		else
-			rm -rf ${mysqlDir}/mysql-${VERSION}
+			# rm -rf ${mysqlDir}/mysql-${VERSION}
 			echo '安装失败' > $install_tmp
+			echo 'install fail'>&2
 			exit 1
 		fi
 	fi

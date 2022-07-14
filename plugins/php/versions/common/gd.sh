@@ -19,8 +19,8 @@ LIBV=0
 
 
 if [ "$version" -lt "74" ];then
-	echo "not need!"
-	exit 1
+	bash $curPath/gd_old.sh $1 $2
+	exit 0
 fi
 
 

@@ -39,9 +39,12 @@ function gogsPost(method,args,callback, title){
 
 function gogsSetConfig(){
     gogsPost('get_gogs_conf', '', function(data){
-        // console.log(data);
-        var rdata = $.parseJSON(data.data);
-        // console.log(rdata);
+        var rrdata = $.parseJSON(data.data);
+        if (!rrdata.status){
+            layer.msg(rrdata.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+            return;
+        }
+        var rdata = rrdata.data;
         var mlist = '';
         for (var i = 0; i < rdata.length; i++) {
             var w = '140';
@@ -141,7 +144,10 @@ function gogsUserList(page, search) {
     gogsPost('user_list', _data, function(data){
 
         var rdata = $.parseJSON(data.data);
-        // console.log(rdata);
+        if (!rdata.status){
+            layer.msg(rdata.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+            return;
+        }
         content = '<div class="finduser"><input class="bt-input-text mr5 outline_no" type="text" placeholder="查找用户名" id="find_user" style="height: 28px; border-radius: 3px;width: 435px;">';
         content += '<button class="btn btn-success btn-sm" onclick="userFind();">查找</button></div>';
 

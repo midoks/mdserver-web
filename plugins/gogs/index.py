@@ -216,8 +216,11 @@ def getRootPath():
 
 
 def getDbConfValue():
-    content = mw.readFile(getConf())
+    conf = getConf()
+    if not os.path.exists(conf):
+        return {}
 
+    content = mw.readFile(conf)
     rep_scope = "\[database\](.*?)\["
     tmp = re.findall(rep_scope, content, re.S)
 
@@ -383,6 +386,10 @@ def postReceiveLog():
 
 
 def getGogsConf():
+    conf = getConf()
+    if not os.path.exists(conf):
+        return mw.returnJson(False, "请先安装初始化!")
+
     gets = [
         {'name': 'DOMAIN', 'type': -1, 'ps': '服务器域名'},
         {'name': 'ROOT_URL', 'type': -1, 'ps': '公开的完整URL路径'},
@@ -403,7 +410,7 @@ def getGogsConf():
         {'name': 'SHOW_FOOTER_VERSION', 'type': 2, 'ps': 'Gogs版本信息'},
         {'name': 'SHOW_FOOTER_TEMPLATE_LOAD_TIME', 'type': 2, 'ps': 'Gogs模板加载时间'},
     ]
-    conf = mw.readFile(getConf())
+    conf = mw.readFile(conf)
     result = []
 
     for g in gets:
@@ -413,7 +420,7 @@ def getGogsConf():
             continue
         g['value'] = tmp.groups()[0]
         result.append(g)
-    return mw.getJson(result)
+    return mw.returnJson(True, 'OK', result)
 
 
 def submitGogsConf():
@@ -445,6 +452,11 @@ def submitGogsConf():
 
 
 def userList():
+
+    conf = getConf()
+    if not os.path.exists(conf):
+        return mw.returnJson(False, "请先安装初始化!")
+
     import math
     args = getArgs()
 
@@ -607,11 +619,9 @@ def projectScriptLoad():
 
 def projectScriptUnload():
     args = getArgs()
-    if not 'user' in args:
-        return mw.returnJson(True, 'username missing')
-
-    if not 'name' in args:
-        return mw.returnJson(True, 'project name missing')
+    data = checkArgs(args, ['user', 'name'])
+    if not data[0]:
+        return data[1]
 
     user = args['user']
     name = args['name'] + '.git'
@@ -628,11 +638,10 @@ def projectScriptUnload():
 
 def projectScriptDebug():
     args = getArgs()
-    if not 'user' in args:
-        return mw.returnJson(True, 'username missing')
+    data = checkArgs(args, ['user', 'name'])
+    if not data[0]:
+        return data[1]
 
-    if not 'name' in args:
-        return mw.returnJson(True, 'project name missing')
     user = args['user']
     name = args['name'] + '.git'
     commit_log = getRootPath() + '/' + user + '/' + name + \

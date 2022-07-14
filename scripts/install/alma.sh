@@ -81,6 +81,10 @@ for yumPack in make cmake gcc gcc-c++ gcc-g77 flex bison file libtool libtool-li
 do yum -y install $yumPack;done
 
 
+# findLD=`cat /etc/ld.so.conf | grep '/usr/local/lib64'`
+# echo "/usr/local/lib64" >> /etc/ld.so.conf
+
+
 cd /www/server/mdserver-web/scripts && bash lib.sh
 chmod 755 /www/server/mdserver-web/data
 
@@ -99,11 +103,9 @@ do
     fi
 done
 
+
 cd /www/server/mdserver-web && /etc/init.d/mw stop
 cd /www/server/mdserver-web && /etc/init.d/mw start
 cd /www/server/mdserver-web && /etc/init.d/mw default
-
-
-
 
 
