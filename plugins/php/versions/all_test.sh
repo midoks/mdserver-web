@@ -44,7 +44,7 @@ for PHP_VER in ${PHP_VER_LIST[@]}; do
 	echo "php${PHP_VER} -- start"
 
 	if [ ! -d /www/server/php/${PHP_VER} ];then
-		echo "php{$PHP_VER} is not install!"
+		echo "php${PHP_VER} is not install!"
 		break;
 	fi
 
