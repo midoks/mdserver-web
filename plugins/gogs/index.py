@@ -216,8 +216,11 @@ def getRootPath():
 
 
 def getDbConfValue():
-    content = mw.readFile(getConf())
+    conf = getConf()
+    if not os.path.exists(conf):
+        return {}
 
+    content = mw.readFile(conf)
     rep_scope = "\[database\](.*?)\["
     tmp = re.findall(rep_scope, content, re.S)
 
