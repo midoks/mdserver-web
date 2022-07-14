@@ -85,6 +85,8 @@ dnf --enablerepo=powertools install -y libmemcached libmemcached-devel
 dnf --enablerepo=powertools install -y rpcgen
 dnf --enablerepo=powertools install -y oniguruma oniguruma-devel
 
+dnf --enablerepo=powertools install -y re2c bison
+
 cd /www/server/mdserver-web/scripts && bash lib.sh
 chmod 755 /www/server/mdserver-web/data
 
