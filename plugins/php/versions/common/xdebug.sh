@@ -25,6 +25,11 @@ if [ "$version" -eq "70" ] || [ "$version" -eq "71" ];then
 	LIBV=2.7.0
 fi
 
+if [ "$version" -eq "82" ];then
+	echo "not need"
+	exit 1
+fi
+
 NON_ZTS_FILENAME=`ls $serverPath/php/${version}/lib/php/extensions | grep no-debug-non-zts`
 extFile=$serverPath/php/${version}/lib/php/extensions/${NON_ZTS_FILENAME}/${LIBNAME}.so
 
