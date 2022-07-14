@@ -49,7 +49,7 @@ Uninstall_varnish()
 
 	if [ "${OSNAME}" == "macos" ]; then
 		brew uninstall varnish
-	elif [ "${OSNAME}" == "centos" ] || [ "${OSNAME}" == "fedora" ] || [ "${OSNAME}" == "alma" ]; then
+	elif [ "${OSNAME}" == "centos" ] || [ "${OSNAME}" == "fedora" ] || [ "${OSNAME}" == "alma" ] || [ "${OSNAME}" == "rocky" ]; then
 		yum remove varnish -y
 	elif [ "${OSNAME}" == "debian" ] || [ "${OSNAME}" == "ubuntu" ]; then
 		apt remove varnish -y
