@@ -17,13 +17,13 @@ version=$2
 LIBNAME=intl
 LIBV=0
 
-LIB_PATH_NAME=lib
+LIB_PATH_NAME=lib/php
 if [ -f $serverPath/php/${version}/lib64 ];then
 	LIB_PATH_NAME=lib64
 fi
 
-NON_ZTS_FILENAME=`ls $serverPath/php/${version}/${LIB_PATH_NAME}/php/extensions | grep no-debug-non-zts`
-extFile=$serverPath/php/${version}/${LIB_PATH_NAME}/php/extensions/${NON_ZTS_FILENAME}/${LIBNAME}.so
+NON_ZTS_FILENAME=`ls $serverPath/php/${version}/${LIB_PATH_NAME}/extensions | grep no-debug-non-zts`
+extFile=$serverPath/php/${version}/${LIB_PATH_NAME}/extensions/${NON_ZTS_FILENAME}/${LIBNAME}.so
 
 sysName=`uname`
 if [ "$sysName" == "Darwin" ];then
