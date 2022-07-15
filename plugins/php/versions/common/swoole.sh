@@ -33,7 +33,7 @@ if [ "$version" -eq "82" ];then
 fi
 
 LIB_PATH_NAME=lib/php
-if [ -f $serverPath/php/${version}/lib64 ];then
+if [ -d $serverPath/php/${version}/lib64 ];then
 	LIB_PATH_NAME=lib64
 fi
 
