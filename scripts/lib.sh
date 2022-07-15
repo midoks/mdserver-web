@@ -31,6 +31,8 @@ elif [ "$OSNAME" == "arch" ];then
     echo "arch lib"
 elif [ "$OSNAME" == "freebsd" ];then
     echo "freebsd lib"
+elif [ "$OSNAME" == "centos" ];then
+    echo "centos lib"
 elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     
     apt install -y devscripts
