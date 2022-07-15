@@ -40,17 +40,16 @@ echo y | pacman -Sy which
 
 ## gd start
 echo y | pacman -Sy gd
-# echo y | pacman -Sy gd
+# echo y | pacman -Sy libgd
 echo y | pacman -Sy libjpeg
 echo y | pacman -Sy libpng
 echo y | pacman -Sy libvpx
 echo y | pacman -Sy libwebp
+echo y | pacman -Sy libxpm
+echo y | pacman -Syu freetype2
 ## gd end
 
-# echo y | pacman -Sy chkconfig
 
-# zypper install -y freetype freetype-devel
-# zypper install -y libjpeg-devel libpng-devel
 # echo y | pacman -Sy rpcgen
 
 hwclock --systohc
