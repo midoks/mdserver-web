@@ -321,11 +321,11 @@ def initMysqlPwd():
     cmd_pass = cmd_pass + "flush privileges;\""
 
     data = mw.execShell(cmd_pass)
-    if data[1].find("ERROR"):
+    # print(data)
+    if data[1].find("ERROR") != -1:
         print("init mariadb password fail:" + data[1])
         exit(1)
 
-    # print(data)
     pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
     return True
 
