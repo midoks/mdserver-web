@@ -32,6 +32,9 @@ def getInitDFile():
 
 
 def getConf():
+    path = '/etc/varnish/vcl.conf'
+    if os.path.exists(path):
+        return path
     path = "/etc/varnish/default.vcl"
     return path
 
