@@ -106,7 +106,7 @@ def reload():
 
 
 def runInfo():
-    cmd = "/usr/bin/varnishstat -j"
+    cmd = "varnishstat -j"
     data = mw.execShell(cmd)[0].strip()
     return data
 
