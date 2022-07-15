@@ -34,6 +34,7 @@ zypper install -y libmemcached libmemcached-devel
 
 zypper install -y icu libicu-devel
 zypper install -y sqlite3 sqlite3-devel
+zypper install -y oniguruma-devel
 
 # zypper install -y protobuf
 # zypper install -y zlib-devel
