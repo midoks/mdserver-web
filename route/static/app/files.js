@@ -727,7 +727,7 @@ function batchPaste(){
 function batchPasteTo(data,path){
 	myloadT = layer.msg("<div class='myspeed'>正在处理,请稍候...</div>",{icon:16,time:0,shade: [0.3, '#000']});
 	setTimeout(function(){getSpeed('.myspeed');},1000);
-	$.post('files/batch_paste',data,function(rdata){
+	$.post('/files/batch_paste',data,function(rdata){
 		layer.close(myloadT);
 		setCookie('BatchSelected', null);
 		getFiles(path);
