@@ -27,6 +27,8 @@ Install_varnish()
 		yum install varnish -y
 	elif [ "${OSNAME}" == "debian" ] || [ "${OSNAME}" == "ubuntu" ]; then
 		apt install varnish -y
+	elif [[ "$OSNAME" == "arch" ]]; then
+		echo y | pacman -Sy varnish
 	elif [ "${OSNAME}" == "opensuse" ];then
 		zypper install -y varnish
 	else
@@ -53,6 +55,8 @@ Uninstall_varnish()
 		yum remove varnish -y
 	elif [ "${OSNAME}" == "debian" ] || [ "${OSNAME}" == "ubuntu" ]; then
 		apt remove varnish -y
+	elif [[ "$OSNAME" == "arch" ]]; then
+		echo y | pacman -Rv varnish
 	elif [ "${OSNAME}" == "opensuse" ];then
 		zypper remove -y varnish
 	else
