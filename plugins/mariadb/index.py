@@ -322,7 +322,7 @@ def initMysqlPwd():
 
     data = mw.execShell(cmd_pass)
     if data[1].find("ERROR"):
-        print("init mariadb db password fail")
+        print("init mariadb db password fail:" + data[1])
         exit(1)
 
     # print(data)
