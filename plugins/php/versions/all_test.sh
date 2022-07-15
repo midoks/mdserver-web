@@ -47,7 +47,7 @@ for PHP_VER in ${PHP_VER_LIST[@]}; do
 
 	if [ ! -d /www/server/php/${PHP_VER} ];then
 		echo "php${PHP_VER} is not install!"
-		continue;
+		continue
 	fi
 
 	NON_ZTS_FILENAME=`ls /www/server/php/${PHP_VER}/lib/php/extensions | grep no-debug-non-zts`
