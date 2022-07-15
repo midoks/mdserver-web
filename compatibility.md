@@ -27,7 +27,7 @@ cd /www/server/mdserver-web/plugins/php/versions && bash all_test.sh
 | AlmaLinix 9 		|✅				|✅				|
 | RockyLinux 8.6 	|✅				|✅				|
 | Arch Linux　 	 	|✅				|✅				|
-| openSUSE 15.4 	|:x:			|:x:			|
+| openSUSE 15.4 	|✅				|✅				|
 
 
 
