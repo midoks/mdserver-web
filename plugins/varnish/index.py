@@ -102,7 +102,6 @@ def restart():
 
 
 def reload():
-    # file = initDreplace()
     return vaOp('reload')
 
 
@@ -162,11 +161,15 @@ def initdUinstall():
 
 
 def runLog():
+
+    if os.path.exists("/var/log/varnish/varnish.log"):
+        return "/var/log/varnish/varnish.log"
+
     return "/var/log/varnish/varnishncsa.log"
 
 
 def confService():
-    return '/lib/systemd/system/varnish.service'
+    return mw.systemdCfgDir() + '/varnish.service'
 
 if __name__ == "__main__":
     func = sys.argv[1]
