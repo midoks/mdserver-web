@@ -129,8 +129,3 @@ cd /www/server/mdserver-web && /etc/init.d/mw stop
 cd /www/server/mdserver-web && /etc/init.d/mw start
 cd /www/server/mdserver-web && /etc/init.d/mw default
 
-
-
-
-
-
