@@ -95,13 +95,14 @@ else
     yum install -y openldap openldap-devel libtirpc libtirpc-devel rpcgen
     yum install -y bison re2c cmake
     yum install -y cmake3
+    yum install -y autoconf
 
     yum install -y libmemcached libmemcached-devel
     yum install -y curl curl-devel
     yum install -y zlib zlib-devel
     yum install -y libzip libzip-devel
     yum install -y pcre pcre-devel
-    yum install -y icu libicu-devel autoconf
+    yum install -y icu libicu-devel 
     yum install -y freetype freetype-devel
     yum install -y openssl openssl-devel
     yum install -y graphviz libxml2 libxml2-devel

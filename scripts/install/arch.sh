@@ -49,8 +49,7 @@ echo y | pacman -Sy libxpm
 echo y | pacman -Syu freetype2
 ## gd end
 
-
-# echo y | pacman -Sy rpcgen
+echo y | pacman -Syu icu
 
 hwclock --systohc
 
