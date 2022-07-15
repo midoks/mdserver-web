@@ -26,6 +26,7 @@ cd /www/server/mdserver-web/plugins/php/versions && bash all_test.sh
 | Fedora 32 		|✅				|✅				|
 | AlmaLinix 9 		|✅				|✅				|
 | RockyLinux 8.6 	|✅				|✅				|
+| Arch Linux　 	 	|✅				|✅				|
 | openSUSE 15.4 	|:x:			|:x:			|
 
 
@@ -45,6 +46,7 @@ cd /www/server/mdserver-web/plugins/php/versions && bash all_test.sh
 | Fedora 32 		|:x:	|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
 | AlmaLinix 9 		|:x:	|✅		|✅		|:x:	|:x:	|:x:	|:x:	|:x:	|✅		|:x:	|:x:	|:x:	|
 | RockyLinux 8.6 	|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
+| Arch Linux 	 	|:x:	|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
 | openSUSE 15.4 	|:x:	|:x:	|:x:	|:x:	|:x:	|:x:	|:x:	|:x:	|:x:	|:x:	|:x:	|:x:	|
 
 
@@ -63,6 +65,7 @@ cd /www/server/mdserver-web/plugins/php/versions && bash all_test.sh
 | Fedora 31 		|✅			|✅			|✅			|✅			|	
 | Fedora 32 		|✅			|✅			|✅			|✅			|	
 | AlmaLinix 9 		|✅			|:x:		|:x:		|:x:		|	
-| RockyLinux 8.6 	|✅			|✅			|✅			|✅			|	
+| RockyLinux 8.6 	|✅			|✅			|✅			|✅			|
+| Arch Linux 	 	|✅			|✅			|✅			|✅			|	
 | openSUSE 15.4 	|:x:		|:x:		|:x:		|:x:		|
 
