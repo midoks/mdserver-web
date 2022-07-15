@@ -92,7 +92,8 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     #apt install -y libmariadbclient-dev
 else
 
-    yum install -y openldap openldap-devel libtirpc libtirpc-devel rpcgen
+    yum install -y libtirpc-devel
+    yum install -y openldap openldap-devel libtirpc  rpcgen
     yum install -y bison re2c cmake
     yum install -y cmake3
     yum install -y autoconf
