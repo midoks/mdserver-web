@@ -27,8 +27,7 @@ fi
 
 
 NON_ZTS_FILENAME=`ls $serverPath/php/${version}/lib/php/extensions | grep no-debug-non-zts`
-extDir=$serverPath/php/${version}/lib/php/extensions/${NON_ZTS_FILENAME}
-extFile=${extDir}/${LIBNAME}.so
+extFile=$serverPath/php/${version}/lib/php/extensions/${NON_ZTS_FILENAME}/${LIBNAME}.so
 
 if [ "$sysName" == "Darwin" ];then
 	BAK='_bak'
