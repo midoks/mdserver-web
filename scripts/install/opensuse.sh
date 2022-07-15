@@ -42,6 +42,9 @@ zypper install -y oniguruma-devel
 zypper install -y python3-devel
 zypper install -y python-devel
 
+zypper install -y libwebp-devel
+zypper install -y libtomcrypt-devel
+
 
 # zypper install -y  php-config
 #https need
