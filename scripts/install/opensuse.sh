@@ -45,6 +45,8 @@ zypper install -y python-devel
 zypper install -y libwebp-devel
 zypper install -y libtomcrypt-devel
 
+zypper install -y libXpm-devel
+zypper install -y freetype2-devel
 
 # zypper install -y  php-config
 #https need
