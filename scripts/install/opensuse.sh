@@ -43,6 +43,7 @@ zypper install -y python3-devel
 zypper install -y python-devel
 
 
+# zypper install -y  php-config
 #https need
 if [ ! -d /root/.acme.sh ];then	
 	curl https://get.acme.sh | sh
