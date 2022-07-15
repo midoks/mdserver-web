@@ -29,7 +29,7 @@ zypper install -y libtirpc-devel
 zypper install -y rpcgen
 
 zypper install -y libmcrypt libmcrypt-devel
-zypper install -y libzpi libmcrypt-devel
+zypper install -y libzip libzip-devel
 zypper install -y libmemcached libmemcached-devel
 
 
