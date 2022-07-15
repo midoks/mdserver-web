@@ -43,7 +43,6 @@ Install_lib()
 		return
 	fi
 	
-	extFile=$extDir${LIBNAME}.so
 	if [ ! -f "$extFile" ];then
 		
 		OPTIONS=''
