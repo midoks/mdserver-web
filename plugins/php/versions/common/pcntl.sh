@@ -17,8 +17,13 @@ version=$2
 LIBNAME=pcntl
 LIBV=0
 
-NON_ZTS_FILENAME=`ls $serverPath/php/${version}/lib/php/extensions | grep no-debug-non-zts`
-extFile=$serverPath/php/${version}/lib/php/extensions/${NON_ZTS_FILENAME}/${LIBNAME}.so
+LIB_PATH_NAME=lib
+if [ -f $serverPath/php/${version}/lib64 ];then
+	LIB_PATH_NAME=lib64
+fi
+
+NON_ZTS_FILENAME=`ls $serverPath/php/${version}/${LIB_PATH_NAME}/php/extensions | grep no-debug-non-zts`
+extFile=$serverPath/php/${version}/${LIB_PATH_NAME}/php/extensions/${NON_ZTS_FILENAME}/${LIBNAME}.so
 
 sysName=`uname`
 if [ "$sysName" == "Darwin" ];then
