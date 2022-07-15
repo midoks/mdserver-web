@@ -46,7 +46,7 @@ cd /www/server/mdserver-web/plugins/php/versions && bash all_test.sh
 | Fedora 32 		|:x:	|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
 | AlmaLinix 9 		|:x:	|✅		|✅		|:x:	|:x:	|:x:	|:x:	|:x:	|✅		|:x:	|:x:	|:x:	|
 | RockyLinux 8.6 	|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
-| Arch Linux 	 	|:x:	|✅		|✅		|:x		|:x		|:x		|:x		|:x		|✅		|✅		|✅		|✅		|
+| Arch Linux 	 	|:x:	|✅		|✅		|:x:	|:x:	|:x:	|:x:	|:x:	|✅		|✅		|✅		|✅		|
 | openSUSE 15.4 	|:x:	|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
 
 
