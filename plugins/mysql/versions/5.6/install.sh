@@ -80,7 +80,7 @@ Install_mysql()
 			echo '5.6' > $serverPath/mysql/version.pl
 			echo '安装完成' > $install_tmp
 		else
-			rm -rf ${mysqlDir}/mysql-5.6.50
+			# rm -rf ${mysqlDir}/mysql-5.6.50
 			echo '安装失败' > $install_tmp
 			echo 'install fail'>&2
 			exit 1
