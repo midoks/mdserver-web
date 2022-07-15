@@ -45,6 +45,8 @@ Install_lib()
 		echo "php-$version 已安装${LIBNAME},请选择其它版本!"
 		return
 	fi
+
+	cd $serverPath/mdserver-web/plugins/php/lib && bash libmcrypt.sh
 	
 	if [ ! -f "$extFile" ];then
 
