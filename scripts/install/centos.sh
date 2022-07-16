@@ -132,6 +132,7 @@ if [ "$VERSION_ID" -eq "9" ];then
 
 	dnf --enablerepo=crb install -y libvpx-devel libXpm-devel libwebp libwebp-devel
 	dnf --enablerepo=crb install -y oniguruma oniguruma-devel
+	dnf --enablerepo=crb install -y libzip libzip-devel
 	# yum remove -y chardet
 fi
 
