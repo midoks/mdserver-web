@@ -107,8 +107,8 @@ yum install -y ImageMagick ImageMagick-devel
 
 
 yum install -y libzstd-devel
-yum install -y libevent libevent-devel unzip
-yum install -y python-imaging libicu-devel zip bzip2-devel gcc  pcre pcre-devel
+yum install -y libevent libevent-devel unzip zip
+yum install -y python-imaging libicu-devel  bzip2-devel gcc  pcre pcre-devel
 
 yum install -y gd gd-devel
 yum install -y libjpeg-devel libpng-devel libwebp libwebp-devel
@@ -125,7 +125,7 @@ do yum -y install $yumPack;done
 if [ "$VERSION_ID" -eq "9" ];then
 	yum install -y patchelf
 	dnf --enablerepo=crb install -y libtirpc-devel
-	dnf --enablerepo=crb install -y libmemcached-devel
+	dnf --enablerepo=crb install -y libmemcached libmemcached-devel
 	dnf --enablerepo=crb install -y libtool libtool-libs
 	dnf --enablerepo=crb install -y gnutls-devel
 	dnf --enablerepo=crb install -y mysql-devel

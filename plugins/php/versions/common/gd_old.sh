@@ -55,7 +55,7 @@ Install_lib()
 		return
 	fi
 
-	cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash freetype_old.sh
+	# cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash freetype_old.sh
 	
 	if [ ! -f "$extFile" ];then
 
@@ -68,10 +68,12 @@ Install_lib()
 		$serverPath/php/$version/bin/phpize
 
 		#--with-xpm
+		# =${serverPath}/lib/freetype_old
+		# =/usr/lib
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
 		--with-gd \
-		--with-jpeg-dir=/usr/lib \
-		--with-freetype-dir=${serverPath}/lib/freetype_old \
+		--with-jpeg-dir \
+		--with-freetype-dir \
 		--enable-gd-jis-conv \
 		--enable-gd-native-ttf
 		make clean && make && make install && make clean
