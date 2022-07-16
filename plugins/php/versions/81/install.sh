@@ -42,8 +42,6 @@ OPTIONS=''
 if [ $sysName == 'Darwin' ]; then
 	OPTIONS='--without-iconv'
 	OPTIONS="${OPTIONS} --with-curl=${serverPath}/lib/curl"
-	# OPTIONS="${OPTIONS} --enable-zip"
-
 	export PATH="/usr/local/opt/bison/bin:$PATH"
 	export LDFLAGS="-L/usr/local/opt/bison/lib"
 	export PKG_CONFIG_PATH="/usr/local/opt/libxml2/lib/pkgconfig"
@@ -69,7 +67,6 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--with-pdo-mysql=mysqlnd \
 	--with-zlib-dir=$serverPath/lib/zlib \
 	--enable-ftp \
-	--enable-zip \
 	--enable-mbstring \
 	--enable-sockets \
 	--enable-simplexml \
