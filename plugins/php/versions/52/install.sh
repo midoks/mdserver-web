@@ -120,6 +120,12 @@ else
 fi
 
 
+IS_64BIT=`getconf LONG_BIT`
+if [ "$IS_64BIT" == "64" ];then
+	OPTIONS="${OPTIONS} --with-libdir=lib64"
+fi
+
+
 if [ ! -d $serverPath/php/${PHP_VER} ];then
 
 	export MYSQL_LIB_DIR=/usr/lib64/mysql

@@ -35,6 +35,8 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 	mv $sourcePath/php/php-${version} $sourcePath/php/php${PHP_VER}
 fi
 
+
+
 cd $sourcePath/php/php${PHP_VER}
 
 OPTIONS=''
@@ -52,7 +54,10 @@ else
 	OPTIONS="${OPTIONS} --with-curl"
 fi
 
-
+IS_64BIT=`getconf LONG_BIT`
+if [ "$IS_64BIT" == "64" ];then
+	OPTIONS="${OPTIONS} --with-libdir=lib64"
+fi
 
 echo "$sourcePath/php/php${PHP_VER}"
 

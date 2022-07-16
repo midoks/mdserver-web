@@ -52,6 +52,11 @@ else
 	OPTIONS="${OPTIONS} --with-curl"
 fi
 
+IS_64BIT=`getconf LONG_BIT`
+if [ "$IS_64BIT" == "64" ];then
+	OPTIONS="${OPTIONS} --with-libdir=lib64"
+fi
+
 echo "$sourcePath/php/php${PHP_VER}"
 
 if [ ! -d $serverPath/php/${PHP_VER} ];then
