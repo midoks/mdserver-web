@@ -53,7 +53,7 @@ else
 	OPTIONS='--without-iconv'
 	# OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
 	OPTIONS="${OPTIONS} --with-curl"
-	# OPTIONS="${OPTIONS} --with-libzip=${serverPath}/lib/libzip"
+	# OPTIONS="${OPTIONS} --with-zip=${serverPath}/lib/libzip"
 fi
 
 IS_64BIT=`getconf LONG_BIT`
@@ -73,10 +73,10 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--enable-mysqlnd \
 	--with-mysqli=mysqlnd \
 	--with-pdo-mysql=mysqlnd \
-	--enable-mbstring \
 	--with-zlib-dir=$serverPath/lib/zlib \
+	--with-zip \
 	--enable-ftp \
-	--enable-zip \
+	--enable-mbstring \
 	--enable-sockets \
 	--enable-simplexml \
 	--enable-soap \
