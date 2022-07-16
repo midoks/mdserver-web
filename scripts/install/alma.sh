@@ -67,22 +67,20 @@ dnf autoremove -y
 
 dnf groupinstall -y "Development Tools"
 dnf install -y epel-release
-
-dnf install -y oniguruma
-dnf --enablerepo=crb install oniguruma-devel
-
 dnf install -y zip unzip
 
 dnf install -y libevent libevent-devel  libmcrypt libmcrypt-devel
 dnf install -y wget libicu-devel  bzip2-devel gcc libxml2 libxml2-devel libjpeg-devel libpng-devel libwebp libwebp-devel pcre pcre-devel
 dnf install -y lsof net-tools
 dnf install -y ncurses-devel cmake
+
 dnf --enablerepo=crb install mysql-devel
+dnf --enablerepo=crb install -y oniguruma oniguruma-devel
 
 dnf install -y langpacks-zh_CN langpacks-en langpacks-en_GB
 
 for yumPack in make cmake gcc gcc-c++ flex bison file libtool libtool-libs autoconf kernel-devel patch wget libpng10 libpng10-devel gd gd-devel libxml2 libxml2-devel zlib zlib-devel glib2 glib2-devel tar bzip2 bzip2-devel libevent libevent-devel ncurses ncurses-devel curl curl-devel libcurl libcurl-devel e2fsprogs e2fsprogs-devel krb5 krb5-devel libidn libidn-devel vim-minimal gettext gettext-devel ncurses-devel gmp-devel pspell-devel libcap diffutils ca-certificates net-tools libc-client-devel psmisc libXpm-devel git-core c-ares-devel libicu-devel libxslt libxslt-devel zip unzip glibc.i686 libstdc++.so.6 cairo-devel bison-devel ncurses-devel libaio-devel perl perl-devel perl-Data-Dumper lsof crontabs expat-devel readline-devel;
-do yum -y install $yumPack;done
+do dnf --enablerepo=crb install -y install $yumPack;done
 
 
 # findLD=`cat /etc/ld.so.conf | grep '/usr/local/lib64'`
