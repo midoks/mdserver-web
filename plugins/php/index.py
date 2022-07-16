@@ -783,6 +783,9 @@ def installPreInspection(version):
     if sysName == 'debian' and sysId > 10:
         return 'debian10可以安装'
 
+    if sysName == 'centos' and sysId > 8:
+        return 'centos[{}]不可以安装'.format(sysId)
+
     if sysName == 'fedora':
         sys_id = mw.execShell(
             "cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}'")
