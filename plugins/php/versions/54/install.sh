@@ -21,7 +21,6 @@ mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
 
-cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash libiconv.sh
 cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash zlib.sh
 
 if [ ! -d $sourcePath/php/php${PHP_VER} ];then

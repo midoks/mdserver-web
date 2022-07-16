@@ -21,9 +21,7 @@ mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
 cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash freetype_old.sh
-cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash libiconv.sh
 cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash zlib.sh
-# cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash libzip.sh
 
 if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 	
@@ -43,9 +41,7 @@ if [ $sysName == 'Darwin' ]; then
 	# OPTIONS="${OPTIONS} --enable-zip"
 else
 	OPTIONS='--without-iconv'
-	# OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
 	OPTIONS="${OPTIONS} --with-curl"
-	OPTIONS="${OPTIONS} --with-libzip=${serverPath}/lib/libzip"
 fi
 
 IS_64BIT=`getconf LONG_BIT`
