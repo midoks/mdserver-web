@@ -45,6 +45,7 @@ if [ $sysName == 'Darwin' ]; then
 else
 	OPTIONS='--without-iconv'
 	OPTIONS="${OPTIONS} --with-curl"
+	OPTIONS="${OPTIONS} --with-libzip=${serverPath}/lib/libzip"
 fi
 
 IS_64BIT=`getconf LONG_BIT`
