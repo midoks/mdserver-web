@@ -4,6 +4,8 @@ export PATH
 
 curPath=`pwd`
 
+appPath=$(dirname "$curPath")
+
 rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 rootPath=$(dirname "$rootPath")
@@ -14,14 +16,9 @@ sourcePath=${serverPath}/source/php
 actionType=$1
 version=$2
 
-LIBNAME=gd
+LIBNAME=iconv
 LIBV=0
 
-
-if [ "$version" -lt "74" ];then
-	bash $curPath/gd_old.sh $1 $2
-	exit 0
-fi
 
 
 LIB_PATH_NAME=lib/php
@@ -47,25 +44,19 @@ Install_lib()
 		echo "php-$version 已安装${LIBNAME},请选择其它版本!"
 		return
 	fi
-
+	
+	cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash libiconv.sh
 	
 	if [ ! -f "$extFile" ];then
 
 		if [ ! -d $sourcePath/php${version}/ext ];then
 			cd $serverPath/mdserver-web/plugins/php && /bin/bash install.sh install ${version}
 		fi
-		
+
 		cd $sourcePath/php${version}/ext/${LIBNAME}
 		
 		$serverPath/php/$version/bin/phpize
-		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
-		--enable-gd \
-		--with-webp \
-		--with-xpm \
-		--with-jpeg \
-		--with-freetype \
-		--enable-gd-jis-conv
-
+		./configure --with-php-config=$serverPath/php/$version/bin/php-config
 		make clean && make && make install && make clean
 		
 	fi
@@ -79,7 +70,7 @@ Install_lib()
 	echo "[${LIBNAME}]" >> $serverPath/php/$version/etc/php.ini
 	echo "extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
 	
-	$serverPath/php/init.d/php${version} restart
+	bash ${rootPath}/plugins/php/versions/lib.sh $version restart
 	echo '==========================================================='
 	echo 'successful!'
 }

@@ -23,7 +23,7 @@ mkdir -p $serverPath/php
 cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash freetype_new.sh
 cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash libiconv.sh
 cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash zlib.sh
-cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash libzip.sh
+# cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash libzip.sh
 
 
 if [ ! -d $sourcePath/php/php${PHP_VER} ];then
@@ -49,10 +49,9 @@ if [ $sysName == 'Darwin' ]; then
 	export PKG_CONFIG_PATH="/usr/local/opt/libxml2/lib/pkgconfig"
 	export LDFLAGS="-L/usr/local/opt/libxml2/lib"
 else
-	OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
-	OPTIONS="${OPTIONS} --with-freetype-dir=${serverPath}/lib/freetype"
+	OPTIONS='--without-iconv'
+	# OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
 	OPTIONS="${OPTIONS} --with-curl"
-	OPTIONS="${OPTIONS} --with-libzip=${serverPath}/lib/libzip"
 fi
 
 
