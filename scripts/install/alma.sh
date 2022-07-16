@@ -74,8 +74,9 @@ dnf install -y wget libicu-devel  bzip2-devel gcc libxml2 libxml2-devel libjpeg-
 dnf install -y lsof net-tools
 dnf install -y ncurses-devel cmake
 
-dnf --enablerepo=crb install mysql-devel
+dnf --enablerepo=crb install -y mysql-devel
 dnf --enablerepo=crb install -y oniguruma oniguruma-devel
+dnf --enablerepo=crb install -y rpcgen
 
 dnf install -y langpacks-zh_CN langpacks-en langpacks-en_GB
 
