@@ -74,7 +74,6 @@ if [ ! -d $serverPath/php/53/bin ];then
 	--enable-simplexml \
 	--enable-dom \
 	--enable-filter \
-	--enable-fileinfo \
 	--enable-pcntl \
 	--enable-bcmath \
 	--enable-xml \

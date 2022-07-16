@@ -74,6 +74,7 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--enable-mbstring \
 	--with-zlib-dir=$serverPath/lib/zlib \
 	--enable-ftp \
+	--enable-zip \
 	--enable-sockets \
 	--enable-simplexml \
 	--enable-soap \

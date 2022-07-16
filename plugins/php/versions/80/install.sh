@@ -69,9 +69,10 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--enable-mysqlnd \
 	--with-mysqli=mysqlnd \
 	--with-pdo-mysql=mysqlnd \
-	--enable-mbstring \
 	--with-zlib-dir=$serverPath/lib/zlib \
 	--enable-ftp \
+	--enable-zip \
+	--enable-mbstring \
 	--enable-sockets \
 	--enable-simplexml \
 	--enable-soap \

@@ -61,11 +61,12 @@ if [ ! -d $serverPath/php/73 ];then
 	--enable-mysqlnd \
 	--with-mysqli=mysqlnd \
 	--with-pdo-mysql=mysqlnd \
-	--enable-mbstring \
 	--with-zlib-dir=$serverPath/lib/zlib \
 	--enable-ftp \
+	--enable-zip \
 	--enable-sockets \
 	--enable-simplexml \
+	--enable-mbstring \
 	--enable-soap \
 	--enable-posix \
 	--enable-sysvmsg \
