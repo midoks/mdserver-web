@@ -124,7 +124,7 @@ if [ "$VERSION_ID" -eq "9" ];then
 	dnf --enablerepo=crb install -y libtirpc-devel
 	dnf --enablerepo=crb install -y libmemcached-devel
 	dnf --enablerepo=crb install -y libtool libtool-libs
-
+	dnf --enablerepo=crb install -y gnutls-devel
 	# yum remove -y chardet
 fi
 
