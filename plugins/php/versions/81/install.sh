@@ -51,7 +51,7 @@ if [ $sysName == 'Darwin' ]; then
 else
 	OPTIONS='--without-iconv'
 	OPTIONS="${OPTIONS} --with-curl"
-	OPTIONS="${OPTIONS} --with-libzip=${serverPath}/lib/libzip"
+	# OPTIONS="${OPTIONS} --with-libzip=${serverPath}/lib/libzip"
 fi
 
 
