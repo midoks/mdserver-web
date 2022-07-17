@@ -80,6 +80,7 @@ dnf --enablerepo=crb install -y rpcgen
 dnf --enablerepo=crb install -y libzip-devel
 dnf --enablerepo=crb install -y libmemcached-devel
 dnf --enablerepo=crb install -y libtirpc libtirpc-devel
+dnf --enablerepo=crb install -y patchelf
 
 dnf install -y langpacks-zh_CN langpacks-en langpacks-en_GB
 
