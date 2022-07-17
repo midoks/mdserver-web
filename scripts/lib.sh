@@ -33,6 +33,10 @@ elif [ "$OSNAME" == "freebsd" ];then
     echo "freebsd lib"
 elif [ "$OSNAME" == "centos" ];then
     echo "centos lib"
+elif [ "$OSNAME" == "fedora" ];then
+    echo "fedora lib"
+elif [ "$OSNAME" == "alma" ];then
+    echo "alma lib"
 elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     
     apt install -y devscripts
@@ -93,26 +97,7 @@ elif [ "$OSNAME" == "ubuntu"  ] || [ "$OSNAME" == "debian" ]; then
     apt install -y libmariadb-dev-compat
     #apt install -y libmariadbclient-dev
 else
-
-    yum install -y libtirpc libtirpc-devel
-    yum install -y rpcgen
-    yum install -y openldap openldap-devel  
-    yum install -y bison re2c cmake
-    yum install -y cmake3
-    yum install -y autoconf
-
-    yum install -y libmemcached libmemcached-devel
-    yum install -y curl curl-devel
-    yum install -y zlib zlib-devel
-    yum install -y libzip libzip-devel
-    yum install -y pcre pcre-devel
-    yum install -y icu libicu-devel 
-    yum install -y freetype freetype-devel
-    yum install -y openssl openssl-devel
-    yum install -y graphviz libxml2 libxml2-devel
-    yum install -y sqlite-devel
-    yum install -y oniguruma oniguruma-devel
-    yum install -y ImageMagick ImageMagick-devel
+    echo "OK"
 fi
 
 
