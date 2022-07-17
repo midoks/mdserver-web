@@ -1,9 +1,0 @@
-\.(svn|htaccess|mysql_history|bash_history|git|DS_Store|idea|user\.ini)
-\.(bak|inc|old|mdb|sh|sql|php~|swp|java|class)$
-(vhost|bbs|host|wwwroot|www|site|root|backup|data|ftp|db|admin|website|web).*\.(rar|sql|zip|tar\.gz|tar)
-(elastic|jmx-console|jmxinvokerservlet)
-java\.lang
-/CSV/
-/(hack|shell|spy|phpspy)\.php$
-(manager|host-manager)/html$
-/(attachments|upimg|images|css|uploadfiles|html|uploads|templets|static|template|data|forumdata|upload|includes|cache|avatar)/(\\w+).(php|jsp)
