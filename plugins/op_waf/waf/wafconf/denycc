@@ -1,7 +1,0 @@
-#ip 60/60 1800
-#ip+uri 60/60 1800
-#ip+domain+CookieParam:sessionid  60/60 1800
-#ip+GetParam:userid 60/60 1800
-#ip+PostParam:userid 60/60 1800
-#$ip+header:imei 30/60  1800
-ip+uri 60/60  3600
