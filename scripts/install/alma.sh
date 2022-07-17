@@ -84,6 +84,27 @@ dnf --enablerepo=crb install -y patchelf
 
 dnf install -y langpacks-zh_CN langpacks-en langpacks-en_GB
 
+
+yum install -y libtirpc libtirpc-devel
+yum install -y rpcgen
+yum install -y openldap openldap-devel  
+yum install -y bison re2c cmake
+yum install -y cmake3
+yum install -y autoconf
+
+yum install -y curl curl-devel
+yum install -y zlib zlib-devel
+yum install -y libzip libzip-devel
+yum install -y pcre pcre-devel
+yum install -y icu libicu-devel 
+yum install -y freetype freetype-devel
+yum install -y openssl openssl-devel
+yum install -y graphviz libxml2 libxml2-devel
+yum install -y sqlite-devel
+yum install -y oniguruma oniguruma-devel
+yum install -y ImageMagick ImageMagick-devel
+
+
 for yumPack in make cmake gcc gcc-c++ flex bison file libtool libtool-libs autoconf kernel-devel patch wget gd gd-devel libxml2 libxml2-devel zlib zlib-devel glib2 glib2-devel tar bzip2 bzip2-devel libevent libevent-devel ncurses ncurses-devel curl curl-devel libcurl libcurl-devel e2fsprogs e2fsprogs-devel libidn libidn-devel vim-minimal gettext gettext-devel ncurses-devel gmp-devel libcap diffutils ca-certificates net-tools psmisc libXpm-devel git-core c-ares-devel libicu-devel libxslt libxslt-devel zip unzip glibc.i686 libstdc++.so.6 cairo-devel bison-devel ncurses-devel libaio-devel perl perl-devel perl-Data-Dumper lsof crontabs expat-devel readline-devel;
 do dnf --enablerepo=crb install -y $yumPack;done
 

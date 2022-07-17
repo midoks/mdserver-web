@@ -68,18 +68,38 @@ systemctl stop firewalld
 yum groupinstall -y "Development Tools"
 yum -y install epel-release
 
-yum install -y libevent libevent-devel libxslt* libjpeg* libpng* gd* zip libmcrypt libmcrypt-devel
+yum install -y libevent libevent-devel zip libmcrypt libmcrypt-devel
 yum install -y gcc libffi-devel python-devel openssl-devel 
 yum install -y curl-devel libmcrypt libmcrypt-devel python3-devel
 
-yum -y install wget python-devel python-imaging libicu-devel unzip bzip2-devel gcc libxml2 libxml2-devel libjpeg-devel libpng-devel libwebp libwebp-devel lsof pcre pcre-devel crontabs
+yum -y install wget python-devel python-imaging libicu-devel unzip bzip2-devel gcc libxml2 libxml2-devel libjpeg-devel libpng-devel libwebp libwebp-devel pcre pcre-devel crontabs
 yum -y install net-tools
 yum -y install ncurses-devel mysql-devel cmake
 yum -y install python-devel
 yum -y install MySQL-python
 yum -y install python3-devel
 
-for yumPack in make cmake gcc gcc-c++ gcc-g77 flex bison file libtool libtool-libs autoconf kernel-devel patch wget libjpeg libjpeg-devel libpng libpng-devel libpng10 libpng10-devel gd gd-devel libxml2 libxml2-devel zlib zlib-devel glib2 glib2-devel tar bzip2 bzip2-devel libevent libevent-devel ncurses ncurses-devel curl curl-devel libcurl libcurl-devel e2fsprogs e2fsprogs-devel krb5 krb5-devel libidn libidn-devel vim-minimal gettext gettext-devel ncurses-devel gmp-devel pspell-devel libcap diffutils ca-certificates net-tools libc-client-devel psmisc libXpm-devel git-core c-ares-devel libicu-devel libxslt libxslt-devel zip unzip glibc.i686 libstdc++.so.6 cairo-devel bison-devel ncurses-devel libaio-devel perl perl-devel perl-Data-Dumper lsof vixie-cron crontabs expat-devel readline-devel;
+yum install -y libtirpc libtirpc-devel
+yum install -y rpcgen
+yum install -y openldap openldap-devel  
+yum install -y bison re2c cmake
+yum install -y cmake3
+yum install -y autoconf
+
+yum install -y libmemcached libmemcached-devel
+yum install -y curl curl-devel
+yum install -y zlib zlib-devel
+yum install -y libzip libzip-devel
+yum install -y pcre pcre-devel
+yum install -y icu libicu-devel 
+yum install -y freetype freetype-devel
+yum install -y openssl openssl-devel
+yum install -y graphviz libxml2 libxml2-devel
+yum install -y sqlite-devel
+yum install -y oniguruma oniguruma-devel
+yum install -y ImageMagick ImageMagick-devel
+
+for yumPack in make cmake gcc gcc-c++ gcc-g77 flex bison file libtool libtool-libs autoconf kernel-devel patch wget libjpeg libjpeg-devel libpng libpng-devel gd gd-devel libxml2 libxml2-devel zlib zlib-devel glib2 glib2-devel tar bzip2 bzip2-devel libevent libevent-devel ncurses ncurses-devel curl curl-devel libcurl libcurl-devel e2fsprogs e2fsprogs-devel krb5 krb5-devel libidn libidn-devel vim-minimal gettext gettext-devel ncurses-devel gmp-devel pspell-devel libcap diffutils ca-certificates net-tools libc-client-devel psmisc libXpm-devel git-core c-ares-devel libicu-devel libxslt libxslt-devel zip unzip glibc.i686 libstdc++.so.6 cairo-devel bison-devel ncurses-devel libaio-devel perl perl-devel perl-Data-Dumper crontabs expat-devel readline-devel;
 do yum -y install $yumPack;done
 
 dnf install libxml2 libxml2-devel -y
