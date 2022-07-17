@@ -64,7 +64,10 @@ if __name__ == "__main__":
     if type == 'panel':
         set_panel_pwd(sys.argv[2])
     elif type == 'username':
-        set_panel_username()
+        if len(sys.argv) > 2:
+            set_panel_username(sys.argv[2])
+        else:
+            set_panel_username()
     elif type == 'getServerIp':
         getServerIp()
     else:

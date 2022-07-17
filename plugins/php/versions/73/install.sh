@@ -21,9 +21,7 @@ mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
 cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash freetype_old.sh
-cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash libiconv.sh
 cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash zlib.sh
-cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash libzip.sh
 
 if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 	
@@ -42,9 +40,13 @@ if [ $sysName == 'Darwin' ]; then
 	# OPTIONS="${OPTIONS} --with-libzip=${serverPath}/lib/libzip"
 	# OPTIONS="${OPTIONS} --enable-zip"
 else
-	OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
+	OPTIONS='--without-iconv'
 	OPTIONS="${OPTIONS} --with-curl"
-	OPTIONS="${OPTIONS} --with-libzip=${serverPath}/lib/libzip"
+fi
+
+IS_64BIT=`getconf LONG_BIT`
+if [ "$IS_64BIT" == "64" ];then
+	OPTIONS="${OPTIONS} --with-libdir=lib64"
 fi
 
 
@@ -56,11 +58,12 @@ if [ ! -d $serverPath/php/73 ];then
 	--enable-mysqlnd \
 	--with-mysqli=mysqlnd \
 	--with-pdo-mysql=mysqlnd \
-	--enable-mbstring \
 	--with-zlib-dir=$serverPath/lib/zlib \
 	--enable-ftp \
+	--enable-zip \
 	--enable-sockets \
 	--enable-simplexml \
+	--enable-mbstring \
 	--enable-soap \
 	--enable-posix \
 	--enable-sysvmsg \

@@ -21,8 +21,13 @@ if [ "$version" -lt "70" ];then
 	LIBV=2.4.0
 fi
 
-NON_ZTS_FILENAME=`ls $serverPath/php/${version}/lib/php/extensions | grep no-debug-non-zts`
-extDir=$serverPath/php/${version}/lib/php/extensions/${NON_ZTS_FILENAME}/
+LIB_PATH_NAME=lib/php
+if [ -d $serverPath/php/${version}/lib64 ];then
+	LIB_PATH_NAME=lib64
+fi
+
+NON_ZTS_FILENAME=`ls $serverPath/php/${version}/${LIB_PATH_NAME}/extensions | grep no-debug-non-zts`
+extFile=$serverPath/php/${version}/${LIB_PATH_NAME}/extensions/${NON_ZTS_FILENAME}/${LIBNAME}.so
 
 if [ "$sysName" == "Darwin" ];then
 	BAK='_bak'
@@ -38,7 +43,6 @@ Install_lib()
 		return
 	fi
 	
-	extFile=$extDir${LIBNAME}.so
 	if [ ! -f "$extFile" ];then
 		
 		OPTIONS=''

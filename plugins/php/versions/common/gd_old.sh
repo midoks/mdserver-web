@@ -24,8 +24,13 @@ LIBV=0
 # fi
 
 
-NON_ZTS_FILENAME=`ls $serverPath/php/${version}/lib/php/extensions | grep no-debug-non-zts`
-extFile=$serverPath/php/${version}/lib/php/extensions/${NON_ZTS_FILENAME}/${LIBNAME}.so
+LIB_PATH_NAME=lib/php
+if [ -d $serverPath/php/${version}/lib64 ];then
+	LIB_PATH_NAME=lib64
+fi
+
+NON_ZTS_FILENAME=`ls $serverPath/php/${version}/${LIB_PATH_NAME}/extensions | grep no-debug-non-zts`
+extFile=$serverPath/php/${version}/${LIB_PATH_NAME}/extensions/${NON_ZTS_FILENAME}/${LIBNAME}.so
 
 sysName=`uname`
 if [ "$sysName" == "Darwin" ];then
@@ -49,6 +54,8 @@ Install_lib()
 		echo "php-$version 已安装${LIBNAME},请选择其它版本!"
 		return
 	fi
+
+	# cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash freetype_old.sh
 	
 	if [ ! -f "$extFile" ];then
 
@@ -61,10 +68,12 @@ Install_lib()
 		$serverPath/php/$version/bin/phpize
 
 		#--with-xpm
+		# =${serverPath}/lib/freetype_old
+		# =/usr/lib
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
 		--with-gd \
-		--with-jpeg \
-		--with-freetype \
+		--with-jpeg-dir \
+		--with-freetype-dir \
 		--enable-gd-jis-conv \
 		--enable-gd-native-ttf
 		make clean && make && make install && make clean

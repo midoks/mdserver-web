@@ -21,9 +21,7 @@ mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
 cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash freetype_new.sh
-cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash libiconv.sh
 cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash zlib.sh
-cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash libzip.sh
 
 
 if [ ! -d $sourcePath/php/php${PHP_VER} ];then
@@ -42,14 +40,15 @@ OPTIONS=''
 if [ $sysName == 'Darwin' ]; then
 	OPTIONS='--without-iconv'
 	OPTIONS="${OPTIONS} --with-curl=${serverPath}/lib/curl"
-	# OPTIONS="${OPTIONS} --enable-zip"
 else
-	OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
-	OPTIONS="${OPTIONS} --with-freetype-dir=${serverPath}/lib/freetype"
+	OPTIONS='--without-iconv'
 	OPTIONS="${OPTIONS} --with-curl"
-	OPTIONS="${OPTIONS} --with-libzip=${serverPath}/lib/libzip"
 fi
 
+IS_64BIT=`getconf LONG_BIT`
+if [ "$IS_64BIT" == "64" ];then
+	OPTIONS="${OPTIONS} --with-libdir=lib64"
+fi
 
 echo "$sourcePath/php/php${PHP_VER}"
 
@@ -63,8 +62,9 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--enable-mysqlnd \
 	--with-mysqli=mysqlnd \
 	--with-pdo-mysql=mysqlnd \
-	--enable-mbstring \
 	--with-zlib-dir=$serverPath/lib/zlib \
+	--with-zip \
+	--enable-mbstring \
 	--enable-ftp \
 	--enable-sockets \
 	--enable-simplexml \

@@ -25,6 +25,8 @@ Install_rsyncd()
 
 	if [ "$OSNAME" == "debian'" ] || [ "$OSNAME" == "ubuntu'" ];then
 		apt install -y rsync
+	elif [[ "$OSNAME" == "arch" ]]; then
+		echo y | pacman -Sy rsync
 	else
 		yum install -y rsync
 	fi

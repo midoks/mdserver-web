@@ -32,6 +32,9 @@ def getInitDFile():
 
 
 def getConf():
+    path = '/etc/varnish/vcl.conf'
+    if os.path.exists(path):
+        return path
     path = "/etc/varnish/default.vcl"
     return path
 
@@ -102,12 +105,11 @@ def restart():
 
 
 def reload():
-    # file = initDreplace()
     return vaOp('reload')
 
 
 def runInfo():
-    cmd = "/usr/bin/varnishstat -j"
+    cmd = "varnishstat -j"
     data = mw.execShell(cmd)[0].strip()
     return data
 
@@ -162,11 +164,15 @@ def initdUinstall():
 
 
 def runLog():
+
+    if os.path.exists("/var/log/varnish/varnish.log"):
+        return "/var/log/varnish/varnish.log"
+
     return "/var/log/varnish/varnishncsa.log"
 
 
 def confService():
-    return '/lib/systemd/system/varnish.service'
+    return mw.systemdCfgDir() + '/varnish.service'
 
 if __name__ == "__main__":
     func = sys.argv[1]

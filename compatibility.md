@@ -1,8 +1,5 @@
 ### 兼容性测试报告
 
-- 暂时不具有指导意见
-
-
 快速测试命令
 
 ```
@@ -24,9 +21,10 @@ cd /www/server/mdserver-web/plugins/php/versions && bash all_test.sh
 | Ubuntu 22.04 		|✅				|✅				|	
 | Fedora 31 		|✅				|✅				|
 | Fedora 32 		|✅				|✅				|
-| AlmaLinix 9 		|✅				|✅				|
+| AlmaLinux 9 		|✅				|✅				|
 | RockyLinux 8.6 	|✅				|✅				|
-| openSUSE 15.4 	|:x:			|:x:			|
+| Arch Linux　 	 	|✅				|✅				|
+| openSUSE 15.4 	|✅				|✅				|
 
 
 
@@ -35,7 +33,7 @@ cd /www/server/mdserver-web/plugins/php/versions && bash all_test.sh
 | CentOS 7.9 		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
 | CentOS 8.4 		|✅ 	|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
 | CentOS 8 Stream 	|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
-| CentOS 9 Stream 	|:x:	|:x:	|:x:	|:x:	|:x:	|:x:	|:x:	|:x:	|:x:	|:x:	|:x:	|:x:	|
+| CentOS 9 Stream 	|:x:	|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
 | Debian 10.3 		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
 | Debian 11.3 		|:x:	|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
 | Ubuntu 18.04 		|:x:	|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
@@ -43,9 +41,10 @@ cd /www/server/mdserver-web/plugins/php/versions && bash all_test.sh
 | Ubuntu 22.04 		|:x:	|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
 | Fedora 31 		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
 | Fedora 32 		|:x:	|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
-| AlmaLinix 9 		|:x:	|✅		|✅		|:x:	|:x:	|:x:	|:x:	|:x:	|✅		|:x:	|:x:	|:x:	|
+| AlmaLinux 9 		|:x:	|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
 | RockyLinux 8.6 	|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
-| openSUSE 15.4 	|:x:	|:x:	|:x:	|:x:	|:x:	|:x:	|:x:	|:x:	|:x:	|:x:	|:x:	|:x:	|
+| Arch Linux 	 	|:x:	|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
+| openSUSE 15.4 	|:x:	|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|✅		|
 
 
 
@@ -54,7 +53,7 @@ cd /www/server/mdserver-web/plugins/php/versions && bash all_test.sh
 | CentOS 7.9 		|✅			|✅			|✅			|:x:		|
 | CentOS 8.4 		|:x:		|✅			|✅			|✅			|	
 | CentOS 8 Stream 	|✅			|✅			|✅			|✅			|		
-| CentOS 9 Stream 	|✅			|:x:		|:x:		|:x:		|
+| CentOS 9 Stream 	|✅			|:x:		|✅			|✅			|
 | Debian 10.3 		|✅			|✅			|✅			|:x:		|	
 | Debian 11.3 		|✅			|✅			|✅			|✅			|
 | Ubuntu 18.04 		|✅			|✅			|✅			|:x:		|	
@@ -62,7 +61,8 @@ cd /www/server/mdserver-web/plugins/php/versions && bash all_test.sh
 | Ubuntu 22.04 		|✅			|✅			|✅			|✅			|
 | Fedora 31 		|✅			|✅			|✅			|✅			|	
 | Fedora 32 		|✅			|✅			|✅			|✅			|	
-| AlmaLinix 9 		|✅			|:x:		|:x:		|:x:		|	
-| RockyLinux 8.6 	|✅			|✅			|✅			|✅			|	
-| openSUSE 15.4 	|:x:		|:x:		|:x:		|:x:		|
+| AlmaLinux 9 		|✅			|:x:		|✅			|✅	 		|	
+| RockyLinux 8.6 	|✅			|✅			|✅			|✅			|
+| Arch Linux 	 	|✅			|✅			|✅			|✅			|	
+| openSUSE 15.4 	|✅			|✅			|✅			|:x:		|
 

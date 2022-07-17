@@ -20,7 +20,6 @@ mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
 cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash freetype_old.sh
-cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash libiconv.sh
 cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash zlib.sh
 
 if [ ! -d $sourcePath/php/php${PHP_VER} ];then
@@ -33,14 +32,17 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 fi
 
 OPTIONS=''
+OPTIONS='--without-iconv'
 if [ $sysName == 'Darwin' ]; then
-	OPTIONS='--without-iconv'
 	OPTIONS="${OPTIONS} --with-curl=${serverPath}/lib/curl"
 else
-	OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
 	OPTIONS="${OPTIONS} --with-curl"
 fi
 
+IS_64BIT=`getconf LONG_BIT`
+if [ "$IS_64BIT" == "64" ];then
+	OPTIONS="${OPTIONS} --with-libdir=lib64"
+fi
 
 if [ ! -d $serverPath/php/71 ];then
 	cd $sourcePath/php/php${PHP_VER} && ./configure \

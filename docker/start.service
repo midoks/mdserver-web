@@ -1,0 +1,9 @@
+[Unit]
+Description=Customize the  script
+After=network.target
+
+[Service]
+ExecStart=/start.sh
+
+[Install]
+WantedBy=multi-user.target

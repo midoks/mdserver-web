@@ -11,7 +11,7 @@ sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 
 
-version=7.4.30
+version=7.4.26
 PHP_VER=74
 Install_php()
 {
@@ -21,9 +21,7 @@ mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
 cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash freetype_new.sh
-cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash libiconv.sh
 cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash zlib.sh
-cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash libzip.sh
 
 if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 
@@ -34,6 +32,8 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 	cd $sourcePath/php && tar -Jxf $sourcePath/php/php-${version}.tar.xz
 	mv $sourcePath/php/php-${version} $sourcePath/php/php${PHP_VER}
 fi
+
+
 
 cd $sourcePath/php/php${PHP_VER}
 
@@ -48,11 +48,16 @@ if [ $sysName == 'Darwin' ]; then
 	export PKG_CONFIG_PATH="/usr/local/opt/libxml2/lib/pkgconfig"
 	export LDFLAGS="-L/usr/local/opt/libxml2/lib"
 else
-	OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
+	OPTIONS='--without-iconv'
+	# OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
 	OPTIONS="${OPTIONS} --with-curl"
+	# OPTIONS="${OPTIONS} --with-zip=${serverPath}/lib/libzip"
 fi
 
-
+IS_64BIT=`getconf LONG_BIT`
+if [ "$IS_64BIT" == "64" ];then
+	OPTIONS="${OPTIONS} --with-libdir=lib64"
+fi
 
 echo "$sourcePath/php/php${PHP_VER}"
 
@@ -66,9 +71,10 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--enable-mysqlnd \
 	--with-mysqli=mysqlnd \
 	--with-pdo-mysql=mysqlnd \
-	--enable-mbstring \
 	--with-zlib-dir=$serverPath/lib/zlib \
+	--with-zip \
 	--enable-ftp \
+	--enable-mbstring \
 	--enable-sockets \
 	--enable-simplexml \
 	--enable-soap \

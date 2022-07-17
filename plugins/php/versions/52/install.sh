@@ -12,45 +12,6 @@ install_tmp=${rootPath}/tmp/mw_install.pl
 
 
 
-_os=`uname`
-echo "use system: ${_os}"
-
-if [ ${_os} == "Darwin" ]; then
-	OSNAME='macos'
-elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
-	OSNAME='centos'
-elif grep -Eqi "Fedora" /etc/issue || grep -Eq "Fedora" /etc/*-release; then
-	OSNAME='fedora'
-elif grep -Eqi "Rocky" /etc/issue || grep -Eq "Rocky" /etc/*-release; then
-	OSNAME='rocky'
-elif grep -Eqi "AlmaLinux" /etc/issue || grep -Eq "AlmaLinux" /etc/*-release; then
-	OSNAME='alma'
-elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
-	OSNAME='debian'
-elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
-	OSNAME='ubuntu'
-elif grep -Eqi "Raspbian" /etc/issue || grep -Eq "Raspbian" /etc/*-release; then
-	OSNAME='raspbian'
-else
-	OSNAME='unknow'
-fi
-
-
-# if [ "$OSNAME" == 'ubuntu' ] || [ "$OSNAME" == 'debian' ] ;then
-# 	apt install bison=2.4.1
-# 	if [ "$?" != "0" ]; then
-# 		echo 'The system version is too high to install'
-# 		exit 1
-# 	fi
-
-# 	apt install flex=2.5.4
-# 	if [ "$?" != "0" ]; then
-# 		echo 'The system version is too high to install'
-# 		exit 1
-# 	fi
-# fi
-
-
 version=5.2.17
 PHP_VER=52
 Install_php()
@@ -60,8 +21,6 @@ echo "安装php-${version} ..." > $install_tmp
 mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
-cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash freetype_old.sh
-cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash libiconv.sh
 cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash zlib.sh
 
 if [ ! -d $sourcePath/php/php${PHP_VER} ];then
@@ -115,8 +74,15 @@ if [ $sysName == 'Darwin' ]; then
 	OPTIONS="${OPTIONS} --with-freetype-dir=${serverPath}/lib/freetype"
 	OPTIONS="${OPTIONS} --with-curl=${serverPath}/lib/curl"
 else
-	OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
+	OPTIONS='--without-iconv'
+	# OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
 	OPTIONS="${OPTIONS} --with-curl"
+fi
+
+
+IS_64BIT=`getconf LONG_BIT`
+if [ "$IS_64BIT" == "64" ];then
+	OPTIONS="${OPTIONS} --with-libdir=lib64"
 fi
 
 
@@ -129,6 +95,7 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--exec-prefix=$serverPath/php/${PHP_VER} \
 	--with-config-file-path=$serverPath/php/${PHP_VER}/etc \
 	--with-zlib-dir=$serverPath/lib/zlib \
+	--enable-zip \
 	--enable-xml \
 	--enable-shared \
 	--with-mysql=mysqlnd \

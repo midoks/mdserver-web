@@ -1983,7 +1983,7 @@ function opSSL(type,id,siteName){
 	var other = '<div class="myKeyCon ptb15"><div class="ssl-con-key pull-left mr20">密钥(KEY)<br><textarea id="key" class="bt-input-text"></textarea></div>'
 					+ '<div class="ssl-con-key pull-left">证书(PEM格式)<br><textarea id="csr" class="bt-input-text"></textarea></div>'
 					+ '<div class="ssl-btn pull-left mtb15" style="width:100%"><button class="btn btn-success btn-sm" onclick="saveSSL(\''+siteName+'\')">保存</button></div></div>'
-					+ '<ul class="help-info-text c7 pull-left"><li>粘贴您的*.key以及*.pem内容，然后保存即可<a href=\'http://www.bt.cn/bbs/thread-704-1-1.html\' class=\'btlink\' target=\'_blank\'>[帮助]</a>。</li>\
+					+ '<ul class="help-info-text c7 pull-left"><li>粘贴您的*.key以及*.pem内容，然后保存即可。</li>\
 					<li>如果浏览器提示证书链不完整,请检查是否正确拼接PEM证书</li><li>PEM格式证书 = 域名证书.crt + 根证书(root_bundle).crt</li>\
 					<li>在未指定SSL默认站点时,未开启SSL的站点使用HTTPS会直接访问到已开启SSL的站点</li></ul>';			
 	switch(type){

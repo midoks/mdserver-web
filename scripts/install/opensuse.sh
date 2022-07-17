@@ -28,8 +28,13 @@ zypper install -y libevent-devel
 zypper install -y libtirpc-devel
 zypper install -y rpcgen
 
+zypper install -y libmcrypt libmcrypt-devel
+zypper install -y libzip libzip-devel
 zypper install -y libmemcached libmemcached-devel
 
+zypper install -y icu libicu-devel
+zypper install -y sqlite3 sqlite3-devel
+zypper install -y oniguruma-devel
 
 # zypper install -y protobuf
 # zypper install -y zlib-devel
@@ -37,7 +42,14 @@ zypper install -y libmemcached libmemcached-devel
 zypper install -y python3-devel
 zypper install -y python-devel
 
+zypper install -y libwebp-devel
+zypper install -y libtomcrypt
+zypper install -y libtomcrypt-devel
 
+zypper install -y libXpm-devel
+zypper install -y freetype2-devel
+
+# zypper install -y  php-config
 #https need
 if [ ! -d /root/.acme.sh ];then	
 	curl https://get.acme.sh | sh
