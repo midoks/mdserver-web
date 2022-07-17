@@ -78,6 +78,8 @@ dnf --enablerepo=crb install -y mysql-devel
 dnf --enablerepo=crb install -y oniguruma oniguruma-devel
 dnf --enablerepo=crb install -y rpcgen
 dnf --enablerepo=crb install -y libzip-devel
+dnf --enablerepo=crb install -y libmemcached-devel
+dnf --enablerepo=crb install -y libtirpc libtirpc-devel
 
 dnf install -y langpacks-zh_CN langpacks-en langpacks-en_GB
 
