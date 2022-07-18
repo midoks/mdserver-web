@@ -1,0 +1,17 @@
+{
+	"sort": 7,
+	"ps": "【DEV】网站统计报表",
+	"name": "webstats",
+	"title": "网站统计报表",
+	"shell": "install.sh",
+	"versions":["0.0.1"],
+	"tip": "soft",
+	"checks": "server/webstats",
+	"path": "server/webstats",
+	"display": 1,
+	"author": "midoks",
+	"date": "2022-07-18",
+	"home": "https://github.com/midoks/mdserver-web",
+	"type": 0,
+	"pid": "1"
+}

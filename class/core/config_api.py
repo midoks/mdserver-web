@@ -17,7 +17,7 @@ class config_api:
 
     # 进行中.
     # 兼容主流Linux系统
-    __version = '0.8.6.9'
+    __version = '0.8.6.10'
 
     def __init__(self):
         pass
