@@ -55,7 +55,7 @@ if [ ! -d $serverPath/php/72 ];then
 	--enable-mysqlnd \
 	--with-mysqli=mysqlnd \
 	--with-pdo-mysql=mysqlnd \
-	--enable-zip \
+	--with-libzip \
 	--enable-mbstring \
 	--enable-simplexml \
 	--enable-sockets \
