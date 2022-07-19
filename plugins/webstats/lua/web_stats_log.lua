@@ -12,11 +12,7 @@ log_by_lua_block {
 		package.path = cpath .. "?.lua;" .. package.path
 	end
 
-	local server_name,ip,today,day,body_length,method,config,cache_count
-
-	local db = nil
-	local cache = ngx.shared.mw_total
-	
+	-- debug func
 	local function D(msg)
 		if not debug_mode then return true end
     	local fp = io.open('{$SERVER_APP}/debug.log', 'ab')
@@ -34,6 +30,33 @@ log_by_lua_block {
     	return true
 	end
 
+
+	-- cache start ---
+	local cache = ngx.shared.mw_total
+	local function cache_set(server_name, id ,key, val)
+		local line_kv = "log_kv_"..server_name..'_'..id.."_"..key
+		cache:set(line_kv, val)
+	end
+
+	local function cache_clear(server_name, id, key)
+		local line_kv = "log_kv_"..server_name..'_'..id.."_"..key
+		cache:delete(line_kv)
+	end
+
+	local function cache_get(server_name, id, key)
+		local line_kv = "log_kv_"..server_name..'_'..id.."_"..key
+		local value = cache:get(line_kv)
+		return value
+	end
+	-- cache end ---
+
+	-- domain config is import
+	local server_name
+	
+	local ip,today,day,body_length,method,config,cache_count
+	local db = nil
+	
+	
 
 	local function run_app()
 		D("debug start")

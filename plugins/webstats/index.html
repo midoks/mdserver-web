@@ -3,7 +3,7 @@
 		<div class="bt-w-menu">
 			<p class="bgw" onclick="pluginService('webstats');">服务</p>
 			<p onclick="pluginConfig('webstats');">概览</p>
-			<p onclick="pluginConfig('webstats');">全局设置</p>
+			<p onclick="wsGlobalSetting();">全局设置</p>
 		</div>
 		<div class="bt-w-con pd15">
 			<div class="soft-man-con"></div>
@@ -12,7 +12,12 @@
 </div>
 <script type="text/javascript">
 resetPluginWinWidth(800);
+
 $.getScript( "/plugins/file?name=webstats&f=js/stats.js", function(){
 	pluginService('webstats');
+});
+
+$.getScript( "/plugins/file?name=webstats&f=js/setting.js", function(){
+	console.log("webstats setting load done");
 });
 </script>
