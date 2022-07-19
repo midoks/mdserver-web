@@ -4,9 +4,11 @@ import sys
 import io
 import os
 import time
+import json
 
 sys.path.append(os.getcwd() + "/class/core")
 import mw
+
 
 app_debug = False
 if mw.isAppleSystem():
@@ -19,6 +21,10 @@ def getPluginName():
 
 def getPluginDir():
     return mw.getPluginDir() + '/' + getPluginName()
+
+
+sys.path.append(getPluginDir() + "/class")
+from LuaMaker import LuaMaker
 
 
 def getServerDir():
@@ -60,11 +66,17 @@ def status():
     return 'start'
 
 
-def pSqliteDb(dbname='web_logs'):
-    file = getServerDir() + '/webstats.db'
-    name = 'webstats'
+def pSqliteDb(dbname='web_logs', site_name='unset'):
+    db_dir = getServerDir() + '/logs/' + site_name
+
+    if not os.path.exists(db_dir):
+        mw.execShell('mkdir -p ' + db_dir)
+
+    name = 'logs'
+    file = db_dir + '/' + name + '.db'
+
     if not os.path.exists(file):
-        conn = mw.M(dbname).dbPos(getServerDir(), name)
+        conn = mw.M(dbname).dbPos(db_dir, name)
         sql = mw.readFile(getPluginDir() + '/conf/init.sql')
         sql_list = sql.split(';')
         for index in range(len(sql_list)):
@@ -72,6 +84,30 @@ def pSqliteDb(dbname='web_logs'):
     else:
         conn = mw.M(dbname).dbPos(getServerDir(), name)
     return conn
+
+
+def makeSiteConfig():
+    siteM = mw.M('sites')
+    domainM = mw.M('domain')
+    slist = siteM.field('id,name').where(
+        'status=?', (1,)).order('id desc').select()
+
+    data = []
+    for s in slist:
+        tmp = {}
+        tmp['name'] = s['name']
+
+        dlist = domainM.field('id,name').where(
+            'pid=?', (s['id'],)).order('id desc').select()
+
+        _t = []
+        for d in dlist:
+            _t.append(d['name'])
+
+        tmp['domains'] = _t
+        data.append(tmp)
+
+    return data
 
 
 def initDreplace():
@@ -94,9 +130,28 @@ def initDreplace():
         mw.execShell('mkdir -p ' + lua_dir)
         lua_tpl = getPluginDir() + '/lua/web_stats_log.lua'
         content = mw.readFile(lua_tpl)
+        # content = content.replace('{$SERVER_PATH}', service_path)
         content = content.replace('{$SERVER_APP}', service_path)
         content = content.replace('{$ROOT_PATH}', mw.getServerDir())
         mw.writeFile(lua_dst, content)
+
+    content = makeSiteConfig()
+    for index in range(len(content)):
+        pSqliteDb('web_log', content[index]['name'])
+
+    lua_site_json = lua_dir + "/sites.json"
+    if not os.path.exists(lua_site_json):
+        mw.writeFile(lua_site_json, json.dumps(content))
+
+    lua_site = lua_dir + "/sites.lua"
+    if not os.path.exists(lua_site):
+        config_sites = LuaMaker.makeLuaTable(content)
+        sites_str = "return " + config_sites
+        mw.writeFile(lua_site, sites_str)
+
+    log_path = getServerDir() + "/logs"
+    if not os.path.exists(log_path):
+        mw.execShell('mkdir -p ' + log_path)
 
     debug_log = getServerDir() + "/debug.log"
     if not os.path.exists(debug_log):

@@ -74,22 +74,10 @@ Install_App()
 	fi
 
 	# copy to code path
-	if [ -f $serverPath/webstats/luarocks/lib/lua/5.1/lsqlite3.so ];then
-		cp -rf $serverPath/webstats/luarocks/lib/lua/5.1/lsqlite3.so $serverPath/webstats/lua/lsqlite3.so 
+	DEFAULT_DIR=$serverPath/webstats/luarocks/lib/lua/5.1
+	if [ -f ${DEFAULT_DIR}/lsqlite3.so ];then
+		cp -rf ${DEFAULT_DIR}/lsqlite3.so $serverPath/webstats/lua/lsqlite3.so 
 	fi
-
-	# if [ ! -d $serverPath/source/webstats/luasql-2.6.0 ];then
-	# 	wget -O $serverPath/source/webstats/luasql_2.6.0.tar.gz https://github.com/keplerproject/luasql/archive/refs/tags/2.6.0.tar.gz
-	# 	cd $serverPath/source/webstats && tar xvf luasql_2.6.0.tar.gz
-	# fi
-
-	# PATH=${serverPath}/openresty/luajit:${serverPath}/openresty/luajit/include/luajit-2.1:$PATH
-	# export PATH
-	# export LUA_INCDIR=${serverPath}/openresty/luajit/include/luajit-2.1
-	# cd $serverPath/source/webstats/luasql-2.6.0 && make sqlite3
-	
-	# $serverPath/webstats/luarocks/bin/luarocks install luasql-sqlite3 SQLITE_DIR=$serverPath/webstats/lua
-
 
 	echo "${VERSION}" > $serverPath/webstats/version.pl
 	echo '安装完成' > $install_tmp
