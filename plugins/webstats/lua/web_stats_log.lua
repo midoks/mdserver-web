@@ -55,14 +55,20 @@ log_by_lua_block {
 	-- cache end ---
 
 	-- domain config is import
-	local server_name
 	local db = nil
 	local json = require "cjson" 
 	local sqlite3 = require "lsqlite3"
-	local request_header = ngx.req.get_headers()
-	
-	local today,day,method,config,cache_count
+
+	local server_name
+	local request_header
+	local method
+	local today,day,config,cache_count
 	--- default common var end ---
+
+	local function init_var()
+		request_header = ngx.req.get_headers()
+		method = ngx.req.get_method()
+	end
 
 	local function get_store_key()
 		return os.date("%Y%m%d%H", os.time())
@@ -82,6 +88,26 @@ log_by_lua_block {
 			domain = "unknown"
 		end
 		return domain
+	end
+
+	local function get_http_original()
+		local data = ""
+		local headers = request_header
+		if not headers then return data end
+		if method ~='GET' then 
+			data = ngx.req.get_body_data()
+			if not data then
+				data = ngx.req.get_post_args(1000000)
+			end
+			if "string" == type(data) then
+				headers["payload"] = data
+			end
+
+			if "table" == type(data) then
+				headers = table.concat(headers, data)
+			end
+		end
+		return json.encode(headers)
 	end
 
 	local function get_server_name(c_name)
@@ -106,7 +132,7 @@ log_by_lua_block {
 					return v['name']
 	            elseif string.find(d_name, "*") then
 					new_domain = string.gsub(d_name, '*', '.*')
-					debug("ngx server name:"..ngx.var.server_name.."/new_domain:"..new_domain)
+					D("ngx server name:"..ngx.var.server_name.."/new_domain:"..new_domain)
 	            	if string.find(c_name, new_domain) then
 	                	-- cache:set(c_name, v['name'],3600)
 	                	-- return v['name']
@@ -141,14 +167,12 @@ log_by_lua_block {
 			new_id = cache:get(last_insert_id_key)
 		end
 
-		D("new_id:"..new_id)
-
 		local ip_list = request_header["x-forwarded-for"]
 		local ip = ngx.var.remote_addr
 		if ip and not ip_list then
 			ip_list = ip
 		end
-		
+
 		local client_port = ngx.var.remote_port
 		local request_time = ngx.var.request_time
 		local real_server_name = server_name
@@ -161,7 +185,7 @@ log_by_lua_block {
 		local body_length = get_length()
 		local domain = get_domain()
 		local referer = ngx.var.http_referer
-
+		local request_headers = get_http_original()
 
 		kv = {
 			id=new_id,
@@ -177,12 +201,12 @@ log_by_lua_block {
 			request_uri=request_uri,
 			body_length=body_length,
 			referer=referer,
-			-- user_agent=request_header['user-agent'], 
+			user_agent=request_header['user-agent'], 
 			protocol=protocol,
 			is_spider=0,
 			request_time=request_time,
 			-- excluded=excluded,
-			-- request_headers="",
+			request_headers=request_headers,
 			ip_list=ip_list,
 			client_port=client_port
 		}
@@ -212,6 +236,8 @@ log_by_lua_block {
 		local is_spider = logline["is_spider"]
 		local domain = logline["domain"]
 		local server_name = logline["server_name"]
+		local user_agent = logline["user_agent"]
+		local request_headers = logline["request_headers"]
 
 		stmt:bind_names{
 			time=time,
@@ -223,11 +249,11 @@ log_by_lua_block {
 			uri=uri,
 			body_length=body_length,
 			referer=referer,
-			user_agent="d",
+			user_agent=user_agent,
 			protocol=protocol,
 			request_time=request_time,
 			is_spider=is_spider,
-			request_headers=".",
+			request_headers=request_headers,
 			ip_list=ip_list,
 			client_port=client_port,
 		}
@@ -318,6 +344,7 @@ log_by_lua_block {
 
 	local function run_app()
 		D("------------ debug start ------------")
+		init_var()
 
 		local c_name = ngx.var.server_name
 		server_name = string.gsub(get_server_name(c_name),'_','.')
