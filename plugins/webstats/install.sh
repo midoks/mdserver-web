@@ -10,10 +10,15 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
-
 install_tmp=${rootPath}/tmp/mw_install.pl
-
 VERSION=$2
+sys_os=`uname`
+
+if [ "$sys_os" == "Darwin" ];then
+	BAK='_bak'
+else
+	BAK=''
+fi
 
 Install_App()
 {
@@ -31,7 +36,6 @@ Install_App()
 
 	
 	# luarocks
-
 	if [ ! -f $serverPath/source/webstats/luarocks-3.5.0.tar.gz ];then
 		wget -O $serverPath/source/webstats/luarocks-3.5.0.tar.gz https://luarocks.org/releases/luarocks-3.5.0.tar.gz
 	fi
@@ -53,10 +57,26 @@ Install_App()
 		cd $serverPath/source/webstats && unzip lsqlite3_fsl09y.zip
 	fi
 
-	# PATH=${serverPath}/openresty/luajit:${serverPath}/openresty/luajit/include/luajit-2.1:$PATH
-	# export PATH=$PATH:$serverPath/webstats/luarocks/bin
-	# cd $serverPath/source/webstats/lsqlite3_fsl09y && make
+	PATH=${serverPath}/openresty/luajit:${serverPath}/openresty/luajit/include/luajit-2.1:$PATH
+	export PATH=$PATH:$serverPath/webstats/luarocks/bin
 
+	if [ "${sys_os}" == "Darwin" ];then
+		cd $serverPath/source/webstats/lsqlite3_fsl09y 
+		# SQLITE_DIR=/usr/local/Cellar/sqlite/3.36.0
+		find_cfg=`cat Makefile | grep 'SQLITE_DIR'`
+		if [ "$find_cfg" == "" ];then
+			LIB_SQLITE_DIR=`brew info sqlite | grep /usr/local/Cellar/sqlite | cut -d \  -f 1 | awk 'END {print}'`
+			sed -i $BAK "s#\$(ROCKSPEC)#\$(ROCKSPEC) SQLITE_DIR=${LIB_SQLITE_DIR}#g"  Makefile
+		fi
+		make
+	else
+		cd $serverPath/source/webstats/lsqlite3_fsl09y && make
+	fi
+
+	# copy to code path
+	if [ -f $serverPath/webstats/luarocks/lib/lua/5.1/lsqlite3.so ];then
+		cp -rf $serverPath/webstats/luarocks/lib/lua/5.1/lsqlite3.so $serverPath/webstats/lua/lsqlite3.so 
+	fi
 
 	# if [ ! -d $serverPath/source/webstats/luasql-2.6.0 ];then
 	# 	wget -O $serverPath/source/webstats/luasql_2.6.0.tar.gz https://github.com/keplerproject/luasql/archive/refs/tags/2.6.0.tar.gz
@@ -68,10 +88,7 @@ Install_App()
 	# export LUA_INCDIR=${serverPath}/openresty/luajit/include/luajit-2.1
 	# cd $serverPath/source/webstats/luasql-2.6.0 && make sqlite3
 	
-	# $serverPath/webstats/luarocks/bin/luarocks config --scope user lib_modules_path ${serverPath}/openresty/luajit/lib
-	# $serverPath/webstats/luarocks/bin/luarocks config --scope user lib_modules_path
-	# $serverPath/webstats/luarocks/bin/luarocks install lua-sqlite3
-	$serverPath/webstats/luarocks/bin/luarocks install luasql-sqlite3 SQLITE_DIR=$serverPath/webstats/lua
+	# $serverPath/webstats/luarocks/bin/luarocks install luasql-sqlite3 SQLITE_DIR=$serverPath/webstats/lua
 
 
 	echo "${VERSION}" > $serverPath/webstats/version.pl

@@ -3,6 +3,15 @@ log_by_lua_block {
 	local ver = '0.0.1'
 	local debug_mode = true
 
+
+	local cpath = "{$SERVER_APP}/lua/"
+    if not package.cpath:find(cpath) then
+        package.cpath = cpath .. "?.so;" .. package.cpath
+    end
+	if not package.path:find(cpath) then
+		package.path = cpath .. "?.lua;" .. package.path
+	end
+
 	local server_name,ip,today,day,body_length,method,config,cache_count
 
 	local db = nil
