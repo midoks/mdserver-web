@@ -62,12 +62,15 @@ log_by_lua_block {
 	local server_name
 	local request_header
 	local method
-	local today,day,config,cache_count
+	local today,day
+	local config,cache_count
 	--- default common var end ---
 
 	local function init_var()
 		request_header = ngx.req.get_headers()
 		method = ngx.req.get_method()
+		today = os.date("%Y%m%d")
+		day = os.date("%d")
 	end
 
 	local function get_store_key()
@@ -211,13 +214,13 @@ log_by_lua_block {
 			client_port=client_port
 		}
 
-		D(server_name..'__'..json.encode(kv))
+		-- D(server_name..'__'..json.encode(kv))
 		cache_set(server_name, new_id, "log_kv", json.encode(kv))
  	end
 
  	local function store_logs_line(db, stmt, input_server_name, lineno)
  		local logvalue = cache_get(input_server_name, lineno, "log_kv")
- 		D("store_logs_line:"..logvalue)
+ 		-- D("store_logs_line:"..logvalue)
 		if not logvalue then return false end
 		local logline = json.decode(logvalue)
 
@@ -292,7 +295,7 @@ log_by_lua_block {
 
 		-- python3 ./plugins/webstats/index.py reload && echo "" > /Users/midoks/Desktop/mwdev/server/webstats/debug.log && wget http://t1.cn/
 
-		D("sqlite3 error:"..tostring(err))
+		-- D("sqlite3 error:"..tostring(err))
 		local stmt2 = nil
 
 
@@ -335,6 +338,10 @@ log_by_lua_block {
 		end
 
 		local res, err = db:execute([[COMMIT]])
+
+
+		cache:set(store_start_id_key, store_end+1)
+
 
 		if db and db:isopen() then
 			db:close()
