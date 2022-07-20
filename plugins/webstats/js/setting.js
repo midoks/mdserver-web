@@ -43,7 +43,7 @@ function wsGlobalSetting(){
 				<div class="item-line">\
 					<div class="choose_title">日志保存天数</div>\
 					<input type="number" class="bt-input-text" name="ip_total" value="50" style="width:55px;">/天 \
-					<button type="button" class="btn btn-default btn-sm" bt-event-click="totalNumSubmit" style="margin-left: 43px;"><span>保存</span></button>\
+					<button type="button" class="btn btn-default btn-sm" bt-event-click="totalNumSubmit" style="margin-left: 48px;"><span>保存</span></button>\
 					<span class="tips" data-toggle="tooltip" data-placement="top" title="缩短日志保存天数原有记录的日志将被删除，请谨慎操作">?</span>\
 				</div>\
 			</div>\
@@ -67,7 +67,7 @@ function wsGlobalSetting(){
 				<p style="margin-top:10px">\
 					<button type="button" class="btn btn-success btn-sm" bt-event-click="submitSetting" name="set">保存</button>\
 					<button type="button" class="btn btn-default btn-sm" bt-event-click="submitSetting" name="setAll" style="margin-left: 10px;">同步所有站点</button>\
-					<span class="ws_tips">*【保存】【同步所有站点】只会保存/同步当前所选中的监控配置内容</span>\
+					<span class="tips" style="margin-left:10px;" data-toggle="tooltip" data-placement="top" title="【保存】【同步所有站点】只会保存/同步当前所选中的监控配置内容">?</span>\
 				</p>\
 			</div>\
 		</div>\

@@ -66,15 +66,19 @@ log_by_lua_block {
 	local server_name
 	local request_header
 	local method
-	local today,day
-	local config,cache_count
+	local config
+	local today
+	local day
 	--- default common var end ---
 
 	local function init_var()
+		config = require "config"
+
 		request_header = ngx.req.get_headers()
 		method = ngx.req.get_method()
 		today = os.date("%Y%m%d")
 		day = os.date("%d")
+
 	end
 
 	local function get_store_key()
@@ -95,6 +99,58 @@ log_by_lua_block {
 			domain = "unknown"
 		end
 		return domain
+	end
+
+	local function arrlen_bylog(arr)
+		if not arr then return 0 end
+		count = 0
+		for _,v in ipairs(arr) do
+			count = count + 1
+		end
+		return count
+	end
+	
+	local function is_ipaddr_bylog(client_ip)
+		local cipn = split_bylog(client_ip,'.')
+		if arrlen_bylog(cipn) < 4 then return false end
+		for _,v in ipairs({1,2,3,4})
+		do
+			local ipv = tonumber(cipn[v])
+			if ipv == nil then return false end
+			if ipv > 255 or ipv < 0 then return false end
+		end
+		return true
+	end
+
+	local function split_bylog(str,reps )
+		local resultStrList = {}
+		string.gsub(str,'[^'..reps..']+',function(w) table.insert(resultStrList,w) end)
+		return resultStrList
+	end
+
+	local function get_client_ip_bylog()
+		local client_ip = "unknown"
+		local cdn = config['cdn']
+		if cdn == true then
+			for _,v in ipairs(config['cdn_headers']) do
+				if request_header[v] ~= nil and request_header[v] ~= "" then
+					local ip_list = request_header[v]
+					client_ip = split_bylog(ip_list,',')[1]
+					break;
+				end
+			end
+		end
+		if type(client_ip) == 'table' then client_ip = "" end
+		if client_ip ~= "unknown" and string.match(client_ip,"^[%w:]+$") then
+			return client_ip
+		end
+		if string.match(client_ip,"%d+%.%d+%.%d+%.%d+") == nil or not is_ipaddr_bylog(client_ip) then
+			client_ip = ngx.var.remote_addr
+			if client_ip == nil then
+				client_ip = "unknown"
+			end
+		end
+		return client_ip
 	end
 
 	local function get_last_id(input_server_name)
@@ -133,6 +189,8 @@ log_by_lua_block {
 		end
 		return json.encode(headers)
 	end
+
+
 
 	local function is_working(name)
 		local work_status = cache:get(name.."_working")
@@ -206,7 +264,7 @@ log_by_lua_block {
 		local err = nil
 
 		local ip_list = request_header["x-forwarded-for"]
-		local ip = ngx.var.remote_addr
+		local ip = get_client_ip_bylog()
 		if ip and not ip_list then
 			ip_list = ip
 		end
@@ -250,7 +308,7 @@ log_by_lua_block {
 			ip_list=ip_list,
 			client_port=client_port
 		}
-		
+
 		cache_set(server_name, new_id, "log_kv", json.encode(kv))
  	end
 
@@ -338,8 +396,11 @@ log_by_lua_block {
 		local db_path= log_dir .. '/' .. input_server_name .. "/logs.db"
 		local db, err = sqlite3.open(db_path)
 
-	
-		-- D("sqlite3 error:"..tostring(err))
+		-- if  tostring(err) ~= 'nil' then
+		-- 	D("sqlite3 open error:"..tostring(err))
+		-- 	return true
+		-- end 
+
 		local stmt2 = nil
 
 

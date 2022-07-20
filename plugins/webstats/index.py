@@ -66,6 +66,56 @@ def status():
     return 'start'
 
 
+def loadLuaLogFile():
+    lua_dir = getServerDir() + "/lua"
+    lua_dst = lua_dir + "/webstats_log.lua"
+
+    lua_tpl = getPluginDir() + '/lua/webstats_log.lua'
+    content = mw.readFile(lua_tpl)
+    content = content.replace('{$SERVER_APP}', getServerDir())
+    content = content.replace('{$ROOT_PATH}', mw.getServerDir())
+    mw.writeFile(lua_dst, content)
+
+
+def loadConfigFile():
+    lua_dir = getServerDir() + "/lua"
+    conf_tpl = getPluginDir() + "/conf/config.json"
+
+    content = mw.readFile(conf_tpl)
+    content = json.loads(content)
+
+    dst_conf_json = getServerDir() + "/lua/config.json"
+    mw.writeFile(dst_conf_json, json.dumps(content))
+
+    dst_conf_lua = getServerDir() + "/lua/config.lua"
+
+    content_lua = LuaMaker.makeLuaTable(content)
+    cfg_str = "return " + content_lua
+    mw.writeFile(dst_conf_lua, cfg_str)
+
+
+def loadLuaSiteFile():
+    lua_dir = getServerDir() + "/lua"
+
+    content = makeSiteConfig()
+    for index in range(len(content)):
+        pSqliteDb('web_log', content[index]['name'])
+
+    lua_site_json = lua_dir + "/sites.json"
+    mw.writeFile(lua_site_json, json.dumps(content))
+
+    lua_site = lua_dir + "/sites.lua"
+    config_sites = LuaMaker.makeLuaTable(content)
+    sites_str = "return " + config_sites
+    mw.writeFile(lua_site, sites_str)
+
+
+def loadDebugLogFile():
+    debug_log = getServerDir() + "/debug.log"
+    lua_dir = getServerDir() + "/lua"
+    mw.writeFile(debug_log, '')
+
+
 def pSqliteDb(dbname='web_logs', site_name='unset'):
 
     db_dir = getServerDir() + '/logs/' + site_name
@@ -125,38 +175,17 @@ def initDreplace():
         mw.writeFile(path, content)
 
     lua_dir = getServerDir() + "/lua"
-    lua_dst = lua_dir + "/webstats_log.lua"
-    if not os.path.exists(lua_dst):
+    if not os.path.exists(lua_dir):
         mw.execShell('mkdir -p ' + lua_dir)
-        lua_tpl = getPluginDir() + '/lua/webstats_log.lua'
-        content = mw.readFile(lua_tpl)
-        # content = content.replace('{$SERVER_PATH}', service_path)
-        content = content.replace('{$SERVER_APP}', service_path)
-        content = content.replace('{$ROOT_PATH}', mw.getServerDir())
-        mw.writeFile(lua_dst, content)
-
-    content = makeSiteConfig()
-    for index in range(len(content)):
-        pSqliteDb('web_log', content[index]['name'])
-
-    lua_site_json = lua_dir + "/sites.json"
-    if not os.path.exists(lua_site_json):
-        mw.writeFile(lua_site_json, json.dumps(content))
-
-    lua_site = lua_dir + "/sites.lua"
-    if not os.path.exists(lua_site):
-        config_sites = LuaMaker.makeLuaTable(content)
-        sites_str = "return " + config_sites
-        mw.writeFile(lua_site, sites_str)
 
     log_path = getServerDir() + "/logs"
     if not os.path.exists(log_path):
         mw.execShell('mkdir -p ' + log_path)
 
-    debug_log = getServerDir() + "/debug.log"
-    if not os.path.exists(debug_log):
-        mw.execShell('mkdir -p ' + lua_dir)
-        mw.writeFile(debug_log, '')
+    loadLuaLogFile()
+    loadConfigFile()
+    loadLuaSiteFile()
+    loadDebugLogFile()
 
     return 'ok'
 
@@ -182,13 +211,8 @@ def restart():
 def reload():
     initDreplace()
 
-    lua_dir = getServerDir() + "/lua"
-    lua_dst = lua_dir + "/webstats_log.lua"
-    lua_tpl = getPluginDir() + '/lua/webstats_log.lua'
-    content = mw.readFile(lua_tpl)
-    content = content.replace('{$SERVER_APP}', getServerDir())
-    content = content.replace('{$ROOT_PATH}', mw.getServerDir())
-    mw.writeFile(lua_dst, content)
+    loadLuaLogFile()
+    loadDebugLogFile()
     mw.restartWeb()
     return 'ok'
 
@@ -202,6 +226,7 @@ def getLogsList():
     page = int(args['page'])
     page_size = int(args['page_size'])
     domain = args['site']
+    tojs = args['tojs']
 
     limit = str((page - 1) * page_size) + ',' + str(page_size)
     conn = pSqliteDb('web_logs', domain)
@@ -217,7 +242,7 @@ def getLogsList():
     _page['count'] = count
     _page['p'] = page
     _page['row'] = page_size
-    _page['tojs'] = 'wsSites'
+    _page['tojs'] = tojs
     data['page'] = mw.getPage(_page)
     data['data'] = clist
 
