@@ -93,6 +93,12 @@ log_by_lua_block {
 		return domain
 	end
 
+	local function get_request_time()
+		local request_time = math.floor((ngx.now() - ngx.req.start_time()) * 1000)
+		if request_time == 0 then  request_time = 1 end
+		return request_time
+	end
+
 	local function get_http_original()
 		local data = ""
 		local headers = request_header
@@ -176,8 +182,10 @@ log_by_lua_block {
 			ip_list = ip
 		end
 
+		-- local request_time = ngx.var.request_time
+		local request_time = get_request_time()
+
 		local client_port = ngx.var.remote_port
-		local request_time = ngx.var.request_time
 		local real_server_name = server_name
 		local uri = ngx.var.uri
 		local status_code = ngx.status
@@ -271,6 +279,7 @@ log_by_lua_block {
 		stmt:reset()
 
 		D("store_logs_line ok")
+		return true
  	end
 	
 	local function store_logs(input_server_name)
@@ -286,6 +295,9 @@ log_by_lua_block {
 		if store_end == nil then
 			store_end = 1
 		end
+
+		local worker_id = ngx.worker.id()
+		D("worker_id:"..worker_id)
 
 
 		local log_dir = "{$SERVER_APP}/logs"
@@ -322,7 +334,7 @@ log_by_lua_block {
 			for i=store_start, store_end, 1 do
 				D("store_start:"..store_start..":store_end:".. store_end)
 				if store_logs_line(db, stmt2, input_server_name, i) then
-					store_count = store_count + 1
+					-- store_count = store_count + 1
 					cache_clear(input_server_name, i, "log_kv")
 					-- cache_clear(input_server_name, i, "STAT_FIELDS")
 				end
@@ -335,13 +347,13 @@ log_by_lua_block {
 			D("Finalize res:"..tostring(res))
 			D("Finalize err:"..tostring(err))
 			D("数据库连接繁忙，稍候存储.")
+			return true
 		end
 
 		local res, err = db:execute([[COMMIT]])
 
 
 		cache:set(store_start_id_key, store_end+1)
-
 
 		if db and db:isopen() then
 			db:close()
@@ -362,7 +374,7 @@ log_by_lua_block {
 		cache_logs()
 		store_logs(server_name)
 
-		D("------------ debug end ------------")
+		D("------------ debug end -------------")
 	end
 
 
@@ -375,7 +387,7 @@ log_by_lua_block {
 			end
 		)
 		if not presult then
-			D("err on :"..tostring(err))
+			D("debug error on :"..tostring(err))
 			return true
 		end
 	end

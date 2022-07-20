@@ -125,10 +125,10 @@ def initDreplace():
         mw.writeFile(path, content)
 
     lua_dir = getServerDir() + "/lua"
-    lua_dst = lua_dir + "/web_stats_log.lua"
+    lua_dst = lua_dir + "/webstats_log.lua"
     if not os.path.exists(lua_dst):
         mw.execShell('mkdir -p ' + lua_dir)
-        lua_tpl = getPluginDir() + '/lua/web_stats_log.lua'
+        lua_tpl = getPluginDir() + '/lua/webstats_log.lua'
         content = mw.readFile(lua_tpl)
         # content = content.replace('{$SERVER_PATH}', service_path)
         content = content.replace('{$SERVER_APP}', service_path)
@@ -183,8 +183,8 @@ def reload():
     initDreplace()
 
     lua_dir = getServerDir() + "/lua"
-    lua_dst = lua_dir + "/web_stats_log.lua"
-    lua_tpl = getPluginDir() + '/lua/web_stats_log.lua'
+    lua_dst = lua_dir + "/webstats_log.lua"
+    lua_tpl = getPluginDir() + '/lua/webstats_log.lua'
     content = mw.readFile(lua_tpl)
     content = content.replace('{$SERVER_APP}', getServerDir())
     content = content.replace('{$ROOT_PATH}', mw.getServerDir())
