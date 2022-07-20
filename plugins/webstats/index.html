@@ -1,19 +1,100 @@
+<style type="text/css">
+
+.ws_setting {
+	margin: 15px 0;
+}
+
+
+.ws_setting .ws_title {
+    display: inline-block;
+    width: 100px;
+    vertical-align: top;
+    margin: 6px 15px 0 0;
+}
+
+.ws_setting .ws_content{
+	display: inline-block;
+}
+
+.ws_setting .ws_content div {
+    display: inline-block;
+}
+
+.ws_setting .ws_content .choose_title {
+    width: 110px;
+}
+
+.ws_setting .ws_content .bt-input-text {
+    height: 26px;
+}
+
+.ws_setting .ws_content .ws_tips {
+    color: #777;
+    margin-left: -10px;
+    vertical-align: middle;
+}
+
+.ws_setting .tab-nav {
+	margin-bottom: 10px;
+}
+
+.ws_setting .ws_content textarea {
+    border-color: #ddd;
+    display: block;
+    margin-top: 10px;
+    margin-left: -10px;
+    font-size: 13px;
+    resize: none;
+}
+
+.ws_setting .ws_content .tips {
+    border: 1px solid #cbcbcb;
+    border-radius: 8px;
+    color: #cbcbcb;
+    cursor: pointer;
+    display: inline-block;
+    font-family: arial;
+    font-size: 12px;
+    font-style: normal;
+    height: 14px;
+    line-height: 14px;
+    margin-left: 5px;
+    text-align: center;
+    width: 14px;
+}
+
+.ws_setting .ws_content .item-line {
+    display: block;
+    padding-bottom: 10px;
+}
+
+.dash_line{
+	margin-top: 15px;
+	padding-top: 15px;
+	border-top:#ccc 1px dashed;
+}
+
+</style>
+
+
 <div class="bt-form">
 	<div class="bt-w-main">
 		<div class="bt-w-menu">
 			<p class="bgw" onclick="pluginService('webstats');">服务</p>
 			<p onclick="wsGlobalSetting();">概览</p>
-			<p onclick="wsGlobalSetting();">网站日志</p>
+			<p onclick="wsSites();">网站日志</p>
 			<p onclick="wsGlobalSetting();">全局设置</p>
 		</div>
-		<div class="bt-w-con pd15">
+		<div class="bt-w-con pd15" style="height: 550px; overflow: auto;">
 			<div class="soft-man-con"></div>
 		</div>
 	</div>
 </div>
 <script type="text/javascript">
-resetPluginWinWidth(800);
-
+resetPluginWinWidth(830);
+$.getScript( "/static/js/echarts.min.js", function(){
+	console.log("echarts load done");
+});
 $.getScript( "/plugins/file?name=webstats&f=js/stats.js", function(){
 	pluginService('webstats');
 });

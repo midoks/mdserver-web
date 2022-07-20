@@ -1001,7 +1001,7 @@ function dbList(page, search){
                     '+ list +'\
                     </tbody></table>\
                 </div>\
-                 <div id="databasePage" class="dataTables_paginate paging_bootstrap page"></div>\
+                <div id="databasePage" class="dataTables_paginate paging_bootstrap page"></div>\
                 <div class="table_toolbar">\
                     <span class="sync btn btn-default btn-sm" style="margin-right:5px" onclick="syncToDatabase(1)" title="将选中数据库信息同步到服务器">同步选中</span>\
                     <span class="sync btn btn-default btn-sm" style="margin-right:5px" onclick="syncToDatabase(0)" title="将所有数据库信息同步到服务器">同步所有</span>\

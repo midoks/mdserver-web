@@ -67,8 +67,8 @@ def status():
 
 
 def pSqliteDb(dbname='web_logs', site_name='unset'):
-    db_dir = getServerDir() + '/logs/' + site_name
 
+    db_dir = getServerDir() + '/logs/' + site_name
     if not os.path.exists(db_dir):
         mw.execShell('mkdir -p ' + db_dir)
 
@@ -82,7 +82,7 @@ def pSqliteDb(dbname='web_logs', site_name='unset'):
         for index in range(len(sql_list)):
             conn.execute(sql_list[index], ())
     else:
-        conn = mw.M(dbname).dbPos(getServerDir(), name)
+        conn = mw.M(dbname).dbPos(db_dir, name)
     return conn
 
 
@@ -193,6 +193,37 @@ def reload():
     return 'ok'
 
 
+def getLogsList():
+    args = getArgs()
+    check = checkArgs(args, ['page', 'page_size', 'site'])
+    if not check[0]:
+        return check[1]
+
+    page = int(args['page'])
+    page_size = int(args['page_size'])
+    domain = args['site']
+
+    limit = str((page - 1) * page_size) + ',' + str(page_size)
+    conn = pSqliteDb('web_logs', domain)
+
+    field = 'time,ip,domain,server_name,method,status_code,request_time,uri,body_length'
+    condition = ''
+    clist = conn.field(
+        field).limit(limit).order('time desc').select()
+    count = conn.count()
+
+    data = {}
+    _page = {}
+    _page['count'] = count
+    _page['p'] = page
+    _page['row'] = page_size
+    _page['tojs'] = 'wsSites'
+    data['page'] = mw.getPage(_page)
+    data['data'] = clist
+
+    return mw.returnJson(True, 'ok', data)
+
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -209,5 +240,7 @@ if __name__ == "__main__":
         print(runInfo())
     elif func == 'conf':
         print(getConf())
+    elif func == 'get_logs_list':
+        print(getLogsList())
     else:
         print('error')
