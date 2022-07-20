@@ -1,5 +1,9 @@
 log_by_lua_block {
 
+	-- python3 ./plugins/webstats/index.py reload && echo "" > /Users/midoks/Desktop/mwdev/server/webstats/debug.log && wget http://t1.cn/
+	-- 
+    -- 
+
 	local ver = '0.0.1'
 	local max_log_id = 99999999999999
 	local debug_mode = true
@@ -93,6 +97,17 @@ log_by_lua_block {
 		return domain
 	end
 
+	local function get_last_id(input_server_name)
+		local last_insert_id_key = input_server_name .. "_last_id"
+		new_id, err = cache:incr(last_insert_id_key, 1, 0)
+		cache:incr(cache_count_id_key, 1, 0)
+		if new_id >= max_log_id then
+			cache:set(last_insert_id_key, 1)
+			new_id = cache:get(last_insert_id_key)
+		end
+		return new_id
+	end
+
 	local function get_request_time()
 		local request_time = math.floor((ngx.now() - ngx.req.start_time()) * 1000)
 		if request_time == 0 then  request_time = 1 end
@@ -118,6 +133,26 @@ log_by_lua_block {
 		end
 		return json.encode(headers)
 	end
+
+	local function is_working(name)
+		local work_status = cache:get(name.."_working")
+		if work_status ~= nil and work_status == true then
+			return true 
+		end
+		return false
+	end
+
+	local function lock_working(name)
+		local working_key = name.."_working"
+		cache:set(working_key, true, 60)
+	end
+
+	local function unlock_working(name)
+		local working_key = name.."_working"
+		cache:set(working_key, false)
+	end
+
+
 
 	local function get_server_name(c_name)
 		local my_name = cache:get(c_name)
@@ -165,16 +200,10 @@ log_by_lua_block {
 	local function cache_logs()
 
 		-- make new id
-		local new_id = nil
-		local last_insert_id_key = server_name .. "_last_id"
-		local err = nil
+		local new_id = get_last_id(server_name)
+		D("new_id:"..new_id)
 
-		new_id, err = cache:incr(last_insert_id_key, 1, 0)
-		cache:incr(cache_count_id_key, 1, 0)
-		if new_id >= max_log_id then
-			cache:set(last_insert_id_key, 1)
-			new_id = cache:get(last_insert_id_key)
-		end
+		local err = nil
 
 		local ip_list = request_header["x-forwarded-for"]
 		local ip = ngx.var.remote_addr
@@ -212,7 +241,7 @@ log_by_lua_block {
 			request_uri=request_uri,
 			body_length=body_length,
 			referer=referer,
-			user_agent=request_header['user-agent'], 
+			user_agent=request_header['user-agent'],
 			protocol=protocol,
 			is_spider=0,
 			request_time=request_time,
@@ -221,8 +250,7 @@ log_by_lua_block {
 			ip_list=ip_list,
 			client_port=client_port
 		}
-
-		-- D(server_name..'__'..json.encode(kv))
+		
 		cache_set(server_name, new_id, "log_kv", json.encode(kv))
  	end
 
@@ -299,14 +327,18 @@ log_by_lua_block {
 		local worker_id = ngx.worker.id()
 		D("worker_id:"..worker_id)
 
+		if is_working(input_server_name) then
+			D("其他worker正在存储中，稍候存储。")
+			-- cache:delete(flush_data_key)
+			return
+		end
+		lock_working(input_server_name)
 
 		local log_dir = "{$SERVER_APP}/logs"
 		local db_path= log_dir .. '/' .. input_server_name .. "/logs.db"
 		local db, err = sqlite3.open(db_path)
-		D("sqlite3 path:"..db_path)
 
-		-- python3 ./plugins/webstats/index.py reload && echo "" > /Users/midoks/Desktop/mwdev/server/webstats/debug.log && wget http://t1.cn/
-
+	
 		-- D("sqlite3 error:"..tostring(err))
 		local stmt2 = nil
 
@@ -352,13 +384,12 @@ log_by_lua_block {
 
 		local res, err = db:execute([[COMMIT]])
 
-
-		cache:set(store_start_id_key, store_end+1)
-
 		if db and db:isopen() then
 			db:close()
 		end
 
+		cache:set(store_start_id_key, store_end+1)
+		unlock_working(input_server_name)
 	end
 
 	local function run_app()
