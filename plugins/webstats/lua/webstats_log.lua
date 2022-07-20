@@ -184,6 +184,7 @@ log_by_lua_block {
 			end
 
 			if "table" == type(data) then
+				D("get_http_original:"..headers..data)
 				headers = table.concat(headers, data)
 			end
 		end
@@ -254,6 +255,53 @@ log_by_lua_block {
 		return unset_server_name
 	end
 
+	-- exclude_func start
+	local function execute_status()
+		if not config['exclude_status'] then return false end
+		local the_status = tostring(ngx.status)
+		for _,v in ipairs(config['exclude_status'])
+		do
+			if the_status == v then
+				return true
+			end
+		end
+		return false
+	end
+
+	local function exclude_extension()
+		if not ngx.var.uri then return false end
+		if not config['exclude_extension'] then return false end
+		for _,v in ipairs(config['exclude_extension'])
+		do
+			if ngx.re.find(ngx.var.uri,"[.]"..v.."$",'ijo') then
+				return true
+			end
+		end
+		return false
+	end
+
+	local function exclude_url()
+		if not ngx.var.uri then return false end
+		if not config['exclude_url'] then return false end
+		local the_uri = string.sub(ngx.var.request_uri, 2)
+		local url_conf = config["exclude_url"]
+		for i,conf in pairs(url_conf)
+		do
+			local mode = conf["mode"]
+			local url = conf["url"]
+			if mode == "regular" then
+				if ngx.re.find(the_uri, url, "ijo") then
+					return true
+				end
+			else
+				if the_uri == url then
+					return true
+				end
+			end
+		end
+		return false
+	end
+	-- exclude_func end
 	
 	local function cache_logs()
 
@@ -309,6 +357,12 @@ log_by_lua_block {
 			client_port=client_port
 		}
 
+		local request_stat_fields = "req=req+1,length=length+"..body_length
+		local spider_stat_fields = "x"
+		local client_stat_fields = "x"
+
+		local stat_fields = request_stat_fields..";"..client_stat_fields..";"..spider_stat_fields
+		D("stat_fields:"..stat_fields)
 		cache_set(server_name, new_id, "log_kv", json.encode(kv))
  	end
 

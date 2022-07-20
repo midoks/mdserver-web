@@ -2,7 +2,7 @@
 	"sort": 7,
 	"ps": "【DEV】网站统计报表",
 	"name": "webstats",
-	"title": "网站统计报表",
+	"title": "网站统计报表[此插件开发完成后,需要反馈问题,不当小白鼠，慎用!]",
 	"shell": "install.sh",
 	"versions":["0.0.1"],
 	"tip": "soft",

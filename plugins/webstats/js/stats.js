@@ -277,10 +277,10 @@ function wsSitesLog(){
         var data = rdata.data.data;
         for(i in data){
             list += '<tr>';
-            list += '<td>' + data[i]['time']+'</td>';
+            list += '<td>' + getLocalTime(data[i]['time'])+'</td>';
             list += '<td>' + data[i]['domain'] +'</td>';
             list += '<td>' + data[i]['ip'] +'</td>';
-            list += '<td>' + data[i]['body_length'] +'</td>';
+            list += '<td>' + toSize(data[i]['body_length']) +'</td>';
             list += '<td>' + data[i]['request_time'] +'ms</td>';
             list += '<td>' + data[i]['uri'] +'</td>';
             list += '<td>' + data[i]['status_code']+'/' + data[i]['method'] +'</td>';
