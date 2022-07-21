@@ -31,6 +31,11 @@ def getServerDir():
     return mw.getServerDir() + '/' + getPluginName()
 
 
+def getConf():
+    conf = getServerDir() + "/lua/config.json"
+    return conf
+
+
 def getArgs():
     args = sys.argv[2:]
     tmp = {}
@@ -217,6 +222,13 @@ def reload():
     return 'ok'
 
 
+def getGloalConf():
+    conf = getConf()
+    content = mw.readFile(conf)
+    content = json.loads(content)
+    return mw.returnJson(True, 'ok', content)
+
+
 def getLogsList():
     args = getArgs()
     check = checkArgs(args, ['page', 'page_size', 'site'])
@@ -263,8 +275,8 @@ if __name__ == "__main__":
         print(reload())
     elif func == 'run_info':
         print(runInfo())
-    elif func == 'conf':
-        print(getConf())
+    elif func == 'get_global_conf':
+        print(getGloalConf())
     elif func == 'get_logs_list':
         print(getLogsList())
     else:

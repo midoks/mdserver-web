@@ -34,8 +34,13 @@
             302,
             303
         ],
+        "exclude_ip":[
+            "192.168.1.1"  
+        ],
+        "exclude_url":[],
+        "ip_top_num": 50,
+        "uri_top_num": 50,
         "statistics_machine_access": true,
-        "exclude_url": [],
         "statistics_ip": true,
         "statistics_uri": true,
         "record_post_args": false,
