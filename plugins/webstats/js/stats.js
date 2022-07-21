@@ -272,7 +272,6 @@ function wsSitesLog(){
     args['tojs'] = 'wsSitesLog';
     wsPost('get_logs_list', '' ,args, function(rdata){
         var rdata = $.parseJSON(rdata.data);
-        console.log(rdata);
         var list = '';
         var data = rdata.data.data;
         for(i in data){
@@ -282,7 +281,7 @@ function wsSitesLog(){
             list += '<td>' + data[i]['ip'] +'</td>';
             list += '<td>' + toSize(data[i]['body_length']) +'</td>';
             list += '<td>' + data[i]['request_time'] +'ms</td>';
-            list += '<td>' + data[i]['uri'] +'</td>';
+            list += '<td><span class="overflow_hide" style="width:180px;">' + data[i]['uri'] +'</span></td>';
             list += '<td>' + data[i]['status_code']+'/' + data[i]['method'] +'</td>';
             list += '<td><a href="javascript:;" class="btlink" onclick="openPhpmyadmin()" title="详情">详情</a></td>';
             list += '</tr>';
@@ -291,12 +290,12 @@ function wsSitesLog(){
                         <div class="tablescroll">\
                             <table id="DataBody" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
                             <thead><tr>\
-                            <th>时间</th>\
+                            <th width="137">时间</th>\
                             <th>域名</th>\
                             <th>IP</th>\
                             <th>响应</th>\
                             <th>耗时</th>\
-                            <th>URL</th>\
+                            <th >URL</th>\
                             <th>状态/类型</th>\
                             <th style="text-align:right;">操作</th></tr></thead>\
                             <tbody>\

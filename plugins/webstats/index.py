@@ -222,11 +222,58 @@ def reload():
     return 'ok'
 
 
-def getGloalConf():
+def getGlobalConf():
     conf = getConf()
     content = mw.readFile(conf)
     content = json.loads(content)
     return mw.returnJson(True, 'ok', content)
+
+
+def setGlobalConf():
+    args = getArgs()
+
+    conf = getConf()
+    content = mw.readFile(conf)
+    content = json.loads(content)
+
+    for v in ['record_post_args', 'record_get_403_args']:
+        data = checkArgs(args, [v])
+        if data[0]:
+            rval = False
+            if args[v] == "true":
+                rval = True
+            content['global'][v] = rval
+
+    for v in ['ip_top_num', 'uri_top_num', 'save_day']:
+        data = checkArgs(args, [v])
+        if data[0]:
+            content['global'][v] = int(args[v])
+
+    for v in ['cdn_headers', 'exclude_extension', 'exclude_status', 'exclude_ip']:
+        data = checkArgs(args, [v])
+        if data[0]:
+            content['global'][v] = args[v].split("\\n")
+
+    data = checkArgs(args, ['exclude_url'])
+    if data[0]:
+        exclude_url = args['exclude_url'].strip(";")
+        exclude_url_list = exclude_url.split(";")
+        exclude_url_val = []
+        for i in exclude_url_list:
+            t = i.split("|")
+            val = {}
+            val['mode'] = t[0]
+            val['url'] = t[1]
+            exclude_url_val.append(val)
+        content['global']['exclude_url'] = exclude_url_val
+
+    mw.writeFile(conf, json.dumps(content))
+    dst_conf_lua = getServerDir() + "/lua/config.lua"
+    content_lua = LuaMaker.makeLuaTable(content)
+    cfg_str = "return " + content_lua
+    mw.writeFile(dst_conf_lua, cfg_str)
+    mw.restartWeb()
+    return mw.returnJson(True, '设置成功')
 
 
 def getLogsList():
@@ -276,7 +323,9 @@ if __name__ == "__main__":
     elif func == 'run_info':
         print(runInfo())
     elif func == 'get_global_conf':
-        print(getGloalConf())
+        print(getGlobalConf())
+    elif func == 'set_global_conf':
+        print(setGlobalConf())
     elif func == 'get_logs_list':
         print(getLogsList())
     else:

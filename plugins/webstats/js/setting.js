@@ -10,14 +10,14 @@ wsPost('get_global_conf', '' ,{}, function(rdata){
 			<div class="ws_content">\
 				<div class="item-line">\
 					<div class="choose_title">IP统计</div>\
-					<input type="number" class="bt-input-text" name="ip_total" value="'+rdata['global']['ip_top_num']+'" style="width:55px;">\
-					<button type="button" class="btn btn-default btn-sm" bt-event-click="totalNumSubmit" style="margin-left: 62px;"><span>保存</span></button>\
+					<input type="number" class="bt-input-text" name="ip_top_num" value="'+rdata['global']['ip_top_num']+'" style="width:55px;">\
+					<button type="button" id="ip_top_num" class="btn btn-default btn-sm" style="margin-left: 62px;"><span>保存</span></button>\
 					<span class="tips" data-toggle="tooltip" data-placement="top" title="设置IP统计页面的TOP数量">?</span>\
 				</div>\
 				<div class="item-line">\
 					<div class="choose_title">URI统计</div>\
-					<input type="number" class="bt-input-text" name="ip_total" value="'+rdata['global']['uri_top_num']+'" style="width:55px;">\
-					<button type="button" class="btn btn-default btn-sm" bt-event-click="totalNumSubmit" style="margin-left: 62px;"><span>保存</span></button>\
+					<input type="number" class="bt-input-text" name="uri_top_num" value="'+rdata['global']['uri_top_num']+'" style="width:55px;">\
+					<button type="button" id="uri_top_num" class="btn btn-default btn-sm" style="margin-left: 62px;"><span>保存</span></button>\
 					<span class="tips" data-toggle="tooltip" data-placement="top" title="设置URI统计页面的TOP数量">?</span>\
 				</div>\
 			</div>\
@@ -28,8 +28,8 @@ wsPost('get_global_conf', '' ,{}, function(rdata){
 			<div class="ws_content">\
 				<div class="item-line">\
 					<div class="choose_title">日志保存天数</div>\
-					<input type="number" class="bt-input-text" name="ip_total" value="'+rdata['global']['save_day']+'" style="width:55px;">/天 \
-					<button type="button" class="btn btn-default btn-sm" bt-event-click="totalNumSubmit" style="margin-left: 48px;"><span>保存</span></button>\
+					<input type="number" class="bt-input-text" name="save_day" value="'+rdata['global']['save_day']+'" style="width:55px;">/天 \
+					<button type="button" id="save_day" class="btn btn-default btn-sm" style="margin-left: 48px;"><span>保存</span></button>\
 					<span class="tips" data-toggle="tooltip" data-placement="top" title="缩短日志保存天数原有记录的日志将被删除，请谨慎操作">?</span>\
 				</div>\
 			</div>\
@@ -51,8 +51,8 @@ wsPost('get_global_conf', '' ,{}, function(rdata){
 					<textarea name="setting-cdn" cols="52" rows="8"></textarea>\
 				</div>\
 				<p style="margin-top:10px">\
-					<button type="button" class="btn btn-success btn-sm" bt-event-click="submitSetting" name="set">保存</button>\
-					<button type="button" class="btn btn-default btn-sm" bt-event-click="submitSetting" name="setAll" style="margin-left: 10px;">同步所有站点</button>\
+					<button type="button" class="btn btn-success btn-sm" id="submitSetting">保存</button>\
+					<button type="button" class="btn btn-default btn-sm" id="setAll" style="margin-left: 10px;">同步所有站点</button>\
 					<span class="tips" style="margin-left:10px;" data-toggle="tooltip" data-placement="top" title="【保存】【同步所有站点】只会保存/同步当前所选中的监控配置内容">?</span>\
 				</p>\
 			</div>\
@@ -100,12 +100,22 @@ wsPost('get_global_conf', '' ,{}, function(rdata){
 					   <div style="margin-left: -10px">考虑到HTTP请求原文会<span style="color:red;">占用额外存储空间</span>，默认仅记录500错误请求原文。</div>'
 			var content = $(common_tpl_tips).html(txt).prop('outerHTML');
 
+			var record_post_args = '';
+			if (rdata['global']['record_post_args']){
+				record_post_args = 'checked';
+			}
+			var record_get_403_args = '';
+			if (rdata['global']['record_get_403_args']){
+				record_get_403_args = 'checked';
+			}
+
+
 			var check = '<div class="checkbox" style="margin: 20px 0 0 -10px;">\
 						<label style="cursor: pointer;margin-right:15px;">\
-							<input type="checkbox" name="id" style="margin: 1px 10 0;">记录POST请求原文\
+							<input type="checkbox" name="record_post_args" style="margin: 1px 10 0;" '+record_post_args+'>记录POST请求原文\
 						</label>\
 						<label style="cursor: pointer;">\
-							<input type="checkbox" name="id" style="margin: 1px 10 0;"><span>记录403错误请求原文</span>\
+							<input type="checkbox" name="record_get_403_args" style="margin: 1px 10 0;" '+record_get_403_args+'><span>记录403错误请求原文</span>\
 						</label>\
 					</div>';
 			content+=check;
@@ -124,12 +134,12 @@ wsPost('get_global_conf', '' ,{}, function(rdata){
 	            
 	            _text += '<tr>\
 	                <td>\
-	                    <select>\
-	                        <option value="normal" '+(_tmp[i].mode == 'normal'?'selected':'')+'>完整匹配</option>\
+	                    <select name="url_type_'+i+'">\
+	                        <option  value="normal" '+(_tmp[i].mode == 'normal'?'selected':'')+'>完整匹配</option>\
 	                        <option value="regular" '+(_tmp[i].mode == 'regular'?'selected':'')+'>模糊匹配</option>\
 	                    </select>\
 	                </td>\
-	                <td><input style="width:290px" placeholder="'+(_tmp[i].mode == 'normal'?'例：需排除a.com/test.html请求，请填写 test.html':'包含此内容的URL请求将不会被统计，请谨慎填写')+'" type="text" value="'+_tmp[i].url+'"></td>\
+	                <td><input name="url_val_'+i+'" style="width:290px" placeholder="'+(_tmp[i].mode == 'normal'?'例：需排除a.com/test.html请求，请填写 test.html':'包含此内容的URL请求将不会被统计，请谨慎填写')+'" type="text" value="'+_tmp[i].url+'"></td>\
 	            </tr>';
             }
 
@@ -147,6 +157,92 @@ wsPost('get_global_conf', '' ,{}, function(rdata){
 		}
 
 	});
+
+	$('#ip_top_num').click(function(){
+		var num = $('input[name="ip_top_num"]').val();
+		wsPost('set_global_conf','',{ip_top_num:num}, function(rdata){
+			var rdata = $.parseJSON(rdata.data);
+			layer.msg(rdata.msg,{icon:rdata.status?1:2});
+		});
+	});
+
+	$('#uri_top_num').click(function(){
+		var num = $('input[name="uri_top_num"]').val();
+		wsPost('set_global_conf','',{uri_top_num:num}, function(rdata){
+			var rdata = $.parseJSON(rdata.data);
+			layer.msg(rdata.msg,{icon:rdata.status?1:2});
+		});
+	});
+
+	$('#save_day').click(function(){
+		var num = $('input[name="save_day"]').val();
+		wsPost('set_global_conf','',{save_day:num}, function(rdata){
+			var rdata = $.parseJSON(rdata.data);
+			layer.msg(rdata.msg,{icon:rdata.status?1:2});
+		});
+	});
+
+	$('#submitSetting').click(function(){
+		var select = $('#webstats .tab-nav span');
+		var select_pos = 0;
+		$('#webstats .tab-nav span').each(function(i){
+			if ($(this).hasClass('on')){select_pos = i;}
+		});
+
+		if ( [0,1,2,4].indexOf(select_pos)>-1 ){
+			var setting_cdn = $('textarea[name="setting-cdn"]').val();
+
+			var list = setting_cdn.split('\n')
+			var args = {}
+
+			if ( select_pos == 0 ){
+				args['cdn_headers'] = list;
+			} else if ( select_pos == 1 ){
+				args['exclude_extension'] = list;
+			} else if ( select_pos == 2 ){
+				args['exclude_status'] = list;
+			} else if ( select_pos == 4 ){
+				args['exclude_ip'] = setting_cdn;
+			}
+
+			wsPost('set_global_conf','', args, function(rdata){
+				var rdata = $.parseJSON(rdata.data);
+				layer.msg(rdata.msg,{icon:rdata.status?1:2});
+			});
+		}
+
+		if (select_pos == 3 ){
+
+			var list = "";
+			for (var i = 0; i<10; i++) {
+				var tmp = "";
+				var url_type = $('select[name="url_type_'+i+'"]').val();
+				var url_val = $('input[name="url_val_'+i+'"]').val();
+
+				if (url_val != ""){
+					list += url_type +'|' + url_val +';';
+				}
+			}
+			wsPost('set_global_conf','', {"exclude_url":list}, function(rdata){
+				var rdata = $.parseJSON(rdata.data);
+				layer.msg(rdata.msg,{icon:rdata.status?1:2});
+			});
+		}
+
+		if (select_pos == 5){
+
+			var record_post_args = $('input[name="record_post_args"]').prop('checked');
+			var record_get_403_args = $('input[name="record_get_403_args"]').prop('checked');
+			wsPost('set_global_conf','', {"record_post_args":record_post_args,'record_get_403_args':record_get_403_args}, function(rdata){
+				var rdata = $.parseJSON(rdata.data);
+				layer.msg(rdata.msg,{icon:rdata.status?1:2});
+			});
+		}
+
+		wsGlobalSetting();
+	});
+
+	
 });
 ///////////////////////////////////////////////
 }
