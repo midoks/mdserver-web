@@ -290,7 +290,7 @@ function wsSitesLog(){
                         <div class="tablescroll">\
                             <table id="DataBody" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
                             <thead><tr>\
-                            <th width="137">时间</th>\
+                            <th>时间</th>\
                             <th>域名</th>\
                             <th>IP</th>\
                             <th>响应</th>\

@@ -82,6 +82,7 @@ log_by_lua_block {
 
 	end
 
+
 	local function get_store_key()
 		return os.date("%Y%m%d%H", os.time())
 	end
@@ -171,6 +172,16 @@ log_by_lua_block {
 		return request_time
 	end
 
+	local function get_end_time()
+		local s_time = os.time()
+		local n_date = os.date("*t",s_time + 86400)
+		n_date.hour = 0
+		n_date.min = 0
+		n_date.sec = 0
+		d_time = os.time(n_date)
+		return d_time - s_time
+	end
+
 	local function get_http_original()
 		local data = ""
 		local headers = request_header
@@ -185,7 +196,7 @@ log_by_lua_block {
 			end
 
 			if "table" == type(data) then
-				-- D("get_http_original:"..data)
+				D("get_http_original:"..data)
 				headers = table.concat(headers, data)
 			end
 		end
@@ -254,6 +265,255 @@ log_by_lua_block {
 		end
 	    cache:set(c_name, unset_server_name, 3600)
 		return unset_server_name
+	end
+
+	---------------------       db start   ---------------------------
+	local function update_stat(update_server_name, db, stat_table, key, columns)
+		-- 根据指定表名，更新统计数据
+		if not columns then return end
+		local stmt = db:prepare(string.format("INSERT INTO %s(time) SELECT :time WHERE NOT EXISTS(SELECT time FROM %s WHERE time=:time);", stat_table, stat_table))
+		stmt:bind_names{time=key}
+		local res, err = stmt:step()
+		stmt:finalize()
+		local update_sql = "UPDATE ".. stat_table .. " SET " .. columns
+		D("update_stat::key::"..tostring(key))
+		update_sql = update_sql .. " WHERE time=" .. key
+		status, errorString = db:exec(update_sql)
+	end
+
+	local function get_update_field(field, value)
+		return field.."="..field.."+"..tostring(value)
+	end
+	---------------------       db end     ---------------------------
+
+
+	local function match_client()
+		-- 匹配客户端
+		local ua = ''
+		if request_header['user-agent'] then
+			ua = request_header['user-agent']
+		end
+		if not ua then
+			return false, nil
+		end
+		local client_stat_fields = ""
+		local clients_map = {
+        	["android"] = "android",
+        	["iphone"] = "iphone",
+        	["ipod"] = "iphone",
+        	["ipad"] = "iphone",
+			["firefox"] = "firefox",
+        	["msie"] = "msie",
+        	["trident"] = "msie",
+        	["360se"] = "qh360",
+        	["360ee"] = "qh360",
+        	["360browser"] = "qh360",
+        	["qihoo"] = "qh360",
+        	["the world"] = "theworld",
+        	["theworld"] = "theworld",
+        	["tencenttraveler"] = "tt",
+        	["maxthon"] = "maxthon",
+        	["opera"] = "opera",
+        	["qqbrowser"] = "qq",
+        	["ucweb"] = "uc",
+        	["ubrowser"] = "uc",
+        	["safari"] = "safari",
+        	["chrome"] = "chrome",
+        	["metasr"] = "metasr",
+        	["2345explorer"] = "pc2345",
+        	["edge"] = "edeg",
+        	["edg"] = "edeg",
+			["windows"] = "windows",
+        	["linux"] = "linux",
+        	["macintosh"] = "mac",
+			["mobile"] = "mobile"
+		}
+		local mobile_regx = "(Mobile|Android|iPhone|iPod|iPad)"
+		local mobile_res = ngx.re.match(ua, mobile_regx, "ijo")
+		--mobile
+		if mobile_res then
+			client_stat_fields = client_stat_fields..","..get_update_field("mobile", 1)
+			mobile_res = string.lower(mobile_res[0])
+			if mobile_res ~= "mobile" then
+				client_stat_fields = client_stat_fields..","..get_update_field(clients_map[mobile_res], 1)
+			end
+		else
+			--pc
+			-- 匹配结果的顺序，与ua中关键词的顺序有关
+			-- lua的正则不支持|语法
+			-- 短字符串string.find效率要比ngx正则高
+			local pc_regx1 = "(360SE|360EE|360browser|Qihoo|TheWorld|TencentTraveler|Maxthon|Opera|QQBrowser|UCWEB|UBrowser|MetaSr|2345Explorer|Edg[e]*)" 
+			local pc_res = ngx.re.match(ua, pc_regx1, "ijo")
+			local cls_pc = nil
+			if not pc_res then
+				if string.find(ua, "[Ff]irefox") then
+					cls_pc = "firefox"
+				elseif string.find(ua, "MSIE") or string.find(ua, "Trident") then
+					cls_pc = "msie"
+				elseif string.find(ua, "[Cc]hrome") then
+					cls_pc = "chrome"
+				elseif string.find(ua, "[Ss]afari") then
+					cls_pc = "safari"
+				end
+			else
+				cls_pc = string.lower(pc_res[0])
+			end
+			D("UA:"..ua)
+			D("PC cls:"..tostring(cls_pc))
+			if cls_pc then
+				client_stat_fields = client_stat_fields..","..get_update_field(clients_map[cls_pc], 1)
+			else
+				-- machine and other
+				local machine_res, err = ngx.re.match(ua, "(ApacheBench|[Cc]url|HeadlessChrome|[a-zA-Z]+[Bb]ot|[Ww]get|[Ss]pider|[Cc]rawler|[Ss]crapy|zgrab|[Pp]ython|java)", "ijo")
+				if machine_res then
+					client_stat_fields = client_stat_fields..","..get_update_field("machine", 1)
+				else
+					-- 移动端+PC端+机器以外 归类到 其他
+					client_stat_fields = client_stat_fields..","..get_update_field("other", 1)
+				end
+			end
+
+			local os_regx = "(Windows|Linux|Macintosh)"
+			local os_res = ngx.re.match(ua, os_regx, "ijo")
+			if os_res then
+				os_res = string.lower(os_res[0])
+				client_stat_fields = client_stat_fields..","..get_update_field(clients_map[os_res], 1)
+			end
+		end
+
+		local other_regx = "MicroMessenger"
+		local other_res = string.find(ua, other_regx)
+		if other_res then
+			client_stat_fields = client_stat_fields..","..get_update_field("weixin", 1)
+		end
+		if client_stat_fields then
+			client_stat_fields = string.sub(client_stat_fields, 2)
+		end
+		return client_stat_fields
+	end
+
+	local function match_spider(client_ip)
+		-- 匹配蜘蛛请求
+		local ua = ''
+		if request_header['user-agent'] then
+			ua = request_header['user-agent']
+		end
+		if not ua then
+			return false, nil, 0
+		end
+		local is_spider = false
+		local spider_name = nil
+
+		local spider_table = {
+			["baidu"] = 1,  -- check
+			["bing"] = 2,  -- check 
+			["qh360"] = 3, -- check
+			["google"] = 4,
+			["bytes"] = 5,  -- check
+			["sogou"] = 6,  -- check
+			["youdao"] = 7,
+			["soso"] = 8,
+			["dnspod"] = 9,
+			["yandex"] = 10,
+			["yisou"] = 11,
+			["other"] = 12,
+			["mpcrawler"] = 13,
+			["yahoo"] = 14, -- check
+			["duckduckgo"] = 15
+		}
+
+		local res,err = ngx.re.match(ua, "(Baiduspider|Bytespider|360Spider|Sogou web spider|Sosospider|Googlebot|bingbot|AdsBot-Google|Google-Adwords|YoudaoBot|Yandex|DNSPod-Monitor|YisouSpider|mpcrawler)", "ijo")
+		check_res = true
+		if res then
+			is_spider = true
+			spider_match = string.lower(res[0])
+			if string.find(spider_match, "baidu", 1, true) then
+				spider_name = "baidu"
+			elseif string.find(spider_match, "bytes", 1, true) then
+				spider_name = "bytes"
+			elseif string.find(spider_match, "360", 1, true) then
+				spider_name = "qh360"
+			elseif string.find(spider_match, "sogou", 1, true) then
+				spider_name = "sogou"
+			elseif string.find(spider_match, "soso", 1, true) then
+				spider_name = "soso"
+			elseif string.find(spider_match, "google", 1, true) then
+				spider_name = "google"
+			elseif string.find(spider_match, "bingbot", 1, true) then
+				spider_name = "bing"
+			elseif string.find(spider_match, "youdao", 1, true) then
+				spider_name = "youdao"
+			elseif string.find(spider_match, "dnspod", 1, true) then
+				spider_name = "dnspod"
+			elseif string.find(spider_match, "yandex", 1, true) then
+				spider_name = "yandex"
+			elseif string.find(spider_match, "yisou", 1, true) then
+				spider_name = "yisou"
+			elseif string.find(spider_match, "mpcrawler", 1, true) then
+				spider_name = "mpcrawler"
+			end
+		end
+
+		if is_spider then 
+			return is_spider, spider_name, spider_table[spider_name]
+		end
+
+		-- Curl|Yahoo|HeadlessChrome|包含bot|Wget|Spider|Crawler|Scrapy|zgrab|python|java|Adsbot|DuckDuckGo
+		local other_res, err = ngx.re.match(ua, "(Yahoo|Slurp|DuckDuckGo)", "ijo")
+		if other_res then
+			other_res = string.lower(other_res[0])
+			if string.find(other_res, "yahoo", 1, true) then
+				spider_name = "yahoo"
+			elseif string.find(other_res, "slurp", 1, true) then
+				spider_name = "yahoo"
+			elseif string.find(other_res, "duckduckgo", 1, true) then
+				spider_name = "duckduckgo"
+			end
+			return true, spider_name, spider_table[spider_name]
+		end
+		return false, nil, 0
+	end
+
+	local function statistics_ipc(input_server_name,ip)
+		-- 判断IP是否重复的时间限定范围是请求的当前时间+24小时
+		local ipc = 0
+		local ip_token = input_server_name..'_'..ip
+		if not cache:get(ip_token) then
+			ipc = 1
+			cache:set(ip_token,1,get_end_time())
+		end
+		return ipc
+	end
+
+	local function statistics_request(ip, is_spider,body_length)
+		-- 计算pv uv
+		local pvc = 0
+		local uvc = 0
+
+		if not is_spider and method == 'GET' and ngx.status == 200 and body_length > 512 then
+			local ua = ''
+			if request_header['user-agent'] then
+				ua = string.lower(request_header['user-agent'])
+			end
+	
+			out_header = ngx.resp.get_headers()
+			if out_header['content-type'] then
+				if string.find(out_header['content-type'],'text/html', 1, true) then
+					pvc = 1
+					if request_header['user-agent'] then
+						if string.find(ua,'mozilla') then
+							local today = os.date("%Y-%m-%d")
+							local uv_token = ngx.md5(ip .. request_header['user-agent'] .. today)
+							if not cache:get(uv_token) then
+								uvc = 1
+								cache:set(uv_token,1,get_end_time())
+							end
+						end
+					end
+				end
+			end
+		end
+		return pvc, uvc
 	end
 
 	--------------------- exclude_func start --------------------------
@@ -377,19 +637,6 @@ log_by_lua_block {
 	end
 	--------------------- exclude_func end ---------------------------
 	
-	---------------------       db start   ---------------------------
-	local function update_stat(update_server_name, db, stat_table, key, columns)
-		-- 根据指定表名，更新统计数据
-		if not columns then return end
-		local stmt = db:prepare(string.format("INSERT INTO %s(time) SELECT :time WHERE NOT EXISTS(SELECT time FROM %s WHERE time=:time);", stat_table, stat_table))
-		stmt:bind_names{time=key}
-		local res, err = stmt:step()
-		stmt:finalize()
-		local update_sql = "UPDATE ".. stat_table .. " SET " .. columns
-		update_sql = update_sql .. " WHERE time=" .. key
-		status, errorString = db:exec(update_sql)
-	end
-	---------------------       db end     ---------------------------
 
 	local function cache_logs()
 
@@ -420,7 +667,6 @@ log_by_lua_block {
 		local body_length = get_length()
 		local domain = get_domain()
 		local referer = ngx.var.http_referer
-		local request_headers = get_http_original()
 
 		kv = {
 			id=new_id,
@@ -441,7 +687,7 @@ log_by_lua_block {
 			is_spider=0,
 			request_time=request_time,
 			excluded=excluded,
-			request_headers=request_headers,
+			request_headers='',
 			ip_list=ip_list,
 			client_port=client_port
 		}
@@ -452,15 +698,60 @@ log_by_lua_block {
 
 		if not excluded then
 
+			if status_code == 500 or (method=="POST" and config["record_post_args"]==true) or (status_code==403 and config["record_get_403_args"]==true) then
+				local data = ""
+				local ok, err = pcall(function() data=get_http_original() end)
+				if ok and not err then
+					kv["request_headers"] = data
+				end
+				D("Get http orgininal ok:"..tostring(ok))
+				D("Get http orgininal res:"..tostring(data))
+			end
+
+
 			if ngx.re.find("500,501,502,503,504,505,506,507,509,510,400,401,402,403,404,405,406,407,408,409,410,411,412,413,414,415,416,417,418,421,422,423,424,425,426,449,451", tostring(status_code), "jo") then
 				local field = "status_"..status_code
 				request_stat_fields = request_stat_fields .. ","..field.."="..field.."+1"
 			end
-			-- debug("method:"..method)
+			
+			D("method:"..method)
 			local lower_method = string.lower(method)
 			if ngx.re.find("get,post,put,patch,delete", lower_method, "ijo") then
 				local field = "http_"..lower_method
 				request_stat_fields = request_stat_fields .. ","..field.."="..field.."+1"
+			end
+
+
+			local ipc = 0
+     		local pvc = 0
+     		local uvc = 0
+
+     		is_spider, request_spider, spider_index = match_spider(ip)
+     		if not is_spider then
+     			client_stat_fields = match_client()	
+				D("Client stat fields:"..tostring(client_stat_fields))
+				if not client_stat_fields or #client_stat_fields == 0 then
+					client_stat_fields = request_stat_fields..",other=other+1"
+				end
+
+				pvc, uvc = statistics_request(ip, is_spider,body_length)
+				ipc = statistics_ipc(server_name,ip)
+			else
+				logline["is_spider"] = spider_index
+				local field = "spider"
+				spider_stat_fields = request_spider.."="..request_spider.."+"..1
+				request_stat_fields = request_stat_fields .. ","..field.."="..field.."+"..1
+			end
+     		D("Is spider:"..tostring(is_spider==true))
+			D("Request spider:".. tostring(request_spider))
+			if ipc > 0 then 
+				request_stat_fields = request_stat_fields..",ip=ip+1"
+			end
+			if uvc > 0 then 
+				request_stat_fields = request_stat_fields..",uv=uv+1"
+			end
+			if pvc > 0 then
+				request_stat_fields = request_stat_fields..",pv=pv+1"
 			end
 		end
 
@@ -473,7 +764,6 @@ log_by_lua_block {
  	local function store_logs_line(db, stmt, input_server_name, lineno)
  		local logvalue = cache_get(input_server_name, lineno, "log_kv")
 		if not logvalue then return false end
-		D("store_logs_line:"..logvalue)
 		local logline = json.decode(logvalue)
 
 		local time = logline["time"]
@@ -517,7 +807,7 @@ log_by_lua_block {
 			end
 		end
 
-
+		local time_key = logline["time_key"]
 		if not excluded then
 			stmt:bind_names{
 				time=time,
@@ -547,13 +837,14 @@ log_by_lua_block {
 			end
 			stmt:reset()
 			D("store_logs_line ok")
-
+			D("client_stat:"..tostring( time_key ).. tostring( client_stat_fields ))
+			D("spider_stat:"..tostring( time_key ).. tostring( spider_stat_fields ))
 			update_stat(store_server_name, db, "client_stat", time_key, client_stat_fields)
 			update_stat(store_server_name, db, "spider_stat", time_key, spider_stat_fields)
 			D("stat ok")
 		end
 
-		local time_key = logline["time_key"]
+		
 		update_stat(input_server_name, db, "request_stat", time_key, request_stat_fields)
 		return true
  	end
@@ -626,7 +917,6 @@ log_by_lua_block {
 		if tostring(res) == "5" then
 			D("Finalize res:"..tostring(res))
 			D("Finalize err:"..tostring(err))
-			D("Finalize busy.")
 			return true
 		end
 
@@ -645,8 +935,7 @@ log_by_lua_block {
 
 		local c_name = ngx.var.server_name
 		server_name = string.gsub(get_server_name(c_name),'_','.')
-	
-		D("c_name:"..c_name)
+
 		D("server_name:"..server_name)
 
 		load_global_exclude_ip()
