@@ -53,6 +53,12 @@ function toSizeG(bytes){
 	return b;
 }
 
+//to unixtime
+function toUnixTime(txt){
+        var unix = new Date(Date.parse(txt.replace(/-/g,'/'))).getTime();
+        return unix/1000;
+    }
+
 function randomStrPwd(b) {
 	b = b || 32;
 	var c = "AaBbCcDdEeFfGHhiJjKkLMmNnPpRSrTsWtXwYxZyz2345678";
