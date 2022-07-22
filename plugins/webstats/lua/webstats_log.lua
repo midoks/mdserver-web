@@ -1,6 +1,6 @@
 log_by_lua_block {
 
-	-- python3 ./plugins/webstats/index.py reload && echo "" > /Users/midoks/Desktop/mwdev/server/webstats/debug.log && wget http://t1.cn/
+	-- python3 ./plugins/webstats/index.py reload && ab -c 10 -n 1000 http://t1.cn/
 	-- 
     -- 
 
@@ -196,7 +196,6 @@ log_by_lua_block {
 			end
 
 			if "table" == type(data) then
-				D("get_http_original:"..data)
 				headers = table.concat(headers, data)
 			end
 		end
@@ -229,11 +228,11 @@ log_by_lua_block {
 		local my_name = cache:get(c_name)
 		if my_name then return my_name end
 
-		D("get_server_name start")
+		-- D("get_server_name start")
 
 		local determined_name = nil
 		local sites = require "sites"
-		D("get_server_name"..json.encode(sites))
+		-- D("get_server_name"..json.encode(sites))
 		for _,v in ipairs(sites)
 		do
 			if c_name == v["name"] then
@@ -247,18 +246,14 @@ log_by_lua_block {
 					return v['name']
 	            elseif string.find(d_name, "*") then
 					new_domain = string.gsub(d_name, '*', '.*')
-					D("ngx server name:"..ngx.var.server_name.."/new_domain:"..new_domain)
 	            	if string.find(c_name, new_domain) then
-	                	-- cache:set(c_name, v['name'],3600)
-	                	-- return v['name']
-						-- debug("find deter name:"..v['name'])
 						determined_name = v['name']
 	            	end
 				end
 			end
 		end
 
-		D("get_server_name end")
+		-- D("get_server_name end")
 		if determined_name then
 	        cache:set(c_name, determined_name,3600)
 			return determined_name
@@ -276,7 +271,6 @@ log_by_lua_block {
 		local res, err = stmt:step()
 		stmt:finalize()
 		local update_sql = "UPDATE ".. stat_table .. " SET " .. columns
-		D("update_stat::key::"..tostring(key))
 		update_sql = update_sql .. " WHERE time=" .. key
 		status, errorString = db:exec(update_sql)
 	end
@@ -358,8 +352,8 @@ log_by_lua_block {
 			else
 				cls_pc = string.lower(pc_res[0])
 			end
-			D("UA:"..ua)
-			D("PC cls:"..tostring(cls_pc))
+			-- D("UA:"..ua)
+			-- D("PC cls:"..tostring(cls_pc))
 			if cls_pc then
 				client_stat_fields = client_stat_fields..","..get_update_field(clients_map[cls_pc], 1)
 			else
@@ -525,8 +519,8 @@ log_by_lua_block {
 			for i, _ip in pairs(global_exclude_ip)
 			do 
 				-- global
+				-- D("set global exclude ip: ".._ip)
 				if not cache:get("global_exclude_ip_".._ip) then
-					D("set global exclude ip: ".._ip)
 					cache:set("global_exclude_ip_".._ip, true)
 				end
 			end
@@ -621,15 +615,15 @@ log_by_lua_block {
 				break
 			end
 		end
-		D("server[" ..input_server_name.."]check exclude ip : "..tostring(check_server_exclude_ip))
+		-- D("server[" ..input_server_name.."]check exclude ip : "..tostring(check_server_exclude_ip))
 		if check_server_exclude_ip then
 			if cache:get(input_server_name .. "_exclude_ip_"..ip) then 
-				D("-Exclude server ip:"..ip)
+				-- D("-Exclude server ip:"..ip)
 				return true
 			end
 		else
 			if cache:get("global_exclude_ip_"..ip) then 
-				D("*Excluded global ip:"..ip)
+				-- D("*Excluded global ip:"..ip)
 				return true
 			end
 		end
@@ -646,8 +640,6 @@ log_by_lua_block {
 		local excluded = false
 		local ip = get_client_ip_bylog()
 		excluded = filter_status() or exclude_extension() or exclude_url() or exclude_ip(server_name, ip)
-
-		D("new_id:"..new_id)
 
 		local ip_list = request_header["x-forwarded-for"]
 		if ip and not ip_list then
@@ -704,8 +696,8 @@ log_by_lua_block {
 				if ok and not err then
 					kv["request_headers"] = data
 				end
-				D("Get http orgininal ok:"..tostring(ok))
-				D("Get http orgininal res:"..tostring(data))
+				-- D("Get http orgininal ok:"..tostring(ok))
+				-- D("Get http orgininal res:"..tostring(data))
 			end
 
 
@@ -713,8 +705,7 @@ log_by_lua_block {
 				local field = "status_"..status_code
 				request_stat_fields = request_stat_fields .. ","..field.."="..field.."+1"
 			end
-			
-			D("method:"..method)
+			-- D("method:"..method)
 			local lower_method = string.lower(method)
 			if ngx.re.find("get,post,put,patch,delete", lower_method, "ijo") then
 				local field = "http_"..lower_method
@@ -728,8 +719,7 @@ log_by_lua_block {
 
      		is_spider, request_spider, spider_index = match_spider(ip)
      		if not is_spider then
-     			client_stat_fields = match_client()	
-				D("Client stat fields:"..tostring(client_stat_fields))
+     			client_stat_fields = match_client()
 				if not client_stat_fields or #client_stat_fields == 0 then
 					client_stat_fields = request_stat_fields..",other=other+1"
 				end
@@ -742,8 +732,8 @@ log_by_lua_block {
 				spider_stat_fields = request_spider.."="..request_spider.."+"..1
 				request_stat_fields = request_stat_fields .. ","..field.."="..field.."+"..1
 			end
-     		D("Is spider:"..tostring(is_spider==true))
-			D("Request spider:".. tostring(request_spider))
+     		-- D("Is spider:"..tostring(is_spider==true))
+			-- D("Request spider:".. tostring(request_spider))
 			if ipc > 0 then 
 				request_stat_fields = request_stat_fields..",ip=ip+1"
 			end
@@ -756,7 +746,7 @@ log_by_lua_block {
 		end
 
 		local stat_fields = request_stat_fields..";"..client_stat_fields..";"..spider_stat_fields
-		D("stat_fields:"..stat_fields)
+		-- D("stat_fields:"..stat_fields)
 		cache_set(server_name, new_id, "stat_fields", stat_fields)
 		cache_set(server_name, new_id, "log_kv", json.encode(kv))
  	end
@@ -790,8 +780,8 @@ log_by_lua_block {
 		local spider_stat_fields = nil
 		local stat_fields = cache_get(input_server_name, id, "stat_fields")
 		if stat_fields == nil then
-			D("Log stat fields is nil.")
-			D("Logdata:"..logvalue)
+			-- D("Log stat fields is nil.")
+			-- D("Logdata:"..logvalue)
 		else
 			stat_fields = split_bylog(stat_fields, ";")
 			request_stat_fields = stat_fields[1]
@@ -830,21 +820,18 @@ log_by_lua_block {
 
 			local res, err = stmt:step()
 			if tostring(res) == "5" then
-				D("Step res:"..tostring(res))
-				D("Step err:"..tostring(err))
-				D("Step数据库连接繁忙，稍候存储。")
+				-- D("Step res:"..tostring(res))
+				-- D("Step err:"..tostring(err))
+				-- D("Step数据库连接繁忙，稍候存储。")
 				return false
 			end
 			stmt:reset()
-			D("store_logs_line ok")
-			D("client_stat:"..tostring( time_key ).. tostring( client_stat_fields ))
-			D("spider_stat:"..tostring( time_key ).. tostring( spider_stat_fields ))
+			-- D("store_logs_line ok")
 			update_stat(store_server_name, db, "client_stat", time_key, client_stat_fields)
 			update_stat(store_server_name, db, "spider_stat", time_key, spider_stat_fields)
-			D("stat ok")
+			-- D("stat ok")
 		end
 
-		
 		update_stat(input_server_name, db, "request_stat", time_key, request_stat_fields)
 		return true
  	end
@@ -864,12 +851,10 @@ log_by_lua_block {
 		end
 
 		local worker_id = ngx.worker.id()
-		D("worker_id:"..worker_id)
-
 		if is_working(input_server_name) then
-			D("其他worker正在存储中，稍候存储。")
+			-- D("其他worker正在存储中，稍候存储。")
 			-- cache:delete(flush_data_key)
-			return
+			return true
 		end
 		lock_working(input_server_name)
 
@@ -893,7 +878,7 @@ log_by_lua_block {
 		end
 
 		if db == nil or stmt2 == nil then
-			D("web data db error")
+			-- D("web data db error")
 			-- cache:set(storing_key, false)
 			if db and db:isopen() then
 				db:close()
@@ -904,7 +889,7 @@ log_by_lua_block {
 		status, errorString = db:exec([[BEGIN TRANSACTION]])
 		if store_end >= store_start then
 			for i=store_start, store_end, 1 do
-				D("store_start:"..store_start..":store_end:".. store_end)
+				-- D("store_start:"..store_start..":store_end:".. store_end)
 				if store_logs_line(db, stmt2, input_server_name, i) then
 					cache_clear(input_server_name, i, "log_kv")
 					cache_clear(input_server_name, i, "stat_fields")
@@ -915,10 +900,16 @@ log_by_lua_block {
 		local res, err = stmt2:finalize()
 
 		if tostring(res) == "5" then
-			D("Finalize res:"..tostring(res))
-			D("Finalize err:"..tostring(err))
-			return true
+			-- D("Finalize res:"..tostring(res))
+			-- D("Finalize err:"..tostring(err))
 		end
+
+		local now_date = os.date("*t")
+		local save_day = config['global']["save_day"]
+		local save_date_timestamp = os.time{year=now_date.year,
+			month=now_date.month, day=now_date.day-save_day, hour=0}
+		-- delete expire data
+		db:exec("DELETE FROM site_logs WHERE time<"..tostring(save_date_timestamp))
 
 		local res, err = db:execute([[COMMIT]])
 		if db and db:isopen() then
@@ -930,13 +921,13 @@ log_by_lua_block {
 	end
 
 	local function run_app()
-		D("------------ debug start ------------")
+		-- D("------------ debug start ------------")
 		init_var()
 
 		local c_name = ngx.var.server_name
 		server_name = string.gsub(get_server_name(c_name),'_','.')
 
-		D("server_name:"..server_name)
+		-- D("server_name:"..server_name)
 
 		load_global_exclude_ip()
 		load_exclude_ip(server_name)
@@ -944,7 +935,7 @@ log_by_lua_block {
 		cache_logs()
 		store_logs(server_name)
 
-		D("------------ debug end -------------")
+		-- D("------------ debug end -------------")
 	end
 
 
