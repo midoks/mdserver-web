@@ -109,6 +109,21 @@ def loadLuaSiteFile():
     lua_site_json = lua_dir + "/sites.json"
     mw.writeFile(lua_site_json, json.dumps(content))
 
+    # 设置默认列表
+    default_json = lua_dir + "/default.json"
+    ddata = {}
+    dlist = []
+    for i in content:
+        dlist.append(i["name"])
+
+    dlist.append('unset')
+    ddata["list"] = dlist
+    if len(ddata["list"]) < 1:
+        ddata["default"] = "unset"
+    else:
+        ddata["default"] = dlist[0]
+    mw.writeFile(default_json, json.dumps(ddata))
+
     lua_site = lua_dir + "/sites.lua"
     config_sites = LuaMaker.makeLuaTable(content)
     sites_str = "return " + config_sites
@@ -276,6 +291,13 @@ def setGlobalConf():
     return mw.returnJson(True, '设置成功')
 
 
+def getDefaultSite():
+    lua_dir = getServerDir() + "/lua"
+    default_json = lua_dir + "/default.json"
+    data = mw.readFile(default_json)
+    return mw.returnJson(True, 'OK', json.loads(data))
+
+
 def getLogsList():
     args = getArgs()
     check = checkArgs(args, ['page', 'page_size', 'site'])
@@ -326,6 +348,8 @@ if __name__ == "__main__":
         print(getGlobalConf())
     elif func == 'set_global_conf':
         print(setGlobalConf())
+    elif func == 'get_default_site':
+        print(getDefaultSite())
     elif func == 'get_logs_list':
         print(getLogsList())
     else:

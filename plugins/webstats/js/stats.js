@@ -222,7 +222,7 @@ function wsSitesErrorLog(){
                                     <button type="button" class="btn btn-default gt">近7天</button>\
                                     <button type="button" class="btn btn-default gt">近30天</button>\
                                 </div>\
-                                <input type="text" class="form-control btn-group-sm" autocomplete="off" placeholder="自定义时间" style="font-size: 12px;padding: 0 10px;height:30px;width: 150px; background-position: 10px center;">\
+                                <input id="time_choose" type="text" class="form-control btn-group-sm" autocomplete="off" placeholder="自定义时间" style="font-size: 12px;padding: 0 10px;height:30px;width: 150px; background-position: 10px center;">\
                             </div>\
                         </div>\
                         <div style="padding-bottom:10px;">\
@@ -264,12 +264,13 @@ function wsSitesErrorLog(){
     });
 }
 
-function wsSitesLog(){
+function wsTableRequest(page){
     var args = {};   
-    args['page'] = 1;
+    args['page'] = page;
     args['page_size'] = 10;
+
     args['site'] = 'unset';
-    args['tojs'] = 'wsSitesLog';
+    args['tojs'] = 'wsTableRequest';
     wsPost('get_logs_list', '' ,args, function(rdata){
         var rdata = $.parseJSON(rdata.data);
         var list = '';
@@ -286,8 +287,7 @@ function wsSitesLog(){
             list += '<td><a href="javascript:;" class="btlink" onclick="openPhpmyadmin()" title="详情">详情</a></td>';
             list += '</tr>';
         }
-        var table = '<div class="divtable mtb10">\
-                        <div class="tablescroll">\
+        var table = '<div class="tablescroll">\
                             <table id="DataBody" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
                             <thead><tr>\
                             <th>时间</th>\
@@ -302,63 +302,108 @@ function wsSitesLog(){
                             '+ list +'\
                             </tbody></table>\
                         </div>\
-                        <div id="wsPage" class="dataTables_paginate paging_bootstrap page"></div>\
-                    </div>';
-
-        var html = '<div>\
-                        <div style="padding-bottom:10px;">\
-                            <span>网站: </span>\
-                            <select class="bt-input-text" name="" style="margin-left:4px">\
-                                <option value="0">请选择</option>\
-                                <option value="1">1-2GB</option>\
-                            </select>\
-                            <span style="margin-left:10px">时间: </span>\
-                            <div class="input-group" style="width:510px;float:right;">\
-                                <div class="input-group-btn btn-group-sm">\
-                                    <button type="button" class="btn btn-default gt">今日</button>\
-                                    <button type="button" class="btn btn-default gt">昨日</button>\
-                                    <button type="button" class="btn btn-default gt">近7天</button>\
-                                    <button type="button" class="btn btn-default gt">近30天</button>\
-                                </div>\
-                                <input type="text" class="form-control btn-group-sm" autocomplete="off" placeholder="自定义时间" style="font-size: 12px;padding: 0 10px;height:30px;width: 150px; background-position: 10px center;">\
-                            </div>\
-                        </div>\
-                        <div style="padding-bottom:10px;">\
-                            <span>请求类型: </span>\
-                            <select class="bt-input-text" name="req_type" style="margin-left:4px">\
-                                <option value="0">所有</option>\
-                                <option value="GET">GET</option>\
-                                <option value="POST">POST</option>\
-                                <option value="HEAD">HEAD</option>\
-                                <option value="PUT">PUT</option>\
-                                <option value="DELETE">DELETE</option>\
-                            </select>\
-                            <span style="margin-left:10px;">状态码: </span>\
-                            <select class="bt-input-text" name="code_type" style="margin-left:4px">\
-                                <option value="0">所有</option>\
-                                <option value="500">500</option>\
-                                <option value="502">502</option>\
-                                <option value="503">503</option>\
-                                <option value="404">404</option>\
-                                <option value="200">200</option>\
-                            </select>\
-                            <span style="margin-left:10px;">蜘蛛过滤: </span>\
-                            <select class="bt-input-text" name="spider_type" style="margin-left:4px">\
-                                <option value="0">不过滤</option>\
-                                <option value="baidu">百度</option>\
-                            </select>\
-                            <span style="margin-left:10px;">URL过滤: </span>\
-                            <div class="input-group" style="width:210px;float:right;">\
-                                <input type="text" class="form-control btn-group-sm" autocomplete="off" placeholder="URI搜索" style="font-size: 12px;padding: 0 10px;height:30px;">\
-                                <div class="input-group-btn btn-group-sm">\
-                                    <button type="button" class="btn btn-default">搜索</button>\
-                                </div>\
-                            </div>\
-                        </div>\
-                        '+table+'\
-                    </div>';
-        $(".soft-man-con").html(html);
+                        <div id="wsPage" class="dataTables_paginate paging_bootstrap page"></div>';
+        $('#ws_table').html(table);
         $('#wsPage').html(rdata.data.page);
+    });
+}
+
+
+function wsSitesLog(){
+
+    var randstr = getRandomString(10);
+
+    var html = '<div>\
+                    <div style="padding-bottom:10px;">\
+                        <span>网站: </span>\
+                        <select class="bt-input-text" name="site" style="margin-left:4px">\
+                            <option value="unset">未设置</option>\
+                        </select>\
+                        <span style="margin-left:10px">时间: </span>\
+                        <div class="input-group" style="margin-left:10px;width:550px;display: inline-table;vertical-align: top;">\
+                            <div class="input-group-btn btn-group-sm">\
+                                <button type="button" class="btn btn-default">今日</button>\
+                                <button type="button" class="btn btn-default">昨日</button>\
+                                <button type="button" class="btn btn-default">近7天</button>\
+                                <button type="button" class="btn btn-default">近30天</button>\
+                            </div>\
+                            <span class="last-span"><input type="text" id="time_choose" lay-key="1000001_'+randstr+'" class="form-control btn-group-sm" autocomplete="off" placeholder="自定义时间" style="display: inline-block;font-size: 12px;padding: 0 10px;height:30px;width: 300px;"></span>\
+                        </div>\
+                    </div>\
+                    <div style="padding-bottom:10px;">\
+                        <span>请求类型: </span>\
+                        <select class="bt-input-text" name="req_type" style="margin-left:4px">\
+                            <option value="0">所有</option>\
+                            <option value="GET">GET</option>\
+                            <option value="POST">POST</option>\
+                            <option value="HEAD">HEAD</option>\
+                            <option value="PUT">PUT</option>\
+                            <option value="DELETE">DELETE</option>\
+                        </select>\
+                        <span style="margin-left:10px;">状态码: </span>\
+                        <select class="bt-input-text" name="code_type" style="margin-left:4px">\
+                            <option value="0">所有</option>\
+                            <option value="500">500</option>\
+                            <option value="502">502</option>\
+                            <option value="503">503</option>\
+                            <option value="404">404</option>\
+                            <option value="200">200</option>\
+                        </select>\
+                        <span style="margin-left:10px;">蜘蛛过滤: </span>\
+                        <select class="bt-input-text" name="spider_type" style="margin-left:4px">\
+                            <option value="0">不过滤</option>\
+                            <option value="baidu">百度</option>\
+                        </select>\
+                        <span style="margin-left:10px;">URL过滤: </span>\
+                        <div class="input-group" style="width:210px;display:inline-flex;">\
+                            <input type="text" class="form-control btn-group-sm" autocomplete="off" placeholder="URI搜索" style="font-size: 12px;padding: 0 10px;height:30px;">\
+                            <div class="input-group-btn btn-group-sm">\
+                                <button type="button" class="btn btn-default">搜索</button>\
+                            </div>\
+                        </div>\
+                    </div>\
+                    <div class="divtable mtb10" id="ws_table"></div>\
+                </div>';
+    $(".soft-man-con").html(html);
+
+
+    wsPost('get_default_site','',{},function(rdata){
+        $('select[name="site"]').html('');
+
+        var rdata = $.parseJSON(rdata.data);
+        var rdata = rdata.data;
+        var default_site = rdata["demo1.biqu.xyz"];
+        var select = '';
+        for (var i = 0; i < rdata["list"].length; i++) {
+            if (default_site ==  rdata["list"][i]){
+                select += '<option value="'+rdata["list"][i]+'" selected>'+rdata["list"][i]+'</option>';
+            } else{
+                select += '<option value="'+rdata["list"][i]+'">'+rdata["list"][i]+'</option>';
+            }
+        }
+        $('select[name="site"]').html(select);
+
+        wsTableRequest(1);
+    });
+
+    //日期范围
+    laydate.render({
+        elem: '#time_choose',
+        value:'',
+        range:true,
+        done:function(value, startDate, endDate){
+            if(!value){
+                $('#time_choose').remove("cur");
+                return false;
+            }
+
+            var timeA  = value.split('-')
+            var start = $.trim(timeA[0]+'-'+timeA[1]+'-'+timeA[2])
+            var end = $.trim(timeA[3]+'-'+timeA[4]+'-'+timeA[5])
+            query_txt = toUnixTime(start + " 00:00:00") + "-"+ toUnixTime(end + " 00:00:00")
+            console.log(query_txt)
+            $('#time_choose').addClass("cur");
+        },
     });
 }
 
