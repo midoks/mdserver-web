@@ -27,6 +27,12 @@ sys.path.append(getPluginDir() + "/class")
 from LuaMaker import LuaMaker
 
 
+def listToLuaFile(path, lists):
+    content = LuaMaker.makeLuaTable(lists)
+    content = "return " + content
+    mw.writeFile(path, content)
+
+
 def getServerDir():
     return mw.getServerDir() + '/' + getPluginName()
 
@@ -93,10 +99,7 @@ def loadConfigFile():
     mw.writeFile(dst_conf_json, json.dumps(content))
 
     dst_conf_lua = getServerDir() + "/lua/config.lua"
-
-    content_lua = LuaMaker.makeLuaTable(content)
-    cfg_str = "return " + content_lua
-    mw.writeFile(dst_conf_lua, cfg_str)
+    listToLuaFile(dst_conf_lua, content)
 
 
 def loadLuaSiteFile():
@@ -125,9 +128,7 @@ def loadLuaSiteFile():
     mw.writeFile(default_json, json.dumps(ddata))
 
     lua_site = lua_dir + "/sites.lua"
-    config_sites = LuaMaker.makeLuaTable(content)
-    sites_str = "return " + config_sites
-    mw.writeFile(lua_site, sites_str)
+    listToLuaFile(lua_site, content)
 
 
 def loadDebugLogFile():
@@ -272,21 +273,20 @@ def setGlobalConf():
     data = checkArgs(args, ['exclude_url'])
     if data[0]:
         exclude_url = args['exclude_url'].strip(";")
-        exclude_url_list = exclude_url.split(";")
         exclude_url_val = []
-        for i in exclude_url_list:
-            t = i.split("|")
-            val = {}
-            val['mode'] = t[0]
-            val['url'] = t[1]
-            exclude_url_val.append(val)
+        if exclude_url != "":
+            exclude_url_list = exclude_url.split(";")
+            for i in exclude_url_list:
+                t = i.split("|")
+                val = {}
+                val['mode'] = t[0]
+                val['url'] = t[1]
+                exclude_url_val.append(val)
         content['global']['exclude_url'] = exclude_url_val
 
     mw.writeFile(conf, json.dumps(content))
-    dst_conf_lua = getServerDir() + "/lua/config.lua"
-    content_lua = LuaMaker.makeLuaTable(content)
-    cfg_str = "return " + content_lua
-    mw.writeFile(dst_conf_lua, cfg_str)
+    conf_lua = getServerDir() + "/lua/config.lua"
+    listToLuaFile(conf_lua, content)
     mw.restartWeb()
     return mw.returnJson(True, '设置成功')
 
