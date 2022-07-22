@@ -293,14 +293,25 @@ def setGlobalConf():
 
 def getDefaultSite():
     lua_dir = getServerDir() + "/lua"
-    default_json = lua_dir + "/default.json"
-    data = mw.readFile(default_json)
+    path = lua_dir + "/default.json"
+    data = mw.readFile(path)
     return mw.returnJson(True, 'OK', json.loads(data))
+
+
+def setDefaultSite(name):
+    lua_dir = getServerDir() + "/lua"
+    path = lua_dir + "/default.json"
+    data = mw.readFile(path)
+    data = json.loads(data)
+    data['default'] = name
+    mw.writeFile(path, json.dumps(data))
+    return mw.returnJson(True, 'OK')
 
 
 def getLogsList():
     args = getArgs()
-    check = checkArgs(args, ['page', 'page_size', 'site'])
+    check = checkArgs(args, ['page', 'page_size',
+                             'site', 'method', 'status_code', 'spider_type'])
     if not check[0]:
         return check[1]
 
@@ -308,15 +319,39 @@ def getLogsList():
     page_size = int(args['page_size'])
     domain = args['site']
     tojs = args['tojs']
+    method = args['method']
+    status_code = args['status_code']
+    spider_type = args['spider_type']
 
-    limit = str((page - 1) * page_size) + ',' + str(page_size)
+    setDefaultSite(domain)
+
+    limit = str(page_size) + ' offset ' + str(page_size * (page - 1))
     conn = pSqliteDb('web_logs', domain)
 
     field = 'time,ip,domain,server_name,method,status_code,request_time,uri,body_length'
     condition = ''
-    clist = conn.field(
-        field).limit(limit).order('time desc').select()
-    count = conn.count()
+    conn = conn.field(field)
+
+    if method != "all":
+        conn = conn.where("method=?", (method,))
+
+    if status_code != "all":
+        conn = conn.where("status_code=?", (status_code,))
+
+    if spider_type == "normal":
+        pass
+    elif spider_type == "only_spider":
+        conn = conn.where("is_spider>?", (0,))
+    elif spider_type == "no_spider":
+        conn = conn.where("is_spider=?", (0,))
+    elif int(spider_type) > 0:
+        conn = conn.where("is_spider=?", (spider_type,))
+
+    clist = conn.limit(limit).order('time desc').inquiry()
+
+    count_key = "count(*) as num"
+    count = conn.field(count_key).limit('').inquiry()
+    count = count[0][count_key]
 
     data = {}
     _page = {}

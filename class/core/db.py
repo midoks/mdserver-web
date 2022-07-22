@@ -59,6 +59,8 @@ class Sql():
         # LIMIT条件
         if len(limit):
             self.__OPT_LIMIT = " LIMIT " + limit
+        else:
+            self.__OPT_LIMIT = ""
         return self
 
     def field(self, field):
@@ -95,6 +97,39 @@ class Sql():
                 data = tmp
                 del(tmp)
             self.__close()
+            return data
+        except Exception as ex:
+            return "error: " + str(ex)
+
+    def inquiry(self):
+        # 查询数据集
+        # 不清空查询参数
+        self.__GetConn()
+        try:
+            sql = "SELECT " + self.__OPT_FIELD + " FROM " + self.__DB_TABLE + \
+                self.__OPT_WHERE + self.__OPT_ORDER + self.__OPT_LIMIT
+            # print(sql)
+            result = self.__DB_CONN.execute(sql, self.__OPT_PARAM)
+            data = result.fetchall()
+            # 构造字曲系列
+            if self.__OPT_FIELD != "*":
+                field = self.__OPT_FIELD.split(',')
+                tmp = []
+                for row in data:
+                    i = 0
+                    tmp1 = {}
+                    for key in field:
+                        tmp1[key] = row[i]
+                        i += 1
+                    tmp.append(tmp1)
+                    del(tmp1)
+                data = tmp
+                del(tmp)
+            else:
+                # 将元组转换成列表
+                tmp = map(list, data)
+                data = tmp
+                del(tmp)
             return data
         except Exception as ex:
             return "error: " + str(ex)
