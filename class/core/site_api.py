@@ -1548,15 +1548,6 @@ class site_api:
 
         tpl = """
 # PROXY-START/
-location ~* \.(gif|png|jpg|css|js|woff|woff2)$
-{
-	proxy_pass {to};
-    proxy_set_header Host {host};
-    proxy_set_header X-Real-IP $remote_addr;
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header REMOTE-HOST $remote_addr;
-    expires 12h;
-}
 location ~* ^{from}(.*)$ {
     proxy_pass {to};
     proxy_set_header Host {host};
@@ -1567,6 +1558,17 @@ location ~* ^{from}(.*)$ {
     add_header X-Cache $upstream_cache_status;
     proxy_ignore_headers Set-Cookie Cache-Control expires;
     add_header Cache-Control no-cache;
+
+    set $static_files_app 0;
+    if ( $uri ~* "\.(gif|png|jpg|css|js|woff|woff2)$" )
+    {
+        set $static_files_app 1;
+        expires 12h;
+    }
+    if ( $static_files_app = 0 )
+    {
+        add_header Cache-Control no-cache;
+    }
 }
 # PROXY-END/
         """
