@@ -37,7 +37,7 @@ Install_App()
 	
 	# luarocks
 	if [ ! -f $serverPath/source/webstats/luarocks-3.5.0.tar.gz ];then
-		wget -O $serverPath/source/webstats/luarocks-3.5.0.tar.gz https://luarocks.org/releases/luarocks-3.5.0.tar.gz
+		wget --no-check-certificate -O $serverPath/source/webstats/luarocks-3.5.0.tar.gz http://luarocks.org/releases/luarocks-3.5.0.tar.gz
 	fi
 	
 	# which luarocks
@@ -53,7 +53,7 @@ Install_App()
 
 
 	if [ ! -f  $serverPath/source/webstats/lsqlite3_fsl09y.zip ];then
-		wget -O $serverPath/source/webstats/lsqlite3_fsl09y.zip http://lua.sqlite.org/index.cgi/zip/lsqlite3_fsl09y.zip?uuid=fsl_9y
+		wget --no-check-certificate -O $serverPath/source/webstats/lsqlite3_fsl09y.zip http://lua.sqlite.org/index.cgi/zip/lsqlite3_fsl09y.zip?uuid=fsl_9y
 		cd $serverPath/source/webstats && unzip lsqlite3_fsl09y.zip
 	fi
 
