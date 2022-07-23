@@ -209,7 +209,7 @@ function wsClientStatLogRequest(page){
                 list += '</tr>';
             }
         } else{
-             list += '<tr><td colspan="8" style="text-align:center;">网站日志为空</td></tr>';
+             list += '<tr><td colspan="14" style="text-align:center;">客服端列表为空</td></tr>';
         }
         
         var table = '<div class="tablescroll">\
@@ -598,7 +598,7 @@ function wsTableErrorLogRequest(page){
                 list += '</tr>';
             }
         } else{
-             list += '<tr><td colspan="8" style="text-align:center;">网站日志为空</td></tr>';
+             list += '<tr><td colspan="8" style="text-align:center;">错误日志为空</td></tr>';
         }
         
         var table = '<div class="tablescroll">\
