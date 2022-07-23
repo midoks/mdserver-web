@@ -641,7 +641,7 @@ function wsTableErrorLogRequest(page){
                     <div><b style="margin-left:10px">URL</b></div>\
                     <div class="lib-con mt10"><div class="divpre">' + $('<div ></div>').text(res.uri).html() + '</div></div>\
                     <div><b style="margin-left:10px">完整IP列表</b></div>\
-                    <div class="lib-con pull-left mt10"><div class="divpre" style="max-height: 66px;">' + $('<div ></div>').text(res.ip_list).html() + '</div></div>\
+                    <div class="lib-con mt10"><div class="divpre" style="max-height: 66px;">' + $('<div ></div>').text(res.ip_list).html() + '</div></div>\
                     <div><b style="margin-left:10px">来路</b></div>\
                     <div class="lib-con mt10"><div class="divpre">' + $('<div ></div>').text(res.referer == null ?'None':res.referer).html() + '</div></div>\
                     <div><b style="margin-left:10px">User-Agent</b></div>\
@@ -850,7 +850,7 @@ function wsTableLogRequest(page){
                     <div><b style="margin-left:10px">URL</b></div>\
                     <div class="lib-con mt10"><div class="divpre">' + $('<div ></div>').text(res.uri).html() + '</div></div>\
                     <div><b style="margin-left:10px">完整IP列表</b></div>\
-                    <div class="lib-con pull-left mt10"><div class="divpre" style="max-height: 66px;">' + $('<div ></div>').text(res.ip_list).html() + '</div></div>\
+                    <div class="lib-con mt10"><div class="divpre" style="max-height: 66px;">' + $('<div ></div>').text(res.ip_list).html() + '</div></div>\
                     <div><b style="margin-left:10px">来路</b></div>\
                     <div class="lib-con mt10"><div class="divpre">' + $('<div ></div>').text(res.referer == null ?'None':res.referer).html() + '</div></div>\
                     <div><b style="margin-left:10px">User-Agent</b></div>\
