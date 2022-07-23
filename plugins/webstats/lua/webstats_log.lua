@@ -727,7 +727,7 @@ log_by_lua_block {
 				pvc, uvc = statistics_request(ip, is_spider,body_length)
 				ipc = statistics_ipc(server_name,ip)
 			else
-				logline["is_spider"] = spider_index
+				kv["is_spider"] = spider_index
 				local field = "spider"
 				spider_stat_fields = request_spider.."="..request_spider.."+"..1
 				request_stat_fields = request_stat_fields .. ","..field.."="..field.."+"..1
