@@ -311,7 +311,7 @@ def setDefaultSite(name):
 def getLogsList():
     args = getArgs()
     check = checkArgs(args, ['page', 'page_size',
-                             'site', 'method', 'status_code', 'spider_type'])
+                             'site', 'method', 'status_code', 'spider_type', 'query_date', 'search_uri'])
     if not check[0]:
         return check[1]
 
@@ -322,7 +322,8 @@ def getLogsList():
     method = args['method']
     status_code = args['status_code']
     spider_type = args['spider_type']
-
+    query_date = args['query_date']
+    search_uri = args['search_uri']
     setDefaultSite(domain)
 
     limit = str(page_size) + ' offset ' + str(page_size * (page - 1))
@@ -331,26 +332,44 @@ def getLogsList():
     field = 'time,ip,domain,server_name,method,status_code,request_time,uri,body_length'
     condition = ''
     conn = conn.field(field)
+    conn = conn.where("1=1", ())
 
     if method != "all":
-        conn = conn.where("method=?", (method,))
+        conn = conn.andWhere("method=?", (method,))
 
     if status_code != "all":
-        conn = conn.where("status_code=?", (status_code,))
+        conn = conn.andWhere("status_code=?", (status_code,))
 
     if spider_type == "normal":
         pass
     elif spider_type == "only_spider":
-        conn = conn.where("is_spider>?", (0,))
+        conn = conn.andWhere("is_spider>?", (0,))
     elif spider_type == "no_spider":
-        conn = conn.where("is_spider=?", (0,))
+        conn = conn.andWhere("is_spider=?", (0,))
     elif int(spider_type) > 0:
-        conn = conn.where("is_spider=?", (spider_type,))
+        conn = conn.andWhere("is_spider=?", (spider_type,))
+
+    todayTime = time.strftime('%Y-%m-%d 00:00:00', time.localtime())
+    todayUt = int(time.mktime(time.strptime(todayTime, "%Y-%m-%d %H:%M:%S")))
+    if query_date == 'today':
+        conn = conn.andWhere("time>=?", (todayUt,))
+    elif query_date == "yesterday":
+        conn = conn.andWhere("time>=? and time<=?", (todayUt - 86400, todayUt))
+    elif query_date == "l7":
+        conn = conn.andWhere("time>=?", (todayUt - 7 * 86400,))
+    elif query_date == "l30":
+        conn = conn.andWhere("time>=?", (todayUt - 30 * 86400,))
+    else:
+        exlist = query_date.split("-")
+        conn = conn.andWhere("time>=? and time<=?", (exlist[0], exlist[1]))
+
+    if search_uri != "":
+        conn = conn.andWhere("uri like '%" + search_uri + "%'", ())
 
     clist = conn.limit(limit).order('time desc').inquiry()
-
     count_key = "count(*) as num"
-    count = conn.field(count_key).limit('').inquiry()
+    count = conn.field(count_key).limit('').order('').inquiry()
+    # print(count)
     count = count[0][count_key]
 
     data = {}

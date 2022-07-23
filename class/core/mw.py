@@ -165,9 +165,9 @@ def restartMw():
 
 
 def checkWebConfig():
-    op_dir = getServerDir() + '/openresty'
+    op_dir = getServerDir() + '/openresty/nginx'
     cmd = "ulimit -n 10240 && " + op_dir + \
-        "/nginx/sbin/nginx -t -c " + op_dir + "/nginx/conf/nginx.conf"
+        "/sbin/nginx -t -c " + op_dir + "/conf/nginx.conf"
     result = execShell(cmd)
     searchStr = 'successful'
     if result[1].find(searchStr) == -1:

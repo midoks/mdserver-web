@@ -49,10 +49,21 @@ class Sql():
             self.__OPT_PARAM = param
         return self
 
+    def andWhere(self, where, param):
+        # WHERE条件
+        if where:
+            self.__OPT_WHERE = self.__OPT_WHERE + " and " + where
+            # print(param)
+            # print(self.__OPT_PARAM)
+            self.__OPT_PARAM = self.__OPT_PARAM + param
+        return self
+
     def order(self, order):
         # ORDER条件
         if len(order):
             self.__OPT_ORDER = " ORDER BY " + order
+        else:
+            self.__OPT_ORDER = ""
         return self
 
     def limit(self, limit):
@@ -108,7 +119,6 @@ class Sql():
         try:
             sql = "SELECT " + self.__OPT_FIELD + " FROM " + self.__DB_TABLE + \
                 self.__OPT_WHERE + self.__OPT_ORDER + self.__OPT_LIMIT
-            # print(sql)
             result = self.__DB_CONN.execute(sql, self.__OPT_PARAM)
             data = result.fetchall()
             # 构造字曲系列
@@ -229,8 +239,8 @@ class Sql():
             opt = opt[0:len(opt) - 1]
             sql = "UPDATE " + self.__DB_TABLE + " SET " + opt + self.__OPT_WHERE
 
-            import mw
-            mw.writeFile('/tmp/test.pl', sql)
+            # import mw
+            # mw.writeFile('/tmp/test.pl', sql)
 
             # 处理拼接WHERE与UPDATE参数
             tmp = list(param)

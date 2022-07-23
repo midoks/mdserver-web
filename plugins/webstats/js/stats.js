@@ -173,7 +173,7 @@ function wsSitesErrorLog(){
     args['tojs'] = 'wsSitesErrorLog';
     wsPost('get_logs_list', '' ,args, function(rdata){
         var rdata = $.parseJSON(rdata.data);
-        console.log(rdata);
+        // console.log(rdata);
         var list = '';
         var data = rdata.data.data;
         for(i in data){
@@ -266,8 +266,7 @@ function wsSitesErrorLog(){
 
 
 function wsTableLogRequest(page){
-
-    // console.log("wsTableRequest:",$('select[name="site"]').val());
+    
     var args = {};   
     args['page'] = page;
     args['page_size'] = 10;
@@ -276,23 +275,43 @@ function wsTableLogRequest(page){
     args['method'] = $('select[name="method"]').val();
     args['status_code'] = $('select[name="status_code"]').val();
     args['spider_type'] = $('select[name="spider_type"]').val();
+
+    var query_date = 'today';
+    if ($('#time_choose').attr("data-name") != ''){
+        query_date = $('#time_choose').attr("data-name");
+    } else {
+        query_date = $('#search_time button.cur').attr("data-name");
+    }
+    args['query_date'] = query_date;
+     // console.log("query_date:",query_date);
+
+
+    var search_uri = $('input[name="search_uri"]').val();
+    args['search_uri'] = search_uri;
+
     args['tojs'] = 'wsTableLogRequest';
     wsPost('get_logs_list', '' ,args, function(rdata){
         var rdata = $.parseJSON(rdata.data);
+        console.log(rdata);
         var list = '';
         var data = rdata.data.data;
-        for(i in data){
-            list += '<tr>';
-            list += '<td>' + getLocalTime(data[i]['time'])+'</td>';
-            list += '<td>' + data[i]['domain'] +'</td>';
-            list += '<td>' + data[i]['ip'] +'</td>';
-            list += '<td>' + toSize(data[i]['body_length']) +'</td>';
-            list += '<td>' + data[i]['request_time'] +'ms</td>';
-            list += '<td><span class="overflow_hide" style="width:180px;">' + data[i]['uri'] +'</span></td>';
-            list += '<td>' + data[i]['status_code']+'/' + data[i]['method'] +'</td>';
-            list += '<td><a href="javascript:;" class="btlink" onclick="openPhpmyadmin()" title="详情">详情</a></td>';
-            list += '</tr>';
+        if (data.length > 0){
+            for(i in data){
+                list += '<tr>';
+                list += '<td>' + getLocalTime(data[i]['time'])+'</td>';
+                list += '<td>' + data[i]['domain'] +'</td>';
+                list += '<td>' + data[i]['ip'] +'</td>';
+                list += '<td>' + toSize(data[i]['body_length']) +'</td>';
+                list += '<td>' + data[i]['request_time'] +'ms</td>';
+                list += '<td><span class="overflow_hide" style="width:180px;">' + data[i]['uri'] +'</span></td>';
+                list += '<td>' + data[i]['status_code']+'/' + data[i]['method'] +'</td>';
+                list += '<td><a href="javascript:;" class="btlink" onclick="openPhpmyadmin()" title="详情">详情</a></td>';
+                list += '</tr>';
+            }
+        } else{
+             list += '<tr><td colspan="8" style="text-align:center;">网站日志为空</td></tr>';
         }
+        
         var table = '<div class="tablescroll">\
                             <table id="DataBody" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
                             <thead><tr>\
@@ -326,13 +345,13 @@ var html = '<div>\
                     </select>\
                     <span style="margin-left:10px">时间: </span>\
                     <div class="input-group" style="margin-left:10px;width:550px;display: inline-table;vertical-align: top;">\
-                        <div class="input-group-btn btn-group-sm">\
-                            <button type="button" class="btn btn-default">今日</button>\
-                            <button type="button" class="btn btn-default">昨日</button>\
-                            <button type="button" class="btn btn-default">近7天</button>\
-                            <button type="button" class="btn btn-default">近30天</button>\
+                        <div id="search_time" class="input-group-btn btn-group-sm">\
+                            <button data-name="today" type="button" class="btn btn-default">今日</button>\
+                            <button data-name="yesterday" type="button" class="btn btn-default">昨日</button>\
+                            <button data-name="l7" type="button" class="btn btn-default">近7天</button>\
+                            <button data-name="l30" type="button" class="btn btn-default">近30天</button>\
                         </div>\
-                        <span class="last-span"><input type="text" id="time_choose" lay-key="1000001_'+randstr+'" class="form-control btn-group-sm" autocomplete="off" placeholder="自定义时间" style="display: inline-block;font-size: 12px;padding: 0 10px;height:30px;width: 300px;"></span>\
+                        <span class="last-span"><input data-name="" type="text" id="time_choose" lay-key="1000001_'+randstr+'" class="form-control btn-group-sm" autocomplete="off" placeholder="自定义时间" style="display: inline-block;font-size: 12px;padding: 0 10px;height:30px;width: 300px;"></span>\
                     </div>\
                 </div>\
                 <div style="padding-bottom:10px;">\
@@ -374,9 +393,9 @@ var html = '<div>\
                     </select>\
                     <span style="margin-left:10px;">URL过滤: </span>\
                     <div class="input-group" style="width:210px;display:inline-flex;">\
-                        <input type="text" class="form-control btn-group-sm" autocomplete="off" placeholder="URI搜索" style="font-size: 12px;padding: 0 10px;height:30px;">\
+                        <input type="text" name="search_uri" class="form-control btn-group-sm" autocomplete="off" placeholder="URI搜索" style="font-size: 12px;padding: 0 10px;height:30px;">\
                         <div class="input-group-btn btn-group-sm">\
-                            <button type="button" class="btn btn-default">搜索</button>\
+                            <button id="logs_search" type="button" class="btn btn-default">搜索</button>\
                         </div>\
                     </div>\
                 </div>\
@@ -391,17 +410,38 @@ laydate.render({
     range:true,
     done:function(value, startDate, endDate){
         if(!value){
-            $('#time_choose').remove("cur");
             return false;
         }
+
+        $('#search_time button').each(function(){
+            $(this).removeClass('cur');
+        });
 
         var timeA  = value.split('-')
         var start = $.trim(timeA[0]+'-'+timeA[1]+'-'+timeA[2])
         var end = $.trim(timeA[3]+'-'+timeA[4]+'-'+timeA[5])
         query_txt = toUnixTime(start + " 00:00:00") + "-"+ toUnixTime(end + " 00:00:00")
-        console.log(query_txt)
+
+        $('#time_choose').attr("data-name",query_txt);
         $('#time_choose').addClass("cur");
+
+        wsTableLogRequest(1);
     },
+});
+
+$('#search_time button:eq(0)').addClass('cur');
+$('#search_time button').click(function(){
+    $('#search_time button').each(function(){
+        if ($(this).hasClass('cur')){
+            $(this).removeClass('cur');
+        }
+    });
+    $('#time_choose').attr("data-name",'');
+    $('#time_choose').removeClass("cur");
+
+    $(this).addClass('cur');
+
+    wsTableLogRequest(1);
 });
 
 $('select[name="method"]').change(function(){
@@ -413,6 +453,10 @@ $('select[name="status_code"]').change(function(){
 });
 
 $('select[name="spider_type"]').change(function(){
+    wsTableLogRequest(1);
+});
+
+$('#logs_search').click(function(){
     wsTableLogRequest(1);
 });
 
