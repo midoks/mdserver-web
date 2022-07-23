@@ -82,7 +82,10 @@ Install_App()
 
 	echo "${VERSION}" > $serverPath/webstats/version.pl
 	echo '安装完成' > $install_tmp
-	# cd $rootPath && python3 ${rootPath}/plugins/webstats/index.py start
+
+	if [ "$sys_os" != "Darwin" ];then
+		cd $rootPath && python3 ${rootPath}/plugins/webstats/index.py start
+	fi
 }
 
 Uninstall_App()

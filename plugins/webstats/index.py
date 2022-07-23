@@ -213,6 +213,10 @@ def initDreplace():
 
 def start():
     initDreplace()
+
+    if not mw.isAppleSystem():
+        mw.execShell("chown -R www:www " + getServerDir())
+
     mw.restartWeb()
     return 'ok'
 
