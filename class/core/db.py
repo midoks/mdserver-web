@@ -11,12 +11,13 @@ class Sql():
     #------------------------------
     __DB_FILE = None            # 数据库文件
     __DB_CONN = None            # 数据库连接对象
-    __DB_TABLE = ""              # 被操作的表名称
-    __OPT_WHERE = ""              # where条件
-    __OPT_LIMIT = ""              # limit条件
-    __OPT_ORDER = ""              # order条件
-    __OPT_FIELD = "*"             # field条件
-    __OPT_PARAM = ()              # where值
+    __DB_TABLE = ""             # 被操作的表名称
+    __OPT_WHERE = ""            # where条件
+    __OPT_LIMIT = ""            # limit条件
+    __OPT_GROUP = ""            # group条件
+    __OPT_ORDER = ""            # order条件
+    __OPT_FIELD = "*"           # field条件
+    __OPT_PARAM = ()            # where值
 
     def __init__(self):
         self.__DB_FILE = 'data/default.db'
@@ -66,6 +67,13 @@ class Sql():
             self.__OPT_ORDER = ""
         return self
 
+    def group(self, group):
+        if len(group):
+            self.__OPT_GROUP = " GROUP BY " + group
+        else:
+            self.__OPT_GROUP = ""
+        return self
+
     def limit(self, limit):
         # LIMIT条件
         if len(limit):
@@ -112,18 +120,24 @@ class Sql():
         except Exception as ex:
             return "error: " + str(ex)
 
-    def inquiry(self):
+    def inquiry(self, input_field=''):
         # 查询数据集
         # 不清空查询参数
         self.__GetConn()
         try:
             sql = "SELECT " + self.__OPT_FIELD + " FROM " + self.__DB_TABLE + \
-                self.__OPT_WHERE + self.__OPT_ORDER + self.__OPT_LIMIT
+                self.__OPT_WHERE + self.__OPT_GROUP + self.__OPT_ORDER + self.__OPT_LIMIT
+            # print(sql)
             result = self.__DB_CONN.execute(sql, self.__OPT_PARAM)
             data = result.fetchall()
             # 构造字曲系列
             if self.__OPT_FIELD != "*":
-                field = self.__OPT_FIELD.split(',')
+
+                if input_field != "":
+                    field = input_field.split(',')
+                else:
+                    field = self.__OPT_FIELD.split(',')
+
                 tmp = []
                 for row in data:
                     i = 0
