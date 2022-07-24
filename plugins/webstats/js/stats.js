@@ -237,8 +237,9 @@ function wsSpiderStatLogRequest(page){
 
         var sumData = rdata.data.sum_data;
 
+        var percent = ((sumData.spider/sumData.reqest_total)*100).toFixed();
         
-        $('#spider_left_total .request_spider').text(sumData.spider);
+        $('#spider_left_total .request_spider').text(sumData.spider+"("+percent+"%)");
         $('#spider_left_total .request_total').text(sumData.reqest_total);
 
         // 图形化
