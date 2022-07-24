@@ -64,105 +64,308 @@ function wsPostCallbak(method, version, args,callback){
 }
 
 
-function wsOverview(){
-    var args = {};   
-    args['page'] = 1;
-    args['page_size'] = 10;
-    args['site'] = 'unset';
-    args['tojs'] = 'wsOverview';
-    wsPost('get_logs_list', '' ,args, function(rdata){
+function wsOverviewRequest(page){
+
+    var args = {};
+
+    args['site'] = $('select[name="site"]').val();
+
+    var query_date = 'today';
+    if ($('#time_choose').attr("data-name") != ''){
+        query_date = $('#time_choose').attr("data-name");
+    } else {
+        query_date = $('#search_time button.cur').attr("data-name");
+    }
+    args['query_date'] = query_date;
+    args['order'] = $('#time_order button.cur').attr('data-name');
+
+    var select_option = $('.indicators-container input:checked').parent().attr('data-name');
+    console.log(select_option);
+
+    wsPost('get_overview_list', '' ,args, function(rdata){
         var rdata = $.parseJSON(rdata.data);
-        console.log(rdata);
         var list = '';
         var data = rdata.data.data;
-        for(i in data){
-            list += '<tr>';
-            list += '<td>' + data[i]['time']+'</td>';
-            list += '<td>' + data[i]['domain'] +'</td>';
-            list += '<td>' + data[i]['ip'] +'</td>';
-            list += '<td>' + data[i]['body_length'] +'</td>';
-            list += '<td>' + data[i]['request_time'] +'ms</td>';
-            list += '<td>' + data[i]['uri'] +'</td>';
-            list += '<td>' + data[i]['status_code']+'/' + data[i]['method'] +'</td>';
-            list += '<td><a href="javascript:;" class="btlink" onclick="openPhpmyadmin()" title="详情">详情</a></td>';
-            list += '</tr>';
-        }
-        var table = '<div class="divtable mtb10">\
-                        <div class="tablescroll">\
-                            <table id="DataBody" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
-                            <thead><tr>\
-                            <th>时间</th>\
-                            <th>域名</th>\
-                            <th>IP</th>\
-                            <th>响应</th>\
-                            <th>耗时</th>\
-                            <th>URL</th>\
-                            <th>状态/类型</th>\
-                            <th style="text-align:right;">操作</th></tr></thead>\
-                            <tbody>\
-                            '+ list +'\
-                            </tbody></table>\
-                        </div>\
-                        <div id="wsPage" class="dataTables_paginate paging_bootstrap page"></div>\
-                    </div>';
+        var statData = rdata.data.stat_list;
 
-        var html = '<div>\
-                        <div style="padding-bottom:10px;">\
-                            <span>网站: </span>\
-                            <select class="bt-input-text" name="" style="margin-left:4px">\
-                                <option value="0">请选择</option>\
-                                <option value="1">1-2GB</option>\
-                            </select>\
-                            <span style="margin-left:10px">时间: </span>\
-                            <div class="input-group" style="width:510px;float:right;">\
-                                <div class="input-group-btn btn-group-sm">\
-                                    <button type="button" class="btn btn-default gt">今日</button>\
-                                    <button type="button" class="btn btn-default gt">昨日</button>\
-                                    <button type="button" class="btn btn-default gt">近7天</button>\
-                                    <button type="button" class="btn btn-default gt">近30天</button>\
-                                </div>\
-                                <input type="text" class="form-control btn-group-sm" autocomplete="off" placeholder="自定义时间" style="font-size: 12px;padding: 0 10px;height:30px;width: 150px; background-position: 10px center;">\
-                            </div>\
-                        </div>\
-                        <div style="padding-bottom:10px;">\
-                            <span>请求类型: </span>\
-                            <select class="bt-input-text" name="req_type" style="margin-left:4px">\
-                                <option value="0">所有</option>\
-                                <option value="GET">GET</option>\
-                                <option value="POST">POST</option>\
-                                <option value="HEAD">HEAD</option>\
-                                <option value="PUT">PUT</option>\
-                                <option value="DELETE">DELETE</option>\
-                            </select>\
-                            <span style="margin-left:10px;">状态码: </span>\
-                            <select class="bt-input-text" name="code_type" style="margin-left:4px">\
-                                <option value="0">所有</option>\
-                                <option value="500">500</option>\
-                                <option value="502">502</option>\
-                                <option value="503">503</option>\
-                                <option value="404">404</option>\
-                                <option value="200">200</option>\
-                            </select>\
-                            <span style="margin-left:10px;">蜘蛛过滤: </span>\
-                            <select class="bt-input-text" name="spider_type" style="margin-left:4px">\
-                                <option value="0">不过滤</option>\
-                                <option value="baidu">百度</option>\
-                            </select>\
-                            <span style="margin-left:10px;">URL过滤: </span>\
-                            <div class="input-group" style="width:210px;float:right;">\
-                                <input type="text" class="form-control btn-group-sm" autocomplete="off" placeholder="URI搜索" style="font-size: 12px;padding: 0 10px;height:30px;">\
-                                <div class="input-group-btn btn-group-sm">\
-                                    <button type="button" class="btn btn-default">搜索</button>\
-                                </div>\
-                            </div>\
-                        </div>\
-                        '+table+'\
-                    </div>';
-        $(".soft-man-con").html(html);
-        $('#wsPage').html(rdata.data.page);
+        console.log(statData, data);
+
+        $('.overview_list .overview_box:eq(0) .ov_num').text(statData['pv']);
+        $('.overview_list .overview_box:eq(1) .ov_num').text(statData['uv']);
+        $('.overview_list .overview_box:eq(2) .ov_num').text(statData['ip']);
+        $('.overview_list .overview_box:eq(3) .ov_num').text(toSize(statData['length']));
+        $('.overview_list .overview_box:eq(4) .ov_num').text(statData['req']);
+
+        var list = [];
+        for (var i = 0; i < data.length; i++) {
+            list.push(data[i][select_option]);
+        }
+
+        console.log("list",list);
+
+        var chat = {};
+
+    
+        var chatSeriesVal = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14','15', '16', '17', '18', '19', '20', '21', '22', '23'];
+        chat['seriesData'] = {
+            data : chatSeriesVal,
+            type: 'line',
+            areaStyle: {}
+        }
+
+
+
+        var statEc = echarts.init(document.getElementById('total_num_echart'));
+        var option = {
+                backgroundColor:'#fff',
+               
+                legend:{
+                    data:chat['xAxisData'],
+                    left:'center',
+                    top:'94%',
+                },
+                grid: {
+                    bottom: '9%',
+                    containLabel: true,
+                    x: 20,
+                    y: 20,
+                    x2: 20,
+                    y2: 20
+                },
+                xAxis:{
+                    type: 'category',
+                    boundaryGap: false,
+                    axisTick: {
+                        alignWithLabel: true
+                    },
+                    axisLabel: {
+                        interval: 1,
+                    },
+                    data: [],
+                },
+                yAxis: [],
+                graphic:[{
+                    type: 'group',
+                    right: 420,
+                    top: 50,
+                    z: 100,
+                    children: [{
+                        type: 'text',
+                        left: 'center',
+                        top: 'center',
+                        z: 100,
+                        style: {
+                            fill: '#ccc',
+                            text: args['site'],
+                            font: '16px Arial'
+                        }
+                    }]
+                }],
+                series:chat['seriesData'],
+            }
+
+        statEc.setOption(option);
     });
 }
 
+
+function wsOverview(){
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+var randstr = getRandomString(10);
+
+var html = '<div>\
+                <div style="padding-bottom:10px;">\
+                    <span>网站: </span>\
+                    <select class="bt-input-text" name="site" style="margin-left:4px;width:100px;">\
+                        <option value="unset">未设置</option>\
+                    </select>\
+                    <span style="margin-left:10px">时间: </span>\
+                    <div class="input-group" style="margin-left:10px;width:300px;display: inline-table;vertical-align: top;">\
+                        <div id="search_time" class="input-group-btn btn-group-sm">\
+                            <button data-name="today" type="button" class="btn btn-default">今日</button>\
+                            <button data-name="yesterday" type="button" class="btn btn-default">昨日</button>\
+                            <button data-name="l7" type="button" class="btn btn-default">近7天</button>\
+                            <button data-name="l30" type="button" class="btn btn-default">近30天</button>\
+                        </div>\
+                        <span class="last-span"><input data-name="" type="text" id="time_choose" lay-key="1000001_'+randstr+'" class="form-control btn-group-sm" autocomplete="off" placeholder="自定义时间" style="display: inline-block;font-size: 12px;padding: 0 10px;height:30px;width: 155px;"></span>\
+                    </div>\
+                    <span style="margin-left:10px">时间: </span>\
+                    <div class="input-group" style="width:100px;margin-left:10px;display: inline-table;vertical-align: top;">\
+                        <div id="time_order" class="input-group-btn btn-group-sm">\
+                            <button data-name="hour" type="button" class="btn btn-default">按时</button>\
+                            <button data-name="day" type="button" class="btn btn-default">按天</button>\
+                        </div>\
+                    </div>\
+                    <div class="input-group" style="width:30px;margin-left:10px;display: inline-table;vertical-align: top;">\
+                        <div class="input-group-btn btn-group-sm">\
+                            <button id="ov_refresh" data-name="refresh" type="button" class="btn btn-default">刷新</button>\
+                        </div>\
+                    </div>\
+                </div>\
+                <!-- stat --->\
+                <div class="overview_list" style="padding-top:10px;">\
+                    <div class="overview_box">\
+                        <p class="ov_title">浏览量(PV)<i class="tips" data-toggle="tooltip" data-placement="top" title="用户每次打开网站页面被记录1次。用户多次打开同一页面，访问量值累计多次。此指标衡量网站访问量情况。">?</i></p>\
+                        <p class="ov_num">0</p>\
+                    </div>\
+                    <div class="overview_box">\
+                        <p class="ov_title">访客量(UV)<i class="tips" data-toggle="tooltip" data-placement="top" title="访问您网站的上网电脑数量（以cookie为依据），此指标衡量独立访客数量情况。">?</i></p>\
+                        <p class="ov_num">0</p>\
+                    </div>\
+                    <div class="overview_box">\
+                        <p class="ov_title">IP数<i class="tips" data-toggle="tooltip" data-placement="top" title="当前时间段内您网站的独立访问ip数。">?</i></p>\
+                        <p class="ov_num">0</p>\
+                    </div>\
+                    <div class="overview_box">\
+                        <p class="ov_title">流量<i class="tips" data-toggle="tooltip" data-placement="top" title="当前时间段内您网站的总响应流量大小。包括已排除的请求。">?</i></p>\
+                        <p class="ov_num">0</p>\
+                    </div>\
+                    <div class="overview_box">\
+                        <p class="ov_title">请求<i class="tips" data-toggle="tooltip" data-placement="top" title="当前时间段内您网站的总请求数量。包括已排除的请求。">?</i></p>\
+                        <p class="ov_num">0</p>\
+                    </div>\
+                    <div class="overview_box">\
+                        <p class="ov_title">实时流量<i class="tips" data-toggle="tooltip" data-placement="top" title="当前10秒内您网站的实时流量大小。包括已排除的请求。">?</i></p>\
+                        <p class="ov_num">0</p>\
+                    </div>\
+                    <div class="overview_box">\
+                        <p class="ov_title">每秒请求<i class="tips" data-toggle="tooltip" data-placement="top" title="当前10秒内您网站的实时请求数量。包括已排除的请求。">?</i></p>\
+                        <p class="ov_num">0</p>\
+                    </div>\
+                </div>\
+                <div class="indicators">\
+                    <div class="indicators-container">\
+                        <span>趋势指标: </span>\
+                        <div class="indicators-label" bt-event-click="indicatorsType" data-name="pv">\
+                            <input type="radio" id="check_pv" name="check_pv" checked="">\
+                            <span class="check_pv" style="font-weight:normal">浏览量(PV)</span>\
+                        </div>\
+                        <div class="indicators-label" bt-event-click="indicatorsType" data-name="uv">\
+                            <input type="radio" id="check_uv" name="check_uv">\
+                            <span class="check_uv" style="font-weight:normal">访客量(UV)</span>\
+                        </div>\
+                        <div class="indicators-label" bt-event-click="indicatorsType" data-name="ip">\
+                            <input type="radio" id="check_ip" name="check_ip">\
+                            <span class="check_ip" style="font-weight:normal">IP数</span>\
+                        </div>\
+                        <div class="indicators-label" bt-event-click="indicatorsType" data-name="length">\
+                            <input type="radio" id="check_length" name="check_length">\
+                            <span class="check_length" style="font-weight:normal">流量</span>\
+                        </div>\
+                        <div class="indicators-label" bt-event-click="indicatorsType" data-name="req">\
+                            <input type="radio" id="check_req" name="check_req">\
+                            <span class="check_req" style="font-weight:normal">请求</span>\
+                        </div>\
+                        <div class="indicators-label" bt-event-click="indicatorsType" data-name="realtime_traffic">\
+                            <input type="radio" id="check_realtime_traffic" name="check_realtime_traffic"> \
+                            <span class="check_realtime_traffic" style="font-weight:normal">实时流量</span>\
+                        </div>\
+                        <div class="indicators-label" bt-event-click="indicatorsType" data-name="realtime_request">\
+                            <input type="radio" id="check_realtime_request" name="check_realtime_request">\
+                            <span class="check_realtime_request" style="font-weight:normal">每秒请求</span>\
+                        </div>\
+                    </div>\
+                </div>\
+                <div class="total_num_echart" id="total_num_echart" style="height:330px;"></div>\
+            </div>';
+$(".soft-man-con").html(html);
+$('[data-toggle="tooltip"]').tooltip();
+//日期范围
+laydate.render({
+    elem: '#time_choose',
+    value:'',
+    range:true,
+    done:function(value, startDate, endDate){
+        if(!value){
+            return false;
+        }
+
+        $('#search_time button').each(function(){
+            $(this).removeClass('cur');
+        });
+
+        var timeA  = value.split('-')
+        var start = $.trim(timeA[0]+'-'+timeA[1]+'-'+timeA[2])
+        var end = $.trim(timeA[3]+'-'+timeA[4]+'-'+timeA[5])
+        query_txt = toUnixTime(start + " 00:00:00") + "-"+ toUnixTime(end + " 00:00:00")
+
+        $('#time_choose').attr("data-name",query_txt);
+        $('#time_choose').addClass("cur");
+
+        wsOverviewRequest(1);
+    },
+});
+
+$('#ov_refresh').click(function(){
+    wsOverviewRequest(1);
+});
+
+$('#time_order button:eq(0)').addClass('cur');
+$('#time_order button').click(function(){
+    $('#time_order button').each(function(){
+        if ($(this).hasClass('cur')){
+            $(this).removeClass('cur');
+        }
+    });
+    $(this).addClass('cur');
+    wsOverviewRequest(1);
+});
+
+
+
+$('#search_time button:eq(0)').addClass('cur');
+$('#search_time button').click(function(){
+    $('#search_time button').each(function(){
+        if ($(this).hasClass('cur')){
+            $(this).removeClass('cur');
+        }
+    });
+    $('#time_choose').attr("data-name",'');
+    $('#time_choose').removeClass("cur");
+
+    $(this).addClass('cur');
+
+    wsOverviewRequest(1);
+});
+
+
+$('.indicators-container input').click(function(){
+    $('.indicators-container input').each(function(){
+        $(this).removeAttr('checked');
+    });
+    $(this).prop({'checked':true});
+    wsOverviewRequest(1);
+});
+
+wsPost('get_default_site','',{},function(rdata){
+    $('select[name="site"]').html('');
+
+    var rdata = $.parseJSON(rdata.data);
+    var rdata = rdata.data;
+    var default_site = rdata["default"];
+    var select = '';
+    for (var i = 0; i < rdata["list"].length; i++) {
+        if (default_site ==  rdata["list"][i]){
+            select += '<option value="'+rdata["list"][i]+'" selected>'+rdata["list"][i]+'</option>';
+        } else{
+            select += '<option value="'+rdata["list"][i]+'">'+rdata["list"][i]+'</option>';
+        }
+    }
+    $('select[name="site"]').html(select);
+    wsOverviewRequest(1);
+
+    $('select[name="site"]').change(function(){
+        wsOverviewRequest(1);
+    });
+});
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+}
+
+
+function wsSitesList(){
+
+}
 
 function wsSpiderStatLogRequest(page){
 

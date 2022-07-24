@@ -313,6 +313,78 @@ def setDefaultSite(name):
     return mw.returnJson(True, 'OK')
 
 
+def toSumField(sql):
+    l = sql.split(",")
+    field = ""
+    for x in l:
+        field += "sum(" + x + ") as " + x + ","
+    field = field.strip(',')
+    return field
+
+
+def getOverviewList():
+    args = getArgs()
+    check = checkArgs(args, ['site', 'query_date', 'order'])
+    if not check[0]:
+        return check[1]
+
+    domain = args['site']
+    query_date = args['query_date']
+    order = args['order']
+
+    setDefaultSite(domain)
+    conn = pSqliteDb('request_stat', domain)
+    conn = conn.where("1=1", ())
+
+    field = 'time,req,pv,uv,ip,length'
+    field_sum = toSumField(field.replace("time,", ""))
+
+    time_field = "substr(time,1,8),"
+    if order == "hour":
+        time_field = "substr(time,9,10),"
+
+    field_sum = time_field + field_sum
+    conn = conn.field(field_sum)
+    if query_date == "today":
+        todayTime = time.strftime(
+            '%Y%m%d00', time.localtime(time.time() - 0 * 86400))
+        conn.andWhere("time >= ?", (todayTime,))
+    elif query_date == "yesterday":
+        startTime = time.strftime(
+            '%Y%m%d00', time.localtime(time.time() - 1 * 86400))
+        endTime = time.strftime(
+            '%Y%m%d00', time.localtime(time.time()))
+        conn.andWhere("time>=? and time<=?", (startTime, endTime))
+    elif query_date == "l7":
+        todayTime = time.strftime(
+            '%Y%m%d00', time.localtime(time.time() - 7 * 86400))
+        conn.andWhere("time >= ?", (todayTime,))
+    elif query_date == "l30":
+        todayTime = time.strftime(
+            '%Y%m%d00', time.localtime(time.time() - 30 * 86400))
+        conn.andWhere("time >= ?", (todayTime,))
+    else:
+        exlist = query_date.split("-")
+        start = time.strftime(
+            '%Y%m%d00', time.localtime(int(exlist[0])))
+        end = time.strftime(
+            '%Y%m%d23', time.localtime(int(exlist[1])))
+        conn.andWhere("time >= ? and time <= ? ", (start, end,))
+
+    # 统计总数
+    stat_list = conn.inquiry(field)
+    del(stat_list[0]['time'])
+
+    # 分组统计
+    dlist = conn.group(time_field.strip(",")).inquiry(field)
+
+    data = {}
+    data['data'] = dlist
+    data['stat_list'] = stat_list[0]
+
+    return mw.returnJson(True, 'ok', data)
+
+
 def getLogsList():
     args = getArgs()
     check = checkArgs(args, ['page', 'page_size',
@@ -452,15 +524,6 @@ def getLogsErrorList():
     return mw.returnJson(True, 'ok', data)
 
 
-def toSumField(sql):
-    l = sql.split(",")
-    field = ""
-    for x in l:
-        field += "sum(" + x + ") as " + x + ","
-    field = field.strip(',')
-    return field
-
-
 def getClientStatList():
     args = getArgs()
     check = checkArgs(args, ['page', 'page_size',
@@ -491,9 +554,11 @@ def getClientStatList():
             '%Y%m%d00', time.localtime(time.time() - 0 * 86400))
         stat.where("time >= ?", (todayTime,))
     elif query_date == "yesterday":
-        todayTime = time.strftime(
+        startTime = time.strftime(
             '%Y%m%d00', time.localtime(time.time() - 1 * 86400))
-        stat.where("time >= ?", (todayTime,))
+        endTime = time.strftime(
+            '%Y%m%d00', time.localtime(time.time()))
+        stat.where("time>=? and time<=?", (startTime, endTime))
     elif query_date == "l7":
         todayTime = time.strftime(
             '%Y%m%d00', time.localtime(time.time() - 7 * 86400))
@@ -632,9 +697,11 @@ def getSpiderStatList():
             '%Y%m%d00', time.localtime(time.time() - 0 * 86400))
         stat.where("time >= ?", (todayTime,))
     elif query_date == "yesterday":
-        todayTime = time.strftime(
+        startTime = time.strftime(
             '%Y%m%d00', time.localtime(time.time() - 1 * 86400))
-        stat.where("time >= ?", (todayTime,))
+        endTime = time.strftime(
+            '%Y%m%d00', time.localtime(time.time()))
+        stat.where("time>=? and time<=?", (startTime, endTime))
     elif query_date == "l7":
         todayTime = time.strftime(
             '%Y%m%d00', time.localtime(time.time() - 7 * 86400))
@@ -719,6 +786,8 @@ if __name__ == "__main__":
         print(setGlobalConf())
     elif func == 'get_default_site':
         print(getDefaultSite())
+    elif func == 'get_overview_list':
+        print(getOverviewList())
     elif func == 'get_logs_list':
         print(getLogsList())
     elif func == 'get_logs_error_list':
