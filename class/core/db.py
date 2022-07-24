@@ -189,7 +189,6 @@ class Sql():
     def add(self, keys, param):
         # 插入数据
         self.__GetConn()
-        self.__DB_CONN.text_factory = str
         try:
             values = ""
             for key in keys.split(','):
@@ -226,7 +225,6 @@ class Sql():
     def addAll(self, keys, param):
         # 插入数据
         self.__GetConn()
-        self.__DB_CONN.text_factory = str
         try:
             values = ""
             for key in keys.split(','):
@@ -246,7 +244,6 @@ class Sql():
     def save(self, keys, param):
         # 更新数据
         self.__GetConn()
-        self.__DB_CONN.text_factory = str
         try:
             opt = ""
             for key in keys.split(','):
