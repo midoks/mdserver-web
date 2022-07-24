@@ -8,8 +8,7 @@ function str2Obj(str){
     return data;
 }
 
-function wsPost(method, version, args,callback){
-    var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
+function wsOriginPost(method, version, args, callback){
 
     var req_data = {};
     req_data['name'] = 'webstats';
@@ -23,17 +22,25 @@ function wsPost(method, version, args,callback){
     }
 
     $.post('/plugins/run', req_data, function(data) {
-        layer.close(loadT);
         if (!data.status){
             //错误展示10S
             layer.msg(data.msg,{icon:0,time:2000,shade: [10, '#000']});
             return;
         }
-
         if(typeof(callback) == 'function'){
             callback(data);
         }
     },'json'); 
+}
+
+
+
+function wsPost(method, version, args,callback){
+    var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
+    wsOriginPost(method, version, args,function(data){
+        layer.close(loadT);
+        callback(data);
+    });
 }
 
 function wsPostCallbak(method, version, args,callback){
@@ -82,7 +89,12 @@ function makeHoursData(data, type="ip"){
     var tmpdata = {};
     for (var i = 0; i < data.length; i++) {
         var tk = data[i]['time'];
-        tmpdata[tk] = data[i];
+
+        var v =  data[i];
+        if (type=='length'){
+            v['length'] = (v['length']/1024).toFixed();
+        }
+        tmpdata[tk] = v;
     }
 
     var val = [];
@@ -111,7 +123,12 @@ function makeDayData(data, type="ip") {
         var tk = data[i]['time'];
 
         rdata_key.push(tk);
-        rdata_val.push(data[i][type])
+
+        var v = data[i];
+        if (type=='length'){
+            v['length'] = (v['length']/1024).toFixed();
+        }
+         rdata_val.push(v)
     }
 
     rdata['key'] = rdata_key;
@@ -120,8 +137,24 @@ function makeDayData(data, type="ip") {
     return rdata
 }
 
+function getTime() {
+    var now = new Date();
+    var hour = now.getHours();
+    var minute = now.getMinutes();
+    var second = now.getSeconds();
+    if (minute < 10) {
+        minute = "0" + minute;
+    }
+    if (second < 10) {
+        second = "0" + second;
+    }
+    var nowdate = hour + ":" + minute + ":" + second;
+    return nowdate;
+}
 
+var ovTimer = null;
 function wsOverviewRequest(page){
+    clearInterval(ovTimer);
 
     var args = {};
 
@@ -138,10 +171,8 @@ function wsOverviewRequest(page){
 
     var select_option = $('.indicators-container input:checked').parent().attr('data-name');
 
-    if (select_option == 'realtime_traffic' || select_option == 'realtime_request'){
-        return;
-    }
-    console.log(select_option);
+    console.log($('.indicators-container input:checked').parent().find('span').text());
+    // console.log(select_option);
 
     wsPost('get_overview_list', '' ,args, function(rdata){
         var rdata = $.parseJSON(rdata.data);
@@ -177,10 +208,13 @@ function wsOverviewRequest(page){
             "value":[]
         }
 
-        if (args['order'] == 'hour'){
-            tmpChatData = makeHoursData(data, select_option);
+        if (select_option == 'realtime_traffic' || select_option == 'realtime_request'){
         } else {
-            tmpChatData = makeDayData(data, select_option);
+            if (args['order'] == 'hour'){
+                tmpChatData = makeHoursData(data, select_option);
+            } else {
+                tmpChatData = makeDayData(data, select_option);
+            }
         }
 
 
@@ -251,7 +285,8 @@ function wsOverviewRequest(page){
             }
         }
 
-        chat['legendData'] = ["PV浏览"];
+        var legendName = $('.indicators-container input:checked').parent().find('span').text()
+        chat['legendData'] = [legendName];
 
         var statEc = echarts.init(document.getElementById('total_num_echart'));
         var option = {
@@ -299,6 +334,7 @@ function wsOverviewRequest(page){
             }],
             series: [
             {
+                name:legendName,
                 data: tmpChatData["value"],
                 type: 'line',
                 smooth: true, 
@@ -326,6 +362,60 @@ function wsOverviewRequest(page){
         };
 
         statEc.setOption(option);
+
+        if (select_option == 'realtime_traffic' || select_option == 'realtime_request'){
+            
+            var xData = [];
+            var yData = [];
+            ovTimer = setInterval(function(){
+                var select_option = $('.indicators-container input:checked').parent().attr('data-name');
+                if (select_option != "realtime_traffic" && select_option != 'realtime_request' ){
+                    clearInterval(ovTimer);
+                    console.log("get_logs_realtime_info over:"+select_option);
+                    return;
+                }
+
+                wsOriginPost("get_logs_realtime_info",'',{"site":args["site"], "type":select_option} , function(rdata){    
+                    
+                    var rdata = $.parseJSON(rdata.data);
+
+                    var realtime_traffic = rdata.data['realtime_traffic'];
+                    var realtime_request = rdata.data['realtime_request'];
+
+                    realtime_traffic_calc = (realtime_traffic/1024).toFixed()
+
+
+                    $('.overview_list .overview_box:eq(5) .ov_num').text(realtime_traffic_calc+"kb");
+                    $('.overview_list .overview_box:eq(6) .ov_num').text(realtime_request);
+
+                    
+                    var realtime_name = select_option == 'realtime_traffic' ? '实时流量':'每秒请求';
+                    var val = realtime_request;
+                    if (select_option == 'realtime_traffic'){
+                        val = realtime_traffic_calc;
+                        realtime_name = realtime_name + " "+ realtime_traffic_calc + "kb";
+                    }
+
+                    xData.push(getTime());
+                    yData.push(val);
+
+                    if (xData.length > 20){
+                        xData.shift();
+                        yData.shift();
+                    }
+
+                    statEc.setOption({
+                        xAxis: {
+                            data: xData
+                        },
+                        series: [{
+                            name: realtime_name,
+                            data: yData
+                        }]
+                    });
+                });
+            },2000);
+        }
     });
 }
 
@@ -496,14 +586,7 @@ $('.indicators-container input').click(function(){
     });
     $(this).prop({'checked':true});
 
-    //实时请求不会执行
     wsOverviewRequest(1);
-
-    //实时请求
-    var select_option = $(this).attr('data-name');
-    if (select_option == 'realtime_traffic' || select_option == 'realtime_request'){
-        return;
-    }
 });
 
 wsPost('get_default_site','',{},function(rdata){

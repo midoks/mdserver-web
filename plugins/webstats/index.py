@@ -388,6 +388,44 @@ def getOverviewList():
     return mw.returnJson(True, 'ok', data)
 
 
+def getLogsRealtimeInfo():
+    '''
+    实时信息
+    '''
+    import datetime
+    args = getArgs()
+    check = checkArgs(args, ['site', 'type'])
+    if not check[0]:
+        return check[1]
+
+    domain = args['site']
+    dtype = args['type']
+
+    conn = pSqliteDb('web_logs', domain)
+    timeInt = time.mktime(datetime.datetime.now().timetuple())
+
+    conn = conn.where("time>=?", (int(timeInt) - 10,))
+
+    field = 'time,body_length'
+    field_sum = toSumField(field.replace("time,", ""))
+    time_field = "substr(time,1,2) as time,"
+    time_field = time_field + field_sum
+    clist = conn.field(time_field.strip(",")).group(
+        'substr(time,1,2)').inquiry(field)
+
+    body_count = 0
+    if len(clist) > 0:
+        body_count = clist[0]['body_length']
+
+    req_count = conn.count()
+
+    data = {}
+    data['realtime_traffic'] = body_count
+    data['realtime_request'] = req_count
+
+    return mw.returnJson(True, 'ok', data)
+
+
 def getLogsList():
     args = getArgs()
     check = checkArgs(args, ['page', 'page_size',
@@ -795,6 +833,8 @@ if __name__ == "__main__":
         print(getLogsList())
     elif func == 'get_logs_error_list':
         print(getLogsErrorList())
+    elif func == 'get_logs_realtime_info':
+        print(getLogsRealtimeInfo())
     elif func == 'get_client_stat_list':
         print(getClientStatList())
     elif func == 'get_spider_stat_list':
