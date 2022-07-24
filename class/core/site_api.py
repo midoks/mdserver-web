@@ -1537,7 +1537,7 @@ class site_api:
         rep = "http(s)?\:\/\/([a-zA-Z0-9][-a-zA-Z0-9]{0,62}\.)+([a-zA-Z0-9][a-zA-Z0-9]{0,62})+.?"
         if not re.match(rep, _to):
             return mw.returnJson(False, "错误的目标地址!")
-
+        _to = _to.strip("/")
         # get host from url
         try:
             if _host == "$host":
