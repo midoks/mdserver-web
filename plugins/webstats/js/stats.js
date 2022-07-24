@@ -181,8 +181,8 @@ function wsSpiderStatLogRequest(page){
     }
     args['query_date'] = query_date;
 
-    args['tojs'] = 'wsClientStatLogRequest';
-    wsPost('get_client_stat_list', '' ,args, function(rdata){
+    args['tojs'] = 'wsSpiderStatLogRequest';
+    wsPost('get_spider_stat_list', '' ,args, function(rdata){
         var rdata = $.parseJSON(rdata.data);
         var list = '';
         var data = rdata.data.data;
@@ -190,23 +190,23 @@ function wsSpiderStatLogRequest(page){
             for(i in data){
                 list += '<tr>';
                 list += '<td>' + data[i]['time']+'</td>';
-                list += '<td>' + data[i]['android'] +'</td>';
-                list += '<td>' + data[i]['iphone'] +'</td>';
-                list += '<td>' + data[i]['windows'] +'</td>';
-                list += '<td>' + data[i]['chrome'] +'</td>';
-                list += '<td>' + data[i]['weixin'] +'</td>';
+                list += '<td>' + data[i]['baidu'] +'</td>';
+                list += '<td>' + data[i]['bing'] +'</td>';
                 list += '<td>' + data[i]['qh360'] +'</td>';
-                list += '<td>' + data[i]['edeg'] +'</td>';
-                list += '<td>' + data[i]['firefox'] +'</td>';
-                list += '<td>' + data[i]['safari'] +'</td>';
-                list += '<td>' + data[i]['mac'] +'</td>';
-                list += '<td>' + data[i]['msie'] +'</td>';
-                list += '<td>' + data[i]['machine'] +'</td>';
+                list += '<td>' + data[i]['google'] +'</td>';
+                list += '<td>' + data[i]['bytes'] +'</td>';
+                list += '<td>' + data[i]['sogou'] +'</td>';
+                list += '<td>' + data[i]['soso'] +'</td>';
+                list += '<td>' + data[i]['youdao'] +'</td>';
+                list += '<td>' + data[i]['youdao'] +'</td>';
+                list += '<td>' + data[i]['dnspod'] +'</td>';
+                list += '<td>' + data[i]['yandex'] +'</td>';
+                list += '<td>' + data[i]['other'] +'</td>';
                 list += '<td>' + data[i]['other'] +'</td>';
                 list += '</tr>';
             }
         } else{
-             list += '<tr><td colspan="14" style="text-align:center;">客服端列表为空</td></tr>';
+             list += '<tr><td colspan="14" style="text-align:center;">蜘蛛列表为空</td></tr>';
         }
         
         var table = '<div class="tablescroll">\
@@ -217,15 +217,15 @@ function wsSpiderStatLogRequest(page){
                             <th>必应</th>\
                             <th>奇虎360</th>\
                             <th>Google</th>\
-                            <th>微信</th>\
-                            <th>360</th>\
-                            <th>Edge</th>\
-                            <th>火狐</th>\
-                            <th>Safari</th>\
-                            <th>Mac</th>\
-                            <th>IE</th>\
-                            <th>机器 <span class="tips" data-toggle="tooltip" data-placement="bottom" title="机器或者脚本应用程序访问，包括：Curl、HeadlessChrome、Bot、Wget、Spider、Crawler、Scrapy、zgrab、Python、java, ab 此类关键词">?</span></th>\
-                            <th>其他</th>\</tr></thead>\
+                            <th>头条</th>\
+                            <th>搜狗</th>\
+                            <th>搜搜</th>\
+                            <th>神马</th>\
+                            <th>有道</th>\
+                            <th>DNSPOD</th>\
+                            <th>Yandex</th>\
+                            <th>其他 <span class="tips" data-toggle="tooltip" data-placement="bottom" title="包括Yahoo,DuckDuckGo">?</span></th>\
+                            <th>操作</th>\</tr></thead>\
                             <tbody>\
                             '+ list +'\
                             </tbody></table>\
@@ -235,99 +235,20 @@ function wsSpiderStatLogRequest(page){
         $('#wsPage').html(rdata.data.page);
         $('[data-toggle="tooltip"]').tooltip();
 
+        var sumData = rdata.data.sum_data;
+
+        
+        $('#spider_left_total .request_spider').text(sumData.spider);
+        $('#spider_left_total .request_total').text(sumData.reqest_total);
 
         // 图形化
         var initData = rdata.data.stat_list;
-        var sumData = rdata.data.sum_data;
+        
         var colorList = ['#6ec71e','#4885FF'];
-        var source_name = {android:'安卓',iphone:'iOS',windows:'Windows',chrome:'Chrome',weixin:'微信',qh360:'360',edeg:'Edge',firefox:'火狐',safari:'Safari',mac:'Mac',linux:'Linux',msie:'IE',metasr:'搜狗',theworld:'世界之窗',tt:'腾讯TT',maxthon:'遨游',opera:'Opera',qq:'QQ浏览器',uc:'UC',pc2345:'2345',other:'其他',machine:'Machine'};
+        var source_name = {baidu:'百度',google:'Google',bytes:'头条',soso:'搜搜',bing:'必应',qh360:'奇虎360',youdao:'有道',yandex:'Yandex',dnspod:'DNSPOD',mpcrawler:'mpcrawler',other:'其他',};
         var lenend2_obj = {};
 
-        var leftEc = echarts.init(document.getElementById('echart_left_total'));
         var rightEc = echarts.init(document.getElementById('echart_right_total'));
-
-
-        var datas = [
-            { value: sumData.pc, name: 'PC客服端' },
-            { value: sumData.mobile, name: '移动客服端' },
-        ];
-
-        var leftOption = {
-            backgroundColor:'#fff',
-            title: {
-                text: sumData.reqest_total,
-                textStyle: {
-                    color: '#484848',
-                    fontSize: 17
-                },
-                subtext: '总请求数',
-                subtextStyle: {
-                    color: '#717171',
-                    fontSize: 15
-                },
-                itemGap: 20,
-                left: 'center',
-                top: '42%'
-            },
-            tooltip: {
-                trigger: 'item'
-            },
-            series: [{
-                type: 'pie',
-                radius: ['45%', '55%'],
-                center: ["50%", "50%"],
-                clockwise: true,
-                avoidLabelOverlap: false,
-                hoverOffset: 15,
-                itemStyle: {
-                    normal: {
-                        label: {
-                            show: true,
-                            position: 'outside',
-                            color: '#666',
-                            formatter: function(params) {
-                                var percent = 0;
-                                var total = 0;
-                                for (var i = 0; i < datas.length; i++) {
-                                    total += datas[i].value;
-                                }
-                                if(params.name !== '') {
-                                    return params.name + '\n' + '\n' +  params.value + '/次';
-                                }else {
-                                    return '';
-                                }
-                            },
-                        },
-                        labelLine: {
-                            length: 20,
-                            length2: 10
-                        },
-                        color: function(params) {
-                            return colorList[params.dataIndex]
-                        }
-                    }
-                },
-                data: datas
-            },{
-                itemStyle: {
-                    normal: {
-                        color: '#F5F6FA',
-                    }
-                },
-                type: 'pie',
-                hoverAnimation: false,
-                radius: ['42%', '58%'],
-                center: ["50%", "50%"],
-                label: {
-                    normal: {
-                        show:false,
-                    }
-                },
-                data: [],
-                z:-1
-            }]
-        }
-        leftEc.setOption(leftOption);
 
         var xAxixName = $('#search_time button.cur').text();
         var is_compare  = false;
@@ -450,7 +371,7 @@ function wsSpiderStatLogRequest(page){
             if (num < 1){
                 legend_option.legend[0].selected[params.name] = true;
             }
-            this.setOption(legend_option)
+            this.setOption(legend_option);
         });
     });
 }
@@ -478,8 +399,11 @@ var html = '<div>\
                     </div>\
                 </div>\
                 <div class="echart_container">\
-                    <div id="echart_left_total" style="height: 280px; width: 300px;display: inline-block;position: relative;"></div>\
-                    <div id="echart_right_total" style="height: 280px; width: 450px;display: inline-block;position: relative;"></div>\
+                    <div id="spider_left_total" style="height: 280px; width: 100px;display: inline-block;position: relative;">\
+                        <div class="total_num_box"><p class="tn_title">总蜘蛛</p><p class="tn_num request_spider">0</p></div>\
+                        <div class="total_num_box"><p class="tn_title">总请求</p><p class="tn_num request_total">0</p></div>\
+                    </div>\
+                    <div id="echart_right_total" style="height: 280px; width: 650px;display: inline-block;position: relative;"></div>\
                 </div>\
                 <div class="divtable mtb10" id="ws_table"></div>\
             </div>';

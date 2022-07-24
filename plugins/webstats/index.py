@@ -577,6 +577,29 @@ def getClientStatList():
     return mw.returnJson(True, 'ok', data)
 
 
+def getWebLogCount(domain, query_date):
+    conn = pSqliteDb('web_logs', domain)
+
+    todayTime = time.strftime('%Y-%m-%d 00:00:00', time.localtime())
+    todayUt = int(time.mktime(time.strptime(todayTime, "%Y-%m-%d %H:%M:%S")))
+    if query_date == 'today':
+        conn = conn.where("time>=?", (todayUt,))
+    elif query_date == "yesterday":
+        conn = conn.where("time>=? and time<=?", (todayUt - 86400, todayUt))
+    elif query_date == "l7":
+        conn = conn.where("time>=?", (todayUt - 7 * 86400,))
+    elif query_date == "l30":
+        conn = conn.where("time>=?", (todayUt - 30 * 86400,))
+    else:
+        exlist = query_date.split("-")
+        conn = conn.where("time>=? and time<=?", (exlist[0], exlist[1]))
+
+    count_key = "count(*) as num"
+    count = conn.field(count_key).limit('').order('').inquiry()
+    count = count[0][count_key]
+    return count
+
+
 def getSpiderStatList():
     args = getArgs()
     check = checkArgs(args, ['page', 'page_size',
@@ -594,9 +617,11 @@ def getSpiderStatList():
     conn = pSqliteDb('spider_stat', domain)
     stat = pSqliteDb('spider_stat', domain)
 
+    total_req = getWebLogCount(domain, query_date)
+
     # 列表
     limit = str(page_size) + ' offset ' + str(page_size * (page - 1))
-    field = 'time,weixin,android,iphone,mac,windows,linux,edeg,firefox,msie,metasr,qh360,theworld,tt,maxthon,opera,qq,uc,pc2345,safari,chrome,machine,mobile,other'
+    field = 'time,bytes,bing,soso,yahoo,sogou,google,baidu,qh360,youdao,yandex,dnspod,other'
     field_sum = toSumField(field.replace("time,", ""))
     time_field = "substr(time,1,8),"
     field_sum = time_field + field_sum
@@ -632,39 +657,21 @@ def getSpiderStatList():
     if len(statlist) > 0:
         del(statlist[0]['time'])
 
-        pc = 0
-        pc_key_list = ['chrome', 'qh360', 'edeg', 'firefox', 'safari', 'msie',
-                       'metasr', 'theworld', 'tt', 'maxthon', 'opera', 'qq', 'pc2345']
+        spider_total = 0
+        for x in statlist[0]:
+            spider_total += statlist[0][x]
 
-        for x in pc_key_list:
-            pc += statlist[0][x]
-
-        mobile = 0
-        mobile_key_list = ['mobile', 'android', 'iphone', 'weixin']
-        for x in mobile_key_list:
-            mobile += statlist[0][x]
-        reqest_total = pc + mobile
-
-        sum_data = {
-            "pc": pc,
-            "mobile": mobile,
-            "reqest_total": reqest_total,
-        }
-
+        sum_data = {"spider": spider_total, "reqest_total": total_req}
         statlist = sorted(statlist[0].items(),
                           key=lambda x: x[1], reverse=True)
-        _statlist = statlist[0:10]
+        _statlist = statlist[0:9]
         __statlist = {}
         statlist = []
         for x in _statlist:
             __statlist[x[0]] = x[1]
         statlist.append(__statlist)
     else:
-        sum_data = {
-            "pc": 0,
-            "mobile": 0,
-            "reqest_total": 0,
-        }
+        sum_data = {"spider": 0, "reqest_total": total_req}
         statlist = []
 
     # 列表数据
@@ -673,7 +680,7 @@ def getSpiderStatList():
         limit).order('time desc').inquiry(field)
 
     sql = "SELECT count(*) num from (\
-            SELECT count(*) as num FROM client_stat GROUP BY substr(time,1,8)\
+            SELECT count(*) as num FROM spider_stat GROUP BY substr(time,1,8)\
         )"
     result = conn.query(sql, ())
     result = list(result)

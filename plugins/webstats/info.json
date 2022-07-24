@@ -4,7 +4,7 @@
 	"name": "webstats",
 	"title": "网站统计",
 	"shell": "install.sh",
-	"versions":["0.0.8"],
+	"versions":["0.1.0"],
 	"tip": "soft",
 	"checks": "server/webstats",
 	"path": "server/webstats",
