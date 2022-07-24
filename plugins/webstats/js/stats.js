@@ -980,7 +980,7 @@ function wsTableErrorLogRequest(page){
             for(i in data){
                 list += '<tr>';
                 list += '<td>' + getLocalTime(data[i]['time'])+'</td>';
-                list += '<td>' + data[i]['domain'] +'</td>';
+                list += '<td><span class="overflow_hide" style="width:100px;">' + data[i]['domain'] +'</span></td>';
                 list += '<td>' + data[i]['ip'] +'</td>';
                 list += '<td>' + toSize(data[i]['body_length']) +'</td>';
                 list += '<td>' + data[i]['request_time'] +'ms</td>';
@@ -1189,7 +1189,7 @@ function wsTableLogRequest(page){
             for(i in data){
                 list += '<tr>';
                 list += '<td>' + getLocalTime(data[i]['time'])+'</td>';
-                list += '<td>' + data[i]['domain'] +'</td>';
+                list += '<td><span class="overflow_hide" style="width:100px;">' + data[i]['domain'] +'</span></td>';
                 list += '<td>' + data[i]['ip'] +'</td>';
                 list += '<td>' + toSize(data[i]['body_length']) +'</td>';
                 list += '<td>' + data[i]['request_time'] +'ms</td>';
