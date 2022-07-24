@@ -154,6 +154,8 @@ def pSqliteDb(dbname='web_logs', site_name='unset'):
             conn.execute(sql_list[index], ())
     else:
         conn = mw.M(dbname).dbPos(db_dir, name)
+
+    conn.text_factory = str
     return conn
 
 
@@ -575,6 +577,122 @@ def getClientStatList():
 
     return mw.returnJson(True, 'ok', data)
 
+
+def getSpiderStatList():
+    args = getArgs()
+    check = checkArgs(args, ['page', 'page_size',
+                             'site', 'query_date'])
+    if not check[0]:
+        return check[1]
+
+    page = int(args['page'])
+    page_size = int(args['page_size'])
+    domain = args['site']
+    tojs = args['tojs']
+    query_date = args['query_date']
+    setDefaultSite(domain)
+
+    conn = pSqliteDb('spider_stat', domain)
+    stat = pSqliteDb('spider_stat', domain)
+
+    # 列表
+    limit = str(page_size) + ' offset ' + str(page_size * (page - 1))
+    field = 'time,weixin,android,iphone,mac,windows,linux,edeg,firefox,msie,metasr,qh360,theworld,tt,maxthon,opera,qq,uc,pc2345,safari,chrome,machine,mobile,other'
+    field_sum = toSumField(field.replace("time,", ""))
+    time_field = "substr(time,1,8),"
+    field_sum = time_field + field_sum
+
+    stat = stat.field(field_sum)
+    if query_date == "today":
+        todayTime = time.strftime(
+            '%Y%m%d00', time.localtime(time.time() - 0 * 86400))
+        stat.where("time >= ?", (todayTime,))
+    elif query_date == "yesterday":
+        todayTime = time.strftime(
+            '%Y%m%d00', time.localtime(time.time() - 1 * 86400))
+        stat.where("time >= ?", (todayTime,))
+    elif query_date == "l7":
+        todayTime = time.strftime(
+            '%Y%m%d00', time.localtime(time.time() - 7 * 86400))
+        stat.where("time >= ?", (todayTime,))
+    elif query_date == "l30":
+        todayTime = time.strftime(
+            '%Y%m%d00', time.localtime(time.time() - 30 * 86400))
+        stat.where("time >= ?", (todayTime,))
+    else:
+        exlist = query_date.split("-")
+        start = time.strftime(
+            '%Y%m%d00', time.localtime(int(exlist[0])))
+        end = time.strftime(
+            '%Y%m%d23', time.localtime(int(exlist[1])))
+        stat.where("time >= ? and time <= ? ", (start, end,))
+
+    # 图表数据
+    statlist = stat.group('substr(time,1,4)').inquiry(field)
+
+    if len(statlist) > 0:
+        del(statlist[0]['time'])
+
+        pc = 0
+        pc_key_list = ['chrome', 'qh360', 'edeg', 'firefox', 'safari', 'msie',
+                       'metasr', 'theworld', 'tt', 'maxthon', 'opera', 'qq', 'pc2345']
+
+        for x in pc_key_list:
+            pc += statlist[0][x]
+
+        mobile = 0
+        mobile_key_list = ['mobile', 'android', 'iphone', 'weixin']
+        for x in mobile_key_list:
+            mobile += statlist[0][x]
+        reqest_total = pc + mobile
+
+        sum_data = {
+            "pc": pc,
+            "mobile": mobile,
+            "reqest_total": reqest_total,
+        }
+
+        statlist = sorted(statlist[0].items(),
+                          key=lambda x: x[1], reverse=True)
+        _statlist = statlist[0:10]
+        __statlist = {}
+        statlist = []
+        for x in _statlist:
+            __statlist[x[0]] = x[1]
+        statlist.append(__statlist)
+    else:
+        sum_data = {
+            "pc": 0,
+            "mobile": 0,
+            "reqest_total": 0,
+        }
+        statlist = []
+
+    # 列表数据
+    conn = conn.field(field_sum)
+    clist = conn.group('substr(time,1,8)').limit(
+        limit).order('time desc').inquiry(field)
+
+    sql = "SELECT count(*) num from (\
+            SELECT count(*) as num FROM client_stat GROUP BY substr(time,1,8)\
+        )"
+    result = conn.query(sql, ())
+    result = list(result)
+    count = result[0][0]
+
+    data = {}
+    _page = {}
+    _page['count'] = count
+    _page['p'] = page
+    _page['row'] = page_size
+    _page['tojs'] = tojs
+    data['page'] = mw.getPage(_page)
+    data['data'] = clist
+    data['stat_list'] = statlist
+    data['sum_data'] = sum_data
+
+    return mw.returnJson(True, 'ok', data)
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -601,6 +719,7 @@ if __name__ == "__main__":
         print(getLogsErrorList())
     elif func == 'get_client_stat_list':
         print(getClientStatList())
-
+    elif func == 'get_spider_stat_list':
+        print(getSpiderStatList())
     else:
         print('error')
