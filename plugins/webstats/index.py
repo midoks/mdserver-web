@@ -407,7 +407,7 @@ def getLogsErrorList():
     limit = str(page_size) + ' offset ' + str(page_size * (page - 1))
     conn = pSqliteDb('web_logs', domain)
 
-    field = 'time,ip,domain,server_name,method,protocol,status_code,request_headers,ip_list,client_port,body_length,user_agent,referer,request_time,uri,body_length'
+    field = 'time,ip,domain,server_name,method,protocol,status_code,ip_list,client_port,body_length,user_agent,referer,request_time,uri,body_length'
     conn = conn.field(field)
     conn = conn.where("1=1", ())
 
