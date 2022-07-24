@@ -64,6 +64,63 @@ function wsPostCallbak(method, version, args,callback){
 }
 
 
+function makeHoursData(data, type="ip"){
+    var list = [];
+    var rlist = [];
+    for (var i = 0; i < 24; i++) {
+        if (i<10){
+            list.push("0"+i)
+        } else {
+            list.push(i+"")
+        }
+        rlist.push(i+"")
+    }
+
+    var rdata = {};
+    rdata['key'] = rlist;
+
+    var tmpdata = {};
+    for (var i = 0; i < data.length; i++) {
+        var tk = data[i]['time'];
+        tmpdata[tk] = data[i];
+    }
+
+    var val = [];
+    for (var i = 0; i < list.length; i++) {
+        var tk = list[i];
+
+        if (tmpdata[tk]){
+            val.push(tmpdata[tk][type]);
+        }else{
+            val.push(0);
+        }
+    }
+
+    rdata['value'] = val;
+    // console.log(rdata);
+    return rdata
+}
+
+function makeDayData(data, type="ip") {
+    var rdata = {};
+
+    var rdata_key = [];
+    var rdata_val = [];
+
+    for (var i = 0; i < data.length; i++) {
+        var tk = data[i]['time'];
+
+        rdata_key.push(tk);
+        rdata_val.push(data[i][type])
+    }
+
+    rdata['key'] = rdata_key;
+    rdata['value'] = rdata_val;
+
+    return rdata
+}
+
+
 function wsOverviewRequest(page){
 
     var args = {};
@@ -80,6 +137,10 @@ function wsOverviewRequest(page){
     args['order'] = $('#time_order button.cur').attr('data-name');
 
     var select_option = $('.indicators-container input:checked').parent().attr('data-name');
+
+    if (select_option == 'realtime_traffic' || select_option == 'realtime_request'){
+        return;
+    }
     console.log(select_option);
 
     wsPost('get_overview_list', '' ,args, function(rdata){
@@ -107,18 +168,21 @@ function wsOverviewRequest(page){
             list.push(data[i][select_option]);
         }
 
-        console.log("list",list);
-
+        // console.log("list",list);
         var chat = {};
         var is_compare = false;
 
-    
-        var chatSeriesVal = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14','15', '16', '17', '18', '19', '20', '21', '22', '23'];
-        chat['seriesData'] = {
-            data : chatSeriesVal,
-            type: 'line',
-            areaStyle: {}
+        var tmpChatData = {
+            "key":[],
+            "value":[]
         }
+
+        if (args['order'] == 'hour'){
+            tmpChatData = makeHoursData(data, select_option);
+        } else {
+            tmpChatData = makeDayData(data, select_option);
+        }
+
 
         chat['yAxis'] = [{
             type: 'value',
@@ -145,7 +209,8 @@ function wsOverviewRequest(page){
             }
         }];
 
-        data['tooltip'] = {
+        chat['tooltip'] = {
+            show:true,
             trigger: 'axis',
             backgroundColor: 'rgba(255,255,255,0.8)',
             axisPointer: { // 坐标轴指示器，坐标轴触发有效
@@ -164,7 +229,7 @@ function wsOverviewRequest(page){
                 for (var i = 0; i < params.length; i++) {
                     var tem = params[i].name;
                     var val = params[i].value;
-                    if(that.template_config.period_time == 'hour'){
+                    if(args['order'] == 'hour'){
                         if (tem.indexOf('/') < 0) {
                             tem > 9 ? tem = tem + ":00 - " + tem + ":59" : tem = "0" + tem + ":00 - " +
                                 "0" + tem + ":59";
@@ -186,9 +251,7 @@ function wsOverviewRequest(page){
             }
         }
 
-        chat['legendData'] = ["PV浏览"]
-
-
+        chat['legendData'] = ["PV浏览"];
 
         var statEc = echarts.init(document.getElementById('total_num_echart'));
         var option = {
@@ -210,7 +273,11 @@ function wsOverviewRequest(page){
             xAxis: {
                 type: 'category',
                 boundaryGap: false,
-                data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+                boundaryGap: false,
+                axisTick: {
+                    alignWithLabel: true
+                },
+                data: tmpChatData["key"],
             },
             yAxis: chat['yAxis'],
             graphic:[{
@@ -232,7 +299,7 @@ function wsOverviewRequest(page){
             }],
             series: [
             {
-                data: [820, 932, 901, 934, 1290, 1330, 1320],
+                data: tmpChatData["value"],
                 type: 'line',
                 smooth: true, 
                 itemStyle: {
@@ -283,7 +350,7 @@ var html = '<div>\
                         </div>\
                         <span class="last-span"><input data-name="" type="text" id="time_choose" lay-key="1000001_'+randstr+'" class="form-control btn-group-sm" autocomplete="off" placeholder="自定义时间" style="display: inline-block;font-size: 12px;padding: 0 10px;height:30px;width: 155px;"></span>\
                     </div>\
-                    <span style="margin-left:10px">时间: </span>\
+                    <span style="margin-left:10px">时段: </span>\
                     <div class="input-group" style="width:100px;margin-left:10px;display: inline-table;vertical-align: top;">\
                         <div id="time_order" class="input-group-btn btn-group-sm">\
                             <button data-name="hour" type="button" class="btn btn-default">按时</button>\
@@ -428,7 +495,15 @@ $('.indicators-container input').click(function(){
         $(this).removeAttr('checked');
     });
     $(this).prop({'checked':true});
+
+    //实时请求不会执行
     wsOverviewRequest(1);
+
+    //实时请求
+    var select_option = $(this).attr('data-name');
+    if (select_option == 'realtime_traffic' || select_option == 'realtime_request'){
+        return;
+    }
 });
 
 wsPost('get_default_site','',{},function(rdata){
