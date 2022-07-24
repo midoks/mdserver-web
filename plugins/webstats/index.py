@@ -155,7 +155,6 @@ def pSqliteDb(dbname='web_logs', site_name='unset'):
     else:
         conn = mw.M(dbname).dbPos(db_dir, name)
 
-    conn.text_factory = str
     return conn
 
 
