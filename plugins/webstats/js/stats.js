@@ -90,11 +90,17 @@ function wsOverviewRequest(page){
 
         console.log(statData, data);
 
-        $('.overview_list .overview_box:eq(0) .ov_num').text(statData['pv']);
-        $('.overview_list .overview_box:eq(1) .ov_num').text(statData['uv']);
-        $('.overview_list .overview_box:eq(2) .ov_num').text(statData['ip']);
-        $('.overview_list .overview_box:eq(3) .ov_num').text(toSize(statData['length']));
-        $('.overview_list .overview_box:eq(4) .ov_num').text(statData['req']);
+        var stat_pv = statData['pv'] == null?0:statData['pv'];
+        var stat_uv = statData['uv'] == null?0:statData['uv'];
+        var stat_ip = statData['ip'] == null?0:statData['ip'];
+        var stat_length = statData['length'] == null?0:statData['length'];
+        var stat_req = statData['req'] == null?0:statData['req'];
+
+        $('.overview_list .overview_box:eq(0) .ov_num').text(stat_pv);
+        $('.overview_list .overview_box:eq(1) .ov_num').text(stat_uv);
+        $('.overview_list .overview_box:eq(2) .ov_num').text(stat_ip);
+        $('.overview_list .overview_box:eq(3) .ov_num').text(toSize(stat_length));
+        $('.overview_list .overview_box:eq(4) .ov_num').text(stat_req);
 
         var list = [];
         for (var i = 0; i < data.length; i++) {
@@ -104,6 +110,7 @@ function wsOverviewRequest(page){
         console.log("list",list);
 
         var chat = {};
+        var is_compare = false;
 
     
         var chatSeriesVal = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14','15', '16', '17', '18', '19', '20', '21', '22', '23'];
@@ -113,56 +120,143 @@ function wsOverviewRequest(page){
             areaStyle: {}
         }
 
+        chat['yAxis'] = [{
+            type: 'value',
+            splitNumber: 5,
+            axisLabel: {
+                textStyle: {
+                    color: '#a8aab0',
+                    fontStyle: 'normal',
+                    fontFamily: '微软雅黑',
+                    fontSize: 12,
+                },
+            },
+            axisLine:{
+                show: false
+            },
+            axisTick:{
+                show: false
+            },
+            splitLine: {
+                show: true,
+                lineStyle: {
+                    color: '#E5E9ED'
+                }
+            }
+        }];
+
+        data['tooltip'] = {
+            trigger: 'axis',
+            backgroundColor: 'rgba(255,255,255,0.8)',
+            axisPointer: { // 坐标轴指示器，坐标轴触发有效
+                type: 'line', // 默认为直线，可选为：'line' | 'shadow'
+                lineStyle: {
+                    color: 'rgba(150,150,150,0.2)'
+                }
+            },
+            textStyle: {
+                color: '#666',
+                fontSize: '14px',
+            },
+            extraCssText: 'width:220px;height:'+(is_compare?'30%':'22%')+';padding:0;box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);"',
+            formatter: function (params) {
+                var htmlStr = "";
+                for (var i = 0; i < params.length; i++) {
+                    var tem = params[i].name;
+                    var val = params[i].value;
+                    if(that.template_config.period_time == 'hour'){
+                        if (tem.indexOf('/') < 0) {
+                            tem > 9 ? tem = tem + ":00 - " + tem + ":59" : tem = "0" + tem + ":00 - " +
+                                "0" + tem + ":59";
+                        }
+                        val > 0 ? val = val : val = '--'
+                    }
+                    
+                    htmlStr +=
+                        '<div style="height:26px;line-height:26px;overflow:hidden;padding:6px 8px;">' +
+                        '<span style="float:left;max-width:160px;overflow:hidden;text-overflow: ellipsis;white-space: nowrap;">' +
+                        '<span style="margin-right:5px;display:inline-block;width:10px;height:10px;border-radius:5px;background-color:' +
+                        params[i].color + ';"></span>' + params[i].seriesName + '</span>' +
+                        '<span style="float:right">' + val + '</span>' + '</div>'
+                }
+                var res ='<div><div style="height:40px;line-height:40px;padding:0 8px;background:rgba(237,233,233,0.4)">' +
+                    tem + '<span style="float:right;">' + (is_compare?trend_name:'') +
+                    '</span>' + htmlStr + '</div></div>'
+                return res;
+            }
+        }
+
+        chat['legendData'] = ["PV浏览"]
+
 
 
         var statEc = echarts.init(document.getElementById('total_num_echart'));
         var option = {
-                backgroundColor:'#fff',
-               
-                legend:{
-                    data:chat['xAxisData'],
-                    left:'center',
-                    top:'94%',
-                },
-                grid: {
-                    bottom: '9%',
-                    containLabel: true,
-                    x: 20,
-                    y: 20,
-                    x2: 20,
-                    y2: 20
-                },
-                xAxis:{
-                    type: 'category',
-                    boundaryGap: false,
-                    axisTick: {
-                        alignWithLabel: true
-                    },
-                    axisLabel: {
-                        interval: 1,
-                    },
-                    data: [],
-                },
-                yAxis: [],
-                graphic:[{
-                    type: 'group',
-                    right: 420,
-                    top: 50,
+            tooltip:chat['tooltip'],
+            backgroundColor:'#fff',
+            legend:{
+                data:chat['legendData'],
+                left:'center',
+                top:'94%',
+            },
+            grid: {
+                bottom: '9%',
+                containLabel: true,
+                x: 20,
+                y: 20,
+                x2: 20,
+                y2: 20
+            },
+            xAxis: {
+                type: 'category',
+                boundaryGap: false,
+                data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+            },
+            yAxis: chat['yAxis'],
+            graphic:[{
+                type: 'group',
+                right: 330,
+                top: 0,
+                z: 100,
+                children: [{
+                    type: 'text',
+                    left: 'center',
+                    top: 'center',
                     z: 100,
-                    children: [{
-                        type: 'text',
-                        left: 'center',
-                        top: 'center',
-                        z: 100,
-                        style: {
-                            fill: '#ccc',
-                            text: args['site'],
-                            font: '16px Arial'
+                    style: {
+                        fill: '#ccc',
+                        text: args['site'],
+                        font: '16px Arial'
+                    }
+                }]
+            }],
+            series: [
+            {
+                data: [820, 932, 901, 934, 1290, 1330, 1320],
+                type: 'line',
+                smooth: true, 
+                itemStyle: {
+                    normal: {
+                        color:'#3A84FF',
+                        lineStyle: {
+                            color: "#3A84FF",
+                            width:1,
+                        },
+                        areaStyle: { 
+                            color: new echarts.graphic.LinearGradient(0, 1, 0, 0, [{
+                                offset: 0,
+                                color: 'rgba(58,132,255,0)'
+                            }, {
+                                offset: 1,
+                                color: 'rgba(58,132,255,0.35)'
+                            }]),
                         }
-                    }]
-                }],
-                series:chat['seriesData'],
+                    }
+                },
+                areaStyle: {}
             }
+          ]
+        };
 
         statEc.setOption(option);
     });
