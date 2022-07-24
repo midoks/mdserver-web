@@ -27,6 +27,7 @@ class Sql():
         try:
             if self.__DB_CONN == None:
                 self.__DB_CONN = sqlite3.connect(self.__DB_FILE)
+                self.__DB_CONN.text_factory = str
         except Exception as ex:
             return "error: " + str(ex)
 
@@ -91,7 +92,6 @@ class Sql():
     def select(self):
         # 查询数据集
         self.__GetConn()
-        self.__DB_CONN.text_factory = str
         try:
             sql = "SELECT " + self.__OPT_FIELD + " FROM " + self.__DB_TABLE + \
                 self.__OPT_WHERE + self.__OPT_ORDER + self.__OPT_LIMIT
@@ -125,7 +125,6 @@ class Sql():
         # 查询数据集
         # 不清空查询参数
         self.__GetConn()
-        self.__DB_CONN.text_factory = str
         try:
             sql = "SELECT " + self.__OPT_FIELD + " FROM " + self.__DB_TABLE + \
                 self.__OPT_WHERE + self.__OPT_GROUP + self.__OPT_ORDER + self.__OPT_LIMIT
