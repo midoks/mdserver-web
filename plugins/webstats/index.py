@@ -155,6 +155,9 @@ def pSqliteDb(dbname='web_logs', site_name='unset'):
     else:
         conn = mw.M(dbname).dbPos(db_dir, name)
 
+    conn.execute("PRAGMA synchronous = 0")
+    conn.execute("PRAGMA page_size = 4096")
+    conn.execute("PRAGMA journal_mode = wal")
     return conn
 
 

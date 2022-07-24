@@ -885,6 +885,10 @@ log_by_lua_block {
 			end
 			return true
 		end
+		db:exec([[PRAGMA synchronous = 0]])
+		db:exec([[PRAGMA page_size = 4096]])
+		db:exec([[PRAGMA journal_mode = wal]])
+		db:exec([[PRAGMA journal_size_limit = 1073741824]])
 
 		status, errorString = db:exec([[BEGIN TRANSACTION]])
 		if store_end >= store_start then
