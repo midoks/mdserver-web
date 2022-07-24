@@ -468,7 +468,7 @@ var html = '<div>\
                         <p class="ov_num">0</p>\
                     </div>\
                     <div class="overview_box">\
-                        <p class="ov_title">流量(KB)<i class="tips" data-toggle="tooltip" data-placement="top" title="当前时间段内您网站的总响应流量大小。包括已排除的请求。">?</i></p>\
+                        <p class="ov_title">流量<i class="tips" data-toggle="tooltip" data-placement="top" title="当前时间段内您网站的总响应流量大小。包括已排除的请求。">?</i></p>\
                         <p class="ov_num">0</p>\
                     </div>\
                     <div class="overview_box">\
@@ -501,7 +501,7 @@ var html = '<div>\
                         </div>\
                         <div class="indicators-label" bt-event-click="indicatorsType" data-name="length">\
                             <input type="radio" id="check_length" name="check_length">\
-                            <span class="check_length" style="font-weight:normal">流量</span>\
+                            <span class="check_length" style="font-weight:normal">流量(KB)</span>\
                         </div>\
                         <div class="indicators-label" bt-event-click="indicatorsType" data-name="req">\
                             <input type="radio" id="check_req" name="check_req">\
@@ -615,9 +615,162 @@ wsPost('get_default_site','',{},function(rdata){
 }
 
 
-function wsSitesList(){
+var ovTimer = null;
+function wsSitesListRequest(page){
+    clearInterval(ovTimer);
 
+    var args = {};
+
+    args['site'] = $('select[name="site"]').val();
+
+    var query_date = 'today';
+    if ($('#time_choose').attr("data-name") != ''){
+        query_date = $('#time_choose').attr("data-name");
+    } else {
+        query_date = $('#search_time button.cur').attr("data-name");
+    }
+    args['query_date'] = query_date;
+    args['order'] = $('#time_order button.cur').attr('data-name');
+
+    var select_option = $('.indicators-container input:checked').parent().attr('data-name');
+
+    console.log($('.indicators-container input:checked').parent().find('span').text());
+    // console.log(select_option);
+
+    wsPost('get_overview_list', '' ,args, function(rdata){
+        var rdata = $.parseJSON(rdata.data);
+        var list = '';
+        var data = rdata.data.data;
+        var statData = rdata.data.stat_list;
+
+        console.log(statData, data);
+
+        var stat_pv = statData['pv'] == null?0:statData['pv'];
+        var stat_uv = statData['uv'] == null?0:statData['uv'];
+        var stat_ip = statData['ip'] == null?0:statData['ip'];
+        var stat_length = statData['length'] == null?0:statData['length'];
+        var stat_req = statData['req'] == null?0:statData['req'];
+
+        $('.overview_list .overview_box:eq(0) .ov_num').text(stat_pv);
+        $('.overview_list .overview_box:eq(1) .ov_num').text(stat_uv);
+        $('.overview_list .overview_box:eq(2) .ov_num').text(stat_ip);
+        $('.overview_list .overview_box:eq(3) .ov_num').text(toSize(stat_length));
+        $('.overview_list .overview_box:eq(4) .ov_num').text(stat_req);
+
+    });
 }
+
+
+function wsSitesList(){
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+var randstr = getRandomString(10);
+
+var html = '<div>\
+                <div style="padding-bottom:10px;">\
+                    <div class="input-group" style="width:300px;display: inline-table;vertical-align: top;">\
+                        <div id="search_time" class="input-group-btn btn-group-sm">\
+                            <button data-name="today" type="button" class="btn btn-default">今日</button>\
+                            <button data-name="yesterday" type="button" class="btn btn-default">昨日</button>\
+                            <button data-name="l7" type="button" class="btn btn-default">近7天</button>\
+                            <button data-name="l30" type="button" class="btn btn-default">近30天</button>\
+                        </div>\
+                        <span class="last-span"><input data-name="" type="text" id="time_choose" lay-key="1000001_'+randstr+'" class="form-control btn-group-sm" autocomplete="off" placeholder="自定义时间" style="display: inline-block;font-size: 12px;padding: 0 10px;height:30px;width: 155px;"></span>\
+                    </div>\
+                </div>\
+                <!-- stat --->\
+                <div class="overview_list" style="padding-top:10px;">\
+                    <div class="overview_box">\
+                        <p class="ov_title">浏览量(PV)<i class="tips" data-toggle="tooltip" data-placement="top" title="用户每次打开网站页面被记录1次。用户多次打开同一页面，访问量值累计多次。此指标衡量网站访问量情况。">?</i></p>\
+                        <p class="ov_num">0</p>\
+                    </div>\
+                    <div class="overview_box">\
+                        <p class="ov_title">访客量(UV)<i class="tips" data-toggle="tooltip" data-placement="top" title="访问您网站的上网电脑数量（以cookie为依据），此指标衡量独立访客数量情况。">?</i></p>\
+                        <p class="ov_num">0</p>\
+                    </div>\
+                    <div class="overview_box">\
+                        <p class="ov_title">IP数<i class="tips" data-toggle="tooltip" data-placement="top" title="当前时间段内您网站的独立访问ip数。">?</i></p>\
+                        <p class="ov_num">0</p>\
+                    </div>\
+                    <div class="overview_box">\
+                        <p class="ov_title">流量<i class="tips" data-toggle="tooltip" data-placement="top" title="当前时间段内您网站的总响应流量大小。包括已排除的请求。">?</i></p>\
+                        <p class="ov_num">0</p>\
+                    </div>\
+                    <div class="overview_box">\
+                        <p class="ov_title">请求<i class="tips" data-toggle="tooltip" data-placement="top" title="当前时间段内您网站的总请求数量。包括已排除的请求。">?</i></p>\
+                        <p class="ov_num">0</p>\
+                    </div>\
+                    <div class="overview_box">\
+                        <p class="ov_title">实时流量<i class="tips" data-toggle="tooltip" data-placement="top" title="当前10秒内您网站的实时流量大小。包括已排除的请求。">?</i></p>\
+                        <p class="ov_num">0</p>\
+                    </div>\
+                    <div class="overview_box">\
+                        <p class="ov_title">每秒请求<i class="tips" data-toggle="tooltip" data-placement="top" title="当前10秒内您网站的实时请求数量。包括已排除的请求。">?</i></p>\
+                        <p class="ov_num">0</p>\
+                    </div>\
+                </div>\
+                <div class="divtable mtb10" id="ws_table"></div>\
+            </div>';
+$(".soft-man-con").html(html);
+$('[data-toggle="tooltip"]').tooltip();
+//日期范围
+laydate.render({
+    elem: '#time_choose',
+    value:'',
+    range:true,
+    done:function(value, startDate, endDate){
+        if(!value){
+            return false;
+        }
+
+        $('#search_time button').each(function(){
+            $(this).removeClass('cur');
+        });
+
+        var timeA  = value.split('-')
+        var start = $.trim(timeA[0]+'-'+timeA[1]+'-'+timeA[2])
+        var end = $.trim(timeA[3]+'-'+timeA[4]+'-'+timeA[5])
+        query_txt = toUnixTime(start + " 00:00:00") + "-"+ toUnixTime(end + " 00:00:00")
+
+        $('#time_choose').attr("data-name",query_txt);
+        $('#time_choose').addClass("cur");
+
+        wsSitesListRequest(1);
+    },
+});
+
+
+$('#time_order button:eq(0)').addClass('cur');
+$('#time_order button').click(function(){
+    $('#time_order button').each(function(){
+        if ($(this).hasClass('cur')){
+            $(this).removeClass('cur');
+        }
+    });
+    $(this).addClass('cur');
+    wsSitesListRequest(1);
+});
+
+
+
+$('#search_time button:eq(0)').addClass('cur');
+$('#search_time button').click(function(){
+    $('#search_time button').each(function(){
+        if ($(this).hasClass('cur')){
+            $(this).removeClass('cur');
+        }
+    });
+    $('#time_choose').attr("data-name",'');
+    $('#time_choose').removeClass("cur");
+
+    $(this).addClass('cur');
+
+    wsSitesListRequest(1);
+});
+
+wsSitesListRequest(1);
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+}
+
 
 function wsSpiderStatLogRequest(page){
 
