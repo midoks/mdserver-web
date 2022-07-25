@@ -624,14 +624,9 @@ wsPost('get_default_site','',{},function(rdata){
 }
 
 
-var ovTimer = null;
 function wsSitesListRequest(page){
-    clearInterval(ovTimer);
 
     var args = {};
-
-    args['site'] = $('select[name="site"]').val();
-
     var query_date = 'today';
     if ($('#time_choose').attr("data-name") != ''){
         query_date = $('#time_choose').attr("data-name");
@@ -639,33 +634,93 @@ function wsSitesListRequest(page){
         query_date = $('#search_time button.cur').attr("data-name");
     }
     args['query_date'] = query_date;
-    args['order'] = $('#time_order button.cur').attr('data-name');
+   
 
-    var select_option = $('.indicators-container input:checked').parent().attr('data-name');
+    wsPost('get_site_list', '' ,args, function(rdata){
 
-    console.log($('.indicators-container input:checked').parent().find('span').text());
-    // console.log(select_option);
-
-    wsPost('get_overview_list', '' ,args, function(rdata){
         var rdata = $.parseJSON(rdata.data);
-        var list = '';
-        var data = rdata.data.data;
-        var statData = rdata.data.stat_list;
+        var data = rdata.data;
 
-        console.log(statData, data);
 
-        var stat_pv = statData['pv'] == null?0:statData['pv'];
-        var stat_uv = statData['uv'] == null?0:statData['uv'];
-        var stat_ip = statData['ip'] == null?0:statData['ip'];
-        var stat_length = statData['length'] == null?0:statData['length'];
-        var stat_req = statData['req'] == null?0:statData['req'];
+        var stat_pv = 0;
+        var stat_uv = 0;
+        var stat_ip = 0;
+        var stat_length = 0;
+        var stat_req = 0;
+
+        console.log(rdata, data);
+
+         var list = '';
+        if (data.length > 0){
+            for(i in data){
+
+                var tmp_pv = 0;
+                var tmp_uv = 0;
+                var tmp_ip = 0;
+                var tmp_length = 0;
+                var tmp_req = 0;
+
+                if (data[i]['pv'] != null){
+                    tmp_pv = data[i]['pv'];
+                    stat_pv += data[i]['pv'];
+                }
+
+                if (data[i]['uv'] != null){
+                    tmp_uv = data[i]['uv'];
+                    stat_uv += data[i]['uv'];
+                }
+
+                if (data[i]['ip'] != null){
+                    tmp_ip = data[i]['ip'];
+                    stat_ip += data[i]['ip'];
+                }
+
+                if (data[i]['length'] != null){
+                    tmp_length = data[i]['length'];
+                    stat_length += data[i]['length'];
+                }
+
+                if (data[i]['req'] != null){
+                    tmp_req = data[i]['req'];
+                    stat_req += data[i]['req'];
+                }
+
+                list += '<tr>';
+                list += '<td>' + data[i]['site']+'</td>';
+                list += '<td>' + tmp_pv +'</td>';
+                list += '<td>' + tmp_uv +'</td>';
+                list += '<td>' + tmp_ip +'</td>';
+                list += '<td>' + tmp_req +'</td>';
+                list += '<td>' + toSize(tmp_length) +'</td>';
+                list += '<td><a data-id="'+i+'" href="javascript:;" class="btlink details" title="设置">设置</a></td>';
+                list += '</tr>';
+            }
+        } else{
+             list += '<tr><td colspan="14" style="text-align:center;">网站列表为空</td></tr>';
+        }
 
         $('.overview_list .overview_box:eq(0) .ov_num').text(stat_pv);
         $('.overview_list .overview_box:eq(1) .ov_num').text(stat_uv);
         $('.overview_list .overview_box:eq(2) .ov_num').text(stat_ip);
         $('.overview_list .overview_box:eq(3) .ov_num').text(toSize(stat_length));
         $('.overview_list .overview_box:eq(4) .ov_num').text(stat_req);
-
+        
+        var table = '<div class="tablescroll">\
+                            <table id="DataBody" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
+                            <thead><tr>\
+                            <th>网站</th>\
+                            <th>流览量</th>\
+                            <th>访客数</th>\
+                            <th>IP数</th>\
+                            <th>请求数</th>\
+                            <th>总流量</th>\
+                            <th>操作</th>\</tr></thead>\
+                            <tbody>\
+                            '+ list +'\
+                            </tbody></table>\
+                        </div>\
+                        <div id="wsPage" class="dataTables_paginate paging_bootstrap page"></div>';
+        $('#ws_table').html(table);
     });
 }
 
@@ -688,32 +743,24 @@ var html = '<div>\
                 </div>\
                 <!-- stat --->\
                 <div class="overview_list" style="padding-top:10px;">\
-                    <div class="overview_box">\
-                        <p class="ov_title">浏览量(PV)<i class="tips" data-toggle="tooltip" data-placement="top" title="用户每次打开网站页面被记录1次。用户多次打开同一页面，访问量值累计多次。此指标衡量网站访问量情况。">?</i></p>\
+                    <div class="overview_box w_p20">\
+                        <p class="ov_title">总浏览量(PV)</p>\
                         <p class="ov_num">0</p>\
                     </div>\
-                    <div class="overview_box">\
-                        <p class="ov_title">访客量(UV)<i class="tips" data-toggle="tooltip" data-placement="top" title="访问您网站的上网电脑数量（以cookie为依据），此指标衡量独立访客数量情况。">?</i></p>\
+                    <div class="overview_box w_p20">\
+                        <p class="ov_title">总访客量(UV)</p>\
                         <p class="ov_num">0</p>\
                     </div>\
-                    <div class="overview_box">\
-                        <p class="ov_title">IP数<i class="tips" data-toggle="tooltip" data-placement="top" title="当前时间段内您网站的独立访问ip数。">?</i></p>\
+                    <div class="overview_box w_p20">\
+                        <p class="ov_title">总IP数</p>\
                         <p class="ov_num">0</p>\
                     </div>\
-                    <div class="overview_box">\
-                        <p class="ov_title">流量<i class="tips" data-toggle="tooltip" data-placement="top" title="当前时间段内您网站的总响应流量大小。包括已排除的请求。">?</i></p>\
+                    <div class="overview_box w_p20">\
+                        <p class="ov_title">总流量</p>\
                         <p class="ov_num">0</p>\
                     </div>\
-                    <div class="overview_box">\
-                        <p class="ov_title">请求<i class="tips" data-toggle="tooltip" data-placement="top" title="当前时间段内您网站的总请求数量。包括已排除的请求。">?</i></p>\
-                        <p class="ov_num">0</p>\
-                    </div>\
-                    <div class="overview_box">\
-                        <p class="ov_title">实时流量<i class="tips" data-toggle="tooltip" data-placement="top" title="当前10秒内您网站的实时流量大小。包括已排除的请求。">?</i></p>\
-                        <p class="ov_num">0</p>\
-                    </div>\
-                    <div class="overview_box">\
-                        <p class="ov_title">每秒请求<i class="tips" data-toggle="tooltip" data-placement="top" title="当前10秒内您网站的实时请求数量。包括已排除的请求。">?</i></p>\
+                    <div class="overview_box w_p20">\
+                        <p class="ov_title">总请求</p>\
                         <p class="ov_num">0</p>\
                     </div>\
                 </div>\

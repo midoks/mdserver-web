@@ -299,11 +299,16 @@ def setGlobalConf():
     return mw.returnJson(True, '设置成功')
 
 
-def getDefaultSite():
+def getSiteListData():
     lua_dir = getServerDir() + "/lua"
     path = lua_dir + "/default.json"
     data = mw.readFile(path)
-    return mw.returnJson(True, 'OK', json.loads(data))
+    return json.loads(data)
+
+
+def getDefaultSite():
+    data = getSiteListData()
+    return mw.returnJson(True, 'OK', data)
 
 
 def setDefaultSite(name):
@@ -323,6 +328,49 @@ def toSumField(sql):
         field += "sum(" + x + ") as " + x + ","
     field = field.strip(',')
     return field
+
+
+def getSiteStatInfo(domain, query_date):
+    conn = pSqliteDb('request_stat', domain)
+    conn = conn.where("1=1", ())
+
+    field = 'time,req,pv,uv,ip,length'
+    field_sum = toSumField(field.replace("time,", ""))
+
+    time_field = "substr(time,1,6),"
+
+    field_sum = time_field + field_sum
+    conn = conn.field(field_sum)
+    if query_date == "today":
+        todayTime = time.strftime(
+            '%Y%m%d00', time.localtime(time.time() - 0 * 86400))
+        conn.andWhere("time >= ?", (todayTime,))
+    elif query_date == "yesterday":
+        startTime = time.strftime(
+            '%Y%m%d00', time.localtime(time.time() - 1 * 86400))
+        endTime = time.strftime(
+            '%Y%m%d00', time.localtime(time.time()))
+        conn.andWhere("time>=? and time<=?", (startTime, endTime))
+    elif query_date == "l7":
+        todayTime = time.strftime(
+            '%Y%m%d00', time.localtime(time.time() - 7 * 86400))
+        conn.andWhere("time >= ?", (todayTime,))
+    elif query_date == "l30":
+        todayTime = time.strftime(
+            '%Y%m%d00', time.localtime(time.time() - 30 * 86400))
+        conn.andWhere("time >= ?", (todayTime,))
+    else:
+        exlist = query_date.split("-")
+        start = time.strftime(
+            '%Y%m%d00', time.localtime(int(exlist[0])))
+        end = time.strftime(
+            '%Y%m%d23', time.localtime(int(exlist[1])))
+        conn.andWhere("time >= ? and time <= ? ", (start, end,))
+
+    # 统计总数
+    stat_list = conn.inquiry(field)
+    del(stat_list[0]['time'])
+    return stat_list[0]
 
 
 def getOverviewList():
@@ -386,6 +434,25 @@ def getOverviewList():
     data['stat_list'] = stat_list[0]
 
     return mw.returnJson(True, 'ok', data)
+
+
+def getSiteList():
+    args = getArgs()
+    check = checkArgs(args, ['query_date'])
+    if not check[0]:
+        return check[1]
+
+    query_date = args['query_date']
+
+    data = getSiteListData()
+    data_list = data["list"]
+
+    rdata = []
+    for x in data_list:
+        tmp = getSiteStatInfo(x, query_date)
+        tmp["site"] = x
+        rdata.append(tmp)
+    return mw.returnJson(True, 'ok', rdata)
 
 
 def getLogsRealtimeInfo():
@@ -829,6 +896,8 @@ if __name__ == "__main__":
         print(getDefaultSite())
     elif func == 'get_overview_list':
         print(getOverviewList())
+    elif func == 'get_site_list':
+        print(getSiteList())
     elif func == 'get_logs_list':
         print(getLogsList())
     elif func == 'get_logs_error_list':
