@@ -74,7 +74,8 @@ function wsPostCallbak(method, version, args,callback){
 function toSecond(val){
     if (val>=1000){
         val = (val / 1000).toFixed()+"s";
-    }
+        return val;
+    } 
     return val + "ms";
 }
 
