@@ -233,15 +233,16 @@ class crontab_api:
         cronConfig += ' ' + cronPath + '/' + cronName + \
             ' >> ' + cronPath + '/' + cronName + '.log 2>&1'
 
+        # print(cronConfig)
         if not mw.isAppleSystem():
             wRes = self.writeShell(cronConfig)
             if type(wRes) != bool:
                 return wRes
             self.crondReload()
 
-        cron_add_time = time.strftime('%Y-%m-%d %X', time.localtime())
+        add_time = time.strftime('%Y-%m-%d %X', time.localtime())
         task_id = mw.M('crontab').add('name,type,where1,where_hour,where_minute,echo,addtime,status,save,backup_to,stype,sname,sbody,urladdress',
-                                      (iname, field_type, where1, hour, minute, cron_add_time, 1, save, backup_to, stype, sname, sbody, urladdress))
+                                      (iname, field_type, where1, hour, minute, cronName, add_time, 1, save, backup_to, stype, sname, sbody, urladdress,))
         return task_id
 
     def startTaskApi(self):
@@ -253,28 +254,34 @@ class crontab_api:
         return mw.returnJson(True, '任务已执行!')
 
     def delApi(self):
-        sid = request.form.get('id', '')
+        task_id = request.form.get('id', '')
         try:
-            find = mw.M('crontab').where(
-                "id=?", (sid,)).field('name,echo').find()
-            if not self.removeForCrond(find['echo']):
-                return mw.returnJson(False, '无法写入文件，请检查是否开启了系统加固功能!')
+            data = self.delete(task_id)
+            if not data[0]:
+                return mw.returnJson(False, data[1])
 
-            cronPath = mw.getServerDir() + '/cron'
-            sfile = cronPath + '/' + find['echo']
-
-            if os.path.exists(sfile):
-                os.remove(sfile)
-            sfile = cronPath + '/' + find['echo'] + '.log'
-            if os.path.exists(sfile):
-                os.remove(sfile)
-
-            mw.M('crontab').where("id=?", (sid,)).delete()
-            mw.writeLog('计划任务', mw.getInfo(
-                '删除计划任务[{1}]成功!', (find['name'],)))
             return mw.returnJson(True, '删除成功')
         except Exception as e:
             return mw.returnJson(False, '删除失败:' + str(e))
+
+    def delete(self, task_id):
+
+        find = mw.M('crontab').where("id=?", (sid,)).field('name,echo').find()
+        if not self.removeForCrond(find['echo']):
+            return (False, '无法写入文件，请检查是否开启了系统加固功能!')
+
+        cronPath = mw.getServerDir() + '/cron'
+        sfile = cronPath + '/' + find['echo']
+
+        if os.path.exists(sfile):
+            os.remove(sfile)
+        sfile = cronPath + '/' + find['echo'] + '.log'
+        if os.path.exists(sfile):
+            os.remove(sfile)
+
+        mw.M('crontab').where("id=?", (sid,)).delete()
+        mw.writeLog('计划任务', mw.getInfo('删除计划任务[{1}]成功!', (find['name'],)))
+        return (True, "OK")
 
     def delLogsApi(self):
         sid = request.form.get('id', '')
@@ -303,18 +310,6 @@ class crontab_api:
         data = {}
         data['data'] = mw.M(stype).field('name,ps').select()
         data['orderOpt'] = []
-        # try:
-        #     tmp = mw.readFile('data/libList.conf')
-        #     libs = json.loads(tmp)
-        #     import imp
-        #     for lib in libs:
-        #         imp.find_module(lib['module'])
-        #         tmp = {}
-        #         tmp['name'] = lib['name']
-        #         tmp['value'] = lib['opt']
-        #         data['orderOpt'].append(tmp)
-        # except Exception as e:
-        #     print e
         return mw.getJson(data)
     ##### ----- start ----- ###
 
