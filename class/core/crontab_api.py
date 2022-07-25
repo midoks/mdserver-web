@@ -210,7 +210,7 @@ class crontab_api:
     def add(self, params):
 
         iname = params["name"]
-        field_type = params["field_type"]
+        field_type = params["type"]
         week = params["week"]
         where1 = params["where1"]
         hour = params["hour"]
@@ -420,7 +420,7 @@ class crontab_api:
                 cfile = mw.getServerDir() + "/mdserver-web/plugin/" + \
                     param['backup_to'] + "/" + param['backup_to'] + "_main.py"
                 if not os.path.exists(cfile):
-                    cfile = mw.getServerDir() + "/mdserver-web/script/backup_" + \
+                    cfile = script_dir + "/backup_" + \
                         param['backup_to'] + ".py"
                 wheres = {
                     'path': head + "python " + cfile + " path " + param['sname'] + " " + str(param['save']),
