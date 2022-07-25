@@ -259,7 +259,6 @@ class crontab_api:
             data = self.delete(task_id)
             if not data[0]:
                 return mw.returnJson(False, data[1])
-
             return mw.returnJson(True, '删除成功')
         except Exception as e:
             return mw.returnJson(False, '删除失败:' + str(e))
