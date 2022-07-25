@@ -197,10 +197,10 @@ class Sql():
             sql = "INSERT INTO " + self.__DB_TABLE + \
                 "(" + keys + ") " + "VALUES(" + values + ")"
             result = self.__DB_CONN.execute(sql, param)
-            id = result.lastrowid
+            last_id = result.lastrowid
             self.__close()
             self.__DB_CONN.commit()
-            return id
+            return last_id
         except Exception as ex:
             return "error: " + str(ex)
 
