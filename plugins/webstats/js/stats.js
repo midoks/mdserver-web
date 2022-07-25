@@ -133,11 +133,11 @@ function makeDayData(data, type="ip") {
 
         rdata_key.push(tk);
 
-        var v = data[i];
+        var v = data[i][type];
         if (type=='length'){
-            v['length'] = (v['length']/1024).toFixed();
+            v = (v/1024).toFixed();
         }
-         rdata_val.push(v)
+        rdata_val.push(v)
     }
 
     rdata['key'] = rdata_key;
