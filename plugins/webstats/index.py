@@ -299,6 +299,99 @@ def setGlobalConf():
     return mw.returnJson(True, '设置成功')
 
 
+def getSiteConf():
+    args = getArgs()
+
+    check = checkArgs(args, ['site'])
+    if not check[0]:
+        return check[1]
+
+    domain = args['site']
+    conf = getConf()
+    content = mw.readFile(conf)
+    content = json.loads(content)
+
+    site_conf = {}
+    if domain in content:
+        site_conf = content[domain]
+    else:
+        site_conf["cdn_headers"] = content['global']['cdn_headers']
+        site_conf["exclude_extension"] = content['global']['exclude_extension']
+        site_conf["exclude_status"] = content['global']['exclude_status']
+        site_conf["exclude_ip"] = content['global']['exclude_ip']
+        site_conf["exclude_url"] = content['global']['exclude_url']
+        site_conf["record_post_args"] = content['global']['record_post_args']
+        site_conf["record_get_403_args"] = content[
+            'global']['record_get_403_args']
+
+    return mw.returnJson(True, 'ok', site_conf)
+
+
+def setSiteConf():
+    args = getArgs()
+    check = checkArgs(args, ['site'])
+    if not check[0]:
+        return check[1]
+
+    domain = args['site']
+    conf = getConf()
+    content = mw.readFile(conf)
+    content = json.loads(content)
+
+    site_conf = {}
+    if domain in content:
+        site_conf = content[domain]
+    else:
+        site_conf["cdn_headers"] = content['global']['cdn_headers']
+        site_conf["exclude_extension"] = content['global']['exclude_extension']
+        site_conf["exclude_status"] = content['global']['exclude_status']
+        site_conf["exclude_ip"] = content['global']['exclude_ip']
+        site_conf["exclude_url"] = content['global']['exclude_url']
+        site_conf["record_post_args"] = content['global']['record_post_args']
+        site_conf["record_get_403_args"] = content[
+            'global']['record_get_403_args']
+
+    for v in ['record_post_args', 'record_get_403_args']:
+        data = checkArgs(args, [v])
+        if data[0]:
+            rval = False
+            if args[v] == "true":
+                rval = True
+            site_conf[v] = rval
+
+    for v in ['ip_top_num', 'uri_top_num', 'save_day']:
+        data = checkArgs(args, [v])
+        if data[0]:
+            site_conf[v] = int(args[v])
+
+    for v in ['cdn_headers', 'exclude_extension', 'exclude_status', 'exclude_ip']:
+        data = checkArgs(args, [v])
+        if data[0]:
+            site_conf[v] = args[v].split("\\n")
+
+    data = checkArgs(args, ['exclude_url'])
+    if data[0]:
+        exclude_url = args['exclude_url'].strip(";")
+        exclude_url_val = []
+        if exclude_url != "":
+            exclude_url_list = exclude_url.split(";")
+            for i in exclude_url_list:
+                t = i.split("|")
+                val = {}
+                val['mode'] = t[0]
+                val['url'] = t[1]
+                exclude_url_val.append(val)
+        site_conf['exclude_url'] = exclude_url_val
+
+    content[domain] = site_conf
+
+    mw.writeFile(conf, json.dumps(content))
+    conf_lua = getServerDir() + "/lua/config.lua"
+    listToLuaFile(conf_lua, content)
+    mw.restartWeb()
+    return mw.returnJson(True, '设置成功')
+
+
 def getSiteListData():
     lua_dir = getServerDir() + "/lua"
     path = lua_dir + "/default.json"
@@ -892,6 +985,10 @@ if __name__ == "__main__":
         print(getGlobalConf())
     elif func == 'set_global_conf':
         print(setGlobalConf())
+    elif func == 'get_site_conf':
+        print(getSiteConf())
+    elif func == 'set_site_conf':
+        print(setSiteConf())
     elif func == 'get_default_site':
         print(getDefaultSite())
     elif func == 'get_overview_list':

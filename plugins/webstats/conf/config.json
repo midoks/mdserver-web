@@ -47,6 +47,5 @@
         "record_get_403_args": false,
         "push_report": false,
         "data_dir": "/www/server/webstats/logs"
-    },
-    "default_site": "unset"
+    }
 }

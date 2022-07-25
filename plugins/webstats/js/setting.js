@@ -192,15 +192,15 @@ wsPost('get_global_conf', '' ,{}, function(rdata){
 		if ( [0,1,2,4].indexOf(select_pos)>-1 ){
 			var setting_cdn = $('textarea[name="setting-cdn"]').val();
 
-			var list = setting_cdn.split('\n')
+			// var list = setting_cdn.split('\n')
 			var args = {}
 
 			if ( select_pos == 0 ){
-				args['cdn_headers'] = list;
+				args['cdn_headers'] = setting_cdn;
 			} else if ( select_pos == 1 ){
-				args['exclude_extension'] = list;
+				args['exclude_extension'] = setting_cdn;
 			} else if ( select_pos == 2 ){
-				args['exclude_status'] = list;
+				args['exclude_status'] = setting_cdn;
 			} else if ( select_pos == 4 ){
 				args['exclude_ip'] = setting_cdn;
 			}

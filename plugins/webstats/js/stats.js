@@ -692,7 +692,7 @@ function wsSitesListRequest(page){
                 list += '<td>' + tmp_ip +'</td>';
                 list += '<td>' + tmp_req +'</td>';
                 list += '<td>' + toSize(tmp_length) +'</td>';
-                list += '<td><a data-id="'+i+'" href="javascript:;" class="btlink details" title="设置">设置</a></td>';
+                list += '<td><a data-id="'+i+'" href="javascript:;" class="btlink web_set" title="设置">设置</a></td>';
                 list += '</tr>';
             }
         } else{
@@ -721,6 +721,197 @@ function wsSitesListRequest(page){
                         </div>\
                         <div id="wsPage" class="dataTables_paginate paging_bootstrap page"></div>';
         $('#ws_table').html(table);
+
+
+        $(".tablescroll .web_set").click(function(){
+            var index = $(this).attr('data-id');
+
+            var domain = data[index]["site"];
+            wsPost('get_site_conf', '' ,{"site":domain}, function(rdata){
+                var rdata = $.parseJSON(rdata.data);
+                var rdata = rdata.data;
+                console.log(rdata);
+                layer.open({
+                    type: 1,
+                    title: "【"+domain + "】监控配置",
+                    btn: ['保存','取消'], 
+                    area: ['600px',"380px"],
+                    closeBtn: 1,
+                    shadeClose: false,
+                    content: '<div id="site_conf" class="pd15 lib-box ws_setting">\
+                       <div class="ws_content" style="width:570px;">\
+                            <div class="tab-nav">\
+                                <span data-type="cdn_headers" class="on">CDN headers</span>\
+                                <span data-type="exclude_extension">排除扩展</span>\
+                                <span data-type="exclude_status">排除响应状态</span>\
+                                <span data-type="exclude_url">排除路径</span>\
+                                <span data-type="exclude_ip">排除IP</span>\
+                                <span data-type="record_post_args">记录请求原文</span>\
+                            </div>\
+                            <div class="tab-con">\
+                                <span class="ws_tips">* 准确识别CDN网络IP地址，请注意大小写，如需多个请换行填写</span>\
+                                <textarea name="setting-cdn" cols="52" rows="8"></textarea>\
+                            </div>\
+                        </div>\
+                    </div>',
+                    success:function(){
+                        var common_tpl_tips = '<span class="ws_tips">* 准确识别CDN网络IP地址，请注意大小写，如需多个请换行填写</span>';
+                        var common_tpl_area = '<textarea name="setting-cdn" cols="52" rows="8"></textarea>';
+
+ 
+                        $('#site_conf .tab-con textarea').text(rdata['cdn_headers'].join('\n'));
+                        $('#site_conf .tab-nav span').click(function(e){
+                            $('#site_conf .tab-nav span').removeClass('on');
+                            $(this).addClass('on');
+                            $('#site_conf .tab-con').html('');
+
+                            var typename = $(this).attr('data-type');
+                            if (typename == 'cdn_headers'){
+                                var content = $(common_tpl_tips).html('* 准确识别CDN网络IP地址，请注意大小写，如需多个请换行填写').prop('outerHTML');
+                                var area = $(common_tpl_area).html(rdata['cdn_headers'].join('\n')).prop('outerHTML');
+
+                                content += area;
+                                $('#site_conf .tab-con').html(content);
+                            } else if (typename == 'exclude_extension'){
+
+                                var content = $(common_tpl_tips).html('* 排除的请求不写入网站日志，不统计PV、UV、IP，只累计总请求、总流量数，如需多个请换行填写').prop('outerHTML');
+                                var area = $(common_tpl_area).html(rdata['exclude_extension'].join('\n')).prop('outerHTML');
+                                content += area;
+                                $('#site_conf .tab-con').html(content);
+                            } else if (typename == 'exclude_status'){
+                                var content = $(common_tpl_tips).html('* 排除的请求不写入网站日志，不统计PV、UV、IP，只累计总请求、总流量数，如需多个请换行填写').prop('outerHTML');
+                                var area = $(common_tpl_area).html(rdata['exclude_status'].join('\n')).prop('outerHTML');
+                                content += area;
+                                $('#site_conf .tab-con').html(content);
+                            } else if (typename == 'exclude_ip'){
+                                var txt = '<div>* 排除的IP不写入网站日志，不统计PV、UV、IP，只累计总请求、总流量数，如需多个请换行填写</div>\
+                                           <div style="margin-left: -10px">* 支持 192.168.1.1-192.168.1.10格式排除区间IP</div>'
+                                var content = $(common_tpl_tips).html(txt).prop('outerHTML');
+                                var area = $(common_tpl_area).html(rdata['exclude_ip'].join('\n')).prop('outerHTML');
+                                content += area;
+                                $('#site_conf .tab-con').html(content);
+                            } else if (typename == 'record_post_args'){
+                                var txt = '<div>记录请求原文说明：HTTP请求原文包括客户端请求详细参数，有助于分析或排查异常请求；</div>\
+                                           <div style="margin-left: -10px">考虑到HTTP请求原文会<span style="color:red;">占用额外存储空间</span>，默认仅记录500错误请求原文。</div>'
+                                var content = $(common_tpl_tips).html(txt).prop('outerHTML');
+
+                                var record_post_args = '';
+                                if (rdata['record_post_args']){
+                                    record_post_args = 'checked';
+                                }
+                                var record_get_403_args = '';
+                                if (rdata['record_get_403_args']){
+                                    record_get_403_args = 'checked';
+                                }
+
+
+                                var check = '<div class="checkbox" style="margin: 20px 0 0 -10px;">\
+                                            <label style="cursor: pointer;margin-right:15px;">\
+                                                <input type="checkbox" name="record_post_args" style="margin: 1px 10 0;" '+record_post_args+'>记录POST请求原文\
+                                            </label>\
+                                            <label style="cursor: pointer;">\
+                                                <input type="checkbox" name="record_get_403_args" style="margin: 1px 10 0;" '+record_get_403_args+'><span>记录403错误请求原文</span>\
+                                            </label>\
+                                        </div>';
+                                content+=check;
+
+                                $('#site_conf .tab-con').html(content);
+                            } else if ( typename == 'exclude_url'){
+                                var txt = '* 排除的请求不写入网站日志，不统计PV、UV、IP，只累计总请求、总流量数'
+                                var content = $(common_tpl_tips).html(txt).prop('outerHTML');
+
+                                var _text = '';
+                                var _tmp = rdata['exclude_url'];
+                                for(var i = 0; i<10; i++){
+                                    if(typeof _tmp[i] == 'undefined'){
+                                        _tmp[i] = {mode:'regular',url:''}
+                                    }
+                                    
+                                    _text += '<tr>\
+                                        <td>\
+                                            <select name="url_type_'+i+'">\
+                                                <option  value="normal" '+(_tmp[i].mode == 'normal'?'selected':'')+'>完整匹配</option>\
+                                                <option value="regular" '+(_tmp[i].mode == 'regular'?'selected':'')+'>模糊匹配</option>\
+                                            </select>\
+                                        </td>\
+                                        <td><input name="url_val_'+i+'" style="width:290px" placeholder="'+(_tmp[i].mode == 'normal'?'例：需排除a.com/test.html请求，请填写 test.html':'包含此内容的URL请求将不会被统计，请谨慎填写')+'" type="text" value="'+_tmp[i].url+'"></td>\
+                                    </tr>';
+                                }
+
+                                var list = '<div class="divtable mt10 setting-exclude-url" style="margin-left: -10px;height: 100px;width:100%;">\
+                                            <table class="table table-hover">\
+                                                <thead>\
+                                                    <tr><th width="96">排除方式</th><th>排除路径</th></tr>\
+                                                </thead>\
+                                                <tbody>'+_text+'</tbody>\
+                                            </table>\
+                                        </div>';
+                                 
+                                content += list;
+                                $('#site_conf .tab-con').html(content);
+                            }
+                        });
+                    },
+                    yes:function(){
+                        var select = $('#webstats .tab-nav span');
+                        var select_pos = 0;
+                        $('#webstats .tab-nav span').each(function(i){
+                            if ($(this).hasClass('on')){select_pos = i;}
+                        });
+                        var args = {"site":domain};
+                        if ( [0,1,2,4].indexOf(select_pos)>-1 ){
+                            var setting_cdn = $('textarea[name="setting-cdn"]').val();
+                            // var list = setting_cdn.split('\n')
+
+                            if ( select_pos == 0 ){
+                                args['cdn_headers'] = setting_cdn;
+                            } else if ( select_pos == 1 ){
+                                args['exclude_extension'] = setting_cdn;
+                            } else if ( select_pos == 2 ){
+                                args['exclude_status'] = setting_cdn;
+                            } else if ( select_pos == 4 ){
+                                args['exclude_ip'] = setting_cdn;
+                            }
+
+                            wsPost('set_site_conf','', args, function(rdata){
+                                var rdata = $.parseJSON(rdata.data);
+                                layer.msg(rdata.msg,{icon:rdata.status?1:2});
+                            });
+                        }
+
+                        if (select_pos == 3 ){
+
+                            var list = "";
+                            for (var i = 0; i<10; i++) {
+                                var tmp = "";
+                                var url_type = $('select[name="url_type_'+i+'"]').val();
+                                var url_val = $('input[name="url_val_'+i+'"]').val();
+
+                                if (url_val != ""){
+                                    list += url_type +'|' + url_val +';';
+                                }
+                            }
+                            args['exclude_url'] = list;
+                            wsPost('set_site_conf','', args, function(rdata){
+                                var rdata = $.parseJSON(rdata.data);
+                                layer.msg(rdata.msg,{icon:rdata.status?1:2});
+                            });
+                        }
+
+                        if (select_pos == 5){
+                            var record_post_args = $('input[name="record_post_args"]').prop('checked');
+                            var record_get_403_args = $('input[name="record_get_403_args"]').prop('checked');
+                            args["record_post_args"] = record_post_args;
+                            args['record_get_403_args'] = record_get_403_args;
+                            wsPost('set_site_conf','', args, function(rdata){
+                                var rdata = $.parseJSON(rdata.data);
+                                layer.msg(rdata.msg,{icon:rdata.status?1:2});
+                            });
+                        }
+                    },
+                });
+            });
+        });
     });
 }
 
@@ -1144,8 +1335,6 @@ wsPost('get_default_site','',{},function(rdata){
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 }
-
-
 
 
 function wsClientStatLogRequest(page){
