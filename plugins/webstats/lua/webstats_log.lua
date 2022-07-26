@@ -67,6 +67,7 @@ log_by_lua_block {
 	local request_header
 	local method
 	local config
+	local auto_config
 	local excluded
 
 	local day
@@ -90,6 +91,22 @@ log_by_lua_block {
 		day_column = "day"..number_day
 		flow_column = "flow"..number_day
 		spider_column = "spider_flow"..number_day
+	end
+
+	local function get_auto_config(site)
+		local config_data = config
+		local global_config = config_data["global"]
+		if config_data[site] == nil then
+			auto_config = global_config
+		else
+			auto_config = config_data[site]
+			for k, v in pairs(global_config) do
+				if auto_config[k] == nil then
+					auto_config[k] = v
+				end
+			end
+		end
+		return auto_config
 	end
 
 
@@ -531,7 +548,7 @@ log_by_lua_block {
 	local function load_global_exclude_ip()
     	local load_key = "global_exclude_ip_load"
 		-- update global exclude ip
-		local global_exclude_ip = config["global"]["exclude_ip"]
+		local global_exclude_ip = auto_config["exclude_ip"]
 		if global_exclude_ip then
 			for i, _ip in pairs(global_exclude_ip)
 			do 
@@ -571,9 +588,9 @@ log_by_lua_block {
 	end
 
 	local function filter_status()
-		if not config['global']['exclude_status'] then return false end
+		if not auto_config['exclude_status'] then return false end
 		local the_status = tostring(ngx.status)
-		for _,v in ipairs(config['global']['exclude_status'])
+		for _,v in ipairs(auto_config['exclude_status'])
 		do
 			if the_status == v then
 				return true
@@ -584,8 +601,8 @@ log_by_lua_block {
 
 	local function exclude_extension()
 		if not ngx.var.uri then return false end
-		if not config['global']['exclude_extension'] then return false end
-		for _,v in ipairs(config['global']['exclude_extension'])
+		if not auto_config['exclude_extension'] then return false end
+		for _,v in ipairs(auto_config['exclude_extension'])
 		do
 			if ngx.re.find(ngx.var.uri,"[.]"..v.."$",'ijo') then
 				return true
@@ -596,9 +613,9 @@ log_by_lua_block {
 
 	local function exclude_url()
 		if not ngx.var.uri then return false end
-		if not config['global']['exclude_url'] then return false end
+		if not auto_config['exclude_url'] then return false end
 		local the_uri = string.sub(ngx.var.request_uri, 2)
-		local url_conf = config['global']["exclude_url"]
+		local url_conf = auto_config["exclude_url"]
 		for i,conf in pairs(url_conf)
 		do
 			local mode = conf["mode"]
@@ -981,6 +998,7 @@ log_by_lua_block {
 
 		local c_name = ngx.var.server_name
 		server_name = string.gsub(get_server_name(c_name),'_','.')
+		get_auto_config(server_name)
 
 		-- D("server_name:"..server_name)
 
