@@ -67,9 +67,14 @@ log_by_lua_block {
 	local request_header
 	local method
 	local config
-	local today
-	local day
 	local excluded
+
+	local day
+	local today
+	local number_day
+	local day_column
+	local flow_column
+	local spider_column
 	--- default common var end ---
 
 	local function init_var()
@@ -77,9 +82,14 @@ log_by_lua_block {
 
 		request_header = ngx.req.get_headers()
 		method = ngx.req.get_method()
-		today = os.date("%Y%m%d")
-		day = os.date("%d")
 
+		day = os.date("%d")
+		today = os.date("%Y%m%d")
+		
+		number_day = tonumber(day)
+		day_column = "day"..number_day
+		flow_column = "flow"..number_day
+		spider_column = "spider_flow"..number_day
 	end
 
 
@@ -270,7 +280,7 @@ log_by_lua_block {
 	end
 
 	---------------------       db start   ---------------------------
-	local function update_stat(update_server_name, db, stat_table, key, columns)
+	local function update_stat(db, stat_table, key, columns)
 		-- 根据指定表名，更新统计数据
 		if not columns then return end
 		local stmt = db:prepare(string.format("INSERT INTO %s(time) SELECT :time WHERE NOT EXISTS(SELECT time FROM %s WHERE time=:time);", stat_table, stat_table))
@@ -638,6 +648,32 @@ log_by_lua_block {
 	end
 	--------------------- exclude_func end ---------------------------
 	
+	local function statistics_uri(db, uri, uri_md5, body_length)
+		-- count the number of URI requests and traffic
+		local open_statistics_uri = config['global']["statistics_uri"]
+		if not open_statistics_uri then return true end
+
+		local stat_sql = nil
+		stat_sql = "INSERT INTO uri_stat(uri_md5,uri) SELECT \""..uri_md5.."\",\""..uri.."\" WHERE NOT EXISTS (SELECT uri_md5 FROM uri_stat WHERE uri_md5=\""..uri_md5.."\");"
+		local res, err = db:exec(stat_sql)
+		
+		stat_sql = "UPDATE uri_stat SET "..day_column.."="..day_column.."+1,"..flow_column.."="..flow_column.."+"..body_length.." WHERE uri_md5=\""..uri_md5.."\""
+		local res, err = db:exec(stat_sql)
+		return true
+	end
+
+	local function statistics_ip(db, ip, body_length)
+		local open_statistics_ip = config['global']["statistics_ip"]	
+		if not open_statistics_ip then return true end
+		
+		local stat_sql = nil
+		stat_sql = "INSERT INTO ip_stat(ip) SELECT \""..ip.."\" WHERE NOT EXISTS (SELECT ip FROM ip_stat WHERE ip=\""..ip.."\");"
+		local res, err = db:exec(stat_sql)
+		
+		stat_sql = "UPDATE ip_stat SET "..day_column.."="..day_column.."+1,"..flow_column.."="..flow_column.."+"..body_length.." WHERE ip=\""..ip.."\""
+		local res, err = db:exec(stat_sql)
+		return true
+	end
 
 	local function cache_logs()
 
@@ -827,19 +863,23 @@ log_by_lua_block {
 
 			local res, err = stmt:step()
 			if tostring(res) == "5" then
-				-- D("Step res:"..tostring(res))
-				-- D("Step err:"..tostring(err))
-				-- D("Step数据库连接繁忙，稍候存储。")
+				-- D("step res:"..tostring(res))
+				-- D("step err:"..tostring(err))
+				-- D("the step database connection is busy, so it will be stored later.")
 				return false
 			end
 			stmt:reset()
 			-- D("store_logs_line ok")
-			update_stat(store_server_name, db, "client_stat", time_key, client_stat_fields)
-			update_stat(store_server_name, db, "spider_stat", time_key, spider_stat_fields)
+			update_stat( db, "client_stat", time_key, client_stat_fields)
+			update_stat( db, "spider_stat", time_key, spider_stat_fields)
 			-- D("stat ok")
+
+			-- only count non spider requests
+			local ok, err = pcall(function() statistics_uri(db, uri, ngx.md5(uri), body_length) end)
+			local ok, err = pcall(function() statistics_ip(db, ip, body_length) end)
 		end
 
-		update_stat(input_server_name, db, "request_stat", time_key, request_stat_fields)
+		update_stat( db, "request_stat", time_key, request_stat_fields)
 		return true
  	end
 	
