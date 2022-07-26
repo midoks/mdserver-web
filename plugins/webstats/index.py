@@ -965,6 +965,17 @@ def getIpStatList():
     total_req = 0
     total_flow = 0
 
+    gepip_mmdb = getServerDir() + '/GeoLite2-City.mmdb'
+    geoip_exists = False
+    if os.path.exists(gepip_mmdb):
+        import geoip2.database
+        reader = geoip2.database.Reader(gepip_mmdb)
+        geoip_exists = True
+        # response = reader.city("172.70.206.144")
+        # print(response.country.names["zh-CN"])
+        # print(response.subdivisions.most_specific.names["zh-CN"])
+        # print(response.city.names["zh-CN"])
+
     for x in clist:
         total_req += x['day']
         total_flow += x['flow']
@@ -972,6 +983,16 @@ def getIpStatList():
     for i in range(len(clist)):
         clist[i]['day_rate'] = round((clist[i]['day'] / total_req) * 100, 2)
         clist[i]['flow_rate'] = round((clist[i]['flow'] / total_flow) * 100, 2)
+        ip = clist[i]['ip']
+
+        if ip == "127.0.0.1":
+            clist[i]['area'] = "本地"
+        elif geoip_exists:
+            response = reader.city(clist[i]['ip'])
+            country = response.country.names["zh-CN"]
+            subdivisions = response.subdivisions.most_specific.names["zh-CN"]
+            city = response.city.names["zh-CN"]
+            clist[i]['area'] = country + "," + subdivisions + "," + city
 
     return mw.returnJson(True, 'ok', clist)
 

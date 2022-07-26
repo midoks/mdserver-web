@@ -1750,7 +1750,7 @@ function wsIpStatLogRequest(page){
                 list += '<tr>';
                 list += '<td>' + (parseInt(i)+1)+'</td>';
                 list += '<td><span style="width:100px;">' + data[i]['ip']+'</span></td>';
-                list += '<td>' + "0" +'</td>';
+                list += '<td>' + data[i]['area'] +'</td>';
                 list += '<td>' + data[i]['day'] +'('+data[i]['day_rate']+'%)</td>';
                 list += '<td>' + toSize(data[i]['flow']) +'('+data[i]['flow_rate']+'%)</td>';
                 list += '<td><span><div class="share_num" style="width:'+data[i]['flow_rate']+'%"></div></span>' +'</td>';
