@@ -218,6 +218,9 @@ def initDreplace():
 def start():
     initDreplace()
 
+    import tool_task
+    tool_task.createBgTask()
+
     if not mw.isAppleSystem():
         mw.execShell("chown -R www:www " + getServerDir())
 
