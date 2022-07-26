@@ -268,9 +268,23 @@ def returnJson(status, msg, data=None):
     return getJson({'status': status, 'msg': msg, 'data': data})
 
 
+def getLanguage():
+    path = 'data/language.pl'
+    if not os.path.exists(path):
+        return 'Simplified_Chinese'
+    return readFile(path).strip()
+
+
+def getStaticJson(name="public"):
+    file = 'static/language/' + getLanguage() + '/' + name + '.json'
+    if not os.path.exists(file):
+        file = 'route/static/language/' + getLanguage() + '/' + name + '.json'
+    return file
+
+
 def returnMsg(status, msg, args=()):
     # 取通用字曲返回
-    pjson = 'static/language/' + getLanguage() + '/public.json'
+    pjson = getStaticJson('public')
     logMessage = json.loads(readFile(pjson))
     keys = logMessage.keys()
 
@@ -293,8 +307,8 @@ def getInfo(msg, args=()):
 def getMsg(key, args=()):
     # 取提示消息
     try:
-        logMessage = json.loads(
-            readFile('static/language/' + getLanguage() + '/public.json'))
+        pjson = getStaticJson('public')
+        logMessage = json.loads(pjson)
         keys = logMessage.keys()
         msg = None
         if key in keys:
@@ -309,8 +323,8 @@ def getMsg(key, args=()):
 
 def getLan(key):
     # 取提示消息
-    logMessage = json.loads(
-        readFile('static/language/' + getLanguage() + '/template.json'))
+    pjson = getStaticJson('public')
+    logMessage = json.loads(pjson)
     keys = logMessage.keys()
     msg = None
     if key in keys:
@@ -326,6 +340,7 @@ def readFile(filename):
         fp.close()
         return fBody
     except Exception as e:
+        # print(e)
         return False
 
 
@@ -333,13 +348,6 @@ def getDate():
     # 取格式时间
     import time
     return time.strftime('%Y-%m-%d %X', time.localtime())
-
-
-def getLanguage():
-    path = 'data/language.pl'
-    if not os.path.exists(path):
-        return 'Simplified_Chinese'
-    return readFile(path).strip()
 
 
 def writeLog(type, logMsg, args=()):
@@ -363,7 +371,7 @@ def writeFile(filename, str):
         fp.write(str)
         fp.close()
         return True
-    except:
+    except Exception as e:
         return False
 
 

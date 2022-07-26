@@ -23,23 +23,8 @@ def getPluginDir():
     return mw.getPluginDir() + '/' + getPluginName()
 
 
-sys.path.append(getPluginDir() + "/class")
-from LuaMaker import LuaMaker
-
-
-def listToLuaFile(path, lists):
-    content = LuaMaker.makeLuaTable(lists)
-    content = "return " + content
-    mw.writeFile(path, content)
-
-
 def getServerDir():
     return mw.getServerDir() + '/' + getPluginName()
-
-
-def getConf():
-    conf = getServerDir() + "/lua/config.json"
-    return conf
 
 
 def getTaskConf():
@@ -124,13 +109,13 @@ def execute():
         cfg = getConfigData()
         task_list = cfg["task_list"]
         for task in task_list:
+            # print(task)
             if task == "migrate_hot_logs":
                 try:
-                    from tool_migrate import tool_migrate
-                    tm = tool_migrate()
-                    tm.migrate_hot_logs("yesterday")
-                except:
-                    pass
+                    import tool_migrate
+                    tool_migrate.migrateHotLogs("yesterday")
+                except Exception as e:
+                    print(e)
         print(now)
         print("-" * 30)
     except Exception as e:
