@@ -149,13 +149,13 @@ def pSqliteDb(dbname='web_logs', site_name='unset', name="logs"):
         sql = mw.readFile(getPluginDir() + '/conf/init.sql')
         sql_list = sql.split(';')
         for index in range(len(sql_list)):
-            conn.execute(sql_list[index], ())
+            conn.execute(sql_list[index])
     else:
         conn = mw.M(dbname).dbPos(db_dir, name)
 
-    conn.execute("PRAGMA synchronous = 0", ())
-    conn.execute("PRAGMA page_size = 4096", ())
-    conn.execute("PRAGMA journal_mode = wal", ())
+    conn.execute("PRAGMA synchronous = 0")
+    conn.execute("PRAGMA page_size = 4096")
+    conn.execute("PRAGMA journal_mode = wal")
     return conn
 
 
@@ -587,6 +587,20 @@ def getLogsRealtimeInfo():
     return mw.returnJson(True, 'ok', data)
 
 
+def attacHistoryLogHack(conn, site_name, query_date='today'):
+    if query_date == "today":
+        return
+    db_dir = getServerDir() + '/logs/' + site_name
+    file = db_dir + '/history_logs.db'
+    if os.path.exists(file):
+        attach = "ATTACH DATABASE '" + file + "' as 'history_logs'"
+        # print(attach)
+        r = conn.originExecute(attach)
+        sql_table = "(select * from web_logs union all select * from history_logs.web_logs)"
+        # print(sql_table)
+        conn.table(sql_table)
+
+
 def getLogsList():
     args = getArgs()
     check = checkArgs(args, ['page', 'page_size',
@@ -644,6 +658,8 @@ def getLogsList():
 
     if search_uri != "":
         conn = conn.andWhere("uri like '%" + search_uri + "%'", ())
+
+    attacHistoryLogHack(conn, domain, query_date)
 
     clist = conn.limit(limit).order('time desc').inquiry()
     count_key = "count(*) as num"
@@ -708,6 +724,8 @@ def getLogsErrorList():
     else:
         exlist = query_date.split("-")
         conn = conn.andWhere("time>=? and time<=?", (exlist[0], exlist[1]))
+
+    attacHistoryLogHack(conn, domain, query_date)
 
     clist = conn.limit(limit).order('time desc').inquiry()
     count_key = "count(*) as num"
