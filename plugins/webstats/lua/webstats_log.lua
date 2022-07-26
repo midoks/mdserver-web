@@ -161,7 +161,7 @@ log_by_lua_block {
 		local client_ip = "unknown"
 		local cdn = config['cdn']
 		if cdn == true then
-			for _,v in ipairs(config['cdn_headers']) do
+			for _,v in ipairs(auto_config['cdn_headers']) do
 				if request_header[v] ~= nil and request_header[v] ~= "" then
 					local ip_list = request_header[v]
 					client_ip = split_bylog(ip_list,',')[1]
