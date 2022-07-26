@@ -20,6 +20,10 @@ else
 	BAK=''
 fi
 
+if [ -f ${rootPath}/bin/activate ];then
+	source ${rootPath}/bin/activate
+fi
+
 Install_App()
 {
 	echo '正在安装脚本文件...' > $install_tmp
@@ -60,17 +64,19 @@ Install_App()
 	PATH=${serverPath}/openresty/luajit:${serverPath}/openresty/luajit/include/luajit-2.1:$PATH
 	export PATH=$PATH:$serverPath/webstats/luarocks/bin
 
-	if [ "${sys_os}" == "Darwin" ];then
-		cd $serverPath/source/webstats/lsqlite3_fsl09y 
-		# SQLITE_DIR=/usr/local/Cellar/sqlite/3.36.0
-		find_cfg=`cat Makefile | grep 'SQLITE_DIR'`
-		if [ "$find_cfg" == "" ];then
-			LIB_SQLITE_DIR=`brew info sqlite | grep /usr/local/Cellar/sqlite | cut -d \  -f 1 | awk 'END {print}'`
-			sed -i $BAK "s#\$(ROCKSPEC)#\$(ROCKSPEC) SQLITE_DIR=${LIB_SQLITE_DIR}#g"  Makefile
+	if [ ! -f $serverPath/webstats/lua/lsqlite3.so ];then
+		if [ "${sys_os}" == "Darwin" ];then
+			cd $serverPath/source/webstats/lsqlite3_fsl09y 
+			# SQLITE_DIR=/usr/local/Cellar/sqlite/3.36.0
+			find_cfg=`cat Makefile | grep 'SQLITE_DIR'`
+			if [ "$find_cfg" == "" ];then
+				LIB_SQLITE_DIR=`brew info sqlite | grep /usr/local/Cellar/sqlite | cut -d \  -f 1 | awk 'END {print}'`
+				sed -i $BAK "s#\$(ROCKSPEC)#\$(ROCKSPEC) SQLITE_DIR=${LIB_SQLITE_DIR}#g"  Makefile
+			fi
+			make
+		else
+			cd $serverPath/source/webstats/lsqlite3_fsl09y && make
 		fi
-		make
-	else
-		cd $serverPath/source/webstats/lsqlite3_fsl09y && make
 	fi
 
 	# copy to code path
@@ -80,9 +86,9 @@ Install_App()
 		cp -rf ${DEFAULT_DIR}/lsqlite3.so $serverPath/webstats/lua/lsqlite3.so 
 	fi
 
-
+	pip install geoip2
 	if [ ! -f $serverPath/webstats/GeoLite2-City.mmdb ];then
-		pip install geoip2
+		# pip install geoip2
 		wget --no-check-certificate -O $serverPath/webstats/GeoLite2-City.mmdb https://git.io/GeoLite2-City.mmdb
 	fi
 
