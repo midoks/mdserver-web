@@ -571,9 +571,9 @@ log_by_lua_block {
 	end
 
 	local function filter_status()
-		if not config['exclude_status'] then return false end
+		if not config['global']['exclude_status'] then return false end
 		local the_status = tostring(ngx.status)
-		for _,v in ipairs(config['exclude_status'])
+		for _,v in ipairs(config['global']['exclude_status'])
 		do
 			if the_status == v then
 				return true
@@ -596,9 +596,9 @@ log_by_lua_block {
 
 	local function exclude_url()
 		if not ngx.var.uri then return false end
-		if not config['exclude_url'] then return false end
+		if not config['global']['exclude_url'] then return false end
 		local the_uri = string.sub(ngx.var.request_uri, 2)
-		local url_conf = config["exclude_url"]
+		local url_conf = config['global']["exclude_url"]
 		for i,conf in pairs(url_conf)
 		do
 			local mode = conf["mode"]
