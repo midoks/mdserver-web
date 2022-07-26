@@ -56,7 +56,7 @@ def getConfigData():
         "task_id": -1,
         "task_list": ["migrate_hot_logs"],
         "default_execute_hour": 3,
-        "default_execute_minute": 10,
+        "default_execute_minute": 15,
     }
 
 
@@ -83,7 +83,7 @@ def createBgTask():
         'week': "",
         'where1': "",
         'hour': cfg['default_execute_hour'],
-        'minute': cfg['default_execute_hour'],
+        'minute': cfg['default_execute_minute'],
         'save': "",
         'backup_to': "",
         'stype': "toShell",
@@ -117,8 +117,24 @@ def removeBgTask():
 
 
 def execute():
-    print("helo")
-
+    try:
+        import time
+        now = time.strftime("%Y-%m-%d", time.localtime())
+        print("-" * 30)
+        cfg = getConfigData()
+        task_list = cfg["task_list"]
+        for task in task_list:
+            if task == "migrate_hot_logs":
+                try:
+                    from tool_migrate import tool_migrate
+                    tm = tool_migrate()
+                    tm.migrate_hot_logs("yesterday")
+                except:
+                    pass
+        print(now)
+        print("-" * 30)
+    except Exception as e:
+        print(e)
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
