@@ -1731,6 +1731,240 @@ wsPost('get_default_site','',{},function(rdata){
 
 
 
+function wsIpStatLogRequest(page){
+
+    var args = {}
+    args['site'] = $('select[name="site"]').val();
+    var query_date = 'today';
+    query_date = $('#search_time button.cur').attr("data-name");
+    args['query_date'] = query_date;
+
+    args['tojs'] = 'wsIpStatLogRequest';
+    wsPost('get_ip_stat_list', '' ,args, function(rdata){
+        var rdata = $.parseJSON(rdata.data);
+        var list = '';
+        var data = rdata.data;
+        // console.log(rdata,data);
+        if (data.length > 0){
+            for(i in data){
+                list += '<tr>';
+                list += '<td>' + (parseInt(i)+1)+'</td>';
+                list += '<td><span style="width:100px;">' + data[i]['ip']+'</span></td>';
+                list += '<td>' + "0" +'</td>';
+                list += '<td>' + data[i]['day'] +'('+data[i]['day_rate']+'%)</td>';
+                list += '<td>' + toSize(data[i]['flow']) +'('+data[i]['flow_rate']+'%)</td>';
+                list += '<td><span><div class="share_num" style="width:'+data[i]['flow_rate']+'%"></div></span>' +'</td>';
+                list += '</tr>';
+            }
+
+
+        } else{
+             list += '<tr><td colspan="6" style="text-align:center;">IP列表为空</td></tr>';
+        }
+        
+        var table = '<div class="tablescroll">\
+                            <table id="DataBody" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
+                            <thead><tr>\
+                            <th>序号</th>\
+                            <th>IP</th>\
+                            <th>归属地(仅供参考)</th>\
+                            <th>请求数</th>\
+                            <th>流量</th>\
+                            <th>流量占比图</th>\
+                            </tr></thead>\
+                            <tbody>\
+                            '+ list +'\
+                            </tbody></table>\
+                        </div>\
+                        <div id="wsPage" class="dataTables_paginate paging_bootstrap page"></div>';
+        $('#ws_table').html(table);
+    });
+}
+
+
+function wsIpStat(){
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+var randstr = getRandomString(10);
+
+var html = '<div>\
+                <div style="padding-bottom:10px;">\
+                    <span>网站: </span>\
+                    <select class="bt-input-text" name="site" style="margin-left:4px;width:100px;">\
+                        <option value="unset">未设置</option>\
+                    </select>\
+                    <span style="margin-left:10px">时间: </span>\
+                    <div class="input-group" style="margin-left:10px;width:350px;display: inline-table;vertical-align: top;">\
+                        <div id="search_time" class="input-group-btn btn-group-sm">\
+                            <button data-name="today" type="button" class="btn btn-default">今日</button>\
+                            <button data-name="yesterday" type="button" class="btn btn-default">昨日</button>\
+                            <button data-name="l7" type="button" class="btn btn-default">近7天</button>\
+                            <button data-name="l30" type="button" class="btn btn-default">近30天</button>\
+                        </div>\
+                    </div>\
+                </div>\
+                <div class="divtable mtb10" id="ws_table"></div>\
+            </div>';
+$(".soft-man-con").html(html);
+
+
+$('#search_time button:eq(0)').addClass('cur');
+$('#search_time button').click(function(){
+    $('#search_time button').each(function(){
+        if ($(this).hasClass('cur')){
+            $(this).removeClass('cur');
+        }
+    });
+    $('#time_choose').attr("data-name",'');
+    $('#time_choose').removeClass("cur");
+
+    $(this).addClass('cur');
+
+    wsIpStatLogRequest(1);
+});
+
+wsPost('get_default_site','',{},function(rdata){
+    $('select[name="site"]').html('');
+
+    var rdata = $.parseJSON(rdata.data);
+    var rdata = rdata.data;
+    var default_site = rdata["default"];
+    var select = '';
+    for (var i = 0; i < rdata["list"].length; i++) {
+        if (default_site ==  rdata["list"][i]){
+            select += '<option value="'+rdata["list"][i]+'" selected>'+rdata["list"][i]+'</option>';
+        } else{
+            select += '<option value="'+rdata["list"][i]+'">'+rdata["list"][i]+'</option>';
+        }
+    }
+    $('select[name="site"]').html(select);
+    wsIpStatLogRequest(1);
+
+    $('select[name="site"]').change(function(){
+        wsIpStatLogRequest(1);
+    });
+});
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+}
+
+
+function wsUriStatLogRequest(page){
+
+    var args = {}
+    args['site'] = $('select[name="site"]').val();
+    var query_date = 'today';
+    query_date = $('#search_time button.cur').attr("data-name");
+    args['query_date'] = query_date;
+
+    args['tojs'] = 'wsUriStatLogRequest';
+    wsPost('get_uri_stat_list', '' ,args, function(rdata){
+        var rdata = $.parseJSON(rdata.data);
+        var list = '';
+        var data = rdata.data;
+        // console.log(rdata,data);
+        if (data.length > 0){
+            for(i in data){
+                list += '<tr>';
+                list += '<td>' + (parseInt(i)+1)+'</td>';
+                list += '<td><span style="width:100px;">' + data[i]['uri']+'</span></td>';
+                list += '<td>' + data[i]['day'] +'('+data[i]['day_rate']+'%)</td>';
+                list += '<td>' + toSize(data[i]['flow']) +'('+data[i]['flow_rate']+'%)</td>';
+                list += '<td><span><div class="share_num" style="width:'+data[i]['flow_rate']+'%"></div></span>' +'</td>';
+                list += '</tr>';
+            }
+
+
+        } else{
+             list += '<tr><td colspan="6" style="text-align:center;">URI列表为空</td></tr>';
+        }
+        
+        var table = '<div class="tablescroll">\
+                            <table id="DataBody" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
+                            <thead><tr>\
+                            <th>序号</th>\
+                            <th>URI</th>\
+                            <th>请求数</th>\
+                            <th>流量</th>\
+                            <th>流量占比图</th>\
+                            </tr></thead>\
+                            <tbody>\
+                            '+ list +'\
+                            </tbody></table>\
+                        </div>\
+                        <div id="wsPage" class="dataTables_paginate paging_bootstrap page"></div>';
+        $('#ws_table').html(table);
+    });
+}
+
+
+function wsUriStat(){
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+var randstr = getRandomString(10);
+
+var html = '<div>\
+                <div style="padding-bottom:10px;">\
+                    <span>网站: </span>\
+                    <select class="bt-input-text" name="site" style="margin-left:4px;width:100px;">\
+                        <option value="unset">未设置</option>\
+                    </select>\
+                    <span style="margin-left:10px">时间: </span>\
+                    <div class="input-group" style="margin-left:10px;width:350px;display: inline-table;vertical-align: top;">\
+                        <div id="search_time" class="input-group-btn btn-group-sm">\
+                            <button data-name="today" type="button" class="btn btn-default">今日</button>\
+                            <button data-name="yesterday" type="button" class="btn btn-default">昨日</button>\
+                            <button data-name="l7" type="button" class="btn btn-default">近7天</button>\
+                            <button data-name="l30" type="button" class="btn btn-default">近30天</button>\
+                        </div>\
+                    </div>\
+                </div>\
+                <div class="divtable mtb10" id="ws_table"></div>\
+            </div>';
+$(".soft-man-con").html(html);
+
+
+$('#search_time button:eq(0)').addClass('cur');
+$('#search_time button').click(function(){
+    $('#search_time button').each(function(){
+        if ($(this).hasClass('cur')){
+            $(this).removeClass('cur');
+        }
+    });
+    $('#time_choose').attr("data-name",'');
+    $('#time_choose').removeClass("cur");
+
+    $(this).addClass('cur');
+
+    wsUriStatLogRequest(1);
+});
+
+wsPost('get_default_site','',{},function(rdata){
+    $('select[name="site"]').html('');
+
+    var rdata = $.parseJSON(rdata.data);
+    var rdata = rdata.data;
+    var default_site = rdata["default"];
+    var select = '';
+    for (var i = 0; i < rdata["list"].length; i++) {
+        if (default_site ==  rdata["list"][i]){
+            select += '<option value="'+rdata["list"][i]+'" selected>'+rdata["list"][i]+'</option>';
+        } else{
+            select += '<option value="'+rdata["list"][i]+'">'+rdata["list"][i]+'</option>';
+        }
+    }
+    $('select[name="site"]').html(select);
+    wsUriStatLogRequest(1);
+
+    $('select[name="site"]').change(function(){
+        wsUriStatLogRequest(1);
+    });
+});
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+}
+
+
+
+
 
 function wsTableErrorLogRequest(page){
 

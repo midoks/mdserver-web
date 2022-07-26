@@ -862,6 +862,219 @@ def getClientStatList():
     return mw.returnJson(True, 'ok', data)
 
 
+def getDateRangeList(start, end):
+    dlist = []
+    if start > end:
+        for x in list(range(start, 32, 1)):
+            dlist.append(x)
+
+        for x in list(range(1, end, 1)):
+            dlist.append(x)
+    else:
+        for x in list(range(start, end, 1)):
+            dlist.append(x)
+
+    return dlist
+
+
+def getIpStatList():
+    args = getArgs()
+    check = checkArgs(args, ['site', 'query_date'])
+    if not check[0]:
+        return check[1]
+
+    domain = args['site']
+    tojs = args['tojs']
+    query_date = args['query_date']
+    setDefaultSite(domain)
+
+    conn = pSqliteDb('ip_stat', domain)
+
+    origin_field = "ip,day,flow"
+
+    if query_date == "today":
+        ftime = time.localtime(time.time())
+        day = ftime.tm_mday
+
+        field_day = "day" + str(day)
+        field_flow = "flow" + str(day)
+        # print(field_day, field_flow)
+
+        field = "ip," + field_day + ' as day,' + field_flow + " as flow"
+
+        conn = conn.field(field)
+        conn = conn.where("day>? and flow>?", (0, 0,))
+
+    elif query_date == "yesterday":
+
+        ftime = time.localtime(time.time() - 86400)
+        day = ftime.tm_mday
+
+        field_day = "day" + str(day)
+        field_flow = "flow" + str(day)
+
+        field = "ip," + field_day + ' as day,' + field_flow + " as flow"
+
+        conn = conn.field(field)
+        conn = conn.where("day>? and flow>?", (0, 0,))
+    elif query_date == "l7":
+
+        field_day = ""
+        field_flow = ""
+
+        now_time = time.localtime(time.time())
+        end_day = now_time.tm_mday
+
+        start_time = time.localtime(time.time() - 7 * 86400)
+        start_day = start_time.tm_mday
+
+        rlist = getDateRangeList(start_day, end_day)
+
+        for x in rlist:
+            field_day += "+cast(day" + str(x) + " as TEXT)"
+            field_flow += "+cast(flow" + str(x) + " as TEXT)"
+
+        field_day = field_day.strip("+")
+        field_flow = field_flow.strip("+")
+
+        field = "ip,(" + field_day + ') as day,(' + field_flow + ") as flow"
+        conn = conn.field(field)
+        conn = conn.where("day>? and flow>?", (0, 0,))
+
+    elif query_date == "l30":
+
+        field_day = ""
+        field_flow = ""
+
+        for x in list(range(1, 32, 1)):
+            field_day += "+cast(day" + str(x) + " as TEXT)"
+            field_flow += "+cast(flow" + str(x) + " as TEXT)"
+
+        field_day = field_day.strip("+")
+        field_flow = field_flow.strip("+")
+
+        # print(field_day)
+        # print(field_flow)
+        field = "ip,(" + field_day + ') as day,(' + field_flow + ") as flow"
+        conn = conn.field(field)
+        conn = conn.where("day>? and flow>?", (0, 0,))
+
+    clist = conn.order("flow desc").limit("50").inquiry(origin_field)
+    # print(clist)
+
+    total_req = 0
+    total_flow = 0
+
+    for x in clist:
+        total_req += x['day']
+        total_flow += x['flow']
+
+    for i in range(len(clist)):
+        clist[i]['day_rate'] = round((clist[i]['day'] / total_req) * 100, 2)
+        clist[i]['flow_rate'] = round((clist[i]['flow'] / total_flow) * 100, 2)
+
+    return mw.returnJson(True, 'ok', clist)
+
+
+def getUriStatList():
+    args = getArgs()
+    check = checkArgs(args, ['site', 'query_date'])
+    if not check[0]:
+        return check[1]
+
+    domain = args['site']
+    tojs = args['tojs']
+    query_date = args['query_date']
+    setDefaultSite(domain)
+
+    conn = pSqliteDb('uri_stat', domain)
+
+    origin_field = "uri,day,flow"
+
+    if query_date == "today":
+        ftime = time.localtime(time.time())
+        day = ftime.tm_mday
+
+        field_day = "day" + str(day)
+        field_flow = "flow" + str(day)
+        # print(field_day, field_flow)
+
+        field = "uri," + field_day + ' as day,' + field_flow + " as flow"
+
+        conn = conn.field(field)
+        conn = conn.where("day>? and flow>?", (0, 0,))
+
+    elif query_date == "yesterday":
+
+        ftime = time.localtime(time.time() - 86400)
+        day = ftime.tm_mday
+
+        field_day = "day" + str(day)
+        field_flow = "flow" + str(day)
+
+        field = "uri," + field_day + ' as day,' + field_flow + " as flow"
+
+        conn = conn.field(field)
+        conn = conn.where("day>? and flow>?", (0, 0,))
+    elif query_date == "l7":
+
+        field_day = ""
+        field_flow = ""
+
+        now_time = time.localtime(time.time())
+        end_day = now_time.tm_mday
+
+        start_time = time.localtime(time.time() - 7 * 86400)
+        start_day = start_time.tm_mday
+
+        rlist = getDateRangeList(start_day, end_day)
+
+        for x in rlist:
+            field_day += "+cast(day" + str(x) + " as TEXT)"
+            field_flow += "+cast(flow" + str(x) + " as TEXT)"
+
+        field_day = field_day.strip("+")
+        field_flow = field_flow.strip("+")
+
+        field = "uri,(" + field_day + ') as day,(' + field_flow + ") as flow"
+        conn = conn.field(field)
+        conn = conn.where("day>? and flow>?", (0, 0,))
+
+    elif query_date == "l30":
+
+        field_day = ""
+        field_flow = ""
+
+        for x in list(range(1, 32, 1)):
+            field_day += "+cast(day" + str(x) + " as TEXT)"
+            field_flow += "+cast(flow" + str(x) + " as TEXT)"
+
+        field_day = field_day.strip("+")
+        field_flow = field_flow.strip("+")
+
+        # print(field_day)
+        # print(field_flow)
+        field = "uri,(" + field_day + ') as day,(' + field_flow + ") as flow"
+        conn = conn.field(field)
+        conn = conn.where("day>? and flow>?", (0, 0,))
+
+    clist = conn.order("flow desc").limit("50").inquiry(origin_field)
+    # print(clist)
+
+    total_req = 0
+    total_flow = 0
+
+    for x in clist:
+        total_req += x['day']
+        total_flow += x['flow']
+
+    for i in range(len(clist)):
+        clist[i]['day_rate'] = round((clist[i]['day'] / total_req) * 100, 2)
+        clist[i]['flow_rate'] = round((clist[i]['flow'] / total_flow) * 100, 2)
+
+    return mw.returnJson(True, 'ok', clist)
+
+
 def getWebLogCount(domain, query_date):
     conn = pSqliteDb('web_logs', domain)
 
@@ -1022,6 +1235,10 @@ if __name__ == "__main__":
         print(getLogsRealtimeInfo())
     elif func == 'get_client_stat_list':
         print(getClientStatList())
+    elif func == 'get_ip_stat_list':
+        print(getIpStatList())
+    elif func == 'get_uri_stat_list':
+        print(getUriStatList())
     elif func == 'get_spider_stat_list':
         print(getSpiderStatList())
     else:

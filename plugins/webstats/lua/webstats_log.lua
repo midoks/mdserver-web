@@ -4,7 +4,7 @@ log_by_lua_block {
 	-- 
     -- 
 
-	local ver = '0.0.1'
+	local ver = '0.2.0'
 	local max_log_id = 99999999999999
 	local debug_mode = true
 
@@ -560,7 +560,7 @@ log_by_lua_block {
 		if site_exclude_ip then
 			for i, _ip in pairs(site_exclude_ip)
 			do 
-				D("set exclude ip: ".._ip)
+				-- D("set exclude ip: ".._ip)
 				cache:set(input_server_name .. "_exclude_ip_".._ip, true)
 			end
 		end
@@ -903,7 +903,7 @@ log_by_lua_block {
 
 		local worker_id = ngx.worker.id()
 		if is_working(input_server_name) then
-			-- D("其他worker正在存储中，稍候存储。")
+			-- D("other workers are being stored, please store later.")
 			-- cache:delete(flush_data_key)
 			return true
 		end
