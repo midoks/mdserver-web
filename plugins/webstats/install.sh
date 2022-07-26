@@ -80,6 +80,14 @@ Install_App()
 		cp -rf ${DEFAULT_DIR}/lsqlite3.so $serverPath/webstats/lua/lsqlite3.so 
 	fi
 
+
+	if [ ! -f $serverPath/webstats/GeoLite2-City.mmdb ];then
+		pip install geoip2
+		wget --no-check-certificate -O $serverPath/webstats/GeoLite2-City.mmdb https://git.io/GeoLite2-City.mmdb
+	fi
+
+	# GeoLite2-Country.mmdb
+
 	echo "${VERSION}" > $serverPath/webstats/version.pl
 	echo '安装完成' > $install_tmp
 
