@@ -27,7 +27,9 @@
             "gif",
             "jpg",
             "css",
-            "js"
+            "js",
+            "ico",
+            "woff2"
         ],
         "exclude_status": [
             301,
