@@ -263,9 +263,9 @@ class crontab_api:
         except Exception as e:
             return mw.returnJson(False, '删除失败:' + str(e))
 
-    def delete(self, task_id):
+    def delete(self, tid):
 
-        find = mw.M('crontab').where("id=?", (sid,)).field('name,echo').find()
+        find = mw.M('crontab').where("id=?", (tid,)).field('name,echo').find()
         if not self.removeForCrond(find['echo']):
             return (False, '无法写入文件，请检查是否开启了系统加固功能!')
 
@@ -278,7 +278,7 @@ class crontab_api:
         if os.path.exists(sfile):
             os.remove(sfile)
 
-        mw.M('crontab').where("id=?", (sid,)).delete()
+        mw.M('crontab').where("id=?", (tid,)).delete()
         mw.writeLog('计划任务', mw.getInfo('删除计划任务[{1}]成功!', (find['name'],)))
         return (True, "OK")
 
@@ -509,6 +509,10 @@ echo "--------------------------------------------------------------------------
                 return False
         else:
             file = u_file
+
+        if mw.isAppleSystem():
+            return True
+
         conf = mw.readFile(file)
         rep = ".+" + str(echo) + ".+\n"
         conf = re.sub(rep, "", conf)
