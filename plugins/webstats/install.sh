@@ -86,6 +86,7 @@ Install_App()
 		cp -rf ${DEFAULT_DIR}/lsqlite3.so $serverPath/webstats/lua/lsqlite3.so 
 	fi
 
+	# https://github.com/P3TERX/GeoLite.mmdb
 	pip install geoip2
 	if [ ! -f $serverPath/webstats/GeoLite2-City.mmdb ];then
 		# pip install geoip2
