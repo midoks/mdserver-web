@@ -137,15 +137,13 @@ def loadDebugLogFile():
     mw.writeFile(debug_log, '')
 
 
-def pSqliteDb(dbname='web_logs', site_name='unset'):
+def pSqliteDb(dbname='web_logs', site_name='unset', name="logs"):
 
     db_dir = getServerDir() + '/logs/' + site_name
     if not os.path.exists(db_dir):
         mw.execShell('mkdir -p ' + db_dir)
 
-    name = 'logs'
     file = db_dir + '/' + name + '.db'
-
     if not os.path.exists(file):
         conn = mw.M(dbname).dbPos(db_dir, name)
         sql = mw.readFile(getPluginDir() + '/conf/init.sql')

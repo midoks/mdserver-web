@@ -202,6 +202,13 @@ log_by_lua_block {
 		return json.encode(headers)
 	end
 
+	local function is_migrating(input_server_name)
+		local file = io.open("{$SERVER_APP}/migrating", "rb")
+		if file then return true end
+		local file = io.open("{$SERVER_APP}/logs/"..input_server_name.."/migrating", "rb")
+		if file then return true end
+		return false
+	end
 
 
 	local function is_working(name)
@@ -837,6 +844,10 @@ log_by_lua_block {
  	end
 	
 	local function store_logs(input_server_name)
+		if is_migrating(input_server_name) == true then
+			-- D("migrating...")
+			return
+		end
 		
 		local last_insert_id_key = input_server_name.."_last_id"
 		local store_start_id_key = input_server_name.."_store_start"
