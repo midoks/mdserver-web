@@ -281,7 +281,16 @@ class Sql():
         except Exception as ex:
             return "error: " + str(ex)
 
-    def execute(self, sql, param):
+    def originExecute(self, sql, param=()):
+        self.__GetConn()
+        try:
+            result = self.__DB_CONN.execute(sql, param)
+            self.__DB_CONN.commit()
+            return result
+        except Exception as ex:
+            return "error: " + str(ex)
+
+    def execute(self, sql, param=()):
         # 执行SQL语句返回受影响行
         self.__GetConn()
         # print sql, param
