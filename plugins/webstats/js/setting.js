@@ -160,6 +160,7 @@ wsPost('get_global_conf', '' ,{}, function(rdata){
 
 	$('#ip_top_num').click(function(){
 		var num = $('input[name="ip_top_num"]').val();
+		if(num == '' || num <= 0 || num > 2000) return layer.msg('请设置1-2000范围的统计数量',{icon:2});
 		wsPost('set_global_conf','',{ip_top_num:num}, function(rdata){
 			var rdata = $.parseJSON(rdata.data);
 			layer.msg(rdata.msg,{icon:rdata.status?1:2});
@@ -168,6 +169,7 @@ wsPost('get_global_conf', '' ,{}, function(rdata){
 
 	$('#uri_top_num').click(function(){
 		var num = $('input[name="uri_top_num"]').val();
+		if(num == '' || num <= 0 || num > 2000) return layer.msg('请设置1-2000范围的统计数量',{icon:2})
 		wsPost('set_global_conf','',{uri_top_num:num}, function(rdata){
 			var rdata = $.parseJSON(rdata.data);
 			layer.msg(rdata.msg,{icon:rdata.status?1:2});
