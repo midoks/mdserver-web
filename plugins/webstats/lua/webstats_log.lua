@@ -964,7 +964,7 @@ log_by_lua_block {
 		local save_date_timestamp = os.time{year=now_date.year,
 			month=now_date.month, day=now_date.day-save_day, hour=0}
 		-- delete expire data
-		db:exec("DELETE FROM site_logs WHERE time<"..tostring(save_date_timestamp))
+		db:exec("DELETE FROM web_logs WHERE time<"..tostring(save_date_timestamp))
 
 		local res, err = db:execute([[COMMIT]])
 		if db and db:isopen() then
