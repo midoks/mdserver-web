@@ -584,8 +584,8 @@ log_by_lua_block {
 
 	local function exclude_extension()
 		if not ngx.var.uri then return false end
-		if not config['exclude_extension'] then return false end
-		for _,v in ipairs(config['exclude_extension'])
+		if not config['global']['exclude_extension'] then return false end
+		for _,v in ipairs(config['global']['exclude_extension'])
 		do
 			if ngx.re.find(ngx.var.uri,"[.]"..v.."$",'ijo') then
 				return true
