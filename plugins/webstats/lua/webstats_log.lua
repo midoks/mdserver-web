@@ -639,7 +639,7 @@ log_by_lua_block {
 		if not auto_config['exclude_extension'] then return false end
 		for _,v in ipairs(auto_config['exclude_extension'])
 		do
-			if ngx.re.find(ngx.var.request_uri,"[.]"..v.."$",'ijo') then
+			if ngx.re.find(ngx.var.uri,"[.]"..v.."$",'ijo') then
 				return true
 			end
 		end
