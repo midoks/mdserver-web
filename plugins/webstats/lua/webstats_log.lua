@@ -997,6 +997,10 @@ log_by_lua_block {
 
 		update_day = load_update_day(input_server_name)
 		if not update_day or update_day ~= today then
+
+			local update_sql = "UPDATE uri_stat SET "..day_column.."=0,"..flow_column.."=0"
+			status, errorString = db:exec(update_sql)
+
 			update_sql = "UPDATE ip_stat SET "..day_column.."=0,"..flow_column.."=0"
 			status, errorString = db:exec(update_sql)
 			write_update_day(input_server_name)
