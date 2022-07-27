@@ -134,7 +134,11 @@ def pSqliteDb(dbname='databases'):
 
 
 def pMysqlDb():
-    db = mw.getMyORM()
+    # mysql.connector
+    # db = mw.getMyORM()
+    # MySQLdb |
+    db = mw.getMyORMDb()
+
     db.setPort(getDbPort())
     db.setSocket(getSocketFile())
     # db.setCharset("utf8")

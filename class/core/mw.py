@@ -1022,3 +1022,13 @@ def getMyORM():
     import orm
     o = orm.ORM()
     return o
+
+
+def getMyORMDb():
+    '''
+    获取MySQL资源的ORM pip install mysqlclient==2.0.3 | pip install mysql-python
+    '''
+    sys.path.append(os.getcwd() + "/class/plugin")
+    import ormDb
+    o = ormDb.ORM()
+    return o
