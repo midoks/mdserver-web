@@ -1993,7 +1993,7 @@ function wsTableErrorLogRequest(page){
                 list += '<tr>';
                 list += '<td>' + getLocalTime(data[i]['time'])+'</td>';
                 list += '<td><span class="overflow_hide" style="width:100px;">' + data[i]['domain'] +'</span></td>';
-                list += '<td><span class="overflow_hide" style="width:110px;">' + data[i]['ip'] +'</span></td>';
+                list += '<td><span class="overflow_hide" style="width:100px;">' + data[i]['ip'] +'</span></td>';
                 list += '<td>' + toSize(data[i]['body_length']) +'</td>';
                 list += '<td>' + toSecond(data[i]['request_time']) +'</td>';
                 list += '<td><span class="overflow_hide" style="width:150px;">' + data[i]['uri'] +'</span></td>';
@@ -2202,7 +2202,7 @@ function wsTableLogRequest(page){
                 list += '<tr>';
                 list += '<td>' + getLocalTime(data[i]['time'])+'</td>';
                 list += '<td><span class="overflow_hide" style="width:100px;">' + data[i]['domain'] +'</span></td>';
-                list += '<td><span class="overflow_hide" style="width:110px;">' + data[i]['ip'] +'</span></td>';
+                list += '<td><span class="overflow_hide" style="width:100px;">' + data[i]['ip'] +'</span></td>';
                 list += '<td>' + toSize(data[i]['body_length']) +'</td>';
                 list += '<td>' + toSecond(data[i]['request_time']) +'</td>';
                 list += '<td><span class="overflow_hide" style="width:150px;">' + data[i]['uri'] +'</span></td>';
