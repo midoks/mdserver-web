@@ -2290,7 +2290,7 @@ location /{
             certInfo = self.getCertName(certPath)
             if not certInfo:
                 return mw.returnData(False, '证书解析失败!')
-            vpath = self.sslDir + certInfo['subject']
+            vpath = self.sslDir + certInfo['subject'].strip()
             if not os.path.exists(vpath):
                 os.system('mkdir -p ' + vpath)
             mw.writeFile(vpath + '/privkey.pem',
