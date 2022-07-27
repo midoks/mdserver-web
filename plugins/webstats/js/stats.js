@@ -2037,7 +2037,7 @@ function wsTableErrorLogRequest(page){
                 content: '<div class="pd15 lib-box">\
                     <div style="height:80px;"><table class="table" style="border:#ddd 1px solid; margin-bottom:10px">\
                     <tbody class="site_details_tbody">\
-                        <tr><th>时间</th><td>' + getLocalTime(res.time) + '</td><th>真实IP</th><td><span class="overflow_hide detail_ip">' + res.ip + '</span></td><th>客户端端口</th><td>'+(res.client_port>0 && res.client_port != ''?res.client_port:'')+'</td></tr>\
+                        <tr><th>时间</th><td>' + getLocalTime(res.time) + '</td><th>真实IP</th><td><span class="overflow_hide detail_ip" style="width:100px;">' + res.ip + '</span></td><th>客户端端口</th><td>'+(res.client_port>0 && res.client_port != ''?res.client_port:'')+'</td></tr>\
                         <tr><th>类型</th><td>' + res.method + '</td><th>状态</th><td>' + res.status_code + '</td><th>响应大小</th><td>' + toSize(res.body_length) + '</td>\</tr>\
                     </tbody></table></div>\
                     <div><b style="margin-left:10px">协议</b></div>\
@@ -2246,7 +2246,7 @@ function wsTableLogRequest(page){
                 content: '<div class="pd15 lib-box">\
                     <div style="height:80px;"><table class="table" style="border:#ddd 1px solid; margin-bottom:10px">\
                     <tbody class="site_details_tbody">\
-                        <tr><th>时间</th><td>' + getLocalTime(res.time) + '</td><th>真实IP</th><td><span class="overflow_hide detail_ip">' + res.ip + '</span></td><th>客户端端口</th><td>'+(res.client_port>0 && res.client_port != ''?res.client_port:'')+'</td></tr>\
+                        <tr><th>时间</th><td>' + getLocalTime(res.time) + '</td><th>真实IP</th><td><span class="overflow_hide detail_ip" style="width:100px;">' + res.ip + '</span></td><th>客户端端口</th><td>'+(res.client_port>0 && res.client_port != ''?res.client_port:'')+'</td></tr>\
                         <tr><th>类型</th><td>' + res.method + '</td><th>状态</th><td>' + res.status_code + '</td><th>响应大小</th><td>' + toSize(res.body_length) + '</td>\</tr>\
                     </tbody></table></div>\
                     <div><b style="margin-left:10px">协议</b></div>\
