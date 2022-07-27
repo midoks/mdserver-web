@@ -11,6 +11,11 @@ sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 
 
+function version_gt() { test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" != "$1"; }
+function version_le() { test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" == "$1"; }
+function version_lt() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" != "$1"; }
+function version_ge() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" == "$1"; }
+
 version=7.4.26
 PHP_VER=74
 Install_php()
@@ -50,9 +55,7 @@ if [ $sysName == 'Darwin' ]; then
 	export LDFLAGS="-L/usr/local/opt/libxml2/lib"
 else
 	OPTIONS='--without-iconv'
-	# OPTIONS="--with-iconv=${serverPath}/lib/libiconv"
 	OPTIONS="${OPTIONS} --with-curl"
-	# OPTIONS="${OPTIONS} --with-zip=${serverPath}/lib/libzip"
 fi
 
 IS_64BIT=`getconf LONG_BIT`
@@ -64,9 +67,9 @@ echo "$sourcePath/php/php${PHP_VER}"
 
 ZIP_OPTION='--with-zip'
 libzip_version=`pkg-config libzip --modversion`
-compare_ver=`echo "${libzip_version} >= 0.11"|bc`
-if [ "$compare_ver" -eq "1" ];then
-	ZIP_OPTION="--with-zip=${serverPath}/lib/libzip"
+if version_lt "$libzip_version" "0.11.0" ;then
+	export PKG_CONFIG_PATH=$serverPath/lib/libzip/lib/pkgconfig
+	ZIP_OPTION="--with-zip=$serverPath/lib/libzip"
 fi
 
 

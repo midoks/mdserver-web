@@ -10,6 +10,10 @@ sourcePath=${serverPath}/source
 sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 
+function version_gt() { test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" != "$1"; }
+function version_le() { test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" == "$1"; }
+function version_lt() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" != "$1"; }
+function version_ge() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" == "$1"; }
 
 version=7.3.33
 PHP_VER=73
@@ -49,6 +53,12 @@ if [ "$IS_64BIT" == "64" ];then
 	OPTIONS="${OPTIONS} --with-libdir=lib64"
 fi
 
+ZIP_OPTION='--enable-zip'
+libzip_version=`pkg-config libzip --modversion`
+if version_lt "$libzip_version" "0.11.0" ;then
+	export PKG_CONFIG_PATH=$serverPath/lib/libzip/lib/pkgconfig
+	ZIP_OPTION="--with-libzip=$serverPath/lib/libzip"
+fi
 
 if [ ! -d $serverPath/php/73 ];then
 	cd $sourcePath/php/php${PHP_VER} && ./configure \
