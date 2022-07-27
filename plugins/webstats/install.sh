@@ -105,6 +105,10 @@ Install_App()
 
 Uninstall_App()
 {
+	if [ "$sys_os" != "Darwin" ];then
+		cd $rootPath && python3 ${rootPath}/plugins/webstats/index.py stop
+	fi
+
 	rm -rf $serverPath/webstats
 	echo "Uninstall_redis" > $install_tmp
 }
