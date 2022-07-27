@@ -18,7 +18,7 @@ class ORM:
     __DB_CNF = '/etc/my.cnf'
     __DB_SOCKET = '/www/server/mysql/mysql.sock'
 
-    __DB_CHARSET = "utf-8"
+    __DB_CHARSET = "utf8"
 
     def __Conn(self):
         '''连接MYSQL数据库'''
