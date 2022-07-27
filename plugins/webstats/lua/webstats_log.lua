@@ -194,7 +194,7 @@ log_by_lua_block {
 
 	local function get_client_ip_bylog()
 		local client_ip = "unknown"
-		local cdn = config['cdn']
+		local cdn = auto_config['cdn']
 		if cdn == true then
 			for _,v in ipairs(auto_config['cdn_headers']) do
 				if request_header[v] ~= nil and request_header[v] ~= "" then
