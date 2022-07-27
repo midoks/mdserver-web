@@ -138,11 +138,13 @@ data/ipv6.pl
 data/restart.pl
 data/ssl.pl
 data/edate.pl
+data/osname.pl
 
 plugins/l2tp
 plugins/openlitespeed
 plugins/gdrive
 plugins/mtproxy
 debug.out
+
 
 
