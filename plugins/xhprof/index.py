@@ -207,6 +207,7 @@ def getConfAppStart():
 
 
 def installPreInspection():
+
     path = mw.getServerDir() + '/php'
     if not os.path.exists(path):
         return "先安装一个可用的PHP版本!"
