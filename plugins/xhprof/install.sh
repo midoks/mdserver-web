@@ -33,7 +33,10 @@ Uninstall_xh()
 
 	rm -rf ${serverPath}/xhprof
 	cd /tmp/xhprof && rm -rf *.xhprof
-	rm -f /www/server/web_conf/nginx/vhost/xhprof.conf
+
+	if [ -f ${serverPath}/web_conf/nginx/vhost/xhprof.conf ];then
+		rm -f ${serverPath}/web_conf/nginx/vhost/xhprof.conf
+	fi
 	echo '卸载完成' > $install_tmp
 }
 
