@@ -70,7 +70,7 @@ if [ ! -d $serverPath/php/73 ];then
 	--with-pdo-mysql=mysqlnd \
 	--with-zlib-dir=$serverPath/lib/zlib \
 	--enable-ftp \
-	--enable-zip \
+	$ZIP_OPTION\
 	--enable-sockets \
 	--enable-simplexml \
 	--enable-mbstring \
