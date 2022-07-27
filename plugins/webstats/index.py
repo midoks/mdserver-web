@@ -993,11 +993,14 @@ def getIpStatList():
 
             # print(ip, response.subdivisions)
             _subdivisions = response.subdivisions
-            if len(_subdivisions) < 1:
+            try:
+                if len(_subdivisions) < 1:
+                    subdivisions = ""
+                else:
+                    subdivisions = "," + response.subdivisions.most_specific.names[
+                        "zh-CN"]
+            except Exception as e:
                 subdivisions = ""
-            else:
-                subdivisions = "," + response.subdivisions.most_specific.names[
-                    "zh-CN"]
 
             try:
                 if 'zh-CN' in response.city.names:
