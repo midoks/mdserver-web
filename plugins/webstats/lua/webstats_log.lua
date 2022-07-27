@@ -130,6 +130,41 @@ log_by_lua_block {
 		return domain
 	end
 
+	local function write_file_bylog(filename,body,mode)
+		local fp = io.open(filename,mode)
+		if fp == nil then
+			return nil
+		end
+		fp:write(body)
+		fp:flush()
+		fp:close()
+		return true
+	end
+	
+	local function read_file_body_bylog(filename)
+		local fp = io.open(filename,'rb')
+		if not fp then
+			return nil
+		end
+		fbody = fp:read("*a")
+		fp:close()
+		if fbody == '' then
+			return nil
+		end
+		return fbody
+	end
+
+	local function load_update_day(input_server_name)
+		local _file = "{$SERVER_APP}/logs/"..input_server_name.."/update_day.log"
+		return read_file_body_bylog(_file)
+	end
+
+	local function write_update_day(input_server_name)
+		local update_day = today
+		local _file = "{$SERVER_APP}/logs/"..input_server_name.."/update_day.log"
+		write_file_bylog(_file, update_day, "w")
+	end
+
 	local function arrlen_bylog(arr)
 		if not arr then return 0 end
 		count = 0
@@ -959,6 +994,14 @@ log_by_lua_block {
 		db:exec([[PRAGMA journal_size_limit = 1073741824]])
 
 		status, errorString = db:exec([[BEGIN TRANSACTION]])
+
+		update_day = load_update_day(input_server_name)
+		if not update_day or update_day ~= today then
+			update_sql = "UPDATE ip_stat SET "..day_column.."=0,"..flow_column.."=0"
+			status, errorString = db:exec(update_sql)
+			write_update_day(input_server_name)
+		end
+
 		if store_end >= store_start then
 			for i=store_start, store_end, 1 do
 				-- D("store_start:"..store_start..":store_end:".. store_end)
