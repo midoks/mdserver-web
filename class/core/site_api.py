@@ -390,6 +390,14 @@ class site_api:
                 mpath = vpath + '/' + d + '/info.json'
                 if not os.path.exists(mpath):
                     continue
+
+                # keyPath = self.sslDir + siteName + '/privkey.pem'
+                # certPath = self.sslDir + siteName + '/fullchain.pem'
+
+                keyPath = vpath + '/' + d + '/privkey.pem'
+                certPath = vpath + '/' + d + '/fullchain.pem'
+                self.saveCert(keyPath, certPath)
+
                 tmp = mw.readFile(mpath)
                 if not tmp:
                     continue
@@ -479,8 +487,8 @@ class site_api:
             mw.execShell('\\cp -a /tmp/backup2.conf ' + csrpath)
             return mw.returnJson(False, 'ERROR: <br><a style="color:red;">' + isError.replace("\n", '<br>') + '</a>')
 
-        mw.restartWeb()
         mw.writeLog('网站管理', '证书已保存!')
+        mw.restartWeb()
         return mw.returnJson(True, '证书已保存!')
 
     def setCertToSiteApi(self):
