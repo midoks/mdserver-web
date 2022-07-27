@@ -66,7 +66,7 @@ ZIP_OPTION='--with-zip'
 libzip_version=`pkg-config libzip --modversion`
 
 
-if [ `echo "$libzip_version < 0.11"|bc` -eq 1 ];then
+if [ `echo "$libzip_version >= 0.11"|bc` -eq 1 ];then
 	ZIP_OPTION="--with-zip=${serverPath}/lib/libzip"
 fi
 
