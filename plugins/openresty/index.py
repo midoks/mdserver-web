@@ -201,7 +201,7 @@ def restyOp(method):
     # 启动时,先检查一下配置文件
     check = getServerDir() + "/bin/openresty -t"
     check_data = mw.execShell(check)
-    if not check_data[1].find('test is successful'):
+    if not check_data[1].find('test is successful') > -1:
         return check_data[1]
 
     if not mw.isAppleSystem():

@@ -68,7 +68,7 @@ def getHomePage():
         return mw.returnJson(False, '插件未启动!')
 
 
-def getPhpVer(expect=55):
+def getPhpVer(expect=56):
     import json
     v = site_api.site_api().getPhpVersion()
     v = json.loads(v)
@@ -205,6 +205,14 @@ def getConfAppStart():
     pstart = mw.getServerDir() + '/php/app_start.php'
     return pstart
 
+
+def installPreInspection():
+
+    path = mw.getServerDir() + '/php'
+    if not os.path.exists(path):
+        return "先安装一个可用的PHP版本!"
+    return 'ok'
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -217,6 +225,8 @@ if __name__ == "__main__":
         print(restart())
     elif func == 'reload':
         print(reload())
+    elif func == 'install_pre_inspection':
+        print(installPreInspection())
     elif func == 'conf':
         print(getConf())
     elif func == 'get_home_page':

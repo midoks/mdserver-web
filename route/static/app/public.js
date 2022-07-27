@@ -53,6 +53,12 @@ function toSizeG(bytes){
 	return b;
 }
 
+//to unixtime
+function toUnixTime(txt){
+        var unix = new Date(Date.parse(txt.replace(/-/g,'/'))).getTime();
+        return unix/1000;
+    }
+
 function randomStrPwd(b) {
 	b = b || 32;
 	var c = "AaBbCcDdEeFfGHhiJjKkLMmNnPpRSrTsWtXwYxZyz2345678";
@@ -164,6 +170,30 @@ function getLocalTime(a) {
 		a = a.substring(0, 10)
 	}
 	return new Date(parseInt(a) * 1000).format("yyyy/MM/dd hh:mm:ss")
+}
+
+function getFormatTime(tm, format) {
+	if (format == undefined) format = "yyyy/MM/dd hh:mm:ss";
+	tm = tm.toString();
+	if (tm.length > 10) {
+	  tm = tm.substring(0, 10);
+	}
+	var data = new Date(parseInt(tm) * 1000);
+	var o = {
+	  "M+": data.getMonth() + 1, //month
+	  "d+": data.getDate(), //day
+	  "h+": data.getHours(), //hour
+	  "m+": data.getMinutes(), //minute
+	  "s+": data.getSeconds(), //second
+	  "q+": Math.floor((data.getMonth() + 3) / 3), //quarter
+	  "S": data.getMilliseconds() //millisecond
+	}
+	if (/(y+)/.test(format)) format = format.replace(RegExp.$1,
+	    (data.getFullYear() + "").substr(4 - RegExp.$1.length));
+	for (var k in o)
+	  if (new RegExp("(" + k + ")").test(format))
+	    format = format.replace(RegExp.$1,RegExp.$1.length == 1 ? o[k] : ("00" + o[k]).substr(("" + o[k]).length));
+	return format;
 }
 
 

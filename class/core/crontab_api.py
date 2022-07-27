@@ -202,14 +202,30 @@ class crontab_api:
             'urladdress': urladdress,
         }
 
+        addData = self.add(params)
+        if addData > 0:
+            return mw.returnJson(True, '添加成功')
+        return mw.returnJson(False, '添加失败')
+
+    def add(self, params):
+
+        iname = params["name"]
+        field_type = params["type"]
+        week = params["week"]
+        where1 = params["where1"]
+        hour = params["hour"]
+        minute = params["minute"]
+        save = params["save"]
+        backup_to = params["backup_to"]
+        stype = params["stype"]
+        sname = params["sname"]
+        sbody = params["sbody"]
+        urladdress = params["urladdress"]
+
         # print params
         cronConfig, get, name = self.getCrondCycle(params)
         cronPath = mw.getServerDir() + '/cron'
-
         cronName = self.getShell(params)
-        # print cronConfig, _params, name
-        # print 'vv', cronPath, cronName
-        # print 'stype', stype
 
         if type(cronName) == dict:
             return cronName
@@ -217,18 +233,17 @@ class crontab_api:
         cronConfig += ' ' + cronPath + '/' + cronName + \
             ' >> ' + cronPath + '/' + cronName + '.log 2>&1'
 
+        # print(cronConfig)
         if not mw.isAppleSystem():
             wRes = self.writeShell(cronConfig)
             if type(wRes) != bool:
                 return wRes
             self.crondReload()
 
-        addData = mw.M('crontab').add('name,type,where1,where_hour,where_minute,echo,addtime,status,save,backup_to,stype,sname,sbody,urladdress', (iname, field_type, where1, hour, minute, cronName, time.strftime(
-            '%Y-%m-%d %X', time.localtime()), 1, save, backup_to, stype, sname, sbody, urladdress))
-
-        if addData > 0:
-            return mw.returnJson(True, '添加成功')
-        return mw.returnJson(False, '添加失败')
+        add_time = time.strftime('%Y-%m-%d %X', time.localtime())
+        task_id = mw.M('crontab').add('name,type,where1,where_hour,where_minute,echo,addtime,status,save,backup_to,stype,sname,sbody,urladdress',
+                                      (iname, field_type, where1, hour, minute, cronName, add_time, 1, save, backup_to, stype, sname, sbody, urladdress,))
+        return task_id
 
     def startTaskApi(self):
         sid = request.form.get('id', '')
@@ -239,28 +254,33 @@ class crontab_api:
         return mw.returnJson(True, '任务已执行!')
 
     def delApi(self):
-        sid = request.form.get('id', '')
+        task_id = request.form.get('id', '')
         try:
-            find = mw.M('crontab').where(
-                "id=?", (sid,)).field('name,echo').find()
-            if not self.removeForCrond(find['echo']):
-                return mw.returnJson(False, '无法写入文件，请检查是否开启了系统加固功能!')
-
-            cronPath = mw.getServerDir() + '/cron'
-            sfile = cronPath + '/' + find['echo']
-
-            if os.path.exists(sfile):
-                os.remove(sfile)
-            sfile = cronPath + '/' + find['echo'] + '.log'
-            if os.path.exists(sfile):
-                os.remove(sfile)
-
-            mw.M('crontab').where("id=?", (sid,)).delete()
-            mw.writeLog('计划任务', mw.getInfo(
-                '删除计划任务[{1}]成功!', (find['name'],)))
+            data = self.delete(task_id)
+            if not data[0]:
+                return mw.returnJson(False, data[1])
             return mw.returnJson(True, '删除成功')
         except Exception as e:
             return mw.returnJson(False, '删除失败:' + str(e))
+
+    def delete(self, tid):
+
+        find = mw.M('crontab').where("id=?", (tid,)).field('name,echo').find()
+        if not self.removeForCrond(find['echo']):
+            return (False, '无法写入文件，请检查是否开启了系统加固功能!')
+
+        cronPath = mw.getServerDir() + '/cron'
+        sfile = cronPath + '/' + find['echo']
+
+        if os.path.exists(sfile):
+            os.remove(sfile)
+        sfile = cronPath + '/' + find['echo'] + '.log'
+        if os.path.exists(sfile):
+            os.remove(sfile)
+
+        mw.M('crontab').where("id=?", (tid,)).delete()
+        mw.writeLog('计划任务', mw.getInfo('删除计划任务[{1}]成功!', (find['name'],)))
+        return (True, "OK")
 
     def delLogsApi(self):
         sid = request.form.get('id', '')
@@ -289,18 +309,6 @@ class crontab_api:
         data = {}
         data['data'] = mw.M(stype).field('name,ps').select()
         data['orderOpt'] = []
-        # try:
-        #     tmp = mw.readFile('data/libList.conf')
-        #     libs = json.loads(tmp)
-        #     import imp
-        #     for lib in libs:
-        #         imp.find_module(lib['module'])
-        #         tmp = {}
-        #         tmp['name'] = lib['name']
-        #         tmp['value'] = lib['opt']
-        #         data['orderOpt'].append(tmp)
-        # except Exception as e:
-        #     print e
         return mw.getJson(data)
     ##### ----- start ----- ###
 
@@ -393,25 +401,27 @@ class crontab_api:
             head = "#!/bin/bash\nPATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin\nexport PATH\n"
             log = '.log'
 
+            script_dir = mw.getServerDir() + "/mdserver-web/scripts"
+
             wheres = {
-                'path': head + "python " + mw.getServerDir() + "/mdserver-web/scripts/backup.py path " + param['sname'] + " " + str(param['save']),
-                'site':   head + "python " + mw.getServerDir() + "/mdserver-web/scripts/backup.py site " + param['sname'] + " " + str(param['save']),
-                'database': head + "python " + mw.getServerDir() + "/mdserver-web/scripts/backup.py database " + param['sname'] + " " + str(param['save']),
-                'logs':   head + "python " + mw.getServerDir() + "/mdserver-web/scripts/logs_backup.py " + param['sname'] + log + " " + str(param['save']),
-                'rememory': head + "/bin/bash " + mw.getServerDir() + '/mdserver-web/scripts/rememory.sh'
+                'path': head + "python " + script_dir + "/backup.py path " + param['sname'] + " " + str(param['save']),
+                'site':   head + "python " + script_dir + "/backup.py site " + param['sname'] + " " + str(param['save']),
+                'database': head + "python " + script_dir + "/backup.py database " + param['sname'] + " " + str(param['save']),
+                'logs':   head + "python " + script_dir + "/logs_backup.py " + param['sname'] + log + " " + str(param['save']),
+                'rememory': head + "/bin/bash " + script_dir + '/rememory.sh'
             }
             if param['backup_to'] != 'localhost':
-                cfile = mw.getServerDir() + "/mdserver-web/plugin/" + param[
-                    'backup_to'] + "/" + param['backup_to'] + "_main.py"
+                cfile = mw.getServerDir() + "/mdserver-web/plugin/" + \
+                    param['backup_to'] + "/" + param['backup_to'] + "_main.py"
                 if not os.path.exists(cfile):
-                    cfile = mw.getServerDir() + "/mdserver-web/script/backup_" + \
+                    cfile = script_dir + "/backup_" + \
                         param['backup_to'] + ".py"
                 wheres = {
                     'path': head + "python " + cfile + " path " + param['sname'] + " " + str(param['save']),
                     'site':   head + "python " + cfile + " site " + param['sname'] + " " + str(param['save']),
                     'database': head + "python " + cfile + " database " + param['sname'] + " " + str(param['save']),
-                    'logs':   head + "python " + mw.getServerDir() + "/mdserver-web/scripts/logs_backup.py " + param['sname'] + log + " " + str(param['save']),
-                    'rememory': head + "/bin/bash " + mw.getServerDir() + '/mdserver-web/scripts/rememory.sh'
+                    'logs':   head + "python " + script_dir + "/logs_backup.py " + param['sname'] + log + " " + str(param['save']),
+                    'rememory': head + "/bin/bash " + script_dir + '/rememory.sh'
                 }
             try:
                 shell = wheres[stype]
@@ -431,6 +441,7 @@ echo "--------------------------------------------------------------------------
         cronPath = mw.getServerDir() + '/cron'
         if not os.path.exists(cronPath):
             mw.execShell('mkdir -p ' + cronPath)
+
         if not 'echo' in param:
             cronName = mw.md5(mw.md5(str(time.time()) + '_mw'))
         else:
@@ -498,6 +509,10 @@ echo "--------------------------------------------------------------------------
                 return False
         else:
             file = u_file
+
+        if mw.isAppleSystem():
+            return True
+
         conf = mw.readFile(file)
         rep = ".+" + str(echo) + ".+\n"
         conf = re.sub(rep, "", conf)

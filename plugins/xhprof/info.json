@@ -7,6 +7,7 @@
 	"to_ver":["1.0"],
 	"versions":["1.0"],
 	"updates":["1.0"],
+	"install_pre_inspection":true,
 	"shell":"install.sh",
 	"checks":"server/xhprof",
 	"path": "server/xhprof",

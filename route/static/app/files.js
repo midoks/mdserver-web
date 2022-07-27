@@ -968,11 +968,10 @@ function downloadFile(action){
 					</div>\
 				</form>'
 	});
-	fly("dlok");
 	$("#mUrl").keyup(function(){
-		durl = $(this).val()
-		tmp = durl.split('/')
-		$("#dfilename").val(tmp[tmp.length-1])
+		durl = $(this).val();
+		tmp = durl.split('/');
+		$("#dfilename").val(tmp[tmp.length-1]);
 	});
 }
 

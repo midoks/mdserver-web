@@ -8,7 +8,7 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
 install_tmp=${rootPath}/tmp/mw_install.pl
-
+sys_os=`uname`
 Install_xh()
 {
 	mkdir -p ${serverPath}/xhprof
@@ -19,14 +19,24 @@ Install_xh()
 
 	echo "${1}" > ${serverPath}/xhprof/version.pl
 	echo '安装完成' > $install_tmp
-		
+
+	if [ "$sys_os" != "Darwin" ];then
+		cd $rootPath && python3 ${rootPath}/plugins/xhprof/index.py start
+	fi	
 }
 
 Uninstall_xh()
 {
+	if [ "$sys_os" != "Darwin" ];then
+		cd $rootPath && python3 ${rootPath}/plugins/xhprof/index.py stop
+	fi	
+
 	rm -rf ${serverPath}/xhprof
 	cd /tmp/xhprof && rm -rf *.xhprof
-	rm -f /www/server/web_conf/nginx/vhost/xhprof.conf
+
+	if [ -f ${serverPath}/web_conf/nginx/vhost/xhprof.conf ];then
+		rm -f ${serverPath}/web_conf/nginx/vhost/xhprof.conf
+	fi
 	echo '卸载完成' > $install_tmp
 }
 

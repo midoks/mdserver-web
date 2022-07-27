@@ -1,0 +1,18 @@
+{
+	"sort": 7,
+	"ps": "[DEV]网站统计报表[此插件开发完成后,需要反馈问题,不当小白鼠，慎用!]",
+	"name": "webstats",
+	"title": "网站统计",
+	"shell": "install.sh",
+	"versions":["0.2.0"],
+	"tip": "soft",
+	"install_pre_inspection":true,
+	"checks": "server/webstats",
+	"path": "server/webstats",
+	"display": 1,
+	"author": "midoks",
+	"date": "2022-07-18",
+	"home": "https://github.com/midoks/mdserver-web",
+	"type": 0,
+	"pid": "1"
+}
