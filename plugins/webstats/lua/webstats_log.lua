@@ -928,7 +928,7 @@ log_by_lua_block {
 			-- D("stat ok")
 
 			-- only count non spider requests
-			local ok, err = pcall(function() statistics_uri(db, uri, ngx.md5(uri), body_length) end)
+			local ok, err = pcall(function() statistics_uri(db, request_uri, ngx.md5(request_uri), body_length) end)
 			local ok, err = pcall(function() statistics_ip(db, ip, body_length) end)
 		end
 
