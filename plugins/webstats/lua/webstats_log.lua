@@ -741,6 +741,13 @@ log_by_lua_block {
 			ip_list = ip
 		end
 
+		local remote_addr = ngx.var.remote_addr
+		if not string.find(ip_list, remote_addr) then
+			if remote_addr then
+				ip_list = ip_list .. "," .. remote_addr
+			end
+		end
+
 		-- local request_time = ngx.var.request_time
 		local request_time = get_request_time()
 		local client_port = ngx.var.remote_port
