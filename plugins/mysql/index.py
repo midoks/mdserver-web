@@ -137,6 +137,7 @@ def pMysqlDb():
     db = mw.getMyORM()
     db.setPort(getDbPort())
     db.setSocket(getSocketFile())
+    # db.setCharset("utf8")
     db.setPwd(pSqliteDb('config').where('id=?', (1,)).getField('mysql_root'))
     return db
 
