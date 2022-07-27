@@ -22,6 +22,7 @@ mkdir -p $serverPath/php
 
 cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash freetype_new.sh
 cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash zlib.sh
+cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash libzip.sh
 
 if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 
@@ -61,6 +62,13 @@ fi
 
 echo "$sourcePath/php/php${PHP_VER}"
 
+ZIP_OPTION='--with-zip'
+libzip_version=`pkg-config libzip --modversion`
+if [ "$libzip_version" -lt "0.10.1" ];then
+	ZIP_OPTION="--with-zip=${serverPath}/lib/libzip"
+fi
+
+
 if [ ! -d $serverPath/php/${PHP_VER} ];then
 	cd $sourcePath/php/php${PHP_VER} && make clean
 	./buildconf --force
@@ -72,7 +80,7 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--with-mysqli=mysqlnd \
 	--with-pdo-mysql=mysqlnd \
 	--with-zlib-dir=$serverPath/lib/zlib \
-	--with-zip \
+	$ZIP_OPTION \
 	--enable-ftp \
 	--enable-mbstring \
 	--enable-sockets \
