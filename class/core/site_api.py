@@ -387,16 +387,18 @@ class site_api:
                 os.system('mkdir -p ' + vpath)
             data = []
             for d in os.listdir(vpath):
-                mpath = vpath + '/' + d + '/info.json'
-                if not os.path.exists(mpath):
-                    continue
 
                 # keyPath = self.sslDir + siteName + '/privkey.pem'
                 # certPath = self.sslDir + siteName + '/fullchain.pem'
 
                 keyPath = vpath + '/' + d + '/privkey.pem'
                 certPath = vpath + '/' + d + '/fullchain.pem'
-                self.saveCert(keyPath, certPath)
+                if os.path.exists(keyPath) and os.path.exists(certPath):
+                    self.saveCert(keyPath, certPath)
+
+                mpath = vpath + '/' + d + '/info.json'
+                if not os.path.exists(mpath):
+                    continue
 
                 tmp = mw.readFile(mpath)
                 if not tmp:
