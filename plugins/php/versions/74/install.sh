@@ -64,7 +64,9 @@ echo "$sourcePath/php/php${PHP_VER}"
 
 ZIP_OPTION='--with-zip'
 libzip_version=`pkg-config libzip --modversion`
-if [ "$libzip_version" -lt "0.11" ];then
+
+
+if [ `echo "$libzip_version < 0.11"|bc` -eq 1 ];then
 	ZIP_OPTION="--with-zip=${serverPath}/lib/libzip"
 fi
 
