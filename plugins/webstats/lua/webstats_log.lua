@@ -857,6 +857,7 @@ log_by_lua_block {
 		local client_port = logline["client_port"]
 		local status_code = logline["status_code"]
 		local uri = logline["uri"]
+		local request_uri = logline["request_uri"]
 		local method = logline["method"]
 		local body_length = logline["body_length"]
 		local referer = logline["referer"]
@@ -901,7 +902,7 @@ log_by_lua_block {
 				server_name=server_name,
 				method=method,
 				status_code=status_code,
-				uri=uri,
+				uri=request_uri,
 				body_length=body_length,
 				referer=referer,
 				user_agent=user_agent,
