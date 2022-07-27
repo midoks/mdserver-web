@@ -18,6 +18,8 @@ class ORM:
     __DB_CNF = '/etc/my.cnf'
     __DB_SOCKET = '/www/server/mysql/mysql.sock'
 
+    __DB_CHARSET = "utf8"
+
     def __Conn(self):
         '''连接MYSQL数据库'''
         try:
@@ -25,19 +27,19 @@ class ORM:
             if os.path.exists(self.__DB_SOCKET):
                 try:
                     self.__DB_CONN = connector.connect(host=self.__DB_HOST, user=self.__DB_USER, passwd=self.__DB_PASS,
-                                                       port=self.__DB_PORT, charset="utf8", connect_timeout=1, unix_socket=self.__DB_SOCKET)
+                                                       port=self.__DB_PORT, charset=self.__DB_CHARSET, connect_timeout=1, unix_socket=self.__DB_SOCKET)
                 except Exception as e:
                     self.__DB_HOST = '127.0.0.1'
                     self.__DB_CONN = connector.connect(host=self.__DB_HOST, user=self.__DB_USER, passwd=self.__DB_PASS,
-                                                       port=self.__DB_PORT, charset="utf8", connect_timeout=1, unix_socket=self.__DB_SOCKET)
+                                                       port=self.__DB_PORT, charset=self.__DB_CHARSET, connect_timeout=1, unix_socket=self.__DB_SOCKET)
             else:
                 try:
                     self.__DB_CONN = connector.connect(host=self.__DB_HOST, user=self.__DB_USER, passwd=self.__DB_PASS,
-                                                       port=self.__DB_PORT, charset="utf8", connect_timeout=1)
+                                                       port=self.__DB_PORT, charset=self.__DB_CHARSET, connect_timeout=1)
                 except Exception as e:
                     self.__DB_HOST = '127.0.0.1'
                     self.__DB_CONN = connector.connect(host=self.__DB_HOST, user=self.__DB_USER, passwd=self.__DB_PASS,
-                                                       port=self.__DB_PORT, charset="utf8", connect_timeout=1)
+                                                       port=self.__DB_PORT, charset=self.__DB_CHARSET, connect_timeout=1)
 
             self.__DB_CUR = self.__DB_CONN.cursor()
             return True
@@ -50,6 +52,9 @@ class ORM:
 
     def setSocket(self, sock):
         self.__DB_SOCKET = sock
+
+    def setCharset(self, charset):
+        self.__DB_CHARSET = charset
 
     def setPort(self, port):
         self.__DB_PORT = port
