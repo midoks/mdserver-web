@@ -25,14 +25,20 @@ Install_rsyncd()
 
 	if [ "$OSNAME" == "debian'" ] || [ "$OSNAME" == "ubuntu'" ];then
 		apt install -y rsync
+		apt install -y lsyncd
 	elif [[ "$OSNAME" == "arch" ]]; then
 		echo y | pacman -Sy rsync
+		echo y | pacman -Sy lsyncd
+	elif [[ "$OSNAME" == "macos" ]]; then
+		brew install rsync
+		brew install lsyncd
 	else
 		yum install -y rsync
+		yum install -y lsyncd
 	fi
 
 	
-	echo '1.0' > $serverPath/rsyncd/version.pl
+	echo '2.0' > $serverPath/rsyncd/version.pl
 	echo '安装完成' > $install_tmp
 	cd ${rootPath} && python3 ${rootPath}/plugins/rsyncd/index.py start
 	cd ${rootPath} && python3 ${rootPath}/plugins/rsyncd/index.py initd_install
@@ -51,6 +57,7 @@ Uninstall_rsyncd()
 	if [ -f $serverPath/rsyncd/initd/rsyncd ];then
 		$serverPath/rsyncd/initd/rsyncd stop
 	fi
+	
 	rm -rf $serverPath/rsyncd
 	echo "卸载完成" > $install_tmp
 }
