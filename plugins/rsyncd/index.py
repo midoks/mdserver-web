@@ -78,11 +78,10 @@ def status():
 
 def appConf():
     return getServerDir() + '/rsyncd.conf'
-    # return '/etc/rsyncd.conf'
 
 
 def appAuthPwd(name):
-    nameDir = getServerDir() + '/secrets/' + name
+    nameDir = getServerDir() + '/receive/' + name
     if not os.path.exists(nameDir):
         mw.execShell("mkdir -p " + nameDir)
     return nameDir + '/auth.db'
@@ -98,8 +97,17 @@ def getLog():
     return tmp.groups()[0]
 
 
-def initDreplace():
+def getLsyncdLog():
+    path = getServerDir() + "/lsyncd.conf"
+    conf = mw.readFile(path)
+    rep = 'logfile\s*=\s*\"(.*)\"'
+    tmp = re.search(rep, conf)
+    if not tmp:
+        return ''
+    return tmp.groups()[0]
 
+
+def initDReceive():
     # conf
     conf_path = appConf()
     conf_tpl_path = getPluginDir() + '/conf/rsyncd.conf'
@@ -110,9 +118,10 @@ def initDreplace():
     initD_path = getServerDir() + '/init.d'
     if not os.path.exists(initD_path):
         os.mkdir(initD_path)
-    file_bin = initD_path + '/' + getPluginName()
 
+    file_bin = initD_path + '/' + getPluginName()
     file_tpl = getInitDTpl()
+    # print(file_bin, file_tpl)
     # initd replace
     if not os.path.exists(file_bin):
         content = mw.readFile(file_tpl)
@@ -131,15 +140,71 @@ def initDreplace():
             exit(0)
 
         service_path = mw.getServerDir()
-        se_content = mw.readFile(systemServiceTpl)
-        se_content = se_content.replace('{$SERVER_PATH}', service_path)
-        se_content = se_content.replace('{$RSYNC_BIN}', rsync_bin)
-        mw.writeFile(systemService, se_content)
+        se = mw.readFile(systemServiceTpl)
+        se = se.replace('{$SERVER_PATH}', service_path)
+        se = se.replace('{$RSYNC_BIN}', rsync_bin)
+        mw.writeFile(systemService, se)
         mw.execShell('systemctl daemon-reload')
 
     rlog = getLog()
     if os.path.exists(rlog):
         mw.writeFile(rlog, '')
+    return file_bin
+
+
+def initDSend():
+
+    service_path = mw.getServerDir()
+
+    conf_path = getServerDir() + '/lsyncd.conf'
+    conf_tpl_path = getPluginDir() + '/conf/lsyncd.conf'
+    if not os.path.exists(conf_path):
+        content = mw.readFile(conf_tpl_path)
+        content = content.replace('{$SERVER_PATH}', service_path)
+        mw.writeFile(conf_path, content)
+
+    initD_path = getServerDir() + '/init.d'
+    if not os.path.exists(initD_path):
+        os.mkdir(initD_path)
+
+    # initd replace
+    file_bin = initD_path + '/lsyncd'
+    file_tpl = getPluginDir() + "/init.d/lsyncd.tpl"
+    if not os.path.exists(file_bin):
+        content = mw.readFile(file_tpl)
+        content = contentReplace(content)
+        mw.writeFile(file_bin, content)
+        mw.execShell('chmod +x ' + file_bin)
+
+    # systemd
+    systemDir = mw.systemdCfgDir()
+    systemService = systemDir + '/lsyncd.service'
+    systemServiceTpl = getPluginDir() + '/init.d/lsyncd.service.tpl'
+    if os.path.exists(systemDir) and not os.path.exists(systemService):
+        lsyncd_bin = mw.execShell('which lsyncd')[0].strip()
+        if lsyncd_bin == '':
+            print('lsyncd missing!')
+            exit(0)
+
+        content = mw.readFile(systemServiceTpl)
+        content = content.replace('{$SERVER_PATH}', service_path)
+        content = content.replace('{$LSYNCD_BIN}', lsyncd_bin)
+        mw.writeFile(systemService, content)
+        mw.execShell('systemctl daemon-reload')
+
+    lslog = getLsyncdLog()
+    if os.path.exists(lslog):
+        mw.writeFile(lslog, '')
+
+    return file_bin
+
+
+def initDreplace():
+
+    initDSend()
+
+    # conf
+    file_bin = initDReceive()
     return file_bin
 
 

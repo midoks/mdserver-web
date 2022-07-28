@@ -39,7 +39,7 @@ Install_rsyncd()
 	fi
 
 	mkdir -p $serverPath/rsyncd
-	mkdir -p $serverPath/rsyncd/secrets
+	mkdir -p $serverPath/rsyncd/receive
 	mkdir -p $serverPath/rsyncd/send
 	
 	echo '2.0' > $serverPath/rsyncd/version.pl

@@ -22,7 +22,7 @@ if [ -f /etc/sysconfig/network ];then
   . /etc/sysconfig/network
 fi
 
-LSYNCD_OPTIONS="-pidfile /var/run/lsyncd.pid /etc/lsyncd.conf"
+LSYNCD_OPTIONS="-pidfile /var/run/lsyncd.pid {$SERVER_PATH}/rsyncd/lsyncd.conf"
 if [ -e /etc/sysconfig/lsyncd ]; then
   . /etc/sysconfig/lsyncd
 fi
@@ -32,7 +32,7 @@ thelock=/var/lock/subsys/lsyncd
 LSYNCD_USER=root
 
 start() {
-    [ -f /etc/lsyncd.conf ] || exit 6
+    [ -f {$SERVER_PATH}/rsyncd/lsyncd.conf ] || exit 6
     echo -n $"Starting $prog: "
     if [ $UID -ne 0 ]; then
             RETVAL=1
