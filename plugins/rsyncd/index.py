@@ -500,14 +500,16 @@ def lsyncdList():
 def lsyncdAdd():
 
     args = getArgs()
-    data = checkArgs(args, ['ip', 'name'])
+    data = checkArgs(args, ['ip', 'name', 'path'])
     if not data[0]:
         return data[1]
 
     ip = args['ip']
     path = args['path']
+    name = args['name']
 
     info = {
+        "name": name,
         "ip": ip,
         "path": path
     }
