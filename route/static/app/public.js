@@ -2031,6 +2031,50 @@ function pluginRollingLogs(_name, version, func, _args, line){
     	},1000);
     },'json');
 }
+
+
+function pluginStandAloneLogs(_name, version, func, _args, line){
+	if ( typeof(version) == 'undefined' ){
+        version = '';
+    }
+
+    var func_name = 'error_log';
+    if ( typeof(func) != 'undefined' ){
+        func_name = func;
+    }
+
+    var file_line = 100;
+    if ( typeof(line) != 'undefined' ){
+        file_line = line;
+    }
+
+
+    layer.open({
+        type: 1,
+        title: _name + '日志',
+        area: '640px',
+        content:'<div class="change-default pd20" id="plugins_stand_alone_logs">\
+        	<textarea readonly="readonly" style="margin: 0px;width: 100%;height: 360px;background-color: #333;color:#fff; padding:0 5px"></textarea>\
+        	</div>'
+    });
+
+    $.post('/plugins/run', {name:_name, func:func_name, version:version,args:_args},function (data) {
+    	var fileName = data.data;
+		$.post('/files/get_last_body', 'path=' + fileName+'&line='+file_line, function(rdata) {
+            if (!rdata.status){   
+                return;
+            }
+            
+            if(rdata.data == '') {
+            	rdata.data = '当前没有日志!';
+            }
+            var ebody = '<textarea readonly="" style="margin: 0px;width: 100%;height: 360px;background-color: #333;color:#fff; padding:0 5px">'+rdata.data+'</textarea>';
+            $("#plugins_stand_alone_logs").html(ebody);
+            var ob = document.getElementById('plugins_stand_alone_logs');
+            ob.scrollTop = ob.scrollHeight; 
+        },'json');
+    },'json');
+}
 /*** 其中功能,针对插件通过库使用 end ***/
 
 

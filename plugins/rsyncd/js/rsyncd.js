@@ -37,6 +37,23 @@ function rsPost(method,args,callback, title){
 }
 
 
+
+function rsyncdConf(){
+    rsPost('conf', {}, function(rdata){
+        rpath = rdata['data'];
+        if (rdata['status']){
+            onlineEditFile(0, rpath);
+        } else {
+            layer.msg(rdata.msg,{icon:1,time:2000,shade: [0.3, '#000']});
+        }        
+    });
+}
+
+function rsyncdLog(){
+    pluginStandAloneLogs("rsyncd","","run_log")
+}
+
+
 function rsyncdReceive(){
 	rsPost('rec_list', '', function(data){
 		var rdata = $.parseJSON(data.data);
@@ -47,6 +64,12 @@ function rsyncdReceive(){
 		// console.log(rdata);
 		var list = rdata.data;
 		var con = '';
+
+        con += '<div style="padding-top:1px;">\
+                <button class="btn btn-success btn-sm" onclick="rsyncdConf();">配置</button>\
+                <button class="btn btn-success btn-sm" onclick="rsyncdLog();">日志</button>\
+            </div>';
+
         con += '<div class="divtable" style="margin-top:5px;"><table class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0">';
         con += '<thead><tr>';
         con += '<th>服务名</th>';
