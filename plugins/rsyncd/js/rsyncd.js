@@ -36,8 +36,57 @@ function rsPost(method,args,callback, title){
     },'json'); 
 }
 
+///////////////// ----------------- 发送配置 ---------------- //////////////
+
+function rsyncdSend(){
+    rsPost('rec_list', '', function(data){
+        var rdata = $.parseJSON(data.data);
+        if (!rdata.status){
+            layer.msg(rdata.msg,{icon:rdata.status?1:2,time:2000,shade: [0.3, '#000']});
+            return;
+        }
+        // console.log(rdata);
+        var list = rdata.data;
+        var con = '';
+
+        con += '<div style="padding-top:1px;">\
+                <button class="btn btn-success btn-sm" onclick="rsyncdConf();">创建发送任务</button>\
+                <button class="btn btn-success btn-sm" onclick="rsyncdLog();">创建本地同步</button>\
+                <button class="btn btn-success btn-sm" onclick="rsyncdLog();">日志</button>\
+            </div>';
+
+        con += '<div class="divtable" style="margin-top:5px;"><table class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0">';
+        con += '<thead><tr>';
+        con += '<th>服务名</th>';
+        con += '<th>路径</th>';
+        con += '<th>备注</th>';
+        con += '<th>操作(<a class="btlink" onclick="addReceive()">添加</a>)</th>';
+        con += '</tr></thead>';
+
+        con += '<tbody>';
+
+        //<a class="btlink" onclick="modReceive(\''+list[i]['name']+'\')">编辑</a>
+        for (var i = 0; i < list.length; i++) {
+            con += '<tr>'+
+                '<td>' + list[i]['name']+'</td>' +
+                '<td>' + list[i]['path']+'</td>' +
+                '<td>' + list[i]['comment']+'</td>' +
+                '<td>\
+                    <a class="btlink" onclick="cmdReceive(\''+list[i]['name']+'\')">命令</a>\
+                    | <a class="btlink" onclick="delReceive(\''+list[i]['name']+'\')">删除</a></td>\
+                </tr>';
+        }
+
+        con += '</tbody>';
+        con += '</table></div>';
+
+        $(".soft-man-con").html(con);
+    });
+}
 
 
+
+///////////////// ----------------- 接收配置 ---------------- //////////////
 function rsyncdConf(){
     rsPost('conf', {}, function(rdata){
         rpath = rdata['data'];
@@ -50,7 +99,7 @@ function rsyncdConf(){
 }
 
 function rsyncdLog(){
-    pluginStandAloneLogs("rsyncd","","run_log")
+    pluginStandAloneLogs("rsyncd","","run_log");
 }
 
 

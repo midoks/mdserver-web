@@ -30,8 +30,9 @@ Install_rsyncd()
 		echo y | pacman -Sy rsync
 		echo y | pacman -Sy lsyncd
 	elif [[ "$OSNAME" == "macos" ]]; then
-		brew install rsync
-		brew install lsyncd
+		# brew install rsync
+		# brew install lsyncd
+		echo "ok"
 	else
 		yum install -y rsync
 		yum install -y lsyncd
@@ -39,6 +40,7 @@ Install_rsyncd()
 
 	mkdir -p $serverPath/rsyncd
 	mkdir -p $serverPath/rsyncd/secrets
+	mkdir -p $serverPath/rsyncd/send
 	
 	echo '2.0' > $serverPath/rsyncd/version.pl
 	echo '安装完成' > $install_tmp

@@ -3,8 +3,8 @@
 		<div class="bt-w-menu">
 			<p class="bgw" onclick="pluginService('rsyncd');">服务</p>
 			<p onclick="pluginInitD('rsyncd');">自启动</p>
+			<p onclick="rsyncdSend();">发送配置</p>
 			<p onclick="rsyncdReceive();">接收配置</p>
-			<p onclick="pluginLogs('rsyncd','','run_log');">日志</p>
 			<p onclick="rsRead()">说明</p>
 		</div>
 		<div class="bt-w-con pd15">
@@ -15,7 +15,7 @@
 
 <script type="text/javascript">
 resetPluginWinWidth(700);
-$.getScript( "/plugins/file?name=rsyncd&f=js/rsyncd.js", function() {
+$.getScript("/plugins/file?name=rsyncd&f=js/rsyncd.js", function() {
 	pluginService('rsyncd');
 });
 </script>
