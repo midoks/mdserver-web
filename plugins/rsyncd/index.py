@@ -176,11 +176,12 @@ def initDSend():
         mw.writeFile(file_bin, content)
         mw.execShell('chmod +x ' + file_bin)
 
+    lock_file = getServerDir() + "/installed.pl"
     # systemd
     systemDir = mw.systemdCfgDir()
     systemService = systemDir + '/lsyncd.service'
     systemServiceTpl = getPluginDir() + '/init.d/lsyncd.service.tpl'
-    if os.path.exists(systemDir) and not os.path.exists(systemService):
+    if not os.path.exists(lock_file):
         lsyncd_bin = mw.execShell('which lsyncd')[0].strip()
         if lsyncd_bin == '':
             print('lsyncd missing!')
@@ -191,6 +192,8 @@ def initDSend():
         content = content.replace('{$LSYNCD_BIN}', lsyncd_bin)
         mw.writeFile(systemService, content)
         mw.execShell('systemctl daemon-reload')
+
+    mw.writeFile(lock_file, "ok")
 
     lslog = getLsyncdLog()
     if os.path.exists(lslog):
