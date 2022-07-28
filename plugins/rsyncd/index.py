@@ -202,12 +202,36 @@ def initDSend():
     return file_bin
 
 
+def getDefaultConf():
+    path = getServerDir() + "/config.json"
+    data = mw.readFile(path)
+    data = json.loads(data)
+    return data
+
+
+def setDefaultConf(data):
+    path = getServerDir() + "/config.json"
+    mw.writeFile(path, json.dumps(data))
+    return True
+
+
+def initConfigJson():
+    path = getServerDir() + "/config.json"
+    tpl = getPluginDir() + "/conf/config.json"
+    if not os.path.exists(path):
+        data = mw.readFile(tpl)
+        data = json.loads(data)
+        mw.writeFile(path, json.dumps(data))
+
+
 def initDreplace():
 
     initDSend()
 
     # conf
     file_bin = initDReceive()
+    initConfigJson()
+
     return file_bin
 
 
@@ -299,21 +323,16 @@ def getRecListData():
     return ret_list
 
 
+def getRecListDataBy(name):
+    l = getRecListData()
+    for x in range(len(l)):
+        if name == l[x]["name"]:
+            return l[x]
+
+
 def getRecList():
     ret_list = getRecListData()
     return mw.returnJson(True, 'ok', ret_list)
-
-
-def getUPwdList():
-    pwd_path = appConfPwd()
-    pwd_content = mw.readFile(pwd_path)
-    plist = pwd_content.strip().split('\n')
-    plist_len = len(plist)
-    data = {}
-    for x in range(plist_len):
-        tmp = plist[x].split(':')
-        data[tmp[0]] = tmp[1]
-    return data
 
 
 def addRec():
@@ -326,6 +345,8 @@ def addRec():
     args_pwd = args['pwd']
     args_path = args['path']
     args_ps = args['ps']
+
+    delRecBy(args_name)
 
     auth_path = appAuthPwd(args_name)
     pwd_content = args_name + ':' + args_pwd + "\n"
@@ -343,9 +364,69 @@ def addRec():
     con += 'secrets file = ' + auth_path + "\n"
     con += 'read only = false'
 
-    content = content + con
+    content = content.strip() + "\n" + con
     mw.writeFile(path, content)
     return mw.returnJson(True, '添加成功')
+
+
+def getRec():
+    args = getArgs()
+    data = checkArgs(args, ['name'])
+    if not data[0]:
+        return data[1]
+
+    name = args['name']
+
+    if name == "":
+        tmp = {}
+        tmp["name"] = ""
+        tmp["path"] = mw.getWwwDir()
+        tmp["pwd"] = mw.getRandomString(16)
+        return mw.returnJson(True, 'OK', tmp)
+
+    data = getRecListDataBy(name)
+
+    content = mw.readFile(data['secrets file'])
+    pwd = content.strip().split(":")
+    data['pwd'] = pwd[1]
+    return mw.returnJson(True, 'OK', data)
+
+
+def delRecBy(name):
+    try:
+        path = appConf()
+        content = mw.readFile(path)
+
+        reclist = getRecListData()
+        ret_list_len = len(reclist)
+        is_end = False
+        next_name = ''
+        for x in range(ret_list_len):
+            tmp = reclist[x]
+            if tmp['name'] == name:
+
+                secrets_file = tmp['secrets file']
+                tp = os.path.dirname(secrets_file)
+                if os.path.exists(tp):
+                    mw.execShell("rm -rf " + tp)
+
+                if x + 1 == ret_list_len:
+                    is_end = True
+                else:
+                    next_name = reclist[x + 1]['name']
+        reg = ''
+        if is_end:
+            reg = '\[' + name + '\]\s*(.*)'
+        else:
+            reg = '\[' + name + '\]\s*(.*)\s*\[' + next_name + '\]'
+
+        conre = re.search(reg,  content, re.S)
+        content = content.replace(
+            "[" + name + "]\n" + conre.groups()[0], '')
+        mw.writeFile(path, content)
+    except Exception as e:
+        return False
+    return True
 
 
 def delRec():
@@ -353,59 +434,98 @@ def delRec():
     data = checkArgs(args, ['name'])
     if not data[0]:
         return data[1]
-    args_name = args['name']
-
-    cmd = "sed -i '_bak' '/" + args_name + "/d' " + appConfPwd()
-    mw.execShell(cmd)
-
-    try:
-
-        path = appConf()
-        content = mw.readFile(path)
-
-        ret_list = getRecListData()
-        ret_list_len = len(ret_list)
-        is_end = False
-        next_name = ''
-        for x in range(ret_list_len):
-            tmp = ret_list[x]
-            if tmp['name'] == args_name:
-                if x + 1 == ret_list_len:
-                    is_end = True
-                else:
-                    next_name = ret_list[x + 1]['name']
-        reg = ''
-        if is_end:
-            reg = '\[' + args_name + '\]\s*(.*)'
-        else:
-            reg = '\[' + args_name + '\]\s*(.*)\s*\[' + next_name + '\]'
-
-        conre = re.search(reg,  content, re.S)
-        content = content.replace(
-            "[" + args_name + "]\n" + conre.groups()[0], '')
-        mw.writeFile(path, content)
+    name = args['name']
+    ok = delRecBy(name)
+    if ok:
         return mw.returnJson(True, '删除成功!')
-    except Exception as e:
-        return mw.returnJson(False, '删除失败!')
+    return mw.returnJson(False, '删除失败!')
 
 
-def cmdRec():
+def cmdRecSecretKey():
+    import base64
+
     args = getArgs()
     data = checkArgs(args, ['name'])
     if not data[0]:
         return data[1]
 
-    an = args['name']
-    pwd_list = getUPwdList()
-    ip = mw.getLocalIp()
+    name = args['name']
+    info = getRecListDataBy(name)
 
-    cmd = 'echo "' + pwd_list[an] + '" > /tmp/p.pass' + "<br>"
-    cmd += 'chmod 600 /tmp/p.pass' + "<br>"
-    cmd += 'rsync -arv --password-file=/tmp/p.pass --progress --delete  /project  ' + \
-        an + '@' + ip + '::' + an
+    m = json.dumps(info)
+    m = m.encode("utf-8")
+    m = base64.b64encode(m)
+    cmd = m.decode("utf-8")
     return mw.returnJson(True, 'OK!', cmd)
 
-# rsyncdReceive
+
+def cmdRecCmd():
+    args = getArgs()
+    data = checkArgs(args, ['name'])
+    if not data[0]:
+        return data[1]
+
+    name = args['name']
+    info = getRecListDataBy(name)
+    ip = mw.getLocalIp()
+
+    content = mw.readFile(info['secrets file'])
+    pwd = content.strip().split(":")
+
+    tmp_name = '/tmp/' + name + '.pass'
+
+    cmd = 'echo "' + pwd[1] + '" > ' + tmp_name + '<br>'
+    cmd += 'chmod 600 ' + tmp_name + ' <br>'
+    cmd += 'rsync -arv --password-file=' + tmp_name + \
+        ' --progress --delete  /project  ' + name + '@' + ip + '::' + name
+    return mw.returnJson(True, 'OK!', cmd)
+
+
+# ----------------------------- rsyncdSend start -------------------------
+
+
+def lsyncdListFindIp(slist, ip):
+    for x in range(len(slist)):
+        if slist[x]["ip"] == ip:
+            return (True, x)
+    return (False, -1)
+
+
+def lsyncdList():
+    data = getDefaultConf()
+    send = data['send']
+    return mw.returnJson(True, "设置成功!", send)
+
+
+def lsyncdAdd():
+
+    args = getArgs()
+    data = checkArgs(args, ['ip', 'name'])
+    if not data[0]:
+        return data[1]
+
+    ip = args['ip']
+    path = args['path']
+
+    info = {
+        "ip": ip,
+        "path": path
+    }
+
+    data = getDefaultConf()
+    slist = data['send']["list"]
+    res = lsyncdListFindIp(slist, ip)
+    if res[0]:
+        list_index = res[1]
+        slist[list_index] = info
+    else:
+        slist.append(info)
+    data['send']["list"] = slist
+
+    setDefaultConf(data)
+    return mw.returnJson(True, "设置成功!")
+
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -434,7 +554,15 @@ if __name__ == "__main__":
         print(addRec())
     elif func == 'del_rec':
         print(delRec())
-    elif func == 'cmd_rec':
-        print(cmdRec())
+    elif func == 'get_rec':
+        print(getRec())
+    elif func == 'cmd_rec_secret_key':
+        print(cmdRecSecretKey())
+    elif func == 'cmd_rec_cmd':
+        print(cmdRecCmd())
+    elif func == 'lsyncd_list':
+        print(lsyncdList())
+    elif func == 'lsyncd_add':
+        print(lsyncdAdd())
     else:
         print('error')
