@@ -66,11 +66,7 @@ def pSqliteDb(dbname='web_logs', site_name='unset', fn="logs"):
     conn.execute("PRAGMA page_size = 4096", ())
     conn.execute("PRAGMA journal_mode = wal", ())
 
-    if sys.version_info[0] == 3:
-        conn.__DB_CONN.text_factory = lambda x: str(
-            x, encoding="utf-8", errors='ignore')
-    else:
-        conn.__DB_CONN.text_factory = lambda x: unicode(x, "utf-8", "ignore")
+    conn.autoTextFactory()
 
     # conn.text_factory = lambda x: str(x, encoding="utf-8", errors='ignore')
     # conn.text_factory = lambda x: unicode(x, "utf-8", "ignore")

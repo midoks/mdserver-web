@@ -3,6 +3,7 @@
 
 import sqlite3
 import os
+import sys
 
 
 class Sql():
@@ -30,6 +31,14 @@ class Sql():
                 self.__DB_CONN.text_factory = str
         except Exception as ex:
             return "error: " + str(ex)
+
+    def autoTextFactory():
+        if sys.version_info[0] == 3:
+            self.__DB_CONN.text_factory = lambda x: str(
+                x, encoding="utf-8", errors='ignore')
+        else:
+            self.__DB_CONN.text_factory = lambda x: unicode(
+                x, "utf-8", "ignore")
 
     def dbfile(self, name):
         self.__DB_FILE = 'data/' + name + '.db'
