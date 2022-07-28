@@ -81,10 +81,11 @@ def appConf():
     # return '/etc/rsyncd.conf'
 
 
-def appConfPwd():
-    # if mw.isAppleSystem():
-    return getServerDir() + '/rsyncd.passwd'
-    # return '/etc/rsyncd.passwd'
+def appAuthPwd(name):
+    nameDir = getServerDir() + '/secrets/' + name
+    if not os.path.exists(nameDir):
+        mw.execShell("mkdir -p " + nameDir)
+    return nameDir + '/auth.db'
 
 
 def getLog():
@@ -106,12 +107,6 @@ def initDreplace():
         content = mw.readFile(conf_tpl_path)
         mw.writeFile(conf_path, content)
 
-    # pwd
-    confpwd_path = appConfPwd()
-    if not os.path.exists(confpwd_path):
-        mw.writeFile(confpwd_path, '')
-        mw.execShell('chmod 0600 ' + confpwd_path)
-
     initD_path = getServerDir() + '/init.d'
     if not os.path.exists(initD_path):
         os.mkdir(initD_path)
@@ -132,7 +127,7 @@ def initDreplace():
     if os.path.exists(systemDir) and not os.path.exists(systemService):
         rsync_bin = mw.execShell('which rsync')[0].strip()
         if rsync_bin == '':
-            print('rsync缺失!')
+            print('rsync missing!')
             exit(0)
 
         service_path = mw.getServerDir()
@@ -211,6 +206,7 @@ def getRecListData():
     content = mw.readFile(path)
 
     flist = re.findall("\[(.*)\]", content)
+
     flist_len = len(flist)
     ret_list = []
     for i in range(flist_len):
@@ -226,11 +222,12 @@ def getRecListData():
         t1 = re.search(reg, content, re.S)
         if t1:
             args = t1.groups()[0]
-            # print 'args start', args, 'args_end'
-            t2 = re.findall('\s*(.*)\s*=\s*(.*)', args, re.M)
+            # print('args start', args, 'args_end')
+            t2 = re.findall('\s*(.*)\s*\=\s*?(.*)?', args, re.M | re.I)
             for i in range(len(t2)):
-                tmp[t2[i][0].strip()] = t2[i][1]
+                tmp[t2[i][0].strip()] = t2[i][1].strip()
         ret_list.append(tmp)
+
     return ret_list
 
 
@@ -262,10 +259,10 @@ def addRec():
     args_path = args['path']
     args_ps = args['ps']
 
-    pwd_path = appConfPwd()
-    pwd_content = mw.readFile(pwd_path)
-    pwd_content += args_name + ':' + args_pwd + "\n"
-    mw.writeFile(pwd_path, pwd_content)
+    auth_path = appAuthPwd(args_name)
+    pwd_content = args_name + ':' + args_pwd + "\n"
+    mw.writeFile(auth_path, pwd_content)
+    mw.execShell("chmod 600 " + auth_path)
 
     path = appConf()
     content = mw.readFile(path)
@@ -274,6 +271,8 @@ def addRec():
     con += 'path = ' + args_path + "\n"
     con += 'comment = ' + args_ps + "\n"
     con += 'auth users = ' + args_name + "\n"
+    con += 'ignore errors' + "\n"
+    con += 'secrets file = ' + auth_path + "\n"
     con += 'read only = false'
 
     content = content + con
@@ -359,8 +358,6 @@ if __name__ == "__main__":
         print(initdUinstall())
     elif func == 'conf':
         print(appConf())
-    elif func == 'conf_pwd':
-        print(appConfPwd())
     elif func == 'run_log':
         print(getLog())
     elif func == 'rec_list':

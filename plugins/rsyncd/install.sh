@@ -21,7 +21,7 @@ install_tmp=${rootPath}/tmp/mw_install.pl
 Install_rsyncd()
 {
 	echo '正在安装脚本文件...' > $install_tmp
-	mkdir -p $serverPath/rsyncd
+	
 
 	if [ "$OSNAME" == "debian'" ] || [ "$OSNAME" == "ubuntu'" ];then
 		apt install -y rsync
@@ -37,6 +37,8 @@ Install_rsyncd()
 		yum install -y lsyncd
 	fi
 
+	mkdir -p $serverPath/rsyncd
+	mkdir -p $serverPath/rsyncd/secrets
 	
 	echo '2.0' > $serverPath/rsyncd/version.pl
 	echo '安装完成' > $install_tmp
