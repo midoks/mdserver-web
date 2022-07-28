@@ -32,7 +32,7 @@ class Sql():
         except Exception as ex:
             return "error: " + str(ex)
 
-    def autoTextFactory():
+    def autoTextFactory(self):
         if sys.version_info[0] == 3:
             self.__DB_CONN.text_factory = lambda x: str(
                 x, encoding="utf-8", errors='ignore')
