@@ -489,6 +489,73 @@ def cmdRecCmd():
 # ----------------------------- rsyncdSend start -------------------------
 
 
+def makeLsyncdConf(data):
+    # print(data)
+
+    lsyncd_data = data['send']
+    lsyncd_setting = lsyncd_data['default']
+
+    content = "setting {\n"
+    for x in lsyncd_setting:
+        v = lsyncd_setting[x]
+        # print(v, type(v))
+        if type(v) == str:
+            content += "\t" + x + ' = "' + v + "\",\n"
+        elif type(v) == int:
+            content += "\t" + x + ' = ' + str(v) + ",\n"
+    content += "}\n\n"
+
+    lsyncd_list = lsyncd_data['list']
+
+    rsync_bin = mw.execShell('which rsync')[0].strip()
+    send_dir = getServerDir() + "/send"
+
+    if len(lsyncd_list) > 0:
+        for x in range(len(lsyncd_list)):
+            t = lsyncd_list[x]
+            name_dir = send_dir + "/" + t["name"]
+            if not os.path.exists(name_dir):
+                mw.execShell("mkdir -p " + name_dir)
+
+            cmd_exclude = name_dir + "/exclude"
+            mw.writeFile(cmd_exclude, "")
+            cmd_pass = name_dir + "/pass"
+            mw.writeFile(cmd_pass, t['password'])
+
+            remote_addr = t['name'] + '@' + t['ip'] + "::" + t['name']
+            cmd = rsync_bin + " -avzP " + "--port=" + str(t['rsync']['port']) + " --bwlimit=" + t['rsync'][
+                'bwlimit'] + "  --exclude-from=" + cmd_exclude + " --password-file=" + cmd_pass + " " + t["path"] + " " + remote_addr
+            mw.writeFile(name_dir + "/cmd", cmd)
+            mw.execShell("cmod +x " + name_dir + "/cmd")
+
+            # print(x, t)
+            content += "sync {\n"
+            content += "\tdefault.rsync,\n"
+            content += "\tsource = \"" + t['path'] + "\",\n"
+            content += "\ttarget = \"" + remote_addr + "\",\n"
+            content += "\tdelete = " + t['delete'] + ",\n"
+            content += "\tdelay = " + t['delay'] + ",\n"
+            content += "\tinit = false,\n"
+
+            # rsync
+            content += "\trsync{\n"
+            content += "\t\tbinary = \"" + rsync_bin + "\",\n"
+            content += "\t\tarchive = true,\n"
+            content += "\t\tverbose = true,\n"
+            content += "\t\tcompress = " + t['rsync']['compress'] + ",\n"
+            content += "\t\t_extra = {\"--bwlimit=" + t['rsync'][
+                'bwlimit'] + "\", --port=\"" + str(t['rsync']['port']) + "\"}\n"
+            # password_file =
+            # "/www/server/panel/plugin/rsync/sclient/debug_pass",
+
+            content += "\t}\n"
+
+            content += "}\n"
+
+    path = getServerDir() + "/lsyncd.conf"
+    mw.writeFile(path, content)
+
+
 def lsyncdListFindIp(slist, ip):
     for x in range(len(slist)):
         if slist[x]["ip"] == ip:
@@ -650,8 +717,35 @@ def lsyncdAdd():
     data['send']["list"] = slist
 
     setDefaultConf(data)
+    makeLsyncdConf(data)
     return mw.returnJson(True, "设置成功!")
 
+
+def lsyncdRun():
+    args = getArgs()
+    data = checkArgs(args, ['name'])
+    if not data[0]:
+        return data[1]
+
+    send_dir = getServerDir() + "/send"
+    name = args['name']
+    app_dir = send_dir + "/" + name
+
+    cmd = "bash " + app_dir + "/cmd >> " + app_dir + "/run.log" + " 2>&1"
+    mw.execShell(cmd)
+    return mw.returnJson(True, "执行成功!")
+
+
+def lsyncdLog():
+    args = getArgs()
+    data = checkArgs(args, ['name'])
+    if not data[0]:
+        return data[1]
+
+    send_dir = getServerDir() + "/send"
+    name = args['name']
+    app_dir = send_dir + "/" + name
+    return app_dir + "/run.log"
 
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -695,5 +789,9 @@ if __name__ == "__main__":
         print(lsyncdGet())
     elif func == 'lsyncd_delete':
         print(lsyncdDelete())
+    elif func == 'lsyncd_run':
+        print(lsyncdRun())
+    elif func == 'lsyncd_log':
+        print(lsyncdLog())
     else:
         print('error')

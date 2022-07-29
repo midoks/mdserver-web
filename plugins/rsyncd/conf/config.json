@@ -18,7 +18,7 @@
         "default":{
             "logfile": "/www/server/rsyncd/lsyncd.log",
             "inotifyMode": "CloseWrite",
-            "maxProcesses": "8",
+            "maxProcesses": 8,
             "statusFile": "/www/server/rsyncd/lsyncd.status"
         },
         "list":[]

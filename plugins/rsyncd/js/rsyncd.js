@@ -363,6 +363,22 @@ function lsyncdDelete(name){
     });
 }
 
+
+function lsyncdRun(name){
+    var args = {};
+    args["name"] = name;
+    rsPost('lsyncd_run', args, function(rdata){
+        var rdata = $.parseJSON(rdata.data);
+        layer.msg(rdata.msg,{icon:rdata.status?1:2,time:2000,shade: [0.3, '#000']});
+    });
+}
+
+function lsyncdLog(name){
+    var args = {};
+    args["name"] = name;
+    pluginStandAloneLogs("rsyncd", '', "lsyncd_log", JSON.stringify(args));
+}
+
 function lsyncdSend(){
     rsPost('lsyncd_list', '', function(data){
         var rdata = $.parseJSON(data.data);
