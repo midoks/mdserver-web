@@ -452,7 +452,12 @@ def cmdRecSecretKey():
     name = args['name']
     info = getRecListDataBy(name)
 
-    m = json.dumps(info)
+    secrets_file = info['secrets file']
+    content = mw.readFile(info['secrets file'])
+    pwd = content.strip().split(":")
+
+    m = {"A": info['name'], "B": pwd[1], "C": "873"}
+    m = json.dumps(m)
     m = m.encode("utf-8")
     m = base64.b64encode(m)
     cmd = m.decode("utf-8")
@@ -491,37 +496,157 @@ def lsyncdListFindIp(slist, ip):
     return (False, -1)
 
 
+def lsyncdListFindName(slist, name):
+    for x in range(len(slist)):
+        if slist[x]["name"] == name:
+            return (True, x)
+    return (False, -1)
+
+
 def lsyncdList():
     data = getDefaultConf()
     send = data['send']
     return mw.returnJson(True, "设置成功!", send)
 
 
+def lsyncdGet():
+    import base64
+    args = getArgs()
+    data = checkArgs(args, ['name'])
+    if not data[0]:
+        return data[1]
+
+    name = args['name']
+    data = getDefaultConf()
+
+    slist = data['send']["list"]
+    res = lsyncdListFindName(slist, name)
+
+    rsync = {
+        'bwlimit': "1024",
+        "compress": "true",
+        "archive": "true",
+        "verbose": "true"
+    }
+
+    info = {
+        "secret_key": '',
+        "ip": '',
+        "path": getServerDir(),
+        'rsync': rsync,
+        'realtime': "true",
+    }
+    if res[0]:
+        list_index = res[1]
+        info = slist[list_index]
+        m = {"A": info['name'], "B": info["password"], "C": "873"}
+        m = json.dumps(m)
+        m = m.encode("utf-8")
+        m = base64.b64encode(m)
+        info['secret_key'] = m.decode("utf-8")
+    return mw.returnJson(True, "OK", info)
+
+
+def lsyncdDelete():
+    args = getArgs()
+    data = checkArgs(args, ['name'])
+    if not data[0]:
+        return data[1]
+
+    name = args['name']
+    data = getDefaultConf()
+    slist = data['send']["list"]
+    res = lsyncdListFindName(slist, name)
+    retdata = {}
+    if res[0]:
+        list_index = res[1]
+        slist.pop(list_index)
+
+    data['send']["list"] = slist
+    setDefaultConf(data)
+    return mw.returnJson(True, "OK")
+
+
 def lsyncdAdd():
+    import base64
 
     args = getArgs()
-    data = checkArgs(args, ['ip', 'name', 'path'])
+    data = checkArgs(args, ['ip', 'conn_type', 'path',
+                            'secret_key', 'delay', 'period'])
     if not data[0]:
         return data[1]
 
     ip = args['ip']
     path = args['path']
-    name = args['name']
+
+    conn_type = args['conn_type']
+    secret_key = args['secret_key']
+    delete = args['delete']
+    realtime = args['realtime']
+    delay = args['delay']
+    bwlimit = args['bwlimit']
+    compress = args['compress']
+    period = args['period']
+
+    hour = args['hour']
+    minute = args['minute']
+    minute_n = args['minute-n']
 
     info = {
-        "name": name,
         "ip": ip,
-        "path": path
+        "path": path,
+        "delete": delete,
+        "realtime": realtime,
+        'delay': delay,
+        "conn_type": conn_type,
+        "period": period,
+        "hour": hour,
+        "minute": minute,
+        "minute-n": minute_n,
     }
+
+    if conn_type == "key":
+        try:
+            m = base64.b64decode(secret_key)
+            m = json.loads(m)
+            info['name'] = m['A']
+            info['password'] = m['B']
+            info['port'] = m['C']
+        except Exception as e:
+            return mw.returnJson(False, "接收密钥格式错误!")
+    else:
+        data = checkArgs(args, ['uname'])
+        if not data[0]:
+            return data[1]
+
+        info['name'] = args['uname']
+        info['password'] = args['uname']
+
+    rsync = {
+        'bwlimit': bwlimit,
+        "port": info['port'],
+        "compress": compress,
+        "archive": "true",
+        "verbose": "true"
+    }
+
+    info['rsync'] = rsync
 
     data = getDefaultConf()
     slist = data['send']["list"]
-    res = lsyncdListFindIp(slist, ip)
+    res = lsyncdListFindName(slist, info['name'])
     if res[0]:
         list_index = res[1]
         slist[list_index] = info
     else:
+        info["exclude"] = [
+            "/**.upload.tmp",
+            "**/*.log",
+            "**/*.tmp",
+            "**/*.temp"
+        ]
         slist.append(info)
+
     data['send']["list"] = slist
 
     setDefaultConf(data)
@@ -566,5 +691,9 @@ if __name__ == "__main__":
         print(lsyncdList())
     elif func == 'lsyncd_add':
         print(lsyncdAdd())
+    elif func == 'lsyncd_get':
+        print(lsyncdGet())
+    elif func == 'lsyncd_delete':
+        print(lsyncdDelete())
     else:
         print('error')
