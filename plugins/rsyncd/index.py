@@ -380,6 +380,7 @@ def getRec():
     if name == "":
         tmp = {}
         tmp["name"] = ""
+        tmp["comment"] = ""
         tmp["path"] = mw.getWwwDir()
         tmp["pwd"] = mw.getRandomString(16)
         return mw.returnJson(True, 'OK', tmp)
