@@ -553,7 +553,7 @@ function addReceive(name = ""){
                 <div class='line'>\
                     <span class='tname'>备注</span>\
                     <div class='info-r c4'>\
-                        <input id='ps' class='bt-input-text' type='text' name='ps' placeholder='备注' style='width:200px'/>\
+                        <input id='ps' class='bt-input-text' type='text' name='ps' value='"+data["comment"]+"' placeholder='备注' style='width:200px'/>\
                     </div>\
                 </div>\
             </div>",
