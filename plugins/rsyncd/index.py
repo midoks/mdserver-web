@@ -631,6 +631,7 @@ def lsyncdDelete():
 
     data['send']["list"] = slist
     setDefaultConf(data)
+    makeLsyncdConf(data)
     return mw.returnJson(True, "OK")
 
 
