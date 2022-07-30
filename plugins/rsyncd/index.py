@@ -633,6 +633,7 @@ def lsyncdGet():
         "path": mw.getServerDir(),
         'rsync': rsync,
         'realtime': "true",
+        'delete': "false",
     }
     if res[0]:
         list_index = res[1]
