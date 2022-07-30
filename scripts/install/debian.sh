@@ -105,6 +105,10 @@ rm -rf ${Install_TmpFile}
 echo -e "\e[0;32mfix libunwind-dev install question end\e[0m"
 
 
+apt install -y libvpx-dev 
+apt install -y libxpm-dev
+apt install -y libwebp-dev
+apt install -y libfreetype6-dev
 
 cd /www/server/mdserver-web/scripts && bash lib.sh
 chmod 755 /www/server/mdserver-web/data
