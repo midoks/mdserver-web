@@ -46,8 +46,6 @@ function createSendTask(name = ''){
         var data = rdata.data;
         console.log(data);
 
-
-
         var layerName = '创建';
         if (name!=''){
             layerName = '编辑';
@@ -115,7 +113,7 @@ function createSendTask(name = ''){
                 <div class='line'>\
                     <span class='tname'>同步目录</span>\
                     <div class='info-r c4'>\
-                        <input id='inputPath' class='bt-input-text mr5' type='text' name='path' value='/www/wwwroot' placeholder='请选择同步目录' style='width:310px' /><span class='glyphicon glyphicon-folder-open cursor' onclick='changePath(\"inputPath\")'></span>\
+                        <input id='inputPath' class='bt-input-text mr5' type='text' name='path' value='"+data["path"]+"' placeholder='请选择同步目录' style='width:310px' /><span class='glyphicon glyphicon-folder-open cursor' onclick='changePath(\"inputPath\")'></span>\
                         <span data-toggle='tooltip' data-placement='top' title='【同步目录】若不以/结尾，则表示将数据同步到二级目录，一般情况下目录路径请以/结尾' class='bt-ico-ask' style='cursor: pointer;'>?</span>\
                     </div>\
                 </div>\

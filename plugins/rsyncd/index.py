@@ -606,7 +606,7 @@ def lsyncdGet():
     info = {
         "secret_key": '',
         "ip": '',
-        "path": getServerDir(),
+        "path": mw.getServerDir(),
         'rsync': rsync,
         'realtime': "true",
     }
