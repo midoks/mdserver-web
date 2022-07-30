@@ -73,6 +73,12 @@ def status():
         "ps -ef|grep rsync |grep -v grep | grep -v python | awk '{print $2}'")
     if data[0] == '':
         return 'stop'
+
+    data = mw.execShell(
+        "ps -ef|grep lsyncd |grep -v grep | grep -v python | awk '{print $2}'")
+    if data[0] == '':
+        return 'stop'
+
     return 'start'
 
 
@@ -522,6 +528,7 @@ def makeLsyncdConf(data):
             mw.writeFile(cmd_exclude, "")
             cmd_pass = name_dir + "/pass"
             mw.writeFile(cmd_pass, t['password'])
+            mw.execShell("chmod 600 " + cmd_pass)
 
             remote_addr = t['name'] + '@' + t['ip'] + "::" + t['name']
             cmd = rsync_bin + " -avzP " + "--port=" + str(t['rsync']['port']) + " --bwlimit=" + t['rsync'][
@@ -546,8 +553,7 @@ def makeLsyncdConf(data):
             content += "\t\tcompress = " + t['rsync']['compress'] + ",\n"
             content += "\t\t_extra = {\"--bwlimit=" + t['rsync'][
                 'bwlimit'] + "\", --port=\"" + str(t['rsync']['port']) + "\"}\n"
-            # password_file =
-            # "/www/server/panel/plugin/rsync/sclient/debug_pass",
+            content += "\t\tpassword-file=\"" + cmd_pass + "\",\n"
 
             content += "\t}\n"
 
