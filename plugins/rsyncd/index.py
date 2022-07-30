@@ -514,7 +514,7 @@ def makeLsyncdConf(data):
     lsyncd_data = data['send']
     lsyncd_setting = lsyncd_data['default']
 
-    content = "setting {\n"
+    content = "settings {\n"
     for x in lsyncd_setting:
         v = lsyncd_setting[x]
         # print(v, type(v))
@@ -567,7 +567,7 @@ def makeLsyncdConf(data):
             content += "\texclude = " + exclude_str + ",\n"
 
             # rsync
-            content += "\trsync{\n"
+            content += "\trsync {\n"
             content += "\t\tbinary = \"" + rsync_bin + "\",\n"
             content += "\t\tarchive = true,\n"
             content += "\t\tverbose = true,\n"
