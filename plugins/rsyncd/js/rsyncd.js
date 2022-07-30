@@ -603,7 +603,7 @@ function rsyncdReceive(){
         for (var i = 0; i < list.length; i++) {
             con += '<tr>'+
                 '<td>' + list[i]['name']+'</td>' +
-                '<td>' + list[i]['path']+'</td>' +
+                '<td><a class="btlink overflow_hide" onclick="openPath(\''+list[i]['path']+'\')">' + list[i]['path']+'</a></td>' +
                 '<td>' + list[i]['comment']+'</td>' +
                 '<td>\
                     <a class="btlink" onclick="cmdRecCmd(\''+list[i]['name']+'\')">命令</a>\
