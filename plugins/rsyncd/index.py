@@ -736,7 +736,9 @@ def lsyncdAdd():
             "/**.upload.tmp",
             "**/*.log",
             "**/*.tmp",
-            "**/*.temp"
+            "**/*.temp",
+            ".git",
+            ".gitignore",
         ]
 
     data = getDefaultConf()
