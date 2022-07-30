@@ -582,7 +582,6 @@ def makeLsyncdConf(data):
                 'bwlimit'] + "\", \"--port=" + str(t['rsync']['port']) + "\"},\n"
 
             content += "\t}\n"
-
             content += "}\n"
 
     path = getServerDir() + "/lsyncd.conf"
@@ -744,6 +743,7 @@ def lsyncdAdd():
             "**/*.temp",
             ".git",
             ".gitignore",
+            ".user.ini",
         ]
 
     data = getDefaultConf()
