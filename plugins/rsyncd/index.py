@@ -567,7 +567,7 @@ def makeLsyncdConf(data):
             content += "\texclude = " + exclude_str + ",\n"
 
             # rsync
-            content += "\trsync {\n"
+            content += "\trsync = {\n"
             content += "\t\tbinary = \"" + rsync_bin + "\",\n"
             content += "\t\tarchive = true,\n"
             content += "\t\tverbose = true,\n"
