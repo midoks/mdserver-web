@@ -504,6 +504,10 @@ def cmdRecCmd():
 # ----------------------------- rsyncdSend start -------------------------
 
 
+def lsyncdReload():
+    mw.execShell('systemctl reload lsyncd')
+
+
 def makeLsyncdConf(data):
     # print(data)
 
@@ -578,6 +582,8 @@ def makeLsyncdConf(data):
 
     path = getServerDir() + "/lsyncd.conf"
     mw.writeFile(path, content)
+
+    lsyncdReload()
 
 
 def lsyncdListFindIp(slist, ip):
