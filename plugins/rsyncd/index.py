@@ -74,10 +74,10 @@ def status():
     if data[0] == '':
         return 'stop'
 
-    data = mw.execShell(
-        "ps -ef|grep lsyncd |grep -v grep | grep -v python | awk '{print $2}'")
-    if data[0] == '':
-        return 'stop'
+    # data = mw.execShell(
+    #     "ps -ef|grep lsyncd |grep -v grep | grep -v python | awk '{print $2}'")
+    # if data[0] == '':
+    #     return 'stop'
 
     return 'start'
 
