@@ -1500,6 +1500,7 @@ def getMasterStatus(version=''):
 
     db = pMysqlDb()
     dlist = db.query('show slave status')
+    dlist = list(dlist)
     # print(dlist, len(dlist))
     if len(dlist) > 0 and (dlist[0][10] == 'Yes' or dlist[0][11] == 'Yes'):
         data['slave_status'] = True
