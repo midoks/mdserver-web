@@ -41,9 +41,8 @@ Install_lib()
 		return
 	fi
 	
-	if [ "$version" -ge "70" ];then
-		cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash openssl.sh
-	else
+	# cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash openssl_10.sh
+	if [ "$version" -lt "70" ];then
 		cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash openssl_10.sh
 	fi
 
@@ -59,9 +58,8 @@ Install_lib()
 			mv config0.m4 config.m4
 		fi
 		
-		if [ "$version" -ge "70" ];then
-			export PKG_CONFIG_PATH=$serverPath/lib/openssl/lib/pkgconfig
-		else
+		openssl_version=`pkg-config openssl --modversion`
+		if [ "$version" -lt "70" ];then
 			export PKG_CONFIG_PATH=$serverPath/lib/openssl10/lib/pkgconfig
 		fi
 

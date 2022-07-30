@@ -186,33 +186,33 @@ function waf_user_agent()
     return false
 end
 
--- function cc()
---     local ip = params['ip']
---     local request_uri = params['request_uri']
---     local endtime = config['cc']['endtime']
+function cc()
+    local ip = params['ip']
+    local request_uri = params['request_uri']
+    local endtime = config['cc']['endtime']
 
---     if not config['cc']['open'] or not site_cc then return false end
---     local token = ngx.md5(ip .. '_' .. request_uri)
---     local count,_ = ngx.shared.limit:get(token)
---     if count then
---         if count > limit then
---             local safe_count,_ = ngx.shared.drop_sum:get(ip)
---             if not safe_count then
---                 ngx.shared.drop_sum:set(ip,1,86400)
---                 safe_count = 1
---             else
---                 ngx.shared.drop_sum:incr(ip,1)
---             end
---             local lock_time = (endtime * safe_count)
---             if lock_time > 86400 then lock_time = 86400 end
---             ngx.shared.drop_ip:set(ip,retry+1,lock_time)
---             C:write_log('cc',cycle..'秒内累计超过'..limit..'次请求,封锁' .. lock_time .. '秒')
---             C:write_drop_ip('cc',lock_time)
---             if not server_name then
---                 insert_ip_list(ip,lock_time,os.time(),'1111')
---             else
---                 insert_ip_list(ip,lock_time,os.time(),server_name)
---             end
+    if not config['cc']['open'] or not site_cc then return false end
+    local token = ngx.md5(ip .. '_' .. request_uri)
+    local count,_ = ngx.shared.limit:get(token)
+    if count then
+        if count > limit then
+            local safe_count,_ = ngx.shared.drop_sum:get(ip)
+            if not safe_count then
+                ngx.shared.drop_sum:set(ip,1,86400)
+                safe_count = 1
+            else
+                ngx.shared.drop_sum:incr(ip,1)
+            end
+            local lock_time = (endtime * safe_count)
+            if lock_time > 86400 then lock_time = 86400 end
+            ngx.shared.drop_ip:set(ip,retry+1,lock_time)
+            C:write_log('cc',cycle..'秒内累计超过'..limit..'次请求,封锁' .. lock_time .. '秒')
+            C:write_drop_ip('cc',lock_time)
+            if not server_name then
+                insert_ip_list(ip,lock_time,os.time(),'1111')
+            else
+                insert_ip_list(ip,lock_time,os.time(),server_name)
+            end
             
 --             ngx.exit(config['cc']['status'])
 --             return true
