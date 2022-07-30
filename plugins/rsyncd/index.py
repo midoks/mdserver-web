@@ -531,6 +531,7 @@ def makeLsyncdConf(data):
 
     if len(lsyncd_list) > 0:
         for x in range(len(lsyncd_list)):
+
             t = lsyncd_list[x]
             name_dir = send_dir + "/" + t["name"]
             if not os.path.exists(name_dir):
@@ -554,6 +555,9 @@ def makeLsyncdConf(data):
                 'bwlimit'] + delete_ok + "  --exclude-from=" + cmd_exclude + " --password-file=" + cmd_pass + " " + t["path"] + " " + remote_addr
             mw.writeFile(name_dir + "/cmd", cmd)
             mw.execShell("cmod +x " + name_dir + "/cmd")
+
+            if t['realtime'] == "false":
+                continue
 
             # print(x, t)
             content += "sync {\n"
