@@ -770,6 +770,11 @@ def lsyncdRun():
     return mw.returnJson(True, "执行成功!")
 
 
+def lsyncdConfLog():
+    logs_path = getServerDir() + "/lsyncd.log"
+    return logs_path
+
+
 def lsyncdLog():
     args = getArgs()
     data = checkArgs(args, ['name'])
@@ -893,6 +898,8 @@ if __name__ == "__main__":
         print(lsyncdRun())
     elif func == 'lsyncd_log':
         print(lsyncdLog())
+    elif func == 'lsyncd_conf_log':
+        print(lsyncdConfLog())
     elif func == 'lsyncd_get_exclude':
         print(lsyncdGetExclude())
     elif func == 'lsyncd_remove_exclude':

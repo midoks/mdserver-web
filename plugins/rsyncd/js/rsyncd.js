@@ -482,6 +482,10 @@ function lsyncdExclude(name){
     });
 }
 
+function lsyncdConfLog(){
+    pluginStandAloneLogs("rsyncd","","lsyncd_conf_log");;
+}
+
 function lsyncdSend(){
     rsPost('lsyncd_list', '', function(data){
         var rdata = $.parseJSON(data.data);
@@ -495,7 +499,7 @@ function lsyncdSend(){
 
         con += '<div style="padding-top:1px;">\
                 <button class="btn btn-success btn-sm" onclick="createSendTask();">创建发送任务</button>\
-                <button class="btn btn-success btn-sm" onclick="rsyncdLog();">日志</button>\
+                <button class="btn btn-success btn-sm" onclick="lsyncdConfLog();">日志</button>\
             </div>';
 
         con += '<div class="divtable" style="margin-top:5px;"><table class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0">';
