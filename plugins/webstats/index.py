@@ -988,29 +988,32 @@ def getIpStatList():
         if ip == "127.0.0.1":
             clist[i]['area'] = "本地"
         elif geoip_exists:
-            response = reader.city(ip)
-            country = response.country.names["zh-CN"]
-
-            # print(ip, response.subdivisions)
-            _subdivisions = response.subdivisions
             try:
-                if len(_subdivisions) < 1:
+                response = reader.city(ip)
+                country = response.country.names["zh-CN"]
+
+                # print(ip, response.subdivisions)
+                _subdivisions = response.subdivisions
+                try:
+                    if len(_subdivisions) < 1:
+                        subdivisions = ""
+                    else:
+                        subdivisions = "," + response.subdivisions.most_specific.names[
+                            "zh-CN"]
+                except Exception as e:
                     subdivisions = ""
-                else:
-                    subdivisions = "," + response.subdivisions.most_specific.names[
-                        "zh-CN"]
-            except Exception as e:
-                subdivisions = ""
 
-            try:
-                if 'zh-CN' in response.city.names:
-                    city = "," + response.city.names["zh-CN"]
-                else:
-                    city = "," + response.city.names["en"]
-            except Exception as e:
-                city = ""
+                try:
+                    if 'zh-CN' in response.city.names:
+                        city = "," + response.city.names["zh-CN"]
+                    else:
+                        city = "," + response.city.names["en"]
+                except Exception as e:
+                    city = ""
 
-            clist[i]['area'] = country + subdivisions + city
+                clist[i]['area'] = country + subdivisions + city
+            except Exception as e:
+                clist[i]['area'] = "内网?"
 
     return mw.returnJson(True, 'ok', clist)
 

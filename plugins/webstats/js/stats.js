@@ -1996,8 +1996,8 @@ function wsTableErrorLogRequest(page){
                 list += '<td><span class="overflow_hide" style="width:100px;">' + data[i]['ip'] +'</span></td>';
                 list += '<td>' + toSize(data[i]['body_length']) +'</td>';
                 list += '<td>' + toSecond(data[i]['request_time']) +'</td>';
-                list += '<td><span class="overflow_hide" style="width:150px;">' + data[i]['uri'] +'</span></td>';
-                list += '<td>' + data[i]['status_code']+'/' + data[i]['method'] +'</td>';
+                list += '<td><span class="overflow_hide" style="width:130px;">' + data[i]['uri'] +'</span></td>';
+                list += '<td><span class="overflow_hide" style="width:60px;">' + data[i]['status_code']+'/' + data[i]['method'] +'</span></td>';
                 list += '<td><a data-id="'+i+'" href="javascript:;" class="btlink details" title="详情">详情</a></td>';
                 list += '</tr>';
             }
@@ -2205,8 +2205,8 @@ function wsTableLogRequest(page){
                 list += '<td><span class="overflow_hide" style="width:100px;">' + data[i]['ip'] +'</span></td>';
                 list += '<td>' + toSize(data[i]['body_length']) +'</td>';
                 list += '<td>' + toSecond(data[i]['request_time']) +'</td>';
-                list += '<td><span class="overflow_hide" style="width:150px;">' + data[i]['uri'] +'</span></td>';
-                list += '<td>' + data[i]['status_code']+'/' + data[i]['method'] +'</td>';
+                list += '<td><span class="overflow_hide" style="width:130px;">' + data[i]['uri'] +'</span></td>';
+                list += '<td><span class="overflow_hide" style="width:60px;">' + data[i]['status_code']+'/' + data[i]['method'] +'</span></td>';
                 list += '<td><a data-id="'+i+'" href="javascript:;" class="btlink details" title="详情">详情</a></td>';
                 list += '</tr>';
             }

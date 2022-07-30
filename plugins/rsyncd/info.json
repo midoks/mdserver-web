@@ -5,7 +5,7 @@
 	"name":"rsyncd",
 	"type":"软件",
 	"ps":"rsyncd同步助手",
-	"versions":"1.0",
+	"versions":"2.0",
 	"shell":"install.sh",
 	"checks":"server/rsyncd",
 	"path": "server/rsyncd",

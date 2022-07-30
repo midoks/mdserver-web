@@ -174,6 +174,12 @@ log_by_lua_block {
 		return count
 	end
 	
+	local function split_bylog(str,reps )
+		local resultStrList = {}
+		string.gsub(str,'[^'..reps..']+',function(w) table.insert(resultStrList,w) end)
+		return resultStrList
+	end
+
 	local function is_ipaddr_bylog(client_ip)
 		local cipn = split_bylog(client_ip,'.')
 		if arrlen_bylog(cipn) < 4 then return false end
@@ -184,12 +190,6 @@ log_by_lua_block {
 			if ipv > 255 or ipv < 0 then return false end
 		end
 		return true
-	end
-
-	local function split_bylog(str,reps )
-		local resultStrList = {}
-		string.gsub(str,'[^'..reps..']+',function(w) table.insert(resultStrList,w) end)
-		return resultStrList
 	end
 
 	local function get_client_ip_bylog()

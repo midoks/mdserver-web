@@ -14,25 +14,35 @@ sysName=`uname`
 # bash /www/server/mdsever-web/scripts/getos.sh
 bash ${rootPath}/scripts/getos.sh
 OSNAME=`cat ${rootPath}/data/osname.pl`
-VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
 
+echo $OSNAME
 install_tmp=${rootPath}/tmp/mw_install.pl
 Install_rsyncd()
 {
 	echo '正在安装脚本文件...' > $install_tmp
-	mkdir -p $serverPath/rsyncd
+	
 
 	if [ "$OSNAME" == "debian'" ] || [ "$OSNAME" == "ubuntu'" ];then
 		apt install -y rsync
+		apt install -y lsyncd
 	elif [[ "$OSNAME" == "arch" ]]; then
 		echo y | pacman -Sy rsync
+		echo y | pacman -Sy lsyncd
+	elif [[ "$OSNAME" == "macos" ]]; then
+		# brew install rsync
+		# brew install lsyncd
+		echo "ok"
 	else
 		yum install -y rsync
+		yum install -y lsyncd
 	fi
 
+	mkdir -p $serverPath/rsyncd
+	mkdir -p $serverPath/rsyncd/receive
+	mkdir -p $serverPath/rsyncd/send
 	
-	echo '1.0' > $serverPath/rsyncd/version.pl
+	echo '2.0' > $serverPath/rsyncd/version.pl
 	echo '安装完成' > $install_tmp
 	cd ${rootPath} && python3 ${rootPath}/plugins/rsyncd/index.py start
 	cd ${rootPath} && python3 ${rootPath}/plugins/rsyncd/index.py initd_install
@@ -51,6 +61,7 @@ Uninstall_rsyncd()
 	if [ -f $serverPath/rsyncd/initd/rsyncd ];then
 		$serverPath/rsyncd/initd/rsyncd stop
 	fi
+	
 	rm -rf $serverPath/rsyncd
 	echo "卸载完成" > $install_tmp
 }

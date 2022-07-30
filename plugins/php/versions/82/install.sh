@@ -10,6 +10,11 @@ sourcePath=${serverPath}/source
 sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 
+function version_gt() { test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" != "$1"; }
+function version_le() { test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" == "$1"; }
+function version_lt() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" != "$1"; }
+function version_ge() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" == "$1"; }
+
 
 version=8.2.0alpha2
 PHP_VER=82
@@ -50,6 +55,14 @@ if [ "$IS_64BIT" == "64" ];then
 	OPTIONS="${OPTIONS} --with-libdir=lib64"
 fi
 
+ZIP_OPTION='--with-zip'
+libzip_version=`pkg-config libzip --modversion`
+if version_lt "$libzip_version" "0.11.0" ;then
+	export PKG_CONFIG_PATH=$serverPath/lib/libzip/lib/pkgconfig
+	ZIP_OPTION="--with-zip=$serverPath/lib/libzip"
+fi
+
+
 echo "$sourcePath/php/php${PHP_VER}"
 
 if [ ! -d $serverPath/php/${PHP_VER} ];then
@@ -63,7 +76,7 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--with-mysqli=mysqlnd \
 	--with-pdo-mysql=mysqlnd \
 	--with-zlib-dir=$serverPath/lib/zlib \
-	--with-zip \
+	$ZIP_OPTION \
 	--enable-mbstring \
 	--enable-ftp \
 	--enable-sockets \

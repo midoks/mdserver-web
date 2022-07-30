@@ -38,6 +38,8 @@ max_allowed_packet = 128M
 #loose-skip-innodb
 #skip-networking
 #skip-name-resolve
+skip-ssl
+
 
 log-bin=mysql-bin
 binlog_format=mixed

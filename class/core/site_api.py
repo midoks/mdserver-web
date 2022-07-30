@@ -387,9 +387,19 @@ class site_api:
                 os.system('mkdir -p ' + vpath)
             data = []
             for d in os.listdir(vpath):
+
+                # keyPath = self.sslDir + siteName + '/privkey.pem'
+                # certPath = self.sslDir + siteName + '/fullchain.pem'
+
+                keyPath = vpath + '/' + d + '/privkey.pem'
+                certPath = vpath + '/' + d + '/fullchain.pem'
+                if os.path.exists(keyPath) and os.path.exists(certPath):
+                    self.saveCert(keyPath, certPath)
+
                 mpath = vpath + '/' + d + '/info.json'
                 if not os.path.exists(mpath):
                     continue
+
                 tmp = mw.readFile(mpath)
                 if not tmp:
                     continue
@@ -479,8 +489,8 @@ class site_api:
             mw.execShell('\\cp -a /tmp/backup2.conf ' + csrpath)
             return mw.returnJson(False, 'ERROR: <br><a style="color:red;">' + isError.replace("\n", '<br>') + '</a>')
 
-        mw.restartWeb()
         mw.writeLog('网站管理', '证书已保存!')
+        mw.restartWeb()
         return mw.returnJson(True, '证书已保存!')
 
     def setCertToSiteApi(self):
@@ -2023,7 +2033,7 @@ location ^~ {from} {
 
     def getPhpVersion(self):
         phpVersions = ('00', '52', '53', '54', '55',
-                       '56', '70', '71', '72', '73', '74', '80', '81')
+                       '56', '70', '71', '72', '73', '74', '80', '81', '82')
         data = []
         for val in phpVersions:
             tmp = {}
@@ -2280,7 +2290,7 @@ location /{
             certInfo = self.getCertName(certPath)
             if not certInfo:
                 return mw.returnData(False, '证书解析失败!')
-            vpath = self.sslDir + certInfo['subject']
+            vpath = self.sslDir + certInfo['subject'].strip()
             if not os.path.exists(vpath):
                 os.system('mkdir -p ' + vpath)
             mw.writeFile(vpath + '/privkey.pem',

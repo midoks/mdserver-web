@@ -1,0 +1,26 @@
+{
+    "receive":{
+        "default":{
+            "uid": "root",
+            "use chroot": "no",
+            "dont compress": "*.gz *.tgz *.zip *.z *.Z *.rpm *.deb *.bz2 *.mp4 *.avi *.swf *.rar",
+            "hosts allow": "",
+            "max connections": 200,
+            "gid": "root",
+            "timeout": 600,
+            "pid file": "/var/run/rsyncd.pid",
+            "log file": "/var/log/rsyncd.log",
+            "port": 873
+        },
+        "list":[]
+    },
+    "send":{
+        "default":{
+            "logfile": "/www/server/rsyncd/lsyncd.log",
+            "inotifyMode": "CloseWrite",
+            "maxProcesses": 8,
+            "statusFile": "/www/server/rsyncd/lsyncd.status"
+        },
+        "list":[]
+    }
+}

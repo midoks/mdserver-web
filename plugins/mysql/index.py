@@ -134,9 +134,14 @@ def pSqliteDb(dbname='databases'):
 
 
 def pMysqlDb():
-    db = mw.getMyORM()
+    # mysql.connector
+    # db = mw.getMyORM()
+    # MySQLdb |
+    db = mw.getMyORMDb()
+
     db.setPort(getDbPort())
     db.setSocket(getSocketFile())
+    # db.setCharset("utf8")
     db.setPwd(pSqliteDb('config').where('id=?', (1,)).getField('mysql_root'))
     return db
 
@@ -1495,6 +1500,7 @@ def getMasterStatus(version=''):
 
     db = pMysqlDb()
     dlist = db.query('show slave status')
+    dlist = list(dlist)
     # print(dlist, len(dlist))
     if len(dlist) > 0 and (dlist[0][10] == 'Yes' or dlist[0][11] == 'Yes'):
         data['slave_status'] = True
