@@ -525,7 +525,10 @@ def makeLsyncdConf(data):
                 mw.execShell("mkdir -p " + name_dir)
 
             cmd_exclude = name_dir + "/exclude"
-            mw.writeFile(cmd_exclude, "")
+            cmd_exclude_txt = ""
+            for x in t['exclude']:
+                cmd_exclude_txt += x + "\n"
+            mw.writeFile(cmd_exclude, cmd_exclude_txt)
             cmd_pass = name_dir + "/pass"
             mw.writeFile(cmd_pass, t['password'])
             mw.execShell("chmod 600 " + cmd_pass)
@@ -544,6 +547,12 @@ def makeLsyncdConf(data):
             content += "\tdelete = " + t['delete'] + ",\n"
             content += "\tdelay = " + t['delay'] + ",\n"
             content += "\tinit = false,\n"
+
+            exclude_str = json.dumps(t['exclude'])
+            exclude_str = exclude_str.replace("[", "{")
+            exclude_str = exclude_str.replace("]", "}")
+            # print(exclude_str)
+            content += "\texclude = " + exclude_str + ",\n"
 
             # rsync
             content += "\trsync{\n"
@@ -707,6 +716,14 @@ def lsyncdAdd():
 
     info['rsync'] = rsync
 
+    if not 'exclude' in info:
+        info["exclude"] = [
+            "/**.upload.tmp",
+            "**/*.log",
+            "**/*.tmp",
+            "**/*.temp"
+        ]
+
     data = getDefaultConf()
     slist = data['send']["list"]
     res = lsyncdListFindName(slist, info['name'])
@@ -714,12 +731,6 @@ def lsyncdAdd():
         list_index = res[1]
         slist[list_index] = info
     else:
-        info["exclude"] = [
-            "/**.upload.tmp",
-            "**/*.log",
-            "**/*.tmp",
-            "**/*.temp"
-        ]
         slist.append(info)
 
     data['send']["list"] = slist
@@ -739,7 +750,7 @@ def lsyncdRun():
     name = args['name']
     app_dir = send_dir + "/" + name
 
-    cmd = "bash " + app_dir + "/cmd >> " + app_dir + "/run.log" + " 2>&1"
+    cmd = "bash " + app_dir + "/cmd >> " + app_dir + "/run.log" + " 2>&1 &"
     mw.execShell(cmd)
     return mw.returnJson(True, "执行成功!")
 
@@ -754,6 +765,72 @@ def lsyncdLog():
     name = args['name']
     app_dir = send_dir + "/" + name
     return app_dir + "/run.log"
+
+
+def lsyncdGetExclude():
+    args = getArgs()
+    data = checkArgs(args, ['name'])
+    if not data[0]:
+        return data[1]
+
+    data = getDefaultConf()
+    slist = data['send']["list"]
+    res = lsyncdListFindName(slist, args['name'])
+    i = res[1]
+    info = slist[i]
+    return mw.returnJson(True, "OK!", info['exclude'])
+
+
+def lsyncdRemoveExclude():
+    args = getArgs()
+    data = checkArgs(args, ['name', 'exclude'])
+    if not data[0]:
+        return data[1]
+
+    exclude = args['exclude']
+
+    data = getDefaultConf()
+    slist = data['send']["list"]
+    res = lsyncdListFindName(slist, args['name'])
+    i = res[1]
+    info = slist[i]
+
+    exclude_list = info['exclude']
+    exclude_pop_key = -1
+    for x in range(len(exclude_list)):
+        if exclude_list[x] == exclude:
+            exclude_pop_key = x
+
+    if exclude_pop_key > -1:
+        exclude_list.pop(exclude_pop_key)
+
+    data['send']["list"][i]['exclude'] = exclude_list
+    setDefaultConf(data)
+    makeLsyncdConf(data)
+    return mw.returnJson(True, "OK!", exclude_list)
+
+
+def lsyncdAddExclude():
+    args = getArgs()
+    data = checkArgs(args, ['name', 'exclude'])
+    if not data[0]:
+        return data[1]
+
+    exclude = args['exclude']
+
+    data = getDefaultConf()
+    slist = data['send']["list"]
+    res = lsyncdListFindName(slist, args['name'])
+    i = res[1]
+    info = slist[i]
+
+    exclude_list = info['exclude']
+    exclude_list.append(exclude)
+
+    data['send']["list"][i]['exclude'] = exclude_list
+    setDefaultConf(data)
+    makeLsyncdConf(data)
+    return mw.returnJson(True, "OK!", exclude_list)
 
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -801,5 +878,11 @@ if __name__ == "__main__":
         print(lsyncdRun())
     elif func == 'lsyncd_log':
         print(lsyncdLog())
+    elif func == 'lsyncd_get_exclude':
+        print(lsyncdGetExclude())
+    elif func == 'lsyncd_remove_exclude':
+        print(lsyncdRemoveExclude())
+    elif func == 'lsyncd_add_exclude':
+        print(lsyncdAddExclude())
     else:
         print('error')

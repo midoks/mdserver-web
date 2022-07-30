@@ -377,6 +377,111 @@ function lsyncdLog(name){
     pluginStandAloneLogs("rsyncd", '', "lsyncd_log", JSON.stringify(args));
 }
 
+
+function lsyncdExclude(name){
+    layer.open({
+        type:1,
+        title:'过滤器',
+        area: '400px', 
+        shadeClose:false,
+        closeBtn:2,
+        content:'<div class="lsyncd_exclude">\
+                <div style="overflow:hidden;">\
+                    <fieldset>\
+                        <legend>排除的文件和目录</legend>\
+                        <input type="text" class="bt-input-text mr5" data-type="exclude" title="例如：/home/www/" placeholder="例如：*.log" style="width:305px;">\
+                        <button data-type="exclude" class=" addList btn btn-default btn-sm">添加</button>\
+                        <div class="table-overflow">\
+                            <table class="table table-hover BlockList"><tbody></tbody></table>\
+                        </div>\
+                    </fieldset>\
+                </div>\
+                <div>\
+                    <ul class="help-info-text c7" style="list-style-type:decimal;">\
+                        <li>排除的文件和目录是指当前目录下不需要同步的目录或者文件</li>\
+                        <li>如果规则以斜线 <code>/</code>开头，则从头开始要匹配全部</li>\
+                        <li>如果规则以 <code>/</code>结尾，则要匹配监控路径的末尾</li>\
+                        <li><code>?</code> 匹配任何字符，但不包括<code>/</code></li>\
+                        <li><code>*</code> 匹配0或多个字符，但不包括<code>/</code></li>\
+                        <li><code>**</code> 匹配0或多个字符，可以是<code>/</code></li>\
+                    </ul>\
+                </div>\
+            </div>'
+    });
+
+    function getIncludeExclude(mName){
+        loadT = layer.msg('正在获取数据...',{icon:16,time:0,shade: [0.3, '#000']});
+        rsPost('lsyncd_get_exclude',{"name":mName}, function(rdata) {
+            layer.close(loadT);
+
+            var rdata = $.parseJSON(rdata.data);
+            var res = rdata.data;
+
+            var list=''
+            for (var i = 0; i < res.length; i++) {
+                list += '<tr><td>'+ res[i] +'</td><td><a href="javascript:;" data-type='+ mName +' class="delList">删除</a></td></tr>';
+            }
+            $('.lsyncd_exclude .BlockList tbody').empty().append(list);
+        });
+    }
+    getIncludeExclude(name);
+
+
+    function addArgs(name,exclude){
+        loadT = layer.msg('正在添加...',{icon:16,time:0,shade: [0.3, '#000']});
+        rsPost('lsyncd_add_exclude', {name:name,exclude:exclude}, function(res){
+            layer.close(loadT);
+
+            console.log('addArgs:',res);
+
+            if (res.status){
+                getIncludeExclude(name);
+                $('.lsyncd_exclude input').val('');
+                layer.msg(res.msg);
+            }else{
+                layer.msg(res.msg);
+            }
+        });
+    }
+    $('.addList').click(function(event) {
+        var val = $(this).prev().val();
+        if(val == ''){
+            layer.msg('当前输入内容为空,请输入');
+            return false;
+        }
+        addArgs(name,val);
+    });
+    $('.lsyncd_exclude input').keyup(function(event){
+        if (event.which == 13){
+            var val = $(this).val();
+            if(val == ''){
+                layer.msg('当前输入内容为空,请输入');
+                return false;
+            }
+            addArgs(name,val);
+        }
+    });
+
+
+    $('.lsyncd_exclude').on('click', '.delList', function(event) {
+        loadT = layer.msg('正在删除...',{icon:16,time:0,shade: [0.3, '#000']});
+        var val = $(this).parent().prev().text();
+        rsPost('lsyncd_remove_exclude',{"name":name,exclude:val}, function(rdata) {
+            layer.close(loadT);
+
+            console.log(rdata)
+            var rdata = $.parseJSON(rdata.data);
+            var res = rdata.data;
+
+            var list=''
+            for (var i = 0; i < res.length; i++) {
+                list += '<tr><td>'+ res[i] +'</td><td><a href="javascript:;" data-type='+ name +' class="delList">删除</a></td></tr>';
+            }
+            $('.lsyncd_exclude .BlockList tbody').empty().append(list);
+        });
+    });
+}
+
 function lsyncdSend(){
     rsPost('lsyncd_list', '', function(data){
         var rdata = $.parseJSON(data.data);
