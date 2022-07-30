@@ -573,7 +573,7 @@ def makeLsyncdConf(data):
             content += "\t\tverbose = true,\n"
             content += "\t\tcompress = " + t['rsync']['compress'] + ",\n"
             content += "\t\t_extra = {\"--bwlimit=" + t['rsync'][
-                'bwlimit'] + "\", --port=\"" + str(t['rsync']['port']) + "\"}\n"
+                'bwlimit'] + "\", \"--port=" + str(t['rsync']['port']) + "\"},\n"
             content += "\t\tpassword-file = \"" + cmd_pass + "\",\n"
 
             content += "\t}\n"
