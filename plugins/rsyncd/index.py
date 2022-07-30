@@ -589,6 +589,9 @@ def makeLsyncdConf(data):
 
     lsyncdReload()
 
+    import tool_task
+    tool_task.createBgTask(lsyncd_list)
+
 
 def lsyncdListFindIp(slist, ip):
     for x in range(len(slist)):
