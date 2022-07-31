@@ -1574,8 +1574,7 @@ def getMasterRepSlaveList(version=''):
 
 def addMasterRepSlaveUser(version=''):
     args = getArgs()
-    data = checkArgs(args,
-                     ['username', 'password'])
+    data = checkArgs(args, ['username', 'password'])
     if not data[0]:
         return data[1]
 
@@ -1696,11 +1695,110 @@ def updateMasterRepSlaveUser(version=''):
     return mw.returnJson(True, '更新成功!')
 
 
+def getSlaveSSHList(version=''):
+    args = getArgs()
+    data = checkArgs(args, ['page', 'page_size'])
+    if not data[0]:
+        return data[1]
+
+    page = int(args['page'])
+    page_size = int(args['page_size'])
+
+    conn = pSqliteDb('slave_id_rsa')
+    limit = str((page - 1) * page_size) + ',' + str(page_size)
+
+    field = 'id,ip,port,id_rsa,ps,addtime'
+    clist = conn.field(field).limit(limit).order('id desc').select()
+    count = conn.count()
+
+    data = {}
+    _page = {}
+    _page['count'] = count
+    _page['p'] = page
+    _page['row'] = page_size
+    _page['tojs'] = args['tojs']
+    data['page'] = mw.getPage(_page)
+    data['data'] = clist
+
+    return mw.getJson(data)
+
+
+def getSlaveSSHByIp(version=''):
+    args = getArgs()
+    data = checkArgs(args, ['ip'])
+    if not data[0]:
+        return data[1]
+
+    ip = args['ip']
+
+    conn = pSqliteDb('slave_id_rsa')
+    data = conn.field('ip,port,id_rsa').where("ip=?", (ip,)).select()
+    return mw.returnJson(True, 'ok', data)
+
+
+def addSlaveSSH(version=''):
+    import base64
+
+    args = getArgs()
+    data = checkArgs(args, ['ip'])
+    if not data[0]:
+        return data[1]
+
+    ip = args['ip']
+    if ip == "":
+        return mw.returnJson(True, 'ok')
+
+    data = checkArgs(args, ['port', 'id_rsa'])
+    if not data[0]:
+        return data[1]
+
+    id_rsa = args['id_rsa']
+    port = args['port']
+    user = 'root'
+    addTime = time.strftime('%Y-%m-%d %X', time.localtime())
+
+    conn = pSqliteDb('slave_id_rsa')
+    data = conn.field('ip,id_rsa').where("ip=?", (ip,)).select()
+    if len(data) > 0:
+        res = conn.where("ip=?", (ip,)).save('port,id_rsa', (port, id_rsa,))
+    else:
+        conn.add('ip,port,user,id_rsa,ps,addtime',
+                 (ip, port, user, id_rsa, '', addTime))
+
+    return mw.returnJson(True, '设置成功!')
+
+
+def delSlaveSSH(version=''):
+    args = getArgs()
+    data = checkArgs(args, ['ip'])
+    if not data[0]:
+        return data[1]
+
+    ip = args['ip']
+
+    conn = pSqliteDb('slave_id_rsa')
+    conn.where("ip=?", (ip,)).delete()
+    return mw.returnJson(True, 'ok')
+
+
+def updateSlaveSSH(version=''):
+    args = getArgs()
+    data = checkArgs(args, ['ip', 'id_rsa'])
+    if not data[0]:
+        return data[1]
+
+    ip = args['ip']
+    id_rsa = args['id_rsa']
+    conn = pSqliteDb('slave_id_rsa')
+    conn.where("ip=?", (ip,)).save('id_rsa', (id_rsa,))
+    return mw.returnJson(True, 'ok')
+
+
 def getSlaveList(version=''):
 
     db = pMysqlDb()
     dlist = db.query('show slave status')
-
+    dlist = list(dlist)
     # print(dlist)
     ret = []
     for x in range(0, len(dlist)):
@@ -1716,6 +1814,14 @@ def getSlaveList(version=''):
     data['data'] = ret
 
     return mw.getJson(data)
+
+
+def getSlaveSyncCmd(version=''):
+
+    root = mw.getRunDir()
+    cmd = 'cd ' + root + ' && python ' + root + \
+        '/plugins/mysql/index.py do_full_sync {"db":"all"}'
+    return mw.returnJson(True, 'ok', cmd)
 
 
 def setSlaveStatus(version=''):
@@ -1774,6 +1880,16 @@ def mw_async(f):
     return wrapper
 
 
+############### --- 重要 同步---- ###########
+
+def writeDbSyncStatus(data):
+    path = '/tmp/db_async_status.txt'
+    # status_data['code'] = 1
+    # status_data['msg'] = '主服务器备份完成...'
+    # status_data['progress'] = 30
+    mw.writeFile(path, json.dumps(data))
+
+
 def doFullSync():
 
     args = getArgs()
@@ -1781,53 +1897,54 @@ def doFullSync():
     if not data[0]:
         return data[1]
 
+    arg_db_select = args['db']
+
     status_data = {}
     status_data['progress'] = 5
 
     db = pMysqlDb()
 
     dlist = db.query('show slave status')
+    dlist = list(dlist)
     if len(dlist) == 0:
         status_data['code'] = -1
         status_data['msg'] = '没有启动...'
 
     ip = dlist[0][1]
-    print(ip)
+    print("master ip:", ip)
 
-    status_file = '/tmp/db_async_status.txt'
+    id_rsa_conn = pSqliteDb('slave_id_rsa')
+    data = id_rsa_conn.field('ip,port,id_rsa').where("ip=?", (ip,)).select()
 
-    status_data['code'] = 0
-    status_data['msg'] = '运行中...'
-    mw.writeFile(status_file, json.dumps(status_data))
+    SSH_PRIVATE_KEY = "/tmp/mysql_sync_id_rsa.txt"
+    id_rsa_key = data[0]['id_rsa']
+    id_rsa_key = id_rsa_key.replace('\\n', '\n')
+    master_port = int(data[0]['port'])
+
+    mw.writeFile(SSH_PRIVATE_KEY, id_rsa_key)
+
+    writeDbSyncStatus({'code': 0, 'msg': '开始同步...', 'progress': 0})
 
     import paramiko
     paramiko.util.log_to_file('paramiko.log')
     ssh = paramiko.SSHClient()
 
-    SSH_PRIVATE_KEY = '/root/.ssh/id_rsa'
-
-    if mw.getOs() == 'darwin':
-        user = mw.execShell(
-            "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
-        SSH_PRIVATE_KEY = '/Users/' + user + '/.ssh/id_rsa'
-
     print(SSH_PRIVATE_KEY)
     if not os.path.exists(SSH_PRIVATE_KEY):
-        status_data['code'] = 0
-        status_data['msg'] = '需要配置免登录...'
-        mw.writeFile(status_file, json.dumps(status_data))
-        return
+        writeDbSyncStatus({'code': 0, 'msg': '需要配置SSH......', 'progress': 0})
+        return 'fail'
 
     try:
         key = paramiko.RSAKey.from_private_key_file(SSH_PRIVATE_KEY)
         # ssh.load_system_host_keys()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(hostname=ip, port=22, username='root', pkey=key)
+        ssh.connect(hostname=ip, port=master_port, username='root', pkey=key)
     except Exception as e:
-        status_data['code'] = 0
-        status_data['msg'] = '需要配置免登录....'
-        mw.writeFile(status_file, json.dumps(status_data))
-        return
+        writeDbSyncStatus(
+            {'code': 0, 'msg': 'SSH配置错误:' + str(e), 'progress': 0})
+        return 'fail'
+
+    writeDbSyncStatus({'code': 0, 'msg': '登录Master成功...', 'progress': 5})
 
     cmd = "cd /www/server/mdserver-web && python /www/server/mdserver-web/plugins/mysql/index.py dump_mysql_data {\"db\":'" + args[
         'db'] + "'}"
@@ -1835,51 +1952,49 @@ def doFullSync():
     result = stdout.read()
     result_err = stderr.read()
 
-    if result == 'ok':
-        status_data['code'] = 1
-        status_data['msg'] = '主服务器备份完成...'
-        status_data['progress'] = 30
-        mw.writeFile(status_file, json.dumps(status_data))
+    result = result.decode('utf-8')
+    # print(result)
+    if result.strip() == 'ok':
+        writeDbSyncStatus({'code': 1, 'msg': '主服务器备份完成...', 'progress': 30})
+    else:
+        writeDbSyncStatus({'code': 1, 'msg': '主服务器备份失败...', 'progress': 30})
+        return 'fail'
 
     r = mw.execShell('scp root@' + ip + ':/tmp/dump.sql /tmp')
     if r[0] == '':
-        status_data['code'] = 2
-        status_data['msg'] = '数据同步本地完成...'
-        status_data['progress'] = 40
-        mw.writeFile(status_file, json.dumps(status_data))
+        writeDbSyncStatus({'code': 2, 'msg': '数据同步本地完成...', 'progress': 40})
 
     cmd = 'cd /www/server/mdserver-web && python /www/server/mdserver-web/plugins/mysql/index.py get_master_rep_slave_user_cmd {"username":"","db":""}'
     stdin, stdout, stderr = ssh.exec_command(cmd)
     result = stdout.read()
     result_err = stderr.read()
     cmd_data = json.loads(result)
+    # print(cmd_data)
 
     db.query('stop slave')
-    status_data['code'] = 3
-    status_data['msg'] = '停止从库完成...'
-    status_data['progress'] = 45
-    mw.writeFile(status_file, json.dumps(status_data))
+    writeDbSyncStatus({'code': 3, 'msg': '停止从库完成...', 'progress': 45})
 
     dlist = db.query(cmd_data['data'])
-    status_data['code'] = 4
-    status_data['msg'] = '刷新库信息完成...'
-    status_data['progress'] = 50
-    mw.writeFile(status_file, json.dumps(status_data))
+    writeDbSyncStatus({'code': 4, 'msg': '刷新从库同步信息完成...', 'progress': 50})
 
     pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
-    cmd = getServerDir() + "/bin/mysql -uroot -p" + pwd + " < /tmp/dump.sql"
-    print(mw.execShell(cmd))
-    status_data['code'] = 5
-    status_data['msg'] = '同步数据完成...'
-    status_data['progress'] = 90
-    mw.writeFile(status_file, json.dumps(status_data))
+    root_dir = getServerDir()
+    msock = root_dir + "/mysql.sock"
+    cmd = root_dir + "/bin/mysql -S " + msock + \
+        " -uroot -p" + pwd + " < /tmp/dump.sql"
+    import_data = mw.execShell(cmd)
+    print(import_data[0])
+    print(import_data[1])
+    if import_data[0] == '':
+        writeDbSyncStatus({'code': 5, 'msg': '导入数据完成...', 'progress': 90})
+    else:
+        writeDbSyncStatus({'code': 5, 'msg': '导入数据失败...', 'progress': 90})
+        return 'fail'
 
     db.query('start slave')
-    status_data['code'] = 6
-    status_data['msg'] = '从库重启完成...'
-    status_data['progress'] = 100
-    mw.writeFile(status_file, json.dumps(status_data))
+    writeDbSyncStatus({'code': 6, 'msg': '从库重启完成...', 'progress': 100})
 
+    os.system("rm -rf " + SSH_PRIVATE_KEY)
     return True
 
 
@@ -1894,15 +2009,20 @@ def fullSync(version=''):
         cmd = 'cd ' + mw.getRunDir() + ' && python ' + \
             getPluginDir() + \
             '/index.py do_full_sync {"db":"' + args['db'] + '"} &'
+        # print(cmd)
         mw.execShell(cmd)
         return json.dumps({'code': 0, 'msg': '同步数据中!', 'progress': 0})
 
     if os.path.exists(status_file):
         c = mw.readFile(status_file)
-        d = json.loads(c)
+        tmp = json.loads(c)
+        if tmp['code'] == 1:
+            dump_size = os.path.getsize("/tmp/dump.sql")
+            tmp['msg'] = tmp['msg'] + ":" + "同步文件:" + mw.toSize(dump_size)
+            c = json.dumps(tmp)
 
-        if d['code'] == 6:
-            os.remove(status_file)
+        # if tmp['code'] == 6:
+        #     os.remove(status_file)
         return c
 
     return json.dumps({'code': 0, 'msg': '点击开始,开始同步!', 'progress': 0})
@@ -2021,6 +2141,18 @@ if __name__ == "__main__":
         print(getMasterRepSlaveUserCmd(version))
     elif func == 'get_slave_list':
         print(getSlaveList(version))
+    elif func == 'get_slave_sync_cmd':
+        print(getSlaveSyncCmd(version))
+    elif func == 'get_slave_ssh_list':
+        print(getSlaveSSHList(version))
+    elif func == 'get_slave_ssh_by_ip':
+        print(getSlaveSSHByIp(version))
+    elif func == 'add_slave_ssh':
+        print(addSlaveSSH(version))
+    elif func == 'del_slave_ssh':
+        print(delSlaveSSH(version))
+    elif func == 'update_slave_ssh':
+        print(updateSlaveSSH(version))
     elif func == 'set_slave_status':
         print(setSlaveStatus(version))
     elif func == 'delete_slave':
