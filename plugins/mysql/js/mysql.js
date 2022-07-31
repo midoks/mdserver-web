@@ -1031,10 +1031,18 @@ function myLogs(){
     myPost('bin_log', {status:1}, function(data){
         var rdata = $.parseJSON(data.data);
 
+        var line_status = ""
+        if (rdata.status){
+            line_status = '<button class="btn btn-success btn-xs btn-bin va0">关闭</button>\
+                        <button class="btn btn-success btn-xs clean-btn-bin va0">清理BINLOG日志</button>'
+        } else {
+            line_status = '<button class="btn btn-success btn-xs btn-bin va0">开启</button>'
+        }
+
         var limitCon = '<p class="conf_p">\
                         <span class="f14 c6 mr20">二进制日志 </span><span class="f14 c6 mr20">' + toSize(rdata.msg) + '</span>\
-                        <button class="btn btn-success btn-xs btn-bin va0">'+ (rdata.status ? lan.soft.off : lan.soft.on) + '</button>\
-                        <p class="f14 c6 mtb10" style="border-top:#ddd 1px solid; padding:10px 0">错误日志<button class="btn btn-default btn-clear btn-xs" style="float:right;" >清空</button></p>\
+                        '+line_status+'\
+                        <p class="f14 c6 mtb10" style="border-top:#ddd 1px solid; padding:10px 0">错误日志<button class="btn btn-default btn-clear btn-xs" style="float:right;" >清理日志</button></p>\
                         <textarea readonly style="margin: 0px;width: 100%;height: 440px;background-color: #333;color:#fff; padding:0 5px" id="error_log"></textarea>\
                     </p>'
         $(".soft-man-con").html(limitCon);
@@ -1044,10 +1052,15 @@ function myLogs(){
             myPost('bin_log', 'close=change', function(data){
                 var rdata = $.parseJSON(data.data);
                 layer.msg(rdata.msg, { icon: rdata.status ? 1 : 5 });
-            
-                setTimeout(function(){
-                    myLogs();
-                }, 2000);
+                setTimeout(function(){myLogs();}, 2000);
+            });
+        });
+
+        $(".clean-btn-bin").click(function () {
+            myPost('clean_bin_log', '', function(data){
+                var rdata = $.parseJSON(data.data);
+                layer.msg(rdata.msg, { icon: rdata.status ? 1 : 5 });
+                setTimeout(function(){myLogs();}, 2000);
             });
         });
 
@@ -1056,10 +1069,7 @@ function myLogs(){
             myPost('error_log', 'close=1', function(data){
                 var rdata = $.parseJSON(data.data);
                 layer.msg(rdata.msg, { icon: rdata.status ? 1 : 5 });
-            
-                setTimeout(function(){
-                    myLogs();
-                }, 2000);
+                setTimeout(function(){myLogs();}, 2000);
             });
         })
 
