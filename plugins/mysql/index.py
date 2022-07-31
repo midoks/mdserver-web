@@ -1995,6 +1995,7 @@ def doFullSync():
     writeDbSyncStatus({'code': 6, 'msg': '从库重启完成...', 'progress': 100})
 
     os.system("rm -rf " + SSH_PRIVATE_KEY)
+    os.system("rm -rf /tmp/dump.sql")
     return True
 
 
