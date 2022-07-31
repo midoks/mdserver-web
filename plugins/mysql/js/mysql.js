@@ -1721,6 +1721,13 @@ function masterOrSlaveConf(version=''){
             var rdata = $.parseJSON(data.data);
             var list = '';
             for(i in rdata.data){
+
+                var v = rdata.data[i];
+                var status = "异常";
+                if (v['Slave_SQL_Running'] == 'Yes' && v['Slave_IO_Running'] == 'Yes'){
+                    status = "正常";
+                }
+
                 list += '<tr>';
                 list += '<td>' + rdata.data[i]['Master_Host'] +'</td>';
                 list += '<td>' + rdata.data[i]['Master_Port'] +'</td>';
@@ -1728,6 +1735,7 @@ function masterOrSlaveConf(version=''){
                 list += '<td>' + rdata.data[i]['Master_Log_File'] +'</td>';
                 list += '<td>' + rdata.data[i]['Slave_IO_Running'] +'</td>';
                 list += '<td>' + rdata.data[i]['Slave_SQL_Running'] +'</td>';
+                list += '<td>' + status +'</td>';
                 list += '<td style="text-align:right">' + 
                     '<a href="javascript:;" class="btlink" onclick="deleteSlave()" title="删除">删除</a>' +
                 '</td>';
@@ -1744,6 +1752,7 @@ function masterOrSlaveConf(version=''){
                         <th>日志</th>\
                         <th>IO</th>\
                         <th>SQL</th>\
+                        <th>状态</th>\
                         <th style="text-align:right;">操作</th></tr></thead>\
                         <tbody>\
                         '+ list +'\
