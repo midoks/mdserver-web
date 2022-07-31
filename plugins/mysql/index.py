@@ -1720,7 +1720,7 @@ def getSlaveList(version=''):
 def setSlaveStatus(version=''):
     db = pMysqlDb()
     dlist = db.query('show slave status')
-
+    dlist = list(dlist)
     if len(dlist) == 0:
         return mw.returnJson(False, '需要手动添加主服务同步命令!')
 
