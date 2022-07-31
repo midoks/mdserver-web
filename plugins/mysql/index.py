@@ -1645,16 +1645,17 @@ def getMasterRepSlaveUserCmd(version):
     port = getMyPort()
 
     db = pMysqlDb()
-    tmp = db.query('show master status')
-
-    if len(tmp) == 0:
+    mstatus = db.query('show master status')
+    # print(mstatus)
+    mstatus = list(mstatus)
+    if len(mstatus) == 0:
         return mw.returnJson(False, '未开启!')
 
     sql = "CHANGE MASTER TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
         clist[0]['username']  + "', MASTER_PASSWORD='" + \
         clist[0]['password'] + \
-        "', MASTER_LOG_FILE='" + tmp[0][0] + \
-        "',MASTER_LOG_POS=" + str(tmp[0][1]) + ""
+        "', MASTER_LOG_FILE='" + mstatus[0][0] + \
+        "',MASTER_LOG_POS=" + str(mstatus[0][1]) + ""
 
     # if args['db'] != '':
     #     replicate-do-table
