@@ -86,12 +86,15 @@ Install_mysql()
 		-DWITH_MEMORY_STORAGE_ENGINE=1 \
 		-DENABLED_LOCAL_INFILE=1 \
 		-DWITH_PARTITION_STORAGE_ENGINE=1 \
+		-DENABLE_DOWNLOADS=1 \
 		-DEXTRA_CHARSETS=all \
 		-DDEFAULT_CHARSET=utf8mb4 \
 		-DDEFAULT_COLLATION=utf8mb4_general_ci \
 		$OPTIONS \
 		-DCMAKE_C_COMPILER=/usr/bin/gcc \
-		-DCMAKE_CXX_COMPILER=/usr/bin/g++
+		-DCMAKE_CXX_COMPILER=/usr/bin/g++ \
+		-DCMAKE_CXX_STANDARD=11
+		
 		make -j${cpuCore} && make install && make clean
 
 
