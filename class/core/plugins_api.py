@@ -845,7 +845,7 @@ class plugins_api:
             return ('', '')
         data = mw.execShell(py_cmd)
 
-        if mw.isAppleSystem():
+        if mw.isDebugMode():
             print('run', py_cmd)
             print(data)
         # print os.path.exists(py_cmd)
@@ -861,7 +861,7 @@ class plugins_api:
         sys.path.append(package)
         eval_str = "__import__('" + script + "')." + func + '(' + args + ')'
         newRet = eval(eval_str)
-        if mw.isAppleSystem():
+        if mw.isDebugMode():
             print('callback', eval_str)
 
         return (True, newRet)

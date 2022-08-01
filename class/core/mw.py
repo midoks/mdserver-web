@@ -111,6 +111,17 @@ def isAppleSystem():
     return False
 
 
+def isDebugMode():
+    if isAppleSystem():
+        return True
+
+    debugPath = getRunDir() + "/data/debug.pl"
+    if os.path.exists(debugPath):
+        return True
+
+    return False
+
+
 def isNumber(s):
     try:
         float(s)
