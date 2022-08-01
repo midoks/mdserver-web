@@ -36,18 +36,24 @@ Install_mysql()
 		touch /var/log/mariadb/mariadb.log
 	fi
 
+	# ----- cpu start ------
 	if [ -z "${cpuCore}" ]; then
     	cpuCore="1"
 	fi
 
+	if [ -f /proc/cpuinfo ];then
+		cpuCore=`cat /proc/cpuinfo | grep "processor" | wc -l`
+	fi
+
 	MEM_INFO=$(free -m|grep Mem|awk '{printf("%.f",($2)/1024)}')
-	if [ "${MEM_INFO}" != "0" ];then
-	    if [ "${cpuCore}" -lt "${MEM_INFO}" ];then
+	if [ "${cpuCore}" != "1" ] &&& [ "${MEM_INFO}" != "0" ];then
+	    if [ "${cpuCore}" -gt "${MEM_INFO}" ];then
 	        cpuCore="${MEM_INFO}"
 	    fi
 	else
 	    cpuCore="1"
 	fi
+	# ----- cpu end ------
 	
 
 	if [ ! -f ${mysqlDir}/mysql-5.6.50.tar.gz ];then

@@ -2047,6 +2047,13 @@ def fullSync(version=''):
     return json.dumps({'code': 0, 'msg': '点击开始,开始同步!', 'progress': 0})
 
 
+def installPreInspection(version):
+    swap_path = mw.getServerDir() + "/swap"
+    if not os.path.exists(swap_path):
+        return "为了稳定安装MySQL,先安装swap插件!"
+    return 'ok'
+
+
 def uninstallPreInspection(version):
     # return "请手动删除MySQL[{}]".format(version)
     return 'ok'
@@ -2074,6 +2081,8 @@ if __name__ == "__main__":
         print(initdInstall())
     elif func == 'initd_uninstall':
         print(initdUinstall())
+    elif func == 'install_pre_inspection':
+        print(installPreInspection(version))
     elif func == 'uninstall_pre_inspection':
         print(uninstallPreInspection(version))
     elif func == 'run_info':
