@@ -222,7 +222,6 @@ function cc()
 --     else
 --         ngx.shared.limit:set(token,1,cycle)
 --     end
---     return false
 -- end
         end
 
