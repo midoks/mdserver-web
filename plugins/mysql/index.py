@@ -1639,6 +1639,11 @@ def addMasterRepSlaveUser(version=''):
 
 
 def getMasterRepSlaveUserCmd(version):
+
+    version_pl = getServerDir() + "/version.pl"
+    if os.path.exists(version_pl):
+        version = mw.readFile(version_pl)
+
     args = getArgs()
     data = checkArgs(args, ['username', 'db'])
     if not data[0]:
