@@ -122,6 +122,10 @@ for yumPack in flex file libtool libtool-libs kernel-devel patch wget glib2 glib
 do yum -y install $yumPack;done
 
 
+if [ "$VERSION_ID" -eq "8" ];then
+	dnf upgrade -y libmodulemd
+fi
+
 if [ "$VERSION_ID" -eq "9" ];then
 	yum install -y patchelf
 	dnf --enablerepo=crb install -y libtirpc-devel

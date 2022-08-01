@@ -48,21 +48,21 @@ cd /www/server/mdserver-web/plugins/php/versions && bash all_test.sh
 
 
 
-| 系统名称 			| MySQL55	|MySQL56	|MySQL57	|MySQL80	|
-| ----------------- |-----------|-----------|-----------|-----------|
-| CentOS 7.9 		|✅			|✅			|✅			|✅			|
-| CentOS 8.4 		|:x:		|✅			|✅			|✅			|	
-| CentOS 8 Stream 	|✅			|✅			|✅			|✅			|		
-| CentOS 9 Stream 	|✅			|:x:		|✅			|✅			|
-| Debian 10.3 		|✅			|✅			|✅			|:x:		|	
-| Debian 11.3 		|✅			|✅			|✅			|✅			|
-| Ubuntu 18.04 		|✅			|✅			|✅			|:x:		|	
-| Ubuntu 20.04 		|✅			|✅			|✅			|:x:		|
-| Ubuntu 22.04 		|✅			|✅			|✅			|✅			|
-| Fedora 31 		|✅			|✅			|✅			|✅			|	
-| Fedora 32 		|✅			|✅			|✅			|✅			|	
-| AlmaLinux 9 		|✅			|:x:		|✅			|✅	 		|	
-| RockyLinux 8.6 	|✅			|✅			|✅			|✅			|
-| Arch Linux 	 	|✅			|✅			|✅			|✅			|	
-| openSUSE 15.4 	|✅			|✅			|✅			|:x:		|
+| 系统名称 			| MySQL55|MySQL56|MySQL57|MySQL80|
+| ----------------- |-------|--------|-------|-------|
+| CentOS 7.9 		|✅		|✅		 |✅	 |✅	 |
+| CentOS 8.4 		|✅		|✅	  	 |✅	 |✅	 |	
+| CentOS 8 Stream 	|✅		|✅	  	 |✅	 |✅	 |		
+| CentOS 9 Stream 	|✅		|:x:  	 |✅	 |✅	 |
+| Debian 10.3 		|✅		|✅	  	 |✅	 |:x:	 |	
+| Debian 11.3 		|✅		|✅	  	 |✅	 |✅	 |
+| Ubuntu 18.04 		|✅		|✅	  	 |✅	 |:x:	 |	
+| Ubuntu 20.04 		|✅		|✅	  	 |✅	 |:x:	 |
+| Ubuntu 22.04 		|✅		|✅	   	 |✅	 |✅	 |
+| Fedora 31 		|✅		|✅	   	 |✅	 |✅	 |	
+| Fedora 32 		|✅		|✅	   	 |✅	 |✅	 |	
+| AlmaLinux 9 		|✅		|:x:   	 |✅	 |✅	 |	
+| RockyLinux 8.6 	|✅		|✅	   	 |✅	 |✅	 |
+| Arch Linux 	 	|✅		|✅	   	 |✅	 |✅	 |	
+| openSUSE 15.4 	|✅		|✅	   	 |✅	 |:x:	 |
 
