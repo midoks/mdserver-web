@@ -75,10 +75,11 @@ class ORM:
         try:
             self.__DB_CUR.execute(sql)
             result = self.__DB_CUR.fetchall()
+            # print(result)
             # 将元组转换成列表
-            data = map(list, result)
+            # data = map(list, result)
             self.__Close()
-            return data
+            return result
         except Exception as ex:
             return ex
 
