@@ -224,6 +224,7 @@ function cc()
 --     end
 --     return false
 -- end
+        end
 
 --强制验证是否使用正常浏览器访问网站
 function waf_cc_increase()
