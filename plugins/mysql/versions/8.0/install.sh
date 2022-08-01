@@ -157,8 +157,8 @@ Install_mysql()
 		apt install -y software-properties-common
 		add-apt-repository ppa:ubuntu-toolchain-r/test
 
-		# pkg-config libudev-dev --modversion
-		if [ -f ${mysqlDir}/libtirpc_1.2.5.orig.tar.bz2 ];then
+		LIBTIRPC_VER=`pkg-config libtirpc --modversion`
+		if [ ! -f ${mysqlDir}/libtirpc_1.2.5.orig.tar.bz2 ];then
 			wget -O ${mysqlDir}/libtirpc_1.2.5.orig.tar.bz2 https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/libtirpc/1.2.5-1ubuntu0.1/libtirpc_1.2.5.orig.tar.bz2
 			cd ${mysqlDir} && tar -jxvf libtirpc_1.2.5.orig.tar.bz2
 			cd libtirpc-1.2.5 && ./configure
