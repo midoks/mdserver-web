@@ -700,6 +700,8 @@ def isSqlError(mysqlMsg):
         return mw.returnJson(False, "Can't connect to MySQL server on '127.0.0.1' (61)")
     if "using password:" in mysqlMsg:
         return mw.returnJson(False, '数据库管理密码错误!')
+    if "1046" in mysqlMsg:
+        return mw.returnJson(False, 'SQL语法错误!')
     if "Connection refused" in mysqlMsg:
         return mw.returnJson(False, '数据库连接失败,请检查数据库服务是否启动!')
     if "1133" in mysqlMsg:
@@ -1591,6 +1593,10 @@ def getMasterRepSlaveList(version=''):
 
 
 def addMasterRepSlaveUser(version=''):
+    version_pl = getServerDir() + "/version.pl"
+    if os.path.exists(version_pl):
+        version = mw.readFile(version_pl).strip()
+
     args = getArgs()
     data = checkArgs(args, ['username', 'password'])
     if not data[0]:
