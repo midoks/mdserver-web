@@ -32,7 +32,26 @@ Install_app()
 	if [ "$sysName" != "Darwin" ];then
 		mkdir -p /var/log/mariadb
 		touch /var/log/mariadb/mariadb.log
-	fi 
+	fi
+
+	# ----- cpu start ------
+	if [ -z "${cpuCore}" ]; then
+    	cpuCore="1"
+	fi
+
+	if [ -f /proc/cpuinfo ];then
+		cpuCore=`cat /proc/cpuinfo | grep "processor" | wc -l`
+	fi
+
+	MEM_INFO=$(free -m|grep Mem|awk '{printf("%.f",($2)/1024)}')
+	if [ "${cpuCore}" != "1" ] && [ "${MEM_INFO}" != "0" ];then
+	    if [ "${cpuCore}" -gt "${MEM_INFO}" ];then
+	        cpuCore="${MEM_INFO}"
+	    fi
+	else
+	    cpuCore="1"
+	fi
+	# ----- cpu end ------
 
 	if [ ! -f ${mariadbDir}/mariadb-${MY_VER}.tar.gz ];then
 		# https://mirrors.aliyun.com/mariadb/mariadb-10.8.3/source/mariadb-10.8.3.tar.gz
@@ -61,7 +80,7 @@ Install_app()
 		-DDEFAULT_COLLATION=utf8mb4_general_ci \
 		-DCMAKE_C_COMPILER=/usr/bin/gcc \
 		-DCMAKE_CXX_COMPILER=/usr/bin/g++
-		make && make install && make clean
+		make -j${cpuCore} && make install && make clean
 
 		if [ -d $serverPath/mariadb ];then
 			echo '10.6' > $serverPath/mariadb/version.pl
