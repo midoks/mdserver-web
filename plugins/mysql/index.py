@@ -1674,8 +1674,12 @@ def getMasterRepSlaveUserCmd(version):
         "', MASTER_LOG_FILE='" + mstatus[0][0] + \
         "',MASTER_LOG_POS=" + str(mstatus[0][1]) + ""
 
-    # if args['db'] != '':
-    #     replicate-do-table
+    if version == "8.0":
+        sql = "CHANGE REPLICATION SOURCE TO SOURCE_HOST='" + ip + "', SOURCE_PORT=" + port + ", SOURCE_USER='" + \
+            clist[0]['username']  + "', SOURCE_PASSWORD='" + \
+            clist[0]['password'] + \
+            "', SOURCE_LOG_FILE='" + mstatus[0][0] + \
+            "',SOURCE_LOG_POS=" + str(mstatus[0][1]) + ""
 
     return mw.returnJson(True, 'OK!', sql)
 
