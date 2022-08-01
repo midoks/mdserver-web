@@ -263,7 +263,7 @@ case "$mode" in
     then
       # Give extra arguments to mysqld with the my.cnf file. This script
       # may be overwritten at next upgrade.
-      $bindir/mysqld_safe --defaults-file=$basedir/etc/my.cnf --datadir="$datadir" --pid-file="$mysqld_pid_file_path" $other_args >/dev/null &
+      $bindir/mysqld_safe --defaults-file=$basedir/etc/my.cnf --datadir="$datadir" $other_args >/dev/null &
       wait_for_pid created "$!" "$mysqld_pid_file_path"; return_value=$?
 
       # Make lock for RedHat / SuSE
