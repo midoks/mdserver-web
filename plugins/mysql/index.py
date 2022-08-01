@@ -620,14 +620,6 @@ def runInfo():
             'Created_tmp_disk_tables', 'Created_tmp_tables', 'Innodb_buffer_pool_pages_dirty', 'Opened_files', 'Open_tables', 'Opened_tables', 'Select_full_join',
             'Select_range_check', 'Sort_merge_passes', 'Table_locks_waited', 'Threads_cached', 'Threads_connected', 'Threads_created', 'Threads_running', 'Connections', 'Uptime']
 
-    try:
-        # print data
-        if data[0] == 1045 or data[0] == 2003:
-            pwd = db.getPwd()
-            return mw.returnJson(False, 'mysql password error:' + pwd + '!')
-    except Exception as e:
-        pass
-
     result = {}
     # print(data)
     for d in data:
