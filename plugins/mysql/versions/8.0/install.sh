@@ -139,21 +139,18 @@ Install_mysql()
 	WHERE_DIR_GCC=/usr/bin/gcc
 	WHERE_DIR_GPP=/usr/bin/g++
 	if [ "$OSNAME" == "centos" ] && [ "$VERSION_ID" == "7" ];then
-		# yum install centos-release-scl -y
-		# yum install devtoolset-7 -y
-		# scl enable devtoolset-7 bash
-		yum install centos-release-scl-rh -y
-        yum install devtoolset-7-gcc devtoolset-7-gcc-c++ -y
-        # yum install cmake3 -y
+		yum install -y libudev-devel
+        yum install -y devtoolset-11-gcc devtoolset-11-gcc-c++ devtoolset-11-binutils
 
 		gcc --version
-		WHERE_DIR_GCC=/opt/rh/devtoolset-7/root/usr/bin/gcc
-		WHERE_DIR_GPP=/opt/rh/devtoolset-7/root/usr/bin/g++
+		WHERE_DIR_GCC=/opt/rh/devtoolset-11/root/usr/bin/gcc
+		WHERE_DIR_GPP=/opt/rh/devtoolset-11/root/usr/bin/g++
 		echo $WHERE_DIR_GCC
 		echo $WHERE_DIR_GPP
 	fi
 
 	if [ ! -d $serverPath/mysql ];then
+		# -DCMAKE_CXX_STANDARD=17 \
 		cd ${mysqlDir}/mysql-${VERSION} && ${INSTALL_CMD} \
 		-DCMAKE_INSTALL_PREFIX=$serverPath/mysql \
 		-DMYSQL_USER=mysql \
@@ -173,6 +170,7 @@ Install_mysql()
 		$OPTIONS \
 		-DCMAKE_C_COMPILER=$WHERE_DIR_GCC \
 		-DCMAKE_CXX_COMPILER=$WHERE_DIR_GPP \
+		-DDOWNLOAD_BOOST=0 \
 		-DWITH_BOOST=${mysqlDir}/mysql-${VERSION}/boost/
 		make -j${cpuCore} && make install && make clean
 
