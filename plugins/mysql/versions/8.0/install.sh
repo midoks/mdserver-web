@@ -75,6 +75,19 @@ Install_mysql()
 		useradd -g mysql mysql
 	fi
 
+	if [ -z "${cpuCore}" ]; then
+    	cpuCore="1"
+	fi
+
+	MEM_INFO=$(free -m|grep Mem|awk '{printf("%.f",($2)/1024)}')
+	if [ "${cpuCore}" != "1" ] && [ "${MEM_INFO}" != "0" ];then
+	    if [ "${cpuCore}" -gt "${MEM_INFO}" ];then
+	        cpuCore="${MEM_INFO}"
+	    fi
+	else
+	    cpuCore="1"
+	fi
+
 	cd $serverPath/mdserver-web/plugins/mysql/lib && /bin/bash rpcgen.sh
 
 	INSTALL_CMD=cmake
@@ -120,9 +133,13 @@ Install_mysql()
 	WHERE_DIR_GCC=/usr/bin/gcc
 	WHERE_DIR_GPP=/usr/bin/g++
 	if [ "$OSNAME" == "centos" ] && [ "$VERSION_ID" == "7" ];then
-		yum install centos-release-scl -y
-		yum install devtoolset-7 -y
+		# yum install centos-release-scl -y
+		# yum install devtoolset-7 -y
 		# scl enable devtoolset-7 bash
+		yum install centos-release-scl-rh -y
+        yum install devtoolset-7-gcc devtoolset-7-gcc-c++ -y
+        # yum install cmake3 -y
+
 		gcc --version
 		WHERE_DIR_GCC=/opt/rh/devtoolset-7/root/usr/bin/gcc
 		WHERE_DIR_GPP=/opt/rh/devtoolset-7/root/usr/bin/g++
@@ -141,6 +158,7 @@ Install_mysql()
 		-DWITH_MEMORY_STORAGE_ENGINE=1 \
 		-DENABLED_LOCAL_INFILE=1 \
 		-DWITH_PARTITION_STORAGE_ENGINE=1 \
+		-DWITH_READLINE=1 \
 		-DEXTRA_CHARSETS=all \
 		-DDEFAULT_CHARSET=utf8mb4 \
 		-DDEFAULT_COLLATION=utf8mb4_general_ci \
@@ -150,7 +168,7 @@ Install_mysql()
 		-DCMAKE_C_COMPILER=$WHERE_DIR_GCC \
 		-DCMAKE_CXX_COMPILER=$WHERE_DIR_GPP \
 		-DWITH_BOOST=${mysqlDir}/mysql-${VERSION}/boost/
-		make && make install && make clean
+		make -j${cpuCore} && make install && make clean
 
 		if [ -d $serverPath/mysql ];then
 			echo '8.0' > $serverPath/mysql/version.pl

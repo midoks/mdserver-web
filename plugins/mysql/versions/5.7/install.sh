@@ -38,6 +38,19 @@ Install_mysql()
 		touch /var/log/mariadb/mariadb.log
 	fi
 
+	if [ -z "${cpuCore}" ]; then
+    	cpuCore="1"
+	fi
+
+	MEM_INFO=$(free -m|grep Mem|awk '{printf("%.f",($2)/1024)}')
+	if [ "${cpuCore}" != "1" ] && [ "${MEM_INFO}" != "0" ];then
+	    if [ "${cpuCore}" -gt "${MEM_INFO}" ];then
+	        cpuCore="${MEM_INFO}"
+	    fi
+	else
+	    cpuCore="1"
+	fi
+
 	cd $serverPath/mdserver-web/plugins/mysql/lib && /bin/bash rpcgen.sh
 
 	if [ ! -f ${mysqlDir}/mysql-boost-${VERSION}.tar.gz ];then
@@ -90,7 +103,7 @@ Install_mysql()
 		-DCMAKE_C_COMPILER=/usr/bin/gcc \
 		-DCMAKE_CXX_COMPILER=/usr/bin/g++ \
 		-DWITH_BOOST=${mysqlDir}/mysql-${VERSION}/boost/
-		make && make install && make clean
+		make -j${cpuCore} && make install && make clean
 
 		if [ -d $serverPath/mysql ];then
 			echo '5.7' > $serverPath/mysql/version.pl

@@ -31,7 +31,20 @@ Install_mysql()
 	if [ "$sysName" != "Darwin" ];then
 		mkdir -p /var/log/mariadb
 		touch /var/log/mariadb/mariadb.log
-	fi 
+	fi
+
+	if [ -z "${cpuCore}" ]; then
+    	cpuCore="1"
+	fi
+
+	MEM_INFO=$(free -m|grep Mem|awk '{printf("%.f",($2)/1024)}')
+	if [ "${cpuCore}" != "1" ] && [ "${MEM_INFO}" != "0" ];then
+	    if [ "${cpuCore}" -gt "${MEM_INFO}" ];then
+	        cpuCore="${MEM_INFO}"
+	    fi
+	else
+	    cpuCore="1"
+	fi
 
 	if [ ! -f ${mysqlDir}/mysql-5.5.62.tar.gz ];then
 		wget -O ${mysqlDir}/mysql-5.5.62.tar.gz --tries=3 https://dev.mysql.com/get/Downloads/MySQL-5.5/mysql-5.5.62.tar.gz
@@ -58,7 +71,7 @@ Install_mysql()
 		-DDEFAULT_COLLATION=utf8mb4_general_ci \
 		-DCMAKE_C_COMPILER=/usr/bin/gcc \
 		-DCMAKE_CXX_COMPILER=/usr/bin/g++
-		make && make install && make clean
+		make -j${cpuCore} && make install && make clean
 
 		if [ -d $serverPath/mysql ];then
 			echo '5.5' > $serverPath/mysql/version.pl
