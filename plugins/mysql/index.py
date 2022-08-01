@@ -371,6 +371,12 @@ def initMysqlPwd():
         pwd + "') WHERE user='root';"
     cmd_pass = cmd_pass + "flush privileges;\""
     data = mw.execShell(cmd_pass)
+
+    # 删除测试数据库
+    drop_test_db = serverdir + '/bin/mysql -uroot -p' + \
+        pwd + ' -e "drop database test";'
+    mw.execShell(drop_test_db)
+
     # print(data)
     pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
     return True
@@ -404,6 +410,11 @@ def initMysql8Pwd():
     data = mw.execShell(cmd_pass)
     # print(data)
     os.remove(tmp_file)
+
+    # 删除测试数据库
+    drop_test_db = serverdir + '/bin/mysql -uroot -p' + \
+        pwd + ' -e "drop database test";'
+    mw.execShell(drop_test_db)
 
     pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
 
