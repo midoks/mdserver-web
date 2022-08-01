@@ -1044,3 +1044,13 @@ def getMyORMDb():
     import ormDb
     o = ormDb.ORM()
     return o
+
+
+def getMyORMMariaDb():
+    '''
+    获取MariaDB资源的ORM | pip install mariadb
+    '''
+    sys.path.append(os.getcwd() + "/class/plugin")
+    import mariaDb
+    o = mariaDb.ORM()
+    return o

@@ -4,8 +4,6 @@ import re
 import os
 import sys
 
-from mysql import connector
-
 
 class ORM:
     __DB_PASS = None
@@ -16,32 +14,30 @@ class ORM:
     __DB_CUR = None
     __DB_ERR = None
     __DB_CNF = '/etc/my.cnf'
-    __DB_SOCKET = '/www/server/mysql/mysql.sock'
 
-    __DB_CHARSET = "utf8"
+    __DB_SOCKET = '/www/server/mysql/mysql.sock'
+    __DB_CHARSET = 'utf8'
 
     def __Conn(self):
-        '''连接MYSQL数据库'''
+        '''连接MariaDB数据库'''
         try:
 
-            if os.path.exists(self.__DB_SOCKET):
-                try:
-                    self.__DB_CONN = connector.connect(host=self.__DB_HOST, user=self.__DB_USER, passwd=self.__DB_PASS,
-                                                       port=self.__DB_PORT, charset=self.__DB_CHARSET, connect_timeout=1, unix_socket=self.__DB_SOCKET)
-                except Exception as e:
-                    self.__DB_HOST = '127.0.0.1'
-                    self.__DB_CONN = connector.connect(host=self.__DB_HOST, user=self.__DB_USER, passwd=self.__DB_PASS,
-                                                       port=self.__DB_PORT, charset=self.__DB_CHARSET, connect_timeout=1, unix_socket=self.__DB_SOCKET)
-            else:
-                try:
-                    self.__DB_CONN = connector.connect(host=self.__DB_HOST, user=self.__DB_USER, passwd=self.__DB_PASS,
-                                                       port=self.__DB_PORT, charset=self.__DB_CHARSET, connect_timeout=1)
-                except Exception as e:
-                    self.__DB_HOST = '127.0.0.1'
-                    self.__DB_CONN = connector.connect(host=self.__DB_HOST, user=self.__DB_USER, passwd=self.__DB_PASS,
-                                                       port=self.__DB_PORT, charset=self.__DB_CHARSET, connect_timeout=1)
+            try:
+                import mariadb
+            except Exception as ex:
+                self.__DB_ERR = ex
+                return False
+
+            try:
+                self.__DB_CONN = mariadb.connect(host=self.__DB_HOST, user=self.__DB_USER, passwd=self.__DB_PASS,
+                                                 port=int(self.__DB_PORT), charset=self.__DB_CHARSET, connect_timeout=1)
+            except Exception as e:
+                self.__DB_HOST = '127.0.0.1'
+                self.__DB_CONN = mariadb.connect(host=self.__DB_HOST, user=self.__DB_USER, passwd=self.__DB_PASS,
+                                                 port=int(self.__DB_PORT), charset=self.__DB_CHARSET, connect_timeout=1)
 
             self.__DB_CUR = self.__DB_CONN.cursor()
+
             return True
         except Exception as e:
             self.__DB_ERR = e
@@ -91,7 +87,7 @@ class ORM:
         except Exception as ex:
             return ex
 
+    # 关闭连接
     def __Close(self):
-        # 关闭连接
         self.__DB_CUR.close()
         self.__DB_CONN.close()
