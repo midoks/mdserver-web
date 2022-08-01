@@ -152,6 +152,22 @@ Install_mysql()
 	if [ "$OSNAME" == "ubuntu" ] && [ "$VERSION_ID" == "18.04" ];then
 		apt install -y libudev-dev
 		apt install -y libtirpc-dev
+		apt install -y libssl-dev
+		apt install -y libgssglue-dev
+		apt install -y software-properties-common
+		add-apt-repository ppa:ubuntu-toolchain-r/test
+
+		# pkg-config libudev-dev --modversion
+		if [ -f ${mysqlDir}/libtirpc_1.2.5.orig.tar.bz2 ];then
+			wget -O ${mysqlDir}/libtirpc_1.2.5.orig.tar.bz2 https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/libtirpc/1.2.5-1ubuntu0.1/libtirpc_1.2.5.orig.tar.bz2
+			cd ${mysqlDir} && tar -jxvf libtirpc_1.2.5.orig.tar.bz2
+			cd libtirpc-1.2.5 && ./configure
+		fi
+
+		export PKG_CONFIG_PATH=/usr/lib/pkgconfig
+		apt install -y gcc-11 g++-11
+		WHERE_DIR_GCC=/usr/bin/gcc-11
+		WHERE_DIR_GPP=/usr/bin/g++-11
 	fi
 
 	if [ ! -d $serverPath/mysql ];then
