@@ -371,13 +371,14 @@ def initMysqlPwd():
         pwd + "') WHERE user='root';"
     cmd_pass = cmd_pass + "flush privileges;\""
     data = mw.execShell(cmd_pass)
+    # print(cmd_pass)
+    # print(data)
 
     # 删除测试数据库
     drop_test_db = serverdir + '/bin/mysql -uroot -p' + \
         pwd + ' -e "drop database test";'
     mw.execShell(drop_test_db)
 
-    # print(data)
     pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
     return True
 
@@ -386,6 +387,8 @@ def initMysql8Pwd():
     time.sleep(2)
 
     serverdir = getServerDir()
+    myconf = serverdir + "/etc/my.cnf"
+
     pwd = mw.getRandomString(16)
 
     alter_root_pwd = 'flush privileges;'
@@ -399,21 +402,23 @@ def initMysql8Pwd():
         "alter user 'root'@'localhost' IDENTIFIED WITH mysql_native_password by '" + pwd + "';"
     alter_root_pwd = alter_root_pwd + "flush privileges;"
 
-    cmd_pass = serverdir + '/bin/mysqladmin -uroot password root'
+    cmd_pass = serverdir + '/bin/mysqladmin --defaults-file=' + \
+        myconf + ' -uroot password root'
     data = mw.execShell(cmd_pass)
+    # print(cmd_pass)
     # print(data)
 
     tmp_file = "/tmp/mysql_init_tmp.log"
     mw.writeFile(tmp_file, alter_root_pwd)
-    cmd_pass = serverdir + '/bin/mysql -uroot -proot < ' + tmp_file
+    cmd_pass = serverdir + '/bin/mysql --defaults-file=' + \
+        myconf + ' -uroot -proot < ' + tmp_file
 
     data = mw.execShell(cmd_pass)
-    # print(data)
     os.remove(tmp_file)
 
     # 删除测试数据库
-    drop_test_db = serverdir + '/bin/mysql -uroot -p' + \
-        pwd + ' -e "drop database test";'
+    drop_test_db = serverdir + '/bin/mysql  --defaults-file=' + \
+        myconf + ' -uroot -p' + pwd + ' -e "drop database test";'
     mw.execShell(drop_test_db)
 
     pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
@@ -700,7 +705,9 @@ def isSqlError(mysqlMsg):
         return mw.returnJson(False, "Can't connect to MySQL server on '127.0.0.1' (61)")
     if "using password:" in mysqlMsg:
         return mw.returnJson(False, '数据库管理密码错误!')
-    if "1046" in mysqlMsg:
+    if "1045" in mysqlMsg:
+        return mw.returnJson(False, '连接错误!')
+    if "SQL syntax" in mysqlMsg:
         return mw.returnJson(False, 'SQL语法错误!')
     if "Connection refused" in mysqlMsg:
         return mw.returnJson(False, '数据库连接失败,请检查数据库服务是否启动!')
@@ -1631,12 +1638,22 @@ def addMasterRepSlaveUser(version=''):
     if psdb.where("username=?", (username)).count():
         return mw.returnJson(False, '用户已存在!')
 
-    result = pdb.execute("GRANT REPLICATION SLAVE ON *.* TO  '" +
-                         username + "'@'%' identified by '" + password + "';FLUSH PRIVILEGES;")
-    # print result
-    isError = isSqlError(result)
-    if isError != None:
-        return isError
+    if version == "8.0":
+        sql = "CREATE USER '" + username + \
+            "'@'%'  IDENTIFIED WITH mysql_native_password BY '" + password + "';"
+        sql += "grant replication slave on *.* to '" + username + "'@'%';"
+        sql += "FLUSH PRIVILEGES;"
+        result = pdb.execute(sql)
+        isError = isSqlError(result)
+        if isError != None:
+            return isError
+    else:
+        sql = "GRANT REPLICATION SLAVE ON *.* TO  '" + username + \
+            "'@'%' identified by '" + password + "';FLUSH PRIVILEGES;"
+        result = pdb.execute(sql)
+        isError = isSqlError(result)
+        if isError != None:
+            return isError
 
     addTime = time.strftime('%Y-%m-%d %X', time.localtime())
     psdb.add('username,password,accept,ps,addtime',
