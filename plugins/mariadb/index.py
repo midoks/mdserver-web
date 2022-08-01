@@ -144,10 +144,10 @@ def pSqliteDb(dbname='databases'):
 
 
 def pMysqlDb():
-    # mysql.connector
-    # db = mw.getMyORM()
+    # pymysql
+    db = mw.getMyORM()
     # MySQLdb |
-    db = mw.getMyORMMariaDb()
+    # db = mw.getMyORMDb()
 
     db.setDbConf(getConf())
     db.setPort(getDbPort())

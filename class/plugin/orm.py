@@ -4,7 +4,7 @@ import re
 import os
 import sys
 
-from mysql import connector
+import pymysql.cursors
 
 
 class ORM:
@@ -21,25 +21,16 @@ class ORM:
     __DB_CHARSET = "utf8"
 
     def __Conn(self):
-        '''连接MYSQL数据库'''
+        '''连接数据库'''
         try:
 
-            if os.path.exists(self.__DB_SOCKET):
-                try:
-                    self.__DB_CONN = connector.connect(host=self.__DB_HOST, user=self.__DB_USER, passwd=self.__DB_PASS,
-                                                       port=self.__DB_PORT, charset=self.__DB_CHARSET, connect_timeout=1, unix_socket=self.__DB_SOCKET)
-                except Exception as e:
-                    self.__DB_HOST = '127.0.0.1'
-                    self.__DB_CONN = connector.connect(host=self.__DB_HOST, user=self.__DB_USER, passwd=self.__DB_PASS,
-                                                       port=self.__DB_PORT, charset=self.__DB_CHARSET, connect_timeout=1, unix_socket=self.__DB_SOCKET)
-            else:
-                try:
-                    self.__DB_CONN = connector.connect(host=self.__DB_HOST, user=self.__DB_USER, passwd=self.__DB_PASS,
-                                                       port=self.__DB_PORT, charset=self.__DB_CHARSET, connect_timeout=1)
-                except Exception as e:
-                    self.__DB_HOST = '127.0.0.1'
-                    self.__DB_CONN = connector.connect(host=self.__DB_HOST, user=self.__DB_USER, passwd=self.__DB_PASS,
-                                                       port=self.__DB_PORT, charset=self.__DB_CHARSET, connect_timeout=1)
+            try:
+                self.__DB_CONN = pymysql.connect(host=self.__DB_HOST, user=self.__DB_USER, passwd=self.__DB_PASS,
+                                                 port=self.__DB_PORT, charset=self.__DB_CHARSET, connect_timeout=1, cursorclass=pymysql.cursors.DictCursor)
+            except Exception as e:
+                self.__DB_HOST = '127.0.0.1'
+                self.__DB_CONN = pymysql.connect(host=self.__DB_HOST, user=self.__DB_USER, passwd=self.__DB_PASS,
+                                                 port=self.__DB_PORT, charset=self.__DB_CHARSET, connect_timeout=1, cursorclass=pymysql.cursors.DictCursor)
 
             self.__DB_CUR = self.__DB_CONN.cursor()
             return True

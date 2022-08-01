@@ -114,7 +114,6 @@ cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirem
 pip3 install gevent-websocket==0.10.1
 pip3 install flask-caching==1.10.1
 pip3 install mysqlclient
-# pip3 install mariadb
 
 
 if [ ! -f /www/server/mdserver-web/bin/activate ];then
@@ -131,5 +130,4 @@ pip3 install -r /www/server/mdserver-web/requirements.txt
 pip3 install gevent-websocket==0.10.1
 pip3 install flask-caching==1.10.1
 pip3 install mysqlclient
-# pip3 install mariadb
 
