@@ -145,9 +145,9 @@ def pSqliteDb(dbname='databases'):
 
 def pMysqlDb():
     # mysql.connector
-    # db = mw.getMyORM()
+    db = mw.getMyORM()
     # MySQLdb |
-    db = mw.getMyORMDb()
+    # db = mw.getMyORMDb()
 
     db.setDbConf(getConf())
     db.setPort(getDbPort())
