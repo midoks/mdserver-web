@@ -511,9 +511,8 @@ def getSpeed():
 def getLastLine(inputfile, lineNum):
     # 读文件指定倒数行数
     try:
-        fp = open(inputfile, 'r')
+        fp = open(inputfile, 'rb')
         lastLine = ""
-
         lines = fp.readlines()
         count = len(lines)
         if count > lineNum:
@@ -523,12 +522,14 @@ def getLastLine(inputfile, lineNum):
         i = 1
         lastre = []
         for i in range(1, (num + 1)):
-            if lines:
-                n = -i
-                lastLine = lines[n].strip()
-                fp.close()
-                lastre.append(lastLine)
+            n = -i
+            try:
+                lastLine = lines[n].decode("utf-8", "ignore").strip()
+            except Exception as e:
+                lastLine = ""
+            lastre.append(lastLine)
 
+        fp.close()
         result = ''
         num -= 1
         while num >= 0:
