@@ -149,6 +149,11 @@ Install_mysql()
 		echo $WHERE_DIR_GPP
 	fi
 
+	if [ "$OSNAME" == "ubuntu" ] && [ "$VERSION_ID" == "18.04" ];then
+		apt install -y libudev-dev
+		apt install -y libtirpc-dev
+	fi
+
 	if [ ! -d $serverPath/mysql ];then
 		# -DCMAKE_CXX_STANDARD=17 \
 		cd ${mysqlDir}/mysql-${VERSION} && ${INSTALL_CMD} \
