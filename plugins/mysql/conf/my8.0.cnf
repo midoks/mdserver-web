@@ -14,7 +14,6 @@ socket		= {$SERVER_APP_PATH}/mysql.sock
 basedir = {$SERVER_APP_PATH}
 datadir = {$SERVER_APP_PATH}/data
 log-error =  {$SERVER_APP_PATH}/data/error.log
-default_storage_engine = MyISAM
 
 key_buffer_size = 8M
 table_open_cache = 32
@@ -33,11 +32,11 @@ max_connect_errors = 100
 open_files_limit = 2560
 max_allowed_packet = 128M
 
-#skip-external-locking
-#skip-grant-tables
-#loose-skip-innodb
+skip_name_resolve = 1
 #skip-networking
-#skip-name-resolve
+#skip-external-locking
+#loose-skip-innodb
+#skip-grant-tables
 skip-ssl
 
 
@@ -46,8 +45,11 @@ binlog_format=mixed
 server-id	= 1
 slow_query_log=1
 slow-query-log-file={$SERVER_APP_PATH}/data/mysql-slow.log
-long_query_time=3
-#log_queries_not_using_indexes=on
+long_query_time=10
+log_queries_not_using_indexes=1
+log_slow_admin_statements=1
+log_slow_slave_statements=1
+expire_logs_days=30
 
 relay-log=mdserver
 relay-log-index=mdserver
@@ -74,13 +76,13 @@ innodb_log_group_home_dir = {$SERVER_APP_PATH}/data
 innodb_buffer_pool_size = 16M
 innodb_log_file_size = 5M
 innodb_log_buffer_size = 8M
-innodb_flush_log_at_trx_commit = 1
+innodb_flush_log_at_trx_commit = 2
 innodb_lock_wait_timeout = 120
 innodb_max_dirty_pages_pct = 90
 innodb_read_io_threads = 1
 innodb_write_io_threads = 1
 innodb_file_per_table=1
-binlog_expire_logs_seconds=2592000
+innodb_large_prefix = 1
 
 secure-file-priv={$SERVER_APP_PATH}/tmp
 
