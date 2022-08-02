@@ -732,16 +732,6 @@ def isSqlError(mysqlMsg):
     return None
 
 
-def mapToList(map_obj):
-    # map to list
-    try:
-        if type(map_obj) != list and type(map_obj) != str:
-            map_obj = list(map_obj)
-        return map_obj
-    except:
-        return []
-
-
 def __createUser(dbname, username, password, address):
     pdb = pMysqlDb()
 

@@ -51,7 +51,7 @@ slow-query-log-file={$SERVER_APP_PATH}/data/mysql-slow.log
 long_query_time=10
 log_queries_not_using_indexes=1
 log_slow_admin_statements=1
-log_slow_slave_statements=1
+log_slow_replica_statements=1
 binlog_expire_logs_seconds=2592000
 
 relay-log=mdserver
