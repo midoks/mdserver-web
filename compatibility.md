@@ -61,7 +61,7 @@ cd /www/server/mdserver-web/plugins/php/versions && bash all_test.sh
 | Ubuntu 22.04 		|✅		|✅	   	 |✅	 |✅	 |
 | Fedora 31 		|✅		|✅	   	 |✅	 |✅	 |	
 | Fedora 32 		|✅		|✅	   	 |✅	 |✅	 |	
-| AlmaLinux 9 		|✅		|:x:   	 |✅	 |✅	 |	
+| AlmaLinux 9 		|✅		|✅   	 |✅	 |✅	 |	
 | RockyLinux 8.6 	|✅		|✅	   	 |✅	 |✅	 |
 | Arch Linux 	 	|✅		|✅	   	 |✅	 |✅	 |	
 | openSUSE 15.4 	|✅		|✅	   	 |✅	 |:x:	 |
