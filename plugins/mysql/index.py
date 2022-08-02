@@ -146,6 +146,26 @@ def pMysqlDb():
     return db
 
 
+def makeInitRsaKey(version=''):
+    datadir = getServerDir() + "/data"
+
+    mysql_pem = datadir + "/mysql.pem"
+    if not os.path.exists(mysql_pem):
+        rdata = mw.execShell(
+            'cd ' + datadir + ' && openssl genrsa -out mysql.pem 1024')
+        # print(data)
+        rdata = mw.execShell(
+            'cd ' + datadir + ' && openssl rsa -in mysql.pem -pubout -out mysql.pub')
+        # print(rdata)
+
+        if not mw.isAppleSystem():
+            mw.execShell('cd ' + datadir + ' && chmod 400 mysql.pem')
+            mw.execShell('cd ' + datadir + ' && chmod 444 mysql.pub')
+
+            mw.execShell('cd ' + datadir + ' && chown mysql:mysql mysql.pem')
+            mw.execShell('cd ' + datadir + ' && chown mysql:mysql mysql.pub')
+
+
 def initDreplace(version=''):
     initd_tpl = getInitdTpl(version)
 
@@ -486,8 +506,11 @@ def my8cmd(version, method):
 
 def appCMD(version, action):
     if version == '8.0' or version == '5.7':
-        return my8cmd(version, action)
-    return myOp(version, action)
+        status = my8cmd(version, action)
+    else:
+        status = myOp(version, action)
+    makeInitRsaKey(version)
+    return status
 
 
 def start(version=''):

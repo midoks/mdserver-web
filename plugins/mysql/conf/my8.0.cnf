@@ -6,7 +6,10 @@ socket		= {$SERVER_APP_PATH}/mysql.sock
 default-character-set = UTF8MB4
 
 [mysqld]
+sha256_password_private_key_path=mysql.pem
+sha256_password_public_key_path=mysql.pub
 default_authentication_plugin=mysql_native_password
+
 pid-file = {$SERVER_APP_PATH}/data/mysql.pid
 user = mysql
 port		= 3306
