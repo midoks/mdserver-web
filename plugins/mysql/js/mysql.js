@@ -1081,7 +1081,7 @@ function myLogs(){
             } else {
                 error_body = rdata.msg;
             }
-            $("#error_log").text(error_body);
+            $("#error_log").html(error_body);
             var ob = document.getElementById('error_log');
             ob.scrollTop = ob.scrollHeight;
         });
@@ -1467,11 +1467,9 @@ function getMasterRepSlaveList(){
 function deleteSlave(){
     myPost('delete_slave', {}, function(data){
         var rdata = $.parseJSON(data.data);
-        layer.msg(rdata['msg']);
-        setTimeout(function(){
+        showMsg(rdata['msg'], function(){
             masterOrSlaveConf();
-        }, 3000);
-
+        },{},3000);
     });
 }
 
@@ -1546,7 +1544,7 @@ function addSlaveSSH(ip=''){
 
         var index = layer.open({
             type: 1,
-            area: ['500px','400px'],
+            area: ['500px','450px'],
             title: '添加SSH',
             closeBtn: 1,
             shift: 5,
@@ -1557,11 +1555,13 @@ function addSlaveSSH(ip=''){
                 <div class='line'><span class='tname'>端口</span><div class='info-r'><input name='port' class='bt-input-text mr5' type='text' style='width:330px;' value='"+port+"'></div></div>\
                 <div class='line'>\
                 <span class='tname'>ID_RSA</span>\
-                <div class='info-r'><textarea class='bt-input-text mr5' row='20' cols='50' name='id_rsa' style='width:330px;height:200px;'>"+id_rsa+"</textarea></div>\
+                <div class='info-r'><textarea class='bt-input-text mr5' row='20' cols='50' name='id_rsa' style='width:330px;height:200px;'></textarea></div>\
                 </div>\
                 <input type='hidden' name='ps' value='' />\
               </form>",
-            success:function(){},
+            success:function(){
+                $('textarea[name="id_rsa"]').html(id_rsa);
+            },
             yes:function(index){
                 var ip = $('input[name="ip"]').val();
                 var port = $('input[name="port"]').val();
@@ -1668,6 +1668,17 @@ function handlerRun(){
         $('.class-copy-cmd').click(function(){
             copyPass(cmd);
         });
+    });
+}
+
+function initSlaveStatus(){
+    myPost('init_slave_status', '', function(data){
+        var rdata = $.parseJSON(data.data);
+        showMsg(rdata.msg,function(){
+            if (rdata.status){
+                masterOrSlaveConf();
+            }
+        },{icon:rdata.status?1:2},2000);
     });
 }
 
@@ -1813,7 +1824,6 @@ function masterOrSlaveConf(version=''){
                     <div class="table_toolbar" style="left:0px;">\
                         <span class="sync btn btn-default btn-sm" onclick="handlerRun()" title="免登录设置后,需要手动执行一下!">手动命令</span>\
                         <span class="sync btn btn-default btn-sm" onclick="getFullSyncStatus(\'ALL\')" title="全量同步">全量同步</span>\
-                        <span class="sync btn btn-default btn-sm" onclick="getSlaveSSHList()" title="[主]SSH配置">[主]SSH配置</span>\
                     </div>\
                 </div>';
 
@@ -1822,20 +1832,26 @@ function masterOrSlaveConf(version=''){
         });
     }
 
+   
+
     function getMasterStatus(){
         myPost('get_master_status', '', function(data){
             var rdata = $.parseJSON(data.data);
             var limitCon = '<p class="conf_p">\
                     <span class="f14 c6 mr20">Master[主]配置</span><span class="f14 c6 mr20"></span>\
-                    <button class="btn '+(!rdata.status ? 'btn-danger' : 'btn-success')+' btn-xs btn-master va0">'+(!rdata.status ? '未开启' : '已开启') +'</button><hr/>\
+                    <button class="btn '+(!rdata.status ? 'btn-danger' : 'btn-success')+' btn-xs btn-master">'+(!rdata.status ? '未开启' : '已开启') +'</button><hr/>\
                 </p>\
                 <!-- master list -->\
                 <div class="safe bgw table_master_list"></div>\
                 <hr/>\
+                <!-- class="conf_p" -->\
                 <p class="conf_p">\
                     <span class="f14 c6 mr20">Slave[从]配置</span><span class="f14 c6 mr20"></span>\
-                    <button class="btn '+(!rdata.data.slave_status ? 'btn-danger' : 'btn-success')+' btn-xs btn-slave va0">'+(!rdata.data.slave_status ? '未启动' : '已启动') +'</button><hr/>\
+                    <button class="btn '+(!rdata.data.slave_status ? 'btn-danger' : 'btn-success')+' btn-xs btn-slave">'+(!rdata.data.slave_status ? '未启动' : '已启动') +'</button>\
+                    <button class="btn btn-success btn-xs" onclick="getSlaveSSHList()" >[主]SSH配置</button>\
+                    <button class="btn btn-success btn-xs" onclick="initSlaveStatus()" >初始化</button>\
                 </p>\
+                <hr/>\
                 <!-- slave status list -->\
                 <div class="safe bgw table_slave_status_list"></div>\
                 <!-- slave list -->\

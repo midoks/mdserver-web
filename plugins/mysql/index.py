@@ -1863,11 +1863,58 @@ def getSlaveSyncCmd(version=''):
     return mw.returnJson(True, 'ok', cmd)
 
 
+def initSlaveStatus(version=''):
+    db = pMysqlDb()
+    dlist = db.query('show slave status')
+    if len(dlist) > 0:
+        return mw.returnJson(False, '已经初始化好了zz...')
+
+    id_rsa_conn = pSqliteDb('slave_id_rsa')
+    data = id_rsa_conn.field('ip,port,id_rsa').select()
+
+    if len(data) < 1:
+        return mw.returnJson(False, '需要先配置【[主]SSH配置】!')
+
+    SSH_PRIVATE_KEY = "/tmp/t_ssh.txt"
+    ip = data[0]['ip']
+    master_port = int(data[0]['port'])
+    mw.writeFile(SSH_PRIVATE_KEY, data[0]['id_rsa'].replace('\\n', '\n'))
+
+    try:
+        import paramiko
+        paramiko.util.log_to_file('paramiko.log')
+        ssh = paramiko.SSHClient()
+        mw.execShell("chmod 600 " + SSH_PRIVATE_KEY)
+        key = paramiko.RSAKey.from_private_key_file(SSH_PRIVATE_KEY)
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.connect(hostname=ip, port=master_port,
+                    username='root', pkey=key)
+
+        cmd = 'cd /www/server/mdserver-web && \
+            python3 /www/server/mdserver-web/plugins/mysql/index.py get_master_rep_slave_user_cmd {"username":"","db":""}'
+        stdin, stdout, stderr = ssh.exec_command(cmd)
+        result = stdout.read()
+        # result_err = stderr.read()
+        result = result.decode('utf-8')
+        cmd_data = json.loads(result)
+
+        db.query('stop slave')
+        db.query(cmd_data['data'])
+        db.query('start slave')
+    except Exception as e:
+        return mw.returnJson(True, 'SSH认证配置连接失败!' + str(e))
+
+    time.sleep(0.5)
+    ssh.close()
+    os.system("rm -rf " + SSH_PRIVATE_KEY)
+    return mw.returnJson(True, '设置成功!')
+
+
 def setSlaveStatus(version=''):
     db = pMysqlDb()
     dlist = db.query('show slave status')
     if len(dlist) == 0:
-        return mw.returnJson(False, '需要手动添加主服务同步命令!')
+        return mw.returnJson(False, '需要手动添加主服务同步命令或者执行[初始化]!')
 
     if len(dlist) > 0 and (dlist[0]["Slave_IO_Running"] == 'Yes' or dlist[0]["Slave_SQL_Running"] == 'Yes'):
         db.query('stop slave')
@@ -1879,7 +1926,8 @@ def setSlaveStatus(version=''):
 
 def deleteSlave(version=''):
     db = pMysqlDb()
-    dlist = db.query('stop slave;reset slave all')
+    dlist = db.query('stop slave')
+    dlist = db.query('reset slave all')
     return mw.returnJson(True, '删除成功!')
 
 
@@ -2216,6 +2264,8 @@ if __name__ == "__main__":
         print(delSlaveSSH(version))
     elif func == 'update_slave_ssh':
         print(updateSlaveSSH(version))
+    elif func == 'init_slave_status':
+        print(initSlaveStatus(version))
     elif func == 'set_slave_status':
         print(setSlaveStatus(version))
     elif func == 'delete_slave':
