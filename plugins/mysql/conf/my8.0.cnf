@@ -40,7 +40,6 @@ skip_name_resolve = 1
 #skip-external-locking
 #loose-skip-innodb
 #skip-grant-tables
-skip-ssl
 
 
 log-bin=mysql-bin
