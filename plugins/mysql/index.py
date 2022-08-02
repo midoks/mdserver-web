@@ -188,6 +188,7 @@ def initDreplace(version=''):
     if not os.path.exists(mysql_tmp):
         os.mkdir(mysql_tmp)
         mw.execShell("chown -R mysql:mysql " + mysql_tmp)
+        mw.execShell("chmod 750 " + mysql_tmp)
 
     mysql_conf = mysql_conf_dir + '/my.cnf'
     if not os.path.exists(mysql_conf):
