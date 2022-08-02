@@ -12,6 +12,7 @@ dnf install -y wget lsof
 dnf install -y python3-devel
 dnf install -y python-devel
 dnf install -y crontabs
+dnf install -y mysql-devel
 
 #https need
 

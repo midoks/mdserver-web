@@ -1002,7 +1002,7 @@ function dbList(page, search){
                     </tbody></table>\
                 </div>\
                 <div id="databasePage" class="dataTables_paginate paging_bootstrap page"></div>\
-                <div class="table_toolbar">\
+                <div class="table_toolbar" style="left:0px;">\
                     <span class="sync btn btn-default btn-sm" style="margin-right:5px" onclick="syncToDatabase(1)" title="将选中数据库信息同步到服务器">同步选中</span>\
                     <span class="sync btn btn-default btn-sm" style="margin-right:5px" onclick="syncToDatabase(0)" title="将所有数据库信息同步到服务器">同步所有</span>\
                     <span class="sync btn btn-default btn-sm" onclick="syncGetDatabase()" title="从服务器获取数据库列表">从服务器获取</span>\
@@ -1031,10 +1031,18 @@ function myLogs(){
     myPost('bin_log', {status:1}, function(data){
         var rdata = $.parseJSON(data.data);
 
+        var line_status = ""
+        if (rdata.status){
+            line_status = '<button class="btn btn-success btn-xs btn-bin va0">关闭</button>\
+                        <button class="btn btn-success btn-xs clean-btn-bin va0">清理BINLOG日志</button>'
+        } else {
+            line_status = '<button class="btn btn-success btn-xs btn-bin va0">开启</button>'
+        }
+
         var limitCon = '<p class="conf_p">\
                         <span class="f14 c6 mr20">二进制日志 </span><span class="f14 c6 mr20">' + toSize(rdata.msg) + '</span>\
-                        <button class="btn btn-success btn-xs btn-bin va0">'+ (rdata.status ? lan.soft.off : lan.soft.on) + '</button>\
-                        <p class="f14 c6 mtb10" style="border-top:#ddd 1px solid; padding:10px 0">错误日志<button class="btn btn-default btn-clear btn-xs" style="float:right;" >清空</button></p>\
+                        '+line_status+'\
+                        <p class="f14 c6 mtb10" style="border-top:#ddd 1px solid; padding:10px 0">错误日志<button class="btn btn-default btn-clear btn-xs" style="float:right;" >清理日志</button></p>\
                         <textarea readonly style="margin: 0px;width: 100%;height: 440px;background-color: #333;color:#fff; padding:0 5px" id="error_log"></textarea>\
                     </p>'
         $(".soft-man-con").html(limitCon);
@@ -1044,10 +1052,15 @@ function myLogs(){
             myPost('bin_log', 'close=change', function(data){
                 var rdata = $.parseJSON(data.data);
                 layer.msg(rdata.msg, { icon: rdata.status ? 1 : 5 });
-            
-                setTimeout(function(){
-                    myLogs();
-                }, 2000);
+                setTimeout(function(){myLogs();}, 2000);
+            });
+        });
+
+        $(".clean-btn-bin").click(function () {
+            myPost('clean_bin_log', '', function(data){
+                var rdata = $.parseJSON(data.data);
+                layer.msg(rdata.msg, { icon: rdata.status ? 1 : 5 });
+                setTimeout(function(){myLogs();}, 2000);
             });
         });
 
@@ -1056,10 +1069,7 @@ function myLogs(){
             myPost('error_log', 'close=1', function(data){
                 var rdata = $.parseJSON(data.data);
                 layer.msg(rdata.msg, { icon: rdata.status ? 1 : 5 });
-            
-                setTimeout(function(){
-                    myLogs();
-                }, 2000);
+                setTimeout(function(){myLogs();}, 2000);
             });
         })
 
@@ -1320,11 +1330,9 @@ function addMasterRepSlaveUser(){
 
 
 function updateMasterRepSlaveUser(username){
-
-        
+  
     var index = layer.open({
         type: 1,
-        skin: 'demo-class',
         area: '500px',
         title: '更新账户',
         closeBtn: 1,
@@ -1347,7 +1355,6 @@ function updateMasterRepSlaveUser(username){
         var data = $("#update_master").serialize();
         data = decodeURIComponent(data);
         var dataObj = str2Obj(data);
-        // console.log(dataObj);
         myPost('update_master_rep_slave_user', data, function(data){
             var rdata = $.parseJSON(data.data);
             showMsg(rdata.msg,function(){
@@ -1435,7 +1442,7 @@ function getMasterRepSlaveList(){
         }
 
         var page = '<div class="dataTables_paginate_4 dataTables_paginate paging_bootstrap page" style="margin-top:0px;"></div>';
-        page += '<div class="table_toolbar"><span class="sync btn btn-default btn-sm" onclick="addMasterRepSlaveUser()" title="">添加同步账户</span></div>';
+        page += '<div class="table_toolbar" style="left:0px;"><span class="sync btn btn-default btn-sm" onclick="addMasterRepSlaveUser()" title="">添加同步账户</span></div>';
 
         var loadOpen = layer.open({
             type: 1,
@@ -1444,7 +1451,7 @@ function getMasterRepSlaveList(){
             content:"<div class='bt-form pd20 c6'>\
                      <div class='divtable mtb10'>\
                         <div><table class='table table-hover'>\
-                            <thead><tr><th>用户民</th><th>密码</th><th>操作</th></tr></thead>\
+                            <thead><tr><th>用户名</th><th>密码</th><th>操作</th></tr></thead>\
                             <tbody>" + list + "</tbody>\
                         </table></div>\
                         "+page +"\
@@ -1470,8 +1477,9 @@ function deleteSlave(){
 
 
 function getFullSyncStatus(db){
+    var timeId = null;
 
-    var btn = '<div class="table_toolbar"><span class="sync btn btn-default btn-sm" id="begin_full_sync" title="">开始</span></div>';
+    var btn = '<div class="table_toolbar" style="left:0px;"><span data-status="init" class="sync btn btn-default btn-sm" id="begin_full_sync" title="">开始</span></div>';
     var loadOpen = layer.open({
         type: 1,
         title: '全量同步['+db+']',
@@ -1484,12 +1492,11 @@ function getFullSyncStatus(db){
                     </div>\
                 </div>\
                 "+btn+"\
-            </div>"
+            </div>",
+        cancel: function(){ 
+            clearInterval(timeId);
+        }
     });
-
-    var timeId = setInterval(function(){
-        fullSync(db,0);
-    }, 1000);
 
     function fullSync(db,begin){
        
@@ -1502,40 +1509,165 @@ function getFullSyncStatus(db){
             if (rdata['code']==6 ||rdata['code']<0){
                 layer.msg(rdata['msg']);
                 clearInterval(timeId);
+                $("#begin_full_sync").attr('data-status','init');
             }
         });
     }
 
-    fullSync(db,0);
     $('#begin_full_sync').click(function(){
-        fullSync(db,1);
-
-        timeId= setTimeout(function(){
-            fullSync(db,0);
-        }, 1000);
-    });
-
-    $('.layui-layer-close1').click(function(){
-        clearInterval(timeId);
+        var val = $(this).attr('data-status');
+        if (val == 'init'){
+            fullSync(db,1);
+            timeId = setInterval(function(){
+                fullSync(db,0);
+            }, 1000);
+            $(this).attr('data-status','starting');
+        } else {
+            layer.msg("正在同步中..");
+        }
     });
 }
 
-function handlerRun(){
-    cmd = 'cd /www/server/mdserver-web && python /www/server/mdserver-web/plugins/mysql/index.py do_full_sync {"db":"all"}';
-    var loadOpen = layer.open({
-        type: 1,
-        title: '手动执行',
-        area: '500px',
-        content:"<form class='bt-form pd20 pb70' id='add_master'>\
-        <div class='line'>"+cmd+"</div>\
-        <div class='bt-form-submit-btn'>\
-            <button type='button' class='btn btn-success btn-sm btn-title class-copy-cmd'>复制</button>\
-        </div>\
-      </form>",
+function addSlaveSSH(ip=''){
+
+    myPost('get_slave_ssh_by_ip', {ip:ip}, function(rdata){
+        
+        var rdata = $.parseJSON(rdata.data);
+
+        var ip = '127.0.0.1';
+        var port = "22";
+        var id_rsa = '';
+
+        if (rdata.data.length>0){
+            ip = rdata.data[0]['ip'];
+            port = rdata.data[0]['port'];
+            id_rsa = rdata.data[0]['id_rsa'];
+        }
+
+        var index = layer.open({
+            type: 1,
+            area: ['500px','400px'],
+            title: '添加SSH',
+            closeBtn: 1,
+            shift: 5,
+            shadeClose: true,
+            btn:["确认","取消"],
+            content: "<form class='bt-form pd20'>\
+                <div class='line'><span class='tname'>IP</span><div class='info-r'><input name='ip' class='bt-input-text mr5' type='text' style='width:330px;' value='"+ip+"'></div></div>\
+                <div class='line'><span class='tname'>端口</span><div class='info-r'><input name='port' class='bt-input-text mr5' type='text' style='width:330px;' value='"+port+"'></div></div>\
+                <div class='line'>\
+                <span class='tname'>ID_RSA</span>\
+                <div class='info-r'><textarea class='bt-input-text mr5' row='20' cols='50' name='id_rsa' style='width:330px;height:200px;'>"+id_rsa+"</textarea></div>\
+                </div>\
+                <input type='hidden' name='ps' value='' />\
+              </form>",
+            success:function(){},
+            yes:function(index){
+                var ip = $('input[name="ip"]').val();
+                var port = $('input[name="port"]').val();
+                var id_rsa = $('textarea[name="id_rsa"]').val();
+                var data = {ip:ip,port:port,id_rsa:id_rsa};
+                myPost('add_slave_ssh', data, function(data){
+                    layer.close(index);
+                    var rdata = $.parseJSON(data.data);
+                    showMsg(rdata.msg,function(){
+                        if (rdata.status){
+                            getSlaveSSHPage();
+                        }
+                    },{icon: rdata.status ? 1 : 2},600);
+                });
+            }
+        });
     });
-    copyPass(cmd);
-    $('.class-copy-cmd').click(function(){
+}
+
+
+function delSlaveSSH(ip){
+    myPost('del_slave_ssh', {ip:ip}, function(rdata){
+        var rdata = $.parseJSON(rdata.data);
+        layer.msg(rdata.msg, {icon: rdata.status ? 1 : 2});
+        getSlaveSSHPage();
+    });
+}
+
+function getSlaveSSHPage(page=1){
+    var _data = {};    
+    _data['page'] = page;
+    _data['page_size'] = 5;
+    _data['tojs'] ='getSlaveSSHPage';
+    myPost('get_slave_ssh_list', _data, function(data){
+        var layerId = null;
+        var rdata = [];
+        try {
+            rdata = $.parseJSON(data.data);
+        } catch(e) {
+            console.log(e);
+        }
+        var list = '';
+        var ssh_list = rdata['data'];
+        for (i in ssh_list) {
+            var ip = ssh_list[i]['ip'];
+            var port = ssh_list[i]['port'];
+            list += '<tr><td>'+ip+'</td>\
+                <td>'+port+'</td>\
+                <td>OK</td>\
+                <td>\
+                    <a class="btlink" onclick="addSlaveSSH(\''+ip+'\');">修改</a> | \
+                    <a class="btlink" onclick="delSlaveSSH(\''+ip+'\');">删除</a>\
+                </td>\
+            </tr>';
+        }
+
+        $('.get-slave-ssh-list tbody').html(list);
+        $('.dataTables_paginate_4').html(rdata['page']);
+    });
+}
+
+
+function getSlaveSSHList(page=1){
+
+    var page = '<div class="dataTables_paginate_4 dataTables_paginate paging_bootstrap page" style="margin-top:0px;"></div>';
+    page += '<div class="table_toolbar" style="left:0px;"><span class="sync btn btn-default btn-sm" onclick="addSlaveSSH()" title="">添加SSH</span></div>';
+
+    layerId = layer.open({
+        type: 1,
+        title: 'SSH列表',
+        area: '500px',
+        content:"<div class='bt-form pd20 c6'>\
+                 <div class='divtable mtb10'>\
+                    <div><table class='table table-hover get-slave-ssh-list'>\
+                        <thead><tr><th>IP</th><th>PORT</th><th>SSH</th><th>操作</th></tr></thead>\
+                        <tbody></tbody>\
+                    </table></div>\
+                    "+page +"\
+                </div>\
+            </div>",
+        success:function(){
+        }
+    });
+
+    getSlaveSSHPage(1);
+}
+
+function handlerRun(){
+    myPostN('get_slave_sync_cmd', {}, function(data){
+        var rdata = $.parseJSON(data.data);
+        var cmd = rdata.data;
+        var loadOpen = layer.open({
+            type: 1,
+            title: '手动执行',
+            area: '500px',
+            content:"<form class='bt-form pd20 pb70' id='add_master'>\
+            <div class='line'>"+cmd+"</div>\
+            <div class='bt-form-submit-btn'>\
+                <button type='button' class='btn btn-success btn-sm btn-title class-copy-cmd'>复制</button>\
+            </div>\
+          </form>",
+        });
         copyPass(cmd);
+        $('.class-copy-cmd').click(function(){
+            copyPass(cmd);
+        });
     });
 }
 
@@ -1576,7 +1708,7 @@ function masterOrSlaveConf(version=''){
                         </tbody></table>\
                     </div>\
                     <div id="databasePage" class="dataTables_paginate paging_bootstrap page"></div>\
-                    <div class="table_toolbar">\
+                    <div class="table_toolbar" style="left:0px;">\
                         <span class="sync btn btn-default btn-sm" onclick="getMasterRepSlaveList()" title="">同步账户列表</span>\
                     </div>\
                 </div>';
@@ -1599,6 +1731,13 @@ function masterOrSlaveConf(version=''){
             var rdata = $.parseJSON(data.data);
             var list = '';
             for(i in rdata.data){
+
+                var v = rdata.data[i];
+                var status = "异常";
+                if (v['Slave_SQL_Running'] == 'Yes' && v['Slave_IO_Running'] == 'Yes'){
+                    status = "正常";
+                }
+
                 list += '<tr>';
                 list += '<td>' + rdata.data[i]['Master_Host'] +'</td>';
                 list += '<td>' + rdata.data[i]['Master_Port'] +'</td>';
@@ -1606,6 +1745,7 @@ function masterOrSlaveConf(version=''){
                 list += '<td>' + rdata.data[i]['Master_Log_File'] +'</td>';
                 list += '<td>' + rdata.data[i]['Slave_IO_Running'] +'</td>';
                 list += '<td>' + rdata.data[i]['Slave_SQL_Running'] +'</td>';
+                list += '<td>' + status +'</td>';
                 list += '<td style="text-align:right">' + 
                     '<a href="javascript:;" class="btlink" onclick="deleteSlave()" title="删除">删除</a>' +
                 '</td>';
@@ -1622,6 +1762,7 @@ function masterOrSlaveConf(version=''){
                         <th>日志</th>\
                         <th>IO</th>\
                         <th>SQL</th>\
+                        <th>状态</th>\
                         <th style="text-align:right;">操作</th></tr></thead>\
                         <tbody>\
                         '+ list +'\
@@ -1653,7 +1794,7 @@ function masterOrSlaveConf(version=''){
                 list += '<td>' + rdata.data[i]['name'] +'</td>';
                 list += '<td style="text-align:right">' + 
                     '<a href="javascript:;" class="btlink" onclick="setDbSlave(\''+rdata.data[i]['name']+'\')"  title="加入|退出">'+(rdata.data[i]['slave']?'退出':'加入')+'</a> | ' +
-                    '<a href="javascript:;" class="btlink" onclick="getFullSyncStatus(\''+rdata.data[i]['name']+'\')" title="修复">修复</a>' +
+                    '<a href="javascript:;" class="btlink" onclick="getFullSyncStatus(\''+rdata.data[i]['name']+'\')" title="同步">同步</a>' +
                 '</td>';
                 list += '</tr>';
             }
@@ -1669,9 +1810,10 @@ function masterOrSlaveConf(version=''){
                         </tbody></table>\
                     </div>\
                     <div id="databasePage" class="dataTables_paginate paging_bootstrap page"></div>\
-                    <div class="table_toolbar">\
+                    <div class="table_toolbar" style="left:0px;">\
                         <span class="sync btn btn-default btn-sm" onclick="handlerRun()" title="免登录设置后,需要手动执行一下!">手动命令</span>\
                         <span class="sync btn btn-default btn-sm" onclick="getFullSyncStatus(\'ALL\')" title="全量同步">全量同步</span>\
+                        <span class="sync btn btn-default btn-sm" onclick="getSlaveSSHList()" title="[主]SSH配置">[主]SSH配置</span>\
                     </div>\
                 </div>';
 

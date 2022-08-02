@@ -66,24 +66,25 @@ systemctl stop firewalld
 
 
 yum groupinstall -y "Development Tools"
-yum -y install epel-release
+yum install -y epel-release
 
 yum install -y libevent libevent-devel zip libmcrypt libmcrypt-devel
 yum install -y gcc libffi-devel python-devel openssl-devel 
 yum install -y curl-devel libmcrypt libmcrypt-devel python3-devel
 
-yum -y install wget python-devel python-imaging libicu-devel unzip bzip2-devel gcc libxml2 libxml2-devel libjpeg-devel libpng-devel libwebp libwebp-devel pcre pcre-devel crontabs
-yum -y install net-tools
-yum -y install ncurses-devel mysql-devel cmake
-yum -y install python-devel
-yum -y install MySQL-python
-yum -y install python3-devel
+yum install -y wget python-devel python-imaging libicu-devel unzip bzip2-devel gcc libxml2 libxml2-devel libjpeg-devel libpng-devel libwebp libwebp-devel pcre pcre-devel crontabs
+yum install -y net-tools
+yum install -y ncurses-devel 
+yum install -y python-devel
+yum install -y MySQL-python
+yum install -y python3-devel
+yum install -y mysql-devel
 
 yum install -y libtirpc libtirpc-devel
 yum install -y rpcgen
 yum install -y openldap openldap-devel  
-yum install -y bison re2c cmake
-yum install -y cmake3
+yum install -y bison re2c
+yum install -y cmake cmake3
 yum install -y autoconf
 
 yum install -y libmemcached libmemcached-devel

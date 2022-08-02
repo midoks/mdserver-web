@@ -27,6 +27,25 @@ fi
 # cd /www/server/mdserver-web/plugins/openresty && /bin/bash install.sh install 1.21.4.1
 Install_openresty()
 {
+	# ----- cpu start ------
+	if [ -z "${cpuCore}" ]; then
+    	cpuCore="1"
+	fi
+
+	if [ -f /proc/cpuinfo ];then
+		cpuCore=`cat /proc/cpuinfo | grep "processor" | wc -l`
+	fi
+
+	MEM_INFO=$(free -m|grep Mem|awk '{printf("%.f",($2)/1024)}')
+	if [ "${cpuCore}" != "1" ] && [ "${MEM_INFO}" != "0" ];then
+	    if [ "${cpuCore}" -gt "${MEM_INFO}" ];then
+	        cpuCore="${MEM_INFO}"
+	    fi
+	else
+	    cpuCore="1"
+	fi
+	# ----- cpu end ------
+
 	mkdir -p ${openrestyDir}
 	echo '正在安装脚本文件...' > $install_tmp
 
@@ -45,7 +64,7 @@ Install_openresty()
 	--with-http_slice_module \
 	--with-http_stub_status_module
 
-	make && make install && make clean
+	make -j${cpuCore} && make install && make clean
 
 	if [ -d $serverPath/openresty ];then
 		echo "${VERSION}" > $serverPath/openresty/version.pl

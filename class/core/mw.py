@@ -111,6 +111,17 @@ def isAppleSystem():
     return False
 
 
+def isDebugMode():
+    if isAppleSystem():
+        return True
+
+    debugPath = getRunDir() + "/data/debug.pl"
+    if os.path.exists(debugPath):
+        return True
+
+    return False
+
+
 def isNumber(s):
     try:
         float(s)
@@ -500,9 +511,8 @@ def getSpeed():
 def getLastLine(inputfile, lineNum):
     # 读文件指定倒数行数
     try:
-        fp = open(inputfile, 'r')
+        fp = open(inputfile, 'rb')
         lastLine = ""
-
         lines = fp.readlines()
         count = len(lines)
         if count > lineNum:
@@ -512,12 +522,14 @@ def getLastLine(inputfile, lineNum):
         i = 1
         lastre = []
         for i in range(1, (num + 1)):
-            if lines:
-                n = -i
-                lastLine = lines[n].strip()
-                fp.close()
-                lastre.append(lastLine)
+            n = -i
+            try:
+                lastLine = lines[n].decode("utf-8", "ignore").strip()
+            except Exception as e:
+                lastLine = ""
+            lastre.append(lastLine)
 
+        fp.close()
         result = ''
         num -= 1
         while num >= 0:
@@ -618,14 +630,14 @@ def getLocalIp():
     try:
         ipaddress = readFile(filename)
         if not ipaddress or ipaddress == '127.0.0.1':
-            raise
+            raise Exception("ip is empty!")
         return ipaddress
     except Exception as e:
         cmd = "curl -4 -sS --connect-timeout 5 -m 60 https://v6r.ipip.net/?format=text"
         ip = execShell(cmd)
         result = ip[0].strip()
         if result == '':
-            raise
+            raise e
         writeFile(filename, result)
         return result
     except Exception as e:

@@ -75,6 +75,25 @@ Install_mysql()
 		useradd -g mysql mysql
 	fi
 
+	# ----- cpu start ------
+	if [ -z "${cpuCore}" ]; then
+    	cpuCore="1"
+	fi
+
+	if [ -f /proc/cpuinfo ];then
+		cpuCore=`cat /proc/cpuinfo | grep "processor" | wc -l`
+	fi
+
+	MEM_INFO=$(free -m|grep Mem|awk '{printf("%.f",($2)/1024)}')
+	if [ "${cpuCore}" != "1" ] && [ "${MEM_INFO}" != "0" ];then
+	    if [ "${cpuCore}" -gt "${MEM_INFO}" ];then
+	        cpuCore="${MEM_INFO}"
+	    fi
+	else
+	    cpuCore="1"
+	fi
+	# ----- cpu end ------
+
 	cd $serverPath/mdserver-web/plugins/mysql/lib && /bin/bash rpcgen.sh
 
 	INSTALL_CMD=cmake
@@ -120,17 +139,50 @@ Install_mysql()
 	WHERE_DIR_GCC=/usr/bin/gcc
 	WHERE_DIR_GPP=/usr/bin/g++
 	if [ "$OSNAME" == "centos" ] && [ "$VERSION_ID" == "7" ];then
-		yum install centos-release-scl -y
-		yum install devtoolset-7 -y
-		# scl enable devtoolset-7 bash
+		yum install -y libudev-devel
+		yum install -y centos-release-scl
+        yum install -y devtoolset-11-gcc devtoolset-11-gcc-c++ devtoolset-11-binutils
+
 		gcc --version
-		WHERE_DIR_GCC=/opt/rh/devtoolset-7/root/usr/bin/gcc
-		WHERE_DIR_GPP=/opt/rh/devtoolset-7/root/usr/bin/g++
+		WHERE_DIR_GCC=/opt/rh/devtoolset-11/root/usr/bin/gcc
+		WHERE_DIR_GPP=/opt/rh/devtoolset-11/root/usr/bin/g++
 		echo $WHERE_DIR_GCC
 		echo $WHERE_DIR_GPP
 	fi
 
+	if [ "$OSNAME" == "ubuntu" ] && [ "$VERSION_ID" == "18.04" ];then
+		apt install -y libudev-dev
+		apt install -y libtirpc-dev
+		apt install -y libssl-dev
+		apt install -y libgssglue-dev
+		apt install -y software-properties-common
+		add-apt-repository ppa:ubuntu-toolchain-r/test
+
+		LIBTIRPC_VER=`pkg-config libtirpc --modversion`
+		if [ ! -f ${mysqlDir}/libtirpc_1.2.5.orig.tar.bz2 ];then
+			wget -O ${mysqlDir}/libtirpc_1.2.5.orig.tar.bz2 https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/libtirpc/1.2.5-1ubuntu0.1/libtirpc_1.2.5.orig.tar.bz2
+			cd ${mysqlDir} && tar -jxvf libtirpc_1.2.5.orig.tar.bz2
+			cd libtirpc-1.2.5 && ./configure
+		fi
+
+		export PKG_CONFIG_PATH=/usr/lib/pkgconfig
+		apt install -y gcc-11 g++-11
+		WHERE_DIR_GCC=/usr/bin/gcc-11
+		WHERE_DIR_GPP=/usr/bin/g++-11
+	fi
+
+
+	if [ "$OSNAME" == "opensuse" ];then
+		zypper install -y gcc11
+		zypper install -y gcc11-c++
+
+
+		WHERE_DIR_GCC=/usr/bin/gcc-11
+		WHERE_DIR_GPP=/usr/bin/g++-11
+	fi
+
 	if [ ! -d $serverPath/mysql ];then
+		# -DCMAKE_CXX_STANDARD=17 \
 		cd ${mysqlDir}/mysql-${VERSION} && ${INSTALL_CMD} \
 		-DCMAKE_INSTALL_PREFIX=$serverPath/mysql \
 		-DMYSQL_USER=mysql \
@@ -141,6 +193,7 @@ Install_mysql()
 		-DWITH_MEMORY_STORAGE_ENGINE=1 \
 		-DENABLED_LOCAL_INFILE=1 \
 		-DWITH_PARTITION_STORAGE_ENGINE=1 \
+		-DWITH_READLINE=1 \
 		-DEXTRA_CHARSETS=all \
 		-DDEFAULT_CHARSET=utf8mb4 \
 		-DDEFAULT_COLLATION=utf8mb4_general_ci \
@@ -149,8 +202,9 @@ Install_mysql()
 		$OPTIONS \
 		-DCMAKE_C_COMPILER=$WHERE_DIR_GCC \
 		-DCMAKE_CXX_COMPILER=$WHERE_DIR_GPP \
+		-DDOWNLOAD_BOOST=0 \
 		-DWITH_BOOST=${mysqlDir}/mysql-${VERSION}/boost/
-		make && make install && make clean
+		make -j${cpuCore} && make install && make clean
 
 		if [ -d $serverPath/mysql ];then
 			echo '8.0' > $serverPath/mysql/version.pl
@@ -171,7 +225,7 @@ Uninstall_mysql()
 }
 
 action=$1
-if [ "${1}" == 'install' ];then
+if [ "${1}" == "install" ];then
 	Install_mysql
 else
 	Uninstall_mysql

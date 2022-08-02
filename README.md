@@ -62,7 +62,7 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 
 ### GW使用
 
-- 自动安装
+- 初始安装
 
 ```
 curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/install.sh | bash
@@ -76,7 +76,7 @@ curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts
 
 ### GN使用
 
-- 自动安装
+- 初始安装
 
 ```
 curl -fsSL  https://gitee.com/midoks/mdserver-web/raw/master/scripts/install_cn.sh | bash
@@ -99,7 +99,7 @@ curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/qu
 
 ### DEV使用
 
-- 自动安装
+- 初始安装
 
 ```
 curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/install_dev.sh | bash

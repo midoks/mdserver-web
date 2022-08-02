@@ -134,10 +134,10 @@ def pSqliteDb(dbname='databases'):
 
 
 def pMysqlDb():
-    # pymysql
-    db = mw.getMyORM()
+    # mysql.connector
+    # db = mw.getMyORM()
     # MySQLdb |
-    # db = mw.getMyORMDb()
+    db = mw.getMyORMDb()
 
     db.setPort(getDbPort())
     db.setSocket(getSocketFile())
@@ -620,13 +620,22 @@ def runInfo():
             'Created_tmp_disk_tables', 'Created_tmp_tables', 'Innodb_buffer_pool_pages_dirty', 'Opened_files', 'Open_tables', 'Opened_tables', 'Select_full_join',
             'Select_range_check', 'Sort_merge_passes', 'Table_locks_waited', 'Threads_cached', 'Threads_connected', 'Threads_created', 'Threads_running', 'Connections', 'Uptime']
 
+    try:
+        # print data
+        if data[0] == 1045 or data[0] == 2003:
+            pwd = db.getPwd()
+            return mw.returnJson(False, 'mysql password error:' + pwd + '!')
+    except Exception as e:
+        pass
+
     result = {}
+
     # print(data)
+
     for d in data:
-        vname = d["Variable_name"]
         for g in gets:
-            if vname == g:
-                result[g] = d["Value"]
+            if d[0] == g:
+                result[g] = d[1]
 
     # print(result, int(result['Uptime']))
     result['Run'] = int(time.time()) - int(result['Uptime'])
@@ -652,11 +661,11 @@ def myDbStatus():
             'innodb_additional_mem_pool_size', 'innodb_log_buffer_size', 'max_connections', 'sort_buffer_size', 'read_buffer_size', 'read_rnd_buffer_size', 'join_buffer_size', 'thread_stack', 'binlog_cache_size']
     result['mem'] = {}
     for d in data:
-        vname = d['Variable_name']
         for g in gets:
-            # print(g)
-            if vname == g:
-                result['mem'][g] = d["Value"]
+            if d[0] == g:
+                result['mem'][g] = d[1]
+    # if result['mem']['query_cache_type'] != 'ON':
+    #     result['mem']['query_cache_size'] = '0'
     return mw.getJson(result)
 
 
@@ -890,30 +899,27 @@ def syncGetDatabases():
         "select User,Host from mysql.user where User!='root' AND Host!='localhost' AND Host!=''")
     nameArr = ['information_schema', 'performance_schema', 'mysql', 'sys']
     n = 0
-
-    # print(users)
     for value in data:
-        vdb_name = value["Database"]
         b = False
         for key in nameArr:
-            if vdb_name == key:
+            if value[0] == key:
                 b = True
                 break
         if b:
             continue
-        if psdb.where("name=?", (vdb_name,)).count() > 0:
+        if psdb.where("name=?", (value[0],)).count():
             continue
         host = '127.0.0.1'
         for user in users:
-            if vdb_name == user["User"]:
-                host = user["Host"]
+            if value[0] == user[0]:
+                host = user[1]
                 break
 
         ps = mw.getMsg('INPUT_PS')
-        if vdb_name == 'test':
+        if value[0] == 'test':
             ps = mw.getMsg('DATABASE_TEST')
         addTime = time.strftime('%Y-%m-%d %X', time.localtime())
-        if psdb.add('name,username,password,accept,ps,addtime', (vdb_name, vdb_name, '', host, ps, addTime)):
+        if psdb.add('name,username,password,accept,ps,addtime', (value[0], value[0], '', host, ps, addTime)):
             n += 1
 
     msg = mw.getInfo('本次共从服务器获取了{1}个数据库!', (str(n),))
@@ -1015,32 +1021,35 @@ def setUserPwd():
 
     newpassword = args['password']
     username = args['name']
-    uid = args['id']
+    id = args['id']
     try:
         pdb = pMysqlDb()
         psdb = pSqliteDb('databases')
-        name = psdb.where('id=?', (uid,)).getField('name')
+        name = psdb.where('id=?', (id,)).getField('name')
 
         m_version = mw.readFile(getServerDir() + '/version.pl')
         if m_version.find('5.7') == 0 or m_version.find('8.0') == 0:
-            accept = pdb.query(
+            tmp = pdb.query(
                 "select Host from mysql.user where User='" + name + "' AND Host!='localhost'")
+            accept = mapToList(tmp)
             pdb.execute(
                 "update mysql.user set authentication_string='' where User='" + username + "'")
             result = pdb.execute(
                 "ALTER USER `%s`@`localhost` IDENTIFIED BY '%s'" % (username, newpassword))
             for my_host in accept:
                 pdb.execute("ALTER USER `%s`@`%s` IDENTIFIED BY '%s'" % (
-                    username, my_host["Host"], newpassword))
+                    username, my_host[0], newpassword))
         else:
             result = pdb.execute("update mysql.user set Password=password('" +
                                  newpassword + "') where User='" + username + "'")
-
+        isError = isSqlError(result)
+        if isError != None:
+            return isError
         pdb.execute("flush privileges")
         psdb.where("id=?", (id,)).setField('password', newpassword)
         return mw.returnJson(True, mw.getInfo('修改数据库[{1}]密码成功!', (name,)))
     except Exception as ex:
-        print(str(ex))
+        # print str(ex)
         return mw.returnJson(False, mw.getInfo('修改数据库[{1}]密码失败!', (name,)))
 
 
@@ -1142,12 +1151,15 @@ def delDb():
 
         # 删除MYSQL
         result = pdb.execute("drop database `" + name + "`")
+        isError = isSqlError(result)
+        if isError != None:
+            return isError
 
-        users = pdb.query("select Host from mysql.user where User='" +
-                          username + "' AND Host!='localhost'")
+        users = pdb.query(
+            "select Host from mysql.user where User='" + username + "' AND Host!='localhost'")
         pdb.execute("drop user '" + username + "'@'localhost'")
         for us in users:
-            pdb.execute("drop user '" + username + "'@'" + us["Host"] + "'")
+            pdb.execute("drop user '" + username + "'@'" + us[0] + "'")
         pdb.execute("flush privileges")
 
         # 删除SQLITE
@@ -1167,16 +1179,16 @@ def getDbAccess():
 
     users = pdb.query("select Host from mysql.user where User='" +
                       username + "' AND Host!='localhost'")
+    isError = isSqlError(users)
+    if isError != None:
+        return isError
 
-    # isError = isSqlError(users)
-    # if isError != None:
-    #     return isError
-
+    users = mapToList(users)
     if len(users) < 1:
         return mw.returnJson(True, "127.0.0.1")
     accs = []
     for c in users:
-        accs.append(c["Host"])
+        accs.append(c[0])
     userStr = ','.join(accs)
     return mw.returnJson(True, userStr)
 
@@ -1211,12 +1223,10 @@ def setDbAccess():
             'id=?', (1,)).getField('mysql_root')
     else:
         password = psdb.where("username=?", (name,)).getField('password')
-
     users = pdb.query("select Host from mysql.user where User='" +
                       name + "' AND Host!='localhost'")
-
     for us in users:
-        pdb.execute("drop user '" + name + "'@'" + us["Host"] + "'")
+        pdb.execute("drop user '" + name + "'@'" + us[0] + "'")
 
     __createUser(dbname, name, password, access)
 
@@ -1233,33 +1243,49 @@ def getDbInfo():
     db_name = args['name']
     pdb = pMysqlDb()
     # print 'show tables from `%s`' % db_name
-    tables = pdb.query('show tables from `%s`' % db_name)
+    table_res = pdb.query('show tables from `%s`' % db_name)
+    isError = isSqlError(table_res)
+    if isError != None:
+        return isError
+
+    tables = mapToList(table_res)
 
     ret = {}
-    data_sum = pdb.query(
-        "select sum(DATA_LENGTH)+sum(INDEX_LENGTH) as sum_size from information_schema.tables  where table_schema='%s'" % db_name)
-    data = data_sum[0]['sum_size']
+    if type(tables) == list:
+        try:
+            data = mapToList(pdb.query(
+                "select sum(DATA_LENGTH)+sum(INDEX_LENGTH) from information_schema.tables  where table_schema='%s'" % db_name))[0][0]
+        except:
+            data = 0
 
-    ret['data_size'] = mw.toSize(data)
-    ret['database'] = db_name
+        if not data:
+            data = 0
+        ret['data_size'] = mw.toSize(data)
+        # print ret
+        ret['database'] = db_name
 
-    ret3 = []
-    table_key = "Tables_in_" + db_name
-    for i in tables:
-        table = pdb.query(
-            "show table status from `%s` where name = '%s'" % (db_name, i[table_key]))
+        ret3 = []
 
-        tmp = {}
-        tmp['type'] = table[0]["Engine"]
-        tmp['rows_count'] = table[0]["Rows"]
-        tmp['collation'] = table[0]["Collation"]
-        data_size = table[0]["Avg_row_length"] + table[0]["Data_length"]
-        tmp['data_byte'] = data_size
-        tmp['data_size'] = mw.toSize(data_size)
-        tmp['table_name'] = table[0]["Name"]
-        ret3.append(tmp)
-
-    ret['tables'] = (ret3)
+        for i in tables:
+            if i == 1049:
+                return mw.returnJson(False, '指定数据库不存在!')
+            table = mapToList(
+                pdb.query("show table status from `%s` where name = '%s'" % (db_name, i[0])))
+            if not table:
+                continue
+            try:
+                ret2 = {}
+                ret2['type'] = table[0][1]
+                ret2['rows_count'] = table[0][4]
+                ret2['collation'] = table[0][14]
+                data_size = table[0][6] + table[0][8]
+                ret2['data_byte'] = data_size
+                ret2['data_size'] = mw.toSize(data_size)
+                ret2['table_name'] = i[0]
+                ret3.append(ret2)
+            except:
+                continue
+        ret['tables'] = (ret3)
 
     return mw.getJson(ret)
 
@@ -1273,19 +1299,18 @@ def repairTable():
     db_name = args['db_name']
     tables = json.loads(args['tables'])
     pdb = pMysqlDb()
-    mtable = pdb.query('show tables from `%s`' % db_name)
-
+    mysql_table = mapToList(pdb.query('show tables from `%s`' % db_name))
     ret = []
-    key = "Tables_in_" + db_name
-    for i in mtable:
-        for tn in tables:
-            if tn == i[key]:
-                ret.append(tn)
-
-    if len(ret) > 0:
-        for i in ret:
-            pdb.execute('REPAIR TABLE `%s`.`%s`' % (db_name, i))
-        return mw.returnJson(True, "修复完成!")
+    if type(mysql_table) == list:
+        if len(mysql_table) > 0:
+            for i in mysql_table:
+                for i2 in tables:
+                    if i2 == i[0]:
+                        ret.append(i2)
+            if len(ret) > 0:
+                for i in ret:
+                    pdb.execute('REPAIR TABLE `%s`.`%s`' % (db_name, i))
+                return mw.returnJson(True, "修复完成!")
     return mw.returnJson(False, "修复失败!")
 
 
@@ -1298,18 +1323,18 @@ def optTable():
     db_name = args['db_name']
     tables = json.loads(args['tables'])
     pdb = pMysqlDb()
-    mtable = pdb.query('show tables from `%s`' % db_name)
+    mysql_table = mapToList(pdb.query('show tables from `%s`' % db_name))
     ret = []
-    key = "Tables_in_" + db_name
-    for i in mtable:
-        for tn in tables:
-            if tn == i[key]:
-                ret.append(tn)
-
-    if len(ret) > 0:
-        for i in ret:
-            pdb.execute('OPTIMIZE TABLE `%s`.`%s`' % (db_name, i))
-        return mw.returnJson(True, "优化成功!")
+    if type(mysql_table) == list:
+        if len(mysql_table) > 0:
+            for i in mysql_table:
+                for i2 in tables:
+                    if i2 == i[0]:
+                        ret.append(i2)
+            if len(ret) > 0:
+                for i in ret:
+                    pdb.execute('OPTIMIZE TABLE `%s`.`%s`' % (db_name, i))
+                return mw.returnJson(True, "优化成功!")
     return mw.returnJson(False, "优化失败或者已经优化过了!")
 
 
@@ -1323,20 +1348,19 @@ def alterTable():
     tables = json.loads(args['tables'])
     table_type = args['table_type']
     pdb = pMysqlDb()
-    mtable = pdb.query('show tables from `%s`' % db_name)
-
+    mysql_table = mapToList(pdb.query('show tables from `%s`' % db_name))
     ret = []
-    key = "Tables_in_" + db_name
-    for i in mtable:
-        for tn in tables:
-            if tn == i[key]:
-                ret.append(tn)
-
-    if len(ret) > 0:
-        for i in ret:
-            pdb.execute('alter table `%s`.`%s` ENGINE=`%s`' %
-                        (db_name, i, table_type))
-        return mw.returnJson(True, "更改成功!")
+    if type(mysql_table) == list:
+        if len(mysql_table) > 0:
+            for i in mysql_table:
+                for i2 in tables:
+                    if i2 == i[0]:
+                        ret.append(i2)
+            if len(ret) > 0:
+                for i in ret:
+                    pdb.execute('alter table `%s`.`%s` ENGINE=`%s`' %
+                                (db_name, i, table_type))
+                return mw.returnJson(True, "更改成功!")
     return mw.returnJson(False, "更改失败!")
 
 
@@ -1503,9 +1527,9 @@ def getMasterStatus(version=''):
 
     db = pMysqlDb()
     dlist = db.query('show slave status')
-
-    # print(dlist[0])
-    if len(dlist) > 0 and (dlist[0]["Slave_IO_Running"] == 'Yes' or dlist[0]["Slave_SQL_Running"] == 'Yes'):
+    dlist = list(dlist)
+    # print(dlist, len(dlist))
+    if len(dlist) > 0 and (dlist[0][10] == 'Yes' or dlist[0][11] == 'Yes'):
         data['slave_status'] = True
 
     return mw.returnJson(master_status, '设置成功', data)
@@ -1611,21 +1635,18 @@ def addMasterRepSlaveUser(version=''):
     pdb = pMysqlDb()
     psdb = pSqliteDb('master_replication_user')
 
-    if psdb.where("username=?", (username)).count() > 0:
+    if psdb.where("username=?", (username)).count():
         return mw.returnJson(False, '用户已存在!')
 
     if version == "8.0":
         sql = "CREATE USER '" + username + \
-            "'  IDENTIFIED WITH mysql_native_password BY '" + password + "';"
-        pdb.execute(sql)
-        sql = "grant replication slave on *.* to '" + username + "'@'%';"
+            "'@'%'  IDENTIFIED WITH mysql_native_password BY '" + password + "';"
+        sql += "grant replication slave on *.* to '" + username + "'@'%';"
+        sql += "FLUSH PRIVILEGES;"
         result = pdb.execute(sql)
         isError = isSqlError(result)
         if isError != None:
             return isError
-
-        sql = "FLUSH PRIVILEGES;"
-        pdb.execute(sql)
     else:
         sql = "GRANT REPLICATION SLAVE ON *.* TO  '" + username + \
             "'@'%' identified by '" + password + "';FLUSH PRIVILEGES;"
@@ -1670,21 +1691,23 @@ def getMasterRepSlaveUserCmd(version):
 
     db = pMysqlDb()
     mstatus = db.query('show master status')
+    # print(mstatus)
+    mstatus = list(mstatus)
     if len(mstatus) == 0:
         return mw.returnJson(False, '未开启!')
 
     sql = "CHANGE MASTER TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
         clist[0]['username']  + "', MASTER_PASSWORD='" + \
         clist[0]['password'] + \
-        "', MASTER_LOG_FILE='" + mstatus[0]["File"] + \
-        "',MASTER_LOG_POS=" + str(mstatus[0]["Position"]) + ""
+        "', MASTER_LOG_FILE='" + mstatus[0][0] + \
+        "',MASTER_LOG_POS=" + str(mstatus[0][1]) + ""
 
     if version == "8.0":
         sql = "CHANGE REPLICATION SOURCE TO SOURCE_HOST='" + ip + "', SOURCE_PORT=" + port + ", SOURCE_USER='" + \
             clist[0]['username']  + "', SOURCE_PASSWORD='" + \
             clist[0]['password'] + \
-            "', SOURCE_LOG_FILE='" + mstatus[0]["File"] + \
-            "',SOURCE_LOG_POS=" + str(mstatus[0]["Position"]) + ""
+            "', SOURCE_LOG_FILE='" + mstatus[0][0] + \
+            "',SOURCE_LOG_POS=" + str(mstatus[0][1]) + ""
 
     return mw.returnJson(True, 'OK!', sql)
 
@@ -1825,15 +1848,17 @@ def getSlaveList(version=''):
 
     db = pMysqlDb()
     dlist = db.query('show slave status')
+    dlist = list(dlist)
+    # print(dlist)
     ret = []
     for x in range(0, len(dlist)):
         tmp = {}
-        tmp['Master_User'] = dlist[x]["Master_User"]
-        tmp['Master_Host'] = dlist[x]["Master_Host"]
-        tmp['Master_Port'] = dlist[x]["Master_Port"]
-        tmp['Master_Log_File'] = dlist[x]["Master_Log_File"]
-        tmp['Slave_IO_Running'] = dlist[x]["Slave_IO_Running"]
-        tmp['Slave_SQL_Running'] = dlist[x]["Slave_SQL_Running"]
+        tmp['Master_User'] = dlist[x][2]
+        tmp['Master_Host'] = dlist[x][1]
+        tmp['Master_Port'] = dlist[x][3]
+        tmp['Master_Log_File'] = dlist[x][5]
+        tmp['Slave_IO_Running'] = dlist[x][10]
+        tmp['Slave_SQL_Running'] = dlist[x][11]
         ret.append(tmp)
     data = {}
     data['data'] = ret
@@ -1852,10 +1877,11 @@ def getSlaveSyncCmd(version=''):
 def setSlaveStatus(version=''):
     db = pMysqlDb()
     dlist = db.query('show slave status')
+    dlist = list(dlist)
     if len(dlist) == 0:
         return mw.returnJson(False, '需要手动添加主服务同步命令!')
 
-    if len(dlist) > 0 and (dlist[0]["Slave_IO_Running"] == 'Yes' or dlist[0]["Slave_SQL_Running"] == 'Yes'):
+    if len(dlist) > 0 and (dlist[0][10] == 'Yes' or dlist[0][11] == 'Yes'):
         db.query('stop slave')
     else:
         db.query('start slave')
@@ -1929,11 +1955,12 @@ def doFullSync():
     db = pMysqlDb()
 
     dlist = db.query('show slave status')
+    dlist = list(dlist)
     if len(dlist) == 0:
         status_data['code'] = -1
         status_data['msg'] = '没有启动...'
 
-    ip = dlist[0]["Master_Host"]
+    ip = dlist[0][1]
     print("master ip:", ip)
 
     id_rsa_conn = pSqliteDb('slave_id_rsa')
@@ -1958,52 +1985,41 @@ def doFullSync():
         return 'fail'
 
     try:
-        mw.execShell("chmod 600 " + SSH_PRIVATE_KEY)
         key = paramiko.RSAKey.from_private_key_file(SSH_PRIVATE_KEY)
         # ssh.load_system_host_keys()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        print(ip, master_port)
-
-        # pkey=key
-        # key_filename=SSH_PRIVATE_KEY
-        ssh.connect(hostname=ip, port=master_port,
-                    username='root', pkey=key)
+        ssh.connect(hostname=ip, port=master_port, username='root', pkey=key)
     except Exception as e:
-        print(str(e))
         writeDbSyncStatus(
             {'code': 0, 'msg': 'SSH配置错误:' + str(e), 'progress': 0})
         return 'fail'
 
     writeDbSyncStatus({'code': 0, 'msg': '登录Master成功...', 'progress': 5})
 
-    cmd = "cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mysql/index.py dump_mysql_data {\"db\":'" + args[
+    cmd = "cd /www/server/mdserver-web && python /www/server/mdserver-web/plugins/mysql/index.py dump_mysql_data {\"db\":'" + args[
         'db'] + "'}"
-    print(cmd)
     stdin, stdout, stderr = ssh.exec_command(cmd)
     result = stdout.read()
     result_err = stderr.read()
 
     result = result.decode('utf-8')
+    # print(result)
     if result.strip() == 'ok':
         writeDbSyncStatus({'code': 1, 'msg': '主服务器备份完成...', 'progress': 30})
     else:
         writeDbSyncStatus({'code': 1, 'msg': '主服务器备份失败...', 'progress': 30})
         return 'fail'
 
-    print("同步文件", "start")
-    cmd = 'scp -P' + str(master_port) + ' -i ' + SSH_PRIVATE_KEY + \
-        ' root@' + ip + ':/tmp/dump.sql /tmp'
-    r = mw.execShell(cmd)
-    print("同步文件", "end")
+    r = mw.execShell('scp root@' + ip + ':/tmp/dump.sql /tmp')
     if r[0] == '':
         writeDbSyncStatus({'code': 2, 'msg': '数据同步本地完成...', 'progress': 40})
 
-    cmd = 'cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mysql/index.py get_master_rep_slave_user_cmd {"username":"","db":""}'
+    cmd = 'cd /www/server/mdserver-web && python /www/server/mdserver-web/plugins/mysql/index.py get_master_rep_slave_user_cmd {"username":"","db":""}'
     stdin, stdout, stderr = ssh.exec_command(cmd)
     result = stdout.read()
     result_err = stderr.read()
-    result = result.decode('utf-8')
     cmd_data = json.loads(result)
+    # print(cmd_data)
 
     db.query('stop slave')
     writeDbSyncStatus({'code': 3, 'msg': '停止从库完成...', 'progress': 45})
@@ -2044,7 +2060,7 @@ def fullSync(version=''):
         cmd = 'cd ' + mw.getRunDir() + ' && python ' + \
             getPluginDir() + \
             '/index.py do_full_sync {"db":"' + args['db'] + '"} &'
-        print(cmd)
+        # print(cmd)
         mw.execShell(cmd)
         return json.dumps({'code': 0, 'msg': '同步数据中!', 'progress': 0})
 
@@ -2052,10 +2068,8 @@ def fullSync(version=''):
         c = mw.readFile(status_file)
         tmp = json.loads(c)
         if tmp['code'] == 1:
-            sys_dump_sql = "/tmp/dump.sql"
-            if os.path.exists(sys_dump_sql):
-                dump_size = os.path.getsize(sys_dump_sql)
-                tmp['msg'] = tmp['msg'] + ":" + "同步文件:" + mw.toSize(dump_size)
+            dump_size = os.path.getsize("/tmp/dump.sql")
+            tmp['msg'] = tmp['msg'] + ":" + "同步文件:" + mw.toSize(dump_size)
             c = json.dumps(tmp)
 
         # if tmp['code'] == 6:

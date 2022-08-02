@@ -65,6 +65,10 @@ if __name__ == '__main__':
         else:
             siteName = siteName.replace("-access_log", '')
         oldFileName = logsPath + '/' + sys.argv[1]
+        errOldFileName = logsPath + '/' + \
+            sys.argv[1].strip(".log") + ".error.log"
         split_logs(oldFileName, num)
+        if os.path.exists(errOldFileName):
+            split_logs(errOldFileName, num)
     path = mw.getServerDir()
     os.system("kill -USR1 `cat " + path + "/openresty/nginx/logs/nginx.pid`")

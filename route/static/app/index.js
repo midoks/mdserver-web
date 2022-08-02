@@ -88,11 +88,11 @@ function reMemory() {
         $(".mem-release").find('.mask').css({ 'color': '#20a53a', 'font-size': '14px' }).html('<span style="display:none">1</span>' + lan.index.memre_ok_0 + ' <img src="/static/img/ings.gif">');
         $.post('/system/rememory', '', function(rdata) {
             var percent = getPercent(rdata.memRealUsed, rdata.memTotal);
-            var memText = rdata.memRealUsed + "/" + rdata.memTotal + " (MB)";
+            var memText = Math.round(rdata.memRealUsed) + "/" + Math.round(rdata.memTotal) + " (MB)";
             percent = Math.round(percent);
             $(".mem-release").find('.mask').css({ 'color': '#20a53a', 'font-size': '14px' }).html("<span style='display:none'>" + percent + "</span>" + lan.index.memre_ok);
             setCookie("mem-before", memText);
-            var memNull = getCookie("memRealUsed") - rdata.memRealUsed;
+            var memNull = Math.round(getCookie("memRealUsed") - rdata.memRealUsed);
             setTimeout(function() {
                 if (memNull > 0) {
                     $(".mem-release").find('.mask').css({ 'color': '#20a53a', 'font-size': '14px', 'line-height': '22px', 'padding-top': '22px' }).html("<span style='display:none'>" + percent + "</span>" + lan.index.memre_ok_1 + "<br>" + memNull + "MB");
