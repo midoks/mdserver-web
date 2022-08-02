@@ -171,6 +171,16 @@ Install_mysql()
 		WHERE_DIR_GPP=/usr/bin/g++-11
 	fi
 
+
+	if [ "$OSNAME" == "opensuse" ];then
+		zypper install -y gcc11
+		zypper install -y gcc11-c++
+
+
+		WHERE_DIR_GCC=/usr/bin/gcc-11
+		WHERE_DIR_GPP=/usr/bin/g++-11
+	fi
+
 	if [ ! -d $serverPath/mysql ];then
 		# -DCMAKE_CXX_STANDARD=17 \
 		cd ${mysqlDir}/mysql-${VERSION} && ${INSTALL_CMD} \
