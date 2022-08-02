@@ -2048,8 +2048,10 @@ def fullSync(version=''):
         c = mw.readFile(status_file)
         tmp = json.loads(c)
         if tmp['code'] == 1:
-            dump_size = os.path.getsize("/tmp/dump.sql")
-            tmp['msg'] = tmp['msg'] + ":" + "同步文件:" + mw.toSize(dump_size)
+            sys_dump_sql = "/tmp/dump.sql"
+            if os.path.exists(sys_dump_sql):
+                dump_size = os.path.getsize(sys_dump_sql)
+                tmp['msg'] = tmp['msg'] + ":" + "同步文件:" + mw.toSize(dump_size)
             c = json.dumps(tmp)
 
         # if tmp['code'] == 6:
