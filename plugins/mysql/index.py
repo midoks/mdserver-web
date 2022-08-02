@@ -1976,30 +1976,34 @@ def doFullSync():
 
     writeDbSyncStatus({'code': 0, 'msg': '登录Master成功...', 'progress': 5})
 
-    cmd = "cd /www/server/mdserver-web && python /www/server/mdserver-web/plugins/mysql/index.py dump_mysql_data {\"db\":'" + args[
+    cmd = "cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mysql/index.py dump_mysql_data {\"db\":'" + args[
         'db'] + "'}"
+    print(cmd)
     stdin, stdout, stderr = ssh.exec_command(cmd)
     result = stdout.read()
     result_err = stderr.read()
 
     result = result.decode('utf-8')
-    # print(result)
     if result.strip() == 'ok':
         writeDbSyncStatus({'code': 1, 'msg': '主服务器备份完成...', 'progress': 30})
     else:
         writeDbSyncStatus({'code': 1, 'msg': '主服务器备份失败...', 'progress': 30})
         return 'fail'
 
-    r = mw.execShell('scp root@' + ip + ':/tmp/dump.sql /tmp')
+    print("同步文件", "start")
+    cmd = 'scp -P' + str(master_port) + ' -i ' + SSH_PRIVATE_KEY + \
+        ' root@' + ip + ':/tmp/dump.sql /tmp'
+    r = mw.execShell(cmd)
+    print("同步文件", "end")
     if r[0] == '':
         writeDbSyncStatus({'code': 2, 'msg': '数据同步本地完成...', 'progress': 40})
 
-    cmd = 'cd /www/server/mdserver-web && python /www/server/mdserver-web/plugins/mysql/index.py get_master_rep_slave_user_cmd {"username":"","db":""}'
+    cmd = 'cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mysql/index.py get_master_rep_slave_user_cmd {"username":"","db":""}'
     stdin, stdout, stderr = ssh.exec_command(cmd)
     result = stdout.read()
     result_err = stderr.read()
+    result = result.decode('utf-8')
     cmd_data = json.loads(result)
-    # print(cmd_data)
 
     db.query('stop slave')
     writeDbSyncStatus({'code': 3, 'msg': '停止从库完成...', 'progress': 45})
