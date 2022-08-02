@@ -140,6 +140,7 @@ Install_mysql()
 	WHERE_DIR_GPP=/usr/bin/g++
 	if [ "$OSNAME" == "centos" ] && [ "$VERSION_ID" == "7" ];then
 		yum install -y libudev-devel
+		yum install -y centos-release-scl
         yum install -y devtoolset-11-gcc devtoolset-11-gcc-c++ devtoolset-11-binutils
 
 		gcc --version
