@@ -2022,6 +2022,7 @@ def doFullSync():
     db.query('stop slave')
     writeDbSyncStatus({'code': 3, 'msg': '停止从库完成...', 'progress': 45})
 
+    print(cmd_data)
     dlist = db.query(cmd_data['data'])
     writeDbSyncStatus({'code': 4, 'msg': '刷新从库同步信息完成...', 'progress': 50})
 
@@ -2055,7 +2056,7 @@ def fullSync(version=''):
 
     status_file = '/tmp/db_async_status.txt'
     if args['begin'] == '1':
-        cmd = 'cd ' + mw.getRunDir() + ' && python ' + \
+        cmd = 'cd ' + mw.getRunDir() + ' && python3 ' + \
             getPluginDir() + \
             '/index.py do_full_sync {"db":"' + args['db'] + '"} &'
         print(cmd)
