@@ -214,16 +214,15 @@ function cc()
                 insert_ip_list(ip,lock_time,os.time(),server_name)
             end
             
---             ngx.exit(config['cc']['status'])
---             return true
---         else
---             ngx.shared.limit:incr(token,1)
---         end
---     else
---         ngx.shared.limit:set(token,1,cycle)
---     end
--- end
+            ngx.exit(config['cc']['status'])
+            return true
+        else
+            ngx.shared.limit:incr(token,1)
         end
+    else
+        ngx.shared.limit:set(token,1,cycle)
+    end
+end
 
 --强制验证是否使用正常浏览器访问网站
 function waf_cc_increase()
