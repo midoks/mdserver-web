@@ -1696,7 +1696,11 @@ def getMasterRepSlaveUserCmd(version):
             "', SOURCE_LOG_FILE='" + mstatus[0]["File"] + \
             "',SOURCE_LOG_POS=" + str(mstatus[0]["Position"])
 
-    return mw.returnJson(True, clist[0], sql)
+    data = {}
+    data['cmd'] = sql
+    data["info"] = clist[0]
+
+    return mw.returnJson(True, 'ok!', data)
 
 
 def delMasterRepSlaveUser(version=''):
@@ -2063,7 +2067,7 @@ def doFullSync():
     writeDbSyncStatus({'code': 3, 'msg': '停止从库完成...', 'progress': 45})
 
     print(cmd_data)
-    dlist = db.query(cmd_data['data'])
+    dlist = db.query(cmd_data['data']['cmd'])
     writeDbSyncStatus({'code': 4, 'msg': '刷新从库同步信息完成...', 'progress': 50})
 
     pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
@@ -2079,8 +2083,9 @@ def doFullSync():
     else:
         writeDbSyncStatus({'code': 5, 'msg': '导入数据失败...', 'progress': 90})
         return 'fail'
-
-    db.query('start slave')
+    uinfo = cmd_data['data']['info']
+    db.query("start slave user='{}' password='{}';".format(
+        uinfo['username'], uinfo['password']))
     writeDbSyncStatus({'code': 6, 'msg': '从库重启完成...', 'progress': 100})
 
     os.system("rm -rf " + SSH_PRIVATE_KEY)

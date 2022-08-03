@@ -1376,22 +1376,24 @@ function getMasterRepSlaveUserCmd(username, db=''){
             return;
         }
 
-
+        var cmd = rdata.data['cmd'];
+        
         var loadOpen = layer.open({
             type: 1,
             title: '同步命令',
             area: '500px',
             content:"<form class='bt-form pd20 pb70' id='add_master'>\
-            <div class='line'>"+rdata.data+"</div>\
+            <div class='line'>"+cmd+"</div>\
             <div class='bt-form-submit-btn'>\
                 <button type='button' class='btn btn-success btn-sm btn-title class-copy-cmd'>复制</button>\
             </div>\
           </form>",
         });
 
-        copyPass(rdata.data);
+       
+        copyPass(cmd);
         $('.class-copy-cmd').click(function(){
-            copyPass(rdata.data);
+            copyPass(cmd);
         });
     });
 }
@@ -1652,7 +1654,7 @@ function getSlaveSSHList(page=1){
 function handlerRun(){
     myPostN('get_slave_sync_cmd', {}, function(data){
         var rdata = $.parseJSON(data.data);
-        var cmd = rdata.data;
+        var cmd = rdata['data'];
         var loadOpen = layer.open({
             type: 1,
             title: '手动执行',
@@ -1840,7 +1842,6 @@ function masterOrSlaveConf(version=''){
             var limitCon = '\
                 <p class="conf_p">\
                     <span class="f14 c6 mr20">运行模式</span><span class="f14 c6 mr20"></span>\
-                    <button class="btn '+(!rdata.status ? 'btn-danger' : 'btn-success')+' btn-xs">'+(!rdata.status ? '未开启' : '已开启') +'</button>\
                     <button class="btn '+(!rdata.status ? 'btn-danger' : 'btn-success')+' btn-xs">经典</button>\
                     <button class="btn '+(!rdata.status ? 'btn-danger' : 'btn-success')+' btn-xs">GTID</button>\
                 </p>\
