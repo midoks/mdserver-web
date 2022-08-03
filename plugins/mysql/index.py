@@ -1902,7 +1902,7 @@ def initSlaveStatus(version=''):
         db.query(cmd_data['data'])
         db.query('start slave')
     except Exception as e:
-        return mw.returnJson(True, 'SSH认证配置连接失败!' + str(e))
+        return mw.returnJson(False, 'SSH认证配置连接失败!' + str(e))
 
     time.sleep(0.5)
     ssh.close()
