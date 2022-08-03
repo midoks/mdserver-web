@@ -1894,8 +1894,6 @@ def initSlaveStatus(version=''):
         cmd = 'cd /www/server/mdserver-web && python3 plugins/mysql/index.py get_master_rep_slave_user_cmd {"username":"","db":""}'
         stdin, stdout, stderr = ssh.exec_command(cmd)
         result = stdout.read()
-        # result_err = stderr.read()
-
         result = result.decode('utf-8')
         cmd_data = json.loads(result)
 
