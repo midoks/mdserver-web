@@ -1837,10 +1837,19 @@ function masterOrSlaveConf(version=''){
     function getMasterStatus(){
         myPost('get_master_status', '', function(data){
             var rdata = $.parseJSON(data.data);
-            var limitCon = '<p class="conf_p">\
-                    <span class="f14 c6 mr20">Master[主]配置</span><span class="f14 c6 mr20"></span>\
-                    <button class="btn '+(!rdata.status ? 'btn-danger' : 'btn-success')+' btn-xs btn-master">'+(!rdata.status ? '未开启' : '已开启') +'</button><hr/>\
+            var limitCon = '\
+                <p class="conf_p">\
+                    <span class="f14 c6 mr20">运行模式</span><span class="f14 c6 mr20"></span>\
+                    <button class="btn '+(!rdata.status ? 'btn-danger' : 'btn-success')+' btn-xs">'+(!rdata.status ? '未开启' : '已开启') +'</button>\
+                    <button class="btn '+(!rdata.status ? 'btn-danger' : 'btn-success')+' btn-xs">经典</button>\
+                    <button class="btn '+(!rdata.status ? 'btn-danger' : 'btn-success')+' btn-xs">GTID</button>\
                 </p>\
+                <hr/>\
+                <p class="conf_p">\
+                    <span class="f14 c6 mr20">Master[主]配置</span><span class="f14 c6 mr20"></span>\
+                    <button class="btn '+(!rdata.status ? 'btn-danger' : 'btn-success')+' btn-xs btn-master">'+(!rdata.status ? '未开启' : '已开启') +'</button>\
+                </p>\
+                <hr/>\
                 <!-- master list -->\
                 <div class="safe bgw table_master_list"></div>\
                 <hr/>\

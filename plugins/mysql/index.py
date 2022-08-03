@@ -1687,16 +1687,16 @@ def getMasterRepSlaveUserCmd(version):
         clist[0]['username']  + "', MASTER_PASSWORD='" + \
         clist[0]['password'] + \
         "', MASTER_LOG_FILE='" + mstatus[0]["File"] + \
-        "',MASTER_LOG_POS=" + str(mstatus[0]["Position"]) + ""
+        "',MASTER_LOG_POS=" + str(mstatus[0]["Position"])
 
     if version == "8.0":
         sql = "CHANGE REPLICATION SOURCE TO SOURCE_HOST='" + ip + "', SOURCE_PORT=" + port + ", SOURCE_USER='" + \
             clist[0]['username']  + "', SOURCE_PASSWORD='" + \
             clist[0]['password'] + \
             "', SOURCE_LOG_FILE='" + mstatus[0]["File"] + \
-            "',SOURCE_LOG_POS=" + str(mstatus[0]["Position"]) + ""
+            "',SOURCE_LOG_POS=" + str(mstatus[0]["Position"])
 
-    return mw.returnJson(True, 'OK!', sql)
+    return mw.returnJson(True, clist[0], sql)
 
 
 def delMasterRepSlaveUser(version=''):
@@ -1854,7 +1854,7 @@ def getSlaveList(version=''):
 def getSlaveSyncCmd(version=''):
 
     root = mw.getRunDir()
-    cmd = 'cd ' + root + ' && python ' + root + \
+    cmd = 'cd ' + root + ' && python3 ' + root + \
         '/plugins/mysql/index.py do_full_sync {"db":"all"}'
     return mw.returnJson(True, 'ok', cmd)
 
