@@ -1656,10 +1656,6 @@ def addMasterRepSlaveUser(version=''):
 
 def getMasterRepSlaveUserCmd(version):
 
-    version_pl = getServerDir() + "/version.pl"
-    if os.path.exists(version_pl):
-        version = mw.readFile(version_pl).strip()
-
     args = getArgs()
     data = checkArgs(args, ['username', 'db'])
     if not data[0]:
@@ -1681,8 +1677,8 @@ def getMasterRepSlaveUserCmd(version):
 
     ip = mw.getLocalIp()
     port = getMyPort()
-
     db = pMysqlDb()
+
     mstatus = db.query('show master status')
     if len(mstatus) == 0:
         return mw.returnJson(False, '未开启!')
@@ -1915,14 +1911,17 @@ def initSlaveStatus(version=''):
 
 
 def setSlaveStatus(version=''):
+
     db = pMysqlDb()
     dlist = db.query('show slave status')
     if len(dlist) == 0:
-        return mw.returnJson(False, '需要手动添加主服务同步命令或者执行[初始化]!')
+        return mw.returnJson(False, '需要手动添加主服务命令或者执行[初始化]!')
 
     if len(dlist) > 0 and (dlist[0]["Slave_IO_Running"] == 'Yes' or dlist[0]["Slave_SQL_Running"] == 'Yes'):
         db.query('stop slave')
     else:
+
+        print(dlist[0])
         db.query('start slave')
 
     return mw.returnJson(True, '设置成功!')
@@ -1957,17 +1956,6 @@ def dumpMysqlData(version):
     if ret[0] == '':
         return 'ok'
     return 'fail'
-
-
-from threading import Thread
-from time import sleep
-
-
-def mw_async(f):
-    def wrapper(*args, **kwargs):
-        thr = Thread(target=f, args=args, kwargs=kwargs)
-        thr.start()
-    return wrapper
 
 
 ############### --- 重要 同步---- ###########
@@ -2147,8 +2135,9 @@ if __name__ == "__main__":
     func = sys.argv[1]
 
     version = "5.6"
-    if (len(sys.argv) > 2):
-        version = sys.argv[2]
+    version_pl = getServerDir() + "/version.pl"
+    if os.path.exists(version_pl):
+        version = mw.readFile(version_pl).strip()
 
     if func == 'status':
         print(status(version))
