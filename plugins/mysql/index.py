@@ -1880,23 +1880,27 @@ def initSlaveStatus(version=''):
     master_port = int(data[0]['port'])
     mw.writeFile(SSH_PRIVATE_KEY, data[0]['id_rsa'].replace('\\n', '\n'))
 
+    import paramiko
+    paramiko.util.log_to_file('paramiko.log')
+    ssh = paramiko.SSHClient()
+
     try:
-        import paramiko
-        paramiko.util.log_to_file('paramiko.log')
-        ssh = paramiko.SSHClient()
+
         mw.execShell("chmod 600 " + SSH_PRIVATE_KEY)
         key = paramiko.RSAKey.from_private_key_file(SSH_PRIVATE_KEY)
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(hostname=ip, port=master_port,
-                    username='root', pkey=key)
+        ssh.connect(hostname=ip, port=master_port, username='root', pkey=key)
 
-        cmd = 'cd /www/server/mdserver-web && \
-            python3 /www/server/mdserver-web/plugins/mysql/index.py get_master_rep_slave_user_cmd {"username":"","db":""}'
+        cmd = 'cd /www/server/mdserver-web && python3 plugins/mysql/index.py get_master_rep_slave_user_cmd {"username":"","db":""}'
         stdin, stdout, stderr = ssh.exec_command(cmd)
         result = stdout.read()
         # result_err = stderr.read()
+
         result = result.decode('utf-8')
         cmd_data = json.loads(result)
+
+        if not cmd_data['status']:
+            return mw.returnJson(False, '[主]:' + cmd_data['msg'])
 
         db.query('stop slave')
         db.query(cmd_data['data'])
@@ -1904,10 +1908,10 @@ def initSlaveStatus(version=''):
     except Exception as e:
         return mw.returnJson(False, 'SSH认证配置连接失败!' + str(e))
 
-    time.sleep(0.5)
     ssh.close()
+    time.sleep(1)
     os.system("rm -rf " + SSH_PRIVATE_KEY)
-    return mw.returnJson(True, '设置成功!')
+    return mw.returnJson(True, '初始化成功!')
 
 
 def setSlaveStatus(version=''):
