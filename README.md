@@ -90,7 +90,7 @@ curl -fsSL  https://gitee.com/midoks/mdserver-web/raw/master/scripts/update_cn.s
 
 
 
-### 通用安装
+### 通用软件安装
 
 ```
 curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/quick/app.sh | bash
