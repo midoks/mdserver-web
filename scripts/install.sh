@@ -58,6 +58,12 @@ if [ $OSNAME != "macos" ];then
 	mkdir -p /www/backup/database
 	mkdir -p /www/backup/site
 
+
+	# cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
+	# if [ ! -z "$cn" ];then
+
+	# fi
+
 	if [ ! -d /www/server/mdserver-web ];then
 		wget -O /tmp/master.zip https://codeload.github.com/midoks/mdserver-web/zip/master
 		cd /tmp && unzip /tmp/master.zip

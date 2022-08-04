@@ -1844,8 +1844,8 @@ function masterOrSlaveConf(version=''){
             var limitCon = '\
                 <p class="conf_p">\
                     <span class="f14 c6 mr20">主从同步模式</span><span class="f14 c6 mr20"></span>\
-                    <button class="btn '+(!(rdata.mode == "classic") ? 'btn-danger' : 'btn-success')+' btn-xs btn-classic">经典</button>\
-                    <button class="btn '+(!(rdata.mode == "gtid") ? 'btn-danger' : 'btn-success')+' btn-xs btn-gtid">GTID</button>\
+                    <button class="btn '+(!(rdata.mode == "classic") ? 'btn-danger' : 'btn-success')+' btn-xs db-mode btn-classic">经典</button>\
+                    <button class="btn '+(!(rdata.mode == "gtid") ? 'btn-danger' : 'btn-success')+' btn-xs db-mode btn-gtid">GTID</button>\
                 </p>\
                 <hr/>\
                 <p class="conf_p">\
@@ -1889,6 +1889,44 @@ function masterOrSlaveConf(version=''){
                     setTimeout(function(){
                         getMasterStatus();
                     }, 3000);
+                });
+            });
+
+            $('.db-mode').click(function(){
+                if ($(this).hasClass('btn-success')){
+                    //no action
+                    return;
+                }
+
+                var mode = 'classic';
+                if ($(this).hasClass('btn-gtid')){
+                    mode = 'gtid';
+                }
+
+                layer.open({
+                    type:1,
+                    title:"MySQL主从模式切换",
+                    shadeClose:false,
+                    btnAlign: 'c',
+                    btn: ['切换并重启', '切换不重启'],
+                    yes: function(index, layero){
+                        this.change(index,mode,"yes");
+
+                    },
+                    btn2: function(index, layero){
+                        this.change(index,mode,"no");
+                        return false;
+                    },
+                    change:function(index,mode,reload){
+                        console.log(index,mode,reload);
+                        myPost('set_dbrun_mode',{'mode':mode,'reload':reload},function(data){
+                            layer.close(index);
+                            var rdata = $.parseJSON(data.data);
+                            showMsg(rdata.msg ,function(){
+                                getMasterStatus();
+                            },{ icon: rdata.status ? 1 : 5 },2000);
+                        });
+                    }
                 });
             });
 

@@ -1402,6 +1402,29 @@ def getDbrunMode(version=''):
     return mw.returnJson(True, "ok", {'mode': mode})
 
 
+def setDbrunMode(version=''):
+    args = getArgs()
+    data = checkArgs(args, ['mode', 'reload'])
+    if not data[0]:
+        return data[1]
+
+    mode = args['mode']
+    dbreload = args['reload']
+
+    if not mode in ['classic', 'gtid']:
+        return mw.returnJson(False, "mode的值无效:" + mode)
+
+    origin_mode = recognizeDbMode()
+    path = getConf()
+    con = mw.readFile(path)
+    rep = r"!include %s/%s\.cnf" % (getServerDir() + "/etc/mode", origin_mode)
+    rep_after = "!include %s/%s.cnf" % (getServerDir() + "/etc/mode", mode)
+    con = re.sub(rep, rep_after, con)
+    mw.writeFile(path, con)
+
+    return mw.returnJson(True, "切换成功!")
+
+
 def findBinlogDoDb():
     conf = getConf()
     con = mw.readFile(conf)
@@ -2258,6 +2281,8 @@ if __name__ == "__main__":
         print(getTotalStatistics())
     elif func == 'get_dbrun_mode':
         print(getDbrunMode(version))
+    elif func == 'set_dbrun_mode':
+        print(setDbrunMode(version))
     elif func == 'get_masterdb_list':
         print(getMasterDbList(version))
     elif func == 'get_master_status':
