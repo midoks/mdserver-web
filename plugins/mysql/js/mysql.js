@@ -1839,11 +1839,13 @@ function masterOrSlaveConf(version=''){
     function getMasterStatus(){
         myPost('get_master_status', '', function(data){
             var rdata = $.parseJSON(data.data);
+            // console.log('mode:',rdata.data);
+            var rdata = rdata.data;
             var limitCon = '\
                 <p class="conf_p">\
-                    <span class="f14 c6 mr20">运行模式</span><span class="f14 c6 mr20"></span>\
-                    <button class="btn '+(!rdata.status ? 'btn-danger' : 'btn-success')+' btn-xs">经典</button>\
-                    <button class="btn '+(!rdata.status ? 'btn-danger' : 'btn-success')+' btn-xs">GTID</button>\
+                    <span class="f14 c6 mr20">主从同步模式</span><span class="f14 c6 mr20"></span>\
+                    <button class="btn '+(!(rdata.mode == "classic") ? 'btn-danger' : 'btn-success')+' btn-xs btn-classic">经典</button>\
+                    <button class="btn '+(!(rdata.mode == "gtid") ? 'btn-danger' : 'btn-success')+' btn-xs btn-gtid">GTID</button>\
                 </p>\
                 <hr/>\
                 <p class="conf_p">\
@@ -1857,7 +1859,7 @@ function masterOrSlaveConf(version=''){
                 <!-- class="conf_p" -->\
                 <p class="conf_p">\
                     <span class="f14 c6 mr20">Slave[从]配置</span><span class="f14 c6 mr20"></span>\
-                    <button class="btn '+(!rdata.data.slave_status ? 'btn-danger' : 'btn-success')+' btn-xs btn-slave">'+(!rdata.data.slave_status ? '未启动' : '已启动') +'</button>\
+                    <button class="btn '+(!rdata.slave_status ? 'btn-danger' : 'btn-success')+' btn-xs btn-slave">'+(!rdata.slave_status ? '未启动' : '已启动') +'</button>\
                     <button class="btn btn-success btn-xs" onclick="getSlaveSSHList()" >[主]SSH配置</button>\
                     <button class="btn btn-success btn-xs" onclick="initSlaveStatus()" >初始化</button>\
                 </p>\
@@ -1894,7 +1896,7 @@ function masterOrSlaveConf(version=''){
                 getMasterDbList();
             }
             
-            if (rdata.data.slave_status){
+            if (rdata.slave_status){
                 getAsyncMasterDbList();
                 getAsyncDataList()
             }

@@ -101,15 +101,9 @@ def getInitdTpl(version=''):
 
 def contentReplace(content):
     service_path = mw.getServerDir()
-    if content.find('{$ROOT_PATH}') != -1:
-        content = content.replace('{$ROOT_PATH}', mw.getRootDir())
-
-    if content.find('{$SERVER_PATH}') != -1:
-        content = content.replace('{$SERVER_PATH}', service_path)
-
-    if content.find('{$SERVER_APP_PATH}') != -1:
-        content = content.replace(
-            '{$SERVER_APP_PATH}', service_path + '/mysql')
+    content = content.replace('{$ROOT_PATH}', mw.getRootDir())
+    content = content.replace('{$SERVER_PATH}', service_path)
+    content = content.replace('{$SERVER_APP_PATH}', service_path + '/mysql')
     return content
 
 
@@ -161,55 +155,74 @@ def makeInitRsaKey(version=''):
         if not mw.isAppleSystem():
             mw.execShell('cd ' + datadir + ' && chmod 400 mysql.pem')
             mw.execShell('cd ' + datadir + ' && chmod 444 mysql.pub')
-
             mw.execShell('cd ' + datadir + ' && chown mysql:mysql mysql.pem')
             mw.execShell('cd ' + datadir + ' && chown mysql:mysql mysql.pub')
 
 
 def initDreplace(version=''):
-    initd_tpl = getInitdTpl(version)
+    conf_dir = getServerDir() + '/etc'
+    mode_dir = conf_dir + '/mode'
 
-    initD_path = getServerDir() + '/init.d'
-    if not os.path.exists(initD_path):
-        os.mkdir(initD_path)
+    conf_list = [
+        conf_dir,
+        mode_dir,
+    ]
+    for conf in conf_list:
+        if not os.path.exists(conf):
+            os.mkdir(conf)
 
-    file_bin = initD_path + '/' + getPluginName()
+    tmp_dir = getServerDir() + '/tmp'
+    if not os.path.exists(tmp_dir):
+        os.mkdir(tmp_dir)
+        mw.execShell("chown -R mysql:mysql " + tmp_dir)
+        mw.execShell("chmod 750 " + tmp_dir)
+
+    my_conf = conf_dir + '/my.cnf'
+    if not os.path.exists(my_conf):
+        tpl = getPluginDir() + '/conf/my' + version + '.cnf'
+        content = mw.readFile(tpl)
+        content = contentReplace(content)
+        mw.writeFile(my_conf, content)
+
+    classic_conf = mode_dir + '/classic.cnf'
+    if not os.path.exists(classic_conf):
+        tpl = getPluginDir() + '/conf/classic.cnf'
+        content = mw.readFile(tpl)
+        content = contentReplace(content)
+        mw.writeFile(classic_conf, content)
+
+    gtid_conf = mode_dir + '/gtid.cnf'
+    if not os.path.exists(gtid_conf):
+        tpl = getPluginDir() + '/conf/gtid.cnf'
+        content = mw.readFile(tpl)
+        content = contentReplace(content)
+        mw.writeFile(gtid_conf, content)
+
+    # systemd
+    system_dir = mw.systemdCfgDir()
+    service = system_dir + '/mysql.service'
+    if os.path.exists(system_dir) and not os.path.exists(service):
+        tpl = getPluginDir() + '/init.d/mysql.service.tpl'
+        service_path = mw.getServerDir()
+        content = mw.readFile(tpl)
+        content = content.replace('{$SERVER_PATH}', service_path)
+        mw.writeFile(service, content)
+        mw.execShell('systemctl daemon-reload')
+
+    if not mw.isAppleSystem():
+        mw.execShell('chown -R mysql mysql ' + getServerDir())
+
+    initd_path = getServerDir() + '/init.d'
+    if not os.path.exists(initd_path):
+        os.mkdir(initd_path)
+
+    file_bin = initd_path + '/' + getPluginName()
     if not os.path.exists(file_bin):
+        initd_tpl = getInitdTpl(version)
         content = mw.readFile(initd_tpl)
         content = contentReplace(content)
         mw.writeFile(file_bin, content)
         mw.execShell('chmod +x ' + file_bin)
-
-    mysql_conf_dir = getServerDir() + '/etc'
-    if not os.path.exists(mysql_conf_dir):
-        os.mkdir(mysql_conf_dir)
-
-    mysql_tmp = getServerDir() + '/tmp'
-    if not os.path.exists(mysql_tmp):
-        os.mkdir(mysql_tmp)
-        mw.execShell("chown -R mysql:mysql " + mysql_tmp)
-        mw.execShell("chmod 750 " + mysql_tmp)
-
-    mysql_conf = mysql_conf_dir + '/my.cnf'
-    if not os.path.exists(mysql_conf):
-        mysql_conf_tpl = getPluginDir() + '/conf/my' + version + '.cnf'
-        content = mw.readFile(mysql_conf_tpl)
-        content = contentReplace(content)
-        mw.writeFile(mysql_conf, content)
-
-    # systemd
-    systemDir = mw.systemdCfgDir()
-    systemService = systemDir + '/mysql.service'
-    systemServiceTpl = getPluginDir() + '/init.d/mysql.service.tpl'
-    if os.path.exists(systemDir) and not os.path.exists(systemService):
-        service_path = mw.getServerDir()
-        se_content = mw.readFile(systemServiceTpl)
-        se_content = se_content.replace('{$SERVER_PATH}', service_path)
-        mw.writeFile(systemService, se_content)
-        mw.execShell('systemctl daemon-reload')
-
-    if mw.getOs() != 'darwin':
-        mw.execShell('chown -R mysql mysql ' + getServerDir())
     return file_bin
 
 
@@ -1371,6 +1384,24 @@ def getTotalStatistics():
         return mw.returnJson(False, 'fail', data)
 
 
+def recognizeDbMode():
+    conf = getConf()
+    con = mw.readFile(conf)
+    rep = r"!include %s/(.*)?\.cnf" % (getServerDir() + "/etc/mode",)
+    mode = 'none'
+    try:
+        data = re.findall(rep, con, re.M)
+        mode = data[0]
+    except Exception as e:
+        pass
+    return mode
+
+
+def getDbrunMode(version=''):
+    mode = recognizeDbMode()
+    return mw.returnJson(True, "ok", {'mode': mode})
+
+
 def findBinlogDoDb():
     conf = getConf()
     con = mw.readFile(conf)
@@ -1506,13 +1537,15 @@ def getMasterStatus(version=''):
         return mw.returnJson(False, 'MySQL未启动,或正在启动中...!', [])
 
     conf = getConf()
-    con = mw.readFile(conf)
+    content = mw.readFile(conf)
     master_status = False
-    if con.find('#log-bin') == -1 and con.find('log-bin') > 1:
+    if content.find('#log-bin') == -1 and content.find('log-bin') > 1:
         dodb = findBinlogDoDb()
         if len(dodb) > 0:
             master_status = True
+
     data = {}
+    data['mode'] = recognizeDbMode()
     data['status'] = master_status
 
     db = pMysqlDb()
@@ -2223,6 +2256,8 @@ if __name__ == "__main__":
         print(alterTable())
     elif func == 'get_total_statistics':
         print(getTotalStatistics())
+    elif func == 'get_dbrun_mode':
+        print(getDbrunMode(version))
     elif func == 'get_masterdb_list':
         print(getMasterDbList(version))
     elif func == 'get_master_status':
