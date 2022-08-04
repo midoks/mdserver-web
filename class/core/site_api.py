@@ -727,8 +727,8 @@ class site_api:
         file = self.getHostConf(siteName)
         conf = mw.readFile(file)
         if conf:
-            # if conf.find('ssl_certificate') == -1:
-            #     return mw.returnJson(False, '当前未开启SSL')
+            if conf.find('ssl_certificate') == -1:
+                return mw.returnJson(False, '当前未开启SSL')
             to = """#error_page 404/404.html;
     # HTTP_TO_HTTPS_START
     if ($server_port !~ 443){
