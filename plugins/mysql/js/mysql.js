@@ -1924,7 +1924,7 @@ function masterOrSlaveConf(version=''){
                             var rdata = $.parseJSON(data.data);
                             showMsg(rdata.msg ,function(){
                                 getMasterStatus();
-                            },{ icon: rdata.status ? 1 : 5 },2000);
+                            },{ icon: rdata.status ? 1 : 5 });
                         });
                     }
                 });
