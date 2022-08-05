@@ -1793,6 +1793,7 @@ def getMasterRepSlaveUserCmd(version):
     data = {}
     data['cmd'] = sql
     data["info"] = clist[0]
+    data['mode'] = getDbrunMode()
 
     return mw.returnJson(True, 'ok!', data)
 
@@ -1994,6 +1995,10 @@ def initSlaveStatus(version=''):
         if not cmd_data['status']:
             return mw.returnJson(False, '[主]:' + cmd_data['msg'])
 
+        local_mode = getDbrunMode()
+        if local_mode != cmd_data['data']['mode']:
+            return mw.returnJson(False, '主【{}】从【{}】,不一致!'.format(cmd_data['data']['mode'], local_mode))
+
         u = cmd_data['data']['info']
         ps = u['username'] + "|" + u['password']
         conn.where('ip=?', (ip,)).setField('ps', ps)
@@ -2162,8 +2167,9 @@ def doFullSync(version=''):
     pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
     root_dir = getServerDir()
     msock = root_dir + "/mysql.sock"
+    mw.execShell("cd /tmp && gzip -d dump.sql.gz")
     cmd = root_dir + "/bin/mysql -S " + msock + \
-        " -uroot -p" + pwd + " < /tmp/dump.sql.gz"
+        " -uroot -p" + pwd + " < /tmp/dump.sql"
     import_data = mw.execShell(cmd)
     if import_data[0] == '':
         print(import_data[1])
@@ -2178,7 +2184,7 @@ def doFullSync(version=''):
     writeDbSyncStatus({'code': 6, 'msg': '从库重启完成...', 'progress': 100})
 
     os.system("rm -rf " + SSH_PRIVATE_KEY)
-    os.system("rm -rf /tmp/dump.sql.gz")
+    os.system("rm -rf /tmp/dump.sql")
     return True
 
 
