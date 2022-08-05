@@ -26,3 +26,19 @@ CREATE TABLE IF NOT EXISTS `master_replication_user` (
 );
 
 
+-- 从库配置主库的[ssh private key]
+-- drop table `slave_id_rsa`;
+CREATE TABLE IF NOT EXISTS `slave_id_rsa` (
+  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+  `ip` TEXT,
+  `port` TEXT,
+  `user` TEXT,
+  `db_user` TEXT,
+  `id_rsa` TEXT,
+  `ps` TEXT,
+  `addtime` TEXT
+);
+
+
+
+

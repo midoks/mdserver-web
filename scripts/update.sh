@@ -46,7 +46,10 @@ else
 	OSNAME='unknow'
 fi
 
+
 wget -O /tmp/master.zip https://codeload.github.com/midoks/mdserver-web/zip/master
+
+
 cd /tmp && unzip /tmp/master.zip
 /usr/bin/cp -rf  /tmp/mdserver-web-master/* /www/server/mdserver-web
 rm -rf /tmp/master.zip
