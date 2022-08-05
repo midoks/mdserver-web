@@ -63,6 +63,11 @@ Install_app()
 		 cd ${mariadbDir} && tar -zxvf  ${mariadbDir}/mariadb-${MY_VER}.tar.gz
 	fi
 	
+	OPTIONS=''
+	if [ "$sysName" == "Darwin" ];then
+		OPTIONS='-DPLUGIN_TOKUDB=NO'
+	fi
+	
 
 	if [ ! -d $serverPath/mariadb ];then
 		cd ${mariadbDir}/mariadb-${MY_VER} && cmake \
@@ -75,6 +80,7 @@ Install_app()
 		-DWITH_MEMORY_STORAGE_ENGINE=1 \
 		-DENABLED_LOCAL_INFILE=1 \
 		-DWITH_PARTITION_STORAGE_ENGINE=1 \
+		$OPTIONS \
 		-DEXTRA_CHARSETS=all \
 		-DDEFAULT_CHARSET=utf8mb4 \
 		-DDEFAULT_COLLATION=utf8mb4_general_ci \
