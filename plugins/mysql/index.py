@@ -1428,22 +1428,25 @@ def setDbrunMode(version=''):
 
     db = pMysqlDb()
 
-    # The value of @@GLOBAL.GTID_MODE can only be changed one step at a
-    # time: OFF <-> OFF_PERMISSIVE <-> ON_PERMISSIVE <-> ON. Also note that
-    # this value must be stepped up or down simultaneously on all servers.
-    # See the Manual for instructions.
-    if mode == 'classic':
-        db.query('set global enforce_gtid_consistency=off')
-        db.query('set global gtid_mode=on')
-        db.query('set global gtid_mode=on_permissive')
-        db.query('set global gtid_mode=off_permissive')
-        db.query('set global gtid_mode=off')
-    elif mode == 'gtid':
-        db.query('set global enforce_gtid_consistency=on')
-        db.query('set global gtid_mode=off')
-        db.query('set global gtid_mode=off_permissive')
-        db.query('set global gtid_mode=on_permissive')
-        db.query('set global gtid_mode=on')
+    if version == '5.6':
+        dbreload = 'yes'
+    else:
+        # The value of @@GLOBAL.GTID_MODE can only be changed one step at a
+        # time: OFF <-> OFF_PERMISSIVE <-> ON_PERMISSIVE <-> ON. Also note that
+        # this value must be stepped up or down simultaneously on all servers.
+        # See the Manual for instructions.
+        if mode == 'classic':
+            db.query('set global enforce_gtid_consistency=off')
+            db.query('set global gtid_mode=on')
+            db.query('set global gtid_mode=on_permissive')
+            db.query('set global gtid_mode=off_permissive')
+            db.query('set global gtid_mode=off')
+        elif mode == 'gtid':
+            db.query('set global enforce_gtid_consistency=on')
+            db.query('set global gtid_mode=off')
+            db.query('set global gtid_mode=off_permissive')
+            db.query('set global gtid_mode=on_permissive')
+            db.query('set global gtid_mode=on')
 
     if dbreload == "yes":
         restart(version)
