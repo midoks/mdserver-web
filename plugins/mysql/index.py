@@ -100,10 +100,17 @@ def getInitdTpl(version=''):
 
 
 def contentReplace(content):
+
     service_path = mw.getServerDir()
     content = content.replace('{$ROOT_PATH}', mw.getRootDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$SERVER_APP_PATH}', service_path + '/mysql')
+    content = content.replace('{$SERVER_ID}', mw.getUniqueId())
+
+    if mw.isAppleSystem():
+        content = content.replace(
+            'lower_case_table_names=0', 'lower_case_table_names=2')
+
     return content
 
 
@@ -227,6 +234,10 @@ def initDreplace(version=''):
 
 
 def status(version=''):
+    path = getConf()
+    if not os.path.exists(path):
+        return 'stop'
+
     pid = getPidFile()
     if not os.path.exists(pid):
         return 'stop'
@@ -1403,7 +1414,6 @@ def getDbrunMode(version=''):
 
 
 def setDbrunMode(version=''):
-
     if version == '5.5':
         return mw.returnJson(False, "不支持切换")
 
@@ -1426,11 +1436,10 @@ def setDbrunMode(version=''):
     con = re.sub(rep, rep_after, con)
     mw.writeFile(path, con)
 
-    db = pMysqlDb()
-
     if version == '5.6':
         dbreload = 'yes'
     else:
+        db = pMysqlDb()
         # The value of @@GLOBAL.GTID_MODE can only be changed one step at a
         # time: OFF <-> OFF_PERMISSIVE <-> ON_PERMISSIVE <-> ON. Also note that
         # this value must be stepped up or down simultaneously on all servers.
@@ -2027,25 +2036,25 @@ def deleteSlave(version=''):
     return mw.returnJson(True, '删除成功!')
 
 
-def dumpMysqlData(version):
-
+def dumpMysqlData(version=''):
     args = getArgs()
     data = checkArgs(args, ['db'])
     if not data[0]:
         return data[1]
 
     pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
-    if args['db'] == 'all' or args['db'] == 'ALL':
+    mysql_dir = getServerDir()
+    myconf = mysql_dir + "/etc/my.cnf"
+    if args['db'].lower() == 'all':
         dlist = findBinlogDoDb()
-        cmd = getServerDir() + "/bin/mysqldump -uroot -p" + \
-            pwd + " --databases " + ' '.join(dlist) + \
-            " > /tmp/dump.sql"
+        cmd = mysql_dir + "/bin/mysqldump --defaults-file=" + myconf + " -uroot -p" + \
+            pwd + " --databases " + \
+            ' '.join(dlist) + " > gzip > /tmp/dump.sql.gz"
     else:
-        cmd = getServerDir() + "/bin/mysqldump -uroot -p" + pwd + \
-            " --databases " + args['db'] + " > /tmp/dump.sql"
+        cmd = mysql_dir + "/bin/mysqldump --defaults-file=" + myconf + " -uroot -p" + \
+            pwd + " --databases " + args['db'] + " | gzip > /tmp/dump.sql.gz"
 
     ret = mw.execShell(cmd)
-
     if ret[0] == '':
         return 'ok'
     return 'fail'
@@ -2127,7 +2136,7 @@ def doFullSync(version=''):
 
     print("同步文件", "start")
     cmd = 'scp -P' + str(master_port) + ' -i ' + SSH_PRIVATE_KEY + \
-        ' root@' + ip + ':/tmp/dump.sql /tmp'
+        ' root@' + ip + ':/tmp/dump.sql.gz /tmp'
     r = mw.execShell(cmd)
     print("同步文件", "end")
     if r[0] == '':
@@ -2154,7 +2163,7 @@ def doFullSync(version=''):
     root_dir = getServerDir()
     msock = root_dir + "/mysql.sock"
     cmd = root_dir + "/bin/mysql -S " + msock + \
-        " -uroot -p" + pwd + " < /tmp/dump.sql"
+        " -uroot -p" + pwd + " < /tmp/dump.sql.gz"
     import_data = mw.execShell(cmd)
     if import_data[0] == '':
         print(import_data[1])

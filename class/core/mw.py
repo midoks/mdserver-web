@@ -261,6 +261,17 @@ def getRandomString(length):
     return str
 
 
+def getUniqueId():
+    """
+    根据时间生成唯一ID
+    :return:
+    """
+    current_time = datetime.datetime.now()
+    str_time = current_time.strftime('%Y%m%d%H%M%S%f')[:-3]
+    unique_id = "{0}".format(str_time)
+    return unique_id
+
+
 def getJson(data):
     import json
     return json.dumps(data)

@@ -19,6 +19,8 @@ socket		= {$SERVER_APP_PATH}/mysql.sock
 basedir = {$SERVER_APP_PATH}
 datadir = {$SERVER_APP_PATH}/data
 log-error =  {$SERVER_APP_PATH}/data/error.log
+server-id	= 1
+server-id	= {$SERVER_ID}
 
 default_storage_engine = InnoDB
 
@@ -47,7 +49,6 @@ skip_name_resolve = 1
 
 log-bin=mysql-bin
 binlog_format=mixed
-server-id	= 1
 slow_query_log=1
 slow-query-log-file={$SERVER_APP_PATH}/data/mysql-slow.log
 long_query_time=10
