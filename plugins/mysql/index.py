@@ -1793,7 +1793,7 @@ def getMasterRepSlaveUserCmd(version):
     data = {}
     data['cmd'] = sql
     data["info"] = clist[0]
-    data['mode'] = getDbrunMode()
+    data['mode'] = recognizeDbMode()
 
     return mw.returnJson(True, 'ok!', data)
 
@@ -1995,7 +1995,7 @@ def initSlaveStatus(version=''):
         if not cmd_data['status']:
             return mw.returnJson(False, '[主]:' + cmd_data['msg'])
 
-        local_mode = getDbrunMode()
+        local_mode = recognizeDbMode()
         if local_mode != cmd_data['data']['mode']:
             return mw.returnJson(False, '主【{}】从【{}】,不一致!'.format(cmd_data['data']['mode'], local_mode))
 
