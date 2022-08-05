@@ -2186,7 +2186,8 @@ def doFullSync(version=''):
     if result.strip() == 'ok':
         writeDbSyncStatus({'code': 1, 'msg': '主服务器备份完成...', 'progress': 30})
     else:
-        writeDbSyncStatus({'code': 1, 'msg': '主服务器备份失败...', 'progress': 100})
+        writeDbSyncStatus(
+            {'code': 1, 'msg': '主服务器备份失败...:' + str(result), 'progress': 100})
         return 'fail'
 
     print("同步文件", "start")
