@@ -540,8 +540,9 @@ function setDbAccess(username){
             title: '设置数据库权限',
             closeBtn: 1,
             shift: 5,
+            btn:["提交","取消"],
             shadeClose: true,
-            content: "<form class='bt-form pd20 pb70' id='set_db_access'>\
+            content: "<form class='bt-form pd20' id='set_db_access'>\
                         <div class='line'>\
                             <span class='tname'>访问权限</span>\
                             <div class='info-r '>\
@@ -552,65 +553,53 @@ function setDbAccess(username){
                                 </select>\
                             </div>\
                         </div>\
-                        <div class='bt-form-submit-btn'>\
-                            <button id='my_mod_close' type='button' class='btn btn-danger btn-sm btn-title'>关闭</button>\
-                            <button id='my_mod_save' type='button' class='btn btn-success btn-sm btn-title'>提交</button>\
-                        </div>\
                       </form>",
-        });
-
-        layer.ready(function(){
-            if (rdata.msg == '127.0.0.1'){
-                $('select[name="dataAccess"]').find("option[value='127.0.0.1']").attr("selected",true);
-            } else if (rdata.msg == '%'){
-                $('select[name="dataAccess"]').find('option[value="%"]').attr("selected",true);
-            } else if ( rdata.msg == 'ip' ){
-                $('select[name="dataAccess"]').find('option[value="ip"]').attr("selected",true);
-                $('select[name="dataAccess"]').after("<input id='dataAccess_subid' class='bt-input-text mr5' type='text' name='address' placeholder='多个IP使用逗号(,)分隔' style='width: 230px; display: inline-block;'>");
-            } else {
-                $('select[name="dataAccess"]').find('option[value="ip"]').attr("selected",true);
-                $('select[name="dataAccess"]').after("<input value='"+rdata.msg+"' id='dataAccess_subid' class='bt-input-text mr5' type='text' name='address' placeholder='多个IP使用逗号(,)分隔' style='width: 230px; display: inline-block;'>");
-            }
-        });
-
-        $('#my_mod_close').click(function(){
-            $('.layui-layer-close1').click();
-        });
-
-
-        $('select[name="dataAccess"]').change(function(){
-            var v = $(this).val();
-            if (v == 'ip'){
-                $(this).after("<input id='dataAccess_subid' class='bt-input-text mr5' type='text' name='address' placeholder='多个IP使用逗号(,)分隔' style='width: 230px; display: inline-block;'>");
-            } else {
-                $('#dataAccess_subid').remove();
-            }
-        });
-
-        $('#my_mod_save').click(function(){
-            var data = $("#set_db_access").serialize();
-            data = decodeURIComponent(data);
-            var dataObj = str2Obj(data);
-            if(!dataObj['access']){
-                dataObj['access'] = dataObj['dataAccess'];
-                if ( dataObj['dataAccess'] == 'ip'){
-                    if (dataObj['address']==''){
-                        layer.msg('IP地址不能空!',{icon:2,shade: [0.3, '#000']});
-                        return;
-                    }
-                    dataObj['access'] = dataObj['address'];
+            success:function(){
+                if (rdata.msg == '127.0.0.1'){
+                    $('select[name="dataAccess"]').find("option[value='127.0.0.1']").attr("selected",true);
+                } else if (rdata.msg == '%'){
+                    $('select[name="dataAccess"]').find('option[value="%"]').attr("selected",true);
+                } else if ( rdata.msg == 'ip' ){
+                    $('select[name="dataAccess"]').find('option[value="ip"]').attr("selected",true);
+                    $('select[name="dataAccess"]').after("<input id='dataAccess_subid' class='bt-input-text mr5' type='text' name='address' placeholder='多个IP使用逗号(,)分隔' style='width: 230px; display: inline-block;'>");
+                } else {
+                    $('select[name="dataAccess"]').find('option[value="ip"]').attr("selected",true);
+                    $('select[name="dataAccess"]').after("<input value='"+rdata.msg+"' id='dataAccess_subid' class='bt-input-text mr5' type='text' name='address' placeholder='多个IP使用逗号(,)分隔' style='width: 230px; display: inline-block;'>");
                 }
+
+                 $('select[name="dataAccess"]').change(function(){
+                    var v = $(this).val();
+                    if (v == 'ip'){
+                        $(this).after("<input id='dataAccess_subid' class='bt-input-text mr5' type='text' name='address' placeholder='多个IP使用逗号(,)分隔' style='width: 230px; display: inline-block;'>");
+                    } else {
+                        $('#dataAccess_subid').remove();
+                    }
+                });
+            },
+            yes:function(index){
+                var data = $("#set_db_access").serialize();
+                data = decodeURIComponent(data);
+                var dataObj = str2Obj(data);
+                if(!dataObj['access']){
+                    dataObj['access'] = dataObj['dataAccess'];
+                    if ( dataObj['dataAccess'] == 'ip'){
+                        if (dataObj['address']==''){
+                            layer.msg('IP地址不能空!',{icon:2,shade: [0.3, '#000']});
+                            return;
+                        }
+                        dataObj['access'] = dataObj['address'];
+                    }
+                }
+                dataObj['username'] = username;
+                myPost('set_db_access', dataObj, function(data){
+                    var rdata = $.parseJSON(data.data);
+                    showMsg(rdata.msg,function(){
+                        layer.close(index);
+                    },{icon: rdata.status ? 1 : 2});   
+                });
             }
-            dataObj['username'] = username;
-            // console.log(data,dataObj);
-            myPost('set_db_access', dataObj, function(data){
-                var rdata = $.parseJSON(data.data);
-                showMsg(rdata.msg,function(){
-                    dbList();
-                    $('.layui-layer-close1').click();
-                },{icon: rdata.status ? 1 : 2});   
-            });
         });
+
     });
 }
 
@@ -1253,77 +1242,56 @@ function setDbSlave(name){
 
 
 function addMasterRepSlaveUser(){
-
-        
-    var index = layer.open({
+    layer.open({
         type: 1,
-        skin: 'demo-class',
         area: '500px',
         title: '添加同步账户',
         closeBtn: 1,
         shift: 5,
         shadeClose: true,
-        content: "<form class='bt-form pd20 pb70' id='add_master'>\
+        btn:["提交","取消"],
+        content: "<form class='bt-form pd20' id='add_master'>\
             <div class='line'><span class='tname'>用户名</span><div class='info-r'><input name='username' class='bt-input-text mr5' placeholder='用户名' type='text' style='width:330px;' value='"+(randomStrPwd(6))+"'></div></div>\
             <div class='line'>\
             <span class='tname'>密码</span>\
             <div class='info-r'><input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:330px' value='"+(randomStrPwd(16))+"' /><span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatPwd(16)'></span></div>\
             </div>\
             <input type='hidden' name='ps' value='' />\
-            <div class='bt-form-submit-btn'>\
-                <button id='my_mod_close' type='button' class='btn btn-danger btn-sm btn-title'>关闭</button>\
-                <button type='button' class='btn btn-success btn-sm btn-title' id='submit_add_master' >提交</button>\
-            </div>\
           </form>",
-    });
+        success:function(){
+            $("input[name='name']").keyup(function(){
+                var v = $(this).val();
+                $("input[name='db_user']").val(v);
+                $("input[name='ps']").val(v);
+            });
 
-    // <div class='line'>\
-    //             <span class='tname'>访问权限</span>\
-    //             <div class='info-r '>\
-    //                 <select class='bt-input-text mr5' name='dataAccess' style='width:100px'>\
-    //                 <option value='127.0.0.1'>本地服务器</option>\
-    //                 <option value=\"%\">所有人</option>\
-    //                 <option value='ip'>指定IP</option>\
-    //                 </select>\
-    //             </div>\
-    //         </div>\
-
-    $("input[name='name']").keyup(function(){
-        var v = $(this).val();
-        $("input[name='db_user']").val(v);
-        $("input[name='ps']").val(v);
-    });
-
-    $('#my_mod_close').click(function(){
-        $('.layui-layer-close1').click();
-    });
-    $('select[name="dataAccess"]').change(function(){
-        var v = $(this).val();
-        if (v == 'ip'){
-            $(this).after("<input id='dataAccess_subid' class='bt-input-text mr5' type='text' name='address' placeholder='多个IP使用逗号(,)分隔' style='width: 230px; display: inline-block;'>");
-        } else {
-            $('#dataAccess_subid').remove();
-        }
-    });
-
-    $('#submit_add_master').click(function(){
-
-        var data = $("#add_master").serialize();
-        data = decodeURIComponent(data);
-        var dataObj = str2Obj(data);
-        if(!dataObj['address']){
-            dataObj['address'] = dataObj['dataAccess'];
-        }
-        // console.log(dataObj);
-        myPost('add_master_rep_slave_user', dataObj, function(data){
-            var rdata = $.parseJSON(data.data);
-            showMsg(rdata.msg,function(){
-                if (rdata.status){
-                    getMasterRepSlaveList();
+            $('select[name="dataAccess"]').change(function(){
+                var v = $(this).val();
+                if (v == 'ip'){
+                    $(this).after("<input id='dataAccess_subid' class='bt-input-text mr5' type='text' name='address' placeholder='多个IP使用逗号(,)分隔' style='width: 230px; display: inline-block;'>");
+                } else {
+                    $('#dataAccess_subid').remove();
                 }
-                $('.layui-layer-close1').click();
-            },{icon: rdata.status ? 1 : 2},600);
-        });
+            });
+        },
+        yes:function(index){
+            var data = $("#add_master").serialize();
+            data = decodeURIComponent(data);
+            var dataObj = str2Obj(data);
+            if(!dataObj['address']){
+                dataObj['address'] = dataObj['dataAccess'];
+            }
+
+            myPost('add_master_rep_slave_user', dataObj, function(data){
+                var rdata = $.parseJSON(data.data);
+                showMsg(rdata.msg,function(){
+                    layer.close(index);
+                    if (rdata.status){
+                        getMasterRepSlaveList();
+                    }
+                },{icon: rdata.status ? 1 : 2},600);
+            });
+        }
     });
 }
 
@@ -1411,6 +1379,84 @@ function delMasterRepSlaveUser(username){
     });
 }
 
+
+function setDbMasterAccess(username){
+    myPost('get_db_access','username='+username, function(data){
+        var rdata = $.parseJSON(data.data);
+        if (!rdata.status){
+            layer.msg(rdata.msg,{icon:2,shade: [0.3, '#000']});
+            return;
+        }
+        
+        var index = layer.open({
+            type: 1,
+            area: '500px',
+            title: '设置数据库权限',
+            closeBtn: 1,
+            shift: 5,
+            btn:["提交","取消"],
+            shadeClose: true,
+            content: "<form class='bt-form pd20' id='set_db_access'>\
+                        <div class='line'>\
+                            <span class='tname'>访问权限</span>\
+                            <div class='info-r '>\
+                                <select class='bt-input-text mr5' name='dataAccess' style='width:100px'>\
+                                <option value='127.0.0.1'>本地服务器</option>\
+                                <option value=\"%\">所有人</option>\
+                                <option value='ip'>指定IP</option>\
+                                </select>\
+                            </div>\
+                        </div>\
+                      </form>",
+            success:function(){
+                if (rdata.msg == '127.0.0.1'){
+                    $('select[name="dataAccess"]').find("option[value='127.0.0.1']").attr("selected",true);
+                } else if (rdata.msg == '%'){
+                    $('select[name="dataAccess"]').find('option[value="%"]').attr("selected",true);
+                } else if ( rdata.msg == 'ip' ){
+                    $('select[name="dataAccess"]').find('option[value="ip"]').attr("selected",true);
+                    $('select[name="dataAccess"]').after("<input id='dataAccess_subid' class='bt-input-text mr5' type='text' name='address' placeholder='多个IP使用逗号(,)分隔' style='width: 230px; display: inline-block;'>");
+                } else {
+                    $('select[name="dataAccess"]').find('option[value="ip"]').attr("selected",true);
+                    $('select[name="dataAccess"]').after("<input value='"+rdata.msg+"' id='dataAccess_subid' class='bt-input-text mr5' type='text' name='address' placeholder='多个IP使用逗号(,)分隔' style='width: 230px; display: inline-block;'>");
+                }
+
+                 $('select[name="dataAccess"]').change(function(){
+                    var v = $(this).val();
+                    if (v == 'ip'){
+                        $(this).after("<input id='dataAccess_subid' class='bt-input-text mr5' type='text' name='address' placeholder='多个IP使用逗号(,)分隔' style='width: 230px; display: inline-block;'>");
+                    } else {
+                        $('#dataAccess_subid').remove();
+                    }
+                });
+            },
+            yes:function(index){
+                var data = $("#set_db_access").serialize();
+                data = decodeURIComponent(data);
+                var dataObj = str2Obj(data);
+                if(!dataObj['access']){
+                    dataObj['access'] = dataObj['dataAccess'];
+                    if ( dataObj['dataAccess'] == 'ip'){
+                        if (dataObj['address']==''){
+                            layer.msg('IP地址不能空!',{icon:2,shade: [0.3, '#000']});
+                            return;
+                        }
+                        dataObj['access'] = dataObj['address'];
+                    }
+                }
+                dataObj['username'] = username;
+                myPost('set_dbmaster_access', dataObj, function(data){
+                    var rdata = $.parseJSON(data.data);
+                    showMsg(rdata.msg,function(){
+                        layer.close(index);
+                    },{icon: rdata.status ? 1 : 2});   
+                });
+            }
+        });
+
+    });
+}
+
 function getMasterRepSlaveList(){
     var _data = {};
     if (typeof(page) =='undefined'){
@@ -1438,30 +1484,37 @@ function getMasterRepSlaveList(){
                 <td>\
                     <a class="btlink" onclick="updateMasterRepSlaveUser(\''+name+'\');">修改</a> | \
                     <a class="btlink" onclick="delMasterRepSlaveUser(\''+name+'\');">删除</a> | \
+                    <a class="btlink" onclick="setDbMasterAccess(\''+name+'\');">权限</a> | \
                     <a class="btlink" onclick="getMasterRepSlaveUserCmd(\''+name+'\');">从库同步命令</a>\
                 </td>\
             </tr>';
         }
 
-        var page = '<div class="dataTables_paginate_4 dataTables_paginate paging_bootstrap page" style="margin-top:0px;"></div>';
+        $('#get_master_rep_slave_list_page tbody').html(list);
+        $('.dataTables_paginate_4').html(rdata['page']);
+    });
+}
+
+function getMasterRepSlaveListPage(){
+    var page = '<div class="dataTables_paginate_4 dataTables_paginate paging_bootstrap page" style="margin-top:0px;"></div>';
         page += '<div class="table_toolbar" style="left:0px;"><span class="sync btn btn-default btn-sm" onclick="addMasterRepSlaveUser()" title="">添加同步账户</span></div>';
 
-        var loadOpen = layer.open({
-            type: 1,
-            title: '同步账户列表',
-            area: '500px',
-            content:"<div class='bt-form pd20 c6'>\
-                     <div class='divtable mtb10'>\
-                        <div><table class='table table-hover'>\
-                            <thead><tr><th>用户名</th><th>密码</th><th>操作</th></tr></thead>\
-                            <tbody>" + list + "</tbody>\
-                        </table></div>\
-                        "+page +"\
-                    </div>\
-                </div>"
-        });
-
-        $('.dataTables_paginate_4').html(rdata['page']);
+    var loadOpen = layer.open({
+        type: 1,
+        title: '同步账户列表',
+        area: '500px',
+        content:"<div class='bt-form pd20 c6'>\
+                 <div class='divtable mtb10' id='get_master_rep_slave_list_page'>\
+                    <div><table class='table table-hover'>\
+                        <thead><tr><th>用户名</th><th>密码</th><th>操作</th></tr></thead>\
+                        <tbody></tbody>\
+                    </table></div>\
+                    "+page +"\
+                </div>\
+            </div>",
+        success:function(){
+            getMasterRepSlaveList();
+        }
     });
 }
 
@@ -1537,16 +1590,18 @@ function addSlaveSSH(ip=''){
         var ip = '127.0.0.1';
         var port = "22";
         var id_rsa = '';
+        var db_user ='';
 
         if (rdata.data.length>0){
             ip = rdata.data[0]['ip'];
             port = rdata.data[0]['port'];
             id_rsa = rdata.data[0]['id_rsa'];
+            db_user = rdata.data[0]['db_user'];
         }
 
         var index = layer.open({
             type: 1,
-            area: ['500px','450px'],
+            area: ['500px','480px'],
             title: '添加SSH',
             closeBtn: 1,
             shift: 5,
@@ -1554,7 +1609,8 @@ function addSlaveSSH(ip=''){
             btn:["确认","取消"],
             content: "<form class='bt-form pd20'>\
                 <div class='line'><span class='tname'>IP</span><div class='info-r'><input name='ip' class='bt-input-text mr5' type='text' style='width:330px;' value='"+ip+"'></div></div>\
-                <div class='line'><span class='tname'>端口</span><div class='info-r'><input name='port' class='bt-input-text mr5' type='text' style='width:330px;' value='"+port+"'></div></div>\
+                <div class='line'><span class='tname'>端口</span><div class='info-r'><input name='port' class='bt-input-text mr5' type='number' style='width:330px;' value='"+port+"'></div></div>\
+                <div class='line'><span class='tname'>同步账户[DB]</span><div class='info-r'><input name='db_user'  placeholder='为空则取第一个!' class='bt-input-text mr5' type='text' style='width:330px;' value='"+db_user+"'></div></div>\
                 <div class='line'>\
                 <span class='tname'>ID_RSA</span>\
                 <div class='info-r'><textarea class='bt-input-text mr5' row='20' cols='50' name='id_rsa' style='width:330px;height:200px;'></textarea></div>\
@@ -1567,8 +1623,10 @@ function addSlaveSSH(ip=''){
             yes:function(index){
                 var ip = $('input[name="ip"]').val();
                 var port = $('input[name="port"]').val();
+                var db_user = $('input[name="db_user"]').val();
                 var id_rsa = $('textarea[name="id_rsa"]').val();
-                var data = {ip:ip,port:port,id_rsa:id_rsa};
+
+                var data = {ip:ip,port:port,id_rsa:id_rsa,db_user:db_user};
                 myPost('add_slave_ssh', data, function(data){
                     layer.close(index);
                     var rdata = $.parseJSON(data.data);
@@ -1610,9 +1668,21 @@ function getSlaveSSHPage(page=1){
         for (i in ssh_list) {
             var ip = ssh_list[i]['ip'];
             var port = ssh_list[i]['port'];
+
+            var id_rsa = '未设置';
+            if ( ssh_list[i]['port'] != ''){
+                id_rsa = '已设置';
+            }
+
+            var db_user = '未设置';
+            if ( ssh_list[i]['db_user'] != ''){
+                db_user = ssh_list[i]['db_user'];
+            }
+
             list += '<tr><td>'+ip+'</td>\
                 <td>'+port+'</td>\
-                <td>OK</td>\
+                <td>'+db_user+'</td>\
+                <td>'+id_rsa+'</td>\
                 <td>\
                     <a class="btlink" onclick="addSlaveSSH(\''+ip+'\');">修改</a> | \
                     <a class="btlink" onclick="delSlaveSSH(\''+ip+'\');">删除</a>\
@@ -1638,17 +1708,16 @@ function getSlaveSSHList(page=1){
         content:"<div class='bt-form pd20 c6'>\
                  <div class='divtable mtb10'>\
                     <div><table class='table table-hover get-slave-ssh-list'>\
-                        <thead><tr><th>IP</th><th>PORT</th><th>SSH</th><th>操作</th></tr></thead>\
+                        <thead><tr><th>IP</th><th>PORT</th><th>同步账户</th><th>SSH</th><th>操作</th></tr></thead>\
                         <tbody></tbody>\
                     </table></div>\
                     "+page +"\
                 </div>\
             </div>",
         success:function(){
+            getSlaveSSHPage(1);
         }
     });
-
-    getSlaveSSHPage(1);
 }
 
 function handlerRun(){
@@ -1722,7 +1791,7 @@ function masterOrSlaveConf(version=''){
                     </div>\
                     <div id="databasePage" class="dataTables_paginate paging_bootstrap page"></div>\
                     <div class="table_toolbar" style="left:0px;">\
-                        <span class="sync btn btn-default btn-sm" onclick="getMasterRepSlaveList()" title="">同步账户列表</span>\
+                        <span class="sync btn btn-default btn-sm" onclick="getMasterRepSlaveListPage()" title="">同步账户列表</span>\
                     </div>\
                 </div>';
 

@@ -1132,8 +1132,8 @@ def addDb():
 
     wheres = {
         'utf8':   'utf8_general_ci',
-        'utf8mb4':   'utf8mb4_general_ci',
-        'gbk':   'gbk_chinese_ci',
+        'utf8mb4': 'utf8mb4_general_ci',
+        'gbk':    'gbk_chinese_ci',
         'big5':   'big5_chinese_ci'
     }
     codeStr = wheres[codeing]
@@ -1205,10 +1205,6 @@ def getDbAccess():
 
     users = pdb.query("select Host from mysql.user where User='" +
                       username + "' AND Host!='localhost'")
-
-    # isError = isSqlError(users)
-    # if isError != None:
-    #     return isError
 
     if len(users) < 1:
         return mw.returnJson(True, "127.0.0.1")
@@ -1479,6 +1475,33 @@ def findBinlogSlaveDoDb():
     return dodb
 
 
+def setDbMasterAccess():
+    args = getArgs()
+    data = checkArgs(args, ['username', 'access'])
+    if not data[0]:
+        return data[1]
+    username = args['username']
+    access = args['access']
+    pdb = pMysqlDb()
+    psdb = pSqliteDb('master_replication_user')
+    password = psdb.where("username=?", (username,)).getField('password')
+    users = pdb.query("select Host from mysql.user where User='" +
+                      username + "' AND Host!='localhost'")
+    for us in users:
+        pdb.execute("drop user '" + username + "'@'" + us["Host"] + "'")
+
+    dbname = '*'
+    for a in access.split(','):
+        pdb.execute(
+            "CREATE USER `%s`@`%s` IDENTIFIED BY '%s'" % (username, a, password))
+        pdb.execute(
+            "grant all privileges on %s.* to `%s`@`%s`" % (dbname, username, a))
+
+    pdb.execute("flush privileges")
+    psdb.where('username=?', (username,)).save('accept', (access,))
+    return mw.returnJson(True, '设置成功!')
+
+
 def getMasterDbList(version=''):
     args = getArgs()
     page = 1
@@ -1684,10 +1707,6 @@ def getMasterRepSlaveList(version=''):
 
 
 def addMasterRepSlaveUser(version=''):
-    version_pl = getServerDir() + "/version.pl"
-    if os.path.exists(version_pl):
-        version = mw.readFile(version_pl).strip()
-
     args = getArgs()
     data = checkArgs(args, ['username', 'password'])
     if not data[0]:
@@ -1736,8 +1755,9 @@ def addMasterRepSlaveUser(version=''):
         pdb.execute(sql)
     else:
         sql = "GRANT REPLICATION SLAVE ON *.* TO  '" + username + \
-            "'@'%' identified by '" + password + "';FLUSH PRIVILEGES;"
+            "'@'%' identified by '" + password + "';"
         result = pdb.execute(sql)
+        result = pdb.execute('FLUSH PRIVILEGES;')
         isError = isSqlError(result)
         if isError != None:
             return isError
@@ -1757,16 +1777,15 @@ def getMasterRepSlaveUserCmd(version):
 
     psdb = pSqliteDb('master_replication_user')
     f = 'username,password'
-    if args['username'] == '':
-
+    username = args['username']
+    if username == '':
         count = psdb.count()
-
         if count == 0:
             return mw.returnJson(False, '请添加同步账户!')
 
         clist = psdb.field(f).limit('1').order('id desc').select()
     else:
-        clist = psdb.field(f).where("username=?", (args['username'],)).limit(
+        clist = psdb.field(f).where("username=?", (username,)).limit(
             '1').order('id desc').select()
 
     ip = mw.getLocalIp()
@@ -1806,7 +1825,7 @@ def getMasterRepSlaveUserCmd(version):
     data = {}
     data['cmd'] = sql
     data["info"] = clist[0]
-    data['mode'] = recognizeDbMode()
+    data['mode'] = mode
 
     return mw.returnJson(True, 'ok!', data)
 
@@ -1817,9 +1836,18 @@ def delMasterRepSlaveUser(version=''):
     if not data[0]:
         return data[1]
 
+    name = args['username']
+
     pdb = pMysqlDb()
     psdb = pSqliteDb('master_replication_user')
-    pdb.execute("drop user '" + args['username'] + "'@'%'")
+    pdb.execute("drop user '" + name + "'@'%'")
+    pdb.execute("drop user '" + name + "'@'localhost'")
+
+    users = pdb.query("select Host from mysql.user where User='" +
+                      name + "' AND Host!='localhost'")
+    for us in users:
+        pdb.execute("drop user '" + name + "'@'" + us["Host"] + "'")
+
     psdb.where("username=?", (args['username'],)).delete()
 
     return mw.returnJson(True, '删除成功!')
@@ -1856,7 +1884,7 @@ def getSlaveSSHList(version=''):
     conn = pSqliteDb('slave_id_rsa')
     limit = str((page - 1) * page_size) + ',' + str(page_size)
 
-    field = 'id,ip,port,id_rsa,ps,addtime'
+    field = 'id,ip,port,db_user,id_rsa,ps,addtime'
     clist = conn.field(field).limit(limit).order('id desc').select()
     count = conn.count()
 
@@ -1881,7 +1909,7 @@ def getSlaveSSHByIp(version=''):
     ip = args['ip']
 
     conn = pSqliteDb('slave_id_rsa')
-    data = conn.field('ip,port,id_rsa').where("ip=?", (ip,)).select()
+    data = conn.field('ip,port,db_user,id_rsa').where("ip=?", (ip,)).select()
     return mw.returnJson(True, 'ok', data)
 
 
@@ -1897,22 +1925,24 @@ def addSlaveSSH(version=''):
     if ip == "":
         return mw.returnJson(True, 'ok')
 
-    data = checkArgs(args, ['port', 'id_rsa'])
+    data = checkArgs(args, ['port', 'id_rsa', 'db_user'])
     if not data[0]:
         return data[1]
 
     id_rsa = args['id_rsa']
     port = args['port']
+    db_user = args['db_user']
     user = 'root'
     addTime = time.strftime('%Y-%m-%d %X', time.localtime())
 
     conn = pSqliteDb('slave_id_rsa')
     data = conn.field('ip,id_rsa').where("ip=?", (ip,)).select()
     if len(data) > 0:
-        res = conn.where("ip=?", (ip,)).save('port,id_rsa', (port, id_rsa,))
+        res = conn.where("ip=?", (ip,)).save(
+            'port,id_rsa,db_user', (port, id_rsa, db_user))
     else:
-        conn.add('ip,port,user,id_rsa,ps,addtime',
-                 (ip, port, user, id_rsa, '', addTime))
+        conn.add('ip,port,user,id_rsa,db_user,ps,addtime',
+                 (ip, port, user, id_rsa, db_user, '', addTime))
 
     return mw.returnJson(True, '设置成功!')
 
@@ -2104,7 +2134,7 @@ def doFullSync(version=''):
     db = pMysqlDb()
 
     id_rsa_conn = pSqliteDb('slave_id_rsa')
-    data = id_rsa_conn.field('ip,port,id_rsa').find()
+    data = id_rsa_conn.field('ip,port,db_user,id_rsa').find()
 
     SSH_PRIVATE_KEY = "/tmp/mysql_sync_id_rsa.txt"
     id_rsa = data['id_rsa'].replace('\\n', '\n')
@@ -2112,6 +2142,7 @@ def doFullSync(version=''):
 
     ip = data["ip"]
     master_port = int(data['port'])
+    db_user = data['db_user']
     print("master ip:", ip)
 
     writeDbSyncStatus({'code': 0, 'msg': '开始同步...', 'progress': 0})
@@ -2166,7 +2197,7 @@ def doFullSync(version=''):
     if r[0] == '':
         writeDbSyncStatus({'code': 2, 'msg': '数据同步本地完成...', 'progress': 40})
 
-    cmd = 'cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mysql/index.py get_master_rep_slave_user_cmd {"username":"","db":""}'
+    cmd = 'cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mysql/index.py get_master_rep_slave_user_cmd {"username":"' + db_user + '","db":""}'
     stdin, stdout, stderr = ssh.exec_command(cmd)
     result = stdout.read()
     result_err = stderr.read()
@@ -2356,6 +2387,8 @@ if __name__ == "__main__":
         print(setDbMaster(version))
     elif func == 'set_db_slave':
         print(setDbSlave(version))
+    elif func == 'set_dbmaster_access':
+        print(setDbMasterAccess())
     elif func == 'get_master_rep_slave_list':
         print(getMasterRepSlaveList(version))
     elif func == 'add_master_rep_slave_user':

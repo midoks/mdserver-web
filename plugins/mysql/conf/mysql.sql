@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS `slave_id_rsa` (
   `ip` TEXT,
   `port` TEXT,
   `user` TEXT,
+  `db_user` TEXT,
   `id_rsa` TEXT,
   `ps` TEXT,
   `addtime` TEXT
