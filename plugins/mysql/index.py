@@ -2103,7 +2103,7 @@ def dumpMysqlData(version=''):
         dlist = findBinlogDoDb()
         cmd = mysql_dir + "/bin/mysqldump --defaults-file=" + myconf + " " + option + " -uroot -p" + \
             pwd + " --databases " + \
-            ' '.join(dlist) + " > gzip > /tmp/dump.sql.gz"
+            ' '.join(dlist) + " | gzip > /tmp/dump.sql.gz"
     else:
         cmd = mysql_dir + "/bin/mysqldump --defaults-file=" + myconf + " " + option + " -uroot -p" + \
             pwd + " --databases " + args['db'] + " | gzip > /tmp/dump.sql.gz"
