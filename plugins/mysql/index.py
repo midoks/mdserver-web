@@ -1777,18 +1777,31 @@ def getMasterRepSlaveUserCmd(version):
     if len(mstatus) == 0:
         return mw.returnJson(False, '未开启!')
 
-    sql = "CHANGE MASTER TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
-        clist[0]['username']  + "', MASTER_PASSWORD='" + \
-        clist[0]['password'] + \
-        "', MASTER_LOG_FILE='" + mstatus[0]["File"] + \
-        "',MASTER_LOG_POS=" + str(mstatus[0]["Position"])
+    mode = recognizeDbMode()
 
-    if version == "8.0":
-        sql = "CHANGE REPLICATION SOURCE TO SOURCE_HOST='" + ip + "', SOURCE_PORT=" + port + ", SOURCE_USER='" + \
-            clist[0]['username']  + "', SOURCE_PASSWORD='" + \
+    if mode == "gtid":
+        sql = "CHANGE MASTER TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
+            clist[0]['username']  + "', MASTER_PASSWORD='" + \
             clist[0]['password'] + \
-            "', SOURCE_LOG_FILE='" + mstatus[0]["File"] + \
-            "',SOURCE_LOG_POS=" + str(mstatus[0]["Position"])
+            "', MASTER_AUTO_POSITION=1"
+        if version == '8.0':
+            sql = "CHANGE REPLICATION SOURCE TO SOURCE_HOST='" + ip + "', SOURCE_PORT=" + port + ", SOURCE_USER='" + \
+                clist[0]['username']  + "', SOURCE_PASSWORD='" + \
+                clist[0]['password'] + \
+                "', MASTER_AUTO_POSITION=1"
+    else:
+        sql = "CHANGE MASTER TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
+            clist[0]['username']  + "', MASTER_PASSWORD='" + \
+            clist[0]['password'] + \
+            "', MASTER_LOG_FILE='" + mstatus[0]["File"] + \
+            "',MASTER_LOG_POS=" + str(mstatus[0]["Position"])
+
+        if version == "8.0":
+            sql = "CHANGE REPLICATION SOURCE TO SOURCE_HOST='" + ip + "', SOURCE_PORT=" + port + ", SOURCE_USER='" + \
+                clist[0]['username']  + "', SOURCE_PASSWORD='" + \
+                clist[0]['password'] + \
+                "', SOURCE_LOG_FILE='" + mstatus[0]["File"] + \
+                "',SOURCE_LOG_POS=" + str(mstatus[0]["Position"])
 
     data = {}
     data['cmd'] = sql
