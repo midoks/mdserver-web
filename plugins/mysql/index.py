@@ -1997,7 +1997,7 @@ def initSlaveStatus(version=''):
 
         local_mode = recognizeDbMode()
         if local_mode != cmd_data['data']['mode']:
-            return mw.returnJson(False, '主【{}】从【{}】,不一致!'.format(cmd_data['data']['mode'], local_mode))
+            return mw.returnJson(False, '主【{}】从【{}】,运行模式不一致!'.format(cmd_data['data']['mode'], local_mode))
 
         u = cmd_data['data']['info']
         ps = u['username'] + "|" + u['password']
