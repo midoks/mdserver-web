@@ -115,8 +115,8 @@ class backupTools:
         # mw.execShell(db_path + "/bin/mysqldump --opt --default-character-set=utf8 " +
         #              name + " | gzip > " + filename)
 
-        mw.execShell(db_path + "/bin/mysqldump --skip-lock-tables --default-character-set=utf8 " +
-                     name + " | gzip > " + filename)
+        # mw.execShell(db_path + "/bin/mysqldump --skip-lock-tables --default-character-set=utf8 " +
+        #              name + " | gzip > " + filename)
 
         if not os.path.exists(filename):
             endDate = time.strftime('%Y/%m/%d %X', time.localtime())
