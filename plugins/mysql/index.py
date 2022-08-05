@@ -2063,13 +2063,19 @@ def dumpMysqlData(version=''):
     pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
     mysql_dir = getServerDir()
     myconf = mysql_dir + "/etc/my.cnf"
+
+    option = ''
+    mode = recognizeDbMode()
+    if mode == 'gtid':
+        option = ' --set-gtid-purged=off '
+
     if args['db'].lower() == 'all':
         dlist = findBinlogDoDb()
-        cmd = mysql_dir + "/bin/mysqldump --defaults-file=" + myconf + " -uroot -p" + \
+        cmd = mysql_dir + "/bin/mysqldump --defaults-file=" + myconf + " " + option + " -uroot -p" + \
             pwd + " --databases " + \
             ' '.join(dlist) + " > gzip > /tmp/dump.sql.gz"
     else:
-        cmd = mysql_dir + "/bin/mysqldump --defaults-file=" + myconf + " -uroot -p" + \
+        cmd = mysql_dir + "/bin/mysqldump --defaults-file=" + myconf + " " + option + " -uroot -p" + \
             pwd + " --databases " + args['db'] + " | gzip > /tmp/dump.sql.gz"
 
     ret = mw.execShell(cmd)
