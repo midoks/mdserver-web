@@ -526,6 +526,17 @@ function checkSelect(){
     },5)
 }
 
+function setDbRw(id,username,val){
+    myPost('get_db_rw',{id:id,username:username,rw:val}, function(data){
+        var rdata = $.parseJSON(data.data);
+        // layer.msg(rdata.msg,{icon:rdata.status ? 1 : 5,shade: [0.3, '#000']});
+        showMsg(rdata.msg, function(){
+            dbList();
+        },{icon:rdata.status ? 1 : 5,shade: [0.3, '#000']}, 2000);
+
+    });
+}
+
 function setDbAccess(username){
     myPost('get_db_access','username='+username, function(data){
         var rdata = $.parseJSON(data.data);
@@ -607,13 +618,13 @@ function setDbPass(id, username, password){
 
     var index = layer.open({
         type: 1,
-        skin: 'demo-class',
         area: '500px',
         title: '修改数据库密码',
         closeBtn: 1,
         shift: 5,
         shadeClose: true,
-        content: "<form class='bt-form pd20 pb70' id='mod_pwd'>\
+        btn:["提交","关闭"],
+        content: "<form class='bt-form pd20' id='mod_pwd'>\
                     <div class='line'>\
                         <span class='tname'>用户名</span>\
                         <div class='info-r'><input readonly='readonly' name=\"name\" class='bt-input-text mr5' type='text' style='width:330px;outline:none;' value='"+username+"' /></div>\
@@ -623,26 +634,17 @@ function setDbPass(id, username, password){
                     <div class='info-r'><input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:330px' value='"+password+"' /><span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatPwd(16)'></span></div>\
                     </div>\
                     <input type='hidden' name='id' value='"+id+"'>\
-                    <div class='bt-form-submit-btn'>\
-                        <button id='my_mod_close' type='button' class='btn btn-danger btn-sm btn-title'>关闭</button>\
-                        <button id='my_mod_save' type='button' class='btn btn-success btn-sm btn-title'>提交</button>\
-                    </div>\
                   </form>",
-    });
-
-    $('#my_mod_close').click(function(){
-        $('.layui-layer-close1').click();
-    });
-
-    $('#my_mod_save').click(function(){
-        var data = $("#mod_pwd").serialize();
-        myPost('set_user_pwd', data, function(data){
-            var rdata = $.parseJSON(data.data);
-            showMsg(rdata.msg,function(){
-                dbList();
-                $('.layui-layer-close1').click();
-            },{icon: rdata.status ? 1 : 2});   
-        });
+        yes:function(index){
+            var data = $("#mod_pwd").serialize();
+            myPost('set_user_pwd', data, function(data){
+                var rdata = $.parseJSON(data.data);
+                showMsg(rdata.msg,function(){
+                    layer.close(index);
+                    dbList();
+                },{icon: rdata.status ? 1 : 2});   
+            });
+        }
     });
 }
 
@@ -957,9 +959,28 @@ function dbList(page, search){
 
             list += '<a href="javascript:;" class="btlink" class="btlink" onclick="setBackup(\''+rdata.data[i]['name']+'\',this)" title="数据库备份">'+(rdata.data[i]['is_backup']?'备份':'未备份') +'</a> | ';
 
+            var rw = '';
+            var rw_change = 'all';
+            if (typeof(rdata.data[i]['rw'])!='undefined'){
+                var rw_val = '读写';
+                if (rdata.data[i]['rw'] == 'all'){
+                    rw_val = "所有";
+                    rw_change = 'rw';
+                } else if (rdata.data[i]['rw'] == 'rw'){
+                    rw_val = "读写";
+                    rw_change = 'r';
+                } else if (rdata.data[i]['rw'] == 'r'){
+                    rw_val = "只读";
+                    rw_change = 'all';
+                }
+                rw = '<a href="javascript:;" class="btlink" onclick="setDbRw(\''+rdata.data[i]['id']+'\',\''+rdata.data[i]['name']+'\',\''+rw_change+'\')" title="设置读写">'+rw_val+'</a> | ';
+            }
+
+
             list += '<a href="javascript:;" class="btlink" onclick="openPhpmyadmin(\''+rdata.data[i]['name']+'\',\''+rdata.data[i]['username']+'\',\''+rdata.data[i]['password']+'\')" title="数据库管理">管理</a> | ' +
                         '<a href="javascript:;" class="btlink" onclick="repTools(\''+rdata.data[i]['name']+'\')" title="MySQL优化修复工具">工具</a> | ' +
                         '<a href="javascript:;" class="btlink" onclick="setDbAccess(\''+rdata.data[i]['username']+'\')" title="设置数据库权限">权限</a> | ' +
+                        rw +
                         '<a href="javascript:;" class="btlink" onclick="setDbPass('+rdata.data[i]['id']+',\''+ rdata.data[i]['username'] +'\',\'' + rdata.data[i]['password'] + '\')">改密</a> | ' +
                         '<a href="javascript:;" class="btlink" onclick="delDb(\''+rdata.data[i]['id']+'\',\''+rdata.data[i]['name']+'\')" title="删除数据库">删除</a>' +
                     '</td>';

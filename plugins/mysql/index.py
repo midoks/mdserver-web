@@ -888,7 +888,7 @@ def getDbList():
     condition = ''
     if not search == '':
         condition = "name like '%" + search + "%'"
-    field = 'id,pid,name,username,password,accept,ps,addtime'
+    field = 'id,pid,name,username,password,accept,rw,ps,addtime'
     clist = conn.where(condition, ()).field(
         field).limit(limit).order('id desc').select()
 
@@ -1013,7 +1013,7 @@ def syncToDatabases():
     return mw.returnJson(True, msg)
 
 
-def setRootPwd():
+def setRootPwd(version=''):
     args = getArgs()
     data = checkArgs(args, ['password'])
     if not data[0]:
@@ -1027,8 +1027,7 @@ def setRootPwd():
         if isError != None:
             return isError
 
-        m_version = mw.readFile(getServerDir() + '/version.pl')
-        if m_version.find('5.7') == 0 or m_version.find('8.0') == 0:
+        if version.find('5.7') > -1 or version.find('8.0') > -1:
             pdb.execute(
                 "UPDATE mysql.user SET authentication_string='' WHERE user='root'")
             pdb.execute(
@@ -1045,7 +1044,7 @@ def setRootPwd():
         return mw.returnJson(False, '修改错误:' + str(ex))
 
 
-def setUserPwd():
+def setUserPwd(version=''):
     args = getArgs()
     data = checkArgs(args, ['password', 'name'])
     if not data[0]:
@@ -1059,27 +1058,28 @@ def setUserPwd():
         psdb = pSqliteDb('databases')
         name = psdb.where('id=?', (uid,)).getField('name')
 
-        m_version = mw.readFile(getServerDir() + '/version.pl')
-        if m_version.find('5.7') == 0 or m_version.find('8.0') == 0:
+        if version.find('5.7') > -1 or version.find('8.0') > -1:
             accept = pdb.query(
                 "select Host from mysql.user where User='" + name + "' AND Host!='localhost'")
-            pdb.execute(
+            t1 = pdb.execute(
                 "update mysql.user set authentication_string='' where User='" + username + "'")
+            # print(t1)
             result = pdb.execute(
                 "ALTER USER `%s`@`localhost` IDENTIFIED BY '%s'" % (username, newpassword))
+            # print(result)
             for my_host in accept:
-                pdb.execute("ALTER USER `%s`@`%s` IDENTIFIED BY '%s'" % (
+                t2 = pdb.execute("ALTER USER `%s`@`%s` IDENTIFIED BY '%s'" % (
                     username, my_host["Host"], newpassword))
+                # print(t2)
         else:
             result = pdb.execute("update mysql.user set Password=password('" +
                                  newpassword + "') where User='" + username + "'")
 
         pdb.execute("flush privileges")
-        psdb.where("id=?", (id,)).setField('password', newpassword)
+        psdb.where("id=?", (uid,)).setField('password', newpassword)
         return mw.returnJson(True, mw.getInfo('修改数据库[{1}]密码成功!', (name,)))
     except Exception as ex:
-        print(str(ex))
-        return mw.returnJson(False, mw.getInfo('修改数据库[{1}]密码失败!', (name,)))
+        return mw.returnJson(False, mw.getInfo('修改数据库[{1}]密码失败[{2}]!', (name, str(ex),)))
 
 
 def setDbPs():
@@ -1215,19 +1215,6 @@ def getDbAccess():
     return mw.returnJson(True, userStr)
 
 
-def toSize(size):
-    d = ('b', 'KB', 'MB', 'GB', 'TB')
-    s = d[0]
-    for b in d:
-        if size < 1024:
-            return str(size) + ' ' + b
-        size = size / 1024
-        s = b
-    _size = round(size, 2)
-    # print(size, _size)
-    return str(size) + ' ' + b
-
-
 def setDbAccess():
     args = getArgs()
     data = checkArgs(args, ['username', 'access'])
@@ -1255,6 +1242,47 @@ def setDbAccess():
     __createUser(dbname, name, password, access)
 
     psdb.where('username=?', (name,)).save('accept', (access,))
+    return mw.returnJson(True, '设置成功!')
+
+
+def setDbRw(version=''):
+    args = getArgs()
+    data = checkArgs(args, ['username', 'id', 'rw'])
+    if not data[0]:
+        return data[1]
+
+    username = args['username']
+    uid = args['id']
+    rw = args['rw']
+
+    pdb = pMysqlDb()
+    psdb = pSqliteDb('databases')
+    dbname = psdb.where("id=?", (uid,)).getField('name')
+    users = pdb.query(
+        "select Host from mysql.user where User='" + username + "'")
+
+    # show grants for demo@"127.0.0.1";
+    for x in users:
+        # REVOKE ALL PRIVILEGES ON `imail`.* FROM 'imail'@'127.0.0.1';
+
+        sql = "REVOKE ALL PRIVILEGES ON `" + dbname + \
+            "`.* FROM '" + username + "'@'" + x["Host"] + "';"
+        r = pdb.query(sql)
+        # print(sql, r)
+
+        if rw == 'rw':
+            sql = "GRANT SELECT, INSERT, UPDATE, DELETE ON " + dbname + ".* TO " + \
+                username + "@'" + x["Host"] + "'"
+        elif rw == 'r':
+            sql = "GRANT SELECT ON " + dbname + ".* TO " + \
+                username + "@'" + x["Host"] + "'"
+        else:
+            sql = "GRANT all privileges ON " + dbname + ".* TO " + \
+                username + "@'" + x["Host"] + "'"
+        pdb.execute(sql)
+    pdb.execute("flush privileges")
+    r = psdb.where("id=?", (uid,)).setField('rw', rw)
+    # print(r)
     return mw.returnJson(True, '设置成功!')
 
 
@@ -2373,13 +2401,15 @@ if __name__ == "__main__":
     elif func == 'sync_to_databases':
         print(syncToDatabases())
     elif func == 'set_root_pwd':
-        print(setRootPwd())
+        print(setRootPwd(version))
     elif func == 'set_user_pwd':
-        print(setUserPwd())
+        print(setUserPwd(version))
     elif func == 'get_db_access':
         print(getDbAccess())
     elif func == 'set_db_access':
         print(setDbAccess())
+    elif func == 'get_db_rw':
+        print(setDbRw(version))
     elif func == 'set_db_ps':
         print(setDbPs())
     elif func == 'get_db_info':
