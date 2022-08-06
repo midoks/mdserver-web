@@ -2197,12 +2197,12 @@ def doFullSync(version=''):
         return 'fail'
 
     print("同步文件", "start")
-    cmd = 'scp -P' + str(master_port) + ' -i ' + SSH_PRIVATE_KEY + \
-        ' root@' + ip + ':/tmp/dump.sql.gz /tmp'
-    cmd = "spawn " + cmd + "\n" + \
-        'expect {"yes/no" { send -- yes\r;exp_continue; }eof};'
-    print(cmd)
-    r = mw.execShell(cmd)
+    # cmd = 'scp -P' + str(master_port) + ' -i ' + SSH_PRIVATE_KEY + \
+    #     ' root@' + ip + ':/tmp/dump.sql.gz /tmp'
+    t = ssh.get_transport()
+    sftp = paramiko.SFTPClient.from_transport(t)
+    copy_status = sftp.put("/tmp/dump.sql.gz", "/tmp/dump.sql.gz")
+    print("同步信息:", copy_status)
     print("同步文件", "end")
     if r[0] == '':
         writeDbSyncStatus({'code': 2, 'msg': '数据同步本地完成...', 'progress': 40})
