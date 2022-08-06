@@ -2204,7 +2204,7 @@ def doFullSync(version=''):
     copy_status = sftp.get("/tmp/dump.sql.gz", "/tmp/dump.sql.gz")
     print("同步信息:", copy_status)
     print("同步文件", "end")
-    if r[0] == '':
+    if copy_status == None:
         writeDbSyncStatus({'code': 2, 'msg': '数据同步本地完成...', 'progress': 40})
 
     cmd = 'cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mysql/index.py get_master_rep_slave_user_cmd {"username":"' + db_user + '","db":""}'
