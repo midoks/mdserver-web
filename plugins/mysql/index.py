@@ -2199,10 +2199,9 @@ def doFullSync(version=''):
     print("同步文件", "start")
     cmd = 'scp -P' + str(master_port) + ' -i ' + SSH_PRIVATE_KEY + \
         ' root@' + ip + ':/tmp/dump.sql.gz /tmp'
-    print(cmd)
-
     cmd = "spawn " + cmd + "\n" + \
         'expect {"yes/no" { send -- yes\r;exp_continue; }eof};'
+    print(cmd)
     r = mw.execShell(cmd)
     print("同步文件", "end")
     if r[0] == '':
