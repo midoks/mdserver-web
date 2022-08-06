@@ -1241,7 +1241,7 @@ def setDbAccess():
 
     __createUser(dbname, name, password, access)
 
-    psdb.where('username=?', (name,)).save('accept', (access,))
+    psdb.where('username=?', (name,)).save('accept,rw', (access, 'rw',))
     return mw.returnJson(True, '设置成功!')
 
 
@@ -1283,7 +1283,7 @@ def setDbRw(version=''):
     pdb.execute("flush privileges")
     r = psdb.where("id=?", (uid,)).setField('rw', rw)
     # print(r)
-    return mw.returnJson(True, '设置成功!')
+    return mw.returnJson(True, '切换成功!')
 
 
 def getDbInfo():

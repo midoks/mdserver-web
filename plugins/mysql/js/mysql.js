@@ -606,6 +606,7 @@ function setDbAccess(username){
                     var rdata = $.parseJSON(data.data);
                     showMsg(rdata.msg,function(){
                         layer.close(index);
+                        dbList();
                     },{icon: rdata.status ? 1 : 2});   
                 });
             }
