@@ -2071,6 +2071,8 @@ def setSlaveStatus(version=''):
         ip = dlist[0]['Master_Host']
         conn = pSqliteDb('slave_id_rsa')
         data = conn.field('ip,ps').where("ip=?", (ip,)).find()
+        if len(data) == 0:
+            return mw.returnJson(False, '没有数据无法重启!')
         u = data['ps'].split("|")
         db.query("start slave user='{}' password='{}';".format(u[0], u[1]))
 
@@ -2208,8 +2210,12 @@ def doFullSync(version=''):
     db.query('stop slave')
     writeDbSyncStatus({'code': 3, 'msg': '停止从库完成...', 'progress': 45})
 
-    print(cmd_data)
-    db.query(cmd_data['data']['cmd'])
+    cmd = cmd_data['data']['cmd']
+    # 保证同步IP一致
+    cmd = re.sub(r"SOURCE_HOST='(.*)'", "SOURCE_HOST='" + ip + "'", cmd, 1)
+    cmd = re.sub(r"MASTER_HOST='(.*)'", "SOURCE_HOST='" + ip + "'", cmd, 1)
+
+    db.query(cmd)
     uinfo = cmd_data['data']['info']
     ps = uinfo['username'] + "|" + uinfo['password']
     id_rsa_conn.where('ip=?', (ip,)).setField('ps', ps)
