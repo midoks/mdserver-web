@@ -12,9 +12,11 @@ CREATE TABLE IF NOT EXISTS `databases` (
   `username` TEXT,
   `password` TEXT,
   `accept` TEXT,
+  `rw` TEXT DEFAULT 'rw',
   `ps` TEXT,
   `addtime` TEXT
 );
+-- ALTER TABLE `databases` ADD COLUMN `rw` TEXT DEFAULT 'rw';
 
 CREATE TABLE IF NOT EXISTS `master_replication_user` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT,
