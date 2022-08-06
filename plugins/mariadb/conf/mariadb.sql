@@ -12,9 +12,11 @@ CREATE TABLE IF NOT EXISTS `databases` (
   `username` TEXT,
   `password` TEXT,
   `accept` TEXT,
+  `rw` TEXT DEFAULT 'rw',
   `ps` TEXT,
   `addtime` TEXT
 );
+-- ALTER TABLE `databases` ADD COLUMN `rw` TEXT DEFAULT 'rw';
 
 CREATE TABLE IF NOT EXISTS `master_replication_user` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -24,7 +26,6 @@ CREATE TABLE IF NOT EXISTS `master_replication_user` (
   `ps` TEXT,
   `addtime` TEXT
 );
-
 
 -- 从库配置主库的[ssh private key]
 -- drop table `slave_id_rsa`;
@@ -38,7 +39,5 @@ CREATE TABLE IF NOT EXISTS `slave_id_rsa` (
   `ps` TEXT,
   `addtime` TEXT
 );
-
-
 
 
