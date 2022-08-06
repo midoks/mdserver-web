@@ -1,4 +1,8 @@
 #!/bin/sh
+# chkconfig: 2345 55 25
+# Description: mysql service
+# distro. For CentOS/Redhat run: 'chkconfig --add mysql'
+
 # Copyright Abandoned 1996 TCX DataKonsult AB & Monty Program KB & Detron HB
 # This file is public domain and comes with NO WARRANTY of any kind
 
@@ -25,7 +29,7 @@
 # Description: MySQL is a very fast and reliable SQL database engine.
 ### END INIT INFO
  
-# If you install MySQL on some other places than /Users/midoks/Desktop/fwww/server/mysql, then you
+# If you install MySQL on some other places than /www/server/mysql, then you
 # have to do one of the following things for this script to work:
 #
 # - Run this script from within the MySQL installation directory
@@ -110,7 +114,7 @@ mode=$1    # start or stop
 [ $# -ge 1 ] && shift
 
 
-other_args="$*"   # uncommon, but needed when called from an RPM upgrade action
+other_args=--sql-mode="NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"   # uncommon, but needed when called from an RPM upgrade action
            # Expected: "--skip-networking --skip-grant-tables"
            # They are not checked here, intentionally, as it is the resposibility
            # of the "spec" file author to give correct arguments only.
@@ -234,6 +238,11 @@ extra_args=""
 if test -r "$basedir/my.cnf"
 then
   extra_args="-e $basedir/my.cnf"
+else
+  if test -r "$datadir/my.cnf"
+  then
+    extra_args="-e $datadir/my.cnf"
+  fi
 fi
 
 parse_server_arguments `$print_defaults $extra_args mysqld server mysql_server mysql.server`
@@ -241,9 +250,10 @@ parse_server_arguments `$print_defaults $extra_args mysqld server mysql_server m
 #
 # Set pid file if not given
 #
+found_pid=`cd $datadir && ls |grep '.pid'`
 if test -z "$mysqld_pid_file_path"
 then
-  mysqld_pid_file_path=$datadir/`hostname`.pid
+  mysqld_pid_file_path=$datadir/$found_pid
 else
   case "$mysqld_pid_file_path" in
     /* ) ;;
@@ -251,6 +261,7 @@ else
   esac
 fi
 
+#ulimit -s unlimited
 case "$mode" in
   'start')
     # Start daemon
@@ -263,7 +274,7 @@ case "$mode" in
     then
       # Give extra arguments to mysqld with the my.cnf file. This script
       # may be overwritten at next upgrade.
-      $bindir/mysqld_safe --datadir="$datadir" --pid-file="$mysqld_pid_file_path" $other_args >/dev/null &
+      $bindir/mysqld_safe --defaults-file=$basedir/etc/my.cnf --datadir="$datadir" $other_args >/dev/null &
       wait_for_pid created "$!" "$mysqld_pid_file_path"; return_value=$?
 
       # Make lock for RedHat / SuSE
@@ -284,9 +295,6 @@ case "$mode" in
 
     if test -s "$mysqld_pid_file_path"
     then
-      # signal mysqld_safe that it needs to stop
-      touch "$mysqld_pid_file_path.shutdown"
-
       mysqld_pid=`cat "$mysqld_pid_file_path"`
 
       if (kill -0 $mysqld_pid 2>/dev/null)
@@ -345,7 +353,7 @@ case "$mode" in
       fi
     else
       # Try to find appropriate mysqld process
-      mysqld_pid=`pgrep -d' ' -f $libexecdir/mysqld`
+      mysqld_pid=`pidof $libexecdir/mysqld`
 
       # test if multiple pids exist
       pid_count=`echo $mysqld_pid | wc -w`
