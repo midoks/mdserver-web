@@ -1800,14 +1800,12 @@ def getMasterRepSlaveUserCmd(version):
 
     if mode == "gtid":
         sql = "CHANGE MASTER TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
-            clist[0]['username']  + "', MASTER_PASSWORD='" + \
-            clist[0]['password'] + \
-            "', MASTER_AUTO_POSITION=1"
+            clist[0]['username'] + "', MASTER_PASSWORD='" + \
+            clist[0]['password'] + "', MASTER_AUTO_POSITION=1"
         if version == '8.0':
             sql = "CHANGE REPLICATION SOURCE TO SOURCE_HOST='" + ip + "', SOURCE_PORT=" + port + ", SOURCE_USER='" + \
                 clist[0]['username']  + "', SOURCE_PASSWORD='" + \
-                clist[0]['password'] + \
-                "', MASTER_AUTO_POSITION=1"
+                clist[0]['password'] + "', MASTER_AUTO_POSITION=1"
     else:
         sql = "CHANGE MASTER TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
             clist[0]['username']  + "', MASTER_PASSWORD='" + \
@@ -2050,8 +2048,13 @@ def initSlaveStatus(version=''):
 
         # 保证同步IP一致
         cmd = cmd_data['data']['cmd']
-        cmd = re.sub(r"SOURCE_HOST='(.*)'", "SOURCE_HOST='" + ip + "'", cmd, 1)
-        cmd = re.sub(r"MASTER_HOST='(.*)'", "SOURCE_HOST='" + ip + "'", cmd, 1)
+        if cmd.find('SOURCE_HOST') > -1:
+            cmd = re.sub(r"SOURCE_HOST='(.*)'",
+                         "SOURCE_HOST='" + ip + "'", cmd, 1)
+
+        if cmd.find('MASTER_HOST') > -1:
+            cmd = re.sub(r"MASTER_HOST='(.*)'",
+                         "MASTER_HOST='" + ip + "'", cmd, 1)
         db.query(cmd)
         db.query("start slave user='{}' password='{}';".format(
             u['username'], u['password']))
@@ -2218,8 +2221,11 @@ def doFullSync(version=''):
 
     cmd = cmd_data['data']['cmd']
     # 保证同步IP一致
-    cmd = re.sub(r"SOURCE_HOST='(.*)'", "SOURCE_HOST='" + ip + "'", cmd, 1)
-    cmd = re.sub(r"MASTER_HOST='(.*)'", "SOURCE_HOST='" + ip + "'", cmd, 1)
+    if cmd.find('SOURCE_HOST') > -1:
+        cmd = re.sub(r"SOURCE_HOST='(.*)'", "SOURCE_HOST='" + ip + "'", cmd, 1)
+
+    if cmd.find('MASTER_HOST') > -1:
+        cmd = re.sub(r"MASTER_HOST='(.*)'", "SOURCE_HOST='" + ip + "'", cmd, 1)
 
     db.query(cmd)
     uinfo = cmd_data['data']['info']
