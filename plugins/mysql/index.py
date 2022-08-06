@@ -2015,7 +2015,7 @@ def initSlaveStatus(version=''):
 
     SSH_PRIVATE_KEY = "/tmp/t_ssh.txt"
     ip = data['ip']
-    master_port = int(data['port'])
+    master_port = data['port']
     mw.writeFile(SSH_PRIVATE_KEY, data['id_rsa'].replace('\\n', '\n'))
 
     import paramiko
@@ -2027,7 +2027,8 @@ def initSlaveStatus(version=''):
         mw.execShell("chmod 600 " + SSH_PRIVATE_KEY)
         key = paramiko.RSAKey.from_private_key_file(SSH_PRIVATE_KEY)
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(hostname=ip, port=master_port, username='root', pkey=key)
+        ssh.connect(hostname=ip, port=int(master_port),
+                    username='root', pkey=key)
 
         cmd = 'cd /www/server/mdserver-web && python3 plugins/mysql/index.py get_master_rep_slave_user_cmd {"username":"","db":""}'
         stdin, stdout, stderr = ssh.exec_command(cmd)
@@ -2148,7 +2149,7 @@ def doFullSync(version=''):
     mw.writeFile(SSH_PRIVATE_KEY, id_rsa)
 
     ip = data["ip"]
-    master_port = int(data['port'])
+    master_port = data['port']
     db_user = data['db_user']
     print("master ip:", ip)
 
@@ -2164,15 +2165,15 @@ def doFullSync(version=''):
         return 'fail'
 
     try:
+        # ssh.load_system_host_keys()
         mw.execShell("chmod 600 " + SSH_PRIVATE_KEY)
         key = paramiko.RSAKey.from_private_key_file(SSH_PRIVATE_KEY)
-        # ssh.load_system_host_keys()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         print(ip, master_port)
 
         # pkey=key
         # key_filename=SSH_PRIVATE_KEY
-        ssh.connect(hostname=ip, port=master_port,
+        ssh.connect(hostname=ip, port=int(master_port),
                     username='root', pkey=key)
     except Exception as e:
         print(str(e))
@@ -2187,8 +2188,6 @@ def doFullSync(version=''):
     print(cmd)
     stdin, stdout, stderr = ssh.exec_command(cmd)
     result = stdout.read()
-    result_err = stderr.read()
-
     result = result.decode('utf-8')
     if result.strip() == 'ok':
         writeDbSyncStatus({'code': 1, 'msg': '主服务器备份完成...', 'progress': 30})
@@ -2208,7 +2207,6 @@ def doFullSync(version=''):
     cmd = 'cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mysql/index.py get_master_rep_slave_user_cmd {"username":"' + db_user + '","db":""}'
     stdin, stdout, stderr = ssh.exec_command(cmd)
     result = stdout.read()
-    result_err = stderr.read()
     result = result.decode('utf-8')
     cmd_data = json.loads(result)
 
