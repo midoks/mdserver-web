@@ -2201,7 +2201,7 @@ def doFullSync(version=''):
     #     ' root@' + ip + ':/tmp/dump.sql.gz /tmp'
     t = ssh.get_transport()
     sftp = paramiko.SFTPClient.from_transport(t)
-    copy_status = sftp.put("/tmp/dump.sql.gz", "/tmp/dump.sql.gz")
+    copy_status = sftp.get("/tmp/dump.sql.gz", "/tmp/dump.sql.gz")
     print("同步信息:", copy_status)
     print("同步文件", "end")
     if r[0] == '':
