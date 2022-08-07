@@ -682,8 +682,8 @@ def runInfo():
     result['Run'] = int(time.time()) - int(result['Uptime'])
     tmp = db.query('show master status')
     try:
-        result['File'] = tmp[0][0]
-        result['Position'] = tmp[0][1]
+        result['File'] = tmp[0]["File"]
+        result['Position'] = tmp[0]["Position"]
     except:
         result['File'] = 'OFF'
         result['Position'] = 'OFF'
@@ -2216,8 +2216,8 @@ def doFullSync(version=''):
 
     writeDbSyncStatus({'code': 0, 'msg': '登录Master成功...', 'progress': 5})
 
-    cmd = "cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mysql/index.py dump_mysql_data {\"db\":'" + args[
-        'db'] + "'}"
+    dbname = args['db']
+    cmd = "cd /www/server/mdserver-web && python3 plugins/mysql/index.py dump_mysql_data {\"db\":'" + dbname + "'}"
     print(cmd)
     stdin, stdout, stderr = ssh.exec_command(cmd)
     result = stdout.read()
@@ -2240,7 +2240,7 @@ def doFullSync(version=''):
     if copy_status == None:
         writeDbSyncStatus({'code': 2, 'msg': '数据同步本地完成...', 'progress': 40})
 
-    cmd = 'cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mysql/index.py get_master_rep_slave_user_cmd {"username":"' + db_user + '","db":""}'
+    cmd = 'cd /www/server/mdserver-web && python3 plugins/mysql/index.py get_master_rep_slave_user_cmd {"username":"' + db_user + '","db":""}'
     stdin, stdout, stderr = ssh.exec_command(cmd)
     result = stdout.read()
     result = result.decode('utf-8')
