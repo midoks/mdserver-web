@@ -105,7 +105,9 @@ def contentReplace(content):
     content = content.replace('{$ROOT_PATH}', mw.getRootDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$SERVER_APP_PATH}', service_path + '/mysql')
-    content = content.replace('{$SERVER_ID}', int(time.time()))
+
+    server_id = int(time.time())
+    content = content.replace('{$SERVER_ID}', str(server_id))
 
     if mw.isAppleSystem():
         content = content.replace(
