@@ -50,8 +50,7 @@ pg_status()
 
 pg_reload()
 {
-	pg_stop
-    pg_start
+	{$APP_PATH}/bin/pg_ctl -D {$APP_PATH}/data -l {$APP_PATH}/logs/server.log reload
 }
 
 
