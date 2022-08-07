@@ -50,6 +50,11 @@ Install_App()
 	else
 	    cpuCore="1"
 	fi
+
+	# for stable installation
+	if [ "$cpuCore" -gt "1" ];then
+		cpuCore=`echo "$cpuCore" | awk '{printf("%.f",($1)*0.8)}'`
+	fi
 	# ----- cpu end ------
 
 	if [ ! -f ${postgreDir}/postgresql-${VERSION}.tar.bz2 ];then
