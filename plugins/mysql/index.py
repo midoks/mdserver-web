@@ -1300,9 +1300,12 @@ def getDbInfo():
     tables = pdb.query('show tables from `%s`' % db_name)
 
     ret = {}
-    data_sum = pdb.query(
-        "select sum(DATA_LENGTH)+sum(INDEX_LENGTH) as sum_size from information_schema.tables  where table_schema='%s'" % db_name)
-    data = data_sum[0]['sum_size']
+    sql = "select sum(DATA_LENGTH)+sum(INDEX_LENGTH) as sum_size from information_schema.tables  where table_schema='%s'" % db_name
+    data_sum = pdb.query(sql)
+
+    data = 0
+    if data_sum[0]['sum_size'] != None:
+        data = data_sum[0]['sum_size']
 
     ret['data_size'] = mw.toSize(data)
     ret['database'] = db_name
@@ -1310,14 +1313,22 @@ def getDbInfo():
     ret3 = []
     table_key = "Tables_in_" + db_name
     for i in tables:
-        table = pdb.query(
-            "show table status from `%s` where name = '%s'" % (db_name, i[table_key]))
+        tb_sql = "show table status from `%s` where name = '%s'" % (db_name, i[
+                                                                    table_key])
+        table = pdb.query(tb_sql)
 
         tmp = {}
         tmp['type'] = table[0]["Engine"]
         tmp['rows_count'] = table[0]["Rows"]
         tmp['collation'] = table[0]["Collation"]
-        data_size = table[0]["Avg_row_length"] + table[0]["Data_length"]
+
+        data_size = 0
+        if table[0]['Avg_row_length'] != None:
+            data_size = table[0]['Avg_row_length']
+
+        if table[0]['Data_length'] != None:
+            data_size = table[0]['Data_length']
+
         tmp['data_byte'] = data_size
         tmp['data_size'] = mw.toSize(data_size)
         tmp['table_name'] = table[0]["Name"]
