@@ -4,8 +4,8 @@ After=network.target
 
 [Service]
 Type=forking
-User=postgres      
-Group=postgres
+User=postgresql      
+Group=postgresql
 WorkingDirectory={$APP_PATH}
 ExecStart={$APP_PATH}/bin/pg_ctl start -D {$APP_PATH}/data
 ExecReload={$APP_PATH}/bin/pg_ctl restart -D {$APP_PATH}/data
