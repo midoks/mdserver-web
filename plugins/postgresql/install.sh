@@ -35,8 +35,8 @@ fi
 
 sh -x $curPath/versions/$2/install.sh $1
 
-if [ "${action}" == "install" ] && [ -d $serverPath/postgresql ];then
-	#初始化 
-	# cd ${rootPath} && python3 ${rootPath}/plugins/postgresql/index.py start ${type}
-	# cd ${rootPath} && python3 ${rootPath}/plugins/postgresql/index.py initd_install ${type}
-fi
+# if [ "${action}" == "install" ] && [ -d $serverPath/postgresql ];then
+# 	#初始化 
+# 	cd ${rootPath} && python3 ${rootPath}/plugins/postgresql/index.py start ${type}
+# 	cd ${rootPath} && python3 ${rootPath}/plugins/postgresql/index.py initd_install ${type}
+# fi
