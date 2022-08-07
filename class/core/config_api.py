@@ -15,8 +15,7 @@ from flask import request
 
 class config_api:
 
-    # 进行中.
-    # 兼容主流Linux系统
+    # mariadb 优化
     __version = '0.8.6.15'
 
     def __init__(self):
