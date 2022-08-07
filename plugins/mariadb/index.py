@@ -900,16 +900,8 @@ def setRootPwd(version=''):
         if isError != None:
             return isError
 
-        if version.find('5.7') > -1 or version.find('8.0') > -1:
-            pdb.execute(
-                "UPDATE mysql.user SET authentication_string='' WHERE user='root'")
-            pdb.execute(
-                "ALTER USER 'root'@'localhost' IDENTIFIED BY '%s'" % password)
-            pdb.execute(
-                "ALTER USER 'root'@'127.0.0.1' IDENTIFIED BY '%s'" % password)
-        else:
-            result = pdb.execute(
-                "update mysql.user set Password=password('" + password + "') where User='root'")
+        result = pdb.execute(
+            "update mysql.user set Password=password('" + password + "') where User='root'")
         pdb.execute("flush privileges")
         pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (password,))
         return mw.returnJson(True, '数据库root密码修改成功!')
@@ -931,22 +923,8 @@ def setUserPwd(version=''):
         psdb = pSqliteDb('databases')
         name = psdb.where('id=?', (uid,)).getField('name')
 
-        if version.find('5.7') > -1 or version.find('8.0') > -1:
-            accept = pdb.query(
-                "select Host from mysql.user where User='" + name + "' AND Host!='localhost'")
-            t1 = pdb.execute(
-                "update mysql.user set authentication_string='' where User='" + username + "'")
-            # print(t1)
-            result = pdb.execute(
-                "ALTER USER `%s`@`localhost` IDENTIFIED BY '%s'" % (username, newpassword))
-            # print(result)
-            for my_host in accept:
-                t2 = pdb.execute("ALTER USER `%s`@`%s` IDENTIFIED BY '%s'" % (
-                    username, my_host["Host"], newpassword))
-                # print(t2)
-        else:
-            result = pdb.execute("update mysql.user set Password=password('" +
-                                 newpassword + "') where User='" + username + "'")
+        result = pdb.execute("update mysql.user set Password=password('" +
+                             newpassword + "') where User='" + username + "'")
 
         pdb.execute("flush privileges")
         psdb.where("id=?", (uid,)).setField('password', newpassword)
@@ -1653,26 +1631,13 @@ def addMasterRepSlaveUser(version=''):
     if psdb.where("username=?", (username)).count() > 0:
         return mw.returnJson(False, '用户已存在!')
 
-    if version == "8.0":
-        sql = "CREATE USER '" + username + \
-            "'  IDENTIFIED WITH mysql_native_password BY '" + password + "';"
-        pdb.execute(sql)
-        sql = "grant replication slave on *.* to '" + username + "'@'%';"
-        result = pdb.execute(sql)
-        isError = isSqlError(result)
-        if isError != None:
-            return isError
-
-        sql = "FLUSH PRIVILEGES;"
-        pdb.execute(sql)
-    else:
-        sql = "GRANT REPLICATION SLAVE ON *.* TO  '" + username + \
-            "'@'%' identified by '" + password + "';"
-        result = pdb.execute(sql)
-        result = pdb.execute('FLUSH PRIVILEGES;')
-        isError = isSqlError(result)
-        if isError != None:
-            return isError
+    sql = "GRANT REPLICATION SLAVE ON *.* TO  '" + username + \
+        "'@'%' identified by '" + password + "';"
+    result = pdb.execute(sql)
+    result = pdb.execute('FLUSH PRIVILEGES;')
+    isError = isSqlError(result)
+    if isError != None:
+        return isError
 
     addTime = time.strftime('%Y-%m-%d %X', time.localtime())
     psdb.add('username,password,accept,ps,addtime',
@@ -1714,23 +1679,12 @@ def getMasterRepSlaveUserCmd(version):
         sql = "CHANGE MASTER TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
             clist[0]['username'] + "', MASTER_PASSWORD='" + \
             clist[0]['password'] + "', MASTER_AUTO_POSITION=1"
-        if version == '8.0':
-            sql = "CHANGE REPLICATION SOURCE TO SOURCE_HOST='" + ip + "', SOURCE_PORT=" + port + ", SOURCE_USER='" + \
-                clist[0]['username']  + "', SOURCE_PASSWORD='" + \
-                clist[0]['password'] + "', MASTER_AUTO_POSITION=1"
     else:
         sql = "CHANGE MASTER TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
             clist[0]['username']  + "', MASTER_PASSWORD='" + \
             clist[0]['password'] + \
             "', MASTER_LOG_FILE='" + mstatus[0]["File"] + \
             "',MASTER_LOG_POS=" + str(mstatus[0]["Position"])
-
-        if version == "8.0":
-            sql = "CHANGE REPLICATION SOURCE TO SOURCE_HOST='" + ip + "', SOURCE_PORT=" + port + ", SOURCE_USER='" + \
-                clist[0]['username']  + "', SOURCE_PASSWORD='" + \
-                clist[0]['password'] + \
-                "', SOURCE_LOG_FILE='" + mstatus[0]["File"] + \
-                "',SOURCE_LOG_POS=" + str(mstatus[0]["Position"])
 
     data = {}
     data['cmd'] = sql
