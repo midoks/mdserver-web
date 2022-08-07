@@ -148,16 +148,16 @@ def initDreplace(version=''):
         conf_dir,
         log_dir
     ]
-    for conf in conf_list:
-        if not os.path.exists(conf):
-            os.mkdir(conf)
+    for c in conf_list:
+        if not os.path.exists(c):
+            os.mkdir(c)
 
-    my_conf = conf_dir + '/my.cnf'
-    if not os.path.exists(my_conf):
-        tpl = getPluginDir() + '/conf/my.cnf'
-        content = mw.readFile(tpl)
-        content = contentReplace(content)
-        mw.writeFile(my_conf, content)
+    # my_conf = conf_dir + '/my.cnf'
+    # if not os.path.exists(my_conf):
+    #     tpl = getPluginDir() + '/conf/my.cnf'
+    #     content = mw.readFile(tpl)
+    #     content = contentReplace(content)
+    #     mw.writeFile(my_conf, content)
 
     # systemd
     system_dir = mw.systemdCfgDir()
@@ -166,7 +166,7 @@ def initDreplace(version=''):
         tpl = getPluginDir() + '/init.d/postgresql.service.tpl'
         service_path = mw.getServerDir()
         content = mw.readFile(tpl)
-        content = content.replace('{$SERVER_PATH}', service_path)
+        content = contentReplace(content)
         mw.writeFile(service, content)
         mw.execShell('systemctl daemon-reload')
 
@@ -248,11 +248,8 @@ def pGetDbUser():
 
 
 def initPgData():
-    datadir = getDataDir()
-    if not os.path.exists(datadir + '/postgresql'):
-        serverdir = getServerDir()
-        myconf = serverdir + "/etc/my.cnf"
-        user = pGetDbUser()
+    serverdir = getServerDir()
+    if not os.path.exists(serverdir + '/postgresql'):
         cmd = 'cd ' + serverdir + ' && ./bin/initdb -D ' + serverdir + "/data"
         mw.execShell(cmd)
         return False
@@ -264,20 +261,13 @@ def initPgPwd():
     serverdir = getServerDir()
     pwd = mw.getRandomString(16)
 
-    cmd_pass = serverdir + '/bin/mysql -uroot -e'
-    cmd_pass = cmd_pass + "\"UPDATE mysql.user SET password=PASSWORD('" + \
-        pwd + "') WHERE user='root';"
-    cmd_pass = cmd_pass + "flush privileges;\""
+    cmd_pass = "echo \"create user root with superuser password '" + pwd + "'\" | "
+    cmd_pass = cmd_pass + serverdir + '/bin/psql -d postgres'
     data = mw.execShell(cmd_pass)
-    # print(cmd_pass)
-    # print(data)
+    print(cmd_pass)
+    print(data)
 
-    # 删除测试数据库
-    drop_test_db = serverdir + '/bin/mysql -uroot -p' + \
-        pwd + ' -e "drop database test";'
-    mw.execShell(drop_test_db)
-
-    pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
+    pSqliteDb('config').where('id=?', (1,)).save('pg_root', (pwd,))
     return True
 
 
@@ -285,6 +275,7 @@ def myOp(version, method):
     # import commands
     init_file = initDreplace()
     cmd = init_file + ' ' + method
+    # print(cmd)
     try:
         isInited = initPgData()
         if not isInited:
@@ -315,7 +306,8 @@ def myOp(version, method):
             mw.execShell('systemctl ' + method + ' postgresql')
         return 'ok'
     except Exception as e:
-        return str(e)
+        # raise
+        return method + ":" + str(e)
 
 
 def appCMD(version, action):
@@ -342,7 +334,7 @@ def initdStatus():
     if mw.isAppleSystem():
         return "Apple Computer does not support"
 
-    shell_cmd = 'systemctl status mysql | grep loaded | grep "enabled;"'
+    shell_cmd = 'systemctl status postgresql | grep loaded | grep "enabled;"'
     data = mw.execShell(shell_cmd)
     if data[0] == '':
         return 'fail'
@@ -353,7 +345,7 @@ def initdInstall():
     if mw.isAppleSystem():
         return "Apple Computer does not support"
 
-    mw.execShell('systemctl enable mysql')
+    mw.execShell('systemctl enable postgresql')
     return 'ok'
 
 
@@ -361,7 +353,7 @@ def initdUinstall():
     if mw.isAppleSystem():
         return "Apple Computer does not support"
 
-    mw.execShell('systemctl disable mysql')
+    mw.execShell('systemctl disable postgresql')
     return 'ok'
 
 
@@ -416,7 +408,7 @@ def setMyDbPos():
         return mw.returnJson(False, '文件迁移失败!')
 
 
-def getMyPort():
+def getPgPort():
     file = getConf()
     content = mw.readFile(file)
     rep = 'port\s*=\s*(.*)'
@@ -424,7 +416,7 @@ def getMyPort():
     return tmp.groups()[0].strip()
 
 
-def setMyPort():
+def setPgPort():
     args = getArgs()
     data = checkArgs(args, ['port'])
     if not data[0]:
@@ -472,6 +464,10 @@ def runInfo():
     return mw.getJson(result)
 
 
+def runLog():
+    return getServerDir() + "/logs/server.log"
+
+
 def myDbStatus():
     result = {}
     db = pMysqlDb()
@@ -517,30 +513,6 @@ def setDbStatus():
     return mw.returnJson(True, '设置成功!')
 
 
-def isSqlError(mysqlMsg):
-    # 检测数据库执行错误
-    mysqlMsg = str(mysqlMsg)
-    if "MySQLdb" in mysqlMsg:
-        return mw.returnJson(False, 'MySQLdb组件缺失! <br>进入SSH命令行输入: pip install mysql-python | pip install mysqlclient==2.0.3')
-    if "2002," in mysqlMsg:
-        return mw.returnJson(False, '数据库连接失败,请检查数据库服务是否启动!')
-    if "2003," in mysqlMsg:
-        return mw.returnJson(False, "Can't connect to MySQL server on '127.0.0.1' (61)")
-    if "using password:" in mysqlMsg:
-        return mw.returnJson(False, '数据库管理密码错误!')
-    if "1045" in mysqlMsg:
-        return mw.returnJson(False, '连接错误!')
-    if "SQL syntax" in mysqlMsg:
-        return mw.returnJson(False, 'SQL语法错误!')
-    if "Connection refused" in mysqlMsg:
-        return mw.returnJson(False, '数据库连接失败,请检查数据库服务是否启动!')
-    if "1133" in mysqlMsg:
-        return mw.returnJson(False, '数据库用户不存在!')
-    if "1007" in mysqlMsg:
-        return mw.returnJson(False, '数据库已经存在!')
-    return None
-
-
 def __createUser(dbname, username, password, address):
     pdb = pMysqlDb()
 
@@ -579,9 +551,8 @@ def setDbBackup():
     if not data[0]:
         return data[1]
 
-    scDir = mw.getRunDir() + '/scripts/backup.py'
-
-    cmd = 'python ' + scDir + ' database ' + args['name'] + ' 3'
+    scDir = getPluginDir() + '/scripts/backup.py'
+    cmd = 'python3 ' + scDir + ' database ' + args['name'] + ' 3'
     os.system(cmd)
     return mw.returnJson(True, 'ok')
 
@@ -741,5 +712,13 @@ if __name__ == "__main__":
         print(getConf())
     elif func == 'run_info':
         print(runInfo())
+    elif func == 'run_log':
+        print(runLog())
+    elif func == 'pg_port':
+        print(getPgPort())
+    elif func == 'set_pg_port':
+        print(setPgPort())
+    elif func == 'get_db_list':
+        print(getDbList())
     else:
         print('error')

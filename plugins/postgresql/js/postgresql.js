@@ -128,8 +128,8 @@ function myDbPos(){
     });
 }
 
-function myPort(){
-    myPost('my_port','',function(data){
+function pgPort(){
+    myPost('pg_port','',function(data){
         var con = '<div class="line ">\
             <div class="info-r  ml0">\
             <input name="port" class="bt-input-text mr5 port" type="text" style="width:100px" value="'+data.data+'">\
@@ -139,7 +139,7 @@ function myPort(){
 
         $('#btn_change_port').click(function(){
             var port = $("input[name='port']").val();
-            myPost('set_my_port','port='+port,function(data){
+            myPost('set_pg_port','port='+port,function(data){
                 var rdata = $.parseJSON(data.data);
                 if (rdata.status){
                     layer.msg('修改成功!',{icon:1,time:2000,shade: [0.3, '#000']});
@@ -978,8 +978,7 @@ function dbList(page, search){
             }
 
 
-            list += '<a href="javascript:;" class="btlink" onclick="openPhpmyadmin(\''+rdata.data[i]['name']+'\',\''+rdata.data[i]['username']+'\',\''+rdata.data[i]['password']+'\')" title="数据库管理">管理</a> | ' +
-                        '<a href="javascript:;" class="btlink" onclick="repTools(\''+rdata.data[i]['name']+'\')" title="MySQL优化修复工具">工具</a> | ' +
+            list += '<a href="javascript:;" class="btlink" onclick="repTools(\''+rdata.data[i]['name']+'\')" title="MySQL优化修复工具">工具</a> | ' +
                         '<a href="javascript:;" class="btlink" onclick="setDbAccess(\''+rdata.data[i]['username']+'\')" title="设置数据库权限">权限</a> | ' +
                         rw +
                         '<a href="javascript:;" class="btlink" onclick="setDbPass('+rdata.data[i]['id']+',\''+ rdata.data[i]['username'] +'\',\'' + rdata.data[i]['password'] + '\')">改密</a> | ' +
@@ -992,7 +991,6 @@ function dbList(page, search){
         var con = '<div class="safe bgw">\
             <button onclick="addDatabase()" title="添加数据库" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">添加数据库</button>\
             <button onclick="setRootPwd(0,\''+rdata.info['root_pwd']+'\')" title="设置MySQL管理员密码" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">root密码</button>\
-            <button onclick="openPhpmyadmin(\'\',\'root\',\''+rdata.info['root_pwd']+'\')" title="打开phpMyadmin" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">phpMyAdmin</button>\
             <button onclick="setDbAccess(\'root\')" title="ROOT权限" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">ROOT权限</button>\
             <span style="float:right">              \
                 <button batch="true" style="float: right;display: none;margin-left:10px;" onclick="delDbBatch();" title="删除选中项" class="btn btn-default btn-sm">删除选中</button>\
@@ -1035,70 +1033,6 @@ function dbList(page, search){
         readerTableChecked();
     });
 }
-
-
-function myLogs(){
-    
-    myPost('bin_log', {status:1}, function(data){
-        var rdata = $.parseJSON(data.data);
-
-        var line_status = ""
-        if (rdata.status){
-            line_status = '<button class="btn btn-success btn-xs btn-bin va0">关闭</button>\
-                        <button class="btn btn-success btn-xs clean-btn-bin va0">清理BINLOG日志</button>';
-        } else {
-            line_status = '<button class="btn btn-success btn-xs btn-bin va0">开启</button>';
-        }
-
-        var limitCon = '<p class="conf_p">\
-                        <span class="f14 c6 mr20">二进制日志 </span><span class="f14 c6 mr20">' + toSize(rdata.msg) + '</span>\
-                        '+line_status+'\
-                        <p class="f14 c6 mtb10" style="border-top:#ddd 1px solid; padding:10px 0">错误日志<button class="btn btn-default btn-clear btn-xs" style="float:right;" >清理日志</button></p>\
-                        <textarea readonly style="margin: 0px;width: 100%;height: 440px;background-color: #333;color:#fff; padding:0 5px" id="error_log"></textarea>\
-                    </p>';
-        $(".soft-man-con").html(limitCon);
-
-        //设置二进制日志
-        $(".btn-bin").click(function () {
-            myPost('bin_log', 'close=change', function(data){
-                var rdata = $.parseJSON(data.data);
-                layer.msg(rdata.msg, { icon: rdata.status ? 1 : 5 });
-                setTimeout(function(){myLogs();}, 2000);
-            });
-        });
-
-        $(".clean-btn-bin").click(function () {
-            myPost('clean_bin_log', '', function(data){
-                var rdata = $.parseJSON(data.data);
-                layer.msg(rdata.msg, { icon: rdata.status ? 1 : 5 });
-                setTimeout(function(){myLogs();}, 2000);
-            });
-        });
-
-         //清空日志
-        $(".btn-clear").click(function () {
-            myPost('error_log', 'close=1', function(data){
-                var rdata = $.parseJSON(data.data);
-                layer.msg(rdata.msg, { icon: rdata.status ? 1 : 5 });
-                setTimeout(function(){myLogs();}, 2000);
-            });
-        })
-
-        myPost('error_log', 'p=1', function(data){
-            var rdata = $.parseJSON(data.data);
-            var error_body = '';
-            if (rdata.status){
-                error_body = rdata.data;
-            } else {
-                error_body = rdata.msg;
-            }
-            $("#error_log").html(error_body);
-            var ob = document.getElementById('error_log');
-            ob.scrollTop = ob.scrollHeight;
-        });
-    });
-}
-
 
 function repCheckeds(tables) {
     var dbs = []

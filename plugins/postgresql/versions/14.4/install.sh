@@ -20,12 +20,12 @@ Install_App()
 	mkdir -p ${postgreDir}
 	echo '正在安装脚本文件...' > $install_tmp
 
-	if id postgres &> /dev/null ;then 
-	    echo "postgres UID is `id -u postgres`"
-	    echo "postgres Shell is `grep "^postgres:" /etc/passwd |cut -d':' -f7 `"
+	if id postgresql &> /dev/null ;then 
+	    echo "postgresql UID is `id -u postgresql`"
+	    echo "postgresql Shell is `grep "^postgresql:" /etc/passwd |cut -d':' -f7 `"
 	else
-	    groupadd postgres
-		useradd -g postgres postgres
+	    groupadd postgresql
+		useradd -g postgresql postgresql
 	fi
 
 	if [ "$sysName" != "Darwin" ];then

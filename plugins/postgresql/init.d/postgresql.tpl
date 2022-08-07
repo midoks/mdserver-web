@@ -39,13 +39,19 @@ pg_stop()
 
 pg_status()
 {
-	echo "123123"
+    isStart=$(ps aux |grep 'postgres'|grep -v grep|awk '{print $2}')
+    if [ "$isStart" != '' ];then
+        echo -e "\033[32mPostgreSQL (pid $isStart) already running\033[0m"
+    else
+        echo -e "\033[31mPostgreSQL not running\033[0m"
+    fi
 }
 
 
 pg_reload()
 {
-	echo "123"
+	pg_stop
+    pg_start
 }
 
 
