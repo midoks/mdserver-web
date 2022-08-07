@@ -98,7 +98,12 @@ def systemdCfgDir():
         return cfg_dir
 
     # debian,centos
-    return "/usr/lib/systemd/system"
+    cfg_dir = '/usr/lib/systemd/system'
+    if os.path.exists(cfg_dir):
+        return cfg_dir
+
+    # local test
+    return "/tmp"
 
 
 def getOs():

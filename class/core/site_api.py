@@ -730,11 +730,11 @@ class site_api:
             if conf.find('ssl_certificate') == -1:
                 return mw.returnJson(False, '当前未开启SSL')
             to = """#error_page 404/404.html;
-    # HTTP_TO_HTTPS_START
+    #HTTP_TO_HTTPS_START
     if ($server_port !~ 443){
         rewrite ^(/.*)$ https://$host$1 permanent;
     }
-    # HTTP_TO_HTTPS_END"""
+    #HTTP_TO_HTTPS_END"""
             conf = conf.replace('#error_page 404/404.html;', to)
             mw.writeFile(file, conf)
 
