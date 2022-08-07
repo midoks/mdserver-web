@@ -57,7 +57,7 @@ Install_App()
 	fi
 
 	if [ ! -d ${postgreDir}/postgresql-${VERSION} ];then
-		 cd ${postgreDir} && tar -zxvf  ${postgreDir}/postgresql-${VERSION}.tar.bz2
+		cd ${postgreDir} && tar -jxvf  ${postgreDir}/postgresql-${VERSION}.tar.bz2
 	fi
 	
 
@@ -79,7 +79,7 @@ Install_App()
 		echo 'install successful' > $install_tmp
 	else
 		echo 'install fail' > $install_tmp
-		echo 'install fail'>&2
+		echo 'install fail' > &2
 	fi
 }
 
