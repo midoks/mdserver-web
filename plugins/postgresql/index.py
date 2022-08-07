@@ -249,7 +249,7 @@ def pGetDbUser():
 
 def initPgData():
     serverdir = getServerDir()
-    if not os.path.exists(serverdir + '/postgresql'):
+    if not os.path.exists(serverdir + '/data'):
         cmd = 'cd ' + serverdir + ' && ./bin/initdb -D ' + serverdir + "/data"
         mw.execShell(cmd)
         return False
