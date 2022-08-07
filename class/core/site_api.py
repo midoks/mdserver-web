@@ -2141,20 +2141,21 @@ location ^~ {from} {
         content = content.replace('{$LOGPATH}', logsPath)
         mw.writeFile(vhost_file, content)
 
-        rewrite_content = '''
-location /{
-    if ($PHP_ENV != "1"){
-        break;
-    }
+# 和反代配置冲突 && 默认伪静态为空
+#         rewrite_content = '''
+# location /{
+#     if ($PHP_ENV != "1"){
+#         break;
+#     }
 
-    if (!-e $request_filename) {
-       rewrite  ^(.*)$  /index.php/$1  last;
-       break;
-    }
-}
-'''
+#     if (!-e $request_filename) {
+#        rewrite  ^(.*)$  /index.php/$1  last;
+#        break;
+#     }
+# }
+# '''
         rewrite_file = self.rewritePath + '/' + self.siteName + '.conf'
-        mw.writeFile(rewrite_file, rewrite_content)
+        mw.writeFile(rewrite_file, '')
 
     def add(self, webname, port, ps, path, version):
         siteMenu = json.loads(webname)
