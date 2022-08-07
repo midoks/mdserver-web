@@ -75,11 +75,10 @@ Install_App()
 	fi
 
 	if [ -d $serverPath/postgresql ];then
-		echo "{$VERSION}" > $serverPath/postgresql/version.pl
+		echo "${VERSION}" > $serverPath/postgresql/version.pl
 		echo 'install successful' > $install_tmp
 	else
 		echo 'install fail' > $install_tmp
-		echo 'install fail' > &2
 	fi
 }
 
