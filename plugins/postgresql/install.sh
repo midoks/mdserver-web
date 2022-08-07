@@ -23,15 +23,15 @@ if [ ! -d $curPath/versions/$2 ];then
 	exit 0
 fi
 
-# if [ "${action}" == "uninstall" ];then
-# 	if [ -f /usr/lib/systemd/system/postgresql.service ] || [ -f /lib/systemd/system/postgresql.service ];then
-# 		systemctl stop postgresql
-# 		systemctl disable postgresql
-# 		rm -rf /usr/lib/systemd/system/postgresql.service
-# 		rm -rf /lib/systemd/system/postgresql.service
-# 		systemctl daemon-reload
-# 	fi
-# fi
+if [ "${action}" == "uninstall" ];then
+	if [ -f /usr/lib/systemd/system/postgresql.service ] || [ -f /lib/systemd/system/postgresql.service ];then
+		systemctl stop postgresql
+		systemctl disable postgresql
+		rm -rf /usr/lib/systemd/system/postgresql.service
+		rm -rf /lib/systemd/system/postgresql.service
+		systemctl daemon-reload
+	fi
+fi
 
 sh -x $curPath/versions/$2/install.sh $1
 
