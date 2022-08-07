@@ -1887,6 +1887,8 @@ def getSlaveList(version=''):
 
     db = pMysqlDb()
     dlist = db.query('show slave status')
+
+    # print(dlist)
     ret = []
     for x in range(0, len(dlist)):
         tmp = {}
@@ -1918,7 +1920,7 @@ def initSlaveStatus(version=''):
         return mw.returnJson(False, '已经初始化好了zz...')
 
     conn = pSqliteDb('slave_id_rsa')
-    data = conn.field('ip,port,id_rsa').find()
+    data = conn.field('ip,port,id_rsa,db_user').find()
 
     if len(data) < 1:
         return mw.returnJson(False, '需要先配置【[主]SSH配置】!')
@@ -1940,12 +1942,14 @@ def initSlaveStatus(version=''):
         ssh.connect(hostname=ip, port=int(master_port),
                     username='root', pkey=key)
 
-        cmd = 'cd /www/server/mdserver-web && python3 plugins/mariadb/index.py get_master_rep_slave_user_cmd {"username":"","db":""}'
+        db_user = data['db_user']
+        cmd = 'cd /www/server/mdserver-web && python3 plugins/mariadb/index.py get_master_rep_slave_user_cmd {"username":"' + db_user + '","db":""}'
         stdin, stdout, stderr = ssh.exec_command(cmd)
         result = stdout.read()
         result = result.decode('utf-8')
         cmd_data = json.loads(result)
-
+        time.sleep(1)
+        ssh.close()
         if not cmd_data['status']:
             return mw.returnJson(False, '[主]:' + cmd_data['msg'])
 
@@ -1961,20 +1965,20 @@ def initSlaveStatus(version=''):
         # 保证同步IP一致
         cmd = cmd_data['data']['cmd']
         if cmd.find('SOURCE_HOST') > -1:
-            cmd = re.sub(r"SOURCE_HOST='(.*)'",
+            cmd = re.sub(r"SOURCE_HOST='(.*?)'",
                          "SOURCE_HOST='" + ip + "'", cmd, 1)
 
         if cmd.find('MASTER_HOST') > -1:
-            cmd = re.sub(r"MASTER_HOST='(.*)'",
+            cmd = re.sub(r"MASTER_HOST='(.*?)'",
                          "MASTER_HOST='" + ip + "'", cmd, 1)
+
+        # print(cmd)
         db.query(cmd)
-        db.query("start slave user='{}' password='{}';".format(
-            u['username'], u['password']))
+        db.query("start slave")
+
     except Exception as e:
         return mw.returnJson(False, 'SSH认证配置连接失败!' + str(e))
 
-    ssh.close()
-    time.sleep(1)
     os.system("rm -rf " + SSH_PRIVATE_KEY)
     return mw.returnJson(True, '初始化成功!')
 
@@ -1986,6 +1990,7 @@ def setSlaveStatus(version=''):
     if len(dlist) == 0:
         return mw.returnJson(False, '需要手动添加主服务命令或者执行[初始化]!')
 
+    # print(dlist)
     if len(dlist) > 0 and (dlist[0]["Slave_IO_Running"] == 'Yes' or dlist[0]["Slave_SQL_Running"] == 'Yes'):
         db.query('stop slave')
     else:
@@ -1994,8 +1999,7 @@ def setSlaveStatus(version=''):
         data = conn.field('ip,ps').where("ip=?", (ip,)).find()
         if len(data) == 0:
             return mw.returnJson(False, '没有数据无法重启!')
-        u = data['ps'].split("|")
-        db.query("start slave user='{}' password='{}';".format(u[0], u[1]))
+        db.query("start slave")
 
     return mw.returnJson(True, '设置成功!')
 
@@ -2159,8 +2163,7 @@ def doFullSync(version=''):
         writeDbSyncStatus({'code': 5, 'msg': '导入数据失败...', 'progress': 100})
         return 'fail'
 
-    db.query("start slave user='{}' password='{}';".format(
-        uinfo['username'], uinfo['password']))
+    db.query("start slave")
     writeDbSyncStatus({'code': 6, 'msg': '从库重启完成...', 'progress': 100})
 
     os.system("rm -rf " + SSH_PRIVATE_KEY)
