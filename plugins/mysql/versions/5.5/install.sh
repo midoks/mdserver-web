@@ -50,6 +50,10 @@ Install_mysql()
 	else
 	    cpuCore="1"
 	fi
+
+	if [ "$cpuCore" -gt "1" ];then
+		cpuCore=`echo "$cpuCore" | awk '{printf("%.f",($1)*0.8)}'`
+	fi
 	# ----- cpu end ------
 
 	if [ ! -f ${mysqlDir}/mysql-5.5.62.tar.gz ];then

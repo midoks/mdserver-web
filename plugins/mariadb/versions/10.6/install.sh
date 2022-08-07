@@ -51,6 +51,10 @@ Install_app()
 	else
 	    cpuCore="1"
 	fi
+
+	if [ "$cpuCore" -gt "1" ];then
+		cpuCore=`echo "$cpuCore" | awk '{printf("%.f",($1)*0.8)}'`
+	fi
 	# ----- cpu end ------
 
 	if [ ! -f ${mariadbDir}/mariadb-${MY_VER}.tar.gz ];then
@@ -61,6 +65,11 @@ Install_app()
 
 	if [ ! -d ${mariadbDir}/mariadb-${MY_VER} ];then
 		 cd ${mariadbDir} && tar -zxvf  ${mariadbDir}/mariadb-${MY_VER}.tar.gz
+	fi
+	
+	OPTIONS=''
+	if [ "$sysName" == "Darwin" ];then
+		OPTIONS='-DPLUGIN_TOKUDB=NO'
 	fi
 	
 
@@ -75,6 +84,7 @@ Install_app()
 		-DWITH_MEMORY_STORAGE_ENGINE=1 \
 		-DENABLED_LOCAL_INFILE=1 \
 		-DWITH_PARTITION_STORAGE_ENGINE=1 \
+		$OPTIONS \
 		-DEXTRA_CHARSETS=all \
 		-DDEFAULT_CHARSET=utf8mb4 \
 		-DDEFAULT_COLLATION=utf8mb4_general_ci \

@@ -6,6 +6,11 @@ socket		= {$SERVER_APP_PATH}/mysql.sock
 default-character-set = UTF8MB4
 
 [mysqld]
+!include {$SERVER_APP_PATH}/etc/mode/classic.cnf
+
+;sha256_password_private_key_path=mysql.pem
+;sha256_password_public_key_path=mysql.pub
+
 pid-file = {$SERVER_APP_PATH}/data/mysql.pid
 user = mysql
 port		= 3306
@@ -13,7 +18,9 @@ socket		= {$SERVER_APP_PATH}/mysql.sock
 basedir = {$SERVER_APP_PATH}
 datadir = {$SERVER_APP_PATH}/data
 log-error =  {$SERVER_APP_PATH}/data/error.log
-default_storage_engine = MyISAM
+server-id	= {$SERVER_ID}
+
+default_storage_engine = InnoDB
 
 key_buffer_size = 8M
 table_open_cache = 32
@@ -32,20 +39,21 @@ max_connect_errors = 100
 open_files_limit = 2560
 max_allowed_packet = 128M
 
-#skip-external-locking
-#skip-grant-tables
-#loose-skip-innodb
+skip_name_resolve = 1
 #skip-networking
-#skip-name-resolve
-skip-ssl
+#skip-external-locking
+#loose-skip-innodb
+#skip-grant-tables
 
 log-bin=mysql-bin
 binlog_format=mixed
-server-id	= 1
 slow_query_log=1
 slow-query-log-file={$SERVER_APP_PATH}/data/mysql-slow.log
-long_query_time=3
-#log_queries_not_using_indexes=on
+long_query_time=10
+#log_queries_not_using_indexes=1
+#log_slow_admin_statements=1
+#log_slow_slave_statements=1
+expire_logs_days=30
 
 relay-log=mdserver
 relay-log-index=mdserver
@@ -58,26 +66,28 @@ binlog-ignore-db = information_schema
 binlog-ignore-db = performance_schema
 
 #slave
-log-slave-updates
+log-slave-updates = 1
+skip-slave-start = 1
 #replicate-do-db
 replicate-ignore-db = information_schema
 replicate-ignore-db = performance_schema
 replicate-ignore-db = mysql
 replicate-ignore-db = test
 
-default_storage_engine = InnoDB
+
 innodb_data_home_dir = {$SERVER_APP_PATH}/data
 innodb_data_file_path = ibdata1:10M:autoextend
 innodb_log_group_home_dir = {$SERVER_APP_PATH}/data
 innodb_buffer_pool_size = 16M
 innodb_log_file_size = 5M
 innodb_log_buffer_size = 8M
-innodb_flush_log_at_trx_commit = 1
+innodb_flush_log_at_trx_commit = 2
 innodb_lock_wait_timeout = 120
 innodb_max_dirty_pages_pct = 90
 innodb_read_io_threads = 1
 innodb_write_io_threads = 1
-innodb_file_per_table=1
+innodb_file_per_table = 1
+innodb_large_prefix = 1
 
 secure-file-priv={$SERVER_APP_PATH}/tmp
 

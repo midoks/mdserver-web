@@ -139,6 +139,14 @@ def start():
         centent = contentReplace(centent)
         mw.writeFile(conf_run, centent)
 
+    log_a = accessLog()
+    log_e = errorLog()
+
+    for i in [log_a, log_e]:
+        if os.path.exists(i):
+            cmd = "echo '' > " + i
+            mw.execShell(cmd)
+
     mw.restartWeb()
     return 'ok'
 
@@ -217,11 +225,11 @@ def setPmaPort():
 
 
 def accessLog():
-    return getServerDir() + '/phpmyadmin/access.log'
+    return getServerDir() + '/access.log'
 
 
 def errorLog():
-    return getServerDir() + '/phpmyadmin/error.log'
+    return getServerDir() + '/error.log'
 
 
 def Version():

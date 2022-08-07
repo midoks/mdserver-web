@@ -3,7 +3,7 @@
 # description: MW Cloud Service
 
 ### BEGIN INIT INFO
-# Provides:          bt
+# Provides:          Midoks
 # Required-Start:    $all
 # Required-Stop:     $all
 # Default-Start:     2 3 4 5

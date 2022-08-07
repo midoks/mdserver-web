@@ -727,14 +727,14 @@ class site_api:
         file = self.getHostConf(siteName)
         conf = mw.readFile(file)
         if conf:
-            # if conf.find('ssl_certificate') == -1:
-            #     return mw.returnJson(False, '当前未开启SSL')
+            if conf.find('ssl_certificate') == -1:
+                return mw.returnJson(False, '当前未开启SSL')
             to = """#error_page 404/404.html;
-    # HTTP_TO_HTTPS_START
+    #HTTP_TO_HTTPS_START
     if ($server_port !~ 443){
         rewrite ^(/.*)$ https://$host$1 permanent;
     }
-    # HTTP_TO_HTTPS_END"""
+    #HTTP_TO_HTTPS_END"""
             conf = conf.replace('#error_page 404/404.html;', to)
             mw.writeFile(file, conf)
 
@@ -2141,20 +2141,21 @@ location ^~ {from} {
         content = content.replace('{$LOGPATH}', logsPath)
         mw.writeFile(vhost_file, content)
 
-        rewrite_content = '''
-location /{
-    if ($PHP_ENV != "1"){
-        break;
-    }
+# 和反代配置冲突 && 默认伪静态为空
+#         rewrite_content = '''
+# location /{
+#     if ($PHP_ENV != "1"){
+#         break;
+#     }
 
-    if (!-e $request_filename) {
-       rewrite  ^(.*)$  /index.php/$1  last;
-       break;
-    }
-}
-'''
+#     if (!-e $request_filename) {
+#        rewrite  ^(.*)$  /index.php/$1  last;
+#        break;
+#     }
+# }
+# '''
         rewrite_file = self.rewritePath + '/' + self.siteName + '.conf'
-        mw.writeFile(rewrite_file, rewrite_content)
+        mw.writeFile(rewrite_file, '')
 
     def add(self, webname, port, ps, path, version):
         siteMenu = json.loads(webname)

@@ -35,13 +35,14 @@ Install_phpmyadmin()
 	mkdir -p ${serverPath}/source/phpmyadmin
 
 	VER=$1
-	FILE=phpMyAdmin-${VER}-all-languages.tar.gz
+	
 	FDIR=phpMyAdmin-${VER}-all-languages
+	FILE=phpMyAdmin-${VER}-all-languages.tar.gz
 	DOWNLOAD=https://files.phpmyadmin.net/phpMyAdmin/${VER}/$FILE
 	
 
 	if [ ! -f $serverPath/source/phpmyadmin/$FILE ];then
-		wget -O $serverPath/source/phpmyadmin/$FILE $DOWNLOAD
+		wget --no-check-certificate -O $serverPath/source/phpmyadmin/$FILE $DOWNLOAD
 	fi
 
 	if [ ! -d $serverPath/source/phpmyadmin/$FDIR ];then

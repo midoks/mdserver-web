@@ -24,63 +24,8 @@ import time
 
 class backupTools:
 
-    def backupSite(self, name, count):
-        sql = db.Sql()
-        path = sql.table('sites').where('name=?', (name,)).getField('path')
-        startTime = time.time()
-        if not path:
-            endDate = time.strftime('%Y/%m/%d %X', time.localtime())
-            log = "网站[" + name + "]不存在!"
-            print("★[" + endDate + "] " + log)
-            print(
-                "----------------------------------------------------------------------------")
-            return
-
-        backup_path = mw.getRootDir() + '/backup/site'
-        if not os.path.exists(backup_path):
-            mw.execShell("mkdir -p " + backup_path)
-
-        filename = backup_path + "/web_" + name + "_" + \
-            time.strftime('%Y%m%d_%H%M%S', time.localtime()) + '.tar.gz'
-        mw.execShell("cd " + os.path.dirname(path) + " && tar zcvf '" +
-                     filename + "' '" + os.path.basename(path) + "' > /dev/null")
-
-        endDate = time.strftime('%Y/%m/%d %X', time.localtime())
-
-        print(filename)
-        if not os.path.exists(filename):
-            log = "网站[" + name + u"]备份失败!"
-            print("★[" + endDate + "] " + log)
-            print(
-                "----------------------------------------------------------------------------")
-            return
-
-        outTime = time.time() - startTime
-        pid = sql.table('sites').where('name=?', (name,)).getField('id')
-        sql.table('backup').add('type,name,pid,filename,addtime,size', ('0', os.path.basename(
-            filename), pid, filename, endDate, os.path.getsize(filename)))
-        log = "网站[" + name + "]备份成功,用时[" + str(round(outTime, 2)) + "]秒"
-        mw.writeLog(u'计划任务', log)
-        print("★[" + endDate + "] " + log)
-        print("|---保留最新的[" + count + "]份备份")
-        print("|---文件名:" + filename)
-
-        # 清理多余备份
-        backups = sql.table('backup').where(
-            'type=? and pid=?', ('0', pid)).field('id,filename').select()
-
-        num = len(backups) - int(count)
-        if num > 0:
-            for backup in backups:
-                mw.execShell("rm -f " + backup['filename'])
-                sql.table('backup').where('id=?', (backup['id'],)).delete()
-                num -= 1
-                print("|---已清理过期备份文件：" + backup['filename'])
-                if num < 1:
-                    break
-
     def backupDatabase(self, name, count):
-        db_path = mw.getServerDir() + '/mysql'
+        db_path = mw.getServerDir() + '/mariadb'
         db_name = 'mysql'
         name = mw.M('databases').dbPos(db_path, 'mysql').where(
             'name=?', (name,)).getField('name')
@@ -161,13 +106,8 @@ class backupTools:
                 if num < 1:
                     break
 
-    def backupSiteAll(self, save):
-        sites = mw.M('sites').field('name').select()
-        for site in sites:
-            self.backupSite(site['name'], save)
-
     def backupDatabaseAll(self, save):
-        db_path = mw.getServerDir() + '/mysql'
+        db_path = mw.getServerDir() + '/mariadb'
         db_name = 'mysql'
         databases = mw.M('databases').dbPos(
             db_path, db_name).field('name').select()
@@ -178,12 +118,7 @@ class backupTools:
 if __name__ == "__main__":
     backup = backupTools()
     type = sys.argv[1]
-    if type == 'site':
-        if sys.argv[2] == 'ALL':
-            backup.backupSiteAll(sys.argv[3])
-        else:
-            backup.backupSite(sys.argv[2], sys.argv[3])
-    elif type == 'database':
+    if type == 'database':
         if sys.argv[2] == 'ALL':
             backup.backupDatabaseAll(sys.argv[3])
         else:

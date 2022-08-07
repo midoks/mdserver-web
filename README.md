@@ -10,6 +10,7 @@
 ![Fedora](https://img.shields.io/badge/LINUX-Fedora-blue?style=for-the-badge&logo=Fedora)
 
 [![Wiki](https://img.shields.io/badge/MW-Wiki-red?style=for-the-badge&logo=wiki)](https://github.com/midoks/mdserver-web/wiki)
+[![](https://data.jsdelivr.com/v1/package/gh/midoks/mdserver-web/badge?style=for-the-badge)](https://www.jsdelivr.com/package/gh/midoks/mdserver-web)
 
 * SSH终端工具
 * 面板收藏功能
@@ -59,6 +60,19 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 * mysql主从配置。
 * swap插件[虚拟内存]。
 
+### jsdelivr [ 发布新版本生效 ]
+
+- 初始安装
+
+```
+curl -fsSL https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/scripts/install.sh | bash
+```
+
+- 更新
+
+```
+curl -fsSL https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/scripts/update.sh | bash
+```
 
 ### GW使用
 
@@ -90,7 +104,7 @@ curl -fsSL  https://gitee.com/midoks/mdserver-web/raw/master/scripts/update_cn.s
 
 
 
-### 通用安装
+### 通用软件安装
 
 ```
 curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/quick/app.sh | bash

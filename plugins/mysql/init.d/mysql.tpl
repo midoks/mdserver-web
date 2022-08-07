@@ -250,9 +250,10 @@ parse_server_arguments `$print_defaults $extra_args mysqld server mysql_server m
 #
 # Set pid file if not given
 #
+found_pid=`cd $datadir && ls |grep '.pid'`
 if test -z "$mysqld_pid_file_path"
 then
-  mysqld_pid_file_path=$datadir/`hostname`.pid
+  mysqld_pid_file_path=$datadir/$found_pid
 else
   case "$mysqld_pid_file_path" in
     /* ) ;;

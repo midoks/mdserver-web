@@ -35,7 +35,7 @@ function getLogs(id){
 		});
 
 		setTimeout(function(){
-			$("#crontab-log").text(rdata.msg);
+			$("#crontab-log").html(rdata.msg);
 		},200);
 	},'json');
 }
