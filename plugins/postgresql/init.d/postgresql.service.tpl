@@ -7,9 +7,9 @@ Type=forking
 User=postgres      
 Group=postgres
 WorkingDirectory={$APP_PATH}
-ExecStart={$APP_PATH}/pg_ctl start -D {$APP_PATH}/data
-ExecReload={$APP_PATH}/pg_ctl restart -D {$APP_PATH}/data
-ExecStop={$APP_PATH}/pg_ctl stop -D {$APP_PATH}/data
+ExecStart={$APP_PATH}/bin/pg_ctl start -D {$APP_PATH}/data
+ExecReload={$APP_PATH}/bin/pg_ctl restart -D {$APP_PATH}/data
+ExecStop={$APP_PATH}/bin/pg_ctl stop -D {$APP_PATH}/data
 PrivateTmp=false
 
 [Install]
