@@ -522,24 +522,129 @@ def runLog():
     return getServerDir() + "/logs/server.log"
 
 
-def myDbStatus():
-    result = {}
-    db = pMysqlDb()
-    data = db.query('show variables')
-    # isError = isSqlError(data)
-    # if isError != None:
-    #     return isError
+def getUnit(args):
+    unit = ''
+    if "GB" in args:
+        unit = "GB"
+    elif "MB" in args:
+        unit = "MB"
+    elif "KB" in args:
+        unit = "KB"
+    elif "kB" in args:
+        unit = "kB"
+    return unit
 
-    gets = ['table_open_cache', 'thread_cache_size', 'key_buffer_size', 'tmp_table_size', 'max_heap_table_size', 'innodb_buffer_pool_size',
-            'innodb_additional_mem_pool_size', 'innodb_log_buffer_size', 'max_connections', 'sort_buffer_size', 'read_buffer_size', 'read_rnd_buffer_size', 'join_buffer_size', 'thread_stack', 'binlog_cache_size']
-    result['mem'] = {}
-    for d in data:
-        vname = d['Variable_name']
-        for g in gets:
-            # print(g)
-            if vname == g:
-                result['mem'][g] = d["Value"]
-    return mw.getJson(result)
+
+def pgDbStatus():
+
+    data_directory = getServerDir() + "/data"
+    data = {}
+    shared_buffers, work_mem, effective_cache_size, maintence_work_mem, max_connections, temp_buffers, max_prepared_transactions, max_stack_depth, bgwriter_lru_maxpages, max_worker_processes, listen_addresses = '', '', '', '', '', '', '', '', '', '', ''
+    with open("{}/postgresql.conf".format(data_directory)) as f:
+        for i in f:
+            if i.strip().startswith("shared_buffers"):
+                shared_buffers = i.split("=")[1]
+            elif i.strip().startswith("#shared_buffers"):
+                shared_buffers = i.split("=")[1]
+
+            shared_buffers_num = re.match(
+                r'\d+', shared_buffers.strip()).group() if re.match(r'\d+', shared_buffers.strip()) else ""
+            data['shared_buffers'] = [shared_buffers_num, "MB",
+                                      "PG通过shared_buffers和内核和磁盘打交道，通常设置为实际内存的10％。"]
+
+            if i.strip().startswith("work_mem"):
+                work_mem = i.split("=")[1]
+            elif i.strip().startswith("#work_mem"):
+                work_mem = i.split("=")[1]
+
+            work_mem_num = re.match(
+                r'\d+', work_mem.strip()).group() if re.match(r'\d+', work_mem.strip()) else ""
+            data['work_mem'] = [work_mem_num, "MB",
+                                "增加work_mem有助于提高排序的速度。通常设置为实际RAM的2% -4%。"]
+
+            if i.strip().startswith("effective_cache_size"):
+                effective_cache_size = i.split("=")[1]
+            elif i.strip().startswith("#effective_cache_size"):
+                effective_cache_size = i.split("=")[1]
+
+            effective_cache_size_num = re.match(r'\d+', effective_cache_size.strip(
+            )).group() if re.match(r'\d+', effective_cache_size.strip()) else ""
+            data['effective_cache_size'] = [effective_cache_size_num,
+                                            "GB", "pgsql能够使用的最大缓存,比如4G的内存，可以设置为3GB."]
+
+            if i.strip().startswith("temp_buffers "):
+                temp_buffers = i.split("=")[1]
+            elif i.strip().startswith("#temp_buffers "):
+                temp_buffers = i.split("=")[1]
+
+            temp_buffers_num = re.match(
+                r'\d+', temp_buffers.strip()).group() if re.match(r'\d+', temp_buffers.strip()) else ""
+            data['temp_buffers'] = [temp_buffers_num, "MB",
+                                    "设置每个数据库会话使用的临时缓冲区的最大数目，默认是8MB"]
+
+            if i.strip().startswith("max_connections"):
+                max_connections = i.split("=")[1]
+            elif i.strip().startswith("#max_connections"):
+                max_connections = i.split("=")[1]
+
+            max_connections_num = re.match(
+                r'\d+', max_connections.strip()).group() if re.match(r'\d+', max_connections.strip()) else ""
+            data['max_connections'] = [max_connections_num,
+                                       getUnit(max_connections), "最大连接数"]
+
+            if i.strip().startswith("max_prepared_transactions"):
+                max_prepared_transactions = i.split("=")[1]
+            elif i.strip().startswith("#max_prepared_transactions"):
+                max_prepared_transactions = i.split("=")[1]
+
+            max_prepared_transactions_num = re.match(r'\d+', max_prepared_transactions.strip(
+            )).group() if re.match(r'\d+', max_prepared_transactions.strip()) else ""
+            data['max_prepared_transactions'] = [max_prepared_transactions_num, getUnit(
+                max_prepared_transactions), "设置可以同时处于 prepared 状态的事务的最大数目"]
+
+            if i.strip().startswith("max_stack_depth "):
+                max_stack_depth = i.split("=")[1]
+            elif i.strip().startswith("#max_stack_depth "):
+                max_stack_depth = i.split("=")[1]
+
+            max_stack_depth_num = re.match(
+                r'\d+', max_stack_depth.strip()).group() if re.match(r'\d+', max_stack_depth.strip()) else ""
+            data['max_stack_depth'] = [max_stack_depth_num,
+                                       "MB", "指定服务器的执行堆栈的最大安全深度，默认是2MB"]
+
+            if i.strip().startswith("bgwriter_lru_maxpages "):
+                bgwriter_lru_maxpages = i.split("=")[1]
+            elif i.strip().startswith("#bgwriter_lru_maxpages "):
+                bgwriter_lru_maxpages = i.split("=")[1]
+
+            bgwriter_lru_maxpages_num = re.match(r'\d+', bgwriter_lru_maxpages.strip(
+            )).group() if re.match(r'\d+', bgwriter_lru_maxpages.strip()) else ""
+            data['bgwriter_lru_maxpages'] = [
+                bgwriter_lru_maxpages_num, "", "一个周期最多写多少脏页"]
+
+            if i.strip().startswith("max_worker_processes "):
+                max_worker_processes = i.split("=")[1]
+            elif i.strip().startswith("#max_worker_processes "):
+                max_worker_processes = i.split("=")[1]
+
+            max_worker_processes_num = re.match(r'\d+', max_worker_processes.strip(
+            )).group() if re.match(r'\d+', max_worker_processes.strip()) else ""
+            data['max_worker_processes'] = [max_worker_processes_num,
+                                            "", "如果要使用worker process, 最多可以允许fork 多少个worker进程."]
+
+            if i.strip().startswith("listen_addresses"):
+                listen_addresses = i.split("=")[1]
+            elif i.strip().startswith("#listen_addresses"):
+                listen_addresses = i.split("=")[1]
+
+            listen_addresses = re.match(r"\'.*?\'", listen_addresses.strip()).group(
+            ) if re.match(r"\'.*?\'", listen_addresses.strip()) else ""
+            data['listen_addresses'] = [listen_addresses.replace(
+                "'", '').replace("127.0.0.1", 'localhost'), "", "pgsql监听地址"]
+
+    # 返回数据到前端
+    data['status'] = True
+    return mw.getJson(data)
 
 
 def setDbStatus():
@@ -869,6 +974,8 @@ if __name__ == "__main__":
         print(runInfo())
     elif func == 'run_log':
         print(runLog())
+    elif func == 'db_status':
+        print(pgDbStatus())
     elif func == 'pg_port':
         print(getPgPort())
     elif func == 'set_pg_port':
