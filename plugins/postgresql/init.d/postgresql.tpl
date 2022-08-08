@@ -36,10 +36,9 @@ pg_stop()
 }
 
 
-
 pg_status()
 {
-    isStart=$(ps aux |grep 'postgres'|grep -v grep|awk '{print $2}')
+    isStart=$(ps aux | grep 'postgres'| grep -v grep | grep -v 'postgresql status' | awk '{print $2}')
     if [ "$isStart" != '' ];then
         echo -e "\033[32mPostgreSQL (pid $isStart) already running\033[0m"
     else
@@ -50,8 +49,8 @@ pg_status()
 
 pg_reload()
 {
-	pg_stop
-    pg_start
+    echo '' > {$APP_PATH}/logs/server.log
+	{$APP_PATH}/bin/pg_ctl -D {$APP_PATH}/data -l {$APP_PATH}/logs/server.log reload
 }
 
 
@@ -63,4 +62,6 @@ case "$1" in
     'restart') 
         pg_stop
         pg_start;;
+    'status') 
+        pg_status;;
 esac

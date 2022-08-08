@@ -1,4 +1,4 @@
-### mdserver-web 0.8.6
+### mdserver-web 0.9.0
 
 简单的Linux面板,感谢BT.CN写出如此好的web管理软件。我一看到，就知道这是我一直想要的页面化管理方式。
 复制了后台管理界面，按照自己想要的方式写了一版。
@@ -28,6 +28,7 @@
 * OpenResty - 轻量级，占有内存少，并发能力强。
 * PHP[52-81] - PHP是世界上最好的编程语言。
 * MySQL - 一种关系数据库管理系统。
+* MariaDB - 是MySQL的一个重要分支。
 * MongoDB - 一种非关系NOSQL数据库管理系统。
 * phpMyAdmin - 著名Web端MySQL管理工具。
 * Memcached - 一个高性能的分布式内存对象缓存系统。
@@ -35,6 +36,19 @@
 * PureFtpd - 一款专注于程序健壮和软件安全的免费FTP服务器软件。
 * Gogs - 一款极易搭建的自助Git服务。
 * Rsyncd - 通用同步服务。
+
+
+### 插件开发相关
+
+```
+插件文档还不完善，如果有不明白的地方提Issue! 我会尽力完善。
+如果你自己写了插件，想分享出来，也可以提Issue。
+```
+
+- 简单例子 - https://github.com/mw-plugin/simple-plugin 
+- 插件地址 - https://github.com/mw-plugin
+- 开发文档 - https://github.com/midoks/mdserver-web/wiki/插件开发
+
 
 # Note
 
@@ -56,11 +70,23 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.8.6
-* mysql主从配置。
-* swap插件[虚拟内存]。
+### 版本更新 0.9.0
+* 主流系统支持。
+* 插件支持更多参数。
+* MySQL主从支持GTID和经典模式。
+* MariaDB主从支持GTID和经典模式。
+* Rsyncd更新。
+* 添加网站统计的插件。
+* 添加varnish插件。
+* 添加PHP的APT安装方式[辅助插件]。
+* 添加PHP的YUM安装方式[辅助插件]。
+* 添加MYSQL的YUM安装方式[辅助插件]。
+* 各种bug修复。
 
-### jsdelivr [ 发布新版本生效 ]
+
+
+
+### JSDelivr安装地址
 
 - 初始安装
 
@@ -68,43 +94,31 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 curl -fsSL https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/scripts/install.sh | bash
 ```
 
-- 更新
+- 直接更新
 
 ```
 curl -fsSL https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/scripts/update.sh | bash
 ```
 
-### GW使用
+### 备用地址
 
 - 初始安装
 
 ```
 curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/install.sh | bash
+
 ```
 
-- 脚本更新
+- 直接更新
 
 ```
 curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/update.sh | bash
 ```
 
-### GN使用
 
-- 初始安装
+### 通用软件安装[命令行安装]
 
-```
-curl -fsSL  https://gitee.com/midoks/mdserver-web/raw/master/scripts/install_cn.sh | bash
-```
-
-- 脚本更新
-
-```
-curl -fsSL  https://gitee.com/midoks/mdserver-web/raw/master/scripts/update_cn.sh | bash
-```
-
-
-
-### 通用软件安装
+- 需已经安装mdserver-web
 
 ```
 curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/quick/app.sh | bash
@@ -113,15 +127,8 @@ curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/qu
 
 ### DEV使用
 
-- 初始安装
-
 ```
 curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/install_dev.sh | bash
-```
-
-- 脚本更新
-
-```
 curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update_dev.sh | bash
 ```
 
@@ -133,17 +140,6 @@ curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/up
 
 [![截图](/route/static/mdw.jpg)](/route/static/mdw.jpg)
 
-
-### 插件开发相关
-
-```
-插件文档还不完善，如果有不明白的地方提Issue! 我会尽力完善。
-如果你自己写了插件，想分享出来，也可以提Issue。
-```
-
-- 简单例子 - https://github.com/mw-plugin/simple-plugin 
-- 插件地址 - https://github.com/mw-plugin
-- 开发文档 - https://github.com/midoks/mdserver-web/wiki/插件开发
 
 
 ### Stargazers over time

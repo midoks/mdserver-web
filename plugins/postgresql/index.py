@@ -76,10 +76,31 @@ def getConf():
     return path
 
 
+def configTpl():
+
+    clist = []
+
+    app_dir = getServerDir()
+    clist.append(app_dir + "/data/postgresql.conf")
+    clist.append(app_dir + "/data/pg_hba.conf")
+
+    return mw.getJson(clist)
+
+
+def readConfigTpl():
+    args = getArgs()
+    data = checkArgs(args, ['file'])
+    if not data[0]:
+        return data[1]
+
+    content = mw.readFile(args['file'])
+    return mw.returnJson(True, 'ok', content)
+
+
 def getDbPort():
     file = getConf()
     content = mw.readFile(file)
-    rep = 'port\s*=\s*(.*)'
+    rep = 'port\s*=\s*(\d*)?'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -127,37 +148,42 @@ def pSqliteDb(dbname='databases'):
     return conn
 
 
-def pMysqlDb():
-    # pymysql
-    db = mw.getMyORM()
-    # MySQLdb |
-    # db = mw.getMyORMDb()
+def pgDb():
+
+    sys.path.append(getPluginDir() + "/class")
+    import pg
+
+    db = pg.ORM()
 
     db.setPort(getDbPort())
-    db.setSocket(getSocketFile())
-    # db.setCharset("utf8")
-    db.setPwd(pSqliteDb('config').where('id=?', (1,)).getField('mysql_root'))
+    # db.setSocket(getSocketFile())
+    db.setPwd(pSqliteDb('config').where('id=?', (1,)).getField('pg_root'))
     return db
 
 
 def initDreplace(version=''):
 
-    conf_dir = getServerDir() + '/etc'
-    log_dir = getServerDir() + "/logs"
+    conf_dir = getServerDir()
     conf_list = [
-        conf_dir,
-        log_dir
+        conf_dir + "/logs",
+        conf_dir + "/tmp",
     ]
     for c in conf_list:
         if not os.path.exists(c):
             os.mkdir(c)
 
-    # my_conf = conf_dir + '/my.cnf'
-    # if not os.path.exists(my_conf):
-    #     tpl = getPluginDir() + '/conf/my.cnf'
-    #     content = mw.readFile(tpl)
-    #     content = contentReplace(content)
-    #     mw.writeFile(my_conf, content)
+    init_pl = conf_dir + "/init.pl"
+    if not os.path.exists(init_pl):
+        # mw.writeFile(init_pl, 'ok')
+        pg_conf = conf_dir + '/data/postgresql.conf'
+        tpl = getPluginDir() + '/conf/postgresql.conf'
+        content = mw.readFile(tpl)
+        content = contentReplace(content)
+        mw.writeFile(pg_conf, content)
+
+        logfile = runLog()
+        if not os.path.exists(logfile):
+            mw.writeFile(logfile, '')
 
     # systemd
     system_dir = mw.systemdCfgDir()
@@ -179,8 +205,8 @@ def initDreplace(version=''):
 
     file_bin = initd_path + '/' + getPluginName()
     if not os.path.exists(file_bin):
-        initd_tpl = getInitdTpl(version)
-        content = mw.readFile(initd_tpl)
+        tpl = getInitdTpl(version)
+        content = mw.readFile(tpl)
         content = contentReplace(content)
         mw.writeFile(file_bin, content)
         mw.execShell('chmod +x ' + file_bin)
@@ -249,8 +275,12 @@ def pGetDbUser():
 
 def initPgData():
     serverdir = getServerDir()
-    if not os.path.exists(serverdir + '/postgresql'):
-        cmd = 'cd ' + serverdir + ' && ./bin/initdb -D ' + serverdir + "/data"
+    if not os.path.exists(serverdir + '/data'):
+        cmd = serverdir + '/bin/initdb -D ' + serverdir + "/data"
+        if not mw.isAppleSystem():
+            cmd = "echo \"" + serverdir + "/bin/initdb -D " + \
+                serverdir + "/data\" | su - postgresql"
+        # print(cmd)
         mw.execShell(cmd)
         return False
     return True
@@ -264,14 +294,14 @@ def initPgPwd():
     cmd_pass = "echo \"create user root with superuser password '" + pwd + "'\" | "
     cmd_pass = cmd_pass + serverdir + '/bin/psql -d postgres'
     data = mw.execShell(cmd_pass)
-    print(cmd_pass)
-    print(data)
+    # print(cmd_pass)
+    # print(data)
 
     pSqliteDb('config').where('id=?', (1,)).save('pg_root', (pwd,))
     return True
 
 
-def myOp(version, method):
+def pgOp(version, method):
     # import commands
     init_file = initDreplace()
     cmd = init_file + ' ' + method
@@ -311,7 +341,7 @@ def myOp(version, method):
 
 
 def appCMD(version, action):
-    return myOp(version, action)
+    return pgOp(version, action)
 
 
 def start(version=''):
@@ -327,6 +357,9 @@ def restart(version=''):
 
 
 def reload(version=''):
+    logfile = runLog()
+    if os.path.exists(logfile):
+        mw.writeFile(logfile, '')
     return appCMD(version, 'reload')
 
 
@@ -472,9 +505,9 @@ def myDbStatus():
     result = {}
     db = pMysqlDb()
     data = db.query('show variables')
-    isError = isSqlError(data)
-    if isError != None:
-        return isError
+    # isError = isSqlError(data)
+    # if isError != None:
+    #     return isError
 
     gets = ['table_open_cache', 'thread_cache_size', 'key_buffer_size', 'tmp_table_size', 'max_heap_table_size', 'innodb_buffer_pool_size',
             'innodb_additional_mem_pool_size', 'innodb_log_buffer_size', 'max_connections', 'sort_buffer_size', 'read_buffer_size', 'read_rnd_buffer_size', 'join_buffer_size', 'thread_stack', 'binlog_cache_size']
@@ -672,6 +705,49 @@ def getDbList():
     return mw.getJson(data)
 
 
+def syncGetDatabases():
+    pdb = pgDb()
+    psdb = pSqliteDb('databases')
+    data = pdb.query('SELECT * FROM pg_database WHERE datistemplate = false')
+    print(data)
+    return
+    # isError = isSqlError(data)
+    # if isError != None:
+    #     return isError
+    users = pdb.query(
+        "select User,Host from mysql.user where User!='root' AND Host!='localhost' AND Host!=''")
+    nameArr = ['information_schema', 'performance_schema', 'mysql', 'sys']
+    n = 0
+
+    # print(users)
+    for value in data:
+        vdb_name = value["Database"]
+        b = False
+        for key in nameArr:
+            if vdb_name == key:
+                b = True
+                break
+        if b:
+            continue
+        if psdb.where("name=?", (vdb_name,)).count() > 0:
+            continue
+        host = '127.0.0.1'
+        for user in users:
+            if vdb_name == user["User"]:
+                host = user["Host"]
+                break
+
+        ps = mw.getMsg('INPUT_PS')
+        if vdb_name == 'test':
+            ps = mw.getMsg('DATABASE_TEST')
+        addTime = time.strftime('%Y-%m-%d %X', time.localtime())
+        if psdb.add('name,username,password,accept,ps,addtime', (vdb_name, vdb_name, '', host, ps, addTime)):
+            n += 1
+
+    msg = mw.getInfo('本次共从服务器获取了{1}个数据库!', (str(n),))
+    return mw.returnJson(True, msg)
+
+
 def installPreInspection(version):
     return 'ok'
 
@@ -710,6 +786,10 @@ if __name__ == "__main__":
         print(uninstallPreInspection(version))
     elif func == 'conf':
         print(getConf())
+    elif func == 'config_tpl':
+        print(configTpl())
+    elif func == 'read_config_tpl':
+        print(readConfigTpl())
     elif func == 'run_info':
         print(runInfo())
     elif func == 'run_log':
@@ -720,5 +800,7 @@ if __name__ == "__main__":
         print(setPgPort())
     elif func == 'get_db_list':
         print(getDbList())
+    elif func == 'sync_get_databases':
+        print(syncGetDatabases())
     else:
         print('error')
