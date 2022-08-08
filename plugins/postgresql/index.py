@@ -632,15 +632,15 @@ def pgDbStatus():
             data['max_worker_processes'] = [max_worker_processes_num,
                                             "", "如果要使用worker process, 最多可以允许fork 多少个worker进程."]
 
-            if i.strip().startswith("listen_addresses"):
-                listen_addresses = i.split("=")[1]
-            elif i.strip().startswith("#listen_addresses"):
-                listen_addresses = i.split("=")[1]
+            # if i.strip().startswith("listen_addresses"):
+            #     listen_addresses = i.split("=")[1]
+            # elif i.strip().startswith("#listen_addresses"):
+            #     listen_addresses = i.split("=")[1]
 
-            listen_addresses = re.match(r"\'.*?\'", listen_addresses.strip()).group(
-            ) if re.match(r"\'.*?\'", listen_addresses.strip()) else ""
-            data['listen_addresses'] = [listen_addresses.replace(
-                "'", '').replace("127.0.0.1", 'localhost'), "", "pgsql监听地址"]
+            # listen_addresses = re.match(r"\'.*?\'", listen_addresses.strip()).group(
+            # ) if re.match(r"\'.*?\'", listen_addresses.strip()) else ""
+            # data['listen_addresses'] = [listen_addresses.replace(
+            #     "'", '').replace("127.0.0.1", 'localhost'), "", "pgsql监听地址"]
 
     # 返回数据到前端
     data['status'] = True
