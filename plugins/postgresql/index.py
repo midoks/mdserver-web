@@ -172,10 +172,6 @@ def initDreplace(version=''):
         if not os.path.exists(c):
             os.mkdir(c)
 
-    logfile = runLog()
-    if not os.path.exists(logfile):
-        mw.writeFile(logfile, '')
-
     init_pl = conf_dir + "/init.pl"
     if not os.path.exists(init_pl):
         # mw.writeFile(init_pl, 'ok')
@@ -184,6 +180,10 @@ def initDreplace(version=''):
         content = mw.readFile(tpl)
         content = contentReplace(content)
         mw.writeFile(pg_conf, content)
+
+        logfile = runLog()
+        if not os.path.exists(logfile):
+            mw.writeFile(logfile, '')
 
     # systemd
     system_dir = mw.systemdCfgDir()
@@ -358,7 +358,7 @@ def restart(version=''):
 
 def reload(version=''):
     logfile = runLog()
-    if not os.path.exists(logfile):
+    if os.path.exists(logfile):
         mw.writeFile(logfile, '')
     return appCMD(version, 'reload')
 
