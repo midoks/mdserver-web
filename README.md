@@ -37,6 +37,19 @@
 * Gogs - 一款极易搭建的自助Git服务。
 * Rsyncd - 通用同步服务。
 
+
+### 插件开发相关
+
+```
+插件文档还不完善，如果有不明白的地方提Issue! 我会尽力完善。
+如果你自己写了插件，想分享出来，也可以提Issue。
+```
+
+- 简单例子 - https://github.com/mw-plugin/simple-plugin 
+- 插件地址 - https://github.com/mw-plugin
+- 开发文档 - https://github.com/midoks/mdserver-web/wiki/插件开发
+
+
 # Note
 
 ```
@@ -69,6 +82,8 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 * 添加PHP的YUM安装方式[辅助插件]。
 * 添加MYSQL的YUM安装方式[辅助插件]。
 * 各种bug修复。
+
+
 
 
 ### JSDelivr安装地址
@@ -125,17 +140,6 @@ curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/up
 
 [![截图](/route/static/mdw.jpg)](/route/static/mdw.jpg)
 
-
-### 插件开发相关
-
-```
-插件文档还不完善，如果有不明白的地方提Issue! 我会尽力完善。
-如果你自己写了插件，想分享出来，也可以提Issue。
-```
-
-- 简单例子 - https://github.com/mw-plugin/simple-plugin 
-- 插件地址 - https://github.com/mw-plugin
-- 开发文档 - https://github.com/midoks/mdserver-web/wiki/插件开发
 
 
 ### Stargazers over time
