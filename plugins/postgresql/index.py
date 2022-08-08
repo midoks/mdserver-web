@@ -606,7 +606,7 @@ def importDbBackup():
         cmd = 'cd ' + mw.getRootDir() + '/backup/database && gzip -d ' + file
         mw.execShell(cmd)
 
-    pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
+    pwd = pSqliteDb('config').where('id=?', (1,)).getField('pg_root')
 
     mysql_cmd = mw.getRootDir() + '/server/mysql/bin/mysql -uroot -p' + pwd + \
         ' ' + name + ' < ' + file_path_sql
@@ -699,7 +699,7 @@ def getDbList():
 
     info = {}
     info['root_pwd'] = pSqliteDb('config').where(
-        'id=?', (1,)).getField('mysql_root')
+        'id=?', (1,)).getField('pg_root')
     data['info'] = info
 
     return mw.getJson(data)
@@ -708,20 +708,14 @@ def getDbList():
 def syncGetDatabases():
     pdb = pgDb()
     psdb = pSqliteDb('databases')
-    data = pdb.query('SELECT * FROM pg_database WHERE datistemplate = false')
-    print(data)
-    return
-    # isError = isSqlError(data)
-    # if isError != None:
-    #     return isError
-    users = pdb.query(
-        "select User,Host from mysql.user where User!='root' AND Host!='localhost' AND Host!=''")
-    nameArr = ['information_schema', 'performance_schema', 'mysql', 'sys']
+    data = pdb.table('pg_database').field(
+        'datname').where("datistemplate=false").select()
+    nameArr = ['postgres', ]
     n = 0
 
     # print(users)
     for value in data:
-        vdb_name = value["Database"]
+        vdb_name = value["datname"]
         b = False
         for key in nameArr:
             if vdb_name == key:
@@ -732,14 +726,12 @@ def syncGetDatabases():
         if psdb.where("name=?", (vdb_name,)).count() > 0:
             continue
         host = '127.0.0.1'
-        for user in users:
-            if vdb_name == user["User"]:
-                host = user["Host"]
-                break
+        # for user in users:
+        #     if vdb_name == user["User"]:
+        #         host = user["Host"]
+        #         break
 
         ps = mw.getMsg('INPUT_PS')
-        if vdb_name == 'test':
-            ps = mw.getMsg('DATABASE_TEST')
         addTime = time.strftime('%Y-%m-%d %X', time.localtime())
         if psdb.add('name,username,password,accept,ps,addtime', (vdb_name, vdb_name, '', host, ps, addTime)):
             n += 1
@@ -748,12 +740,74 @@ def syncGetDatabases():
     return mw.returnJson(True, msg)
 
 
+def addDb():
+    args = getArgs()
+    data = checkArgs(
+        args, ['password', 'name', 'codeing', 'db_user', 'dataAccess', 'ps'])
+    if not data[0]:
+        return data[1]
+
+    if not 'address' in args:
+        address = ''
+    else:
+        address = args['address'].strip()
+
+    dbname = args['name'].strip()
+    dbuser = args['db_user'].strip()
+    codeing = args['codeing'].strip()
+    password = args['password'].strip()
+    dataAccess = args['dataAccess'].strip()
+    ps = args['ps'].strip()
+
+    reg = "^[\w\.-]+$"
+    if not re.match(reg, args['name']):
+        return mw.returnJson(False, '数据库名称不能带有特殊符号!')
+
+    checks = ['root', 'mysql', 'test', 'sys', 'panel_logs']
+    if dbuser in checks or len(dbuser) < 1:
+        return mw.returnJson(False, '数据库用户名不合法!')
+    if dbname in checks or len(dbname) < 1:
+        return mw.returnJson(False, '数据库名称不合法!')
+
+    if len(password) < 1:
+        password = mw.md5(time.time())[0:8]
+
+    wheres = {
+        'utf8':   'utf8_general_ci',
+        'utf8mb4': 'utf8mb4_general_ci',
+        'gbk':    'gbk_chinese_ci',
+        'big5':   'big5_chinese_ci'
+    }
+
+    codeStr = wheres[codeing]
+
+    pdb = pgDb()
+    psdb = pSqliteDb('databases')
+    if psdb.where("name=? or username=?", (dbname, dbuser)).count():
+        return mw.returnJson(False, '数据库已存在!')
+
+    result = pdb.execute("create database " + dbname)
+
+    print(result)
+    return
+
+    # pdb.execute("drop user '" + dbuser + "'@'localhost'")
+    # for a in address.split(','):
+    #     pdb.execute("drop user '" + dbuser + "'@'" + a + "'")
+
+    # __createUser(dbname, dbuser, password, address)
+
+    addTime = time.strftime('%Y-%m-%d %X', time.localtime())
+    psdb.add('pid,name,username,password,accept,ps,addtime',
+             (0, dbname, dbuser, password, address, ps, addTime))
+    return mw.returnJson(True, '添加成功!')
+
+
 def installPreInspection(version):
     return 'ok'
 
 
 def uninstallPreInspection(version):
-    # return "请手动删除MySQL[{}]".format(version)
     return 'ok'
 
 if __name__ == "__main__":
@@ -800,6 +854,8 @@ if __name__ == "__main__":
         print(setPgPort())
     elif func == 'get_db_list':
         print(getDbList())
+    elif func == 'add_db':
+        print(addDb())
     elif func == 'sync_get_databases':
         print(syncGetDatabases())
     else:
