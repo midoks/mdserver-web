@@ -71,6 +71,7 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 
 
 ### 版本更新 0.9.0
+
 * 主流系统支持。
 * 插件支持更多参数。
 * MySQL主从支持GTID和经典模式。
@@ -82,9 +83,6 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 * 添加PHP的YUM安装方式[辅助插件]。
 * 添加MYSQL的YUM安装方式[辅助插件]。
 * 各种bug修复。
-
-
-
 
 ### JSDelivr安装地址
 
