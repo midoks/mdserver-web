@@ -708,7 +708,7 @@ def getDbList():
 def syncGetDatabases():
     pdb = pgDb()
     psdb = pSqliteDb('databases')
-    data = pdb.query('show databases')
+    data = pdb.query('SELECT * FROM pg_database WHERE datistemplate = false')
     print(data)
     return
     # isError = isSqlError(data)
