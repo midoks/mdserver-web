@@ -164,13 +164,17 @@ def pgDb():
 def initDreplace(version=''):
 
     conf_dir = getServerDir()
-    log_dir = conf_dir + "/logs"
     conf_list = [
-        log_dir
+        conf_dir + "/logs",
+        conf_dir + "/tmp",
     ]
     for c in conf_list:
         if not os.path.exists(c):
             os.mkdir(c)
+
+    logfile = runLog()
+    if not os.path.exists(logfile):
+        mw.writeFile(logfile, '')
 
     init_pl = conf_dir + "/init.pl"
     if not os.path.exists(init_pl):
@@ -353,6 +357,9 @@ def restart(version=''):
 
 
 def reload(version=''):
+    logfile = runLog()
+    if not os.path.exists(logfile):
+        mw.writeFile(logfile, '')
     return appCMD(version, 'reload')
 
 
