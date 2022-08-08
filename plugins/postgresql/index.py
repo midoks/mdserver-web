@@ -470,30 +470,51 @@ def runInfo():
     if status(version) == 'stop':
         return mw.returnJson(False, 'PG未启动', [])
 
-    db = pMysqlDb()
-    data = db.query('show global status')
-    gets = ['Max_used_connections', 'Com_commit', 'Com_rollback', 'Questions', 'Innodb_buffer_pool_reads', 'Innodb_buffer_pool_read_requests', 'Key_reads', 'Key_read_requests', 'Key_writes',
-            'Key_write_requests', 'Qcache_hits', 'Qcache_inserts', 'Bytes_received', 'Bytes_sent', 'Aborted_clients', 'Aborted_connects',
-            'Created_tmp_disk_tables', 'Created_tmp_tables', 'Innodb_buffer_pool_pages_dirty', 'Opened_files', 'Open_tables', 'Opened_tables', 'Select_full_join',
-            'Select_range_check', 'Sort_merge_passes', 'Table_locks_waited', 'Threads_cached', 'Threads_connected', 'Threads_created', 'Threads_running', 'Connections', 'Uptime']
-
+    db = pgDb()
+    # data = db.query('show global status')
+    data_directory = getServerDir() + "/data"
+    port = getPgPort()
     result = {}
-    # print(data)
-    for d in data:
-        vname = d["Variable_name"]
-        for g in gets:
-            if vname == g:
-                result[g] = d["Value"]
 
-    # print(result, int(result['Uptime']))
-    result['Run'] = int(time.time()) - int(result['Uptime'])
-    tmp = db.query('show master status')
-    try:
-        result['File'] = tmp[0]["File"]
-        result['Position'] = tmp[0]["Position"]
-    except:
-        result['File'] = 'OFF'
-        result['Position'] = 'OFF'
+    result['uptime'] = mw.execShell(
+        '''cat {}/postmaster.pid |sed -n 3p '''.format(data_directory))[0]
+    timestamp = result['uptime']
+    time_local = time.localtime(int(timestamp))
+    dt = time.strftime("%Y-%m-%d %H:%M:%S", time_local)
+    result['uptime'] = dt
+
+    result['progress_num'] = mw.execShell(
+        "ps -ef |grep postgres |wc -l")[0].strip()
+    result['pid'] = mw.execShell(
+        '''cat {}/postmaster.pid |sed -n 1p '''.format(data_directory))[0].strip()
+    res = db.query(
+        'SELECT count(*) FROM pg_stat_activity WHERE NOT pid=pg_backend_pid()')
+    result['connections'] = res[0][0]
+
+    res = db.query("select pg_size_pretty(pg_database_size('postgres'))")
+    result['pg_size'] = res[0][0]
+    result['pg_mem'] = mw.execShell(
+        '''cat /proc/%s/status|grep VmRSS|awk -F: '{print $2}' ''' % (result['pid']))[0]
+
+    result['pg_vm_lock'] = mw.execShell(
+        '''cat /proc/%s/status|grep VmLck|awk -F: '{print $2}'  ''' % (result['pid'].strip()))[0]
+    result['pg_vm_high'] = mw.execShell(
+        '''cat /proc/%s/status|grep VmHWM|awk -F: '{print $2}'  ''' % (result['pid'].strip()))[0]
+    result['pg_vm_data_size'] = mw.execShell(
+        '''cat /proc/%s/status|grep VmData|awk -F: '{print $2}'  ''' % (result['pid'].strip()))[0]
+    result['pg_vm_sk_size'] = mw.execShell(
+        '''cat /proc/%s/status|grep VmStk|awk -F: '{print $2}'  ''' % (result['pid'].strip()))[0]
+    result['pg_vm_code_size'] = mw.execShell(
+        '''cat /proc/%s/status|grep VmExe|awk -F: '{print $2}'  ''' % (result['pid'].strip()))[0]
+    result['pg_vm_lib_size'] = mw.execShell(
+        '''cat /proc/%s/status|grep VmLib|awk -F: '{print $2}'  ''' % (result['pid'].strip()))[0]
+    result['pg_vm_swap_size'] = mw.execShell(
+        '''cat /proc/%s/status|grep VmSwap|awk -F: '{print $2}'  ''' % (result['pid'].strip()))[0]
+    result['pg_vm_page_size'] = mw.execShell(
+        '''cat /proc/%s/status|grep VmPTE|awk -F: '{print $2}'  ''' % (result['pid'].strip()))[0]
+    result['pg_sigq'] = mw.execShell(
+        '''cat /proc/%s/status|grep SigQ|awk -F: '{print $2}'  ''' % (result['pid'].strip()))[0]
+
     return mw.getJson(result)
 
 

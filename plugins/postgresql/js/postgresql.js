@@ -81,26 +81,23 @@ function runInfo(){
         if (cache_size == 'NaN%') cache_size = 'OFF';
         var Con = '<div class="divtable"><table class="table table-hover table-bordered" style="margin-bottom:10px;background-color:#fafafa">\
                     <tbody>\
-                        <tr><th>启动时间</th><td>' + getLocalTime(rdata.Run) + '</td><th>每秒查询</th><td>' + parseInt(rdata.Questions / rdata.Uptime) + '</td></tr>\
-                        <tr><th>总连接次数</th><td>' + rdata.Connections + '</td><th>每秒事务</th><td>' + parseInt((parseInt(rdata.Com_commit) + parseInt(rdata.Com_rollback)) / rdata.Uptime) + '</td></tr>\
-                        <tr><th>发送</th><td>' + toSize(rdata.Bytes_sent) + '</td><th>File</th><td>' + rdata.File + '</td></tr>\
-                        <tr><th>接收</th><td>' + toSize(rdata.Bytes_received) + '</td><th>Position</th><td>' + rdata.Position + '</td></tr>\
+                        <tr><th>启动时间</th><td>' + rdata.uptime + '</td><th>进程数</th><td>' +rdata.progress_num+ '</td></tr>\
+                        <tr><th>总连接次数</th><td>' + rdata.connections + '</td><th>PID</th><td>' +rdata.pid+ '</td></tr>\
+                        <tr><th>占用空间</th><td>' + rdata.pg_size + '</td><th>占用内存</th><td>' +rdata.pg_mem+ '</td></tr>\
                     </tbody>\
                     </table>\
                     <table class="table table-hover table-bordered">\
                     <thead style="display:none;"><th></th><th></th><th></th><th></th></thead>\
                     <tbody>\
-                        <tr><th>活动/峰值连接数</th><td>' + rdata.Threads_running + '/' + rdata.Max_used_connections + '</td><td colspan="2">若值过大,增加max_connections</td></tr>\
-                        <tr><th>线程缓存命中率</th><td>' + ((1 - rdata.Threads_created / rdata.Connections) * 100).toFixed(2) + '%</td><td colspan="2">若过低,增加thread_cache_size</td></tr>\
-                        <tr><th>索引命中率</th><td>' + ((1 - rdata.Key_reads / rdata.Key_read_requests) * 100).toFixed(2) + '%</td><td colspan="2">若过低,增加key_buffer_size</td></tr>\
-                        <tr><th>Innodb索引命中率</th><td>' + ((1 - rdata.Innodb_buffer_pool_reads / rdata.Innodb_buffer_pool_read_requests) * 100).toFixed(2) + '%</td><td colspan="2">若过低,增加innodb_buffer_pool_size</td></tr>\
-                        <tr><th>查询缓存命中率</th><td>' + cache_size + '</td><td colspan="2">' + lan.soft.mysql_status_ps5 + '</td></tr>\
-                        <tr><th>创建临时表到磁盘</th><td>' + ((rdata.Created_tmp_disk_tables / rdata.Created_tmp_tables) * 100).toFixed(2) + '%</td><td colspan="2">若过大,尝试增加tmp_table_size</td></tr>\
-                        <tr><th>已打开的表</th><td>' + rdata.Open_tables + '</td><td colspan="2">若过大,增加table_cache_size</td></tr>\
-                        <tr><th>没有使用索引的量</th><td>' + rdata.Select_full_join + '</td><td colspan="2">若不为0,请检查数据表的索引是否合理</td></tr>\
-                        <tr><th>没有索引的JOIN量</th><td>' + rdata.Select_range_check + '</td><td colspan="2">若不为0,请检查数据表的索引是否合理</td></tr>\
-                        <tr><th>排序后的合并次数</th><td>' + rdata.Sort_merge_passes + '</td><td colspan="2">若值过大,增加sort_buffer_size</td></tr>\
-                        <tr><th>锁表次数</th><td>' + rdata.Table_locks_waited + '</td><td colspan="2">若值过大,请考虑增加您的数据库性能</td></tr>\
+                        <tr><th>表进程已经锁住的物理内存的大小</th><td>' + rdata.pg_vm_lock + '</td></tr>\
+                        <tr><th>数据库分配到物理内存的峰值</th><td>' + rdata.pg_vm_high + '</td></tr>\
+                        <tr><th>进程数据段的大小</th><td>' + rdata.pg_vm_data_size + '</td></tr>\
+                        <tr><th>进程堆栈段的大小</th><td>' + rdata.pg_vm_sk_size + '</td></tr>\
+                        <tr><th>进程代码的大小</th><td>' + rdata.pg_vm_code_size + '</td></tr>\
+                        <tr><th>进程所使用LIB库的大小</th><td>' + rdata.pg_vm_lib_size + '</td></tr>\
+                        <tr><th>进程占用Swap的大小</th><td>' + rdata.pg_vm_swap_size + '</td></tr>\
+                        <tr><th>占用的页表的大小</th><td>' + rdata.pg_vm_page_size + '</td></tr>\
+                        <tr><th>当前待处理信号的个数</th><td>' + rdata.pg_sigq + '</td></tr>\
                     <tbody>\
             </table></div>';
         $(".soft-man-con").html(Con);
