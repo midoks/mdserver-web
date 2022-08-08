@@ -13,10 +13,10 @@ install_tmp=${rootPath}/tmp/mw_install.pl
 action=$1
 type=$2
 
-pip install psycopg2
+pip install psycopg2-binary
 if [ -f ${rootPath}/bin/activate ];then
 	source ${rootPath}/bin/activate
-	pip install psycopg2
+	pip install psycopg2-binary
 fi
 
 
