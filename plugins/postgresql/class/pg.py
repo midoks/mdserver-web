@@ -39,7 +39,9 @@ class ORM:
                 self.__DB_CONN = psycopg2.connect(database='postgres', user=self.__DB_USER, password=self.__DB_PASS,
                                                   host=self.__DB_HOST, port=int(self.__DB_PORT))
 
+            self.__DB_CONN.autocommit = True
             self.__DB_CUR = self.__DB_CONN.cursor()
+
             return True
         except Exception as e:
             self.__DB_ERR = e

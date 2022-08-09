@@ -87,6 +87,10 @@ def configTpl():
     return mw.getJson(clist)
 
 
+def pgHbaConf():
+    return getServerDir() + "/data/pg_hba.conf"
+
+
 def readConfigTpl():
     args = getArgs()
     data = checkArgs(args, ['file'])
@@ -174,7 +178,7 @@ def initDreplace(version=''):
 
     init_pl = conf_dir + "/init.pl"
     if not os.path.exists(init_pl):
-        # mw.writeFile(init_pl, 'ok')
+        mw.writeFile(init_pl, 'ok')
         pg_conf = conf_dir + '/data/postgresql.conf'
         tpl = getPluginDir() + '/conf/postgresql.conf'
         content = mw.readFile(tpl)
@@ -219,50 +223,6 @@ def status(version=''):
     if data[0] == '':
         return 'stop'
     return 'start'
-
-
-def getDataDir():
-    file = getConf()
-    content = mw.readFile(file)
-    rep = 'datadir\s*=\s*(.*)'
-    tmp = re.search(rep, content)
-    return tmp.groups()[0].strip()
-
-
-def getPidFile():
-    file = getConf()
-    content = mw.readFile(file)
-    rep = 'pid-file\s*=\s*(.*)'
-    tmp = re.search(rep, content)
-    return tmp.groups()[0].strip()
-
-
-def getErrorLog():
-    args = getArgs()
-    path = getDataDir()
-    filename = ''
-    for n in os.listdir(path):
-        if len(n) < 5:
-            continue
-        if n == 'error.log':
-            filename = path + '/' + n
-            break
-    # print filename
-    if not os.path.exists(filename):
-        return mw.returnJson(False, '指定文件不存在!')
-    if 'close' in args:
-        mw.writeFile(filename, '')
-        return mw.returnJson(False, '日志已清空')
-    info = mw.getNumLines(filename, 18)
-    return mw.returnJson(True, 'OK', info)
-
-
-def getShowLogFile():
-    file = getConf()
-    content = mw.readFile(file)
-    rep = 'slow-query-log-file\s*=\s*(.*)'
-    tmp = re.search(rep, content)
-    return tmp.groups()[0].strip()
 
 
 def pGetDbUser():
@@ -398,7 +358,7 @@ def getMyDbPos():
     return tmp.groups()[0].strip()
 
 
-def setMyDbPos():
+def setPgDbPos():
     args = getArgs()
     data = checkArgs(args, ['datadir'])
     if not data[0]:
@@ -522,6 +482,11 @@ def runLog():
     return getServerDir() + "/logs/server.log"
 
 
+def getSlowLog():
+    # pgsql慢日志查询
+    return getServerDir() + "/logs/" + time.strftime("postgresql-%Y-%m-%d.log")
+
+
 def getUnit(args):
     unit = ''
     if "GB" in args:
@@ -550,7 +515,7 @@ def pgDbStatus():
             shared_buffers_num = re.match(
                 r'\d+', shared_buffers.strip()).group() if re.match(r'\d+', shared_buffers.strip()) else ""
             data['shared_buffers'] = [shared_buffers_num, "MB",
-                                      "PG通过shared_buffers和内核和磁盘打交道，通常设置为实际内存的10％。"]
+                                      "PG通过shared_buffers和内核和磁盘打交道，通常设置为实际内存的10％."]
 
             if i.strip().startswith("work_mem"):
                 work_mem = i.split("=")[1]
@@ -560,7 +525,7 @@ def pgDbStatus():
             work_mem_num = re.match(
                 r'\d+', work_mem.strip()).group() if re.match(r'\d+', work_mem.strip()) else ""
             data['work_mem'] = [work_mem_num, "MB",
-                                "增加work_mem有助于提高排序的速度。通常设置为实际RAM的2% -4%。"]
+                                "增加work_mem有助于提高排序的速度。通常设置为实际RAM的2% -4%."]
 
             if i.strip().startswith("effective_cache_size"):
                 effective_cache_size = i.split("=")[1]
@@ -570,7 +535,7 @@ def pgDbStatus():
             effective_cache_size_num = re.match(r'\d+', effective_cache_size.strip(
             )).group() if re.match(r'\d+', effective_cache_size.strip()) else ""
             data['effective_cache_size'] = [effective_cache_size_num,
-                                            "GB", "pgsql能够使用的最大缓存,比如4G的内存，可以设置为3GB."]
+                                            "GB", "PG能够使用的最大缓存,比如4G的内存，可以设置为3GB."]
 
             if i.strip().startswith("temp_buffers "):
                 temp_buffers = i.split("=")[1]
@@ -647,28 +612,34 @@ def pgDbStatus():
     return mw.getJson(data)
 
 
-def setDbStatus():
-    gets = ['key_buffer_size', 'tmp_table_size', 'max_heap_table_size', 'innodb_buffer_pool_size', 'innodb_log_buffer_size', 'max_connections',
-            'table_open_cache', 'thread_cache_size', 'sort_buffer_size', 'read_buffer_size', 'read_rnd_buffer_size', 'join_buffer_size', 'thread_stack', 'binlog_cache_size']
-    emptys = ['max_connections', 'thread_cache_size', 'table_open_cache']
+def sedConf(name, val):
+    path = getServerDir() + "/data/postgresql.conf"
+    content = ''
+    with open(path) as f:
+        for i in f:
+            if i.strip().startswith(name):
+                i = "{} = {} \n".format(name, val)
+            content += i
+
+    mw.writeFile(path, content)
+    return True
+
+
+def pgSetDbStatus():
+    ''' 
+    保存pgsql性能调整信息
+    '''
     args = getArgs()
-    conFile = getConf()
-    content = mw.readFile(conFile)
-    n = 0
-    for g in gets:
-        s = 'M'
-        if n > 5:
-            s = 'K'
-        if g in emptys:
-            s = ''
-        rep = '\s*' + g + '\s*=\s*\d+(M|K|k|m|G)?\n'
-        c = g + ' = ' + args[g] + s + '\n'
-        if content.find(g) != -1:
-            content = re.sub(rep, '\n' + c, content, 1)
-        else:
-            content = content.replace('[mysqld]\n', '[mysqld]\n' + c)
-        n += 1
-    mw.writeFile(conFile, content)
+    data = checkArgs(args, ['shared_buffers', 'work_mem', 'effective_cache_size',
+                            'temp_buffers', 'max_connections', 'max_prepared_transactions',
+                            'max_stack_depth', 'bgwriter_lru_maxpages', 'max_worker_processes'])
+    if not data[0]:
+        return data[1]
+
+    for k, v in args.items():
+        sedConf(k, v)
+
+    restart()
     return mw.returnJson(True, '设置成功!')
 
 
@@ -868,28 +839,35 @@ def syncGetDatabases():
 
 def addDb():
     args = getArgs()
-    data = checkArgs(
-        args, ['password', 'name', 'codeing', 'db_user', 'dataAccess', 'ps'])
+    data = checkArgs(args, ['password', 'name', 'db_user', 'dataAccess'])
     if not data[0]:
         return data[1]
 
-    if not 'address' in args:
-        address = ''
-    else:
+    address = ''
+    if 'address' in args:
         address = args['address'].strip()
 
     dbname = args['name'].strip()
     dbuser = args['db_user'].strip()
-    codeing = args['codeing'].strip()
     password = args['password'].strip()
     dataAccess = args['dataAccess'].strip()
-    ps = args['ps'].strip()
+
+    listen_ip = "127.0.0.1/32"
+    if 'listen_ip' in args:
+        listen_ip = args['listen_ip'].strip()
+
+    if not re.match(r"(?:[0-9]{1,3}\.){3}[0-9]{1,3}/\d+", listen_ip):
+        return mw.returnJson(False, "你输入的权限不合法，添加失败！")
+
+    # # 修改监听所有地址
+    # if listen_ip not in ["127.0.0.1/32", "localhost", "127.0.0.1"]:
+    #     sedConf("listen_addresses", "'*'")
 
     reg = "^[\w\.-]+$"
     if not re.match(reg, args['name']):
         return mw.returnJson(False, '数据库名称不能带有特殊符号!')
 
-    checks = ['root', 'mysql', 'test', 'sys', 'panel_logs']
+    checks = ['root', 'mysql', 'test', 'sys', 'postgres', 'postgresql']
     if dbuser in checks or len(dbuser) < 1:
         return mw.returnJson(False, '数据库用户名不合法!')
     if dbname in checks or len(dbname) < 1:
@@ -898,35 +876,55 @@ def addDb():
     if len(password) < 1:
         password = mw.md5(time.time())[0:8]
 
-    wheres = {
-        'utf8':   'utf8_general_ci',
-        'utf8mb4': 'utf8mb4_general_ci',
-        'gbk':    'gbk_chinese_ci',
-        'big5':   'big5_chinese_ci'
-    }
-
-    codeStr = wheres[codeing]
-
     pdb = pgDb()
     psdb = pSqliteDb('databases')
     if psdb.where("name=? or username=?", (dbname, dbuser)).count():
-        return mw.returnJson(False, '数据库已存在!')
+        return mw.returnJson(False, '数据库或用户已存在!')
 
-    result = pdb.execute("create database " + dbname)
+    r = pdb.execute("create database " + dbname)
+    r = pdb.execute("create user " + dbuser)
+    pdb.execute("alter user {} with password '{}'".format(dbuser, password,))
+    pdb.execute(
+        "GRANT ALL PRIVILEGES ON DATABASE {} TO {}".format(dbname, dbuser,))
 
-    print(result)
-    return
+    pg_hba = getServerDir() + "/data/pg_hba.conf"
 
-    # pdb.execute("drop user '" + dbuser + "'@'localhost'")
-    # for a in address.split(','):
-    #     pdb.execute("drop user '" + dbuser + "'@'" + a + "'")
-
-    # __createUser(dbname, dbuser, password, address)
+    content = mw.readFile(pg_hba)
+    content += "\nhost    {}  {}    {}    md5".format(
+        dbname, dbuser, listen_ip)
+    mw.writeFile(pg_hba, content)
 
     addTime = time.strftime('%Y-%m-%d %X', time.localtime())
     psdb.add('pid,name,username,password,accept,ps,addtime',
-             (0, dbname, dbuser, password, address, ps, addTime))
+             (0, dbname, dbuser, password, address, dbname, addTime))
+
+    restart()
     return mw.returnJson(True, '添加成功!')
+
+
+def delDb():
+    args = getArgs()
+    data = checkArgs(args, ['id', 'name'])
+    if not data[0]:
+        return data[1]
+
+    did = args['id']
+    name = args['name']
+
+    pdb = pgDb()
+    psdb = pSqliteDb('databases')
+    pdb.execute("drop database " + name)
+
+    username = psdb.where('id=?', (did,)).getField('username')
+    pdb.execute("drop user " + username)
+
+    pg_hba = getServerDir() + "/data/pg_hba.conf"
+    old_config = mw.readFile(pg_hba)
+    new_config = re.sub(r'host\s*{}.*'.format(name), '', old_config).strip()
+    mw.writeFile(pg_hba, new_config)
+
+    psdb.where("id=?", (did,)).delete()
+    return mw.returnJson(True, '删除成功!')
 
 
 def installPreInspection(version):
@@ -966,6 +964,8 @@ if __name__ == "__main__":
         print(uninstallPreInspection(version))
     elif func == 'conf':
         print(getConf())
+    elif func == 'pg_hba_conf':
+        print(pgHbaConf())
     elif func == 'config_tpl':
         print(configTpl())
     elif func == 'read_config_tpl':
@@ -974,8 +974,12 @@ if __name__ == "__main__":
         print(runInfo())
     elif func == 'run_log':
         print(runLog())
+    elif func == 'slow_log':
+        print(getSlowLog())
     elif func == 'db_status':
         print(pgDbStatus())
+    elif func == 'set_db_status':
+        print(pgSetDbStatus())
     elif func == 'pg_port':
         print(getPgPort())
     elif func == 'set_pg_port':
@@ -984,6 +988,8 @@ if __name__ == "__main__":
         print(getDbList())
     elif func == 'add_db':
         print(addDb())
+    elif func == 'del_db':
+        print(delDb())
     elif func == 'sync_get_databases':
         print(syncGetDatabases())
     else:

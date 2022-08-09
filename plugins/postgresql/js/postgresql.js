@@ -103,26 +103,6 @@ function runInfo(){
 }
 
 
-function myDbPos(){
-    myPost('my_db_pos','',function(data){
-        var con = '<div class="line ">\
-            <div class="info-r  ml0">\
-            <input id="datadir" name="datadir" class="bt-input-text mr5 port" type="text" style="width:330px" value="'+data.data+'">\
-            <span class="glyphicon cursor mr5 glyphicon-folder-open icon_datadir" onclick="changePath(\'datadir\')"></span>\
-            <button id="btn_change_path" name="btn_change_path" class="btn btn-success btn-sm mr5 ml5 btn_change_port">迁移</button>\
-            </div></div>';
-        $(".soft-man-con").html(con);
-
-        $('#btn_change_path').click(function(){
-            var datadir = $("input[name='datadir']").val();
-            myPost('set_db_pos','datadir='+datadir,function(data){
-                var rdata = $.parseJSON(data.data);
-                layer.msg(rdata.msg,{icon:rdata.status ? 1 : 5,time:2000,shade: [0.3, '#000']});
-            });
-        });
-    });
-}
-
 function pgPort(){
     myPost('pg_port','',function(data){
         var con = '<div class="line ">\
@@ -148,7 +128,7 @@ function pgPort(){
 
 
 //数据库存储信置
-function changeMySQLDataPath(act) {
+function changePgDataPath(act) {
     if (act != undefined) {
         layer.confirm(lan.soft.mysql_to_msg, { closeBtn: 2, icon: 3 }, function() {
             var datadir = $("#datadir").val();
@@ -176,155 +156,48 @@ function pgPerfOpt() {
     //获取MySQL配置
     myPost('db_status','',function(data){
         var rdata = $.parseJSON(data.data);
-
-        console.log(rdata);
         var html_p = '';
         for (i in rdata){
-            if (i!='status'){
+            if (i != 'status' ){
                 var v = rdata[i];
-                html_p += '<p><span>'+i+'</span><input style="width: 70px;" class="bt-input-text mr5" name="'+i+'" value="' + v[0] + '" type="number" >'+v[1] +', <font>' + v[2] + '</font></p>'
+                html_p += '<p><span>'+i+'</span><input style="width: 70px;" class="bt-input-text mr5" unit="'+v[1]+'" name="'+i+'" value="' + v[0] + '" type="number" >'+v[1] +', <font>' + v[2] + '</font></p>'
             }
         }
 
-
-        var memCon = '<div class="conf_p" style="margin-bottom:0">\
-                        <div style="border-bottom:#ccc 1px solid;padding-bottom:10px;margin-bottom:10px"><span><b>最大使用内存: </b></span>\
-                        <select class="bt-input-text" name="pg_set" style="margin-left:-4px">\
-                            <option value="0">请选择</option>\
-                            <option value="1">1-2GB</option>\
-                            <option value="2">2-4GB</option>\
-                            <option value="3">4-8GB</option>\
-                            <option value="4">8-16GB</option>\
-                            <option value="5">16-32GB</option>\
-                        </select>\
-                        <span>最大使用内存: </span><input style="width:70px;background-color:#eee;" class="bt-input-text mr5" name="memSize" type="text" value="' + "10" + '" readonly>MB\
-                        </div>\
-                        '+html_p+'\
-                    </div>'
+        var memCon = '<form class="bt-form" id="pg_conf"><div class="conf_p" style="margin-bottom:0">'+html_p
+            +'<div style="margin-top:10px; padding-right:15px" class="text-right">\
+            <div>\
+                <button class="btn btn-success btn-sm mr5" onclick="reBootMySqld()">重启数据库</button>\
+                <button class="btn btn-success btn-sm" onclick="setPgConf()">保存</button></div>\
+            </div>'
+            +'</div></form>'
 
         $(".soft-man-con").html(memCon);
 
-        $(".conf_p input[name*='size'],.conf_p input[name='max_connections'],.conf_p input[name='thread_stack']").change(function() {
-            comMySqlMem();
-        });
-
-        $(".conf_p select[name='pg_set']").change(function() {
-            pgSQLMemOpt($(this).val());
-            comMySqlMem();
+        $("#pg_conf").change(function (e) {
+        　　e.preventDefault();
+            var data = {};
+            $('#pg_conf p input').each(function (index, element) {
+                data[$(this).attr('name')] = $(this).val() + ($(this).attr('unit') || '');
+            })
+            // console.log(data);
+            myPost('set_db_status', data, function(data){
+                var rdata = $.parseJSON(data.data);
+                showMsg(rdata.msg,function(){
+                },{ icon: rdata.status ? 1 : 2 });
+            });
+            return false;
         });
     });
 }
 
-function reBootMySqld(){
-    pluginOpService('mysql','restart','');
+function reBootPgSqld(){
+    pluginOpService('postgresql','restart','');
 }
 
-
-//设置MySQL配置参数
-function setMySQLConf() {
-    $.post('/system/system_total', '', function(memInfo) {
-        var memSize = memInfo['memTotal'];
-        var setSize = parseInt($("input[name='memSize']").val());
-        
-        if(memSize < setSize){
-            var errMsg = "错误,内存分配过高!<p style='color:red;'>物理内存: {1}MB<br>最大使用内存: {2}MB<br>可能造成的后果: 导致数据库不稳定,甚至无法启动MySQLd服务!";
-            var msg = errMsg.replace('{1}',memSize).replace('{2}',setSize);
-            layer.msg(msg,{icon:2,time:5000});
-            return;
-        }
-
-        var query_cache_size = parseInt($("input[name='query_cache_size']").val());
-        var query_cache_type = 0;
-        if (query_cache_size > 0) {
-            query_cache_type = 1;
-        }
-        var data = {
-            key_buffer_size: parseInt($("input[name='key_buffer_size']").val()),
-            query_cache_size: query_cache_size,
-            query_cache_type: query_cache_type,
-            tmp_table_size: parseInt($("input[name='tmp_table_size']").val()),
-            max_heap_table_size: parseInt($("input[name='tmp_table_size']").val()),
-            innodb_buffer_pool_size: parseInt($("input[name='innodb_buffer_pool_size']").val()),
-            innodb_log_buffer_size: parseInt($("input[name='innodb_log_buffer_size']").val()),
-            sort_buffer_size: parseInt($("input[name='sort_buffer_size']").val()),
-            read_buffer_size: parseInt($("input[name='read_buffer_size']").val()),
-            read_rnd_buffer_size: parseInt($("input[name='read_rnd_buffer_size']").val()),
-            join_buffer_size: parseInt($("input[name='join_buffer_size']").val()),
-            thread_stack: parseInt($("input[name='thread_stack']").val()),
-            binlog_cache_size: parseInt($("input[name='binlog_cache_size']").val()),
-            thread_cache_size: parseInt($("input[name='thread_cache_size']").val()),
-            table_open_cache: parseInt($("input[name='table_open_cache']").val()),
-            max_connections: parseInt($("input[name='max_connections']").val())
-        };
-
-        myPost('set_db_status', data, function(data){
-            var rdata = $.parseJSON(data.data);
-            showMsg(rdata.msg,function(){
-                reBootMySqld();
-            },{ icon: rdata.status ? 1 : 2 });
-        });
-    },'json');
-}
-
-
-//MySQL内存优化方案
-function pgSQLMemOpt(opt) {
-    var query_size = parseInt($("input[name='query_cache_size']").val());
-    switch (opt) {
-        case '0':
-            $("input[name='key_buffer_size']").val(8);
-            if (query_size) $("input[name='query_cache_size']").val(4);
-            $("input[name='tmp_table_size']").val(8);
-            $("input[name='innodb_buffer_pool_size']").val(16);
-            $("input[name='sort_buffer_size']").val(256);
-            $("input[name='read_buffer_size']").val(256);
-            $("input[name='read_rnd_buffer_size']").val(128);
-            $("input[name='join_buffer_size']").val(128);
-            $("input[name='thread_stack']").val(256);
-            $("input[name='binlog_cache_size']").val(32);
-            $("input[name='thread_cache_size']").val(4);
-            $("input[name='table_open_cache']").val(32);
-            $("input[name='max_connections']").val(500);
-            break;
-        case '1':
-            $("input[name='key_buffer_size']").val(128);
-            if (query_size) $("input[name='query_cache_size']").val(64);
-            $("input[name='tmp_table_size']").val(64);
-            $("input[name='innodb_buffer_pool_size']").val(256);
-            $("input[name='sort_buffer_size']").val(768);
-            $("input[name='read_buffer_size']").val(768);
-            $("input[name='read_rnd_buffer_size']").val(512);
-            $("input[name='join_buffer_size']").val(1024);
-            $("input[name='thread_stack']").val(256);
-            $("input[name='binlog_cache_size']").val(64);
-            $("input[name='thread_cache_size']").val(64);
-            $("input[name='table_open_cache']").val(128);
-            $("input[name='max_connections']").val(100);
-            break;
-    }
-}
-
-//计算MySQL内存开销
-function comMySqlMem() {
-    var key_buffer_size = parseInt($("input[name='key_buffer_size']").val());
-    var query_cache_size = parseInt($("input[name='query_cache_size']").val());
-    var tmp_table_size = parseInt($("input[name='tmp_table_size']").val());
-    var innodb_buffer_pool_size = parseInt($("input[name='innodb_buffer_pool_size']").val());
-    var innodb_additional_mem_pool_size = parseInt($("input[name='innodb_additional_mem_pool_size']").val());
-    var innodb_log_buffer_size = parseInt($("input[name='innodb_log_buffer_size']").val());
-
-    var sort_buffer_size = $("input[name='sort_buffer_size']").val() / 1024;
-    var read_buffer_size = $("input[name='read_buffer_size']").val() / 1024;
-    var read_rnd_buffer_size = $("input[name='read_rnd_buffer_size']").val() / 1024;
-    var join_buffer_size = $("input[name='join_buffer_size']").val() / 1024;
-    var thread_stack = $("input[name='thread_stack']").val() / 1024;
-    var binlog_cache_size = $("input[name='binlog_cache_size']").val() / 1024;
-    var max_connections = $("input[name='max_connections']").val();
-
-    var a = key_buffer_size + query_cache_size + tmp_table_size + innodb_buffer_pool_size + innodb_additional_mem_pool_size + innodb_log_buffer_size
-    var b = sort_buffer_size + read_buffer_size + read_rnd_buffer_size + join_buffer_size + thread_stack + binlog_cache_size
-    var memSize = a + max_connections * b
-    $("input[name='memSize']").val(memSize.toFixed(2));
+//设置PG配置参数
+function setPgConf() {
+    return false;
 }
 
 function syncGetDatabase(){
@@ -360,33 +233,28 @@ function setRootPwd(type, pwd){
             showMsg(rdata.msg,function(){
                 dbList();
                 $('.layui-layer-close1').click();
-            },{icon: rdata.status ? 1 : 2});   
+            },{icon: rdata.status ? 1 : 2});
         });
         return;
     }
 
     var index = layer.open({
         type: 1,
-        skin: 'demo-class',
         area: '500px',
         title: '修改数据库密码',
         closeBtn: 1,
         shift: 5,
         shadeClose: true,
-        content: "<form class='bt-form pd20 pb70' id='mod_pwd'>\
+        btn:["取消","提交"],
+        content: "<form class='bt-form pd20' id='mod_pwd'>\
                     <div class='line'>\
                     <span class='tname'>root密码</span>\
                     <div class='info-r'><input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:330px' value='"+pwd+"' /><span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatPwd(16)'></span></div>\
                     </div>\
-                    <div class='bt-form-submit-btn'>\
-                        <button id='my_mod_close' type='button' class='btn btn-danger btn-sm btn-title'>关闭</button>\
-                        <button type='button' class='btn btn-success btn-sm btn-title' onclick=\"setRootPwd(1)\" >提交</button>\
-                    </div>\
-                  </form>",
-    });
-
-    $('#my_mod_close').click(function(){
-        $('.layui-layer-close1').click();
+                </form>",
+        yes:function(){
+            setRootPwd(1);
+        }
     });
 }
 
@@ -557,85 +425,86 @@ function setDbPass(id, username, password){
     });
 }
 
-function addDatabase(type){
-    if (type==1){
+function addDatabase(type,layer_index){
+    if (type == 1){
         var data = $("#add_db").serialize();
         data = decodeURIComponent(data);
         var dataObj = str2Obj(data);
         if(!dataObj['address']){
             dataObj['address'] = dataObj['dataAccess'];
         }
+        
+        var ip_segment = $('[name="dataAccess"]').val();
+        if ($('[name="dataAccess"]').val() == 'ip'){
+            dataObj['listen_ip'] = ip_segment;
+        }
         myPost('add_db', dataObj, function(data){
             var rdata = $.parseJSON(data.data);
             showMsg(rdata.msg,function(){
+                layer.close(layer_index);
                 if (rdata.status){
                     dbList();
                 }
-                $('.layui-layer-close1').click();
-            },{icon: rdata.status ? 1 : 2},600);
+            },{icon: rdata.status ? 1 : 2},2000);
         });
         return;
     }
-    var index = layer.open({
+    
+    layer.open({
         type: 1,
-        skin: 'demo-class',
-        area: '500px',
+        area: '450px',
         title: '添加数据库',
         closeBtn: 1,
         shift: 5,
         shadeClose: true,
-        content: "<form class='bt-form pd20 pb70' id='add_db'>\
+        btn:["提交","取消"],
+        content: "<form class='bt-form pd20' id='add_db'>\
                     <div class='line'>\
                         <span class='tname'>数据库名</span>\
-                        <div class='info-r'><input name='name' class='bt-input-text mr5' placeholder='新的数据库名称' type='text' style='width:65%' value=''>\
-                        <select class='bt-input-text mr5 codeing_a5nGsm' name='codeing' style='width:27%'>\
-                            <option value='utf8'>utf-8</option>\
-                            <option value='utf8mb4'>utf8mb4</option>\
-                            <option value='gbk'>gbk</option>\
-                            <option value='big5'>big5</option>\
-                        </select>\
+                        <div class='info-r'>\
+                            <input name='name' class='bt-input-text mr5' placeholder='新的数据库名称' type='text' style='width:270px' value=''>\
                         </div>\
                     </div>\
-                    <div class='line'><span class='tname'>用户名</span><div class='info-r'><input name='db_user' class='bt-input-text mr5' placeholder='数据库用户' type='text' style='width:65%' value=''></div></div>\
+                    <div class='line'><span class='tname'>用户名</span><div class='info-r'><input name='db_user' class='bt-input-text mr5' placeholder='数据库用户' type='text' style='width:270px' value=''></div></div>\
                     <div class='line'>\
                     <span class='tname'>密码</span>\
-                    <div class='info-r'><input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:330px' value='"+(randomStrPwd(16))+"' /><span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatPwd(16)'></span></div>\
+                    <div class='info-r'><input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:270px' value='"+(randomStrPwd(16))+"' />\
+                        <span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatPwd(16)'></span></div>\
                     </div>\
                     <div class='line'>\
                         <span class='tname'>访问权限</span>\
-                        <div class='info-r '>\
+                        <div class='info-r'>\
                             <select class='bt-input-text mr5' name='dataAccess' style='width:100px'>\
                             <option value='127.0.0.1'>本地服务器</option>\
                             <option value=\"%\">所有人</option>\
-                            <option value='ip'>指定IP</option>\
+                            <option value='ip'>指定网段</option>\
                             </select>\
+                            <input class='bt-input-text' style='width: 162px;display:none;' placeholder='如: 192.168.1.0/24' name='ip_segment' value='' />\
                         </div>\
                     </div>\
-                    <input type='hidden' name='ps' value='' />\
-                    <div class='bt-form-submit-btn'>\
-                        <button id='my_mod_close' type='button' class='btn btn-danger btn-sm btn-title'>关闭</button>\
-                        <button type='button' class='btn btn-success btn-sm btn-title' onclick=\"addDatabase(1)\" >提交</button>\
-                    </div>\
                   </form>",
-    });
+        success:function(){
 
-    $("input[name='name']").keyup(function(){
-        var v = $(this).val();
-        $("input[name='db_user']").val(v);
-        $("input[name='ps']").val(v);
-    });
+            $("input[name='name']").keyup(function(){
+                var v = $(this).val();
+                $("input[name='db_user']").val(v);
+            });
 
-    $('#my_mod_close').click(function(){
-        $('.layui-layer-close1').click();
-    });
-    $('select[name="dataAccess"]').change(function(){
-        var v = $(this).val();
-        if (v == 'ip'){
-            $(this).after("<input id='dataAccess_subid' class='bt-input-text mr5' type='text' name='address' placeholder='多个IP使用逗号(,)分隔' style='width: 230px; display: inline-block;'>");
-        } else {
-            $('#dataAccess_subid').remove();
+            $('select[name="dataAccess"]').change(function(){
+                var v = $(this).val();
+                if (v == 'ip'){
+                    $('input[name="ip_segment"]').show();
+                } else {
+                    $('input[name="ip_segment"]').hide();
+                    
+                }
+            });
+        },
+        yes:function(index){
+            addDatabase(1,index);
         }
     });
+
 }
 
 function delDb(id, name){
@@ -886,8 +755,7 @@ function dbList(page, search){
             }
 
 
-            list += '<a href="javascript:;" class="btlink" onclick="repTools(\''+rdata.data[i]['name']+'\')" title="MySQL优化修复工具">工具</a> | ' +
-                        '<a href="javascript:;" class="btlink" onclick="setDbAccess(\''+rdata.data[i]['username']+'\')" title="设置数据库权限">权限</a> | ' +
+            list += '<a href="javascript:;" class="btlink" onclick="setDbAccess(\''+rdata.data[i]['username']+'\')" title="设置数据库权限">权限</a> | ' +
                         rw +
                         '<a href="javascript:;" class="btlink" onclick="setDbPass('+rdata.data[i]['id']+',\''+ rdata.data[i]['username'] +'\',\'' + rdata.data[i]['password'] + '\')">改密</a> | ' +
                         '<a href="javascript:;" class="btlink" onclick="delDb(\''+rdata.data[i]['id']+'\',\''+rdata.data[i]['name']+'\')" title="删除数据库">删除</a>' +
