@@ -127,30 +127,6 @@ function pgPort(){
 }
 
 
-//数据库存储信置
-function changePgDataPath(act) {
-    if (act != undefined) {
-        layer.confirm(lan.soft.mysql_to_msg, { closeBtn: 2, icon: 3 }, function() {
-            var datadir = $("#datadir").val();
-            var data = 'datadir=' + datadir;
-            var loadT = layer.msg(lan.soft.mysql_to_msg1, { icon: 16, time: 0, shade: [0.3, '#000'] });
-            $.post('/database?action=SetDataDir', data, function(rdata) {
-                layer.close(loadT)
-                layer.msg(rdata.msg, { icon: rdata.status ? 1 : 5 });
-            });
-        });
-        return;
-    }
-
-    $.post('/database?action=GetMySQLInfo', '', function(rdata) {
-        var LimitCon = '<p class="conf_p">\
-                            <input id="datadir" class="phpUploadLimit bt-input-text mr5" style="width:350px;" type="text" value="' + rdata.datadir + '" name="datadir">\
-                            <span onclick="ChangePath(\'datadir\')" class="glyphicon glyphicon-folder-open cursor mr20" style="width:auto"></span><button class="btn btn-success btn-sm" onclick="changeMySQLDataPath(1)">' + lan.soft.mysql_to + '</button>\
-                        </p>';
-        $(".soft-man-con").html(LimitCon);
-    });
-}
-
 //数据库配置状态
 function pgPerfOpt() {
     //获取MySQL配置
@@ -313,8 +289,8 @@ function setDbRw(id,username,val){
     });
 }
 
-function setDbAccess(username){
-    myPost('get_db_access','username='+username, function(data){
+function setDbAccess(name){
+    myPost('get_db_access','name='+name, function(data){
         var rdata = $.parseJSON(data.data);
         if (!rdata.status){
             layer.msg(rdata.msg,{icon:2,shade: [0.3, '#000']});
@@ -334,30 +310,27 @@ function setDbAccess(username){
                             <span class='tname'>访问权限</span>\
                             <div class='info-r '>\
                                 <select class='bt-input-text mr5' name='dataAccess' style='width:100px'>\
-                                <option value='127.0.0.1'>本地服务器</option>\
+                                <option value='127.0.0.1/32'>本地服务器</option>\
                                 <option value=\"%\">所有人</option>\
-                                <option value='ip'>指定IP</option>\
+                                <option value='ip'>指定网段</option>\
                                 </select>\
                             </div>\
                         </div>\
                       </form>",
             success:function(){
-                if (rdata.msg == '127.0.0.1'){
-                    $('select[name="dataAccess"]').find("option[value='127.0.0.1']").attr("selected",true);
-                } else if (rdata.msg == '%'){
+                if (rdata.msg == '127.0.0.1/32'){
+                    $('select[name="dataAccess"]').find("option[value='127.0.0.1/32']").attr("selected",true);
+                } else if (rdata.msg == '0.0.0.0/0'){
                     $('select[name="dataAccess"]').find('option[value="%"]').attr("selected",true);
-                } else if ( rdata.msg == 'ip' ){
-                    $('select[name="dataAccess"]').find('option[value="ip"]').attr("selected",true);
-                    $('select[name="dataAccess"]').after("<input id='dataAccess_subid' class='bt-input-text mr5' type='text' name='address' placeholder='多个IP使用逗号(,)分隔' style='width: 230px; display: inline-block;'>");
                 } else {
                     $('select[name="dataAccess"]').find('option[value="ip"]').attr("selected",true);
-                    $('select[name="dataAccess"]').after("<input value='"+rdata.msg+"' id='dataAccess_subid' class='bt-input-text mr5' type='text' name='address' placeholder='多个IP使用逗号(,)分隔' style='width: 230px; display: inline-block;'>");
+                    $('select[name="dataAccess"]').after("<input value='"+rdata.msg+"' id='dataAccess_subid' class='bt-input-text mr5' type='text' name='address' placeholder='如: 192.168.1.0/24' style='width: 230px; display: inline-block;'>");
                 }
 
-                 $('select[name="dataAccess"]').change(function(){
+                $('select[name="dataAccess"]').change(function(){
                     var v = $(this).val();
                     if (v == 'ip'){
-                        $(this).after("<input id='dataAccess_subid' class='bt-input-text mr5' type='text' name='address' placeholder='多个IP使用逗号(,)分隔' style='width: 230px; display: inline-block;'>");
+                        $(this).after("<input id='dataAccess_subid' class='bt-input-text mr5' type='text' name='address' placeholder='如: 192.168.1.0/24' style='width: 230px; display: inline-block;'>");
                     } else {
                         $('#dataAccess_subid').remove();
                     }
@@ -377,7 +350,7 @@ function setDbAccess(username){
                         dataObj['access'] = dataObj['address'];
                     }
                 }
-                dataObj['username'] = username;
+                dataObj['name'] = name;
                 myPost('set_db_access', dataObj, function(data){
                     var rdata = $.parseJSON(data.data);
                     showMsg(rdata.msg,function(){
@@ -571,60 +544,6 @@ function setDbPs(id, name, obj) {
     });
 }
 
-function openPhpmyadmin(name,username,password){
-
-    data = syncPost('/plugins/check',{'name':'phpmyadmin'});
-
-
-    if (!data.status){
-        layer.msg(data.msg,{icon:2,shade: [0.3, '#000']});
-        return;
-    }
-
-    data = syncPost('/plugins/run',{'name':'phpmyadmin','func':'status'});
-    if (data.data != 'start'){
-        layer.msg('phpMyAdmin未启动',{icon:2,shade: [0.3, '#000']});
-        return;
-    }
-    // console.log(data);
-    data = syncPost('/plugins/run',{'name':'phpmyadmin','func':'get_home_page'});
-    var rdata = $.parseJSON(data.data);
-    if (!rdata.status){
-        layer.msg(rdata.msg,{icon:2,shade: [0.3, '#000']});
-        return;
-    }
-    $("#toPHPMyAdmin").attr('action',rdata.data);
-
-    if($("#toPHPMyAdmin").attr('action').indexOf('phpmyadmin') == -1){
-        layer.msg('请先安装phpMyAdmin',{icon:2,shade: [0.3, '#000']});
-        setTimeout(function(){ window.location.href = '/soft'; },3000);
-        return;
-    }
-
-    //检查版本
-    data = syncPost('/plugins/run',{'name':'phpmyadmin','func':'version'});
-    bigVer = data.data.split('.')[0]
-    if (bigVer>=4.5){
-
-        setTimeout(function(){
-            $("#toPHPMyAdmin").submit();
-        },3000);
-        layer.msg('phpMyAdmin['+data.data+']需要手动登录😭',{icon:16,shade: [0.3, '#000'],time:4000});
-        
-    } else{
-        var murl = $("#toPHPMyAdmin").attr('action');
-        $("#pma_username").val(username);
-        $("#pma_password").val(password);
-        $("#db").val(name);
-
-        layer.msg('正在打开phpMyAdmin',{icon:16,shade: [0.3, '#000'],time:2000});
-
-        setTimeout(function(){
-            $("#toPHPMyAdmin").submit();
-        },3000);
-    }    
-}
-
 function delBackup(filename,name){
     myPost('delete_db_backup',{filename:filename},function(){
         layer.msg('执行成功!');
@@ -647,9 +566,10 @@ function importBackup(file,name){
 }
 
 function setBackup(db_name,obj){
-     myPost('get_db_backup_list', {name:db_name}, function(data){
+     myPost('pg_back_list', {name:db_name}, function(data){
 
         var rdata = $.parseJSON(data.data);
+        console.log(rdata);
         var tbody = '';
         for (var i = 0; i < rdata.data.length; i++) {
             tbody += '<tr>\
@@ -693,7 +613,7 @@ function setBackup(db_name,obj){
         });
 
         $('#btn_backup').click(function(){
-            myPost('set_db_backup',{name:db_name}, function(data){
+            myPost('pg_back',{name:db_name}, function(data){
                 layer.msg('执行成功!');
 
                 setTimeout(function(){
@@ -755,7 +675,7 @@ function dbList(page, search){
             }
 
 
-            list += '<a href="javascript:;" class="btlink" onclick="setDbAccess(\''+rdata.data[i]['username']+'\')" title="设置数据库权限">权限</a> | ' +
+            list += '<a href="javascript:;" class="btlink" onclick="setDbAccess(\''+rdata.data[i]['name']+'\')" title="设置数据库权限">权限</a> | ' +
                         rw +
                         '<a href="javascript:;" class="btlink" onclick="setDbPass('+rdata.data[i]['id']+',\''+ rdata.data[i]['username'] +'\',\'' + rdata.data[i]['password'] + '\')">改密</a> | ' +
                         '<a href="javascript:;" class="btlink" onclick="delDb(\''+rdata.data[i]['id']+'\',\''+rdata.data[i]['name']+'\')" title="删除数据库">删除</a>' +
@@ -809,146 +729,7 @@ function dbList(page, search){
         readerTableChecked();
     });
 }
-
-function repCheckeds(tables) {
-    var dbs = []
-    if (tables) {
-        dbs.push(tables)
-    } else {
-        var db_tools = $("input[value^='dbtools_']");
-        for (var i = 0; i < db_tools.length; i++) {
-            if (db_tools[i].checked) dbs.push(db_tools[i].value.replace('dbtools_', ''));
-        }
-    }
-
-    if (dbs.length < 1) {
-        layer.msg('请至少选择一张表!', { icon: 2 });
-        return false;
-    }
-    return dbs;
-}
-
-function repDatabase(db_name, tables) {
-    dbs = repCheckeds(tables);
-    
-    myPost('repair_table', { db_name: db_name, tables: JSON.stringify(dbs) }, function(data){
-        var rdata = $.parseJSON(data.data);
-        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
-        repTools(db_name, true);
-    },'已送修复指令,请稍候...');
-}
-
-
-function optDatabase(db_name, tables) {
-    dbs = repCheckeds(tables);
-    
-    myPost('opt_table', { db_name: db_name, tables: JSON.stringify(dbs) }, function(data){
-        var rdata = $.parseJSON(data.data);
-        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
-        repTools(db_name, true);
-    },'已送优化指令,请稍候...');
-}
-
-function toDatabaseType(db_name, tables, type){
-    dbs = repCheckeds(tables);
-    myPost('alter_table', { db_name: db_name, tables: JSON.stringify(dbs),table_type: type }, function(data){
-        var rdata = $.parseJSON(data.data);
-        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
-        repTools(db_name, true);
-    }, '已送引擎转换指令,请稍候...');
-}
-
-
-function selectedTools(my_obj, db_name) {
-    var is_checked = false
-
-    if (my_obj) is_checked = my_obj.checked;
-    var db_tools = $("input[value^='dbtools_']");
-    var n = 0;
-    for (var i = 0; i < db_tools.length; i++) {
-        if (my_obj) db_tools[i].checked = is_checked;
-        if (db_tools[i].checked) n++;
-    }
-    if (n > 0) {
-        var my_btns = '<button class="btn btn-default btn-sm" onclick="repDatabase(\'' + db_name + '\',null)">修复</button>\
-            <button class="btn btn-default btn-sm" onclick="optDatabase(\'' + db_name + '\',null)">优化</button>\
-            <button class="btn btn-default btn-sm" onclick="toDatabaseType(\'' + db_name + '\',null,\'InnoDB\')">转为InnoDB</button></button>\
-            <button class="btn btn-default btn-sm" onclick="toDatabaseType(\'' + db_name + '\',null,\'MyISAM\')">转为MyISAM</button>'
-        $("#db_tools").html(my_btns);
-    } else {
-        $("#db_tools").html('');
-    }
-}
-
-function repTools(db_name, res){
-    myPost('get_db_info', {name:db_name}, function(data){
-        var rdata = $.parseJSON(data.data);
-        var types = { InnoDB: "MyISAM", MyISAM: "InnoDB" };
-        var tbody = '';
-        for (var i = 0; i < rdata.tables.length; i++) {
-            if (!types[rdata.tables[i].type]) continue;
-            tbody += '<tr>\
-                    <td><input value="dbtools_' + rdata.tables[i].table_name + '" class="check" onclick="selectedTools(null,\'' + db_name + '\');" type="checkbox"></td>\
-                    <td><span style="width:220px;"> ' + rdata.tables[i].table_name + '</span></td>\
-                    <td>' + rdata.tables[i].type + '</td>\
-                    <td><span style="width:90px;"> ' + rdata.tables[i].collation + '</span></td>\
-                    <td>' + rdata.tables[i].rows_count + '</td>\
-                    <td>' + rdata.tables[i].data_size + '</td>\
-                    <td style="text-align: right;">\
-                        <a class="btlink" onclick="repDatabase(\''+ db_name + '\',\'' + rdata.tables[i].table_name + '\')">修复</a> |\
-                        <a class="btlink" onclick="optDatabase(\''+ db_name + '\',\'' + rdata.tables[i].table_name + '\')">优化</a> |\
-                        <a class="btlink" onclick="toDatabaseType(\''+ db_name + '\',\'' + rdata.tables[i].table_name + '\',\'' + types[rdata.tables[i].type] + '\')">转为' + types[rdata.tables[i].type] + '</a>\
-                    </td>\
-                </tr> '
-        }
-
-        if (res) {
-            $(".gztr").html(tbody);
-            $("#db_tools").html('');
-            $("input[type='checkbox']").attr("checked", false);
-            $(".tools_size").html('大小：' + rdata.data_size);
-            return;
-        }
-
-        layer.open({
-            type: 1,
-            title: "MySQL工具箱【" + db_name + "】",
-            area: ['780px', '580px'],
-            closeBtn: 2,
-            shadeClose: false,
-            content: '<div class="pd15">\
-                            <div class="db_list">\
-                                <span><a>数据库名称：'+ db_name + '</a>\
-                                <a class="tools_size">大小：'+ rdata.data_size + '</a></span>\
-                                <span id="db_tools" style="float: right;"></span>\
-                            </div >\
-                            <div class="divtable">\
-                            <div  id="database_fix"  style="height:360px;overflow:auto;border:#ddd 1px solid">\
-                            <table class="table table-hover "style="border:none">\
-                                <thead>\
-                                    <tr>\
-                                        <th><input class="check" onclick="selectedTools(this,\''+ db_name + '\');" type="checkbox"></th>\
-                                        <th>表名</th>\
-                                        <th>引擎</th>\
-                                        <th>字符集</th>\
-                                        <th>行数</th>\
-                                        <th>大小</th>\
-                                        <th style="text-align: right;">操作</th>\
-                                    </tr>\
-                                </thead>\
-                                <tbody class="gztr">' + tbody + '</tbody>\
-                            </table>\
-                            </div>\
-                        </div>\
-                        <ul class="help-info-text c7">\
-                            <li>【修复】尝试使用REPAIR命令修复损坏的表，仅能做简单修复，若修复不成功请考虑使用myisamchk工具</li>\
-                            <li>【优化】执行OPTIMIZE命令，可回收未释放的磁盘空间，建议每月执行一次</li>\
-                            <li>【转为InnoDB/MyISAM】转换数据表引擎，建议将所有表转为InnoDB</li>\
-                        </ul></div>'
-        });
-        tableFixed('database_fix');
-    });
-}
+///////////////////////////////// 主从 /////////////////////////
 
 
 function setDbMaster(name){

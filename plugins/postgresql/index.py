@@ -626,7 +626,7 @@ def sedConf(name, val):
 
 
 def pgSetDbStatus():
-    ''' 
+    '''
     保存pgsql性能调整信息
     '''
     args = getArgs()
@@ -643,22 +643,27 @@ def pgSetDbStatus():
     return mw.returnJson(True, '设置成功!')
 
 
-def __createUser(dbname, username, password, address):
-    pdb = pMysqlDb()
+def setUserPwd(version=''):
+    args = getArgs()
+    data = checkArgs(args, ['password', 'name'])
+    if not data[0]:
+        return data[1]
 
-    if username == 'root':
-        dbname = '*'
+    newpwd = args['password']
+    username = args['name']
+    uid = args['id']
+    try:
+        pdb = pgDb()
+        psdb = pSqliteDb('databases')
+        name = psdb.where('id=?', (uid,)).getField('name')
 
-    pdb.execute(
-        "CREATE USER `%s`@`localhost` IDENTIFIED BY '%s'" % (username, password))
-    pdb.execute(
-        "grant all privileges on %s.* to `%s`@`localhost`" % (dbname, username))
-    for a in address.split(','):
-        pdb.execute(
-            "CREATE USER `%s`@`%s` IDENTIFIED BY '%s'" % (username, a, password))
-        pdb.execute(
-            "grant all privileges on %s.* to `%s`@`%s`" % (dbname, username, a))
-    pdb.execute("flush privileges")
+        r = pdb.execute(
+            "alter user {} with password '{}'".format(username, newpwd))
+
+        psdb.where("id=?", (uid,)).setField('password', newpwd)
+        return mw.returnJson(True, mw.getInfo('修改数据库[{1}]密码成功!', (name,)))
+    except Exception as ex:
+        return mw.returnJson(False, mw.getInfo('修改数据库[{1}]密码失败[{2}]!', (name, str(ex),)))
 
 
 def getDbBackupListFunc(dbname=''):
@@ -859,12 +864,12 @@ def addDb():
     if not re.match(r"(?:[0-9]{1,3}\.){3}[0-9]{1,3}/\d+", listen_ip):
         return mw.returnJson(False, "你输入的权限不合法，添加失败！")
 
-    # # 修改监听所有地址
-    # if listen_ip not in ["127.0.0.1/32", "localhost", "127.0.0.1"]:
-    #     sedConf("listen_addresses", "'*'")
+    # 修改监听所有地址
+    if listen_ip not in ["127.0.0.1/32", "localhost", "127.0.0.1"]:
+        sedConf("listen_addresses", "'*'")
 
     reg = "^[\w\.-]+$"
-    if not re.match(reg, args['name']):
+    if not re.match(reg, dbname):
         return mw.returnJson(False, '数据库名称不能带有特殊符号!')
 
     checks = ['root', 'mysql', 'test', 'sys', 'postgres', 'postgresql']
@@ -896,7 +901,7 @@ def addDb():
 
     addTime = time.strftime('%Y-%m-%d %X', time.localtime())
     psdb.add('pid,name,username,password,accept,ps,addtime',
-             (0, dbname, dbuser, password, address, dbname, addTime))
+             (0, dbname, dbuser, password, listen_ip, dbname, addTime))
 
     restart()
     return mw.returnJson(True, '添加成功!')
@@ -925,6 +930,135 @@ def delDb():
 
     psdb.where("id=?", (did,)).delete()
     return mw.returnJson(True, '删除成功!')
+
+
+def getDbAccess():
+    args = getArgs()
+    data = checkArgs(args, ['name'])
+    if not data[0]:
+        return data[1]
+    name = args['name']
+    psdb = pSqliteDb('databases')
+    accept = psdb.where("name=?", (name,)).getField('accept')
+    return mw.returnJson(True, accept)
+
+
+def setDbAccess():
+    args = getArgs()
+    data = checkArgs(args, ['name'])
+    if not data[0]:
+        return data[1]
+
+    name = args['name']
+
+    return mw.returnJson(True, "设置成功")
+
+
+def pgBack():
+    # 备份数据库
+
+    args = getArgs()
+    data = checkArgs(args, ['name'])
+    if not data[0]:
+        return data[1]
+
+    bk_path = mw.getBackupDir() + "/pg"
+    if not os.path.isdir(bk_path):
+        mw.execShell("mkdir -p {}/upload".format(bk_path))
+
+    bk_path_upload = bk_path + "/upload"
+    database = args['name']
+    port = getPgPort()
+
+    cmd = '''su - postgres -c "/www/server/pgsql/bin/pg_dump -c {} -p {} "| gzip > {}/{}_{}.gz '''.format(
+        database, port, bk_path_upload, database, time.strftime("%Y%m%d_%H%M%S"))
+
+    if mw.isAppleSystem():
+        cmd = '''{}/bin/pg_dump -c {} -p {} | gzip > {}/{}_{}.gz '''.format(
+            getServerDir(), database, port, bk_path_upload, database, time.strftime("%Y%m%d_%H%M%S"))
+    mw.execShell(cmd)
+
+    return mw.returnJson(True, '备份成功!')
+
+
+def pgBackList():
+
+    args = getArgs()
+    data = checkArgs(args, ['name'])
+    if not data[0]:
+        return data[1]
+
+    database = args['name']
+
+    bk_path = mw.getBackupDir() + "/pg"
+    if not os.path.isdir(bk_path):
+        mw.execShell("mkdir -p {}/upload".format(bk_path))
+
+    bk_path_upload = bk_path + "/upload"
+    file_list = os.listdir(bk_path_upload)
+    data = []
+    for i in file_list:
+        if i.split("_")[0].startswith(database):
+            file_path = os.path.join(bk_path_upload, i)
+            file_info = os.stat(file_path)
+            create_time = file_info.st_ctime
+            time_local = time.localtime(int(create_time))
+            create_time = time.strftime("%Y-%m-%d %H:%M:%S", time_local)
+            file_size = file_info.st_size
+            file_size = mw.toSize(file_size)
+            data.append({"name": i, "time": create_time,
+                         "size": file_size, "file": file_path})
+
+    return mw.returnJson(True, 'ok', data)
+
+
+def importDbBackup():
+    args = getArgs()
+    data = checkArgs(args, ['file', 'name'])
+    if not data[0]:
+        return data[1]
+
+    file = args['file']
+    name = args['name']
+
+    bk_path = mw.getBackupDir() + "/pg"
+    if not os.path.isdir(bk_path):
+        mw.execShell("mkdir -p {}/upload".format(bk_path))
+
+    bk_path_upload = bk_path + "/upload"
+
+    file_path = os.path.join(bk_path_upload, name)
+    if not os.path.exists(file_path):
+        return mw.returnJson(False, '备份文件不存在')
+
+    port = getPgPort()
+    cmd = '''gunzip -c {}|su - postgres -c " /www/server/pgsql/bin/psql  -d {}  -p {} " '''.format(
+        file, name, port)
+
+    if mw.isAppleSystem():
+        cmd = '''gunzip -c {} | {}/bin/psql  -d {}  -p {}'''.format(
+            name, getServerDir(), port)
+
+    # print(cmd)
+
+    mw.execShell(cmd)
+    return mw.returnJson(True, '恢复数据库成功')
+
+
+def deleteDbBackup():
+    args = getArgs()
+    data = checkArgs(args, ['filename'])
+    if not data[0]:
+        return data[1]
+
+    bk_path = mw.getBackupDir() + "/pg"
+    if not os.path.isdir(bk_path):
+        mw.execShell("mkdir -p {}/upload".format(bk_path))
+
+    bk_path_upload = bk_path + "/upload"
+
+    os.remove(bk_path_upload + '/' + args['filename'])
+    return mw.returnJson(True, 'ok')
 
 
 def installPreInspection(version):
@@ -980,6 +1114,8 @@ if __name__ == "__main__":
         print(pgDbStatus())
     elif func == 'set_db_status':
         print(pgSetDbStatus())
+    elif func == 'set_user_pwd':
+        print(setUserPwd())
     elif func == 'pg_port':
         print(getPgPort())
     elif func == 'set_pg_port':
@@ -990,6 +1126,18 @@ if __name__ == "__main__":
         print(addDb())
     elif func == 'del_db':
         print(delDb())
+    elif func == 'get_db_access':
+        print(getDbAccess())
+    elif func == 'set_db_access':
+        print(setDbAccess())
+    elif func == 'pg_back':
+        print(pgBack())
+    elif func == 'pg_back_list':
+        print(pgBackList())
+    elif func == 'import_db_backup':
+        print(importDbBackup())
+    elif func == 'delete_db_backup':
+        print(deleteDbBackup())
     elif func == 'sync_get_databases':
         print(syncGetDatabases())
     else:
