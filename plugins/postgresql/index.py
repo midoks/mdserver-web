@@ -279,7 +279,7 @@ def initPgPwd():
 
     if not mw.isAppleSystem():
         cmd_pass = cmd_pass + ' su - postgres -c "' + \
-            serverdir + '/bin/psql" -d postgres'
+            serverdir + '/bin/psql -d postgres"'
     else:
         cmd_pass = cmd_pass + serverdir + '/bin/psql -d postgres'
     data = mw.execShell(cmd_pass)
