@@ -272,6 +272,9 @@ def initPgPwd():
     serverdir = getServerDir()
     pwd = mw.getRandomString(16)
 
+    cmd_pass = serverdir + '/bin/createuser -s postgres'
+    data = mw.execShell(cmd_pass)
+
     cmd_pass = "echo \"alter user postgres with password '" + pwd + "'\" | "
     cmd_pass = cmd_pass + serverdir + '/bin/psql -d postgres'
     data = mw.execShell(cmd_pass)
@@ -428,7 +431,6 @@ def runInfo():
     res = db.query(
         "select count(*) from pg_stat_activity where not pid=pg_backend_pid()")
 
-    # print(res)
     result['connections'] = res[0][0]
 
     res = db.query("select pg_size_pretty(pg_database_size('postgres'))")
