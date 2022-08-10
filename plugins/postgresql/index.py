@@ -964,10 +964,8 @@ def setDbRw(version=''):
     psdb = pSqliteDb('databases')
     dbname = psdb.where("id=?", (uid,)).getField('name')
 
-    # sql = "REVOKE ALL ON database " + dbname + " FROM " + username
-    # r = pdb.query(sql)
-    # print(sql)
-    # print("uu:" + str(r))
+    sql = "REVOKE ALL ON database " + dbname + " FROM " + username
+    pdb.query(sql)
 
     if rw == 'rw':
         sql = "GRANT SELECT, INSERT, UPDATE, DELETE ON database " + dbname + " TO " + username
