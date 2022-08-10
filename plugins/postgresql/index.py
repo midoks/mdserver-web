@@ -188,11 +188,19 @@ def initDreplace(version=''):
     init_pl = conf_dir + "/init.pl"
     if not os.path.exists(init_pl):
         mw.writeFile(init_pl, 'ok')
+
+        # postgresql.conf
         pg_conf = conf_dir + '/data/postgresql.conf'
         tpl = getPluginDir() + '/conf/postgresql.conf'
         content = mw.readFile(tpl)
         content = contentReplace(content)
         mw.writeFile(pg_conf, content)
+
+        # pg_hba.conf
+        tpl = getPluginDir() + '/conf/pg_hba.conf'
+        pg_hba_conf = conf_dir + '/data/pg_hba.conf'
+        content = mw.readFile(tpl)
+        mw.writeFile(pg_hba_conf, content)
 
         logfile = runLog()
         if not os.path.exists(logfile):
