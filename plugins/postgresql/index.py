@@ -180,22 +180,22 @@ def initConfig(version=''):
     if not os.path.exists(init_pl):
         mw.writeFile(init_pl, 'ok')
 
-        # postgresql.conf
-        pg_conf = conf_dir + '/data/postgresql.conf'
-        tpl = getPluginDir() + '/conf/postgresql.conf'
-        content = mw.readFile(tpl)
-        content = contentReplace(content)
-        mw.writeFile(pg_conf, content)
+        # # postgresql.conf
+        # pg_conf = conf_dir + '/data/postgresql.conf'
+        # tpl = getPluginDir() + '/conf/postgresql.conf'
+        # content = mw.readFile(tpl)
+        # content = contentReplace(content)
+        # mw.writeFile(pg_conf, content)
 
-        # pg_hba.conf
-        tpl = getPluginDir() + '/conf/pg_hba.conf'
-        pg_hba_conf = conf_dir + '/data/pg_hba.conf'
-        content = mw.readFile(tpl)
-        mw.writeFile(pg_hba_conf, content)
+        # # pg_hba.conf
+        # tpl = getPluginDir() + '/conf/pg_hba.conf'
+        # pg_hba_conf = conf_dir + '/data/pg_hba.conf'
+        # content = mw.readFile(tpl)
+        # mw.writeFile(pg_hba_conf, content)
 
-        logfile = runLog()
-        if not os.path.exists(logfile):
-            mw.writeFile(logfile, '')
+        # logfile = runLog()
+        # if not os.path.exists(logfile):
+        #     mw.writeFile(logfile, '')
 
 
 def initDreplace(version=''):
@@ -279,12 +279,12 @@ def initPgPwd():
     data = mw.execShell(cmd_pass)
 
     cmd_pass = "echo \"alter user postgres with password '" + pwd + "'\" | "
-
     if not mw.isAppleSystem():
         cmd_pass = cmd_pass + ' su - postgres -c "' + \
             serverdir + '/bin/psql -d postgres"'
     else:
         cmd_pass = cmd_pass + serverdir + '/bin/psql -d postgres'
+
     data = mw.execShell(cmd_pass)
     # print(cmd_pass)
     # print(data)
@@ -439,6 +439,7 @@ def runInfo():
     res = db.query(
         "select count(*) from pg_stat_activity where not pid=pg_backend_pid()")
 
+    # print(res)
     result['connections'] = res[0][0]
 
     res = db.query("select pg_size_pretty(pg_database_size('postgres'))")
