@@ -276,7 +276,12 @@ def initPgPwd():
     data = mw.execShell(cmd_pass)
 
     cmd_pass = "echo \"alter user postgres with password '" + pwd + "'\" | "
-    cmd_pass = cmd_pass + serverdir + '/bin/psql -d postgres'
+
+    if not mw.isAppleSystem():
+        cmd_pass = cmd_pass + ' su - postgres -c "' + \
+            serverdir + '/bin/psql" -d postgres'
+    else:
+        cmd_pass = cmd_pass + serverdir + '/bin/psql -d postgres'
     data = mw.execShell(cmd_pass)
     # print(cmd_pass)
     # print(data)
