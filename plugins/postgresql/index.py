@@ -64,6 +64,15 @@ def getArgs():
     return tmp
 
 
+def getBackupDir():
+    bk_path = mw.getBackupDir() + "/pg"
+    if not os.path.isdir(bk_path):
+        mw.execShell("mkdir -p {}/upload".format(bk_path))
+
+    bk_path_upload = bk_path + "/upload"
+    return bk_path_upload
+
+
 def checkArgs(data, ck=[]):
     for i in range(len(ck)):
         if not ck[i] in data:
@@ -251,7 +260,7 @@ def initPgPwd():
     serverdir = getServerDir()
     pwd = mw.getRandomString(16)
 
-    cmd_pass = "echo \"create user root with superuser password '" + pwd + "'\" | "
+    cmd_pass = "echo \"create user postgres with superuser password '" + pwd + "'\" | "
     cmd_pass = cmd_pass + serverdir + '/bin/psql -d postgres'
     data = mw.execShell(cmd_pass)
     # print(cmd_pass)
@@ -812,10 +821,9 @@ def syncGetDatabases():
     psdb = pSqliteDb('databases')
     data = pdb.table('pg_database').field(
         'datname').where("datistemplate=false").select()
-    nameArr = ['postgres', ]
+    nameArr = ['postgres']
     n = 0
 
-    # print(users)
     for value in data:
         vdb_name = value["datname"]
         b = False
@@ -827,13 +835,8 @@ def syncGetDatabases():
             continue
         if psdb.where("name=?", (vdb_name,)).count() > 0:
             continue
-        host = '127.0.0.1'
-        # for user in users:
-        #     if vdb_name == user["User"]:
-        #         host = user["Host"]
-        #         break
-
-        ps = mw.getMsg('INPUT_PS')
+        host = '127.0.0.1/32'
+        ps = vdb_name
         addTime = time.strftime('%Y-%m-%d %X', time.localtime())
         if psdb.add('name,username,password,accept,ps,addtime', (vdb_name, vdb_name, '', host, ps, addTime)):
             n += 1
@@ -883,11 +886,16 @@ def addDb():
 
     pdb = pgDb()
     psdb = pSqliteDb('databases')
+
     if psdb.where("name=? or username=?", (dbname, dbuser)).count():
         return mw.returnJson(False, '数据库或用户已存在!')
 
+    sql = "select pg_terminate_backend(pid) from pg_stat_activity where DATNAME = 'template1';"
+    pdb.execute(sql)
     r = pdb.execute("create database " + dbname)
+    # print(r)
     r = pdb.execute("create user " + dbuser)
+    # print(r)
     pdb.execute("alter user {} with password '{}'".format(dbuser, password,))
     pdb.execute(
         "GRANT ALL PRIVILEGES ON DATABASE {} TO {}".format(dbname, dbuser,))
@@ -918,10 +926,20 @@ def delDb():
 
     pdb = pgDb()
     psdb = pSqliteDb('databases')
-    pdb.execute("drop database " + name)
 
     username = psdb.where('id=?', (did,)).getField('username')
-    pdb.execute("drop user " + username)
+    # print(username, len(username))
+    if len(username) > 0:
+        r = pdb.execute("drop user " + str(username))
+        # print(r)
+
+    sql = "SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity WHERE datname='" + \
+        name + "' AND pid<>pg_backend_pid();"
+
+    r = pdb.execute(sql)
+    # print(r)
+    r = pdb.execute("drop database " + name)
+    # print(r)
 
     pg_hba = getServerDir() + "/data/pg_hba.conf"
     old_config = mw.readFile(pg_hba)
@@ -930,6 +948,37 @@ def delDb():
 
     psdb.where("id=?", (did,)).delete()
     return mw.returnJson(True, '删除成功!')
+
+
+def setDbRw(version=''):
+    args = getArgs()
+    data = checkArgs(args, ['username', 'id', 'rw'])
+    if not data[0]:
+        return data[1]
+
+    username = args['username']
+    uid = args['id']
+    rw = args['rw']
+
+    pdb = pgDb()
+    psdb = pSqliteDb('databases')
+    dbname = psdb.where("id=?", (uid,)).getField('name')
+
+    # sql = "REVOKE ALL ON database " + dbname + " FROM " + username
+    # r = pdb.query(sql)
+    # print(sql)
+    # print("uu:" + str(r))
+
+    if rw == 'rw':
+        sql = "GRANT SELECT, INSERT, UPDATE, DELETE ON database " + dbname + " TO " + username
+    elif rw == 'r':
+        sql = "GRANT SELECT ON database " + dbname + " TO " + username
+    else:
+        sql = "GRANT all ON database " + dbname + " TO " + username
+
+    r = pdb.execute(sql)
+    psdb.where("id=?", (uid,)).setField('rw', rw)
+    return mw.returnJson(True, '切换成功!')
 
 
 def getDbAccess():
@@ -962,11 +1011,7 @@ def pgBack():
     if not data[0]:
         return data[1]
 
-    bk_path = mw.getBackupDir() + "/pg"
-    if not os.path.isdir(bk_path):
-        mw.execShell("mkdir -p {}/upload".format(bk_path))
-
-    bk_path_upload = bk_path + "/upload"
+    bk_path_upload = getBackupDir()
     database = args['name']
     port = getPgPort()
 
@@ -990,11 +1035,7 @@ def pgBackList():
 
     database = args['name']
 
-    bk_path = mw.getBackupDir() + "/pg"
-    if not os.path.isdir(bk_path):
-        mw.execShell("mkdir -p {}/upload".format(bk_path))
-
-    bk_path_upload = bk_path + "/upload"
+    bk_path_upload = getBackupDir()
     file_list = os.listdir(bk_path_upload)
     data = []
     for i in file_list:
@@ -1021,11 +1062,7 @@ def importDbBackup():
     file = args['file']
     name = args['name']
 
-    bk_path = mw.getBackupDir() + "/pg"
-    if not os.path.isdir(bk_path):
-        mw.execShell("mkdir -p {}/upload".format(bk_path))
-
-    bk_path_upload = bk_path + "/upload"
+    bk_path_upload = getBackupDir()
 
     file_path = os.path.join(bk_path_upload, name)
     if not os.path.exists(file_path):
@@ -1051,12 +1088,7 @@ def deleteDbBackup():
     if not data[0]:
         return data[1]
 
-    bk_path = mw.getBackupDir() + "/pg"
-    if not os.path.isdir(bk_path):
-        mw.execShell("mkdir -p {}/upload".format(bk_path))
-
-    bk_path_upload = bk_path + "/upload"
-
+    bk_path_upload = getBackupDir()
     os.remove(bk_path_upload + '/' + args['filename'])
     return mw.returnJson(True, 'ok')
 
@@ -1126,6 +1158,8 @@ if __name__ == "__main__":
         print(addDb())
     elif func == 'del_db':
         print(delDb())
+    elif func == 'set_db_rw':
+        print(setDbRw(version))
     elif func == 'get_db_access':
         print(getDbAccess())
     elif func == 'set_db_access':

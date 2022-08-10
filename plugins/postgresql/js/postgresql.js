@@ -279,13 +279,11 @@ function checkSelect(){
 }
 
 function setDbRw(id,username,val){
-    myPost('get_db_rw',{id:id,username:username,rw:val}, function(data){
+    myPost('set_db_rw',{id:id,username:username,rw:val}, function(data){
         var rdata = $.parseJSON(data.data);
-        // layer.msg(rdata.msg,{icon:rdata.status ? 1 : 5,shade: [0.3, '#000']});
         showMsg(rdata.msg, function(){
             dbList();
         },{icon:rdata.status ? 1 : 5,shade: [0.3, '#000']}, 2000);
-
     });
 }
 
@@ -686,8 +684,8 @@ function dbList(page, search){
         //<button onclick="" id="dataRecycle" title="删除选中项" class="btn btn-default btn-sm" style="margin-left: 5px;"><span class="glyphicon glyphicon-trash" style="margin-right: 5px;"></span>回收站</button>
         var con = '<div class="safe bgw">\
             <button onclick="addDatabase()" title="添加数据库" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">添加数据库</button>\
-            <button onclick="setRootPwd(0,\''+rdata.info['root_pwd']+'\')" title="设置MySQL管理员密码" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">root密码</button>\
-            <button onclick="setDbAccess(\'root\')" title="ROOT权限" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">ROOT权限</button>\
+            <button onclick="setRootPwd(0,\''+rdata.info['root_pwd']+'\')" title="管理员密码" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">PG密码</button>\
+            <button onclick="setDbAccess(\'postgres\')" title="ROOT权限" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">ROOT权限</button>\
             <span style="float:right">              \
                 <button batch="true" style="float: right;display: none;margin-left:10px;" onclick="delDbBatch();" title="删除选中项" class="btn btn-default btn-sm">删除选中</button>\
             </span>\
@@ -698,9 +696,7 @@ function dbList(page, search){
                     <th>数据库名</th>\
                     <th>用户名</th>\
                     <th>密码</th>\
-                    '+
-                    // '<th>备份</th>'+
-                    '<th>备注</th>\
+                    <th>备注</th>\
                     <th style="text-align:right;">操作</th></tr></thead>\
                     <tbody>\
                     '+ list +'\
@@ -708,8 +704,6 @@ function dbList(page, search){
                 </div>\
                 <div id="databasePage" class="dataTables_paginate paging_bootstrap page"></div>\
                 <div class="table_toolbar" style="left:0px;">\
-                    <span class="sync btn btn-default btn-sm" style="margin-right:5px" onclick="syncToDatabase(1)" title="将选中数据库信息同步到服务器">同步选中</span>\
-                    <span class="sync btn btn-default btn-sm" style="margin-right:5px" onclick="syncToDatabase(0)" title="将所有数据库信息同步到服务器">同步所有</span>\
                     <span class="sync btn btn-default btn-sm" onclick="syncGetDatabase()" title="从服务器获取数据库列表">从服务器获取</span>\
                 </div>\
             </div>\

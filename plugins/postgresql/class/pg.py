@@ -9,7 +9,7 @@ import psycopg2
 
 class ORM:
     __DB_PASS = None
-    __DB_USER = 'root'
+    __DB_USER = 'postgres'
     __DB_PORT = 5432
     __DB_HOST = 'localhost'
     __DB_CONN = None
@@ -117,7 +117,8 @@ class ORM:
 
     def select(self):
         # 查询数据集
-        self.__Conn()
+        if not self.__Conn():
+            return self.__DB_ERR
         try:
             sql = "SELECT " + self.__OPT_FIELD + " FROM " + self.__DB_TABLE + \
                 self.__OPT_WHERE + self.__OPT_GROUP + self.__OPT_ORDER + self.__OPT_LIMIT
