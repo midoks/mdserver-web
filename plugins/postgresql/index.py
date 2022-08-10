@@ -272,7 +272,10 @@ def initPgPwd():
     serverdir = getServerDir()
     pwd = mw.getRandomString(16)
 
-    cmd_pass = serverdir + '/bin/createuser -s postgres'
+    cmd_pass = serverdir + '/bin/createuser -s -r postgres'
+
+    if not mw.isAppleSystem():
+        cmd_pass = 'su - postgres -c "' + cmd_pass + '"'
     data = mw.execShell(cmd_pass)
 
     cmd_pass = "echo \"alter user postgres with password '" + pwd + "'\" | "
