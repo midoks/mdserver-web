@@ -169,7 +169,6 @@ def pgDb():
     db = pg.ORM()
 
     db.setPort(getDbPort())
-    # db.setSocket(getSocketFile())
     db.setPwd(pSqliteDb('config').where('id=?', (1,)).getField('pg_root'))
     return db
 
@@ -180,22 +179,22 @@ def initConfig(version=''):
     if not os.path.exists(init_pl):
         mw.writeFile(init_pl, 'ok')
 
-        # # postgresql.conf
-        # pg_conf = conf_dir + '/data/postgresql.conf'
-        # tpl = getPluginDir() + '/conf/postgresql.conf'
-        # content = mw.readFile(tpl)
-        # content = contentReplace(content)
-        # mw.writeFile(pg_conf, content)
+        # postgresql.conf
+        pg_conf = conf_dir + '/data/postgresql.conf'
+        tpl = getPluginDir() + '/conf/postgresql.conf'
+        content = mw.readFile(tpl)
+        content = contentReplace(content)
+        mw.writeFile(pg_conf, content)
 
-        # # pg_hba.conf
-        # tpl = getPluginDir() + '/conf/pg_hba.conf'
-        # pg_hba_conf = conf_dir + '/data/pg_hba.conf'
-        # content = mw.readFile(tpl)
-        # mw.writeFile(pg_hba_conf, content)
+        # pg_hba.conf
+        tpl = getPluginDir() + '/conf/pg_hba.conf'
+        pg_hba_conf = conf_dir + '/data/pg_hba.conf'
+        content = mw.readFile(tpl)
+        mw.writeFile(pg_hba_conf, content)
 
-        # logfile = runLog()
-        # if not os.path.exists(logfile):
-        #     mw.writeFile(logfile, '')
+        logfile = runLog()
+        if not os.path.exists(logfile):
+            mw.writeFile(logfile, '')
 
 
 def initDreplace(version=''):
@@ -259,8 +258,7 @@ def initPgData():
     if not os.path.exists(serverdir + '/data'):
         cmd = serverdir + '/bin/initdb -D ' + serverdir + "/data"
         if not mw.isAppleSystem():
-            cmd = "echo \"" + serverdir + "/bin/initdb -D " + \
-                serverdir + "/data\" | su - postgresql"
+            cmd = "su - postgres -c \"" + serverdir + "/bin/initdb -D \""
         # print(cmd)
         mw.execShell(cmd)
         return False
