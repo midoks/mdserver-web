@@ -68,13 +68,13 @@ Install_App()
 
 	if [ ! -d $serverPath/postgresql ];then
 		cd ${postgreDir}/postgresql-${VERSION} && ./configure \
-		--prefix=$serverPath/postgresql
-		# --with-openssl \
+		--prefix=$serverPath/postgresql \
+		--with-openssl
 		# --with-pgport=33206
 
 		echo "cd ${postgreDir}/postgresql-${VERSION} && ./configure \
-		--prefix=$serverPath/postgresql"
-		# --with-openssl \
+		--prefix=$serverPath/postgresql \
+		--with-openssl"
 		# --with-pgport=33206
 		make -j${cpuCore} && make install && make clean
 	fi
