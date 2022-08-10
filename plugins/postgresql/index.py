@@ -221,7 +221,7 @@ def initDreplace(version=''):
         mw.execShell('systemctl daemon-reload')
 
     if not mw.isAppleSystem():
-        mw.execShell('chown -R postgresql:postgresql ' + getServerDir())
+        mw.execShell('chown -R postgres:postgres ' + getServerDir())
 
     initd_path = getServerDir() + '/init.d'
     if not os.path.exists(initd_path):
