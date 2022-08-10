@@ -174,17 +174,8 @@ def pgDb():
     return db
 
 
-def initDreplace(version=''):
-
+def initConfig(version=''):
     conf_dir = getServerDir()
-    conf_list = [
-        conf_dir + "/logs",
-        conf_dir + "/tmp",
-    ]
-    for c in conf_list:
-        if not os.path.exists(c):
-            os.mkdir(c)
-
     init_pl = conf_dir + "/init.pl"
     if not os.path.exists(init_pl):
         mw.writeFile(init_pl, 'ok')
@@ -205,6 +196,19 @@ def initDreplace(version=''):
         logfile = runLog()
         if not os.path.exists(logfile):
             mw.writeFile(logfile, '')
+
+
+def initDreplace(version=''):
+
+    conf_dir = getServerDir()
+    conf_list = [
+        conf_dir + "/logs",
+        conf_dir + "/tmp",
+        conf_dir + "/archivelog",
+    ]
+    for c in conf_list:
+        if not os.path.exists(c):
+            os.mkdir(c)
 
     # systemd
     system_dir = mw.systemdCfgDir()
@@ -285,6 +289,7 @@ def pgOp(version, method):
     # print(cmd)
     try:
         isInited = initPgData()
+        initConfig(version)
         if not isInited:
             if mw.isAppleSystem():
                 cmd_init_start = init_file + ' start'
@@ -949,7 +954,7 @@ def delDb():
     r = pdb.execute("drop database " + name)
     # print(r)
 
-    pg_hba = getServerDir() + "/data/pg_hba.conf"
+    pg_hba = pgHbaConf()
     old_config = mw.readFile(pg_hba)
     new_config = re.sub(r'host\s*{}.*'.format(name), '', old_config).strip()
     mw.writeFile(pg_hba, new_config)
@@ -1099,6 +1104,293 @@ def deleteDbBackup():
     return mw.returnJson(True, 'ok')
 
 
+############ 主从功能 ######################
+def getMasterStatus(version=''):
+
+    data = {}
+    data['mode'] = 'classic'
+    data['status'] = False
+    data['slave_status'] = False
+    pg_conf = getServerDir() + "/data/postgresql.conf"
+    pg_content = mw.readFile(pg_conf)
+
+    if pg_content.find('#archive_mode') > -1:
+        data['status'] = False
+    else:
+        data['status'] = True
+
+    if pg_content.find('#hot_standby') > -1:
+        data['slave_status'] = False
+    else:
+        data['slave_status'] = True
+
+    return mw.returnJson(True, '设置成功', data)
+
+
+def setMasterStatus(version=''):
+    pg_conf = getServerDir() + "/data/postgresql.conf"
+    data = mw.readFile(pg_conf)
+
+    if data.find('#archive_mode') > -1:
+        data = data.replace('#archive_mode', 'archive_mode')
+        data = data.replace('#archive_command', 'archive_command')
+        data = data.replace('#wal_level', 'wal_level')
+        data = data.replace('#max_wal_senders', 'max_wal_senders')
+        data = data.replace('#wal_sender_timeout', 'wal_sender_timeout')
+    else:
+        data = data.replace('archive_mode', '#archive_mode')
+        data = data.replace('archive_command', '#archive_command')
+        data = data.replace('wal_level', '#wal_level')
+        data = data.replace('max_wal_senders', '#max_wal_senders')
+        data = data.replace('wal_sender_timeout', '#wal_sender_timeout')
+
+    mw.writeFile(pg_conf, data)
+    restart(version)
+    return mw.returnJson(True, '设置成功')
+
+
+def setSlaveStatus(version):
+    pg_conf = getServerDir() + "/data/postgresql.conf"
+    data = mw.readFile(pg_conf)
+    if data.find('#hot_standby') > -1:
+        data = data.replace('#hot_standby', 'hot_standby')
+        data = data.replace('#primary_conninfo', 'primary_conninfo')
+        data = data.replace('#max_standby_streaming_delay',
+                            'max_standby_streaming_delay')
+        data = data.replace('#wal_receiver_status_interval',
+                            'wal_receiver_status_interval')
+        data = data.replace('#hot_standby_feedback', 'hot_standby_feedback')
+    else:
+        data = data.replace('hot_standby', '#hot_standby')
+        data = data.replace('primary_conninfo', '#primary_conninfo')
+        data = data.replace('max_standby_streaming_delay',
+                            '#max_standby_streaming_delay')
+        data = data.replace('wal_receiver_status_interval',
+                            '#wal_receiver_status_interval')
+        data = data.replace('hot_standby_feedback', '#hot_standby_feedback')
+
+    mw.writeFile(pg_conf, data)
+
+    restart(version)
+    return mw.returnJson(True, '设置成功')
+
+
+def getSlaveList(version=''):
+
+    db = pgDb()
+    # dlist = db.query('show slave status')
+    # ret = []
+    # for x in range(0, len(dlist)):
+    #     tmp = {}
+    #     tmp['Master_User'] = dlist[x]["Master_User"]
+    #     tmp['Master_Host'] = dlist[x]["Master_Host"]
+    #     tmp['Master_Port'] = dlist[x]["Master_Port"]
+    #     tmp['Master_Log_File'] = dlist[x]["Master_Log_File"]
+    #     tmp['Slave_IO_Running'] = dlist[x]["Slave_IO_Running"]
+    #     tmp['Slave_SQL_Running'] = dlist[x]["Slave_SQL_Running"]
+    #     ret.append(tmp)
+    data = {}
+    data['data'] = []
+
+    return mw.getJson(data)
+
+
+def getSlaveSSHByIp(version=''):
+    args = getArgs()
+    data = checkArgs(args, ['ip'])
+    if not data[0]:
+        return data[1]
+
+    ip = args['ip']
+
+    conn = pSqliteDb('slave_id_rsa')
+    data = conn.field('ip,port,db_user,id_rsa').where("ip=?", (ip,)).select()
+    return mw.returnJson(True, 'ok', data)
+
+
+def getSlaveSSHList(version=''):
+    args = getArgs()
+    data = checkArgs(args, ['page', 'page_size'])
+    if not data[0]:
+        return data[1]
+
+    page = int(args['page'])
+    page_size = int(args['page_size'])
+
+    conn = pSqliteDb('slave_id_rsa')
+    limit = str((page - 1) * page_size) + ',' + str(page_size)
+
+    field = 'id,ip,port,db_user,id_rsa,ps,addtime'
+    clist = conn.field(field).limit(limit).order('id desc').select()
+    count = conn.count()
+
+    data = {}
+    _page = {}
+    _page['count'] = count
+    _page['p'] = page
+    _page['row'] = page_size
+    _page['tojs'] = args['tojs']
+    data['page'] = mw.getPage(_page)
+    data['data'] = clist
+
+    return mw.getJson(data)
+
+
+def addSlaveSSH(version=''):
+    import base64
+
+    args = getArgs()
+    data = checkArgs(args, ['ip'])
+    if not data[0]:
+        return data[1]
+
+    ip = args['ip']
+    if ip == "":
+        return mw.returnJson(True, 'ok')
+
+    data = checkArgs(args, ['port', 'id_rsa', 'db_user'])
+    if not data[0]:
+        return data[1]
+
+    id_rsa = args['id_rsa']
+    port = args['port']
+    db_user = args['db_user']
+    user = 'root'
+    addTime = time.strftime('%Y-%m-%d %X', time.localtime())
+
+    conn = pSqliteDb('slave_id_rsa')
+    data = conn.field('ip,id_rsa').where("ip=?", (ip,)).select()
+    if len(data) > 0:
+        res = conn.where("ip=?", (ip,)).save(
+            'port,id_rsa,db_user', (port, id_rsa, db_user))
+    else:
+        conn.add('ip,port,user,id_rsa,db_user,ps,addtime',
+                 (ip, port, user, id_rsa, db_user, '', addTime))
+
+    return mw.returnJson(True, '设置成功!')
+
+
+def delSlaveSSH(version=''):
+    args = getArgs()
+    data = checkArgs(args, ['ip'])
+    if not data[0]:
+        return data[1]
+
+    ip = args['ip']
+
+    conn = pSqliteDb('slave_id_rsa')
+    conn.where("ip=?", (ip,)).delete()
+    return mw.returnJson(True, 'ok')
+
+
+def updateSlaveSSH(version=''):
+    args = getArgs()
+    data = checkArgs(args, ['ip', 'id_rsa'])
+    if not data[0]:
+        return data[1]
+
+    ip = args['ip']
+    id_rsa = args['id_rsa']
+    conn = pSqliteDb('slave_id_rsa')
+    conn.where("ip=?", (ip,)).save('id_rsa', (id_rsa,))
+    return mw.returnJson(True, 'ok')
+
+
+def getMasterRepSlaveList(version=''):
+    args = getArgs()
+    data = checkArgs(args, ['page', 'page_size'])
+    if not data[0]:
+        return data[1]
+
+    page = int(args['page'])
+    page_size = int(args['page_size'])
+    data = {}
+
+    conn = pSqliteDb('master_replication_user')
+    limit = str((page - 1) * page_size) + ',' + str(page_size)
+
+    field = 'id,username,password,accept,ps,addtime'
+    clist = conn.field(field).limit(limit).order('id desc').select()
+    count = conn.count()
+
+    _page = {}
+    _page['count'] = count
+    _page['p'] = page
+    _page['row'] = page_size
+    _page['tojs'] = 'getMasterRepSlaveList'
+    data['page'] = mw.getPage(_page)
+    data['data'] = clist
+
+    return mw.getJson(data)
+
+
+def addMasterRepSlaveUser(version=''):
+    args = getArgs()
+    data = checkArgs(args, ['username', 'password', 'address'])
+    if not data[0]:
+        return data[1]
+
+    address = args['address'].strip()
+    username = args['username'].strip()
+    password = args['password'].strip()
+
+    if len(password) < 1:
+        password = mw.md5(time.time())[0:8]
+
+    if not re.match("^[\w\.-]+$", username):
+        return mw.returnJson(False, '用户名不能带有特殊符号!')
+    checks = ['root', 'mysql', 'test', 'sys', 'panel_logs']
+    if username in checks or len(username) < 1:
+        return mw.returnJson(False, '用户名不合法!')
+    if password in checks or len(password) < 1:
+        return mw.returnJson(False, '密码不合法!')
+
+    pdb = pgDb()
+    psdb = pSqliteDb('master_replication_user')
+
+    if psdb.where("username=?", (username)).count() > 0:
+        return mw.returnJson(False, '用户已存在!')
+
+    sql = "CREATE ROLE " + username + " login replication password '" + password + "'"
+    pdb.execute(sql)
+
+    pg_conf = pgHbaConf()
+    data = mw.readFile(pg_conf)
+
+    data = data + "\nhost   replication  " + \
+        username + "   " + address + "     md5"
+
+    mw.writeFile(pg_conf, data)
+
+    addTime = time.strftime('%Y-%m-%d %X', time.localtime())
+    psdb.add('username,password,accept,ps,addtime',
+             (username, password, address, '', addTime))
+    return mw.returnJson(True, '添加成功!')
+
+
+def delMasterRepSlaveUser(version=''):
+    args = getArgs()
+    data = checkArgs(args, ['username'])
+    if not data[0]:
+        return data[1]
+
+    name = args['username']
+
+    pdb = pgDb()
+    psdb = pSqliteDb('master_replication_user')
+
+    pdb.execute("drop user " + name)
+
+    pg_hba = pgHbaConf()
+    old_config = mw.readFile(pg_hba)
+    new_config = re.sub(
+        r'host\s*replication\s*{}.*'.format(name), '', old_config).strip()
+    mw.writeFile(pg_hba, new_config)
+
+    psdb.where("username=?", (args['username'],)).delete()
+    return mw.returnJson(True, '删除成功!')
+
+
 def installPreInspection(version):
     return 'ok'
 
@@ -1180,5 +1472,29 @@ if __name__ == "__main__":
         print(deleteDbBackup())
     elif func == 'sync_get_databases':
         print(syncGetDatabases())
+    elif func == 'add_slave_ssh':
+        print(addSlaveSSH(version))
+    elif func == 'get_slave_list':
+        print(getSlaveList(version))
+    elif func == 'del_slave_ssh':
+        print(delSlaveSSH(version))
+    elif func == 'update_slave_ssh':
+        print(updateSlaveSSH(version))
+    elif func == 'get_slave_ssh_list':
+        print(getSlaveSSHList(version))
+    elif func == 'get_slave_ssh_by_ip':
+        print(getSlaveSSHByIp(version))
+    elif func == 'get_master_status':
+        print(getMasterStatus(version))
+    elif func == 'set_master_status':
+        print(setMasterStatus(version))
+    elif func == 'set_slave_status':
+        print(setSlaveStatus(version))
+    elif func == 'get_master_rep_slave_list':
+        print(getMasterRepSlaveList(version))
+    elif func == 'add_master_rep_slave_user':
+        print(addMasterRepSlaveUser(version))
+    elif func == 'del_master_rep_slave_user':
+        print(delMasterRepSlaveUser(version))
     else:
         print('error')

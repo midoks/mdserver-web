@@ -8,6 +8,17 @@ function str2Obj(str){
     return data;
 }
 
+function randomStr(b) {
+    b = b || 32;
+    var c = "AaBbCcDdEeFfGHhiJjKkLMmNnPpRSrTsWtXwYxZyz";
+    var a = c.length;
+    var d = "";
+    for(i = 0; i < b; i++) {
+        d += c.charAt(Math.floor(Math.random() * a))
+    }
+    return d
+}
+
 function myPost(method,args,callback, title){
 
     var _args = null; 
@@ -748,6 +759,10 @@ function setDbSlave(name){
 }
 
 
+function repeatMSPwd(a) {
+    $("#MyPassword").val(randomStr(a))
+}
+
 function addMasterRepSlaveUser(){
     layer.open({
         type: 1,
@@ -760,8 +775,17 @@ function addMasterRepSlaveUser(){
         content: "<form class='bt-form pd20' id='add_master'>\
             <div class='line'><span class='tname'>用户名</span><div class='info-r'><input name='username' class='bt-input-text mr5' placeholder='用户名' type='text' style='width:330px;' value='"+(randomStrPwd(6))+"'></div></div>\
             <div class='line'>\
-            <span class='tname'>密码</span>\
-            <div class='info-r'><input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:330px' value='"+(randomStrPwd(16))+"' /><span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatPwd(16)'></span></div>\
+                <span class='tname'>密码</span>\
+                <div class='info-r'>\
+                    <input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:330px' value='"+(randomStr(16))+"' />\
+                    <span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatMSPwd(16)'></span>\
+                </div>\
+            </div>\
+            <div class='line'>\
+                <span class='tname'>网段</span>\
+                <div class='info-r'>\
+                    <input class='bt-input-text mr5' type='text' name='address' style='width:330px' value='127.0.0.1/32' />\
+                </div>\
             </div>\
             <input type='hidden' name='ps' value='' />\
           </form>",
@@ -1262,51 +1286,6 @@ function initSlaveStatus(){
 
 function masterOrSlaveConf(version=''){
 
-    function getMasterDbList(){
-        var _data = {};
-        if (typeof(page) =='undefined'){
-            var page = 1;
-        }
-        
-        _data['page'] = page;
-        _data['page_size'] = 10;
-
-        myPost('get_masterdb_list', _data, function(data){
-            var rdata = $.parseJSON(data.data);
-            var list = '';
-            for(i in rdata.data){
-                list += '<tr>';
-                list += '<td>' + rdata.data[i]['name'] +'</td>';
-                list += '<td>' + (rdata.data[i]['master']?'是':'否') +'</td>';
-                list += '<td style="text-align:right">' + 
-                    '<a href="javascript:;" class="btlink" onclick="setDbMaster(\''+rdata.data[i]['name']+'\')" title="加入或退出">'+(rdata.data[i]['master']?'退出':'加入')+'</a> | ' +
-                    '<a href="javascript:;" class="btlink" onclick="getMasterRepSlaveUserCmd(\'\',\''+rdata.data[i]['name']+'\')" title="同步命令">同步命令</a>' +
-                '</td>';
-                list += '</tr>';
-            }
-
-            var con = '<div class="divtable mtb10">\
-                    <div class="tablescroll">\
-                        <table id="DataBody" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
-                        <thead><tr>\
-                        <th>数据库名</th>\
-                        <th>同步</th>\
-                        <th style="text-align:right;">操作</th></tr></thead>\
-                        <tbody>\
-                        '+ list +'\
-                        </tbody></table>\
-                    </div>\
-                    <div id="databasePage" class="dataTables_paginate paging_bootstrap page"></div>\
-                    <div class="table_toolbar" style="left:0px;">\
-                        <span class="sync btn btn-default btn-sm" onclick="getMasterRepSlaveListPage()" title="">同步账户列表</span>\
-                    </div>\
-                </div>';
-
-            $(".table_master_list").html(con);
-            $('#databasePage').html(rdata.page);
-        });
-    }
-
     function getAsyncMasterDbList(){
         var _data = {};
         if (typeof(page) =='undefined'){
@@ -1367,51 +1346,6 @@ function masterOrSlaveConf(version=''){
         });
     }
 
-    function getAsyncDataList(){
-        var _data = {};
-        if (typeof(page) =='undefined'){
-            var page = 1;
-        }
-        
-        _data['page'] = page;
-        _data['page_size'] = 10;
-        myPost('get_masterdb_list', _data, function(data){
-            var rdata = $.parseJSON(data.data);
-            var list = '';
-            for(i in rdata.data){
-                list += '<tr>';
-                list += '<td>' + rdata.data[i]['name'] +'</td>';
-                list += '<td style="text-align:right">' + 
-                    '<a href="javascript:;" class="btlink" onclick="setDbSlave(\''+rdata.data[i]['name']+'\')"  title="加入|退出">'+(rdata.data[i]['slave']?'退出':'加入')+'</a> | ' +
-                    '<a href="javascript:;" class="btlink" onclick="getFullSyncStatus(\''+rdata.data[i]['name']+'\')" title="同步">同步</a>' +
-                '</td>';
-                list += '</tr>';
-            }
-
-            var con = '<div class="divtable mtb10">\
-                    <div class="tablescroll">\
-                        <table id="DataBody" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
-                        <thead><tr>\
-                        <th>本地库名</th>\
-                        <th style="text-align:right;">操作</th></tr></thead>\
-                        <tbody>\
-                        '+ list +'\
-                        </tbody></table>\
-                    </div>\
-                    <div id="databasePage" class="dataTables_paginate paging_bootstrap page"></div>\
-                    <div class="table_toolbar" style="left:0px;">\
-                        <span class="sync btn btn-default btn-sm" onclick="handlerRun()" title="免登录设置后,需要手动执行一下!">手动命令</span>\
-                        <span class="sync btn btn-default btn-sm" onclick="getFullSyncStatus(\'ALL\')" title="全量同步">全量同步</span>\
-                    </div>\
-                </div>';
-
-            $(".table_slave_list").html(con);
-            $('#databasePage').html(rdata.page);
-        });
-    }
-
-   
-
     function getMasterStatus(){
         myPost('get_master_status', '', function(data){
             var rdata = $.parseJSON(data.data);
@@ -1421,16 +1355,13 @@ function masterOrSlaveConf(version=''){
                 <p class="conf_p">\
                     <span class="f14 c6 mr20">主从同步模式</span><span class="f14 c6 mr20"></span>\
                     <button class="btn '+(!(rdata.mode == "classic") ? 'btn-danger' : 'btn-success')+' btn-xs db-mode btn-classic">经典</button>\
-                    <button class="btn '+(!(rdata.mode == "gtid") ? 'btn-danger' : 'btn-success')+' btn-xs db-mode btn-gtid">GTID</button>\
                 </p>\
                 <hr/>\
                 <p class="conf_p">\
                     <span class="f14 c6 mr20">Master[主]配置</span><span class="f14 c6 mr20"></span>\
                     <button class="btn '+(!rdata.status ? 'btn-danger' : 'btn-success')+' btn-xs btn-master">'+(!rdata.status ? '未开启' : '已开启') +'</button>\
+                    <button class="btn btn-success btn-xs" onclick="getMasterRepSlaveListPage()" >同步账户</button>\
                 </p>\
-                <hr/>\
-                <!-- master list -->\
-                <div class="safe bgw table_master_list"></div>\
                 <hr/>\
                 <!-- class="conf_p" -->\
                 <p class="conf_p">\
@@ -1467,52 +1398,9 @@ function masterOrSlaveConf(version=''){
                     }, 3000);
                 });
             });
-
-            $('.db-mode').click(function(){
-                if ($(this).hasClass('btn-success')){
-                    //no action
-                    return;
-                }
-
-                var mode = 'classic';
-                if ($(this).hasClass('btn-gtid')){
-                    mode = 'gtid';
-                }
-
-                layer.open({
-                    type:1,
-                    title:"MySQL主从模式切换",
-                    shadeClose:false,
-                    btnAlign: 'c',
-                    btn: ['切换并重启', '切换不重启'],
-                    yes: function(index, layero){
-                        this.change(index,mode,"yes");
-
-                    },
-                    btn2: function(index, layero){
-                        this.change(index,mode,"no");
-                        return false;
-                    },
-                    change:function(index,mode,reload){
-                        console.log(index,mode,reload);
-                        myPost('set_dbrun_mode',{'mode':mode,'reload':reload},function(data){
-                            layer.close(index);
-                            var rdata = $.parseJSON(data.data);
-                            showMsg(rdata.msg ,function(){
-                                getMasterStatus();
-                            },{ icon: rdata.status ? 1 : 5 });
-                        });
-                    }
-                });
-            });
-
-            if (rdata.status){
-                getMasterDbList();
-            }
             
             if (rdata.slave_status){
                 getAsyncMasterDbList();
-                getAsyncDataList()
             }
         });
     }
