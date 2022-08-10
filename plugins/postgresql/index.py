@@ -272,7 +272,7 @@ def initPgPwd():
     serverdir = getServerDir()
     pwd = mw.getRandomString(16)
 
-    cmd_pass = "echo \"create user postgres with superuser password '" + pwd + "'\" | "
+    cmd_pass = "echo \"alter user postgres with password '" + pwd + "'\" | "
     cmd_pass = cmd_pass + serverdir + '/bin/psql -d postgres'
     data = mw.execShell(cmd_pass)
     # print(cmd_pass)
@@ -380,49 +380,6 @@ def getMyDbPos():
     return tmp.groups()[0].strip()
 
 
-def setPgDbPos():
-    args = getArgs()
-    data = checkArgs(args, ['datadir'])
-    if not data[0]:
-        return data[1]
-
-    s_datadir = getMyDbPos()
-    t_datadir = args['datadir']
-    if t_datadir == s_datadir:
-        return mw.returnJson(False, '与当前存储目录相同，无法迁移文件!')
-
-    if not os.path.exists(t_datadir):
-        mw.execShell('mkdir -p ' + t_datadir)
-
-    # mw.execShell('/etc/init.d/mysqld stop')
-    stop()
-    mw.execShell('cp -rf ' + s_datadir + '/* ' + t_datadir + '/')
-    mw.execShell('chown -R mysql mysql ' + t_datadir)
-    mw.execShell('chmod -R 755 ' + t_datadir)
-    mw.execShell('rm -f ' + t_datadir + '/*.pid')
-    mw.execShell('rm -f ' + t_datadir + '/*.err')
-
-    path = getServerDir()
-    myfile = path + '/etc/my.cnf'
-    mycnf = mw.readFile(myfile)
-    mw.writeFile(path + '/etc/my_backup.cnf', mycnf)
-
-    mycnf = mycnf.replace(s_datadir, t_datadir)
-    mw.writeFile(myfile, mycnf)
-    start()
-
-    result = mw.execShell(
-        'ps aux|grep mysqld| grep -v grep|grep -v python')
-    if len(result[0]) > 10:
-        mw.writeFile('data/datadir.pl', t_datadir)
-        return mw.returnJson(True, '存储目录迁移成功!')
-    else:
-        mw.execShell('pkill -9 mysqld')
-        mw.writeFile(myfile, mw.readFile(path + '/etc/my_backup.cnf'))
-        start()
-        return mw.returnJson(False, '文件迁移失败!')
-
-
 def getPgPort():
     file = getConf()
     content = mw.readFile(file)
@@ -453,13 +410,12 @@ def runInfo():
         return mw.returnJson(False, 'PG未启动', [])
 
     db = pgDb()
-    # data = db.query('show global status')
-    data_directory = getServerDir() + "/data"
+    data_dir = getServerDir() + "/data"
     port = getPgPort()
     result = {}
 
     result['uptime'] = mw.execShell(
-        '''cat {}/postmaster.pid |sed -n 3p '''.format(data_directory))[0]
+        '''cat {}/postmaster.pid |sed -n 3p '''.format(data_dir))[0]
     timestamp = result['uptime']
     time_local = time.localtime(int(timestamp))
     dt = time.strftime("%Y-%m-%d %H:%M:%S", time_local)
@@ -468,9 +424,11 @@ def runInfo():
     result['progress_num'] = mw.execShell(
         "ps -ef |grep postgres |wc -l")[0].strip()
     result['pid'] = mw.execShell(
-        '''cat {}/postmaster.pid |sed -n 1p '''.format(data_directory))[0].strip()
+        '''cat {}/postmaster.pid |sed -n 1p '''.format(data_dir))[0].strip()
     res = db.query(
-        'SELECT count(*) FROM pg_stat_activity WHERE NOT pid=pg_backend_pid()')
+        "select count(*) from pg_stat_activity where not pid=pg_backend_pid()")
+
+    # print(res)
     result['connections'] = res[0][0]
 
     res = db.query("select pg_size_pretty(pg_database_size('postgres'))")
