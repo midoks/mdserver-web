@@ -258,7 +258,7 @@ def initPgData():
     if not os.path.exists(serverdir + '/data'):
         cmd = serverdir + '/bin/initdb -D ' + serverdir + "/data"
         if not mw.isAppleSystem():
-            cmd = "su - postgres -c \"" + serverdir + "/bin/initdb -D \""
+            cmd = "su - postgres -c \"" + cmd + "\""
         # print(cmd)
         mw.execShell(cmd)
         return False
