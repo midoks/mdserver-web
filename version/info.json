@@ -1,8 +1,8 @@
 [
     {
         "version": "0.9.1",
-        "content": "* 主流系统支持。<br/> * 插件支持更多参数。<br/>* MySQL主从支持GTID和经典模式。<br/>* MariaDB主从支持GTID和经典模式。<br/>* Rsyncd更新。<br/>* 添加网站统计的插件。<br/>* 添加varnish插件。",
-        "path": "https://github.com/midoks/mdserver-web/releases/download/0.9.9/mdserver-web.zip",
+        "content": "* 菜单修复。<br/> * 更新修复",
+        "path": "https://github.com/midoks/mdserver-web/releases/download/0.9.1/mdserver-web.zip",
         "purge":"https://purge.jsdelivr.net/gh/midoks/mdserver-web@latest/scripts/update.sh",
     },
     {

@@ -16,7 +16,7 @@ from flask import request
 class config_api:
 
     # mariadb 优化
-    __version = '0.9.0.1'
+    __version = '0.9.1'
 
     def __init__(self):
         pass

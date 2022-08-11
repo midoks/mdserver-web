@@ -1,4 +1,4 @@
-### mdserver-web 0.9.0
+### mdserver-web 0.9.1
 
 简单的Linux面板,感谢BT.CN写出如此好的web管理软件。我一看到，就知道这是我一直想要的页面化管理方式。
 复制了后台管理界面，按照自己想要的方式写了一版。
@@ -70,19 +70,10 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.9.0
+### 版本更新 0.9.1
 
-* 主流系统支持。
-* 插件支持更多参数。
-* MySQL主从支持GTID和经典模式。
-* MariaDB主从支持GTID和经典模式。
-* Rsyncd更新。
-* 添加网站统计的插件。
-* 添加varnish插件。
-* 添加PHP的APT安装方式[辅助插件]。
-* 添加PHP的YUM安装方式[辅助插件]。
-* 添加MYSQL的YUM安装方式[辅助插件]。
-* 各种bug修复。
+* 菜单修复.
+* 更新修复.
 
 ### JSDelivr安装地址
 
