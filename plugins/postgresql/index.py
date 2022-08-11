@@ -977,7 +977,19 @@ def setDbAccess():
         return data[1]
 
     name = args['name']
+    access = args['access']
 
+    psdb = pSqliteDb('databases')
+
+    conf = pgHbaConf()
+    data = mw.readFile(conf)
+    new_data = re.sub(r'host\s*{}.*'.format(name), '', data).strip()
+
+    new_data += "\nhost    {}  {}    {}    md5".format(
+        name, name, access)
+    mw.writeFile(conf, new_data)
+
+    psdb.where("name=?", (name,)).setField('accept', access)
     return mw.returnJson(True, "设置成功")
 
 
