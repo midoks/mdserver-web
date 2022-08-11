@@ -739,7 +739,18 @@ function batchPasteTo(data,path){
 //取扩展名
 function getExtName(fileName){
 	var extArr = fileName.split(".");	
-	var exts = ['folder','folder-unempty','sql','c','cpp','cs','flv','css','js','htm','html','java','log','mht','php','url','xml','ai','bmp','cdr','gif','ico','jpeg','jpg','JPG','png','psd','webp','ape','avi','flv','mkv','mov','mp3','mp4','mpeg','mpg','rm','rmvb','swf','wav','webm','wma','wmv','rtf','docx','fdf','potm','pptx','txt','xlsb','xlsx','7z','cab','iso','rar','zip','gz','bt','file','apk','bookfolder','folder','folder-empty','folder-unempty','fromchromefolder','documentfolder','fromphonefolder','mix','musicfolder','picturefolder','videofolder','sefolder','access','mdb','accdb','sql','c','cpp','cs','js','fla','flv','htm','html','java','log','mht','php','url','xml','ai','bmp','cdr','gif','ico','jpeg','jpg','JPG','png','psd','webp','ape','avi','flv','mkv','mov','mp3','mp4','mpeg','mpg','rm','rmvb','swf','wav','webm','wma','wmv','doc','docm','dotx','dotm','dot','rtf','docx','pdf','fdf','ppt','pptm','pot','potm','pptx','txt','xls','csv','xlsm','xlsb','xlsx','7z','gz','cab','iso','rar','zip','bt','file','apk','css'];
+	var exts = ['folder','folder-unempty','sql','c','cpp','cs','flv','css','js',
+	'htm','html','java','log','mht','php','url','xml','ai','bmp','cdr','gif','ico',
+	'jpeg','jpg','JPG','png','psd','webp','ape','avi','flv','mkv','mov','mp3','mp4',
+	'mpeg','mpg','rm','rmvb','swf','wav','webm','wma','wmv','rtf','docx','fdf','potm',
+	'pptx','txt','xlsb','xlsx','7z','cab','iso','rar','zip','gz','bt','file','apk','bookfolder',
+	'folder','folder-empty','folder-unempty','fromchromefolder','documentfolder','fromphonefolder',
+	'mix','musicfolder','picturefolder','videofolder','sefolder','access','mdb','accdb','sql','c',
+	'cpp','cs','js','fla','flv','htm','html','java','log','mht','php','url','xml','ai','bmp','cdr',
+	'gif','ico','jpeg','jpg','JPG','png','psd','webp','ape','avi','flv','mkv','mov','mp3','mp4','mpeg',
+	'mpg','rm','rmvb','swf','wav','webm','wma','wmv','doc','docm','dotx','dotm','dot','rtf','docx','pdf',
+	'fdf','ppt','pptm','pot','potm','pptx','txt','xls','csv','xlsm','xlsb','xlsx','7z','gz','cab','iso',
+	'rar','zip','bt','file','apk','css'];
 	var extLastName = extArr[extArr.length - 1];
 	for(var i=0; i<exts.length; i++){
 		if(exts[i]==extLastName){
@@ -886,7 +897,7 @@ function deleteFile(fileName){
 		$.post('/files/delete', 'path=' + encodeURIComponent(fileName), function(rdata) {
 			layer.closeAll();
 			layer.msg(rdata.msg, {
-				icon: rdata.status ? 1 : 2
+				icon: rdata.status ? 1 : 2,
 			});
 			getFiles($("#DirPathPlace input").val());
 		},'json');
@@ -1011,19 +1022,22 @@ function reName(type, fileName) {
 		closeBtn: 2,
 		area: '320px', 
 		title: '重命名',
-		content: '<div class="bt-form pd20 pb70">\
+		btn:["确定","保存"],
+		content: '<div class="bt-form pd20">\
 					<div class="line">\
 					<input type="text" class="bt-input-text" name="Name" id="newFileName" value="' + fileName + '" placeholder="文件名" style="width:100%" />\
 					</div>\
-					<div class="bt-form-submit-btn">\
-					<button type="button" class="btn btn-danger btn-sm btn-title" onclick="layer.closeAll()">关闭</button>\
-					<button type="button" id="ReNameBtn" class="btn btn-success btn-sm btn-title" onclick="reName(1,\'' + fileName.replace(/'/,"\\'") + '\')">保存</button>\
-					</div>\
-				</div>'
+				</div>',
+		success:function(){
+			$("#newFileName").focus().keyup(function(e){
+				if(e.keyCode == 13) $("#ReNameBtn").click();
+			});
+		},
+		yes:function(){
+			reName(1,fileName.replace(/'/,"\\'"));
+		}
 	});
-	$("#newFileName").focus().keyup(function(e){
-		if(e.keyCode == 13) $("#ReNameBtn").click();
-	});
+	
 }
 //剪切
 function cutFile(fileName) {
@@ -1032,7 +1046,7 @@ function cutFile(fileName) {
 	setCookie('copyFileName', null);
 	layer.msg('已剪切', {
 		icon: 1,
-		time: 1000
+		time: 1000,
 	});
 	setTimeout(function(){
 		getFiles(path);
@@ -1045,7 +1059,7 @@ function copyFile(fileName) {
 	setCookie('cutFileName', null);
 	layer.msg('已复制', {
 		icon: 1,
-		time: 1000
+		time: 1000,
 	});
 
 	setTimeout(function(){
@@ -1149,8 +1163,8 @@ function zip(dirName,submits) {
 	
 	param = dirName;
 	if(dirName.indexOf(',') != -1){
-		tmp = path.split('/')
-		dirName = path + '/' + tmp[tmp.length-1]
+		tmp = path.split('/');
+		dirName = path + '/' + tmp[tmp.length-1];
 	}
 	
 	layer.open({
@@ -1168,21 +1182,20 @@ function zip(dirName,submits) {
 					+'<button type="button" class="btn btn-danger btn-sm btn-title" onclick="layer.closeAll()">'+lan.public.close+'</button>'
 					+'<button type="button" id="ReNameBtn" class="btn btn-success btn-sm btn-title" onclick="zip(\'' + param + '\',1)">'+lan.files.file_menu_zip+'</button>'
 					+'</div>'
-				+'</div>'
+				+'</div>',
+		success:function(){
+			$("#dfile").change(function(){
+				var dfile = $(this).val()
+				tmp = dfile.split('.');
+				if(tmp[tmp.length-1] != 'gz'){
+					var path = $("#DirPathPlace input").val();
+					tmp = path.split('/');
+					dfile += '/' + tmp[tmp.length-1] + '.tar.gz'
+					$(this).val(dfile.replace(/\/\//g,'/'))
+				}
+			});
+		}
 	});
-	
-	setTimeout(function(){
-		$("#dfile").change(function(){
-			var dfile = $(this).val()
-			tmp = dfile.split('.');
-			if(tmp[tmp.length-1] != 'gz'){
-				var path = $("#DirPathPlace input").val();
-				tmp = path.split('/');
-				dfile += '/' + tmp[tmp.length-1] + '.tar.gz'
-				$(this).val(dfile.replace(/\/\//g,'/'))
-			}
-		});
-	},100);
 	
 }
 		
