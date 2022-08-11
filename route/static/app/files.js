@@ -512,23 +512,23 @@ function getFiles(Path) {
 		$("input[name=id]").dblclick(function(e){
 			e.stopPropagation();
 		});
-		//禁用右键
-		$("#fileCon").bind("contextmenu",function(e){
-			return false;
-		});
-		bindselect();
-		//绑定右键
-		$("#fileCon").mousedown(function(e){
-			var count = totalFile();
-			if(e.which == 3) {
-				if(count>1){
-					RClickAll(e);
-				}
-				else{
-					return
-				}
-			}
-		});
+		// //禁用右键
+		// $("#fileCon").bind("contextmenu",function(e){
+		// 	return false;
+		// });
+		// bindselect();
+		// //绑定右键
+		// $("#fileCon").mousedown(function(e){
+		// 	var count = totalFile();
+		// 	if(e.which == 3) {
+		// 		if(count>1){
+		// 			RClickAll(e);
+		// 		}
+		// 		else{
+		// 			return
+		// 		}
+		// 	}
+		// });
 		$(".folderBox,.folderBoxTr").mousedown(function(e){
 			var count = totalFile();
 			if(e.which == 3) {
@@ -601,18 +601,17 @@ function bindselect(){
 //选择操作
 function showSeclect(){
 	var count = totalFile();
-	var BatchTools = '';
+	var batchTools = '';
 	if(count > 1){
-		BatchTools = '<button onclick="javascript:batch(1);" class="btn btn-default btn-sm">复制</button>\
+		batchTools = '<button onclick="javascript:batch(1);" class="btn btn-default btn-sm">复制</button>\
 		  <button onclick="javascript:batch(2);" class="btn btn-default btn-sm">剪切</button>\
 		  <button onclick="javascript:batch(3);" class="btn btn-default btn-sm">权限</button>\
 		  <button onclick="javascript:batch(5);" class="btn btn-default btn-sm">压缩</button>\
-		  <button onclick="javascript:batch(4);" class="btn btn-default btn-sm">删除</button>'
-		$("#Batch").html(BatchTools);
+		  <button onclick="javascript:batch(4);" class="btn btn-default btn-sm">删除</button>';
 	}else{
-		$("#Batch").html(BatchTools);
 		//setCookie('BatchSelected', null);
 	}
+	$("#Batch").html(batchTools);
 }
 
 //滚动条事件
@@ -760,12 +759,6 @@ function ShowEditMenu(){
 	})
 }
 
-// //取文件名
-// function GetFileName(fileNameFull) {
-// 	var pName = fileNameFull.split('/');
-// 	return pName[pName.length - 1];
-// }
-
 //取磁盘
 function getDisk() {
 	var LBody = '';
@@ -836,11 +829,14 @@ function createFile(type, path) {
 					<button type="button" class="btn btn-danger btn-sm" onclick="layer.closeAll()">关闭</button>\
 					<button id="createFileBtn" type="button" class="btn btn-success btn-sm" onclick="createFile(1,\'' + path + '\')">新建</button>\
 					</div>\
-				</div>'
+				</div>',
+		success:function(){
+			$("#newFileName").focus().keyup(function(e){
+				if(e.keyCode == 13) $("#createFileBtn").click();
+			});
+		}
 	});
-	$("#newFileName").focus().keyup(function(e){
-		if(e.keyCode == 13) $("#createFileBtn").click();
-	});
+	
 }
 //新建目录
 function createDir(type, path) {
@@ -873,11 +869,14 @@ function createDir(type, path) {
 					<button type="button" class="btn btn-danger btn-sm btn-title" onclick="layer.closeAll()">关闭</button>\
 					<button type="button" id="createDirBtn" class="btn btn-success btn-sm btn-title" onclick="createDir(1,\'' + path + '\')">新建</button>\
 					</div>\
-				</div>'
+				</div>',
+		success:function(){
+			$("#newDirName").focus().keyup(function(e){
+				if(e.keyCode == 13) $("#createDirBtn").click();
+			});
+		}
 	});
-	$("#newDirName").focus().keyup(function(e){
-		if(e.keyCode == 13) $("#createDirBtn").click();
-	});
+	
 }
 
 //删除文件
@@ -934,10 +933,18 @@ function downloadFile(action){
 	if(action == 1){
 		var fUrl = $("#mUrl").val();
 		fUrl = encodeURIComponent(fUrl);
-		fpath = $("#dpath").val();
+
+		var fpath = $("#dpath").val();
 		fname = encodeURIComponent($("#dfilename").val());
+
+		if (fUrl == "" ){
+			layer.msg("URL地址不能为空!",{icon:2});
+			return;
+		}
+
 		layer.closeAll();
 		layer.msg(lan.files.down_task,{time:0,icon:16,shade: [0.3, '#000']});
+
 		$.post('/files/download_file','path='+fpath+'&url='+fUrl+'&filename='+fname,function(rdata){
 			layer.closeAll();
 			getFiles(fpath);
@@ -946,14 +953,16 @@ function downloadFile(action){
 		},'json');
 		return;
 	}
+
 	var path = $("#DirPathPlace input").val();
 	layer.open({
 		type: 1,
 		shift: 5,
 		closeBtn: 2,
 		area: '500px',
+		btn:["确定","关闭"],
 		title: lan.files.down_title,
-		content: '<form class="bt-form pd20 pb70">\
+		content: '<form class="bt-form pd20">\
 					<div class="line">\
 					<span class="tname">URL地址:</span><input type="text" class="bt-input-text" name="url" id="mUrl" placeholder="URL地址" style="width:330px" />\
 					</div>\
@@ -963,20 +972,19 @@ function downloadFile(action){
 					<div class="line">\
 					<span class="tname">文件名:</span><input type="text" class="bt-input-text" name="filename" id="dfilename" value="" placeholder="文件名" style="width:330px" />\
 					</div>\
-					<div class="bt-form-submit-btn">\
-					<button type="button" class="btn btn-danger btn-sm" onclick="layer.closeAll()">关闭</button>\
-					<button type="button" id="dlok" class="btn btn-success btn-sm dlok" onclick="downloadFile(1)">确定</button>\
-					</div>\
-				</form>'
-	});
-	$("#mUrl").keyup(function(){
-		durl = $(this).val();
-		tmp = durl.split('/');
-		$("#dfilename").val(tmp[tmp.length-1]);
+				</form>',
+		success:function(){
+			$("#mUrl").keyup(function(){
+				durl = $(this).val();
+				tmp = durl.split('/');
+				$("#dfilename").val(tmp[tmp.length-1]);
+			});
+		},
+		yes:function(){
+			downloadFile(1);
+		}
 	});
 }
-
-
 
 //重命名
 function reName(type, fileName) {
