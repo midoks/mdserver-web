@@ -3,7 +3,7 @@
         "version": "0.9.1",
         "content": "* 菜单修复。<br/> * 更新修复",
         "path": "https://github.com/midoks/mdserver-web/releases/download/0.9.1/mdserver-web.zip",
-        "purge":"https://purge.jsdelivr.net/gh/midoks/mdserver-web@latest/scripts/update.sh",
+        "purge":"https://purge.jsdelivr.net/gh/midoks/mdserver-web@latest/scripts/update.sh"
     },
     {
         "version": "0.9.0",
