@@ -235,7 +235,7 @@ function setRootPwd(type, pwd){
         btn:["取消","提交"],
         content: "<form class='bt-form pd20' id='mod_pwd'>\
                     <div class='line'>\
-                    <span class='tname'>root密码</span>\
+                    <span class='tname'>postgres密码</span>\
                     <div class='info-r'><input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:330px' value='"+pwd+"' /><span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatPwd(16)'></span></div>\
                     </div>\
                 </form>",
@@ -696,7 +696,6 @@ function dbList(page, search){
         var con = '<div class="safe bgw">\
             <button onclick="addDatabase()" title="添加数据库" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">添加数据库</button>\
             <button onclick="setRootPwd(0,\''+rdata.info['root_pwd']+'\')" title="管理员密码" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">PG密码</button>\
-            <button onclick="setDbAccess(\'postgres\')" title="ROOT权限" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">ROOT权限</button>\
             <span style="float:right">              \
                 <button batch="true" style="float: right;display: none;margin-left:10px;" onclick="delDbBatch();" title="删除选中项" class="btn btn-default btn-sm">删除选中</button>\
             </span>\
@@ -1015,8 +1014,7 @@ function getMasterRepSlaveList(){
                 <td>\
                     <a class="btlink" onclick="updateMasterRepSlaveUser(\''+name+'\');">修改</a> | \
                     <a class="btlink" onclick="delMasterRepSlaveUser(\''+name+'\');">删除</a> | \
-                    <a class="btlink" onclick="setDbMasterAccess(\''+name+'\');">权限</a> | \
-                    <a class="btlink" onclick="getMasterRepSlaveUserCmd(\''+name+'\');">从库同步命令</a>\
+                    <a class="btlink" onclick="setDbMasterAccess(\''+name+'\');">权限</a>\
                 </td>\
             </tr>';
         }
