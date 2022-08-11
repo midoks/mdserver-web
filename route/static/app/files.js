@@ -305,7 +305,7 @@ function getFiles(Path) {
 	if(!showRow) {
 		showRow = '100';
 	}
-	var Body = '';
+	var body = '';
 	var data = 'path=' + Path;
 	var loadT = layer.load();
 	var totalSize = 0;
@@ -340,7 +340,7 @@ function getFiles(Path) {
 			if(getCookie('rank') == 'a'){
 					$("#set_list").addClass("active");
 					$("#set_icon").removeClass("active");
-					Body += "<tr class='folderBoxTr' data-path='" + rdata.PATH + "/" + fmp[0] + "' filetype='dir'>\
+					body += "<tr class='folderBoxTr' data-path='" + rdata.PATH + "/" + fmp[0] + "' filetype='dir'>\
 						<td><input type='checkbox' name='id' value='"+fmp[0]+"'></td>\
 						<td class='column-name'><span class='cursor' onclick=\"getFiles('" + rdata.PATH + "/" + fmp[0] + "')\"><span class='ico ico-folder'></span><a class='text' title='" + fmp[0] + fmp[5] + "'>" + cnametext + "</a></span></td>\
 						<td>"+toSize(fmp[1])+"</td>\
@@ -358,7 +358,7 @@ function getFiles(Path) {
 			} else {
 				$("#set_icon").addClass("active");
 				$("#set_list").removeClass("active");
-				Body += "<div class='file folderBox menufolder' data-path='" + rdata.PATH + "/" + fmp[0] + "' filetype='dir' title='"+lan.files.file_name+"：" + fmp[0]+"&#13;"+lan.files.file_size+"：" + toSize(fmp[1])+"&#13;"+lan.files.file_etime+"："+getLocalTime(fmp[2])+"&#13;"+lan.files.file_auth+"："+fmp[3]+"&#13;"+lan.files.file_own+"："+fmp[4]+"'>\
+				body += "<div class='file folderBox menufolder' data-path='" + rdata.PATH + "/" + fmp[0] + "' filetype='dir' title='"+lan.files.file_name+"：" + fmp[0]+"&#13;"+lan.files.file_size+"：" + toSize(fmp[1])+"&#13;"+lan.files.file_etime+"："+getLocalTime(fmp[2])+"&#13;"+lan.files.file_auth+"："+fmp[3]+"&#13;"+lan.files.file_own+"："+fmp[4]+"'>\
 						<input type='checkbox' name='id' value='"+fmp[0]+"'>\
 						<div class='ico ico-folder' ondblclick=\"getFiles('" + rdata.PATH + "/" + fmp[0] + "')\"></div>\
 						<div class='titleBox' onclick=\"getFiles('" + rdata.PATH + "/" + fmp[0] + "')\"><span class='tname'>" + fmp[0] + "</span></div>\
@@ -397,7 +397,7 @@ function getFiles(Path) {
 			
 			totalSize +=  parseInt(fmp[1]);
 			if(getCookie("rank")=="a"){
-				Body += "<tr class='folderBoxTr' data-path='" + rdata.PATH +"/"+ fmp[0] + "' filetype='" + fmp[0] + "'><td><input type='checkbox' name='id' value='"+fmp[0]+"'></td>\
+				body += "<tr class='folderBoxTr' data-path='" + rdata.PATH +"/"+ fmp[0] + "' filetype='" + fmp[0] + "'><td><input type='checkbox' name='id' value='"+fmp[0]+"'></td>\
 						<td class='column-name'><span class='ico ico-"+(getExtName(fmp[0]))+"'></span><a class='text' title='" + fmp[0] + fmp[5] + "'>" + cnametext + "</a></td>\
 						<td>" + (toSize(fmp[1])) + "</td>\
 						<td>" + ((fmp[2].length > 11)?fmp[2]:getLocalTime(fmp[2])) + "</td>\
@@ -414,7 +414,7 @@ function getFiles(Path) {
 						</span></td></tr>";
 			}
 			else{
-				Body += "<div class='file folderBox menufile' data-path='" + rdata.PATH +"/"+ fmp[0] + "' filetype='"+fmp[0]+"' title='文件名：" + fmp[0]+"&#13;大小：" + toSize(fmp[1])+"&#13;修改时间："+getLocalTime(fmp[2])+"&#13;权限："+fmp[3]+"&#13;所有者："+fmp[4]+"'>\
+				body += "<div class='file folderBox menufile' data-path='" + rdata.PATH +"/"+ fmp[0] + "' filetype='"+fmp[0]+"' title='文件名：" + fmp[0]+"&#13;大小：" + toSize(fmp[1])+"&#13;修改时间："+getLocalTime(fmp[2])+"&#13;权限："+fmp[3]+"&#13;所有者："+fmp[4]+"'>\
 						<input type='checkbox' name='id' value='"+fmp[0]+"'>\
 						<div class='ico ico-"+(getExtName(fmp[0]))+"'></div>\
 						<div class='titleBox'><span class='tname'>" + fmp[0] + "</span></div>\
@@ -436,13 +436,13 @@ function getFiles(Path) {
 									<th style="text-align: right;" width="330">操作</th>\
 								</tr>\
 							</thead>\
-							<tbody id="filesBody" class="list-list">'+Body+'</tbody>\
+							<tbody id="filesBody" class="list-list">'+body+'</tbody>\
 						</table>';
 			$("#fileCon").removeClass("fileList").html(tablehtml);
 			$("#tipTools").width($("#fileCon").width());
 		}
 		else{
-			$("#fileCon").addClass("fileList").html(Body);
+			$("#fileCon").addClass("fileList").html(body);
 			$("#tipTools").width($("#fileCon").width());
 		}
 		$("#DirPathPlace input").val(rdata.PATH);
@@ -464,19 +464,20 @@ function getFiles(Path) {
 		var copyName = getCookie('copyFileName');
 		var cutName = getCookie('cutFileName');
 		var isPaste = (copyName == 'null') ? cutName : copyName;
-		console.log('isPaste:',isPaste);
+		// console.log('isPaste:',isPaste);
 		//---
 		if (isPaste != 'null' && isPaste != undefined) {
 			BarTools += ' <button onclick="javascript:pasteFile(\'' + (getFileName(isPaste)) + '\');" class="btn btn-Warning btn-sm">粘贴</button>';
 		}
 		
 		$("#Batch").html('');
-		var BatchTools = '';
+		var batchTools = '';
 		var isBatch = getCookie('BatchSelected');
 		if (isBatch == 1 || isBatch == '1') {
-			BatchTools += ' <button onclick="javascript:batchPaste();" class="btn btn-default btn-sm">粘贴所有</button>';
+			batchTools += ' <button onclick="javascript:batchPaste();" class="btn btn-default btn-sm">粘贴所有</button>';
 		}
-		$("#Batch").html(BatchTools);
+		$("#Batch").html(batchTools);
+
 		$("#setBox").prop("checked", false);
 		
 		$("#BarTools").html(BarTools);

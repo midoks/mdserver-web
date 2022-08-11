@@ -24,6 +24,7 @@ apt install -y python3-pip
 apt install -y python3-dev
 apt install -y python3-venv
 apt install -y cron
+apt install -y expect
 
 apt install -y locate
 locale-gen en_US.UTF-8

@@ -27,6 +27,7 @@ zypper install -y libjpeg-devel libpng-devel
 zypper install -y libevent-devel
 zypper install -y libtirpc-devel
 zypper install -y rpcgen
+zypper install -y expect
 
 zypper install -y libzip libzip-devel
 zypper install -y libmemcached libmemcached-devel
