@@ -878,6 +878,9 @@ class site_api:
         domain = request.form.get('domain', '')
         webname = request.form.get('webname', '')
         pid = request.form.get('id', '')
+        return self.addDomain(domain, webname, pid)
+
+    def addDomain(self, domain, webname, pid):
         if len(domain) < 3:
             return mw.returnJson(False, '域名不能为空!')
         domains = domain.split(',')
@@ -2184,7 +2187,7 @@ location ^~ {from} {
             sdomain = domain
             swebname = self.siteName
             spid = str(pid)
-            # self.addDomain(domain, webname, pid)
+            self.addDomain(domain, webname, pid)
 
         mw.M('domain').add('pid,name,port,addtime',
                            (pid, self.siteName, self.sitePort, mw.getDate()))
