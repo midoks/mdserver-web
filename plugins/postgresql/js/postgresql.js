@@ -935,7 +935,8 @@ function getMasterRepSlaveList(){
             list += '<tr><td>'+name+'</td>\
                 <td>'+user_list[i]['password']+'</td>\
                 <td>\
-                    <a class="btlink" onclick="delMasterRepSlaveUser(\''+name+'\');">删除</a> \
+                    <a class="btlink" onclick="delMasterRepSlaveUser(\''+name+'\');">删除</a> | \
+                    <a class="btlink" onclick="getMasterRepSlaveUserCmd(\''+name+'\');">从库同步命令</a> \
                 </td>\
             </tr>';
         }
@@ -1049,9 +1050,9 @@ function addSlaveSSH(ip=''){
             db_user = rdata.data[0]['db_user'];
         }
 
-        var index = layer.open({
+        layer.open({
             type: 1,
-            area: ['500px','480px'],
+            area: ['500px','450px'],
             title: '添加SSH',
             closeBtn: 1,
             shift: 5,
@@ -1060,7 +1061,6 @@ function addSlaveSSH(ip=''){
             content: "<form class='bt-form pd20'>\
                 <div class='line'><span class='tname'>IP</span><div class='info-r'><input name='ip' class='bt-input-text mr5' type='text' style='width:330px;' value='"+ip+"'></div></div>\
                 <div class='line'><span class='tname'>端口</span><div class='info-r'><input name='port' class='bt-input-text mr5' type='number' style='width:330px;' value='"+port+"'></div></div>\
-                <div class='line'><span class='tname'>同步账户[DB]</span><div class='info-r'><input name='db_user'  placeholder='为空则取第一个!' class='bt-input-text mr5' type='text' style='width:330px;' value='"+db_user+"'></div></div>\
                 <div class='line'>\
                 <span class='tname'>ID_RSA</span>\
                 <div class='info-r'><textarea class='bt-input-text mr5' row='20' cols='50' name='id_rsa' style='width:330px;height:200px;'></textarea></div>\
@@ -1131,7 +1131,6 @@ function getSlaveSSHPage(page=1){
 
             list += '<tr><td>'+ip+'</td>\
                 <td>'+port+'</td>\
-                <td>'+db_user+'</td>\
                 <td>'+id_rsa+'</td>\
                 <td>\
                     <a class="btlink" onclick="addSlaveSSH(\''+ip+'\');">修改</a> | \
@@ -1158,7 +1157,7 @@ function getSlaveSSHList(page=1){
         content:"<div class='bt-form pd20 c6'>\
                  <div class='divtable mtb10'>\
                     <div><table class='table table-hover get-slave-ssh-list'>\
-                        <thead><tr><th>IP</th><th>PORT</th><th>同步账户</th><th>SSH</th><th>操作</th></tr></thead>\
+                        <thead><tr><th>IP</th><th>PORT</th><th>SSH</th><th>操作</th></tr></thead>\
                         <tbody></tbody>\
                     </table></div>\
                     "+page +"\

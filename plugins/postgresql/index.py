@@ -141,9 +141,8 @@ def contentReplace(content):
     return content
 
 
-def pSqliteDb(dbname='databases'):
-    file = getServerDir() + '/pgsql.db'
-    name = 'pgsql'
+def pSqliteDb(dbname='databases', name='pgsql'):
+    file = getServerDir() + '/' + name + '.db'
     if not os.path.exists(file):
         conn = mw.M(dbname).dbPos(getServerDir(), name)
         csql = mw.readFile(getPluginDir() + '/conf/pgsql.sql')
@@ -1139,6 +1138,8 @@ def setSlaveStatus(version):
         data = data.replace('#wal_receiver_status_interval',
                             'wal_receiver_status_interval')
         data = data.replace('#hot_standby_feedback', 'hot_standby_feedback')
+        data = data.replace('#recovery_target_timeline',
+                            'recovery_target_timeline')
     else:
         data = data.replace('hot_standby', '#hot_standby')
         data = data.replace('primary_conninfo', '#primary_conninfo')
@@ -1147,6 +1148,8 @@ def setSlaveStatus(version):
         data = data.replace('wal_receiver_status_interval',
                             '#wal_receiver_status_interval')
         data = data.replace('hot_standby_feedback', '#hot_standby_feedback')
+        data = data.replace('#recovery_target_timeline',
+                            'recovery_target_timeline')
 
     mw.writeFile(pg_conf, data)
 
@@ -1157,6 +1160,9 @@ def setSlaveStatus(version):
 def getSlaveList(version=''):
 
     db = pgDb()
+
+    res = db.execute('select * from pg_stat_replication')
+    # print(res)
     # dlist = db.query('show slave status')
     # ret = []
     # for x in range(0, len(dlist)):
@@ -1182,7 +1188,7 @@ def getSlaveSSHByIp(version=''):
 
     ip = args['ip']
 
-    conn = pSqliteDb('slave_id_rsa')
+    conn = pSqliteDb('slave_id_rsa', 'pgsql_slave')
     data = conn.field('ip,port,db_user,id_rsa').where("ip=?", (ip,)).select()
     return mw.returnJson(True, 'ok', data)
 
@@ -1196,7 +1202,7 @@ def getSlaveSSHList(version=''):
     page = int(args['page'])
     page_size = int(args['page_size'])
 
-    conn = pSqliteDb('slave_id_rsa')
+    conn = pSqliteDb('slave_id_rsa', 'pgsql_slave')
     limit = str((page - 1) * page_size) + ',' + str(page_size)
 
     field = 'id,ip,port,db_user,id_rsa,ps,addtime'
@@ -1227,24 +1233,23 @@ def addSlaveSSH(version=''):
     if ip == "":
         return mw.returnJson(True, 'ok')
 
-    data = checkArgs(args, ['port', 'id_rsa', 'db_user'])
+    data = checkArgs(args, ['port', 'id_rsa'])
     if not data[0]:
         return data[1]
 
     id_rsa = args['id_rsa']
     port = args['port']
-    db_user = args['db_user']
     user = 'root'
     addTime = time.strftime('%Y-%m-%d %X', time.localtime())
 
-    conn = pSqliteDb('slave_id_rsa')
+    conn = pSqliteDb('slave_id_rsa', 'pgsql_slave')
     data = conn.field('ip,id_rsa').where("ip=?", (ip,)).select()
     if len(data) > 0:
         res = conn.where("ip=?", (ip,)).save(
-            'port,id_rsa,db_user', (port, id_rsa, db_user))
+            'port,id_rsa', (port, id_rsa,))
     else:
-        conn.add('ip,port,user,id_rsa,db_user,ps,addtime',
-                 (ip, port, user, id_rsa, db_user, '', addTime))
+        conn.add('ip,port,user,id_rsa,ps,addtime',
+                 (ip, port, user, id_rsa, '', addTime))
 
     return mw.returnJson(True, '设置成功!')
 
@@ -1257,7 +1262,7 @@ def delSlaveSSH(version=''):
 
     ip = args['ip']
 
-    conn = pSqliteDb('slave_id_rsa')
+    conn = pSqliteDb('slave_id_rsa', 'pgsql_slave')
     conn.where("ip=?", (ip,)).delete()
     return mw.returnJson(True, 'ok')
 
@@ -1270,7 +1275,7 @@ def updateSlaveSSH(version=''):
 
     ip = args['ip']
     id_rsa = args['id_rsa']
-    conn = pSqliteDb('slave_id_rsa')
+    conn = pSqliteDb('slave_id_rsa', 'pgsql_slave')
     conn.where("ip=?", (ip,)).save('id_rsa', (id_rsa,))
     return mw.returnJson(True, 'ok')
 
@@ -1368,6 +1373,37 @@ def delMasterRepSlaveUser(version=''):
 
     psdb.where("username=?", (args['username'],)).delete()
     return mw.returnJson(True, '删除成功!')
+
+
+def getMasterRepSlaveUserCmd(version=''):
+    args = getArgs()
+    data = checkArgs(args, ['username', 'db'])
+    if not data[0]:
+        return data[1]
+
+    psdb = pSqliteDb('master_replication_user')
+    mdir = getServerDir()
+    port = getPgPort()
+    localIp = mw.getLocalIp()
+    f = 'username,password'
+    username = args['username']
+    if username == '':
+        clist = psdb.field(f).limit('1').order('id desc').select()
+    else:
+        clist = psdb.field(f).where(
+            "username=?", (username,)).order('id desc').select()
+
+    if len(clist) == 0:
+        return mw.returnJson(False, '请添加同步账户!')
+
+    cmd = mdir + '/bin/pg_basebackup -Fp --progress -D ' + mdir + \
+        '/postgresql/data -h ' + localIp + ' -p ' + port + \
+        ' -U ' + clist[0]['username'] + ' --password'
+
+    data = {}
+    data['cmd'] = cmd
+    data['info'] = clist
+    return mw.returnJson(True, 'ok!', data)
 
 
 def installPreInspection(version):
@@ -1475,5 +1511,7 @@ if __name__ == "__main__":
         print(addMasterRepSlaveUser(version))
     elif func == 'del_master_rep_slave_user':
         print(delMasterRepSlaveUser(version))
+    elif func == 'get_master_rep_slave_user_cmd':
+        print(getMasterRepSlaveUserCmd(version))
     else:
         print('error')
