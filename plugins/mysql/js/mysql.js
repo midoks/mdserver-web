@@ -527,7 +527,7 @@ function checkSelect(){
 }
 
 function setDbRw(id,username,val){
-    myPost('get_db_rw',{id:id,username:username,rw:val}, function(data){
+    myPost('set_db_rw',{id:id,username:username,rw:val}, function(data){
         var rdata = $.parseJSON(data.data);
         // layer.msg(rdata.msg,{icon:rdata.status ? 1 : 5,shade: [0.3, '#000']});
         showMsg(rdata.msg, function(){

@@ -130,6 +130,7 @@ pyvenv.cfg
 include
 pip-selfcheck.json
 
+scripts/mdserver-web
 data/api_login.txt
 data/sessions
 data/ssl.pl

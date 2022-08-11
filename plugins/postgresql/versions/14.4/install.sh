@@ -20,12 +20,12 @@ Install_App()
 	mkdir -p ${postgreDir}
 	echo '正在安装脚本文件...' > $install_tmp
 
-	if id postgresql &> /dev/null ;then 
-	    echo "postgresql UID is `id -u postgresql`"
-	    echo "postgresql Shell is `grep "^postgresql:" /etc/passwd |cut -d':' -f7 `"
+	if id postgres &> /dev/null ;then 
+	    echo "postgres UID is `id -u postgres`"
+	    echo "postgres Shell is `grep "^postgres:" /etc/passwd |cut -d':' -f7 `"
 	else
-	    groupadd postgresql
-		useradd -g postgresql postgresql
+	    groupadd postgres
+		useradd -g postgres postgres
 	fi
 
 	if [ "$sysName" != "Darwin" ];then
@@ -68,13 +68,13 @@ Install_App()
 
 	if [ ! -d $serverPath/postgresql ];then
 		cd ${postgreDir}/postgresql-${VERSION} && ./configure \
-		--prefix=$serverPath/postgresql
-		# --with-openssl \
+		--prefix=$serverPath/postgresql \
+		--with-openssl
 		# --with-pgport=33206
 
 		echo "cd ${postgreDir}/postgresql-${VERSION} && ./configure \
-		--prefix=$serverPath/postgresql"
-		# --with-openssl \
+		--prefix=$serverPath/postgresql \
+		--with-openssl"
 		# --with-pgport=33206
 		make -j${cpuCore} && make install && make clean
 	fi

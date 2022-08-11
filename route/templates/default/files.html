@@ -25,7 +25,7 @@
                 </div>
                 <div class="clearfix ptb10">
                     <button class="btn btn-default btn-sm pull-left" onclick="uploadFiles()">上传</button>
-                    <button class="btn btn-default btn-sm pull-left" onclick="downloadFile()" title="$tData['lan']['TI1']" style="margin:0 5px">远程下载</button>
+                    <button class="btn btn-default btn-sm pull-left" onclick="downloadFile()" title="远程下载" style="margin:0 5px">远程下载</button>
                     <span id='BarTools'></span>
                     <span id='Batch' style="background-color:#fff;position:absolute;right:190px;z-index:10"></span>
                     <span id='comlist' class="comlist"></span>
@@ -54,14 +54,18 @@
     <li onclick="javascript:batch(3);"><a style="cursor: pointer;">压缩</a></li>
     <li onclick="javascript:batch(4);"><a style="cursor: pointer;">删除</a></li>
 </ul>
+
 <script src="/static/js/jquery-ui.min.js?v={{config.version}}"></script>
 <script src="/static/js/jquery.contextify.min.js?v={{config.version}}"></script>
 <script src="/static/app/files.js?v={{config.version}}"></script>
 <script src="/static/app/upload.js?v={{config.version}}"></script>
 <script type="text/javascript">
+
 setTimeout(function() {
     getDisk();
 }, 500);
+
+
 var xPath = getCookie('open_dir_path');
 setTimeout(function() {
     getFiles((xPath != undefined ? xPath : '/www/wwwroot'));
@@ -72,18 +76,21 @@ setCookie('uploadSize', 1024 * 1024 * 1024);
 if (getCookie('rank') == undefined || getCookie('rank') == null) {
     setCookie('rank', 'a');
 }
+
 $("#set_icon").click(function() {
     setCookie('rank', 'b');
     $(this).addClass("active");
     $("#set_list").removeClass("active");
     getFiles(getCookie('open_dir_path'));
 });
+
 $("#set_list").click(function() {
     setCookie('rank', 'a');
     $(this).addClass("active");
     $("#set_icon").removeClass("active");
     getFiles(getCookie('open_dir_path'));
 })
+
 $(".refreshBtn").click(function() {
     getFiles(getCookie('open_dir_path'));
 })

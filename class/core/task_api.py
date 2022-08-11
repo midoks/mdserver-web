@@ -53,8 +53,8 @@ class task_api:
         return v
 
     def getTaskSpeedApi(self):
-        tempFile = os.getcwd() + '/tmp/panelExec.log'
-        freshFile = os.getcwd() + '/tmp/panelFresh'
+        tempFile = mw.getRunDir() + '/tmp/panelExec.log'
+        freshFile = mw.getRunDir() + '/tmp/panelFresh'
 
         find = mw.M('tasks').where('status=? OR status=?',
                                    ('-1', '0')).field('id,type,name,execstr').find()
@@ -63,25 +63,28 @@ class task_api:
 
         mw.triggerTask()
 
-        echoMsg = {}
-        echoMsg['name'] = find['name']
-        echoMsg['execstr'] = find['execstr']
+        data = {}
+        data['name'] = find['name']
+        data['execstr'] = find['execstr']
         if find['type'] == 'download':
-            import json
-            try:
-                tmp = mw.readFile(tempFile)
-                if len(tmp) < 10:
-                    return mw.returnJson(False, '当前没有任务队列在执行-3!')
-                echoMsg['msg'] = json.loads(tmp)
-                echoMsg['isDownload'] = True
-            except:
-                mw.M('tasks').where(
-                    "id=?", (find['id'],)).save('status', ('0',))
-                return mw.returnJson(False, '当前没有任务队列在执行-4!')
+            readLine = ""
+            for i in range(3):
+                try:
+                    readLine = mw.readFile(tempFile)
+                    if len(readLine) > 10:
+                        data['msg'] = json.loads(readLine)
+                        data['isDownload'] = True
+                        break
+                except Exception as e:
+                    if i == 2:
+                        mw.M('tasks').where("id=?", (find['id'],)).save(
+                            'status', ('0',))
+                        return mw.returnJson(False, '当前没有任务队列在执行-4:' + str(e))
+                time.sleep(0.5)
         else:
-            echoMsg['msg'] = mw.getLastLine(tempFile, 10)
-            echoMsg['isDownload'] = False
+            data['msg'] = mw.getLastLine(tempFile, 10)
+            data['isDownload'] = False
 
-        echoMsg['task'] = mw.M('tasks').where("status!=?", ('1',)).field(
+        data['task'] = mw.M('tasks').where("status!=?", ('1',)).field(
             'id,status,name,type').order("id asc").select()
-        return mw.getJson(echoMsg)
+        return mw.getJson(data)

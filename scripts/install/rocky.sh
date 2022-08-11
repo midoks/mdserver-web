@@ -17,6 +17,7 @@ yum install -y wget lsof
 yum install -y python3-devel
 yum install -y python-devel
 yum install -y crontabs
+yum install -y expect
 yum install -y curl curl-devel libcurl libcurl-devel
 #https need
 

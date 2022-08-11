@@ -2421,7 +2421,7 @@ if __name__ == "__main__":
         print(getDbAccess())
     elif func == 'set_db_access':
         print(setDbAccess())
-    elif func == 'get_db_rw':
+    elif func == 'set_db_rw':
         print(setDbRw(version))
     elif func == 'set_db_ps':
         print(setDbPs())

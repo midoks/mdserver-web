@@ -2,18 +2,17 @@
 	<div class='plugin_version'></div>
 	<div class="bt-w-main">
 		<div class="bt-w-menu">
-			<!-- <script type="text/javascript">console.log($('.plugin_version').attr('version'));</script> -->
 			<p class="bgw" onclick="pluginService('postgresql', $('.plugin_version').attr('version'));">服务</p>
 			<p onclick="pluginInitD('postgresql', $('.plugin_version').attr('version'));">自启动</p>
-			<p onclick="pluginConfigTpl('postgresql');">配置文件</p>
-			<!--<p onclick="myDbPos();">存储位置</p> -->
+			<p onclick="pluginConfigTpl('postgresql');">配置文件</p> 
+			<p onclick="pluginConfig('postgresql','','pg_hba_conf');">客服端认证</p>
 			<p onclick="pgPort();">端口</p>
-			<!-- <p onclick="runInfo();">当前状态</p>
-			<p onclick="myPerfOpt();">性能优化</p> -->
+			<p onclick="runInfo();">当前状态</p>
+			<p onclick="pgPerfOpt();">性能优化</p>
 			<p onclick="pluginLogs('postgresql',$('.plugin_version').attr('version'),'run_log');">日志</p>
-			<!--<p onclick="pluginLogs('postgresql',$('.plugin_version').attr('version'),'show_log');">慢日志</p>-->
+			<p onclick="pluginLogs('postgresql',$('.plugin_version').attr('version'),'slow_log');">慢日志</p> 
 			<p onclick="dbList()">管理列表</p>
-			<!--<p onclick="masterOrSlaveConf($('.plugin_version').attr('version'))">主从配置</p> -->
+			<p onclick="masterOrSlaveConf($('.plugin_version').attr('version'))">主从配置</p> 
 		</div>
 		<div class="bt-w-con pd15">
 			<div class="soft-man-con" style="height: 530px; overflow: auto;"></div>

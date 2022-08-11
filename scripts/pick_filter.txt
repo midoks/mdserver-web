@@ -102,6 +102,14 @@ venv.bak/
 # mypy
 scripts/.git/*
 .git/*
+.github/*
+bin/*
+lib/*
+include/*
+pyvenv.cfg
+__pycache__
+
+docker/*
 .mypy_cache/
 .gitignore
 .git
@@ -117,5 +125,15 @@ data/system.db
 data/default.pl
 data/control.conf
 data/iplist.txt
+data/osname.pl
+data/edate.pl
+data/backup.pl
+data/default_site.pl
+data/port.pl
+data/api_login.txt
 data/json/index.json
+data/sessions/*
+
+
+
 script/init.d/mw

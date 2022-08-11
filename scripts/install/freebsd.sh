@@ -26,6 +26,7 @@ pkg install -y cmake
 pkg install -y libxslt
 pkg install -y libunwind
 pkg install -y influxpkg-config
+pkg install -y expect
 
 pkg install -y pcre
 pkg install -y webp

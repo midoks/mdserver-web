@@ -14,6 +14,7 @@ setenforce 0
 sed -i 's#SELINUX=enforcing#SELINUX=disabled#g' /etc/selinux/config
 
 yum install -y wget curl lsof unzip
+yum install -y expect
 dnf install crontabs -y
 
 #https need
