@@ -1191,14 +1191,33 @@ function handlerRun(){
     });
 }
 
-function initSlaveStatus(){
-    myPost('init_slave_status', '', function(data){
+function slaveSyncCmd(){
+    myPost('slave_sync_cmd', {}, function(data){
         var rdata = $.parseJSON(data.data);
-        showMsg(rdata.msg,function(){
-            if (rdata.status){
-                masterOrSlaveConf();
-            }
-        },{icon:rdata.status?1:2},2000);
+
+        if (!rdata['status']){
+            layer.msg(rdata['msg']);
+            return;
+        }
+
+        var cmd = rdata.data['cmd'];
+        
+        var loadOpen = layer.open({
+            type: 1,
+            title: '同步命令',
+            area: '500px',
+            content:"<form class='bt-form pd20 pb70' id='add_master'>\
+            <div class='line'>"+cmd+"</div>\
+            <div class='bt-form-submit-btn'>\
+                <button type='button' class='btn btn-success btn-sm btn-title class-copy-cmd'>复制</button>\
+            </div>\
+          </form>",
+        });
+       
+        copyPass(cmd);
+        $('.class-copy-cmd').click(function(){
+            copyPass(cmd);
+        });
     });
 }
 
@@ -1286,7 +1305,7 @@ function masterOrSlaveConf(version=''){
                     <span class="f14 c6 mr20">Slave[从]配置</span><span class="f14 c6 mr20"></span>\
                     <button class="btn '+(!rdata.slave_status ? 'btn-danger' : 'btn-success')+' btn-xs btn-slave">'+(!rdata.slave_status ? '未启动' : '已启动') +'</button>\
                     <button class="btn btn-success btn-xs" onclick="getSlaveSSHList()" >[主]SSH配置</button>\
-                    <button class="btn btn-success btn-xs" onclick="initSlaveStatus()" >初始化</button>\
+                    <button class="btn btn-success btn-xs" onclick="slaveSyncCmd()" >同步命令</button>\
                 </p>\
                 <hr/>\
                 <!-- slave status list -->\

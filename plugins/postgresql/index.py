@@ -1162,7 +1162,7 @@ def getSlaveList(version=''):
     db = pgDb()
 
     res = db.execute('select * from pg_stat_replication')
-    # print(res)
+    print(res)
     # dlist = db.query('show slave status')
     # ret = []
     # for x in range(0, len(dlist)):
@@ -1396,7 +1396,7 @@ def getMasterRepSlaveUserCmd(version=''):
     if len(clist) == 0:
         return mw.returnJson(False, '请添加同步账户!')
 
-    cmd = mdir + '/bin/pg_basebackup -Fp --progress -D ' + mdir + \
+    cmd = 'echo "' + clist[0]['password'] + '" | ' + mdir + '/bin/pg_basebackup -Fp --progress -D ' + mdir + \
         '/postgresql/data -h ' + localIp + ' -p ' + port + \
         ' -U ' + clist[0]['username'] + ' --password'
 
@@ -1404,6 +1404,114 @@ def getMasterRepSlaveUserCmd(version=''):
     data['cmd'] = cmd
     data['info'] = clist
     return mw.returnJson(True, 'ok!', data)
+
+
+def slaveSyncCmd(version=''):
+    data = {}
+    data['cmd'] = 'cd /www/server/mdserver-web && python3 plugins/postgresql/index.py do_full_sync'
+    return mw.returnJson(True, 'ok!', data)
+
+
+def writeDbSyncStatus(data):
+    path = '/tmp/db_async_status.txt'
+    mw.writeFile(path, json.dumps(data))
+
+
+def doFullSync(version=''):
+
+    db = pgDb()
+
+    id_rsa_conn = pSqliteDb('slave_id_rsa', 'pgsql_slave')
+    data = id_rsa_conn.field('ip,port,db_user,id_rsa').find()
+
+    SSH_PRIVATE_KEY = "/tmp/pg_sync_id_rsa.txt"
+    id_rsa = data['id_rsa'].replace('\\n', '\n')
+    mw.writeFile(SSH_PRIVATE_KEY, id_rsa)
+
+    ip = data["ip"]
+    master_port = data['port']
+    print("master ip:", ip)
+
+    writeDbSyncStatus({'code': 0, 'msg': '开始同步...', 'progress': 0})
+
+    import paramiko
+    paramiko.util.log_to_file('paramiko.log')
+    ssh = paramiko.SSHClient()
+
+    print(SSH_PRIVATE_KEY)
+    if not os.path.exists(SSH_PRIVATE_KEY):
+        writeDbSyncStatus({'code': 0, 'msg': '需要配置SSH......', 'progress': 0})
+        return 'fail'
+
+    try:
+        # ssh.load_system_host_keys()
+        mw.execShell("chmod 600 " + SSH_PRIVATE_KEY)
+        key = paramiko.RSAKey.from_private_key_file(SSH_PRIVATE_KEY)
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        print(ip, master_port)
+
+        # pkey=key
+        # key_filename=SSH_PRIVATE_KEY
+        ssh.connect(hostname=ip, port=int(master_port),
+                    username='root', pkey=key)
+    except Exception as e:
+        print(str(e))
+        writeDbSyncStatus(
+            {'code': 0, 'msg': 'SSH配置错误:' + str(e), 'progress': 0})
+        return 'fail'
+
+    writeDbSyncStatus({'code': 0, 'msg': '登录Master成功...', 'progress': 5})
+
+    print("同步文件", "start")
+    t = ssh.get_transport()
+    sftp = paramiko.SFTPClient.from_transport(t)
+    copy_status = sftp.get(
+        "/www/server/postgresql/pgsql.db", getServerDir() + "/pgsql.db")
+    print("同步信息:", copy_status)
+    print("同步文件", "end")
+    if copy_status == None:
+        writeDbSyncStatus({'code': 2, 'msg': '数据库信息同步本地完成...', 'progress': 40})
+
+    cmd = 'cd /www/server/mdserver-web && python3 plugins/postgresql/index.py get_master_rep_slave_user_cmd {"username":"","db":""}'
+    stdin, stdout, stderr = ssh.exec_command(cmd)
+    result = stdout.read()
+    result = result.decode('utf-8')
+    cmd_data = json.loads(result)
+
+    print(cmd_data)
+    username = cmd_data['data']['info'][0]['username']
+    password = cmd_data['data']['info'][0]['password']
+
+    writeDbSyncStatus({'code': 3, 'msg': '数据库获取完成...', 'progress': 45})
+
+    mdir = getServerDir()
+    port = getPgPort()
+
+    cmd = mdir + '/bin/pg_basebackup -Fp --progress -D ' + mdir + \
+        '/postgresql/data -h ' + ip + ' -p ' + port + \
+        ' -U ' + username + ' --password'
+    print(cmd)
+
+    cmd_tmp = "/tmp/cmd_run.sh"
+
+    cmd_tmp_data = """#!/bin/expect
+spawn %s
+expect "Password:"
+ 
+send "%s\r"
+
+interact
+""" % (cmd, password)
+
+    mw.writeFile(cmd_tmp, cmd_tmp_data)
+
+    os.system("expect " + cmd_tmp)
+
+    writeDbSyncStatus({'code': 6, 'msg': '从库重启完成...', 'progress': 100})
+
+    os.system("rm -rf " + SSH_PRIVATE_KEY)
+    os.system("rm -rf " + cmd_tmp)
+    return True
 
 
 def installPreInspection(version):
@@ -1513,5 +1621,9 @@ if __name__ == "__main__":
         print(delMasterRepSlaveUser(version))
     elif func == 'get_master_rep_slave_user_cmd':
         print(getMasterRepSlaveUserCmd(version))
+    elif func == 'slave_sync_cmd':
+        print(slaveSyncCmd(version))
+    elif func == 'do_full_sync':
+        print(doFullSync(version))
     else:
         print('error')
