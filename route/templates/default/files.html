@@ -83,12 +83,14 @@ $("#set_icon").click(function() {
     $("#set_list").removeClass("active");
     getFiles(getCookie('open_dir_path'));
 });
+
 $("#set_list").click(function() {
     setCookie('rank', 'a');
     $(this).addClass("active");
     $("#set_icon").removeClass("active");
     getFiles(getCookie('open_dir_path'));
 })
+
 $(".refreshBtn").click(function() {
     getFiles(getCookie('open_dir_path'));
 })

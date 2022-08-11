@@ -1,4 +1,4 @@
-console.log(lan);
+// console.log(lan);
 
 //判断磁盘数量超出宽度
 function isDiskWidth(){
@@ -342,7 +342,8 @@ function getFiles(Path) {
 					$("#set_icon").removeClass("active");
 					body += "<tr class='folderBoxTr' data-path='" + rdata.PATH + "/" + fmp[0] + "' filetype='dir'>\
 						<td><input type='checkbox' name='id' value='"+fmp[0]+"'></td>\
-						<td class='column-name'><span class='cursor' onclick=\"getFiles('" + rdata.PATH + "/" + fmp[0] + "')\"><span class='ico ico-folder'></span><a class='text' title='" + fmp[0] + fmp[5] + "'>" + cnametext + "</a></span></td>\
+						<td class='column-name'><span class='cursor' onclick=\"getFiles('" + rdata.PATH + "/" + fmp[0] + "')\">\
+						<span class='ico ico-folder'></span><a class='text' title='" + fmp[0] + fmp[5] + "'>" + cnametext + "</a></span></td>\
 						<td>"+toSize(fmp[1])+"</td>\
 						<td>"+getLocalTime(fmp[2])+"</td>\
 						<td>"+fmp[3]+"</td>\
@@ -358,7 +359,8 @@ function getFiles(Path) {
 			} else {
 				$("#set_icon").addClass("active");
 				$("#set_list").removeClass("active");
-				body += "<div class='file folderBox menufolder' data-path='" + rdata.PATH + "/" + fmp[0] + "' filetype='dir' title='"+lan.files.file_name+"：" + fmp[0]+"&#13;"+lan.files.file_size+"：" + toSize(fmp[1])+"&#13;"+lan.files.file_etime+"："+getLocalTime(fmp[2])+"&#13;"+lan.files.file_auth+"："+fmp[3]+"&#13;"+lan.files.file_own+"："+fmp[4]+"'>\
+				body += "<div class='file folderBox menufolder' data-path='" + rdata.PATH + "/" + fmp[0] + "' filetype='dir' title='"+lan.files.file_name+"：" + fmp[0]+"&#13;"+lan.files.file_size+"：" 
+						+ toSize(fmp[1])+"&#13;"+lan.files.file_etime+"："+getLocalTime(fmp[2])+"&#13;"+lan.files.file_auth+"："+fmp[3]+"&#13;"+lan.files.file_own+"："+fmp[4]+"'>\
 						<input type='checkbox' name='id' value='"+fmp[0]+"'>\
 						<div class='ico ico-folder' ondblclick=\"getFiles('" + rdata.PATH + "/" + fmp[0] + "')\"></div>\
 						<div class='titleBox' onclick=\"getFiles('" + rdata.PATH + "/" + fmp[0] + "')\"><span class='tname'>" + fmp[0] + "</span></div>\
@@ -414,14 +416,16 @@ function getFiles(Path) {
 						</span></td></tr>";
 			}
 			else{
-				body += "<div class='file folderBox menufile' data-path='" + rdata.PATH +"/"+ fmp[0] + "' filetype='"+fmp[0]+"' title='文件名：" + fmp[0]+"&#13;大小：" + toSize(fmp[1])+"&#13;修改时间："+getLocalTime(fmp[2])+"&#13;权限："+fmp[3]+"&#13;所有者："+fmp[4]+"'>\
+				body += "<div class='file folderBox menufile' data-path='" + rdata.PATH +"/"+ fmp[0] + "' filetype='"+fmp[0]+"' title='文件名：" + fmp[0]+"&#13;大小：" 
+						+ toSize(fmp[1])+"&#13;修改时间："+getLocalTime(fmp[2])+"&#13;权限："+fmp[3]+"&#13;所有者："+fmp[4]+"'>\
 						<input type='checkbox' name='id' value='"+fmp[0]+"'>\
 						<div class='ico ico-"+(getExtName(fmp[0]))+"'></div>\
 						<div class='titleBox'><span class='tname'>" + fmp[0] + "</span></div>\
 						</div>";
 			}
 		}
-		var dirInfo = '(共{1}个目录与{2}个文件,大小:'.replace('{1}',rdata.DIR.length+'').replace('{2}',rdata.DIR.length+'')+'<font id="pathSize">'+(toSize(totalSize))+'<a class="btlink ml5" onClick="getPathSize()">获取</a></font>)';
+		var dirInfo = '(共{1}个目录与{2}个文件,大小:'.replace('{1}',rdata.DIR.length+'').replace('{2}',rdata.DIR.length+'')+'<font id="pathSize">'
+			+ (toSize(totalSize))+'<a class="btlink ml5" onClick="getPathSize()">获取</a></font>)';
 		$("#DirInfo").html(dirInfo);
 		if(getCookie('rank')=='a'){
 			var tablehtml = '<table width="100%" border="0" cellpadding="0" cellspacing="0" class="table table-hover">\
@@ -512,11 +516,15 @@ function getFiles(Path) {
 		$("input[name=id]").dblclick(function(e){
 			e.stopPropagation();
 		});
+
+
 		// //禁用右键
 		// $("#fileCon").bind("contextmenu",function(e){
 		// 	return false;
 		// });
 		// bindselect();
+
+
 		// //绑定右键
 		// $("#fileCon").mousedown(function(e){
 		// 	var count = totalFile();
@@ -529,15 +537,17 @@ function getFiles(Path) {
 		// 		}
 		// 	}
 		// });
+
 		$(".folderBox,.folderBoxTr").mousedown(function(e){
+			// console.log(e);
 			var count = totalFile();
 			if(e.which == 3) {
 				if(count <= 1){
 					var a = $(this);
-					a.contextify(RClick(a.attr("filetype"),a.attr("data-path"),a.find("input").val()));
-				}
-				else{
-					RClickAll(e);
+					var option = rightMenuClick(a.attr("filetype"),a.attr("data-path"),a.find("input").val());
+					a.contextify(option);
+				} else{
+					rightMenuClickAll(e);
 				}
 			}
 		});
@@ -775,9 +785,11 @@ function getDisk() {
 	var LBody = '';
 	$.get('/system/disk_info', function(rdata) {
 		for (var i = 0; i < rdata.length; i++) {
-			LBody += "<span onclick=\"getFiles('" + rdata[i].path + "')\"><span class='glyphicon glyphicon-hdd'></span>&nbsp;" + (rdata[i].path=='/'?lan.files.path_root:rdata[i].path) + "(" + rdata[i].size[2] + ")</span>";
+			LBody += "<span onclick=\"getFiles('" + rdata[i].path + "')\">\
+				<span class='glyphicon glyphicon-hdd'></span>&nbsp;" + (rdata[i].path=='/'?lan.files.path_root:rdata[i].path) + "(" + rdata[i].size[2] + ")</span>";
 		}
-		var trash = '<span id="recycle_bin" onclick="recycleBin(\'open\')" title="回收站" style="position: absolute; border-color: #ccc; right: 77px;"><span class="glyphicon glyphicon-trash"></span>&nbsp;回收站</span>';
+		var trash = '<span id="recycle_bin" onclick="recycleBin(\'open\')" title="回收站" style="position: absolute; border-color: #ccc; right: 77px;">\
+			<span class="glyphicon glyphicon-trash"></span>&nbsp;回收站</span>';
 		$("#comlist").html(LBody+trash);
 		isDiskWidth();
 	},'json');
@@ -975,13 +987,16 @@ function downloadFile(action){
 		title: lan.files.down_title,
 		content: '<form class="bt-form pd20">\
 					<div class="line">\
-					<span class="tname">URL地址:</span><input type="text" class="bt-input-text" name="url" id="mUrl" placeholder="URL地址" style="width:330px" />\
+						<span class="tname">URL地址:</span>\
+						<input type="text" class="bt-input-text" name="url" id="mUrl" placeholder="URL地址" style="width:330px" />\
 					</div>\
 					<div class="line">\
-					<span class="tname ">下载到:</span><input type="text" class="bt-input-text" name="path" id="dpath" value="'+path+'" placeholder="下载到" style="width:330px" />\
+						<span class="tname ">下载到:</span>\
+						<input type="text" class="bt-input-text" name="path" id="dpath" value="'+path+'" placeholder="下载到" style="width:330px" />\
 					</div>\
 					<div class="line">\
-					<span class="tname">文件名:</span><input type="text" class="bt-input-text" name="filename" id="dfilename" value="" placeholder="文件名" style="width:330px" />\
+						<span class="tname">文件名:</span>\
+						<input type="text" class="bt-input-text" name="filename" id="dfilename" value="" placeholder="文件名" style="width:330px" />\
 					</div>\
 				</form>',
 		success:function(){
@@ -1176,7 +1191,9 @@ function zip(dirName,submits) {
 		content: '<div class="bt-form pd20 pb70">'
 					+'<div class="line noborder">'
 					+'<input type="text" class="form-control" id="sfile" value="' +param + '" placeholder="" style="display:none" />'
-					+'<span>'+lan.files.zip_to+'</span><input type="text" class="bt-input-text" id="dfile" value="'+dirName + '.tar.gz" placeholder="'+lan.files.zip_to+'" style="width: 75%; display: inline-block; margin: 0px 10px 0px 20px;" /><span class="glyphicon glyphicon-folder-open cursor" onclick="ChangePath(\'dfile\')"></span>'
+					+'<span>'+lan.files.zip_to+'</span>\
+						<input type="text" class="bt-input-text" id="dfile" value="'+dirName + '.tar.gz" placeholder="'+lan.files.zip_to+'" style="width: 75%; display: inline-block; margin: 0px 10px 0px 20px;" />\
+						<span class="glyphicon glyphicon-folder-open cursor" onclick="changePath(\'dfile\')"></span>'
 					+'</div>'
 					+'<div class="bt-form-submit-btn">'
 					+'<button type="button" class="btn btn-danger btn-sm btn-title" onclick="layer.closeAll()">'+lan.public.close+'</button>'
@@ -1230,8 +1247,8 @@ function unZip(fileName,type) {
 		content: '<div class="bt-form pd20 pb70">'
 					+'<div class="line unzipdiv">'
 					+'<span class="tname">'+lan.files.unzip_name+'</span><input type="text" class="bt-input-text" id="sfile" value="' +fileName + '" placeholder="'+lan.files.unzip_name_title+'" style="width:330px" /></div>'
-					+'<div class="line"><span class="tname">'+lan.files.unzip_to+'</span><input type="text" class="bt-input-text" id="dfile" value="'+path + '" placeholder="'+lan.files.unzip_to+'" style="width:330px" /></div>' + umpass
-					+'<div class="line"><span class="tname">'+lan.files.unzip_coding+'</span><select class="bt-input-text" name="coding">'
+					+'<div class="line"><span class="tname">'+lan.files.unzip_to+'</span><input type="text" class="bt-input-text" id="dfile" value="'+path + '" placeholder="'+lan.files.unzip_to+'" style="width:330px" /></div>' 
+					+ umpass +'<div class="line"><span class="tname">'+lan.files.unzip_coding+'</span><select class="bt-input-text" name="coding">'
 						+'<option value="UTF-8">UTF-8</option>'
 						+'<option value="gb18030">GBK</option>'
 					+'</select>'
@@ -1255,7 +1272,8 @@ function isZip(fileName){
 
 //是否文本文件
 function isText(fileName){
-	var exts = ['rar','zip','tar.gz','gz','iso','xsl','doc','xdoc','jpeg','jpg','png','gif','bmp','tiff','exe','so','7z','bz'];
+	var exts = ['rar','zip','tar.gz','gz','iso','xsl','doc','xdoc','jpeg',
+		'jpg','png','gif','bmp','tiff','exe','so','7z','bz'];
 	return isExts(fileName,exts)?false:true;
 }
 
@@ -1446,36 +1464,63 @@ function onAccess(){
 		}
 	}
 }
+
+
 //右键菜单
-function RClick(type,path,name){
+function rightMenuClick(type,path,name){
+	console.log(type,path,name);
 	var displayZip = isZip(type);
 	var options = {items:[
-	  {text: lan.files.file_menu_copy, 	onclick: function() {copyFile(path)}},
-	  {text: lan.files.file_menu_mv, 	onclick: function() {cutFile(path)}},
-	  {text: lan.files.file_menu_rename, 	onclick: function() {reName(0,name)}},
-	  {text: lan.files.file_menu_auth, 	onclick: function() {setChmod(0,path)}},
-	  {text: lan.files.file_menu_zip, onclick: function() {zip(path)}}
-	  
+		{text: "复制", onclick: function() {copyFile(path)}},
+		{text: "剪切", 	onclick: function() {cutFile(path)}},
+		{text: "重命名", onclick: function() {reName(0,name)}},
+		{text: lan.files.file_menu_auth, onclick: function() {setChmod(0,path)}},
+	 	{text: lan.files.file_menu_zip, onclick: function() {zip(path)}},
 	]};
 	if(type == "dir"){
-		options.items.push({text: lan.files.file_menu_del, onclick: function() {DeleteDir(path)}});
+		options.items.push({text: lan.files.file_menu_del, onclick: function() {
+			deleteDir(path)}
+		});
 	}
 	else if(isText(type)){
-		options.items.push({text: lan.files.file_menu_edit, onclick: function() {onlineEditFile(0,path)}},{text: lan.files.file_menu_down, onclick: function() {GetFileBytes(path)}},{text: lan.files.file_menu_del, onclick: function() {deleteFile(path)}});
+		options.items.push({text: lan.files.file_menu_edit, onclick: function() {
+			onlineEditFile(0,path);
+		}},{text: lan.files.file_menu_down, onclick: function() {
+			getFileBytes(path);
+		}},{ text: lan.files.file_menu_del, onclick: function() {
+			deleteFile(path);
+		}});
 	}
 	else if(displayZip != -1){
-		options.items.push({text: lan.files.file_menu_unzip, onclick: function() {unZip(path,displayZip)}},{text: lan.files.file_menu_down, onclick: function() {GetFileBytes(path)}},{text: lan.files.file_menu_del, onclick: function() {deleteFile(path)}});
+		options.items.push({text: lan.files.file_menu_unzip, onclick: function() {
+			unZip(path,displayZip);
+		}},{text: lan.files.file_menu_down, onclick: function() {
+			getFileBytes(path);
+		}},{text: lan.files.file_menu_del, onclick: function() {
+			deleteFile(path);
+		}});
 	}
 	else if(isImage(type)){
-		options.items.push({text: lan.files.file_menu_img, onclick: function() {GetImage(path)}},{text: lan.files.file_menu_down, onclick: function() {GetFileBytes(path)}},{text: lan.files.file_menu_del, onclick: function() {deleteFile(path)}});
+		options.items.push({text: lan.files.file_menu_img, onclick: function() {
+			getImage(path);
+		}},{text: lan.files.file_menu_down, onclick: function() {
+			getFileBytes(path);
+		}},{text: lan.files.file_menu_del, onclick: function() {
+			deleteFile(path);
+		}});
 	}
 	else{
-		options.items.push({text: lan.files.file_menu_down, onclick: function() {GetFileBytes(path)}},{text: lan.files.file_menu_del, onclick: function() {deleteFile(path)}});
+		options.items.push({text: lan.files.file_menu_down, onclick: function() {
+			getFileBytes(path);
+		}},{text: lan.files.file_menu_del, onclick: function() {
+			deleteFile(path);
+		}});
 	}
 	return options;
 }
+
 //右键批量操作
-function RClickAll(e){
+function rightMenuClickAll(e){
 	var menu = $("#rmenu");
 	var windowWidth = $(window).width(),
 		windowHeight = $(window).height(),
