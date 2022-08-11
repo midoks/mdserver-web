@@ -74,7 +74,7 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ### 版本更新 0.9.2
 
 * 批量域名添加修复。
-* 常用命令说命。
+* 常用命令说明。
 
 ### JSDelivr安装地址
 
