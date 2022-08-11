@@ -22,6 +22,7 @@
 
 - 吹水组 - https://t.me/mdserver_web
 - [兼容性测试报告](/compatibility.md)
+- [常用命令说明](/cmd.md)
 
 ### 主要插件介绍
 
