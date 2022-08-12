@@ -625,13 +625,13 @@ class system_api:
     def getServerInfo(self):
         import urllib.request
         import ssl
-        upAddr = 'https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/version/info.json'
+        upAddr = 'https://api.github.com/repos/midoks/mdserver-web/releases/latest'
         try:
             context = ssl._create_unverified_context()
             req = urllib.request.urlopen(upAddr, context=context, timeout=3)
             result = req.read().decode('utf-8')
             version = json.loads(result)
-            return version[0]
+            return version
         except Exception as e:
             print('getServerInfo', e)
         return {}
@@ -645,11 +645,11 @@ class system_api:
             if stype == 'check':
                 version_now = config_api.config_api().getVersion()
                 version_new_info = self.getServerInfo()
-                if not 'version' in version_new_info:
+                if not 'name' in version_new_info:
                     return mw.returnJson(False, '服务器数据或网络有问题!')
 
                 diff = self.versionDiff(
-                    version_now, version_new_info['version'])
+                    version_now, version_new_info['tag_name'])
                 if diff == 'new':
                     return mw.returnJson(True, '有新版本!', version_new_info['version'])
                 elif diff == 'test':
