@@ -77,6 +77,7 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 * 常用命令说明。
 * 重写页面更新功能。
 * MySQL8.0安装地址修改。
+* 删除MySQL[Yum]插件。
 
 ### JSDelivr安装地址
 
