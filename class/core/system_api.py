@@ -685,19 +685,26 @@ class system_api:
 
                 newUrl = "https://github.com/midoks/mdserver-web/archive/refs/tags/" + version + ".zip"
 
-                r = mw.execShell('wget -O ' + toPath + '/mw.zip ' + newUrl)
+                dist_mw = toPath + '/mw.zip'
+                if not os.path.exists(dist_mw):
+                    mw.execShell('wget -O ' + dist_mw + ' ' + newUrl)
 
-                mw.execShell('unzip -o ' + toPath +
-                             '/mw.zip' + ' -d ' + toPath)
+                dist_to = toPath + "/mdserver-web-" + version
+                if not os.path.exists(dist_to):
+                    mw.execShell('unzip -o ' + toPath +
+                                 '/mw.zip' + ' -d ' + toPath)
 
                 cmd_cp = "cp -rf " + toPath + '/mdserver-web-' + \
                     version + "/* " + mw.getRootDir() + "/mdserver-web"
 
-                mw.execShell(cmd_cp)
+                rcp = mw.execShell(cmd_cp)
+                print(rcp)
+                return mw.returnJson(True, "debug")
+
                 mw.execShell('rm -rf ' + toPath + '/mdserver-web-' + version)
                 mw.execShell('rm -rf ' + toPath + '/mw.zip')
 
-                self.restartMw()
+                # self.restartMw()
                 return mw.returnJson(True, '安装更新成功,需自己重启!')
 
             return mw.returnJson(False, '已经是最新,无需更新!')
