@@ -1,5 +1,9 @@
 [
     {
+        "version": "0.9.3",
+        "content": "* 关闭页面更新功能",
+    },
+    {
         "version": "0.9.2",
         "content": "* 批量域名添加修复。<br/> * 常用命令说明。",
         "path": "https://github.com/midoks/mdserver-web/releases/download/0.9.2/mdserver-web.zip"
