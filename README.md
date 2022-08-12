@@ -1,4 +1,4 @@
-### mdserver-web 0.9.1
+### mdserver-web 0.9.2
 
 简单的Linux面板,感谢BT.CN写出如此好的web管理软件。我一看到，就知道这是我一直想要的页面化管理方式。
 复制了后台管理界面，按照自己想要的方式写了一版。
@@ -22,6 +22,7 @@
 
 - 吹水组 - https://t.me/mdserver_web
 - [兼容性测试报告](/compatibility.md)
+- [常用命令说明](/cmd.md)
 
 ### 主要插件介绍
 
@@ -70,10 +71,10 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.9.1
+### 版本更新 0.9.2
 
-* 菜单修复.
-* 更新修复.
+* 批量域名添加修复。
+* 常用命令说明。
 
 ### JSDelivr安装地址
 
