@@ -32,8 +32,8 @@ fi
 
 if [ "${action}" == "uninstall" ];then
 	
-	cd ${rootPath} && python3 ${rootPath}/plugins/mysql-yum/index.py stop ${type}
-	cd ${rootPath} && python3 ${rootPath}/plugins/mysql-yum/index.py initd_uninstall ${type}
+	cd ${rootPath} && python3 plugins/mysql-yum/index.py stop ${type}
+	cd ${rootPath} && python3 plugins/mysql-yum/index.py initd_uninstall ${type}
 	cd $curPath
 fi
 
@@ -41,6 +41,6 @@ sh -x $curPath/versions/$2/install.sh $1
 
 if [ "${action}" == "install" ];then
 # 	#初始化 
-	cd ${rootPath} && python3 ${rootPath}/plugins/mysql-yum/index.py start ${type}
-	cd ${rootPath} && python3 ${rootPath}/plugins/mysql-yum/index.py initd_install ${type}
+	cd ${rootPath} && python3 plugins/mysql-yum/index.py start ${type}
+	cd ${rootPath} && python3 plugins/mysql-yum/index.py initd_install ${type}
 fi
