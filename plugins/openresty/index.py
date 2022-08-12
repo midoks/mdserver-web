@@ -296,12 +296,6 @@ def errorLogPath():
     return getServerDir() + '/nginx/logs/error.log'
 
 
-def installPreInspection():
-    check_op = mw.getServerDir() + "/openresty"
-    if not os.path.exists(check_op):
-        return "请先安装OpenResty"
-    return 'ok'
-
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -320,8 +314,6 @@ if __name__ == "__main__":
         print(initdInstall())
     elif func == 'initd_uninstall':
         print(initdUinstall())
-    elif func == 'install_pre_inspection':
-        print(installPreInspection())
     elif func == 'conf':
         print(getConf())
     elif func == 'get_os':
