@@ -695,16 +695,14 @@ class system_api:
                                  '/mw.zip' + ' -d ' + toPath)
 
                 cmd_cp = "cp -rf " + toPath + '/mdserver-web-' + \
-                    version + "/* " + mw.getRootDir() + "/mdserver-web"
+                    version + "/* " + mw.getServerDir() + "/mdserver-web"
 
                 rcp = mw.execShell(cmd_cp)
-                print(rcp)
-                return mw.returnJson(True, "debug")
 
                 mw.execShell('rm -rf ' + toPath + '/mdserver-web-' + version)
                 mw.execShell('rm -rf ' + toPath + '/mw.zip')
 
-                # self.restartMw()
+                self.restartMw()
                 return mw.returnJson(True, '安装更新成功,需自己重启!')
 
             return mw.returnJson(False, '已经是最新,无需更新!')
