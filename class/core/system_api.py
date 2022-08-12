@@ -625,13 +625,13 @@ class system_api:
     def getServerInfo(self):
         import urllib.request
         import ssl
-        upAddr = 'https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/version/info.json'
+        upAddr = 'https://api.github.com/repos/midoks/mdserver-web/releases/latest'
         try:
             context = ssl._create_unverified_context()
             req = urllib.request.urlopen(upAddr, context=context, timeout=3)
             result = req.read().decode('utf-8')
             version = json.loads(result)
-            return version[0]
+            return version
         except Exception as e:
             print('getServerInfo', e)
         return {}
@@ -642,58 +642,69 @@ class system_api:
             if not mw.isRestart():
                 return mw.returnJson(False, '请等待所有安装任务完成再执行!')
 
+            version_new_info = self.getServerInfo()
+            version_now = config_api.config_api().getVersion()
+
+            new_ver = version_new_info['name']
+
             if stype == 'check':
-                version_now = config_api.config_api().getVersion()
-                version_new_info = self.getServerInfo()
-                if not 'version' in version_new_info:
+                if not 'name' in version_new_info:
                     return mw.returnJson(False, '服务器数据或网络有问题!')
 
-                diff = self.versionDiff(
-                    version_now, version_new_info['version'])
+                diff = self.versionDiff(version_now, new_ver)
                 if diff == 'new':
-                    return mw.returnJson(True, '有新版本!', version_new_info['version'])
+                    return mw.returnJson(True, '有新版本!', new_ver)
                 elif diff == 'test':
-                    return mw.returnJson(True, '有测试版本!', version_new_info['version'])
+                    return mw.returnJson(True, '有测试版本!', new_ver)
                 else:
                     return mw.returnJson(False, '已经是最新,无需更新!')
 
             if stype == 'info':
-                version_new_info = self.getServerInfo()
-                version_now = config_api.config_api().getVersion()
-
-                if not 'version' in version_new_info:
+                if not 'name' in version_new_info:
                     return mw.returnJson(False, '服务器数据有问题!')
-                diff = self.versionDiff(
-                    version_now, version_new_info['version'])
-                return mw.returnJson(True, '更新信息!', version_new_info)
+                diff = self.versionDiff(version_now, new_ver)
+                data = {}
+                data['version'] = new_ver
+                data['content'] = version_new_info[
+                    'body'].replace("\n", "<br/>")
+                return mw.returnJson(True, '更新信息!', data)
 
             if stype == 'update':
                 if version == '':
                     return mw.returnJson(False, '缺少版本信息!')
 
-                v_new_info = self.getServerInfo()
-                if v_new_info['version'] != version:
+                if new_ver != version:
                     return mw.returnJson(False, '更新失败,请重试!')
 
-                if not 'path' in v_new_info or v_new_info['path'] == '':
-                    return mw.returnJson(False, '下载地址不存在!')
-
-                newUrl = v_new_info['path']
                 toPath = mw.getRootDir() + '/temp'
                 if not os.path.exists(toPath):
                     mw.execShell('mkdir -p ' + toPath)
 
-                mw.execShell('wget -O ' + toPath + '/mw.zip ' + newUrl)
+                newUrl = "https://github.com/midoks/mdserver-web/archive/refs/tags/" + version + ".zip"
 
-                mw.execShell('unzip -o ' + toPath + '/mw.zip' + ' -d ./')
-                mw.execShell('unzip -o mw.zip -d ./')
-                mw.execShell('rm -f mw.zip')
+                dist_mw = toPath + '/mw.zip'
+                if not os.path.exists(dist_mw):
+                    mw.execShell('wget -O ' + dist_mw + ' ' + newUrl)
+
+                dist_to = toPath + "/mdserver-web-" + version
+                if not os.path.exists(dist_to):
+                    mw.execShell('unzip -o ' + toPath +
+                                 '/mw.zip' + ' -d ' + toPath)
+
+                cmd_cp = "cp -rf " + toPath + '/mdserver-web-' + \
+                    version + "/* " + mw.getServerDir() + "/mdserver-web"
+                mw.execShell(cmd_cp)
+
+                mw.execShell('rm -rf ' + toPath + '/mdserver-web-' + version)
+                mw.execShell('rm -rf ' + toPath + '/mw.zip')
+
+                self.restartMw()
                 return mw.returnJson(True, '安装更新成功,需自己重启!')
 
             return mw.returnJson(False, '已经是最新,无需更新!')
         except Exception as ex:
-            print('updateServer', ex)
-            return mw.returnJson(False, "连接服务器失败!")
+            # print('updateServer', ex)
+            return mw.returnJson(False, "连接服务器失败!" + str(ex))
 
     # 修复面板
     def repPanel(self, get):
