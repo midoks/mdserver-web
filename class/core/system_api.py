@@ -696,8 +696,7 @@ class system_api:
 
                 cmd_cp = "cp -rf " + toPath + '/mdserver-web-' + \
                     version + "/* " + mw.getServerDir() + "/mdserver-web"
-
-                rcp = mw.execShell(cmd_cp)
+                mw.execShell(cmd_cp)
 
                 mw.execShell('rm -rf ' + toPath + '/mdserver-web-' + version)
                 mw.execShell('rm -rf ' + toPath + '/mw.zip')
