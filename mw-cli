@@ -48,6 +48,11 @@ def mw_reset_pwd():
 
 
 if __name__ == '__main__':
+
+    if os.geteuid() != 0:
+        print("请使用root账户执行该命令.")
+        sys.exit(1)
+
     os.chdir("/www/server/mdserver-web")
     sys.path.append(os.getcwd() + "/class/core")
 
