@@ -12,6 +12,37 @@ config = C:read_file_body_decode(cpath .. 'config.json')
 local site_config = C:read_file_body_decode(cpath .. 'site.json')
 C:setConfData(config, site_config)
 
+-- D func
+local function D(msg)
+    local _msg = ''
+    if type(msg) == 'table' then
+        for key, val in pairs(msg) do
+            _msg = key..':'..val.."\n"
+        end
+    elseif type(msg) == 'string' then
+        _msg = msg
+     elseif type(msg) == 'nil' then
+        _msg = 'nil'
+    else
+        _msg = msg
+    end
+
+    if not debug_mode then return true end
+    local fp = io.open(cpath..'debug.log', 'ab')
+    if fp == nil then
+        return nil
+    end
+    local localtime = os.date("%Y-%m-%d %H:%M:%S")
+    if server_name then
+        fp:write(tostring(_msg) .. "\n")
+    else
+        fp:write(localtime..":"..tostring(_msg) .. "\n")
+    end
+    fp:flush()
+    fp:close()
+    return true
+end
+
 function initParams()
     local data = {}
     data['ip'] = C:get_client_ip()
@@ -314,6 +345,7 @@ end
 function  post_data_chekc()
     if params['method'] =="POST" then
         if C:return_post_data() then return false end
+        ngx.req.read_body()
         request_args = ngx.req.get_post_args()
         if not request_args then return false end
 
