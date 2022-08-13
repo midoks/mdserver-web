@@ -5,6 +5,7 @@ import io
 import os
 import time
 import re
+import json
 
 sys.path.append(os.getcwd() + "/class/core")
 import mw
@@ -42,6 +43,13 @@ def getArgs():
             tmp[t[0]] = t[1]
 
     return tmp
+
+
+def checkArgs(data, ck=[]):
+    for i in range(len(ck)):
+        if not ck[i] in data:
+            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
+    return (True, mw.returnJson(True, 'ok'))
 
 
 def getConf():
@@ -107,7 +115,42 @@ def contentReplace(content):
     content = content.replace('{$PHP_CONF_PATH}', php_conf_dir)
     content = content.replace('{$PHP_VER}', php_ver)
     content = content.replace('{$BLOWFISH_SECRET}', blowfish_secret)
+
+    cfg = getCfg()
+    if (cfg['choose'] == ""):
+        content = content.replace('{$CHOOSE_DB}', 'mysql')
+        content = content.replace('{$CHOOSE_DB_DIR}', 'mysql')
+    else:
+        content = content.replace('{$CHOOSE_DB}', 'MariaDB')
+        content = content.replace('{$CHOOSE_DB_DIR}', 'mariadb')
+
     return content
+
+
+def initCfg():
+    cfg = getServerDir() + "/cfg.json"
+    if not os.path.exists(cfg):
+        data = {}
+        data['port'] = '888'
+        data['choose'] = ''
+        data['username'] = 'admin'
+        data['password'] = 'admin'
+        mw.writeFile(cfg, json.dumps(data))
+
+
+def setCfg(key, val):
+    cfg = getServerDir() + "/cfg.json"
+    data = mw.readFile(cfg)
+    data = json.loads(data)
+    data[key] = val
+    mw.writeFile(cfg, json.dumps(data))
+
+
+def getCfg():
+    cfg = getServerDir() + "/cfg.json"
+    data = mw.readFile(cfg)
+    data = json.loads(data)
+    return data
 
 
 def status():
@@ -120,6 +163,8 @@ def status():
 
 
 def start():
+    initCfg()
+
     file_tpl = getPluginDir() + '/conf/phpmyadmin.conf'
     file_run = getConf()
 
@@ -127,6 +172,14 @@ def start():
         centent = mw.readFile(file_tpl)
         centent = contentReplace(centent)
         mw.writeFile(file_run, centent)
+
+    pma_path = getServerDir() + '/pma.pass'
+    if not os.path.exists(pma_path):
+        username = mw.getRandomString(10)
+        pass_cmd = username + ':' + mw.hasPwd(username)
+        setCfg('username', username)
+        setCfg('password', username)
+        mw.writeFile(pma_path, pass_cmd)
 
     tmp = getServerDir() + '/phpmyadmin/tmp'
     if not os.path.exists(tmp):
@@ -179,12 +232,11 @@ def setPhpVer():
     file_tpl = getPluginDir() + '/conf/phpmyadmin.conf'
     file_run = getConf()
 
-    centent = mw.readFile(file_tpl)
-    centent = contentReplace(centent)
-    mw.writeFile(file_run, centent)
+    content = mw.readFile(file_tpl)
+    content = contentReplace(content)
+    mw.writeFile(file_run, content)
 
     mw.restartWeb()
-
     return 'ok'
 
 
@@ -193,6 +245,11 @@ def getSetPhpVer():
     if os.path.exists(cacheFile):
         return mw.readFile(cacheFile).strip()
     return ''
+
+
+def getPmaOption():
+    data = getCfg()
+    return mw.returnJson(True, 'ok', data)
 
 
 def getPmaPort():
@@ -206,8 +263,9 @@ def getPmaPort():
 
 def setPmaPort():
     args = getArgs()
-    if not 'port' in args:
-        return mw.returnJson(False, 'port missing!')
+    data = checkArgs(args, ['port'])
+    if not data[0]:
+        return data[1]
 
     port = args['port']
     if port == '80':
@@ -220,6 +278,63 @@ def setPmaPort():
     rep = 'listen\s*(.*);'
     content = re.sub(rep, "listen " + port + ';', content)
     mw.writeFile(file, content)
+    mw.restartWeb()
+    return mw.returnJson(True, '修改成功!')
+
+
+def setPmaChoose():
+    args = getArgs()
+    data = checkArgs(args, ['choose'])
+    if not data[0]:
+        return data[1]
+
+    choose = args['choose']
+    setCfg('choose', choose)
+
+    conf_run = getServerDir() + '/phpmyadmin/config.inc.php'
+    conf_tpl = getPluginDir() + '/conf/config.inc.php'
+    centent = mw.readFile(conf_tpl)
+    centent = contentReplace(centent)
+    mw.writeFile(conf_run, centent)
+
+    mw.restartWeb()
+    return mw.returnJson(True, '修改成功!')
+
+
+def setPmaUsername():
+    args = getArgs()
+    data = checkArgs(args, ['username'])
+    if not data[0]:
+        return data[1]
+
+    username = args['username']
+    setCfg('username', username)
+
+    cfg = getCfg()
+    pma_path = getServerDir() + '/pma.pass'
+    username = mw.getRandomString(10)
+    pass_cmd = cfg['username'] + ':' + cfg['password']
+    mw.writeFile(pma_path, pass_cmd)
+
+    mw.restartWeb()
+    return mw.returnJson(True, '修改成功!')
+
+
+def setPmaPassword():
+    args = getArgs()
+    data = checkArgs(args, ['password'])
+    if not data[0]:
+        return data[1]
+
+    password = args['password']
+    setCfg('password', password)
+
+    cfg = getCfg()
+    pma_path = getServerDir() + '/pma.pass'
+    username = mw.getRandomString(10)
+    pass_cmd = cfg['username'] + ':' + cfg['password']
+    mw.writeFile(pma_path, pass_cmd)
+
     mw.restartWeb()
     return mw.returnJson(True, '修改成功!')
 
@@ -264,6 +379,14 @@ if __name__ == "__main__":
         print(getPmaPort())
     elif func == 'set_pma_port':
         print(setPmaPort())
+    elif func == 'get_pma_option':
+        print(getPmaOption())
+    elif func == 'set_pma_choose':
+        print(setPmaChoose())
+    elif func == 'set_pma_username':
+        print(setPmaUsername())
+    elif func == 'set_pma_password':
+        print(setPmaUsername())
     elif func == 'access_log':
         print(accessLog())
     elif func == 'error_log':
