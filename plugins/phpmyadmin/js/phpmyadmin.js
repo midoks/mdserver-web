@@ -90,24 +90,68 @@ function phpVerChange(type, msg) {
 
 //phpmyadmin安全设置
 function safeConf() {
-    var data = pmaAsyncPost('get_pma_port');
-    var rdata = $.parseJSON(data.data);
-    if (!rdata.status){
-        layer.msg(rdata.msg,{icon:2,time:2000,shade: [0.3, '#000']});
-        return;
-    }
-    var con = '<div class="ver line">\
-                    <span style="margin-right:10px">访问端口</span>\
-                    <input class="bt-input-text phpmyadmindk mr20" name="Name" id="pmport" value="' + rdata['data'] + '" placeholder="phpmyadmin访问端口" maxlength="5" type="number">\
-                    <button class="btn btn-success btn-sm" onclick="phpmyadminPort()">保存</button>\
+    pmaPost('get_pma_option', {}, function(rdata){
+        var rdata = $.parseJSON(rdata.data);
+        if (!rdata.status){
+            layer.msg(rdata.msg,{icon:2,time:2000,shade: [0.3, '#000']});
+            return;
+        }
+
+        var cfg = rdata.data;
+        var con = '<div class="ver line">\
+                    <span class="tname">访问端口</span>\
+                    <input style="width:110px" class="bt-input-text phpmyadmindk mr20" name="Name" id="pmport" value="' + cfg['port'] + '" placeholder="phpmyadmin访问端口" maxlength="5" type="number">\
+                    <button class="btn btn-success btn-sm" onclick="setPamPort()">保存</button>\
+                </div>\
+                <div class="ver line">\
+                    <span class="tname">访问切换</span>\
+                    <select id="access_choose" class="bt-input-text mr20" name="choose" style="width:110px">\
+                        <option value="mariadb" '+(cfg['choose']=="mariadb"?"selected='selected'":"")+'>MariaDB</option>\
+                        <option value="mysql" '+ (cfg['choose']==""?"selected='selected'":"")+'>MySQL</option>\
+                    </select>\
+                    <button class="btn btn-success btn-sm" onclick="setPmaChoose()">保存</button>\
+                </div>\
+                <div class="ver line">\
+                    <span class="tname">用户名</span>\
+                    <input style="width:110px" class="bt-input-text mr20" name="username" id="pmport" value="' + cfg['username'] + '" placeholder="认证用户名" type="text">\
+                    <button class="btn btn-success btn-sm" onclick="setPmaUsername()">保存</button>\
+                </div>\
+                <div class="ver line">\
+                    <span class="tname">密码</span>\
+                    <input style="width:110px" class="bt-input-text mr20" name="password" id="pmport" value="' + cfg['password'] + '" placeholder="密码" type="text">\
+                    <button class="btn btn-success btn-sm" onclick="setPmaPassword()">保存</button>\
                 </div>';
-    $(".soft-man-con").html(con);
+        $(".soft-man-con").html(con);
+    });
 }
 
 
+function setPmaChoose(){
+    var choose = $("#access_choose").val();
+    pmaPost('set_pma_choose',{'choose':choose}, function(data){
+        var rdata = $.parseJSON(data.data);
+        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+    });
+}
+
+function setPmaUsername(){
+    var username = $("input[name=username]").val();
+    pmaPost('set_pma_username',{'username':username}, function(data){
+        var rdata = $.parseJSON(data.data);
+        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+    });
+}
+
+function setPmaPassword(){
+    var password = $("input[name=password]").val();
+    pmaPost('set_pma_password',{'password':password}, function(data){
+        var rdata = $.parseJSON(data.data);
+        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+    });
+}
 
 //修改phpmyadmin端口
-function phpmyadminPort() {
+function setPamPort() {
     var pmport = $("#pmport").val();
     if (pmport < 80 || pmport > 65535) {
         layer.msg('端口范围不合法!', { icon: 2 });

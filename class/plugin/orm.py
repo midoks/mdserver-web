@@ -11,6 +11,7 @@ class ORM:
     __DB_PASS = None
     __DB_USER = 'root'
     __DB_PORT = 3306
+    __DB_NAME = ''
     __DB_HOST = 'localhost'
     __DB_CONN = None
     __DB_CUR = None
@@ -27,21 +28,25 @@ class ORM:
             if os.path.exists(self.__DB_SOCKET):
                 try:
                     self.__DB_CONN = pymysql.connect(host=self.__DB_HOST, user=self.__DB_USER, passwd=self.__DB_PASS,
+                                                     database=self.__DB_NAME,
                                                      port=int(self.__DB_PORT), charset=self.__DB_CHARSET, connect_timeout=1,
                                                      unix_socket=self.__DB_SOCKET, cursorclass=pymysql.cursors.DictCursor)
                 except Exception as e:
                     self.__DB_HOST = '127.0.0.1'
                     self.__DB_CONN = pymysql.connect(host=self.__DB_HOST, user=self.__DB_USER, passwd=self.__DB_PASS,
+                                                     database=self.__DB_NAME,
                                                      port=int(self.__DB_PORT), charset=self.__DB_CHARSET, connect_timeout=1,
                                                      unix_socket=self.__DB_SOCKET, cursorclass=pymysql.cursors.DictCursor)
             else:
                 try:
                     self.__DB_CONN = pymysql.connect(host=self.__DB_HOST, user=self.__DB_USER, passwd=self.__DB_PASS,
+                                                     database=self.__DB_NAME,
                                                      port=int(self.__DB_PORT), charset=self.__DB_CHARSET, connect_timeout=1,
                                                      cursorclass=pymysql.cursors.DictCursor)
                 except Exception as e:
                     self.__DB_HOST = '127.0.0.1'
                     self.__DB_CONN = pymysql.connect(host=self.__DB_HOST, user=self.__DB_USER, passwd=self.__DB_PASS,
+                                                     database=self.__DB_NAME,
                                                      port=int(self.__DB_PORT), charset=self.__DB_CHARSET, connect_timeout=1,
                                                      cursorclass=pymysql.cursors.DictCursor)
 
@@ -68,6 +73,9 @@ class ORM:
 
     def getPwd(self):
         return self.__DB_PASS
+
+    def setDbName(self, name):
+        self.__DB_NAME = name
 
     def execute(self, sql):
         # 执行SQL语句返回受影响行
