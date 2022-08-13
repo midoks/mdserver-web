@@ -313,7 +313,7 @@ def setPmaUsername():
     cfg = getCfg()
     pma_path = getServerDir() + '/pma.pass'
     username = mw.getRandomString(10)
-    pass_cmd = cfg['username'] + ':' + cfg['password']
+    pass_cmd = cfg['username'] + ':' + mw.hasPwd(cfg['password'])
     mw.writeFile(pma_path, pass_cmd)
 
     mw.restartWeb()
@@ -332,7 +332,7 @@ def setPmaPassword():
     cfg = getCfg()
     pma_path = getServerDir() + '/pma.pass'
     username = mw.getRandomString(10)
-    pass_cmd = cfg['username'] + ':' + cfg['password']
+    pass_cmd = cfg['username'] + ':' + mw.hasPwd(cfg['password'])
     mw.writeFile(pma_path, pass_cmd)
 
     mw.restartWeb()
@@ -386,7 +386,7 @@ if __name__ == "__main__":
     elif func == 'set_pma_username':
         print(setPmaUsername())
     elif func == 'set_pma_password':
-        print(setPmaUsername())
+        print(setPmaPassword())
     elif func == 'access_log':
         print(accessLog())
     elif func == 'error_log':
