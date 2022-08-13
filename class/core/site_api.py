@@ -1140,10 +1140,10 @@ class site_api:
             if conf.find(rep) == -1:
                 rep = '#error_page 404/404.html;'
             data = '''
-    # AUTH_START
+    #AUTH_START
     auth_basic "Authorization";
     auth_basic_user_file %s;
-    # AUTH_END''' % (filename,)
+    #AUTH_END''' % (filename,)
             conf = conf.replace(rep, rep + data)
             mw.writeFile(configFile, conf)
         # 写密码配置
