@@ -135,7 +135,7 @@ function setPmaChoose(){
 }
 
 function setPmaUsername(){
-    var password = $("input[name=username]").val();
+    var username = $("input[name=username]").val();
     pmaPost('set_pma_username',{'username':username}, function(data){
         var rdata = $.parseJSON(data.data);
         layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
