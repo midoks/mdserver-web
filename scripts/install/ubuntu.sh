@@ -10,6 +10,7 @@ fi
 
 
 apt update -y
+apt-get update -y 
 
 apt install -y wget curl lsof unzip
 apt install -y python3-pip
