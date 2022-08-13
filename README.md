@@ -76,7 +76,6 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 * 修复maridb的用户管理。
 * OP防火墙优化。
 * phpmyadmin插件优化。
-* 
 
 
 ### JSDelivr安装地址
