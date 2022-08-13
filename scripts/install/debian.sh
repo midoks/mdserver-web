@@ -17,6 +17,7 @@ if grep -Eq "Debian" /etc/*-release; then
 fi
 
 apt update -y
+apt-get update -y 
 
 
 apt install -y wget curl lsof unzip
