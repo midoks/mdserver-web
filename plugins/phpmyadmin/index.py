@@ -153,6 +153,12 @@ def getCfg():
     return data
 
 
+def returnCfg():
+    cfg = getServerDir() + "/cfg.json"
+    data = mw.readFile(cfg)
+    return data
+
+
 def status():
     conf = getConf()
     conf_inc = getServerDir() + '/phpmyadmin/config.inc.php'
@@ -367,6 +373,8 @@ if __name__ == "__main__":
         print(getConf())
     elif func == 'version':
         print(Version())
+    elif func == 'get_cfg':
+        print(returnCfg())
     elif func == 'config_inc':
         print(getConfInc())
     elif func == 'get_home_page':
