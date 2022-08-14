@@ -628,12 +628,17 @@ function setDbPass(id, username, password){
                     </div>\
                     <div class='line'>\
                     <span class='tname'>密码</span>\
-                    <div class='info-r'><input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:330px' value='"+password+"' /><span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatPwd(16)'></span></div>\
+                    <div class='info-r'>\
+                        <input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:330px' value='"+password+"' />\
+                        <span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatPwd(16)'></span></div>\
                     </div>\
                     <input type='hidden' name='id' value='"+id+"'>\
                   </form>",
         yes:function(index){
-            var data = $("#mod_pwd").serialize();
+            var data = {};
+            data['name'] = $('input[name=name]').val();
+            data['password'] = $('#MyPassword').val();
+            data['id'] = $('input[name=id]').val();
             myPost('set_user_pwd', data, function(data){
                 var rdata = $.parseJSON(data.data);
                 showMsg(rdata.msg,function(){
