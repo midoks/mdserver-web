@@ -86,7 +86,7 @@ Install_app()
 		make -j${cpuCore} && make install && make clean
 
 		if [ -d $serverPath/mariadb ];then
-			echo '10.7' > $serverPath/mariadb/version.pl
+			echo '10.8' > $serverPath/mariadb/version.pl
 			echo '安装完成' > $install_tmp
 		else
 			# rm -rf ${mariadbDir}/mariadb-${MY_VER}
