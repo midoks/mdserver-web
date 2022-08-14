@@ -75,7 +75,7 @@ Install_app()
 	INSTALL_CMD=cmake
 	CMAKE3=`which cmake3`
 	if [ "$?" == "0" ];then
-		INSTALL_CMD='cmake3'
+		INSTALL_CMD=cmake3
 	fi
 
 	if [ ! -d $serverPath/mariadb ];then
