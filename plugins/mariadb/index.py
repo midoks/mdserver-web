@@ -632,7 +632,7 @@ def isSqlError(mysqlMsg):
 
 
 def __createUser(dbname, username, password, address):
-    pdb = pMysqlDb()
+    pdb = pMysqlDb('mysql')
 
     if username == 'root':
         dbname = '*'
