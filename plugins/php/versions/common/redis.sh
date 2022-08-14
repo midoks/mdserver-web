@@ -12,7 +12,7 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
 LIBNAME=redis
-LIBV=5.3.7
+LIBV=5.3.6
 sysName=`uname`
 actionType=$1
 version=$2
