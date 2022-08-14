@@ -1038,7 +1038,7 @@ def delDb():
         id = args['id']
         name = args['name']
         psdb = pSqliteDb('databases')
-        pdb = pMysqlDb()
+        pdb = pMysqlDb('mysql')
         find = psdb.where("id=?", (id,)).field(
             'id,pid,name,username,password,accept,ps,addtime').find()
         accept = find['accept']
