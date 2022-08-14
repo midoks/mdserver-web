@@ -445,10 +445,9 @@ function syncToDatabase(type){
 
 function setRootPwd(type, pwd){
     if (type==1){
-        var data = $("#mod_pwd").serialize();
-        myPost('set_root_pwd', data, function(data){
+        var password = $("#MyPassword").val();
+        myPost('set_root_pwd', {password:password}, function(data){
             var rdata = $.parseJSON(data.data);
-            // console.log(rdata);
             showMsg(rdata.msg,function(){
                 dbList();
                 $('.layui-layer-close1').click();
@@ -459,26 +458,23 @@ function setRootPwd(type, pwd){
 
     var index = layer.open({
         type: 1,
-        skin: 'demo-class',
         area: '500px',
         title: '修改数据库密码',
         closeBtn: 1,
         shift: 5,
+        btn:["提交","关闭"],
         shadeClose: true,
-        content: "<form class='bt-form pd20 pb70' id='mod_pwd'>\
+        content: "<form class='bt-form pd20' id='mod_pwd'>\
                     <div class='line'>\
-                    <span class='tname'>root密码</span>\
-                    <div class='info-r'><input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:330px' value='"+pwd+"' /><span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatPwd(16)'></span></div>\
-                    </div>\
-                    <div class='bt-form-submit-btn'>\
-                        <button id='my_mod_close' type='button' class='btn btn-danger btn-sm btn-title'>关闭</button>\
-                        <button type='button' class='btn btn-success btn-sm btn-title' onclick=\"setRootPwd(1)\" >提交</button>\
+                        <span class='tname'>root密码</span>\
+                        <div class='info-r'><input class='bt-input-text mr5' type='text' name='password' id='MyPassword' style='width:330px' value='"+pwd+"' />\
+                            <span title='随机密码' class='glyphicon glyphicon-repeat cursor' onclick='repeatPwd(16)'></span>\
+                        </div>\
                     </div>\
                   </form>",
-    });
-
-    $('#my_mod_close').click(function(){
-        $('.layui-layer-close1').click();
+        yes:function(){
+            setRootPwd(1);
+        }
     });
 }
 
