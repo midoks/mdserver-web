@@ -1088,7 +1088,7 @@ def setDbAccess():
         return data[1]
     name = args['username']
     access = args['access']
-    pdb = pMysqlDb()
+    pdb = pMysqlDb('mysql')
     psdb = pSqliteDb('databases')
 
     dbname = psdb.where('username=?', (name,)).getField('name')
