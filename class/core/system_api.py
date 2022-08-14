@@ -684,8 +684,7 @@ class system_api:
 
                 dist_mw = toPath + '/mw.zip'
                 if not os.path.exists(dist_mw):
-                    mw.execShell(
-                        'wget --no-check-certificate -O ' + dist_mw + ' ' + newUrl)
+                    mw.execShell('wget -O ' + dist_mw + ' ' + newUrl)
 
                 dist_to = toPath + "/mdserver-web-" + version
                 if not os.path.exists(dist_to):
