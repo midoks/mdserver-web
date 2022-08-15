@@ -684,22 +684,23 @@ class system_api:
 
                 dist_mw = toPath + '/mw.zip'
                 if not os.path.exists(dist_mw):
-                    mw.execShell('wget -O ' + dist_mw + ' ' + newUrl)
+                    mw.execShell(
+                        'wget --no-check-certificate -O ' + dist_mw + ' ' + newUrl)
 
                 dist_to = toPath + "/mdserver-web-" + version
                 if not os.path.exists(dist_to):
-                    mw.execShell('unzip -o ' + toPath +
-                                 '/mw.zip' + ' -d ' + toPath)
+                    os.system('unzip -o ' + toPath +
+                              '/mw.zip' + ' -d ' + toPath)
 
-                cmd_cp = "cp -rf " + toPath + '/mdserver-web-' + \
-                    version + "/* " + mw.getServerDir() + "/mdserver-web"
+                cmd_cp = 'cp -rf ' + toPath + '/mdserver-web-' + \
+                    version + '/* ' + mw.getServerDir() + '/mdserver-web'
                 mw.execShell(cmd_cp)
 
                 mw.execShell('rm -rf ' + toPath + '/mdserver-web-' + version)
                 mw.execShell('rm -rf ' + toPath + '/mw.zip')
 
                 self.restartMw()
-                return mw.returnJson(True, '安装更新成功,需自己重启!')
+                return mw.returnJson(True, '安装更新成功!')
 
             return mw.returnJson(False, '已经是最新,无需更新!')
         except Exception as ex:

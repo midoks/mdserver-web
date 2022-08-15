@@ -71,10 +71,15 @@ Install_app()
 	if [ "$sysName" == "Darwin" ];then
 		OPTIONS='-DPLUGIN_TOKUDB=NO'
 	fi
-	
+
+	INSTALL_CMD=cmake
+	CMAKE3=`which cmake3`
+	if [ "$?" == "0" ];then
+		INSTALL_CMD=cmake3
+	fi
 
 	if [ ! -d $serverPath/mariadb ];then
-		cd ${mariadbDir}/mariadb-${MY_VER} && cmake \
+		cd ${mariadbDir}/mariadb-${MY_VER} && $INSTALL_CMD \
 		-DCMAKE_INSTALL_PREFIX=$serverPath/mariadb \
 		-DMYSQL_DATADIR=$serverPath/mariadb/data/ \
 		-DMYSQL_USER=mysql \

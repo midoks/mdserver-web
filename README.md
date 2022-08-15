@@ -1,4 +1,4 @@
-### mdserver-web 0.9.4
+### mdserver-web 0.9.5
 
 简单的Linux面板,感谢BT.CN写出如此好的web管理软件。我一看到，就知道这是我一直想要的页面化管理方式。
 复制了后台管理界面，按照自己想要的方式写了一版。
@@ -71,11 +71,13 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.9.4
+### 版本更新 0.9.5
 
-* 修复maridb的用户管理。
-* OP防火墙优化。
-* phpmyadmin插件优化。
+* 页面更新优化[2].
+* 修复maridb的用户管理[2].
+* Gogs初始化提示更人性.
+* MySQL&&MariaDB修改密码修复.
+* MySQL&&MariaDB导入修复.
 
 
 ### JSDelivr安装地址

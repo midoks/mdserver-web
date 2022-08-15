@@ -632,7 +632,7 @@ def isSqlError(mysqlMsg):
 
 
 def __createUser(dbname, username, password, address):
-    pdb = pMysqlDb()
+    pdb = pMysqlDb('mysql')
 
     if username == 'root':
         dbname = '*'
@@ -692,8 +692,8 @@ def importDbBackup():
         mw.execShell(cmd)
 
     pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
-
-    mysql_cmd = mw.getRootDir() + '/server/mysql/bin/mysql -uroot -p' + pwd + \
+    sock = getSocketFile()
+    mysql_cmd = getServerDir() + '/bin/mysql -S ' + sock + ' -uroot -p' + pwd + \
         ' ' + name + ' < ' + file_path_sql
 
     # print(mysql_cmd)
@@ -1038,7 +1038,7 @@ def delDb():
         id = args['id']
         name = args['name']
         psdb = pSqliteDb('databases')
-        pdb = pMysqlDb()
+        pdb = pMysqlDb('mysql')
         find = psdb.where("id=?", (id,)).field(
             'id,pid,name,username,password,accept,ps,addtime').find()
         accept = find['accept']
@@ -1088,7 +1088,7 @@ def setDbAccess():
         return data[1]
     name = args['username']
     access = args['access']
-    pdb = pMysqlDb()
+    pdb = pMysqlDb('mysql')
     psdb = pSqliteDb('databases')
 
     dbname = psdb.where('username=?', (name,)).getField('name')

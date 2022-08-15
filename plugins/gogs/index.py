@@ -388,7 +388,7 @@ def postReceiveLog():
 def getGogsConf():
     conf = getConf()
     if not os.path.exists(conf):
-        return mw.returnJson(False, "请先安装初始化!")
+        return mw.returnJson(False, "请先安装初始化!<br/>默认地址:http://" + mw.getLocalIp() + ":3000")
 
     gets = [
         {'name': 'DOMAIN', 'type': -1, 'ps': '服务器域名'},
@@ -455,7 +455,7 @@ def userList():
 
     conf = getConf()
     if not os.path.exists(conf):
-        return mw.returnJson(False, "请先安装初始化!")
+        return mw.returnJson(False, "请先安装初始化!<br/>默认地址:http://" + mw.getLocalIp() + ":3000")
 
     import math
     args = getArgs()
