@@ -203,6 +203,7 @@ function planAdd(){
 	$("#set-Config input[name='type']").val(type);
 	
 	var where1 = $("#ptime input[name='where1']").val();
+	
 	var is1;
 	var is2 = 1;
 	switch(type){
@@ -226,6 +227,7 @@ function planAdd(){
 		return;
 	}
 	
+	where1 = $('#excode_week b').attr('val');
 	$("#set-Config input[name='where1']").val(where1);
 	
 	var hour = $("#ptime input[name='hour']").val();
@@ -305,7 +307,9 @@ function planAdd(){
 	
 	$("#set-Config input[name='sName']").val(sName);
 	layer.msg('正在添加,请稍候...!',{icon:16,time:0,shade: [0.3, '#000']});
-	var data= $("#set-Config").serialize() + '&sBody='+sBody + '&urladdress=' + urladdress;
+	var data = $("#set-Config").serialize() + '&sBody='+sBody + '&urladdress=' + urladdress;
+
+	console.log(data);
 	$.post('/crontab/add',data,function(rdata){
 		if(!rdata.status) {
 			layer.msg(rdata.msg,{icon:2, time:2000});
@@ -469,9 +473,9 @@ function toBackup(type){
 			sOpt += '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="'+rdata.data[i].name+'">'+rdata.data[i].name+'['+rdata.data[i].ps+']</a></li>';			
 		}
 		
-		var orderOpt = ''
+		var orderOpt = '';
 		for (var i=0;i<rdata.orderOpt.length;i++){
-			orderOpt += '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="'+rdata.orderOpt[i].value+'">'+rdata.orderOpt[i].name+'</a></li>'
+			orderOpt += '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="'+rdata.orderOpt[i].name+'">'+rdata.orderOpt[i].title+'</a></li>'
 		}
 		
 
@@ -514,7 +518,7 @@ function editTaskInfo(id){
 	layer.msg('正在获取,请稍候...',{icon:16,time:0,shade: [0.3, '#000']});
 	$.post('/crontab/get_crond_find',{id:id},function(rdata){
 		layer.closeAll();
-		// console.log('init:', rdata);
+		// console.log('get_crond_find:', rdata);
 		var sTypeName = '',sTypeDom = '',cycleName = '',cycleDom = '',weekName = '',weekDom = '',sNameName ='',sNameDom = '',backupsName = '',backupsDom ='';
 		obj = {
 			from:{
@@ -557,10 +561,11 @@ function editTaskInfo(id){
 
 				if(obj.from.stype == 'site' || obj.from.stype == 'database' || obj.from.stype == 'path' || obj.from.stype == 'logs'){
 					$.post('/crontab/get_data_list',{type:obj.from.stype  == 'databases'?'database':'sites'},function(rdata){
+						// console.log(rdata);
 						obj.sNameArray = rdata.data;
 						obj.sNameArray.unshift({name:'ALL',ps:'所有'});
 						obj.backupsArray = rdata.orderOpt;
-						obj.backupsArray.unshift({name:'服务器磁盘',value:'localhost'});
+						obj.backupsArray.unshift({title:'服务器磁盘',name:'localhost'});
 						for(var i = 0; i <obj['sNameArray'].length; i++){
 							if(obj.from['sname'] == obj['sNameArray'][i]['name']){
 								sNameName  = obj['sNameArray'][i]['ps'];
@@ -568,10 +573,10 @@ function editTaskInfo(id){
 							sNameDom += '<li><a role="menuitem"  href="javascript:;" value="'+ obj['sNameArray'][i]['name'] +'">'+ obj['sNameArray'][i]['ps'] +'</a></li>';
 						}
 						for(var i = 0; i <obj['backupsArray'].length; i++){
-							if(obj.from['backup_to'] == obj['backupsArray'][i]['value'])  {
-								backupsName  = obj['backupsArray'][i]['name'];
+							if(obj.from['backup_to'] == obj['backupsArray'][i]['name'])  {
+								backupsName  = obj['backupsArray'][i]['title'];
 							}
-							backupsDom += '<li><a role="menuitem"  href="javascript:;" value="'+ obj['backupsArray'][i]['value'] +'">'+ obj['backupsArray'][i]['name'] +'</a></li>';
+							backupsDom += '<li><a role="menuitem"  href="javascript:;" value="'+ obj['backupsArray'][i]['name'] +'">'+ obj['backupsArray'][i]['title'] +'</a></li>';
 						}
 						callback();
 					},'json');
@@ -629,7 +634,7 @@ function editTaskInfo(id){
 								<span class="typename controls c4 pull-left f14 text-right mr20">'+ sTypeName  +'</span>\
 								<div style="line-height:34px"><div class="dropdown pull-left mr20 sName_btn" style="display:'+ (obj.from.sType != "path"?'block;':'none') +'">\
 									<button class="btn btn-default dropdown-toggle" type="button"  data-toggle="dropdown" style="width:auto" disabled="disabled">\
-										<b id="sName" val="'+ obj.from.sname +'">'+ sNameName +'</b>\
+										<b id="sName" val="'+ obj.from.sname +'">'+ obj.from.sname +'</b>\
 										<span class="caret"></span>\
 									</button>\
 									<ul class="dropdown-menu" role="menu" aria-labelledby="sName">'+ sNameDom +'</ul>\
@@ -835,10 +840,10 @@ function closeOpt(){
 //星期
 function toWeek(){
 	var mBody = '<div class="dropdown planweek pull-left mr20">\
-				  <button class="btn btn-default dropdown-toggle" type="button" id="excode" data-toggle="dropdown">\
+				  <button class="btn btn-default dropdown-toggle" type="button" id="excode_week" data-toggle="dropdown">\
 					<b val="1">周一</b> <span class="caret"></span>\
 				  </button>\
-				  <ul class="dropdown-menu" role="menu" aria-labelledby="excode">\
+				  <ul class="dropdown-menu" role="menu" aria-labelledby="excode_week">\
 					<li><a role="menuitem" tabindex="-1" href="javascript:;" value="1">周一</a></li>\
 					<li><a role="menuitem" tabindex="-1" href="javascript:;" value="2">周二</a></li>\
 					<li><a role="menuitem" tabindex="-1" href="javascript:;" value="3">周三</a></li>\

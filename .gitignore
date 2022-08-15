@@ -141,15 +141,14 @@ data/ssl.pl
 data/edate.pl
 data/osname.pl
 data/system.db-journal
+data/hook_*.json
 
 plugins/l2tp
 plugins/openlitespeed
 plugins/gdrive
 plugins/mtproxy
 plugins/zimg
+plugins/bk_demo
 debug.out
-
-
-
 
 
