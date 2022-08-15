@@ -699,7 +699,7 @@ class system_api:
                 mw.execShell('rm -rf ' + toPath + '/mw.zip')
 
                 self.restartMw()
-                return mw.returnJson(True, '安装更新成功,需自己重启!')
+                return mw.returnJson(True, '安装更新成功!')
 
             return mw.returnJson(False, '已经是最新,无需更新!')
         except Exception as ex:
