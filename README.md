@@ -73,6 +73,7 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 
 ### 版本更新 0.9.5
 
+* 页面更新优化[2].
 * 修复maridb的用户管理[2].
 * Gogs初始化提示更人性.
 * MySQL&&MariaDB修改密码修复.
