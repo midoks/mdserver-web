@@ -691,9 +691,10 @@ class system_api:
                 if not os.path.exists(dist_to):
                     os.system('unzip -o ' + toPath +
                               '/mw.zip' + ' -d ' + toPath)
-                    cmd_cp = 'cp -rf ' + toPath + '/mdserver-web-' + \
-                        version + '/* ' + mw.getServerDir() + '/mdserver-web'
-                    mw.execShell(cmd_cp)
+
+                cmd_cp = 'cp -rf ' + toPath + '/mdserver-web-' + \
+                    version + '/* ' + mw.getServerDir() + '/mdserver-web'
+                mw.execShell(cmd_cp)
 
                 mw.execShell('rm -rf ' + toPath + '/mdserver-web-' + version)
                 mw.execShell('rm -rf ' + toPath + '/mw.zip')
