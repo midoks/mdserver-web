@@ -132,8 +132,7 @@ curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/up
 
 ### 无图不真相
 
-[![截图](https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/route/static/img/mdw.jpg)](https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/route/static/img/mdw.jpg)
-
+[![截图](https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/route/static/mdw.jpg)](https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/route/static/mdw.jpg)
 
 
 ### Stargazers over time
