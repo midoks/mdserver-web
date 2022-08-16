@@ -127,7 +127,7 @@ curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/up
 ```
 
 ### 微信赞助
-[![截图](/route/static/img/weixin_zz.jpg)](/route/static/img/weixin_zz.jpg)
+[![截图](/route/static/img/weixin_zz.jpg)](https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/route/static/img/weixin_zz.jpg)
 
 
 ### 无图不真相
