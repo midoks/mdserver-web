@@ -676,8 +676,7 @@ class files_api:
                     data['encoding'] = 'utf-8'
                 if char['encoding'] == 'Big5':
                     data['encoding'] = 'BIG5'
-                if not char['encoding'] in ['GBK', 'utf-8',
-                                            'BIG5']:
+                if not char['encoding'] in ['GBK', 'utf-8', 'BIG5']:
                     data['encoding'] = 'utf-8'
                 try:
                     if sys.version_info[0] == 2:
