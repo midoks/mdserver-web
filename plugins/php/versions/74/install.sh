@@ -39,7 +39,11 @@ if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 	mv $sourcePath/php/php-${version} $sourcePath/php/php${PHP_VER}
 fi
 
-
+if [ ! -d $sourcePath/php/php${PHP_VER} ];then
+	rm -rf $sourcePath/php/php-${version}.tar.xz
+	echo "reinstall php${version}"
+	exit 1
+fi
 
 cd $sourcePath/php/php${PHP_VER}
 
