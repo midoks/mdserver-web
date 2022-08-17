@@ -405,7 +405,7 @@ function supConfigTpl(_name, version, func, config_tpl_func, read_config_tpl_fun
 		                return;
 		            }
 
-    				$("#textBody").empty().text(rdata.data);
+    				$("#textBody").empty().html(rdata.data);
     				$(".CodeMirror").remove();
 		            var editor = CodeMirror.fromTextArea(document.getElementById("textBody"), {
 		                extraKeys: {
@@ -424,7 +424,7 @@ function supConfigTpl(_name, version, func, config_tpl_func, read_config_tpl_fun
 		            $(".CodeMirror-scroll").css({"height":"300px","margin":0,"padding":0});
 		            $("#onlineEditFileBtn").unbind('click');
 		            $("#onlineEditFileBtn").click(function(){
-		                $("#textBody").text(editor.getValue());
+		                $("#textBody").html(editor.getValue());
 		                pluginConfigSave(fileName);
 		            });
     			},'json');
@@ -500,7 +500,7 @@ function supLogs(_name, config_tpl_func, read_config_tpl_func,line){
 	                return;
 	            }
 
-				$("#info_log").empty().text(rdata.data);
+				$("#info_log").empty().html(rdata.data);
 			},'json');
     	});
     }
@@ -533,7 +533,7 @@ function supLogs(_name, config_tpl_func, read_config_tpl_func,line){
 	                return;
 	            }
 
-				$("#info_log").empty().text(rdata.data);
+				$("#info_log").empty().html(rdata.data);
 			},'json');
 
 			clearLog(selected);
