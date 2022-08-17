@@ -14,7 +14,7 @@ sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 mariadbDir=${serverPath}/source/mariadb
 
-MY_VER=10.6.8
+MY_VER=10.6.9
 
 Install_app()
 {
