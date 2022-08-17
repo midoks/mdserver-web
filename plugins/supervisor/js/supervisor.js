@@ -474,6 +474,7 @@ function supLogs(_name, config_tpl_func, read_config_tpl_func,line){
 
     var con = '<div><select id="config_tpl" class="bt-input-text mr20" style="width:30%;margin-bottom: 3px;"><option value="0">请选择</option></select>\
     			<button id="sup_clear_log" class="btn btn-success btn-sm clear_logs mr5">清理日志</button>\
+    			<button id="sup_error_log" class="btn btn-success btn-sm clear_logs mr5">查看错误日志</button>\
     		</div>';
     con += '<textarea readonly="" style="margin: 0px;width: 100%;height: 520px;background-color: #333;color:#fff; padding:0 5px" id="info_log"></textarea>';
     $(".soft-man-con").html(con);
@@ -486,6 +487,21 @@ function supLogs(_name, config_tpl_func, read_config_tpl_func,line){
     			var rdata = $.parseJSON(data.data);
     			layer.msg(rdata.msg,{icon:rdata.status?1:2,time:2000,shade: [0.3, '#000']});
     		});
+    	});
+    }
+
+    function errorLog(file,file_line){
+    	$('#sup_error_log').click(function(){
+    		var _args = JSON.stringify({file:file,line:file_line});
+			$.post('/plugins/run', {name:_name, func:'read_config_log_error_tpl',args:_args}, function(data){
+				var rdata = $.parseJSON(data.data);
+				if (!rdata.status){
+	                layer.msg(rdata.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+	                return;
+	            }
+
+				$("#info_log").empty().text(rdata.data);
+			},'json');
     	});
     }
 
@@ -521,6 +537,7 @@ function supLogs(_name, config_tpl_func, read_config_tpl_func,line){
 			},'json');
 
 			clearLog(selected);
+			errorLog(selected,file_line);
     	///
     	});
 

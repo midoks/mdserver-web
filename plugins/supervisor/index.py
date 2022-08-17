@@ -477,6 +477,28 @@ def readConfigLogTpl():
     return mw.returnJson(False, 'OK', '')
 
 
+def readConfigLogErrorTpl():
+    args = getArgs()
+    data = checkArgs(args, ['file'])
+    if not data[0]:
+        return data[1]
+    file_log = args['file']
+    line_log = args['line']
+
+    with open(file_log, "r") as fr:
+        infos = fr.readlines()
+
+    stderr_logfile = ''
+    for line in infos:
+        if "stderr_logfile=" in line.strip():
+            stderr_logfile = line.strip().split('=')[1]
+
+    if stderr_logfile != '':
+        data = mw.getNumLines(stderr_logfile, int(line_log))
+        return mw.returnJson(True, 'OK', data)
+    return mw.returnJson(False, 'OK', '')
+
+
 def supClearLog():
     args = getArgs()
     data = checkArgs(args, ['file'])
@@ -529,6 +551,8 @@ if __name__ == "__main__":
         print(readConfigTpl())
     elif func == 'read_config_log_tpl':
         print(readConfigLogTpl())
+    elif func == 'read_config_log_error_tpl':
+        print(readConfigLogErrorTpl())
     elif func == 'sup_clear_log':
         print(supClearLog())
     elif func == 'conf':
