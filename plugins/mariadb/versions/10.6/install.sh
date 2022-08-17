@@ -59,13 +59,13 @@ Install_app()
 
 	# https://mirrors.aliyun.com/mariadb/mariadb-10.8.3/source/mariadb-10.8.3.tar.gz
 	if [ ! -f ${mariadbDir}/mariadb-${MY_VER}.tar.gz ];then
-		wget -O ${mariadbDir}/mariadb-${MY_VER}.tar.gz --tries=3 https://mirrors.aliyun.com/mariadb/mariadb-${MY_VER}/source/mariadb-${MY_VER}.tar.gz
+		wget --no-check-certificate -O ${mariadbDir}/mariadb-${MY_VER}.tar.gz --tries=3 https://mirrors.aliyun.com/mariadb/mariadb-${MY_VER}/source/mariadb-${MY_VER}.tar.gz
 		
 	fi
 
 	# https://downloads.mariadb.org/interstitial/mariadb-10.6.8/source/mariadb-10.6.8.tar.gz
 	if [ "$?" != "0" ];then
-		wget -O ${mariadbDir}/mariadb-${MY_VER}.tar.gz --tries=3 https://downloads.mariadb.org/interstitial/mariadb-${MY_VER}/source/mariadb-${MY_VER}.tar.gz
+		wget --no-check-certificate -O ${mariadbDir}/mariadb-${MY_VER}.tar.gz --tries=3 https://downloads.mariadb.org/interstitial/mariadb-${MY_VER}/source/mariadb-${MY_VER}.tar.gz
 	fi
 
 	if [ ! -d ${mariadbDir}/mariadb-${MY_VER} ];then
