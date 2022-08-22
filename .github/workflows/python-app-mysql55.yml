@@ -5,9 +5,9 @@ name: MW APP MySQL55
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "run_test" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "run_test" ]
 
 permissions:
   contents: read
