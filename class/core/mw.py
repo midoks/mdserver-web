@@ -57,8 +57,20 @@ def getPluginDir():
     return getRunDir() + '/plugins'
 
 
+def getPanelDataDir():
+    return getRunDir() + '/data'
+
+
 def getServerDir():
     return getRootDir() + '/server'
+
+
+def getLogsDir():
+    return getRootDir() + '/wwwlogs'
+
+
+def getBackupDir():
+    return getRootDir() + '/backup'
 
 
 def getWwwDir():
@@ -71,14 +83,6 @@ def getWwwDir():
 def setWwwDir(wdir):
     file = getRunDir() + '/data/site.pl'
     return writeFile(file, wdir)
-
-
-def getLogsDir():
-    return getRootDir() + '/wwwlogs'
-
-
-def getBackupDir():
-    return getRootDir() + '/backup'
 
 
 def setBackupDir(bdir):

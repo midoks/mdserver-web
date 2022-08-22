@@ -295,9 +295,18 @@ class crontab_api:
     # 取数据列表
     def getDataListApi(self):
         stype = request.form.get('type', '')
+
+        bak_data = []
+
+        if stype == 'sites' or stype == 'databases':
+            hookPath = mw.getPanelDataDir() + "/hook_backup.json"
+            if os.path.exists(hookPath):
+                t = mw.readFile(hookPath)
+                bak_data = json.loads(t)
+
         if stype == 'databases':
             db_list = {}
-            db_list['orderOpt'] = []
+            db_list['orderOpt'] = bak_data
             path = mw.getServerDir() + '/mysql'
             if not os.path.exists(path + '/mysql.db'):
                 db_list['data'] = []
@@ -307,8 +316,9 @@ class crontab_api:
             return mw.getJson(db_list)
 
         data = {}
+        data['orderOpt'] = bak_data
+
         data['data'] = mw.M(stype).field('name,ps').select()
-        data['orderOpt'] = []
         return mw.getJson(data)
     ##### ----- start ----- ###
 
@@ -411,16 +421,13 @@ class crontab_api:
                 'rememory': head + "/bin/bash " + script_dir + '/rememory.sh'
             }
             if param['backup_to'] != 'localhost':
-                cfile = mw.getServerDir() + "/mdserver-web/plugin/" + \
-                    param['backup_to'] + "/" + param['backup_to'] + "_main.py"
-                if not os.path.exists(cfile):
-                    cfile = script_dir + "/backup_" + \
-                        param['backup_to'] + ".py"
+                cfile = mw.getPluginDir() + "/" + \
+                    param['backup_to'] + "/index.py"
                 wheres = {
-                    'path': head + "python " + cfile + " path " + param['sname'] + " " + str(param['save']),
-                    'site':   head + "python " + cfile + " site " + param['sname'] + " " + str(param['save']),
-                    'database': head + "python " + cfile + " database " + param['sname'] + " " + str(param['save']),
-                    'logs':   head + "python " + script_dir + "/logs_backup.py " + param['sname'] + log + " " + str(param['save']),
+                    'path': head + "python3 " + cfile + " path " + param['sname'] + " " + str(param['save']),
+                    'site':   head + "python3 " + cfile + " site " + param['sname'] + " " + str(param['save']),
+                    'database': head + "python3 " + cfile + " database " + param['sname'] + " " + str(param['save']),
+                    'logs':   head + "python3 " + script_dir + "/logs_backup.py " + param['sname'] + log + " " + str(param['save']),
                     'rememory': head + "/bin/bash " + script_dir + '/rememory.sh'
                 }
             try:

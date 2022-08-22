@@ -14,7 +14,7 @@ sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 mariadbDir=${serverPath}/source/mariadb
 
-MY_VER=10.7.4
+MY_VER=10.7.5
 
 Install_app()
 {
@@ -58,14 +58,16 @@ Install_app()
 	# ----- cpu end ------
 
 	if [ ! -f ${mariadbDir}/mariadb-${MY_VER}.tar.gz ];then
-		wget -O ${mariadbDir}/mariadb-${MY_VER}.tar.gz --tries=3 https://mirrors.aliyun.com/mariadb/mariadb-${MY_VER}/source/mariadb-${MY_VER}.tar.gz
-		# wget -O ${mariadbDir}/mariadb-${MY_VER}.tar.gz --tries=3 https://downloads.mariadb.org/interstitial/mariadb-${MY_VER}/source/mariadb-${MY_VER}.tar.gz
+		wget --no-check-certificate -O ${mariadbDir}/mariadb-${MY_VER}.tar.gz --tries=3 https://mirrors.aliyun.com/mariadb/mariadb-${MY_VER}/source/mariadb-${MY_VER}.tar.gz
+	fi
+
+	if [ "$?" != "0" ];then
+		wget --no-check-certificate -O ${mariadbDir}/mariadb-${MY_VER}.tar.gz --tries=3 https://downloads.mariadb.org/interstitial/mariadb-${MY_VER}/source/mariadb-${MY_VER}.tar.gz
 	fi
 
 	if [ ! -d ${mariadbDir}/mariadb-${MY_VER} ];then
 		 cd ${mariadbDir} && tar -zxvf  ${mariadbDir}/mariadb-${MY_VER}.tar.gz
 	fi
-	
 
 	if [ ! -d $serverPath/mariadb ];then
 		cd ${mariadbDir}/mariadb-${MY_VER} && cmake \

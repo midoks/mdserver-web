@@ -114,6 +114,7 @@ class plugins_api:
             return mw.returnJson(False, '配置文件不存在!', ())
 
         pluginInfo = json.loads(mw.readFile(infoJsonPos))
+        self.hookInstall(pluginInfo)
 
         execstr = "cd " + os.getcwd() + "/plugins/" + \
             name + " && /bin/bash " + pluginInfo["shell"] \
@@ -131,6 +132,55 @@ class plugins_api:
         mw.triggerTask()
         return mw.returnJson(True, '已将安装任务添加到队列!')
 
+    def hookInstallFile(self, hook_name, info):
+        hookPath = mw.getPanelDataDir() + "/hook_" + hook_name + ".json"
+        data = []
+        if os.path.exists(hookPath):
+            t = mw.readFile(hookPath)
+            data = json.loads(t)
+
+        isNeedAdd = True
+        for x in range(len(data)):
+            if data[x]['title'] == info['title'] and data[x]['name'] == info['name']:
+                isNeedAdd = False
+
+        if isNeedAdd:
+            tmp = {}
+            tmp['title'] = info['title']
+            tmp['name'] = info['name']
+            data.append(tmp)
+        mw.writeFile(hookPath, json.dumps(data))
+
+    def hookUninstallFile(self, hook_name, info):
+        hookPath = mw.getPanelDataDir() + "/hook_" + hook_name + ".json"
+        data = []
+        if os.path.exists(hookPath):
+            t = mw.readFile(hookPath)
+            data = json.loads(t)
+
+        for idx in range(len(data)):
+            if data[idx]['title'] == info['title'] and data[idx]['name'] == info['name']:
+                data.remove(data[idx])
+        mw.writeFile(hookPath, json.dumps(data))
+
+    def hookInstall(self, info):
+        if 'hook' in info:
+            hooks = info['hook']
+            for x in hooks:
+                if x in ['backup']:
+                    self.hookInstallFile(x, info)
+                    return True
+        return False
+
+    def hookUninstall(self, info):
+        if 'hook' in info:
+            hooks = info['hook']
+            for x in hooks:
+                if x in ['backup']:
+                    self.hookUninstallFile(x, info)
+                    return True
+        return False
+
     def uninstallOldApi(self):
         rundir = mw.getRunDir()
         name = request.form.get('name', '')
@@ -147,7 +197,6 @@ class plugins_api:
             return mw.returnJson(False, "配置文件不存在!", ())
 
         pluginInfo = json.loads(mw.readFile(infoJsonPos))
-
         execstr = "cd " + os.getcwd() + "/plugins/" + \
             name + " && /bin/bash " + pluginInfo["shell"] \
             + " uninstall " + version
@@ -175,13 +224,13 @@ class plugins_api:
             return mw.returnJson(False, "配置文件不存在!", ())
 
         pluginInfo = json.loads(mw.readFile(infoJsonPos))
-
+        self.hookUninstall(pluginInfo)
         execstr = "cd " + os.getcwd() + "/plugins/" + \
             name + " && /bin/bash " + pluginInfo["shell"] \
             + " uninstall " + version
 
         data = mw.execShell(execstr)
-        if mw.isAppleSystem():
+        if mw.isDebugMode():
             print(execstr)
             print(data[0], data[1])
         self.removeIndex(name, version)
@@ -793,7 +842,7 @@ class plugins_api:
                     print('getIndexList:', e)
 
         # 使用gevent模式时,无法使用多进程
-        #plist = self.checkStatusMProcess(plist)
+        # plist = self.checkStatusMProcess(plist)
         plist = self.checkStatusMThreads(plist)
         return plist
 

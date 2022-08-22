@@ -339,7 +339,10 @@ function createSendTask(name = ''){
                     layer.msg(rdata.msg,{icon:rdata.status?1:2,time:2000,shade: [0.3, '#000']});
 
                     if (rdata.status){
-                         setTimeout(function(){layer.close(index);},2000);
+                         setTimeout(function(){
+                            layer.close(index);
+                            lsyncdSend();
+                         },2000);
                         return;
                     }
                 });
