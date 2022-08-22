@@ -650,16 +650,14 @@ def getLocalIp():
     try:
         ipaddress = readFile(filename)
         if not ipaddress or ipaddress == '127.0.0.1':
-            raise Exception("ip is empty!")
+            cmd = "curl -4 -sS --connect-timeout 5 -m 60 https://v6r.ipip.net/?format=text"
+            ip = execShell(cmd)
+            result = ip[0].strip()
+            if result == '':
+                raise Exception("ipv4 is empty!")
+            writeFile(filename, result)
+            return result
         return ipaddress
-    except Exception as e:
-        cmd = "curl -4 -sS --connect-timeout 5 -m 60 https://v6r.ipip.net/?format=text"
-        ip = execShell(cmd)
-        result = ip[0].strip()
-        if result == '':
-            raise e
-        writeFile(filename, result)
-        return result
     except Exception as e:
         cmd = "curl -6 -sS --connect-timeout 5 -m 60 https://v6r.ipip.net/?format=text"
         ip = execShell(cmd)
@@ -668,6 +666,8 @@ def getLocalIp():
             return '127.0.0.1'
         writeFile(filename, result)
         return result
+    finally:
+        pass
     return '127.0.0.1'
 
 
