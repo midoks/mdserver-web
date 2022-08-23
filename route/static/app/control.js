@@ -77,7 +77,7 @@ $(".networkbtn").click(function(){
 function Wday(day,name){
 	var now = (new Date().getTime())/1000;
 	if(day==0){
-		var b = (new Date(GetToday() + " 00:00:01").getTime())/1000;
+		var b = (new Date(getToday() + " 00:00:01").getTime())/1000;
 			b = Math.round(b);
 		var e = Math.round(now);
 	}
@@ -111,7 +111,7 @@ function Wday(day,name){
 	}
 }
 
-function GetToday(){
+function getToday(){
    var mydate = new Date();
    var str = "" + mydate.getFullYear() + "/";
    str += (mydate.getMonth()+1) + "/";
@@ -123,30 +123,51 @@ function GetToday(){
 function getStatus(){
 	loadT = layer.msg('正在读取,请稍候...',{icon:16,time:0})
 	$.post('/system/set_control','type=-1',function(rdata){
-		// console.log(rdata);
 		layer.close(loadT);
+
 		if(rdata.status){
-			$("#openJK").html("<input class='btswitch btswitch-ios' id='ctswitch' type='checkbox' checked><label class='btswitch-btn' for='ctswitch' onclick='setControl()'></label>")
+			$("#openJK").html("<input class='btswitch btswitch-ios' id='ctswitch' type='checkbox' checked><label class='btswitch-btn' for='ctswitch' onclick='setControl(\"openjk\", true)'></label>");
+		} else {
+			$("#openJK").html("<input class='btswitch btswitch-ios' id='ctswitch' type='checkbox'><label class='btswitch-btn' for='ctswitch' onclick='setControl(\"openjk\",false)'></label>");
 		}
-		else{
-			$("#openJK").html("<input class='btswitch btswitch-ios' id='ctswitch' type='checkbox'><label class='btswitch-btn' for='ctswitch' onclick='setControl()'></label>")
+
+		if(rdata.stat_all_status){
+			$("#statAll").html("<input class='btswitch btswitch-ios' id='stat_witch' type='checkbox' checked><label class='btswitch-btn' for='stat_witch' onclick='setControl(\"stat\",true)'></label>");
+		} else{
+			$("#statAll").html("<input class='btswitch btswitch-ios' id='stat_witch' type='checkbox'><label class='btswitch-btn' for='stat_witch' onclick='setControl(\"stat\",false)'></label>");
 		}
-		$("#saveDay").val(rdata.day)
+
+		$("#save_day").val(rdata.day);
+
 	},'json');
 }
 getStatus();
 
 //设置监控状态
-function setControl(act){
-	var day = $("#saveDay").val()
-	if(day < 1){
-		layer.msg('保存天数不合法!',{icon:2});
-		return;
-	}
-	if(act){
-		var type = $("#ctswitch").prop('checked')?'1':'0';
-	}else{
+function setControl(act, value=false){
+
+	if (act == 'openjk'){
 		var type = $("#ctswitch").prop('checked')?'0':'1';
+		var day = $("#save_day").val();
+		if(day < 1){
+			layer.msg('保存天数不合法!',{icon:2});
+			return;
+		}
+	} else if (act == 'stat'){
+		var type = $("#stat_witch").prop('checked')?'2':'3';
+	} else if (act == 'save_day'){
+		var type = $("#ctswitch").prop('checked')?'1':'0';
+		var day = $("#save_day").val();
+
+		if(type == 0){
+			layer.msg('先开启监控!',{icon:2});
+			return;
+		}
+
+		if(day < 1){
+			layer.msg('保存天数不合法!',{icon:2});
+			return;
+		}
 	}
 	
 	loadT = layer.msg('正在处理,请稍候...',{icon:16,time:0})
@@ -156,13 +177,13 @@ function setControl(act){
 	},'json');
 }
 
+
 //清理记录
 function closeControl(){
 	layer.confirm('您真的清空所有监控记录吗？',{title:'清空记录',icon:3,closeBtn:2}, function() {
 		loadT = layer.msg('正在处理,请稍候...',{icon:16,time:0})
 		$.post('/system/set_control','type=del',function(rdata){
 			layer.close(loadT);
-			// $.get('/system?action=ReWeb',function(){});
 			layer.msg(rdata.msg,{icon:rdata.status?1:2});
 		},'json');
 	});
