@@ -135,6 +135,7 @@ def initDReceive():
         mw.writeFile(file_bin, content)
         mw.execShell('chmod +x ' + file_bin)
 
+    lock_file = getServerDir() + "/installed_rsyncd.pl"
     # systemd
     systemDir = mw.systemdCfgDir()
     systemService = systemDir + '/rsyncd.service'
@@ -151,6 +152,8 @@ def initDReceive():
         se = se.replace('{$RSYNC_BIN}', rsync_bin)
         mw.writeFile(systemService, se)
         mw.execShell('systemctl daemon-reload')
+
+        mw.writeFile(lock_file, "ok")
 
     rlog = getLog()
     if os.path.exists(rlog):
@@ -199,7 +202,7 @@ def initDSend():
         mw.writeFile(systemService, content)
         mw.execShell('systemctl daemon-reload')
 
-    mw.writeFile(lock_file, "ok")
+        mw.writeFile(lock_file, "ok")
 
     lslog = getLsyncdLog()
     if os.path.exists(lslog):
