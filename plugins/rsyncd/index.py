@@ -140,7 +140,7 @@ def initDReceive():
     systemDir = mw.systemdCfgDir()
     systemService = systemDir + '/rsyncd.service'
     systemServiceTpl = getPluginDir() + '/init.d/rsyncd.service.tpl'
-    if os.path.exists(systemDir) and not os.path.exists(systemService):
+    if not os.path.exists(lock_file):
         rsync_bin = mw.execShell('which rsync')[0].strip()
         if rsync_bin == '':
             print('rsync missing!')
