@@ -1,0 +1,19 @@
+{
+	"sort": 7,
+	"ps": "可靠、高性能的TCP/HTTP负载平衡器",
+	"name": "haproxy",
+	"title": "haproxy",
+	"shell": "install.sh",
+	"versions":["2.6"],
+	"updates":["2.6"],
+	"tip": "soft",
+	"checks": "server/haproxy",
+	"path": "server/haproxy",
+	"display": 1,
+	"author": "midoks",
+	"date": "2022-08-26",
+	"home": "https://www.haproxy.org/",
+	"doc1": "https://www.haproxy.org/",
+	"type": 0,
+	"pid": "4"
+}
