@@ -147,22 +147,7 @@ def initDreplace():
     return file_bin
 
 
-def checkIndexSph():
-    content = mw.readFile(getConf())
-    rep = 'path\s*=\s*(.*)'
-    p = re.compile(rep)
-    tmp = p.findall(content)
-    for x in tmp:
-        if x.find('binlog') != -1:
-            continue
-        else:
-            p = x + '.sph'
-            if os.path.exists(p):
-                return False
-    return True
-
-
-def sphOp(method):
+def haOp(method):
     file = initDreplace()
 
     if not mw.isAppleSystem():
@@ -178,27 +163,19 @@ def sphOp(method):
 
 
 def start():
-    return sphOp('start')
+    return haOp('start')
 
 
 def stop():
-    return sphOp('stop')
+    return haOp('stop')
 
 
 def restart():
-    return sphOp('restart')
+    return haOp('restart')
 
 
 def reload():
-    return sphOp('reload')
-
-
-def rebuild():
-    file = initDreplace()
-    subprocess.Popen(file + ' rebuild &',
-                     stdout=subprocess.PIPE, shell=True)
-    # data = mw.execShell(file + ' rebuild')
-    return 'ok'
+    return haOp('reload')
 
 
 def initdStatus():
@@ -315,8 +292,6 @@ if __name__ == "__main__":
         print(restart())
     elif func == 'reload':
         print(reload())
-    elif func == 'rebuild':
-        print(rebuild())
     elif func == 'initd_status':
         print(initdStatus())
     elif func == 'initd_install':
