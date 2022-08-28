@@ -40,7 +40,7 @@ def getConfTpl():
 
 
 def getConf():
-    path = getServerDir() + "/sphinx.conf"
+    path = getServerDir() + "/haproxy.conf"
     return path
 
 
