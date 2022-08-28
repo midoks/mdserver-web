@@ -109,19 +109,6 @@ def status():
     return 'start'
 
 
-def mkdirAll():
-    content = mw.readFile(getConf())
-    rep = 'path\s*=\s*(.*)'
-    p = re.compile(rep)
-    tmp = p.findall(content)
-
-    for x in tmp:
-        if x.find('binlog') != -1:
-            mw.execShell('mkdir -p ' + x)
-        else:
-            mw.execShell('mkdir -p ' + os.path.dirname(x))
-
-
 def initDreplace():
 
     file_tpl = getInitDTpl()
@@ -157,7 +144,6 @@ def initDreplace():
         mw.writeFile(systemService, se_content)
         mw.execShell('systemctl daemon-reload')
 
-    mkdirAll()
     return file_bin
 
 

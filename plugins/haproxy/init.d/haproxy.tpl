@@ -1,82 +1,116 @@
-#! /bin/bash
-#
-# searchd:   sphinx Daemon   
-#
-# chkconfig:    - 90 25  
-# description:  sphinx Daemon   
-#
-### BEGIN INIT INFO
-# Provides:          sphinx
-# Required-Start:    $syslog
-# Required-Stop:     $syslog
-# Should-Start:        $local_fs
-# Should-Stop:        $local_fs
-# Default-Start:     2 3 4 5
-# Default-Stop:      0 1 6
-# Short-Description:    sphinx - Document Index Daemon
-# Description:        sphinx - Document Index Daemon
-### END INIT INFO
+#!/bin/sh
+# 
+# chkconfig: - 85 15
+# description: HA-Proxy is a TCP/HTTP reverse proxy which is particularly suited \
+#              for high availability environments.
+# processname: haproxy
+# config: /etc/haproxy/haproxy.cfg
+# pidfile: /var/run/haproxy.pid
+# Script Author: Simon Matter <simon.matter@invoca.ch>
+# Version: 2004060600
+# Source function library.
+ 
+if [ -f /etc/init.d/functions ]; then
+  . /etc/init.d/functions
+elif [ -f /etc/rc.d/init.d/functions ] ; then
+  . /etc/rc.d/init.d/functions
+else
+  exit 0
+fi
+ 
+# Source networking configuration.
+ 
+. /etc/sysconfig/network
+# Check that networking is up.
+[ ${NETWORKING} = "no" ] && exit 0
 
-APP_PATH={$SERVER_APP}
-APP_CONF={$SERVER_APP}/sphinx.conf
-prog="sphinx"
+HAPROXYDIR={$SERVER_PATH}/haproxy
+BASENAME=haproxy
+ 
+# This is our service name
+ 
+#BASENAME=`basename $0`
+#if [ -L $0 ]; then
+#  BASENAME=`find $0 -name $BASENAME -printf %l`
+#  BASENAME=`basename $BASENAME`
+#fi
+ 
+[ -f $HAPROXYDIR/etc/$BASENAME.cfg ] || exit 1
+ 
+RETVAL=0
+ 
+start() {
+    $HAPROXYDIR/sbin/$BASENAME -c -q -f $HAPROXYDIR/etc/$BASENAME.cfg
 
-start () {
-    echo -n $"Starting $prog: "
-    ${APP_PATH}/bin/bin/searchd -c ${APP_CONF}
-    if [ "$?" != 0 ] ; then
-        echo " failed"
-        exit 1
-    else
-        echo " done"
+    if [ $? -ne 0 ]; then
+    echo "Errors found in configuration file, check it with '$BASENAME check'."
+    return 1
     fi
+
+    echo -n "Starting $BASENAME: "
+    daemon $HAPROXYDIR/sbin/$BASENAME -D -f $HAPROXYDIR/etc/$BASENAME.cfg -p /var/run/$BASENAME.pid
+    RETVAL=$?
+    echo
+    [ $RETVAL -eq 0 ] && touch /var/lock/subsys/$BASENAME
+    return $RETVAL
 }
+ 
+ 
+stop() {
+ 
+  echo -n "Shutting down $BASENAME: "
+  killproc $BASENAME -USR1
 
-rebuild () {
-    ${APP_PATH}/bin/bin/indexer -c ${APP_CONF} --all --rotate & 
+  RETVAL=$?
+  echo
+  [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/$BASENAME
+  [ $RETVAL -eq 0 ] && rm -f /var/run/$BASENAME.pid
+  return $RETVAL
 }
-
-
-stop () {
-    echo -n $"Stopping $prog: "
-    if [ ! -e ${APP_PATH}/index/searchd.pid ]; then
-        echo -n $"$prog is not running."
-        exit 1
-    fi
-    kill `cat ${APP_PATH}/index/searchd.pid`
-    if [ "$?" != 0 ] ; then
-        echo " failed"
-        exit 1
-    else
-        rm -f ${APP_PATH}/index/searchd.pid
-        echo " done"
-    fi
+ 
+restart() {
+  $HAPROXYDIR/sbin/$BASENAME -c -q -f $HAPROXYDIR/etc/$BASENAME.cfg
+  if [ $? -ne 0 ]; then
+    echo "Errors found in configuration file, check it with '$BASENAME check'."
+    return 1
+  fi
+  stop
+  start
 }
-
-restart () {
-    $0 stop
-    sleep 2
-    $0 start
+ 
+reload() {
+  $HAPROXYDIR/sbin/$BASENAME -c -q -f $HAPROXYDIR/etc/$BASENAME.cfg
+  if [ $? -ne 0 ]; then
+    echo "Errors found in configuration file, check it with '$BASENAME check'."
+    return 1
+  fi
+  $HAPROXYDIR/sbin/$BASENAME -D -f $HAPROXYDIR/etc/$BASENAME.cfg -p /var/run/$BASENAME.pid -sf $(cat /var/run/$BASENAME.pid)
 }
-
+ 
+check() {
+  $HAPROXYDIR/sbin/$BASENAME -c -q -V -f $HAPROXYDIR/etc/$BASENAME.cfg
+}
+ 
+rhstatus() {
+  status $BASENAME
+}
+ 
+condrestart() {
+  [ -e /var/lock/subsys/$BASENAME ] && restart || :
+}
+ 
 # See how we were called.
 case "$1" in
-    start)
-        start
-        ;;
-    stop)
-        stop
-        ;;
-    restart|reload)
-        restart
-        ;;
-    rebuild)
-        rebuild
-        ;;
-    *)
-        echo $"Usage: $0 {start|stop|status|restart|reload}"
-        exit 1
-        ;;
+  start) start ;;
+  stop) stop ;;
+  restart) restart;;
+  reload) reload;;
+  condrestart) condrestart ;;
+  status) rhstatus ;;
+  check) check ;;
+  *)
+    echo $"Usage: $BASENAME {start|stop|restart|reload|condrestart|status|check}"
+    exit 1
 esac
-
+ 
 exit $?
