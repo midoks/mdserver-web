@@ -35,12 +35,12 @@ BASENAME=haproxy
 #  BASENAME=`basename $BASENAME`
 #fi
  
-[ -f $HAPROXYDIR/etc/$BASENAME.cfg ] || exit 1
+[ -f $HAPROXYDIR/etc/$BASENAME.conf ] || exit 1
  
 RETVAL=0
  
 start() {
-    $HAPROXYDIR/sbin/$BASENAME -c -q -f $HAPROXYDIR/etc/$BASENAME.cfg
+    $HAPROXYDIR/sbin/$BASENAME -c -q -f $HAPROXYDIR/etc/$BASENAME.conf
 
     if [ $? -ne 0 ]; then
     echo "Errors found in configuration file, check it with '$BASENAME check'."
@@ -48,7 +48,7 @@ start() {
     fi
 
     echo -n "Starting $BASENAME: "
-    daemon $HAPROXYDIR/sbin/$BASENAME -D -f $HAPROXYDIR/etc/$BASENAME.cfg -p /var/run/$BASENAME.pid
+    daemon $HAPROXYDIR/sbin/$BASENAME -D -f $HAPROXYDIR/etc/$BASENAME.conf -p /var/run/$BASENAME.pid
     RETVAL=$?
     echo
     [ $RETVAL -eq 0 ] && touch /var/lock/subsys/$BASENAME
@@ -69,7 +69,7 @@ stop() {
 }
  
 restart() {
-  $HAPROXYDIR/sbin/$BASENAME -c -q -f $HAPROXYDIR/etc/$BASENAME.cfg
+  $HAPROXYDIR/sbin/$BASENAME -c -q -f $HAPROXYDIR/etc/$BASENAME.conf
   if [ $? -ne 0 ]; then
     echo "Errors found in configuration file, check it with '$BASENAME check'."
     return 1
@@ -79,16 +79,16 @@ restart() {
 }
  
 reload() {
-  $HAPROXYDIR/sbin/$BASENAME -c -q -f $HAPROXYDIR/etc/$BASENAME.cfg
+  $HAPROXYDIR/sbin/$BASENAME -c -q -f $HAPROXYDIR/etc/$BASENAME.conf
   if [ $? -ne 0 ]; then
     echo "Errors found in configuration file, check it with '$BASENAME check'."
     return 1
   fi
-  $HAPROXYDIR/sbin/$BASENAME -D -f $HAPROXYDIR/etc/$BASENAME.cfg -p /var/run/$BASENAME.pid -sf $(cat /var/run/$BASENAME.pid)
+  $HAPROXYDIR/sbin/$BASENAME -D -f $HAPROXYDIR/etc/$BASENAME.conf -p /var/run/$BASENAME.pid -sf $(cat /var/run/$BASENAME.pid)
 }
  
 check() {
-  $HAPROXYDIR/sbin/$BASENAME -c -q -V -f $HAPROXYDIR/etc/$BASENAME.cfg
+  $HAPROXYDIR/sbin/$BASENAME -c -q -V -f $HAPROXYDIR/etc/$BASENAME.conf
 }
  
 rhstatus() {
