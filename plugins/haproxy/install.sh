@@ -14,6 +14,14 @@ type=$2
 
 echo $action $type
 
+if id haproxy &> /dev/null ;then 
+    echo "haproxy UID is `id -u haproxy`"
+    echo "haproxy Shell is `grep "^haproxy:" /etc/passwd |cut -d':' -f7 `"
+else
+    groupadd haproxy
+	useradd -g haproxy haproxy
+fi
+
 if [ "${2}" == "" ];then
 	echo '缺少安装脚本...' > $install_tmp
 	exit 0
