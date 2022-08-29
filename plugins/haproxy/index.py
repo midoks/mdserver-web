@@ -249,37 +249,6 @@ def runStatus():
     return mw.returnJson(True, 'ok', rData)
 
 
-def sphinxConfParse():
-    file = getConf()
-    bin_dir = getServerDir()
-    content = mw.readFile(file)
-    rep = 'index\s(.*)'
-    sindex = re.findall(rep, content)
-    indexlen = len(sindex)
-    cmd = {}
-    if indexlen > 0:
-        cmd_index = []
-        cmd_delta = []
-        for x in range(indexlen):
-            if sindex[x].find(':') != -1:
-                cmd_delta.append(sindex[x])
-            else:
-                cmd_index.append(sindex[x])
-
-        cmd['index'] = cmd_index
-        cmd['delta'] = cmd_delta
-        cmd['cmd'] = bin_dir + '/bin/bin/indexer -c ' + bin_dir + '/sphinx.conf'
-    return cmd
-
-
-def sphinxCmd():
-    data = sphinxConfParse()
-    if 'index' in data:
-        return mw.returnJson(True, 'ok', data)
-    else:
-        return mw.returnJson(False, 'no index')
-
-
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -310,7 +279,5 @@ if __name__ == "__main__":
         print(queryLog())
     elif func == 'run_status':
         print(runStatus())
-    elif func == 'sphinx_cmd':
-        print(sphinxCmd())
     else:
         print('error')
