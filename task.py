@@ -250,7 +250,7 @@ def systemTask():
                 cpuInfo = tmp
 
             # 取当前网络Io
-            networkIo = psutil.net_io_counters()[:4]
+            networkIo = sm.psutilNetIoCounters()
             if not network_up:
                 network_up = networkIo[0]
                 network_down = networkIo[1]
