@@ -21,14 +21,26 @@ OSNAME=`cat ${rootPath}/data/osname.pl`
 SYS_VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
 
+
+
+
+
+
 Install_app_mac()
 {
-	if [ ! -f $serverPath/source/mongodb-macos-x86_64-${VERSION}.tgz ];then
-		wget -O $serverPath/source/mongodb-macos-x86_64-${VERSION}.tgz https://fastdl.mongodb.org/osx/mongodb-macos-x86_64-${VERSION}.tgz
+	mkdir -p $serverPath/mongodb
+	if [ "$VERSION" == "5.0" ];then
+		G_VERSION="5.0.11"
+	elif [[ "$VERSION" == "4.4" ]]; then
+		G_VERSION="4.4.11"
 	fi
 
-	cd $serverPath/source && tar -zxvf mongodb-macos-x86_64-${VERSION}.tgz
-	cd  mongodb-macos-x86_64-${VERSION} && mv  ./* $serverPath/mongodb
+	if [ ! -f $serverPath/source/mongodb-macos-x86_64-${G_VERSION}.tgz ];then
+		wget -O $serverPath/source/mongodb-macos-x86_64-${G_VERSION}.tgz https://fastdl.mongodb.org/osx/mongodb-macos-x86_64-${G_VERSION}.tgz
+	fi
+
+	cd $serverPath/source && tar -zxvf mongodb-macos-x86_64-${G_VERSION}.tgz
+	cd  mongodb-macos-x86_64-${G_VERSION} && mv  ./* $serverPath/mongodb
 }
 
 
