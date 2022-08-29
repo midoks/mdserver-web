@@ -15,14 +15,16 @@ if [ -f /etc/init.d/functions ]; then
 elif [ -f /etc/rc.d/init.d/functions ] ; then
   . /etc/rc.d/init.d/functions
 else
-  exit 0
+  echo ".."
 fi
  
 # Source networking configuration.
- 
-. /etc/sysconfig/network
+if [ -f /etc/sysconfig/network ];then
+  . /etc/sysconfig/network
+fi
+
 # Check that networking is up.
-[ ${NETWORKING} = "no" ] && exit 0
+# [ ${NETWORKING} = "no" ] && exit 0
 
 HAPROXYDIR={$SERVER_PATH}/haproxy
 BASENAME=haproxy
@@ -42,16 +44,17 @@ RETVAL=0
 start() {
     $HAPROXYDIR/sbin/$BASENAME -c -q -f $HAPROXYDIR/etc/$BASENAME.conf
 
+
     if [ $? -ne 0 ]; then
     echo "Errors found in configuration file, check it with '$BASENAME check'."
     return 1
     fi
 
     echo -n "Starting $BASENAME: "
-    daemon $HAPROXYDIR/sbin/$BASENAME -D -f $HAPROXYDIR/etc/$BASENAME.conf -p /var/run/$BASENAME.pid
+    daemon $HAPROXYDIR/sbin/$BASENAME -D -f $HAPROXYDIR/etc/$BASENAME.conf
     RETVAL=$?
-    echo
-    [ $RETVAL -eq 0 ] && touch /var/lock/subsys/$BASENAME
+    # echo
+    # [ $RETVAL -eq 0 ] && touch /var/lock/subsys/$BASENAME
     return $RETVAL
 }
  
@@ -84,7 +87,7 @@ reload() {
     echo "Errors found in configuration file, check it with '$BASENAME check'."
     return 1
   fi
-  $HAPROXYDIR/sbin/$BASENAME -D -f $HAPROXYDIR/etc/$BASENAME.conf -p /var/run/$BASENAME.pid -sf $(cat /var/run/$BASENAME.pid)
+  $HAPROXYDIR/sbin/$BASENAME -D -f $HAPROXYDIR/$BASENAME.conf -p /var/run/$BASENAME.pid -sf $(cat /var/run/$BASENAME.pid)
 }
  
 check() {
