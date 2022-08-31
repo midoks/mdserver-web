@@ -2338,7 +2338,7 @@ def installPreInspection(version):
 
 
 def uninstallPreInspection(version):
-    return "请手动删除MySQL[{}]\n rm -rf {}".format(version, getServerDir())
+    return "请手动删除MySQL[{}]<br/> rm -rf {}".format(version, getServerDir())
     # return 'ok'
 
 if __name__ == "__main__":
