@@ -2338,8 +2338,8 @@ def installPreInspection(version):
 
 
 def uninstallPreInspection(version):
-    # return "请手动删除MySQL[{}]".format(version)
-    return 'ok'
+    return "请手动删除MySQL[{}]".format(version)
+    # return 'ok'
 
 if __name__ == "__main__":
     func = sys.argv[1]
