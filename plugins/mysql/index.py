@@ -2338,8 +2338,10 @@ def installPreInspection(version):
 
 
 def uninstallPreInspection(version):
+    if mw.isDebugMode():
+        return 'ok'
+
     return "请手动删除MySQL[{}]<br/> rm -rf {}".format(version, getServerDir())
-    # return 'ok'
 
 if __name__ == "__main__":
     func = sys.argv[1]

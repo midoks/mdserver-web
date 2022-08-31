@@ -2180,8 +2180,10 @@ def installPreInspection(version):
 
 
 def uninstallPreInspection(version):
-    # return "请手动删除MySQL[{}]".format(version)
-    return 'ok'
+    if mw.isDebugMode():
+        return 'ok'
+
+    return "请手动删除MariaDB[{}]<br/> rm -rf {}".format(version, getServerDir())
 
 if __name__ == "__main__":
     func = sys.argv[1]
