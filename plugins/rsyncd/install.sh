@@ -23,7 +23,7 @@ Install_rsyncd()
 	echo '正在安装脚本文件...' > $install_tmp
 	
 
-	if [ "$OSNAME" == "debian'" ] || [ "$OSNAME" == "ubuntu'" ];then
+	if [ "$OSNAME" == "debian" ] || [ "$OSNAME" == "ubuntu" ];then
 		apt install -y rsync
 		apt install -y lsyncd
 	elif [[ "$OSNAME" == "arch" ]]; then
