@@ -63,8 +63,8 @@ PHP[72-81]支持phpMyAdmin[5.2.0]
 
 # AD - VPS推荐 - 🙏
 
-| 服务商			| 	LOGO 		|	推广地址 	| 优惠码 |
-| ----------------- |---------------|---------------|
+| 服务商			| 	LOGO   |  推广地址  | 优惠码 |
+| ------------- |----------|-----------|-------|
 | digitalvirt	|[![digitalvirt](https://digitalvirt.com/templates/BlueWhite/img/logo-dark.svg)](https://digitalvirt.com/aff.php?aff=154) | https://digitalvirt.com/aff.php?aff=154 | 9SYDY7UH0U |
 | 搬瓦工	|[![搬瓦工](https://bwh81.net/templates/organicbandwagon/images/logo.png)](https://bandwagonhost.com/aff.php?aff=54161) | https://bandwagonhost.com/aff.php?aff=54161 | BWH3HYATVBJW |
 
