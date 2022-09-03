@@ -62,7 +62,9 @@ PHP[72-81]支持phpMyAdmin[5.2.0]
 ```
 
 # AD - VPS推荐
-| [![digitalvirt](https://digitalvirt.com/templates/BlueWhite/img/logo-dark.svg)](https://digitalvirt.com/aff.php?aff=154) |
+[![digitalvirt](https://digitalvirt.com/templates/BlueWhite/img/logo-dark.svg)](https://digitalvirt.com/aff.php?aff=154)
+[![搬瓦工](https://bwh81.net/templates/organicbandwagon/images/logo.png)](https://bandwagonhost.com/aff.php?aff=54161)
+
 
 # Docker
 
