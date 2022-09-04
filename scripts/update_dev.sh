@@ -49,7 +49,14 @@ else
 	OSNAME='unknow'
 fi
 
-wget -O /tmp/dev.zip https://github.com/midoks/mdserver-web/archive/refs/heads/dev.zip
+cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
+if [ ! -z "$cn" ];then
+	wget -O /tmp/dev.zip https://github.com/midoks/mdserver-web/archive/refs/heads/dev.zip
+else
+	wget -O /tmp/dev.zip https://codeload.github.com/midoks/mdserver-web/zip/dev
+fi
+
+# wget -O /tmp/dev.zip https://github.com/midoks/mdserver-web/archive/refs/heads/dev.zip
 cd /tmp && unzip /tmp/dev.zip
 cp -rf /tmp/mdserver-web-dev/* /www/server/mdserver-web
 rm -rf /tmp/dev.zip
