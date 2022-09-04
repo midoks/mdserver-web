@@ -127,6 +127,10 @@ curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/qu
 ```
 curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/install_dev.sh | bash
 curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update_dev.sh | bash
+
+
+curl -fsSL https://gitee.com/midoks/mdserver-web/raw/master/scripts/install_dev.sh | bash
+curl -fsSL https://gitee.com/midoks/mdserver-web/raw/master/scripts/update_dev.sh | bash
 ```
 
 ### 微信赞助
