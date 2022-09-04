@@ -29,6 +29,8 @@ getBit(){
 
 Install_gogs()
 {
+	pip3 install mysqlclient
+	
 	mkdir -p $serverPath/source/gogs
 
 	echo '正在安装脚本文件...' > $install_tmp
