@@ -53,7 +53,7 @@ cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
 if [ ! -z "$cn" ];then
 	wget -O /tmp/dev.zip https://github.com/midoks/mdserver-web/archive/refs/heads/dev.zip
 else
-	wget -O /tmp/dev.zip https://codeload.github.com/midoks/mdserver-web/zip/dev
+	wget -O /tmp/dev.zip https://gitee.com/midoks/mdserver-web/repository/archive/dev.zip
 fi
 
 # wget -O /tmp/dev.zip https://github.com/midoks/mdserver-web/archive/refs/heads/dev.zip
