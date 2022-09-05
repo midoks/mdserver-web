@@ -412,7 +412,6 @@ def setFpmConfig(version):
     # if not 'max' in args:
     #     return 'missing time args!'
 
-    version = args['version']
     max_children = args['max_children']
     start_servers = args['start_servers']
     min_spare_servers = args['min_spare_servers']
