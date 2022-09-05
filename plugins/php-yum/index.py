@@ -439,7 +439,7 @@ def setFpmConfig(version):
     rep = "\s*pm\s*=\s*(\w+)\s*"
     conf = re.sub(rep, "\npm = " + pm + "\n", conf)
 
-    mw.writeFile(file, conf)
+    mw.writeFile(filefpm, conf)
     reload(version)
 
     msg = mw.getInfo('设置PHP-{1}并发设置,max_children={2},start_servers={3},min_spare_servers={4},max_spare_servers={5}', (version, max_children,
