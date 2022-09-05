@@ -419,7 +419,8 @@ def setFpmConfig(version):
     max_spare_servers = args['max_spare_servers']
     pm = args['pm']
 
-    file = getServerDir() + '/php' + version + '/php-fpm.d/www.conf'
+    # file = getServerDir() + '/php' + version + '/php-fpm.d/www.conf'
+    file = getFpmConfFile(version)
     conf = mw.readFile(file)
 
     rep = "\s*pm.max_children\s*=\s*([0-9]+)\s*"
