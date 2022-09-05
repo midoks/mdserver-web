@@ -419,8 +419,8 @@ def setFpmConfig(version):
     pm = args['pm']
 
     # file = getServerDir() + '/php' + version + '/php-fpm.d/www.conf'
-    file = getFpmConfFile(version)
-    conf = mw.readFile(file)
+    filefpm = getFpmConfFile(version)
+    conf = mw.readFile(filefpm)
 
     rep = "\s*pm.max_children\s*=\s*([0-9]+)\s*"
     conf = re.sub(rep, "\npm.max_children = " + max_children, conf)
