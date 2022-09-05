@@ -19,7 +19,6 @@ if [ "$EUID" -ne 0 ]
 fi
 
 
-
 if [ ${_os} == "Darwin" ]; then
 	OSNAME='macos'
 elif grep -Eq "openSUSE" /etc/*-release; then
