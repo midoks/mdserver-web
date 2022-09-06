@@ -141,7 +141,8 @@ curl -fsSL https://gitee.com/midoks/mdserver-web/raw/master/scripts/update_dev.s
 
 ### 捐赠地址 USDT（TRC20）
 
-TM1p4FcH3w8MGJ6MWRWd2waMiDXPcSEYVZ
+TVbNgrpeGBGZVm5gTLa21ADP7RpnPFhjya
+
 
 ### 微信赞助
 
