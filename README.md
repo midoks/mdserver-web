@@ -1,4 +1,10 @@
-### mdserver-web 0.9.7
+<p align="center">
+  <img alt="mdserver-web logo" src="https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/route/static/logo.jpg" height="140" />
+  <h3 align="center">mdserver-web</h3>
+  <p align="center">mdserver-web 是一款简单Linux面板服务。</p>
+</p>
+
+### 简介
 
 简单的Linux面板,感谢BT.CN写出如此好的web管理软件。我一看到，就知道这是我一直想要的页面化管理方式。
 复制了后台管理界面，按照自己想要的方式写了一版。
