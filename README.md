@@ -1,7 +1,7 @@
 <p align="center">
   <img alt="logo" src="https://raw.githubusercontent.com/midoks/mdserver-web/dev/route/static/logo.png" height="140" />
   <h3 align="center">mdserver-web</h3>
-  <p align="center">一款简单Linux面板服务。</p>
+  <p align="center">一款简单Linux面板服务</p>
 </p>
 
 ### 简介
