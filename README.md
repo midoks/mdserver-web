@@ -133,7 +133,12 @@ curl -fsSL https://gitee.com/midoks/mdserver-web/raw/master/scripts/install_dev.
 curl -fsSL https://gitee.com/midoks/mdserver-web/raw/master/scripts/update_dev.sh | bash
 ```
 
+### 捐赠地址 USDT（TRC20）
+
+TM1p4FcH3w8MGJ6MWRWd2waMiDXPcSEYVZ
+
 ### 微信赞助
+
 [![截图](https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/route/static/img/weixin_zz.jpg)](https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/route/static/img/weixin_zz.jpg)
 
 
