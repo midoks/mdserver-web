@@ -59,6 +59,7 @@ Install_openresty()
 	# --with-openssl=$serverPath/source/lib/openssl-1.0.2q
 	cd ${openrestyDir}/openresty-${VERSION} && ./configure \
 	--prefix=$serverPath/openresty \
+	--with-ipv6 \
 	--with-http_v2_module \
 	--with-http_ssl_module  \
 	--with-http_slice_module \
