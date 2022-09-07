@@ -12,7 +12,7 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
 LIBNAME=xhprof
-LIBV=2.3.5
+LIBV=2.3.7
 sysName=`uname`
 actionType=$1
 version=$2
