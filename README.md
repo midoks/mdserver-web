@@ -95,6 +95,7 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 * 配置模板添加一个whmcs。
 * MySQL和MariaDB无法直接卸载。
 * OpenResty加入http_realip_module模块。
+* PHP加入igbinary扩展。
 
 
 ### JSDelivr安装地址
