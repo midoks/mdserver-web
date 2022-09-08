@@ -12,7 +12,7 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
 LIBNAME=memcached
-LIBV=3.2.0
+LIBV=3.1.5
 sysName=`uname`
 actionType=$1
 version=$2
