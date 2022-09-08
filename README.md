@@ -84,10 +84,18 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.9.7
+### 版本更新 0.9.9
 
-* haproxy插件添加.
-* 细节优化.
+* 更换Logo。
+* 增加amazon linux系统支持。
+* 修复rsyncd在debian或ubuntu下安装失败问题。
+* Readme加入一AD。
+* PHP-YUM|PHP-APT优化[性能调整]。
+* 优化Gogs使用MySQL的方式。
+* 配置模板添加一个whmcs。
+* MySQL和MariaDB无法直接卸载。
+* OpenResty加入http_realip_module模块。
+
 
 ### JSDelivr安装地址
 
