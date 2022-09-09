@@ -68,6 +68,9 @@ class ORM:
     def setPort(self, port):
         self.__DB_PORT = port
 
+    def setUser(self, user):
+        self.__DB_USER = user
+
     def setPwd(self, pwd):
         self.__DB_PASS = pwd
 

@@ -34,6 +34,9 @@ elif grep -Eqi "Rocky" /etc/issue || grep -Eq "Rocky" /etc/*-release; then
 elif grep -Eqi "AlmaLinux" /etc/issue || grep -Eq "AlmaLinux" /etc/*-release; then
 	OSNAME='alma'
 	yum install -y wget zip unzip
+elif grep -Eqi "Amazon Linux" /etc/issue || grep -Eq "Amazon Linux" /etc/*-release; then
+	OSNAME='amazon'
+	yum install -y wget zip unzip
 elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
 	OSNAME='debian'
 	apt install -y wget zip unzip

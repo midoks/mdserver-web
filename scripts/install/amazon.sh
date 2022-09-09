@@ -17,7 +17,6 @@ yum install -y wget lsof crontabs
 yum install -y python3-devel
 yum install -y python3-pip
 yum install -y python-devel
-yum install -y vixie-cron
 yum install -y curl-devel libmcrypt libmcrypt-devel
 yum install -y mysql-devel
 yum install -y expect

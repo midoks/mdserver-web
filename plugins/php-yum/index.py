@@ -412,15 +412,15 @@ def setFpmConfig(version):
     # if not 'max' in args:
     #     return 'missing time args!'
 
-    version = args['version']
     max_children = args['max_children']
     start_servers = args['start_servers']
     min_spare_servers = args['min_spare_servers']
     max_spare_servers = args['max_spare_servers']
     pm = args['pm']
 
-    file = getServerDir() + '/php' + version + '/php-fpm.d/www.conf'
-    conf = mw.readFile(file)
+    # file = getServerDir() + '/php' + version + '/php-fpm.d/www.conf'
+    filefpm = getFpmConfFile(version)
+    conf = mw.readFile(filefpm)
 
     rep = "\s*pm.max_children\s*=\s*([0-9]+)\s*"
     conf = re.sub(rep, "\npm.max_children = " + max_children, conf)
@@ -439,7 +439,7 @@ def setFpmConfig(version):
     rep = "\s*pm\s*=\s*(\w+)\s*"
     conf = re.sub(rep, "\npm = " + pm + "\n", conf)
 
-    mw.writeFile(file, conf)
+    mw.writeFile(filefpm, conf)
     reload(version)
 
     msg = mw.getInfo('设置PHP-{1}并发设置,max_children={2},start_servers={3},min_spare_servers={4},max_spare_servers={5}', (version, max_children,

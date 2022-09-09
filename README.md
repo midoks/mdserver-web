@@ -1,4 +1,10 @@
-### mdserver-web 0.9.7
+<p align="center">
+  <img alt="logo" src="https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/route/static/logo.png" height="140" />
+  <h3 align="center">mdserver-web</h3>
+  <p align="center">一款简单Linux面板服务</p>
+</p>
+
+### 简介
 
 简单的Linux面板,感谢BT.CN写出如此好的web管理软件。我一看到，就知道这是我一直想要的页面化管理方式。
 复制了后台管理界面，按照自己想要的方式写了一版。
@@ -61,6 +67,15 @@ PHP[53-72]支持phpMyAdmin[4.4.15]
 PHP[72-81]支持phpMyAdmin[5.2.0]
 ```
 
+# AD - VPS推荐 - 🙏
+
+- [ZZZ评测](https://www.zzzvps.com/)
+
+| 服务商			| 	LOGO   |  推广地址  | 优惠码 |
+| ------------- |----------|-----------|-------|
+| digitalvirt	|[![digitalvirt](https://digitalvirt.com/templates/BlueWhite/img/logo-dark.svg)](https://digitalvirt.com/aff.php?aff=154) | https://digitalvirt.com/aff.php?aff=154 | 9SYDY7UH0U |
+| 搬瓦工	|[![搬瓦工](https://bwh81.net/templates/organicbandwagon/images/logo.png)](https://bandwagonhost.com/aff.php?aff=54161) | https://bandwagonhost.com/aff.php?aff=54161 | BWH3HYATVBJW |
+
 # Docker
 
 - 由[DDSRem](https://github.com/DDSRem)开发维护。
@@ -71,10 +86,19 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.9.7
+### 版本更新 0.9.9
 
-* haproxy插件添加.
-* 细节优化.
+* 更换Logo。
+* 增加amazon linux系统支持。
+* 修复rsyncd在debian或ubuntu下安装失败问题。
+* Readme加入一AD。
+* PHP-YUM|PHP-APT优化[性能调整]。
+* 优化Gogs使用MySQL的方式。
+* 配置模板添加一个whmcs。
+* MySQL和MariaDB无法直接卸载。
+* OpenResty加入http_realip_module模块。
+* PHP加入igbinary扩展。
+
 
 ### JSDelivr安装地址
 
@@ -120,9 +144,19 @@ curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/qu
 ```
 curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/install_dev.sh | bash
 curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update_dev.sh | bash
+
+
+curl -fsSL https://gitee.com/midoks/mdserver-web/raw/master/scripts/install_dev.sh | bash
+curl -fsSL https://gitee.com/midoks/mdserver-web/raw/master/scripts/update_dev.sh | bash
 ```
 
+### 捐赠地址 USDT（TRC20）
+
+TVbNgrpeGBGZVm5gTLa21ADP7RpnPFhjya
+
+
 ### 微信赞助
+
 [![截图](https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/route/static/img/weixin_zz.jpg)](https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/route/static/img/weixin_zz.jpg)
 
 
@@ -138,7 +172,7 @@ curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/up
 
 ### 感谢开发赞助
 
-[![digitalvirt](https://digitalvirt.com/templates/BlueWhite/img/logo-dark.svg)](https://digitalvirt.com/)
+[![digitalvirt](https://digitalvirt.com/templates/BlueWhite/img/logo-dark.svg)](https://digitalvirt.com/aff.php?aff=154)
 
 ### 授权许可
 

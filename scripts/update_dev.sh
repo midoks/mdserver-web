@@ -22,8 +22,6 @@ elif grep -Eq "openSUSE" /etc/*-release; then
 	zypper refresh
 elif grep -Eq "FreeBSD" /etc/*-release; then
 	OSNAME='freebsd'
-elif grep -Eqi "Arch" /etc/issue || grep -Eq "Arch" /etc/*-release; then
-	OSNAME='arch'
 elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
 	OSNAME='centos'
 	yum install -y wget zip unzip
@@ -35,6 +33,9 @@ elif grep -Eqi "Rocky" /etc/issue || grep -Eq "Rocky" /etc/*-release; then
 	yum install -y wget zip unzip
 elif grep -Eqi "AlmaLinux" /etc/issue || grep -Eq "AlmaLinux" /etc/*-release; then
 	OSNAME='alma'
+	yum install -y wget zip unzip
+elif grep -Eqi "Amazon Linux" /etc/issue || grep -Eq "Amazon Linux" /etc/*-release; then
+	OSNAME='amazon'
 	yum install -y wget zip unzip
 elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
 	OSNAME='debian'
@@ -48,7 +49,14 @@ else
 	OSNAME='unknow'
 fi
 
-wget -O /tmp/dev.zip https://github.com/midoks/mdserver-web/archive/refs/heads/dev.zip
+cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
+if [ ! -z "$cn" ];then
+	wget -O /tmp/dev.zip https://gitee.com/midoks/mdserver-web/repository/archive/dev.zip
+else
+	wget -O /tmp/dev.zip https://github.com/midoks/mdserver-web/archive/refs/heads/dev.zip
+fi
+
+# wget -O /tmp/dev.zip https://github.com/midoks/mdserver-web/archive/refs/heads/dev.zip
 cd /tmp && unzip /tmp/dev.zip
 cp -rf /tmp/mdserver-web-dev/* /www/server/mdserver-web
 rm -rf /tmp/dev.zip

@@ -31,9 +31,6 @@ def getPluginName():
 def getPluginDir():
     return mw.getPluginDir() + '/' + getPluginName()
 
-sys.path.append(getPluginDir() + "/class")
-import mysqlDb
-
 
 def getServerDir():
     return mw.getServerDir() + '/' + getPluginName()
@@ -235,16 +232,19 @@ def getDbConfValue():
 
 
 def pMysqlDb(conf):
-
     host = conf['HOST'].split(':')
-    conn = mysqlDb.mysqlDb()
+    # pymysql
+    db = mw.getMyORM()
+    # MySQLdb |
+    # db = mw.getMyORMDb()
 
-    conn.setHost(host[0])
-    conn.setUser(conf['USER'])
-    conn.setPwd(conf['PASSWD'])
-    conn.setPort(int(host[1]))
-    conn.setDb(conf['NAME'])
-    return conn
+    db.setPort(int(host[1]))
+    db.setUser(conf['USER'])
+    db.setPwd(conf['PASSWD'])
+    db.setDbName(conf['NAME'])
+    # db.setSocket(getSocketFile())
+    db.setCharset("utf8")
+    return db
 
 
 def pSqliteDb(conf):
@@ -476,7 +476,7 @@ def userList():
 
     start = (page - 1) * page_size
     list_count = pQuery('select count(id) as num from user')
-    count = list_count[0][0]
+    count = list_count[0]["num"]
     list_data = pQuery(
         'select id,name,email from user order by id desc limit ' + str(start) + ',' + str(page_size))
     data['list'] = mw.getPage({'count': count, 'p': page,

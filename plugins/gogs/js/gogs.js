@@ -163,11 +163,11 @@ function gogsUserList(page, search) {
 
         ulist = rdata['data']['data'];
         for (i in ulist){
-            email = ulist[i][2] == '' ? '无' : ulist[i][2];
-            content += '<tr><td>'+ulist[i][0]+'</td>'+
-                '<td>'+ulist[i][1]+'</td>'+
+            email = ulist[i]["email"] == '' ? '无' : ulist[i]["email"];
+            content += '<tr><td>'+ulist[i]["id"]+'</td>'+
+                '<td>'+ulist[i]["name"]+'</td>'+
                 '<td>'+email+'</td>'+
-                '<td><a class="btlink" onclick="userProjectList(\''+ulist[i][1]+'\')">项目管理</a></td>'+
+                '<td><a class="btlink" onclick="userProjectList(\''+ulist[i]["name"]+'\')">项目管理</a></td>'+
                 '</tr>';
         }
 
