@@ -13,7 +13,7 @@ service mw [start|stop|reload|restart|status]
 
 ```
 
-sytemctl [start|stop|reload|restart|status] openresty 
+systemctl [start|stop|reload|restart|status] openresty 
 
 ```
 
@@ -21,7 +21,7 @@ sytemctl [start|stop|reload|restart|status] openresty
 
 ```
 
-sytemctl [start|stop|reload|restart|status] mysql 
+systemctl [start|stop|reload|restart|status] mysql 
 
 ```
 
@@ -29,7 +29,7 @@ sytemctl [start|stop|reload|restart|status] mysql
 
 ```
 
-sytemctl [start|stop|reload|restart|status] mariadb 
+systemctl [start|stop|reload|restart|status] mariadb 
 
 ```
 
@@ -37,16 +37,16 @@ sytemctl [start|stop|reload|restart|status] mariadb
 
 ```
 
-sytemctl [start|stop|reload|restart|status] php[54-81] 
+systemctl [start|stop|reload|restart|status] php[54-81] 
 
-sytemctl start php71
+systemctl start php71
 ```
 
 - Redis
 
 ```
 
-sytemctl [start|stop|reload|restart|status] redis
+systemctl [start|stop|reload|restart|status] redis
 
 ```
 
@@ -54,7 +54,7 @@ sytemctl [start|stop|reload|restart|status] redis
 
 ```
 
-sytemctl [start|stop|reload|restart|status] memcached
+systemctl [start|stop|reload|restart|status] memcached
 
 ```
 
@@ -63,6 +63,6 @@ sytemctl [start|stop|reload|restart|status] memcached
 
 ```
 
-sytemctl [start|stop|reload|restart|status] sphinx
+systemctl [start|stop|reload|restart|status] sphinx
 
 ```
