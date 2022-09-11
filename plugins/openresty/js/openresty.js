@@ -79,7 +79,7 @@ function orPluginOpService(a, b, v,request_callback) {
 
 function orPluginOpServiceOp(a,b,c,d,a,v,request_callback){
 
-     var request_path = "/plugins/run";
+    var request_path = "/plugins/run";
     if (request_callback == 'yes'){
         request_path = "/plugins/callback";
     }
