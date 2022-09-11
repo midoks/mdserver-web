@@ -167,13 +167,13 @@ def restartWeb():
     # systemd
     systemd = '/lib/systemd/system/openresty.service'
     if os.path.exists(systemd):
-        execShell('systemctl restart openresty')
+        execShell('systemctl reload openresty')
         return True
 
     # initd
     initd = getServerDir() + '/openresty/init.d/openresty'
     if os.path.exists(initd):
-        execShell(initd + ' ' + 'restart')
+        execShell(initd + ' ' + 'reload')
         return True
 
     return False
