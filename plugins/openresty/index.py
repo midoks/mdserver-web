@@ -216,11 +216,14 @@ def restyOp(method):
         return 'ok'
     return data[1]
 
-def submit_restart1():
+
+def op_submit_systemctl_restart():
     mw.execShell('systemctl restart openresty')
 
-def submit_restart2(file):
+
+def op_submit_init_restart(file):
     mw.execShell(file + ' restart')
+
 
 def restyOp_restart():
     file = initDreplace()
@@ -232,13 +235,14 @@ def restyOp_restart():
         return check_data[1]
 
     if not mw.isAppleSystem():
-        threading.Timer(5,submit_restart1,args=()).start()
-        #submit_restart1()
+        threading.Timer(2, op_submit_systemctl_restart, args=()).start()
+        # submit_restart1()
         return 'ok'
 
-    threading.Timer(5,submit_restart2,args=(file)).start()
-    #submit_restart2(file)
+    threading.Timer(2, op_submit_init_restart, args=(file,)).start()
+    # submit_restart2(file)
     return 'ok'
+
 
 def start():
     return restyOp('start')
@@ -254,7 +258,6 @@ def restart():
 
 def reload():
     return restyOp('reload')
-
 
 
 def initdStatus():
