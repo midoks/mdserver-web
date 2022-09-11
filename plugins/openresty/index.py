@@ -215,6 +215,29 @@ def restyOp(method):
         return 'ok'
     return data[1]
 
+def submit_restart1():
+    mw.execShell('systemctl restart openresty')
+
+def submit_restart2(file):
+    mw.execShell(file + ' restart')
+
+def restyOp_restart():
+    file = initDreplace()
+
+    # 启动时,先检查一下配置文件
+    check = getServerDir() + "/bin/openresty -t"
+    check_data = mw.execShell(check)
+    if not check_data[1].find('test is successful') > -1:
+        return check_data[1]
+
+    if not mw.isAppleSystem():
+        threading.Timer(5,submit_restart1,args=()).start()
+        #submit_restart1()
+        return 'ok'
+
+    threading.Timer(5,submit_restart2,args=(file)).start()
+    #submit_restart2(file)
+    return 'ok'
 
 def start():
     return restyOp('start')
@@ -225,11 +248,12 @@ def stop():
 
 
 def restart():
-    return restyOp('restart')
+    return restyOp_restart()
 
 
 def reload():
     return restyOp('reload')
+
 
 
 def initdStatus():
