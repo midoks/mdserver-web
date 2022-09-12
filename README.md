@@ -67,6 +67,10 @@ PHP[53-72]支持phpMyAdmin[4.4.15]
 PHP[72-81]支持phpMyAdmin[5.2.0]
 ```
 
+# 特别赞助
+
+- [找资源 - 阿里云盘资源搜索引擎](https://zhaoziyuan.la/)
+
 # AD - VPS推荐 - 🙏
 
 - [ZZZ评测](https://www.zzzvps.com/)
