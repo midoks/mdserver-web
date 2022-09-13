@@ -35,7 +35,6 @@ OSNAME=`cat ${rootPath}/data/osname.pl`
 OSNAME_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
 
-
 Install_debain(){
 	hostname=`hostname`
   	# 安装postfix和postfix-sqlite
@@ -52,6 +51,19 @@ Install_debain(){
 
   	apt install cyrus-sasl-plain -y
 }
+
+Uninstall_debain(){
+	apt remove postfix postfix-sqlite -y && rm -rf /etc/postfix
+    dpkg -P postfix postfix-sqlite
+    apt remove dovecot-core dovecot-imapd dovecot-lmtpd dovecot-pop3d dovecot-sqlite dovecot-sieve -y
+    dpkg -P dovecot-core dovecot-imapd dovecot-lmtpd dovecot-pop3d dovecot-sqlite dovecot-sieve
+    apt remove opendkim opendkim-tools -y
+    dpkg -P opendkim opendkim-tools
+    apt remove rspamd -y
+    dpkg -P rspamd
+}
+
+
 
 Install_App()
 {
@@ -104,12 +116,30 @@ Install_App()
 
 Uninstall_App()
 {
+	if [[ $OSNAME = "centos" ]]; then
+
+		if [[ $OSNAME_ID == "7" ]];then
+			Install_centos7
+		fi
+
+		if [[ $OSNAME_ID == "8" ]];then
+			Install_centos8
+		fi
+
+  	elif [[ $OSNAME = "debian" ]]; then
+    	Uninstall_debain
+  	else
+    	Install_ubuntu
+  	fi
 
 	if [ -f $serverPath/mail/initd/mail ];then
 		$serverPath/mail/initd/mail stop
 	fi
 
-	rm -rf $serverPath/mail
+	rm -rf /etc/postfix
+	rm -rf /etc/dovecot
+	rm -rf /etc/opendkim
+	rm -rf /usr/share/rspamd/www/rspamd
 	echo "Uninstall_Mail" > $install_tmp
 }
 
