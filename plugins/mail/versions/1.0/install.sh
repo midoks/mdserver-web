@@ -74,6 +74,26 @@ Install_App()
     	Install_ubuntu
   	fi
 
+  	if [ ! -f /etc/dovecot/conf.d/90-sieve.conf ];then
+	    if [ -f "/usr/bin/apt-get" ];then
+	     	apt install dovecot-sieve -y
+	    else
+	     	rm -rf /etc/dovecot_back
+	      	cp -a /etc/dovecot /etc/dovecot_back
+	      	yum remove dovecot -y
+	      	yum install dovecot-pigeonhole -y
+	      	if [ ! -f /usr/sbin/dovecot ]; then
+	        	yum install dovecot -y
+	      	fi
+	      	\cp -a /etc/dovecot_back/* /etc/dovecot
+	      	chown -R vmail:dovecot /etc/dovecot
+	      	chmod -R o-rwx /etc/dovecot
+
+	      	systemctl enable dovecot
+	      	systemctl restart  dovecot
+	    fi
+	  fi
+
   	filesize=`ls -l /etc/dovecot/dh.pem | awk '{print $5}'`
   	echo $filesize
 
