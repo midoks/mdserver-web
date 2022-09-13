@@ -26,6 +26,9 @@ fi
 # 	exit 0
 # fi
 
+## debug:
+## cd /www/server/mdserver-web/plugins/mail && bash install.sh install 1.0
+
 bash ${rootPath}/scripts/getos.sh
 OSNAME=`cat ${rootPath}/data/osname.pl`
 OSNAME_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
@@ -33,7 +36,19 @@ OSNAME_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F
 
 
 Install_debain(){
+	hostname=`hostname`
+  	# 安装postfix和postfix-sqlite
+  	debconf-set-selections <<< "postfix postfix/mailname string ${hostname}"
+  	debconf-set-selections <<< "postfix postfix/main_mailer_type string 'Internet Site'"
+  	apt install postfix -y
+  	apt install postfix-sqlite -y
+  	apt install sqlite -y
+  	# 安装dovecot和dovecot-sieve
+  	apt install dovecot-core dovecot-pop3d dovecot-imapd dovecot-lmtpd dovecot-sqlite dovecot-sieve -y
 
+  	apt install rspamd -y
+  	
+  	apt install cyrus-sasl-plain -y
 }
 
 Install_App()
