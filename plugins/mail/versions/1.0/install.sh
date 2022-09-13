@@ -26,6 +26,7 @@ fi
 # 	exit 0
 # fi
 
+## curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update_dev.sh | bash
 ## debug:
 ## cd /www/server/mdserver-web/plugins/mail && bash install.sh install 1.0
 
@@ -43,11 +44,12 @@ Install_debain(){
   	apt install postfix -y
   	apt install postfix-sqlite -y
   	apt install sqlite -y
+
   	# 安装dovecot和dovecot-sieve
   	apt install dovecot-core dovecot-pop3d dovecot-imapd dovecot-lmtpd dovecot-sqlite dovecot-sieve -y
 
   	apt install rspamd -y
-  	
+
   	apt install cyrus-sasl-plain -y
 }
 
@@ -70,6 +72,13 @@ Install_App()
     	Install_debain
   	else
     	Install_ubuntu
+  	fi
+
+  	filesize=`ls -l /etc/dovecot/dh.pem | awk '{print $5}'`
+  	echo $filesize
+
+  	if [ ! -f "/etc/dovecot/dh.pem" ] || [ $filesize -lt 300 ]; then
+    	openssl dhparam 2048 > /etc/dovecot/dh.pem
   	fi
 }
 
