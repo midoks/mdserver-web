@@ -211,7 +211,10 @@ def initdUinstall():
 
 
 def runLog():
-    return getServerDir() + '/data/redis.log'
+    path = '/var/log/maillog'
+    # if "ubuntu" in:
+    #     path = '/var/log/mail.log'
+    return path
 
 if __name__ == "__main__":
     func = sys.argv[1]

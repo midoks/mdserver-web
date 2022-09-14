@@ -63,23 +63,23 @@ Uninstall_debain(){
     dpkg -P rspamd
 }
 
+Install_ubuntu(){
+	Install_debain
+}
 
+Uninstall_ubuntu(){
+	Uninstall_debain
+}
 
 Install_App()
 {
 	echo '正在安装脚本文件...' > $install_tmp
 	mkdir -p $serverPath/source
 
-	if [[ $OSNAME = "centos" ]]; then
+	runScript=$curPath/install_$OSNAME.sh
 
-		if [[ $OSNAME_ID == "7" ]];then
-			Install_centos7
-		fi
-
-		if [[ $OSNAME_ID == "8" ]];then
-			Install_centos8
-		fi
-
+	if [[ -f $runScript ]]; then
+		sh -x $runScript install
   	elif [[ $OSNAME = "debian" ]]; then
     	Install_debain
   	else
@@ -116,20 +116,13 @@ Install_App()
 
 Uninstall_App()
 {
-	if [[ $OSNAME = "centos" ]]; then
-
-		if [[ $OSNAME_ID == "7" ]];then
-			Install_centos7
-		fi
-
-		if [[ $OSNAME_ID == "8" ]];then
-			Install_centos8
-		fi
-
+	runScript=$curPath/install_$OSNAME.sh
+	if [[ -f $runScript ]]; then
+		sh -x $runScript uninstall
   	elif [[ $OSNAME = "debian" ]]; then
     	Uninstall_debain
   	else
-    	Install_ubuntu
+    	Uninstall_ubuntu
   	fi
 
 	if [ -f $serverPath/mail/initd/mail ];then
