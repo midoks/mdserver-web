@@ -112,6 +112,10 @@ Install_App()
   	if [ ! -f "/etc/dovecot/dh.pem" ] || [ $filesize -lt 300 ]; then
     	openssl dhparam 2048 > /etc/dovecot/dh.pem
   	fi
+
+  	mkdir -p $serverPath/mail
+  	echo '1.0' > $serverPath/mail/version.pl
+	echo '安装完成' > $install_tmp
 }
 
 Uninstall_App()

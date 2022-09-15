@@ -1,10 +1,8 @@
 <div class="bt-form">
 	<div class="bt-w-main">
 		<div class="bt-w-menu">
-			<p class="bgw" onclick="pluginService('mail');">域名列表</p>
-			<p onclick="pluginInitD('mail');">自启动</p>
-			<p onclick="pluginConfig('mail');">配置修改</p>
-			<p onclick="pluginConfig('mail');">服务状态</p>
+			<p class="bgw" onclick="domainList();">域名列表</p>
+			<p onclick="serviceStatus();">服务状态</p>
 			<p onclick="pluginLogs('mail','','run_log');">日志</p>
 		</div>
 		<div class="bt-w-con pd15">
@@ -13,7 +11,8 @@
 	</div>
 </div>
 <script type="text/javascript">
+resetPluginWinWidth(870);
 $.getScript( "/plugins/file?name=mail&f=js/mail.js", function(){
-	pluginService('mail', $('.plugin_version').attr('version'));
+	domainList();
 });
 </script>

@@ -70,12 +70,12 @@ Install_centos7() {
 }
 
 install_rspamd() {
-    if [[ $systemver = "7" ]];then
+    if [[ $OSNAME_ID = "7" ]];then
         wget -O /etc/yum.repos.d/rspamd.repo https://rspamd.com/rpm-stable/centos-7/rspamd.repo
         rpm --import https://rspamd.com/rpm-stable/gpg.key
         yum makecache
         yum install rspamd -y
-    elif [ $systemver = "8" ]; then
+    elif [ $OSNAME_ID = "8" ]; then
         wget -O /etc/yum.repos.d/rspamd.repo https://rspamd.com/rpm-stable/centos-8/rspamd.repo
         rpm --import https://rspamd.com/rpm-stable/gpg.key
         yum makecache
