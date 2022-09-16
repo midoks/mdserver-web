@@ -80,6 +80,7 @@ $('#LoadList .mask').hover(function() {
 
 
 function showCpuTips(rdata){
+    $('#cpuChart .mask').unbind();
     $('#cpuChart .mask').hover(function() {
         var cpuText = '';
         for (var i = 1; i < rdata.cpu[2].length + 1; i++) {
@@ -481,6 +482,8 @@ function setImg() {
             $(this).find('.left').css('transform', "rotate(" + (num - 180) + "deg)");
         };
     });
+    
+    $('.diskbox .mask').unbind();
     $('.diskbox .mask').hover(function() {
         layer.closeAll('tips');
         var that = this;
