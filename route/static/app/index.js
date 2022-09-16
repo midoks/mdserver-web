@@ -83,14 +83,19 @@ function showCpuTips(rdata){
     $('#cpuChart .mask').unbind();
     $('#cpuChart .mask').hover(function() {
         var cpuText = '';
-        for (var i = 1; i < rdata.cpu[2].length + 1; i++) {
-          var cpuUse = parseFloat(rdata.cpu[2][i - 1] == 0 ? 0 : rdata.cpu[2][i - 1]).toFixed(1)
-          if (i % 2 != 0) {
-            cpuText += 'CPU-' + i + '：' + cpuUse + '%&nbsp;|&nbsp;'
-          } else {
-            cpuText += 'CPU-' + i + '：' + cpuUse + '%'
-            cpuText += '\n'
-          }
+
+        if (rdata.cpu[2].length == 1){
+            cpuText += 'CPU-1：' + cpuUse + '%'
+        } else{
+            for (var i = 1; i < rdata.cpu[2].length + 1; i++) {
+              var cpuUse = parseFloat(rdata.cpu[2][i - 1] == 0 ? 0 : rdata.cpu[2][i - 1]).toFixed(1)
+              if (i % 2 != 0) {
+                cpuText += 'CPU-' + i + '：' + cpuUse + '%&nbsp;|&nbsp;'
+              } else {
+                cpuText += 'CPU-' + i + '：' + cpuUse + '%'
+                cpuText += '\n'
+              }
+            } 
         }
         layer.tips(rdata.cpu[3] + "</br>" + rdata.cpu[5] + "个物理CPU，" + (rdata.cpu[4]) + "个物理核心，" + rdata.cpu[1] + "个逻辑核心</br>" + cpuText, this, { time: 0, tips: [1, '#999'] });
     }, function() {
@@ -482,7 +487,7 @@ function setImg() {
             $(this).find('.left').css('transform', "rotate(" + (num - 180) + "deg)");
         };
     });
-    
+
     $('.diskbox .mask').unbind();
     $('.diskbox .mask').hover(function() {
         layer.closeAll('tips');
