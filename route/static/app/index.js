@@ -65,6 +65,7 @@ function getLoad(data) {
 $('#LoadList .circle').click(function() {
     getNet();
 });
+
 $('#LoadList .mask').hover(function() {
     var one, five, fifteen;
     var that = this;
@@ -76,6 +77,25 @@ $('#LoadList .mask').hover(function() {
 }, function() {
     layer.closeAll('tips');
 });
+
+
+function showCpuTips(rdata){
+    $('#cpuChart .mask').hover(function() {
+        var cpuText = '';
+        for (var i = 1; i < rdata.cpu[2].length + 1; i++) {
+          var cpuUse = parseFloat(rdata.cpu[2][i - 1] == 0 ? 0 : rdata.cpu[2][i - 1]).toFixed(1)
+          if (i % 2 != 0) {
+            cpuText += 'CPU-' + i + '：' + cpuUse + '%&nbsp;|&nbsp;'
+          } else {
+            cpuText += 'CPU-' + i + '：' + cpuUse + '%'
+            cpuText += '\n'
+          }
+        }
+        layer.tips(rdata.cpu[3] + "</br>" + rdata.cpu[5] + "个物理CPU，" + (rdata.cpu[4]) + "个物理核心，" + rdata.cpu[1] + "个逻辑核心</br>" + cpuText, this, { time: 0, tips: [1, '#999'] });
+    }, function() {
+        layer.closeAll('tips');
+    });
+}
 
 
 function rocket(sum, m) {
@@ -249,9 +269,11 @@ function setcolor(pre, s, s1, s2, s3) {
     co.parent('.circle').css("background", LoadColor);
 }
 
+
+
+
 function getNet() {
-    var up;
-    var down;
+    var up, down;
     $.get("/system/network", function(net) {
         $("#InterfaceSpeed").html(lan.index.interfacespeed + "： 1.0Gbps");
         $("#upSpeed").html(net.up + ' KB');
@@ -269,6 +291,8 @@ function getNet() {
     
         // setMemImg(net.mem);
         setImg();
+
+        showCpuTips(net);
     },'json');
 }
 
@@ -478,16 +502,7 @@ setTimeout(function() {
             $('#toUpdate a').css("position","relative");
             return;
         }
-        // $.get('/system?action=ReWeb', function() {});
-        // layer.msg(rdata.msg, { icon: 1 });
-        // setTimeout(function() {
-        //     window.location.reload();
-        // }, 3000);
     },'json').error(function() {
-        // $.get('/system?action=ReWeb', function() {});
-        // setTimeout(function() {
-        //     window.location.reload();
-        // }, 3000);
     });
 }, 3000);
 

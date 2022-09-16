@@ -714,13 +714,24 @@ def getStrBetween(startStr, endStr, srcStr):
 
 
 def getCpuType():
+    cpuType = ''
+    if isAppleSystem():
+        cmd = "system_profiler SPHardwareDataType | grep 'Processor Name' | awk -F ':' '{print $2}'"
+        cpuinfo = execShell(cmd)
+        return cpuinfo[0].strip()
+
     # 取CPU类型
     cpuinfo = open('/proc/cpuinfo', 'r').read()
     rep = "model\s+name\s+:\s+(.+)"
-    tmp = re.search(rep, cpuinfo)
-    cpuType = None
+    tmp = re.search(rep, cpuinfo, re.I)
     if tmp:
         cpuType = tmp.groups()[0]
+    else:
+        cpuinfo = execShell('LANG="en_US.UTF-8" && lscpu')[0]
+        rep = "Model\s+name:\s+(.+)"
+        tmp = re.search(rep, cpuinfo, re.I)
+        if tmp:
+            cpuType = tmp.groups()[0]
     return cpuType
 
 
