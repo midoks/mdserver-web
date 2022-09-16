@@ -280,7 +280,7 @@ class system_api:
         used = psutil.cpu_percent(interval=interval)
 
         if os.path.exists('/proc/cpuinfo'):
-            c_tmp = public.readFile('/proc/cpuinfo')
+            c_tmp = mw.readFile('/proc/cpuinfo')
             d_tmp = re.findall("physical id.+", c_tmp)
             cpuLogicalNum = len(set(d_tmp))
 
