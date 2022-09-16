@@ -85,6 +85,7 @@ function showCpuTips(rdata){
         var cpuText = '';
 
         if (rdata.cpu[2].length == 1){
+            var cpuUse = parseFloat(rdata.cpu[2][0] == 0 ? 0 : rdata.cpu[2][0]).toFixed(1)
             cpuText += 'CPU-1：' + cpuUse + '%'
         } else{
             for (var i = 1; i < rdata.cpu[2].length + 1; i++) {
