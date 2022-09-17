@@ -52,6 +52,32 @@ def status():
     return 'start'
 
 
+def pSqliteDb(dbname='domain'):
+    file = getServerDir() + '/postfixadmin.db'
+    name = 'mail'
+    if not os.path.exists(file):
+        conn = mw.M(dbname).dbPos(getServerDir(), name)
+        csql = mw.readFile(getPluginDir() + '/conf/postfixadmin.sql')
+        csql_list = csql.split(';')
+        for index in range(len(csql_list)):
+            conn.execute(csql_list[index], ())
+    else:
+        # 现有run
+        # conn = mw.M(dbname).dbPos(getServerDir(), name)
+        # csql = mw.readFile(getPluginDir() + '/conf/mysql.sql')
+        # csql_list = csql.split(';')
+        # for index in range(len(csql_list)):
+        #     conn.execute(csql_list[index], ())
+        conn = mw.M(dbname).dbPos(getServerDir(), name)
+    return conn
+
+
+def addDomain():
+    args = getArgs()
+
+    return mw.returnJson(False, 'OK')
+
+
 def runLog():
     path = '/var/log/maillog'
     # if "ubuntu" in:
@@ -66,5 +92,7 @@ if __name__ == "__main__":
         print(getConf())
     elif func == 'run_log':
         print(runLog())
+    elif func == 'add_domain':
+        print(addDomain())
     else:
         print('error')

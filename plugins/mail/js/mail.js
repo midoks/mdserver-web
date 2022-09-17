@@ -1,192 +1,328 @@
+var mail  = {
+    plugin_name: 'mail',
+    init: function () {
+        var _this = this;
 
-function str2Obj(str){
-    var data = {};
-    kv = str.split('&');
-    for(i in kv){
-        v = kv[i].split('=');
-        data[v[0]] = v[1];
+        this.event();
+    },
+    event: function () {
+        var _this = this;
+
+        $('.bt-w-main .bt-w-menu p').click(function () {
+            var index = $(this).index();
+            $(this).addClass('on').siblings().removeClass('on');
+            $('.soft-man-con .task_block').eq(index).show().siblings().hide();
+            console.log(index);
+        });
+
+        console.log(_this);
+    },
+
+    // 编辑添加邮箱用户视图-方法
+    edit_domain_view: function (type, obj) {
+        var _this = this;
+        if (obj == undefined) {
+            obj = {
+                domain: '',
+                company_name: '',
+                admin_name: '',
+                admin_phone: ''
+            }
+        }
+    
+        layer.open({
+            type: 1,
+            title: type ? '添加邮箱域名' : '编辑邮箱域名',
+            area: '500px',
+            closeBtn: 1,
+            btn: [type ? '提交' : '保存', '取消'],
+            content: "<div class='bt-form pd20'>\
+                <div class='line'>\
+                    <span class='tname'>邮箱域名</span>\
+                    <div class='info-r c4'>\
+                        <input class='bt-input-text mr5' type='text' name='domain'  " + (!type ? "readonly='readonly'" : "") +
+                "    value='" + obj.domain + "' placeholder='请输入域名，例如btmail.cn' style='width:320px;' />\
+                    </div>\
+                </div>\
+                <div class='line'>\
+                    <span class='tname'>A记录</span>\
+                    <div class='info-r c4'>\
+                        <input class='bt-input-text mr5' type='text' name='a_record'  " + (!type ? "readonly='readonly'" : "") +
+                "    value='" + obj.domain + "' placeholder='请输入A记录,例如:btmail.btmail.cn' style='width:320px;' />\
+                    </div>\
+                </div>\
+                <div class='line'>\
+                    <ul class='help-info-text c7 mlr20' style='margin-top: 0px'>\
+                        <li style='color: red;'>当前邮箱域名仅支持一级域名</li>\
+                        <li>A记录解析参数[主机记录：mail或其他字符]、[记录值：当前服务器IP]</li>\
+                        <li>A记录需要解析当前域名A记录，A记录=主机记录值+当前域名</li>\
+                    </ul>\
+                </div>\
+            </div>",
+            yes: function (index, layers) {
+                var array = [
+                        ['domain', '邮箱域名不能为空！', 'a_record', 'A记录值不能为空!']
+                    ],
+                    _form = {},
+                    tel_reg = /^[1][3,4,5,6,7,8,9][0-9]{9}$/;
+                for (var i = 0; i < array.length; i++) {
+                    if ($('[name="' + array[i][0] + '"]').val() == '') {
+                        layer.msg(array[i][1], {
+                            icon: 2
+                        });
+                        return false;
+                    } else if (array[i][0] == 'admin_phone' && !tel_reg.test($('[name="' + array[i]
+                            [0] + '"]').val())) {
+                        layer.msg('管理手机号码格式错误，请重试！', {
+                            icon: 2
+                        });
+                        return false;
+                    }
+                    _form[array[i][0]] = $('[name="' + array[i][0] + '"]').val();
+                    _form[array[i][2]] = $('[name="' + array[i][2] + '"]').val();
+                }
+                if (type) {
+                    _this.add_domain(_form, function (res) {
+                        _this.create_domain_list({
+                            page: 1,
+                            size: 10
+                        }, function (res) {
+                            var rdata = res.msg.data,
+                                hostname = rdata;
+                            for (var i = 0; i < rdata.length; i++) {
+                                if (rdata[i].domain == _form['domain']) hostname =
+                                    rdata[i]['domain']
+                            }
+                            layer.close(index);
+                        });
+                    });
+                } else {
+                    _form['active'] = obj.active;
+                    _this.update_domain(_form, function (res) {
+                        _this.create_domain_list({
+                            page: 1,
+                            size: 10
+                        }, function (res) {
+                            layer.msg(res.msg, {
+                                icon: 1
+                            });
+                            layer.close(index);
+                        });
+                    });
+                }
+            }
+        })
+    },
+
+    // 添加域名_请求
+    add_domain: function (obj, callback) {
+        this.send({
+            tips: '正在添加域名，请稍候...',
+            method: 'add_domain',
+            data: {
+                domain: obj.domain,
+                a_record: obj.a_record,
+                company_name: obj.company_name,
+                admin_name: obj.admin_name,
+                admin_phone: obj.admin_phone
+            },
+            success: function (res) {
+                if (callback) callback(res);
+            }
+        });
+    },
+    // 获取域名列表_请求
+    get_domain_list: function (obj, callback) {
+        this.send({
+            tips: '正在获取域名列表,请稍候....',
+            method: 'get_domains',
+            data: {
+                p: obj.page,
+                size: obj.size
+            },
+            success: function (res) {
+                if (callback) callback(res);
+            }
+        })
+    },
+
+    // 创建域名列表-方法
+    create_domain_list: function (obj, callback) {
+        if (obj == undefined) obj = {
+            page: 1,
+            size: 10
+        }
+        var _this = this;
+        this.get_domain_list(obj, function (res) {
+            var _tbody = '',
+                rdata = res.msg.data;
+            _this.domain_list = rdata
+            if (rdata.length > 0) {
+                for (var i = 0; i < rdata.length; i++) {
+                    _tbody += '<tr>\
+                      <td>' + rdata[i].domain + '</td>\
+                      <td>' + (rdata[i].mx_status ?
+                        '<div style="color:#20a53a;"><span class="glyphicon glyphicon-ok" style="margin-right: 7px;"></span>已设置</div>' :
+                        '<div style="color:red;display: inline-block;"><span class="glyphicon glyphicon-remove" style="margin-right: 7px;"></span><a href="javascript:;" style="color:red" onclick="mail.set_analysis_mail(\'' +
+                        rdata[i].dkim_value + '\',\'' + rdata[i].dmarc_value + '\',\'' + rdata[i]
+                        .domain + '\',\'' + rdata[i].mx_record + '\')">未设置记录值</a></div>') + '</td>\
+                      <td>' + (rdata[i].a_status ?
+                        '<div style="color:#20a53a;"><span class="glyphicon glyphicon-ok" style="margin-right: 7px;"></span>已设置</div>' :
+                        '<div style="color:red;display: inline-block;"><span class="glyphicon glyphicon-remove" style="margin-right: 7px;"></span><a href="javascript:;" style="color:red" onclick="mail.set_analysis_mail(\'' +
+                        rdata[i].dkim_value + '\',\'' + rdata[i].dmarc_value + '\',\'' + rdata[i]
+                        .domain + '\',\'' + rdata[i].mx_record + '\')">未设置记录值</a></div>') + '</td>\
+                      <td>' + (rdata[i].spf_status ?
+                        '<div style="color:#20a53a;"><span class="glyphicon glyphicon-ok" style="margin-right: 7px;"></span>已设置</span></div>' :
+                        '<div style="color:red;display: inline-block;"><span class="glyphicon glyphicon-remove" style="margin-right: 7px;"></span><a href="javascript:;" style="color:red" onclick="mail.set_analysis_mail(\'' +
+                        rdata[i].dkim_value + '\',\'' + rdata[i].dmarc_value + '\',\'' + rdata[i]
+                        .domain + '\',\'' + rdata[i].mx_record + '\')">未设置记录值</a></div>') + '</td>\
+                      <td>' + (rdata[i].dkim_status ?
+                        '<div style="color:#20a53a;"><span class="glyphicon glyphicon-ok" style="margin-right: 7px;"></span>已设置</span></div>' :
+                        '<div style="color:red;display: inline-block;"><span class="glyphicon glyphicon-remove" style="margin-right: 7px;"></span><a href="javascript:;" style="color:red" onclick="mail.set_analysis_mail(\'' +
+                        rdata[i].dkim_value + '\',\'' + rdata[i].dmarc_value + '\',\'' + rdata[i]
+                        .domain + '\',\'' + rdata[i].mx_record + '\')">未设置记录值</a></div>') + '</td>\
+                      <td>' + (rdata[i].dmarc_status ?
+                        '<div style="color:#20a53a;"><span class="glyphicon glyphicon-ok" style="margin-right: 7px;"></span>已设置</span></div>' :
+                        '<div style="color:red;display: inline-block;"><span class="glyphicon glyphicon-remove" style="margin-right: 7px;"></span><a href="javascript:;" style="color:red" onclick="mail.set_analysis_mail(\'' +
+                        rdata[i].dkim_value + '\',\'' + rdata[i].dmarc_value + '\',\'' + rdata[i]
+                        .domain + '\',\'' + rdata[i].mx_record + '\')">未设置记录值</a></div>') + '</td>\
+                      <td><div><input type="checkbox" id="'+ rdata[i].domain +'" '+(rdata[i].catch_all ? 'checked':'')+' class="btswitch btswitch-ios catch_all"><label for="'+ rdata[i].domain +'" class="btswitch-btn"></label></div></td>\
+                         <td><a href="javascript:;" class="btlink add_certificate" data-index='+i+'>'+(rdata[i].ssl_status?('到期时间: '+rdata[i].ssl_info.notAfter):'添加证书')+'</a></td>\
+                      <td style="text-align: right;">' + (rdata[i].mx_status ? (
+                        '<a href="javascript:;" class="btlink edit_ground_domain" data-hostname="' +
+                        rdata[i].mx_record + '" data-domain="' + rdata[i].domain +
+                        '" data-index="' + i + '">用户管理</a>') : (
+                        '<a href="javascript:;" class="btlink" onclick="mail.set_analysis_mail(\'' +
+                        rdata[i].dkim_value + '\',\'' + rdata[i].dmarc_value + '\',\'' + rdata[
+                            i].domain + '\',\'' + rdata[i].mx_record + '\')">添加记录值</a>')) + '&nbsp;|&nbsp;\
+                          <a href="javascript:;" class="btlink red del_domain" data-domain="' + rdata[i].domain + '">删除</a>\
+                      </td>\
+                      </tr>';
+                };
+            }
+            $('#domain_list').html(_tbody);
+            $('#domain_page').html(res.msg.page);
+            $('#domain_page a').click(function (e) {
+                _this.create_domain_list({
+                    page: $(this).attr('href').split('p=')[1],
+                    size: 10
+                })
+                e.stopPropagation();
+                e.preventDefault();
+            })
+            $('#flush_domain_record').unbind().on('click',function(e){
+                _this.flush_domain_record('all',function(res){
+                    layer.msg(res.msg, { icon: res.status ? 1 : 2 });
+                });
+            })
+            $('.add_certificate').unbind().on('click',function(){
+                var index = $(this).attr('data-index')
+                _this.open_certificate_view(rdata[index].ssl_status, rdata[index].domain, rdata[index].ssl_info.dns, index)
+            })
+            $('.catch_all').click(function (e) {
+                e.preventDefault();
+                var _catch = $(this),
+                _status = $(this).prop('checked'),
+                _html = _status ? '<div style="font-size: 12px;"><span>邮件转寄</span><input class="bt-input-text mr5 catchall" type="text" name="catchall" placeholder="捕获不存在的邮箱，转发到此邮箱" style="width:275px;margin-left: 10px;"></div>' : '确认关闭此功能?',
+                loadT = layer.confirm(_html, {title:'CatchAll设置', closeBtn: 2, area: '500'},function(){
+                    var _email = _status ? $(".catchall").val() : '',
+                    loadS = bt.load();
+                    _this.enable_catchall({domain:_catch.attr('id'), email: _email},function(res){
+                        loadS.close();
+                        if(res.status) _catch.prop('checked', _status);
+                        layer.msg(res.msg, { icon: res.status ? 1 : 2 });
+                        loadT.close();
+                    })
+                });
+            });
+            if (callback) callback(res);
+        });
+    },
+       
+    str2Obj:function(str){
+        var data = {};
+        kv = str.split('&');
+        for(i in kv){
+            v = kv[i].split('=');
+            data[v[0]] = v[1];
+        }
+        return data;
+    },
+
+    send:function(info){
+        var tips = info['tips'];
+        var method = info['method'];
+        var args = info['data'];
+        var callback = info['callback'];
+
+        var loadT = layer.msg(tips, { icon: 16, time: 0, shade: 0.3 });
+
+        var data = {};
+        data['name'] = 'mail';
+        data['func'] = method;
+        data['version'] = $('.plugin_version').attr('version');
+     
+        if (typeof(args) == 'string'){
+            data['args'] = JSON.stringify(this.str2Obj(args));
+        } else {
+            data['args'] = JSON.stringify(args);
+        }
+
+        $.post('/plugins/run', data, function(res) {
+
+            layer.close(loadT);
+            if (!res.status){
+                layer.msg(res.msg,{icon:2,time:10000});
+                return;
+            }
+
+            var ret_data = $.parseJSON(res.data);
+              if (!ret_data.status){
+                layer.msg(ret_data.msg,{icon:2,time:2000});
+                return;
+            }
+
+            if(typeof(callback) == 'function'){
+                callback(res);
+            }
+        },'json'); 
+    },
+    postCallback:function(info){
+        var tips = info['tips'];
+        var method = info['method'];
+        var args = info['data'];
+        var callback = info['callback'];
+        
+        var loadT = layer.msg(tips, { icon: 16, time: 0, shade: 0.3 });
+
+        var data = {};
+        data['name'] = 'mail';
+        data['func'] = method;
+        data['version'] = $('.plugin_version').attr('version');
+     
+        if (typeof(args) == 'string'){
+            data['args'] = JSON.stringify(this.str2Obj(args));
+        } else {
+            data['args'] = JSON.stringify(args);
+        }
+
+        $.post('/plugins/callback', data, function(res) {
+
+            layer.close(loadT);
+            if (!res.status){
+                layer.msg(res.msg,{icon:2,time:10000});
+                return;
+            }
+
+            var ret_data = $.parseJSON(res.data);
+              if (!ret_data.status){
+                layer.msg(ret_data.msg,{icon:2,time:2000});
+                return;
+            }
+
+            if(typeof(callback) == 'function'){
+                callback(res);
+            }
+        },'json');
     }
-    return data;
 }
-
-function mailPost(method, version, args,callback){
-    var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
-
-    var req_data = {};
-    req_data['name'] = 'mail';
-    req_data['func'] = method;
-    req_data['version'] = version;
- 
-    if (typeof(args) == 'string'){
-        req_data['args'] = JSON.stringify(str2Obj(args));
-    } else {
-        req_data['args'] = JSON.stringify(args);
-    }
-
-    $.post('/plugins/run', req_data, function(data) {
-        layer.close(loadT);
-        if (!data.status){
-            //错误展示10S
-            layer.msg(data.msg,{icon:0,time:2000,shade: [10, '#000']});
-            return;
-        }
-
-        if(typeof(callback) == 'function'){
-            callback(data);
-        }
-    },'json'); 
-}
-
-function mailPostCallbak(method, version, args,callback){
-    var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
-
-    var req_data = {};
-    req_data['name'] = 'mail';
-    req_data['func'] = method;
-    args['version'] = version;
- 
-    if (typeof(args) == 'string'){
-        req_data['args'] = JSON.stringify(str2Obj(args));
-    } else {
-        req_data['args'] = JSON.stringify(args);
-    }
-
-    $.post('/plugins/callback', req_data, function(data) {
-        layer.close(loadT);
-        if (!data.status){
-            layer.msg(data.msg,{icon:0,time:2000,shade: [0.3, '#000']});
-            return;
-        }
-
-        if(typeof(callback) == 'function'){
-            callback(data);
-        }
-    },'json'); 
-}
-
-
-function domainList(){
-    var con = '<div class="task_block">\
-            <button class="btn btn-sm btn-success mb15" style="margin-right:10px;" onclick="mail.edit_domain_view(true)">添加域名</button>\
-            <!-- <div class="ssl-item" style="display: flex;width: 150px;float: right;">\
-                <span style="display: inline-table;margin-top: 2px; margin-right: 5px;">添加证书</span>\
-                <input type="checkbox" id="certificateSSL" class="btswitch btswitch-ios">\
-                <label for="certificateSSL" class="btswitch-btn" onclick="mail.open_certificate_view()"></label>\
-            </div> -->\
-            <button class="btn btn-sm btn-default mb15" style="float:right" id="flush_domain_record">刷新域名记录</button>\
-            <div class="domain_table divtable">\
-                <table class="table table-hover">\
-                    <thead>\
-                        <tr>\
-                            <th>邮箱域名</th>\
-                            <th>MX记录</th>\
-                            <th>A记录</th>\
-                            <th>SPF记录</th>\
-                            <th>DKIM记录</th>\
-                            <th>DMARC记录</th>\
-                            <th>CatchAll</th>\
-                            <th width="160px">SSL</th>\
-                            <th width="120px" style="text-align: right;">操作</th>\
-                        </tr>\
-                    </thead>\
-                    <tbody id="domain_list"></tbody>\
-                </table>\
-            </div>\
-            <div class="page" id="domain_page"></div>\
-            <ul class="help-info-text c7 mlr20">\
-                <li>\
-                    <font style="color:red">添加域名后，需要添加MX记录（用于邮箱服务）和TXT记录（用于邮箱反垃圾服务）才能正常使用邮箱服务。</font>\
-                </li>\
-                <li>\
-                    <font style="color:red">提示： 部分云厂商(如：阿里云，腾讯云)默认关闭25端口，需联系厂商开通25端口后才能正常使用邮局服务</font>\
-                </li>\
-                <li>该自建邮局版本为基础版本，仅提供基础功能，更多功能请耐心等候开发进度。</li>\
-            </ul>\
-        </div>';
-
-    $(".soft-man-con").html(con);
-}
-
-
-
-function serviceStatus(){
-    var con = '<div class="task_block divtable">\
-            <table class="table table-hover">\
-                <thead>\
-                    <tr>\
-                        <th>服务名称</th>\
-                        <th>服务状态</th>\
-                        <th width="190" style="text-align: center">操作</th>\
-                    </tr>\
-                </thead>\
-                <tbody>\
-                    <tr>\
-                        <td>Dovecot</td>\
-                        <td><span class="dovecot">获取中...</span></td>\
-                        <td style="text-align: right">\
-                            <a href="javascript:" class="btlink dovecot_start"\
-                                onclick="">启动</a>\
-                            <a href="javascript:" class="btlink dovecot_stop"\
-                                onclick="">停止</a>&nbsp;|&nbsp;\
-                            <a href="javascript:" class="btlink"\
-                                onclick="">重启</a>&nbsp;|&nbsp;\
-                            <a href="javascript:" class="btlink"\
-                                onclick="">修复</a>&nbsp;|&nbsp;\
-                            <a href="javascript:;" class="btlink"\
-                                onclick=">配置文件</a>\
-                        </td>\
-                    </tr>\
-                    <tr>\
-                        <td>Opendkim</td>\
-                        <td><span class="opendkim">获取中...</span></td>\
-                        <td style="text-align: right">\
-                            <a href="javascript:" class="btlink opendkim_start"\
-                                onclick="">启动</a>\
-                            <a href="javascript:" class="btlink opendkim_stop"\
-                                onclick="">停止</a>&nbsp;|&nbsp;\
-                            <a href="javascript:" class="btlink"\
-                                onclick="">重启</a>&nbsp;|&nbsp;\
-                            <a href="javascript:" class="btlink"\
-                                onclick="">修复</a>&nbsp;|&nbsp;\
-                            <a href="javascript:;" class="btlink"\
-                                onclick="">配置文件</a>\
-                        </td>\
-                    </tr>\
-                    <tr>\
-                        <td>Rspamd</td>\
-                        <td><span class="rspamd">获取中...</span></td>\
-                        <td style="text-align: right">\
-                            <a href="javascript:" class="btlink rspamd_start"\
-                                onclick="">启动</a>\
-                            <a href="javascript:" class="btlink rspamd_stop"\
-                                onclick="">停止</a>&nbsp;|&nbsp;\
-                            <a href="javascript:" class="btlink"\
-                                onclick="">重启</a>&nbsp;|&nbsp;\
-                            <a href="javascript:" class="btlink"\
-                                onclick="">修复</a>&nbsp;|&nbsp;\
-                            <a href="javascript:;" class="btlink"\
-                                onclick="">配置文件</a>\
-                        </td>\
-                    </tr>\
-                    <tr>\
-                        <td>Postfix</td>\
-                        <td><span class="postfix">获取中...</span></td>\
-                        <td style="text-align: right">\
-                            <a href="javascript:" class="btlink postfix_start"\
-                                onclick="">启动</a>\
-                            <a href="javascript:" class="btlink postfix_stop"\
-                                onclick="">停止</a>&nbsp;|&nbsp;\
-                            <a href="javascript:" class="btlink"\
-                                onclick="">重启</a>&nbsp;|&nbsp;\
-                            <a href="javascript:" class="btlink"\
-                                onclick="">修复</a>&nbsp;|&nbsp;\
-                            <a href="javascript:;" class="btlink"\
-                                onclick="">配置文件</a>\
-                        </td>\
-                    </tr>\
-                </tbody>\
-            </table>\
-        </div>';
-    $(".soft-man-con").html(con);
-}
-

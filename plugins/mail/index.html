@@ -1,18 +1,1041 @@
+<style type="text/css">
+.tasklist {
+	display: flex;
+	height: 750px;
+	padding: 0;
+}
+
+.tasklist .tab-con {
+	flex: 1;
+	padding: 15px;
+}
+
+.tab-con .SetupPostfix {
+	overflow: hidden;
+}
+
+.tab-con .clearfixPostfix>p {
+	float: left;
+	margin-top: 35px;
+	margin-left: 25px;
+}
+
+.tab-con .clearfixPostfix>p button {
+	margin-right: 15px;
+	padding-left: 18px;
+	padding-right: 18px;
+}
+
+.tab-con .SetupPostfix .clearfixPostfix {
+	overflow: hidden;
+	margin-bottom: 25px;
+}
+
+.tab-con .SetupPostfix .SetAggregateOne p {
+	margin-top: 15px;
+}
+
+.tab-con .SetupPostfix .SetAggregateOne p span {
+	margin-right: 15px;
+	display: inline-block;
+	width: 51px;
+	text-align: right;
+}
+
+.tab-con .SetupPostfix .SetAggregateOne p input {
+	height: 30px;
+	width: 240px;
+	padding-left: 10px;
+	font-size: 13px;
+}
+
+.tab-con .SetupPostfix .SetAggregateOne {
+	width: 325px;
+	float: left;
+}
+
+.tab-con .info-r .bt-input-text {
+	width: 193px;
+}
+
+.tasklist .tab-nav {
+	width: 125px;
+	height: 100%;
+	background-color: #F0F0F1;
+	border-bottom: 0px;
+}
+
+.tasklist .tab-nav span {
+	display: block;
+	width: 125px;
+	padding-right: 0;
+	height: 40px;
+	line-height: 40px;
+	padding-left: 20px;
+	position: relative;
+	cursor: pointer;
+	border: none;
+	background: #F0F0F1;
+}
+
+.select_conter>input {
+	border: none !important;
+	width: 350px !important;
+	padding: 0 35px 0 10px !important;
+}
+
+.send_mail_conter input {
+	width: 95%;
+	border-radius: 0;
+	box-shadow: 1px 1px 2px #ececec inset;
+	outline: 0;
+	padding: 0 10px;
+	font-size: 14px;
+	vertical-align: top;
+	height: 34px;
+}
+
+.domain_table {
+	height: 220px;
+}
+
+.tasklist .tab-nav span.on {
+	background-color: #fff;
+}
+
+.send_mail_conter .line {
+	margin-bottom: 10px;
+}
+
+.send_mail_conter .line>span {
+	width: 60px;
+	height: 30px;
+	line-height: 30px;
+	margin-right: 10px;
+	text-align: right;
+	display: inline-block;
+}
+
+.send_mail_conter .line .conter {
+	width: 90%;
+	height: 30px;
+	line-height: 30px;
+	display: inline-block;
+
+}
+
+.send_mail_conter .select_conter {
+	margin-left: 0;
+	border: 1px solid #ccc;
+
+}
+
+.send_mail_conter .sender_list {
+	margin-left: -3px;
+	padding: 0 10px;
+}
+
+.send_mail_conter .line>span {
+	height: 34px;
+	line-height: 34px;
+}
+
+.send_mail_conter .line input {
+	height: 34px;
+	line-height: 34px;
+}
+
+.editor_conter {
+	position: relative;
+	height: 430px;
+}
+
+.editor_conter .sname {
+	position: absolute;
+	top: 0px;
+}
+
+.cke_editor_editor1 {
+	width: 95%;
+}
+
+.editor_conter .conter {
+	position: absolute;
+	left: 73px;
+	height: 100% !important;
+}
+
+/* .right {
+	width: auto;
+	height: auto;
+	position: initial;
+} */
+
+.radio_glign_ground {
+	display: inline-block;
+	height: 25px;
+	line-height: 25px;
+	vertical-align: top;
+	margin-right: 15px;
+	font-weight: 400;
+	font-size: 14px;
+}
+
+.radio_glign {
+	height: 15px;
+	width: 15px;
+	position: relative;
+	top: 2px;
+	margin-right: 5px !important;
+}
+
+.bt-form-login .line .tname {
+	width: 110px;
+}
+
+#domain_list .btswitch+.btswitch-btn,
+#mailboxs_list .btswitch+.btswitch-btn {
+	width: 2.4em;
+	height: 1.4em;
+	margin-bottom: 0
+}
+
+#Editor .w-e-toolbar,
+#Editor .w-e-text-container {
+	width: 95%
+}
+
+.service_tip {
+	display: inline-block;
+	width: 100%;
+	height: 35px;
+	line-height: 35px;
+	background: #F0F0F1;
+	padding-right: 15px;
+	text-align: right;
+}
+
+.mail_title {
+	width: 100%;
+	background: #ecf5ff;
+	border-bottom: 1px solid #ececec;
+	padding: 20px 45px;
+}
+
+.mail_title ul li {
+	height: 20px;
+	line-height: 20px;
+	margin-bottom: 5px;
+	color: #888;
+}
+
+.mail_title ul h4 {
+	color: #333;
+	font-size: 16px;
+	font-weight: 600;
+	padding-bottom: 7px;
+	border-bottom: 1px solid #999;
+}
+
+.mail_conter {
+	line-height: 25px;
+	font-size: 13px;
+	padding: 35px 45px;
+}
+
+.cke_editor_editor1 .cke_top {
+	padding: 2px;
+	height: 28px !important;
+}
+
+.mail_html {
+	display: inline-block;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	vertical-align: bottom;
+}
+
+.mail_html span {
+	color: #bbb;
+}
+
+input[readonly] {
+	background-color: #efefef;
+}
+
+.selects_conter {
+	position: relative;
+	z-index: 999
+}
+
+.selects_conter .select_text {
+	display: inline-block;
+	height: 36px;
+	line-height: 36px;
+	padding: 0 15px;
+	position: relative;
+	border: 1px solid #ececec;
+	background: #f3f3f3;
+	color: #666;
+}
+
+.select_conter {
+	display: inline-block;
+	font-size: 14px;
+	border: 1px solid #ececec;
+	color: #444;
+	position: relative;
+	cursor: pointer;
+	height: 36px;
+	line-height: 36px;
+	margin-left: -5px;
+	vertical-align: bottom;
+}
+
+.select_conter .domain_input {
+	display: inline-block;
+	padding-left: 15px;
+	height: 34px;
+	line-height: 34px;
+	vertical-align: top;
+}
+
+.inbox_input:focus {
+	outline: none;
+}
+
+.select_conter .select_down {
+	display: inline-block;
+	width: 0;
+	height: 0;
+	border-width: 6px;
+	border-style: solid;
+	border-color: #777 transparent transparent transparent;
+	position: absolute;
+	top: 14px;
+	right: 12px;
+	transition: all 500ms;
+}
+
+.select_conter .domain_list {
+	display: none;
+	background: #fff;
+	position: absolute;
+	top: 34px;
+	left: -1px;
+	border: 1px solid #ececec;
+	overflow-y: auto;
+	max-height: 280px;
+	width: 203px;
+	z-index: 999;
+	box-shadow: 2px 5px 8px #ccc;
+}
+
+.select_conter .domain_list.active {
+	display: block;
+}
+
+.select_conter .domain_list li {
+	text-align: left;
+	padding: 0 10px;
+}
+
+.select_conter .domain_list li:hover {
+	background: #20a53a;
+	color: #fff;
+}
+
+.select_conter .domain_list li.active {
+	background: #20a53a;
+	color: #fff;
+}
+
+.bt_tips {
+	font-size: 16px;
+	color: #444;
+	font-weight: 600;
+	margin-bottom: 10px;
+}
+
+.bt_vice_tips {
+	font-size: 14px;
+	color: #666;
+	margin-bottom: 10px;
+}
+
+.bt-body .bt_conter {
+	margin-bottom: 30px;
+}
+
+.bt-body .bt_center {
+	text-align: center;
+	margin-bottom: 15px;
+}
+
+.mail_table {
+	height: 550px;
+	overflow: auto;
+	position: relative;
+}
+
+.bt_select {
+	display: inline-block;
+	width: auto;
+	outline: none;
+	border-radius: 0;
+	height: 30px;
+	line-height: 30px;
+	padding: 0 10px;
+	font-size: 13px;
+}
+
+.user_info .help-info-text b {
+	color: #666;
+}
+
+.logs_code_style {
+	margin: 0px;
+	background-color: #333;
+	color: #fff;
+	padding: 0 5px;
+	width: 100%;
+	height: 720px;
+	line-height: 20px;
+}
+
+.user_forward input,
+.user_forward select {
+	width: 300px;
+}
+
+.tabs-nav {
+	border-bottom: #cacad9 1px solid;
+}
+
+.tabs-nav .on {
+	background: #fff;
+	border-bottom: #fff 1px solid;
+	color: #444;
+}
+
+.tabs-nav span {
+	background-color: #ddd;
+	background: -moz-linear-gradient(top, #f6f6f6, #ddd);
+	background: -webkit-gradient(linear, 0% 0, 0% 100%, from(#f6f6f6), to(#ddd));
+	background: -ms-linear-gradient(top, #f6f6f6, #ddd);
+	height: 32px;
+	line-height: 32px;
+	padding: 0 12px;
+	border: #cacad9 1px solid;
+	color: #444;
+	display: inline-block;
+	margin: 0 3px -1px 0;
+	cursor: pointer;
+}
+
+.mail_backup .plan {
+	margin-bottom: 0;
+}
+
+.mail_backup .plan .typename {
+	width: 80px;
+}
+.mail_backup_set .plan_hms span input{
+	width: 50px;
+	padding-left: 5px;
+}
+.mail_backup_set .plan_hms{
+	padding-left: 0;
+}
+.bt-mail-index .divtable .table>thead>tr>th,
+.bt-mail-index .divtable .table>tbody>tr>td{
+    border-right: 1px solid #ddd;
+}
+.green{
+    color:green;
+}
+.red{
+    color: red;
+}
+.bt-mail-btn{
+    background-color: #f6f8f8;
+    border-top: 1px solid #edf1f2;
+    float: left;
+    padding: 9px 18px 10px;
+    pointer-events: auto;
+    text-align: right;
+    width: 100%;
+    user-select: none;
+    -webkit-user-select: none;
+    position: absolute;
+    bottom: 0;
+}
+.bt-mail-btn .layui-layer-btn1,.bt-mail-btn .layui-layer-btn1 {
+    border-color: #cbcbcb;
+    background-color: #cbcbcb;
+    color: #fff;
+}
+.bt-mail-btn .layui-layer-btn1:hover {
+    background-color: #c9302c;
+}
+.bt-mail-btn a {
+    background-color: #20a53a;
+    border-radius: 3px;
+    color: #fff;
+    cursor: pointer;
+    float: right;
+    font-size: 12px;
+    font-weight: 700;
+    height: 30px;
+    line-height: 28px;
+    margin-left: 8px;
+    padding: 0 12px;
+    text-decoration: none;
+}
+.bt-mail-btn a:hover {
+    background-color: #10952a;
+    border-color: #398439;
+    text-decoration: none;
+}
+.tab-con .divtable .table>thead>tr>th:last-child{
+    text-align: right;
+}
+.tab-block-mail{
+    width: 100%;
+}
+#checkPostEnv .divtable {
+    overflow: visible;
+}
+</style>
+<!-- pluginLogs('mail','','run_log') -->
 <div class="bt-form">
+	<div class='plugin_version'></div>
 	<div class="bt-w-main">
 		<div class="bt-w-menu">
-			<p class="bgw" onclick="domainList();">域名列表</p>
-			<p onclick="serviceStatus();">服务状态</p>
-			<p onclick="pluginLogs('mail','','run_log');">日志</p>
+			<p class="on">域名列表</p>
+			<p>邮件秘抄</p>
+			<p>邮件中继</p>
+			<p>邮件转发</p>
+			<p>邮件备份</p>
+			<p>收件箱</p>
+			<p>垃圾箱</p>
+			<p>已发送</p>
+			<p>发送邮件</p>
+			<p>服务状态</p>
+			<p>日志</p>
 		</div>
 		<div class="bt-w-con pd15">
-			<div class="soft-man-con"></div>
+			<div class="soft-man-con">
+				<!-- 域名列表 -->
+				<div class="task_block">
+					<button class="btn btn-sm btn-success mb15" style="margin-right:10px;" onclick="mail.edit_domain_view(true)">添加域名</button>
+					<!-- <div class="ssl-item" style="display: flex;width: 150px;float: right;">
+						<span style="display: inline-table;margin-top: 2px; margin-right: 5px;">添加证书</span>
+						<input type="checkbox" id="certificateSSL" class="btswitch btswitch-ios">
+						<label for="certificateSSL" class="btswitch-btn" onclick="mail.open_certificate_view()"></label>
+					</div> -->
+					<button class="btn btn-sm btn-default mb15" style="float:right" id="flush_domain_record">刷新域名记录</button>
+					<div class="domain_table divtable">
+						<table class="table table-hover">
+							<thead>
+								<tr>
+									<th>邮箱域名</th>
+									<th>MX记录</th>
+									<th>A记录</th>
+									<th>SPF记录</th>
+									<th>DKIM记录</th>
+									<th>DMARC记录</th>
+									<th>CatchAll</th>
+									<th width="160px">SSL</th>
+									<th width="120px" style="text-align: right;">操作</th>
+								</tr>
+							</thead>
+							<tbody id="domain_list"></tbody>
+						</table>
+					</div>
+					<div class="page" id="domain_page"></div>
+					<ul class="help-info-text c7 mlr20">
+						<li><font style="color:red">添加域名后，需要添加MX记录（用于邮箱服务）和TXT记录（用于邮箱反垃圾服务）才能正常使用邮箱服务。</font></li>
+						<li><font style="color:red">提示： 部分云厂商(如：阿里云，腾讯云)默认关闭25端口，需联系厂商开通25端口后才能正常使用邮局服务</font></li>
+						<li>该自建邮局版本为基础版本，仅提供基础功能，更多功能请耐心等候开发进度。</li>
+					</ul>
+				</div>
+				<!-- 邮件秘抄 -->
+				<div class="task_block" style="display:none;">
+					<div class="t-mana">
+						<button class="btn btn-sm btn-success add_bcc" style="margin-bottom: 10px;">添加秘抄</button>
+						<div class="tabs-nav">
+							<span class="on">接收</span>
+							<span>发送</span>
+						</div>
+						<div class="text_con">
+							<div class="text_block">
+								<div class="forward_table divtable ptb15">
+									<table class="table table-hover">
+										<thead>
+											<tr>
+												<th style="width: 30%;">被抄送者</th>
+												<th style="width: 30%;">抄送到</th>
+												<th style="text-align: right;">操作</th>
+											</tr>
+										</thead>
+										<tbody></tbody>
+									</table>
+									<div class="tbTbody" style="max-height: 400px;overflow: auto;">
+										<table class="table table-hover">
+											<thead></thead>
+											<tbody id="recipient_list"></tbody>
+										</table>
+									</div>
+								</div>
+							</div>
+							<div class="text_block" style="display: none;">
+								<div class="forward_table divtable ptb15">
+									<table class="table table-hover">
+										<thead>
+											<tr>
+												<th style="width: 30%;">被抄送者</th>
+												<th style="width: 30%;">抄送到</th>
+												<th style="text-align: right;">操作</th>
+											</tr>
+										</thead>
+										<tbody></tbody>
+									</table>
+									<div class="tbTbody" style="max-height: 400px;overflow: auto;">
+										<table class="table table-hover">
+											<thead></thead>
+											<tbody id="sender_list"></tbody>
+										</table>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- 邮件中继 -->
+				<div class="task_block" style="display:none;">
+					<div class="line" style="border-bottom: 1px solid #ccc;margin-bottom: 10px;padding-left: 19px;">
+						<span class="tname checkType" style="color:#20a53a;font-size: 14px;">SMTP中继</span>
+						<div style="display: inline-block;height: 32px;line-height: 32px;">
+							<input type="checkbox" name="checksmtp" id="checksmtp" class="btswitch btswitch-ios">
+							<label for="checksmtp" class="btswitch-btn" style="margin-top:5px;"></label>
+						</div>
+						<a href="https://www.bt.cn/bbs/thread-49167-1-1.html" target="blank"
+							style="color:#20a53a;font-size: 13px;display: inline-block;margin-left: 23px;height: 32px;line-height: 32px;overflow: hidden;text-decoration: none;">[使用帮助]</a>
+					</div>
+					<div class="smtp" style="display:none;">
+						<div class="line">
+							<span class="tname">用户名</span>
+							<div class="info-r">
+								<input type="text" name="smtp_username" class="bt-input-text mr5" placeholder="SMTP Username">
+							</div>
+						</div>
+						<div class="line">
+							<span class="tname">密码</span>
+							<div class="info-r">
+								<input type="text" name="passwd" class="bt-input-text mr5" placeholder="SMTP Passwd">
+							</div>
+						</div>
+						<div class="line">
+							<span class="tname">端口</span>
+							<div class="info-r">
+								<input type="text" name="port" class="bt-input-text mr5" placeholder="SMTP Port">
+							</div>
+						</div>
+						<div class="line">
+							<span class="tname">主机</span>
+							<div class="info-r">
+								<input type="text" name="smtphost" class="bt-input-text mr5" placeholder="SMTP Host">
+							</div>
+						</div>
+						<div style="margin: 17px 0 10px 101px;"><button
+								class="btn btn-success btn-sm mb15 smtp_save">保存</button></div>
+					</div>
+				</div>
+				<!-- 邮件转发 -->
+				<div class="task_block" style="display:none;">
+					<div class="t-mana">
+						<div>
+							<button class="btn btn-success btn-sm ml5 add_forward">添加转发</button>
+						</div>
+						<div class="text_con">
+							<div class="text_block" style="display: block;">
+								<div class="divtable ptb15">
+									<table class="table table-hover">
+										<thead>
+											<tr>
+												<th>被转发者</th>
+												<th>转发到</th>
+												<th>域名</th>
+												<th>添加时间</th>
+												<th>修改时间</th>
+												<th>状态</th>
+												<th>操作</th>
+											</tr>
+										</thead>
+										<tbody class="mail_forward_list">
+
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- 邮件备份 -->
+				<div class="task_block" style="display:none;">
+					<div class="mail_backup">
+						<div class="line" style="padding-left: 19px;">
+							<span class="tname checkType" style="color:#20a53a;font-size: 14px;">备份计划</span>
+							<div style="display: inline-block;height: 32px;line-height: 32px;">
+								<input type="checkbox" name="backup_task" id="backup_task" class="btswitch btswitch-ios">
+								<label for="backup_task" class="btswitch-btn" style="margin-top:5px;"></label>
+							</div>
+						</div>
+						<div class="mail_backup_set"
+							style="border-top: 1px solid #ccc;padding-top: 10px;display: none;margin-bottom: 20px;">
+							<div class="clearfix plan">
+								<span class="typename c4 pull-left f14 text-right mr20">执行周期</span>
+								<div class="dropdown plancycle pull-left mr20">
+									<button class="btn btn-default dropdown-toggle" type="button" id="cycle"
+										data-toggle="dropdown" style="width:94px">
+										<b val="week">每星期</b>
+										<span class="caret"></span>
+									</button>
+									<ul class="dropdown-menu" role="menu" aria-labelledby="cycle">
+										<li>
+											<a role="menuitem" tabindex="-1" href="javascript:;" value="day">每天</a>
+										</li>
+										<li>
+											<a role="menuitem" tabindex="-1" href="javascript:;" value="week">每星期</a>
+										</li>
+									</ul>
+								</div>
+								<div id="ptime" class="pull-left">
+									<div class="dropdown planweek pull-left mr20">
+										<button class="btn btn-default dropdown-toggle" type="button" id="excode"
+											data-toggle="dropdown">
+											<b val="1">周一</b> <span class="caret"></span>
+										</button>
+										<ul class="dropdown-menu" role="menu" aria-labelledby="excode">
+											<li><a role="menuitem" tabindex="-1" href="javascript:;" value="1">周一</a></li>
+											<li><a role="menuitem" tabindex="-1" href="javascript:;" value="2">周二</a></li>
+											<li><a role="menuitem" tabindex="-1" href="javascript:;" value="3">周三</a></li>
+											<li><a role="menuitem" tabindex="-1" href="javascript:;" value="4">周四</a></li>
+											<li><a role="menuitem" tabindex="-1" href="javascript:;" value="5">周五</a></li>
+											<li><a role="menuitem" tabindex="-1" href="javascript:;" value="6">周六</a></li>
+											<li><a role="menuitem" tabindex="-1" href="javascript:;" value="0">周日</a></li>
+										</ul>
+									</div>
+									<div class="plan_hms pull-left mr20 bt-input-text">
+										<span><input type="number" name="hour" maxlength="2" max="23" min="0" value="1"></span>
+										<span class="name">小时</span>
+									</div>
+									<div class="plan_hms pull-left mr20 bt-input-text">
+										<span><input type="number" name="minute" maxlength="2" max="59" min="0" value="30"></span>
+										<span class="name">分钟</span>
+									</div>
+								</div>
+							</div>
+							<div class="clearfix plan">
+								<span class="typename controls c4 pull-left f14 text-right mr20">备份到</span>
+								<div id="backup_plan" style="line-height:34px">
+									<!-- <div class="info-r" style="display: inline-block;float: left;margin-right: 25px;"><input
+											id="inputPath" class="bt-input-text mr5" type="text" name="path" value="/www/wwwroot/"
+											placeholder="备份目录" style="width:208px;height:33px;"><span
+											class="glyphicon glyphicon-folder-open cursor"
+											onclick="ChangePath(&quot;inputPath&quot;)"></span></div>
+									<div class="textname pull-left mr20" style="display:inline-block">备份到</div> -->
+									<div class="dropdown planBackupTo pull-left mr20" style="display:inline-block"> <button
+											class="btn btn-default dropdown-toggle" type="button" name="backupTo" data-toggle="dropdown"
+											style="width:auto;"> <b val="localhost">服务器磁盘</b> <span class="caret"></span>
+										</button>
+										<ul class="dropdown-menu" role="menu" aria-labelledby="excode"></ul>
+									</div>
+									<div class="textname pull-left mr20">保留最新</div>
+									<div class="plan_hms pull-left mr20 bt-input-text">
+										<span><input type="number" name="save" maxlength="4" max="100" min="1" value="3"></span>
+										<span class="name">份</span>
+									</div>
+									<p class="clearfix plan"> </p>
+								</div>
+							</div>
+							<div><button class="btn btn-success btn-sm mb15 backup_save" style="margin-left: 120px;">保存任务</button>
+							</div>
+						</div>
+					</div>
+					<div class="line" style="border-top: 1px solid #ccc;padding-top: 13px;padding-left: 19px;">
+						<span class="tname checkType" style="color:#20a53a;font-size: 14px;">邮件导入</span>
+						<button class="btn btn-sm btn-default" style="margin-top: 2px;" onclick="mail.upload_files()">从本地上传</button>
+						<div class="divtable mtb15" style="max-height:303px; overflow:auto;padding-left: 100px;margin-right: 30px;">
+							<table id="mail_backup_list" class="table table-hover">
+								<thead>
+									<tr>
+										<th>文件名</th>
+										<th>导入时间</th>
+										<th style="text-align:right;">操作</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>cnarea20191031.sql</td>
+										<td>2020/05/22 14:54:50</td>
+										<td style="text-align:right"><a class="btlink" herf="javascrpit:;" onclick="bt.database.input_sql('/www/backup/database/cnarea20191031.sql','web')">恢复</a>
+											| <a class="btlink" onclick="database.remove_input_file('/www/backup/database/cnarea20191031.sql','web')">删除</a>
+										</td>
+									</tr>
+									<tr>
+										<td>db_web_20200417_163412.sql.gz</td>
+										<td>2020/04/17 16:34:20</td>
+										<td style="text-align:right"><a class="btlink" herf="javascrpit:;" onclick="bt.database.input_sql('/www/backup/database/db_web_20200417_163412.sql.gz','web')">恢复</a>
+											| <a class="btlink" onclick="database.remove_input_file('/www/backup/database/db_web_20200417_163412.sql.gz','web')">删除</a>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+					<ul class="help-info-text c7 mlr20 backup-path">
+						<li>
+							<font style="color:red">1. 备份计划是调用的计划任务，如果想立即执行请到计划任务列表执行名称为：[勿删]堡塔邮局-数据备份任务的计划任务；</font>
+						</li>
+						<li>
+							<font style="color:red">2. 本地的备份会存储在<span></span>/path目录下，可以直接用来进行恢复操作；</font>
+						</li>
+						<li><font style="color:red">3. 云端的备份需要先下载下来，然后点击从本地上传按钮上传到服务器<span></span>/path目录下才能用来进行恢复操作。</font></li>
+					</ul>
+				</div>
+				<!-- 收件箱 -->
+				<div class="task_block divtable" style="height: 630px;display:none;">
+					<div class="selects_conter" style="margin-bottom: 10px;">
+						<span class="select_text">邮件归属</span>
+						<div class="select_conter">
+							<span style="display: none;" class="domain_hide_value"></span>
+							<input type="text" placeholder="请选择" autocomplete="off" class="inbox_input domain_input"
+								name="inbox_input" style="border: none;">
+							<ul class="domain_list" id="domain_select_list"></ul>
+							<span class="select_down"></span>
+						</div>
+						<div style="display: inline-block;margin-left: 30px;">
+							邮件保留时间：
+							<input type="text" placeholder="3" class="bt-input-text mr5 mail_day" style="width: 65px;"
+								onkeyup="value=value.replace(/^(0+)|[^\d]+/g,'')">天
+							<button class="btn btn-success btn-sm set_save_day" style="margin-left: 10px;">保存</button>
+						</div>
+					</div>
+
+					<div class="mail_table">
+						<table class="table table-hover" id="mailListTable">
+							<thead>
+								<tr>
+									<th width="15%">发件人</th>
+									<th>主题</th>
+									<th width="145">时间</th>
+									<th width="170" style="text-align: right;">操作</th>
+								</tr>
+							</thead>
+							<tbody id="mails_list"></tbody>
+						</table>
+					</div>
+				</div>
+				<!-- 垃圾箱 -->
+				<div class="task_block divtable" style="height: 630px;display:none;">
+					<div class="selects_conter" style="margin-bottom: 10px;">
+						<span class="select_text">邮件归属</span>
+						<div class="select_conter">
+							<span style="display: none;" class="domain_hide_value"></span>
+							<input type="text" placeholder="请选择" autocomplete="off" class="inbox_input domain_input"
+								name="inbox_input" style="border: none;">
+							<ul class="domain_list" id="domain_select_list"></ul>
+							<span class="select_down"></span>
+						</div>
+						<div style="display: inline-block;margin-left: 30px;">
+							邮件保留时间：
+							<input type="text" placeholder="3" class="bt-input-text mr5 mail_day" style="width: 65px;"
+								onkeyup="value=value.replace(/^(0+)|[^\d]+/g,'')">天
+							<button class="btn btn-success btn-sm set_save_day" style="margin-left: 10px;">保存</button>
+						</div>
+						 <button class="btn btn-success btn-sm pull-right go_to_rspamd" style="margin-top: 3px;">Rspamd管理页面</button>
+					</div>
+					<div class="mail_table">
+						<table class="table table-hover" id="junkListTable">
+							<thead>
+								<tr>
+									<th width="15%">发件人</th>
+									<th>主题</th>
+									<th width="145">时间</th>
+									<th width="170" style="text-align: right;">操作</th>
+								</tr>
+							</thead>
+							<tbody id="junks_list"></tbody>
+						</table>
+					</div>
+				</div>
+				<!-- 已发送 -->
+				<div class="task_block divtable" style="height: 630px;display:none;">
+					<div class="selects_conter" style="margin-bottom: 10px;">
+						<span class="select_text">邮件归属</span>
+						<div class="select_conter">
+							<span style="display: none;" class="domain_hide_value"></span>
+							<input type="text" placeholder="请选择" autocomplete="off" class="inbox_input domain_input"
+								name="inboxs_input" style="border: none;">
+							<ul class="domain_list" id="domain_select_lists"></ul>
+							<span class="select_down"></span>
+						</div>
+						<div style="display: inline-block;margin-left: 30px;">
+							邮件保留时间：
+							<input type="text" placeholder="3" class="bt-input-text mr5 mail_day" style="width: 65px;"
+								onkeyup="value=value.replace(/^(0+)|[^\d]+/g,'')">天
+							<button class="btn btn-success btn-sm set_save_day" style="margin-left: 10px;">保存</button>
+						</div>
+					</div>
+					<div class="mail_table">
+						<table class="table table-hover" id="mailListTables">
+							<thead>
+								<tr>
+									<th width="15%">收件人</th>
+									<th>主题</th>
+									<th width="250">时间</th>
+									<th width="120">操作</th>
+								</tr>
+							</thead>
+							<tbody id="mails_lists"></tbody>
+						</table>
+					</div>
+				</div>
+				<!-- 发送邮件 -->
+				<div class="task_block send_mail_conter" style="display:none;">
+					<div class="line">
+						<span class="sname">发件人</span>
+						<div class="select_conter">
+							<span style="display: none;" class="domain_hide_value"></span>
+							<input type="text" placeholder="请输入或选择用户邮箱" autocomplete="off" class="inbox_input domain_input" name="send_input" style="border: none;vertical-align: top;height: 34px;" />
+							<ul class="domain_list" id="domain_select_lists"></ul>
+							<span class="select_down"></span>
+						</div>
+					</div>
+					<div class="line">
+						<span class="sname">收件人</span>
+						<div class="conter">
+							<input type="text" name="mail_to" class="bt-input-text" placeholder="多个收件人请使用英文逗号分隔" />
+							</div>
+					</div>
+					<div class="line">
+						<span class="sname">主题</span>
+						<div class="conter">
+							<input type="text" name="subject" class="bt-input-text" />
+						</div>
+					</div>
+					<div class="line editor_conter">
+						<span class="sname">正文</span>
+						<div class="conter">
+							<textarea name="editor1" id="editor1" rows="10" cols="80"></textarea>
+						</div>
+					</div>
+					<div class="line">
+						<span class="sname">&nbsp;</span>
+						<div class="conter">
+							<button class="btn btn-sm btn-success " style="margin-right:10px"
+								onclick="mail.sublimt_send_mail_request()">发送邮件</button>
+							<button class="btn btn-sm btn-default" onclick="mail.clear_send_mail()">清空内容</button>
+						</div>
+					</div>
+					<ul class="help-info-text c7 mlr20">
+						<li>
+							<font style="color:red">提示：此功能只建议测试发件功能用，真正使用请使用客户端软件(比如foxmail)或者api接口</font>
+						</li>
+					</ul>
+				</div>
+				<!-- 服务状态 -->
+				<div class="task_block divtable" style="display:none;">
+					<table class="table table-hover">
+						<thead>
+							<tr>
+								<th>服务名称</th>
+								<th>服务状态</th>
+								<th width="190" style="text-align: center">操作</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>Dovecot</td>
+								<td><span class="dovecot">获取中...</span></td>
+								<td style="text-align: right">
+									<a href="javascript:" class="btlink dovecot_start"
+										onclick="mail.service_admin('dovecot', 'start')">启动</a>
+									<a href="javascript:" class="btlink dovecot_stop"
+										onclick="mail.service_admin('dovecot', 'stop')">停止</a>&nbsp;|&nbsp;
+									<a href="javascript:" class="btlink"
+										onclick="mail.service_admin('dovecot', 'restart')">重启</a>&nbsp;|&nbsp;
+									<a href="javascript:" class="btlink"
+										onclick="mail.service_admin('dovecot', 'repair')">修复</a>&nbsp;|&nbsp;
+									<a href="javascript:;" class="btlink"
+										onclick="mail.open_editCode_view({service:'dovecot',title:'dovecot_配置文件'})">配置文件</a>
+								</td>
+							</tr>
+							<tr>
+								<td>Opendkim</td>
+								<td><span class="opendkim">获取中...</span></td>
+								<td style="text-align: right">
+									<a href="javascript:" class="btlink opendkim_start"
+										onclick="mail.service_admin('opendkim', 'start')">启动</a>
+									<a href="javascript:" class="btlink opendkim_stop"
+										onclick="mail.service_admin('opendkim', 'stop')">停止</a>&nbsp;|&nbsp;
+									<a href="javascript:" class="btlink"
+										onclick="mail.service_admin('opendkim', 'restart')">重启</a>&nbsp;|&nbsp;
+									<a href="javascript:" class="btlink"
+										onclick="mail.service_admin('opendkim', 'repair')">修复</a>&nbsp;|&nbsp;
+									<a href="javascript:;" class="btlink"
+										onclick="mail.open_editCode_view({service:'opendkim',title:'opendkim_配置文件'})">配置文件</a>
+								</td>
+							</tr>
+							<tr>
+								<td>Rspamd</td>
+								<td><span class="rspamd">获取中...</span></td>
+								<td style="text-align: right">
+									<a href="javascript:" class="btlink rspamd_start"
+										onclick="mail.service_admin('rspamd', 'start')">启动</a>
+									<a href="javascript:" class="btlink rspamd_stop"
+										onclick="mail.service_admin('rspamd', 'stop')">停止</a>&nbsp;|&nbsp;
+									<a href="javascript:" class="btlink"
+										onclick="mail.service_admin('rspamd', 'restart')">重启</a>&nbsp;|&nbsp;
+									<a href="javascript:" class="btlink"
+										onclick="mail.service_admin('rspamd', 'repair')">修复</a>&nbsp;|&nbsp;
+									<a href="javascript:;" class="btlink"
+										onclick="mail.open_editCode_view({service:'rspamd',title:'rspamd_配置文件'})">配置文件</a>
+								</td>
+							</tr>
+							<tr>
+								<td>Postfix</td>
+								<td><span class="postfix">获取中...</span></td>
+								<td style="text-align: right">
+									<a href="javascript:" class="btlink postfix_start"
+										onclick="mail.service_admin('postfix', 'start')">启动</a>
+									<a href="javascript:" class="btlink postfix_stop"
+										onclick="mail.service_admin('postfix', 'stop')">停止</a>&nbsp;|&nbsp;
+									<a href="javascript:" class="btlink"
+										onclick="mail.service_admin('postfix', 'restart')">重启</a>&nbsp;|&nbsp;
+									<a href="javascript:" class="btlink"
+										onclick="mail.service_admin('postfix', 'repair')">修复</a>&nbsp;|&nbsp;
+									<a href="javascript:;" class="btlink"
+										onclick="mail.open_editCode_view({service:'postfix',title:'postfix_配置文件'})">配置文件</a>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<!-- 日志 -->
+				<div class="task_block" style="display:none;">
+					<textarea id="mail_logs_val" class="logs_code_style"></textarea>
+				</div>
+			</div>
 		</div>
 	</div>
 </div>
 <script type="text/javascript">
-resetPluginWinWidth(870);
+resetPluginWinWidth(1000);
 $.getScript( "/plugins/file?name=mail&f=js/mail.js", function(){
-	domainList();
+	mail.init();
 });
 </script>
