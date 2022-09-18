@@ -51,6 +51,36 @@ class App:
 
         return tmp
 
+    def check_mail_sys(self):
+        args = self.getArgs()
+
+        if os.path.exists('/etc/postfix/sqlite_virtual_domains_maps.cf'):
+            mw.execShell(
+                '/sbin/postconf -e "message_size_limit = 102400000"')
+            # 修改postfix mydestination配置项
+            result = mw.readFile(self.postfix_main_cf)
+            if not result:
+                return mw.returnJson(False, "找不到postfix配置文件")
+            result = re.search(r"\n*mydestination\s*=(.+)", result)
+            if not result:
+                return mw.returnJson(False, "postfix配置文件中找不到mydestination配置项")
+            result = result.group(1)
+            if 'localhost' in result or '$myhostname' in result or '$mydomain' in result:
+                mw.execShell(
+                    '/sbin/postconf -e "mydestination =" && systemctl restart postfix')
+            # 修改dovecot配置
+            dovecot_conf = public.readFile("/etc/dovecot/dovecot.conf")
+            if not dovecot_conf or not re.search(r"\n*protocol\s*imap", dovecot_conf):
+                return mw.returnJson(False, '配置dovecot失败')
+            # 修复之前版本未安装opendkim的问题
+            # if not (os.path.exists("/usr/sbin/opendkim") and os.path.exists("/etc/opendkim.conf") and os.path.exists("/etc/opendkim")):
+            #     if not self.setup_opendkim():
+            # return public.returnMsg(False, 'Failed to configure opendkim 1')
+
+            return mw.returnJson(True, '邮局系统已经存在，重装之前请先卸载!')
+        else:
+            return mw.returnJson(False, '之前没有安装过邮局系统，请放心安装!')
+
     def __get_session(self):
         session = mw.readFile(self.__session_conf)
         if session:

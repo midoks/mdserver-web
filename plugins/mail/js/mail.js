@@ -5,7 +5,52 @@ var mail  = {
 
         this.event();
 
-        _this.create_domain_list();
+        $('.layui-layer-page').hide();
+
+        setTimeout(function () {
+            var win = $(window),
+                layer = $('.layui-layer-page');
+            layer.show();
+            layer.css({
+                    'width':'1080px',
+                    'top':((win.height()-layer.height())/2)+'px',
+                    'left':((win.width()-1000)/2)+'px',
+                    'zIndex':'999'
+            });
+            $('.layui-layer-shade').css('zIndex', '998');
+        }, 200);
+
+
+        _this.check_mail_sys({
+            tips: '正在检查邮局服务是否正常,请稍后....',
+            hostname: ''
+        }, function (res) {
+            console.log("aaaa",res);
+            if (res.status == false && res.msg == '之前没有安装过邮局系统，请放心安装!') {
+                layer.confirm('当前未设置邮局服务，是否现在设置?', {
+                    icon: 0,
+                    title: '邮局初始化',
+                    btn: ['设置', '取消'], //按钮
+                    cancel: function () {
+                        layer.closeAll();
+                    }
+                }, function (index) {
+                    _this.check_post_env('setup_mail_sys')
+                }, function () {
+                    layer.closeAll();
+                });
+            } else {
+                // _this.create_domain_list();
+                $('.tasklist .tab-nav span:first').click(); // 初始化
+                _this.loadScript('/static/ckeditor/ckeditor.js', function () {
+                    CKEDITOR.replace('editor1', {
+                        customConfig: '/static/ckeditor/config.js?v1.0'
+                    })
+                });
+            }
+        });
+
+        // _this.create_domain_list();
     },
     event: function () {
         var _this = this;
@@ -26,6 +71,8 @@ var mail  = {
                     break;
             }
         });
+
+
         
 
         console.log(_this);
@@ -269,6 +316,83 @@ var mail  = {
             if (callback) callback(res);
         });
     },
+
+    // 获取邮箱服务是否正常_请求
+    check_mail_sys: function (obj, callback) {
+        this.send({
+            tips: obj.tips,
+            method: 'check_mail_sys',
+            data: {
+                hostname: obj.hostname
+            },
+            check: true,
+            success: function (res) {
+                if (callback) callback(res);
+            }
+        })
+    },
+
+    //检查邮局环境
+    check_post_env:function (name) {
+        var _this = this;
+        var layerE =  layer.open({
+            type: 1,
+            closeBtn:2,
+            title:'检查邮局环境',
+            area: ['600px','575px'], //宽高
+            content:'\
+            <div class="pd20 mlr20 bt-mail-index" accept-charset="utf-8">\
+                <div id="checkPostEnv"></div>\
+                <ul class="help-info-text c7 mlr20">\
+                    <li>如果邮局环境异常，请先排除故障。 请在所有异常修复完成后执行下一步操作</li>\
+                </ul>\
+            </div>\
+            <div class="bt-mail-btn">\
+                <a class="layui-layer-btn0" data-index="0">提交</a>\
+                <a class="layui-layer-btn2" data-index="2">刷新列表</a>\
+                <a class="layui-layer-btn1" data-index="1">取消</a>\
+            </div>',
+            success:function(index){
+                _this.create_post_env_table()
+                $('.bt-mail-btn').unbind().on('click','a',function(){
+                    var _index = $(this).attr('data-index')
+                    switch (_index){
+                        case '0':
+                            if($('#checkPostEnv').find('.set_mail_key').length >0){
+                                layer.msg('请修复好所有的异常再提交')
+                            }else{
+                                switch (name){
+                                    case 'setup_mail_sys':
+                                        _this.setup_mail_sys({tips:'正在初始化邮局...'},function(res){
+                                            layer.close(layerE)
+                                            layer.msg(res.msg,{icon:res.status?1:2});
+                                            _this.create_domain_list();
+                                        });
+                                        break;
+                                    case 'change_to_rspamd':
+                                        _this.change_to_rspamd(function(res){
+                                            layer.close(layerE)
+                                            layer.msg(res.msg,{icon:res.status?1:2});
+                                            _this.create_server_status_table()
+                                        })
+                                        break;
+                                }
+                            }
+                            break;
+                        case '1':
+                            name == 'change_to_rspamd'?layer.close(layerE):layer.closeAll();
+                            break;
+                        case '2':
+                           _this.create_post_env_table();
+                    }
+                })
+            },
+            cancel:function(){
+                 name == 'change_to_rspamd'?layer.close(layerE):layer.closeAll()
+            }
+        })
+    },
+    
        
     str2Obj:function(str){
         var data = {};
@@ -307,10 +431,13 @@ var mail  = {
             }
 
             var ret_data = $.parseJSON(res.data);
-            if (!ret_data.status){
-                layer.msg(ret_data.msg,{icon:2,time:2000});
-                return;
-            }
+            // console.log("send1:",ret_data);
+            // if (!ret_data.status){
+            //     layer.msg(ret_data.msg,{icon:2,time:2000});
+            //     return;
+            // }
+
+            // console.log("send2:",ret_data);
 
             if(typeof(callback) == 'function'){
                 callback(ret_data);
