@@ -320,7 +320,7 @@ class App:
         #     path = '/var/log/mail.log'
         return path
 
-    def add_domain():
+    def add_domain(self):
         args = self.getArgs()
 
         if 'domain' not in args:
@@ -337,13 +337,13 @@ class App:
             if not check[0]:
                 return mw.returnJson(False, 'A记录解析失败<br>域名：{}<br>IP：{}'.format(a_record, check[1]['value']))
 
-        if M('domain').where("domain=?", (domain,)).count() > 0:
+        if self.M('domain').where("domain=?", (domain,)).count() > 0:
             return mw.returnJson(False, '该域名已存在')
 
         cur_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         try:
-            M('domain').add('domain,a_record,created',
-                            (domain, a_record, cur_time))
+            self.M('domain').add('domain,a_record,created',
+                                 (domain, a_record, cur_time))
         except:
             return mw.returnJson(False, '邮局没有初始化成功！<br>'
                                  '请尝试重新初始化,<br>'
