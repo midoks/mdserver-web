@@ -95,9 +95,10 @@
 	height: 34px;
 }
 
+/*
 .domain_table {
-	height: 220px;
-}
+	height: auto;
+}*/
 
 .tasklist .tab-nav span.on {
 	background-color: #fff;
@@ -514,7 +515,7 @@ input[readonly] {
 	<!-- style="height: auto;" -->
 	<div class="bt-w-main" >
 		<div class="bt-w-menu">
-			<p class="on">域名列表</p>
+			<p class="bgw on">域名列表</p>
 			<p>邮件秘抄</p>
 			<p>邮件中继</p>
 			<p>邮件转发</p>
@@ -1035,7 +1036,7 @@ input[readonly] {
 	</div>
 </div>
 <script type="text/javascript">
-resetPluginWinWidth(1000);
+resetPluginWinWidth(1080);
 $.getScript( "/plugins/file?name=mail&f=js/mail.js", function(){
 	mail.init();
 });

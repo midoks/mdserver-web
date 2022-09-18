@@ -4,6 +4,8 @@ var mail  = {
         var _this = this;
 
         this.event();
+
+        _this.create_domain_list();
     },
     event: function () {
         var _this = this;
@@ -13,7 +15,18 @@ var mail  = {
             $(this).addClass('on').siblings().removeClass('on');
             $('.soft-man-con .task_block').eq(index).show().siblings().hide();
             console.log(index);
+
+
+            switch (index) {
+                case 0:
+                    _this.create_domain_list();
+                    // _this.get_mailSSL_status(function (res) {
+                    //     $('#certificateSSL').prop("checked", res);
+                    // });
+                    break;
+            }
         });
+        
 
         console.log(_this);
     },
@@ -83,6 +96,7 @@ var mail  = {
                 }
                 if (type) {
                     _this.add_domain(_form, function (res) {
+                        console.log(res);
                         _this.create_domain_list({
                             page: 1,
                             size: 10
@@ -146,6 +160,22 @@ var mail  = {
         })
     },
 
+    flush_domain_record: function(obj,callback){
+        var _this = this;
+        this.send({
+            tips: obj == 'all'?'正在刷新所有域名记录，刷新时间视域名数量而定，请稍后...':'Refresh domain record, please wait...',
+            method: 'flush_domain_record',
+            data: {
+                domain: obj
+            },
+            success: function (res) {
+                console.log(res);
+                if(res.status) _this.create_domain_list();
+                if (callback) callback(res);
+            }
+        });
+    },
+
     // 创建域名列表-方法
     create_domain_list: function (obj, callback) {
         if (obj == undefined) obj = {
@@ -154,8 +184,9 @@ var mail  = {
         }
         var _this = this;
         this.get_domain_list(obj, function (res) {
+            console.log(res);
             var _tbody = '',
-                rdata = res.msg.data;
+            rdata = res.data.data;
             _this.domain_list = rdata
             if (rdata.length > 0) {
                 for (var i = 0; i < rdata.length; i++) {
@@ -201,7 +232,7 @@ var mail  = {
                 };
             }
             $('#domain_list').html(_tbody);
-            $('#domain_page').html(res.msg.page);
+            $('#domain_page').html(res.page);
             $('#domain_page a').click(function (e) {
                 _this.create_domain_list({
                     page: $(this).attr('href').split('p=')[1],
@@ -253,7 +284,7 @@ var mail  = {
         var tips = info['tips'];
         var method = info['method'];
         var args = info['data'];
-        var callback = info['callback'];
+        var callback = info['success'];
 
         var loadT = layer.msg(tips, { icon: 16, time: 0, shade: 0.3 });
 
@@ -269,7 +300,6 @@ var mail  = {
         }
 
         $.post('/plugins/run', data, function(res) {
-
             layer.close(loadT);
             if (!res.status){
                 layer.msg(res.msg,{icon:2,time:10000});
@@ -277,13 +307,13 @@ var mail  = {
             }
 
             var ret_data = $.parseJSON(res.data);
-              if (!ret_data.status){
+            if (!ret_data.status){
                 layer.msg(ret_data.msg,{icon:2,time:2000});
                 return;
             }
 
             if(typeof(callback) == 'function'){
-                callback(res);
+                callback(ret_data);
             }
         },'json'); 
     },
@@ -291,7 +321,7 @@ var mail  = {
         var tips = info['tips'];
         var method = info['method'];
         var args = info['data'];
-        var callback = info['callback'];
+        var callback = info['success'];
         
         var loadT = layer.msg(tips, { icon: 16, time: 0, shade: 0.3 });
 
