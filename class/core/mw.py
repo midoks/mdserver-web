@@ -609,7 +609,7 @@ def getNumLines(path, num, p=1):
                 break
         fp.close()
     except Exception as e:
-        return ''
+        return str(e)
 
     return "\n".join(data)
 
