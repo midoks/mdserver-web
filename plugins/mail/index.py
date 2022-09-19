@@ -24,6 +24,8 @@ app_debug = False
 if mw.isAppleSystem():
     app_debug = True
 
+import mail_init as mi
+
 
 class App:
     __setupPath = '/www/server/mail'
@@ -453,6 +455,10 @@ class App:
         # mw.writeFile(self._session_conf, json.dumps(self._session))
 
         return mw.returnJson(True, '刷新成功！')
+
+    def check_mail_env(self):
+        data = mi.mail_init().check_env()
+        return mw.returnJson(True, 'ok', data)
 
 
 if __name__ == "__main__":

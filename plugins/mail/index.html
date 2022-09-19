@@ -977,22 +977,6 @@ input[readonly] {
 								</td>
 							</tr>
 							<tr>
-								<td>Opendkim</td>
-								<td><span class="opendkim">获取中...</span></td>
-								<td style="text-align: right">
-									<a href="javascript:" class="btlink opendkim_start"
-										onclick="mail.service_admin('opendkim', 'start')">启动</a>
-									<a href="javascript:" class="btlink opendkim_stop"
-										onclick="mail.service_admin('opendkim', 'stop')">停止</a>&nbsp;|&nbsp;
-									<a href="javascript:" class="btlink"
-										onclick="mail.service_admin('opendkim', 'restart')">重启</a>&nbsp;|&nbsp;
-									<a href="javascript:" class="btlink"
-										onclick="mail.service_admin('opendkim', 'repair')">修复</a>&nbsp;|&nbsp;
-									<a href="javascript:;" class="btlink"
-										onclick="mail.open_editCode_view({service:'opendkim',title:'opendkim_配置文件'})">配置文件</a>
-								</td>
-							</tr>
-							<tr>
 								<td>Rspamd</td>
 								<td><span class="rspamd">获取中...</span></td>
 								<td style="text-align: right">
@@ -1036,7 +1020,7 @@ input[readonly] {
 	</div>
 </div>
 <script type="text/javascript">
-resetPluginWinWidth(1080);
+// resetPluginWinWidth(1080);
 $.getScript( "/plugins/file?name=mail&f=js/mail.js", function(){
 	mail.init();
 });
