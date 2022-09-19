@@ -4,6 +4,8 @@ import sys
 import io
 import os
 import time
+import re
+import socket
 
 from datetime import datetime
 
@@ -460,9 +462,28 @@ class App:
         data = mi.mail_init().check_env()
         return mw.returnJson(True, 'ok', data)
 
+    def change_hostname(self):
+        '''
+        mac
+        sudo scutil --set HostName mac_hostname.vm
+        '''
+        args = self.getArgs()
+        hostname = args['hostname']
+        rep_domain = "^(?=^.{3,255}$)[a-zA-Z0-9\_\-][a-zA-Z0-9\_\-]{0,62}(\.[a-zA-Z0-9\_\-][a-zA-Z0-9\_\-]{0,62})+$"
+        if not re.search(rep_domain, hostname):
+            return mw.returnJson(False, "请输入完整域名，例如 mail.bt.com),")
+        mw.execShell('hostnamectl set-hostname --static {}'.format(hostname))
+        h = socket.gethostname()
+        if h == hostname:
+            return mw.returnJson(True, "设置成功！")
+        return mw.returnJson(False, "设置失败！")
+
 
 if __name__ == "__main__":
     func = sys.argv[1]
     classApp = App()
-    data = eval("classApp." + func + "()")
-    print(data)
+    try:
+        data = eval("classApp." + func + "()")
+        print(data)
+    except Exception as e:
+        print('error:' + str(e))

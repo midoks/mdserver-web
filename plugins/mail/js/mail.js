@@ -462,9 +462,14 @@ var mail  = {
             case 'Dovecot-install':
                 _key = 'repair_dovecot';
                 break;
+            case 'HostName':
+                _key = 'repair_host_name';
+                break;
         }
-
-        console.log(key,_key);
+        if (key == 'HostName'){
+            this.repair_host_name();
+            return;
+        }
         
         this.send({
             tips: '正在修复' + key + ',请稍候...',
@@ -475,7 +480,60 @@ var mail  = {
             }
         })
     },
+
+    // 修复hostname
+    repair_host_name: function () {
+        var _this = this;
+        layer.open({
+            type: 1,
+            shift: 5,
+            closeBtn: 1,
+            shadeClose: false,
+            title: '修复【主机名】',
+            btn: ['确定', '取消'],
+            area: "400px",
+            content: '\
+            <div class="bt-form pd20">\
+                <div class="line">\
+                    <span class="tname">域名</span>\
+                    <div class="info-r" style="margin-left: 102px;">\
+                        <input class="bt-input-text" type="text" name="hostname" style="width: 190px" />\
+                    </div>\
+                </div>\
+                <ul class="help-info-text c7">\
+                    <li>请输入你的完整域名，如：mail.mw.cn</li>\
+                </ul>\
+            </div>',
+            success: function ($layer, index) {
+            },
+            yes: function(index){
+                var hostname = $('input[name="hostname"]').val().trim();
+                if (hostname === '') {
+                    layer.msg('请输入你的完整域名', { icon: 2, closeBtn: true });
+                    return
+                }
+                _this.change_hostname({
+                    hostname: hostname,
+                }, function (res) {
+                    layer.close(index);
+                    _this.create_post_env_table();
+                    layer.msg(res.msg, { icon: res.status ? 1 : 5 });
+                });
+            }
+        });
+    },
     
+    // 一键修复主机名
+    change_hostname: function(data, callback){
+        this.send({
+            tips: '正在获取修复主机名, 请稍候...',
+            method: 'change_hostname',
+            data: data,
+            success: function (res) {
+                if (callback) callback(res);
+            }
+        });
+    },
        
     str2Obj:function(str){
         var data = {};
