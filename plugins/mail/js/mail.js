@@ -349,10 +349,12 @@ var mail  = {
     check_post_env:function (name) {
         var _this = this;
         var layerE =  layer.open({
+            skin:"",
             type: 1,
-            closeBtn:2,
+            closeBtn:1,
             title:'检查邮局环境',
-            area: ['600px','575px'], //宽高
+            area: ['600px','520px'], //宽高
+            btn: ['提交','取消','刷新列表'],
             content:'\
             <div class="pd20 mlr20 bt-mail-index" accept-charset="utf-8">\
                 <div id="checkPostEnv">\
@@ -373,50 +375,43 @@ var mail  = {
                 <ul class="help-info-text c7 mlr20">\
                     <li>如果邮局环境异常，请先排除故障。 请在所有异常修复完成后执行下一步操作</li>\
                 </ul>\
-            </div>\
-            <div class="bt-mail-btn">\
-                <a class="layui-layer-btn0" data-index="0">提交</a>\
-                <a class="layui-layer-btn2" data-index="2">刷新列表</a>\
-                <a class="layui-layer-btn1" data-index="1">取消</a>\
             </div>',
             success:function(index){
                 _this.create_post_env_table();
-                $('.bt-mail-btn').unbind().on('click','a',function(){
-                    var _index = $(this).attr('data-index')
-                    switch (_index){
-                        case '0':
-                            if($('#checkPostEnv').find('.set_mail_key').length >0){
-                                layer.msg('请修复好所有的异常再提交')
-                            }else{
-                                switch (name){
-                                    case 'setup_mail_sys':
-                                        _this.setup_mail_sys({tips:'正在初始化邮局...'},function(res){
-                                            layer.close(layerE)
-                                            layer.msg(res.msg,{icon:res.status?1:2});
-                                            _this.create_domain_list();
-                                        });
-                                        break;
-                                    case 'change_to_rspamd':
-                                        _this.change_to_rspamd(function(res){
-                                            layer.close(layerE)
-                                            layer.msg(res.msg,{icon:res.status?1:2});
-                                            _this.create_server_status_table()
-                                        })
-                                        break;
-                                }
-                            }
-                            break;
-                        case '1':
-                            name == 'change_to_rspamd'?layer.close(layerE):layer.closeAll();
-                            break;
-                        case '2':
-                           _this.create_post_env_table();
-                    }
-                })
             },
             cancel:function(){
-                 name == 'change_to_rspamd'?layer.close(layerE):layer.closeAll()
-            }
+                layer.closeAll();
+            },
+            yes:function(){
+                if($('#checkPostEnv').find('.set_mail_key').length > 0){
+                    layer.msg('请修复好所有的异常再提交');
+                }else{
+                    switch (name){
+                        case 'setup_mail_sys':
+                            _this.setup_mail_sys({tips:'正在初始化邮局...'},function(res){
+                                layer.close(layerE)
+                                layer.msg(res.msg,{icon:res.status?1:2});
+                                _this.create_domain_list();
+                            });
+                            break;
+                        case 'change_to_rspamd':
+                            _this.change_to_rspamd(function(res){
+                                layer.close(layerE)
+                                layer.msg(res.msg,{icon:res.status?1:2});
+                                _this.create_server_status_table()
+                            })
+                            break;
+                    }
+                }
+            },
+            btn3: function(index, layero){
+                _this.create_post_env_table();
+                return false;
+            },
+            btn2: function(index, layero){
+                name == 'change_to_rspamd'?layer.close(layerE):layer.closeAll();
+            },
+           
         })
     },
 
@@ -429,98 +424,14 @@ var mail  = {
             $.each(_this.post_env_list,function(index,item){
                 var list = [];
                 var noOperList = ['Redis-install', 'Redis-Passwd', 'SElinux'];
-                $.each(_this.post_env_list, function (index, item) {
-                    var data = res[item];
-                    list.push({
-                        env: item,
-                        title: _this.post_env_text[index],
-                        details: data.msg,
-                        status: data.status
-                    });
-                });
-                $('#checkPostEnv tbody').empty();
-                //  bt_tools.table({
-                //     el: '#checkPostEnv',
-                //     autoHeight: true,
-                //     data: list,
-                //     default: 'No Data',
-                //     column: [
-                //         {
-                //             fid: 'title',
-                //             title: '环境',
-                //             width: 140
-                //         },
-                //         {
-                //             fid: 'details',
-                //             title: '详情',
-                //             type: 'text',
-                //             width: 260,
-                //             template: function (row) {
-                //                 var _html = '';
-                //                 var _cont = '';
-                //                 var _class = '';
-                //                 var msg = row.details;
-                //                 var status = row.status;
-                //                 var result = noOperList.includes(row.env);
-
-                //                 _class = status ? 'green' : 'set_mail_key red';
-                //                 if (msg && result) {
-                //                     _cont = status ? '就绪' : msg;
-                //                 } else {
-                //                     _cont = status ? '就绪' : (msg != '' ? msg : '异常');
-                //                 }
-                //                 _html = '<span class="size_ellipsis ' + _class + '" style="width: 240px;" title="' + _cont + '">' + _cont + '</span>';
-                //                 return _html;
-                //             }
-                //         },
-                //         {
-                //             title: '操作',
-                //             type: 'group',
-                //             group: [
-                //                 {
-                //                     title: '修复',
-                //                     template: function (row) {
-                //                         var _html = '<span>无操作</span>';
-                //                         var msg = row.details;
-                //                         var status = row.status;
-                //                         var result = noOperList.includes(row.env);
-                //                         if (!result && !!msg && !status) {
-                //                             _html = '修复';
-                //                         }
-                //                         return _html;
-                //                     },
-                //                     event: function (row, index, ev, key, that) {
-                //                         var flag = $(ev.currentTarget).hasClass('btlink');
-                //                         if (!flag) return;
-                //                         var key = row.env;
-                //                         if (key == 'HostName') {
-                //                             _this.repair_host_name();
-                //                         } else {
-                //                             layer.confirm('是否修复邮局环境?', {
-                //                                 title: '修复邮局环境',
-                //                                 btn: [lan.public.submit, lan.public.cancel],
-                //                                 closeBtn: 2
-                //                             }, function () {
-                //                                 _this.repair_mail_env(key);
-                //                             });
-                //                         }
-                //                     }
-                //                 }
-                //             ]
-                //         }
-                //     ]
-                // });
-                // $('#checkPostEnv .divtable').removeClass('mtb10');
-                
-
-                if(res[item].msg && ['Redis-install','Redis-Passwd','SElinux'].includes(item)){
+                if(res[item].msg && noOperList.includes(item)){
                     $('#checkPostEnv tbody').append($('<tr><td>'+_this.post_env_text[index] +'</td><td title="'+res[item].msg.toString()+'" class="'+(res[item].status?'green':'set_mail_key red')+'">'+(res[item].status?"就绪":(res[item].msg.toString().length>30?res[item].msg.toString().substring(0,30)+'...':res[item].msg.toString()))+'</td><td>无操作</td></tr>'))
                 }else{
                     $('#checkPostEnv tbody').append($(`<tr><td>`+_this.post_env_text[index] +`</td><td title="`+res[item].msg+`" class="${(res[item].status?"green":"red")}">${(res[item].status?"就绪":(res[item].msg !=''?(res[item].msg.toString().length>30?res[item].msg.toString().substring(0,30)+'...':res[item].msg.toString()):"异常"))}</td><td>${(res[item].status?"无操作":"<a href='javascript:;' class='btlink set_mail_key' data-keys= "+ item+" >修复</a>")}</td></tr>`))
                 }
                 $('#checkPostEnv .divtable').removeClass('mtb10');
                 callback && callback();
-            })
+            });
         })
     },
     
