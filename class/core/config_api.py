@@ -207,6 +207,14 @@ class config_api:
         mw.execShell("chown root.root " + filename)
         return mw.returnJson(True, '面板已关闭!')
 
+    def openDebugApi(self):
+        filename = 'data/debug.pl'
+        if os.path.exists(filename):
+            os.remove(filename)
+            return mw.returnJson(True, '开发模式关闭!')
+        mw.writeFile(filename, 'True')
+        return mw.returnJson(True, '开发模式开启!')
+
     def setIpv6StatusApi(self):
         ipv6_file = 'data/ipv6.pl'
         if os.path.exists('data/ipv6.pl'):
@@ -316,10 +324,16 @@ class config_api:
             data['admin_path'] = mw.readFile(admin_path_file)
 
         ipv6_file = 'data/ipv6.pl'
-        if os.path.exists('data/ipv6.pl'):
+        if os.path.exists(ipv6_file):
             data['ipv6'] = 'checked'
         else:
             data['ipv6'] = ''
+
+        debug_file = 'data/debug.pl'
+        if os.path.exists(debug_file):
+            data['debug'] = 'checked'
+        else:
+            data['debug'] = ''
 
         ssl_file = 'data/ssl.pl'
         if os.path.exists('data/ssl.pl'):
