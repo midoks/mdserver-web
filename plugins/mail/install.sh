@@ -9,6 +9,14 @@ serverPath=$(dirname "$rootPath")
 
 install_tmp=${rootPath}/tmp/mw_install.pl
 
+pip install dnspython
+
+if [ -f ${rootPath}/bin/activate ];then
+	source ${rootPath}/bin/activate
+	pip install dnspython
+fi
+
+
 action=$1
 type=$2
 
