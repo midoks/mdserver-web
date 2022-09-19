@@ -29,7 +29,7 @@ class mail_init:
             '/usr/sbin/dovecot') else {"status": False, "msg": "Dovecot未安装,请点击修复按钮"}
         data['Postfix-Version'] = self.check_postfix_ver()
         data['Redis-install'] = {"status": True, "msg": "Redis已经安装"} if os.path.exists(
-            '/www/server/redis/src/redis-server') else {"status": False, "msg": "请到软件商店内安装Redis"}
+            mw.getServerDir() + '/redis/bin/redis-server') else {"status": False, "msg": "请到软件商店内安装Redis"}
         data['Redis-Passwd'] = self.check_redis_passwd(data['Redis-install'])
         data['Rspamd-install'] = {"status": True, "msg": "Rspamd已经安装"} if os.path.exists(
             '/usr/bin/rspamd') else {"status": False, "msg": "Rspamd未安装,请点击修复按钮"}
@@ -57,7 +57,7 @@ class mail_init:
             return mw.returnData(False, "当前版本不支持或Postfix没有安装成功：{}".format(postfix_version))
 
     def check_redis_passwd(self, redis_install):
-        redis_conf = mw.readFile('/www/server/redis/redis.conf')
+        redis_conf = mw.readFile(mw.getServerDir() + '/redis/redis.conf')
         if redis_install['status']:
             if re.search('\n\s*requirepass', redis_conf):
                 return mw.returnData(True, "Redis已经设置密码")

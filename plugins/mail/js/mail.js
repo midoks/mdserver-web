@@ -430,8 +430,49 @@ var mail  = {
                     $('#checkPostEnv tbody').append($(`<tr><td>`+_this.post_env_text[index] +`</td><td title="`+res[item].msg+`" class="${(res[item].status?"green":"red")}">${(res[item].status?"就绪":(res[item].msg !=''?(res[item].msg.toString().length>30?res[item].msg.toString().substring(0,30)+'...':res[item].msg.toString()):"异常"))}</td><td>${(res[item].status?"无操作":"<a href='javascript:;' class='btlink set_mail_key' data-keys= "+ item+" >修复</a>")}</td></tr>`))
                 }
                 $('#checkPostEnv .divtable').removeClass('mtb10');
-                callback && callback();
             });
+        });
+
+        $('#checkPostEnv').unbind().on('click','a',function(){
+           var key = $(this).attr('data-keys');
+           var confirmA = layer.confirm('是否修复邮局环境?', {
+               title: '修复邮局环境',
+               icon: 3,
+               closeBtn:2,
+               btn: ['确定', '取消'],
+           },function(index, layero){
+                _this.repair_mail_env(key);
+            });
+       })
+       if(callback) callback()
+    },
+
+    //修复邮局环境
+    repair_mail_env: function (key) {
+        var _this = this,_key;
+        switch(key) {
+            case 'Postfix-Version':
+            case 'Postfix-install':
+            case 'Sqlite-support':
+                _key = 'repair_postfix';
+                break;
+            case 'Rspamd-install':
+                _key = 'install_rspamd';
+                break;
+            case 'Dovecot-install':
+                _key = 'repair_dovecot';
+                break;
+        }
+
+        console.log(key,_key);
+        
+        this.send({
+            tips: '正在修复' + key + ',请稍候...',
+            method: _key,
+            success: function (res) {
+                layer.msg(res.msg, { icon: res.status?1:2 });
+                _this.create_post_env_table();
+            }
         })
     },
     
