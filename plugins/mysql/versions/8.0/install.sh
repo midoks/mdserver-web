@@ -95,7 +95,7 @@ Install_mysql()
 	fi
 	# ----- cpu end ------
 
-	cd $serverPath/mdserver-web/plugins/mysql/lib && /bin/bash rpcgen.sh
+	cd ${rootPath}/plugins/mysql/lib && /bin/bash rpcgen.sh
 
 	INSTALL_CMD=cmake
 	# check cmake version
@@ -132,7 +132,7 @@ Install_mysql()
 	OPENSSL_VERSION=`openssl version|awk '{print $2}'|awk -F '.' '{print $1}'`
 	if [ "${OPENSSL_VERSION}" -ge "3" ];then
 		#openssl version to high
-		cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash openssl.sh
+		cd ${rootPath}/plugins/php/lib && /bin/bash openssl.sh
 		export PKG_CONFIG_PATH=$serverPath/lib/openssl/lib/pkgconfig
 		OPTIONS="-DWITH_SSL=${serverPath}/lib/openssl"
 	fi

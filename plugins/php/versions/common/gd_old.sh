@@ -55,7 +55,7 @@ Install_lib()
 		return
 	fi
 
-	cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash freetype_old.sh
+	cd ${rootPath}/plugins/php/lib && /bin/bash freetype_old.sh
 	
 	if [ ! -f "$extFile" ];then
 
