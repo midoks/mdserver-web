@@ -9,7 +9,7 @@
 	"checks": "server/swap",
 	"path": "server/swap",
 	"display": 1,
-	"author": "midoks",
+	"author": "swap",
 	"date": "2021-01-29",
 	"home": "swap",
 	"type": 0,
