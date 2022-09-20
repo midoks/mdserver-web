@@ -1829,13 +1829,13 @@ location ^~ {from} {
         logPath = mw.getLogsDir() + '/' + siteName + '.log'
         if not os.path.exists(logPath):
             return mw.returnJson(False, '日志为空')
-        return mw.returnJson(True, mw.getNumLines(logPath, 100))
+        return mw.returnJson(True, mw.getLastLine(logPath, 100))
 
     def getErrorLogs(self, siteName):
         logPath = mw.getLogsDir() + '/' + siteName + '.error.log'
         if not os.path.exists(logPath):
             return mw.returnJson(False, '日志为空')
-        return mw.returnJson(True, mw.getNumLines(logPath, 100))
+        return mw.returnJson(True, mw.getLastLine(logPath, 100))
 
     # 取日志状态
     def getLogsStatus(self, siteName):
