@@ -40,7 +40,7 @@ Install_lib()
 		php_lib=$sourcePath/php_lib
 		mkdir -p $php_lib
 
-		cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash icu.sh
+		cd ${rootPath}/plugins/php/lib && /bin/bash icu.sh
 
 		wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
 

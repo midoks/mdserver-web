@@ -40,7 +40,7 @@ else
 fi
 
 
-# cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash freetype_old.sh
+# cd ${rootPath}/plugins/php/lib && /bin/bash freetype_old.sh
 # OPTIONS="${OPTIONS} --with-freetype-dir=${serverPath}/lib/freetype_old"
 # OPTIONS="${OPTIONS} --with-gd --enable-gd-native-ttf"
 # OPTIONS="${OPTIONS} --with-jpeg --with-jpeg-dir=/usr/lib"
@@ -60,7 +60,7 @@ Install_lib()
 	if [ ! -f "$extFile" ];then
 
 		if [ ! -d $sourcePath/php${version}/ext ];then
-			cd $serverPath/mdserver-web/plugins/php && /bin/bash install.sh install ${version}
+			cd ${rootPath}/plugins/php && /bin/bash install.sh install ${version}
 		fi
 		
 		cd $sourcePath/php${version}/ext/${LIBNAME}

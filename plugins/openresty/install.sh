@@ -24,7 +24,6 @@ else
 	useradd -g www -s /bin/bash www
 fi
 
-# cd /www/server/mdserver-web/plugins/openresty && /bin/bash install.sh install 1.21.4.1
 Install_openresty()
 {
 	# ----- cpu start ------

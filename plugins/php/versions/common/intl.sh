@@ -34,7 +34,7 @@ fi
 
 OPTIONS=''
 if [ "$version" -lt "71" ];then
-	cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash icu.sh
+	cd ${rootPath}/plugins/php/lib && /bin/bash icu.sh
 	OPTIONS="--with-icu-dir=${serverPath}/lib/icu"
 fi
 
