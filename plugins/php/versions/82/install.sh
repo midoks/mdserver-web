@@ -32,7 +32,7 @@ cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash zlib.sh
 if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 
 	if [ ! -f $sourcePath/php/php-${version}.tar.xz ];then
-		wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz https://downloads.php.net/~pierrick/php-${version}.tar.xz
+		wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz https://downloads.php.net/~sergey/php-${version}.tar.xz
 	fi
 	
 	cd $sourcePath/php && tar -Jxf $sourcePath/php/php-${version}.tar.xz
