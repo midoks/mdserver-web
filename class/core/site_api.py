@@ -2103,12 +2103,16 @@ location ^~ {from} {
         return rewriteList
 
     def createRootDir(self, path):
+        autoInit = False
         if not os.path.exists(path):
+            autoInit = True
             os.makedirs(path)
         if not mw.isAppleSystem():
             mw.execShell('chown -R www:www ' + path)
-        mw.writeFile(path + '/index.html', 'Work has started!!!')
-        mw.execShell('chmod -R 755 ' + path)
+
+        if autoInit:
+            mw.writeFile(path + '/index.html', 'Work has started!!!')
+            mw.execShell('chmod -R 755 ' + path)
 
     def nginxAddDomain(self, webname, domain, port):
         file = self.getHostConf(webname)
