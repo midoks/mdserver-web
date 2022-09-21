@@ -2608,12 +2608,12 @@ function tryRestartPHP(siteName){
 		}
 		
 		var php_sign = 'php';
-		if (phpversion.find('yum') > -1){
+		if (phpversion.indexOf('yum') > -1){
 			php_sign = 'php-yum';
 			phpversion = phpversion.replace('yum','');
 		}
 
-		if (phpversion.find('apt') > -1){
+		if (phpversion.indexOf('apt') > -1){
 			php_sign = 'php-apt';
 			phpversion = phpversion.replace('apt','');
 		}
