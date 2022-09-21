@@ -1149,10 +1149,10 @@ class site_api:
             if conf.find(rep) == -1:
                 rep = '#error_page 404/404.html;'
             data = '''
-    # AUTH_START
+    #AUTH_START
     auth_basic "Authorization";
     auth_basic_user_file %s;
-    # AUTH_END''' % (filename,)
+    #AUTH_END''' % (filename,)
             conf = conf.replace(rep, rep + data)
             mw.writeFile(configFile, conf)
         # 写密码配置
@@ -1241,13 +1241,13 @@ class site_api:
         content = mw.readFile(vhost_file)
 
         cnf_301 = '''
-    # 301-START
+    #301-START
     include %s/*.conf;
-    # 301-END
+    #301-END
 ''' % (self.getRedirectPath( siteName))
 
         cnf_301_source = '''
-    # 301-START
+    #301-START
 '''
         # print('operateRedirectConf', content.find('#301-END'))
         if content.find('#301-END') != -1:
@@ -1433,13 +1433,13 @@ class site_api:
         content = mw.readFile(vhost_file)
 
         proxy_cnf = '''
-    # PROXY-START
+    #PROXY-START
     include %s/*.conf;
-    # PROXY-END
+    #PROXY-END
 ''' % (self.getProxyPath(siteName))
 
         proxy_cnf_source = '''
-    # PROXY-START
+    #PROXY-START
 '''
 
         if content.find('#PROXY-END') != -1:
@@ -1571,7 +1571,7 @@ class site_api:
 
         # location ~* ^{from}(.*)$ {
         tpl = """
-# PROXY-START/
+#PROXY-START/
 location ^~ {from} {
     proxy_pass {to};
     proxy_set_header Host {host};
@@ -1594,7 +1594,7 @@ location ^~ {from} {
         add_header Cache-Control no-cache;
     }
 }
-# PROXY-END/
+#PROXY-END/
         """
 
         # replace
@@ -2035,7 +2035,7 @@ location ^~ {from} {
            return 404;
         }
     }
-    # SECURITY-END
+    #SECURITY-END
     include %s/enable-php-''' % (fix.strip().replace(',', '|'), domains.strip().replace(',', ' '), pre_path)
                 conf = re.sub(re_path, rconf, conf)
                 mw.writeLog('网站管理', '站点[' + name + ']已开启防盗链!')
