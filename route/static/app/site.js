@@ -338,6 +338,7 @@ function webPathEdit(id){
 		var userini = data['data'];
 		var webpath = userini['path'];
 		var siteName = userini['name'];
+		var runPath = userini['runPath']['runPath'];
 		var userinicheckeds = userini.userini?'checked':'';
 		var logscheckeds = userini.logs?'checked':'';
 		var opt = ''
@@ -385,7 +386,10 @@ function webPathEdit(id){
 
 		$("#webedit-con").html(webPathHtml);		
 		$("#userini").change(function(){
-			$.post('/site/set_dir_user_ini','path='+webpath,function(userini){
+			$.post('/site/set_dir_user_ini',{
+				'path':webpath,
+				'runPath':runPath,
+			},function(userini){
 				layer.msg(userini.msg+'<p style="color:red;">注意：设置防跨站需要重启PHP才能生效!</p>',{icon:userini.status?1:2});
 				tryRestartPHP(siteName);
 			},'json');
@@ -2601,16 +2605,28 @@ function setSizeClassType(){
 // 尝试重启PHP
 function tryRestartPHP(siteName){
 	$.post('/site/get_site_php_version','siteName='+siteName,function(data){
+		var phpversion = data.phpversion;
 
-		if (data.phpversion == "00"){
+		if (phpversion == "00"){
 			return
 		}
 		
-		var reqData = {name:'php', func:'restart'}
-		reqData['version'] = data.phpversion;
+		var php_sign = 'php';
+		if (phpversion.indexOf('yum') > -1){
+			php_sign = 'php-yum';
+			phpversion = phpversion.replace('yum','');
+		}
+
+		if (phpversion.indexOf('apt') > -1){
+			php_sign = 'php-apt';
+			phpversion = phpversion.replace('apt','');
+		}
+
+		var reqData = {name: php_sign, func:'restart'}
+		reqData['version'] = phpversion;
 
 		// console.log(reqData);
-		var loadT = layer.msg('尝试自动重启PHP['+data.phpversion+']...', { icon: 16, time: 0, shade: 0.3 });
+		var loadT = layer.msg('尝试自动重启PHP['+phpversion+']...', { icon: 16, time: 0, shade: 0.3 });
 		$.post('/plugins/run', reqData, function(data) {
 			layer.close(loadT);
 	        layer.msg(data.msg,{icon:data.status?1:2,time:3000,shade: [0.3, '#000']});

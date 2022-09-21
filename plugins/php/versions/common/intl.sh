@@ -34,7 +34,7 @@ fi
 
 OPTIONS=''
 if [ "$version" -lt "71" ];then
-	cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash icu.sh
+	cd ${rootPath}/plugins/php/lib && /bin/bash icu.sh
 	OPTIONS="--with-icu-dir=${serverPath}/lib/icu"
 fi
 
@@ -51,7 +51,7 @@ Install_lib()
 	if [ ! -f "$extFile" ];then
 
 		if [ ! -d $sourcePath/php${version}/ext ];then
-			cd $serverPath/mdserver-web/plugins/php && /bin/bash install.sh install ${version}
+			cd ${rootPath}/plugins/php && /bin/bash install.sh install ${version}
 		fi
 
 		cd $sourcePath/php${version}/ext/${LIBNAME}

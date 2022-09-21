@@ -45,12 +45,12 @@ Install_lib()
 		return
 	fi
 	
-	cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash libiconv.sh
+	cd ${rootPath}/plugins/php/lib && /bin/bash libiconv.sh
 	
 	if [ ! -f "$extFile" ];then
 
 		if [ ! -d $sourcePath/php${version}/ext ];then
-			cd $serverPath/mdserver-web/plugins/php && /bin/bash install.sh install ${version}
+			cd ${rootPath}/plugins/php && /bin/bash install.sh install ${version}
 		fi
 
 		cd $sourcePath/php${version}/ext/${LIBNAME}

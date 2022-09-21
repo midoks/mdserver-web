@@ -26,11 +26,24 @@ function closePanel(){
 	}}, function() {
 		$.post('/config/close_panel','',function(rdata){
 			layer.msg(rdata.msg,{icon:rdata.status?1:2});
-			setTimeout(function(){window.location.reload();},1000);
+			setTimeout(function(){
+				window.location.reload();
+			},1000);
 		},'json');
 	},function(){
 		$("#closePl").prop("checked",false);
 	});
+}
+
+//开发模式
+function debugMode(){
+	var loadT = layer.msg('正在发送请求,请稍候...', { icon: 16, time: 0, shade: [0.3, '#000'] });
+    $.post('/config/open_debug', {}, function (rdata) {
+        layer.close(loadT);
+        showMsg(rdata.msg, function(){
+			window.location.reload();
+		} ,{icon:rdata.status?1:2}, 1000);
+    },'json');
 }
 
 

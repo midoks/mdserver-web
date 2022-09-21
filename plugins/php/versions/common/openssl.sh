@@ -41,15 +41,15 @@ Install_lib()
 		return
 	fi
 	
-	# cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash openssl_10.sh
+	# cd ${rootPath}/plugins/php/lib && /bin/bash openssl_10.sh
 	if [ "$version" -lt "70" ];then
-		cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash openssl_10.sh
+		cd ${rootPath}/plugins/php/lib && /bin/bash openssl_10.sh
 	fi
 
 	if [ ! -f "$extFile" ];then
 
 		if [ ! -d $sourcePath/php${version}/ext ];then
-			cd $serverPath/mdserver-web/plugins/php && /bin/bash install.sh install ${version}
+			cd ${rootPath}/plugins/php && /bin/bash install.sh install ${version}
 		fi
 
 		cd $sourcePath/php${version}/ext/${LIBNAME}

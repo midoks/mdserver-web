@@ -35,7 +35,7 @@ Install_lib()
 		return
 	fi
 	
-	cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash icu.sh
+	cd $rootPath/plugins/php/lib && /bin/bash icu.sh
 
 	if [ ! -f "$extFile" ];then
 

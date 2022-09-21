@@ -103,7 +103,7 @@ def initDreplace():
         mw.writeFile(conf, conf_content)
 
     if os.path.exists(systemDir) and not os.path.exists(systemService):
-        activate_file = mw.getServerDir() + '/mdserver-web/bin/activate'
+        activate_file = mw.getRunDir() + '/bin/activate'
         if os.path.exists(activate_file):
             supervisord_bin = mw.execShell(
                 'source ' + activate_file + '&& which supervisord')[0].strip()
@@ -472,7 +472,7 @@ def readConfigLogTpl():
             stdout_logfile = line.strip().split('=')[1]
 
     if stdout_logfile != '':
-        data = mw.getNumLines(stdout_logfile, int(line_log))
+        data = mw.getLastLine(stdout_logfile, int(line_log))
         return mw.returnJson(True, 'OK', data)
     return mw.returnJson(False, 'OK', '')
 
@@ -494,7 +494,7 @@ def readConfigLogErrorTpl():
             stderr_logfile = line.strip().split('=')[1]
 
     if stderr_logfile != '':
-        data = mw.getNumLines(stderr_logfile, int(line_log))
+        data = mw.getLastLine(stderr_logfile, int(line_log))
         return mw.returnJson(True, 'OK', data)
     return mw.returnJson(False, 'OK', '')
 

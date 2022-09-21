@@ -61,7 +61,7 @@ def createBgTask():
     import crontab_api
     api = crontab_api.crontab_api()
 
-    cmd = "cd " + mw.getServerDir() + "/mdserver-web && nice -n 10 python3 " + \
+    cmd = "cd " + mw.getRunDir() + " && nice -n 10 python3 " + \
         getPluginDir() + "/tool_task.py execute"
     params = {
         'name': name,

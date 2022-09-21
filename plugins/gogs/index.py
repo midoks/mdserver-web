@@ -681,12 +681,7 @@ def getTotalStatistics():
     data = {}
     if st.strip() == 'start':
         list_count = pQuery('select count(id) as num from repository')
-
-        if list_count.find("error") > -1:
-            data['status'] = False
-            data['count'] = 0
-            return mw.returnJson(False, 'fail', data)
-
+        count = list_count[0]["num"]
         data['status'] = True
         data['count'] = count
         data['ver'] = mw.readFile(getServerDir() + '/version.pl').strip()

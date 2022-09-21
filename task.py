@@ -103,6 +103,13 @@ def downloadFile(url, filename):
         import urllib
         import socket
         socket.setdefaulttimeout(60)
+
+        headers = (
+            'User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36')
+        opener = urllib.request.build_opener()
+        opener.addheaders = [headers]
+        urllib.request.install_opener(opener)
+
         urllib.request.urlretrieve(
             url, filename=filename, reporthook=downloadHook)
 

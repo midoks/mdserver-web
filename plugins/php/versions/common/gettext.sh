@@ -14,13 +14,8 @@ sourcePath=${serverPath}/source/php
 actionType=$1
 version=$2
 
-LIBNAME=fileinfo
+LIBNAME=gettext
 LIBV=0
-
-if [ "$version" == "53" ];then
-	echo "i wont support it"
-	exit
-fi
 
 LIB_PATH_NAME=lib/php
 if [ -d $serverPath/php/${version}/lib64 ];then

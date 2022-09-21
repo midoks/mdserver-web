@@ -122,6 +122,7 @@ data/datadir.pl
 data/502Task.pl
 data/default.pl
 data/backup.pl
+data/debug.pl
 data/default_site.pl
 lib/python*
 
@@ -151,6 +152,7 @@ plugins/gdrive
 plugins/mtproxy
 plugins/zimg
 plugins/bk_demo
+plugins/mail
 debug.out
 
 

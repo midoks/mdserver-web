@@ -9,7 +9,7 @@
 	"shell":"install.sh",
 	"checks":"server/webssh",
 	"path": "server/webssh",
-	"author":"midoks",
+	"author":"ssh",
 	"home":"",
 	"date":"2018-12-20",
 	"pid":"4"

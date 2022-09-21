@@ -9,7 +9,7 @@
 	"shell":"install.sh",
 	"checks":"server/rsyncd",
 	"path": "server/rsyncd",
-	"author":"midoks",
+	"author":"samba",
 	"home":"https://rsync.samba.org/",
 	"date":"2019-03-05",
 	"pid":"4"

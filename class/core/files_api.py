@@ -36,7 +36,7 @@ class files_api:
             return mw.returnJson(False, '文件不存在', (path,))
 
         try:
-            data = mw.getNumLines(path, int(line))
+            data = mw.getLastLine(path, int(line))
             return mw.returnJson(True, 'OK', data)
         except Exception as ex:
             return mw.returnJson(False, u'无法正确读取文件!' + str(ex))

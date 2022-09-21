@@ -4,8 +4,8 @@ define('XHProf_Name', 'mdd');
 
 /**
  * xhprof 配置,便于调试快速找到问题
- * author midoks@163.com
  */
+
 function app_xhprof_start() {
     $root = '{$ROOT_PATH}';
     $lib  = $root . '/server/xhprof/xhprof_lib/utils/xhprof_lib.php';

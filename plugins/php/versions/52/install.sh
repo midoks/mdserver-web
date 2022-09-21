@@ -21,7 +21,7 @@ echo "安装php-${version} ..." > $install_tmp
 mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
-cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash zlib.sh
+cd ${rootPath}/plugins/php/lib && /bin/bash zlib.sh
 
 if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 	if [ ! -f $sourcePath/php/php-${version}.tar.gz ];then
@@ -131,7 +131,6 @@ fi
 # ps -ef|grep php/52 |grep -v grep |awk '{print $2}'|xargs kill
 # /www/server/php/init.d/php52 start
 # /www/server/php/52/sbin/php-fpm start
-# cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/php/index.py start 52
 mkdir -p $serverPath/php/${PHP_VER}/var/log
 mkdir -p $serverPath/php/${PHP_VER}/var/run
 

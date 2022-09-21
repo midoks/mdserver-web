@@ -19,6 +19,14 @@
 					</div>
 
 					<div class="ss-text pull-left mr50">
+						<em>开发模式</em>
+						<div class="ssh-item">
+	                        <input class="btswitch btswitch-ios" id="debugMode" type="checkbox" {{data['debug']}}>
+	                        <label class="btswitch-btn" for="debugMode" onclick="debugMode()"></label>
+	                    </div>
+					</div>
+
+					<div class="ss-text pull-left mr50">
 	                    <em title="开启后允许使用ipv6访问面板">监听IPv6</em>
 	                    <div class='ssh-item'>
 	                        <input class='btswitch btswitch-ios' id='panelIPv6' type='checkbox' {{data['ipv6']}}>

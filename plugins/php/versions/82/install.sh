@@ -16,7 +16,7 @@ function version_lt() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)"
 function version_ge() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" == "$1"; }
 
 
-version=8.2.0beta3
+version=8.2.0RC2
 PHP_VER=82
 Install_php()
 {
@@ -25,14 +25,14 @@ echo "安装php-${version} ..." > $install_tmp
 mkdir -p $sourcePath/php
 mkdir -p $serverPath/php
 
-cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash freetype_new.sh
-cd $serverPath/mdserver-web/plugins/php/lib && /bin/bash zlib.sh
+cd ${rootPath}/plugins/php/lib && /bin/bash freetype_new.sh
+cd ${rootPath}/plugins/php/lib && /bin/bash zlib.sh
 
 
 if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 
 	if [ ! -f $sourcePath/php/php-${version}.tar.xz ];then
-		wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz https://downloads.php.net/~pierrick/php-8.2.0alpha2.tar.xz
+		wget --no-check-certificate -O $sourcePath/php/php-${version}.tar.xz https://downloads.php.net/~sergey/php-${version}.tar.xz
 	fi
 	
 	cd $sourcePath/php && tar -Jxf $sourcePath/php/php-${version}.tar.xz

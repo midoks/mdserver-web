@@ -162,7 +162,7 @@ class system_api:
             except:
                 port = mw.readFile('data/port.pl')
         except:
-            port = '8888'
+            port = '7200'
         domain = ''
         if os.path.exists('data/domain.conf'):
             domain = mw.readFile('data/domain.conf')
@@ -201,9 +201,9 @@ class system_api:
     def getLoadAverage(self):
         c = os.getloadavg()
         data = {}
-        data['one'] = float(c[0])
-        data['five'] = float(c[1])
-        data['fifteen'] = float(c[2])
+        data['one'] = round(float(c[0]), 2)
+        data['five'] = round(float(c[1]), 2)
+        data['fifteen'] = round(float(c[2]), 2)
         data['max'] = psutil.cpu_count() * 2
         data['limit'] = data['max']
         data['safe'] = data['max'] * 0.75
@@ -276,8 +276,17 @@ class system_api:
     def getCpuInfo(self, interval=1):
         # 取CPU信息
         cpuCount = psutil.cpu_count()
+        cpuLogicalNum = psutil.cpu_count(logical=False)
         used = psutil.cpu_percent(interval=interval)
-        return used, cpuCount
+
+        if os.path.exists('/proc/cpuinfo'):
+            c_tmp = mw.readFile('/proc/cpuinfo')
+            d_tmp = re.findall("physical id.+", c_tmp)
+            cpuLogicalNum = len(set(d_tmp))
+
+        used_all = psutil.cpu_percent(percpu=True)
+        cpu_name = mw.getCpuType() + " * {}".format(cpuLogicalNum)
+        return used, cpuCount, used_all, cpu_name, cpuCount, cpuLogicalNum
 
     def getMemInfo(self):
         # 取内存信息
