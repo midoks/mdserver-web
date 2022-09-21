@@ -2195,18 +2195,15 @@ location ^~ {from} {
                 return mw.returnJson(False, '您添加的域名已存在!')
             mw.M('domain').where('pid=?', (opid,)).delete()
 
+        self.createRootDir(self.sitePath)
+        self.nginxAddConf()
+
         # 添加更多域名
         for domain in siteMenu['domainlist']:
-            sdomain = domain
-            swebname = self.siteName
-            spid = str(pid)
-            self.addDomain(domain, webname, pid)
+            self.addDomain(domain, self.siteName, pid)
 
         mw.M('domain').add('pid,name,port,addtime',
                            (pid, self.siteName, self.sitePort, mw.getDate()))
-
-        self.createRootDir(self.sitePath)
-        self.nginxAddConf()
 
         data = {}
         data['siteStatus'] = False
