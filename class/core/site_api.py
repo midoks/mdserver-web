@@ -2371,7 +2371,7 @@ location ^~ {from} {
         self.delUserInI(newPath)
         openPath = 'open_basedir={}/:{}/'.format(newPath, sitePath)
         if runPath == '/':
-            openPath = 'open_basedir={}/'.format(newPath)
+            openPath = 'open_basedir={}/'.format(sitePath)
 
         mw.writeFile(filename, openPath + ':/www/server/php:/tmp/:/proc/')
         mw.execShell("chattr +i " + filename)
