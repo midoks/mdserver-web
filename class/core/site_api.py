@@ -340,10 +340,16 @@ class site_api:
         name = mw.M('sites').where("id=?", (mid,)).getField('name')
         data = {}
         data['logs'] = self.getLogsStatus(name)
+        data['runPath'] = self.getSiteRunPath(mid)
+
         data['userini'] = False
         if os.path.exists(path + '/.user.ini'):
             data['userini'] = True
-        data['runPath'] = self.getSiteRunPath(mid)
+
+        if data['runPath']['runPath'] != '/':
+            if os.path.exists(path + data['runPath']['runPath'] + '/.user.ini'):
+                data['userini'] = True
+
         data['pass'] = self.getHasPwd(name)
         data['path'] = path
         data['name'] = name
@@ -1095,6 +1101,7 @@ class site_api:
         sitePath = mw.M('sites').where('id=?', (mid,)).getField('path')
 
         newPath = sitePath + runPath
+
         # 处理Nginx
         filename = self.getHostConf(siteName)
         if os.path.exists(filename):
@@ -1104,8 +1111,7 @@ class site_api:
             conf = conf.replace(path, newPath)
             mw.writeFile(filename, conf)
 
-        self.delUserInI(sitePath)
-        self.setDirUserINI(newPath)
+        self.setDirUserINI(sitePath, runPath)
 
         mw.restartWeb()
         return mw.returnJson(True, '设置成功!')
@@ -2350,16 +2356,19 @@ location ^~ {from} {
         return True
 
     # 设置目录防御
-    def setDirUserINI(self, newPath):
+    def setDirUserINI(self, sitePath, runPath):
         filename = newPath + '/.user.ini'
         if os.path.exists(filename):
             mw.execShell("chattr -i " + filename)
             os.remove(filename)
             return mw.returnJson(True, '已清除防跨站设置!')
 
+        newPath = sitePath + runPath
         self.delUserInI(newPath)
-        mw.writeFile(filename, 'open_basedir=' +
-                     newPath + '/:/www/server/php:/tmp/:/proc/')
+
+        openPath = 'open_basedir={}/:{}/'.format(newPath, sitePath)
+
+        mw.writeFile(filename, openPath + ':/www/server/php:/tmp/:/proc/')
         mw.execShell("chattr +i " + filename)
 
         return mw.returnJson(True, '已打开防跨站设置!')
