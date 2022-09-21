@@ -338,6 +338,7 @@ function webPathEdit(id){
 		var userini = data['data'];
 		var webpath = userini['path'];
 		var siteName = userini['name'];
+		var runPath = userini['runPath']['runPath'];
 		var userinicheckeds = userini.userini?'checked':'';
 		var logscheckeds = userini.logs?'checked':'';
 		var opt = ''
@@ -385,7 +386,10 @@ function webPathEdit(id){
 
 		$("#webedit-con").html(webPathHtml);		
 		$("#userini").change(function(){
-			$.post('/site/set_dir_user_ini','path='+webpath,function(userini){
+			$.post('/site/set_dir_user_ini',{
+				'path':webpath,
+				'runPath':runPath,
+			},function(userini){
 				layer.msg(userini.msg+'<p style="color:red;">注意：设置防跨站需要重启PHP才能生效!</p>',{icon:userini.status?1:2});
 				tryRestartPHP(siteName);
 			},'json');

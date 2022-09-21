@@ -357,15 +357,18 @@ class site_api:
 
     def setDirUserIniApi(self):
         path = request.form.get('path', '')
+        runPath = request.form.get('runPath', '')
         filename = path + '/.user.ini'
-        self.delUserInI(path)
+
         if os.path.exists(filename):
+            self.delUserInI(path)
             mw.execShell("which chattr && chattr -i " + filename)
             os.remove(filename)
             return mw.returnJson(True, '已清除防跨站设置!')
-        mw.writeFile(filename, 'open_basedir=' + path +
-                     '/:/www/server/php:/tmp/:/proc/')
+
+        self.setDirUserINI(path, runPath)
         mw.execShell("which chattr && chattr +i " + filename)
+
         return mw.returnJson(True, '已打开防跨站设置!')
 
     def logsOpenApi(self):
@@ -736,11 +739,11 @@ class site_api:
             if conf.find('ssl_certificate') == -1:
                 return mw.returnJson(False, '当前未开启SSL')
             to = """#error_page 404/404.html;
-    #HTTP_TO_HTTPS_START
+    # HTTP_TO_HTTPS_START
     if ($server_port !~ 443){
         rewrite ^(/.*)$ https://$host$1 permanent;
     }
-    #HTTP_TO_HTTPS_END"""
+    # HTTP_TO_HTTPS_END"""
             conf = conf.replace('#error_page 404/404.html;', to)
             mw.writeFile(file, conf)
 
@@ -1146,10 +1149,10 @@ class site_api:
             if conf.find(rep) == -1:
                 rep = '#error_page 404/404.html;'
             data = '''
-    #AUTH_START
+    # AUTH_START
     auth_basic "Authorization";
     auth_basic_user_file %s;
-    #AUTH_END''' % (filename,)
+    # AUTH_END''' % (filename,)
             conf = conf.replace(rep, rep + data)
             mw.writeFile(configFile, conf)
         # 写密码配置
@@ -1238,13 +1241,13 @@ class site_api:
         content = mw.readFile(vhost_file)
 
         cnf_301 = '''
-    #301-START
+    # 301-START
     include %s/*.conf;
-    #301-END
+    # 301-END
 ''' % (self.getRedirectPath( siteName))
 
         cnf_301_source = '''
-    #301-START
+    # 301-START
 '''
         # print('operateRedirectConf', content.find('#301-END'))
         if content.find('#301-END') != -1:
@@ -1430,13 +1433,13 @@ class site_api:
         content = mw.readFile(vhost_file)
 
         proxy_cnf = '''
-    #PROXY-START
+    # PROXY-START
     include %s/*.conf;
-    #PROXY-END
+    # PROXY-END
 ''' % (self.getProxyPath(siteName))
 
         proxy_cnf_source = '''
-    #PROXY-START
+    # PROXY-START
 '''
 
         if content.find('#PROXY-END') != -1:
@@ -2032,7 +2035,7 @@ location ^~ {from} {
            return 404;
         }
     }
-    #SECURITY-END
+    # SECURITY-END
     include %s/enable-php-''' % (fix.strip().replace(',', '|'), domains.strip().replace(',', ' '), pre_path)
                 conf = re.sub(re_path, rconf, conf)
                 mw.writeLog('网站管理', '站点[' + name + ']已开启防盗链!')
@@ -2357,17 +2360,17 @@ location ^~ {from} {
 
     # 设置目录防御
     def setDirUserINI(self, sitePath, runPath):
+        newPath = sitePath + runPath
+
         filename = newPath + '/.user.ini'
         if os.path.exists(filename):
             mw.execShell("chattr -i " + filename)
             os.remove(filename)
             return mw.returnJson(True, '已清除防跨站设置!')
 
-        newPath = sitePath + runPath
         self.delUserInI(newPath)
 
         openPath = 'open_basedir={}/:{}/'.format(newPath, sitePath)
-
         mw.writeFile(filename, openPath + ':/www/server/php:/tmp/:/proc/')
         mw.execShell("chattr +i " + filename)
 
