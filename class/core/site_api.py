@@ -2369,8 +2369,10 @@ location ^~ {from} {
             return mw.returnJson(True, '已清除防跨站设置!')
 
         self.delUserInI(newPath)
-
         openPath = 'open_basedir={}/:{}/'.format(newPath, sitePath)
+        if runPath == '/':
+            openPath = 'open_basedir={}/'.format(newPath)
+
         mw.writeFile(filename, openPath + ':/www/server/php:/tmp/:/proc/')
         mw.execShell("chattr +i " + filename)
 
