@@ -418,6 +418,18 @@ def backFile(self, file, act=None):
     execShell("/usr/bin/cp -p {0} {1}".format(file, file + file_type))
 
 
+def restoreFile(self, file, act=None):
+    """
+        @name 还原配置文件
+        @param file 需要还原的文件
+        @param act 如果存在，则还原默认配置
+    """
+    file_type = "_bak"
+    if act:
+        file_type = "_def"
+    execShell("/usr/bin/cp -p {1} {0}".format(file, file + file_type))
+
+
 def HttpGet(url, timeout=10):
     """
     发送GET请求
