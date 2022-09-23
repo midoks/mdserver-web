@@ -59,22 +59,30 @@ class firewall_api:
 
     # 添加放行端口
     def addAcceptPortApi(self):
-
         if not self.getFwStatus():
             return mw.returnJson(False, '防火墙启动时,才能添加规则!')
 
-        import re
-        import time
         port = request.form.get('port', '').strip()
         ps = request.form.get('ps', '').strip()
         stype = request.form.get('type', '').strip()
 
+        data = self.addAcceptPortArgs(port, ps, stype)
+        return mw.getJson(data)
+
+    # 添加放行端口
+    def addAcceptPortArgs(self, port, ps, stype):
+        import re
+        import time
+
+        if not self.getFwStatus():
+            self.setFw(0)
+
         rep = "^\d{1,5}(:\d{1,5})?$"
         if not re.search(rep, port):
-            return mw.returnJson(False, '端口范围不正确!')
+            return mw.returnData(False, '端口范围不正确!')
 
         if mw.M('firewall').where("port=?", (port,)).count() > 0:
-            return mw.returnJson(False, '您要放行的端口已存在，无需重复放行!')
+            return mw.returnData(False, '您要放行的端口已存在，无需重复放行!')
 
         msg = mw.getInfo('放行端口[{1}]成功', (port,))
         mw.writeLog("防火墙管理", msg)
@@ -83,7 +91,7 @@ class firewall_api:
 
         self.addAcceptPort(port)
         self.firewallReload()
-        return mw.returnJson(True, '添加放行(' + port + ')端口成功!')
+        return mw.returnData(True, '添加放行(' + port + ')端口成功!')
 
     # 删除IP屏蔽
     def delDropAddressApi(self):
@@ -290,6 +298,9 @@ class firewall_api:
             return mw.returnJson(True, '开发机不能设置!')
 
         status = request.form.get('status', '1')
+        return mw.getJson(self.setFw(status))
+
+    def setFw(self, status):
         if status == '1':
             if self.__isUfw:
                 mw.execShell('/usr/sbin/ufw disable')
@@ -313,7 +324,7 @@ class firewall_api:
                 mw.execShell('/etc/init.d/iptables save')
                 mw.execShell('/etc/init.d/iptables restart')
 
-        return mw.returnJson(True, '设置成功!')
+        return mw.returnData(True, '设置成功!')
 
     def delPanelLogsApi(self):
         mw.M('logs').where('id>?', (0,)).delete()
