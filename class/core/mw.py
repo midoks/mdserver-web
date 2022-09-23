@@ -406,6 +406,18 @@ def writeFile(filename, str):
         return False
 
 
+def backFile(self, file, act=None):
+    """
+        @name 备份配置文件
+        @param file 需要备份的文件
+        @param act 如果存在，则备份一份作为默认配置
+    """
+    file_type = "_bak"
+    if act:
+        file_type = "_def"
+    execShell("/usr/bin/cp -p {0} {1}".format(file, file + file_type))
+
+
 def HttpGet(url, timeout=10):
     """
     发送GET请求
