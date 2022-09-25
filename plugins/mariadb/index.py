@@ -343,6 +343,7 @@ def initMariaDbPwd():
     time.sleep(5)
 
     serverdir = getServerDir()
+    myconf = serverdir + "/etc/my.cnf"
     pwd = mw.getRandomString(16)
 
     db_option = "-S " + serverdir + "/mysql.sock"
