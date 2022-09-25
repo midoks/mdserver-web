@@ -404,6 +404,7 @@ def initMysqlPwd():
     time.sleep(5)
 
     serverdir = getServerDir()
+    myconf = serverdir + "/etc/my.cnf"
     pwd = mw.getRandomString(16)
     # cmd_pass = serverdir + '/bin/mysqladmin -uroot password ' + pwd
 
