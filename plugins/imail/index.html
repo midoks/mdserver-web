@@ -4,8 +4,6 @@
 			<p class="bgw" onclick="pluginService('imail');">服务</p>
 			<p onclick="pluginInitD('imail');">自启动</p>
 			<p onclick="pluginConfig('imail',null, 'conf');">配置文件</p>
-			<p onclick="gogsSetConfig();">配置修改</p>
-			<p onclick="gogsUserList();">用户列表</p>
 			<p onclick="pluginLogs('imail',null,'run_log');">运行日志</p>
 		</div>
 		<div class="bt-w-con pd15">
@@ -17,5 +15,6 @@
 <script type="text/javascript">
 $.getScript( "/plugins/file?name=imail&f=js/imail.js", function(){
 	mail.init();
+	pluginService('imail');
 });
 </script>

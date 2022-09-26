@@ -10,8 +10,7 @@ serverPath=$(dirname "$rootPath")
 install_tmp=${rootPath}/tmp/mw_install.pl
 VERSION=0.0.14
 
-## curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update_dev.sh | bash
-## debug:
+
 ## cd /www/server/mdserver-web/plugins/imail && bash install.sh install 1.0
 
 bash ${rootPath}/scripts/getos.sh
@@ -92,8 +91,6 @@ Install_App()
 
 	pushd "$TARGET_DIR/scripts" >/dev/null 2>&1
 	bash make.sh
-
-	systemctl daemon-reload
 
 	echo "$VERSION" > $serverPath/imail/version.pl
 	echo '安装完成' > $install_tmp

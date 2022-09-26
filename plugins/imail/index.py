@@ -20,9 +20,16 @@ if mw.isAppleSystem():
 
 class App:
     __setupPath = '/www/server/imail'
+    __SR = ''
 
     def __init__(self):
         self.__setupPath = self.getServerDir()
+
+        self.__SR = '''#!/bin/bash
+    PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+    export PATH
+    export USER=%s
+    export HOME=%s && ''' % ( self.getRunUser(), self.getHomeDir())
 
     def getArgs(self):
         args = sys.argv[3:]
@@ -41,7 +48,7 @@ class App:
         return tmp
 
     def getPluginName(self):
-        return 'mail'
+        return 'imail'
 
     def getPluginDir(self):
         return mw.getPluginDir() + '/' + self.getPluginName()
@@ -49,12 +56,42 @@ class App:
     def getServerDir(self):
         return mw.getServerDir() + '/' + self.getPluginName()
 
+    def getInitdConfTpl(self):
+        path = self.getPluginDir() + "/init.d/imail.tpl"
+        return path
+
+    def getHomeDir(self):
+        if mw.isAppleSystem():
+            user = mw.execShell(
+                "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
+            return '/Users/' + user
+        else:
+            return '/root'
+
+    def getRunUser(self):
+        if mw.isAppleSystem():
+            user = mw.execShell(
+                "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
+            return user
+        else:
+            return 'root'
+
     def status(self):
         data = mw.execShell(
             "ps -ef|grep " + self.getPluginName() + " |grep -v grep | grep -v python | awk '{print $2}'")
         if data[0] == '':
             return 'stop'
         return 'start'
+
+    def contentReplace(self, content):
+
+        service_path = mw.getServerDir()
+        content = content.replace('{$ROOT_PATH}', mw.getRootDir())
+        content = content.replace('{$SERVER_PATH}', service_path)
+        content = content.replace('{$RUN_USER}', self.getRunUser())
+        content = content.replace('{$HOME_DIR}', self.getHomeDir())
+
+        return content
 
     def initDreplace(self):
 
@@ -68,7 +105,9 @@ class App:
 
         if not os.path.exists(file_bin):
             content = mw.readFile(file_tpl)
-            content = contentReplace(content)
+            print(file_tpl)
+            print(content)
+            content = self.contentReplace(content)
             mw.writeFile(file_bin, content)
             mw.execShell('chmod +x ' + file_bin)
 
@@ -93,12 +132,13 @@ class App:
         file = self.initDreplace()
 
         if not mw.isAppleSystem():
-            data = mw.execShell('systemctl ' + method + ' imail')
+            cmd = 'systemctl {} {}'.format(method, self.getPluginName())
+            data = mw.execShell(cmd)
             if data[1] == '':
                 return 'ok'
             return 'fail'
 
-        data = mw.execShell(__SR + file + ' ' + method)
+        data = mw.execShell(self.__SR + file + ' ' + method)
         if data[1] == '':
             return 'ok'
         return data[0]
@@ -114,6 +154,36 @@ class App:
 
     def reload(self):
         return self.imOp('reload')
+
+    def initd_status(self):
+        if mw.isAppleSystem():
+            return "Apple Computer does not support"
+
+        cmd = 'systemctl status imail | grep loaded | grep "enabled;"'
+        data = mw.execShell(cmd)
+        if data[0] == '':
+            return 'fail'
+        return 'ok'
+
+    def initd_install(self):
+        if mw.isAppleSystem():
+            return "Apple Computer does not support"
+
+        mw.execShell('systemctl enable imail')
+        return 'ok'
+
+    def initd_uinstall(self):
+        if mw.isAppleSystem():
+            return "Apple Computer does not support"
+
+        mw.execShell('systemctl disable imail')
+        return 'ok'
+
+    def conf(self):
+        return self.getServerDir() + '/custom/conf/app.conf'
+
+    def run_log(self):
+        return self.getServerDir() + '/logs/imail.log'
 
 
 if __name__ == "__main__":
