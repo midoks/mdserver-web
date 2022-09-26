@@ -98,7 +98,7 @@ Install_App()
 
 Uninstall_App()
 {
-
+	rm -rf $serverPath/imail
 	echo "Uninstall_Mail" > $install_tmp
 }
 

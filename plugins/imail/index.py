@@ -180,9 +180,18 @@ class App:
         return 'ok'
 
     def conf(self):
+        conf_path = self.getServerDir() + '/custom/conf/app.conf'
+        if not os.path.exists(conf_path):
+            return mw.returnJson(False, "请先安装初始化!<br/>默认地址:http://" + mw.getLocalIp() + ":1080")
+
         return self.getServerDir() + '/custom/conf/app.conf'
 
     def run_log(self):
+        ilog = self.getServerDir() + '/logs/imail.log'
+
+        if not os.path.exists(ilog):
+            return mw.returnJson(False, "请先安装初始化!<br/>默认地址:http://" + mw.getLocalIp() + ":1080")
+
         return self.getServerDir() + '/logs/imail.log'
 
 
