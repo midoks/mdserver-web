@@ -103,6 +103,8 @@ Install_App()
 
 Uninstall_App()
 {
+	cd ${rootPath} && python3 ${rootPath}/plugins/imail/index.py initd_uninstall
+	cd ${rootPath} && python3 ${rootPath}/plugins/imail/index.py stop
 	rm -rf $serverPath/imail
 	echo "install fail" > $install_tmp
 }
