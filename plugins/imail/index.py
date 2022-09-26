@@ -188,7 +188,6 @@ class App:
 
     def run_log(self):
         ilog = self.getServerDir() + '/logs/imail.log'
-
         if not os.path.exists(ilog):
             return mw.returnJson(False, "请先安装初始化!<br/>默认地址:http://" + mw.getLocalIp() + ":1080")
 
