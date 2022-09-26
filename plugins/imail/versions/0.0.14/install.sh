@@ -92,14 +92,19 @@ Install_App()
 	pushd "$TARGET_DIR/scripts" >/dev/null 2>&1
 	bash make.sh
 
-	echo "$VERSION" > $serverPath/imail/version.pl
-	echo '安装完成' > $install_tmp
+	if [ -d $serverPath/imail ];then
+		echo "$VERSION" > $serverPath/imail/version.pl
+
+		cd ${rootPath} && python3 ${rootPath}/plugins/imail/index.py start
+		cd ${rootPath} && python3 ${rootPath}/plugins/imail/index.py initd_install
+	fi
+	echo 'install successful' > $install_tmp
 }
 
 Uninstall_App()
 {
 	rm -rf $serverPath/imail
-	echo "Uninstall_Mail" > $install_tmp
+	echo "install fail" > $install_tmp
 }
 
 action=$1
