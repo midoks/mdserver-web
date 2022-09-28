@@ -10,13 +10,11 @@ serverPath=$(dirname "$rootPath")
 install_tmp=${rootPath}/tmp/mw_install.pl
 VERSION=0.0.15
 
-
 ## cd /www/server/mdserver-web/plugins/imail && bash install.sh install 1.0
 
 bash ${rootPath}/scripts/getos.sh
 OSNAME=`cat ${rootPath}/data/osname.pl`
 OSNAME_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
-
 
 get_arch() {
 	ARCH="amd64"
