@@ -1,5 +1,5 @@
 [Unit]
-Description=Gogs
+Description=Imail Simple Mail Server
 After=network.target
 
 [Service]
