@@ -8,7 +8,7 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
 install_tmp=${rootPath}/tmp/mw_install.pl
-VERSION=0.0.14
+VERSION=0.0.15
 
 
 ## cd /www/server/mdserver-web/plugins/imail && bash install.sh install 1.0
