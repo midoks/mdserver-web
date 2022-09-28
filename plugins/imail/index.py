@@ -120,7 +120,7 @@ class App:
             mw.writeFile(systemService, se_content)
             mw.execShell('systemctl daemon-reload')
 
-        log_path = self.getServerDir() + '/log'
+        log_path = self.getServerDir() + '/logs'
         if not os.path.exists(log_path):
             os.mkdir(log_path)
 
