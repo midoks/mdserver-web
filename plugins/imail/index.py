@@ -112,7 +112,7 @@ class App:
         # systemd
         systemDir = mw.systemdCfgDir()
         systemService = systemDir + '/imail.service'
-        systemServiceTpl = getPluginDir() + '/init.d/imail.service.tpl'
+        systemServiceTpl = self.getPluginDir() + '/init.d/imail.service.tpl'
         if os.path.exists(systemDir) and not os.path.exists(systemService):
             service_path = mw.getServerDir()
             se_content = mw.readFile(systemServiceTpl)
