@@ -17,22 +17,13 @@ bash ${rootPath}/scripts/getos.sh
 OSNAME=`cat ${rootPath}/data/osname.pl`
 OSNAME_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
-check_go_environment() {
-	if test ! -x "$(command -v go)"; then
-		printf "\e[1;31mmissing go running environment\e[0m\n"
-		exit 1
-	fi
-}
 
 get_arch() {
-	echo "package main
-import (
-	\"fmt\"
-	\"runtime\"
-)
-func main() { fmt.Println(runtime.GOARCH) }" > /tmp/go_arch.go
-
-	ARCH=$(go run /tmp/go_arch.go)
+	
+	TMP_ARCH=`arch`
+	if [ "$TMP_ARCH" == "x86_64" ];then
+		ARCH="amd64"
+	fi
 }
 
 load_vars() {
@@ -74,7 +65,6 @@ Install_App()
 	echo '正在安装脚本文件...' > $install_tmp
 	mkdir -p $serverPath/source
 
-	check_go_environment
 	load_vars
 	get_arch
 	get_download_url
