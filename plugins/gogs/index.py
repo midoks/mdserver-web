@@ -240,7 +240,12 @@ def pMysqlDb(conf):
 
     db.setPort(int(host[1]))
     db.setUser(conf['USER'])
-    db.setPwd(conf['PASSWD'])
+
+    if 'PASSWD' in conf:
+        db.setPwd(conf['PASSWD'])
+    else:
+        db.setPwd(conf['PASSWORD'])
+
     db.setDbName(conf['NAME'])
     # db.setSocket(getSocketFile())
     db.setCharset("utf8")
