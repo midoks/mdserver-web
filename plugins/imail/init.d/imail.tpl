@@ -30,7 +30,7 @@ im_start(){
     isStart=`ps -ef|grep 'imail service' |grep -v grep|awk '{print $2}'`
     if [ "$isStart" == '' ];then
         echo -e "Starting imail... \c"
-        cd $app_path && daemon "${app_path}/imail service &"
+        cd $app_path && ${app_path}/imail service &
         isStart=""
         while [[ "$isStart" == "" ]];
         do
