@@ -110,19 +110,19 @@ class App:
             mw.execShell('chmod +x ' + file_bin)
 
         # systemd
-        # systemDir = mw.systemdCfgDir()
-        # systemService = systemDir + '/gogs.service'
-        # systemServiceTpl = getPluginDir() + '/init.d/gogs.service.tpl'
-        # if os.path.exists(systemDir) and not os.path.exists(systemService):
-        #     service_path = mw.getServerDir()
-        #     se_content = mw.readFile(systemServiceTpl)
-        #     se_content = se_content.replace('{$SERVER_PATH}', service_path)
-        #     mw.writeFile(systemService, se_content)
-        #     mw.execShell('systemctl daemon-reload')
+        systemDir = mw.systemdCfgDir()
+        systemService = systemDir + '/imail.service'
+        systemServiceTpl = getPluginDir() + '/init.d/imail.service.tpl'
+        if os.path.exists(systemDir) and not os.path.exists(systemService):
+            service_path = mw.getServerDir()
+            se_content = mw.readFile(systemServiceTpl)
+            se_content = se_content.replace('{$SERVER_PATH}', service_path)
+            mw.writeFile(systemService, se_content)
+            mw.execShell('systemctl daemon-reload')
 
-        # log_path = getServerDir() + '/log'
-        # if not os.path.exists(log_path):
-        #     os.mkdir(log_path)
+        log_path = getServerDir() + '/log'
+        if not os.path.exists(log_path):
+            os.mkdir(log_path)
 
         return file_bin
 
