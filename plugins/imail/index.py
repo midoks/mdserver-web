@@ -105,8 +105,6 @@ class App:
 
         if not os.path.exists(file_bin):
             content = mw.readFile(file_tpl)
-            print(file_tpl)
-            print(content)
             content = self.contentReplace(content)
             mw.writeFile(file_bin, content)
             mw.execShell('chmod +x ' + file_bin)
