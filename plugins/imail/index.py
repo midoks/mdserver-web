@@ -47,6 +47,20 @@ class App:
 
         return tmp
 
+    def __release_port(self, port):
+        from collections import namedtuple
+        try:
+            import firewall_api
+            firewall_api.firewall_api().addAcceptPortArgs(port, 'Mail-Server', 'port')
+            return port
+        except Exception as e:
+            return "Release failed {}".format(e)
+
+    def openPort(self):
+        for i in ["25", "110", "143", "465", "995", "993", "587"]:
+            self.__release_port(i)
+        return True
+
     def getPluginName(self):
         return 'imail'
 
@@ -101,6 +115,8 @@ class App:
         initD_path = self.getServerDir() + '/init.d'
         if not os.path.exists(initD_path):
             os.mkdir(initD_path)
+            self.openPort()
+
         file_bin = initD_path + '/' + self.getPluginName()
 
         if not os.path.exists(file_bin):
