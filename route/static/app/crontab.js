@@ -201,8 +201,7 @@ function planAdd(){
 	
 	var type = $(".plancycle").find("b").attr("val");
 	$("#set-Config input[name='type']").val(type);
-	
-	var where1 = $("#ptime input[name='where1']").val();
+
 	
 	var is1;
 	var is2 = 1;
@@ -303,6 +302,11 @@ function planAdd(){
 		}
 		allAddCrontab(dataList,0,'');
 		return;
+	}
+
+	if (type == 'minute-n'){
+		var where1 = $("#ptime input[name='where1']").val();
+		$("#set-Config input[name='where1']").val(where1);
 	}
 	
 	$("#set-Config input[name='sName']").val(sName);
