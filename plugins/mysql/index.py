@@ -498,7 +498,7 @@ def initMysql8Pwd():
 
 def myOp(version, method):
     # import commands
-    init_file = initDreplace()
+    init_file = initDreplace(version)
     try:
         isInited = initMysqlData()
         if not isInited:
