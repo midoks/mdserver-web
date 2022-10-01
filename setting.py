@@ -3,7 +3,9 @@
 
 import time
 import sys
+import random
 import os
+
 chdir = os.getcwd()
 sys.path.append(chdir + '/class/core')
 
@@ -31,6 +33,9 @@ if os.path.exists("data/port.pl"):
     mw_port = mw.readFile('data/port.pl')
     mw_port.strip()
 else:
+    import firewall_api
+    mw_port = str(random.randint(10000, 65530))
+    firewall_api.firewall_api().addAcceptPortArgs(mw_port, 'MW-Panel', 'port')
     mw.writeFile('data/port.pl', mw_port)
 
 bind = []
