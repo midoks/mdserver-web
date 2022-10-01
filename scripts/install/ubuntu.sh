@@ -31,7 +31,7 @@ if [ -f /usr/sbin/ufw ];then
 	ufw allow 80/tcp
 	ufw allow 443/tcp
 	ufw allow 888/tcp
-	ufw allow 7200/tcp
+	# ufw allow 7200/tcp
 	# ufw allow 3306/tcp
 	# ufw allow 30000:40000/tcp
 
@@ -51,7 +51,7 @@ if [ ! -f /usr/sbin/ufw ];then
 	firewall-cmd --permanent --zone=public --add-port=80/tcp
 	firewall-cmd --permanent --zone=public --add-port=443/tcp
 	firewall-cmd --permanent --zone=public --add-port=888/tcp
-	firewall-cmd --permanent --zone=public --add-port=7200/tcp
+	# firewall-cmd --permanent --zone=public --add-port=7200/tcp
 	# firewall-cmd --permanent --zone=public --add-port=3306/tcp
 	# firewall-cmd --permanent --zone=public --add-port=30000-40000/tcp
 
