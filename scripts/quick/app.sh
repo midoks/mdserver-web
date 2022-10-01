@@ -37,7 +37,7 @@ fi
 
 # swap
 if [ ! -d /www/server/swap ];then
-	cd /www/server/mdserver-web/plugins/swap && bash install.sh install 5.6
+	cd /www/server/mdserver-web/plugins/swap && bash install.sh install 1.1
 else
 	echo "swap alreay exist!"
 fi
