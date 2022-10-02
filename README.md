@@ -98,6 +98,7 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 * imail插件添加。
 * 安装面板初始化安装时不再固定端口[7200]，优化为随机端口。
 * redis添加性能调整功能。
+* 计划任务在创建的时候选择的分钟数不会生效BUG。已解决。
 
 
 ### JSDelivr安装地址
