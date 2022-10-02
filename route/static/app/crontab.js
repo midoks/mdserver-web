@@ -60,9 +60,12 @@ function getCronData(page){
 					cron_save = rdata.data[i]['save']+'份';
 				}
 
-				var cron_backupto = '本地磁盘';
-				if (rdata.data[i]['backup_to'] != 'localhost'){
-					cron_backupto = rdata.data[i]['backup_to'];
+				var cron_backupto = '-';
+				if (rdata.data[i]['stype'] == 'site' || rdata.data[i]['stype']=='database' ){
+					cron_backupto = '本地磁盘';
+					if (rdata.data[i]['backup_to'] != 'localhost'){
+						cron_backupto = rdata.data[i]['backup_to'];
+					}
 				}
 
 				cbody += "<tr>\
