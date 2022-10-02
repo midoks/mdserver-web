@@ -53,34 +53,94 @@ def getArgs():
     return tmp
 
 
+def getLockFile():
+    return getServerDir() + "/installed_lock.pl"
+
+
+def runLog():
+    return getServerDir() + "/clean.log"
+
+
 def status():
-    if os.path.exists(getConf()):
+    initConf()
+    if os.path.exists(getLockFile()):
         return "start"
     return 'stop'
 
 
+def initConf():
+    conf = getConf()
+    if not os.path.exists(conf):
+        content = ""
+
+        clog = [
+            "/var/log/cron-*",
+            "/var/log/maillog-*",
+            "/var/log/secure-*",
+            "/var/log/spooler-*",
+            "/var/log/yum.log-*",
+            "/var/log/messages-*",
+            "/var/log/btmp-*",
+            "/var/log/audit/audit.log.*",
+            "/var/log/rhsm/rhsm.log-*",
+            "/var/log/rhsm/rhsmcertd.log-*",
+            "/tmp/yum_save_*",
+            "/tmp/tmp.*",
+        ]
+        for i in clog:
+            content += i + "\n"
+
+         # 常用日志
+        clogcom = [
+            "/var/log/messages",
+            "/var/log/btmp",
+            "/var/log/wtmp",
+            "/var/log/secure",
+            "/var/log/lastlog",
+            "/var/log/cron",
+        ]
+        for i in clogcom:
+            if os.path.exists(i):
+                content += i + "\n"
+
+        # 清理日志
+        rootDir = "/var/log"
+
+        l = os.listdir(rootDir)
+        for x in range(len(l)):
+            abspath = rootDir + "/" + l[x]
+            content += abspath + "\n"
+        mw.writeFile(conf, content)
+
+
 def start():
-    file = initDreplace()
-    data = mw.execShell(file + ' start')
-    if data[1] == '':
+    initConf()
+
+    lock_file = getLockFile()
+    if not os.path.exists(lock_file):
+        mw.writeFile(lock_file, "")
+
+        import tool_task
+        tool_task.createBgTask()
         return 'ok'
+
     return 'fail'
 
 
 def stop():
-    file = initDreplace()
-    data = mw.execShell(file + ' stop')
-    if data[1] == '':
+    initConf()
+    lock_file = getLockFile()
+    if os.path.exists(lock_file):
+        os.remove(lock_file)
+        import tool_task
+        tool_task.removeBgTask()
         return 'ok'
+
     return 'fail'
 
 
 def reload():
-    file = initDreplace()
-    data = mw.execShell(file + ' reload')
-    if data[1] == '':
-        return 'ok'
-    return 'fail'
+    return 'ok'
 
 
 def get_filePath_fileName_fileExt(filename):
@@ -93,15 +153,20 @@ def cleanFileLog(path):
     filepath, shotname, extension = get_filePath_fileName_fileExt(path)
     if extension == ".log":
         cmd = "echo \"\" > " + path
+        tmp = mw.execShell(cmd)
+        if tmp[1] != "":
+            cmd += " | error:" + tmp[1].strip()
         print(cmd)
-        print(mw.execShell(cmd))
 
 
 def cleanSelfFileLog(path):
     filepath, shotname, extension = get_filePath_fileName_fileExt(path)
-    cmd = "echo \"\" > " + path
-    print(cmd)
-    print(mw.execShell(cmd))
+    if extension == ".log":
+        cmd = "echo \"\" > " + path
+        tmp = mw.execShell(cmd)
+        if tmp[1] != "":
+            cmd += " | error:" + tmp[1].strip()
+        print(cmd)
 
 
 def cleanDirLog(path):
@@ -115,70 +180,28 @@ def cleanDirLog(path):
 
 
 def cleanLog():
-    # 清理日志
-    rootDir = "/var/log"
-    print("clean start")
-
-    clog = [
-        "rm -rf /var/log/cron-*",
-        "rm -rf /var/log/maillog-*",
-        "rm -rf /var/log/secure-*",
-        "rm -rf /var/log/spooler-*",
-        "rm -rf /var/log/yum.log-*",
-        "rm -rf /var/log/messages-*",
-        "rm -rf /var/log/btmp-*",
-        "rm -rf /var/log/audit/audit.log.*",
-        "rm -rf /var/log/rhsm/rhsm.log-*",
-        "rm -rf /var/log/rhsm/rhsmcertd.log-*",
-        "rm -rf /tmp/yum_save_*",
-        "rm -rf /tmp/tmp.*",
-    ]
-
-    for i in clog:
-        print(i)
-        mw.execShell(i)
-
-    # 常用日志
-    clogcom = [
-        "/var/log/messages",
-        "/var/log/btmp",
-        "/var/log/wtmp",
-        "/var/log/secure",
-        "/var/log/lastlog",
-        "/var/log/cron",
-    ]
-    for i in clogcom:
-        if os.path.exists(i):
-            mw.execShell("echo \"\" > " + i)
-
-    l = os.listdir(rootDir)
-    for x in range(len(l)):
-        abspath = rootDir + "/" + l[x]
-        if os.path.isfile(abspath):
-            cleanFileLog(abspath)
-
-        if os.path.isdir(abspath):
-            cleanDirLog(abspath)
-
-    print("conf clean")
-
-    confFile = getServerDir()
-    # mw.readFile()
-    confFile = confFile + "/clean.conf"
-    clist = mw.readFile(confFile).strip()
+    conf = getConf()
+    clist = mw.readFile(conf).strip()
     clist = clist.split("\n")
 
     for x in clist:
         abspath = x.strip()
+
+        if abspath.find('*') > 1:
+            cmd = 'rm -rf ' + abspath
+            print(cmd)
+            data = mw.execShell(cmd)
+            # print(data)
+            continue
+
         if os.path.exists(abspath):
             if os.path.isfile(abspath):
                 cleanSelfFileLog(abspath)
+                continue
 
             if os.path.isdir(abspath):
                 cleanDirLog(abspath)
-    print("conf clean end")
-
-    print("clean end")
+                continue
 
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -194,6 +217,8 @@ if __name__ == "__main__":
         print(reload())
     elif func == 'conf':
         print(getConf())
+    elif func == 'run_log':
+        print(runLog())
     elif func == 'clean':
         cleanLog()
     else:

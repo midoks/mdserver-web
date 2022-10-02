@@ -13,6 +13,10 @@ serverPath=$(dirname "$rootPath")
 install_tmp=${rootPath}/tmp/mw_install.pl
 VERSION=$2
 
+if [ -f ${rootPath}/bin/activate ];then
+	source ${rootPath}/bin/activate
+fi
+
 
 Install_app()
 {
@@ -21,12 +25,14 @@ Install_app()
 
 	echo "" > $serverPath/clean/clean.conf
 
+	cd ${rootPath} && python3 ${rootPath}/plugins/clean/index.py start
 	echo "${VERSION}" > $serverPath/clean/version.pl
 	echo '安装完成' > $install_tmp
 }
 
 Uninstall_app()
 {
+	cd ${rootPath} && python3 ${rootPath}/plugins/clean/index.py stop
 	rm -rf $serverPath/clean
 	echo "Uninstall_clean" > $install_tmp
 }
