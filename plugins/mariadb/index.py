@@ -343,6 +343,7 @@ def initMariaDbPwd():
     time.sleep(5)
 
     serverdir = getServerDir()
+    myconf = serverdir + "/etc/my.cnf"
     pwd = mw.getRandomString(16)
 
     db_option = "-S " + serverdir + "/mysql.sock"
@@ -362,6 +363,16 @@ def initMariaDbPwd():
     drop_test_db = serverdir + '/bin/mysql ' + db_option + ' -uroot -p' + \
         pwd + ' -e "drop database test";'
     mw.execShell(drop_test_db)
+
+    # 删除冗余账户
+    hostname = mw.execShell('hostname')[0].strip()
+    drop_hostname =  serverdir + '/bin/mysql  --defaults-file=' + \
+        myconf + ' -uroot -p' + pwd + ' -e "drop user \'\'@\'' + hostname + '\'";'
+    mw.execShell(drop_hostname)
+
+    drop_root_hostname =  serverdir + '/bin/mysql  --defaults-file=' + \
+        myconf + ' -uroot -p' + pwd + ' -e "drop user \'root\'@\'' + hostname + '\'";'
+    mw.execShell(drop_root_hostname)
 
     pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
     return True

@@ -102,7 +102,7 @@ def downloadFile(url, filename):
     try:
         import urllib
         import socket
-        socket.setdefaulttimeout(60)
+        socket.setdefaulttimeout(300)
 
         headers = (
             'User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36')

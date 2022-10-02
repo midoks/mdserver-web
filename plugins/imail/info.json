@@ -1,0 +1,18 @@
+{
+	"sort": 7,
+	"ps": "简单邮件服务[DEV]",
+	"name": "imail",
+	"title": "邮件服务",
+	"shell": "install.sh",
+	"versions":["0.0.17"],
+	"updates":["0.0.17"],
+	"tip": "soft",
+	"checks": "server/imail",
+	"path": "server/imail",
+	"display": 1,
+	"author": "midoks",
+	"date": "2022-09-26",
+	"home": "https://github.com/midoks/mdserver-web",
+	"type": 0,
+	"pid": "5"
+}

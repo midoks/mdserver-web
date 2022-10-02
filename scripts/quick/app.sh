@@ -34,6 +34,14 @@ else
 	echo "php74 alreay exist!"
 fi
 
+
+# swap
+if [ ! -d /www/server/swap ];then
+	cd /www/server/mdserver-web/plugins/swap && bash install.sh install 1.1
+else
+	echo "swap alreay exist!"
+fi
+
 # mysql
 if [ ! -d /www/server/mysql ];then
 	cd /www/server/mdserver-web/plugins/mysql && bash install.sh install 5.6

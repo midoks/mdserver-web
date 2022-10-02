@@ -404,6 +404,7 @@ def initMysqlPwd():
     time.sleep(5)
 
     serverdir = getServerDir()
+    myconf = serverdir + "/etc/my.cnf"
     pwd = mw.getRandomString(16)
     # cmd_pass = serverdir + '/bin/mysqladmin -uroot password ' + pwd
 
@@ -425,6 +426,17 @@ def initMysqlPwd():
     drop_test_db = serverdir + '/bin/mysql -uroot -p' + \
         pwd + ' -e "drop database test";'
     mw.execShell(drop_test_db)
+
+    # 删除冗余账户
+    hostname = mw.execShell('hostname')[0].strip()
+
+    drop_hostname =  serverdir + '/bin/mysql  --defaults-file=' + \
+        myconf + ' -uroot -p' + pwd + ' -e "drop user \'\'@\'' + hostname + '\'";'
+    mw.execShell(drop_hostname)
+
+    drop_root_hostname =  serverdir + '/bin/mysql  --defaults-file=' + \
+        myconf + ' -uroot -p' + pwd + ' -e "drop user \'root\'@\'' + hostname + '\'";'
+    mw.execShell(drop_root_hostname)
 
     pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
     return True
@@ -468,6 +480,17 @@ def initMysql8Pwd():
         myconf + ' -uroot -p' + pwd + ' -e "drop database test";'
     mw.execShell(drop_test_db)
 
+    # 删除冗余账户
+    hostname = mw.execShell('hostname')[0].strip()
+
+    drop_hostname =  serverdir + '/bin/mysql  --defaults-file=' + \
+        myconf + ' -uroot -p' + pwd + ' -e "drop user \'\'@\'' + hostname + '\'";'
+    mw.execShell(drop_hostname)
+
+    drop_root_hostname =  serverdir + '/bin/mysql  --defaults-file=' + \
+        myconf + ' -uroot -p' + pwd + ' -e "drop user \'root\'@\'' + hostname + '\'";'
+    mw.execShell(drop_root_hostname)
+
     pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
 
     return True
@@ -475,7 +498,7 @@ def initMysql8Pwd():
 
 def myOp(version, method):
     # import commands
-    init_file = initDreplace()
+    init_file = initDreplace(version)
     try:
         isInited = initMysqlData()
         if not isInited:
