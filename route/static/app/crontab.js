@@ -54,14 +54,25 @@ function getCronData(page){
 				'<span class="btOpen" onclick="setTaskStatus(' + rdata.data[i].id + ',0)" style="color:rgb(92, 184, 92);cursor:pointer" title="停用该计划任务">正常<span class="glyphicon glyphicon-play"></span></span>' 
 				:'<span onclick="setTaskStatus('+ rdata.data[i].id +',1)" class="btClose" style="color:red;cursor:pointer" title="启用该计划任务">停用<span style="color:rgb(255, 0, 0);" class="glyphicon glyphicon-pause"></span></span>';
 
+
+				var cron_save = '--';
+				if (rdata.data[i]['save'] != ''){
+					cron_save = rdata.data[i]['save']+'份';
+				}
+
+				var cron_backupto = '本地磁盘';
+				if (rdata.data[i]['backup_to'] != 'localhost'){
+					cron_backupto = rdata.data[i]['backup_to'];
+				}
+
 				cbody += "<tr>\
 							<td><input type='checkbox' onclick='checkSelect();' title='"+rdata.data[i].name+"' name='id' value='"+rdata.data[i].id+"'></td>\
 							<td>"+rdata.data[i].name+"</td>\
 							<td>"+status+"</td>\
 							<td>"+rdata.data[i].type+"</td>\
 							<td>"+rdata.data[i].cycle+"</td>\
-							<td>-</td>\
-							<td>--</td>\
+							<td>"+cron_save +"</td>\
+							<td>"+cron_backupto+"</td>\
 							<td>"+rdata.data[i].addtime+"</td>\
 							<td>\
 								<a href=\"javascript:startTask("+rdata.data[i].id+");\" class='btlink'>执行</a> | \
