@@ -1,0 +1,16 @@
+{
+	"ps": "Gitea 是一个开源社区驱动的轻量级代码托管解决方案。",
+	"name": "gitea",
+	"title": "Gitea",
+	"versions": ["1.17.2"],
+	"tip": "soft",
+	"checks": "server/gitea",
+	"path":"server/gitea",
+	"author": "gitea",
+	"date": "2022-10-03",
+	"home": "https://dl.gitea.io/",
+	"type": "Git服务器",
+	"shell": "install.sh",
+	"pid": "3",
+	"sort": 7
+}

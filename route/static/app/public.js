@@ -1598,6 +1598,18 @@ function remove_ssh_menu() {
 }
 
 /*** 其中功能,针对插件通过库使用 start ***/
+
+//字符串转数组对象
+function toArrayObject(str){
+	var data = {};
+    kv = str.split('&');
+    for(i in kv){
+        v = kv[i].split('=');
+        data[v[0]] = v[1];
+    }
+    return data;
+}
+
 function pluginService(_name, version){
 	var data = {name:_name, func:'status'}
 	if ( typeof(version) != 'undefined' ){
