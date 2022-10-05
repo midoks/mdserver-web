@@ -8,7 +8,7 @@ RestartSec=2s
 Type=simple
 User=git
 Group=git
-WorkingDirectory=/var/lib/gitea/
+WorkingDirectory={$SERVER_PATH}/gitea
 ExecStart={$SERVER_PATH}/gitea/gitea web
 Restart=always
 Environment=USER=git HOME=/home/git GITEA_WORK_DIR=/var/lib/gitea
