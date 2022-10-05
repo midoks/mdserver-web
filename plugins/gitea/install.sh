@@ -35,6 +35,16 @@ Install_App()
 {	
 	mkdir -p $serverPath/source/gitea
 
+
+	if id git &> /dev/null ;then 
+	    echo "git UID is `id -u git`"
+	    echo "git Shell is `grep "^git:" /etc/passwd |cut -d':' -f7 `"
+	else
+	    groupadd git
+		useradd -g git git
+	fi
+
+
 	echo '正在安装脚本文件...' > $install_tmp
 	version=$1
 	os=`getOs`

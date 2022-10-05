@@ -6,12 +6,12 @@ After=network.target
 [Service]
 RestartSec=2s
 Type=simple
-User=root
-Group=root
+User=git
+Group=git
 WorkingDirectory=/var/lib/gitea/
 ExecStart={$SERVER_PATH}/gitea/gitea web
 Restart=always
-Environment=USER=root HOME=/home/root GITEA_WORK_DIR=/var/lib/gitea
+Environment=USER=git HOME=/home/git GITEA_WORK_DIR=/var/lib/gitea
 RemainAfterExit=yes
 AmbientCapabilities=CAP_NET_BIND_SERVICE
 CapabilityBoundingSet=CAP_NET_BIND_SERVICE
