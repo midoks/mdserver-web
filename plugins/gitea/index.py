@@ -319,7 +319,7 @@ def appOp(method):
     file = initDreplace()
 
     if not mw.isAppleSystem():
-        data = mw.execShell('systemctl ' + method + ' gogs')
+        data = mw.execShell('systemctl ' + method + ' ' + getPluginName())
         if data[1] == '':
             return 'ok'
         return 'fail'
