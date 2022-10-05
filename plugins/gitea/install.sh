@@ -68,7 +68,10 @@ Install_App()
 		mkdir -p $serverPath/gitea
 		mv $serverPath/source/gitea/$file $serverPath/gitea/gitea
 		chmod +x $serverPath/gitea/gitea
+
+		chown -R git:git $serverPath/gitea
 	fi
+
 
 	if [ -d $serverPath/gitea ];then
 		echo $version > $serverPath/gitea/version.pl
