@@ -552,7 +552,7 @@ def getSpeed():
     return json.loads(data)
 
 
-def getLastLine(inputfile, lineNum):
+def getLastLineBk(inputfile, lineNum):
     # 读文件指定倒数行数
     try:
         fp = open(inputfile, 'rb')
@@ -585,7 +585,7 @@ def getLastLine(inputfile, lineNum):
         # return getMsg('TASK_SLEEP')
 
 
-def getNumLines(path, num, p=1):
+def getLastLine(path, num, p=1):
     pyVersion = sys.version_info[0]
     try:
         import html
@@ -624,7 +624,7 @@ def getNumLines(path, num, p=1):
                     t_buf = fp.read(to_read)
                     if pyVersion == 3:
                         if type(t_buf) == bytes:
-                            t_buf = t_buf.decode('utf-8')
+                            t_buf = t_buf.decode("utf-8", "ignore").strip()
                     buf = t_buf + buf
                     fp.seek(-to_read, 1)
                     if pos - to_read == 0:
