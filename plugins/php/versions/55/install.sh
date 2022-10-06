@@ -47,6 +47,25 @@ if [ "$IS_64BIT" == "64" ];then
 	OPTIONS="${OPTIONS} --with-libdir=lib64"
 fi
 
+# ----- cpu start ------
+if [ -z "${cpuCore}" ]; then
+	cpuCore="1"
+fi
+
+if [ -f /proc/cpuinfo ];then
+	cpuCore=`cat /proc/cpuinfo | grep "processor" | wc -l`
+fi
+
+MEM_INFO=$(free -m|grep Mem|awk '{printf("%.f",($2)/1024)}')
+if [ "${cpuCore}" != "1" ] && [ "${MEM_INFO}" != "0" ];then
+    if [ "${cpuCore}" -gt "${MEM_INFO}" ];then
+        cpuCore="${MEM_INFO}"
+    fi
+else
+    cpuCore="1"
+fi
+# ----- cpu end ------
+
 if [ ! -d $serverPath/php/55  ];then
 	cd $sourcePath/php/php${PHP_VER} && ./configure \
 	--prefix=$serverPath/php/55 \
@@ -71,7 +90,7 @@ if [ ! -d $serverPath/php/55  ];then
 	--disable-fileinfo \
 	$OPTIONS \
 	--enable-fpm
-	make clean && make  && make install && make clean
+	make clean && make -j${cpuCore} && make install && make clean
 fi
 
 #------------------------ install end ------------------------------------#

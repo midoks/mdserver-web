@@ -76,6 +76,24 @@ if version_lt "$libzip_version" "0.11.0" ;then
 	ZIP_OPTION="--with-zip=$serverPath/lib/libzip"
 fi
 
+# ----- cpu start ------
+if [ -z "${cpuCore}" ]; then
+	cpuCore="1"
+fi
+
+if [ -f /proc/cpuinfo ];then
+	cpuCore=`cat /proc/cpuinfo | grep "processor" | wc -l`
+fi
+
+MEM_INFO=$(free -m|grep Mem|awk '{printf("%.f",($2)/1024)}')
+if [ "${cpuCore}" != "1" ] && [ "${MEM_INFO}" != "0" ];then
+    if [ "${cpuCore}" -gt "${MEM_INFO}" ];then
+        cpuCore="${MEM_INFO}"
+    fi
+else
+    cpuCore="1"
+fi
+# ----- cpu end ------
 
 if [ ! -d $serverPath/php/${PHP_VER} ];then
 	cd $sourcePath/php/php${PHP_VER} && make clean
@@ -102,7 +120,7 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--disable-fileinfo \
 	$OPTIONS \
 	--enable-fpm
-	make && make install && make clean
+	make clean && make -j${cpuCore} && make install && make clean
 fi 
 #------------------------ install end ------------------------------------#
 }
