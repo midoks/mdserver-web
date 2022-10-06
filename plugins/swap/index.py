@@ -53,6 +53,13 @@ def getArgs():
     return tmp
 
 
+def checkArgs(data, ck=[]):
+    for i in range(len(ck)):
+        if not ck[i] in data:
+            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
+    return (True, mw.returnJson(True, 'ok'))
+
+
 def status():
     data = mw.execShell("free -m|grep Swap|awk '{print $2}'")
     if data[0].strip() == '0':
@@ -158,6 +165,29 @@ def initdUinstall():
     mw.execShell('systemctl disable swap')
     return 'ok'
 
+
+def swapStatus():
+    sfile = getServerDir() + '/swapfile'
+    size = os.path.getsize(sfile)
+    data = {'size': size}
+    return mw.returnJson(True, "ok", data)
+
+
+def changeSwap():
+    args = getArgs()
+    data = checkArgs(args, ['size'])
+    if not data[0]:
+        return data[1]
+
+    size = args['size']
+    swapOp('stop')
+    os.system('dd if=/dev/zero of=' + getServerDir() +
+              '/swapfile bs=1M count=' + size)
+    os.system('chmod 600 ' + getServerDir() + '/swapfile')
+    swapOp('start')
+
+    return mw.returnJson(True, "修改成功!")
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -178,5 +208,9 @@ if __name__ == "__main__":
         print(initdUinstall())
     elif func == 'conf':
         print(getConf())
+    elif func == "swap_status":
+        print(swapStatus())
+    elif func == "change_swap":
+        print(changeSwap())
     else:
         print('error')
