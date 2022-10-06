@@ -114,6 +114,7 @@ mw_stop_panel()
             kill -9 $p &>/dev/null
     done
     
+    pidfile=${mw_path}/logs/mw.pid
     if [ -f $pidfile ];then
         rm -f $pidfile
     fi
