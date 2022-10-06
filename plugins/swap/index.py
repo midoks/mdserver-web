@@ -187,6 +187,8 @@ def changeSwap():
     swapOp('stop')
     os.system('dd if=/dev/zero of=' + getServerDir() +
               '/swapfile bs=1M count=' + size)
+
+    os.system('mkswap ' + getServerDir() + '/swapfile')
     os.system('chmod 600 ' + getServerDir() + '/swapfile')
     swapOp('start')
 
