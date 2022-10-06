@@ -93,6 +93,10 @@ if [ "${cpuCore}" != "1" ] && [ "${MEM_INFO}" != "0" ];then
 else
     cpuCore="1"
 fi
+
+if [ "$cpuCore" -gt "1" ];then
+	cpuCore=`echo "$cpuCore" | awk '{printf("%.f",($1)*0.8)}'`
+fi
 # ----- cpu end ------
 
 if [ ! -d $serverPath/php/${PHP_VER} ];then
