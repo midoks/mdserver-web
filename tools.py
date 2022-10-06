@@ -22,9 +22,9 @@ INIT_CMD = INIT_DIR + "/mw"
 
 
 def mwcli(mw_input=0):
-    raw_tip = "======================================================="
+    raw_tip = "======================================================"
     if not mw_input:
-        print("===============mdserver-web cli tools==================")
+        print("===============mdserver-web cli tools=================")
         print("(1) 重启面板服务")
         print("(2) 停止面板服务")
         print("(3) 启动面板服务")
