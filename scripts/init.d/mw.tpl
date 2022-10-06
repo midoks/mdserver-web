@@ -245,4 +245,7 @@ case "$1" in
         echo -e "\033[33mrelease the following port (${show_panel_ip}888|80|443|22) in the security group.\033[0m"
         echo -e "=================================================================="
         ;;
+    *)
+        cd $mw_path && python3 $mw_path/tools.py cli $1
+        ;;
 esac

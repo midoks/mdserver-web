@@ -65,9 +65,13 @@ rm -rf /tmp/mdserver-web-dev
 #pip uninstall public
 echo "use system version: ${OSNAME}"
 
-# cd /www/server/mdserver-web && bash ./scripts/install/debian.sh
 cd /www/server/mdserver-web && bash scripts/update/${OSNAME}.sh
-# curl -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update/${OSNAME}.sh | bash
+
+if [ ! -e /usr/bin/mw ]; then
+	if [ ! -f /usr/bin/mw ];then
+		ln -s /etc/init.d/mw /usr/bin/mw
+	fi
+fi
 
 endTime=`date +%s`
 ((outTime=($endTime-$startTime)/60))
