@@ -22,7 +22,7 @@ Install_swap()
 	if [ "$sysName" == "Darwin" ];then
 		pass
 	else
-		dd if=/dev/zero of=$serverPath/swap/swapfile bs=1M count=2048
+		dd if=/dev/zero of=$serverPath/swap/swapfile bs=1M count=1024
 		chmod 600 $serverPath/swap/swapfile
 		mkswap $serverPath/swap/swapfile
 		swapon $serverPath/swap/swapfile
