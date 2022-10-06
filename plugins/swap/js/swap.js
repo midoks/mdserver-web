@@ -52,9 +52,14 @@ function swapStatus() {
         $(".soft-man-con").html(spCon);
 
         $(".conf_p select[name='swap_set']").change(function() {
-            var size = $(this).val();
-            $("input[name='cur_size']").val(size);
-            $("input[name='size']").val(size);
+            var swap_size = $(this).val();
+            if (swap_size.indexOf('GB')>-1){
+                swap_size = parseInt(swap_size)*1024;
+            } else{
+                swap_size = parseInt(swap_size);
+            }
+            $("input[name='cur_size']").val(swap_size);
+            $("input[name='size']").val(swap_size);
         });
     });
 }

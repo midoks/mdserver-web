@@ -168,7 +168,11 @@ def initdUinstall():
 
 def swapStatus():
     sfile = getServerDir() + '/swapfile'
-    size = os.path.getsize(sfile) / 1024 / 1024
+
+    if os.path.exists(sfile):
+        size = os.path.getsize(sfile) / 1024 / 1024
+    else:
+        size = '218'
     data = {'size': size}
     return mw.returnJson(True, "ok", data)
 
