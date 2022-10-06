@@ -109,7 +109,7 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--disable-fileinfo \
 	$OPTIONS \
 	--enable-fpm
-	make clean && make && make install && make clean
+	make clean && make -j${cpuCore} && make install && make clean
 fi 
 #------------------------ install end ------------------------------------#
 }
