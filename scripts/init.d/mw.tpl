@@ -179,6 +179,17 @@ error_logs()
 	tail -n 100 $mw_path/logs/error.log
 }
 
+
+mw_update()
+{
+    curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/update.sh | bash
+}
+
+mw_update_dev()
+{
+    curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update_dev.sh | bash
+}
+
 case "$1" in
     'start') mw_start;;
     'stop') mw_stop;;
@@ -194,6 +205,8 @@ case "$1" in
         mw_start_task;;
     'status') mw_status;;
     'logs') error_logs;;
+    'update') mw_update;;
+    'update_dev') mw_update_dev;;
     'default')
         cd $mw_path
         port=7200
