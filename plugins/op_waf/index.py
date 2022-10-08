@@ -186,10 +186,12 @@ def status():
 
 def contentReplace(content):
     service_path = mw.getServerDir()
-    waf_path = getServerDir() + "/waf"
+    waf_root = getServerDir()
+    waf_path = waf_root + "/waf"
     content = content.replace('{$ROOT_PATH}', mw.getRootDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$WAF_PATH}', waf_path)
+    content = content.replace('{$WAF_ROOT}', waf_root)
     return content
 
 
@@ -200,6 +202,10 @@ def initDreplace():
         sdir = getPluginDir() + '/waf'
         cmd = 'cp -rf ' + sdir + ' ' + path
         mw.execShell(cmd)
+
+    logs_path = path + '/logs'
+    if not os.path.exists(logs_path):
+        mw.execShell('mkdir -p ' + logs_path)
 
     config = path + '/waf/config.json'
     content = mw.readFile(config)

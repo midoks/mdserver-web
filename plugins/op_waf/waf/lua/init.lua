@@ -1,7 +1,7 @@
 
 local cpath = "{$WAF_PATH}/"
 local rpath = "{$WAF_PATH}/rule/"
-local logdir = "{$ROOT_PATH}/wwwlogs/waf/"
+local logdir = "{$WAF_ROOT}/logs/"
 local json = require "cjson"
 local ngx_match = ngx.re.find
 
