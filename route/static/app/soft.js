@@ -7,13 +7,16 @@ function resetPluginWinWidth(width){
 
 //软件管理窗口
 function softMain(name, title, version) {
+
+    var _title = title.replace('-'+version,'')
+
     var loadT = layer.msg("正在处理,请稍后...", { icon: 16, time: 0, shade: [0.3, '#000'] });
     $.get('/plugins/setting?name='+name, function(rdata) {
         layer.close(loadT);
         layer.open({
             type: 1,
             area: '640px',
-            title: title + '【' + version + "】管理",
+            title: _title + '【' + version + "】管理",
             closeBtn: 1,
             shift: 0,
             content: rdata
