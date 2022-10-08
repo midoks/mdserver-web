@@ -24,7 +24,7 @@ function getLogs(id){
 			title:lan.crontab.task_log_title,
 			area: ['60%','500px'], 
 			shadeClose:false,
-			closeBtn:2,
+			closeBtn:1,
 			content:'<div class="setchmod bt-form pd20 pb70">'
 					+'<pre id="crontab-log" style="overflow: auto; border: 0px none; line-height:23px;padding: 15px; margin: 0px; white-space: pre-wrap; height: 405px; background-color: rgb(51,51,51);color:#f1f1f1;border-radius:0px;font-family:"></pre>'
 					+'<div class="bt-form-submit-btn" style="margin-top: 0px;">'
@@ -93,7 +93,7 @@ function getCronData(page){
 
 // 设置计划任务状态
 function setTaskStatus(id,status){
-	var confirm = layer.confirm(status == '0'?'计划任务暂停后将无法继续运行，您真的要停用这个计划任务吗？':'该计划任务已停用，是否要启用这个计划任务', {title:'提示',icon:3,closeBtn:2},function(index) {
+	var confirm = layer.confirm(status == '0'?'计划任务暂停后将无法继续运行，您真的要停用这个计划任务吗？':'该计划任务已停用，是否要启用这个计划任务', {title:'提示',icon:3,closeBtn:1},function(index) {
 		if (index > 0) {
 			var loadT = layer.msg('正在设置状态，请稍后...',{icon:16,time:0,shade: [0.3, '#000']});
 			$.post('/crontab/set_cron_status',{id:id},function(rdata){
@@ -610,7 +610,7 @@ function editTaskInfo(id){
 				area: ['850px','450px'], 
 				skin:'layer-create-content',
 				shadeClose:false,
-				closeBtn:2,
+				closeBtn:1,
 				content:'<div class="setting-con ptb20">\
 							<div class="clearfix plan ptb10">\
 								<span class="typename c4 pull-left f14 text-right mr20">任务类型</span>\

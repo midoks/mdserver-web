@@ -196,7 +196,7 @@ function recycleBin(type){
 			layer.open({
 				type: 1,
 				shift: 5,
-				closeBtn: 2,
+				closeBtn: 1,
 				area: ['80%','606px'],
 				title: lan.files.recycle_bin_title,
 				content: tablehtml
@@ -841,7 +841,7 @@ function createFile(type, path) {
 	layer.open({
 		type: 1,
 		shift: 5,
-		closeBtn: 2,
+		closeBtn: 1,
 		area: '320px', 
 		title: '新建空白文件',
 		content: '<div class="bt-form pd20 pb70">\
@@ -881,7 +881,7 @@ function createDir(type, path) {
 	layer.open({
 		type: 1,
 		shift: 5,
-		closeBtn: 2,
+		closeBtn: 1,
 		area: '320px',
 		title: '新建目录',
 		content: '<div class="bt-form pd20 pb70">\
@@ -981,7 +981,7 @@ function downloadFile(action){
 	layer.open({
 		type: 1,
 		shift: 5,
-		closeBtn: 2,
+		closeBtn: 1,
 		area: '500px',
 		btn:["确定","关闭"],
 		title: lan.files.down_title,
@@ -1034,7 +1034,7 @@ function reName(type, fileName) {
 	layer.open({
 		type: 1,
 		shift: 5,
-		closeBtn: 2,
+		closeBtn: 1,
 		area: '320px', 
 		title: '重命名',
 		btn:["确定","保存"],
@@ -1185,7 +1185,7 @@ function zip(dirName,submits) {
 	layer.open({
 		type: 1,
 		shift: 5,
-		closeBtn: 2,
+		closeBtn: 1,
 		area: '650px',
 		title: lan.files.zip_title,
 		content: '<div class="bt-form pd20 pb70">'
@@ -1241,7 +1241,7 @@ function unZip(fileName,type) {
 	layer.open({
 		type: 1,
 		shift: 5,
-		closeBtn: 2,
+		closeBtn: 1,
 		area: '490px',
 		title: '解压文件',
 		content: '<div class="bt-form pd20 pb70">'
@@ -1299,7 +1299,7 @@ function getImage(fileName){
 	var imgUrl = '/files/download?filename='+fileName;
 	layer.open({
 		type:1,
-		closeBtn: 2,
+		closeBtn: 1,
 		title:false,
 		area: '500px',
 		shadeClose: true,
@@ -1319,7 +1319,7 @@ function uploadFiles(){
 	var path = $("#DirPathPlace input").val()+"/";
 	layer.open({
 		type:1,
-		closeBtn: 2,
+		closeBtn: 1,
 		title:lan.files.up_title,
 		area: ['500px','300px'], 
 		shadeClose:false,
@@ -1364,7 +1364,7 @@ function setChmod(action,fileName){
 		// console.log(rdata);
 		layer.open({
 			type:1,
-			closeBtn: 2,
+			closeBtn: 1,
 			title: '设置权限['+fileName+']',
 			area: '400px', 
 			shadeClose:false,

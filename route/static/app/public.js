@@ -204,7 +204,7 @@ function changePath(d) {
 		type: 1,
 		area: "650px",
 		title: '选择目录',
-		closeBtn: 2,
+		closeBtn: 1,
 		shift: 5,
 		shadeClose: false,
 		content: "<div class='changepath'><div class='path-top'><button type='button' class='btn btn-default btn-sm' onclick='backFile()'><span class='glyphicon glyphicon-share-alt'></span>返回</button>\
@@ -554,7 +554,7 @@ function onlineEditFile(k, f) {
 		var r = layer.open({
 			type: 1,
 			shift: 5,
-			closeBtn: 2,
+			closeBtn: 1,
 			area: ["90%", "90%"],
 			title: lan.bt.edit_title+"[" + f + "]",
 			content: '<form class="bt-form pd20 pb70"><div class="line"><p style="color:red;margin-bottom:10px">'+lan.bt.edit_ps+'			<select class="bt-input-text" name="encoding" style="width: 74px;position: absolute;top: 31px;right: 19px;height: 22px;z-index: 9999;border-radius: 0;">' + n + '</select></p><textarea class="mCustomScrollbar bt-input-text" id="textBody" style="width:100%;margin:0 auto;line-height: 1.8;position: relative;top: 10px;" value="" />			</div>			<div class="bt-form-submit-btn" style="position:absolute; bottom:0; width:100%">			<button type="button" class="btn btn-danger btn-sm btn-editor-close">'+lan.public.close+'</button>			<button id="OnlineEditFileBtn" type="button" class="btn btn-success btn-sm">'+lan.public.save+'</button>			</div>			</form>'
@@ -638,7 +638,7 @@ function safeMessage(j, h, g, f) {
 		type: 1,
 		title: j,
 		area: "350px",
-		closeBtn: 2,
+		closeBtn: 1,
 		shadeClose: true,
 		content: "<div class='bt-form webDelete pd20 pb70'><p>" + h + "</p>" + f + "<div class='vcode'>"+lan.bt.cal_msg+"<span class='text'>" + sumtext + "</span>=<input type='number' id='vcodeResult' value=''></div><div class='bt-form-submit-btn'><button type='button' class='btn btn-danger btn-sm bt-cancel'>"+lan.public.cancel+"</button> <button type='button' id='toSubmit' class='btn btn-success btn-sm' >"+lan.public.ok+"</button></div></div>"
 	});
@@ -718,7 +718,7 @@ $(function() {
 });
 
 $("#dologin").click(function() {
-	layer.confirm('您真的要退出面板吗?', {icon:3,closeBtn: 2}, function() {
+	layer.confirm('您真的要退出面板吗?', {icon:3,closeBtn: 1}, function() {
 		window.location.href = "/login?dologin=True"
 	});
 	return false
@@ -1030,7 +1030,7 @@ function bindPanel(a,type,ip,btid,url,user,pw){
 		type: 1,
 		area: "400px",
 		title: titleName,
-		closeBtn: 2,
+		closeBtn: 1,
 		shift: 5,
 		shadeClose: false,
 		content: "<div class='bt-form pd20 pb70'>\
@@ -1106,7 +1106,7 @@ function messageBox() {
 		type: 1,
 		title: '消息盒子',
 		area: "670px",
-		closeBtn: 2,
+		closeBtn: 1,
 		shadeClose: false,
 		content: '<div class="bt-form">\
 					<div class="bt-w-main">\
@@ -1459,7 +1459,7 @@ function webShell() {
         type: 1,
         title: "本地终端",
         area: ['685px','435px'],
-        closeBtn: 2,
+        closeBtn: 1,
         shadeClose: false,
         content: '<div class="term-box"><div id="term"></div></div>\
 					<div class="shell-text-input">\
@@ -1661,7 +1661,7 @@ function pluginOpService(a, b, v) {
         case "restart":d = '重启';break;
         case "reload":d = '重载';break;
     }
-    layer.confirm( msgTpl('您真的要{1}{2}{3}服务吗？', [d,a,v]), {icon:3,closeBtn: 2}, function() {
+    layer.confirm( msgTpl('您真的要{1}{2}{3}服务吗？', [d,a,v]), {icon:3,closeBtn: 1}, function() {
         var e = layer.msg(msgTpl('正在{1}{2}{3}服务,请稍候...',[d,a,v]), {icon: 16,time: 0});
         $.post("/plugins/run", c, function(g) {
             layer.close(e);
@@ -1937,7 +1937,7 @@ function pluginOpInitD(a, _version, b) {
         case "initd_install":d = '加载';break;
         case "initd_uninstall":d = '卸载';break;
     }
-    layer.confirm( msgTpl('您真的要{1}{2}{3}服务吗？', [d,a,_version]), {icon:3,closeBtn: 2}, function() {
+    layer.confirm( msgTpl('您真的要{1}{2}{3}服务吗？', [d,a,_version]), {icon:3,closeBtn: 1}, function() {
         var e = layer.msg(msgTpl('正在{1}{2}{3}服务,请稍候...',[d,a,_version]), {icon: 16,time: 0});
         $.post("/plugins/run", c, function(g) {
             layer.close(e);

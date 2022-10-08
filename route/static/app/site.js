@@ -233,7 +233,7 @@ function webAddPage(type) {
 			skin: 'demo-class',
 			area: '640px',
 			title: '添加网站',
-			closeBtn: 2,
+			closeBtn: 1,
 			shift: 0,
 			shadeClose: false,
 			content: "<form class='bt-form pd20 pb70' id='addweb'>\
@@ -673,7 +673,7 @@ function DomainRoot(id, name,msg) {
 			skin: 'demo-class',
 			area: '450px',
 			title: lan.site.domain_man,
-			closeBtn: 2,
+			closeBtn: 1,
 			shift: 0,
 			shadeClose: true,
 			content: "<div class='divtable padding-10'>\
@@ -869,7 +869,7 @@ function getBackup(id,name,page) {
 			skin: 'demo-class',
 			area: '700px',
 			title: '打包备份',
-			closeBtn: 2,
+			closeBtn: 1,
 			shift: 0,
 			shadeClose: false,
 			content: "<div class='bt-form ptb15 mlr15' id='webBackup'>\
@@ -918,7 +918,7 @@ function setIndex(id){
 				type: 1,
 				area: '500px',
 				title: lan.site.setindex,
-				closeBtn: 2,
+				closeBtn: 1,
 				shift: 5,
 				shadeClose: true,
 				content:"<form class='bt-form' id='SetIndex'><div class='SetIndex'>"
@@ -964,7 +964,7 @@ function getDefaultSite(){
 				type: 1,
 				area: '530px',
 				title: '设置默认站点',
-				closeBtn: 2,
+				closeBtn: 1,
 				shift: 5,
 				shadeClose: true,
 				content:'<div class="bt-form ptb15 pb70">\
@@ -1021,7 +1021,7 @@ function webEdit(id,website,endTime,addtime){
 		type: 1,
 		area: '640px',
 		title: '站点修改['+website+']  --  添加时间['+addtime+']',
-		closeBtn: 2,
+		closeBtn: 1,
 		shift: 0,
 		content: "<div class='bt-form'>"
 			+"<div class='bt-w-menu pull-left' style='height: 565px;'>"
@@ -1363,7 +1363,7 @@ function showRewrite(rdata){
 		type: 1,
 		area: '500px',
 		title: '配置伪静态规则',
-		closeBtn: 2,
+		closeBtn: 1,
 		shift: 5,
 		shadeClose: true,
 		content:webBakHtml
@@ -1430,7 +1430,7 @@ function to301(siteName, type, obj){
 			skin: 'demo-class',
 			area: '650px',
 			title: type == 1 ? '创建重定向' : '修改重定向[' + obj.redirectname + ']',
-			closeBtn: 2,
+			closeBtn: 1,
 			shift: 5,
 			shadeClose: false,
 			content: "<form id='form_redirect' class='divtable pd20' style='padding-bottom: 60px'>" +
@@ -1632,7 +1632,7 @@ function toProxy(siteName, type, obj) {
 			type: 1,
 			area: '650px',
 			title: "创建反向代理",
-			closeBtn: 2,
+			closeBtn: 1,
 			shift: 5,
 			shadeClose: false,
 			btn: ['提交','关闭'],
@@ -2381,7 +2381,7 @@ function setRewriteTel(act){
 	aindex = layer.open({
 		type: 1,
 		shift: 5,
-		closeBtn: 2,
+		closeBtn: 1,
 		area: '320px', //宽高
 		title: '保存为Rewrite模板',
 		content: '<div class="bt-form pd20 pb70">\
@@ -2408,7 +2408,7 @@ function siteDefaultPage(){
 		type: 1,
 		area: '460px',
 		title: '修改默认页',
-		closeBtn: 2,
+		closeBtn: 1,
 		shift: 0,
 		content: '<div class="changeDefault pd20">\
 						<button class="btn btn-default btn-sm mg10" style="width:188px" onclick="changeDefault(1)">默认文档</button>\
@@ -2465,7 +2465,7 @@ function setClassType(){
 			type: 1,
 			area: '350px',
 			title: '网站分类管理',
-			closeBtn: 2,
+			closeBtn: 1,
 			shift: 0,
 			content: '<div class="bt-form edit_site_type">\
 					<div class="divtable mtb15" style="overflow:auto">\
@@ -2523,7 +2523,7 @@ function editClassType(id,name){
 		type: 1,
 		area: '350px',
 		title: '修改分类管理【' + name + '】',
-		closeBtn: 2,
+		closeBtn: 1,
 		shift: 0,
 		content: "<form class='bt-form bt-form pd20 pb70' id='mod_pwd'>\
                     <div class='line'>\
@@ -2563,7 +2563,7 @@ function moveClassTYpe(){
 			type: 1,
 			area: '350px',
 			title: '设置站点分类',
-			closeBtn: 2,
+			closeBtn: 1,
 			shift: 0,
 			content: '<div class="bt-form edit_site_type">\
 					<div class="divtable mtb15" style="overflow:auto;height:80px;">\

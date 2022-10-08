@@ -205,7 +205,7 @@ function addVersion(name, ver, type, obj, title, install_pre_inspection) {
         type: 1,
         title: titlename + "软件安装",
         area: '350px',
-        closeBtn: 2,
+        closeBtn: 1,
         shadeClose: true,
         btn: ['提交','关闭'],
         content: "<div class='bt-form pd20 c6'>\
@@ -262,7 +262,7 @@ function uninstallPreInspection(name, ver, callback){
 
 
 function runUninstallVersion(name, version){
-    layer.confirm(msgTpl('您真的要卸载[{1}-{2}]吗?', [name, version]), { icon: 3, closeBtn: 2 }, function() {
+    layer.confirm(msgTpl('您真的要卸载[{1}-{2}]吗?', [name, version]), { icon: 3, closeBtn: 1 }, function() {
         var data = 'name=' + name + '&version=' + version;
         var loadT = layer.msg('正在处理,请稍候...', { icon: 16, time: 0, shade: [0.3, '#000'] });
         $.post('/plugins/uninstall', data, function(rdata) {
@@ -431,7 +431,7 @@ function importPlugin(file){
                 type: 1,
                 area: "500px",
                 title: "安装第三方插件包",
-                closeBtn: 2,
+                closeBtn: 1,
                 shift: 5,
                 shadeClose: false,
                 content: '<style>\
