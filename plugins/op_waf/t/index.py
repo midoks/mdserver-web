@@ -7,13 +7,18 @@ import time
 import json
 
 
-TEST_URL = "t1.cn"
+TEST_URL = "http://t1.cn/"
 
 
 def run():
-    print('op lua run ok')
+    url = TEST_URL + '?t=../etc/passwd'
+    print("args test start")
+
+    print("args test end")
+
+
+def test_start():
+
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
-    if action == "run":
-        run()
+    test_start()

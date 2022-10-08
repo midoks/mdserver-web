@@ -806,7 +806,7 @@ def getLogsList():
         return data[1]
 
     data = []
-    path = mw.getLogsDir() + '/waf'
+    path = getServerDir() + '/logs'
 
     if not os.path.exists(path):
         return mw.returnJson(False, '还未生成!', [])
@@ -829,7 +829,8 @@ def getSafeLogs():
     if not data[0]:
         return data[1]
 
-    path = mw.getLogsDir() + '/waf'
+    path = getServerDir() + '/logs'
+
     file = path + '/' + args['siteName'] + '_' + args['toDate'] + '.log'
     if not os.path.exists(file):
         return mw.returnJson(False, "文件不存在!")
