@@ -98,6 +98,7 @@ def initConf():
             "/var/log/secure",
             "/var/log/lastlog",
             "/var/log/cron",
+            "/www/server/cron"
         ]
         for i in clogcom:
             if os.path.exists(i):
