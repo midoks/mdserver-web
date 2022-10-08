@@ -114,6 +114,7 @@ mw_stop_panel()
             kill -9 $p &>/dev/null
     done
     
+    pidfile=${mw_path}/logs/mw.pid
     if [ -f $pidfile ];then
         rm -f $pidfile
     fi
@@ -243,5 +244,8 @@ case "$1" in
         echo -e "\033[33mIf you cannot access the panel. \033[0m"
         echo -e "\033[33mrelease the following port (${show_panel_ip}888|80|443|22) in the security group.\033[0m"
         echo -e "=================================================================="
+        ;;
+    *)
+        cd $mw_path && python3 $mw_path/tools.py cli $1
         ;;
 esac

@@ -76,6 +76,7 @@ apt install -y patchelf
 
 VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 if [ "${VERSION_ID}" == "22.04" ];then
+	apt install -y python3-cffi
     pip3 install -U --force-reinstall --no-binary :all: gevent
 fi
 
@@ -87,6 +88,7 @@ else
 fi
 
 if [ "${VERSION_ID}" == "22.04" ];then
+	apt install -y python3-cffi
     pip3 install -U --force-reinstall --no-binary :all: gevent
 fi
 

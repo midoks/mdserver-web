@@ -14,6 +14,68 @@ import db
 # p = "/usr/local/lib/" + info[0].strip() + "/site-packages"
 # sys.path.append(p)
 
+INIT_DIR = "/etc/init.d"
+if mw.isAppleSystem():
+    INIT_DIR = mw.getRunDir() + "/scripts/init.d"
+
+INIT_CMD = INIT_DIR + "/mw"
+
+
+def mwcli(mw_input=0):
+    raw_tip = "======================================================"
+    if not mw_input:
+        print("===============mdserver-web cli tools=================")
+        print("(1) 重启面板服务")
+        print("(2) 停止面板服务")
+        print("(3) 启动面板服务")
+        print("(4) 重载面板服务")
+        print("(10) 查看面板默认信息")
+        print("(11) 修改面板密码")
+        print("(12) 修改面板用户名")
+        print("(13) 显示面板错误日志")
+        print("(0) 取消")
+        print(raw_tip)
+        try:
+            mw_input = input("请输入命令编号：")
+            if sys.version_info[0] == 3:
+                mw_input = int(mw_input)
+        except:
+            mw_input = 0
+
+    nums = [1, 2, 3, 4,  10, 11, 12, 13]
+    if not mw_input in nums:
+        print(raw_tip)
+        print("已取消!")
+        exit()
+
+    if mw_input == 1:
+        os.system(INIT_CMD + " restart")
+    elif mw_input == 2:
+        os.system(INIT_CMD + " stop")
+    elif mw_input == 3:
+        os.system(INIT_CMD + " start")
+    elif mw_input == 4:
+        os.system(INIT_CMD + " reload")
+    elif mw_input == 10:
+        os.system(INIT_CMD + " default")
+    elif mw_input == 11:
+        if sys.version_info[0] == 2:
+            input_pwd = raw_input("请输入新的面板密码：")
+        else:
+            input_pwd = input("请输入新的面板密码：")
+        if len(input_pwd.strip()) < 5:
+            print("|-错误，密码长度不能小于5位")
+            return
+        set_panel_pwd(input_pwd.strip(), True)
+    elif mw_input == 12:
+        if sys.version_info[0] == 2:
+            input_user = raw_input("请输入新的面板用户名(>3位)：")
+        else:
+            input_user = input("请输入新的面板用户名(>3位)：")
+        set_panel_username(input_user.strip())
+    elif mw_input == 13:
+        os.system('tail -100 ' + mw.getRunDir() + '/logs/error.log')
+
 
 def set_panel_pwd(password, ncli=False):
     # 设置面板密码
@@ -60,15 +122,23 @@ def getServerIp():
 
 
 if __name__ == "__main__":
-    type = sys.argv[1]
-    if type == 'panel':
+    method = sys.argv[1]
+    if method == 'panel':
         set_panel_pwd(sys.argv[2])
-    elif type == 'username':
+    elif method == 'username':
         if len(sys.argv) > 2:
             set_panel_username(sys.argv[2])
         else:
             set_panel_username()
-    elif type == 'getServerIp':
+    elif method == 'getServerIp':
         getServerIp()
+    elif method == "cli":
+        clinum = 0
+        try:
+            if len(sys.argv) > 2:
+                clinum = int(sys.argv[2]) if sys.argv[2][:6] else sys.argv[2]
+        except:
+            clinum = sys.argv[2]
+        mwcli(clinum)
     else:
         print('ERROR: Parameter error')

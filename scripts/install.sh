@@ -83,10 +83,13 @@ fi
 echo "use system version: ${OSNAME}"
 cd /www/server/mdserver-web && bash scripts/install/${OSNAME}.sh
 
-chmod +x /www/server/mdserver-web/mw-cli
-if [ ! -e /usr/bin/mw-cli ]; then 
-	ln -s /www/server/mdserver-web/mw-cli /usr/bin/mw-cli
+
+if [ ! -e /usr/bin/mw ]; then
+	if [ -f /etc/init.d/mw ];then
+		ln -s /etc/init.d/mw /usr/bin/mw
+	fi
 fi
+
 endTime=`date +%s`
 ((outTime=(${endTime}-${startTime})/60))
 echo -e "Time consumed:\033[32m $outTime \033[0mMinute!"

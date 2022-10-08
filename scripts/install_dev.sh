@@ -71,15 +71,12 @@ if [ $OSNAME != "macos" ];then
 fi
 
 echo "use system version: ${OSNAME}"
-
-
-# cd /www/server/mdserver-web && bash ./scripts/install/debian.sh
 cd /www/server/mdserver-web && bash scripts/install/${OSNAME}.sh
-# curl -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/install/${OSNAME}.sh | bash
 
-chmod +x /www/server/mdserver-web/mw-cli
-if [ ! -e /usr/bin/mw-cli ]; then 
-	ln -s /www/server/mdserver-web/mw-cli /usr/bin/mw-cli
+if [ ! -e /usr/bin/mw ]; then
+	if [ -f /etc/init.d/mw ];then
+		ln -s /etc/init.d/mw /usr/bin/mw
+	fi
 fi
 
 endTime=`date +%s`

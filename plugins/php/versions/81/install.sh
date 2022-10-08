@@ -16,7 +16,7 @@ function version_lt() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)"
 function version_ge() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" == "$1"; }
 
 
-version=8.1.10
+version=8.1.11
 PHP_VER=81
 Install_php()
 {
@@ -61,6 +61,28 @@ if version_lt "$libzip_version" "0.11.0" ;then
 	ZIP_OPTION="--with-zip=$serverPath/lib/libzip"
 fi
 
+# ----- cpu start ------
+if [ -z "${cpuCore}" ]; then
+	cpuCore="1"
+fi
+
+if [ -f /proc/cpuinfo ];then
+	cpuCore=`cat /proc/cpuinfo | grep "processor" | wc -l`
+fi
+
+MEM_INFO=$(free -m|grep Mem|awk '{printf("%.f",($2)/1024)}')
+if [ "${cpuCore}" != "1" ] && [ "${MEM_INFO}" != "0" ];then
+    if [ "${cpuCore}" -gt "${MEM_INFO}" ];then
+        cpuCore="${MEM_INFO}"
+    fi
+else
+    cpuCore="1"
+fi
+
+if [ "$cpuCore" -gt "1" ];then
+	cpuCore=`echo "$cpuCore" | awk '{printf("%.f",($1)*0.8)}'`
+fi
+# ----- cpu end ------
 
 echo "$sourcePath/php/php${PHP_VER}"
 
@@ -89,7 +111,7 @@ if [ ! -d $serverPath/php/${PHP_VER} ];then
 	--disable-fileinfo \
 	$OPTIONS \
 	--enable-fpm
-	make clean && make && make install && make clean
+	make clean && make -j${cpuCore} && make install && make clean
 fi 
 #------------------------ install end ------------------------------------#
 }

@@ -29,7 +29,6 @@ getBit(){
 
 Install_gogs()
 {
-	pip3 install mysqlclient
 	
 	mkdir -p $serverPath/source/gogs
 

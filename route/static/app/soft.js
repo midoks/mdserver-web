@@ -6,15 +6,18 @@ function resetPluginWinWidth(width){
 }
 
 //软件管理窗口
-function softMain(name, version) {
+function softMain(name, title, version) {
+
+    var _title = title.replace('-'+version,'')
+
     var loadT = layer.msg("正在处理,请稍后...", { icon: 16, time: 0, shade: [0.3, '#000'] });
     $.get('/plugins/setting?name='+name, function(rdata) {
         layer.close(loadT);
         layer.open({
             type: 1,
             area: '640px',
-            title: name + '-' + version + "管理",
-            closeBtn: 2,
+            title: _title + '【' + version + "】管理",
+            closeBtn: 1,
             shift: 0,
             content: rdata
         });
@@ -104,8 +107,8 @@ function getSList(isdisplay) {
 
                 var mupdate = '';//(plugin.versions[n] == plugin.updates[n]) '' : '<a class="btlink" onclick="softUpdate(\'' + plugin.name + '\',\'' + plugin.versions[n].version + '\',\'' + plugin.updates[n] + '\')">更新</a> | ';
                 // if (plugin.versions[n] == '') mupdate = '';
-                handle = mupdate + '<a class="btlink" onclick="softMain(\'' + plugin.name + '\',\'' + plugin.setup_version + '\')">设置</a> | <a class="btlink" onclick="uninstallVersion(\'' + plugin.name + '\',\'' + plugin.setup_version + '\',' + plugin.uninstall_pre_inspection +')">卸载</a>';
-                titleClick = 'onclick="softMain(\'' + plugin.name + '\',\'' + plugin.setup_version + '\')" style="cursor:pointer"';
+                handle = mupdate + '<a class="btlink" onclick="softMain(\'' + plugin.name + '\',\'' + plugin.title + '\',\'' + plugin.setup_version + '\')">设置</a> | <a class="btlink" onclick="uninstallVersion(\'' + plugin.name + '\',\'' + plugin.setup_version + '\',' + plugin.uninstall_pre_inspection +')">卸载</a>';
+                titleClick = 'onclick="softMain(\'' + plugin.name + '\',\'' + plugin.title + '\',\'' + plugin.setup_version + '\')" style="cursor:pointer"';
              
                 softPath = '<span class="glyphicon glyphicon-folder-open" title="' + plugin.path + '" onclick="openPath(\'' + plugin.path + '\')"></span>';
                 if (plugin.coexist){
@@ -335,19 +338,11 @@ function indexListHtml(callback){
                 name = plugin.title + '  ';
                 data_id = plugin.name + '-' + plugin.versions;
             }
-            
-            // con += '<div class="col-sm-3 col-md-3 col-lg-3" data-id="' + data_id + '">\
-            //     <span class="spanmove"></span>\
-            //     <div onclick="softMain(\'' + plugin.name + '\',\'' + plugin.setup_version + '\')">\
-            //     <div class="image"><img src="/static/img/loading.gif" data-src="/plugins/file?name=' + plugin.name + '&f=ico.png"></div>\
-            //     <div class="sname">' +  name + state + '</div>\
-            //     </div>\
-            // </div>';
 
             con += '<div class="col-sm-3 col-md-3 col-lg-3" data-id="' + data_id + '">\
                 <span class="spanmove"></span>\
-                <div onclick="softMain(\'' + plugin.name + '\',\'' + plugin.setup_version + '\')">\
-                <div class="image"><img src="/plugins/file?name=' + plugin.name + '&f=ico.png" style="max-width:48px;"></div>\
+                <div onclick="softMain(\'' + plugin.name + '\',\'' + plugin.title + '\',\'' + plugin.setup_version + '\')">\
+                <div class="image"><img bk-src="/static/img/loading.gif" src="/plugins/file?name=' + plugin.name + '&f=ico.png" style="max-width:48px;"></div>\
                 <div class="sname">' +  name + state + '</div>\
                 </div>\
             </div>';

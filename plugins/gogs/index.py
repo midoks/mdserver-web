@@ -462,6 +462,11 @@ def userList():
     if not os.path.exists(conf):
         return mw.returnJson(False, "请先安装初始化!<br/>默认地址:http://" + mw.getLocalIp() + ":3000")
 
+    conf = getDbConfValue()
+    gtype = getGogsDbType(conf)
+    if gtype != 'mysql':
+        return mw.returnJson(False, "仅支持mysql数据操作!")
+
     import math
     args = getArgs()
 

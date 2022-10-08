@@ -11,11 +11,10 @@ sys.path.append(os.getcwd() + "/class/core")
 import mw
 
 
-cmd = 'ls /usr/local/lib/ | grep python  | cut -d \\  -f 1 | awk \'END {print}\''
-info = mw.execShell(cmd)
-p = "/usr/local/lib/" + info[0].strip() + "/site-packages"
-sys.path.append(p)
-import psutil
+# cmd = 'ls /usr/local/lib/ | grep python  | cut -d \\  -f 1 | awk \'END {print}\''
+# info = mw.execShell(cmd)
+# p = "/usr/local/lib/" + info[0].strip() + "/site-packages"
+# sys.path.append(p)
 
 
 app_debug = False
@@ -24,14 +23,11 @@ if mw.isAppleSystem():
 
 
 def getPluginName():
-    return 'gogs'
+    return 'gitea'
 
 
 def getPluginDir():
     return mw.getPluginDir() + '/' + getPluginName()
-
-sys.path.append(getPluginDir() + "/class")
-import mysqlDb
 
 
 def getServerDir():
@@ -61,18 +57,28 @@ def getArgs():
     return tmp
 
 
+def checkArgs(data, ck=[]):
+    for i in range(len(ck)):
+        if not ck[i] in data:
+            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
+    return (True, mw.returnJson(True, 'ok'))
+
+
 def getInitdConfTpl():
-    path = getPluginDir() + "/init.d/gogs.tpl"
+    path = getPluginDir() + "/init.d/gitea.tpl"
     return path
 
 
 def getInitdConf():
-    path = getServerDir() + "/init.d/gogs"
+    path = getServerDir() + "/init.d/gitea"
     return path
 
 
 def getConf():
     path = getServerDir() + "/custom/conf/app.ini"
+
+    if not os.path.exists(path):
+        return mw.returnJson(False, "请先安装初始化!<br/>默认地址:http://" + mw.getLocalIp() + ":3000")
     return path
 
 
@@ -95,7 +101,7 @@ def getHomeDir():
             "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
         return '/Users/' + user
     else:
-        return '/root'
+        return 'git'
 
 
 def getRunUser():
@@ -104,7 +110,7 @@ def getRunUser():
             "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
         return user
     else:
-        return 'root'
+        return 'git'
 
 __SR = '''#!/bin/bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
@@ -140,13 +146,16 @@ def initDreplace():
         mw.writeFile(file_bin, content)
         mw.execShell('chmod +x ' + file_bin)
 
-    conf_bin = getConf()
-    if not os.path.exists(conf_bin):
-        mw.execShell('mkdir -p ' + getServerDir() + '/custom/conf')
-        conf_tpl = getConfTpl()
-        content = mw.readFile(conf_tpl)
-        content = contentReplace(content)
-        mw.writeFile(conf_bin, content)
+    # systemd
+    systemDir = mw.systemdCfgDir()
+    systemService = systemDir + '/gitea.service'
+    systemServiceTpl = getPluginDir() + '/init.d/gitea.service.tpl'
+    if os.path.exists(systemDir) and not os.path.exists(systemService):
+        service_path = mw.getServerDir()
+        se_content = mw.readFile(systemServiceTpl)
+        se_content = se_content.replace('{$SERVER_PATH}', service_path)
+        mw.writeFile(systemService, se_content)
+        mw.execShell('systemctl daemon-reload')
 
     log_path = getServerDir() + '/log'
     if not os.path.exists(log_path):
@@ -159,9 +168,14 @@ def getRootUrl():
     content = mw.readFile(getConf())
     rep = 'ROOT_URL\s*=\s*(.*)'
     tmp = re.search(rep, content)
-    if not tmp:
-        return ''
-    return tmp.groups()[0]
+    if tmp:
+        return tmp.groups()[0]
+
+    rep = 'EXTERNAL_URL\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    if tmp:
+        return tmp.groups()[0]
+    return ''
 
 
 def getSshPort():
@@ -192,8 +206,11 @@ def getRootPath():
 
 
 def getDbConfValue():
-    content = mw.readFile(getConf())
+    conf = getConf()
+    if not os.path.exists(conf):
+        return {}
 
+    content = mw.readFile(conf)
     rep_scope = "\[database\](.*?)\["
     tmp = re.findall(rep_scope, content, re.S)
 
@@ -207,18 +224,72 @@ def getDbConfValue():
     return r
 
 
-def pMysqlDb():
-    conf = getDbConfValue()
-
+def pMysqlDb(conf):
     host = conf['HOST'].split(':')
-    conn = mysqlDb.mysqlDb()
+    # pymysql
+    db = mw.getMyORM()
+    # MySQLdb |
+    # db = mw.getMyORMDb()
 
-    conn.setHost(host[0])
-    conn.setUser(conf['USER'])
-    conn.setPwd(conf['PASSWD'])
-    conn.setPort(int(host[1]))
-    conn.setDb(conf['NAME'])
-    return conn
+    db.setPort(int(host[1]))
+    db.setUser(conf['USER'])
+
+    if 'PASSWD' in conf:
+        db.setPwd(conf['PASSWD'])
+    else:
+        db.setPwd(conf['PASSWORD'])
+
+    db.setDbName(conf['NAME'])
+    # db.setSocket(getSocketFile())
+    db.setCharset("utf8")
+    return db
+
+
+def pSqliteDb(conf):
+    # print(conf)
+    import db
+    psDb = db.Sql()
+
+    # 默认
+    gsdir = getServerDir() + '/data'
+    dbname = 'gitea'
+    if conf['PATH'][0] == '/':
+        # 绝对路径
+        pass
+    else:
+        path = conf['PATH'].split('/')
+        gsdir = getServerDir() + '/' + path[0]
+        dbname = path[1].split('.')[0]
+
+    # print(gsdir, dbname)
+    psDb.dbPos(gsdir, dbname)
+    return psDb
+
+
+def getGiteaDbType(conf):
+
+    if 'DB_TYPE' in conf:
+        return conf['DB_TYPE']
+
+    if 'TYPE' in conf:
+        return conf['TYPE']
+
+    return 'NONE'
+
+
+def pQuery(sql):
+    conf = getDbConfValue()
+    gtype = getGiteaDbType(conf)
+    if gtype == 'sqlite3':
+        db = pSqliteDb(conf)
+        data = db.query(sql, []).fetchall()
+        return data
+    elif gtype == 'mysql':
+        db = pMysqlDb(conf)
+        return db.query(sql)
+
+    print("仅支持mysql|sqlite3配置")
+    exit(0)
 
 
 def isSqlError(mysqlMsg):
@@ -244,93 +315,66 @@ def isSqlError(mysqlMsg):
     return mw.returnData(True, 'OK')
 
 
-def start():
-
-    is_frist = True
-    conf_bin = getConf()
-    if os.path.exists(conf_bin):
-        is_frist = False
-
+def appOp(method):
     file = initDreplace()
 
-    if is_frist:
-        return "第一次启动Gogs,默认使用MySQL连接!<br>可以在配置文件中重新设置,再启动!"
+    if not mw.isAppleSystem():
+        data = mw.execShell('systemctl ' + method + ' ' + getPluginName())
+        if data[1] == '':
+            return 'ok'
+        return 'fail'
 
-    conn = pMysqlDb()
-    list_table = conn.query('show tables')
-    data = isSqlError(list_table)
-    if not data['status']:
-        return data['msg']
-
-    data = mw.execShell(__SR + file + ' start')
+    data = mw.execShell(__SR + file + ' ' + method)
     if data[1] == '':
         return 'ok'
     return data[0]
 
 
+def start():
+    return appOp('start')
+
+
 def stop():
-    file = initDreplace()
-    data = mw.execShell(__SR + file + ' stop')
-    if data[1] == '':
-        return 'ok'
-    return data[1]
+    return appOp('stop')
 
 
 def restart():
-    file = initDreplace()
-    data = mw.execShell(__SR + file + ' restart')
-    if data[1] == '':
-        return 'ok'
-    return data[1]
+    return appOp('restart')
 
 
 def reload():
-    file = initDreplace()
-    data = mw.execShell(__SR + file + ' reload')
-    if data[1] == '':
-        return 'ok'
-    return data[1]
+    return appOp('reload')
 
 
 def initdStatus():
-    if not app_debug:
-        os_name = mw.getOs()
-        if os_name == 'darwin':
-            return "Apple Computer does not support"
-    initd_bin = getInitDFile()
-    if os.path.exists(initd_bin):
-        return 'ok'
-    return 'fail'
+    if mw.isAppleSystem():
+        return "Apple Computer does not support"
+
+    shell_cmd = 'systemctl status gitea | grep loaded | grep "enabled;"'
+    data = mw.execShell(shell_cmd)
+    if data[0] == '':
+        return 'fail'
+    return 'ok'
 
 
 def initdInstall():
-    import shutil
-    if not app_debug:
-        os_name = mw.getOs()
-        if os_name == 'darwin':
-            return "Apple Computer does not support"
+    if mw.isAppleSystem():
+        return "Apple Computer does not support"
 
-    mem_bin = initDreplace()
-    initd_bin = getInitDFile()
-    shutil.copyfile(mem_bin, initd_bin)
-    mw.execShell('chmod +x ' + initd_bin)
-    mw.execShell('chkconfig --add ' + getPluginName())
+    mw.execShell('systemctl enable gitea')
     return 'ok'
 
 
 def initdUinstall():
-    if not app_debug:
-        os_name = mw.getOs()
-        if os_name == 'darwin':
-            return "Apple Computer does not support"
-    initd_bin = getInitDFile()
-    os.remove(initd_bin)
-    mw.execShell('chkconfig --del ' + getPluginName())
+    if mw.isAppleSystem():
+        return "Apple Computer does not support"
+
+    mw.execShell('systemctl disable gitea')
     return 'ok'
 
 
 def runLog():
-    log_path = getServerDir() + '/log/gogs.log'
+    log_path = getServerDir() + '/log/gitea.log'
     return log_path
 
 
@@ -340,6 +384,10 @@ def postReceiveLog():
 
 
 def getGogsConf():
+    conf = getConf()
+    if not os.path.exists(conf):
+        return mw.returnJson(False, "请先安装初始化!<br/>默认地址:http://" + mw.getLocalIp() + ":3000")
+
     gets = [
         {'name': 'DOMAIN', 'type': -1, 'ps': '服务器域名'},
         {'name': 'ROOT_URL', 'type': -1, 'ps': '公开的完整URL路径'},
@@ -360,7 +408,7 @@ def getGogsConf():
         {'name': 'SHOW_FOOTER_VERSION', 'type': 2, 'ps': 'Gogs版本信息'},
         {'name': 'SHOW_FOOTER_TEMPLATE_LOAD_TIME', 'type': 2, 'ps': 'Gogs模板加载时间'},
     ]
-    conf = mw.readFile(getConf())
+    conf = mw.readFile(conf)
     result = []
 
     for g in gets:
@@ -370,7 +418,7 @@ def getGogsConf():
             continue
         g['value'] = tmp.groups()[0]
         result.append(g)
-    return mw.getJson(result)
+    return mw.returnJson(True, 'OK', result)
 
 
 def submitGogsConf():
@@ -402,18 +450,27 @@ def submitGogsConf():
 
 
 def userList():
+
+    conf = getConf()
+    if not os.path.exists(conf):
+        return mw.returnJson(False, "请先安装初始化!<br/>默认地址:http://" + mw.getLocalIp() + ":3000")
+
+    conf = getDbConfValue()
+    gtype = getGiteaDbType(conf)
+    if gtype != 'mysql':
+        return mw.returnJson(False, "仅支持mysql数据操作!")
+
     import math
     args = getArgs()
 
-    page = 1
-    page_size = 10
+    data = checkArgs(args, ['page', 'page_size'])
+    if not data[0]:
+        return data[1]
+
+    page = int(args['page'])
+    page_size = int(args['page_size'])
+    tojs = args['tojs']
     search = ''
-    if 'page' in args:
-        page = int(args['page'])
-
-    if 'page_size' in args:
-        page_size = int(args['page_size'])
-
     if 'search' in args:
         search = args['search']
 
@@ -421,17 +478,14 @@ def userList():
 
     data['root_url'] = getRootUrl()
 
-    pm = pMysqlDb()
     start = (page - 1) * page_size
-    list_count = pm.query('select count(id) as num from user')
-    count = list_count[0][0]
+    list_count = pQuery('select count(id) as num from user')
 
-    list_data = pm.query(
+    count = list_count[0]["num"]
+    list_data = pQuery(
         'select id,name,email from user order by id desc limit ' + str(start) + ',' + str(page_size))
-
-    page_info = {'count': count, 'p': page,
-                 'row': page_size, 'tojs': 'gogsUserList'}
-    data['list'] = mw.getPage(page_info)
+    data['list'] = mw.getPage(
+        {'count': count, 'p': page, 'row': page_size, 'tojs': tojs})
     data['page'] = page
     data['page_size'] = page_size
     data['page_count'] = int(math.ceil(count / page_size))
@@ -556,8 +610,8 @@ def projectScriptLoad():
 
     cc_content = mw.readFile(commit_tpl)
 
-    sshUrl = 'http://127.0.0.1:' + getHttpPort()
-    cc_content = cc_content.replace('{$GITROOTURL}', sshUrl)
+    gitPath = getRootPath()
+    cc_content = cc_content.replace('{$GITROOTURL}', gitPath)
     cc_content = cc_content.replace('{$CODE_DIR}', codeDir)
     cc_content = cc_content.replace('{$USERNAME}', user)
     cc_content = cc_content.replace('{$PROJECT}', args['name'])
@@ -570,11 +624,9 @@ def projectScriptLoad():
 
 def projectScriptUnload():
     args = getArgs()
-    if not 'user' in args:
-        return mw.returnJson(True, 'username missing')
-
-    if not 'name' in args:
-        return mw.returnJson(True, 'project name missing')
+    data = checkArgs(args, ['user', 'name'])
+    if not data[0]:
+        return data[1]
 
     user = args['user']
     name = args['name'] + '.git'
@@ -591,11 +643,10 @@ def projectScriptUnload():
 
 def projectScriptDebug():
     args = getArgs()
-    if not 'user' in args:
-        return mw.returnJson(True, 'username missing')
+    data = checkArgs(args, ['user', 'name'])
+    if not data[0]:
+        return data[1]
 
-    if not 'name' in args:
-        return mw.returnJson(True, 'project name missing')
     user = args['user']
     name = args['name'] + '.git'
     commit_log = getRootPath() + '/' + user + '/' + name + \
@@ -634,14 +685,8 @@ def getTotalStatistics():
     st = status()
     data = {}
     if st.strip() == 'start':
-        pm = pMysqlDb()
-        list_count = pm.query('select count(id) as num from repository')
-
-        if list_count.find("error") > -1:
-            data['status'] = False
-            data['count'] = 0
-            return mw.returnJson(False, 'fail', data)
-
+        list_count = pQuery('select count(id) as num from repository')
+        count = list_count[0]["num"]
         data['status'] = True
         data['count'] = count
         data['ver'] = mw.readFile(getServerDir() + '/version.pl').strip()

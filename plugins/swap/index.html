@@ -3,7 +3,7 @@
 		<div class="bt-w-menu">
 			<p class="bgw" onclick="pluginService('swap');">服务</p>
 			<p onclick="pluginInitD('swap');">自启动</p>
-			<!-- <p onclick="pluginConfig('swap');">配置修改</p> -->
+			<p onclick="swapStatus();">配置调整</p>
 			<p onclick="readme();">说明</p>
 		</div>
 		<div class="bt-w-con pd15">
@@ -11,15 +11,9 @@
 		</div>
 	</div>
 </div>
+
 <script type="text/javascript">
-pluginService('swap');
-
-
-function readme(){
-    var readme = '<ul class="help-info-text c7">';
-    readme += '<li>dd if=/dev/zero of=/www/server/swap/swapfile bs=1M count=2048</li>';
-    readme += '<li>mkswap /www/server/swap/swapfile</li>';
-    readme += '</ul>';
-    $('.soft-man-con').html(readme);
-}
+$.getScript( "/plugins/file?name=swap&f=js/swap.js", function(){
+	pluginService('swap');
+});
 </script>

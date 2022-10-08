@@ -414,10 +414,10 @@ class crontab_api:
             script_dir = mw.getServerDir() + "/mdserver-web/scripts"
 
             wheres = {
-                'path': head + "python " + script_dir + "/backup.py path " + param['sname'] + " " + str(param['save']),
-                'site':   head + "python " + script_dir + "/backup.py site " + param['sname'] + " " + str(param['save']),
-                'database': head + "python " + script_dir + "/backup.py database " + param['sname'] + " " + str(param['save']),
-                'logs':   head + "python " + script_dir + "/logs_backup.py " + param['sname'] + log + " " + str(param['save']),
+                'path': head + "python3 " + script_dir + "/backup.py path " + param['sname'] + " " + str(param['save']),
+                'site':   head + "python3 " + script_dir + "/backup.py site " + param['sname'] + " " + str(param['save']),
+                'database': head + "python3 " + script_dir + "/backup.py database " + param['sname'] + " " + str(param['save']),
+                'logs':   head + "python3 " + script_dir + "/logs_backup.py " + param['sname'] + log + " " + str(param['save']),
                 'rememory': head + "/bin/bash " + script_dir + '/rememory.sh'
             }
             if param['backup_to'] != 'localhost':
