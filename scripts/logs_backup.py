@@ -15,7 +15,7 @@ if sys.platform != 'darwin':
 
 chdir = os.getcwd()
 sys.path.append(chdir + '/class/core')
-reload(sys)
+importlib.reload(sys)
 sys.setdefaultencoding('utf-8')
 
 import mw
