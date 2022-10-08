@@ -784,7 +784,7 @@ function loadKeyDataCount(){
                 }
                 var html = '<li class="sys-li-box col-xs-3 col-sm-3 col-md-3 col-lg-3">\
                             <p class="name f15 c9">'+pname+'</p>\
-                            <div class="val"><a class="btlink" onclick="softMain(\''+pname+'\',\''+rdata['ver']+'\',\''+rdata['data']['ver']+'\')">'+rdata['data']['count']+'</a></div></li>';
+                            <div class="val"><a class="btlink" onclick="softMain(\''+pname+'\',\''+pname+'\',\''+rdata['data']['ver']+'\')">'+rdata['data']['count']+'</a></div></li>';
                 $('#index_overview').append(html);
             },'json');
         }
