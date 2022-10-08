@@ -577,7 +577,10 @@ end
 function waf()
     min_route()
 
+    -- white ip
     if waf_ip_white() then return true end
+
+    -- black ip
     waf_ip_black()
 
 
