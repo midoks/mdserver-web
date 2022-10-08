@@ -830,7 +830,6 @@ def getSafeLogs():
         return data[1]
 
     path = getServerDir() + '/logs'
-
     file = path + '/' + args['siteName'] + '_' + args['toDate'] + '.log'
     if not os.path.exists(file):
         return mw.returnJson(False, "文件不存在!")
