@@ -22,12 +22,25 @@ from random import Random
 TEST_URL = "http://t1.cn/"
 
 
-def httpGet(url, timeout):
+def httpGet(url, timeout=10):
     import urllib.request
 
     try:
         req = urllib.request.urlopen(url, timeout=timeout)
         result = req.read().decode('utf-8')
+        return result
+
+    except Exception as e:
+        return str(e)
+
+
+def httpGet__UA(url, ua, timeout=10):
+    import urllib.request
+    headers = {'user-agent': ua}
+    try:
+        req = urllib.request.Request(url, headers=headers)
+        response = urllib.request.urlopen(req)
+        result = response.read().decode('utf-8')
         return result
 
     except Exception as e:
@@ -74,15 +87,57 @@ def httpPost(url, data, timeout=10):
 
 
 def test_Dir():
+    '''
+    目录保存
+    '''
     url = TEST_URL + '?t=../etc/passwd'
     print("args test start")
-    httpGet(url, 10)
+    url_val = httpGet(url, 10)
+    # print(url_val)
     print("args test end")
+
+
+def test_UA():
+    '''
+    user-agent 过滤
+    '''
+    url = TEST_URL
+    print("user-agent test start")
+    url_val = httpGet__UA(url, 'ApacheBench')
+    print(url_val)
+    print("user-agent test end")
+
+
+def test_POST():
+    '''
+    user-agent 过滤
+    '''
+    url = TEST_URL
+    print("POST test start")
+    url_val = httpPost(url, {'data': "substr($mmsss,0,1)"})
+    # url_val = httpPost(url, {'data': "123123"})
+    print(url_val)
+    print("POST test end")
+
+
+def test_scan():
+    '''
+    目录保存
+    '''
+    url = TEST_URL + '/acunetix_wvs_security_test?t=1'
+    print("scan test start")
+    url_val = httpGet(url, 10)
+    print(url_val)
+    print("scan test end")
 
 
 def test_start():
     test_Dir()
+    test_UA()
+    test_POST()
+    test_scan()
 
 
 if __name__ == "__main__":
+    os.system('cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/op_waf && sh install.sh uninstall 0.1 && sh install.sh install 0.1')
     test_start()

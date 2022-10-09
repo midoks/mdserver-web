@@ -222,6 +222,10 @@ def initDreplace():
     if not os.path.exists(logs_path):
         mw.execShell('mkdir -p ' + logs_path)
 
+    debug_log = path + '/debug.log'
+    if not os.path.exists(debug_log):
+        mw.execShell('echo "" > ' + debug_log)
+
     config = path + '/waf/config.json'
     content = mw.readFile(config)
     content = json.loads(content)
@@ -234,6 +238,11 @@ def initDreplace():
     content = mw.readFile(config)
     content = contentReplace(content)
     mw.writeFile(config, content)
+
+    config_common = path + "/waf/lua/common.lua"
+    content = mw.readFile(config_common)
+    content = contentReplace(content)
+    mw.writeFile(config_common, content)
 
     waf_conf = mw.getServerDir() + "/openresty/nginx/conf/luawaf.conf"
     waf_tpl = getPluginDir() + "/conf/luawaf.conf"

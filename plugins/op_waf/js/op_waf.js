@@ -28,7 +28,7 @@ function setRequestCode(ruleName, statusCode){
         title: "设置响应代码【" + ruleName + "】",
         area: '300px',
         shift: 5,
-        closeBtn: 2,
+        closeBtn: 1,
         shadeClose: true,
         content: '<div class="bt-form pd20 pb70">\
                     <div class="line">\
@@ -144,7 +144,7 @@ function setCcRule(cycle, limit, endtime, siteName, increase){
         type: 1,
         title: "设置CC规则",
         area: '540px',
-        closeBtn: 2,
+        closeBtn: 1,
         shadeClose: false,
         content: '<form class="bt-form pd20 pb70">\
                 <div class="line">\
@@ -184,7 +184,7 @@ function setRetry(retry_cycle, retry, retry_time, siteName) {
         type: 1,
         title: "设置恶意容忍规则",
         area: '500px',
-        closeBtn: 2,
+        closeBtn: 1,
         shadeClose: false,
         content: '<form class="bt-form pd20 pb70">\
                 <div class="line">\
@@ -339,7 +339,7 @@ function setObjConf(ruleName, type) {
             type: 1,
             title: "编辑规则【" + ruleName + "】",
             area: ['700px', '530px'],
-            closeBtn: 2,
+            closeBtn: 1,
             shadeClose: false,
             content: '<div class="pd15">\
                 <div style="border-bottom:#ccc 1px solid;margin-bottom:10px;padding-bottom:10px">\
@@ -405,7 +405,7 @@ function scanRule() {
             type: 1,
             title: "常用扫描器过滤规则",
             area: '650px',
-            closeBtn: 2,
+            closeBtn: 1,
             shadeClose: false,
             content: '<form class="bt-form pd20 pb70">\
                     <div class="line">\
@@ -571,7 +571,7 @@ function ipWhite(type) {
             type: 1,
             title: "管理IP白名单",
             area: ['500px', '500px'],
-            closeBtn: 2,
+            closeBtn: 1,
             shadeClose: false,
             content: '<div class="pd15 ipv4_list">\
                         <div style="border-bottom:#ccc 1px solid;margin-bottom:10px;padding-bottom:10px">\
@@ -714,7 +714,7 @@ function ipBlack(type) {
             type: 1,
             title: "管理IP黑名单",
             area: ['500px', '500px'],
-            closeBtn: 2,
+            closeBtn: 1,
             shadeClose: false,
             content: '<div class="tab_list"><div class="tab_block active">IPv4黑名单</div><div class="tab_block">IPv6黑名单</div></div>\
                 <div class="pd15 ipv4_block">\
@@ -824,7 +824,7 @@ function wafScreen(){
             <div class="line"><span class="name">CC攻击</span><span class="val">'+rdata.rules.cc+'</span></div>\
             <div class="line"><span class="name">恶意User-Agent</span><span class="val">'+rdata.rules.user_agent+'</span></div>\
             <div class="line"><span class="name">Cookie渗透</span><span class="val">'+rdata.rules.cookie+'</span></div>\
-            <div class="line"><span class="name">恶意扫描</span><span class="val">0</span></div>\
+            <div class="line"><span class="name">恶意扫描</span><span class="val">'+rdata.rules.scan+'</span></div>\
             <div class="line"><span class="name">恶意HEAD请求</span><span class="val">0</span></div>\
             <div class="line"><span class="name">URI自定义拦截</span><span class="val">'+rdata.rules.args+'</span></div>\
             <div class="line"><span class="name">URI保护</span><span class="val">'+rdata.rules.args+'</span></div>\
@@ -975,7 +975,7 @@ function siteWafLog(siteName) {
             type: 1,
             title: "日志【" + siteName + "】",
             area: ['880px', '500px'],
-            closeBtn: 2,
+            closeBtn: 1,
             shadeClose: false,
             content: '<div class="lib-box pd15 lib-box-log">\
                 <div class="lib-con-title" style="height:40px"><select id="selectLogDay" class="bt-input-text" onchange="siteLogCon(\''+ siteName + '\',this.options[this.options.selectedIndex].value,1)">' + selectLogDay + '</select></div>\
@@ -1071,7 +1071,7 @@ function siteLogCon(siteName, day, page) {
                 type: 1,
                 title: time + "详情",
                 area: '600px',
-                closeBtn: 2,
+                closeBtn: 1,
                 shadeClose: false,
                 content: '<div class="pd15 lib-box">\
                         <table class="table" style="border:#ddd 1px solid; margin-bottom:10px">\
@@ -1190,7 +1190,7 @@ function siteRuleAdmin(siteName, ruleName, type) {
             type: 1,
             title: "管理网站过滤规则【" + title + "】",
             area: ['500px', '500px'],
-            closeBtn: 2,
+            closeBtn: 1,
             shadeClose: false,
             content: '<div class="pd15">\
                 <div style="border-bottom:#ccc 1px solid;margin-bottom:10px;padding-bottom:10px">\
@@ -1237,7 +1237,7 @@ function cdnHeader(siteName, type) {
             type: 1,
             title: "管理网站【" + siteName + "】CDN-Headers",
             area: ['500px', '500px'],
-            closeBtn: 2,
+            closeBtn: 1,
             shadeClose: false,
             content: '<div class="pd15">\
                 <div style="border-bottom:#ccc 1px solid;margin-bottom:10px;padding-bottom:10px">\
@@ -1342,7 +1342,7 @@ function setSiteObjConf(siteName, ruleName, type) {
             type: 1,
             title: "编辑网站【" + siteName + "】规则【" + ruleName + "】",
             area: ['700px', '530px'],
-            closeBtn: 2,
+            closeBtn: 1,
             shadeClose: false,
             content: '<div class="pd15">\
                 <div class="divtable">\
@@ -1394,7 +1394,7 @@ function siteWafConfig(siteName, type) {
             type: 1,
             title: "网站配置【" + siteName + "】",
             area: ['700px', '500px'],
-            closeBtn: 2,
+            closeBtn: 1,
             shadeClose: false,
             content: '<div id="s_w_c"></div>'
         });

@@ -1,47 +1,27 @@
-
-local cpath = "{$WAF_PATH}/"
-local rpath = "{$WAF_PATH}/rule/"
-local logdir = "{$WAF_ROOT}/logs/"
 local json = require "cjson"
 local ngx_match = ngx.re.find
 
-local _C = require "common"
-local C = _C:new(cpath, rpath, logdir)
+local __C = require "common"
+local C = __C:new()
 
-config = C:read_file_body_decode(cpath .. 'config.json')
-local site_config = C:read_file_body_decode(cpath .. 'site.json')
+local waf_root = "{$WAF_ROOT}"
+
+config = C:read_file_body_decode(waf_root.."/waf/"..'config.json')
+local site_config = C:read_file_body_decode(waf_root.."/waf/"..'site.json')
 C:setConfData(config, site_config)
 
--- D func
-local function D(msg)
-    local _msg = ''
-    if type(msg) == 'table' then
-        for key, val in pairs(msg) do
-            _msg = key..':'..val.."\n"
-        end
-    elseif type(msg) == 'string' then
-        _msg = msg
-     elseif type(msg) == 'nil' then
-        _msg = 'nil'
-    else
-        _msg = msg
-    end
 
-    if not debug_mode then return true end
-    local fp = io.open(cpath..'debug.log', 'ab')
-    if fp == nil then
-        return nil
-    end
-    local localtime = os.date("%Y-%m-%d %H:%M:%S")
-    if server_name then
-        fp:write(tostring(_msg) .. "\n")
-    else
-        fp:write(localtime..":"..tostring(_msg) .. "\n")
-    end
-    fp:flush()
-    fp:close()
-    return true
-end
+
+local get_html = C:read_file_body(config["reqfile_path"] .. '/' .. config["get"]["reqfile"])
+local post_html = C:read_file_body(config["reqfile_path"] .. '/' .. config["post"]["reqfile"])
+local user_agent_html = C:read_file_body(config["reqfile_path"] .. '/' .. config["user-agent"]["reqfile"])
+local args_rules = C:read_file_table('args')
+local ip_white_rules = C:read_file('ip_white')
+local ip_black_rules = C:read_file('ip_black')
+local scan_black_rules = C:read_file('scan_black')
+local user_agent_rules = C:read_file('user_agent')
+local post_rules = C:read_file('post')
+
 
 function initParams()
     local data = {}
@@ -53,13 +33,14 @@ function initParams()
     data['uri_request_args'] = ngx.req.get_uri_args()
     data['method'] = ngx.req.get_method()
     data['request_uri'] = ngx.var.request_uri
+    data['cookie'] = ngx.var.http_cookie
     return data
 end
 
 local params = initParams()
 C:setParams(params)
 
-
+C:setDebug(true)
 
 function get_return_state(rstate,rmsg)
     result = {}
@@ -102,7 +83,7 @@ function save_ip_on(data)
     end
 end
 
-function remove_btwaf_drop_ip()
+function remove_waf_drop_ip()
     if not uri_request_args['ip'] or not C:is_ipaddr(uri_request_args['ip']) then return get_return_state(true,'格式错误') end
     if ngx.shared.btwaf:get(cpath2 .. 'stop_ip') then
         ret=ngx.shared.btwaf:get(cpath2 .. 'stop_ip')
@@ -125,7 +106,7 @@ function remove_btwaf_drop_ip()
     return get_return_state(true,uri_request_args['ip'] .. '已解封')
 end
 
-function clean_btwaf_drop_ip()
+function clean_waf_drop_ip()
     if ngx.shared.btwaf:get(cpath2 .. 'stop_ip') then
         ret2=ngx.shared.btwaf:get(cpath2 .. 'stop_ip')
         ip_data2=json.decode(ret2)
@@ -154,14 +135,6 @@ function min_route()
         return_message(200,clean_waf_drop_ip())
     end
 end
-
-local get_html = C:read_file_body(config["reqfile_path"] .. '/' .. config["get"]["reqfile"])
-local post_html = C:read_file_body(config["reqfile_path"] .. '/' .. config["post"]["reqfile"])
-local user_agent_html = C:read_file_body(config["reqfile_path"] .. '/' .. config["user-agent"]["reqfile"])
-local args_rules = C:read_file_table('args')
-local ip_white_rules = C:read_file('ip_white')
-local ip_black_rules = C:read_file('ip_black')
-local scan_black_rules = C:read_file('scan_black')
 
 function waf_args()
     if not config['get']['open'] or not C:is_site_config('get') then return false end
@@ -208,9 +181,9 @@ end
 
 
 function waf_user_agent()
-    D("12312")
-    if not config['user-agent']['open'] or not C:is_site_config('user-agent') then return false end   
-    if C:is_ngx_match(user_agent_rules,params['request_header']['user-agent'],'user_agent') then
+    -- user_agent 过滤
+    if not config['user-agent']['open'] or not C:is_site_config('user-agent') then return false end
+    if C:is_ngx_match_ua(user_agent_rules,params['request_header']['user-agent']) then
         C:write_log('user_agent','regular')
         C:return_html(config['user-agent']['status'],user_agent_html)
         return true
@@ -288,20 +261,25 @@ end
 
 
 function waf_scan_black()
+    -- 扫描软件禁止
     if not config['scan']['open'] or not C:is_site_config('scan') then return false end
-    if C:is_ngx_match(scan_black_rules['cookie'],params["request_header"]["cookie"],false) then
+    if not params["cookie"] then
+        if C:ngx_match_string(scan_black_rules['cookie'], tostring(params["cookie"]),'scan') then
+            C:write_log('scan','regular')
+            ngx.exit(config['scan']['status'])
+            return true
+        end
+    end
+
+    if C:ngx_match_string(scan_black_rules['args'], params["request_uri"], 'scan') then
         C:write_log('scan','regular')
         ngx.exit(config['scan']['status'])
         return true
     end
-    if C:is_ngx_match(scan_black_rules['args'],params["request_uri"],false) then
-        C:write_log('scan','regular')
-        ngx.exit(config['scan']['status'])
-        return true
-    end
+
     for key,value in pairs(params["request_header"])
     do
-        if C:is_ngx_match(scan_black_rules['header'], key, false) then
+        if C:ngx_match_string(scan_black_rules['header'], key, 'scan') then
             C:write_log('scan','regular')
             ngx.exit(config['scan']['status'])
             return true
@@ -334,7 +312,19 @@ function waf_post()
         return false
     end
 
-    if C:is_ngx_match(post_rules,request_args,'post') then
+    for key, val in pairs(request_args) do
+        if type(val) == "table" then
+            if type(val[1]) == "boolean" then
+                return false
+            end
+            data = table.concat(val, ", ")
+        else
+            data = val
+        end
+        
+    end
+
+    if C:is_ngx_match_post(post_rules,data) then
         C:write_log('post','regular')
         C:return_html(config['post']['status'],post_html)
         return true
@@ -367,10 +357,11 @@ function  post_data_chekc()
         end
         
         if not list_list then return false end 
-        aaa=nil
+        
+        aaa = nil
         for k,v in pairs(request_args)
         do
-            aaa=v
+            aaa = v
         end
 
         if not aaa then return false end 
@@ -382,7 +373,7 @@ function  post_data_chekc()
         if not data_len then return false end
         if arrlen(data_len) ==0 then return false end
 
-        if C:is_ngx_match(post_rules,data_len,'post') then
+        if C:is_ngx_match_post(post_rules , data_len) then
             C:write_log('post','regular')
             C:return_html(config['post']['status'],post_html)
             return true
@@ -601,6 +592,8 @@ function waf()
     end
 
     waf_args()
+    
+    -- 扫描软件禁止
     waf_scan_black()
 
     waf_post()

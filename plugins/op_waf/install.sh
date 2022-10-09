@@ -19,12 +19,12 @@ Install_of(){
 	echo '0.1' > $serverPath/op_waf/version.pl
 	echo 'install ok' > $install_tmp
 
-	cd ${rootPath} && python3 plugins/op_waf/index.py start
+	cd ${rootPath} && python3 ${rootPath}/plugins/op_waf/index.py start
 }
 
 Uninstall_of(){
 
-	cd ${rootPath} && python3 plugins/op_waf/index.py stop
+	cd ${rootPath} && python3 ${rootPath}/plugins/op_waf/index.py stop
 	rm -rf $serverPath/op_waf
 }
 
