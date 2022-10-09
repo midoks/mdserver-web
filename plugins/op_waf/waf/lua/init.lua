@@ -398,7 +398,7 @@ end
 function post_X_Forwarded()
     if not config['post']['open'] or not C:is_site_config('post') then return false end   
     if params['method'] ~= "POST" then return false end
-    if C:is_ngx_match(post_rules,params["request_header"]['X-forwarded-For'],'post') then
+    if C:is_ngx_match_post(post_rules,params["request_header"]['X-forwarded-For']) then
         C:write_log('post','regular')
         C:return_html(config['post']['status'],post_html)
         return true
@@ -592,7 +592,7 @@ function waf()
     end
 
     waf_args()
-    
+
     -- 扫描软件禁止
     waf_scan_black()
 
