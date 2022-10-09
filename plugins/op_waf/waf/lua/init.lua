@@ -191,17 +191,31 @@ function waf_user_agent()
     return false
 end
 
-function cc()
+function waf_cc()
     local ip = params['ip']
     local request_uri = params['request_uri']
     local endtime = config['cc']['endtime']
 
-    if not config['cc']['open'] or not site_cc then return false end
+    if not config['cc']['open'] or not C:is_site_config('cc') then return false end
+
+    local ip_lock = ngx.shared.drop_ip:get(ip)
+    if ip_lock then
+        if ip_lock > 0 then
+            ngx.exit(config['cc']['status'])
+            return true
+        end
+    end
+
     local token = ngx.md5(ip .. '_' .. request_uri)
-    local count,_ = ngx.shared.limit:get(token)
+    local count = ngx.shared.limit:get(token)
+
+    local limit = config['cc']['limit']
+    local cycle = config['cc']['cycle']
+
     if count then
-        if count > limit then
-            local safe_count,_ = ngx.shared.drop_sum:get(ip)
+        if count > limit then 
+
+            local safe_count, _ = ngx.shared.drop_sum:get(ip)
             if not safe_count then
                 ngx.shared.drop_sum:set(ip,1,86400)
                 safe_count = 1
@@ -210,22 +224,19 @@ function cc()
             end
             local lock_time = (endtime * safe_count)
             if lock_time > 86400 then lock_time = 86400 end
-            ngx.shared.drop_ip:set(ip,retry+1,lock_time)
+
+            ngx.shared.drop_ip:set(ip,1,lock_time)
+
             C:write_log('cc',cycle..'秒内累计超过'..limit..'次请求,封锁' .. lock_time .. '秒')
             C:write_drop_ip('cc',lock_time)
-            if not server_name then
-                insert_ip_list(ip,lock_time,os.time(),'1111')
-            else
-                insert_ip_list(ip,lock_time,os.time(),server_name)
-            end
-            
+
             ngx.exit(config['cc']['status'])
             return true
         else
             ngx.shared.limit:incr(token,1)
         end
     else
-        ngx.shared.limit:set(token,1,cycle)
+        ngx.shared.limit:set(token, 1, cycle)
     end
 end
 
@@ -574,6 +585,9 @@ function waf()
 
     -- black ip
     waf_ip_black()
+
+    -- cc setting
+    waf_cc()
 
 
     waf_drop()

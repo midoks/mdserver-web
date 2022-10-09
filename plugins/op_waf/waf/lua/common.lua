@@ -208,7 +208,8 @@ end
 
 
 function _M.write_drop_ip(self, is_drop, drop_time)
-    local filename = self.cpath .. 'drop_ip.log'
+    local filename = self.logdir .. 'drop_ip.log'
+
     local fp = io.open(filename,'ab')
     local server_name = self.params["server_name"]
     local ip = self.params["server_name"]
@@ -378,6 +379,7 @@ end
 
 
 function _M.ngx_match_string(self, rules, content,sign)
+
     local t = self:is_ngx_match_orgin(rules, content, sign)
     if t then
         return true

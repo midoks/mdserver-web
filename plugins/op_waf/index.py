@@ -111,7 +111,7 @@ def initSiteInfo():
             tmp['log'] = True
             tmp['get'] = True
             tmp['post'] = True
-            tmp['open'] = False
+            tmp['open'] = True
 
             tmp['cc'] = config_contents['cc']
             tmp['retry'] = config_contents['retry']

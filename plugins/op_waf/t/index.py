@@ -20,6 +20,7 @@ from random import Random
 
 
 TEST_URL = "http://t1.cn/"
+# TEST_URL = "https://www.zzzvps.com/"
 
 
 def httpGet(url, timeout=10):
@@ -131,11 +132,26 @@ def test_scan():
     print("scan test end")
 
 
+def test_CC():
+    '''
+    目录保存
+    '''
+    url = TEST_URL + 'ok.txt'
+    print("CC test start")
+
+    for x in range(122):
+        url_val = httpGet(url, 10)
+        print(url_val)
+
+    print("CC test end")
+
+
 def test_start():
-    test_Dir()
-    test_UA()
-    test_POST()
-    test_scan()
+    # test_Dir()
+    # test_UA()
+    # test_POST()
+    # test_scan()
+    test_CC()
 
 
 if __name__ == "__main__":
