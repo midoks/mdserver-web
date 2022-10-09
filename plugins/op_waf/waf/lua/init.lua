@@ -208,6 +208,7 @@ end
 
 
 function waf_user_agent()
+    D("12312")
     if not config['user-agent']['open'] or not C:is_site_config('user-agent') then return false end   
     if C:is_ngx_match(user_agent_rules,params['request_header']['user-agent'],'user_agent') then
         C:write_log('user_agent','regular')
