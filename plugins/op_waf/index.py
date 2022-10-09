@@ -122,7 +122,22 @@ def initSiteInfo():
             tmp['scan'] = config_contents['scan']
 
             cdn_header = ['x-forwarded-for',
-                          'x-real-ip', 'HTTP_CF_CONNECTING_IP']
+                          'x-real-ip',
+                          'x-forwarded',
+                          'forwarded-for',
+                          'forwarded',
+                          'true-client-ip',
+                          'client-ip',
+                          'ali-cdn-real-ip',
+                          'cdn-src-ip',
+                          'cdn-real-ip',
+                          'cf-connecting-ip',
+                          'cf-connecting-ip',
+                          'x-cluster-client-ip',
+                          'wl-proxy-client-ip',
+                          'proxy-client-ip',
+                          'true-client-ip',
+                          'HTTP_CF_CONNECTING_IP']
             tmp['cdn_header'] = cdn_header
 
             disable_upload_ext = ["php", "jsp"]
