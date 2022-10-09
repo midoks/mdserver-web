@@ -68,6 +68,26 @@ function myAsyncPost(method,args){
     return syncPost('/plugins/run', {name:'mysql', func:method, args:_args}); 
 }
 
+function vaildPhpmyadmin(url,username,password){
+
+    console.log("Authorization: Basic " + btoa(username + ":" + password));
+    $.ajax({
+        type: "GET",
+        url: url,
+        dataType: 'json',
+        async: false,
+        username:username,
+        password:password,
+        headers: {
+            "Authorization": "Basic " + btoa(username + ":" + password)
+        },
+        data: 'vaild',
+        success: function (){
+            alert('Thanks for your comment!');
+        }
+    });
+}
+
 function runInfo(){
     myPost('run_info','',function(data){
 
@@ -818,16 +838,19 @@ function openPhpmyadmin(name,username,password){
         layer.msg('当前为[mariadb]模式,若要使用请切换模式.',{icon:2,shade: [0.3, '#000']});
         return;
     }
-    
-    // console.log(data);
+
+    var phpmyadmin_cfg = rdata;
     data = syncPost('/plugins/run',{'name':'phpmyadmin','func':'get_home_page'});
     var rdata = $.parseJSON(data.data);
     if (!rdata.status){
         layer.msg(rdata.msg,{icon:2,shade: [0.3, '#000']});
         return;
     }
-    $("#toPHPMyAdmin").attr('action',rdata.data);
+    var home_page = rdata.data;
 
+    home_page = home_page.replace("http://","http://"+phpmyadmin_cfg['username']+":"+phpmyadmin_cfg['password']+"@")
+
+    $("#toPHPMyAdmin").attr('action',home_page);
     if($("#toPHPMyAdmin").attr('action').indexOf('phpmyadmin') == -1){
         layer.msg('请先安装phpMyAdmin',{icon:2,shade: [0.3, '#000']});
         setTimeout(function(){ window.location.href = '/soft'; },3000);
@@ -836,7 +859,7 @@ function openPhpmyadmin(name,username,password){
 
     //检查版本
     data = syncPost('/plugins/run',{'name':'phpmyadmin','func':'version'});
-    bigVer = data.data.split('.')[0]
+    bigVer = data.data.split('.')[0];
     if (bigVer>=4.5){
 
         setTimeout(function(){
