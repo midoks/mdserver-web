@@ -186,9 +186,10 @@ def changeSwap():
     size = args['size']
     swapOp('stop')
 
-    cmd = 'dd if=/dev/zero of=' + getServerDir() + '/swapfile bs=1M count=' + size
-    cmd += ' && mkswap ' + getServerDir() + '/swapfile && chmod 600 ' + \
-        getServerDir() + '/swapfile'
+    gsdir = getServerDir()
+
+    cmd = 'dd if=/dev/zero of=' + gsdir + '/swapfile bs=1M count=' + size
+    cmd += ' && mkswap ' + gsdir + '/swapfile && chmod 600 ' + gsdir + '/swapfile'
     msg = mw.execShell(cmd)
     swapOp('start')
 
