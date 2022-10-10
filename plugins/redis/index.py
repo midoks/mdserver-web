@@ -167,9 +167,15 @@ def runInfo():
     if tmp:
         requirepass = tmp.groups()[1]
 
-    cmd = getServerDir() + "/bin/redis-cli info"
+    default_ip = '0.0.0.0'
+    findDebian = mw.execShell('cat /etc/issue |grep Debian')
+    if findDebian[0] != '':
+        default_ip = mw.getLocalIp()
+
+    cmd = getServerDir() + "/bin/redis-cli -h " + default_ip + " info"
     if requirepass != "":
-        cmd = getServerDir() + '/bin/redis-cli -a "' + requirepass + '" info'
+        cmd = getServerDir() + '/bin/redis-cli -h ' + default_ip + \
+            ' -a "' + requirepass + '" info'
 
     data = mw.execShell(cmd)[0]
     res = [
