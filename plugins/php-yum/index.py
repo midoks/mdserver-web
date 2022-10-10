@@ -617,13 +617,13 @@ def setSessionConf(version):
                             '\n;session.save_path = "' + session_tmp + '"' + val, phpini)
 
     mw.writeFile(filename, phpini)
-    reload(version)
+    restart(version)
     return mw.returnJson(True, '设置成功!')
 
 
 def getSessionCount_Origin(version):
     session_tmp = getServerDir() + "/tmp/session"
-    d = [session_tmp]
+    d = ["/tmp", session_tmp]
     count = 0
     for i in d:
         if not os.path.exists(i):
