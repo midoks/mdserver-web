@@ -154,6 +154,10 @@ def reload():
 
 
 def runInfo():
+    s = status()
+    if s == 'stop':
+        return mw.returnJson(False, '未启动')
+
     requirepass = ""
 
     conf = getServerDir() + '/redis.conf'
