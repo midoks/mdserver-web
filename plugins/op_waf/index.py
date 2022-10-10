@@ -178,6 +178,7 @@ def initTotalInfo():
             tmp['get'] = 0
             tmp['post'] = 0
             tmp['total'] = 0
+            tmp['url_ext'] = 0
             _name = {}
             _name[name] = tmp
             total_contents['sites'] = _name

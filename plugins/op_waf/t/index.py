@@ -145,15 +145,26 @@ def test_CC():
 
     print("CC test end")
 
-    # 7FKnElusaEqY0qIc
+
+def test_url_ext():
+    '''
+    目录保存
+    '''
+    url = TEST_URL + 't.sql'
+    print("url_ext start")
+    url_val = httpGet(url, 10)
+    print(url_val)
+
+    print("url_ext end")
 
 
 def test_start():
-    test_Dir()
-    test_UA()
+    # test_Dir()
+    # test_UA()
     # test_POST()
     # test_scan()
     # test_CC()
+    test_url_ext()
 
 
 if __name__ == "__main__":

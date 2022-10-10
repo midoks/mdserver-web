@@ -43,6 +43,10 @@ C:setParams(params)
 
 C:setDebug(true)
 
+local server_name = params["server_name"]
+
+C:D(server_name)
+
 function get_return_state(rstate,rmsg)
     result = {}
     result['status'] = rstate
@@ -412,39 +416,39 @@ function post_X_Forwarded()
 end
 
 
-function php_path()
-    if site_config[server_name] == nil then return false end
-    for _,rule in ipairs(site_config[server_name]['disable_php_path'])
-    do
-        if ngx_match(uri,rule .. "/?.*\\.php$","isjo") then
-            C:write_log('php_path','regular')
-            C:return_html(config['other']['status'],other_html)
-            return C:return_message(200,uri)
-        end
-    end
-    return false
-end
+-- function php_path()
+--     if site_config[server_name] == nil then return false end
+--     for _,rule in ipairs(site_config[server_name]['disable_php_path'])
+--     do
+--         if C:ngx_match_string(params['uri'],rule .. "/?.*\\.php$","isjo") then
+--             C:write_log('php_path','regular')
+--             C:return_html(config['other']['status'],other_html)
+--             return C:return_message(200,uri)
+--         end
+--     end
+--     return false
+-- end
 
-function url_path()
-    if site_config[server_name] == nil then return false end
-    for _,rule in ipairs(site_config[server_name]['disable_path'])
-    do
-        if ngx_match(uri,rule,"isjo") then
-            C:write_log('path','regular')
-            C:return_html(config['other']['status'],other_html)
-            return true
-        end
-    end
-    return false
-end
+-- function url_path()
+--     if site_config[server_name] == nil then return false end
+--     for _,rule in ipairs(site_config[server_name]['disable_path'])
+--     do
+--         if ngx_match(uri,rule,"isjo") then
+--             C:write_log('path','regular')
+--             C:return_html(config['other']['status'],other_html)
+--             return true
+--         end
+--     end
+--     return false
+-- end
 
 function url_ext()
     if site_config[server_name] == nil then return false end
     for _,rule in ipairs(site_config[server_name]['disable_ext'])
     do
-        if ngx_match(uri,"\\."..rule.."$","isjo") then
+        if C:ngx_match_string("\\."..rule.."$", params['uri'],'url_ext') then
             C:write_log('url_ext','regular')
-            C:return_html(config['other']['status'],other_html)
+            C:return_html(config['other']['status'], other_html)
             return true
         end
     end
@@ -571,7 +575,6 @@ function waf()
     if waf_ip_black() then return true end
 
 
-
     -- cc setting
     if waf_drop() then return true end
     if waf_cc() then return true end
@@ -581,26 +584,24 @@ function waf()
     if waf_url() then return true end
 
     -- cookie检查
-    waf_cookie()
+    if waf_cookie() then return true end
     
     -- args参数拦截
-    waf_get_args()
+    if waf_get_args() then return true end
 
     -- 扫描软件禁止
-    waf_scan_black()
+    if waf_scan_black() then return true end
 
-    waf_post()
-    post_data_chekc()
-
-    local server_name = params["server_name"]
+    if waf_post() then return true end
+    if post_data_chekc() then return true end
+    
     if site_config[server_name] then
-        X_Forwarded()
-        post_X_Forwarded()
-        php_path()
-        url_path()
-        url_ext()
-        url_rule_ex()
-        url_tell()
+        if X_Forwarded() then return true end
+        if post_X_Forwarded() then return true end
+        -- url_path()
+        if url_ext() then return true end
+        -- url_rule_ex()
+        -- url_tell()
         post_data()
     end
 end
