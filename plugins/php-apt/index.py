@@ -617,7 +617,7 @@ def setSessionConf(version):
 
 def getSessionCount_Origin(version):
     session_tmp = getServerDir() + "/tmp/session"
-    d = [session_tmp]
+    d = ["/tmp", session_tmp]
     count = 0
     for i in d:
         if not os.path.exists(i):
