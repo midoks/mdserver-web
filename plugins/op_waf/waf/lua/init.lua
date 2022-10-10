@@ -127,7 +127,7 @@ function clean_waf_drop_ip()
 end
 
 function min_route()
-    -- if ngx.var.remote_addr ~= '127.0.0.1' then return false end
+    if ngx.var.remote_addr ~= '127.0.0.1' then return false end
     if uri == '/get_waf_drop_ip' then
         return_message(200,get_waf_drop_ip())
     elseif uri == '/remove_waf_drop_ip' then
