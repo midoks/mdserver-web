@@ -621,7 +621,7 @@ def setSessionConf(version):
 
 def getSessionCount_Origin(version):
     session_tmp = getServerDir() + "/tmp/session"
-    d = ["/tmp", session_tmp]
+    d = ["/tmp", "/var/lib/php/sessions", session_tmp]
     count = 0
     for i in d:
         if not os.path.exists(i):
