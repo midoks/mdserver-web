@@ -829,7 +829,7 @@ function wafScreen(){
             <div class="line"><span class="name">URI自定义拦截</span><span class="val">'+rdata.rules.args+'</span></div>\
             <div class="line"><span class="name">URI保护</span><span class="val">'+rdata.rules.args+'</span></div>\
             <div class="line"><span class="name">恶意文件上传</span><span class="val">0</span></div>\
-            <div class="line"><span class="name">禁止的扩展名</span><span class="val">0</span></div>\
+            <div class="line"><span class="name">禁止的扩展名</span><span class="val">'+rdata.rules.url_ext+'</span></div>\
             <div class="line"><span class="name">禁止PHP脚本</span><span class="val">0</span></div>\
             </div>';
 
