@@ -190,6 +190,11 @@ mw_update_dev()
     curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update_dev.sh | bash
 }
 
+mw_install_app()
+{
+    bash $mw_path/scripts/quick/app.sh
+}
+
 case "$1" in
     'start') mw_start;;
     'stop') mw_stop;;
@@ -207,6 +212,7 @@ case "$1" in
     'logs') error_logs;;
     'update') mw_update;;
     'update_dev') mw_update_dev;;
+    'install_app') mw_install_app;;
     'default')
         cd $mw_path
         port=7200
