@@ -378,13 +378,25 @@ function _M.is_ngx_match_orgin(self,rule,match, sign)
 end
 
 
-function _M.ngx_match_string(self, rules, content,sign)
-
-    local t = self:is_ngx_match_orgin(rules, content, sign)
+function _M.ngx_match_string(self, rule, content,sign)
+    local t = self:is_ngx_match_orgin(rule, content, sign)
     if t then
         return true
     end
   
+    return false
+end
+
+function _M.ngx_match_list(self, rules, content)
+    for i,rule in ipairs(rules)
+    do
+        if rule[1] == 1 then
+            local t = self:is_ngx_match_orgin(rule[2], content, rule[3])
+            if t then
+                return true
+            end
+        end
+    end
     return false
 end
 
@@ -477,7 +489,7 @@ function _M.write_log(self, name, rule)
     else
         ngx.shared.drop_ip:set(ip,1,retry_cycle)
     end
-    
+
     if self.config['log'] ~= true or self:is_site_config('log') ~= true then return false end
     local method = ngx.req.get_method()
     if error_rule then 

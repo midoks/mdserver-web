@@ -553,7 +553,7 @@ function waf_cookie()
     if not params["request_header"]['cookie'] then return false end
     if type(params["request_header"]['cookie']) ~= "string" then return false end
     request_cookie = string.lower(params["request_header"]['cookie'])
-    if C:is_ngx_match(cookie_rules,request_cookie,'cookie') then
+    if C:ngx_match_list(cookie_rules,request_cookie,'cookie') then
         C:write_log('cookie','regular')
         C:return_html(config['cookie']['status'],cookie_html)
         return true
