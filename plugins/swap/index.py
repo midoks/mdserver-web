@@ -117,7 +117,7 @@ def swapOp(method):
             return 'ok'
         return 'fail'
 
-    data = mw.execShell(file + ' start')
+    data = mw.execShell(file + ' ' + method)
     if data[1] == '':
         return 'ok'
     return 'fail'
