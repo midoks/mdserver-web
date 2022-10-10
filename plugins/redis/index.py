@@ -125,7 +125,7 @@ def redisOp(method):
         data = mw.execShell('systemctl ' + method + ' redis')
         if data[1] == '':
             return 'ok'
-        return 'fail'
+        return data[1]
 
     data = mw.execShell(file + ' start')
     if data[1] == '':

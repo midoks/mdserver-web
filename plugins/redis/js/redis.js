@@ -69,11 +69,10 @@ function redisStatus(version) {
 
     redisPost('run_info',version, {},function(data){
         var rdata = $.parseJSON(data.data);
-        if (!rdata.status){
-            layer.msg(data.msg,{icon:0,time:2000,shade: [0.3, '#000']});
-            return;
-        }
-
+        // if (!rdata.status){
+        //     layer.msg(data.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+        //     return;
+        // }
 
         hit = (parseInt(rdata.keyspace_hits) / (parseInt(rdata.keyspace_hits) + parseInt(rdata.keyspace_misses)) * 100).toFixed(2);
         var con = '<div class="divtable">\
