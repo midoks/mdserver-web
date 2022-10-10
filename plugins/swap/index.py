@@ -136,7 +136,7 @@ def restart():
 
 
 def reload():
-    return swapOp('reload')
+    return 'ok'
 
 
 def initdStatus():
