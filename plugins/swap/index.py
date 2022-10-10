@@ -185,14 +185,16 @@ def changeSwap():
 
     size = args['size']
     swapOp('stop')
-    os.system('dd if=/dev/zero of=' + getServerDir() +
-              '/swapfile bs=1M count=' + size)
 
-    os.system('mkswap ' + getServerDir() + '/swapfile')
-    os.system('chmod 600 ' + getServerDir() + '/swapfile')
+    cmd = 'dd if=/dev/zero of=' + getServerDir() + '/swapfile bs=1M count=' + size
+    msg = mw.execShell(cmd)
+
+    cmd = 'mkswap ' + getServerDir() + '/swapfile && chmod 600 ' + \
+        getServerDir() + '/swapfile'
+    os.system(cmd)
     swapOp('start')
 
-    return mw.returnJson(True, "修改成功!")
+    return mw.returnJson(True, "修改成功!" + msg[0])
 
 if __name__ == "__main__":
     func = sys.argv[1]
