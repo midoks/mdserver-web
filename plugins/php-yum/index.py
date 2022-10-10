@@ -492,6 +492,176 @@ def getFpmStatus(version):
     return mw.returnJson(True, "OK", data)
 
 
+def getSessionConf(version):
+    filename = getConf(version)
+    if not os.path.exists(filename):
+        return mw.returnJson(False, '指定PHP版本不存在!')
+
+    phpini = mw.readFile(filename)
+
+    rep = r'session.save_handler\s*=\s*([0-9A-Za-z_& ~]+)(\s*;?|\r?\n)'
+    save_handler = re.search(rep, phpini)
+    if save_handler:
+        save_handler = save_handler.group(1)
+    else:
+        save_handler = "files"
+
+    reppath = r'\nsession.save_path\s*=\s*"tcp\:\/\/([\d\.]+):(\d+).*\r?\n'
+    passrep = r'\nsession.save_path\s*=\s*"tcp://[\w\.\?\:]+=(.*)"\r?\n'
+    memcached = r'\nsession.save_path\s*=\s*"([\d\.]+):(\d+)"'
+    save_path = re.search(reppath, phpini)
+    if not save_path:
+        save_path = re.search(memcached, phpini)
+    passwd = re.search(passrep, phpini)
+    port = ""
+    if passwd:
+        passwd = passwd.group(1)
+    else:
+        passwd = ""
+    if save_path:
+        port = save_path.group(2)
+        save_path = save_path.group(1)
+
+    else:
+        save_path = ""
+
+    data = {"save_handler": save_handler, "save_path": save_path,
+            "passwd": passwd, "port": port}
+    return mw.returnJson(True, 'ok', data)
+
+
+def setSessionConf(version):
+
+    args = getArgs()
+
+    ip = args['ip']
+    port = args['port']
+    passwd = args['passwd']
+    save_handler = args['save_handler']
+
+    if save_handler != "file":
+        iprep = r"(2(5[0-5]{1}|[0-4]\d{1})|[0-1]?\d{1,2})\.(2(5[0-5]{1}|[0-4]\d{1})|[0-1]?\d{1,2})\.(2(5[0-5]{1}|[0-4]\d{1})|[0-1]?\d{1,2})\.(2(5[0-5]{1}|[0-4]\d{1})|[0-1]?\d{1,2})"
+        if not re.search(iprep, ip):
+            return mw.returnJson(False, '请输入正确的IP地址')
+
+        try:
+            port = int(port)
+            if port >= 65535 or port < 1:
+                return mw.returnJson(False, '请输入正确的端口号')
+        except:
+            return mw.returnJson(False, '请输入正确的端口号')
+        prep = r"[\~\`\/\=]"
+        if re.search(prep, passwd):
+            return mw.returnJson(False, '请不要输入以下特殊字符 " ~ ` / = "')
+
+    filename = getConf(version)
+    if not os.path.exists(filename):
+        return mw.returnJson(False, '指定PHP版本不存在!')
+    phpini = mw.readFile(filename)
+
+    session_tmp = getServerDir() + "/tmp/session"
+
+    rep = r'session.save_handler\s*=\s*(.+)\r?\n'
+    val = r'session.save_handler = ' + save_handler + '\n'
+    phpini = re.sub(rep, val, phpini)
+
+    if save_handler == "memcached":
+        if not re.search("memcached.so", phpini):
+            return mw.returnJson(False, '请先安装%s扩展' % save_handler)
+        rep = r'\nsession.save_path\s*=\s*(.+)\r?\n'
+        val = r'\nsession.save_path = "%s:%s" \n' % (ip, port)
+        if re.search(rep, phpini):
+            phpini = re.sub(rep, val, phpini)
+        else:
+            phpini = re.sub('\n;session.save_path = "' + session_tmp + '"',
+                            '\n;session.save_path = "' + session_tmp + '"' + val, phpini)
+
+    if save_handler == "memcache":
+        if not re.search("memcache.so", phpini):
+            return mw.returnJson(False, '请先安装%s扩展' % save_handler)
+        rep = r'\nsession.save_path\s*=\s*(.+)\r?\n'
+        val = r'\nsession.save_path = "%s:%s" \n' % (ip, port)
+        if re.search(rep, phpini):
+            phpini = re.sub(rep, val, phpini)
+        else:
+            phpini = re.sub('\n;session.save_path = "' + session_tmp + '"',
+                            '\n;session.save_path = "' + session_tmp + '"' + val, phpini)
+
+    if save_handler == "redis":
+        if not re.search("redis.so", phpini):
+            return mw.returnJson(False, '请先安装%s扩展' % save_handler)
+        if passwd:
+            passwd = "?auth=" + passwd
+        else:
+            passwd = ""
+        rep = r'\nsession.save_path\s*=\s*(.+)\r?\n'
+        val = r'\nsession.save_path = "tcp://%s:%s%s"\n' % (ip, port, passwd)
+        res = re.search(rep, phpini)
+        if res:
+            phpini = re.sub(rep, val, phpini)
+        else:
+            phpini = re.sub('\n;session.save_path = "' + session_tmp + '"',
+                            '\n;session.save_path = "' + session_tmp + '"' + val, phpini)
+
+    if save_handler == "file":
+        rep = r'\nsession.save_path\s*=\s*(.+)\r?\n'
+        val = r'\nsession.save_path = "' + session_tmp + '"\n'
+        if re.search(rep, phpini):
+            phpini = re.sub(rep, val, phpini)
+        else:
+            phpini = re.sub('\n;session.save_path = "' + session_tmp + '"',
+                            '\n;session.save_path = "' + session_tmp + '"' + val, phpini)
+
+    mw.writeFile(filename, phpini)
+    reload(version)
+    return mw.returnJson(True, '设置成功!')
+
+
+def getSessionCount_Origin(version):
+    session_tmp = getServerDir() + "/tmp/session"
+    d = [session_tmp]
+    count = 0
+    for i in d:
+        if not os.path.exists(i):
+            mw.execShell('mkdir -p %s' % i)
+        list = os.listdir(i)
+        for l in list:
+            if os.path.isdir(i + "/" + l):
+                l1 = os.listdir(i + "/" + l)
+                for ll in l1:
+                    if "sess_" in ll:
+                        count += 1
+                continue
+            if "sess_" in l:
+                count += 1
+
+    s = "find /tmp -mtime +1 |grep 'sess_' | wc -l"
+    old_file = int(mw.execShell(s)[0].split("\n")[0])
+
+    s = "find " + session_tmp + " -mtime +1 |grep 'sess_'|wc -l"
+    old_file += int(mw.execShell(s)[0].split("\n")[0])
+    return {"total": count, "oldfile": old_file}
+
+
+def getSessionCount(version):
+    data = getSessionCount_Origin(version)
+    return mw.returnJson(True, 'ok!', data)
+
+
+def cleanSessionOld(version):
+    s = "find /tmp -mtime +1 |grep 'sess_'|xargs rm -f"
+    mw.execShell(s)
+
+    session_tmp = getServerDir() + "/tmp/session"
+    s = "find " + session_tmp + " -mtime +1 |grep 'sess_' |xargs rm -f"
+    mw.execShell(s)
+    old_file_conf = getSessionCount_Origin(version)["oldfile"]
+    if old_file_conf == 0:
+        return mw.returnJson(True, '清理成功')
+    else:
+        return mw.returnJson(True, '清理失败')
+
+
 def getDisableFunc(version):
     filename = getConf(version)
     if not os.path.exists(filename):
@@ -689,6 +859,14 @@ if __name__ == "__main__":
         print(setFpmConfig(version))
     elif func == 'get_fpm_status':
         print(getFpmStatus(version))
+    elif func == 'get_session_conf':
+        print(getSessionConf(version))
+    elif func == 'set_session_conf':
+        print(setSessionConf(version))
+    elif func == 'get_session_count':
+        print(getSessionCount(version))
+    elif func == 'clean_session_old':
+        print(cleanSessionOld(version))
     elif func == 'get_disable_func':
         print(getDisableFunc(version))
     elif func == 'set_disable_func':

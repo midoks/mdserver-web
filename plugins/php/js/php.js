@@ -444,7 +444,9 @@ function getSessionConfig(version){
             $('#clean_func').click(function(){
                 phpPost('clean_session_old', version, '', function(ret_data){
                     var rdata = $.parseJSON(ret_data.data);
-                    layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });  
+                    showMsg(rdata.msg,function(){
+                        getSessionConfig(version);
+                    },{ icon: rdata.status ? 1 : 2 });
                 });
             });
         });
