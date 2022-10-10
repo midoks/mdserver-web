@@ -21,6 +21,7 @@ local ip_black_rules = C:read_file('ip_black')
 local scan_black_rules = C:read_file('scan_black')
 local user_agent_rules = C:read_file('user_agent')
 local post_rules = C:read_file('post')
+local cookie_rules = C:read_file('cookie')
 
 
 function initParams()
@@ -88,15 +89,15 @@ function remove_waf_drop_ip()
     if ngx.shared.btwaf:get(cpath2 .. 'stop_ip') then
         ret=ngx.shared.btwaf:get(cpath2 .. 'stop_ip')
         ip_data=json.decode(ret)
-        result=is_chekc_table(ip_data,uri_request_args['ip'])
+        result = is_chekc_table(ip_data,uri_request_args['ip'])
         os.execute("sleep " .. 0.6)
         ret2=ngx.shared.btwaf:get(cpath2 .. 'stop_ip')
-        ip_data2=json.decode(ret2)
+        ip_data2 = json.decode(ret2)
         if result == 3 then
             for k,v in pairs(ip_data2)
             do
                 if uri_request_args['ip'] == v['ip'] then 
-                    v['time']=0
+                    v['time'] = 0
                 end
             end
         end
@@ -126,7 +127,7 @@ function clean_waf_drop_ip()
 end
 
 function min_route()
-    if ngx.var.remote_addr ~= '127.0.0.1' then return false end
+    -- if ngx.var.remote_addr ~= '127.0.0.1' then return false end
     if uri == '/get_waf_drop_ip' then
         return_message(200,get_waf_drop_ip())
     elseif uri == '/remove_waf_drop_ip' then
@@ -136,7 +137,7 @@ function min_route()
     end
 end
 
-function waf_args()
+function waf_get_args()
     if not config['get']['open'] or not C:is_site_config('get') then return false end
     if C:is_ngx_match(args_rules, params['uri_request_args'],'args') then
         C:write_log('args','regular')
@@ -169,17 +170,6 @@ function waf_ip_black()
 end
 
 
-function waf_drop()
-    local count,_ = ngx.shared.drop_ip:get(ip)
-    if not count then return false end
-    if count > config['retry'] then
-        ngx.exit(config['cc']['status'])
-        return true
-    end
-    return false
-end
-
-
 function waf_user_agent()
     -- user_agent 过滤
     if not config['user-agent']['open'] or not C:is_site_config('user-agent') then return false end
@@ -191,12 +181,19 @@ function waf_user_agent()
     return false
 end
 
+
+function waf_drop()
+    local count , _ = ngx.shared.drop_ip:get(ip)
+    if not count then return false end
+    if count > config['retry'] then
+        ngx.exit(config['cc']['status'])
+        return true
+    end
+    return false
+end
+
 function waf_cc()
     local ip = params['ip']
-    local request_uri = params['request_uri']
-    local endtime = config['cc']['endtime']
-
-    if not config['cc']['open'] or not C:is_site_config('cc') then return false end
 
     local ip_lock = ngx.shared.drop_ip:get(ip)
     if ip_lock then
@@ -205,6 +202,12 @@ function waf_cc()
             return true
         end
     end
+
+    if not config['cc']['open'] or not C:is_site_config('cc') then return false end
+
+
+    local request_uri = params['request_uri']
+    local endtime = config['cc']['endtime']
 
     local token = ngx.md5(ip .. '_' .. request_uri)
     local count = ngx.shared.limit:get(token)
@@ -225,19 +228,21 @@ function waf_cc()
             local lock_time = (endtime * safe_count)
             if lock_time > 86400 then lock_time = 86400 end
 
+            -- lock_time = 10
             ngx.shared.drop_ip:set(ip,1,lock_time)
 
             C:write_log('cc',cycle..'秒内累计超过'..limit..'次请求,封锁' .. lock_time .. '秒')
             C:write_drop_ip('cc',lock_time)
-
             ngx.exit(config['cc']['status'])
             return true
         else
             ngx.shared.limit:incr(token,1)
         end
     else
+        ngx.shared.drop_sum:set(ip,1,86400)
         ngx.shared.limit:set(token, 1, cycle)
     end
+    return false
 end
 
 --强制验证是否使用正常浏览器访问网站
@@ -295,16 +300,6 @@ function waf_scan_black()
             ngx.exit(config['scan']['status'])
             return true
         end
-    end
-    return false
-end
-
-function waf_post_referer()
-    if params['method'] ~= "POST" then return false end
-    if C:is_ngx_match(referer_local, params['request_header']['Referer'],'post') then
-        C:write_log('post_referer','regular')
-        C:return_html(config['post']['status'],post_html)
-        return true
     end
     return false
 end
@@ -566,16 +561,6 @@ function waf_cookie()
     return false
 end
 
-function waf_referer()
-    if params["method"] ~= "GET" then return false end
-    if not config['get']['open'] or not C:is_site_config('get') then return false end
-    if C:is_ngx_match(referer_local,params["request_header"]['Referer'],'args') then
-        C:write_log('get_referer','regular')
-        C:return_html(config['get']['status'], get_html)
-        return true
-    end
-    return false
-end
 
 function waf()
     min_route()
@@ -584,28 +569,23 @@ function waf()
     if waf_ip_white() then return true end
 
     -- black ip
-    waf_ip_black()
+    if waf_ip_black() then return true end
+
+
 
     -- cc setting
-    waf_cc()
+    if waf_drop() then return true end
+    if waf_cc() then return true end
 
+    -- ua check
+    if waf_user_agent() then return true end
+    if waf_url() then return true end
 
-    waf_drop()
-    waf_user_agent()
-
-    waf_url()
-
-    if params["method"] == "GET" then
-        waf_referer()  
-        waf_cookie()
-    end
-
-    if params["method"] == "POST" then
-        waf_referer()
-        waf_cookie()
-    end
-
-    waf_args()
+    -- cookie检查
+    waf_cookie()
+    
+    -- args参数拦截
+    waf_get_args()
 
     -- 扫描软件禁止
     waf_scan_black()

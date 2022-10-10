@@ -254,6 +254,9 @@ def initDreplace():
     initSiteInfo()
     initTotalInfo()
 
+    if not mw.isAppleSystem():
+        mw.execShell("chown -R www:www " + path)
+
 
 def start():
     initDreplace()

@@ -477,6 +477,7 @@ function _M.write_log(self, name, rule)
     else
         ngx.shared.drop_ip:set(ip,1,retry_cycle)
     end
+    
     if self.config['log'] ~= true or self:is_site_config('log') ~= true then return false end
     local method = ngx.req.get_method()
     if error_rule then 

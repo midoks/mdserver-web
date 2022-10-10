@@ -147,13 +147,14 @@ def test_CC():
 
 
 def test_start():
-    # test_Dir()
-    # test_UA()
+    test_Dir()
+    test_UA()
     # test_POST()
     # test_scan()
-    test_CC()
+    # test_CC()
 
 
 if __name__ == "__main__":
     os.system('cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/op_waf && sh install.sh uninstall 0.1 && sh install.sh install 0.1')
+    os.system('cd /Users/midoks/Desktop/mwdev/server/mdserver-web/ && python3 plugins/openresty/index.py stop && python3 plugins/openresty/index.py start')
     test_start()
