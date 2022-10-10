@@ -193,7 +193,7 @@ def changeSwap():
     msg = mw.execShell(cmd)
     swapOp('start')
 
-    return mw.returnJson(True, "修改成功!:" + msg[0])
+    return mw.returnJson(True, "修改成功:\n" + msg[0])
 
 if __name__ == "__main__":
     func = sys.argv[1]
