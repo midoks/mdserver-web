@@ -577,8 +577,8 @@ def setSessionConf(version):
         if re.search(rep, phpini):
             phpini = re.sub(rep, val, phpini)
         else:
-            phpini = re.sub('\n;session.save_path = "' + session_tmp + '"',
-                            '\n;session.save_path = "' + session_tmp + '"' + val, phpini)
+            phpini = re.sub('\n;session.save_path = "/tmp"',
+                            '\n;session.save_path = "/tmp"' + val, phpini)
 
     if save_handler == "memcache":
         if not content.find("memcache.so") > -1:
@@ -588,8 +588,8 @@ def setSessionConf(version):
         if re.search(rep, phpini):
             phpini = re.sub(rep, val, phpini)
         else:
-            phpini = re.sub('\n;session.save_path = "' + session_tmp + '"',
-                            '\n;session.save_path = "' + session_tmp + '"' + val, phpini)
+            phpini = re.sub('\n;session.save_path = "/tmp"',
+                            '\n;session.save_path = "/tmp"' + val, phpini)
 
     if save_handler == "redis":
         if not content.find("redis.so") > -1:
@@ -604,8 +604,8 @@ def setSessionConf(version):
         if res:
             phpini = re.sub(rep, val, phpini)
         else:
-            phpini = re.sub('\n;session.save_path = "' + session_tmp + '"',
-                            '\n;session.save_path = "' + session_tmp + '"' + val, phpini)
+            phpini = re.sub('\n;session.save_path = "/tmp"',
+                            '\n;session.save_path = "/tmp"' + val, phpini)
 
     if save_handler == "file":
         rep = r'\nsession.save_path\s*=\s*(.+)\r?\n'
@@ -613,8 +613,8 @@ def setSessionConf(version):
         if re.search(rep, phpini):
             phpini = re.sub(rep, val, phpini)
         else:
-            phpini = re.sub('\n;session.save_path = "' + session_tmp + '"',
-                            '\n;session.save_path = "' + session_tmp + '"' + val, phpini)
+            phpini = re.sub('\n;session.save_path = "/tmp"',
+                            '\n;session.save_path = "/tmp"' + val, phpini)
 
     mw.writeFile(filename, phpini)
     restart(version)
