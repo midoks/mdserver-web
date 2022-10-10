@@ -565,8 +565,12 @@ def setSessionConf(version):
     val = r'session.save_handler = ' + save_handler + '\n'
     phpini = re.sub(rep, val, phpini)
 
+    content = mw.execShell('cat /etc/opt/remi/php' +
+                           version + "/php.d/* | grep -v '^;' |tr -s '\n'")
+    content = content[0]
+
     if save_handler == "memcached":
-        if not re.search("memcached.so", phpini):
+        if not content.find("memcached.so") > -1:
             return mw.returnJson(False, '请先安装%s扩展' % save_handler)
         rep = r'\nsession.save_path\s*=\s*(.+)\r?\n'
         val = r'\nsession.save_path = "%s:%s" \n' % (ip, port)
@@ -577,7 +581,7 @@ def setSessionConf(version):
                             '\n;session.save_path = "' + session_tmp + '"' + val, phpini)
 
     if save_handler == "memcache":
-        if not re.search("memcache.so", phpini):
+        if not content.find("memcache.so") > -1:
             return mw.returnJson(False, '请先安装%s扩展' % save_handler)
         rep = r'\nsession.save_path\s*=\s*(.+)\r?\n'
         val = r'\nsession.save_path = "%s:%s" \n' % (ip, port)
@@ -588,7 +592,7 @@ def setSessionConf(version):
                             '\n;session.save_path = "' + session_tmp + '"' + val, phpini)
 
     if save_handler == "redis":
-        if not re.search("redis.so", phpini):
+        if not content.find("redis.so") > -1:
             return mw.returnJson(False, '请先安装%s扩展' % save_handler)
         if passwd:
             passwd = "?auth=" + passwd
