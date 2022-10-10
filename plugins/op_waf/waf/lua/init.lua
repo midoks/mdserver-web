@@ -307,7 +307,6 @@ end
 function waf_post()
     if not config['post']['open'] or not C:is_site_config('post') then return false end   
     if params['method'] ~= "POST" then return false end
-    if waf_post_referer() then return true end
     content_length = tonumber(params["request_header"]['content-length'])
     max_len = 640 * 1020000
     if content_length > max_len then return false end
