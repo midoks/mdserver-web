@@ -187,11 +187,9 @@ def changeSwap():
     swapOp('stop')
 
     cmd = 'dd if=/dev/zero of=' + getServerDir() + '/swapfile bs=1M count=' + size
-    msg = mw.execShell(cmd)
-
-    cmd = 'mkswap ' + getServerDir() + '/swapfile && chmod 600 ' + \
+    cmd += ' && mkswap ' + getServerDir() + '/swapfile && chmod 600 ' + \
         getServerDir() + '/swapfile'
-    os.system(cmd)
+    msg = mw.execShell(cmd)
     swapOp('start')
 
     return mw.returnJson(True, "修改成功!:" + msg[0])
