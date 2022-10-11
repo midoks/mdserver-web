@@ -525,6 +525,7 @@ function _M.get_real_ip(self, server_name)
             local request_header = self.params["request_header"]
             for _,v in ipairs(self.site_config[server_name]['cdn_header'])
             do
+                self:D("client_ip[for]:"..tostring(request_header[v]))
                 if request_header[v] ~= nil and request_header[v] ~= "" then
                     local header_tmp = request_header[v]
                     if type(header_tmp) == "table" then header_tmp = header_tmp[1] end
