@@ -24,13 +24,17 @@ local post_rules = C:read_file('post')
 local cookie_rules = C:read_file('cookie')
 
 
+local server_name = string.gsub(C:get_server_name(),'_','.')
+
+
+-- C:D("sss:"..C:get_server_name())
 function initParams()
     local data = {}
-    data['ip'] = C:get_client_ip()
-    data['ipn'] = C:arrip(data['ip'])
+    data['server_name'] = server_name
+    -- data['ip'] = C:get_client_ip()
+    -- data['ipn'] = C:arrip(data['ip'])
     data['request_header'] = ngx.req.get_headers()
     data['uri'] = ngx.unescape_uri(ngx.var.uri)
-    data['server_name'] = string.gsub(C:get_server_name(),'_','.')
     data['uri_request_args'] = ngx.req.get_uri_args()
     data['method'] = ngx.req.get_method()
     data['request_uri'] = ngx.var.request_uri
@@ -40,11 +44,11 @@ end
 
 local params = initParams()
 C:setParams(params)
-
 C:setDebug(true)
 
 local server_name = params["server_name"]
-
+params['ip'] = C:get_client_ip()
+params['ipn'] = C:arrip(params['ip'])
 C:D(server_name)
 
 function get_return_state(rstate,rmsg)
@@ -595,7 +599,7 @@ function waf()
     if waf_post() then return true end
     if post_data_chekc() then return true end
     
-    if site_config[server_name] then
+    if site_config[server_name]['open'] then
         if X_Forwarded() then return true end
         if post_X_Forwarded() then return true end
         -- url_path()

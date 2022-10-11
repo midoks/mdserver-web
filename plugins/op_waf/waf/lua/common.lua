@@ -23,8 +23,10 @@ function _M.new(self)
         logdir = logdir,
         config = '',
         site_config = '',
+        server_name = '',
         params = nil
     }
+
     return setmetatable(self, mt)
 end
 
@@ -364,10 +366,6 @@ function _M.get_server_name(self)
 end
 
 
--- function _M.get_sn(self)
---     retun string.gsub(self:get_server_name(),'_','.')
--- end
-
 
 function _M.is_ngx_match_orgin(self,rule,match, sign)
     if ngx_match(ngx.unescape_uri(match), rule,"isjo") then
@@ -522,10 +520,13 @@ end
 
 function _M.get_client_ip(self)
     local client_ip = "unknown"
+    local server_name = self.params['server_name']
+    -- self:D("fff..."..client_ip..server_name)
     if self.site_config[server_name] then
         if self.site_config[server_name]['cdn'] then
             for _,v in ipairs(self.site_config[server_name]['cdn_header'])
             do
+                -- C:D("vv:"..v..tostring(request_header[v]))
                 if request_header[v] ~= nil and request_header[v] ~= "" then
                     local header_tmp = request_header[v]
                     if type(header_tmp) == "table" then header_tmp = header_tmp[1] end
@@ -546,7 +547,6 @@ end
 
 
 function _M.is_site_config(self,cname)
-    local server_name = self.params["server_name"]
     if self.site_config[server_name] ~= nil then
         if cname == 'cc' then
             return self.site_config[server_name][cname]['open']
