@@ -120,6 +120,7 @@ def initSiteInfo():
             tmp['user-agent'] = config_contents['user-agent']
             tmp['cookie'] = config_contents['cookie']
             tmp['scan'] = config_contents['scan']
+            tmp['safe_verify'] = config_contents['safe_verify']
 
             cdn_header = ['x-forwarded-for',
                           'x-real-ip',
@@ -668,6 +669,30 @@ def setRetry():
     return mw.returnJson(True, '设置成功!', [])
 
 
+def setSafeVerify():
+    args = getArgs()
+    data = checkArgs(args, ['auto', 'time', 'cpu'])
+    if not data[0]:
+        return data[1]
+
+    conf = getJsonPath('config')
+    content = mw.readFile(conf)
+    cobj = json.loads(content)
+
+    cobj['safe_verify']['time'] = args['time']
+    cobj['safe_verify']['cpu'] = args['cpu']
+
+    if args['auto'] == '0':
+        cobj['safe_verify']['auto'] = False
+    else:
+        cobj['safe_verify']['auto'] = True
+
+    cjson = mw.getJson(cobj)
+    mw.writeFile(conf, cjson)
+
+    return mw.returnJson(True, '设置成功!', [])
+
+
 def setSiteRetry():
     return mw.returnJson(True, '设置成功-?!', [])
 
@@ -997,6 +1022,8 @@ if __name__ == "__main__":
         print(setSiteCcConf())
     elif func == 'set_retry':
         print(setRetry())
+    elif func == 'set_safe_verify':
+        print(setSafeVerify())
     elif func == 'set_site_retry':
         print(setSiteRetry())
     elif func == 'save_scan_rule':

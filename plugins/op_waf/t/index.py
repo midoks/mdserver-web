@@ -182,14 +182,26 @@ def test_url_ext():
     print("url_ext end")
 
 
+def test_OK():
+    '''
+    目录保存
+    '''
+    url = TEST_URL
+    print("ok test start")
+    url_val = httpGet(url, 10)
+    print(url_val)
+    print("ok test end")
+
+
 def test_start():
+    test_OK()
     # test_Dir()
     # test_UA()
     # test_POST()
     # test_scan()
     # test_CC()
     # test_url_ext()
-    test_cdn()
+    # test_cdn()
 
 
 if __name__ == "__main__":

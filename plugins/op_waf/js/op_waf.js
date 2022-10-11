@@ -69,8 +69,10 @@ function setObjOpen(ruleName){
     owPost('set_obj_open', {obj:ruleName},function(data){
         var rdata = $.parseJSON(data.data);
         if (rdata.status){
-            layer.msg(rdata.msg,{icon:0,time:2000,shade: [0.3, '#000']});
-            wafGloabl();
+
+            showMsg(rdata.msg, function(){
+                wafGloabl();
+            },{icon:1,time:2000,shade: [0.3, '#000']},2000);
         } else {
             layer.msg('设置失败!',{icon:0,time:2000,shade: [0.3, '#000']});
         }
@@ -84,7 +86,7 @@ function saveCcRule(siteName,is_open_global, type) {
     if(type == 2){
         // set_aicc_open('start');
         increase = "0";
-    }else{
+    } else {
         // set_aicc_open('stop');
         increase = type;
     }
@@ -164,7 +166,10 @@ function setCcRule(cycle, limit, endtime, siteName, increase){
                     <li>请不要设置过于严格的CC规则,以免影响正常用户体验</li>\
                     <li><font style="color:red;display:'+ (siteName == 'undefined'?'display: inline-block;':'none') +';">全局应用:全局设置当前CC规则，且覆盖当前全部站点的CC规则</font></li>\
                 </ul>\
-                <div class="bt-form-submit-btn"><button type="button" class="btn btn-danger btn-sm btn_cc_all" style="margin-right:10px;display:'+ (siteName == 'undefined'?'display: inline-block;':'none') +';">全局应用</button><button type="button" class="btn btn-success btn-sm btn_cc_present">应用</button></div>\
+                <div class="bt-form-submit-btn">\
+                    <button type="button" class="btn btn-danger btn-sm btn_cc_all" style="margin-right:10px;display:'+ (siteName == 'undefined'?'display: inline-block;':'none') +';">全局应用</button>\
+                    <button type="button" class="btn btn-success btn-sm btn_cc_present">应用</button>\
+                </div>\
             </form>',
             success:function(layero,index){
                 $('.btn_cc_all').click(function(){
@@ -201,9 +206,12 @@ function setRetry(retry_cycle, retry, retry_time, siteName) {
                 </div>\
                 <ul class="help-info-text c7 ptb10">\
                     <li><font style="color:red;">'+ retry_cycle + '</font> 秒内累计恶意请求超过  <font style="color:red;">' + retry + '</font> 次,封锁 <font style="color:red;">' + retry_time + '</font> 秒</li>\
-                    <li><font style="color:red;">全局应用:全局设置当前恶意容忍规则，且覆盖当前全部站点的恶意容忍规则</li>\
+                    <li><font style="color:red;">全局应用:全局设置当前恶意容忍规则，且覆盖当前全部站点的恶意容忍规则</font></li>\
                 </ul>\
-                <div class="bt-form-submit-btn"><button type="button" class="btn btn-danger btn-sm btn_retry_all" style="margin-right:10px;display:'+ (siteName == undefined?'inline-block;':'none') +';">全局应用</button><button type="button" class="btn btn-success btn-sm btn_retry_present">应用</button></div>\
+                <div class="bt-form-submit-btn">\
+                    <button type="button" class="btn btn-danger btn-sm btn_retry_all" style="margin-right:10px;display:'+ (siteName == undefined?'inline-block;':'none') +';">全局应用</button>\
+                    <button type="button" class="btn btn-success btn-sm btn_retry_present">应用</button>\
+                </div>\
             </form>',
         success:function(){
             $('.btn_retry_all').click(function(){
@@ -213,6 +221,65 @@ function setRetry(retry_cycle, retry, retry_time, siteName) {
                 saveRetry(siteName,0);
             });
         }
+    });
+}
+
+
+
+//设置safe_verify规则
+function setSafeVerify(auto, cpu, time, siteName) {
+    var svlayer = layer.open({
+        type: 1,
+        title: "设置强制安全验证",
+        area: '500px',
+        closeBtn: 1,
+        shadeClose: false,
+        content: '<form class="bt-form pd20 pb70">\
+                <div class="line">\
+                    <span class="tname">CPU</span>\
+                    <div class="info-r"><input class="bt-input-text" name="cpu" type="number" max-number="100" value="'+ cpu + '" /> %</div>\
+                </div>\
+                <div class="line">\
+                    <span class="tname">通行时间</span>\
+                    <div class="info-r"><input class="bt-input-text" name="time" type="number" value="'+ time + '" /> 秒</div>\
+                </div>\
+                <div class="line">\
+                    <span class="tname">开启自动</span>\
+                    <div class="info-r">\
+                        <select class="bt-input-text mr5" style="width:80px" name="auto">\
+                        <option value="0" '+(auto==false?"selected=selected":"")+'>关闭</option>\
+                        <option value="1" '+(auto==true?"selected=selected":"")+'>开启</option>\
+                    </select>\
+                </div>\
+                </div>\
+                <ul class="help-info-text c7 ptb10">\
+                    <li><font style="color:red;">全局设置强制安全验证</font></li>\
+                    <li>开启自动后:cpu超过['+cpu+'%]后，强制验证。</li>\
+                </ul>\
+                <div class="bt-form-submit-btn">\
+                    <button type="button" class="btn btn-success btn-sm btn_sv_present">应用</button>\
+                </div>\
+            </form>',
+        success:function(index){
+            $('.btn_sv_present').click(function(){
+                var pdata = {
+                    siteName: siteName,
+                    cpu: $("input[name='cpu']").val(),
+                    auto: $("select[name='auto']").val(),
+                    time: $("input[name='time']").val(),
+                }
+                var act = 'set_safe_verify';
+                owPost(act, pdata, function(data){
+                    var rdata = $.parseJSON(data.data);
+                    showMsg(rdata.msg, function() {
+                       layer.close(svlayer);
+                       wafGloabl();
+                    },{ icon: rdata.status ? 1 : 2 },1000);
+                });
+            });   
+
+            
+        },
     });
 }
 
@@ -253,15 +320,6 @@ function addRule(ruleName) {
             },1000);
         }
     });
-
-    // var loadT = layer.msg('正在添加，请稍候..', { icon: 16, time: 0 });
-    // $.post('/plugin?action=a&name=btwaf&s=add_rule', pdata, function (rdata) {
-    //     layer.close(loadT);
-    //     layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
-    //     if (rdata.status) {
-    //         set_obj_conf(ruleName, 1);
-    //     }
-    // });
 }
 
 function modifyRule(index, ruleName) {
@@ -877,6 +935,16 @@ function wafGloabl(){
                         <td><a class="btlink" onclick="setRequestCode(\'cc\','+ rdata.cc.status + ')">' + rdata.cc.status + '</a></td>\
                         <td style="text-align: center;">--</td>\
                         <td class="text-right"><a class="btlink" onclick="setRetry('+ rdata.retry.retry_cycle + ',' + rdata.retry.retry + ',' + rdata.retry.retry_time + ')">初始规则</a></td>\
+                    </tr>\
+                    <tr>\
+                        <td>强制安全验证</td>\
+                        <td>'+rdata.safe_verify.ps+'</td>\
+                        <td>--</td>\
+                        <td style="text-align: center;"><div class="ssh-item">\
+                            <input class="btswitch btswitch-ios" id="close_safe_verify" type="checkbox" '+(rdata.safe_verify.open ? 'checked' : '')+'>\
+                            <label class="btswitch-btn" for="close_safe_verify" onclick="setObjOpen(\'safe_verify\')"></label></div>\
+                        </td>\
+                        <td class="text-right"><a class="btlink" onclick="setSafeVerify('+ rdata.safe_verify.auto + ',' + rdata.safe_verify.cpu + ',' + rdata.safe_verify.time + ')">设置</a> | <a class="btlink" href="javascript:;" onclick="onlineEditFile(0,\''+rdata['reqfile_path']+'/safe_js.html\')">响应内容</a></td>\
                     </tr>\
                     <tr>\
                         <td>GET-URI过滤</td>\
@@ -1612,10 +1680,7 @@ function wafSite(){
 
 
 
-function wafHistory(){
-    
-
-    
+function wafHistory(){    
     var con = '<button class="btn btn-success btn-sm" onclick="UncoverAll()">解封所有</button>';
     con += '<div class="divtable mt10">\
         <table class="table table-hover waftable" style="color:#fff;">\

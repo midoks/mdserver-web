@@ -15,6 +15,7 @@ C:setDebug(true)
 local get_html = C:read_file_body(config["reqfile_path"] .. '/' .. config["get"]["reqfile"])
 local post_html = C:read_file_body(config["reqfile_path"] .. '/' .. config["post"]["reqfile"])
 local user_agent_html = C:read_file_body(config["reqfile_path"] .. '/' .. config["user-agent"]["reqfile"])
+local cc_safe_js_html = C:read_file_body(config["reqfile_path"] .. '/' .. config["cc"]["reqfile"])
 local args_rules = C:read_file_table('args')
 local ip_white_rules = C:read_file('ip_white')
 local ip_black_rules = C:read_file('ip_black')
@@ -57,6 +58,25 @@ function get_waf_drop_ip()
     return data
 end
 
+
+math.randomseed(os.time())
+ 
+function get_random(n) 
+    local t = {
+        "0","1","2","3","4","5","6","7","8","9",
+        "a","b","c","d","e","f","g","h","i","j",
+        "k","l","m","n","o","p","q","r","s","t",
+        "u","v","w","x","y","z",
+        "A","B","C","D","E","F","G","H","I","J",
+        "K","L","M","N","O","P","Q","R","S","T",
+        "U","V","W","X","Y","Z",
+    }    
+    local s = ""
+    for i =1, n do
+        s = s .. t[math.random(#t)]        
+    end
+    return s
+end
 
 function is_chekc_table(data,strings)
     if type(data) ~= 'table' then return 1 end 
@@ -258,22 +278,47 @@ function waf_cc()
     return false
 end
 
+-- 是否符合开强制验证条件
+function is_open_waf_cc_increase()
+
+    if config['safe_verify']['open'] then
+        return true
+    end
+
+    if site_config[server_name]['safe_verify']['open'] then
+        return true
+    end
+    return false
+end
+
+
 --强制验证是否使用正常浏览器访问网站
 function waf_cc_increase()
-    
-    if not config['cc']['open'] or not site_cc then return false end
-    if not site_config[server_name] then return false end
-    if not site_config[server_name]['cc']['increase'] then return false end
+    local ip = params['ip']
+    local uri = params['uri']
+
+    if not is_open_waf_cc_increase() then return false end
     local cache_token = ngx.md5(ip .. '_' .. server_name)
+
     --判断是否已经通过验证
-    if ngx.shared.btwaf:get(cache_token) then  return false end
-    if cc_uri_white() then
-        ngx.shared.btwaf:delete(cache_token .. '_key')
-        ngx.shared.btwaf:set(cache_token,1,60)
-        return false 
+    if ngx.shared.limit:get(cache_token) then return false end
+
+    local cache_rand_key = ip..':rand'
+    local cache_rand = ngx.shared.limit:get(cache_rand_key)
+    if not cache_rand then 
+        cache_rand = get_random(8)
+        ngx.shared.limit:set(cache_rand_key,cache_rand,10)
     end
-    if security_verification() then return false end
-    send_check_heml(cache_token)
+
+    make_uri_str = "unbind_"..cache_rand.."_"..cache_token
+    make_uri = "/"..make_uri_str
+    if uri == make_uri then
+        ngx.shared.limit:set(cache_token,1, config['safe_verify']['time'])
+        C:return_message(200, get_return_state(0,'ok'))
+    end
+
+    local cc_html = string.gsub(cc_safe_js_html, "{uri}", make_uri_str)
+    C:return_html(200, cc_html)
 end
 
 
@@ -586,6 +631,7 @@ function waf()
 
     -- cc setting
     if waf_drop() then return true end
+    if waf_cc_increase() then return true end
     if waf_cc() then return true end
 
     -- ua check
