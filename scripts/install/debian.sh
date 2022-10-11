@@ -30,7 +30,6 @@ apt install -y expect
 apt install -y locate
 locale-gen en_US.UTF-8
 localedef -v -c -i en_US -f UTF-8 en_US.UTF-8
-sudo localedef -i en_US -f UTF-8 en_US.UTF-8
 
 if [ ! -d /root/.acme.sh ];then	
 	curl  https://get.acme.sh | sh
@@ -113,9 +112,11 @@ apt install -y libxpm-dev
 apt install -y libwebp-dev
 apt install -y libfreetype6-dev
 
+
+sudo localedef -i en_US -f UTF-8 en_US.UTF-8
+
 cd /www/server/mdserver-web/scripts && bash lib.sh
 chmod 755 /www/server/mdserver-web/data
-
 
 
 cd /www/server/mdserver-web && ./cli.sh start
