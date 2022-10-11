@@ -48,6 +48,19 @@ def httpGet__UA(url, ua, timeout=10):
         return str(e)
 
 
+def httpGet__cdn(url, ip, timeout=10):
+    import urllib.request
+    headers = {'x-forwarded-for': ip}
+    try:
+        req = urllib.request.Request(url, headers=headers)
+        response = urllib.request.urlopen(req)
+        result = response.read().decode('utf-8')
+        return result
+
+    except Exception as e:
+        return str(e)
+
+
 def httpPost(url, data, timeout=10):
     """
     发送POST请求
@@ -109,6 +122,17 @@ def test_UA():
     print("user-agent test end")
 
 
+def test_cdn():
+    '''
+    user-agent 过滤
+    '''
+    url = TEST_URL
+    print("cdn test start")
+    url_val = httpGet__cdn(url, '2409:8a62:e20:95f0:45b7:233e:f003:c0ab')
+    print(url_val)
+    print("cdn test end")
+
+
 def test_POST():
     '''
     user-agent 过滤
@@ -165,6 +189,7 @@ def test_start():
     # test_scan()
     # test_CC()
     test_url_ext()
+    # test_cdn()
 
 
 if __name__ == "__main__":

@@ -255,7 +255,7 @@ function _M.array_len(self, arr)
 end
 
 function _M.is_ipaddr(self, client_ip)
-    local cipn = split(client_ip,'.')
+    local cipn = self:split_bylog(client_ip,'.')
     if self:array_len(cipn) < 4 then return false end
     for _,v in ipairs({1,2,3,4})
     do
@@ -515,59 +515,38 @@ function _M.write_log(self, name, rule)
     self:inc_log(name,rule)
 end
 
+function _M.split_bylog(self,str,reps )
+    local resultStrList = {}
+    string.gsub(str,'[^'..reps..']+',function(w) table.insert(resultStrList,w) end)
+    return resultStrList
+end
+
 
 function _M.get_real_ip(self, server_name)
     local client_ip = "unknown"
-    self:D("client_ip[0]:"..client_ip)
     if self.site_config[server_name] then
         if self.site_config[server_name]['cdn'] then
             local request_header = ngx.req.get_headers()
-            self:D("ipheader[rr]:"..self:to_json(request_header))
             for _,v in ipairs(self.site_config[server_name]['cdn_header'])
             do
-                self:D("client_ip[for]:"..tostring(request_header[v]))
                 if request_header[v] ~= nil and request_header[v] ~= "" then
                     local header_tmp = request_header[v]
                     if type(header_tmp) == "table" then header_tmp = header_tmp[1] end
-                    client_ip = split(header_tmp,',')[1]
+                    client_ip = self:split_bylog(header_tmp,',')[1]
                     break;
                 end
             end 
         end
     end
 
-    self:D("client_ip[cf]:"..client_ip)
-    if string.match(client_ip,"%d+%.%d+%.%d+%.%d+") == nil or not self:is_ipaddr(client_ip) then
-        client_ip = ngx.var.remote_addr
-        self:D("client_ip[2]:"..client_ip)
-        if client_ip == nil then
-            client_ip = "unknown"
-        end
+    -- ipv6
+    if type(client_ip) == 'table' then client_ip = "" end
+    if client_ip ~= "unknown" and string.match(client_ip,"^[%w:]+$") then
+        return client_ip
     end
 
-    self:D("client_ip:"..client_ip)
-    return client_ip
-end
-
-function _M.get_client_ip(self)
-    local client_ip = "unknown"
-    local server_name = self.params['server_name']
-    if self.site_config[server_name] then
-        if self.site_config[server_name]['cdn'] then
-            request_header = self.params["request_header"]
-            for _,v in ipairs(self.site_config[server_name]['cdn_header'])
-            do
-                -- C:D("vv:"..v..tostring(request_header[v]))
-                if request_header[v] ~= nil and request_header[v] ~= "" then
-                    local header_tmp = request_header[v]
-                    if type(header_tmp) == "table" then header_tmp = header_tmp[1] end
-                    client_ip = split(header_tmp,',')[1]
-                    break;
-                end
-            end 
-        end
-    end
-    if string.match(client_ip,"%d+%.%d+%.%d+%.%d+") == nil or not self:is_ipaddr(client_ip) then
+    -- ipv4
+    if  string.match(client_ip,"%d+%.%d+%.%d+%.%d+") == nil or not self:is_ipaddr(client_ip) then
         client_ip = ngx.var.remote_addr
         if client_ip == nil then
             client_ip = "unknown"

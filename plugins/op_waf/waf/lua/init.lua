@@ -27,13 +27,9 @@ local cookie_rules = C:read_file('cookie')
 local server_name = string.gsub(C:get_server_name(),'_','.')
 
 
-C:D("server_name:"..server_name)
-C:D("ipheader:".. C:to_json(ngx.req.get_headers()))
-
 function initParams()
     local data = {}
     data['server_name'] = server_name
-    C:D("server_name:init")
     data['ip'] = C:get_real_ip(server_name)
     data['ipn'] = C:arrip(data['ip'])
     data['request_header'] = ngx.req.get_headers()
@@ -48,10 +44,6 @@ end
 local params = initParams()
 C:setParams(params)
 
-
-
-C:D("ip demo:".. params['ip'])
-
 function get_return_state(rstate,rmsg)
     result = {}
     result['status'] = rstate
@@ -61,9 +53,6 @@ end
 
 function get_waf_drop_ip()
     local data =  ngx.shared.drop_ip:get_keys(0)
-
-    C:D("[get_waf_drop_ip]data:"..data)
-
     return data
 end
 
