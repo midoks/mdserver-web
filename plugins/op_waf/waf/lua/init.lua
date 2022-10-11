@@ -606,7 +606,7 @@ function waf()
         if url_ext() then return true end
         -- url_rule_ex()
         -- url_tell()
-        post_data()
+        -- post_data()
     end
 end
 
