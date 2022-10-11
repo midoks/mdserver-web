@@ -25,6 +25,11 @@ local cookie_rules = C:read_file('cookie')
 
 
 local server_name = string.gsub(C:get_server_name(),'_','.')
+
+
+C:D("server_name:"..server_name)
+C:D("ipheader:".. C:to_json(ngx.req.get_headers()))
+
 function initParams()
     local data = {}
     data['server_name'] = server_name
@@ -44,7 +49,7 @@ local params = initParams()
 C:setParams(params)
 
 
-C:D("server_name:"..server_name)
+
 C:D("ip demo:".. params['ip'])
 
 function get_return_state(rstate,rmsg)

@@ -552,6 +552,7 @@ function _M.get_client_ip(self)
     -- self:D("fff..."..client_ip..server_name)
     if self.site_config[server_name] then
         if self.site_config[server_name]['cdn'] then
+            request_header = self.params["request_header"]
             for _,v in ipairs(self.site_config[server_name]['cdn_header'])
             do
                 -- C:D("vv:"..v..tostring(request_header[v]))
