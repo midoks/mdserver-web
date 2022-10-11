@@ -522,6 +522,7 @@ function _M.get_real_ip(self, server_name)
     self:D("ipheader[0]:"..self:to_json(request_header))
     if self.site_config[server_name] then
         if self.site_config[server_name]['cdn'] then
+            local request_header = self.params["request_header"]
             for _,v in ipairs(self.site_config[server_name]['cdn_header'])
             do
                 if request_header[v] ~= nil and request_header[v] ~= "" then
@@ -534,6 +535,7 @@ function _M.get_real_ip(self, server_name)
         end
     end
 
+    self:D("client_ip[cf]:"..client_ip)
     if string.match(client_ip,"%d+%.%d+%.%d+%.%d+") == nil or not self:is_ipaddr(client_ip) then
         client_ip = ngx.var.remote_addr
         self:D("client_ip[2]:"..client_ip)
@@ -549,7 +551,6 @@ end
 function _M.get_client_ip(self)
     local client_ip = "unknown"
     local server_name = self.params['server_name']
-    -- self:D("fff..."..client_ip..server_name)
     if self.site_config[server_name] then
         if self.site_config[server_name]['cdn'] then
             request_header = self.params["request_header"]

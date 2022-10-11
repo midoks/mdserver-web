@@ -132,7 +132,6 @@ def initSiteInfo():
                           'cdn-src-ip',
                           'cdn-real-ip',
                           'cf-connecting-ip',
-                          'cf-connecting-ip',
                           'x-cluster-client-ip',
                           'wl-proxy-client-ip',
                           'proxy-client-ip',
