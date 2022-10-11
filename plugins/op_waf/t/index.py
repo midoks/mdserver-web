@@ -188,8 +188,8 @@ def test_start():
     # test_POST()
     # test_scan()
     # test_CC()
-    test_url_ext()
-    # test_cdn()
+    # test_url_ext()
+    test_cdn()
 
 
 if __name__ == "__main__":

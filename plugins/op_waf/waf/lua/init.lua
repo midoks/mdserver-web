@@ -18,6 +18,7 @@ local user_agent_html = C:read_file_body(config["reqfile_path"] .. '/' .. config
 local args_rules = C:read_file_table('args')
 local ip_white_rules = C:read_file('ip_white')
 local ip_black_rules = C:read_file('ip_black')
+local ipv6_black_rules = C:read_file('ipv6_black')
 local scan_black_rules = C:read_file('scan_black')
 local user_agent_rules = C:read_file('user_agent')
 local post_rules = C:read_file('post')
@@ -160,9 +161,20 @@ function waf_ip_white()
 end
 
 function waf_ip_black()
+    
+    -- ipv4 ip black
     for _,rule in ipairs(ip_black_rules)
     do
         if C:compare_ip(rule) then 
+            ngx.exit(config['cc']['status'])
+            return true 
+        end
+    end
+
+    -- ipv6 ip black
+    for _,rule in ipairs(ipv6_black_rules)
+    do
+        if rule == params['ip'] then 
             ngx.exit(config['cc']['status'])
             return true 
         end
