@@ -317,7 +317,7 @@ function waf_cc_increase()
         C:return_message(200, get_return_state(0,'ok'))
     end
 
-    local cc_html = string.gsub(cc_safe_js_html, "{uri}", make_uri_str)
+    local cc_html = ngx.re.gsub(cc_safe_js_html, "{uri}", make_uri_str)
     C:return_html(200, cc_html)
 end
 
