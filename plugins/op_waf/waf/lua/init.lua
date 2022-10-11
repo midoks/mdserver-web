@@ -9,7 +9,7 @@ local waf_root = "{$WAF_ROOT}"
 config = C:read_file_body_decode(waf_root.."/waf/"..'config.json')
 local site_config = C:read_file_body_decode(waf_root.."/waf/"..'site.json')
 C:setConfData(config, site_config)
-
+C:setDebug(true)
 
 
 local get_html = C:read_file_body(config["reqfile_path"] .. '/' .. config["get"]["reqfile"])
@@ -25,14 +25,12 @@ local cookie_rules = C:read_file('cookie')
 
 
 local server_name = string.gsub(C:get_server_name(),'_','.')
-
-
--- C:D("sss:"..C:get_server_name())
 function initParams()
     local data = {}
     data['server_name'] = server_name
-    -- data['ip'] = C:get_client_ip()
-    -- data['ipn'] = C:arrip(data['ip'])
+    C:D("server_name:init")
+    data['ip'] = C:get_real_ip(server_name)
+    data['ipn'] = C:arrip(data['ip'])
     data['request_header'] = ngx.req.get_headers()
     data['uri'] = ngx.unescape_uri(ngx.var.uri)
     data['uri_request_args'] = ngx.req.get_uri_args()
@@ -44,12 +42,10 @@ end
 
 local params = initParams()
 C:setParams(params)
-C:setDebug(true)
 
-local server_name = params["server_name"]
-params['ip'] = C:get_client_ip()
-params['ipn'] = C:arrip(params['ip'])
-C:D(server_name)
+
+C:D("server_name:"..server_name)
+C:D("ip demo:".. params['ip'])
 
 function get_return_state(rstate,rmsg)
     result = {}
@@ -60,6 +56,9 @@ end
 
 function get_waf_drop_ip()
     local data =  ngx.shared.drop_ip:get_keys(0)
+
+    C:D("[get_waf_drop_ip]data:"..data)
+
     return data
 end
 

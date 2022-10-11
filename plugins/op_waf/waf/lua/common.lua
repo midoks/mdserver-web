@@ -15,7 +15,6 @@ local rpath = cpath.."/rule/"
 
 function _M.new(self)
 
-
     local self = {
         waf_root = waf_root,
         cpath = cpath,
@@ -26,7 +25,6 @@ function _M.new(self)
         server_name = '',
         params = nil
     }
-
     return setmetatable(self, mt)
 end
 
@@ -517,6 +515,35 @@ function _M.write_log(self, name, rule)
     self:inc_log(name,rule)
 end
 
+
+function _M.get_real_ip(self, server_name)
+    local client_ip = "unknown"
+    self:D("client_ip[0]:"..client_ip)
+    if self.site_config[server_name] then
+        if self.site_config[server_name]['cdn'] then
+            for _,v in ipairs(self.site_config[server_name]['cdn_header'])
+            do
+                if request_header[v] ~= nil and request_header[v] ~= "" then
+                    local header_tmp = request_header[v]
+                    if type(header_tmp) == "table" then header_tmp = header_tmp[1] end
+                    client_ip = split(header_tmp,',')[1]
+                    break;
+                end
+            end 
+        end
+    end
+
+    if string.match(client_ip,"%d+%.%d+%.%d+%.%d+") == nil or not self:is_ipaddr(client_ip) then
+        client_ip = ngx.var.remote_addr
+        self:D("client_ip[2]:"..client_ip)
+        if client_ip == nil then
+            client_ip = "unknown"
+        end
+    end
+
+    self:D("client_ip:"..client_ip)
+    return client_ip
+end
 
 function _M.get_client_ip(self)
     local client_ip = "unknown"
