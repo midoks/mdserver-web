@@ -519,10 +519,10 @@ end
 function _M.get_real_ip(self, server_name)
     local client_ip = "unknown"
     self:D("client_ip[0]:"..client_ip)
-    self:D("ipheader[0]:"..self:to_json(request_header))
     if self.site_config[server_name] then
         if self.site_config[server_name]['cdn'] then
             local request_header = ngx.req.get_headers()
+            self:D("ipheader[0]:"..self:to_json(request_header))
             for _,v in ipairs(self.site_config[server_name]['cdn_header'])
             do
                 self:D("client_ip[for]:"..tostring(request_header[v]))
