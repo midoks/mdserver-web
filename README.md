@@ -90,16 +90,15 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.9.12
+### 版本更新 0.9.13
 
-* 日志清理插件优化。
-* 计划任务显示完整。
-* 加入gitea插件。
-* 融合mw-cli命令。
-* 加快php编译速度。
-* swap加上调整功能。
-* 其他细节优化。
-
+* 优化弹框。
+* 修复计划任务[日志切割]。
+* 优化mysql的与phpmyadmin的连接。
+* PHP添加`会话管理`功能。
+* redis优化。
+* 更新mysql[5.7]的安装。
+* OP防火墙部分功能优化。
 
 ### JSDelivr安装地址
 

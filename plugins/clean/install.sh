@@ -23,8 +23,6 @@ Install_app()
 	echo '正在安装脚本文件...' > $install_tmp
 	mkdir -p $serverPath/clean
 
-	echo "" > $serverPath/clean/clean.conf
-
 	cd ${rootPath} && python3 ${rootPath}/plugins/clean/index.py start
 	echo "${VERSION}" > $serverPath/clean/version.pl
 	echo '安装完成' > $install_tmp

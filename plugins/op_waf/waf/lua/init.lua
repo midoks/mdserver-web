@@ -1,65 +1,55 @@
-
-local cpath = "{$WAF_PATH}/"
-local rpath = "{$WAF_PATH}/rule/"
-local logdir = "{$ROOT_PATH}/wwwlogs/waf/"
 local json = require "cjson"
 local ngx_match = ngx.re.find
 
-local _C = require "common"
-local C = _C:new(cpath, rpath, logdir)
+local __C = require "common"
+local C = __C:new()
 
-config = C:read_file_body_decode(cpath .. 'config.json')
-local site_config = C:read_file_body_decode(cpath .. 'site.json')
+local waf_root = "{$WAF_ROOT}"
+
+config = C:read_file_body_decode(waf_root.."/waf/"..'config.json')
+local site_config = C:read_file_body_decode(waf_root.."/waf/"..'site.json')
 C:setConfData(config, site_config)
 
--- D func
-local function D(msg)
-    local _msg = ''
-    if type(msg) == 'table' then
-        for key, val in pairs(msg) do
-            _msg = key..':'..val.."\n"
-        end
-    elseif type(msg) == 'string' then
-        _msg = msg
-     elseif type(msg) == 'nil' then
-        _msg = 'nil'
-    else
-        _msg = msg
-    end
 
-    if not debug_mode then return true end
-    local fp = io.open(cpath..'debug.log', 'ab')
-    if fp == nil then
-        return nil
-    end
-    local localtime = os.date("%Y-%m-%d %H:%M:%S")
-    if server_name then
-        fp:write(tostring(_msg) .. "\n")
-    else
-        fp:write(localtime..":"..tostring(_msg) .. "\n")
-    end
-    fp:flush()
-    fp:close()
-    return true
-end
 
+local get_html = C:read_file_body(config["reqfile_path"] .. '/' .. config["get"]["reqfile"])
+local post_html = C:read_file_body(config["reqfile_path"] .. '/' .. config["post"]["reqfile"])
+local user_agent_html = C:read_file_body(config["reqfile_path"] .. '/' .. config["user-agent"]["reqfile"])
+local args_rules = C:read_file_table('args')
+local ip_white_rules = C:read_file('ip_white')
+local ip_black_rules = C:read_file('ip_black')
+local scan_black_rules = C:read_file('scan_black')
+local user_agent_rules = C:read_file('user_agent')
+local post_rules = C:read_file('post')
+local cookie_rules = C:read_file('cookie')
+
+
+local server_name = string.gsub(C:get_server_name(),'_','.')
+
+
+-- C:D("sss:"..C:get_server_name())
 function initParams()
     local data = {}
-    data['ip'] = C:get_client_ip()
-    data['ipn'] = C:arrip(data['ip'])
+    data['server_name'] = server_name
+    -- data['ip'] = C:get_client_ip()
+    -- data['ipn'] = C:arrip(data['ip'])
     data['request_header'] = ngx.req.get_headers()
     data['uri'] = ngx.unescape_uri(ngx.var.uri)
-    data['server_name'] = string.gsub(C:get_server_name(),'_','.')
     data['uri_request_args'] = ngx.req.get_uri_args()
     data['method'] = ngx.req.get_method()
     data['request_uri'] = ngx.var.request_uri
+    data['cookie'] = ngx.var.http_cookie
     return data
 end
 
 local params = initParams()
 C:setParams(params)
+C:setDebug(true)
 
-
+local server_name = params["server_name"]
+params['ip'] = C:get_client_ip()
+params['ipn'] = C:arrip(params['ip'])
+C:D(server_name)
 
 function get_return_state(rstate,rmsg)
     result = {}
@@ -102,20 +92,20 @@ function save_ip_on(data)
     end
 end
 
-function remove_btwaf_drop_ip()
+function remove_waf_drop_ip()
     if not uri_request_args['ip'] or not C:is_ipaddr(uri_request_args['ip']) then return get_return_state(true,'格式错误') end
     if ngx.shared.btwaf:get(cpath2 .. 'stop_ip') then
         ret=ngx.shared.btwaf:get(cpath2 .. 'stop_ip')
         ip_data=json.decode(ret)
-        result=is_chekc_table(ip_data,uri_request_args['ip'])
+        result = is_chekc_table(ip_data,uri_request_args['ip'])
         os.execute("sleep " .. 0.6)
         ret2=ngx.shared.btwaf:get(cpath2 .. 'stop_ip')
-        ip_data2=json.decode(ret2)
+        ip_data2 = json.decode(ret2)
         if result == 3 then
             for k,v in pairs(ip_data2)
             do
                 if uri_request_args['ip'] == v['ip'] then 
-                    v['time']=0
+                    v['time'] = 0
                 end
             end
         end
@@ -125,7 +115,7 @@ function remove_btwaf_drop_ip()
     return get_return_state(true,uri_request_args['ip'] .. '已解封')
 end
 
-function clean_btwaf_drop_ip()
+function clean_waf_drop_ip()
     if ngx.shared.btwaf:get(cpath2 .. 'stop_ip') then
         ret2=ngx.shared.btwaf:get(cpath2 .. 'stop_ip')
         ip_data2=json.decode(ret2)
@@ -155,15 +145,7 @@ function min_route()
     end
 end
 
-local get_html = C:read_file_body(config["reqfile_path"] .. '/' .. config["get"]["reqfile"])
-local post_html = C:read_file_body(config["reqfile_path"] .. '/' .. config["post"]["reqfile"])
-local user_agent_html = C:read_file_body(config["reqfile_path"] .. '/' .. config["user-agent"]["reqfile"])
-local args_rules = C:read_file_table('args')
-local ip_white_rules = C:read_file('ip_white')
-local ip_black_rules = C:read_file('ip_black')
-local scan_black_rules = C:read_file('scan_black')
-
-function waf_args()
+function waf_get_args()
     if not config['get']['open'] or not C:is_site_config('get') then return false end
     if C:is_ngx_match(args_rules, params['uri_request_args'],'args') then
         C:write_log('args','regular')
@@ -196,8 +178,20 @@ function waf_ip_black()
 end
 
 
+function waf_user_agent()
+    -- user_agent 过滤
+    if not config['user-agent']['open'] or not C:is_site_config('user-agent') then return false end
+    if C:is_ngx_match_ua(user_agent_rules,params['request_header']['user-agent']) then
+        C:write_log('user_agent','regular')
+        C:return_html(config['user-agent']['status'],user_agent_html)
+        return true
+    end
+    return false
+end
+
+
 function waf_drop()
-    local count,_ = ngx.shared.drop_ip:get(ip)
+    local count , _ = ngx.shared.drop_ip:get(ip)
     if not count then return false end
     if count > config['retry'] then
         ngx.exit(config['cc']['status'])
@@ -206,28 +200,33 @@ function waf_drop()
     return false
 end
 
-
-function waf_user_agent()
-    if not config['user-agent']['open'] or not C:is_site_config('user-agent') then return false end   
-    if C:is_ngx_match(user_agent_rules,params['request_header']['user-agent'],'user_agent') then
-        C:write_log('user_agent','regular')
-        C:return_html(config['user-agent']['status'],user_agent_html)
-        return true
-    end
-    return false
-end
-
-function cc()
+function waf_cc()
     local ip = params['ip']
+
+    local ip_lock = ngx.shared.drop_ip:get(ip)
+    if ip_lock then
+        if ip_lock > 0 then
+            ngx.exit(config['cc']['status'])
+            return true
+        end
+    end
+
+    if not config['cc']['open'] or not C:is_site_config('cc') then return false end
+
+
     local request_uri = params['request_uri']
     local endtime = config['cc']['endtime']
 
-    if not config['cc']['open'] or not site_cc then return false end
     local token = ngx.md5(ip .. '_' .. request_uri)
-    local count,_ = ngx.shared.limit:get(token)
+    local count = ngx.shared.limit:get(token)
+
+    local limit = config['cc']['limit']
+    local cycle = config['cc']['cycle']
+
     if count then
-        if count > limit then
-            local safe_count,_ = ngx.shared.drop_sum:get(ip)
+        if count > limit then 
+
+            local safe_count, _ = ngx.shared.drop_sum:get(ip)
             if not safe_count then
                 ngx.shared.drop_sum:set(ip,1,86400)
                 safe_count = 1
@@ -236,23 +235,22 @@ function cc()
             end
             local lock_time = (endtime * safe_count)
             if lock_time > 86400 then lock_time = 86400 end
-            ngx.shared.drop_ip:set(ip,retry+1,lock_time)
+
+            -- lock_time = 10
+            ngx.shared.drop_ip:set(ip,1,lock_time)
+
             C:write_log('cc',cycle..'秒内累计超过'..limit..'次请求,封锁' .. lock_time .. '秒')
             C:write_drop_ip('cc',lock_time)
-            if not server_name then
-                insert_ip_list(ip,lock_time,os.time(),'1111')
-            else
-                insert_ip_list(ip,lock_time,os.time(),server_name)
-            end
-            
             ngx.exit(config['cc']['status'])
             return true
         else
             ngx.shared.limit:incr(token,1)
         end
     else
-        ngx.shared.limit:set(token,1,cycle)
+        ngx.shared.drop_sum:set(ip,1,86400)
+        ngx.shared.limit:set(token, 1, cycle)
     end
+    return false
 end
 
 --强制验证是否使用正常浏览器访问网站
@@ -287,20 +285,25 @@ end
 
 
 function waf_scan_black()
+    -- 扫描软件禁止
     if not config['scan']['open'] or not C:is_site_config('scan') then return false end
-    if C:is_ngx_match(scan_black_rules['cookie'],params["request_header"]["cookie"],false) then
+    if not params["cookie"] then
+        if C:ngx_match_string(scan_black_rules['cookie'], tostring(params["cookie"]),'scan') then
+            C:write_log('scan','regular')
+            ngx.exit(config['scan']['status'])
+            return true
+        end
+    end
+
+    if C:ngx_match_string(scan_black_rules['args'], params["request_uri"], 'scan') then
         C:write_log('scan','regular')
         ngx.exit(config['scan']['status'])
         return true
     end
-    if C:is_ngx_match(scan_black_rules['args'],params["request_uri"],false) then
-        C:write_log('scan','regular')
-        ngx.exit(config['scan']['status'])
-        return true
-    end
+
     for key,value in pairs(params["request_header"])
     do
-        if C:is_ngx_match(scan_black_rules['header'], key, false) then
+        if C:ngx_match_string(scan_black_rules['header'], key, 'scan') then
             C:write_log('scan','regular')
             ngx.exit(config['scan']['status'])
             return true
@@ -309,20 +312,9 @@ function waf_scan_black()
     return false
 end
 
-function waf_post_referer()
-    if params['method'] ~= "POST" then return false end
-    if C:is_ngx_match(referer_local, params['request_header']['Referer'],'post') then
-        C:write_log('post_referer','regular')
-        C:return_html(config['post']['status'],post_html)
-        return true
-    end
-    return false
-end
-
 function waf_post()
     if not config['post']['open'] or not C:is_site_config('post') then return false end   
     if params['method'] ~= "POST" then return false end
-    if waf_post_referer() then return true end
     content_length = tonumber(params["request_header"]['content-length'])
     max_len = 640 * 1020000
     if content_length > max_len then return false end
@@ -333,7 +325,19 @@ function waf_post()
         return false
     end
 
-    if C:is_ngx_match(post_rules,request_args,'post') then
+    for key, val in pairs(request_args) do
+        if type(val) == "table" then
+            if type(val[1]) == "boolean" then
+                return false
+            end
+            data = table.concat(val, ", ")
+        else
+            data = val
+        end
+        
+    end
+
+    if C:is_ngx_match_post(post_rules,data) then
         C:write_log('post','regular')
         C:return_html(config['post']['status'],post_html)
         return true
@@ -366,10 +370,11 @@ function  post_data_chekc()
         end
         
         if not list_list then return false end 
-        aaa=nil
+        
+        aaa = nil
         for k,v in pairs(request_args)
         do
-            aaa=v
+            aaa = v
         end
 
         if not aaa then return false end 
@@ -381,7 +386,7 @@ function  post_data_chekc()
         if not data_len then return false end
         if arrlen(data_len) ==0 then return false end
 
-        if C:is_ngx_match(post_rules,data_len,'post') then
+        if C:is_ngx_match_post(post_rules , data_len) then
             C:write_log('post','regular')
             C:return_html(config['post']['status'],post_html)
             return true
@@ -406,7 +411,7 @@ end
 function post_X_Forwarded()
     if not config['post']['open'] or not C:is_site_config('post') then return false end   
     if params['method'] ~= "POST" then return false end
-    if C:is_ngx_match(post_rules,params["request_header"]['X-forwarded-For'],'post') then
+    if C:is_ngx_match_post(post_rules,params["request_header"]['X-forwarded-For']) then
         C:write_log('post','regular')
         C:return_html(config['post']['status'],post_html)
         return true
@@ -415,39 +420,39 @@ function post_X_Forwarded()
 end
 
 
-function php_path()
-    if site_config[server_name] == nil then return false end
-    for _,rule in ipairs(site_config[server_name]['disable_php_path'])
-    do
-        if ngx_match(uri,rule .. "/?.*\\.php$","isjo") then
-            C:write_log('php_path','regular')
-            C:return_html(config['other']['status'],other_html)
-            return C:return_message(200,uri)
-        end
-    end
-    return false
-end
+-- function php_path()
+--     if site_config[server_name] == nil then return false end
+--     for _,rule in ipairs(site_config[server_name]['disable_php_path'])
+--     do
+--         if C:ngx_match_string(params['uri'],rule .. "/?.*\\.php$","isjo") then
+--             C:write_log('php_path','regular')
+--             C:return_html(config['other']['status'],other_html)
+--             return C:return_message(200,uri)
+--         end
+--     end
+--     return false
+-- end
 
-function url_path()
-    if site_config[server_name] == nil then return false end
-    for _,rule in ipairs(site_config[server_name]['disable_path'])
-    do
-        if ngx_match(uri,rule,"isjo") then
-            C:write_log('path','regular')
-            C:return_html(config['other']['status'],other_html)
-            return true
-        end
-    end
-    return false
-end
+-- function url_path()
+--     if site_config[server_name] == nil then return false end
+--     for _,rule in ipairs(site_config[server_name]['disable_path'])
+--     do
+--         if ngx_match(uri,rule,"isjo") then
+--             C:write_log('path','regular')
+--             C:return_html(config['other']['status'],other_html)
+--             return true
+--         end
+--     end
+--     return false
+-- end
 
 function url_ext()
     if site_config[server_name] == nil then return false end
     for _,rule in ipairs(site_config[server_name]['disable_ext'])
     do
-        if ngx_match(uri,"\\."..rule.."$","isjo") then
+        if C:ngx_match_string("\\."..rule.."$", params['uri'],'url_ext') then
             C:write_log('url_ext','regular')
-            C:return_html(config['other']['status'],other_html)
+            C:return_html(config['other']['status'], other_html)
             return true
         end
     end
@@ -555,7 +560,7 @@ function waf_cookie()
     if not params["request_header"]['cookie'] then return false end
     if type(params["request_header"]['cookie']) ~= "string" then return false end
     request_cookie = string.lower(params["request_header"]['cookie'])
-    if C:is_ngx_match(cookie_rules,request_cookie,'cookie') then
+    if C:ngx_match_list(cookie_rules,request_cookie,'cookie') then
         C:write_log('cookie','regular')
         C:return_html(config['cookie']['status'],cookie_html)
         return true
@@ -563,55 +568,45 @@ function waf_cookie()
     return false
 end
 
-function waf_referer()
-    if params["method"] ~= "GET" then return false end
-    if not config['get']['open'] or not C:is_site_config('get') then return false end
-    if C:is_ngx_match(referer_local,params["request_header"]['Referer'],'args') then
-        C:write_log('get_referer','regular')
-        C:return_html(config['get']['status'], get_html)
-        return true
-    end
-    return false
-end
 
 function waf()
     min_route()
 
+    -- white ip
     if waf_ip_white() then return true end
-    waf_ip_black()
+
+    -- black ip
+    if waf_ip_black() then return true end
 
 
-    waf_drop()
-    waf_user_agent()
+    -- cc setting
+    if waf_drop() then return true end
+    if waf_cc() then return true end
 
-    waf_url()
+    -- ua check
+    if waf_user_agent() then return true end
+    if waf_url() then return true end
 
-    if params["method"] == "GET" then
-        waf_referer()  
-        waf_cookie()
-    end
+    -- cookie检查
+    if waf_cookie() then return true end
+    
+    -- args参数拦截
+    if waf_get_args() then return true end
 
-    if params["method"] == "POST" then
-        waf_referer()
-        waf_cookie()
-    end
+    -- 扫描软件禁止
+    if waf_scan_black() then return true end
 
-    waf_args()
-    waf_scan_black()
-
-    waf_post()
-    post_data_chekc()
-
-    local server_name = params["server_name"]
-    if site_config[server_name] then
-        X_Forwarded()
-        post_X_Forwarded()
-        php_path()
-        url_path()
-        url_ext()
-        url_rule_ex()
-        url_tell()
-        post_data()
+    if waf_post() then return true end
+    if post_data_chekc() then return true end
+    
+    if site_config[server_name]['open'] then
+        if X_Forwarded() then return true end
+        if post_X_Forwarded() then return true end
+        -- url_path()
+        if url_ext() then return true end
+        -- url_rule_ex()
+        -- url_tell()
+        -- post_data()
     end
 end
 

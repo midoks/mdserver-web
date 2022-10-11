@@ -180,7 +180,7 @@ function setControl(act, value=false){
 
 //清理记录
 function closeControl(){
-	layer.confirm('您真的清空所有监控记录吗？',{title:'清空记录',icon:3,closeBtn:2}, function() {
+	layer.confirm('您真的清空所有监控记录吗？',{title:'清空记录',icon:3,closeBtn:1}, function() {
 		loadT = layer.msg('正在处理,请稍候...',{icon:16,time:0})
 		$.post('/system/set_control','type=del',function(rdata){
 			layer.close(loadT);

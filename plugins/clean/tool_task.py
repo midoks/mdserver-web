@@ -88,16 +88,18 @@ def createBgTaskByName(name, args):
         _where1 = args['minute-n']
         _minute = ''
 
+    mw_dir = mw.getRunDir()
     cmd = '''
+mw_dir=%s
 rname=%s
 plugin_path=%s
 script_path=%s
 logs_file=$plugin_path/${rname}.log
-''' % (name, getServerDir(), getPluginDir())
+''' % (mw_dir, name, getServerDir(), getPluginDir())
     cmd += 'echo "★【`date +"%Y-%m-%d %H:%M:%S"`】 STSRT★" >> $logs_file' + "\n"
     cmd += 'echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" >> $logs_file' + "\n"
     cmd += 'echo "python3 $script_path/index.py clean >> $logs_file 2>&1"' + "\n"
-    cmd += 'python3 $script_path/index.py clean >> $logs_file 2>&1' + "\n"
+    cmd += 'cd $mw_dir && python3 $script_path/index.py clean >> $logs_file 2>&1' + "\n"
     cmd += 'echo "【`date +"%Y-%m-%d %H:%M:%S"`】 END★" >> $logs_file' + "\n"
     cmd += 'echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" >> $logs_file' + "\n"
 

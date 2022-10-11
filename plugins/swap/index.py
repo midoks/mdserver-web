@@ -117,7 +117,7 @@ def swapOp(method):
             return 'ok'
         return 'fail'
 
-    data = mw.execShell(file + ' start')
+    data = mw.execShell(file + ' ' + method)
     if data[1] == '':
         return 'ok'
     return 'fail'
@@ -136,7 +136,7 @@ def restart():
 
 
 def reload():
-    return swapOp('reload')
+    return 'ok'
 
 
 def initdStatus():
@@ -185,14 +185,15 @@ def changeSwap():
 
     size = args['size']
     swapOp('stop')
-    os.system('dd if=/dev/zero of=' + getServerDir() +
-              '/swapfile bs=1M count=' + size)
 
-    os.system('mkswap ' + getServerDir() + '/swapfile')
-    os.system('chmod 600 ' + getServerDir() + '/swapfile')
+    gsdir = getServerDir()
+
+    cmd = 'dd if=/dev/zero of=' + gsdir + '/swapfile bs=1M count=' + size
+    cmd += ' && mkswap ' + gsdir + '/swapfile && chmod 600 ' + gsdir + '/swapfile'
+    msg = mw.execShell(cmd)
     swapOp('start')
 
-    return mw.returnJson(True, "修改成功!")
+    return mw.returnJson(True, "修改成功:\n" + msg[0])
 
 if __name__ == "__main__":
     func = sys.argv[1]

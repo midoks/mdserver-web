@@ -1,3 +1,41 @@
+
+<style type="text/css">
+.bt-w-main{
+	height: 600px;
+}
+
+.session_clear_list {
+	border:1px solid #ececec;
+	margin-bottom: 15px;
+	width: 270px;
+}
+
+.session_clear_list .line {
+	padding: 0;
+	border-bottom: 1px solid #ececec;
+	width: 270px;
+}
+
+.session_clear_list .line:last-child {
+	border-bottom: 0px;
+}
+
+.session_clear_list .line span{
+	width: auto;
+	height: 35px;
+	line-height: 35px;
+	text-align: left;
+	padding: 0 5px;
+}
+
+.session_clear_list .line span:first-child {
+	width: 170px;
+	border-right: 1px solid #ececec;
+	background: #f7f7f7;
+	float: left;
+}
+</style>
+
 <div class="bt-form">
 	<div class='plugin_version'></div>
 	<div class="bt-w-main">
@@ -13,6 +51,7 @@
 			<p onclick="disableFunc($('.plugin_version').attr('version'));">禁用函数</p>
 			<p onclick="getFpmConfig($('.plugin_version').attr('version'));">性能调整</p>
 			<p onclick="getFpmStatus($('.plugin_version').attr('version'));">负载状况</p>
+			<p onclick="getSessionConfig($('.plugin_version').attr('version'));" title="session管理">会话管理</p>
 			<p onclick="pluginLogs('php-apt',$('.plugin_version').attr('version'),'fpm_log');">FPM日志</p>
 			<p onclick="pluginLogs('php-apt',$('.plugin_version').attr('version'),'fpm_slow_log');">慢日志</p>
 			<p onclick="getPhpinfo($('.plugin_version').attr('version'));">PHPIFNO</p>

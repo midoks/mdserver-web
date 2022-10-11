@@ -17,7 +17,7 @@ sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 mysqlDir=${serverPath}/source/mysql
 
-VERSION="5.7.37"
+VERSION="5.7.39"
 
 
 Install_mysql()
@@ -68,7 +68,7 @@ Install_mysql()
 	fi
 
 	#检测文件是否损坏.
-	md5_mysql_ok=d0489fc3880248a58759c50bfb286dbb
+	md5_mysql_ok=db1b672fc257bd46356c7af26dd22801
 	if [ -f ${mysqlDir}/mysql-boost-${VERSION}.tar.gz ];then
 		md5_mysql=`md5sum ${mysqlDir}/mysql-boost-${VERSION}.tar.gz  | awk '{print $1}'`
 		if [ "${md5_mysql_ok}" == "${md5_mysql}" ]; then

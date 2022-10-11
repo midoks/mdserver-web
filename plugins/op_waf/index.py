@@ -111,7 +111,7 @@ def initSiteInfo():
             tmp['log'] = True
             tmp['get'] = True
             tmp['post'] = True
-            tmp['open'] = False
+            tmp['open'] = True
 
             tmp['cc'] = config_contents['cc']
             tmp['retry'] = config_contents['retry']
@@ -122,7 +122,22 @@ def initSiteInfo():
             tmp['scan'] = config_contents['scan']
 
             cdn_header = ['x-forwarded-for',
-                          'x-real-ip', 'HTTP_CF_CONNECTING_IP']
+                          'x-real-ip',
+                          'x-forwarded',
+                          'forwarded-for',
+                          'forwarded',
+                          'true-client-ip',
+                          'client-ip',
+                          'ali-cdn-real-ip',
+                          'cdn-src-ip',
+                          'cdn-real-ip',
+                          'cf-connecting-ip',
+                          'cf-connecting-ip',
+                          'x-cluster-client-ip',
+                          'wl-proxy-client-ip',
+                          'proxy-client-ip',
+                          'true-client-ip',
+                          'HTTP_CF_CONNECTING_IP']
             tmp['cdn_header'] = cdn_header
 
             disable_upload_ext = ["php", "jsp"]
@@ -163,6 +178,7 @@ def initTotalInfo():
             tmp['get'] = 0
             tmp['post'] = 0
             tmp['total'] = 0
+            tmp['url_ext'] = 0
             _name = {}
             _name[name] = tmp
             total_contents['sites'] = _name
@@ -186,10 +202,12 @@ def status():
 
 def contentReplace(content):
     service_path = mw.getServerDir()
-    waf_path = getServerDir() + "/waf"
+    waf_root = getServerDir()
+    waf_path = waf_root + "/waf"
     content = content.replace('{$ROOT_PATH}', mw.getRootDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$WAF_PATH}', waf_path)
+    content = content.replace('{$WAF_ROOT}', waf_root)
     return content
 
 
@@ -200,6 +218,14 @@ def initDreplace():
         sdir = getPluginDir() + '/waf'
         cmd = 'cp -rf ' + sdir + ' ' + path
         mw.execShell(cmd)
+
+    logs_path = path + '/logs'
+    if not os.path.exists(logs_path):
+        mw.execShell('mkdir -p ' + logs_path)
+
+    debug_log = path + '/debug.log'
+    if not os.path.exists(debug_log):
+        mw.execShell('echo "" > ' + debug_log)
 
     config = path + '/waf/config.json'
     content = mw.readFile(config)
@@ -214,6 +240,11 @@ def initDreplace():
     content = contentReplace(content)
     mw.writeFile(config, content)
 
+    config_common = path + "/waf/lua/common.lua"
+    content = mw.readFile(config_common)
+    content = contentReplace(content)
+    mw.writeFile(config_common, content)
+
     waf_conf = mw.getServerDir() + "/openresty/nginx/conf/luawaf.conf"
     waf_tpl = getPluginDir() + "/conf/luawaf.conf"
     content = mw.readFile(waf_tpl)
@@ -223,6 +254,9 @@ def initDreplace():
     initDomainInfo()
     initSiteInfo()
     initTotalInfo()
+
+    if not mw.isAppleSystem():
+        mw.execShell("chown -R www:www " + path)
 
 
 def start():
@@ -800,7 +834,7 @@ def getLogsList():
         return data[1]
 
     data = []
-    path = mw.getLogsDir() + '/waf'
+    path = getServerDir() + '/logs'
 
     if not os.path.exists(path):
         return mw.returnJson(False, '还未生成!', [])
@@ -823,7 +857,7 @@ def getSafeLogs():
     if not data[0]:
         return data[1]
 
-    path = mw.getLogsDir() + '/waf'
+    path = getServerDir() + '/logs'
     file = path + '/' + args['siteName'] + '_' + args['toDate'] + '.log'
     if not os.path.exists(file):
         return mw.returnJson(False, "文件不存在!")

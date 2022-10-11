@@ -1,25 +1,88 @@
 
 local setmetatable = setmetatable
-local _M = { _VERSION = '0.01' }
+local _M = { _VERSION = '0.02' }
 local mt = { __index = _M }
+
 local json = require "cjson"
 local ngx_match = ngx.re.find
 
+local debug_mode = false
 
-function _M.new(self, cpath, rpath, logdir)
-    -- ngx.log(ngx.ERR,"read:"..cpath..",rpath:"..rpath)
-    local opt = {
-         cpath = cpath,
-         rpath = rpath,
-         logdir = logdir,
-         config = '',
-         site_config = '',
-         params = nil
+local waf_root = "{$WAF_ROOT}"
+local cpath = waf_root.."/waf/"
+local logdir = waf_root.."/logs/"
+local rpath = cpath.."/rule/"
+
+function _M.new(self)
+
+
+    local self = {
+        waf_root = waf_root,
+        cpath = cpath,
+        rpath = rpath,
+        logdir = logdir,
+        config = '',
+        site_config = '',
+        server_name = '',
+        params = nil
     }
-    local p = setmetatable(opt, mt)
-    return p
+
+    return setmetatable(self, mt)
 end
 
+
+function _M.setDebug(self, mode)
+    debug_mode = mode
+end
+
+
+-- 调试方式
+function _M.D(self, msg)
+
+    if not debug_mode then return true end
+
+    local _msg = ''
+    if type(msg) == 'table' then
+        for key, val in pairs(msg) do
+            _msg = tostring( key)..':'.."\n"
+        end
+    elseif type(msg) == 'string' then
+        _msg = msg
+     elseif type(msg) == 'nil' then
+        _msg = 'nil'
+    else
+        _msg = msg
+    end
+
+
+    local fp = io.open(waf_root.."/debug.log", "ab")
+    if fp == nil then
+        return nil
+    end
+
+    local localtime = os.date("%Y-%m-%d %H:%M:%S")
+    if server_name then
+        fp:write(tostring(_msg) .. "\n")
+    else
+        fp:write(localtime..":"..tostring(_msg) .. "\n")
+    end
+
+    fp:flush()
+    fp:close()
+    return true
+end
+
+
+local function write_file_clear(filename, body)
+    fp = io.open(filename,'w')
+    if fp == nil then
+        return nil
+    end
+    fp:write(body)
+    fp:flush()
+    fp:close()
+    return true
+end
 
 function _M.setConfData( self, config, site_config )
     self.config = config
@@ -94,6 +157,10 @@ function _M.compare_ip(self,ips)
 end
 
 
+function _M.to_json(self, msg)
+    return json.encode(msg)
+end
+
 function _M.return_message(self, status, msg)
     ngx.header.content_type = "application/json;"
     ngx.status = status
@@ -136,20 +203,15 @@ function _M.write_file(self, filename, body)
     return true
 end
 
+
 function _M.write_file_clear(self, filename, body)
-    fp = io.open(filename,'w')
-    if fp == nil then
-        return nil
-    end
-    fp:write(body)
-    fp:flush()
-    fp:close()
-    return true
+    return write_file_clear(filename, body)
 end
 
 
 function _M.write_drop_ip(self, is_drop, drop_time)
-    local filename = self.cpath .. 'drop_ip.log'
+    local filename = self.logdir .. 'drop_ip.log'
+
     local fp = io.open(filename,'ab')
     local server_name = self.params["server_name"]
     local ip = self.params["server_name"]
@@ -234,11 +296,21 @@ function _M.read_file(self, name)
 end
 
 function _M.read_file_table( self, name )
-    return self:select_rule(self:read_file('args'))
+    return self:select_rule(self:read_file(name))
 end
 
 
+local function timer_at_inc_log(premature)
+    local total_path = cpath .. 'total.json'
+    local tbody = ngx.shared.limit:get(total_path)
+    if not tbody then
+        return false
+    end
+    return write_file_clear(total_path,tbody)
+end
+
 function _M.inc_log(self, name, rule)
+
     local server_name = self.params['server_name']
     local total_path = self.cpath .. 'total.json'
     local tbody = ngx.shared.limit:get(total_path)
@@ -246,7 +318,10 @@ function _M.inc_log(self, name, rule)
         tbody = self:read_file_body(total_path)
         if not tbody then return false end
     end
+
     local total = json.decode(tbody)
+
+    -- 开始计算
     if not total['sites'] then total['sites'] = {} end
     if not total['sites'][server_name] then total['sites'][server_name] = {} end
     if not total['sites'][server_name][name] then total['sites'][server_name][name] = 0 end
@@ -256,13 +331,15 @@ function _M.inc_log(self, name, rule)
     total['total'] = total['total'] + 1
     total['sites'][server_name][name] = total['sites'][server_name][name] + 1
     total['rules'][name] = total['rules'][name] + 1
+
     local total_log = json.encode(total)
     if not total_log then return false end
+
     ngx.shared.limit:set(total_path,total_log)
-    if not ngx.shared.limit:get('mw_waf_timeout') then
-        self:write_file_clear(total_path,total_log)
-        ngx.shared.limit:set('mw_waf_timeout',1,5)
-    end
+
+    -- 异步执行
+    ngx.timer.at(1, timer_at_inc_log)
+ 
 end
 
 
@@ -289,9 +366,66 @@ function _M.get_server_name(self)
 end
 
 
--- function _M.get_sn(self)
---     retun string.gsub(self:get_server_name(),'_','.')
--- end
+
+function _M.is_ngx_match_orgin(self,rule,match, sign)
+    if ngx_match(ngx.unescape_uri(match), rule,"isjo") then
+        error_rule = rule .. ' >> ' .. sign .. ':' .. match
+        return true
+    end
+    return false
+end
+
+
+function _M.ngx_match_string(self, rule, content,sign)
+    local t = self:is_ngx_match_orgin(rule, content, sign)
+    if t then
+        return true
+    end
+  
+    return false
+end
+
+function _M.ngx_match_list(self, rules, content)
+    for i,rule in ipairs(rules)
+    do
+        if rule[1] == 1 then
+            local t = self:is_ngx_match_orgin(rule[2], content, rule[3])
+            if t then
+                return true
+            end
+        end
+    end
+    return false
+end
+
+function _M.is_ngx_match_ua(self, rules, content)
+    -- ngx.header.content_type = "text/html"
+    for i,rule in ipairs(rules)
+    do
+        -- 开启的规则，才匹配。
+        if rule[1] == 1 then
+            local t = self:is_ngx_match_orgin(rule[2], content, rule[3])
+            if t then
+                return true
+            end
+        end
+    end
+    return false
+end
+
+function _M.is_ngx_match_post(self, rules, content)
+    for i,rule in ipairs(rules)
+    do
+        -- 开启的规则，才匹配。
+        if rule[1] == 1 then
+            local t = self:is_ngx_match_orgin(rule[2],content, rule[3])
+            if t then
+                return true
+            end
+        end
+    end
+    return false
+end
 
 
 function _M.is_ngx_match(self, rules, sbody, rule_name)
@@ -341,6 +475,7 @@ end
 
 
 function _M.write_log(self, name, rule)
+
     local ip = self.params['ip']
     local retry = self.config['retry']['retry']
     local retry_time = self.config['retry']['retry_time']
@@ -352,6 +487,7 @@ function _M.write_log(self, name, rule)
     else
         ngx.shared.drop_ip:set(ip,1,retry_cycle)
     end
+
     if self.config['log'] ~= true or self:is_site_config('log') ~= true then return false end
     local method = ngx.req.get_method()
     if error_rule then 
@@ -384,10 +520,13 @@ end
 
 function _M.get_client_ip(self)
     local client_ip = "unknown"
+    local server_name = self.params['server_name']
+    -- self:D("fff..."..client_ip..server_name)
     if self.site_config[server_name] then
         if self.site_config[server_name]['cdn'] then
             for _,v in ipairs(self.site_config[server_name]['cdn_header'])
             do
+                -- C:D("vv:"..v..tostring(request_header[v]))
                 if request_header[v] ~= nil and request_header[v] ~= "" then
                     local header_tmp = request_header[v]
                     if type(header_tmp) == "table" then header_tmp = header_tmp[1] end
@@ -408,7 +547,6 @@ end
 
 
 function _M.is_site_config(self,cname)
-    local server_name = self.params["server_name"]
     if self.site_config[server_name] ~= nil then
         if cname == 'cc' then
             return self.site_config[server_name][cname]['open']

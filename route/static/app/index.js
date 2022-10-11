@@ -527,7 +527,7 @@ function checkUpdate() {
         }
 
         if (rdata.status === false) {
-            layer.confirm(rdata.msg, { title: lan.index.update_check, icon: 1, closeBtn: 2, btn: [lan.public.know, lan.public.close] });
+            layer.confirm(rdata.msg, { title: lan.index.update_check, icon: 1, closeBtn: 1, btn: [lan.public.know, lan.public.close] });
             return;
         }
         layer.msg(rdata.msg, { icon: 1 });
@@ -610,7 +610,7 @@ function reBoot() {
         type: 1,
         title: '重启服务器或者面板',
         area: '330px',
-        closeBtn: 2,
+        closeBtn: 1,
         shadeClose: false,
         content: '<div class="rebt-con"><div class="rebt-li"><a data-id="server" href="javascript:;">重启服务器</a></div><div class="rebt-li"><a data-id="panel" href="javascript:;">重启面板</a></div></div>'
     });
@@ -620,7 +620,7 @@ function reBoot() {
         var type = $(this).attr('data-id');
         switch (type) {
             case 'panel':
-                layer.confirm('即将重启面板服务，继续吗？', { title: '重启面板服务', closeBtn: 2, icon: 3 }, function () {
+                layer.confirm('即将重启面板服务，继续吗？', { title: '重启面板服务', closeBtn: 1, icon: 3 }, function () {
                     var loadT = layer.load();
                     $.post('/system/restart','',function (rdata) {
                         layer.close(loadT);
@@ -634,7 +634,7 @@ function reBoot() {
                     type: 1,
                     title: '安全重启服务器',
                     area: ['500px', '280px'],
-                    closeBtn: 2,
+                    closeBtn: 1,
                     shadeClose: false,
                     content: "<div class='bt-form bt-window-restart'>\
                             <div class='pd15'>\
@@ -692,7 +692,7 @@ function reBoot() {
 
 //修复面板
 function repPanel() {
-    layer.confirm(lan.index.rep_panel_msg, { title: lan.index.rep_panel_title, closeBtn: 2, icon: 3 }, function() {
+    layer.confirm(lan.index.rep_panel_msg, { title: lan.index.rep_panel_title, closeBtn: 1, icon: 3 }, function() {
         var loadT = layer.msg(lan.index.rep_panel_the, { icon: 16, time: 0, shade: [0.3, '#000'] });
         $.get('/system?action=RepPanel', function(rdata) {
             layer.close(loadT);
@@ -750,7 +750,7 @@ function showDanger(num, port) {
         type: 1,
         area: ['720px', '410px'],
         title: '安全提醒(如你想放弃任何安全提醒通知，请删除宝塔安全登录插件)',
-        closeBtn: 2,
+        closeBtn: 1,
         shift: 5,
         content: '<div class="pd20">\
 				<table class="f14 showDanger"><tbody>\
@@ -769,7 +769,7 @@ function showDanger(num, port) {
 //加载关键数据总数
 loadKeyDataCount();
 function loadKeyDataCount(){
-    var plist = ['mysql', 'csvn', 'gogs'];
+    var plist = ['mysql', 'gogs','gitea'];
     for (var i = 0; i < plist.length; i++) {
         pname = plist[i];
         function call(pname){
@@ -784,7 +784,7 @@ function loadKeyDataCount(){
                 }
                 var html = '<li class="sys-li-box col-xs-3 col-sm-3 col-md-3 col-lg-3">\
                             <p class="name f15 c9">'+pname+'</p>\
-                            <div class="val"><a class="btlink" onclick="softMain(\''+pname+'\',\''+rdata['data']['ver']+'\')">'+rdata['data']['count']+'</a></div></li>';
+                            <div class="val"><a class="btlink" onclick="softMain(\''+pname+'\',\''+pname+'\',\''+rdata['data']['ver']+'\')">'+rdata['data']['count']+'</a></div></li>';
                 $('#index_overview').append(html);
             },'json');
         }

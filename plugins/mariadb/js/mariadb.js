@@ -817,6 +817,7 @@ function openPhpmyadmin(name,username,password){
         layer.msg('当前为['+rdata.choose+']模式,若要使用请切换模式.',{icon:2,shade: [0.3, '#000']});
         return;
     }
+    var phpmyadmin_cfg = rdata;
 
     data = syncPost('/plugins/run',{'name':'phpmyadmin','func':'get_home_page'});
     var rdata = $.parseJSON(data.data);
@@ -824,7 +825,10 @@ function openPhpmyadmin(name,username,password){
         layer.msg(rdata.msg,{icon:2,shade: [0.3, '#000']});
         return;
     }
-    $("#toPHPMyAdmin").attr('action',rdata.data);
+
+    var home_page = rdata.data;
+    home_page = home_page.replace("http://","http://"+phpmyadmin_cfg['username']+":"+phpmyadmin_cfg['password']+"@");
+    $("#toPHPMyAdmin").attr('action',home_page);
 
     if($("#toPHPMyAdmin").attr('action').indexOf('phpmyadmin') == -1){
         layer.msg('请先安装phpMyAdmin',{icon:2,shade: [0.3, '#000']});

@@ -125,7 +125,7 @@ def redisOp(method):
         data = mw.execShell('systemctl ' + method + ' redis')
         if data[1] == '':
             return 'ok'
-        return 'fail'
+        return data[1]
 
     data = mw.execShell(file + ' start')
     if data[1] == '':
@@ -154,6 +154,10 @@ def reload():
 
 
 def runInfo():
+    s = status()
+    if s == 'stop':
+        return mw.returnJson(False, '未启动')
+
     requirepass = ""
 
     conf = getServerDir() + '/redis.conf'
@@ -163,9 +167,15 @@ def runInfo():
     if tmp:
         requirepass = tmp.groups()[1]
 
-    cmd = getServerDir() + "/bin/redis-cli info"
+    default_ip = '0.0.0.0'
+    findDebian = mw.execShell('cat /etc/issue |grep Debian')
+    if findDebian[0] != '':
+        default_ip = mw.getLocalIp()
+
+    cmd = getServerDir() + "/bin/redis-cli -h " + default_ip + " info"
     if requirepass != "":
-        cmd = getServerDir() + '/bin/redis-cli -a "' + requirepass + '" info'
+        cmd = getServerDir() + '/bin/redis-cli -h ' + default_ip + \
+            ' -a "' + requirepass + '" info'
 
     data = mw.execShell(cmd)[0]
     res = [
