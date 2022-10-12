@@ -131,7 +131,6 @@ var ok = setInterval(function(){
 
 	ajax('JSON',true).post('/{uri}',{'pass':"ok"},function(data){
 		if (data['status'] == 0){
-			// document.getElementById('status').innerHTML = "ok";
 			location.reload();
 		}
 	});
