@@ -19,11 +19,18 @@ name=$2
 
 # /opt/openresty-systemtap-toolkit/sample-bt -p 496435 -t 5 -k > a.bt
 
+# export PATH=$PATH:/opt/stapxx
+# /opt/stapxx/samples/lj-lua-stacks.sxx --arg time=5 --skip-badvars -x 562556 -DSTP_NO_OVERLOAD > tmp.bt
 
 
 if [ ! -d /opt/openresty-systemtap-toolkit ];then
     cd /opt && git clone https://github.com/openresty/openresty-systemtap-toolkit
 fi
+
+if [ ! -d stapxx ];then
+    cd /opt && git clone https://github.com/openresty/stapxx
+fi
+
 
 if [ ! -d /opt/FlameGraph ];then
     cd /opt && git clone https://github.com/brendangregg/FlameGraph
