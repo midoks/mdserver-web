@@ -58,7 +58,8 @@ function _M.D(self, msg)
         return nil
     end
 
-    local localtime = os.date("%Y-%m-%d %H:%M:%S")
+    -- local localtime = os.date("%Y-%m-%d %H:%M:%S")
+    local localtime = ngx.localtime()
     if server_name then
         fp:write(tostring(_msg) .. "\n")
     else
@@ -175,7 +176,13 @@ function _M.return_html(self,status,html)
 end
 
 function _M.read_file_body(self, filename)
-    -- ngx.log(ngx.ERR,"read_file_body:"..filename)
+
+    local key = "file_config_"..filename
+    fbody = ngx.shared.limit:get(key, fbody)
+    if fbody then
+        return fbody
+    end
+    -- self:D("read_file_body:"..filename)
     fp = io.open(filename, 'r')
     if fp == nil then
         return nil
@@ -185,10 +192,31 @@ function _M.read_file_body(self, filename)
     if fbody == '' then
         return nil
     end
+    ngx.shared.limit:set(key,fbody)
     return fbody
 end
 
+function _M.read_file(self, name)
+    f = self.rpath .. name .. '.json'
+    local key = "read_file_"..name
+    fbody = ngx.shared.limit:get(key, fbody)
+    if fbody then
+        return fbody
+    end
+    -- self:D("read_file:"..name)
+    fbody = self:read_file_body(f)
+    if fbody == nil then
+        return {}
+    end
 
+    data = json.decode(fbody)
+    ngx.shared.limit:set(key,data)
+    return data
+end
+
+function _M.read_file_table( self, name )
+    return self:select_rule(self:read_file(name))
+end
 
 function _M.write_file(self, filename, body)
     fp = io.open(filename,'ab')
@@ -282,21 +310,6 @@ function _M.select_rule(self, rules)
     end
     return new_rules
 end
-
-
-function _M.read_file(self, name)
-    f = self.rpath .. name .. '.json'   
-    fbody = self:read_file_body(f)
-    if fbody == nil then
-        return {}
-    end
-    return json.decode(fbody)
-end
-
-function _M.read_file_table( self, name )
-    return self:select_rule(self:read_file(name))
-end
-
 
 local function timer_at_inc_log(premature)
     local total_path = cpath .. 'total.json'

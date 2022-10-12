@@ -15,7 +15,7 @@ C:setDebug(true)
 local get_html = C:read_file_body(config["reqfile_path"] .. '/' .. config["get"]["reqfile"])
 local post_html = C:read_file_body(config["reqfile_path"] .. '/' .. config["post"]["reqfile"])
 local user_agent_html = C:read_file_body(config["reqfile_path"] .. '/' .. config["user-agent"]["reqfile"])
-local cc_safe_js_html = C:read_file_body(config["reqfile_path"] .. '/' .. config["cc"]["reqfile"])
+local cc_safe_js_html = C:read_file_body(config["reqfile_path"] .. '/' .. config["safe_verify"]["reqfile"])
 local args_rules = C:read_file_table('args')
 local ip_white_rules = C:read_file('ip_white')
 local ip_black_rules = C:read_file('ip_black')
@@ -25,11 +25,9 @@ local user_agent_rules = C:read_file('user_agent')
 local post_rules = C:read_file('post')
 local cookie_rules = C:read_file('cookie')
 
-
 local server_name = string.gsub(C:get_server_name(),'_','.')
 
-
-function initParams()
+local function initParams()
     local data = {}
     data['server_name'] = server_name
     data['ip'] = C:get_real_ip(server_name)
@@ -46,22 +44,24 @@ end
 local params = initParams()
 C:setParams(params)
 
-function get_return_state(rstate,rmsg)
+local cpu_percent = ngx.shared.limit:get("cpu_usage")
+C:D("cpu:"..tostring (cpu_percent))
+
+
+local function get_return_state(rstate,rmsg)
     result = {}
     result['status'] = rstate
     result['msg'] = rmsg
     return result
 end
 
-function get_waf_drop_ip()
+local function get_waf_drop_ip()
     local data =  ngx.shared.drop_ip:get_keys(0)
     return data
 end
 
-
-math.randomseed(os.time())
- 
-function get_random(n) 
+local function get_random(n) 
+    math.randomseed(ngx.time())
     local t = {
         "0","1","2","3","4","5","6","7","8","9",
         "a","b","c","d","e","f","g","h","i","j",
@@ -78,7 +78,7 @@ function get_random(n)
     return s
 end
 
-function is_chekc_table(data,strings)
+local function is_chekc_table(data,strings)
     if type(data) ~= 'table' then return 1 end 
     if not data then return 1 end
     data=chekc_ip_timeout(data)
@@ -91,7 +91,7 @@ function is_chekc_table(data,strings)
     return 2
 end
 
-function save_ip_on(data)
+local function save_ip_on(data)
     locak_file=read_file_body(cpath2 .. 'stop_ip.lock')
     if not locak_file then
         C:write_file(cpath2 .. 'stop_ip.lock','1')
@@ -106,7 +106,7 @@ function save_ip_on(data)
     end
 end
 
-function remove_waf_drop_ip()
+local function remove_waf_drop_ip()
     if not uri_request_args['ip'] or not C:is_ipaddr(uri_request_args['ip']) then return get_return_state(true,'格式错误') end
     if ngx.shared.btwaf:get(cpath2 .. 'stop_ip') then
         ret=ngx.shared.btwaf:get(cpath2 .. 'stop_ip')
@@ -129,7 +129,7 @@ function remove_waf_drop_ip()
     return get_return_state(true,uri_request_args['ip'] .. '已解封')
 end
 
-function clean_waf_drop_ip()
+local function clean_waf_drop_ip()
     if ngx.shared.btwaf:get(cpath2 .. 'stop_ip') then
         ret2=ngx.shared.btwaf:get(cpath2 .. 'stop_ip')
         ip_data2=json.decode(ret2)
@@ -148,7 +148,7 @@ function clean_waf_drop_ip()
     return get_return_state(true,'已解封所有封锁IP')
 end
 
-function min_route()
+local function min_route()
     if ngx.var.remote_addr ~= '127.0.0.1' then return false end
     if uri == '/get_waf_drop_ip' then
         return_message(200,get_waf_drop_ip())
@@ -159,7 +159,7 @@ function min_route()
     end
 end
 
-function waf_get_args()
+local function waf_get_args()
     if not config['get']['open'] or not C:is_site_config('get') then return false end
     if C:is_ngx_match(args_rules, params['uri_request_args'],'args') then
         C:write_log('args','regular')
@@ -170,7 +170,7 @@ function waf_get_args()
 end
 
 
-function waf_ip_white()
+local function waf_ip_white()
     for _,rule in ipairs(ip_white_rules)
     do
         if C:compare_ip(rule) then 
@@ -180,7 +180,7 @@ function waf_ip_white()
     return false
 end
 
-function waf_ip_black()
+local function waf_ip_black()
     
     -- ipv4 ip black
     for _,rule in ipairs(ip_black_rules)
@@ -203,7 +203,7 @@ function waf_ip_black()
 end
 
 
-function waf_user_agent()
+local function waf_user_agent()
     -- user_agent 过滤
     if not config['user-agent']['open'] or not C:is_site_config('user-agent') then return false end
     if C:is_ngx_match_ua(user_agent_rules,params['request_header']['user-agent']) then
@@ -215,7 +215,7 @@ function waf_user_agent()
 end
 
 
-function waf_drop()
+local function waf_drop()
     local count , _ = ngx.shared.drop_ip:get(ip)
     if not count then return false end
     if count > config['retry'] then
@@ -225,7 +225,7 @@ function waf_drop()
     return false
 end
 
-function waf_cc()
+local function waf_cc()
     local ip = params['ip']
 
     local ip_lock = ngx.shared.drop_ip:get(ip)
@@ -279,7 +279,7 @@ function waf_cc()
 end
 
 -- 是否符合开强制验证条件
-function is_open_waf_cc_increase()
+local function is_open_waf_cc_increase()
 
     if config['safe_verify']['open'] then
         return true
@@ -288,16 +288,25 @@ function is_open_waf_cc_increase()
     if site_config[server_name]['safe_verify']['open'] then
         return true
     end
+
+    if cpu_percent >= config['safe_verify']['cpu'] then
+        return true
+    end
+
+    if cpu_percent >= site_config[server_name]['safe_verify']['cpu'] then
+        return true
+    end
+
     return false
 end
 
 
 --强制验证是否使用正常浏览器访问网站
-function waf_cc_increase()
+local function waf_cc_increase()
+    if not is_open_waf_cc_increase() then return false end
+
     local ip = params['ip']
     local uri = params['uri']
-
-    if not is_open_waf_cc_increase() then return false end
     local cache_token = ngx.md5(ip .. '_' .. server_name)
 
     --判断是否已经通过验证
@@ -322,7 +331,7 @@ function waf_cc_increase()
 end
 
 
-function waf_url()
+local function waf_url()
     if not config['get']['open'] or not C:is_site_config('get') then return false end
     --正则--
     if C:is_ngx_match(url_rules,params["uri"],'url') then
@@ -334,7 +343,7 @@ function waf_url()
 end
 
 
-function waf_scan_black()
+local function waf_scan_black()
     -- 扫描软件禁止
     if not config['scan']['open'] or not C:is_site_config('scan') then return false end
     if not params["cookie"] then
@@ -362,7 +371,7 @@ function waf_scan_black()
     return false
 end
 
-function waf_post()
+local function waf_post()
     if not config['post']['open'] or not C:is_site_config('post') then return false end   
     if params['method'] ~= "POST" then return false end
     content_length = tonumber(params["request_header"]['content-length'])
@@ -396,7 +405,7 @@ function waf_post()
 end
 
 
-function  post_data_chekc()
+local function  post_data_chekc()
     if params['method'] =="POST" then
         if C:return_post_data() then return false end
         ngx.req.read_body()
@@ -446,7 +455,7 @@ function  post_data_chekc()
 end
 
 
-function X_Forwarded()
+local function X_Forwarded()
     if params['method'] ~= "GET" then return false end
     if not config['get']['open'] or not C:is_site_config('get') then return false end 
     if C:is_ngx_match(args_rules,params["request_header"]['X-forwarded-For'],'args') then
@@ -458,7 +467,7 @@ function X_Forwarded()
 end
 
 
-function post_X_Forwarded()
+local function post_X_Forwarded()
     if not config['post']['open'] or not C:is_site_config('post') then return false end   
     if params['method'] ~= "POST" then return false end
     if C:is_ngx_match_post(post_rules,params["request_header"]['X-forwarded-For']) then
@@ -496,7 +505,7 @@ end
 --     return false
 -- end
 
-function url_ext()
+local function url_ext()
     if site_config[server_name] == nil then return false end
     for _,rule in ipairs(site_config[server_name]['disable_ext'])
     do
@@ -509,7 +518,7 @@ function url_ext()
     return false
 end
 
-function url_rule_ex()
+local function url_rule_ex()
     if site_config[server_name] == nil then return false end
     if method == "POST" and not request_args then
         content_length=tonumber(request_header['content-length'])
@@ -541,7 +550,7 @@ function url_rule_ex()
     return false
 end
 
-function url_tell()
+local function url_tell()
     if site_config[server_name] == nil then return false end
     for _,rule in ipairs(site_config[server_name]['url_tell'])
     do
@@ -557,7 +566,7 @@ function url_tell()
 end
 
 
-function disable_upload_ext(ext)
+local function disable_upload_ext(ext)
     if not ext then return false end
     ext = string.lower(ext)
     if is_key(site_config[server_name]['disable_upload_ext'],ext) then
@@ -567,7 +576,7 @@ function disable_upload_ext(ext)
     end
 end
 
-function data_in_php(data)
+local function data_in_php(data)
     if not data then
         return false
     else
@@ -581,7 +590,7 @@ function data_in_php(data)
     end
 end
 
-function post_data()
+local function post_data()
     if params["method"] ~= "POST" then return false end
     content_length = tonumber(params["request_header"]['content-length'])
     if not content_length then return false end
@@ -605,7 +614,7 @@ function post_data()
     return false
 end
 
-function waf_cookie()
+local function waf_cookie()
     if not config['cookie']['open'] or not C:is_site_config('cookie') then return false end
     if not params["request_header"]['cookie'] then return false end
     if type(params["request_header"]['cookie']) ~= "string" then return false end

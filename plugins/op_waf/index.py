@@ -245,6 +245,11 @@ def initDreplace():
     content = contentReplace(content)
     mw.writeFile(config_common, content)
 
+    init_worker = path + "/waf/lua/init_worker.lua"
+    content = mw.readFile(init_worker)
+    content = contentReplace(content)
+    mw.writeFile(init_worker, content)
+
     waf_conf = mw.getServerDir() + "/openresty/nginx/conf/luawaf.conf"
     waf_tpl = getPluginDir() + "/conf/luawaf.conf"
     content = mw.readFile(waf_tpl)
