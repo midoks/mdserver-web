@@ -345,7 +345,7 @@ def addRule():
 
     cjson = mw.getJson(content)
     mw.writeFile(fpath, cjson)
-
+    mw.restartWeb()
     return mw.returnJson(True, '设置成功!', content)
 
 
@@ -367,7 +367,7 @@ def removeRule():
 
     cjson = mw.getJson(content)
     mw.writeFile(fpath, cjson)
-
+    mw.restartWeb()
     return mw.returnJson(True, '设置成功!', content)
 
 
@@ -392,7 +392,7 @@ def setRuleState():
 
     cjson = mw.getJson(content)
     mw.writeFile(fpath, cjson)
-
+    mw.restartWeb()
     return mw.returnJson(True, '设置成功!', content)
 
 
@@ -423,7 +423,7 @@ def modifyRule():
 
     cjson = mw.getJson(content)
     mw.writeFile(fpath, cjson)
-
+    mw.restartWeb()
     return mw.returnJson(True, '设置成功!', content)
 
 
@@ -464,6 +464,7 @@ def addSiteRule():
 
     cjson = mw.getJson(content)
     mw.writeFile(path, cjson)
+    mw.restartWeb()
     return mw.returnJson(True, '设置成功!')
 
 
@@ -499,6 +500,7 @@ def addIpWhite():
 
     cjson = mw.getJson(content)
     mw.writeFile(path, cjson)
+    mw.restartWeb()
     return mw.returnJson(True, '设置成功!')
 
 
@@ -519,6 +521,7 @@ def removeIpWhite():
 
     cjson = mw.getJson(content)
     mw.writeFile(path, cjson)
+    mw.restartWeb()
     return mw.returnJson(True, '设置成功!')
 
 
@@ -554,6 +557,7 @@ def addIpBlack():
 
     cjson = mw.getJson(content)
     mw.writeFile(path, cjson)
+    mw.restartWeb()
     return mw.returnJson(True, '设置成功!')
 
 
@@ -574,6 +578,7 @@ def removeIpBlack():
 
     cjson = mw.getJson(content)
     mw.writeFile(path, cjson)
+    mw.restartWeb()
     return mw.returnJson(True, '设置成功!')
 
 
@@ -592,6 +597,7 @@ def setIpv6Black():
 
     cjson = mw.getJson(content)
     mw.writeFile(path, cjson)
+    mw.restartWeb()
     return mw.returnJson(True, '设置成功!')
 
 
@@ -633,6 +639,7 @@ def removeSiteRule():
 
     cjson = mw.getJson(content)
     mw.writeFile(path, cjson)
+    mw.restartWeb()
     return mw.returnJson(True, '设置成功!')
 
 
@@ -652,6 +659,7 @@ def setObjStatus():
 
     cjson = mw.getJson(cobj)
     mw.writeFile(conf, cjson)
+    mw.restartWeb()
     return mw.returnJson(True, '设置成功!')
 
 
@@ -670,7 +678,7 @@ def setRetry():
 
     cjson = mw.getJson(cobj)
     mw.writeFile(conf, cjson)
-
+    mw.restartWeb()
     return mw.returnJson(True, '设置成功!', [])
 
 
@@ -694,7 +702,7 @@ def setSafeVerify():
 
     cjson = mw.getJson(cobj)
     mw.writeFile(conf, cjson)
-
+    mw.restartWeb()
     return mw.returnJson(True, '设置成功!', [])
 
 
@@ -724,6 +732,7 @@ def setCcConf():
 
     cjson = mw.getJson(cobj)
     mw.writeFile(conf, cjson)
+    mw.restartWeb()
     return mw.returnJson(True, '设置成功!', [])
 
 
@@ -740,6 +749,7 @@ def saveScanRule():
     path = getRuleJsonPath('scan_black')
     cjson = mw.getJson(args)
     mw.writeFile(path, cjson)
+    mw.restartWeb()
     return mw.returnJson(True, '设置成功!', [])
 
 
@@ -812,6 +822,7 @@ def addSiteCdnHeader():
 
     cjson = mw.getJson(content)
     mw.writeFile(path, cjson)
+    mw.restartWeb()
     return mw.returnJson(True, '添加成功!')
 
 
@@ -831,6 +842,7 @@ def removeSiteCdnHeader():
 
     cjson = mw.getJson(content)
     mw.writeFile(path, cjson)
+    mw.restartWeb()
     return mw.returnJson(True, '删除成功!')
 
 
@@ -853,6 +865,7 @@ def importData():
 
     path = getRuleJsonPath(args['s_Name'])
     mw.writeFile(path, args['pdata'])
+    mw.restartWeb()
     return mw.returnJson(True, '设置成功!')
 
 
@@ -922,6 +935,7 @@ def setObjOpen():
 
     cjson = mw.getJson(cobj)
     mw.writeFile(conf, cjson)
+    mw.restartWeb()
     return mw.returnJson(True, '设置成功!')
 
 
@@ -951,6 +965,7 @@ def setSiteObjOpen():
 
     cjson = mw.getJson(content)
     mw.writeFile(path, cjson)
+    mw.restartWeb()
     return mw.returnJson(True, '设置成功!')
 
 
