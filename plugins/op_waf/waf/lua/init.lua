@@ -45,8 +45,6 @@ local params = initParams()
 C:setParams(params)
 
 local cpu_percent = ngx.shared.limit:get("cpu_usage")
-C:D("cpu:"..tostring (cpu_percent))
-
 
 local function get_return_state(rstate,rmsg)
     result = {}
