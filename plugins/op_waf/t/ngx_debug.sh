@@ -1,7 +1,8 @@
 #!/bin/sh
  
 
- # cd /www/server/mdserver-web/plugins/op_waf/t && sh ngx_debug.sh lua
+# cd /www/server/mdserver-web/plugins/op_waf/t && sh ngx_debug.sh lua t1
+# cd /www/server/mdserver-web/plugins/op_waf/t && sh ngx_debug.sh c t2
 
 if [ $# -ne 2 ]
 then
@@ -22,10 +23,12 @@ if [ ! -d /opt/FlameGraph ];then
 fi
  
 if [ $1 == "lua" ]; then
+    # /opt/openresty-systemtap-toolkit/ngx-sample-lua-bt -p 496435 --luajit21 -t 30 >temp.bt
     /opt/openresty-systemtap-toolkit/ngx-sample-lua-bt -p $pid --luajit20 -t 30 >temp.bt
+    # /opt/openresty-systemtap-toolkit/fix-lua-bt temp.bt >t1.bt
     /opt/openresty-systemtap-toolkit/fix-lua-bt temp.bt >${name}.bt
 elif [ $1 == "c" ]; then
-    /opt/nginx-systemtap-toolkit/sample-bt -p $pid -t 10 -u > ${name}.bt
+    /opt/openresty-systemtap-toolkit/sample-bt -p $pid -t 10 -u > ${name}.bt
 else
     echo "type is only lua/c"
     exit
