@@ -64,6 +64,8 @@ Install_openresty()
 	--with-http_slice_module \
 	--with-http_stub_status_module \
 	--with-http_realip_module
+	# --without-luajit-gc64
+	# 用于调式
 
 	make -j${cpuCore} && make install && make clean
 
