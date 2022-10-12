@@ -528,9 +528,9 @@ function _M.write_log(self, name, rule)
     self:inc_log(name,rule)
 end
 
-function _M.split_bylog(self,str,reps )
+function _M.split_bylog(self, str,reps)
     local resultStrList = {}
-    string.gsub(str,'[^'..reps..']+',function(w) table.insert(resultStrList,w) end)
+    ngx.re.gsub(str,'[^'..reps..']+',function(w) table.insert(resultStrList,w) end)
     return resultStrList
 end
 
@@ -554,12 +554,12 @@ function _M.get_real_ip(self, server_name)
 
     -- ipv6
     if type(client_ip) == 'table' then client_ip = "" end
-    if client_ip ~= "unknown" and string.match(client_ip,"^[%w:]+$") then
+    if client_ip ~= "unknown" and ngx.re.match(client_ip,"^[%w:]+$") then
         return client_ip
     end
 
     -- ipv4
-    if  string.match(client_ip,"%d+%.%d+%.%d+%.%d+") == nil or not self:is_ipaddr(client_ip) then
+    if  ngx.re.match(client_ip,"%d+%.%d+%.%d+%.%d+") == nil or not self:is_ipaddr(client_ip) then
         client_ip = ngx.var.remote_addr
         if client_ip == nil then
             client_ip = "unknown"
