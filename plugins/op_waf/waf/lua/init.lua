@@ -663,7 +663,7 @@ function waf()
     if waf_post() then return true end
     if post_data_chekc() then return true end
     
-    if site_config[server_name]['open'] then
+    if site_config[server_name] and site_config[server_name]['open'] then
         if X_Forwarded() then return true end
         if post_X_Forwarded() then return true end
         -- url_path()
