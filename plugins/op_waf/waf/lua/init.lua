@@ -79,7 +79,7 @@ end
 local function is_chekc_table(data,strings)
     if type(data) ~= 'table' then return 1 end 
     if not data then return 1 end
-    data=chekc_ip_timeout(data)
+    data = chekc_ip_timeout(data)
     for k,v in pairs(data)
     do
         if strings ==v['ip'] then
