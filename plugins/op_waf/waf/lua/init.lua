@@ -319,13 +319,17 @@ local function waf_cc_increase()
         ngx.shared.limit:set(cache_rand_key,cache_rand,30)
     end
 
-    make_uri_str = "waf_unbind_"..cache_rand.."_"..cache_token
+    make_token = "waf_unbind_"..cache_rand.."_"..cache_token
+    make_uri_str = "?token="..make_token
     make_uri = "/"..make_uri_str
-    C:D("waf_cc_increase:"..make_uri_str..":"..uri)
-    if uri == make_uri then
-        ngx.shared.limit:set(cache_token,1, config['safe_verify']['time'])
-        C:return_message(200, get_return_state(0,'ok'))
-    end
+
+    if params['uri_request_args']['token'] then
+        local args_token = params['uri_request_args']['token']
+        if args_token == make_token then
+            ngx.shared.limit:set(cache_token,1, config['safe_verify']['time'])
+            C:return_message(200, get_return_state(0,'ok'))
+        end
+    end    
 
     local cc_html = ngx.re.gsub(cc_safe_js_html, "{uri}", make_uri_str)
     C:return_html(200, cc_html)
@@ -522,7 +526,7 @@ end
 local function url_rule_ex()
     if site_config[server_name] == nil then return false end
     if method == "POST" and not request_args then
-        content_length=tonumber(request_header['content-length'])
+        content_length = tonumber(request_header['content-length'])
         max_len = 640 * 102400000
         request_args = nil
         if content_length < max_len then
