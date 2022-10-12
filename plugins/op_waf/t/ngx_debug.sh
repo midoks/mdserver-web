@@ -5,7 +5,7 @@
 
 if [ $# -ne 3 ]
 then
-    echo "Usage: ./`basename $0` lua/c PID NAME"
+    echo "Usage: ./`basename $0` lua/c NAME"
     exit
 fi
  
