@@ -316,7 +316,7 @@ local function waf_cc_increase()
     local cache_rand = ngx.shared.limit:get(cache_rand_key)
     if not cache_rand then 
         cache_rand = get_random(8)
-        ngx.shared.limit:set(cache_rand_key,cache_rand,10)
+        ngx.shared.limit:set(cache_rand_key,cache_rand,30)
     end
 
     make_uri_str = "waf_unbind_"..cache_rand.."_"..cache_token
