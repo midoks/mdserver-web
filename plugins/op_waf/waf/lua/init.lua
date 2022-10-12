@@ -640,12 +640,14 @@ function waf()
     -- black ip
     if waf_ip_black() then return true end
 
+    -- 封禁ip返回
+    if waf_drop() then return true end
+
     -- ua check
     if waf_user_agent() then return true end
     if waf_url() then return true end
 
     -- cc setting
-    if waf_drop() then return true end
     if waf_cc_increase() then return true end
     if waf_cc() then return true end
 
