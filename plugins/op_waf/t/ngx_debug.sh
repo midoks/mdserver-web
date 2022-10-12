@@ -1,13 +1,16 @@
 #!/bin/sh
  
+
+ # cd /www/server/mdserver-web/plugins/op_waf/t && sh ngx_debug.sh lua
+
 if [ $# -ne 3 ]
 then
     echo "Usage: ./`basename $0` lua/c PID NAME"
     exit
 fi
  
-pid=$2
-name=$3
+pid=`ps -ef|grep openresty | grep -v grep | awk '{print $2}'`
+name=$2
 
 
 if [ ! -d /opt/openresty-systemtap-toolkit ];then
