@@ -590,7 +590,6 @@ function _M.split_bylog(self, str,reps)
     local resultStrList = {}
     string.gsub(str,'[^'..reps..']+', function(w)
         table.insert(resultStrList,w)
-        return w 
     end)
     return resultStrList
 end
@@ -598,30 +597,32 @@ end
 
 function _M.get_real_ip(self, server_name)
     local client_ip = "unknown"
-    if self.site_config[server_name] then
-        if self.site_config[server_name]['cdn'] then
+    local site_config = self.site_config
+    if site_config[server_name] then
+        if site_config[server_name]['cdn'] then
             local request_header = ngx.req.get_headers()
             for _,v in ipairs(self.site_config[server_name]['cdn_header'])
             do
-                self:D("ddd:"..self:to_json(request_header[v]))
                 if request_header[v] ~= nil and request_header[v] ~= "" then
                     local header_tmp = request_header[v]
                     if type(header_tmp) == "table" then header_tmp = header_tmp[1] end
                     client_ip = self:split_bylog(header_tmp,',')[1]
+                    -- return client_ip
                     break;
                 end
             end 
         end
     end
+    
 
     -- ipv6
     if type(client_ip) == 'table' then client_ip = "" end
-    if client_ip ~= "unknown" and ngx.re.match(client_ip,"^[%w:]+$") then
+    if client_ip ~= "unknown" and ngx.re.match(client_ip,"^([a-fA-F0-9]*):") then
         return client_ip
     end
 
     -- ipv4
-    if  ngx.re.match(client_ip,"%d+%.%d+%.%d+%.%d+") == nil or not self:is_ipaddr(client_ip) then
+    if  not ngx.re.match(client_ip,"\\d+\\.\\d+\\.\\d+\\.\\d+") == nil or not self:is_ipaddr(client_ip) then
         client_ip = ngx.var.remote_addr
         if client_ip == nil then
             client_ip = "unknown"
