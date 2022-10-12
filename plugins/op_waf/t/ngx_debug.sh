@@ -3,7 +3,7 @@
 
  # cd /www/server/mdserver-web/plugins/op_waf/t && sh ngx_debug.sh lua
 
-if [ $# -ne 3 ]
+if [ $# -ne 2 ]
 then
     echo "Usage: ./`basename $0` lua/c NAME"
     exit
