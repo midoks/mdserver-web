@@ -321,7 +321,7 @@ local function waf_cc_increase()
 
     make_uri_str = "waf_unbind_"..cache_rand.."_"..cache_token
     make_uri = "/"..make_uri_str
-    C:D("waf_cc_increase:"..make_uri_str..":"..make_uri)
+    C:D("waf_cc_increase:"..make_uri_str..":"..uri)
     if uri == make_uri then
         ngx.shared.limit:set(cache_token,1, config['safe_verify']['time'])
         C:return_message(200, get_return_state(0,'ok'))
