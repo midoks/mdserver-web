@@ -130,6 +130,9 @@ def test_cdn():
     print("cdn test start")
     url_val = httpGet__cdn(url, '2409:8a62:e20:95f0:45b7:233e:f003:c0ab')
     print(url_val)
+
+    url_val2 = httpGet__cdn(url, '91.245.227.173')
+    print(url_val2)
     print("cdn test end")
 
 
@@ -194,14 +197,14 @@ def test_OK():
 
 
 def test_start():
-    test_OK()
+    # test_OK()
     # test_Dir()
     # test_UA()
     # test_POST()
     # test_scan()
     # test_CC()
     # test_url_ext()
-    # test_cdn()
+    test_cdn()
 
 
 if __name__ == "__main__":
