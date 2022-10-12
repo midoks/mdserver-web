@@ -528,9 +528,70 @@ function _M.write_log(self, name, rule)
     self:inc_log(name,rule)
 end
 
+local ffi = require("ffi")
+ffi.cdef[[
+    struct timeval {
+        long int tv_sec;
+        long int tv_usec;
+    };
+    int gettimeofday(struct timeval *tv, void *tz);
+]];
+local tm = ffi.new("struct timeval");
+ 
+-- 返回微秒级时间戳
+function _M.current_time_millis()   
+    ffi.C.gettimeofday(tm,nil);
+    local sec =  tonumber(tm.tv_sec);
+    local usec =  tonumber(tm.tv_usec);
+    return sec + usec * 10^-6;
+end
+
+
+function _M.bench(self, limit, sign, call)
+    local func_start = self.current_time_millis()
+    for i=1,limit do
+        call()
+    end
+    local func_end = self.current_time_millis()
+    local cos = func_end - func_start
+
+    self:D("["..sign.."][start]:"..tostring(func_start))
+    self:D("["..sign.."][end]:"..tostring(func_end))
+    self:D("cos["..sign.."]:"..tostring(cos))
+end
+
+-- 测试方法保留
+function _M.split_bylog_debug(self, str,reps)
+    local resultStrList = {}
+
+    self:bench(1000000, "string.gsub",function()
+        string.gsub(str,'[^'..reps..']+', function(w)
+            table.insert(resultStrList,w)
+            return w 
+        end)
+    end)
+
+    -- string.gsub(str,'[^'..reps..']+', function(w)
+    --     table.insert(resultStrList,w) 
+    -- end)
+
+    self:bench(1000000, "ngx.re.gsub" ,function()
+        ngx.re.gsub(str,'[^'..reps..']+', function(w)
+            table.insert(resultStrList,w[0])
+            return w
+        end, "ijo")
+    end)
+
+    return resultStrList
+end
+
+
 function _M.split_bylog(self, str,reps)
     local resultStrList = {}
-    ngx.re.gsub(str,'[^'..reps..']+',function(w) table.insert(resultStrList,w) end)
+    string.gsub(str,'[^'..reps..']+', function(w)
+        table.insert(resultStrList,w)
+        return w 
+    end)
     return resultStrList
 end
 
