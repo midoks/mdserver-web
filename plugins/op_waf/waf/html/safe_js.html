@@ -82,6 +82,26 @@ function ajax(type,bool){
 		}	
 	};
 
+	xhr.get = function(url,result){
+		//添加回调函数
+		var name ='PHPjs';
+		var r = name + '_' + Math.random().toString().substr(2);//随机
+
+		xhr.url = url+'&'+name+'='+r;
+		
+		if(result!=null){
+			xhr.XHR.onreadystatechange = xhr.processHandle;
+			xhr.result = result;
+		}
+		if(window.XMLHttpRequest){
+			xhr.XHR.open('GET',xhr.url,xhr.async);
+			xhr.XHR.send(null);
+		}else{
+			xhr.XHR.open('GET',xhr.url,xhr.async);
+			xhr.XHR.send();
+		}
+	};
+
 	xhr.post = function(url,send,result){
 		xhr.url = url;
 		if(typeof(send) == 'object'){
