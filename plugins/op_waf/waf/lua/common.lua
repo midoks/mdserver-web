@@ -603,7 +603,7 @@ function _M.get_real_ip(self, server_name)
             local request_header = ngx.req.get_headers()
             for _,v in ipairs(self.site_config[server_name]['cdn_header'])
             do
-                C:D("ddd:"..C:to_json(request_header[v]))
+                self:D("ddd:"..self:to_json(request_header[v]))
                 if request_header[v] ~= nil and request_header[v] ~= "" then
                     local header_tmp = request_header[v]
                     if type(header_tmp) == "table" then header_tmp = header_tmp[1] end
