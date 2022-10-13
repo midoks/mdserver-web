@@ -6,20 +6,17 @@ local C = __C:new()
 
 local waf_root = "{$WAF_ROOT}"
 
--- config = C:read_file_body_decode(waf_root.."/waf/"..'config.json')
 local config = require "config"
--- config = C:read_file_body_decode(waf_root.."/waf/"..'site.json')
 local site_config = require "site"
+
 C:setConfData(config, site_config)
 C:setDebug(true)
 
--- C:D("conf"..C:to_json(config))
 
-
-local get_html = C:read_file_body(config["reqfile_path"] .. '/' .. config["get"]["reqfile"])
-local post_html = C:read_file_body(config["reqfile_path"] .. '/' .. config["post"]["reqfile"])
-local user_agent_html = C:read_file_body(config["reqfile_path"] .. '/' .. config["user-agent"]["reqfile"])
-local cc_safe_js_html = C:read_file_body(config["reqfile_path"] .. '/' .. config["safe_verify"]["reqfile"])
+local get_html = require "html_get"
+local post_html = require "html_post"
+local user_agent_html = require "html_user_agent"
+local cc_safe_js_html = require "html_safe_js"
 
 local args_rules = require "rule_args"
 local ip_white_rules = require "rule_ip_white"
@@ -27,9 +24,7 @@ local ip_black_rules = require "rule_ip_black"
 local ipv6_black_rules = require "rule_ipv6_black"
 local scan_black_rules = require "rule_scan_black"
 local user_agent_rules = require "rule_user_agent"
--- local post_rules = C:read_file_table('post')
 local post_rules = require "rule_post"
--- local cookie_rules = C:read_file_table('cookie')
 local cookie_rules = require "rule_cookie"
 
 local server_name = string.gsub(C:get_server_name(),'_','.')
@@ -89,7 +84,7 @@ local function is_chekc_table(data,strings)
     data = chekc_ip_timeout(data)
     for k,v in pairs(data)
     do
-        if strings ==v['ip'] then
+        if strings == v['ip'] then
             return 3
         end
     end
@@ -102,8 +97,8 @@ local function save_ip_on(data)
         C:write_file(cpath2 .. 'stop_ip.lock','1')
     end
     name='stop_ip'
-    local extime=18000
-    data=json.encode(data)
+    local extime = 18000
+    data = json.encode(data)
     ngx.shared.btwaf:set(cpath2 .. name,data,extime)
     if not ngx.shared.btwaf:get(cpath2 .. name .. '_lock') then
         ngx.shared.btwaf:set(cpath2 .. name .. '_lock',1,0.5)

@@ -62,6 +62,11 @@ def listToLuaFile(path, lists):
     mw.writeFile(path, content)
 
 
+def htmlToLuaFile(path, content):
+    content = "return [[" + content + "]]"
+    mw.writeFile(path, content)
+
+
 def getConf():
     path = mw.getServerDir() + "/openresty/nginx/conf/nginx.conf"
     return path
@@ -239,6 +244,13 @@ def autoMakeLuaImportSingle(file):
     listToLuaFile(to_path, content)
 
 
+def autoMakeLuaHtmlSingle(file):
+    path = getServerDir() + "/waf/html/" + file + ".html"
+    to_path = getServerDir() + "/waf/html/html_" + file + ".lua"
+    content = mw.readFile(path)
+    htmlToLuaFile(to_path, content)
+
+
 def autoMakeLuaConf():
     conf_list = ['args', 'cookie', 'ip_black', 'ip_white',
                  'ipv6_black', 'post', 'scan_black', 'url',
@@ -249,6 +261,10 @@ def autoMakeLuaConf():
     import_list = ['config', 'site']
     for x in import_list:
         autoMakeLuaImportSingle(x)
+
+    html_list = ['get', 'post', 'safe_js', 'user_agent', 'cookie', 'other']
+    for x in html_list:
+        autoMakeLuaHtmlSingle(x)
 
 
 def initDreplace():
@@ -334,8 +350,10 @@ def restart():
 
 def reload():
     stop()
-    mw.execShell('rm -rf ' + mw.getServerDir() +
-                 "/openresty/nginx/logs/error.log")
+
+    errlog = mw.getServerDir() + "/openresty/nginx/logs/error.log"
+    mw.execShell('rm -rf ' + errlog)
+
     start()
     return 'ok'
 
