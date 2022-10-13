@@ -302,13 +302,13 @@ function _M.is_ipaddr(self, client_ip)
 end
 
 
-function _M.read_file_body_decode(self, filename)
+function _M.read_file_body_decode(self, name)
     local key = "read_file_body_decode"..name
     local fbody = ngx.shared.limit:get(key, fbody)
     if fbody then
         return fbody
     end
-    local data = json.decode(self:read_file_body(filename))
+    local data = json.decode(self:read_file_body(name))
     ngx.shared.limit:set(key,data)
     return data
 end
