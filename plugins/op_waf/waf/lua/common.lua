@@ -178,7 +178,7 @@ end
 function _M.read_file_body(self, filename)
 
     local key = "file_config_"..filename
-    fbody = ngx.shared.limit:get(key, fbody)
+    local fbody = ngx.shared.limit:get(key, fbody)
     if fbody then
         return fbody
     end
@@ -187,7 +187,7 @@ function _M.read_file_body(self, filename)
     if fp == nil then
         return nil
     end
-    fbody = fp:read("*a")
+    local fbody = fp:read("*a")
     fp:close()
     if fbody == '' then
         return nil
@@ -199,23 +199,30 @@ end
 function _M.read_file(self, name)
     f = self.rpath .. name .. '.json'
     local key = "read_file_"..name
-    fbody = ngx.shared.limit:get(key, fbody)
+    local fbody = ngx.shared.limit:get(key, fbody)
     if fbody then
         return fbody
     end
-    -- self:D("read_file:"..name)
-    fbody = self:read_file_body(f)
+    local fbody = self:read_file_body(f)
     if fbody == nil then
         return {}
     end
 
-    data = json.decode(fbody)
+    local data = json.decode(fbody)
     ngx.shared.limit:set(key,data)
     return data
 end
 
 function _M.read_file_table( self, name )
-    return self:select_rule(self:read_file(name))
+    local key = "read_file_table"..name
+    fbody = ngx.shared.limit:get(key, fbody)
+    if fbody then
+        return fbody
+    end
+
+    local data =  self:select_rule(self:read_file(name))
+    ngx.shared.limit:set(key,data)
+    return data
 end
 
 function _M.write_file(self, filename, body)
@@ -601,7 +608,7 @@ function _M.get_real_ip(self, server_name)
     if site_config[server_name] then
         if site_config[server_name]['cdn'] then
             local request_header = ngx.req.get_headers()
-            for _,v in ipairs(self.site_config[server_name]['cdn_header'])
+            for _,v in ipairs(site_config[server_name]['cdn_header'])
             do
                 if request_header[v] ~= nil and request_header[v] ~= "" then
                     local header_tmp = request_header[v]

@@ -3,6 +3,7 @@
 
 sudo apt-get install -y linux-tools-common linux-tools-generic linux-tools-`uname -r`
 apt-get update -y
+sudo apt -y install elfutils
 apt-get install -y systemtap gcc
 sudo apt-get install -y linux-headers-generic gcc libcap-dev
 apt install -y kernel-debuginfo-common kernel-debuginfo

@@ -1,5 +1,5 @@
 #!/bin/sh
-export PATH=$PATH:/opt/stapxx
+export PATH=$PATH:/opt/stap/bin:/opt/stapxx
 
 # https://moonbingbing.gitbooks.io/openresty-best-practices/content/flame_graph/install.html
 # apt install elfutils
@@ -35,7 +35,7 @@ name=$2
 
 
 
-# /opt/stapxx/samples/lj-lua-stacks.sxx --arg time=5 --skip-badvars -x 314532  > tmp.bt
+# /opt/stapxx/samples/lj-lua-stacks.sxx --arg time=5 --skip-badvars -x 45266  > tmp.bt
 
 
 if [ ! -d /opt/openresty-systemtap-toolkit ];then
@@ -46,8 +46,13 @@ if [ ! -d /opt/stapxx ];then
     cd /opt && git clone https://github.com/openresty/stapxx
 fi
 
+# stap++ -I ./tapset -x 45266 --arg limit=10 samples/ngx-upstream-post-conn.sxx
 # dpkg -i --force-overwrite /var/cache/apt/archives/linux-tools-common_5.4.0-128.144_all.deb
 
+# /opt/openresty-systemtap-toolkit/ngx-active-reqs -p 45266
+
+# git clone git://sourceware.org/git/systemtap.git
+# ./configure --prefix=/opt/stap --disable-docs --disable-publican --disable-refdocs CFLAGS="-g -O2"
 
 if [ ! -d /opt/FlameGraph ];then
     cd /opt && git clone https://github.com/brendangregg/FlameGraph
