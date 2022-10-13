@@ -27,7 +27,26 @@ local user_agent_rules = require "rule_user_agent"
 local post_rules = require "rule_post"
 local cookie_rules = require "rule_cookie"
 
-local server_name = string.gsub(C:get_server_name(),'_','.')
+
+function get_server_name()
+    local request_name = ngx.var.server_name
+    -- local my_name = ngx.shared.limit:get(c_name)
+    -- if my_name then return my_name end
+    local config_domains = require "domains"
+    for _,v in ipairs(config_domains)
+    do
+        for _,cd_name in ipairs(v['domains'])
+        do
+            if request_name == cd_name then
+                -- ngx.shared.limit:set(c_name,v['name'],3600)
+                return v['name']
+            end
+        end
+    end
+    return request_name
+end
+
+local server_name = string.gsub(get_server_name(),'_','.')
 
 local function initParams()
     local data = {}
@@ -161,7 +180,7 @@ end
 
 local function waf_get_args()
     if not config['get']['open'] or not C:is_site_config('get') then return false end
-    if C:is_ngx_match(args_rules, params['uri_request_args'],'args') then
+    if C:ngx_match_list(args_rules, params['uri_request_args']) then
         C:write_log('args','regular')
         C:return_html(config['get']['status'], get_html)
         return true

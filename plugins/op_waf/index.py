@@ -258,7 +258,7 @@ def autoMakeLuaConf():
     for x in conf_list:
         autoMakeLuaConfSingle(x)
 
-    import_list = ['config', 'site']
+    import_list = ['config', 'site', 'domains']
     for x in import_list:
         autoMakeLuaImportSingle(x)
 
@@ -772,7 +772,7 @@ def setSiteRetry():
 def setCcConf():
     args = getArgs()
     data = checkArgs(args, ['siteName', 'cycle', 'limit',
-                            'endtime', 'is_open_global', 'increase'])
+                            'endtime', 'is_open_global'])
     if not data[0]:
         return data[1]
 

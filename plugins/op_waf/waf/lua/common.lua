@@ -500,11 +500,13 @@ end
 
 
 function _M.write_log(self, name, rule)
+    local config = self.config
 
     local ip = self.params['ip']
-    local retry = self.config['retry']['retry']
-    local retry_time = self.config['retry']['retry_time']
-    local retry_cycle = self.config['retry']['retry_cycle']
+    
+    local retry = config['retry']['retry']
+    local retry_time = config['retry']['retry_time']
+    local retry_cycle = config['retry']['retry_cycle']
     
     local count, _ = ngx.shared.drop_ip:get(ip)
     if count then
@@ -513,8 +515,8 @@ function _M.write_log(self, name, rule)
         ngx.shared.drop_ip:set(ip,1,retry_cycle)
     end
 
-    if self.config['log'] ~= true or self:is_site_config('log') ~= true then return false end
-    local method = ngx.req.get_method()
+    if config['log'] ~= true or self:is_site_config('log') ~= true then return false end
+    local method = self.params['method']
     if error_rule then 
         rule = error_rule
         error_rule = nil

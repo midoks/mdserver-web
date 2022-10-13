@@ -197,9 +197,9 @@ def test_OK():
 
 
 def test_start():
-    # test_OK()
+    test_OK()
     # test_Dir()
-    test_UA()
+    # test_UA()
     # test_POST()
     # test_scan()
     # test_CC()
