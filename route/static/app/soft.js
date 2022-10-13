@@ -107,7 +107,7 @@ function getSList(isdisplay) {
 
                 var mupdate = '';//(plugin.versions[n] == plugin.updates[n]) '' : '<a class="btlink" onclick="softUpdate(\'' + plugin.name + '\',\'' + plugin.versions[n].version + '\',\'' + plugin.updates[n] + '\')">更新</a> | ';
                 // if (plugin.versions[n] == '') mupdate = '';
-                handle = mupdate + '<a class="btlink" onclick="softMain(\'' + plugin.name + '\',\'' + plugin.title + '\',\'' + plugin.setup_version + '\')">设置</a> | <a class="btlink" onclick="uninstallVersion(\'' + plugin.name + '\',' + plugin.title +',\'' + plugin.setup_version + '\',' + plugin.uninstall_pre_inspection +')">卸载</a>';
+                handle = mupdate + '<a class="btlink" onclick="softMain(\'' + plugin.name + '\',\'' + plugin.title + '\',\'' + plugin.setup_version + '\')">设置</a> | <a class="btlink" onclick="uninstallVersion(\'' + plugin.name + '\',\'' + plugin.title +'\',\'' + plugin.setup_version + '\',' + plugin.uninstall_pre_inspection +')">卸载</a>';
                 titleClick = 'onclick="softMain(\'' + plugin.name + '\',\'' + plugin.title + '\',\'' + plugin.setup_version + '\')" style="cursor:pointer"';
              
                 softPath = '<span class="glyphicon glyphicon-folder-open" title="' + plugin.path + '" onclick="openPath(\'' + plugin.path + '\')"></span>';
@@ -263,7 +263,8 @@ function uninstallPreInspection(name, ver, callback){
 
 
 function runUninstallVersion(name, title, version){
-    layer.confirm(msgTpl('您真的要卸载[{1}-{2}]吗?', [title, version]), { icon: 3, closeBtn: 1 }, function() {
+    var title = title.replace("-"+version,"");
+    layer.confirm(msgTpl('您真的要卸载【{1}-{2}】吗?', [title, version]), { icon: 3, closeBtn: 1 }, function() {
         var data = 'name=' + name + '&version=' + version;
         var loadT = layer.msg('正在处理,请稍候...', { icon: 16, time: 0, shade: [0.3, '#000'] });
         $.post('/plugins/uninstall', data, function(rdata) {
@@ -275,7 +276,7 @@ function runUninstallVersion(name, title, version){
 }
 
 
-function uninstallVersion(name, title ,version,uninstall_pre_inspection) {
+function uninstallVersion(name, title, version, uninstall_pre_inspection) {
     if (uninstall_pre_inspection) {
         uninstallPreInspection(name,title,version,function(){
             runUninstallVersion(name,title,version);
