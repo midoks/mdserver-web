@@ -6,10 +6,14 @@ local C = __C:new()
 
 local waf_root = "{$WAF_ROOT}"
 
-config = C:read_file_body_decode(waf_root.."/waf/"..'config.json')
-local site_config = C:read_file_body_decode(waf_root.."/waf/"..'site.json')
+-- config = C:read_file_body_decode(waf_root.."/waf/"..'config.json')
+local config = require "config"
+-- config = C:read_file_body_decode(waf_root.."/waf/"..'site.json')
+local site_config = require "site"
 C:setConfData(config, site_config)
 C:setDebug(true)
+
+-- C:D("conf"..C:to_json(config))
 
 
 local get_html = C:read_file_body(config["reqfile_path"] .. '/' .. config["get"]["reqfile"])

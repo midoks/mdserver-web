@@ -89,7 +89,6 @@ Install_App()
 	# https://github.com/P3TERX/GeoLite.mmdb
 	pip install geoip2
 	if [ ! -f $serverPath/webstats/GeoLite2-City.mmdb ];then
-		# pip install geoip2
 		wget --no-check-certificate -O $serverPath/webstats/GeoLite2-City.mmdb https://git.io/GeoLite2-City.mmdb
 	fi
 

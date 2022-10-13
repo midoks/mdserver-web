@@ -22,7 +22,7 @@ python3 index.py
 
 # yum -y kernel-devel kernel-headers gcc elfutils
 # stap -ve 'probe begin { log("hello systemtap!") exit() }'
-stap -e 'probe vfs.add_to_page_cache {printf("dev=%d, devname=%s, ino=%d, index=%d, nrpages=%d\n", dev, devname, ino, index, nrpages )}'
+# stap -e 'probe vfs.add_to_page_cache {printf("dev=%d, devname=%s, ino=%d, index=%d, nrpages=%d\n", dev, devname, ino, index, nrpages )}'
 # git clone https://github.com/openresty/openresty-systemtap-toolkit
 # http://openresty.org/en/build-systemtap.html
 
@@ -33,22 +33,22 @@ stap -e 'probe vfs.add_to_page_cache {printf("dev=%d, devname=%s, ino=%d, index=
 # ./ngx-active-reqs -p 383774
 
 
-wget -O kernel-debuginfo-$(uname -r).rpm http://debuginfo.centos.org/8/x86_64/kernel-debuginfo-$(uname -r).rpm
+# wget -O kernel-debuginfo-$(uname -r).rpm http://debuginfo.centos.org/8/x86_64/kernel-debuginfo-$(uname -r).rpm
 
-wget -O kernel-debuginfo-4.18.0-348.el8.x86_64.rpm http://debuginfo.centos.org/8/x86_64/Packages/kernel-debuginfo-4.18.0-348.el8.x86_64.rpm
-wget -O kernel-debuginfo-common-x86_64-4.18.0-348.el8.x86_64.rpm http://debuginfo.centos.org/8/x86_64/Packages/kernel-debuginfo-common-x86_64-4.18.0-348.el8.x86_64.rpm
+# wget -O kernel-debuginfo-4.18.0-348.el8.x86_64.rpm http://debuginfo.centos.org/8/x86_64/Packages/kernel-debuginfo-4.18.0-348.el8.x86_64.rpm
+# wget -O kernel-debuginfo-common-x86_64-4.18.0-348.el8.x86_64.rpm http://debuginfo.centos.org/8/x86_64/Packages/kernel-debuginfo-common-x86_64-4.18.0-348.el8.x86_64.rpm
 
-rpm -ivh kernel-debuginfo-4.18.0-348.el8.x86_64.rpm
-rpm -ivh kernel-debuginfo-common-x86_64-4.18.0-348.el8.x86_64.rpm
+# rpm -ivh kernel-debuginfo-4.18.0-348.el8.x86_64.rpm
+# rpm -ivh kernel-debuginfo-common-x86_64-4.18.0-348.el8.x86_64.rpm
 # uname -r 
 
 # yum install kernel-devel-4.18.0-358.el8.x86_64
 # yum install kernel-debuginfo-4.18.0-358.el8.x86_64
 
-yum search kernel-debuginfo
-kernel-devel
+# yum search kernel-debuginfo
+# kernel-devel
 
-rpm -ivh kernel-debuginfo-4.18.0-358.el8.x86_64
+# rpm -ivh kernel-debuginfo-4.18.0-358.el8.x86_64
 # yum install systemtap -y
 # yum install perf -y
 
@@ -56,11 +56,11 @@ rpm -ivh kernel-debuginfo-4.18.0-358.el8.x86_64
 # perf record -F 99  -p 4452 -g -o test.data -- sleep 100
 
 
-perf record -F 99  -p 153145 -g -o test.data -- sleep 100
+# perf record -F 99  -p 153145 -g -o test.data -- sleep 100
 
-perf script -i test.data &> perf.unfold
-./FlameGraph/stackcollapse-perf.pl perf.unfold &> perf.folded
-./FlameGraph/flamegraph.pl perf.folded > perf.svg
+# perf script -i test.data &> perf.unfold
+# ./FlameGraph/stackcollapse-perf.pl perf.unfold &> perf.folded
+# ./FlameGraph/flamegraph.pl perf.folded > perf.svg
 
 #
 # git clone https://github.com/brendangregg/FlameGraph.git

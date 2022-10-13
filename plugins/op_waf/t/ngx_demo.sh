@@ -6,6 +6,8 @@
 
 pid=`ps -ef|grep openresty | grep -v grep | awk '{print $2}'`
 
+
+# perf record -F 99 -p 45266 -g -- sleep 60 
 perf record -F 99 -p $pid -g -- sleep 60
 
 perf script -i perf.data &> perf.unfold

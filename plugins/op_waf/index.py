@@ -52,6 +52,16 @@ def checkArgs(data, ck=[]):
     return (True, mw.returnJson(True, 'ok'))
 
 
+sys.path.append(getPluginDir() + "/class")
+from luamaker import luamaker
+
+
+def listToLuaFile(path, lists):
+    content = luamaker.makeLuaTable(lists)
+    content = "return " + content
+    mw.writeFile(path, content)
+
+
 def getConf():
     path = mw.getServerDir() + "/openresty/nginx/conf/nginx.conf"
     return path
@@ -211,6 +221,36 @@ def contentReplace(content):
     return content
 
 
+def autoMakeLuaConfSingle(file):
+    path = getServerDir() + "/waf/rule/" + file + ".json"
+    to_path = getServerDir() + "/waf/conf/" + file + ".lua"
+    content = mw.readFile(path)
+    # print(content)
+    content = json.loads(content)
+    listToLuaFile(to_path, content)
+
+
+def autoMakeLuaImportSingle(file):
+    path = getServerDir() + "/waf/" + file + ".json"
+    to_path = getServerDir() + "/waf/conf/" + file + ".lua"
+    content = mw.readFile(path)
+    # print(content)
+    content = json.loads(content)
+    listToLuaFile(to_path, content)
+
+
+def autoMakeLuaConf():
+    conf_list = ['args', 'cookie', 'ip_black', 'ip_white',
+                 'ipv6_black', 'post', 'scan_black', 'url',
+                 'user_agent']
+    for x in conf_list:
+        autoMakeLuaConfSingle(x)
+
+    import_list = ['config', 'site']
+    for x in import_list:
+        autoMakeLuaImportSingle(x)
+
+
 def initDreplace():
 
     path = getServerDir()
@@ -259,6 +299,7 @@ def initDreplace():
     initDomainInfo()
     initSiteInfo()
     initTotalInfo()
+    autoMakeLuaConf()
 
     if not mw.isAppleSystem():
         mw.execShell("chown -R www:www " + path)
