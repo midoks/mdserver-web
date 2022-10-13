@@ -21,16 +21,16 @@ local post_html = C:read_file_body(config["reqfile_path"] .. '/' .. config["post
 local user_agent_html = C:read_file_body(config["reqfile_path"] .. '/' .. config["user-agent"]["reqfile"])
 local cc_safe_js_html = C:read_file_body(config["reqfile_path"] .. '/' .. config["safe_verify"]["reqfile"])
 
-local args_rules = require "args"
-local ip_white_rules = require "ip_white"
-local ip_black_rules = require "ip_black"
-local ipv6_black_rules = require "ipv6_black"
-local scan_black_rules = require "scan_black"
-local user_agent_rules = require "user_agent"
+local args_rules = require "rule_args"
+local ip_white_rules = require "rule_ip_white"
+local ip_black_rules = require "rule_ip_black"
+local ipv6_black_rules = require "rule_ipv6_black"
+local scan_black_rules = require "rule_scan_black"
+local user_agent_rules = require "rule_user_agent"
 -- local post_rules = C:read_file_table('post')
-local post_rules = require "post"
+local post_rules = require "rule_post"
 -- local cookie_rules = C:read_file_table('cookie')
-local cookie_rules = require "cookie"
+local cookie_rules = require "rule_cookie"
 
 local server_name = string.gsub(C:get_server_name(),'_','.')
 

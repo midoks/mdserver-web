@@ -223,7 +223,7 @@ def contentReplace(content):
 
 def autoMakeLuaConfSingle(file):
     path = getServerDir() + "/waf/rule/" + file + ".json"
-    to_path = getServerDir() + "/waf/conf/" + file + ".lua"
+    to_path = getServerDir() + "/waf/conf/rule_" + file + ".lua"
     content = mw.readFile(path)
     # print(content)
     content = json.loads(content)
