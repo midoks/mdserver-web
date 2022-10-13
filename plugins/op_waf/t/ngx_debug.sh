@@ -17,9 +17,6 @@ export PATH=$PATH:/opt/stapxx
 # apt-key adv --keyserver keyserver.ubuntu.com --recv-keys ECDCAD72428D7C01
 # apt-get update
 
-# cd /www/server/mdserver-web/plugins/op_waf/t && sh ngx_debug.sh lua t1
-# cd /www/server/mdserver-web/plugins/op_waf/t && sh ngx_debug.sh c t2
-
 if [ $# -ne 2 ]
 then
     echo "Usage: ./`basename $0` lua/c NAME"
@@ -29,11 +26,8 @@ fi
 pid=`ps -ef|grep openresty | grep -v grep | awk '{print $2}'`
 name=$2
 
-# stap --ldd -d /www/server/openresty/bin/openresty --all-modules -D MAXMAPENTRIES=256 -D 
-
 
 # /opt/openresty-systemtap-toolkit/ngx-active-reqs -p 496435
-
 # /opt/openresty-systemtap-toolkit/sample-bt -p 496435 -t 5 -k > a.bt
 # kernel-debuginfo-common kernel-debuginfo
 # apt install -y kernel-debuginfo-common kernel-debuginfo
@@ -60,7 +54,7 @@ if [ ! -d /opt/FlameGraph ];then
 fi
  
 if [ $1 == "lua" ]; then
-    # /opt/openresty-systemtap-toolkit/ngx-sample-lua-bt -p 790 --luajit20 -t 30 >temp.bt
+    # /opt/openresty-systemtap-toolkit/ngx-sample-lua-bt -p 45266 --luajit20 -t 30 >temp.bt
     /opt/openresty-systemtap-toolkit/ngx-sample-lua-bt -p $pid --luajit20 -t 30 >temp.bt
     # /opt/openresty-systemtap-toolkit/fix-lua-bt temp.bt >t1.bt
     /opt/openresty-systemtap-toolkit/fix-lua-bt temp.bt >${name}.bt
