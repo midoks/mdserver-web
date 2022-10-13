@@ -1,5 +1,5 @@
 #!/bin/sh
- 
+export PATH=$PATH:/opt/stapxx
 
 # https://moonbingbing.gitbooks.io/openresty-best-practices/content/flame_graph/install.html
 # apt install elfutils
@@ -36,11 +36,11 @@ name=$2
 
 # /opt/openresty-systemtap-toolkit/sample-bt -p 496435 -t 5 -k > a.bt
 # kernel-debuginfo-common kernel-debuginfo
-# apt intall -y kernel-debuginfo-common kernel-debuginfo
-# apt intall -y kernel-*
+# apt install -y kernel-debuginfo-common kernel-debuginfo
+# apt install -y kernel-*
 
 
-# export PATH=$PATH:/opt/stapxx
+
 # /opt/stapxx/samples/lj-lua-stacks.sxx --arg time=5 --skip-badvars -x 314532  > tmp.bt
 
 
@@ -52,7 +52,7 @@ if [ ! -d /opt/stapxx ];then
     cd /opt && git clone https://github.com/openresty/stapxx
 fi
 
-dpkg -i --force-overwrite /var/cache/apt/archives/linux-tools-common_5.4.0-128.144_all.deb
+# dpkg -i --force-overwrite /var/cache/apt/archives/linux-tools-common_5.4.0-128.144_all.deb
 
 
 if [ ! -d /opt/FlameGraph ];then
