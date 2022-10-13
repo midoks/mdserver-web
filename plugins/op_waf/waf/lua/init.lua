@@ -30,15 +30,15 @@ local cookie_rules = require "rule_cookie"
 
 function get_server_name()
     local request_name = ngx.var.server_name
-    -- local my_name = ngx.shared.limit:get(c_name)
-    -- if my_name then return my_name end
+    local cache_name = ngx.shared.limit:get(request_name)
+    if cache_name then return cache_name end
     local config_domains = require "domains"
     for _,v in ipairs(config_domains)
     do
         for _,cd_name in ipairs(v['domains'])
         do
             if request_name == cd_name then
-                -- ngx.shared.limit:set(c_name,v['name'],3600)
+                ngx.shared.limit:set(cd_name,v['name'],3600)
                 return v['name']
             end
         end
