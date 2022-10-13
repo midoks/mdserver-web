@@ -41,13 +41,18 @@ class luamaker:
                         if type(v) not in [int, float, bool, list, dict, tuple]:
                             v = v.encode()
                     if isinstance(v, str):
+                         # print("lua", var)
+                        v = v.replace("\\", "\\\\")
+                        v = v.replace("\"", "\\\"")
                         var = "\"" + v + "\""
+
                     elif isinstance(v, bool):
                         var = v and "true" or "false"
                     elif isinstance(v, int) or isinstance(v, float):
                         var = str(v)
                     else:
                         var = analysisTable(v, thisIndent, _parent + key)
+
                     cell.append(thisIndent + key + " = " + str(var))
                 lineJoin = ",\n"
                 return "{\n" + lineJoin.join(cell) + "\n" + _indent + "}"
