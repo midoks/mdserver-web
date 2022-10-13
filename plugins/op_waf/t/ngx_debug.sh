@@ -5,7 +5,10 @@
 # apt install elfutils
 # sudo apt-get install -y systemtap gcc
 # sudo apt-get install linux-headers-generic gcc libcap-dev
-
+# apt-get install -y libdw-dev
+# apt-get install -y fakeroot build-essential crash kexec-tools makedumpfile kernel-wedge kernel-package
+# apt-get install -y git-core libncurses5 libncurses5-dev libelf-dev asciidoc binutils-dev
+# apt-get build-dep linux
 
 # cat > /etc/apt/sources.list.d/ddebs.list << EOF
 # deb http://ddebs.ubuntu.com/ precise main restricted universe multiverse
@@ -26,15 +29,19 @@ fi
 pid=`ps -ef|grep openresty | grep -v grep | awk '{print $2}'`
 name=$2
 
-
+# stap --ldd -d /www/server/openresty/bin/openresty --all-modules -D MAXMAPENTRIES=256 -D 
 
 
 # /opt/openresty-systemtap-toolkit/ngx-active-reqs -p 496435
 
 # /opt/openresty-systemtap-toolkit/sample-bt -p 496435 -t 5 -k > a.bt
+# kernel-debuginfo-common kernel-debuginfo
+# apt intall -y kernel-debuginfo-common kernel-debuginfo
+# apt intall -y kernel-*
+
 
 # export PATH=$PATH:/opt/stapxx
-# /opt/stapxx/samples/lj-lua-stacks.sxx --arg time=5 --skip-badvars -x 562556 -DSTP_NO_OVERLOAD > tmp.bt
+# /opt/stapxx/samples/lj-lua-stacks.sxx --arg time=5 --skip-badvars -x 314532  > tmp.bt
 
 
 if [ ! -d /opt/openresty-systemtap-toolkit ];then
@@ -45,13 +52,15 @@ if [ ! -d /opt/stapxx ];then
     cd /opt && git clone https://github.com/openresty/stapxx
 fi
 
+dpkg -i --force-overwrite /var/cache/apt/archives/linux-tools-common_5.4.0-128.144_all.deb
+
 
 if [ ! -d /opt/FlameGraph ];then
     cd /opt && git clone https://github.com/brendangregg/FlameGraph
 fi
  
 if [ $1 == "lua" ]; then
-    # /opt/openresty-systemtap-toolkit/ngx-sample-lua-bt -p 496435 --luajit21 -t 30 >temp.bt
+    # /opt/openresty-systemtap-toolkit/ngx-sample-lua-bt -p 790 --luajit20 -t 30 >temp.bt
     /opt/openresty-systemtap-toolkit/ngx-sample-lua-bt -p $pid --luajit20 -t 30 >temp.bt
     # /opt/openresty-systemtap-toolkit/fix-lua-bt temp.bt >t1.bt
     /opt/openresty-systemtap-toolkit/fix-lua-bt temp.bt >${name}.bt
