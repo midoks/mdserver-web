@@ -29,24 +29,7 @@ local post_rules = require "rule_post"
 local cookie_rules = require "rule_cookie"
 
 
-function get_server_name()
-    local request_name = ngx.var.server_name
-    local cache_name = ngx.shared.waf_limit:get(request_name)
-    if cache_name then return cache_name end
-    for _,v in ipairs(config_domains)
-    do
-        for _,cd_name in ipairs(v['domains'])
-        do
-            if request_name == cd_name then
-                ngx.shared.waf_limit:set(cd_name,v['name'], 86400)
-                return v['name']
-            end
-        end
-    end
-    return request_name
-end
-
-local server_name = string.gsub(get_server_name(),'_','.')
+local server_name = string.gsub(C:get_sn(config_domains),'_','.')
 
 local function initParams()
     local data = {}
@@ -74,7 +57,7 @@ local function get_return_state(rstate,rmsg)
     return result
 end
 
-local function get_waf_waf_waf_drop_ip()
+local function get_waf_drop_ip()
     local data =  ngx.shared.waf_waf_drop_ip:get_keys(0)
     return data
 end
@@ -265,7 +248,7 @@ local function waf_cc()
             ngx.shared.waf_waf_drop_ip:set(ip,1,lock_time)
 
             C:write_log('cc',cycle..'秒内累计超过'..waf_limit..'次请求,封锁' .. lock_time .. '秒')
-            C:write_drop_ip('cc',lock_time)
+            -- C:write_drop_ip('cc',lock_time)
             ngx.exit(config['cc']['status'])
             return true
         else

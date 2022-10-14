@@ -8,7 +8,7 @@ local __C = require "common"
 local C = __C:getInstance()
 
 
-local function timer_stats_log(premature)
+local function timer_stats_total_log(premature)
     C:timer_stats_total()
 end
 
@@ -24,5 +24,5 @@ if 0 == ngx.worker.id() then
     ngx.timer.every(5, timer_every_get_cpu)
 
     -- 异步执行
-    ngx.timer.every(3, timer_stats_log)
+    ngx.timer.every(3, timer_stats_total_log)
 end

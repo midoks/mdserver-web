@@ -344,30 +344,27 @@ function _M.add_log(self, name, rule)
 
     -- 异步执行
     -- 现在改再init_workder.lua 定时执行
-    -- ngx.timer.at(0, timer_at_inc_log)
+    -- ngx.timer.every(3, timer_stats_total_log)
 end
 
 
----------------------------------------------------
+-- 获取配置域名
+function _M.get_sn(self, config_domains)
+    local request_name = ngx.var.server_name
+    local cache_name = ngx.shared.waf_limit:get(request_name)
+    if cache_name then return cache_name end
 
-function _M.get_server_name(self)
-    local c_name = ngx.var.server_name
-    local my_name = ngx.shared.waf_limit:get(c_name)
-    if my_name then return my_name end
-    local tmp = self:read_file_body(self.cpath .. 'domains.json')
-    if not tmp then return c_name end
-    local domains = json.decode(tmp)
-    for _,v in ipairs(domains)
+    for _,v in ipairs(config_domains)
     do
-        for _,d_name in ipairs(v['domains'])
+        for _,cd_name in ipairs(v['domains'])
         do
-            if c_name == d_name then
-                ngx.shared.waf_limit:set(c_name,v['name'],3600)
+            if request_name == cd_name then
+                ngx.shared.waf_limit:set(request_name,v['name'],86400)
                 return v['name']
             end
         end
     end
-    return c_name
+    return request_name
 end
 
 function _M.get_random(self,n) 
@@ -536,7 +533,7 @@ function _M.write_log(self, name, rule)
         logtmp = {ngx.localtime(),ip,method,ngx.var.request_uri, ngx.var.http_user_agent,name,retry_cycle .. '秒以内累计超过'..retry..'次以上非法请求,封锁'.. lock_time ..'秒'}
         logstr = logstr .. json.encode(logtmp) .. "\n"
         ngx.shared.waf_drop_ip:set(ip,retry+1,lock_time)
-        self:write_drop_ip('inc',lock_time)
+        -- self:write_drop_ip('inc',lock_time)
     end
     self:write_to_file(logstr)
     self:add_log(name,rule)
