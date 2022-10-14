@@ -180,11 +180,10 @@ end
 function _M.return_message(self, status, msg)
     ngx.header.content_type = "application/json"
 
-    local data = self:return_state(status,msg)
+    local data = self:return_state(status, msg)
     ngx.say(json.encode(data))
     ngx.exit(200)
 end
-
 
 function _M.return_html(self,status, html)
     ngx.header.content_type = "text/html"
@@ -532,10 +531,10 @@ function _M.write_log(self, name, rule)
     if count > retry and name ~= 'cc' then
         local safe_count,_ = ngx.shared.waf_drop_sum:get(ip)
         if not safe_count then
-            ngx.shared.waf_drop_sum:set(ip,1,86400)
+            ngx.shared.waf_drop_sum:set(ip, 1, 86400)
             safe_count = 1
         else
-            ngx.shared.waf_drop_sum:incr(ip,1)
+            ngx.shared.waf_drop_sum:incr(ip, 1)
         end
         local lock_time = retry_time * safe_count
         if lock_time > 86400 then lock_time = 86400 end

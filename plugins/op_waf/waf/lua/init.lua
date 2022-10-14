@@ -135,11 +135,11 @@ end
 local function min_route()
     if ngx.var.remote_addr ~= '127.0.0.1' then return false end
     if uri == '/get_waf_drop_ip' then
-        C:return_message(200,get_waf_drop_ip())
+        C:return_message(0,get_waf_drop_ip())
     elseif uri == '/remove_waf_drop_ip' then
-        C:return_message(200,remove_waf_drop_ip())
+        C:return_message(0,remove_waf_drop_ip())
     elseif uri == '/clean_waf_waf_waf_drop_ip' then
-        C:return_message(200,clean_waf_drop_ip())
+        C:return_message(0,clean_waf_drop_ip())
     end
 end
 
@@ -310,7 +310,7 @@ local function waf_cc_increase()
         local args_token = params['uri_request_args']['token']
         if args_token == make_token then
             ngx.shared.waf_limit:set(cache_token,1, config['safe_verify']['time'])
-            C:return_message(200, get_return_state(0,'ok'))
+            C:return_message(0,'ok')
         end
     end    
 
@@ -592,7 +592,6 @@ local function post_data()
         if not tmp then return false end
         if not tmp[2] then return false end
         local tmp2=ngx.re.match(ngx.req.get_body_data(),[[Content-Type:[^\+]{45}]]) 
-        --return return_message(200,tmp2[0])
         disable_upload_ext(tmp[2])
         if tmp2 == nil then return false end 
         data_in_php(tmp2[0])
