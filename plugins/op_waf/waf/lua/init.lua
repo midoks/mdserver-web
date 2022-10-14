@@ -97,7 +97,7 @@ local function remove_waf_drop_ip()
         ip_data=json.decode(ret)
         result = is_chekc_table(ip_data,uri_request_args['ip'])
         os.execute("sleep " .. 0.6)
-        ret2=ngx.shared.waf_limit:get(cpath2 .. 'stop_ip')
+        ret2 = ngx.shared.waf_limit:get(cpath2 .. 'stop_ip')
         ip_data2 = json.decode(ret2)
         if result == 3 then
             for k,v in pairs(ip_data2)
@@ -302,9 +302,9 @@ local function waf_cc_increase()
         ngx.shared.waf_limit:set(cache_rand_key,cache_rand,30)
     end
 
-    make_token = "waf_unbind_"..cache_rand.."_"..cache_token
-    make_uri_str = "?token="..make_token
-    make_uri = "/"..make_uri_str
+    local make_token = "waf_unbind_"..cache_rand.."_"..cache_token
+    local make_uri_str = "?token="..make_token
+    local make_uri = "/"..make_uri_str
 
     if params['uri_request_args']['token'] then
         local args_token = params['uri_request_args']['token']
