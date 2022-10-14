@@ -17,7 +17,7 @@ sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 mysqlDir=${serverPath}/source/mysql
 
-VERSION="5.7.39"
+VERSION=5.7.39
 
 
 Install_mysql()
@@ -64,7 +64,7 @@ Install_mysql()
 	cd ${rootPath}/plugins/mysql/lib && /bin/bash rpcgen.sh
 
 	if [ ! -f ${mysqlDir}/mysql-boost-${VERSION}.tar.gz ];then
-		wget -O ${mysqlDir}/mysql-boost-${VERSION}.tar.gz --tries=3 https://cdn.mysql.com/Downloads/MySQL-5.7/mysql-boost-${VERSION}.tar.gz
+		wget -O ${mysqlDir}/mysql-boost-${VERSION}.tar.gz --tries=3 https://cdn.mysql.com/archives/mysql-5.7/mysql-boost-${VERSION}.tar.gz
 	fi
 
 	#检测文件是否损坏.
@@ -76,7 +76,7 @@ Install_mysql()
 		else
 			# 重新下载
 			rm -rf ${mysqlDir}/mysql-${VERSION}
-			wget -O ${mysqlDir}/mysql-boost-${VERSION}.tar.gz --tries=3 https://cdn.mysql.com/Downloads/MySQL-5.7/mysql-boost-${VERSION}.tar.gz
+			wget -O ${mysqlDir}/mysql-boost-${VERSION}.tar.gz --tries=3 https://cdn.mysql.com/archives/mysql-5.7/mysql-boost-${VERSION}.tar.gz
 		fi
 	fi
 
