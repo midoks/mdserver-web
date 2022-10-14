@@ -236,16 +236,16 @@ local function waf_cc()
 
             local safe_count, _ = ngx.shared.waf_drop_sum:get(ip)
             if not safe_count then
-                ngx.shared.waf_drop_sum:set(ip,1,86400)
+                ngx.shared.waf_drop_sum:set(ip, 1, 86400)
                 safe_count = 1
             else
-                ngx.shared.waf_drop_sum:incr(ip,1)
+                ngx.shared.waf_drop_sum:incr(ip, 1)
             end
             local lock_time = (endtime * safe_count)
             if lock_time > 86400 then lock_time = 86400 end
 
             -- lock_time = 10
-            ngx.shared.waf_waf_drop_ip:set(ip,1,lock_time)
+            ngx.shared.waf_drop_ip:set(ip,1,lock_time)
 
             C:write_log('cc',cycle..'秒内累计超过'..waf_limit..'次请求,封锁' .. lock_time .. '秒')
             -- C:write_drop_ip('cc',lock_time)
