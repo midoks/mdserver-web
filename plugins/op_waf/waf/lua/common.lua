@@ -165,19 +165,28 @@ function _M.compare_ip(self,ips)
 end
 
 
+
 function _M.to_json(self, msg)
     return json.encode(msg)
 end
 
+function _M.return_state(status,msg)
+    result = {}
+    result['status'] = status
+    result['msg'] = msg
+    return result
+end
+
 function _M.return_message(self, status, msg)
-    ngx.header.content_type = "application/json;"
-    ngx.status = status
-    ngx.say(json.encode(msg))
-    ngx.exit(status)
+    ngx.header.content_type = "application/json"
+
+    local data = self:return_state(status,msg)
+    ngx.say(json.encode(data))
+    ngx.exit(200)
 end
 
 
-function _M.return_html(self,status,html)
+function _M.return_html(self,status, html)
     ngx.header.content_type = "text/html"
     ngx.status = status
     ngx.say(html)
@@ -274,7 +283,7 @@ end
 function _M.continue_key(self,key)
     key = tostring(key)
     if string.len(key) > 64 then return false end;
-    local keys = {"content","contents","body","msg","file","files","img","newcontent"}
+    local keys = { "content", "contents", "body", "msg", "file", "files", "img", "newcontent" }
     for _,k in ipairs(keys)
     do
         if k == key then return false end;

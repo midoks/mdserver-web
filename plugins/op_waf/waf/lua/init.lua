@@ -83,21 +83,21 @@ local function save_ip_on(data)
     name='stop_ip'
     local extime = 18000
     data = json.encode(data)
-    ngx.shared.btwaf:set(cpath2 .. name,data,extime)
-    if not ngx.shared.btwaf:get(cpath2 .. name .. '_lock') then
-        ngx.shared.btwaf:set(cpath2 .. name .. '_lock',1,0.5)
+    ngx.shared.waf_limit:set(cpath2 .. name,data,extime)
+    if not ngx.shared.waf_limit:get(cpath2 .. name .. '_lock') then
+        ngx.shared.waf_limit:set(cpath2 .. name .. '_lock',1,0.5)
         C:write_file(cpath2 .. name .. '.json',data)
     end
 end
 
 local function remove_waf_drop_ip()
     if not uri_request_args['ip'] or not C:is_ipaddr(uri_request_args['ip']) then return get_return_state(true,'格式错误') end
-    if ngx.shared.btwaf:get(cpath2 .. 'stop_ip') then
-        ret=ngx.shared.btwaf:get(cpath2 .. 'stop_ip')
+    if ngx.shared.waf_limit:get(cpath2 .. 'stop_ip') then
+        ret=ngx.shared.waf_limit:get(cpath2 .. 'stop_ip')
         ip_data=json.decode(ret)
         result = is_chekc_table(ip_data,uri_request_args['ip'])
         os.execute("sleep " .. 0.6)
-        ret2=ngx.shared.btwaf:get(cpath2 .. 'stop_ip')
+        ret2=ngx.shared.waf_limit:get(cpath2 .. 'stop_ip')
         ip_data2 = json.decode(ret2)
         if result == 3 then
             for k,v in pairs(ip_data2)
@@ -114,8 +114,8 @@ local function remove_waf_drop_ip()
 end
 
 local function clean_waf_drop_ip()
-    if ngx.shared.btwaf:get(cpath2 .. 'stop_ip') then
-        ret2 = ngx.shared.btwaf:get(cpath2 .. 'stop_ip')
+    if ngx.shared.waf_limit:get(cpath2 .. 'stop_ip') then
+        ret2 = ngx.shared.waf_limit:get(cpath2 .. 'stop_ip')
         ip_data2 = json.decode(ret2)
         for k,v in pairs(ip_data2)
         do
@@ -127,7 +127,7 @@ local function clean_waf_drop_ip()
     local data = get_waf_drop_ip()
     for _,value in ipairs(data)
     do
-        ngx.shared.waf_waf_drop_ip:delete(value)
+        ngx.shared.waf_drop_ip:delete(value)
     end
     return get_return_state(true,'已解封所有封锁IP')
 end
@@ -165,7 +165,6 @@ local function waf_ip_white()
 end
 
 local function waf_ip_black()
-    
     -- ipv4 ip black
     for _,rule in ipairs(ip_black_rules)
     do
@@ -230,6 +229,8 @@ local function waf_cc()
     local endtime = config['cc']['endtime']
     local waf_limit = config['cc']['limit']
     local cycle = config['cc']['cycle']
+
+
     if count then
         if count > waf_limit then 
 
