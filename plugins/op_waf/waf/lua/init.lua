@@ -8,6 +8,7 @@ local waf_root = "{$WAF_ROOT}"
 
 local config = require "config"
 local site_config = require "site"
+local config_domains = require "domains"
 
 C:setConfData(config, site_config)
 C:setDebug(true)
@@ -32,13 +33,12 @@ function get_server_name()
     local request_name = ngx.var.server_name
     local cache_name = ngx.shared.limit:get(request_name)
     if cache_name then return cache_name end
-    local config_domains = require "domains"
     for _,v in ipairs(config_domains)
     do
         for _,cd_name in ipairs(v['domains'])
         do
             if request_name == cd_name then
-                ngx.shared.limit:set(cd_name,v['name'],3600)
+                ngx.shared.limit:set(cd_name,v['name'], 86400)
                 return v['name']
             end
         end
@@ -77,24 +77,6 @@ end
 local function get_waf_drop_ip()
     local data =  ngx.shared.drop_ip:get_keys(0)
     return data
-end
-
-local function get_random(n) 
-    math.randomseed(ngx.time())
-    local t = {
-        "0","1","2","3","4","5","6","7","8","9",
-        "a","b","c","d","e","f","g","h","i","j",
-        "k","l","m","n","o","p","q","r","s","t",
-        "u","v","w","x","y","z",
-        "A","B","C","D","E","F","G","H","I","J",
-        "K","L","M","N","O","P","Q","R","S","T",
-        "U","V","W","X","Y","Z",
-    }    
-    local s = ""
-    for i =1, n do
-        s = s .. t[math.random(#t)]        
-    end
-    return s
 end
 
 local function is_chekc_table(data,strings)
@@ -334,7 +316,7 @@ local function waf_cc_increase()
     local cache_rand_key = ip..':rand'
     local cache_rand = ngx.shared.limit:get(cache_rand_key)
     if not cache_rand then 
-        cache_rand = get_random(8)
+        cache_rand = C:get_random(8)
         ngx.shared.limit:set(cache_rand_key,cache_rand,30)
     end
 

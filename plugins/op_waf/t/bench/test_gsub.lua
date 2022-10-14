@@ -5,7 +5,7 @@ end
 for i = 1, 100 do
     target()
 end
-
+-- 以上为预热操作
 collectgarbage()
 
 local function test_string_gsub(str,reps)

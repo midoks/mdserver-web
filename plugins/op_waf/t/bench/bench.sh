@@ -20,6 +20,9 @@ fi
 
 # test
 # $RUN_CMD a.lua
+# $RUN_CMD test_gsub.lua
 
-$RUN_CMD test_gsub.lua
+# $RUN_CMD --shdict 'limit 10m' test_find_server_name.lua
+# $RUN_CMD --stap --shdict 'limit 10m' test_find_server_name.lua
 
+$RUN_CMD  test_rand.lua
