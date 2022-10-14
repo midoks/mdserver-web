@@ -68,7 +68,7 @@ Install_mysql()
 	fi
 
 	#检测文件是否损坏.
-	md5_mysql_ok=db1b672fc257bd46356c7af26dd22801
+	md5_mysql_ok=d949b0ef81c3f52f7ef0874066244221
 	if [ -f ${mysqlDir}/mysql-boost-${VERSION}.tar.gz ];then
 		md5_mysql=`md5sum ${mysqlDir}/mysql-boost-${VERSION}.tar.gz  | awk '{print $1}'`
 		if [ "${md5_mysql_ok}" == "${md5_mysql}" ]; then
