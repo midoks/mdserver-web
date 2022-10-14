@@ -363,8 +363,8 @@ function _M.inc_log(self, name, rule)
     ngx.shared.limit:set(total_path,total_log)
 
     -- 异步执行
+    -- 现在改再init_workder.lua 定时执行
     -- ngx.timer.at(0, timer_at_inc_log)
-
 end
 
 
