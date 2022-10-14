@@ -533,7 +533,7 @@ function _M.write_log(self, name, rule)
         logtmp = {ngx.localtime(),ip,method,ngx.var.request_uri, ngx.var.http_user_agent,name,retry_cycle .. '秒以内累计超过'..retry..'次以上非法请求,封锁'.. lock_time ..'秒'}
         logstr = logstr .. json.encode(logtmp) .. "\n"
         ngx.shared.waf_drop_ip:set(ip,retry+1,lock_time)
-        -- self:write_drop_ip('inc',lock_time)
+        self:write_drop_ip('inc',lock_time)
     end
     self:write_to_file(logstr)
     self:add_log(name,rule)
