@@ -6,7 +6,7 @@ local mt = { __index = _M }
 local json = require "cjson"
 local ngx_match = ngx.re.find
 
-local debug_mode = false
+local debug_mode = true
 
 local waf_root = "{$WAF_ROOT}"
 local cpath = waf_root.."/waf/"
@@ -23,11 +23,20 @@ function _M.new(self)
         config = '',
         site_config = '',
         server_name = '',
-        params = nil
+        global_tatal = nil,
+        params = nil,
     }
     return setmetatable(self, mt)
 end
 
+
+function _M.getInstance(self)
+    if rawget(self, "instance") == nil then
+        rawset(self, "instance", self.new())
+    end
+    assert(self.instance ~= nil)
+    return self.instance
+end
 
 function _M.setDebug(self, mode)
     debug_mode = mode
@@ -126,11 +135,11 @@ function _M.is_max(self,ip1,ip2)
 end
 
 function _M.split(self, str,reps )
-    local resultStrList = {}
+    local rsList = {}
     string.gsub(str,'[^'..reps..']+',function(w)
-        table.insert(resultStrList,w)
+        table.insert(rsList,w)
     end)
-    return resultStrList
+    return rsList
 end
 
 function _M.arrip(self, ipstr)
@@ -176,13 +185,6 @@ function _M.return_html(self,status,html)
 end
 
 function _M.read_file_body(self, filename)
-
-    local key = "file_config_"..filename
-    local fbody = ngx.shared.waf_limit:get(key, fbody)
-    if fbody then
-        return fbody
-    end
-    -- self:D("read_file_body:"..filename)
     fp = io.open(filename, 'r')
     if fp == nil then
         return nil
@@ -192,37 +194,40 @@ function _M.read_file_body(self, filename)
     if fbody == '' then
         return nil
     end
-    ngx.shared.waf_limit:set(key,fbody)
     return fbody
 end
 
 function _M.read_file(self, name)
     f = self.rpath .. name .. '.json'
-    local key = "read_file_"..name
-    local fbody = ngx.shared.waf_limit:get(key, fbody)
-    if fbody then
-        return fbody
-    end
     local fbody = self:read_file_body(f)
     if fbody == nil then
         return {}
     end
 
     local data = json.decode(fbody)
-    ngx.shared.waf_limit:set(key,data)
     return data
 end
 
-function _M.read_file_table( self, name )
-    local key = "read_file_table"..name
-    fbody = ngx.shared.waf_limit:get(key, fbody)
-    if fbody then
-        return fbody
-    end
 
-    local data =  self:select_rule(self:read_file(name))
-    ngx.shared.waf_limit:set(key,data)
-    return data
+function _M.select_rule(self, rules)
+    if not rules then return {} end
+    new_rules = {}
+    for i,v in ipairs(rules)
+    do 
+        if v[1] == 1 then
+            table.insert(new_rules,v[2])
+        end
+    end
+    return new_rules
+end
+
+function _M.read_file_table( self, name )
+    return self:select_rule(self:read_file(name))
+end
+
+
+function _M.read_file_body_decode(self, name)
+    return json.decode(self:read_file_body(name))
 end
 
 function _M.write_file(self, filename, body)
@@ -236,14 +241,20 @@ function _M.write_file(self, filename, body)
     return true
 end
 
-
 function _M.write_file_clear(self, filename, body)
     return write_file_clear(filename, body)
 end
 
+function _M.write_to_file(self, logstr)
+    local server_name = self.params['server_name']
+    local filename = self.logdir .. '/' .. server_name .. '_' .. ngx.today() .. '.log'
+    self:write_file(filename, logstr)
+    return true
+end
 
-function _M.write_waf_waf_drop_ip(self, is_drop, drop_time)
-    local filename = self.logdir .. 'waf_waf_drop_ip.log'
+
+function _M.write_drop_ip(self, is_drop, drop_time)
+    local filename = self.logdir .. 'waf_drop_ip.log'
 
     local fp = io.open(filename,'ab')
     local server_name = self.params["server_name"]
@@ -259,13 +270,6 @@ function _M.write_waf_waf_drop_ip(self, is_drop, drop_time)
     return true
 end
 
-
-function _M.write_to_file(self, logstr)
-    local server_name = self.params['server_name']
-    local filename = self.logdir .. '/' .. server_name .. '_' .. ngx.today() .. '.log'
-    self:write_file(filename, logstr)
-    return true
-end
 
 function _M.continue_key(self,key)
     key = tostring(key)
@@ -290,7 +294,7 @@ function _M.array_len(self, arr)
 end
 
 function _M.is_ipaddr(self, client_ip)
-    local cipn = self:split_bylog(client_ip,'.')
+    local cipn = self:split(client_ip,'.')
     if self:array_len(cipn) < 4 then return false end
     for _,v in ipairs({1,2,3,4})
     do
@@ -301,50 +305,29 @@ function _M.is_ipaddr(self, client_ip)
     return true
 end
 
-
-function _M.read_file_body_decode(self, name)
-    local key = "read_file_body_decode"..name
-    local fbody = ngx.shared.waf_limit:get(key, fbody)
-    if fbody then
-        return fbody
-    end
-    local data = json.decode(self:read_file_body(name))
-    ngx.shared.waf_limit:set(key,data)
-    return data
-end
-
-function _M.select_rule(self, rules)
-    if not rules then return {} end
-    new_rules = {}
-    for i,v in ipairs(rules)
-    do 
-        if v[1] == 1 then
-            table.insert(new_rules,v[2])
-        end
-    end
-    return new_rules
-end
-
-local function timer_at_inc_log(premature)
-    local total_path = cpath .. 'total.json'
-    local tbody = ngx.shared.waf_limit:get(total_path)
-    if not tbody then
+-- 定时异步同步统计信息
+function _M.timer_stats_total(self)
+    local total_path = self.cpath .. 'total.json'
+    local total = ngx.shared.waf_limit:get(total_path)
+    if not total then
         return false
     end
-    return write_file_clear(total_path,tbody)
+    return self:write_file_clear(total_path,total)
 end
 
-function _M.inc_log(self, name, rule)
-
+function _M.add_log(self, name, rule)
     local server_name = self.params['server_name']
-    local total_path = self.cpath .. 'total.json'
-    local tbody = ngx.shared.waf_limit:get(total_path)
-    if not tbody then
-        tbody = self:read_file_body(total_path)
-        if not tbody then return false end
+    local total_path = cpath .. 'total.json'
+    local total = ngx.shared.waf_limit:get(total_path)
+
+    if not total then
+        local tbody = self:read_file_body(total_path)
+        total = json.decode(tbody)
+    else
+        total = json.decode(total)
     end
 
-    local total = json.decode(tbody)
+    if not total then return false end
 
     -- 开始计算
     if not total['sites'] then total['sites'] = {} end
@@ -357,10 +340,7 @@ function _M.inc_log(self, name, rule)
     total['sites'][server_name][name] = total['sites'][server_name][name] + 1
     total['rules'][name] = total['rules'][name] + 1
 
-    local total_log = json.encode(total)
-    if not total_log then return false end
-
-    ngx.shared.waf_limit:set(total_path,total_log)
+    ngx.shared.waf_limit:set(total_path,json.encode(total))
 
     -- 异步执行
     -- 现在改再init_workder.lua 定时执行
@@ -526,11 +506,11 @@ function _M.write_log(self, name, rule)
     local retry_time = config['retry']['retry_time']
     local retry_cycle = config['retry']['retry_cycle']
     
-    local count, _ = ngx.shared.waf_waf_drop_ip:get(ip)
+    local count, _ = ngx.shared.waf_drop_ip:get(ip)
     if count then
-        ngx.shared.waf_waf_drop_ip:incr(ip,1)
+        ngx.shared.waf_drop_ip:incr(ip,1)
     else
-        ngx.shared.waf_waf_drop_ip:set(ip,1,retry_cycle)
+        ngx.shared.waf_drop_ip:set(ip,1,retry_cycle)
     end
 
     if config['log'] ~= true or self:is_site_config('log') ~= true then return false end
@@ -542,7 +522,7 @@ function _M.write_log(self, name, rule)
 
     local logtmp = {ngx.localtime(), ip, method, ngx.var.request_uri, ngx.var.http_user_agent, name, rule}
     local logstr = json.encode(logtmp) .. "\n"
-    local count,_ = ngx.shared.waf_waf_drop_ip:get(ip)  
+    local count,_ = ngx.shared.waf_drop_ip:get(ip)  
     if count > retry and name ~= 'cc' then
         local safe_count,_ = ngx.shared.waf_drop_sum:get(ip)
         if not safe_count then
@@ -555,11 +535,11 @@ function _M.write_log(self, name, rule)
         if lock_time > 86400 then lock_time = 86400 end
         logtmp = {ngx.localtime(),ip,method,ngx.var.request_uri, ngx.var.http_user_agent,name,retry_cycle .. '秒以内累计超过'..retry..'次以上非法请求,封锁'.. lock_time ..'秒'}
         logstr = logstr .. json.encode(logtmp) .. "\n"
-        ngx.shared.waf_waf_drop_ip:set(ip,retry+1,lock_time)
-        self:write_waf_waf_drop_ip('inc',lock_time)
+        ngx.shared.waf_drop_ip:set(ip,retry+1,lock_time)
+        self:write_drop_ip('inc',lock_time)
     end
     self:write_to_file(logstr)
-    self:inc_log(name,rule)
+    self:add_log(name,rule)
 end
 
 local ffi = require("ffi")
@@ -640,7 +620,7 @@ function _M.get_real_ip(self, server_name)
                 if request_header[v] ~= nil and request_header[v] ~= "" then
                     local header_tmp = request_header[v]
                     if type(header_tmp) == "table" then header_tmp = header_tmp[1] end
-                    client_ip = self:split_bylog(header_tmp,',')[1]
+                    client_ip = self:split(header_tmp,',')[1]
                     -- return client_ip
                     break;
                 end
@@ -667,11 +647,12 @@ end
 
 
 function _M.is_site_config(self,cname)
-    if self.site_config[server_name] ~= nil then
+    local site_config = self.site_config
+    if site_config[server_name] ~= nil then
         if cname == 'cc' then
-            return self.site_config[server_name][cname]['open']
+            return site_config[server_name][cname]['open']
         else
-            return self.site_config[server_name][cname]
+            return site_config[server_name][cname]
         end
     end
     return true

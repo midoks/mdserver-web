@@ -2,7 +2,7 @@ local json = require "cjson"
 local ngx_match = ngx.re.find
 
 local __C = require "common"
-local C = __C:new()
+local C = __C:getInstance()
 
 local waf_root = "{$WAF_ROOT}"
 
@@ -107,7 +107,7 @@ local function save_ip_on(data)
     end
 end
 
-local function remove_waf_waf_waf_drop_ip()
+local function remove_waf_drop_ip()
     if not uri_request_args['ip'] or not C:is_ipaddr(uri_request_args['ip']) then return get_return_state(true,'格式错误') end
     if ngx.shared.btwaf:get(cpath2 .. 'stop_ip') then
         ret=ngx.shared.btwaf:get(cpath2 .. 'stop_ip')
@@ -126,22 +126,22 @@ local function remove_waf_waf_waf_drop_ip()
         end
         save_ip_on(ip_data2)
     end
-    ngx.shared.waf_waf_drop_ip:delete(uri_request_args['ip'])
+    ngx.shared.waf_drop_ip:delete(uri_request_args['ip'])
     return get_return_state(true,uri_request_args['ip'] .. '已解封')
 end
 
-local function clean_waf_waf_waf_drop_ip()
+local function clean_waf_drop_ip()
     if ngx.shared.btwaf:get(cpath2 .. 'stop_ip') then
-        ret2=ngx.shared.btwaf:get(cpath2 .. 'stop_ip')
-        ip_data2=json.decode(ret2)
+        ret2 = ngx.shared.btwaf:get(cpath2 .. 'stop_ip')
+        ip_data2 = json.decode(ret2)
         for k,v in pairs(ip_data2)
         do
-                v['time']=0
+            v['time'] = 0
         end
         save_ip_on(ip_data2)
         os.execute("sleep " .. 2)
     end
-    local data = get_btwaf_waf_waf_drop_ip()
+    local data = get_waf_drop_ip()
     for _,value in ipairs(data)
     do
         ngx.shared.waf_waf_drop_ip:delete(value)
@@ -151,12 +151,12 @@ end
 
 local function min_route()
     if ngx.var.remote_addr ~= '127.0.0.1' then return false end
-    if uri == '/get_waf_waf_waf_drop_ip' then
-        return_message(200,get_waf_waf_waf_drop_ip())
-    elseif uri == '/remove_waf_waf_waf_drop_ip' then
-        return_message(200,remove_waf_waf_waf_drop_ip())
+    if uri == '/get_waf_drop_ip' then
+        C:return_message(200,get_waf_drop_ip())
+    elseif uri == '/remove_waf_drop_ip' then
+        C:return_message(200,remove_waf_drop_ip())
     elseif uri == '/clean_waf_waf_waf_drop_ip' then
-        return_message(200,clean_waf_waf_waf_drop_ip())
+        C:return_message(200,clean_waf_drop_ip())
     end
 end
 
@@ -239,17 +239,16 @@ local function waf_cc()
 
     if not config['cc']['open'] or not C:is_site_config('cc') then return false end
 
-
     local request_uri = params['request_uri']
-    local endtime = config['cc']['endtime']
 
     local token = ngx.md5(ip .. '_' .. request_uri)
     local count = ngx.shared.waf_limit:get(token)
 
-    local waf_limit = config['cc']['waf_limit']
+    local endtime = config['cc']['endtime']
+    local waf_limit = config['cc']['limit']
     local cycle = config['cc']['cycle']
-
     if count then
+        
         if count > waf_limit then 
 
             local safe_count, _ = ngx.shared.waf_drop_sum:get(ip)
@@ -266,7 +265,7 @@ local function waf_cc()
             ngx.shared.waf_waf_drop_ip:set(ip,1,lock_time)
 
             C:write_log('cc',cycle..'秒内累计超过'..waf_limit..'次请求,封锁' .. lock_time .. '秒')
-            C:write_waf_waf_drop_ip('cc',lock_time)
+            C:write_drop_ip('cc',lock_time)
             ngx.exit(config['cc']['status'])
             return true
         else
@@ -445,9 +444,8 @@ local function  post_data_chekc()
         if not aaa then return false end 
         if tostring(aaa) == 'true' then return false end
         if type(aaa) ~= "string" then return false end
-        data_len=split(aaa,list_list)
-        
-        --return return_message(200,data_len)
+        data_len = split(aaa,list_list)
+
         if not data_len then return false end
         if arrlen(data_len) ==0 then return false end
 

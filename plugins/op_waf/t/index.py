@@ -197,14 +197,14 @@ def test_OK():
 
 
 def test_start():
-    test_OK()
+    # test_OK()
     # test_Dir()
     # test_UA()
     # test_POST()
     # test_scan()
     # test_CC()
     # test_url_ext()
-    # test_cdn()
+    test_cdn()
 
 
 if __name__ == "__main__":
