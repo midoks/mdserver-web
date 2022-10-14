@@ -231,7 +231,6 @@ local function waf_cc()
     local waf_limit = config['cc']['limit']
     local cycle = config['cc']['cycle']
     if count then
-        
         if count > waf_limit then 
 
             local safe_count, _ = ngx.shared.waf_drop_sum:get(ip)
@@ -245,17 +244,17 @@ local function waf_cc()
             if lock_time > 86400 then lock_time = 86400 end
 
             -- lock_time = 10
-            ngx.shared.waf_drop_ip:set(ip,1,lock_time)
+            ngx.shared.waf_drop_ip:set(ip, 1, lock_time)
 
             C:write_log('cc',cycle..'秒内累计超过'..waf_limit..'次请求,封锁' .. lock_time .. '秒')
             C:write_drop_ip('cc',lock_time)
             ngx.exit(config['cc']['status'])
             return true
         else
-            ngx.shared.waf_limit:incr(token,1)
+            ngx.shared.waf_limit:incr(token, 1)
         end
     else
-        ngx.shared.waf_drop_sum:set(ip,1,86400)
+        ngx.shared.waf_drop_sum:set(ip, 1, 86400)
         ngx.shared.waf_limit:set(token, 1, cycle)
     end
     return false

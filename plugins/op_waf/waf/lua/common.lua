@@ -505,9 +505,9 @@ function _M.write_log(self, name, rule)
     
     local count, _ = ngx.shared.waf_drop_ip:get(ip)
     if count then
-        ngx.shared.waf_drop_ip:incr(ip,1)
+        ngx.shared.waf_drop_ip:incr(ip, 1)
     else
-        ngx.shared.waf_drop_ip:set(ip,1,retry_cycle)
+        ngx.shared.waf_drop_ip:set(ip, 1, retry_cycle)
     end
 
     if config['log'] ~= true or self:is_site_config('log') ~= true then return false end
@@ -595,16 +595,6 @@ function _M.split_bylog_debug(self, str,reps)
 
     return resultStrList
 end
-
-
-function _M.split_bylog(self, str,reps)
-    local resultStrList = {}
-    string.gsub(str,'[^'..reps..']+', function(w)
-        table.insert(resultStrList,w)
-    end)
-    return resultStrList
-end
-
 
 function _M.get_real_ip(self, server_name)
     local client_ip = "unknown"
