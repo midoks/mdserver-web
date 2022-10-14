@@ -178,7 +178,7 @@ end
 function _M.read_file_body(self, filename)
 
     local key = "file_config_"..filename
-    local fbody = ngx.shared.limit:get(key, fbody)
+    local fbody = ngx.shared.waf_limit:get(key, fbody)
     if fbody then
         return fbody
     end
@@ -192,14 +192,14 @@ function _M.read_file_body(self, filename)
     if fbody == '' then
         return nil
     end
-    ngx.shared.limit:set(key,fbody)
+    ngx.shared.waf_limit:set(key,fbody)
     return fbody
 end
 
 function _M.read_file(self, name)
     f = self.rpath .. name .. '.json'
     local key = "read_file_"..name
-    local fbody = ngx.shared.limit:get(key, fbody)
+    local fbody = ngx.shared.waf_limit:get(key, fbody)
     if fbody then
         return fbody
     end
@@ -209,19 +209,19 @@ function _M.read_file(self, name)
     end
 
     local data = json.decode(fbody)
-    ngx.shared.limit:set(key,data)
+    ngx.shared.waf_limit:set(key,data)
     return data
 end
 
 function _M.read_file_table( self, name )
     local key = "read_file_table"..name
-    fbody = ngx.shared.limit:get(key, fbody)
+    fbody = ngx.shared.waf_limit:get(key, fbody)
     if fbody then
         return fbody
     end
 
     local data =  self:select_rule(self:read_file(name))
-    ngx.shared.limit:set(key,data)
+    ngx.shared.waf_limit:set(key,data)
     return data
 end
 
@@ -242,8 +242,8 @@ function _M.write_file_clear(self, filename, body)
 end
 
 
-function _M.write_drop_ip(self, is_drop, drop_time)
-    local filename = self.logdir .. 'drop_ip.log'
+function _M.write_waf_waf_drop_ip(self, is_drop, drop_time)
+    local filename = self.logdir .. 'waf_waf_drop_ip.log'
 
     local fp = io.open(filename,'ab')
     local server_name = self.params["server_name"]
@@ -304,12 +304,12 @@ end
 
 function _M.read_file_body_decode(self, name)
     local key = "read_file_body_decode"..name
-    local fbody = ngx.shared.limit:get(key, fbody)
+    local fbody = ngx.shared.waf_limit:get(key, fbody)
     if fbody then
         return fbody
     end
     local data = json.decode(self:read_file_body(name))
-    ngx.shared.limit:set(key,data)
+    ngx.shared.waf_limit:set(key,data)
     return data
 end
 
@@ -327,7 +327,7 @@ end
 
 local function timer_at_inc_log(premature)
     local total_path = cpath .. 'total.json'
-    local tbody = ngx.shared.limit:get(total_path)
+    local tbody = ngx.shared.waf_limit:get(total_path)
     if not tbody then
         return false
     end
@@ -338,7 +338,7 @@ function _M.inc_log(self, name, rule)
 
     local server_name = self.params['server_name']
     local total_path = self.cpath .. 'total.json'
-    local tbody = ngx.shared.limit:get(total_path)
+    local tbody = ngx.shared.waf_limit:get(total_path)
     if not tbody then
         tbody = self:read_file_body(total_path)
         if not tbody then return false end
@@ -360,7 +360,7 @@ function _M.inc_log(self, name, rule)
     local total_log = json.encode(total)
     if not total_log then return false end
 
-    ngx.shared.limit:set(total_path,total_log)
+    ngx.shared.waf_limit:set(total_path,total_log)
 
     -- 异步执行
     -- 现在改再init_workder.lua 定时执行
@@ -372,7 +372,7 @@ end
 
 function _M.get_server_name(self)
     local c_name = ngx.var.server_name
-    local my_name = ngx.shared.limit:get(c_name)
+    local my_name = ngx.shared.waf_limit:get(c_name)
     if my_name then return my_name end
     local tmp = self:read_file_body(self.cpath .. 'domains.json')
     if not tmp then return c_name end
@@ -382,7 +382,7 @@ function _M.get_server_name(self)
         for _,d_name in ipairs(v['domains'])
         do
             if c_name == d_name then
-                ngx.shared.limit:set(c_name,v['name'],3600)
+                ngx.shared.waf_limit:set(c_name,v['name'],3600)
                 return v['name']
             end
         end
@@ -526,11 +526,11 @@ function _M.write_log(self, name, rule)
     local retry_time = config['retry']['retry_time']
     local retry_cycle = config['retry']['retry_cycle']
     
-    local count, _ = ngx.shared.drop_ip:get(ip)
+    local count, _ = ngx.shared.waf_waf_drop_ip:get(ip)
     if count then
-        ngx.shared.drop_ip:incr(ip,1)
+        ngx.shared.waf_waf_drop_ip:incr(ip,1)
     else
-        ngx.shared.drop_ip:set(ip,1,retry_cycle)
+        ngx.shared.waf_waf_drop_ip:set(ip,1,retry_cycle)
     end
 
     if config['log'] ~= true or self:is_site_config('log') ~= true then return false end
@@ -542,21 +542,21 @@ function _M.write_log(self, name, rule)
 
     local logtmp = {ngx.localtime(), ip, method, ngx.var.request_uri, ngx.var.http_user_agent, name, rule}
     local logstr = json.encode(logtmp) .. "\n"
-    local count,_ = ngx.shared.drop_ip:get(ip)  
+    local count,_ = ngx.shared.waf_waf_drop_ip:get(ip)  
     if count > retry and name ~= 'cc' then
-        local safe_count,_ = ngx.shared.drop_sum:get(ip)
+        local safe_count,_ = ngx.shared.waf_drop_sum:get(ip)
         if not safe_count then
-            ngx.shared.drop_sum:set(ip,1,86400)
+            ngx.shared.waf_drop_sum:set(ip,1,86400)
             safe_count = 1
         else
-            ngx.shared.drop_sum:incr(ip,1)
+            ngx.shared.waf_drop_sum:incr(ip,1)
         end
         local lock_time = retry_time * safe_count
         if lock_time > 86400 then lock_time = 86400 end
         logtmp = {ngx.localtime(),ip,method,ngx.var.request_uri, ngx.var.http_user_agent,name,retry_cycle .. '秒以内累计超过'..retry..'次以上非法请求,封锁'.. lock_time ..'秒'}
         logstr = logstr .. json.encode(logtmp) .. "\n"
-        ngx.shared.drop_ip:set(ip,retry+1,lock_time)
-        self:write_drop_ip('inc',lock_time)
+        ngx.shared.waf_waf_drop_ip:set(ip,retry+1,lock_time)
+        self:write_waf_waf_drop_ip('inc',lock_time)
     end
     self:write_to_file(logstr)
     self:inc_log(name,rule)
@@ -581,9 +581,9 @@ function _M.current_time_millis()
 end
 
 
-function _M.bench(self, limit, sign, call)
+function _M.bench(self, waf_limit, sign, call)
     local func_start = self.current_time_millis()
-    for i=1,limit do
+    for i=1,waf_limit do
         call()
     end
     local func_end = self.current_time_millis()

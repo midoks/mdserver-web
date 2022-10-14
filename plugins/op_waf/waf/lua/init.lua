@@ -31,14 +31,14 @@ local cookie_rules = require "rule_cookie"
 
 function get_server_name()
     local request_name = ngx.var.server_name
-    local cache_name = ngx.shared.limit:get(request_name)
+    local cache_name = ngx.shared.waf_limit:get(request_name)
     if cache_name then return cache_name end
     for _,v in ipairs(config_domains)
     do
         for _,cd_name in ipairs(v['domains'])
         do
             if request_name == cd_name then
-                ngx.shared.limit:set(cd_name,v['name'], 86400)
+                ngx.shared.waf_limit:set(cd_name,v['name'], 86400)
                 return v['name']
             end
         end
@@ -65,7 +65,7 @@ end
 local params = initParams()
 C:setParams(params)
 
-local cpu_percent = ngx.shared.limit:get("cpu_usage")
+local cpu_percent = ngx.shared.waf_limit:get("cpu_usage")
 
 local function get_return_state(rstate,rmsg)
     result = {}
@@ -74,8 +74,8 @@ local function get_return_state(rstate,rmsg)
     return result
 end
 
-local function get_waf_drop_ip()
-    local data =  ngx.shared.drop_ip:get_keys(0)
+local function get_waf_waf_waf_drop_ip()
+    local data =  ngx.shared.waf_waf_drop_ip:get_keys(0)
     return data
 end
 
@@ -107,7 +107,7 @@ local function save_ip_on(data)
     end
 end
 
-local function remove_waf_drop_ip()
+local function remove_waf_waf_waf_drop_ip()
     if not uri_request_args['ip'] or not C:is_ipaddr(uri_request_args['ip']) then return get_return_state(true,'格式错误') end
     if ngx.shared.btwaf:get(cpath2 .. 'stop_ip') then
         ret=ngx.shared.btwaf:get(cpath2 .. 'stop_ip')
@@ -126,11 +126,11 @@ local function remove_waf_drop_ip()
         end
         save_ip_on(ip_data2)
     end
-    ngx.shared.drop_ip:delete(uri_request_args['ip'])
+    ngx.shared.waf_waf_drop_ip:delete(uri_request_args['ip'])
     return get_return_state(true,uri_request_args['ip'] .. '已解封')
 end
 
-local function clean_waf_drop_ip()
+local function clean_waf_waf_waf_drop_ip()
     if ngx.shared.btwaf:get(cpath2 .. 'stop_ip') then
         ret2=ngx.shared.btwaf:get(cpath2 .. 'stop_ip')
         ip_data2=json.decode(ret2)
@@ -141,22 +141,22 @@ local function clean_waf_drop_ip()
         save_ip_on(ip_data2)
         os.execute("sleep " .. 2)
     end
-    local data = get_btwaf_drop_ip()
+    local data = get_btwaf_waf_waf_drop_ip()
     for _,value in ipairs(data)
     do
-        ngx.shared.drop_ip:delete(value)
+        ngx.shared.waf_waf_drop_ip:delete(value)
     end
     return get_return_state(true,'已解封所有封锁IP')
 end
 
 local function min_route()
     if ngx.var.remote_addr ~= '127.0.0.1' then return false end
-    if uri == '/get_waf_drop_ip' then
-        return_message(200,get_waf_drop_ip())
-    elseif uri == '/remove_waf_drop_ip' then
-        return_message(200,remove_waf_drop_ip())
-    elseif uri == '/clean_waf_drop_ip' then
-        return_message(200,clean_waf_drop_ip())
+    if uri == '/get_waf_waf_waf_drop_ip' then
+        return_message(200,get_waf_waf_waf_drop_ip())
+    elseif uri == '/remove_waf_waf_waf_drop_ip' then
+        return_message(200,remove_waf_waf_waf_drop_ip())
+    elseif uri == '/clean_waf_waf_waf_drop_ip' then
+        return_message(200,clean_waf_waf_waf_drop_ip())
     end
 end
 
@@ -217,7 +217,7 @@ end
 
 
 local function waf_drop()
-    local count , _ = ngx.shared.drop_ip:get(ip)
+    local count , _ = ngx.shared.waf_drop_ip:get(ip)
     if not count then return false end
     if count > config['retry'] then
         ngx.exit(config['cc']['status'])
@@ -229,7 +229,7 @@ end
 local function waf_cc()
     local ip = params['ip']
 
-    local ip_lock = ngx.shared.drop_ip:get(ip)
+    local ip_lock = ngx.shared.waf_drop_ip:get(ip)
     if ip_lock then
         if ip_lock > 0 then
             ngx.exit(config['cc']['status'])
@@ -244,37 +244,37 @@ local function waf_cc()
     local endtime = config['cc']['endtime']
 
     local token = ngx.md5(ip .. '_' .. request_uri)
-    local count = ngx.shared.limit:get(token)
+    local count = ngx.shared.waf_limit:get(token)
 
-    local limit = config['cc']['limit']
+    local waf_limit = config['cc']['waf_limit']
     local cycle = config['cc']['cycle']
 
     if count then
-        if count > limit then 
+        if count > waf_limit then 
 
-            local safe_count, _ = ngx.shared.drop_sum:get(ip)
+            local safe_count, _ = ngx.shared.waf_drop_sum:get(ip)
             if not safe_count then
-                ngx.shared.drop_sum:set(ip,1,86400)
+                ngx.shared.waf_drop_sum:set(ip,1,86400)
                 safe_count = 1
             else
-                ngx.shared.drop_sum:incr(ip,1)
+                ngx.shared.waf_drop_sum:incr(ip,1)
             end
             local lock_time = (endtime * safe_count)
             if lock_time > 86400 then lock_time = 86400 end
 
             -- lock_time = 10
-            ngx.shared.drop_ip:set(ip,1,lock_time)
+            ngx.shared.waf_waf_drop_ip:set(ip,1,lock_time)
 
-            C:write_log('cc',cycle..'秒内累计超过'..limit..'次请求,封锁' .. lock_time .. '秒')
-            C:write_drop_ip('cc',lock_time)
+            C:write_log('cc',cycle..'秒内累计超过'..waf_limit..'次请求,封锁' .. lock_time .. '秒')
+            C:write_waf_waf_drop_ip('cc',lock_time)
             ngx.exit(config['cc']['status'])
             return true
         else
-            ngx.shared.limit:incr(token,1)
+            ngx.shared.waf_limit:incr(token,1)
         end
     else
-        ngx.shared.drop_sum:set(ip,1,86400)
-        ngx.shared.limit:set(token, 1, cycle)
+        ngx.shared.waf_drop_sum:set(ip,1,86400)
+        ngx.shared.waf_limit:set(token, 1, cycle)
     end
     return false
 end
@@ -311,13 +311,13 @@ local function waf_cc_increase()
     local cache_token = ngx.md5(ip .. '_' .. server_name)
 
     --判断是否已经通过验证
-    if ngx.shared.limit:get(cache_token) then return false end
+    if ngx.shared.waf_limit:get(cache_token) then return false end
 
     local cache_rand_key = ip..':rand'
-    local cache_rand = ngx.shared.limit:get(cache_rand_key)
+    local cache_rand = ngx.shared.waf_limit:get(cache_rand_key)
     if not cache_rand then 
         cache_rand = C:get_random(8)
-        ngx.shared.limit:set(cache_rand_key,cache_rand,30)
+        ngx.shared.waf_limit:set(cache_rand_key,cache_rand,30)
     end
 
     make_token = "waf_unbind_"..cache_rand.."_"..cache_token
@@ -327,7 +327,7 @@ local function waf_cc_increase()
     if params['uri_request_args']['token'] then
         local args_token = params['uri_request_args']['token']
         if args_token == make_token then
-            ngx.shared.limit:set(cache_token,1, config['safe_verify']['time'])
+            ngx.shared.waf_limit:set(cache_token,1, config['safe_verify']['time'])
             C:return_message(200, get_return_state(0,'ok'))
         end
     end    
