@@ -248,7 +248,7 @@ local function waf_cc()
             ngx.shared.waf_drop_ip:set(ip,1,lock_time)
 
             C:write_log('cc',cycle..'秒内累计超过'..waf_limit..'次请求,封锁' .. lock_time .. '秒')
-            -- C:write_drop_ip('cc',lock_time)
+            C:write_drop_ip('cc',lock_time)
             ngx.exit(config['cc']['status'])
             return true
         else
