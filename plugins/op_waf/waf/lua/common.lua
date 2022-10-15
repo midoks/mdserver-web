@@ -180,7 +180,10 @@ end
 function _M.return_message(self, status, msg)
     ngx.header.content_type = "application/json"
 
+    self:D("return_message:"..tostring(status)..tostring(msg))
     local data = self:return_state(status, msg)
+
+    self:D("return_message[data]:"..tostring(data))
     ngx.say(json.encode(data))
     ngx.exit(200)
 end

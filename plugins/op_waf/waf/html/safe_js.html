@@ -125,14 +125,14 @@ function ajax(type,bool){
 	return xhr;
 }
 
+ajax('JSON',true).post('{uri}',{'pass':"ok"}, function(data){
+	if (data['status'] == 0){
+		document.getElementById('status').innerHTML = 'ok';
+		location.reload();
+	}
+});
+
 var ok = setInterval(function(){
-
-	ajax('JSON',true).post('{uri}',{'pass':"ok"},function(data){
-		if (data['status'] == 0){
-			location.reload();
-		}
-	});
-
 	var id = document.getElementById('change').innerHTML;
 	id = id - 1;
 	if (id == 0){
