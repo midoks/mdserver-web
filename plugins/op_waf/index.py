@@ -329,6 +329,9 @@ def start():
     conf = conf.replace('#include luawaf.conf;', "include luawaf.conf;")
     mw.writeFile(path, conf)
 
+    import tool_task
+    tool_task.createBgTask()
+
     mw.restartWeb()
     return 'ok'
 
@@ -339,6 +342,10 @@ def stop():
     conf = conf.replace('include luawaf.conf;', "#include luawaf.conf;")
 
     mw.writeFile(path, conf)
+
+    import tool_task
+    tool_task.removeBgTask()
+
     mw.restartWeb()
     return 'ok'
 

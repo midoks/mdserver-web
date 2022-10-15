@@ -4,9 +4,9 @@ local _M = { _VERSION = '0.02' }
 local mt = { __index = _M }
 
 local json = require "cjson"
-local ngx_match = ngx.re.find
 
-local debug_mode = true
+local ngx_match = ngx.re.find
+local debug_mode = false
 
 local waf_root = "{$WAF_ROOT}"
 local cpath = waf_root.."/waf/"
@@ -259,24 +259,6 @@ function _M.write_to_file(self, logstr)
 end
 
 
-function _M.write_drop_ip(self, is_drop, drop_time)
-    local filename = self.logdir .. 'waf_drop_ip.log'
-
-    local fp = io.open(filename,'ab')
-    local server_name = self.params["server_name"]
-    local ip = self.params["server_name"]
-    local request_uri = self.params["request_uri"]
-
-    if fp == nil then return false end
-    local logtmp = {os.time(),ip,server_name,request_uri,drop_time,is_drop}
-    local logstr = json.encode(logtmp) .. "\n"
-    fp:write(logstr)
-    fp:flush()
-    fp:close()
-    return true
-end
-
-
 function _M.continue_key(self,key)
     key = tostring(key)
     if string.len(key) > 64 then return false end;
@@ -525,7 +507,6 @@ function _M.write_log(self, name, rule)
 
     local count = ngx.shared.waf_drop_ip:get(ip)
 
-    self:D("count:"..tostring(count))
     if (count > retry) then
         local safe_count,_ = ngx.shared.waf_drop_sum:get(ip)
         if not safe_count then
@@ -539,25 +520,23 @@ function _M.write_log(self, name, rule)
         local logtmp = {
             ngx.localtime(),
             ip,
-            method,ngx.var.request_uri, 
-            ngx.var.http_user_agent, 
-            name, 
+            method,ngx.var.request_uri,
+            ngx.var.http_user_agent,
+            name,
             retry_cycle .. '秒以内累计超过'..retry..'次以上非法请求,封锁'.. lock_time ..'秒'
         }
         local logstr = json.encode(logtmp) .. "\n"
         retry_times = retry + 1
         ngx.shared.waf_drop_ip:set(ip, retry_times, lock_time)
-
-        self:write_drop_ip('inc',lock_time)
         self:write_to_file(logstr)
     else
         local logtmp = {
             ngx.localtime(),
-            ip, 
-            method, 
-            ngx.var.request_uri, 
-            ngx.var.http_user_agent, 
-            name, 
+            ip,
+            method,
+            ngx.var.request_uri,
+            ngx.var.http_user_agent,
+            name,
             rule
         }
         local logstr = json.encode(logtmp) .. "\n"

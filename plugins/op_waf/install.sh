@@ -27,7 +27,9 @@ Install_of(){
 Uninstall_of(){
 
 	cd ${rootPath} && python3 ${rootPath}/plugins/op_waf/index.py stop
-	rm -rf $serverPath/op_waf
+	if [ "$?" == "0" ];then
+		rm -rf $serverPath/op_waf
+	fi
 }
 
 

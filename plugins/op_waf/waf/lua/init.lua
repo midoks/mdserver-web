@@ -13,6 +13,9 @@ local config_domains = require "domains"
 C:setConfData(config, site_config)
 C:setDebug(true)
 
+-- local ngx_os = require "os"
+-- C:("msss".. ngx_os.name)
+
 
 local get_html = require "html_get"
 local post_html = require "html_post"
