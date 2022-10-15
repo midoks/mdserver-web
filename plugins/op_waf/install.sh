@@ -13,6 +13,11 @@ install_tmp=${rootPath}/tmp/mw_install.pl
 action=$1
 version=$2
 
+
+if [ -f ${rootPath}/bin/activate ];then
+	source ${rootPath}/bin/activate
+fi
+
 Install_of(){
 	
 	echo '正在安装脚本文件...' > $install_tmp
