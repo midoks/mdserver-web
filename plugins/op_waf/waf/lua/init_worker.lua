@@ -14,10 +14,13 @@ end
 
 
 ngx.shared.waf_limit:set("cpu_usage", 0, 10)
-
 function timer_every_get_cpu(premature)
-    cpu_percent = 80
-    ngx.shared.waf_limit:set("cpu_usage", cpu_percent, 10)
+    local cpu_percent = C:read_file_body(waf_root.."/cpu.info")
+    if cpu_percent then
+        ngx.shared.waf_limit:set("cpu_usage", cpu_percent, 10)
+    else
+        ngx.shared.waf_limit:set("cpu_usage", 0, 10)
+    end
 end
 
 if 0 == ngx.worker.id() then
