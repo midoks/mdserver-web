@@ -59,7 +59,7 @@ if [ ! -d /opt/FlameGraph ];then
 fi
  
 if [ $1 == "lua" ]; then
-    # /opt/openresty-systemtap-toolkit/ngx-sample-lua-bt -p 45266 --luajit20 -t 30 >temp.bt
+    # /opt/openresty-systemtap-toolkit/ngx-sample-lua-bt -p 377452 --luajit20 -t 30 >temp.bt
     /opt/openresty-systemtap-toolkit/ngx-sample-lua-bt -p $pid --luajit20 -t 30 >temp.bt
     # /opt/openresty-systemtap-toolkit/fix-lua-bt temp.bt >t1.bt
     /opt/openresty-systemtap-toolkit/fix-lua-bt temp.bt >${name}.bt

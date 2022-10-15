@@ -122,6 +122,18 @@ def test_UA():
     print("user-agent test end")
 
 
+def test_UA_for(num):
+    '''
+    user-agent 过滤
+    '''
+    url = TEST_URL
+    print("user-agent test start")
+    for x in range(num):
+        url_val = httpGet__UA(url, 'ApacheBench')
+        print(url_val)
+    print("user-agent test end")
+
+
 def test_cdn():
     '''
     user-agent 过滤
@@ -200,14 +212,15 @@ def test_start():
     # test_OK()
     # test_Dir()
     # test_UA()
+    test_UA_for(1000)
     # test_POST()
     # test_scan()
     # test_CC()
     # test_url_ext()
-    test_cdn()
+    # test_cdn()
 
 
 if __name__ == "__main__":
-    os.system('cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/op_waf && sh install.sh uninstall 0.1 && sh install.sh install 0.1')
+    os.system('cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/op_waf && sh install.sh uninstall 0.2.2 && sh install.sh install 0.2.2')
     os.system('cd /Users/midoks/Desktop/mwdev/server/mdserver-web/ && python3 plugins/openresty/index.py stop && python3 plugins/openresty/index.py start')
     test_start()

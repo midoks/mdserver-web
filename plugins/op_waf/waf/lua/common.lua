@@ -323,7 +323,7 @@ function _M.timer_stats_total(self)
     return self:write_file_clear(total_path,total)
 end
 
-function _M.add_log(self, name, rule)
+function _M.stats_total(self, name, rule)
     local server_name = self.params['server_name']
     local total_path = cpath .. 'total.json'
     local total = ngx.shared.waf_limit:get(total_path)
@@ -511,7 +511,7 @@ function _M.write_log(self, name, rule)
     local retry_time = config['retry']['retry_time']
     local retry_cycle = config['retry']['retry_cycle']
     
-    local count, _ = ngx.shared.waf_drop_ip:get(ip)
+    local count = ngx.shared.waf_drop_ip:get(ip)
     if count then
         ngx.shared.waf_drop_ip:incr(ip, 1)
     else
@@ -525,10 +525,10 @@ function _M.write_log(self, name, rule)
         error_rule = nil
     end
 
-    local logtmp = {ngx.localtime(), ip, method, ngx.var.request_uri, ngx.var.http_user_agent, name, rule}
-    local logstr = json.encode(logtmp) .. "\n"
-    local count,_ = ngx.shared.waf_drop_ip:get(ip)  
-    if count > retry and name ~= 'cc' then
+    local count = ngx.shared.waf_drop_ip:get(ip)
+
+    self:D("count:"..tostring(count))
+    if (count > retry) then
         local safe_count,_ = ngx.shared.waf_drop_sum:get(ip)
         if not safe_count then
             ngx.shared.waf_drop_sum:set(ip, 1, 86400)
@@ -538,71 +538,37 @@ function _M.write_log(self, name, rule)
         end
         local lock_time = retry_time * safe_count
         if lock_time > 86400 then lock_time = 86400 end
-        logtmp = {ngx.localtime(),ip,method,ngx.var.request_uri, ngx.var.http_user_agent,name,retry_cycle .. '秒以内累计超过'..retry..'次以上非法请求,封锁'.. lock_time ..'秒'}
-        logstr = logstr .. json.encode(logtmp) .. "\n"
-        ngx.shared.waf_drop_ip:set(ip,retry+1,lock_time)
+        local logtmp = {
+            ngx.localtime(),
+            ip,
+            method,ngx.var.request_uri, 
+            ngx.var.http_user_agent, 
+            name, 
+            retry_cycle .. '秒以内累计超过'..retry..'次以上非法请求,封锁'.. lock_time ..'秒'
+        }
+        local logstr = json.encode(logtmp) .. "\n"
+        retry_times = retry + 1
+        ngx.shared.waf_drop_ip:set(ip, retry_times, lock_time)
+
         self:write_drop_ip('inc',lock_time)
+        self:write_to_file(logstr)
+    else
+        local logtmp = {
+            ngx.localtime(),
+            ip, 
+            method, 
+            ngx.var.request_uri, 
+            ngx.var.http_user_agent, 
+            name, 
+            rule
+        }
+        local logstr = json.encode(logtmp) .. "\n"
+        self:write_to_file(logstr)
     end
-    self:write_to_file(logstr)
-    self:add_log(name,rule)
+    
+    self:stats_total(name, rule)
 end
 
-local ffi = require("ffi")
-ffi.cdef[[
-    struct timeval {
-        long int tv_sec;
-        long int tv_usec;
-    };
-    int gettimeofday(struct timeval *tv, void *tz);
-]];
-local tm = ffi.new("struct timeval");
- 
--- 返回微秒级时间戳
-function _M.current_time_millis()   
-    ffi.C.gettimeofday(tm,nil);
-    local sec =  tonumber(tm.tv_sec);
-    local usec =  tonumber(tm.tv_usec);
-    return sec + usec * 10^-6;
-end
-
-
-function _M.bench(self, waf_limit, sign, call)
-    local func_start = self.current_time_millis()
-    for i=1,waf_limit do
-        call()
-    end
-    local func_end = self.current_time_millis()
-    local cos = func_end - func_start
-
-    self:D("["..sign.."][start]:"..tostring(func_start))
-    self:D("["..sign.."][end]:"..tostring(func_end))
-    self:D("cos["..sign.."]:"..tostring(cos))
-end
-
--- 测试方法保留
-function _M.split_bylog_debug(self, str,reps)
-    local resultStrList = {}
-
-    self:bench(1000000, "string.gsub",function()
-        string.gsub(str,'[^'..reps..']+', function(w)
-            table.insert(resultStrList,w)
-            return w 
-        end)
-    end)
-
-    -- string.gsub(str,'[^'..reps..']+', function(w)
-    --     table.insert(resultStrList,w) 
-    -- end)
-
-    self:bench(1000000, "ngx.re.gsub" ,function()
-        ngx.re.gsub(str,'[^'..reps..']+', function(w)
-            table.insert(resultStrList,w[0])
-            return w
-        end, "ijo")
-    end)
-
-    return resultStrList
-end
 
 function _M.get_real_ip(self, server_name)
     local client_ip = "unknown"

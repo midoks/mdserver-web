@@ -199,9 +199,11 @@ end
 
 
 local function waf_drop()
-    local count , _ = ngx.shared.waf_drop_ip:get(ip)
+    local ip = params['ip']
+    local count = ngx.shared.waf_drop_ip:get(ip)
     if not count then return false end
-    if count > config['retry'] then
+
+    if count > config['retry']['retry'] then
         ngx.exit(config['cc']['status'])
         return true
     end
@@ -244,11 +246,8 @@ local function waf_cc()
             local lock_time = (endtime * safe_count)
             if lock_time > 86400 then lock_time = 86400 end
 
-            -- lock_time = 10
             ngx.shared.waf_drop_ip:set(ip, 1, lock_time)
-
             C:write_log('cc',cycle..'秒内累计超过'..waf_limit..'次请求,封锁' .. lock_time .. '秒')
-            C:write_drop_ip('cc',lock_time)
             ngx.exit(config['cc']['status'])
             return true
         else
@@ -410,10 +409,10 @@ local function  post_data_chekc()
 
         if not ac then return false end 
 
-        list_list=nil
+        list_list = nil
         for i,v in ipairs(ac)
         do
-             list_list='--'..v
+             list_list = '--'..v
         end
         
         if not list_list then return false end 
@@ -443,8 +442,10 @@ end
 
 
 local function X_Forwarded()
+
     if params['method'] ~= "GET" then return false end
     if not config['get']['open'] or not C:is_site_config('get') then return false end 
+
     if C:is_ngx_match(args_rules,params["request_header"]['X-forwarded-For'],'args') then
         C:write_log('args','regular')
         C:return_html(config['get']['status'],get_html)
@@ -647,8 +648,8 @@ function waf()
     if post_data_chekc() then return true end
     
     if site_config[server_name] and site_config[server_name]['open'] then
-        if X_Forwarded() then return true end
-        if post_X_Forwarded() then return true end
+        -- if X_Forwarded() then return true end
+        -- if post_X_Forwarded() then return true end
         -- url_path()
         if url_ext() then return true end
         -- url_rule_ex()
