@@ -99,7 +99,7 @@ function _M.cron(self)
         -- 空闲空间小于10M,立即存盘
         -- local capacity_bytes = ngx.shared.mw_total:free_space()
         -- self:D("capacity_bytes:"..capacity_bytes)
-        
+        os.execute("sleep " .. 1)
         local nlen = llen - 100
         for i = 1,llen do
             local data = "" 
@@ -117,7 +117,7 @@ function _M.cron(self)
         self:unlock_working(cron_key)
     end
 
-    ngx.timer.every(3, timer_every_get_data)
+    ngx.timer.every(1, timer_every_get_data)
 end
 
 
