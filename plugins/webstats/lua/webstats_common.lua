@@ -95,7 +95,7 @@ function _M.cron(self)
             end
         end
 
-        local tmp_log = "{$SERVER_APP}/logs/tmp_"+ngx.now()+".log"
+        local tmp_log = "{$SERVER_APP}/logs/tmp_" .. tostring( ngx.now() ) .. ".log"
         -- 空闲空间小于10M,立即存盘
         -- local capacity_bytes = ngx.shared.mw_total:free_space()
         -- self:D("capacity_bytes:"..capacity_bytes)
