@@ -1,16 +1,5 @@
 log_by_lua_block {
 
-	-- python3 ./plugins/webstats/index.py reload && ab -c 10 -n 1000 http://t1.cn/
-	-- 
-    -- 
-
-	local ver = '0.2.0'
-	local max_log_id = 99999999999999
-	local debug_mode = true
-
-	local unset_server_name = "unset"
-
-
 	local cpath = "{$SERVER_APP}/lua/"
     if not package.cpath:find(cpath) then
         package.cpath = cpath .. "?.so;" .. package.cpath
@@ -19,24 +8,14 @@ log_by_lua_block {
 		package.path = cpath .. "?.lua;" .. package.path
 	end
 
-	-- debug func
-	local function D(msg)
-		if not debug_mode then return true end
-    	local fp = io.open('{$SERVER_APP}/debug.log', 'ab')
-    	if fp == nil then
-        	return nil
-    	end
-		local localtime = os.date("%Y-%m-%d %H:%M:%S")
-		if server_name then
-    		fp:write(tostring(msg) .. "\n")
-		else
-    		fp:write(localtime..":"..tostring(msg) .. "\n")
-		end
-    	fp:flush()
-    	fp:close()
-    	return true
-	end
+	local ver = '0.2.0'
+	local max_log_id = 99999999999999
+	local debug_mode = true
 
+	local unset_server_name = "unset"
+
+	local __C = require "webstats_common"
+	local C = __C:getInstance()
 
 
 	-- cache start ---
@@ -56,17 +35,23 @@ log_by_lua_block {
 		local value = cache:get(line_kv)
 		return value
 	end
+
+
 	-- cache end ---
 
 	-- domain config is import
 	local db = nil
 	local json = require "cjson" 
 	local sqlite3 = require "lsqlite3"
+	local config = require "webstats_config"
+	local sites = require "webstats_sites"
+
+	C:setConfData(config, sites)
 
 	local server_name
 	local request_header
 	local method
-	local config
+	
 	local auto_config
 	local excluded
 
@@ -78,14 +63,19 @@ log_by_lua_block {
 	local spider_column
 	--- default common var end ---
 
+
+	local function to_json(msg)
+		return json.encode(msg)
+	end
+
 	local function init_var()
-		config = require "config"
 
 		request_header = ngx.req.get_headers()
 		method = ngx.req.get_method()
 
 		day = os.date("%d")
-		today = os.date("%Y%m%d")
+		-- today = os.date("%Y%m%d")
+		today = ngx.re.gsub(ngx.today(),'-','')
 		
 		number_day = tonumber(day)
 		day_column = "day"..number_day
@@ -204,16 +194,21 @@ log_by_lua_block {
 				end
 			end
 		end
-		if type(client_ip) == 'table' then client_ip = "" end
-		if client_ip ~= "unknown" and string.match(client_ip,"^[%w:]+$") then
-			return client_ip
-		end
-		if string.match(client_ip,"%d+%.%d+%.%d+%.%d+") == nil or not is_ipaddr_bylog(client_ip) then
-			client_ip = ngx.var.remote_addr
-			if client_ip == nil then
-				client_ip = "unknown"
-			end
-		end
+
+		-- ipv6
+	    if type(client_ip) == 'table' then client_ip = "" end
+	    if client_ip ~= "unknown" and ngx.re.match(client_ip,"^([a-fA-F0-9]*):") then
+	        return client_ip
+	    end
+
+	    -- ipv4
+	    if  not ngx.re.match(client_ip,"\\d+\\.\\d+\\.\\d+\\.\\d+") == nil or not is_ipaddr_bylog(client_ip) then
+	        client_ip = ngx.var.remote_addr
+	        if client_ip == nil then
+	            client_ip = "unknown"
+	        end
+	    end
+
 		return client_ip
 	end
 
@@ -292,26 +287,20 @@ log_by_lua_block {
 	end
 
 
-
 	local function get_server_name(c_name)
 		local my_name = cache:get(c_name)
 		if my_name then return my_name end
-
-		-- D("get_server_name start")
-
 		local determined_name = nil
-		local sites = require "sites"
-		-- D("get_server_name"..json.encode(sites))
 		for _,v in ipairs(sites)
 		do
 			if c_name == v["name"] then
-				cache:set(c_name, v['name'],3600)
+				cache:set(c_name, v['name'],86400)
 				return v["name"]
 			end
 			for _,d_name in ipairs(v['domains'])
 			do
 				if c_name == d_name then
-					cache:set(c_name,v['name'],3600)
+					cache:set(c_name, v['name'], 86400)
 					return v['name']
 	            elseif string.find(d_name, "*") then
 					new_domain = string.gsub(d_name, '*', '.*')
@@ -322,12 +311,11 @@ log_by_lua_block {
 			end
 		end
 
-		-- D("get_server_name end")
 		if determined_name then
-	        cache:set(c_name, determined_name,3600)
+	        cache:set(c_name, determined_name,86400)
 			return determined_name
 		end
-	    cache:set(c_name, unset_server_name, 3600)
+	    cache:set(c_name, unset_server_name, 86400)
 		return unset_server_name
 	end
 
@@ -543,7 +531,7 @@ log_by_lua_block {
 		local ip_token = input_server_name..'_'..ip
 		if not cache:get(ip_token) then
 			ipc = 1
-			cache:set(ip_token,1,get_end_time())
+			cache:set(ip_token,1, get_end_time())
 		end
 		return ipc
 	end
@@ -569,7 +557,7 @@ log_by_lua_block {
 							local uv_token = ngx.md5(ip .. request_header['user-agent'] .. today)
 							if not cache:get(uv_token) then
 								uvc = 1
-								cache:set(uv_token,1,get_end_time())
+								cache:set(uv_token,1, get_end_time())
 							end
 						end
 					end
@@ -762,7 +750,7 @@ log_by_lua_block {
 		local domain = get_domain()
 		local referer = ngx.var.http_referer
 
-		kv = {
+		local kv = {
 			id=new_id,
 			time_key=time_key,
 			time=os.time(),
@@ -792,21 +780,19 @@ log_by_lua_block {
 
 		if not excluded then
 
-			if status_code == 500 or (method=="POST" and config["record_post_args"]==true) or (status_code==403 and config["record_get_403_args"]==true) then
+			if status_code == 500 or (method=="POST" and config["record_post_args"] == true) or (status_code==403 and config["record_get_403_args"]==true) then
 				local data = ""
 				local ok, err = pcall(function() data=get_http_original() end)
 				if ok and not err then
 					kv["request_headers"] = data
 				end
-				-- D("Get http orgininal ok:"..tostring(ok))
-				-- D("Get http orgininal res:"..tostring(data))
 			end
-
 
 			if ngx.re.find("500,501,502,503,504,505,506,507,509,510,400,401,402,403,404,405,406,407,408,409,410,411,412,413,414,415,416,417,418,421,422,423,424,425,426,449,451", tostring(status_code), "jo") then
 				local field = "status_"..status_code
 				request_stat_fields = request_stat_fields .. ","..field.."="..field.."+1"
 			end
+
 			-- D("method:"..method)
 			local lower_method = string.lower(method)
 			if ngx.re.find("get,post,put,patch,delete", lower_method, "ijo") then
@@ -834,8 +820,7 @@ log_by_lua_block {
 				spider_stat_fields = request_spider.."="..request_spider.."+"..1
 				request_stat_fields = request_stat_fields .. ","..field.."="..field.."+"..1
 			end
-     		-- D("Is spider:"..tostring(is_spider==true))
-			-- D("Request spider:".. tostring(request_spider))
+
 			if ipc > 0 then 
 				request_stat_fields = request_stat_fields..",ip=ip+1"
 			end
@@ -848,9 +833,19 @@ log_by_lua_block {
 		end
 
 		local stat_fields = request_stat_fields..";"..client_stat_fields..";"..spider_stat_fields
-		-- D("stat_fields:"..stat_fields)
-		cache_set(server_name, new_id, "stat_fields", stat_fields)
-		cache_set(server_name, new_id, "log_kv", json.encode(kv))
+
+		local data = {
+			server_name = server_name,
+			stat_fields = stat_fields,
+			log_kv = kv,
+		}
+
+		local push_data = json.encode(data)
+		local key = C:getTotalKey()
+		ngx.shared.mw_total:rpush(key, push_data)
+
+		-- cache_set(server_name, new_id, "stat_fields", stat_fields)
+		-- cache_set(server_name, new_id, "log_kv", json.encode(kv))
  	end
 
  	local function store_logs_line(db, stmt, input_server_name, lineno)
@@ -970,7 +965,7 @@ log_by_lua_block {
 		lock_working(input_server_name)
 
 		local log_dir = "{$SERVER_APP}/logs"
-		local db_path= log_dir .. '/' .. input_server_name .. "/logs.db"
+		local db_path = log_dir .. '/' .. input_server_name .. "/logs.db"
 		local db, err = sqlite3.open(db_path)
 
 		-- if  tostring(err) ~= 'nil' then
@@ -1025,7 +1020,6 @@ log_by_lua_block {
 		end
 
 		local res, err = stmt2:finalize()
-
 		if tostring(res) == "5" then
 			-- D("Finalize res:"..tostring(res))
 			-- D("Finalize err:"..tostring(err))
@@ -1061,7 +1055,7 @@ log_by_lua_block {
 		load_exclude_ip(server_name)
 
 		cache_logs()
-		store_logs(server_name)
+		-- store_logs(server_name)
 
 		-- D("------------ debug end -------------")
 	end
@@ -1076,7 +1070,7 @@ log_by_lua_block {
 			end
 		)
 		if not presult then
-			D("debug error on :"..tostring(err))
+			C:D("debug error on :"..tostring(err))
 			return true
 		end
 	end

@@ -77,11 +77,11 @@ def status():
     return 'start'
 
 
-def loadLuaLogFile():
+def loadLuaFile(name):
     lua_dir = getServerDir() + "/lua"
-    lua_dst = lua_dir + "/webstats_log.lua"
+    lua_dst = lua_dir + "/" + name
 
-    lua_tpl = getPluginDir() + '/lua/webstats_log.lua'
+    lua_tpl = getPluginDir() + '/lua/' + name
     content = mw.readFile(lua_tpl)
     content = content.replace('{$SERVER_APP}', getServerDir())
     content = content.replace('{$ROOT_PATH}', mw.getServerDir())
@@ -98,7 +98,7 @@ def loadConfigFile():
     dst_conf_json = getServerDir() + "/lua/config.json"
     mw.writeFile(dst_conf_json, json.dumps(content))
 
-    dst_conf_lua = getServerDir() + "/lua/config.lua"
+    dst_conf_lua = getServerDir() + "/lua/webstats_config.lua"
     listToLuaFile(dst_conf_lua, content)
 
 
@@ -127,7 +127,7 @@ def loadLuaSiteFile():
         ddata["default"] = dlist[0]
     mw.writeFile(default_json, json.dumps(ddata))
 
-    lua_site = lua_dir + "/sites.lua"
+    lua_site = lua_dir + "/webstats_sites.lua"
     listToLuaFile(lua_site, content)
 
 
@@ -205,7 +205,14 @@ def initDreplace():
     if not os.path.exists(log_path):
         mw.execShell('mkdir -p ' + log_path)
 
-    loadLuaLogFile()
+    file_list = [
+        'webstats_common.lua',
+        'webstats_log.lua',
+    ]
+
+    for fl in file_list:
+        loadLuaFile(fl)
+
     loadConfigFile()
     loadLuaSiteFile()
     loadDebugLogFile()
@@ -294,7 +301,7 @@ def setGlobalConf():
         content['global']['exclude_url'] = exclude_url_val
 
     mw.writeFile(conf, json.dumps(content))
-    conf_lua = getServerDir() + "/lua/config.lua"
+    conf_lua = getServerDir() + "/lua/webstats_config.lua"
     listToLuaFile(conf_lua, content)
     mw.restartWeb()
     return mw.returnJson(True, '设置成功')
@@ -387,7 +394,7 @@ def setSiteConf():
     content[domain] = site_conf
 
     mw.writeFile(conf, json.dumps(content))
-    conf_lua = getServerDir() + "/lua/config.lua"
+    conf_lua = getServerDir() + "/lua/webstats_config.lua"
     listToLuaFile(conf_lua, content)
     mw.restartWeb()
     return mw.returnJson(True, '设置成功')

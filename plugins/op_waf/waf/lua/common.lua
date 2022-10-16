@@ -30,6 +30,8 @@ function _M.new(self)
 end
 
 
+
+
 function _M.getInstance(self)
     if rawget(self, "instance") == nil then
         rawset(self, "instance", self.new())
@@ -256,6 +258,14 @@ function _M.write_to_file(self, logstr)
     local filename = self.logdir .. '/' .. server_name .. '_' .. ngx.today() .. '.log'
     self:write_file(filename, logstr)
     return true
+end
+
+-- 是否文件迁入数据库中
+function  _M.is_migrating(self)
+    local migrating = self.waf_root +"/migrating"
+    local file = io.open(migrating, "rb")
+    if file then return true end
+    return false
 end
 
 

@@ -4,17 +4,12 @@ local ngx_match = ngx.re.find
 local __C = require "common"
 local C = __C:getInstance()
 
-local waf_root = "{$WAF_ROOT}"
-
 local config = require "config"
 local site_config = require "site"
 local config_domains = require "domains"
 
 C:setConfData(config, site_config)
 C:setDebug(true)
-
--- local ngx_os = require "os"
--- C:("msss".. ngx_os.name)
 
 
 local get_html = require "html_get"
@@ -335,9 +330,9 @@ end
 local function waf_url()
     if not config['get']['open'] or not C:is_site_config('get') then return false end
     --正则--
-    if C:is_ngx_match(url_rules,params["uri"],'url') then
+    if C:is_ngx_match(url_rules, params["uri"], 'url') then
         C:write_log('url','regular')
-        C:return_html(config['get']['status'],get_html)
+        C:return_html(config['get']['status'], get_html)
         return true
     end
     return false
