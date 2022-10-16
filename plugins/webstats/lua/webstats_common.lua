@@ -18,6 +18,8 @@ local day_column = "day"..number_day
 local flow_column = "flow"..number_day
 local spider_column = "spider_flow"..number_day
 
+local log_dir = "{$SERVER_APP}/logs"
+
 function _M.new(self)
     local self = {
         total_key = total_key,
@@ -42,7 +44,6 @@ end
 
 
 function _M.initDB(self, input_sn)
-    local log_dir = "{$SERVER_APP}/logs"
     local path = log_dir .. '/' .. input_sn .. "/logs.db"
     db, _ = sqlite3.open(path)
 
@@ -70,24 +71,47 @@ end
 
 -- 后台任务
 function _M.cron(self)
+    local cron_key = 'cron_every_1s'
     local timer_every_get_data = function (premature)
+        if self:is_working(cron_key) then
+            return
+        end
+
+        self:lock_working(cron_key)
+
         local llen, _ = ngx.shared.mw_total:llen(total_key)
-        -- self:D("cron llen:"..tostring(llen))
-        for i=1,llen do
-            local data, _ = ngx.shared.mw_total:lpop(total_key)
+        local tmp_log = "{$SERVER_APP}/logs/tmp.log"
+        -- 空闲空间小于10M,立即存盘
+        local capacity_bytes = ngx.shared.mw_total:free_space()
+        -- self:D("capacity_bytes:"..capacity_bytes)
+        if capacity_bytes <= 10485760 then
+            local data = "" 
+            for i = 1,llen do
+                local tmp, _ = ngx.shared.mw_total:lpop(total_key)
+                data = data .. tmp .. "\n"
+            end
+            if data ~= "" then
+                self:write_file(tmp_log, data, "ab")
+            end
+        end
+        
+        -- 每秒100条
+        local llen, _ = cache:llen(total_key)
+        for i=1,100 do
+            local data, _ = cache:lpop(total_key)
             if data then
                 local info = json.decode(data)
                 local input_sn = info['server_name']
                 if self:is_working(input_sn) then
-                    ngx.shared.mw_total:rpush(total_key, data)
-                    local capacity_bytes = ngx.shared.mw_total:free_space()
-                    self:D("cron free_capacity:"..tostring(capacity_bytes))
+                    cache:rpush(total_key, data)
                     os.execute("sleep " .. 0.6)
                     return true
                 end
                 self:store_logs(info)
             end
         end
+
+        self:unlock_working(cron_key)
     end
 
     ngx.timer.every(1, timer_every_get_data)
@@ -324,21 +348,21 @@ function _M.is_migrating(self,input_sn)
     return false
 end
 
-function _M.is_working(self,input_sn)
-    local work_status = cache:get(input_sn.."_working")
+function _M.is_working(self,sign)
+    local work_status = cache:get(sign.."_working")
     if work_status ~= nil and work_status == true then
         return true 
     end
     return false
 end
 
-function _M.lock_working(self, input_sn)
-    local working_key = input_sn.."_working"
+function _M.lock_working(self, sign)
+    local working_key = sign.."_working"
     cache:set(working_key, true, 60)
 end
 
-function _M.unlock_working(self, input_sn)
-    local working_key = input_sn.."_working"
+function _M.unlock_working(self, sign)
+    local working_key = sign.."_working"
     cache:set(working_key, false)
 end
 
