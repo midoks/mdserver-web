@@ -74,36 +74,20 @@ function _M.cron(self)
     local cron_key = 'cron_every_1s'
     local timer_every_get_data = function (premature)
         if self:is_working(cron_key) then
-            return
+            return true
         end
 
         self:lock_working(cron_key)
 
         local llen, _ = ngx.shared.mw_total:llen(total_key)
-        local tmp_log = "{$SERVER_APP}/logs/tmp.log"
-        -- 空闲空间小于10M,立即存盘
-        local capacity_bytes = ngx.shared.mw_total:free_space()
-        -- self:D("capacity_bytes:"..capacity_bytes)
-        if capacity_bytes <= 10485760 then
-            local data = "" 
-            for i = 1,llen do
-                local tmp, _ = ngx.shared.mw_total:lpop(total_key)
-                data = data .. tmp .. "\n"
-            end
-            if data ~= "" then
-                self:write_file(tmp_log, data, "ab")
-            end
-        end
-        
         -- 每秒100条
-        local llen, _ = cache:llen(total_key)
         for i=1,100 do
-            local data, _ = cache:lpop(total_key)
+            local data, _ = ngx.shared.mw_total:lpop(total_key)
             if data then
                 local info = json.decode(data)
                 local input_sn = info['server_name']
                 if self:is_working(input_sn) then
-                    cache:rpush(total_key, data)
+                    ngx.shared.mw_total:rpush(total_key, data)
                     os.execute("sleep " .. 0.6)
                     return true
                 end
@@ -111,10 +95,26 @@ function _M.cron(self)
             end
         end
 
+        local tmp_log = "{$SERVER_APP}/logs/tmp.log"
+        -- 空闲空间小于10M,立即存盘
+        -- local capacity_bytes = ngx.shared.mw_total:free_space()
+        -- self:D("capacity_bytes:"..capacity_bytes)
+        local data = "" 
+        local nlen = llen - 100
+        for i = 1,llen do
+            local tmp, _ = ngx.shared.mw_total:lpop(total_key)
+            if tmp then
+                data = data .. tmp .. "\n"
+            end
+        end
+        if data ~= "" then
+            self:write_file(tmp_log, data, "ab")
+        end
+
         self:unlock_working(cron_key)
     end
 
-    ngx.timer.every(1, timer_every_get_data)
+    ngx.timer.every(3, timer_every_get_data)
 end
 
 
