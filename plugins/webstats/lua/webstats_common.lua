@@ -71,8 +71,8 @@ end
 
 -- 后台任务
 function _M.cron(self)
-    local cron_key = 'cron_every_1s'
     local timer_every_get_data = function (premature)
+        local cron_key = 'cron_every_1s'
         if self:is_working(cron_key) then
             return true
         end
@@ -99,17 +99,20 @@ function _M.cron(self)
         -- 空闲空间小于10M,立即存盘
         -- local capacity_bytes = ngx.shared.mw_total:free_space()
         -- self:D("capacity_bytes:"..capacity_bytes)
-        local data = "" 
+        
         local nlen = llen - 100
         for i = 1,llen do
+            local data = "" 
             local tmp, _ = ngx.shared.mw_total:lpop(total_key)
             if tmp then
                 data = data .. tmp .. "\n"
             end
+
+            if data ~= "" then
+                self:write_file(tmp_log, data, "ab")
+            end
         end
-        if data ~= "" then
-            self:write_file(tmp_log, data, "ab")
-        end
+        
 
         self:unlock_working(cron_key)
     end
