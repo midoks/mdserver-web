@@ -77,11 +77,15 @@ function _M.cron(self)
             local data, _ = ngx.shared.mw_total:lpop(total_key)
             if data then
                 local info = json.decode(data)
+                local input_sn = info['server_name']
+                if self:is_working(input_sn) then
+                    ngx.shared.mw_total:rpush(total_key, data)
+                    os.execute("sleep " .. 0.6)
+                    return true
+                end
                 self:store_logs(info)
             end
         end
-        -- local capacity_bytes = ngx.shared.mw_total:free_space()
-        -- self:D("cron free_capacity:"..tostring(capacity_bytes))
     end
 
     ngx.timer.every(1, timer_every_get_data)
@@ -226,6 +230,7 @@ function _M.store_logs(self,info)
     end
 
     if self:is_working(input_sn) then
+
         return true
     end
 
