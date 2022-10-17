@@ -419,19 +419,19 @@ function _M.store_logs_line(self, db, stmt, input_sn, info)
         end
         stmt:reset()
 
-        -- local res ,err = self:update_stat( db, "client_stat", time_key, client_stat_fields)
-        -- -- self:D("step res:"..tostring(res) ..",step err:"..tostring(err))
-        -- local res ,err = self:update_stat( db, "spider_stat", time_key, spider_stat_fields)
-        -- -- self:D("step res:"..tostring(res) ..",step err:"..tostring(err))
-        -- -- self:D("stat ok"..)
+        local res ,err = self:update_stat( db, "client_stat", time_key, client_stat_fields)
+        -- self:D("step res:"..tostring(res) ..",step err:"..tostring(err))
+        local res ,err = self:update_stat( db, "spider_stat", time_key, spider_stat_fields)
+        -- self:D("step res:"..tostring(res) ..",step err:"..tostring(err))
+        -- self:D("stat ok"..)
 
-        -- -- only count non spider requests
-        -- local ok, err = self:statistics_uri(db, request_uri, ngx.md5(request_uri), body_length)
-        -- local ok, err = self:statistics_ip(db, ip, body_length)
-        -- -- self:D("stat url ip ok")
+        -- only count non spider requests
+        local ok, err = self:statistics_uri(db, request_uri, ngx.md5(request_uri), body_length)
+        local ok, err = self:statistics_ip(db, ip, body_length)
+        -- self:D("stat url ip ok")
     end
 
-    -- self:update_stat( db, "request_stat", time_key, request_stat_fields)
+    self:update_stat( db, "request_stat", time_key, request_stat_fields)
     return true
 end
 
