@@ -120,6 +120,8 @@ function _M.cron(self)
             local db = dbs[input_sn]
 
             if db then
+                db:exec([[BEGIN TRANSACTION]])
+                
                 stmt2_pre = db:prepare[[INSERT INTO web_logs(
                         time, ip, domain, server_name, method, status_code, uri, body_length,
                         referer, user_agent, protocol, request_time, is_spider, request_headers, ip_list, client_port)
@@ -204,8 +206,6 @@ function _M.store_logs(self, db, stmt2, info)
     local input_sn = info["server_name"]
 
     self:lock_working(input_sn)
-
-    db:exec([[BEGIN TRANSACTION]])
 
     self:store_logs_line(db, stmt2, input_sn, info)
 
