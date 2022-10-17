@@ -83,6 +83,7 @@ function _M.cron(self)
         -- self:D( json.encode (sites) )
 
         local dbs = {}
+        local stmt2 = {}
         for i,v in ipairs(sites) do
             local input_sn = v["name"]
             local db = self:initDB(input_sn)
@@ -100,6 +101,15 @@ function _M.cron(self)
                     status, errorString = db:exec(update_sql)
                     self:write_update_day(input_sn)
                 end
+
+         
+                stmt2_pre = db:prepare[[INSERT INTO web_logs(
+                        time, ip, domain, server_name, method, status_code, uri, body_length,
+                        referer, user_agent, protocol, request_time, is_spider, request_headers, ip_list, client_port)
+                        VALUES(:time, :ip, :domain, :server_name, :method, :status_code, :uri,
+                        :body_length, :referer, :user_agent, :protocol, :request_time, :is_spider,
+                        :request_headers, :ip_list, :client_port)]]
+                stmt2[input_sn] = stmt2_pre
             end
         end
 
@@ -132,7 +142,9 @@ function _M.cron(self)
                         os.execute("sleep " .. 0.6)
                         return true
                     end
-                    self:store_logs(db, info)
+
+                    local local_stmt2 = stmt2[input_sn] 
+                    self:store_logs(db, local_stmt2, info)
                 end
             end
         end
@@ -180,24 +192,12 @@ function _M.cron(self)
     ngx.timer.every(3, timer_every_get_data)
 end
 
-function _M.store_logs(self, db, info)
+function _M.store_logs(self, db, stmt2, info)
     local input_sn = info["server_name"]
 
     self:lock_working(input_sn)
 
-    local stmt2 = nil
-    if db ~= nil then
-        stmt2 = db:prepare[[INSERT INTO web_logs(
-            time, ip, domain, server_name, method, status_code, uri, body_length,
-            referer, user_agent, protocol, request_time, is_spider, request_headers, ip_list, client_port)
-            VALUES(:time, :ip, :domain, :server_name, :method, :status_code, :uri,
-            :body_length, :referer, :user_agent, :protocol, :request_time, :is_spider,
-            :request_headers, :ip_list, :client_port)]]
-    end
-
-    status, errorString = db:exec([[BEGIN TRANSACTION]])
-
-    
+    db:exec([[BEGIN TRANSACTION]])
 
     self:store_logs_line(db, stmt2, input_sn, info)
 
