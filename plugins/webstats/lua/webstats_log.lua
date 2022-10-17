@@ -318,10 +318,9 @@ log_by_lua_block {
 
 		-- C:D("stat_fields:"..stat_fields)
 		-- C:D("log_kv:"..json.encode(kv))
+		
 		-- cache_set(server_name, new_id, "stat_fields", stat_fields)
 		-- cache_set(server_name, new_id, "log_kv", json.encode(kv))
-
-
 		
  	end
 
