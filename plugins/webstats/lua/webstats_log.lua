@@ -1054,7 +1054,7 @@ log_by_lua_block {
 		load_global_exclude_ip()
 		load_exclude_ip(server_name)
 
-		cache_logs()
+		-- cache_logs()
 		-- store_logs(server_name)
 
 		-- D("------------ debug end -------------")
