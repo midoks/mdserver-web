@@ -112,8 +112,6 @@ function _M.cron(self)
 
         self:lock_working(cron_key)
 
-
-
         local llen, _ = ngx.shared.mw_total:llen(total_key)
         -- 每秒100条
         for i=1,llen do
