@@ -2032,7 +2032,7 @@ function wsTableErrorLogRequest(page){
                 type: 1,
                 title: "【"+res.domain + "】详情信息",
                 area: '600px',
-                closeBtn: 2,
+                closeBtn: 1,
                 shadeClose: false,
                 content: '<div class="pd15 lib-box">\
                     <div style="height:80px;"><table class="table" style="border:#ddd 1px solid; margin-bottom:10px">\
@@ -2241,7 +2241,7 @@ function wsTableLogRequest(page){
                 type: 1,
                 title: "【"+res.domain + "】详情信息",
                 area: '600px',
-                closeBtn: 2,
+                closeBtn: 1,
                 shadeClose: false,
                 content: '<div class="pd15 lib-box">\
                     <div style="height:80px;"><table class="table" style="border:#ddd 1px solid; margin-bottom:10px">\

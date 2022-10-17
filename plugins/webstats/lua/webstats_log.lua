@@ -66,8 +66,6 @@ log_by_lua_block {
 	local method = ngx.req.get_method()
 	local excluded = false
 
-
-	local today = ngx.re.gsub(ngx.today(),'-','')
 	local day = os.date("%d")
 	local number_day = tonumber(day)
 	local day_column = "day"..number_day
@@ -230,7 +228,7 @@ log_by_lua_block {
 		local protocol = ngx.var.server_protocol
 		local request_uri = ngx.var.request_uri
 		local time_key = C:get_store_key()
-		local method = ngx.req.get_method()
+		local method = method
 		local body_length = C:get_length()
 		local domain = C:get_domain()
 		local referer = ngx.var.http_referer
