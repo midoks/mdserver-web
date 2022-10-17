@@ -46,7 +46,10 @@ end
 function _M.getInstance(self)
     if rawget(self, "instance") == nil then
         rawset(self, "instance", self.new())
-        self:cron()
+
+        if 0 == ngx.worker.id() then
+            self:cron()
+        end
     end
     assert(self.instance ~= nil)
     return self.instance
