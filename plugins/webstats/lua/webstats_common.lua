@@ -45,7 +45,11 @@ end
 
 function _M.initDB(self, input_sn)
     local path = log_dir .. '/' .. input_sn .. "/logs.db"
-    db, _ = sqlite3.open(path)
+    db, err = sqlite3.open(path)
+
+    if err then
+        return nil
+    end
 
     db:exec([[PRAGMA synchronous = 0]])
     db:exec([[PRAGMA page_size = 4096]])
@@ -119,13 +123,22 @@ function _M.cron(self)
             end
         end
 
+        
         for _, local_db in pairs(dbs) do
-            local res, err = local_db:execute([[COMMIT]])
+            if local_db then
+                local now_date = os.date("*t")
+                local save_day = config['global']["save_day"]
+                local save_date_timestamp = os.time{year=now_date.year,
+                    month=now_date.month, day=now_date.day-save_day, hour=0}
+                -- delete expire data
+                local_db:exec("DELETE FROM web_logs WHERE time<"..tostring(save_date_timestamp))
+            end
+
             if local_db and local_db:isopen() then
+                local_db:execute([[COMMIT]])
                 local_db:close()
             end
-        end
-      
+        end 
         
 
         -- local tmp_log = "{$SERVER_APP}/logs/tmp_" .. tostring( ngx.now() ) .. ".log"
@@ -154,13 +167,6 @@ end
 
 function _M.store_logs(self, db, info)
     local input_sn = info["server_name"]
-
-    
-
-    if self:is_working(input_sn) then
-
-        return true
-    end
 
     self:lock_working(input_sn)
 
@@ -201,13 +207,6 @@ function _M.store_logs(self, db, info)
     if tostring(res) == "5" then
         self:D("Finalize res:"..tostring(res)..",Finalize err:"..tostring(err))
     end
-
-    local now_date = os.date("*t")
-    local save_day = config['global']["save_day"]
-    local save_date_timestamp = os.time{year=now_date.year,
-        month=now_date.month, day=now_date.day-save_day, hour=0}
-    -- delete expire data
-    db:exec("DELETE FROM web_logs WHERE time<"..tostring(save_date_timestamp))
 
     self:unlock_working(input_sn)
 end
