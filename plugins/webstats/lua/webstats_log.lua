@@ -8,7 +8,7 @@ log_by_lua_block {
 		package.path = cpath .. "?.lua;" .. package.path
 	end
 
-	local ver = '0.2.0'
+	local ver = '0.2.2'
 	local debug_mode = true
 
 	local __C = require "webstats_common"
