@@ -36,7 +36,7 @@ end
 function _M.getInstance(self)
     if rawget(self, "instance") == nil then
         rawset(self, "instance", self.new())
-        self:cron()
+        -- self:cron()
     end
     assert(self.instance ~= nil)
     return self.instance
@@ -135,8 +135,6 @@ function _M.cron(self)
                         os.execute("sleep " .. 0.6)
                         return true
                     end
-
-
 
                     local local_stmt2 = db:prepare[[INSERT INTO web_logs(
                         time, ip, domain, server_name, method, status_code, uri, body_length,
