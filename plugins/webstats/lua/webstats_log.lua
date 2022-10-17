@@ -834,18 +834,26 @@ log_by_lua_block {
 
 		local stat_fields = request_stat_fields..";"..client_stat_fields..";"..spider_stat_fields
 
-		local data = {
-			server_name = server_name,
-			stat_fields = stat_fields,
-			log_kv = kv,
-		}
+		-- local data = {
+		-- 	server_name = server_name,
+		-- 	stat_fields = stat_fields,
+		-- 	log_kv = kv,
+		-- }
 
 		-- local push_data = json.encode(data)
 		-- local key = C:getTotalKey()
 		-- ngx.shared.mw_total:rpush(key, push_data)
 
+		-- C:D("ddd")
 		cache_set(server_name, new_id, "stat_fields", stat_fields)
-		cache_set(server_name, new_id, "log_kv", json.encode(kv))
+		-- cache_set(server_name, new_id, "log_kv", json.encode(kv))
+
+
+		for i,v in pairs(kv) do
+			cache_set(server_name, new_id, tostring(i), tostring(v))
+			-- C:D("kv:"..tostring(i)..":"..tostring(v))
+		end
+		
  	end
 
  	local function store_logs_line(db, stmt, input_server_name, lineno)
