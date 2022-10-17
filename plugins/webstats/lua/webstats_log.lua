@@ -14,11 +14,24 @@ log_by_lua_block {
 	local __C = require "webstats_common"
 	local C = __C:getInstance()
 
+	-- local redis = require "resty.redis"
+ --    local red = redis:new()
+
+ --    local ok, err = red:connect("127.0.0.1", 6379)
+ --    if not ok then
+ --        ngx.say("failed to connect: ", err)
+ --        return
+ --    end
+
+ --    red:auth("admin")
+
 
 	-- cache start ---
 	local cache = ngx.shared.mw_total
 	local function cache_set(server_name, id ,key, val)
 		local line_kv = "log_kv_"..server_name..'_'..id.."_"..key
+		-- cache:set(line_kv, val)
+
 		cache:set(line_kv, val)
 	end
 
@@ -49,10 +62,12 @@ log_by_lua_block {
 
 	local auto_config = C:setInputSn(server_name)
 
-	local request_header = ngx.req.get_method()
-	local method = ngx.req.get_headers()
-	local excluded
+	local request_header = ngx.req.get_headers()
+	local method = ngx.req.get_method()
+	local excluded = false
 
+
+	local today = ngx.re.gsub(ngx.today(),'-','')
 	local day = os.date("%d")
 	local number_day = tonumber(day)
 	local day_column = "day"..number_day
@@ -223,7 +238,7 @@ log_by_lua_block {
 		local kv = {
 			id=new_id,
 			time_key=time_key,
-			time=os.time(),
+			time=ngx.time(),
 			ip=ip,
 			domain=domain,
 			server_name=server_name,
@@ -317,7 +332,8 @@ log_by_lua_block {
 		-- local key = C:getTotalKey()
 		-- ngx.shared.mw_total:rpush(key, push_data)
 
-		-- C:D("ddd")
+		-- C:D("stat_fields:"..stat_fields)
+		-- C:D("log_kv:"..json.encode(kv))
 		cache_set(server_name, new_id, "stat_fields", stat_fields)
 		cache_set(server_name, new_id, "log_kv", json.encode(kv))
 
@@ -406,13 +422,14 @@ log_by_lua_block {
 			end
 			stmt:reset()
 			-- D("store_logs_line ok")
+
 			C:update_stat( db, "client_stat", time_key, client_stat_fields)
 			C:update_stat( db, "spider_stat", time_key, spider_stat_fields)
-			-- D("stat ok")
+			-- C:D("stat ok")
 
 			-- only count non spider requests
-			local ok, err = pcall(function() C:statistics_uri(db, request_uri, ngx.md5(request_uri), body_length) end)
-			local ok, err = pcall(function() C:statistics_ip(db, ip, body_length) end)
+			local ok, err = C:statistics_uri(db, request_uri, ngx.md5(request_uri), body_length)
+			local ok, err = C:statistics_ip(db, ip, body_length)
 		end
 
 		C:update_stat( db, "request_stat", time_key, request_stat_fields)
@@ -454,6 +471,11 @@ log_by_lua_block {
 			return true
 		end 
 
+		db:exec([[PRAGMA synchronous = 0]])
+		db:exec([[PRAGMA page_size = 4096]])
+		db:exec([[PRAGMA journal_mode = wal]])
+		db:exec([[PRAGMA journal_size_limit = 1073741824]])
+
 		local stmt2 = nil
 		if db ~= nil then
 			stmt2 = db:prepare[[INSERT INTO web_logs(
@@ -472,23 +494,10 @@ log_by_lua_block {
 			end
 			return true
 		end
-		db:exec([[PRAGMA synchronous = 0]])
-		db:exec([[PRAGMA page_size = 4096]])
-		db:exec([[PRAGMA journal_mode = wal]])
-		db:exec([[PRAGMA journal_size_limit = 1073741824]])
-
+		
 		status, errorString = db:exec([[BEGIN TRANSACTION]])
 
-		update_day = C:load_update_day(input_sn)
-		if not update_day or update_day ~= today then
-
-			local update_sql = "UPDATE uri_stat SET "..day_column.."=0,"..flow_column.."=0"
-			status, errorString = db:exec(update_sql)
-
-			update_sql = "UPDATE ip_stat SET "..day_column.."=0,"..flow_column.."=0"
-			status, errorString = db:exec(update_sql)
-			C:write_update_day(input_sn)
-		end
+		C:clean_stats(db, input_sn)
 
 		if store_end >= store_start then
 			for i=store_start, store_end, 1 do

@@ -412,9 +412,11 @@ function _M.store_logs_line(self, db, stmt, input_sn, info)
         end
         stmt:reset()
 
-        self:update_stat( db, "client_stat", time_key, client_stat_fields)
-        self:update_stat( db, "spider_stat", time_key, spider_stat_fields)
-        -- self:D("stat ok")
+        local res ,err = self:update_stat( db, "client_stat", time_key, client_stat_fields)
+        -- self:D("step res:"..tostring(res) ..",step err:"..tostring(err))
+        local res ,err = self:update_stat( db, "spider_stat", time_key, spider_stat_fields)
+        -- self:D("step res:"..tostring(res) ..",step err:"..tostring(err))
+        -- self:D("stat ok"..)
 
         -- only count non spider requests
         local ok, err = self:statistics_uri(db, request_uri, ngx.md5(request_uri), body_length)
@@ -478,7 +480,7 @@ function _M.statistics_uri(self, db, uri, uri_md5, body_length)
     stat_sql = "INSERT INTO uri_stat(uri_md5,uri) SELECT \""..uri_md5.."\",\""..uri.."\" WHERE NOT EXISTS (SELECT uri_md5 FROM uri_stat WHERE uri_md5=\""..uri_md5.."\");"
     local res, err = db:exec(stat_sql)
     
-    stat_sql = "UPDATE uri_stat SET "..day_column.."="..day_column.."+1,"..flow_column.."="..flow_column.."+"..body_length.." WHERE uri_md5=\""..uri_md5.."\""
+    stat_sql = "UPDATE uri_stat SET "..day_column.."="..day_column.."+1,"..flow_column.."="..flow_column.."+"..body_length.." WHERE uri_md5=\""..uri_md5.."\";"
     local res, err = db:exec(stat_sql)
     return true
 end
@@ -588,6 +590,20 @@ end
 function _M.write_update_day(self, input_sn)
     local _file = "{$SERVER_APP}/logs/"..input_sn.."/update_day.log"
     return self:write_file(_file, today, "w")
+end
+
+function _M.clean_stats(self, db, input_sn)
+    -- 清空 uri,ip 汇总的信息[昨日]
+    local update_day = self:load_update_day(input_sn)
+    if not update_day or update_day ~= today then
+
+        local update_sql = "UPDATE uri_stat SET "..day_column.."=0,"..flow_column.."=0"
+        db:exec(update_sql)
+
+        update_sql = "UPDATE ip_stat SET "..day_column.."=0,"..flow_column.."=0"
+        db:exec(update_sql)
+        self:write_update_day(input_sn)
+    end
 end
 
 function _M.lpop(self)

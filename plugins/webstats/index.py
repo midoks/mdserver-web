@@ -1051,6 +1051,8 @@ def getUriStatList():
         ftime = time.localtime(time.time())
         day = ftime.tm_mday
 
+        # print(day)
+
         field_day = "day" + str(day)
         field_flow = "flow" + str(day)
         # print(field_day, field_flow)

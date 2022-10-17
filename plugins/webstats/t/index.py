@@ -74,13 +74,29 @@ def httpPost(url, data, timeout=10):
             return str(ex)
 
 
+def httpGet__UA(url, ua, timeout=10):
+    import urllib.request
+    headers = {'user-agent': ua}
+    try:
+        req = urllib.request.Request(url, headers=headers)
+        response = urllib.request.urlopen(req)
+        result = response.read().decode('utf-8')
+        return result
+
+    except Exception as e:
+        return str(e)
+
+
 def test_OK():
     '''
     目录保存
     '''
     url = TEST_URL + "ok.txt"
     print("ok test start")
-    url_val = httpGet(url, 10)
+    # Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36
+    # (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36
+    url_val = httpGet__UA(
+        url, "Mozilla / 5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit / 537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36")
     print(url_val)
     print("ok test end")
 
