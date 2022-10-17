@@ -62,7 +62,8 @@ function _M.initDB(self, input_sn)
     end
 
     db:exec([[PRAGMA synchronous = 0]])
-    db:exec([[PRAGMA page_size = 4096]])
+    db:exec([[PRAGMA cache_size = 8000]])
+    db:exec([[PRAGMA page_size = 32768]])
     db:exec([[PRAGMA journal_mode = wal]])
     db:exec([[PRAGMA journal_size_limit = 1073741824]])
     return db
