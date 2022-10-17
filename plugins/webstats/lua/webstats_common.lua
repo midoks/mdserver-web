@@ -237,14 +237,18 @@ function _M.cron(self)
             if db then
                 dbs[input_sn] = db
                 self:clean_stats(db,input_sn)
-                db:exec([[BEGIN TRANSACTION]])
 
-                stmts[input_sn] = db:prepare[[INSERT INTO web_logs(
+                local stmt = db:prepare[[INSERT INTO web_logs(
                         time, ip, domain, server_name, method, status_code, uri, body_length,
                         referer, user_agent, protocol, request_time, is_spider, request_headers, ip_list, client_port)
                         VALUES(:time, :ip, :domain, :server_name, :method, :status_code, :uri,
                         :body_length, :referer, :user_agent, :protocol, :request_time, :is_spider,
                         :request_headers, :ip_list, :client_port)]]
+                stmts[input_sn] = stmt
+                -- self:D("init stmt:"..input_sn..":"..tostring(stmts[input_sn])..":"..tostring(stmt))
+                db:exec([[BEGIN TRANSACTION]])   
+
+
             end
         end
 
@@ -266,11 +270,11 @@ function _M.cron(self)
                 local db = dbs[input_sn]
                 if db then
 
-                    if self:is_working(input_sn) then
-                        ngx.shared.mw_total:rpush(total_key, data)
-                        self:unlock_working(cron_key)
-                        return true
-                    end
+                    -- if self:is_working(input_sn) then
+                    --     ngx.shared.mw_total:rpush(total_key, data)
+                    --     self:unlock_working(cron_key)
+                    --     return true
+                    -- end
 
                     -- local local_stmt2 = db:prepare[[INSERT INTO web_logs(
                     --     time, ip, domain, server_name, method, status_code, uri, body_length,
@@ -279,51 +283,43 @@ function _M.cron(self)
                     --     :body_length, :referer, :user_agent, :protocol, :request_time, :is_spider,
                     --     :request_headers, :ip_list, :client_port)]]
 
-                    self:store_logs(db, stmts[input_sn], info)
+                    -- self:store_logs(db, stmts[input_sn], info)
+                    self:store_logs_line(db, stmts[input_sn], input_sn, info)
                 end
             end
         end
 
-        for _, local_db in pairs(dbs) do
-            if local_db then
 
+        for i,v in ipairs(sites) do
+            local input_sn = v["name"]
+            
+            if stmts[input_sn] then
+                local res, err = stmts[input_sn]:finalize()
+                if tostring(res) == "5" then
+                    self:D("Finalize res:"..tostring(res)..",Finalize err:"..tostring(err))
+                end
+            end
+
+            local db = dbs[input_sn]
+            if db then
                 local now_date = os.date("*t")
                 local save_day = config['global']["save_day"]
                 local save_date_timestamp = os.time{year=now_date.year,
                     month=now_date.month, day=now_date.day-save_day, hour=0}
                 -- delete expire data
-                local_db:exec("DELETE FROM web_logs WHERE time<"..tostring(save_date_timestamp))
+                db:exec("DELETE FROM web_logs WHERE time<"..tostring(save_date_timestamp))
             end
 
-            if local_db and local_db:isopen() then
-                local_db:execute([[COMMIT]])
-                local_db:close()
+            if db and db:isopen() then
+                db:execute([[COMMIT]])
+                db:close()
             end
-        end 
-        
-
-        -- local tmp_log = "{$SERVER_APP}/logs/tmp_" .. tostring( ngx.now() ) .. ".log"
-        -- -- 空闲空间小于10M,立即存盘
-        -- -- local capacity_bytes = ngx.shared.mw_total:free_space()
-        -- -- self:D("capacity_bytes:"..capacity_bytes)
-        -- os.execute("sleep " .. 1)
-        -- local nlen = llen - 100
-        -- for i = 1,llen do
-        --     local data = "" 
-        --     local tmp, _ = ngx.shared.mw_total:lpop(total_key)
-        --     if tmp then
-        --         data = data .. tmp .. "\n"
-        --     end
-
-        --     if data ~= "" then
-        --         self:write_file(tmp_log, data, "ab")
-        --     end
-        -- end
+        end
         
         self:unlock_working(cron_key)
 
         ngx.update_time()
-        self:D(tostring(llen)..", elapsed: " .. tostring(ngx.now() - begin))
+        self:D("--【"..tostring(llen).."】, elapsed: " .. tostring(ngx.now() - begin))
     end
 
     ngx.timer.every(1, timer_every_get_data)
@@ -332,16 +328,13 @@ end
 function _M.store_logs(self, db, stmt2, info)
     local input_sn = info["server_name"]
 
-    self:lock_working(input_sn)
+    self:D("init store_logs:"..input_sn..":"..tostring(db)..":"..tostring(stmt2))
+
+    -- self:lock_working(input_sn)
 
     self:store_logs_line(db, stmt2, input_sn, info)
 
-    local res, err = stmt2:finalize()
-    if tostring(res) == "5" then
-        self:D("Finalize res:"..tostring(res)..",Finalize err:"..tostring(err))
-    end
-
-    self:unlock_working(input_sn)
+    -- self:unlock_working(input_sn)
 end
 
 
@@ -393,6 +386,9 @@ function _M.store_logs_line(self, db, stmt, input_sn, info)
 
     local time_key = logline["time_key"]
     if not excluded then
+
+        -- self:D("store_logs_line:"..input_sn..":"..tostring(db)..":"..tostring(stmt))
+
         stmt:bind_names {
             time=time,
             ip=ip,
@@ -420,19 +416,19 @@ function _M.store_logs_line(self, db, stmt, input_sn, info)
         end
         stmt:reset()
 
-        local res ,err = self:update_stat( db, "client_stat", time_key, client_stat_fields)
-        -- self:D("step res:"..tostring(res) ..",step err:"..tostring(err))
-        local res ,err = self:update_stat( db, "spider_stat", time_key, spider_stat_fields)
-        -- self:D("step res:"..tostring(res) ..",step err:"..tostring(err))
-        -- self:D("stat ok"..)
+        -- local res ,err = self:update_stat( db, "client_stat", time_key, client_stat_fields)
+        -- -- self:D("step res:"..tostring(res) ..",step err:"..tostring(err))
+        -- local res ,err = self:update_stat( db, "spider_stat", time_key, spider_stat_fields)
+        -- -- self:D("step res:"..tostring(res) ..",step err:"..tostring(err))
+        -- -- self:D("stat ok"..)
 
-        -- only count non spider requests
-        local ok, err = self:statistics_uri(db, request_uri, ngx.md5(request_uri), body_length)
-        local ok, err = self:statistics_ip(db, ip, body_length)
-        -- self:D("stat url ip ok")
+        -- -- only count non spider requests
+        -- local ok, err = self:statistics_uri(db, request_uri, ngx.md5(request_uri), body_length)
+        -- local ok, err = self:statistics_ip(db, ip, body_length)
+        -- -- self:D("stat url ip ok")
     end
 
-    self:update_stat( db, "request_stat", time_key, request_stat_fields)
+    -- self:update_stat( db, "request_stat", time_key, request_stat_fields)
     return true
 end
 
