@@ -102,30 +102,24 @@ function _M.cron(self)
                 local info = json.decode(data)
                 local input_sn = info['server_name']
                 local db = dbs[input_sn]
-                if self:is_working(input_sn) then
-                    ngx.shared.mw_total:rpush(total_key, data)
-                    os.execute("sleep " .. 0.6)
-                    return true
+                if db then
+                    if self:is_working(input_sn) then
+                        ngx.shared.mw_total:rpush(total_key, data)
+                        os.execute("sleep " .. 0.6)
+                        return true
+                    end
+                    self:store_logs(db, info)
                 end
-                self:store_logs(db, info)
             end
         end
 
-    
-        for i,v in ipairs(sites) do
-            local db = dbs[v["name"]]
-            local res, err = db:execute([[COMMIT]])
-            if db and db:isopen() then
-                db:close()
+        for _, local_db in pairs(dbs) do
+            local res, err = local_db:execute([[COMMIT]])
+            if local_db and local_db:isopen() then
+                local_db:close()
             end
         end
-
-        local db = dbs["unset"]
-        local res, err = db:execute([[COMMIT]])
-        if db and db:isopen() then
-            db:close()
-        end
-
+      
         
 
         -- local tmp_log = "{$SERVER_APP}/logs/tmp_" .. tostring( ngx.now() ) .. ".log"
@@ -149,7 +143,7 @@ function _M.cron(self)
         self:unlock_working(cron_key)
     end
 
-    ngx.timer.every(1, timer_every_get_data)
+    ngx.timer.every(3, timer_every_get_data)
 end
 
 
