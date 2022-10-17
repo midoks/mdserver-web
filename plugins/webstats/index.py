@@ -125,9 +125,16 @@ def loadLuaSiteFile():
         ddata["default"] = "unset"
     else:
         ddata["default"] = dlist[0]
+
     mw.writeFile(default_json, json.dumps(ddata))
 
     lua_site = lua_dir + "/webstats_sites.lua"
+
+    tmp = {
+        "name": "unset",
+        "domain": [],
+    }
+    content.append(tmp)
     listToLuaFile(lua_site, content)
 
 

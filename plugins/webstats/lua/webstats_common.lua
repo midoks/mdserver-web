@@ -84,10 +84,24 @@ function _M.cron(self)
 
         local dbs = {}
         for i,v in ipairs(sites) do
-            dbs[v["name"]] = self:initDB(v["name"])
-        end
-        dbs["unset"] = self:initDB("unset")
+            local input_sn = v["name"]
+            local db = self:initDB(input_sn)
 
+            if db then
+                dbs[input_sn] = db
+
+                local update_day = self:load_update_day(input_sn)
+                if not update_day or update_day ~= today then
+
+                    local update_sql = "UPDATE uri_stat SET "..day_column.."=0,"..flow_column.."=0"
+                    status, errorString = db:exec(update_sql)
+
+                    update_sql = "UPDATE ip_stat SET "..day_column.."=0,"..flow_column.."=0"
+                    status, errorString = db:exec(update_sql)
+                    self:write_update_day(input_sn)
+                end
+            end
+        end
 
         -- self:D( tostring (dbs["t1.cn"]) )
 
@@ -97,6 +111,8 @@ function _M.cron(self)
         end
 
         self:lock_working(cron_key)
+
+
 
         local llen, _ = ngx.shared.mw_total:llen(total_key)
         -- 每秒100条
@@ -126,6 +142,7 @@ function _M.cron(self)
         
         for _, local_db in pairs(dbs) do
             if local_db then
+
                 local now_date = os.date("*t")
                 local save_day = config['global']["save_day"]
                 local save_date_timestamp = os.time{year=now_date.year,
@@ -180,26 +197,9 @@ function _M.store_logs(self, db, info)
             :request_headers, :ip_list, :client_port)]]
     end
 
-    if db == nil or stmt2 == nil then
-        if db and db:isopen() then
-            db:close()
-        end
-        return true
-    end
-
-
     status, errorString = db:exec([[BEGIN TRANSACTION]])
 
-    local update_day = self:load_update_day(input_sn)
-    if not update_day or update_day ~= today then
-
-        local update_sql = "UPDATE uri_stat SET "..day_column.."=0,"..flow_column.."=0"
-        status, errorString = db:exec(update_sql)
-
-        update_sql = "UPDATE ip_stat SET "..day_column.."=0,"..flow_column.."=0"
-        status, errorString = db:exec(update_sql)
-        self:write_update_day(input_sn)
-    end
+    
 
     self:store_logs_line(db, stmt2, input_sn, info)
 
