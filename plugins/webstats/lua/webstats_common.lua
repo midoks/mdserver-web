@@ -101,8 +101,14 @@ function _M.cron(self)
             if data then
                 local info = json.decode(data)
                 local input_sn = info['server_name']
+                -- 迁移合并时不执行
+                if self:is_migrating(input_sn) then
+                    return true
+                end
+
                 local db = dbs[input_sn]
                 if db then
+
                     if self:is_working(input_sn) then
                         ngx.shared.mw_total:rpush(total_key, data)
                         os.execute("sleep " .. 0.6)
@@ -145,6 +151,67 @@ function _M.cron(self)
 
     ngx.timer.every(3, timer_every_get_data)
 end
+
+function _M.store_logs(self, db, info)
+    local input_sn = info["server_name"]
+
+    
+
+    if self:is_working(input_sn) then
+
+        return true
+    end
+
+    self:lock_working(input_sn)
+
+    local stmt2 = nil
+    if db ~= nil then
+        stmt2 = db:prepare[[INSERT INTO web_logs(
+            time, ip, domain, server_name, method, status_code, uri, body_length,
+            referer, user_agent, protocol, request_time, is_spider, request_headers, ip_list, client_port)
+            VALUES(:time, :ip, :domain, :server_name, :method, :status_code, :uri,
+            :body_length, :referer, :user_agent, :protocol, :request_time, :is_spider,
+            :request_headers, :ip_list, :client_port)]]
+    end
+
+    if db == nil or stmt2 == nil then
+        if db and db:isopen() then
+            db:close()
+        end
+        return true
+    end
+
+
+    status, errorString = db:exec([[BEGIN TRANSACTION]])
+
+    local update_day = self:load_update_day(input_sn)
+    if not update_day or update_day ~= today then
+
+        local update_sql = "UPDATE uri_stat SET "..day_column.."=0,"..flow_column.."=0"
+        status, errorString = db:exec(update_sql)
+
+        update_sql = "UPDATE ip_stat SET "..day_column.."=0,"..flow_column.."=0"
+        status, errorString = db:exec(update_sql)
+        self:write_update_day(input_sn)
+    end
+
+    self:store_logs_line(db, stmt2, input_sn, info)
+
+    local res, err = stmt2:finalize()
+    if tostring(res) == "5" then
+        self:D("Finalize res:"..tostring(res)..",Finalize err:"..tostring(err))
+    end
+
+    local now_date = os.date("*t")
+    local save_day = config['global']["save_day"]
+    local save_date_timestamp = os.time{year=now_date.year,
+        month=now_date.month, day=now_date.day-save_day, hour=0}
+    -- delete expire data
+    db:exec("DELETE FROM web_logs WHERE time<"..tostring(save_date_timestamp))
+
+    self:unlock_working(input_sn)
+end
+
 
 
 function _M.store_logs_line(self, db, stmt, input_sn, info)
@@ -275,69 +342,6 @@ function _M.update_stat(self,db, stat_table, key, columns)
     status, errorString = db:exec(update_sql)
 end
 
-function _M.store_logs(self, db, info)
-    local input_sn = info["server_name"]
-
-    -- 迁移合并时不执行
-    if self:is_migrating(input_sn) == true then
-        return
-    end
-
-    if self:is_working(input_sn) then
-
-        return true
-    end
-
-    self:lock_working(input_sn)
-
-    local stmt2 = nil
-    if db ~= nil then
-        stmt2 = db:prepare[[INSERT INTO web_logs(
-            time, ip, domain, server_name, method, status_code, uri, body_length,
-            referer, user_agent, protocol, request_time, is_spider, request_headers, ip_list, client_port)
-            VALUES(:time, :ip, :domain, :server_name, :method, :status_code, :uri,
-            :body_length, :referer, :user_agent, :protocol, :request_time, :is_spider,
-            :request_headers, :ip_list, :client_port)]]
-    end
-
-    if db == nil or stmt2 == nil then
-        if db and db:isopen() then
-            db:close()
-        end
-        return true
-    end
-
-
-    status, errorString = db:exec([[BEGIN TRANSACTION]])
-
-    local update_day = self:load_update_day(input_sn)
-    if not update_day or update_day ~= today then
-
-        local update_sql = "UPDATE uri_stat SET "..day_column.."=0,"..flow_column.."=0"
-        status, errorString = db:exec(update_sql)
-
-        update_sql = "UPDATE ip_stat SET "..day_column.."=0,"..flow_column.."=0"
-        status, errorString = db:exec(update_sql)
-        self:write_update_day(input_sn)
-    end
-
-    self:store_logs_line(db, stmt2, input_sn, info)
-
-    local res, err = stmt2:finalize()
-    if tostring(res) == "5" then
-        -- self:D("Finalize res:"..tostring(res))
-        -- self:D("Finalize err:"..tostring(err))
-    end
-
-    local now_date = os.date("*t")
-    local save_day = config['global']["save_day"]
-    local save_date_timestamp = os.time{year=now_date.year,
-        month=now_date.month, day=now_date.day-save_day, hour=0}
-    -- delete expire data
-    db:exec("DELETE FROM web_logs WHERE time<"..tostring(save_date_timestamp))
-
-    self:unlock_working(input_sn)
-end
 
 
 -- debug func
