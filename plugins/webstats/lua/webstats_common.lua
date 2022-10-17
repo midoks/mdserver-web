@@ -101,6 +101,8 @@ function _M.cron(self)
                     status, errorString = db:exec(update_sql)
                     self:write_update_day(input_sn)
                 end
+
+                db:exec([[BEGIN TRANSACTION]])
             end
         end
 
@@ -134,7 +136,7 @@ function _M.cron(self)
                         return true
                     end
 
-                    db:exec([[BEGIN TRANSACTION]])
+
 
                     local local_stmt2 = db:prepare[[INSERT INTO web_logs(
                         time, ip, domain, server_name, method, status_code, uri, body_length,
