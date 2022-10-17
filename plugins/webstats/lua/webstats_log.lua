@@ -840,12 +840,12 @@ log_by_lua_block {
 			log_kv = kv,
 		}
 
-		local push_data = json.encode(data)
-		local key = C:getTotalKey()
-		ngx.shared.mw_total:rpush(key, push_data)
+		-- local push_data = json.encode(data)
+		-- local key = C:getTotalKey()
+		-- ngx.shared.mw_total:rpush(key, push_data)
 
-		-- cache_set(server_name, new_id, "stat_fields", stat_fields)
-		-- cache_set(server_name, new_id, "log_kv", json.encode(kv))
+		cache_set(server_name, new_id, "stat_fields", stat_fields)
+		cache_set(server_name, new_id, "log_kv", json.encode(kv))
  	end
 
  	local function store_logs_line(db, stmt, input_server_name, lineno)
@@ -968,10 +968,10 @@ log_by_lua_block {
 		local db_path = log_dir .. '/' .. input_server_name .. "/logs.db"
 		local db, err = sqlite3.open(db_path)
 
-		-- if  tostring(err) ~= 'nil' then
-		-- 	D("sqlite3 open error:"..tostring(err))
-		-- 	return true
-		-- end 
+		if  tostring(err) ~= 'nil' then
+			C:D("sqlite3 open error:"..tostring(err))
+			return true
+		end 
 
 		local stmt2 = nil
 		if db ~= nil then
@@ -1021,8 +1021,7 @@ log_by_lua_block {
 
 		local res, err = stmt2:finalize()
 		if tostring(res) == "5" then
-			-- D("Finalize res:"..tostring(res))
-			-- D("Finalize err:"..tostring(err))
+			C:D("Finalize res:"..tostring(res)..",Finalize err:"..tostring(err))
 		end
 
 		local now_date = os.date("*t")
@@ -1054,7 +1053,7 @@ log_by_lua_block {
 		load_global_exclude_ip()
 		load_exclude_ip(server_name)
 
-		-- cache_logs()
+		cache_logs()
 		-- store_logs(server_name)
 
 		-- D("------------ debug end -------------")
