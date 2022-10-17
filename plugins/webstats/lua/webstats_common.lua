@@ -113,25 +113,6 @@ function _M.cron(self)
 
         self:lock_working(cron_key)
 
-        local stmt2 = {}
-        for i,v in ipairs(sites) do
-
-            local input_sn = v["name"]
-            local db = dbs[input_sn]
-
-            if db then
-                db:exec([[BEGIN TRANSACTION]])
-                
-                stmt2_pre = db:prepare[[INSERT INTO web_logs(
-                        time, ip, domain, server_name, method, status_code, uri, body_length,
-                        referer, user_agent, protocol, request_time, is_spider, request_headers, ip_list, client_port)
-                        VALUES(:time, :ip, :domain, :server_name, :method, :status_code, :uri,
-                        :body_length, :referer, :user_agent, :protocol, :request_time, :is_spider,
-                        :request_headers, :ip_list, :client_port)]]
-                stmt2[input_sn] = stmt2_pre
-            end
-        end
-
         local llen, _ = ngx.shared.mw_total:llen(total_key)
         -- 每秒100条
         for i=1,llen do
@@ -153,7 +134,15 @@ function _M.cron(self)
                         return true
                     end
 
-                    local local_stmt2 = stmt2[input_sn] 
+                    db:exec([[BEGIN TRANSACTION]])
+
+                    local local_stmt2 = db:prepare[[INSERT INTO web_logs(
+                        time, ip, domain, server_name, method, status_code, uri, body_length,
+                        referer, user_agent, protocol, request_time, is_spider, request_headers, ip_list, client_port)
+                        VALUES(:time, :ip, :domain, :server_name, :method, :status_code, :uri,
+                        :body_length, :referer, :user_agent, :protocol, :request_time, :is_spider,
+                        :request_headers, :ip_list, :client_port)]]
+
                     self:store_logs(db, local_stmt2, info)
                 end
             end
@@ -367,7 +356,7 @@ function _M.D(self,msg)
     return true
 end
 
-function _M.is_migrating(self,input_sn)
+function _M.is_migrating(self, input_sn)
     local file = io.open("{$SERVER_APP}/migrating", "rb")
     if file then return true end
     local file = io.open("{$SERVER_APP}/logs/"..input_sn.."/migrating", "rb")
