@@ -1051,8 +1051,6 @@ def getUriStatList():
         ftime = time.localtime(time.time())
         day = ftime.tm_mday
 
-        # print(day)
-
         field_day = "day" + str(day)
         field_flow = "flow" + str(day)
         # print(field_day, field_flow)
@@ -1117,7 +1115,6 @@ def getUriStatList():
         conn = conn.where("day>? and flow>?", (0, 0,))
 
     clist = conn.order("flow desc").limit("50").inquiry(origin_field)
-    # print(clist)
 
     total_req = 0
     total_flow = 0
