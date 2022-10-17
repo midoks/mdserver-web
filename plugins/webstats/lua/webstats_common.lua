@@ -96,7 +96,7 @@ function _M.cron(self)
 
         local llen, _ = ngx.shared.mw_total:llen(total_key)
         -- 每秒100条
-        for i=1,100 do
+        for i=1,llen do
             local data, _ = ngx.shared.mw_total:lpop(total_key)
             if data then
                 local info = json.decode(data)
@@ -146,7 +146,6 @@ function _M.cron(self)
         --     end
         -- end
         
-
         self:unlock_working(cron_key)
     end
 
