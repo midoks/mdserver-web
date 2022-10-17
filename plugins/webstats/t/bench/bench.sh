@@ -21,4 +21,9 @@ fi
 # test
 # $RUN_CMD simple.lua
 
-$RUN_CMD  test_today.lua
+# $RUN_CMD  test_today.lua
+# $RUN_CMD  test_time.lua
+
+# $RUN_CMD  test_ngx_find.lua
+
+$RUN_CMD  test_match_spider.lua
