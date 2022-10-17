@@ -404,13 +404,13 @@ function _M.store_logs_line(self, db, stmt, input_sn, info)
             client_port=client_port,
         }
 
-        -- local res, err = stmt:step()
+        local res, err = stmt:step()
         if tostring(res) == "5" then
             self:D("step res:"..tostring(res) ..",step err:"..tostring(err))
             self:D("the step database connection is busy, so it will be stored later.")
             return false
         end
-        -- stmt:reset()
+        stmt:reset()
 
         local res ,err = self:update_stat( db, "client_stat", time_key, client_stat_fields)
         -- self:D("step res:"..tostring(res) ..",step err:"..tostring(err))
