@@ -223,6 +223,7 @@ function _M.cron(self)
         
 
         local dbs = {}
+        local stmts = {}
         
         for i,v in ipairs(sites) do
             local input_sn = v["name"]
@@ -237,6 +238,13 @@ function _M.cron(self)
                 dbs[input_sn] = db
                 self:clean_stats(db,input_sn)
                 db:exec([[BEGIN TRANSACTION]])
+
+                stmts[input_sn] = db:prepare[[INSERT INTO web_logs(
+                        time, ip, domain, server_name, method, status_code, uri, body_length,
+                        referer, user_agent, protocol, request_time, is_spider, request_headers, ip_list, client_port)
+                        VALUES(:time, :ip, :domain, :server_name, :method, :status_code, :uri,
+                        :body_length, :referer, :user_agent, :protocol, :request_time, :is_spider,
+                        :request_headers, :ip_list, :client_port)]]
             end
         end
 
@@ -264,14 +272,14 @@ function _M.cron(self)
                         return true
                     end
 
-                    local local_stmt2 = db:prepare[[INSERT INTO web_logs(
-                        time, ip, domain, server_name, method, status_code, uri, body_length,
-                        referer, user_agent, protocol, request_time, is_spider, request_headers, ip_list, client_port)
-                        VALUES(:time, :ip, :domain, :server_name, :method, :status_code, :uri,
-                        :body_length, :referer, :user_agent, :protocol, :request_time, :is_spider,
-                        :request_headers, :ip_list, :client_port)]]
+                    -- local local_stmt2 = db:prepare[[INSERT INTO web_logs(
+                    --     time, ip, domain, server_name, method, status_code, uri, body_length,
+                    --     referer, user_agent, protocol, request_time, is_spider, request_headers, ip_list, client_port)
+                    --     VALUES(:time, :ip, :domain, :server_name, :method, :status_code, :uri,
+                    --     :body_length, :referer, :user_agent, :protocol, :request_time, :is_spider,
+                    --     :request_headers, :ip_list, :client_port)]]
 
-                    self:store_logs(db, local_stmt2, info)
+                    self:store_logs(db, stmts[input_sn], info)
                 end
             end
         end
