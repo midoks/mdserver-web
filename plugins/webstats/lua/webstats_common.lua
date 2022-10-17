@@ -83,7 +83,7 @@ function _M.cron(self)
         -- self:D( json.encode (sites) )
 
         local dbs = {}
-        local stmt2 = {}
+        
         for i,v in ipairs(sites) do
             local input_sn = v["name"]
             local db = self:initDB(input_sn)
@@ -101,15 +101,6 @@ function _M.cron(self)
                     status, errorString = db:exec(update_sql)
                     self:write_update_day(input_sn)
                 end
-
-         
-                stmt2_pre = db:prepare[[INSERT INTO web_logs(
-                        time, ip, domain, server_name, method, status_code, uri, body_length,
-                        referer, user_agent, protocol, request_time, is_spider, request_headers, ip_list, client_port)
-                        VALUES(:time, :ip, :domain, :server_name, :method, :status_code, :uri,
-                        :body_length, :referer, :user_agent, :protocol, :request_time, :is_spider,
-                        :request_headers, :ip_list, :client_port)]]
-                stmt2[input_sn] = stmt2_pre
             end
         end
 
@@ -121,6 +112,23 @@ function _M.cron(self)
         end
 
         self:lock_working(cron_key)
+
+        local stmt2 = {}
+        for i,v in ipairs(sites) do
+
+            local input_sn = v["name"]
+            local db = dbs[input_sn]
+
+            if db then
+                stmt2_pre = db:prepare[[INSERT INTO web_logs(
+                        time, ip, domain, server_name, method, status_code, uri, body_length,
+                        referer, user_agent, protocol, request_time, is_spider, request_headers, ip_list, client_port)
+                        VALUES(:time, :ip, :domain, :server_name, :method, :status_code, :uri,
+                        :body_length, :referer, :user_agent, :protocol, :request_time, :is_spider,
+                        :request_headers, :ip_list, :client_port)]]
+                stmt2[input_sn] = stmt2_pre
+            end
+        end
 
         local llen, _ = ngx.shared.mw_total:llen(total_key)
         -- 每秒100条
