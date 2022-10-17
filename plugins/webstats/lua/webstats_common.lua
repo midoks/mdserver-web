@@ -216,6 +216,11 @@ function _M.cron(self)
             return true
         end
 
+        ngx.update_time()
+        local begin = ngx.now()
+        
+        
+
         local dbs = {}
         
         for i,v in ipairs(sites) do
@@ -307,6 +312,9 @@ function _M.cron(self)
         -- end
         
         self:unlock_working(cron_key)
+
+        ngx.update_time()
+        self:D(tostring(llen)..", elapsed: " .. tostring(ngx.now() - begin))
     end
 
     ngx.timer.every(1, timer_every_get_data)
