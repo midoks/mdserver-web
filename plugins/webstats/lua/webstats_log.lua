@@ -14,24 +14,11 @@ log_by_lua_block {
 	local __C = require "webstats_common"
 	local C = __C:getInstance()
 
-	-- local redis = require "resty.redis"
- --    local red = redis:new()
-
- --    local ok, err = red:connect("127.0.0.1", 6379)
- --    if not ok then
- --        ngx.say("failed to connect: ", err)
- --        return
- --    end
-
- --    red:auth("admin")
-
-
 	-- cache start ---
 	local cache = ngx.shared.mw_total
 	local function cache_set(server_name, id ,key, val)
 		local line_kv = "log_kv_"..server_name..'_'..id.."_"..key
 		-- cache:set(line_kv, val)
-
 		cache:set(line_kv, val)
 	end
 
@@ -110,7 +97,6 @@ log_by_lua_block {
 		if site_exclude_ip then
 			for i, _ip in pairs(site_exclude_ip)
 			do 
-				-- D("set exclude ip: ".._ip)
 				cache:set(input_server_name .. "_exclude_ip_".._ip, true)
 			end
 		end
@@ -149,7 +135,7 @@ log_by_lua_block {
 		if not auto_config['exclude_url'] then return false end
 		local the_uri = string.sub(ngx.var.request_uri, 2)
 		local url_conf = auto_config["exclude_url"]
-		for i,conf in pairs(url_conf)
+		for i,conf in ipairs(url_conf)
 		do
 			local mode = conf["mode"]
 			local url = conf["url"]
@@ -320,26 +306,22 @@ log_by_lua_block {
 
 		local stat_fields = request_stat_fields..";"..client_stat_fields..";"..spider_stat_fields
 
-		-- local data = {
-		-- 	server_name = server_name,
-		-- 	stat_fields = stat_fields,
-		-- 	log_kv = kv,
-		-- }
+		local data = {
+			server_name = server_name,
+			stat_fields = stat_fields,
+			log_kv = kv,
+		}
 
-		-- local push_data = json.encode(data)
-		-- local key = C:getTotalKey()
-		-- ngx.shared.mw_total:rpush(key, push_data)
+		local push_data = json.encode(data)
+		local key = C:getTotalKey()
+		ngx.shared.mw_total:rpush(key, push_data)
 
 		-- C:D("stat_fields:"..stat_fields)
 		-- C:D("log_kv:"..json.encode(kv))
-		cache_set(server_name, new_id, "stat_fields", stat_fields)
-		cache_set(server_name, new_id, "log_kv", json.encode(kv))
+		-- cache_set(server_name, new_id, "stat_fields", stat_fields)
+		-- cache_set(server_name, new_id, "log_kv", json.encode(kv))
 
 
-		-- for i,v in pairs(kv) do
-		-- 	cache_set(server_name, new_id, tostring(i), tostring(v))
-		-- 	C:D("kv:"..tostring(i)..":"..tostring(v))
-		-- end
 		
  	end
 
@@ -536,8 +518,7 @@ log_by_lua_block {
 		load_exclude_ip(server_name)
 
 		cache_logs(server_name)
-		store_logs(server_name)
-
+		-- store_logs(server_name)
 		-- D("------------ debug end -------------")
 	end
 

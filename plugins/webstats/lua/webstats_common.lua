@@ -46,7 +46,7 @@ end
 function _M.getInstance(self)
     if rawget(self, "instance") == nil then
         rawset(self, "instance", self.new())
-        -- self:cron()
+        self:cron()
     end
     assert(self.instance ~= nil)
     return self.instance
@@ -210,28 +210,26 @@ end
 -- 后台任务
 function _M.cron(self)
     local timer_every_get_data = function (premature)
-        -- self:D( json.encode (sites) )
+
+        local llen, _ = ngx.shared.mw_total:llen(total_key)
+        if llen < 1 then
+            return true
+        end
 
         local dbs = {}
         
         for i,v in ipairs(sites) do
             local input_sn = v["name"]
+            -- 迁移合并时不执行
+            if self:is_migrating(input_sn) then
+                return true
+            end
+
             local db = self:initDB(input_sn)
 
             if db then
                 dbs[input_sn] = db
-
-                local update_day = self:load_update_day(input_sn)
-                if not update_day or update_day ~= today then
-
-                    local update_sql = "UPDATE uri_stat SET "..day_column.."=0,"..flow_column.."=0"
-                    status, errorString = db:exec(update_sql)
-
-                    update_sql = "UPDATE ip_stat SET "..day_column.."=0,"..flow_column.."=0"
-                    status, errorString = db:exec(update_sql)
-                    self:write_update_day(input_sn)
-                end
-
+                self:clean_stats(db,input_sn)
                 db:exec([[BEGIN TRANSACTION]])
             end
         end
@@ -244,25 +242,19 @@ function _M.cron(self)
         end
 
         self:lock_working(cron_key)
-
-        local llen, _ = ngx.shared.mw_total:llen(total_key)
+        
         -- 每秒100条
         for i=1,llen do
             local data, _ = ngx.shared.mw_total:lpop(total_key)
             if data then
                 local info = json.decode(data)
                 local input_sn = info['server_name']
-                -- 迁移合并时不执行
-                if self:is_migrating(input_sn) then
-                    return true
-                end
-
                 local db = dbs[input_sn]
                 if db then
 
                     if self:is_working(input_sn) then
                         ngx.shared.mw_total:rpush(total_key, data)
-                        os.execute("sleep " .. 0.6)
+                        self:unlock_working(cron_key)
                         return true
                     end
 
@@ -278,7 +270,6 @@ function _M.cron(self)
             end
         end
 
-        
         for _, local_db in pairs(dbs) do
             if local_db then
 
@@ -318,7 +309,7 @@ function _M.cron(self)
         self:unlock_working(cron_key)
     end
 
-    ngx.timer.every(3, timer_every_get_data)
+    ngx.timer.every(1, timer_every_get_data)
 end
 
 function _M.store_logs(self, db, stmt2, info)
