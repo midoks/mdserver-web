@@ -281,8 +281,6 @@ function _M.cron(self)
         end
 
         self:lock_working(cron_key)
-
-        
         
         -- 每秒100条
         for i=1,llen do
@@ -297,8 +295,6 @@ function _M.cron(self)
                     self:store_logs_line(db, stmts[input_sn]["web_logs"], input_sn, info)
 
                     local stat_tmp_fields = info['stat_fields']
-
-                    -- self:D("stat_fields:"..json.encode(stat_tmp_fields))
 
                     -- 合并统计数据
                     for stf_k,stf_v in pairs(stat_tmp_fields) do
@@ -317,27 +313,9 @@ function _M.cron(self)
                     end
 
                     stat_fields[input_sn] = stat_fields_is
-
-                    -- local request_stat_fields = stat_fields[1]
-                    -- local client_stat_fields = stat_fields[2]
-                    -- local spider_stat_fields = stat_fields[3]
-
-                    -- if "x" == client_stat_fields then
-                    --     client_stat_fields = nil
-                    -- end
-
-                    -- if "x" == spider_stat_fields then
-                    --     spider_stat_fields = nil
-                    -- end
-
-                    -- self:D("request_stat_fields:"..tostring(request_stat_fields))
-                    -- self:D("client_stat_fields:"..tostring(client_stat_fields))
-                    -- self:D("spider_stat_fields:"..tostring(spider_stat_fields))
                 end
             end
         end
-
-        
 
         for site_k, site_v in ipairs(sites) do
             local input_sn = site_v["name"]
@@ -355,8 +333,6 @@ function _M.cron(self)
 
             local stat_fields_is = stat_fields[input_sn]
             local db = dbs[input_sn]
-
-            -- self:D("【stat_fields】["..input_sn.."]:"..json.encode(stat_fields_is))
 
             -- 统计【spider_stat,client_stat,request_stat】
             for sti_k,sti_v in pairs(stat_fields_is) do
