@@ -640,6 +640,7 @@ log_by_lua_block {
 		load_exclude_ip(server_name)
 
 		cache_logs(server_name)
+		-- C:cron()
 
 		-- cache_logs_old(server_name)
 		-- store_logs(server_name)

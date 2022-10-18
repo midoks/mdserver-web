@@ -174,6 +174,10 @@ function _M.get_store_key(self)
     return os.date("%Y%m%d%H", ngx.time())
 end
 
+function _M.get_store_key_with_time(self, htime)
+    return os.date("%Y%m%d%H", htime)
+end
+
 function _M.get_length(self)
     local clen  = ngx.var.body_bytes_sent
     if clen == nil then clen = 0 end
@@ -216,20 +220,22 @@ function _M.cron(self)
     local timer_every_get_data = function (premature)
 
         local llen, _ = ngx.shared.mw_total:llen(total_key)
-        if llen < 1 then
+        if llen == 0 then
             return true
         end
 
         ngx.update_time()
         local begin = ngx.now()
-        
-        
 
         local dbs = {}
         local stmts = {}
+        local stat_fields = {}
+
+        local time_key = self:get_store_key()
+        local time_key_next = self:get_store_key_with_time(ngx.time()+3600)
         
-        for i,v in ipairs(sites) do
-            local input_sn = v["name"]
+        for site_k, site_v in ipairs(sites) do
+            local input_sn = site_v["name"]
             -- 迁移合并时不执行
             if self:is_migrating(input_sn) then
                 return true
@@ -237,25 +243,37 @@ function _M.cron(self)
 
             local db = self:initDB(input_sn)
 
+            stat_fields[input_sn] = {}
+
             if db then
                 dbs[input_sn] = db
                 self:clean_stats(db,input_sn)
 
+                local tmp_stmt = {}
                 local stmt = db:prepare[[INSERT INTO web_logs(
                         time, ip, domain, server_name, method, status_code, uri, body_length,
                         referer, user_agent, protocol, request_time, is_spider, request_headers, ip_list, client_port)
                         VALUES(:time, :ip, :domain, :server_name, :method, :status_code, :uri,
                         :body_length, :referer, :user_agent, :protocol, :request_time, :is_spider,
                         :request_headers, :ip_list, :client_port)]]
-                stmts[input_sn] = stmt
-                -- self:D("init stmt:"..input_sn..":"..tostring(stmts[input_sn])..":"..tostring(stmt))
-                db:exec([[BEGIN TRANSACTION]])   
+                tmp_stmt["web_logs"] = stmt
+                stmts[input_sn] = tmp_stmt
 
+                db:exec([[BEGIN TRANSACTION]])
+
+                local wc_stat = {
+                    'request_stat',
+                    'client_stat',
+                    'spider_stat'
+                }
+
+                for _,ws_v in ipairs(wc_stat) do
+                    self:_update_stat_pre(db, ws_v, time_key)
+                    self:_update_stat_pre(db, ws_v, time_key_next)
+                end
 
             end
         end
-
-        -- self:D( tostring (dbs["t1.cn"]) )
 
         local cron_key = 'cron_every_1s'
         if self:is_working(cron_key) then
@@ -263,6 +281,8 @@ function _M.cron(self)
         end
 
         self:lock_working(cron_key)
+
+        
         
         -- 每秒100条
         for i=1,llen do
@@ -271,39 +291,95 @@ function _M.cron(self)
                 local info = json.decode(data)
                 local input_sn = info['server_name']
                 local db = dbs[input_sn]
+                local stat_fields_is = stat_fields[input_sn]
                 if db then
 
-                    -- if self:is_working(input_sn) then
-                    --     ngx.shared.mw_total:rpush(total_key, data)
-                    --     self:unlock_working(cron_key)
-                    --     return true
+                    self:store_logs_line(db, stmts[input_sn]["web_logs"], input_sn, info)
+
+                    local stat_tmp_fields = info['stat_fields']
+
+                    -- self:D("stat_fields:"..json.encode(stat_tmp_fields))
+
+                    -- 合并统计数据
+                    for stf_k,stf_v in pairs(stat_tmp_fields) do
+
+                        if not stat_fields_is[stf_k] then
+                            stat_fields_is[stf_k] = {}
+                        end
+                        
+                        for sv_k,sv_v in pairs(stf_v) do
+                            if not stat_fields_is[stf_k][sv_k] then
+                                stat_fields_is[stf_k][sv_k] = sv_v
+                            else
+                                stat_fields_is[stf_k][sv_k] = stat_fields_is[stf_k][sv_k] + 1
+                            end
+                        end
+                    end
+
+                    stat_fields[input_sn] = stat_fields_is
+
+                    -- local request_stat_fields = stat_fields[1]
+                    -- local client_stat_fields = stat_fields[2]
+                    -- local spider_stat_fields = stat_fields[3]
+
+                    -- if "x" == client_stat_fields then
+                    --     client_stat_fields = nil
                     -- end
 
-                    -- local local_stmt2 = db:prepare[[INSERT INTO web_logs(
-                    --     time, ip, domain, server_name, method, status_code, uri, body_length,
-                    --     referer, user_agent, protocol, request_time, is_spider, request_headers, ip_list, client_port)
-                    --     VALUES(:time, :ip, :domain, :server_name, :method, :status_code, :uri,
-                    --     :body_length, :referer, :user_agent, :protocol, :request_time, :is_spider,
-                    --     :request_headers, :ip_list, :client_port)]]
+                    -- if "x" == spider_stat_fields then
+                    --     spider_stat_fields = nil
+                    -- end
 
-                    -- self:store_logs(db, stmts[input_sn], info)
-                    self:store_logs_line(db, stmts[input_sn], input_sn, info)
+                    -- self:D("request_stat_fields:"..tostring(request_stat_fields))
+                    -- self:D("client_stat_fields:"..tostring(client_stat_fields))
+                    -- self:D("spider_stat_fields:"..tostring(spider_stat_fields))
                 end
             end
         end
 
+        
 
-        for i,v in ipairs(sites) do
-            local input_sn = v["name"]
-            
+        for site_k, site_v in ipairs(sites) do
+            local input_sn = site_v["name"]
+
             if stmts[input_sn] then
-                local res, err = stmts[input_sn]:finalize()
-                if tostring(res) == "5" then
-                    self:D("Finalize res:"..tostring(res)..",Finalize err:"..tostring(err))
+                for stmts_k,stmts_v in ipairs(stmts[input_sn]) do
+                    self:D("stmts_k:"..stmts_k)
+                    local res, err = stmts_v:finalize()
+                    if tostring(res) == "5" then
+                        self:D(stmts_k..":Finalize res:"..tostring(res)..",Finalize err:"..tostring(err))
+                    end
                 end
             end
 
+
+            local stat_fields_is = stat_fields[input_sn]
             local db = dbs[input_sn]
+
+            -- self:D("【stat_fields】["..input_sn.."]:"..json.encode(stat_fields_is))
+
+            -- 统计【spider_stat,client_stat,request_stat】
+            for sti_k,sti_v in pairs(stat_fields_is) do
+                local vkk = ""
+                for sv_k,sv_v in pairs(sti_v) do
+                    vkk = vkk..sv_k.."="..sv_k.."+"..sv_v..","
+                end
+                if vkk ~= "" then
+                    vkk = string.sub(vkk,1,string.len(vkk)-1) 
+                end
+                if sti_k == 'request_stat_fields' and vkk ~= '' then
+                    self:update_stat( db, "request_stat", time_key, vkk)
+                end
+
+                if sti_k == 'client_stat_fields' and vkk ~= '' then
+                    self:update_stat( db, "client_stat", time_key, vkk)
+                end
+
+                if sti_k == 'spider_stat_fields' and vkk ~= '' then
+                    self:update_stat( db, "spider_stat", time_key, vkk)
+                end
+            end
+
             if db then
                 local now_date = os.date("*t")
                 local save_day = config['global']["save_day"]
@@ -327,19 +403,6 @@ function _M.cron(self)
 
     ngx.timer.every(1, timer_every_get_data)
 end
-
-function _M.store_logs(self, db, stmt2, info)
-    local input_sn = info["server_name"]
-
-    self:D("init store_logs:"..input_sn..":"..tostring(db)..":"..tostring(stmt2))
-
-    -- self:lock_working(input_sn)
-
-    self:store_logs_line(db, stmt2, input_sn, info)
-
-    -- self:unlock_working(input_sn)
-end
-
 
 
 function _M.store_logs_line(self, db, stmt, input_sn, info)
@@ -368,24 +431,24 @@ function _M.store_logs_line(self, db, stmt, input_sn, info)
     local request_stat_fields = nil 
     local client_stat_fields = nil
     local spider_stat_fields = nil
-    local stat_fields = info['stat_fields']
-    if stat_fields == nil then
-        -- D("Log stat fields is nil.")
-        -- D("Logdata:"..logvalue)
-    else
-        stat_fields = self:split(stat_fields, ";")
-        request_stat_fields = stat_fields[1]
-        client_stat_fields = stat_fields[2]
-        spider_stat_fields = stat_fields[3]
+    -- local stat_fields = info['stat_fields']
+    -- if stat_fields == nil then
+    --     -- D("Log stat fields is nil.")
+    --     -- D("Logdata:"..logvalue)
+    -- else
+    --     stat_fields = self:split(stat_fields, ";")
+    --     request_stat_fields = stat_fields[1]
+    --     client_stat_fields = stat_fields[2]
+    --     spider_stat_fields = stat_fields[3]
 
-        if "x" == client_stat_fields then
-            client_stat_fields = nil
-        end
+    --     if "x" == client_stat_fields then
+    --         client_stat_fields = nil
+    --     end
 
-        if "x" == spider_stat_fields then
-            spider_stat_fields = nil
-        end
-    end
+    --     if "x" == spider_stat_fields then
+    --         spider_stat_fields = nil
+    --     end
+    -- end
 
     local time_key = logline["time_key"]
     if not excluded then
@@ -419,19 +482,19 @@ function _M.store_logs_line(self, db, stmt, input_sn, info)
         end
         stmt:reset()
 
-        local res ,err = self:update_stat( db, "client_stat", time_key, client_stat_fields)
-        -- self:D("step res:"..tostring(res) ..",step err:"..tostring(err))
-        local res ,err = self:update_stat( db, "spider_stat", time_key, spider_stat_fields)
-        -- self:D("step res:"..tostring(res) ..",step err:"..tostring(err))
-        -- self:D("stat ok"..)
+        -- local res ,err = self:update_stat( db, "client_stat", time_key, client_stat_fields)
+        -- -- self:D("step res:"..tostring(res) ..",step err:"..tostring(err))
+        -- local res ,err = self:update_stat( db, "spider_stat", time_key, spider_stat_fields)
+        -- -- self:D("step res:"..tostring(res) ..",step err:"..tostring(err))
+        -- -- self:D("stat ok"..)
 
-        -- only count non spider requests
-        local ok, err = self:statistics_uri(db, request_uri, ngx.md5(request_uri), body_length)
-        local ok, err = self:statistics_ip(db, ip, body_length)
-        -- self:D("stat url ip ok")
+        -- -- only count non spider requests
+        -- local ok, err = self:statistics_uri(db, request_uri, ngx.md5(request_uri), body_length)
+        -- local ok, err = self:statistics_ip(db, ip, body_length)
+        -- -- self:D("stat url ip ok")
     end
 
-    self:update_stat( db, "request_stat", time_key, request_stat_fields)
+    -- self:update_stat( db, "request_stat", time_key, request_stat_fields)
     return true
 end
 
@@ -478,6 +541,8 @@ function _M.statistics_request(self, ip, is_spider, body_length)
 end
 
 ---------------------       db start   ---------------------------
+
+
 function _M.statistics_uri(self, db, uri, uri_md5, body_length)
     -- count the number of URI requests and traffic
     local open_statistics_uri = config['global']["statistics_uri"]
@@ -506,17 +571,28 @@ function _M.statistics_ip(self, db, ip, body_length)
 end
 
 
+function _M._update_stat_pre(self, db, stat_table, key)
+    local stmt = db:prepare(string.format("INSERT INTO %s(time) SELECT :time WHERE NOT EXISTS(SELECT time FROM %s WHERE time=:time);", stat_table, stat_table))
+    stmt:bind_names{time=key}
+    stmt:step()
+    stmt:finalize()
+end
+
+function _M.update_stat_quick(self, db, stat_table, key,columns)
+    if not columns then return end
+    local update_sql = "UPDATE ".. stat_table .. " SET " .. columns .. " WHERE time=" .. key
+    return db:exec(update_sql)
+end
 
 
-function _M.update_stat(self,db, stat_table, key, columns)
+function _M.update_stat(self, db, stat_table, key, columns)
     -- 根据指定表名，更新统计数据
     if not columns then return end
     local stmt = db:prepare(string.format("INSERT INTO %s(time) SELECT :time WHERE NOT EXISTS(SELECT time FROM %s WHERE time=:time);", stat_table, stat_table))
     stmt:bind_names{time=key}
     local res, err = stmt:step()
     stmt:finalize()
-    local update_sql = "UPDATE ".. stat_table .. " SET " .. columns
-    update_sql = update_sql .. " WHERE time=" .. key
+    local update_sql = "UPDATE ".. stat_table .. " SET " .. columns .. " WHERE time=" .. key
     return db:exec(update_sql)
 end
 ---------------------       db end   ---------------------------
@@ -820,6 +896,106 @@ function _M.match_client(self, ua)
     end
     if client_stat_fields then
         client_stat_fields = string.sub(client_stat_fields, 2)
+    end
+    return client_stat_fields
+end
+
+
+function _M.match_client_arr(self, ua)
+    local client_stat_fields = {}
+    
+    if not ua then
+        return client_stat_fields
+    end
+
+    local clients_map = {
+        ["android"] = "android",
+        ["iphone"] = "iphone",
+        ["ipod"] = "iphone",
+        ["ipad"] = "iphone",
+        ["firefox"] = "firefox",
+        ["msie"] = "msie",
+        ["trident"] = "msie",
+        ["360se"] = "qh360",
+        ["360ee"] = "qh360",
+        ["360browser"] = "qh360",
+        ["qihoo"] = "qh360",
+        ["the world"] = "theworld",
+        ["theworld"] = "theworld",
+        ["tencenttraveler"] = "tt",
+        ["maxthon"] = "maxthon",
+        ["opera"] = "opera",
+        ["qqbrowser"] = "qq",
+        ["ucweb"] = "uc",
+        ["ubrowser"] = "uc",
+        ["safari"] = "safari",
+        ["chrome"] = "chrome",
+        ["metasr"] = "metasr",
+        ["2345explorer"] = "pc2345",
+        ["edge"] = "edeg",
+        ["edg"] = "edeg",
+        ["windows"] = "windows",
+        ["linux"] = "linux",
+        ["macintosh"] = "mac",
+        ["mobile"] = "mobile"
+    }
+    local mobile_regx = "(Mobile|Android|iPhone|iPod|iPad)"
+    local mobile_res = ngx.re.match(ua, mobile_regx, "ijo")
+    --mobile
+    if mobile_res then
+        client_stat_fields['mobile'] = 1
+        mobile_res = string.lower(mobile_res[0])
+        if mobile_res ~= "mobile" then
+            client_stat_fields[clients_map[mobile_res]] = 1
+        end
+    else
+        --pc
+        -- 匹配结果的顺序，与ua中关键词的顺序有关
+        -- lua的正则不支持|语法
+        -- 短字符串string.find效率要比ngx正则高
+        local pc_regx1 = "(360SE|360EE|360browser|Qihoo|TheWorld|TencentTraveler|Maxthon|Opera|QQBrowser|UCWEB|UBrowser|MetaSr|2345Explorer|Edg[e]*)" 
+        local pc_res = ngx.re.match(ua, pc_regx1, "ijo")
+        local cls_pc = nil
+        if not pc_res then
+            if ngx.re.find(ua, "[Ff]irefox") then
+                cls_pc = "firefox"
+            elseif string.find(ua, "MSIE") or string.find(ua, "Trident") then
+                cls_pc = "msie"
+            elseif string.find(ua, "[Cc]hrome") then
+                cls_pc = "chrome"
+            elseif string.find(ua, "[Ss]afari") then
+                cls_pc = "safari"
+            end
+        else
+            cls_pc = string.lower(pc_res[0])
+        end
+        -- D("UA:"..ua)
+        -- D("PC cls:"..tostring(cls_pc))
+        if cls_pc then
+            client_stat_fields[clients_map[cls_pc]] = 1
+        else
+            -- machine and other
+            local machine_res, err = ngx.re.match(ua, "(ApacheBench|[Cc]url|HeadlessChrome|[a-zA-Z]+[Bb]ot|[Ww]get|[Ss]pider|[Cc]rawler|[Ss]crapy|zgrab|[Pp]ython|java)", "ijo")
+            if machine_res then
+                client_stat_fields["machine"] = 1
+            else
+                -- 移动端+PC端+机器以外 归类到 其他
+                client_stat_fields["other"] = 1
+            end
+        end
+
+        local os_regx = "(Windows|Linux|Macintosh)"
+        local os_res = ngx.re.match(ua, os_regx, "ijo")
+        if os_res then
+            os_res = string.lower(os_res[0])
+            client_stat_fields[clients_map[os_res]] = 1
+        end
+    end
+
+    local other_regx = "MicroMessenger"
+    local other_res = ngx.re.find(ua, other_regx)
+    if other_res then
+        client_stat_fields["weixin"] = 1
     end
     return client_stat_fields
 end

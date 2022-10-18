@@ -93,16 +93,27 @@ def test_OK():
     '''
     url = TEST_URL + "ok.txt"
     print("ok test start")
-    # Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36
-    # (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36
     url_val = httpGet__UA(
         url, "Mozilla / 5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit / 537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36")
     print(url_val)
     print("ok test end")
 
 
+def test_Spider():
+    '''
+    目录保存
+    '''
+    url = TEST_URL + "ok.txt"
+    print("spider test start")
+    url_val = httpGet__UA(
+        url, "Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.5249.103 Mobile Safari/537.36 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)")
+    print(url_val)
+    print("spider test end")
+
+
 def test_start():
     test_OK()
+    test_Spider()
 
 
 if __name__ == "__main__":
