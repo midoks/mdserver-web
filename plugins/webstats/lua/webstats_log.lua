@@ -184,7 +184,7 @@ log_by_lua_block {
 	end
 	--------------------- exclude_func end ---------------------------
 
-	local function cache_logs(server_name)
+	local function cache_logs_old(server_name)
 
 		-- make new id
 		local new_id = C:get_last_id(server_name)
@@ -242,8 +242,6 @@ log_by_lua_block {
 			ip_list=ip_list,
 			client_port=client_port
 		}
-
-		-- C:D(json.encode(kv))
 
 		local request_stat_fields = "req=req+1,length=length+"..body_length
 		local spider_stat_fields = "x"
@@ -306,22 +304,147 @@ log_by_lua_block {
 
 		local stat_fields = request_stat_fields..";"..client_stat_fields..";"..spider_stat_fields
 
+
+		C:D("stat_fields:"..stat_fields)
+		-- cache_set(server_name, new_id, "stat_fields", stat_fields)
+		-- cache_set(server_name, new_id, "log_kv", json.encode(kv))
+ 	end
+
+	local function cache_logs(input_sn)
+
+		-- make new id
+		local new_id = C:get_last_id(input_sn)
+
+		local excluded = false
+		local ip = C:get_client_ip()
+		excluded = filter_status() or exclude_extension() or exclude_url() or exclude_ip(input_sn, ip)
+
+		local ip_list = request_header["x-forwarded-for"]
+		if ip and not ip_list then
+			ip_list = ip
+		end
+
+		local remote_addr = ngx.var.remote_addr
+		if not string.find(ip_list, remote_addr) then
+			if remote_addr then
+				ip_list = ip_list .. "," .. remote_addr
+			end
+		end
+
+		-- local request_time = ngx.var.request_time
+		local request_time = C:get_request_time()
+		local client_port = ngx.var.remote_port
+		local real_server_name = input_sn
+		local uri = ngx.var.uri
+		local status_code = ngx.status
+		local protocol = ngx.var.server_protocol
+		local request_uri = ngx.var.request_uri
+		local time_key = C:get_store_key()
+		local method = method
+		local body_length = C:get_length()
+		local domain = C:get_domain()
+		local referer = ngx.var.http_referer
+
+		local kv = {
+			id=new_id,
+			time_key=time_key,
+			time=ngx.time(),
+			ip=ip,
+			domain=domain,
+			server_name=input_sn,
+			real_server_name=real_server_name,
+			method=method, 
+			status_code=status_code,
+			uri=uri,
+			request_uri=request_uri,
+			body_length=body_length,
+			referer=referer,
+			user_agent=request_header['user-agent'],
+			protocol=protocol,
+			is_spider=0,
+			request_time=request_time,
+			excluded=excluded,
+			request_headers='',
+			ip_list=ip_list,
+			client_port=client_port
+		}
+
+		-- C:D(json.encode(kv))
+		local request_stat_fields = {
+			req=1,
+			length=body_length,
+		}
+
+		local spider_stat_fields = {}
+		local client_stat_fields = {}
+
+		if not excluded then
+
+			if status_code == 500 or (method=="POST" and config["record_post_args"] == true) or (status_code==403 and config["record_get_403_args"] == true) then
+				local data = ""
+				local ok, err = pcall(function() data = C:get_http_origin() end)
+				if ok and not err then
+					kv["request_headers"] = data
+				end
+			end
+
+			if ngx.re.find("500,501,502,503,504,505,506,507,509,510,400,401,402,403,404,405,406,407,408,409,410,411,412,413,414,415,416,417,418,421,422,423,424,425,426,449,451", tostring(status_code), "jo") then
+				local field = "status_"..status_code
+				request_stat_fields[field] = 1
+			end
+
+			-- D("method:"..method)
+			local lower_method = string.lower(method)
+			if ngx.re.find("get,post,put,patch,delete", lower_method, "ijo") then
+				local field = "http_"..lower_method
+				request_stat_fields[field] = 1
+			end
+
+
+			local ipc = 0
+     		local pvc = 0
+     		local uvc = 0
+
+     		local is_spider, request_spider, spider_index = C:match_spider(kv['user_agent'])
+     		if not is_spider then
+
+     			client_stat_fields = C:match_client_arr(kv['user_agent'])
+				pvc, uvc = C:statistics_request(ip, is_spider,body_length)
+				ipc = C:statistics_ipc(input_sn,ip)
+			else
+				kv["is_spider"] = spider_index
+				local field = "spider"
+				spider_stat_fields[request_spider] = 1
+				request_stat_fields[field] = 1
+			end
+
+			if ipc > 0 then
+				request_stat_fields["ip"] = 1
+			end
+			if uvc > 0 then 
+				request_stat_fields["uv"] = 1
+			end
+			if pvc > 0 then
+				request_stat_fields["pv"] = 1
+			end
+		end
+
+		local stat_fields = {
+			request_stat_fields=request_stat_fields,
+			client_stat_fields=client_stat_fields,
+			spider_stat_fields=spider_stat_fields,
+		}
+
 		local data = {
-			server_name = server_name,
-			stat_fields = stat_fields,
-			log_kv = kv,
+			server_name=input_sn,
+			stat_fields=stat_fields,
+			log_kv=kv,
 		}
 
 		local push_data = json.encode(data)
+		-- C:D("push_data:"..push_data)
 		local key = C:getTotalKey()
-		ngx.shared.mw_total:rpush(key, push_data)
-
-		-- C:D("stat_fields:"..stat_fields)
-		-- C:D("log_kv:"..json.encode(kv))
-		
-		-- cache_set(server_name, new_id, "stat_fields", stat_fields)
-		-- cache_set(server_name, new_id, "log_kv", json.encode(kv))
-		
+		ngx.shared.mw_total:rpush(key, push_data)		
  	end
 
  	local function store_logs_line(db, stmt, input_server_name, lineno)
@@ -517,6 +640,8 @@ log_by_lua_block {
 		load_exclude_ip(server_name)
 
 		cache_logs(server_name)
+
+		-- cache_logs_old(server_name)
 		-- store_logs(server_name)
 		-- D("------------ debug end -------------")
 	end
