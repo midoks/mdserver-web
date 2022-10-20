@@ -17,7 +17,7 @@ local cache = ngx.shared.mw_total
 
 local today = ngx.re.gsub(ngx.today(),'-','')
 local request_header = ngx.req.get_headers()
-local method = ngx.req.get_headers()
+local method = ngx.req.get_method()
 
 local day = os.date("%d")
 local number_day = tonumber(day)
@@ -443,8 +443,8 @@ function _M.cron(self)
         
         self:unlock_working(cron_key)
 
-        ngx.update_time()
-        self:D("--【"..tostring(llen).."】, elapsed: " .. tostring(ngx.now() - begin))
+        -- ngx.update_time()
+        -- self:D("--【"..tostring(llen).."】, elapsed: " .. tostring(ngx.now() - begin))
     end
 
     ngx.timer.every(0.5, timer_every_get_data)
