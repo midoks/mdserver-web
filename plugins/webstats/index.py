@@ -236,7 +236,7 @@ def start():
     if not mw.isAppleSystem():
         mw.execShell("chown -R www:www " + getServerDir())
 
-    mw.restartWeb()
+    mw.opWeb("reload")
     return 'ok'
 
 
@@ -247,14 +247,14 @@ def stop():
     import tool_task
     tool_task.removeBgTask()
 
-    mw.restartWeb()
+    mw.opWeb("restart")
     return 'ok'
 
 
 def restart():
     initDreplace()
 
-    mw.restartWeb()
+    mw.opWeb("reload")
     return 'ok'
 
 
@@ -262,7 +262,8 @@ def reload():
     initDreplace()
 
     loadDebugLogFile()
-    mw.restartWeb()
+
+    mw.opWeb("reload")
     return 'ok'
 
 

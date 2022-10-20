@@ -220,6 +220,7 @@ function _M.cron(self)
     local timer_every_get_data = function (premature)
 
         local llen, _ = ngx.shared.mw_total:llen(total_key)
+        -- self:D("llen:"..tostring(llen))
         if llen == 0 then
             return true
         end
@@ -443,7 +444,7 @@ function _M.cron(self)
         
         self:unlock_working(cron_key)
 
-        -- ngx.update_time()
+        ngx.update_time()
         -- self:D("--【"..tostring(llen).."】, elapsed: " .. tostring(ngx.now() - begin))
     end
 
