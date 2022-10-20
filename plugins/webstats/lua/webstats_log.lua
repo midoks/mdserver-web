@@ -262,7 +262,6 @@ log_by_lua_block {
 				request_stat_fields = request_stat_fields .. ","..field.."="..field.."+1"
 			end
 
-			-- D("method:"..method)
 			local lower_method = string.lower(method)
 			if ngx.re.find("get,post,put,patch,delete", lower_method, "ijo") then
 				local field = "http_"..lower_method
@@ -304,10 +303,8 @@ log_by_lua_block {
 
 		local stat_fields = request_stat_fields..";"..client_stat_fields..";"..spider_stat_fields
 
-
-		C:D("stat_fields:"..stat_fields)
-		-- cache_set(server_name, new_id, "stat_fields", stat_fields)
-		-- cache_set(server_name, new_id, "log_kv", json.encode(kv))
+		cache_set(server_name, new_id, "stat_fields", stat_fields)
+		cache_set(server_name, new_id, "log_kv", json.encode(kv))
  	end
 
 	local function cache_logs(input_sn)
@@ -370,10 +367,7 @@ log_by_lua_block {
 		}
 
 		-- C:D(json.encode(kv))
-		local request_stat_fields = {
-			req=1,
-			length=body_length,
-		}
+		local request_stat_fields = {req=1,length=body_length}
 
 		local spider_stat_fields = {}
 		local client_stat_fields = {}
@@ -442,7 +436,7 @@ log_by_lua_block {
 		}
 
 		local push_data = json.encode(data)
-		-- C:D("push_data:"..push_data)
+
 		local key = C:getTotalKey()
 		ngx.shared.mw_total:rpush(key, push_data)		
  	end

@@ -25,19 +25,42 @@ function _M.new(self)
         server_name = '',
         global_tatal = nil,
         params = nil,
+        db = nil,
     }
     return setmetatable(self, mt)
 end
 
 
-
-
 function _M.getInstance(self)
     if rawget(self, "instance") == nil then
         rawset(self, "instance", self.new())
+        self.initDB()
     end
     assert(self.instance ~= nil)
     return self.instance
+end
+
+function _M.initDB(self)
+    if self.db then
+        return self.db
+    end
+
+    local path = log_dir .. "/waf.db"
+    db, err = sqlite3.open(path)
+
+    if err then
+        self:D("initDB err:"..tostring(err))
+        return nil
+    end
+
+    db:exec([[PRAGMA synchronous = 0]])
+    db:exec([[PRAGMA cache_size = 8000]])
+    db:exec([[PRAGMA page_size = 32768]])
+    db:exec([[PRAGMA journal_mode = wal]])
+    db:exec([[PRAGMA journal_size_limit = 1073741824]])
+
+    self.db = db
+    return db
 end
 
 function _M.setDebug(self, mode)

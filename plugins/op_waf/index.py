@@ -72,6 +72,30 @@ def getConf():
     return path
 
 
+def pSqliteDb(dbname='waf_history'):
+    name = "waf"
+    db_dir = getServerDir() + '/logs/'
+
+    if not os.path.exists(db_dir):
+        mw.execShell('mkdir -p ' + db_dir)
+
+    file = db_dir + name + '.db'
+    if not os.path.exists(file):
+        conn = mw.M(dbname).dbPos(db_dir, name)
+        sql = mw.readFile(getPluginDir() + '/conf/init.sql')
+        sql_list = sql.split(';')
+        for index in range(len(sql_list)):
+            conn.execute(sql_list[index])
+    else:
+        conn = mw.M(dbname).dbPos(db_dir, name)
+
+    conn.execute("PRAGMA synchronous = 0")
+    conn.execute("PRAGMA page_size = 4096")
+    conn.execute("PRAGMA journal_mode = wal")
+    conn.execute("PRAGMA journal_size_limit = 1073741824")
+    return conn
+
+
 def initDomainInfo():
     data = []
     path_domains = getJsonPath('domains')
@@ -316,6 +340,8 @@ def initDreplace():
     initSiteInfo()
     initTotalInfo()
     autoMakeLuaConf()
+
+    pSqliteDb()
 
     if not mw.isAppleSystem():
         mw.execShell("chown -R www:www " + path)
