@@ -375,7 +375,7 @@ function _M.cron(self)
 
             if stmts[input_sn] then
                 for stmts_k,stmts_v in ipairs(stmts[input_sn]) do
-                    self:D("stmts_k:"..stmts_k)
+                    self:D("stmts_k:"..tostring(stmts_k))
                     local res, err = stmts_v:finalize()
                     if tostring(res) == "5" then
                         self:D(stmts_k..":Finalize res:"..tostring(res)..",Finalize err:"..tostring(err))
