@@ -34,7 +34,7 @@ end
 
 function _M.getInstance(self)
     if rawget(self, "instance") == nil then
-        rawset(self, "instance", self.new())
+        rawset(self, "instance", self:new())
     end
     assert(self.instance ~= nil)
     return self.instance
