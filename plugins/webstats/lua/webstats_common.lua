@@ -447,7 +447,7 @@ function _M.cron(self)
         self:D("--【"..tostring(llen).."】, elapsed: " .. tostring(ngx.now() - begin))
     end
 
-    ngx.timer.every(1, timer_every_get_data)
+    ngx.timer.every(0.5, timer_every_get_data)
 end
 
 
