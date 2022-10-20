@@ -113,7 +113,7 @@ Uninstall_App()
 	fi
 
 	rm -rf $serverPath/webstats
-	echo "Uninstall_redis" > $install_tmp
+	echo "卸载完成" > $install_tmp
 }
 
 action=$1
