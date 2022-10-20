@@ -4,9 +4,11 @@ local ngx_match = ngx.re.find
 local __C = require "common"
 local C = __C:getInstance()
 
-local config = require "config"
-local site_config = require "site"
-local config_domains = require "domains"
+local config = require "waf_config"
+local site_config = require "waf_site"
+local config_domains = require "waf_domains"
+
+-- C:D("config:"..C:to_json(config))
 
 C:setConfData(config, site_config)
 C:setDebug(true)
@@ -39,7 +41,9 @@ local function initParams()
     data['uri_request_args'] = ngx.req.get_uri_args()
     data['method'] = ngx.req.get_method()
     data['request_uri'] = ngx.var.request_uri
+    data['status_code'] = ngx.status
     data['cookie'] = ngx.var.http_cookie
+    data['time'] = ngx.time()
     return data
 end
 
@@ -47,6 +51,9 @@ local params = initParams()
 C:setParams(params)
 
 local cpu_percent = ngx.shared.waf_limit:get("cpu_usage")
+if not cpu_percent then
+    cpu_percent = 0 
+end
 
 local function get_return_state(rstate,rmsg)
     result = {}

@@ -3,7 +3,7 @@ PRAGMA page_size = 4096;
 PRAGMA journal_mode = wal;
 PRAGMA journal_size_limit = 1073741824;
 
-CREATE TABLE IF NOT EXISTS `waf_history` (
+CREATE TABLE IF NOT EXISTS `logs` (
     `time` INTEGER,
     `ip` TEXT,
     `domain` TEXT,
@@ -11,5 +11,6 @@ CREATE TABLE IF NOT EXISTS `waf_history` (
     `method` TEXT,
     `status_code` INTEGER,
     `uri` TEXT,
+    `rule_name` TEXT,
     `reason` TEXT
 );

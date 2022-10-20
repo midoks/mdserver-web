@@ -72,7 +72,7 @@ def getConf():
     return path
 
 
-def pSqliteDb(dbname='waf_history'):
+def pSqliteDb(dbname='logs'):
     name = "waf"
     db_dir = getServerDir() + '/logs/'
 
@@ -261,7 +261,7 @@ def autoMakeLuaConfSingle(file):
 
 def autoMakeLuaImportSingle(file):
     path = getServerDir() + "/waf/" + file + ".json"
-    to_path = getServerDir() + "/waf/conf/" + file + ".lua"
+    to_path = getServerDir() + "/waf/conf/waf_" + file + ".lua"
     content = mw.readFile(path)
     # print(content)
     content = json.loads(content)

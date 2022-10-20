@@ -10,7 +10,7 @@ local debug_mode = false
 
 local waf_root = "{$WAF_ROOT}"
 local cpath = waf_root.."/waf/"
-local logdir = waf_root.."/logs/"
+local log_dir = waf_root.."/logs/"
 local rpath = cpath.."/rule/"
 
 function _M.new(self)
@@ -19,7 +19,7 @@ function _M.new(self)
         waf_root = waf_root,
         cpath = cpath,
         rpath = rpath,
-        logdir = logdir,
+        logdir = log_dir,
         config = '',
         site_config = '',
         server_name = '',
@@ -34,7 +34,6 @@ end
 function _M.getInstance(self)
     if rawget(self, "instance") == nil then
         rawset(self, "instance", self.new())
-        self.initDB()
     end
     assert(self.instance ~= nil)
     return self.instance
@@ -63,6 +62,40 @@ function _M.initDB(self)
     return db
 end
 
+function _M.log(self, args, rule_name, reason)
+    local local_db = self:initDB()
+    local stmt2 = local_db:prepare[[INSERT INTO logs(time, ip, domain, server_name, method, status_code, uri, rule_name,reason) 
+        VALUES(:time, :ip, :domain, :server_name, :method, :status_code, :uri, :rule_name, :reason)]]
+
+    local_db:exec([[BEGIN TRANSACTION]])
+
+    stmt2:bind_names{
+        time=args['time'],
+        ip=args['ip'],
+        domain=args['server_name'],
+        server_name=args['server_name'],
+        method=args['method'],
+        status_code=args['status_code'],
+        uri=args['request_uri'],
+        rule_name=rule_name,
+        reason=reason
+    }
+
+    local res, err = stmt2:step()
+    self:D("LOG[1]:"..tostring(res)..":"..tostring(err))
+    if tostring(res) == "5" then
+        self.D("waf the step database connection is busy, so it will be stored later.")
+        return false
+    end
+    stmt2:reset()
+
+    local res, err = local_db:execute([[COMMIT]])
+
+    self:D("LOG[2]:"..tostring(res)..":"..tostring(err))
+    if local_db and local_db:isopen() then
+        local_db:close()
+    end
+end
 function _M.setDebug(self, mode)
     debug_mode = mode
 end
@@ -517,8 +550,10 @@ end
 
 function _M.write_log(self, name, rule)
     local config = self.config
+    local params = self.params
 
-    local ip = self.params['ip']
+    local ip = params['ip']
+    local ngx_time = ngx.time()
     
     local retry = config['retry']['retry']
     local retry_time = config['retry']['retry_time']
@@ -532,7 +567,7 @@ function _M.write_log(self, name, rule)
     end
 
     if config['log'] ~= true or self:is_site_config('log') ~= true then return false end
-    local method = self.params['method']
+    local method = params['method']
     if error_rule then 
         rule = error_rule
         error_rule = nil
@@ -550,30 +585,15 @@ function _M.write_log(self, name, rule)
         end
         local lock_time = retry_time * safe_count
         if lock_time > 86400 then lock_time = 86400 end
-        local logtmp = {
-            ngx.localtime(),
-            ip,
-            method,ngx.var.request_uri,
-            ngx.var.http_user_agent,
-            name,
-            retry_cycle .. '秒以内累计超过'..retry..'次以上非法请求,封锁'.. lock_time ..'秒'
-        }
-        local logstr = json.encode(logtmp) .. "\n"
+
         retry_times = retry + 1
         ngx.shared.waf_drop_ip:set(ip, retry_times, lock_time)
-        self:write_to_file(logstr)
+
+        local reason = retry_cycle .. '秒以内累计超过'..retry..'次以上非法请求,封锁'.. lock_time ..'秒'
+        self:log(params, name, reason)
     else
-        local logtmp = {
-            ngx.localtime(),
-            ip,
-            method,
-            ngx.var.request_uri,
-            ngx.var.http_user_agent,
-            name,
-            rule
-        }
-        local logstr = json.encode(logtmp) .. "\n"
-        self:write_to_file(logstr)
+
+        self:log(params, name, rule)
     end
     
     self:stats_total(name, rule)
