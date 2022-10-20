@@ -4,6 +4,7 @@ local _M = { _VERSION = '0.02' }
 local mt = { __index = _M }
 
 local json = require "cjson"
+local sqlite3 = require "lsqlite3"
 
 local ngx_match = ngx.re.find
 local debug_mode = false
@@ -64,25 +65,25 @@ end
 
 function _M.log(self, args, rule_name, reason)
     local local_db = self:initDB()
-    local stmt2 = local_db:prepare[[INSERT INTO logs(time, ip, domain, server_name, method, status_code, uri, rule_name,reason) 
+    local stmt2 = local_db:prepare[[INSERT INTO logs(time, ip, domain, server_name, method, status_code, uri, rule_name, reason) 
         VALUES(:time, :ip, :domain, :server_name, :method, :status_code, :uri, :rule_name, :reason)]]
 
     local_db:exec([[BEGIN TRANSACTION]])
 
     stmt2:bind_names{
-        time=args['time'],
-        ip=args['ip'],
-        domain=args['server_name'],
-        server_name=args['server_name'],
-        method=args['method'],
-        status_code=args['status_code'],
-        uri=args['request_uri'],
+        time=args["time"],
+        ip=args["ip"],
+        domain=args["server_name"],
+        server_name=args["server_name"],
+        method=args["method"],
+        status_code=args["status_code"],
+        uri=args["request_uri"],
         rule_name=rule_name,
         reason=reason
     }
 
     local res, err = stmt2:step()
-    self:D("LOG[1]:"..tostring(res)..":"..tostring(err))
+    -- self:D("LOG[1]:"..tostring(res)..":"..tostring(err))
     if tostring(res) == "5" then
         self.D("waf the step database connection is busy, so it will be stored later.")
         return false
@@ -90,8 +91,7 @@ function _M.log(self, args, rule_name, reason)
     stmt2:reset()
 
     local res, err = local_db:execute([[COMMIT]])
-
-    self:D("LOG[2]:"..tostring(res)..":"..tostring(err))
+    -- self:D("LOG[2]:"..tostring(res)..":"..tostring(err))
     if local_db and local_db:isopen() then
         local_db:close()
     end

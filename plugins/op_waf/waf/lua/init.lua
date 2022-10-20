@@ -2,6 +2,7 @@ local json = require "cjson"
 local ngx_match = ngx.re.find
 
 local __C = require "common"
+
 local C = __C:getInstance()
 
 local config = require "waf_config"

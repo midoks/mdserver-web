@@ -294,7 +294,7 @@ def autoMakeLuaConf():
 def initDreplace():
 
     path = getServerDir()
-    if not os.path.exists(path + '/waf'):
+    if not os.path.exists(path + '/waf/lua'):
         sdir = getPluginDir() + '/waf'
         cmd = 'cp -rf ' + sdir + ' ' + path
         mw.execShell(cmd)

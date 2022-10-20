@@ -77,15 +77,18 @@ Install_of(){
 	# copy to code path
 	DEFAULT_DIR=$serverPath/op_waf/luarocks/lib/lua/5.1
 	if [ -f ${DEFAULT_DIR}/lsqlite3.so ];then
-		mkdir -p $serverPath/webstats/lua
+		mkdir -p $serverPath/op_waf/waf/conf
 		cp -rf ${DEFAULT_DIR}/lsqlite3.so $serverPath/op_waf/waf/conf/lsqlite3.so
 	fi
-
 
 	echo "${version}" > $serverPath/op_waf/version.pl
 	echo 'install ok' > $install_tmp
 
 	cd ${rootPath} && python3 ${rootPath}/plugins/op_waf/index.py start
+
+	
+
+	# cd ${rootPath} && python3 ${rootPath}/plugins/op_waf/index.py restart
 }
 
 Uninstall_of(){

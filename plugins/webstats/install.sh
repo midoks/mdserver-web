@@ -108,10 +108,7 @@ Install_App()
 
 Uninstall_App()
 {
-	if [ "$sys_os" != "Darwin" ];then
-		cd $rootPath && python3 ${rootPath}/plugins/webstats/index.py stop
-	fi
-
+	cd $rootPath && python3 ${rootPath}/plugins/webstats/index.py stop
 	rm -rf $serverPath/webstats
 	echo "卸载完成" > $install_tmp
 }

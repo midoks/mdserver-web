@@ -242,7 +242,8 @@ def start():
 
 def stop():
     path = luaConf()
-    os.remove(path)
+    if os.path.exists(path):
+        os.remove(path)
 
     import tool_task
     tool_task.removeBgTask()
