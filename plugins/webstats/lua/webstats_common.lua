@@ -261,19 +261,19 @@ function _M.cron(self)
                 tmp_stmt["web_logs"] = stmt
                 stmts[input_sn] = tmp_stmt
 
-                db:exec([[BEGIN TRANSACTION]])
-
                 local wc_stat = {
                     'request_stat',
                     'client_stat',
                     'spider_stat'
                 }
 
-                for _,ws_v in ipairs(wc_stat) do
+                for _,ws_v in pairs(wc_stat) do
                     self:_update_stat_pre(db, ws_v, time_key)
                     self:_update_stat_pre(db, ws_v, time_key_next)
                 end
 
+
+                db:exec([[BEGIN TRANSACTION]])
             end
         end
 
@@ -374,8 +374,8 @@ function _M.cron(self)
             local input_sn = site_v["name"]
 
             if stmts[input_sn] then
-                for stmts_k,stmts_v in ipairs(stmts[input_sn]) do
-                    self:D("stmts_k:"..tostring(stmts_k))
+                for stmts_k,stmts_v in pairs(stmts[input_sn]) do
+                    -- self:D("stmts_k:"..tostring(stmts_k))
                     local res, err = stmts_v:finalize()
                     if tostring(res) == "5" then
                         self:D(stmts_k..":Finalize res:"..tostring(res)..",Finalize err:"..tostring(err))
@@ -611,10 +611,10 @@ end
 
 
 function _M._update_stat_pre(self, db, stat_table, key)
-    local stmt = db:prepare(string.format("INSERT INTO %s(time) SELECT :time WHERE NOT EXISTS(SELECT time FROM %s WHERE time=:time);", stat_table, stat_table))
-    stmt:bind_names{time=key}
-    stmt:step()
-    stmt:finalize()
+    local update_stat_stmt = db:prepare(string.format("INSERT INTO %s(time) SELECT :time WHERE NOT EXISTS(SELECT time FROM %s WHERE time=:time);", stat_table, stat_table))
+    update_stat_stmt:bind_names{time=key}
+    update_stat_stmt:step()
+    update_stat_stmt:finalize()
 end
 
 function _M.update_stat_quick(self, db, stat_table, key,columns)
