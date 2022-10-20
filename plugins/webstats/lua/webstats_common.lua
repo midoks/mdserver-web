@@ -533,11 +533,11 @@ function _M.statistics_request(self, ip, is_spider, body_length)
 
         out_header = ngx.resp.get_headers()
         if out_header['content-type'] then
-            if string.find(out_header['content-type'],'text/html', 1, true) then
+            if string.find(out_header['content-type'], 'text/html', 1, true) then
                 pvc = 1
                 if request_header['user-agent'] then
                     if string.find(ua,'mozilla') then
-                        local today = os.date("%Y-%m-%d")
+                        local today = ngx.today()
                         local uv_token = ngx.md5(ip .. request_header['user-agent'] .. today)
                         if not cache:get(uv_token) then
                             uvc = 1
