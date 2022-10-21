@@ -314,6 +314,15 @@ def initDefaultInfo():
         mw.writeFile(default_json, json.dumps(ddata))
 
 
+def autoMakeConfig():
+    path = getServerDir()
+
+    initDomainInfo()
+    initSiteInfo()
+    initTotalInfo()
+    autoMakeLuaConf()
+
+
 def initDreplace():
 
     path = getServerDir()
@@ -363,7 +372,6 @@ def initDreplace():
     initSiteInfo()
     initTotalInfo()
     autoMakeLuaConf()
-
     initDefaultInfo()
 
     pSqliteDb()
@@ -1086,6 +1094,8 @@ def setObjOpen():
 
     cjson = mw.getJson(cobj)
     mw.writeFile(conf, cjson)
+
+    autoMakeConfig()
     mw.restartWeb()
     return mw.returnJson(True, '设置成功!')
 
@@ -1116,6 +1126,9 @@ def setSiteObjOpen():
 
     cjson = mw.getJson(content)
     mw.writeFile(path, cjson)
+
+    autoMakeConfig()
+
     mw.restartWeb()
     return mw.returnJson(True, '设置成功!')
 
