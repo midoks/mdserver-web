@@ -1728,7 +1728,7 @@ function wafLogRequest(page){
             var time = getLocalTime(res.time);
             layer.open({
                 type: 1,
-                title: "【"+time + "】详情",
+                title: "【"+res.domain + "】详情",
                 area: '600px',
                 closeBtn: 1,
                 shadeClose: false,
