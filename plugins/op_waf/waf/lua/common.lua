@@ -60,13 +60,13 @@ function _M.initDB(self)
     db:exec([[PRAGMA journal_size_limit = 1073741824]])
 
     self.db = db
-    return self.db
+    return db
 end
 
 function _M.log(self, args, rule_name, reason)
     local local_db = self:initDB()
-    local stmt2 = local_db:prepare[[INSERT INTO logs(time, ip, domain, server_name, method, status_code, uri, rule_name, reason) 
-        VALUES(:time, :ip, :domain, :server_name, :method, :status_code, :uri, :rule_name, :reason)]]
+    local stmt2 = local_db:prepare[[INSERT INTO logs(time, ip, domain, server_name, method, status_code, uri, user_agent, rule_name, reason) 
+        VALUES(:time, :ip, :domain, :server_name, :method, :status_code, :uri, :user_agent, :rule_name, :reason)]]
 
     local_db:exec([[BEGIN TRANSACTION]])
 
@@ -77,6 +77,7 @@ function _M.log(self, args, rule_name, reason)
         server_name=args["server_name"],
         method=args["method"],
         status_code=args["status_code"],
+        user_agent=args["user_agent"],
         uri=args["request_uri"],
         rule_name=rule_name,
         reason=reason
@@ -84,12 +85,12 @@ function _M.log(self, args, rule_name, reason)
 
     local res, err = stmt2:step()
     -- self:D("LOG[1]:"..tostring(res)..":"..tostring(err))
+
     if tostring(res) == "5" then
         self.D("waf the step database connection is busy, so it will be stored later.")
         return false
     end
     stmt2:reset()
-
     local res, err = local_db:execute([[COMMIT]])
     -- self:D("LOG[2]:"..tostring(res)..":"..tostring(err))
     if local_db and local_db:isopen() then

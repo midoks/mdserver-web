@@ -2110,7 +2110,7 @@ laydate.render({
             $(this).removeClass('cur');
         });
 
-        var timeA  = value.split('-')
+        var timeA  = value.split('-');
         var start = $.trim(timeA[0]+'-'+timeA[1]+'-'+timeA[2])
         var end = $.trim(timeA[3]+'-'+timeA[4]+'-'+timeA[5])
         query_txt = toUnixTime(start + " 00:00:00") + "-"+ toUnixTime(end + " 00:00:00")

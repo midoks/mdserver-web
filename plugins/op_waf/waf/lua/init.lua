@@ -45,6 +45,7 @@ local function initParams()
     data['method'] = ngx.req.get_method()
     data['request_uri'] = ngx.var.request_uri
     data['status_code'] = ngx.status
+    data['user_agent'] = data['request_header']['user-agent']
     data['cookie'] = ngx.var.http_cookie
     data['time'] = ngx.time()
     return data

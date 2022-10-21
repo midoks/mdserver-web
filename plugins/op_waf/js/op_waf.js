@@ -1611,7 +1611,6 @@ function siteWafConfig(siteName, type) {
 
 
 function wafSite(){
-
     owPost('get_site_config', {}, function(data){
         var tmp = $.parseJSON(data.data);
         var rdata = $.parseJSON(tmp.data);
@@ -1621,24 +1620,12 @@ function wafSite(){
             i += 1;
             tbody += '<tr>\
                     <td><a onclick="siteWafConfig(\''+ k + '\')" class="sitename btlink" title="' + k + '">' + k + '</a></td>\
-                    <td>\
-                        <input onclick="setSiteObjState(\''+ k + '\',\'get\')" type="checkbox" ' + (v.get ? 'checked' : '') + '><span class="' + back_css(v.total[1].value) + '" title="拦截GET渗透次数:' + v.total[1].value + '">' + v.total[1].value + '</span>\
-                    </td>\
-                    <td>\
-                        <input onclick="setSiteObjState(\''+ k + '\',\'post\')"  type="checkbox" ' + (v.post ? 'checked' : '') + '><span class="' + back_css(v.total[0].value) + '"  title="拦截POST渗透次数:' + v.total[0].value + '">' + v.total[0].value + '</span>\
-                    </td>\
-                    <td>\
-                        <input onclick="setSiteObjState(\''+ k + '\',\'user-agent\')"  type="checkbox" ' + (v['user-agent'] ? 'checked' : '') + '><span class="' + back_css(v.total[3].value) + '" title="拦截恶意User-Agent次数:' + v.total[3].value + '">' + v.total[3].value + '</span>\
-                    </td>\
-                    <td>\
-                        <input onclick="setSiteObjState(\''+ k + '\',\'cookie\')"  type="checkbox" ' + (v.cookie ? 'checked' : '') + '><span class="' + back_css(v.total[4].value) + '" title="拦截Cookie渗透次数:' + v.total[4].value + '">' + v.total[4].value + '</span>\
-                    </td>\
-                    <td>\
-                        <input onclick="setSiteObjState(\''+ k + '\',\'cdn\')"  type="checkbox" ' + (v.cdn ? 'checked' : '') + '>\
-                    </td>\
-                    <td>\
-                        <input onclick="setSiteObjState(\''+ k + '\',\'cc\')"  type="checkbox" ' + (v.cc.open ? 'checked' : '') + '><span class="' + back_css(v.total[2].value) + '" title="拦截CC攻击次数:' + v.total[2].value + '">' + v.total[2].value + '</span>\
-                    </td>\
+                    <td><input onclick="setSiteObjState(\''+ k + '\',\'get\')" type="checkbox" ' + (v.get ? 'checked' : '') + '><span class="' + back_css(v.total[1].value) + '" title="拦截GET渗透次数:' + v.total[1].value + '">' + v.total[1].value + '</span></td>\
+                    <td><input onclick="setSiteObjState(\''+ k + '\',\'post\')"  type="checkbox" ' + (v.post ? 'checked' : '') + '><span class="' + back_css(v.total[0].value) + '"  title="拦截POST渗透次数:' + v.total[0].value + '">' + v.total[0].value + '</span></td>\
+                    <td><input onclick="setSiteObjState(\''+ k + '\',\'user-agent\')"  type="checkbox" ' + (v['user-agent'] ? 'checked' : '') + '><span class="' + back_css(v.total[3].value) + '" title="拦截恶意User-Agent次数:' + v.total[3].value + '">' + v.total[3].value + '</span></td>\
+                    <td><input onclick="setSiteObjState(\''+ k + '\',\'cookie\')"  type="checkbox" ' + (v.cookie ? 'checked' : '') + '><span class="' + back_css(v.total[4].value) + '" title="拦截Cookie渗透次数:' + v.total[4].value + '">' + v.total[4].value + '</span></td>\
+                    <td><input onclick="setSiteObjState(\''+ k + '\',\'cdn\')"  type="checkbox" ' + (v.cdn ? 'checked' : '') + '></td>\
+                    <td><input onclick="setSiteObjState(\''+ k + '\',\'cc\')"  type="checkbox" ' + (v.cc.open ? 'checked' : '') + '><span class="' + back_css(v.total[2].value) + '" title="拦截CC攻击次数:' + v.total[2].value + '">' + v.total[2].value + '</span></td>\
                     <td>\
                         <div class="ssh-item" style="margin-left:0">\
                             <input class="btswitch btswitch-ios" id="closeget_'+ i + '" type="checkbox" ' + (v.open ? 'checked' : '') + '>\
@@ -1646,7 +1633,7 @@ function wafSite(){
                         </div>\
                     </td>\
                     <td class="text-right"><a onclick="siteWafLog(\''+ k + '\')" class="btlink ' + (v.log_size > 0 ? 'dot' : '') + '">日志</a> | <a onclick="siteWafConfig(\'' + k + '\')" class="btlink">设置</a></td>\
-                </tr>'
+                </tr>';
         });
 
         var con = '<div class="lib-box">\
@@ -1680,24 +1667,181 @@ function wafSite(){
 
 
 
-function wafHistory(){    
-    var con = '<button class="btn btn-success btn-sm" onclick="UncoverAll()">解封所有</button>';
-    con += '<div class="divtable mt10">\
-        <table class="table table-hover waftable" style="color:#fff;">\
-            <thead><tr><th width="18%">开始时间</th>\
-            <th width="44%">IP</th>\
-            <th width="10%">站点</th>\
-            <th width="10%">封锁原因</th>\
-            <th width="10%">封锁时长</th>\
-            <th style="text-align: center;" width="10%">状态</th>\
-            </thead>\
-        </table>\
-        </div>';
-    $(".soft-man-con").html(con);
+function wafLogRequest(page){
+    var args = {};   
+    args['page'] = page;
+    args['page_size'] = 10;
+    args['site'] = $('select[name="site"]').val();
+
+    var query_date = 'today';
+    if ($('#time_choose').attr("data-name") != ''){
+        query_date = $('#time_choose').attr("data-name");
+    } else {
+        query_date = $('#search_time button.cur').attr("data-name");
+    }
+
+    args['query_date'] = query_date;
+    args['tojs'] = 'wafLogRequest';
+
+    owPost('get_logs_list', args, function(rdata){
+        var rdata = $.parseJSON(rdata.data);
+        var list = '';
+        var data = rdata.data.data;
+        if (data.length > 0){
+            for(i in data){
+                list += '<tr>';
+                list += '<td><span class="overflow_hide" style="width:112px;">' + getLocalTime(data[i]['time'])+'</span></td>';
+                list += '<td><span class="overflow_hide" style="width:50px;">' + data[i]['domain'] +'</span></td>';
+                list += '<td><span class="overflow_hide" style="width:60px;">' + data[i]['ip'] +'</span></td>';
+                list += '<td><span class="overflow_hide" style="width:50px;">' + data[i]['uri'] +'</span></td>';
+                list += '<td><span class="overflow_hide" style="width:50px;">' + data[i]['rule_name'] +'</span></td>';
+                list += '<td><span class="overflow_hide" style="width:200px;">' + data[i]['reason'] +'</span></td>';
+                list += '<td><a data-id="'+i+'" href="javascript:;" class="btlink details" title="详情">详情</a></td>';
+                list += '</tr>';
+            }
+        } else{
+             list += '<tr><td colspan="8" style="text-align:center;">封锁日志为空</td></tr>';
+        }
+        
+        var table = '<div class="tablescroll">\
+                            <table id="DataBody" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
+                            <thead><tr>\
+                            <th>时间</th>\
+                            <th>域名</th>\
+                            <th>IP</th>\
+                            <th>URI</th>\
+                            <th>规则名</th>\
+                            <th>原因</th>\
+                            <th style="text-align:right;">操作</th></tr></thead>\
+                            <tbody>\
+                            '+ list +'\
+                            </tbody></table>\
+                        </div>\
+                        <div id="wsPage" class="dataTables_paginate paging_bootstrap page"></div>';
+        $('#ws_table').html(table);
+        $('#wsPage').html(rdata.data.page);
+
+        $(".tablescroll .details").click(function(){
+            var index = $(this).attr('data-id');
+            var res = data[index];
+            var ip = res.ip;
+            var time = getLocalTime(res.time);
+            layer.open({
+                type: 1,
+                title: "【"+time + "】详情",
+                area: '600px',
+                closeBtn: 1,
+                shadeClose: false,
+                content: '<div class="pd15 lib-box">\
+                        <table class="table" style="border:#ddd 1px solid; margin-bottom:10px">\
+                        <tbody><tr><th>时间</th><td>'+ time + '</td><th>用户IP</th><td><a class="btlink" href="javascript:add_log_ip_black(\'' + escapeHTML(ip) + '\')" title="加入黑名单">' + escapeHTML(ip) + '</a></td></tr><tr><th>类型</th><td>' + escapeHTML(res.method) + '</td><th>过滤器</th><td>' + escapeHTML(res.rule_name) + '</td></tr></tbody></table>\
+                        <div><b style="margin-left:10px">URI地址</b></div>\
+                        <div class="lib-con pull-left mt10"><div class="divpre">'+ escapeHTML(res.uri) + '</div></div>\
+                        <div><b style="margin-left:10px">User-Agent</b></div>\
+                        <div class="lib-con pull-left mt10"><div class="divpre">'+ escapeHTML(res.user_agent) + '</div></div>\
+                        <div><b style="margin-left:10px">过滤规则</b></div>\
+                        <div class="lib-con pull-left mt10"><div class="divpre">'+ escapeHTML(res.rule_name) + '</div></div>\
+                         <div><b style="margin-left:10px">Reason</b></div>\
+                        <div class="lib-con pull-left mt10"><div class="divpre">'+ escapeHTML(res.reason) + '</div></div>\
+                    </div>'
+            })
+        });
+    });
+}
+
+function wafLogs(){
+    var randstr = getRandomString(10);
+
+
+    var html = '<div>\
+                <div style="padding-bottom:10px;">\
+                    <span>网站: </span>\
+                    <select class="bt-input-text" name="site" style="margin-left:4px;width:100px;">\
+                        <option value="unset">未设置</option>\
+                    </select>\
+                    <span style="margin-left:10px">时间: </span>\
+                    <div class="input-group" style="margin-left:10px;width:350px;display: inline-table;vertical-align: top;">\
+                        <div id="search_time" class="input-group-btn btn-group-sm">\
+                            <button data-name="today" type="button" class="btn btn-default">今日</button>\
+                            <button data-name="yesterday" type="button" class="btn btn-default">昨日</button>\
+                            <button data-name="l7" type="button" class="btn btn-default">近7天</button>\
+                            <button data-name="l30" type="button" class="btn btn-default">近30天</button>\
+                        </div>\
+                        <span class="last-span"><input data-name="" type="text" id="time_choose" lay-key="1000001_'+randstr+'" class="form-control btn-group-sm" autocomplete="off" placeholder="自定义时间" style="display: inline-block;font-size: 12px;padding: 0 10px;height:30px;width: 200px;"></span>\
+                    </div>\
+                </div>\
+                <div class="divtable mtb10" id="ws_table"></div>\
+            </div>';
+    $(".soft-man-con").html(html);
+    // wafLogRequest(1);
+
+    //日期范围
+    laydate.render({
+        elem: '#time_choose',
+        value:'',
+        range:true,
+        done:function(value, startDate, endDate){
+            if(!value){
+                return false;
+            }
+
+            $('#search_time button').each(function(){
+                $(this).removeClass('cur');
+            });
+
+            var timeA  = value.split('-');
+            var start = $.trim(timeA[0]+'-'+timeA[1]+'-'+timeA[2])
+            var end = $.trim(timeA[3]+'-'+timeA[4]+'-'+timeA[5])
+            query_txt = toUnixTime(start + " 00:00:00") + "-"+ toUnixTime(end + " 00:00:00")
+
+            $('#time_choose').attr("data-name",query_txt);
+            $('#time_choose').addClass("cur");
+
+            wsTableErrorLogRequest(1);
+        },
+    });
+
+    $('#search_time button:eq(0)').addClass('cur');
+    $('#search_time button').click(function(){
+        $('#search_time button').each(function(){
+            if ($(this).hasClass('cur')){
+                $(this).removeClass('cur');
+            }
+        });
+        $('#time_choose').attr("data-name",'');
+        $('#time_choose').removeClass("cur");
+
+        $(this).addClass('cur');
+
+        wafLogRequest(1);
+    });
+
+    owPost('get_default_site',{},function(rdata){
+        $('select[name="site"]').html('');
+
+        var rdata = $.parseJSON(rdata.data);
+        var rdata = rdata.data;
+        var default_site = rdata["default"];
+        var select = '';
+        for (var i = 0; i < rdata["list"].length; i++) {
+            if (default_site ==  rdata["list"][i]){
+                select += '<option value="'+rdata["list"][i]+'" selected>'+rdata["list"][i]+'</option>';
+            } else{
+                select += '<option value="'+rdata["list"][i]+'">'+rdata["list"][i]+'</option>';
+            }
+        }
+        $('select[name="site"]').html(select);
+        wafLogRequest(1);
+
+        $('select[name="site"]').change(function(){
+            wafLogRequest(1);
+        });
+    });
+
 }
 
 
-function wafLogs(){
+function wafOpLogs(){
     var con = '<div class="divtable">\
         <table class="table table-hover waftable" style="color:#fff;">\
             <thead><tr><th width="18%">名称</th>\

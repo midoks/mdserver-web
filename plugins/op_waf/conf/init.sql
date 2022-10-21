@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS `logs` (
     `server_name` TEXT,
     `method` TEXT,
     `status_code` INTEGER,
+    `user_agent` TEXT,
     `uri` TEXT,
     `rule_name` TEXT,
     `reason` TEXT

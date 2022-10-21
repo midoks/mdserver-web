@@ -164,7 +164,7 @@ def test_scan():
     '''
     目录保存
     '''
-    url = TEST_URL + '/acunetix_wvs_security_test?t=1'
+    url = TEST_URL + 'acunetix_wvs_security_test?t=1'
     print("scan test start")
     url_val = httpGet(url, 10)
     print(url_val)
@@ -214,8 +214,8 @@ def test_start():
     # test_UA()
     # test_UA_for(1000)
     # test_POST()
-    # test_scan()
-    test_CC()
+    test_scan()
+    # test_CC()
     # test_url_ext()
     # test_cdn()
 

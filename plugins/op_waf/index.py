@@ -291,6 +291,29 @@ def autoMakeLuaConf():
         autoMakeLuaHtmlSingle(x)
 
 
+def initDefaultInfo():
+    path = getServerDir()
+    djson = path + "/waf/domains.json"
+    default_json = path + "/waf/default.json"
+    if os.path.exists(djson):
+        content = mw.readFile(djson)
+        content = json.loads(content)
+
+        ddata = {}
+        dlist = []
+        for i in content:
+            dlist.append(i["name"])
+
+        dlist.append('unset')
+        ddata["list"] = dlist
+        if len(ddata["list"]) < 1:
+            ddata["default"] = "unset"
+        else:
+            ddata["default"] = dlist[0]
+
+        mw.writeFile(default_json, json.dumps(ddata))
+
+
 def initDreplace():
 
     path = getServerDir()
@@ -340,6 +363,8 @@ def initDreplace():
     initSiteInfo()
     initTotalInfo()
     autoMakeLuaConf()
+
+    initDefaultInfo()
 
     pSqliteDb()
 
@@ -881,6 +906,26 @@ def getSiteConfig():
     return mw.returnJson(True, 'ok!', content)
 
 
+def getSiteListData():
+    path = getServerDir() + "/waf/default.json"
+    data = mw.readFile(path)
+    return json.loads(data)
+
+
+def setDefaultSite(name):
+    path = getServerDir() + "/waf/default.json"
+    data = mw.readFile(path)
+    data = json.loads(data)
+    data['default'] = name
+    mw.writeFile(path, json.dumps(data))
+    return mw.returnJson(True, 'OK')
+
+
+def getDefaultSite():
+    data = getSiteListData()
+    return mw.returnJson(True, 'OK', data)
+
+
 def getSiteConfigByName():
     args = getArgs()
     data = checkArgs(args, ['siteName'])
@@ -963,24 +1008,38 @@ def importData():
 
 def getLogsList():
     args = getArgs()
-    data = checkArgs(args, ['siteName'])
+    data = checkArgs(args, ['site', 'page', 'page_size', 'tojs'])
     if not data[0]:
         return data[1]
 
-    data = []
-    path = getServerDir() + '/logs'
+    page = int(args['page'])
+    page_size = int(args['page_size'])
+    domain = args['site']
+    tojs = args['tojs']
 
-    if not os.path.exists(path):
-        return mw.returnJson(False, '还未生成!', [])
+    conn = pSqliteDb('logs')
 
-    files = os.listdir(path)
-    for f in files:
-        if f == '.DS_Store':
-            continue
-        f = f.split('_')
-        if f[0] == args['siteName']:
-            fl = f[1].split('.')
-            data.append(fl[0])
+    field = 'time,ip,domain,server_name,method,uri,user_agent,rule_name,reason'
+    limit = str(page_size) + ' offset ' + str(page_size * (page - 1))
+
+    condition = ''
+    conn = conn.field(field)
+    conn = conn.where("1=1", ()).where("domain=?", (domain,))
+
+    clist = conn.limit(limit).order('time desc').inquiry()
+    count_key = "count(*) as num"
+    count = conn.field(count_key).limit('').order('').inquiry()
+    # print(count)
+    count = count[0][count_key]
+
+    data = {}
+    _page = {}
+    _page['count'] = count
+    _page['p'] = page
+    _page['row'] = page_size
+    _page['tojs'] = tojs
+    data['page'] = mw.getPage(_page)
+    data['data'] = clist
 
     return mw.returnJson(True, 'ok!', data)
 
@@ -1142,6 +1201,8 @@ if __name__ == "__main__":
         print(saveScanRule())
     elif func == 'get_site_config':
         print(getSiteConfig())
+    elif func == 'get_default_site':
+        print(getDefaultSite())
     elif func == 'get_site_config_byname':
         print(getSiteConfigByName())
     elif func == 'add_site_cdn_header':
