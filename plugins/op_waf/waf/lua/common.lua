@@ -60,7 +60,7 @@ function _M.initDB(self)
     db:exec([[PRAGMA journal_size_limit = 1073741824]])
 
     self.db = db
-    return db
+    return self.db
 end
 
 function _M.log(self, args, rule_name, reason)
@@ -95,6 +95,7 @@ function _M.log(self, args, rule_name, reason)
     if local_db and local_db:isopen() then
         local_db:close()
     end
+    return true
 end
 function _M.setDebug(self, mode)
     debug_mode = mode
@@ -103,7 +104,6 @@ end
 
 -- 调试方式
 function _M.D(self, msg)
-
     if not debug_mode then return true end
 
     local _msg = ''

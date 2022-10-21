@@ -211,16 +211,16 @@ def test_OK():
 def test_start():
     # test_OK()
     # test_Dir()
-    test_UA()
+    # test_UA()
     # test_UA_for(1000)
     # test_POST()
     # test_scan()
-    # test_CC()
+    test_CC()
     # test_url_ext()
     # test_cdn()
 
 
 if __name__ == "__main__":
-    os.system('cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/op_waf && sh install.sh uninstall 0.2.2 && sh install.sh install 0.2.2')
-    os.system('cd /Users/midoks/Desktop/mwdev/server/mdserver-web/ && python3 plugins/openresty/index.py stop && python3 plugins/openresty/index.py start')
+    # os.system('cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/op_waf && sh install.sh uninstall 0.2.2 && sh install.sh install 0.2.2')
+    # os.system('cd /Users/midoks/Desktop/mwdev/server/mdserver-web/ && python3 plugins/openresty/index.py stop && python3 plugins/openresty/index.py start')
     test_start()
