@@ -26,7 +26,6 @@ function _M.new(self)
         server_name = '',
         global_tatal = nil,
         params = nil,
-        db = nil,
     }
     return setmetatable(self, mt)
 end
@@ -41,10 +40,6 @@ function _M.getInstance(self)
 end
 
 function _M.initDB(self)
-    if self.db then
-        return self.db
-    end
-
     local path = log_dir .. "/waf.db"
     db, err = sqlite3.open(path)
 
@@ -58,17 +53,16 @@ function _M.initDB(self)
     db:exec([[PRAGMA page_size = 32768]])
     db:exec([[PRAGMA journal_mode = wal]])
     db:exec([[PRAGMA journal_size_limit = 1073741824]])
-
-    self.db = db
     return db
 end
 
 function _M.log(self, args, rule_name, reason)
-    local local_db = self:initDB()
-    local stmt2 = local_db:prepare[[INSERT INTO logs(time, ip, domain, server_name, method, status_code, uri, user_agent, rule_name, reason) 
+    local db = self:initDB()
+
+    local stmt2 = db:prepare[[INSERT INTO logs(time, ip, domain, server_name, method, status_code, uri, user_agent, rule_name, reason) 
         VALUES(:time, :ip, :domain, :server_name, :method, :status_code, :uri, :user_agent, :rule_name, :reason)]]
 
-    local_db:exec([[BEGIN TRANSACTION]])
+    db:exec([[BEGIN TRANSACTION]])
 
     stmt2:bind_names{
         time=args["time"],
@@ -91,10 +85,11 @@ function _M.log(self, args, rule_name, reason)
         return false
     end
     stmt2:reset()
-    local res, err = local_db:execute([[COMMIT]])
+    
+    local res, err = db:execute([[COMMIT]])
     -- self:D("LOG[2]:"..tostring(res)..":"..tostring(err))
-    if local_db and local_db:isopen() then
-        local_db:close()
+    if db and db:isopen() then
+        db:close()
     end
     return true
 end
