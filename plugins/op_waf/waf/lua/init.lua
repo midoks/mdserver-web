@@ -163,6 +163,8 @@ end
 
 local function waf_get_args()
     if not config['get']['open'] or not C:is_site_config('get') then return false end
+
+    C:D(C:to_json(args_rules)..":"..json.encode(params['uri_request_args']))
     if C:ngx_match_list(args_rules, params['uri_request_args']) then
         C:write_log('args','regular')
         C:return_html(config['get']['status'], get_html)

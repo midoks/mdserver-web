@@ -85,7 +85,7 @@ function _M.log(self, args, rule_name, reason)
         return false
     end
     stmt2:reset()
-    
+
     local res, err = db:execute([[COMMIT]])
     -- self:D("LOG[2]:"..tostring(res)..":"..tostring(err))
     if db and db:isopen() then
@@ -459,10 +459,22 @@ function _M.ngx_match_list(self, rules, content)
     for i,rule in ipairs(rules)
     do
         if rule[1] == 1 then
-            local t = self:is_ngx_match_orgin(rule[2], content, rule[3])
-            if t then
-                return true
+            if type(content) == "string" then
+                local t = self:is_ngx_match_orgin(rule[2], content, rule[3])
+                if t then
+                    return true
+                end
             end
+
+            if type(content) == "table" then
+                for arg_k,arg_v in ipairs(content) do
+                    local t = self:is_ngx_match_orgin(rule[2], arg_v, rule[3])
+                    if t then
+                        return true
+                    end
+                end
+            end
+            
         end
     end
     return false
