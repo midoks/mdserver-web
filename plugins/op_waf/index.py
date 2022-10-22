@@ -1164,6 +1164,12 @@ def installPreInspection():
     return 'ok'
 
 
+def cleanDropIp():
+    url = "http://127.0.0.1/clean_waf_drop_ip"
+    data = mw.httpGet(url)
+    return mw.returnJson(True, 'ok!', data)
+
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -1250,5 +1256,7 @@ if __name__ == "__main__":
         print(getWafConf())
     elif func == 'waf_site':
         print(getWafSite())
+    elif func == 'clean_drop_ip':
+        print(cleanDropIp())
     else:
         print('error')

@@ -753,6 +753,23 @@ function addIpBlack() {
     });
 }
 
+function addIpBlackArgs(ip) {
+    var pdata = {
+        start_ip: ip,
+        end_ip: ip,
+    }
+
+    if (pdata['start_ip'].split('.').length < 4 || pdata['end_ip'].split('.').length < 4) {
+        layer.msg('起始IP或结束IP格式不正确!');
+        return;
+    }
+
+    owPost('add_ip_black', pdata, function(data){
+        var rdata = $.parseJSON(data.data);
+        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+    });
+}
+
 
 //从IP黑名单删除IP段
 function removeIpBlack(index) {
@@ -1022,146 +1039,6 @@ function back_css(v) {
     else {
         return 'tipsval tipsvalnull'
     }
-}
-
-//查看网站日志
-function siteWafLog(siteName) {
-    var loadT = layer.msg('正在处理，请稍候..', { icon: 16, time: 0 });
-    owPost('get_logs_list', { siteName: siteName } , function (data) {
-        var tmp = $.parseJSON(data.data);
-        var rdata = tmp.data;
-        var selectLogDay = "";
-        var day = rdata[0];
-        for (var i = 0; i < rdata.length; i++) {
-            selectLogDay += '<option value="' + rdata[i] + '">' + rdata[i] + '</option>';
-        }
-        if (rdata == "") {
-            layer.msg("暂无日志记录", { icon: 6, shade: 0.3, time: 1000 });
-            return
-        }
-        layer.open({
-            type: 1,
-            title: "日志【" + siteName + "】",
-            area: ['880px', '500px'],
-            closeBtn: 1,
-            shadeClose: false,
-            content: '<div class="lib-box pd15 lib-box-log">\
-                <div class="lib-con-title" style="height:40px"><select id="selectLogDay" class="bt-input-text" onchange="siteLogCon(\''+ siteName + '\',this.options[this.options.selectedIndex].value,1)">' + selectLogDay + '</select></div>\
-                <div class="lib-con">\
-                    <div class="divtable">\
-                        <div id="site_waf_log" style="max-height:400px;overflow:auto;border:#ddd 1px solid">\
-                        <table class="table table-hover" style="border:none;">\
-                            <thead><tr><th width="150">时间</th><th width="120">用户IP</th><th width="70">类型</th><th>URI地址</th><th class="tdhide">User-Agent</th><th width="60">状态</th><th width="100">过滤器</th><th class="tdhide">过滤规则</th><th width="100" class="text-right">操作</th></tr></thead>\
-                            <tbody id="LogDayCon"></tbody>\
-                        </table>\
-                        </div>\
-                    </div>\
-                    <div class="page pull-right" id="size_log_page" style="margin-top:10px"></div>\
-                </div>\
-                </div>'
-        });
-        siteLogCon(siteName, day, 1);
-        tableFixed("site_waf_log");
-    });
-}
-
-
-//日志内容
-function siteLogCon(siteName, day, page) {
-    if (!page) page = 1;
-    var last = page - 1;
-    var next = page + 1;
-    var pagehtml = '';
-    $("#site_waf_log").scrollTop(0);
-
-    owPost('get_safe_logs', { siteName: siteName, toDate: day, p: page }, function(data){
-        var tmp = $.parseJSON(data.data);
-        if (!tmp.status){
-            layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
-            return;
-        }
-        var rdata = tmp.data;
-        var con = '';
-        for (var i = 0; i < rdata.length; i++) {
-            con += '<tr>\
-                <td class="td0">'+ escapeHTML(rdata[i][0]) + '</td>\
-                <td class="td1"><a class="btlink" href="javascript:add_log_ip_black(\''+ escapeHTML(rdata[i][1]) + '\');" title="加入黑名单">' + escapeHTML(rdata[i][1]) + '</a></td>\
-                <td class="td2">'+ escapeHTML(rdata[i][2]) + '</td>\
-                <td class="td3"><span class="td3txt">'+ escapeHTML(rdata[i][3]) + '</span></td>\
-                <td class="tdhide td4">'+ escapeHTML(rdata[i][4]) + '</td><td>已拦截</td>\
-                <td class="td5"><span class="filtertext">'+ escapeHTML(rdata[i][5]) + '</span></td>\
-                <td class="tdhide td6">'+ escapeHTML(rdata[i][6]) + '</td>\
-                <td class="text-right"><a href="javascript:;" class="btlink submit_msg" data-index="'+ i +'">误报</a> | <a href="javascript:;" class="btlink btwaf_details" data-index="'+ i +'">详细</a></td>\
-            </tr>'
-        }
-
-        $("#LogDayCon").html(con);
-        pagehtml = '<a class="Pstart" onclick="site_log_con(\'' + siteName + '\',\'' + day + '\',1)">首页</a><a class="prevPage" onclick="site_log_con(\'' + siteName + '\',\'' + day + '\',' + last + ')">上一页</a><a class="nextPage" onclick="site_log_con(\'' + siteName + '\',\'' + day + '\',' + next + ')">下一页</a><a class="Pcount">第 ' + page + ' 页</a>';
-        $("#size_log_page").html(pagehtml);
-        if (rdata.length < 1) $(".nextPage").hide();
-        if (last < 1) $(".prevPage").hide();
-
-        // 发送误报请求
-        $(".submit_msg").click(function () {
-            var _this = $(this);
-            var res = rdata[$(this).attr('data-index')];
-            layer.confirm('是否确定提交误报反馈？', { title: '误报反馈',closeBtn:2,icon:3}, function () {
-                var url_address = res[3];
-                var rule_arry = res[6].split(" &gt;&gt; ");
-                var pdata = { url_rule: url_address };
-                var loadT = layer.msg('正在添加URL白名单..', { icon: 16, time: 0 });
-                $.post('/plugin?action=a&name=btwaf&s=add_url_white', pdata, function (rdata) {
-                    layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
-                    layer.close(loadT);
-                    if (rule_arry[1] != undefined){ $.get('https://www.bt.cn/Api/add_waf_logs?data=' + rule_arry[1],function(rdata){},'jsonp')}
-                });
-            });
-        })
-
-        // 详情
-        $(".btwaf_details").click(function () {
-            var res = rdata[$(this).attr('data-index')];
-            var time =  res[0]; //时间
-            var ip_address = res[1]; //IP地址
-            var req_type = res[2]; // 请求类型
-            var url_address = res[3]; // 请求类型
-            var user_agent = res[4]; // 请求类型
-            var filters = res[5]; //过滤器
-            var filter_rule = ''; //过滤规则
-            var rule_arry =  res[6].split(" &gt;&gt; ");
-            var incoming_value = '',risk_value = ''; //传入值,风险值
-            if(rule_arry.length == 0) filter_rule = rule_arry[0]
-            incoming_value = rule_arry[1] == undefined?'空':rule_arry[1];
-            risk_value = incoming_value.match(new RegExp(rule_arry[0].replace(/\//g,'\\/'),'i'));
-            risk_value = risk_value?risk_value[0]:'空';
-
-            layer.open({
-                type: 1,
-                title: time + "详情",
-                area: '600px',
-                closeBtn: 1,
-                shadeClose: false,
-                content: '<div class="pd15 lib-box">\
-                        <table class="table" style="border:#ddd 1px solid; margin-bottom:10px">\
-                        <tbody><tr><th>时间</th><td>'+ escapeHTML(time) + '</td><th>用户IP</th><td><a class="btlink" href="javascript:add_log_ip_black(\'' + escapeHTML(ip_address) + '\')" title="加入黑名单">' + escapeHTML(ip_address) + '</a></td></tr><tr><th>类型</th><td>' + escapeHTML(req_type) + '</td><th>过滤器</th><td>' + escapeHTML(filters) + '</td></tr></tbody></table>\
-                        <div><b style="margin-left:10px">URI地址</b></div>\
-                        <div class="lib-con pull-left mt10"><div class="divpre">'+ escapeHTML(url_address) + '</div></div>\
-                        <div><b style="margin-left:10px">User-Agent</b></div>\
-                        <div class="lib-con pull-left mt10"><div class="divpre">'+ escapeHTML(user_agent) + '</div></div>\
-                        <div><b style="margin-left:10px">过滤规则</b></div>\
-                        <div class="lib-con pull-left mt10"><div class="divpre">'+ escapeHTML(rule_arry[0]) + '</div></div>\
-                        <div><b style="margin-left:10px">传入值</b></div>\
-                        <div class="lib-con pull-left mt10"><div class="divpre">'+ escapeHTML(incoming_value) + '</div></div>\
-                        <div><b style="margin-left:10px">风险值</b></div>\
-                        <div class="lib-con pull-left mt10"><div class="divpre">'+ escapeHTML(risk_value) + '</div></div>\
-                    </div>'
-            })
-        })
-        $("#LogDayCon td").click(function () {
-            $(this).parents("tr").addClass("active").siblings().removeClass("active");
-        });
-
-    });
 }
 
 function html_encode(value) {
@@ -1734,7 +1611,7 @@ function wafLogRequest(page){
                 shadeClose: false,
                 content: '<div class="pd15 lib-box">\
                         <table class="table" style="border:#ddd 1px solid; margin-bottom:10px">\
-                        <tbody><tr><th>时间</th><td>'+ time + '</td><th>用户IP</th><td><a class="btlink" href="javascript:add_log_ip_black(\'' + escapeHTML(ip) + '\')" title="加入黑名单">' + escapeHTML(ip) + '</a></td></tr><tr><th>类型</th><td>' + escapeHTML(res.method) + '</td><th>过滤器</th><td>' + escapeHTML(res.rule_name) + '</td></tr></tbody></table>\
+                        <tbody><tr><th>时间</th><td>'+ time + '</td><th>用户IP</th><td><a class="btlink" href="javascript:addIpBlackArgs(\'' + escapeHTML(ip) + '\')" title="加入黑名单">' + escapeHTML(ip) + '</a></td></tr><tr><th>类型</th><td>' + escapeHTML(res.method) + '</td><th>过滤器</th><td>' + escapeHTML(res.rule_name) + '</td></tr></tbody></table>\
                         <div><b style="margin-left:10px">URI地址</b></div>\
                         <div class="lib-con pull-left mt10"><div class="divpre">'+ escapeHTML(res.uri) + '</div></div>\
                         <div><b style="margin-left:10px">User-Agent</b></div>\
@@ -1777,7 +1654,15 @@ function wafLogs(){
     // wafLogRequest(1);
 
     $("#UncoverAll").click(function(){
-        console.log("UncoverAll");
+        owPost('clean_drop_ip',{},function(data){
+            var rdata = $.parseJSON(data.data);
+            var ndata = $.parseJSON(rdata.data);
+            if (ndata.status == 0){
+                layer.msg("解封所有成功",{icon:1,time:2000,shade: [0.3, '#000']});
+            } else{
+                layer.msg("解封所有异常:"+ndata.msg,{icon:5,time:2000,shade: [0.3, '#000']});
+            }
+        });
     });
 
 

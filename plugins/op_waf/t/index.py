@@ -309,16 +309,16 @@ def test_Upload():
 
 def test_start():
     # test_OK()
-    # test_Dir()
+    test_Dir()
     # test_UA()
     # test_Header()
     # test_UA_for(1000)
     # test_POST()
     # test_scan()
-    # test_CC()
+    test_CC()
     # test_url_ext()
     # test_cdn()
-    test_Upload()
+    # test_Upload()
 
 
 if __name__ == "__main__":

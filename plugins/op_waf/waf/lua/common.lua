@@ -578,8 +578,8 @@ function _M.write_log(self, name, rule)
 
         local reason = retry_cycle .. '秒以内累计超过'..retry..'次以上非法请求,封锁'.. lock_time ..'秒'
         self:log(params, name, reason)
-    -- else
-    --     self:log(params, name, rule)
+    elseif name ~= 'cc' then
+        self:log(params, name, rule)
     end
     
     self:stats_total(name, rule)
