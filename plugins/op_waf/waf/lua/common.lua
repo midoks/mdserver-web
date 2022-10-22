@@ -34,6 +34,10 @@ end
 function _M.getInstance(self)
     if rawget(self, "instance") == nil then
         rawset(self, "instance", self:new())
+
+        if 0 == ngx.worker.id() then
+            self:cron()
+        end
     end
     assert(self.instance ~= nil)
     return self.instance
@@ -54,6 +58,25 @@ function _M.initDB(self)
     db:exec([[PRAGMA journal_mode = wal]])
     db:exec([[PRAGMA journal_size_limit = 1073741824]])
     return db
+end
+
+-- 后台任务
+function _M.cron(self)
+    local timer_every_get_data = function (premature)
+        self.clean_log()
+    end
+    ngx.timer.every(10, timer_every_get_data)
+end
+
+
+function _M.clean_log(self)
+    local db = self:initDB()
+    local now_date = os.date("*t")
+    local save_day = 90
+    local save_date_timestamp = os.time{year=now_date.year,
+        month=now_date.month, day=now_date.day-save_day, hour=0}
+    -- delete expire data
+    db:exec("DELETE FROM web_logs WHERE time<"..tostring(save_date_timestamp))
 end
 
 function _M.log(self, args, rule_name, reason)
