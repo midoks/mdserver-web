@@ -137,8 +137,9 @@ function _M.log(self, args, rule_name, reason)
     args["reason"] = reason
 
     local push_data = json.encode(args)
-    -- self:D("push_data:"..push_data)
+
     ngx.shared.waf_limit:rpush("waf_limit_logs", push_data)
+    -- self:D("push_data:"..push_data)
 
     -- local db = self:initDB()
 
