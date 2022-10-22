@@ -878,7 +878,7 @@ function wafScreen(){
 
         con += '<div class="screen">\
             <div class="line"><span class="name">POST渗透</span><span class="val">'+rdata.rules.post+'</span></div>\
-            <div class="line"><span class="name">GET渗透</span><span class="val">0</span></div>\
+            <div class="line"><span class="name">GET渗透</span><span class="val">'+rdata.rules.args+'</span></div>\
             <div class="line"><span class="name">CC攻击</span><span class="val">'+rdata.rules.cc+'</span></div>\
             <div class="line"><span class="name">恶意User-Agent</span><span class="val">'+rdata.rules.user_agent+'</span></div>\
             <div class="line"><span class="name">Cookie渗透</span><span class="val">'+rdata.rules.cookie+'</span></div>\
@@ -886,9 +886,9 @@ function wafScreen(){
             <div class="line"><span class="name">恶意HEAD请求</span><span class="val">0</span></div>\
             <div class="line"><span class="name">URI自定义拦截</span><span class="val">'+rdata.rules.args+'</span></div>\
             <div class="line"><span class="name">URI保护</span><span class="val">'+rdata.rules.args+'</span></div>\
-            <div class="line"><span class="name">恶意文件上传</span><span class="val">0</span></div>\
-            <div class="line"><span class="name">禁止的扩展名</span><span class="val">'+rdata.rules.url_ext+'</span></div>\
-            <div class="line"><span class="name">禁止PHP脚本</span><span class="val">0</span></div>\
+            <div class="line"><span class="name">恶意文件上传</span><span class="val">'+rdata.rules.upload_ext+'</span></div>\
+            <div class="line"><span class="name">禁止的扩展名</span><span class="val">'+rdata.rules.path+'</span></div>\
+            <div class="line"><span class="name">禁止PHP脚本</span><span class="val">'+rdata.rules.php_path+'</span></div>\
             </div>';
 
         con += '<div style="width:660px;"><ul class="help-info-text c7">\

@@ -19,6 +19,7 @@ C:setDebug(true)
 
 local get_html = require "html_get"
 local post_html = require "html_post"
+local other_html = require "html_other"
 local user_agent_html = require "html_user_agent"
 local cc_safe_js_html = require "html_safe_js"
 
@@ -67,7 +68,7 @@ local function get_return_state(rstate,rmsg)
 end
 
 local function get_waf_drop_ip()
-    local data =  ngx.shared.waf_waf_drop_ip:get_keys(0)
+    local data =  ngx.shared.waf_drop_ip:get_keys(0)
     return data
 end
 
@@ -163,8 +164,7 @@ end
 
 local function waf_get_args()
     if not config['get']['open'] or not C:is_site_config('get') then return false end
-
-    C:D(C:to_json(args_rules)..":"..json.encode(params['uri_request_args']))
+    -- C:D("waf_get_args:"..C:to_json(args_rules)..":"..json.encode(params['uri_request_args']))
     if C:ngx_match_list(args_rules, params['uri_request_args']) then
         C:write_log('args','regular')
         C:return_html(config['get']['status'], get_html)
@@ -208,40 +208,51 @@ end
 
 local function waf_user_agent()
     -- user_agent 过滤
-    if not config['user-agent']['open'] or not C:is_site_config('user-agent') then return false end
-    if C:is_ngx_match_ua(user_agent_rules,params['request_header']['user-agent']) then
+    -- if not config['user-agent']['open'] or not C:is_site_config('user-agent') then return false end
+
+    -- C:D("waf_user_agent;user_agent_rules:"..json.encode(user_agent_rules)..",ua:"..tostring(params['request_header']['user-agent']))
+    if C:is_ngx_match_ua(user_agent_rules, params['request_header']['user-agent']) then
+        -- C:D("waf_user_agent........... true")
         C:write_log('user_agent','regular')
-        C:return_html(config['user-agent']['status'],user_agent_html)
+        C:return_html(config['user-agent']['status'], user_agent_html)
         return true
     end
+
+    -- C:D("waf_user_agent........... false")
     return false
 end
 
 
-local function waf_drop()
+local function waf_drop_ip()
     local ip = params['ip']
     local count = ngx.shared.waf_drop_ip:get(ip)
     if not count then return false end
 
-    if count > config['retry']['retry'] then
+    local retry = config['retry']['retry']
+    -- C:D("waf_drop;count:"..tostring(count)..",retry:"..tostring(retry))
+    -- C:D("waf_drop;count > retry:"..tostring(count > retry))
+    if count >  retry then
+        -- C:D("waf_drop_ip........... true")
         ngx.exit(config['cc']['status'])
         return true
     end
+    -- C:D("waf_drop_ip........... false")
     return false
 end
 
 local function waf_cc()
+    if not config['cc']['open'] or not C:is_site_config('cc') then return false end
+
     local ip = params['ip']
 
-    local ip_lock = ngx.shared.waf_drop_ip:get(ip)
-    if ip_lock then
-        if ip_lock > 0 then
-            ngx.exit(config['cc']['status'])
-            return true
-        end
-    end
-
-    if not config['cc']['open'] or not C:is_site_config('cc') then return false end
+    -- 多次cc，才封禁。
+    -- local ip_lock = ngx.shared.waf_drop_ip:get(ip)
+    -- if ip_lock then
+    --     if ip_lock > 0 then
+    --         ngx.exit(config['cc']['status'])
+    --         return true
+    --     end
+    -- end
 
     local request_uri = params['request_uri']
 
@@ -251,7 +262,6 @@ local function waf_cc()
     local endtime = config['cc']['endtime']
     local waf_limit = config['cc']['limit']
     local cycle = config['cc']['cycle']
-
 
     if count then
         if count > waf_limit then 
@@ -267,7 +277,9 @@ local function waf_cc()
             if lock_time > 86400 then lock_time = 86400 end
 
             ngx.shared.waf_drop_ip:set(ip, 1, lock_time)
-            C:write_log('cc',cycle..'秒内累计超过'..waf_limit..'次请求,封锁' .. lock_time .. '秒')
+            local reason = cycle..'秒内累计超过'..waf_limit..'次请求,封锁' .. lock_time .. '秒'
+            C:write_log('cc', reason)
+            C:log(params, 'cc',reason)
             ngx.exit(config['cc']['status'])
             return true
         else
@@ -383,15 +395,14 @@ end
 local function waf_post()
     if not config['post']['open'] or not C:is_site_config('post') then return false end   
     if params['method'] ~= "POST" then return false end
-    content_length = tonumber(params["request_header"]['content-length'])
-    max_len = 640 * 1020000
+    local content_length = tonumber(params["request_header"]['content-length'])
+    local max_len = 640 * 1020000
     if content_length > max_len then return false end
     if C:get_boundary() then return false end
     ngx.req.read_body()
-    request_args = ngx.req.get_post_args()
-    if not request_args then
-        return false
-    end
+
+    local request_args = params['uri_request_args']
+    if not request_args then return false end
 
     for key, val in pairs(request_args) do
         if type(val) == "table" then
@@ -402,32 +413,40 @@ local function waf_post()
         else
             data = val
         end
-        
     end
 
-    if C:is_ngx_match_post(post_rules,data) then
+    -- C:D("post:"..json.encode(data))
+    if C:ngx_match_list(post_rules, data) then
         C:write_log('post','regular')
-        C:return_html(config['post']['status'],post_html)
+        C:return_html(config['post']['status'], post_html)
         return true
     end
     return false
 end
 
+local function  waf_post_data_check()
+    if params['method'] == "POST" then
 
-local function  post_data_chekc()
-    if params['method'] =="POST" then
+        C:D("post_data_check start")
         if C:return_post_data() then return false end
         ngx.req.read_body()
-        request_args = ngx.req.get_post_args()
+
+        local request_args = params['uri_request_args']
         if not request_args then return false end
 
-        if request_header then
-            if not request_header['Content-Type'] then return false end
-            av = string.match(request_header['Content-Type'],"=.+")
+        C:D("post_data_check:"..json.encode(params['request_header']))
+
+        local av = nil
+        if params['request_header'] then
+            if not params['request_header']['content-type'] then return false end
+            av = string.match(params['request_header']['content-type'], "=.+")
+
+            C:D("post_data_check[av]:"..json.encode(av))
         end
+        
 
         if not av then return false end
-        ac = split(av,'=')
+        ac = C:split(av,'=')
 
         if not ac then return false end 
 
@@ -448,14 +467,17 @@ local function  post_data_chekc()
         if not aaa then return false end 
         if tostring(aaa) == 'true' then return false end
         if type(aaa) ~= "string" then return false end
-        data_len = split(aaa,list_list)
+        data_len = C:split(aaa, list_list)
 
         if not data_len then return false end
-        if arrlen(data_len) ==0 then return false end
+        if arrlen(data_len) == 0 then return false end
+
+
+        C:D("post_rules:"..json.encode(post_rules).."data_len:"..json.encode(data_len))
 
         if C:is_ngx_match_post(post_rules , data_len) then
             C:write_log('post','regular')
-            C:return_html(config['post']['status'],post_html)
+            C:return_html(config['post']['status'], post_html)
             return true
         end
 
@@ -467,10 +489,11 @@ local function X_Forwarded()
 
     if params['method'] ~= "GET" then return false end
     if not config['get']['open'] or not C:is_site_config('get') then return false end 
+    if not params["request_header"]['X-forwarded-For'] then return false end
 
-    if C:is_ngx_match(args_rules,params["request_header"]['X-forwarded-For'],'args') then
+    if C:ngx_match_list(args_rules, params["request_header"]['X-forwarded-For']) then
         C:write_log('args','regular')
-        C:return_html(config['get']['status'],get_html)
+        C:return_html(config['get']['status'], get_html)
         return true
     end
     return false
@@ -480,47 +503,25 @@ end
 local function post_X_Forwarded()
     if not config['post']['open'] or not C:is_site_config('post') then return false end   
     if params['method'] ~= "POST" then return false end
-    if C:is_ngx_match_post(post_rules,params["request_header"]['X-forwarded-For']) then
+    if not params["request_header"]['X-forwarded-For'] then return false end
+    if C:is_ngx_match_list(post_rules, params["request_header"]['X-forwarded-For']) then
         C:write_log('post','regular')
-        C:return_html(config['post']['status'],post_html)
+        C:return_html(config['post']['status'], post_html)
         return true
     end
     return false
 end
-
-
--- function php_path()
---     if site_config[server_name] == nil then return false end
---     for _,rule in ipairs(site_config[server_name]['disable_php_path'])
---     do
---         if C:ngx_match_string(params['uri'],rule .. "/?.*\\.php$","isjo") then
---             C:write_log('php_path','regular')
---             C:return_html(config['other']['status'],other_html)
---             return C:return_message(200,uri)
---         end
---     end
---     return false
--- end
-
--- function url_path()
---     if site_config[server_name] == nil then return false end
---     for _,rule in ipairs(site_config[server_name]['disable_path'])
---     do
---         if ngx_match(uri,rule,"isjo") then
---             C:write_log('path','regular')
---             C:return_html(config['other']['status'],other_html)
---             return true
---         end
---     end
---     return false
--- end
 
 local function url_ext()
     if site_config[server_name] == nil then return false end
     for _,rule in ipairs(site_config[server_name]['disable_ext'])
     do
         if C:ngx_match_string("\\."..rule.."$", params['uri'],'url_ext') then
-            C:write_log('url_ext','regular')
+            if rule == "php" then
+                C:write_log('php_path','regular')
+            else
+                C:write_log('path','regular')
+            end
             C:return_html(config['other']['status'], other_html)
             return true
         end
@@ -528,59 +529,11 @@ local function url_ext()
     return false
 end
 
-local function url_rule_ex()
-    if site_config[server_name] == nil then return false end
-    if method == "POST" and not request_args then
-        content_length = tonumber(request_header['content-length'])
-        max_len = 640 * 102400000
-        request_args = nil
-        if content_length < max_len then
-            ngx.req.read_body()
-            request_args = ngx.req.get_post_args()
-        end
-    end
-    for _,rule in ipairs(site_config[server_name]['url_rule'])
-    do
-        if ngx_match(uri,rule[1],"isjo") then
-            if C:is_ngx_match(rule[2],uri_request_args,false) then
-                C:write_log('url_rule','regular')
-                C:return_html(config['other']['status'],other_html)
-                return true
-            end
-            
-            if params['method'] == "POST" and request_args ~= nil then 
-                if C:is_ngx_match(rule[2],request_args,'post') then
-                    C:write_log('post','regular')
-                    C:return_html(config['other']['status'],other_html)
-                    return true
-                end
-            end
-        end
-    end
-    return false
-end
-
-local function url_tell()
-    if site_config[server_name] == nil then return false end
-    for _,rule in ipairs(site_config[server_name]['url_tell'])
-    do
-        if ngx_match(uri,rule[1],"isjo") then
-            if uri_request_args[rule[2]] ~= rule[3] then
-                C:write_log('url_tell','regular')
-                C:return_html(config['other']['status'],other_html)
-                return true
-            end
-        end
-    end
-    return false
-end
-
-
 local function disable_upload_ext(ext)
     if not ext then return false end
     ext = string.lower(ext)
-    if is_key(site_config[server_name]['disable_upload_ext'],ext) then
-        C:write_log('upload_ext','上传扩展名黑名单')
+    if C:is_key(site_config[server_name]['disable_upload_ext'], ext) then
+        C:write_log('upload_ext', '上传扩展名黑名单')
         C:return_html(config['other']['status'],other_html)
         return true
     end
@@ -590,9 +543,9 @@ local function data_in_php(data)
     if not data then
         return false
     else
-        if C:is_ngx_match('php',data,'post') then
+        if C:is_ngx_match('php', data, 'post') then
             C:write_log('upload_ext','上传扩展名黑名单')
-            C:return_html(config['other']['status'],other_html)
+            C:return_html(config['other']['status'], other_html)
             return true
         else
             return false
@@ -602,9 +555,9 @@ end
 
 local function post_data()
     if params["method"] ~= "POST" then return false end
-    content_length = tonumber(params["request_header"]['content-length'])
+    local content_length = tonumber(params["request_header"]['content-length'])
     if not content_length then return false end
-    max_len = 2560 * 1024000
+    local max_len = 2560 * 1024000
     if content_length > max_len then return false end
     local boundary = C:get_boundary()
     if boundary then
@@ -614,11 +567,10 @@ local function post_data()
         local tmp = ngx.re.match(data,[[filename=\"(.+)\.(.*)\"]])
         if not tmp then return false end
         if not tmp[2] then return false end
-        local tmp2=ngx.re.match(ngx.req.get_body_data(),[[Content-Type:[^\+]{45}]]) 
+        local tmp2 = ngx.re.match(ngx.req.get_body_data(),[[Content-Type:[^\+]{45}]]) 
         disable_upload_ext(tmp[2])
         if tmp2 == nil then return false end 
         data_in_php(tmp2[0])
-        
     end
     return false
 end
@@ -647,7 +599,7 @@ function waf()
     if waf_ip_black() then return true end
 
     -- 封禁ip返回
-    if waf_drop() then return true end
+    if waf_drop_ip() then return true end
 
     -- ua check
     if waf_user_agent() then return true end
@@ -667,16 +619,13 @@ function waf()
     if waf_scan_black() then return true end
 
     if waf_post() then return true end
-    if post_data_chekc() then return true end
+    -- if waf_post_data_check() then return true end
     
     if site_config[server_name] and site_config[server_name]['open'] then
-        -- if X_Forwarded() then return true end
-        -- if post_X_Forwarded() then return true end
-        -- url_path()
+        if X_Forwarded() then return true end
+        if post_X_Forwarded() then return true end
         if url_ext() then return true end
-        -- url_rule_ex()
-        -- url_tell()
-        -- post_data()
+        if post_data() then return true end 
     end
 end
 

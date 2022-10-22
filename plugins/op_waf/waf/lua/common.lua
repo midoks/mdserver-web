@@ -437,8 +437,8 @@ end
 
 
 
-function _M.is_ngx_match_orgin(self,rule,match, sign)
-    if ngx_match(ngx.unescape_uri(match), rule,"isjo") then
+function _M.is_ngx_match_orgin(self,rule, match, sign)
+    if ngx_match(ngx.unescape_uri(match), rule, "isjo") then
         error_rule = rule .. ' >> ' .. sign .. ':' .. match
         return true
     end
@@ -456,18 +456,21 @@ function _M.ngx_match_string(self, rule, content,sign)
 end
 
 function _M.ngx_match_list(self, rules, content)
+    local args_type  = type(content)
     for i,rule in ipairs(rules)
     do
         if rule[1] == 1 then
-            if type(content) == "string" then
+            if args_type == 'string' then
+                -- self:D("string: "..tostring(rule[2])..":".. tostring(content)..":"..tostring(rule[3]))
                 local t = self:is_ngx_match_orgin(rule[2], content, rule[3])
                 if t then
                     return true
                 end
             end
 
-            if type(content) == "table" then
-                for arg_k,arg_v in ipairs(content) do
+            if args_type == 'table' then
+                for _,arg_v in pairs(content) do
+                    -- self:D("table : "..tostring(rule[2])..":".. tostring(arg_v)..":"..tostring(rule[3]))
                     local t = self:is_ngx_match_orgin(rule[2], arg_v, rule[3])
                     if t then
                         return true
@@ -582,8 +585,8 @@ function _M.write_log(self, name, rule)
     end
 
     local count = ngx.shared.waf_drop_ip:get(ip)
-
-    if (count > retry) then
+    self:D("write_log; count:" ..tostring(count).. ",retry:" .. tostring(retry) )
+    if (count > retry and name ~= 'cc') then
         local safe_count,_ = ngx.shared.waf_drop_sum:get(ip)
         if not safe_count then
             ngx.shared.waf_drop_sum:set(ip, 1, 86400)
@@ -599,9 +602,8 @@ function _M.write_log(self, name, rule)
 
         local reason = retry_cycle .. '秒以内累计超过'..retry..'次以上非法请求,封锁'.. lock_time ..'秒'
         self:log(params, name, reason)
-    else
-
-        self:log(params, name, rule)
+    -- else
+    --     self:log(params, name, rule)
     end
     
     self:stats_total(name, rule)
@@ -669,6 +671,16 @@ function _M.get_boundary(self)
         return m
     end
     return string.match(header, ";%s*boundary=([^\",;]+)")
+end
+
+
+function _M.is_key(self, arr, key)
+    for _,v in ipairs(arr) do
+        if v == key then
+            return true
+        end
+    end
+    return false
 end
 
 

@@ -217,7 +217,9 @@ def initTotalInfo():
             tmp['get'] = 0
             tmp['post'] = 0
             tmp['total'] = 0
-            tmp['url_ext'] = 0
+            tmp['path'] = 0
+            tmp['php_path'] = 0
+            tmp['upload_ext'] = 0
             _name = {}
             _name[name] = tmp
             total_contents['sites'] = _name
@@ -589,6 +591,8 @@ def addSiteRule():
 
     cjson = mw.getJson(content)
     mw.writeFile(path, cjson)
+
+    autoMakeConfig()
     mw.restartWeb()
     return mw.returnJson(True, '设置成功!')
 
@@ -625,6 +629,9 @@ def addIpWhite():
 
     cjson = mw.getJson(content)
     mw.writeFile(path, cjson)
+
+    autoMakeConfig()
+
     mw.restartWeb()
     return mw.returnJson(True, '设置成功!')
 
@@ -646,6 +653,8 @@ def removeIpWhite():
 
     cjson = mw.getJson(content)
     mw.writeFile(path, cjson)
+
+    autoMakeConfig()
     mw.restartWeb()
     return mw.returnJson(True, '设置成功!')
 
@@ -682,6 +691,8 @@ def addIpBlack():
 
     cjson = mw.getJson(content)
     mw.writeFile(path, cjson)
+
+    autoMakeConfig()
     mw.restartWeb()
     return mw.returnJson(True, '设置成功!')
 
@@ -703,6 +714,8 @@ def removeIpBlack():
 
     cjson = mw.getJson(content)
     mw.writeFile(path, cjson)
+
+    autoMakeConfig()
     mw.restartWeb()
     return mw.returnJson(True, '设置成功!')
 
@@ -722,6 +735,8 @@ def setIpv6Black():
 
     cjson = mw.getJson(content)
     mw.writeFile(path, cjson)
+
+    autoMakeConfig()
     mw.restartWeb()
     return mw.returnJson(True, '设置成功!')
 
@@ -741,6 +756,8 @@ def delIpv6Black():
     content.remove(addr)
 
     cjson = mw.getJson(content)
+
+    autoMakeConfig()
     mw.writeFile(path, cjson)
     return mw.returnJson(True, '设置成功!')
 
@@ -764,6 +781,8 @@ def removeSiteRule():
 
     cjson = mw.getJson(content)
     mw.writeFile(path, cjson)
+
+    autoMakeConfig()
     mw.restartWeb()
     return mw.returnJson(True, '设置成功!')
 
@@ -784,6 +803,8 @@ def setObjStatus():
 
     cjson = mw.getJson(cobj)
     mw.writeFile(conf, cjson)
+
+    autoMakeConfig()
     mw.restartWeb()
     return mw.returnJson(True, '设置成功!')
 
@@ -803,6 +824,8 @@ def setRetry():
 
     cjson = mw.getJson(cobj)
     mw.writeFile(conf, cjson)
+
+    autoMakeConfig()
     mw.restartWeb()
     return mw.returnJson(True, '设置成功!', [])
 
@@ -827,6 +850,8 @@ def setSafeVerify():
 
     cjson = mw.getJson(cobj)
     mw.writeFile(conf, cjson)
+
+    autoMakeConfig()
     mw.restartWeb()
     return mw.returnJson(True, '设置成功!', [])
 
@@ -857,6 +882,8 @@ def setCcConf():
 
     cjson = mw.getJson(cobj)
     mw.writeFile(conf, cjson)
+
+    autoMakeConfig()
     mw.restartWeb()
     return mw.returnJson(True, '设置成功!', [])
 
@@ -874,6 +901,8 @@ def saveScanRule():
     path = getRuleJsonPath('scan_black')
     cjson = mw.getJson(args)
     mw.writeFile(path, cjson)
+
+    autoMakeConfig()
     mw.restartWeb()
     return mw.returnJson(True, '设置成功!', [])
 
@@ -967,6 +996,8 @@ def addSiteCdnHeader():
 
     cjson = mw.getJson(content)
     mw.writeFile(path, cjson)
+
+    autoMakeConfig()
     mw.restartWeb()
     return mw.returnJson(True, '添加成功!')
 
@@ -987,6 +1018,8 @@ def removeSiteCdnHeader():
 
     cjson = mw.getJson(content)
     mw.writeFile(path, cjson)
+
+    autoMakeConfig()
     mw.restartWeb()
     return mw.returnJson(True, '删除成功!')
 
@@ -1128,7 +1161,6 @@ def setSiteObjOpen():
     mw.writeFile(path, cjson)
 
     autoMakeConfig()
-
     mw.restartWeb()
     return mw.returnJson(True, '设置成功!')
 
