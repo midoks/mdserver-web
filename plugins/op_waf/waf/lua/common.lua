@@ -240,7 +240,9 @@ end
 
 function _M.return_html(self, status, html)
     ngx.header.content_type = "text/html"
-    ngx.say(html)
+    if status == 200 then
+        ngx.say(html)
+    end
     ngx.exit(status)
 end
 
