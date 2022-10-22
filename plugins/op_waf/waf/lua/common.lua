@@ -66,6 +66,58 @@ function _M.cron(self)
         self.clean_log()
     end
     ngx.timer.every(10, timer_every_get_data)
+
+    local timer_every_import_data = function (premature)
+
+        local llen, _ = ngx.shared.waf_limit:llen('waf_limit_logs')
+        if llen == 0 then
+            return true
+        end
+
+        local db = self:initDB()
+
+        local stmt2 = db:prepare[[INSERT INTO logs(time, ip, domain, server_name, method, status_code, uri, user_agent, rule_name, reason) 
+            VALUES(:time, :ip, :domain, :server_name, :method, :status_code, :uri, :user_agent, :rule_name, :reason)]]
+
+        db:exec([[BEGIN TRANSACTION]])
+
+        for i=1,llen do
+            local data, _ = ngx.shared.waf_limit:lpop('waf_limit_logs')
+            -- self:D("waf_limit_logs:"..data)
+            if not data then
+                break
+            end
+
+            local info = json.decode(data)
+    
+            stmt2:bind_names{
+                time=info["time"],
+                ip=info["ip"],
+                domain=info["server_name"],
+                server_name=info["server_name"],
+                method=info["method"],
+                status_code=info["status_code"],
+                user_agent=info["user_agent"],
+                uri=info["request_uri"],
+                rule_name=info['rule_name'],
+                reason=info['reason']
+            }
+
+            local res, err = stmt2:step()
+            if tostring(res) == "5" then
+                self.D("waf the step database connection is busy, so it will be stored later.")
+                return false
+            end
+            stmt2:reset() 
+        end
+
+        local res, err = db:execute([[COMMIT]])
+        if db and db:isopen() then
+            db:close()
+        end
+
+    end
+    ngx.timer.every(0.5, timer_every_import_data)
 end
 
 
@@ -80,42 +132,52 @@ function _M.clean_log(self)
 end
 
 function _M.log(self, args, rule_name, reason)
-    local db = self:initDB()
 
-    local stmt2 = db:prepare[[INSERT INTO logs(time, ip, domain, server_name, method, status_code, uri, user_agent, rule_name, reason) 
-        VALUES(:time, :ip, :domain, :server_name, :method, :status_code, :uri, :user_agent, :rule_name, :reason)]]
+    args["rule_name"] = rule_name
+    args["reason"] = reason
 
-    db:exec([[BEGIN TRANSACTION]])
+    local push_data = json.encode(args)
+    -- self:D("push_data:"..push_data)
+    ngx.shared.waf_limit:rpush("waf_limit_logs", push_data)
 
-    stmt2:bind_names{
-        time=args["time"],
-        ip=args["ip"],
-        domain=args["server_name"],
-        server_name=args["server_name"],
-        method=args["method"],
-        status_code=args["status_code"],
-        user_agent=args["user_agent"],
-        uri=args["request_uri"],
-        rule_name=rule_name,
-        reason=reason
-    }
+    -- local db = self:initDB()
 
-    local res, err = stmt2:step()
-    -- self:D("LOG[1]:"..tostring(res)..":"..tostring(err))
+    -- local stmt2 = db:prepare[[INSERT INTO logs(time, ip, domain, server_name, method, status_code, uri, user_agent, rule_name, reason) 
+    --     VALUES(:time, :ip, :domain, :server_name, :method, :status_code, :uri, :user_agent, :rule_name, :reason)]]
 
-    if tostring(res) == "5" then
-        self.D("waf the step database connection is busy, so it will be stored later.")
-        return false
-    end
-    stmt2:reset()
+    -- db:exec([[BEGIN TRANSACTION]])
 
-    local res, err = db:execute([[COMMIT]])
-    -- self:D("LOG[2]:"..tostring(res)..":"..tostring(err))
-    if db and db:isopen() then
-        db:close()
-    end
-    return true
+    -- stmt2:bind_names{
+    --     time=args["time"],
+    --     ip=args["ip"],
+    --     domain=args["server_name"],
+    --     server_name=args["server_name"],
+    --     method=args["method"],
+    --     status_code=args["status_code"],
+    --     user_agent=args["user_agent"],
+    --     uri=args["request_uri"],
+    --     rule_name=rule_name,
+    --     reason=reason
+    -- }
+
+    -- local res, err = stmt2:step()
+    -- -- self:D("LOG[1]:"..tostring(res)..":"..tostring(err))
+
+    -- if tostring(res) == "5" then
+    --     self.D("waf the step database connection is busy, so it will be stored later.")
+    --     return false
+    -- end
+    -- stmt2:reset()
+
+    -- local res, err = db:execute([[COMMIT]])
+    -- -- self:D("LOG[2]:"..tostring(res)..":"..tostring(err))
+    -- if db and db:isopen() then
+    --     db:close()
+    -- end
+    -- return true
 end
+
+
 function _M.setDebug(self, mode)
     debug_mode = mode
 end
