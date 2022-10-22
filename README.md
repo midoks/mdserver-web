@@ -65,6 +65,8 @@ phpMyAdmin[5.2.0]支持MySQL[8.0]
 
 PHP[53-72]支持phpMyAdmin[4.4.15]
 PHP[72-81]支持phpMyAdmin[5.2.0]
+
+
 ```
 
 # 特别赞助
@@ -78,7 +80,7 @@ PHP[72-81]支持phpMyAdmin[5.2.0]
 | 服务商			| 	LOGO   |  推广地址  | 优惠码 |
 | ------------- |----------|-----------|-------|
 | digitalvirt	|[![digitalvirt](https://digitalvirt.com/templates/BlueWhite/img/logo-dark.svg)](https://digitalvirt.com/aff.php?aff=154) | https://digitalvirt.com/aff.php?aff=154 | 9SYDY7UH0U |
-| 搬瓦工	|[![搬瓦工](https://bwh81.net/templates/organicbandwagon/images/logo.png)](https://bandwagonhost.com/aff.php?aff=54161) | https://bandwagonhost.com/aff.php?aff=54161 | BWH3HYATVBJW |
+| 搬瓦工	|[![搬瓦工](https://bwh81.net/templates/organicbandwagon/images/logo.png)](https://bwh81.net/aff.php?aff=54161) | https://bwh81.net/aff.php?aff=54161 | BWH3HYATVBJW |
 
 # Docker
 
