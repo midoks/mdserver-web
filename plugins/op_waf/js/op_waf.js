@@ -1632,7 +1632,7 @@ function wafSite(){
                             <label class="btswitch-btn" for="closeget_'+ i + '" onclick="setSiteObjState(\'' + k + '\',\'open\')"></label>\
                         </div>\
                     </td>\
-                    <td class="text-right"><a onclick="siteWafLog(\''+ k + '\')" class="btlink ' + (v.log_size > 0 ? 'dot' : '') + '">日志</a> | <a onclick="siteWafConfig(\'' + k + '\')" class="btlink">设置</a></td>\
+                    <td class="text-right"><a onclick="wafLogs(\''+ k + '\')" class="btlink ' + (v.log_size > 0 ? 'dot' : '') + '">日志</a> | <a onclick="siteWafConfig(\'' + k + '\')" class="btlink">设置</a></td>\
                 </tr>';
         });
 
@@ -1769,11 +1769,17 @@ function wafLogs(){
                         </div>\
                         <span class="last-span"><input data-name="" type="text" id="time_choose" lay-key="1000001_'+randstr+'" class="form-control btn-group-sm" autocomplete="off" placeholder="自定义时间" style="display: inline-block;font-size: 12px;padding: 0 10px;height:30px;width: 200px;"></span>\
                     </div>\
+                    <div style="float:right;"><button id="UncoverAll" class="btn btn-success btn-sm">解封所有</button></div>\
                 </div>\
                 <div class="divtable mtb10" id="ws_table"></div>\
             </div>';
     $(".soft-man-con").html(html);
     // wafLogRequest(1);
+
+    $("#UncoverAll").click(function(){
+        console.log("UncoverAll");
+    });
+
 
     //日期范围
     laydate.render({
@@ -1797,7 +1803,7 @@ function wafLogs(){
             $('#time_choose').attr("data-name",query_txt);
             $('#time_choose').addClass("cur");
 
-            wsTableErrorLogRequest(1);
+            wafLogRequest(1);
         },
     });
 

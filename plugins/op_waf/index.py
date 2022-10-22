@@ -146,7 +146,7 @@ def initSiteInfo():
             site_contents_new[name] = site_contents[name]
         else:
             tmp = {}
-            tmp['cdn'] = True
+            tmp['cdn'] = False
             tmp['log'] = True
             tmp['get'] = True
             tmp['post'] = True

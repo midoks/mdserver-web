@@ -134,6 +134,24 @@ function _M.D(self, msg)
     return true
 end
 
+function _M.is_working(self,sign)
+    local work_status = ngx.shared.waf_limit:get(sign.."_working")
+    if work_status ~= nil and work_status == true then
+        return true 
+    end
+    return false
+end
+
+function _M.lock_working(self, sign)
+    local working_key = sign.."_working"
+    ngx.shared.waf_limit:set(working_key, true, 60)
+end
+
+function _M.unlock_working(self, sign)
+    local working_key = sign.."_working"
+    ngx.shared.waf_limit:set(working_key, false)
+end
+
 
 local function write_file_clear(filename, body)
     fp = io.open(filename,'w')

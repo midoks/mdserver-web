@@ -95,71 +95,66 @@ local function is_chekc_table(data,strings)
     return 2
 end
 
-local function save_ip_on(data)
-    locak_file=read_file_body(cpath2 .. 'stop_ip.lock')
-    if not locak_file then
-        C:write_file(cpath2 .. 'stop_ip.lock','1')
-    end
-    name='stop_ip'
-    local extime = 18000
-    data = json.encode(data)
-    ngx.shared.waf_limit:set(cpath2 .. name,data,extime)
-    if not ngx.shared.waf_limit:get(cpath2 .. name .. '_lock') then
-        ngx.shared.waf_limit:set(cpath2 .. name .. '_lock',1,0.5)
-        C:write_file(cpath2 .. name .. '.json',data)
-    end
-end
-
 local function remove_waf_drop_ip()
-    if not uri_request_args['ip'] or not C:is_ipaddr(uri_request_args['ip']) then return get_return_state(true,'格式错误') end
-    if ngx.shared.waf_limit:get(cpath2 .. 'stop_ip') then
-        ret=ngx.shared.waf_limit:get(cpath2 .. 'stop_ip')
-        ip_data=json.decode(ret)
-        result = is_chekc_table(ip_data,uri_request_args['ip'])
-        os.execute("sleep " .. 0.6)
-        ret2 = ngx.shared.waf_limit:get(cpath2 .. 'stop_ip')
-        ip_data2 = json.decode(ret2)
-        if result == 3 then
-            for k,v in pairs(ip_data2)
-            do
-                if uri_request_args['ip'] == v['ip'] then 
-                    v['time'] = 0
-                end
-            end
-        end
-        save_ip_on(ip_data2)
+    ngx.header.content_type = "application/json"
+    local ip = params['uri_request_args']['ip']
+
+    if not ip or not C:is_ipaddr(ip) then 
+        local data = get_return_state(-1, "格式错误")
+        ngx.say(json.encode(data))
+        ngx.exit(200)
+        return true
     end
-    ngx.shared.waf_drop_ip:delete(uri_request_args['ip'])
-    return get_return_state(true,uri_request_args['ip'] .. '已解封')
+    
+    local sign = "remove_waf_drop_ip"
+    if C:is_working(sign) then 
+        local data = get_return_state(-1, "fail")
+        ngx.say(json.encode(data))
+        ngx.exit(200)
+        return true
+    end
+
+    C:lock_working(sign)
+    ngx.shared.waf_drop_ip:delete(ip)
+    C:unlock_working(sign)
+
+    local data = get_return_state(0, "ok")
+    ngx.say(json.encode(data))
+    ngx.exit(200)
 end
 
 local function clean_waf_drop_ip()
-    if ngx.shared.waf_limit:get(cpath2 .. 'stop_ip') then
-        ret2 = ngx.shared.waf_limit:get(cpath2 .. 'stop_ip')
-        ip_data2 = json.decode(ret2)
-        for k,v in pairs(ip_data2)
-        do
-            v['time'] = 0
-        end
-        save_ip_on(ip_data2)
-        os.execute("sleep " .. 2)
+    ngx.header.content_type = "application/json"
+
+    local sign = "clean_waf_drop_ip"
+    if C:is_working(sign) then 
+        local data = get_return_state(-1, "fail")
+        ngx.say(json.encode(data))
+        ngx.exit(200)
+        return true
     end
-    local data = get_waf_drop_ip()
-    for _,value in ipairs(data)
-    do
-        ngx.shared.waf_drop_ip:delete(value)
-    end
-    return get_return_state(true,'已解封所有封锁IP')
+
+    C:lock_working(sign)
+    ngx.shared.waf_drop_ip:flush_all()
+    C:unlock_working(sign)
+
+    local data = get_return_state(0, "ok")
+    ngx.say(json.encode(data))
+    ngx.exit(200)
 end
 
 local function min_route()
     if ngx.var.remote_addr ~= '127.0.0.1' then return false end
+    local uri = params['uri']
     if uri == '/get_waf_drop_ip' then
-        C:return_message(0,get_waf_drop_ip())
+        ngx.header.content_type = "application/json"
+        local data = get_return_state(0, get_waf_drop_ip())
+        ngx.say(json.encode(data))
+        ngx.exit(200)
     elseif uri == '/remove_waf_drop_ip' then
-        C:return_message(0,remove_waf_drop_ip())
-    elseif uri == '/clean_waf_waf_waf_drop_ip' then
-        C:return_message(0,clean_waf_drop_ip())
+        remove_waf_drop_ip()
+    elseif uri == '/clean_waf_drop_ip' then
+        clean_waf_drop_ip()
     end
 end
 
