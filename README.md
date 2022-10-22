@@ -65,6 +65,8 @@ phpMyAdmin[5.2.0]支持MySQL[8.0]
 
 PHP[53-72]支持phpMyAdmin[4.4.15]
 PHP[72-81]支持phpMyAdmin[5.2.0]
+
+
 ```
 
 # 特别赞助
@@ -78,7 +80,7 @@ PHP[72-81]支持phpMyAdmin[5.2.0]
 | 服务商			| 	LOGO   |  推广地址  | 优惠码 |
 | ------------- |----------|-----------|-------|
 | digitalvirt	|[![digitalvirt](https://digitalvirt.com/templates/BlueWhite/img/logo-dark.svg)](https://digitalvirt.com/aff.php?aff=154) | https://digitalvirt.com/aff.php?aff=154 | 9SYDY7UH0U |
-| 搬瓦工	|[![搬瓦工](https://bwh81.net/templates/organicbandwagon/images/logo.png)](https://bandwagonhost.com/aff.php?aff=54161) | https://bandwagonhost.com/aff.php?aff=54161 | BWH3HYATVBJW |
+| 搬瓦工	|[![搬瓦工](https://bwh81.net/templates/organicbandwagon/images/logo.png)](https://bwh81.net/aff.php?aff=54161) | https://bwh81.net/aff.php?aff=54161 | BWH3HYATVBJW |
 
 # Docker
 
@@ -90,15 +92,11 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.9.13
+### 版本更新 0.9.14
 
-* 优化弹框。
-* 修复计划任务[日志切割]。
-* 优化mysql的与phpmyadmin的连接。
-* PHP添加`会话管理`功能。
-* redis优化。
-* 更新mysql[5.7]的安装。
-* OP防火墙部分功能优化。
+* 优化网站统计插件，提搞速度和并发数。
+* mysql8安装地址更新。
+* OP防火墙优化。
 
 ### JSDelivr安装地址
 

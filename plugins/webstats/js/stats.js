@@ -2032,7 +2032,7 @@ function wsTableErrorLogRequest(page){
                 type: 1,
                 title: "【"+res.domain + "】详情信息",
                 area: '600px',
-                closeBtn: 2,
+                closeBtn: 1,
                 shadeClose: false,
                 content: '<div class="pd15 lib-box">\
                     <div style="height:80px;"><table class="table" style="border:#ddd 1px solid; margin-bottom:10px">\
@@ -2110,7 +2110,7 @@ laydate.render({
             $(this).removeClass('cur');
         });
 
-        var timeA  = value.split('-')
+        var timeA  = value.split('-');
         var start = $.trim(timeA[0]+'-'+timeA[1]+'-'+timeA[2])
         var end = $.trim(timeA[3]+'-'+timeA[4]+'-'+timeA[5])
         query_txt = toUnixTime(start + " 00:00:00") + "-"+ toUnixTime(end + " 00:00:00")
@@ -2193,12 +2193,37 @@ function wsTableLogRequest(page){
     args['search_uri'] = search_uri;
 
     args['tojs'] = 'wsTableLogRequest';
+
+    var spider_table = {
+        "1":"百度",
+        "2":"必应",
+        "3":"奇虎360",
+        "4":"Google",
+        "5":"头条",
+        "6":"搜狗",
+        "7":"有道",
+        "8":"搜搜",
+        "9":"Dnspod",
+        "10":"Yandex",
+        "11":"一搜",
+        "12":"其他",
+    }
+
+
     wsPost('get_logs_list', '' ,args, function(rdata){
         var rdata = $.parseJSON(rdata.data);
         var list = '';
         var data = rdata.data.data;
+
         if (data.length > 0){
             for(i in data){
+                
+                var spider_tip = '';
+                if (data[i]['is_spider']>0){
+                    spider_tip_name = spider_table[data[i]['is_spider']]
+                    spider_tip = '<div data-toggle="tooltip" title="'+spider_tip_name+'爬虫" style="cursor:pointer;margin:3px;float:left;width:8px;height:8px;line-height:40px;border-radius:50%;background-color:#ccc;"></div>';
+                }
+
                 list += '<tr>';
                 list += '<td>' + getLocalTime(data[i]['time'])+'</td>';
                 list += '<td><span class="overflow_hide" style="width:100px;">' + data[i]['domain'] +'</span></td>';
@@ -2206,7 +2231,7 @@ function wsTableLogRequest(page){
                 list += '<td>' + toSize(data[i]['body_length']) +'</td>';
                 list += '<td>' + toSecond(data[i]['request_time']) +'</td>';
                 list += '<td><span class="overflow_hide" style="width:130px;">' + data[i]['uri'] +'</span></td>';
-                list += '<td><span class="overflow_hide" style="width:60px;">' + data[i]['status_code']+'/' + data[i]['method'] +'</span></td>';
+                list += '<td>'+spider_tip+'<span class="overflow_hide" style="width:60px;">' + data[i]['status_code']+'/' + data[i]['method'] +'</span></td>';
                 list += '<td><a data-id="'+i+'" href="javascript:;" class="btlink details" title="详情">详情</a></td>';
                 list += '</tr>';
             }
@@ -2241,7 +2266,7 @@ function wsTableLogRequest(page){
                 type: 1,
                 title: "【"+res.domain + "】详情信息",
                 area: '600px',
-                closeBtn: 2,
+                closeBtn: 1,
                 shadeClose: false,
                 content: '<div class="pd15 lib-box">\
                     <div style="height:80px;"><table class="table" style="border:#ddd 1px solid; margin-bottom:10px">\
@@ -2264,6 +2289,8 @@ function wsTableLogRequest(page){
                 </div>',
             });
         });
+
+        $('[data-toggle="tooltip"]').tooltip();
     });
 }
 
@@ -2322,7 +2349,7 @@ var html = '<div>\
                         <option value="8">搜搜</option>\
                         <option value="9">Dnspod</option>\
                         <option value="10">Yandex</option>\
-                        <option value="12">神马</option>\
+                        <option value="11">一搜</option>\
                         <option value="12">其他</option>\
                     </select>\
                     <span style="margin-left:10px;">URL过滤: </span>\
@@ -2418,13 +2445,5 @@ wsPost('get_default_site','',{},function(rdata){
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 }
-
-
-
-
-
-
-
-
 
 

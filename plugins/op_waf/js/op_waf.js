@@ -69,8 +69,10 @@ function setObjOpen(ruleName){
     owPost('set_obj_open', {obj:ruleName},function(data){
         var rdata = $.parseJSON(data.data);
         if (rdata.status){
-            layer.msg(rdata.msg,{icon:0,time:2000,shade: [0.3, '#000']});
-            wafGloabl();
+
+            showMsg(rdata.msg, function(){
+                wafGloabl();
+            },{icon:1,time:2000,shade: [0.3, '#000']},2000);
         } else {
             layer.msg('设置失败!',{icon:0,time:2000,shade: [0.3, '#000']});
         }
@@ -84,7 +86,7 @@ function saveCcRule(siteName,is_open_global, type) {
     if(type == 2){
         // set_aicc_open('start');
         increase = "0";
-    }else{
+    } else {
         // set_aicc_open('stop');
         increase = type;
     }
@@ -164,7 +166,10 @@ function setCcRule(cycle, limit, endtime, siteName, increase){
                     <li>请不要设置过于严格的CC规则,以免影响正常用户体验</li>\
                     <li><font style="color:red;display:'+ (siteName == 'undefined'?'display: inline-block;':'none') +';">全局应用:全局设置当前CC规则，且覆盖当前全部站点的CC规则</font></li>\
                 </ul>\
-                <div class="bt-form-submit-btn"><button type="button" class="btn btn-danger btn-sm btn_cc_all" style="margin-right:10px;display:'+ (siteName == 'undefined'?'display: inline-block;':'none') +';">全局应用</button><button type="button" class="btn btn-success btn-sm btn_cc_present">应用</button></div>\
+                <div class="bt-form-submit-btn">\
+                    <button type="button" class="btn btn-danger btn-sm btn_cc_all" style="margin-right:10px;display:'+ (siteName == 'undefined'?'display: inline-block;':'none') +';">全局应用</button>\
+                    <button type="button" class="btn btn-success btn-sm btn_cc_present">应用</button>\
+                </div>\
             </form>',
             success:function(layero,index){
                 $('.btn_cc_all').click(function(){
@@ -201,9 +206,12 @@ function setRetry(retry_cycle, retry, retry_time, siteName) {
                 </div>\
                 <ul class="help-info-text c7 ptb10">\
                     <li><font style="color:red;">'+ retry_cycle + '</font> 秒内累计恶意请求超过  <font style="color:red;">' + retry + '</font> 次,封锁 <font style="color:red;">' + retry_time + '</font> 秒</li>\
-                    <li><font style="color:red;">全局应用:全局设置当前恶意容忍规则，且覆盖当前全部站点的恶意容忍规则</li>\
+                    <li><font style="color:red;">全局应用:全局设置当前恶意容忍规则，且覆盖当前全部站点的恶意容忍规则</font></li>\
                 </ul>\
-                <div class="bt-form-submit-btn"><button type="button" class="btn btn-danger btn-sm btn_retry_all" style="margin-right:10px;display:'+ (siteName == undefined?'inline-block;':'none') +';">全局应用</button><button type="button" class="btn btn-success btn-sm btn_retry_present">应用</button></div>\
+                <div class="bt-form-submit-btn">\
+                    <button type="button" class="btn btn-danger btn-sm btn_retry_all" style="margin-right:10px;display:'+ (siteName == undefined?'inline-block;':'none') +';">全局应用</button>\
+                    <button type="button" class="btn btn-success btn-sm btn_retry_present">应用</button>\
+                </div>\
             </form>',
         success:function(){
             $('.btn_retry_all').click(function(){
@@ -213,6 +221,65 @@ function setRetry(retry_cycle, retry, retry_time, siteName) {
                 saveRetry(siteName,0);
             });
         }
+    });
+}
+
+
+
+//设置safe_verify规则
+function setSafeVerify(auto, cpu, time, siteName) {
+    var svlayer = layer.open({
+        type: 1,
+        title: "设置强制安全验证",
+        area: '500px',
+        closeBtn: 1,
+        shadeClose: false,
+        content: '<form class="bt-form pd20 pb70">\
+                <div class="line">\
+                    <span class="tname">CPU</span>\
+                    <div class="info-r"><input class="bt-input-text" name="cpu" type="number" max-number="100" value="'+ cpu + '" /> %</div>\
+                </div>\
+                <div class="line">\
+                    <span class="tname">通行时间</span>\
+                    <div class="info-r"><input class="bt-input-text" name="time" type="number" value="'+ time + '" /> 秒</div>\
+                </div>\
+                <div class="line">\
+                    <span class="tname">开启自动</span>\
+                    <div class="info-r">\
+                        <select class="bt-input-text mr5" style="width:80px" name="auto">\
+                        <option value="0" '+(auto==false?"selected=selected":"")+'>关闭</option>\
+                        <option value="1" '+(auto==true?"selected=selected":"")+'>开启</option>\
+                    </select>\
+                </div>\
+                </div>\
+                <ul class="help-info-text c7 ptb10">\
+                    <li><font style="color:red;">全局设置强制安全验证</font></li>\
+                    <li>开启自动后:cpu超过['+cpu+'%]后，强制验证。</li>\
+                </ul>\
+                <div class="bt-form-submit-btn">\
+                    <button type="button" class="btn btn-success btn-sm btn_sv_present">应用</button>\
+                </div>\
+            </form>',
+        success:function(index){
+            $('.btn_sv_present').click(function(){
+                var pdata = {
+                    siteName: siteName,
+                    cpu: $("input[name='cpu']").val(),
+                    auto: $("select[name='auto']").val(),
+                    time: $("input[name='time']").val(),
+                }
+                var act = 'set_safe_verify';
+                owPost(act, pdata, function(data){
+                    var rdata = $.parseJSON(data.data);
+                    showMsg(rdata.msg, function() {
+                       layer.close(svlayer);
+                       wafGloabl();
+                    },{ icon: rdata.status ? 1 : 2 },1000);
+                });
+            });   
+
+            
+        },
     });
 }
 
@@ -253,15 +320,6 @@ function addRule(ruleName) {
             },1000);
         }
     });
-
-    // var loadT = layer.msg('正在添加，请稍候..', { icon: 16, time: 0 });
-    // $.post('/plugin?action=a&name=btwaf&s=add_rule', pdata, function (rdata) {
-    //     layer.close(loadT);
-    //     layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
-    //     if (rdata.status) {
-    //         set_obj_conf(ruleName, 1);
-    //     }
-    // });
 }
 
 function modifyRule(index, ruleName) {
@@ -695,6 +753,23 @@ function addIpBlack() {
     });
 }
 
+function addIpBlackArgs(ip) {
+    var pdata = {
+        start_ip: ip,
+        end_ip: ip,
+    }
+
+    if (pdata['start_ip'].split('.').length < 4 || pdata['end_ip'].split('.').length < 4) {
+        layer.msg('起始IP或结束IP格式不正确!');
+        return;
+    }
+
+    owPost('add_ip_black', pdata, function(data){
+        var rdata = $.parseJSON(data.data);
+        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+    });
+}
+
 
 //从IP黑名单删除IP段
 function removeIpBlack(index) {
@@ -820,17 +895,17 @@ function wafScreen(){
 
         con += '<div class="screen">\
             <div class="line"><span class="name">POST渗透</span><span class="val">'+rdata.rules.post+'</span></div>\
-            <div class="line"><span class="name">GET渗透</span><span class="val">0</span></div>\
+            <div class="line"><span class="name">GET渗透</span><span class="val">'+rdata.rules.args+'</span></div>\
             <div class="line"><span class="name">CC攻击</span><span class="val">'+rdata.rules.cc+'</span></div>\
             <div class="line"><span class="name">恶意User-Agent</span><span class="val">'+rdata.rules.user_agent+'</span></div>\
             <div class="line"><span class="name">Cookie渗透</span><span class="val">'+rdata.rules.cookie+'</span></div>\
             <div class="line"><span class="name">恶意扫描</span><span class="val">'+rdata.rules.scan+'</span></div>\
             <div class="line"><span class="name">恶意HEAD请求</span><span class="val">0</span></div>\
-            <div class="line"><span class="name">URI自定义拦截</span><span class="val">'+rdata.rules.args+'</span></div>\
+            <div class="line"><span class="name">URI自定义拦截</span><span class="val">'+rdata.rules.url+'</span></div>\
             <div class="line"><span class="name">URI保护</span><span class="val">'+rdata.rules.args+'</span></div>\
-            <div class="line"><span class="name">恶意文件上传</span><span class="val">0</span></div>\
-            <div class="line"><span class="name">禁止的扩展名</span><span class="val">'+rdata.rules.url_ext+'</span></div>\
-            <div class="line"><span class="name">禁止PHP脚本</span><span class="val">0</span></div>\
+            <div class="line"><span class="name">恶意文件上传</span><span class="val">'+rdata.rules.upload_ext+'</span></div>\
+            <div class="line"><span class="name">禁止的扩展名</span><span class="val">'+rdata.rules.path+'</span></div>\
+            <div class="line"><span class="name">禁止PHP脚本</span><span class="val">'+rdata.rules.php_path+'</span></div>\
             </div>';
 
         con += '<div style="width:660px;"><ul class="help-info-text c7">\
@@ -877,6 +952,16 @@ function wafGloabl(){
                         <td><a class="btlink" onclick="setRequestCode(\'cc\','+ rdata.cc.status + ')">' + rdata.cc.status + '</a></td>\
                         <td style="text-align: center;">--</td>\
                         <td class="text-right"><a class="btlink" onclick="setRetry('+ rdata.retry.retry_cycle + ',' + rdata.retry.retry + ',' + rdata.retry.retry_time + ')">初始规则</a></td>\
+                    </tr>\
+                    <tr>\
+                        <td>强制安全验证</td>\
+                        <td>'+rdata.safe_verify.ps+'</td>\
+                        <td>--</td>\
+                        <td style="text-align: center;"><div class="ssh-item">\
+                            <input class="btswitch btswitch-ios" id="close_safe_verify" type="checkbox" '+(rdata.safe_verify.open ? 'checked' : '')+'>\
+                            <label class="btswitch-btn" for="close_safe_verify" onclick="setObjOpen(\'safe_verify\')"></label></div>\
+                        </td>\
+                        <td class="text-right"><a class="btlink" onclick="setSafeVerify('+ rdata.safe_verify.auto + ',' + rdata.safe_verify.cpu + ',' + rdata.safe_verify.time + ')">设置</a> | <a class="btlink" href="javascript:;" onclick="onlineEditFile(0,\''+rdata['reqfile_path']+'/safe_js.html\')">响应内容</a></td>\
                     </tr>\
                     <tr>\
                         <td>GET-URI过滤</td>\
@@ -954,146 +1039,6 @@ function back_css(v) {
     else {
         return 'tipsval tipsvalnull'
     }
-}
-
-//查看网站日志
-function siteWafLog(siteName) {
-    var loadT = layer.msg('正在处理，请稍候..', { icon: 16, time: 0 });
-    owPost('get_logs_list', { siteName: siteName } , function (data) {
-        var tmp = $.parseJSON(data.data);
-        var rdata = tmp.data;
-        var selectLogDay = "";
-        var day = rdata[0];
-        for (var i = 0; i < rdata.length; i++) {
-            selectLogDay += '<option value="' + rdata[i] + '">' + rdata[i] + '</option>';
-        }
-        if (rdata == "") {
-            layer.msg("暂无日志记录", { icon: 6, shade: 0.3, time: 1000 });
-            return
-        }
-        layer.open({
-            type: 1,
-            title: "日志【" + siteName + "】",
-            area: ['880px', '500px'],
-            closeBtn: 1,
-            shadeClose: false,
-            content: '<div class="lib-box pd15 lib-box-log">\
-                <div class="lib-con-title" style="height:40px"><select id="selectLogDay" class="bt-input-text" onchange="siteLogCon(\''+ siteName + '\',this.options[this.options.selectedIndex].value,1)">' + selectLogDay + '</select></div>\
-                <div class="lib-con">\
-                    <div class="divtable">\
-                        <div id="site_waf_log" style="max-height:400px;overflow:auto;border:#ddd 1px solid">\
-                        <table class="table table-hover" style="border:none;">\
-                            <thead><tr><th width="150">时间</th><th width="120">用户IP</th><th width="70">类型</th><th>URI地址</th><th class="tdhide">User-Agent</th><th width="60">状态</th><th width="100">过滤器</th><th class="tdhide">过滤规则</th><th width="100" class="text-right">操作</th></tr></thead>\
-                            <tbody id="LogDayCon"></tbody>\
-                        </table>\
-                        </div>\
-                    </div>\
-                    <div class="page pull-right" id="size_log_page" style="margin-top:10px"></div>\
-                </div>\
-                </div>'
-        });
-        siteLogCon(siteName, day, 1);
-        tableFixed("site_waf_log");
-    });
-}
-
-
-//日志内容
-function siteLogCon(siteName, day, page) {
-    if (!page) page = 1;
-    var last = page - 1;
-    var next = page + 1;
-    var pagehtml = '';
-    $("#site_waf_log").scrollTop(0);
-
-    owPost('get_safe_logs', { siteName: siteName, toDate: day, p: page }, function(data){
-        var tmp = $.parseJSON(data.data);
-        if (!tmp.status){
-            layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
-            return;
-        }
-        var rdata = tmp.data;
-        var con = '';
-        for (var i = 0; i < rdata.length; i++) {
-            con += '<tr>\
-                <td class="td0">'+ escapeHTML(rdata[i][0]) + '</td>\
-                <td class="td1"><a class="btlink" href="javascript:add_log_ip_black(\''+ escapeHTML(rdata[i][1]) + '\');" title="加入黑名单">' + escapeHTML(rdata[i][1]) + '</a></td>\
-                <td class="td2">'+ escapeHTML(rdata[i][2]) + '</td>\
-                <td class="td3"><span class="td3txt">'+ escapeHTML(rdata[i][3]) + '</span></td>\
-                <td class="tdhide td4">'+ escapeHTML(rdata[i][4]) + '</td><td>已拦截</td>\
-                <td class="td5"><span class="filtertext">'+ escapeHTML(rdata[i][5]) + '</span></td>\
-                <td class="tdhide td6">'+ escapeHTML(rdata[i][6]) + '</td>\
-                <td class="text-right"><a href="javascript:;" class="btlink submit_msg" data-index="'+ i +'">误报</a> | <a href="javascript:;" class="btlink btwaf_details" data-index="'+ i +'">详细</a></td>\
-            </tr>'
-        }
-
-        $("#LogDayCon").html(con);
-        pagehtml = '<a class="Pstart" onclick="site_log_con(\'' + siteName + '\',\'' + day + '\',1)">首页</a><a class="prevPage" onclick="site_log_con(\'' + siteName + '\',\'' + day + '\',' + last + ')">上一页</a><a class="nextPage" onclick="site_log_con(\'' + siteName + '\',\'' + day + '\',' + next + ')">下一页</a><a class="Pcount">第 ' + page + ' 页</a>';
-        $("#size_log_page").html(pagehtml);
-        if (rdata.length < 1) $(".nextPage").hide();
-        if (last < 1) $(".prevPage").hide();
-
-        // 发送误报请求
-        $(".submit_msg").click(function () {
-            var _this = $(this);
-            var res = rdata[$(this).attr('data-index')];
-            layer.confirm('是否确定提交误报反馈？', { title: '误报反馈',closeBtn:2,icon:3}, function () {
-                var url_address = res[3];
-                var rule_arry = res[6].split(" &gt;&gt; ");
-                var pdata = { url_rule: url_address };
-                var loadT = layer.msg('正在添加URL白名单..', { icon: 16, time: 0 });
-                $.post('/plugin?action=a&name=btwaf&s=add_url_white', pdata, function (rdata) {
-                    layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
-                    layer.close(loadT);
-                    if (rule_arry[1] != undefined){ $.get('https://www.bt.cn/Api/add_waf_logs?data=' + rule_arry[1],function(rdata){},'jsonp')}
-                });
-            });
-        })
-
-        // 详情
-        $(".btwaf_details").click(function () {
-            var res = rdata[$(this).attr('data-index')];
-            var time =  res[0]; //时间
-            var ip_address = res[1]; //IP地址
-            var req_type = res[2]; // 请求类型
-            var url_address = res[3]; // 请求类型
-            var user_agent = res[4]; // 请求类型
-            var filters = res[5]; //过滤器
-            var filter_rule = ''; //过滤规则
-            var rule_arry =  res[6].split(" &gt;&gt; ");
-            var incoming_value = '',risk_value = ''; //传入值,风险值
-            if(rule_arry.length == 0) filter_rule = rule_arry[0]
-            incoming_value = rule_arry[1] == undefined?'空':rule_arry[1];
-            risk_value = incoming_value.match(new RegExp(rule_arry[0].replace(/\//g,'\\/'),'i'));
-            risk_value = risk_value?risk_value[0]:'空';
-
-            layer.open({
-                type: 1,
-                title: time + "详情",
-                area: '600px',
-                closeBtn: 1,
-                shadeClose: false,
-                content: '<div class="pd15 lib-box">\
-                        <table class="table" style="border:#ddd 1px solid; margin-bottom:10px">\
-                        <tbody><tr><th>时间</th><td>'+ escapeHTML(time) + '</td><th>用户IP</th><td><a class="btlink" href="javascript:add_log_ip_black(\'' + escapeHTML(ip_address) + '\')" title="加入黑名单">' + escapeHTML(ip_address) + '</a></td></tr><tr><th>类型</th><td>' + escapeHTML(req_type) + '</td><th>过滤器</th><td>' + escapeHTML(filters) + '</td></tr></tbody></table>\
-                        <div><b style="margin-left:10px">URI地址</b></div>\
-                        <div class="lib-con pull-left mt10"><div class="divpre">'+ escapeHTML(url_address) + '</div></div>\
-                        <div><b style="margin-left:10px">User-Agent</b></div>\
-                        <div class="lib-con pull-left mt10"><div class="divpre">'+ escapeHTML(user_agent) + '</div></div>\
-                        <div><b style="margin-left:10px">过滤规则</b></div>\
-                        <div class="lib-con pull-left mt10"><div class="divpre">'+ escapeHTML(rule_arry[0]) + '</div></div>\
-                        <div><b style="margin-left:10px">传入值</b></div>\
-                        <div class="lib-con pull-left mt10"><div class="divpre">'+ escapeHTML(incoming_value) + '</div></div>\
-                        <div><b style="margin-left:10px">风险值</b></div>\
-                        <div class="lib-con pull-left mt10"><div class="divpre">'+ escapeHTML(risk_value) + '</div></div>\
-                    </div>'
-            })
-        })
-        $("#LogDayCon td").click(function () {
-            $(this).parents("tr").addClass("active").siblings().removeClass("active");
-        });
-
-    });
 }
 
 function html_encode(value) {
@@ -1543,7 +1488,6 @@ function siteWafConfig(siteName, type) {
 
 
 function wafSite(){
-
     owPost('get_site_config', {}, function(data){
         var tmp = $.parseJSON(data.data);
         var rdata = $.parseJSON(tmp.data);
@@ -1553,32 +1497,20 @@ function wafSite(){
             i += 1;
             tbody += '<tr>\
                     <td><a onclick="siteWafConfig(\''+ k + '\')" class="sitename btlink" title="' + k + '">' + k + '</a></td>\
-                    <td>\
-                        <input onclick="setSiteObjState(\''+ k + '\',\'get\')" type="checkbox" ' + (v.get ? 'checked' : '') + '><span class="' + back_css(v.total[1].value) + '" title="拦截GET渗透次数:' + v.total[1].value + '">' + v.total[1].value + '</span>\
-                    </td>\
-                    <td>\
-                        <input onclick="setSiteObjState(\''+ k + '\',\'post\')"  type="checkbox" ' + (v.post ? 'checked' : '') + '><span class="' + back_css(v.total[0].value) + '"  title="拦截POST渗透次数:' + v.total[0].value + '">' + v.total[0].value + '</span>\
-                    </td>\
-                    <td>\
-                        <input onclick="setSiteObjState(\''+ k + '\',\'user-agent\')"  type="checkbox" ' + (v['user-agent'] ? 'checked' : '') + '><span class="' + back_css(v.total[3].value) + '" title="拦截恶意User-Agent次数:' + v.total[3].value + '">' + v.total[3].value + '</span>\
-                    </td>\
-                    <td>\
-                        <input onclick="setSiteObjState(\''+ k + '\',\'cookie\')"  type="checkbox" ' + (v.cookie ? 'checked' : '') + '><span class="' + back_css(v.total[4].value) + '" title="拦截Cookie渗透次数:' + v.total[4].value + '">' + v.total[4].value + '</span>\
-                    </td>\
-                    <td>\
-                        <input onclick="setSiteObjState(\''+ k + '\',\'cdn\')"  type="checkbox" ' + (v.cdn ? 'checked' : '') + '>\
-                    </td>\
-                    <td>\
-                        <input onclick="setSiteObjState(\''+ k + '\',\'cc\')"  type="checkbox" ' + (v.cc.open ? 'checked' : '') + '><span class="' + back_css(v.total[2].value) + '" title="拦截CC攻击次数:' + v.total[2].value + '">' + v.total[2].value + '</span>\
-                    </td>\
+                    <td><input onclick="setSiteObjState(\''+ k + '\',\'get\')" type="checkbox" ' + (v.get ? 'checked' : '') + '><span class="' + back_css(v.total[1].value) + '" title="拦截GET渗透次数:' + v.total[1].value + '">' + v.total[1].value + '</span></td>\
+                    <td><input onclick="setSiteObjState(\''+ k + '\',\'post\')"  type="checkbox" ' + (v.post ? 'checked' : '') + '><span class="' + back_css(v.total[0].value) + '"  title="拦截POST渗透次数:' + v.total[0].value + '">' + v.total[0].value + '</span></td>\
+                    <td><input onclick="setSiteObjState(\''+ k + '\',\'user-agent\')"  type="checkbox" ' + (v['user-agent'] ? 'checked' : '') + '><span class="' + back_css(v.total[3].value) + '" title="拦截恶意User-Agent次数:' + v.total[3].value + '">' + v.total[3].value + '</span></td>\
+                    <td><input onclick="setSiteObjState(\''+ k + '\',\'cookie\')"  type="checkbox" ' + (v.cookie ? 'checked' : '') + '><span class="' + back_css(v.total[4].value) + '" title="拦截Cookie渗透次数:' + v.total[4].value + '">' + v.total[4].value + '</span></td>\
+                    <td><input onclick="setSiteObjState(\''+ k + '\',\'cdn\')"  type="checkbox" ' + (v.cdn ? 'checked' : '') + '></td>\
+                    <td><input onclick="setSiteObjState(\''+ k + '\',\'cc\')"  type="checkbox" ' + (v.cc.open ? 'checked' : '') + '><span class="' + back_css(v.total[2].value) + '" title="拦截CC攻击次数:' + v.total[2].value + '">' + v.total[2].value + '</span></td>\
                     <td>\
                         <div class="ssh-item" style="margin-left:0">\
                             <input class="btswitch btswitch-ios" id="closeget_'+ i + '" type="checkbox" ' + (v.open ? 'checked' : '') + '>\
                             <label class="btswitch-btn" for="closeget_'+ i + '" onclick="setSiteObjState(\'' + k + '\',\'open\')"></label>\
                         </div>\
                     </td>\
-                    <td class="text-right"><a onclick="siteWafLog(\''+ k + '\')" class="btlink ' + (v.log_size > 0 ? 'dot' : '') + '">日志</a> | <a onclick="siteWafConfig(\'' + k + '\')" class="btlink">设置</a></td>\
-                </tr>'
+                    <td class="text-right"><a onclick="wafLogs(\''+ k + '\')" class="btlink ' + (v.log_size > 0 ? 'dot' : '') + '">日志</a> | <a onclick="siteWafConfig(\'' + k + '\')" class="btlink">设置</a></td>\
+                </tr>';
         });
 
         var con = '<div class="lib-box">\
@@ -1612,27 +1544,195 @@ function wafSite(){
 
 
 
-function wafHistory(){
-    
+function wafLogRequest(page){
+    var args = {};   
+    args['page'] = page;
+    args['page_size'] = 10;
+    args['site'] = $('select[name="site"]').val();
 
-    
-    var con = '<button class="btn btn-success btn-sm" onclick="UncoverAll()">解封所有</button>';
-    con += '<div class="divtable mt10">\
-        <table class="table table-hover waftable" style="color:#fff;">\
-            <thead><tr><th width="18%">开始时间</th>\
-            <th width="44%">IP</th>\
-            <th width="10%">站点</th>\
-            <th width="10%">封锁原因</th>\
-            <th width="10%">封锁时长</th>\
-            <th style="text-align: center;" width="10%">状态</th>\
-            </thead>\
-        </table>\
-        </div>';
-    $(".soft-man-con").html(con);
+    var query_date = 'today';
+    if ($('#time_choose').attr("data-name") != ''){
+        query_date = $('#time_choose').attr("data-name");
+    } else {
+        query_date = $('#search_time button.cur').attr("data-name");
+    }
+
+    args['query_date'] = query_date;
+    args['tojs'] = 'wafLogRequest';
+
+    owPost('get_logs_list', args, function(rdata){
+        var rdata = $.parseJSON(rdata.data);
+        var list = '';
+        var data = rdata.data.data;
+        if (data.length > 0){
+            for(i in data){
+                list += '<tr>';
+                list += '<td><span class="overflow_hide" style="width:112px;">' + getLocalTime(data[i]['time'])+'</span></td>';
+                list += '<td><span class="overflow_hide" style="width:50px;">' + data[i]['domain'] +'</span></td>';
+                list += '<td><span class="overflow_hide" style="width:60px;">' + data[i]['ip'] +'</span></td>';
+                list += '<td><span class="overflow_hide" style="width:50px;">' + data[i]['uri'] +'</span></td>';
+                list += '<td><span class="overflow_hide" style="width:50px;">' + data[i]['rule_name'] +'</span></td>';
+                list += '<td><span class="overflow_hide" style="width:200px;">' + data[i]['reason'] +'</span></td>';
+                list += '<td><a data-id="'+i+'" href="javascript:;" class="btlink details" title="详情">详情</a></td>';
+                list += '</tr>';
+            }
+        } else{
+             list += '<tr><td colspan="8" style="text-align:center;">封锁日志为空</td></tr>';
+        }
+        
+        var table = '<div class="tablescroll">\
+                            <table id="DataBody" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
+                            <thead><tr>\
+                            <th>时间</th>\
+                            <th>域名</th>\
+                            <th>IP</th>\
+                            <th>URI</th>\
+                            <th>规则名</th>\
+                            <th>原因</th>\
+                            <th style="text-align:right;">操作</th></tr></thead>\
+                            <tbody>\
+                            '+ list +'\
+                            </tbody></table>\
+                        </div>\
+                        <div id="wsPage" class="dataTables_paginate paging_bootstrap page"></div>';
+        $('#ws_table').html(table);
+        $('#wsPage').html(rdata.data.page);
+
+        $(".tablescroll .details").click(function(){
+            var index = $(this).attr('data-id');
+            var res = data[index];
+            var ip = res.ip;
+            var time = getLocalTime(res.time);
+            layer.open({
+                type: 1,
+                title: "【"+res.domain + "】详情",
+                area: '600px',
+                closeBtn: 1,
+                shadeClose: false,
+                content: '<div class="pd15 lib-box">\
+                        <table class="table" style="border:#ddd 1px solid; margin-bottom:10px">\
+                        <tbody><tr><th>时间</th><td>'+ time + '</td><th>用户IP</th><td><a class="btlink" href="javascript:addIpBlackArgs(\'' + escapeHTML(ip) + '\')" title="加入黑名单">' + escapeHTML(ip) + '</a></td></tr><tr><th>类型</th><td>' + escapeHTML(res.method) + '</td><th>过滤器</th><td>' + escapeHTML(res.rule_name) + '</td></tr></tbody></table>\
+                        <div><b style="margin-left:10px">URI地址</b></div>\
+                        <div class="lib-con pull-left mt10"><div class="divpre">'+ escapeHTML(res.uri) + '</div></div>\
+                        <div><b style="margin-left:10px">User-Agent</b></div>\
+                        <div class="lib-con pull-left mt10"><div class="divpre">'+ escapeHTML(res.user_agent) + '</div></div>\
+                        <div><b style="margin-left:10px">过滤规则</b></div>\
+                        <div class="lib-con pull-left mt10"><div class="divpre">'+ escapeHTML(res.rule_name) + '</div></div>\
+                         <div><b style="margin-left:10px">Reason</b></div>\
+                        <div class="lib-con pull-left mt10"><div class="divpre">'+ escapeHTML(res.reason) + '</div></div>\
+                    </div>'
+            })
+        });
+    });
+}
+
+function wafLogs(){
+    var randstr = getRandomString(10);
+
+
+    var html = '<div>\
+                <div style="padding-bottom:10px;">\
+                    <span>网站: </span>\
+                    <select class="bt-input-text" name="site" style="margin-left:4px;width:100px;">\
+                        <option value="unset">未设置</option>\
+                    </select>\
+                    <span style="margin-left:10px">时间: </span>\
+                    <div class="input-group" style="margin-left:10px;width:350px;display: inline-table;vertical-align: top;">\
+                        <div id="search_time" class="input-group-btn btn-group-sm">\
+                            <button data-name="today" type="button" class="btn btn-default">今日</button>\
+                            <button data-name="yesterday" type="button" class="btn btn-default">昨日</button>\
+                            <button data-name="l7" type="button" class="btn btn-default">近7天</button>\
+                            <button data-name="l30" type="button" class="btn btn-default">近30天</button>\
+                        </div>\
+                        <span class="last-span"><input data-name="" type="text" id="time_choose" lay-key="1000001_'+randstr+'" class="form-control btn-group-sm" autocomplete="off" placeholder="自定义时间" style="display: inline-block;font-size: 12px;padding: 0 10px;height:30px;width: 200px;"></span>\
+                    </div>\
+                    <div style="float:right;"><button id="UncoverAll" class="btn btn-success btn-sm">解封所有</button></div>\
+                </div>\
+                <div class="divtable mtb10" id="ws_table"></div>\
+            </div>';
+    $(".soft-man-con").html(html);
+    // wafLogRequest(1);
+
+    $("#UncoverAll").click(function(){
+        owPost('clean_drop_ip',{},function(data){
+            var rdata = $.parseJSON(data.data);
+            var ndata = $.parseJSON(rdata.data);
+            if (ndata.status == 0){
+                layer.msg("解封所有成功",{icon:1,time:2000,shade: [0.3, '#000']});
+            } else{
+                layer.msg("解封所有异常:"+ndata.msg,{icon:5,time:2000,shade: [0.3, '#000']});
+            }
+        });
+    });
+
+
+    //日期范围
+    laydate.render({
+        elem: '#time_choose',
+        value:'',
+        range:true,
+        done:function(value, startDate, endDate){
+            if(!value){
+                return false;
+            }
+
+            $('#search_time button').each(function(){
+                $(this).removeClass('cur');
+            });
+
+            var timeA  = value.split('-');
+            var start = $.trim(timeA[0]+'-'+timeA[1]+'-'+timeA[2])
+            var end = $.trim(timeA[3]+'-'+timeA[4]+'-'+timeA[5])
+            query_txt = toUnixTime(start + " 00:00:00") + "-"+ toUnixTime(end + " 00:00:00")
+
+            $('#time_choose').attr("data-name",query_txt);
+            $('#time_choose').addClass("cur");
+
+            wafLogRequest(1);
+        },
+    });
+
+    $('#search_time button:eq(0)').addClass('cur');
+    $('#search_time button').click(function(){
+        $('#search_time button').each(function(){
+            if ($(this).hasClass('cur')){
+                $(this).removeClass('cur');
+            }
+        });
+        $('#time_choose').attr("data-name",'');
+        $('#time_choose').removeClass("cur");
+
+        $(this).addClass('cur');
+
+        wafLogRequest(1);
+    });
+
+    owPost('get_default_site',{},function(rdata){
+        $('select[name="site"]').html('');
+
+        var rdata = $.parseJSON(rdata.data);
+        var rdata = rdata.data;
+        var default_site = rdata["default"];
+        var select = '';
+        for (var i = 0; i < rdata["list"].length; i++) {
+            if (default_site ==  rdata["list"][i]){
+                select += '<option value="'+rdata["list"][i]+'" selected>'+rdata["list"][i]+'</option>';
+            } else{
+                select += '<option value="'+rdata["list"][i]+'">'+rdata["list"][i]+'</option>';
+            }
+        }
+        $('select[name="site"]').html(select);
+        wafLogRequest(1);
+
+        $('select[name="site"]').change(function(){
+            wafLogRequest(1);
+        });
+    });
+
 }
 
 
-function wafLogs(){
+function wafOpLogs(){
     var con = '<div class="divtable">\
         <table class="table table-hover waftable" style="color:#fff;">\
             <thead><tr><th width="18%">名称</th>\

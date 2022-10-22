@@ -247,7 +247,7 @@ wsPost('get_global_conf', '' ,{}, function(rdata){
 
 	$('#setAll').click(function(){
 		var args = "name=webstats&func=reload";
-		layer.confirm('您真的要同步所有站点吗?', {icon:3,closeBtn: 2}, function() {
+		layer.confirm('您真的要同步所有站点吗?', {icon:3,closeBtn: 1}, function() {
 	        var e = layer.msg('正在同步,请稍候...', {icon: 16,time: 0});
 	        $.post("/plugins/run", args, function(g) {
 	            layer.close(e);

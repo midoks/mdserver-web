@@ -24,12 +24,14 @@ if [ -f ${rootPath}/bin/activate ];then
 	source ${rootPath}/bin/activate
 fi
 
+get_latest_release() {
+    curl -sL "https://api.github.com/repos/$1/releases/latest" | grep '"tag_name":' | cut -d'"' -f4
+}
+
 Install_App()
 {
 	echo '正在安装脚本文件...' > $install_tmp
 	mkdir -p $serverPath/source/webstats
-
-
 	mkdir -p $serverPath/webstats
 
 	# 下载源码安装包
@@ -88,29 +90,31 @@ Install_App()
 
 	# https://github.com/P3TERX/GeoLite.mmdb
 	pip install geoip2
-	if [ ! -f $serverPath/webstats/GeoLite2-City.mmdb ];then
-		# pip install geoip2
-		wget --no-check-certificate -O $serverPath/webstats/GeoLite2-City.mmdb https://git.io/GeoLite2-City.mmdb
+	# if [ ! -f $serverPath/webstats/GeoLite2-City.mmdb ];then
+	# 	wget --no-check-certificate -O $serverPath/webstats/GeoLite2-City.mmdb https://github.com/P3TERX/GeoLite.mmdb/releases/download/2022.10.16/GeoLite2-City.mmdb
+	# fi
+
+	# 缓存数据
+	GEO_VERSION=$(get_latest_release "P3TERX/GeoLite.mmdb")
+	if [ ! -f $serverPath/source/webstats/GeoLite2-City.mmdb ];then
+		wget --no-check-certificate -O $serverPath/source/webstats/GeoLite2-City.mmdb https://github.com/P3TERX/GeoLite.mmdb/releases/download/${GEO_VERSION}/GeoLite2-City.mmdb
 	fi
 
-	# GeoLite2-Country.mmdb
+	if [ -f $serverPath/source/webstats/GeoLite2-City.mmdb ];then
+		cp -rf $serverPath/source/webstats/GeoLite2-City.mmdb $serverPath/webstats/GeoLite2-City.mmdb
+	fi
 
 	echo "${VERSION}" > $serverPath/webstats/version.pl
 	echo '安装完成' > $install_tmp
 
-	if [ "$sys_os" != "Darwin" ];then
-		cd $rootPath && python3 ${rootPath}/plugins/webstats/index.py start
-	fi
+	cd $rootPath && python3 ${rootPath}/plugins/webstats/index.py start
 }
 
 Uninstall_App()
 {
-	if [ "$sys_os" != "Darwin" ];then
-		cd $rootPath && python3 ${rootPath}/plugins/webstats/index.py stop
-	fi
-
+	cd $rootPath && python3 ${rootPath}/plugins/webstats/index.py stop
 	rm -rf $serverPath/webstats
-	echo "Uninstall_redis" > $install_tmp
+	echo "卸载完成" > $install_tmp
 }
 
 action=$1

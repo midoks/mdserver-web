@@ -21,6 +21,14 @@ if mw.isAppleSystem():
 INIT_CMD = INIT_DIR + "/mw"
 
 
+def mw_input_cmd(msg):
+    if sys.version_info[0] == 2:
+        in_val = raw_input(msg)
+    else:
+        in_val = input(msg)
+    return in_val
+
+
 def mwcli(mw_input=0):
     raw_tip = "======================================================"
     if not mw_input:
@@ -29,6 +37,7 @@ def mwcli(mw_input=0):
         print("(2) 停止面板服务")
         print("(3) 启动面板服务")
         print("(4) 重载面板服务")
+        print("(5) 修改面板端口")
         print("(10) 查看面板默认信息")
         print("(11) 修改面板密码")
         print("(12) 修改面板用户名")
@@ -42,7 +51,7 @@ def mwcli(mw_input=0):
         except:
             mw_input = 0
 
-    nums = [1, 2, 3, 4,  10, 11, 12, 13]
+    nums = [1, 2, 3, 4, 5, 10, 11, 12, 13]
     if not mw_input in nums:
         print(raw_tip)
         print("已取消!")
@@ -56,22 +65,27 @@ def mwcli(mw_input=0):
         os.system(INIT_CMD + " start")
     elif mw_input == 4:
         os.system(INIT_CMD + " reload")
+    elif mw_input == 5:
+        in_port = mw_input_cmd("请输入新的面板端口：")
+        in_port_int = int(in_port.strip())
+        if in_port_int < 65536 and in_port_int > 0:
+            import firewall_api
+            firewall_api.firewall_api().addAcceptPortArgs(
+                in_port, 'WEB面板[TOOLS修改]', 'port')
+            mw.writeFile('data/port.pl', in_port)
+        else:
+            print("|-端口范围在0-65536之间")
+        return
     elif mw_input == 10:
         os.system(INIT_CMD + " default")
     elif mw_input == 11:
-        if sys.version_info[0] == 2:
-            input_pwd = raw_input("请输入新的面板密码：")
-        else:
-            input_pwd = input("请输入新的面板密码：")
+        input_pwd = mw_input_cmd("请输入新的面板密码：")
         if len(input_pwd.strip()) < 5:
             print("|-错误，密码长度不能小于5位")
             return
         set_panel_pwd(input_pwd.strip(), True)
     elif mw_input == 12:
-        if sys.version_info[0] == 2:
-            input_user = raw_input("请输入新的面板用户名(>3位)：")
-        else:
-            input_user = input("请输入新的面板用户名(>3位)：")
+        input_user = mw_input_cmd("请输入新的面板用户名(>3位)：")
         set_panel_username(input_user.strip())
     elif mw_input == 13:
         os.system('tail -100 ' + mw.getRunDir() + '/logs/error.log')

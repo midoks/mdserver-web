@@ -1,0 +1,151 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>OP网站防火墙|安全校验</title>
+<style>
+*{margin:0;padding:0;color:#444}
+.main{width:600px;margin:10% auto;}
+.title{background: #20a53a;color: #fff;font-size: 16px;height: 40px;line-height: 40px;text-align: center;}
+.content{background-color:#f3f7f9; height:280px;border:1px dashed #c6d9b6;padding:20px}
+#change{
+	font-size: 200px;
+	text-align: center;
+}
+</style>
+</head>
+
+<body>
+	<div class="main">
+		<div class="title">OP网站防火墙|安全校验</div>
+		<div class="content">
+			<p id="change">5</p>
+		</div>
+		<div id="status" style="display: none;">false</div>
+	</div>
+</body>
+
+<script type="text/javascript">
+
+function ajax(type,bool){
+	var xhr = {};
+	if(typeof(type)=='undefined'){
+		xhr.type='HTML';
+	}else{
+		xhr.type=type.toUpperCase();
+	}
+	if(typeof(bool)=='undefined'){
+		xhr.async=true;
+	}else{
+		xhr.async=bool;
+	}
+	xhr.url = '';
+	xhr.send = '';
+	xhr.result=null;
+
+	xhr.createXHR = function(){
+		try{
+			request = new XMLHttpRequest();
+			if(request.overrideMimeType){
+				request.overrideMimeType('text/html');
+			}
+		}catch(e){
+			var v = ['Microsoft.XMLHTTP', 'MSXML.XMLHTTP', 'Microsoft.XMLHTTP',
+				'Msxml2.XMLHTTP.7.0', 'Msxml2.XMLHTTP.6.0', 'Msxml2.XMLHTTP.5.0',
+					'Msxml2.XMLHTTP.4.0', 'MSXML2.XMLHTTP.3.0', 'MSXML2.XMLHTTP'];
+			for(var i=0;i<v.length;i++){
+				try{
+					request = new ActiveXObject(v[i]); 
+					if(request){return request;}
+				}catch(e){continue;
+				
+				}
+			}
+		}
+		return request;
+	}
+
+	xhr.XHR = xhr.createXHR();
+
+	xhr.processHandle = function(){
+		if( xhr.XHR.readyState ==4 && xhr.XHR.status==200){
+			if(xhr.type=='HTML'){
+				xhr.result(xhr.XHR.responseText);
+				return xhr.XHR.responseText;
+			}else if(xhr.type=='JSON'){
+				xhr.result(eval('('+xhr.XHR.responseText+')'));
+				return eval('('+xhr.XHR.responseText+')');
+			}else{
+				xhr.result(xhr.XHR.responseXML);
+				return xhr.XHR.responseXML;
+			}
+		}	
+	};
+
+	xhr.get = function(url,result){
+		//添加回调函数
+		var name ='PHPjs';
+		var r = name + '_' + Math.random().toString().substr(2);//随机
+
+		xhr.url = url+'&'+name+'='+r;
+		
+		if(result!=null){
+			xhr.XHR.onreadystatechange = xhr.processHandle;
+			xhr.result = result;
+		}
+		if(window.XMLHttpRequest){
+			xhr.XHR.open('GET',xhr.url,xhr.async);
+			xhr.XHR.send(null);
+		}else{
+			xhr.XHR.open('GET',xhr.url,xhr.async);
+			xhr.XHR.send();
+		}
+	};
+
+	xhr.post = function(url,send,result){
+		xhr.url = url;
+		if(typeof(send) == 'object'){
+			var str = '';
+			for(var pro in send){
+				str +=pro +'='+send[pro]+'&';
+			}
+			xhr.send = str.substr(0,str.length-1);
+		}else{
+			xhr.send = send;
+		}
+		if(result!=null){
+			xhr.XHR.onreadystatechange = xhr.processHandle;
+			xhr.result = result;
+		}
+		xhr.XHR.open('POST',url,xhr.async);
+		xhr.XHR.setRequestHeader('request-type','ajax');
+		xhr.XHR.setRequestHeader('Content-type','application/x-www-form-urlencoded');
+		xhr.XHR.send(xhr.send);
+	}
+	return xhr;
+}
+
+ajax('JSON',true).post('{uri}',{'pass':"ok"}, function(data){
+	if (data['status'] == 0){
+		document.getElementById('status').innerHTML = 'ok';
+		location.reload();
+	}
+});
+
+var ok = setInterval(function(){
+	var id = document.getElementById('change').innerHTML;
+	id = id - 1;
+	if (id == 0){
+		document.getElementById('change').innerHTML = '稍等';
+		clearInterval(ok);
+		if (document.getElementById('status').innerHTML == 'ok'){
+			location.reload();
+		}
+	} else {
+		document.getElementById('change').innerHTML = id;
+	}
+},1000);
+
+</script>
+</html>
+

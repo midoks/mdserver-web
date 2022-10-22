@@ -161,19 +161,24 @@ def isInstalledWeb():
 
 
 def restartWeb():
+    return opWeb("reload")
+
+
+def opWeb(method):
     if not isInstalledWeb():
         return False
 
     # systemd
     systemd = '/lib/systemd/system/openresty.service'
     if os.path.exists(systemd):
-        execShell('systemctl reload openresty')
+        execShell('systemctl ' + method + ' openresty')
         return True
 
     # initd
     initd = getServerDir() + '/openresty/init.d/openresty'
+
     if os.path.exists(initd):
-        execShell(initd + ' ' + 'reload')
+        execShell(initd + ' ' + method)
         return True
 
     return False
@@ -595,12 +600,14 @@ def getLastLine(path, num, p=1):
         count = start_line + num
         fp = open(path, 'rb')
         buf = ""
-        fp.seek(-1, 2)
+
+        fp.seek(0, 2)
         if fp.read(1) == "\n":
-            fp.seek(-1, 2)
+            fp.seek(0, 2)
         data = []
         b = True
         n = 0
+
         for i in range(count):
             while True:
                 newline_pos = str.rfind(str(buf), "\n")

@@ -52,7 +52,7 @@ def createBgTask():
     removeBgTask()
     args = {
         "period": "minute-n",
-        "minute-n": "3",
+        "minute-n": "1",
     }
     createBgTaskByName(getPluginName(), args)
 
@@ -71,7 +71,7 @@ def createBgTaskByName(name, args):
             print("计划任务已经存在!")
             return True
     import crontab_api
-    api = crontab_api.crontab_api()
+    cron_api = crontab_api.crontab_api()
 
     period = args['period']
     _hour = ''
@@ -87,16 +87,18 @@ def createBgTaskByName(name, args):
         _where1 = args['minute-n']
         _minute = ''
 
+    mw_dir = mw.getRunDir()
     cmd = '''
+mw_dir=%s
 rname=%s
 plugin_path=%s
 script_path=%s
 logs_file=$plugin_path/${rname}.log
-''' % (name, getServerDir(), getPluginDir())
+''' % (mw_dir, name, getServerDir(), getPluginDir())
     cmd += 'echo "★【`date +"%Y-%m-%d %H:%M:%S"`】 STSRT★" >> $logs_file' + "\n"
     cmd += 'echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" >> $logs_file' + "\n"
-    cmd += 'echo "python3 $script_path/tool_task.py run >> $logs_file 2>&1"' + "\n"
-    cmd += 'python3 $script_path/tool_task.py run >> $logs_file 2>&1' + "\n"
+    cmd += 'echo "cd $mw_dir && source bin/activate && python3 $script_path/tool_task.py run >> $logs_file 2>&1"' + "\n"
+    cmd += 'cd $mw_dir && source bin/activate && python3 $script_path/tool_task.py run >> $logs_file 2>&1' + "\n"
     cmd += 'echo "【`date +"%Y-%m-%d %H:%M:%S"`】 END★" >> $logs_file' + "\n"
     cmd += 'echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" >> $logs_file' + "\n"
 
@@ -115,7 +117,7 @@ logs_file=$plugin_path/${rname}.log
         'urladdress': '',
     }
 
-    task_id = api.add(params)
+    task_id = cron_api.add(params)
     if task_id > 0:
         cfg["task_id"] = task_id
         cfg["name"] = name
@@ -144,8 +146,15 @@ def removeBgTask():
     return False
 
 
+def getCpuUsed():
+    import psutil
+    used = psutil.cpu_percent(interval=1)
+    path = getServerDir() + "/cpu.info"
+    mw.writeFile(path, str(int(used)))
+
+
 def run():
-    print('op lua run ok')
+    getCpuUsed()
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:

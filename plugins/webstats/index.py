@@ -77,11 +77,11 @@ def status():
     return 'start'
 
 
-def loadLuaLogFile():
+def loadLuaFile(name):
     lua_dir = getServerDir() + "/lua"
-    lua_dst = lua_dir + "/webstats_log.lua"
+    lua_dst = lua_dir + "/" + name
 
-    lua_tpl = getPluginDir() + '/lua/webstats_log.lua'
+    lua_tpl = getPluginDir() + '/lua/' + name
     content = mw.readFile(lua_tpl)
     content = content.replace('{$SERVER_APP}', getServerDir())
     content = content.replace('{$ROOT_PATH}', mw.getServerDir())
@@ -98,7 +98,7 @@ def loadConfigFile():
     dst_conf_json = getServerDir() + "/lua/config.json"
     mw.writeFile(dst_conf_json, json.dumps(content))
 
-    dst_conf_lua = getServerDir() + "/lua/config.lua"
+    dst_conf_lua = getServerDir() + "/lua/webstats_config.lua"
     listToLuaFile(dst_conf_lua, content)
 
 
@@ -125,9 +125,16 @@ def loadLuaSiteFile():
         ddata["default"] = "unset"
     else:
         ddata["default"] = dlist[0]
+
     mw.writeFile(default_json, json.dumps(ddata))
 
-    lua_site = lua_dir + "/sites.lua"
+    lua_site = lua_dir + "/webstats_sites.lua"
+
+    tmp = {
+        "name": "unset",
+        "domain": [],
+    }
+    content.append(tmp)
     listToLuaFile(lua_site, content)
 
 
@@ -205,7 +212,14 @@ def initDreplace():
     if not os.path.exists(log_path):
         mw.execShell('mkdir -p ' + log_path)
 
-    loadLuaLogFile()
+    file_list = [
+        'webstats_common.lua',
+        'webstats_log.lua',
+    ]
+
+    for fl in file_list:
+        loadLuaFile(fl)
+
     loadConfigFile()
     loadLuaSiteFile()
     loadDebugLogFile()
@@ -222,28 +236,35 @@ def start():
     if not mw.isAppleSystem():
         mw.execShell("chown -R www:www " + getServerDir())
 
-    mw.restartWeb()
+    mw.opWeb("reload")
     return 'ok'
 
 
 def stop():
     path = luaConf()
-    os.remove(path)
-    mw.restartWeb()
+    if os.path.exists(path):
+        os.remove(path)
+
+    import tool_task
+    tool_task.removeBgTask()
+
+    mw.opWeb("restart")
     return 'ok'
 
 
 def restart():
     initDreplace()
+
+    mw.opWeb("reload")
     return 'ok'
 
 
 def reload():
     initDreplace()
 
-    loadLuaLogFile()
     loadDebugLogFile()
-    mw.restartWeb()
+
+    mw.opWeb("reload")
     return 'ok'
 
 
@@ -294,7 +315,7 @@ def setGlobalConf():
         content['global']['exclude_url'] = exclude_url_val
 
     mw.writeFile(conf, json.dumps(content))
-    conf_lua = getServerDir() + "/lua/config.lua"
+    conf_lua = getServerDir() + "/lua/webstats_config.lua"
     listToLuaFile(conf_lua, content)
     mw.restartWeb()
     return mw.returnJson(True, '设置成功')
@@ -387,7 +408,7 @@ def setSiteConf():
     content[domain] = site_conf
 
     mw.writeFile(conf, json.dumps(content))
-    conf_lua = getServerDir() + "/lua/config.lua"
+    conf_lua = getServerDir() + "/lua/webstats_config.lua"
     listToLuaFile(conf_lua, content)
     mw.restartWeb()
     return mw.returnJson(True, '设置成功')
@@ -622,7 +643,7 @@ def getLogsList():
     limit = str(page_size) + ' offset ' + str(page_size * (page - 1))
     conn = pSqliteDb('web_logs', domain)
 
-    field = 'time,ip,domain,server_name,method,protocol,status_code,request_headers,ip_list,client_port,body_length,user_agent,referer,request_time,uri,body_length'
+    field = 'time,ip,domain,server_name,method,is_spider,protocol,status_code,request_headers,ip_list,client_port,body_length,user_agent,referer,request_time,uri,body_length'
     condition = ''
     conn = conn.field(field)
     conn = conn.where("1=1", ())
@@ -1101,7 +1122,6 @@ def getUriStatList():
         conn = conn.where("day>? and flow>?", (0, 0,))
 
     clist = conn.order("flow desc").limit("50").inquiry(origin_field)
-    # print(clist)
 
     total_req = 0
     total_flow = 0
