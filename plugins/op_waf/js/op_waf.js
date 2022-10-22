@@ -884,7 +884,7 @@ function wafScreen(){
             <div class="line"><span class="name">Cookie渗透</span><span class="val">'+rdata.rules.cookie+'</span></div>\
             <div class="line"><span class="name">恶意扫描</span><span class="val">'+rdata.rules.scan+'</span></div>\
             <div class="line"><span class="name">恶意HEAD请求</span><span class="val">0</span></div>\
-            <div class="line"><span class="name">URI自定义拦截</span><span class="val">'+rdata.rules.args+'</span></div>\
+            <div class="line"><span class="name">URI自定义拦截</span><span class="val">'+rdata.rules.url+'</span></div>\
             <div class="line"><span class="name">URI保护</span><span class="val">'+rdata.rules.args+'</span></div>\
             <div class="line"><span class="name">恶意文件上传</span><span class="val">'+rdata.rules.upload_ext+'</span></div>\
             <div class="line"><span class="name">禁止的扩展名</span><span class="val">'+rdata.rules.path+'</span></div>\

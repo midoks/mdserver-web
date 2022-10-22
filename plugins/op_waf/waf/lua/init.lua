@@ -31,6 +31,7 @@ local scan_black_rules = require "rule_scan_black"
 local user_agent_rules = require "rule_user_agent"
 local post_rules = require "rule_post"
 local cookie_rules = require "rule_cookie"
+local url_rules = require "rule_url"
 
 
 local server_name = string.gsub(C:get_sn(config_domains),'_','.')
@@ -355,7 +356,8 @@ end
 local function waf_url()
     if not config['get']['open'] or not C:is_site_config('get') then return false end
     --正则--
-    if C:is_ngx_match(url_rules, params["uri"], 'url') then
+    -- C:D("waf_url:"..json.encode(url_rules)..":uri:"..params["uri"])
+    if C:ngx_match_list(url_rules, params["uri"]) then
         C:write_log('url','regular')
         C:return_html(config['get']['status'], get_html)
         return true
@@ -424,67 +426,6 @@ local function waf_post()
     return false
 end
 
-local function  waf_post_data_check()
-    if params['method'] == "POST" then
-
-        C:D("post_data_check start")
-        if C:return_post_data() then return false end
-        ngx.req.read_body()
-
-        local request_args = params['uri_request_args']
-        if not request_args then return false end
-
-        C:D("post_data_check:"..json.encode(params['request_header']))
-
-        local av = nil
-        if params['request_header'] then
-            if not params['request_header']['content-type'] then return false end
-            av = string.match(params['request_header']['content-type'], "=.+")
-
-            C:D("post_data_check[av]:"..json.encode(av))
-        end
-        
-
-        if not av then return false end
-        ac = C:split(av,'=')
-
-        if not ac then return false end 
-
-        list_list = nil
-        for i,v in ipairs(ac)
-        do
-             list_list = '--'..v
-        end
-        
-        if not list_list then return false end 
-        
-        aaa = nil
-        for k,v in pairs(request_args)
-        do
-            aaa = v
-        end
-
-        if not aaa then return false end 
-        if tostring(aaa) == 'true' then return false end
-        if type(aaa) ~= "string" then return false end
-        data_len = C:split(aaa, list_list)
-
-        if not data_len then return false end
-        if arrlen(data_len) == 0 then return false end
-
-
-        C:D("post_rules:"..json.encode(post_rules).."data_len:"..json.encode(data_len))
-
-        if C:is_ngx_match_post(post_rules , data_len) then
-            C:write_log('post','regular')
-            C:return_html(config['post']['status'], post_html)
-            return true
-        end
-
-    end
-end
-
-
 local function X_Forwarded()
 
     if params['method'] ~= "GET" then return false end
@@ -537,40 +478,26 @@ local function disable_upload_ext(ext)
         C:return_html(config['other']['status'],other_html)
         return true
     end
-end
-
-local function data_in_php(data)
-    if not data then
-        return false
-    else
-        if C:is_ngx_match('php', data, 'post') then
-            C:write_log('upload_ext','上传扩展名黑名单')
-            C:return_html(config['other']['status'], other_html)
-            return true
-        else
-            return false
-        end
-    end
+    return false
 end
 
 local function post_data()
     if params["method"] ~= "POST" then return false end
+    -- C:D("content-length:"..params["request_header"]['content-length'])
     local content_length = tonumber(params["request_header"]['content-length'])
     if not content_length then return false end
     local max_len = 2560 * 1024000
     if content_length > max_len then return false end
     local boundary = C:get_boundary()
+    -- C:D("boundary:".. tostring( boundary) )
     if boundary then
         ngx.req.read_body()
         local data = ngx.req.get_body_data()
         if not data then return false end
         local tmp = ngx.re.match(data,[[filename=\"(.+)\.(.*)\"]])
-        if not tmp then return false end
-        if not tmp[2] then return false end
-        local tmp2 = ngx.re.match(ngx.req.get_body_data(),[[Content-Type:[^\+]{45}]]) 
+        if not tmp or not tmp[2] then return false end
+        -- C:D("upload_ext:".. tostring(tmp[2]) )
         disable_upload_ext(tmp[2])
-        if tmp2 == nil then return false end 
-        data_in_php(tmp2[0])
     end
     return false
 end
@@ -619,7 +546,6 @@ function waf()
     if waf_scan_black() then return true end
 
     if waf_post() then return true end
-    -- if waf_post_data_check() then return true end
     
     if site_config[server_name] and site_config[server_name]['open'] then
         if X_Forwarded() then return true end

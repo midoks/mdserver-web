@@ -517,52 +517,6 @@ function _M.is_ngx_match_post(self, rules, content)
 end
 
 
-function _M.is_ngx_match(self, rules, sbody, rule_name)
-    if rules == nil or sbody == nil then return false end
-    if type(sbody) == "string" then
-        sbody = {sbody}
-    end
-    
-    if type(rules) == "string" then
-        rules = {rules}
-    end
-
-    for k,body in pairs(sbody)
-    do
-        if self:continue_key(k) then
-            for i,rule in ipairs(rules)
-            do
-                if self.site_config[server_name] and rule_name then
-                    local n = i - 1
-                    for _,j in ipairs(self.site_config[server_name]['disable_rule'][rule_name])
-                    do
-                        if n == j then
-                            rule = ""
-                        end
-                    end
-                end
-                
-                if body and rule ~="" then
-                    if type(body) == "string" then
-                        if ngx_match(ngx.unescape_uri(body),rule,"isjo") then
-                            error_rule = rule .. ' >> ' .. k .. ':' .. body
-                            return true
-                        end
-                    end
-                    if type(k) == "string" then
-                        if ngx_match(ngx.unescape_uri(k),rule,"isjo") then
-                            error_rule = rule .. ' >> ' .. k
-                            return true
-                        end
-                    end
-                end
-            end
-        end
-    end
-    return false
-end
-
-
 function _M.write_log(self, name, rule)
     local config = self.config
     local params = self.params
