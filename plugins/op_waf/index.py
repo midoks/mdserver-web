@@ -791,7 +791,7 @@ def setObjStatus():
     cobj = json.loads(content)
 
     o = args['obj']
-    status = args['statusCode']
+    status = int(args['statusCode'])
     cobj[o]['status'] = status
 
     cjson = mw.getJson(cobj)

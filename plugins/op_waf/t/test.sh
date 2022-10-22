@@ -10,4 +10,13 @@ export PATH
 # ab -c 10 -n 1000 http://t1.cn/wp-admin/index.php
 # ab -c 1000 -n 1000000 http://dev156.cachecha.com/
 
+curPath=`pwd`
+rootPath=$(dirname "$curPath")
+rootPath=$(dirname "$rootPath")
+rootPath=$(dirname "$rootPath")
+
+if [ -f ${rootPath}/bin/activate ];then
+	source ${rootPath}/bin/activate
+fi
+
 python3 index.py

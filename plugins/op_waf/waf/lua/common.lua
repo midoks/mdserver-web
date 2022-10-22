@@ -240,6 +240,8 @@ end
 
 function _M.return_html(self, status, html)
     ngx.header.content_type = "text/html"
+    status = tonumber(status)
+    -- self:D("return_html:"..tostring(status))
     if status == 200 then
         ngx.say(html)
     end
@@ -587,7 +589,7 @@ function _M.write_log(self, name, rule)
     end
 
     local count = ngx.shared.waf_drop_ip:get(ip)
-    self:D("write_log; count:" ..tostring(count).. ",retry:" .. tostring(retry) )
+    -- self:D("write_log; count:" ..tostring(count).. ",retry:" .. tostring(retry) )
     if (count > retry and name ~= 'cc') then
         local safe_count,_ = ngx.shared.waf_drop_sum:get(ip)
         if not safe_count then
