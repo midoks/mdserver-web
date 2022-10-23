@@ -17,6 +17,7 @@
 
 </div>
 <script type="text/javascript">
-$.getScript( "/plugins/file?name=phpmyadmin&f=js/phpmyadmin.js");
-pluginService('phpmyadmin');
+$.getScript( "/plugins/file?name=phpmyadmin&f=js/phpmyadmin.js", function(){
+	pluginService('phpmyadmin');
+});
 </script>
