@@ -743,7 +743,7 @@ def setSessionConf(version):
             phpini = re.sub('\n;session.save_path = "' + session_tmp + '"',
                             '\n;session.save_path = "' + session_tmp + '"' + val, phpini)
 
-    if save_handler == "file":
+    if save_handler == "files":
         rep = r'\nsession.save_path\s*=\s*(.+)\r?\n'
         val = r'\nsession.save_path = "' + session_tmp + '"\n'
         if re.search(rep, phpini):

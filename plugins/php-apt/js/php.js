@@ -405,7 +405,7 @@ function getSessionConfig(version){
 
         $(".soft-man-con").html(con);
 
-        if (rdata.save_handler == 'file'){
+        if (rdata.save_handler == 'files'){
             $('input[name="ip"]').attr('disabled','disabled');
             $('input[name="port"]').attr('disabled','disabled');
             $('input[name="passwd"]').attr('placeholder','如果没有密码留空');
@@ -436,7 +436,7 @@ function getSessionConfig(version){
                     $('input[name="port"]').removeAttr('disabled');
                     $('input[name="passwd"]').removeAttr('disabled');
                     break;
-                case 'file':
+                case 'files':
                     $('input[name="ip"]').val("").attr('disabled','disabled');
                     $('input[name="port"]').val("").attr('disabled','disabled');
                     $('input[name="passwd"]').val("").attr('disabled','disabled');
