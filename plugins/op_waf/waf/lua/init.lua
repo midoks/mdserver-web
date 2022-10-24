@@ -33,6 +33,7 @@ local user_agent_rules = require "rule_user_agent"
 local post_rules = require "rule_post"
 local cookie_rules = require "rule_cookie"
 local url_rules = require "rule_url"
+local url_white_rules = require "rule_url_white"
 
 
 local server_name = string.gsub(C:get_sn(config_domains),'_','.')
@@ -177,6 +178,13 @@ local function waf_ip_white()
         if C:compare_ip(rule) then 
             return true 
         end
+    end
+    return false
+end
+
+local function waf_url_white()
+    if C:ngx_match_list(url_white_rules, params['uri']) then
+        return true
     end
     return false
 end
@@ -516,6 +524,9 @@ function waf()
 
     -- white ip
     if waf_ip_white() then return true end
+
+    -- url white
+    if waf_url_white() then return true end
 
     -- black ip
     if waf_ip_black() then return true end

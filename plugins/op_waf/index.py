@@ -253,6 +253,7 @@ def contentReplace(content):
 
 
 def autoMakeLuaConfSingle(file):
+    # path = getPluginDir() + "/waf/rule/" + file + ".json"
     path = getServerDir() + "/waf/rule/" + file + ".json"
     to_path = getServerDir() + "/waf/conf/rule_" + file + ".lua"
     content = mw.readFile(path)
@@ -280,7 +281,7 @@ def autoMakeLuaHtmlSingle(file):
 def autoMakeLuaConf():
     conf_list = ['args', 'cookie', 'ip_black', 'ip_white',
                  'ipv6_black', 'post', 'scan_black', 'url',
-                 'user_agent']
+                 'url_white', 'user_agent']
     for x in conf_list:
         autoMakeLuaConfSingle(x)
 
