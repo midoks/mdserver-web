@@ -76,10 +76,16 @@ function _M.cron(self)
 
         local db = self:initDB()
 
+        db:exec([[BEGIN TRANSACTION]])
+
         local stmt2 = db:prepare[[INSERT INTO logs(time, ip, domain, server_name, method, status_code, uri, user_agent, rule_name, reason) 
             VALUES(:time, :ip, :domain, :server_name, :method, :status_code, :uri, :user_agent, :rule_name, :reason)]]
 
-        db:exec([[BEGIN TRANSACTION]])
+
+        if not stmt2 then
+            self:D("waf timer db:prepare fail!")
+            return false
+        end
 
         for i=1,llen do
             local data, _ = ngx.shared.waf_limit:lpop('waf_limit_logs')
