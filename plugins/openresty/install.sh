@@ -35,8 +35,13 @@ Install_openresty()
 		cpuCore=`cat /proc/cpuinfo | grep "processor" | wc -l`
 	fi
 
-	if [ "$cpuCore" -gt "1" ];then
-		cpuCore=`echo "$cpuCore" | awk '{printf("%.f",($1)*0.8)}'`
+	MEM_INFO=$(free -m|grep Mem|awk '{printf("%.f",($2)/1024)}')
+	if [ "${cpuCore}" != "1" ] && [ "${MEM_INFO}" != "0" ];then
+	    if [ "${cpuCore}" -gt "${MEM_INFO}" ];then
+	        cpuCore="${MEM_INFO}"
+	    fi
+	else
+	    cpuCore="1"
 	fi
 	# ----- cpu end ------
 
