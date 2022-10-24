@@ -245,6 +245,8 @@ case "$1" in
             elif [ "$v6" != "" ]; then
                 echo 'True' > $mw_path/data/ipv6.pl
                 address="MW-Panel-Url: http://[$v6]:$port$auth_path"
+
+                # 需要重启,ipv4才能生效
                 restart
             else
                 address="MW-Panel-Url: http://you-network-ip:$port$auth_path"
