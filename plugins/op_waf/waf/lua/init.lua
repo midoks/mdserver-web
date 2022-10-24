@@ -42,7 +42,7 @@ local function initParams()
     data['ip'] = C:get_real_ip(server_name)
     data['ipn'] = C:arrip(data['ip'])
     data['request_header'] = ngx.req.get_headers()
-    data['uri'] = ngx.unescape_uri(ngx.var.uri)
+    data['uri'] = tostring(ngx.unescape_uri(ngx.var.uri))
     data['uri_request_args'] = ngx.req.get_uri_args()
     data['method'] = ngx.req.get_method()
     data['request_uri'] = ngx.var.request_uri
