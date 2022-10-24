@@ -466,7 +466,7 @@ end
 
 local function disable_upload_ext(ext)
     if not ext then return false end
-    ext = string.lower(ext)
+    local ext = string.lower(ext)
     if C:is_key(site_config[server_name]['disable_upload_ext'], ext) then
         C:write_log('upload_ext', '上传扩展名黑名单')
         C:return_html(config['other']['status'],other_html)
