@@ -132,7 +132,7 @@ def loadLuaSiteFile():
 
     tmp = {
         "name": "unset",
-        "domain": [],
+        "domains": [],
     }
     content.append(tmp)
     listToLuaFile(lua_site, content)

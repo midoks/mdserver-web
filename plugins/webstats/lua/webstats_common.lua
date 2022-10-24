@@ -149,7 +149,7 @@ function _M.get_sn(self, input_sn)
             cache:set(input_sn, v['name'], 86400)
             return v["name"]
         end
-
+        -- self:D("get_sn:"..json.encode(v))
         for _,dst_domain in ipairs(v['domains'])
         do
             if input_sn == dst_domain then

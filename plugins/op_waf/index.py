@@ -424,6 +424,15 @@ def restart():
 def reload():
     stop()
 
+    path = getServerDir()
+    path_tpl = getPluginDir()
+
+    config = path + "/waf/lua/init.lua"
+    config_tpl = path_tpl + "/waf/lua/init.lua"
+    content = mw.readFile(config_tpl)
+    content = contentReplace(content)
+    mw.writeFile(config, content)
+
     errlog = mw.getServerDir() + "/openresty/nginx/logs/error.log"
     mw.execShell('rm -rf ' + errlog)
 
