@@ -528,7 +528,7 @@ function _M.get_sn(self, config_domains)
             end
         end
     end
-    return request_name
+    return "unset"
 end
 
 function _M.get_random(self,n) 
