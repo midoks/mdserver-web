@@ -423,7 +423,7 @@ function _M.cron(self)
                 -- url统计
                 if local_url_stats then
                     for url_md5,url_val in pairs(local_url_stats) do
-                        self:update_statistics_uri( db, url_val["uri"],url_md5, url_val["url_num"], url_val["body_length"])
+                        self:update_statistics_uri( db, tostring(url_val["uri"]),url_md5, url_val["url_num"], url_val["body_length"])
                     end
                 end
 
