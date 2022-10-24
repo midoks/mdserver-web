@@ -45,7 +45,7 @@ local function initParams()
     data['uri'] = tostring(ngx.unescape_uri(ngx.var.uri))
     data['uri_request_args'] = ngx.req.get_uri_args()
     data['method'] = ngx.req.get_method()
-    data['request_uri'] = ngx.var.request_uri
+    data['request_uri'] = tostring(ngx.var.request_uri)
     data['status_code'] = ngx.status
     data['user_agent'] = data['request_header']['user-agent']
     data['cookie'] = ngx.var.http_cookie
