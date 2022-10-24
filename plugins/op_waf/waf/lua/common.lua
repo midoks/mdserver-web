@@ -83,7 +83,7 @@ function _M.cron(self)
 
 
         if not stmt2 then
-            self:D("waf timer db:prepare fail!")
+            self:D("waf timer db:prepare fail!:"..tostring(stmt2))
             return false
         end
 
