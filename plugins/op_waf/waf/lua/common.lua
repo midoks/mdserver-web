@@ -105,7 +105,7 @@ function _M.cron(self)
 
             local res, err = stmt2:step()
             if tostring(res) == "5" then
-                self.D("waf the step database connection is busy, so it will be stored later.")
+                self:D("waf the step database connection is busy, so it will be stored later.")
                 return false
             end
             stmt2:reset() 
