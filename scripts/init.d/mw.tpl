@@ -245,7 +245,7 @@ case "$1" in
             elif [ "$v6" != "" ]; then
 
                 if [ ! -f $mw_path/data/ipv6.pl ];then
-                    # 需要重启,ipv4才能生效.
+                    #  Need to restart ipv6 to take effect
                     mw_stop
                     mw_start
                     echo 'True' > $mw_path/data/ipv6.pl

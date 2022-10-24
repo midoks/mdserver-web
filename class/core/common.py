@@ -85,7 +85,7 @@ def initInitD():
         mw.execShell('mkdir -p /etc/init.d')
 
     # initd
-    if os.path.exists("/etc/init.d"):
+    if os.path.exists('/etc/init.d'):
         initd_bin = '/etc/init.d/mw'
         if not os.path.exists(initd_bin):
             import shutil
