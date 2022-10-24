@@ -247,7 +247,8 @@ case "$1" in
                 address="MW-Panel-Url: http://[$v6]:$port$auth_path"
 
                 # 需要重启,ipv4才能生效
-                restart
+                mw_stop
+                mw_start
             else
                 address="MW-Panel-Url: http://you-network-ip:$port$auth_path"
             fi
