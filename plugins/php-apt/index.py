@@ -537,7 +537,7 @@ def setSessionConf(version):
     passwd = args['passwd']
     save_handler = args['save_handler']
 
-    if save_handler != "file":
+    if save_handler != "files":
         iprep = r"(2(5[0-5]{1}|[0-4]\d{1})|[0-1]?\d{1,2})\.(2(5[0-5]{1}|[0-4]\d{1})|[0-1]?\d{1,2})\.(2(5[0-5]{1}|[0-4]\d{1})|[0-1]?\d{1,2})\.(2(5[0-5]{1}|[0-4]\d{1})|[0-1]?\d{1,2})"
         if not re.search(iprep, ip):
             return mw.returnJson(False, '请输入正确的IP地址')
