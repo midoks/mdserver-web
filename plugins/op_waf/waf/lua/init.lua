@@ -207,7 +207,7 @@ local function waf_user_agent()
     -- if not config['user-agent']['open'] or not C:is_site_config('user-agent') then return false end
 
     -- C:D("waf_user_agent;user_agent_rules:"..json.encode(user_agent_rules)..",ua:"..tostring(params['request_header']['user-agent']))
-    if C:is_ngx_match_ua(user_agent_rules, params['request_header']['user-agent']) then
+    if C:ngx_match_list(user_agent_rules, params['request_header']['user-agent']) then
         -- C:D("waf_user_agent........... true")
         C:write_log('user_agent','regular')
         C:return_html(config['user-agent']['status'], user_agent_html)
