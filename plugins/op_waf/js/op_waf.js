@@ -1025,7 +1025,7 @@ function wafGloabl(){
 
         con += '<div style="width:645px;margin-top:10px;"><ul class="help-info-text c7">\
             <li>继承: 全局设置将在站点配置中自动继承为默认值</li>\
-            <li>优先级: IP白名单>IP黑名单>URL白名单>URL黑名单>CC防御>禁止国外IP访问>User-Agent>URI过滤>URL参数>Cookie>POST</li>\
+            <li>优先级: IP白名单>IP黑名单>URL白名单>URL黑名单>CC防御>User-Agent>URI过滤>URL参数>Cookie>POST</li>\
             </ul></div>';
         $(".soft-man-con").html(con);
     });
