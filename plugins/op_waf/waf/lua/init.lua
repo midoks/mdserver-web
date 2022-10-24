@@ -22,7 +22,7 @@ local post_html = require "html_post"
 local other_html = require "html_other"
 local user_agent_html = require "html_user_agent"
 local cc_safe_js_html = require "html_safe_js"
-local cookie_html = require "html_safe_js"
+local cookie_html = require "html_cookie"
 
 local args_rules = require "rule_args"
 local ip_white_rules = require "rule_ip_white"
