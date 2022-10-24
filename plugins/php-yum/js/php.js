@@ -349,7 +349,7 @@ function getSessionConfig(version){
         }
         var rdata = rdata.data;
 
-         var cacheList = "<option value='file' " + (rdata.save_handler == "file" ? 'selected' : '') + ">file</option>" +
+         var cacheList = "<option value='files' " + (rdata.save_handler == "files" ? 'selected' : '') + ">files</option>" +
             "<option value='redis' " + (rdata.save_handler == "redis" ? 'selected' : '') + ">redis</option>" +
             "<option value='memcache' " + (rdata.save_handler == "memcache" ? 'selected' : '') + ">memcache</option>" +
             "<option value='memcached' " + (rdata.save_handler == "memcached" ? 'selected' : '') + ">memcached</option>";
