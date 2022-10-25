@@ -110,8 +110,9 @@ def initDreplace():
     pureFtpdConfigBak = getServerDir() + "/etc/pure-ftpd.bak.conf"
     pureFtpdConfigTpl = getPluginDir() + "/conf/pure-ftpd.conf"
 
-    if not os.path.exists(pureFtpdConfigBak):
-        shutil.copyfile(pureFtpdConfig, pureFtpdConfigBak)
+    if not os.path.exists(pureFtpdConfigBak) or not os.path.exists(pureFtpdConfig):
+        if os.path.exists(pureFtpdConfig):
+            shutil.copyfile(pureFtpdConfig, pureFtpdConfigBak)
         content = mw.readFile(pureFtpdConfigTpl)
         content = contentReplace(content)
         mw.writeFile(pureFtpdConfig, content)
