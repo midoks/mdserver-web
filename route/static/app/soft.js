@@ -208,7 +208,7 @@ function addVersion(name, ver, type, obj, title, install_pre_inspection) {
         closeBtn: 1,
         shadeClose: true,
         btn: ['提交','关闭'],
-        content: "<div class='bt-input-text mr5'>\
+        content: "<div class='bt-form pd20 c6'>\
 			<div class='version line'>安装版本：" + option + "</div>\
 	    </div>",
         success:function(){
