@@ -127,6 +127,10 @@ def getList():
 
 
 def createDir():
+    cfg = getServerDir() + "/cfg.json"
+    if not os.path.exists(cfg):
+        return mw.returnJson(False, "未配置FTP,请点击`账户设置`", [])
+
     args = getArgs()
     data = checkArgs(args, ['path', 'name'])
     if not data[0]:
