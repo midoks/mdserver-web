@@ -1,18 +1,10 @@
-function str2Obj(str){
-	var data = {};
-	kv = str.split('&');
-	for(i in kv){
-		v = kv[i].split('=');
-		data[v[0]] = v[1];
-	}
-	return data;
-}
 
 function ftpPost(method,args,callback){
 
 	var _args = null; 
 	if (typeof(args) == 'string'){
-		_args = JSON.stringify(str2Obj(args));
+		strto
+		_args = JSON.stringify(toArrayObject(args));
 	} else {
 		_args = JSON.stringify(args);
 	}
