@@ -1,9 +1,7 @@
 
 function ftpPost(method,args,callback){
-
 	var _args = null; 
 	if (typeof(args) == 'string'){
-		strto
 		_args = JSON.stringify(toArrayObject(args));
 	} else {
 		_args = JSON.stringify(args);
