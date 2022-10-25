@@ -1,0 +1,17 @@
+{
+	"title":"FTP存储空间",
+	"hook":["backup"],
+	"tip":"soft",
+	"name":"backup_ftp",
+	"type":"运行环境",
+	"ps":"将网站或数据库打包备份到FTP存储空间",
+	"versions":["1.0"],
+	"install_pre_inspection":false,
+	"shell":"install.sh",
+	"checks":"server/backup_ftp",
+	"path": "server/backup_ftp",
+	"author":"midoks",
+	"home":"",
+	"date":"2022-10-23",
+	"pid": "4"
+}
