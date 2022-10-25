@@ -21,7 +21,7 @@ Install_App()
 
 Uninstall_App()
 {
-	rm -rf ${serverPath}/bk_demo
+	rm -rf ${serverPath}/backup_ftp
 }
 
 action=$1
