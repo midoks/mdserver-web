@@ -109,7 +109,7 @@ class FtpPSClient:
             ftp.login(self.__user, self.__password)
             return ftp
         except Exception as e:
-            raise OsError("无法连接FTP客户端，请检查配置参数是否正确。")
+            raise OsError("无法连接FTP客户端，请检查配置参数是否正确!")
 
     # 取目录路径
     def getPath(self, path):
