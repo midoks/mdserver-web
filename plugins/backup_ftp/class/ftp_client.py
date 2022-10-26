@@ -379,7 +379,7 @@ class FtpPSClient:
                 files = ftp.nlst(path)
                 mlsd = False
             except:
-                raise RuntimeError("ftp服务器数据返回异常。")
+                raise RuntimeError("FTP服务器数据返回异常!")
         ftp.close()
         # print(files)
         f_list = []
