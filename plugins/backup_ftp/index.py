@@ -100,15 +100,12 @@ def setConf():
     try:
         ftp = FtpPSClient(load_config=False)
         ftp.injection_config(args)
-        data = ftp.getList()
+        data = ftp.getList("/")
         if data:
             mw.writeFile(cfg, mw.getJson(args))
             return mw.returnJson(True, '设置成功', [])
     except Exception as e:
-        # print(str(e))
-        pass
-
-    return mw.returnJson(False, 'FTP校验失败，请核实!', [])
+        return mw.returnJson(False, "FTP校验失败，请核实!\n" + str(e), [])
 
 
 def getList():
