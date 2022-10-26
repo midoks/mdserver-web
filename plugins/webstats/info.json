@@ -1,6 +1,6 @@
 {
 	"sort": 7,
-	"ps": "[DEV]网站统计报表[此插件-需要小白鼠反馈问题,慎用!]",
+	"ps": "网站统计报表",
 	"name": "webstats",
 	"title": "网站统计",
 	"shell": "install.sh",

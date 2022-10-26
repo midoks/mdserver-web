@@ -92,11 +92,15 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.9.14
+### 版本更新 0.10.0
 
-* 优化网站统计插件，提搞速度和并发数。
-* mysql8安装地址更新。
 * OP防火墙优化。
+* OP防火墙-添加URL白名单功能。
+* 网站统计优化。
+* 添加`FTP存储空间`插件。
+* 初始安装IPv6安装。
+* phpMyAdmin优化。
+
 
 ### JSDelivr安装地址
 
