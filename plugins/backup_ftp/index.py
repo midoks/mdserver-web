@@ -118,9 +118,12 @@ def getList():
     if not data[0]:
         return data[1]
 
-    ftp = FtpPSClient()
-    flist = ftp.getList(args['path'])
-    return mw.returnJson(True, "ok", flist)
+    try:
+        ftp = FtpPSClient()
+        flist = ftp.getList(args['path'])
+        return mw.returnJson(True, "ok", flist)
+    except Exception as e:
+        return mw.returnJson(False, str(e), [])
 
 
 def createDir():

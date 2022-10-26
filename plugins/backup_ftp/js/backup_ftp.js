@@ -184,7 +184,9 @@ function osList(path){
         
         var rdata = $.parseJSON(rdata.data);
         if(rdata.status === false){
-            upyunApi();
+            showMsg(rdata.msg,function(){
+                upyunApi();
+            },{icon:2},2000);
             return;
         }
 
