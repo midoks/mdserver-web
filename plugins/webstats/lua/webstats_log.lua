@@ -332,7 +332,7 @@ log_by_lua_block {
 		local request_time = C:get_request_time()
 		local client_port = ngx.var.remote_port
 		local real_server_name = input_sn
-		local uri = ngx.var.uri
+		local uri = tostring(ngx.var.uri)
 		local status_code = ngx.status
 		local protocol = ngx.var.server_protocol
 		local request_uri = ngx.var.request_uri

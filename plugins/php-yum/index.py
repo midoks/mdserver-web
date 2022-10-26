@@ -539,7 +539,7 @@ def setSessionConf(version):
     passwd = args['passwd']
     save_handler = args['save_handler']
 
-    if save_handler != "file":
+    if save_handler != "files":
         iprep = r"(2(5[0-5]{1}|[0-4]\d{1})|[0-1]?\d{1,2})\.(2(5[0-5]{1}|[0-4]\d{1})|[0-1]?\d{1,2})\.(2(5[0-5]{1}|[0-4]\d{1})|[0-1]?\d{1,2})\.(2(5[0-5]{1}|[0-4]\d{1})|[0-1]?\d{1,2})"
         if not re.search(iprep, ip):
             return mw.returnJson(False, '请输入正确的IP地址')
@@ -607,7 +607,7 @@ def setSessionConf(version):
             phpini = re.sub('\n;session.save_path = "/tmp"',
                             '\n;session.save_path = "/tmp"' + val, phpini)
 
-    if save_handler == "file":
+    if save_handler == "files":
         rep = r'\nsession.save_path\s*=\s*(.+)\r?\n'
         val = r'\nsession.save_path = "' + session_tmp + '"\n'
         if re.search(rep, phpini):

@@ -724,7 +724,7 @@ def checkIp(ip):
 
 def checkPort(port):
     # 检查端口是否合法
-    ports = ['21', '25', '7200', '888']
+    ports = ['21', '25', '443', '888']
     if port in ports:
         return False
     intport = int(port)

@@ -349,7 +349,7 @@ function getSessionConfig(version){
         }
         var rdata = rdata.data;
 
-         var cacheList = "<option value='file' " + (rdata.save_handler == "file" ? 'selected' : '') + ">file</option>" +
+         var cacheList = "<option value='files' " + (rdata.save_handler == "files" ? 'selected' : '') + ">files</option>" +
             "<option value='redis' " + (rdata.save_handler == "redis" ? 'selected' : '') + ">redis</option>" +
             "<option value='memcache' " + (rdata.save_handler == "memcache" ? 'selected' : '') + ">memcache</option>" +
             "<option value='memcached' " + (rdata.save_handler == "memcached" ? 'selected' : '') + ">memcached</option>";
@@ -374,7 +374,7 @@ function getSessionConfig(version){
 
         $(".soft-man-con").html(con);
 
-        if (rdata.save_handler == 'file'){
+        if (rdata.save_handler == 'files'){
             $('input[name="ip"]').attr('disabled','disabled');
             $('input[name="port"]').attr('disabled','disabled');
             $('input[name="passwd"]').attr('placeholder','如果没有密码留空');
@@ -405,7 +405,7 @@ function getSessionConfig(version){
                     $('input[name="port"]').removeAttr('disabled');
                     $('input[name="passwd"]').removeAttr('disabled');
                     break;
-                case 'file':
+                case 'files':
                     $('input[name="ip"]').val("").attr('disabled','disabled');
                     $('input[name="port"]').val("").attr('disabled','disabled');
                     $('input[name="passwd"]').val("").attr('disabled','disabled');

@@ -68,8 +68,8 @@ class crontab_api:
                     _list[i]['where_hour']), str(_list[i]['where_minute'])))
             data.append(tmp)
 
-        _ret = {}
-        _ret['data'] = data
+        rdata = {}
+        rdata['data'] = data
 
         count = mw.M('crontab').where('', ()).count()
         _page = {}
@@ -78,9 +78,17 @@ class crontab_api:
         _page['row'] = psize
         _page['tojs'] = "getCronData"
 
-        _ret['list'] = mw.getPage(_page)
-        _ret['p'] = p
-        return mw.getJson(_ret)
+        rdata['list'] = mw.getPage(_page)
+        rdata['p'] = p
+
+        # backup hock
+        bh_file = mw.getPanelDataDir() + "/hook_backup.json"
+        if os.path.exists(bh_file):
+            hb_data = mw.readFile(bh_file)
+            hb_data = json.loads(hb_data)
+            rdata['backup_hook'] = hb_data
+
+        return mw.getJson(rdata)
 
     # 设置计划任务状态
     def setCronStatusApi(self):
@@ -409,6 +417,15 @@ class crontab_api:
             shell = param.sFile
         else:
             head = "#!/bin/bash\nPATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin\nexport PATH\n"
+
+            source_bin_activate = '''
+MW_PATH=%s/bin/activate
+if [ -f $MW_PATH ];then
+    source $MW_PATH
+fi
+            ''' % (mw.getRunDir(),)
+
+            head = head + source_bin_activate + "\n"
             log = '.log'
 
             script_dir = mw.getServerDir() + "/mdserver-web/scripts"

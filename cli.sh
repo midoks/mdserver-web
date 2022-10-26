@@ -9,7 +9,7 @@ if [ -f bin/activate ];then
 	source bin/activate
 fi
 
-# export LC_ALL="en_US.UTF-8"
+export LC_ALL="en_US.UTF-8"
 
 
 mw_start_task()

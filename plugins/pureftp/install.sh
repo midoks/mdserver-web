@@ -53,8 +53,8 @@ Install_pureftp()
 
 	# curl -sSLo pure-ftpd-1.0.49.tar.gz https://download.pureftpd.org/pub/pure-ftpd/releases/pure-ftpd-1.0.49.tar.gz
 	if [ ! -f $serverPath/source/pureftp/pure-ftpd-${VER}.tar.gz ];then
-		# wget --no-check-certificate -O $serverPath/source/pureftp/pure-ftpd-${VER}.tar.gz $DOWNLOAD
-		curl -sSLo $serverPath/source/pureftp/pure-ftpd-${VER}.tar.gz $DOWNLOAD
+		wget --no-check-certificate -O $serverPath/source/pureftp/pure-ftpd-${VER}.tar.gz $DOWNLOAD
+		# curl -sSLo $serverPath/source/pureftp/pure-ftpd-${VER}.tar.gz $DOWNLOAD
 	fi
 
 	#检测文件是否损坏.
@@ -66,7 +66,8 @@ Install_pureftp()
 		else
 			# 重新下载
 			rm -rf $serverPath/source/pureftp/pure-ftpd-${VER}
-			curl -sSLo $serverPath/source/pureftp/pure-ftpd-${VER}.tar.gz $DOWNLOAD
+			wget --no-check-certificate -O $serverPath/source/pureftp/pure-ftpd-${VER}.tar.gz $DOWNLOAD
+			# curl -sSLo $serverPath/source/pureftp/pure-ftpd-${VER}.tar.gz $DOWNLOAD
 		fi
 	fi
 
@@ -75,7 +76,24 @@ Install_pureftp()
 	fi
 
 	cd $serverPath/source/pureftp/pure-ftpd-${VER} &&  ./configure --prefix=${serverPath}/pureftp \
-　　 	--with-everything && make && make install && make clean
+　　 	CFLAGS=-O2 \
+		--with-puredb \
+		--with-quotas \
+		--with-cookie \
+		--with-virtualhosts \
+		--with-diraliases \
+		--with-sysquotas \
+		--with-ratios \
+		--with-altlog \
+		--with-paranoidmsg \
+		--with-shadow \
+		--with-welcomemsg \
+		--with-throttling \
+		--with-uploadscript \
+		--with-language=english \
+		--with-rfc2640 \
+		--with-ftpwho \
+		--with-tls && make && make install && make clean
 	
 	if [ -d ${serverPath}/pureftp ];then 
 		echo "${1}" > ${serverPath}/pureftp/version.pl

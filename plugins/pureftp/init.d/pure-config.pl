@@ -10,7 +10,7 @@ my ($conffile, @flg) = @ARGV;
 my $PUREFTPD;
 -x && ($PUREFTPD=$_, last) for qw(
         {$SERVER_PATH}/pureftp/sbin/pure-ftpd
-        /www/server/pure-ftpd/sbin/pure-ftpd
+        /www/server/pureftp/sbin/pure-ftpd
         /www/server/pureftpd/sbin/pure-ftpd
         /www/server/sbin/pure-ftpd
         /usr/sbin/pure-ftpd

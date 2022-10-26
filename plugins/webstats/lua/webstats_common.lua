@@ -149,7 +149,7 @@ function _M.get_sn(self, input_sn)
             cache:set(input_sn, v['name'], 86400)
             return v["name"]
         end
-
+        -- self:D("get_sn:"..json.encode(v))
         for _,dst_domain in ipairs(v['domains'])
         do
             if input_sn == dst_domain then
@@ -423,7 +423,7 @@ function _M.cron(self)
                 -- url统计
                 if local_url_stats then
                     for url_md5,url_val in pairs(local_url_stats) do
-                        self:update_statistics_uri( db, url_val["uri"],url_md5, url_val["url_num"], url_val["body_length"])
+                        self:update_statistics_uri( db, tostring(url_val["uri"]),url_md5, url_val["url_num"], url_val["body_length"])
                     end
                 end
 

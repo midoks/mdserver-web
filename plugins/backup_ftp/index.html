@@ -1,0 +1,101 @@
+<style>
+.upyunCon {
+    height: 428px;
+}
+
+.up-place {
+    height: 62px;
+    border-bottom: 1px solid #ddd;
+}
+
+.up-place .btn {
+    border-radius: 0;
+}
+
+.up-place .place-input {
+    background-color: #f3f3f3;
+    border: 1px solid #ccc;
+    height: 30px;
+    line-height: 28px;
+    overflow: hidden;
+    margin: 1px 0 0 -1px;
+    width: 340px;
+}
+
+.place-input ul {
+    display: inline-block;
+    position: relative;
+    width: auto;
+}
+
+.place-input ul li {
+    background: url("/static/img/ico/ico-ltr.png") no-repeat right center;
+    float: left;
+    padding-left: 10px;
+    padding-right: 18px;
+}
+
+.place-input ul li a {
+    height: 28px;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.upyunlist {
+    height: 516px;
+    overflow: auto;
+}
+
+.up-bottom {
+    background-color: #fafafa;
+    border-top: 1px solid #eee;
+    bottom: 0;
+    position: absolute;
+    width: 100%;
+}
+
+.up-use {
+    line-height: 50px
+}
+
+.list-list .cursor span {
+    line-height: 30px;
+}
+
+.btn-title {
+    margin-top: 1px
+}
+
+.tip {
+    font-size: 10px;
+    font-style: oblique;
+    color: green;
+}
+</style>
+<div class="upyunCon">
+    <div class="up-place pd15">
+        <button id="backBtn" class="btn btn-default btn-sm glyphicon glyphicon-arrow-left pull-left" title="后退"></button>
+        <input id="myPath" style="display:none;" type="text" value="">
+        <div class="place-input pull-left">
+            <div style="width:1400px;height:28px"><ul></ul></div>
+        </div>
+        <button class="refreshBtn btn btn-default btn-sm glyphicon glyphicon-refresh pull-left mr20" title="刷新" style="margin-left:-1px;"></button>
+        <button class="btn btn-default btn-sm pull-right btn-title" onclick="upyunApi()">帐户设置</button>
+        <button class="btn btn-default btn-sm pull-right mr20 btn-title" onclick="createDir()">新建文件夹</button>
+    </div>
+
+    <div class="upyunlist pd15">
+        <div class="divtable" style="margin-bottom:15px">
+            <table class="table table-hover">
+                <thead><tr><th>名称</th><th>大小</th><th>更新时间</th><th class="text-right">操作</th></tr></thead>
+                <tbody class="list-list"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+$.getScript( "/plugins/file?name=backup_ftp&f=js/backup_ftp.js", function(){
+    osList('/');
+});
+</script>

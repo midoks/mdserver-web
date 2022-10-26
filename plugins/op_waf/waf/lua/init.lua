@@ -22,6 +22,7 @@ local post_html = require "html_post"
 local other_html = require "html_other"
 local user_agent_html = require "html_user_agent"
 local cc_safe_js_html = require "html_safe_js"
+local cookie_html = require "html_cookie"
 
 local args_rules = require "rule_args"
 local ip_white_rules = require "rule_ip_white"
@@ -32,6 +33,7 @@ local user_agent_rules = require "rule_user_agent"
 local post_rules = require "rule_post"
 local cookie_rules = require "rule_cookie"
 local url_rules = require "rule_url"
+local url_white_rules = require "rule_url_white"
 
 
 local server_name = string.gsub(C:get_sn(config_domains),'_','.')
@@ -42,10 +44,10 @@ local function initParams()
     data['ip'] = C:get_real_ip(server_name)
     data['ipn'] = C:arrip(data['ip'])
     data['request_header'] = ngx.req.get_headers()
-    data['uri'] = ngx.unescape_uri(ngx.var.uri)
+    data['uri'] = tostring(ngx.unescape_uri(ngx.var.uri))
     data['uri_request_args'] = ngx.req.get_uri_args()
     data['method'] = ngx.req.get_method()
-    data['request_uri'] = ngx.var.request_uri
+    data['request_uri'] = tostring(ngx.var.request_uri)
     data['status_code'] = ngx.status
     data['user_agent'] = data['request_header']['user-agent']
     data['cookie'] = ngx.var.http_cookie
@@ -180,6 +182,13 @@ local function waf_ip_white()
     return false
 end
 
+local function waf_url_white()
+    if C:ngx_match_list(url_white_rules, params['uri']) then
+        return true
+    end
+    return false
+end
+
 local function waf_ip_black()
     -- ipv4 ip black
     for _,rule in ipairs(ip_black_rules)
@@ -207,7 +216,7 @@ local function waf_user_agent()
     -- if not config['user-agent']['open'] or not C:is_site_config('user-agent') then return false end
 
     -- C:D("waf_user_agent;user_agent_rules:"..json.encode(user_agent_rules)..",ua:"..tostring(params['request_header']['user-agent']))
-    if C:is_ngx_match_ua(user_agent_rules, params['request_header']['user-agent']) then
+    if C:ngx_match_list(user_agent_rules, params['request_header']['user-agent']) then
         -- C:D("waf_user_agent........... true")
         C:write_log('user_agent','regular')
         C:return_html(config['user-agent']['status'], user_agent_html)
@@ -295,16 +304,15 @@ local function is_open_waf_cc_increase()
         return true
     end
 
-    if site_config[server_name]['safe_verify']['open'] then
-        return true
-    end
-
+    -- C:D("waf config:"..json.encode(config))
     if cpu_percent >= config['safe_verify']['cpu'] then
         return true
     end
 
-    if cpu_percent >= site_config[server_name]['safe_verify']['cpu'] then
-        return true
+    if site_config[server_name] and site_config[server_name]['safe_verify']['open'] then
+        if cpu_percent >= site_config[server_name]['safe_verify']['cpu'] then
+            return true
+        end
     end
 
     return false
@@ -440,7 +448,7 @@ local function post_X_Forwarded()
     if not config['post']['open'] or not C:is_site_config('post') then return false end   
     if params['method'] ~= "POST" then return false end
     if not params["request_header"]['X-forwarded-For'] then return false end
-    if C:is_ngx_match_list(post_rules, params["request_header"]['X-forwarded-For']) then
+    if C:ngx_match_list(post_rules, params["request_header"]['X-forwarded-For']) then
         C:write_log('post','regular')
         C:return_html(config['post']['status'], post_html)
         return true
@@ -467,7 +475,7 @@ end
 
 local function disable_upload_ext(ext)
     if not ext then return false end
-    ext = string.lower(ext)
+    local ext = string.lower(ext)
     if C:is_key(site_config[server_name]['disable_upload_ext'], ext) then
         C:write_log('upload_ext', '上传扩展名黑名单')
         C:return_html(config['other']['status'],other_html)
@@ -516,6 +524,9 @@ function waf()
 
     -- white ip
     if waf_ip_white() then return true end
+
+    -- url white
+    if waf_url_white() then return true end
 
     -- black ip
     if waf_ip_black() then return true end

@@ -76,10 +76,16 @@ function _M.cron(self)
 
         local db = self:initDB()
 
+        db:exec([[BEGIN TRANSACTION]])
+
         local stmt2 = db:prepare[[INSERT INTO logs(time, ip, domain, server_name, method, status_code, uri, user_agent, rule_name, reason) 
             VALUES(:time, :ip, :domain, :server_name, :method, :status_code, :uri, :user_agent, :rule_name, :reason)]]
 
-        db:exec([[BEGIN TRANSACTION]])
+
+        if not stmt2 then
+            self:D("waf timer db:prepare fail!:"..tostring(stmt2))
+            return false
+        end
 
         for i=1,llen do
             local data, _ = ngx.shared.waf_limit:lpop('waf_limit_logs')
@@ -105,7 +111,7 @@ function _M.cron(self)
 
             local res, err = stmt2:step()
             if tostring(res) == "5" then
-                self.D("waf the step database connection is busy, so it will be stored later.")
+                self:D("waf the step database connection is busy, so it will be stored later.")
                 return false
             end
             stmt2:reset() 
@@ -522,7 +528,7 @@ function _M.get_sn(self, config_domains)
             end
         end
     end
-    return request_name
+    return "unset"
 end
 
 function _M.get_random(self,n) 

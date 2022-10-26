@@ -124,6 +124,10 @@ def contentReplace(content):
         content = content.replace('{$CHOOSE_DB}', 'MariaDB')
         content = content.replace('{$CHOOSE_DB_DIR}', 'mariadb')
 
+    port = cfg["port"]
+    rep = 'listen\s*(.*);'
+    content = re.sub(rep, "listen " + port + ';', content)
+
     return content
 
 
@@ -284,6 +288,8 @@ def setPmaPort():
     rep = 'listen\s*(.*);'
     content = re.sub(rep, "listen " + port + ';', content)
     mw.writeFile(file, content)
+
+    setCfg("port", port)
     mw.restartWeb()
     return mw.returnJson(True, '修改成功!')
 

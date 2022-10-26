@@ -146,7 +146,7 @@ def initSiteInfo():
             site_contents_new[name] = site_contents[name]
         else:
             tmp = {}
-            tmp['cdn'] = False
+            tmp['cdn'] = True
             tmp['log'] = True
             tmp['get'] = True
             tmp['post'] = True
@@ -253,6 +253,7 @@ def contentReplace(content):
 
 
 def autoMakeLuaConfSingle(file):
+    # path = getPluginDir() + "/waf/rule/" + file + ".json"
     path = getServerDir() + "/waf/rule/" + file + ".json"
     to_path = getServerDir() + "/waf/conf/rule_" + file + ".lua"
     content = mw.readFile(path)
@@ -280,7 +281,7 @@ def autoMakeLuaHtmlSingle(file):
 def autoMakeLuaConf():
     conf_list = ['args', 'cookie', 'ip_black', 'ip_white',
                  'ipv6_black', 'post', 'scan_black', 'url',
-                 'user_agent']
+                 'url_white', 'user_agent']
     for x in conf_list:
         autoMakeLuaConfSingle(x)
 
@@ -423,6 +424,15 @@ def restart():
 
 def reload():
     stop()
+
+    path = getServerDir()
+    path_tpl = getPluginDir()
+
+    config = path + "/waf/lua/init.lua"
+    config_tpl = path_tpl + "/waf/lua/init.lua"
+    content = mw.readFile(config_tpl)
+    content = contentReplace(content)
+    mw.writeFile(config, content)
 
     errlog = mw.getServerDir() + "/openresty/nginx/logs/error.log"
     mw.execShell('rm -rf ' + errlog)

@@ -101,7 +101,8 @@ yum install -y pcre pcre-devel
 yum install -y icu libicu-devel 
 yum install -y freetype freetype-devel
 yum install -y openssl openssl-devel
-yum install -y graphviz libxml2 libxml2-devel
+yum install -y libxml2 libxml2-devel
+yum install -y graphviz
 yum install -y sqlite-devel
 yum install -y oniguruma oniguruma-devel
 yum install -y ImageMagick ImageMagick-devel
