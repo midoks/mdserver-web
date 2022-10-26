@@ -409,6 +409,15 @@ class crontab_api:
             shell = param.sFile
         else:
             head = "#!/bin/bash\nPATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin\nexport PATH\n"
+
+            source_bin_activate = '''
+MW_PATH=%s/bin/activate
+if [ -f $MW_PATH ];then
+    source $MW_PATH
+fi
+            ''' % (mw.getRunDir(),)
+
+            head = head + source_bin_activate + "\n"
             log = '.log'
 
             script_dir = mw.getServerDir() + "/mdserver-web/scripts"
