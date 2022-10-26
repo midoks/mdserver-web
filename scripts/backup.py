@@ -42,14 +42,18 @@ class backupTools:
 
         filename = backup_path + "/web_" + name + "_" + \
             time.strftime('%Y%m%d_%H%M%S', time.localtime()) + '.tar.gz'
-        mw.execShell("cd " + os.path.dirname(path) + " && tar zcvf '" +
-                     filename + "' '" + os.path.basename(path) + "' > /dev/null")
+
+        cmd = "cd " + os.path.dirname(path) + " && tar zcvf '" + \
+            filename + "' '" + os.path.basename(path) + "' > /dev/null"
+
+        # print(cmd)
+        mw.execShell(cmd)
 
         endDate = time.strftime('%Y/%m/%d %X', time.localtime())
 
         print(filename)
         if not os.path.exists(filename):
-            log = "网站[" + name + u"]备份失败!"
+            log = "网站[" + name + "]备份失败!"
             print("★[" + endDate + "] " + log)
             print(
                 "----------------------------------------------------------------------------")
@@ -60,7 +64,7 @@ class backupTools:
         sql.table('backup').add('type,name,pid,filename,addtime,size', ('0', os.path.basename(
             filename), pid, filename, endDate, os.path.getsize(filename)))
         log = "网站[" + name + "]备份成功,用时[" + str(round(outTime, 2)) + "]秒"
-        mw.writeLog(u'计划任务', log)
+        mw.writeLog('计划任务', log)
         print("★[" + endDate + "] " + log)
         print("|---保留最新的[" + count + "]份备份")
         print("|---文件名:" + filename)

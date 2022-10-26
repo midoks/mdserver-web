@@ -163,10 +163,56 @@ def deleteFile():
         return data[1]
 
     ftp = FtpPSClient()
-    isok = ftp.deleteFile(args['filename'])
+    isok = ftp.deleteFile(args['path'] + "/" + args['filename'])
     if isok:
         return mw.returnJson(True, "删除成功")
     return mw.returnJson(False, "删除失败")
+
+
+def backupAllFunc(stype):
+    os.chdir(mw.getRunDir())
+
+    name = sys.argv[2]
+    num = sys.argv[3]
+
+    args = stype + " " + name + " " + num
+
+    cmd = 'python3 ' + mw.getRunDir() + '/scripts/backup.py ' + args
+    os.system(cmd)
+
+    # 开始执行上传信息
+
+    prefix_dict = {
+        "site": "web",
+        "database": "db",
+        "path": "path",
+    }
+
+    find_path = mw.getBackupDir() + '/' + stype + '/' + \
+        prefix_dict[stype] + '_' + name
+
+    find_new_file = "ls " + find_path + \
+        "_* | grep tar.gz | cut -d \  -f 1 | awk 'END {print}'"
+
+    filename = mw.execShell(find_new_file)[0].strip()
+    # print("filename:", filename)
+
+    ftp = FtpPSClient()
+    ftp.uploadFile(filename, stype)
+
+    return True
+
+
+def backupSite():
+    # 备份站点
+    pass
+
+
+def in_array(name, arr=[]):
+    for x in arr:
+        if name == x:
+            return True
+    return False
 
 
 def installPreInspection():
@@ -198,5 +244,7 @@ if __name__ == "__main__":
         print(deleteDir())
     elif func == 'delete_file':
         print(deleteFile())
+    elif in_array(func, ['site', 'database', 'path']):
+        print(backupAllFunc(func))
     else:
         print('error')

@@ -22,6 +22,12 @@ function bkfPost(method,args,callback){
     },'json'); 
 }
 
+function getFtpLocalTime(data){
+    var str = data.slice(0,4)+"/"+data.slice(4,6)+"/"+data.slice(6,8)
+        + " " + data.slice(8,10)+":"+data.slice(10,12)+":"+data.slice(12,14);
+    return str;
+}
+
 // 自定义部分
 var i = null;
 //设置API
@@ -195,7 +201,7 @@ function osList(path){
             }else{
                 listFiles += '<tr><td class="cursor"><span class="ico ico-file"></span>\<span>'+mlist.list[i].name+'</span></td>\
                 <td>'+toSize(mlist.list[i].size)+'</td>\
-                <td>'+getLocalTime(mlist.list[i].time)+'</td>\
+                <td>'+getFtpLocalTime(mlist.list[i].time)+'</td>\
                 <td class="text-right"><a target="_blank" href="'+mlist.list[i].download+'" class="btlink">下载</a> | <a class="btlink" onclick="deleteFile(\''+mlist.list[i].name+'\', false)">删除</a></td></tr>'
             }
         }
@@ -225,11 +231,11 @@ function osList(path){
 
         upPathLeft();
 
-        $('#backBtn').click(function() {
+        $('#backBtn').unbind().click(function() {
             osList(backPath);
         });
 
-        $('.upyunCon .refreshBtn').click(function(){
+        $('.upyunCon .refreshBtn').unbind().click(function(){
             osList(path);
         });
     });
