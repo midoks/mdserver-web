@@ -59,6 +59,7 @@ Install_openresty()
 	cd ${openrestyDir}/openresty-${VERSION} && ./configure \
 	--prefix=$serverPath/openresty \
 	--with-ipv6 \
+	--with-stream \
 	--with-http_v2_module \
 	--with-http_ssl_module  \
 	--with-http_slice_module \
