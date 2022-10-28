@@ -112,7 +112,9 @@ function orPluginOpServiceOp(a,b,c,d,a,v,request_callback){
 
 //查看Nginx负载状态
 function getOpenrestyStatus() {
+    var loadT = layer.msg('正在处理，请稍后...', { icon: 16, time: 0, shade: 0.3 });
     $.post('/plugins/run', {name:'openresty', func:'run_info'}, function(data) {
+        layer.close(loadT);
         if (!data.status){
             showMsg(data.msg, function(){}, null,3000);
             return;
