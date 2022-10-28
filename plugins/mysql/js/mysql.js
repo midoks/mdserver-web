@@ -1352,7 +1352,7 @@ function repTools(db_name, res){
             type: 1,
             title: "MySQL工具箱【" + db_name + "】",
             area: ['780px', '580px'],
-            closeBtn: 2,
+            closeBtn: 1,
             shadeClose: false,
             content: '<div class="pd15">\
                             <div class="db_list">\
