@@ -1323,7 +1323,8 @@ function uploadFiles(){
 		title:lan.files.up_title,
 		area: ['500px','300px'], 
 		shadeClose:false,
-		content:'<div class="fileUploadDiv"><input type="hidden" id="input-val" value="'+path+'" />\
+		content:'<div class="fileUploadDiv">\
+				<input type="hidden" id="input-val" value="'+path+'" />\
 				<input type="file" id="file_input"  multiple="true" autocomplete="off" />\
 				<button type="button"  id="opt" autocomplete="off">添加文件</button>\
 				<button type="button" id="up" autocomplete="off" >开始上传</button>\
@@ -1337,7 +1338,8 @@ function uploadFiles(){
 				</select>\
 				</span>\
 				<button type="button" id="filesClose" autocomplete="off" onClick="layer.closeAll()" >关闭</button>\
-				<ul id="up_box"></ul></div>'
+				<ul id="up_box"></ul>\
+			</div>'
 	});
 	uploadStart();
 }
