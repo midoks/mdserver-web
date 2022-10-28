@@ -663,33 +663,15 @@ function setDbPass(id, username, password){
 }
 
 function addDatabase(type){
-    if (type==1){
-        var data = $("#add_db").serialize();
-        data = decodeURIComponent(data);
-        var dataObj = toArrayObject(data);
-        if(!dataObj['address']){
-            dataObj['address'] = dataObj['dataAccess'];
-        }
-        myPost('add_db', dataObj, function(data){
-            var rdata = $.parseJSON(data.data);
-            showMsg(rdata.msg,function(){
-                if (rdata.status){
-                    dbList();
-                }
-                $('.layui-layer-close1').click();
-            },{icon: rdata.status ? 1 : 2},600);
-        });
-        return;
-    }
-    var index = layer.open({
+    layer.open({
         type: 1,
-        skin: 'demo-class',
         area: '500px',
         title: '添加数据库',
         closeBtn: 1,
         shift: 5,
         shadeClose: true,
-        content: "<form class='bt-form pd20 pb70' id='add_db'>\
+        btn:["提交","关闭"],
+        content: "<form class='bt-form pd20' id='add_db'>\
                     <div class='line'>\
                         <span class='tname'>数据库名</span>\
                         <div class='info-r'><input name='name' class='bt-input-text mr5' placeholder='新的数据库名称' type='text' style='width:65%' value=''>\
@@ -717,28 +699,39 @@ function addDatabase(type){
                         </div>\
                     </div>\
                     <input type='hidden' name='ps' value='' />\
-                    <div class='bt-form-submit-btn'>\
-                        <button id='my_mod_close' type='button' class='btn btn-danger btn-sm btn-title'>关闭</button>\
-                        <button type='button' class='btn btn-success btn-sm btn-title' onclick=\"addDatabase(1)\" >提交</button>\
-                    </div>\
                   </form>",
-    });
+        success:function(){
+            $("input[name='name']").keyup(function(){
+                var v = $(this).val();
+                $("input[name='db_user']").val(v);
+                $("input[name='ps']").val(v);
+            });
 
-    $("input[name='name']").keyup(function(){
-        var v = $(this).val();
-        $("input[name='db_user']").val(v);
-        $("input[name='ps']").val(v);
-    });
-
-    $('#my_mod_close').click(function(){
-        $('.layui-layer-close1').click();
-    });
-    $('select[name="dataAccess"]').change(function(){
-        var v = $(this).val();
-        if (v == 'ip'){
-            $(this).after("<input id='dataAccess_subid' class='bt-input-text mr5' type='text' name='address' placeholder='多个IP使用逗号(,)分隔' style='width: 230px; display: inline-block;'>");
-        } else {
-            $('#dataAccess_subid').remove();
+            $('select[name="dataAccess"]').change(function(){
+                var v = $(this).val();
+                if (v == 'ip'){
+                    $(this).after("<input id='dataAccess_subid' class='bt-input-text mr5' type='text' name='address' placeholder='多个IP使用逗号(,)分隔' style='width: 230px; display: inline-block;'>");
+                } else {
+                    $('#dataAccess_subid').remove();
+                }
+            });
+        },
+        yes:function(index) {
+            var data = $("#add_db").serialize();
+            data = decodeURIComponent(data);
+            var dataObj = toArrayObject(data);
+            if(!dataObj['address']){
+                dataObj['address'] = dataObj['dataAccess'];
+            }
+            myPost('add_db', dataObj, function(data){
+                var rdata = $.parseJSON(data.data);
+                showMsg(rdata.msg,function(){
+                    if (rdata.status){
+                        layer.close(index);
+                        dbList();
+                    }
+                },{icon: rdata.status ? 1 : 2},600);
+            });
         }
     });
 }
@@ -750,7 +743,6 @@ function delDb(id, name){
             var rdata = $.parseJSON(data.data);
             showMsg(rdata.msg,function(){
                 dbList();
-                $('.layui-layer-close1').click();
             },{icon: rdata.status ? 1 : 2}, 600);
         });
     });
