@@ -111,7 +111,7 @@ function orPluginOpServiceOp(a,b,c,d,a,v,request_callback){
 
 
 //查看Nginx负载状态
-function getOpenrestyStatus() {
+function getOpStatus() {
     var loadT = layer.msg('正在处理，请稍后...', { icon: 16, time: 0, shade: 0.3 });
     $.post('/plugins/run', {name:'openresty', func:'run_info'}, function(data) {
         layer.close(loadT);
@@ -136,3 +136,78 @@ function getOpenrestyStatus() {
         }
     },'json');
 }
+
+
+function setOpCfg(){
+    orPost('get_cfg', {}, function(data){
+        var rdata = $.parseJSON(data.data);
+        var rdata = rdata.data;
+        console.log(rdata);
+
+        var mlist = '';
+        for (var i = 0; i < rdata.length; i++) {
+            var w = '70'
+            var ibody = '<input style="width: ' + w + 'px;" class="bt-input-text mr5" name="' + rdata[i].name + '" value="' + rdata[i].value + '" type="text" >';
+            switch (rdata[i].type) {
+                case 0:
+                    var selected_1 = (rdata[i].value == 1) ? 'selected' : '';
+                    var selected_0 = (rdata[i].value == 0) ? 'selected' : '';
+                    ibody = '<select class="bt-input-text mr5" name="' + rdata[i].name + '" style="width: ' + w + 'px;">\
+                        <option value="1" ' + selected_1 + '>开启</option>\
+                        <option value="0" ' + selected_0 + '>关闭</option>\
+                    </select>';
+                    break;
+                case 1:
+                    var selected_1 = (rdata[i].value == 'on') ? 'selected' : '';
+                    var selected_0 = (rdata[i].value == 'off') ? 'selected' : '';
+                    ibody = '<select class="bt-input-text mr5" name="' + rdata[i].name + '" style="width: ' + w + 'px;">\
+                        <option value="on" ' + selected_1 + '>开启</option>\
+                        <option value="off" ' + selected_0 + '>关闭</option>\
+                    </select>';
+                    break;
+            }
+            mlist += '<p style="margin-top:15px;"><span>' + rdata[i].name + '</span>' + ibody + "<b class='unit c9'>"+rdata[i].unit+"</b>" +', <font class="c9">' + rdata[i].ps + '</font></p>';
+        }
+        var con = '<style>.conf_p p{margin-bottom: 2px}</style><div class="conf_p" style="margin-bottom:0">\
+                        ' + mlist + '\
+                        <div style="margin-top:10px; padding-right:15px" class="text-right">\
+                            <button class="btn btn-success btn-sm mr5" onclick="setOpCfg()">刷新</button>\
+                            <button class="btn btn-success btn-sm" onclick="submitConf()">保存</button>\
+                        </div>\
+                    </div>'
+        $(".soft-man-con").html(con);
+    });
+}
+
+function submitConf() {
+    var data = {
+        worker_processes: $("input[name='worker_processes']").val(),
+        worker_connections: $("input[name='worker_connections']").val(),
+        keepalive_timeout: $("input[name='keepalive_timeout']").val(),
+        gzip: $("select[name='gzip']").val() || 'on',
+        gzip_min_length: $("input[name='gzip_min_length']").val(),
+        gzip_comp_level: $("input[name='gzip_comp_level']").val(),
+        client_max_body_size: $("input[name='client_max_body_size']").val(),
+        server_names_hash_bucket_size: $("input[name='server_names_hash_bucket_size']").val(),
+        client_header_buffer_size: $("input[name='client_header_buffer_size']").val(),
+    };
+
+    // console.log(data);
+    orPost('set_cfg', data, function(rdata){
+        var rdata = $.parseJSON(rdata.data);
+        console.log(rdata);
+        layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
+    });
+}
+
+
+
+
+
+
+
+
+
+
+
+
