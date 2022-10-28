@@ -842,35 +842,48 @@ def importDbExternal():
     if not os.path.exists(file_path):
         return mw.returnJson(False, '文件突然消失?')
 
+    exts = ['sql', 'gz', 'zip']
+    tmp = file.split('.')
+    ext = tmp[len(tmp) - 1]
+    if ext not in exts:
+        return mw.returnJson(False, '导入数据库格式不对!')
+
+    tmp = file.split('/')
+    tmpFile = tmp[len(tmp) - 1]
+    tmpFile = tmpFile.replace('.sql.' + ext, '.sql')
+    tmpFile = tmpFile.replace('.' + ext, '.sql')
+    tmpFile = tmpFile.replace('tar.', '')
+
+    # print(tmpFile)
     import_sql = ""
     if file.find("sql.gz") > -1:
         cmd = 'cd ' + import_dir + ' && gzip -dc ' + \
-            file + " > " + import_dir + "tmp.sql"
+            file + " > " + import_dir + tmpFile
         info = mw.execShell(cmd)
         if info[1] == "":
-            import_sql = import_dir + "tmp.sql"
+            import_sql = import_dir + tmpFile
 
     if file.find(".zip") > -1:
         cmd = 'cd ' + import_dir + ' && unzip -o ' + file
         mw.execShell(cmd)
+        import_sql = import_dir + tmpFile
 
     if file.find("tar.gz") > -1:
         cmd = 'cd ' + import_dir + ' && tar -zxvf ' + file
         mw.execShell(cmd)
-
-    if import_sql == "":
-        cmd = 'cd ' + import_dir + ' && ls && grep ".sql$"'
-        sql_name = mw.execShell(cmd)
-        import_sql = import_dir + sql_name[0]
+        import_sql = import_dir + tmpFile
 
     if import_sql == "":
         return mw.returnJson(False, '未找SQL文件')
 
     pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
     sock = getSocketFile()
+
+    os.environ["MYSQL_PWD"] = pwd
     mysql_cmd = getServerDir() + '/bin/mysql -S ' + sock + ' -uroot -p' + \
         pwd + ' ' + name + ' < ' + import_sql
 
+    # print(mysql_cmd)
     os.system(mysql_cmd)
     os.remove(import_sql)
 
