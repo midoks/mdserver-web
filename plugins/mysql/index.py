@@ -851,7 +851,7 @@ def importDbExternal():
             import_sql = import_dir + "tmp.sql"
 
     if file.find(".zip") > -1:
-        cmd = 'cd ' + import_dir + ' && unzip ' + file
+        cmd = 'cd ' + import_dir + ' && unzip -o ' + file
         mw.execShell(cmd)
 
     if file.find("tar.gz") > -1:
