@@ -758,7 +758,7 @@ class files_api:
         try:
             tmps = mw.getRunDir() + '/tmp/panelExec.log'
             if stype == 'zip':
-                os.system("cd " + path + " && unzip -d '" + dfile +
+                os.system("cd " + path + " && unzip -o -d '" + dfile +
                           "' '" + sfile + "' > " + tmps + " 2>&1 &")
             else:
                 sfiles = ''

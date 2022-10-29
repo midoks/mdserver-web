@@ -92,14 +92,15 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.10.0
+### 版本更新 0.10.1
 
-* OP防火墙优化。
-* OP防火墙-添加URL白名单功能。
-* 网站统计优化。
-* 添加`FTP存储空间`插件。
-* 初始安装IPv6安装。
-* phpMyAdmin优化。
+* MySQL添加外部导入功能。
+* OpenResty添加性能调整功能。
+* 优化ubuntu22.04安装过程。
+* Debian9友好,【SSH终端 1.0】无法使用。
+* phpMyAdmin优化，需要卸载重装。
+* 文件管理解压直接覆盖FIX。
+* 优化文件多选的BUG。
 
 
 ### JSDelivr安装地址
@@ -116,6 +117,12 @@ curl -fsSL https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/scripts/instal
 curl -fsSL https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/scripts/update.sh | bash
 ```
 
+- 卸载脚本
+
+```
+curl -fsSL https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/scripts/uninstall.sh | bash
+```
+
 ### 备用地址
 
 - 初始安装
@@ -129,6 +136,12 @@ curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts
 
 ```
 curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/update.sh | bash
+```
+
+- 卸载脚本
+
+```
+curl -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/uninstall.sh | bash
 ```
 
 

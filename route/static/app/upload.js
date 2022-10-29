@@ -200,6 +200,8 @@ function uploadStart(d) {
 					}
 					if(!d) {
 						getFiles(getCookie("open_dir_path"));
+					} else{
+						d();
 					}
 				},
 				error: function(j) {

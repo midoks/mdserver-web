@@ -827,6 +827,69 @@ def setDbBackup():
     return mw.returnJson(True, 'ok')
 
 
+def importDbExternal():
+    args = getArgs()
+    data = checkArgs(args, ['file', 'name'])
+    if not data[0]:
+        return data[1]
+
+    file = args['file']
+    name = args['name']
+
+    import_dir = mw.getRootDir() + '/backup/import/'
+
+    file_path = import_dir + file
+    if not os.path.exists(file_path):
+        return mw.returnJson(False, '文件突然消失?')
+
+    exts = ['sql', 'gz', 'zip']
+    tmp = file.split('.')
+    ext = tmp[len(tmp) - 1]
+    if ext not in exts:
+        return mw.returnJson(False, '导入数据库格式不对!')
+
+    tmp = file.split('/')
+    tmpFile = tmp[len(tmp) - 1]
+    tmpFile = tmpFile.replace('.sql.' + ext, '.sql')
+    tmpFile = tmpFile.replace('.' + ext, '.sql')
+    tmpFile = tmpFile.replace('tar.', '')
+
+    # print(tmpFile)
+    import_sql = ""
+    if file.find("sql.gz") > -1:
+        cmd = 'cd ' + import_dir + ' && gzip -dc ' + \
+            file + " > " + import_dir + tmpFile
+        info = mw.execShell(cmd)
+        if info[1] == "":
+            import_sql = import_dir + tmpFile
+
+    if file.find(".zip") > -1:
+        cmd = 'cd ' + import_dir + ' && unzip -o ' + file
+        mw.execShell(cmd)
+        import_sql = import_dir + tmpFile
+
+    if file.find("tar.gz") > -1:
+        cmd = 'cd ' + import_dir + ' && tar -zxvf ' + file
+        mw.execShell(cmd)
+        import_sql = import_dir + tmpFile
+
+    if import_sql == "":
+        return mw.returnJson(False, '未找SQL文件')
+
+    pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
+    sock = getSocketFile()
+
+    os.environ["MYSQL_PWD"] = pwd
+    mysql_cmd = getServerDir() + '/bin/mysql -S ' + sock + ' -uroot -p' + \
+        pwd + ' ' + name + ' < ' + import_sql
+
+    # print(mysql_cmd)
+    os.system(mysql_cmd)
+    os.remove(import_sql)
+
+    return mw.returnJson(True, 'ok')
+
+
 def importDbBackup():
     args = getArgs()
     data = checkArgs(args, ['file', 'name'])
@@ -855,13 +918,17 @@ def importDbBackup():
 
 def deleteDbBackup():
     args = getArgs()
-    data = checkArgs(args, ['filename'])
+    data = checkArgs(args, ['filename', 'path'])
     if not data[0]:
         return data[1]
 
+    path = args['path']
+    full_file = ""
     bkDir = mw.getRootDir() + '/backup/database'
-
-    os.remove(bkDir + '/' + args['filename'])
+    full_file = bkDir + '/' + args['filename']
+    if path != "":
+        full_file = path + "/" + args['filename']
+    os.remove(full_file)
     return mw.returnJson(True, 'ok')
 
 
@@ -891,6 +958,39 @@ def getDbBackupList():
         data['file'] = p
 
     return mw.returnJson(True, 'ok', rr)
+
+
+def getDbBackupImportList():
+
+    bkImportDir = mw.getRootDir() + '/backup/import'
+    if not os.path.exists(bkImportDir):
+        os.mkdir(bkImportDir)
+
+    blist = os.listdir(bkImportDir)
+
+    rr = []
+    for x in range(0, len(blist)):
+        name = blist[x]
+        p = bkImportDir + '/' + name
+        data = {}
+        data['name'] = name
+
+        rsize = os.path.getsize(p)
+        data['size'] = mw.toSize(rsize)
+
+        t = os.path.getctime(p)
+        t = time.localtime(t)
+
+        data['time'] = time.strftime('%Y-%m-%d %H:%M:%S', t)
+        rr.append(data)
+
+        data['file'] = p
+
+    rdata = {
+        "list": rr,
+        "upload_dir": bkImportDir,
+    }
+    return mw.returnJson(True, 'ok', rdata)
 
 
 def getDbList():
@@ -2427,10 +2527,14 @@ if __name__ == "__main__":
         print(setDbBackup())
     elif func == 'import_db_backup':
         print(importDbBackup())
+    elif func == 'import_db_external':
+        print(importDbExternal())
     elif func == 'delete_db_backup':
         print(deleteDbBackup())
     elif func == 'get_db_backup_list':
         print(getDbBackupList())
+    elif func == 'get_db_backup_import_list':
+        print(getDbBackupImportList())
     elif func == 'add_db':
         print(addDb())
     elif func == 'del_db':

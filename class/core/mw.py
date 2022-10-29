@@ -411,7 +411,7 @@ def writeFile(filename, str):
         return False
 
 
-def backFile(self, file, act=None):
+def backFile(file, act=None):
     """
         @name 备份配置文件
         @param file 需要备份的文件
@@ -420,10 +420,12 @@ def backFile(self, file, act=None):
     file_type = "_bak"
     if act:
         file_type = "_def"
-    execShell("/usr/bin/cp -p {0} {1}".format(file, file + file_type))
+
+    # print("cp -p {0} {1}".format(file, file + file_type))
+    execShell("cp -p {0} {1}".format(file, file + file_type))
 
 
-def restoreFile(self, file, act=None):
+def restoreFile(file, act=None):
     """
         @name 还原配置文件
         @param file 需要还原的文件
@@ -432,7 +434,7 @@ def restoreFile(self, file, act=None):
     file_type = "_bak"
     if act:
         file_type = "_def"
-    execShell("/usr/bin/cp -p {1} {0}".format(file, file + file_type))
+    execShell("cp -p {1} {0}".format(file, file + file_type))
 
 
 def HttpGet(url, timeout=10):

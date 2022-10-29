@@ -329,11 +329,11 @@ function getFiles(Path) {
 			var cnametext =fmp[0] + fmp[5];
 			fmp[0] = fmp[0].replace(/'/,"\\'");
 			if(cnametext.length>20){
-				cnametext = cnametext.substring(0,20)+'...'
+				cnametext = cnametext.substring(0,20) + '...';
 			}
 			if(isChineseChar(cnametext)){
 				if(cnametext.length>10){
-					cnametext = cnametext.substring(0,10)+'...'
+					cnametext = cnametext.substring(0,10) + '...';
 				}
 			}
 			var timetext ='--';
@@ -376,11 +376,11 @@ function getFiles(Path) {
 			var cnametext =fmp[0] + fmp[5];
 			fmp[0] = fmp[0].replace(/'/,"\\'");
 			if(cnametext.length>48){
-				cnametext = cnametext.substring(0,48)+'...'
+				cnametext = cnametext.substring(0,48) + '...';
 			}
 			if(isChineseChar(cnametext)){
 				if(cnametext.length>16){
-					cnametext = cnametext.substring(0,16)+'...'
+					cnametext = cnametext.substring(0,16) + '...';
 				}
 			}
 			if(displayZip != -1){
@@ -400,52 +400,52 @@ function getFiles(Path) {
 			totalSize +=  parseInt(fmp[1]);
 			if(getCookie("rank")=="a"){
 				body += "<tr class='folderBoxTr' data-path='" + rdata.PATH +"/"+ fmp[0] + "' filetype='" + fmp[0] + "'><td><input type='checkbox' name='id' value='"+fmp[0]+"'></td>\
-						<td class='column-name'><span class='ico ico-"+(getExtName(fmp[0]))+"'></span><a class='text' title='" + fmp[0] + fmp[5] + "'>" + cnametext + "</a></td>\
-						<td>" + (toSize(fmp[1])) + "</td>\
-						<td>" + ((fmp[2].length > 11)?fmp[2]:getLocalTime(fmp[2])) + "</td>\
-						<td>"+fmp[3]+"</td>\
-						<td>"+fmp[4]+"</td>\
-						<td class='editmenu'>\
-						<span><a class='btlink' href='javascript:;' onclick=\"copyFile('" + rdata.PATH +"/"+ fmp[0] + "')\">复制</a> | \
-						<a class='btlink' href='javascript:;' onclick=\"cutFile('" + rdata.PATH +"/"+ fmp[0] + "')\">剪切</a> | \
-						<a class='btlink' href='javascript:;' onclick=\"reName(0,'" + fmp[0] + "')\">重命名</a> | \
-						<a class='btlink' href=\"javascript:setChmod(0,'" + rdata.PATH +"/"+ fmp[0] + "');\">权限</a> | \
-						<a class='btlink' href=\"javascript:zip('" + rdata.PATH +"/" +fmp[0] + "');\">压缩</a> | \
-						"+bodyZip+download+"\
-						<a class='btlink' href='javascript:;' onclick=\"deleteFile('" + rdata.PATH +"/"+ fmp[0] + "')\">删除</a>\
-						</span></td></tr>";
+					<td class='column-name'><span class='ico ico-"+(getExtName(fmp[0]))+"'></span><a class='text' title='" + fmp[0] + fmp[5] + "'>" + cnametext + "</a></td>\
+					<td>" + (toSize(fmp[1])) + "</td>\
+					<td>" + ((fmp[2].length > 11)?fmp[2]:getLocalTime(fmp[2])) + "</td>\
+					<td>"+fmp[3]+"</td>\
+					<td>"+fmp[4]+"</td>\
+					<td class='editmenu'>\
+					<span><a class='btlink' href='javascript:;' onclick=\"copyFile('" + rdata.PATH +"/"+ fmp[0] + "')\">复制</a> | \
+					<a class='btlink' href='javascript:;' onclick=\"cutFile('" + rdata.PATH +"/"+ fmp[0] + "')\">剪切</a> | \
+					<a class='btlink' href='javascript:;' onclick=\"reName(0,'" + fmp[0] + "')\">重命名</a> | \
+					<a class='btlink' href=\"javascript:setChmod(0,'" + rdata.PATH +"/"+ fmp[0] + "');\">权限</a> | \
+					<a class='btlink' href=\"javascript:zip('" + rdata.PATH +"/" +fmp[0] + "');\">压缩</a> | \
+					"+bodyZip+download+"\
+					<a class='btlink' href='javascript:;' onclick=\"deleteFile('" + rdata.PATH +"/"+ fmp[0] + "')\">删除</a>\
+					</span></td>\
+				</tr>";
 			}
 			else{
-				body += "<div class='file folderBox menufile' data-path='" + rdata.PATH +"/"+ fmp[0] + "' filetype='"+fmp[0]+"' title='文件名：" + fmp[0]+"&#13;大小：" 
-						+ toSize(fmp[1])+"&#13;修改时间："+getLocalTime(fmp[2])+"&#13;权限："+fmp[3]+"&#13;所有者："+fmp[4]+"'>\
-						<input type='checkbox' name='id' value='"+fmp[0]+"'>\
-						<div class='ico ico-"+(getExtName(fmp[0]))+"'></div>\
-						<div class='titleBox'><span class='tname'>" + fmp[0] + "</span></div>\
-						</div>";
+				body += "<div class='file folderBox menufile' data-path='" + rdata.PATH +"/"+ fmp[0] + "' filetype='"+fmp[0]+"' title='文件名：" + fmp[0]+"&#13;大小："
+					+ toSize(fmp[1])+"&#13;修改时间："+getLocalTime(fmp[2])+"&#13;权限："+fmp[3]+"&#13;所有者："+fmp[4]+"'>\
+					<input type='checkbox' name='id' value='"+fmp[0]+"'>\
+					<div class='ico ico-"+(getExtName(fmp[0]))+"'></div>\
+					<div class='titleBox'><span class='tname'>" + fmp[0] + "</span></div>\
+				</div>";
 			}
 		}
 		var dirInfo = '(共{1}个目录与{2}个文件,大小:'.replace('{1}',rdata.DIR.length+'').replace('{2}',rdata.DIR.length+'')+'<font id="pathSize">'
 			+ (toSize(totalSize))+'<a class="btlink ml5" onClick="getPathSize()">获取</a></font>)';
 		$("#DirInfo").html(dirInfo);
-		if(getCookie('rank')=='a'){
+		if( getCookie('rank') == 'a' ){
 			var tablehtml = '<table width="100%" border="0" cellpadding="0" cellspacing="0" class="table table-hover">\
-							<thead>\
-								<tr>\
-									<th width="30"><input type="checkbox" id="setBox" placeholder=""></th>\
-									<th>文件名</th>\
-									<th>大小</th>\
-									<th>修改时间</th>\
-									<th>权限</th>\
-									<th>所有者</th>\
-									<th style="text-align: right;" width="330">操作</th>\
-								</tr>\
-							</thead>\
-							<tbody id="filesBody" class="list-list">'+body+'</tbody>\
-						</table>';
+						<thead>\
+							<tr>\
+								<th width="30"><input type="checkbox" id="setBox" placeholder=""></th>\
+								<th>文件名</th>\
+								<th>大小</th>\
+								<th>修改时间</th>\
+								<th>权限</th>\
+								<th>所有者</th>\
+								<th style="text-align: right;" width="330">操作</th>\
+							</tr>\
+						</thead>\
+						<tbody id="filesBody" class="list-list">'+body+'</tbody>\
+					</table>';
 			$("#fileCon").removeClass("fileList").html(tablehtml);
 			$("#tipTools").width($("#fileCon").width());
-		}
-		else{
+		} else {
 			$("#fileCon").addClass("fileList").html(body);
 			$("#tipTools").width($("#fileCon").width());
 		}
@@ -518,25 +518,19 @@ function getFiles(Path) {
 		});
 
 
-		// //禁用右键
-		// $("#fileCon").bind("contextmenu",function(e){
-		// 	return false;
-		// });
-		// bindselect();
-
+		//禁用右键
+		$("#fileCon").bind("contextmenu",function(e){
+			return false;
+		});
+		bindselect();
 
 		// //绑定右键
-		// $("#fileCon").mousedown(function(e){
-		// 	var count = totalFile();
-		// 	if(e.which == 3) {
-		// 		if(count>1){
-		// 			RClickAll(e);
-		// 		}
-		// 		else{
-		// 			return
-		// 		}
-		// 	}
-		// });
+		$("#fileCon").mousedown(function(e){
+			var count = totalFile();
+			if(e.which == 3) {
+				if(count>1){rightMenuClickAll(e);} else {return;}
+			}
+		});
 
 		$(".folderBox,.folderBoxTr").mousedown(function(e){
 			// console.log(e);
@@ -1217,7 +1211,7 @@ function zip(dirName,submits) {
 }
 		
 //解压目录
-function unZip(fileName,type) {
+function unZip(fileName, type) {
 	var path = $("#DirPathPlace input").val();
 	if(type.length ==3){
 		var sfile = encodeURIComponent($("#sfile").val());
@@ -1233,7 +1227,7 @@ function unZip(fileName,type) {
 		return
 	}
 	
-	type = (type == 1) ? 'tar':'zip'
+	type = (type == 1) ? 'tar':'zip';
 	var umpass = '';
 	if(type == 'zip'){
 		umpass = '<div class="line"><span class="tname">'+lan.files.zip_pass_title+'</span><input type="text" class="bt-input-text" id="unpass" value="" placeholder="'+lan.files.zip_pass_msg+'" style="width:330px" /></div>'
@@ -1245,19 +1239,19 @@ function unZip(fileName,type) {
 		area: '490px',
 		title: '解压文件',
 		content: '<div class="bt-form pd20 pb70">'
-					+'<div class="line unzipdiv">'
-					+'<span class="tname">'+lan.files.unzip_name+'</span><input type="text" class="bt-input-text" id="sfile" value="' +fileName + '" placeholder="'+lan.files.unzip_name_title+'" style="width:330px" /></div>'
-					+'<div class="line"><span class="tname">'+lan.files.unzip_to+'</span><input type="text" class="bt-input-text" id="dfile" value="'+path + '" placeholder="'+lan.files.unzip_to+'" style="width:330px" /></div>' 
-					+ umpass +'<div class="line"><span class="tname">'+lan.files.unzip_coding+'</span><select class="bt-input-text" name="coding">'
-						+'<option value="UTF-8">UTF-8</option>'
-						+'<option value="gb18030">GBK</option>'
-					+'</select>'
-					+'</div>'
-					+'<div class="bt-form-submit-btn">'
-					+'<button type="button" class="btn btn-danger btn-sm btn-title" onclick="layer.closeAll()">'+lan.public.close+'</button>'
-					+'<button type="button" id="ReNameBtn" class="btn btn-success btn-sm btn-title" onclick="unZip(\'' + fileName + '\',\''+type+'\')">'+lan.files.file_menu_unzip+'</button>'
-					+'</div>'
-				+'</div>'
+			+'<div class="line unzipdiv">'
+			+'<span class="tname">'+lan.files.unzip_name+'</span><input type="text" class="bt-input-text" id="sfile" value="' +fileName + '" placeholder="'+lan.files.unzip_name_title+'" style="width:330px" /></div>'
+			+'<div class="line"><span class="tname">'+lan.files.unzip_to+'</span><input type="text" class="bt-input-text" id="dfile" value="'+path + '" placeholder="'+lan.files.unzip_to+'" style="width:330px" /></div>' 
+			+ umpass +'<div class="line"><span class="tname">'+lan.files.unzip_coding+'</span><select class="bt-input-text" name="coding">'
+				+'<option value="UTF-8">UTF-8</option>'
+				+'<option value="gb18030">GBK</option>'
+			+'</select>'
+			+'</div>'
+			+'<div class="bt-form-submit-btn">'
+			+'<button type="button" class="btn btn-danger btn-sm btn-title" onclick="layer.closeAll()">'+lan.public.close+'</button>'
+			+'<button type="button" id="ReNameBtn" class="btn btn-success btn-sm btn-title" onclick="unZip(\'' + fileName + '\',\''+type+'\')">'+lan.files.file_menu_unzip+'</button>'
+			+'</div>'
+		+'</div>'
 	});
 }
 
@@ -1323,7 +1317,8 @@ function uploadFiles(){
 		title:lan.files.up_title,
 		area: ['500px','300px'], 
 		shadeClose:false,
-		content:'<div class="fileUploadDiv"><input type="hidden" id="input-val" value="'+path+'" />\
+		content:'<div class="fileUploadDiv">\
+				<input type="hidden" id="input-val" value="'+path+'" />\
 				<input type="file" id="file_input"  multiple="true" autocomplete="off" />\
 				<button type="button"  id="opt" autocomplete="off">添加文件</button>\
 				<button type="button" id="up" autocomplete="off" >开始上传</button>\
@@ -1337,7 +1332,8 @@ function uploadFiles(){
 				</select>\
 				</span>\
 				<button type="button" id="filesClose" autocomplete="off" onClick="layer.closeAll()" >关闭</button>\
-				<ul id="up_box"></ul></div>'
+				<ul id="up_box"></ul>\
+			</div>'
 	});
 	uploadStart();
 }
@@ -1560,14 +1556,14 @@ function pathPlaceBtn(path){
 	var title = '';
 	var	Dpath = path;
 	if(path == '/'){
-		html ='<li><a title="/">'+lan.files.path_root+'</a></li>';
+		html = '<li><a title="/">'+lan.files.path_root+'</a></li>';
 	}
 	else{
 		Dpath = path.split("/");
 		for(var i = 0; i<Dpath.length; i++ ){
 			title += Dpath[i]+'/';
 			Dpath[0] = lan.files.path_root;
-			html +='<li><a title="'+title+'">'+Dpath[i]+'</a></li>';
+			html += '<li><a title="'+title+'">'+Dpath[i]+'</a></li>';
 		}
 	}
 	html = '<div style="width:1200px;height:26px"><ul>'+html+'</ul></div>';
@@ -1590,10 +1586,10 @@ function pathLeft(){
 	var SpanPathWidth = $("#PathPlaceBtn").width() - 50;
 	var Ml = UlWidth - SpanPathWidth;
 	if(UlWidth > SpanPathWidth ){
-		$("#PathPlaceBtn ul").css("left",-Ml)
+		$("#PathPlaceBtn ul").css("left",-Ml);
 	}
 	else{
-		$("#PathPlaceBtn ul").css("left",0)
+		$("#PathPlaceBtn ul").css("left",0);
 	}
 }
 //路径快捷点击

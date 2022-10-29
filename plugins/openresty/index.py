@@ -6,6 +6,7 @@ import os
 import time
 import threading
 import subprocess
+import re
 
 sys.path.append(os.getcwd() + "/class/core")
 import mw
@@ -50,6 +51,13 @@ def getArgs():
             tmp[t[0]] = t[1]
 
     return tmp
+
+
+def checkArgs(data, ck=[]):
+    for i in range(len(ck)):
+        if not ck[i] in data:
+            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
+    return (True, mw.returnJson(True, 'ok'))
 
 
 def clearTemp():
@@ -232,7 +240,7 @@ def restyOp_restart():
     check = getServerDir() + "/bin/openresty -t"
     check_data = mw.execShell(check)
     if not check_data[1].find('test is successful') > -1:
-        return check_data[1]
+        return 'ERROR: 配置出错<br><a style="color:red;">' + check_data[1].replace("\n", '<br>') + '</a>'
 
     if not mw.isAppleSystem():
         threading.Timer(2, op_submit_systemctl_restart, args=()).start()
@@ -291,7 +299,7 @@ def initdUinstall():
 def runInfo():
     # 取Openresty负载状态
     try:
-        url = 'http://' + mw.getHostAddr() + '/nginx_status'
+        url = 'http://127.0.0.1/nginx_status'
         result = mw.httpGet(url)
         tmp = result.split()
         data = {}
@@ -304,7 +312,8 @@ def runInfo():
         data['Waiting'] = tmp[15]
         return mw.getJson(data)
     except Exception as e:
-        url = 'http://127.0.0.1/nginx_status'
+
+        url = 'http://' + mw.getHostAddr() + '/nginx_status'
         result = mw.httpGet(url)
         tmp = result.split()
         data = {}
@@ -322,6 +331,111 @@ def runInfo():
 
 def errorLogPath():
     return getServerDir() + '/nginx/logs/error.log'
+
+
+def getCfg():
+    cfg = getConf()
+    content = mw.readFile(cfg)
+
+    unitrep = "[kmgKMG]"
+    cfg_args = [
+        {"name": "worker_processes", "ps": "处理进程,auto表示自动,数字表示进程数", 'type': 2},
+        {"name": "worker_connections", "ps": "最大并发链接数", 'type': 2},
+        {"name": "keepalive_timeout", "ps": "连接超时时间", 'type': 2},
+        {"name": "gzip", "ps": "是否开启压缩传输", 'type': 1},
+        {"name": "gzip_min_length", "ps": "最小压缩文件", 'type': 2},
+        {"name": "gzip_comp_level", "ps": "压缩率", 'type': 2},
+        {"name": "client_max_body_size", "ps": "最大上传文件", 'type': 2},
+        {"name": "server_names_hash_bucket_size",
+            "ps": "服务器名字的hash表大小", 'type': 2},
+        {"name": "client_header_buffer_size", "ps": "客户端请求头buffer大小", 'type': 2},
+    ]
+
+    # {"name": "client_body_buffer_size", "ps": "请求主体缓冲区"}
+    rdata = []
+    for i in cfg_args:
+        rep = "(%s)\s+(\w+)" % i["name"]
+        k = re.search(rep, content)
+        if not k:
+            return mw.returnJson(False, "获取 key {} 失败".format(k))
+        k = k.group(1)
+        v = re.search(rep, content)
+        if not v:
+            return mw.returnJson(False, "获取 value {} 失败".format(v))
+        v = v.group(2)
+
+        if re.search(unitrep, v):
+            u = str.upper(v[-1])
+            v = v[:-1]
+            if len(u) == 1:
+                psstr = u + "B，" + i["ps"]
+            else:
+                psstr = u + "，" + i["ps"]
+        else:
+            u = ""
+
+        kv = {"name": k, "value": v, "unit": u,
+              "ps": i["ps"], "type": i["type"]}
+        rdata.append(kv)
+
+    return mw.returnJson(True, "ok", rdata)
+
+
+def setCfg():
+
+    args = getArgs()
+    data = checkArgs(args, [
+        'worker_processes', 'worker_connections', 'keepalive_timeout',
+        'gzip', 'gzip_min_length', 'gzip_comp_level', 'client_max_body_size',
+        'server_names_hash_bucket_size', 'client_header_buffer_size'
+    ])
+    if not data[0]:
+        return data[1]
+
+    cfg = getConf()
+    mw.backFile(cfg)
+    content = mw.readFile(cfg)
+
+    unitrep = "[kmgKMG]"
+    cfg_args = [
+        {"name": "worker_processes", "ps": "处理进程,auto表示自动,数字表示进程数", 'type': 2},
+        {"name": "worker_connections", "ps": "最大并发链接数", 'type': 2},
+        {"name": "keepalive_timeout", "ps": "连接超时时间", 'type': 2},
+        {"name": "gzip", "ps": "是否开启压缩传输", 'type': 1},
+        {"name": "gzip_min_length", "ps": "最小压缩文件", 'type': 2},
+        {"name": "gzip_comp_level", "ps": "压缩率", 'type': 2},
+        {"name": "client_max_body_size", "ps": "最大上传文件", 'type': 2},
+        {"name": "server_names_hash_bucket_size",
+            "ps": "服务器名字的hash表大小", 'type': 2},
+        {"name": "client_header_buffer_size", "ps": "客户端请求头buffer大小", 'type': 2},
+    ]
+
+    # print(args)
+    for k, v in args.items():
+        # print(k, v)
+        rep = "%s\s+[^kKmMgG\;\n]+" % k
+        if k == "worker_processes" or k == "gzip":
+            if not re.search("auto|on|off|\d+", v):
+                return mw.returnJson(False, '参数值错误')
+        else:
+            if not re.search("\d+", v):
+                return mw.returnJson(False, '参数值错误,请输入数字整数')
+
+        if re.search(rep, content):
+            newconf = "%s %s" % (k, v)
+            content = re.sub(rep, newconf, content)
+        elif re.search(rep, content):
+            newconf = "%s %s" % (k, v)
+            content = re.sub(rep, newconf, content)
+
+    mw.writeFile(cfg, content)
+    isError = mw.checkWebConfig()
+    if (isError != True):
+        mw.restoreFile(cfg)
+        return mw.returnJson(False, 'ERROR: 配置出错<br><a style="color:red;">' + isError.replace("\n", '<br>') + '</a>')
+
+    mw.restartWeb()
+    return mw.returnJson(True, '设置成功')
 
 
 def installPreInspection():
@@ -356,5 +470,9 @@ if __name__ == "__main__":
         print(runInfo())
     elif func == 'error_log':
         print(errorLogPath())
+    elif func == 'get_cfg':
+        print(getCfg())
+    elif func == 'set_cfg':
+        print(setCfg())
     else:
         print('error')
