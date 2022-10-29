@@ -99,6 +99,8 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 * 优化ubuntu22.04安装过程。
 * Debian9友好,【SSH终端 1.0】无法使用。
 * phpMyAdmin优化，需要卸载重装。
+* 文件管理解压直接覆盖FIX。
+* 优化文件多选的BUG。
 
 
 ### JSDelivr安装地址
