@@ -97,6 +97,7 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 * MySQL添加外部导入功能。
 * OpenResty添加性能调整功能。
 * 优化ubuntu22.04安装过程。
+* Debian9友好,【SSH终端 1.0】无法使用。
 
 
 ### JSDelivr安装地址
