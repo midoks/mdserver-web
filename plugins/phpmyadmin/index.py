@@ -377,6 +377,9 @@ def setPmaPath():
 
     path = args['path']
 
+    if len(path) < 5:
+        return mw.returnJson(False, '不能小于5位!')
+
     old_path = getServerDir() + "/" + getCfg()['path']
     new_path = getServerDir() + "/" + path
 
