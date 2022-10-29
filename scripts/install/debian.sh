@@ -16,6 +16,10 @@ if grep -Eq "Debian" /etc/*-release; then
     ln -sf /bin/bash /bin/sh
 fi
 
+# synchronize time first
+apt-get install ntpdate -y
+ntpdate time.nist.gov | logger -t NTP
+
 apt update -y
 apt-get update -y 
 
