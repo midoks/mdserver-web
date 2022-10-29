@@ -57,7 +57,7 @@ def getConf():
 
 
 def getConfInc():
-    return getServerDir() + '/phpmyadmin/config.inc.php'
+    return getServerDir() + "/" + getCfg()['path'] + '/config.inc.php'
 
 
 def getPort():
@@ -74,7 +74,8 @@ def getHomePage():
         ip = '127.0.0.1'
         if not mw.isAppleSystem():
             ip = mw.getLocalIp()
-        url = 'http://' + ip + ':' + port + '/phpmyadmin/index.php'
+        url = 'http://' + ip + ':' + port + \
+            '/' + getCfg()['path'] + '/index.php'
         return mw.returnJson(True, 'OK', url)
     except Exception as e:
         return mw.returnJson(False, '插件未启动!')
@@ -124,6 +125,8 @@ def contentReplace(content):
         content = content.replace('{$CHOOSE_DB}', 'MariaDB')
         content = content.replace('{$CHOOSE_DB_DIR}', 'mariadb')
 
+    content = content.replace('{$PMA_PATH}', cfg['path'])
+
     port = cfg["port"]
     rep = 'listen\s*(.*);'
     content = re.sub(rep, "listen " + port + ';', content)
@@ -137,6 +140,7 @@ def initCfg():
         data = {}
         data['port'] = '888'
         data['choose'] = ''
+        data['path'] = ''
         data['username'] = 'admin'
         data['password'] = 'admin'
         mw.writeFile(cfg, json.dumps(data))
@@ -165,7 +169,7 @@ def returnCfg():
 
 def status():
     conf = getConf()
-    conf_inc = getServerDir() + '/phpmyadmin/config.inc.php'
+    conf_inc = getServerDir() + "/" + getCfg()["path"] + '/config.inc.php'
     # 两个文件都在，才算启动成功
     if os.path.exists(conf) and os.path.exists(conf_inc):
         return 'start'
@@ -175,9 +179,16 @@ def status():
 def start():
     initCfg()
 
+    pma_dir = getServerDir() + "/phpmyadmin"
+    if os.path.exists(pma_dir):
+        rand_str = mw.getRandomString(6)
+        rand_str = rand_str.lower()
+        pma_dir_dst = pma_dir + "_" + rand_str
+        mw.execShell("mv " + pma_dir + " " + pma_dir_dst)
+        setCfg('path', 'phpmyadmin_' + rand_str)
+
     file_tpl = getPluginDir() + '/conf/phpmyadmin.conf'
     file_run = getConf()
-
     if not os.path.exists(file_run):
         centent = mw.readFile(file_tpl)
         centent = contentReplace(centent)
@@ -191,11 +202,12 @@ def start():
         setCfg('password', username)
         mw.writeFile(pma_path, pass_cmd)
 
-    tmp = getServerDir() + '/phpmyadmin/tmp'
+    tmp = getServerDir() + "/" + getCfg()["path"] + '/tmp'
     if not os.path.exists(tmp):
         os.mkdir(tmp)
+        mw.execShell("chown -R www:www " + tmp)
 
-    conf_run = getServerDir() + '/phpmyadmin/config.inc.php'
+    conf_run = getServerDir() + "/" + getCfg()["path"] + '/config.inc.php'
     if not os.path.exists(conf_run):
         conf_tpl = getPluginDir() + '/conf/config.inc.php'
         centent = mw.readFile(conf_tpl)
@@ -227,6 +239,12 @@ def restart():
 
 
 def reload():
+    file_tpl = getPluginDir() + '/conf/phpmyadmin.conf'
+    file_run = getConf()
+    if os.path.exists(file_run):
+        centent = mw.readFile(file_tpl)
+        centent = contentReplace(centent)
+        mw.writeFile(file_run, centent)
     return start()
 
 
@@ -351,6 +369,22 @@ def setPmaPassword():
     return mw.returnJson(True, '修改成功!')
 
 
+def setPmaPath():
+    args = getArgs()
+    data = checkArgs(args, ['path'])
+    if not data[0]:
+        return data[1]
+
+    path = args['path']
+
+    old_path = getServerDir() + "/" + getCfg()['path']
+    new_path = getServerDir() + "/" + path
+
+    mw.execShell("mv " + old_path + " " + new_path)
+    setCfg('path', path)
+    return mw.returnJson(True, '修改成功!')
+
+
 def accessLog():
     return getServerDir() + '/access.log'
 
@@ -401,6 +435,8 @@ if __name__ == "__main__":
         print(setPmaUsername())
     elif func == 'set_pma_password':
         print(setPmaPassword())
+    elif func == 'set_pma_path':
+        print(setPmaPath())
     elif func == 'access_log':
         print(accessLog())
     elif func == 'error_log':
