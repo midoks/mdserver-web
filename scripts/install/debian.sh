@@ -112,12 +112,20 @@ apt install -y libxpm-dev
 apt install -y libwebp-dev
 apt install -y libfreetype6-dev
 
-
 sudo localedef -i en_US -f UTF-8 en_US.UTF-8
+
+VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
+if [ "$VERSION_ID" == "9" ];then
+	sed "s/flask==2.0.3/flask==1.1.1/g" -i /www/server/mdserver-web/requirements.txt
+	sed "s/cryptography==3.3.2/cryptography==2.5/g" -i /www/server/mdserver-web/requirements.txt
+	sed "s/ConfigParser==5.2.0/ConfigParser==4.0.2/g" -i /www/server/mdserver-web/requirements.txt
+	sed "s/flask-socketio==5.2.0/flask-socketio==4.2.0/g" -i /www/server/mdserver-web/requirements.txt
+	sed "s/python-engineio==4.3.2/python-engineio==3.9.0/g" -i /www/server/mdserver-web/requirements.txt
+	# pip3 install -r /www/server/mdserver-web/requirements.txt
+fi
 
 cd /www/server/mdserver-web/scripts && bash lib.sh
 chmod 755 /www/server/mdserver-web/data
-
 
 cd /www/server/mdserver-web && ./cli.sh start
 isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`
