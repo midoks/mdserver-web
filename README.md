@@ -114,6 +114,12 @@ curl -fsSL https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/scripts/instal
 curl -fsSL https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/scripts/update.sh | bash
 ```
 
+- 卸载脚本
+
+```
+curl -fsSL https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/scripts/uninstall.sh | bash
+```
+
 ### 备用地址
 
 - 初始安装
@@ -127,6 +133,12 @@ curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts
 
 ```
 curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/update.sh | bash
+```
+
+- 卸载脚本
+
+```
+curl -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/uninstall.sh | bash
 ```
 
 
