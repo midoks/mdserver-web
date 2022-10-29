@@ -9,8 +9,8 @@ if grep -Eq "Ubuntu" /etc/*-release; then
     #sudo dpkg-reconfigure dash
 fi
 
-sudo DEBIAN_FRONTEND=noninteractive apt update -y
-sudo DEBIAN_FRONTEND=noninteractive apt-get update -y 
+apt update -y
+apt-get update -y 
 
 apt install -y wget curl lsof unzip
 apt install -y python3-pip
