@@ -150,54 +150,6 @@ function planDel(id,name){
 		},'json');
 	});
 }
-
-//批量删除
-function allDeleteCron(){
-	var checkList = $("input[name=id]");
-	var dataList = new Array();
-	for(var i=0;i<checkList.length;i++){
-		if(!checkList[i].checked) continue;
-		var tmp = new Object();
-		tmp.name = checkList[i].title;
-		tmp.id = checkList[i].value;
-		dataList.push(tmp);
-	}
-	safeMessage('批量删除任务!',"<a style='color:red;'>"+lan.get('del_all_task',[dataList.length])+"</a>",function(){
-		layer.closeAll();
-		syncDeleteCron(dataList,0,'');
-	});
-}
-
-//模拟同步开始批量删除数据库
-function syncDeleteCron(dataList,successCount,errorMsg){
-	if(dataList.length < 1) {
-		layer.msg(lan.get('del_all_task_ok',[successCount]),{icon:1});
-		return;
-	}
-	var loadT = layer.msg(lan.get('del_all_task_the',[dataList[0].name]),{icon:16,time:0,shade: [0.3, '#000']});
-	$.ajax({
-		type:'POST',
-		url:'/crontab?action=DelCrontab',
-		data:'id='+dataList[0].id+'&name='+dataList[0].name,
-		async: true,
-		success:function(frdata){
-			layer.close(loadT);
-			if(frdata.status){
-				successCount++;
-				$("input[title='"+dataList[0].name+"']").parents("tr").remove();
-			}else{
-				if(!errorMsg){
-					errorMsg = '<br><p>'+lan.crontab.del_task_err+'</p>';
-				}
-				errorMsg += '<li>'+dataList[0].name+' -> '+frdata.msg+'</li>'
-			}
-			
-			dataList.splice(0,1);
-			syncDeleteCron(dataList,successCount,errorMsg);
-		}
-	});
-}
-
 	
 function isURL(str_url){
 	var strRegex = '^(https|http|ftp|rtsp|mms)?://.+';
