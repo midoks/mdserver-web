@@ -7,6 +7,11 @@ import time
 import re
 import json
 
+# print(sys.platform)
+if sys.platform != "darwin":
+    os.chdir("/www/server/mdserver-web")
+
+
 sys.path.append(os.getcwd() + "/class/core")
 import mw
 
