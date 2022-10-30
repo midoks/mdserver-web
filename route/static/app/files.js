@@ -1554,28 +1554,27 @@ $("#DirPathPlace input").keyup(function(e){
 function pathPlaceBtn(path){
 	var html = '';
 	var title = '';
-	var	Dpath = path;
 	if(path == '/'){
 		html = '<li><a title="/">'+lan.files.path_root+'</a></li>';
 	}
 	else{
-		Dpath = path.split("/");
-		for(var i = 0; i<Dpath.length; i++ ){
-			title += Dpath[i]+'/';
-			Dpath[0] = lan.files.path_root;
-			html += '<li><a title="'+title+'">'+Dpath[i]+'</a></li>';
+		var dst_path = path.split("/");
+		for(var i = 0; i<dst_path.length; i++ ){
+			title += dst_path[i]+'/';
+			dst_path[0] = lan.files.path_root;
+			html += '<li><a title="'+title+'">'+dst_path[i]+'</a></li>';
 		}
 	}
 	html = '<div style="width:1200px;height:26px"><ul>'+html+'</ul></div>';
 	$("#PathPlaceBtn").html(html);
 	$("#PathPlaceBtn ul li a").click(function(e){
-		var Gopath = $(this).attr("title");
-		if(Gopath.length>1){
-			if(Gopath.substr(Gopath.length-1,Gopath.length) =='/'){
-				Gopath = Gopath.substr(0,Gopath.length-1);
+		var go_path = $(this).attr("title");
+		if(go_path.length>1){
+			if(go_path.substr(go_path.length-1,go_path.length) =='/'){
+				Gopath = go_path.substr(0,go_path.length-1);
 			}
 		}
-		getFiles(Gopath);
+		getFiles(go_path);
 		e.stopPropagation();
 	});
 	pathLeft();
