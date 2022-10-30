@@ -26,12 +26,12 @@ function getLogs(id){
 			shadeClose:false,
 			closeBtn:1,
 			content:'<div class="setchmod bt-form pd20 pb70">'
-					+'<pre id="crontab-log" style="overflow: auto; border: 0px none; line-height:23px;padding: 15px; margin: 0px; white-space: pre-wrap; height: 405px; background-color: rgb(51,51,51);color:#f1f1f1;border-radius:0px;font-family:"></pre>'
-					+'<div class="bt-form-submit-btn" style="margin-top: 0px;">'
-					+'<button type="button" class="btn btn-success btn-sm" onclick="closeLogs('+id+')">清空</button>'
-					+'<button type="button" class="btn btn-danger btn-sm" onclick="layer.closeAll()">关闭</button>'
-				    +'</div>'
-					+'</div>'
+				+'<pre id="crontab-log" style="overflow: auto; border: 0px none; line-height:23px;padding: 15px; margin: 0px; white-space: pre-wrap; height: 405px; background-color: rgb(51,51,51);color:#f1f1f1;border-radius:0px;font-family:"></pre>'
+				+'<div class="bt-form-submit-btn" style="margin-top: 0px;">'
+				+'<button type="button" class="btn btn-success btn-sm" onclick="closeLogs('+id+')">清空</button>'
+				+'<button type="button" class="btn btn-danger btn-sm" onclick="layer.closeAll()">关闭</button>'
+			    +'</div>'
+			+'</div>'
 		});
 
 		setTimeout(function(){
@@ -176,25 +176,25 @@ function syncDeleteCron(dataList,successCount,errorMsg){
 	}
 	var loadT = layer.msg(lan.get('del_all_task_the',[dataList[0].name]),{icon:16,time:0,shade: [0.3, '#000']});
 	$.ajax({
-			type:'POST',
-			url:'/crontab?action=DelCrontab',
-			data:'id='+dataList[0].id+'&name='+dataList[0].name,
-			async: true,
-			success:function(frdata){
-				layer.close(loadT);
-				if(frdata.status){
-					successCount++;
-					$("input[title='"+dataList[0].name+"']").parents("tr").remove();
-				}else{
-					if(!errorMsg){
-						errorMsg = '<br><p>'+lan.crontab.del_task_err+'</p>';
-					}
-					errorMsg += '<li>'+dataList[0].name+' -> '+frdata.msg+'</li>'
+		type:'POST',
+		url:'/crontab?action=DelCrontab',
+		data:'id='+dataList[0].id+'&name='+dataList[0].name,
+		async: true,
+		success:function(frdata){
+			layer.close(loadT);
+			if(frdata.status){
+				successCount++;
+				$("input[title='"+dataList[0].name+"']").parents("tr").remove();
+			}else{
+				if(!errorMsg){
+					errorMsg = '<br><p>'+lan.crontab.del_task_err+'</p>';
 				}
-				
-				dataList.splice(0,1);
-				syncDeleteCron(dataList,successCount,errorMsg);
+				errorMsg += '<li>'+dataList[0].name+' -> '+frdata.msg+'</li>'
 			}
+			
+			dataList.splice(0,1);
+			syncDeleteCron(dataList,successCount,errorMsg);
+		}
 	});
 }
 
@@ -381,25 +381,25 @@ function allAddCrontab(dataList,successCount,errorMsg){
 	$("#set-Config input[name='sName']").val(dataList[0]);
 	var pdata = $("#set-Config").serialize() + '&sBody=&urladdress=';
 	$.ajax({
-			type:'POST',
-			url:'/crontab/add',
-			data:pdata,
-			async: true,
-			success:function(frdata){
-				layer.close(loadT);
-				if(frdata.status){
-					successCount++;
-					getCronData(1);
-				}else{
-					if(!errorMsg){
-						errorMsg = '<br><p>'+lan.crontab.backup_all_err+'</p>';
-					}
-					errorMsg += '<li>'+dataList[0]+' -> '+frdata.msg+'</li>'
+		type:'POST',
+		url:'/crontab/add',
+		data:pdata,
+		async: true,
+		success:function(frdata){
+			layer.close(loadT);
+			if(frdata.status){
+				successCount++;
+				getCronData(1);
+			}else{
+				if(!errorMsg){
+					errorMsg = '<br><p>'+lan.crontab.backup_all_err+'</p>';
 				}
-				
-				dataList.splice(0,1);
-				allAddCrontab(dataList,successCount,errorMsg);
+				errorMsg += '<li>'+dataList[0]+' -> '+frdata.msg+'</li>'
 			}
+			
+			dataList.splice(0,1);
+			allAddCrontab(dataList,successCount,errorMsg);
+		}
 	});
 }
 
@@ -857,7 +857,7 @@ function editTaskInfo(id){
 						}
 
 						showMsg(rdata.msg, function(){
-							layer.close(loadT);
+							layer.closeAll();
 							getCronData(1);
 							initDropdownMenu();
 						},{icon:rdata.status?1:2}, 2000);
