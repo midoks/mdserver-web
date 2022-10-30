@@ -187,7 +187,7 @@ class FtpPSClient:
             }
             mw.writeFile(pg_file, json.dumps(progress_info))
         else:
-            progress_info = json.loads(public.readFile(pg_file))
+            progress_info = json.loads(mw.readFile(pg_file))
             if total_bytes == progress_info.get("total_bytes"):
                 # 取远程文件大小
                 _max_loop = 10
@@ -352,7 +352,7 @@ class FtpPSClient:
             ftp.rmd(dir_name)
             return True
         except ftplib.error_perm as e:
-            print(str(e) + ":" + dir_name)
+            print("deleteDir:" + str(e) + ":" + dir_name)
         except Exception as e:
             print(e)
         return False

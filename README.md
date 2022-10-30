@@ -92,16 +92,12 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.10.1
+### 版本更新 0.10.2
 
-* MySQL添加外部导入功能。
-* OpenResty添加性能调整功能。
-* 优化ubuntu22.04安装过程。
-* Debian9友好,【SSH终端 1.0】无法使用。
-* phpMyAdmin优化，需要卸载重装。
-* 文件管理解压直接覆盖FIX。
-* 优化文件多选的BUG。
-
+* 修复上次更新的UI问题。
+* `FTP存储空间` 备份数据库修复。
+* 修复计划任务执行Python脚本的编码问题。
+* 添加，修改计划任务参数强校验。
 
 ### JSDelivr安装地址
 

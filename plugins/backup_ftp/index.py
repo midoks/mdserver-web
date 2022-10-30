@@ -7,6 +7,11 @@ import time
 import re
 import json
 
+# print(sys.platform)
+if sys.platform != "darwin":
+    os.chdir("/www/server/mdserver-web")
+
+
 sys.path.append(os.getcwd() + "/class/core")
 import mw
 
@@ -192,10 +197,12 @@ def backupAllFunc(stype):
         prefix_dict[stype] + '_' + name
 
     find_new_file = "ls " + find_path + \
-        "_* | grep tar.gz | cut -d \  -f 1 | awk 'END {print}'"
+        "_* | grep '.gz' | cut -d \  -f 1 | awk 'END {print}'"
 
     filename = mw.execShell(find_new_file)[0].strip()
-    # print("filename:", filename)
+    if filename == "":
+        print("not find upload file!")
+        return False
 
     ftp = FtpPSClient()
     ftp.uploadFile(filename, stype)

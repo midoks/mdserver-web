@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <link rel="icon" href="/static/favicon.ico" type="image/x-icon" />
 <link rel="shortcut icon" href="/static/favicon.ico" type="image/x-icon" />
-<title>mdserver-web</title>
+<title>{{data['title']}}</title>
 <link rel="stylesheet" type="text/css" href="/static/css/site.css?v={{config.version}}">
 <link rel="stylesheet" type="text/css" href="/static/css/login.css?v={{config.version}}">
 <style type="text/css">
@@ -122,7 +122,7 @@
 	<div class="login">
 		<div class="account">
 			<form class="loginform" method="post" action="/login" onsubmit="return false;">
-			<div class="rlogo">mdserver-web</div>
+			<div class="rlogo">{{data['title']}}</div>
 			<div class="line"><input class="inputtxt" value="" name="username" datatype="*" nullmsg="请填写账户" errormsg="请填写账户" placeholder="账户" type="text"><div class="Validform_checktip"></div></div>
 			<div class="line"><input class="inputtxt" name="password" value="" datatype="*" nullmsg="请填写密码" errormsg="请填写密码" placeholder="密码" type="password">
 				<div class="Validform_checktip"></div>

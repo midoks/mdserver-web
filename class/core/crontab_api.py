@@ -115,6 +115,56 @@ class crontab_api:
             'id=?', (sid,)).field(self.field).find()
         return mw.getJson(data)
 
+    # 参数校验
+    def cronCheck(self, params):
+
+        if params['stype'] == 'site' or params['stype'] == 'database' or params['stype'] == 'logs':
+            if params['save'] == '':
+                return False, '保留份数不能为空!'
+
+        if params['type'] == 'day':
+            if params['hour'] == '':
+                return False, '小时不能为空!'
+            if params['minute'] == '':
+                return False, '分钟不能为空!'
+
+        if params['type'] == 'day-n':
+            if params['where1'] == '':
+                return False, '天不能为空!'
+            if params['hour'] == '':
+                return False, '小时不能为空!'
+            if params['minute'] == '':
+                return False, '分钟不能为空!'
+        if params['type'] == 'hour':
+            if params['minute'] == '':
+                return False, '分钟不能为空!'
+
+        if params['type'] == 'hour-n':
+            if params['hour'] == '':
+                return False, '小时不能为空!'
+            if params['minute'] == '':
+                return False, '分钟不能为空!'
+
+        if params['type'] == 'minute-n':
+            if params['minute'] == '':
+                return False, '分钟不能为空!'
+
+        if params['type'] == 'week':
+            if params['hour'] == '':
+                return False, '小时不能为空!'
+            if params['minute'] == '':
+                return False, '分钟不能为空!'
+
+        if params['type'] == 'month':
+            if params['where1'] == '':
+                return False, '日不能为空!'
+            if params['hour'] == '':
+                return False, '小时不能为空!'
+            if params['minute'] == '':
+                return False, '分钟不能为空!'
+
+        return True, 'OK'
+
     def modifyCrondApi(self):
         sid = request.form.get('id', '')
         iname = request.form.get('name', '')
@@ -147,6 +197,11 @@ class crontab_api:
             'sbody': sbody,
             'urladdress': urladdress,
         }
+
+        is_check_pass, msg = self.cronCheck(params)
+        if not is_check_pass:
+            return mw.returnJson(is_check_pass, msg)
+
         cuonConfig, get, name = self.getCrondCycle(params)
         cronInfo = mw.M('crontab').where(
             'id=?', (sid,)).field(self.field).find()
@@ -209,6 +264,10 @@ class crontab_api:
             'sbody': sbody,
             'urladdress': urladdress,
         }
+
+        is_check_pass, msg = self.cronCheck(params)
+        if not is_check_pass:
+            return mw.returnJson(is_check_pass, msg)
 
         addData = self.add(params)
         if addData > 0:
@@ -419,6 +478,7 @@ class crontab_api:
             head = "#!/bin/bash\nPATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin\nexport PATH\n"
 
             source_bin_activate = '''
+export LANG=en_US.UTF-8
 MW_PATH=%s/bin/activate
 if [ -f $MW_PATH ];then
     source $MW_PATH
