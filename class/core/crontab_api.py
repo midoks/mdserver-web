@@ -419,6 +419,7 @@ class crontab_api:
             head = "#!/bin/bash\nPATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin\nexport PATH\n"
 
             source_bin_activate = '''
+export LANG=en_US.UTF-8
 MW_PATH=%s/bin/activate
 if [ -f $MW_PATH ];then
     source $MW_PATH
