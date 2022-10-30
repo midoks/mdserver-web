@@ -119,7 +119,7 @@ function startTask(id){
 	var data='id='+id;
 	$.post('/crontab/start_task',data,function(rdata){
 		showMsg(rdata.msg, function(){
-			layer.close(loadT);
+			layer.closeAll();
 		},{icon:rdata.status?1:2,time:2000});
 	},'json');
 }
@@ -131,7 +131,7 @@ function closeLogs(id){
 	var data='id='+id;
 	$.post('/crontab/del_logs',data,function(rdata){
 		showMsg(rdata.msg, function(){
-			layer.close(loadT);
+			layer.closeAll();
 		},{icon:rdata.status?1:2,time:2000});
 	},'json');
 }
@@ -144,7 +144,7 @@ function planDel(id,name){
 		var data='id='+id;
 		$.post('/crontab/del',data,function(rdata){
 			showMsg(rdata.msg, function(){
-				layer.close(load);
+				layer.closeAll();
 				getCronData(1);
 			},{icon:rdata.status?1:2,time:2000});
 		},'json');
