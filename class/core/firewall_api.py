@@ -249,7 +249,7 @@ class firewall_api:
         self.firewallReload()
         # mw.M('firewall').where(
         #     "ps=?", ('SSH远程管理服务',)).setField('port', port)
-        msg = mw.getInfo('改SSH端口为[{1}]成功!', port)
+        msg = "改SSH端口为[{}]成功!".format(port)
         mw.writeLog("防火墙管理", msg)
         return mw.returnJson(True, '修改成功!')
 
