@@ -4,6 +4,7 @@
 	"name":"op_waf",
 	"type":"其他插件",
 	"ps":"有效防止sql注入/xss/一句话木马等常见渗透攻击",
+	"install_pre_inspection":true,
 	"shell":"install.sh",
 	"checks":"server/op_waf",
 	"path":"server/op_waf",
