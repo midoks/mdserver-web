@@ -146,7 +146,7 @@ class crontab_api:
                 return False, '分钟不能为空!'
 
         if params['type'] == 'minute-n':
-            if params['minute'] == '':
+            if params['where1'] == '':
                 return False, '分钟不能为空!'
 
         if params['type'] == 'week':
