@@ -548,8 +548,8 @@ function onlineEditFile(k, f) {
 		var m = "";
 		var o = "";
 		for(var p = 0; p < u.length; p++) {
-			m = s.encoding == u[p] ? "selected" : "";
-			n += '<option value="' + u[p] + '" ' + m + ">" + u[p] + "</option>"
+			m = s.data.encoding == u[p] ? "selected" : "";
+			n += '<option value="' + u[p] + '" ' + m + ">" + u[p] + "</option>";
 		}
 		var r = layer.open({
 			type: 1,
@@ -557,7 +557,18 @@ function onlineEditFile(k, f) {
 			closeBtn: 1,
 			area: ["90%", "90%"],
 			title: lan.bt.edit_title+"[" + f + "]",
-			content: '<form class="bt-form pd20 pb70"><div class="line"><p style="color:red;margin-bottom:10px">'+lan.bt.edit_ps+'			<select class="bt-input-text" name="encoding" style="width: 74px;position: absolute;top: 31px;right: 19px;height: 22px;z-index: 9999;border-radius: 0;">' + n + '</select></p><textarea class="mCustomScrollbar bt-input-text" id="textBody" style="width:100%;margin:0 auto;line-height: 1.8;position: relative;top: 10px;" value="" />			</div>			<div class="bt-form-submit-btn" style="position:absolute; bottom:0; width:100%">			<button type="button" class="btn btn-danger btn-sm btn-editor-close">'+lan.public.close+'</button>			<button id="OnlineEditFileBtn" type="button" class="btn btn-success btn-sm">'+lan.public.save+'</button>			</div>			</form>'
+			content: '<form class="bt-form pd20 pb70">\
+				<div class="line">\
+					<p style="color:red;margin-bottom:10px">' + lan.bt.edit_ps + '\
+						<select class="bt-input-text" name="encoding" style="width: 74px;position: absolute;top: 31px;right: 19px;height: 22px;z-index: 9999;border-radius: 0;">' + n + '</select>\
+					</p>\
+					<textarea class="mCustomScrollbar bt-input-text" id="textBody" style="width:100%;margin:0 auto;line-height: 1.8;position: relative;top: 10px;" value="" />\
+				</div>\
+				<div class="bt-form-submit-btn" style="position:absolute; bottom:0; width:100%">\
+				<button type="button" class="btn btn-danger btn-sm btn-editor-close">'+lan.public.close+'</button>\
+				<button id="OnlineEditFileBtn" type="button" class="btn btn-success btn-sm">'+lan.public.save+'</button>\
+				</div>\
+			</form>'
 		});
 		$("#textBody").text(s.data.data);
 		var q = $(window).height() * 0.9;

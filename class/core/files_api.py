@@ -652,7 +652,7 @@ class files_api:
             return mw.returnJson(False, '文件不存在', (path,))
 
         if os.path.getsize(path) > 2097152:
-            return mw.returnJson(False, u'不能在线编辑大于2MB的文件!')
+            return mw.returnJson(False, '不能在线编辑大于2MB的文件!')
 
         fp = open(path, 'rb')
         data = {}
@@ -676,8 +676,10 @@ class files_api:
                     data['encoding'] = 'utf-8'
                 if char['encoding'] == 'Big5':
                     data['encoding'] = 'BIG5'
-                if not char['encoding'] in ['GBK', 'utf-8', 'BIG5']:
+
+                if not data['encoding'] in ['GBK', 'utf-8', 'BIG5']:
                     data['encoding'] = 'utf-8'
+
                 try:
                     if sys.version_info[0] == 2:
                         data['data'] = srcBody.decode(
@@ -691,16 +693,17 @@ class files_api:
                             data['encoding']).encode('utf-8', errors='ignore')
                     else:
                         data['data'] = srcBody.decode(data['encoding'])
+                return mw.returnJson(True, 'OK', data)
             else:
                 if sys.version_info[0] == 2:
                     data['data'] = srcBody.decode('utf-8').encode('utf-8')
                 else:
                     data['data'] = srcBody.decode('utf-8')
-                data['encoding'] = u'utf-8'
+                data['encoding'] = 'utf-8'
 
             return mw.returnJson(True, 'OK', data)
         except Exception as ex:
-            return mw.returnJson(False, u'文件编码不被兼容，无法正确读取文件!' + str(ex))
+            return mw.returnJson(False, '文件编码不被兼容，无法正确读取文件!' + str(ex))
 
     def saveBody(self, path, data, encoding='utf-8'):
         if not os.path.exists(path):
@@ -724,7 +727,7 @@ class files_api:
             mw.writeLog('文件管理', '文件保存成功', (path,))
             return mw.returnJson(True, '文件保存成功')
         except Exception as ex:
-            return mw.returnJson(False, 'FILE_SAVE_ERR:' + str(ex))
+            return mw.returnJson(False, '文件保存错误:' + str(ex))
 
     def zip(self, sfile, dfile, stype, path):
         if sfile.find(',') == -1:
