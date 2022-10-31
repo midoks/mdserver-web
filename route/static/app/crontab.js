@@ -279,7 +279,7 @@ function planAdd(){
 
 	if (type == 'minute-n'){
 		var where1 = $("#ptime input[name='where1']").val();
-		$("#set-Config input[name='where1']").val(where1);
+		$("#set-Config input[name='minute']").val(where1);
 	}
 
 	if (type == 'day-n'){
