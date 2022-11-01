@@ -697,8 +697,8 @@ def lsyncdAdd():
     path = args['path']
 
     if not mw.isAppleSystem():
-        mw.execShell("mkdir -p " + args_path)
-        mw.execShell("chown -R  www:www " + args_path)
+        mw.execShell("mkdir -p " + path)
+        mw.execShell("chown -R  www:www " + path)
 
     conn_type = args['conn_type']
     secret_key = args['secret_key']
