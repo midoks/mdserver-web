@@ -20,7 +20,7 @@ fi
 
 
 rm -rf /usr/bin/mw
-rm -rf /www
+rm -rf /www/mdserver-web
 
 
 endTime=`date +%s`
