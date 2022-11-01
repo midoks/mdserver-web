@@ -81,13 +81,13 @@ def getHomePage():
         return mw.returnJson(False, '插件未启动!')
 
 
-def getPhpVer(expect=55):
+def getPhpVer(expect=00):
     import json
     v = site_api.site_api().getPhpVersion()
     v = json.loads(v)
     for i in range(len(v)):
         t = int(v[i]['version'])
-        if (t >= expect):
+        if (t == expect):
             return str(t)
     return str(expect)
 
