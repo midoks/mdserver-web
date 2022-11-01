@@ -20,7 +20,7 @@ fi
 
 UNINSTALL_MySQL()
 {
-    MYSQLD_CHECK=$(ps -ef |grep mysqld|grep -v grep|grep /www/server/mysql)
+    MYSQLD_CHECK=$(ps -ef |grep mysqld | grep -v grep | grep /www/server/mysql)
     if [ "$MYSQLD_CHECK" != "" ];then
         echo -e "----------------------------------------------------"
         echo -e "检查已有MySQL环境，卸载可能影响现有站点及数据"
@@ -32,6 +32,45 @@ UNINSTALL_MySQL()
             echo "取消卸载MySQL"
         else
             cd /www/server/mdserver-web/plugins/mysql && sh install.sh uninstall 8.0
+        fi
+    fi
+}
+
+UNINSTALL_OP()
+{
+    if [ -f /www/server/openresty ];then
+        echo -e "----------------------------------------------------"
+        echo -e "检查已有OpenResty环境，卸载可能影响现有站点及数据"
+        echo -e "----------------------------------------------------"
+        echo -e "已知风险/输入yes强制卸载!"
+        read -p "输入yes强制卸载: " yes;
+        if [ "$yes" != "yes" ];then
+            echo -e "------------"
+            echo "取消卸载OpenResty"
+        else
+            cd /www/server/mdserver-web/plugins/openresty && sh install.sh uninstall
+        fi
+    fi
+}
+
+UNINSTALL_PHP()
+{
+    if [ -d /www/server/php ];then
+        echo -e "----------------------------------------------------"
+        echo -e "检查已有PHP环境，卸载可能影响现有站点及数据"
+        echo -e "----------------------------------------------------"
+        read -p "输入yes强制卸载所有PHP: " yes;
+        if [ "$yes" != "yes" ];then
+            echo -e "------------"
+            echo "取消卸载PHP"
+        else
+            PHP_VER_LIST=(53 54 55 56 70 71 72 73 74 80 81 82)
+            for PHP_VER in ${PHP_VER_LIST[@]}; do
+                if [ -d /www/server/php/${PHP_VER} ];then
+                    cd /www/server/mdserver-web/plugins/php && bash install.sh uninstall ${PHP_VER}
+                fi
+                echo "卸载PHP${PHP_VER}"
+            done
         fi
     fi
 }
@@ -50,7 +89,8 @@ UNINSTALL_MW()
     fi
 }
 
-
+UNINSTALL_OP
+UNINSTALL_PHP
 UNINSTALL_MySQL
 UNINSTALL_MW
 
