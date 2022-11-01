@@ -510,9 +510,13 @@ def cmdRecCmd():
 
 # ----------------------------- rsyncdSend start -------------------------
 
-
 def lsyncdReload():
-    mw.execShell('systemctl restart lsyncd')
+    data = mw.execShell(
+        "ps -ef|grep lsyncd |grep -v grep | grep -v python | awk '{print $2}'")
+    if data[0] == '':
+        mw.execShell('systemctl start lsyncd')
+    else:
+        mw.execShell('systemctl restart lsyncd')
 
 
 def makeLsyncdConf(data):
