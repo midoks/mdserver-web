@@ -102,7 +102,6 @@ fi
 
 
 #面板需要的库
-
 if [ ! -f /usr/local/bin/pip3 ];then
     # python3 -m pip install --upgrade pip setuptools wheel -i https://mirrors.aliyun.com/pypi/simple
     python3 -m pip install --upgrade pip setuptools wheel -i https://pypi.python.org/pypi
