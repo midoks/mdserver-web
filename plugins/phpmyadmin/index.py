@@ -92,7 +92,9 @@ def getPhpVer(expect=55):
             is_find = True
             return str(t)
     if not is_find:
-        return "00"
+        if len(v) > 1:
+            return v[1]['version']
+        return v[0]['version']
     return str(expect)
 
 
