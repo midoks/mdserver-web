@@ -18,6 +18,24 @@ if [ "$EUID" -ne 0 ]
   exit
 fi
 
+UNINSTALL_CHECK()
+{
+    echo -e "----------------------------------------------------"
+    echo -e "暂时只能卸载OpenResty/PHP/MySQL/Redis/Memcached"
+    echo -e "其他插件先手动卸载!"
+    echo -e "----------------------------------------------------"
+    echo -e "已知风险/输入yes强制卸载![yes/no]"
+    read -p "输入yes强制卸载: " yes;
+    if [ "$yes" != "yes" ];then
+        echo -e "------------"
+        echo "取消卸载"
+        exit 1
+    else
+        echo "开始卸载!"
+    fi
+}
+
+
 UNINSTALL_MySQL()
 {
     MYSQLD_CHECK=$(ps -ef |grep mysqld | grep -v grep | grep /www/server/mysql)
@@ -125,6 +143,8 @@ UNINSTALL_MW()
         echo "卸载面板成功"
     fi
 }
+
+UNINSTALL_CHECK
 
 UNINSTALL_OP
 UNINSTALL_PHP
