@@ -512,7 +512,7 @@ def cmdRecCmd():
 
 
 def lsyncdReload():
-    mw.execShell('systemctl reload lsyncd')
+    mw.execShell('systemctl restart lsyncd')
 
 
 def makeLsyncdConf(data):
