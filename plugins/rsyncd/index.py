@@ -113,6 +113,21 @@ def getLsyncdLog():
     return tmp.groups()[0]
 
 
+def __release_port(port):
+    try:
+        import firewall_api
+        firewall_api.firewall_api().addAcceptPortArgs(port, 'RSYNC同步', 'port')
+        return port
+    except Exception as e:
+        return "Release failed {}".format(e)
+
+
+def openPort():
+    for i in ["873"]:
+        __release_port(i)
+    return True
+
+
 def initDReceive():
     # conf
     conf_path = appConf()
@@ -141,6 +156,7 @@ def initDReceive():
     systemService = systemDir + '/rsyncd.service'
     systemServiceTpl = getPluginDir() + '/init.d/rsyncd.service.tpl'
     if not os.path.exists(lock_file):
+
         rsync_bin = mw.execShell('which rsync')[0].strip()
         if rsync_bin == '':
             print('rsync missing!')
@@ -154,6 +170,7 @@ def initDReceive():
         mw.execShell('systemctl daemon-reload')
 
         mw.writeFile(lock_file, "ok")
+        openPort()
 
     rlog = getLog()
     if os.path.exists(rlog):
