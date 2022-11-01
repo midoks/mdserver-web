@@ -363,6 +363,10 @@ def addRec():
     args_path = args['path']
     args_ps = args['ps']
 
+    if not mw.isAppleSystem():
+        mw.execShell("mkdir -p " + args_path)
+        mw.execShell("chown -R  www:www " + args_path)
+
     delRecBy(args_name)
 
     auth_path = appAuthPwd(args_name)
@@ -691,6 +695,10 @@ def lsyncdAdd():
 
     ip = args['ip']
     path = args['path']
+
+    if not mw.isAppleSystem():
+        mw.execShell("mkdir -p " + args_path)
+        mw.execShell("chown -R  www:www " + args_path)
 
     conn_type = args['conn_type']
     secret_key = args['secret_key']
