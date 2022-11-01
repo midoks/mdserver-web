@@ -16,11 +16,10 @@ install_tmp=${rootPath}/tmp/mw_install.pl
 openrestyDir=${serverPath}/source/openresty
 
 if id www &> /dev/null ;then 
-    echo "www UID is `id -u www`"
-    echo "www Shell is `grep "^www:" /etc/passwd |cut -d':' -f7 `"
+    echo "www uid is `id -u www`"
+    echo "www shell is `grep "^www:" /etc/passwd |cut -d':' -f7 `"
 else
     groupadd www
-	# useradd -g www -s /sbin/nologin www
 	useradd -g www -s /bin/bash www
 fi
 
