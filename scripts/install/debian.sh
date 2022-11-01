@@ -16,6 +16,13 @@ if grep -Eq "Debian" /etc/*-release; then
     ln -sf /bin/bash /bin/sh
 fi
 
+__GET_BIT=`getconf LONG_BIT`
+if [ "$__GET_BIT" == "32" ];then
+	# install rust | 32bit need
+	# curl https://sh.rustup.rs -sSf | sh
+	apt install -y rustc
+fi
+
 # synchronize time first
 apt-get install ntpdate -y
 ntpdate time.nist.gov | logger -t NTP

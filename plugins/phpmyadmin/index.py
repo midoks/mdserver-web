@@ -85,10 +85,16 @@ def getPhpVer(expect=55):
     import json
     v = site_api.site_api().getPhpVersion()
     v = json.loads(v)
+    is_find = False
     for i in range(len(v)):
         t = int(v[i]['version'])
-        if (t >= expect):
+        if (t == expect):
+            is_find = True
             return str(t)
+    if not is_find:
+        if len(v) > 1:
+            return v[1]['version']
+        return v[0]['version']
     return str(expect)
 
 

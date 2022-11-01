@@ -102,7 +102,6 @@ fi
 
 
 #面板需要的库
-
 if [ ! -f /usr/local/bin/pip3 ];then
     # python3 -m pip install --upgrade pip setuptools wheel -i https://mirrors.aliyun.com/pypi/simple
     python3 -m pip install --upgrade pip setuptools wheel -i https://pypi.python.org/pypi
@@ -112,8 +111,7 @@ pip install --upgrade pip
 pip3 install --upgrade setuptools
 cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
 
-pip3 install gevent-websocket==0.10.1
-pip3 install flask-caching==1.10.1
+# pip3 install flask-caching==1.10.1
 # pip3 install mysqlclient
 
 
@@ -128,7 +126,6 @@ pip install --upgrade pip
 pip3 install --upgrade setuptools
 pip3 install -r /www/server/mdserver-web/requirements.txt
 
-pip3 install gevent-websocket==0.10.1
-pip3 install flask-caching==1.10.1
+# pip3 install flask-caching==1.10.1
 # pip3 install mysqlclient
 

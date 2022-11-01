@@ -10,7 +10,7 @@ $cfg['Servers'][$i]['socket']          = '{$SERVER_PATH}/{$CHOOSE_DB_DIR}/mysql.
 $cfg['Servers'][$i]['connect_type']    = 'socket';
 $cfg['Servers'][$i]['compress']        = false;
 $cfg['Servers'][$i]['AllowNoPassword'] = false;
-$cfg['TempDir']                        = '{$SERVER_PATH}/phpmyadmin/tmp';
+$cfg['TempDir']                        = '{$SERVER_PATH}/phpmyadmin/{$PMA_PATH}/tmp';
 $cfg['UploadDir']                      = '';
 $cfg['SaveDir']                        = '';
 ?>

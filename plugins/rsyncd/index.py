@@ -363,6 +363,10 @@ def addRec():
     args_path = args['path']
     args_ps = args['ps']
 
+    if not mw.isAppleSystem():
+        mw.execShell("mkdir -p " + args_path)
+        mw.execShell("chown -R  www:www " + args_path)
+
     delRecBy(args_name)
 
     auth_path = appAuthPwd(args_name)
@@ -506,9 +510,13 @@ def cmdRecCmd():
 
 # ----------------------------- rsyncdSend start -------------------------
 
-
 def lsyncdReload():
-    mw.execShell('systemctl reload lsyncd')
+    data = mw.execShell(
+        "ps -ef|grep lsyncd |grep -v grep | grep -v python | awk '{print $2}'")
+    if data[0] == '':
+        mw.execShell('systemctl start lsyncd')
+    else:
+        mw.execShell('systemctl restart lsyncd')
 
 
 def makeLsyncdConf(data):
@@ -691,6 +699,10 @@ def lsyncdAdd():
 
     ip = args['ip']
     path = args['path']
+
+    if not mw.isAppleSystem():
+        mw.execShell("mkdir -p " + path)
+        mw.execShell("chown -R  www:www " + path)
 
     conn_type = args['conn_type']
     secret_key = args['secret_key']

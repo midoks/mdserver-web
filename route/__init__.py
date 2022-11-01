@@ -208,6 +208,7 @@ def doLogin():
             login_cache_limit = cache.get('login_cache_limit')
             code_msg = mw.getInfo("验证码错误,您还可以尝试[{1}]次!", (str(
                 login_cache_count - login_cache_limit)))
+            mw.writeLog('用户登录', code_msg)
             return mw.returnJson(False, code_msg)
 
     userInfo = mw.M('users').where(

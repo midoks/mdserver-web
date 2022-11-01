@@ -16,6 +16,14 @@ bash ${rootPath}/scripts/getos.sh
 OSNAME=`cat ${rootPath}/data/osname.pl`
 
 
+if id www &> /dev/null ;then 
+    echo "www uid is `id -u www`"
+    echo "www shell is `grep "^www:" /etc/passwd |cut -d':' -f7 `"
+else
+    groupadd www
+	useradd -g www -s /bin/bash www
+fi
+
 echo $OSNAME
 install_tmp=${rootPath}/tmp/mw_install.pl
 Install_rsyncd()
@@ -55,6 +63,14 @@ Uninstall_rsyncd()
 		systemctl disable rsyncd
 		rm -rf /usr/lib/systemd/system/rsyncd.service
 		rm -rf /lib/systemd/system/rsyncd.service
+		systemctl daemon-reload
+	fi
+
+	if [ -f /usr/lib/systemd/system/lsyncd.service ] || [ -f /lib/systemd/system/lsyncd.service ];then
+		systemctl stop lsyncd
+		systemctl disable lsyncd
+		rm -rf /usr/lib/systemd/system/lsyncd.service
+		rm -rf /lib/systemd/system/lsyncd.service
 		systemctl daemon-reload
 	fi
 
