@@ -25,13 +25,14 @@ UNINSTALL_MySQL()
         echo -e "----------------------------------------------------"
         echo -e "检查已有MySQL环境，卸载可能影响现有站点及数据"
         echo -e "----------------------------------------------------"
-        echo -e "已知风险/输入yes强制卸载!"
+        echo -e "已知风险/输入yes强制卸载![yes/no]"
         read -p "输入yes强制卸载: " yes;
         if [ "$yes" != "yes" ];then
             echo -e "------------"
             echo "取消卸载MySQL"
         else
             cd /www/server/mdserver-web/plugins/mysql && sh install.sh uninstall 8.0
+            echo "卸载MySQL成功!"
         fi
     fi
 }
@@ -42,13 +43,14 @@ UNINSTALL_OP()
         echo -e "----------------------------------------------------"
         echo -e "检查已有OpenResty环境，卸载可能影响现有站点及数据"
         echo -e "----------------------------------------------------"
-        echo -e "已知风险/输入yes强制卸载!"
+        echo -e "已知风险/输入yes强制卸载![yes/no]"
         read -p "输入yes强制卸载: " yes;
         if [ "$yes" != "yes" ];then
             echo -e "------------"
             echo "取消卸载OpenResty"
         else
             cd /www/server/mdserver-web/plugins/openresty && sh install.sh uninstall
+            echo "卸载OpenResty成功!"
         fi
     fi
 }
@@ -59,7 +61,7 @@ UNINSTALL_PHP()
         echo -e "----------------------------------------------------"
         echo -e "检查已有PHP环境，卸载可能影响现有站点及数据"
         echo -e "----------------------------------------------------"
-        read -p "输入yes强制卸载所有PHP: " yes;
+        read -p "输入yes强制卸载所有PHP[yes/no]: " yes;
         if [ "$yes" != "yes" ];then
             echo -e "------------"
             echo "取消卸载PHP"
@@ -69,8 +71,25 @@ UNINSTALL_PHP()
                 if [ -d /www/server/php/${PHP_VER} ];then
                     cd /www/server/mdserver-web/plugins/php && bash install.sh uninstall ${PHP_VER}
                 fi
-                echo "卸载PHP${PHP_VER}"
+                echo "卸载PHP${PHP_VER}成功!"
             done
+        fi
+    fi
+}
+
+UNINSTALL_MEMCACHED()
+{
+    if [ -d /www/server/memcached ];then
+        echo -e "----------------------------------------------------"
+        echo -e "检查已有Memcached环境，卸载可能影响现有站点及数据"
+        echo -e "----------------------------------------------------"
+        read -p "输入yes强制卸载所有Memcached[yes/no]: " yes;
+        if [ "$yes" != "yes" ];then
+            echo -e "------------"
+            echo "取消卸载Memcached"
+        else
+            cd /www/server/mdserver-web/plugins/memcached && bash install.sh uninstall
+            echo "卸载Memcached成功"
         fi
     fi
 }
@@ -86,6 +105,7 @@ UNINSTALL_MW()
         rm -rf /etc/init.d/mw
         systemctl daemon-reload
         rm -rf /www/server/mdserver-web
+        echo "卸载面板成功"
     fi
 }
 
