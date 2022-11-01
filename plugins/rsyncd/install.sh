@@ -66,6 +66,14 @@ Uninstall_rsyncd()
 		systemctl daemon-reload
 	fi
 
+	if [ -f /usr/lib/systemd/system/lsyncd.service ] || [ -f /lib/systemd/system/lsyncd.service ];then
+		systemctl stop lsyncd
+		systemctl disable lsyncd
+		rm -rf /usr/lib/systemd/system/lsyncd.service
+		rm -rf /lib/systemd/system/lsyncd.service
+		systemctl daemon-reload
+	fi
+
 	if [ -f $serverPath/rsyncd/initd/rsyncd ];then
 		$serverPath/rsyncd/initd/rsyncd stop
 	fi
