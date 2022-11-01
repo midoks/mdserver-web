@@ -94,6 +94,23 @@ UNINSTALL_MEMCACHED()
     fi
 }
 
+UNINSTALL_REDIS()
+{
+    if [ -d /www/server/redis ];then
+        echo -e "----------------------------------------------------"
+        echo -e "检查已有Redis环境，卸载可能影响现有站点及数据"
+        echo -e "----------------------------------------------------"
+        read -p "输入yes强制卸载所有Redis[yes/no]: " yes;
+        if [ "$yes" != "yes" ];then
+            echo -e "------------"
+            echo "取消卸载Redis"
+        else
+            cd /www/server/mdserver-web/plugins/redis && bash install.sh uninstall 7.0.4
+            echo "卸载Redis成功"
+        fi
+    fi
+}
+
 UNINSTALL_MW()
 {
     read -p "输入yes强制卸载面板: " yes;
