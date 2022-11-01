@@ -38,11 +38,17 @@ UNINSTALL_MySQL()
 
 UNINSTALL_MW()
 {
-    rm -rf /usr/bin/mw
-    rm -rf /etc/init.d/mw
-    systemctl daemon-reload
+    read -p "输入yes强制卸载面板: " yes;
 
-    rm -rf /www/server/mdserver-web
+    if [ "$yes" != "yes" ];then
+        echo -e "------------"
+        echo "取消卸载面板"
+    else
+        rm -rf /usr/bin/mw
+        rm -rf /etc/init.d/mw
+        systemctl daemon-reload
+        rm -rf /www/server/mdserver-web
+    fi
 }
 
 
