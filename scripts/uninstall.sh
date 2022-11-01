@@ -39,7 +39,6 @@ UNINSTALL_MySQL()
 UNINSTALL_MW()
 {
     read -p "输入yes强制卸载面板: " yes;
-
     if [ "$yes" != "yes" ];then
         echo -e "------------"
         echo "取消卸载面板"
