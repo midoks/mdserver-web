@@ -14,7 +14,7 @@ sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 mariadbDir=${serverPath}/source/mariadb
 
-MY_VER=10.6.8
+MY_VER=10.9.1
 
 Install_app()
 {
@@ -57,13 +57,11 @@ Install_app()
 	fi
 	# ----- cpu end ------
 
-	# https://mirrors.aliyun.com/mariadb/mariadb-10.8.3/source/mariadb-10.8.3.tar.gz
 	if [ ! -f ${mariadbDir}/mariadb-${MY_VER}.tar.gz ];then
 		wget --no-check-certificate -O ${mariadbDir}/mariadb-${MY_VER}.tar.gz --tries=3 https://mirrors.aliyun.com/mariadb/mariadb-${MY_VER}/source/mariadb-${MY_VER}.tar.gz
-		
 	fi
 
-	# https://downloads.mariadb.org/interstitial/mariadb-10.6.8/source/mariadb-10.6.8.tar.gz
+	# https://downloads.mariadb.org/interstitial/mariadb-10.9.1/source/mariadb-10.9.1.tar.gz
 	if [ "$?" != "0" ];then
 		wget --no-check-certificate -O ${mariadbDir}/mariadb-${MY_VER}.tar.gz --tries=3 https://downloads.mariadb.org/interstitial/mariadb-${MY_VER}/source/mariadb-${MY_VER}.tar.gz
 	fi
@@ -72,19 +70,9 @@ Install_app()
 		 cd ${mariadbDir} && tar -zxvf  ${mariadbDir}/mariadb-${MY_VER}.tar.gz
 	fi
 	
-	OPTIONS=''
-	if [ "$sysName" == "Darwin" ];then
-		OPTIONS='-DPLUGIN_TOKUDB=NO'
-	fi
-
-	INSTALL_CMD=cmake
-	CMAKE3=`which cmake3`
-	if [ "$?" == "0" ];then
-		INSTALL_CMD=cmake3
-	fi
 
 	if [ ! -d $serverPath/mariadb ];then
-		cd ${mariadbDir}/mariadb-${MY_VER} && $INSTALL_CMD \
+		cd ${mariadbDir}/mariadb-${MY_VER} && cmake \
 		-DCMAKE_INSTALL_PREFIX=$serverPath/mariadb \
 		-DMYSQL_DATADIR=$serverPath/mariadb/data/ \
 		-DMYSQL_USER=mysql \
@@ -94,7 +82,6 @@ Install_app()
 		-DWITH_MEMORY_STORAGE_ENGINE=1 \
 		-DENABLED_LOCAL_INFILE=1 \
 		-DWITH_PARTITION_STORAGE_ENGINE=1 \
-		$OPTIONS \
 		-DEXTRA_CHARSETS=all \
 		-DDEFAULT_CHARSET=utf8mb4 \
 		-DDEFAULT_COLLATION=utf8mb4_general_ci \
@@ -103,7 +90,7 @@ Install_app()
 		make -j${cpuCore} && make install && make clean
 
 		if [ -d $serverPath/mariadb ];then
-			echo '10.6' > $serverPath/mariadb/version.pl
+			echo '10.8' > $serverPath/mariadb/version.pl
 			echo '安装完成' > $install_tmp
 		else
 			# rm -rf ${mariadbDir}/mariadb-${MY_VER}
