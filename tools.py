@@ -85,7 +85,7 @@ def mwcli(mw_input=0):
             return
         set_panel_pwd(input_pwd.strip(), True)
     elif mw_input == 12:
-        input_user = mw_input_cmd("请输入新的面板用户名(>3位)：")
+        input_user = mw_input_cmd("请输入新的面板用户名(>5位)：")
         set_panel_username(input_user.strip())
     elif mw_input == 13:
         os.system('tail -100 ' + mw.getRunDir() + '/logs/error.log')
