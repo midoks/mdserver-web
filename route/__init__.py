@@ -134,13 +134,29 @@ def publicObject(toObject, func, action=None, get=None):
         return mw.getJson(data)
 
 
-@app.route("/debug")
-def debug():
-    print(sys.version_info)
-    print(session)
-    os = mw.getOs()
-    print(os)
-    return mw.getLocalIp()
+# @app.route("/debug")
+# def debug():
+#     print(sys.version_info)
+#     print(session)
+#     os = mw.getOs()
+#     print(os)
+#     return mw.getLocalIp()
+
+# 仅针对webhook插件
+@app.route("/hook")
+def webhook():
+    input_args = {
+        'access_key': request.args.get('access_key', '').strip(),
+        'params': request.args.get('params', '').strip()
+    }
+
+    wh_install_path = mw.getServerDir() + '/webhook'
+    if not os.path.exists(wh_install_path):
+        return mw.returnJson(False, '请先安装WebHook插件!')
+
+    sys.path.append('plugins/webhook')
+    import index
+    return index.runShellArgs(input_args)
 
 
 @app.route('/close')
