@@ -1883,7 +1883,7 @@ location ^~ {from} {
         conf = mw.readFile(filename)
         if conf.find('#ErrorLog') != -1:
             return False
-        if conf.find("access_log  /dev/null") != -1:
+        if conf.find("access_log  off") != -1:
             return False
         return True
 

@@ -396,9 +396,11 @@ function webPathEdit(id){
 		});
 		
 		$("#logs").change(function(){
-			$.post('/site/logs_open','id='+id,function(userini){
-				layer.msg(userini.msg,{icon:userini.status?1:2});
-			},'josn');
+			var loadT = layer.msg("正在设置中...",{icon:16,time:10000,shade: [0.3, '#000']});
+			$.post('/site/logs_open','id='+id, function(rdata){
+				layer.close(loadT);
+				layer.msg(rdata.msg,{icon:rdata.status?1:2});
+			},'json');
 		});
 		
 	},'json');
