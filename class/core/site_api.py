@@ -371,6 +371,36 @@ class site_api:
 
         return mw.returnJson(True, '已打开防跨站设置!')
 
+    def setRewriteApi(self):
+        data = request.form.get('data', '')
+        path = request.form.get('path', '')
+        encoding = request.form.get('encoding', '')
+        if not os.path.exists(path):
+            mw.writeFile(path, '')
+
+        mw.backFile(path)
+        mw.writeFile(path, data)
+        isError = mw.checkWebConfig()
+        if(type(isError) == str):
+            mw.restoreFile(path)
+            return mw.returnJson(False, 'ERROR: <br><a style="color:red;">' + isError.replace("\n", '<br>') + '</a>')
+        return mw.returnJson(True, '设置模板成功!')
+
+    def setRewriteTplApi(self):
+        data = request.form.get('data', '')
+        name = request.form.get('name', '')
+        path = mw.getRunDir() + "/rewrite/nginx/" + name + ".conf"
+        if os.path.exists(path):
+            return mw.returnJson(False, '模版已经存在!')
+
+        if data == "":
+            return mw.returnJson(False, '模版内容不能为空!')
+        ok = mw.writeFile(path, data)
+        if not ok:
+            return mw.returnJson(False, '模版保持失败!')
+
+        return mw.returnJson(True, '设置模板成功!')
+
     def logsOpenApi(self):
         mid = request.form.get('id', '')
         name = mw.M('sites').where("id=?", (mid,)).getField('name')
@@ -381,9 +411,10 @@ class site_api:
             conf = mw.readFile(filename)
             rep = self.logsPath + "/" + name + ".log"
             if conf.find(rep) != -1:
-                conf = conf.replace(rep, "off")
+                conf = conf.replace(rep + " main", "off")
             else:
-                conf = conf.replace('access_log  off', 'access_log  ' + rep)
+                conf = conf.replace('access_log  off',
+                                    'access_log  ' + rep + " main")
             mw.writeFile(filename, conf)
 
         mw.restartWeb()

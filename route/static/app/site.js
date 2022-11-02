@@ -2348,7 +2348,7 @@ function rewrite(siteName){
 function setRewrite(filename){
 	var data = 'data='+encodeURIComponent($("#rewriteBody").val())+'&path='+filename+'&encoding=utf-8';
 	var loadT = layer.msg(lan.site.saving_txt,{icon:16,time:0,shade: [0.3, '#000']});
-	$.post('/files/save_body',data,function(rdata){
+	$.post('/site/set_rewrite',data,function(rdata){
 		layer.close(loadT);
 		if(rdata.status){
 			layer.msg(rdata.msg,{icon:1});
@@ -2360,45 +2360,39 @@ function setRewrite(filename){
 var aindex = null;
 
 //保存为模板
-function setRewriteTel(act){
-	if(act != undefined){
-		name = $("#rewriteName").val();
-		if(name == ''){
-			layer.msg(lan.site.template_empty,{icon:5});
-			return;
-		}
-		var data = 'data='+encodeURIComponent($("#rewriteBody").val())+'&name='+name;
-		var loadT = layer.msg(lan.site.saving_txt,{icon:16,time:0,shade: [0.3, '#000']});
-		$.post('/site?action=SetRewriteTel',data,function(rdata){
-			layer.close(loadT);
-			layer.close(aindex);
-			
-			layer.msg(rdata.msg,{icon:rdata.status?1:5});
-		});
-		return;
-	}
-	
+function setRewriteTel(act){	
 	aindex = layer.open({
 		type: 1,
 		shift: 5,
 		closeBtn: 1,
 		area: '320px', //宽高
 		title: '保存为Rewrite模板',
-		content: '<div class="bt-form pd20 pb70">\
+		btn:[lan.public.ok,lan.public.cancel],
+		content: '<div class="bt-form pd20">\
 					<div class="line">\
 						<input type="text" class="bt-input-text" name="rewriteName" id="rewriteName" value="" placeholder="'+lan.site.template_name+'" style="width:100%" />\
 					</div>\
-					<div class="bt-form-submit-btn">\
-					<button type="button" class="btn btn-danger btn-sm">'+lan.public.cancel+'</button>\
-					<button type="button" id="rewriteNameBtn" class="btn btn-success btn-sm" onclick="SetRewriteTel(1)">'+lan.public.ok+'</button>\
-					</div>\
-				</div>'
-	});
-	$(".btn-danger").click(function(){
-		layer.close(aindex);
-	});
-	$("#rewriteName").focus().keyup(function(e){
-		if(e.keyCode == 13) $("#rewriteNameBtn").click();
+				</div>',
+		success:function(index){
+			$("#rewriteName").focus().keyup(function(e){
+				if(e.keyCode == 13) $("#rewriteNameBtn").click();
+			});
+		},
+		yes:function(index){
+			name = $("#rewriteName").val();
+			if(name == ''){
+				layer.msg(lan.site.template_empty,{icon:5});
+				return;
+			}
+			var data = 'data='+encodeURIComponent($("#rewriteBody").val())+'&name='+name;
+			var loadT = layer.msg(lan.site.saving_txt,{icon:16,time:0,shade: [0.3, '#000']});
+			$.post('/site/set_rewrite_tpl',data,function(rdata){
+				layer.close(loadT);
+				layer.close(index);
+				layer.msg(rdata.msg, {icon:rdata.status?1:5});
+			},'json');
+			return;
+		}
 	});
 }
 //修改默认页
