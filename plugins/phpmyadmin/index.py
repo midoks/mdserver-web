@@ -124,7 +124,8 @@ def contentReplace(content):
     content = content.replace('{$BLOWFISH_SECRET}', blowfish_secret)
 
     cfg = getCfg()
-    if (cfg['choose'] == ""):
+
+    if (cfg['choose'] == "mysql"):
         content = content.replace('{$CHOOSE_DB}', 'mysql')
         content = content.replace('{$CHOOSE_DB_DIR}', 'mysql')
     else:
@@ -136,7 +137,6 @@ def contentReplace(content):
     port = cfg["port"]
     rep = 'listen\s*(.*);'
     content = re.sub(rep, "listen " + port + ';', content)
-
     return content
 
 
@@ -327,11 +327,13 @@ def setPmaChoose():
     choose = args['choose']
     setCfg('choose', choose)
 
-    conf_run = getServerDir() + '/phpmyadmin/config.inc.php'
+    pma_path = getCfg()['path']
+    conf_run = getServerDir() + "/" + pma_path + '/config.inc.php'
+
     conf_tpl = getPluginDir() + '/conf/config.inc.php'
-    centent = mw.readFile(conf_tpl)
-    centent = contentReplace(centent)
-    mw.writeFile(conf_run, centent)
+    content = mw.readFile(conf_tpl)
+    content = contentReplace(content)
+    mw.writeFile(conf_run, content)
 
     mw.restartWeb()
     return mw.returnJson(True, '修改成功!')
