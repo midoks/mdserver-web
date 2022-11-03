@@ -88,6 +88,7 @@ function runInfo(){
             return;
         }
 
+        // Com_select , Qcache_inserts
         var cache_size = ((parseInt(rdata.Qcache_hits) / (parseInt(rdata.Qcache_hits) + parseInt(rdata.Qcache_inserts))) * 100).toFixed(2) + '%';
         if (cache_size == 'NaN%') cache_size = 'OFF';
         var Con = '<div class="divtable"><table class="table table-hover table-bordered" style="margin-bottom:10px;background-color:#fafafa">\
