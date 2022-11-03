@@ -541,13 +541,17 @@ def setMyPort():
     return mw.returnJson(True, '编辑成功!')
 
 
-def runInfo():
+def runInfo(version):
 
     if status(version) == 'stop':
         return mw.returnJson(False, 'MySQL未启动', [])
 
     db = pMysqlDb()
     data = db.query('show global status')
+    isError = isSqlError(data)
+    if isError != None:
+        return isError
+
     gets = ['Max_used_connections', 'Com_commit', 'Com_rollback', 'Questions', 'Innodb_buffer_pool_reads', 'Innodb_buffer_pool_read_requests', 'Key_reads', 'Key_read_requests', 'Key_writes',
             'Key_write_requests', 'Qcache_hits', 'Qcache_inserts', 'Bytes_received', 'Bytes_sent', 'Aborted_clients', 'Aborted_connects',
             'Created_tmp_disk_tables', 'Created_tmp_tables', 'Innodb_buffer_pool_pages_dirty', 'Opened_files', 'Open_tables', 'Opened_tables', 'Select_full_join',
@@ -1183,6 +1187,10 @@ def getDbAccess():
     users = pdb.query("select Host from user where User='" +
                       username + "' AND Host!='localhost'")
 
+    isError = isSqlError(users)
+    if isError != None:
+        return isError
+
     if len(users) < 1:
         return mw.returnJson(True, "127.0.0.1")
     accs = []
@@ -1648,30 +1656,32 @@ def setDbSlave(version):
 
 
 def getMasterStatus(version=''):
+    try:
+        if status(version) == 'stop':
+            return mw.returnJson(False, 'MySQL未启动,或正在启动中...!', [])
 
-    if status(version) == 'stop':
-        return mw.returnJson(False, 'MySQL未启动,或正在启动中...!', [])
+        conf = getConf()
+        content = mw.readFile(conf)
+        master_status = False
+        if content.find('#log-bin') == -1 and content.find('log-bin') > 1:
+            dodb = findBinlogDoDb()
+            if len(dodb) > 0:
+                master_status = True
 
-    conf = getConf()
-    content = mw.readFile(conf)
-    master_status = False
-    if content.find('#log-bin') == -1 and content.find('log-bin') > 1:
-        dodb = findBinlogDoDb()
-        if len(dodb) > 0:
-            master_status = True
+        data = {}
+        data['mode'] = recognizeDbMode()
+        data['status'] = master_status
 
-    data = {}
-    data['mode'] = recognizeDbMode()
-    data['status'] = master_status
+        db = pMysqlDb()
+        dlist = db.query('show slave status')
 
-    db = pMysqlDb()
-    dlist = db.query('show slave status')
+        # print(dlist[0])
+        if len(dlist) > 0 and (dlist[0]["Slave_IO_Running"] == 'Yes' or dlist[0]["Slave_SQL_Running"] == 'Yes'):
+            data['slave_status'] = True
 
-    # print(dlist[0])
-    if len(dlist) > 0 and (dlist[0]["Slave_IO_Running"] == 'Yes' or dlist[0]["Slave_SQL_Running"] == 'Yes'):
-        data['slave_status'] = True
-
-    return mw.returnJson(master_status, '设置成功', data)
+        return mw.returnJson(master_status, '设置成功', data)
+    except Exception as e:
+        return mw.returnJson(False, "数据库密码错误,在管理列表-点击【修复】!")
 
 
 def setMasterStatus(version=''):
@@ -2342,7 +2352,7 @@ if __name__ == "__main__":
     elif func == 'uninstall_pre_inspection':
         print(uninstallPreInspection(version))
     elif func == 'run_info':
-        print(runInfo())
+        print(runInfo(version))
     elif func == 'db_status':
         print(myDbStatus())
     elif func == 'set_db_status':

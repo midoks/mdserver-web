@@ -174,6 +174,11 @@ function myPerfOpt() {
     //获取MySQL配置
     myPost('db_status','',function(data){
         var rdata = $.parseJSON(data.data);
+        if ( typeof(rdata.status) != 'undefined' && !rdata.status){
+            layer.msg(rdata.msg, {icon:2});
+            return; 
+        }
+
         // console.log(rdata);
         var key_buffer_size = toSizeM(rdata.mem.key_buffer_size);
         var query_cache_size = toSizeM(rdata.mem.query_cache_size);
@@ -2067,9 +2072,14 @@ function masterOrSlaveConf(version=''){
    
 
     function getMasterStatus(){
-        myPost('get_master_status', '', function(data){
-            var rdata = $.parseJSON(data.data);
+        myPost('get_master_status', '', function(rdata){
+             var rdata = $.parseJSON(rdata.data);
             // console.log('mode:',rdata.data);
+            if (!rdata.status){
+                layer.msg(rdata.msg, {icon:2});
+                return; 
+            }
+
             var rdata = rdata.data;
             var limitCon = '\
                 <p class="conf_p">\
