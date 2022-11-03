@@ -576,7 +576,7 @@ function setDbAccess(username){
             yes:function(index){
                 var data = $("#set_db_access").serialize();
                 data = decodeURIComponent(data);
-                var dataObj = str2Obj(data);
+                var dataObj = toArrayObject(data);
                 if(!dataObj['access']){
                     dataObj['access'] = dataObj['dataAccess'];
                     if ( dataObj['dataAccess'] == 'ip'){
@@ -653,7 +653,7 @@ function addDatabase(type){
     if (type==1){
         var data = $("#add_db").serialize();
         data = decodeURIComponent(data);
-        var dataObj = str2Obj(data);
+        var dataObj = toArrayObject(data);
         if(!dataObj['address']){
             dataObj['address'] = dataObj['dataAccess'];
         }
@@ -1445,7 +1445,7 @@ function addMasterRepSlaveUser(){
         yes:function(index){
             var data = $("#add_master").serialize();
             data = decodeURIComponent(data);
-            var dataObj = str2Obj(data);
+            var dataObj = toArrayObject(data);
             if(!dataObj['address']){
                 dataObj['address'] = dataObj['dataAccess'];
             }
@@ -1490,7 +1490,7 @@ function updateMasterRepSlaveUser(username){
     $('#submit_update_master').click(function(){
         var data = $("#update_master").serialize();
         data = decodeURIComponent(data);
-        var dataObj = str2Obj(data);
+        var dataObj = toArrayObject(data);
         myPost('update_master_rep_slave_user', data, function(data){
             var rdata = $.parseJSON(data.data);
             showMsg(rdata.msg,function(){
@@ -1601,7 +1601,7 @@ function setDbMasterAccess(username){
             yes:function(index){
                 var data = $("#set_db_access").serialize();
                 data = decodeURIComponent(data);
-                var dataObj = str2Obj(data);
+                var dataObj = toArrayObject(data);
                 if(!dataObj['access']){
                     dataObj['access'] = dataObj['dataAccess'];
                     if ( dataObj['dataAccess'] == 'ip'){
