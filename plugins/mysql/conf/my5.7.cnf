@@ -22,6 +22,7 @@ server-id	= {$SERVER_ID}
 
 default_storage_engine = InnoDB
 
+
 key_buffer_size = 8M
 table_open_cache = 32
 sort_buffer_size = 256K
@@ -31,6 +32,7 @@ read_rnd_buffer_size = 256K
 myisam_sort_buffer_size = 4M
 thread_cache_size = 4
 lower_case_table_names=0
+query_cache_size = 4M
 tmp_table_size = 8M
 character-set-server = UTF8MB4
 

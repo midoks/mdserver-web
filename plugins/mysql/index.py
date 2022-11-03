@@ -681,8 +681,7 @@ def setMyPort():
     return mw.returnJson(True, '编辑成功!')
 
 
-def runInfo():
-
+def runInfo(version):
     if status(version) == 'stop':
         return mw.returnJson(False, 'MySQL未启动', [])
 
@@ -713,7 +712,7 @@ def runInfo():
     return mw.getJson(result)
 
 
-def myDbStatus():
+def myDbStatus(version):
     result = {}
     db = pMysqlDb()
     data = db.query('show variables')
@@ -723,6 +722,10 @@ def myDbStatus():
 
     gets = ['table_open_cache', 'thread_cache_size', 'key_buffer_size', 'tmp_table_size', 'max_heap_table_size', 'innodb_buffer_pool_size',
             'innodb_additional_mem_pool_size', 'innodb_log_buffer_size', 'max_connections', 'sort_buffer_size', 'read_buffer_size', 'read_rnd_buffer_size', 'join_buffer_size', 'thread_stack', 'binlog_cache_size']
+
+    if version != "8.0":
+        gets.append('query_cache_size')
+
     result['mem'] = {}
     for d in data:
         vname = d['Variable_name']
@@ -733,9 +736,16 @@ def myDbStatus():
     return mw.getJson(result)
 
 
-def setDbStatus():
+def setDbStatus(version):
     gets = ['key_buffer_size', 'tmp_table_size', 'max_heap_table_size', 'innodb_buffer_pool_size', 'innodb_log_buffer_size', 'max_connections',
             'table_open_cache', 'thread_cache_size', 'sort_buffer_size', 'read_buffer_size', 'read_rnd_buffer_size', 'join_buffer_size', 'thread_stack', 'binlog_cache_size']
+
+    if version != "8.0":
+        # gets.append('query_cache_size')
+        gets = ['key_buffer_size', 'query_cache_size', 'tmp_table_size', 'max_heap_table_size', 'innodb_buffer_pool_size', 'innodb_log_buffer_size', 'max_connections',
+                'table_open_cache', 'thread_cache_size', 'sort_buffer_size', 'read_buffer_size', 'read_rnd_buffer_size', 'join_buffer_size', 'thread_stack', 'binlog_cache_size']
+
+    # print(gets)
     emptys = ['max_connections', 'thread_cache_size', 'table_open_cache']
     args = getArgs()
     conFile = getConf()
@@ -2496,11 +2506,11 @@ if __name__ == "__main__":
     elif func == 'uninstall_pre_inspection':
         print(uninstallPreInspection(version))
     elif func == 'run_info':
-        print(runInfo())
+        print(runInfo(version))
     elif func == 'db_status':
-        print(myDbStatus())
+        print(myDbStatus(version))
     elif func == 'set_db_status':
-        print(setDbStatus())
+        print(setDbStatus(version))
     elif func == 'conf':
         print(getConf())
     elif func == 'bin_log':
