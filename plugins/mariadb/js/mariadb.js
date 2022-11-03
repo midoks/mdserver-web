@@ -601,6 +601,15 @@ function setDbAccess(username){
     });
 }
 
+function fixDbAccess(username){
+    myPost('fix_db_access', '', function(rdata){
+        var rdata = $.parseJSON(rdata.data);
+        showMsg(rdata.msg,function(){
+            dbList();
+        },{icon: rdata.status ? 1 : 2}); 
+    });
+}
+
 function setDbPass(id, username, password){
 
     var index = layer.open({
@@ -661,7 +670,6 @@ function addDatabase(type){
     }
     var index = layer.open({
         type: 1,
-        skin: 'demo-class',
         area: '500px',
         title: '添加数据库',
         closeBtn: 1,
@@ -850,12 +858,14 @@ function openPhpmyadmin(name,username,password){
     }    
 }
 
-function delBackup(filename,name){
-    myPost('delete_db_backup',{filename:filename},function(){
+function delBackup(filename, name, path){
+    if(typeof(path) == "undefined"){
+        path = "";
+    }
+    myPost('delete_db_backup',{filename:filename,path:path},function(){
         layer.msg('执行成功!');
         setTimeout(function(){
-            $('.layui-layer-close2').click();
-            setBackup(name);
+            setBackupReq(name);
         },2000);
     });
 }
@@ -871,9 +881,180 @@ function importBackup(file,name){
     });
 }
 
-function setBackup(db_name,obj){
-     myPost('get_db_backup_list', {name:db_name}, function(data){
 
+function importDbExternal(file,name){
+    myPost('import_db_external',{file:file,name:name}, function(data){
+        layer.msg('执行成功!');
+    });
+}
+
+function setLocalImport(db_name){
+
+    //上传文件
+    function uploadDbFiles(upload_dir){
+        var up_db = layer.open({
+            type:1,
+            closeBtn: 1,
+            title:"上传导入文件["+upload_dir+']',
+            area: ['500px','300px'],
+            shadeClose:false,
+            content:'<div class="fileUploadDiv">\
+                    <input type="hidden" id="input-val" value="'+upload_dir+'" />\
+                    <input type="file" id="file_input"  multiple="true" autocomplete="off" />\
+                    <button type="button"  id="opt" autocomplete="off">添加文件</button>\
+                    <button type="button" id="up" autocomplete="off" >开始上传</button>\
+                    <span id="totalProgress" style="position: absolute;top: 7px;right: 147px;"></span>\
+                    <span style="float:right;margin-top: 9px;">\
+                    <font>文件编码:</font>\
+                    <select id="fileCodeing" >\
+                        <option value="byte">二进制</option>\
+                        <option value="utf-8">UTF-8</option>\
+                        <option value="gb18030">GB2312</option>\
+                    </select>\
+                    </span>\
+                    <button type="button" id="filesClose" autocomplete="off">关闭</button>\
+                    <ul id="up_box"></ul>\
+                </div>',
+            success:function(){
+                $('#filesClose').click(function(){
+                    layer.close(up_db);
+                });
+            }
+
+        });
+        uploadStart(function(){
+            getList();
+            layer.close(up_db);
+        });
+    }
+
+    function getList(){
+        myPost('get_db_backup_import_list',{}, function(data){
+            var rdata = $.parseJSON(data.data);
+
+            var file_list = rdata.data.list;
+            var upload_dir = rdata.data.upload_dir;
+
+            var tbody = '';
+            for (var i = 0; i < file_list.length; i++) {
+                tbody += '<tr>\
+                        <td><span> ' + file_list[i]['name'] + '</span></td>\
+                        <td><span> ' + file_list[i]['size'] + '</span></td>\
+                        <td><span> ' + file_list[i]['time'] + '</span></td>\
+                        <td style="text-align: right;">\
+                            <a class="btlink" onclick="importDbExternal(\'' + file_list[i]['name'] + '\',\'' +db_name+ '\')">导入</a> | \
+                            <a class="btlink del" index="'+i+'">删除</a>\
+                        </td>\
+                    </tr>';
+            }
+
+            $('#import_db_file_list').html(tbody);
+            $('input[name="upload_dir"]').val(upload_dir);
+
+            $("#import_db_file_list .del").on('click',function(){
+                var index = $(this).attr('index');
+                var filename = file_list[index]["name"];
+                myPost('delete_db_backup',{filename:filename,path:upload_dir},function(){
+                    showMsg('执行成功!', function(){
+                        getList();
+                    },{icon:1},2000);
+                });
+            });
+        });
+    }
+
+    var layerIndex = layer.open({
+        type: 1,
+        title: "从文件导入数据",
+        area: ['600px', '380px'],
+        closeBtn: 1,
+        shadeClose: false,
+        content: '<div class="pd15">\
+                    <div class="db_list">\
+                        <button id="btn_file_upload" class="btn btn-success btn-sm" type="button">从本地上传</button>\
+                    </div >\
+                    <div class="divtable">\
+                    <input type="hidden" name="upload_dir" value=""> \
+                    <div id="database_fix"  style="height:150px;overflow:auto;border:#ddd 1px solid">\
+                    <table class="table table-hover "style="border:none">\
+                        <thead>\
+                            <tr>\
+                                <th>文件名称</th>\
+                                <th>文件大小</th>\
+                                <th>备份时间</th>\
+                                <th style="text-align: right;">操作</th>\
+                            </tr>\
+                        </thead>\
+                        <tbody  id="import_db_file_list" class="gztr"></tbody>\
+                    </table>\
+                    </div>\
+                    <ul class="help-info-text c7">\
+                        <li>仅支持sql、zip、sql.gz、(tar.gz|gz|tgz)</li>\
+                        <li>zip、tar.gz压缩包结构：test.zip或test.tar.gz压缩包内，必需包含test.sql</li>\
+                        <li>若文件过大，您还可以使用SFTP工具，将数据库文件上传到/www/backup/import</li>\
+                    </ul>\
+                </div>\
+        </div>',
+        success:function(index){
+            $('#btn_file_upload').click(function(){
+                var upload_dir = $('input[name="upload_dir"]').val();
+                uploadDbFiles(upload_dir);
+            });
+            getList();
+        },
+    });    
+}
+
+
+function setBackup(db_name){
+    var layerIndex = layer.open({
+        type: 1,
+        title: "数据库备份详情",
+        area: ['600px', '280px'],
+        closeBtn: 1,
+        shadeClose: false,
+        content: '<div class="pd15">\
+                    <div class="db_list">\
+                        <button id="btn_backup" class="btn btn-success btn-sm" type="button">备份</button>\
+                        <button id="btn_local_import" class="btn btn-success btn-sm" type="button">外部导入</button>\
+                    </div >\
+                    <div class="divtable">\
+                    <div  id="database_fix"  style="height:150px;overflow:auto;border:#ddd 1px solid">\
+                    <table id="database_table" class="table table-hover "style="border:none">\
+                        <thead>\
+                            <tr>\
+                                <th>文件名称</th>\
+                                <th>文件大小</th>\
+                                <th>备份时间</th>\
+                                <th style="text-align: right;">操作</th>\
+                            </tr>\
+                        </thead>\
+                        <tbody class="list"></tbody>\
+                    </table>\
+                    </div>\
+                </div>\
+        </div>',
+        success:function(index){
+            $('#btn_backup').click(function(){
+                myPost('set_db_backup',{name:db_name}, function(data){
+                    showMsg('执行成功!', function(){
+                        setBackupReq(db_name);
+                    }, {icon:1}, 2000);
+                });
+            });
+
+            $('#btn_local_import').click(function(){
+                setLocalImport(db_name);
+            });
+
+            setBackupReq(db_name);
+        },
+    });
+}
+
+
+function setBackupReq(db_name, obj){
+     myPost('get_db_backup_list', {name:db_name}, function(data){
         var rdata = $.parseJSON(data.data);
         var tbody = '';
         for (var i = 0; i < rdata.data.length; i++) {
@@ -888,45 +1069,7 @@ function setBackup(db_name,obj){
                     </td>\
                 </tr> ';
         }
-
-        var s = layer.open({
-            type: 1,
-            title: "数据库备份详情",
-            area: ['600px', '280px'],
-            closeBtn: 2,
-            shadeClose: false,
-            content: '<div class="pd15">\
-                        <div class="db_list">\
-                            <button id="btn_backup" class="btn btn-success btn-sm" type="button">备份</button>\
-                        </div >\
-                        <div class="divtable">\
-                        <div  id="database_fix"  style="height:150px;overflow:auto;border:#ddd 1px solid">\
-                        <table class="table table-hover "style="border:none">\
-                            <thead>\
-                                <tr>\
-                                    <th>文件名称</th>\
-                                    <th>文件大小</th>\
-                                    <th>备份时间</th>\
-                                    <th style="text-align: right;">操作</th>\
-                                </tr>\
-                            </thead>\
-                            <tbody class="gztr">' + tbody + '</tbody>\
-                        </table>\
-                        </div>\
-                    </div>\
-            </div>'
-        });
-
-        $('#btn_backup').click(function(){
-            myPost('set_db_backup',{name:db_name}, function(data){
-                layer.msg('执行成功!');
-
-                setTimeout(function(){
-                    layer.close(s);
-                    setBackup(db_name,obj);
-                },2000);
-            });
-        });
+        $('#database_table tbody').html(tbody);
     });
 }
 
@@ -960,7 +1103,7 @@ function dbList(page, search){
             list += '<td><span class="c9 input-edit" onclick="setDbPs(\''+rdata.data[i]['id']+'\',\''+rdata.data[i]['name']+'\',this)" style="display: inline-block;">'+rdata.data[i]['ps']+'</span></td>';
             list += '<td style="text-align:right">';
 
-            list += '<a href="javascript:;" class="btlink" class="btlink" onclick="setBackup(\''+rdata.data[i]['name']+'\',this)" title="数据库备份">'+(rdata.data[i]['is_backup']?'备份':'未备份') +'</a> | ';
+            list += '<a href="javascript:;" class="btlink" class="btlink" onclick="setBackup(\''+rdata.data[i]['name']+'\')" title="数据库备份">'+(rdata.data[i]['is_backup']?'备份':'未备份') +'</a> | ';
 
             var rw = '';
             var rw_change = 'all';
@@ -996,6 +1139,7 @@ function dbList(page, search){
             <button onclick="setRootPwd(0,\''+rdata.info['root_pwd']+'\')" title="设置MySQL管理员密码" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">root密码</button>\
             <button onclick="openPhpmyadmin(\'\',\'root\',\''+rdata.info['root_pwd']+'\')" title="打开phpMyadmin" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">phpMyAdmin</button>\
             <button onclick="setDbAccess(\'root\')" title="ROOT权限" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">ROOT权限</button>\
+            <button onclick="fixDbAccess(\'root\')" title="修复" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">修复</button>\
             <span style="float:right">              \
                 <button batch="true" style="float: right;display: none;margin-left:10px;" onclick="delDbBatch();" title="删除选中项" class="btn btn-default btn-sm">删除选中</button>\
             </span>\

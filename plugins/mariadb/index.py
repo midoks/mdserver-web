@@ -628,7 +628,7 @@ def isSqlError(mysqlMsg):
     if "2003," in mysqlMsg:
         return mw.returnJson(False, "Can't connect to MySQL server on '127.0.0.1' (61)")
     if "using password:" in mysqlMsg:
-        return mw.returnJson(False, '数据库管理密码错误!')
+        return mw.returnJson(False, '数据库密码错误,在管理列表-点击【修复】!')
     if "1045" in mysqlMsg:
         return mw.returnJson(False, '连接错误!')
     if "SQL syntax" in mysqlMsg:
@@ -712,15 +712,82 @@ def importDbBackup():
     return mw.returnJson(True, 'ok')
 
 
-def deleteDbBackup():
+def importDbExternal():
     args = getArgs()
-    data = checkArgs(args, ['filename'])
+    data = checkArgs(args, ['file', 'name'])
     if not data[0]:
         return data[1]
 
-    bkDir = mw.getRootDir() + '/backup/database'
+    file = args['file']
+    name = args['name']
 
-    os.remove(bkDir + '/' + args['filename'])
+    import_dir = mw.getRootDir() + '/backup/import/'
+
+    file_path = import_dir + file
+    if not os.path.exists(file_path):
+        return mw.returnJson(False, '文件突然消失?')
+
+    exts = ['sql', 'gz', 'zip']
+    tmp = file.split('.')
+    ext = tmp[len(tmp) - 1]
+    if ext not in exts:
+        return mw.returnJson(False, '导入数据库格式不对!')
+
+    tmp = file.split('/')
+    tmpFile = tmp[len(tmp) - 1]
+    tmpFile = tmpFile.replace('.sql.' + ext, '.sql')
+    tmpFile = tmpFile.replace('.' + ext, '.sql')
+    tmpFile = tmpFile.replace('tar.', '')
+
+    # print(tmpFile)
+    import_sql = ""
+    if file.find("sql.gz") > -1:
+        cmd = 'cd ' + import_dir + ' && gzip -dc ' + \
+            file + " > " + import_dir + tmpFile
+        info = mw.execShell(cmd)
+        if info[1] == "":
+            import_sql = import_dir + tmpFile
+
+    if file.find(".zip") > -1:
+        cmd = 'cd ' + import_dir + ' && unzip -o ' + file
+        mw.execShell(cmd)
+        import_sql = import_dir + tmpFile
+
+    if file.find("tar.gz") > -1:
+        cmd = 'cd ' + import_dir + ' && tar -zxvf ' + file
+        mw.execShell(cmd)
+        import_sql = import_dir + tmpFile
+
+    if import_sql == "":
+        return mw.returnJson(False, '未找SQL文件')
+
+    pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
+    sock = getSocketFile()
+
+    os.environ["MYSQL_PWD"] = pwd
+    mysql_cmd = getServerDir() + '/bin/mysql -S ' + sock + ' -uroot -p' + \
+        pwd + ' ' + name + ' < ' + import_sql
+
+    # print(mysql_cmd)
+    os.system(mysql_cmd)
+    os.remove(import_sql)
+
+    return mw.returnJson(True, 'ok')
+
+
+def deleteDbBackup():
+    args = getArgs()
+    data = checkArgs(args, ['filename', 'path'])
+    if not data[0]:
+        return data[1]
+
+    path = args['path']
+    full_file = ""
+    bkDir = mw.getRootDir() + '/backup/database'
+    full_file = bkDir + '/' + args['filename']
+    if path != "":
+        full_file = path + "/" + args['filename']
+    os.remove(full_file)
     return mw.returnJson(True, 'ok')
 
 
@@ -750,6 +817,39 @@ def getDbBackupList():
         data['file'] = p
 
     return mw.returnJson(True, 'ok', rr)
+
+
+def getDbBackupImportList():
+
+    bkImportDir = mw.getRootDir() + '/backup/import'
+    if not os.path.exists(bkImportDir):
+        os.mkdir(bkImportDir)
+
+    blist = os.listdir(bkImportDir)
+
+    rr = []
+    for x in range(0, len(blist)):
+        name = blist[x]
+        p = bkImportDir + '/' + name
+        data = {}
+        data['name'] = name
+
+        rsize = os.path.getsize(p)
+        data['size'] = mw.toSize(rsize)
+
+        t = os.path.getctime(p)
+        t = time.localtime(t)
+
+        data['time'] = time.strftime('%Y-%m-%d %H:%M:%S', t)
+        rr.append(data)
+
+        data['file'] = p
+
+    rdata = {
+        "list": rr,
+        "upload_dir": bkImportDir,
+    }
+    return mw.returnJson(True, 'ok', rdata)
 
 
 def getDbList():
@@ -1120,6 +1220,22 @@ def setDbAccess():
 
     psdb.where('username=?', (name,)).save('accept,rw', (access, 'rw',))
     return mw.returnJson(True, '设置成功!')
+
+
+def fixDbAccess(version):
+    try:
+        pdb = pMysqlDb()
+        psdb = pSqliteDb('databases')
+        data = pdb.query('show databases')
+        isError = isSqlError(data)
+        if isError != None:
+            appCMD(version, 'stop')
+            mw.execShell("rm -rf " + getServerDir() + "/data")
+            appCMD(version, 'start')
+            return mw.returnJson(True, '修复成功!')
+        return mw.returnJson(True, '正常无需修复!')
+    except Exception as e:
+        return mw.returnJson(False, '修复失败请重试!')
 
 
 def setDbRw(version=''):
@@ -2200,7 +2316,7 @@ def uninstallPreInspection(version):
 if __name__ == "__main__":
     func = sys.argv[1]
 
-    version = "5.6"
+    version = "10.6"
     version_pl = getServerDir() + "/version.pl"
     if os.path.exists(version_pl):
         version = mw.readFile(version_pl).strip()
@@ -2257,10 +2373,14 @@ if __name__ == "__main__":
         print(setDbBackup())
     elif func == 'import_db_backup':
         print(importDbBackup())
+    elif func == 'import_db_external':
+        print(importDbExternal())
     elif func == 'delete_db_backup':
         print(deleteDbBackup())
     elif func == 'get_db_backup_list':
         print(getDbBackupList())
+    elif func == 'get_db_backup_import_list':
+        print(getDbBackupImportList())
     elif func == 'add_db':
         print(addDb())
     elif func == 'del_db':
@@ -2277,6 +2397,8 @@ if __name__ == "__main__":
         print(getDbAccess())
     elif func == 'set_db_access':
         print(setDbAccess())
+    elif func == 'fix_db_access':
+        print(fixDbAccess(version))
     elif func == 'get_db_rw':
         print(setDbRw(version))
     elif func == 'set_db_ps':

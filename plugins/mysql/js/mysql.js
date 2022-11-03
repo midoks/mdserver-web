@@ -879,15 +879,14 @@ function openPhpmyadmin(name,username,password){
     }    
 }
 
-function delBackup(filename,name,path){
+function delBackup(filename, name, path){
     if(typeof(path) == "undefined"){
         path = "";
     }
     myPost('delete_db_backup',{filename:filename,path:path},function(){
         layer.msg('执行成功!');
         setTimeout(function(){
-            $('.layui-layer-close2').click();
-            setBackup(name);
+            setBackupReq(name);
         },2000);
     });
 }
@@ -946,6 +945,7 @@ function setLocalImport(db_name){
         });
         uploadStart(function(){
             getList();
+            layer.close(up_db);
         });
     }
 
@@ -1029,9 +1029,55 @@ function setLocalImport(db_name){
     
 }
 
-function setBackup(db_name,obj){
-     myPost('get_db_backup_list', {name:db_name}, function(data){
+function setBackup(db_name){
+    var layerIndex = layer.open({
+        type: 1,
+        title: "数据库备份详情",
+        area: ['600px', '280px'],
+        closeBtn: 1,
+        shadeClose: false,
+        content: '<div class="pd15">\
+                    <div class="db_list">\
+                        <button id="btn_backup" class="btn btn-success btn-sm" type="button">备份</button>\
+                        <button id="btn_local_import" class="btn btn-success btn-sm" type="button">外部导入</button>\
+                    </div >\
+                    <div class="divtable">\
+                    <div  id="database_fix"  style="height:150px;overflow:auto;border:#ddd 1px solid">\
+                    <table id="database_table" class="table table-hover "style="border:none">\
+                        <thead>\
+                            <tr>\
+                                <th>文件名称</th>\
+                                <th>文件大小</th>\
+                                <th>备份时间</th>\
+                                <th style="text-align: right;">操作</th>\
+                            </tr>\
+                        </thead>\
+                        <tbody class="list"></tbody>\
+                    </table>\
+                    </div>\
+                </div>\
+        </div>',
+        success:function(index){
+            $('#btn_backup').click(function(){
+                myPost('set_db_backup',{name:db_name}, function(data){
+                    showMsg('执行成功!', function(){
+                        setBackupReq(db_name);
+                    }, {icon:1}, 2000);
+                });
+            });
 
+            $('#btn_local_import').click(function(){
+                setLocalImport(db_name);
+            });
+
+            setBackupReq(db_name);
+        },
+    });
+}
+
+
+function setBackupReq(db_name, obj){
+     myPost('get_db_backup_list', {name:db_name}, function(data){
         var rdata = $.parseJSON(data.data);
         var tbody = '';
         for (var i = 0; i < rdata.data.length; i++) {
@@ -1041,56 +1087,14 @@ function setBackup(db_name,obj){
                     <td><span> ' + rdata.data[i]['time'] + '</span></td>\
                     <td style="text-align: right;">\
                         <a class="btlink" onclick="importBackup(\'' + rdata.data[i]['name'] + '\',\'' +db_name+ '\')">导入</a> | \
+                        <a class="btlink" onclick="downloadBackup(\'' + rdata.data[i]['file'] + '\')">下载</a> | \
                         <a class="btlink" onclick="delBackup(\'' + rdata.data[i]['name'] + '\',\'' +db_name+ '\')">删除</a>\
                     </td>\
                 </tr> ';
         }
-
-        var layerIndex = layer.open({
-            type: 1,
-            title: "数据库备份详情",
-            area: ['600px', '280px'],
-            closeBtn: 1,
-            shadeClose: false,
-            content: '<div class="pd15">\
-                        <div class="db_list">\
-                            <button id="btn_backup" class="btn btn-success btn-sm" type="button">备份</button>\
-                            <button id="btn_local_import" class="btn btn-success btn-sm" type="button">外部导入</button>\
-                        </div >\
-                        <div class="divtable">\
-                        <div  id="database_fix"  style="height:150px;overflow:auto;border:#ddd 1px solid">\
-                        <table class="table table-hover "style="border:none">\
-                            <thead>\
-                                <tr>\
-                                    <th>文件名称</th>\
-                                    <th>文件大小</th>\
-                                    <th>备份时间</th>\
-                                    <th style="text-align: right;">操作</th>\
-                                </tr>\
-                            </thead>\
-                            <tbody class="gztr">' + tbody + '</tbody>\
-                        </table>\
-                        </div>\
-                    </div>\
-            </div>',
-            success:function(index){
-                $('#btn_backup').click(function(){
-                    myPost('set_db_backup',{name:db_name}, function(data){
-                        showMsg('执行成功!', function(){
-                            layer.close(layerIndex);
-                            setBackup(db_name,obj);
-                        }, {icon:1}, 2000);
-                    });
-                });
-
-                $('#btn_local_import').click(function(){
-                    setLocalImport(db_name);
-                });
-            },
-        });
+        $('#database_table tbody').html(tbody);
     });
 }
-
 
 function dbList(page, search){
     var _data = {};

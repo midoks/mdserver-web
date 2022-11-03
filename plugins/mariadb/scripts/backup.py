@@ -26,6 +26,7 @@ class backupTools:
 
     def backupDatabase(self, name, count):
         db_path = mw.getServerDir() + '/mariadb'
+        db_sock = mw.getServerDir() + '/mariadb/'
         db_name = 'mysql'
         name = mw.M('databases').dbPos(db_path, 'mysql').where(
             'name=?', (name,)).getField('name')
@@ -63,8 +64,11 @@ class backupTools:
         # mw.execShell(db_path + "/bin/mysqldump --skip-lock-tables --default-character-set=utf8 " +
         #              name + " | gzip > " + filename)
 
-        mw.execShell(db_path + "/bin/mysqldump  --single-transaction --quick --default-character-set=utf8 " +
-                     name + " | gzip > " + filename)
+        cmd = db_path + "/bin/mysqldump  --single-transaction --quick --default-character-set=utf8 " + \
+            name + " | gzip > " + filename
+
+        # print(cmd)
+        mw.execShell(cmd)
 
         if not os.path.exists(filename):
             endDate = time.strftime('%Y/%m/%d %X', time.localtime())
