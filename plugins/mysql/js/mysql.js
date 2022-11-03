@@ -196,6 +196,12 @@ function myPerfOpt() {
     //获取MySQL配置
     myPost('db_status','',function(data){
         var rdata = $.parseJSON(data.data);
+        if ( typeof(rdata.status) != 'undefined' && !rdata.status){
+            layer.msg(rdata.msg, {icon:2});
+            return; 
+        }
+
+
         // console.log(rdata);
         var key_buffer_size = toSizeM(rdata.mem.key_buffer_size);
         var query_cache_size = toSizeM(rdata.mem.query_cache_size);
@@ -623,9 +629,17 @@ function setDbAccess(username){
     });
 }
 
-function setDbPass(id, username, password){
+function fixDbAccess(username){
+    myPost('fix_db_access', '', function(rdata){
+        var rdata = $.parseJSON(rdata.data);
+        showMsg(rdata.msg,function(){
+            dbList();
+        },{icon: rdata.status ? 1 : 2}); 
+    });
+}
 
-    var index = layer.open({
+function setDbPass(id, username, password){
+    layer.open({
         type: 1,
         area: '500px',
         title: '修改数据库密码',
@@ -1143,6 +1157,7 @@ function dbList(page, search){
             <button onclick="setRootPwd(0,\''+rdata.info['root_pwd']+'\')" title="设置MySQL管理员密码" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">root密码</button>\
             <button onclick="openPhpmyadmin(\'\',\'root\',\''+rdata.info['root_pwd']+'\')" title="打开phpMyadmin" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">phpMyAdmin</button>\
             <button onclick="setDbAccess(\'root\')" title="ROOT权限" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">ROOT权限</button>\
+            <button onclick="fixDbAccess(\'root\')" title="修复" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">修复</button>\
             <span style="float:right">              \
                 <button batch="true" style="float: right;display: none;margin-left:10px;" onclick="delDbBatch();" title="删除选中项" class="btn btn-default btn-sm">删除选中</button>\
             </span>\
@@ -2077,9 +2092,14 @@ function masterOrSlaveConf(version=''){
    
 
     function getMasterStatus(){
-        myPost('get_master_status', '', function(data){
-            var rdata = $.parseJSON(data.data);
+        myPost('get_master_status', '', function(rdata){
+            var rdata = $.parseJSON(rdata.data);
             // console.log('mode:',rdata.data);
+            if (!rdata.status){
+                layer.msg(rdata.msg, {icon:2});
+                return; 
+            }
+
             var rdata = rdata.data;
             var limitCon = '\
                 <p class="conf_p">\

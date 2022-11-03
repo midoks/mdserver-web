@@ -682,11 +682,16 @@ def setMyPort():
 
 
 def runInfo(version):
+
     if status(version) == 'stop':
         return mw.returnJson(False, 'MySQL未启动', [])
 
     db = pMysqlDb()
     data = db.query('show global status')
+    isError = isSqlError(data)
+    if isError != None:
+        return isError
+
     gets = ['Max_used_connections', 'Com_commit', 'Com_select', 'Com_rollback', 'Questions', 'Innodb_buffer_pool_reads', 'Innodb_buffer_pool_read_requests', 'Key_reads', 'Key_read_requests', 'Key_writes',
             'Key_write_requests', 'Qcache_hits', 'Qcache_inserts', 'Bytes_received', 'Bytes_sent', 'Aborted_clients', 'Aborted_connects',
             'Created_tmp_disk_tables', 'Created_tmp_tables', 'Innodb_buffer_pool_pages_dirty', 'Opened_files', 'Open_tables', 'Opened_tables', 'Select_full_join',
@@ -778,7 +783,7 @@ def isSqlError(mysqlMsg):
     if "2003," in mysqlMsg:
         return mw.returnJson(False, "Can't connect to MySQL server on '127.0.0.1' (61)")
     if "using password:" in mysqlMsg:
-        return mw.returnJson(False, '数据库管理密码错误!')
+        return mw.returnJson(False, '数据库密码错误,在管理列表-点击【修复】!')
     if "1045" in mysqlMsg:
         return mw.returnJson(False, '连接错误!')
     if "SQL syntax" in mysqlMsg:
@@ -1304,11 +1309,11 @@ def delDb():
     if not data[0]:
         return data[1]
     try:
-        id = args['id']
+        sid = args['id']
         name = args['name']
         psdb = pSqliteDb('databases')
         pdb = pMysqlDb()
-        find = psdb.where("id=?", (id,)).field(
+        find = psdb.where("id=?", (sid,)).field(
             'id,pid,name,username,password,accept,ps,addtime').find()
         accept = find['accept']
         username = find['username']
@@ -1324,7 +1329,7 @@ def delDb():
         pdb.execute("flush privileges")
 
         # 删除SQLITE
-        psdb.where("id=?", (id,)).delete()
+        psdb.where("id=?", (sid,)).delete()
         return mw.returnJson(True, '删除成功!')
     except Exception as ex:
         return mw.returnJson(False, '删除失败!' + str(ex))
@@ -1340,6 +1345,10 @@ def getDbAccess():
 
     users = pdb.query("select Host from mysql.user where User='" +
                       username + "' AND Host!='localhost'")
+
+    isError = isSqlError(users)
+    if isError != None:
+        return isError
 
     if len(users) < 1:
         return mw.returnJson(True, "127.0.0.1")
@@ -1378,6 +1387,22 @@ def setDbAccess():
 
     psdb.where('username=?', (name,)).save('accept,rw', (access, 'rw',))
     return mw.returnJson(True, '设置成功!')
+
+
+def fixDbAccess(version):
+    try:
+        pdb = pMysqlDb()
+        psdb = pSqliteDb('databases')
+        data = pdb.query('show databases')
+        isError = isSqlError(data)
+        if isError != None:
+            appCMD(version, 'stop')
+            mw.execShell("rm -rf " + getServerDir() + "/data")
+            appCMD(version, 'start')
+            return mw.returnJson(True, '修复成功!')
+        return mw.returnJson(True, '正常无需修复!')
+    except Exception as e:
+        return mw.returnJson(False, '修复失败请重试!')
 
 
 def setDbRw(version=''):
@@ -1677,55 +1702,57 @@ def setDbMasterAccess():
 
 
 def getMasterDbList(version=''):
-    args = getArgs()
-    page = 1
-    page_size = 10
-    search = ''
-    data = {}
-    if 'page' in args:
-        page = int(args['page'])
+    try:
+        args = getArgs()
+        page = 1
+        page_size = 10
+        search = ''
+        data = {}
+        if 'page' in args:
+            page = int(args['page'])
 
-    if 'page_size' in args:
-        page_size = int(args['page_size'])
+        if 'page_size' in args:
+            page_size = int(args['page_size'])
 
-    if 'search' in args:
-        search = args['search']
+        if 'search' in args:
+            search = args['search']
 
-    conn = pSqliteDb('databases')
-    limit = str((page - 1) * page_size) + ',' + str(page_size)
-    condition = ''
-    dodb = findBinlogDoDb()
-    data['dodb'] = dodb
+        conn = pSqliteDb('databases')
+        limit = str((page - 1) * page_size) + ',' + str(page_size)
+        condition = ''
+        dodb = findBinlogDoDb()
+        data['dodb'] = dodb
 
-    slave_dodb = findBinlogSlaveDoDb()
+        slave_dodb = findBinlogSlaveDoDb()
 
-    if not search == '':
-        condition = "name like '%" + search + "%'"
-    field = 'id,pid,name,username,password,accept,ps,addtime'
-    clist = conn.where(condition, ()).field(
-        field).limit(limit).order('id desc').select()
-    count = conn.where(condition, ()).count()
+        if not search == '':
+            condition = "name like '%" + search + "%'"
+        field = 'id,pid,name,username,password,accept,ps,addtime'
+        clist = conn.where(condition, ()).field(
+            field).limit(limit).order('id desc').select()
+        count = conn.where(condition, ()).count()
 
-    for x in range(0, len(clist)):
-        if clist[x]['name'] in dodb:
-            clist[x]['master'] = 1
-        else:
-            clist[x]['master'] = 0
+        for x in range(0, len(clist)):
+            if clist[x]['name'] in dodb:
+                clist[x]['master'] = 1
+            else:
+                clist[x]['master'] = 0
 
-        if clist[x]['name'] in slave_dodb:
-            clist[x]['slave'] = 1
-        else:
-            clist[x]['slave'] = 0
+            if clist[x]['name'] in slave_dodb:
+                clist[x]['slave'] = 1
+            else:
+                clist[x]['slave'] = 0
 
-    _page = {}
-    _page['count'] = count
-    _page['p'] = page
-    _page['row'] = page_size
-    _page['tojs'] = 'dbList'
-    data['page'] = mw.getPage(_page)
-    data['data'] = clist
-
-    return mw.getJson(data)
+        _page = {}
+        _page['count'] = count
+        _page['p'] = page
+        _page['row'] = page_size
+        _page['tojs'] = 'dbList'
+        data['page'] = mw.getPage(_page)
+        data['data'] = clist
+        return mw.getJson(data)
+    except Exception as e:
+        return mw.returnJson(False, "数据库密码错误,在管理列表-点击【修复】!")
 
 
 def setDbMaster(version):
@@ -1791,29 +1818,32 @@ def setDbSlave(version):
 
 def getMasterStatus(version=''):
 
-    if status(version) == 'stop':
-        return mw.returnJson(False, 'MySQL未启动,或正在启动中...!', [])
+    try:
+        if status(version) == 'stop':
+            return mw.returnJson(False, 'MySQL未启动,或正在启动中...!', [])
 
-    conf = getConf()
-    content = mw.readFile(conf)
-    master_status = False
-    if content.find('#log-bin') == -1 and content.find('log-bin') > 1:
-        dodb = findBinlogDoDb()
-        if len(dodb) > 0:
-            master_status = True
+        conf = getConf()
+        content = mw.readFile(conf)
+        master_status = False
+        if content.find('#log-bin') == -1 and content.find('log-bin') > 1:
+            dodb = findBinlogDoDb()
+            if len(dodb) > 0:
+                master_status = True
 
-    data = {}
-    data['mode'] = recognizeDbMode()
-    data['status'] = master_status
+        data = {}
+        data['mode'] = recognizeDbMode()
+        data['status'] = master_status
 
-    db = pMysqlDb()
-    dlist = db.query('show slave status')
+        db = pMysqlDb()
+        dlist = db.query('show slave status')
 
-    # print(dlist[0])
-    if len(dlist) > 0 and (dlist[0]["Slave_IO_Running"] == 'Yes' or dlist[0]["Slave_SQL_Running"] == 'Yes'):
-        data['slave_status'] = True
+        # print(dlist[0])
+        if len(dlist) > 0 and (dlist[0]["Slave_IO_Running"] == 'Yes' or dlist[0]["Slave_SQL_Running"] == 'Yes'):
+            data['slave_status'] = True
 
-    return mw.returnJson(master_status, '设置成功', data)
+        return mw.returnJson(master_status, '设置成功', data)
+    except Exception as e:
+        return mw.returnJson(False, "数据库密码错误,在管理列表-点击【修复】!")
 
 
 def setMasterStatus(version=''):
@@ -2561,6 +2591,8 @@ if __name__ == "__main__":
         print(getDbAccess())
     elif func == 'set_db_access':
         print(setDbAccess())
+    elif func == 'fix_db_access':
+        print(fixDbAccess(version))
     elif func == 'set_db_rw':
         print(setDbRw(version))
     elif func == 'set_db_ps':
