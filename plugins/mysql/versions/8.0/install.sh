@@ -91,8 +91,9 @@ Install_mysql()
 	fi
 
 	if [ "$cpuCore" -gt "1" ];then
-		cpuCore=`echo "$cpuCore" | awk '{printf("%.f",($1)*0.8)}'`
+		cpuCore=`echo "$cpuCore" | awk '{printf("%.2f",($1)*0.8)}' | awk -F '.' '{print $1}'`
 	fi
+
 	# ----- cpu end ------
 
 	cd ${rootPath}/plugins/mysql/lib && /bin/bash rpcgen.sh

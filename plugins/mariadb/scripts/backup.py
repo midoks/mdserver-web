@@ -5,6 +5,8 @@
 
 import sys
 import os
+import re
+import time
 
 if sys.platform != 'darwin':
     os.chdir('/www/server/mdserver-web')
@@ -19,13 +21,13 @@ sys.path.append(chdir + '/class/core')
 
 import mw
 import db
-import time
 
 
 class backupTools:
 
     def backupDatabase(self, name, count):
         db_path = mw.getServerDir() + '/mariadb'
+        db_sock = mw.getServerDir() + '/mariadb/'
         db_name = 'mysql'
         name = mw.M('databases').dbPos(db_path, 'mysql').where(
             'name=?', (name,)).getField('name')
@@ -45,26 +47,27 @@ class backupTools:
         filename = backup_path + "/db_" + name + "_" + \
             time.strftime('%Y%m%d_%H%M%S', time.localtime()) + ".sql.gz"
 
-        import re
         mysql_root = mw.M('config').dbPos(db_path, db_name).where(
             "id=?", (1,)).getField('mysql_root')
 
-        mycnf = mw.readFile(db_path + '/etc/my.cnf')
+        my_conf_path = db_path + '/etc/my.cnf'
+        content = mw.readFile(my_conf_path)
         rep = "\[mysqldump\]\nuser=root"
         sea = "[mysqldump]\n"
         subStr = sea + "user=root\npassword=" + mysql_root + "\n"
-        mycnf = mycnf.replace(sea, subStr)
-        if len(mycnf) > 100:
-            mw.writeFile(db_path + '/etc/my.cnf', mycnf)
+        content = content.replace(sea, subStr)
+        if len(content) > 100:
+            mw.writeFile(my_conf_path, content)
 
-        # mw.execShell(db_path + "/bin/mysqldump --opt --default-character-set=utf8 " +
+        # mw.execShell(db_path + "/bin/mysqldump --defaults-file=" + my_conf_path + " --opt --default-character-set=utf8 " +
         #              name + " | gzip > " + filename)
 
-        # mw.execShell(db_path + "/bin/mysqldump --skip-lock-tables --default-character-set=utf8 " +
+        # mw.execShell(db_path + "/bin/mysqldump --defaults-file=" + my_conf_path + " --skip-lock-tables --default-character-set=utf8 " +
         #              name + " | gzip > " + filename)
 
-        mw.execShell(db_path + "/bin/mysqldump  --single-transaction --quick --default-character-set=utf8 " +
-                     name + " | gzip > " + filename)
+        cmd = db_path + "/bin/mysqldump --defaults-file=" + my_conf_path + "  --single-transaction --quick --default-character-set=utf8 " + \
+            name + " | gzip > " + filename
+        mw.execShell(cmd)
 
         if not os.path.exists(filename):
             endDate = time.strftime('%Y/%m/%d %X', time.localtime())
