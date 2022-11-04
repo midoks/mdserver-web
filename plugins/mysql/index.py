@@ -417,7 +417,7 @@ def initMysqlPwd():
     cmd_pass = serverdir + '/bin/mysql -uroot -e'
     cmd_pass = cmd_pass + "\"UPDATE mysql.user SET password=PASSWORD('" + \
         pwd + "') WHERE user='root';"
-    cmd_pass = cmd_pass + "flush privileges;\""
+    cmd_pass = cmd_pass + "delete from user where USER='';flush privileges;\""
     data = mw.execShell(cmd_pass)
     # print(cmd_pass)
     # print(data)
@@ -1392,7 +1392,6 @@ def setDbAccess():
 def fixDbAccess(version):
     try:
         pdb = pMysqlDb()
-        psdb = pSqliteDb('databases')
         data = pdb.query('show databases')
         isError = isSqlError(data)
         if isError != None:
