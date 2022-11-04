@@ -415,12 +415,18 @@ def initMysqlPwd():
     #     "UPDATE mysql.user SET password=PASSWORD('" + \
     #     pwd + "') WHERE user='root'"
     cmd_pass = serverdir + '/bin/mysql -uroot -e'
-    cmd_pass = cmd_pass + "\"UPDATE mysql.user SET password=PASSWORD('" + \
+    cmd_pass = cmd_pass + \
+        '"UPDATE mysql.user SET password=PASSWORD(' + \
         pwd + "') WHERE user='root';"
-    cmd_pass = cmd_pass + "delete from user where USER='';flush privileges;\""
+    cmd_pass = cmd_pass + 'flush privileges;"'
     data = mw.execShell(cmd_pass)
     # print(cmd_pass)
     # print(data)
+
+    # 删除空账户
+    drop_empty_user = serverdir + '/bin/mysql -uroot -p' + \
+        pwd + ' -e "delete from user where USER=''"'
+    mw.execShell(drop_empty_user)
 
     # 删除测试数据库
     drop_test_db = serverdir + '/bin/mysql -uroot -p' + \
