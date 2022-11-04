@@ -239,9 +239,9 @@ case "$1" in
             v6=$(python3 $mw_path/tools.py getServerIp 6)
 
             if [ "$v4" != "" ] && [ "$v6" != "" ]; then
-                address="MW-Panel-Url-Ipv4: http://$v4:$port$auth_path \nMW-Panel-Url-Ipv6: http://[$v6]:$port$auth_path"
+                address="MW-Panel-Url-Ipv4: http://$v4:$port/$auth_path \nMW-Panel-Url-Ipv6: http://[$v6]:$port/$auth_path"
             elif [ "$v4" != "" ]; then
-                address="MW-Panel-Url: http://$v4:$port$auth_path"
+                address="MW-Panel-Url: http://$v4:$port/$auth_path"
             elif [ "$v6" != "" ]; then
 
                 if [ ! -f $mw_path/data/ipv6.pl ];then
@@ -250,14 +250,12 @@ case "$1" in
                     mw_start
                     echo 'True' > $mw_path/data/ipv6.pl
                 fi
-                
-                address="MW-Panel-Url: http://[$v6]:$port$auth_path"
-
+                address="MW-Panel-Url: http://[$v6]:$port/$auth_path"
             else
-                address="MW-Panel-Url: http://you-network-ip:$port$auth_path"
+                address="MW-Panel-Url: http://you-network-ip:$port/$auth_path"
             fi
         else
-            address="MW-Panel-Url: http://$address:$port$auth_path"
+            address="MW-Panel-Url: http://$address:$port/$auth_path"
         fi
 
         show_panel_ip="$port|"
