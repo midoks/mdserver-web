@@ -1843,7 +1843,7 @@ def getMasterStatus(version=''):
 
         return mw.returnJson(master_status, '设置成功', data)
     except Exception as e:
-        return mw.returnJson(False, "数据库密码错误,在管理列表-点击【修复】!")
+        return mw.returnJson(False, "数据库密码错误,在管理列表-点击【修复】!", 'pwd')
 
 
 def setMasterStatus(version=''):
