@@ -42,6 +42,10 @@ Install_openresty()
 	else
 	    cpuCore="1"
 	fi
+
+	if [ "$cpuCore" -gt "1" ];then
+		cpuCore=`echo "$cpuCore" | awk '{printf("%.2f",($1)*0.8)}' | awk -F '.' '{print $1}'`
+	fi
 	# ----- cpu end ------
 
 	mkdir -p ${openrestyDir}
@@ -63,6 +67,7 @@ Install_openresty()
 	--with-http_ssl_module  \
 	--with-http_slice_module \
 	--with-http_stub_status_module \
+	--with-http_sub_module \
 	--with-http_realip_module
 	# --without-luajit-gc64
 	# --with-debug
@@ -79,6 +84,7 @@ Install_openresty()
 		#初始化 
 		cd ${rootPath} && python3 ${rootPath}/plugins/openresty/index.py start
 		cd ${rootPath} && python3 ${rootPath}/plugins/openresty/index.py initd_install
+		rm -rf $openrestyDir
     fi
 	echo '安装完成' > $install_tmp
 }

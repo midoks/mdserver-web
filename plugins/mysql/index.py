@@ -406,21 +406,20 @@ def initMysqlPwd():
     serverdir = getServerDir()
     myconf = serverdir + "/etc/my.cnf"
     pwd = mw.getRandomString(16)
-    # cmd_pass = serverdir + '/bin/mysqladmin -uroot password ' + pwd
 
-    # cmd_pass = "insert into mysql.user(Select_priv,Insert_priv,Update_priv,Delete_priv,Create_priv,Drop_priv,Reload_priv,Shutdown_priv,Process_priv,File_priv,Grant_priv,References_priv,Index_priv,Alter_priv,Show_db_priv,Super_priv,Create_tmp_table_priv,Lock_tables_priv,Execute_priv,Repl_slave_priv,Repl_client_priv,Create_view_priv,Show_view_priv,Create_routine_priv,Alter_routine_priv,Create_user_priv,Event_priv,Trigger_priv,Create_tablespace_priv,User,Password,host)values('Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','root',password('" + pwd + "'),'127.0.0.1')"
-    # cmd_pass = cmd_pass + \
-    #     "insert into mysql.user(Select_priv,Insert_priv,Update_priv,Delete_priv,Create_priv,Drop_priv,Reload_priv,Shutdown_priv,Process_priv,File_priv,Grant_priv,References_priv,Index_priv,Alter_priv,Show_db_priv,Super_priv,Create_tmp_table_priv,Lock_tables_priv,Execute_priv,Repl_slave_priv,Repl_client_priv,Create_view_priv,Show_view_priv,Create_routine_priv,Alter_routine_priv,Create_user_priv,Event_priv,Trigger_priv,Create_tablespace_priv,User,Password,host)values('Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','root',password('" + pwd + "'),'localhost')"
-    # cmd_pass = cmd_pass + \
-    #     "UPDATE mysql.user SET password=PASSWORD('" + \
-    #     pwd + "') WHERE user='root'"
     cmd_pass = serverdir + '/bin/mysql -uroot -e'
-    cmd_pass = cmd_pass + "\"UPDATE mysql.user SET password=PASSWORD('" + \
+    cmd_pass = cmd_pass + \
+        '"UPDATE mysql.user SET password=PASSWORD(\'' + \
         pwd + "') WHERE user='root';"
-    cmd_pass = cmd_pass + "flush privileges;\""
+    cmd_pass = cmd_pass + 'flush privileges;"'
     data = mw.execShell(cmd_pass)
     # print(cmd_pass)
     # print(data)
+
+    # 删除空账户
+    drop_empty_user = serverdir + '/bin/mysql -uroot -p' + \
+        pwd + ' -e "use mysql;delete from user where USER=\'\'"'
+    mw.execShell(drop_empty_user)
 
     # 删除测试数据库
     drop_test_db = serverdir + '/bin/mysql -uroot -p' + \
@@ -1392,7 +1391,6 @@ def setDbAccess():
 def fixDbAccess(version):
     try:
         pdb = pMysqlDb()
-        psdb = pSqliteDb('databases')
         data = pdb.query('show databases')
         isError = isSqlError(data)
         if isError != None:

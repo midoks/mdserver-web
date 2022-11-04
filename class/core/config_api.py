@@ -164,10 +164,12 @@ class config_api:
 
     def setAdminPathApi(self):
         admin_path = request.form.get('admin_path', '').strip()
-        admin_path_checks = ['/', '/close', '/login', '/do_login', '/site',
-                             '/sites', '/download_file', '/control', '/crontab',
-                             '/firewall', '/files', 'config', '/soft', '/system',
-                             '/code', '/ssl', '/plugins']
+        admin_path_checks = ['/', '/close', '/login',
+                             '/do_login', '/site', '/sites',
+                             '/download_file', '/control', '/crontab',
+                             '/firewall', '/files', 'config',
+                             '/soft', '/system', '/code',
+                             '/ssl', '/plugins', '/hook']
         if admin_path == '':
             admin_path = '/'
         if admin_path != '/':
@@ -176,16 +178,18 @@ class config_api:
             if admin_path in admin_path_checks:
                 return mw.returnJson(False, '该入口已被面板占用,请使用其它入口!')
             if not re.match("^/[\w\./-_]+$", admin_path):
-                return mw.returnJson(False, '入口地址格式不正确,示例: /my_panel')
-        else:
-            domain = mw.readFile('data/domain.conf')
-            if not domain:
-                domain = ''
-            limitip = mw.readFile('data/limitip.conf')
-            if not limitip:
-                limitip = ''
-            if not domain.strip() and not limitip.strip():
-                return mw.returnJson(False, '警告，关闭安全入口等于直接暴露你的后台地址在外网，十分危险，至少开启以下一种安全方式才能关闭：<a style="color:red;"><br>1、绑定访问域名<br>2、绑定授权IP</a>')
+                return mw.returnJson(False, '入口地址格式不正确,示例: /mw_rand')
+        # else:
+        #     domain = mw.readFile('data/bind_domain.pl')
+        #     if not domain:
+        #         domain = ''
+        #     limitip = mw.readFile('data/bind_limitip.pl')
+        #     if not limitip:
+        #         limitip = ''
+        #     if not domain.strip() and not limitip.strip():
+        # return mw.returnJson(False,
+        # '警告，关闭安全入口等于直接暴露你的后台地址在外网，十分危险，至少开启以下一种安全方式才能关闭：<a
+        # style="color:red;"><br>1、绑定访问域名<br>2、绑定授权IP</a>')
 
         admin_path_file = 'data/admin_path.pl'
         admin_path_old = '/'

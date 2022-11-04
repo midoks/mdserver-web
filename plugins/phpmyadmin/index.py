@@ -145,7 +145,7 @@ def initCfg():
     if not os.path.exists(cfg):
         data = {}
         data['port'] = '888'
-        data['choose'] = ''
+        data['choose'] = 'mysql'
         data['path'] = ''
         data['username'] = 'admin'
         data['password'] = 'admin'

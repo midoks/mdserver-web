@@ -47,6 +47,12 @@ if os.path.exists('data/ipv6.pl'):
 else:
     bind.append('0.0.0.0:%s' % mw_port)
 
+
+# 初始安装时,自动生成安全路径
+if not os.path.exists('data/admin_path.pl'):
+    admin_path = mw.getRandomString(8)
+    mw.writeFile('data/admin_path.pl', admin_path)
+
 if workers > 2:
     workers = 2
 
