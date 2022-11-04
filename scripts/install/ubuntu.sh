@@ -128,7 +128,7 @@ apt install -y libmariadb-dev
 apt install -y libmariadb-dev-compat
 #apt install -y libmariadbclient-dev
 
-
+cd /www/server/mdserver-web/scripts && bash lib.sh
 chmod 755 /www/server/mdserver-web/data
 
 
