@@ -63,6 +63,7 @@ Install_openresty()
 	--with-http_ssl_module  \
 	--with-http_slice_module \
 	--with-http_stub_status_module \
+	--with-http_stub_module \
 	--with-http_realip_module
 	# --without-luajit-gc64
 	# --with-debug
