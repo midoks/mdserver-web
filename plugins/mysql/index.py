@@ -416,7 +416,7 @@ def initMysqlPwd():
     #     pwd + "') WHERE user='root'"
     cmd_pass = serverdir + '/bin/mysql -uroot -e'
     cmd_pass = cmd_pass + \
-        '"UPDATE mysql.user SET password=PASSWORD(' + \
+        '"UPDATE mysql.user SET password=PASSWORD(\'' + \
         pwd + "') WHERE user='root';"
     cmd_pass = cmd_pass + 'flush privileges;"'
     data = mw.execShell(cmd_pass)
