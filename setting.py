@@ -51,7 +51,7 @@ else:
 # 初始安装时,自动生成安全路径
 if not os.path.exists('data/admin_path.pl'):
     admin_path = mw.getRandomString(8)
-    mw.writeFile('data/admin_path.pl', admin_path.lower())
+    mw.writeFile('data/admin_path.pl', '/' + admin_path.lower())
 
 if workers > 2:
     workers = 2
