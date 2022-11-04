@@ -2073,11 +2073,11 @@ function masterOrSlaveConf(version=''){
 
     function getMasterStatus(){
         myPost('get_master_status', '', function(rdata){
-             var rdata = $.parseJSON(rdata.data);
+            var rdata = $.parseJSON(rdata.data);
             // console.log('mode:',rdata.data);
-            if (!rdata.status){
+            if ( typeof(rdata.status) != 'undefined' && !rdata.status && rdata.data == 'pwd'){
                 layer.msg(rdata.msg, {icon:2});
-                return; 
+                return;
             }
 
             var rdata = rdata.data;
