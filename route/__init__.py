@@ -136,6 +136,10 @@ def isLogined():
             session['overdue'] = int(time.time()) + 7 * 24 * 60 * 60
             return False
 
+        if 'tmp_login_expire' in session and now_time > session['tmp_login_expire']:
+            session.clear()
+            return False
+
         return True
 
     if os.path.exists('data/api_login.txt'):
@@ -329,10 +333,14 @@ def login_temp_user(token):
 
     stime = int(time.time())
     data = mw.M('temp_login').where('state=? and expire>?',
-                                    (0, stime)).field('id,token,salt,expire').find()
+                                    (0, stime)).field('id,token,salt,expire,addtime').find()
     if not data:
         setErrorNum(skey)
         return '验证失败!'
+
+    if stime > int(data['addtime']):
+        setErrorNum(skey)
+        return "过期"
 
     r_token = mw.md5(token + data['salt'])
     if r_token != data['token']:
@@ -345,7 +353,7 @@ def login_temp_user(token):
     session['username'] = userInfo['username']
     session['tmp_login'] = True
     session['tmp_login_id'] = str(data['id'])
-    session['tmp_login_expire'] = time.time() + 3600
+    session['tmp_login_expire'] = int(data['addtime']) + 3600
     session['uid'] = data['id']
 
     login_addr = mw.getClientIp() + ":" + str(request.environ.get('REMOTE_PORT'))
@@ -502,14 +510,6 @@ def connect_ssh():
     shell = ssh.invoke_shell(term='xterm', width=83, height=21)
     shell.setblocking(0)
     return True
-
-
-# 取数据对象
-def get_input_data(data):
-    pdata = common.dict_obj()
-    for key in data.keys():
-        pdata[key] = str(data[key])
-    return pdata
 
 
 @socketio.on('webssh')
