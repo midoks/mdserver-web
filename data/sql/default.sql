@@ -109,6 +109,18 @@ CREATE TABLE IF NOT EXISTS `tasks` (
   `execstr` 	TEXT
 );
 
+CREATE TABLE IF NOT EXISTS `temp_login` (
+  `id`  INTEGER PRIMARY KEY AUTOINCREMENT,
+  `token` REAL,
+  `salt`  REAL,
+  `state` INTEGER,
+  `login_time`  INTEGER,
+  `login_addr`  REAL,
+  `logout_time` INTEGER,
+  `expire`  INTEGER,
+  `addtime` INTEGER
+);
+
 CREATE TABLE IF NOT EXISTS `panel` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT,
   `title` TEXT,
