@@ -136,7 +136,7 @@ def isLogined():
             session['overdue'] = int(time.time()) + 7 * 24 * 60 * 60
             return False
 
-        if 'tmp_login_expire' in session and now_time > session['tmp_login_expire']:
+        if 'tmp_login_expire' in session and now_time > int(session['tmp_login_expire']):
             session.clear()
             return False
 
