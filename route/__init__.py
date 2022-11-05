@@ -338,7 +338,7 @@ def login_temp_user(token):
         setErrorNum(skey)
         return '验证失败!'
 
-    if stime > int(data['addtime']) + 3600:
+    if stime > int(data['expire']):
         setErrorNum(skey)
         return "过期"
 
@@ -353,7 +353,7 @@ def login_temp_user(token):
     session['username'] = userInfo['username']
     session['tmp_login'] = True
     session['tmp_login_id'] = str(data['id'])
-    session['tmp_login_expire'] = int(data['addtime']) + 3600
+    session['tmp_login_expire'] = int(data['expire'])
     session['uid'] = data['id']
 
     login_addr = mw.getClientIp() + ":" + str(request.environ.get('REMOTE_PORT'))
