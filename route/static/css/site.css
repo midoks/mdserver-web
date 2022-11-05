@@ -2220,26 +2220,26 @@ html .menu .menu_exit:hover {
     margin-left: -40px;
     vertical-align: 0;
     position: relative;
-    z-index: 10
+    z-index: 10;
 }
 
 .setting-con p .set-info {
-    margin-left: 20px
+    margin-left: 10px;
 }
 
 .set-submit {
-    margin: 20px 0 10px 100px
+    margin: 20px 0 10px 100px;
 }
 
 .changepath {
-    height: 500px
+    height: 500px;
 }
 
 .changepath .path-top {
     height: 50px;
     line-height: 50px;
     padding-left: 10px;
-    border-bottom: #aaa 1px solid
+    border-bottom: #aaa 1px solid;
 }
 
 .changepath .path-top .btn {

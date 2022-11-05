@@ -392,10 +392,13 @@ def writeLog(stype, msg, args=()):
         import time
         import db
         import json
+        from flask import session
+        uid = 1
+        if 'uid' in session:
+            uid = session['uid']
         sql = db.Sql()
         mdate = time.strftime('%Y-%m-%d %X', time.localtime())
         wmsg = getInfo(msg, args)
-        uid = 1
         data = (stype, wmsg, uid, mdate)
         result = sql.table('logs').add('type,log,uid,addtime', data)
         return True

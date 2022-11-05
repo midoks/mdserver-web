@@ -213,6 +213,29 @@ class Sql():
         except Exception as ex:
             return "error: " + str(ex)
 
+    # 插入数据
+    def insert(self, pdata):
+        if not pdata:
+            return False
+        keys, param = self.__format_pdata(pdata)
+        return self.add(keys, param)
+
+    # 更新数据
+    def update(self, pdata):
+        if not pdata:
+            return False
+        keys, param = self.__format_pdata(pdata)
+        return self.save(keys, param)
+
+    # 构造数据
+    def __format_pdata(self, pdata):
+        keys = pdata.keys()
+        keys_str = ','.join(keys)
+        param = []
+        for k in keys:
+            param.append(pdata[k])
+        return keys_str, tuple(param)
+
     def checkInput(self, data):
         if not data:
             return data

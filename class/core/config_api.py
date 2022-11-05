@@ -20,6 +20,9 @@ class config_api:
     def __init__(self):
         pass
 
+    def getVersion(self):
+        return self.__version
+
     ##### ----- start ----- ###
 
     # 取面板列表
@@ -306,8 +309,83 @@ class config_api:
             return True
         return False
 
-    def getVersion(self):
-        return self.__version
+    # 获取临时登录列表
+    def getTempLoginApi(self):
+        if 'tmp_login_expire' in session:
+            return mw.returnJson(False, '没有权限')
+        limit = request.form.get('limit', '10').strip()
+        p = request.form.get('p', '1').strip()
+        tojs = request.form.get('tojs', '').strip()
+
+        tempLoginM = mw.M('temp_login')
+        tempLoginM.where('state=? and expire<?',
+                         (0, int(time.time()))).setField('state', -1)
+
+        start = (int(p) - 1) * (int(limit))
+        vlist = tempLoginM.limit(str(start) + ',' + str(limit)).order('id desc').field(
+            'id,addtime,expire,login_time,login_addr,state').select()
+
+        data = {}
+        data['data'] = vlist
+
+        count = tempLoginM.count()
+        page_args = {}
+        page_args['count'] = count
+        page_args['tojs'] = 'get_temp_login'
+        page_args['p'] = p
+        page_args['row'] = limit
+
+        data['page'] = mw.getPage(page_args)
+        return mw.getJson(data)
+
+    # 删除临时登录
+    def removeTempLoginApi(self):
+        if 'tmp_login_expire' in session:
+            return mw.returnJson(False, '没有权限')
+        sid = request.form.get('id', '10').strip()
+        if mw.M('temp_login').where('id=?', (sid,)).delete():
+            mw.writeLog('面板设置', '删除临时登录连接')
+            return mw.returnJson(True, '删除成功')
+        return mw.returnJson(False, '删除失败')
+
+    def setTempLoginApi(self):
+        if 'tmp_login_expire' in session:
+            return mw.returnJson(False, '没有权限')
+        s_time = int(time.time())
+        mw.M('temp_login').where(
+            'state=? and expire>?', (0, s_time)).delete()
+        token = mw.getRandomString(48)
+        salt = mw.getRandomString(12)
+
+        pdata = {
+            'token': mw.md5(token + salt),
+            'salt': salt,
+            'state': 0,
+            'login_time': 0,
+            'login_addr': '',
+            'expire': s_time + 3600,
+            'addtime': s_time
+        }
+
+        if not mw.M('temp_login').count():
+            pdata['id'] = 101
+
+        if mw.M('temp_login').insert(pdata):
+            mw.writeLog('面板设置', '生成临时连接,过期时间:{}'.format(
+                mw.formatDate(times=pdata['expire'])))
+            return mw.getJson({'status': True, 'msg': "临时连接已生成", 'token': token, 'expire': pdata['expire']})
+        return mw.returnJson(False, '连接生成失败')
+
+    def getTempLoginLogsApi(self):
+        if 'tmp_login_expire' in session:
+            return mw.returnJson(False, '没有权限')
+
+        logs_id = request.form.get('id', '').strip()
+        logs_id = int(logs_id)
+        data = mw.M('logs').where(
+            'uid=?', (logs_id,)).order('id desc').field(
+            'id,type,uid,log,addtime').select()
+        return mw.returnJson(False, 'ok', data)
 
     def get(self):
 

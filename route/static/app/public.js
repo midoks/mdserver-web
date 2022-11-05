@@ -616,19 +616,18 @@ function divcenter() {
 	$(".layui-layer").css("top", e + "px")
 }
 
-function btcopy(password) {
-	$("#bt_copys").attr('data-clipboard-text',password);
-	$("#bt_copys").click();
+function copyText(value) {
+	var clipboard = new ClipboardJS('#bt_copys');
+    clipboard.on('success', function (e) {
+        layer.msg('复制成功',{icon:1,time:2000});
+    });
+
+    clipboard.on('error', function (e) {
+        layer.msg('复制失败，浏览器不兼容!',{icon:2,time:2000});
+    });
+    $("#bt_copys").attr('data-clipboard-text',value);
+    $("#bt_copys").click();
 }
-
-var clipboard = new ClipboardJS('#bt_copys');
-clipboard.on('success', function (e) {
-    layer.msg('复制成功!',{icon:1});
-});
-
-clipboard.on('error', function (e) {
-    layer.msg('复制失败，浏览器不兼容!',{icon:2});
-});
 
 function isChineseChar(b) {
 	var a = /[\u4E00-\u9FA5\uF900-\uFA2D]/;
