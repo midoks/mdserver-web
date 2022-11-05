@@ -443,7 +443,6 @@ function _M.cron(self)
         end
         
         self:unlock_working(cron_key)
-
         ngx.update_time()
         -- self:D("--【"..tostring(llen).."】, elapsed: " .. tostring(ngx.now() - begin))
     end
