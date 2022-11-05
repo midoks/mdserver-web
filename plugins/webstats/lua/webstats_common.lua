@@ -47,9 +47,9 @@ function _M.getInstance(self)
     if rawget(self, "instance") == nil then
         rawset(self, "instance", self.new())
 
-        if 0 == ngx.worker.id() then
-            self:cron()
-        end
+        -- if 0 == ngx.worker.id() then
+        self:cron()
+        -- end
     end
     assert(self.instance ~= nil)
     return self.instance
@@ -448,7 +448,7 @@ function _M.cron(self)
         -- self:D("--【"..tostring(llen).."】, elapsed: " .. tostring(ngx.now() - begin))
     end
 
-    ngx.timer.every(0.5, timer_every_get_data)
+    ngx.timer.every(1, timer_every_get_data)
 end
 
 
