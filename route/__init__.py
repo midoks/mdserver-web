@@ -76,12 +76,39 @@ socketio.init_app(app)
 # http_server.serve_forever()
 
 # debug macosx dev
-if mw.isAppleSystem():
+if mw.isDebugMode():
     app.debug = True
     app.config.version = app.config.version + str(time.time())
 
 import common
 common.init()
+
+
+# ----------  error function start -----------------
+def getErrorNum(key, limit=None):
+    key = mw.md5(key)
+    num = cache.get(key)
+    if not num:
+        num = 0
+    if not limit:
+        return num
+    if limit > num:
+        return True
+    return False
+
+
+def setErrorNum(key, empty=False, expire=3600):
+    key = mw.md5(key)
+    num = cache.get(key)
+    if not num:
+        num = 0
+    else:
+        if empty:
+            cache.delete(key)
+            return True
+    cache.set(key, num + 1, expire)
+    return True
+# ----------  error function end -----------------
 
 
 def funConvert(fun):
@@ -98,6 +125,7 @@ def isLogined():
     if 'login' in session and 'username' in session and session['login'] == True:
         userInfo = mw.M('users').where(
             "id=?", (1,)).field('id,username,password').find()
+        # print(userInfo)
         if userInfo['username'] != session['username']:
             return False
 
@@ -106,6 +134,10 @@ def isLogined():
         if 'overdue' in session and now_time > session['overdue']:
             # 自动续期
             session['overdue'] = int(time.time()) + 7 * 24 * 60 * 60
+            return False
+
+        if 'tmp_login_expire' in session and now_time > int(session['tmp_login_expire']):
+            session.clear()
             return False
 
         return True
@@ -291,6 +323,49 @@ def admin_safe_path(path, req, data, pageFile):
     return render_template(req + '.html', data=data)
 
 
+def login_temp_user(token):
+    if len(token) != 48:
+        return '错误的参数!'
+
+    skey = mw.getClientIp() + '_temp_login'
+    if not getErrorNum(skey, 10):
+        return '连续10次验证失败，禁止1小时'
+
+    stime = int(time.time())
+    data = mw.M('temp_login').where('state=? and expire>?',
+                                    (0, stime)).field('id,token,salt,expire,addtime').find()
+    if not data:
+        setErrorNum(skey)
+        return '验证失败!'
+
+    if stime > int(data['expire']):
+        setErrorNum(skey)
+        return "过期"
+
+    r_token = mw.md5(token + data['salt'])
+    if r_token != data['token']:
+        setErrorNum(skey)
+        return '验证失败!'
+
+    userInfo = mw.M('users').where(
+        "id=?", (1,)).field('id,username').find()
+    session['login'] = True
+    session['username'] = userInfo['username']
+    session['tmp_login'] = True
+    session['tmp_login_id'] = str(data['id'])
+    session['tmp_login_expire'] = int(data['expire'])
+    session['uid'] = data['id']
+
+    login_addr = mw.getClientIp() + ":" + str(request.environ.get('REMOTE_PORT'))
+    mw.writeLog('用户登录', "登录成功,帐号:{1},登录IP:{2}",
+                (userInfo['username'], login_addr))
+    mw.M('temp_login').where('id=?', (data['id'],)).update(
+        {"login_time": stime, 'state': 1, 'login_addr': login_addr})
+
+    # print(session)
+    return redirect('/')
+
+
 @app.route('/<reqClass>/<reqAction>', methods=['POST', 'GET'])
 @app.route('/<reqClass>/', methods=['POST', 'GET'])
 @app.route('/<reqClass>', methods=['POST', 'GET'])
@@ -312,11 +387,17 @@ def index(reqClass=None, reqAction=None, reqData=None):
         pageFile = ('config', 'control', 'crontab', 'files', 'firewall',
                     'index', 'plugins', 'login', 'system', 'site', 'ssl', 'task', 'soft')
 
+        if reqClass == 'login':
+            token = request.args.get('tmp_token', '').strip()
+            if token != '':
+                return login_temp_user(token)
+
         # 设置了安全路径
         ainfo = get_admin_safe()
 
         # 登录页
         if reqClass == 'login':
+
             dologin = request.args.get('dologin', '')
             if dologin == 'True':
                 session.clear()
@@ -429,14 +510,6 @@ def connect_ssh():
     shell = ssh.invoke_shell(term='xterm', width=83, height=21)
     shell.setblocking(0)
     return True
-
-
-# 取数据对象
-def get_input_data(data):
-    pdata = common.dict_obj()
-    for key in data.keys():
-        pdata[key] = str(data[key])
-    return pdata
 
 
 @socketio.on('webssh')

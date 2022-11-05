@@ -338,3 +338,178 @@ function savePanelSSL(){
 	},'json');
 }
 
+
+function removeTempAccess(id){
+	$.post('/config/remove_temp_login', {id:id}, function(rdata){
+		showMsg(rdata.msg, function(){
+			setTempAccessReq();
+		},{ icon: rdata.status ? 1 : 2 }, 2000);
+	},'json');
+}
+
+function getTempAccessLogsReq(id){
+	$.post('/config/get_temp_login_logs', {id:id}, function(rdata){			
+		var tbody = '';
+		for (var i = 0; i < rdata.data.length; i++) {
+
+			tbody += '<tr>';
+			tbody += '<td>' + (rdata.data[i]['type']) +'</td>';
+			tbody += '<td>' + rdata.data[i]['addtime'] +'</td>';
+			tbody += '<td>'+ rdata.data[i]['log'] +'</td>';
+			tbody += '</tr>';
+		}
+		$('#logs_list').html(tbody);
+
+	},'json');
+}
+
+function getTempAccessLogs(id){
+
+	layer.open({
+		area: ['700px', '250px'],
+		title: '临时授权管理',
+		closeBtn:1,
+		shift: 0,
+		type: 1,
+		content: "<div class=\"pd20\">\
+					<button class=\"btn btn-success btn-sm refresh_log\">刷新日志</button>\
+					<div class=\"divtable mt10\">\
+						<table class=\"table table-hover\">\
+							<thead>\
+								<tr><th>操作类型</th><th>操作时间</th><th>日志</th></tr>\
+							</thead>\
+							<tbody id=\"logs_list\"></tbody>\
+						</table>\
+					</div>\
+				</div>",
+		success:function(){
+			getTempAccessLogsReq(id);
+			$('.refresh_log').click(function(){
+				getTempAccessLogsReq(id);
+			});
+		}
+	});
+}
+
+function setTempAccessReq(page){
+	if (typeof(page) == 'undefined'){
+		page = 1;
+	}
+
+	$.post('/config/get_temp_login', {page:page}, function(rdata){
+		if ( typeof(rdata.status) !='undefined' && !rdata.status){
+			showMsg(rdata.msg,function(){
+				layer.closeAll();
+			},{icon:2}, 2000);
+			return;
+		}
+
+		var tbody = '';
+		for (var i = 0; i < rdata.data.length; i++) {
+
+			tbody += '<tr>';
+			tbody += '<td>' + (rdata.data[i]['login_addr']||'未登陆') +'</td>';
+
+			tbody += '<td>';
+			switch (parseInt(rdata.data[i]['state'])) {
+				case 0:
+					tbody += '<a style="color:green;">待使用</a>';
+					break;
+				case 1:
+					tbody += '<a style="color:brown;">已使用</a>';
+					break;
+				case -1:
+					tbody += '<a>已过期</a>';
+					break;
+			}
+			tbody += '</td>';
+
+			tbody += '<td>' + (getLocalTime(rdata.data[i]['login_time'])||'未登陆') +'</td>';
+			tbody += '<td>' + getLocalTime(rdata.data[i]['expire']) +'</td>';
+
+			tbody += '<td>';
+
+			if (rdata.data[i]['state'] == '1' ){
+				tbody += '<a class="btlink" onclick="getTempAccessLogs(\''+rdata.data[i]['id']+'\')">操作日志</a>';
+			} else{
+				tbody += '<a class="btlink" onclick="removeTempAccess(\''+rdata.data[i]['id']+'\')">删除</a>';
+			}
+			
+			tbody += '</td>';
+
+			tbody += '</tr>';
+		}
+
+		$('#temp_login_view_tbody').html(tbody);
+		$('.temp_login_view_page').html(rdata.page);
+	},'json');
+}
+
+function setTempAccess(){
+	layer.open({
+		area: ['700px', '250px'],
+		title: '临时授权管理',
+		closeBtn:1,
+		shift: 0,
+		type: 1,
+		content: "<div class=\"login_view_table pd20\">\
+					<button class=\"btn btn-success btn-sm create_temp_login\" >临时访问授权</button>\
+					<div class=\"divtable mt10\">\
+						<table class=\"table table-hover\">\
+							<thead>\
+								<tr><th>登录IP</th><th>状态</th><th>登录时间</th><th>过期时间</th><th style=\"text-align:right;\">操作</th></tr>\
+							</thead>\
+							<tbody id=\"temp_login_view_tbody\"></tbody>\
+						</table>\
+						<div class=\"temp_login_view_page page\"></div>\
+					</div>\
+				</div>",
+		success:function(){
+			setTempAccessReq();
+
+			$('.create_temp_login').click(function(){
+				layer.confirm('<span style="color:red">注意1：滥用临时授权可能导致安全风险。</br>注意2：请勿在公共场合发布临时授权连接</span></br>即将创建临时授权连接，继续吗？',
+				{
+					title:'风险提示',
+					closeBtn:1,
+					icon:13,
+				}, function(create_temp_login_layer) {
+					$.post('/config/set_temp_login', {}, function(rdata){
+						layer.close(create_temp_login_layer);
+						setTempAccessReq();
+						layer.open({
+							area: '570px',
+							title: '创建临时授权',
+							shift: 0,
+							type: 1,
+							content: "<div class=\"bt-form create_temp_view pd15\">\
+									<div class=\"line\">\
+										<span class=\"tname\">临时授权地址</span>\
+										<div>\
+											<textarea id=\"temp_link\" class=\"bt-input-text mr20\" style=\"margin: 0px;width: 500px;height: 50px;line-height: 19px;\"></textarea>\
+										</div>\
+									</div>\
+									<div class=\"line\"><button type=\"submit\" class=\"btn btn-success btn-sm btn-copy-temp-link\" data-clipboard-text=\"\">复制地址</button></div>\
+									<ul class=\"help-info-text c7 ptb15\">\
+										<li>临时授权生成后1小时内使用有效，为一次性授权，使用后立即失效</li>\
+										<li>使用临时授权登录面板后1小时内拥有面板所有权限，请勿在公共场合发布临时授权连接</li>\
+										<li>授权连接信息仅在此处显示一次，若在使用前忘记，请重新生成</li>\
+									</ul>\
+								</div>",
+							success:function(){
+								var temp_link = "".concat(location.origin, "/login?tmp_token=").concat(rdata.token);
+								$('#temp_link').val(temp_link);
+
+								copyText(temp_link);
+								$('.btn-copy-temp-link').click(function(){
+									copyText(temp_link);
+								});
+							}
+						});
+					},'json');
+				});
+			});
+		}
+	});
+}
+

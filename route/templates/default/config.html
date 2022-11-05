@@ -50,9 +50,7 @@
 					<h3 class="f16">设置</h3>
 				</div>
 				<div class="info-title-tips" style="margin: 20px 30px 0px;">
-					<p>
-						<span class="glyphicon glyphicon-alert" style="color: #f39c12; margin-right: 10px;">
-						</span>为了提高安全，请修改别名、默认端口、面板用户和密码!</p>
+					<p><span class="glyphicon glyphicon-alert" style="color: #f39c12; margin-right: 10px;"></span>为了提高安全,修改面板密码!</p>
 				</div>
 				<div class="setting-con pd15">
 					<form id="set_config">
@@ -67,7 +65,8 @@
 
 						<p class="mtb15">
 							<span class="set-tit text-right">安全入口</span>
-							<input id="admin_path" name="admin_path" class="inputtxt bt-input-text disable" type="text" value="{{data['admin_path']}}"><span class="modify btn btn-xs btn-success" onclick="modifyAuthPath();">修改</span>
+							<input id="admin_path" name="admin_path" class="inputtxt bt-input-text disable" type="text" value="{{data['admin_path']}}">
+							<button type="button" class="btn btn-success btn-sm ml5" onclick="modifyAuthPath()">设置</button>
 							<span class="set-info c7">面板管理入口,设置后只能通过指定安全入口登录面板,如: /abc</span>
 						</p>
 
@@ -99,18 +98,36 @@
 			
 						<p class="mtb15">
 							<span class="set-tit text-right" title="服务器时间">服务器时间</span>
-							<input id="systemdate" name="systemdate" class="inputtxt bt-input-text disable" type="text" value="{{data['systemdate']}}"><span class="modify btn btn-xs btn-success" onclick="syncDate()">同步</span>
+							<input id="systemdate" name="systemdate" class="inputtxt bt-input-text disable" type="text" value="{{data['systemdate']}}">
+							<button type="button" class="btn btn-success btn-sm ml5" onclick="syncDate()">同步</button>
+							<span class="set-info c7">同步当前服务器时间</span>
 						</p>
 						<p class="mtb15">
 							<span class="set-tit text-right" title="面板用户">面板用户</span>
-							<input name="username_" class="inputtxt bt-input-text disable" type="text" value="{{data['username']}}" disabled><span class="modify btn btn-xs btn-success" onclick="setUserName()">修改</span>
+							<input name="username_" class="inputtxt bt-input-text disable" type="text" value="{{data['username']}}" disabled>
+							<button type="button" class="btn btn-success btn-sm ml5" onclick="setUserName()">设置</button>
+							<span class="set-info c7">设置面板账号</span>
 						</p>
 						<p class="mtb15">
 							<span class="set-tit text-right" title="面板密码">面板密码</span>
-							<input name="password_" class="inputtxt bt-input-text disable" type="text" value="******" disabled><span class="modify btn btn-xs btn-success" onclick="setPassword()">修改</span>
+							<input name="password_" class="inputtxt bt-input-text disable" type="text" value="******" disabled>
+							<button type="button" class="btn btn-success btn-sm ml5" onclick="setPassword()">设置</button>
+							<span class="set-info c7">设置面板密码</span>
 						</p>
 					</form>
 					<div class="bt-submit set-submit">保存</div>
+				</div>
+
+				<div class="title c6 plr15">
+					<h3 class="f16">安全</h3>
+				</div>
+
+				<div class="setting-con pd15">
+					<p class="mtb15">
+						<span class="set-tit text-right" title="临时访问授权">临时访问授权</span>
+						<button type="button" class="btn btn-success btn-sm ml5" onclick="setTempAccess()">临时访问授权管理</button>
+						<span class="set-info c7">为非管理员临时提供面板访问权限</span>
+					</p>
 				</div>
 			</div>
 		</div>

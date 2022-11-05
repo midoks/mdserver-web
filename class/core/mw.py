@@ -386,18 +386,24 @@ def getDate():
     return time.strftime('%Y-%m-%d %X', time.localtime())
 
 
-def writeLog(type, logMsg, args=()):
+def writeLog(stype, msg, args=()):
     # 写日志
     try:
         import time
         import db
         import json
+        from flask import session
+        uid = 1
+        if 'uid' in session:
+            uid = session['uid']
         sql = db.Sql()
-        mDate = time.strftime('%Y-%m-%d %X', time.localtime())
-        data = (type, logMsg, mDate)
-        result = sql.table('logs').add('type,log,addtime', data)
+        mdate = time.strftime('%Y-%m-%d %X', time.localtime())
+        wmsg = getInfo(msg, args)
+        data = (stype, wmsg, uid, mdate)
+        result = sql.table('logs').add('type,log,uid,addtime', data)
+        return True
     except Exception as e:
-        pass
+        return False
 
 
 def writeFile(filename, str):
@@ -678,6 +684,11 @@ def getLocalIpBack():
         return '127.0.0.1'
 
 
+def getClientIp():
+    from flask import request
+    return request.remote_addr.replace('::ffff:', '')
+
+
 def getLocalIp():
     filename = 'data/iplist.txt'
     try:
@@ -711,6 +722,14 @@ def inArray(arrays, searchStr):
             return True
 
     return False
+
+
+def formatDate(format="%Y-%m-%d %H:%M:%S", times=None):
+    # 格式化指定时间戳
+    if not times:
+        times = int(time.time())
+    time_local = time.localtime(times)
+    return time.strftime(format, time_local)
 
 
 def checkIp(ip):
