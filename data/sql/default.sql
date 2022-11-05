@@ -56,6 +56,7 @@ CREATE TABLE IF NOT EXISTS `logs` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT,
   `type` TEXT,
   `log` TEXT,
+  `uid` TEXT,
   `addtime` TEXT
 );
 
