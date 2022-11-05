@@ -320,7 +320,6 @@ def admin_safe_path(path, req, data, pageFile):
 
 
 def login_temp_user(token):
-    print(token)
     if len(token) != 48:
         return '错误的参数!'
 
@@ -355,7 +354,7 @@ def login_temp_user(token):
     mw.M('temp_login').where('id=?', (data['id'],)).update(
         {"login_time": stime, 'state': 1, 'login_addr': login_addr})
 
-    print(session)
+    # print(session)
     return redirect('/')
 
 
@@ -382,7 +381,6 @@ def index(reqClass=None, reqAction=None, reqData=None):
 
         if reqClass == 'login':
             token = request.args.get('tmp_token', '').strip()
-            print(token)
             if token != '':
                 return login_temp_user(token)
 
