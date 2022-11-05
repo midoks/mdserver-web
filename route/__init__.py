@@ -338,7 +338,7 @@ def login_temp_user(token):
         setErrorNum(skey)
         return '验证失败!'
 
-    if stime > int(data['addtime']):
+    if stime > int(data['addtime']) + 3600:
         setErrorNum(skey)
         return "过期"
 
