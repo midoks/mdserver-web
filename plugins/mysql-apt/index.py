@@ -86,7 +86,7 @@ def checkArgs(data, ck=[]):
 
 
 def getConf():
-    path = getServerDir() + '/etc/my.cnf'
+    path = '/etc/mysql/my.cnf'
     return path
 
 

@@ -23,8 +23,11 @@ VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -
 # cd /www/server/mdserver-web/plugins/mysql-apt && bash install.sh install 8.0
 
 MYSQL_VER=8.0.31
-
 SUFFIX_NAME=${MYSQL_VER}-1${OSNAME}${VERSION_ID}_amd64
+
+
+# /lib/systemd/system/mysql.service
+# /etc/mysql/my.cnf
 
 APT_INSTALL()
 {
@@ -34,15 +37,14 @@ chmod +x /tmp/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
 tar vxf /tmp/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
 
 apt update -y
-# apt upgrade -y
 apt install -y libnuma1 libaio1 libmecab2
 
 # 手动调试
-# dpkg -i mysql-common_8.0.29-1ubuntu18.04_amd64.deb
-# dpkg -i mysql-community-client-plugins_8.0.29-1ubuntu18.04_amd64.deb
-# dpkg -i mysql-community-client-core_8.0.29-1ubuntu18.04_amd64.deb
+# dpkg -i mysql-common_8.0.31-1ubuntu18.04_amd64.deb
+# dpkg -i mysql-community-client-plugins_8.0.31-1ubuntu18.04_amd64.deb
+# dpkg -i mysql-community-client-core_8.0.31-1ubuntu18.04_amd64.deb
 # dpkg -i mysql-community-client_8.0.29-1ubuntu18.04_amd64.deb
-# dpkg -i mysql-client_8.0.29-1ubuntu18.04_amd64.deb
+# dpkg -i mysql-client_8.0.31-1ubuntu18.04_amd64.deb
 
 
 dpkg -i mysql-common_${SUFFIX_NAME}.deb
