@@ -14,7 +14,7 @@ sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 mariadbDir=${serverPath}/source/mariadb
 
-MY_VER=10.8.3
+MY_VER=10.8.5
 
 Install_app()
 {
@@ -64,7 +64,7 @@ Install_app()
 	fi
 
 	if [ "$?" != "0" ];then
-		wget --no-check-certificate -O ${mariadbDir}/mariadb-${MY_VER}.tar.gz --tries=3 https://downloads.mariadb.org/interstitial/mariadb-${MY_VER}/source/mariadb-${MY_VER}.tar.gz
+		wget --no-check-certificate -O ${mariadbDir}/mariadb-${MY_VER}.tar.gz --tries=3 https://archive.mariadb.org/mariadb-${MY_VER}/source/mariadb-${MY_VER}.tar.gz
 	fi
 
 	if [ ! -d ${mariadbDir}/mariadb-${MY_VER} ];then

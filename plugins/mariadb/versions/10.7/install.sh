@@ -65,7 +65,7 @@ Install_app()
 
 	# https://downloads.mariadb.org/interstitial/mariadb-10.7.4/source/mariadb-10.7.4.tar.gz
 	if [ "$?" != "0" ];then
-		wget --no-check-certificate -O ${mariadbDir}/mariadb-${MY_VER}.tar.gz --tries=3 https://downloads.mariadb.org/interstitial/mariadb-${MY_VER}/source/mariadb-${MY_VER}.tar.gz
+		wget --no-check-certificate -O ${mariadbDir}/mariadb-${MY_VER}.tar.gz --tries=3 https://archive.mariadb.org/mariadb-${MY_VER}/source/mariadb-${MY_VER}.tar.gz
 	fi
 
 	if [ ! -d ${mariadbDir}/mariadb-${MY_VER} ];then
