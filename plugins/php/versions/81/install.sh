@@ -79,8 +79,10 @@ else
     cpuCore="1"
 fi
 
-if [ "$cpuCore" -gt "1" ];then
-	cpuCore=`echo "$cpuCore" | awk '{printf("%.2f",($1)*0.8)}' | awk -F '.' '{print $1}'`
+if [ "$cpuCore" -gt "2" ];then
+	cpuCore=`echo "$cpuCore" | awk '{printf("%.f",($1)*0.8)}'`
+else
+	cpuCore="1"
 fi
 # ----- cpu end ------
 
