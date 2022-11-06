@@ -22,7 +22,7 @@ VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -
 
 # cd /www/server/mdserver-web/plugins/mysql-apt && bash install.sh install 8.0
 
-MYSQL_VER=8.0.31
+MYSQL_VER=8.0.30
 SUFFIX_NAME=${MYSQL_VER}-1${OSNAME}${VERSION_ID}_amd64
 
 
@@ -32,7 +32,8 @@ SUFFIX_NAME=${MYSQL_VER}-1${OSNAME}${VERSION_ID}_amd64
 APT_INSTALL()
 {
 ########
-wget -O /tmp/mysql-server_${SUFFIX_NAME}.deb-bundle.tar https://cdn.mysql.com//Downloads/MySQL-8.0/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
+
+wget -O /tmp/mysql-server_${SUFFIX_NAME}.deb-bundle.tar https://cdn.mysql.com/archives/mysql-8.0/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
 chmod +x /tmp/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
 tar vxf /tmp/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
 
