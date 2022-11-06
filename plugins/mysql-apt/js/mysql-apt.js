@@ -1,18 +1,10 @@
-function str2Obj(str){
-    var data = {};
-    kv = str.split('&');
-    for(i in kv){
-        v = kv[i].split('=');
-        data[v[0]] = v[1];
-    }
-    return data;
-}
+
 
 function myPost(method,args,callback, title){
 
     var _args = null; 
     if (typeof(args) == 'string'){
-        _args = JSON.stringify(str2Obj(args));
+        _args = JSON.stringify(toArrayObject(args));
     } else {
         _args = JSON.stringify(args);
     }
@@ -39,7 +31,7 @@ function myPost(method,args,callback, title){
 function myPostN(method,args,callback, title){
     var _args = null; 
     if (typeof(args) == 'string'){
-        _args = JSON.stringify(str2Obj(args));
+        _args = JSON.stringify(toArrayObject(args));
     } else {
         _args = JSON.stringify(args);
     }
@@ -58,7 +50,7 @@ function myPostN(method,args,callback, title){
 function myAsyncPost(method,args){
     var _args = null; 
     if (typeof(args) == 'string'){
-        _args = JSON.stringify(str2Obj(args));
+        _args = JSON.stringify(toArrayObject(args));
     } else {
         _args = JSON.stringify(args);
     }
@@ -589,7 +581,7 @@ function setDbAccess(username){
         $('#my_mod_save').click(function(){
             var data = $("#set_db_access").serialize();
             data = decodeURIComponent(data);
-            var dataObj = str2Obj(data);
+            var dataObj = toArrayObject(data);
             if(!dataObj['access']){
                 dataObj['access'] = dataObj['dataAccess'];
                 if ( dataObj['dataAccess'] == 'ip'){
@@ -660,7 +652,7 @@ function addDatabase(type){
     if (type==1){
         var data = $("#add_db").serialize();
         data = decodeURIComponent(data);
-        var dataObj = str2Obj(data);
+        var dataObj = toArrayObject(data);
         if(!dataObj['address']){
             dataObj['address'] = dataObj['dataAccess'];
         }
@@ -1299,7 +1291,7 @@ function addMasterRepSlaveUser(){
 
         var data = $("#add_master").serialize();
         data = decodeURIComponent(data);
-        var dataObj = str2Obj(data);
+        var dataObj = toArrayObject(data);
         if(!dataObj['address']){
             dataObj['address'] = dataObj['dataAccess'];
         }
@@ -1345,7 +1337,7 @@ function updateMasterRepSlaveUser(username){
     $('#submit_update_master').click(function(){
         var data = $("#update_master").serialize();
         data = decodeURIComponent(data);
-        var dataObj = str2Obj(data);
+        var dataObj = toArrayObject(data);
         // console.log(dataObj);
         myPost('update_master_rep_slave_user', data, function(data){
             var rdata = $.parseJSON(data.data);
