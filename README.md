@@ -65,13 +65,12 @@ phpMyAdmin[5.2.0]支持MySQL[8.0]
 
 PHP[53-72]支持phpMyAdmin[4.4.15]
 PHP[72-81]支持phpMyAdmin[5.2.0]
-
-
 ```
 
 # 特别赞助
 
 - [找资源 - 阿里云盘资源搜索引擎](https://zhaoziyuan.la/)
+- [奈飞丝 - 奈飞中国 Netflix MOD首发](https://naifeis.com/index.php#/register?code=k7P7V6Ur)
 
 # AD - VPS推荐 - 🙏
 

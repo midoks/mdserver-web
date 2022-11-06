@@ -2,8 +2,7 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
-#https://dev.mysql.com/downloads/mysql/5.5.html#downloads
-#https://dev.mysql.com/downloads/file/?id=480541
+# https://mariadb.org/download/?t=mariadb
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
@@ -14,7 +13,7 @@ sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 mariadbDir=${serverPath}/source/mariadb
 
-MY_VER=10.6.8
+MY_VER=10.6.9
 
 Install_app()
 {
@@ -67,7 +66,7 @@ Install_app()
 
 	# https://downloads.mariadb.org/interstitial/mariadb-10.6.8/source/mariadb-10.6.8.tar.gz
 	if [ "$?" != "0" ];then
-		wget --no-check-certificate -O ${mariadbDir}/mariadb-${MY_VER}.tar.gz --tries=3 https://downloads.mariadb.org/interstitial/mariadb-${MY_VER}/source/mariadb-${MY_VER}.tar.gz
+		wget --no-check-certificate -O ${mariadbDir}/mariadb-${MY_VER}.tar.gz --tries=3 https://archive.mariadb.org/mariadb-${MY_VER}/source/mariadb-${MY_VER}.tar.gz
 	fi
 
 	if [ ! -d ${mariadbDir}/mariadb-${MY_VER} ];then
