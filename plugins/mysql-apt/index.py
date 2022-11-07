@@ -290,7 +290,8 @@ def initMysql8Data():
         serverdir = getServerDir()
         user = pGetDbUser()
 
-        cmd = 'mysqld --basedir=/usr --datadir=' + datadir + ' --initialize-insecure'
+        cmd = 'mysqld --basedir=/usr --datadir=' + datadir + \
+            ' --initialize-insecure --lower-case-table-names=1'
         data = mw.execShell(cmd)
         if data[1].find('ERROR') != -1:
             exit("Init MySQL{} Data Error".format(8))

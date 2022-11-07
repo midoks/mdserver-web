@@ -24,7 +24,7 @@ read_buffer_size = 128K
 read_rnd_buffer_size = 256K
 myisam_sort_buffer_size = 4M
 thread_cache_size = 4
-lower_case_table_names=1
+lower_case_table_names=0
 tmp_table_size = 8M
 character-set-server = UTF8MB4
 
