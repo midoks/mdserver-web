@@ -87,6 +87,22 @@ def getConf():
     return path
 
 
+def getDbPort():
+    file = getConf()
+    content = mw.readFile(file)
+    rep = 'port\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
+
+
+def getSocketFile():
+    file = getConf()
+    content = mw.readFile(file)
+    rep = 'socket\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
+
+
 def contentReplace(content):
     service_path = mw.getServerDir()
     content = content.replace('{$ROOT_PATH}', mw.getRootDir())
