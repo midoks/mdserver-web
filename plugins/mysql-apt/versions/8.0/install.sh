@@ -35,7 +35,7 @@ APT_INSTALL()
 
 wget -O /tmp/mysql-server_${SUFFIX_NAME}.deb-bundle.tar https://cdn.mysql.com/archives/mysql-8.0/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
 chmod +x /tmp/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
-tar vxf /tmp/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
+cd /tmp && tar vxf /tmp/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
 
 apt update -y
 apt install -y libnuma1 libaio1 libmecab2

@@ -20,6 +20,7 @@ sys.path.append(chdir + '/class/core')
 import mw
 import db
 import time
+import re
 
 
 class backupTools:
@@ -45,7 +46,6 @@ class backupTools:
         filename = backup_path + "/db_" + name + "_" + \
             time.strftime('%Y%m%d_%H%M%S', time.localtime()) + ".sql.gz"
 
-        import re
         mysql_root = mw.M('config').dbPos(db_path, db_name).where(
             "id=?", (1,)).getField('mysql_root')
 
