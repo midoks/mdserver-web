@@ -375,7 +375,7 @@ def initMariaDbPwd():
 
     # 删除冗余账户
     hostname = mw.execShell('hostname')[0].strip()
-    if hostname != 'hostname':
+    if hostname != 'localhost':
         drop_hostname =  serverdir + '/bin/mysql  --defaults-file=' + \
             myconf + ' -uroot -p' + pwd + ' -e "drop user \'\'@\'' + hostname + '\'";'
         mw.execShell(drop_hostname)
