@@ -35,6 +35,14 @@ if [ "${action}" == "uninstall" ];then
 	cd ${rootPath} && python3 ${rootPath}/plugins/mysql-apt/index.py stop ${type}
 	cd ${rootPath} && python3 ${rootPath}/plugins/mysql-apt/index.py initd_uninstall ${type}
 	cd $curPath
+
+	if [ -f /usr/lib/systemd/system/mysql-apt.service ] || [ -f /lib/systemd/system/mysql-apt.service ];then
+		systemctl stop mysql-apt
+		systemctl disable mysql-apt
+		rm -rf /usr/lib/systemd/system/mysql-apt.service
+		rm -rf /lib/systemd/system/mysql-apt.service
+		systemctl daemon-reload
+	fi
 fi
 
 sh -x $curPath/versions/$2/install.sh $1
