@@ -102,7 +102,7 @@ class backupTools:
                     break
 
     def backupDatabaseAll(self, save):
-        db_path = mw.getServerDir() + '/mysql-ya'
+        db_path = mw.getServerDir() + '/mysql-apt'
         db_name = 'mysql'
         databases = mw.M('databases').dbPos(
             db_path, db_name).field('name').select()
