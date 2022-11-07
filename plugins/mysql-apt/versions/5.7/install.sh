@@ -56,7 +56,8 @@ dpkg -i mysql-community-server-core_${SUFFIX_NAME}.deb
 #会覆盖/lib/systemd/system/mysql.service,不安装
 # dpkg -i mysql-community-server_${SUFFIX_NAME}.deb
 dpkg -i mysql-server_${SUFFIX_NAME}.deb
-rm -rf $myDir
+
+# rm -rf $myDir
 #######
 }
 
