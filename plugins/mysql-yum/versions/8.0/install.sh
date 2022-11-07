@@ -29,8 +29,18 @@ bash ${rootPath}/scripts/getos.sh
 OSNAME=`cat ${rootPath}/data/osname.pl`
 VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
+OS_SIGN=el9
+if [ "$OSNAME" == "centos" ];then
+	OS_SIGN=1.el${$VERSION_ID}
+elif [ "$OSNAME" == "fedora" ]; then
+	OS_SIGN=10.fc${$VERSION_ID}
+elif [ "$OSNAME" == "suse" ]; then
+	OS_SIGN=1.sl${$VERSION_ID}
+fi
+
 MYSQL_VER=8.0.30
-SUFFIX_NAME=${MYSQL_VER}-1.${OSNAME}${ARCH}
+
+SUFFIX_NAME=${MYSQL_VER}-${OS_SIGN}.${ARCH}
 
 YUM_INSTALL()
 {
