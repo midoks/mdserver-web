@@ -156,10 +156,6 @@ def initDreplace(version=''):
         content = contentReplace(content)
         mw.writeFile(mysql_conf, content)
 
-    # lock_file = getServerDir() + "/installed.pl"
-    # if not os.path.exists(lock_file):
-    #     mw.writeFile(lock_file, "ok")
-
     # systemd
     systemDir = mw.systemdCfgDir()
     systemService = systemDir + '/mysql-apt.service'
@@ -277,7 +273,7 @@ def initMysql57Data():
         myconf = serverdir + "/etc/my.cnf"
         user = pGetDbUser()
 
-        cmd = 'mysqld --defaults-file=' + myconf + \
+        cmd = serverdir + '/bin/usr/sbin/mysqld --defaults-file=' + myconf + \
             ' --initialize-insecure --explicit_defaults_for_timestamp'
         mw.execShell(cmd)
         return False
