@@ -25,7 +25,7 @@ import time
 class backupTools:
 
     def backupDatabase(self, name, count):
-        db_path = mw.getServerDir() + '/mysql-ya'
+        db_path = mw.getServerDir() + '/mysql-apt'
         db_name = 'mysql'
         name = mw.M('databases').dbPos(db_path, 'mysql').where(
             'name=?', (name,)).getField('name')
@@ -57,8 +57,9 @@ class backupTools:
         if len(mycnf) > 100:
             mw.writeFile(db_path + '/etc/my.cnf', mycnf)
 
-        mw.execShell(
-            db_path + "/bin/mysqldump --opt --default-character-set=utf8 " + name + " | gzip > " + filename)
+        cmd = "mysqldump --defaults-file=" + my_conf_path + "  --single-transaction --quick --default-character-set=utf8 " + \
+            name + " | gzip > " + filename
+        mw.execShell(cmd)
 
         if not os.path.exists(filename):
             endDate = time.strftime('%Y/%m/%d %X', time.localtime())
