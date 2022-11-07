@@ -24,7 +24,7 @@ OSNAME=`cat ${rootPath}/data/osname.pl`
 VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
 MYSQL_VER=5.7.39
-if [ "$OSNAME" == "debian" && "$VERSION_ID" == "11" ];then
+if [ "$OSNAME" == "debian" ];then
 	# mysql5.7现在仅有10的编译版
 	VERSION_ID="10"
 fi
