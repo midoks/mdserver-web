@@ -22,6 +22,11 @@ import db
 import time
 import re
 
+'''
+DEBUG:
+python3 /www/server/mdserver-web/plugins/mysql-apt/scripts/backup.py  database admin 3
+'''
+
 
 class backupTools:
 
