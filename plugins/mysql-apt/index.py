@@ -321,7 +321,7 @@ def initMysql8Pwd():
     myconf = serverdir + "/etc/my.cnf"
     pwd = mw.getRandomString(16)
 
-    cmd_my = '/usr/bin/mysql'
+    cmd_my = serverdir + '/usr/bin/mysql'
 
     cmd_pass = cmd_my + ' --defaults-file=' + myconf + ' -uroot -e'
     cmd_pass = cmd_pass + \
