@@ -3,6 +3,7 @@
 
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
+export DEBIAN_FRONTEND=noninteractive
 
 # https://downloads.mysql.com/archives/community/
 
@@ -36,7 +37,7 @@ mkdir -p $serverPath/mysql-apt/bin
 
 wget -O ${myDir}/mysql-server_${SUFFIX_NAME}.deb-bundle.tar https://cdn.mysql.com/archives/mysql-8.0/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
 chmod +x ${myDir}/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
-cd ${myDir} && tar vxf /tmp/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
+cd ${myDir} && tar vxf ${myDir}/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
 
 apt update -y
 apt install -y libnuma1 libaio1 libmecab2
@@ -45,7 +46,7 @@ apt install -y libnuma1 libaio1 libmecab2
 dpkg -X mysql-common_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
 
 
-export DEBIAN_FRONTEND=noninteractive
+
 dpkg -X mysql-community-client-plugins_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
 dpkg -X mysql-community-client-core_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
 dpkg -X mysql-community-client_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
