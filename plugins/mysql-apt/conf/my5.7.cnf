@@ -77,7 +77,7 @@ innodb_max_dirty_pages_pct = 90
 innodb_read_io_threads = 1
 innodb_write_io_threads = 1
 innodb_file_per_table=1
-binlog_expire_logs_seconds=2592000
+expire_logs_days=30
 
 secure-file-priv={$SERVER_APP_PATH}/tmp
 
