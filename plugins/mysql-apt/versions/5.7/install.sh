@@ -3,6 +3,7 @@
 
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
+export DEBIAN_FRONTEND=noninteractive
 
 # https://downloads.mysql.com/archives/community/
 
@@ -22,6 +23,12 @@ VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -
 # cd /www/server/mdserver-web/plugins/mysql-apt && bash install.sh install 8.0
 
 MYSQL_VER=5.7.39
+
+if [ "$OSNAME" == "debian" && "$VERSION_ID" == "11" ];then
+	# mysql5.7现在仅有10的编译版
+	VERSION_ID="10"
+fi
+
 SUFFIX_NAME=${MYSQL_VER}-1${OSNAME}${VERSION_ID}_amd64
 
 
@@ -32,30 +39,29 @@ APT_INSTALL()
 {
 ########
 mkdir -p $myDir
+mkdir -p $serverPath/mysql-apt/bin
 
 wget -O ${myDir}/mysql-server_${SUFFIX_NAME}.deb-bundle.tar https://cdn.mysql.com/archives/mysql-5.7/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
 chmod +x ${myDir}/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
-cd ${myDir} && tar vxf /tmp/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
+cd ${myDir} && tar vxf ${myDir}/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
 
 apt update -y
 apt install -y libnuma1 libaio1 libmecab2
 
 # 安装
-dpkg -i mysql-common_${SUFFIX_NAME}.deb
+dpkg -X mysql-common_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
 
 
-export DEBIAN_FRONTEND=noninteractive
-dpkg -i mysql-community-client-plugins_${SUFFIX_NAME}.deb
-dpkg -i mysql-community-client-core_${SUFFIX_NAME}.deb
-dpkg -i mysql-community-client_${SUFFIX_NAME}.deb
-dpkg -i mysql-client_${SUFFIX_NAME}.deb
 
-dpkg -i mysql-community-server-core_${SUFFIX_NAME}.deb
+dpkg -X mysql-community-client-plugins_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
+dpkg -X mysql-community-client-core_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
+dpkg -X mysql-community-client_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
+dpkg -X mysql-client_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
 
-# dpkg -X mysql-community-server_5.-1debian11_amd64.deb ./tmp
-#会覆盖/lib/systemd/system/mysql.service,不安装
-# dpkg -i mysql-community-server_${SUFFIX_NAME}.deb
-dpkg -i mysql-server_${SUFFIX_NAME}.deb
+dpkg -X mysql-community-server-core_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
+
+dpkg -X mysql-community-server_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
+dpkg -X mysql-server_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
 
 # rm -rf $myDir
 #######
@@ -65,7 +71,7 @@ APT_UNINSTALL()
 {
 ###
 rm -rf $myDir
-apt remove -y mysql-server
+# apt remove -y mysql-server
 ###
 }
 
