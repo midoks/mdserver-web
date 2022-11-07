@@ -2312,9 +2312,27 @@ def fullSync(version=''):
 
 
 def installPreInspection(version):
-    swap_path = mw.getServerDir() + "/swap"
-    if not os.path.exists(swap_path):
-        return "为了稳定安装MySQL,先安装swap插件!"
+
+    sys = mw.execShell(
+        "cat /etc/*-release | grep PRETTY_NAME |awk -F = '{print $2}' | awk -F '\"' '{print $2}'| awk '{print $1}'")
+
+    if sys[1] != '':
+        return '不支持改系统'
+
+    sys_id = mw.execShell(
+        "cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F '\"' '{print $2}'")
+
+    sysName = sys[0].strip().lower()
+    sysId = sys_id[0].strip()
+
+    if not sysName in ('debian', 'ubuntu'):
+        return '仅支持debian,ubuntu'
+
+    if sysName == 'debian' and not sysId in('11', '10'):
+        return 'debian支持10,11'
+
+    if sysName == 'ubuntu' and not sysId in ('18.04', '20.04', '22.04'):
+        return 'ubuntu支持18.04, 20.04, 22.04'
     return 'ok'
 
 
