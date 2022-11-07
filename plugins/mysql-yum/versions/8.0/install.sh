@@ -44,12 +44,13 @@ SUFFIX_NAME=${MYSQL_VER}-${OS_SIGN}.${ARCH}
 
 YUM_INSTALL()
 {
-mkdir -p $myDir
 
 #######
+mkdir -p $myDir
 
 wget -O $myDir/mysql-${SUFFIX_NAME}.rpm-bundle.tar https://cdn.mysql.com/archives/mysql-8.0/mysql-${SUFFIX_NAME}.rpm-bundle.tar
-cd ${myDir} && tar vxf ${myDir}/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
+cd ${myDir} && tar vxf mysql-server_${SUFFIX_NAME}.deb-bundle.tar
+
 
 #######
 }
