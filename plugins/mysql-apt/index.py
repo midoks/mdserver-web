@@ -35,9 +35,6 @@ def getPluginName():
 def getPluginDir():
     return mw.getPluginDir() + '/' + getPluginName()
 
-sys.path.append(getPluginDir() + "/class")
-import mysqlDb
-
 
 def getServerDir():
     return mw.getServerDir() + '/' + getPluginName()
@@ -86,7 +83,7 @@ def checkArgs(data, ck=[]):
 
 
 def getConf():
-    path = '/etc/mysql/mysql.conf.d/mysqld.cnf'
+    path = '/etc/mysql/my.cnf'
     return path
 
 
@@ -120,11 +117,15 @@ def pSqliteDb(dbname='databases'):
 
 
 def pMysqlDb():
-    db = mysqlDb.mysqlDb()
-    db.__DB_CNF = getConf()
-    db.setDbConf(getConf())
-    db.setPwd(pSqliteDb('config').where(
-        'id=?', (1,)).getField('mysql_root'))
+    # pymysql
+    db = mw.getMyORM()
+    # MySQLdb |
+    # db = mw.getMyORMDb()
+
+    db.setPort(getDbPort())
+    db.setSocket(getSocketFile())
+    # db.setCharset("utf8")
+    db.setPwd(pSqliteDb('config').where('id=?', (1,)).getField('mysql_root'))
     return db
 
 
@@ -145,6 +146,10 @@ def initDreplace(version=''):
         content = mw.readFile(mysql_conf_tpl)
         content = contentReplace(content)
         mw.writeFile(mysql_conf, content)
+
+    # lock_file = getServerDir() + "/installed.pl"
+    # if not os.path.exists(lock_file):
+    #     mw.writeFile(lock_file, "ok")
 
     # systemd
     systemDir = mw.systemdCfgDir()
