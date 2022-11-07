@@ -30,6 +30,11 @@ if [ "$OSNAME" == "debian" ];then
 	VERSION_ID="10"
 fi
 
+if [ "$OSNAME" == "ubuntu" ];then
+	# mysql5.7现在仅有18.04的编译版
+	VERSION_ID="18.04"
+fi
+
 SUFFIX_NAME=${MYSQL_VER}-1${OSNAME}${VERSION_ID}_amd64
 
 APT_INSTALL()
