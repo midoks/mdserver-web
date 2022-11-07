@@ -836,7 +836,7 @@ def setDbBackup():
 
     scDir = mw.getRunDir() + '/scripts/backup.py'
 
-    cmd = 'python ' + scDir + ' database ' + args['name'] + ' 3'
+    cmd = 'python3 ' + scDir + ' database ' + args['name'] + ' 3'
     os.system(cmd)
     return mw.returnJson(True, 'ok')
 
