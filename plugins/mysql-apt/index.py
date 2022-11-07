@@ -319,6 +319,10 @@ def initMysql8Data():
 
 
 def initMysql8Pwd():
+    '''
+    /usr/bin/mysql --defaults-file=/www/server/mysql-apt/etc/my.cnf -uroot -e"UPDATE mysql.user SET password=PASSWORD('BhIroUczczNVaKvw') WHERE user='root';flush privileges;"
+    /usr/bin/mysql --defaults-file=/www/server/mysql-apt/etc/my.cnf -uroot -e"alter user 'root'@'localhost' identified by '123456';"
+    '''
     time.sleep(5)
 
     serverdir = getServerDir()
@@ -329,8 +333,7 @@ def initMysql8Pwd():
 
     cmd_pass = cmd_my + ' --defaults-file=' + myconf + ' -uroot -e'
     cmd_pass = cmd_pass + \
-        '"UPDATE mysql.user SET password=PASSWORD(\'' + \
-        pwd + "') WHERE user='root';"
+        '"alter user \'root\'@\'localhost\' identified by \'' + pwd + '\';"'
     cmd_pass = cmd_pass + 'flush privileges;"'
     # print(cmd_pass)
     data = mw.execShell(cmd_pass)
