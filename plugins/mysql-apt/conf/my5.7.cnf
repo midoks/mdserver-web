@@ -13,6 +13,7 @@ socket		= {$SERVER_APP_PATH}/mysql.sock
 datadir = {$SERVER_APP_PATH}/data
 log-error =  {$SERVER_APP_PATH}/data/error.log
 default_storage_engine = InnoDB
+language={$SERVER_APP_PATH}/bin/usr/share/mysql/english
 
 key_buffer_size = 8M
 table_open_cache = 32
