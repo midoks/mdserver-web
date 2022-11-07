@@ -1,7 +1,7 @@
 [client]
 user = root
 #password	= your_password
-port		= 3376
+port		= 33206
 socket		= {$SERVER_APP_PATH}/mysql.sock
 default-character-set = UTF8MB4
 
