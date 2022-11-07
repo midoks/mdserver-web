@@ -333,7 +333,7 @@ def initMysql8Pwd():
 
     cmd_pass = cmd_my + ' --defaults-file=' + myconf + ' -uroot -e'
     cmd_pass = cmd_pass + \
-        '"alter user \'root\'@\'localhost\' identified by \'' + pwd + '\';"'
+        '"alter user \'root\'@\'localhost\' identified by \'' + pwd + '\';'
     cmd_pass = cmd_pass + 'flush privileges;"'
     # print(cmd_pass)
     data = mw.execShell(cmd_pass)
