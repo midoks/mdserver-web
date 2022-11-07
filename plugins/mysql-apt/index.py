@@ -281,6 +281,7 @@ def initMysql57Data():
 
         if not mw.isAppleSystem():
             mw.execShell('chown -R mysql:mysql ' + datadir)
+            mw.execShell('chmod 755 ' + datadir)
         return False
     return True
 
