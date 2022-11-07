@@ -278,6 +278,9 @@ def initMysql57Data():
         data = mw.execShell(cmd)
         # print(cmd)
         # print(data)
+
+        if not mw.isAppleSystem():
+            mw.execShell('chown -R mysql:mysql ' + datadir)
         return False
     return True
 

@@ -9,6 +9,7 @@ export DEBIAN_FRONTEND=noninteractive
 
 # debug
 # cd /www/server/mdserver-web/plugins/mysql-apt && bash install.sh install 8.0
+# /www/server/mysql-apt/bin/usr/sbin/mysqld --defaults-file=/www/server/mysql-apt/etc/my.cnf --daemonize
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
