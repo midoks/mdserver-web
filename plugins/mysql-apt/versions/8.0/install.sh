@@ -27,7 +27,6 @@ SUFFIX_NAME=${MYSQL_VER}-1${OSNAME}${VERSION_ID}_amd64
 
 # /lib/systemd/system/mysql.service
 # /etc/mysql/my.cnf
-# dpkg -X mysql-testsuite_8.0.30-1debian11_amd64.deb ./tmp
 
 APT_INSTALL()
 {
@@ -54,9 +53,7 @@ dpkg -X mysql-client_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
 
 dpkg -X mysql-community-server-core_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
 
-# dpkg -X mysql-community-server_8.0.30-1debian11_amd64.deb ./tmp
-#会覆盖/lib/systemd/system/mysql.service,不安装
-# dpkg -X mysql-community-server_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
+dpkg -X mysql-community-server_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
 dpkg -X mysql-server_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
 
 # rm -rf $myDir
@@ -67,7 +64,7 @@ APT_UNINSTALL()
 {
 ###
 rm -rf $myDir
-apt remove -y mysql-server
+# apt remove -y mysql-server
 ###
 }
 
