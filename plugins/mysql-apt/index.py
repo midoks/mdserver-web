@@ -325,12 +325,13 @@ def initMysql8Pwd():
     myconf = serverdir + "/etc/my.cnf"
     pwd = mw.getRandomString(16)
 
-    cmd_pass = serverdir + '/bin/mysql -uroot -e'
+    cmd_pass = '/usr/sbin/mysql -uroot -e'
     cmd_pass = cmd_pass + \
         '"UPDATE mysql.user SET password=PASSWORD(\'' + \
         pwd + "') WHERE user='root';"
     cmd_pass = cmd_pass + 'flush privileges;"'
     data = mw.execShell(cmd_pass)
+    # print(cmd_pass)
     # print(data)
 
     # 删除空账户
