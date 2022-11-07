@@ -1,7 +1,7 @@
 [client]
 user = root
 #password	= your_password
-port		= 3386
+port		= 33206
 socket		= {$SERVER_APP_PATH}/mysql.sock
 default-character-set = UTF8MB4
 
@@ -9,8 +9,8 @@ default-character-set = UTF8MB4
 default_authentication_plugin=mysql_native_password
 pid-file = {$SERVER_APP_PATH}/data/mysql.pid
 user = mysql
-port		= 3386
-mysqlx_port = 33860
+port		= 33206
+mysqlx_port = 33260
 socket		= {$SERVER_APP_PATH}/mysql.sock
 datadir = {$SERVER_APP_PATH}/data
 log-error =  {$SERVER_APP_PATH}/data/error.log
