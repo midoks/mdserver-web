@@ -159,7 +159,7 @@ def initDreplace(version=''):
     # systemd
     systemDir = mw.systemdCfgDir()
     systemService = systemDir + '/mysql-apt.service'
-    systemServiceTpl = getPluginDir() + '/init.d/mysql.service.tpl'
+    systemServiceTpl = getPluginDir() + '/init.d/mysql' + version + '.service.tpl'
     if os.path.exists(systemDir) and not os.path.exists(systemService):
         service_path = mw.getServerDir()
         se_content = mw.readFile(systemServiceTpl)
