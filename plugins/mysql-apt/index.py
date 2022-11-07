@@ -609,15 +609,17 @@ def isSqlError(mysqlMsg):
     if "2003," in mysqlMsg:
         return mw.returnJson(False, "Can't connect to MySQL server on '127.0.0.1' (61)")
     if "using password:" in mysqlMsg:
-        return mw.returnJson(False, '数据库管理密码错误!')
+        return mw.returnJson(False, '数据库密码错误,在管理列表-点击【修复】!')
+    if "1045" in mysqlMsg:
+        return mw.returnJson(False, '连接错误!')
+    if "SQL syntax" in mysqlMsg:
+        return mw.returnJson(False, 'SQL语法错误!')
     if "Connection refused" in mysqlMsg:
         return mw.returnJson(False, '数据库连接失败,请检查数据库服务是否启动!')
     if "1133" in mysqlMsg:
         return mw.returnJson(False, '数据库用户不存在!')
     if "1007" in mysqlMsg:
         return mw.returnJson(False, '数据库已经存在!')
-    if "1045" in mysqlMsg:
-        return mw.returnJson(False, '数据库管理密码错误!')
     return None
 
 
