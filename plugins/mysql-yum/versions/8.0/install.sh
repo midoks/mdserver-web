@@ -28,7 +28,7 @@ esac
 bash ${rootPath}/scripts/getos.sh
 OSNAME=`cat ${rootPath}/data/osname.pl`
 VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
-
+echo "VERSION_ID:${VERSION_ID}"
 OS_SIGN=1.el9
 if [ "$OSNAME" == "centos" ];then
 	OS_SIGN=1.el${$VERSION_ID}
