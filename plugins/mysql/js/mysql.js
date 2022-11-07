@@ -60,8 +60,7 @@ function myAsyncPost(method,args){
 }
 
 function vaildPhpmyadmin(url,username,password){
-
-    console.log("Authorization: Basic " + btoa(username + ":" + password));
+    // console.log("Authorization: Basic " + btoa(username + ":" + password));
     $.ajax({
         type: "GET",
         url: url,
