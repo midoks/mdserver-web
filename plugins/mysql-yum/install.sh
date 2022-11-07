@@ -35,6 +35,14 @@ if [ "${action}" == "uninstall" ];then
 	cd ${rootPath} && python3 plugins/mysql-yum/index.py stop ${type}
 	cd ${rootPath} && python3 plugins/mysql-yum/index.py initd_uninstall ${type}
 	cd $curPath
+
+	if [ -f /usr/lib/systemd/system/mysql-yum.service ] || [ -f /lib/systemd/system/mysql-yum.service ];then
+		systemctl stop mysql-yum
+		systemctl disable mysql-yum
+		rm -rf /usr/lib/systemd/system/mysql-yum.service
+		rm -rf /lib/systemd/system/mysql-yum.service
+		systemctl daemon-reload
+	fi
 fi
 
 sh -x $curPath/versions/$2/install.sh $1

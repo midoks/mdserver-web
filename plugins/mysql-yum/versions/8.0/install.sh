@@ -95,9 +95,7 @@ Uninstall_mysql()
 	if [ "$isYum" != "" ];then
 		YUM_UNINSTALL
 	fi
-
-
-	rm -rf $serverPath/mysql-ya
+	rm -rf $serverPath/mysql-yum
 	echo '卸载完成' > $install_tmp
 }
 
