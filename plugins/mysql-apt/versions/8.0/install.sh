@@ -56,6 +56,8 @@ dpkg -i mysql-community-server-core_${SUFFIX_NAME}.deb
 # dpkg -i mysql-community-server_${SUFFIX_NAME}.deb
 dpkg -i mysql-server_${SUFFIX_NAME}.deb
 
+
+rm -rf $myDir
 #######
 }
 
