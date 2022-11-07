@@ -4,8 +4,7 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
-#https://dev.mysql.com/downloads/mysql/5.7.html
-#https://dev.mysql.com/downloads/file/?id=489855
+# https://downloads.mysql.com/archives/community/
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
@@ -15,60 +14,39 @@ sysName=`uname`
 
 
 install_tmp=${rootPath}/tmp/mw_install.pl
-mysqlDir=${serverPath}/source/mysql
+myDir=${serverPath}/source/mysql-yum
 
+ARCH=`uname -m`
+ARCH_NAME=''
+case $(uname -m) in
+    i386)   ARCH_NAME="386" ;;
+    i686)   ARCH_NAME="386" ;;
+    x86_64) ARCH_NAME="amd64" ;;
+    arm)    ARCH_NAME="arm64" ;;
+esac
 
-_os=`uname`
-if [ ${_os} == "Darwin" ]; then
-    OSNAME='macos'
-elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
-    OSNAME='centos'
-elif grep -Eqi "Rocky" /etc/issue || grep -Eq "Rocky" /etc/*-release; then
-    OSNAME='rocky'
-elif grep -Eqi "Red Hat Enterprise Linux Server" /etc/issue || grep -Eq "Red Hat Enterprise Linux Server" /etc/*-release; then
-    OSNAME='rhel'
-elif grep -Eqi "Aliyun" /etc/issue || grep -Eq "Aliyun" /etc/*-release; then
-    OSNAME='aliyun'
-elif grep -Eqi "Fedora" /etc/issue || grep -Eq "Fedora" /etc/*-release; then
-    OSNAME='fedora'
-elif grep -Eqi "Amazon Linux AMI" /etc/issue || grep -Eq "Amazon Linux AMI" /etc/*-release; then
-    OSNAME='amazon'
-elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
-    OSNAME='debian'
-elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
-    OSNAME='ubuntu'
-elif grep -Eqi "Raspbian" /etc/issue || grep -Eq "Raspbian" /etc/*-release; then
-    OSNAME='raspbian'
-elif grep -Eqi "Deepin" /etc/issue || grep -Eq "Deepin" /etc/*-release; then
-    OSNAME='deepin'
-else
-    OSNAME='unknow'
-fi
-
+bash ${rootPath}/scripts/getos.sh
+OSNAME=`cat ${rootPath}/data/osname.pl`
 VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
-
+MYSQL_VER=8.0.30
+SUFFIX_NAME=${MYSQL_VER}-1.${OSNAME}${ARCH}
 
 YUM_INSTALL()
 {
+mkdir -p $myDir
+
 #######
 
-if [ "${OSNAME}" == "centos" ];then
-	wget -O /tmp/mysql80-community-release.rpm http://repo.mysql.com/mysql80-community-release-el${VERSION}.rpm
-else
-	wget -O /tmp/mysql80-community-release.rpm http://repo.mysql.com/mysql80-community-release-el8.rpm
-fi
-rpm -ivh /tmp/mysql80-community-release.rpm
-yum -y install mysql-server
+wget -O $myDir/mysql-${SUFFIX_NAME}.rpm-bundle.tar https://cdn.mysql.com/archives/mysql-8.0/mysql-${SUFFIX_NAME}.rpm-bundle.tar
 
-rm -rf  /tmp/mysql80-community-release.rpm
 #######
 }
 
 YUM_UNINSTALL()
 {
 ### YUM卸载 START ########
-yum -y remove mysql-server
+# yum -y remove mysql-server
 ### YUM卸载 END   ########
 }
 
@@ -77,10 +55,9 @@ Install_mysql()
 {
 
 	echo '正在安装脚本文件...' > $install_tmp
-
 	if id mysql &> /dev/null ;then 
-	    echo "mysql UID is `id -u mysql`"
-	    echo "mysql Shell is `grep "^mysql:" /etc/passwd |cut -d':' -f7 `"
+	    echo "mysql uid is `id -u mysql`"
+	    echo "mysql shell is `grep "^mysql:" /etc/passwd |cut -d':' -f7 `"
 	else
 	    groupadd mysql
 		useradd -g mysql mysql
