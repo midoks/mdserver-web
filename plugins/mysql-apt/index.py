@@ -320,28 +320,39 @@ def initMysql8Data():
 
 def initMysql8Pwd():
     time.sleep(5)
+
+    serverdir = getServerDir()
+    myconf = serverdir + "/etc/my.cnf"
     pwd = mw.getRandomString(16)
 
-    alter_root_pwd = 'flush privileges;'
-    alter_root_pwd = alter_root_pwd + \
-        "alter user 'root'@'localhost' IDENTIFIED by '" + pwd + "';"
-    alter_root_pwd = alter_root_pwd + \
-        "alter user 'root'@'localhost' IDENTIFIED WITH mysql_native_password by '" + pwd + "';"
-    alter_root_pwd = alter_root_pwd + "flush privileges;"
-
-    cmd_pass = 'mysqladmin --defaults-file=' + \
-        getServerDir() + '/etc/my.cnf -uroot password root'
+    cmd_pass = serverdir + '/bin/mysql -uroot -e'
+    cmd_pass = cmd_pass + \
+        '"UPDATE mysql.user SET password=PASSWORD(\'' + \
+        pwd + "') WHERE user='root';"
+    cmd_pass = cmd_pass + 'flush privileges;"'
     data = mw.execShell(cmd_pass)
     # print(data)
 
-    tmp_file = "/tmp/mysql_ya_init_tmp.log"
-    mw.writeFile(tmp_file, alter_root_pwd)
-    cmd_pass = 'mysql --defaults-file=' + \
-        getServerDir() + '/etc/my.cnf -uroot -proot < ' + tmp_file
+    # 删除空账户
+    drop_empty_user = serverdir + '/bin/mysql -uroot -p' + \
+        pwd + ' -e "use mysql;delete from user where USER=\'\'"'
+    mw.execShell(drop_empty_user)
 
-    data = mw.execShell(cmd_pass)
-    # print(data)
-    os.remove(tmp_file)
+    # 删除测试数据库
+    drop_test_db = serverdir + '/bin/mysql -uroot -p' + \
+        pwd + ' -e "drop database test";'
+    mw.execShell(drop_test_db)
+
+    # 删除冗余账户
+    hostname = mw.execShell('hostname')[0].strip()
+
+    drop_hostname =  serverdir + '/bin/mysql  --defaults-file=' + \
+        myconf + ' -uroot -p' + pwd + ' -e "drop user \'\'@\'' + hostname + '\'";'
+    mw.execShell(drop_hostname)
+
+    drop_root_hostname =  serverdir + '/bin/mysql  --defaults-file=' + \
+        myconf + ' -uroot -p' + pwd + ' -e "drop user \'root\'@\'' + hostname + '\'";'
+    mw.execShell(drop_root_hostname)
 
     pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
 
