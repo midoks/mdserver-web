@@ -50,10 +50,11 @@ dpkg -i mysql-community-client-core_${SUFFIX_NAME}.deb
 dpkg -i mysql-community-client_${SUFFIX_NAME}.deb
 dpkg -i mysql-client_${SUFFIX_NAME}.deb
 
-
-
 dpkg -i mysql-community-server-core_${SUFFIX_NAME}.deb
-dpkg -i mysql-community-server_${SUFFIX_NAME}.deb
+
+# dpkg -X mysql-community-server_8.0.30-1debian11_amd64.deb ./tmp
+#会覆盖/lib/systemd/system/mysql.service,不安装
+# dpkg -i mysql-community-server_${SUFFIX_NAME}.deb
 dpkg -i mysql-server_${SUFFIX_NAME}.deb
 
 #######

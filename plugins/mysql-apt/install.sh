@@ -20,7 +20,6 @@ action=$1
 type=$2
 
 
-
 if [ "${2}" == "" ];then
 	echo '缺少安装脚本...' > $install_tmp
 	exit 0
