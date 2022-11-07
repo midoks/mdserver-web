@@ -265,7 +265,7 @@ function myPerfOpt() {
 }
 
 function reBootMySqld(){
-    pluginOpService('mysql','restart','');
+    pluginOpService('mysql-apt','restart','');
 }
 
 
