@@ -64,6 +64,7 @@ rm -rf $myDir
 APT_UNINSTALL()
 {
 ###
+rm -rf $myDir
 apt remove -y mysql-server
 ###
 }
