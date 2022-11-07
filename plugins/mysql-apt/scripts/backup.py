@@ -27,10 +27,10 @@ class backupTools:
     def backupDatabase(self, name, count):
         db_path = mw.getServerDir() + '/mysql-apt'
         db_name = 'mysql'
-        name = mw.M('databases').dbPos(db_path, 'mysql').where(
+        find_name = mw.M('databases').dbPos(db_path, 'mysql').where(
             'name=?', (name,)).getField('name')
         startTime = time.time()
-        if not name:
+        if not find_name:
             endDate = time.strftime('%Y/%m/%d %X', time.localtime())
             log = "数据库[" + name + "]不存在!"
             print("★[" + endDate + "] " + log)
