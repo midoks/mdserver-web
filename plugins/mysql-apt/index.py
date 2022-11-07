@@ -713,7 +713,7 @@ def importDbExternal():
     sock = getSocketFile()
 
     os.environ["MYSQL_PWD"] = pwd
-    mysql_cmd = getServerDir() + '/bin/mysql -S ' + sock + ' -uroot -p' + \
+    mysql_cmd = '/usr/bin/mysql -S ' + sock + ' -uroot -p' + \
         pwd + ' ' + name + ' < ' + import_sql
 
     # print(mysql_cmd)
@@ -741,7 +741,7 @@ def importDbBackup():
 
     pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
     sock = getSocketFile()
-    mysql_cmd = getServerDir() + '/bin/mysql -S ' + sock + ' -uroot -p' + pwd + \
+    mysql_cmd = '/usr/bin/mysql -S ' + sock + ' -uroot -p' + pwd + \
         ' ' + name + ' < ' + file_path_sql
 
     # print(mysql_cmd)
