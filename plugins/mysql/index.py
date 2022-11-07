@@ -407,7 +407,7 @@ def initMysqlPwd():
     myconf = serverdir + "/etc/my.cnf"
     pwd = mw.getRandomString(16)
 
-    cmd_pass = serverdir + '/bin/mysql -uroot -e'
+    cmd_pass = serverdir + '/bin/mysql --defaults-file=' + myconf + ' -uroot -e'
     cmd_pass = cmd_pass + \
         '"UPDATE mysql.user SET password=PASSWORD(\'' + \
         pwd + "') WHERE user='root';"
