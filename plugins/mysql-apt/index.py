@@ -275,7 +275,9 @@ def initMysql57Data():
 
         cmd = serverdir + '/bin/usr/sbin/mysqld --defaults-file=' + myconf + \
             ' --initialize-insecure --explicit_defaults_for_timestamp'
-        mw.execShell(cmd)
+        data = mw.execShell(cmd)
+        # print(cmd)
+        # print(data)
         return False
     return True
 
