@@ -335,6 +335,10 @@ def initMysqlData():
         data = mw.execShell(cmd)
         # print(data[0])
         # print(data[1])
+
+        if not mw.isAppleSystem():
+            mw.execShell('chown -R mysql:mysql ' + serverdir + '/data')
+            mw.execShell('chmod -R 755 ' + serverdir + '/data')
         return False
     return True
 
