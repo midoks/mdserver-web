@@ -81,7 +81,7 @@ class backupTools:
 
         mw.M('backup').add('type,name,pid,filename,addtime,size', (1, os.path.basename(
             filename), pid, filename, endDate, os.path.getsize(filename)))
-        log = "数据库[" + name + "]备份成功,用时[" + str(round(outTime, 2)) + u"]秒"
+        log = "数据库[" + name + "]备份成功,用时[" + str(round(outTime, 2)) + "]秒"
         mw.writeLog('计划任务', log)
         print("★[" + endDate + "] " + log)
         print("|---保留最新的[" + count + "]份备份")
