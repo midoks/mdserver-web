@@ -7,6 +7,9 @@ export DEBIAN_FRONTEND=noninteractive
 
 # https://downloads.mysql.com/archives/community/
 
+# debug
+# cd /www/server/mdserver-web/plugins/mysql-apt && bash install.sh install 8.0
+
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
@@ -20,20 +23,13 @@ bash ${rootPath}/scripts/getos.sh
 OSNAME=`cat ${rootPath}/data/osname.pl`
 VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
-# cd /www/server/mdserver-web/plugins/mysql-apt && bash install.sh install 8.0
-
 MYSQL_VER=5.7.39
-
 if [ "$OSNAME" == "debian" && "$VERSION_ID" == "11" ];then
 	# mysql5.7现在仅有10的编译版
 	VERSION_ID="10"
 fi
 
 SUFFIX_NAME=${MYSQL_VER}-1${OSNAME}${VERSION_ID}_amd64
-
-
-# /lib/systemd/system/mysql.service
-# /etc/mysql/my.cnf
 
 APT_INSTALL()
 {
@@ -50,7 +46,6 @@ apt install -y libnuma1 libaio1 libmecab2
 
 # 安装
 dpkg -X mysql-common_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
-
 
 
 dpkg -X mysql-community-client-plugins_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
