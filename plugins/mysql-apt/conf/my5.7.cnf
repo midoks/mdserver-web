@@ -44,6 +44,7 @@ server-id	= 1
 slow_query_log=1
 slow-query-log-file={$SERVER_APP_PATH}/data/mysql-slow.log
 long_query_time=3
+expire_logs_days=30
 #log_queries_not_using_indexes=on
 
 relay-log=mdserver
@@ -77,7 +78,6 @@ innodb_max_dirty_pages_pct = 90
 innodb_read_io_threads = 1
 innodb_write_io_threads = 1
 innodb_file_per_table=1
-expire_logs_days=30
 
 secure-file-priv={$SERVER_APP_PATH}/tmp
 
