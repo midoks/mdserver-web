@@ -363,20 +363,26 @@ def initMariaDbPwd():
         print("init mariadb password fail:" + data[1])
         exit(1)
 
+    # 删除空账户
+    drop_empty_user = serverdir + '/bin/mysql ' + db_option + '-uroot -p' + \
+        pwd + ' -e "use mysql;delete from user where USER=\'\'"'
+    mw.execShell(drop_empty_user)
+
     # 删除测试数据库
     drop_test_db = serverdir + '/bin/mysql ' + db_option + ' -uroot -p' + \
         pwd + ' -e "drop database test";'
     mw.execShell(drop_test_db)
 
     # 删除冗余账户
-    hostname = mw.execShell('hostname')[0].strip()
-    drop_hostname =  serverdir + '/bin/mysql  --defaults-file=' + \
-        myconf + ' -uroot -p' + pwd + ' -e "drop user \'\'@\'' + hostname + '\'";'
-    mw.execShell(drop_hostname)
+    if hostname != 'hostname':
+        hostname = mw.execShell('hostname')[0].strip()
+        drop_hostname =  serverdir + '/bin/mysql  --defaults-file=' + \
+            myconf + ' -uroot -p' + pwd + ' -e "drop user \'\'@\'' + hostname + '\'";'
+        mw.execShell(drop_hostname)
 
-    drop_root_hostname =  serverdir + '/bin/mysql  --defaults-file=' + \
-        myconf + ' -uroot -p' + pwd + ' -e "drop user \'root\'@\'' + hostname + '\'";'
-    mw.execShell(drop_root_hostname)
+        drop_root_hostname =  serverdir + '/bin/mysql  --defaults-file=' + \
+            myconf + ' -uroot -p' + pwd + ' -e "drop user \'root\'@\'' + hostname + '\'";'
+        mw.execShell(drop_root_hostname)
 
     pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
     return True

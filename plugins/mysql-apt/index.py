@@ -345,16 +345,16 @@ def initMysql8Pwd():
 
     # 删除冗余账户
     hostname = mw.execShell('hostname')[0].strip()
+    if hostname != 'localhost':
+        drop_hostname =  cmd_my + ' --defaults-file=' + \
+            myconf + ' -uroot -p' + pwd + ' -e "drop user \'\'@\'' + hostname + '\'";'
+        mw.execShell(drop_hostname)
 
-    drop_hostname =  cmd_my + ' --defaults-file=' + \
-        myconf + ' -uroot -p' + pwd + ' -e "drop user \'\'@\'' + hostname + '\'";'
-    mw.execShell(drop_hostname)
+        drop_root_hostname =  cmd_my + ' --defaults-file=' + \
+            myconf + ' -uroot -p' + pwd + ' -e "drop user \'root\'@\'' + hostname + '\'";'
+        mw.execShell(drop_root_hostname)
 
-    drop_root_hostname =  cmd_my + ' --defaults-file=' + \
-        myconf + ' -uroot -p' + pwd + ' -e "drop user \'root\'@\'' + hostname + '\'";'
-    mw.execShell(drop_root_hostname)
-
-    pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
+        pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
     return True
 
 
