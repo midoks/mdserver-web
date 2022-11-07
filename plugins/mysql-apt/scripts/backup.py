@@ -54,7 +54,8 @@ class backupTools:
         mysql_root = mw.M('config').dbPos(db_path, db_name).where(
             "id=?", (1,)).getField('mysql_root')
 
-        mycnf = mw.readFile(db_path + '/etc/my.cnf')
+        my_conf_path = db_path + '/etc/my.cnf'
+        mycnf = mw.readFile(my_conf_path)
         rep = "\[mysqldump\]\nuser=root"
         sea = "[mysqldump]\n"
         subStr = sea + "user=root\npassword=" + mysql_root + "\n"
