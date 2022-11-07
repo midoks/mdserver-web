@@ -6,6 +6,8 @@ socket		= {$SERVER_APP_PATH}/mysql.sock
 default-character-set = UTF8MB4
 
 [mysqld]
+!include {$SERVER_APP_PATH}/etc/mode/classic.cnf
+
 pid-file = {$SERVER_APP_PATH}/data/mysql.pid
 user = mysql
 port		= 33206

@@ -806,7 +806,14 @@ def installPreInspection(version):
     sysId = sys_id[0].strip()
 
     if not sysName in ('debian', 'ubuntu'):
-        return '暂时支持debian,ubuntu'
+        return '仅支持debian,ubuntu'
+
+    if sysName == 'debian' and not sysId in('11', '10'):
+        return 'debian支持10,11'
+
+    if sysName == 'ubuntu' and not sysId in ('10'):
+        return ''
+
     return 'ok'
 
 if __name__ == "__main__":
