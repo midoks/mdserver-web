@@ -653,7 +653,7 @@ def setDbBackup():
     if not data[0]:
         return data[1]
 
-    scDir = mw.getRunDir() + '/scripts/backup.py'
+    scDir = getServerDir() + '/scripts/backup.py'
 
     cmd = 'python3 ' + scDir + ' database ' + args['name'] + ' 3'
     os.system(cmd)
