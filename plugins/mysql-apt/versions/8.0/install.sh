@@ -27,11 +27,14 @@ SUFFIX_NAME=${MYSQL_VER}-1${OSNAME}${VERSION_ID}_amd64
 
 # /lib/systemd/system/mysql.service
 # /etc/mysql/my.cnf
+# dpkg -X mysql-testsuite_8.0.30-1debian11_amd64.deb ./tmp
 
 APT_INSTALL()
 {
 ########
 mkdir -p $myDir
+mkdir -p $serverPath/mysql-apt/bin
+
 wget -O ${myDir}/mysql-server_${SUFFIX_NAME}.deb-bundle.tar https://cdn.mysql.com/archives/mysql-8.0/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
 chmod +x ${myDir}/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
 cd ${myDir} && tar vxf /tmp/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
@@ -40,21 +43,21 @@ apt update -y
 apt install -y libnuma1 libaio1 libmecab2
 
 # 安装
-dpkg -i mysql-common_${SUFFIX_NAME}.deb
+dpkg -X mysql-common_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
 
 
 export DEBIAN_FRONTEND=noninteractive
-dpkg -i mysql-community-client-plugins_${SUFFIX_NAME}.deb
-dpkg -i mysql-community-client-core_${SUFFIX_NAME}.deb
-dpkg -i mysql-community-client_${SUFFIX_NAME}.deb
-dpkg -i mysql-client_${SUFFIX_NAME}.deb
+dpkg -X mysql-community-client-plugins_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
+dpkg -X mysql-community-client-core_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
+dpkg -X mysql-community-client_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
+dpkg -X mysql-client_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
 
-dpkg -i mysql-community-server-core_${SUFFIX_NAME}.deb
+dpkg -X mysql-community-server-core_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
 
 # dpkg -X mysql-community-server_8.0.30-1debian11_amd64.deb ./tmp
 #会覆盖/lib/systemd/system/mysql.service,不安装
-# dpkg -i mysql-community-server_${SUFFIX_NAME}.deb
-dpkg -i mysql-server_${SUFFIX_NAME}.deb
+# dpkg -X mysql-community-server_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
+dpkg -X mysql-server_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
 
 # rm -rf $myDir
 #######
