@@ -3,9 +3,13 @@
 
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
+export DEBIAN_FRONTEND=noninteractive
 
-#https://dev.mysql.com/downloads/mysql/5.7.html
-#https://dev.mysql.com/downloads/file/?id=489855
+# https://downloads.mysql.com/archives/community/
+
+# debug
+# cd /www/server/mdserver-web/plugins/mysql-apt && bash install.sh install 8.0
+# /www/server/mysql-apt/bin/usr/sbin/mysqld --defaults-file=/www/server/mysql-apt/etc/my.cnf --daemonize
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
@@ -13,76 +17,77 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sysName=`uname`
 
-
 install_tmp=${rootPath}/tmp/mw_install.pl
-mysqlDir=${serverPath}/source/mysql
+myDir=${serverPath}/source/mysql-apt
 
-
-_os=`uname`
-if [ ${_os} == "Darwin" ]; then
-    OSNAME='macos'
-elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
-    OSNAME='centos'
-elif grep -Eqi "Rocky" /etc/issue || grep -Eq "Rocky" /etc/*-release; then
-    OSNAME='rocky'
-elif grep -Eqi "Red Hat Enterprise Linux Server" /etc/issue || grep -Eq "Red Hat Enterprise Linux Server" /etc/*-release; then
-    OSNAME='rhel'
-elif grep -Eqi "Aliyun" /etc/issue || grep -Eq "Aliyun" /etc/*-release; then
-    OSNAME='aliyun'
-elif grep -Eqi "Fedora" /etc/issue || grep -Eq "Fedora" /etc/*-release; then
-    OSNAME='fedora'
-elif grep -Eqi "Amazon Linux AMI" /etc/issue || grep -Eq "Amazon Linux AMI" /etc/*-release; then
-    OSNAME='amazon'
-elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
-    OSNAME='debian'
-elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
-    OSNAME='ubuntu'
-elif grep -Eqi "Raspbian" /etc/issue || grep -Eq "Raspbian" /etc/*-release; then
-    OSNAME='raspbian'
-elif grep -Eqi "Deepin" /etc/issue || grep -Eq "Deepin" /etc/*-release; then
-    OSNAME='deepin'
-else
-    OSNAME='unknow'
-fi
-
+bash ${rootPath}/scripts/getos.sh
+OSNAME=`cat ${rootPath}/data/osname.pl`
 VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
+MYSQL_VER=5.7.39
+if [ "$OSNAME" == "debian" ];then
+	# mysql5.7现在仅有10的编译版
+	VERSION_ID="10"
+fi
 
+if [ "$OSNAME" == "ubuntu" ];then
+	# mysql5.7现在仅有18.04的编译版
+	VERSION_ID="18.04"
+fi
 
+SUFFIX_NAME=${MYSQL_VER}-1${OSNAME}${VERSION_ID}_amd64
 
 APT_INSTALL()
 {
 ########
-wget -O /tmp/mysql-apt-config_0.8.22-1_all.deb https://repo.mysql.com/mysql-apt-config_0.8.22-1_all.deb
-dpkg -i /tmp/mysql-apt-config_0.8.22-1_all.deb
+mkdir -p $myDir
+mkdir -p $serverPath/mysql-apt/bin
+
+wget -O ${myDir}/mysql-server_${SUFFIX_NAME}.deb-bundle.tar https://cdn.mysql.com/archives/mysql-5.7/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
+chmod +x ${myDir}/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
+cd ${myDir} && tar vxf ${myDir}/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
 
 apt update -y
-apt install -y mysql-server
+apt install -y libnuma1 libaio1 libmecab2
 
-rm -rf  /tmp/mysql-apt-config_0.8.22-1_all.deb
+# 安装
+dpkg -X mysql-common_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
+
+
+dpkg -X mysql-community-client-plugins_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
+dpkg -X mysql-community-client-core_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
+dpkg -X mysql-community-client_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
+dpkg -X mysql-client_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
+
+dpkg -X mysql-community-server-core_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
+
+dpkg -X mysql-community-server_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
+dpkg -X mysql-server_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
+
+# rm -rf $myDir
 #######
 }
 
 APT_UNINSTALL()
 {
 ###
-apt remove -y mysql-server
+rm -rf $myDir
+# apt remove -y mysql-server
 ###
 }
 
 
 Install_mysql()
 {
-
 	echo '正在安装脚本文件...' > $install_tmp
-
 	if id mysql &> /dev/null ;then 
-	    echo "mysql UID is `id -u mysql`"
-	    echo "mysql Shell is `grep "^mysql:" /etc/passwd |cut -d':' -f7 `"
+	    echo "mysql uid is `id -u mysql`"
+	    echo "mysql shell is `grep "^mysql:" /etc/passwd |cut -d':' -f7 `"
 	else
 	    groupadd mysql
 		useradd -g mysql mysql
 	fi
+
 
 	isApt=`which apt`
 	if [ "$isApt" != "" ];then

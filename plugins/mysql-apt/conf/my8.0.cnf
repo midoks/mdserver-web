@@ -1,20 +1,22 @@
 [client]
 user = root
 #password	= your_password
-port		= 3386
+port		= 33206
 socket		= {$SERVER_APP_PATH}/mysql.sock
 default-character-set = UTF8MB4
 
 [mysqld]
-default_authentication_plugin=mysql_native_password
+!include {$SERVER_APP_PATH}/etc/mode/classic.cnf
+
+authentication_policy=mysql_native_password
 pid-file = {$SERVER_APP_PATH}/data/mysql.pid
 user = mysql
-port		= 3386
-mysqlx_port = 33860
+port		= 33206
+mysqlx_port = 33260
 socket		= {$SERVER_APP_PATH}/mysql.sock
 datadir = {$SERVER_APP_PATH}/data
 log-error =  {$SERVER_APP_PATH}/data/error.log
-default_storage_engine = MyISAM
+default_storage_engine = InnoDB
 
 key_buffer_size = 8M
 table_open_cache = 32
@@ -24,7 +26,7 @@ read_buffer_size = 128K
 read_rnd_buffer_size = 256K
 myisam_sort_buffer_size = 4M
 thread_cache_size = 4
-lower_case_table_names=0
+lower_case_table_names=1
 tmp_table_size = 8M
 character-set-server = UTF8MB4
 
@@ -70,7 +72,7 @@ innodb_data_home_dir = {$SERVER_APP_PATH}/data
 innodb_data_file_path = ibdata1:10M:autoextend
 innodb_log_group_home_dir = {$SERVER_APP_PATH}/data
 innodb_buffer_pool_size = 16M
-innodb_log_file_size = 5M
+innodb_redo_log_capacity=10485760
 innodb_log_buffer_size = 8M
 innodb_flush_log_at_trx_commit = 1
 innodb_lock_wait_timeout = 120

@@ -3,9 +3,9 @@
 
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
+export DEBIAN_FRONTEND=noninteractive
 
-#https://dev.mysql.com/downloads/mysql/5.7.html
-#https://dev.mysql.com/downloads/file/?id=489855
+# https://downloads.mysql.com/archives/community/
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
@@ -14,7 +14,7 @@ serverPath=$(dirname "$rootPath")
 sysName=`uname`
 
 install_tmp=${rootPath}/tmp/mw_install.pl
-mysqlDir=${serverPath}/source/mysql
+myDir=${serverPath}/source/mysql-apt
 
 bash ${rootPath}/scripts/getos.sh
 OSNAME=`cat ${rootPath}/data/osname.pl`
@@ -32,59 +32,40 @@ SUFFIX_NAME=${MYSQL_VER}-1${OSNAME}${VERSION_ID}_amd64
 APT_INSTALL()
 {
 ########
+mkdir -p $myDir
+mkdir -p $serverPath/mysql-apt/bin
 
-wget -O /tmp/mysql-server_${SUFFIX_NAME}.deb-bundle.tar https://cdn.mysql.com/archives/mysql-8.0/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
-chmod +x /tmp/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
-tar vxf /tmp/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
+wget -O ${myDir}/mysql-server_${SUFFIX_NAME}.deb-bundle.tar https://cdn.mysql.com/archives/mysql-8.0/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
+chmod +x ${myDir}/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
+cd ${myDir} && tar vxf ${myDir}/mysql-server_${SUFFIX_NAME}.deb-bundle.tar
 
 apt update -y
 apt install -y libnuma1 libaio1 libmecab2
 
-# 手动调试
-# dpkg -i mysql-common_8.0.31-1ubuntu18.04_amd64.deb
-# dpkg -i mysql-community-client-plugins_8.0.31-1ubuntu18.04_amd64.deb
-# dpkg -i mysql-community-client-core_8.0.31-1ubuntu18.04_amd64.deb
-# dpkg -i mysql-community-client_8.0.29-1ubuntu18.04_amd64.deb
-# dpkg -i mysql-client_8.0.31-1ubuntu18.04_amd64.deb
+# 安装
+dpkg -X mysql-common_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
 
 
-dpkg -i mysql-common_${SUFFIX_NAME}.deb
 
-# dpkg-preconfigure mysql-community-server_8.0.29-1ubuntu18.04_amd64.deb
-export DEBIAN_FRONTEND=noninteractive
-dpkg -i mysql-community-client-plugins_${SUFFIX_NAME}.deb
-dpkg -i mysql-community-client-core_${SUFFIX_NAME}.deb
-dpkg -i mysql-community-client_${SUFFIX_NAME}.deb
-dpkg -i mysql-client_${SUFFIX_NAME}.deb
+dpkg -X mysql-community-client-plugins_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
+dpkg -X mysql-community-client-core_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
+dpkg -X mysql-community-client_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
+dpkg -X mysql-client_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
 
-# dpkg -i mysql-community-client-plugins_${SUFFIX_NAME}.deb
-# dpkg -i mysql-community-client_${SUFFIX_NAME}.deb
+dpkg -X mysql-community-server-core_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
 
-# dpkg -i mysql-client_${SUFFIX_NAME}.deb
-# dpkg -i libmysqlclient-dev_${SUFFIX_NAME}.deb
-# dpkg -i libmysqld-dev_${SUFFIX_NAME}.deb
-# dpkg -i mysql-community-${SUFFIX_NAME}.deb
-# dpkg -i mysql-client_${SUFFIX_NAME}.deb
-# dpkg -i mysql-common_${SUFFIX_NAME}.deb
+dpkg -X mysql-community-server_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
+dpkg -X mysql-server_${SUFFIX_NAME}.deb $serverPath/mysql-apt/bin
 
-# apt -f install
-# apt -f install libmecab2
-
-dpkg -i mysql-community-server-core_${SUFFIX_NAME}.deb
-dpkg -i mysql-community-server_${SUFFIX_NAME}.deb
-dpkg -i mysql-server_${SUFFIX_NAME}.deb
-
-# dpkg -i mysql-server_${SUFFIX_NAME}.deb
-# apt -f install
-# apt install -y mysql-server
-# rm -rf /tmp/mysql-server_8.0.29-1debian11_amd64.deb-bundle.tar
+# rm -rf $myDir
 #######
 }
 
 APT_UNINSTALL()
 {
 ###
-apt remove -y mysql-server
+rm -rf $myDir
+# apt remove -y mysql-server
 ###
 }
 

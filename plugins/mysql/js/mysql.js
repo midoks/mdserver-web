@@ -60,8 +60,7 @@ function myAsyncPost(method,args){
 }
 
 function vaildPhpmyadmin(url,username,password){
-
-    console.log("Authorization: Basic " + btoa(username + ":" + password));
+    // console.log("Authorization: Basic " + btoa(username + ":" + password));
     $.ajax({
         type: "GET",
         url: url,
@@ -832,8 +831,8 @@ function openPhpmyadmin(name,username,password){
 
     data = syncPost('/plugins/run',{'name':'phpmyadmin','func':'get_cfg'});
     var rdata = $.parseJSON(data.data);
-    if (rdata.choose == 'mariadb'){
-        layer.msg('当前为[mariadb]模式,若要使用请切换模式.',{icon:2,shade: [0.3, '#000']});
+    if (rdata.choose != 'mysql'){
+        layer.msg('当前为['+rdata.choose+']模式,若要使用请切换模式.',{icon:2,shade: [0.3, '#000']});
         return;
     }
 

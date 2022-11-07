@@ -18,14 +18,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 # MySQL systemd service file
 
 [Unit]
 Description=MySQL Community Server
-Documentation=man:mysqld(8)
-Documentation=http://dev.mysql.com/doc/refman/en/using-systemd.html
 After=network.target
 
 [Install]
@@ -34,17 +32,13 @@ WantedBy=multi-user.target
 [Service]
 User=mysql
 Group=mysql
-Type=notify
-ExecStartPre=+/usr/share/mysql-8.0/mysql-systemd-start pre
-ExecStart=/usr/sbin/mysqld
-TimeoutSec=0
-LimitNOFILE = 10000
+Type=forking
+PermissionsStartOnly=true
+#ExecStartPre=/usr/share/mysql/mysql-systemd-start pre
+ExecStart={$SERVER_PATH}/mysql-apt/bin/usr/sbin/mysqld --defaults-file={$SERVER_PATH}/mysql-apt/etc/my.cnf --daemonize
+TimeoutSec=600
+LimitNOFILE = 5000
 Restart=on-failure
 RestartPreventExitStatus=1
-
-# Always restart when mysqld exits with exit code of 16. This special exit code
-# is used by mysqld for RESTART SQL.
-RestartForceExitStatus=16
-
-# Set enviroment variable MYSQLD_PARENT_PID. This is required for restart.
-Environment=MYSQLD_PARENT_PID=1
+RuntimeDirectory=mysqld
+RuntimeDirectoryMode=755

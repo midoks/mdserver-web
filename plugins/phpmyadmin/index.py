@@ -125,9 +125,15 @@ def contentReplace(content):
 
     cfg = getCfg()
 
-    if (cfg['choose'] == "mysql"):
+    if cfg['choose'] == "mysql":
         content = content.replace('{$CHOOSE_DB}', 'mysql')
         content = content.replace('{$CHOOSE_DB_DIR}', 'mysql')
+    elif cfg['choose'] == "mysql-apt":
+        content = content.replace('{$CHOOSE_DB}', 'mysql')
+        content = content.replace('{$CHOOSE_DB_DIR}', 'mysql-apt')
+    elif cfg['choose'] == "mysql-yum":
+        content = content.replace('{$CHOOSE_DB}', 'mysql')
+        content = content.replace('{$CHOOSE_DB_DIR}', 'mysql-yum')
     else:
         content = content.replace('{$CHOOSE_DB}', 'MariaDB')
         content = content.replace('{$CHOOSE_DB_DIR}', 'mariadb')

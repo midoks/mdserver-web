@@ -1,6 +1,6 @@
 {
 	"sort": 7,
-	"ps": "PHP是世界上最好的编程语言[YUM]",
+	"ps": "PHP是世界上最好的编程语言(极速安装)",
 	"shell": "install.sh",
 	"name": "php-yum",
 	"title": "PHP[YUM]",

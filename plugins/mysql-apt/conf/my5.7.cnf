@@ -1,19 +1,21 @@
 [client]
 user = root
 #password	= your_password
-port		= 3376
+port		= 33206
 socket		= {$SERVER_APP_PATH}/mysql.sock
 default-character-set = UTF8MB4
 
 [mysqld]
+!include {$SERVER_APP_PATH}/etc/mode/classic.cnf
+
 pid-file = {$SERVER_APP_PATH}/data/mysql.pid
 user = mysql
-port		= 3376
-mysqlx_port = 33760
+port		= 33206
 socket		= {$SERVER_APP_PATH}/mysql.sock
 datadir = {$SERVER_APP_PATH}/data
 log-error =  {$SERVER_APP_PATH}/data/error.log
-default_storage_engine = MyISAM
+default_storage_engine = InnoDB
+language={$SERVER_APP_PATH}/bin/usr/share/mysql/english
 
 key_buffer_size = 8M
 table_open_cache = 32
@@ -44,6 +46,7 @@ server-id	= 1
 slow_query_log=1
 slow-query-log-file={$SERVER_APP_PATH}/data/mysql-slow.log
 long_query_time=3
+expire_logs_days=30
 #log_queries_not_using_indexes=on
 
 relay-log=mdserver
@@ -77,7 +80,6 @@ innodb_max_dirty_pages_pct = 90
 innodb_read_io_threads = 1
 innodb_write_io_threads = 1
 innodb_file_per_table=1
-binlog_expire_logs_seconds=2592000
 
 secure-file-priv={$SERVER_APP_PATH}/tmp
 

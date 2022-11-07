@@ -7,7 +7,7 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
-# curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update_dev.sh | bash
+# https://downloads.mysql.com/archives/community/
 
 # cd /www/server/mdserver-web/plugins/mysql-apt && bash install.sh install 8.0
 # cd /www/server/mdserver-web/plugins/mysql-apt && bash install.sh uninstall 8.0
@@ -18,7 +18,6 @@ install_tmp=${rootPath}/tmp/mw_install.pl
 
 action=$1
 type=$2
-
 
 
 if [ "${2}" == "" ];then
@@ -36,6 +35,14 @@ if [ "${action}" == "uninstall" ];then
 	cd ${rootPath} && python3 ${rootPath}/plugins/mysql-apt/index.py stop ${type}
 	cd ${rootPath} && python3 ${rootPath}/plugins/mysql-apt/index.py initd_uninstall ${type}
 	cd $curPath
+
+	if [ -f /usr/lib/systemd/system/mysql-apt.service ] || [ -f /lib/systemd/system/mysql-apt.service ];then
+		systemctl stop mysql-apt
+		systemctl disable mysql-apt
+		rm -rf /usr/lib/systemd/system/mysql-apt.service
+		rm -rf /lib/systemd/system/mysql-apt.service
+		systemctl daemon-reload
+	fi
 fi
 
 sh -x $curPath/versions/$2/install.sh $1
