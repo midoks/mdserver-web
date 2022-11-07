@@ -332,9 +332,9 @@ def initMysql8Pwd():
         '"UPDATE mysql.user SET password=PASSWORD(\'' + \
         pwd + "') WHERE user='root';"
     cmd_pass = cmd_pass + 'flush privileges;"'
-    print(cmd_pass)
+    # print(cmd_pass)
     data = mw.execShell(cmd_pass)
-    print(data)
+    # print(data)
 
     # 删除空账户
     drop_empty_user = cmd_my + ' --defaults-file=' + myconf + ' -uroot -p' + \
