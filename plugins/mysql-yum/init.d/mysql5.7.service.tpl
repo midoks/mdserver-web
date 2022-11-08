@@ -31,7 +31,7 @@ After=syslog.target
 After=network.target
 
 [Service]
-Type=notify
+Type=forking
 User=mysql
 Group=mysql
 
@@ -39,7 +39,7 @@ Group=mysql
 #ExecStartPre=/usr/libexec/mysql-prepare-db-dir %n
 # Note: we set --basedir to prevent probes that might trigger SELinux alarms,
 # per bug #547485
-ExecStart={$SERVER_PATH}/mysql-yum/bin/usr/sbin/mysqld --defaults-file={$SERVER_PATH}/mysql-yum/etc/my.cnf --basedir={$SERVER_PATH}/mysql-yum/bin/usr --user=mysql --daemonize
+ExecStart={$SERVER_PATH}/mysql-yum/bin/usr/sbin/mysqld --defaults-file={$SERVER_PATH}/mysql-yum/etc/my.cnf --daemonize
 #ExecStartPost=/usr/libexec/mysql-check-upgrade
 #ExecStopPost=/usr/libexec/mysql-wait-stop
 
