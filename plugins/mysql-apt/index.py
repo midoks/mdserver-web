@@ -307,7 +307,9 @@ def initMysql8Data():
         if data[1].find('ERROR') != -1:
             exit("Init MySQL{} Data Error".format(8))
 
-        mw.execShell('chown -R mysql mysql ' + getServerDir())
+        if not mw.isAppleSystem():
+            mw.execShell('chown -R mysql:mysql ' + datadir)
+            mw.execShell('chmod -R 755 ' + datadir)
         return False
     return True
 
