@@ -73,7 +73,7 @@ YUM_UNINSTALL()
 {
 ### YUM卸载 START ########
 # yum -y remove mysql-server
-rm -rf ${serverPath}/mysql-yum
+rm -rf ${myDir}
 ### YUM卸载 END   ########
 }
 
