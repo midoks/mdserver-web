@@ -39,7 +39,7 @@ Group=mysql
 #ExecStartPre=/usr/libexec/mysql-prepare-db-dir %n
 # Note: we set --basedir to prevent probes that might trigger SELinux alarms,
 # per bug #547485
-ExecStart={$SERVER_PATH}/bin/usr/sbin/mysqld --defaults-file={$SERVER_PATH}/mysql-yum/etc/my.cnf --basedir={$SERVER_PATH}/bin/usr --user=mysql
+ExecStart={$SERVER_PATH}/mysql-yum/bin/usr/sbin/mysqld --defaults-file={$SERVER_PATH}/mysql-yum/etc/my.cnf --basedir={$SERVER_PATH}/bin/usr --user=mysql
 #ExecStartPost=/usr/libexec/mysql-check-upgrade
 #ExecStopPost=/usr/libexec/mysql-wait-stop
 
