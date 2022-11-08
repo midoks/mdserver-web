@@ -2321,6 +2321,11 @@ def installPreInspection(version):
     if not sysName in ('centos',):
         return '仅支持centos'
 
+    if sysName == 'centos' and version == '5.7' and not sysId in ('7'):
+        return 'mysql5.7 仅支持centos7'
+
+    if sysName == 'centos' and version == '8.0' and not sysId in ('7', '8', '9'):
+        return 'mysql8.0 仅支持centos7,8,9'
     return 'ok'
 
 
