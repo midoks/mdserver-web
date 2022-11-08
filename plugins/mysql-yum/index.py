@@ -147,17 +147,17 @@ def pMysqlDb():
 
 def initDreplace(version=''):
 
-    mysql_conf_dir = getServerDir() + '/etc'
-    if not os.path.exists(mysql_conf_dir):
-        os.mkdir(mysql_conf_dir)
+    my_dir = getServerDir() + '/etc'
+    if not os.path.exists(my_dir):
+        os.mkdir(my_dir)
 
-    mysql_tmp = getServerDir() + '/tmp'
-    if not os.path.exists(mysql_tmp):
-        os.mkdir(mysql_tmp)
-        mw.execShell("chown -R mysql:mysql " + mysql_tmp)
+    tmp_dir = getServerDir() + '/tmp'
+    if not os.path.exists(tmp_dir):
+        os.mkdir(tmp_dir)
+        mw.execShell("chown -R mysql:mysql " + tmp_dir)
         mw.execShell("chmod 750 " + tmp_dir)
 
-    mysql_conf = mysql_conf_dir + '/my.cnf'
+    mysql_conf = my_dir + '/my.cnf'
     if not os.path.exists(mysql_conf):
         mysql_conf_tpl = getPluginDir() + '/conf/my' + version + '.cnf'
         content = mw.readFile(mysql_conf_tpl)
