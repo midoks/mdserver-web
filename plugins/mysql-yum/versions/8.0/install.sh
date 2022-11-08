@@ -96,13 +96,10 @@ Install_mysql()
 	fi
 
 
-	if [ "$?" == "0" ];then
-		mkdir -p $serverPath/mysql-yum
-		echo '8.0' > $serverPath/mysql-yum/version.pl
-		echo '安装完成' > $install_tmp
-	else
-		echo "暂时不支持该系统" > $install_tmp
-	fi
+	
+	mkdir -p $serverPath/mysql-yum
+	echo '8.0' > $serverPath/mysql-yum/version.pl
+	echo '安装完成' > $install_tmp
 }
 
 Uninstall_mysql()
