@@ -35,13 +35,13 @@ Type=notify
 User=mysql
 Group=mysql
 
-ExecStartPre=/usr/libexec/mysql-check-socket
-ExecStartPre=/usr/libexec/mysql-prepare-db-dir %n
+#ExecStartPre=/usr/libexec/mysql-check-socket
+#ExecStartPre=/usr/libexec/mysql-prepare-db-dir %n
 # Note: we set --basedir to prevent probes that might trigger SELinux alarms,
 # per bug #547485
-ExecStart=/usr/libexec/mysqld --defaults-file={$SERVER_PATH}/mysql-ya/etc/my.cnf --basedir=/usr --user=mysql
-ExecStartPost=/usr/libexec/mysql-check-upgrade
-ExecStopPost=/usr/libexec/mysql-wait-stop
+ExecStart=/usr/libexec/mysqld --defaults-file={$SERVER_PATH}/mysql-yum/etc/my.cnf --basedir={$SERVER_PATH}/bin/usr --user=mysql
+#ExecStartPost=/usr/libexec/mysql-check-upgrade
+#ExecStopPost=/usr/libexec/mysql-wait-stop
 
 # Give a reasonable amount of time for the server to start up/shut down
 TimeoutSec=300
