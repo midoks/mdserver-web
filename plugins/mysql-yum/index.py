@@ -233,25 +233,6 @@ def setSkipGrantTables(v):
     return True
 
 
-# def getErrorLog():
-#     args = getArgs()
-#     path = getDataDir()
-#     filename = ''
-#     for n in os.listdir(path):
-#         if len(n) < 5:
-#             continue
-#         if n == 'error.log':
-#             filename = path + '/' + n
-#             break
-#     # print filename
-#     if not os.path.exists(filename):
-#         return mw.returnJson(False, '指定文件不存在!')
-#     if 'close' in args:
-#         mw.writeFile(filename, '')
-#         return mw.returnJson(False, '日志已清空')
-#     info = mw.getNumLines(filename, 18)
-#     return mw.returnJson(True, 'OK', info)
-
 def getErrorLog():
     file = getConf()
     content = mw.readFile(file)
@@ -282,9 +263,14 @@ def initMysql57Data():
         serverdir = getServerDir()
         myconf = serverdir + "/etc/my.cnf"
         user = pGetDbUser()
-        cmd = 'mysqld --defaults-file=' + myconf + \
-            ' --initialize-insecure --explicit_defaults_for_timestamp'
-        mw.execShell(cmd)
+        cmd = serverdir + '/bin/usr/sbin/mysqld --basedir=' + serverdir + '/bin/usr --datadir=' + \
+            datadir + ' --initialize-insecure --explicit_defaults_for_timestamp'
+        data = mw.execShell(cmd)
+        # print(cmd)
+        # print(data)
+        if not mw.isAppleSystem():
+            mw.execShell('chown -R mysql:mysql ' + datadir)
+            mw.execShell('chmod -R 755 ' + datadir)
         return False
     return True
 
@@ -294,9 +280,13 @@ def initMysql8Data():
     if not os.path.exists(datadir + '/mysql'):
         serverdir = getServerDir()
         user = pGetDbUser()
-        cmd = 'mysqld --basedir=/usr --datadir=' + datadir + ' --initialize-insecure'
+        cmd = serverdir + '/bin/usr/sbin/mysqld --basedir=' + serverdir + '/bin/usr --datadir=' + \
+            datadir + ' --initialize-insecure'
         mw.execShell(cmd)
-        mw.execShell('chown -R mysql mysql ' + getServerDir())
+
+        if not mw.isAppleSystem():
+            mw.execShell('chown -R mysql:mysql ' + datadir)
+            mw.execShell('chmod -R 755 ' + datadir)
         return False
     return True
 
