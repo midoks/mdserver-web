@@ -51,6 +51,20 @@ mkdir -p $myDir
 wget -O $myDir/mysql-${SUFFIX_NAME}.rpm-bundle.tar https://cdn.mysql.com/archives/mysql-8.0/mysql-${SUFFIX_NAME}.rpm-bundle.tar
 cd ${myDir} && tar vxf mysql-server_${SUFFIX_NAME}.deb-bundle.tar
 
+mkdir -p ${serverPath}/mysql-yum/bin && cd ${serverPath}/mysql-yum/bin
+
+rpm2cpio ${myDir}/mysql-community-client-8.0.30-1.el7.x86_64.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-client-plugins-8.0.30-1.el7.x86_64.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-common-8.0.30-1.el7.x86_64.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-debuginfo-8.0.30-1.el7.x86_64.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-devel-8.0.30-1.el7.x86_64.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-embedded-compat-8.0.30-1.el7.x86_64.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-icu-data-files-8.0.30-1.el7.x86_64.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-libs-8.0.30-1.el7.x86_64.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-libs-compat-8.0.30-1.el7.x86_64.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-server-8.0.30-1.el7.x86_64.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-server-debug-8.0.30-1.el7.x86_64.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-test-8.0.30-1.el7.x86_64.rpm | cpio -div
 
 #######
 }
