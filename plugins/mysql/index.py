@@ -92,6 +92,14 @@ def getSocketFile():
     return tmp.groups()[0].strip()
 
 
+def getErrorLogsFile():
+    file = getConf()
+    content = mw.readFile(file)
+    rep = 'log-error\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
+
+
 def getInitdTpl(version=''):
     path = getPluginDir() + '/init.d/mysql' + version + '.tpl'
     if not os.path.exists(path):
@@ -319,15 +327,7 @@ def setSkipGrantTables(v):
 
 def getErrorLog():
     args = getArgs()
-    path = getDataDir()
-    filename = ''
-    for n in os.listdir(path):
-        if len(n) < 5:
-            continue
-        if n == 'error.log':
-            filename = path + '/' + n
-            break
-    # print filename
+    filename = getErrorLogsFile()
     if not os.path.exists(filename):
         return mw.returnJson(False, '指定文件不存在!')
     if 'close' in args:
