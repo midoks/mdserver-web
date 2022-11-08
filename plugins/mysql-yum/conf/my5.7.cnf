@@ -13,7 +13,7 @@ mysqlx_port = 33760
 socket		= {$SERVER_APP_PATH}/mysql.sock
 datadir = {$SERVER_APP_PATH}/data
 log-error =  {$SERVER_APP_PATH}/data/error.log
-default_storage_engine = MyISAM
+default_storage_engine = InnoDB
 
 key_buffer_size = 8M
 table_open_cache = 32
