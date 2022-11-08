@@ -30,7 +30,7 @@ OSNAME=`cat ${rootPath}/data/osname.pl`
 VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 echo "VERSION_ID:${VERSION_ID}"
 
-if [ "$VERSION_ID" -gt "7" ]; then
+if [ "$OSNAME" == "centos" ] && [ "$VERSION_ID" -gt "7" ]; then
 	VERSION_ID=7
 fi
 
