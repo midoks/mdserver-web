@@ -281,7 +281,7 @@ def initMysql8Data():
         serverdir = getServerDir()
         user = pGetDbUser()
         cmd = serverdir + '/bin/usr/sbin/mysqld --basedir=' + serverdir + '/bin/usr --datadir=' + \
-            datadir + ' --initialize-insecure'
+            datadir + ' --initialize-insecure --lower-case-table-names=1'
         mw.execShell(cmd)
 
         if not mw.isAppleSystem():
