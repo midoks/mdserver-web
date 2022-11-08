@@ -2372,7 +2372,7 @@ if __name__ == "__main__":
     elif func == 'clean_bin_log':
         print(cleanBinLog())
     elif func == 'error_log':
-        print(getErrorLogs())
+        print(getErrorLog())
     elif func == 'show_log':
         print(getShowLogFile())
     elif func == 'my_db_pos':
