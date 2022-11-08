@@ -29,7 +29,7 @@ if mw.isAppleSystem():
 
 
 def getPluginName():
-    return 'mysql'
+    return 'mysql-yum'
 
 
 def getPluginDir():
@@ -38,12 +38,6 @@ def getPluginDir():
 
 def getServerDir():
     return mw.getServerDir() + '/' + getPluginName()
-
-
-def getInitDFile():
-    if app_debug:
-        return '/tmp/' + getPluginName()
-    return '/etc/init.d/' + getPluginName()
 
 
 def getArgs():
@@ -76,6 +70,22 @@ def getConf():
     return path
 
 
+def getDataDir():
+    file = getConf()
+    content = mw.readFile(file)
+    rep = 'datadir\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
+
+
+def getPidFile():
+    file = getConf()
+    content = mw.readFile(file)
+    rep = 'pid-file\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
+
+
 def getDbPort():
     file = getConf()
     content = mw.readFile(file)
@@ -100,27 +110,12 @@ def getErrorLogsFile():
     return tmp.groups()[0].strip()
 
 
-def getInitdTpl(version=''):
-    path = getPluginDir() + '/init.d/mysql' + version + '.tpl'
-    if not os.path.exists(path):
-        path = getPluginDir() + '/init.d/mysql.tpl'
-    return path
-
-
 def contentReplace(content):
-
     service_path = mw.getServerDir()
     content = content.replace('{$ROOT_PATH}', mw.getRootDir())
     content = content.replace('{$SERVER_PATH}', service_path)
-    content = content.replace('{$SERVER_APP_PATH}', service_path + '/mysql')
-
-    server_id = int(time.time())
-    content = content.replace('{$SERVER_ID}', str(server_id))
-
-    if mw.isAppleSystem():
-        content = content.replace(
-            'lower_case_table_names=0', 'lower_case_table_names=2')
-
+    content = content.replace('{$SERVER_APP_PATH}',
+                              service_path + '/' + getPluginName())
     return content
 
 
@@ -145,48 +140,23 @@ def pSqliteDb(dbname='databases'):
 
 
 def pMysqlDb():
-    # pymysql
+    # mysql.connector
     db = mw.getMyORM()
     # MySQLdb |
     # db = mw.getMyORMDb()
 
+    db.__DB_CNF = getConf()
     db.setPort(getDbPort())
     db.setSocket(getSocketFile())
-    # db.setCharset("utf8")
     db.setPwd(pSqliteDb('config').where('id=?', (1,)).getField('mysql_root'))
     return db
 
 
-def makeInitRsaKey(version=''):
-    datadir = getServerDir() + "/data"
-
-    mysql_pem = datadir + "/mysql.pem"
-    if not os.path.exists(mysql_pem):
-        rdata = mw.execShell(
-            'cd ' + datadir + ' && openssl genrsa -out mysql.pem 1024')
-        # print(data)
-        rdata = mw.execShell(
-            'cd ' + datadir + ' && openssl rsa -in mysql.pem -pubout -out mysql.pub')
-        # print(rdata)
-
-        if not mw.isAppleSystem():
-            mw.execShell('cd ' + datadir + ' && chmod 400 mysql.pem')
-            mw.execShell('cd ' + datadir + ' && chmod 444 mysql.pub')
-            mw.execShell('cd ' + datadir + ' && chown mysql:mysql mysql.pem')
-            mw.execShell('cd ' + datadir + ' && chown mysql:mysql mysql.pub')
-
-
 def initDreplace(version=''):
-    conf_dir = getServerDir() + '/etc'
-    mode_dir = conf_dir + '/mode'
 
-    conf_list = [
-        conf_dir,
-        mode_dir,
-    ]
-    for conf in conf_list:
-        if not os.path.exists(conf):
-            os.mkdir(conf)
+    my_dir = getServerDir() + '/etc'
+    if not os.path.exists(my_dir):
+        os.mkdir(my_dir)
 
     tmp_dir = getServerDir() + '/tmp'
     if not os.path.exists(tmp_dir):
@@ -194,81 +164,34 @@ def initDreplace(version=''):
         mw.execShell("chown -R mysql:mysql " + tmp_dir)
         mw.execShell("chmod 750 " + tmp_dir)
 
-    my_conf = conf_dir + '/my.cnf'
-    if not os.path.exists(my_conf):
-        tpl = getPluginDir() + '/conf/my' + version + '.cnf'
-        content = mw.readFile(tpl)
+    mysql_conf = my_dir + '/my.cnf'
+    if not os.path.exists(mysql_conf):
+        mysql_conf_tpl = getPluginDir() + '/conf/my' + version + '.cnf'
+        content = mw.readFile(mysql_conf_tpl)
         content = contentReplace(content)
-        mw.writeFile(my_conf, content)
-
-    classic_conf = mode_dir + '/classic.cnf'
-    if not os.path.exists(classic_conf):
-        tpl = getPluginDir() + '/conf/classic.cnf'
-        content = mw.readFile(tpl)
-        content = contentReplace(content)
-        mw.writeFile(classic_conf, content)
-
-    gtid_conf = mode_dir + '/gtid.cnf'
-    if not os.path.exists(gtid_conf):
-        tpl = getPluginDir() + '/conf/gtid.cnf'
-        content = mw.readFile(tpl)
-        content = contentReplace(content)
-        mw.writeFile(gtid_conf, content)
+        mw.writeFile(mysql_conf, content)
 
     # systemd
-    system_dir = mw.systemdCfgDir()
-    service = system_dir + '/mysql.service'
-    if os.path.exists(system_dir) and not os.path.exists(service):
-        tpl = getPluginDir() + '/init.d/mysql.service.tpl'
+    systemDir = mw.systemdCfgDir()
+    systemService = systemDir + '/mysql-yum.service'
+    systemServiceTpl = getPluginDir() + '/init.d/mysql' + version + '.service.tpl'
+    if os.path.exists(systemDir) and not os.path.exists(systemService):
         service_path = mw.getServerDir()
-        content = mw.readFile(tpl)
-        content = content.replace('{$SERVER_PATH}', service_path)
-        mw.writeFile(service, content)
+        se_content = mw.readFile(systemServiceTpl)
+        se_content = se_content.replace('{$SERVER_PATH}', service_path)
+        mw.writeFile(systemService, se_content)
         mw.execShell('systemctl daemon-reload')
 
-    if not mw.isAppleSystem():
+    if mw.getOs() != 'darwin':
         mw.execShell('chown -R mysql mysql ' + getServerDir())
-
-    initd_path = getServerDir() + '/init.d'
-    if not os.path.exists(initd_path):
-        os.mkdir(initd_path)
-
-    file_bin = initd_path + '/' + getPluginName()
-    if not os.path.exists(file_bin):
-        initd_tpl = getInitdTpl(version)
-        content = mw.readFile(initd_tpl)
-        content = contentReplace(content)
-        mw.writeFile(file_bin, content)
-        mw.execShell('chmod +x ' + file_bin)
-    return file_bin
+    return 'ok'
 
 
 def status(version=''):
-    path = getConf()
-    if not os.path.exists(path):
-        return 'stop'
-
     pid = getPidFile()
     if not os.path.exists(pid):
         return 'stop'
-
     return 'start'
-
-
-def getDataDir():
-    file = getConf()
-    content = mw.readFile(file)
-    rep = 'datadir\s*=\s*(.*)'
-    tmp = re.search(rep, content)
-    return tmp.groups()[0].strip()
-
-
-def getPidFile():
-    file = getConf()
-    content = mw.readFile(file)
-    rep = 'pid-file\s*=\s*(.*)'
-    tmp = re.search(rep, content)
-    return tmp.groups()[0].strip()
 
 
 def binLog():
@@ -301,13 +224,6 @@ def binLog():
 
     mw.writeFile(conf, con)
     return mw.returnJson(True, '设置成功!')
-
-
-def cleanBinLog():
-    db = pMysqlDb()
-    cleanTime = time.strftime('%Y-%m-%d %H:%i:%s', time.localtime())
-    db.execute("PURGE MASTER LOGS BEFORE '" + cleanTime + "';")
-    return mw.returnJson(True, '清理BINLOG成功!')
 
 
 def setSkipGrantTables(v):
@@ -353,31 +269,20 @@ def pGetDbUser():
     return 'mysql'
 
 
-def initMysqlData():
-    datadir = getDataDir()
-    if not os.path.exists(datadir + '/mysql'):
-        serverdir = getServerDir()
-        myconf = serverdir + "/etc/my.cnf"
-        user = pGetDbUser()
-        cmd = 'cd ' + serverdir + ' && ./scripts/mysql_install_db --defaults-file=' + myconf
-        mw.execShell(cmd)
-        return False
-    return True
-
-
 def initMysql57Data():
-    '''
-    cd /www/server/mysql && /www/server/mysql/bin/mysqld --defaults-file=/www/server/mysql/etc/my.cnf  --initialize-insecure --explicit_defaults_for_timestamp
-    '''
     datadir = getDataDir()
     if not os.path.exists(datadir + '/mysql'):
         serverdir = getServerDir()
         myconf = serverdir + "/etc/my.cnf"
         user = pGetDbUser()
-        cmd = 'cd ' + serverdir + ' && ./bin/mysqld --defaults-file=' + myconf + \
-            ' --initialize-insecure --explicit_defaults_for_timestamp'
+        cmd = serverdir + '/bin/usr/sbin/mysqld --basedir=' + serverdir + '/bin/usr --datadir=' + \
+            datadir + ' --initialize-insecure --explicit_defaults_for_timestamp'
         data = mw.execShell(cmd)
+        # print(cmd)
         # print(data)
+        if not mw.isAppleSystem():
+            mw.execShell('chown -R mysql:mysql ' + datadir)
+            mw.execShell('chmod -R 755 ' + datadir)
         return False
     return True
 
@@ -387,134 +292,68 @@ def initMysql8Data():
     if not os.path.exists(datadir + '/mysql'):
         serverdir = getServerDir()
         user = pGetDbUser()
-        # cmd = 'cd ' + serverdir + ' && ./bin/mysqld --basedir=' + serverdir + ' --datadir=' + \
-        #     datadir + ' --initialize'
+        cmd = serverdir + '/bin/usr/sbin/mysqld --basedir=' + serverdir + '/bin/usr --datadir=' + \
+            datadir + ' --initialize-insecure --lower-case-table-names=1'
+        mw.execShell(cmd)
 
-        cmd = 'cd ' + serverdir + ' && ./bin/mysqld --basedir=' + serverdir + ' --datadir=' + \
-            datadir + ' --initialize-insecure'
-
-        # print(cmd)
-        data = mw.execShell(cmd)
-        # print(data)
+        if not mw.isAppleSystem():
+            mw.execShell('chown -R mysql:mysql ' + datadir)
+            mw.execShell('chmod -R 755 ' + datadir)
         return False
     return True
 
 
-def initMysqlPwd():
+def initMysql8Pwd():
+    '''
+    /usr/bin/mysql --defaults-file=/www/server/mysql-apt/etc/my.cnf -uroot -e"UPDATE mysql.user SET password=PASSWORD('BhIroUczczNVaKvw') WHERE user='root';flush privileges;"
+    /usr/bin/mysql --defaults-file=/www/server/mysql-apt/etc/my.cnf -uroot -e"alter user 'root'@'localhost' identified by '123456';"
+    '''
     time.sleep(5)
 
     serverdir = getServerDir()
     myconf = serverdir + "/etc/my.cnf"
     pwd = mw.getRandomString(16)
 
-    cmd_pass = serverdir + '/bin/mysql --defaults-file=' + myconf + ' -uroot -e'
+    cmd_my = serverdir + '/bin/usr/bin/mysql'
+
+    cmd_pass = cmd_my + ' --defaults-file=' + myconf + ' -uroot -e'
     cmd_pass = cmd_pass + \
-        '"UPDATE mysql.user SET password=PASSWORD(\'' + \
-        pwd + "') WHERE user='root';"
+        '"alter user \'root\'@\'localhost\' identified by \'' + pwd + '\';'
+    cmd_pass = cmd_pass + \
+        "alter user 'root'@'localhost' IDENTIFIED WITH mysql_native_password by '" + pwd + "';"
     cmd_pass = cmd_pass + 'flush privileges;"'
-    data = mw.execShell(cmd_pass)
     # print(cmd_pass)
+    data = mw.execShell(cmd_pass)
     # print(data)
 
     # 删除空账户
-    drop_empty_user = serverdir + '/bin/mysql -uroot -p' + \
+    drop_empty_user = cmd_my + ' --defaults-file=' + myconf + ' -uroot -p' + \
         pwd + ' -e "use mysql;delete from user where USER=\'\'"'
     mw.execShell(drop_empty_user)
 
     # 删除测试数据库
-    drop_test_db = serverdir + '/bin/mysql -uroot -p' + \
+    drop_test_db = cmd_my + ' --defaults-file=' + myconf + ' -uroot -p' + \
         pwd + ' -e "drop database test";'
     mw.execShell(drop_test_db)
 
     # 删除冗余账户
     hostname = mw.execShell('hostname')[0].strip()
     if hostname != 'localhost':
-        drop_hostname =  serverdir + '/bin/mysql  --defaults-file=' + \
+        drop_hostname =  cmd_my + ' --defaults-file=' + \
             myconf + ' -uroot -p' + pwd + ' -e "drop user \'\'@\'' + hostname + '\'";'
         mw.execShell(drop_hostname)
 
-        drop_root_hostname =  serverdir + '/bin/mysql  --defaults-file=' + \
+        drop_root_hostname =  cmd_my + ' --defaults-file=' + \
             myconf + ' -uroot -p' + pwd + ' -e "drop user \'root\'@\'' + hostname + '\'";'
         mw.execShell(drop_root_hostname)
 
-    pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
+        pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
     return True
-
-
-def initMysql8Pwd():
-    time.sleep(2)
-
-    serverdir = getServerDir()
-    myconf = serverdir + "/etc/my.cnf"
-
-    pwd = mw.getRandomString(16)
-
-    alter_root_pwd = 'flush privileges;'
-
-    alter_root_pwd = alter_root_pwd + \
-        "UPDATE mysql.user SET authentication_string='' WHERE user='root';"
-    alter_root_pwd = alter_root_pwd + "flush privileges;"
-    alter_root_pwd = alter_root_pwd + \
-        "alter user 'root'@'localhost' IDENTIFIED by '" + pwd + "';"
-    alter_root_pwd = alter_root_pwd + \
-        "alter user 'root'@'localhost' IDENTIFIED WITH mysql_native_password by '" + pwd + "';"
-    alter_root_pwd = alter_root_pwd + "flush privileges;"
-
-    cmd_pass = serverdir + '/bin/mysqladmin --defaults-file=' + \
-        myconf + ' -uroot password root'
-    data = mw.execShell(cmd_pass)
-    # print(cmd_pass)
-    # print(data)
-
-    tmp_file = "/tmp/mysql_init_tmp.log"
-    mw.writeFile(tmp_file, alter_root_pwd)
-    cmd_pass = serverdir + '/bin/mysql --defaults-file=' + \
-        myconf + ' -uroot -proot < ' + tmp_file
-
-    data = mw.execShell(cmd_pass)
-    os.remove(tmp_file)
-
-    # 删除测试数据库
-    drop_test_db = serverdir + '/bin/mysql  --defaults-file=' + \
-        myconf + ' -uroot -p' + pwd + ' -e "drop database test";'
-    mw.execShell(drop_test_db)
-
-    # 删除冗余账户
-    hostname = mw.execShell('hostname')[0].strip()
-
-    drop_hostname =  serverdir + '/bin/mysql  --defaults-file=' + \
-        myconf + ' -uroot -p' + pwd + ' -e "drop user \'\'@\'' + hostname + '\'";'
-    mw.execShell(drop_hostname)
-
-    drop_root_hostname =  serverdir + '/bin/mysql  --defaults-file=' + \
-        myconf + ' -uroot -p' + pwd + ' -e "drop user \'root\'@\'' + hostname + '\'";'
-    mw.execShell(drop_root_hostname)
-
-    pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
-
-    return True
-
-
-def myOp(version, method):
-    # import commands
-    init_file = initDreplace(version)
-    try:
-        isInited = initMysqlData()
-        if not isInited:
-            mw.execShell('systemctl start mysql')
-            initMysqlPwd()
-            mw.execShell('systemctl stop mysql')
-
-        mw.execShell('systemctl ' + method + ' mysql')
-        return 'ok'
-    except Exception as e:
-        return str(e)
 
 
 def my8cmd(version, method):
+    initDreplace(version)
     # mysql 8.0  and 5.7
-    init_file = initDreplace(version)
-    cmd = init_file + ' ' + method
     try:
         if version == '5.7':
             isInited = initMysql57Data()
@@ -522,44 +361,18 @@ def my8cmd(version, method):
             isInited = initMysql8Data()
 
         if not isInited:
-
-            if mw.isAppleSystem():
-                cmd_init_start = init_file + ' start'
-                subprocess.Popen(cmd_init_start, stdout=subprocess.PIPE, shell=True,
-                                 bufsize=4096, stderr=subprocess.PIPE)
-
-                time.sleep(6)
-            else:
-                mw.execShell('systemctl start mysql')
-
+            mw.execShell('systemctl start ' + getPluginName())
             initMysql8Pwd()
+            mw.execShell('systemctl stop ' + getPluginName())
 
-            if mw.isAppleSystem():
-                cmd_init_stop = init_file + ' stop'
-                subprocess.Popen(cmd_init_stop, stdout=subprocess.PIPE, shell=True,
-                                 bufsize=4096, stderr=subprocess.PIPE)
-                time.sleep(3)
-            else:
-                mw.execShell('systemctl stop mysql')
-
-        if mw.isAppleSystem():
-            sub = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True,
-                                   bufsize=4096, stderr=subprocess.PIPE)
-            sub.wait(5)
-        else:
-            mw.execShell('systemctl ' + method + ' mysql')
+        mw.execShell('systemctl ' + method + ' ' + getPluginName())
         return 'ok'
     except Exception as e:
         return str(e)
 
 
 def appCMD(version, action):
-    if version == '8.0' or version == '5.7':
-        status = my8cmd(version, action)
-    else:
-        status = myOp(version, action)
-    makeInitRsaKey(version)
-    return status
+    return my8cmd(version, action)
 
 
 def start(version=''):
@@ -582,7 +395,8 @@ def initdStatus():
     if mw.isAppleSystem():
         return "Apple Computer does not support"
 
-    shell_cmd = 'systemctl status mysql | grep loaded | grep "enabled;"'
+    shell_cmd = 'systemctl status ' + \
+        getPluginName() + ' | grep loaded | grep "enabled;"'
     data = mw.execShell(shell_cmd)
     if data[0] == '':
         return 'fail'
@@ -593,7 +407,7 @@ def initdInstall():
     if mw.isAppleSystem():
         return "Apple Computer does not support"
 
-    mw.execShell('systemctl enable mysql')
+    mw.execShell('systemctl enable ' + getPluginName())
     return 'ok'
 
 
@@ -601,7 +415,7 @@ def initdUinstall():
     if mw.isAppleSystem():
         return "Apple Computer does not support"
 
-    mw.execShell('systemctl disable mysql')
+    mw.execShell('systemctl disable ' + getPluginName())
     return 'ok'
 
 
@@ -776,7 +590,7 @@ def isSqlError(mysqlMsg):
     # 检测数据库执行错误
     mysqlMsg = str(mysqlMsg)
     if "MySQLdb" in mysqlMsg:
-        return mw.returnJson(False, 'MySQLdb组件缺失! <br>进入SSH命令行输入: pip install mysql-python | pip install mysqlclient==2.0.3')
+        return mw.returnJson(False, 'err:' + str(mysqlMsg) + "\n" + 'MySQLdb组件缺失! <br>进入SSH命令行输入: pip install mysql-python | pip install mysqlclient==2.0.3')
     if "2002," in mysqlMsg:
         return mw.returnJson(False, '数据库连接失败,请检查数据库服务是否启动!')
     if "2003," in mysqlMsg:
@@ -834,8 +648,7 @@ def setDbBackup():
     if not data[0]:
         return data[1]
 
-    scDir = mw.getRunDir() + '/scripts/backup.py'
-
+    scDir = getPluginDir() + '/scripts/backup.py'
     cmd = 'python3 ' + scDir + ' database ' + args['name'] + ' 3'
     os.system(cmd)
     return mw.returnJson(True, 'ok')
@@ -894,7 +707,7 @@ def importDbExternal():
     sock = getSocketFile()
 
     os.environ["MYSQL_PWD"] = pwd
-    mysql_cmd = getServerDir() + '/bin/mysql -S ' + sock + ' -uroot -p' + \
+    mysql_cmd = getServerDir() + '/bin/usr/bin/mysql -S ' + sock + ' -uroot -p' + \
         pwd + ' ' + name + ' < ' + import_sql
 
     # print(mysql_cmd)
@@ -922,7 +735,7 @@ def importDbBackup():
 
     pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
     sock = getSocketFile()
-    mysql_cmd = getServerDir() + '/bin/mysql -S ' + sock + ' -uroot -p' + pwd + \
+    mysql_cmd = getServerDir() + '/bin/usr/bin/mysql -S ' + sock + ' -uroot -p' + pwd + \
         ' ' + name + ' < ' + file_path_sql
 
     # print(mysql_cmd)
@@ -2492,9 +2305,27 @@ def fullSync(version=''):
 
 
 def installPreInspection(version):
-    swap_path = mw.getServerDir() + "/swap"
-    if not os.path.exists(swap_path):
-        return "为了稳定安装MySQL,先安装swap插件!"
+
+    sys = mw.execShell(
+        "cat /etc/*-release | grep PRETTY_NAME |awk -F = '{print $2}' | awk -F '\"' '{print $2}'| awk '{print $1}'")
+
+    if sys[1] != '':
+        return '不支持改系统'
+
+    sys_id = mw.execShell(
+        "cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F '\"' '{print $2}'")
+
+    sysName = sys[0].strip().lower()
+    sysId = sys_id[0].strip()
+
+    if not sysName in ('centos',):
+        return '仅支持centos'
+
+    if not (sysName == 'centos' and version == '5.7' and not sysId in('7',)):
+        return 'mysql5.7 仅支持centos7'
+
+    if not (sysName == 'centos' and version == '8.0' and not sysId in ('7', '8', '9',)):
+        return 'mysql8.0 仅支持centos7,8,9'
     return 'ok'
 
 

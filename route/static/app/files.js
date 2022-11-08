@@ -327,7 +327,7 @@ function getFiles(Path) {
 		for (var i = 0; i < rdata.DIR.length; i++) {
 			var fmp = rdata.DIR[i].split(";");
 			var cnametext =fmp[0] + fmp[5];
-			fmp[0] = fmp[0].replace(/'/,"\\'");
+			fmp[0] = fmp[0].replace(/'/, "\\'");
 			if(cnametext.length>20){
 				cnametext = cnametext.substring(0,20) + '...';
 			}
@@ -1556,8 +1556,7 @@ function pathPlaceBtn(path){
 	var title = '';
 	if(path == '/'){
 		html = '<li><a title="/">'+lan.files.path_root+'</a></li>';
-	}
-	else{
+	} else {
 		var dst_path = path.split("/");
 		for(var i = 0; i<dst_path.length; i++ ){
 			title += dst_path[i]+'/';
@@ -1565,13 +1564,14 @@ function pathPlaceBtn(path){
 			html += '<li><a title="'+title+'">'+dst_path[i]+'</a></li>';
 		}
 	}
+	
 	html = '<div style="width:1200px;height:26px"><ul>'+html+'</ul></div>';
 	$("#PathPlaceBtn").html(html);
 	$("#PathPlaceBtn ul li a").click(function(e){
 		var go_path = $(this).attr("title");
 		if(go_path.length>1){
 			if(go_path.substr(go_path.length-1,go_path.length) =='/'){
-				Gopath = go_path.substr(0,go_path.length-1);
+				go_path = go_path.substr(0,go_path.length-1);
 			}
 		}
 		getFiles(go_path);

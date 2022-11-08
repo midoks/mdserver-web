@@ -383,6 +383,7 @@ def addRec():
     if not mw.isAppleSystem():
         mw.execShell("mkdir -p " + args_path)
         mw.execShell("chown -R  www:www " + args_path)
+        mw.execShell("chmdo -R 755 " + args_path)
 
     delRecBy(args_name)
 
@@ -720,6 +721,7 @@ def lsyncdAdd():
     if not mw.isAppleSystem():
         mw.execShell("mkdir -p " + path)
         mw.execShell("chown -R  www:www " + path)
+        mw.execShell("chmod -R 755 " + path)
 
     conn_type = args['conn_type']
     secret_key = args['secret_key']

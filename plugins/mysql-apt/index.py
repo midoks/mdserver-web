@@ -95,6 +95,14 @@ def getSocketFile():
     return tmp.groups()[0].strip()
 
 
+def getErrorLogsFile():
+    file = getConf()
+    content = mw.readFile(file)
+    rep = 'log-error\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
+
+
 def contentReplace(content):
     service_path = mw.getServerDir()
     content = content.replace('{$ROOT_PATH}', mw.getRootDir())
@@ -243,11 +251,15 @@ def setSkipGrantTables(v):
 
 
 def getErrorLog():
-    file = getConf()
-    content = mw.readFile(file)
-    rep = 'log-error\s*=\s*(.*)'
-    tmp = re.search(rep, content)
-    return tmp.groups()[0].strip()
+    args = getArgs()
+    filename = getErrorLogsFile()
+    if not os.path.exists(filename):
+        return mw.returnJson(False, '指定文件不存在!')
+    if 'close' in args:
+        mw.writeFile(filename, '')
+        return mw.returnJson(False, '日志已清空')
+    info = mw.getLastLine(filename, 18)
+    return mw.returnJson(True, 'OK', info)
 
 
 def getShowLogFile():
@@ -307,7 +319,9 @@ def initMysql8Data():
         if data[1].find('ERROR') != -1:
             exit("Init MySQL{} Data Error".format(8))
 
-        mw.execShell('chown -R mysql mysql ' + getServerDir())
+        if not mw.isAppleSystem():
+            mw.execShell('chown -R mysql:mysql ' + datadir)
+            mw.execShell('chmod -R 755 ' + datadir)
         return False
     return True
 
@@ -597,7 +611,7 @@ def isSqlError(mysqlMsg):
     # 检测数据库执行错误
     mysqlMsg = str(mysqlMsg)
     if "MySQLdb" in mysqlMsg:
-        return mw.returnJson(False, 'MySQLdb组件缺失! <br>进入SSH命令行输入: pip install mysql-python | pip install mysqlclient==2.0.3')
+        return mw.returnJson(False, 'err:' + str(mysqlMsg) + "\n" + 'MySQLdb组件缺失! <br>进入SSH命令行输入: pip install mysql-python | pip install mysqlclient==2.0.3')
     if "2002," in mysqlMsg:
         return mw.returnJson(False, '数据库连接失败,请检查数据库服务是否启动!')
     if "2003," in mysqlMsg:
@@ -2328,13 +2342,13 @@ def installPreInspection(version):
     if not sysName in ('debian', 'ubuntu'):
         return '仅支持debian,ubuntu'
 
-    if sysName == 'debian' and not sysId in('11', '10'):
+    if not (sysName == 'debian' and not sysId in('11', '10')):
         return 'debian支持10,11'
 
-    if sysName == 'ubuntu' and version == '5.7' and not sysId in ('18.04'):
+    if not (sysName == 'ubuntu' and version == '5.7' and not sysId in ('18.04')):
         return 'ubuntu支持18.04'
 
-    if sysName == 'ubuntu' and version == '8.0' and not sysId in ('18.04', '20.04', '22.04'):
+    if not (sysName == 'ubuntu' and version == '8.0' and not sysId in ('18.04', '20.04', '22.04')):
         return 'ubuntu支持18.04,20.04,22.04'
     return 'ok'
 
