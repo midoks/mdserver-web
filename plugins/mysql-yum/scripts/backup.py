@@ -55,18 +55,21 @@ class backupTools:
             "id=?", (1,)).getField('mysql_root')
 
         my_conf_path = db_path + '/etc/my.cnf'
-        mycnf = mw.readFile(my_conf_path)
+
+        mw.backFile(my_conf_path)
+        content = mw.readFile(my_conf_path)
         rep = "\[mysqldump\]\nuser=root"
         sea = "[mysqldump]\n"
         subStr = sea + "user=root\npassword=" + mysql_root + "\n"
-        mycnf = mycnf.replace(sea, subStr)
-        if len(mycnf) > 100:
-            mw.writeFile(db_path + '/etc/my.cnf', mycnf)
+        content = content.replace(sea, subStr)
+        if len(content) > 100:
+            mw.writeFile(my_conf_path, content)
 
         cmd = db_path + "/bin/usr/bin/mysqldump --defaults-file=" + my_conf_path + "  --single-transaction --quick --default-character-set=utf8 " + \
             name + " | gzip > " + filename
         mw.execShell(cmd)
 
+        mw.restoreFile(my_conf_path)
         if not os.path.exists(filename):
             endDate = time.strftime('%Y/%m/%d %X', time.localtime())
             log = "数据库[" + name + "]备份失败!"
@@ -74,11 +77,6 @@ class backupTools:
             print(
                 "----------------------------------------------------------------------------")
             return
-
-        mycnf = mw.readFile(my_conf_path)
-        content = mycnf.replace(subStr, sea)
-        if len(mycnf) > 100:
-            mw.writeFile(my_conf_path, content)
 
         endDate = time.strftime('%Y/%m/%d %X', time.localtime())
         outTime = time.time() - startTime
