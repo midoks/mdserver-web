@@ -53,7 +53,7 @@ YUM_INSTALL()
 mkdir -p $myDir
 
 wget -O $myDir/mysql-${SUFFIX_NAME}.rpm-bundle.tar https://cdn.mysql.com/archives/mysql-5.7/mysql-${SUFFIX_NAME}.rpm-bundle.tar
-cd ${myDir} && tar vxf mysql-server_${SUFFIX_NAME}.deb-bundle.tar
+cd ${myDir} && tar vxf mysql-server_${SUFFIX_NAME}.rpm-bundle.tar
 
 mkdir -p ${serverPath}/mysql-yum/bin && cd ${serverPath}/mysql-yum/bin
 
