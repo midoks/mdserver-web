@@ -292,32 +292,50 @@ def initMysql8Data():
 
 
 def initMysql8Pwd():
+    '''
+    /usr/bin/mysql --defaults-file=/www/server/mysql-apt/etc/my.cnf -uroot -e"UPDATE mysql.user SET password=PASSWORD('BhIroUczczNVaKvw') WHERE user='root';flush privileges;"
+    /usr/bin/mysql --defaults-file=/www/server/mysql-apt/etc/my.cnf -uroot -e"alter user 'root'@'localhost' identified by '123456';"
+    '''
     time.sleep(5)
+
+    serverdir = getServerDir()
+    myconf = serverdir + "/etc/my.cnf"
     pwd = mw.getRandomString(16)
 
-    alter_root_pwd = 'flush privileges;'
-    alter_root_pwd = alter_root_pwd + \
-        "alter user 'root'@'localhost' IDENTIFIED by '" + pwd + "';"
-    alter_root_pwd = alter_root_pwd + \
+    cmd_my = serverdir + '/bin/usr/bin/mysql'
+
+    cmd_pass = cmd_my + ' --defaults-file=' + myconf + ' -uroot -e'
+    cmd_pass = cmd_pass + \
+        '"alter user \'root\'@\'localhost\' identified by \'' + pwd + '\';'
+    cmd_pass = cmd_pass + \
         "alter user 'root'@'localhost' IDENTIFIED WITH mysql_native_password by '" + pwd + "';"
-    alter_root_pwd = alter_root_pwd + "flush privileges;"
-
-    cmd_pass = 'mysqladmin --defaults-file=' + \
-        getServerDir() + '/etc/my.cnf -uroot password root'
+    cmd_pass = cmd_pass + 'flush privileges;"'
+    # print(cmd_pass)
     data = mw.execShell(cmd_pass)
     # print(data)
 
-    tmp_file = "/tmp/mysql_ya_init_tmp.log"
-    mw.writeFile(tmp_file, alter_root_pwd)
-    cmd_pass = 'mysql --defaults-file=' + \
-        getServerDir() + '/etc/my.cnf -uroot -proot < ' + tmp_file
+    # 删除空账户
+    drop_empty_user = cmd_my + ' --defaults-file=' + myconf + ' -uroot -p' + \
+        pwd + ' -e "use mysql;delete from user where USER=\'\'"'
+    mw.execShell(drop_empty_user)
 
-    data = mw.execShell(cmd_pass)
-    # print(data)
-    os.remove(tmp_file)
+    # 删除测试数据库
+    drop_test_db = cmd_my + ' --defaults-file=' + myconf + ' -uroot -p' + \
+        pwd + ' -e "drop database test";'
+    mw.execShell(drop_test_db)
 
-    pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
+    # 删除冗余账户
+    hostname = mw.execShell('hostname')[0].strip()
+    if hostname != 'localhost':
+        drop_hostname =  cmd_my + ' --defaults-file=' + \
+            myconf + ' -uroot -p' + pwd + ' -e "drop user \'\'@\'' + hostname + '\'";'
+        mw.execShell(drop_hostname)
 
+        drop_root_hostname =  cmd_my + ' --defaults-file=' + \
+            myconf + ' -uroot -p' + pwd + ' -e "drop user \'root\'@\'' + hostname + '\'";'
+        mw.execShell(drop_root_hostname)
+
+        pSqliteDb('config').where('id=?', (1,)).save('mysql_root', (pwd,))
     return True
 
 
