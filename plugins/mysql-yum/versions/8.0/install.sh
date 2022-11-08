@@ -53,18 +53,18 @@ cd ${myDir} && tar vxf mysql-server_${SUFFIX_NAME}.deb-bundle.tar
 
 mkdir -p ${serverPath}/mysql-yum/bin && cd ${serverPath}/mysql-yum/bin
 
-rpm2cpio ${myDir}/mysql-community-client-8.0.30-1.el7.x86_64.rpm | cpio -div
-rpm2cpio ${myDir}/mysql-community-client-plugins-8.0.30-1.el7.x86_64.rpm | cpio -div
-rpm2cpio ${myDir}/mysql-community-common-8.0.30-1.el7.x86_64.rpm | cpio -div
-rpm2cpio ${myDir}/mysql-community-debuginfo-8.0.30-1.el7.x86_64.rpm | cpio -div
-rpm2cpio ${myDir}/mysql-community-devel-8.0.30-1.el7.x86_64.rpm | cpio -div
-rpm2cpio ${myDir}/mysql-community-embedded-compat-8.0.30-1.el7.x86_64.rpm | cpio -div
-rpm2cpio ${myDir}/mysql-community-icu-data-files-8.0.30-1.el7.x86_64.rpm | cpio -div
-rpm2cpio ${myDir}/mysql-community-libs-8.0.30-1.el7.x86_64.rpm | cpio -div
-rpm2cpio ${myDir}/mysql-community-libs-compat-8.0.30-1.el7.x86_64.rpm | cpio -div
-rpm2cpio ${myDir}/mysql-community-server-8.0.30-1.el7.x86_64.rpm | cpio -div
-rpm2cpio ${myDir}/mysql-community-server-debug-8.0.30-1.el7.x86_64.rpm | cpio -div
-rpm2cpio ${myDir}/mysql-community-test-8.0.30-1.el7.x86_64.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-client-${SUFFIX_NAME}.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-client-${SUFFIX_NAME}.x86_64.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-common-${SUFFIX_NAME}.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-debuginfo-${SUFFIX_NAME}.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-devel-${SUFFIX_NAME}.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-embedded-compat-${SUFFIX_NAME}.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-icu-data-files-${SUFFIX_NAME}.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-libs-${SUFFIX_NAME}.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-libs-compat-${SUFFIX_NAME}.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-server-${SUFFIX_NAME}.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-server-debug-${SUFFIX_NAME}.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-test-${SUFFIX_NAME}.rpm | cpio -div
 
 #######
 }
