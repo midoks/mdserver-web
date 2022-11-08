@@ -58,16 +58,14 @@ cd ${myDir} && tar vxf mysql-${SUFFIX_NAME}.rpm-bundle.tar
 mkdir -p ${serverPath}/mysql-yum/bin && cd ${serverPath}/mysql-yum/bin
 
 rpm2cpio ${myDir}/mysql-community-client-${SUFFIX_NAME}.rpm | cpio -div
-rpm2cpio ${myDir}/mysql-community-client-${SUFFIX_NAME}.x86_64.rpm | cpio -div
 rpm2cpio ${myDir}/mysql-community-common-${SUFFIX_NAME}.rpm | cpio -div
-rpm2cpio ${myDir}/mysql-community-debuginfo-${SUFFIX_NAME}.rpm | cpio -div
 rpm2cpio ${myDir}/mysql-community-devel-${SUFFIX_NAME}.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-embedded-${SUFFIX_NAME}.rpm | cpio -div
 rpm2cpio ${myDir}/mysql-community-embedded-compat-${SUFFIX_NAME}.rpm | cpio -div
-rpm2cpio ${myDir}/mysql-community-icu-data-files-${SUFFIX_NAME}.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-embedded-devel-${SUFFIX_NAME}.rpm | cpio -div
 rpm2cpio ${myDir}/mysql-community-libs-${SUFFIX_NAME}.rpm | cpio -div
 rpm2cpio ${myDir}/mysql-community-libs-compat-${SUFFIX_NAME}.rpm | cpio -div
 rpm2cpio ${myDir}/mysql-community-server-${SUFFIX_NAME}.rpm | cpio -div
-rpm2cpio ${myDir}/mysql-community-server-debug-${SUFFIX_NAME}.rpm | cpio -div
 rpm2cpio ${myDir}/mysql-community-test-${SUFFIX_NAME}.rpm | cpio -div
 
 #######
