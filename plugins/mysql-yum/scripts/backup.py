@@ -116,8 +116,8 @@ class backupTools:
 
 if __name__ == "__main__":
     backup = backupTools()
-    type = sys.argv[1]
-    if type == 'database':
+    stype = sys.argv[1]
+    if stype == 'database':
         if sys.argv[2] == 'ALL':
             backup.backupDatabaseAll(sys.argv[3])
         else:
