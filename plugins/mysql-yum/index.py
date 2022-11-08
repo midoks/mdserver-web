@@ -137,7 +137,6 @@ def pMysqlDb():
     # MySQLdb |
     # db = mw.getMyORMDb()
 
-    # db = mw.getMyORM()
     db.__DB_CNF = getConf()
     db.setPort(getDbPort())
     db.setSocket(getSocketFile())
