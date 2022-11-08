@@ -75,10 +75,10 @@ class backupTools:
                 "----------------------------------------------------------------------------")
             return
 
-        mycnf = mw.readFile(db_path + '/etc/my.cnf')
-        mycnf = mycnf.replace(subStr, sea)
+        mycnf = mw.readFile(my_conf_path)
+        content = mycnf.replace(subStr, sea)
         if len(mycnf) > 100:
-            mw.writeFile(db_path + '/etc/my.cnf', mycnf)
+            mw.writeFile(my_conf_path, content)
 
         endDate = time.strftime('%Y/%m/%d %X', time.localtime())
         outTime = time.time() - startTime
