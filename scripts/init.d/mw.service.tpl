@@ -12,5 +12,9 @@ ExecReload=kill -HUP $MAINID
 KillMode=process
 Restart=on-failure
 
+[Timer]
+# 每日凌晨点重启
+OnCalendar=*-*-* 03:30:00
+
 [Install]
 WantedBy=multi-user.target
