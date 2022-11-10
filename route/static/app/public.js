@@ -1620,6 +1620,34 @@ function toArrayObject(str){
     return data;
 }
 
+/**
+* 实体字符编码
+* @param {*} text 待编码的文本
+* @returns
+*/
+function entitiesEncode(text) {
+    text = text.replace(/&/g, "&amp;");
+    text = text.replace(/</g, "&lt;");
+    text = text.replace(/>/g, "&gt;");
+    text = text.replace(/ /g, "&nbsp;");
+    text = text.replace(/"/g, "&quot;");
+    return text;
+}
+/**
+* 实体字符解码
+* @param {*} text 待解码的文本
+* @returns
+*/
+function entitiesDecode(text) {
+    text = text.replace(/&amp;/g, "&");
+    text = text.replace(/&lt;/g, "<");
+    text = text.replace(/&gt;/g, ">");
+    text = text.replace(/&nbsp;/g, " ");
+    text = text.replace(/&quot;/g, "'");
+    return text;
+}
+
+
 function pluginService(_name, version){
 	var data = {name:_name, func:'status'}
 	if ( typeof(version) != 'undefined' ){
