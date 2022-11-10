@@ -16,9 +16,6 @@ cd /www/server/mdserver-web/scripts && bash lib.sh
 chmod 755 /www/server/mdserver-web/data
 
 
-if [ -f /etc/init.d/mw ];then 
-    sh /etc/init.d/mw stop && rm -rf  /www/server/mdserver-web/scripts/init.d/mw && rm -rf  /etc/init.d/mw
-fi
 
 echo -e "stop mw"
 isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`
@@ -56,6 +53,3 @@ done
 echo -e "start mw success"
 
 systemctl daemon-reload
-/etc/init.d/mw default
-
-

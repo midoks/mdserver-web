@@ -8,8 +8,6 @@ LANG=en_US.UTF-8
 
 # systemctl stop SuSEfirewall2
 
-
-
 cd /www/server/mdserver-web/scripts && bash lib.sh
 chmod 755 /www/server/mdserver-web/data
 
@@ -28,7 +26,6 @@ do
     fi
 done
 
-cd /www/server/mdserver-web && /etc/init.d/mw stop
-cd /www/server/mdserver-web && /etc/init.d/mw start
-cd /www/server/mdserver-web && /etc/init.d/mw default
+cd /www/server/mdserver-web && bash /etc/rc.d/init.d/mw stop
+cd /www/server/mdserver-web && bash /etc/rc.d/init.d/mw start
 

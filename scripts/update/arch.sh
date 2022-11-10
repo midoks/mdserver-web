@@ -29,6 +29,5 @@ do
     fi
 done
 
-cd /www/server/mdserver-web && /etc/init.d/mw stop
-cd /www/server/mdserver-web && /etc/init.d/mw start
-cd /www/server/mdserver-web && /etc/init.d/mw default
+cd /www/server/mdserver-web && bash /etc/rc.d/init.d/mw stop
+cd /www/server/mdserver-web && bash /etc/rc.d/init.d/mw start

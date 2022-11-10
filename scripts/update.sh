@@ -63,13 +63,20 @@ cd /tmp && unzip /tmp/master.zip
 rm -rf /tmp/master.zip
 rm -rf /tmp/mdserver-web-master
 
+
+if [ -f /etc/rc.d/init.d/mw ];then
+    sh /etc/rc.d/init.d/mw stop && rm -rf /www/server/mdserver-web/scripts/init.d/mw && rm -rf /etc/rc.d/init.d/mw
+fi
+
 #pip uninstall public
 echo "use system version: ${OSNAME}"
 cd /www/server/mdserver-web && bash scripts/update/${OSNAME}.sh
 
+bash /etc/rc.d/init.d/mw default
+
 if [ ! -e /usr/bin/mw ]; then
 	if [ ! -f /usr/bin/mw ];then
-		ln -s /etc/init.d/mw /usr/bin/mw
+		ln -s /etc/rc.d/init.d/mw /usr/bin/mw
 	fi
 fi
 
