@@ -59,7 +59,7 @@ def initInitD():
 
     # systemctl
     sysCfgDir = mw.systemdCfgDir()
-    if os.path.exists(sysCfgDir) and mw.getOs() == 'centos' and mw.getOsID() == '9':
+    if os.path.exists(sysCfgDir) and mw.getOsName() == 'centos' and mw.getOsID() == '9':
         systemd_mw = sysCfgDir + '/mw.service'
         systemd_mw_task = sysCfgDir + '/mw-task.service'
 
