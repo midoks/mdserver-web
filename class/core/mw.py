@@ -129,7 +129,7 @@ def getOs():
 
 def getOsName():
     cmd = "cat /etc/*-release | grep PRETTY_NAME |awk -F = '{print $2}' | awk -F '\"' '{print $2}'| awk '{print $1}'"
-    data = mw.execShell(cmd)
+    data = execShell(cmd)
     return data[0].strip().lower()
 
 
