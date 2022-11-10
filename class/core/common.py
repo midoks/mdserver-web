@@ -66,8 +66,11 @@ def initInitD():
         systemd_mw_tpl = mw.getRunDir() + '/scripts/init.d/mw.service.tpl'
         systemd_mw_task_tpl = mw.getRunDir() + '/scripts/init.d/mw-task.service.tpl'
 
-        os.remove(systemd_mw)
-        os.remove(systemd_mw_task)
+        if os.path.exists(systemd_mw):
+            os.remove(systemd_mw)
+        if os.path.exists(systemd_mw_task)
+            os.remove(systemd_mw_task)
+
         doContentReplace(systemd_mw_tpl, systemd_mw)
         doContentReplace(systemd_mw_task_tpl, systemd_mw_task)
 
