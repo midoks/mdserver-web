@@ -129,7 +129,7 @@ def getOs():
 
 def getOsID():
     cmd = "cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F '\"' '{print $2}'"
-    sys_id = mw.execShell(cmd)
+    sys_id = execShell(cmd)
     return sys_id[0].strip()
 
 
