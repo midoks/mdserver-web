@@ -58,9 +58,10 @@ def doContentReplace(src, dst):
 def initInitD():
 
     # systemctl
-    if os.path.exists('/lib/systemd/system') and mw.getOs() == 'centos' and mw.getOsID() == '9':
-        systemd_mw = '/lib/systemd/system/mw.service'
-        systemd_mw_task = '/lib/systemd/system/mw-task.service'
+    sysCfgDir = mw.systemdCfgDir()
+    if os.path.exists(sysCfgDir) and mw.getOs() == 'centos' and mw.getOsID() == '9':
+        systemd_mw = sysCfgDir + '/mw.service'
+        systemd_mw_task = sysCfgDir + '/mw-task.service'
 
         systemd_mw_tpl = mw.getRunDir() + '/scripts/init.d/mw.service.tpl'
         systemd_mw_task_tpl = mw.getRunDir() + '/scripts/init.d/mw-task.service.tpl'
