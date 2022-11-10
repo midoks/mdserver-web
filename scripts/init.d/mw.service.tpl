@@ -15,6 +15,7 @@ Restart=on-failure
 [Timer]
 # 每日凌晨点重启
 OnCalendar=*-*-* 03:30:00
+Unit=mw.service
 
 [Install]
 WantedBy=multi-user.target
