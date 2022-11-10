@@ -93,10 +93,6 @@ cd /www/server/mdserver-web && bash /etc/rc.d/init.d/mw stop
 cd /www/server/mdserver-web && bash /etc/rc.d/init.d/mw start
 cd /www/server/mdserver-web && bash /etc/rc.d/init.d/mw default
 
-if [ -f /usr/bin/mw ];then
-	rm -rf /usr/bin/mw
-fi
-
 if [ ! -e /usr/bin/mw ]; then
 	if [ -f /etc/init.d/mw ];then
 		ln -s /etc/rc.d/init.d/mw /usr/bin/mw

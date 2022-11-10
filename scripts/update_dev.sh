@@ -72,6 +72,10 @@ cd /www/server/mdserver-web && bash scripts/update/${OSNAME}.sh
 
 bash /etc/rc.d/init.d/mw default
 
+if [ -f /usr/bin/mw ];then
+	rm -rf /usr/bin/mw
+fi
+
 if [ ! -e /usr/bin/mw ]; then
 	if [ ! -f /usr/bin/mw ];then
 		ln -s /etc/rc.d/init.d/mw /usr/bin/mw
