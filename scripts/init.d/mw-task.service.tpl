@@ -1,5 +1,5 @@
 [Unit]
-Description=mw-task server daemon
+Description=mw-task daemon
 After=network.target
 
 [Service]
