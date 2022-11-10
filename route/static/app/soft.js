@@ -253,10 +253,10 @@ function uninstallPreInspection(name, ver, callback){
             if (rdata.data == 'ok'){
                 callback();
             } else {
-                layer.msg(rdata.data, { icon: 2 });
+                layer.msg(rdata.data, { icon: 2 , time: 6666});
             }
         } else {
-            layer.msg(rdata.data, { icon: rdata.status ? 1 : 2 });
+            layer.msg(rdata.data, { icon: rdata.status ? 1 : 2, time: 6666 });
         }
     },'json');
 }
