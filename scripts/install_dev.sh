@@ -78,7 +78,7 @@ cd /www/server/mdserver-web && bash scripts/install/${OSNAME}.sh
 cd /www/server/mdserver-web && ./cli.sh start
 isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`
 n=0
-while [[ ! -f /etc/init.d/mw ]];
+while [[ ! -f /etc/rc.d/init.d/mw ]];
 do
     echo -e ".\c"
     sleep 1
