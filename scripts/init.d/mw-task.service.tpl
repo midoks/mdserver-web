@@ -5,6 +5,7 @@ After=network.target
 [Service]
 Type=simple
 WorkingDirectory={$SERVER_PATH}
+EnvironmentFile={$SERVER_PATH}/scripts/init.d/service.sh
 ExecStart=python3 task.py
 ExecStop=kill -HUP $MAINID
 ExecReload=kill -HUP $MAINID
