@@ -87,7 +87,7 @@ cd /www/server/mdserver-web && bash /etc/rc.d/init.d/mw start
 cd /www/server/mdserver-web && bash /etc/rc.d/init.d/mw default
 
 if [ ! -e /usr/bin/mw ]; then
-	if [ -f /etc/init.d/mw ];then
+	if [ -f /etc/rc.d/init.d/mw ];then
 		ln -s /etc/rc.d/init.d/mw /usr/bin/mw
 	fi
 fi
