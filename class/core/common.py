@@ -68,7 +68,7 @@ def initInitD():
 
         if os.path.exists(systemd_mw):
             os.remove(systemd_mw)
-        if os.path.exists(systemd_mw_task)
+        if os.path.exists(systemd_mw_task):
             os.remove(systemd_mw_task)
 
         doContentReplace(systemd_mw_tpl, systemd_mw)
