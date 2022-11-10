@@ -127,10 +127,16 @@ def getOs():
     return sys.platform
 
 
+def getOsName():
+    cmd = "cat /etc/*-release | grep PRETTY_NAME |awk -F = '{print $2}' | awk -F '\"' '{print $2}'| awk '{print $1}'"
+    data = mw.execShell(cmd)
+    return data[0].strip().lower()
+
+
 def getOsID():
     cmd = "cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F '\"' '{print $2}'"
-    sys_id = execShell(cmd)
-    return sys_id[0].strip()
+    data = execShell(cmd)
+    return data[0].strip()
 
 
 def isAppleSystem():
