@@ -437,10 +437,10 @@ def writeLog(stype, msg, args=()):
         return False
 
 
-def writeFile(filename, str):
+def writeFile(filename, str, mode='w+'):
     # 写文件内容
     try:
-        fp = open(filename, 'w+')
+        fp = open(filename, mode)
         fp.write(str)
         fp.close()
         return True
