@@ -923,10 +923,8 @@ class cert_request:
 
     # 替换服务器上的同域名同品牌证书
     def subAllCert(self, key_file, pem_file):
-        cert_init = self.get_cert_init(pem_file)  # 获取新证书的基本信息
-        paths = ['/www/server/mdserver-web/vhost/cert',
-                 '/www/server/mdserver-web/vhost/ssl',
-                 '/www/server/mdserver-web']
+        cert_init = self.getCertInit(pem_file)  # 获取新证书的基本信息
+        paths = ['/www/server/mdserver-web/data/letsencrypt']
         is_panel = False
         for path in paths:
             if not os.path.exists(path):
