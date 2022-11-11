@@ -1010,7 +1010,7 @@ fullchain.pem       粘贴到证书输入框
             mw.writeFile(path + '/readme.txt', ps)
             self.subAllCert(key_file, pem_file)
         except:
-            writeLog(public.getTracebackInfo())
+            writeLog(mw.getTracebackInfo())
 
     # 获取证书到期时间
     def getCertTimeout(self, cret_data):
