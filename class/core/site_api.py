@@ -634,7 +634,7 @@ class site_api:
                 return mw.returnJson(False, '检测到您的站点做了301重定向设置，请先关闭重定向!')
 
             #检测存在反向代理
-            data_path = self.getProxytDataPath(siteName)
+            data_path = self.getProxyDataPath(siteName)
             data_content = mw.readFile(data_path)
             if data_content != False:
                 try:
@@ -1556,7 +1556,7 @@ class site_api:
     def getProxyListApi(self):
         _siteName = request.form.get('siteName', '')
 
-        data_path = self.getProxytDataPath(_siteName)
+        data_path = self.getProxyDataPath(_siteName)
         data_content = mw.readFile(data_path)
 
         # not exists
@@ -1593,7 +1593,7 @@ class site_api:
         if _siteName == "" or _from == "" or _to == "" or _host == "":
             return mw.returnJson(False, "必填项不能为空")
 
-        data_path = self.getProxytDataPath(_siteName)
+        data_path = self.getProxyDataPath(_siteName)
         data_content = mw.readFile(
             data_path) if os.path.exists(data_path) else ""
         data = json.loads(data_content) if data_content != "" else []
@@ -1678,7 +1678,7 @@ location ^~ {from} {
             return mw.returnJson(False, "必填项不能为空!")
 
         try:
-            data_path = self.getProxytDataPath(_siteName)
+            data_path = self.getProxyDataPath(_siteName)
             data_content = mw.readFile(
                 data_path) if os.path.exists(data_path) else ""
             data = json.loads(data_content) if data_content != "" else []
@@ -1859,7 +1859,7 @@ location ^~ {from} {
     def getRedirectPath(self, siteName):
         return "{}/{}".format(self.redirectPath, siteName)
 
-    def getProxytDataPath(self, siteName):
+    def getProxyDataPath(self, siteName):
         return "{}/{}/data.json".format(self.proxyPath, siteName)
 
     def getProxyPath(self, siteName):
