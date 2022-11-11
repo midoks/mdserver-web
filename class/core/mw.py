@@ -58,6 +58,12 @@ def execShell(cmdstring, cwd=None, timeout=None, shell=True):
     return (t1, t2)
 
 
+def getTracebackInfo():
+    import traceback
+    errorMsg = traceback.format_exc()
+    return errorMsg
+
+
 def getRunDir():
     return os.getcwd()
 
