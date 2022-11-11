@@ -79,6 +79,7 @@ class cert_request:
     __dns_class = None
     __auto_wildcard = False
     __mod_index = {True: "Staging", False: "Production"}
+    __save_path = 'data/letsencrypt'
     __cfg_file = 'data/letsencrypt.json'
 
     def __init__(self):
@@ -1047,7 +1048,7 @@ fullchain.pem       粘贴到证书输入框
         self.__config['orders'][index]['cert_timeout'] = cert['cert_timeout']
         domain_name = self.__config['orders'][index]['domains'][0]
         self.__config['orders'][index]['save_path'] = '{}/{}'.format(
-            self._save_path, domain_name)
+            self.__save_path, domain_name)
         cert['save_path'] = self.__config['orders'][index]['save_path']
         self.saveConfig()
         self.saveCert(cert, index)
