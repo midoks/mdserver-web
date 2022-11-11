@@ -988,7 +988,7 @@ root_cert.csr   根证书
 cert.csr        域名证书
 fullchain.pfx   用于IIS的证书格式
 
-如何在宝塔面板使用：
+如何在MW面板使用：
 privkey.pem         粘贴到密钥输入框
 fullchain.pem       粘贴到证书输入框
 '''
