@@ -1173,6 +1173,57 @@ fullchain.pem       粘贴到证书输入框
                 return to_path
         return False
 
+    def renewCertOther(self):
+        cert_path = "{}/vhost/cert".format(mw.getRunDir())
+        if not os.path.exists(cert_path):
+            return
+        new_time = time.time() + (86400 * 30)
+        n = 0
+        if not 'orders' in self.__config:
+            self.__config['orders'] = {}
+        import panelSite
+        siteObj = panelSite.panelSite()
+        args = public.dict_obj()
+        for siteName in os.listdir(cert_path):
+            try:
+                cert_file = '{}/{}/fullchain.pem'.format(cert_path, siteName)
+                if not os.path.exists(cert_file):
+                    continue  # 无证书文件
+                siteInfo = mw.M('sites').where('name=?', siteName).find()
+                if not siteInfo:
+                    continue  # 无网站信息
+                cert_init = self.getCertInit(cert_file)
+                if not cert_init:
+                    continue  # 无法获取证书
+                end_time = time.mktime(time.strptime(
+                    cert_init['notAfter'], '%Y-%m-%d'))
+                if end_time > new_time:
+                    continue  # 未到期
+                try:
+                    if not cert_init['issuer'] in ['R3', "Let's Encrypt"] and cert_init['issuer'].find("Let's Encrypt") == -1:
+                        continue  # 非同品牌证书
+                except:
+                    continue
+
+                if isinstance(cert_init['dns'], str):
+                    cert_init['dns'] = [cert_init['dns']]
+                index = self.getIndex(cert_init['dns'])
+                if index in self.__config['orders'].keys():
+                    continue  # 已在订单列表
+
+                n += 1
+                writeLog(
+                    "|-正在续签第 {} 张其它证书，域名: {}..".format(n, cert_init['subject']))
+                writeLog("|-正在创建订单..")
+                args.id = siteInfo['id']
+                runPath = siteObj.GetRunPath(args)
+                if runPath and not runPath in ['/']:
+                    path = siteInfo['path'] + '/' + runPath
+                else:
+                    path = siteInfo['path']
+            except:
+                write_log("|-[{}]续签失败".format(siteName))
+
     def renewCert(self, index):
         writeLog("", "wb+")
         self.D('renew_cert', index)
@@ -1245,6 +1296,13 @@ fullchain.pem       粘贴到证书输入框
 
                     # 加入到续签订单
                     order_index.append(i)
+                if not order_index:
+                    writeLog("|-没有找到30天内到期的SSL证书，正在尝试去寻找其它可续签证书!")
+                    self.getApis()
+                    # self.renewCertOther()
+                    writeLog("|-所有任务已处理完成!")
+                    return
+            writeLog("|-共需要续签 {} 张证书".format(len(order_index)))
 
             self.D('renew_cert', order_index)
         except Exception as ex:
@@ -1254,7 +1312,7 @@ fullchain.pem       粘贴到证书输入框
                 msg[1] = json.loads(msg[1])
             else:
                 msg = ex
-                writeLog(me.getTracebackInfo())
+                writeLog(mw.getTracebackInfo())
             return mw.returnJson(False, msg)
 
     def do(self, args):
