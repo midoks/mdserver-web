@@ -74,8 +74,7 @@ echo "use system version: ${OSNAME}"
 cd /www/server/mdserver-web && bash scripts/install/${OSNAME}.sh
 
 
-
-cd /www/server/mdserver-web && ./cli.sh start
+cd /www/server/mdserver-web && bash cli.sh start
 isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`
 n=0
 while [[ ! -f /etc/rc.d/init.d/mw ]];
@@ -93,13 +92,13 @@ cd /www/server/mdserver-web && bash /etc/rc.d/init.d/mw stop
 cd /www/server/mdserver-web && bash /etc/rc.d/init.d/mw start
 cd /www/server/mdserver-web && bash /etc/rc.d/init.d/mw default
 
+sleep 2
+
 if [ ! -e /usr/bin/mw ]; then
 	if [ -f /etc/init.d/mw ];then
 		ln -s /etc/rc.d/init.d/mw /usr/bin/mw
 	fi
 fi
-
-systemctl daemon-reload
 
 endTime=`date +%s`
 ((outTime=(${endTime}-${startTime})/60))

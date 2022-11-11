@@ -82,10 +82,27 @@ fi
 
 echo "use system version: ${OSNAME}"
 cd /www/server/mdserver-web && bash scripts/install/${OSNAME}.sh
+
+
+cd /www/server/mdserver-web && bash cli.sh start
+isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`
+n=0
+while [[ ! -f /etc/rc.d/init.d/mw ]];
+do
+    echo -e ".\c"
+    sleep 1
+    let n+=1
+    if [ $n -gt 20 ];then
+    	echo -e "start mw fail"
+        exit 1
+    fi
+done
+
 cd /www/server/mdserver-web && bash /etc/rc.d/init.d/mw stop
 cd /www/server/mdserver-web && bash /etc/rc.d/init.d/mw start
 cd /www/server/mdserver-web && bash /etc/rc.d/init.d/mw default
 
+sleep 2
 if [ ! -e /usr/bin/mw ]; then
 	if [ -f /etc/rc.d/init.d/mw ];then
 		ln -s /etc/rc.d/init.d/mw /usr/bin/mw
@@ -95,8 +112,4 @@ fi
 endTime=`date +%s`
 ((outTime=(${endTime}-${startTime})/60))
 echo -e "Time consumed:\033[32m $outTime \033[0mMinute!"
-
-
-systemctl daemon-reload
-
 
