@@ -1011,6 +1011,16 @@ fullchain.pem       粘贴到证书输入框
         except:
             writeLog(public.getTracebackInfo())
 
+    # 获取证书到期时间
+    def getCertTimeout(self, cret_data):
+        try:
+            x509 = OpenSSL.crypto.load_certificate(
+                OpenSSL.crypto.FILETYPE_PEM, cret_data)
+            cert_timeout = bytes.decode(x509.get_notAfter())[:-1]
+            return int(time.mktime(time.strptime(cert_timeout, '%Y%m%d%H%M%S')))
+        except:
+            return int(time.time() + (86400 * 90))
+
     # 下载证书
     def downloadCert(self, index):
         res = self.acmeRequest(
@@ -1021,8 +1031,8 @@ fullchain.pem       粘贴到证书输入框
         pem_certificate = res.content
         if type(pem_certificate) == bytes:
             pem_certificate = pem_certificate.decode('utf-8')
-        cert = self.split_ca_data(pem_certificate)
-        cert['cert_timeout'] = self.get_cert_timeout(cert['cert'])
+        cert = self.splitCaData(pem_certificate)
+        cert['cert_timeout'] = self.getCertTimeout(cert['cert'])
         cert['private_key'] = self.__config['orders'][index]['private_key']
         cert['domains'] = self.__config['orders'][index]['domains']
         del(self.__config['orders'][index]['private_key'])
