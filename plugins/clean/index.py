@@ -74,6 +74,7 @@ def initConf():
         content = ""
 
         clog = [
+            "/var/spool/clientmqueue/*",
             "/var/log/cron-*",
             "/var/log/maillog-*",
             "/var/log/secure-*",
