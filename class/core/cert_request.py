@@ -1145,6 +1145,34 @@ fullchain.pem       粘贴到证书输入框
             root = old_domain_name
         return root, zone
 
+    # 获取当前正在使用此证书的网站目录
+    def getSslUsedSite(self, save_path):
+        pkey_file = '{}/privkey.pem'.format(save_path)
+        pkey = public.readFile(pkey_file)
+        if not pkey:
+            return False
+        cert_paths = 'vhost/cert'
+        import panelSite
+        args = public.dict_obj()
+        args.siteName = ''
+        for c_name in os.listdir(cert_paths):
+            skey_file = '{}/{}/privkey.pem'.format(cert_paths, c_name)
+            skey = public.readFile(skey_file)
+            if not skey:
+                continue
+            if skey == pkey:
+                args.siteName = c_name
+                run_path = panelSite.panelSite().GetRunPath(args)
+                if not run_path:
+                    continue
+                sitePath = public.M('sites').where(
+                    'name=?', c_name).getField('path')
+                if not sitePath:
+                    continue
+                to_path = "{}/{}".format(sitePath, run_path)
+                return to_path
+        return False
+
     def renewCert(self, index):
         writeLog("", "wb+")
         self.D('renew_cert', index)
@@ -1181,7 +1209,7 @@ fullchain.pem       粘贴到证书输入框
                     # 已删除的网站直接跳过续签
                     if self.__config['orders'][i]['auth_to'].find('|') == -1 and self.__config['orders'][i]['auth_to'].find('/') != -1:
                         if not os.path.exists(self.__config['orders'][i]['auth_to']):
-                            auth_to = self.get_ssl_used_site(
+                            auth_to = self.getSslUsedSite(
                                 self.__config['orders'][i]['save_path'])
                             if not auth_to:
                                 continue
@@ -1198,6 +1226,25 @@ fullchain.pem       粘贴到证书输入框
                                 continue
 
                             self.__config['orders'][i]['auth_to'] = auth_to
+
+                    # 是否到了允许重试的时间
+                    if 'next_retry_time' in self._config['orders'][i]:
+                        timeout = self.__config['orders'][i][
+                            'next_retry_time'] - int(time.time())
+                        if timeout > 0:
+                            writeLog('|-本次跳过域名:{}，因第上次续签失败，还需要等待{}小时后再重试'.format(
+                                self.__config['orders'][i]['domains'], int(timeout / 60 / 60)))
+                            continue
+
+                    # 是否到了最大重试次数
+                    if 'retry_count' in self.__config['orders'][i]:
+                        if self.__config['orders'][i]['retry_count'] >= 5:
+                            writeLog('|-本次跳过域名:{}，因连续5次续签失败，不再续签此证书(可尝试手动续签此证书，成功后错误次数将被重置)'.format(
+                                self.__config['orders'][i]['domains']))
+                            continue
+
+                    # 加入到续签订单
+                    order_index.append(i)
 
             self.D('renew_cert', order_index)
         except Exception as e:
