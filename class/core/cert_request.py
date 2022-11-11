@@ -992,7 +992,7 @@ fullchain.pfx   用于IIS的证书格式
 privkey.pem         粘贴到密钥输入框
 fullchain.pem       粘贴到证书输入框
 '''
-            mw.writeFile(path + '/说明.txt', ps)
+            mw.writeFile(path + '/readme.txt', ps)
             self.subAllCert(key_file, pem_file)
         except:
             writeLog(public.getTracebackInfo())
