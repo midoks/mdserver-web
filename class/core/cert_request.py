@@ -801,13 +801,27 @@ class cert_request:
             ]
         )
         pk = OpenSSL.crypto.load_privatekey(
-            OpenSSL.crypto.FILETYPE_PEM, self.create_certificate_key(
+            OpenSSL.crypto.FILETYPE_PEM, self.createCertificateKey(
                 index).encode()
         )
         X509Req.set_pubkey(pk)
         X509Req.set_version(2)
-        X509Req.sign(pk, self._digest)
+        X509Req.sign(pk, self.__digest)
         return OpenSSL.crypto.dump_certificate_request(OpenSSL.crypto.FILETYPE_ASN1, X509Req)
+
+    # 获取证书密钥对
+    def createCertificateKey(self, index):
+        # 判断是否已经创建private_key
+        if 'private_key' in self.__config['orders'][index]:
+            return self.__config['orders'][index]['private_key']
+        # 创建新的私钥
+        private_key = self.createKey()
+        if type(private_key) == bytes:
+            private_key = private_key.decode()
+        # 保存私钥到订单配置文件
+        self.__config['orders'][index]['private_key'] = private_key
+        self.saveConfig()
+        return private_key
 
     # 发送CSR
     def sendCsr(self, index):
@@ -1141,7 +1155,7 @@ fullchain.pem       粘贴到证书输入框
 # exp:
 '''
 
-python3 class/core/cert_request.py --domain=dev38.cachecha.com --type=http --path=/www/wwwroot/
+python3 class/core/cert_request.py --domain=dev38.cachecha.com --type=http --path=/www/wwwroot/dev38.cachecha.com
 
 python3 class/core/cert_request.py --domain=dev38.cachecha.com --type=http --path=/Users/midoks/Desktop/mwdev/wwwroot/test
 
