@@ -102,6 +102,14 @@ def getSocketFile():
     return tmp.groups()[0].strip()
 
 
+def getErrorLogsFile():
+    file = getConf()
+    content = mw.readFile(file)
+    rep = 'log-error\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
+
+
 def contentReplace(content):
     service_path = mw.getServerDir()
     content = content.replace('{$ROOT_PATH}', mw.getRootDir())
@@ -137,7 +145,6 @@ def pMysqlDb():
     # MySQLdb |
     # db = mw.getMyORMDb()
 
-    # db = mw.getMyORM()
     db.__DB_CNF = getConf()
     db.setPort(getDbPort())
     db.setSocket(getSocketFile())
@@ -147,16 +154,17 @@ def pMysqlDb():
 
 def initDreplace(version=''):
 
-    mysql_conf_dir = getServerDir() + '/etc'
-    if not os.path.exists(mysql_conf_dir):
-        os.mkdir(mysql_conf_dir)
+    my_dir = getServerDir() + '/etc'
+    if not os.path.exists(my_dir):
+        os.mkdir(my_dir)
 
-    mysql_tmp = getServerDir() + '/tmp'
-    if not os.path.exists(mysql_tmp):
-        os.mkdir(mysql_tmp)
-        mw.execShell("chown -R mysql:mysql " + mysql_tmp)
+    tmp_dir = getServerDir() + '/tmp'
+    if not os.path.exists(tmp_dir):
+        os.mkdir(tmp_dir)
+        mw.execShell("chown -R mysql:mysql " + tmp_dir)
+        mw.execShell("chmod 750 " + tmp_dir)
 
-    mysql_conf = mysql_conf_dir + '/my.cnf'
+    mysql_conf = my_dir + '/my.cnf'
     if not os.path.exists(mysql_conf):
         mysql_conf_tpl = getPluginDir() + '/conf/my' + version + '.cnf'
         content = mw.readFile(mysql_conf_tpl)
@@ -166,7 +174,7 @@ def initDreplace(version=''):
     # systemd
     systemDir = mw.systemdCfgDir()
     systemService = systemDir + '/mysql-yum.service'
-    systemServiceTpl = getPluginDir() + '/init.d/mysql.service.tpl'
+    systemServiceTpl = getPluginDir() + '/init.d/mysql' + version + '.service.tpl'
     if os.path.exists(systemDir) and not os.path.exists(systemService):
         service_path = mw.getServerDir()
         se_content = mw.readFile(systemServiceTpl)
@@ -234,11 +242,15 @@ def setSkipGrantTables(v):
 
 
 def getErrorLog():
-    file = getConf()
-    content = mw.readFile(file)
-    rep = 'log-error\s*=\s*(.*)'
-    tmp = re.search(rep, content)
-    return tmp.groups()[0].strip()
+    args = getArgs()
+    filename = getErrorLogsFile()
+    if not os.path.exists(filename):
+        return mw.returnJson(False, '指定文件不存在!')
+    if 'close' in args:
+        mw.writeFile(filename, '')
+        return mw.returnJson(False, '日志已清空')
+    info = mw.getLastLine(filename, 18)
+    return mw.returnJson(True, 'OK', info)
 
 
 def getShowLogFile():
@@ -2309,6 +2321,11 @@ def installPreInspection(version):
     if not sysName in ('centos',):
         return '仅支持centos'
 
+    if not (sysName == 'centos' and version == '5.7' and not sysId in('7',)):
+        return 'mysql5.7 仅支持centos7'
+
+    if not (sysName == 'centos' and version == '8.0' and not sysId in ('7', '8', '9',)):
+        return 'mysql8.0 仅支持centos7,8,9'
     return 'ok'
 
 

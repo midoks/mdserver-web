@@ -128,10 +128,6 @@ apt install -y libmariadb-dev
 apt install -y libmariadb-dev-compat
 #apt install -y libmariadbclient-dev
 
-cd /www/server/mdserver-web/scripts && bash lib.sh
-chmod 755 /www/server/mdserver-web/data
-
-
 
 # mysql8.0 在ubuntu22需要的库
 apt install -y patchelf
@@ -142,37 +138,12 @@ if [ "${VERSION_ID}" == "22.04" ];then
     pip3 install -U --force-reinstall --no-binary :all: gevent
 fi
 
-if [ ! -f /www/server/mdserver-web/bin/activate ];then
-    cd /www/server/mdserver-web && python3 -m venv .
-    cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate
-else
-    cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate
-fi
+cd /www/server/mdserver-web/scripts && bash lib.sh
+chmod 755 /www/server/mdserver-web/data
+
 
 if [ "${VERSION_ID}" == "22.04" ];then
 	apt install -y python3-cffi
     pip3 install -U --force-reinstall --no-binary :all: gevent
 fi
-
-
-
-cd /www/server/mdserver-web && ./cli.sh start
-isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`
-n=0
-while [[ ! -f /etc/init.d/mw ]];
-do
-    echo -e ".\c"
-    sleep 1
-    let n+=1
-    if [ $n -gt 20 ];then
-    	echo -e "start mw fail"
-        exit 1
-    fi
-done
-
-cd /www/server/mdserver-web && /etc/init.d/mw stop
-cd /www/server/mdserver-web && /etc/init.d/mw start
-cd /www/server/mdserver-web && /etc/init.d/mw default
-
-
 

@@ -1,4 +1,17 @@
-# coding: utf-8
+# coding:utf-8
+
+# ---------------------------------------------------------------------------------
+# MW-Linux面板
+# ---------------------------------------------------------------------------------
+# copyright (c) 2018-∞(https://github.com/midoks/mdserver-web) All rights reserved.
+# ---------------------------------------------------------------------------------
+# Author: midoks <midoks@163.com>
+# ---------------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------------
+# 核心方法库
+# ---------------------------------------------------------------------------------
+
 
 import os
 import sys
@@ -43,6 +56,12 @@ def execShell(cmdstring, cwd=None, timeout=None, shell=True):
     if isinstance(data[1], bytes):
         t2 = str(data[1], encoding='utf-8')
     return (t1, t2)
+
+
+def getTracebackInfo():
+    import traceback
+    errorMsg = traceback.format_exc()
+    return errorMsg
 
 
 def getRunDir():
@@ -112,6 +131,18 @@ def systemdCfgDir():
 
 def getOs():
     return sys.platform
+
+
+def getOsName():
+    cmd = "cat /etc/*-release | grep PRETTY_NAME |awk -F = '{print $2}' | awk -F '\"' '{print $2}'| awk '{print $1}'"
+    data = execShell(cmd)
+    return data[0].strip().lower()
+
+
+def getOsID():
+    cmd = "cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F '\"' '{print $2}'"
+    data = execShell(cmd)
+    return data[0].strip()
 
 
 def isAppleSystem():

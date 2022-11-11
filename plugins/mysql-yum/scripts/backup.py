@@ -20,17 +20,23 @@ sys.path.append(chdir + '/class/core')
 import mw
 import db
 import time
+import re
+
+'''
+DEBUG:
+python3 /www/server/mdserver-web/plugins/mysql-yum/scripts/backup.py  database admin 3
+'''
 
 
 class backupTools:
 
     def backupDatabase(self, name, count):
-        db_path = mw.getServerDir() + '/mysql-ya'
+        db_path = mw.getServerDir() + '/mysql-yum'
         db_name = 'mysql'
-        name = mw.M('databases').dbPos(db_path, 'mysql').where(
+        find_name = mw.M('databases').dbPos(db_path, 'mysql').where(
             'name=?', (name,)).getField('name')
         startTime = time.time()
-        if not name:
+        if not find_name:
             endDate = time.strftime('%Y/%m/%d %X', time.localtime())
             log = "数据库[" + name + "]不存在!"
             print("★[" + endDate + "] " + log)
@@ -45,21 +51,25 @@ class backupTools:
         filename = backup_path + "/db_" + name + "_" + \
             time.strftime('%Y%m%d_%H%M%S', time.localtime()) + ".sql.gz"
 
-        import re
         mysql_root = mw.M('config').dbPos(db_path, db_name).where(
             "id=?", (1,)).getField('mysql_root')
 
-        mycnf = mw.readFile(db_path + '/etc/my.cnf')
+        my_cnf = db_path + '/etc/my.cnf'
+
+        mw.backFile(my_cnf)
+        content = mw.readFile(my_cnf)
         rep = "\[mysqldump\]\nuser=root"
         sea = "[mysqldump]\n"
         subStr = sea + "user=root\npassword=" + mysql_root + "\n"
-        mycnf = mycnf.replace(sea, subStr)
-        if len(mycnf) > 100:
-            mw.writeFile(db_path + '/etc/my.cnf', mycnf)
+        content = content.replace(sea, subStr)
+        if len(content) > 100:
+            mw.writeFile(my_cnf, content)
 
-        mw.execShell(
-            db_path + "/bin/mysqldump --opt --default-character-set=utf8 " + name + " | gzip > " + filename)
+        cmd = db_path + "/bin/usr/bin/mysqldump --defaults-file=" + my_cnf + "  --single-transaction --quick --default-character-set=utf8 " + \
+            name + " | gzip > " + filename
+        mw.execShell(cmd)
 
+        mw.restoreFile(my_cnf)
         if not os.path.exists(filename):
             endDate = time.strftime('%Y/%m/%d %X', time.localtime())
             log = "数据库[" + name + "]备份失败!"
@@ -68,11 +78,6 @@ class backupTools:
                 "----------------------------------------------------------------------------")
             return
 
-        mycnf = mw.readFile(db_path + '/etc/my.cnf')
-        mycnf = mycnf.replace(subStr, sea)
-        if len(mycnf) > 100:
-            mw.writeFile(db_path + '/etc/my.cnf', mycnf)
-
         endDate = time.strftime('%Y/%m/%d %X', time.localtime())
         outTime = time.time() - startTime
         pid = mw.M('databases').dbPos(db_path, db_name).where(
@@ -80,7 +85,7 @@ class backupTools:
 
         mw.M('backup').add('type,name,pid,filename,addtime,size', (1, os.path.basename(
             filename), pid, filename, endDate, os.path.getsize(filename)))
-        log = "数据库[" + name + "]备份成功,用时[" + str(round(outTime, 2)) + u"]秒"
+        log = "数据库[" + name + "]备份成功,用时[" + str(round(outTime, 2)) + "]秒"
         mw.writeLog('计划任务', log)
         print("★[" + endDate + "] " + log)
         print("|---保留最新的[" + count + "]份备份")
@@ -101,7 +106,7 @@ class backupTools:
                     break
 
     def backupDatabaseAll(self, save):
-        db_path = mw.getServerDir() + '/mysql-ya'
+        db_path = mw.getServerDir() + '/mysql-yum'
         db_name = 'mysql'
         databases = mw.M('databases').dbPos(
             db_path, db_name).field('name').select()
@@ -111,8 +116,8 @@ class backupTools:
 
 if __name__ == "__main__":
     backup = backupTools()
-    type = sys.argv[1]
-    if type == 'database':
+    stype = sys.argv[1]
+    if stype == 'database':
         if sys.argv[2] == 'ALL':
             backup.backupDatabaseAll(sys.argv[3])
         else:

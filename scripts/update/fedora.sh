@@ -10,20 +10,14 @@ fi
 
 sed -i 's#SELINUX=enforcing#SELINUX=disabled#g' /etc/selinux/config
 
-
 cd /www/server/mdserver-web/scripts && bash lib.sh
 chmod 755 /www/server/mdserver-web/data
 
-
-if [ -f /etc/init.d/mw ];then
-    sh /etc/init.d/mw stop && rm -rf  /www/server/mdserver-web/scripts/init.d/mw && rm -rf  /etc/init.d/mw
-fi
 
 echo -e "stop mw"
 isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`
 
 port=7200
-
 if [ -f /www/server/mdserver-web/data/port.pl ];then
     port=$(cat /www/server/mdserver-web/data/port.pl)
 fi
@@ -42,18 +36,17 @@ done
 
 
 echo -e "start mw"
-cd /www/server/mdserver-web && sh cli.sh start
+cd /www/server/mdserver-web && bash cli.sh start
 isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`
 n=0
-while [[ ! -f /etc/init.d/mw ]];
+while [[ ! -f /etc/rc.d/init.d/mw ]];
 do
     echo -e ".\c"
-    sleep 0.5
+    sleep 1
     let n+=1
-    if [ $n -gt 15 ];then
-        break;
+    if [ $n -gt 20 ];then
+        echo -e "start mw fail"
+        exit 1
     fi
 done
 echo -e "start mw success"
-
-/etc/init.d/mw default

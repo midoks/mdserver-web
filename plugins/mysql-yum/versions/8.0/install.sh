@@ -49,22 +49,22 @@ YUM_INSTALL()
 mkdir -p $myDir
 
 wget -O $myDir/mysql-${SUFFIX_NAME}.rpm-bundle.tar https://cdn.mysql.com/archives/mysql-8.0/mysql-${SUFFIX_NAME}.rpm-bundle.tar
-cd ${myDir} && tar vxf mysql-server_${SUFFIX_NAME}.deb-bundle.tar
+cd ${myDir} && tar vxf mysql-${SUFFIX_NAME}.rpm-bundle.tar
 
 mkdir -p ${serverPath}/mysql-yum/bin && cd ${serverPath}/mysql-yum/bin
 
-rpm2cpio ${myDir}/mysql-community-client-8.0.30-1.el7.x86_64.rpm | cpio -div
-rpm2cpio ${myDir}/mysql-community-client-plugins-8.0.30-1.el7.x86_64.rpm | cpio -div
-rpm2cpio ${myDir}/mysql-community-common-8.0.30-1.el7.x86_64.rpm | cpio -div
-rpm2cpio ${myDir}/mysql-community-debuginfo-8.0.30-1.el7.x86_64.rpm | cpio -div
-rpm2cpio ${myDir}/mysql-community-devel-8.0.30-1.el7.x86_64.rpm | cpio -div
-rpm2cpio ${myDir}/mysql-community-embedded-compat-8.0.30-1.el7.x86_64.rpm | cpio -div
-rpm2cpio ${myDir}/mysql-community-icu-data-files-8.0.30-1.el7.x86_64.rpm | cpio -div
-rpm2cpio ${myDir}/mysql-community-libs-8.0.30-1.el7.x86_64.rpm | cpio -div
-rpm2cpio ${myDir}/mysql-community-libs-compat-8.0.30-1.el7.x86_64.rpm | cpio -div
-rpm2cpio ${myDir}/mysql-community-server-8.0.30-1.el7.x86_64.rpm | cpio -div
-rpm2cpio ${myDir}/mysql-community-server-debug-8.0.30-1.el7.x86_64.rpm | cpio -div
-rpm2cpio ${myDir}/mysql-community-test-8.0.30-1.el7.x86_64.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-client-${SUFFIX_NAME}.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-client-${SUFFIX_NAME}.x86_64.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-common-${SUFFIX_NAME}.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-debuginfo-${SUFFIX_NAME}.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-devel-${SUFFIX_NAME}.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-embedded-compat-${SUFFIX_NAME}.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-icu-data-files-${SUFFIX_NAME}.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-libs-${SUFFIX_NAME}.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-libs-compat-${SUFFIX_NAME}.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-server-${SUFFIX_NAME}.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-server-debug-${SUFFIX_NAME}.rpm | cpio -div
+rpm2cpio ${myDir}/mysql-community-test-${SUFFIX_NAME}.rpm | cpio -div
 
 #######
 }
@@ -73,7 +73,7 @@ YUM_UNINSTALL()
 {
 ### YUM卸载 START ########
 # yum -y remove mysql-server
-rm -rf ${serverPath}/mysql-yum
+rm -rf ${myDir}
 ### YUM卸载 END   ########
 }
 
@@ -96,13 +96,10 @@ Install_mysql()
 	fi
 
 
-	if [ "$?" == "0" ];then
-		mkdir -p $serverPath/mysql-yum
-		echo '8.0' > $serverPath/mysql-yum/version.pl
-		echo '安装完成' > $install_tmp
-	else
-		echo "暂时不支持该系统" > $install_tmp
-	fi
+	
+	mkdir -p $serverPath/mysql-yum
+	echo '8.0' > $serverPath/mysql-yum/version.pl
+	echo '安装完成' > $install_tmp
 }
 
 Uninstall_mysql()

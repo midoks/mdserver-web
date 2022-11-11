@@ -1612,8 +1612,6 @@ function wafSite(){
     });
 }
 
-
-
 function wafLogRequest(page){
     var args = {};   
     args['page'] = page;
@@ -1640,9 +1638,9 @@ function wafLogRequest(page){
                 list += '<td><span class="overflow_hide" style="width:112px;">' + getLocalTime(data[i]['time'])+'</span></td>';
                 list += '<td><span class="overflow_hide" style="width:50px;">' + data[i]['domain'] +'</span></td>';
                 list += '<td><span class="overflow_hide" style="width:60px;">' + data[i]['ip'] +'</span></td>';
-                list += '<td><span class="overflow_hide" style="width:50px;">' + data[i]['uri'] +'</span></td>';
+                list += '<td><span class="overflow_hide" style="width:50px;">' + data[i]['uri'] +'</span></td>';// data[i]['uri']
                 list += '<td><span class="overflow_hide" style="width:50px;">' + data[i]['rule_name'] +'</span></td>';
-                list += '<td><span class="overflow_hide" style="width:200px;">' + data[i]['reason'] +'</span></td>';
+                list += '<td><span class="overflow_hide" style="width:200px;">' + entitiesEncode(data[i]['reason']) +'</span></td>';//data[i]['reason']
                 list += '<td><a data-id="'+i+'" href="javascript:;" class="btlink details" title="详情">详情</a></td>';
                 list += '</tr>';
             }
