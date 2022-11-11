@@ -1092,6 +1092,59 @@ fullchain.pem       粘贴到证书输入框
                 writeLog(mw.getTracebackInfo())
             return mw.returnJson(False, msg)
 
+    # 取根域名和记录值
+    def extractZone(self, domain_name):
+        top_domain_list = ['.ac.cn', '.ah.cn', '.bj.cn', '.com.cn', '.cq.cn', '.fj.cn', '.gd.cn', '.gov.cn', '.gs.cn',
+                           '.gx.cn', '.gz.cn', '.ha.cn', '.hb.cn', '.he.cn', '.hi.cn', '.hk.cn', '.hl.cn', '.hn.cn',
+                           '.jl.cn', '.js.cn', '.jx.cn', '.ln.cn', '.mo.cn', '.net.cn', '.nm.cn', '.nx.cn', '.org.cn',
+                           '.my.id', '.com.ac', '.com.ad', '.com.ae', '.com.af', '.com.ag', '.com.ai', '.com.al', '.com.am',
+                           '.com.an', '.com.ao', '.com.aq', '.com.ar', '.com.as', '.com.as', '.com.at', '.com.au', '.com.aw',
+                           '.com.az', '.com.ba', '.com.bb', '.com.bd', '.com.be', '.com.bf', '.com.bg', '.com.bh', '.com.bi',
+                           '.com.bj', '.com.bm', '.com.bn', '.com.bo', '.com.br', '.com.bs', '.com.bt', '.com.bv', '.com.bw',
+                           '.com.by', '.com.bz', '.com.ca', '.com.ca', '.com.cc', '.com.cd', '.com.cf', '.com.cg', '.com.ch',
+                           '.com.ci', '.com.ck', '.com.cl', '.com.cm', '.com.cn', '.com.co', '.com.cq', '.com.cr', '.com.cu',
+                           '.com.cv', '.com.cx', '.com.cy', '.com.cz', '.com.de', '.com.dj', '.com.dk', '.com.dm', '.com.do',
+                           '.com.dz', '.com.ec', '.com.ee', '.com.eg', '.com.eh', '.com.es', '.com.et', '.com.eu', '.com.ev',
+                           '.com.fi', '.com.fj', '.com.fk', '.com.fm', '.com.fo', '.com.fr', '.com.ga', '.com.gb', '.com.gd',
+                           '.com.ge', '.com.gf', '.com.gh', '.com.gi', '.com.gl', '.com.gm', '.com.gn', '.com.gp', '.com.gr',
+                           '.com.gt', '.com.gu', '.com.gw', '.com.gy', '.com.hm', '.com.hn', '.com.hr', '.com.ht', '.com.hu',
+                           '.com.id', '.com.id', '.com.ie', '.com.il', '.com.il', '.com.in', '.com.io', '.com.iq', '.com.ir',
+                           '.com.is', '.com.it', '.com.jm', '.com.jo', '.com.jp', '.com.ke', '.com.kg', '.com.kh', '.com.ki',
+                           '.com.km', '.com.kn', '.com.kp', '.com.kr', '.com.kw', '.com.ky', '.com.kz', '.com.la', '.com.lb',
+                           '.com.lc', '.com.li', '.com.lk', '.com.lr', '.com.ls', '.com.lt', '.com.lu', '.com.lv', '.com.ly',
+                           '.com.ma', '.com.mc', '.com.md', '.com.me', '.com.mg', '.com.mh', '.com.ml', '.com.mm', '.com.mn',
+                           '.com.mo', '.com.mp', '.com.mq', '.com.mr', '.com.ms', '.com.mt', '.com.mv', '.com.mw', '.com.mx',
+                           '.com.my', '.com.mz', '.com.na', '.com.nc', '.com.ne', '.com.nf', '.com.ng', '.com.ni', '.com.nl',
+                           '.com.no', '.com.np', '.com.nr', '.com.nr', '.com.nt', '.com.nu', '.com.nz', '.com.om', '.com.pa',
+                           '.com.pe', '.com.pf', '.com.pg', '.com.ph', '.com.pk', '.com.pl', '.com.pm', '.com.pn', '.com.pr',
+                           '.com.pt', '.com.pw', '.com.py', '.com.qa', '.com.re', '.com.ro', '.com.rs', '.com.ru', '.com.rw',
+                           '.com.sa', '.com.sb', '.com.sc', '.com.sd', '.com.se', '.com.sg', '.com.sh', '.com.si', '.com.sj',
+                           '.com.sk', '.com.sl', '.com.sm', '.com.sn', '.com.so', '.com.sr', '.com.st', '.com.su', '.com.sy',
+                           '.com.sz', '.com.tc', '.com.td', '.com.tf', '.com.tg', '.com.th', '.com.tj', '.com.tk', '.com.tl',
+                           '.com.tm', '.com.tn', '.com.to', '.com.tp', '.com.tr', '.com.tt', '.com.tv', '.com.tw', '.com.tz',
+                           '.com.ua', '.com.ug', '.com.uk', '.com.uk', '.com.us', '.com.uy', '.com.uz', '.com.va', '.com.vc',
+                           '.com.ve', '.com.vg', '.com.vn', '.com.vu', '.com.wf', '.com.ws', '.com.ye', '.com.za', '.com.zm',
+                           '.com.zw', '.mil.cn', '.qh.cn', '.sc.cn', '.sd.cn', '.sh.cn', '.sx.cn', '.tj.cn', '.tw.cn', '.tw.cn',
+                           '.xj.cn', '.xz.cn', '.yn.cn', '.zj.cn', '.bj.cn', '.edu.kg'
+                           ]
+        old_domain_name = domain_name
+        top_domain = "." + ".".join(domain_name.rsplit('.')[-2:])
+        new_top_domain = "." + top_domain.replace(".", "")
+        is_tow_top = False
+        if top_domain in top_domain_list:
+            is_tow_top = True
+            domain_name = domain_name[:-len(top_domain)] + new_top_domain
+
+        if domain_name.count(".") > 1:
+            zone, middle, last = domain_name.rsplit(".", 2)
+            if is_tow_top:
+                last = top_domain[1:]
+            root = ".".join([middle, last])
+        else:
+            zone = ""
+            root = old_domain_name
+        return root, zone
+
     def renewCert(self, index):
         writeLog("", "wb+")
         self.D('renew_cert', index)
@@ -1103,6 +1156,49 @@ fullchain.pem       粘贴到证书输入框
                 if not index in self.__config['orders']:
                     raise Exception("指定订单号不存在，无法续签!")
                 order_index.append(index)
+            else:
+                start_time = time.time() + (30 * 86400)
+
+                # print(self.__config)
+                if not 'orders' in self.__config:
+                    self.__config['orders'] = {}
+
+                for i in self.__config['orders'].keys():
+                    if not 'save_path' in self.__config['orders'][i]:
+                        continue
+
+                    if 'cert' in self.__config['orders'][i]:
+                        self.__config['orders'][i]['cert_timeout'] = self.__config[
+                            'orders'][i]['cert']['cert_timeout']
+
+                    if not 'cert_timeout' in self.__config['orders'][i]:
+                        self.__config['orders'][i][
+                            'cert_timeout'] = int(time.time())
+
+                    if self.__config['orders'][i]['cert_timeout'] > start_time or self.__config['orders'][i]['auth_to'] == 'dns':
+                        continue
+
+                    # 已删除的网站直接跳过续签
+                    if self.__config['orders'][i]['auth_to'].find('|') == -1 and self.__config['orders'][i]['auth_to'].find('/') != -1:
+                        if not os.path.exists(self.__config['orders'][i]['auth_to']):
+                            auth_to = self.get_ssl_used_site(
+                                self.__config['orders'][i]['save_path'])
+                            if not auth_to:
+                                continue
+
+                            # 域名不存在？
+                            for domain in self.__config['orders'][i]['domains']:
+                                if domain.find('*') != -1:
+                                    break
+                                if not mw.M('domain').where("name=?", (domain,)).count() and not mw.M('binding').where("domain=?", domain).count():
+                                    auth_to = None
+                                    writeLog(
+                                        "|-跳过被删除的域名: {}".format(self.__config['orders'][i]['domains']))
+                            if not auth_to:
+                                continue
+
+                            self.__config['orders'][i]['auth_to'] = auth_to
+
             self.D('renew_cert', order_index)
         except Exception as e:
             start_time = time.time() + (30 * 86400)
@@ -1163,11 +1259,13 @@ fullchain.pem       粘贴到证书输入框
 
 # exp:
 '''
-
+// create
 python3 class/core/cert_request.py --domain=dev38.cachecha.com --type=http --path=/www/wwwroot/dev38.cachecha.com
+// renew
+cd /www/server/mdserver-web && python3 class/core/cert_request.py --renew=1
 
 python3 class/core/cert_request.py --domain=dev38.cachecha.com --type=http --path=/Users/midoks/Desktop/mwdev/wwwroot/test
-
+python3 class/core/cert_request.py --renew=1
 '''
 if __name__ == "__main__":
     p = argparse.ArgumentParser(usage="必要的参数：--domain 域名列表，多个以逗号隔开!")
