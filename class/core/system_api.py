@@ -442,7 +442,7 @@ class system_api:
                 else:
                     os.remove(filename)
                 count += 1
-        mw.serviceReload()
+        mw.restartWeb()
         os.system('echo > /tmp/panelBoot.pl')
         return total, count
 

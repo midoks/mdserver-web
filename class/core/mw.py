@@ -474,6 +474,45 @@ def restoreFile(file, act=None):
     execShell("cp -p {1} {0}".format(file, file + file_type))
 
 
+def enPunycode(domain):
+    if sys.version_info[0] == 2:
+        domain = domain.encode('utf8')
+    tmp = domain.split('.')
+    newdomain = ''
+    for dkey in tmp:
+        if dkey == '*':
+            continue
+        # 匹配非ascii字符
+        match = re.search(u"[\x80-\xff]+", dkey)
+        if not match:
+            match = re.search(u"[\u4e00-\u9fa5]+", dkey)
+        if not match:
+            newdomain += dkey + '.'
+        else:
+            if sys.version_info[0] == 2:
+                newdomain += 'xn--' + \
+                    dkey.decode('utf-8').encode('punycode') + '.'
+            else:
+                newdomain += 'xn--' + \
+                    dkey.encode('punycode').decode('utf-8') + '.'
+    if tmp[0] == '*':
+        newdomain = "*." + newdomain
+    return newdomain[0:-1]
+
+
+def dePunycode(domain):
+    # punycode 转中文
+    tmp = domain.split('.')
+    newdomain = ''
+    for dkey in tmp:
+        if dkey.find('xn--') >= 0:
+            newdomain += dkey.replace('xn--',
+                                      '').encode('utf-8').decode('punycode') + '.'
+        else:
+            newdomain += dkey + '.'
+    return newdomain[0:-1]
+
+
 def HttpGet(url, timeout=10):
     """
     发送GET请求
@@ -772,6 +811,41 @@ def checkIp(ip):
         return True
     else:
         return False
+
+
+def createLinuxUser(user, group):
+    execShell("groupadd {}".format(group))
+    execShell('useradd -s /sbin/nologin -g {} {}'.format(user, group))
+    return True
+
+
+def setOwn(filename, user, group=None):
+    if isAppleSystem():
+        return True
+
+    # 设置用户组
+    if not os.path.exists(filename):
+        return False
+    from pwd import getpwnam
+    try:
+        user_info = getpwnam(user)
+        user = user_info.pw_uid
+        if group:
+            user_info = getpwnam(group)
+        group = user_info.pw_gid
+    except:
+        if user == 'www':
+            createLinuxUser(user)
+        # 如果指定用户或组不存在，则使用www
+        try:
+            user_info = getpwnam('www')
+        except:
+            createLinuxUser(user)
+            user_info = getpwnam('www')
+        user = user_info.pw_uid
+        group = user_info.pw_gid
+    os.chown(filename, user, group)
+    return True
 
 
 def checkPort(port):
