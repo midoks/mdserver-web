@@ -1247,11 +1247,15 @@ fullchain.pem       粘贴到证书输入框
                     order_index.append(i)
 
             self.D('renew_cert', order_index)
-        except Exception as e:
-            start_time = time.time() + (30 * 86400)
-            if not 'orders' in self.__config:
-                self.__config['orders'] = {}
-            self.D('renew_cert', e)
+        except Exception as ex:
+            ex = str(ex)
+            if ex.find(">>>>") != -1:
+                msg = ex.split(">>>>")
+                msg[1] = json.loads(msg[1])
+            else:
+                msg = ex
+                writeLog(me.getTracebackInfo())
+            return mw.returnJson(False, msg)
 
     def do(self, args):
         cert = None
