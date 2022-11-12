@@ -1226,7 +1226,7 @@ fullchain.pem       粘贴到证书输入框
 
     def renewCert(self, index):
         writeLog("", "wb+")
-        self.D('renew_cert', index)
+        # self.D('renew_cert', index)
         try:
             order_index = []
             if index:
@@ -1237,7 +1237,6 @@ fullchain.pem       粘贴到证书输入框
                 order_index.append(index)
             else:
                 start_time = time.time() + (30 * 86400)
-
                 # print(self.__config)
                 if not 'orders' in self.__config:
                     self.__config['orders'] = {}
