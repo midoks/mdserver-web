@@ -1326,6 +1326,8 @@ fullchain.pem       粘贴到证书输入框
             "certificate": self.calculateSafeBase64(cert),
             "reason": 4
         }
+
+        self.getApis()
         res = self.acmeRequest(self.__apis['revokeCert'], payload)
         if res.status_code in [200, 201]:
             if os.path.exists(cert_path):
