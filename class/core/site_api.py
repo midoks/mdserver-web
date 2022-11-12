@@ -384,7 +384,7 @@ class site_api:
         if(type(isError) == str):
             mw.restoreFile(path)
             return mw.returnJson(False, 'ERROR: <br><a style="color:red;">' + isError.replace("\n", '<br>') + '</a>')
-        return mw.returnJson(True, '设置模板成功!')
+        return mw.returnJson(True, '设置成功!')
 
     def setRewriteTplApi(self):
         data = request.form.get('data', '')
@@ -633,7 +633,7 @@ class site_api:
             if siteConf.find('301-END') != -1:
                 return mw.returnJson(False, '检测到您的站点做了301重定向设置，请先关闭重定向!')
 
-            #检测存在反向代理
+            # 检测存在反向代理
             data_path = self.getProxyDataPath(siteName)
             data_content = mw.readFile(data_path)
             if data_content != False:
