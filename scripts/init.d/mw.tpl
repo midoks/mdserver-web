@@ -188,6 +188,7 @@ mw_update()
 mw_update_dev()
 {
     curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update_dev.sh | bash
+    cd /www/server/mdserver-web
 }
 
 mw_install_app()
