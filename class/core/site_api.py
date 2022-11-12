@@ -384,6 +384,7 @@ class site_api:
         if(type(isError) == str):
             mw.restoreFile(path)
             return mw.returnJson(False, 'ERROR: <br><a style="color:red;">' + isError.replace("\n", '<br>') + '</a>')
+        mw.restartWeb()
         return mw.returnJson(True, '设置成功!')
 
     def setRewriteTplApi(self):
