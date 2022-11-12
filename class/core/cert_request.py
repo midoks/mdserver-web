@@ -1250,7 +1250,7 @@ fullchain.pem       粘贴到证书输入框
 
                     if self.__config['orders'][i]['cert_timeout'] > start_time:
                         writeLog(
-                            "| -本次跳过域名: {}，未过期!".format(self.__config['orders'][i]['domains'][0]))
+                            "|-本次跳过域名: {}，未过期!".format(self.__config['orders'][i]['domains'][0]))
                         continue
 
                     # 已删除的网站直接跳过续签
