@@ -1021,7 +1021,7 @@ function webEdit(id,website,endTime,addtime){
 
 	layer.open({
 		type: 1,
-		area: '640px',
+		area: '700px',
 		title: '站点修改['+website+']  --  添加时间['+addtime+']',
 		closeBtn: 1,
 		shift: 0,
@@ -1041,18 +1041,19 @@ function webEdit(id,website,endTime,addtime){
 		$(this).hide();
 		$('#newdomain').focus();
 	});
+
 	$('#newdomain').focus(function() {
 	    $(".placeholder").hide();
 	});
 	
 	$('#newdomain').blur(function() {
-		if($(this).val().length==0){
+		if($(this).val().length == 0){
 			$(".placeholder").show();
 		}  
 	});
+
 	//切换
-	var $p = $(".bt-w-menu p");
-	$p.click(function(){
+	$(".bt-w-menu p").click(function(){
 		$(this).addClass("bgw").siblings().removeClass("bgw");
 	});
 }
@@ -1067,7 +1068,7 @@ function getSiteLogs(siteName){
 			logs.msg = '';
 		}
 		if (logs.msg == '') logs.msg = '当前没有日志.';
-		var phpCon = '<textarea wrap="off" readonly="" style="white-space: pre;margin: 0px;width: 500px;height: 520px;background-color: #333;color:#fff; padding:0 5px" id="error_log">'+logs.msg+'</textarea>';
+		var phpCon = '<textarea wrap="off" readonly="" style="white-space: pre;margin: 0px;width: 560px;height: 530px;background-color: #333;color:#fff; padding:0 5px" id="error_log">'+logs.msg+'</textarea>';
 		$("#webedit-con").html(phpCon);
 		var ob = document.getElementById('error_log');
 		ob.scrollTop = ob.scrollHeight;		
@@ -1084,7 +1085,7 @@ function getSiteErrorLogs(siteName){
 			logs.msg = '';
 		}
 		if (logs.msg == '') logs.msg = '当前没有日志.';
-		var phpCon = '<textarea wrap="off" readonly="" style="white-space: pre;margin: 0px;width: 500px;height: 520px;background-color: #333;color:#fff; padding:0 5px" id="error_log">'+logs.msg+'</textarea>';
+		var phpCon = '<textarea wrap="off" readonly="" style="white-space: pre;margin: 0px;width: 560px;height: 530px;background-color: #333;color:#fff; padding:0 5px" id="error_log">'+logs.msg+'</textarea>';
 		$("#webedit-con").html(phpCon);
 		var ob = document.getElementById('error_log');
 		ob.scrollTop = ob.scrollHeight;		
@@ -1870,22 +1871,23 @@ function setCertSsl(certName,siteName){
 
 //ssl
 function setSSL(id,siteName){
-	var mBody = '<div class="tab-nav">\
-					<span class="on" onclick="opSSL(\'lets\','+id+',\''+siteName+'\')">Let\'s Encrypt</span>\
-					<span onclick="opSSL(\'other\','+id+',\''+siteName+'\')">其他证书</span>\
-					<span class="sslclose" onclick="closeSSL(\''+siteName+'\')">关闭</span>\
+	var sslHtml = '<div class="warning_info mb10 "><p class="">温馨提示：当前站点未开启SSL证书访问，站点访问可能存在风险。<button class="btn btn-success btn-xs ml10 cutTabView">申请证书</button></p></div>\
+				<div class="tab-nav" style="margin-top: 10px;">\
+					<span class="on" onclick="opSSL(\'now\','+id+',\''+siteName+'\')">当前证书 - <i class="error">[未部署SSL]</i></span>\
+					<span onclick="opSSL(\'lets\','+id+',\''+siteName+'\')">Let\'s Encrypt</span>\
+					<span onclick="opSSL(\'acme\','+id+',\''+siteName+'\')">ACME</span>\
 					<span id="ssl_admin" onclick="sslAdmin(\''+siteName+'\')">证书夹</span>'
 					+ '<div class="ss-text pull-right mr30" style="position: relative;top:-4px">\
-	                    <em>强制HTTPS</em>\
+	                    <!-- <em>强制HTTPS</em>\
 	                    <div class="ssh-item">\
 	                    	<input class="btswitch btswitch-ios" id="toHttps" type="checkbox">\
 	                    	<label class="btswitch-btn" for="toHttps" onclick="httpToHttps(\''+siteName+'\')"></label>\
-	                    </div>\
+	                    </div> -->\
 	                </div></div>'
-			  + '<div class="tab-con" style="padding: 0px;"></div>'
-			  
-	$("#webedit-con").html(mBody);
-	opSSL('lets',id,siteName);
+			  + '<div class="tab-con" style="padding: 0px;"></div>';
+	// <span class="sslclose" onclick="closeSSL(\''+siteName+'\')">关闭</span>\
+	$("#webedit-con").html(sslHtml);
+	opSSL('now',id,siteName);
 	$(".tab-nav span").click(function(){
 		$(this).addClass("on").siblings().removeClass("on");
 	});
@@ -1973,6 +1975,7 @@ function httpToHttps(siteName){
 
 //SSL
 function opSSL(type,id,siteName){
+
 	var lets =  '<div class="btssl"><div class="label-input-group">'
 			  + '<div class="line mtb10"><form><span class="tname text-center">验证方式</span><div style="margin-top:7px;display:inline-block"><input type="radio" name="c_type" onclick="file_check()" id="check_file" checked="checked" />\
 			  	<label class="mr20" for="check_file" style="font-weight:normal">文件验证</label></label></div></form></div>'
@@ -1987,6 +1990,13 @@ function opSSL(type,id,siteName){
 			  + '</div>';
 	
 	var other = '<div class="myKeyCon ptb15"><div class="ssl-con-key pull-left mr20">密钥(KEY)<br><textarea id="key" class="bt-input-text"></textarea></div>'
+					+ '<div class="ssl-con-key pull-left">证书(PEM格式)<br><textarea id="csr" class="bt-input-text"></textarea></div>'
+					+ '<div class="ssl-btn pull-left mtb15" style="width:100%"><button class="btn btn-success btn-sm" onclick="saveSSL(\''+siteName+'\')">保存</button></div></div>'
+					+ '<ul class="help-info-text c7 pull-left"><li>粘贴您的*.key以及*.pem内容，然后保存即可。</li>\
+					<li>如果浏览器提示证书链不完整,请检查是否正确拼接PEM证书</li><li>PEM格式证书 = 域名证书.crt + 根证书(root_bundle).crt</li>\
+					<li>在未指定SSL默认站点时,未开启SSL的站点使用HTTPS会直接访问到已开启SSL的站点</li></ul>';
+
+	var now = '<div class="myKeyCon ptb15"><div class="ssl-con-key pull-left mr20">密钥(KEY)<br><textarea id="key" class="bt-input-text"></textarea></div>'
 					+ '<div class="ssl-con-key pull-left">证书(PEM格式)<br><textarea id="csr" class="bt-input-text"></textarea></div>'
 					+ '<div class="ssl-btn pull-left mtb15" style="width:100%"><button class="btn btn-success btn-sm" onclick="saveSSL(\''+siteName+'\')">保存</button></div></div>'
 					+ '<ul class="help-info-text c7 pull-left"><li>粘贴您的*.key以及*.pem内容，然后保存即可。</li>\
@@ -2050,6 +2060,26 @@ function opSSL(type,id,siteName){
 					newSSL(siteName,domains);
 					
 				})
+			},'json');
+			break;
+		case 'now':
+			$(".tab-con").html(other);
+			var key = '';
+			var csr = '';
+			var loadT = layer.msg('正在提交任务...',{icon:16,time:0,shade: [0.3, '#000']});
+			$.post('site/get_ssl','siteName='+siteName,function(data){
+				layer.close(loadT);
+				var rdata = data['data'];
+				if (rdata.type == 0){
+					setCookie('letssl', 1);
+				}
+				if(rdata.status){
+					$(".ssl-btn").append("<button class='btn btn-default btn-sm' onclick=\"ocSSL('close_ssl_conf','"+siteName+"')\" style='margin-left:10px'>关闭SSL</button>");
+				}
+				if(rdata.key == false) rdata.key = '';
+				if(rdata.csr == false) rdata.csr = '';
+				$("#key").val(rdata.key);
+				$("#csr").val(rdata.csr);
 			},'json');
 			break;
 		case 'other':

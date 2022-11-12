@@ -2369,6 +2369,16 @@ html .menu .menu_exit:hover {
     width: 100%
 }
 
+.warning_info {
+    color: #a94442;
+    background-color: #f2dede;
+    border-color: #ebccd1;
+    height: 40px;
+    line-height: 20px;
+    padding: 10px 15px;
+    border-radius: 4px;
+}
+
 .success-msg {
     width: 100%;
     padding: 30px 50px;
@@ -2454,7 +2464,7 @@ html .menu .menu_exit:hover {
     border: #cacad9 1px solid;
     color: #444;
     display: inline-block;
-    margin: 0 3px -1px 0;
+    margin: 0 -5px -1px 0;
     cursor: pointer
 }
 
