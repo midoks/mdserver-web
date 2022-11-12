@@ -1242,6 +1242,7 @@ fullchain.pem       粘贴到证书输入框
                     self.__config['orders'] = {}
 
                 for i in self.__config['orders'].keys():
+                    # print(self.__config['orders'][i])
                     if not 'save_path' in self.__config['orders'][i]:
                         continue
 
@@ -1253,7 +1254,9 @@ fullchain.pem       粘贴到证书输入框
                         self.__config['orders'][i][
                             'cert_timeout'] = int(time.time())
 
-                    if self.__config['orders'][i]['cert_timeout'] > start_time or self.__config['orders'][i]['auth_to'] == 'dns':
+                    if self.__config['orders'][i]['cert_timeout'] > start_time:
+                        writeLog(
+                            "| -本次跳过域名: {}，未过期!".format(self.__config['orders'][i]['domains'][0]))
                         continue
 
                     # 已删除的网站直接跳过续签
