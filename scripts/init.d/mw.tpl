@@ -195,6 +195,12 @@ mw_install_app()
     bash $mw_path/scripts/quick/app.sh
 }
 
+mw_close_admin_path(){
+    if [ -f $mw_path/data/admin_path.pl ]; then
+        rm -rf $mw_path/data/admin_path.pl
+    fi
+}
+
 case "$1" in
     'start') mw_start;;
     'stop') mw_stop;;
@@ -213,6 +219,7 @@ case "$1" in
     'update') mw_update;;
     'update_dev') mw_update_dev;;
     'install_app') mw_install_app;;
+    'close_admin_path') mw_close_admin_path;;
     'default')
         cd $mw_path
         port=7200
