@@ -1302,8 +1302,6 @@ fullchain.pem       粘贴到证书输入框
                     writeLog("|-所有任务已处理完成!")
                     return
             writeLog("|-共需要续签 {} 张证书".format(len(order_index)))
-
-            self.D('renew_cert', order_index)
         except Exception as ex:
             ex = str(ex)
             if ex.find(">>>>") != -1:
