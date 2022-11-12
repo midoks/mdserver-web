@@ -1310,13 +1310,9 @@ fullchain.pem       粘贴到证书输入框
             return mw.returnJson(False, msg)
 
     def revokeOrder(self, index):
-        print(self.__config['orders'][index])
-        print(index)
         if not index in self.__config['orders']:
             raise Exception("指定订单不存在!")
         cert_path = self.__config['orders'][index]['save_path']
-
-        print(cert_path)
         if not os.path.exists(cert_path):
             raise Exception("指定订单没有找到可用的证书!")
         cert = self.dumpDer(cert_path)
@@ -1343,8 +1339,8 @@ fullchain.pem       粘贴到证书输入框
             if not args.index:
                 if not args.domains:
                     echoErr("请在--domain参数中指定要申请证书的域名，多个以逗号(,)隔开")
-                if not args.auth_type in ['http', 'tls', 'dns']:
-                    echoErr("请在--type参数中指定正确的验证类型，支持dns和http")
+                if not args.auth_type in ['http', 'tls']:
+                    echoErr("请在--type参数中指定正确的验证类型，http")
 
                 auth_to = ''
                 if args.auth_type in ['http', 'tls']:
@@ -1354,7 +1350,7 @@ fullchain.pem       粘贴到证书输入框
                         echoErr("指定网站根目录不存在，请检查：{}".format(args.path))
                     auth_to = args.path
                 else:
-                    echoErr("请在--path参数中指定网站根目录!")
+                    echoErr("仅支持文件验证!")
                     exit()
 
                 domains = args.domains.strip().split(',')
