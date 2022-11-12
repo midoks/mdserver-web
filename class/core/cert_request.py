@@ -1385,11 +1385,11 @@ python3 class/core/cert_request.py --domain=dev38.cachecha.com --type=http --pat
 // renew
 cd /www/server/mdserver-web && python3 class/core/cert_request.py --renew=1
 // revoke
-cd /www/server/mdserver-web && python3 class/core/cert_request.py --revoke --index=370423ed29481b2caf22e36d90a6894a
+cd /www/server/mdserver-web && python3 class/core/cert_request.py --revoke=1 --index=370423ed29481b2caf22e36d90a6894a
 
 python3 class/core/cert_request.py --domain=dev38.cachecha.com --type=http --path=/Users/midoks/Desktop/mwdev/wwwroot/test
 python3 class/core/cert_request.py --renew=1
-python3 class/core/cert_request.py --revoke --index=370423ed29481b2caf22e36d90a6894a
+python3 class/core/cert_request.py --revoke=1 --index=370423ed29481b2caf22e36d90a6894a
 '''
 if __name__ == "__main__":
     p = argparse.ArgumentParser(usage="必要的参数：--domain 域名列表，多个以逗号隔开!")
