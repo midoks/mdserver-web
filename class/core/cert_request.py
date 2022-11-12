@@ -324,12 +324,6 @@ class cert_request:
         return OpenSSL.crypto.sign(pk, message.encode("utf8"), self.__digest)
 
     def getSiteRunPathByid(self, site_id):
-        '''
-            @name 通过site_id获取网站运行目录
-            @author hwliang
-            @param site_id<int> 网站标识
-            @return None or string
-        '''
         if mw.M('sites').where('id=? and project_type=?', (site_id, 'PHP')).count() >= 1:
             site_path = public.M('sites').where(
                 'id=?', site_id).getField('path')
@@ -1315,6 +1309,32 @@ fullchain.pem       粘贴到证书输入框
                 writeLog(mw.getTracebackInfo())
             return mw.returnJson(False, msg)
 
+    def revokeOrder(self, index):
+        print(self.__config['orders'][index])
+        print(index)
+        if not index in self.__config['orders']:
+            raise Exception("指定订单不存在!")
+        cert_path = self.__config['orders'][index]['save_path']
+
+        print(cert_path)
+        if not os.path.exists(cert_path):
+            raise Exception("指定订单没有找到可用的证书!")
+        cert = self.dumpDer(cert_path)
+        if not cert:
+            raise Exception("证书读取失败!")
+        payload = {
+            "certificate": self.calculateSafeBase64(cert),
+            "reason": 4
+        }
+        res = self.acmeRequest(self.__apis['revokeCert'], payload)
+        if res.status_code in [200, 201]:
+            if os.path.exists(cert_path):
+                mw.execShell("rm -rf {}".format(cert_path))
+            del(self.__config['orders'][index])
+            self.saveConfig()
+            return mw.returnJson(True, "证书吊销成功!")
+        return res.json()
+
     def do(self, args):
         cert = None
         try:
@@ -1327,21 +1347,13 @@ fullchain.pem       粘贴到证书输入框
                 auth_to = ''
                 if args.auth_type in ['http', 'tls']:
                     if not args.path:
-                        echo_err("请在--path参数中指定网站根目录!")
+                        echoErr("请在--path参数中指定网站根目录!")
                     if not os.path.exists(args.path):
-                        echo_err("指定网站根目录不存在，请检查：{}".format(args.path))
+                        echoErr("指定网站根目录不存在，请检查：{}".format(args.path))
                     auth_to = args.path
                 else:
-                    if args.dnsapi == '0':
-                        auth_to = 'dns'
-                    else:
-                        if not args.key:
-                            echo_err("使用dnsapi申请时请在--dns_key参数中指定dnsapi的key!")
-                        if not args.secret:
-                            echo_err(
-                                "使用dnsapi申请时请在--dns_secret参数中指定dnsapi的secret!")
-                        auth_to = "{}|{}|{}".format(
-                            args.dnsapi, args.key, args.secret)
+                    echoErr("请在--path参数中指定网站根目录!")
+                    exit()
 
                 domains = args.domains.strip().split(',')
                 cert = self.applyCert(
@@ -1371,10 +1383,13 @@ fullchain.pem       粘贴到证书输入框
 // create
 python3 class/core/cert_request.py --domain=dev38.cachecha.com --type=http --path=/www/wwwroot/dev38.cachecha.com
 // renew
-cd /www/server/mdserver-web && python3 class/core/cert_request.py --renew=1
+cd /www/server/mdserver-web && python3 class/core/cert_request.py --renew=1 --index=370423ed29481b2caf22e36d90a6894a
+// revoke
+cd /www/server/mdserver-web && python3 class/core/cert_request.py --revoke --index=370423ed29481b2caf22e36d90a6894a
 
 python3 class/core/cert_request.py --domain=dev38.cachecha.com --type=http --path=/Users/midoks/Desktop/mwdev/wwwroot/test
 python3 class/core/cert_request.py --renew=1
+python3 class/core/cert_request.py --revoke=1 --index=1
 '''
 if __name__ == "__main__":
     p = argparse.ArgumentParser(usage="必要的参数：--domain 域名列表，多个以逗号隔开!")
@@ -1382,10 +1397,6 @@ if __name__ == "__main__":
                    help="请指定要申请证书的域名", dest="domains")
     p.add_argument('--type', default=None, help="请指定验证类型", dest="auth_type")
     p.add_argument('--path', default=None, help="请指定网站根目录", dest="path")
-    p.add_argument('--dnsapi', default=None, help="请指定DNSAPI", dest="dnsapi")
-    p.add_argument('--dns_key', default=None, help="请指定DNSAPI的key", dest="key")
-    p.add_argument('--dns_secret', default=None,
-                   help="请指定DNSAPI的secret", dest="secret")
     p.add_argument('--index', default=None, help="指定订单索引", dest="index")
     p.add_argument('--renew', default=None, help="续签证书", dest="renew")
     p.add_argument('--revoke', default=None, help="吊销证书", dest="revoke")
