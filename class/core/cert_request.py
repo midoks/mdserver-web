@@ -844,7 +844,7 @@ class cert_request:
     # 证书转为DER
     def dumpDer(self, cert_path):
         cert = OpenSSL.crypto.load_certificate(
-            OpenSSL.crypto.FILETYPE_PEM, public.readFile(cert_path + '/cert.csr'))
+            OpenSSL.crypto.FILETYPE_PEM, mw.readFile(cert_path + '/cert.csr'))
         return OpenSSL.crypto.dump_certificate(OpenSSL.crypto.FILETYPE_ASN1, cert)
 
     # 证书转为pkcs12
