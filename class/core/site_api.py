@@ -470,11 +470,21 @@ class site_api:
             stype = -1
 
         toHttps = self.isToHttps(siteName)
-        id = mw.M('sites').where("name=?", (siteName,)).getField('id')
+        sid = mw.M('sites').where("name=?", (siteName,)).getField('id')
         domains = mw.M('domain').where(
-            "pid=?", (id,)).field('name').select()
-        data = {'status': status, 'domain': domains, 'key': key,
-                'csr': csr, 'type': stype, 'httpTohttps': toHttps}
+            "pid=?", (sid,)).field('name').select()
+
+        certData = self.getCertName(csrpath)
+
+        data = {
+            'status': status,
+            'domain': domains,
+            'key': key,
+            'csr': csr,
+            'type': stype,
+            'httpTohttps': toHttps,
+            'cert_data': certData,
+        }
         return mw.returnJson(True, 'OK', data)
 
     def setSslApi(self):
@@ -804,7 +814,7 @@ class site_api:
 
         # print home_cert
         log_file = mw.getRunDir() + '/logs/acme.log'
-        mw.writeFile(log_file, '开始ACME申请', "wb+")
+        mw.writeFile(log_file, "开始ACME申请...\n", "wb+")
         cmd = 'export ACCOUNT_EMAIL=' + email + ' && ' + \
             execStr + ' >> ' + log_file
         # print(domains)
@@ -2434,27 +2444,67 @@ location ^~ {from} {
         except Exception as e:
             return mw.returnData(False, '证书保存失败!')
 
+    # 转换时间
+    def strfDate(self, sdate):
+        return time.strftime('%Y-%m-%d', time.strptime(sdate, '%Y%m%d%H%M%S'))
+
     # 获取证书名称
     def getCertName(self, certPath):
+        if not os.path.exists(certPath):
+            return None
         try:
-            openssl = '/usr/local/openssl/bin/openssl'
-            if not os.path.exists(openssl):
-                openssl = 'openssl'
-            result = mw.execShell(
-                openssl + " x509 -in " + certPath + " -noout -subject -enddate -startdate -issuer")
-            tmp = result[0].split("\n")
-            data = {}
-            data['subject'] = tmp[0].split('=')[-1]
-            data['notAfter'] = self.strfToTime(tmp[1].split('=')[1])
-            data['notBefore'] = self.strfToTime(tmp[2].split('=')[1])
-            data['issuer'] = tmp[3].split('O=')[-1].split(',')[0]
-            if data['issuer'].find('/') != -1:
-                data['issuer'] = data['issuer'].split('/')[0]
-            result = mw.execShell(
-                openssl + " x509 -in " + certPath + " -noout -text|grep DNS")
-            data['dns'] = result[0].replace(
-                'DNS:', '').replace(' ', '').strip().split(',')
-            return data
+            import OpenSSL
+            result = {}
+            x509 = OpenSSL.crypto.load_certificate(
+                OpenSSL.crypto.FILETYPE_PEM, mw.readFile(certPath))
+            # 取产品名称
+            issuer = x509.get_issuer()
+            result['issuer'] = ''
+            if hasattr(issuer, 'CN'):
+                result['issuer'] = issuer.CN
+            if not result['issuer']:
+                is_key = [b'0', '0']
+                issue_comp = issuer.get_components()
+                if len(issue_comp) == 1:
+                    is_key = [b'CN', 'CN']
+                for iss in issue_comp:
+                    if iss[0] in is_key:
+                        result['issuer'] = iss[1].decode()
+                        break
+            if not result['issuer']:
+                if hasattr(issuer, 'O'):
+                    result['issuer'] = issuer.O
+            # 取到期时间
+            result['notAfter'] = self.strfDate(
+                bytes.decode(x509.get_notAfter())[:-1])
+            # 取申请时间
+            result['notBefore'] = self.strfDate(
+                bytes.decode(x509.get_notBefore())[:-1])
+            # 取可选名称
+            result['dns'] = []
+            for i in range(x509.get_extension_count()):
+                s_name = x509.get_extension(i)
+                if s_name.get_short_name() in [b'subjectAltName', 'subjectAltName']:
+                    s_dns = str(s_name).split(',')
+                    for d in s_dns:
+                        result['dns'].append(d.split(':')[1])
+            subject = x509.get_subject().get_components()
+            # 取主要认证名称
+            if len(subject) == 1:
+                result['subject'] = subject[0][1].decode()
+            else:
+                if not result['dns']:
+                    for sub in subject:
+                        if sub[0] == b'CN':
+                            result['subject'] = sub[1].decode()
+                            break
+                    if 'subject' in result:
+                        result['dns'].append(result['subject'])
+                else:
+                    result['subject'] = result['dns'][0]
+            result['endtime'] = int(int(time.mktime(time.strptime(
+                result['notAfter'], "%Y-%m-%d")) - time.time()) / 86400)
+            return result
         except:
             return None
 

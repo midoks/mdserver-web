@@ -1030,7 +1030,7 @@ function webEdit(id,website,endTime,addtime){
 			+"	<p class='bgw'  onclick=\"domainEdit(" + id + ",'" + website + "')\">"+lan.site.domain_man+"</p>"
 			+"	"+eMenu+""
 			+"</div>"
-			+"<div id='webedit-con' class='bt-w-con webedit-con pd15'></div>"
+			+"<div id='webedit-con' class='bt-w-con webedit-con pd15' style='height: 565px;overflow: scroll;'></div>"
 			+"</div>",
 
 		success:function(){
@@ -1131,78 +1131,6 @@ function setSecurity(name,id){
 		layer.msg(rdata.msg,{icon:rdata.status?1:2});
 		if(rdata.status) setTimeout(function(){security(id,name);},1000);
 	},'json');
-}
-
-
-//木马扫描
-function CheckSafe(id,act){
-	if(act != undefined){
-		var loadT = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});
-		$.post('/site?action=CheckSafe','id='+id,function(rdata){
-			$(".btnStart").hide()
-			setTimeout(function(){
-				CheckSafe(id);
-			},3000);
-			GetTaskCount();
-			layer.close(loadT)
-			layer.msg(rdata.msg,{icon:rdata.status?1:5});
-		});
-		
-		return;
-	}
-	
-   $.post('/site?action=GetCheckSafe','id='+id,function(rdata){
-   		var done = "<button type='button' class='btn btn-success btn-sm btnStart mr5'  onclick=\"CheckSafe("+id+",1)\">"+lan.site.start_scan+"</button>\
-   					<button type='button' class='btn btn-default btn-sm btnStart mr20'  onclick=\"UpdateRulelist()\">"+lan.site.update_lib+"</button>\
-   					<a class='f14 mr20' style='color:green;'>"+lan.site.scanned+"："+rdata.count+"</a><a class='f14' style='color:red;'>"+lan.site.risk_quantity+"："+rdata.error+"</a>";
-   		
-   		if(rdata['scan']) done = "<a class='f14 mr20' style='color:green;'>"+lan.site.scanned+"："+rdata.count+"</a><a class='f14' style='color:red;'>"+lan.site.risk_quantity+"："+rdata.error+"</a>";
-		var echoHtml = "<div class='mtb15'>"
-					   + done
-					   +"</div>"
-		for(var i=0;i<rdata.phpini.length;i++){
-			echoHtml += "<tr><td>"+lan.site.danger_fun+"</td><td>"+lan.site.danger+"</td><td>"+lan.site.danger_fun_no+"："+rdata.phpini[i].function+"<br>"+lan.site.file+"：<a style='color: red;' href='javascript:;' onclick=\"OnlineEditFile(0,'/www/server/php/"+rdata.phpini[i].version+"/etc/php.ini')\">/www/server/php/"+rdata.phpini[i].version+"/etc/php.ini</a></td></tr>";
-		}
-		
-		if(!rdata.sshd){
-			echoHtml += "<tr><td>"+lan.site.ssh_port+"</td><td>"+lan.site.high_risk+"</td><td>"+lan.site.sshd_tampering+"</td></tr>";
-		}
-		
-		if(!rdata.userini){
-			echoHtml += "<tr><td>"+lan.site.xss_attack+"</td><td>"+lan.site.danger+"</td><td>"+lan.site.site_xss_attack+"</td></tr>";
-		}
-		
-		for(var i=0;i<rdata.data.length;i++){
-			echoHtml += "<tr><td>"+rdata.data[i].msg+"</td><td>"+rdata.data[i].level+"</td><td>文件：<a style='color: red;' href='javascript:;' onclick=\"OnlineEditFile(0,'"+rdata.data[i].filename+"')\">"+rdata.data[i].filename+"</a><br>"+lan.site.mod_time+"："+rdata.data[i].etime+"<br>"+lan.site.code+"："+rdata.data[i].code+"</td></tr>";
-		}
-
-		var body = "<div>"
-					+"<div class='divtable mtb15'><table class='table table-hover' width='100%' style='margin-bottom:0'>"
-				  	+"<thead><tr><th width='100px'>"+lan.site.behavior+"</th><th width='70px'>"+lan.site.risk+"</th><th>"+lan.site.details+"</th></tr></thead>"
-				   	+"<tbody id='checkDomain'>" + echoHtml + "</tbody>"
-				   	+"</table></div>"
-		
-		$("#webedit-con").html(body);
-		$(".btnStart").click(function(){
-			fly('btnStart');	
-		});
-		if(rdata['scan']){
-			c = $("#site_"+id).attr('class');
-			if(c != 'active') return;
-			setTimeout(function(){
-				CheckSafe(id);
-			},1000);
-		}
-	});
-}
-
-function UpdateRulelist(){
-	var loadT = layer.msg(lan.site.to_update,{icon:16,time:0,shade: [0.3, '#000']});
-	$.post('/site?action=UpdateRulelist','',function(rdata){
-		layer.close(loadT)
-		layer.msg(rdata.msg,{icon:rdata.status?1:5});
-	});
-	
 }
 
 
@@ -1407,15 +1335,6 @@ function delDirBind(id,siteId){
 			dirBinding(siteId);
 			layer.msg(rdata.msg,{icon:rdata.status?1:2});
 		},'json');
-	});
-}
-
-//开启缓存
-function openCache(siteName){
-	var loadT = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});
-	$.post('/site?action=ProxyCache',{siteName:siteName},function(rdata){
-		layer.close(loadT);
-		layer.msg(rdata.msg,{icon:rdata.status?1:2});
 	});
 }
 		
@@ -1890,37 +1809,37 @@ function setSSL(id,siteName){
 			  + '<div class="tab-con" style="padding: 0px;"></div>';
 	// <span class="sslclose" onclick="closeSSL(\''+siteName+'\')">关闭</span>\
 	$("#webedit-con").html(sslHtml);
-	opSSL('now',id,siteName);
 	$(".tab-nav span").click(function(){
 		$(this).addClass("on").siblings().removeClass("on");
 	});
-	var loadT = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});
-	$.post('/site/get_ssl','siteName='+siteName,function(rdata){
-		layer.close(loadT);
-		$("#toHttps").attr('checked',rdata.data.httpTohttps);
-		switch(rdata.data.type){
-			case 1:
-				$(".tab-nav span").eq(1).addClass("on").siblings().removeClass("on");
-				setCookie('letssl',1);
-				var lets = '<div class="myKeyCon ptb15"><div class="ssl-con-key pull-left mr20">密钥(KEY)<br><textarea id="key" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.data.key+'</textarea></div>'
-					+ '<div class="ssl-con-key pull-left">证书(PEM格式)<br><textarea id="csr" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.data.csr+'</textarea></div>'
-					+ '</div>'
-					+ '<ul class="help-info-text c7 pull-left"><li>已为您自动生成Let\'s Encrypt免费证书；</li>\
-						<li>如需使用其他SSL,请切换其他证书后粘贴您的KEY以及PEM内容，然后保存即可。</li></ul>'
-				$(".tab-con").html(lets);
-				$(".help-info-text").after("<div class='line mtb15'><button class='btn btn-default btn-sm' onclick=\"ocSSL('close_ssl_conf','"+siteName+"')\" style='margin-left:10px'>关闭SSL</button></div>");
-				break;
-			case 0:
-			case 3:
-				$(".tab-nav span").eq(1).addClass("on").siblings().removeClass("on");
-				opSSL('other',id,siteName);
-				break;
-			case 2:
-				$(".tab-nav span").eq(0).addClass("on").siblings().removeClass("on");
-				opSSL('a',id,siteName);
-				break;
-		}
-	},'json');
+	opSSL('now',id,siteName);
+	// var loadT = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});
+	// $.post('/site/get_ssl',{'siteName':siteName },function(rdata){
+	// 	layer.close(loadT);
+	// 	$("#toHttps").attr('checked',rdata.data.httpTohttps);
+	// 	switch(rdata.data.type){
+	// 		case 1:
+	// 			$(".tab-nav span").eq(1).addClass("on").siblings().removeClass("on");
+	// 			setCookie('letssl',1);
+	// 			var lets = '<div class="myKeyCon ptb15"><div class="ssl-con-key pull-left mr20">密钥(KEY)<br><textarea id="key" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.data.key+'</textarea></div>'
+	// 				+ '<div class="ssl-con-key pull-left">证书(PEM格式)<br><textarea id="csr" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.data.csr+'</textarea></div>'
+	// 				+ '</div>'
+	// 				+ '<ul class="help-info-text c7 pull-left"><li>已为您自动生成Let\'s Encrypt免费证书；</li>\
+	// 					<li>如需使用其他SSL,请切换其他证书后粘贴您的KEY以及PEM内容，然后保存即可。</li></ul>'
+	// 			$(".tab-con").html(lets);
+	// 			$(".help-info-text").after("<div class='line mtb15'><button class='btn btn-default btn-sm' onclick=\"ocSSL('close_ssl_conf','"+siteName+"')\" style='margin-left:10px'>关闭SSL</button></div>");
+	// 			break;
+	// 		case 0:
+	// 		case 3:
+	// 			$(".tab-nav span").eq(1).addClass("on").siblings().removeClass("on");
+	// 			opSSL('other',id,siteName);
+	// 			break;
+	// 		case 2:
+	// 			$(".tab-nav span").eq(0).addClass("on").siblings().removeClass("on");
+	// 			opSSL('a',id,siteName);
+	// 			break;
+	// 	}
+	// },'json');
 }
 
 
@@ -1979,9 +1898,15 @@ function httpToHttps(siteName){
 //SSL
 function opSSL(type, id, siteName, callback){
 
-	var now = '<div class="myKeyCon ptb15"><div class="ssl-con-key pull-left mr20">密钥(KEY)<br><textarea id="key" class="bt-input-text"></textarea></div>'
-					+ '<div class="ssl-con-key pull-left">证书(PEM格式)<br><textarea id="csr" class="bt-input-text"></textarea></div>'
-					+ '<div class="ssl-btn pull-left mtb15" style="width:100%"><button class="btn btn-success btn-sm" onclick="saveSSL(\''+siteName+'\')">保存</button></div></div>'
+	var now = '<div class="myKeyCon ptb15">\
+	 				<div class="ssl_state_info" style="display:none;"></div>\
+					<div class="custom_certificate_info">\
+						<div class="ssl-con-key pull-left mr20">密钥(KEY)<br><textarea id="key" class="bt-input-text"></textarea></div>\
+						<div class="ssl-con-key pull-left">证书(PEM格式)<br><textarea id="csr" class="bt-input-text"></textarea></div>\
+					</div>\
+					<div class="ssl-btn pull-left mtb15" style="width:100%"><button class="btn btn-success btn-sm" onclick="saveSSL(\''+siteName+'\')">保存</button>\
+					</div>\
+				</div>'
 					+ '<ul class="help-info-text c7 pull-left"><li>粘贴您的*.key以及*.pem内容，然后保存即可。</li>\
 					<li>如果浏览器提示证书链不完整,请检查是否正确拼接PEM证书</li><li>PEM格式证书 = 域名证书.crt + 根证书(root_bundle).crt</li>\
 					<li>在未指定SSL默认站点时,未开启SSL的站点使用HTTPS会直接访问到已开启SSL的站点</li></ul>';	
@@ -2147,22 +2072,38 @@ function opSSL(type, id, siteName, callback){
 			$.post('site/get_ssl','siteName='+siteName,function(data){
 				layer.close(loadT);
 				var rdata = data['data'];
-				if (rdata.type == 0){
-					setCookie('letssl', 1);
-				}
+
+				var issuer = rdata['cert_data']['issuer'].split(" ");
+				var domains = rdata['cert_data']['dns'].join("、");
+
+				var cert_data = "<div class='state_info_flex'>\
+					<div class='state_item'><span>证书品牌：</span><span class='ellipsis_text'>"+issuer[0]+"</span></div>\
+					<div class='state_item'><span>到期时间：</span><span class='btlink'>剩余"+rdata['cert_data']['endtime']+"天到期</span></div>\
+				</div>\
+				<div class='state_info_flex'>\
+					<div class='state_item'><span>认证域名：</span><span class='ellipsis_text'>"+domains+"</span></div>\
+					<div class='state_item'><span>强制HTTPS：</span><span></span></div>\
+				</div>";
+				$(".ssl_state_info").html(cert_data);
+				$(".ssl_state_info").css('display','block');
+				
+
+				console.log(rdata);
 				if(rdata.status){
+
 					$(".ssl-btn").append("<button class='btn btn-default btn-sm' onclick=\"ocSSL('close_ssl_conf','"+siteName+"')\" style='margin-left:10px'>关闭SSL</button>");
 				}
 				if(rdata.key == false) rdata.key = '';
 				if(rdata.csr == false) rdata.csr = '';
 				$("#key").val(rdata.key);
 				$("#csr").val(rdata.csr);
+
 				if (typeof (callback) != 'undefined'){
 					callback(rdata);
 				}
 			},'json');
 			break;
-		case 'other':
+		default:
 			layer.msg("错误类型", {icon:5});
 			break;
 	}
