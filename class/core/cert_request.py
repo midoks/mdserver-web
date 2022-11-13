@@ -31,11 +31,6 @@ try:
 except:
     mw.execShell("pip install pyopenssl")
     import OpenSSL
-try:
-    import dns.resolver
-except:
-    mw.execShell("pip install dnspython")
-    import dns.resolver
 
 # import http_requests as requests
 # requests.DEFAULT_TYPE = 'curl'
