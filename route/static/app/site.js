@@ -1031,31 +1031,35 @@ function webEdit(id,website,endTime,addtime){
 			+"	"+eMenu+""
 			+"</div>"
 			+"<div id='webedit-con' class='bt-w-con webedit-con pd15'></div>"
-			+"</div>"
-	});
-	domainEdit(id,website);
-	//域名输入提示
-	var placeholder = "<div class='placeholder'>每行填写一个域名，默认为80端口<br>泛解析添加方法 *.domain.com<br>如另加端口格式为 www.domain.com:88</div>";
-	$('#newdomain').after(placeholder);
-	$(".placeholder").click(function(){
-		$(this).hide();
-		$('#newdomain').focus();
-	});
+			+"</div>",
 
-	$('#newdomain').focus(function() {
-	    $(".placeholder").hide();
-	});
-	
-	$('#newdomain').blur(function() {
-		if($(this).val().length == 0){
-			$(".placeholder").show();
-		}  
-	});
+		success:function(){
+			//域名输入提示
+			var placeholder = "<div class='placeholder'>每行填写一个域名，默认为80端口<br>泛解析添加方法 *.domain.com<br>如另加端口格式为 www.domain.com:88</div>";
+			$('#newdomain').after(placeholder);
+			$(".placeholder").click(function(){
+				$(this).hide();
+				$('#newdomain').focus();
+			});
 
-	//切换
-	$(".bt-w-menu p").click(function(){
-		$(this).addClass("bgw").siblings().removeClass("bgw");
-	});
+			$('#newdomain').focus(function() {
+			    $(".placeholder").hide();
+			});
+			
+			$('#newdomain').blur(function() {
+				if($(this).val().length == 0){
+					$(".placeholder").show();
+				}  
+			});
+
+			//切换
+			$(".bt-w-menu p").click(function(){
+				$(this).addClass("bgw").siblings().removeClass("bgw");
+			});
+
+			domainEdit(id,website);
+		}
+	});	
 }
 
 //取网站日志
@@ -1685,7 +1689,6 @@ function toProxy(siteName, type, obj) {
 						layer.msg(res.msg, {icon: 2});
 					}
 				},'json');
-				
 			}
 		});
 	}
@@ -1983,7 +1986,7 @@ function opSSL(type, id, siteName, callback){
 					<li>如果浏览器提示证书链不完整,请检查是否正确拼接PEM证书</li><li>PEM格式证书 = 域名证书.crt + 根证书(root_bundle).crt</li>\
 					<li>在未指定SSL默认站点时,未开启SSL的站点使用HTTPS会直接访问到已开启SSL的站点</li></ul>';	
 
-	var lets =  '<div class="btssl"><div class="label-input-group">'
+	var lets =  '<div class="apply_ssl"><div class="label-input-group">'
 			  + '<div class="line mtb10"><form><span class="tname text-center">验证方式</span><div style="margin-top:7px;display:inline-block"><input type="radio" name="c_type" onclick="file_check()" id="check_file" checked="checked" />\
 			  	<label class="mr20" for="check_file" style="font-weight:normal">文件验证</label></label></div></form></div>'
 			  + '<div class="check_message line"><div style="margin-left:100px"><input type="checkbox" name="checkDomain" id="checkDomain" checked=""><label class="mr20" for="checkDomain" style="font-weight:normal">提前校验域名(提前发现问题,减少失败率)</label></div></div>'
@@ -1996,7 +1999,7 @@ function opSSL(type, id, siteName, callback){
 			  	<li>在未指定SSL默认站点时,未开启SSL的站点使用HTTPS会直接访问到已开启SSL的站点</li></ul>'
 			  + '</div>';
 
-	var acme =  '<div class="btssl"><div class="label-input-group">'
+	var acme =  '<div class="apply_ssl"><div class="label-input-group">'
 			  + '<div class="line mtb10"><form><span class="tname text-center">验证方式</span><div style="margin-top:7px;display:inline-block"><input type="radio" name="c_type" onclick="file_check()" id="check_file" checked="checked" />\
 			  	<label class="mr20" for="check_file" style="font-weight:normal">文件验证</label></label></div></form></div>'
 			  + '<div class="check_message line"><div style="margin-left:100px"><input type="checkbox" name="checkDomain" id="checkDomain" checked=""><label class="mr20" for="checkDomain" style="font-weight:normal">提前校验域名(提前发现问题,减少失败率)</label></div></div>'
@@ -2137,7 +2140,7 @@ function opSSL(type, id, siteName, callback){
 			},'json');
 			break;
 		case 'now':
-			$(".tab-con").html(other);
+			$(".tab-con").html(now);
 			var key = '';
 			var csr = '';
 			var loadT = layer.msg('正在提交任务...',{icon:16,time:0,shade: [0.3, '#000']});
@@ -2165,35 +2168,6 @@ function opSSL(type, id, siteName, callback){
 	}
 }
 
-
-//一键部署证书
-function onekeySSl(partnerOrderId,siteName){
-	var loadT = layer.msg(lan.site.ssl_apply_3,{icon:16,time:0,shade:0.3});
-	$.post("/ssl?action=GetSSLInfo","partnerOrderId="+partnerOrderId+"&siteName="+siteName,function(zdata){
-		layer.close(loadT);
-		layer.msg(zdata.msg,{icon:zdata.status?1:2});
-		getSSLlist(siteName);
-	})
-}
-
-//验证域名
-function verifyDomain(partnerOrderId,siteName){
-	var loadT = layer.msg(lan.site.ssl_apply_2,{icon:16,time:0,shade:0.3});
-	$.post("/ssl?action=Completed","partnerOrderId="+partnerOrderId+'&siteName='+siteName,function(ydata){
-		layer.close(loadT);
-		if(!ydata.status){
-			layer.msg(ydata.msg,{icon:2});
-			return;
-		}
-		//第三步
-		var loadT = layer.msg(lan.site.ssl_apply_3,{icon:16,time:0,shade:0.3});
-		$.post("/ssl?action=GetSSLInfo","partnerOrderId="+partnerOrderId+"&siteName="+siteName,function(zdata){
-			layer.close(loadT);
-			if(zdata.status) getSSLlist();
-			layer.msg(zdata.msg,{icon:zdata.status?1:2});
-		});
-	});
-}
 
 //开启与关闭SSL
 function ocSSL(action,siteName){
@@ -2228,29 +2202,29 @@ function ocSSL(action,siteName){
 }
 
 //生成SSL
-function newSSL(siteName,domains){
-	var loadT = layer.msg('正在校验域名，请稍后...',{icon:16,time:0,shade: [0.3, '#000']});
-	var force = '';
-	if($("#checkDomain").prop("checked")) force = '&force=true';
-	var email = $("input[name='admin_email']").val();
-	$.post('/site/create_let','siteName='+siteName+'&domains='+domains+'&updateOf=1&email='+email + force,function(rdata){
-		layer.close(loadT);
-		if(rdata.status){
-			var mykeyhtml = '<div class="myKeyCon ptb15"><div class="ssl-con-key pull-left mr20">密钥(KEY)<br><textarea id="key" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.data.key+'</textarea></div>'
-					+ '<div class="ssl-con-key pull-left">证书(PEM格式)<br><textarea id="csr" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.data.csr+'</textarea></div>'
-					+ '</div>'
-					+ '<ul class="help-info-text c7 pull-left"><li>已为您自动生成Let\'s Encrypt免费证书；</li>\
-						<li>如需使用其他SSL,请切换其他证书后粘贴您的KEY以及PEM内容，然后保存即可。</li></ul>';
-			$(".btssl").html(mykeyhtml);
-			layer.msg(rdata.data.msg,{icon:rdata.status?1:2});
-			setCookie('letssl',1);
-			return;
-		}
-		
-		setCookie('letssl',0);
-		layer.msg(rdata.msg,{icon:2,area:'500px',time:0,shade:0.3,shadeClose:true});
-		
-	},'json');
+function newSSL(siteName, domains){
+	showSpeedWindow('正在申请...', 'site.get_let_logs', function(layers,index){
+		var force = '';
+		if ($("#checkDomain").prop("checked")) force = '&force=true';
+		var email = $("input[name='admin_email']").val();
+		$.post('/site/create_let','siteName='+siteName+'&domains='+domains+'&updateOf=1&email='+email + force,function(rdata){
+			layer.close(index);
+			if(rdata.status){
+				var key = '<div class="myKeyCon ptb15">\
+							<div class="ssl-con-key pull-left mr20">密钥(KEY)<br><textarea id="key" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.data.key+'</textarea></div>\
+							<div class="ssl-con-key pull-left">证书(PEM格式)<br><textarea id="csr" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.data.csr+'</textarea></div>\
+						</div>\
+						<ul class="help-info-text c7 pull-left"><li>已为您自动生成Let\'s Encrypt免费证书；</li>\
+							<li>如需使用其他SSL,请切换其他证书后粘贴您的KEY以及PEM内容，然后保存即可。</li>\
+						</ul>';
+				$(".apply_ssl").html(key);
+				layer.msg(rdata.data.msg,{icon:rdata.status?1:2});
+				return;
+			}
+			layer.msg(rdata.data[0],{icon:2,area:'500px',time:0,shade:0.3,shadeClose:true});
+		},'json');
+	});
+	
 }
 
 function newAcmeSSL(siteName,domains){
@@ -2266,7 +2240,7 @@ function newAcmeSSL(siteName,domains){
 					+ '</div>'
 					+ '<ul class="help-info-text c7 pull-left"><li>已为您自动生成Let\'s Encrypt免费证书；</li>\
 						<li>如需使用其他SSL,请切换其他证书后粘贴您的KEY以及PEM内容，然后保存即可。</li></ul>';
-			$(".btssl").html(mykeyhtml);
+			$(".apply_ssl").html(mykeyhtml);
 			layer.msg(rdata.data.msg,{icon:rdata.status?1:2});
 			setCookie('letssl',1);
 			return;

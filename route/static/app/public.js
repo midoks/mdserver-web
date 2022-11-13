@@ -1607,6 +1607,49 @@ function remove_ssh_menu() {
     $(".contextmenu").remove();
 }
 
+//显示进度
+function showSpeed(filename) {
+    $.post('/files/get_last_body', { num: 10,path: filename}, function (rdata) {
+    	if ($("#speed_log_lst").text() == ''){
+    		return;
+    	}
+		if (rdata.status) {
+			$("#speed_log_lst").text(rdata.data);
+			$("#speed_log_lst").scrollTop($("#speed_log_lst")[0].scrollHeight);
+		}
+		setTimeout(function () { showSpeed(filename); }, 1000);
+    },'json');
+}
+/**
+ * 显示进度窗口
+ */
+function showSpeedWindow(msg, speed_log_func_name, callback){
+	var speed_msg = "<pre style='margin-bottom: 0px;height:250px;text-align: left;background-color: #000;color: #fff;white-space: pre-wrap;' id='speed_log_lst'>[MSG]</pre>";
+	var showSpeedKey = layer.open({
+		title: false,
+		type: 1,
+		closeBtn: 0,
+		shade: 0.3,
+		area: "500px",
+		offset: "30%",
+		content: speed_msg.replace('[MSG]', msg),
+		success: function (layers, index) {
+			var url = speed_log_func_name.replace('.','/');
+			$.post('/'+url, {}, function(rdata){
+				if (rdata.status){
+					setTimeout(function () {
+						showSpeed(rdata.data);
+					}, 1000);
+				} else {
+					layer.msg("缺少指定文件!");
+				}
+			},'json');
+			if (callback) {callback(layers,index,showSpeedKey);}
+		}
+    });
+}
+
+
 /*** 其中功能,针对插件通过库使用 start ***/
 
 //字符串转数组对象

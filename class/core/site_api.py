@@ -611,6 +611,12 @@ class site_api:
         mw.restartWeb()
         return mw.returnJson(True, 'SSL已关闭!')
 
+    def getLetLogsApi(self):
+        log_file = mw.getRunDir() + '/logs/letsencrypt.log'
+        if not os.path.exists(log_file):
+            mw.execShell('touch ' + log_file)
+        return mw.returnJson(True, 'OK', log_file)
+
     def createLetApi(self):
         siteName = request.form.get('siteName', '')
         updateOf = request.form.get('updateOf', '')
@@ -648,28 +654,30 @@ class site_api:
                     if os.path.exists(proxy_dir_file):
                         return mw.returnJson(False, '检测到您的站点做了反向代理设置，请先关闭反向代理!')
 
-        letpath = self.sslDir + siteName
-        csrpath = letpath + "/fullchain.pem"  # 生成证书路径
-        keypath = letpath + "/privkey.pem"  # 密钥文件路径
+        auth_to = self.getSitePath(siteName)
+        to_args = {
+            'domains': domains,
+            'auth_type': 'http',
+            'auth_to': auth_to,
+        }
 
-        siteInfo = mw.M('sites').where(
-            'name=?', (siteName,)).field('id,name,path').find()
-        path = self.getSitePath(siteName)
-        srcPath = siteInfo['path']
+        # print(to_args)
+        import cert_request
+        data = cert_request.cert_request().applyCertApi(to_args)
 
-        # print(domains)
-        # print(cmd)
-        result = mw.execShell(cmd)
+        # letpath = self.sslDir + siteName
+        # csrpath = letpath + "/fullchain.pem"  # 生成证书路径
+        # keypath = letpath + "/privkey.pem"  # 密钥文件路径
 
-        # 写入配置文件
-        result = self.setSslConf(siteName)
-        if not result['status']:
-            return mw.getJson(result)
-        result['csr'] = mw.readFile(csrpath)
-        result['key'] = mw.readFile(keypath)
-        mw.restartWeb()
+        # # 写入配置文件
+        # result = self.setSslConf(siteName)
+        # if not result['status']:
+        #     return mw.getJson(result)
+        # result['csr'] = mw.readFile(csrpath)
+        # result['key'] = mw.readFile(keypath)
 
-        return mw.returnJson(True, 'OK', result)
+        # mw.restartWeb()
+        return mw.returnJson(data['status'], '', data['msg'])
 
     def createAcmeApi(self):
         siteName = request.form.get('siteName', '')
@@ -1092,10 +1100,10 @@ class site_api:
         mw.M('binding').add('pid,domain,port,path,addtime',
                             (pid, domain, port, dirName, mw.getDate()))
 
-        mw.restartWeb()
         msg = mw.getInfo('网站[{1}]子目录[{2}]绑定到[{3}]',
                          (siteInfo['name'], dirName, domain))
         mw.writeLog('网站管理', msg)
+        mw.restartWeb()
         return mw.returnJson(True, '添加成功!')
 
     def delDirBindApi(self):

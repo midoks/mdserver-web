@@ -39,7 +39,7 @@ class files_api:
             data = mw.getLastLine(path, int(line))
             return mw.returnJson(True, 'OK', data)
         except Exception as ex:
-            return mw.returnJson(False, u'无法正确读取文件!' + str(ex))
+            return mw.returnJson(False, '无法正确读取文件!' + str(ex))
 
     def saveBodyApi(self):
         path = request.form.get('path', '')
