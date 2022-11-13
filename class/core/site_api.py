@@ -796,9 +796,9 @@ class site_api:
         if mw.isAppleSystem():
             user = mw.execShell(
                 "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
-            acem = '/Users/' + user + '/.acme.sh/'
+            acme = '/Users/' + user + '/.acme.sh/'
             if not os.path.exists(home_cert):
-                home_path = acem + domains[0]
+                home_path = acme + domains[0]
                 home_cert = home_path + '/fullchain.cer'
                 home_key = home_path + '/' + domains[0] + '.key'
 
