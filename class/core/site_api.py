@@ -2305,8 +2305,7 @@ location ^~ {from} {
         # 写入数据库
         pid = mw.M('sites').add('name,path,status,ps,edate,addtime,type_id',
                                 (self.siteName, self.sitePath, '1', ps, '0000-00-00', mw.getDate(), 0,))
-        opid = mw.M('domain').where(
-            "name=?", (self.siteName,)).getField('pid')
+        opid = mw.M('domain').where("name=?", (self.siteName,)).getField('pid')
         if opid:
             if mw.M('sites').where('id=?', (opid,)).count():
                 return mw.returnJson(False, '您添加的域名已存在!')
@@ -2399,8 +2398,9 @@ location ^~ {from} {
             tmp = re.findall(rep, conf)
             if not mw.inArray(tmp, '443'):
                 listen = re.search(rep, conf).group()
+                http_ssl = "\n\tlisten 443 ssl http2;"
                 conf = conf.replace(
-                    listen, listen + "\n\tlisten 443 ssl http2;")
+                    listen, listen + http_ssl)
             shutil.copyfile(file, '/tmp/backup.conf')
 
             mw.writeFile(file, conf)
@@ -2409,11 +2409,12 @@ location ^~ {from} {
                 shutil.copyfile('/tmp/backup.conf', file)
                 return mw.returnData(False, '证书错误: <br><a style="color:red;">' + isError.replace("\n", '<br>') + '</a>')
 
-        mw.restartWeb()
         self.saveCert(keyPath, certPath)
 
         msg = mw.getInfo('网站[{1}]开启SSL成功!', siteName)
         mw.writeLog('网站管理', msg)
+
+        mw.restartWeb()
         return mw.returnData(True, 'SSL开启成功!')
 
     def saveCert(self, keyPath, certPath):
