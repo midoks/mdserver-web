@@ -745,7 +745,7 @@ class site_api:
             try:
                 mw.execShell("curl -sS curl https://get.acme.sh | sh")
             except:
-                return mw.returnJson(False, '尝试自动安装ACME失败,请通过以下命令尝试手动安装<p>安装命令: curl https://get.acme.sh | sh</p>' + acme)
+                pass
         if not os.path.exists(acme):
             return mw.returnJson(False, '尝试自动安装ACME失败,请通过以下命令尝试手动安装<p>安装命令: curl https://get.acme.sh | sh</p>' + acme)
 
