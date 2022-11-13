@@ -811,25 +811,22 @@ class site_api:
         # print(cmd)
         result = mw.execShell(cmd)
 
+        msg = '签发失败,您尝试申请证书的失败次数已达上限!<p>1、检查域名是否绑定到对应站点</p>\
+            <p>2、检查域名是否正确解析到本服务器,或解析还未完全生效</p>\
+            <p>3、如果您的站点设置了反向代理,或使用了CDN,请先将其关闭</p>\
+            <p>4、如果您的站点设置了301重定向,请先将其关闭</p>\
+            <p>5、如果以上检查都确认没有问题，请尝试更换DNS服务商</p>'
         if not os.path.exists(home_cert.replace("\*", "*")):
             data = {}
             data['err'] = result
             data['out'] = result[0]
-            data['msg'] = '签发失败,我们无法验证您的域名:<p>1、检查域名是否绑定到对应站点</p>\
-                <p>2、检查域名是否正确解析到本服务器,或解析还未完全生效</p>\
-                <p>3、如果您的站点设置了反向代理,或使用了CDN,请先将其关闭</p>\
-                <p>4、如果您的站点设置了301重定向,请先将其关闭</p>\
-                <p>5、如果以上检查都确认没有问题，请尝试更换DNS服务商</p>'
+            data['msg'] = msg
             data['result'] = {}
             if result[1].find('new-authz error:') != -1:
                 data['result'] = json.loads(
                     re.search("{.+}", result[1]).group())
                 if data['result']['status'] == 429:
-                    data['msg'] = '签发失败,您尝试申请证书的失败次数已达上限!<p>1、检查域名是否绑定到对应站点</p>\
-                        <p>2、检查域名是否正确解析到本服务器,或解析还未完全生效</p>\
-                        <p>3、如果您的站点设置了反向代理,或使用了CDN,请先将其关闭</p>\
-                        <p>4、如果您的站点设置了301重定向,请先将其关闭</p>\
-                        <p>5、如果以上检查都确认没有问题，请尝试更换DNS服务商</p>'
+                    data['msg'] = msg
             data['status'] = False
             return mw.getJson(data)
 
