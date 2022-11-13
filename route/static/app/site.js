@@ -1800,11 +1800,6 @@ function setSSL(id,siteName){
 					<span onclick="opSSL(\'acme\','+id+',\''+siteName+'\')">ACME</span>\
 					<span id="ssl_admin" onclick="sslAdmin(\''+siteName+'\')">证书夹</span>'
 					+ '<div class="ss-text pull-right mr30" style="position: relative;top:-4px">\
-	                    <!-- <em>强制HTTPS</em>\
-	                    <div class="ssh-item">\
-	                    	<input class="btswitch btswitch-ios" id="toHttps" type="checkbox">\
-	                    	<label class="btswitch-btn" for="toHttps" onclick="httpToHttps(\''+siteName+'\')"></label>\
-	                    </div> -->\
 	                </div></div>'
 			  + '<div class="tab-con" style="padding: 0px;"></div>';
 	// <span class="sslclose" onclick="closeSSL(\''+siteName+'\')">关闭</span>\
@@ -1813,36 +1808,7 @@ function setSSL(id,siteName){
 		$(this).addClass("on").siblings().removeClass("on");
 	});
 	opSSL('now',id,siteName);
-	// var loadT = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});
-	// $.post('/site/get_ssl',{'siteName':siteName },function(rdata){
-	// 	layer.close(loadT);
-	// 	$("#toHttps").attr('checked',rdata.data.httpTohttps);
-	// 	switch(rdata.data.type){
-	// 		case 1:
-	// 			$(".tab-nav span").eq(1).addClass("on").siblings().removeClass("on");
-	// 			setCookie('letssl',1);
-	// 			var lets = '<div class="myKeyCon ptb15"><div class="ssl-con-key pull-left mr20">密钥(KEY)<br><textarea id="key" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.data.key+'</textarea></div>'
-	// 				+ '<div class="ssl-con-key pull-left">证书(PEM格式)<br><textarea id="csr" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.data.csr+'</textarea></div>'
-	// 				+ '</div>'
-	// 				+ '<ul class="help-info-text c7 pull-left"><li>已为您自动生成Let\'s Encrypt免费证书；</li>\
-	// 					<li>如需使用其他SSL,请切换其他证书后粘贴您的KEY以及PEM内容，然后保存即可。</li></ul>'
-	// 			$(".tab-con").html(lets);
-	// 			$(".help-info-text").after("<div class='line mtb15'><button class='btn btn-default btn-sm' onclick=\"ocSSL('close_ssl_conf','"+siteName+"')\" style='margin-left:10px'>关闭SSL</button></div>");
-	// 			break;
-	// 		case 0:
-	// 		case 3:
-	// 			$(".tab-nav span").eq(1).addClass("on").siblings().removeClass("on");
-	// 			opSSL('other',id,siteName);
-	// 			break;
-	// 		case 2:
-	// 			$(".tab-nav span").eq(0).addClass("on").siblings().removeClass("on");
-	// 			opSSL('a',id,siteName);
-	// 			break;
-	// 	}
-	// },'json');
 }
-
-
 
 
 function closeSSL(siteName){
@@ -2022,7 +1988,7 @@ function opSSL(type, id, siteName, callback){
 				return;
 			}
 			$(".tab-con").html(lets);
-			var opt='';
+			var opt = '';
 			$.post('/site/get_site_domains',{id:id}, function(rdata) {
 				var data = rdata['data'];
 				for(var i=0;i<data.domains.length;i++){
@@ -2082,15 +2048,18 @@ function opSSL(type, id, siteName, callback){
 				</div>\
 				<div class='state_info_flex'>\
 					<div class='state_item'><span>认证域名：</span><span class='ellipsis_text'>"+domains+"</span></div>\
-					<div class='state_item'><span>强制HTTPS：</span><span></span></div>\
+					<div class='state_item'><span>强制HTTPS：</span><span class='switch'>\
+						<input class='btswitch btswitch-ios' id='toHttps' type='checkbox'>\
+	                    <label class='btswitch-btn' for='toHttps' onclick=\"httpToHttps('" + siteName + "')\">\
+					</span></div>\
 				</div>";
 				$(".ssl_state_info").html(cert_data);
 				$(".ssl_state_info").css('display','block');
-				
+
+				$("#toHttps").attr('checked',rdata.httpTohttps);
 
 				console.log(rdata);
 				if(rdata.status){
-
 					$(".ssl-btn").append("<button class='btn btn-default btn-sm' onclick=\"ocSSL('close_ssl_conf','"+siteName+"')\" style='margin-left:10px'>关闭SSL</button>");
 				}
 				if(rdata.key == false) rdata.key = '';

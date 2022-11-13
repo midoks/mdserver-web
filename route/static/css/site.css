@@ -1603,12 +1603,12 @@ html .menu .menu_exit:hover {
 }
 
 
-.ssl_state_info  .state_item .switch-btn{
+.ssl_state_info  .state_item .btswitch-btn{
   margin-bottom: 0;
   height: 1.9rem;
   width: 3.2rem;
   position: relative;
-  top;
+  top:2.5px;
 }
 
 .custom_certificate_info{
