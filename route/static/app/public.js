@@ -1630,7 +1630,7 @@ function showSpeedWindow(msg, speed_log_func_name, callback){
 		type: 1,
 		closeBtn: 0,
 		shade: 0.3,
-		area: "500px",
+		area: "700px",
 		offset: "30%",
 		content: speed_msg.replace('[MSG]', msg),
 		success: function (layers, index) {
