@@ -652,117 +652,14 @@ class site_api:
         csrpath = letpath + "/fullchain.pem"  # 生成证书路径
         keypath = letpath + "/privkey.pem"  # 密钥文件路径
 
-        actionstr = updateOf
         siteInfo = mw.M('sites').where(
             'name=?', (siteName,)).field('id,name,path').find()
         path = self.getSitePath(siteName)
         srcPath = siteInfo['path']
 
-        # 检测acem是否安装
-        if mw.isAppleSystem():
-            user = mw.execShell(
-                "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
-            acem = '/Users/' + user + '/.acme.sh/acme.sh'
-        else:
-            acem = '/root/.acme.sh/acme.sh'
-        if not os.path.exists(acem):
-            acem = '/.acme.sh/acme.sh'
-        if not os.path.exists(acem):
-            try:
-                mw.execShell("curl -sS curl https://get.acme.sh | sh")
-            except:
-                return mw.returnJson(False, '尝试自动安装ACME失败,请通过以下命令尝试手动安装<p>安装命令: curl https://get.acme.sh | sh</p>' + acem)
-        if not os.path.exists(acem):
-            return mw.returnJson(False, '尝试自动安装ACME失败,请通过以下命令尝试手动安装<p>安装命令: curl https://get.acme.sh | sh</p>' + acem)
-
-        # 避免频繁执行
-        checkAcmeRun = mw.execShell('ps -ef|grep acme.sh |grep -v grep')
-        if checkAcmeRun[0] != '':
-            return mw.returnJson(False, '正在申请或更新SSL中...')
-
-        if force == 'true':
-            force_bool = True
-
-        if renew == 'true':
-            execStr = acem + " --renew --yes-I-know-dns-manual-mode-enough-go-ahead-please"
-        else:
-            execStr = acem + " --issue --force"
-
-        # 确定主域名顺序
-        domainsTmp = []
-        if siteName in domains:
-            domainsTmp.append(siteName)
-        for domainTmp in domains:
-            if domainTmp == siteName:
-                continue
-            domainsTmp.append(domainTmp)
-        domains = domainsTmp
-
-        domainCount = 0
-        for domain in domains:
-            if mw.checkIp(domain):
-                continue
-            if domain.find('*.') != -1:
-                return mw.returnJson(False, '泛域名不能使用【文件验证】的方式申请证书!')
-            execStr += ' -w ' + path
-            execStr += ' -d ' + domain
-            domainCount += 1
-        if domainCount == 0:
-            return mw.returnJson(False, '请选择域名(不包括IP地址与泛域名)!')
-
-        home_path = '/root/.acme.sh/' + domains[0]
-        home_cert = home_path + '/fullchain.cer'
-        home_key = home_path + '/' + domains[0] + '.key'
-
-        if not os.path.exists(home_cert):
-            home_path = '/.acme.sh/' + domains[0]
-            home_cert = home_path + '/fullchain.cer'
-            home_key = home_path + '/' + domains[0] + '.key'
-
-        if mw.isAppleSystem():
-            user = mw.execShell(
-                "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
-            acem = '/Users/' + user + '/.acme.sh/'
-            if not os.path.exists(home_cert):
-                home_path = acem + domains[0]
-                home_cert = home_path + '/fullchain.cer'
-                home_key = home_path + '/' + domains[0] + '.key'
-
-        # print home_cert
-        cmd = 'export ACCOUNT_EMAIL=' + email + ' && ' + execStr
         # print(domains)
         # print(cmd)
         result = mw.execShell(cmd)
-
-        if not os.path.exists(home_cert.replace("\*", "*")):
-            data = {}
-            data['err'] = result
-            data['out'] = result[0]
-            data['msg'] = '签发失败,我们无法验证您的域名:<p>1、检查域名是否绑定到对应站点</p>\
-                <p>2、检查域名是否正确解析到本服务器,或解析还未完全生效</p>\
-                <p>3、如果您的站点设置了反向代理,或使用了CDN,请先将其关闭</p>\
-                <p>4、如果您的站点设置了301重定向,请先将其关闭</p>\
-                <p>5、如果以上检查都确认没有问题，请尝试更换DNS服务商</p>'
-            data['result'] = {}
-            if result[1].find('new-authz error:') != -1:
-                data['result'] = json.loads(
-                    re.search("{.+}", result[1]).group())
-                if data['result']['status'] == 429:
-                    data['msg'] = '签发失败,您尝试申请证书的失败次数已达上限!<p>1、检查域名是否绑定到对应站点</p>\
-                        <p>2、检查域名是否正确解析到本服务器,或解析还未完全生效</p>\
-                        <p>3、如果您的站点设置了反向代理,或使用了CDN,请先将其关闭</p>\
-                        <p>4、如果您的站点设置了301重定向,请先将其关闭</p>\
-                        <p>5、如果以上检查都确认没有问题，请尝试更换DNS服务商</p>'
-            data['status'] = False
-            return mw.getJson(data)
-
-        if not os.path.exists(letpath):
-            mw.execShell("mkdir -p " + letpath)
-        mw.execShell("ln -sf \"" + home_cert + "\" \"" + csrpath + '"')
-        mw.execShell("ln -sf \"" + home_key + "\" \"" + keypath + '"')
-        mw.execShell('echo "let" > "' + letpath + '/README"')
-        if(actionstr == '2'):
-            return mw.returnJson(True, '证书已更新!')
 
         # 写入配置文件
         result = self.setSslConf(siteName)

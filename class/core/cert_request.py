@@ -1218,6 +1218,48 @@ fullchain.pem       粘贴到证书输入框
             except:
                 write_log("|-[{}]续签失败".format(siteName))
 
+    def apply_cert_api(self, args):
+        '''
+        申请证书 - api
+        '''
+        if not 'id' in args:
+            return mw.returnJson(False, '网站id不能为空!')
+        # 是否为指定站点
+        if mw.M('sites').where('id=?', (args.id,)).count():
+            project_info = public.M('sites').where(
+                'id=?', (args.id,)).getField('project_config')
+            try:
+                project_info = json.loads(project_info)
+                if not os.path.exists(project_info['ssl_path']):
+                    os.makedirs(project_info['ssl_path'])
+                path = project_info['ssl_path']
+                args.auth_to = path
+                if args.auto_wildcard == '1':
+                    self._auto_wildcard = True
+                return self.applyCert(json.loads(args.domains), args.auth_type, args.auth_to)
+            except:
+                return mw.returnJson(False, '当前Java项目配置文件存在问题,请重新建立')
+        else:
+            if re.match(r"^\d+$", args.auth_to):
+                import panelSite
+                path = mw.M('sites').where(
+                    'id=?', (args.id,)).getField('path')
+                args.auth_to = path + '/' + panelSite.panelSite().GetRunPath(args)
+                args.auth_to = args.auth_to.replace("//", "/")
+                if args.auth_to[-1] == '/':
+                    args.auth_to = args.auth_to[:-1]
+
+                if not os.path.exists(args.auth_to):
+                    return mw.returnJson(False, '无效的站点目录，请检查指定站点是否存在!')
+
+            check_result = self.checkAuthEnv(args)
+            if check_result:
+                return check_result
+
+            if args.auto_wildcard == '1':
+                self._auto_wildcard = True
+            return self.apply_cert(json.loads(args.domains), args.auth_type, args.auth_to)
+
     def renewCert(self, index):
         writeLog("", "wb+")
         # self.D('renew_cert', index)
