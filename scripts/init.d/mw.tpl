@@ -202,9 +202,26 @@ mw_close_admin_path(){
     fi
 }
 
+mw_force_kill()
+{
+    PLIST=`ps -ef|grep app:app |grep -v grep|awk '{print $2}'`
+    for i in $PLIST
+    do
+        kill -9 $i
+    done
+
+    pids=`ps -ef|grep task.py | grep -v grep |awk '{print $2}'`
+    arr=($pids)
+    for p in ${arr[@]}
+    do
+        kill -9 $p
+    done
+}
+
 mw_debug(){
     mw_stop
-    
+    mw_force_kill
+
     port=7200    
     if [ -f $mw_path/data/port.pl ];then
         port=$(cat $mw_path/data/port.pl)
