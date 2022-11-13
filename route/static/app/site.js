@@ -2083,24 +2083,7 @@ function opSSL(type,id,siteName){
 			},'json');
 			break;
 		case 'other':
-			$(".tab-con").html(other);
-			var key = '';
-			var csr = '';
-			var loadT = layer.msg('正在提交任务...',{icon:16,time:0,shade: [0.3, '#000']});
-			$.post('site/get_ssl','siteName='+siteName,function(data){
-				layer.close(loadT);
-				var rdata = data['data'];
-				if (rdata.type == 0){
-					setCookie('letssl', 1);
-				}
-				if(rdata.status){
-					$(".ssl-btn").append("<button class='btn btn-default btn-sm' onclick=\"ocSSL('close_ssl_conf','"+siteName+"')\" style='margin-left:10px'>关闭SSL</button>");
-				}
-				if(rdata.key == false) rdata.key = '';
-				if(rdata.csr == false) rdata.csr = '';
-				$("#key").val(rdata.key);
-				$("#csr").val(rdata.csr);
-			},'json');
+			layer.msg("错误类型", {icon:5});
 			break;
 	}
 }
