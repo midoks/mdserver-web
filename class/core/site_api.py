@@ -804,9 +804,9 @@ class site_api:
 
         # print home_cert
         cmd = 'export ACCOUNT_EMAIL=' + email + ' && ' + \
-            execStr + ' > ' + mw.getRunDir() + '/logs/acme.log'
+            execStr + ' >> ' + mw.getRunDir() + '/logs/acme.log'
         # print(domains)
-        print(cmd)
+        # print(cmd)
         result = mw.execShell(cmd)
 
         if not os.path.exists(home_cert.replace("\*", "*")):

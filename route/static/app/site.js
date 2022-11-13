@@ -2007,7 +2007,7 @@ function opSSL(type, id, siteName, callback){
 			  + '<div class="line mtb10"><span class="tname text-center">域名</span><ul id="ymlist" style="padding: 5px 10px;max-height:180px;overflow:auto; width:240px;border:#ccc 1px solid;border-radius:3px"></ul></div>'
 			  + '<div class="line mtb10" style="margin-left:100px"><button class="btn btn-success btn-sm letsApply">申请</button></div>'
 			  + '<ul class="help-info-text c7" id="lets_help"><li>申请之前，请确保域名已解析，如未解析会导致审核失败</li>\
-			  	<li>Let\'s Encrypt免费证书，有效期3个月，支持多域名。默认会自动续签</li>\
+			  	<li>由ACME免费申请证书，有效期3个月，支持多域名。默认会自动续签</li>\
 			  	<li>若您的站点使用了CDN或301重定向会导致续签失败</li>\
 			  	<li>在未指定SSL默认站点时,未开启SSL的站点使用HTTPS会直接访问到已开启SSL的站点</li></ul>'
 			  + '</div>';
@@ -2236,11 +2236,14 @@ function newAcmeSSL(siteName,domains){
 		$.post('/site/create_acme','siteName='+siteName+'&domains='+domains+'&updateOf=1&email='+email + force,function(rdata){
 			layer.close(index);
 			if(rdata.status){
-				var acme_html = '<div class="myKeyCon ptb15"><div class="ssl-con-key pull-left mr20">密钥(KEY)<br><textarea id="key" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.data.key+'</textarea></div>'
-						+ '<div class="ssl-con-key pull-left">证书(PEM格式)<br><textarea id="csr" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.data.csr+'</textarea></div>'
-						+ '</div>'
-						+ '<ul class="help-info-text c7 pull-left"><li>已为您自动生成Let\'s Encrypt免费证书；</li>\
-							<li>如需使用其他SSL,请切换其他证书后粘贴您的KEY以及PEM内容，然后保存即可。</li></ul>';
+				var acme_html = '<div class="myKeyCon ptb15">\
+						<div class="ssl-con-key pull-left mr20">密钥(KEY)<br><textarea id="key" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.data.key+'</textarea></div>\
+						<div class="ssl-con-key pull-left">证书(PEM格式)<br><textarea id="csr" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.data.csr+'</textarea></div>\
+					</div>\
+						<ul class="help-info-text c7 pull-left">\
+							<li>ACME已为您自动生成免费证书；</li>\
+							<li>如需使用其他SSL,请切换其他证书后粘贴您的KEY以及PEM内容，然后保存即可。</li>\
+						</ul>';
 				$(".apply_ssl").html(acme_html);
 				layer.msg(rdata.data.msg,{icon:rdata.status?1:2});
 				return;
