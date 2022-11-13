@@ -2224,32 +2224,31 @@ function newSSL(siteName, domains){
 			layer.msg(rdata.data[0],{icon:2,area:'500px',time:0,shade:0.3,shadeClose:true});
 		},'json');
 	});
-	
 }
 
 function newAcmeSSL(siteName,domains){
-	var loadT = layer.msg('正在校验域名，请稍后...',{icon:16,time:0,shade: [0.3, '#000']});
-	var force = '';
-	if($("#checkDomain").prop("checked")) force = '&force=true';
-	var email = $("input[name='admin_email']").val();
-	$.post('/site/create_acme','siteName='+siteName+'&domains='+domains+'&updateOf=1&email='+email + force,function(rdata){
-		layer.close(loadT);
-		if(rdata.status){
-			var mykeyhtml = '<div class="myKeyCon ptb15"><div class="ssl-con-key pull-left mr20">密钥(KEY)<br><textarea id="key" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.data.key+'</textarea></div>'
-					+ '<div class="ssl-con-key pull-left">证书(PEM格式)<br><textarea id="csr" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.data.csr+'</textarea></div>'
-					+ '</div>'
-					+ '<ul class="help-info-text c7 pull-left"><li>已为您自动生成Let\'s Encrypt免费证书；</li>\
-						<li>如需使用其他SSL,请切换其他证书后粘贴您的KEY以及PEM内容，然后保存即可。</li></ul>';
-			$(".apply_ssl").html(mykeyhtml);
-			layer.msg(rdata.data.msg,{icon:rdata.status?1:2});
-			setCookie('letssl',1);
-			return;
-		}
-		
-		setCookie('letssl',0);
-		layer.msg(rdata.msg,{icon:2,area:'500px',time:0,shade:0.3,shadeClose:true});
-		
-	},'json');
+	showSpeedWindow('正在由ACME申请...', 'site.get_acme_logs', function(layers,index){
+		var force = '';
+		if($("#checkDomain").prop("checked")) force = '&force=true';
+		var email = $("input[name='admin_email']").val();
+		$.post('/site/create_acme','siteName='+siteName+'&domains='+domains+'&updateOf=1&email='+email + force,function(rdata){
+			layer.close(loadT);
+			if(rdata.status){
+				var mykeyhtml = '<div class="myKeyCon ptb15"><div class="ssl-con-key pull-left mr20">密钥(KEY)<br><textarea id="key" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.data.key+'</textarea></div>'
+						+ '<div class="ssl-con-key pull-left">证书(PEM格式)<br><textarea id="csr" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.data.csr+'</textarea></div>'
+						+ '</div>'
+						+ '<ul class="help-info-text c7 pull-left"><li>已为您自动生成Let\'s Encrypt免费证书；</li>\
+							<li>如需使用其他SSL,请切换其他证书后粘贴您的KEY以及PEM内容，然后保存即可。</li></ul>';
+				$(".apply_ssl").html(mykeyhtml);
+				layer.msg(rdata.data.msg,{icon:rdata.status?1:2});
+				setCookie('letssl',1);
+				return;
+			}
+			
+			setCookie('letssl',0);
+			layer.msg(rdata.msg,{icon:2,area:'500px',time:0,shade:0.3,shadeClose:true});
+		},'json');
+	});
 }
 
 //保存SSL

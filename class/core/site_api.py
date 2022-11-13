@@ -679,6 +679,12 @@ class site_api:
         # mw.restartWeb()
         return mw.returnJson(data['status'], '', data['msg'])
 
+    def getAcmeLogsApi(self):
+        log_file = mw.getRunDir() + '/logs/acme.log'
+        if not os.path.exists(log_file):
+            mw.execShell('touch ' + log_file)
+        return mw.returnJson(True, 'OK', log_file)
+
     def createAcmeApi(self):
         siteName = request.form.get('siteName', '')
         updateOf = request.form.get('updateOf', '')
