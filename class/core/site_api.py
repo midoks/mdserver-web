@@ -2214,6 +2214,8 @@ location ^~ {from} {
         file = self.getHostConf(siteName)
         conf = mw.readFile(file)
         if conf:
+            # if conf.find('HTTP_TO_HTTPS_START') != -1:
+            #     return True
             if conf.find('$server_port !~ 443') != -1:
                 return True
         return False
