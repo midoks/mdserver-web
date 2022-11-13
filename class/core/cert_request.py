@@ -131,8 +131,8 @@ class cert_request:
             if api_index in self.__config['apis']:
                 if 'expires' in self.__config['apis'][api_index] and 'directory' in self.__config['apis'][api_index]:
                     if time.time() < self.__config['apis'][api_index]['expires']:
-                        self.__apis = self.__config['apis'][
-                            api_index]['directory']
+                        self.__apis = self.__config[
+                            'apis'][api_index]['directory']
                         return self.__apis
 
             # 尝试从官方获取获取
@@ -276,12 +276,8 @@ class cert_request:
         # 如果没有保存上一次的随机数或force=True时则重新获取新的随机数
         if not self.__replay_nonce or force:
             headers = {"User-Agent": self.__user_agent}
-            response = requests.get(
-                self.__apis['newNonce'],
-                timeout=self.__acme_timeout,
-                headers=headers,
-                verify=self.__verify
-            )
+            response = requests.get(self.__apis[
+                                    'newNonce'], timeout=self.__acme_timeout, headers=headers, verify=self.__verify)
             self.__replay_nonce = response.headers["Replay-Nonce"]
         return self.__replay_nonce
 
