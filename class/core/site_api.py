@@ -804,7 +804,7 @@ class site_api:
 
         # print home_cert
         log_file = mw.getRunDir() + '/logs/acme.log'
-        mw.writeFile(log_file, '开始ACME申请', 'wb+')
+        mw.writeFile(log_file, '开始ACME申请', "wb+")
         cmd = 'export ACCOUNT_EMAIL=' + email + ' && ' + \
             execStr + ' >> ' + log_file
         # print(domains)
