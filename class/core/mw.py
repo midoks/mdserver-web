@@ -269,11 +269,11 @@ def getPageObject(args, result='1,2,3,4,5,8'):
     return (page.GetPage(info, result), page)
 
 
-def md5(str):
+def md5(content):
     # 生成MD5
     try:
         m = hashlib.md5()
-        m.update(str.encode("utf-8"))
+        m.update(content.encode("utf-8"))
         return m.hexdigest()
     except Exception as ex:
         return False
@@ -437,11 +437,11 @@ def writeLog(stype, msg, args=()):
         return False
 
 
-def writeFile(filename, str, mode='w+'):
+def writeFile(filename, content, mode='w+'):
     # 写文件内容
     try:
         fp = open(filename, mode)
-        fp.write(str)
+        fp.write(content.encode('utf-8'))
         fp.close()
         return True
     except Exception as e:
