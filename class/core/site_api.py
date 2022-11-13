@@ -736,17 +736,17 @@ class site_api:
         if mw.isAppleSystem():
             user = mw.execShell(
                 "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
-            acem = '/Users/' + user + '/.acme.sh/acme.sh'
+            acme = '/Users/' + user + '/.acme.sh/acme.sh'
         else:
-            acem = '/root/.acme.sh/acme.sh'
-        if not os.path.exists(acem):
-            acem = '/.acme.sh/acme.sh'
-        if not os.path.exists(acem):
+            acme = '/root/.acme.sh/acme.sh'
+        if not os.path.exists(acme):
+            acme = '/.acme.sh/acme.sh'
+        if not os.path.exists(acme):
             try:
                 mw.execShell("curl -sS curl https://get.acme.sh | sh")
             except:
                 return mw.returnJson(False, '尝试自动安装ACME失败,请通过以下命令尝试手动安装<p>安装命令: curl https://get.acme.sh | sh</p>' + acem)
-        if not os.path.exists(acem):
+        if not os.path.exists(acme):
             return mw.returnJson(False, '尝试自动安装ACME失败,请通过以下命令尝试手动安装<p>安装命令: curl https://get.acme.sh | sh</p>' + acem)
 
         # 避免频繁执行
@@ -758,9 +758,9 @@ class site_api:
             force_bool = True
 
         if renew == 'true':
-            execStr = acem + " --renew --yes-I-know-dns-manual-mode-enough-go-ahead-please"
+            execStr = acme + " --renew --yes-I-know-dns-manual-mode-enough-go-ahead-please"
         else:
-            execStr = acem + " --issue --force"
+            execStr = acme + " --issue --force"
 
         # 确定主域名顺序
         domainsTmp = []
@@ -803,8 +803,11 @@ class site_api:
                 home_key = home_path + '/' + domains[0] + '.key'
 
         # print home_cert
+        log_file = mw.getRunDir() + '/logs/acme.log'
+        mw.writeFile(log_file, '', 'wb+')
+        mw.writeFile(log_file, '开始ACME申请', 'ab+')
         cmd = 'export ACCOUNT_EMAIL=' + email + ' && ' + \
-            execStr + ' >> ' + mw.getRunDir() + '/logs/acme.log'
+            execStr + ' >> ' + log_file
         # print(domains)
         # print(cmd)
         result = mw.execShell(cmd)
@@ -835,7 +838,7 @@ class site_api:
             mw.execShell("mkdir -p " + letpath)
         mw.execShell("ln -sf \"" + home_cert + "\" \"" + csrpath + '"')
         mw.execShell("ln -sf \"" + home_key + "\" \"" + keypath + '"')
-        mw.execShell('echo "let" > "' + letpath + '/README"')
+        mw.execShell('echo "acme" > "' + letpath + '/README"')
         if(actionstr == '2'):
             return mw.returnJson(True, '证书已更新!')
 
