@@ -2056,7 +2056,7 @@ function opSSL(type, id, siteName, callback){
 				$(".ssl_state_info").html(cert_data);
 				$(".ssl_state_info").css('display','block');
 
-				$("#toHttps").attr('checked',!rdata.httpTohttps);
+				$("#toHttps").attr('checked',rdata.httpTohttps);
 
 				console.log(rdata);
 				if(rdata.status){
