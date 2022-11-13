@@ -807,7 +807,7 @@ class site_api:
         mw.writeFile(log_file, '', 'wb+')
         mw.writeFile(log_file, '开始ACME申请', 'ab+')
         cmd = 'export ACCOUNT_EMAIL=' + email + ' && ' + \
-            execStr + ' >> ' + log_file
+            execStr + ' > ' + log_file
         # print(domains)
         # print(cmd)
         result = mw.execShell(cmd)
