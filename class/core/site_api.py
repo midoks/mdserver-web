@@ -745,9 +745,9 @@ class site_api:
             try:
                 mw.execShell("curl -sS curl https://get.acme.sh | sh")
             except:
-                return mw.returnJson(False, '尝试自动安装ACME失败,请通过以下命令尝试手动安装<p>安装命令: curl https://get.acme.sh | sh</p>' + acem)
+                return mw.returnJson(False, '尝试自动安装ACME失败,请通过以下命令尝试手动安装<p>安装命令: curl https://get.acme.sh | sh</p>' + acme)
         if not os.path.exists(acme):
-            return mw.returnJson(False, '尝试自动安装ACME失败,请通过以下命令尝试手动安装<p>安装命令: curl https://get.acme.sh | sh</p>' + acem)
+            return mw.returnJson(False, '尝试自动安装ACME失败,请通过以下命令尝试手动安装<p>安装命令: curl https://get.acme.sh | sh</p>' + acme)
 
         # 避免频繁执行
         checkAcmeRun = mw.execShell('ps -ef|grep acme.sh |grep -v grep')
@@ -804,7 +804,7 @@ class site_api:
 
         # print home_cert
         log_file = mw.getRunDir() + '/logs/acme.log'
-        mw.writeFile(log_file, '开始ACME申请', 'wb+')
+        # mw.writeFile(log_file, '开始ACME申请', 'wb+')
         cmd = 'export ACCOUNT_EMAIL=' + email + ' && ' + \
             execStr + ' >> ' + log_file
         # print(domains)
