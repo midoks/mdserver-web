@@ -203,11 +203,13 @@ mw_close_admin_path(){
 }
 
 mw_debug(){
+    mw_stop
+    
     port=7200    
     if [ -f $mw_path/data/port.pl ];then
         port=$(cat $mw_path/data/port.pl)
     fi
-    
+
     cd /www/server/mdserver-web
     gunicorn -b :$port -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1  app:app
 }
