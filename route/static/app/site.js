@@ -2218,7 +2218,7 @@ function newSSL(siteName, domains){
 							<li>如需使用其他SSL,请切换其他证书后粘贴您的KEY以及PEM内容，然后保存即可。</li>\
 						</ul>';
 				$(".apply_ssl").html(key);
-				layer.msg(rdata.data.msg,{icon:rdata.status?1:2});
+				layer.msg(rdata.data,{icon:rdata.status?1:2});
 				return;
 			}
 			layer.msg(rdata.data[0],{icon:2,area:'500px',time:0,shade:0.3,shadeClose:true});
