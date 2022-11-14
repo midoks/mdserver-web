@@ -674,7 +674,13 @@ class site_api:
         # mw.restartWeb()
 
         if not data['status']:
-            return mw.returnJson(data['status'], data['msg'][0], data['msg'])
+            msg = ''
+            if typeof(data['msg']) == str:
+                msg = data['msg']
+            else:
+                msg = data['msg'][0]
+
+            return mw.returnJson(data['status'], msg, data['msg'])
         return mw.returnJson(data['status'], data['msg'])
 
     def getAcmeLogsApi(self):

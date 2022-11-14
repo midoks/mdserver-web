@@ -2127,9 +2127,12 @@ function ocSSL(action,siteName){
 function newSSL(siteName, domains){
 	showSpeedWindow('正在申请...', 'site.get_let_logs', function(layers,index){
 		var force = '';
-		if ($("#checkDomain").prop("checked")) force = '&force=true';
+		
+		if ($("#checkDomain").prop("checked")){
+			force = '&force=true';
+		}
 		var email = $("input[name='admin_email']").val();
-		$.post('/site/create_let','siteName='+siteName+'&domains='+domains+'&updateOf=1&email='+email + force,function(rdata){
+		$.post('/site/create_let','siteName='+siteName+'&domains='+domains+'&email='+email + force,function(rdata){
 			layer.close(index);
 			if(rdata.status){
 				var key = '<div class="myKeyCon ptb15">\
