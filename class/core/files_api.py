@@ -324,7 +324,7 @@ class files_api:
         if not self.checkDir(path):
             return mw.returnJson(False, '敏感目录,请不要花样作死!')
 
-        os.system('which chattr && chattr -R -i ' + rPath + path)
+        mw.execShell('which chattr && chattr -R -i ' + rPath + path)
         if os.path.isdir(rPath + path):
             import shutil
             shutil.rmtree(rPath + path)
