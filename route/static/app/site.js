@@ -2069,7 +2069,7 @@ function opSSL(type, id, siteName, callback){
 				if(rdata.status){
 					$('.warning_info').css('display','none');
 					$(".ssl-btn").append("<button class='btn btn-default btn-sm' onclick=\"ocSSL('close_ssl_conf','"+siteName+"')\" style='margin-left:10px'>关闭SSL</button>");
-					$('#now_ssl').html('当前证书 - <i style="color:blue;">[已部署SSL]</i>');
+					$('#now_ssl').html('当前证书 - <i style="color:#20a53a;">[已部署SSL]</i>');
 				} else{
 					$('#now_ssl').html('当前证书 - <i style="color:red;">[未部署SSL]</i>');
 				}
