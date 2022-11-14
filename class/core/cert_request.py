@@ -744,6 +744,33 @@ class cert_request:
             auth['dns_challenge_url'], payload)
         return respond_to_challenge_response
 
+    # 检查DNS记录
+    def checkDns(self, domain, value, s_type='TXT'):
+        writeLog(
+            "|-尝试本地验证DNS记录,域名: {} , 类型: {} 记录值: {}".format(domain, s_type, value))
+        time.sleep(10)
+        n = 0
+        while n < 20:
+            n += 1
+            try:
+                import dns.resolver
+                ns = dns.resolver.query(domain, s_type)
+                for j in ns.response.answer:
+                    for i in j.items:
+                        txt_value = i.to_text().replace('"', '').strip()
+                        writeLog("|-第 {} 次验证值: {}".format(n, txt_value))
+                        if txt_value == value:
+                            write_log("|-本地验证成功!")
+                            return True
+            except:
+                try:
+                    import dns.resolver
+                except:
+                    return False
+            time.sleep(3)
+        writeLog("|-本地验证失败!")
+        return True
+
     def authDomain(self, index):
         if not index in self.__config['orders']:
             raise Exception('指定订单不存在!')
@@ -753,7 +780,7 @@ class cert_request:
             res = self.checkAuthStatus(auth['url'])  # 检查是否需要验证
             if res.json()['status'] == 'pending':
                 if auth['type'] == 'dns':  # 尝试提前验证dns解析
-                    self.check_dns(
+                    self.checkDns(
                         "_acme-challenge.{}".format(
                             auth['domain'].replace('*.', '')),
                         auth['auth_value'],
