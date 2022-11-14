@@ -2143,7 +2143,7 @@ function newSSL(siteName, domains){
 				layer.msg(rdata.data,{icon:rdata.status?1:2});
 				return;
 			}
-			layer.msg(rdata.data[0],{icon:2,area:'500px',time:0,shade:0.3,shadeClose:true});
+			layer.msg(rdata.data,{icon:2,area:'500px',time:0,shade:0.3,shadeClose:true});
 		},'json');
 	});
 }
