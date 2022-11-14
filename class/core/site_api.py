@@ -675,7 +675,7 @@ class site_api:
 
         if not data['status']:
             msg = ''
-            if typeof(data['msg']) == str:
+            if type(data['msg']) == str:
                 msg = data['msg']
             else:
                 msg = data['msg'][0]
