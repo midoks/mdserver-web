@@ -75,7 +75,7 @@ mw_start_task()
         fi
         echo -e "\033[32mdone\033[0m"
     else
-        echo "Starting mw-tasks... mw-tasks (pid $(echo $isStart)) already running"
+        echo "starting mw-tasks... mw-tasks (pid $(echo $isStart)) already running"
     fi
 }
 
@@ -89,11 +89,11 @@ mw_start()
 mw_stop_task()
 {
     if [ -f $mw_path/tmp/panelTask.pl ];then
-        echo -e "\033[32mThe task is running and cannot be stopped\033[0m"
+        echo -e "\033[32mthe task is running and cannot be stopped\033[0m"
         exit 0
     fi
 
-    echo -e "Stopping mw-tasks... \c";
+    echo -e "stopping mw-tasks... \c";
     pids=$(ps aux | grep 'task.py'|grep -v grep|awk '{print $2}')
     arr=($pids)
     for p in ${arr[@]}
@@ -105,7 +105,7 @@ mw_stop_task()
 
 mw_stop_panel()
 {
-    echo -e "Stopping mw-panel... \c";
+    echo -e "stopping mw-panel... \c";
     arr=`ps aux|grep 'gunicorn -c setting.py app:app'|grep -v grep|awk '{print $2}'`
     for p in ${arr[@]}
     do
@@ -148,7 +148,7 @@ mw_reload()
 	isStart=$(ps aux|grep 'gunicorn -c setting.py app:app'|grep -v grep|awk '{print $2}')
     
     if [ "$isStart" != '' ];then
-    	echo -e "Reload mw... \c";
+    	echo -e "reload mw... \c";
 	    arr=`ps aux|grep 'gunicorn -c setting.py app:app'|grep -v grep|awk '{print $2}'`
 		for p in ${arr[@]}
         do
