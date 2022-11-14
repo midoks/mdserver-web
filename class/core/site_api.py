@@ -657,7 +657,7 @@ class site_api:
         }
 
         # print(to_args)
-
+        from route import socketio
         socketio.sleep(0)
         import cert_api
         data = cert_api.cert_api().applyCertApi(to_args)
