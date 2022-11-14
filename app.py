@@ -1,13 +1,22 @@
 # coding:utf-8
 
+# ---------------------------------------------------------------------------------
+# MW-Linux面板
+# ---------------------------------------------------------------------------------
+# copyright (c) 2018-∞(https://github.com/midoks/mdserver-web) All rights reserved.
+# ---------------------------------------------------------------------------------
+# Author: midoks <midoks@163.com>
+# ---------------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------------
+# 入口文件
+# ---------------------------------------------------------------------------------
+
+
 # pip install profiler_online
 # 性能测试
 # from profiler_online import run_profiler
 # run_profiler()
-
-from gevent import monkey
-monkey.patch_all()
-
 import sys
 import io
 import os
@@ -16,6 +25,9 @@ from route import app, socketio
 
 from gevent.pywsgi import WSGIServer
 from geventwebsocket.handler import WebSocketHandler
+
+from gevent import monkey
+monkey.patch_all()
 
 try:
     if __name__ == "__main__":
