@@ -24,6 +24,9 @@ import os
 import sys
 import argparse
 
+
+os.chdir('/www/server/mdserver-web')
+
 import mw
 
 try:
