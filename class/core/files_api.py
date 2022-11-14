@@ -784,7 +784,7 @@ class files_api:
 
         # 检查是否为.user.ini
         if path.find('.user.ini') >= 0:
-            os.system("which chattr && chattr -i '" + path + "'")
+            mw.execShell("which chattr && chattr -i '" + path + "'")
 
         try:
             if os.path.exists('data/recycle_bin.pl'):
