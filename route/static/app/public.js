@@ -1610,9 +1610,9 @@ function remove_ssh_menu() {
 //显示进度
 function showSpeed(filename) {
     $.post('/files/get_last_body', { num: 10,path: filename}, function (rdata) {
-    	if ($("#speed_log_lst").text() == ''){
-    		return;
-    	}
+    	// if ($("#speed_log_lst").text() == ''){
+    	// 	return;
+    	// }
 		if (rdata.status) {
 			$("#speed_log_lst").html(rdata.data);
 			$("#speed_log_lst").scrollTop($("#speed_log_lst")[0].scrollHeight);
