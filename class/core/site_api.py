@@ -660,7 +660,7 @@ class site_api:
         import cert_request
         data = cert_request.cert_request().applyCertApi(to_args)
 
-        # letpath = self.sslDir + siteName
+        # letpath = self.sslDir + '/' +siteName
         # csrpath = letpath + "/fullchain.pem"  # 生成证书路径
         # keypath = letpath + "/privkey.pem"  # 密钥文件路径
 
