@@ -284,7 +284,7 @@ class cert_request:
                 headers = {"User-Agent": self.__user_agent}
                 response = requests.get(self.__apis[
                                         'newNonce'], timeout=self.__acme_timeout, headers=headers, verify=self.__verify)
-                self.__replay_nonce = response.headers["Replay-Nonce"]
+                self.__replay_nonce = response.headers["replay-nonce"]
             except Exception as e:
                 raise Exception("获取随机数失败: {}".format(str(e)))
 
