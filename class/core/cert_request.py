@@ -1418,7 +1418,7 @@ fullchain.pem       粘贴到证书输入框
         if not cert:
             exit()
 
-        # print(cert)
+        print(cert)
         writeLog("=" * 65)
         writeLog("|-证书获取成功!")
         writeLog("=" * 65)
