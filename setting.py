@@ -18,8 +18,10 @@ import sys
 import random
 import os
 
-chdir = os.getcwd()
-sys.path.append(chdir + '/class/core')
+pwd = os.getcwd()
+pwd = '/www/server/mdserver-web'
+os.chdir(pwd)
+sys.path.append(pwd + '/class/core')
 
 import mw
 
