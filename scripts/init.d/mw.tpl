@@ -22,15 +22,13 @@ PATH=$PATH:$mw_path/bin
 
 if [ -f $mw_path/bin/activate ];then
     source $mw_path/bin/activate
-else 
-    echo ""
 fi
 
 mw_start_panel()
 {
     isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`
     if [ "$isStart" == '' ];then
-        echo -e "Starting mw-panel... \c"
+        echo -e "starting mw-panel... \c"
         cd $mw_path &&  gunicorn -c setting.py app:app
         port=$(cat ${mw_path}/data/port.pl)
         isStart=""
@@ -45,12 +43,12 @@ mw_start_panel()
             fi
         done
         if [ "$isStart" == '' ];then
-                echo -e "\033[31mfailed\033[0m"
-                echo '------------------------------------------------------'
-                tail -n 20 ${mw_path}/logs/error.log
-                echo '------------------------------------------------------'
-                echo -e "\033[31mError: mw-panel service startup failed.\033[0m"
-                return;
+            echo -e "\033[31mfailed\033[0m"
+            echo '------------------------------------------------------'
+            tail -n 20 ${mw_path}/logs/error.log
+            echo '------------------------------------------------------'
+            echo -e "\033[31mError: mw-panel service startup failed.\033[0m"
+            return;
         fi
         echo -e "\033[32mdone\033[0m"
     else
@@ -68,12 +66,12 @@ mw_start_task()
         sleep 0.3
         isStart=$(ps aux |grep 'task.py'|grep -v grep|awk '{print $2}')
         if [ "$isStart" == '' ];then
-                echo -e "\033[31mfailed\033[0m"
-                echo '------------------------------------------------------'
-                tail -n 20 $mw_path/logs/task.log
-                echo '------------------------------------------------------'
-                echo -e "\033[31mError: mw-tasks service startup failed.\033[0m"
-                return;
+            echo -e "\033[31mfailed\033[0m"
+            echo '------------------------------------------------------'
+            tail -n 20 $mw_path/logs/task.log
+            echo '------------------------------------------------------'
+            echo -e "\033[31mError: mw-tasks service startup failed.\033[0m"
+            return;
         fi
         echo -e "\033[32mdone\033[0m"
     else
@@ -111,7 +109,7 @@ mw_stop_panel()
     arr=`ps aux|grep 'gunicorn -c setting.py app:app'|grep -v grep|awk '{print $2}'`
     for p in ${arr[@]}
     do
-            kill -9 $p &>/dev/null
+        kill -9 $p &>/dev/null
     done
     
     pidfile=${mw_path}/logs/mw.pid
