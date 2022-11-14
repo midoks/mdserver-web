@@ -451,7 +451,7 @@ class site_api:
     def getSslApi(self):
         siteName = request.form.get('siteName', '')
 
-        path = self.sslDir + siteName
+        path = self.sslDir + '/' + siteName
         csrpath = path + "/fullchain.pem"  # 生成证书路径
         keypath = path + "/privkey.pem"  # 密钥文件路径
         key = mw.readFile(keypath)
@@ -469,8 +469,7 @@ class site_api:
 
         toHttps = self.isToHttps(siteName)
         sid = mw.M('sites').where("name=?", (siteName,)).getField('id')
-        domains = mw.M('domain').where(
-            "pid=?", (sid,)).field('name').select()
+        domains = mw.M('domain').where("pid=?", (sid,)).field('name').select()
 
         certData = self.getCertName(csrpath)
 
@@ -487,10 +486,11 @@ class site_api:
 
     def setSslApi(self):
         siteName = request.form.get('siteName', '')
+
         key = request.form.get('key', '')
         csr = request.form.get('csr', '')
 
-        path = self.sslDir + siteName
+        path = self.sslDir + '/' + siteName
         if not os.path.exists(path):
             mw.execShell('mkdir -p ' + path)
 
@@ -506,22 +506,8 @@ class site_api:
         if not mw.checkCert('/tmp/cert.pl'):
             return mw.returnJson(False, '证书错误,请粘贴正确的PEM格式证书!')
 
-        mw.execShell('\\cp -a ' + keypath + ' /tmp/backup1.conf')
-        mw.execShell('\\cp -a ' + csrpath + ' /tmp/backup2.conf')
-
-        # 清理旧的证书链
-        if os.path.exists(path + '/README'):
-            mw.execShell('rm -rf ' + path)
-            mw.execShell('rm -rf ' + path + '-00*')
-            mw.execShell('rm -rf /etc/letsencrypt/archive/' + siteName)
-            mw.execShell(
-                'rm -rf /etc/letsencrypt/archive/' + siteName + '-00*')
-            mw.execShell(
-                'rm -f /etc/letsencrypt/renewal/' + siteName + '.conf')
-            mw.execShell('rm -rf /etc/letsencrypt/renewal/' +
-                         siteName + '-00*.conf')
-            mw.execShell('rm -rf ' + path + '/README')
-            mw.execShell('mkdir -p ' + path)
+        mw.backFile(keypath)
+        mw.backFile(csrpath)
 
         mw.writeFile(keypath, key)
         mw.writeFile(csrpath, csr)
@@ -534,8 +520,8 @@ class site_api:
 
         isError = mw.checkWebConfig()
         if(type(isError) == str):
-            mw.execShell('\\cp -a /tmp/backup1.conf ' + keypath)
-            mw.execShell('\\cp -a /tmp/backup2.conf ' + csrpath)
+            mw.restoreFile(keypath)
+            mw.restoreFile(csrpath)
             return mw.returnJson(False, 'ERROR: <br><a style="color:red;">' + isError.replace("\n", '<br>') + '</a>')
 
         mw.writeLog('网站管理', '证书已保存!')
@@ -730,7 +716,7 @@ class site_api:
                     if os.path.exists(proxy_dir_file):
                         return mw.returnJson(False, '检测到您的站点做了反向代理设置，请先关闭反向代理!')
 
-        letpath = self.sslDir + siteName
+        letpath = self.sslDir + '/' + siteName
         csrpath = letpath + "/fullchain.pem"  # 生成证书路径
         keypath = letpath + "/privkey.pem"  # 密钥文件路径
 
@@ -2383,8 +2369,8 @@ location ^~ {from} {
         file = self.getHostConf(siteName)
         conf = mw.readFile(file)
 
-        keyPath = self.sslDir + siteName + '/privkey.pem'
-        certPath = self.sslDir + siteName + '/fullchain.pem'
+        keyPath = self.sslDir + '/' + siteName + '/privkey.pem'
+        certPath = self.sslDir + '/' + siteName + '/fullchain.pem'
         if conf:
             if conf.find('ssl_certificate') == -1:
                 sslStr = """#error_page 404/404.html;
@@ -2407,14 +2393,16 @@ location ^~ {from} {
             if not mw.inArray(tmp, '443'):
                 listen = re.search(rep, conf).group()
                 http_ssl = "\n\tlisten 443 ssl http2;"
-                conf = conf.replace(
-                    listen, listen + http_ssl)
-            shutil.copyfile(file, '/tmp/backup.conf')
+                conf = conf.replace(listen, listen + http_ssl)
+                # http_ssl = "\n\tlisten 443 ssl http2;"
+                # conf = conf.replace(listen, listen + http_ssl)
+
+            mw.backFile(file)
 
             mw.writeFile(file, conf)
             isError = mw.checkWebConfig()
             if(isError != True):
-                shutil.copyfile('/tmp/backup.conf', file)
+                mw.restoreFile(file)
                 return mw.returnData(False, '证书错误: <br><a style="color:red;">' + isError.replace("\n", '<br>') + '</a>')
 
         self.saveCert(keyPath, certPath)
@@ -2430,13 +2418,11 @@ location ^~ {from} {
             certInfo = self.getCertName(certPath)
             if not certInfo:
                 return mw.returnData(False, '证书解析失败!')
-            vpath = self.sslDir + certInfo['subject'].strip()
+            vpath = self.sslDir + '/' + certInfo['subject'].strip()
             if not os.path.exists(vpath):
                 os.system('mkdir -p ' + vpath)
-            mw.writeFile(vpath + '/privkey.pem',
-                         mw.readFile(keyPath))
-            mw.writeFile(vpath + '/fullchain.pem',
-                         mw.readFile(certPath))
+            mw.writeFile(vpath + '/privkey.pem', mw.readFile(keyPath))
+            mw.writeFile(vpath + '/fullchain.pem', mw.readFile(certPath))
             mw.writeFile(vpath + '/info.json', json.dumps(certInfo))
             return mw.returnData(True, '证书保存成功!')
         except Exception as e:

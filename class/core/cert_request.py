@@ -339,16 +339,9 @@ class cert_request:
             return False
 
     def getSiteRunPath(self, domains):
-        '''
-            @name 通过域名列表获取网站运行目录
-            @author hwliang
-            @param domains<list> 域名列表
-            @return None or string
-        '''
         site_id = 0
         for domain in domains:
-            site_id = mw.M('domain').where(
-                "name=?", domain).getField('pid')
+            site_id = mw.M('domain').where("name=?", domain).getField('pid')
             if site_id:
                 break
 
