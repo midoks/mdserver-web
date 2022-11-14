@@ -24,8 +24,8 @@ import os
 import sys
 import argparse
 
-
-os.chdir('/www/server/mdserver-web')
+if os.path.exists('/www/server/mdserver-web'):
+    os.chdir('/www/server/mdserver-web')
 
 import mw
 
@@ -430,7 +430,7 @@ class cert_request:
     # 写验证文件
     def writeAuthFile(self, auth_to, token, acme_keyauthorization):
         try:
-            self.D('writeAuthFile', auth_to)
+            # self.D('writeAuthFile', auth_to)
             acme_path = '{}/.well-known/acme-challenge'.format(auth_to)
             if not os.path.exists(acme_path):
                 os.makedirs(acme_path)
@@ -449,7 +449,6 @@ class cert_request:
             return True
         except:
             err = mw.getTracebackInfo()
-            print(err)
             raise Exception("写入验证文件失败: {}".format(err))
 
     # 设置验证信息
