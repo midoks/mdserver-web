@@ -1798,7 +1798,7 @@ function setCertSsl(certName,siteName){
 
 //ssl
 function setSSL(id,siteName){
-	var sslHtml = '<div class="warning_info mb10 "><p class="">温馨提示：当前站点未开启SSL证书访问，站点访问可能存在风险。<button class="btn btn-success btn-xs ml10 cutTabView">申请证书</button></p></div>\
+	var sslHtml = '<div class="warning_info mb10" style="display:none;"><p class="">温馨提示：当前站点未开启SSL证书访问，站点访问可能存在风险。<button class="btn btn-success btn-xs ml10 cutTabView">申请证书</button></p></div>\
 				<div class="tab-nav" style="margin-top: 10px;">\
 					<span class="on" id="now_ssl" onclick="opSSL(\'now\','+id+',\''+siteName+'\')">当前证书 - <i class="error">[未部署SSL]</i></span>\
 					<span onclick="opSSL(\'lets\','+id+',\''+siteName+'\')">Let\'s Encrypt</span>\

@@ -450,6 +450,7 @@ class site_api:
 
     def getSslApi(self):
         siteName = request.form.get('siteName', '')
+        sslType = request.form.get('sslType', '')
 
         path = self.sslDir + '/' + siteName
         csrpath = path + "/fullchain.pem"  # 生成证书路径
