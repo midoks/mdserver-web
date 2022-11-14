@@ -672,7 +672,10 @@ class site_api:
         # result['key'] = mw.readFile(keypath)
 
         # mw.restartWeb()
-        return mw.returnJson(data['status'], '', data['msg'])
+
+        if not data['status']:
+            return mw.returnJson(data['status'], data['msg'][0], data['msg'])
+        return mw.returnJson(data['status'], data['msg'])
 
     def getAcmeLogsApi(self):
         log_file = mw.getRunDir() + '/logs/acme.log'
