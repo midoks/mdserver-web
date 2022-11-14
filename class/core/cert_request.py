@@ -281,6 +281,18 @@ class cert_request:
         # 如果没有保存上一次的随机数或force=True时则重新获取新的随机数
         if not self.__replay_nonce or force:
             try:
+
+                import urllib.request
+                try:
+                    response = urllib.request.urlopen(self.__apis['newNonce'],
+                                                      timeout=self.__acme_timeout,
+                                                      headers=headers,
+                                                      verify=self.__verify)
+                    self.__replay_nonce = response.headers["replay-nonce"]
+                    return self.__replay_nonce
+                except Exception as e:
+                    pass
+
                 headers = {"User-Agent": self.__user_agent}
                 response = requests.get(self.__apis['newNonce'],
                                         timeout=self.__acme_timeout,
@@ -330,13 +342,12 @@ class cert_request:
 
     def getSiteRunPathByid(self, site_id):
         if mw.M('sites').where('id=?', (site_id,)).count() >= 1:
-            site_path = public.M('sites').where(
-                'id=?', site_id).getField('path')
+            site_path = mw.M('sites').where('id=?', site_id).getField('path')
             if not site_path:
                 return None
             if not os.path.exists(site_path):
                 return None
-            args = public.dict_obj()
+            args = mw.dict_obj()
             args.id = site_id
             import panelSite
             run_path = panelSite.panelSite().GetRunPath(args)
