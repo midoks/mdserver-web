@@ -315,7 +315,7 @@ class cert_request:
         return OpenSSL.crypto.sign(pk, message.encode("utf8"), self.__digest)
 
     def getSiteRunPathByid(self, site_id):
-        if mw.M('sites').where('id=? and project_type=?', (site_id, 'PHP')).count() >= 1:
+        if mw.M('sites').where('id=?', (site_id,)).count() >= 1:
             site_path = public.M('sites').where(
                 'id=?', site_id).getField('path')
             if not site_path:

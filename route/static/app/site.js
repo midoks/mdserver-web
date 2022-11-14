@@ -2044,29 +2044,33 @@ function opSSL(type, id, siteName, callback){
 				layer.close(loadT);
 				var rdata = data['data'];
 
-				var issuer = rdata['cert_data']['issuer'].split(" ");
-				var domains = rdata['cert_data']['dns'].join("、");
+				if (rdata['cert_data']){
+					var issuer = rdata['cert_data']['issuer'].split(" ");
+					var domains = rdata['cert_data']['dns'].join("、");
 
-				var cert_data = "<div class='state_info_flex'>\
-					<div class='state_item'><span>证书品牌：</span><span class='ellipsis_text'>"+issuer[0]+"</span></div>\
-					<div class='state_item'><span>到期时间：</span><span class='btlink'>剩余"+rdata['cert_data']['endtime']+"天到期</span></div>\
-				</div>\
-				<div class='state_info_flex'>\
-					<div class='state_item'><span>认证域名：</span><span class='ellipsis_text'>"+domains+"</span></div>\
-					<div class='state_item'><span>强制HTTPS：</span><span class='switch'>\
-						<input class='btswitch btswitch-ios' id='toHttps' type='checkbox'>\
-	                    <label class='btswitch-btn' for='toHttps' onclick=\"httpToHttps('" + siteName + "')\">\
-					</span></div>\
-				</div>";
-				$(".ssl_state_info").html(cert_data);
-				$(".ssl_state_info").css('display','block');
+					var cert_data = "<div class='state_info_flex'>\
+						<div class='state_item'><span>证书品牌：</span><span class='ellipsis_text'>"+issuer[0]+"</span></div>\
+						<div class='state_item'><span>到期时间：</span><span class='btlink'>剩余"+rdata['cert_data']['endtime']+"天到期</span></div>\
+					</div>\
+					<div class='state_info_flex'>\
+						<div class='state_item'><span>认证域名：</span><span class='ellipsis_text'>"+domains+"</span></div>\
+						<div class='state_item'><span>强制HTTPS：</span><span class='switch'>\
+							<input class='btswitch btswitch-ios' id='toHttps' type='checkbox'>\
+		                    <label class='btswitch-btn' for='toHttps' onclick=\"httpToHttps('" + siteName + "')\">\
+						</span></div>\
+					</div>";
+					$(".ssl_state_info").html(cert_data);
+					$(".ssl_state_info").css('display','block');
+				}
+				console.log(rdata);
+				
 
 				$("#toHttps").attr('checked',rdata.httpTohttps);
-
-				console.log(rdata);
 				if(rdata.status){
+					$('.warning_info').css('display','none');
 					$(".ssl-btn").append("<button class='btn btn-default btn-sm' onclick=\"ocSSL('close_ssl_conf','"+siteName+"')\" style='margin-left:10px'>关闭SSL</button>");
 				}
+
 				if(rdata.key == false) rdata.key = '';
 				if(rdata.csr == false) rdata.csr = '';
 				$("#key").val(rdata.key);

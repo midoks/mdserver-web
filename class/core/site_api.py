@@ -30,32 +30,30 @@ class site_api:
     def __init__(self):
         # nginx conf
         self.setupPath = mw.getServerDir() + '/web_conf'
-        self.vhostPath = vh = self.setupPath + '/nginx/vhost'
-        if not os.path.exists(vh):
-            mw.execShell("mkdir -p " + vh + " && chmod -R 755 " + vh)
-        self.rewritePath = rw = self.setupPath + '/nginx/rewrite'
-        if not os.path.exists(rw):
-            mw.execShell("mkdir -p " + rw + " && chmod -R 755 " + rw)
-        self.passPath = self.setupPath + '/nginx/pass'
-        # if not os.path.exists(pp):
-        #     mw.execShell("mkdir -p " + rw + " && chmod -R 755 " + rw)
 
-        self.redirectPath = self.setupPath + '/nginx/redirect'
-        if not os.path.exists(self.redirectPath):
-            mw.execShell("mkdir -p " + self.redirectPath +
-                         " && chmod -R 755 " + self.redirectPath)
+        self.vhostPath = vhost = self.setupPath + '/nginx/vhost'
+        if not os.path.exists(vhost):
+            mw.execShell("mkdir -p " + vhost + " && chmod -R 755 " + vhost)
+        self.rewritePath = rewrite = self.setupPath + '/nginx/rewrite'
+        if not os.path.exists(rewrite):
+            mw.execShell("mkdir -p " + rewrite + " && chmod -R 755 " + rewrite)
 
-        self.proxyPath = self.setupPath + '/nginx/proxy'
-        if not os.path.exists(self.proxyPath):
-            mw.execShell("mkdir -p " + self.proxyPath +
-                         " && chmod -R 755 " + self.proxyPath)
+        self.passPath = passwd = self.setupPath + '/nginx/pass'
+        if not os.path.exists(passwd):
+            mw.execShell("mkdir -p " + passwd + " && chmod -R 755 " + passwd)
+
+        self.redirectPath = redirect = self.setupPath + '/nginx/redirect'
+        if not os.path.exists(redirect):
+            mw.execShell("mkdir -p " + redirect +
+                         " && chmod -R 755 " + redirect)
+
+        self.proxyPath = proxy = self.setupPath + '/nginx/proxy'
+        if not os.path.exists(proxy):
+            mw.execShell("mkdir -p " + proxy + " && chmod -R 755 " + proxy)
 
         self.logsPath = mw.getRootDir() + '/wwwlogs'
         # ssl conf
-        if mw.isAppleSystem():
-            self.sslDir = self.setupPath + '/letsencrypt/'
-        else:
-            self.sslDir = '/etc/letsencrypt/live/'
+        self.sslDir = self.setupPath + '/ssl'
 
     ##### ----- start ----- ###
     def listApi(self):
