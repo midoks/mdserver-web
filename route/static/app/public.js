@@ -1628,7 +1628,7 @@ function showSpeedWindow(msg, speed_log_func_name, callback){
 	var showSpeedKey = layer.open({
 		title: false,
 		type: 1,
-		closeBtn: 0,
+		closeBtn: 2,
 		shade: 0.3,
 		area: "700px",
 		offset: "30%",
