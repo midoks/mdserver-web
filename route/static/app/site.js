@@ -2130,8 +2130,8 @@ function newSSL(siteName, domains){
 		if ($("#checkDomain").prop("checked")) force = '&force=true';
 		var email = $("input[name='admin_email']").val();
 		$.post('/site/create_let','siteName='+siteName+'&domains='+domains+'&updateOf=1&email='+email + force,function(rdata){
+			layer.close(index);
 			if(rdata.status){
-				layer.close(index);
 				var key = '<div class="myKeyCon ptb15">\
 							<div class="ssl-con-key pull-left mr20">密钥(KEY)<br><textarea id="key" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.data.key+'</textarea></div>\
 							<div class="ssl-con-key pull-left">证书(PEM格式)<br><textarea id="csr" class="bt-input-text" readonly="" style="background-color:#f6f6f6">'+rdata.data.csr+'</textarea></div>\
