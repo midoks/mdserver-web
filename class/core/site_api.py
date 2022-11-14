@@ -800,7 +800,7 @@ class site_api:
         log_file = mw.getRunDir() + '/logs/acme.log'
         mw.writeFile(log_file, "开始ACME申请...\n", "wb+")
         cmd = 'export ACCOUNT_EMAIL=' + email + ' && ' + \
-            execStr + ' >> ' + log_file
+            execStr + ' > ' + log_file
         # print(domains)
         # print(cmd)
         result = mw.execShell(cmd)
