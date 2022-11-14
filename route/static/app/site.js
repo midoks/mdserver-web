@@ -1759,7 +1759,12 @@ function sslAdmin(siteName){
 		var rdata = data['data'];
 		var tbody = '';
 		for(var i=0;i<rdata.length;i++){
-			tbody += '<tr><td>'+rdata[i].subject+'</td><td>'+rdata[i].dns.join('<br>')+'</td><td>'+rdata[i].notAfter+'</td><td>'+rdata[i].issuer+'</td><td style="text-align: right;"><a onclick="setCertSsl(\''+rdata[i].subject+'\',\''+siteName+'\')" class="btlink">部署</a> | <a onclick="removeSsl(\''+rdata[i].subject+'\')" class="btlink">删除</a></td></tr>'
+			tbody += '<tr><td>'+rdata[i].subject+'</td>\
+				<td>'+rdata[i].dns.join('<br>')+'</td>\
+				<td>'+rdata[i].notAfter+'</td>\
+				<td>'+rdata[i].issuer.split(' ')[0]+'</td>\
+				<td style="text-align: right;"><a onclick="setCertSsl(\''+rdata[i].subject+'\',\''+siteName+'\')" class="btlink">部署</a> | <a onclick="removeSsl(\''+rdata[i].subject+'\')" class="btlink">删除</a></td>\
+			</tr>'
 		}
 		var txt = '<div class="mtb15" style="line-height:30px">\
 		<button style="margin-bottom: 7px;display:none;" class="btn btn-success btn-sm">添加</button>\
