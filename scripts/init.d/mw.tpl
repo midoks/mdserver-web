@@ -225,7 +225,9 @@ mw_debug(){
         port=$(cat $mw_path/data/port.pl)
     fi
 
-    cd /www/server/mdserver-web
+    if [ -d /www/server/mdserver-web ];then
+        cd /www/server/mdserver-web
+    fi
     gunicorn -b :$port -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1  app:app
 }
 
