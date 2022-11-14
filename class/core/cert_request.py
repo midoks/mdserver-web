@@ -282,8 +282,10 @@ class cert_request:
         if not self.__replay_nonce or force:
             try:
                 headers = {"User-Agent": self.__user_agent}
-                response = requests.get(self.__apis[
-                                        'newNonce'], timeout=self.__acme_timeout, headers=headers, verify=self.__verify)
+                response = requests.get(self.__apis['newNonce'],
+                                        timeout=self.__acme_timeout,
+                                        headers=headers,
+                                        verify=self.__verify)
 
                 self.__replay_nonce = response.headers["replay-nonce"]
             except Exception as e:
