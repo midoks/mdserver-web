@@ -278,6 +278,7 @@ class cert_request:
 
     # 获取随机数
     def getNonce(self, force=False):
+        return '1AADXO5Sdc3EzuOS8ViYj-MVdhgx3DRE2kSDSwrObJ1jG_w'
         # 如果没有保存上一次的随机数或force=True时则重新获取新的随机数
         if not self.__replay_nonce or force:
             try:
