@@ -277,10 +277,14 @@ class cert_request:
     def getNonce(self, force=False):
         # 如果没有保存上一次的随机数或force=True时则重新获取新的随机数
         if not self.__replay_nonce or force:
-            headers = {"User-Agent": self.__user_agent}
-            response = requests.get(self.__apis[
-                                    'newNonce'], timeout=self.__acme_timeout, headers=headers, verify=self.__verify)
-            self.__replay_nonce = response.headers["Replay-Nonce"]
+            try:
+                headers = {"User-Agent": self.__user_agent}
+                response = requests.get(self.__apis[
+                                        'newNonce'], timeout=self.__acme_timeout, headers=headers, verify=self.__verify)
+                self.__replay_nonce = response.headers["Replay-Nonce"]
+            except Exception as e:
+                raise Exception("获取随机数失败: {}".format(str(e)))
+
         return self.__replay_nonce
 
     # 获请ACME请求头
