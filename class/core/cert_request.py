@@ -77,6 +77,9 @@ class cert_request:
     __cfg_file = 'data/letsencrypt.json'
 
     def __init__(self):
+        self.__save_path = mw.getServerDir() + '/web_conf/letsencrypt'
+        if not os.path.exists(self.__save_path):
+            os.makedirs(self.__save_path)
         if self.__debug:
             self.__url = 'https://acme-staging-v02.api.letsencrypt.org/directory'
         else:
