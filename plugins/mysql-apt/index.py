@@ -2342,13 +2342,13 @@ def installPreInspection(version):
     if not sysName in ('debian', 'ubuntu'):
         return '仅支持debian,ubuntu'
 
-    if not (sysName == 'debian' and not sysId in('11', '10')):
+    if (sysName == 'debian' and not sysId in('11', '10')):
         return 'debian支持10,11'
 
-    if not (sysName == 'ubuntu' and version == '5.7' and not sysId in ('18.04')):
+    if (sysName == 'ubuntu' and version == '5.7' and not sysId in ('18.04')):
         return 'ubuntu支持18.04'
 
-    if not (sysName == 'ubuntu' and version == '8.0' and not sysId in ('18.04', '20.04', '22.04')):
+    if (sysName == 'ubuntu' and version == '8.0' and not sysId in ('18.04', '20.04', '22.04')):
         return 'ubuntu支持18.04,20.04,22.04'
     return 'ok'
 
