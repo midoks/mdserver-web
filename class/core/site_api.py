@@ -657,8 +657,8 @@ class site_api:
         }
 
         # print(to_args)
-        import cert_request
-        data = cert_request.cert_request().applyCertApi(to_args)
+        import cert_api
+        data = cert_api.cert_api().applyCertApi(to_args)
 
         # letpath = self.sslDir + '/' +siteName
         # csrpath = letpath + "/fullchain.pem"  # 生成证书路径

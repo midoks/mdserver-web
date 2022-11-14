@@ -385,7 +385,7 @@ def index(reqClass=None, reqAction=None, reqData=None):
             reqClass = 'index'
 
         pageFile = ('config', 'control', 'crontab', 'files', 'firewall',
-                    'index', 'plugins', 'login', 'system', 'site', 'ssl', 'task', 'soft')
+                    'index', 'plugins', 'login', 'system', 'site', 'cert', 'ssl', 'task', 'soft')
 
         if reqClass == 'login':
             token = request.args.get('tmp_token', '').strip()
