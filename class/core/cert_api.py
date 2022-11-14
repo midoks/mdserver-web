@@ -60,7 +60,7 @@ def writeLog(log_str, mode="ab+"):
     return True
 
 
-class cert_request:
+class cert_api:
     __debug = False
     __user_agent = "MW-Panel"
     __apis = None
