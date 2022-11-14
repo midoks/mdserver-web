@@ -1614,7 +1614,7 @@ function showSpeed(filename) {
     	// 	return;
     	// }
 		if (rdata.status) {
-			$("#speed_log_lst").text(rdata.data);
+			$("#speed_log_lst").html(rdata.data);
 			$("#speed_log_lst").scrollTop($("#speed_log_lst")[0].scrollHeight);
 		}
 		setTimeout(function () { showSpeed(filename); }, 1000);
