@@ -522,7 +522,7 @@ class cert_request:
 
     # 更新随机数
     def updateReplayNonce(self, res):
-        replay_nonce = res.headers.get('Replay-Nonce')
+        replay_nonce = res.headers.get('replay-nonce')
         if replay_nonce:
             self.__replay_nonce = replay_nonce
 
