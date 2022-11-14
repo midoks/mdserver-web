@@ -292,8 +292,9 @@ class cert_request:
 
     # 获请ACME请求头
     def getAcmeHeader(self, url):
-        header = {"alg": "RS256", "nonce": self.getNonce(
-            force=True), "url": url}
+        nonce = self.getNonce(force=True)
+
+        header = {"alg": "RS256", "nonce": nonce, "url": url}
         if url in [self.__apis['newAccount'], 'GET_THUMBPRINT']:
             from cryptography.hazmat.backends import default_backend
             from cryptography.hazmat.primitives import serialization
