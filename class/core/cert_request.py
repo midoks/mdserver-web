@@ -660,6 +660,7 @@ class cert_request:
 
     # 创建订单
     def createOrder(self, domains, auth_type, auth_to, index=None):
+        self.getNonce(force=True)
         domains = self.formatDomains(domains)
         if not domains:
             raise Exception("至少需要有一个域名")
@@ -676,7 +677,6 @@ class cert_request:
             if 'type' in e_body:
                 # 如果随机数失效
                 if e_body['type'].find('error:badNonce') != -1:
-                    self.getNonce(force=True)
                     res = self.acmeRequest(self.__apis['newOrder'], payload)
 
                 # 如果帐户失效
@@ -684,7 +684,6 @@ class cert_request:
                     k = self._mod_index[self.__debug]
                     del(self.__config['account'][k])
                     self.getKid()
-                    self.getNonce(force=True)
                     res = self.acmeRequest(self.__apis['newOrder'], payload)
             if not res.status_code in [201]:
                 a_auth = res.json()
