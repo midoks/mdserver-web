@@ -295,7 +295,7 @@ class cert_request:
 
     # 获请ACME请求头
     def getAcmeHeader(self, url):
-        nonce = self.getNonce(force=True)
+        nonce = self.getNonce()
 
         header = {"alg": "RS256", "nonce": nonce, "url": url}
         if url in [self.__apis['newAccount'], 'GET_THUMBPRINT']:
@@ -546,7 +546,11 @@ class cert_request:
             {"protected": protected64, "payload": payload64, "signature": signature64})
         headers.update({"Content-Type": "application/jose+json"})
         response = requests.post(
-            url, data=data.encode("utf8"), timeout=self.__acme_timeout, headers=headers, verify=self.__verify
+            url,
+            data=data.encode("utf8"),
+            timeout=self.__acme_timeout,
+            headers=headers,
+            verify=self.__verify
         )
         # 更新随机数
         self.updateReplayNonce(response)
