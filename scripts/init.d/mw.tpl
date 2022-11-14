@@ -127,19 +127,19 @@ mw_stop()
 
 mw_status()
 {
-        isStart=$(ps aux|grep 'gunicorn -c setting.py app:app'|grep -v grep|awk '{print $2}')
-        if [ "$isStart" != '' ];then
-                echo -e "\033[32mmw (pid $(echo $isStart)) already running\033[0m"
-        else
-                echo -e "\033[31mmw not running\033[0m"
-        fi
-        
-        isStart=$(ps aux |grep 'task.py'|grep -v grep|awk '{print $2}')
-        if [ "$isStart" != '' ];then
-                echo -e "\033[32mmw-task (pid $isStart) already running\033[0m"
-        else
-                echo -e "\033[31mmw-task not running\033[0m"
-        fi
+    isStart=$(ps aux|grep 'gunicorn -c setting.py app:app'|grep -v grep|awk '{print $2}')
+    if [ "$isStart" != '' ];then
+        echo -e "\033[32mmw (pid $(echo $isStart)) already running\033[0m"
+    else
+        echo -e "\033[31mmw not running\033[0m"
+    fi
+    
+    isStart=$(ps aux |grep 'task.py'|grep -v grep|awk '{print $2}')
+    if [ "$isStart" != '' ];then
+        echo -e "\033[32mmw-task (pid $isStart) already running\033[0m"
+    else
+        echo -e "\033[31mmw-task not running\033[0m"
+    fi
 }
 
 
@@ -157,12 +157,12 @@ mw_reload()
         cd $mw_path && gunicorn -c setting.py app:app
         isStart=`ps aux|grep 'gunicorn -c setting.py app:app'|grep -v grep|awk '{print $2}'`
         if [ "$isStart" == '' ];then
-                echo -e "\033[31mfailed\033[0m"
-                echo '------------------------------------------------------'
-                tail -n 20 $mw_path/logs/error.log
-                echo '------------------------------------------------------'
-                echo -e "\033[31mError: mw service startup failed.\033[0m"
-                return;
+            echo -e "\033[31mfailed\033[0m"
+            echo '------------------------------------------------------'
+            tail -n 20 $mw_path/logs/error.log
+            echo '------------------------------------------------------'
+            echo -e "\033[31mError: mw service startup failed.\033[0m"
+            return;
         fi
         echo -e "\033[32mdone\033[0m"
     else
