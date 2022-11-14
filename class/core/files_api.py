@@ -343,7 +343,7 @@ class files_api:
 
     def closeRecycleBinApi(self):
         rPath = self.rPath
-        os.system('which chattr && chattr -R -i ' + rPath)
+        mw.execShell('which chattr && chattr -R -i ' + rPath)
         rlist = os.listdir(rPath)
         i = 0
         l = len(rlist)
