@@ -657,6 +657,8 @@ class site_api:
         }
 
         # print(to_args)
+
+        socketio.sleep(0)
         import cert_api
         data = cert_api.cert_api().applyCertApi(to_args)
 
