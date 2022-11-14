@@ -1418,11 +1418,10 @@ fullchain.pem       粘贴到证书输入框
         if not cert:
             exit()
 
-        print(cert)
-
+        # print(cert)
         if not cert['status']:
-            writeLog(cert['status']['msg'][0])
-            return
+            writeLog(cert['status']['msg'])
+            exit()
         writeLog("=" * 65)
         writeLog("|-证书获取成功!")
         writeLog("=" * 65)
