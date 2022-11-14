@@ -66,7 +66,7 @@ if not os.path.exists('data/admin_path.pl'):
     mw.writeFile('data/admin_path.pl', '/' + admin_path.lower())
 
 if workers > 2:
-    workers = 2
+    workers = 1
 
 threads = workers * 1
 backlog = 512
