@@ -1080,12 +1080,11 @@ fullchain.pem       粘贴到证书输入框
     def downloadCert(self, index):
         res = self.acmeRequest(
             self.__config['orders'][index]['certificate_url'], "")
-        if res.status_code not in [200, 201]:
-            raise Exception("下载证书失败: {}".format(res.json()))
 
-        pem_certificate = res.content
-        if type(pem_certificate) == bytes:
-            pem_certificate = pem_certificate.decode('utf-8')
+        pem_certificate = res.read().decode('utf-8')
+        if res.status not in [200, 201]:
+            raise Exception("下载证书失败: {}".format(json.loads(pem_certificate)))
+
         cert = self.splitCaData(pem_certificate)
         cert['cert_timeout'] = self.getCertTimeout(cert['cert'])
         cert['private_key'] = self.__config['orders'][index]['private_key']
@@ -1411,7 +1410,7 @@ fullchain.pem       粘贴到证书输入框
 
         self.getApis()
         res = self.acmeRequest(self.__apis['revokeCert'], payload)
-        if res.status_code in [200, 201]:
+        if res.status in [200, 201]:
             if os.path.exists(cert_path):
                 mw.execShell("rm -rf {}".format(cert_path))
             del(self.__config['orders'][index])
