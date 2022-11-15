@@ -614,7 +614,6 @@ class site_api:
 
     def createLetApi(self):
         siteName = request.form.get('siteName', '')
-        updateOf = request.form.get('updateOf', '')
         domains = request.form.get('domains', '')
         force = request.form.get('force', '')
         renew = request.form.get('renew', '')
@@ -656,13 +655,10 @@ class site_api:
             'auth_to': auth_to,
         }
 
-        # print(to_args)
-        from route import socketio
-        socketio.sleep(0)
         import cert_api
         data = cert_api.cert_api().applyCertApi(to_args)
 
-        # letpath = self.sslDir + '/' +siteName
+        # letpath = self.sslDir + '/' + siteName
         # csrpath = letpath + "/fullchain.pem"  # 生成证书路径
         # keypath = letpath + "/privkey.pem"  # 密钥文件路径
 

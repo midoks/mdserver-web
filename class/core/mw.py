@@ -556,6 +556,11 @@ def HttpGet2(url, timeout):
     import urllib.request
 
     try:
+        import ssl
+        try:
+            ssl._create_default_https_context = ssl._create_unverified_context
+        except:
+            pass
         req = urllib.request.urlopen(url, timeout=timeout)
         result = req.read().decode('utf-8')
         return result

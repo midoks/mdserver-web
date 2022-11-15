@@ -35,6 +35,11 @@ except:
     mw.execShell("pip install pyopenssl")
     import OpenSSL
 
+# import http_requests as requests
+# requests.DEFAULT_TYPE = 'curl'
+import requests
+requests.packages.urllib3.disable_warnings()
+
 
 def echoErr(msg):
     writeLog("\033[31m=" * 65)
@@ -55,7 +60,7 @@ def writeLog(log_str, mode="ab+"):
     return True
 
 
-class cert_api:
+class cert_request:
     __debug = False
     __user_agent = "MW-Panel"
     __apis = None
@@ -271,55 +276,30 @@ class cert_api:
             self.__config = self.readConfig()
         return self.__config['account'][k]['kid']
 
-    def requestsGet(self, url, timeout):
-        try:
-            import urllib.request
-            import ssl
-            try:
-                ssl._create_default_https_context = ssl._create_unverified_context
-            except:
-                pass
-
-            headers = {"User-Agent": self.__user_agent}
-            req = urllib.request.Request(url=url, headers=headers)
-            req = urllib.request.urlopen(url, timeout=timeout)
-            return req
-        except Exception as ex:
-            raise Exception("requestsGet: {}".format(str(ex)))
-
-    def requestsPost(self, url, data, timeout):
-        try:
-            import urllib.request
-            import ssl
-            try:
-                ssl._create_default_https_context = ssl._create_unverified_context
-            except:
-                pass
-
-            headers = {"User-Agent": self.__user_agent}
-            headers.update({"Content-Type": "application/jose+json"})
-            data = bytes(data, encoding="utf8")
-            req = urllib.request.Request(
-                url, data, headers=headers, method='POST')
-            response = urllib.request.urlopen(req, timeout=timeout)
-            return response
-        except Exception as ex:
-            raise Exception("requestsPost: {}".format(str(ex)))
-
-    def getRequestJson(self, response):
-        try:
-            data = response.read().decode('utf-8')
-            return json.loads(data)
-        except Exception as ex:
-            raise Exception("getRequestJson: {}".format(str(ex)))
-
+    # 获取随机数
     def getNonce(self, force=False):
-        # 获取随机数
+        return '1AADXO5Sdc3EzuOS8ViYj-MVdhgx3DRE2kSDSwrObJ1jG_w'
         # 如果没有保存上一次的随机数或force=True时则重新获取新的随机数
         if not self.__replay_nonce or force:
             try:
-                response = self.requestsGet(
-                    self.__apis['newNonce'], timeout=self.__acme_timeout)
+
+                import urllib.request
+                try:
+                    response = urllib.request.urlopen(self.__apis['newNonce'],
+                                                      timeout=self.__acme_timeout,
+                                                      headers=headers,
+                                                      verify=self.__verify)
+                    self.__replay_nonce = response.headers["replay-nonce"]
+                    return self.__replay_nonce
+                except Exception as e:
+                    pass
+
+                headers = {"User-Agent": self.__user_agent}
+                response = requests.get(self.__apis['newNonce'],
+                                        timeout=self.__acme_timeout,
+                                        headers=headers,
+                                        verify=self.__verify)
+
                 self.__replay_nonce = response.headers["replay-nonce"]
             except Exception as e:
                 raise Exception("获取随机数失败: {}".format(str(e)))
@@ -521,10 +501,10 @@ class cert_api:
         auths = []
         for auth_url in self.__config['orders'][index]['authorizations']:
             res = self.acmeRequest(auth_url, "")
-            if res.status not in [200, 201]:
+            if res.status_code not in [200, 201]:
                 raise Exception("获取授权失败: {}".format(res.json()))
 
-            s_body = self.getRequestJson(res)
+            s_body = res.json()
             if 'status' in s_body:
                 if s_body['status'] in ['invalid']:
                     raise Exception("无效订单，此订单当前为验证失败状态!")
@@ -574,15 +554,16 @@ class cert_api:
         signature = self.signMessage(
             message="{0}.{1}".format(protected64, payload64))  # bytes
         signature64 = self.calculateSafeBase64(signature)  # str
-        data = json.dumps({
-            "protected": protected64,
-            "payload": payload64,
-            "signature": signature64
-        })
-
+        data = json.dumps(
+            {"protected": protected64, "payload": payload64, "signature": signature64})
         headers.update({"Content-Type": "application/jose+json"})
-        response = self.requestsPost(
-            url, data=data, timeout=self.__acme_timeout)
+        response = requests.post(
+            url,
+            data=data.encode("utf8"),
+            timeout=self.__acme_timeout,
+            headers=headers,
+            verify=self.__verify
+        )
         # 更新随机数
         self.updateReplayNonce(response)
         return response
@@ -691,8 +672,8 @@ class cert_api:
 
         # 请求创建订单
         res = self.acmeRequest(self.__apis['newOrder'], payload)
-        if not res.status in [201]:  # 如果创建失败
-            e_body = self.getRequestJson(res)
+        if not res.status_code in [201]:  # 如果创建失败
+            e_body = res.json()
             if 'type' in e_body:
                 # 如果随机数失效
                 if e_body['type'].find('error:badNonce') != -1:
@@ -714,7 +695,7 @@ class cert_api:
                     ret_title, json.dumps(a_auth)))
 
         # 返回验证地址和验证
-        s_json = self.getRequestJson(res)
+        s_json = res.json()
         s_json['auth_type'] = auth_type
         s_json['domains'] = domains
         s_json['auth_to'] = auth_to
@@ -723,17 +704,14 @@ class cert_api:
 
     # 检查验证状态
     def checkAuthStatus(self, url, desired_status=None):
-
         desired_status = desired_status or ["pending", "valid", "invalid"]
         number_of_checks = 0
-        rdata = None
         while True:
             if desired_status == ['valid', 'invalid']:
                 writeLog("|-第{}次查询验证结果..".format(number_of_checks + 1))
                 time.sleep(self.__wait_time)
             check_authorization_status_response = self.acmeRequest(url, "")
-            a_auth = rdata = self.getRequestJson(
-                check_authorization_status_response)
+            a_auth = check_authorization_status_response.json()
             authorization_status = a_auth["status"]
             number_of_checks += 1
             if authorization_status in desired_status:
@@ -768,7 +746,7 @@ class cert_api:
                 )
         if desired_status == ['valid', 'invalid']:
             writeLog("|-验证成功!")
-        return rdata
+        return check_authorization_status_response
 
     # 发送验证请求
     def respondToChallenge(self, auth):
@@ -812,7 +790,7 @@ class cert_api:
         # 开始验证
         for auth in self.__config['orders'][index]['auths']:
             res = self.checkAuthStatus(auth['url'])  # 检查是否需要验证
-            if res['status'] == 'pending':
+            if res.json()['status'] == 'pending':
                 if auth['type'] == 'dns':  # 尝试提前验证dns解析
                     self.checkDns(
                         "_acme-challenge.{}".format(
@@ -1285,18 +1263,6 @@ fullchain.pem       粘贴到证书输入框
                 write_log("|-[{}]续签失败".format(siteName))
 
     # 外部API - START ----------------------------------------------------------
-    def getHostConf(self, siteName):
-        return mw.getServerDir() + '/web_conf/nginx/vhost/' + siteName + '.conf'
-
-    def getSitePath(self, siteName):
-        file = self.getHostConf(siteName)
-        if os.path.exists(file):
-            conf = mw.readFile(file)
-            rep = '\s*root\s*(.+);'
-            path = re.search(rep, conf).groups()[0]
-            return path
-        return ''
-
     def applyCertApi(self, args):
         '''
         申请证书 - api
@@ -1468,19 +1434,15 @@ fullchain.pem       粘贴到证书输入框
 # exp:
 '''
 // create
-python3 class/core/cert_api.py --domain=dev38.cachecha.com --type=http --path=/www/wwwroot/dev38.cachecha.com
+python3 class/core/cert_request.py --domain=dev38.cachecha.com --type=http --path=/www/wwwroot/dev38.cachecha.com
 // renew
-cd /www/server/mdserver-web && python3 class/core/cert_api.py --renew=1
+cd /www/server/mdserver-web && python3 class/core/cert_request.py --renew=1
 // revoke
-cd /www/server/mdserver-web && python3 class/core/cert_api.py --revoke=1 --index=370423ed29481b2caf22e36d90a6894a
-
-
+cd /www/server/mdserver-web && python3 class/core/cert_request.py --revoke=1 --index=370423ed29481b2caf22e36d90a6894a
 
 python3 class/core/cert_request.py --domain=dev38.cachecha.com --type=http --path=/Users/midoks/Desktop/mwdev/wwwroot/test
-
-python3 class/core/cert_api.py --domain=dev38.cachecha.com --type=http --path=/Users/midoks/Desktop/mwdev/wwwroot/test
-python3 class/core/cert_api.py --renew=1
-python3 class/core/cert_api.py --revoke=1 --index=370423ed29481b2caf22e36d90a6894a
+python3 class/core/cert_request.py --renew=1
+python3 class/core/cert_request.py --revoke=1 --index=370423ed29481b2caf22e36d90a6894a
 '''
 if __name__ == "__main__":
     p = argparse.ArgumentParser(usage="必要的参数：--domain 域名列表，多个以逗号隔开!")
@@ -1493,7 +1455,7 @@ if __name__ == "__main__":
     p.add_argument('--revoke', default=None, help="吊销证书", dest="revoke")
 
     args = p.parse_args()
-    cr = cert_api()
+    cr = cert_request()
 
     if args.revoke:
         if not args.index:
