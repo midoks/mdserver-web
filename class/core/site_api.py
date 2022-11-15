@@ -25,7 +25,8 @@ class site_api:
     passPath = None
     rewritePath = None
     redirectPath = None
-    sslDir = None  # ssl目录
+    sslDir = None       # ssl目录
+    sslLetsDir = None   # lets ssl目录
 
     def __init__(self):
         # nginx conf
@@ -54,6 +55,10 @@ class site_api:
         self.logsPath = mw.getRootDir() + '/wwwlogs'
         # ssl conf
         self.sslDir = self.setupPath + '/ssl'
+        self.sslLetsDir = self.setupPath + '/letsencrypt'
+        if not os.path.exists(self.sslLetsDir):
+            mw.execShell("mkdir -p " + self.sslLetsDir +
+                         " && chmod -R 755 " + self.sslLetsDir)
 
     ##### ----- start ----- ###
     def listApi(self):
@@ -139,8 +144,8 @@ class site_api:
         path = self.setupPath + '/stop'
         if not os.path.exists(path):
             os.makedirs(path)
-            mw.writeFile(path + '/index.html',
-                         'The website has been closed!!!')
+            default_text = 'The website has been closed!!!'
+            mw.writeFile(path + '/index.html', default_text)
 
         binding = mw.M('binding').where('pid=?', (mid,)).field(
             'id,pid,domain,path,port,addtime').select()
@@ -449,39 +454,48 @@ class site_api:
             return mw.returnJson(True, 'OK', [])
 
     def getSslApi(self):
-        siteName = request.form.get('siteName', '')
-        sslType = request.form.get('sslType', '')
+        site_name = request.form.get('site_name', '')
+        ssl_type = request.form.get('ssl_type', '')
 
-        path = self.sslDir + '/' + siteName
-        csrpath = path + "/fullchain.pem"  # 生成证书路径
-        keypath = path + "/privkey.pem"  # 密钥文件路径
-        key = mw.readFile(keypath)
-        csr = mw.readFile(csrpath)
+        path = self.sslDir + '/' + site_name
 
-        file = self.getHostConf(siteName)
-        conf = mw.readFile(file)
+        file = self.getHostConf(site_name)
+        content = mw.readFile(file)
 
-        keyText = 'ssl_certificate'
+        key_text = 'ssl_certificate'
         status = True
         stype = 0
-        if(conf.find(keyText) == -1):
+        if content.find(key_text) == -1:
             status = False
             stype = -1
 
-        toHttps = self.isToHttps(siteName)
-        sid = mw.M('sites').where("name=?", (siteName,)).getField('id')
+        to_https = self.isToHttps(site_name)
+        sid = mw.M('sites').where("name=?", (site_name,)).getField('id')
         domains = mw.M('domain').where("pid=?", (sid,)).field('name').select()
 
-        certData = self.getCertName(csrpath)
+        csr_path = path + '/fullchain.pem'  # 生成证书路径
+        key_path = path + '/privkey.pem'    # 密钥文件路径
 
+        cert_data = None
+        if ssl_type == 'lets':
+            csr_path = self.sslLetsDir + '/' + site_name + '/fullchain.pem'  # 生成证书路径
+            key_path = self.sslLetsDir + '/' + site_name + '/privkey.pem'    # 密钥文件路径
+        elif ssl_type == 'acme':
+            csr_path = mw.getAcmeDir() + '/' + site_name + '/fullchain.csr'  # 生成证书路径
+            key_path = mw.getAcmeDir() + '/' + site_name + '/' + \
+                site_name + '.key'    # 密钥文件路径
+
+        key = mw.readFile(key_path)
+        csr = mw.readFile(csr_path)
+        cert_data = self.getCertName(csr_path)
         data = {
             'status': status,
             'domain': domains,
             'key': key,
             'csr': csr,
             'type': stype,
-            'httpTohttps': toHttps,
-            'cert_data': certData,
+            'httpTohttps': to_https,
+            'cert_data': cert_data,
         }
         return mw.returnJson(True, 'OK', data)
 
@@ -735,20 +749,13 @@ class site_api:
         srcPath = siteInfo['path']
 
         # 检测acme是否安装
-        if mw.isAppleSystem():
-            user = mw.execShell(
-                "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
-            acme = '/Users/' + user + '/.acme.sh/acme.sh'
-        else:
-            acme = '/root/.acme.sh/acme.sh'
-        if not os.path.exists(acme):
-            acme = '/.acme.sh/acme.sh'
-        if not os.path.exists(acme):
+        acme_dir = mw.getAcmeDir()
+        if not os.path.exists(acme_dir):
             try:
                 mw.execShell("curl -sS curl https://get.acme.sh | sh")
             except:
                 pass
-        if not os.path.exists(acme):
+        if not os.path.exists(acme_dir):
             return mw.returnJson(False, '尝试自动安装ACME失败,请通过以下命令尝试手动安装<p>安装命令: curl https://get.acme.sh | sh</p>')
 
         # 避免频繁执行
@@ -814,17 +821,7 @@ class site_api:
             data['status'] = False
             return mw.getJson(data)
 
-        src_path = '/root/.acme.sh/' + domains[0]
-        if not os.path.exists(home_cert):
-            src_path = '/.acme.sh/' + domains[0]
-
-        if mw.isAppleSystem():
-            user = mw.execShell(
-                "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
-            acme = '/Users/' + user + '/.acme.sh'
-            if not os.path.exists(src_path):
-                src_path = acme + '/' + domains[0]
-
+        src_path = acme_dir + '/' + domains[0]
         src_cert = src_path + '/fullchain.cer'
         src_key = src_path + '/' + domains[0] + '.key'
 
