@@ -674,7 +674,7 @@ class site_api:
 
         if not os.path.exists(dst_letpath):
             mw.execShell('mkdir -p ' + dst_letpath)
-            mw.execShell('ln - sf "' + src_letpath + '" "' + dst_csrpath + '"')
+            mw.execShell('ln -sf "' + src_letpath + '" "' + dst_csrpath + '"')
             mw.execShell('ln -sf "' + src_keypath + '" "' + dst_keypath + '"')
             mw.execShell('echo "let" > "' + dst_letpath + '/README"')
 
