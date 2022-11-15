@@ -57,7 +57,7 @@ def writeLog(log_str, mode="ab+"):
 
 class cert_api:
     __debug = False
-    __user_agent = "MW-Panel-R"
+    __user_agent = "MW-Panel"
     __apis = None
     __url = None
     __replay_nonce = None
@@ -75,6 +75,7 @@ class cert_api:
     __cfg_file = 'data/letsencrypt.json'
 
     def __init__(self):
+        self.__user_agent = 'MW-Panel:' + mw.getRandomString(8)
         self.__save_path = mw.getServerDir() + '/web_conf/letsencrypt'
         if not os.path.exists(self.__save_path):
             os.makedirs(self.__save_path)
