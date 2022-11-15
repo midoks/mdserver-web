@@ -886,14 +886,14 @@ class cert_api:
         payload = {"csr": self.calculateSafeBase64(csr)}
         send_csr_response = self.acmeRequest(
             url=self.__config['orders'][index]['finalize'], payload=payload)
-        if send_csr_response.status_code not in [200, 201]:
+        send_csr_response_json = self.getRequestJson(send_csr_response)
+        if send_csr_response.status not in [200, 201]:
             raise ValueError(
                 "错误： 发送CSR: 响应状态{status_code} 响应值:{response}".format(
-                    status_code=send_csr_response.status_code,
-                    response=send_csr_response.json(),
+                    status_code=send_csr_response.status,
+                    response=send_csr_response_json,
                 )
             )
-        send_csr_response_json = send_csr_response.json()
         certificate_url = send_csr_response_json["certificate"]
         self.__config['orders'][index]['certificate_url'] = certificate_url
         self.saveConfig()
