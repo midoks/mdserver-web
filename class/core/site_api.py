@@ -679,9 +679,10 @@ class site_api:
             mw.execShell('echo "let" > "' + dst_letpath + '/README"')
 
         # 写入配置文件
-        # result = self.setSslConf(siteName)
-        # if not result['status']:
-        #     return mw.getJson(result)
+        result = self.setSslConf(siteName)
+        if not result['status']:
+            return mw.getJson(result)
+
         result['csr'] = mw.readFile(src_csrpath)
         result['key'] = mw.readFile(src_keypath)
         return mw.returnJson(data['status'], data['msg'], result)
