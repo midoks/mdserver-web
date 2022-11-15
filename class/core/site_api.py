@@ -676,6 +676,12 @@ class site_api:
             msg = data['msg']
             if type(data['msg']) != str:
                 msg = data['msg'][0]
+                + '<p><span>响应状态:</span>' + \
+                    data['msg'][1]['challenges'][0]['error']['status'] + '</p>'
+                + '<p><span>错误类型:</span>' + \
+                    data['msg'][1]['challenges'][0]['error']['type'] + '</p>'
+                + '<p><span>错误代码:</span>' + \
+                    data['msg'][1]['challenges'][0]['error']['detail'] + '</p>'
             return mw.returnJson(data['status'], msg, data['msg'])
 
         src_letpath = mw.getServerDir() + '/web_conf/letsencrypt/' + siteName
