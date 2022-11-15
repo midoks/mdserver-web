@@ -770,9 +770,9 @@ class site_api:
             force_bool = True
 
         if renew == 'true':
-            execStr = acme + " --renew --yes-I-know-dns-manual-mode-enough-go-ahead-please"
+            execStr = acme_dir + "/acme.sh --renew --yes-I-know-dns-manual-mode-enough-go-ahead-please"
         else:
-            execStr = acme + " --issue --force"
+            execStr = acme_dir + "/acme.sh --issue --force"
 
         # 确定主域名顺序
         domainsTmp = []
