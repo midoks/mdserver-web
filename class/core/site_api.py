@@ -2359,6 +2359,15 @@ location ^~ {from} {
             rootPath = mw.getWwwDir() + '/' + webname
             mw.execShell('rm -rf ' + rootPath)
 
+        # ssl
+        ssl_dir = self.sslDir + '/' + webname
+        if os.path.exists(ssl_dir):
+            mw.execShell('rm -rf ' + ssl_dir)
+
+        ssl_acme_dir = mw.getAcmeDir() + '/' + webname
+        if os.path.exists(ssl_acme_dir):
+            mw.execShell('rm -rf ' + ssl_acme_dir)
+
         mw.M('sites').where("id=?", (sid,)).delete()
         mw.restartWeb()
         return mw.returnJson(True, '站点删除成功!')
