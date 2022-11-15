@@ -695,7 +695,6 @@ class site_api:
 
     def createAcmeApi(self):
         siteName = request.form.get('siteName', '')
-        updateOf = request.form.get('updateOf', '')
         domains = request.form.get('domains', '')
         force = request.form.get('force', '')
         renew = request.form.get('renew', '')
@@ -730,11 +729,6 @@ class site_api:
                     if os.path.exists(proxy_dir_file):
                         return mw.returnJson(False, '检测到您的站点做了反向代理设置，请先关闭反向代理!')
 
-        letpath = self.sslDir + '/' + siteName
-        csrpath = letpath + "/fullchain.pem"  # 生成证书路径
-        keypath = letpath + "/privkey.pem"  # 密钥文件路径
-
-        actionstr = updateOf
         siteInfo = mw.M('sites').where(
             'name=?', (siteName,)).field('id,name,path').find()
         path = self.getSitePath(siteName)
@@ -792,24 +786,6 @@ class site_api:
         if domainCount == 0:
             return mw.returnJson(False, '请选择域名(不包括IP地址与泛域名)!')
 
-        home_path = '/root/.acme.sh/' + domains[0]
-        home_cert = home_path + '/fullchain.cer'
-        home_key = home_path + '/' + domains[0] + '.key'
-
-        if not os.path.exists(home_cert):
-            home_path = '/.acme.sh/' + domains[0]
-            home_cert = home_path + '/fullchain.cer'
-            home_key = home_path + '/' + domains[0] + '.key'
-
-        if mw.isAppleSystem():
-            user = mw.execShell(
-                "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
-            acme = '/Users/' + user + '/.acme.sh/'
-            if not os.path.exists(home_cert):
-                home_path = acme + domains[0]
-                home_cert = home_path + '/fullchain.cer'
-                home_key = home_path + '/' + domains[0] + '.key'
-
         # print home_cert
         log_file = mw.getRunDir() + '/logs/acme.log'
         mw.writeFile(log_file, "开始ACME申请...\n", "wb+")
@@ -838,23 +814,39 @@ class site_api:
             data['status'] = False
             return mw.getJson(data)
 
-        if not os.path.exists(letpath):
-            mw.execShell("mkdir -p " + letpath)
-        mw.execShell("ln -sf \"" + home_cert + "\" \"" + csrpath + '"')
-        mw.execShell("ln -sf \"" + home_key + "\" \"" + keypath + '"')
-        mw.execShell('echo "acme" > "' + letpath + '/README"')
-        if(actionstr == '2'):
-            return mw.returnJson(True, '证书已更新!')
+        src_path = '/root/.acme.sh/' + domains[0]
+        if not os.path.exists(home_cert):
+            src_path = '/.acme.sh/' + domains[0]
+
+        if mw.isAppleSystem():
+            user = mw.execShell(
+                "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
+            acme = '/Users/' + user + '/.acme.sh'
+            if not os.path.exists(src_path):
+                src_path = acme + '/' + domains[0]
+
+        src_cert = src_path + '/fullchain.cer'
+        src_key = src_path + '/' + domains[0] + '.key'
+
+        dst_path = self.sslDir + '/' + siteName
+        dst_cert = dst_path + "/fullchain.pem"  # 生成证书路径
+        dst_key = dst_path + "/privkey.pem"  # 密钥文件路径
+
+        if not os.path.exists(dst_path):
+            mw.execShell("mkdir -p " + dst_path)
+        mw.execShell('ln -sf "' + src_cert + '" "' + dst_cert + '"')
+        mw.execShell('ln -sf "' + src_key + '" "' + dst_key + '"')
+        mw.execShell('echo "acme" > "' + dst_path + '/README"')
 
         # 写入配置文件
         result = self.setSslConf(siteName)
         if not result['status']:
             return mw.getJson(result)
-        result['csr'] = mw.readFile(csrpath)
-        result['key'] = mw.readFile(keypath)
-        mw.restartWeb()
+        result['csr'] = mw.readFile(src_cert)
+        result['key'] = mw.readFile(src_key)
 
-        return mw.returnJson(True, 'OK', result)
+        mw.restartWeb()
+        return mw.returnJson(True, '证书已更新!', result)
 
     def httpToHttpsApi(self):
         siteName = request.form.get('siteName', '')
