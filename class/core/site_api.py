@@ -664,16 +664,26 @@ class site_api:
                 msg = data['msg'][0]
             return mw.returnJson(data['status'], msg, data['msg'])
 
-        letpath = mw.getServerDir() + '/web_conf/letsencrypt/' + siteName
-        csrpath = letpath + "/fullchain.pem"  # 生成证书路径
-        keypath = letpath + "/privkey.pem"  # 密钥文件路径
+        src_letpath = mw.getServerDir() + '/web_conf/letsencrypt/' + siteName
+        src_csrpath = src_letpath + "/fullchain.pem"  # 生成证书路径
+        src_keypath = src_letpath + "/privkey.pem"  # 密钥文件路径
 
-        # # 写入配置文件
-        result = self.setSslConf(siteName)
-        if not result['status']:
-            return mw.getJson(result)
-        result['csr'] = mw.readFile(csrpath)
-        result['key'] = mw.readFile(keypath)
+        dst_letpath = self.sslDir + '/' + siteName
+        dst_csrpath = dst_letpath + '/fullchain.pem'
+        dst_keypath = dst_letpath + '/privkey.pem'
+
+        if not os.path.exists(dst_letpath):
+            mw.execShell('mkdir -p ' + dst_letpath)
+            mw.execShell('ln - sf "' + src_letpath + '" "' + dst_csrpath + '"')
+            mw.execShell('ln -sf "' + src_keypath + '" "' + dst_keypath + '"')
+            mw.execShell('echo "let" > "' + dst_letpath + '/README"')
+
+        # 写入配置文件
+        # result = self.setSslConf(siteName)
+        # if not result['status']:
+        #     return mw.getJson(result)
+        result['csr'] = mw.readFile(src_csrpath)
+        result['key'] = mw.readFile(src_keypath)
         return mw.returnJson(data['status'], data['msg'], result)
 
     def getAcmeLogsApi(self):
