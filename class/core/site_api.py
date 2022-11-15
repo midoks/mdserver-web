@@ -664,7 +664,7 @@ class site_api:
                 msg = data['msg'][0]
             return mw.returnJson(data['status'], msg, data['msg'])
 
-        letpath = mw.getServerDir() + 'web_conf/letsencrypt/' + siteName
+        letpath = mw.getServerDir() + '/web_conf/letsencrypt/' + siteName
         csrpath = letpath + "/fullchain.pem"  # 生成证书路径
         keypath = letpath + "/privkey.pem"  # 密钥文件路径
 
