@@ -805,12 +805,16 @@ class site_api:
         # print(cmd)
         result = mw.execShell(cmd)
 
+        src_path = acme_dir + '/' + domains[0]
+        src_cert = src_path + '/fullchain.cer'
+        src_key = src_path + '/' + domains[0] + '.key'
+
         msg = '签发失败,您尝试申请证书的失败次数已达上限!<p>1、检查域名是否绑定到对应站点</p>\
             <p>2、检查域名是否正确解析到本服务器,或解析还未完全生效</p>\
             <p>3、如果您的站点设置了反向代理,或使用了CDN,请先将其关闭</p>\
             <p>4、如果您的站点设置了301重定向,请先将其关闭</p>\
             <p>5、如果以上检查都确认没有问题，请尝试更换DNS服务商</p>'
-        if not os.path.exists(home_cert.replace("\*", "*")):
+        if not os.path.exists(src_cert.replace("\*", "*")):
             data = {}
             data['err'] = result
             data['out'] = result[0]
@@ -823,10 +827,6 @@ class site_api:
                     data['msg'] = msg
             data['status'] = False
             return mw.getJson(data)
-
-        src_path = acme_dir + '/' + domains[0]
-        src_cert = src_path + '/fullchain.cer'
-        src_key = src_path + '/' + domains[0] + '.key'
 
         dst_path = self.sslDir + '/' + siteName
         dst_cert = dst_path + "/fullchain.pem"  # 生成证书路径
