@@ -2364,6 +2364,10 @@ location ^~ {from} {
         if os.path.exists(ssl_dir):
             mw.execShell('rm -rf ' + ssl_dir)
 
+        ssl_lets_dir = self.sslLetsDir + '/' + webname
+        if os.path.exists(ssl_lets_dir):
+            mw.execShell('rm -rf ' + ssl_lets_dir)
+
         ssl_acme_dir = mw.getAcmeDir() + '/' + webname
         if os.path.exists(ssl_acme_dir):
             mw.execShell('rm -rf ' + ssl_acme_dir)
