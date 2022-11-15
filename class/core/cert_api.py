@@ -562,6 +562,7 @@ class cert_api:
 
     # 请求到ACME接口
     def acmeRequest(self, url, payload):
+        time.sleep(1)
         headers = {"User-Agent": self.__user_agent}
         payload = self.stringfyItems(payload)
 
