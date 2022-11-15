@@ -677,7 +677,8 @@ class site_api:
             if type(data['msg']) != str:
                 msg = data['msg'][0]
                 + '<p><span>响应状态:</span>' + \
-                    data['msg'][1]['challenges'][0]['error']['status'] + '</p>'
+                    str(data['msg'][1]['challenges'][
+                        0]['error']['status']) + '</p>'
                 + '<p><span>错误类型:</span>' + \
                     data['msg'][1]['challenges'][0]['error']['type'] + '</p>'
                 + '<p><span>错误代码:</span>' + \
