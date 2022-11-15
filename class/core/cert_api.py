@@ -707,8 +707,8 @@ class cert_api:
                     self.getKid()
                     self.getNonce(force=True)
                     res = self.acmeRequest(self.__apis['newOrder'], payload)
-            if not res.status_code in [201]:
-                a_auth = res.json()
+            if not res.status in [201]:
+                a_auth = e_body
 
                 ret_title = self.getError(str(a_auth))
                 raise StopIteration("{0} >>>> {1}".format(
