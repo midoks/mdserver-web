@@ -658,28 +658,23 @@ class site_api:
         import cert_api
         data = cert_api.cert_api().applyCertApi(to_args)
 
-        # letpath = self.sslDir + '/' + siteName
-        # csrpath = letpath + "/fullchain.pem"  # 生成证书路径
-        # keypath = letpath + "/privkey.pem"  # 密钥文件路径
+        if not data['status']:
+            msg = data['msg']
+            if type(data['msg']) != str:
+                msg = data['msg'][0]
+            return mw.returnJson(data['status'], msg, data['msg'])
+
+        letpath = mw.getServerDir() + 'web_conf/letsencrypt/' + siteName
+        csrpath = letpath + "/fullchain.pem"  # 生成证书路径
+        keypath = letpath + "/privkey.pem"  # 密钥文件路径
 
         # # 写入配置文件
-        # result = self.setSslConf(siteName)
-        # if not result['status']:
-        #     return mw.getJson(result)
-        # result['csr'] = mw.readFile(csrpath)
-        # result['key'] = mw.readFile(keypath)
-
-        # mw.restartWeb()
-
-        if not data['status']:
-            msg = ''
-            if type(data['msg']) == str:
-                msg = data['msg']
-            else:
-                msg = data['msg'][0]
-
-            return mw.returnJson(data['status'], msg, data['msg'])
-        return mw.returnJson(data['status'], data['msg'])
+        result = self.setSslConf(siteName)
+        if not result['status']:
+            return mw.getJson(result)
+        result['csr'] = mw.readFile(csrpath)
+        result['key'] = mw.readFile(keypath)
+        return mw.returnJson(data['status'], data['msg'], result)
 
     def getAcmeLogsApi(self):
         log_file = mw.getRunDir() + '/logs/acme.log'
