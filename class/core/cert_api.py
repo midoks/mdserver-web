@@ -288,7 +288,6 @@ class cert_api:
             raise Exception("requestsGet: {}".format(str(ex)))
 
     def requestsPost(self, url, data, timeout):
-        time.sleep(3)
         try:
             import urllib.request
             import ssl
