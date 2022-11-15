@@ -70,6 +70,7 @@ fi
 echo "use system version: ${OSNAME}"
 cd /www/server/mdserver-web && bash scripts/update/${OSNAME}.sh
 
+bash /etc/rc.d/init.d/mw restart
 bash /etc/rc.d/init.d/mw default
 
 if [ -f /usr/bin/mw ];then
