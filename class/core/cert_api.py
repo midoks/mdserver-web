@@ -57,7 +57,7 @@ def writeLog(log_str, mode="ab+"):
 
 class cert_api:
     __debug = False
-    __user_agent = "MW-Panel"
+    __user_agent = "MW-Panel-R"
     __apis = None
     __url = None
     __replay_nonce = None
