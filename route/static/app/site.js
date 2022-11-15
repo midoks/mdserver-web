@@ -2197,7 +2197,7 @@ function newAcmeSSL(siteName, id, domains){
 			layer.close(index);
 			if(rdata.status){
 				showMsg(rdata.msg, function(){
-					opSSL('now', id, siteName);
+					$(".tab-nav span:first-child").click();
 				},{icon:1}, 2000);
 				return;
 			}
