@@ -796,7 +796,6 @@ class site_api:
         if domainCount == 0:
             return mw.returnJson(False, '请选择域名(不包括IP地址与泛域名)!')
 
-        # print home_cert
         log_file = mw.getRunDir() + '/logs/acme.log'
         mw.writeFile(log_file, "开始ACME申请...\n", "wb+")
         cmd = 'export ACCOUNT_EMAIL=' + email + ' && ' + \
