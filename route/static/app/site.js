@@ -2178,7 +2178,7 @@ function newSSL(siteName, id, domains){
 			if(rdata.status){
 				showMsg(rdata.msg, function(){
 					opSSL('now', id, siteName);
-				},{icon:rdata.status:1}, 2000);
+				},{icon:1}, 2000);
 				return;
 			}
 			layer.msg(rdata.msg,{icon:2,area:'500px',time:0,shade:0.3,shadeClose:true});
@@ -2198,7 +2198,7 @@ function newAcmeSSL(siteName, id, domains){
 			if(rdata.status){
 				showMsg(rdata.msg, function(){
 					opSSL('now', id, siteName);
-				},{icon:rdata.status:1}, 2000);
+				},{icon:1}, 2000);
 				return;
 			}
 			layer.msg(rdata.msg,{icon:2,area:'500px',time:0,shade:0.3,shadeClose:true});
