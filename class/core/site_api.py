@@ -479,11 +479,13 @@ class site_api:
             csr_lets_path = ssl_lets_dir + '/fullchain.pem'  # 生成证书路径
             if mw.md5(mw.readFile(csr_lets_path)) == mw.md5(mw.readFile(csr_path)):
                 return mw.returnJson(False, '使用中,先关闭再删除')
+            mw.execShell('rm -rf ' + ssl_lets_dir)
         elif ssl_type == 'acme':
             ssl_acme_dir = mw.getAcmeDir() + '/' + site_name
             csr_acme_path = ssl_acme_dir + '/fullchain.cer'  # 生成证书路径
             if mw.md5(mw.readFile(csr_acme_path)) == mw.md5(mw.readFile(csr_path)):
                 return mw.returnJson(False, '使用中,先关闭再删除')
+            mw.execShell('rm -rf ' + ssl_acme_dir)
 
         # mw.restartWeb()
         return mw.returnJson(True, '删除成功')

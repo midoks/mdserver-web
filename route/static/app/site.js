@@ -2121,7 +2121,7 @@ function opSSL(type, id, siteName, callback){
 				if(rdata.status){
 					$('.warning_info').css('display','none');
 					
-					$(".ssl-btn").append("<button class='btn btn-success btn-sm' onclick=\"ocSSL('close_ssl_conf','"+siteName+"')\" style='margin-left:10px'>关闭SSL</button>");
+					$(".ssl-btn").append("<button class='btn btn-success btn-sm' onclick=\"ocSSL('close_ssl_conf','"+siteName+"')\" style='margin-left:5px;'>关闭SSL</button>");
 					$('#now_ssl').html('当前证书 - <i style="color:#20a53a;">[已部署SSL]</i>');
 				} else{
 					$('.warning_info').css('display','block');
@@ -2131,7 +2131,7 @@ function opSSL(type, id, siteName, callback){
 				if(rdata.key == false){
 					rdata.key = '';
 				} else {
-					$(".ssl-btn").append('<button style=\'margin-left:10px\' class="btn btn-success btn-sm" onclick="deleteSSL(\'now\','+id+',\''+siteName+'\')">删除</button>');
+					$(".ssl-btn").append('<button style=\'margin-left:5px\' class="btn btn-success btn-sm" onclick="deleteSSL(\'now\','+id+',\''+siteName+'\')">删除</button>');
 				}
 
 				if(rdata.csr == false){
