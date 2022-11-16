@@ -2412,8 +2412,8 @@ location ^~ {from} {
                 listen = re.search(rep, conf).group()
                 http_ssl = "\n\tlisten 443 ssl http2;"
                 conf = conf.replace(listen, listen + http_ssl)
-                # http_ssl = "\n\tlisten 443 ssl http2;"
-                # conf = conf.replace(listen, listen + http_ssl)
+                http_ipv6_ssl = "\n\t[::]:443 ssl http2;"
+                conf = conf.replace(listen, listen + http_ipv6_ssl)
 
             mw.backFile(file)
 

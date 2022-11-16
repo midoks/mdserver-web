@@ -1972,6 +1972,7 @@ function opSSL(type, id, siteName, callback){
 						</div>\
 						<div class="ssl-btn pull-left mtb15" style="width:100%">\
 							<button class="btn btn-success btn-sm" onclick="ocSSL(\'close_ssl_conf\',"'+siteName+'")">关闭SSL</button>\
+							<button class="btn btn-success btn-sm" onclick="ocSSL(\'renewal\',"'+siteName+'")">续期</button>\
 						</div>\
 					</div>\
 					<ul class="help-info-text c7 pull-left">\
@@ -2157,8 +2158,6 @@ function ocSSL(action,siteName){
 			layer.msg(data,{icon:2,time:0,shade:0.3,shadeClose:true});
 			return;
 		}
-
-		setCookie('letssl',0);
 		layer.msg(rdata.msg,{icon:rdata.status?1:2});
 		if(action == 'close_ssl_conf'){
 			layer.msg('已关闭SSL,请务必清除浏览器缓存后再访问站点!',{icon:1,time:5000});
