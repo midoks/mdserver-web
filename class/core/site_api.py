@@ -584,7 +584,7 @@ class site_api:
         certName = request.form.get('certName', '')
         siteName = request.form.get('siteName', '')
         try:
-            path = self.sslDir + siteName.strip()
+            path = self.sslDir + '/' + siteName.strip()
             if not os.path.exists(path):
                 return mw.returnJson(False, '证书不存在!')
 
