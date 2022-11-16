@@ -1761,7 +1761,6 @@ function setSSL(id,siteName){
 					+ '<div class="ss-text pull-right mr30" style="position: relative;top:-4px">\
 	                </div></div>'
 			  + '<div class="tab-con" style="padding: 0px;"></div>';
-	// <span class="sslclose" onclick="closeSSL(\''+siteName+'\')">关闭</span>\
 	$("#webedit-con").html(sslHtml);
 	$(".tab-nav span").click(function(){
 		$(this).addClass("on").siblings().removeClass("on");
@@ -1819,6 +1818,14 @@ function httpToHttps(siteName){
 }
 
 
+function deleteSSL(type,id,siteName){
+	$.post('/site/delete_ssl','site_name='+siteName+'&ssl_type='+type,function(rdata){
+		layer.msg(rdata.msg,{icon:rdata.status?1:2});
+		showMsg(rdata.msg, function(){
+			opSSL(type,id,siteName);
+		},{icon:rdata.status?1:2}, 2000);
+	},'json');
+}
 
 //SSL
 function opSSL(type, id, siteName, callback){
@@ -1920,7 +1927,6 @@ function opSSL(type, id, siteName, callback){
 			$.post('/site/get_ssl',  'site_name='+siteName+'&ssl_type=lets', function(data){
 				var rdata = data['data'];
 				if(rdata.csr == false){
-					
 					$.post('/site/get_site_domains','id='+id, function(rdata) {
 						var data = rdata['data'];
 						var opt='';
@@ -1971,8 +1977,9 @@ function opSSL(type, id, siteName, callback){
 							<div class="ssl-con-key pull-left" readonly>证书(PEM格式)<br><textarea id="csr" class="bt-input-text">'+rdata.csr+'</textarea></div>\
 						</div>\
 						<div class="ssl-btn pull-left mtb15" style="width:100%">\
-							<button class="btn btn-success btn-sm" onclick="ocSSL(\'close_ssl_conf\',"'+siteName+'")">关闭SSL</button>\
-							<button class="btn btn-success btn-sm" onclick="ocSSL(\'renewal\',"'+siteName+'")">续期</button>\
+							<button class="btn btn-success btn-sm" onclick="ocSSL(\'close_ssl_conf\',\''+siteName+'\')">关闭SSL</button>\
+							<button class="btn btn-success btn-sm" onclick="ocSSL(\'renewal\',\''+siteName+'\')">续期</button>\
+							<button class="btn btn-success btn-sm" onclick="deleteSSL(\'lets\','+id+',\''+siteName+'\')">删除</button>\
 						</div>\
 					</div>\
 					<ul class="help-info-text c7 pull-left">\
@@ -2055,7 +2062,8 @@ function opSSL(type, id, siteName, callback){
 							<div class="ssl-con-key pull-left" readonly>证书(PEM格式)<br><textarea id="csr" class="bt-input-text">'+rdata.csr+'</textarea></div>\
 						</div>\
 						<div class="ssl-btn pull-left mtb15" style="width:100%">\
-							<button class="btn btn-success btn-sm" onclick="ocSSL(\'close_ssl_conf\',"'+siteName+'")">关闭SSL</button>\
+							<button class="btn btn-success btn-sm" onclick="ocSSL(\'close_ssl_conf\',\''+siteName+'\')">关闭SSL</button>\
+							<button class="btn btn-success btn-sm" onclick="deleteSSL(\'acme\','+id+',\''+siteName+'\')">删除</button>\
 						</div>\
 					</div>\
 					<ul class="help-info-text c7 pull-left">\
@@ -2112,6 +2120,7 @@ function opSSL(type, id, siteName, callback){
 				$("#toHttps").attr('checked',rdata.httpTohttps);
 				if(rdata.status){
 					$('.warning_info').css('display','none');
+					
 					$(".ssl-btn").append("<button class='btn btn-default btn-sm' onclick=\"ocSSL('close_ssl_conf','"+siteName+"')\" style='margin-left:10px'>关闭SSL</button>");
 					$('#now_ssl').html('当前证书 - <i style="color:#20a53a;">[已部署SSL]</i>');
 				} else{
@@ -2119,8 +2128,14 @@ function opSSL(type, id, siteName, callback){
 					$('#now_ssl').html('当前证书 - <i style="color:red;">[未部署SSL]</i>');
 				}
 
-				if(rdata.key == false) rdata.key = '';
-				if(rdata.csr == false) rdata.csr = '';
+				if(rdata.key == false){
+					rdata.key = '';
+				} else {
+					$(".ssl-btn").append('<button class="btn btn-success btn-sm" onclick="deleteSSL(\'now\','+id+',\''+siteName+'\')">删除</button>');
+				}
+				if(rdata.csr == false){
+					rdata.csr = '';
+				}
 				$("#key").val(rdata.key);
 				$("#csr").val(rdata.csr);
 
