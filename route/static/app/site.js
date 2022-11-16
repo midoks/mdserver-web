@@ -1746,7 +1746,9 @@ function setCertSsl(certName,siteName){
 	var loadT = layer.msg('正在部署证书...',{icon:16,time:0,shade: [0.3, '#000']});
 	$.post('/site/set_cert_to_site',{certName:certName,siteName:siteName},function(rdata){
 		layer.close(loadT);
-		layer.msg(rdata.msg,{icon:rdata.status?1:2});
+		showMsg(rdata.msg, function(){
+			$(".tab-nav span:first-child").click();
+		},{icon:rdata.status?1:2},2000);
 	},'json');
 }
 
@@ -1766,39 +1768,6 @@ function setSSL(id,siteName){
 		$(this).addClass("on").siblings().removeClass("on");
 	});
 	opSSL('now',id,siteName);
-}
-
-
-function closeSSL(siteName){
-	var loadT = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});
-	$.post('/site/get_ssl','siteName='+siteName,function(rdata){
-		layer.close(loadT);
-		switch(rdata.data.type){
-			case -1:
-				var txt = "<div class='mtb15' style='line-height:30px'>本站点未设置SSL，如需设置SSL，请选择切换类目申请开启SSL<br>\
-					<p style='color:red;'>关闭SSL以后,请务必清除浏览器缓存再访问站点</p></div>";
-				setCookie('letssl',0);
-				$(".tab-con").html(txt);
-				break;
-			case 0:
-				var txt = "Let's Encrypt";
-				closeSSLHTML(txt,siteName);
-				break;
-			case 1:
-				var txt = '其它';
-				closeSSLHTML(txt,siteName);
-				break;
-			case 2:
-				var txt = 'SSL';
-				closeSSLHTML(txt,siteName);
-				break;
-		}
-	},'json');
-}
-
-//关闭SSL内容
-function closeSSLHTML(txt,siteName){
-	$(".tab-con").html("<div class='line mtb15'>"+lan.get('ssl_enable',[txt])+"</div><div class='line mtb15'><button class='btn btn-success btn-sm' onclick=\"ocSSL('close_ssl_conf','"+siteName+"')\">关闭SSL</button></div>");
 }
 
 //设置httpToHttps
