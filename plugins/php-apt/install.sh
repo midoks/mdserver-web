@@ -72,15 +72,15 @@ cd ${curPath} && sh -x $curPath/versions/$2/install.sh $1
 if [ "${action}" == "install" ] && [ -d ${serverPath}/php-apt/${type} ];then
 
 	# 安装通用扩展
-	echo "install PHP-APT[${PHP_VER}] extend start"
-	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${PHP_VER} install gd
-	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${PHP_VER} install iconv
-	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${PHP_VER} install exif
-	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${PHP_VER} install intl
-	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${PHP_VER} install mcrypt
-	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${PHP_VER} install openssl
-	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${PHP_VER} install gettext
-	echo "install PHP-APT[${PHP_VER}] extend end"
+	echo "install PHP-APT[${type}] extend start"
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type} install gd
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type} install iconv
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type} install exif
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type} install intl
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type} install mcrypt
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type} install openssl
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type} install gettext
+	echo "install PHP-APT[${type}] extend end"
 
 	#初始化 
 	cd ${rootPath} && python3 ${rootPath}/plugins/php-apt/index.py start ${type}
