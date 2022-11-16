@@ -56,6 +56,7 @@ if [ "${action}" == "install" ] && [ -d ${serverPath}/php/${type} ];then
 	cd ${rootPath}/plugins/php/versions/common && bash openssl.sh install ${PHP_VER}
 	cd ${rootPath}/plugins/php/versions/common && bash gettext.sh install ${PHP_VER}
 	echo "install PHP${PHP_VER} extend end"
+	
 	#初始化 
 	cd ${rootPath} && python3 ${rootPath}/plugins/php/index.py start ${type}
 	cd ${rootPath} && python3 ${rootPath}/plugins/php/index.py initd_install ${type}
