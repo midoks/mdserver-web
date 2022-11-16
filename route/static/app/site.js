@@ -1789,7 +1789,14 @@ function httpToHttps(siteName){
 
 function deleteSSL(type,id,siteName){
 	$.post('/site/delete_ssl','site_name='+siteName+'&ssl_type='+type,function(rdata){
-		layer.msg(rdata.msg,{icon:rdata.status?1:2});
+		showMsg(rdata.msg, function(){
+			opSSL(type,id,siteName);
+		},{icon:rdata.status?1:2}, 2000);
+	},'json');
+}
+
+function deploySSL(type,id,siteName){
+	$.post('/site/deploy_ssl','site_name='+siteName+'&ssl_type='+type,function(rdata){
 		showMsg(rdata.msg, function(){
 			opSSL(type,id,siteName);
 		},{icon:rdata.status?1:2}, 2000);
@@ -1946,7 +1953,7 @@ function opSSL(type, id, siteName, callback){
 							<div class="ssl-con-key pull-left" readonly>证书(PEM格式)<br><textarea id="csr" class="bt-input-text">'+rdata.csr+'</textarea></div>\
 						</div>\
 						<div class="ssl-btn pull-left mtb15" style="width:100%">\
-							<button class="btn btn-success btn-sm" onclick="ocSSL(\'close_ssl_conf\',\''+siteName+'\')">部署</button>\
+							<button class="btn btn-success btn-sm" onclick="deploySSL(\'lets\','+id+',\''+siteName+'\')">部署</button>\
 							<button class="btn btn-success btn-sm" onclick="ocSSL(\'renewal\',\''+siteName+'\')">续期</button>\
 							<button class="btn btn-success btn-sm" onclick="deleteSSL(\'lets\','+id+',\''+siteName+'\')">删除</button>\
 						</div>\
@@ -2031,7 +2038,7 @@ function opSSL(type, id, siteName, callback){
 							<div class="ssl-con-key pull-left" readonly>证书(PEM格式)<br><textarea id="csr" class="bt-input-text">'+rdata.csr+'</textarea></div>\
 						</div>\
 						<div class="ssl-btn pull-left mtb15" style="width:100%">\
-							<button class="btn btn-success btn-sm" onclick="ocSSL(\'close_ssl_conf\',\''+siteName+'\')">部署</button>\
+							<button class="btn btn-success btn-sm" onclick="deploySSL(\'acme\','+id+',\''+siteName+'\')">部署</button>\
 							<button class="btn btn-success btn-sm" onclick="deleteSSL(\'acme\','+id+',\''+siteName+'\')">删除</button>\
 						</div>\
 					</div>\

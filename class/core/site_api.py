@@ -666,13 +666,6 @@ class site_api:
         path = self.sslDir + '/' + site_name
         csr_path = path + '/fullchain.pem'  # 生成证书路径
 
-        file = self.getHostConf(site_name)
-        content = mw.readFile(file)
-        key_text = 'ssl_certificate'
-        status = True
-        if content.find(key_text) == -1:
-            status = False
-
         if ssl_type == 'lets':
             ssl_lets_dir = self.sslLetsDir + '/' + site_name
             csr_lets_path = ssl_lets_dir + '/fullchain.pem'  # 生成证书路径
@@ -683,6 +676,13 @@ class site_api:
             csr_acme_path = ssl_acme_dir + '/fullchain.cer'  # 生成证书路径
             if mw.md5(mw.readFile(csr_acme_path)) == mw.md5(mw.readFile(csr_path)):
                 return mw.returnJson(False, '已部署Acme')
+
+        file = self.getHostConf(site_name)
+        content = mw.readFile(file)
+        key_text = 'ssl_certificate'
+        status = True
+        if content.find(key_text) == -1:
+            status = False
 
     def getLetLogsApi(self):
         log_file = mw.getRunDir() + '/logs/letsencrypt.log'
