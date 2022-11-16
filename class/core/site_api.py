@@ -596,7 +596,7 @@ class site_api:
             mw.writeLog('网站管理', '证书已部署!')
             return mw.returnJson(True, '证书已部署!')
         except Exception as ex:
-            return mw.returnJson(False, '设置错误,' + str(ex))
+            return mw.returnJson(False, '设置错误:' + str(ex))
 
     def removeCertApi(self):
         certName = request.form.get('certName', '')
