@@ -677,12 +677,14 @@ class site_api:
             if mw.md5(mw.readFile(csr_acme_path)) == mw.md5(mw.readFile(csr_path)):
                 return mw.returnJson(False, '已部署ACME')
 
-        file = self.getHostConf(site_name)
-        content = mw.readFile(file)
-        key_text = 'ssl_certificate'
-        status = True
-        if content.find(key_text) == -1:
-            status = False
+        # file = self.getHostConf(site_name)
+        # content = mw.readFile(file)
+        # key_text = 'ssl_certificate'
+        # status = True
+        # if content.find(key_text) == -1:
+        #     status = False
+
+        return mw.returnJson(True, '部署成功')
 
     def getLetLogsApi(self):
         log_file = mw.getRunDir() + '/logs/letsencrypt.log'
