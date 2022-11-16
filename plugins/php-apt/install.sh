@@ -79,6 +79,7 @@ if [ "${action}" == "install" ] && [ -d ${serverPath}/php-apt/${type} ];then
 	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type} install intl
 	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type} install mcrypt
 	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type} install openssl
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type} install mysqlnd
 	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type} install gettext
 	echo "install PHP-APT[${type}] extend end"
 
