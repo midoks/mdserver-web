@@ -481,7 +481,7 @@ class site_api:
             csr_path = self.sslLetsDir + '/' + site_name + '/fullchain.pem'  # 生成证书路径
             key_path = self.sslLetsDir + '/' + site_name + '/privkey.pem'    # 密钥文件路径
         elif ssl_type == 'acme':
-            csr_path = mw.getAcmeDir() + '/' + site_name + '/fullchain.csr'  # 生成证书路径
+            csr_path = mw.getAcmeDir() + '/' + site_name + '/fullchain.cer'  # 生成证书路径
             key_path = mw.getAcmeDir() + '/' + site_name + '/' + \
                 site_name + '.key'    # 密钥文件路径
 
