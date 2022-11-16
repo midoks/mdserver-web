@@ -566,7 +566,6 @@ class site_api:
 
         # 写入配置文件
         result = self.setSslConf(siteName)
-        # print result['msg']
         if not result['status']:
             return mw.getJson(result)
 
@@ -677,12 +676,9 @@ class site_api:
             if mw.md5(mw.readFile(csr_acme_path)) == mw.md5(mw.readFile(csr_path)):
                 return mw.returnJson(False, '已部署ACME')
 
-        # file = self.getHostConf(site_name)
-        # content = mw.readFile(file)
-        # key_text = 'ssl_certificate'
-        # status = True
-        # if content.find(key_text) == -1:
-        #     status = False
+        result = self.setSslConf(siteName)
+        if not result['status']:
+            return mw.getJson(result)
 
         return mw.returnJson(True, '部署成功')
 
@@ -921,11 +917,11 @@ class site_api:
             if conf.find('ssl_certificate') == -1:
                 return mw.returnJson(False, '当前未开启SSL')
             to = """#error_page 404/404.html;
-    #HTTP_TO_HTTPS_START
+    # HTTP_TO_HTTPS_START
     if ($server_port !~ 443){
         rewrite ^(/.*)$ https://$host$1 permanent;
     }
-    #HTTP_TO_HTTPS_END"""
+    # HTTP_TO_HTTPS_END"""
             conf = conf.replace('#error_page 404/404.html;', to)
             mw.writeFile(file, conf)
 
@@ -1331,10 +1327,10 @@ class site_api:
             if conf.find(rep) == -1:
                 rep = '#error_page 404/404.html;'
             data = '''
-    #AUTH_START
+    # AUTH_START
     auth_basic "Authorization";
     auth_basic_user_file %s;
-    #AUTH_END''' % (filename,)
+    # AUTH_END''' % (filename,)
             conf = conf.replace(rep, rep + data)
             mw.writeFile(configFile, conf)
         # 写密码配置
@@ -1423,13 +1419,13 @@ class site_api:
         content = mw.readFile(vhost_file)
 
         cnf_301 = '''
-    #301-START
+    # 301-START
     include %s/*.conf;
-    #301-END
+    # 301-END
 ''' % (self.getRedirectPath( siteName))
 
         cnf_301_source = '''
-    #301-START
+    # 301-START
 '''
         # print('operateRedirectConf', content.find('#301-END'))
         if content.find('#301-END') != -1:
@@ -1615,13 +1611,13 @@ class site_api:
         content = mw.readFile(vhost_file)
 
         proxy_cnf = '''
-    #PROXY-START
+    # PROXY-START
     include %s/*.conf;
-    #PROXY-END
+    # PROXY-END
 ''' % (self.getProxyPath(siteName))
 
         proxy_cnf_source = '''
-    #PROXY-START
+    # PROXY-START
 '''
 
         if content.find('#PROXY-END') != -1:
@@ -1753,7 +1749,7 @@ class site_api:
 
         # location ~* ^{from}(.*)$ {
         tpl = """
-#PROXY-START/
+# PROXY-START/
 location ^~ {from} {
     proxy_pass {to};
     proxy_set_header Host {host};
@@ -1776,7 +1772,7 @@ location ^~ {from} {
         add_header Cache-Control no-cache;
     }
 }
-#PROXY-END/
+# PROXY-END/
         """
 
         # replace
@@ -2217,7 +2213,7 @@ location ^~ {from} {
            return 404;
         }
     }
-    #SECURITY-END
+    # SECURITY-END
     include %s/enable-php-''' % (fix.strip().replace(',', '|'), domains.strip().replace(',', ' '), pre_path)
                 conf = re.sub(re_path, rconf, conf)
                 mw.writeLog('网站管理', '站点[' + name + ']已开启防盗链!')
