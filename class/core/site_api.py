@@ -613,6 +613,8 @@ class site_api:
             conf = re.sub(rep, '', conf)
             rep = "\s+listen\s+443.*;"
             conf = re.sub(rep, '', conf)
+            rep = "\s+listen\s+\[\:\:\]\:443.*;"
+            conf = re.sub(rep, '', conf)
             mw.writeFile(file, conf)
 
         msg = mw.getInfo('网站[{1}]关闭SSL成功!', (siteName,))
