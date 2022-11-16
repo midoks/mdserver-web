@@ -10,8 +10,8 @@ serverPath=$(dirname "$rootPath")
 install_tmp=${rootPath}/tmp/mw_install.pl
 
 if id www &> /dev/null ;then 
-    echo "www UID is `id -u www`"
-    echo "www Shell is `grep "^www:" /etc/passwd |cut -d':' -f7 `"
+    echo "www uid is `id -u www`"
+    echo "www shell is `grep "^www:" /etc/passwd |cut -d':' -f7 `"
 else
     groupadd www
 	# useradd -g www -s /sbin/nologin www
@@ -73,14 +73,14 @@ if [ "${action}" == "install" ] && [ -d ${serverPath}/php-apt/${type} ];then
 
 	# 安装通用扩展
 	echo "install PHP-APT[${type}] extend start"
-	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type} install gd
-	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type} install iconv
-	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type} install exif
-	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type} install intl
-	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type} install mcrypt
-	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type} install openssl
-	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type} install mysqlnd
-	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type} install gettext
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type:0:1}.${type:1:2} install gd
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type:0:1}.${type:1:2} install iconv
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type:0:1}.${type:1:2} install exif
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type:0:1}.${type:1:2} install intl
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type:0:1}.${type:1:2} install mcrypt
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type:0:1}.${type:1:2} install openssl
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type:0:1}.${type:1:2} install mysqlnd
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type:0:1}.${type:1:2} install gettext
 	echo "install PHP-APT[${type}] extend end"
 
 	#初始化 

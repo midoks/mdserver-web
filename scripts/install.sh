@@ -19,6 +19,7 @@ if [ "$EUID" -ne 0 ]
 fi
 
 
+
 if [ ${_os} == "Darwin" ]; then
 	OSNAME='macos'
 elif grep -Eq "openSUSE" /etc/*-release; then
@@ -55,6 +56,13 @@ fi
 
 
 if [ $OSNAME != "macos" ];then
+	if id www &> /dev/null ;then 
+	    echo ""
+	else
+	    groupadd www
+		useradd -g www -s /bin/bash www
+	fi
+
 	mkdir -p /www/server
 	mkdir -p /www/wwwroot
 	mkdir -p /www/wwwlogs
