@@ -601,7 +601,7 @@ class site_api:
     def removeCertApi(self):
         certName = request.form.get('certName', '')
         try:
-            path = self.sslDir + certName
+            path = self.sslDir + '/' + certName
             if not os.path.exists(path):
                 return mw.returnJson(False, '证书已不存在!')
             os.system("rm -rf " + path)
@@ -658,6 +658,31 @@ class site_api:
         mw.writeLog('网站管理', msg)
         mw.restartWeb()
         return mw.returnJson(True, 'SSL已关闭!')
+
+    def deploySslApi(self):
+        site_name = request.form.get('site_name', '')
+        ssl_type = request.form.get('ssl_type', '')
+
+        path = self.sslDir + '/' + site_name
+        csr_path = path + '/fullchain.pem'  # 生成证书路径
+
+        file = self.getHostConf(site_name)
+        content = mw.readFile(file)
+        key_text = 'ssl_certificate'
+        status = True
+        if content.find(key_text) == -1:
+            status = False
+
+        if ssl_type == 'lets':
+            ssl_lets_dir = self.sslLetsDir + '/' + site_name
+            csr_lets_path = ssl_lets_dir + '/fullchain.pem'  # 生成证书路径
+            if mw.md5(mw.readFile(csr_lets_path)) == mw.md5(mw.readFile(csr_path)):
+                return mw.returnJson(False, '已部署Lets')
+        elif ssl_type == 'acme':
+            ssl_acme_dir = mw.getAcmeDir() + '/' + site_name
+            csr_acme_path = ssl_acme_dir + '/fullchain.cer'  # 生成证书路径
+            if mw.md5(mw.readFile(csr_acme_path)) == mw.md5(mw.readFile(csr_path)):
+                return mw.returnJson(False, '已部署Acme')
 
     def getLetLogsApi(self):
         log_file = mw.getRunDir() + '/logs/letsencrypt.log'
