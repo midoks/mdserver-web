@@ -113,8 +113,8 @@ class cert_api:
             return self.__config
         return self.__config
 
-    # 写配置文件
     def saveConfig(self):
+        # 写配置文件
         fp = open(self.__cfg_file, 'w+')
         fcntl.flock(fp, fcntl.LOCK_EX)  # 加锁
         fp.write(json.dumps(self.__config))
@@ -122,9 +122,75 @@ class cert_api:
         fp.close()
         return True
 
+    def createCertCron(self):
+        # 创建证书自动续签任务
+        try:
+            import crontab_api
+            api = crontab_api.crontab_api()
+
+            echo = mw.md5(mw.md5('panel_renew_lets_cron'))
+            cron_id = mw.M('crontab').where('echo=?', (echo,)).getField('id')
+
+            cron_path = mw.getServerDir() + '/cron'
+            if not os.path.exists(cron_path):
+                mw.execShell('mkdir -p ' + cron_path)
+
+            shell = 'python3 -u {}/class/core/cert_api.py --renew=1'.format(
+                mw.getRunDir())
+
+            logs_file = cron_path + '/' + echo + '.log'
+
+            cmd = '''#!/bin/bash
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
+
+dst_dir=%s
+logs_file=%s
+cd $dst_dir
+
+if [ -f bin/activate ];then
+    source bin/activate
+fi
+
+''' % (mw.getRunDir(), logs_file)
+            cmd += 'echo "★【`date +"%Y-%m-%d %H:%M:%S"`】 STSRT★" >> $logs_file' + "\n"
+            cmd += 'echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" >> $logs_file' + "\n"
+            cmd += 'cd $dst_dir && ' + shell + ' >> $logs_file 2>&1' + "\n"
+            cmd += 'echo "【`date +"%Y-%m-%d %H:%M:%S"`】 END★" >> $logs_file' + "\n"
+            cmd += 'echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" >> $logs_file' + "\n"
+
+            file = cron_path + '/' + echo
+
+            if type(cron_id) != int:
+
+                mw.writeFile(file, cmd)
+                mw.execShell('chmod 750 ' + file)
+
+                info = {}
+                info['type'] = 'day'
+                info['minute'] = '10'
+                info['hour'] = '0'
+                shell_cron, rinfo, name = api.getCrondCycle(info)
+                shell_cron += ' ' + cron_path + '/' + echo + \
+                    ' >> ' + logs_file + ' 2>&1'
+
+                api.writeShell(shell_cron)
+
+                insert_id = mw.M('crontab').add('name,type,where1,where_hour,where_minute,echo,addtime,status,save,backup_to,stype,sname,sbody,urladdress', (
+                    "续签Let's Encrypt证书", 'day', '', '0', '10', echo, time.strftime('%Y-%m-%d %X', time.localtime()), '1', '', 'localhost', 'toShell', '', cmd, ''))
+
+                if insert_id > 0:
+                    print('创建证书自动续签任务成功!')
+            else:
+                mw.writeFile(file, cmd)
+                mw.execShell('chmod 750 ' + file)
+                mw.M('crontab').where('id=?', (cron_id)).save('sbody', (cmd,))
+        except Exception as e:
+            print(mw.getTracebackInfo())
+
     def getApis(self):
         if not self.__apis:
-                # 尝试从配置文件中获取
+            # 尝试从配置文件中获取
             api_index = self.__mod_index[self.__debug]
             if not 'apis' in self.__config:
                 self.__config['apis'] = {}

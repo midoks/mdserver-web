@@ -23,6 +23,7 @@ def init():
     initDB()
     initUserInfo()
     initInitD()
+    initInitTask()
 
 
 def local():
@@ -100,6 +101,13 @@ def initInitD():
 
     # 获取系统IPV4
     mw.setHostAddr(mw.getLocalIp())
+
+
+def initInitTask():
+    # 创建证书同步命令
+    import cert_api
+    api = cert_api.cert_api()
+    api.createCertCron()
 
 
 def initUserInfo():
