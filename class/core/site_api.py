@@ -2413,7 +2413,7 @@ location ^~ {from} {
             if not mw.inArray(tmp, '443'):
                 listen = re.search(rep, conf).group()
                 http_ssl = "\n\tlisten 443 ssl http2;"
-                http_ssl = http_ssl + "\n\ttlisten [::]:443 ssl http2;"
+                http_ssl = http_ssl + "\n\tlisten [::]:443 ssl http2;"
                 conf = conf.replace(listen, listen + http_ssl)
 
             mw.backFile(file)
