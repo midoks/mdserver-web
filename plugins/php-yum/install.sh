@@ -61,6 +61,17 @@ fi
 cd ${curPath} && sh -x $curPath/versions/$2/install.sh $1
 
 if [ "${action}" == "install" ] && [ -d ${serverPath}/php-yum/${type} ];then
+	# 安装通用扩展
+	echo "install PHP-YUM[${PHP_VER}] extend start"
+	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${PHP_VER} install gd
+	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${PHP_VER} install iconv
+	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${PHP_VER} install exif
+	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${PHP_VER} install intl
+	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${PHP_VER} install mcrypt
+	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${PHP_VER} install openssl
+	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${PHP_VER} install gettext
+	echo "install PHP-YUM[${PHP_VER}] extend end"
+
 	#初始化 
 	cd ${rootPath} && python3 ${rootPath}/plugins/php-yum/index.py start ${type}
 	cd ${rootPath} && python3 ${rootPath}/plugins/php-yum/index.py initd_install ${type}
