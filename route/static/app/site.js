@@ -1967,8 +1967,8 @@ function opSSL(type, id, siteName, callback){
 				var lets = '<div class="myKeyCon ptb15">\
 						<div class="ssl_state_info" style="display:none;"></div>\
 						<div class="custom_certificate_info">\
-							<div class="ssl-con-key pull-left mr20">密钥(KEY)<br><textarea id="key" class="bt-input-text">'+rdata.key+'</textarea></div>\
-							<div class="ssl-con-key pull-left">证书(PEM格式)<br><textarea id="csr" class="bt-input-text">'+rdata.csr+'</textarea></div>\
+							<div class="ssl-con-key pull-left mr20" readonly="readonly">密钥(KEY)<br><textarea id="key" class="bt-input-text">'+rdata.key+'</textarea></div>\
+							<div class="ssl-con-key pull-left" readonly="readonly">证书(PEM格式)<br><textarea id="csr" class="bt-input-text">'+rdata.csr+'</textarea></div>\
 						</div>\
 						<div class="ssl-btn pull-left mtb15" style="width:100%">\
 							<button class="btn btn-success btn-sm" onclick="ocSSL(\'close_ssl_conf\',"'+siteName+'")">关闭SSL</button>\
@@ -2050,8 +2050,8 @@ function opSSL(type, id, siteName, callback){
 				var acme = '<div class="myKeyCon ptb15">\
 						<div class="ssl_state_info" style="display:none;"></div>\
 						<div class="custom_certificate_info">\
-							<div class="ssl-con-key pull-left mr20">密钥(KEY)<br><textarea id="key" class="bt-input-text">'+rdata.key+'</textarea></div>\
-							<div class="ssl-con-key pull-left">证书(PEM格式)<br><textarea id="csr" class="bt-input-text">'+rdata.csr+'</textarea></div>\
+							<div class="ssl-con-key pull-left mr20" readonly="readonly">密钥(KEY)<br><textarea id="key" class="bt-input-text">'+rdata.key+'</textarea></div>\
+							<div class="ssl-con-key pull-left" readonly="readonly">证书(PEM格式)<br><textarea id="csr" class="bt-input-text">'+rdata.csr+'</textarea></div>\
 						</div>\
 						<div class="ssl-btn pull-left mtb15" style="width:100%">\
 							<button class="btn btn-success btn-sm" onclick="ocSSL(\'close_ssl_conf\',"'+siteName+'")">关闭SSL</button>\
