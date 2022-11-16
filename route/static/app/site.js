@@ -1976,6 +1976,7 @@ function opSSL(type, id, siteName, callback){
 					</div>\
 					<ul class="help-info-text c7 pull-left">\
 						<li>已为您自动生成Let\'s Encrypt免费证书</li>\
+						<li>由Let\'s Encrypt免费申请证书，有效期3个月，支持多域名。默认会自动续签</li>\
 						<li>如需使用其他SSL,请切换其他证书后粘贴您的KEY以及PEM内容，然后保存即可。</li>\
 					</ul>';
 				$(".tab-con").html(lets);
@@ -2057,7 +2058,8 @@ function opSSL(type, id, siteName, callback){
 						</div>\
 					</div>\
 					<ul class="help-info-text c7 pull-left">\
-						<li>已为您自动生成Let\'s Encrypt免费证书</li>\
+						<li>已为您自动生成ACME免费证书</li>\
+						<li>由ACME免费申请证书，有效期3个月，支持多域名。默认会自动续签</li>\
 						<li>如需使用其他SSL,请切换其他证书后粘贴您的KEY以及PEM内容，然后保存即可。</li>\
 					</ul>';
 				$(".tab-con").html(acme);
