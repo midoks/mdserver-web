@@ -45,6 +45,17 @@ fi
 cd ${curPath} && sh -x $curPath/versions/$2/install.sh $1
 
 if [ "${action}" == "install" ] && [ -d ${serverPath}/php/${type} ];then
+
+	# 安装通用扩展
+	echo "install PHP${PHP_VER} extend start"
+	cd ${rootPath}/plugins/php/versions/common && bash gd.sh install ${PHP_VER}
+	cd ${rootPath}/plugins/php/versions/common && bash iconv.sh install ${PHP_VER}
+	cd ${rootPath}/plugins/php/versions/common && bash exif.sh install ${PHP_VER}
+	cd ${rootPath}/plugins/php/versions/common && bash intl.sh install ${PHP_VER}
+	cd ${rootPath}/plugins/php/versions/common && bash mcrypt.sh install ${PHP_VER}
+	cd ${rootPath}/plugins/php/versions/common && bash openssl.sh install ${PHP_VER}
+	cd ${rootPath}/plugins/php/versions/common && bash gettext.sh install ${PHP_VER}
+	echo "install PHP${PHP_VER} extend end"
 	#初始化 
 	cd ${rootPath} && python3 ${rootPath}/plugins/php/index.py start ${type}
 	cd ${rootPath} && python3 ${rootPath}/plugins/php/index.py initd_install ${type}
