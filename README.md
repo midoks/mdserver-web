@@ -115,7 +115,7 @@ curl -fsSL https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/scripts/update
 - 卸载脚本
 
 ```
-curl -fsSL https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/scripts/uninstall.sh | bash
+wget -O uninstall.sh https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/scripts/uninstall.sh && bash uninstall.sh
 ```
 
 ### 备用地址

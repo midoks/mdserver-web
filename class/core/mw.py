@@ -524,6 +524,22 @@ def dePunycode(domain):
     return newdomain[0:-1]
 
 
+def buildSoftLink(src, dst, force=False):
+    '''
+    建立软连接
+    '''
+    if not os.path.exists(src):
+        return False
+
+    if os.path.exists(dst) and force:
+        os.remove(dst)
+
+    if not os.path.exists(dst):
+        execShell('ln -sf "' + src_csrpath + '" "' + dst_csrpath + '"')
+        return True
+    return False
+
+
 def HttpGet(url, timeout=10):
     """
     发送GET请求

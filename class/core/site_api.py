@@ -664,17 +664,28 @@ class site_api:
 
         path = self.sslDir + '/' + site_name
         csr_path = path + '/fullchain.pem'  # 生成证书路径
+        key_path = path + '/privkey.pem'  # 生成证书路径
 
         if ssl_type == 'lets':
             ssl_lets_dir = self.sslLetsDir + '/' + site_name
-            csr_lets_path = ssl_lets_dir + '/fullchain.pem'  # 生成证书路径
-            if mw.md5(mw.readFile(csr_lets_path)) == mw.md5(mw.readFile(csr_path)):
+            lets_csrpath = ssl_lets_dir + '/fullchain.pem'
+            lets_keypath = ssl_lets_dir + '/privkey.pem'
+            if mw.md5(mw.readFile(lets_csrpath)) == mw.md5(mw.readFile(csr_path)):
                 return mw.returnJson(False, '已部署Lets')
+            else:
+                mw.buildSoftLink(lets_csrpath, csr_path, True)
+                mw.buildSoftLink(lets_keypath, key_path, True)
+                mw.execShell('echo "lets" > "' + path + '/README"')
         elif ssl_type == 'acme':
             ssl_acme_dir = mw.getAcmeDir() + '/' + site_name
-            csr_acme_path = ssl_acme_dir + '/fullchain.cer'  # 生成证书路径
-            if mw.md5(mw.readFile(csr_acme_path)) == mw.md5(mw.readFile(csr_path)):
+            acme_csrpath = ssl_acme_dir + '/fullchain.cer'
+            acme_keypath = ssl_acme_dir + '/' + site_name + '.key'
+            if mw.md5(mw.readFile(acme_csrpath)) == mw.md5(mw.readFile(csr_path)):
                 return mw.returnJson(False, '已部署ACME')
+            else:
+                mw.buildSoftLink(acme_csrpath, csr_path, True)
+                mw.buildSoftLink(acme_keypath, key_path, True)
+                mw.execShell('echo "lets" > "' + path + '/README"')
 
         result = self.setSslConf(siteName)
         if not result['status']:
