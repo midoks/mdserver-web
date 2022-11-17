@@ -687,7 +687,7 @@ class site_api:
                 mw.buildSoftLink(acme_keypath, key_path, True)
                 mw.execShell('echo "acme" > "' + path + '/README"')
 
-        result = self.setSslConf(siteName)
+        result = self.setSslConf(site_name)
         if not result['status']:
             return mw.getJson(result)
 
