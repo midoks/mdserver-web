@@ -690,8 +690,13 @@ class site_api:
         result = self.setSslConf(site_name)
         if not result['status']:
             return mw.getJson(result)
-
         return mw.returnJson(True, '部署成功')
+
+    def renewSslApi(self):
+        site_name = request.form.get('site_name', '')
+        ssl_type = request.form.get('ssl_type', '')
+
+        return mw.returnJson(True, '续期成功')
 
     def getLetLogsApi(self):
         log_file = mw.getRunDir() + '/logs/letsencrypt.log'

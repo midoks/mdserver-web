@@ -1807,6 +1807,14 @@ function deploySSL(type,id,siteName){
 	},'json');
 }
 
+function renewSSL(type,id,siteName){
+	$.post('/site/re_ssl','site_name='+siteName+'&ssl_type='+type,function(rdata){
+		showMsg(rdata.msg, function(){
+			opSSL(type,id,siteName);
+		},{icon:rdata.status?1:2}, 2000);
+	},'json');
+}
+
 //SSL
 function opSSL(type, id, siteName, callback){
 
@@ -1958,7 +1966,7 @@ function opSSL(type, id, siteName, callback){
 						</div>\
 						<div class="ssl-btn pull-left mtb15" style="width:100%">\
 							<button class="btn btn-success btn-sm" onclick="deploySSL(\'lets\','+id+',\''+siteName+'\')">部署</button>\
-							<button class="btn btn-success btn-sm" onclick="ocSSL(\'renewal\',\''+siteName+'\')">续期</button>\
+							<button class="btn btn-success btn-sm" onclick="renewSSL(\'lets\','+id+',\''+siteName+'\')">续期</button>\
 							<button class="btn btn-success btn-sm" onclick="deleteSSL(\'lets\','+id+',\''+siteName+'\')">删除</button>\
 						</div>\
 					</div>\
