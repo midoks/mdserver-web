@@ -696,13 +696,32 @@ class site_api:
             return mw.getJson(result)
         return mw.returnJson(True, '部署成功')
 
+    def getLetsIndex(self, site_name):
+        cfg = mw.getRunDir() + '/data/letsencrypt.json'
+        if not os.path.exists(cfg):
+            return False
+
+        data = mw.readFile(cfg)
+        lets_data = json.loads(data)
+        order_list = lets_data['orders']
+
+        for x in order_list:
+            if order_list[x]['status'] == 'valid':
+                for d in range(len(order_list[x]['domains'])):
+                    if d == site_name:
+                        return x
+        return False
+
     def renewSslApi(self):
         site_name = request.form.get('site_name', '')
         ssl_type = request.form.get('ssl_type', '')
-
         if ssl_type == 'lets':
-            import cert_api
-            data = cert_api.cert_api().renewCert(to_args)
+            index = self.getLetsIndex(site_name)
+            if index:
+                import cert_api
+                cert_api.cert_api().renewCert(index)
+            else:
+                return mw.returnJson(True, '无效操作')
 
         return mw.returnJson(True, '续期成功')
 
