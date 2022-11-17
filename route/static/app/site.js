@@ -1808,7 +1808,7 @@ function deploySSL(type,id,siteName){
 }
 
 function renewSSL(type,id,siteName){
-	$.post('/site/re_ssl','site_name='+siteName+'&ssl_type='+type,function(rdata){
+	$.post('/site/renew_ssl','site_name='+siteName+'&ssl_type='+type,function(rdata){
 		showMsg(rdata.msg, function(){
 			opSSL(type,id,siteName);
 		},{icon:rdata.status?1:2}, 2000);
