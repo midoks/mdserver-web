@@ -35,6 +35,9 @@ for PHP_VER in ${PHP_VER_LIST[@]}; do
 done
 
 
+# cd /www/server/mdserver-web/plugins/php-yum && bash install.sh install 74
+
+
 # mysql
 if [ ! -d /www/server/mysql ];then
 	# cd /www/server/mdserver-web/plugins/mysql && bash install.sh install 5.7
