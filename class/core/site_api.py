@@ -1354,10 +1354,10 @@ class site_api:
             if conf.find(rep) == -1:
                 rep = '#error_page 404/404.html;'
             data = '''
-    # AUTH_START
+    #AUTH_START
     auth_basic "Authorization";
     auth_basic_user_file %s;
-    # AUTH_END''' % (filename,)
+    #AUTH_END''' % (filename,)
             conf = conf.replace(rep, rep + data)
             mw.writeFile(configFile, conf)
         # 写密码配置
@@ -1446,14 +1446,14 @@ class site_api:
         content = mw.readFile(vhost_file)
 
         cnf_301 = '''
-    # 301-START
+    #301-START
     include %s/*.conf;
-    # 301-END
+    #301-END
 ''' % (self.getRedirectPath( siteName))
 
-        cnf_301_source = '''
-    # 301-START
-'''
+        cnf_301_source = '\
+    #301-START\
+'
         # print('operateRedirectConf', content.find('#301-END'))
         if content.find('#301-END') != -1:
             if method == 'stop':
@@ -1638,14 +1638,14 @@ class site_api:
         content = mw.readFile(vhost_file)
 
         proxy_cnf = '''
-    # PROXY-START
+    #PROXY-START
     include %s/*.conf;
-    # PROXY-END
+    #PROXY-END
 ''' % (self.getProxyPath(siteName))
 
-        proxy_cnf_source = '''
-    # PROXY-START
-'''
+        proxy_cnf_source = '\
+    #PROXY-START\
+'
 
         if content.find('#PROXY-END') != -1:
             if method == 'stop':
@@ -1775,32 +1775,30 @@ class site_api:
             return mw.returnJson(False, "错误的目标地址")
 
         # location ~* ^{from}(.*)$ {
-        tpl = """
-# PROXY-START/
-location ^~ {from} {
-    proxy_pass {to};
-    proxy_set_header Host {host};
-    proxy_set_header X-Real-IP $remote_addr;
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header REMOTE-HOST $remote_addr;
-    
-    add_header X-Cache $upstream_cache_status;
-    proxy_ignore_headers Set-Cookie Cache-Control expires;
-    add_header Cache-Control no-cache;
-
-    set $static_files_app 0;
-    if ( $uri ~* "\.(gif|png|jpg|css|js|woff|woff2)$" )
-    {
-        set $static_files_app 1;
-        expires 12h;
-    }
-    if ( $static_files_app = 0 )
-    {
-        add_header Cache-Control no-cache;
-    }
-}
-# PROXY-END/
-        """
+        tpl = '#PROXY-START\
+location ^~ {from} {\
+    proxy_pass {to};\
+    proxy_set_header Host {host};\
+    proxy_set_header X-Real-IP $remote_addr;\
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\
+    proxy_set_header REMOTE-HOST $remote_addr;\
+    \
+    add_header X-Cache $upstream_cache_status;\
+    proxy_ignore_headers Set-Cookie Cache-Control expires;\
+    add_header Cache-Control no-cache;\
+    \
+    set $static_files_app 0;\
+    if ( $uri ~* "\.(gif|png|jpg|css|js|woff|woff2)$" )\
+    {\
+        set $static_files_app 1;\
+        expires 12h;\
+    }\
+    if ( $static_files_app = 0 )\
+    {\
+        add_header Cache-Control no-cache;\
+    }\
+}\
+#PROXY-END'
 
         # replace
         if _from[0] != '/':
@@ -2240,7 +2238,7 @@ location ^~ {from} {
            return 404;
         }
     }
-    # SECURITY-END
+    #SECURITY-END
     include %s/enable-php-''' % (fix.strip().replace(',', '|'), domains.strip().replace(',', ' '), pre_path)
                 conf = re.sub(re_path, rconf, conf)
                 mw.writeLog('网站管理', '站点[' + name + ']已开启防盗链!')
