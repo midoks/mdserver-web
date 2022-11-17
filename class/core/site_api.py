@@ -1641,9 +1641,7 @@ class site_api:
     #PROXY-END
 ''' % (self.getProxyPath(siteName))
 
-        proxy_cnf_source = '\
-    #PROXY-START\
-'
+        proxy_cnf_source = '#PROXY-START'
 
         if content.find('#PROXY-END') != -1:
             if method == 'stop':
