@@ -764,8 +764,8 @@ class site_api:
 
         if not os.path.exists(dst_letpath):
             mw.execShell('mkdir -p ' + dst_letpath)
-            mw.buildSoftLink(src_csrpath, dst_csrpath)
-            mw.buildSoftLink(src_keypath, dst_keypath)
+            mw.buildSoftLink(src_csrpath, dst_csrpath, True)
+            mw.buildSoftLink(src_keypath, dst_keypath, True)
             mw.execShell('echo "lets" > "' + dst_letpath + '/README"')
 
         # 写入配置文件
