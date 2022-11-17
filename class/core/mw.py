@@ -535,7 +535,7 @@ def buildSoftLink(src, dst, force=False):
         os.remove(dst)
 
     if not os.path.exists(dst):
-        execShell('ln -sf "' + src_csrpath + '" "' + dst_csrpath + '"')
+        execShell('ln -sf "' + src + '" "' + dst + '"')
         return True
     return False
 
