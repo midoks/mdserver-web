@@ -721,7 +721,7 @@ class site_api:
                 import cert_api
                 cert_api.cert_api().renewCert(index)
             else:
-                return mw.returnJson(True, '无效操作')
+                return mw.returnJson(False, '无效操作')
 
         return mw.returnJson(True, '续期成功')
 
