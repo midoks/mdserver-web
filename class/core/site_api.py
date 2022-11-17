@@ -1635,8 +1635,7 @@ class site_api:
         vhost_file = self.vhostPath + '/' + siteName + '.conf'
         content = mw.readFile(vhost_file)
 
-        proxy_cnf = '''
-    #PROXY-START
+        proxy_cnf = '''#PROXY-START
     include %s/*.conf;
     #PROXY-END
 ''' % (self.getProxyPath(siteName))
