@@ -1771,30 +1771,30 @@ class site_api:
             return mw.returnJson(False, "错误的目标地址")
 
         # location ~* ^{from}(.*)$ {
-        tpl = '#PROXY-START\
-location ^~ {from} {\
-    proxy_pass {to};\
-    proxy_set_header Host {host};\
-    proxy_set_header X-Real-IP $remote_addr;\
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\
-    proxy_set_header REMOTE-HOST $remote_addr;\
-    \
-    add_header X-Cache $upstream_cache_status;\
-    proxy_ignore_headers Set-Cookie Cache-Control expires;\
-    add_header Cache-Control no-cache;\
-    \
-    set $static_files_app 0;\
-    if ( $uri ~* "\.(gif|png|jpg|css|js|woff|woff2)$" )\
-    {\
-        set $static_files_app 1;\
-        expires 12h;\
-    }\
-    if ( $static_files_app = 0 )\
-    {\
-        add_header Cache-Control no-cache;\
-    }\
-}\
-#PROXY-END'
+        tpl = "#PROXY-START\n\
+location ^~ {from} {\n\
+    proxy_pass {to};\n\
+    proxy_set_header Host {host};\n\
+    proxy_set_header X-Real-IP $remote_addr;\n\
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n\
+    proxy_set_header REMOTE-HOST $remote_addr;\n\
+    \n\
+    add_header X-Cache $upstream_cache_status;\n\
+    proxy_ignore_headers Set-Cookie Cache-Control expires;\n\
+    add_header Cache-Control no-cache;\n\
+    \n\
+    set $static_files_app 0;\n\
+    if ( $uri ~* \"\.(gif|png|jpg|css|js|woff|woff2)$\" )\n\
+    {\n\
+        set $static_files_app 1;\n\
+        expires 12h;\n\
+    }\n\
+    if ( $static_files_app = 0 )\n\
+    {\n\
+        add_header Cache-Control no-cache;\n\
+    }\n\
+}\n\
+#PROXY-END"
 
         # replace
         if _from[0] != '/':
