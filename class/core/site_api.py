@@ -666,6 +666,9 @@ class site_api:
         csr_path = path + '/fullchain.pem'  # 生成证书路径
         key_path = path + '/privkey.pem'  # 生成证书路径
 
+        if not os.path.exists(path):
+            os.makedirs(path)
+
         if ssl_type == 'lets':
             ssl_lets_dir = self.sslLetsDir + '/' + site_name
             lets_csrpath = ssl_lets_dir + '/fullchain.pem'
@@ -673,6 +676,7 @@ class site_api:
             if mw.md5(mw.readFile(lets_csrpath)) == mw.md5(mw.readFile(csr_path)):
                 return mw.returnJson(False, '已部署Lets')
             else:
+
                 mw.buildSoftLink(lets_csrpath, csr_path, True)
                 mw.buildSoftLink(lets_keypath, key_path, True)
                 mw.execShell('echo "lets" > "' + path + '/README"')
