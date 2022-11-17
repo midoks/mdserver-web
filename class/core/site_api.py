@@ -1635,8 +1635,7 @@ class site_api:
 
         proxy_cnf = '''#PROXY-START
     include %s/*.conf;
-    #PROXY-END
-''' % (self.getProxyPath(siteName))
+    #PROXY-END''' % (self.getProxyPath(siteName))
 
         proxy_cnf_source = '#PROXY-START'
 
