@@ -1799,7 +1799,7 @@ function deploySSL(type,id,siteName){
 	$.post('/site/deploy_ssl','site_name='+siteName+'&ssl_type='+type,function(rdata){
 		showMsg(rdata.msg, function(){
 			if (rdata.status){
-				opSSL('now',id,siteName);
+				$('#now_ssl').click();
 			} else{
 				opSSL(type,id,siteName);
 			}
