@@ -954,7 +954,7 @@ class site_api:
 
     def closeToHttpsApi(self):
         siteName = request.form.get('siteName', '')
-        return self.httpToHttps(siteName)
+        return self.closeToHttps(siteName)
 
     def closeToHttps(self, site_name):
         file = self.getHostConf(site_name)
