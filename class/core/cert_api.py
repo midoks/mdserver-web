@@ -1544,7 +1544,7 @@ fullchain.pem       粘贴到证书输入框
                 writeLog("|-正在续签第 {} 张，域名: {}..".format(n,
                                                         self.__config['orders'][index]['domains']))
                 writeLog("|-正在创建订单..")
-                cert = self.renewCertTo(self.__config['orders'][index]['domains'], self._config[
+                cert = self.renewCertTo(self.__config['orders'][index]['domains'], self.__config[
                     'orders'][index]['auth_type'], self.__config['orders'][index]['auth_to'], index)
             return cert
         except Exception as ex:
