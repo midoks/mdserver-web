@@ -1445,11 +1445,9 @@ class site_api:
         vhost_file = self.vhostPath + '/' + siteName + '.conf'
         content = mw.readFile(vhost_file)
 
-        cnf_301 = '''
-    #301-START
+        cnf_301 = '''#301-START
     include %s/*.conf;
-    #301-END
-''' % (self.getRedirectPath( siteName))
+    #301-END''' % (self.getRedirectPath( siteName))
 
         cnf_301_source = '#301-START'
         # print('operateRedirectConf', content.find('#301-END'))
