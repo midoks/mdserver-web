@@ -1451,9 +1451,7 @@ class site_api:
     #301-END
 ''' % (self.getRedirectPath( siteName))
 
-        cnf_301_source = '\
-    #301-START\
-'
+        cnf_301_source = '#301-START'
         # print('operateRedirectConf', content.find('#301-END'))
         if content.find('#301-END') != -1:
             if method == 'stop':
