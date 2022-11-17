@@ -1383,7 +1383,7 @@ fullchain.pem       粘贴到证书输入框
         return siteName
 
     def renewCertTo(self, domains, auth_type, auth_to, index=None):
-        siteName = None
+        site_name = None
         cert = {}
 
         import site_api
@@ -1391,21 +1391,18 @@ fullchain.pem       粘贴到证书输入框
         if os.path.exists(auth_to):
             if mw.M('sites').where('path=?', auth_to).count() == 1:
                 site_id = m.M('sites').where('path=?', auth_to).getField('id')
-                siteName = m.M('sites').where(
+                site_name = m.M('sites').where(
                     'path=?', auth_to).getField('name')
 
-                import panelSite
-                siteObj = panelSite.panelSite()
-                args = public.dict_obj()
-                args.id = site_id
-                runPath = siteObj.GetRunPath(args)
+                rdata = api.getSiteRunPath(site_id)
+                runPath = rdata['runPath']
                 if runPath and not runPath in ['/']:
                     path = auth_to + '/' + runPath
                     if os.path.exists(path):
                         auth_to = path.replace('//', '/')
 
             else:
-                siteName = self.getSiteNameByDomains(domains)
+                site_name = self.getSiteNameByDomains(domains)
         is_rep = api.httpToHttps(site_name)
         try:
             index = self.createOrder(
@@ -1423,11 +1420,11 @@ fullchain.pem       粘贴到证书输入框
             self.sendCsr(index)
             writeLog("|-正在下载证书..")
             cert = self.downloadCert(index)
-            self._config['orders'][index]['renew_time'] = int(time.time())
+            self.__config['orders'][index]['renew_time'] = int(time.time())
 
             # 清理失败重试记录
-            self._config['orders'][index]['retry_count'] = 0
-            self._config['orders'][index]['next_retry_time'] = 0
+            self.__config['orders'][index]['retry_count'] = 0
+            self.__config['orders'][index]['next_retry_time'] = 0
 
             # 保存证书配置
             self.saveConfig()
@@ -1439,12 +1436,12 @@ fullchain.pem       粘贴到证书输入框
             if str(e).find('请稍候重试') == -1:  # 受其它证书影响和连接CA失败的的不记录重试次数
                 if index:
                     # 设置下次重试时间
-                    self._config['orders'][index][
+                    self.__config['orders'][index][
                         'next_retry_time'] = int(time.time() + (86400 * 2))
                     # 记录重试次数
-                    if not 'retry_count' in self._config['orders'][index].keys():
-                        self._config['orders'][index]['retry_count'] = 1
-                    self._config['orders'][index]['retry_count'] += 1
+                    if not 'retry_count' in self.__config['orders'][index].keys():
+                        self.__config['orders'][index]['retry_count'] = 1
+                    self.__config['orders'][index]['retry_count'] += 1
                     # 保存证书配置
                     self.saveConfig()
             msg = str(e).split('>>>>')[0]
