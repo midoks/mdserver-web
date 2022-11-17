@@ -764,9 +764,9 @@ class site_api:
 
         if not os.path.exists(dst_letpath):
             mw.execShell('mkdir -p ' + dst_letpath)
-            mw.execShell('ln -sf "' + src_csrpath + '" "' + dst_csrpath + '"')
-            mw.execShell('ln -sf "' + src_keypath + '" "' + dst_keypath + '"')
-            mw.execShell('echo "let" > "' + dst_letpath + '/README"')
+            mw.buildSoftLink(src_csrpath, dst_csrpath)
+            mw.buildSoftLink(src_keypath, dst_keypath)
+            mw.execShell('echo "lets" > "' + dst_letpath + '/README"')
 
         # 写入配置文件
         result = self.setSslConf(siteName)
@@ -906,8 +906,9 @@ class site_api:
 
         if not os.path.exists(dst_path):
             mw.execShell("mkdir -p " + dst_path)
-        mw.execShell('ln -sf "' + src_cert + '" "' + dst_cert + '"')
-        mw.execShell('ln -sf "' + src_key + '" "' + dst_key + '"')
+
+        mw.buildSoftLink(src_cert, dst_cert, True)
+        mw.buildSoftLink(src_key, dst_key, True)
         mw.execShell('echo "acme" > "' + dst_path + '/README"')
 
         # 写入配置文件
