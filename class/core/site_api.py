@@ -685,7 +685,7 @@ class site_api:
             else:
                 mw.buildSoftLink(acme_csrpath, csr_path, True)
                 mw.buildSoftLink(acme_keypath, key_path, True)
-                mw.execShell('echo "lets" > "' + path + '/README"')
+                mw.execShell('echo "acme" > "' + path + '/README"')
 
         result = self.setSslConf(siteName)
         if not result['status']:
