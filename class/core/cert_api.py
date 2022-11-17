@@ -1450,7 +1450,7 @@ fullchain.pem       粘贴到证书输入框
         finally:
             is_rep_decode = json.loads(is_rep)
             if is_rep_decode['status']:
-                api.closeToHttps(siteName)
+                api.closeToHttps(site_name)
         writeLog("-" * 70)
         return cert
 
