@@ -696,6 +696,10 @@ class site_api:
         site_name = request.form.get('site_name', '')
         ssl_type = request.form.get('ssl_type', '')
 
+        if ssl_type == 'lets':
+            import cert_api
+            data = cert_api.cert_api().renewCert(to_args)
+
         return mw.returnJson(True, '续期成功')
 
     def getLetLogsApi(self):
@@ -928,26 +932,32 @@ class site_api:
 
     def httpToHttpsApi(self):
         siteName = request.form.get('siteName', '')
-        file = self.getHostConf(siteName)
+        return self.httpToHttps(siteName)
+
+    def httpToHttps(self, site_name):
+        file = self.getHostConf(site_name)
         conf = mw.readFile(file)
         if conf:
             if conf.find('ssl_certificate') == -1:
                 return mw.returnJson(False, '当前未开启SSL')
-            to = """#error_page 404/404.html;
-    # HTTP_TO_HTTPS_START
-    if ($server_port !~ 443){
-        rewrite ^(/.*)$ https://$host$1 permanent;
-    }
-    # HTTP_TO_HTTPS_END"""
+            to = '#error_page 404/404.html;\
+    #HTTP_TO_HTTPS_START\
+    if ($server_port !~ 443){\
+        rewrite ^(/.*)$ https://$host$1 permanent;\
+    }\
+    #HTTP_TO_HTTPS_END'
             conf = conf.replace('#error_page 404/404.html;', to)
             mw.writeFile(file, conf)
 
         mw.restartWeb()
-        return mw.returnJson(True, '设置成功!证书也要设置好哟!')
+        return mw.returnJson(True, '设置成功!')
 
     def closeToHttpsApi(self):
         siteName = request.form.get('siteName', '')
-        file = self.getHostConf(siteName)
+        return self.httpToHttps(siteName)
+
+    def closeToHttps(self, site_name):
+        file = self.getHostConf(site_name)
         conf = mw.readFile(file)
         if conf:
             rep = "\n\s*#HTTP_TO_HTTPS_START(.|\n){1,300}#HTTP_TO_HTTPS_END"

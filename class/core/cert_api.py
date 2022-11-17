@@ -1370,6 +1370,93 @@ fullchain.pem       粘贴到证书输入框
         return self.applyCert(args['domains'], args['auth_type'], args['auth_to'])
     # 外部API - END ----------------------------------------------------------
 
+    def getSiteNameByDomains(self, domains):
+        # 通过域名获取网站名称
+        sql = mw.M('domain')
+        site_sql = mw.M('sites')
+        siteName = None
+        for domain in domains:
+            pid = sql.where('name=?', domain).getField('pid')
+            if pid:
+                siteName = site_sql.where('id=?', pid).getField('name')
+                break
+        return siteName
+
+    def renewCertTo(self, domains, auth_type, auth_to, index=None):
+        siteName = None
+        cert = {}
+
+        import site_api
+        api = site_api.site_api()
+        if os.path.exists(auth_to):
+            if mw.M('sites').where('path=?', auth_to).count() == 1:
+                site_id = m.M('sites').where('path=?', auth_to).getField('id')
+                siteName = m.M('sites').where(
+                    'path=?', auth_to).getField('name')
+
+                import panelSite
+                siteObj = panelSite.panelSite()
+                args = public.dict_obj()
+                args.id = site_id
+                runPath = siteObj.GetRunPath(args)
+                if runPath and not runPath in ['/']:
+                    path = auth_to + '/' + runPath
+                    if os.path.exists(path):
+                        auth_to = path.replace('//', '/')
+
+            else:
+                siteName = self.getSiteNameByDomains(domains)
+        is_rep = api.httpToHttps(site_name)
+        try:
+            index = self.createOrder(
+                domains,
+                auth_type,
+                auth_to.replace('//', '/'),
+                index
+            )
+
+            writeLog("|-正在获取验证信息..")
+            self.getAuths(index)
+            writeLog("|-正在验证域名..")
+            self.authAomain(index)
+            writeLog("|-正在发送CSR..")
+            self.sendCsr(index)
+            writeLog("|-正在下载证书..")
+            cert = self.downloadCert(index)
+            self._config['orders'][index]['renew_time'] = int(time.time())
+
+            # 清理失败重试记录
+            self._config['orders'][index]['retry_count'] = 0
+            self._config['orders'][index]['next_retry_time'] = 0
+
+            # 保存证书配置
+            self.saveConfig()
+            cert['status'] = True
+            cert['msg'] = '续签成功!'
+            writeLog("|-续签成功!")
+        except Exception as e:
+
+            if str(e).find('请稍候重试') == -1:  # 受其它证书影响和连接CA失败的的不记录重试次数
+                if index:
+                    # 设置下次重试时间
+                    self._config['orders'][index][
+                        'next_retry_time'] = int(time.time() + (86400 * 2))
+                    # 记录重试次数
+                    if not 'retry_count' in self._config['orders'][index].keys():
+                        self._config['orders'][index]['retry_count'] = 1
+                    self._config['orders'][index]['retry_count'] += 1
+                    # 保存证书配置
+                    self.saveConfig()
+            msg = str(e).split('>>>>')[0]
+            writeLog("|-" + msg)
+            return mw.returnJson(False, msg)
+        finally:
+            is_rep_decode = json.loads(is_rep)
+            if is_rep_decode['status']:
+                api.closeToHttps(siteName)
+        writeLog("-" * 70)
+        return cert
+
     def renewCert(self, index):
         writeLog("", "wb+")
         # self.D('renew_cert', index)
@@ -1451,6 +1538,18 @@ fullchain.pem       粘贴到证书输入框
                     writeLog("|-所有任务已处理完成!")
                     return
             writeLog("|-共需要续签 {} 张证书".format(len(order_index)))
+
+            n = 0
+            self.getApis()
+            cert = None
+            for index in order_index:
+                n += 1
+                writeLog("|-正在续签第 {} 张，域名: {}..".format(n,
+                                                        self.__config['orders'][index]['domains']))
+                writeLog("|-正在创建订单..")
+                cert = self.renewCertTo(self.__config['orders'][index]['domains'], self._config[
+                    'orders'][index]['auth_type'], self.__config['orders'][index]['auth_to'], index)
+            return cert
         except Exception as ex:
             ex = str(ex)
             if ex.find(">>>>") != -1:
