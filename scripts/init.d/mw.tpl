@@ -171,21 +171,29 @@ mw_reload()
     fi
 }
 
-
 error_logs()
 {
 	tail -n 100 $mw_path/logs/error.log
 }
 
-
 mw_update()
 {
-    curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/update.sh | bash
+    cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
+    if [ ! -z "$cn" ];then
+        curl -fsSL https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/scripts/update.sh | bash
+    else
+        curl -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/update.sh | bash
+    fi
 }
 
 mw_update_dev()
 {
-    curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update_dev.sh | bash
+    cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
+    if [ ! -z "$cn" ];then
+        curl -fsSL https://gitee.com/midoks/mdserver-web/raw/master/scripts/update_dev.sh | bash
+    else
+        curl -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update_dev.sh | bash
+    fi
     cd /www/server/mdserver-web
 }
 
