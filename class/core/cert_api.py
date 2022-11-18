@@ -1530,7 +1530,7 @@ fullchain.pem       粘贴到证书输入框
                     order_index.append(i)
                 if not order_index:
                     writeLog("|-没有找到30天内到期的SSL证书，正在尝试去寻找其它可续签证书!")
-                    self.getApis()
+                    # self.getApis()
                     # self.renewCertOther()
                     writeLog("|-所有任务已处理完成!")
                     return
