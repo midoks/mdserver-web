@@ -55,6 +55,8 @@ if [ "${action}" == "install" ] && [ -d ${serverPath}/php/${type} ];then
 	cd ${rootPath}/plugins/php/versions/common && bash mcrypt.sh install ${type}
 	cd ${rootPath}/plugins/php/versions/common && bash openssl.sh install ${type}
 	cd ${rootPath}/plugins/php/versions/common && bash gettext.sh install ${type}
+	cd ${rootPath}/plugins/php/versions/common && bash redis.sh install ${type}
+	cd ${rootPath}/plugins/php/versions/common && bash memcached.sh install ${type}
 	echo "install PHP${type} extend end"
 
 	#初始化 

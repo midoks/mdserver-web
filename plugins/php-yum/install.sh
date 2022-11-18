@@ -70,6 +70,8 @@ if [ "${action}" == "install" ] && [ -d ${serverPath}/php-yum/${type} ];then
 	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install mcrypt
 	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install openssl
 	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install gettext
+	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install redis
+	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install memcached
 	echo "install PHP-YUM[${type}] extend end"
 
 	#初始化 

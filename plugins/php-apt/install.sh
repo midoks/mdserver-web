@@ -80,6 +80,8 @@ if [ "${action}" == "install" ] && [ -d ${serverPath}/php-apt/${type} ];then
 	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type:0:1}.${type:1:2} install mcrypt
 	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type:0:1}.${type:1:2} install mysqlnd
 	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type:0:1}.${type:1:2} install gettext
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type:0:1}.${type:1:2} install redis
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type:0:1}.${type:1:2} install memcached
 	echo "install PHP-APT[${type}] extend end"
 
 	#初始化 
