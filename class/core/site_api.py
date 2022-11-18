@@ -731,7 +731,8 @@ class site_api:
             index = self.getLetsIndex(site_name)
             if index:
                 import cert_api
-                cert_api.cert_api().renewCert(index)
+                data = cert_api.cert_api().renewCert(index)
+                return data
             else:
                 return mw.returnJson(False, '无效操作')
 
