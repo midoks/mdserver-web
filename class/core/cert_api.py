@@ -1432,6 +1432,10 @@ fullchain.pem       粘贴到证书输入框
             cert['msg'] = '续签成功!'
             writeLog("|-续签成功!")
         except Exception as e:
+            if str(e).find('429') > -1:
+                msg = '至少超过7天，才能续期!'
+                writeLog("|-" + msg)
+                return mw.returnJson(False, msg)
 
             if str(e).find('请稍候重试') == -1:  # 受其它证书影响和连接CA失败的的不记录重试次数
                 if index:
