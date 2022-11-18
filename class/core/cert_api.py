@@ -1420,7 +1420,7 @@ fullchain.pem       粘贴到证书输入框
             writeLog("|-正在获取验证信息..")
             self.getAuths(index)
             writeLog("|-正在验证域名..")
-            self.authAomain(index)
+            self.authDomain(index)
             writeLog("|-正在发送CSR..")
             self.sendCsr(index)
             writeLog("|-正在下载证书..")
