@@ -41,6 +41,10 @@ fi
 
 Install_phpmyadmin()
 {
+	if [ -d $serverPath/phpmyadmin ];then
+		exit 0
+	fi
+
 	mkdir -p ${serverPath}/phpmyadmin
 	mkdir -p ${serverPath}/source/phpmyadmin
 

@@ -31,6 +31,10 @@ if [ ! -d $curPath/versions/$2 ];then
 	exit 0
 fi
 
+if [ -d $serverPath/php/${type} ];then
+	exit 0
+fi
+
 if [ "${action}" == "uninstall" ];then
 	
 	if [ -f /usr/lib/systemd/system/php${type}.service ] || [ -f /lib/systemd/system/php${type}.service ] ;then

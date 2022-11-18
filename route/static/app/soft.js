@@ -307,9 +307,19 @@ function toIndexDisplay(name, version, coexist) {
 }
 
 function indexListHtml(callback){
-    var loadT = layer.msg('正在获取列表...', { icon: 16, time: 0, shade: [0.3, '#000'] });
+    
+
+    // init
+    $("#indexsoft").html('');
+    var index_soft = '';
+    for (var i = 0; i < 12; i++) {
+        index_soft += '<div class="col-sm-3 col-md-3 col-lg-3 no-bg"></div>';
+    }
+    $("#indexsoft").html(index_soft);
+
+    // var loadT = layer.msg('正在获取列表...', { icon: 16, time: 0, shade: [0.3, '#000'] });
     $.get('/plugins/index_list', function(rdata) {
-        layer.close(loadT);
+        // layer.close(loadT);
         $("#indexsoft").html('');
         var con = '';
         for (var i = 0; i < rdata.length; i++) {
@@ -360,7 +370,6 @@ function indexListHtml(callback){
         var softboxn = softboxlen;
         if (softboxlen <= softboxsum) {
             for (var i = 0; i < softboxsum - softboxlen; i++) {
-                // softboxn += 1000;
                 softboxcon += '<div class="col-sm-3 col-md-3 col-lg-3 no-bg" data-id=""></div>';
             }
             $("#indexsoft").append(softboxcon);

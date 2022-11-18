@@ -352,14 +352,8 @@ html {
     box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6)
 }
 
-.important-title {
-    color:red;
-    background-color: #fef3e2;
-    line-height: 46px;
-    margin-bottom: 15px;
-    padding-left: 10px;
-    box-shadow: 0 1px 2px 0 rgba(0,0,0,.2);
-}
+
+
 .info-title-tips {
     background-color: #fbfbfb;
     border: 1px solid #eee;
@@ -1967,19 +1961,46 @@ html .menu .menu_exit:hover {
 }
 
 .sl-s-info {
-    width: 124px;
-    border: #ccc 1px solid
+    width: 210px;
+    border: #ccc 1px solid;
+}
+
+.important-title {
+    display: flex;
+    color:red;
+    background-color: #fef3e2;
+    line-height: 46px;
+    margin-bottom: 15px;
+    padding-left: 10px;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,.2);
+}
+
+.important-title>p {
+    flex: 1;
+}
+
+.rec-box-con .onekey {
+    font-family: "宋体";
+    width: 90px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    background-color: #20a53a;
+    border-radius: 3px;
+    color: #fff;
+    margin: 20px auto 15px;
+    cursor: pointer;
 }
 
 .rec-install {
     padding: 16px;
     width: 100%;
-    float: left
+    float: left;
 }
 
 .rec-install .rec-box {
-    width: 305px;
-    float: left
+    width: 290px;
+    float: left;
 }
 
 .rec-install h3 {

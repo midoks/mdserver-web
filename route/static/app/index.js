@@ -277,8 +277,6 @@ function setcolor(pre, s, s1, s2, s3) {
 }
 
 
-
-
 function getNet() {
     var up, down;
     $.get("/system/network", function(net) {
@@ -304,8 +302,8 @@ function getNet() {
 }
 
 //网络Io
-function NetImg() {
-    var myChartNetwork = echarts.init(document.getElementById('NetImg'));
+function netImg() {
+    var myChartNetwork = echarts.init(document.getElementById('netImg'));
     var xData = [];
     var yData = [];
     var zData = [];
@@ -475,7 +473,7 @@ function NetImg() {
         myChartNetwork.resize();
     });
 }
-NetImg();
+
 
 function setImg() {
     $('.circle').each(function(index, el) {
@@ -499,7 +497,6 @@ function setImg() {
         layer.closeAll('tips');
     });
 }
-setImg();
 
 // 检查更新
 setTimeout(function() {
@@ -733,7 +730,7 @@ function warningTo(to_url, def) {
         layer.close(loadT);
         layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
         if (rdata.status && def) setTimeout(function() { location.reload(); }, 1000);
-    });
+    },'json');
 }
 
 function setSafeHide() {
@@ -766,10 +763,100 @@ function showDanger(num, port) {
     $(".showDanger td").css("padding", "8px")
 }
 
-//加载关键数据总数
-loadKeyDataCount();
+function pluginInit(){
+    $.post('/plugins/init', function(data){
+        if (!data.status){
+            return false;
+        }
+
+        var rdata = data.data;
+        var plugin_list = '';
+
+        for (var i = 0; i < rdata.length; i++) {
+            var ver = rdata[i]['versions'];
+            var select_list = '';
+            if (typeof(ver)=='string'){
+                select_list = '<option value="' + ver +'">' + rdata[i]['title'] + ' - ' + ver + '</option>';
+            } else {
+                for (var vi = 0; vi < ver.length; vi++) {
+
+                    if (ver[vi] == rdata[i]['default_ver']){
+                        select_list += '<option value="'+ver[vi]+'" selected="selected">'+ rdata[i]['title'] + ' - '+ ver[vi] + '</option>';
+                    } else {
+                        select_list += '<option value="'+ver[vi]+'">'+ rdata[i]['title'] + ' - '+ ver[vi] + '</option>';
+                    }
+                }
+            }
+
+            var pn_checked = '<input id="data_'+rdata[i]['name']+'" type="checkbox" checked>';
+            if (rdata[i]['name'] == 'swap'){
+                var pn_checked = '<input id="data_'+rdata[i]['name']+'" type="checkbox" disabled="disabled" checked>';
+            }
+            
+            plugin_list += '<li><span class="ico"><img src="/plugins/file?name='+rdata[i]['name']+'&f=ico.png"></span>\
+            <span class="name">\
+                <select id="select_'+rdata[i]['name']+'" class="sl-s-info">'+select_list+'</select>\
+            </span>\
+            <span class="pull-right">'+pn_checked+'</span></li>';
+        }
+
+        layer.open({
+            type: 1,
+            title: '推荐安装',
+            area: ["320px", "400px"],
+            closeBtn: 2,
+            shadeClose: false,
+            content:"\
+        <div class='rec-install'>\
+            <div class='important-title'>\
+                <p><span class='glyphicon glyphicon-alert' style='color: #f39c12; margin-right: 10px;'></span>推荐以下一键套件，或在<a href='javascript:jump()' style='color:#20a53a'>软件管理</a>按需选择。</p>\
+                <!-- <button style='margin-top: 8px;height: 30px;' type='button' class='btn btn-sm btn-default no-show-rec-btn'>不再显示推荐</button> -->\
+            </div>\
+            <div class='rec-box'>\
+                <h3 style='text-align: center'>经典LNMP</h3>\
+                <div class='rec-box-con'>\
+                    <ul class='rec-list'>" + plugin_list + "</ul>\
+                    <div class='onekey'>一键安装</div>\
+                </div>\
+            </div>\
+        </div>",
+            success:function(l,index){
+                $('.rec-box-con .onekey').click(function(){
+                    var post_data = [];
+                    for (var i = 0; i < rdata.length; i++) {
+                        var key_ver = '#select_'+rdata[i]['name'];
+                        var key_checked = '#data_'+rdata[i]['name'];
+
+                        var val_checked = $(key_checked).prop("checked");
+                        if (val_checked){
+
+                            var tmp = {};
+                            var val_key = $(key_ver).val();
+
+                            tmp['version'] = val_key;
+                            tmp['name'] = rdata[i]['name'];
+                            post_data.push(tmp);
+                        }
+                    }
+
+                    $.post('/plugins/init_install', 'list='+JSON.stringify(post_data), function(data){
+                        layer.msg(data.msg, { icon: data.status ? 1 : 2 });
+                    },'json');
+                });   
+            },
+            cancel:function(){
+                layer.confirm('是否不再显示推荐安装套件?', {btn : ['确定', '取消'],title: "不再显示推荐?"}, function() {
+                    $.post('/files/create_dir', 'path=/www/server/php', function(rdata) {
+                        layer.closeAll();
+                    },'json');
+                });
+            }
+        });
+    },'json');
+}
+
 function loadKeyDataCount(){
-    var plist = ['mysql', 'gogs','gitea'];
+    var plist = ['mysql', 'gogs', 'gitea'];
     for (var i = 0; i < plist.length; i++) {
         pname = plist[i];
         function call(pname){
@@ -783,8 +870,9 @@ function loadKeyDataCount(){
                     return;
                 }
                 var html = '<li class="sys-li-box col-xs-3 col-sm-3 col-md-3 col-lg-3">\
-                            <p class="name f15 c9">'+pname+'</p>\
-                            <div class="val"><a class="btlink" onclick="softMain(\''+pname+'\',\''+pname+'\',\''+rdata['data']['ver']+'\')">'+rdata['data']['count']+'</a></div></li>';
+                        <p class="name f15 c9">'+pname+'</p>\
+                        <div class="val"><a class="btlink" onclick="softMain(\''+pname+'\',\''+pname+'\',\''+rdata['data']['ver']+'\')">'+rdata['data']['count']+'</a></div>\
+                    </li>';
                 $('#index_overview').append(html);
             },'json');
         }

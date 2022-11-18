@@ -24,6 +24,10 @@ if [ ! -d $curPath/versions/$2 ];then
 	exit 0
 fi
 
+if [ -d $serverPath/mysql ];then
+	exit 0
+fi
+
 if [ "${action}" == "uninstall" ];then
 	
 	if [ -f /usr/lib/systemd/system/mysql.service ] || [ -f /lib/systemd/system/mysql.service ];then
