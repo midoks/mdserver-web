@@ -1203,6 +1203,11 @@ fullchain.pem       粘贴到证书输入框
             cert['status'] = True
             cert['msg'] = '申请成功!'
             writeLog("|-申请成功，正在部署到站点..")
+
+            self.clearAuthFile(index)
+
+            if os.path.exists(auth_to):
+                mw.execShell("rm -rf {}/.well-known".format(auth_to))
             return cert
         except Exception as ex:
             ex = str(ex)
