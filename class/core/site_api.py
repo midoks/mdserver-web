@@ -707,7 +707,7 @@ class site_api:
 
         for x in order_list:
             if order_list[x]['status'] == 'valid':
-                for d in range(len(order_list[x]['domains'])):
+                for d in order_list[x]['domains']:
                     if d == site_name:
                         return x
         return False

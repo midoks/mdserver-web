@@ -1811,7 +1811,10 @@ function renewSSL(type,id,siteName){
 	showSpeedWindow('正在续签...', 'site.get_let_logs', function(layers,index){
 		$.post('/site/renew_ssl','site_name='+siteName+'&ssl_type='+type,function(rdata){
 			showMsg(rdata.msg, function(){
-				opSSL(type,id,siteName);
+				if (rdata.status){
+					layer.close(index);
+					opSSL(type,id,siteName);
+				}
 			},{icon:rdata.status?1:2}, 2000);
 		},'json');
 	});	
