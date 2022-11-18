@@ -1353,7 +1353,7 @@ fullchain.pem       粘贴到证书输入框
                 else:
                     path = siteInfo['path']
             except:
-                write_log("|-[{}]续签失败".format(siteName))
+                writeLog("|-[{}]续签失败".format(siteName))
 
     # 外部API - START ----------------------------------------------------------
     def getHostConf(self, siteName):
@@ -1555,6 +1555,7 @@ fullchain.pem       粘贴到证书输入框
                 writeLog("|-正在创建订单..")
                 cert = self.renewCertTo(self.__config['orders'][index]['domains'], self.__config[
                     'orders'][index]['auth_type'], self.__config['orders'][index]['auth_to'], index)
+                self.clearAuthFile(index)
             return cert
         except Exception as ex:
             ex = str(ex)
