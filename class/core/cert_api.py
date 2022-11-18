@@ -463,7 +463,7 @@ fi
         return self.getSiteRunPathByid(site_id)
 
     # 清理验证文件
-    def claerAuthFile(self, index):
+    def clearAuthFile(self, index):
         if not self.__config['orders'][index]['auth_type'] in ['http', 'tls']:
             return True
         acme_path = '{}/.well-known/acme-challenge'.format(
@@ -583,7 +583,7 @@ fi
                 self.__config['orders'][index]['auth_to'] = site_run_path
 
         # 清理旧验证
-        self.claerAuthFile(index)
+        self.clearAuthFile(index)
 
         auths = []
         for auth_url in self.__config['orders'][index]['authorizations']:
