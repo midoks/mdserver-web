@@ -1632,7 +1632,7 @@ fullchain.pem       粘贴到证书输入框
 // create
 python3 class/core/cert_api.py --domain=dev38.cachecha.com --type=http --path=/www/wwwroot/dev38.cachecha.com
 // renew
-cd /www/server/mdserver-web && python3 class/core/cert_api.py --renew=1
+cd /www/server/mdserver-web && python3 class/core/cert_api.py --renew=1 --index=46c558aa1fae96facf36ac7df8eb4750
 // revoke
 cd /www/server/mdserver-web && python3 class/core/cert_api.py --revoke=1 --index=370423ed29481b2caf22e36d90a6894a
 
