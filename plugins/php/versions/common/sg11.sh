@@ -64,8 +64,8 @@ Install_lib()
 			cd $php_lib && tar -jxvf $php_lib/sg11_loaders.tar.bz2 -C $php_lib/sg11
 		fi 
 		cd $php_lib/sg11
-		echo "mv $php_lib/sg11/${DEFAULT_OSNAME}/ixed.${SG_VER}.lin $extFile"
-		mv $php_lib/sg11/${DEFAULT_OSNAME}/ixed.${SG_VER}.lin $extFile
+		# echo "mv $php_lib/sg11/${DEFAULT_OSNAME}/ixed.${SG_VER}.lin $extFile"
+		cp -rf $php_lib/sg11/${DEFAULT_OSNAME}/ixed.${SG_VER}.lin $extFile
 	fi
 	
 	if [ ! -f "$extFile" ];then
