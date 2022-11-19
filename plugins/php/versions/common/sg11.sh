@@ -19,6 +19,7 @@ LIBV=0
 sysName=`uname`
 actionType=$1
 version=$2
+SG_VER=${version:0:1}.${version:1:2}
 
 
 LIB_PATH_NAME=lib/php
@@ -38,6 +39,13 @@ fi
 
 Install_lib()
 {
+	bash ${rootPath}/scripts/getos.sh
+	OSNAME=`cat ${rootPath}/data/osname.pl`
+	VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
+	echo "${OSNAME}:${VERSION_ID}"
+
+	DEFAULT_OSNAME=linux-x86_64
+
 	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep "${LIBNAME}.so"`
 	if [ "${isInstall}" != "" ];then
 		echo "php-$version 已安装${LIBNAME},请选择其它版本!"
@@ -49,12 +57,13 @@ Install_lib()
 
 		php_lib=$sourcePath/php_lib
 		mkdir -p $php_lib
+		mkdir -p $php_lib/sg11
 		if [ ! -f $php_lib/sg11_loaders.tar.bz2 ];then
 			wget --no-check-certificate -O $php_lib/sg11_loaders.tar.bz2 https://www.sourceguardian.com/loaders/download/loaders.tar.bz2
-			cd $php_lib && tar -Jxf sg11_loaders.tar.bz2
+			cd $php_lib && tar -jxvf sg11_loaders.tar.bz2 -C $php_lib/sg11
 		fi 
-		# cd $php_lib/loaders
-		# cp -rf $php_lib/loaders/ioncube_loader_lin_${IC_VERSION}.so $extFile/sg11.so
+		cd $php_lib/sg11
+		cp -rf $php_lib/sg11/${DEFAULT_OSNAME}/ixed.${SG_VER}.lin $extFile/sg11.so
 	fi
 	
 	if [ ! -f "$extFile" ];then
