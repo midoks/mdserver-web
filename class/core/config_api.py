@@ -158,6 +158,18 @@ class config_api:
             mw.setHostAddr(host_ip)
         return mw.returnJson(True, 'IP保存成功!')
 
+    def setWwwDirApi(self):
+        sites_path = request.form.get('sites_path', '')
+        if sites_path != mw.getWwwDir():
+            mw.setWwwDir(sites_path)
+        return mw.returnJson(True, '修改默认建站目录成功!')
+
+    def setBackupDirApi(self):
+        backup_path = request.form.get('backup_path', '')
+        if backup_path != mw.getBackupDir():
+            mw.setBackupDir(backup_path)
+        return mw.returnJson(True, '修改默认备份目录成功!')
+
     def setApi(self):
         webname = request.form.get('webname', '')
         port = request.form.get('port', '')

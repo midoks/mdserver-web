@@ -88,10 +88,6 @@ def getLogsDir():
     return getRootDir() + '/wwwlogs'
 
 
-def getBackupDir():
-    return getRootDir() + '/backup'
-
-
 def getWwwDir():
     file = getRunDir() + '/data/site.pl'
     if os.path.exists(file):
@@ -102,6 +98,13 @@ def getWwwDir():
 def setWwwDir(wdir):
     file = getRunDir() + '/data/site.pl'
     return writeFile(file, wdir)
+
+
+def getBackupDir():
+    file = getRunDir() + '/data/backup.pl'
+    if os.path.exists(file):
+        return readFile(file).strip()
+    return getRootDir() + '/backup'
 
 
 def setBackupDir(bdir):

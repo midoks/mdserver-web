@@ -64,14 +64,14 @@
 						<p class="mtb15">
 							<span class="set-tit text-right" title="服务器IP">服务器IP</span>
 							<input name="host_ip" class="inputtxt bt-input-text" type="text" value="{{data['ip']}}">
-							<button type="button" class="btn btn-success btn-sm ml5 btn_host_ip" disabled>设置</button>
+							<button type="button" class="btn btn-success btn-sm ml5 btn_host_ip" disabled>保存</button>
 							<span class="set-info c7">默认为外网IP,若您在本地虚拟机测试,请填写虚拟机内网IP!</span>
 						</p>
 
 						<p class="mtb15">
 							<span class="set-tit text-right">面板端口</span>
 							<input id="banport" name="port" class="inputtxt bt-input-text" type="numner" value="{{data['port']}}" maxlength="5">
-							<button type="button" class="btn btn-success btn-sm ml5 btn_port" disabled>设置</button>
+							<button type="button" class="btn btn-success btn-sm ml5 btn_port" disabled>保存</button>
 							<span class="set-info c7">建议端口范围7200 - 65535</span>
 						</p>
 
@@ -93,12 +93,14 @@
 						<p class="mtb15">
 							<span class="set-tit text-right" title="默认建站目录">默认建站目录</span>
 							<input name="sites_path" class="inputtxt bt-input-text" type="text" value="{{data['site_path']}}">
+							<button type="button" class="btn btn-success btn-sm ml5 btn_sites_path" disabled>保存</button>
 							<span class="set-info c7">新创建的站点,默认将保存到该目录的下级目录!</span>
 						</p>
 
 						<p class="mtb15">
 							<span class="set-tit text-right" title="默认建站目录">默认备份目录</span>
 							<input name="backup_path" class="inputtxt bt-input-text" type="text" value="{{data['backup_path']}}">
+							<button type="button" class="btn btn-success btn-sm ml5 btn_backup_path" disabled>保存</button>
 							<span class="set-info c7">网站和数据库的备份目录!</span>
 						</p>
 
@@ -121,7 +123,7 @@
 							<span class="set-info c7">设置面板密码</span>
 						</p>
 					</form>
-					<div class="bt-submit set-submit">保存</div>
+					<!-- <div class="bt-submit set-submit">保存</div> -->
 				</div>
 
 				<div class="title c6 plr15">

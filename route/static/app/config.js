@@ -49,6 +49,27 @@ $('input[name="port"]').change(function(){
 	});
 });
 
+$('input[name="sites_path"]').change(function(){
+	var sites_path = $(this).val();
+	$('.btn_sites_path').removeAttr('disabled');
+	$('.btn_sites_path').unbind().click(function(){
+		$.post('/config/set_www_dir','sites_path='+sites_path, function(rdata){
+			showMsg(rdata.msg,function(){window.location.reload();},{icon:rdata.status?1:2},2000);
+		},'json');
+	});
+});
+
+
+$('input[name="backup_path"]').change(function(){
+	var backup_path = $(this).val();
+	$('.backup_path').removeAttr('disabled');
+	$('.btn_sites_path').unbind().click(function(){
+		$.post('/config/set_backup_dir','backup_path='+backup_path, function(rdata){
+			showMsg(rdata.msg,function(){window.location.reload();},{icon:rdata.status?1:2},2000);
+		},'json');
+	});
+});
+
 
 
 /** op **/
