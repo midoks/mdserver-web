@@ -208,7 +208,8 @@ class config_api:
         mw.writeFile(path, json.dumps(ba_conf))
         os.chmod(path, 384)
         mw.writeLog('面板设置', '设置BasicAuth状态为: %s' % is_open)
-        mw.writeFile('data/reload.pl', 'True')
+
+        mw.restartMw()
         return mw.returnJson(True, '设置成功!')
 
     def setApi(self):
