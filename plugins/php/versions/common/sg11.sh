@@ -59,7 +59,7 @@ Install_lib()
 		mkdir -p $php_lib
 		mkdir -p $php_lib/sg11
 		if [ ! -f $php_lib/sg11_loaders.tar.bz2 ];then
-			wget --no-check-certificate -O $php_lib/sg11_loaders.tar.bz2 https://www.sourceguardian.com/loaders/download/loaders.tar.bz2
+			curl -sSLo $php_lib/sg11_loaders.tar.bz2 https://www.sourceguardian.com/loaders/download/loaders.tar.bz2
 			cd $php_lib && tar -jxvf sg11_loaders.tar.bz2 -C $php_lib/sg11
 		fi 
 		cd $php_lib/sg11
