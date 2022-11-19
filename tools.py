@@ -27,7 +27,7 @@ import db
 # p = "/usr/local/lib/" + info[0].strip() + "/site-packages"
 # sys.path.append(p)
 
-INIT_DIR = "/etc/init.d"
+INIT_DIR = "/etc/rc.d/init.d"
 if mw.isAppleSystem():
     INIT_DIR = mw.getRunDir() + "/scripts/init.d"
 
