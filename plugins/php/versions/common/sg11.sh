@@ -12,19 +12,13 @@ sourcePath=${serverPath}/source/php
 
 # https://www.sourceguardian.com/loaders.html
 
-# support 52-74
+# support 52-81
 
 LIBNAME=sg11
 LIBV=0
 sysName=`uname`
 actionType=$1
 version=$2
-IC_VERSION=${version:0:1}.${version:1:2}
-
-if [ "$version" -gt "74" ];then
-	echo "not need"
-	exit 1
-fi
 
 
 LIB_PATH_NAME=lib/php
@@ -56,7 +50,7 @@ Install_lib()
 		php_lib=$sourcePath/php_lib
 		mkdir -p $php_lib
 		if [ ! -f $php_lib/sg11_loaders.tar.bz2 ];then
-			wget -O $php_lib/sg11_loaders.tar.bz2 https://www.sourceguardian.com/loaders/download/loaders.tar.bz2
+			wget --no-check-certificate -O $php_lib/sg11_loaders.tar.bz2 https://www.sourceguardian.com/loaders/download/loaders.tar.bz2
 			cd $php_lib && tar -Jxf sg11_loaders.tar.gz
 		fi 
 		cd $php_lib/loaders
