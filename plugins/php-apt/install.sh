@@ -71,6 +71,11 @@ cd ${curPath} && sh -x $curPath/versions/$2/install.sh $1
 
 if [ "${action}" == "install" ] && [ -d ${serverPath}/php-apt/${type} ];then
 
+	#初始化 
+	cd ${rootPath} && python3 ${rootPath}/plugins/php-apt/index.py start ${type}
+	cd ${rootPath} && python3 ${rootPath}/plugins/php-apt/index.py restart ${type}
+	cd ${rootPath} && python3 ${rootPath}/plugins/php-apt/index.py initd_install ${type}
+
 	# 安装通用扩展
 	echo "install PHP-APT[${type}] extend start"
 	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type:0:1}.${type:1:2} install gd
@@ -83,11 +88,6 @@ if [ "${action}" == "install" ] && [ -d ${serverPath}/php-apt/${type} ];then
 	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type:0:1}.${type:1:2} install redis
 	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type:0:1}.${type:1:2} install memcached
 	echo "install PHP-APT[${type}] extend end"
-
-	#初始化 
-	cd ${rootPath} && python3 ${rootPath}/plugins/php-apt/index.py start ${type}
-	cd ${rootPath} && python3 ${rootPath}/plugins/php-apt/index.py restart ${type}
-	cd ${rootPath} && python3 ${rootPath}/plugins/php-apt/index.py initd_install ${type}
 fi
 
 

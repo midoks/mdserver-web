@@ -50,6 +50,10 @@ cd ${curPath} && sh -x $curPath/versions/$2/install.sh $1
 
 if [ "${action}" == "install" ] && [ -d ${serverPath}/php/${type} ];then
 
+	#初始化 
+	cd ${rootPath} && python3 ${rootPath}/plugins/php/index.py start ${type}
+	cd ${rootPath} && python3 ${rootPath}/plugins/php/index.py initd_install ${type}
+
 	# 安装通用扩展
 	echo "install PHP${type} extend start"
 	cd ${rootPath}/plugins/php/versions/common && bash gd.sh install ${type}
@@ -62,10 +66,6 @@ if [ "${action}" == "install" ] && [ -d ${serverPath}/php/${type} ];then
 	cd ${rootPath}/plugins/php/versions/common && bash redis.sh install ${type}
 	cd ${rootPath}/plugins/php/versions/common && bash memcached.sh install ${type}
 	echo "install PHP${type} extend end"
-
-	#初始化 
-	cd ${rootPath} && python3 ${rootPath}/plugins/php/index.py start ${type}
-	cd ${rootPath} && python3 ${rootPath}/plugins/php/index.py initd_install ${type}
 fi
 
 

@@ -170,6 +170,45 @@ class config_api:
             mw.setBackupDir(backup_path)
         return mw.returnJson(True, '修改默认备份目录成功!')
 
+    def setBasicAuthApi(self):
+        basic_user = request.form.get('basic_user', '').strip()
+        basic_pwd = request.form.get('basic_pwd', '').strip()
+        basic_open = request.form.get('is_open', '').strip()
+
+        salt = '_md_salt'
+        path = 'config/basic_auth.json'
+
+        is_open = False
+        if basic_open == 'True':
+            is_open = True
+
+        if basic_user == '' or basic_pwd == '':
+            return mw.returnJson(True, '用户和密码不能为空!')
+
+        ba_conf = None
+        if os.path.exists(path):
+            try:
+                ba_conf = json.loads(public.readFile(path))
+            except:
+                os.remove(path)
+
+        if not ba_conf:
+            ba_conf = {
+                "basic_user": mw.md5(basic_user + salt),
+                "basic_pwd": mw.md5(basic_pwd + salt),
+                "open": is_open
+            }
+        else:
+            ba_conf['basic_user'] = mw.md5(basic_user + salt)
+            ba_conf['basic_pwd'] = mw.md5(basic_pwd + salt)
+            ba_conf['open'] = is_open
+
+        mw.writeFile(path, json.dumps(ba_conf))
+        os.chmod(path, 384)
+        mw.writeLog('面板设置', '设置BasicAuth状态为: %s' % is_open)
+        mw.writeFile('data/reload.pl', 'True')
+        return mw.returnJson(True, '设置成功!')
+
     def setApi(self):
         webname = request.form.get('webname', '')
         port = request.form.get('port', '')
