@@ -41,10 +41,20 @@ Install_lib()
 {
 	bash ${rootPath}/scripts/getos.sh
 	OSNAME=`cat ${rootPath}/data/osname.pl`
-	VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
+	if [ "$OSNAME" == 'macos' ];then
+		VERSION_ID=none
+	else
+		VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
+	fi
+	
 	echo "${OSNAME}:${VERSION_ID}"
 
 	DEFAULT_OSNAME=linux-x86_64
+	SUFFIX_NAME=lin
+	if [ "$OSNAME" == 'macos' ];then
+		DEFAULT_OSNAME=macosx
+		SUFFIX_NAME=dar
+	fi
 
 	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep "${LIBNAME}.so"`
 	if [ "${isInstall}" != "" ];then
@@ -63,9 +73,18 @@ Install_lib()
 			echo "cd $php_lib && tar -jxvf $php_lib/sg11_loaders.tar.bz2 -C $php_lib/sg11"
 			cd $php_lib && tar -jxvf $php_lib/sg11_loaders.tar.bz2 -C $php_lib/sg11
 		fi 
+
+
+		if [ ! -d $php_lib/sg11/macosx ];then
+			cd $php_lib && tar -jxvf $php_lib/sg11_loaders.tar.bz2 -C $php_lib/sg11
+		fi
 		cd $php_lib/sg11
 		# echo "mv $php_lib/sg11/${DEFAULT_OSNAME}/ixed.${SG_VER}.lin $extFile"
-		cp -rf $php_lib/sg11/${DEFAULT_OSNAME}/ixed.${SG_VER}.lin $extFile
+		cp -rf $php_lib/sg11/${DEFAULT_OSNAME}/ixed.${SG_VER}.${SUFFIX_NAME} $extFile
+
+		if [ "$OSNAME" == 'macos' ];then
+			xattr -c * $extFile
+		fi
 	fi
 	
 	if [ ! -f "$extFile" ];then
