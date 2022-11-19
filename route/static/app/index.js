@@ -840,6 +840,7 @@ function pluginInit(){
                     }
 
                     $.post('/plugins/init_install', 'list='+JSON.stringify(post_data), function(data){
+                        layer.close(index);
                         layer.msg(data.msg, { icon: data.status ? 1 : 2 });
                     },'json');
                 });   
