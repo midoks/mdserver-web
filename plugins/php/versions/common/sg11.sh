@@ -51,11 +51,10 @@ Install_lib()
 		mkdir -p $php_lib
 		if [ ! -f $php_lib/sg11_loaders.tar.bz2 ];then
 			wget --no-check-certificate -O $php_lib/sg11_loaders.tar.bz2 https://www.sourceguardian.com/loaders/download/loaders.tar.bz2
-			cd $php_lib && tar -Jxf sg11_loaders.tar.gz
+			cd $php_lib && tar -Jxf sg11_loaders.tar.bz2
 		fi 
-		cd $php_lib/loaders
-		
-		cp -rf $php_lib/loaders/ioncube_loader_lin_${IC_VERSION}.so $extFile/sg11.so
+		# cd $php_lib/loaders
+		# cp -rf $php_lib/loaders/ioncube_loader_lin_${IC_VERSION}.so $extFile/sg11.so
 	fi
 	
 	if [ ! -f "$extFile" ];then
@@ -65,7 +64,7 @@ Install_lib()
 
 	echo "" >> $serverPath/php/$version/etc/php.ini
 	echo "[${LIBNAME}]" >> $serverPath/php/$version/etc/php.ini
-	echo "zend_extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
+	echo "extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
 
 	bash ${rootPath}/plugins/php/versions/lib.sh $version restart
 	echo '==========================================================='
