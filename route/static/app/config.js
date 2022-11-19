@@ -3,7 +3,7 @@
 // 	console.log(rdata);
 // },'json');
 
-
+/** op **/
 $(".set-submit").click(function(){
 	var data = $("#set_config").serialize();
 	layer.msg('正在保存配置...',{icon:16,time:0,shade: [0.3, '#000']});
@@ -17,6 +17,41 @@ $(".set-submit").click(function(){
 		}
 	},'json');
 });
+
+$('input[name="webname"]').change(function(){
+	var webname = $(this).val();
+	$('.btn_webname').removeAttr('disabled');
+	$('.btn_webname').unbind().click(function(){
+		$.post('/config/set_webname','webname='+webname, function(rdata){
+			showMsg(rdata.msg,function(){window.location.reload();},{icon:rdata.status?1:2},2000);
+		},'json');
+	});
+});
+
+
+$('input[name="host_ip"]').change(function(){
+	var host_ip = $(this).val();
+	$('.btn_host_ip').removeAttr('disabled');
+	$('.btn_host_ip').unbind().click(function(){
+		$.post('/config/set_ip','host_ip='+host_ip, function(rdata){
+			showMsg(rdata.msg,function(){window.location.reload();},{icon:rdata.status?1:2},2000);
+		},'json');
+	});
+});
+
+$('input[name="port"]').change(function(){
+	var port = $(this).val();
+	$('.btn_port').removeAttr('disabled');
+	$('.btn_port').unbind().click(function(){
+		$.post('/config/set_port','port='+port, function(rdata){
+			showMsg(rdata.msg,function(){window.location.reload();},{icon:rdata.status?1:2},2000);
+		},'json');
+	});
+});
+
+
+
+/** op **/
 
 
 //关闭面板

@@ -122,6 +122,42 @@ class config_api:
         session['username'] = name1
         return mw.returnJson(True, '用户修改成功!')
 
+    def setWebnameApi(self):
+        webname = request.form.get('webname', '')
+        if webname != mw.getConfig('title'):
+            mw.setConfig('title', webname)
+        return mw.returnJson(True, '面板别名保存成功!')
+
+    def setPortApi(self):
+        port = request.form.get('port', '')
+        if port != mw.getHostPort():
+            import system_api
+            import firewall_api
+
+            if os.path.exists("/lib/systemd/system/firewalld.service"):
+                if not firewall_api.firewall_api().getFwStatus():
+                    return mw.returnJson(False, 'firewalld必须先启动!')
+
+            mw.setHostPort(port)
+
+            msg = mw.getInfo('放行端口[{1}]成功', (port,))
+            mw.writeLog("防火墙管理", msg)
+            addtime = time.strftime('%Y-%m-%d %X', time.localtime())
+            mw.M('firewall').add('port,ps,addtime', (port, "配置修改", addtime))
+
+            firewall_api.firewall_api().addAcceptPort(port)
+            firewall_api.firewall_api().firewallReload()
+
+            system_api.system_api().restartMw()
+
+        return mw.returnJson(True, '端口保存成功!')
+
+    def setIpApi(self):
+        host_ip = request.form.get('host_ip', '')
+        if host_ip != mw.getHostAddr():
+            mw.setHostAddr(host_ip)
+        return mw.returnJson(True, 'IP保存成功!')
+
     def setApi(self):
         webname = request.form.get('webname', '')
         port = request.form.get('port', '')
