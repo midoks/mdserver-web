@@ -1726,6 +1726,33 @@ html .menu .menu_exit:hover {
     position: relative
 }
 
+.explain-describe-list{
+  border: 1px solid #ececec;
+  border-radius: 6px;
+  margin: 0 auto;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  background: #f7f7f7;
+  padding: 15px;
+  list-style-type: inherit;
+}
+
+
+.agreement-box label{
+  font-weight: 400;
+  margin: 0 0 0 5px;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+.agreement-box input{
+  height: 15px;
+  width: 15px;
+  vertical-align: middle;
+  margin-top: 0;
+  cursor: pointer;
+}
+
 .label-input-group input {
     margin-top: 0;
     margin-right: 5px;

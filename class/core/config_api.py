@@ -176,11 +176,13 @@ class config_api:
         basic_open = request.form.get('is_open', '').strip()
 
         salt = '_md_salt'
-        path = 'config/basic_auth.json'
+        path = 'data/basic_auth.json'
+        is_open = True
 
-        is_open = False
-        if basic_open == 'True':
-            is_open = True
+        if basic_open == 'false':
+            if os.path.exists(path):
+                os.remove(path)
+            return mw.returnJson(True, '删除BasicAuth成功!')
 
         if basic_user == '' or basic_pwd == '':
             return mw.returnJson(True, '用户和密码不能为空!')
@@ -521,6 +523,15 @@ class config_api:
             data['ssl'] = 'checked'
         else:
             data['ssl'] = ''
+
+        basic_auth = 'data/basic_auth.json'
+        if os.path.exists(basic_auth):
+            bac = mw.readFile(basic_auth)
+            bac = json.loads(bac)
+            if bac['open']:
+                data['basic_auth'] = 'checked'
+        else:
+            data['basic_auth'] = ''
 
         data['site_count'] = mw.M('sites').count()
 

@@ -123,7 +123,6 @@
 							<span class="set-info c7">设置面板密码</span>
 						</p>
 					</form>
-					<!-- <div class="bt-submit set-submit">保存</div> -->
 				</div>
 
 				<div class="title c6 plr15">
@@ -131,6 +130,14 @@
 				</div>
 
 				<div class="setting-con pd15">
+
+					<p class="mtb15">
+						<span class="set-tit text-right" title="BasicAuth认证" style="float: left;">BasicAuth认证</span>
+ 						<input class="btswitch btswitch-ios" id="cfg_basic_auth" type="checkbox" {{data['basic_auth']}}/>
+		                <label class="btswitch-btn ml5" for="cfg_basic_auth" style="float: left;margin-top:4px;" onclick="setBasicAuth()"></label>
+						<span class="set-info c7">为面板增加一道基于BasicAuth的认证服务，有效防止面板被扫描</span>
+					</p>
+
 					<p class="mtb15">
 						<span class="set-tit text-right" title="临时访问授权">临时访问授权</span>
 						<button type="button" class="btn btn-success btn-sm ml5" onclick="setTempAccess()">临时访问授权管理</button>
