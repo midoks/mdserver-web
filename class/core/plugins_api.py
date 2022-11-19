@@ -115,11 +115,13 @@ class plugins_api:
         }
 
         pn_dir = mw.getPluginDir()
+        pn_server_dir = mw.getServerDir()
         pn_list = []
         for pn in plugin_names:
             info = {}
             pn_json = pn_dir + '/' + pn + '/info.json'
-            if not os.path.exists(pn_json):
+            pn_server = pn_server_dir + '/' + pn
+            if not os.path.exists(pn_server):
 
                 tmp = mw.readFile(pn_json)
                 tmp = json.loads(tmp)
