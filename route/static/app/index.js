@@ -842,6 +842,7 @@ function pluginInit(){
                     $.post('/plugins/init_install', 'list='+JSON.stringify(post_data), function(data){
                         showMsg(data.msg, function(){
                             if (data.status){
+                                layer.closeAll();
                                 messageBox();
                             }
                         },{ icon: data.status ? 1 : 2 },2000);
