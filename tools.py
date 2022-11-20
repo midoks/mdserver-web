@@ -108,7 +108,7 @@ def mwcli(mw_input=0):
         if os.path.exists(basic_auth):
             os.remove(basic_auth)
             os.system(INIT_CMD + " restart")
-            os.system(INIT_CMD + " default")
+            print("|-关闭basic_auth成功")
 
 
 def set_panel_pwd(password, ncli=False):
