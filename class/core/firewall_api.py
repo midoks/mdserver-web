@@ -197,25 +197,17 @@ class firewall_api:
         except:
             isPing = True
 
-        import system_api
-        panelsys = system_api.system_api()
-
-        if os.path.exists('/usr/bin/apt-get'):
-            if os.path.exists('/etc/init.d/sshd'):
-                cmd = "service sshd status | grep -P '(dead|stop)'|grep -v grep"
-                status = mw.execShell(cmd)
-            else:
-                cmd = "service ssh status | grep -P '(dead|stop)'|grep -v grep"
-                status = mw.execShell(cmd)
-        else:
-            cmd = "systemctl status sshd.service | grep 'dead'|grep -v grep"
-            status = mw.execShell(cmd)
-            # cmd = "/etc/init.d/sshd status | grep -e 'stopped' -e '已停'|grep -v grep"
-            # status = mw.execShell(cmd)
-        if len(status[0]) > 3:
+        # sshd 检测
+        status = True
+        cmd = "service sshd status | grep -P '(dead|stop)'|grep -v grep"
+        ssh_status = mw.execShell(cmd)
+        if ssh_status[0] != '':
             status = False
-        else:
-            status = True
+
+        cmd = "systemctl status sshd.service | grep 'dead'|grep -v grep"
+        ssh_status = mw.execShell(cmd)
+        if ssh_status[0] != '':
+            status = False
 
         data = {}
         data['port'] = port
