@@ -292,7 +292,7 @@ function openFilename(obj){
 		onlineEditFile(0, path);
 	}
 
-	if (inArray(ext,['png','jpeg','gif'])){
+	if (inArray(ext,['png','jpeg','gif','jpg'])){
         getImage(path);
 	}
 
@@ -1331,7 +1331,7 @@ function getImage(fileName){
 		title:false,
 		area: '500px',
 		shadeClose: true,
-		content: '<div class="showpicdiv"><img width="100%" src="'+imgUrl+'"></div>'
+		content: '<div class="showpicdiv"><img src="'+imgUrl+'"></div>'
 	});
 }
 
