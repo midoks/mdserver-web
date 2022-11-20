@@ -271,14 +271,13 @@ class firewall_api:
             return mw.returnJson(True, '开发机不能操作!')
 
         status = request.form.get('status', '1').strip()
+        msg = 'SSH服务已启用'
+        act = 'start'
         if status == "1":
             msg = 'SSH服务已停用'
             act = 'stop'
-        else:
-            msg = 'SSH服务已启用'
-            act = 'start'
 
-        ssh_service = get.systemdCfgDir() + '/sshd.service'
+        ssh_service = mw.systemdCfgDir() + '/sshd.service'
         if os.path.exists(ssh_service):
             mw.execShell("systemctl " + act + " sshd.service")
         else:
