@@ -235,7 +235,7 @@ class firewall_api:
         if int(port) < 22 or int(port) > 65535:
             return mw.returnJson(False, '端口范围必需在22-65535之间!')
 
-        ports = ['21', '25', '80', '443', '7200', '8080', '888', '8888']
+        ports = ['21', '25', '80', '443', '888']
         if port in ports:
             return mw.returnJson(False, '(' + port + ')' + '特殊端口不可设置!')
 

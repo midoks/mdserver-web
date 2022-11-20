@@ -4,7 +4,7 @@
 
 <style>
 .weblog{
-	font-size: 14px;
+	font-size: 12px;
     display:inline-block;
 	line-height:30px;
 }
@@ -38,17 +38,16 @@
 			</div>
 		</div>
 		<div class="safe container-fluid bgw mtb15 pd15">
-			<div class="mr20 pull-left">
+			<div class="mr20 pull-left" style="border-right: 1px solid #ccc;padding-right: 20px;">
+
 				<form>
 					<div class="ss-text pull-left">
-						<em>启用SSH</em>
-						<div class='ssh-item' id="in_safe">
-							<input class='btswitch btswitch-ios' id='sshswitch' type='checkbox'><label class='btswitch-btn sshswitch' for='sshswitch' ></label>
-						</div>
+						<a class="btlink" style="line-height: 32px;" onclick="sshMgr();">SSH管理</a>
 					</div>
 				</form>
 			</div>
-			<div class="mr20 pull-left">
+			<div class="mr20 pull-left" style="border-right: 1px solid #ccc;padding-right: 20px;">
+
 				<div class="ss-text pull-left mr5">
 					<em>SSH端口:</em>
 					<input type="text" class="bt-input-text" id="mstscPort" value=""/>

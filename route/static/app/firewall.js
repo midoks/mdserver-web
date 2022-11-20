@@ -14,7 +14,7 @@ setTimeout(function(){
 $(function(){
 	// start 
 	$.post('/firewall/get_www_path',function(data){
-		var html ='<a href="javascript:openPath(\''+data['path']+'\');">日志目录</a>\
+		var html ='<a class="btlink" href="javascript:openPath(\''+data['path']+'\');">日志目录</a>\
 				<em id="logSize">0KB</em>\
 				<button class="btn btn-default btn-sm" onclick="closeLogs();">清空</button>';
 		$('#firewall_weblog').html(html);
@@ -52,19 +52,59 @@ $("#firewalldType").change(function(){
 });
 
 
+function sshMgr(){
+
+	$.post('/firewall/get_ssh_info', '', function(rdata){
+		var ssh_status = rdata.status ? 'checked':'';
+		var login_status = '';
+		var con = '<div class="pd15">\
+                <div class="divtable">\
+                    <table class="table table-hover waftable">\
+                        <thead><tr><th>名称</th><th width="80">状态</th></tr></thead>\
+                        <tbody>\
+                            <tr>\
+                                <td>启动SSH</td>\
+                                <td>\
+                                    <div class="ssh-item" style="margin-left:0">\
+                                        <input class="btswitch btswitch-ios" id="sshswitch" type="checkbox" '+ssh_status+'>\
+                                        <label class="btswitch-btn" for="sshswitch" onclick=\'setMstscStatus()\'></label>\
+                                    </div>\
+                                </td>\
+                            </tr>\
+                            <tr>\
+                                <td>禁止登陆</td>\
+                                <td>\
+                                    <div class="ssh-item" style="margin-left:0">\
+                                        <input class="btswitch btswitch-ios" id="ssh_login" type="checkbox" '+login_status+'>\
+                                        <label class="btswitch-btn" for="ssh_login" onclick=\'setMstscStatus()\'></label>\
+                                    </div>\
+                                </td>\
+                            </tr>\
+                        </tbody>\
+                    </table>\
+                </div>\
+            </div>';
+        layer.open({
+	        type: 1,
+	        title: "SSH管理",
+	        area: ['300px', '230px'],
+	        closeBtn: 1,
+	        shadeClose: false,
+	        content: '<div id="ssh_list">'+con+'</div>',
+	        success:function(){
+	        },
+	    });
+
+	},'json');
+}
+
+
 function getSshInfo(){
 	$.post('/firewall/get_ssh_info', '', function(rdata){
-		// console.log(rdata);
-		var SSHchecked = ''
-		if(rdata.status){
-			SSHchecked = "<input class='btswitch btswitch-ios' id='sshswitch' type='checkbox' checked><label class='btswitch-btn' for='sshswitch' onclick='setMstscStatus()'></label>";
-		} else {
-			SSHchecked = "<input class='btswitch btswitch-ios' id='sshswitch' type='checkbox'><label class='btswitch-btn' for='sshswitch' onclick='setMstscStatus()'></label>";
-			$("#mstscSubmit").attr('disabled','disabled');
+		if(!rdata.status){
 			$("#mstscPort").attr('disabled','disabled');
 		}
 		
-		$("#in_safe").html(SSHchecked);
 		$("#mstscPort").val(rdata.port);
 		var isPint = '';
 		if(rdata.ping){
