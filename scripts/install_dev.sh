@@ -62,7 +62,7 @@ if [ $OSNAME != "macos" ];then
 	mkdir -p /www/backup/site
 
 	if [ ! -d /www/server/mdserver-web ];then
-		wget -O /tmp/dev.zip https://github.com/midoks/mdserver-web/archive/refs/heads/dev.zip
+		curl -sSLo /tmp/dev.zip https://github.com/midoks/mdserver-web/archive/refs/heads/dev.zip
 		cd /tmp && unzip /tmp/dev.zip
 		mv -f /tmp/mdserver-web-dev /www/server/mdserver-web
 		rm -rf /tmp/dev.zip
