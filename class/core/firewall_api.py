@@ -212,7 +212,7 @@ class firewall_api:
             status = False
 
         # 密码登陆配置检查
-        pass_rep = "^(PasswordAuthentication)\s+(\w*)\s*\n"
+        pass_rep = "^#PasswordAuthentication\s+(\w*)\s*\n"
         pass_status = re.search(pass_rep, conf)
         data['pass_prohibit_status'] = True
         if pass_status and pass_status.groups(0)[0].strip() == 'yes':
