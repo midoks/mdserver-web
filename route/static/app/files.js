@@ -286,10 +286,10 @@ function setRecycleBin(db){
 
 function openFilename(obj){
 	var path = $(obj).attr('data-path');
-	var ext = getExtName(path);
+	var ext = getSuffixName(path);
 
 	// console.log(path,ext);
-	if (inArray(ext,['html','htm','php','txt','md','js','css','scss','json','c','h'])){
+	if (inArray(ext,['html','htm','php','txt','md','js','css','scss','json','c','h','pl','py'])){
 		onlineEditFile(0, path);
 	}
 
@@ -778,6 +778,29 @@ function batchPasteTo(data,path){
 }
 
 
+function getSuffixName(fileName){
+	var extArr = fileName.split(".");	
+	var exts = ['folder','folder-unempty','sql','c','cpp','cs','flv','css','js',
+	'htm','html','java','log','mht','url','xml','ai','bmp','cdr','gif','ico',
+	'jpeg','jpg','JPG','png','psd','webp','ape','avi','flv','mkv','mov','mp3','mp4',
+	'mpeg','mpg','rm','rmvb','swf','wav','webm','wma','wmv','rtf','docx','fdf','potm',
+	'pptx','txt','xlsb','xlsx','7z','cab','iso','rar','zip','gz','bt','file','apk','bookfolder',
+	'folder','folder-empty','folder-unempty','fromchromefolder','documentfolder','fromphonefolder',
+	'mix','musicfolder','picturefolder','videofolder','sefolder','access','mdb','accdb','sql','c',
+	'cpp','cs','js','fla','flv','htm','html','java','log','mht','url','xml','ai','bmp','cdr',
+	'gif','ico','jpeg','jpg','JPG','png','psd','webp','ape','avi','flv','mkv','mov','mp3','mp4','mpeg',
+	'mpg','rm','rmvb','swf','wav','webm','wma','wmv','doc','docm','dotx','dotm','dot','rtf','docx','pdf',
+	'fdf','ppt','pptm','pot','potm','pptx','txt','xls','csv','xlsm','xlsb','xlsx','7z','gz','cab','iso',
+	'rar','zip','bt','file','apk','css','scss','svg','pl','py','php','md'];
+	var extLastName = extArr[extArr.length - 1];
+	for(var i=0; i<exts.length; i++){
+		if(exts[i]==extLastName){
+			return exts[i];
+		}
+	}
+	return 'file';
+}
+
 //取扩展名
 function getExtName(fileName){
 	var extArr = fileName.split(".");	
@@ -788,11 +811,11 @@ function getExtName(fileName){
 	'pptx','txt','xlsb','xlsx','7z','cab','iso','rar','zip','gz','bt','file','apk','bookfolder',
 	'folder','folder-empty','folder-unempty','fromchromefolder','documentfolder','fromphonefolder',
 	'mix','musicfolder','picturefolder','videofolder','sefolder','access','mdb','accdb','sql','c',
-	'cpp','cs','js','fla','flv','htm','html','java','log','mht','php','url','xml','ai','bmp','cdr',
+	'cpp','cs','js','fla','flv','htm','html','java','log','mht','url','xml','ai','bmp','cdr',
 	'gif','ico','jpeg','jpg','JPG','png','psd','webp','ape','avi','flv','mkv','mov','mp3','mp4','mpeg',
 	'mpg','rm','rmvb','swf','wav','webm','wma','wmv','doc','docm','dotx','dotm','dot','rtf','docx','pdf',
 	'fdf','ppt','pptm','pot','potm','pptx','txt','xls','csv','xlsm','xlsb','xlsx','7z','gz','cab','iso',
-	'rar','zip','bt','file','apk','css','svg'];
+	'rar','zip','bt','file','apk','css'];
 	var extLastName = extArr[extArr.length - 1];
 	for(var i=0; i<exts.length; i++){
 		if(exts[i]==extLastName){
