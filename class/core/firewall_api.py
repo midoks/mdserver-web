@@ -292,9 +292,9 @@ class firewall_api:
             return mw.returnJson(True, '开发机不能操作!')
 
         status = request.form.get('status', '1').strip()
-        msg = '禁止密码登陆'
+        msg = '禁止密码登陆成功'
         if status == "1":
-            msg = '开启密码登陆'
+            msg = '开启密码登陆成功'
 
         file = '/etc/ssh/sshd_config'
         if not os.path.exists(file):
@@ -311,7 +311,7 @@ class firewall_api:
         mw.writeFile(file, conf)
         mw.execShell("systemctl restart sshd.service")
         mw.writeLog("SSH管理", msg)
-        return mw.returnJson(True, '操作成功!')
+        return mw.returnJson(True, msg)
 
     def setPingApi(self):
         if mw.isAppleSystem():
