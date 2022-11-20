@@ -271,20 +271,21 @@ class firewall_api:
             return mw.returnJson(True, '开发机不能操作!')
 
         status = request.form.get('status', '1').strip()
-        version = mw.readFile('/etc/redhat-release')
-        if int(status) == 1:
+        if status == "1":
             msg = 'SSH服务已停用'
             act = 'stop'
         else:
             msg = 'SSH服务已启用'
             act = 'start'
 
-        if not os.path.exists('/etc/redhat-release'):
-            mw.execShell('service ssh ' + act)
-        elif version.find(' 7.') != -1:
+        ssh_service = get.systemdCfgDir() + '/sshd.service'
+        if os.path.exists(ssh_service):
             mw.execShell("systemctl " + act + " sshd.service")
         else:
-            mw.execShell("/etc/init.d/sshd " + act)
+            mw.execShell('service sshd ' + act)
+
+        if os.path.exists('/etc/init.d/sshd'):
+            mw.execShell('/etc/init.d/sshd ' + act)
 
         mw.writeLog("防火墙管理", msg)
         return mw.returnJson(True, '操作成功!')
