@@ -296,6 +296,9 @@ class firewall_api:
             msg = '开始密码登陆'
 
         file = '/etc/ssh/sshd_config'
+        if not os.path.exists(file):
+            return mw.returnJson(False, '无法设置!')
+
         conf = mw.readFile(file)
 
         # print(conf)
