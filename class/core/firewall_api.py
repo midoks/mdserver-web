@@ -212,11 +212,12 @@ class firewall_api:
             status = False
 
         # 密码登陆配置检查
-        pass_rep = "^#PasswordAuthentication\s+(\w*)\s*\n"
-        pass_status = re.search(pass_rep, conf)
+        pass_rep = "PasswordAuthentication\s+(\w*)\s*\n"
         data['pass_prohibit_status'] = True
-        if pass_status and pass_status.groups(0)[0].strip() == 'yes':
-            data['pass_prohibit_status'] = False
+        pass_status = re.search(pass_rep, conf)
+        if pass_status:
+            if pass_status.groups(0)[0].strip() == 'yes':
+                data['pass_prohibit_status'] = False
 
         data['port'] = port
         data['status'] = status
@@ -287,8 +288,8 @@ class firewall_api:
         return mw.returnJson(True, '操作成功!')
 
     def setSshPassStatusApi(self):
-        # if mw.isAppleSystem():
-        #     return mw.returnJson(True, '开发机不能操作!')
+        if mw.isAppleSystem():
+            return mw.returnJson(True, '开发机不能操作!')
 
         status = request.form.get('status', '1').strip()
         msg = '禁止密码登陆'
@@ -301,15 +302,12 @@ class firewall_api:
 
         conf = mw.readFile(file)
 
-        # print(conf)
         if status == '1':
             rep = "#PasswordAuthentication\s+(\w*)\s*\n"
             conf = re.sub(rep, "PasswordAuthentication yes\n", conf)
         else:
-            rep = "^(PasswordAuthentication)\s+(\w*)\s*\n"
+            rep = "PasswordAuthentication\s+(\w*)\s*\n"
             conf = re.sub(rep, "#PasswordAuthentication yes\n", conf)
-        # print('......' * 10)
-        # print(conf)
         mw.writeFile(file, conf)
         mw.execShell("systemctl restart sshd.service")
         mw.writeLog("SSH管理", msg)
