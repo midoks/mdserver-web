@@ -227,8 +227,7 @@ function setMstscStatus(){
 	layer.confirm(msg,{title:'警告',closeBtn:2,cancel:function(){
 		if(status == 0){
 			$("#sshswitch").prop("checked",false);
-		}
-		else{
+		} else {
 			$("#sshswitch").prop("checked",true);
 		}
 	}},function(index){
@@ -257,8 +256,7 @@ function setSshPassStatus(){
 	layer.confirm(msg,{title:'警告',closeBtn:2,cancel:function(){
 		if(status == 0){
 			$("#pass_status").prop("checked",false);
-		}
-		else{
+		} else {
 			$("#pass_status").prop("checked",true);
 		}
 	}},function(index){
