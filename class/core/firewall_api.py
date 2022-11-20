@@ -212,12 +212,12 @@ class firewall_api:
             status = False
 
         # 密码登陆配置检查
-        pass_rep = "PasswordAuthentication\s+(\w*)\s*\n"
-        data['pass_prohibit_status'] = True
+        pass_rep = "#PasswordAuthentication\s+(\w*)\s*\n"
+        data['pass_prohibit_status'] = False
         pass_status = re.search(pass_rep, conf)
         if pass_status:
             if pass_status.groups(0)[0].strip() == 'yes':
-                data['pass_prohibit_status'] = False
+                data['pass_prohibit_status'] = True
 
         data['port'] = port
         data['status'] = status
