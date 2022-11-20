@@ -178,6 +178,8 @@ class firewall_api:
         return self.getLogList(int(p), int(limit), search)
 
     def getSshInfoApi(self):
+        data = {}
+
         file = '/etc/ssh/sshd_config'
         conf = mw.readFile(file)
         rep = "#*Port\s+([0-9]+)\s*\n"
@@ -189,9 +191,9 @@ class firewall_api:
                 isPing = True
             else:
                 file = '/etc/sysctl.conf'
-                conf = mw.readFile(file)
+                sys_conf = mw.readFile(file)
                 rep = "#*net\.ipv4\.icmp_echo_ignore_all\s*=\s*([0-9]+)"
-                tmp = re.search(rep, conf).groups(0)[0]
+                tmp = re.search(rep, sys_conf).groups(0)[0]
                 if tmp == '1':
                     isPing = False
         except:
@@ -209,9 +211,14 @@ class firewall_api:
         if ssh_status[0] != '':
             status = False
 
-        data = {}
-        data['port'] = port
+        # 密码登陆配置检查
+        pass_rep = "^(PasswordAuthentication)\s+(\w*)\s*\n"
+        pass_status = re.search(pass_rep, conf)
+        data['pass_prohibit_status'] = True
+        if pass_status and pass_status.groups(0)[0].strip() == 'yes':
+            data['pass_prohibit_status'] = False
 
+        data['port'] = port
         data['status'] = status
         data['ping'] = isPing
         if mw.isAppleSystem():
@@ -277,6 +284,32 @@ class firewall_api:
             mw.execShell('/etc/init.d/sshd ' + act)
 
         mw.writeLog("防火墙管理", msg)
+        return mw.returnJson(True, '操作成功!')
+
+    def setSshPassStatusApi(self):
+        # if mw.isAppleSystem():
+        #     return mw.returnJson(True, '开发机不能操作!')
+
+        status = request.form.get('status', '1').strip()
+        msg = '禁止密码登陆'
+        if status == "1":
+            msg = '开始密码登陆'
+
+        file = '/etc/ssh/sshd_config'
+        conf = mw.readFile(file)
+
+        # print(conf)
+        if status == '1':
+            rep = "#PasswordAuthentication\s+(\w*)\s*\n"
+            conf = re.sub(rep, "PasswordAuthentication yes\n", conf)
+        else:
+            rep = "^(PasswordAuthentication)\s+(\w*)\s*\n"
+            conf = re.sub(rep, "#PasswordAuthentication yes\n", conf)
+        # print('......' * 10)
+        # print(conf)
+        mw.writeFile(file, conf)
+        mw.execShell("systemctl restart sshd.service")
+        mw.writeLog("SSH管理", msg)
         return mw.returnJson(True, '操作成功!')
 
     def setPingApi(self):
