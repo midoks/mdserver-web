@@ -292,7 +292,7 @@ function openFilename(obj){
 		onlineEditFile(0, path);
 	}
 
-	if (inArray(ext,['png','jpeg','gif','jpg'])){
+	if (inArray(ext,['png','jpeg','gif','jpg','ico'])){
         getImage(path);
 	}
 
