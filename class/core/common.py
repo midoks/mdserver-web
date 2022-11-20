@@ -110,7 +110,7 @@ def initInitD():
             import shutil
             shutil.copyfile(script_bin, initd_bin)
             mw.execShell('chmod +x ' + initd_bin)
-
+        # 加入自启动
         mw.execShell('which chkconfig && chkconfig --add mw')
 
     if os.path.exists('/etc/init.d'):
@@ -119,7 +119,7 @@ def initInitD():
             import shutil
             shutil.copyfile(script_bin, initd_bin)
             mw.execShell('chmod +x ' + initd_bin)
-        # 加入自启动
+
         mw.execShell('which update-rc.d && update-rc.d -f mw defaults')
 
     # 获取系统IPV4
