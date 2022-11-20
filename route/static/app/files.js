@@ -288,7 +288,8 @@ function openFilename(obj){
 	var path = $(obj).attr('data-path');
 	var ext = getExtName(path);
 
-	if (inArray(ext,['html','htm','php','txt','md','js','css','json','c','h'])){
+	// console.log(path,ext);
+	if (inArray(ext,['html','htm','php','txt','md','js','css','scss','json','c','h'])){
 		onlineEditFile(0, path);
 	}
 
@@ -431,7 +432,7 @@ function getFiles(Path) {
 			
 			totalSize +=  parseInt(fmp[1]);
 			if(getCookie("rank")=="a"){
-				body += "<tr style='cursor:pointer;' class='folderBoxTr' data-path='" + rdata.PATH +"/"+ fmp[0] + "' filetype='" + fmp[0] + "' onclick='openFilename(this)'>\
+				body += "<tr style='cursor:pointer;' class='folderBoxTr' data-path='" + rdata.PATH +"/"+ fmp[0] + "' filetype='" + fmp[0] + "' ondblclick='openFilename(this)'>\
 					<td><input type='checkbox' name='id' value='"+fmp[0]+"'></td>\
 					<td class='column-name'><span class='ico ico-"+(getExtName(fmp[0]))+"'></span><a class='text' title='" + fmp[0] + fmp[5] + "'>" + cnametext + "</a></td>\
 					<td>" + (toSize(fmp[1])) + "</td>\
@@ -453,7 +454,7 @@ function getFiles(Path) {
 				body += "<div class='file folderBox menufile' data-path='" + rdata.PATH +"/"+ fmp[0] + "' filetype='"+fmp[0]+"' title='文件名：" + fmp[0]+"&#13;大小："
 					+ toSize(fmp[1])+"&#13;修改时间："+getLocalTime(fmp[2])+"&#13;权限："+fmp[3]+"&#13;所有者："+fmp[4]+"' >\
 					<input type='checkbox' name='id' value='"+fmp[0]+"'>\
-					<div data-path='" + rdata.PATH +"/"+ fmp[0] + "' filetype='"+fmp[0]+"' class='ico ico-"+(getExtName(fmp[0]))+"' onclick='openFilename(this)'></div>\
+					<div data-path='" + rdata.PATH +"/"+ fmp[0] + "' filetype='"+fmp[0]+"' class='ico ico-"+(getExtName(fmp[0]))+"' ondblclick='javascript;openFilename(this)'></div>\
 					<div class='titleBox'><span class='tname'>" + fmp[0] + "</span></div>\
 				</div>";
 			}
@@ -561,7 +562,11 @@ function getFiles(Path) {
 		$("#fileCon").mousedown(function(e){
 			var count = totalFile();
 			if(e.which == 3) {
-				if(count>1){rightMenuClickAll(e);} else {return;}
+				if(count>1){
+					rightMenuClickAll(e);
+				} else {
+					return;
+				}
 			}
 		});
 
