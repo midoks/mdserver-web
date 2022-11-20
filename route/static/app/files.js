@@ -289,7 +289,7 @@ function openFilename(obj){
 	var ext = getSuffixName(path);
 
 	// console.log(path,ext);
-	if (inArray(ext,['html','htm','php','txt','md','js','css','scss','json','c','h','pl','py'])){
+	if (inArray(ext,['html','htm','php','txt','md','js','css','scss','json','c','h','pl','py','java','log'])){
 		onlineEditFile(0, path);
 	}
 
@@ -787,7 +787,7 @@ function getSuffixName(fileName){
 	'pptx','txt','xlsb','xlsx','7z','cab','iso','rar','zip','gz','bt','file','apk','bookfolder',
 	'folder','folder-empty','folder-unempty','fromchromefolder','documentfolder','fromphonefolder',
 	'mix','musicfolder','picturefolder','videofolder','sefolder','access','mdb','accdb','sql','c',
-	'cpp','cs','js','fla','flv','htm','html','java','log','mht','url','xml','ai','bmp','cdr',
+	'cpp','cs','js','fla','flv','htm','html','java','mht','url','xml','ai','bmp','cdr',
 	'gif','ico','jpeg','jpg','JPG','png','psd','webp','ape','avi','flv','mkv','mov','mp3','mp4','mpeg',
 	'mpg','rm','rmvb','swf','wav','webm','wma','wmv','doc','docm','dotx','dotm','dot','rtf','docx','pdf',
 	'fdf','ppt','pptm','pot','potm','pptx','txt','xls','csv','xlsm','xlsb','xlsx','7z','gz','cab','iso',
