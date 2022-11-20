@@ -16,6 +16,15 @@ function toSize(a) {
 	}
 }
 
+function inArray(f, arr){
+	for (var i = 0; i < arr.length; i++) {
+		if (f == arr[i]) {
+			return true;
+		}
+	}
+	return false;
+}
+
 //表格头固定
 function tableFixed(name) {
     var tableName = document.querySelector('#' + name);

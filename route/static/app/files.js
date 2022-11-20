@@ -284,6 +284,38 @@ function setRecycleBin(db){
 	},'json');
 }
 
+function openFilename(obj){
+	var path = $(obj).attr('data-path');
+	var ext = getExtName(path);
+
+	if (inArray(ext,['html','htm','php','txt','md','js','css','json','c','h'])){
+		onlineEditFile(0, path);
+	}
+
+	if (inArray(ext,['png','jpeg','gif'])){
+        getImage(path);
+	}
+
+	if (inArray(ext,['svg'])){
+
+		$.post("/files/get_body", "path=" + encodeURIComponent(path), function(rdata) {
+			
+			if (rdata.data.status){
+				layer.open({
+					type:1,
+					closeBtn: 1,
+					title:false,
+					area: '600px',
+					shadeClose: true,
+					content: '<div class="showpicdiv">'+rdata.data.data+'</div>'
+				});
+			} else {
+				layer.msg("无法预览");
+			}
+		},'json');
+	}
+}
+
 //取数据
 function getFiles(Path) {
 	var searchtype = Path;
@@ -399,7 +431,8 @@ function getFiles(Path) {
 			
 			totalSize +=  parseInt(fmp[1]);
 			if(getCookie("rank")=="a"){
-				body += "<tr class='folderBoxTr' data-path='" + rdata.PATH +"/"+ fmp[0] + "' filetype='" + fmp[0] + "'><td><input type='checkbox' name='id' value='"+fmp[0]+"'></td>\
+				body += "<tr style='cursor:pointer;' class='folderBoxTr' data-path='" + rdata.PATH +"/"+ fmp[0] + "' filetype='" + fmp[0] + "' onclick='openFilename(this)'>\
+					<td><input type='checkbox' name='id' value='"+fmp[0]+"'></td>\
 					<td class='column-name'><span class='ico ico-"+(getExtName(fmp[0]))+"'></span><a class='text' title='" + fmp[0] + fmp[5] + "'>" + cnametext + "</a></td>\
 					<td>" + (toSize(fmp[1])) + "</td>\
 					<td>" + ((fmp[2].length > 11)?fmp[2]:getLocalTime(fmp[2])) + "</td>\
@@ -418,9 +451,9 @@ function getFiles(Path) {
 			}
 			else{
 				body += "<div class='file folderBox menufile' data-path='" + rdata.PATH +"/"+ fmp[0] + "' filetype='"+fmp[0]+"' title='文件名：" + fmp[0]+"&#13;大小："
-					+ toSize(fmp[1])+"&#13;修改时间："+getLocalTime(fmp[2])+"&#13;权限："+fmp[3]+"&#13;所有者："+fmp[4]+"'>\
+					+ toSize(fmp[1])+"&#13;修改时间："+getLocalTime(fmp[2])+"&#13;权限："+fmp[3]+"&#13;所有者："+fmp[4]+"' >\
 					<input type='checkbox' name='id' value='"+fmp[0]+"'>\
-					<div class='ico ico-"+(getExtName(fmp[0]))+"'></div>\
+					<div data-path='" + rdata.PATH +"/"+ fmp[0] + "' filetype='"+fmp[0]+"' class='ico ico-"+(getExtName(fmp[0]))+"' onclick='openFilename(this)'></div>\
 					<div class='titleBox'><span class='tname'>" + fmp[0] + "</span></div>\
 				</div>";
 			}
@@ -694,7 +727,7 @@ function batch(type,access){
 		
 	myloadT = layer.msg("<div class='myspeed'>正在处理,请稍候...</div>",{icon:16,time:0,shade: [0.3, '#000']});
 	setTimeout(function(){getSpeed('.myspeed');},1000);
-	console.log(data);
+	// console.log(data);
 	$.post('/files/set_batch_data',data,function(rdata){
 		layer.close(myloadT);
 		getFiles(path);
@@ -754,7 +787,7 @@ function getExtName(fileName){
 	'gif','ico','jpeg','jpg','JPG','png','psd','webp','ape','avi','flv','mkv','mov','mp3','mp4','mpeg',
 	'mpg','rm','rmvb','swf','wav','webm','wma','wmv','doc','docm','dotx','dotm','dot','rtf','docx','pdf',
 	'fdf','ppt','pptm','pot','potm','pptx','txt','xls','csv','xlsm','xlsb','xlsx','7z','gz','cab','iso',
-	'rar','zip','bt','file','apk','css'];
+	'rar','zip','bt','file','apk','css','svg'];
 	var extLastName = extArr[extArr.length - 1];
 	for(var i=0; i<exts.length; i++){
 		if(exts[i]==extLastName){
@@ -763,6 +796,7 @@ function getExtName(fileName){
 	}
 	return 'file';
 }
+
 //操作显示
 function ShowEditMenu(){
 	$("#filesBody > tr").hover(function(){
@@ -1299,7 +1333,6 @@ function getImage(fileName){
 		shadeClose: true,
 		content: '<div class="showpicdiv"><img width="100%" src="'+imgUrl+'"></div>'
 	});
-	$(".layui-layer").css("top", "30%");
 }
 
 //获取文件数据
@@ -1464,7 +1497,7 @@ function onAccess(){
 
 //右键菜单
 function rightMenuClick(type,path,name){
-	console.log(type,path,name);
+	// console.log(type,path,name);
 	var displayZip = isZip(type);
 	var options = {items:[
 		{text: "复制", onclick: function() {copyFile(path)}},
