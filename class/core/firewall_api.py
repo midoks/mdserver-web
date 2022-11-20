@@ -304,10 +304,10 @@ class firewall_api:
 
         if status == '1':
             rep = "(#)PasswordAuthentication\s+(\w*)\s*\n"
-            conf = re.sub(rep, "PasswordAuthentication yes\n", conf)
+            conf = re.sub(rep, "PasswordAuthentication no\n", conf)
         else:
             rep = "(#)PasswordAuthentication\s+(\w*)\s*\n"
-            conf = re.sub(rep, "PasswordAuthentication no\n", conf)
+            conf = re.sub(rep, "PasswordAuthentication yes\n", conf)
         mw.writeFile(file, conf)
         mw.execShell("systemctl restart sshd.service")
         mw.writeLog("SSH管理", msg)
