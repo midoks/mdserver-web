@@ -492,7 +492,7 @@ function getFiles(Path) {
 						<li><a href="javascript:createFile(0,\'' + Path + '\');">新建空白文件</a></li>\
 						<li><a href="javascript:createDir(0,\'' + Path + '\');">新建目录</a></li>\
 						</ul>\
-						</div>';
+					</div>';
 		if (rdata.PATH != '/') {
 			BarTools += ' <button onclick="javascript:backDir();" class="btn btn-default btn-sm glyphicon glyphicon-arrow-left" title="返回上一级"></button>';
 		}

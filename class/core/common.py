@@ -100,6 +100,9 @@ def initInitD():
     if not mw.isAppleSystem() and not os.path.exists("/etc/rc.d/init.d"):
         mw.execShell('mkdir -p /etc/rc.d/init.d')
 
+    if not mw.isAppleSystem() and not os.path.exists("/etc/init.d"):
+        mw.execShell('mkdir -p /etc/init.d')
+
     # initd
     if os.path.exists('/etc/rc.d/init.d'):
         initd_bin = '/etc/rc.d/init.d/mw'
@@ -107,8 +110,16 @@ def initInitD():
             import shutil
             shutil.copyfile(script_bin, initd_bin)
             mw.execShell('chmod +x ' + initd_bin)
-        # 加入自启动
+
         mw.execShell('which chkconfig && chkconfig --add mw')
+
+    if os.path.exists('/etc/init.d'):
+        initd_bin = '/etc/init.d/mw'
+        if not os.path.exists(initd_bin):
+            import shutil
+            shutil.copyfile(script_bin, initd_bin)
+            mw.execShell('chmod +x ' + initd_bin)
+        # 加入自启动
         mw.execShell('which update-rc.d && update-rc.d -f mw defaults')
 
     # 获取系统IPV4
