@@ -294,7 +294,7 @@ class firewall_api:
         status = request.form.get('status', '1').strip()
         msg = '禁止密码登陆'
         if status == "1":
-            msg = '开始密码登陆'
+            msg = '开启密码登陆'
 
         file = '/etc/ssh/sshd_config'
         if not os.path.exists(file):
@@ -303,11 +303,11 @@ class firewall_api:
         conf = mw.readFile(file)
 
         if status == '1':
-            rep = "#PasswordAuthentication\s+(\w*)\s*\n"
+            rep = "PasswordAuthentication\s+(\w*)\s*\n"
             conf = re.sub(rep, "PasswordAuthentication yes\n", conf)
         else:
-            rep = "PasswordAuthentication\s+(\w*)\s*\n"
-            conf = re.sub(rep, "#PasswordAuthentication yes\n", conf)
+            rep = "(#)PasswordAuthentication\s+(\w*)\s*\n"
+            conf = re.sub(rep, "PasswordAuthentication no\n", conf)
         mw.writeFile(file, conf)
         mw.execShell("systemctl restart sshd.service")
         mw.writeLog("SSH管理", msg)
