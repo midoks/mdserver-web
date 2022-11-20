@@ -308,10 +308,10 @@ class firewall_api:
         conf = mw.readFile(file)
 
         if status == '1':
-            rep = "(#)PasswordAuthentication\s+(\w*)\s*\n"
+            rep = "(#)?PasswordAuthentication\s+(\w*)\s*\n"
             conf = re.sub(rep, "PasswordAuthentication yes\n", conf)
         else:
-            rep = "(#)PasswordAuthentication\s+(\w*)\s*\n"
+            rep = "(#)?PasswordAuthentication\s+(\w*)\s*\n"
             conf = re.sub(rep, "PasswordAuthentication no\n", conf)
         mw.writeFile(file, conf)
         mw.execShell("systemctl restart sshd.service")
