@@ -199,7 +199,7 @@ class firewall_api:
 
         import system_api
         panelsys = system_api.system_api()
-        version = panelsys.getSystemVersion()
+
         if os.path.exists('/usr/bin/apt-get'):
             if os.path.exists('/etc/init.d/sshd'):
                 cmd = "service sshd status | grep -P '(dead|stop)'|grep -v grep"
@@ -208,12 +208,10 @@ class firewall_api:
                 cmd = "service ssh status | grep -P '(dead|stop)'|grep -v grep"
                 status = mw.execShell(cmd)
         else:
-            if version.find(' 7.') != -1:
-                cmd = "systemctl status sshd.service | grep 'dead'|grep -v grep"
-                status = mw.execShell(cmd)
-            else:
-                cmd = "/etc/init.d/sshd status | grep -e 'stopped' -e '已停'|grep -v grep"
-                status = mw.execShell(cmd)
+            cmd = "systemctl status sshd.service | grep 'dead'|grep -v grep"
+            status = mw.execShell(cmd)
+            # cmd = "/etc/init.d/sshd status | grep -e 'stopped' -e '已停'|grep -v grep"
+            # status = mw.execShell(cmd)
         if len(status[0]) > 3:
             status = False
         else:
