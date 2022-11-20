@@ -216,7 +216,7 @@ class firewall_api:
         data['pass_prohibit_status'] = False
         pass_status = re.search(pass_rep, conf)
         if pass_status:
-            if pass_status.groups(0)[0].strip() == 'yes':
+            if pass_status.groups(0)[0].strip() == 'no':
                 data['pass_prohibit_status'] = True
 
         data['port'] = port
