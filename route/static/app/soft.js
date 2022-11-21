@@ -283,9 +283,9 @@ function uninstallVersion(name, title, version, uninstall_pre_inspection) {
         uninstallPreInspection(name,title,version,function(){
             runUninstallVersion(name,title,version);
         });
-        return;
+    } else {
+        runUninstallVersion(name,title,version);
     }
-    runUninstallVersion(name,title,version);
 }
 
 
