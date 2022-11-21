@@ -677,6 +677,8 @@ function editTaskInfo(id){
 				}
 
 				obj.from.minute = $('.minute_create').val();
+				obj.from.hour = $('.hour_create').val();
+				obj.from.where1 = $('.where1_create').val();
 
 				$('.sName_create').blur(function () {
 					obj.from.name = $(this).val();

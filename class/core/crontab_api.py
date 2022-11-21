@@ -153,7 +153,7 @@ class crontab_api:
                 return False, '分钟不能为空!'
 
         if params['type'] == 'hour-n':
-            if params['hour'] == '':
+            if params['where1'] == '':
                 return False, '小时不能为空!'
             if params['minute'] == '':
                 return False, '分钟不能为空!'
