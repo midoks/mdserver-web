@@ -775,16 +775,16 @@ class files_api:
         try:
             tmps = mw.getRunDir() + '/tmp/panelExec.log'
             if stype == 'zip':
-                os.system("cd " + path + " && unzip -o -d '" + dfile +
-                          "' '" + sfile + "' > " + tmps + " 2>&1 &")
+                mw.execShell("cd " + path + " && unzip -o -d '" + dfile +
+                             "' '" + sfile + "' > " + tmps + " 2>&1 &")
             else:
                 sfiles = ''
                 for sfile in sfile.split(','):
                     if not sfile:
                         continue
                     sfiles += " '" + sfile + "'"
-                os.system("cd " + path + " && tar -zxvf " + sfiles +
-                          " -C " + dfile + " > " + tmps + " 2>&1 &")
+                mw.execShell("cd " + path + " && tar -zxvf " + sfiles +
+                             " -C " + dfile + " > " + tmps + " 2>&1 &")
 
             self.setFileAccept(dfile)
             mw.writeLog("文件管理", '文件解压成功!', (sfile, dfile))
