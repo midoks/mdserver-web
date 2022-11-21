@@ -245,7 +245,7 @@ def status(version=''):
 
 
 def pgCmd(cmd):
-    return = "su - postgres -c \"" + cmd + "\""
+    return "su - postgres -c \"" + cmd + "\""
 
 
 def pGetDbUser():
