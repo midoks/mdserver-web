@@ -251,7 +251,9 @@ function uninstallPreInspection(name, ver, callback){
         layer.close(loading);
         if (rdata.status){
             if (rdata.data == 'ok'){
-                callback();
+                if (typeof(callback) == 'function'){
+                    callback();
+                }
             } else {
                 layer.msg(rdata.data, { icon: 2 , time: 6666});
             }
