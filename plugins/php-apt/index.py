@@ -178,11 +178,9 @@ def initReplace(version):
         phpini = getConf(version)
         ssl_crt = mw.getSslCrt()
 
-        cmd_openssl = "sed -i \"s#;openssl.cafile=#openssl.cafile=${crtPath}#\" " + \
-            ssl_crt + "/etc/php.ini"
+        cmd_openssl = "sed -i \"s#;openssl.cafile=#openssl.cafile=" + ssl_crt + "#\" " + phpini
         mw.execShell(cmd_openssl)
-        cmd_curl = "sed -i \"s#;curl.cainfo =#curl.cainfo=${crtPath}#\" " + \
-            ssl_crt + "/etc/php.ini"
+        cmd_curl = "sed -i \"s#;curl.cainfo =#curl.cainfo=" + ssl_crt + "#\" " + phpini
         mw.execShell(cmd_curl)
 
         mw.writeFile(install_ok, 'ok')
