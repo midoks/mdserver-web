@@ -15,6 +15,7 @@ import json
 # python3 plugins/postgresql/index.py start 14.4
 # python3 plugins/postgresql/index.py run_info 14.4
 # ps -ef | grep -v grep| grep run_info | awk '{print $2}' | xargs kill -9
+# vi /etc/sysconfig/network-scripts/ifcfg-eth0
 
 sys.path.append(os.getcwd() + "/class/core")
 import mw
@@ -174,7 +175,7 @@ def pgDb():
     db.setPort(getDbPort())
     db.setPwd(pSqliteDb('config').where('id=?', (1,)).getField('pg_root'))
 
-    db.setHostAddr(mw.getLocalIp())
+    # db.setHostAddr(mw.getLocalIp())
     return db
 
 
