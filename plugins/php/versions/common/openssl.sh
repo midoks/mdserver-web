@@ -85,7 +85,7 @@ Install_lib()
 	echo "extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
 	if [ -f "/etc/ssl/certs/ca-certificates.crt" ];then
 		echo "openssl.cafile=/etc/ssl/certs/ca-certificates.crt" >> $serverPath/php/$version/etc/php.ini
-	elif [ -f "/etc/pki/tls/certs/ca-bundle.crt" ];
+	elif [ -f "/etc/pki/tls/certs/ca-bundle.crt" ];then
 		echo "openssl.cafile=/etc/pki/tls/certs/ca-bundle.crt" >> $serverPath/php/$version/etc/php.ini
 	fi
 	echo "extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
