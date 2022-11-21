@@ -78,6 +78,14 @@ def status(version):
     return 'start'
 
 
+def getSslCrt():
+    if os.path.exists('/etc/ssl/certs/ca-certificates.crt'):
+        return '/etc/ssl/certs/ca-certificates.crt'
+    if os.path.exists('/etc/pki/tls/certs/ca-bundle.crt'):
+        return '/etc/pki/tls/certs/ca-bundle.crt'
+    return ''
+
+
 def contentReplace(content, version):
     service_path = mw.getServerDir()
     content = content.replace('{$ROOT_PATH}', mw.getRootDir())
@@ -173,6 +181,19 @@ def initReplace(version):
     makeOpConf(version)
     phpFpmWwwReplace(version)
 
+    install_ok = getServerDir() + "/install.ok"
+    if not os.path.exists(install_ok):
+        phpini = getConf(version)
+        ssl_crt = getSslCrt()
+
+        cmd_openssl = "sed -i \"s#;openssl.cafile=#openssl.cafile=${crtPath}#\" " + \
+            ssl_crt + "/etc/php.ini"
+        mw.execShell(cmd_openssl)
+        cmd_curl = "sed -i \"s#;curl.cainfo =#curl.cainfo=${crtPath}#\" " + \
+            ssl_crt + "/etc/php.ini"
+        mw.execShell(cmd_curl)
+
+        mw.writeFile(install_ok, 'ok')
     # systemd
     # mw.execShell('systemctl daemon-reload')
     return 'ok'
