@@ -2346,10 +2346,10 @@ def installPreInspection(version):
         return 'debian支持10,11'
 
     if (sysName == 'ubuntu' and version == '5.7' and not sysId in ('18.04')):
-        return 'ubuntu支持18.04'
+        return "Ubuntu Apt MySQL[" + version + "] 仅支持18.04"
 
     if (sysName == 'ubuntu' and version == '8.0' and not sysId in ('18.04', '20.04', '22.04')):
-        return 'ubuntu支持18.04,20.04,22.04'
+        return 'Ubuntu Apt MySQL[' + version + '] 仅支持18.04,20.04,22.04'
     return 'ok'
 
 
