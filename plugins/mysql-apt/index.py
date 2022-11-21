@@ -2368,6 +2368,9 @@ if __name__ == "__main__":
     if os.path.exists(version_pl):
         version = mw.readFile(version_pl).strip()
 
+    if (len(sys.argv) > 2):
+        version = sys.argv[2]
+
     if func == 'status':
         print(status(version))
     elif func == 'start':
