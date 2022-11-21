@@ -15,7 +15,7 @@ postgreDir=${serverPath}/source/postgresql
 
 VERSION=14.4
 
-# su - postgres -c
+# su - postgres -c "/www/server/postgresql/bin/pg_ctl start -D /www/server/postgresql/data"
 
 Install_App()
 {
