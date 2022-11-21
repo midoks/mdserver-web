@@ -78,14 +78,6 @@ def status(version):
     return 'start'
 
 
-def getSslCrt():
-    if os.path.exists('/etc/ssl/certs/ca-certificates.crt'):
-        return '/etc/ssl/certs/ca-certificates.crt'
-    if os.path.exists('/etc/pki/tls/certs/ca-bundle.crt'):
-        return '/etc/pki/tls/certs/ca-bundle.crt'
-    return ''
-
-
 def contentReplace(content, version):
     service_path = mw.getServerDir()
     content = content.replace('{$ROOT_PATH}', mw.getRootDir())
@@ -184,7 +176,7 @@ def initReplace(version):
     install_ok = getServerDir() + "/" + version + "/install.ok"
     if not os.path.exists(install_ok):
         phpini = getConf(version)
-        ssl_crt = getSslCrt()
+        ssl_crt = mw.getSslCrt()
 
         cmd_openssl = "sed -i \"s#;openssl.cafile=#openssl.cafile=${crtPath}#\" " + \
             ssl_crt + "/etc/php.ini"

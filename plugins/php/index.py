@@ -109,21 +109,13 @@ def status(version):
     return 'start'
 
 
-def getSslCrt():
-    if os.path.exists('/etc/ssl/certs/ca-certificates.crt'):
-        return '/etc/ssl/certs/ca-certificates.crt'
-    if os.path.exists('/etc/pki/tls/certs/ca-bundle.crt'):
-        return '/etc/pki/tls/certs/ca-bundle.crt'
-    return ''
-
-
 def contentReplace(content, version):
     service_path = mw.getServerDir()
     content = content.replace('{$ROOT_PATH}', mw.getRootDir())
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$PHP_VERSION}', version)
     content = content.replace('{$LOCAL_IP}', mw.getLocalIp())
-    content = content.replace('{$SSL_CRT}', getSslCrt())
+    content = content.replace('{$SSL_CRT}', mw.getSslCrt())
 
     if mw.isAppleSystem():
         # user = mw.execShell(
