@@ -244,6 +244,10 @@ def status(version=''):
     return 'start'
 
 
+def pgCmd(cmd):
+    return = "su - postgres -c \"" + cmd + "\""
+
+
 def pGetDbUser():
     if mw.isAppleSystem():
         user = mw.execShell(
@@ -257,7 +261,7 @@ def initPgData():
     if not os.path.exists(serverdir + '/data'):
         cmd = serverdir + '/bin/initdb -D ' + serverdir + "/data"
         if not mw.isAppleSystem():
-            cmd = "su - postgres -c \"" + cmd + "\""
+            cmd = pgCmd(cmd)
         # print(cmd)
         mw.execShell(cmd)
         return False
@@ -277,8 +281,8 @@ def initPgPwd():
 
     cmd_pass = "echo \"alter user postgres with password '" + pwd + "'\" | "
     if not mw.isAppleSystem():
-        cmd_pass = cmd_pass + ' su - postgres -c "' + \
-            serverdir + '/bin/psql -d postgres"'
+        cmd = serverdir + '/bin/psql -d postgres'
+        cmd_pass = cmd_pass + ' ' pgCmd(cmd)
     else:
         cmd_pass = cmd_pass + serverdir + '/bin/psql -d postgres'
 

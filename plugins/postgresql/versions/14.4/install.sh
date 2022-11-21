@@ -15,6 +15,8 @@ postgreDir=${serverPath}/source/postgresql
 
 VERSION=14.4
 
+# su - postgres -c
+
 Install_App()
 {
 	mkdir -p ${postgreDir}
