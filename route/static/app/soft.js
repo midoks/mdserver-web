@@ -245,7 +245,7 @@ function addVersion(name, ver, type, obj, title, install_pre_inspection) {
 }
 
 //卸载软件
-function uninstallPreInspection(name, ver, callback){
+function uninstallPreInspection(name, title, ver, callback){
     var loading = layer.msg('正在检查卸载环境...', { icon: 16, time: 0, shade: [0.3, '#000'] });
      $.post("/plugins/run", {'name':name,'version':ver,'func':'uninstall_pre_inspection'}, function(rdata) {
         layer.close(loading);
