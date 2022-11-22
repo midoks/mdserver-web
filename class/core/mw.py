@@ -167,6 +167,12 @@ def getOsID():
     return data[0].strip()
 
 
+def getFileSuffix(file):
+    tmp = file.split('.')
+    ext = tmp[len(tmp) - 1]
+    return ext
+
+
 def isAppleSystem():
     if getOs() == 'darwin':
         return True

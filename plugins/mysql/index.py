@@ -857,8 +857,7 @@ def importDbExternal():
         return mw.returnJson(False, '文件突然消失?')
 
     exts = ['sql', 'gz', 'zip']
-    tmp = file.split('.')
-    ext = tmp[len(tmp) - 1]
+    ext = mw.getFileSuffix(file)
     if ext not in exts:
         return mw.returnJson(False, '导入数据库格式不对!')
 
@@ -885,6 +884,9 @@ def importDbExternal():
     if file.find("tar.gz") > -1:
         cmd = 'cd ' + import_dir + ' && tar -zxvf ' + file
         mw.execShell(cmd)
+        import_sql = import_dir + tmpFile
+
+    if file.find(".sql") > -1 and file.find(".sql.gz") == -1:
         import_sql = import_dir + tmpFile
 
     if import_sql == "":
