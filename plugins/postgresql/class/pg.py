@@ -40,14 +40,14 @@ class ORM:
                     self.__DB_CONN = psycopg2.connect(database='postgres',
                                                       user=self.__DB_USER,
                                                       password=self.__DB_PASS,
-                                                      host=self.__DB_HOST,
+                                                      host=self.__DB_SOCKET,
                                                       port=int(self.__DB_PORT))
                 except Exception as e:
                     self.__DB_HOST = '127.0.0.1'
                     self.__DB_CONN = psycopg2.connect(database='postgres',
                                                       user=self.__DB_USER,
                                                       password=self.__DB_PASS,
-                                                      host=self.__DB_HOST,
+                                                      host=self.__DB_SOCKET,
                                                       port=int(self.__DB_PORT))
             else:
                 try:
