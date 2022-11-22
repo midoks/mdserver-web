@@ -91,12 +91,17 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.10.2
+### 版本更新 0.11.0
 
-* 修复上次更新的UI问题。
-* `FTP存储空间` 备份数据库修复。
-* 修复计划任务执行Python脚本的编码问题。
-* 添加，修改计划任务参数强校验。
+* 改造HTTPS升级，为lets和acme申请。
+* 改造SSH管理,加入`禁止密码登陆`。
+* 计划任务BUG,修改时错误提示。
+* PG在debian11优化。
+* PHP默认配置curl,openssl ssl配置优化。
+* 初始花安装提示。
+* 面板设置UI优化。
+* 加入BasicAuth认证功能。
+* MYSQL[APT,YUM]安装检查优化。
 
 ### JSDelivr安装地址
 
