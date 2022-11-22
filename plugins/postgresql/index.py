@@ -178,7 +178,7 @@ def pgDb():
 
     db.setPort(getDbPort())
     db.setPwd(pSqliteDb('config').where('id=?', (1,)).getField('pg_root'))
-    db.setHostAddr(getSocketFile())
+    db.setSocket(getSocketFile())
     return db
 
 
