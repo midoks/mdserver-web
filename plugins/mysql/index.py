@@ -887,7 +887,7 @@ def importDbExternal():
         import_sql = import_dir + tmpFile
 
     if file.find(".sql") > -1 and file.find(".sql.gz") == -1:
-        import_sql = import_dir + tmpFile
+        import_sql = import_dir + file
 
     if import_sql == "":
         return mw.returnJson(False, '未找SQL文件')
