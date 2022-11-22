@@ -20,7 +20,7 @@ class ORM:
     __DB_CUR = None
     __DB_ERR = None
     __DB_CNF = '/etc/postgresql.cnf'
-    __DB_SOCKET = '/www/server/postgresql/mysql.sock'
+    __DB_SOCKET = '/tmp/mysql.sock'
     __DB_CHARSET = "utf8"
 
     __DB_TABLE = ""             # 被操作的表名称

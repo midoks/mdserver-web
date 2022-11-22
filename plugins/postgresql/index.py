@@ -124,10 +124,14 @@ def getDbPort():
 
 
 def getSocketFile():
-    file = getConf()
-    content = mw.readFile(file)
-    rep = 'socket\s*=\s*(.*)'
-    tmp = re.search(rep, content)
+    sock_name = 's.PGSQL.' + getDbPort()
+    sock_tmp = '/tmp/' + sock_name
+    if os.path.exists(sock_tmp):
+        return sock_tmp
+
+    sock_app = getServerDir() + "/" + sock_name
+    if os.path.exists(sock_app):
+        return sock_app
     return tmp.groups()[0].strip()
 
 
@@ -174,8 +178,7 @@ def pgDb():
 
     db.setPort(getDbPort())
     db.setPwd(pSqliteDb('config').where('id=?', (1,)).getField('pg_root'))
-
-    # db.setHostAddr(mw.getLocalIp())
+    db.setHostAddr(getSocketFile())
     return db
 
 
@@ -255,6 +258,10 @@ def pgCmd(cmd):
     return "su - postgres -c \"" + cmd + "\""
 
 
+def execShellPg(cmd):
+    return mw.execShell(pgCmd(cmd))
+
+
 def pGetDbUser():
     if mw.isAppleSystem():
         user = mw.execShell(
@@ -268,8 +275,8 @@ def initPgData():
     if not os.path.exists(serverdir + '/data'):
         cmd = serverdir + '/bin/initdb -D ' + serverdir + "/data"
         if not mw.isAppleSystem():
-            cmd = pgCmd(cmd)
-        # print(cmd)
+            execShellPg(cmd)
+            return False
         mw.execShell(cmd)
         return False
     return True
