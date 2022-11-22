@@ -132,7 +132,7 @@ def getSocketFile():
     sock_app = getServerDir() + "/" + sock_name
     if os.path.exists(sock_app):
         return sock_app
-    return tmp.groups()[0].strip()
+    return sock_app
 
 
 def getInitdTpl(version=''):
