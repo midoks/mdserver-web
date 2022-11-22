@@ -10,8 +10,8 @@ serverPath=$(dirname "$rootPath")
 install_tmp=${rootPath}/tmp/mw_install.pl
 
 if id www &> /dev/null ;then 
-    echo "www UID is `id -u www`"
-    echo "www Shell is `grep "^www:" /etc/passwd |cut -d':' -f7 `"
+    echo "www uid is `id -u www`"
+    echo "www shell is `grep "^www:" /etc/passwd |cut -d':' -f7 `"
 else
     groupadd www
 	# useradd -g www -s /sbin/nologin www
@@ -61,9 +61,23 @@ fi
 cd ${curPath} && sh -x $curPath/versions/$2/install.sh $1
 
 if [ "${action}" == "install" ] && [ -d ${serverPath}/php-yum/${type} ];then
+
 	#初始化 
 	cd ${rootPath} && python3 ${rootPath}/plugins/php-yum/index.py start ${type}
 	cd ${rootPath} && python3 ${rootPath}/plugins/php-yum/index.py initd_install ${type}
+
+	# 安装通用扩展
+	echo "install PHP-YUM[${type}] extend start"
+	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install gd
+	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install iconv
+	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install exif
+	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install intl
+	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install mcrypt
+	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install openssl
+	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install gettext
+	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install redis
+	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install memcached
+	echo "install PHP-YUM[${type}] extend end"
 fi
 
 

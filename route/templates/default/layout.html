@@ -67,11 +67,43 @@
             <script src="/static/js/jquery.dragsort-0.5.2.min.js?v={{config.version}}"></script>
             
             {% block content %}{% endblock %}
-            <div class="footer bgw">mdserver-web &copy;2018-∞ 面板 (<a style="color:#20a53a;" target="_blank" href="//github.com/midoks/mdserver-web">源码</a>)<a style="margin-left:20px;color:#20a53a;" href="//github.com/midoks/mdserver-web/wiki" target="_blank">wiki</a>
+            <div class="footer bgw">mdserver-web &copy;2018-∞ Linux面板 (<a class="btlink" target="_blank" href="//github.com/midoks/mdserver-web">源码</a>) <span style="margin-left:5px;">/</span>
+                <a class="btlink" style="margin-left:5px;" href="//github.com/midoks/mdserver-web/wiki" target="_blank">WIKI</a><span style="margin-left:5px;">/</span>
+                <a class='btlink panel_ad_list_mode' style="margin-left:5px;">AD</a>
         </div>
     </div>
     </div>
 </body>
+
+<script type="text/javascript">
+
+function showAd(){
+    layer.open({
+        type: 1
+        ,title: "【AD】求恰饭"
+        ,closeBtn: 1
+        ,area: '300px;'
+        ,shade: 0.8
+        ,id: 'panel_ad_list_mode'
+        ,btnAlign: 'c'
+        ,moveType: 1
+        ,content: '<div style="padding: 10px; line-height: 22px; font-weight: 300;">\
+                <table class="table table-hover">\
+                    <thead><tr><td style="text-align: center;">商家</td><td style="text-align: center;">优惠码</td><tr></thead>\
+                    <tbody>\
+                        <tr><td><a target="_blank" href="https://digitalvirt.com/aff.php?aff=154"><img src="https://digitalvirt.com/templates/BlueWhite/img/logo-dark.svg"/></a></td><td>9SYDY7UH0U</td></tr>\
+                    </tbody>\
+                </table>\
+        </div>'
+        ,success: function(layero){
+        }
+    });
+}
+
+$('.panel_ad_list_mode').click(function(){
+    showAd();
+});
+</script>
 
 <script src="/static/codemirror/lib/codemirror.js?v={{config.version}}"></script>
 <script src="/static/codemirror/addon/edit/editAll.js?v={{config.version}}"></script>

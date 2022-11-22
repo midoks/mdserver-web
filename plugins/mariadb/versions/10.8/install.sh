@@ -22,8 +22,8 @@ Install_app()
 	echo '正在安装脚本文件...' > $install_tmp
 
 	if id mysql &> /dev/null ;then 
-	    echo "mysql UID is `id -u www`"
-	    echo "mysql Shell is `grep "^www:" /etc/passwd |cut -d':' -f7 `"
+	    echo "mysql uid is `id -u www`"
+	    echo "mysql shell is `grep "^www:" /etc/passwd |cut -d':' -f7 `"
 	else
 	    groupadd mysql
 		useradd -g mysql mysql
@@ -59,11 +59,11 @@ Install_app()
 	fi
 	# ----- cpu end ------
 
-	if [ ! -f ${mariadbDir}/mariadb-${MY_VER}.tar.gz ];then
-		wget --no-check-certificate -O ${mariadbDir}/mariadb-${MY_VER}.tar.gz --tries=3 https://mirrors.aliyun.com/mariadb/mariadb-${MY_VER}/source/mariadb-${MY_VER}.tar.gz
-	fi
+	# if [ ! -f ${mariadbDir}/mariadb-${MY_VER}.tar.gz ];then
+	# 	wget --no-check-certificate -O ${mariadbDir}/mariadb-${MY_VER}.tar.gz --tries=3 https://mirrors.aliyun.com/mariadb/mariadb-${MY_VER}/source/mariadb-${MY_VER}.tar.gz
+	# fi
 
-	if [ "$?" != "0" ];then
+	if [ ! -f ${mariadbDir}/mariadb-${MY_VER}.tar.gz ];then
 		wget --no-check-certificate -O ${mariadbDir}/mariadb-${MY_VER}.tar.gz --tries=3 https://archive.mariadb.org/mariadb-${MY_VER}/source/mariadb-${MY_VER}.tar.gz
 	fi
 
@@ -94,12 +94,14 @@ Install_app()
 			echo '10.8' > $serverPath/mariadb/version.pl
 			echo '安装完成' > $install_tmp
 		else
-			# rm -rf ${mariadbDir}/mariadb-${MY_VER}
 			echo '安装失败' > $install_tmp
 			echo 'install fail'>&2
 			exit 1
 		fi
 	fi
+
+	rm -rf ${mariadbDir}/mariadb-${MY_VER}
+	rm -rf ${mariadbDir}/mariadb-${MY_VER}.tar.gz
 }
 
 Uninstall_app()

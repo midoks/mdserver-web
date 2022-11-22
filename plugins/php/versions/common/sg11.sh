@@ -1,7 +1,6 @@
 #!/bin/bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
-
 curPath=`pwd`
 
 rootPath=$(dirname "$curPath")
@@ -11,11 +10,17 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
+# https://www.sourceguardian.com/loaders.html
+
+# support 52-81
+
+LIBNAME=sg11
+LIBV=0
+sysName=`uname`
 actionType=$1
 version=$2
+SG_VER=${version:0:1}.${version:1:2}
 
-LIBNAME=openssl
-LIBV=0
 
 LIB_PATH_NAME=lib/php
 if [ -d $serverPath/php/${version}/lib64 ];then
@@ -25,15 +30,31 @@ fi
 NON_ZTS_FILENAME=`ls $serverPath/php/${version}/${LIB_PATH_NAME}/extensions | grep no-debug-non-zts`
 extFile=$serverPath/php/${version}/${LIB_PATH_NAME}/extensions/${NON_ZTS_FILENAME}/${LIBNAME}.so
 
-sysName=`uname`
 if [ "$sysName" == "Darwin" ];then
 	BAK='_bak'
 else
 	BAK=''
 fi
 
+
 Install_lib()
 {
+	bash ${rootPath}/scripts/getos.sh
+	OSNAME=`cat ${rootPath}/data/osname.pl`
+	if [ "$OSNAME" == 'macos' ];then
+		VERSION_ID=none
+	else
+		VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
+	fi
+	
+	echo "${OSNAME}:${VERSION_ID}"
+
+	DEFAULT_OSNAME=linux-x86_64
+	SUFFIX_NAME=lin
+	if [ "$OSNAME" == 'macos' ];then
+		DEFAULT_OSNAME=macosx
+		SUFFIX_NAME=dar
+	fi
 
 	isInstall=`cat $serverPath/php/$version/etc/php.ini|grep "${LIBNAME}.so"`
 	if [ "${isInstall}" != "" ];then
@@ -41,54 +62,40 @@ Install_lib()
 		return
 	fi
 	
-	# cd ${rootPath}/plugins/php/lib && /bin/bash openssl_10.sh
-	if [ "$version" -lt "70" ];then
-		cd ${rootPath}/plugins/php/lib && /bin/bash openssl_10.sh
-	fi
-
-	if [ "$sysName" == "Darwin" ] ;then 
-		LIB_DEPEND_DIR=`brew info openssl@1.1 | grep /usr/local/Cellar/openssl | cut -d \  -f 1 | awk 'END {print}'`
-		export PKG_CONFIG_PATH=$LIB_DEPEND_DIR/lib/pkgconfig
-	fi
-
+	
 	if [ ! -f "$extFile" ];then
 
-		if [ ! -d $sourcePath/php${version}/ext ];then
-			cd ${rootPath}/plugins/php && /bin/bash install.sh install ${version}
-		fi
+		php_lib=$sourcePath/php_lib
+		mkdir -p $php_lib
+		mkdir -p $php_lib/sg11
+		if [ ! -f $php_lib/sg11_loaders.tar.bz2 ];then
+			curl -sSLo $php_lib/sg11_loaders.tar.bz2 https://www.sourceguardian.com/loaders/download/loaders.tar.bz2
+			echo "cd $php_lib && tar -jxvf $php_lib/sg11_loaders.tar.bz2 -C $php_lib/sg11"
+			cd $php_lib && tar -jxvf $php_lib/sg11_loaders.tar.bz2 -C $php_lib/sg11
+		fi 
 
-		cd $sourcePath/php${version}/ext/${LIBNAME}
 
-		if [ ! -f "config.m4" ];then
-			mv config0.m4 config.m4
+		if [ ! -d $php_lib/sg11/macosx ];then
+			cd $php_lib && tar -jxvf $php_lib/sg11_loaders.tar.bz2 -C $php_lib/sg11
 		fi
-		
-		openssl_version=`pkg-config openssl --modversion`
-		if [ "$version" -lt "70" ];then
-			export PKG_CONFIG_PATH=$serverPath/lib/openssl10/lib/pkgconfig
-		fi
+		cd $php_lib/sg11
+		# echo "mv $php_lib/sg11/${DEFAULT_OSNAME}/ixed.${SG_VER}.lin $extFile"
+		cp -rf $php_lib/sg11/${DEFAULT_OSNAME}/ixed.${SG_VER}.${SUFFIX_NAME} $extFile
 
-		$serverPath/php/$version/bin/phpize
-		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
-		--with-openssl
-		make clean && make && make install && make clean
-		
+		if [ "$OSNAME" == 'macos' ];then
+			xattr -c * $extFile
+		fi
 	fi
-
+	
 	if [ ! -f "$extFile" ];then
 		echo "ERROR!"
 		return
 	fi
 
-    echo "" >> $serverPath/php/$version/etc/php.ini
+	echo "" >> $serverPath/php/$version/etc/php.ini
 	echo "[${LIBNAME}]" >> $serverPath/php/$version/etc/php.ini
 	echo "extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
-	if [ -f "/etc/ssl/certs/ca-certificates.crt" ];then
-		echo "openssl.cafile=/etc/ssl/certs/ca-certificates.crt" >> $serverPath/php/$version/etc/php.ini
-	elif [ -f "/etc/pki/tls/certs/ca-bundle.crt" ];then
-		echo "openssl.cafile=/etc/pki/tls/certs/ca-bundle.crt" >> $serverPath/php/$version/etc/php.ini
-	fi
-	
+
 	bash ${rootPath}/plugins/php/versions/lib.sh $version restart
 	echo '==========================================================='
 	echo 'successful!'
@@ -98,25 +105,25 @@ Install_lib()
 Uninstall_lib()
 {
 	if [ ! -f "$serverPath/php/$version/bin/php-config" ];then
-		echo "php-$version 未安装,请选择其它版本!"
+		echo "php$version 未安装,请选择其它版本!"
 		return
 	fi
 	
 	if [ ! -f "$extFile" ];then
-		echo "php-$version 未安装${LIBNAME},请选择其它版本!"
+		echo "php$version 未安装${LIBNAME},请选择其它版本!"
+		echo "php-$vphp not install ${LIBNAME}, Plese select other version!"
 		return
 	fi
 	
-	echo $serverPath/php/$version/etc/php.ini
 	sed -i $BAK "/${LIBNAME}.so/d" $serverPath/php/$version/etc/php.ini
 	sed -i $BAK "/${LIBNAME}/d" $serverPath/php/$version/etc/php.ini
 		
 	rm -f $extFile
+
 	bash ${rootPath}/plugins/php/versions/lib.sh $version restart
 	echo '==============================================='
 	echo 'successful!'
 }
-
 
 
 if [ "$actionType" == 'install' ];then

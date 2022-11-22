@@ -1,5 +1,18 @@
 # coding: utf-8
 
+# ---------------------------------------------------------------------------------
+# MW-Linux面板
+# ---------------------------------------------------------------------------------
+# copyright (c) 2018-∞(https://github.com/midoks/mdserver-web) All rights reserved.
+# ---------------------------------------------------------------------------------
+# Author: midoks <midoks@163.com>
+# ---------------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------------
+# 工具箱
+# ---------------------------------------------------------------------------------
+
+
 import sys
 import os
 import json
@@ -14,7 +27,7 @@ import db
 # p = "/usr/local/lib/" + info[0].strip() + "/site-packages"
 # sys.path.append(p)
 
-INIT_DIR = "/etc/init.d"
+INIT_DIR = "/etc/rc.d/init.d"
 if mw.isAppleSystem():
     INIT_DIR = mw.getRunDir() + "/scripts/init.d"
 
@@ -42,6 +55,7 @@ def mwcli(mw_input=0):
         print("(11) 修改面板密码")
         print("(12) 修改面板用户名")
         print("(13) 显示面板错误日志")
+        print("(20) 关闭BasicAuth认证")
         print("(0) 取消")
         print(raw_tip)
         try:
@@ -51,7 +65,7 @@ def mwcli(mw_input=0):
         except:
             mw_input = 0
 
-    nums = [1, 2, 3, 4, 5, 10, 11, 12, 13]
+    nums = [1, 2, 3, 4, 5, 10, 11, 12, 13, 20]
     if not mw_input in nums:
         print(raw_tip)
         print("已取消!")
@@ -89,6 +103,12 @@ def mwcli(mw_input=0):
         set_panel_username(input_user.strip())
     elif mw_input == 13:
         os.system('tail -100 ' + mw.getRunDir() + '/logs/error.log')
+    elif mw_input == 20:
+        basic_auth = 'data/basic_auth.json'
+        if os.path.exists(basic_auth):
+            os.remove(basic_auth)
+            os.system(INIT_CMD + " restart")
+            print("|-关闭basic_auth成功")
 
 
 def set_panel_pwd(password, ncli=False):

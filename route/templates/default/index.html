@@ -107,7 +107,7 @@
                         <div class="col-sm-6 col-md-3"><p class="c9">总发送</p><a id="upAll">0</a></div>
                         <div class="col-sm-6 col-md-3"><p class="c9">总接收</p><a id="downAll">0</a></div>
                     </div>
-                    <div id="NetImg" style="width:100%;height:330px;"></div>
+                    <div id="netImg" style="width:100%;height:330px;"></div>
                 </div>
             </div>
         </div>
@@ -118,6 +118,13 @@
 <script type="text/javascript" src="/static/app/soft.js?v={{config.version}}"></script>
 <script type="text/javascript" src="/static/app/index.js?v={{config.version}}"></script>
 <script type="text/javascript">
+
+netImg();
+setImg();
+pluginInit();
+//加载关键数据总数
+loadKeyDataCount();
+
 setTimeout(function() {
     getDiskInfo();
 }, 500)

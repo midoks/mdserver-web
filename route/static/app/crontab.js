@@ -289,7 +289,7 @@ function planAdd(){
 
 	if (type == 'hour-n'){
 		var where1 = $("#ptime input[name='where1']").val();
-		$("#set-Config input[name='hour']").val(where1);
+		$("#set-Config input[name='where1']").val(where1);
 	}
 	
 	$("#set-Config input[name='sName']").val(sName);
@@ -677,6 +677,8 @@ function editTaskInfo(id){
 				}
 
 				obj.from.minute = $('.minute_create').val();
+				obj.from.hour = $('.hour_create').val();
+				obj.from.where1 = $('.where1_create').val();
 
 				$('.sName_create').blur(function () {
 					obj.from.name = $(this).val();

@@ -1,5 +1,17 @@
 # coding: utf-8
 
+# ---------------------------------------------------------------------------------
+# MW-Linux面板
+# ---------------------------------------------------------------------------------
+# copyright (c) 2018-∞(https://github.com/midoks/mdserver-web) All rights reserved.
+# ---------------------------------------------------------------------------------
+# Author: midoks <midoks@163.com>
+# ---------------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------------
+# sqlite3操作
+# ---------------------------------------------------------------------------------
+
 
 import sqlite3
 import os
@@ -23,7 +35,7 @@ class Sql():
     def __init__(self):
         self.__DB_FILE = 'data/default.db'
 
-    def __GetConn(self):
+    def __getConn(self):
         # 取数据库对象
         try:
             if self.__DB_CONN == None:
@@ -100,10 +112,11 @@ class Sql():
 
     def select(self):
         # 查询数据集
-        self.__GetConn()
+        self.__getConn()
         try:
             sql = "SELECT " + self.__OPT_FIELD + " FROM " + self.__DB_TABLE + \
                 self.__OPT_WHERE + self.__OPT_GROUP + self.__OPT_ORDER + self.__OPT_LIMIT
+            # print(sql)
             result = self.__DB_CONN.execute(sql, self.__OPT_PARAM)
             data = result.fetchall()
             # 构造字曲系列
@@ -133,7 +146,7 @@ class Sql():
     def inquiry(self, input_field=''):
         # 查询数据集
         # 不清空查询参数
-        self.__GetConn()
+        self.__getConn()
         try:
             sql = "SELECT " + self.__OPT_FIELD + " FROM " + self.__DB_TABLE + \
                 self.__OPT_WHERE + self.__OPT_GROUP + self.__OPT_ORDER + self.__OPT_LIMIT
@@ -171,6 +184,7 @@ class Sql():
     def getField(self, keyName):
         # 取回指定字段
         result = self.field(keyName).select()
+        # print(result)
         if len(result) == 1:
             return result[0][keyName]
         return result
@@ -197,7 +211,7 @@ class Sql():
 
     def add(self, keys, param):
         # 插入数据
-        self.__GetConn()
+        self.__getConn()
         try:
             values = ""
             for key in keys.split(','):
@@ -256,7 +270,7 @@ class Sql():
 
     def addAll(self, keys, param):
         # 插入数据
-        self.__GetConn()
+        self.__getConn()
         try:
             values = ""
             for key in keys.split(','):
@@ -275,7 +289,7 @@ class Sql():
 
     def save(self, keys, param):
         # 更新数据
-        self.__GetConn()
+        self.__getConn()
         try:
             opt = ""
             for key in keys.split(','):
@@ -300,7 +314,7 @@ class Sql():
 
     def delete(self, id=None):
         # 删除数据
-        self.__GetConn()
+        self.__getConn()
         try:
             if id:
                 self.__OPT_WHERE = " WHERE id=?"
@@ -314,7 +328,7 @@ class Sql():
             return "error: " + str(ex)
 
     def originExecute(self, sql, param=()):
-        self.__GetConn()
+        self.__getConn()
         try:
             result = self.__DB_CONN.execute(sql, param)
             self.__DB_CONN.commit()
@@ -324,7 +338,7 @@ class Sql():
 
     def execute(self, sql, param=()):
         # 执行SQL语句返回受影响行
-        self.__GetConn()
+        self.__getConn()
         # print sql, param
         try:
             result = self.__DB_CONN.execute(sql, param)
@@ -335,7 +349,7 @@ class Sql():
 
     def query(self, sql, param):
         # 执行SQL语句返回数据集
-        self.__GetConn()
+        self.__getConn()
         try:
             result = self.__DB_CONN.execute(sql, param)
             # 将元组转换成列表
@@ -346,7 +360,7 @@ class Sql():
 
     def create(self, name):
         # 创建数据表
-        self.__GetConn()
+        self.__getConn()
         import mw
         script = mw.readFile('data/' + name + '.sql')
         result = self.__DB_CONN.executescript(script)
@@ -355,7 +369,7 @@ class Sql():
 
     def fofile(self, filename):
         # 执行脚本
-        self.__GetConn()
+        self.__getConn()
         import mw
         script = mw.readFile(filename)
         result = self.__DB_CONN.executescript(script)

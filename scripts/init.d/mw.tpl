@@ -14,7 +14,7 @@
 
 
 PATH=/usr/local/bin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
-export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
 
 mw_path={$SERVER_PATH}
 PATH=$PATH:$mw_path/bin
@@ -22,15 +22,13 @@ PATH=$PATH:$mw_path/bin
 
 if [ -f $mw_path/bin/activate ];then
     source $mw_path/bin/activate
-else 
-    echo ""
 fi
 
 mw_start_panel()
 {
     isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`
     if [ "$isStart" == '' ];then
-        echo -e "Starting mw-panel... \c"
+        echo -e "starting mw-panel... \c"
         cd $mw_path &&  gunicorn -c setting.py app:app
         port=$(cat ${mw_path}/data/port.pl)
         isStart=""
@@ -45,16 +43,16 @@ mw_start_panel()
             fi
         done
         if [ "$isStart" == '' ];then
-                echo -e "\033[31mfailed\033[0m"
-                echo '------------------------------------------------------'
-                tail -n 20 ${mw_path}/logs/error.log
-                echo '------------------------------------------------------'
-                echo -e "\033[31mError: mw-panel service startup failed.\033[0m"
-                return;
+            echo -e "\033[31mfailed\033[0m"
+            echo '------------------------------------------------------'
+            tail -n 20 ${mw_path}/logs/error.log
+            echo '------------------------------------------------------'
+            echo -e "\033[31mError: mw-panel service startup failed.\033[0m"
+            return;
         fi
         echo -e "\033[32mdone\033[0m"
     else
-        echo "Starting mw-panel... mw(pid $(echo $isStart)) already running"
+        echo "starting mw-panel... mw(pid $(echo $isStart)) already running"
     fi
 }
 
@@ -63,21 +61,21 @@ mw_start_task()
 {
     isStart=$(ps aux |grep 'task.py'|grep -v grep|awk '{print $2}')
     if [ "$isStart" == '' ];then
-        echo -e "Starting mw-tasks... \c"
+        echo -e "starting mw-tasks... \c"
         cd $mw_path && python3 task.py >> ${mw_path}/logs/task.log 2>&1 &
         sleep 0.3
         isStart=$(ps aux |grep 'task.py'|grep -v grep|awk '{print $2}')
         if [ "$isStart" == '' ];then
-                echo -e "\033[31mfailed\033[0m"
-                echo '------------------------------------------------------'
-                tail -n 20 $mw_path/logs/task.log
-                echo '------------------------------------------------------'
-                echo -e "\033[31mError: mw-tasks service startup failed.\033[0m"
-                return;
+            echo -e "\033[31mfailed\033[0m"
+            echo '------------------------------------------------------'
+            tail -n 20 $mw_path/logs/task.log
+            echo '------------------------------------------------------'
+            echo -e "\033[31mError: mw-tasks service startup failed.\033[0m"
+            return;
         fi
         echo -e "\033[32mdone\033[0m"
     else
-        echo "Starting mw-tasks... mw-tasks (pid $(echo $isStart)) already running"
+        echo "starting mw-tasks... mw-tasks (pid $(echo $isStart)) already running"
     fi
 }
 
@@ -91,11 +89,11 @@ mw_start()
 mw_stop_task()
 {
     if [ -f $mw_path/tmp/panelTask.pl ];then
-        echo -e "\033[32mThe task is running and cannot be stopped\033[0m"
+        echo -e "\033[32mthe task is running and cannot be stopped\033[0m"
         exit 0
     fi
 
-    echo -e "Stopping mw-tasks... \c";
+    echo -e "stopping mw-tasks... \c";
     pids=$(ps aux | grep 'task.py'|grep -v grep|awk '{print $2}')
     arr=($pids)
     for p in ${arr[@]}
@@ -107,11 +105,11 @@ mw_stop_task()
 
 mw_stop_panel()
 {
-    echo -e "Stopping mw-panel... \c";
+    echo -e "stopping mw-panel... \c";
     arr=`ps aux|grep 'gunicorn -c setting.py app:app'|grep -v grep|awk '{print $2}'`
     for p in ${arr[@]}
     do
-            kill -9 $p &>/dev/null
+        kill -9 $p &>/dev/null
     done
     
     pidfile=${mw_path}/logs/mw.pid
@@ -129,19 +127,19 @@ mw_stop()
 
 mw_status()
 {
-        isStart=$(ps aux|grep 'gunicorn -c setting.py app:app'|grep -v grep|awk '{print $2}')
-        if [ "$isStart" != '' ];then
-                echo -e "\033[32mmw (pid $(echo $isStart)) already running\033[0m"
-        else
-                echo -e "\033[31mmw not running\033[0m"
-        fi
-        
-        isStart=$(ps aux |grep 'task.py'|grep -v grep|awk '{print $2}')
-        if [ "$isStart" != '' ];then
-                echo -e "\033[32mmw-task (pid $isStart) already running\033[0m"
-        else
-                echo -e "\033[31mmw-task not running\033[0m"
-        fi
+    isStart=$(ps aux|grep 'gunicorn -c setting.py app:app'|grep -v grep|awk '{print $2}')
+    if [ "$isStart" != '' ];then
+        echo -e "\033[32mmw (pid $(echo $isStart)) already running\033[0m"
+    else
+        echo -e "\033[31mmw not running\033[0m"
+    fi
+    
+    isStart=$(ps aux |grep 'task.py'|grep -v grep|awk '{print $2}')
+    if [ "$isStart" != '' ];then
+        echo -e "\033[32mmw-task (pid $isStart) already running\033[0m"
+    else
+        echo -e "\033[31mmw-task not running\033[0m"
+    fi
 }
 
 
@@ -150,7 +148,7 @@ mw_reload()
 	isStart=$(ps aux|grep 'gunicorn -c setting.py app:app'|grep -v grep|awk '{print $2}')
     
     if [ "$isStart" != '' ];then
-    	echo -e "Reload mw... \c";
+    	echo -e "reload mw... \c";
 	    arr=`ps aux|grep 'gunicorn -c setting.py app:app'|grep -v grep|awk '{print $2}'`
 		for p in ${arr[@]}
         do
@@ -159,12 +157,12 @@ mw_reload()
         cd $mw_path && gunicorn -c setting.py app:app
         isStart=`ps aux|grep 'gunicorn -c setting.py app:app'|grep -v grep|awk '{print $2}'`
         if [ "$isStart" == '' ];then
-                echo -e "\033[31mfailed\033[0m"
-                echo '------------------------------------------------------'
-                tail -n 20 $mw_path/logs/error.log
-                echo '------------------------------------------------------'
-                echo -e "\033[31mError: mw service startup failed.\033[0m"
-                return;
+            echo -e "\033[31mfailed\033[0m"
+            echo '------------------------------------------------------'
+            tail -n 20 $mw_path/logs/error.log
+            echo '------------------------------------------------------'
+            echo -e "\033[31mError: mw service startup failed.\033[0m"
+            return;
         fi
         echo -e "\033[32mdone\033[0m"
     else
@@ -173,26 +171,72 @@ mw_reload()
     fi
 }
 
-
 error_logs()
 {
 	tail -n 100 $mw_path/logs/error.log
 }
 
-
 mw_update()
 {
-    curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/update.sh | bash
+    cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
+    if [ ! -z "$cn" ];then
+        curl -fsSL https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/scripts/update.sh | bash
+    else
+        curl -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/update.sh | bash
+    fi
 }
 
 mw_update_dev()
 {
-    curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update_dev.sh | bash
+    cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
+    if [ ! -z "$cn" ];then
+        curl -fsSL https://gitee.com/midoks/mdserver-web/raw/dev/scripts/update_dev.sh | bash
+    else
+        curl -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update_dev.sh | bash
+    fi
+    cd /www/server/mdserver-web
 }
 
 mw_install_app()
 {
     bash $mw_path/scripts/quick/app.sh
+}
+
+mw_close_admin_path(){
+    if [ -f $mw_path/data/admin_path.pl ]; then
+        rm -rf $mw_path/data/admin_path.pl
+    fi
+}
+
+mw_force_kill()
+{
+    PLIST=`ps -ef|grep app:app |grep -v grep|awk '{print $2}'`
+    for i in $PLIST
+    do
+        kill -9 $i
+    done
+
+    pids=`ps -ef|grep task.py | grep -v grep |awk '{print $2}'`
+    arr=($pids)
+    for p in ${arr[@]}
+    do
+        kill -9 $p
+    done
+}
+
+mw_debug(){
+    mw_stop
+    mw_force_kill
+
+    port=7200    
+    if [ -f $mw_path/data/port.pl ];then
+        port=$(cat $mw_path/data/port.pl)
+    fi
+
+    if [ -d /www/server/mdserver-web ];then
+        cd /www/server/mdserver-web
+    fi
+    gunicorn -b :$port -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1  app:app
 }
 
 case "$1" in
@@ -213,6 +257,8 @@ case "$1" in
     'update') mw_update;;
     'update_dev') mw_update_dev;;
     'install_app') mw_install_app;;
+    'close_admin_path') mw_close_admin_path;;
+    'debug') mw_debug;;
     'default')
         cd $mw_path
         port=7200

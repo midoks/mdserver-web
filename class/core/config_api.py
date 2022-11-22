@@ -1,5 +1,17 @@
 # coding: utf-8
 
+# ---------------------------------------------------------------------------------
+# MW-Linux面板
+# ---------------------------------------------------------------------------------
+# copyright (c) 2018-∞(https://github.com/midoks/mdserver-web) All rights reserved.
+# ---------------------------------------------------------------------------------
+# Author: midoks <midoks@163.com>
+# ---------------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------------
+# 配置操作
+# ---------------------------------------------------------------------------------
+
 import psutil
 import time
 import os
@@ -15,7 +27,7 @@ from flask import request
 
 class config_api:
 
-    __version = '0.10.2'
+    __version = '0.11.0'
 
     def __init__(self):
         pass
@@ -109,6 +121,96 @@ class config_api:
 
         session['username'] = name1
         return mw.returnJson(True, '用户修改成功!')
+
+    def setWebnameApi(self):
+        webname = request.form.get('webname', '')
+        if webname != mw.getConfig('title'):
+            mw.setConfig('title', webname)
+        return mw.returnJson(True, '面板别名保存成功!')
+
+    def setPortApi(self):
+        port = request.form.get('port', '')
+        if port != mw.getHostPort():
+            import system_api
+            import firewall_api
+
+            if os.path.exists("/lib/systemd/system/firewalld.service"):
+                if not firewall_api.firewall_api().getFwStatus():
+                    return mw.returnJson(False, 'firewalld必须先启动!')
+
+            mw.setHostPort(port)
+
+            msg = mw.getInfo('放行端口[{1}]成功', (port,))
+            mw.writeLog("防火墙管理", msg)
+            addtime = time.strftime('%Y-%m-%d %X', time.localtime())
+            mw.M('firewall').add('port,ps,addtime', (port, "配置修改", addtime))
+
+            firewall_api.firewall_api().addAcceptPort(port)
+            firewall_api.firewall_api().firewallReload()
+
+            system_api.system_api().restartMw()
+
+        return mw.returnJson(True, '端口保存成功!')
+
+    def setIpApi(self):
+        host_ip = request.form.get('host_ip', '')
+        if host_ip != mw.getHostAddr():
+            mw.setHostAddr(host_ip)
+        return mw.returnJson(True, 'IP保存成功!')
+
+    def setWwwDirApi(self):
+        sites_path = request.form.get('sites_path', '')
+        if sites_path != mw.getWwwDir():
+            mw.setWwwDir(sites_path)
+        return mw.returnJson(True, '修改默认建站目录成功!')
+
+    def setBackupDirApi(self):
+        backup_path = request.form.get('backup_path', '')
+        if backup_path != mw.getBackupDir():
+            mw.setBackupDir(backup_path)
+        return mw.returnJson(True, '修改默认备份目录成功!')
+
+    def setBasicAuthApi(self):
+        basic_user = request.form.get('basic_user', '').strip()
+        basic_pwd = request.form.get('basic_pwd', '').strip()
+        basic_open = request.form.get('is_open', '').strip()
+
+        salt = '_md_salt'
+        path = 'data/basic_auth.json'
+        is_open = True
+
+        if basic_open == 'false':
+            if os.path.exists(path):
+                os.remove(path)
+            return mw.returnJson(True, '删除BasicAuth成功!')
+
+        if basic_user == '' or basic_pwd == '':
+            return mw.returnJson(True, '用户和密码不能为空!')
+
+        ba_conf = None
+        if os.path.exists(path):
+            try:
+                ba_conf = json.loads(public.readFile(path))
+            except:
+                os.remove(path)
+
+        if not ba_conf:
+            ba_conf = {
+                "basic_user": mw.md5(basic_user + salt),
+                "basic_pwd": mw.md5(basic_pwd + salt),
+                "open": is_open
+            }
+        else:
+            ba_conf['basic_user'] = mw.md5(basic_user + salt)
+            ba_conf['basic_pwd'] = mw.md5(basic_pwd + salt)
+            ba_conf['open'] = is_open
+
+        mw.writeFile(path, json.dumps(ba_conf))
+        os.chmod(path, 384)
+        mw.writeLog('面板设置', '设置BasicAuth状态为: %s' % is_open)
+
+        mw.restartMw()
+        return mw.returnJson(True, '设置成功!')
 
     def setApi(self):
         webname = request.form.get('webname', '')
@@ -422,6 +524,15 @@ class config_api:
             data['ssl'] = 'checked'
         else:
             data['ssl'] = ''
+
+        basic_auth = 'data/basic_auth.json'
+        if os.path.exists(basic_auth):
+            bac = mw.readFile(basic_auth)
+            bac = json.loads(bac)
+            if bac['open']:
+                data['basic_auth'] = 'checked'
+        else:
+            data['basic_auth'] = ''
 
         data['site_count'] = mw.M('sites').count()
 

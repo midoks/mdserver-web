@@ -145,6 +145,8 @@ data/osname.pl
 data/only_netio_counters.pl
 data/system.db-journal
 data/hook_*.json
+data/letsencrypt.json
+data/basic_auth.json
 
 plugins/l2tp
 plugins/openlitespeed
@@ -154,6 +156,5 @@ plugins/zimg
 plugins/bk_demo
 plugins/mail
 debug.out
-
 
 

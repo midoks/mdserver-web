@@ -1,13 +1,25 @@
 # coding:utf-8
 
+# ---------------------------------------------------------------------------------
+# MW-Linux面板
+# ---------------------------------------------------------------------------------
+# copyright (c) 2018-∞(https://github.com/midoks/mdserver-web) All rights reserved.
+# ---------------------------------------------------------------------------------
+# Author: midoks <midoks@163.com>
+# ---------------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------------
+# 配置文件
+# ---------------------------------------------------------------------------------
+
 
 import time
 import sys
 import random
 import os
 
-chdir = os.getcwd()
-sys.path.append(chdir + '/class/core')
+pwd = os.getcwd()
+sys.path.append(pwd + '/class/core')
 
 import mw
 
@@ -54,7 +66,7 @@ if not os.path.exists('data/admin_path.pl'):
     mw.writeFile('data/admin_path.pl', '/' + admin_path.lower())
 
 if workers > 2:
-    workers = 2
+    workers = 1
 
 threads = workers * 1
 backlog = 512

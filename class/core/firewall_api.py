@@ -1,5 +1,18 @@
 # coding: utf-8
 
+# ---------------------------------------------------------------------------------
+# MW-Linux面板
+# ---------------------------------------------------------------------------------
+# copyright (c) 2018-∞(https://github.com/midoks/mdserver-web) All rights reserved.
+# ---------------------------------------------------------------------------------
+# Author: midoks <midoks@163.com>
+# ---------------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------------
+# 防火墙操作
+# ---------------------------------------------------------------------------------
+
+
 import psutil
 import time
 import os
@@ -165,6 +178,8 @@ class firewall_api:
         return self.getLogList(int(p), int(limit), search)
 
     def getSshInfoApi(self):
+        data = {}
+
         file = '/etc/ssh/sshd_config'
         conf = mw.readFile(file)
         rep = "#*Port\s+([0-9]+)\s*\n"
@@ -176,39 +191,40 @@ class firewall_api:
                 isPing = True
             else:
                 file = '/etc/sysctl.conf'
-                conf = mw.readFile(file)
+                sys_conf = mw.readFile(file)
                 rep = "#*net\.ipv4\.icmp_echo_ignore_all\s*=\s*([0-9]+)"
-                tmp = re.search(rep, conf).groups(0)[0]
+                tmp = re.search(rep, sys_conf).groups(0)[0]
                 if tmp == '1':
                     isPing = False
         except:
             isPing = True
 
-        import system_api
-        panelsys = system_api.system_api()
-        version = panelsys.getSystemVersion()
-        if os.path.exists('/usr/bin/apt-get'):
-            if os.path.exists('/etc/init.d/sshd'):
-                cmd = "service sshd status | grep -P '(dead|stop)'|grep -v grep"
-                status = mw.execShell(cmd)
-            else:
-                cmd = "service ssh status | grep -P '(dead|stop)'|grep -v grep"
-                status = mw.execShell(cmd)
-        else:
-            if version.find(' 7.') != -1:
-                cmd = "systemctl status sshd.service | grep 'dead'|grep -v grep"
-                status = mw.execShell(cmd)
-            else:
-                cmd = "/etc/init.d/sshd status | grep -e 'stopped' -e '已停'|grep -v grep"
-                status = mw.execShell(cmd)
-        if len(status[0]) > 3:
+        # sshd 检测
+        status = True
+        cmd = "service sshd status | grep -P '(dead|stop)'|grep -v grep"
+        ssh_status = mw.execShell(cmd)
+        if ssh_status[0] != '':
             status = False
-        else:
-            status = True
 
-        data = {}
+        cmd = "systemctl status sshd.service | grep 'dead'|grep -v grep"
+        ssh_status = mw.execShell(cmd)
+        if ssh_status[0] != '':
+            status = False
+
+        data['pass_prohibit_status'] = False
+        # 密码登陆配置检查
+        pass_rep = "#PasswordAuthentication\s+(\w*)\s*\n"
+        pass_status = re.search(pass_rep, conf)
+        if pass_status:
+            data['pass_prohibit_status'] = True
+
+        if not data['pass_prohibit_status']:
+            pass_rep = "PasswordAuthentication\s+(\w*)\s*\n"
+            pass_status = re.search(pass_rep, conf)
+            if pass_status and pass_status.groups(0)[0].strip() == 'no':
+                data['pass_prohibit_status'] = True
+
         data['port'] = port
-
         data['status'] = status
         data['ping'] = isPing
         if mw.isAppleSystem():
@@ -222,7 +238,7 @@ class firewall_api:
         if int(port) < 22 or int(port) > 65535:
             return mw.returnJson(False, '端口范围必需在22-65535之间!')
 
-        ports = ['21', '25', '80', '443', '7200', '8080', '888', '8888']
+        ports = ['21', '25', '80', '443', '888']
         if port in ports:
             return mw.returnJson(False, '(' + port + ')' + '特殊端口不可设置!')
 
@@ -258,23 +274,49 @@ class firewall_api:
             return mw.returnJson(True, '开发机不能操作!')
 
         status = request.form.get('status', '1').strip()
-        version = mw.readFile('/etc/redhat-release')
-        if int(status) == 1:
+        msg = 'SSH服务已启用'
+        act = 'start'
+        if status == "1":
             msg = 'SSH服务已停用'
             act = 'stop'
-        else:
-            msg = 'SSH服务已启用'
-            act = 'start'
 
-        if not os.path.exists('/etc/redhat-release'):
-            mw.execShell('service ssh ' + act)
-        elif version.find(' 7.') != -1:
+        ssh_service = mw.systemdCfgDir() + '/sshd.service'
+        if os.path.exists(ssh_service):
             mw.execShell("systemctl " + act + " sshd.service")
         else:
-            mw.execShell("/etc/init.d/sshd " + act)
+            mw.execShell('service sshd ' + act)
+
+        if os.path.exists('/etc/init.d/sshd'):
+            mw.execShell('/etc/init.d/sshd ' + act)
 
         mw.writeLog("防火墙管理", msg)
         return mw.returnJson(True, '操作成功!')
+
+    def setSshPassStatusApi(self):
+        if mw.isAppleSystem():
+            return mw.returnJson(True, '开发机不能操作!')
+
+        status = request.form.get('status', '1').strip()
+        msg = '禁止密码登陆成功'
+        if status == "1":
+            msg = '开启密码登陆成功'
+
+        file = '/etc/ssh/sshd_config'
+        if not os.path.exists(file):
+            return mw.returnJson(False, '无法设置!')
+
+        conf = mw.readFile(file)
+
+        if status == '1':
+            rep = "(#)?PasswordAuthentication\s+(\w*)\s*\n"
+            conf = re.sub(rep, "PasswordAuthentication yes\n", conf)
+        else:
+            rep = "(#)?PasswordAuthentication\s+(\w*)\s*\n"
+            conf = re.sub(rep, "PasswordAuthentication no\n", conf)
+        mw.writeFile(file, conf)
+        mw.execShell("systemctl restart sshd.service")
+        mw.writeLog("SSH管理", msg)
+        return mw.returnJson(True, msg)
 
     def setPingApi(self):
         if mw.isAppleSystem():

@@ -25,6 +25,10 @@ fi
 
 Install_openresty()
 {
+	if [ -d $serverPath/openresty ];then
+		exit 0
+	fi
+	
 	# ----- cpu start ------
 	if [ -z "${cpuCore}" ]; then
     	cpuCore="1"

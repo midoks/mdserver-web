@@ -62,7 +62,7 @@ if [ $OSNAME != "macos" ];then
 	mkdir -p /www/backup/site
 
 	if [ ! -d /www/server/mdserver-web ];then
-		wget -O /tmp/dev.zip https://github.com/midoks/mdserver-web/archive/refs/heads/dev.zip
+		curl -sSLo /tmp/dev.zip https://github.com/midoks/mdserver-web/archive/refs/heads/dev.zip
 		cd /tmp && unzip /tmp/dev.zip
 		mv -f /tmp/mdserver-web-dev /www/server/mdserver-web
 		rm -rf /tmp/dev.zip
@@ -73,15 +73,32 @@ fi
 echo "use system version: ${OSNAME}"
 cd /www/server/mdserver-web && bash scripts/install/${OSNAME}.sh
 
+
+cd /www/server/mdserver-web && bash cli.sh start
+isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`
+n=0
+while [ ! -f /etc/rc.d/init.d/mw ];
+do
+    echo -e ".\c"
+    sleep 1
+    let n+=1
+    if [ $n -gt 20 ];then
+    	echo -e "start mw fail"
+        exit 1
+    fi
+done
+
+cd /www/server/mdserver-web && bash /etc/rc.d/init.d/mw stop
+cd /www/server/mdserver-web && bash /etc/rc.d/init.d/mw start
+cd /www/server/mdserver-web && bash /etc/rc.d/init.d/mw default
+
+sleep 2
 if [ ! -e /usr/bin/mw ]; then
-	if [ -f /etc/init.d/mw ];then
-		ln -s /etc/init.d/mw /usr/bin/mw
+	if [ -f /etc/rc.d/init.d/mw ];then
+		ln -s /etc/rc.d/init.d/mw /usr/bin/mw
 	fi
 fi
 
 endTime=`date +%s`
 ((outTime=(${endTime}-${startTime})/60))
 echo -e "Time consumed:\033[32m $outTime \033[0mMinute!"
-
-systemctl daemon-reload
-

@@ -173,6 +173,17 @@ def initReplace(version):
     makeOpConf(version)
     phpFpmWwwReplace(version)
 
+    install_ok = getServerDir() + "/" + version + "/install.ok"
+    if not os.path.exists(install_ok):
+        phpini = getConf(version)
+        ssl_crt = mw.getSslCrt()
+
+        cmd_openssl = "sed -i \"s#;openssl.cafile=#openssl.cafile=" + ssl_crt + "#\" " + phpini
+        mw.execShell(cmd_openssl)
+        cmd_curl = "sed -i \"s#;curl.cainfo =#curl.cainfo=" + ssl_crt + "#\" " + phpini
+        mw.execShell(cmd_curl)
+
+        mw.writeFile(install_ok, 'ok')
     # systemd
     # mw.execShell('systemctl daemon-reload')
     return 'ok'

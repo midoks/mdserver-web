@@ -56,11 +56,23 @@
 					<form id="set_config">
 						<p class="mtb15">
 							<span class="set-tit text-right">别名</span>
-							<input id="webname" name="webname" class="inputtxt bt-input-text" type="text" value="{{data['title']}}" ><span class="set-info c7">面板名称</span>
+							<input id="webname" name="webname" class="inputtxt bt-input-text" type="text" value="{{data['title']}}">
+							<button type="button" class="btn btn-success btn-sm ml5 btn_webname" disabled>保存</button>
+							<span class="set-info c7">面板名称</span>
 						</p>
+
+						<p class="mtb15">
+							<span class="set-tit text-right" title="服务器IP">服务器IP</span>
+							<input name="host_ip" class="inputtxt bt-input-text" type="text" value="{{data['ip']}}">
+							<button type="button" class="btn btn-success btn-sm ml5 btn_host_ip" disabled>保存</button>
+							<span class="set-info c7">默认为外网IP,若您在本地虚拟机测试,请填写虚拟机内网IP!</span>
+						</p>
+
 						<p class="mtb15">
 							<span class="set-tit text-right">面板端口</span>
-							<input id="banport" name="port" class="inputtxt bt-input-text" type="numner" value="{{data['port']}}" maxlength="5"><span class="set-info c7">建议端口范围7200 - 65535</span>
+							<input id="banport" name="port" class="inputtxt bt-input-text" type="numner" value="{{data['port']}}" maxlength="5">
+							<button type="button" class="btn btn-success btn-sm ml5 btn_port" disabled>保存</button>
+							<span class="set-info c7">建议端口范围7200 - 65535</span>
 						</p>
 
 						<p class="mtb15">
@@ -81,21 +93,17 @@
 						<p class="mtb15">
 							<span class="set-tit text-right" title="默认建站目录">默认建站目录</span>
 							<input name="sites_path" class="inputtxt bt-input-text" type="text" value="{{data['site_path']}}">
+							<button type="button" class="btn btn-success btn-sm ml5 btn_sites_path" disabled>保存</button>
 							<span class="set-info c7">新创建的站点,默认将保存到该目录的下级目录!</span>
 						</p>
 
 						<p class="mtb15">
 							<span class="set-tit text-right" title="默认建站目录">默认备份目录</span>
 							<input name="backup_path" class="inputtxt bt-input-text" type="text" value="{{data['backup_path']}}">
+							<button type="button" class="btn btn-success btn-sm ml5 btn_backup_path" disabled>保存</button>
 							<span class="set-info c7">网站和数据库的备份目录!</span>
 						</p>
 
-						<p class="mtb15">
-							<span class="set-tit text-right" title="服务器IP">服务器IP</span>
-							<input name="host_ip" class="inputtxt bt-input-text" type="text" value="{{data['ip']}}">
-							<span class="set-info c7">默认为外网IP,若您在本地虚拟机测试,请填写虚拟机内网IP!</span>
-						</p>
-			
 						<p class="mtb15">
 							<span class="set-tit text-right" title="服务器时间">服务器时间</span>
 							<input id="systemdate" name="systemdate" class="inputtxt bt-input-text disable" type="text" value="{{data['systemdate']}}">
@@ -115,7 +123,6 @@
 							<span class="set-info c7">设置面板密码</span>
 						</p>
 					</form>
-					<div class="bt-submit set-submit">保存</div>
 				</div>
 
 				<div class="title c6 plr15">
@@ -123,6 +130,14 @@
 				</div>
 
 				<div class="setting-con pd15">
+
+					<p class="mtb15">
+						<span class="set-tit text-right" title="BasicAuth认证" style="float: left;">BasicAuth认证</span>
+ 						<input class="btswitch btswitch-ios" id="cfg_basic_auth" type="checkbox" {{data['basic_auth']}}/>
+		                <label class="btswitch-btn ml5" for="cfg_basic_auth" style="float: left;margin-top:4px;" onclick="setBasicAuth()"></label>
+						<span class="set-info c7">为面板增加一道基于BasicAuth的认证服务，有效防止面板被扫描</span>
+					</p>
+
 					<p class="mtb15">
 						<span class="set-tit text-right" title="临时访问授权">临时访问授权</span>
 						<button type="button" class="btn btn-success btn-sm ml5" onclick="setTempAccess()">临时访问授权管理</button>

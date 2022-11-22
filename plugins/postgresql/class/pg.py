@@ -7,6 +7,10 @@ import sys
 import psycopg2
 
 
+sys.path.append(os.getcwd() + "/class/core")
+import mw
+
+
 class ORM:
     __DB_PASS = None
     __DB_USER = 'postgres'
@@ -16,7 +20,7 @@ class ORM:
     __DB_CUR = None
     __DB_ERR = None
     __DB_CNF = '/etc/postgresql.cnf'
-    __DB_SOCKET = '/www/server/postgresql/mysql.sock'
+    __DB_SOCKET = '/tmp/.s.PGSQL.5432'
     __DB_CHARSET = "utf8"
 
     __DB_TABLE = ""             # 被操作的表名称
@@ -31,13 +35,34 @@ class ORM:
         '''连接数据库'''
         try:
 
-            try:
-                self.__DB_CONN = psycopg2.connect(database='postgres', user=self.__DB_USER, password=self.__DB_PASS,
-                                                  host=self.__DB_HOST, port=int(self.__DB_PORT))
-            except Exception as e:
-                self.__DB_HOST = '127.0.0.1'
-                self.__DB_CONN = psycopg2.connect(database='postgres', user=self.__DB_USER, password=self.__DB_PASS,
-                                                  host=self.__DB_HOST, port=int(self.__DB_PORT))
+            if os.path.exists(self.__DB_SOCKET):
+                try:
+                    self.__DB_CONN = psycopg2.connect(database='postgres',
+                                                      user=self.__DB_USER,
+                                                      password=self.__DB_PASS,
+                                                      host=self.__DB_SOCKET,
+                                                      port=int(self.__DB_PORT))
+                except Exception as e:
+                    self.__DB_HOST = '127.0.0.1'
+                    self.__DB_CONN = psycopg2.connect(database='postgres',
+                                                      user=self.__DB_USER,
+                                                      password=self.__DB_PASS,
+                                                      host=self.__DB_SOCKET,
+                                                      port=int(self.__DB_PORT))
+            else:
+                try:
+                    self.__DB_CONN = psycopg2.connect(database='postgres',
+                                                      user=self.__DB_USER,
+                                                      password=self.__DB_PASS,
+                                                      host=self.__DB_HOST,
+                                                      port=int(self.__DB_PORT))
+                except Exception as e:
+                    self.__DB_HOST = '127.0.0.1'
+                    self.__DB_CONN = psycopg2.connect(database='postgres',
+                                                      user=self.__DB_USER,
+                                                      password=self.__DB_PASS,
+                                                      host=self.__DB_HOST,
+                                                      port=int(self.__DB_PORT))
 
             self.__DB_CONN.autocommit = True
             self.__DB_CUR = self.__DB_CONN.cursor()
@@ -58,6 +83,9 @@ class ORM:
 
     def setPort(self, port):
         self.__DB_PORT = port
+
+    def setHostAddr(self, host):
+        self.__DB_HOST = host
 
     def setPwd(self, pwd):
         self.__DB_PASS = pwd

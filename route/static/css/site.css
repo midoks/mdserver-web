@@ -352,14 +352,8 @@ html {
     box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6)
 }
 
-.important-title {
-    color:red;
-    background-color: #fef3e2;
-    line-height: 46px;
-    margin-bottom: 15px;
-    padding-left: 10px;
-    box-shadow: 0 1px 2px 0 rgba(0,0,0,.2);
-}
+
+
 .info-title-tips {
     background-color: #fbfbfb;
     border: 1px solid #eee;
@@ -1497,11 +1491,11 @@ html .menu .menu_exit:hover {
     position: absolute;
     top: 0;
     width: 100%;
-    z-index: 0
+    z-index: 0;
 }
 
 .soft-man .rowbg .col-lg-3 {
-    cursor: default
+    cursor: default;
 }
 
 .soft-man .rowbg .col-lg-3:hover {
@@ -1540,16 +1534,16 @@ html .menu .menu_exit:hover {
 }
 .bw-info ul li {
     height: 56px;
-    line-height: 56px
+    line-height: 56px;
 }
 
 .bw-info ul li.bi-line {
-    border-bottom: #ddd solid 1px
+    border-bottom: #ddd solid 1px;
 }
 
 .bw-info ul li span {
     display: block;
-    margin-right: 15px
+    margin-right: 15px;
 }
 
 .btn-zhm {
@@ -1557,7 +1551,83 @@ html .menu .menu_exit:hover {
     display: none;
     position: absolute;
     right: 42px;
-    top: 0
+    top: 0;
+}
+
+.ellipsis_text {
+    width: 220px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.ssl_state_info{
+  padding: 15px 30px;
+  background: #f5faf2;
+  margin-top: 5px;
+  border-radius: 4px;
+  border: 1px solid #EAF1F2;
+  font-size: 12px;
+  position: relative;
+}
+
+.ssl_state_info .state_item{
+  width: 49%;
+  height: 25px;
+  line-height: 25px;
+  display: inline-block;
+  vertical-align: top;
+}
+
+.ssl_state_info .state_item span{
+  height: 25px;
+  line-height: 25px;
+  vertical-align: top;
+}
+
+
+.ssl_state_info .state_item span:nth-child(1){
+  font-weight: bold;
+  color: #666;
+}
+
+
+
+.ssl_state_info  .state_item .switch{
+  display: inline-block;
+}
+
+
+.ssl_state_info  .state_item .btswitch-btn{
+  margin-bottom: 0;
+  height: 1.9rem;
+  width: 3.2rem;
+  position: relative;
+  top:2.5px;
+}
+
+.custom_certificate_info{
+  margin-top: 15px;
+}
+
+.custom_certificate_info .state_item{
+  width: 48%;
+  height: 50px;
+  display: inline-block;
+  margin-right: 4%;
+}
+.custom_certificate_info .state_item:nth-child(2){
+  margin-right: 0;
+}
+
+.custom_certificate_info .state_item span{
+  width:100%;
+  margin-bottom: 5px;
+}
+
+.custom_certificate_info .state_item textarea{
+  width: 100%;
+  height: 250px;
+  line-height: 25px;
 }
 
 .line {
@@ -1654,6 +1724,33 @@ html .menu .menu_exit:hover {
 .bt-w-con {
     margin-left: 110px;
     position: relative
+}
+
+.explain-describe-list{
+  border: 1px solid #ececec;
+  border-radius: 6px;
+  margin: 0 auto;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  background: #f7f7f7;
+  padding: 15px;
+  list-style-type: inherit;
+}
+
+
+.agreement-box label{
+  font-weight: 400;
+  margin: 0 0 0 5px;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+.agreement-box input{
+  height: 15px;
+  width: 15px;
+  vertical-align: middle;
+  margin-top: 0;
+  cursor: pointer;
 }
 
 .label-input-group input {
@@ -1891,19 +1988,46 @@ html .menu .menu_exit:hover {
 }
 
 .sl-s-info {
-    width: 124px;
-    border: #ccc 1px solid
+    width: 210px;
+    border: #ccc 1px solid;
+}
+
+.important-title {
+    display: flex;
+    color:red;
+    background-color: #fef3e2;
+    line-height: 46px;
+    margin-bottom: 15px;
+    padding-left: 10px;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,.2);
+}
+
+.important-title>p {
+    flex: 1;
+}
+
+.rec-box-con .onekey {
+    font-family: "宋体";
+    width: 90px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    background-color: #20a53a;
+    border-radius: 3px;
+    color: #fff;
+    margin: 20px auto 15px;
+    cursor: pointer;
 }
 
 .rec-install {
     padding: 16px;
     width: 100%;
-    float: left
+    float: left;
 }
 
 .rec-install .rec-box {
-    width: 305px;
-    float: left
+    width: 290px;
+    float: left;
 }
 
 .rec-install h3 {
@@ -2369,6 +2493,16 @@ html .menu .menu_exit:hover {
     width: 100%
 }
 
+.warning_info {
+    color: #a94442;
+    background-color: #f2dede;
+    border-color: #ebccd1;
+    height: 40px;
+    line-height: 20px;
+    padding: 10px 15px;
+    border-radius: 4px;
+}
+
 .success-msg {
     width: 100%;
     padding: 30px 50px;
@@ -2454,7 +2588,7 @@ html .menu .menu_exit:hover {
     border: #cacad9 1px solid;
     color: #444;
     display: inline-block;
-    margin: 0 3px -1px 0;
+    margin: 0 -5px -1px 0;
     cursor: pointer
 }
 
@@ -3125,6 +3259,10 @@ html .menu .menu_exit:hover {
     background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAOVJREFUeNpi/P//P8NAAhZkzrVr1zyB1FwglqSiHSZAfBZZQEtLC7sDQJZLSUlJcnNzU8Xm27dvg6jVQByqqqp6FpsaJjS+JCcnJ8O/f/+ogkFATk5uJ8gRQMcYE+MAqgN2dvYMeXn5g0DmGmyOYKJHQmNjY0tQUFA4gc0RLLS0mI+PD5YOQCACSp8BYka6OEBUVJRBXFwcW8KkTwiAACwx4gJMDAMMRh0w6oBRB4w6YNQBow4YdcCoA0YdMOgc8Pzbt280swxq9gt8reKU58+fgzqnEjRyw1MgTkMWYBzo7jlAgAEAzk5sMbucHicAAAAASUVORK5CYII=")
 }
 
+.list-list .ico-svg {
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAOVJREFUeNpi/P//P8NAAhZkzrVr1zyB1FwglqSiHSZAfBZZQEtLC7sDQJZLSUlJcnNzU8Xm27dvg6jVQByqqqp6FpsaJjS+JCcnJ8O/f/+ogkFATk5uJ8gRQMcYE+MAqgN2dvYMeXn5g0DmGmyOYKJHQmNjY0tQUFA4gc0RLLS0mI+PD5YOQCACSp8BYka6OEBUVJRBXFwcW8KkTwiAACwx4gJMDAMMRh0w6oBRB4w6YNQBow4YdcCoA0YdMOgc8Pzbt280swxq9gt8reKU58+fgzqnEjRyw1MgTkMWYBzo7jlAgAEAzk5sMbucHicAAAAASUVORK5CYII=")
+}
+
 .list-list .ico-apk {
     background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAhlJREFUeNpi/P//P8NAAhZkzrVr1zyB1FwglqSiHSZAfBZZQEtLC7sDQJZLSUlJcnNzU8Xm27dvg6jVQByqqqp6FpsaJjS+JCcnJ8O/f/+ogkFATk5uJ8gRQMcYE+MAqgN2dvYMeXn5g0DmGmyOINkBa68sYfj55yeG+JEHexnOPD2OVQ8bG1uCgoLCCWyOYCHVARK8Ugzbb61n+PrrM8Pzz08g8cYrw/Dq6wuGZONcFLV8fHywdAACEVD6DBAzku2AH39+MFx7dRFF7OGHe2D67LMTDI5KHnBxUVFRBnFxcWwJk7wouP32OsPJx4fB7FjDdLg4jH380UGwGmSALWGS7YDTT47C2YvPz8TKPvX4CPkFESEQpZ9C25IQG+g90gimi23qGdoOVBJlaJVDO4o+ihzwE5joyAHE6qN5QURxFLCzcJBXAhKpj6ADCMUhpfoGPApIcoAsvwJBNTL88rQrB2AlHiw7grIbNj7NQmBAcgExKZzcnAICjMiNUmCb8L+ysjJNfXz37l1Qm5BxcEbBogeTGRge0N7SDq3puBMhCysLTlzm1YjBh2FsatDVgzDVc0Hf7mYwLnKtRREH8UHiVMuGMAPRLcKnlurZEJvlMDFiLSTLAeg+QuZjsxgWUiRHAQcz1z9qdVaxRRfIbA5mzn84C6L5h6fVP/x2p+7H3+80KR84mbn+ynEpNyfaZjVidcBAAIAAAwAW1gmCSUCdXAAAAABJRU5ErkJggg==")
 }
@@ -3419,12 +3557,12 @@ html .menu .menu_exit:hover {
     background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAABQCAYAAACOEfKtAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAehJREFUeNrs3D9PwkAcxvFrKXUhCAMEAhsbL8nJxElfgYPR+CZ0MnHyJbEwMkDoQGAG6h2CNlIo16t/cvd9kktL2g73ye9a7gj14jgWJH88AAH8v4CDwSCUm3vZLmXr2NLpTrf7LDc3p55/Xq0ePBZkXPtYq9Vu6/W6CILACrzhcCii6fS60WwKHcS8gFcKz/d9sV6vrRl2rXZbTMbjQhD9jOMNhWdbzsJwg6gqUX58+klAa1MUorOARSE6DVgEovOApogAGiICaIgIoCEigIaIWXPhuNfrWYUTRZFYLBZa1/T7fS/vVM66yLm9qFQqH9Xjfbkc2h+NRgzhZMrl8ufCSHL05V3Wc64Cd4gqq9Vqr+oOVSKAKYgKaLlcbra6cM4Dbjq/HcrJpTpdSOe/xijEUqm0N4y/VyUVeCQ7QFWJafdCAE9EVGjJpzFDWDNq9V23AgFMQdT5GQPAtPntiQ8Q7oEZiFTgLyACaHrPhABAAAEEkAAIIIAAEgABBBBAAiCAAAJIAAQQQAAJgAACCCABEEAAASQAAggggARAAAEEkAAIIIAAEgABBNBywCj5bhXXsu17ZAL4MpvNhIuIqs+q7zKvx87L+sP1w3w+D2W7kPstxwwnsr3JdnfsJF4FbxgAAfzbvAswAK/3kejP2oZLAAAAAElFTkSuQmCC")
 }
 
-.fileList .ico-apk {
-    background-image: url("../img/ico/ico-apk.png")
+.fileList .ico-svg,.ico-css {
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAABQCAYAAACOEfKtAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAehJREFUeNrs3D9PwkAcxvFrKXUhCAMEAhsbL8nJxElfgYPR+CZ0MnHyJbEwMkDoQGAG6h2CNlIo16t/cvd9kktL2g73ye9a7gj14jgWJH88AAH8v4CDwSCUm3vZLmXr2NLpTrf7LDc3p55/Xq0ePBZkXPtYq9Vu6/W6CILACrzhcCii6fS60WwKHcS8gFcKz/d9sV6vrRl2rXZbTMbjQhD9jOMNhWdbzsJwg6gqUX58+klAa1MUorOARSE6DVgEovOApogAGiICaIgIoCEigIaIWXPhuNfrWYUTRZFYLBZa1/T7fS/vVM66yLm9qFQqH9Xjfbkc2h+NRgzhZMrl8ufCSHL05V3Wc64Cd4gqq9Vqr+oOVSKAKYgKaLlcbra6cM4Dbjq/HcrJpTpdSOe/xijEUqm0N4y/VyUVeCQ7QFWJafdCAE9EVGjJpzFDWDNq9V23AgFMQdT5GQPAtPntiQ8Q7oEZiFTgLyACaHrPhABAAAEEkAAIIIAAEgABBBBAAiCAAAJIAAQQQAAJgAACCCABEEAAASQAAggggARAAAEEkAAIIIAAEgABBNBywCj5bhXXsu17ZAL4MpvNhIuIqs+q7zKvx87L+sP1w3w+D2W7kPstxwwnsr3JdnfsJF4FbxgAAfzbvAswAK/3kejP2oZLAAAAAElFTkSuQmCC")
 }
 
-.fileList .ico-css {
-    background-image: url("../img/ico/ico-css.png")
+.fileList .ico-apk {
+    background-image: url("../img/ico/ico-apk.png")
 }
 
 .ico-cmd {

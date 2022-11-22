@@ -14,7 +14,7 @@ setTimeout(function(){
 $(function(){
 	// start 
 	$.post('/firewall/get_www_path',function(data){
-		var html ='<a href="javascript:openPath(\''+data['path']+'\');">日志目录</a>\
+		var html ='<a class="btlink" href="javascript:openPath(\''+data['path']+'\');">日志目录</a>\
 				<em id="logSize">0KB</em>\
 				<button class="btn btn-default btn-sm" onclick="closeLogs();">清空</button>';
 		$('#firewall_weblog').html(html);
@@ -52,19 +52,59 @@ $("#firewalldType").change(function(){
 });
 
 
+function sshMgr(){
+
+	$.post('/firewall/get_ssh_info', '', function(rdata){
+		var ssh_status = rdata.status ? 'checked':'';
+		var pass_prohibit_status = rdata.pass_prohibit_status ? 'checked':'';
+		var con = '<div class="pd15">\
+                <div class="divtable">\
+                    <table class="table table-hover waftable">\
+                        <thead><tr><th>名称</th><th width="80">状态</th></tr></thead>\
+                        <tbody>\
+                            <tr>\
+                                <td>启动SSH</td>\
+                                <td>\
+                                    <div class="ssh-item" style="margin-left:0">\
+                                        <input class="btswitch btswitch-ios" id="sshswitch" type="checkbox" '+ssh_status+'>\
+                                        <label class="btswitch-btn" for="sshswitch" onclick=\'setMstscStatus()\'></label>\
+                                    </div>\
+                                </td>\
+                            </tr>\
+                            <tr>\
+                                <td>禁止密码登陆</td>\
+                                <td>\
+                                    <div class="ssh-item" style="margin-left:0">\
+                                        <input class="btswitch btswitch-ios" id="pass_status" type="checkbox" '+pass_prohibit_status+'>\
+                                        <label class="btswitch-btn" for="pass_status" onclick=\'setSshPassStatus()\'></label>\
+                                    </div>\
+                                </td>\
+                            </tr>\
+                        </tbody>\
+                    </table>\
+                </div>\
+            </div>';
+        layer.open({
+	        type: 1,
+	        title: "SSH管理",
+	        area: ['300px', '230px'],
+	        closeBtn: 1,
+	        shadeClose: false,
+	        content: '<div id="ssh_list">'+con+'</div>',
+	        success:function(){
+	        },
+	    });
+
+	},'json');
+}
+
+
 function getSshInfo(){
 	$.post('/firewall/get_ssh_info', '', function(rdata){
-		// console.log(rdata);
-		var SSHchecked = ''
-		if(rdata.status){
-			SSHchecked = "<input class='btswitch btswitch-ios' id='sshswitch' type='checkbox' checked><label class='btswitch-btn' for='sshswitch' onclick='setMstscStatus()'></label>";
-		} else {
-			SSHchecked = "<input class='btswitch btswitch-ios' id='sshswitch' type='checkbox'><label class='btswitch-btn' for='sshswitch' onclick='setMstscStatus()'></label>";
-			$("#mstscSubmit").attr('disabled','disabled');
+		if(!rdata.status){
 			$("#mstscPort").attr('disabled','disabled');
 		}
 		
-		$("#in_safe").html(SSHchecked);
 		$("#mstscPort").val(rdata.port);
 		var isPint = '';
 		if(rdata.ping){
@@ -187,18 +227,14 @@ function setMstscStatus(){
 	layer.confirm(msg,{title:'警告',closeBtn:2,cancel:function(){
 		if(status == 0){
 			$("#sshswitch").prop("checked",false);
-		}
-		else{
+		} else {
 			$("#sshswitch").prop("checked",true);
 		}
 	}},function(index){
 		if(index > 0){
 			layer.msg('正在处理,请稍候...',{icon:16,time:20000});
 			$.post('/firewall/set_ssh_status','status='+status,function(rdata){
-				// console.log(rdata);
-				layer.closeAll();
 				layer.msg(rdata.msg,{icon:rdata.status?1:2});
-				setTimeout(function(){window.location.reload();},3000);
 			},'json');
 		}
 	},function(){
@@ -206,6 +242,35 @@ function setMstscStatus(){
 			$("#sshswitch").prop("checked",false);
 		} else {
 			$("#sshswitch").prop("checked",true);
+		}
+	});
+}
+
+/**
+ * 设置远程服务状态
+ * @param {Int} state 0.启用 1.关闭
+ */
+function setSshPassStatus(){
+	status = $("#pass_status").prop("checked")==true?1:0;
+	var msg = status==1?'开启密码登陆,继续吗？':'确定禁止密码登陆吗？';
+	layer.confirm(msg,{title:'警告',closeBtn:2,cancel:function(){
+		if(status == 0){
+			$("#pass_status").prop("checked",false);
+		} else {
+			$("#pass_status").prop("checked",true);
+		}
+	}},function(index){
+		if(index > 0){
+			layer.msg('正在处理,请稍候...',{icon:16,time:20000});
+			$.post('/firewall/set_ssh_pass_status','status='+status,function(rdata){
+				layer.msg(rdata.msg,{icon:rdata.status?1:2});
+			},'json');
+		}
+	},function(){
+		if(status == 0){
+			$("#pass_status").prop("checked",false);
+		} else {
+			$("#pass_status").prop("checked",true);
 		}
 	});
 }

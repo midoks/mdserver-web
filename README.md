@@ -91,12 +91,18 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.10.2
+### 版本更新 0.11.0
 
-* 修复上次更新的UI问题。
-* `FTP存储空间` 备份数据库修复。
-* 修复计划任务执行Python脚本的编码问题。
-* 添加，修改计划任务参数强校验。
+* 改造HTTPS升级，为lets和acme申请。
+* 改造SSH管理,加入`禁止密码登陆`。
+* 计划任务BUG,修改时错误提示。
+* PG在debian11优化。
+* PHP默认配置curl,openssl ssl配置优化。
+* 初始花安装提示。
+* 面板设置UI优化。
+* 加入BasicAuth认证功能。
+* MySQL[APT,YUM]安装检查优化。
+* MySQL导入优化，对sql后缀支持。
 
 ### JSDelivr安装地址
 
@@ -115,7 +121,7 @@ curl -fsSL https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/scripts/update
 - 卸载脚本
 
 ```
-curl -fsSL https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/scripts/uninstall.sh | bash
+wget -O uninstall.sh https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/scripts/uninstall.sh && bash uninstall.sh
 ```
 
 ### 备用地址
@@ -158,7 +164,7 @@ curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/up
 wget -O uninstall.sh https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/uninstall.sh && bash uninstall.sh
 
 curl -fsSL https://gitee.com/midoks/mdserver-web/raw/master/scripts/install_dev.sh | bash
-curl -fsSL https://gitee.com/midoks/mdserver-web/raw/master/scripts/update_dev.sh | bash
+curl -fsSL https://gitee.com/midoks/mdserver-web/raw/dev/scripts/update_dev.sh | bash
 ```
 
 ### 捐赠地址 USDT（TRC20）

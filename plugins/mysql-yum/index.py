@@ -670,8 +670,7 @@ def importDbExternal():
         return mw.returnJson(False, '文件突然消失?')
 
     exts = ['sql', 'gz', 'zip']
-    tmp = file.split('.')
-    ext = tmp[len(tmp) - 1]
+    ext = mw.getFileSuffix(file)
     if ext not in exts:
         return mw.returnJson(False, '导入数据库格式不对!')
 
@@ -700,6 +699,9 @@ def importDbExternal():
         mw.execShell(cmd)
         import_sql = import_dir + tmpFile
 
+    if file.find(".sql") > -1 and file.find(".sql.gz") == -1:
+        import_sql = import_dir + file
+
     if import_sql == "":
         return mw.returnJson(False, '未找SQL文件')
 
@@ -712,7 +714,8 @@ def importDbExternal():
 
     # print(mysql_cmd)
     os.system(mysql_cmd)
-    os.remove(import_sql)
+    if ext != 'sql':
+        os.remove(import_sql)
 
     return mw.returnJson(True, 'ok')
 
@@ -2321,10 +2324,10 @@ def installPreInspection(version):
     if not sysName in ('centos',):
         return '仅支持centos'
 
-    if not (sysName == 'centos' and version == '5.7' and not sysId in('7',)):
+    if (sysName == 'centos' and version == '5.7' and not sysId in('7',)):
         return 'mysql5.7 仅支持centos7'
 
-    if not (sysName == 'centos' and version == '8.0' and not sysId in ('7', '8', '9',)):
+    if (sysName == 'centos' and version == '8.0' and not sysId in ('7', '8', '9',)):
         return 'mysql8.0 仅支持centos7,8,9'
     return 'ok'
 

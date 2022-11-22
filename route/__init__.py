@@ -6,6 +6,7 @@ import os
 import time
 import shutil
 import uuid
+import json
 import traceback
 
 # reload(sys)
@@ -27,7 +28,6 @@ from flask_caching import Cache
 from flask_session import Session
 
 sys.path.append(os.getcwd() + "/class/core")
-# sys.path.append("/usr/local/lib/python3.6/site-packages")
 
 import db
 import mw
@@ -63,6 +63,20 @@ app.config['SESSION_KEY_PREFIX'] = 'MW_:'
 app.config['SESSION_COOKIE_NAME'] = "MW_VER_1"
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=31)
 # Session(app)
+
+# 设置BasicAuth
+basic_auth_conf = 'data/basic_auth.json'
+app.config['BASIC_AUTH_OPEN'] = False
+if os.path.exists(basic_auth_conf):
+    try:
+        ba_conf = json.loads(mw.readFile(basic_auth_conf))
+        print(ba_conf)
+        app.config['BASIC_AUTH_USERNAME'] = ba_conf['basic_user']
+        app.config['BASIC_AUTH_PASSWORD'] = ba_conf['basic_pwd']
+        app.config['BASIC_AUTH_OPEN'] = ba_conf['open']
+        app.config['BASIC_AUTH_FORCE'] = True
+    except Exception as e:
+        print(e)
 
 # socketio
 from flask_socketio import SocketIO, emit, send
@@ -118,6 +132,33 @@ def funConvert(fun):
         suf = block[x + 1].title()
         func += suf
     return func
+
+# Flask请求勾子
+
+
+def sendAuthenticated():
+    # 发送http认证信息
+    request_host = mw.getHostAddr()
+    result = Response(
+        '', 401, {'WWW-Authenticate': 'Basic realm="%s"' % request_host.strip()})
+    if not 'login' in session and not 'admin_auth' in session:
+        session.clear()
+    return result
+
+
+@app.before_request
+def requestCheck():
+    if app.config['BASIC_AUTH_OPEN']:
+        auth = request.authorization
+        if request.path in ['/download', '/hook', '/down']:
+            return
+
+        if not auth:
+            return sendAuthenticated()
+        salt = '_md_salt'
+        if mw.md5(auth.username.strip() + salt) != app.config['BASIC_AUTH_USERNAME'] \
+                or mw.md5(auth.password.strip() + salt) != app.config['BASIC_AUTH_PASSWORD']:
+            return sendAuthenticated()
 
 
 def isLogined():
@@ -385,7 +426,7 @@ def index(reqClass=None, reqAction=None, reqData=None):
             reqClass = 'index'
 
         pageFile = ('config', 'control', 'crontab', 'files', 'firewall',
-                    'index', 'plugins', 'login', 'system', 'site', 'ssl', 'task', 'soft')
+                    'index', 'plugins', 'login', 'system', 'site', 'cert', 'ssl', 'task', 'soft')
 
         if reqClass == 'login':
             token = request.args.get('tmp_token', '').strip()

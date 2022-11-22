@@ -142,7 +142,7 @@ function setOpCfg(){
     orPost('get_cfg', {}, function(data){
         var rdata = $.parseJSON(data.data);
         var rdata = rdata.data;
-        console.log(rdata);
+        // console.log(rdata);
 
         var mlist = '';
         for (var i = 0; i < rdata.length; i++) {
@@ -195,7 +195,7 @@ function submitConf() {
     // console.log(data);
     orPost('set_cfg', data, function(rdata){
         var rdata = $.parseJSON(rdata.data);
-        console.log(rdata);
+        // console.log(rdata);
         layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
     });
 }

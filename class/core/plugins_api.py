@@ -1,5 +1,18 @@
 # coding: utf-8
 
+# ---------------------------------------------------------------------------------
+# MW-Linux面板
+# ---------------------------------------------------------------------------------
+# copyright (c) 2018-∞(https://github.com/midoks/mdserver-web) All rights reserved.
+# ---------------------------------------------------------------------------------
+# Author: midoks <midoks@163.com>
+# ---------------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------------
+# 插件操作
+# ---------------------------------------------------------------------------------
+
+
 import psutil
 import time
 import os
@@ -91,6 +104,63 @@ class plugins_api:
             return mw.returnJson(True, '成功!')
         return mw.returnJson(False, '失败!')
 
+    def initApi(self):
+
+        plugin_names = {
+            'openresty': '1.21.4.1',
+            'php': '56',
+            'swap': '1.1',
+            'mysql': '5.7',
+            'phpmyadmin': '4.4.15',
+        }
+
+        pn_dir = mw.getPluginDir()
+        pn_server_dir = mw.getServerDir()
+        pn_list = []
+        for pn in plugin_names:
+            info = {}
+            pn_json = pn_dir + '/' + pn + '/info.json'
+            pn_server = pn_server_dir + '/' + pn
+            if not os.path.exists(pn_server):
+
+                tmp = mw.readFile(pn_json)
+                tmp = json.loads(tmp)
+
+                info['title'] = tmp['title']
+                info['name'] = tmp['name']
+                info['versions'] = tmp['versions']
+                info['default_ver'] = plugin_names[pn]
+                pn_list.append(info)
+            else:
+                return mw.returnJson(False, 'ok')
+
+        return mw.returnJson(True, 'ok', pn_list)
+
+    def initInstallApi(self):
+        pn_list = request.form.get('list', '')
+        try:
+            pn_list = json.loads(pn_list)
+
+            for pn in pn_list:
+                name = pn['name']
+                version = pn['version']
+                infoJsonPos = self.__plugin_dir + '/' + name + '/' + 'info.json'
+                pluginInfo = json.loads(mw.readFile(infoJsonPos))
+                self.hookInstall(pluginInfo)
+                execstr = 'cd ' + mw.getPluginDir() + '/' + name + ' && bash ' + \
+                    pluginInfo['shell'] + ' install ' + version
+
+                taskAdd = ('安装[' + name + '-' + version + ']',
+                           'execshell', '0', time.strftime('%Y-%m-%d %H:%M:%S'), execstr)
+
+                mw.M('tasks').add('name,type,status,addtime, execstr', taskAdd)
+            os.mkdir(mw.getServerDir() + '/php')
+            # 任务执行相关
+            mw.triggerTask()
+            return mw.returnJson(True, '添加成功')
+        except Exception as e:
+            return mw.returnJson(False, mw.getTracebackInfo())
+
     def installApi(self):
         rundir = mw.getRunDir()
         name = request.form.get('name', '')
@@ -116,17 +186,16 @@ class plugins_api:
         pluginInfo = json.loads(mw.readFile(infoJsonPos))
         self.hookInstall(pluginInfo)
 
-        execstr = "cd " + os.getcwd() + "/plugins/" + \
-            name + " && /bin/bash " + pluginInfo["shell"] \
-            + " install " + version
+        execstr = 'cd ' + mw.getPluginDir() + '/' + name + ' && bash ' + \
+            pluginInfo['shell'] + ' install ' + version
 
         if mw.isAppleSystem():
             print(execstr)
 
-        taskAdd = (None, mmsg + '[' + name + '-' + version + ']',
+        taskAdd = (mmsg + '[' + name + '-' + version + ']',
                    'execshell', '0', time.strftime('%Y-%m-%d %H:%M:%S'), execstr)
 
-        mw.M('tasks').add('id,name,type,status,addtime, execstr', taskAdd)
+        mw.M('tasks').add('name,type,status,addtime, execstr', taskAdd)
 
         # 任务执行相关
         mw.triggerTask()

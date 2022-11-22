@@ -1,5 +1,18 @@
 # coding: utf-8
 
+# ---------------------------------------------------------------------------------
+# MW-Linux面板
+# ---------------------------------------------------------------------------------
+# copyright (c) 2018-∞(https://github.com/midoks/mdserver-web) All rights reserved.
+# ---------------------------------------------------------------------------------
+# Author: midoks <midoks@163.com>
+# ---------------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------------
+# 文件类操作
+# ---------------------------------------------------------------------------------
+
+
 import psutil
 import time
 import os
@@ -39,7 +52,7 @@ class files_api:
             data = mw.getLastLine(path, int(line))
             return mw.returnJson(True, 'OK', data)
         except Exception as ex:
-            return mw.returnJson(False, u'无法正确读取文件!' + str(ex))
+            return mw.returnJson(False, '无法正确读取文件!' + str(ex))
 
     def saveBodyApi(self):
         path = request.form.get('path', '')
@@ -324,7 +337,7 @@ class files_api:
         if not self.checkDir(path):
             return mw.returnJson(False, '敏感目录,请不要花样作死!')
 
-        os.system('which chattr && chattr -R -i ' + rPath + path)
+        mw.execShell('which chattr && chattr -R -i ' + rPath + path)
         if os.path.isdir(rPath + path):
             import shutil
             shutil.rmtree(rPath + path)
@@ -343,7 +356,7 @@ class files_api:
 
     def closeRecycleBinApi(self):
         rPath = self.rPath
-        os.system('which chattr && chattr -R -i ' + rPath)
+        mw.execShell('which chattr && chattr -R -i ' + rPath)
         rlist = os.listdir(rPath)
         i = 0
         l = len(rlist)
@@ -626,6 +639,7 @@ class files_api:
             user = mw.execShell(
                 "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
             auth = user + ':staff'
+
         os.system('chown -R ' + auth + ' ' + filename)
         os.system('chmod -R 755 ' + filename)
 
@@ -737,16 +751,16 @@ class files_api:
         try:
             tmps = mw.getRunDir() + '/tmp/panelExec.log'
             if stype == 'zip':
-                os.system("cd '" + path + "' && zip '" + dfile +
-                          "' -r '" + sfile + "' > " + tmps + " 2>&1")
+                mw.execShell("cd '" + path + "' && zip '" + dfile +
+                             "' -r '" + sfile + "' > " + tmps + " 2>&1")
             else:
                 sfiles = ''
                 for sfile in sfile.split(','):
                     if not sfile:
                         continue
                     sfiles += " '" + sfile + "'"
-                os.system("cd '" + path + "' && tar -zcvf '" +
-                          dfile + "' " + sfiles + " > " + tmps + " 2>&1")
+                mw.execShell("cd '" + path + "' && tar -zcvf '" +
+                             dfile + "' " + sfiles + " > " + tmps + " 2>&1")
             self.setFileAccept(dfile)
             mw.writeLog("文件管理", '文件压缩成功!', (sfile, dfile))
             return mw.returnJson(True, '文件压缩成功!')
@@ -761,16 +775,17 @@ class files_api:
         try:
             tmps = mw.getRunDir() + '/tmp/panelExec.log'
             if stype == 'zip':
-                os.system("cd " + path + " && unzip -o -d '" + dfile +
-                          "' '" + sfile + "' > " + tmps + " 2>&1 &")
+                mw.execShell("cd " + path + " && unzip -o -d '" + dfile +
+                             "' '" + sfile + "' > " + tmps + " 2>&1 &")
             else:
                 sfiles = ''
                 for sfile in sfile.split(','):
                     if not sfile:
                         continue
                     sfiles += " '" + sfile + "'"
-                os.system("cd " + path + " && tar -zxvf " + sfiles +
-                          " -C " + dfile + " > " + tmps + " 2>&1 &")
+                mw.execShell("cd " + path + " && tar -zxvf " + sfiles +
+                             " -C " + dfile + " > " + tmps + " 2>&1 &")
+
             self.setFileAccept(dfile)
             mw.writeLog("文件管理", '文件解压成功!', (sfile, dfile))
             return mw.returnJson(True, '文件解压成功!')
@@ -784,7 +799,7 @@ class files_api:
 
         # 检查是否为.user.ini
         if path.find('.user.ini') >= 0:
-            os.system("which chattr && chattr -i '" + path + "'")
+            mw.execShell("which chattr && chattr -i '" + path + "'")
 
         try:
             if os.path.exists('data/recycle_bin.pl'):

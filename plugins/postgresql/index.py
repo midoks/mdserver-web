@@ -12,6 +12,11 @@ import json
 # reload(sys)
 # sys.setdefaultencoding('utf-8')
 
+# python3 plugins/postgresql/index.py start 14.4
+# python3 plugins/postgresql/index.py run_info 14.4
+# ps -ef | grep -v grep| grep run_info | awk '{print $2}' | xargs kill -9
+# vi /etc/sysconfig/network-scripts/ifcfg-eth0
+
 sys.path.append(os.getcwd() + "/class/core")
 import mw
 
@@ -119,11 +124,16 @@ def getDbPort():
 
 
 def getSocketFile():
-    file = getConf()
-    content = mw.readFile(file)
-    rep = 'socket\s*=\s*(.*)'
-    tmp = re.search(rep, content)
-    return tmp.groups()[0].strip()
+    # sock_name = '.s.PGSQL.' + getDbPort()
+    sock_name = ""
+    sock_tmp = '/tmp/' + sock_name
+    if os.path.exists(sock_tmp):
+        return sock_tmp
+
+    sock_app = getServerDir() + "/" + sock_name
+    if os.path.exists(sock_app):
+        return sock_app
+    return sock_app
 
 
 def getInitdTpl(version=''):
@@ -169,6 +179,7 @@ def pgDb():
 
     db.setPort(getDbPort())
     db.setPwd(pSqliteDb('config').where('id=?', (1,)).getField('pg_root'))
+    db.setSocket(getSocketFile())
     return db
 
 
@@ -244,6 +255,14 @@ def status(version=''):
     return 'start'
 
 
+def pgCmd(cmd):
+    return "su - postgres -c \"" + cmd + "\""
+
+
+def execShellPg(cmd):
+    return mw.execShell(pgCmd(cmd))
+
+
 def pGetDbUser():
     if mw.isAppleSystem():
         user = mw.execShell(
@@ -257,8 +276,8 @@ def initPgData():
     if not os.path.exists(serverdir + '/data'):
         cmd = serverdir + '/bin/initdb -D ' + serverdir + "/data"
         if not mw.isAppleSystem():
-            cmd = "su - postgres -c \"" + cmd + "\""
-        # print(cmd)
+            execShellPg(cmd)
+            return False
         mw.execShell(cmd)
         return False
     return True
@@ -277,8 +296,8 @@ def initPgPwd():
 
     cmd_pass = "echo \"alter user postgres with password '" + pwd + "'\" | "
     if not mw.isAppleSystem():
-        cmd_pass = cmd_pass + ' su - postgres -c "' + \
-            serverdir + '/bin/psql -d postgres"'
+        cmd = serverdir + '/bin/psql -d postgres'
+        cmd_pass = cmd_pass + ' ' + pgCmd(cmd)
     else:
         cmd_pass = cmd_pass + serverdir + '/bin/psql -d postgres'
 

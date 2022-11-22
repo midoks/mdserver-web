@@ -19,6 +19,7 @@ if [ "$EUID" -ne 0 ]
 fi
 
 
+
 if [ ${_os} == "Darwin" ]; then
 	OSNAME='macos'
 elif grep -Eq "openSUSE" /etc/*-release; then
@@ -55,6 +56,13 @@ fi
 
 
 if [ $OSNAME != "macos" ];then
+	if id www &> /dev/null ;then 
+	    echo ""
+	else
+	    groupadd www
+		useradd -g www -s /bin/bash www
+	fi
+
 	mkdir -p /www/server
 	mkdir -p /www/wwwroot
 	mkdir -p /www/wwwlogs
@@ -68,9 +76,9 @@ if [ $OSNAME != "macos" ];then
 
 		cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
 		if [ ! -z "$cn" ];then
-			wget -O /tmp/master.zip https://gitee.com/midoks/mdserver-web/repository/archive/master.zip
+			curl -sSLo /tmp/master.zip https://gitee.com/midoks/mdserver-web/repository/archive/master.zip
 		else
-			wget -O /tmp/master.zip https://codeload.github.com/midoks/mdserver-web/zip/master
+			curl -sSLo /tmp/master.zip https://codeload.github.com/midoks/mdserver-web/zip/master
 		fi
 
 		cd /tmp && unzip /tmp/master.zip
@@ -84,17 +92,32 @@ echo "use system version: ${OSNAME}"
 cd /www/server/mdserver-web && bash scripts/install/${OSNAME}.sh
 
 
+cd /www/server/mdserver-web && bash cli.sh start
+isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`
+n=0
+while [ ! -f /etc/rc.d/init.d/mw ];
+do
+    echo -e ".\c"
+    sleep 1
+    let n+=1
+    if [ $n -gt 20 ];then
+    	echo -e "start mw fail"
+    	exit 1
+    fi
+done
+
+cd /www/server/mdserver-web && bash /etc/rc.d/init.d/mw stop
+cd /www/server/mdserver-web && bash /etc/rc.d/init.d/mw start
+cd /www/server/mdserver-web && bash /etc/rc.d/init.d/mw default
+
+sleep 2
 if [ ! -e /usr/bin/mw ]; then
-	if [ -f /etc/init.d/mw ];then
-		ln -s /etc/init.d/mw /usr/bin/mw
+	if [ -f /etc/rc.d/init.d/mw ];then
+		ln -s /etc/rc.d/init.d/mw /usr/bin/mw
 	fi
 fi
 
 endTime=`date +%s`
 ((outTime=(${endTime}-${startTime})/60))
 echo -e "Time consumed:\033[32m $outTime \033[0mMinute!"
-
-
-systemctl daemon-reload
-
 

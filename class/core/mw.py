@@ -1,4 +1,17 @@
-# coding: utf-8
+# coding:utf-8
+
+# ---------------------------------------------------------------------------------
+# MW-Linux面板
+# ---------------------------------------------------------------------------------
+# copyright (c) 2018-∞(https://github.com/midoks/mdserver-web) All rights reserved.
+# ---------------------------------------------------------------------------------
+# Author: midoks <midoks@163.com>
+# ---------------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------------
+# 核心方法库
+# ---------------------------------------------------------------------------------
+
 
 import os
 import sys
@@ -45,6 +58,12 @@ def execShell(cmdstring, cwd=None, timeout=None, shell=True):
     return (t1, t2)
 
 
+def getTracebackInfo():
+    import traceback
+    errorMsg = traceback.format_exc()
+    return errorMsg
+
+
 def getRunDir():
     return os.getcwd()
 
@@ -69,10 +88,6 @@ def getLogsDir():
     return getRootDir() + '/wwwlogs'
 
 
-def getBackupDir():
-    return getRootDir() + '/backup'
-
-
 def getWwwDir():
     file = getRunDir() + '/data/site.pl'
     if os.path.exists(file):
@@ -85,9 +100,27 @@ def setWwwDir(wdir):
     return writeFile(file, wdir)
 
 
+def getBackupDir():
+    file = getRunDir() + '/data/backup.pl'
+    if os.path.exists(file):
+        return readFile(file).strip()
+    return getRootDir() + '/backup'
+
+
 def setBackupDir(bdir):
     file = getRunDir() + '/data/backup.pl'
     return writeFile(file, bdir)
+
+
+def getAcmeDir():
+    acme = '/root/.acme.sh'
+    if isAppleSystem():
+        cmd = "who | sed -n '2, 1p' |awk '{print $1}'"
+        user = execShell(cmd)[0].strip()
+        acme = '/Users/' + user + '/.acme.sh'
+    if not os.path.exists(acme):
+        acme = '/.acme.sh'
+    return acme
 
 
 def triggerTask():
@@ -110,8 +143,34 @@ def systemdCfgDir():
     return "/tmp"
 
 
+def getSslCrt():
+    if os.path.exists('/etc/ssl/certs/ca-certificates.crt'):
+        return '/etc/ssl/certs/ca-certificates.crt'
+    if os.path.exists('/etc/pki/tls/certs/ca-bundle.crt'):
+        return '/etc/pki/tls/certs/ca-bundle.crt'
+    return ''
+
+
 def getOs():
     return sys.platform
+
+
+def getOsName():
+    cmd = "cat /etc/*-release | grep PRETTY_NAME |awk -F = '{print $2}' | awk -F '\"' '{print $2}'| awk '{print $1}'"
+    data = execShell(cmd)
+    return data[0].strip().lower()
+
+
+def getOsID():
+    cmd = "cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F '\"' '{print $2}'"
+    data = execShell(cmd)
+    return data[0].strip()
+
+
+def getFileSuffix(file):
+    tmp = file.split('.')
+    ext = tmp[len(tmp) - 1]
+    return ext
 
 
 def isAppleSystem():
@@ -238,11 +297,11 @@ def getPageObject(args, result='1,2,3,4,5,8'):
     return (page.GetPage(info, result), page)
 
 
-def md5(str):
+def md5(content):
     # 生成MD5
     try:
         m = hashlib.md5()
-        m.update(str.encode("utf-8"))
+        m.update(content.encode("utf-8"))
         return m.hexdigest()
     except Exception as ex:
         return False
@@ -406,11 +465,11 @@ def writeLog(stype, msg, args=()):
         return False
 
 
-def writeFile(filename, str):
+def writeFile(filename, content, mode='w+'):
     # 写文件内容
     try:
-        fp = open(filename, 'w+')
-        fp.write(str)
+        fp = open(filename, mode)
+        fp.write(content)
         fp.close()
         return True
     except Exception as e:
@@ -441,6 +500,61 @@ def restoreFile(file, act=None):
     if act:
         file_type = "_def"
     execShell("cp -p {1} {0}".format(file, file + file_type))
+
+
+def enPunycode(domain):
+    if sys.version_info[0] == 2:
+        domain = domain.encode('utf8')
+    tmp = domain.split('.')
+    newdomain = ''
+    for dkey in tmp:
+        if dkey == '*':
+            continue
+        # 匹配非ascii字符
+        match = re.search(u"[\x80-\xff]+", dkey)
+        if not match:
+            match = re.search(u"[\u4e00-\u9fa5]+", dkey)
+        if not match:
+            newdomain += dkey + '.'
+        else:
+            if sys.version_info[0] == 2:
+                newdomain += 'xn--' + \
+                    dkey.decode('utf-8').encode('punycode') + '.'
+            else:
+                newdomain += 'xn--' + \
+                    dkey.encode('punycode').decode('utf-8') + '.'
+    if tmp[0] == '*':
+        newdomain = "*." + newdomain
+    return newdomain[0:-1]
+
+
+def dePunycode(domain):
+    # punycode 转中文
+    tmp = domain.split('.')
+    newdomain = ''
+    for dkey in tmp:
+        if dkey.find('xn--') >= 0:
+            newdomain += dkey.replace('xn--',
+                                      '').encode('utf-8').decode('punycode') + '.'
+        else:
+            newdomain += dkey + '.'
+    return newdomain[0:-1]
+
+
+def buildSoftLink(src, dst, force=False):
+    '''
+    建立软连接
+    '''
+    if not os.path.exists(src):
+        return False
+
+    if os.path.exists(dst) and force:
+        os.remove(dst)
+
+    if not os.path.exists(dst):
+        execShell('ln -sf "' + src + '" "' + dst + '"')
+        return True
+    return False
 
 
 def HttpGet(url, timeout=10):
@@ -486,6 +600,11 @@ def HttpGet2(url, timeout):
     import urllib.request
 
     try:
+        import ssl
+        try:
+            ssl._create_default_https_context = ssl._create_unverified_context
+        except:
+            pass
         req = urllib.request.urlopen(url, timeout=timeout)
         result = req.read().decode('utf-8')
         return result
@@ -743,6 +862,41 @@ def checkIp(ip):
         return False
 
 
+def createLinuxUser(user, group):
+    execShell("groupadd {}".format(group))
+    execShell('useradd -s /sbin/nologin -g {} {}'.format(user, group))
+    return True
+
+
+def setOwn(filename, user, group=None):
+    if isAppleSystem():
+        return True
+
+    # 设置用户组
+    if not os.path.exists(filename):
+        return False
+    from pwd import getpwnam
+    try:
+        user_info = getpwnam(user)
+        user = user_info.pw_uid
+        if group:
+            user_info = getpwnam(group)
+        group = user_info.pw_gid
+    except:
+        if user == 'www':
+            createLinuxUser(user)
+        # 如果指定用户或组不存在，则使用www
+        try:
+            user_info = getpwnam('www')
+        except:
+            createLinuxUser(user)
+            user_info = getpwnam('www')
+        user = user_info.pw_uid
+        group = user_info.pw_gid
+    os.chown(filename, user, group)
+    return True
+
+
 def checkPort(port):
     # 检查端口是否合法
     ports = ['21', '25', '443', '888']
@@ -828,7 +982,7 @@ def makeConf():
     file = getRunDir() + '/data/json/config.json'
     if not os.path.exists(file):
         c = {}
-        c['title'] = '祖龙面板'
+        c['title'] = '猫王面板'
         c['home'] = 'http://github/midoks/mdserver-web'
         c['recycle_bin'] = True
         c['template'] = 'default'

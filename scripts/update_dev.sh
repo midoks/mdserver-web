@@ -51,9 +51,9 @@ fi
 
 cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
 if [ ! -z "$cn" ];then
-	wget -O /tmp/dev.zip https://gitee.com/midoks/mdserver-web/repository/archive/dev.zip
+	curl -sSLo /tmp/dev.zip https://gitee.com/midoks/mdserver-web/repository/archive/dev.zip
 else
-	wget -O /tmp/dev.zip https://github.com/midoks/mdserver-web/archive/refs/heads/dev.zip
+	curl -sSLo /tmp/dev.zip https://github.com/midoks/mdserver-web/archive/refs/heads/dev.zip
 fi
 
 # wget -O /tmp/dev.zip https://github.com/midoks/mdserver-web/archive/refs/heads/dev.zip
@@ -62,14 +62,24 @@ cp -rf /tmp/mdserver-web-dev/* /www/server/mdserver-web
 rm -rf /tmp/dev.zip
 rm -rf /tmp/mdserver-web-dev
 
+if [ -f /etc/rc.d/init.d/mw ];then
+    sh /etc/rc.d/init.d/mw stop && rm -rf /www/server/mdserver-web/scripts/init.d/mw && rm -rf /etc/rc.d/init.d/mw
+fi
+
 #pip uninstall public
 echo "use system version: ${OSNAME}"
-
 cd /www/server/mdserver-web && bash scripts/update/${OSNAME}.sh
+
+bash /etc/rc.d/init.d/mw restart
+bash /etc/rc.d/init.d/mw default
+
+if [ -f /usr/bin/mw ];then
+	rm -rf /usr/bin/mw
+fi
 
 if [ ! -e /usr/bin/mw ]; then
 	if [ ! -f /usr/bin/mw ];then
-		ln -s /etc/init.d/mw /usr/bin/mw
+		ln -s /etc/rc.d/init.d/mw /usr/bin/mw
 	fi
 fi
 

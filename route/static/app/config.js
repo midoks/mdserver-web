@@ -1,22 +1,73 @@
+/** op **/
+// $(".set-submit").click(function(){
+// 	var data = $("#set_config").serialize();
+// 	layer.msg('正在保存配置...',{icon:16,time:0,shade: [0.3, '#000']});
+// 	$.post('/config/set',data,function(rdata){
+// 		layer.closeAll();
+// 		layer.msg(rdata.msg,{icon:rdata.status?1:2});
+// 		if(rdata.status){
+// 			setTimeout(function(){
+// 				window.location.href = ((window.location.protocol.indexOf('https') != -1)?'https://':'http://') + rdata.data.host + window.location.pathname;
+// 			},2500);
+// 		}
+// 	},'json');
+// });
 
-// $.post('/config/get','',function(rdata){
-// 	console.log(rdata);
-// },'json');
-
-
-$(".set-submit").click(function(){
-	var data = $("#set_config").serialize();
-	layer.msg('正在保存配置...',{icon:16,time:0,shade: [0.3, '#000']});
-	$.post('/config/set',data,function(rdata){
-		layer.closeAll();
-		layer.msg(rdata.msg,{icon:rdata.status?1:2});
-		if(rdata.status){
-			setTimeout(function(){
-				window.location.href = ((window.location.protocol.indexOf('https') != -1)?'https://':'http://') + rdata.data.host + window.location.pathname;
-			},2500);
-		}
-	},'json');
+$('input[name="webname"]').change(function(){
+	var webname = $(this).val();
+	$('.btn_webname').removeAttr('disabled');
+	$('.btn_webname').unbind().click(function(){
+		$.post('/config/set_webname','webname='+webname, function(rdata){
+			showMsg(rdata.msg,function(){window.location.reload();},{icon:rdata.status?1:2},2000);
+		},'json');
+	});
 });
+
+
+$('input[name="host_ip"]').change(function(){
+	var host_ip = $(this).val();
+	$('.btn_host_ip').removeAttr('disabled');
+	$('.btn_host_ip').unbind().click(function(){
+		$.post('/config/set_ip','host_ip='+host_ip, function(rdata){
+			showMsg(rdata.msg,function(){window.location.reload();},{icon:rdata.status?1:2},2000);
+		},'json');
+	});
+});
+
+$('input[name="port"]').change(function(){
+	var port = $(this).val();
+	$('.btn_port').removeAttr('disabled');
+	$('.btn_port').unbind().click(function(){
+		$.post('/config/set_port','port='+port, function(rdata){
+			showMsg(rdata.msg,function(){window.location.reload();},{icon:rdata.status?1:2},2000);
+		},'json');
+	});
+});
+
+$('input[name="sites_path"]').change(function(){
+	var sites_path = $(this).val();
+	$('.btn_sites_path').removeAttr('disabled');
+	$('.btn_sites_path').unbind().click(function(){
+		$.post('/config/set_www_dir','sites_path='+sites_path, function(rdata){
+			showMsg(rdata.msg,function(){window.location.reload();},{icon:rdata.status?1:2},2000);
+		},'json');
+	});
+});
+
+
+$('input[name="backup_path"]').change(function(){
+	var backup_path = $(this).val();
+	$('.backup_path').removeAttr('disabled');
+	$('.btn_sites_path').unbind().click(function(){
+		$.post('/config/set_backup_dir','backup_path='+backup_path, function(rdata){
+			showMsg(rdata.msg,function(){window.location.reload();},{icon:rdata.status?1:2},2000);
+		},'json');
+	});
+});
+
+
+
+/** op **/
 
 
 //关闭面板
@@ -248,7 +299,6 @@ function setPanelSSL(){
 	<li>开启后导致面板不能访问，可以点击下面链接了解解决方法</li>\
 	<p style="margin-top: 10px;">\
 		<input type="checkbox" id="checkSSL" /><label style="font-weight: 400;margin: 3px 5px 0px;" for="checkSSL">我已了经解详情,并愿意承担风险</label>\
-		<a target="_blank" class="btlink" href="https://www.bt.cn/bbs/thread-4689-1-1.html" style="float: right;">了解详情</a>\
 	</p>';
 	layer.confirm(msg,{title:'设置面板SSL',closeBtn:1,icon:3,area:'550px',cancel:function(){
 		if(status == 0){
@@ -511,5 +561,107 @@ function setTempAccess(){
 			});
 		}
 	});
+}
+
+function setBasicAuthTip(callback){
+	var tip = layer.open({
+		area: ['500px', '385px'],
+		title: '开启BasicAuth认证提示',
+		closeBtn:0,
+		shift: 0,
+		type: 1,
+		content: '<div class="bt-form pd20">\
+		<div class="mb15">\
+			<h3 class="layer-info-title">风险操作！此功能不懂请勿开启！</h3>\
+		</div>\
+		<ul class="help-info-text c7 explain-describe-list pd15">\
+			<li style="color: red;">必须要用到且了解此功能才决定自己是否要开启!</li>\
+			<li>开启后，以任何方式访问面板，将先要求输入BasicAuth用户名和密码</li>\
+			<li>开启后，能有效防止面板被扫描发现，但并不能代替面板本身的帐号密码</li>\
+			<li>请牢记BasicAuth密码，一但忘记将无法访问面板</li>\
+			<li>如忘记密码，可在SSH通过mw命令来关闭BasicAuth验证</li>\
+		</ul>\
+		<div class="mt10 plr15 agreement-box" id="checkBasicAuth">\
+			<input class="bt-input-text mr5" name="agreement" type="checkbox" value="false" id="agreement_more">\
+			<label for="agreement_more"><span>我已经了解详情,并愿意承担风险</span></label>\
+		</div>\
+	</div>',
+		btn:["确定","取消"],
+		yes:function(l,index){
+			is_agree = $('#agreement_more').prop("checked");
+			if (is_agree){
+				layer.close(tip);
+				callback();
+			}
+			return is_agree;
+		},
+		btn2: function(index, layero){
+		    $('#cfg_basic_auth').prop("checked", false);
+		}
+	});
+}
+
+function setBasicAuth(){
+
+	var basic_auth = $('#cfg_basic_auth').prop("checked");
+	if (!basic_auth){
+		setBasicAuthTip(function(){
+			var tip = layer.open({
+				area: ['500px', '385px'],
+				title: '配置BasicAuth认证',
+				closeBtn:1,
+				shift: 0,
+				type: 1,
+				content: '<div class="bt-form pd20">\
+			<div class="line">\
+				<span class="tname">用户名</span>\
+				<div class="info-r"><input class="bt-input-text mr5" name="basic_user" type="text" placeholder="请设置用户名" style="width: 280px;"></div>\
+			</div>\
+			<div class="line">\
+				<span class="tname">密码</span>\
+				<div class="info-r"><input class="bt-input-text mr5" name="basic_pwd" type="text" placeholder="请设置密码" style="width: 280px;"></div>\
+			</div>\
+			<div class="line">\
+				<span class="tname"></span>\
+				<div class="info-r"><button class="btn btn-success btn-sm save_auth_cfg">保存配置</button></div>\
+			</div>\
+			<ul class="help-info-text c7">\
+				<li style="color: red;">注意：请不要在这里使用您的常用密码，这可能导致密码泄漏！</li>\
+				<li>开启后，以任何方式访问面板，将先要求输入BasicAuth用户名和密码</li>\
+				<li>开启后，能有效防止面板被扫描发现，但并不能代替面板本身的帐号密码</li>\
+				<li>请牢记BasicAuth密码，一但忘记将无法访问面板</li><li>如忘记密码，可在SSH通过mw命令来关闭BasicAuth验证</li>\
+			</ul>\
+		</div>',
+				success:function(){
+					$('.save_auth_cfg').click(function(){
+						var basic_user = $('input[name="basic_user"]').val();
+						var basic_pwd = $('input[name="basic_pwd"]').val();
+						$.post('/config/set_basic_auth', {'basic_user':basic_user,'basic_pwd':basic_pwd},function(rdata){
+							showMsg(rdata.msg, function(){
+								window.location.reload();
+							} ,{icon:rdata.status?1:2}, 2000);
+						},'json');
+					});
+				},
+				cancel:function(){
+					$('#cfg_basic_auth').prop("checked", false);
+				},
+			});
+		});
+	} else {
+	    layer.confirm('关闭BasicAuth认证后，面板登录将不再验证BasicAuth基础认证，这将会导致面板安全性下降，继续操作！', 
+	    {btn: ['确定', '取消'], title: "是否关闭BasicAuth认证?", icon:13}, function (index) {
+	    	var basic_user = '';
+			var basic_pwd = '';
+			$.post('/config/set_basic_auth', {'is_open':'false'},function(rdata){
+				showMsg(rdata.msg, function(){
+					layer.close(index);
+					window.location.reload();
+				} ,{icon:rdata.status?1:2}, 2000);
+			},'json');
+	    },function(){
+	    	$('#cfg_basic_auth').prop("checked", true);
+	    });
+	}
 }
 

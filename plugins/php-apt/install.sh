@@ -10,8 +10,8 @@ serverPath=$(dirname "$rootPath")
 install_tmp=${rootPath}/tmp/mw_install.pl
 
 if id www &> /dev/null ;then 
-    echo "www UID is `id -u www`"
-    echo "www Shell is `grep "^www:" /etc/passwd |cut -d':' -f7 `"
+    echo "www uid is `id -u www`"
+    echo "www shell is `grep "^www:" /etc/passwd |cut -d':' -f7 `"
 else
     groupadd www
 	# useradd -g www -s /sbin/nologin www
@@ -70,10 +70,25 @@ fi
 cd ${curPath} && sh -x $curPath/versions/$2/install.sh $1
 
 if [ "${action}" == "install" ] && [ -d ${serverPath}/php-apt/${type} ];then
+
 	#初始化 
 	cd ${rootPath} && python3 ${rootPath}/plugins/php-apt/index.py start ${type}
 	cd ${rootPath} && python3 ${rootPath}/plugins/php-apt/index.py restart ${type}
 	cd ${rootPath} && python3 ${rootPath}/plugins/php-apt/index.py initd_install ${type}
+
+	# 安装通用扩展
+	echo "install PHP-APT[${type}] extend start"
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type:0:1}.${type:1:2} install gd
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type:0:1}.${type:1:2} install iconv
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type:0:1}.${type:1:2} install exif
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type:0:1}.${type:1:2} install intl
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type:0:1}.${type:1:2} install xml
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type:0:1}.${type:1:2} install mcrypt
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type:0:1}.${type:1:2} install mysqlnd
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type:0:1}.${type:1:2} install gettext
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type:0:1}.${type:1:2} install redis
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type:0:1}.${type:1:2} install memcached
+	echo "install PHP-APT[${type}] extend end"
 fi
 
 

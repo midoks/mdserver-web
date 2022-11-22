@@ -245,18 +245,20 @@ function addVersion(name, ver, type, obj, title, install_pre_inspection) {
 }
 
 //卸载软件
-function uninstallPreInspection(name, ver, callback){
+function uninstallPreInspection(name, title, ver, callback){
     var loading = layer.msg('正在检查卸载环境...', { icon: 16, time: 0, shade: [0.3, '#000'] });
      $.post("/plugins/run", {'name':name,'version':ver,'func':'uninstall_pre_inspection'}, function(rdata) {
         layer.close(loading);
         if (rdata.status){
             if (rdata.data == 'ok'){
-                callback();
+                if (typeof(callback) == 'function'){
+                    callback();
+                }
             } else {
-                layer.msg(rdata.data, { icon: 2 });
+                layer.msg(rdata.data, { icon: 2 , time: 6666});
             }
         } else {
-            layer.msg(rdata.data, { icon: rdata.status ? 1 : 2 });
+            layer.msg(rdata.data, { icon: rdata.status ? 1 : 2, time: 6666 });
         }
     },'json');
 }
@@ -281,9 +283,9 @@ function uninstallVersion(name, title, version, uninstall_pre_inspection) {
         uninstallPreInspection(name,title,version,function(){
             runUninstallVersion(name,title,version);
         });
-        return;
+    } else {
+        runUninstallVersion(name,title,version);
     }
-    runUninstallVersion(name,title,version);
 }
 
 
@@ -307,9 +309,19 @@ function toIndexDisplay(name, version, coexist) {
 }
 
 function indexListHtml(callback){
-    var loadT = layer.msg('正在获取列表...', { icon: 16, time: 0, shade: [0.3, '#000'] });
+    
+
+    // init
+    $("#indexsoft").html('');
+    var index_soft = '';
+    for (var i = 0; i < 12; i++) {
+        index_soft += '<div class="col-sm-3 col-md-3 col-lg-3 no-bg"></div>';
+    }
+    $("#indexsoft").html(index_soft);
+
+    // var loadT = layer.msg('正在获取列表...', { icon: 16, time: 0, shade: [0.3, '#000'] });
     $.get('/plugins/index_list', function(rdata) {
-        layer.close(loadT);
+        // layer.close(loadT);
         $("#indexsoft").html('');
         var con = '';
         for (var i = 0; i < rdata.length; i++) {
@@ -360,7 +372,6 @@ function indexListHtml(callback){
         var softboxn = softboxlen;
         if (softboxlen <= softboxsum) {
             for (var i = 0; i < softboxsum - softboxlen; i++) {
-                // softboxn += 1000;
                 softboxcon += '<div class="col-sm-3 col-md-3 col-lg-3 no-bg" data-id=""></div>';
             }
             $("#indexsoft").append(softboxcon);

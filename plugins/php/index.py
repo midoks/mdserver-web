@@ -115,6 +115,7 @@ def contentReplace(content, version):
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$PHP_VERSION}', version)
     content = content.replace('{$LOCAL_IP}', mw.getLocalIp())
+    content = content.replace('{$SSL_CRT}', mw.getSslCrt())
 
     if mw.isAppleSystem():
         # user = mw.execShell(
