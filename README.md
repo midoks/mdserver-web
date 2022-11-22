@@ -101,7 +101,8 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 * 初始花安装提示。
 * 面板设置UI优化。
 * 加入BasicAuth认证功能。
-* MYSQL[APT,YUM]安装检查优化。
+* MySQL[APT,YUM]安装检查优化。
+* MySQL导入优化，对sql后缀支持。
 
 ### JSDelivr安装地址
 
