@@ -124,7 +124,8 @@ def getDbPort():
 
 
 def getSocketFile():
-    sock_name = '.s.PGSQL.' + getDbPort()
+    # sock_name = '.s.PGSQL.' + getDbPort()
+    sock_name = ""
     sock_tmp = '/tmp/' + sock_name
     if os.path.exists(sock_tmp):
         return sock_tmp
