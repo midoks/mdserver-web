@@ -7,6 +7,10 @@ import sys
 import psycopg2
 
 
+sys.path.append(os.getcwd() + "/class/core")
+import mw
+
+
 class ORM:
     __DB_PASS = None
     __DB_USER = 'postgres'
@@ -32,12 +36,25 @@ class ORM:
         try:
 
             try:
-                self.__DB_CONN = psycopg2.connect(database='postgres', user=self.__DB_USER, password=self.__DB_PASS,
-                                                  host=self.__DB_HOST, port=int(self.__DB_PORT))
+                self.__DB_CONN = psycopg2.connect(database='postgres',
+                                                  user=self.__DB_USER,
+                                                  password=self.__DB_PASS,
+                                                  host=self.__DB_HOST,
+                                                  port=int(self.__DB_PORT))
             except Exception as e:
                 self.__DB_HOST = '127.0.0.1'
-                self.__DB_CONN = psycopg2.connect(database='postgres', user=self.__DB_USER, password=self.__DB_PASS,
-                                                  host=self.__DB_HOST, port=int(self.__DB_PORT))
+                self.__DB_CONN = psycopg2.connect(database='postgres',
+                                                  user=self.__DB_USER,
+                                                  password=self.__DB_PASS,
+                                                  host=self.__DB_HOST,
+                                                  port=int(self.__DB_PORT))
+            except Exception as e:
+                self.__DB_HOST = mw.getLocalIp()
+                self.__DB_CONN = psycopg2.connect(database='postgres',
+                                                  user=self.__DB_USER,
+                                                  password=self.__DB_PASS,
+                                                  host=self.__DB_HOST,
+                                                  port=int(self.__DB_PORT))
 
             self.__DB_CONN.autocommit = True
             self.__DB_CUR = self.__DB_CONN.cursor()
