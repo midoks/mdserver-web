@@ -155,6 +155,7 @@ plugins/mtproxy
 plugins/zimg
 plugins/bk_demo
 plugins/mail
+plugins/fastdfs
 debug.out
 
 
