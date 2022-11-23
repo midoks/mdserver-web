@@ -57,8 +57,8 @@ $('input[name="sites_path"]').change(function(){
 
 $('input[name="backup_path"]').change(function(){
 	var backup_path = $(this).val();
-	$('.backup_path').removeAttr('disabled');
-	$('.btn_sites_path').unbind().click(function(){
+	$('.btn_backup_path').removeAttr('disabled');
+	$('.btn_backup_path').unbind().click(function(){
 		$.post('/config/set_backup_dir','backup_path='+backup_path, function(rdata){
 			showMsg(rdata.msg,function(){window.location.reload();},{icon:rdata.status?1:2},2000);
 		},'json');
