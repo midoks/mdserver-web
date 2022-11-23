@@ -292,9 +292,9 @@ case "$1" in
 
                 if [ ! -f $mw_path/data/ipv6.pl ];then
                     #  Need to restart ipv6 to take effect
+                    echo 'True' > $mw_path/data/ipv6.pl
                     mw_stop
                     mw_start
-                    echo 'True' > $mw_path/data/ipv6.pl
                 fi
                 address="MW-Panel-Url: http://[$v6]:$port$auth_path"
             else
