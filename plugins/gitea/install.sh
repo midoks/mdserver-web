@@ -33,21 +33,28 @@ getBit(){
 
 Install_App()
 {	
+	os=`getOs`
+
 	mkdir -p $serverPath/source/gitea
 
 
 	if id git &> /dev/null ;then 
-	    echo "git UID is `id -u git`"
-	    echo "git Shell is `grep "^git:" /etc/passwd |cut -d':' -f7 `"
+	    echo "git uid is `id -u git`"
+	    echo "git shell is `grep "^git:" /etc/passwd |cut -d':' -f7 `"
 	else
 	    groupadd git
 		useradd -g git git
 	fi
 
+	if [ "darwin" != "$os" ];then
+		if [ -d /home/git ];then
+			mkdir -p /home/git
+		fi
+	fi
 
 	echo '正在安装脚本文件...' > $install_tmp
 	version=$1
-	os=`getOs`
+	
 
 	git config --global push.default simple
 
