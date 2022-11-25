@@ -770,6 +770,7 @@ def lsyncdAdd():
 
         info['name'] = args['sname']
         info['password'] = args['password']
+        info['port'] = args['port']
 
     rsync = {
         'bwlimit': bwlimit,
