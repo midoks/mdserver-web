@@ -158,7 +158,7 @@ plugins/bk_demo
 plugins/mail
 plugins/fastdfs
 plugins/v2ray
-plugins/frpc
+plugins/frp
 debug.out
 
 
