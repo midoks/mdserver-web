@@ -710,8 +710,7 @@ def lsyncdAdd():
     import base64
 
     args = getArgs()
-    data = checkArgs(args, ['ip', 'conn_type', 'path',
-                            'secret_key', 'delay', 'period'])
+    data = checkArgs(args, ['ip', 'conn_type', 'path', 'delay', 'period'])
     if not data[0]:
         return data[1]
 
@@ -724,7 +723,7 @@ def lsyncdAdd():
         os.system("chmod -R 755 " + path + " &")
 
     conn_type = args['conn_type']
-    secret_key = args['secret_key']
+
     delete = args['delete']
     realtime = args['realtime']
     delay = args['delay']
@@ -750,6 +749,12 @@ def lsyncdAdd():
     }
 
     if conn_type == "key":
+
+        secret_key_check = checkArgs(args, ['secret_key'])
+        if not secret_key_check[0]:
+            return secret_key_check[1]
+
+        secret_key = args['secret_key']
         try:
             m = base64.b64decode(secret_key)
             m = json.loads(m)
