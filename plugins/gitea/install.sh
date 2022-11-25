@@ -28,11 +28,9 @@ getBit(){
 
 
 Install_App()
-{	
-	os=`getOs`
-
+{
+	
 	mkdir -p $serverPath/source/gitea
-
 
 	if id git &> /dev/null ;then 
 	    echo "git uid is `id -u git`"
