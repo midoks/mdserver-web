@@ -157,6 +157,7 @@ plugins/zimg
 plugins/bk_demo
 plugins/mail
 plugins/fastdfs
+plugins/v2ray
 debug.out
 
 
