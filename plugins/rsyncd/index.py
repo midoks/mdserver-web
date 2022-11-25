@@ -719,9 +719,9 @@ def lsyncdAdd():
     path = args['path']
 
     if not mw.isAppleSystem():
-        os.system("mkdir -p " + path)
-        os.system("chown -R  www:www " + path)
-        os.system("chmod -R 755 " + path)
+        os.system("mkdir -p " + path + " &")
+        os.system("chown -R  www:www " + path + " &")
+        os.system("chmod -R 755 " + path + " &")
 
     conn_type = args['conn_type']
     secret_key = args['secret_key']
