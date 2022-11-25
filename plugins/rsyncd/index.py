@@ -764,12 +764,12 @@ def lsyncdAdd():
         except Exception as e:
             return mw.returnJson(False, "接收密钥格式错误!")
     else:
-        data = checkArgs(args, ['uname'])
+        data = checkArgs(args, ['sname', 'password'])
         if not data[0]:
             return data[1]
 
-        info['name'] = args['uname']
-        info['password'] = args['uname']
+        info['name'] = args['sname']
+        info['password'] = args['password']
 
     rsync = {
         'bwlimit': bwlimit,
