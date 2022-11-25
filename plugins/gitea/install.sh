@@ -29,7 +29,7 @@ getBit(){
 
 Install_App()
 {
-	
+
 	mkdir -p $serverPath/source/gitea
 
 	if id git &> /dev/null ;then 
@@ -41,8 +41,9 @@ Install_App()
 	fi
 
 	if [ "macos" != "$OSNAME" ];then
-		if [ -d /home/git ];then
+		if [ ! -d /home/git ];then
 			mkdir -p /home/git
+			chown -R git:git /home/git
 		fi
 	fi
 
