@@ -381,9 +381,9 @@ def addRec():
     args_ps = args['ps']
 
     if not mw.isAppleSystem():
-        mw.execShell("mkdir -p " + args_path)
-        mw.execShell("chown -R  www:www " + args_path)
-        mw.execShell("chmdo -R 755 " + args_path)
+        os.system("mkdir -p " + args_path + " &")
+        os.system("chown -R  www:www " + args_path + " &")
+        os.system("chmod -R 755 " + args_path + " &")
 
     delRecBy(args_name)
 
