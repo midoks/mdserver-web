@@ -16,15 +16,11 @@ fi
 
 URL_DOWNLOAD=https://dl.gitea.io/
 
-getOs(){
-	os=`uname`
-	if [ "Darwin" == "$os" ];then
-		echo 'darwin'
-	else
-		echo 'linux'
-	fi
-	return 0
-}
+
+bash ${rootPath}/scripts/getos.sh
+OSNAME=`cat ${rootPath}/data/osname.pl`
+OSNAME_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
+
 
 getBit(){
 	echo `getconf  LONG_BIT`
@@ -46,7 +42,7 @@ Install_App()
 		useradd -g git git
 	fi
 
-	if [ "darwin" != "$os" ];then
+	if [ "macos" != "$OSNAME" ];then
 		if [ -d /home/git ];then
 			mkdir -p /home/git
 		fi
@@ -58,7 +54,7 @@ Install_App()
 
 	git config --global push.default simple
 
-	if [ "darwin" == "$os" ];then
+	if [ "macos" == "$OSNAME" ];then
 		file=gitea-${version}-darwin-10.12-amd64
 	else
 		file=gitea-${version}-linux-amd64
