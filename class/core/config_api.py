@@ -489,6 +489,73 @@ class config_api:
             'id,type,uid,log,addtime').select()
         return mw.returnJson(False, 'ok', data)
 
+    def getPanelTokenApi(self):
+        api_file = 'data/api.json'
+
+        tmp = mw.readFile(api_file)
+        if not os.path.exists(api_file):
+            ready_data = {"open": False, "token": "", "limit_addr": []}
+            mw.writeFile(api_file, json.dumps(ready_data))
+            mw.execShell("chmod 600 " + api_file)
+            tmp = mw.readFile(api_file)
+        data = json.loads(tmp)
+
+        if not 'key' in data:
+            data['key'] = mw.getRandomString(16)
+            mw.writeFile(api_file, json.dumps(data))
+
+        if 'token_crypt' in data:
+            data['token'] = mw.deCrypt(data['token'], data['token_crypt'])
+        else:
+            token = mw.getRandomString(32)
+            data['token'] = mw.md5(token)
+            data['token_crypt'] = mw.enCrypt(
+                data['token'], token).decode('utf-8')
+            mw.writeFile(api_file, json.dumps(data))
+            data['token'] = "***********************************"
+
+        data['limit_addr'] = '\n'.join(data['limit_addr'])
+
+        del(data['key'])
+        return mw.returnJson(True, 'ok', data)
+
+    def setPanelTokenApi(self):
+        op_type = request.form.get('op_type', '').strip()
+
+        api_file = 'data/api.json'
+        tmp = mw.readFile(api_file)
+        data = json.loads(tmp)
+
+        if op_type == '1':
+            token = mw.getRandomString(32)
+            data['token'] = mw.md5(token)
+            data['token_crypt'] = mw.enCrypt(
+                data['token'], token).decode('utf-8')
+            mw.writeLog('API配置', '重新生成API-Token')
+            mw.writeFile(api_file, json.dumps(data))
+            return mw.returnJson(True, 'ok', token)
+
+        elif op_type == '2':
+            data['open'] = not data['open']
+            stats = {True: '开启', False: '关闭'}
+            if not 'token_crypt' in data:
+                token = mw.getRandomString(32)
+                data['token'] = mw.md5(token)
+                data['token_crypt'] = mw.enCrypt(
+                    data['token'], token).decode('utf-8')
+
+            token = stats[data['open']] + '成功!'
+            mw.writeLog('API配置', '%sAPI接口' % stats[data['open']])
+            mw.writeFile(api_file, json.dumps(data))
+            return mw.returnJson(not not data['open'], token)
+
+        elif op_type == '3':
+            limit_addr = request.form.get('limit_addr', '').strip()
+            data['limit_addr'] = limit_addr.split('\n')
+            mw.writeLog('API配置', '变更IP限制为[%s]' % limit_addr)
+            mw.writeFile(api_file, json.dumps(data))
+            return mw.returnJson(True, '保存成功!')
+
     def get(self):
 
         data = {}
@@ -533,6 +600,15 @@ class config_api:
                 data['basic_auth'] = 'checked'
         else:
             data['basic_auth'] = ''
+
+        api_token = 'data/api.json'
+        if os.path.exists(api_token):
+            bac = mw.readFile(api_token)
+            bac = json.loads(bac)
+            if bac['open']:
+                data['api_token'] = 'checked'
+        else:
+            data['api_token'] = ''
 
         data['site_count'] = mw.M('sites').count()
 

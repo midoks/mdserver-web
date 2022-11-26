@@ -541,6 +541,34 @@ def dePunycode(domain):
     return newdomain[0:-1]
 
 
+def enCrypt(key, strings):
+    # 加密字符串
+    try:
+        if type(strings) != bytes:
+            strings = strings.encode('utf-8')
+        from cryptography.fernet import Fernet
+        f = Fernet(key)
+        result = f.encrypt(strings)
+        return result.decode('utf-8')
+    except:
+        # print(get_error_info())
+        return strings
+
+
+def deCrypt(key, strings):
+    # 解密字符串
+    try:
+        if type(strings) != bytes:
+            strings = strings.decode('utf-8')
+        from cryptography.fernet import Fernet
+        f = Fernet(key)
+        result = f.decrypt(strings).decode('utf-8')
+        return result
+    except:
+        # print(get_error_info())
+        return strings
+
+
 def buildSoftLink(src, dst, force=False):
     '''
     建立软连接
