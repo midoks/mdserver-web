@@ -665,3 +665,4 @@ function setBasicAuth(){
 	}
 }
 
+	} else{
