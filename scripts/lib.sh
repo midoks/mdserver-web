@@ -52,7 +52,7 @@ if [ ! -f /usr/local/bin/pip3 ];then
     python3 -m pip install --upgrade pip setuptools wheel -i https://pypi.python.org/pypi
 fi
 
-pip install --upgrade pip
+which pip && pip install --upgrade pip
 pip3 install --upgrade setuptools
 cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
 
