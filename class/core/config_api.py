@@ -28,6 +28,7 @@ from flask import request
 class config_api:
 
     __version = '0.11.0'
+    __api_addr = 'data/api.json'
 
     def __init__(self):
         pass
@@ -490,7 +491,7 @@ class config_api:
         return mw.returnJson(False, 'ok', data)
 
     def getPanelTokenApi(self):
-        api_file = 'data/api.json'
+        api_file = self.__api_addr
 
         tmp = mw.readFile(api_file)
         if not os.path.exists(api_file):
@@ -522,7 +523,7 @@ class config_api:
     def setPanelTokenApi(self):
         op_type = request.form.get('op_type', '').strip()
 
-        api_file = 'data/api.json'
+        api_file = self.__api_addr
         tmp = mw.readFile(api_file)
         data = json.loads(tmp)
 
@@ -601,7 +602,7 @@ class config_api:
         else:
             data['basic_auth'] = ''
 
-        api_token = 'data/api.json'
+        api_token = self.__api_addr
         if os.path.exists(api_token):
             bac = mw.readFile(api_token)
             bac = json.loads(bac)

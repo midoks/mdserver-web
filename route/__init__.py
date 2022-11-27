@@ -407,6 +407,11 @@ def login_temp_user(token):
     return redirect('/')
 
 
+@app.route('/api', methods=['POST', 'GET'])
+def api(reqClass=None, reqAction=None, reqData=None):
+    pass
+
+
 @app.route('/<reqClass>/<reqAction>', methods=['POST', 'GET'])
 @app.route('/<reqClass>/', methods=['POST', 'GET'])
 @app.route('/<reqClass>', methods=['POST', 'GET'])
