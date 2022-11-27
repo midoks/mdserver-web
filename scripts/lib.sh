@@ -33,6 +33,8 @@ elif [ "$OSNAME" == "freebsd" ];then
     echo "freebsd lib"
 elif [ "$OSNAME" == "centos" ];then
     echo "centos lib"
+elif [ "$OSNAME" == "rocky" ]; then
+    echo "rocky lib"
 elif [ "$OSNAME" == "fedora" ];then
     echo "fedora lib"
 elif [ "$OSNAME" == "alma" ];then
