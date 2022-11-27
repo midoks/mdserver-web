@@ -71,11 +71,14 @@ yum groupinstall -y "Development Tools"
 yum install -y epel-release
 
 yum install -y libevent libevent-devel zip unzip libmcrypt libmcrypt-devel
-yum install -y wget python-imaging libicu-devel readline-devel zip bzip2 bzip2-devel libxml2 libxml2-dev 
+yum install -y wget libicu-devel readline-devel zip bzip2 bzip2-devel libxml2 libxml2-devel
 yum install -y libpng libpng-devel libwebp libwebp-devel pcre pcre-devel gd gd-devel zlib zlib-devel gettext gettext-devel
 yum install -y net-tools
 yum install -y ncurses ncurses-devel mysql-devel make cmake
+
+# python-imaging
 # yum install -y MySQL-python
+
 
 yum install -y perl perl-devel perl-Data-Dumper
 
