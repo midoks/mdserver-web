@@ -73,6 +73,7 @@ fi
 echo "use system version: ${OSNAME}"
 cd /www/server/mdserver-web && bash scripts/install/${OSNAME}.sh
 
+echo "debug1"
 
 cd /www/server/mdserver-web && bash cli.sh start
 isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`

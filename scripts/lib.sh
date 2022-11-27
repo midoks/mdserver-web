@@ -71,6 +71,7 @@ pip install --upgrade pip
 pip3 install --upgrade setuptools
 pip3 install -r /www/server/mdserver-web/requirements.txt
 
+echo "lib ok!"
 # pip3 install flask-caching==1.10.1
 # pip3 install mysqlclient
 
