@@ -86,8 +86,7 @@ for yumPack in  gcc gcc-c++ flex file libtool libtool-libs autoconf kernel-devel
 do dnf --enablerepo=powertools install -y $yumPack;done
 
 yum install -y libtirpc libtirpc-devel
-
-dnf install boost-locale
+dnf install -y boost-locale
 
 dnf --enablerepo=powertools install -y libmemcached libmemcached-devel
 dnf --enablerepo=powertools install -y rpcgen
