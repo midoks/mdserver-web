@@ -2317,11 +2317,11 @@ def dumpMysqlData(version=''):
 
     if args['db'].lower() == 'all':
         dlist = findBinlogDoDb()
-        cmd = mysql_dir + "/bin/mysqldump --defaults-file=" + myconf + " " + option + " -uroot -p" + \
+        cmd = mysql_dir + "/bin/mysqldump --defaults-file=" + myconf + " " + option + " --force -uroot -p" + \
             pwd + " --databases " + \
             ' '.join(dlist) + " | gzip > /tmp/dump.sql.gz"
     else:
-        cmd = mysql_dir + "/bin/mysqldump --defaults-file=" + myconf + " " + option + " -uroot -p" + \
+        cmd = mysql_dir + "/bin/mysqldump --defaults-file=" + myconf + " " + option + " --force -uroot -p" + \
             pwd + " --databases " + args['db'] + " | gzip > /tmp/dump.sql.gz"
 
     ret = mw.execShell(cmd)
