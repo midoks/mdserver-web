@@ -2317,12 +2317,13 @@ def dumpMysqlData(version=''):
 
     if args['db'].lower() == 'all':
         dlist = findBinlogDoDb()
-        cmd = mysql_dir + "/bin/mysqldump --defaults-file=" + myconf + " " + option + " --force -uroot -p" + \
-            pwd + " --databases " + \
+        cmd = mysql_dir + "/bin/mysqldump --defaults-file=" + myconf + " " + option + " -uroot -p" + \
+            pwd + " --force --databases " + \
             ' '.join(dlist) + " | gzip > /tmp/dump.sql.gz"
     else:
-        cmd = mysql_dir + "/bin/mysqldump --defaults-file=" + myconf + " " + option + " --force -uroot -p" + \
-            pwd + " --databases " + args['db'] + " | gzip > /tmp/dump.sql.gz"
+        cmd = mysql_dir + "/bin/mysqldump --defaults-file=" + myconf + " " + option + " -uroot -p" + \
+            pwd + " --force --databases " + \
+            args['db'] + " | gzip > /tmp/dump.sql.gz"
 
     ret = mw.execShell(cmd)
     if ret[0] == '':
@@ -2446,6 +2447,8 @@ def doFullSync(version=''):
     mw.execShell("cd /tmp && gzip -d dump.sql.gz")
     cmd = root_dir + "/bin/mysql -S " + msock + \
         " -uroot -p" + pwd + " < /tmp/dump.sql"
+
+    print(cmd)
     import_data = mw.execShell(cmd)
     if import_data[0] == '':
         print(import_data[1])
