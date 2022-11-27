@@ -2432,7 +2432,7 @@ def doFullSync(version=''):
 
     if cmd.find('MASTER_HOST') > -1:
         cmd = re.sub(r"MASTER_HOST='(.*?)'",
-                     "SOURCE_HOST='" + ip + "'", cmd, 1)
+                     "MASTER_HOST='" + ip + "'", cmd, 1)
 
     db.query(cmd)
     uinfo = cmd_data['data']['info']
