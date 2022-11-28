@@ -62,7 +62,7 @@ Install_App()
 	file_xz="${file}.xz"
 	echo "wget -O $serverPath/source/gitea/$file_xz ${URL_DOWNLOAD}/gitea/${version}/${file_xz}"
 	if [ ! -f $serverPath/source/gitea/$file_xz ];then
-		wget -O $serverPath/source/gitea/$file_xz ${URL_DOWNLOAD}/gitea/${version}/${file_xz}
+		wget  --no-check-certificate -O $serverPath/source/gitea/$file_xz ${URL_DOWNLOAD}/gitea/${version}/${file_xz}
 	fi
 
 	cd $serverPath/source/gitea && xz -k -d $file_xz
