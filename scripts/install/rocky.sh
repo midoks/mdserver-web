@@ -75,6 +75,7 @@ yum install -y wget libicu-devel readline-devel zip bzip2 bzip2-devel libxml2 li
 yum install -y libpng libpng-devel libwebp libwebp-devel pcre pcre-devel gd gd-devel zlib zlib-devel gettext gettext-devel
 yum install -y net-tools
 yum install -y ncurses ncurses-devel mysql-devel make cmake
+yum install -y sqlite-devel
 
 # python-imaging
 # yum install -y MySQL-python
