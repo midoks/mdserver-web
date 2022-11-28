@@ -59,7 +59,7 @@ Install_mysql()
 	# ----- cpu end ------
 
 	if [ ! -f ${mysqlDir}/mysql-5.5.62.tar.gz ];then
-		wget -O ${mysqlDir}/mysql-5.5.62.tar.gz --tries=3 https://dev.mysql.com/get/Downloads/MySQL-5.5/mysql-5.5.62.tar.gz
+		wget --no-check-certificate -O ${mysqlDir}/mysql-5.5.62.tar.gz --tries=3 https://dev.mysql.com/get/Downloads/MySQL-5.5/mysql-5.5.62.tar.gz
 	fi
 
 	if [ ! -d ${mysqlDir}/mysql-5.5.62 ];then
