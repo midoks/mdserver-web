@@ -19,12 +19,17 @@ sysName=`uname`
 actionType=$1
 version=$2
 IC_VERSION=${version:0:1}.${version:1:2}
+ARCH=`uname -m`
 
 if [ "$version" -gt "74" ];then
 	echo "not need"
 	exit 1
 fi
 
+DEFAULT_ARCH='x86-64'
+if [ "$ARCH" == "aarch64" ];then
+	DEFAULT_ARCH='aarch64'
+fi
 
 LIB_PATH_NAME=lib/php
 if [ -d $serverPath/php/${version}/lib64 ];then
@@ -55,7 +60,7 @@ Install_lib()
 		php_lib=$sourcePath/php_lib
 		mkdir -p $php_lib
 		if [ ! -f $php_lib/ioncube_loaders_lin.tar.gz ];then
-			wget -O $php_lib/ioncube_loaders_lin.tar.gz https://downloads.ioncube.com/loader_downloads/ioncube_loaders_lin_x86-64.tar.gz
+			wget -O $php_lib/ioncube_loaders_lin.tar.gz https://downloads.ioncube.com/loader_downloads/ioncube_loaders_lin_${DEFAULT_ARCH}.tar.gz
 			cd $php_lib && tar -zxvf ioncube_loaders_lin.tar.gz
 		fi 
 		cd $php_lib/ioncube
