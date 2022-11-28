@@ -490,6 +490,18 @@ class config_api:
             'id,type,uid,log,addtime').select()
         return mw.returnJson(False, 'ok', data)
 
+    def checkPanelToken(self):
+        api_file = self.__api_addr
+        if not os.path.exists(api_file):
+            return False, ''
+
+        tmp = mw.readFile(api_file)
+        data = json.loads(tmp)
+        if data['open']:
+            return True, data
+        else:
+            return False, ''
+
     def getPanelTokenApi(self):
         api_file = self.__api_addr
 
