@@ -96,6 +96,22 @@ def loadConfigFile():
     content = json.loads(content)
 
     dst_conf_json = getServerDir() + "/lua/config.json"
+    if not os.path.exists(dst_conf_json):
+        mw.writeFile(dst_conf_json, json.dumps(content))
+
+    dst_conf_lua = getServerDir() + "/lua/webstats_config.lua"
+    if not os.path.exists(dst_conf_lua):
+        listToLuaFile(dst_conf_lua, content)
+
+
+def loadConfigFileReload():
+    lua_dir = getServerDir() + "/lua"
+    conf_tpl = getPluginDir() + "/conf/config.json"
+
+    content = mw.readFile(conf_tpl)
+    content = json.loads(content)
+
+    dst_conf_json = getServerDir() + "/lua/config.json"
     mw.writeFile(dst_conf_json, json.dumps(content))
 
     dst_conf_lua = getServerDir() + "/lua/webstats_config.lua"
@@ -262,6 +278,7 @@ def restart():
 def reload():
     initDreplace()
 
+    loadConfigFileReload()
     loadDebugLogFile()
 
     mw.opWeb("reload")
