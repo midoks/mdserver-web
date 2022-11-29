@@ -690,8 +690,8 @@ function addDatabase(type){
                         <span class='tname'>数据库名</span>\
                         <div class='info-r'><input name='name' class='bt-input-text mr5' placeholder='新的数据库名称' type='text' style='width:65%' value=''>\
                         <select class='bt-input-text mr5 codeing_a5nGsm' name='codeing' style='width:27%'>\
-                            <option value='utf8'>utf-8</option>\
                             <option value='utf8mb4'>utf8mb4</option>\
+                            <option value='utf8'>utf-8</option>\
                             <option value='gbk'>gbk</option>\
                             <option value='big5'>big5</option>\
                         </select>\
