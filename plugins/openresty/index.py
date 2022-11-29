@@ -300,7 +300,7 @@ def runInfo():
     # 取Openresty负载状态
     try:
         url = 'http://127.0.0.1/nginx_status'
-        result = mw.httpGet(url)
+        result = mw.httpGet(url, timeout=1)
         tmp = result.split()
         data = {}
         data['active'] = tmp[2]

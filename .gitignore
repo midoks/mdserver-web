@@ -107,7 +107,6 @@ venv.bak/
 tmp/*
 *.swp
 *.zip
-scripts/init.d/mw
 logs/*
 data/*.db
 data/control.conf
@@ -132,7 +131,9 @@ include
 share
 pip-selfcheck.json
 
+scripts/init.d/mw
 scripts/mdserver-web
+
 data/api_login.txt
 data/sessions
 data/ssl.pl
@@ -147,6 +148,7 @@ data/system.db-journal
 data/hook_*.json
 data/letsencrypt.json
 data/basic_auth.json
+data/api.json
 
 plugins/l2tp
 plugins/openlitespeed
@@ -156,6 +158,8 @@ plugins/zimg
 plugins/bk_demo
 plugins/mail
 plugins/fastdfs
+plugins/v2ray
+plugins/frp
 debug.out
 
 

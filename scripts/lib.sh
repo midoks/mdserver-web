@@ -33,6 +33,8 @@ elif [ "$OSNAME" == "freebsd" ];then
     echo "freebsd lib"
 elif [ "$OSNAME" == "centos" ];then
     echo "centos lib"
+elif [ "$OSNAME" == "rocky" ]; then
+    echo "rocky lib"
 elif [ "$OSNAME" == "fedora" ];then
     echo "fedora lib"
 elif [ "$OSNAME" == "alma" ];then
@@ -52,7 +54,7 @@ if [ ! -f /usr/local/bin/pip3 ];then
     python3 -m pip install --upgrade pip setuptools wheel -i https://pypi.python.org/pypi
 fi
 
-pip install --upgrade pip
+which pip && pip install --upgrade pip
 pip3 install --upgrade setuptools
 cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
 
@@ -69,8 +71,9 @@ fi
 
 pip install --upgrade pip
 pip3 install --upgrade setuptools
-pip3 install -r /www/server/mdserver-web/requirements.txt
+cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
 
+echo "lib ok!"
 # pip3 install flask-caching==1.10.1
 # pip3 install mysqlclient
 

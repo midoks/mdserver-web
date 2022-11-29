@@ -133,8 +133,6 @@ def funConvert(fun):
         func += suf
     return func
 
-# Flask请求勾子
-
 
 def sendAuthenticated():
     # 发送http认证信息
@@ -148,6 +146,7 @@ def sendAuthenticated():
 
 @app.before_request
 def requestCheck():
+    # Flask请求勾子
     if app.config['BASIC_AUTH_OPEN']:
         auth = request.authorization
         if request.path in ['/download', '/hook', '/down']:
@@ -407,6 +406,51 @@ def login_temp_user(token):
     return redirect('/')
 
 
+@app.route('/api/<reqClass>/<reqAction>', methods=['POST', 'GET'])
+def api(reqClass=None, reqAction=None, reqData=None):
+
+    comReturn = common.local()
+    if comReturn:
+        return comReturn
+
+    import config_api
+    isOk, data = config_api.config_api().checkPanelToken()
+    if not isOk:
+        return mw.returnJson(False, '未开启API')
+
+    request_time = request.form.get('request_time', '')
+    request_token = request.form.get('request_token', '')
+    request_ip = request.remote_addr
+
+    token_md5 = mw.md5(str(request_time) + mw.md5(data['token_crypt']))
+
+    if not (token_md5 == request_token):
+        return mw.returnJson(False, '密钥错误')
+
+    if not mw.inArray(data['limit_addr'], request_ip):
+        return mw.returnJson(False, '非法请求')
+
+    if reqClass == None:
+        return mw.returnJson(False, '请指定请求方法类')
+
+    if reqAction == None:
+        return mw.returnJson(False, '请指定请求方法')
+
+    classFile = ('config_api', 'crontab_api', 'files_api', 'firewall_api',
+                 'plugins_api', 'system_api', 'site_api', 'task_api')
+    className = reqClass + '_api'
+    if not className in classFile:
+        return "external api request error"
+
+    eval_str = "__import__('" + className + "')." + className + '()'
+    newInstance = eval(eval_str)
+
+    try:
+        return publicObject(newInstance, reqAction)
+    except Exception as e:
+        return mw.getTracebackInfo()
+
+
 @app.route('/<reqClass>/<reqAction>', methods=['POST', 'GET'])
 @app.route('/<reqClass>/', methods=['POST', 'GET'])
 @app.route('/<reqClass>', methods=['POST', 'GET'])
@@ -462,14 +506,14 @@ def index(reqClass=None, reqAction=None, reqData=None):
         return render_template(reqClass + '.html', data=data)
 
     if not isLogined():
-        return 'request error!'
+        return 'error request!'
 
     # API请求
     classFile = ('config_api', 'crontab_api', 'files_api', 'firewall_api',
                  'plugins_api', 'system_api', 'site_api', 'task_api')
     className = reqClass + '_api'
     if not className in classFile:
-        return "api request error"
+        return "api error request"
 
     eval_str = "__import__('" + className + "')." + className + '()'
     newInstance = eval(eval_str)

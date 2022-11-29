@@ -53,7 +53,7 @@ Install_gogs()
 	fi
 
 	if [ ! -f $serverPath/source/gogs/$file ];then
-		wget -O $serverPath/source/gogs/$file ${GOGS_DOWNLOAD}/${version}/${file}
+		wget  --no-check-certificate -O $serverPath/source/gogs/$file ${GOGS_DOWNLOAD}/${version}/${file}
 	fi
 
 	cd $serverPath/source/gogs && unzip -o $file -d gogs_${version}

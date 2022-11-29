@@ -17,7 +17,7 @@ which rpcgen
 if [ "$?" != "0" ];then
 	
 	if [ ! -f ${SOURCE_ROOT}/rpcsvc-proto-1.4.tar.gz ];then
-		wget -O ${SOURCE_ROOT}/rpcsvc-proto-1.4.tar.gz  https://github.com/thkukuk/rpcsvc-proto/releases/download/v1.4/rpcsvc-proto-1.4.tar.gz
+		wget  --no-check-certificate -O ${SOURCE_ROOT}/rpcsvc-proto-1.4.tar.gz  https://github.com/thkukuk/rpcsvc-proto/releases/download/v1.4/rpcsvc-proto-1.4.tar.gz
 	fi
 
 	if [ ! -d ${SERVER_ROOT}/rpcsvc-proto-1.4 ];then

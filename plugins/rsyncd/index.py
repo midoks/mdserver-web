@@ -381,9 +381,9 @@ def addRec():
     args_ps = args['ps']
 
     if not mw.isAppleSystem():
-        mw.execShell("mkdir -p " + args_path)
-        mw.execShell("chown -R  www:www " + args_path)
-        mw.execShell("chmdo -R 755 " + args_path)
+        os.system("mkdir -p " + args_path + " &")
+        os.system("chown -R  www:www " + args_path + " &")
+        os.system("chmod -R 755 " + args_path + " &")
 
     delRecBy(args_name)
 
@@ -710,8 +710,7 @@ def lsyncdAdd():
     import base64
 
     args = getArgs()
-    data = checkArgs(args, ['ip', 'conn_type', 'path',
-                            'secret_key', 'delay', 'period'])
+    data = checkArgs(args, ['ip', 'conn_type', 'path', 'delay', 'period'])
     if not data[0]:
         return data[1]
 
@@ -719,12 +718,12 @@ def lsyncdAdd():
     path = args['path']
 
     if not mw.isAppleSystem():
-        mw.execShell("mkdir -p " + path)
-        mw.execShell("chown -R  www:www " + path)
-        mw.execShell("chmod -R 755 " + path)
+        os.system("mkdir -p " + path + " &")
+        os.system("chown -R  www:www " + path + " &")
+        os.system("chmod -R 755 " + path + " &")
 
     conn_type = args['conn_type']
-    secret_key = args['secret_key']
+
     delete = args['delete']
     realtime = args['realtime']
     delay = args['delay']
@@ -750,6 +749,12 @@ def lsyncdAdd():
     }
 
     if conn_type == "key":
+
+        secret_key_check = checkArgs(args, ['secret_key'])
+        if not secret_key_check[0]:
+            return secret_key_check[1]
+
+        secret_key = args['secret_key']
         try:
             m = base64.b64decode(secret_key)
             m = json.loads(m)
@@ -759,12 +764,13 @@ def lsyncdAdd():
         except Exception as e:
             return mw.returnJson(False, "接收密钥格式错误!")
     else:
-        data = checkArgs(args, ['uname'])
+        data = checkArgs(args, ['sname', 'password'])
         if not data[0]:
             return data[1]
 
-        info['name'] = args['uname']
-        info['password'] = args['uname']
+        info['name'] = args['sname']
+        info['password'] = args['password']
+        info['port'] = args['port']
 
     rsync = {
         'bwlimit': bwlimit,

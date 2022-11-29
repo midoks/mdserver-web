@@ -324,7 +324,7 @@ def startJob():
 
     data = mw.execShell(cmd)
 
-    if data[0] != '':
+    if data[1] != '':
         return mw.returnJson(False, action + '[' + name + ']失败!')
     return mw.returnJson(True, action + '[' + name + ']成功!')
 

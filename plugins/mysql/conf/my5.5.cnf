@@ -33,7 +33,7 @@ tmp_table_size = 8M
 
 
 query_cache_type = 1
-query_cache_size = 4M
+query_cache_size = 64M
 
 max_connections = 500
 max_connect_errors = 100

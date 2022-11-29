@@ -171,6 +171,17 @@ mw_reload()
     fi
 }
 
+mw_close(){
+    echo 'True' > $mw_path/data/close.pl
+}
+
+mw_open()
+{
+    if [ -f $mw_path/data/close.pl ];then
+        rm -rf $mw_path/data/close.pl
+    fi
+}
+
 error_logs()
 {
 	tail -n 100 $mw_path/logs/error.log
@@ -254,6 +265,8 @@ case "$1" in
         mw_start_task;;
     'status') mw_status;;
     'logs') error_logs;;
+    'close') mw_close;;
+    'open') mw_open;;
     'update') mw_update;;
     'update_dev') mw_update_dev;;
     'install_app') mw_install_app;;

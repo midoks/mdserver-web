@@ -2232,7 +2232,12 @@ function wsTableLogRequest(page){
                 list += '<td>' + toSecond(data[i]['request_time']) +'</td>';
                 list += '<td><span class="overflow_hide" style="width:130px;">' + data[i]['uri'] +'</span></td>';
                 list += '<td>'+spider_tip+'<span class="overflow_hide" style="width:60px;">' + data[i]['status_code']+'/' + data[i]['method'] +'</span></td>';
-                list += '<td><a data-id="'+i+'" href="javascript:;" class="btlink details" title="详情">详情</a></td>';
+
+                var http_data = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
+                if (data[i]['request_headers']!=''){
+                    http_data = '<a data-id="'+i+'" href="javascript:;" class="btlink http_data" title="HTTP">HTTP</a>&nbsp;|&nbsp;';
+                }
+                list += '<td><span>'+http_data+'<a data-id="'+i+'" href="javascript:;" class="btlink details" title="详情">详情</a></span></td>';
                 list += '</tr>';
             }
         } else{
@@ -2277,15 +2282,48 @@ function wsTableLogRequest(page){
                     <div><b style="margin-left:10px">协议</b></div>\
                     <div class="lib-con mt10"><div class="divpre">' + res.protocol + '</div></div>\
                     <div><b style="margin-left:10px">URL</b></div>\
-                    <div class="lib-con mt10"><div class="divpre">' + $('<div ></div>').text(res.uri).html() + '</div></div>\
+                    <div class="lib-con mt10"><div class="divpre">' + $('<div></div>').text(res.uri).html() + '</div></div>\
                     <div><b style="margin-left:10px">完整IP列表</b></div>\
                     <div class="lib-con mt10"><div class="divpre" style="max-height: 66px;">' + $('<div ></div>').text(res.ip_list).html() + '</div></div>\
                     <div><b style="margin-left:10px">来路</b></div>\
-                    <div class="lib-con mt10"><div class="divpre">' + $('<div ></div>').text(res.referer == null ?'None':res.referer).html() + '</div></div>\
+                    <div class="lib-con mt10"><div class="divpre">' + $('<div></div>').text(res.referer == null ?'None':res.referer).html() + '</div></div>\
                     <div><b style="margin-left:10px">User-Agent</b></div>\
-                    <div class="lib-con mt10"><div class="divpre">' + $('<div ></div>').text(res.user_agent).html() + '</div></div>\
+                    <div class="lib-con mt10"><div class="divpre">' + $('<div></div>').text(res.user_agent).html() + '</div></div>\
                     <div><b style="margin-left:10px">处理耗时</b></div>\
                     <div class="lib-con mt10"><div class="divpre">' +res.request_time + ' ms</div></div>\
+                </div>',
+            });
+        });
+
+        $(".tablescroll .http_data").click(function(){
+            var index = $(this).attr('data-id');
+            var res = data[index];
+            var request_headers = res.request_headers;
+            var req_data = $.parseJSON(request_headers);
+
+            var req_data_html = res.method +' ' + res.uri + '<br/>';
+            for (var d in req_data) {
+
+                if (d == 'payload'){
+                    req_data_html += '<b style="color:red;">'+d +"</b>:"+req_data[d]+"<br/>";
+                } else{
+                    req_data_html += d+":"+req_data[d]+"<br/>";
+                }
+
+                
+            }
+
+            layer.open({
+                type: 1,
+                title: "【"+res.domain + "】HTTP详情",
+                area: ['600px','375px'],
+                closeBtn: 1,
+                shadeClose: false,
+                content: '<div class="pd15 lib-box">\
+                    <div class="lib-con mt10"><div class="divpre" style="max-height:250px;white-space: break-spaces;">' + req_data_html + '</div></div>\
+                    <ul class="help-info-text c7 mtb15">\
+                        <li style="list-style: none;">payload: POST请求中客户端提交的参数。</li>\
+                    </ul>\
                 </div>',
             });
         });

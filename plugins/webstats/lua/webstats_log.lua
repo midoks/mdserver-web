@@ -373,8 +373,7 @@ log_by_lua_block {
 		local client_stat_fields = {}
 
 		if not excluded then
-
-			if status_code == 500 or (method=="POST" and config["record_post_args"] == true) or (status_code==403 and config["record_get_403_args"] == true) then
+			if status_code == 500 or (method=="POST" and config['global']["record_post_args"] == true) or (status_code==403 and config['global']["record_get_403_args"] == true) then
 				local data = ""
 				local ok, err = pcall(function() data = C:get_http_origin() end)
 				if ok and not err then

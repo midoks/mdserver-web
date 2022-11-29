@@ -29,7 +29,7 @@ Install_App()
 	
 	if [ ! -f ${APP_DIR}/haproxy-${VERSION}.tar.gz ];then
 		if [ $sysName == 'Darwin' ]; then
-			wget -O ${APP_DIR}/haproxy-${VERSION}.tar.gz https://www.haproxy.org/download/${MIN_VERSION}/src/haproxy-${VERSION}.tar.gz
+			wget --no-check-certificate -O ${APP_DIR}/haproxy-${VERSION}.tar.gz https://www.haproxy.org/download/${MIN_VERSION}/src/haproxy-${VERSION}.tar.gz
 		else
 			curl -sSLo ${APP_DIR}/haproxy-${VERSION}.tar.gz https://www.haproxy.org/download/${MIN_VERSION}/src/haproxy-${VERSION}.tar.gz
 		fi

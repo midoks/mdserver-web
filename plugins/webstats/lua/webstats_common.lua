@@ -76,6 +76,10 @@ function _M.getTotalKey(self)
     return self.total_key
 end
 
+function _M.to_json(self, msg)
+    return json.encode(msg)
+end
+
 function _M.setConfData( self, config, site_config )
     self.config = config
     self.site_config = site_config

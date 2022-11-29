@@ -842,7 +842,7 @@ def setSafeVerify():
     cobj = json.loads(content)
 
     cobj['safe_verify']['time'] = args['time']
-    cobj['safe_verify']['cpu'] = args['cpu']
+    cobj['safe_verify']['cpu'] = int(args['cpu'])
 
     if args['auto'] == '0':
         cobj['safe_verify']['auto'] = False

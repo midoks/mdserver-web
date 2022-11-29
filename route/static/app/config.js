@@ -57,8 +57,8 @@ $('input[name="sites_path"]').change(function(){
 
 $('input[name="backup_path"]').change(function(){
 	var backup_path = $(this).val();
-	$('.backup_path').removeAttr('disabled');
-	$('.btn_sites_path').unbind().click(function(){
+	$('.btn_backup_path').removeAttr('disabled');
+	$('.btn_backup_path').unbind().click(function(){
 		$.post('/config/set_backup_dir','backup_path='+backup_path, function(rdata){
 			showMsg(rdata.msg,function(){window.location.reload();},{icon:rdata.status?1:2},2000);
 		},'json');
@@ -663,5 +663,75 @@ function setBasicAuth(){
 	    	$('#cfg_basic_auth').prop("checked", true);
 	    });
 	}
+}
+
+function showPanelApi(){
+	$.post('/config/get_panel_token', '', function(rdata){
+		var tip = layer.open({
+			area: ['500px', '355px'],
+			title: '配置面板API',
+			closeBtn:1,
+			shift: 0,
+			type: 1,
+			content: '<div class="bt-form pd20">\
+		<div class="line">\
+			<span class="tname">接口密钥</span>\
+			<div class="info-r">\
+				<input class="bt-input-text mr5" name="token" type="text" style="width: 310px;" disabled>\
+				<button class="btn btn-success btn-xs reset_token" style="margin-left: -50px;">重置</button>\
+			</div>\
+		</div>\
+		<div class="line">\
+			<span class="tname" style="width: 90px; overflow: initial; height: 20px; line-height: 20px;">IP白名单<br/>(每行1个)</span>\
+			<div class="info-r"><textarea class="bt-input-text" name="api_limit_addr" style="width: 310px; height: 80px; line-height: 20px; padding: 5px 8px;"></textarea></div>\
+		</div>\
+		<div class="line">\
+			<span class="tname"></span>\
+			<div class="info-r"><button class="btn btn-success btn-sm save_api">保存配置</button></div>\
+		</div>\
+		<ul class="help-info-text c7">\
+			<li>开启API后，必需在IP白名单列表中的IP才能访问面板API接口</li>\
+			<li style="color: red;">请不要在生产环境开启，这可能增加服务器安全风险；</li>\
+		</ul>\
+	</div>',
+			success:function(layero,index){
+
+				$('input[name="token"]').val(rdata.data.token);
+				$('textarea[name="api_limit_addr"]').val(rdata.data.limit_addr);
+
+
+				$('.reset_token').click(function(){
+					layer.confirm('您确定要重置当前密钥吗？<br/><span style="color: red; ">重置密钥后，已关联密钥产品，将失效，请重新添加新密钥至产品。</span>',{title:'重置密钥',closeBtn:2,icon:13,cancel:function(){
+					}}, function() {
+						$.post('/config/set_panel_token', {'op_type':"1"},function(rdata){
+							showMsg("接口密钥已生成，重置密钥后，已关联密钥产品，将失效，请重新添加新密钥至产品。", function(){
+								$('input[name="token"]').val(rdata.data);
+							} ,{icon:1}, 2000);
+						},'json');
+					});
+				});
+
+				$('.save_api').click(function(){
+					var limit_addr = $('textarea[name="api_limit_addr"]').val();
+					$.post('/config/set_panel_token', {'op_type':"3",'limit_addr':limit_addr},function(rdata){
+						showMsg(rdata.msg, function(){
+						} ,{icon:rdata.status?1:2}, 2000);
+					},'json');
+				});
+			},
+		});
+	},'json');	
+}
+
+
+function setPanelApi(){
+	var cfg_panel_api = $('#cfg_panel_api').prop("checked");
+	$.post('/config/set_panel_token', {'op_type':"2"},function(rdata){
+		showMsg(rdata.msg, function(){
+			if (rdata.status){
+				showPanelApi();
+			}
+		} ,{icon:rdata.status?1:2}, 1000);
+	},'json');
 }
 

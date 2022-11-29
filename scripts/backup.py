@@ -36,7 +36,7 @@ class backupTools:
                 "----------------------------------------------------------------------------")
             return
 
-        backup_path = mw.getRootDir() + '/backup/site'
+        backup_path = mw.getBackupDir() + '/site'
         if not os.path.exists(backup_path):
             mw.execShell("mkdir -p " + backup_path)
 
@@ -97,7 +97,7 @@ class backupTools:
                 "----------------------------------------------------------------------------")
             return
 
-        backup_path = mw.getRootDir() + '/backup/database'
+        backup_path = mw.getBackupDir() + '/database'
         if not os.path.exists(backup_path):
             mw.execShell("mkdir -p " + backup_path)
 
@@ -122,7 +122,10 @@ class backupTools:
         # mw.execShell(db_path + "/bin/mysqldump --skip-lock-tables --default-character-set=utf8 " +
         #              name + " | gzip > " + filename)
 
-        mw.execShell(db_path + "/bin/mysqldump  --single-transaction --quick --default-character-set=utf8 " +
+        # mw.execShell(db_path + "/bin/mysqldump  --single-transaction --quick --default-character-set=utf8 " +
+        #              name + " | gzip > " + filename)
+
+        mw.execShell(db_path + "/bin/mysqldump  --force --opt --default-character-set=utf8 " +
                      name + " | gzip > " + filename)
 
         if not os.path.exists(filename):

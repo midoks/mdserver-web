@@ -11,7 +11,7 @@ Group=git
 WorkingDirectory={$SERVER_PATH}/gitea
 ExecStart={$SERVER_PATH}/gitea/gitea web
 Restart=always
-Environment=USER=git HOME=/home/git GITEA_WORK_DIR=/var/lib/gitea
+Environment=USER=git HOME=/home/git GITEA_WORK_DIR={$SERVER_PATH}/gitea
 RemainAfterExit=yes
 #AmbientCapabilities=CAP_NET_BIND_SERVICE
 #CapabilityBoundingSet=CAP_NET_BIND_SERVICE
