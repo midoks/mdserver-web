@@ -91,18 +91,16 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.11.0
+### 版本更新 0.11.1
 
-* 改造HTTPS升级，为lets和acme申请。
-* 改造SSH管理,加入`禁止密码登陆`。
-* 计划任务BUG,修改时错误提示。
-* PG在debian11优化。
-* PHP默认配置curl,openssl ssl配置优化。
-* 初始花安装提示。
-* 面板设置UI优化。
-* 加入BasicAuth认证功能。
-* MySQL[APT,YUM]安装检查优化。
-* MySQL导入优化，对sql后缀支持。
+* 提供面板API接口访问的支持。
+* rockylinux系统安装优化。
+* 网站统计记录POST请求原文优化。
+* 针对mysql下载速度优化。
+* mysql初始化默认参数优化。
+* OP防火墙安全设置BUG解决。
+* Gitea优化。
+
 
 ### JSDelivr安装地址
 
