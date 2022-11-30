@@ -703,7 +703,7 @@ def uninstallPreInspection():
         return 'ok'
     dir_list = os.listdir(repo_dir)
     if len(dir_list) > 0:
-        return "有项目!请手动删除Gitea<br/> rm -rf {}".format(getServerDir())
+        return "有项目数据!请手动删除Gitea<br/> rm -rf {}".format(getServerDir())
     return 'ok'
 
 if __name__ == "__main__":
