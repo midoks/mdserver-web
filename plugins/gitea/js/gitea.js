@@ -276,10 +276,9 @@ function projectScriptLoad(user,name){
             return;
         }
 
-        layer.msg('加载成功!',{icon:1,time:2000,shade: [0.3, '#000']});
-        setTimeout(function(){
+        showMsg('加载成功!',function(){
             userProjectList(1);
-        }, 2000);
+        },{icon:1,time:2000,shade: [0.3, '#000']},2000);
     });
 }
 

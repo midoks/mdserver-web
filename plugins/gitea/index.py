@@ -601,11 +601,13 @@ def projectScriptLoad():
 
     if not os.path.exists(path + '/custom_hooks'):
         mw.execShell('mkdir -p ' + path + '/custom_hooks')
+        mw.execShell('chown -R www:www ' + path + '/custom_hooks')
 
     pct_content = mw.readFile(post_receive_tpl)
     pct_content = pct_content.replace('{$PATH}', path + '/custom_hooks')
     mw.writeFile(post_receive, pct_content)
     mw.execShell('chmod 777 ' + post_receive)
+    mw.execShell('chown -R www:www ' + post_receive)
 
     commit_tpl = getPluginDir() + '/hook/commit.tpl'
     commit = path + '/custom_hooks/commit'
@@ -622,6 +624,7 @@ def projectScriptLoad():
     cc_content = cc_content.replace('{$WEB_ROOT}', mw.getWwwDir())
     mw.writeFile(commit, cc_content)
     mw.execShell('chmod 777 ' + commit)
+    mw.execShell('chown -R www:www ' + commit)
 
     return 'ok'
 
