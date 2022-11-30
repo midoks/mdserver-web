@@ -597,7 +597,7 @@ def projectScriptLoad():
 
     path = getRootPath() + '/' + user + '/' + name
     post_receive_tpl = getPluginDir() + '/hook/post-receive.tpl'
-    post_receive = path + '/custom_hooks/post-receive'
+    post_receive = path + '/hooks/post-receive.d/post-receive'
 
     if not os.path.exists(path + '/custom_hooks'):
         mw.execShell('mkdir -p ' + path + '/custom_hooks')
