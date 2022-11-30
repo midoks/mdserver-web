@@ -445,7 +445,7 @@ def submitGogsConf():
             val = g + ' = ' + args[g]
             conf = re.sub(rep, val, conf)
     mw.writeFile(filename, conf)
-    reload()
+    restart()
     return mw.returnJson(True, '设置成功')
 
 
