@@ -204,6 +204,7 @@ function _M.get_http_origin(self)
     local headers = request_header
     if not headers then return data end
     if method ~='GET' then 
+        ngx.req.read_body()
         data = ngx.req.get_body_data()
         if not data then
             data = ngx.req.get_post_args(1000000)
