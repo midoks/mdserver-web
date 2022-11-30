@@ -736,9 +736,9 @@ $(function() {
 	})
 });
 
-$("#dologin").click(function() {
+$("#signout").click(function() {
 	layer.confirm('您真的要退出面板吗?', {icon:3,closeBtn: 1}, function() {
-		window.location.href = "/login?dologin=True"
+		window.location.href = "/login?signout=True"
 	});
 	return false
 });

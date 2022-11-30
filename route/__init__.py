@@ -483,8 +483,8 @@ def index(reqClass=None, reqAction=None, reqData=None):
         # 登录页
         if reqClass == 'login':
 
-            dologin = request.args.get('dologin', '')
-            if dologin == 'True':
+            signout = request.args.get('signout', '')
+            if signout == 'True':
                 session.clear()
                 session['login'] = False
                 session['overdue'] = 0
