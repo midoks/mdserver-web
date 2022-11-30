@@ -4,6 +4,8 @@
 	"title": "Gitea",
 	"versions": ["1.17.2"],
 	"tip": "soft",
+	"install_pre_inspection":false,
+	"uninstall_pre_inspection":true,
 	"checks": "server/gitea",
 	"path":"server/gitea",
 	"author": "gitea",

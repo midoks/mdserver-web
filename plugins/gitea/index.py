@@ -697,6 +697,15 @@ def getTotalStatistics():
     return mw.returnJson(False, 'fail', data)
 
 
+def uninstallPreInspection():
+    repo_dir = getServerDir() + "/data/gitea-repositories"
+    if not os.path.exists(repo_dir):
+        return 'ok'
+    dir_list = os.listdir(repo_dir)
+    if len(dir_list) > 0:
+        return "有项目!请手动删除Gitea<br/> rm -rf {}".format(getServerDir())
+    return 'ok'
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -715,6 +724,8 @@ if __name__ == "__main__":
         print(initdInstall())
     elif func == 'initd_uninstall':
         print(initdUinstall())
+    elif func == 'uninstall_pre_inspection':
+        print(uninstallPreInspection())
     elif func == 'run_log':
         print(runLog())
     elif func == 'post_receive_log':
