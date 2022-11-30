@@ -378,6 +378,8 @@ log_by_lua_block {
 				local ok, err = pcall(function() data = C:get_http_origin() end)
 				if ok and not err then
 					kv["request_headers"] = data
+				else
+					C:D("debug request_headers error:"..tostring(err))
 				end
 			end
 
