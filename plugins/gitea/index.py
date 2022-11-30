@@ -639,7 +639,7 @@ def projectScriptUnload():
     name = args['name'] + '.git'
 
     post_receive = getRootPath() + '/' + user + '/' + name + \
-        '/custom_hooks/post-receive'
+        '/hooks/post-receive.d/post-receive'
     mw.execShell('rm -f ' + post_receive)
 
     commit = getRootPath() + '/' + user + '/' + name + \
