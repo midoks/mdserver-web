@@ -101,7 +101,7 @@ def getHomeDir():
             "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
         return '/Users/' + user
     else:
-        return 'git'
+        return 'www'
 
 
 def getRunUser():
@@ -110,7 +110,7 @@ def getRunUser():
             "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
         return user
     else:
-        return 'git'
+        return 'www'
 
 __SR = '''#!/bin/bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
@@ -134,6 +134,10 @@ def initDreplace():
 
     file_tpl = getInitdConfTpl()
     service_path = mw.getServerDir()
+
+    git_dir = mw.getServerDir() + '/git'
+    if not os.path.exists(git_dir):
+        mw.execShell('mkdir -p ' + git_dir)
 
     initD_path = getServerDir() + '/init.d'
     if not os.path.exists(initD_path):

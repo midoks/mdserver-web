@@ -32,18 +32,18 @@ Install_App()
 
 	mkdir -p $serverPath/source/gitea
 
-	if id git &> /dev/null ;then 
-	    echo "git uid is `id -u git`"
-	    echo "git shell is `grep "^git:" /etc/passwd |cut -d':' -f7 `"
+	if id www &> /dev/null ;then 
+	    echo "www uid is `id -u www`"
+	    echo "www shell is `grep "^www:" /etc/passwd |cut -d':' -f7 `"
 	else
-	    groupadd git
-		useradd -g git git
+	    groupadd www
+		useradd -g www www
 	fi
 
 	if [ "macos" != "$OSNAME" ];then
-		if [ ! -d /home/git ];then
-			mkdir -p /home/git
-			chown -R git:git /home/git
+		if [ ! -d /home/www ];then
+			mkdir -p /home/www
+			chown -R www:www /home/www
 		fi
 	fi
 
@@ -71,7 +71,7 @@ Install_App()
 		mv $serverPath/source/gitea/$file $serverPath/gitea/gitea
 		chmod +x $serverPath/gitea/gitea
 
-		chown -R git:git $serverPath/gitea
+		chown -R www:www $serverPath/gitea
 	fi
 
 
