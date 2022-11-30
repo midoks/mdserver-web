@@ -519,7 +519,7 @@ def checkProjectListIsHasScript(user, data):
     path = getRootPath() + '/' + user
     for x in range(len(data)):
         name = data[x]['name'] + '.git'
-        path_tmp = path + '/' + name + '/custom_hooks/post-receive'
+        path_tmp = path + '/' + name + '/hooks/post-receive.d/post-receive'
         if os.path.exists(path_tmp):
             data[x]['has_hook'] = True
         else:
