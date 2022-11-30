@@ -26,9 +26,24 @@ getBit(){
 	echo `getconf  LONG_BIT`
 }
 
+Install_Rsync(){
+	if [ "$OSNAME" == "debian" ] || [ "$OSNAME" == "ubuntu" ];then
+		apt install -y rsync
+	elif [[ "$OSNAME" == "arch" ]]; then
+		echo y | pacman -Sy rsync
+	elif [[ "$OSNAME" == "macos" ]]; then
+		# brew install rsync
+		# brew install lsyncd
+		echo "ok"
+	else
+		yum install -y rsync
+	fi
+}
+
 
 Install_App()
 {
+	Install_Rsync
 
 	mkdir -p $serverPath/source/gitea
 
