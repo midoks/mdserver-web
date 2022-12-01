@@ -106,9 +106,8 @@ end
 
 function _M.get_domain(self)
     local domain = ngx.req.get_headers()['host']
-    if domain ~= nil then
-        domain = ngx.re.gsub(domain, "_", ".")
-    else
+     -- domain = ngx.re.gsub(domain, "_", ".")
+    if domain == nil then
         domain = "unknown"
     end
     return domain
