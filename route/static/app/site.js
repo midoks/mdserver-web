@@ -977,12 +977,16 @@ function setPHPVer(){
 						    <li>安装新的PHP版本后此处需要重新设置</li>\
 					    </ul>\
 					</div>',
-			yes:function(){
+			yes:function(layero,index){
 				var version = $("#default_ver").val();
 				var loadT = layer.msg('正在处理,请稍候...',{icon:16,time:0,shade: [0.3, '#000']});
 				$.post('/site/set_cli_php_version','version='+version,function(rdata){
 					layer.close(loadT);
-					layer.msg(rdata.msg,{icon:rdata.status?1:5});
+					showMsg(rdata.msg,function(){
+						if (rdata.status){
+							layer.close(index);
+						}
+					},{icon:rdata.status?1:5},2000);
 				},'json');
 			},
 		});
