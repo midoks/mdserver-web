@@ -648,11 +648,7 @@ log_by_lua_block {
 	local function run_app_ok()
 		if not debug_mode then return run_app() end
 
-		local presult, err = pcall(
-			function() 
-				run_app()
-			end
-		)
+		local presult, err = pcall( function() run_app() end)
 		if not presult then
 			C:D("debug error on :"..tostring(err))
 			return true
