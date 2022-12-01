@@ -959,7 +959,7 @@ function setPHPVer(){
 			opt += '<option value="' + rdata.versions[i].version + '" ' + selected + '>' + rdata.versions[i].name + '</option>';
 		}
 		
-		layer.open({
+		var phpver_layer = layer.open({
 			type: 1,
 			area: '530px',
 			title: '设置PHP-CLI(命令行)版本',
@@ -984,7 +984,7 @@ function setPHPVer(){
 					layer.close(loadT);
 					showMsg(rdata.msg,function(){
 						if (rdata.status){
-							layer.close(index);
+							layer.close(phpver_layer);
 						}
 					},{icon:rdata.status?1:5},2000);
 				},'json');
