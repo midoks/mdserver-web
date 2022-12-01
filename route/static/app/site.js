@@ -944,6 +944,51 @@ function getDefaultSite(){
 	},'json');
 }
 
+function setPHPVer(){
+	$.post('/site/get_cli_php_version','',function(rdata){
+		if(typeof(rdata['status'])!='undefined'){
+			layer.msg(rdata.msg,{icon:rdata.status?1:2});
+			return;
+		}
+
+		var opt = '';
+		var selected = '';
+		for(var i=0;i<rdata.versions.length;i++){
+			selected = '';
+			if(rdata.select.version == rdata.versions[i].version) selected = 'selected';
+			opt += '<option value="' + rdata.versions[i].version + '" ' + selected + '>' + rdata.versions[i].name + '</option>';
+		}
+		
+		layer.open({
+			type: 1,
+			area: '530px',
+			title: '设置PHP-CLI(命令行)版本',
+			closeBtn: 1,
+			shift: 5,
+			shadeClose: true,
+			btn:["确定","取消"],
+			content:'<div class="bt-form ptb15">\
+						<p class="line">\
+							<span class="tname text-right">PHP-CLI版本</span>\
+							<select id="default_ver" class="bt-input-text" style="width: 300px;">'+opt+'</select>\
+						</p>\
+						<ul class="help-info-text c6 plr20">\
+						    <li>此处可设置命令行运行php时使用的PHP版本</li>\
+						    <li>安装新的PHP版本后此处需要重新设置</li>\
+						    <li>其它PHP版本在命令行可通过php+版本的方式运行，如：php74,php80</li>\
+					    </ul>\
+					</div>',
+			yes:function(){
+				var name = $("#default_ver").val();
+				var loadT = layer.msg('正在处理,请稍候...',{icon:16,time:0,shade: [0.3, '#000']});
+				$.post('/site/set_cli_php_version','version='+version,function(rdata){
+					layer.msg(rdata.msg,{icon:rdata.status?1:5});
+				},'json');
+			},
+		});
+	},'json');
+}
+
 function setIndexList(id){
 	var Dindex = $("#Dindex").val().replace(new RegExp(/(\n)/g), ",");
 	if(id == undefined ){
