@@ -979,9 +979,10 @@ function setPHPVer(){
 					    </ul>\
 					</div>',
 			yes:function(){
-				var name = $("#default_ver").val();
+				var version = $("#default_ver").val();
 				var loadT = layer.msg('正在处理,请稍候...',{icon:16,time:0,shade: [0.3, '#000']});
 				$.post('/site/set_cli_php_version','version='+version,function(rdata){
+					layer.close(loadT);
 					layer.msg(rdata.msg,{icon:rdata.status?1:5});
 				},'json');
 			},
