@@ -43,7 +43,9 @@ log_by_lua_block {
 	local config = require "webstats_config"
 	local sites = require "webstats_sites"
 
-	local server_name = string.gsub(C:get_sn(ngx.var.server_name),'_','.')
+	-- string.gsub(C:get_sn(ngx.var.server_name),'_','.')
+	local server_name = ngx.var.server_name
+
 
 	C:setConfData(config, sites)
 
