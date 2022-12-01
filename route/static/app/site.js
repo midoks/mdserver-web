@@ -975,7 +975,6 @@ function setPHPVer(){
 						<ul class="help-info-text c6 plr20">\
 						    <li>此处可设置命令行运行php时使用的PHP版本</li>\
 						    <li>安装新的PHP版本后此处需要重新设置</li>\
-						    <li>其它PHP版本在命令行可通过php+版本的方式运行，如：php74,php80</li>\
 					    </ul>\
 					</div>',
 			yes:function(){

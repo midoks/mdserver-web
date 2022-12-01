@@ -147,7 +147,11 @@ class site_api:
         if len(php_versions) < 1:
             return mw.returnJson(False, '未安装PHP,无法设置')
 
-        # if not os.path.exists(php_bin) or not os.path.islink(php_bin):
+        if os.path.exists(php_bin) and os.path.islink(php_bin):
+            link_re = os.readlink(php_bin)
+            for v in php_versions:
+                if link_re.find(v['version']) != -1:
+                    return mw.getJson({"select": v, "versions": php_versions})
 
         return mw.getJson({
             "select": php_versions[0],
