@@ -280,7 +280,7 @@ def reload():
     initDreplace()
     loadDebugLogFile()
 
-    mw.opWeb("reload")
+    mw.opWeb("restart")
     return 'ok'
 
 
