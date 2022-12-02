@@ -110,7 +110,8 @@ yum install -y ImageMagick ImageMagick-devel
 
 yum install -y libzstd-devel
 yum install -y libevent libevent-devel unzip zip
-yum install -y python-imaging libicu-devel  bzip2-devel  pcre pcre-devel
+# yum install -y python-imaging
+yum install -y libicu-devel  bzip2-devel  pcre pcre-devel
 
 yum install -y gd gd-devel
 yum install -y libjpeg-devel libpng-devel libwebp libwebp-devel
