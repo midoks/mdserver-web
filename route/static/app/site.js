@@ -956,6 +956,15 @@ function setPHPVer(){
 		for(var i=0;i<rdata.versions.length;i++){
 			selected = '';
 			if(rdata.select.version == rdata.versions[i].version) selected = 'selected';
+
+			if (rdata.versions[i].version.find("yum")>-1){
+				continue;
+			}
+
+			if (rdata.versions[i].version.find("apt")>-1){
+				continue;
+			}
+
 			opt += '<option value="' + rdata.versions[i].version + '" ' + selected + '>' + rdata.versions[i].name + '</option>';
 		}
 		
