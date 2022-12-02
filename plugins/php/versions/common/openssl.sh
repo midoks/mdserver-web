@@ -63,10 +63,11 @@ Install_lib()
 			mv config0.m4 config.m4
 		fi
 		
-		openssl_version=`pkg-config openssl --modversion`
-		if [ "$version" -lt "70" ];then
-			export PKG_CONFIG_PATH=$serverPath/lib/openssl10/lib/pkgconfig
-		fi
+		# openssl_version=`pkg-config openssl --modversion`
+		export PKG_CONFIG_PATH=$serverPath/lib/openssl10/lib/pkgconfig
+		# if [ "$version" -lt "70" ];then
+		# 	export PKG_CONFIG_PATH=$serverPath/lib/openssl10/lib/pkgconfig
+		# fi
 
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
