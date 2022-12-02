@@ -89,6 +89,21 @@ class config_api:
             return mw.returnJson(True, '修改成功!')
         return mw.returnJson(False, '修改失败!')
 
+    def setPanelDomainApi(self):
+        domain = request.form.get('domain', '')
+
+        cfg_domain = 'data/domain.conf'
+        if domain == '':
+            os.remove(cfg_domain)
+            return mw.returnJson(True, '清空域名成功!')
+
+        reg = r"^([\w\-\*]{1,100}\.){1,4}(\w{1,10}|\w{1,10}\.\w{1,10})$"
+        if not re.match(reg, domain):
+            return mw.returnJson(False, '主域名格式不正确')
+
+        mw.writeFile(cfg_domain, domain)
+        return mw.returnJson(True, '设置域名成功!')
+
     def syncDateApi(self):
         if mw.isAppleSystem():
             return mw.returnJson(True, '开发系统不必同步时间!')

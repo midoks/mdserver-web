@@ -132,6 +132,13 @@
 				<div class="setting-con pd15">
 
 					<p class="mtb15">
+						<span class="set-tit text-right" title="绑定域名" style="float: left;">绑定域名</span>
+ 						<input name="bind_domain" class="inputtxt bt-input-text" type="text" value="{{data['bind_domain']}}">
+		                <button type="button" class="btn btn-success btn-sm ml5 btn_bind_domain" disabled>保存</button>
+						<span class="set-info c7">为面板绑定一个访问域名，<b style="color: red;">注意：一旦绑定域名，只能通过域名访问面板</b></span>
+					</p>
+
+					<p class="mtb15">
 						<span class="set-tit text-right" title="BasicAuth认证" style="float: left;">BasicAuth认证</span>
  						<input class="btswitch btswitch-ios" id="cfg_basic_auth" type="checkbox" {{data['basic_auth']}}/>
 		                <label class="btswitch-btn ml5" for="cfg_basic_auth" style="float: left;margin-top:4px;" onclick="setBasicAuth()"></label>
