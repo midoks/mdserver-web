@@ -42,7 +42,7 @@ Install_lib()
 	fi
 	
 	# cd ${rootPath}/plugins/php/lib && /bin/bash openssl_10.sh
-	if [ "$version" -lt "80" ];then
+	if [ "$version" -lt "81" ];then
 		cd ${rootPath}/plugins/php/lib && /bin/bash openssl_10.sh
 	fi
 
@@ -65,7 +65,7 @@ Install_lib()
 		
 		# openssl_version=`pkg-config openssl --modversion`
 		# export PKG_CONFIG_PATH=$serverPath/lib/openssl10/lib/pkgconfig
-		if [ "$version" -lt "80" ];then
+		if [ "$version" -lt "81" ];then
 			export PKG_CONFIG_PATH=$serverPath/lib/openssl10/lib/pkgconfig
 		fi
 
