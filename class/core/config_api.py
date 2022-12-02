@@ -92,7 +92,7 @@ class config_api:
     def setPanelDomainApi(self):
         domain = request.form.get('domain', '')
 
-        cfg_domain = 'data/domain.conf'
+        cfg_domain = 'data/bind_domain.pl'
         if domain == '':
             os.remove(cfg_domain)
             return mw.returnJson(True, '清空域名成功!')
@@ -628,6 +628,13 @@ class config_api:
                 data['basic_auth'] = 'checked'
         else:
             data['basic_auth'] = ''
+
+        cfg_domain = 'data/bind_domain.pl'
+        if os.path.exists(cfg_domain):
+            domain = mw.readFile(cfg_domain)
+            data['bind_domain'] = domain.strip()
+        else:
+            data['bind_domain'] = ''
 
         api_token = self.__api_addr
         if os.path.exists(api_token):
