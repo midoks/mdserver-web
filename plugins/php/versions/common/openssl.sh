@@ -42,9 +42,9 @@ Install_lib()
 	fi
 	
 	# cd ${rootPath}/plugins/php/lib && /bin/bash openssl_10.sh
-	# if [ "$version" -lt "70" ];then
-		# cd ${rootPath}/plugins/php/lib && /bin/bash openssl_10.sh
-	# fi
+	if [ "$version" -lt "80" ];then
+		cd ${rootPath}/plugins/php/lib && /bin/bash openssl_10.sh
+	fi
 
 	if [ "$sysName" == "Darwin" ] ;then 
 		LIB_DEPEND_DIR=`brew info openssl@1.1 | grep /usr/local/Cellar/openssl | cut -d \  -f 1 | awk 'END {print}'`
@@ -64,10 +64,10 @@ Install_lib()
 		fi
 		
 		# openssl_version=`pkg-config openssl --modversion`
-		export PKG_CONFIG_PATH=$serverPath/lib/openssl10/lib/pkgconfig
-		# if [ "$version" -lt "70" ];then
-		# 	export PKG_CONFIG_PATH=$serverPath/lib/openssl10/lib/pkgconfig
-		# fi
+		# export PKG_CONFIG_PATH=$serverPath/lib/openssl10/lib/pkgconfig
+		if [ "$version" -lt "80" ];then
+			export PKG_CONFIG_PATH=$serverPath/lib/openssl10/lib/pkgconfig
+		fi
 
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
