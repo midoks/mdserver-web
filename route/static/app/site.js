@@ -957,11 +957,11 @@ function setPHPVer(){
 			selected = '';
 			if(rdata.select.version == rdata.versions[i].version) selected = 'selected';
 
-			if (rdata.versions[i].version.find("yum")>-1){
+			if (rdata.versions[i].version.indexOf("yum")>-1){
 				continue;
 			}
 
-			if (rdata.versions[i].version.find("apt")>-1){
+			if (rdata.versions[i].version.indexOf("apt")>-1){
 				continue;
 			}
 
