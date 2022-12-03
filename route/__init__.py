@@ -159,6 +159,10 @@ def requestCheck():
                 or mw.md5(auth.password.strip() + salt) != app.config['BASIC_AUTH_PASSWORD']:
             return sendAuthenticated()
 
+    domain_check = mw.checkDomainPanel()
+    if domain_check:
+        return domain_check
+
 
 def isLogined():
     # print('isLogined', session)

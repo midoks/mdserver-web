@@ -890,6 +890,47 @@ def checkIp(ip):
         return False
 
 
+def getHost(port=False):
+    from flask import request
+    host_tmp = request.headers.get('host')
+    if not host_tmp:
+        if request.url_root:
+            tmp = re.findall(r"(https|http)://([\w:\.-]+)", request.url_root)
+            if tmp:
+                host_tmp = tmp[0][1]
+    if not host_tmp:
+        host_tmp = getLocalIp() + ':' + readFile('data/port.pl').strip()
+    try:
+        if host_tmp.find(':') == -1:
+            host_tmp += ':80'
+    except:
+        host_tmp = "127.0.0.1:8888"
+    h = host_tmp.split(':')
+    if port:
+        return h[-1]
+    return ':'.join(h[0:-1])
+
+
+def getClientIp():
+    from flask import request
+    return request.remote_addr.replace('::ffff:', '')
+
+
+def checkDomainPanel():
+    tmp = getHost()
+    domain = readFile('data/bind_domain.pl')
+    port = readFile('data/port.pl').strip()
+    if domain:
+        client_ip = getClientIp()
+        if client_ip in ['127.0.0.1', 'localhost', '::1']:
+            return False
+        if tmp.strip().lower() != domain.strip().lower():
+            from flask import Flask, redirect, request, url_for
+            to = "http://" + domain + ":" + port
+            return redirect(to, code=302)
+    return False
+
+
 def createLinuxUser(user, group):
     execShell("groupadd {}".format(group))
     execShell('useradd -s /sbin/nologin -g {} {}'.format(user, group))
