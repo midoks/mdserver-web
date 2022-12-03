@@ -27,7 +27,7 @@ from flask import request
 
 class config_api:
 
-    __version = '0.11.1'
+    __version = '0.11.2'
     __api_addr = 'data/api.json'
 
     def __init__(self):
@@ -88,6 +88,21 @@ class config_api:
         if isRe:
             return mw.returnJson(True, '修改成功!')
         return mw.returnJson(False, '修改失败!')
+
+    def setPanelDomainApi(self):
+        domain = request.form.get('domain', '')
+
+        cfg_domain = 'data/bind_domain.pl'
+        if domain == '':
+            os.remove(cfg_domain)
+            return mw.returnJson(True, '清空域名成功!')
+
+        reg = r"^([\w\-\*]{1,100}\.){1,4}(\w{1,10}|\w{1,10}\.\w{1,10})$"
+        if not re.match(reg, domain):
+            return mw.returnJson(False, '主域名格式不正确')
+
+        mw.writeFile(cfg_domain, domain)
+        return mw.returnJson(True, '设置域名成功!')
 
     def syncDateApi(self):
         if mw.isAppleSystem():
@@ -613,6 +628,13 @@ class config_api:
                 data['basic_auth'] = 'checked'
         else:
             data['basic_auth'] = ''
+
+        cfg_domain = 'data/bind_domain.pl'
+        if os.path.exists(cfg_domain):
+            domain = mw.readFile(cfg_domain)
+            data['bind_domain'] = domain.strip()
+        else:
+            data['bind_domain'] = ''
 
         api_token = self.__api_addr
         if os.path.exists(api_token):

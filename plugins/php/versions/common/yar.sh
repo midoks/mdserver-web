@@ -21,6 +21,11 @@ if [ "$version" -lt "70" ];then
 	LIBV=1.2.5
 fi
 
+if [ "$version" -eq "82" ];then
+	echo "wait php82 release"
+	exit 0
+fi
+
 
 LIB_PATH_NAME=lib/php
 if [ -d $serverPath/php/${version}/lib64 ];then

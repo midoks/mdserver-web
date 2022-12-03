@@ -104,18 +104,19 @@ def loadConfigFile():
         listToLuaFile(dst_conf_lua, content)
 
 
-def loadConfigFileReload():
-    lua_dir = getServerDir() + "/lua"
-    conf_tpl = getPluginDir() + "/conf/config.json"
+# def loadConfigFileReload():
+#     -- 配置生活或可使用
+#     lua_dir = getServerDir() + "/lua"
+#     conf_tpl = getPluginDir() + "/conf/config.json"
 
-    content = mw.readFile(conf_tpl)
-    content = json.loads(content)
+#     content = mw.readFile(conf_tpl)
+#     content = json.loads(content)
 
-    dst_conf_json = getServerDir() + "/lua/config.json"
-    mw.writeFile(dst_conf_json, json.dumps(content))
+#     dst_conf_json = getServerDir() + "/lua/config.json"
+#     mw.writeFile(dst_conf_json, json.dumps(content))
 
-    dst_conf_lua = getServerDir() + "/lua/webstats_config.lua"
-    listToLuaFile(dst_conf_lua, content)
+#     dst_conf_lua = getServerDir() + "/lua/webstats_config.lua"
+#     listToLuaFile(dst_conf_lua, content)
 
 
 def loadLuaSiteFile():
@@ -277,11 +278,9 @@ def restart():
 
 def reload():
     initDreplace()
-
-    loadConfigFileReload()
     loadDebugLogFile()
 
-    mw.opWeb("reload")
+    mw.opWeb("restart")
     return 'ok'
 
 

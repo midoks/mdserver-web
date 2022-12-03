@@ -43,7 +43,9 @@ log_by_lua_block {
 	local config = require "webstats_config"
 	local sites = require "webstats_sites"
 
-	local server_name = string.gsub(C:get_sn(ngx.var.server_name),'_','.')
+	-- string.gsub(C:get_sn(ngx.var.server_name),'_','.')
+	local server_name = ngx.var.server_name
+
 
 	C:setConfData(config, sites)
 
@@ -378,6 +380,8 @@ log_by_lua_block {
 				local ok, err = pcall(function() data = C:get_http_origin() end)
 				if ok and not err then
 					kv["request_headers"] = data
+				else
+					C:D("debug request_headers error:"..tostring(err))
 				end
 			end
 
@@ -644,11 +648,7 @@ log_by_lua_block {
 	local function run_app_ok()
 		if not debug_mode then return run_app() end
 
-		local presult, err = pcall(
-			function() 
-				run_app()
-			end
-		)
+		local presult, err = pcall( function() run_app() end)
 		if not presult then
 			C:D("debug error on :"..tostring(err))
 			return true

@@ -15,6 +15,8 @@ if [ ! -d $GIT_PROJECT_DIR ];then
 fi
 
 unset GIT_DIR
+git config pull.rebase false
+
 cd $GIT_PROJECT_DIR && git pull
 
 # func 2

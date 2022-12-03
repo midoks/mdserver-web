@@ -47,11 +47,14 @@ else
     echo "OK"
 fi
 
-
 #面板需要的库
 if [ ! -f /usr/local/bin/pip3 ];then
-    # python3 -m pip install --upgrade pip setuptools wheel -i https://mirrors.aliyun.com/pypi/simple
-    python3 -m pip install --upgrade pip setuptools wheel -i https://pypi.python.org/pypi
+    cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
+    if [ ! -z "$cn" ];then
+        python3 -m pip install --upgrade pip setuptools wheel -i https://mirrors.aliyun.com/pypi/simple
+    else
+        python3 -m pip install --upgrade pip setuptools wheel -i https://pypi.python.org/pypi
+    fi
 fi
 
 which pip && pip install --upgrade pip

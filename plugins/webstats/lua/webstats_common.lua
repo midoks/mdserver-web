@@ -106,9 +106,8 @@ end
 
 function _M.get_domain(self)
     local domain = ngx.req.get_headers()['host']
-    if domain ~= nil then
-        domain = ngx.re.gsub(domain, "_", ".")
-    else
+     -- domain = ngx.re.gsub(domain, "_", ".")
+    if domain == nil then
         domain = "unknown"
     end
     return domain
@@ -201,9 +200,11 @@ end
 
 function _M.get_http_origin(self)
     local data = ""
-    local headers = request_header
+    local headers = ngx.req.get_headers()
     if not headers then return data end
     if method ~='GET' then 
+        -- API disabled in the context of log_by_lua*
+        -- ngx.req.read_body()
         data = ngx.req.get_body_data()
         if not data then
             data = ngx.req.get_post_args(1000000)

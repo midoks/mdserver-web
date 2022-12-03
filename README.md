@@ -79,7 +79,6 @@ PHP[72-81]支持phpMyAdmin[5.2.0]
 | 服务商			| 	LOGO   |  推广地址  | 优惠码 |
 | ------------- |----------|-----------|-------|
 | digitalvirt	|[![digitalvirt](https://digitalvirt.com/templates/BlueWhite/img/logo-dark.svg)](https://digitalvirt.com/aff.php?aff=154) | https://digitalvirt.com/aff.php?aff=154 | mdserver-web |
-| 搬瓦工	|[![搬瓦工](https://bwh81.net/templates/organicbandwagon/images/logo.png)](https://bwh81.net/aff.php?aff=54161) | https://bwh81.net/aff.php?aff=54161 | BWH3HYATVBJW |
 
 # Docker
 
@@ -91,15 +90,15 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.11.1
+### 版本更新 0.11.2
 
-* 提供面板API接口访问的支持。
-* rockylinux系统安装优化。
-* 网站统计记录POST请求原文优化。
-* 针对mysql下载速度优化。
-* mysql初始化默认参数优化。
-* OP防火墙安全设置BUG解决。
+* redis安全强化。
+* 添加php命令行设置。
+* 域名绑定。
 * Gitea优化。
+* 网站统计优化。
+* centos9下php-gd安装优化。
+* php82rc7测试版。
 
 
 ### JSDelivr安装地址

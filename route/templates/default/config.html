@@ -34,15 +34,6 @@
 	                    </div>
 	                </div>
 
-	                <!--
-					<div class="ss-text pull-left mr50">
-						<em class="btlink" style="color: #20a53a;" onclick="getPanelSSL()" title="点击自定义面板证书">面板SSL</em>
-						<div class='ssh-item'>
-							<input class='btswitch btswitch-ios' id='panelSSL' type='checkbox' {{data['ssl']}}>
-							<label class='btswitch-btn' for='panelSSL' onclick="setPanelSSL()"></label>
-						</div>
-					</div>
-					-->
 				</div>
 			</div>
 			<div class="setbox bgw mtb15">
@@ -81,14 +72,6 @@
 							<button type="button" class="btn btn-success btn-sm ml5" onclick="modifyAuthPath()">设置</button>
 							<span class="set-info c7">面板管理入口,设置后只能通过指定安全入口登录面板,如: /abc</span>
 						</p>
-
-						<!--
-						<p class="mtb15">
-							<span class="set-tit text-right">域名</span>
-							<input name="domain" class="inputtxt bt-input-text" type="text" value="">
-							<span class="set-info c7">为面板绑定一个访问域名;注意：一旦绑定域名,只能通过域名访问面板!</span>
-						</p>
-						-->
 
 						<p class="mtb15">
 							<span class="set-tit text-right" title="默认建站目录">默认建站目录</span>
@@ -130,6 +113,21 @@
 				</div>
 
 				<div class="setting-con pd15">
+
+					<p class="mtb15">
+						<span class="set-tit text-right" title="绑定域名" style="float: left;">绑定域名</span>
+ 						<input name="bind_domain" class="inputtxt bt-input-text" type="text" value="{{data['bind_domain']}}">
+		                <button type="button" class="btn btn-success btn-sm ml5 btn_bind_domain" disabled>保存</button>
+						<span class="set-info c7">为面板绑定一个访问域名，<b style="color: red;">注意：一旦绑定域名，只能通过域名访问面板</b></span>
+					</p>
+
+					<!-- <p class="mtb15">
+						<span class="set-tit text-right" title="面板SSL" style="float: left;">面板SSL</span>
+ 						<input id="cfg_ssl" name="bind_ssl" class="btswitch btswitch-ios" type="checkbox" {{data['ssl']}}>
+ 						<label class="btswitch-btn ml5" for="cfg_ssl" style="float: left;margin-top:4px;" onclick="getPanelSSL()"></label>
+		                <button ype="button" class="btn btn-default btn-xs panel_api_btn" style="vertical-align: middle; margin-left: 10px" onclick="getPanelSSL();">面板SSL配置</button>
+						<span class="set-info c7">为面板设置https协议访问，提升面板访问<b style="color: red;">安全性</b></span>
+					</p> -->
 
 					<p class="mtb15">
 						<span class="set-tit text-right" title="BasicAuth认证" style="float: left;">BasicAuth认证</span>

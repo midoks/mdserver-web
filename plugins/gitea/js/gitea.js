@@ -1,19 +1,9 @@
 
-function str2Obj(str){
-    var data = {};
-    kv = str.split('&');
-    for(i in kv){
-        v = kv[i].split('=');
-        data[v[0]] = v[1];
-    }
-    return data;
-}
-
 function gogsPost(method,args,callback, title){
 
     var _args = null; 
     if (typeof(args) == 'string'){
-        _args = JSON.stringify(str2Obj(args));
+        _args = JSON.stringify(toArrayObject(args));
     } else {
         _args = JSON.stringify(args);
     }
@@ -186,6 +176,28 @@ function giteaUserList(page, search) {
 }
 
 function userProjectList(user, search){
+    var loadOpen = layer.open({
+        type: 1,
+        title: '用户('+user+')项目列表',
+        area: '500px',
+        content:"<div class='bt-form pd20 c6'>\
+                    <div>\
+                        <div id='gitea_table' class='divtable' style='margin-top:5px;'>\
+                            <table class='table table-hover'>\
+                                <thead><tr><th>项目</th><th>操作</th></tr></thead>\
+                                <tbody></tbody>\
+                            </table>\
+                            <div class='dataTables_paginate paging_bootstrap pagination' style='margin-top:0px;'><ul id='gitea_page' class='page'></ul></div>\
+                        </div>\
+                    </div>\
+                </div>",
+        success:function(){
+            userProjectListPost(user,search);
+        }
+    });
+}
+
+function userProjectListPost(user, search){
     var req = {};
     if (!isNaN(user)){
         req['page'] = user;
@@ -201,8 +213,7 @@ function userProjectList(user, search){
     if(typeof(search) != 'undefined'){
         req['search'] = search;
     }
-
-    $('.layui-layer-close1').click();
+    
     gogsPost('user_project_list', req, function(data){
         var rdata = [];
         try {
@@ -227,24 +238,10 @@ function userProjectList(user, search){
                 </tr>';
         }
 
-        var page = '<div class="dataTables_paginate paging_bootstrap pagination" style="margin-top:0px;"><ul id="softPage" class="page"><div>';
-        page += rdata['data']['list'];
-        page += '</div></ul></div>';
+        $('#gitea_table tbody').html(list);
 
-        var loadOpen = layer.open({
-            type: 1,
-            title: '用户('+user+')项目列表',
-            area: '500px',
-            content:"<div class='bt-form pd20 c6'>\
-                    <div>\
-                            <div class='divtable' style='margin-top:5px;'>\
-                                <table class='table table-hover'>\
-                                    <thead><tr><th>项目</th><th>操作</th></tr></thead>\
-                                    <tbody>" + list + "</tbody>\
-                                </table>" + 
-                                page +
-                    "</div></div></div>"
-        });
+        var page = rdata['data']['list'];
+        $('#gitea_table .gitea_page').html(page);
     });
 }
 
@@ -253,23 +250,41 @@ function projectScript(user, name,has_hook){
     // console.log(user,name,has_hook);
     var html = '';
     if (has_hook){
-        html += '<button onclick="projectScriptEdit(\''+user+'\',\''+name+'\')" class="btn btn-default btn-sm">手动编辑</button>';
-        html += '<button onclick="projectScriptDebug(\''+user+'\',\''+name+'\')" class="btn btn-default btn-sm">调试日志</button>';
-        html += '<button onclick="projectScriptLoad(\''+user+'\',\''+name+'\')" class="btn btn-default btn-sm">重新加载</button>';
-        html += '<button onclick="projectScriptUnload(\''+user+'\',\''+name+'\')" class="btn btn-default btn-sm">卸载脚本</button>';
+        html += '<button class="btn btn-default btn-sm hook_edit">手动编辑</button>';
+        html += '<button class="btn btn-default btn-sm hook_log">调试日志</button>';
+        html += '<button class="btn btn-default btn-sm hook_load">重新加载</button>';
+        html += '<button class="btn btn-default btn-sm hook_unload">卸载脚本</button>';
     } else {
-        html += '<button onclick="projectScriptLoad(\''+user+'\',\''+name+'\')" class="btn btn-default btn-sm">加载脚本</button>';
+        html += '<button class="btn btn-default btn-sm hook_load">加载脚本</button>';
     }
 
     var loadOpen = layer.open({
         type: 1,
         title: '['+user+']['+name+']脚本设置',
         area: '240px',
-        content:'<div class="change-default pd20">'+html+'</div>'
+        content:'<div class="change-default pd20">'+html+'</div>',
+        success:function(layero,index) {
+
+            $('.hook_edit').click(function(){
+                projectScriptEdit(user,name,index);
+            });
+
+            $('.hook_log').click(function(){
+                projectScriptDebug(user,name,index);
+            });
+
+            $('.hook_load').click(function(){
+                projectScriptLoad(user,name,index);
+            });
+
+            $('.hook_unload').click(function(){
+                projectScriptUnload(user,name,index);
+            });
+        }
     });
 }
 
-function projectScriptEdit(user,name){
+function projectScriptEdit(user,name,index){
     gogsPost('project_script_edit', {'user':user,'name':name}, function(data){
         var rdata = $.parseJSON(data.data);
         if (rdata['status']){
@@ -280,41 +295,42 @@ function projectScriptEdit(user,name){
     });
 }
 
-function projectScriptLoad(user,name){
+function projectScriptLoad(user,name,index){
     gogsPost('project_script_load', {'user':user,'name':name}, function(data){
         if (data.data != 'ok'){
             layer.msg(data.data,{icon:0,time:2000,shade: [0.3, '#000']});
             return;
         }
 
-        layer.msg('加载成功!',{icon:1,time:2000,shade: [0.3, '#000']});
-        setTimeout(function(){
-            userProjectList(1);
-        }, 2000);
+        showMsg('加载成功!',function(){
+            layer.close(index);
+            userProjectListPost(1);
+        },{icon:1,time:2000,shade: [0.3, '#000']},2000);
     });
 }
 
-function projectScriptUnload(user,name){
+function projectScriptUnload(user,name,index){
     gogsPost('project_script_unload', {'user':user,'name':name}, function(data){
         if (data.data != 'ok'){
             layer.msg(data.data,{icon:0,time:2000,shade: [0.3, '#000']});
             return;
         }
 
-        layer.msg('卸载成功!',{icon:1,time:2000,shade: [0.3, '#000']});
-        setTimeout(function(){
-            userProjectList(1);
-        }, 2000);
+        showMsg('卸载成功!',function(){
+            layer.close(index);
+            userProjectListPost(1);
+        },{icon:1,time:2000,shade: [0.3, '#000']},2000);
     });
 } 
 
-function projectScriptDebug(user,name){
+function projectScriptDebug(user,name,index){
     gogsPost('project_script_debug', {'user':user,'name':name}, function(data){
         var rdata = $.parseJSON(data.data);
         if (rdata['status']){
             onlineEditFile(0, rdata['path']);
         } else {
-            layer.msg(rdata.msg,{icon:1,time:2000,shade: [0.3, '#000']});
+            showMsg(rdata.msg,function(){
+            },{icon:1,time:2000,shade: [0.3, '#000']},2000);
         }        
     });
 }

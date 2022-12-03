@@ -66,6 +66,16 @@ $('input[name="backup_path"]').change(function(){
 });
 
 
+$('input[name="bind_domain"]').change(function(){
+	var domain = $(this).val();
+	console.log(domain);
+	$('.btn_bind_domain').removeAttr('disabled');
+	$('.btn_bind_domain').unbind().click(function(){
+		$.post('/config/set_panel_domain','domain='+domain, function(rdata){
+			showMsg(rdata.msg,function(){window.location.reload();},{icon:rdata.status?1:2},2000);
+		},'json');
+	});
+});
 
 /** op **/
 
@@ -734,4 +744,3 @@ function setPanelApi(){
 		} ,{icon:rdata.status?1:2}, 1000);
 	},'json');
 }
-

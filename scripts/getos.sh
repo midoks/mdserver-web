@@ -38,4 +38,10 @@ else
     OSNAME='unknow'
 fi
 
-echo "$OSNAME" > /www/server/mdserver-web/data/osname.pl
+if [ -d /www/server/mdserver-web ];then
+    echo "$OSNAME" > /www/server/mdserver-web/data/osname.pl
+fi
+
+if [ "$OSNAME" == "macos" ];then
+    echo "$OSNAME"
+fi

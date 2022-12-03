@@ -159,6 +159,10 @@ def requestCheck():
                 or mw.md5(auth.password.strip() + salt) != app.config['BASIC_AUTH_PASSWORD']:
             return sendAuthenticated()
 
+    domain_check = mw.checkDomainPanel()
+    if domain_check:
+        return domain_check
+
 
 def isLogined():
     # print('isLogined', session)
@@ -483,8 +487,8 @@ def index(reqClass=None, reqAction=None, reqData=None):
         # 登录页
         if reqClass == 'login':
 
-            dologin = request.args.get('dologin', '')
-            if dologin == 'True':
+            signout = request.args.get('signout', '')
+            if signout == 'True':
                 session.clear()
                 session['login'] = False
                 session['overdue'] = 0

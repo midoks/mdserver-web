@@ -139,6 +139,58 @@ class site_api:
         data['default_site'] = mw.readFile('data/default_site.pl')
         return mw.getJson(data)
 
+    def getCliPhpVersionApi(self):
+        php_bin = '/usr/bin/php'
+        php_versions = self.getPhpVersion()
+        php_versions = php_versions[1:]
+
+        if len(php_versions) < 1:
+            return mw.returnJson(False, '未安装PHP,无法设置')
+
+        if os.path.exists(php_bin) and os.path.islink(php_bin):
+            link_re = os.readlink(php_bin)
+            for v in php_versions:
+                if link_re.find(v['version']) != -1:
+                    return mw.getJson({"select": v, "versions": php_versions})
+
+        return mw.getJson({
+            "select": php_versions[0],
+            "versions": php_versions})
+
+    def setCliPhpVersionApi(self):
+        if mw.isAppleSystem():
+            return mw.returnJson(False, "开发机不可设置!")
+
+        version = request.form.get('version', '')
+
+        php_bin = '/usr/bin/php'
+        php_bin_src = "/www/server/php/%s/bin/php" % version
+        php_ize = '/usr/bin/phpize'
+        php_ize_src = "/www/server/php/%s/bin/phpize" % version
+        php_fpm = '/usr/bin/php-fpm'
+        php_fpm_src = "/www/server/php/%s/sbin/php-fpm" % version
+        php_pecl = '/usr/bin/pecl'
+        php_pecl_src = "/www/server/php/%s/bin/pecl" % version
+        php_pear = '/usr/bin/pear'
+        php_pear_src = "/www/server/php/%s/bin/pear" % version
+        if not os.path.exists(php_bin_src):
+            return mw.returnJson(False, '指定PHP版本未安装!')
+
+        is_chattr = mw.execShell('lsattr /usr|grep /usr/bin')[0].find('-i-')
+        if is_chattr != -1:
+            mw.execShell('chattr -i /usr/bin')
+        mw.execShell("rm -f " + php_bin + ' ' + php_ize + ' ' +
+                     php_fpm + ' ' + php_pecl + ' ' + php_pear)
+        mw.execShell("ln -sf %s %s" % (php_bin_src, php_bin))
+        mw.execShell("ln -sf %s %s" % (php_ize_src, php_ize))
+        mw.execShell("ln -sf %s %s" % (php_fpm_src, php_fpm))
+        mw.execShell("ln -sf %s %s" % (php_pecl_src, php_pecl))
+        mw.execShell("ln -sf %s %s" % (php_pear_src, php_pear))
+        if is_chattr != -1:
+            mw.execShell('chattr +i /usr/bin')
+        mw.writeLog('面板设置', '设置PHP-CLI版本为: %s' % version)
+        return mw.returnJson(True, '设置成功!')
+
     def setPsApi(self):
         mid = request.form.get('id', '')
         ps = request.form.get('ps', '')
@@ -266,7 +318,8 @@ class site_api:
         return mw.returnJson(True, '站点删除成功!')
 
     def getPhpVersionApi(self):
-        return self.getPhpVersion()
+        data = self.getPhpVersion()
+        return mw.getJson(data)
 
     def setPhpVersionApi(self):
         siteName = request.form.get('siteName', '')
@@ -2311,7 +2364,7 @@ location ^~ {from} {\n\
             tmp['name'] = 'PHP-' + matchVer
             data.append(tmp)
 
-        return mw.getJson(data)
+        return data
 
     # 是否跳转到https
     def isToHttps(self, siteName):

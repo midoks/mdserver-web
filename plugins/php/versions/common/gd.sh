@@ -18,9 +18,16 @@ LIBNAME=gd
 LIBV=0
 
 
-if [ "$version" -lt "74" ];then
-	bash $curPath/gd_old.sh $1 $2
-	exit 0
+bash ${rootPath}/scripts/getos.sh
+OSNAME=`cat ${rootPath}/data/osname.pl`
+OSNAME_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
+
+
+if [ "centos" == "$OSNAME" ] || [ "OSNAME_ID" != "9" ];then
+	if [ "$version" -lt "74" ];then
+		bash $curPath/gd_old.sh $1 $2
+		exit 0
+	fi
 fi
 
 

@@ -101,7 +101,7 @@ def getHomeDir():
             "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
         return '/Users/' + user
     else:
-        return 'git'
+        return 'www'
 
 
 def getRunUser():
@@ -110,7 +110,7 @@ def getRunUser():
             "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
         return user
     else:
-        return 'git'
+        return 'www'
 
 __SR = '''#!/bin/bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
@@ -134,6 +134,10 @@ def initDreplace():
 
     file_tpl = getInitdConfTpl()
     service_path = mw.getServerDir()
+
+    git_dir = mw.getServerDir() + '/git'
+    if not os.path.exists(git_dir):
+        mw.execShell('mkdir -p ' + git_dir)
 
     initD_path = getServerDir() + '/init.d'
     if not os.path.exists(initD_path):
@@ -445,7 +449,7 @@ def submitGogsConf():
             val = g + ' = ' + args[g]
             conf = re.sub(rep, val, conf)
     mw.writeFile(filename, conf)
-    reload()
+    restart()
     return mw.returnJson(True, '设置成功')
 
 
@@ -515,7 +519,7 @@ def checkProjectListIsHasScript(user, data):
     path = getRootPath() + '/' + user
     for x in range(len(data)):
         name = data[x]['name'] + '.git'
-        path_tmp = path + '/' + name + '/custom_hooks/post-receive'
+        path_tmp = path + '/' + name + '/hooks/post-receive.d/post-receive'
         if os.path.exists(path_tmp):
             data[x]['has_hook'] = True
         else:
@@ -593,15 +597,17 @@ def projectScriptLoad():
 
     path = getRootPath() + '/' + user + '/' + name
     post_receive_tpl = getPluginDir() + '/hook/post-receive.tpl'
-    post_receive = path + '/custom_hooks/post-receive'
+    post_receive = path + '/hooks/post-receive.d/post-receive'
 
     if not os.path.exists(path + '/custom_hooks'):
         mw.execShell('mkdir -p ' + path + '/custom_hooks')
+        mw.execShell('chown -R www:www ' + path + '/custom_hooks')
 
     pct_content = mw.readFile(post_receive_tpl)
     pct_content = pct_content.replace('{$PATH}', path + '/custom_hooks')
     mw.writeFile(post_receive, pct_content)
     mw.execShell('chmod 777 ' + post_receive)
+    mw.execShell('chown -R www:www ' + post_receive)
 
     commit_tpl = getPluginDir() + '/hook/commit.tpl'
     commit = path + '/custom_hooks/commit'
@@ -618,6 +624,7 @@ def projectScriptLoad():
     cc_content = cc_content.replace('{$WEB_ROOT}', mw.getWwwDir())
     mw.writeFile(commit, cc_content)
     mw.execShell('chmod 777 ' + commit)
+    mw.execShell('chown -R www:www ' + commit)
 
     return 'ok'
 
@@ -632,7 +639,7 @@ def projectScriptUnload():
     name = args['name'] + '.git'
 
     post_receive = getRootPath() + '/' + user + '/' + name + \
-        '/custom_hooks/post-receive'
+        '/hooks/post-receive.d/post-receive'
     mw.execShell('rm -f ' + post_receive)
 
     commit = getRootPath() + '/' + user + '/' + name + \
@@ -697,6 +704,15 @@ def getTotalStatistics():
     return mw.returnJson(False, 'fail', data)
 
 
+def uninstallPreInspection():
+    repo_dir = getServerDir() + "/data/gitea-repositories"
+    if not os.path.exists(repo_dir):
+        return 'ok'
+    dir_list = os.listdir(repo_dir)
+    if len(dir_list) > 0:
+        return "有项目数据!请手动删除Gitea<br/> rm -rf {}".format(getServerDir())
+    return 'ok'
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -715,6 +731,8 @@ if __name__ == "__main__":
         print(initdInstall())
     elif func == 'initd_uninstall':
         print(initdUinstall())
+    elif func == 'uninstall_pre_inspection':
+        print(uninstallPreInspection())
     elif func == 'run_log':
         print(runLog())
     elif func == 'post_receive_log':

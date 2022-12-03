@@ -52,10 +52,11 @@ Install_lib()
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config
 
-		FIND_C99=`cat Makefile|grep c99`
-		if [ "$FIND_C99" == "" ];then
-			sed -i $BAK 's/CFLAGS \=/CFLAGS \= -std=c99/g' Makefile
-		fi
+		# PHP52需要,因为52关闭。所有注释掉
+		# FIND_C99=`cat Makefile|grep c99`
+		# if [ "$FIND_C99" == "" ];then
+		# 	sed -i $BAK 's/CFLAGS \=/CFLAGS \= -std=c99/g' Makefile
+		# fi
 
 		make clean && make && make install && make clean
 		
