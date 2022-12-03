@@ -289,7 +289,7 @@ function openFilename(obj){
 	var ext = getSuffixName(path);
 
 	// console.log(path,ext);
-	if (inArray(ext,['html','htm','php','txt','md','js','css','scss','json','c','h','pl','py','java','log','conf'])){
+	if (inArray(ext,['html','htm','php','txt','md','js','css','scss','json','c','h','pl','py','java','log','conf','sh','json'])){
 		onlineEditFile(0, path);
 	}
 
@@ -317,6 +317,10 @@ function openFilename(obj){
 	}
 }
 
+function searchFile(p){
+	getFiles(p);
+}
+
 //取数据
 function getFiles(Path) {
 	var searchtype = Path;
@@ -342,7 +346,14 @@ function getFiles(Path) {
 	var data = 'path=' + Path;
 	var loadT = layer.load();
 	var totalSize = 0;
-	$.post('/files/get_dir?p=' + p + '&showRow=' + showRow + search, data, function(rdata) {
+
+	var search_all = '';
+	var all = $('#search_all').hasClass('active');
+	if(all){
+		search_all = "&all=yes";
+	}
+	
+	$.post('/files/get_dir?p=' + p + '&showRow=' + showRow + search + search_all, data, function(rdata) {
 		layer.close(loadT);
 		
 		var rows = ['10','50','100','200','500','1000','2000'];
@@ -444,8 +455,7 @@ function getFiles(Path) {
 					<a class='btlink' href='javascript:;' onclick=\"cutFile('" + rdata.PATH +"/"+ fmp[0] + "')\">剪切</a> | \
 					<a class='btlink' href='javascript:;' onclick=\"reName(0,'" + fmp[0] + "')\">重命名</a> | \
 					<a class='btlink' href=\"javascript:setChmod(0,'" + rdata.PATH +"/"+ fmp[0] + "');\">权限</a> | \
-					<a class='btlink' href=\"javascript:zip('" + rdata.PATH +"/" +fmp[0] + "');\">压缩</a> | \
-					"+bodyZip+download+"\
+					<a class='btlink' href=\"javascript:zip('" + rdata.PATH +"/" +fmp[0] + "');\">压缩</a> | "+bodyZip+download+"\
 					<a class='btlink' href='javascript:;' onclick=\"deleteFile('" + rdata.PATH +"/"+ fmp[0] + "')\">删除</a>\
 					</span></td>\
 				</tr>";
@@ -459,9 +469,9 @@ function getFiles(Path) {
 				</div>";
 			}
 		}
-		var dirInfo = '(共{1}个目录与{2}个文件,大小:'.replace('{1}',rdata.DIR.length+'').replace('{2}',rdata.DIR.length+'')+'<font id="pathSize">'
+		var dirInfo = '(共{1}个目录与{2}个文件,大小:'.replace('{1}',rdata.DIR.length+'').replace('{2}',rdata.FILES.length+'')+'<font id="pathSize">'
 			+ (toSize(totalSize))+'<a class="btlink ml5" onClick="getPathSize()">获取</a></font>)';
-		$("#DirInfo").html(dirInfo);
+		$("#dir_info").html(dirInfo);
 		if( getCookie('rank') == 'a' ){
 			var tablehtml = '<table width="100%" border="0" cellpadding="0" cellspacing="0" class="table table-hover">\
 						<thead>\
@@ -791,7 +801,7 @@ function getSuffixName(fileName){
 	'gif','ico','jpeg','jpg','JPG','png','psd','webp','ape','avi','flv','mkv','mov','mp3','mp4','mpeg',
 	'mpg','rm','rmvb','swf','wav','webm','wma','wmv','doc','docm','dotx','dotm','dot','rtf','docx','pdf',
 	'fdf','ppt','pptm','pot','potm','pptx','txt','xls','csv','xlsm','xlsb','xlsx','7z','gz','cab','iso',
-	'rar','zip','bt','file','apk','css','scss','svg','pl','py','php','md'];
+	'rar','zip','bt','file','apk','css','scss','svg','pl','py','php','md','json','sh'];
 	var extLastName = extArr[extArr.length - 1];
 	for(var i=0; i<exts.length; i++){
 		if(exts[i]==extLastName){
