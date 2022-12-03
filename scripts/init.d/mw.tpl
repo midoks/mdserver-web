@@ -182,6 +182,13 @@ mw_open()
     fi
 }
 
+mw_unbind_domain()
+{
+    if [ -f $mw_path/data/bind_domain.pl ];then
+        rm -rf $mw_path/data/bind_domain.pl
+    fi
+}
+
 error_logs()
 {
 	tail -n 100 $mw_path/logs/error.log
@@ -271,6 +278,7 @@ case "$1" in
     'update_dev') mw_update_dev;;
     'install_app') mw_install_app;;
     'close_admin_path') mw_close_admin_path;;
+    'unbind_domain') mw_unbind_domain;;
     'debug') mw_debug;;
     'default')
         cd $mw_path
