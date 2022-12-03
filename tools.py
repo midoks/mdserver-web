@@ -110,6 +110,7 @@ def mwcli(mw_input=0):
             os.remove(basic_auth)
             os.system(INIT_CMD + " restart")
             print("|-关闭basic_auth成功")
+    elif mw_input == 21:
         bind_domain = 'data/bind_domain.pl'
         if os.path.exists(bind_domain):
             os.remove(bind_domain)

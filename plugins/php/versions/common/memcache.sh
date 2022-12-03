@@ -17,10 +17,13 @@ sysName=`uname`
 actionType=$1
 version=$2
 
-if [ "$version" -gt "56" ];then
-	echo "not need"
-	exit 1
-fi 
+if [ "$version" -gt "56" ] && [ "$version" -lt "80" ];then
+	LIBV=4.0.5.2
+fi
+
+if [ "$version" -gt "74" ];then
+	LIBV=8.0
+fi
 
 
 LIB_PATH_NAME=lib/php
