@@ -23,14 +23,11 @@ elif [ "$version" == "70" ];then
 	LIBV=4.3.0
 elif [ "$version" == "71" ];then
 	LIBV=4.5.2
+elif [ "$version" -gt "74" ];then
+	LIBV=5.0.1
 else
-	echo '72+'
+	echo 'other?'
 fi
-
-# if [ "$version" -eq "82" ];then
-# 	echo "not need"
-# 	exit 1
-# fi
 
 LIB_PATH_NAME=lib/php
 if [ -d $serverPath/php/${version}/lib64 ];then
