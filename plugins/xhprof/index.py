@@ -71,7 +71,6 @@ def getHomePage():
 def getPhpVer(expect=56):
     import json
     v = site_api.site_api().getPhpVersion()
-    v = json.loads(v)
     for i in range(len(v)):
         t = int(v[i]['version'])
         if (t >= expect):
