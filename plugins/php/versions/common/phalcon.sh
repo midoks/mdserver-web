@@ -17,10 +17,15 @@ version=$2
 LIBNAME=phalcon
 LIBV=4.1.2
 
+if [ "$version" -lt "73" ];then
+	echo "not support!"
+	exit 1
+else
+
 if [ "$version" -gt "74" ];then
 	LIBV=5.1.2
 else
-	echo 'other?'
+	echo "not support!"
 fi
 
 LIB_PATH_NAME=lib/php
