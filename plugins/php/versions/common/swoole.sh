@@ -19,10 +19,10 @@ LIBV=4.8.10
 
 if [ "$version" -lt "70" ];then
 	LIBV=1.10.1
-elif [ "$version" == "71" ];then
-	LIBV=4.5.2
 elif [ "$version" == "70" ];then
 	LIBV=4.3.0
+elif [ "$version" == "71" ];then
+	LIBV=4.5.2
 else
 	echo '72+'
 fi
