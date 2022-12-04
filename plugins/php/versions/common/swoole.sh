@@ -27,10 +27,10 @@ else
 	echo '72+'
 fi
 
-if [ "$version" -eq "82" ];then
-	echo "not need"
-	exit 1
-fi
+# if [ "$version" -eq "82" ];then
+# 	echo "not need"
+# 	exit 1
+# fi
 
 LIB_PATH_NAME=lib/php
 if [ -d $serverPath/php/${version}/lib64 ];then
