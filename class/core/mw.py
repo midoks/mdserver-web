@@ -1287,8 +1287,8 @@ def getSSHPort():
     try:
         file = '/etc/ssh/sshd_config'
         conf = readFile(file)
-        rep = "#*Port\s+([0-9]+)\s*\n"
-        port = re.search(rep, conf).groups(0)[0]
+        rep = "(#*)?Port\s+([0-9]+)\s*\n"
+        port = re.search(rep, conf).groups(0)[1]
         return int(port)
     except:
         return 22
