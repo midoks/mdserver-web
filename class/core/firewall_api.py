@@ -356,7 +356,7 @@ class firewall_api:
                 mw.execShell('/etc/init.d/iptables stop')
         else:
             if self.__isUfw:
-                mw.execShell("echo 'y'|sudo ufw enable")
+                mw.execShell("echo 'y'| ufw enable")
             if self.__isFirewalld:
                 mw.execShell('systemctl start firewalld.service')
                 mw.execShell('systemctl enable firewalld.service')
