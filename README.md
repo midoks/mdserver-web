@@ -170,6 +170,8 @@ curl -fsSL https://gitee.com/midoks/mdserver-web/raw/dev/scripts/update_dev.sh |
 
 TVbNgrpeGBGZVm5gTLa21ADP7RpnPFhjya
 
+日行一善，以后必定大富大贵
+
 
 ### 微信赞助
 
