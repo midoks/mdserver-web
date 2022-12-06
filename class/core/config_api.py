@@ -388,17 +388,17 @@ class config_api:
         sslConf = mw.getRunDir() + '/data/ssl.pl'
         if os.path.exists(sslConf):
             os.system('rm -f ' + sslConf)
+            mw.restartMw()
             return mw.returnJson(True, 'SSL已关闭，请使用http协议访问面板!')
         else:
-            # os.system('pip install cffi==1.10')
-            # os.system('pip install cryptography==2.1')
-            # os.system('pip install pyOpenSSL==16.2')
             try:
-                if not mw.createSSL():
-                    return mw.returnJson(False, '开启失败，无法自动安装pyOpenSSL组件!<p>请尝试手动安装: pip install pyOpenSSL</p>')
+                if not os.path.exists('ssl/input.ssl'):
+                    mw.createSSL()
                 mw.writeFile(sslConf, 'True')
             except Exception as ex:
-                return mw.returnJson(False, '开启失败，无法自动安装pyOpenSSL组件!<p>请尝试手动安装: pip install pyOpenSSL</p>')
+                return mw.returnJson(False, '开启失败:' + str(ex))
+
+            mw.restartMw()
             return mw.returnJson(True, '开启成功，请使用https协议访问面板!')
 
     def getApi(self):
