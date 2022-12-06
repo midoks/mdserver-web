@@ -944,10 +944,13 @@ class files_api:
             link = ''
             if os.path.islink(filename):
                 link = ' -> ' + os.readlink(filename)
+
             if path:
                 tmp_path = (path + '/').replace('//', '/')
                 if tmp_path != '/':
                     filename = filename.replace(tmp_path, '', 1)
+
+            filename = filename.replace('//', '/')
             return filename + ';' + size + ';' + mtime + ';' + accept + ';' + user + ';' + link
         except Exception as e:
             # print(e)
