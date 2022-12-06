@@ -931,6 +931,7 @@ class files_api:
         return mw.getJson(data)
 
     def __get_stats(self, filename, path=None):
+        filename = filename.replace('//', '/')
         try:
             stat = os.stat(filename)
             accept = str(oct(stat.st_mode)[-3:])
@@ -947,11 +948,8 @@ class files_api:
 
             if path:
                 tmp_path = (path + '/').replace('//', '/')
-                if tmp_path != '/':
-                    filename = filename.replace(tmp_path, '', 1)
+                filename = filename.replace(tmp_path, '', 1)
 
-            filename = filename.replace('//', '/')
-            filename = filename.replace('/', '')
             return filename + ';' + size + ';' + mtime + ';' + accept + ';' + user + ';' + link
         except Exception as e:
             # print(e)
