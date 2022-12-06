@@ -1371,8 +1371,8 @@ def createSSL():
     private_key = OpenSSL.crypto.dump_privatekey(
         OpenSSL.crypto.FILETYPE_PEM, key)
     if len(cert_ca) > 100 and len(private_key) > 100:
-        writeFile('ssl/certificate.pem', cert_ca, 'wb+')
-        writeFile('ssl/privateKey.pem', private_key, 'wb+')
+        writeFile('ssl/cert.pem', cert_ca, 'wb+')
+        writeFile('ssl/private.pem', private_key, 'wb+')
         return True
     return False
 

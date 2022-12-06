@@ -102,6 +102,22 @@ class config_api:
             return mw.returnJson(False, '主域名格式不正确')
 
         mw.writeFile(cfg_domain, domain)
+
+        op_dir = mw.getServerDir() + "/openresty"
+        if not os.path.exists(op_dir):
+            return mw.returnJson(False, '依赖OpenResty,先安装启动它!')
+
+        panel_tpl = mw.getRunDir() + "/data/tpl/nginx_panel.conf"
+        dst_panel_path = mw.getServerDir() + "/web_conf/nginx/vhost/panel.conf"
+
+        content = mw.readFile(panel_tpl)
+        content = content.replace("{$PORT}", "80")
+        content = content.replace("{$SERVER_NAME}", domain)
+        content = content.replace("{$PANAL_PORT}", mw.readFile('data/port.pl'))
+        content = content.replace("{$LOGPATH}", mw.getRunDir() + '/logs')
+        content = content.replace("{$PANAL_ADDR}", mw.getRunDir())
+        mw.writeFile(dst_panel_path, content)
+
         return mw.returnJson(True, '设置域名成功!')
 
     def syncDateApi(self):
@@ -355,19 +371,22 @@ class config_api:
     def getPanelSslApi(self):
         cert = {}
 
-        if not os.path.exists('ssl/certificate.pem'):
+        keyPath = 'ssl/private.pem'
+        certPath = 'ssl/cert.pem'
+
+        if not os.path.exists(certPath):
             mw.createSSL()
 
-        cert['privateKey'] = mw.readFile('ssl/privateKey.pem')
-        cert['certPem'] = mw.readFile('ssl/certificate.pem')
+        cert['privateKey'] = mw.readFile(keyPath)
+        cert['certPem'] = mw.readFile(certPath)
         cert['rep'] = os.path.exists('ssl/input.pl')
-        cert['info'] = mw.getCertName('ssl/certificate.pem')
+        cert['info'] = mw.getCertName(certPath)
         return mw.getJson(cert)
 
     # 保存面板证书
     def savePanelSslApi(self):
-        keyPath = 'ssl/privateKey.pem'
-        certPath = 'ssl/certificate.pem'
+        keyPath = 'ssl/private.pem'
+        certPath = 'ssl/cert.pem'
         checkCert = '/tmp/cert.pl'
 
         certPem = request.form.get('certPem', '').strip()
@@ -388,7 +407,6 @@ class config_api:
         sslConf = mw.getRunDir() + '/data/ssl.pl'
         if os.path.exists(sslConf):
             os.system('rm -f ' + sslConf)
-            mw.restartMw()
             return mw.returnJson(True, 'SSL已关闭，请使用http协议访问面板!')
         else:
             try:
@@ -398,7 +416,6 @@ class config_api:
             except Exception as ex:
                 return mw.returnJson(False, '开启失败:' + str(ex))
 
-            mw.restartMw()
             return mw.returnJson(True, '开启成功，请使用https协议访问面板!')
 
     def getApi(self):
