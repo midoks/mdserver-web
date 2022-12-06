@@ -68,13 +68,19 @@ $('input[name="backup_path"]').change(function(){
 
 $('input[name="bind_domain"]').change(function(){
 	var domain = $(this).val();
-	console.log(domain);
 	$('.btn_bind_domain').removeAttr('disabled');
 	$('.btn_bind_domain').unbind().click(function(){
 		$.post('/config/set_panel_domain','domain='+domain, function(rdata){
 			showMsg(rdata.msg,function(){window.location.reload();},{icon:rdata.status?1:2},2000);
 		},'json');
 	});
+});
+
+$('input[name="bind_ssl"]').click(function(){
+	var open_ssl = $(this).prop("checked");
+	$.post('/config/set_panel_ssl',{}, function(rdata){
+		showMsg(rdata.msg,function(){window.location.reload();},{icon:rdata.status?1:2},2000);
+	},'json');
 });
 
 /** op **/
@@ -353,13 +359,29 @@ function getPanelSSL(){
 	var loadT = layer.msg('正在获取证书信息...',{icon:16,time:0,shade: [0.3, '#000']});
 	$.post('/config/get_panel_ssl',{},function(cert){
 		layer.close(loadT);
+
+
+		var cert_data = '';
+		if (cert['info']){
+			cert_data = "<div class='ssl_state_info'><div class='state_info_flex'>\
+				<div class='state_item'><span>证书品牌：</span><span class='ellipsis_text'>"+cert['info']['issuer']+"</span></div>\
+				<div class='state_item'><span>到期时间：</span><span class='btlink'>剩余"+cert['info']['endtime']+"天到期</span></div>\
+			</div>\
+			<div class='state_info_flex'>\
+				<div class='state_item'><span>认证域名：</span><span class='ellipsis_text'>"+cert['info']['subject']+"</span></div>\
+			</div></div>";
+		}
+
 		var certBody = '<div class="tab-con">\
 			<div class="myKeyCon ptb15">\
-				<div class="ssl-con-key pull-left mr20">密钥(KEY)<br>\
-					<textarea id="key" class="bt-input-text">'+cert.privateKey+'</textarea>\
-				</div>\
-				<div class="ssl-con-key pull-left">证书(PEM格式)<br>\
-					<textarea id="csr" class="bt-input-text">'+cert.certPem+'</textarea>\
+				'+cert_data+'\
+				<div class="custom_certificate_info">\
+					<div class="ssl-con-key pull-left mr20">密钥(KEY)<br>\
+						<textarea id="key" class="bt-input-text">'+cert.privateKey+'</textarea>\
+					</div>\
+					<div class="ssl-con-key pull-left">证书(PEM格式)<br>\
+						<textarea id="csr" class="bt-input-text">'+cert.certPem+'</textarea>\
+					</div>\
 				</div>\
 				<div class="ssl-btn pull-left mtb15" style="width:100%">\
 					<button class="btn btn-success btn-sm" onclick="savePanelSSL()">保存</button>\

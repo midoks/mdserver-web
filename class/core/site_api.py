@@ -589,7 +589,7 @@ class site_api:
 
         key = mw.readFile(key_path)
         csr = mw.readFile(csr_path)
-        cert_data = self.getCertName(csr_path)
+        cert_data = mw.getCertName(csr_path)
         data = {
             'status': status,
             'domain': domains,
@@ -2582,7 +2582,6 @@ location ^~ {from} {\n\
                 conf = conf.replace(listen, listen + http_ssl)
 
             mw.backFile(file)
-
             mw.writeFile(file, conf)
             isError = mw.checkWebConfig()
             if(isError != True):
@@ -2599,7 +2598,7 @@ location ^~ {from} {\n\
 
     def saveCert(self, keyPath, certPath):
         try:
-            certInfo = self.getCertName(certPath)
+            certInfo = mw.getCertName(certPath)
             if not certInfo:
                 return mw.returnData(False, '证书解析失败!')
             vpath = self.sslDir + '/' + certInfo['subject'].strip()
@@ -2611,70 +2610,6 @@ location ^~ {from} {\n\
             return mw.returnData(True, '证书保存成功!')
         except Exception as e:
             return mw.returnData(False, '证书保存失败!')
-
-    # 转换时间
-    def strfDate(self, sdate):
-        return time.strftime('%Y-%m-%d', time.strptime(sdate, '%Y%m%d%H%M%S'))
-
-    # 获取证书名称
-    def getCertName(self, certPath):
-        if not os.path.exists(certPath):
-            return None
-        try:
-            import OpenSSL
-            result = {}
-            x509 = OpenSSL.crypto.load_certificate(
-                OpenSSL.crypto.FILETYPE_PEM, mw.readFile(certPath))
-            # 取产品名称
-            issuer = x509.get_issuer()
-            result['issuer'] = ''
-            if hasattr(issuer, 'CN'):
-                result['issuer'] = issuer.CN
-            if not result['issuer']:
-                is_key = [b'0', '0']
-                issue_comp = issuer.get_components()
-                if len(issue_comp) == 1:
-                    is_key = [b'CN', 'CN']
-                for iss in issue_comp:
-                    if iss[0] in is_key:
-                        result['issuer'] = iss[1].decode()
-                        break
-            if not result['issuer']:
-                if hasattr(issuer, 'O'):
-                    result['issuer'] = issuer.O
-            # 取到期时间
-            result['notAfter'] = self.strfDate(
-                bytes.decode(x509.get_notAfter())[:-1])
-            # 取申请时间
-            result['notBefore'] = self.strfDate(
-                bytes.decode(x509.get_notBefore())[:-1])
-            # 取可选名称
-            result['dns'] = []
-            for i in range(x509.get_extension_count()):
-                s_name = x509.get_extension(i)
-                if s_name.get_short_name() in [b'subjectAltName', 'subjectAltName']:
-                    s_dns = str(s_name).split(',')
-                    for d in s_dns:
-                        result['dns'].append(d.split(':')[1])
-            subject = x509.get_subject().get_components()
-            # 取主要认证名称
-            if len(subject) == 1:
-                result['subject'] = subject[0][1].decode()
-            else:
-                if not result['dns']:
-                    for sub in subject:
-                        if sub[0] == b'CN':
-                            result['subject'] = sub[1].decode()
-                            break
-                    if 'subject' in result:
-                        result['dns'].append(result['subject'])
-                else:
-                    result['subject'] = result['dns'][0]
-            result['endtime'] = int(int(time.mktime(time.strptime(
-                result['notAfter'], "%Y-%m-%d")) - time.time()) / 86400)
-            return result
-        except:
-            return None
 
     # 清除多余user.ini
     def delUserInI(self, path, up=0):

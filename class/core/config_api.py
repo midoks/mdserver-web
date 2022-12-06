@@ -354,9 +354,14 @@ class config_api:
     # 获取面板证书
     def getPanelSslApi(self):
         cert = {}
+
+        if not os.path.exists('ssl/certificate.pem'):
+            mw.createSSL()
+
         cert['privateKey'] = mw.readFile('ssl/privateKey.pem')
         cert['certPem'] = mw.readFile('ssl/certificate.pem')
         cert['rep'] = os.path.exists('ssl/input.pl')
+        cert['info'] = mw.getCertName('ssl/certificate.pem')
         return mw.getJson(cert)
 
     # 保存面板证书
@@ -385,11 +390,11 @@ class config_api:
             os.system('rm -f ' + sslConf)
             return mw.returnJson(True, 'SSL已关闭，请使用http协议访问面板!')
         else:
-            os.system('pip install cffi==1.10')
-            os.system('pip install cryptography==2.1')
-            os.system('pip install pyOpenSSL==16.2')
+            # os.system('pip install cffi==1.10')
+            # os.system('pip install cryptography==2.1')
+            # os.system('pip install pyOpenSSL==16.2')
             try:
-                if not self.createSSL():
+                if not mw.createSSL():
                     return mw.returnJson(False, '开启失败，无法自动安装pyOpenSSL组件!<p>请尝试手动安装: pip install pyOpenSSL</p>')
                 mw.writeFile(sslConf, 'True')
             except Exception as ex:
@@ -400,32 +405,6 @@ class config_api:
         data = {}
         return mw.getJson(data)
     ##### ----- end ----- ###
-
-    # 自签证书
-    def createSSL(self):
-        if os.path.exists('ssl/input.pl'):
-            return True
-        import OpenSSL
-        key = OpenSSL.crypto.PKey()
-        key.generate_key(OpenSSL.crypto.TYPE_RSA, 2048)
-        cert = OpenSSL.crypto.X509()
-        cert.set_serial_number(0)
-        cert.get_subject().CN = mw.getLocalIp()
-        cert.set_issuer(cert.get_subject())
-        cert.gmtime_adj_notBefore(0)
-        cert.gmtime_adj_notAfter(86400 * 3650)
-        cert.set_pubkey(key)
-        cert.sign(key, 'md5')
-        cert_ca = OpenSSL.crypto.dump_certificate(
-            OpenSSL.crypto.FILETYPE_PEM, cert)
-        private_key = OpenSSL.crypto.dump_privatekey(
-            OpenSSL.crypto.FILETYPE_PEM, key)
-        if len(cert_ca) > 100 and len(private_key) > 100:
-            mw.writeFile('ssl/certificate.pem', cert_ca)
-            mw.writeFile('ssl/privateKey.pem', private_key)
-            print(cert_ca, private_key)
-            return True
-        return False
 
     # 获取临时登录列表
     def getTempLoginApi(self):
