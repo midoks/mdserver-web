@@ -117,7 +117,7 @@ class config_api:
         content = content.replace("{$LOGPATH}", mw.getRunDir() + '/logs')
         content = content.replace("{$PANAL_ADDR}", mw.getRunDir())
         mw.writeFile(dst_panel_path, content)
-
+        mw.restartWeb()
         return mw.returnJson(True, '设置域名成功!')
 
     def syncDateApi(self):
