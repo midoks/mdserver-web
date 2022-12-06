@@ -951,6 +951,7 @@ class files_api:
                     filename = filename.replace(tmp_path, '', 1)
 
             filename = filename.replace('//', '/')
+            filename = filename.replace('/', '')
             return filename + ';' + size + ';' + mtime + ';' + accept + ';' + user + ';' + link
         except Exception as e:
             # print(e)
