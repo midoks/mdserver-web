@@ -168,7 +168,8 @@ class config_api:
             import system_api
             import firewall_api
 
-            if os.path.exists("/lib/systemd/system/firewalld.service"):
+            sysCfgDir = mw.systemdCfgDir()
+            if os.path.exists(sysCfgDir + "/firewalld.service"):
                 if not firewall_api.firewall_api().getFwStatus():
                     return mw.returnJson(False, 'firewalld必须先启动!')
 
@@ -275,7 +276,8 @@ class config_api:
             import system_api
             import firewall_api
 
-            if os.path.exists("/lib/systemd/system/firewalld.service"):
+            sysCfgDir = mw.systemdCfgDir()
+            if os.path.exists(sysCfgDir + "/firewalld.service"):
                 if not firewall_api.firewall_api().getFwStatus():
                     return mw.returnJson(False, 'firewalld必须先启动!')
 
@@ -394,6 +396,11 @@ class config_api:
         certPem = request.form.get('certPem', '').strip()
         privateKey = request.form.get('privateKey', '').strip()
 
+        if(privateKey.find('KEY') == -1):
+            return mw.returnJson(False, '秘钥错误，请检查!')
+        if(certPem.find('CERTIFICATE') == -1):
+            return mw.returnJson(False, '证书错误，请检查!')
+
         mw.writeFile(checkCert, certPem)
         if privateKey:
             mw.writeFile(keyPath, privateKey)
@@ -407,14 +414,94 @@ class config_api:
      # 设置面板SSL
     def setPanelSslApi(self):
         sslConf = mw.getRunDir() + '/data/ssl.pl'
+
+        panel_tpl = mw.getRunDir() + "/data/tpl/nginx_panel.conf"
+        dst_panel_path = mw.getServerDir() + "/web_conf/nginx/vhost/panel.conf"
         if os.path.exists(sslConf):
             os.system('rm -f ' + sslConf)
+
+            conf = mw.readFile(dst_panel_path)
+            if conf:
+                rep = "\s+ssl_certificate\s+.+;\s+ssl_certificate_key\s+.+;"
+                conf = re.sub(rep, '', conf)
+                rep = "\s+ssl_protocols\s+.+;\n"
+                conf = re.sub(rep, '', conf)
+                rep = "\s+ssl_ciphers\s+.+;\n"
+                conf = re.sub(rep, '', conf)
+                rep = "\s+ssl_prefer_server_ciphers\s+.+;\n"
+                conf = re.sub(rep, '', conf)
+                rep = "\s+ssl_session_cache\s+.+;\n"
+                conf = re.sub(rep, '', conf)
+                rep = "\s+ssl_session_timeout\s+.+;\n"
+                conf = re.sub(rep, '', conf)
+                rep = "\s+ssl_ecdh_curve\s+.+;\n"
+                conf = re.sub(rep, '', conf)
+                rep = "\s+ssl_session_tickets\s+.+;\n"
+                conf = re.sub(rep, '', conf)
+                rep = "\s+ssl_stapling\s+.+;\n"
+                conf = re.sub(rep, '', conf)
+                rep = "\s+ssl_stapling_verify\s+.+;\n"
+                conf = re.sub(rep, '', conf)
+                rep = "\s+add_header\s+.+;\n"
+                conf = re.sub(rep, '', conf)
+                rep = "\s+add_header\s+.+;\n"
+                conf = re.sub(rep, '', conf)
+                rep = "\s+ssl\s+on;"
+                conf = re.sub(rep, '', conf)
+                rep = "\s+error_page\s497.+;"
+                conf = re.sub(rep, '', conf)
+                rep = "\s+if.+server_port.+\n.+\n\s+\s*}"
+                conf = re.sub(rep, '', conf)
+                rep = "\s+listen\s+443.*;"
+                conf = re.sub(rep, '', conf)
+                rep = "\s+listen\s+\[\:\:\]\:443.*;"
+                conf = re.sub(rep, '', conf)
+                mw.writeFile(dst_panel_path, conf)
+
+            mw.writeLog('面板配置', '面板SSL关闭成功!')
+            mw.restartWeb()
             return mw.returnJson(True, 'SSL已关闭，请使用http协议访问面板!')
         else:
             try:
                 if not os.path.exists('ssl/input.ssl'):
                     mw.createSSL()
                 mw.writeFile(sslConf, 'True')
+
+                keyPath = mw.getRunDir() + '/ssl/private.pem'
+                certPath = mw.getRunDir() + '/ssl/cert.pem'
+
+                conf = mw.readFile(dst_panel_path)
+                if conf:
+                    if conf.find('ssl_certificate') == -1:
+                        sslStr = """#error_page 404/404.html;
+    ssl_certificate    %s;
+    ssl_certificate_key  %s;
+    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+    ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:HIGH:!aNULL:!MD5:!RC4:!DHE;
+    ssl_prefer_server_ciphers on;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 10m;
+    error_page 497  https://$host$request_uri;""" % (certPath, keyPath)
+                    if(conf.find('ssl_certificate') != -1):
+                        return mw.returnData(True, 'SSL开启成功!')
+
+                    conf = conf.replace('#error_page 404/404.html;', sslStr)
+
+                    rep = "listen\s+([0-9]+)\s*[default_server]*;"
+                    tmp = re.findall(rep, conf)
+                    if not mw.inArray(tmp, '443'):
+                        listen = re.search(rep, conf).group()
+                        http_ssl = "\n\tlisten 443 ssl http2;"
+                        http_ssl = http_ssl + "\n\tlisten [::]:443 ssl http2;"
+                        conf = conf.replace(listen, listen + http_ssl)
+
+                    mw.backFile(dst_panel_path)
+                    mw.writeFile(dst_panel_path, conf)
+                    isError = mw.checkWebConfig()
+                    if(isError != True):
+                        mw.restoreFile(dst_panel_path)
+                        return mw.returnData(False, '证书错误: <br><a style="color:red;">' + isError.replace("\n", '<br>') + '</a>')
+
             except Exception as ex:
                 return mw.returnJson(False, '开启失败:' + str(ex))
 
