@@ -483,7 +483,7 @@ class config_api:
     ssl_session_timeout 10m;
     error_page 497  https://$host$request_uri;""" % (certPath, keyPath)
                     if(conf.find('ssl_certificate') != -1):
-                        return mw.returnData(True, 'SSL开启成功!')
+                        return mw.returnJson(True, 'SSL开启成功!')
 
                     conf = conf.replace('#error_page 404/404.html;', sslStr)
 
@@ -500,7 +500,7 @@ class config_api:
                     isError = mw.checkWebConfig()
                     if(isError != True):
                         mw.restoreFile(dst_panel_path)
-                        return mw.returnData(False, '证书错误: <br><a style="color:red;">' + isError.replace("\n", '<br>') + '</a>')
+                        return mw.returnJson(False, '证书错误: <br><a style="color:red;">' + isError.replace("\n", '<br>') + '</a>')
             except Exception as ex:
                 return mw.returnJson(False, '开启失败:' + str(ex))
             mw.restartWeb()
