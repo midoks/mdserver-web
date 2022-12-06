@@ -92,9 +92,14 @@ class config_api:
     def setPanelDomainApi(self):
         domain = request.form.get('domain', '')
 
+        panel_tpl = mw.getRunDir() + "/data/tpl/nginx_panel.conf"
+        dst_panel_path = mw.getServerDir() + "/web_conf/nginx/vhost/panel.conf"
+
         cfg_domain = 'data/bind_domain.pl'
         if domain == '':
             os.remove(cfg_domain)
+            os.remove(dst_panel_path)
+            mw.restartWeb()
             return mw.returnJson(True, '清空域名成功!')
 
         reg = r"^([\w\-\*]{1,100}\.){1,4}(\w{1,10}|\w{1,10}\.\w{1,10})$"
@@ -106,9 +111,6 @@ class config_api:
         op_dir = mw.getServerDir() + "/openresty"
         if not os.path.exists(op_dir):
             return mw.returnJson(False, '依赖OpenResty,先安装启动它!')
-
-        panel_tpl = mw.getRunDir() + "/data/tpl/nginx_panel.conf"
-        dst_panel_path = mw.getServerDir() + "/web_conf/nginx/vhost/panel.conf"
 
         content = mw.readFile(panel_tpl)
         content = content.replace("{$PORT}", "80")
