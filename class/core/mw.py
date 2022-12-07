@@ -927,7 +927,7 @@ def checkDomainPanel():
 
     nconf = getServerDir() + "/web_conf/nginx/vhost/panel.conf"
     if os.path.exists(nconf):
-        port = 80
+        port = "80"
 
     if domain:
         client_ip = getClientIp()
