@@ -97,11 +97,11 @@ class files_api:
         import shutil
         try:
             shutil.move(sfile, dfile)
-            msg = mw.getInfo('移动文件或目录[{1}]到[{2}]成功!', (sfile, dfile,))
+            msg = mw.getInfo('移动或重名命文件[{1}]到[{2}]成功!', (sfile, dfile,))
             mw.writeLog('文件管理', msg)
-            return mw.returnJson(True, '移动文件或目录成功!')
+            return mw.returnJson(True, '移动或重名命文件成功!')
         except:
-            return mw.returnJson(False, '移动文件或目录失败!')
+            return mw.returnJson(False, '移动或重名命文件失败!')
 
     def deleteApi(self):
         path = request.form.get('path', '')
@@ -148,12 +148,16 @@ class files_api:
         if not os.path.exists(path):
             path = mw.getRootDir() + "/wwwroot"
         search = request.args.get('search', '').strip().lower()
+        search_all = request.args.get('all', '').strip().lower()
         page = request.args.get('p', '1').strip().lower()
         row = request.args.get('showRow', '10')
         disk = request.form.get('disk', '')
         if disk == 'True':
             row = 1000
 
+        # return self.getAllDir(path, int(page), int(row), "wp-inlcude")
+        if search_all == 'yes' and search != '':
+            return self.getAllDir(path, int(page), int(row), search)
         return self.getDir(path, int(page), int(row), search)
 
     def createFileApi(self):
@@ -830,10 +834,58 @@ class files_api:
             if search:
                 if name.lower().find(search) == -1:
                     continue
-            # if name[0:1] == '.':
-            #     continue
+            if name == '.':
+                continue
             i += 1
         return i
+
+    def getAllDir(self, path, page=1, page_size=10, search=None):
+        # print("search:", search)
+        data = {}
+        dirnames = []
+        filenames = []
+
+        count = 0
+        max_limit = 3000
+
+        for d_list in os.walk(path):
+            if count >= max_limit:
+                break
+
+            for d in d_list[1]:
+                if count >= max_limit:
+                    break
+                if d.lower().find(search) != -1:
+                    filename = d_list[0] + '/' + d
+                    if not os.path.exists(filename):
+                        continue
+                    dirnames.append(self.__get_stats(filename, path))
+                    count += 1
+
+            for f in d_list[2]:
+                if count >= max_limit:
+                    break
+
+                if f.lower().find(search) != -1:
+                    filename = d_list[0] + '/' + f
+                    if not os.path.exists(filename):
+                        continue
+                    filenames.append(self.__get_stats(filename, path))
+                    count += 1
+
+        data['DIR'] = sorted(dirnames)
+        data['FILES'] = sorted(filenames)
+        data['PATH'] = path.replace('//', '/')
+
+        info = {}
+        info['count'] = len(dirnames) + len(filenames)
+        info['row'] = page_size
+        info['p'] = page
+        info['tojs'] = 'getFiles'
+        pageObj = mw.getPageObject(info, '1,2,3,4,5,6,7,8')
+        data['PAGE'] = pageObj[0]
+
+        return mw.getJson(data)
 
     def getDir(self, path, page=1, page_size=10, search=None):
         data = {}
@@ -861,31 +913,14 @@ class files_api:
                 continue
             try:
                 filePath = path + '/' + filename
-                link = ''
-                if os.path.islink(filePath):
-                    filePath = os.readlink(filePath)
-                    link = ' -> ' + filePath
-                    if not os.path.exists(filePath):
-                        filePath = path + '/' + filePath
-                    if not os.path.exists(filePath):
-                        continue
+                if not os.path.exists(filePath):
+                    continue
 
-                stat = os.stat(filePath)
-                accept = str(oct(stat.st_mode)[-3:])
-                mtime = str(int(stat.st_mtime))
-                user = ''
-                try:
-                    user = pwd.getpwuid(stat.st_uid).pw_name
-                except Exception as ee:
-                    user = str(stat.st_uid)
-
-                size = str(stat.st_size)
+                file_stats = self.__get_stats(filePath, path)
                 if os.path.isdir(filePath):
-                    dirnames.append(filename + ';' + size + ';' +
-                                    mtime + ';' + accept + ';' + user + ';' + link)
+                    dirnames.append(file_stats)
                 else:
-                    filenames.append(filename + ';' + size + ';' +
-                                     mtime + ';' + accept + ';' + user + ';' + link)
+                    filenames.append(file_stats)
                 n += 1
             except Exception as e:
                 continue
@@ -894,3 +929,28 @@ class files_api:
         data['PATH'] = path.replace('//', '/')
 
         return mw.getJson(data)
+
+    def __get_stats(self, filename, path=None):
+        filename = filename.replace('//', '/')
+        try:
+            stat = os.stat(filename)
+            accept = str(oct(stat.st_mode)[-3:])
+            mtime = str(int(stat.st_mtime))
+            user = ''
+            try:
+                user = str(pwd.getpwuid(stat.st_uid).pw_name)
+            except:
+                user = str(stat.st_uid)
+            size = str(stat.st_size)
+            link = ''
+            if os.path.islink(filename):
+                link = ' -> ' + os.readlink(filename)
+
+            if path:
+                tmp_path = (path + '/').replace('//', '/')
+                filename = filename.replace(tmp_path, '', 1)
+
+            return filename + ';' + size + ';' + mtime + ';' + accept + ';' + user + ';' + link
+        except Exception as e:
+            # print(e)
+            return ';;;;;'

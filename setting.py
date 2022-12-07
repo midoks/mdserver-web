@@ -82,6 +82,3 @@ loglevel = 'info'
 errorlog = log_dir + '/error.log'
 accesslog = log_dir + '/access.log'
 pidfile = log_dir + '/mw.pid'
-if os.path.exists(os.getcwd() + '/data/ssl.pl'):
-    certfile = 'ssl/certificate.pem'
-    keyfile = 'ssl/privateKey.pem'

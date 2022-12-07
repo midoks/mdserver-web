@@ -56,6 +56,7 @@ def mwcli(mw_input=0):
         print("(12) 修改面板用户名")
         print("(13) 显示面板错误日志")
         print("(20) 关闭BasicAuth认证")
+        print("(21) 解除域名绑定")
         print("(0) 取消")
         print(raw_tip)
         try:
@@ -65,7 +66,7 @@ def mwcli(mw_input=0):
         except:
             mw_input = 0
 
-    nums = [1, 2, 3, 4, 5, 10, 11, 12, 13, 20]
+    nums = [1, 2, 3, 4, 5, 10, 11, 12, 13, 20, 21]
     if not mw_input in nums:
         print(raw_tip)
         print("已取消!")
@@ -109,6 +110,12 @@ def mwcli(mw_input=0):
             os.remove(basic_auth)
             os.system(INIT_CMD + " restart")
             print("|-关闭basic_auth成功")
+    elif mw_input == 21:
+        bind_domain = 'data/bind_domain.pl'
+        if os.path.exists(bind_domain):
+            os.remove(bind_domain)
+            os.system(INIT_CMD + " unbind_domain")
+            print("|-解除域名绑定成功")
 
 
 def set_panel_pwd(password, ncli=False):

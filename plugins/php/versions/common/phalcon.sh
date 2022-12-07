@@ -11,20 +11,22 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
-LIBNAME=memcache
-LIBV=2.2.7
-sysName=`uname`
 actionType=$1
 version=$2
 
-if [ "$version" -gt "56" ] && [ "$version" -lt "80" ];then
-	LIBV=4.0.5.2
-fi
+LIBNAME=phalcon
+LIBV=4.1.2
+
+if [ "$version" -lt "73" ];then
+	echo "not support!"
+	exit 1
+else
 
 if [ "$version" -gt "74" ];then
-	LIBV=8.0
+	LIBV=5.1.2
+else
+	echo "not support!"
 fi
-
 
 LIB_PATH_NAME=lib/php
 if [ -d $serverPath/php/${version}/lib64 ];then
@@ -34,6 +36,7 @@ fi
 NON_ZTS_FILENAME=`ls $serverPath/php/${version}/${LIB_PATH_NAME}/extensions | grep no-debug-non-zts`
 extFile=$serverPath/php/${version}/${LIB_PATH_NAME}/extensions/${NON_ZTS_FILENAME}/${LIBNAME}.so
 
+sysName=`uname`
 if [ "$sysName" == "Darwin" ];then
 	BAK='_bak'
 else
@@ -49,28 +52,40 @@ Install_lib()
 	fi
 	
 	if [ ! -f "$extFile" ];then
+
 		php_lib=$sourcePath/php_lib
 		mkdir -p $php_lib
 
-		wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
-
-		cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
-		cd ${LIBNAME}-${LIBV}
+		if [ ! -f  $php_lib/${LIBNAME}-${LIBV}.tgz ];then
+			wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
+			cd $php_lib
+			tar xvf ${LIBNAME}-${LIBV}.tgz
+		fi
+		cd $php_lib/${LIBNAME}-${LIBV}
+		
 		$serverPath/php/$version/bin/phpize
-		./configure --with-php-config=$serverPath/php/$version/bin/php-config --enable-memcache --with-zlib-dir
+		./configure --with-php-config=$serverPath/php/$version/bin/php-config
 		make clean && make && make install && make clean
-
 	fi
 	
-	if [ ! -f "$extFile" ];then
-		echo "ERROR!"
-		return
-	fi
-	echo "" >> $serverPath/php/$version/etc/php.ini
+	while [[ ! -f "$extFile" ]];
+    do
+        echo -e ".\c"
+        sleep 0.5
+        if [ ! -f "$extFile" ];then
+			echo "ERROR!"
+		fi
+        let n+=1
+        if [ $n -gt 8 ];then
+        	echo "WAIT " $n "TIMES FAIL!"
+            return;
+        fi
+    done
+
+    echo "" >> $serverPath/php/$version/etc/php.ini
 	echo "[${LIBNAME}]" >> $serverPath/php/$version/etc/php.ini
 	echo "extension=${LIBNAME}.so" >> $serverPath/php/$version/etc/php.ini
 	
-
 	bash ${rootPath}/plugins/php/versions/lib.sh $version restart
 	echo '==========================================================='
 	echo 'successful!'
@@ -86,10 +101,10 @@ Uninstall_lib()
 	
 	if [ ! -f "$extFile" ];then
 		echo "php-$version 未安装${LIBNAME},请选择其它版本!"
-		echo "php-$version not install memcache, Plese select other version!"
 		return
 	fi
 	
+	echo $serverPath/php/$version/etc/php.ini
 	sed -i $BAK "/${LIBNAME}.so/d" $serverPath/php/$version/etc/php.ini
 	sed -i $BAK "/${LIBNAME}/d" $serverPath/php/$version/etc/php.ini
 		
@@ -98,6 +113,7 @@ Uninstall_lib()
 	echo '==============================================='
 	echo 'successful!'
 }
+
 
 
 if [ "$actionType" == 'install' ];then

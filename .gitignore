@@ -106,6 +106,7 @@ venv.bak/
 .idea/*.iml
 tmp/*
 *.swp
+*.pem
 *.zip
 logs/*
 data/*.db
@@ -116,13 +117,15 @@ data/json/config.json
 data/site.pl
 data/admin_path.pl
 data/close.pl
-ssl/input.pl
 data/datadir.pl
 data/502Task.pl
 data/default.pl
 data/backup.pl
 data/debug.pl
 data/default_site.pl
+
+ssl/input.pl
+
 lib/python*
 
 bin
