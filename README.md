@@ -90,15 +90,14 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.11.2
+### 版本更新 0.11.3
 
-* redis安全强化。
-* 添加php命令行设置。
-* 域名绑定。
-* Gitea优化。
-* 网站统计优化。
-* centos9下php-gd安装优化。
-* php82rc7测试版。
+* 域名绑定修改。
+* 面板ssl配置加入。
+* 文件搜索优化。
+* php加入phalcon。
+* 文件管理UI优化。
+* phpmyadmin优化。
 
 
 ### JSDelivr安装地址
