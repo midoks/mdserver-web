@@ -935,7 +935,7 @@ def checkDomainPanel():
             return False
         if tmp.strip().lower() != domain.strip().lower():
             from flask import Flask, redirect, request, url_for
-            to = "http://" + domain + ":" + port
+            to = "http://" + domain + ":" + str(port)
             return redirect(to, code=302)
     return False
 
