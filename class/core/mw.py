@@ -920,6 +920,15 @@ def checkDomainPanel():
     tmp = getHost()
     domain = readFile('data/bind_domain.pl')
     port = readFile('data/port.pl').strip()
+
+    npid = mw.getServerDir() + "/openresty/nginx/logs/nginx.pid"
+    if not os.path.exists(npid):
+        return False
+
+    nconf = mw.getServerDir() + "/web_conf/nginx/vhost/panel.conf"
+    if os.path.exists(nconf):
+        port = 80
+
     if domain:
         client_ip = getClientIp()
         if client_ip in ['127.0.0.1', 'localhost', '::1']:
