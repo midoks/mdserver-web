@@ -395,8 +395,6 @@ class config_api:
         if not re.match(reg, domain):
             return mw.returnJson(False, '主域名格式不正确')
 
-        mw.writeFile(cfg_domain, domain)
-
         op_dir = mw.getServerDir() + "/openresty"
         if not os.path.exists(op_dir):
             return mw.returnJson(False, '依赖OpenResty,先安装启动它!')
@@ -409,6 +407,8 @@ class config_api:
         content = content.replace("{$PANAL_ADDR}", mw.getRunDir())
         mw.writeFile(dst_panel_path, content)
         mw.restartWeb()
+
+        mw.writeFile(cfg_domain, domain)
         return mw.returnJson(True, '设置域名成功!')
 
      # 设置面板SSL
