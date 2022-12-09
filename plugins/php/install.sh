@@ -32,9 +32,9 @@ if [ ! -d $curPath/versions/$2 ];then
 fi
 
 
-if [ "${action}" == "install" ] && [ -d $serverPath/php/${type} ];then
-	exit 0
-fi
+# if [ "${action}" == "install" ] && [ -d $serverPath/php/${type} ];then
+# 	exit 0
+# fi
 
 if [ "${action}" == "uninstall" ];then
 	
