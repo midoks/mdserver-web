@@ -67,7 +67,7 @@ Install_lib()
 				FILE_softmagic=$sourcePath/php${version}/ext/${LIBNAME}/libmagic/softmagic.c
 				FIND_UNDEF_STRNDUP=`cat $FILE_softmagic|grep '#undef strndup'`
 				if [ "$version" -gt "74" ] && [ "$FIND_C99" == "" ];then
-					sed -i $BAK "s/char *strndup(const char *str, size_t n); \=/#undef char *strndup\nchar *strndup(const char *str, size_t n);/g" $FILE_softmagic
+					sed -i $BAK "s/char *strndup(const char *str, size_t n);/#undef char *strndup\nchar *strndup(const char *str, size_t n);/g" $FILE_softmagic
 				fi
 			fi
 		fi
