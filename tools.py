@@ -145,7 +145,7 @@ def show_panel_pwd():
     if mw.md5(file_pwd) == password:
         print('password: ' + file_pwd)
         return
-    print("the password has been changed..")
+    print("the password has been changed!")
 
 
 def set_panel_username(username=None):
