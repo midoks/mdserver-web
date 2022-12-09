@@ -188,7 +188,7 @@ if __name__ == "__main__":
         else:
             set_panel_username()
     elif method == 'password':
-        print("123123")
+        show_panel_pwd()
     elif method == 'getServerIp':
         getServerIp()
     elif method == "cli":
