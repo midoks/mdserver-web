@@ -58,6 +58,20 @@ Install_lib()
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config
 
+
+		# It is considered as a temporary bug
+		if [ "$version" == "81" ] || [ "$version" == "82" ];then
+			bash ${rootPath}/scripts/getos.sh
+			OSNAME=`cat ${rootPath}/data/osname.pl`
+			if [ "$OSNAME" == 'centos' ];then
+				FILE_softmagic=$sourcePath/php${version}/ext/${LIBNAME}/libmagic/softmagic.c
+				FIND_UNDEF_STRNDUP=`cat $FILE_softmagic|grep '#undef strndup'`
+				if [ "$version" -gt "74" ] && [ "$FIND_C99" == "" ];then
+					sed -i $BAK "s/char *strndup(const char *str, size_t n); \=/#undef char *strndup\nchar *strndup(const char *str, size_t n);/g" $FILE_softmagic
+				fi
+			fi
+		fi
+
 		FIND_C99=`cat Makefile|grep c99`
 		if [ "$version" -gt "74" ] && [ "$FIND_C99" == "" ];then
 			sed -i $BAK 's/CFLAGS \=/CFLAGS \= -std=gnu99/g' Makefile
