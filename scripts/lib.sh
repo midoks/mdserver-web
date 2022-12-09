@@ -52,7 +52,7 @@ if [ ! -f /usr/local/bin/pip3 ];then
     cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
     PIPSRC="https://pypi.python.org/simple"
     if [ ! -z "$cn" ];then
-        PIPSRC="https://mirrors.aliyun.com/pypi/simple"
+        PIPSRC="https://pypi.tuna.tsinghua.edu.cn/simple"
     fi
     python3 -m pip install --upgrade pip setuptools wheel -i $PIPSRC
 fi
