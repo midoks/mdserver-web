@@ -20,7 +20,7 @@ LIBV=4.1.2
 if [ "$version" -lt "73" ];then
 	echo "not support!"
 	exit 1
-else
+fi
 
 if [ "$version" -gt "74" ];then
 	LIBV=5.1.2
