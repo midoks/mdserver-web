@@ -66,7 +66,7 @@ Install_lib()
 			if [ "$OSNAME" == 'centos' ];then
 				FILE_softmagic=$sourcePath/php${version}/ext/${LIBNAME}/libmagic/softmagic.c
 				FIND_UNDEF_STRNDUP=`cat $FILE_softmagic|grep '#undef strndup'`
-				if [ "$version" -gt "74" ] && [ "$FIND_C99" == "" ];then
+				if [ "$version" -gt "74" ] && [ "$FIND_UNDEF_STRNDUP" == "" ];then
 					sed -i $BAK "s/char \*strndup/#undef strndup\nchar \*strndup/g" $FILE_softmagic
 				fi
 			fi
