@@ -49,6 +49,7 @@ Install_lib()
 	if [ ! -f "$extFile" ];then
 
 		if [ ! -d $sourcePath/php${version}/ext ];then
+			echo "cd ${rootPath}/plugins/php && /bin/bash install.sh install ${version}"
 			cd ${rootPath}/plugins/php && /bin/bash install.sh install ${version}
 		fi
 
@@ -57,9 +58,23 @@ Install_lib()
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config
 
+
+		# It is considered as a temporary bug
+		if [ "$version" == "81" ] || [ "$version" == "82" ];then
+			bash ${rootPath}/scripts/getos.sh
+			OSNAME=`cat ${rootPath}/data/osname.pl`
+			if [ "$OSNAME" == 'centos' ];then
+				FILE_softmagic=$sourcePath/php${version}/ext/${LIBNAME}/libmagic/softmagic.c
+				FIND_UNDEF_STRNDUP=`cat $FILE_softmagic|grep '#undef strndup'`
+				if [ "$version" -gt "74" ] && [ "$FIND_UNDEF_STRNDUP" == "" ];then
+					sed -i $BAK "s/char \*strndup/#undef strndup\nchar \*strndup/g" $FILE_softmagic
+				fi
+			fi
+		fi
+
 		FIND_C99=`cat Makefile|grep c99`
-		if [ "$FIND_C99" == "" ];then
-			sed -i $BAK 's/CFLAGS \=/CFLAGS \= -std=c99/g' Makefile
+		if [ "$version" -gt "74" ] && [ "$FIND_C99" == "" ];then
+			sed -i $BAK 's/CFLAGS \=/CFLAGS \= -std=gnu99/g' Makefile
 		fi
 
 		make clean && make && make install && make clean

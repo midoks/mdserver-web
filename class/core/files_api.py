@@ -240,6 +240,11 @@ class files_api:
                 system_api.system_api().restartTask()
         except:
             system_api.system_api().restartTask()
+
+        # 删除日志
+        task_log = mw.getRunDir() + "/tmp/panelTask.pl"
+        if os.path.exists(task_log):
+            os.remove(task_log)
         return mw.returnJson(True, '任务已删除!')
 
     # 上传文件
