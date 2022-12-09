@@ -24,8 +24,6 @@ else
 
 if [ "$version" -gt "74" ];then
 	LIBV=5.1.2
-else
-	echo "not support!"
 fi
 
 LIB_PATH_NAME=lib/php
