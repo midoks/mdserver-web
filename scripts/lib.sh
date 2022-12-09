@@ -47,13 +47,14 @@ else
     echo "OK"
 fi
 
+cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
+PIPSRC="https://pypi.python.org/simple"
+if [ ! -z "$cn" ];then
+    PIPSRC="https://pypi.tuna.tsinghua.edu.cn/simple"
+fi
+
 #面板需要的库
-if [ ! -f /usr/local/bin/pip3 ];then
-    cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
-    PIPSRC="https://pypi.python.org/simple"
-    if [ ! -z "$cn" ];then
-        PIPSRC="https://pypi.tuna.tsinghua.edu.cn/simple"
-    fi
+if [ ! -f /usr/local/bin/pip3 ] && [ ! -f /usr/bin/pip3 ];then
     python3 -m pip install --upgrade pip setuptools wheel -i $PIPSRC
 fi
 
