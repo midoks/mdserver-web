@@ -121,45 +121,16 @@ if [ "$DISTRO" == 'debian' ]; then
 	fi
 fi
 
-apt install -y devscripts
-apt install -y net-tools
-apt install -y python3-dev
-apt install -y autoconf
-apt install -y gcc
+apt install -y build-essential devscripts
 
-apt install -y libffi-dev
-apt install -y cmake automake make
+apt install --ignore-missing -y autoconf automake cmake curl dia gcc imagemagick libbz2-dev libcurl4-gnutls-dev\
+    libcurl4-openssl-dev libevent-dev libffi-dev libfreetype6 libfreetype6-dev libgmp-dev libgmp3-dev libicu-dev \
+	libjpeg-dev libjpeg62-turbo-dev libldap2-dev libmagickwand-dev libmcrypt-dev libmemcached-dev libncurses5-dev \
+	libpcre3 libpcre3-dev libpng-dev libpspell-dev libreadline-dev librecode-dev libsasl2-dev libssl-dev \
+	libunwind-dev libwebp-dev libxml2 libxml2-dev libxpm-dev libzip-dev lzma lzma-dev make net-tools openssl \
+	pkg-config python3-dev scons webp zlib1g-dev
 
-apt install -y webp scons
-apt install -y libwebp-dev
-apt install -y lzma lzma-dev
-apt install -y libunwind-dev
 
-apt install -y libpcre3 libpcre3-dev
-apt install -y openssl
-apt install -y libssl-dev
-
-apt install -y libmemcached-dev
-apt install -y libsasl2-dev
-apt install -y imagemagick
-apt install -y libmagickwand-dev
-
-apt install -y libxml2 libxml2-dev libbz2-dev libmcrypt-dev libpspell-dev librecode-dev
-apt install -y libgmp-dev libgmp3-dev libreadline-dev libxpm-dev
-apt install -y dia pkg-config
-apt install -y zlib1g-dev
-apt install -y libjpeg-dev libpng-dev
-apt install -y libfreetype6
-apt install -y libjpeg62-turbo-dev
-apt install -y libfreetype6-dev
-apt install -y libevent-dev libncurses5-dev libldap2-dev
-apt install -y libzip-dev
-apt install -y libicu-dev
-
-apt install -y build-essential
-
-apt install -y libcurl4-openssl-dev
-apt install -y curl libcurl4-gnutls-dev
 #https://blog.csdn.net/qq_36228377/article/details/123154344
 # ln -s  /usr/include/x86_64-linux-gnu/curl  /usr/include/curl
 if [ ! -d /usr/include/curl ];then
@@ -167,16 +138,10 @@ if [ ! -d /usr/include/curl ];then
 fi
 
 
-apt install -y graphviz bison re2c flex
-apt install -y libsqlite3-dev
-apt install -y libonig-dev
+apt install -y graphviz bison re2c flex libsqlite3-dev libonig-dev perl g++ libtool libxslt1-dev
+apt install -y libmariadb-dev libmariadb-dev-compat
 
-apt install -y perl g++ libtool
-apt install -y libxslt1-dev
-
-apt install -y libmariadb-dev
 #apt install -y libmysqlclient-dev
-apt install -y libmariadb-dev-compat
 #apt install -y libmariadbclient-dev
 
 cd /www/server/mdserver-web/scripts && bash lib.sh
