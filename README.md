@@ -92,14 +92,12 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.11.3
+### 版本更新 0.11.4
 
-* 域名绑定修改。
-* 面板ssl配置加入。
-* 文件搜索优化。
-* php加入phalcon。
-* 文件管理UI优化。
-* phpmyadmin优化。
+* PHP82正式释出。
+* PHP-fileinfo扩展优化。
+* 删除任务时删除日志。
+* 优化修改密码后的显示问题(#288)。
 
 
 ### JSDelivr安装地址
