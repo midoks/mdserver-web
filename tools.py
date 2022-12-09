@@ -132,6 +132,22 @@ def set_panel_pwd(password, ncli=False):
         print(username)
 
 
+def show_panel_pwd():
+    # 设置面板密码
+    import db
+    sql = db.Sql()
+    password = sql.table('users').where('id=?', (1,)).getField('password')
+
+    file_pwd = ''
+    if os.path.exists('data/default.pl'):
+        file_pwd = mw.readFile('data/default.pl').strip()
+
+    if mw.md5(file_pwd) == password:
+        print('password: ' + file_pwd)
+        return
+    print("the password has been changed..")
+
+
 def set_panel_username(username=None):
     # 随机面板用户名
     import db
@@ -171,6 +187,8 @@ if __name__ == "__main__":
             set_panel_username(sys.argv[2])
         else:
             set_panel_username()
+    elif method == 'password':
+        print("123123")
     elif method == 'getServerIp':
         getServerIp()
     elif method == "cli":
