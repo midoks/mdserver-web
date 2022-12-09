@@ -27,7 +27,7 @@ if [ $VERSION_ID -ge 8 ];then
     	dnf install -y epel-release
     fi
     if [ $VERSION_ID -ge 9 ];then
-        REPOS='--enablerepo=appstream,baseos,epel,extras,cbr'
+        REPOS='--enablerepo=appstream,baseos,epel,extras,crb'
     else
         REPOS='--enablerepo=appstream,baseos,epel,extras,powertools'
     fi
