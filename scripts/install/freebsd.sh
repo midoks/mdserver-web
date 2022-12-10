@@ -37,13 +37,7 @@ pkg install -y harfbuzz
 
 # pkg install -y py38-cffi
 
-
 pkg autoremove -y
-
-#https need
-if [ ! -d /root/.acme.sh ];then	
-	curl https://get.acme.sh | sh
-fi
 
 if [ -f /usr/sbin/iptables ];then
 

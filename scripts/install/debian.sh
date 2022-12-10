@@ -12,6 +12,12 @@ elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
 fi
 VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
+cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
+NTPHOST='time.nist.gov'
+if [ ! -z "$cn" ];then
+    NTPHOST='ntp1.aliyun.com'
+fi
+
 ln -sf /bin/bash /bin/sh
 
 __GET_BIT=`getconf LONG_BIT`
@@ -23,17 +29,13 @@ fi
 
 # synchronize time first
 apt-get install ntpdate -y
-ntpdate time.nist.gov | logger -t NTP
+ntpdate $NTPHOST | logger -t NTP
 
 apt-get update -y
-apt install -y wget curl lsof unzip cron expect locate
+apt install -y wget curl lsof unzip tar cron expect locate
 apt install -y python3-pip python3-dev python3-venv
 locale-gen en_US.UTF-8
 localedef -v -c -i en_US -f UTF-8 en_US.UTF-8
-
-if [ ! -d /root/.acme.sh ];then
-	curl  https://get.acme.sh | sh
-fi
 
 if [ -f /usr/sbin/ufw ];then
 

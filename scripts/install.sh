@@ -29,27 +29,27 @@ elif grep -Eq "FreeBSD" /etc/*-release; then
 	OSNAME='freebsd'
 elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
 	OSNAME='rhel'
-	yum install -y wget zip unzip
+	yum install -y wget curl zip unzip tar
 elif grep -Eqi "Fedora" /etc/issue || grep -Eq "Fedora" /etc/*-release; then
 	OSNAME='fedora'
-	yum install -y wget zip unzip
+	yum install -y wget curl zip unzip tar
 elif grep -Eqi "Rocky" /etc/issue || grep -Eq "Rocky" /etc/*-release; then
 	OSNAME='rhel'
-	yum install -y wget zip unzip
+	yum install -y wget curl zip unzip tar
 elif grep -Eqi "AlmaLinux" /etc/issue || grep -Eq "AlmaLinux" /etc/*-release; then
 	OSNAME='rhel'
-	yum install -y wget zip unzip
+	yum install -y wget curl zip unzip tar
 elif grep -Eqi "Amazon Linux" /etc/issue || grep -Eq "Amazon Linux" /etc/*-release; then
 	OSNAME='amazon'
-	yum install -y wget zip unzip
+	yum install -y wget curl zip unzip tar
 elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
 	OSNAME='debian'
 	apt update -y
 	apt install -y devscripts
-	apt install -y wget zip unzip
+	apt install -y wget curl zip unzip tar
 elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
 	OSNAME='debian'
-	apt install -y wget zip unzip
+	apt install -y wget curl zip unzip tar
 else
 	OSNAME='unknow'
 fi
@@ -69,12 +69,11 @@ if [ $OSNAME != "macos" ];then
 	mkdir -p /www/backup/database
 	mkdir -p /www/backup/site
 
-
 	# https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/scripts/install.sh
 
-	if [ ! -d /www/server/mdserver-web ];then
+	cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
 
-		cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
+	if [ ! -d /www/server/mdserver-web ];then
 		if [ ! -z "$cn" ];then
 			curl -sSLo /tmp/master.zip https://gitee.com/midoks/mdserver-web/repository/archive/master.zip
 		else
@@ -86,11 +85,27 @@ if [ $OSNAME != "macos" ];then
 		rm -rf /tmp/master.zip
 		rm -rf /tmp/mdserver-web-master
 	fi
+
+	# install acme.sh
+	if [ ! -d /root/.acme.sh ];then
+	    if [ ! -z "$cn" ];then
+	        curl -sSL -o /tmp/acme.tar.gz https://ghproxy.com/github.com/acmesh-official/acme.sh/archive/master.tar.gz
+	        tar xvzf /tmp/acme.tar.gz -C /tmp
+	        cd /tmp/acme.sh-master
+	        bash acme.sh install
+	        cd -
+	    fi
+
+	    if [ ! -d /root/.acme.sh ];then
+	        curl  https://get.acme.sh | sh
+	    fi
+	fi
 fi
+
+
 
 echo "use system version: ${OSNAME}"
 cd /www/server/mdserver-web && bash scripts/install/${OSNAME}.sh
-
 
 cd /www/server/mdserver-web && bash cli.sh start
 isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`
