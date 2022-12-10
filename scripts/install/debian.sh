@@ -144,6 +144,12 @@ apt install -y libmariadb-dev libmariadb-dev-compat
 #apt install -y libmysqlclient-dev
 #apt install -y libmariadbclient-dev
 
+if [ "$DISTRO" == 'ubuntu' ] && [ "${VERSION_ID}" == "22.04" ]; then
+	apt install -y patchelf
+	apt install -y python3-cffi
+	pip3 install -U --force-reinstall --no-binary :all: gevent
+fi
+
 cd /www/server/mdserver-web/scripts && bash lib.sh
 chmod 755 /www/server/mdserver-web/data
 
