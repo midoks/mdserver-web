@@ -27,28 +27,28 @@ elif grep -Eq "openSUSE" /etc/*-release; then
 	zypper refresh
 elif grep -Eq "FreeBSD" /etc/*-release; then
 	OSNAME='freebsd'
-elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
+elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/redhat-release; then
 	OSNAME='rhel'
 	yum install -y wget curl zip unzip tar
 elif grep -Eqi "Fedora" /etc/issue || grep -Eq "Fedora" /etc/*-release; then
 	OSNAME='fedora'
 	yum install -y wget curl zip unzip tar
-elif grep -Eqi "Rocky" /etc/issue || grep -Eq "Rocky" /etc/*-release; then
+elif grep -Eqi "Rocky" /etc/issue || grep -Eq "Rocky" /etc/redhat-release; then
 	OSNAME='rhel'
 	yum install -y wget curl zip unzip tar
-elif grep -Eqi "AlmaLinux" /etc/issue || grep -Eq "AlmaLinux" /etc/*-release; then
+elif grep -Eqi "AlmaLinux" /etc/issue || grep -Eq "AlmaLinux" /etc/redhat-release; then
 	OSNAME='rhel'
 	yum install -y wget curl zip unzip tar
 elif grep -Eqi "Amazon Linux" /etc/issue || grep -Eq "Amazon Linux" /etc/*-release; then
 	OSNAME='amazon'
 	yum install -y wget curl zip unzip tar
-elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
+elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/os-release; then
 	OSNAME='debian'
 	apt update -y
-	apt install -y devscripts
 	apt install -y wget curl zip unzip tar
-elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
+elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/os-release; then
 	OSNAME='debian'
+	apt update -y
 	apt install -y wget curl zip unzip tar
 else
 	OSNAME='unknow'
