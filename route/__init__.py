@@ -27,6 +27,8 @@ from flask import render_template_string, abort
 from flask_caching import Cache
 from flask_session import Session
 
+from whitenoise import WhiteNoise
+
 sys.path.append(os.getcwd() + "/class/core")
 
 import db
@@ -35,6 +37,8 @@ import config_api
 
 app = Flask(__name__, template_folder='templates/default')
 app.config.version = config_api.config_api().getVersion()
+
+app.wsgi_app = WhiteNoise(app.wsgi_app, root="route/static/", prefix="static/", max_age=604800)
 
 cache = Cache(config={'CACHE_TYPE': 'simple'})
 cache.init_app(app, config={'CACHE_TYPE': 'simple'})

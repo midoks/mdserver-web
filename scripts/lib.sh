@@ -47,23 +47,23 @@ else
     echo "OK"
 fi
 
-#面板需要的库
-if [ ! -f /usr/local/bin/pip3 ];then
-    cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
-    if [ ! -z "$cn" ];then
-        python3 -m pip install --upgrade pip setuptools wheel -i https://mirrors.aliyun.com/pypi/simple
-    else
-        python3 -m pip install --upgrade pip setuptools wheel -i https://pypi.python.org/pypi
-    fi
+cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
+PIPSRC="https://pypi.python.org/simple"
+if [ ! -z "$cn" ];then
+    PIPSRC="https://pypi.tuna.tsinghua.edu.cn/simple"
 fi
 
-which pip && pip install --upgrade pip
-pip3 install --upgrade setuptools
-cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
+#面板需要的库
+if [ ! -f /usr/local/bin/pip3 ] && [ ! -f /usr/bin/pip3 ];then
+    python3 -m pip install --upgrade pip setuptools wheel -i $PIPSRC
+fi
+
+which pip && pip install --upgrade pip -i $PIPSRC
+pip3 install --upgrade setuptools -i $PIPSRC
+cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt -i $PIPSRC
 
 # pip3 install flask-caching==1.10.1
 # pip3 install mysqlclient
-
 
 if [ ! -f /www/server/mdserver-web/bin/activate ];then
     cd /www/server/mdserver-web && python3 -m venv .
@@ -72,9 +72,9 @@ else
     cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate
 fi
 
-pip install --upgrade pip
-pip3 install --upgrade setuptools
-cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt
+pip install --upgrade pip -i $PIPSRC
+pip3 install --upgrade setuptools -i $PIPSRC
+cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt -i $PIPSRC
 
 echo "lib ok!"
 # pip3 install flask-caching==1.10.1
