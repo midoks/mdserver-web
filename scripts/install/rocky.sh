@@ -18,11 +18,6 @@ yum install -y python3-devel
 yum install -y crontabs
 yum install -y expect
 yum install -y curl curl-devel libcurl libcurl-devel
-#https need
-
-if [ ! -d /root/.acme.sh ];then	
-	curl https://get.acme.sh | sh
-fi
 
 if [ -f /usr/sbin/iptables ];then
 

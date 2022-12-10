@@ -14,11 +14,6 @@ dnf install -y python-devel
 dnf install -y crontabs
 dnf install -y mysql-devel
 
-#https need
-
-if [ ! -d /root/.acme.sh ];then	
-	curl https://get.acme.sh | sh
-fi
 
 if [ -f /usr/sbin/iptables ];then
 

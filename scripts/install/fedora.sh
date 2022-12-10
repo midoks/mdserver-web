@@ -17,12 +17,6 @@ yum install -y wget curl lsof unzip
 yum install -y expect
 dnf install crontabs -y
 
-#https need
-
-if [ ! -d /root/.acme.sh ];then	
-	curl  https://get.acme.sh | sh
-fi
-
 if [ -f /usr/sbin/iptables ];then
 
 	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 22 -j ACCEPT

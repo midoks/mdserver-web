@@ -18,21 +18,28 @@ if [ ! -z "$stream" ];then
 fi
 
 PKGMGR='yum'
-
 if [ $VERSION_ID -ge 8 ];then
     PKGMGR='dnf'
-    if [ ! -z "$cn" ];then
-    	dnf install -y http://mirrors.cloud.tencent.com/epel/epel-release-latest-$VERSION_ID.noarch.rpm
-    else
-    	dnf install -y epel-release
-    fi
+fi
+
+$PKGMGR install -y epel-release
+if [ ! -z "$cn" ];then
+    sed -e 's|^metalink=|#metalink=|g' \
+        -e 's|^#baseurl=|baseurl=|g' \
+        -e 's|//download\.fedoraproject\.org/pub|//mirrors.tuna.tsinghua.edu.cn|g' \
+        -e 's|//download\.example/pub|//mirrors.tuna.tsinghua.edu.cn|g' \
+        -i.bak /etc/yum.repos.d/epel*.repo
+fi
+$PKGMGR makecache
+$PKGMGR groupinstall -y "Development Tools"
+
+if [ $VERSION_ID -ge 8 ];then
+    # EL8 及以上
     if [ $VERSION_ID -ge 9 ];then
         REPOS='--enablerepo=appstream,baseos,epel,extras,crb'
     else
         REPOS='--enablerepo=appstream,baseos,epel,extras,powertools'
     fi
-    dnf $REPOS makecache
-    dnf groupinstall -y "Development Tools"
     dnf $REPOS install -y --allowerasing --skip-broken autoconf bzip2 bzip2-devel c-ares-devel \
         ca-certificates cairo-devel cmake crontabs curl curl-devel diffutils e2fsprogs e2fsprogs-devel \
         expat-devel expect file flex gcc gcc-c++ gd gd-devel gettext gettext-devel glib2 glib2-devel glibc.i686 \
@@ -44,8 +51,6 @@ if [ $VERSION_ID -ge 8 ];then
         readline-devel rpcgen sqlite-devel tar unzip vim-minimal wget zip zlib zlib-devel
 else
     # CentOS 7
-    yum makecache
-    yum groupinstall -y "Development Tools"
     yum install -y --skip-broken autoconf bison bzip2 bzip2-devel c-ares-devel ca-certificates cairo-devel \
         cmake cmake3 crontabs curl curl-devel diffutils e2fsprogs e2fsprogs-devel expat-devel expect file \
         flex freetype freetype-devel gcc gcc-c++ gd gd-devel gettext gettext-devel git-core glib2 glib2-devel \
@@ -60,7 +65,7 @@ else
 fi
 
 #https need
-if [ ! -d /root/.acme.sh ];then	
+if [ ! -d /root/.acme.sh ];then
 	curl https://get.acme.sh | sh
 fi
 

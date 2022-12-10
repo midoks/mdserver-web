@@ -20,10 +20,6 @@ apt install -y expect
 
 apt install -y cron
 
-if [ ! -d /root/.acme.sh ];then	
-	curl  https://get.acme.sh | sh
-fi
-
 apt install -y locate
 locale-gen en_US.UTF-8
 localedef -v -c -i en_US -f UTF-8 en_US.UTF-8

@@ -51,10 +51,6 @@ zypper install -y libXpm-devel
 zypper install -y freetype2-devel
 
 # zypper install -y  php-config
-#https need
-if [ ! -d /root/.acme.sh ];then	
-	curl https://get.acme.sh | sh
-fi
 
 if [ -f /usr/sbin/iptables ];then
 
