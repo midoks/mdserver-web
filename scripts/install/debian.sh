@@ -31,11 +31,21 @@ fi
 apt-get install ntpdate -y
 ntpdate $NTPHOST | logger -t NTP
 
+if [ ! -f /usr/sbin/locale-gen ];then
+	apt install -y locales
+	sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen
+	locale-gen en_US.UTF-8
+	localedef -v -c -i en_US -f UTF-8 en_US.UTF-8
+	dpkg-reconfigure --frontend=noninteractive locales
+	update-locale LANG=en_US.UTF-8
+else
+	locale-gen en_US.UTF-8
+	localedef -v -c -i en_US -f UTF-8 en_US.UTF-8
+fi
+
 apt-get update -y
-apt install -y wget curl lsof unzip tar cron expect locate
+apt install -y wget curl lsof unzip tar cron expect locate 
 apt install -y python3-pip python3-dev python3-venv
-locale-gen en_US.UTF-8
-localedef -v -c -i en_US -f UTF-8 en_US.UTF-8
 
 if [ -f /usr/sbin/ufw ];then
 
