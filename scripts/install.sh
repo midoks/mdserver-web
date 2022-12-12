@@ -25,31 +25,32 @@ if [ ${_os} == "Darwin" ]; then
 elif grep -Eq "openSUSE" /etc/*-release; then
 	OSNAME='opensuse'
 	zypper refresh
+	zypper install cron wget curl zip unzip
 elif grep -Eq "FreeBSD" /etc/*-release; then
 	OSNAME='freebsd'
 elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/redhat-release; then
 	OSNAME='rhel'
-	yum install -y wget curl zip unzip tar
+	yum install -y wget curl zip unzip tar crontabs
 elif grep -Eqi "Fedora" /etc/issue || grep -Eq "Fedora" /etc/*-release; then
 	OSNAME='fedora'
-	yum install -y wget curl zip unzip tar
+	yum install -y wget curl zip unzip tar crontabs
 elif grep -Eqi "Rocky" /etc/issue || grep -Eq "Rocky" /etc/redhat-release; then
 	OSNAME='rhel'
-	yum install -y wget curl zip unzip tar
+	yum install -y wget curl zip unzip tar crontabs
 elif grep -Eqi "AlmaLinux" /etc/issue || grep -Eq "AlmaLinux" /etc/redhat-release; then
 	OSNAME='rhel'
-	yum install -y wget curl zip unzip tar
+	yum install -y wget curl zip unzip tar crontabs
 elif grep -Eqi "Amazon Linux" /etc/issue || grep -Eq "Amazon Linux" /etc/*-release; then
 	OSNAME='amazon'
-	yum install -y wget curl zip unzip tar
+	yum install -y wget curl zip unzip tar crontabs
 elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/os-release; then
 	OSNAME='debian'
 	apt update -y
-	apt install -y wget curl zip unzip tar
+	apt install -y wget curl zip unzip tar cron
 elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/os-release; then
 	OSNAME='debian'
 	apt update -y
-	apt install -y wget curl zip unzip tar
+	apt install -y wget curl zip unzip tar cron
 else
 	OSNAME='unknow'
 fi
