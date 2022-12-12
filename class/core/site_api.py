@@ -140,6 +140,10 @@ class site_api:
         return mw.getJson(data)
 
     def getCliPhpVersionApi(self):
+        php_dir = mw.getServerDir() + '/php'
+        if not os.path.exists(php_dir):
+            return mw.returnJson(False, '未安装PHP,无法设置')
+
         php_bin = '/usr/bin/php'
         php_versions = self.getPhpVersion()
         php_versions = php_versions[1:]
