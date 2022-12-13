@@ -40,7 +40,8 @@ if [ $VERSION_ID -ge 8 ];then
     else
         REPOS='--enablerepo=appstream,baseos,epel,extras,powertools'
     fi
-    dnf $REPOS install -y --allowerasing --skip-broken autoconf bzip2 bzip2-devel c-ares-devel \
+
+    for rpms in autoconf bzip2 bzip2-devel c-ares-devel \
         ca-certificates cairo-devel cmake crontabs curl curl-devel diffutils e2fsprogs e2fsprogs-devel \
         expat-devel expect file flex gcc gcc-c++ gd gd-devel gettext gettext-devel glib2 glib2-devel glibc.i686 \
         gmp-devel kernel-devel libXpm-devel libaio-devel libcap libcurl libcurl-devel libevent libevent-devel \
@@ -48,10 +49,13 @@ if [ $VERSION_ID -ge 8 ];then
         libpng libpng-devel libstdc++.so.6 libtirpc libtirpc-devel libtool libtool-libs libwebp libwebp-devel \
         libxml2 libxml2-devel libxslt libxslt-devel lsof make mysql-devel ncurses ncurses-devel net-tools \
         oniguruma oniguruma-devel patch pcre pcre-devel perl perl-Data-Dumper perl-devel procps psmisc python3-devel \
-        readline-devel rpcgen sqlite-devel tar unzip vim-minimal wget zip zlib zlib-devel
+        readline-devel rpcgen sqlite-devel tar unzip vim-minimal wget zip zlib zlib-devel ;
+    do
+        dnf $REPOS install -y $rpms;
+    done
 else
     # CentOS 7
-    yum install -y --skip-broken autoconf bison bzip2 bzip2-devel c-ares-devel ca-certificates cairo-devel \
+    for rpms in autoconf bison bzip2 bzip2-devel c-ares-devel ca-certificates cairo-devel \
         cmake cmake3 crontabs curl curl-devel diffutils e2fsprogs e2fsprogs-devel expat-devel expect file \
         flex freetype freetype-devel gcc gcc-c++ gd gd-devel gettext gettext-devel git-core glib2 glib2-devel \
         glibc.i686 gmp-devel graphviz icu kernel-devel libXpm-devel libaio-devel libcap libcurl libcurl-devel \
@@ -61,7 +65,10 @@ else
         make mysql-devel ncurses ncurses-devel net-tools oniguruma oniguruma-devel openldap openldap-devel \
         openssl openssl-devel patch pcre pcre-devel perl perl-Data-Dumper perl-devel psmisc python-devel \
         python3-devel python3-pip re2c readline-devel rpcgen sqlite-devel tar unzip vim-minimal vixie-cron \
-        wget zip zlib zlib-devel ImageMagick ImageMagick-devel
+        wget zip zlib zlib-devel ImageMagick ImageMagick-devel ;
+    do
+        yum install -y $rpms;
+    done
 fi
 
 #https need
