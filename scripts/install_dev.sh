@@ -4,6 +4,12 @@ export PATH
 # LANG=en_US.UTF-8
 is64bit=`getconf LONG_BIT`
 
+echo -e "您正在安装的是\033[31m mdserver-web 测试版\033[0m，非开发测试用途请使用正式版 install.sh ！" 
+echo -e "\nYou are installing\033[31m mdserver-web dev version \033[0m, normally use install.sh for production.\n" 
+sleep 8
+
+{
+
 if [ -f /etc/motd ];then
     echo "welcome to mdserver-web panel" > /etc/motd
 fi
@@ -101,3 +107,8 @@ fi
 endTime=`date +%s`
 ((outTime=(${endTime}-${startTime})/60))
 echo -e "Time consumed:\033[32m $outTime \033[0mMinute!"
+
+} 1> >(tee mw-install.log) 2>&1
+
+echo -e "\nInstall completed. If error occurs, please contact us with the log file mw-install.log ."
+echo "安装完毕，如果出现错误，请带上同目录下的安装日志 mw-install.log 联系我们反馈."
