@@ -21,6 +21,8 @@ if [ "$version" == "52" ];then
 	LIBV=2.2.7
 elif [ "$version" -lt "70" ];then
 	LIBV=4.2.0
+elif [ "$version" -gt "74" ];then
+	LIBV=5.3.5
 else
 	echo 'ok'
 fi

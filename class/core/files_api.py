@@ -97,11 +97,11 @@ class files_api:
         import shutil
         try:
             shutil.move(sfile, dfile)
-            msg = mw.getInfo('移动文件或目录[{1}]到[{2}]成功!', (sfile, dfile,))
+            msg = mw.getInfo('移动或重名命文件[{1}]到[{2}]成功!', (sfile, dfile,))
             mw.writeLog('文件管理', msg)
-            return mw.returnJson(True, '移动文件或目录成功!')
+            return mw.returnJson(True, '移动或重名命文件成功!')
         except:
-            return mw.returnJson(False, '移动文件或目录失败!')
+            return mw.returnJson(False, '移动或重名命文件失败!')
 
     def deleteApi(self):
         path = request.form.get('path', '')
@@ -240,6 +240,11 @@ class files_api:
                 system_api.system_api().restartTask()
         except:
             system_api.system_api().restartTask()
+
+        # 删除日志
+        task_log = mw.getRunDir() + "/tmp/panelTask.pl"
+        if os.path.exists(task_log):
+            os.remove(task_log)
         return mw.returnJson(True, '任务已删除!')
 
     # 上传文件

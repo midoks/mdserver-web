@@ -331,7 +331,8 @@ case "$1" in
         echo -e "=================================================================="
         echo -e "$address"
         echo -e `python3 $mw_path/tools.py username`
-        echo -e "password: $password"
+        echo -e `python3 $mw_path/tools.py password`
+        # echo -e "password: $password"
         echo -e "\033[33mWarning:\033[0m"
         echo -e "\033[33mIf you cannot access the panel. \033[0m"
         echo -e "\033[33mrelease the following port (${show_panel_ip}888|80|443|22) in the security group.\033[0m"

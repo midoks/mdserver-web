@@ -1103,7 +1103,7 @@ function reName(type, fileName) {
 		closeBtn: 1,
 		area: '320px', 
 		title: '重命名',
-		btn:["确定","保存"],
+		btn:["确定","取消"],
 		content: '<div class="bt-form pd20">\
 					<div class="line">\
 					<input type="text" class="bt-input-text" name="Name" id="newFileName" value="' + fileName + '" placeholder="文件名" style="width:100%" />\
@@ -1615,10 +1615,13 @@ function getPathSize(){
 $("body").not(".def-log").click(function(){
 	$("#rmenu").hide()
 });
+
 //指定路径
 $("#DirPathPlace input").keyup(function(e){
 	if(e.keyCode == 13) {
-		getFiles($(this).val());
+		var fpath = $(this).val();
+		fpath = filterPath(fpath);
+		getFiles(fpath);
 	}
 });
 
@@ -1662,6 +1665,7 @@ function pathLeft(){
 		$("#PathPlaceBtn ul").css("left",0);
 	}
 }
+
 //路径快捷点击
 $("#PathPlaceBtn").on("click", function(e){
 	if($("#DirPathPlace").is(":hidden")){

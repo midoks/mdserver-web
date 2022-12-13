@@ -31,11 +31,6 @@ if [ "$version" -eq "72" ] || [ "$version" -eq "73" ];then
 	LIBV=3.2.5
 fi
 
-if [ "$version" -eq "82" ];then
-	echo "not need"
-	exit 1
-fi
-
 
 LIB_PATH_NAME=lib/php
 if [ -d $serverPath/php/${version}/lib64 ];then
