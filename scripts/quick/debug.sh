@@ -2,7 +2,7 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
-if [ ${_os} != "Darwin" ] && [ ! -d /www/server/log ]; then
+if [ ! -d /www/server/log ]; then
 	mkdir -p /www/server/log
 fi
 
