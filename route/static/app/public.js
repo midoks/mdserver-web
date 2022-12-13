@@ -639,7 +639,7 @@ function divcenter() {
 }
 
 function copyText(value) {
-	var clipboard = new ClipboardJS('#bt_copys');
+	var clipboard = new ClipboardJS('#mw_copys');
     clipboard.on('success', function (e) {
         layer.msg('复制成功',{icon:1,time:2000});
     });
@@ -647,8 +647,8 @@ function copyText(value) {
     clipboard.on('error', function (e) {
         layer.msg('复制失败，浏览器不兼容!',{icon:2,time:2000});
     });
-    $("#bt_copys").attr('data-clipboard-text',value);
-    $("#bt_copys").click();
+    $("#mw_copys").attr('data-clipboard-text',value);
+    $("#mw_copys").click();
 }
 
 function isChineseChar(b) {
