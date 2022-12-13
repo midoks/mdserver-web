@@ -14,37 +14,42 @@ if [ "$EUID" -ne 0 ]
   exit
 fi
 
-
+# macOS
 if [ ${_os} == "Darwin" ]; then
 	OSNAME='macos'
+# SUSE Linux
 elif grep -Eq "openSUSE" /etc/*-release; then
 	OSNAME='opensuse'
 	zypper refresh
+	zypper install cron wget curl zip unzip
+# FreeBSD
 elif grep -Eq "FreeBSD" /etc/*-release; then
 	OSNAME='freebsd'
-elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
-	OSNAME='centos'
-	yum install -y wget zip unzip
-elif grep -Eqi "Fedora" /etc/issue || grep -Eq "Fedora" /etc/*-release; then
-	OSNAME='fedora'
-	yum install -y wget zip unzip
-elif grep -Eqi "Rocky" /etc/issue || grep -Eq "Rocky" /etc/*-release; then
-	OSNAME='rocky'
-	yum install -y wget zip unzip
-elif grep -Eqi "AlmaLinux" /etc/issue || grep -Eq "AlmaLinux" /etc/*-release; then
-	OSNAME='alma'
-	yum install -y wget zip unzip
-elif grep -Eqi "Amazon Linux" /etc/issue || grep -Eq "Amazon Linux" /etc/*-release; then
-	OSNAME='amazon'
-	yum install -y wget zip unzip
-elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
+# Arch Linux
+elif [ -f /etc/arch-release ]; then
+	OSNAME='arch'
+	pacman -Syu --noconfirm
+	pacman -S --noconfirm curl cronie
+# Enterprise Linux
+elif [ -f /etc/redhat-release ]; then
+	if grep -Eq "AlmaLinux" /etc/redhat-release ; then OSNAME='alma';
+	elif grep -Eq "CentOS" /etc/redhat-release ; then OSNAME='centos';
+	elif grep -Eq "Rocky" /etc/redhat-release ; then OSNAME='rocky';
+	elif grep -Eq "Red Hat" /etc/redhat-release ; then OSNAME='rhel';
+	fi
+	OSNAME='rhel'
+	if grep -Eq "Amazon Linux" /etc/redhat-release ; then OSNAME='amazon'; fi
+	if grep -Eq "Fedora" /etc/redhat-release ; then OSNAME='fedora'; fi
+	yum install -y wget curl zip unzip tar crontabs
+# Debian / Ubuntu
+elif [ -f /etc/lsb-release ]; then
 	OSNAME='debian'
-	apt install -y wget zip unzip
-elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
-	OSNAME='ubuntu'
-	apt install -y wget zip unzip
-elif grep -Eqi "Raspbian" /etc/issue || grep -Eq "Raspbian" /etc/*-release; then
-	OSNAME='raspbian'
+	if grep -Eq "Ubuntu" /etc/os-release; then OSNAME='ubuntu';
+	elif grep -Eq "Debian" /etc/os-release; then OSNAME='debian';
+	fi
+	apt update -y
+	apt install -y wget curl zip unzip tar cron
+# Others
 else
 	OSNAME='unknow'
 fi
