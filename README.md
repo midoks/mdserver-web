@@ -2,6 +2,7 @@
   <img alt="logo" src="https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/route/static/logo.png" height="140" />
   <h3 align="center">mdserver-web</h3>
   <p align="center">一款简单Linux面板服务</p>
+  <p align="center">强烈推荐系统:debian</p>
 </p>
 
 ### 简介
@@ -10,10 +11,11 @@
 复制了后台管理界面，按照自己想要的方式写了一版。
 
 
-![CentOS](https://img.shields.io/badge/LINUX-CentOS-blue?style=for-the-badge&logo=CentOS)
-![Ubuntu](https://img.shields.io/badge/LINUX-Ubuntu-blue?style=for-the-badge&logo=Ubuntu)
 ![Debian](https://img.shields.io/badge/LINUX-Debian-blue?style=for-the-badge&logo=Debian)
+![Ubuntu](https://img.shields.io/badge/LINUX-Ubuntu-blue?style=for-the-badge&logo=Ubuntu)
 ![Fedora](https://img.shields.io/badge/LINUX-Fedora-blue?style=for-the-badge&logo=Fedora)
+![CentOS](https://img.shields.io/badge/LINUX-CentOS-blue?style=for-the-badge&logo=CentOS)
+
 
 [![Wiki](https://img.shields.io/badge/MW-Wiki-red?style=for-the-badge&logo=wiki)](https://github.com/midoks/mdserver-web/wiki)
 [![](https://data.jsdelivr.com/v1/package/gh/midoks/mdserver-web/badge?style=for-the-badge)](https://www.jsdelivr.com/package/gh/midoks/mdserver-web)
@@ -90,15 +92,12 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.11.2
+### 版本更新 0.11.4
 
-* redis安全强化。
-* 添加php命令行设置。
-* 域名绑定。
-* Gitea优化。
-* 网站统计优化。
-* centos9下php-gd安装优化。
-* php82rc7测试版。
+* PHP82正式释出。
+* PHP-fileinfo扩展优化。
+* 删除任务时删除日志。
+* 优化修改密码后的显示问题(#288)。
 
 
 ### JSDelivr安装地址

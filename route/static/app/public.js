@@ -100,6 +100,19 @@ function isContains(str, substr) {
     return str.indexOf(substr) >= 0;
 }
 
+
+function filterPath(path){
+	var path_arr = path.split('/');
+	var path_new = [];
+	for (var i = 0; i < path_arr.length; i++) {
+		if (path_arr[i]!=''){
+			path_new.push(path_arr[i]);
+		}
+	}
+	var rdata = "/"+path_new.join('/');
+	return rdata;
+}
+
 function msgTpl(msg, args){
 	if (typeof args == 'string'){
 		return msg.replace('{1}', args);

@@ -48,7 +48,7 @@ elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/os-release; then
 	apt update -y
 	apt install -y wget curl zip unzip tar cron
 elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/os-release; then
-	OSNAME='debian'
+	OSNAME='ubuntu'
 	apt update -y
 	apt install -y wget curl zip unzip tar cron
 else

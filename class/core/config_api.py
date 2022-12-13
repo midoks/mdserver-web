@@ -27,7 +27,7 @@ from flask import request
 
 class config_api:
 
-    __version = '0.11.2'
+    __version = '0.11.4'
     __api_addr = 'data/api.json'
 
     def __init__(self):
@@ -89,21 +89,6 @@ class config_api:
             return mw.returnJson(True, '修改成功!')
         return mw.returnJson(False, '修改失败!')
 
-    def setPanelDomainApi(self):
-        domain = request.form.get('domain', '')
-
-        cfg_domain = 'data/bind_domain.pl'
-        if domain == '':
-            os.remove(cfg_domain)
-            return mw.returnJson(True, '清空域名成功!')
-
-        reg = r"^([\w\-\*]{1,100}\.){1,4}(\w{1,10}|\w{1,10}\.\w{1,10})$"
-        if not re.match(reg, domain):
-            return mw.returnJson(False, '主域名格式不正确')
-
-        mw.writeFile(cfg_domain, domain)
-        return mw.returnJson(True, '设置域名成功!')
-
     def syncDateApi(self):
         if mw.isAppleSystem():
             return mw.returnJson(True, '开发系统不必同步时间!')
@@ -150,7 +135,8 @@ class config_api:
             import system_api
             import firewall_api
 
-            if os.path.exists("/lib/systemd/system/firewalld.service"):
+            sysCfgDir = mw.systemdCfgDir()
+            if os.path.exists(sysCfgDir + "/firewalld.service"):
                 if not firewall_api.firewall_api().getFwStatus():
                     return mw.returnJson(False, 'firewalld必须先启动!')
 
@@ -257,7 +243,8 @@ class config_api:
             import system_api
             import firewall_api
 
-            if os.path.exists("/lib/systemd/system/firewalld.service"):
+            sysCfgDir = mw.systemdCfgDir()
+            if os.path.exists(sysCfgDir + "/firewalld.service"):
                 if not firewall_api.firewall_api().getFwStatus():
                     return mw.returnJson(False, 'firewalld必须先启动!')
 
@@ -355,23 +342,31 @@ class config_api:
     def getPanelSslApi(self):
         cert = {}
 
-        if not os.path.exists('ssl/certificate.pem'):
+        keyPath = 'ssl/private.pem'
+        certPath = 'ssl/cert.pem'
+
+        if not os.path.exists(certPath):
             mw.createSSL()
 
-        cert['privateKey'] = mw.readFile('ssl/privateKey.pem')
-        cert['certPem'] = mw.readFile('ssl/certificate.pem')
+        cert['privateKey'] = mw.readFile(keyPath)
+        cert['certPem'] = mw.readFile(certPath)
         cert['rep'] = os.path.exists('ssl/input.pl')
-        cert['info'] = mw.getCertName('ssl/certificate.pem')
+        cert['info'] = mw.getCertName(certPath)
         return mw.getJson(cert)
 
     # 保存面板证书
     def savePanelSslApi(self):
-        keyPath = 'ssl/privateKey.pem'
-        certPath = 'ssl/certificate.pem'
+        keyPath = 'ssl/private.pem'
+        certPath = 'ssl/cert.pem'
         checkCert = '/tmp/cert.pl'
 
         certPem = request.form.get('certPem', '').strip()
         privateKey = request.form.get('privateKey', '').strip()
+
+        if(privateKey.find('KEY') == -1):
+            return mw.returnJson(False, '秘钥错误，请检查!')
+        if(certPem.find('CERTIFICATE') == -1):
+            return mw.returnJson(False, '证书错误，请检查!')
 
         mw.writeFile(checkCert, certPem)
         if privateKey:
@@ -383,22 +378,128 @@ class config_api:
         mw.writeFile('ssl/input.pl', 'True')
         return mw.returnJson(True, '证书已保存!')
 
+    def setPanelDomainApi(self):
+        domain = request.form.get('domain', '')
+
+        panel_tpl = mw.getRunDir() + "/data/tpl/nginx_panel.conf"
+        dst_panel_path = mw.getServerDir() + "/web_conf/nginx/vhost/panel.conf"
+
+        cfg_domain = 'data/bind_domain.pl'
+        if domain == '':
+            os.remove(cfg_domain)
+            os.remove(dst_panel_path)
+            mw.restartWeb()
+            return mw.returnJson(True, '清空域名成功!')
+
+        reg = r"^([\w\-\*]{1,100}\.){1,4}(\w{1,10}|\w{1,10}\.\w{1,10})$"
+        if not re.match(reg, domain):
+            return mw.returnJson(False, '主域名格式不正确')
+
+        op_dir = mw.getServerDir() + "/openresty"
+        if not os.path.exists(op_dir):
+            return mw.returnJson(False, '依赖OpenResty,先安装启动它!')
+
+        content = mw.readFile(panel_tpl)
+        content = content.replace("{$PORT}", "80")
+        content = content.replace("{$SERVER_NAME}", domain)
+        content = content.replace("{$PANAL_PORT}", mw.readFile('data/port.pl'))
+        content = content.replace("{$LOGPATH}", mw.getRunDir() + '/logs')
+        content = content.replace("{$PANAL_ADDR}", mw.getRunDir())
+        mw.writeFile(dst_panel_path, content)
+        mw.restartWeb()
+
+        mw.writeFile(cfg_domain, domain)
+        return mw.returnJson(True, '设置域名成功!')
+
      # 设置面板SSL
     def setPanelSslApi(self):
         sslConf = mw.getRunDir() + '/data/ssl.pl'
+
+        panel_tpl = mw.getRunDir() + "/data/tpl/nginx_panel.conf"
+        dst_panel_path = mw.getServerDir() + "/web_conf/nginx/vhost/panel.conf"
         if os.path.exists(sslConf):
             os.system('rm -f ' + sslConf)
-            mw.restartMw()
+
+            conf = mw.readFile(dst_panel_path)
+            if conf:
+                rep = "\s+ssl_certificate\s+.+;\s+ssl_certificate_key\s+.+;"
+                conf = re.sub(rep, '', conf)
+                rep = "\s+ssl_protocols\s+.+;\n"
+                conf = re.sub(rep, '', conf)
+                rep = "\s+ssl_ciphers\s+.+;\n"
+                conf = re.sub(rep, '', conf)
+                rep = "\s+ssl_prefer_server_ciphers\s+.+;\n"
+                conf = re.sub(rep, '', conf)
+                rep = "\s+ssl_session_cache\s+.+;\n"
+                conf = re.sub(rep, '', conf)
+                rep = "\s+ssl_session_timeout\s+.+;\n"
+                conf = re.sub(rep, '', conf)
+                rep = "\s+ssl_ecdh_curve\s+.+;\n"
+                conf = re.sub(rep, '', conf)
+                rep = "\s+ssl_session_tickets\s+.+;\n"
+                conf = re.sub(rep, '', conf)
+                rep = "\s+ssl_stapling\s+.+;\n"
+                conf = re.sub(rep, '', conf)
+                rep = "\s+ssl_stapling_verify\s+.+;\n"
+                conf = re.sub(rep, '', conf)
+                rep = "\s+ssl\s+on;"
+                conf = re.sub(rep, '', conf)
+                rep = "\s+error_page\s497.+;"
+                conf = re.sub(rep, '', conf)
+                rep = "\s+if.+server_port.+\n.+\n\s+\s*}"
+                conf = re.sub(rep, '', conf)
+                rep = "\s+listen\s+443.*;"
+                conf = re.sub(rep, '', conf)
+                rep = "\s+listen\s+\[\:\:\]\:443.*;"
+                conf = re.sub(rep, '', conf)
+                mw.writeFile(dst_panel_path, conf)
+
+            mw.writeLog('面板配置', '面板SSL关闭成功!')
+            mw.restartWeb()
             return mw.returnJson(True, 'SSL已关闭，请使用http协议访问面板!')
         else:
             try:
                 if not os.path.exists('ssl/input.ssl'):
                     mw.createSSL()
                 mw.writeFile(sslConf, 'True')
+
+                keyPath = mw.getRunDir() + '/ssl/private.pem'
+                certPath = mw.getRunDir() + '/ssl/cert.pem'
+
+                conf = mw.readFile(dst_panel_path)
+                if conf:
+                    if conf.find('ssl_certificate') == -1:
+                        sslStr = """#error_page 404/404.html;
+    ssl_certificate    %s;
+    ssl_certificate_key  %s;
+    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+    ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:HIGH:!aNULL:!MD5:!RC4:!DHE;
+    ssl_prefer_server_ciphers on;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 10m;
+    error_page 497  https://$host$request_uri;""" % (certPath, keyPath)
+                    if(conf.find('ssl_certificate') != -1):
+                        return mw.returnJson(True, 'SSL开启成功!')
+
+                    conf = conf.replace('#error_page 404/404.html;', sslStr)
+
+                    rep = "listen\s+([0-9]+)\s*[default_server]*;"
+                    tmp = re.findall(rep, conf)
+                    if not mw.inArray(tmp, '443'):
+                        listen = re.search(rep, conf).group()
+                        http_ssl = "\n\tlisten 443 ssl http2;"
+                        http_ssl = http_ssl + "\n\tlisten [::]:443 ssl http2;"
+                        conf = conf.replace(listen, listen + http_ssl)
+
+                    mw.backFile(dst_panel_path)
+                    mw.writeFile(dst_panel_path, conf)
+                    isError = mw.checkWebConfig()
+                    if(isError != True):
+                        mw.restoreFile(dst_panel_path)
+                        return mw.returnJson(False, '证书错误: <br><a style="color:red;">' + isError.replace("\n", '<br>') + '</a>')
             except Exception as ex:
                 return mw.returnJson(False, '开启失败:' + str(ex))
-
-            mw.restartMw()
+            mw.restartWeb()
             return mw.returnJson(True, '开启成功，请使用https协议访问面板!')
 
     def getApi(self):

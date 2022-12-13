@@ -920,13 +920,22 @@ def checkDomainPanel():
     tmp = getHost()
     domain = readFile('data/bind_domain.pl')
     port = readFile('data/port.pl').strip()
+
+    npid = getServerDir() + "/openresty/nginx/logs/nginx.pid"
+    if not os.path.exists(npid):
+        return False
+
+    nconf = getServerDir() + "/web_conf/nginx/vhost/panel.conf"
+    if os.path.exists(nconf):
+        port = "80"
+
     if domain:
         client_ip = getClientIp()
         if client_ip in ['127.0.0.1', 'localhost', '::1']:
             return False
         if tmp.strip().lower() != domain.strip().lower():
             from flask import Flask, redirect, request, url_for
-            to = "http://" + domain + ":" + port
+            to = "http://" + domain + ":" + str(port)
             return redirect(to, code=302)
     return False
 
@@ -1371,8 +1380,8 @@ def createSSL():
     private_key = OpenSSL.crypto.dump_privatekey(
         OpenSSL.crypto.FILETYPE_PEM, key)
     if len(cert_ca) > 100 and len(private_key) > 100:
-        writeFile('ssl/certificate.pem', cert_ca, 'wb+')
-        writeFile('ssl/privateKey.pem', private_key, 'wb+')
+        writeFile('ssl/cert.pem', cert_ca, 'wb+')
+        writeFile('ssl/private.pem', private_key, 'wb+')
         return True
     return False
 
