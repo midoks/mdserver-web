@@ -2,6 +2,12 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
+if [ ${_os} != "Darwin" ] && [ ! -d /www/server/log ]; then
+	mkdir -p /www/server/log
+fi
+
+{
+
 echo "welcome to mdserver-web panel"
 
 startTime=`date +%s`
@@ -21,7 +27,6 @@ fi
 # if [ ! -d /www/server/php/71 ];then
 # 	cd /www/server/mdserver-web/plugins/php && bash install.sh install 71
 # fi
-
 
 
 PHP_VER_LIST=(53 54 55 56 70 71 72 73 74 80 81)
@@ -51,3 +56,4 @@ endTime=`date +%s`
 ((outTime=(${endTime}-${startTime})/60))
 echo -e "Time consumed:\033[32m $outTime \033[0mMinute!"
 
+} 1> >(tee /www/server/log/mw-debug.log) 2>&1
