@@ -94,7 +94,7 @@ class crontab_api:
         rdata['list'] = mw.getPage(_page)
         rdata['p'] = p
 
-        # backup hock
+        # backup hook
         bh_file = mw.getPanelDataDir() + "/hook_backup.json"
         if os.path.exists(bh_file):
             hb_data = mw.readFile(bh_file)
