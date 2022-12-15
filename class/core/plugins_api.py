@@ -243,7 +243,7 @@ class plugins_api:
 
     def hookUninstall(self, info):
         if 'hook' in info:
-            hooks = info['hook', ]
+            hooks = info['hook']
             for x in hooks:
                 if x in ['backup', 'database']:
                     self.hookUninstallFile(x, info)
