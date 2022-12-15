@@ -1,4 +1,5 @@
 {
+	"hook":["database"],
 	"title":"MySQL[YUM]",
 	"tip":"soft",
 	"name":"mysql-yum",
