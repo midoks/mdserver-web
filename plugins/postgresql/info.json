@@ -1,4 +1,5 @@
 {
+	"hook":["database"],
 	"title":"PostgreSQL",
 	"tip":"soft",
 	"name":"postgresql",
