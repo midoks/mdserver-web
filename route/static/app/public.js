@@ -651,6 +651,10 @@ function copyText(value) {
     $("#mw_copys").click();
 }
 
+function copyPass(value){
+	copyText(value);
+}
+
 function isChineseChar(b) {
 	var a = /[\u4E00-\u9FA5\uF900-\uFA2D]/;
 	return a.test(b)
