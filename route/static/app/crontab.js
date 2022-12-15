@@ -1,13 +1,3 @@
-function isURL(str_url){
-	var strRegex = '^(https|http|ftp|rtsp|mms)?://.+';
-	var re=new RegExp(strRegex);
-	if (re.test(str_url)){
-		return (true);
-	}else{
-		return (false);
-	}
-}
-
 var num = 0;
 //查看任务日志
 function getLogs(id){
@@ -413,6 +403,9 @@ function initDropdownMenu(){
 				toBackup('sites');
 				$(".controls").html('备份网站');
 				break;
+			case 'database_mariadb':
+			case 'database_mysql-apt':
+			case 'database_mysql-yum':
 			case 'database':
 				toBackup('databases');
 				$(".controls").html('备份数据库');
