@@ -812,7 +812,7 @@ def getDbBackupList():
         return data[1]
 
     r = getDbBackupListFunc(args['name'])
-    bkDir = mw.getRootDir() + '/backup/database'
+    bkDir = mw.getRootDir() + '/backup/database/mariadb'
     rr = []
     for x in range(0, len(r)):
         p = bkDir + '/' + r[x]
