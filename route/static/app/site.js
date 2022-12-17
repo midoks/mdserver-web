@@ -15,7 +15,7 @@
 
 	var type = '';
 	if ( typeof(type_id) == 'undefined' ){
-		type = '&type_id=0';
+		type = '&type_id=-1';
 	} else {
 		type = '&type_id='+type_id;
 	}
@@ -2538,7 +2538,6 @@ function changeDefault(type){
 	},'json');
 }
 
-
 function getClassType(){
 	var select = $('.site_type > select');
 	$.post('/site/get_site_types',function(rdata){
@@ -2556,9 +2555,6 @@ function getClassType(){
 	},'json');
 }
 getClassType();
-
-
-
 
 function setClassType(){
 	$.post('/site/get_site_types',function(rdata){

@@ -76,16 +76,16 @@ class site_api:
     def listApi(self):
         limit = request.form.get('limit', '10')
         p = request.form.get('p', '1')
-        type_id = request.form.get('type_id', '')
+        type_id = request.form.get('type_id', '0').strip()
 
         start = (int(p) - 1) * (int(limit))
 
-        siteM = mw.M('sites')
-        if type_id != '' and type_id == '-1' and type_id == '0':
-            siteM.where('type_id=?', (type_id))
+        siteM = mw.M('sites').field('id,name,path,status,ps,addtime,edate')
+        if type_id != '' and int(type_id) >= 0:
+            siteM.where('type_id=?', (type_id,))
 
-        _list = siteM.field('id,name,path,status,ps,addtime,edate').limit(
-            (str(start)) + ',' + limit).order('id desc').select()
+        _list = siteM.limit((str(start)) + ',' +
+                            limit).order('id desc').select()
 
         for i in range(len(_list)):
             _list[i]['backup_count'] = mw.M('backup').where(

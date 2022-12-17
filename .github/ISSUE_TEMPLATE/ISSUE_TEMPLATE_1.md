@@ -11,8 +11,7 @@ Debian x, Centos x, Centos x stream, Ubuntu x?
 
 Ex:
 ```bash
-................start mw success
-bash: line 149: ./scripts/init.d/mw: No such file or directory
+一个issue，一个问题。多余问题，视情况而答。
 ```
 
 ## 错误截图 ?
