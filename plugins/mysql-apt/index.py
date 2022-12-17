@@ -688,7 +688,7 @@ def importDbExternal():
     file = args['file']
     name = args['name']
 
-    import_dir = mw.getBackupDir() + '/import/'
+    import_dir = mw.getBackupDir() + '/import/mysql-apt'
 
     file_path = import_dir + file
     if not os.path.exists(file_path):
