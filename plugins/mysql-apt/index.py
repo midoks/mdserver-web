@@ -650,7 +650,11 @@ def __createUser(dbname, username, password, address):
 
 
 def getDbBackupListFunc(dbname=''):
+
     bkDir = mw.getBackupDir() + '/database/mysql-apt'
+    if not os.path.exists(bkDir):
+        os.mkdir(bkDir)
+
     blist = os.listdir(bkDir)
     r = []
 

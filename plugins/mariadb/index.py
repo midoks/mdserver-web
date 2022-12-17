@@ -814,6 +814,9 @@ def getDbBackupList():
 
     r = getDbBackupListFunc(args['name'])
     bkDir = mw.getBackupDir() + '/database/mariadb'
+    if not os.path.exists(bkDir):
+        os.mkdir(bkDir)
+
     rr = []
     for x in range(0, len(r)):
         p = bkDir + '/' + r[x]
