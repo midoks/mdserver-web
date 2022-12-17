@@ -48,7 +48,7 @@ class backupTools:
         if not os.path.exists(backup_path):
             mw.execShell("mkdir -p " + backup_path)
 
-        filename = backup_path + "/db_" + name + "_" + \
+        filename = backup_path + "/mysql-apt_" + name + "_" + \
             time.strftime('%Y%m%d_%H%M%S', time.localtime()) + ".sql.gz"
 
         mysql_root = mw.M('config').dbPos(db_path, db_name).where(
