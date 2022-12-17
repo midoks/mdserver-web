@@ -70,7 +70,7 @@ def getArgs():
 
 
 def getBackupDir():
-    bk_path = mw.getBackupDir() + "/databases/postgresql"
+    bk_path = mw.getBackupDir() + "/database/postgresql"
     if not os.path.isdir(bk_path):
         mw.execShell("mkdir -p {}".format(bk_path))
     return bk_path

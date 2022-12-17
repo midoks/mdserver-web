@@ -67,6 +67,13 @@ def getArgs():
     return tmp
 
 
+def getBackupDir():
+    bk_path = mw.getBackupDir() + "/database/mysql-apt"
+    if not os.path.isdir(bk_path):
+        mw.execShell("mkdir -p {}".format(bk_path))
+    return bk_path
+
+
 def checkArgs(data, ck=[]):
     for i in range(len(ck)):
         if not ck[i] in data:
@@ -651,7 +658,7 @@ def __createUser(dbname, username, password, address):
 
 def getDbBackupListFunc(dbname=''):
 
-    bkDir = mw.getBackupDir() + '/database/mysql-apt'
+    bkDir = getBackupDir()
     if not os.path.exists(bkDir):
         os.mkdir(bkDir)
 
@@ -688,7 +695,7 @@ def importDbExternal():
     file = args['file']
     name = args['name']
 
-    import_dir = mw.getBackupDir() + '/import/mysql-apt'
+    import_dir = mw.getBackupDir() + '/import/'
 
     file_path = import_dir + file
     if not os.path.exists(file_path):
@@ -779,7 +786,7 @@ def deleteDbBackup():
 
     path = args['path']
     full_file = ""
-    bkDir = mw.getBackupDir() + '/database/mysql-apt'
+    bkDir = getBackupDir()
     full_file = bkDir + '/' + args['filename']
     if path != "":
         full_file = path + "/" + args['filename']
@@ -794,7 +801,7 @@ def getDbBackupList():
         return data[1]
 
     r = getDbBackupListFunc(args['name'])
-    bkDir = mw.getBackupDir() + '/database/mysql-apt'
+    bkDir = getBackupDir()
     rr = []
     for x in range(0, len(r)):
         p = bkDir + '/' + r[x]

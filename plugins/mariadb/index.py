@@ -71,6 +71,13 @@ def checkArgs(data, ck=[]):
     return (True, mw.returnJson(True, 'ok'))
 
 
+def getBackupDir():
+    bk_path = mw.getBackupDir() + "/database/mariadb"
+    if not os.path.isdir(bk_path):
+        mw.execShell("mkdir -p {}".format(bk_path))
+    return bk_path
+
+
 def getConf():
     path = getServerDir() + '/etc/my.cnf'
     return path
@@ -675,7 +682,7 @@ def __createUser(dbname, username, password, address):
 
 
 def getDbBackupListFunc(dbname=''):
-    bkDir = mw.getRootDir() + '/backup/database/mariadb'
+    bkDir = getBackupDir()
     blist = os.listdir(bkDir)
     r = []
 
@@ -709,9 +716,8 @@ def importDbBackup():
     file = args['file']
     name = args['name']
 
-    file_path = mw.getBackupDir() + '/database/mariadb/' + file
-    file_path_sql = mw.getBackupDir() + '/database/mariadb/' + \
-        file.replace('.gz', '')
+    file_path = getBackupDir() + '/' + file
+    file_path_sql = getBackupDir() + '/' + file.replace('.gz', '')
 
     if not os.path.exists(file_path_sql):
         cmd = 'cd ' + mw.getBackupDir() + '/database/mariadb && gzip -d ' + file
@@ -798,7 +804,7 @@ def deleteDbBackup():
 
     path = args['path']
     full_file = ""
-    bkDir = mw.getRootDir() + '/backup/database/mariadb'
+    bkDir = getBackupDir()
     full_file = bkDir + '/' + args['filename']
     if path != "":
         full_file = path + "/" + args['filename']
@@ -813,7 +819,7 @@ def getDbBackupList():
         return data[1]
 
     r = getDbBackupListFunc(args['name'])
-    bkDir = mw.getBackupDir() + '/database/mariadb'
+    bkDir = getBackupDir()
     if not os.path.exists(bkDir):
         os.mkdir(bkDir)
 
