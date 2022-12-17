@@ -78,6 +78,12 @@ if [ "${action}" == "install" ] && [ -d ${serverPath}/php/${type} ];then
 	fi
 
 	echo "install PHP${type} extend end"
+
+	if [ ! -f /usr/local/bin/composer ];then
+		cd /tmp
+		curl -sS https://getcomposer.org/installer | php
+		mv composer.phar /usr/local/bin/composer
+	fi
 fi
 
 

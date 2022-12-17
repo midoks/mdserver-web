@@ -228,16 +228,18 @@ function planAdd(){
 
 	var sType = $(".planjs").find("b").attr("val");
 	var sBody = encodeURIComponent($("#implement textarea[name='sBody']").val());
-	
-	if(sType == 'toFile'){
-		if($("#viewfile").val() == ''){
-			layer.msg('请选择脚本文件!',{icon:2});
-			return;
-		}
-	} else {
+
+	if (sType == 'toShell'){
 		if(sBody == ''){
 			$("#implement textarea[name='sBody']").focus();
 			layer.msg('脚本代码不能为空!',{icon:2});
+			return;
+		}
+	}
+
+	if(sType == 'toFile'){
+		if($("#viewfile").val() == ''){
+			layer.msg('请选择脚本文件!',{icon:2});
 			return;
 		}
 	}
