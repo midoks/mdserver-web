@@ -131,7 +131,7 @@ class crontab_api:
     # 参数校验
     def cronCheck(self, params):
 
-        if params['stype'] == 'site' or params['stype'] == 'database' or params['stype'] == 'logs':
+        if params['stype'] == 'site' or params['stype'] == 'database' or params['stype'].find('database_') > -1 or params['stype'] == 'logs':
             if params['save'] == '':
                 return False, '保留份数不能为空!'
 
