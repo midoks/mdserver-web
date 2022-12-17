@@ -4,12 +4,6 @@ export PATH
 export LANG=en_US.UTF-8
 export DEBIAN_FRONTEND=noninteractive
 
-DISTRO=''
-if grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/*-release; then
-	DISTRO='debian'
-elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/*-release; then
-	DISTRO='ubuntu'
-fi
 VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 
 cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
@@ -86,51 +80,49 @@ fi
 #安装时不开启
 systemctl stop firewalld
 
-if [ "$DISTRO" == 'debian' ]; then
-	#fix zlib1g-dev fail
-	echo -e "\e[0;32mfix zlib1g-dev install question start\e[0m"
-	Install_TmpFile=/tmp/debian-fix-zlib1g-dev.txt
-	apt install -y zlib1g-dev > ${Install_TmpFile}
-	if [ "$?" != "0" ];then
-		ZLIB1G_BASE_VER=$(cat ${Install_TmpFile} | grep zlib1g | awk -F "=" '{print $2}' | awk -F ")" '{print $1}')
-		ZLIB1G_BASE_VER=`echo ${ZLIB1G_BASE_VER} | sed "s/^[ \s]\{1,\}//g;s/[ \s]\{1,\}$//g"`
-		# echo "1${ZLIB1G_BASE_VER}1"
-		echo -e "\e[1;31mapt install zlib1g=${ZLIB1G_BASE_VER} zlib1g-dev\e[0m"
-		echo "Y" | apt install zlib1g=${ZLIB1G_BASE_VER}  zlib1g-dev
-	fi
-	rm -rf ${Install_TmpFile}
-	echo -e "\e[0;32mfix zlib1g-dev install question end\e[0m"
+#fix zlib1g-dev fail
+echo -e "\e[0;32mfix zlib1g-dev install question start\e[0m"
+Install_TmpFile=/tmp/debian-fix-zlib1g-dev.txt
+apt install -y zlib1g-dev > ${Install_TmpFile}
+if [ "$?" != "0" ];then
+	ZLIB1G_BASE_VER=$(cat ${Install_TmpFile} | grep zlib1g | awk -F "=" '{print $2}' | awk -F ")" '{print $1}')
+	ZLIB1G_BASE_VER=`echo ${ZLIB1G_BASE_VER} | sed "s/^[ \s]\{1,\}//g;s/[ \s]\{1,\}$//g"`
+	# echo "1${ZLIB1G_BASE_VER}1"
+	echo -e "\e[1;31mapt install zlib1g=${ZLIB1G_BASE_VER} zlib1g-dev\e[0m"
+	echo "Y" | apt install zlib1g=${ZLIB1G_BASE_VER}  zlib1g-dev
+fi
+rm -rf ${Install_TmpFile}
+echo -e "\e[0;32mfix zlib1g-dev install question end\e[0m"
 
 
-	#fix libunwind-dev fail
-	echo -e "\e[0;32mfix libunwind-dev install question start\e[0m"
-	Install_TmpFile=/tmp/debian-fix-libunwind-dev.txt
-	apt install -y libunwind-dev > ${Install_TmpFile}
-	if [ "$?" != "0" ];then
-		liblzma5_BASE_VER=$(cat ${Install_TmpFile} | grep liblzma-dev | awk -F "=" '{print $2}' | awk -F ")" '{print $1}')
-		liblzma5_BASE_VER=`echo ${liblzma5_BASE_VER} | sed "s/^[ \s]\{1,\}//g;s/[ \s]\{1,\}$//g"`
-		echo -e "\e[1;31mapt install liblzma5=${liblzma5_BASE_VER} libunwind-dev\e[0m"
-		echo "Y" | apt install liblzma5=${liblzma5_BASE_VER} libunwind-dev
-	fi
-	rm -rf ${Install_TmpFile}
-	echo -e "\e[0;32mfix libunwind-dev install question end\e[0m"
+#fix libunwind-dev fail
+echo -e "\e[0;32mfix libunwind-dev install question start\e[0m"
+Install_TmpFile=/tmp/debian-fix-libunwind-dev.txt
+apt install -y libunwind-dev > ${Install_TmpFile}
+if [ "$?" != "0" ];then
+	liblzma5_BASE_VER=$(cat ${Install_TmpFile} | grep liblzma-dev | awk -F "=" '{print $2}' | awk -F ")" '{print $1}')
+	liblzma5_BASE_VER=`echo ${liblzma5_BASE_VER} | sed "s/^[ \s]\{1,\}//g;s/[ \s]\{1,\}$//g"`
+	echo -e "\e[1;31mapt install liblzma5=${liblzma5_BASE_VER} libunwind-dev\e[0m"
+	echo "Y" | apt install liblzma5=${liblzma5_BASE_VER} libunwind-dev
+fi
+rm -rf ${Install_TmpFile}
+echo -e "\e[0;32mfix libunwind-dev install question end\e[0m"
 
 
-	apt install -y libvpx-dev
-	apt install -y libxpm-dev
-	apt install -y libwebp-dev
-	apt install -y libfreetype6-dev
+apt install -y libvpx-dev
+apt install -y libxpm-dev
+apt install -y libwebp-dev
+apt install -y libfreetype6-dev
 
-	localedef -i en_US -f UTF-8 en_US.UTF-8
+localedef -i en_US -f UTF-8 en_US.UTF-8
 
-	if [ "$VERSION_ID" == "9" ];then
-		sed "s/flask==2.0.3/flask==1.1.1/g" -i /www/server/mdserver-web/requirements.txt
-		sed "s/cryptography==3.3.2/cryptography==2.5/g" -i /www/server/mdserver-web/requirements.txt
-		sed "s/configparser==5.2.0/configparser==4.0.2/g" -i /www/server/mdserver-web/requirements.txt
-		sed "s/flask-socketio==5.2.0/flask-socketio==4.2.0/g" -i /www/server/mdserver-web/requirements.txt
-		sed "s/python-engineio==4.3.2/python-engineio==3.9.0/g" -i /www/server/mdserver-web/requirements.txt
-		# pip3 install -r /www/server/mdserver-web/requirements.txt
-	fi
+if [ "$VERSION_ID" == "9" ];then
+	sed "s/flask==2.0.3/flask==1.1.1/g" -i /www/server/mdserver-web/requirements.txt
+	sed "s/cryptography==3.3.2/cryptography==2.5/g" -i /www/server/mdserver-web/requirements.txt
+	sed "s/configparser==5.2.0/configparser==4.0.2/g" -i /www/server/mdserver-web/requirements.txt
+	sed "s/flask-socketio==5.2.0/flask-socketio==4.2.0/g" -i /www/server/mdserver-web/requirements.txt
+	sed "s/python-engineio==4.3.2/python-engineio==3.9.0/g" -i /www/server/mdserver-web/requirements.txt
+	# pip3 install -r /www/server/mdserver-web/requirements.txt
 fi
 
 apt install -y build-essential
@@ -179,7 +171,7 @@ apt install -y curl libcurl4-gnutls-dev
 #	libunwind-dev libwebp-dev libxml2 libxml2-dev libxpm-dev libzip-dev lzma lzma-dev make net-tools openssl \
 #	pkg-config python3-dev scons webp zlib1g-dev
 
-if [ "$DISTRO" == 'debian' ] && [ "$VERSION_ID" != "9" ]; then
+if [ "$VERSION_ID" != "9" ]; then
 	apt install -y libjpeg62-turbo-dev
 fi
 
