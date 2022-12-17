@@ -30,6 +30,16 @@ function getLogs(id){
 	},'json');
 }
 
+
+function getBackupName(hook_data, name){
+	for (var i = 0; i < hook_data.length; i++) {
+		if (hook_data[i]['name'] == 'backup_ftp'){
+			return hook_data[i]['title'];
+		}
+	}
+	return name;
+}
+
 function getCronData(page){
 	var load = layer.msg(lan.public.the,{icon:16,time:0,shade: [0.3, '#000']});
 	$.post("/crontab/list?p="+page,'', function(rdata){
@@ -54,7 +64,7 @@ function getCronData(page){
 				if (rdata.data[i]['stype'] == 'site' || rdata.data[i]['stype']=='database' || rdata.data[i]['stype'].indexOf('database_')>-1 ){
 					cron_backupto = '本地磁盘';
 					if (rdata.data[i]['backup_to'] != 'localhost'){
-						cron_backupto = rdata.data[i]['backup_to'];
+						cron_backupto = getBackupName(rdata['backup_hook'],rdata.data[i]['backup_to']);
 					}
 				}
 
