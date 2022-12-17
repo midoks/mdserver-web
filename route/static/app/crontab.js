@@ -404,6 +404,7 @@ function initDropdownMenu(){
 				$(".controls").html('备份网站');
 				break;
 			case 'database_mariadb':
+			case 'database_postgresql':
 			case 'database_mysql-apt':
 			case 'database_mysql-yum':
 			case 'database':
@@ -432,6 +433,7 @@ function toBackup(type){
 			sType = "sites";
 			break;
 		case 'database_mariadb':
+		case 'database_postgresql':
 		case 'database_mysql-apt':
 		case 'database_mysql-yum':
 		case 'database':
