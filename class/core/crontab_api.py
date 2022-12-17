@@ -510,9 +510,12 @@ fi''' % (mw.getRunDir(),)
             log = '.log'
 
             script_dir = mw.getRunDir() + "/scripts"
+            source_stype = 'database'
             if stype.find('database_') > -1:
                 plugin_name = stype.replace('database_', '')
                 script_dir = mw.getRunDir() + "/plugins/" + plugin_name + "/scripts"
+
+                source_stype = stype
                 stype = 'database'
 
             wheres = {
@@ -525,13 +528,14 @@ fi''' % (mw.getRunDir(),)
             if param['backup_to'] != 'localhost':
                 cfile = mw.getPluginDir() + "/" + \
                     param['backup_to'] + "/index.py"
-                wheres = {
-                    'path': head + "python3 " + cfile + " path " + param['sname'] + " " + str(param['save']),
-                    'site':   head + "python3 " + cfile + " site " + param['sname'] + " " + str(param['save']),
-                    'database': head + "python3 " + cfile + " " + stype + " " + param['sname'] + " " + str(param['save']),
-                    'logs':   head + "python3 " + script_dir + "/logs_backup.py " + param['sname'] + log + " " + str(param['save']),
-                    'rememory': head + "/bin/bash " + script_dir + '/rememory.sh'
-                }
+
+                wheres['path'] = head + "python3 " + cfile + \
+                    " path " + param['sname'] + " " + str(param['save'])
+                wheres['site'] = head + "python3 " + cfile + \
+                    " site " + param['sname'] + " " + str(param['save'])
+                wheres['database'] = head + "python3 " + cfile + " " + \
+                    source_stype + " " + \
+                    param['sname'] + " " + str(param['save'])
             try:
                 shell = wheres[stype]
             except:
