@@ -514,7 +514,6 @@ fi''' % (mw.getRunDir(),)
                 plugin_name = stype.replace('database_', '')
                 script_dir = mw.getRunDir() + "/plugins/" + plugin_name + "/scripts"
                 stype = 'database'
-                script_dir = ''
 
             wheres = {
                 'path': head + "python3 " + script_dir + "/backup.py path " + param['sname'] + " " + str(param['save']),
