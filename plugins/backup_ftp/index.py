@@ -188,10 +188,6 @@ def backupAllFunc(stype):
 
     args = stype + " " + name + " " + num
     cmd = 'python3 ' + mw.getRunDir() + '/scripts/backup.py ' + args
-    if stype == 'database':
-        find_path = mw.getBackupDir() + '/' + stype + '/' + \
-            prefix_dict[stype] + '_' + name
-
     if stype.find('database_') > -1:
         plugin_name = stype.replace('database_', '')
         args = "database " + name + " " + num
@@ -201,6 +197,12 @@ def backupAllFunc(stype):
     os.system(cmd)
     # 开始执行上传信息
 
+    if stype == 'database':
+        db_prefix = prefix_dict[stype]
+    else:
+        db_prefix = 'd__'
+
+    find_path = mw.getBackupDir() + '/database/' + db_prefix + '_' + name
     find_new_file = "ls " + find_path + \
         "_* | grep '.gz' | cut -d \  -f 1 | awk 'END {print}'"
 
