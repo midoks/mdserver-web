@@ -255,7 +255,7 @@ if __name__ == "__main__":
         print(deleteDir())
     elif func == 'delete_file':
         print(deleteFile())
-    elif in_array(func, ['site', 'database', 'path']) and func.find('database_') > -1:
+    elif in_array(func, ['site', 'database', 'path']) or func.find('database_') > -1:
         print(backupAllFunc(func))
     else:
         print('error')
