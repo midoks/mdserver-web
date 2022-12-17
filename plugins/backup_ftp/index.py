@@ -188,8 +188,9 @@ def backupAllFunc(stype):
 
     args = stype + " " + name + " " + num
     cmd = 'python3 ' + mw.getRunDir() + '/scripts/backup.py ' + args
-    find_path = mw.getBackupDir() + '/' + stype + '/' + \
-        prefix_dict[stype] + '_' + name
+    if stype == 'database':
+        find_path = mw.getBackupDir() + '/' + stype + '/' + \
+            prefix_dict[stype] + '_' + name
 
     if stype.find('database_') > -1:
         plugin_name = stype.replace('database_', '')
