@@ -180,21 +180,25 @@ def backupAllFunc(stype):
     name = sys.argv[2]
     num = sys.argv[3]
 
-    args = stype + " " + name + " " + num
-
-    cmd = 'python3 ' + mw.getRunDir() + '/scripts/backup.py ' + args
-    os.system(cmd)
-
-    # 开始执行上传信息
-
     prefix_dict = {
         "site": "web",
         "database": "db",
         "path": "path",
     }
 
+    args = stype + " " + name + " " + num
+    cmd = 'python3 ' + mw.getRunDir() + '/scripts/backup.py ' + args
     find_path = mw.getBackupDir() + '/' + stype + '/' + \
         prefix_dict[stype] + '_' + name
+
+    if stype.find('database_') > -1:
+        plugin_name = stype.replace('database_', '')
+        args = "database " + name + " " + num
+        cmd = 'python3 ' + mw.getRunDir() + '/plugins/' + plugin_name + \
+            '/scripts/backup.py ' + args
+
+    os.system(cmd)
+    # 开始执行上传信息
 
     find_new_file = "ls " + find_path + \
         "_* | grep '.gz' | cut -d \  -f 1 | awk 'END {print}'"
