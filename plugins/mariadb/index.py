@@ -798,7 +798,7 @@ def deleteDbBackup():
 
     path = args['path']
     full_file = ""
-    bkDir = mw.getRootDir() + '/backup/database'
+    bkDir = mw.getRootDir() + '/backup/database/mariadb'
     full_file = bkDir + '/' + args['filename']
     if path != "":
         full_file = path + "/" + args['filename']
