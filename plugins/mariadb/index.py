@@ -709,11 +709,12 @@ def importDbBackup():
     file = args['file']
     name = args['name']
 
-    file_path = mw.getRootDir() + '/backup/database/' + file
-    file_path_sql = mw.getRootDir() + '/backup/database/' + file.replace('.gz', '')
+    file_path = mw.getBackupDir() + '/database/mariadb/' + file
+    file_path_sql = mw.getBackupDir() + '/database/mariadb/' + \
+        file.replace('.gz', '')
 
     if not os.path.exists(file_path_sql):
-        cmd = 'cd ' + mw.getRootDir() + '/backup/database && gzip -d ' + file
+        cmd = 'cd ' + mw.getBackupDir() + '/database/mariadb && gzip -d ' + file
         mw.execShell(cmd)
 
     pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
@@ -735,7 +736,7 @@ def importDbExternal():
     file = args['file']
     name = args['name']
 
-    import_dir = mw.getRootDir() + '/backup/import/'
+    import_dir = mw.getBackupDir() + '/import/'
 
     file_path = import_dir + file
     if not os.path.exists(file_path):
@@ -812,7 +813,7 @@ def getDbBackupList():
         return data[1]
 
     r = getDbBackupListFunc(args['name'])
-    bkDir = mw.getRootDir() + '/backup/database/mariadb'
+    bkDir = mw.getBackupDir() + '/database/mariadb'
     rr = []
     for x in range(0, len(r)):
         p = bkDir + '/' + r[x]
@@ -835,7 +836,7 @@ def getDbBackupList():
 
 def getDbBackupImportList():
 
-    bkImportDir = mw.getRootDir() + '/backup/import'
+    bkImportDir = mw.getBackupDir() + '/import'
     if not os.path.exists(bkImportDir):
         os.mkdir(bkImportDir)
 
