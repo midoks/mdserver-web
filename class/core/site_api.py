@@ -844,18 +844,6 @@ class site_api:
             'auth_to': auth_to,
         }
 
-        import cert_api
-        data = cert_api.cert_api().applyCertApi(to_args)
-
-        if not data['status']:
-            msg = data['msg']
-            if type(data['msg']) != str:
-                msg = data['msg'][0]
-                emsg = data['msg'][1]['challenges'][0]['error']
-                msg = msg + '<p><span>响应状态:</span>' + str(emsg['status']) + '</p><p><span>错误类型:</span>' + emsg[
-                    'type'] + '</p><p><span>错误代码:</span>' + emsg['detail'] + '</p>'
-            return mw.returnJson(data['status'], msg, data['msg'])
-
         src_letpath = mw.getServerDir() + '/web_conf/letsencrypt/' + siteName
         src_csrpath = src_letpath + "/fullchain.pem"  # 生成证书路径
         src_keypath = src_letpath + "/privkey.pem"  # 密钥文件路径
@@ -863,6 +851,18 @@ class site_api:
         dst_letpath = self.sslDir + '/' + siteName
         dst_csrpath = dst_letpath + '/fullchain.pem'
         dst_keypath = dst_letpath + '/privkey.pem'
+
+        if not os.path.exists(src_letpath):
+            import cert_api
+            data = cert_api.cert_api().applyCertApi(to_args)
+            if not data['status']:
+                msg = data['msg']
+                if type(data['msg']) != str:
+                    msg = data['msg'][0]
+                    emsg = data['msg'][1]['challenges'][0]['error']
+                    msg = msg + '<p><span>响应状态:</span>' + str(emsg['status']) + '</p><p><span>错误类型:</span>' + emsg[
+                        'type'] + '</p><p><span>错误代码:</span>' + emsg['detail'] + '</p>'
+                return mw.returnJson(data['status'], msg, data['msg'])
 
         if not os.path.exists(dst_letpath):
             mw.execShell('mkdir -p ' + dst_letpath)
