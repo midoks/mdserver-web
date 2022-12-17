@@ -89,6 +89,12 @@ if [ "${action}" == "install" ] && [ -d ${serverPath}/php-apt/${type} ];then
 	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type:0:1}.${type:1:2} install redis
 	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type:0:1}.${type:1:2} install memcached
 	echo "install PHP-APT[${type}] extend end"
+
+	if [ ! -f /usr/local/bin/composer ];then
+		cd /tmp
+		curl -sS https://getcomposer.org/installer | php
+		mv composer.phar /usr/local/bin/composer
+	fi
 fi
 
 
