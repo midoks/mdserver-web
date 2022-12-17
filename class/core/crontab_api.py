@@ -504,13 +504,17 @@ export LANG=en_US.UTF-8
 MW_PATH=%s/bin/activate
 if [ -f $MW_PATH ];then
     source $MW_PATH
-fi
-            ''' % (mw.getRunDir(),)
+fi''' % (mw.getRunDir(),)
 
             head = head + source_bin_activate + "\n"
             log = '.log'
 
-            script_dir = mw.getServerDir() + "/mdserver-web/scripts"
+            script_dir = mw.getRunDir() + "/scripts"
+            if stype.find('database_') > -1:
+                plugin_name = stype.replace('database_', '')
+                script_dir = mw.getRunDir() + "/plugins/" + plugin_name + "/scripts"
+                stype = 'database'
+                script_dir = ''
 
             wheres = {
                 'path': head + "python3 " + script_dir + "/backup.py path " + param['sname'] + " " + str(param['save']),
