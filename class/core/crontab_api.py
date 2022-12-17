@@ -378,16 +378,21 @@ class crontab_api:
 
         bak_data = []
 
-        if stype == 'sites' or stype == 'databases':
+        if stype == 'sites' or stype == 'database':
             hookPath = mw.getPanelDataDir() + "/hook_backup.json"
             if os.path.exists(hookPath):
                 t = mw.readFile(hookPath)
                 bak_data = json.loads(t)
 
-        if stype == 'databases':
+        if stype == 'database' or stype == 'database_mariadb' or stype == 'database_mysql-apt' or stype == 'database_mysql-yum':
+            path = mw.getServerDir() + '/mysql'
+            if stype != 'database':
+                soft_name = stype.replace('database_', '')
+                path = mw.getServerDir() + '/' + soft_name
+
             db_list = {}
             db_list['orderOpt'] = bak_data
-            path = mw.getServerDir() + '/mysql'
+
             if not os.path.exists(path + '/mysql.db'):
                 db_list['data'] = []
             else:

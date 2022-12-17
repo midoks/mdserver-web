@@ -407,7 +407,7 @@ function initDropdownMenu(){
 			case 'database_mysql-apt':
 			case 'database_mysql-yum':
 			case 'database':
-				toBackup('databases');
+				toBackup(type);
 				$(".controls").html('备份数据库');
 				break;
 			case 'logs':
@@ -431,16 +431,24 @@ function toBackup(type){
 			sMsg = '备份网站';
 			sType = "sites";
 			break;
-		case 'databases':
+		case 'database_mariadb':
+		case 'database_mysql-apt':
+		case 'database_mysql-yum':
+		case 'database':
 			sMsg = '备份数据库';
-			sType = "databases";
+			suffix = type.replace('database','')
+			if (suffix != ''){
+				suffix = suffix.replace('_','')
+				sMsg = '备份数据库['+suffix+']';
+			}
+			sType = type;
 			break;
 		case 'logs':
 			sMsg = '切割日志';
 			sType = "sites";
 			break;
 	}
-	var data='type='+sType
+	var data = 'type='+sType;
 	$.post('/crontab/get_data_list',data,function(rdata){
 		$(".planname input[name='name']").attr('readonly','true').css({"background-color":"#f6f6f6","color":"#666"});
 		var sOpt = "";
