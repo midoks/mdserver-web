@@ -384,16 +384,20 @@ class crontab_api:
                 t = mw.readFile(hookPath)
                 bak_data = json.loads(t)
 
-        if stype == 'database' or stype == 'database_mariadb' or stype == 'database_mysql-apt' or stype == 'database_mysql-yum':
+        sqlite3_name = 'mysql'
+        if stype == 'database' or stype == 'database_mariadb' or stype == 'database_mysql-apt' or stype == 'database_mysql-yum' or stype == 'database_postgresql':
             path = mw.getServerDir() + '/mysql'
             if stype != 'database':
                 soft_name = stype.replace('database_', '')
                 path = mw.getServerDir() + '/' + soft_name
 
+                if soft_name == 'postgresql':
+                    sqlite3_name = 'pgsql'
+
             db_list = {}
             db_list['orderOpt'] = bak_data
 
-            if not os.path.exists(path + '/mysql.db'):
+            if not os.path.exists(path + '/' + sqlite3_name + '.db'):
                 db_list['data'] = []
             else:
                 db_list['data'] = mw.M('databases').dbPos(
