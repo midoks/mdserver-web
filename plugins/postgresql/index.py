@@ -70,12 +70,11 @@ def getArgs():
 
 
 def getBackupDir():
-    bk_path = mw.getBackupDir() + "/pg"
+    bk_path = mw.getBackupDir() + "/databases/postgresql"
     if not os.path.isdir(bk_path):
-        mw.execShell("mkdir -p {}/upload".format(bk_path))
+        mw.execShell("mkdir -p {}".format(bk_path))
 
-    bk_path_upload = bk_path + "/upload"
-    return bk_path_upload
+    return bk_path
 
 
 def checkArgs(data, ck=[]):
