@@ -423,6 +423,10 @@ function initDropdownMenu(){
 				toBackup(type);
 				$(".controls").html('备份数据库');
 				break;
+			case 'path':
+				toBackup('path');
+				$(".controls").html('备份目录');
+				break;
 			case 'logs':
 				toBackup('logs');
 				$(".controls").html('切割网站');
@@ -461,20 +465,31 @@ function toBackup(type){
 			sMsg = '切割日志';
 			sType = "sites";
 			break;
+		case 'path':
+			sMsg = '备份目录';
+			sType = "path";
+			break;
 	}
 	var data = 'type='+sType;
+
 	$.post('/crontab/get_data_list',data,function(rdata){
 		$(".planname input[name='name']").attr('readonly','true').css({"background-color":"#f6f6f6","color":"#666"});
 		var sOpt = "";
 		if(rdata.data.length == 0){
 			layer.msg(lan.public.list_empty,{icon:2})
-			return
+			return;
 		}
+
 		for(var i=0;i<rdata.data.length;i++){
 			if(i==0){
 				$(".planname input[name='name']").val(sMsg+'['+rdata.data[i].name+']');
 			}
 			sOpt += '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="'+rdata.data[i].name+'">'+rdata.data[i].name+'['+rdata.data[i].ps+']</a></li>';			
+		}
+
+		
+		if (sType != 'path'){
+			sOpt = '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="backupAll">所有</a></li>' + sOpt;
 		}
 		
 		var orderOpt = '';
@@ -482,20 +497,23 @@ function toBackup(type){
 			orderOpt += '<li><a role="menuitem" tabindex="-1" href="javascript:;" value="'+rdata.orderOpt[i].name+'">'+rdata.orderOpt[i].title+'</a></li>'
 		}
 		
+		
+		var changeDir = '';
+		if (sType == 'path'){
+			changeDir = '<span onclick="changePath(\'sName\')" class="glyphicon glyphicon-folder-open cursor mr20" style="float:left;line-height: 30px;"></span>';
+		}
 
 		var sBody = '<div class="dropdown pull-left mr20">\
 					  <button class="btn btn-default dropdown-toggle" type="button" id="backdata" data-toggle="dropdown" style="width:auto">\
 						<b id="sName" val="'+rdata.data[0].name+'">'+rdata.data[0].name+'['+rdata.data[0].ps+']</b> <span class="caret"></span>\
 					  </button>\
-					  <ul class="dropdown-menu" role="menu" aria-labelledby="backdata">\
-					  	<li><a role="menuitem" tabindex="-1" href="javascript:;" value="backupAll">所有</a></li>\
-					  	'+sOpt+'\
-					  </ul>\
+					  <ul class="dropdown-menu" role="menu" aria-labelledby="backdata">'+sOpt+'</ul>\
 					</div>\
+					'+ changeDir +'\
 					<div class="textname pull-left mr20">备份到</div>\
 					<div class="dropdown planBackupTo pull-left mr20">\
 					  <button class="btn btn-default dropdown-toggle" type="button" id="excode" data-toggle="dropdown" style="width:auto;">\
-						<b val="localhost">服务器磁盘</b> <span class="caret"></span>\
+						<b val="localhost">服务器磁盘</b><span class="caret"></span>\
 					  </button>\
 					  <ul class="dropdown-menu" role="menu" aria-labelledby="excode">\
 						<li><a role="menuitem" tabindex="-1" href="javascript:;" value="localhost">服务器磁盘</a></li>\
@@ -514,6 +532,7 @@ function toBackup(type){
 			$(".planname input[name='name']").val(sMsg+'['+sName+']');
 		});
 	},'json');
+
 }
 
 
@@ -596,10 +615,16 @@ function editTaskInfo(id){
 			}
 		};
 		obj.create(function(){
+
+			var changeDir = '';
+			if (obj.from.stype == 'path'){
+				changeDir = '<span onclick="changePath(\'sName\')" class="glyphicon glyphicon-folder-open cursor mr20" style="float:left;line-height: 30px;"></span>';
+			}
+
 			layer.open({
 				type:1,
 				title:'编辑计划任务-['+rdata.name+']',
-				area: ['650px','440px'], 
+				area: ['850px','440px'], 
 				skin:'layer-create-content',
 				shadeClose:false,
 				closeBtn:1,
@@ -652,6 +677,7 @@ function editTaskInfo(id){
 								<div class="info-r" style="float: left;margin-right: 25px;display:'+ (obj.from.sType == "path"?'block;':'none') +'">\
 									<input id="inputPath" class="bt-input-text mr5 " type="text" name="path" value="'+ obj.from.sName +'" placeholder="备份目录" style="width:208px;height:33px;" disabled="disabled">\
 								</div>\
+								'+changeDir+'\
 								<div class="textname pull-left mr20">备份到</div>\
 									<div class="dropdown  pull-left mr20">\
 										<button class="btn btn-default dropdown-toggle backup_btn" type="button"  data-toggle="dropdown" style="width:auto;">\

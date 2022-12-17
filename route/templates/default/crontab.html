@@ -28,12 +28,14 @@
 							{% for db in data['hook_database'] %}
 							<li><a role="menuitem" tabindex="-1" href="javascript:;" value="database_{{db['name']}}">备份数据库【{{db['title']}}】</a></li>
 					        {% endfor %}
+
+					        <li><a role="menuitem" tabindex="-1" href="javascript:;" value="path">备份目录</a></li>
 							<li><a role="menuitem" tabindex="-1" href="javascript:;" value="logs">日志切割</a></li>
 							<li><a role="menuitem" tabindex="-1" href="javascript:;" value="rememory">释放内存</a></li>
 							<li><a role="menuitem" tabindex="-1" href="javascript:;" value="toUrl">访问URL</a></li>
 						</ul>
 					</div>
-					<span class="planSign"><i>*</i>任务类型包含以下部分：Shell脚本、备份网站、备份数据库、日志切割、释放内存、访问URL</span>
+					<span class="planSign"><i>*</i>任务类型包含以下部分：Shell脚本、备份网站、备份数据库、备份目录、日志切割、释放内存、访问URL</span>
 				</div>
 				<div class="clearfix plan">
 					<span class="typename c4 pull-left f14 text-right mr20">任务名称</span>

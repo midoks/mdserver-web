@@ -184,14 +184,16 @@ class backupTools:
 
 if __name__ == "__main__":
     backup = backupTools()
-    type = sys.argv[1]
-    if type == 'site':
+    stype = sys.argv[1]
+    if stype == 'site':
         if sys.argv[2] == 'ALL':
             backup.backupSiteAll(sys.argv[3])
         else:
             backup.backupSite(sys.argv[2], sys.argv[3])
-    elif type == 'database':
+    elif stype == 'database':
         if sys.argv[2] == 'ALL':
             backup.backupDatabaseAll(sys.argv[3])
         else:
             backup.backupDatabase(sys.argv[2], sys.argv[3])
+    elif stype == 'path':
+        print(".")

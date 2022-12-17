@@ -131,7 +131,7 @@ class crontab_api:
     # 参数校验
     def cronCheck(self, params):
 
-        if params['stype'] == 'site' or params['stype'] == 'database' or params['stype'].find('database_') > -1 or params['stype'] == 'logs':
+        if params['stype'] == 'site' or params['stype'] == 'database' or params['stype'].find('database_') > -1 or params['stype'] == 'logs' or params['stype'] == 'path':
             if params['save'] == '':
                 return False, '保留份数不能为空!'
 
@@ -378,7 +378,7 @@ class crontab_api:
 
         bak_data = []
 
-        if stype == 'sites' or stype == 'database' or stype.find('database_') > -1:
+        if stype == 'sites' or stype == 'database' or stype.find('database_') > -1 or stype == 'path':
             hookPath = mw.getPanelDataDir() + "/hook_backup.json"
             if os.path.exists(hookPath):
                 t = mw.readFile(hookPath)
@@ -402,6 +402,12 @@ class crontab_api:
             else:
                 db_list['data'] = mw.M('databases').dbPos(
                     path, sqlite3_name).field('name,ps').select()
+            return mw.getJson(db_list)
+
+        if stype == 'path':
+            db_list = {}
+            db_list['data'] = [{"name": mw.getWwwDir(), "ps": "www"}]
+            db_list['orderOpt'] = bak_data
             return mw.getJson(db_list)
 
         data = {}

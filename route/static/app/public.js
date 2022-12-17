@@ -219,6 +219,46 @@ function getFormatTime(tm, format) {
 }
 
 
+
+function changePathCallback() {
+
+	var c = layer.open({
+		type: 1,
+		area: "650px",
+		title: '选择目录',
+		closeBtn: 1,
+		shift: 5,
+		shadeClose: false,
+		content: "<div class='changepath'><div class='path-top'><button type='button' class='btn btn-default btn-sm' onclick='backFile()'><span class='glyphicon glyphicon-share-alt'></span>返回</button>\
+		<div class='place' id='PathPlace'>当前路径：<span></span></div></div><div class='path-con'><div class='path-con-left'><dl><dt id='changecomlist' onclick='backMyComputer()'>计算机</dt></dl></div>\
+		<div class='path-con-right'><ul class='default' id='computerDefautl'></ul><div class='file-list divtable'>\
+			<table class='table table-hover' style='border:0 none'>\
+				<thead><tr class='file-list-head'><th width='40%'>文件名</th><th width='20%'>修改时间</th><th width='10%'>权限</th><th width='10%'>所有者</th><th width='10%'></th></tr></thead>\
+				<tbody id='tbody' class='list-list'></tbody></table></div></div></div></div><div class='getfile-btn' style='margin-top:0'>\
+				<button type='button' class='btn btn-default btn-sm pull-left' onclick='createFolder()'>新建文件夹</button>\
+				<button type='button' class='btn btn-danger btn-sm mr5' onclick=\"layer.close(getCookie('changePath'))\">关闭</button>\
+				<button type='button' class='btn btn-success btn-sm' onclick='getfilePath()'>选择</button>\
+		</div>",
+		success:function(){
+			
+		}
+	});
+	setCookie("changePath", c);
+	var b = $("#" + d).val();
+	tmp = b.split(".");
+	if(tmp[tmp.length - 1] == "gz") {
+		tmp = b.split("/");
+		b = "";
+		for(var a = 0; a < tmp.length - 1; a++) {
+			b += "/" + tmp[a]
+		}
+		setCookie("SetName", tmp[tmp.length - 1])
+	}
+	b = b.replace(/\/\//g, "/");
+	getDiskList(b);
+	activeDisk();
+}
+
 function changePath(d) {
 	setCookie('SetId', d);
 	setCookie('SetName', '');
@@ -236,11 +276,11 @@ function changePath(d) {
 				<thead><tr class='file-list-head'><th width='40%'>文件名</th><th width='20%'>修改时间</th><th width='10%'>权限</th><th width='10%'>所有者</th><th width='10%'></th></tr></thead>\
 				<tbody id='tbody' class='list-list'></tbody></table></div></div></div></div><div class='getfile-btn' style='margin-top:0'>\
 				<button type='button' class='btn btn-default btn-sm pull-left' onclick='createFolder()'>新建文件夹</button>\
-				<button type='button' class='btn btn-danger btn-sm mr5' onclick=\"layer.close(getCookie('ChangePath'))\">关闭</button>\
+				<button type='button' class='btn btn-danger btn-sm mr5' onclick=\"layer.close(getCookie('changePath'))\">关闭</button>\
 				<button type='button' class='btn btn-success btn-sm' onclick='getfilePath()'>选择</button>\
 		</div>"
 	});
-	setCookie("ChangePath", c);
+	setCookie("changePath", c);
 	var b = $("#" + d).val();
 	tmp = b.split(".");
 	if(tmp[tmp.length - 1] == "gz") {
@@ -421,7 +461,7 @@ function getfilePath() {
 	}
 
 	$("#" + getCookie("SetId")).val(a + getCookie("SetName"));
-	layer.close(getCookie("ChangePath"));
+	layer.close(getCookie("changePath"));
 }
 
 function setCookie(a, c) {
