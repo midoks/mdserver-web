@@ -675,7 +675,7 @@ def __createUser(dbname, username, password, address):
 
 
 def getDbBackupListFunc(dbname=''):
-    bkDir = mw.getRootDir() + '/backup/database'
+    bkDir = mw.getRootDir() + '/backup/database/mariadb'
     blist = os.listdir(bkDir)
     r = []
 
