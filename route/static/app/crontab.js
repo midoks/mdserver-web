@@ -534,11 +534,17 @@ function editTaskInfo(id){
 			sNameArray:[],
 			backupsArray:[],
 			create:function(callback){
-				for(var i = 0; i <obj['sTypeArray'].length; i++){
-					if(obj.from['stype'] == obj['sTypeArray'][i][0]){
-						sTypeName  = obj['sTypeArray'][i][1];
+				if (obj.from['stype'].indexOf('database_')>-1){
+					name = obj.from['stype'].replace('database_','');
+					sTypeName = '备份数据库['+name+']';
+					sTypeDom += '<li><a role="menuitem"  href="javascript:;" value="'+ obj.from['stype'] +'">'+ sTypeName +'</a></li>';
+				} else {
+					for(var i = 0; i <obj['sTypeArray'].length; i++){
+						if(obj.from['stype'] == obj['sTypeArray'][i][0]){
+							sTypeName  = obj['sTypeArray'][i][1];
+						}
+						sTypeDom += '<li><a role="menuitem"  href="javascript:;" value="'+ obj['sTypeArray'][i][0] +'">'+ obj['sTypeArray'][i][1] +'</a></li>';
 					}
-					sTypeDom += '<li><a role="menuitem"  href="javascript:;" value="'+ obj['sTypeArray'][i][0] +'">'+ obj['sTypeArray'][i][1] +'</a></li>';
 				}
 
 				for(var i = 0; i <obj['cycleArray'].length; i++){
@@ -551,8 +557,8 @@ function editTaskInfo(id){
 					weekDom += '<li><a role="menuitem"  href="javascript:;" value="'+ obj['weekArray'][i][0] +'">'+ obj['weekArray'][i][1] +'</a></li>';
 				}
 
-				if(obj.from.stype == 'site' || obj.from.stype == 'database' || obj.from.stype == 'path' || obj.from.stype == 'logs'){
-					$.post('/crontab/get_data_list',{type:obj.from.stype  == 'databases'?'database':'sites'},function(rdata){
+				if(obj.from.stype == 'site' || obj.from.stype == 'database' || obj.from.stype == 'path' || obj.from.stype == 'logs' || obj.from['stype'].indexOf('database_')>-1){
+					$.post('/crontab/get_data_list',{type:obj.from.stype},function(rdata){
 						// console.log(rdata);
 						obj.sNameArray = rdata.data;
 						obj.sNameArray.unshift({name:'ALL',ps:'所有'});
