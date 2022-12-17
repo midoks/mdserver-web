@@ -587,7 +587,7 @@ function editTaskInfo(id){
 			layer.open({
 				type:1,
 				title:'编辑计划任务-['+rdata.name+']',
-				area: ['850px','450px'], 
+				area: ['750px','450px'], 
 				skin:'layer-create-content',
 				shadeClose:false,
 				closeBtn:1,

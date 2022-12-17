@@ -1887,33 +1887,35 @@ html .menu .menu_exit:hover {
     color: #fff;
     line-height: 24px;
     text-align: center;
-    cursor: pointer
+    cursor: pointer;
 }
 
 .plan {
     padding: 10px 20px;
-    margin-bottom: 10px
+    margin-bottom: 10px;
 }
 
 .plan .typename {
     line-height: 34px;
-    width: 120px
+    width: 120px;
+    font-size: 12px;
 }
 
 .plan .textname {
     height: 34px;
     line-height: 34px;
-    float: left
+    float: left;
 }
 
 .plan .planname input {
     height: 34px;
     width: 260px;
-    padding: 0 12px
+    padding: 0 12px;
 }
 
 .plan .dropdown button b {
-    font-weight: normal
+    font-weight: normal;
+    font-size: 12px;
 }
 
 .plan .dropdown-menu {
