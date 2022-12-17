@@ -401,7 +401,7 @@ class crontab_api:
                 db_list['data'] = []
             else:
                 db_list['data'] = mw.M('databases').dbPos(
-                    path, 'mysql').field('name,ps').select()
+                    path, sqlite3_name).field('name,ps').select()
             return mw.getJson(db_list)
 
         data = {}
