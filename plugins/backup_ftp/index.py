@@ -201,7 +201,7 @@ def backupAllFunc(stype):
         db_prefix = prefix_dict[stype]
     else:
         plugin_name = stype.replace('database_', '')
-        db_prefix = plugin_name
+        db_prefix = plugin_name + '/db'
 
     find_path = mw.getBackupDir() + '/database/' + db_prefix + '_' + name
     find_new_file = "ls " + find_path + \
