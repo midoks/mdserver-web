@@ -528,7 +528,7 @@ fi''' % (mw.getRunDir(),)
                 wheres = {
                     'path': head + "python3 " + cfile + " path " + param['sname'] + " " + str(param['save']),
                     'site':   head + "python3 " + cfile + " site " + param['sname'] + " " + str(param['save']),
-                    'database': head + "python3 " + cfile + " database " + param['sname'] + " " + str(param['save']),
+                    'database': head + "python3 " + cfile + " " + stype + " " + param['sname'] + " " + str(param['save']),
                     'logs':   head + "python3 " + script_dir + "/logs_backup.py " + param['sname'] + log + " " + str(param['save']),
                     'rememory': head + "/bin/bash " + script_dir + '/rememory.sh'
                 }
@@ -595,9 +595,9 @@ echo "--------------------------------------------------------------------------
     # 重载配置
     def crondReload(self):
         if mw.isAppleSystem():
+            # mw.execShell('/usr/sbin/cron restart')
             if os.path.exists('/etc/crontab'):
                 pass
-                # mw.execShell('/usr/sbin/cron restart')
         else:
             if os.path.exists('/etc/init.d/crond'):
                 mw.execShell('/etc/init.d/crond reload')
