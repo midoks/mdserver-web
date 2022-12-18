@@ -864,11 +864,10 @@ class site_api:
                         'type'] + '</p><p><span>错误代码:</span>' + emsg['detail'] + '</p>'
                 return mw.returnJson(data['status'], msg, data['msg'])
 
-        if os.path.exists(dst_letpath):
-            mw.execShell('mkdir -p ' + dst_letpath)
-            mw.buildSoftLink(src_csrpath, dst_csrpath, True)
-            mw.buildSoftLink(src_keypath, dst_keypath, True)
-            mw.execShell('echo "lets" > "' + dst_letpath + '/README"')
+        mw.execShell('mkdir -p ' + dst_letpath)
+        mw.buildSoftLink(src_csrpath, dst_csrpath, True)
+        mw.buildSoftLink(src_keypath, dst_keypath, True)
+        mw.execShell('echo "lets" > "' + dst_letpath + '/README"')
 
         # 写入配置文件
         result = self.setSslConf(siteName)
