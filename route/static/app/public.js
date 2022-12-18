@@ -220,7 +220,7 @@ function getFormatTime(tm, format) {
 
 
 
-function changePathCallback() {
+function changePathCallback(default_dir, callback) {
 
 	var c = layer.open({
 		type: 1,
@@ -236,26 +236,27 @@ function changePathCallback() {
 				<thead><tr class='file-list-head'><th width='40%'>文件名</th><th width='20%'>修改时间</th><th width='10%'>权限</th><th width='10%'>所有者</th><th width='10%'></th></tr></thead>\
 				<tbody id='tbody' class='list-list'></tbody></table></div></div></div></div><div class='getfile-btn' style='margin-top:0'>\
 				<button type='button' class='btn btn-default btn-sm pull-left' onclick='createFolder()'>新建文件夹</button>\
-				<button type='button' class='btn btn-danger btn-sm mr5' onclick=\"layer.close(getCookie('changePath'))\">关闭</button>\
-				<button type='button' class='btn btn-success btn-sm' onclick='getfilePath()'>选择</button>\
+				<button type='button' class='btn btn-danger btn-sm mr5 btn-close'>关闭</button>\
+				<button type='button' class='btn btn-success btn-sm btn-choose'>选择</button>\
 		</div>",
-		success:function(){
-			
+		success:function(layero,layer_index){
+			$('.btn-close').click(function(){
+				layer.close(layer_index);
+			});
+
+			$('.btn-choose').click(function(){
+				var a = $("#PathPlace").find("span").text();
+				a = a.replace(new RegExp(/(\\)/g), "/");
+				a_len = a.length;
+				if (a[a_len-1] == '/'){
+					a = a.substr(0,a_len-1);
+				}
+				callback(a);
+				layer.close(layer_index);
+			});
 		}
 	});
-	setCookie("changePath", c);
-	var b = $("#" + d).val();
-	tmp = b.split(".");
-	if(tmp[tmp.length - 1] == "gz") {
-		tmp = b.split("/");
-		b = "";
-		for(var a = 0; a < tmp.length - 1; a++) {
-			b += "/" + tmp[a]
-		}
-		setCookie("SetName", tmp[tmp.length - 1])
-	}
-	b = b.replace(/\/\//g, "/");
-	getDiskList(b);
+	getDiskList(default_dir);
 	activeDisk();
 }
 
@@ -462,6 +463,7 @@ function getfilePath() {
 
 	$("#" + getCookie("SetId")).val(a + getCookie("SetName"));
 	layer.close(getCookie("changePath"));
+	return a;
 }
 
 function setCookie(a, c) {

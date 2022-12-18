@@ -61,7 +61,7 @@ function getCronData(page){
 				}
 
 				var cron_backupto = '-';
-				if (rdata.data[i]['stype'] == 'site' || rdata.data[i]['stype']=='database' || rdata.data[i]['stype'].indexOf('database_')>-1 ){
+				if (rdata.data[i]['stype'] == 'site' || rdata.data[i]['stype']=='path' ||  rdata.data[i]['stype']=='database' || rdata.data[i]['stype'].indexOf('database_')>-1 ){
 					cron_backupto = '本地磁盘';
 					if (rdata.data[i]['backup_to'] != 'localhost'){
 						cron_backupto = getBackupName(rdata['backup_hook'],rdata.data[i]['backup_to']);
@@ -297,7 +297,6 @@ function planAdd(){
 	$("#set-Config input[name='sName']").val(sName);
 	layer.msg('正在添加,请稍候...!',{icon:16,time:0,shade: [0.3, '#000']});
 	var data = $("#set-Config").serialize() + '&sBody='+sBody + '&urladdress=' + urladdress;
-	// console.log(data);
 	$.post('/crontab/add',data,function(rdata){
 		if(!rdata.status) {
 			layer.msg(rdata.msg,{icon:2, time:2000});
@@ -500,11 +499,11 @@ function toBackup(type){
 		
 		var changeDir = '';
 		if (sType == 'path'){
-			changeDir = '<span onclick="changePath(\'sName\')" class="glyphicon glyphicon-folder-open cursor mr20" style="float:left;line-height: 30px;"></span>';
+			changeDir = '<span class="glyphicon glyphicon-folder-open cursor mr20 changePathDir" style="float:left;line-height: 30px;"></span>';
 		}
 
-		var sBody = '<div class="dropdown pull-left mr20">\
-					  <button class="btn btn-default dropdown-toggle" type="button" id="backdata" data-toggle="dropdown" style="width:auto">\
+		var sBody = '<div class="dropdown pull-left mr20 check">\
+					  <button class="btn btn-default dropdown-toggle sname" type="button" id="backdata" data-toggle="dropdown" style="width:auto">\
 						<b id="sName" val="'+rdata.data[0].name+'">'+rdata.data[0].name+'['+rdata.data[0].ps+']</b> <span class="caret"></span>\
 					  </button>\
 					  <ul class="dropdown-menu" role="menu" aria-labelledby="backdata">'+sOpt+'</ul>\
@@ -526,6 +525,15 @@ function toBackup(type){
 					</div>';
 		$("#implement").html(sBody);
 		getselectname();
+
+		$('.changePathDir').click(function(){
+			changePathCallback($('#sName').val(),function(select_dir){
+				$(".planname input[name='name']").val('备份目录['+select_dir+']');
+				$('#implement .sname b').attr('val',select_dir).text(select_dir);
+			});
+		});
+
+
 		$(".dropdown ul li a").click(function(){
 			var sName = $("#sName").attr("val");
 			if(!sName) return;
@@ -618,7 +626,7 @@ function editTaskInfo(id){
 
 			var changeDir = '';
 			if (obj.from.stype == 'path'){
-				changeDir = '<span onclick="changePath(\'sName\')" class="glyphicon glyphicon-folder-open cursor mr20" style="float:left;line-height: 30px;"></span>';
+				changeDir = '<span class="glyphicon glyphicon-folder-open cursor mr20 changePathDir" style="float:left;line-height: 30px;"></span>';
 			}
 
 			layer.open({
@@ -707,165 +715,174 @@ function editTaskInfo(id){
 							<div class="clearfix plan ptb10">\
 								<div class="bt-submit plan-submits " style="margin-left: 141px;">保存编辑</div>\
 							</div>\
-						</div>'
+						</div>',
+
+				success:function(){
+
+					$('.changePathDir').click(function(){
+						changePathCallback($('#sName').val(),function(select_dir){
+							$('input[name="name"]').val('备份目录['+select_dir+']');
+							$('.sName_btn button b').attr('val',select_dir).text(select_dir);
+						});
+					});
+					
+					if(obj.from.stype == 'toShell'){
+						$('.site_list').hide();
+					}else if(obj.from.stype == 'rememory'){
+						$('.site_list').hide();
+					}else if( obj.from.stype == 'toUrl'){
+						$('.site_list').hide();
+					}else{
+						$('.site_list').show();
+					}
+
+					obj.from.minute = $('.minute_create').val();
+					obj.from.hour = $('.hour_create').val();
+					obj.from.where1 = $('.where1_create').val();
+
+					$('.sName_create').blur(function () {
+						obj.from.name = $(this).val();
+					});
+					$('.where1_create').blur(function () {
+						obj.from.where1 = $(this).val();
+					});
+		
+					$('.hour_create').blur(function () {
+						obj.from.hour = $(this).val();
+					});
+		
+					$('.minute_create').blur(function () {
+						obj.from.minute = $(this).val();
+					});
+		
+					$('.save_create').blur(function () {
+						obj.from.save = $(this).val();
+					});
+		
+					$('.sBody_create').blur(function () {
+						obj.from.sbody = $(this).val();
+					});
+					$('.url_create').blur(function () {
+						obj.from.urladdress = $(this).val();
+					});
+		
+					$('[aria-labelledby="cycle"] a').unbind().click(function () {
+						$('.cycle_btn').find('b').attr('val',$(this).attr('value')).html($(this).html());
+						var type = $(this).attr('value');
+						switch(type){
+							case 'day':
+								$('.week_btn').hide();
+								$('.where1_input').hide();
+								$('.hour_input').show().find('input').val('1');
+								$('.minute_input').show().find('input').val('30');
+								obj.from.week = '';
+								obj.from.type = '';
+								obj.from.hour = 1;
+								obj.from.minute = 30;
+							break;
+							case 'day-n':
+								$('.week_btn').hide();
+								$('.where1_input').show().find('input').val('1');
+								$('.hour_input').show().find('input').val('1');
+								$('.minute_input').show().find('input').val('30');
+								obj.from.week = '';
+								obj.from.where1 = 1;
+								obj.from.hour = 1;
+								obj.from.minute = 30;
+							break;
+							case 'hour':
+								$('.week_btn').hide();
+								$('.where1_input').hide();
+								$('.hour_input').hide();
+								$('.minute_input').show().find('input').val('30');
+								obj.from.week = '';
+								obj.from.where1 = '';
+								obj.from.hour = '';
+								obj.from.minute = 30;
+							break;
+							case 'hour-n':
+								$('.week_btn').hide();
+								$('.where1_input').hide();
+								$('.hour_input').show().find('input').val('1');
+								$('.minute_input').show().find('input').val('30');
+								obj.from.week = '';
+								obj.from.where1 = '';
+								obj.from.hour = 1;
+								obj.from.minute = 30;
+							break;
+							case 'minute-n':
+								$('.week_btn').hide();
+								$('.where1_input').hide();
+								$('.hour_input').hide();
+								$('.minute_input').show();
+								obj.from.week = '';
+								obj.from.where1 = '';
+								obj.from.hour = '';
+								obj.from.minute = 30;
+								console.log(obj.from);
+							break;
+							case 'week':
+								$('.week_btn').show();
+								$('.where1_input').hide();
+								$('.hour_input').show();
+								$('.minute_input').show();
+								obj.from.week = 1;
+								obj.from.where1 = '';
+								obj.from.hour = 1;
+								obj.from.minute = 30;
+							break;
+							case 'month':
+								$('.week_btn').hide();
+								$('.where1_input').show();
+								$('.hour_input').show();
+								$('.minute_input').show();
+								obj.from.week = '';
+								obj.from.where1 = 1;
+								obj.from.hour = 1;
+								obj.from.minute = 30;
+							break;
+						}
+						obj.from.type = $(this).attr('value');
+					});
+		
+					$('[aria-labelledby="week"] a').unbind().click(function () {
+						$('.week_btn').find('b').attr('val',$(this).attr('value')).html($(this).html());
+						obj.from.week = $(this).attr('value');
+					});
+		
+					$('[aria-labelledby="backupTo"] a').unbind().click(function () {
+						$('.backup_btn').find('b').attr('val',$(this).attr('value')).html($(this).html());
+						obj.from.backup_to = $(this).attr('value');
+					});
+					$('.plan-submits').unbind().click(function(){
+						if(obj.from.type == 'hour-n'){
+							obj.from.where1 = obj.from.hour;
+							obj.from.hour = '';
+						} else if(obj.from.type == 'minute-n') {
+							obj.from.where1 = obj.from.minute;
+							obj.from.minute = '';
+						}
+						var loadT = layer.msg('正在保存编辑内容，请稍后...',{icon:16,time:0,shade: [0.3, '#000']});
+						$.post('/crontab/modify_crond',obj.from,function(rdata){
+
+							if (!rdata.status){
+								layer.msg(rdata.msg,{icon:rdata.status?1:2});
+								return;
+							}
+
+							showMsg(rdata.msg, function(){
+								layer.closeAll();
+								getCronData(1);
+								initDropdownMenu();
+							},{icon:rdata.status?1:2}, 2000);
+
+						},'json');
+					});
+				}
 				,cancel: function(){ 
 				    initDropdownMenu();
 				}
 			});
-			setTimeout(function(){
-				if(obj.from.stype == 'toShell'){
-					$('.site_list').hide();
-				}else if(obj.from.stype == 'rememory'){
-					$('.site_list').hide();
-				}else if( obj.from.stype == 'toUrl'){
-					$('.site_list').hide();
-				}else{
-					$('.site_list').show();
-				}
-
-				obj.from.minute = $('.minute_create').val();
-				obj.from.hour = $('.hour_create').val();
-				obj.from.where1 = $('.where1_create').val();
-
-				$('.sName_create').blur(function () {
-					obj.from.name = $(this).val();
-				});
-				$('.where1_create').blur(function () {
-					obj.from.where1 = $(this).val();
-				});
-	
-				$('.hour_create').blur(function () {
-					obj.from.hour = $(this).val();
-				});
-	
-				$('.minute_create').blur(function () {
-					obj.from.minute = $(this).val();
-				});
-	
-				$('.save_create').blur(function () {
-					obj.from.save = $(this).val();
-				});
-	
-				$('.sBody_create').blur(function () {
-					obj.from.sbody = $(this).val();
-				});
-				$('.url_create').blur(function () {
-					obj.from.urladdress = $(this).val();
-				});
-	
-				$('[aria-labelledby="cycle"] a').unbind().click(function () {
-					$('.cycle_btn').find('b').attr('val',$(this).attr('value')).html($(this).html());
-					var type = $(this).attr('value');
-					switch(type){
-						case 'day':
-							$('.week_btn').hide();
-							$('.where1_input').hide();
-							$('.hour_input').show().find('input').val('1');
-							$('.minute_input').show().find('input').val('30');
-							obj.from.week = '';
-							obj.from.type = '';
-							obj.from.hour = 1;
-							obj.from.minute = 30;
-						break;
-						case 'day-n':
-							$('.week_btn').hide();
-							$('.where1_input').show().find('input').val('1');
-							$('.hour_input').show().find('input').val('1');
-							$('.minute_input').show().find('input').val('30');
-							obj.from.week = '';
-							obj.from.where1 = 1;
-							obj.from.hour = 1;
-							obj.from.minute = 30;
-						break;
-						case 'hour':
-							$('.week_btn').hide();
-							$('.where1_input').hide();
-							$('.hour_input').hide();
-							$('.minute_input').show().find('input').val('30');
-							obj.from.week = '';
-							obj.from.where1 = '';
-							obj.from.hour = '';
-							obj.from.minute = 30;
-						break;
-						case 'hour-n':
-							$('.week_btn').hide();
-							$('.where1_input').hide();
-							$('.hour_input').show().find('input').val('1');
-							$('.minute_input').show().find('input').val('30');
-							obj.from.week = '';
-							obj.from.where1 = '';
-							obj.from.hour = 1;
-							obj.from.minute = 30;
-						break;
-						case 'minute-n':
-							$('.week_btn').hide();
-							$('.where1_input').hide();
-							$('.hour_input').hide();
-							$('.minute_input').show();
-							obj.from.week = '';
-							obj.from.where1 = '';
-							obj.from.hour = '';
-							obj.from.minute = 30;
-							console.log(obj.from);
-						break;
-						case 'week':
-							$('.week_btn').show();
-							$('.where1_input').hide();
-							$('.hour_input').show();
-							$('.minute_input').show();
-							obj.from.week = 1;
-							obj.from.where1 = '';
-							obj.from.hour = 1;
-							obj.from.minute = 30;
-						break;
-						case 'month':
-							$('.week_btn').hide();
-							$('.where1_input').show();
-							$('.hour_input').show();
-							$('.minute_input').show();
-							obj.from.week = '';
-							obj.from.where1 = 1;
-							obj.from.hour = 1;
-							obj.from.minute = 30;
-						break;
-					}
-					obj.from.type = $(this).attr('value');
-				});
-	
-				$('[aria-labelledby="week"] a').unbind().click(function () {
-					$('.week_btn').find('b').attr('val',$(this).attr('value')).html($(this).html());
-					obj.from.week = $(this).attr('value');
-				});
-	
-				$('[aria-labelledby="backupTo"] a').unbind().click(function () {
-					$('.backup_btn').find('b').attr('val',$(this).attr('value')).html($(this).html());
-					obj.from.backup_to = $(this).attr('value');
-				});
-				$('.plan-submits').unbind().click(function(){
-					if(obj.from.type == 'hour-n'){
-						obj.from.where1 = obj.from.hour;
-						obj.from.hour = '';
-					} else if(obj.from.type == 'minute-n') {
-						obj.from.where1 = obj.from.minute;
-						obj.from.minute = '';
-					}
-					var loadT = layer.msg('正在保存编辑内容，请稍后...',{icon:16,time:0,shade: [0.3, '#000']});
-					$.post('/crontab/modify_crond',obj.from,function(rdata){
-
-						if (!rdata.status){
-							layer.msg(rdata.msg,{icon:rdata.status?1:2});
-							return;
-						}
-
-						showMsg(rdata.msg, function(){
-							layer.closeAll();
-							getCronData(1);
-							initDropdownMenu();
-						},{icon:rdata.status?1:2}, 2000);
-
-					},'json');
-				});
-			},100);
 		});
 	},'json');
 }
