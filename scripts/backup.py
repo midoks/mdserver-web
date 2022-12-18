@@ -181,10 +181,17 @@ class backupTools:
         for database in databases:
             self.backupDatabase(database['name'], save)
 
+    def findPathName(self, path, filename):
+        f = os.scandir(path)
+        l = []
+        for ff in f:
+            if ff.name.find(filename) > -1:
+                l.append(ff.name)
+        return l
+
     def backupPath(self, path, count):
-        print("=" * 90)
-        print("★开始备份[{}]".format(mw.formatDate()))
-        print("=" * 90)
+
+        mw.echoStart('备份')
 
         backup_path = mw.getBackupDir() + '/path'
         if not os.path.exists(backup_path):
@@ -195,15 +202,36 @@ class backupTools:
             dirname, mw.formatDate("%Y%m%d_%H%M%S"))
         dfile = os.path.join(backup_path, fname)
 
+        p_size = mw.getPathSize(path)
+        stime = time.time()
+
         cmd = "cd " + os.path.dirname(path) + " && tar zcvf '" + dfile + "' '" + dirname + "' 2>{err_log} 1> /dev/null".format(
             err_log='/tmp/backup_err.log')
-
         mw.execShell(cmd)
 
-        print("=" * 90)
-        print("☆备份完成[{}]".format(mw.formatDate()))
-        print("=" * 90)
-        print("\n")
+        tar_size = os.path.getsize(dfile)
+
+        mw.echoInfo('备份目录：' + path)
+        mw.echoInfo('目录已备份到：' + dfile)
+        mw.echoInfo("目录大小：{}".format(mw.toSize(p_size)))
+        mw.echoInfo("开始压缩文件：{}".format(mw.formatDate(times=stime)))
+        mw.echoInfo("文件压缩完成，耗时{:.2f}秒，压缩包大小：{}".format(
+            time.time() - stime, mw.toSize(tar_size)))
+        mw.echoInfo('保留最新的备份数：' + count + '份')
+
+        backups = self.findPathName(backup_path, 'path_{}'.format(dirname))
+        num = len(backups) - int(count)
+        backups.sort()
+        if num > 0:
+            for backup in backups:
+                abspath_bk = backup_path + "/" + backup
+                mw.execShell("rm -f " + abspath_bk)
+                mw.echoInfo("|---已清理过期备份文件：" + abspath_bk)
+                num -= 1
+                if num < 1:
+                    break
+
+        mw.echoEnd('备份')
 
 if __name__ == "__main__":
     backup = backupTools()
