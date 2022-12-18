@@ -864,7 +864,7 @@ class site_api:
                         'type'] + '</p><p><span>错误代码:</span>' + emsg['detail'] + '</p>'
                 return mw.returnJson(data['status'], msg, data['msg'])
 
-        if not os.path.exists(dst_letpath):
+        if os.path.exists(dst_letpath):
             mw.execShell('mkdir -p ' + dst_letpath)
             mw.buildSoftLink(src_csrpath, dst_csrpath, True)
             mw.buildSoftLink(src_keypath, dst_keypath, True)
