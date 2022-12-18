@@ -230,8 +230,8 @@ class crontab_api:
         cronInfo['sbody'] = get['sbody']
         cronInfo['urladdress'] = get['urladdress']
 
-        addData = mw.M('crontab').where('id=?', (sid,)).save('name,type,where1,where_hour,where_minute,save,backup_to,sbody,urladdress', (get[
-            'name'], field_type, get['where1'], get['hour'], get['minute'], get['save'], get['backup_to'], get['sbody'], get['urladdress']))
+        addData = mw.M('crontab').where('id=?', (sid,)).save('name,type,where1,where_hour,where_minute,save,backup_to, sname, sbody,urladdress',
+                                                             (iname, field_type, get['where1'], get['hour'], get['minute'], get['save'], get['backup_to'], sname, get['sbody'], get['urladdress']))
         self.removeForCrond(cronInfo['echo'])
         self.syncToCrond(cronInfo)
         mw.writeLog('计划任务', '修改计划任务[' + cronInfo['name'] + ']成功')

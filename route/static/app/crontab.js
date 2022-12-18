@@ -676,7 +676,7 @@ function editTaskInfo(id){
 							<div class="clearfix plan ptb10 site_list" style="display:none">\
 								<span class="typename controls c4 pull-left f14 text-right mr20">'+ sTypeName  +'</span>\
 								<div style="line-height:34px"><div class="dropdown pull-left mr20 sName_btn" style="display:'+ (obj.from.sType != "path"?'block;':'none') +'">\
-									<button class="btn btn-default dropdown-toggle" type="button"  data-toggle="dropdown" style="width:auto" disabled="disabled">\
+									<button class="btn btn-default dropdown-toggle sname" type="button"  data-toggle="dropdown" style="width:auto" disabled="disabled">\
 										<b id="sName" val="'+ obj.from.sname +'">'+ obj.from.sname +'</b>\
 										<span class="caret"></span>\
 									</button>\
@@ -722,19 +722,22 @@ function editTaskInfo(id){
 					$('.changePathDir').click(function(){
 						changePathCallback($('#sName').val(),function(select_dir){
 							$('input[name="name"]').val('备份目录['+select_dir+']');
-							$('.sName_btn button b').attr('val',select_dir).text(select_dir);
+							$('.sName_btn .sname b').attr('val',select_dir).text(select_dir);
+							obj.from.sname = select_dir;
 						});
 					});
 					
 					if(obj.from.stype == 'toShell'){
 						$('.site_list').hide();
-					}else if(obj.from.stype == 'rememory'){
+					} else if (obj.from.stype == 'rememory') {
 						$('.site_list').hide();
-					}else if( obj.from.stype == 'toUrl'){
+					} else if ( obj.from.stype == 'toUrl'){
 						$('.site_list').hide();
-					}else{
+					} else {
 						$('.site_list').show();
 					}
+
+					
 
 					obj.from.minute = $('.minute_create').val();
 					obj.from.hour = $('.hour_create').val();

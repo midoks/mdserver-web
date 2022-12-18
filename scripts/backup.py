@@ -181,6 +181,29 @@ class backupTools:
         for database in databases:
             self.backupDatabase(database['name'], save)
 
+    def backupPath(self, path, count):
+        print("=" * 90)
+        print("★开始备份[{}]".format(mw.formatDate()))
+        print("=" * 90)
+
+        backup_path = mw.getBackupDir() + '/path'
+        if not os.path.exists(backup_path):
+            mw.execShell("mkdir -p " + backup_path)
+
+        dirname = os.path.basename(path)
+        fname = 'path_{}_{}.tar.gz'.format(
+            dirname, mw.formatDate("%Y%m%d_%H%M%S"))
+        dfile = os.path.join(backup_path, fname)
+
+        cmd = "cd " + os.path.dirname(path) + " && tar zcvf '" + dfile + "' '" + dirname + "' 2>{err_log} 1> /dev/null".format(
+            err_log='/tmp/backup_err.log')
+
+        mw.execShell(cmd)
+
+        print("=" * 90)
+        print("☆备份完成[{}]".format(mw.formatDate()))
+        print("=" * 90)
+        print("\n")
 
 if __name__ == "__main__":
     backup = backupTools()
@@ -196,4 +219,4 @@ if __name__ == "__main__":
         else:
             backup.backupDatabase(sys.argv[2], sys.argv[3])
     elif stype == 'path':
-        print(".")
+        backup.backupPath(sys.argv[2], sys.argv[3])
