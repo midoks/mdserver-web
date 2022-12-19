@@ -80,11 +80,13 @@ class FtpPSClient:
             return default_config
 
     def injection_config(self, data):
-        host = data["ftp_host"].strip()
+        self.__host = host = data["ftp_host"].strip()
         if host.find(':') == -1:
             self.__port = self.default_port
+        else:
+            self.__host = host.split(':')[0]
+            self.__port = host.split(':')[1]
 
-        self.__host = data['ftp_host'].strip()
         self.__user = data['ftp_user'].strip()
         self.__password = data['ftp_pass'].strip()
         bp = data['backup_path'].strip()
