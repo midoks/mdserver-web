@@ -198,7 +198,6 @@ def backupAllFunc(stype):
     # 开始执行上传信息
 
     bk_prefix = prefix_dict[stype]
-
     bk_name = stype
     if stype.find('database_') > -1:
         bk_name = 'database'
