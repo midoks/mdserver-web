@@ -377,10 +377,11 @@ class crontab_api:
         stype = request.form.get('type', '')
 
         bak_data = []
-        hookPath = mw.getPanelDataDir() + "/hook_backup.json"
-        if os.path.exists(hookPath):
-            t = mw.readFile(hookPath)
-            bak_data = json.loads(t)
+        if stype == 'sites' or stype == 'database' or stype.find('database_') > -1 or stype == 'path':
+            hookPath = mw.getPanelDataDir() + "/hook_backup.json"
+            if os.path.exists(hookPath):
+                t = mw.readFile(hookPath)
+                bak_data = json.loads(t)
 
         if stype == 'database' or stype.find('database_') > -1:
             sqlite3_name = 'mysql'
@@ -411,10 +412,11 @@ class crontab_api:
         data = {}
         data['orderOpt'] = bak_data
 
-        if stype == 'site' or stype == 'logs':
-            stype == 'sites'
+        default_db = 'sites'
+        # if stype == 'site' or stype == 'logs':
+        #     stype == 'sites'
 
-        data['data'] = mw.M(stype).field('name,ps').select()
+        data['data'] = mw.M(default_db).field('name,ps').select()
         return mw.getJson(data)
     ##### ----- start ----- ###
 

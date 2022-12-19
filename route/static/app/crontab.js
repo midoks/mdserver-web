@@ -462,7 +462,7 @@ function toBackup(type){
 			break;
 		case 'logs':
 			sMsg = '切割日志';
-			sType = "sites";
+			sType = "logs";
 			break;
 		case 'path':
 			sMsg = '备份目录';
