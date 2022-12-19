@@ -98,6 +98,8 @@ fi
 if [ ! -f /usr/sbin/iptables ];then
 	$PKGMGR install firewalld -y
 	systemctl enable firewalld
+    #取消服务锁定
+    systemctl unmask firewalld
 	systemctl start firewalld
 
 	firewall-cmd --permanent --zone=public --add-port=22/tcp
