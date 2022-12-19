@@ -196,20 +196,23 @@ def backupAllFunc(stype):
 
     os.system(cmd)
     # 开始执行上传信息
-
     if stype == 'database':
-        db_prefix = prefix_dict[stype]
+        bk_prefix = prefix_dict[stype]
     else:
         plugin_name = stype.replace('database_', '')
-        db_prefix = plugin_name + '/db'
+        bk_prefix = plugin_name + '/db'
 
-    find_path = mw.getBackupDir() + '/database/' + db_prefix + '_' + name
+    bk_name = stype
+    if stype.find('database_') > -1:
+        bk_name = 'database'
+
+    find_path = mw.getBackupDir() + '/' + bk_name + '/' + bk_prefix + '_' + name
     find_new_file = "ls " + find_path + \
         "_* | grep '.gz' | cut -d \  -f 1 | awk 'END {print}'"
 
     filename = mw.execShell(find_new_file)[0].strip()
     if filename == "":
-        print("not find upload file!")
+        mw.echoInfo("not find upload file!")
         return False
 
     ftp = FtpPSClient()

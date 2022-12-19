@@ -377,8 +377,7 @@ class crontab_api:
         stype = request.form.get('type', '')
 
         bak_data = []
-
-        if stype == 'sites' or stype == 'database' or stype.find('database_') > -1 or stype == 'path':
+        if stype == 'sites' or stype == 'database' or stype.find('database_') > -1 or stype == 'path' or stype == 'logs':
             hookPath = mw.getPanelDataDir() + "/hook_backup.json"
             if os.path.exists(hookPath):
                 t = mw.readFile(hookPath)
