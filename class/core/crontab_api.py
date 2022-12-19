@@ -411,7 +411,7 @@ class crontab_api:
         data = {}
         data['orderOpt'] = bak_data
 
-        if stype == 'sites' or stype == 'logs':
+        if stype == 'site' or stype == 'logs':
             stype == 'sites'
 
         data['data'] = mw.M(stype).field('name,ps').select()
