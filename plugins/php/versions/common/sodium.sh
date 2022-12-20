@@ -16,7 +16,7 @@ actionType=$1
 version=$2
 
 sysName=`uname`
-LIBNAME=libsodium
+LIBNAME=sodium
 LIBV=2.0.23
 
 
@@ -50,7 +50,7 @@ Install_lib()
 		php_lib=$sourcePath/php_lib
 		mkdir -p $php_lib
 		if [ ! -d $php_lib/${LIBNAME}-${LIBV} ];then
-			wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
+			wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/lib${LIBNAME}-${LIBV}.tgz
 			cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
 		fi 
 		cd $php_lib/${LIBNAME}-${LIBV}
