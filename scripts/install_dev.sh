@@ -74,6 +74,21 @@ if [ $OSNAME != "macos" ];then
 		rm -rf /tmp/dev.zip
 		rm -rf /tmp/mdserver-web-dev
 	fi
+
+	# install acme.sh
+	if [ ! -d /root/.acme.sh ];then
+	    if [ ! -z "$cn" ];then
+	        curl -sSL -o /tmp/acme.tar.gz https://ghproxy.com/github.com/acmesh-official/acme.sh/archive/master.tar.gz
+	        tar xvzf /tmp/acme.tar.gz -C /tmp
+	        cd /tmp/acme.sh-master
+	        bash acme.sh install
+	        cd -
+	    fi
+
+	    if [ ! -d /root/.acme.sh ];then
+	        curl  https://get.acme.sh | sh
+	    fi
+	fi
 fi
 
 echo "use system version: ${OSNAME}"
