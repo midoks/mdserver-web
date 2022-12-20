@@ -56,7 +56,7 @@ Install_lib()
 		cd $php_lib/${LIBNAME}-${LIBV}
 
 		$serverPath/php/$version/bin/phpize
-		./configure --with-php-config=$serverPath/php/$version/bin/php-config
+		./configure --with-php-config=$serverPath/php/$version/bin/php-config --with-sodium=$serverPath/lib/libsodium
 		make clean && make && make install && make clean
 
 	fi
