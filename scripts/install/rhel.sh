@@ -29,7 +29,7 @@ if [ ! -d /root/.acme.sh ];then
 fi
 
 if [ -f /usr/sbin/iptables ];then
-    $PKGMGR install -y iptables-services
+    # $PKGMGR install -y iptables-services
     iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 22 -j ACCEPT
     iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
     iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 443 -j ACCEPT
