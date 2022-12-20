@@ -22,7 +22,7 @@ fi
 if [ ! -d ${SERVER_ROOT}/icu ];then
 
 	if [ ! -f ${SOURCE_ROOT}/icu4c-52_2-src.tgz ];then
-		wget -O ${SOURCE_ROOT}/icu4c-52_2-src.tgz ${HTTP_PREFIX}github.com/unicode-org/icu/releases/download/release-52-2/icu4c-52_2-src.tgz
+		wget --no-check-certificate -O ${SOURCE_ROOT}/icu4c-52_2-src.tgz ${HTTP_PREFIX}github.com/unicode-org/icu/releases/download/release-52-2/icu4c-52_2-src.tgz
 	fi
 
 	if [ ! -d ${SERVER_ROOT}/icu/52.2 ];then

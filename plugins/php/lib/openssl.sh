@@ -16,7 +16,7 @@ SOURCE_ROOT=$rootPath/source/lib
 if [ ! -d ${SERVER_ROOT}/openssl ];then
     cd ${SOURCE_ROOT}
     if [ ! -f ${SOURCE_ROOT}/openssl-1.1.1p.tar.gz ];then
-        wget -O ${SOURCE_ROOT}/openssl-1.1.1p.tar.gz https://www.openssl.org/source/openssl-1.1.1p.tar.gz
+        wget --no-check-certificate -O ${SOURCE_ROOT}/openssl-1.1.1p.tar.gz https://www.openssl.org/source/openssl-1.1.1p.tar.gz
     fi 
     tar -zxvf openssl-1.1.1p.tar.gz
     cd openssl-1.1.1p

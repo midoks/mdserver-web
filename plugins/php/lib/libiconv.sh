@@ -21,7 +21,7 @@ fi
 
 if [ ! -d ${SERVER_ROOT}/libiconv ];then
     cd $SOURCE_ROOT
-	wget -O libiconv-1.15.tar.gz  ${HTTP_PREFIX}github.com/midoks/mdserver-web/releases/download/init/libiconv-1.15.tar.gz  -T 5
+	wget --no-check-certificate -O libiconv-1.15.tar.gz  ${HTTP_PREFIX}github.com/midoks/mdserver-web/releases/download/init/libiconv-1.15.tar.gz  -T 5
     tar zxvf libiconv-1.15.tar.gz
     cd libiconv-1.15
     ./configure --prefix=${SERVER_ROOT}/libiconv --enable-static && make && make install
