@@ -102,6 +102,10 @@ if [ ! -f /usr/sbin/iptables ];then
     systemctl unmask firewalld
 	systemctl start firewalld
 
+    sed -i 's#AllowZoneDrifting=yes#AllowZoneDrifting=no#g' /etc/firewalld/firewalld.conf
+    firewall-cmd --reload
+    
+
 	firewall-cmd --permanent --zone=public --add-port=22/tcp
 	firewall-cmd --permanent --zone=public --add-port=80/tcp
 	firewall-cmd --permanent --zone=public --add-port=443/tcp
@@ -110,7 +114,7 @@ if [ ! -f /usr/sbin/iptables ];then
 	# firewall-cmd --permanent --zone=public --add-port=3306/tcp
 	# firewall-cmd --permanent --zone=public --add-port=30000-40000/tcp
 
-	sed -i 's#AllowZoneDrifting=yes#AllowZoneDrifting=no#g' /etc/firewalld/firewalld.conf
+	# sed -i 's#AllowZoneDrifting=yes#AllowZoneDrifting=no#g' /etc/firewalld/firewalld.conf
 	firewall-cmd --reload
 
 	#安装时不开启
