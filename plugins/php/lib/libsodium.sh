@@ -24,6 +24,6 @@ if [ ! -d ${SERVER_ROOT}/libsodium-stable ];then
     fi 
     tar -zxvf libsodium-${VERSION}-stable.tar.gz
     cd libsodium-stable
-    ./configure && make && make check && sudo make install
+    ./configure --prefix=${SERVER_ROOT}/libsodium && make && make check && sudo make install
 fi
 #----------------------------- libsodium end -------------------------#
