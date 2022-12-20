@@ -57,6 +57,8 @@ if [ ! -f /usr/sbin/iptables ];then
     sed -i 's#AllowZoneDrifting=yes#AllowZoneDrifting=no#g' /etc/firewalld/firewalld.conf
     firewall-cmd --reload
     
+    # look
+    # firewall-cmd --list-all
 
     firewall-cmd --permanent --zone=public --add-port=22/tcp
     firewall-cmd --permanent --zone=public --add-port=80/tcp
