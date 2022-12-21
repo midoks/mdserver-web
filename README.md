@@ -94,8 +94,6 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 
 ### 版本更新 0.12.0
 
-
-
 * 安装脚本优化 @hiCasper。
 * 数据库[pg/apt/yum/mariadb]计划任务备份ok。
 * php源码加入sodium扩展。
