@@ -94,8 +94,7 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 
 ### 版本更新 0.12.0
 
-此次版本:默认面板名为【大圣面板】。
-由于#309问题。先注释。提前发版。
+
 
 * 安装脚本优化 @hiCasper。
 * 数据库[pg/apt/yum/mariadb]计划任务备份ok。
