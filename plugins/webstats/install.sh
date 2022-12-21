@@ -61,9 +61,6 @@ Install_App()
 	if [ ! -f  $serverPath/source/webstats/lsqlite3_fsl09y.zip ];then
 		wget --no-check-certificate -O $serverPath/source/webstats/lsqlite3_fsl09y.zip http://lua.sqlite.org/index.cgi/zip/lsqlite3_fsl09y.zip?uuid=fsl_9y
 		cd $serverPath/source/webstats && unzip lsqlite3_fsl09y.zip
-
-		#delete
-		rm -rf $serverPath/source/webstats/lsqlite3_fsl09y.zip
 	fi
 
 	PATH=${serverPath}/openresty/luajit:${serverPath}/openresty/luajit/include/luajit-2.1:$PATH
@@ -111,6 +108,10 @@ Install_App()
 	echo '安装完成' > $install_tmp
 
 	cd $rootPath && python3 ${rootPath}/plugins/webstats/index.py start
+
+
+	# delete install data
+	rm -rf $serverPath/source/webstats
 }
 
 Uninstall_App()
