@@ -29,7 +29,7 @@ if [ ! -d /root/.acme.sh ];then
 fi
 
 if [ -f /usr/sbin/iptables ];then
-    # $PKGMGR install -y iptables-services
+    $PKGMGR install -y iptables-services
 
     # iptables -nL --line-number
     
