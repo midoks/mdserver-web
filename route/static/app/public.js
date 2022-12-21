@@ -219,6 +219,47 @@ function getFormatTime(tm, format) {
 }
 
 
+
+function changePathCallback(default_dir, callback) {
+
+	var c = layer.open({
+		type: 1,
+		area: "650px",
+		title: '选择目录',
+		closeBtn: 1,
+		shift: 5,
+		shadeClose: false,
+		content: "<div class='changepath'><div class='path-top'><button type='button' class='btn btn-default btn-sm' onclick='backFile()'><span class='glyphicon glyphicon-share-alt'></span>返回</button>\
+		<div class='place' id='PathPlace'>当前路径：<span></span></div></div><div class='path-con'><div class='path-con-left'><dl><dt id='changecomlist' onclick='backMyComputer()'>计算机</dt></dl></div>\
+		<div class='path-con-right'><ul class='default' id='computerDefautl'></ul><div class='file-list divtable'>\
+			<table class='table table-hover' style='border:0 none'>\
+				<thead><tr class='file-list-head'><th width='40%'>文件名</th><th width='20%'>修改时间</th><th width='10%'>权限</th><th width='10%'>所有者</th><th width='10%'></th></tr></thead>\
+				<tbody id='tbody' class='list-list'></tbody></table></div></div></div></div><div class='getfile-btn' style='margin-top:0'>\
+				<button type='button' class='btn btn-default btn-sm pull-left' onclick='createFolder()'>新建文件夹</button>\
+				<button type='button' class='btn btn-danger btn-sm mr5 btn-close'>关闭</button>\
+				<button type='button' class='btn btn-success btn-sm btn-choose'>选择</button>\
+		</div>",
+		success:function(layero,layer_index){
+			$('.btn-close').click(function(){
+				layer.close(layer_index);
+			});
+
+			$('.btn-choose').click(function(){
+				var a = $("#PathPlace").find("span").text();
+				a = a.replace(new RegExp(/(\\)/g), "/");
+				a_len = a.length;
+				if (a[a_len-1] == '/'){
+					a = a.substr(0,a_len-1);
+				}
+				callback(a);
+				layer.close(layer_index);
+			});
+		}
+	});
+	getDiskList(default_dir);
+	activeDisk();
+}
+
 function changePath(d) {
 	setCookie('SetId', d);
 	setCookie('SetName', '');
@@ -236,11 +277,11 @@ function changePath(d) {
 				<thead><tr class='file-list-head'><th width='40%'>文件名</th><th width='20%'>修改时间</th><th width='10%'>权限</th><th width='10%'>所有者</th><th width='10%'></th></tr></thead>\
 				<tbody id='tbody' class='list-list'></tbody></table></div></div></div></div><div class='getfile-btn' style='margin-top:0'>\
 				<button type='button' class='btn btn-default btn-sm pull-left' onclick='createFolder()'>新建文件夹</button>\
-				<button type='button' class='btn btn-danger btn-sm mr5' onclick=\"layer.close(getCookie('ChangePath'))\">关闭</button>\
+				<button type='button' class='btn btn-danger btn-sm mr5' onclick=\"layer.close(getCookie('changePath'))\">关闭</button>\
 				<button type='button' class='btn btn-success btn-sm' onclick='getfilePath()'>选择</button>\
 		</div>"
 	});
-	setCookie("ChangePath", c);
+	setCookie("changePath", c);
 	var b = $("#" + d).val();
 	tmp = b.split(".");
 	if(tmp[tmp.length - 1] == "gz") {
@@ -421,7 +462,8 @@ function getfilePath() {
 	}
 
 	$("#" + getCookie("SetId")).val(a + getCookie("SetName"));
-	layer.close(getCookie("ChangePath"));
+	layer.close(getCookie("changePath"));
+	return a;
 }
 
 function setCookie(a, c) {
@@ -639,7 +681,7 @@ function divcenter() {
 }
 
 function copyText(value) {
-	var clipboard = new ClipboardJS('#bt_copys');
+	var clipboard = new ClipboardJS('#mw_copys');
     clipboard.on('success', function (e) {
         layer.msg('复制成功',{icon:1,time:2000});
     });
@@ -647,8 +689,12 @@ function copyText(value) {
     clipboard.on('error', function (e) {
         layer.msg('复制失败，浏览器不兼容!',{icon:2,time:2000});
     });
-    $("#bt_copys").attr('data-clipboard-text',value);
-    $("#bt_copys").click();
+    $("#mw_copys").attr('data-clipboard-text',value);
+    $("#mw_copys").click();
+}
+
+function copyPass(value){
+	copyText(value);
 }
 
 function isChineseChar(b) {

@@ -54,12 +54,7 @@ echo y | pacman -Syu icu
 
 hwclock --systohc
 
-#https need
-if [ ! -d /root/.acme.sh ];then	
-	curl https://get.acme.sh | sh
-fi
-
-if [ -f /etc/init.d/iptables ];then
+if [ -f /usr/sbin/iptables ];then
 
 	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 22 -j ACCEPT
 	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
@@ -80,7 +75,7 @@ if [ -f /etc/init.d/iptables ];then
 fi
 
 
-if [ ! -f /etc/init.d/iptables ];then
+if [ ! -f /usr/sbin/iptables ];then
 	echo y | pacman -Sy firewalld
 	systemctl enable firewalld
 	systemctl start firewalld

@@ -44,7 +44,7 @@ class backupTools:
                 "----------------------------------------------------------------------------")
             return
 
-        backup_path = mw.getRootDir() + '/backup/database'
+        backup_path = mw.getRootDir() + '/backup/database/mysql-apt'
         if not os.path.exists(backup_path):
             mw.execShell("mkdir -p " + backup_path)
 

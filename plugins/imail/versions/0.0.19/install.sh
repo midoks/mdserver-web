@@ -21,10 +21,13 @@ OSNAME_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F
 ARCH="amd64"
 
 get_arch() {
-
 	TMP_ARCH=`arch`
 	if [ "$TMP_ARCH" == "x86_64" ];then
 		ARCH="amd64"
+	else if [ "$TMP_ARCH" == "aarch64" ];then
+		ARCH="arm64"
+	else
+		echo $ARCH
 	fi
 }
 

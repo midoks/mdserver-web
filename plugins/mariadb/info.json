@@ -1,4 +1,5 @@
 {
+	"hook":["database"],
 	"title":"MariaDB",
 	"tip":"soft",
 	"name":"mariadb",

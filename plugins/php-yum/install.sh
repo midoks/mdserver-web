@@ -78,6 +78,12 @@ if [ "${action}" == "install" ] && [ -d ${serverPath}/php-yum/${type} ];then
 	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install redis
 	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install memcached
 	echo "install PHP-YUM[${type}] extend end"
+
+	if [ ! -f /usr/local/bin/composer ];then
+		cd /tmp
+		curl -sS https://getcomposer.org/installer | php
+		mv composer.phar /usr/local/bin/composer
+	fi
 fi
 
 

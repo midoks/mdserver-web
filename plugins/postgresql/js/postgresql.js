@@ -259,19 +259,6 @@ function showHidePass(obj){
     }
 }
 
-function copyPass(password){
-    var clipboard = new ClipboardJS('#bt_copys');
-    clipboard.on('success', function (e) {
-        layer.msg('复制成功',{icon:1,time:2000});
-    });
-
-    clipboard.on('error', function (e) {
-        layer.msg('复制失败，浏览器不兼容!',{icon:2,time:2000});
-    });
-    $("#bt_copys").attr('data-clipboard-text',password);
-    $("#bt_copys").click();
-}
-
 function checkSelect(){
     setTimeout(function () {
         var num = $('input[type="checkbox"].check:checked').length;

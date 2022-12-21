@@ -76,16 +76,16 @@ class site_api:
     def listApi(self):
         limit = request.form.get('limit', '10')
         p = request.form.get('p', '1')
-        type_id = request.form.get('type_id', '')
+        type_id = request.form.get('type_id', '0').strip()
 
         start = (int(p) - 1) * (int(limit))
 
-        siteM = mw.M('sites')
-        if type_id != '' and type_id == '-1' and type_id == '0':
-            siteM.where('type_id=?', (type_id))
+        siteM = mw.M('sites').field('id,name,path,status,ps,addtime,edate')
+        if type_id != '' and int(type_id) >= 0:
+            siteM.where('type_id=?', (type_id,))
 
-        _list = siteM.field('id,name,path,status,ps,addtime,edate').limit(
-            (str(start)) + ',' + limit).order('id desc').select()
+        _list = siteM.limit((str(start)) + ',' +
+                            limit).order('id desc').select()
 
         for i in range(len(_list)):
             _list[i]['backup_count'] = mw.M('backup').where(
@@ -140,6 +140,10 @@ class site_api:
         return mw.getJson(data)
 
     def getCliPhpVersionApi(self):
+        php_dir = mw.getServerDir() + '/php'
+        if not os.path.exists(php_dir):
+            return mw.returnJson(False, '未安装PHP,无法设置')
+
         php_bin = '/usr/bin/php'
         php_versions = self.getPhpVersion()
         php_versions = php_versions[1:]
@@ -840,18 +844,6 @@ class site_api:
             'auth_to': auth_to,
         }
 
-        import cert_api
-        data = cert_api.cert_api().applyCertApi(to_args)
-
-        if not data['status']:
-            msg = data['msg']
-            if type(data['msg']) != str:
-                msg = data['msg'][0]
-                emsg = data['msg'][1]['challenges'][0]['error']
-                msg = msg + '<p><span>响应状态:</span>' + str(emsg['status']) + '</p><p><span>错误类型:</span>' + emsg[
-                    'type'] + '</p><p><span>错误代码:</span>' + emsg['detail'] + '</p>'
-            return mw.returnJson(data['status'], msg, data['msg'])
-
         src_letpath = mw.getServerDir() + '/web_conf/letsencrypt/' + siteName
         src_csrpath = src_letpath + "/fullchain.pem"  # 生成证书路径
         src_keypath = src_letpath + "/privkey.pem"  # 密钥文件路径
@@ -860,11 +852,22 @@ class site_api:
         dst_csrpath = dst_letpath + '/fullchain.pem'
         dst_keypath = dst_letpath + '/privkey.pem'
 
-        if not os.path.exists(dst_letpath):
-            mw.execShell('mkdir -p ' + dst_letpath)
-            mw.buildSoftLink(src_csrpath, dst_csrpath, True)
-            mw.buildSoftLink(src_keypath, dst_keypath, True)
-            mw.execShell('echo "lets" > "' + dst_letpath + '/README"')
+        if not os.path.exists(src_letpath):
+            import cert_api
+            data = cert_api.cert_api().applyCertApi(to_args)
+            if not data['status']:
+                msg = data['msg']
+                if type(data['msg']) != str:
+                    msg = data['msg'][0]
+                    emsg = data['msg'][1]['challenges'][0]['error']
+                    msg = msg + '<p><span>响应状态:</span>' + str(emsg['status']) + '</p><p><span>错误类型:</span>' + emsg[
+                        'type'] + '</p><p><span>错误代码:</span>' + emsg['detail'] + '</p>'
+                return mw.returnJson(data['status'], msg, data['msg'])
+
+        mw.execShell('mkdir -p ' + dst_letpath)
+        mw.buildSoftLink(src_csrpath, dst_csrpath, True)
+        mw.buildSoftLink(src_keypath, dst_keypath, True)
+        mw.execShell('echo "lets" > "' + dst_letpath + '/README"')
 
         # 写入配置文件
         result = self.setSslConf(siteName)

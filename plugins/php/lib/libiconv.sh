@@ -13,9 +13,15 @@ rootPath=$(dirname "$rootPath")
 SERVER_ROOT=$rootPath/lib
 SOURCE_ROOT=$rootPath/source/lib
 
+cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
+HTTP_PREFIX="https://"
+if [ ! -z "$cn" ];then
+    HTTP_PREFIX="https://ghproxy.com/"
+fi
+
 if [ ! -d ${SERVER_ROOT}/libiconv ];then
     cd $SOURCE_ROOT
-	wget -O libiconv-1.15.tar.gz  https://github.com/midoks/mdserver-web/releases/download/init/libiconv-1.15.tar.gz  -T 5
+	wget --no-check-certificate -O libiconv-1.15.tar.gz  ${HTTP_PREFIX}github.com/midoks/mdserver-web/releases/download/init/libiconv-1.15.tar.gz  -T 5
     tar zxvf libiconv-1.15.tar.gz
     cd libiconv-1.15
     ./configure --prefix=${SERVER_ROOT}/libiconv --enable-static && make && make install

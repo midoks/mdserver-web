@@ -14,6 +14,11 @@ if [ "$EUID" -ne 0 ]
   exit
 fi
 
+if [ ${_os} != "Darwin" ] && [ ! -d /www/server/mdserver-web/logs ]; then
+	mkdir -p /www/server/mdserver-web/logs
+fi
+
+{
 
 if [ ${_os} == "Darwin" ]; then
 	OSNAME='macos'
@@ -86,3 +91,5 @@ fi
 endTime=`date +%s`
 ((outTime=($endTime-$startTime)/60))
 echo -e "Time consumed:\033[32m $outTime \033[0mMinute!"
+
+} 1> >(tee /www/server/mdserver-web/logs/mw-update.log) 2>&1

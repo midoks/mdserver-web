@@ -1060,7 +1060,7 @@ def makeConf():
     file = getRunDir() + '/data/json/config.json'
     if not os.path.exists(file):
         c = {}
-        c['title'] = '猫王面板'
+        c['title'] = '大圣面板'
         c['home'] = 'http://github/midoks/mdserver-web'
         c['recycle_bin'] = True
         c['template'] = 'default'
@@ -1453,3 +1453,24 @@ def getMyORMDb():
     import ormDb
     o = ormDb.ORM()
     return o
+
+# ---------------------------------------------------------------------------------
+# 打印相关
+# ---------------------------------------------------------------------------------
+
+
+def echoStart(tag):
+    print("=" * 90)
+    print("★开始{}[{}]".format(tag, formatDate()))
+    print("=" * 90)
+
+
+def echoEnd(tag):
+    print("=" * 90)
+    print("☆{}完成[{}]".format(tag, formatDate()))
+    print("=" * 90)
+    print("\n")
+
+
+def echoInfo(msg):
+    print("|-{}".format(msg))

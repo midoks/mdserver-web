@@ -27,7 +27,7 @@ from flask import request
 
 class config_api:
 
-    __version = '0.11.4'
+    __version = '0.12.0'
     __api_addr = 'data/api.json'
 
     def __init__(self):
@@ -729,5 +729,14 @@ class config_api:
 
         data['username'] = mw.M('users').where(
             "id=?", (1,)).getField('username')
+
+        # databases hook 获取
+        database_file = 'data/hook_database.json'
+        if os.path.exists(database_file):
+            df = mw.readFile(database_file)
+            df = json.loads(df)
+            data['hook_database'] = df
+        else:
+            data['hook_database'] = []
 
         return data

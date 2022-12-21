@@ -17,13 +17,7 @@ yum install -y wget curl lsof unzip
 yum install -y expect
 dnf install crontabs -y
 
-#https need
-
-if [ ! -d /root/.acme.sh ];then	
-	curl  https://get.acme.sh | sh
-fi
-
-if [ -f /etc/init.d/iptables ];then
+if [ -f /usr/sbin/iptables ];then
 
 	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 22 -j ACCEPT
 	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
@@ -46,7 +40,7 @@ fi
 
 
 if [ "${isVersion}" == '' ];then
-	if [ ! -f "/etc/init.d/iptables" ];then
+	if [ ! -f "/usr/sbin/iptables" ];then
 		yum install firewalld -y
 		systemctl enable firewalld
 		systemctl start firewalld

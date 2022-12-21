@@ -2,6 +2,12 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
+if [ ! -d /www/server/mdserver-web/logs ]; then
+	mkdir -p /www/server/mdserver-web/logs
+fi
+
+{
+
 echo "welcome to mdserver-web panel"
 
 startTime=`date +%s`
@@ -60,3 +66,4 @@ endTime=`date +%s`
 ((outTime=(${endTime}-${startTime})/60))
 echo -e "Time consumed:\033[32m $outTime \033[0mMinute!"
 
+} 1> >(tee /www/server/mdserver-web/logs/mw-app.log) 2>&1

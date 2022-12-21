@@ -352,8 +352,8 @@ class firewall_api:
             elif self.__isMac:
                 pass
             else:
-                mw.execShell('/etc/init.d/iptables save')
-                mw.execShell('/etc/init.d/iptables stop')
+                mw.execShell('service iptables save')
+                mw.execShell('service iptables stop')
         else:
             if self.__isUfw:
                 mw.execShell("echo 'y'| ufw enable")
@@ -363,8 +363,8 @@ class firewall_api:
             elif self.__isMac:
                 pass
             else:
-                mw.execShell('/etc/init.d/iptables save')
-                mw.execShell('/etc/init.d/iptables restart')
+                mw.execShell('service iptables save')
+                mw.execShell('service iptables restart')
 
         return mw.returnData(True, '设置成功!')
 
@@ -437,8 +437,8 @@ class firewall_api:
         elif self.__isMac:
             pass
         else:
-            mw.execShell('/etc/init.d/iptables save')
-            mw.execShell('/etc/init.d/iptables restart')
+            mw.execShell('service iptables save')
+            mw.execShell('service iptables restart')
 
     def getFwStatus(self):
         if self.__isUfw:

@@ -70,12 +70,10 @@ def getArgs():
 
 
 def getBackupDir():
-    bk_path = mw.getBackupDir() + "/pg"
+    bk_path = mw.getBackupDir() + "/database/postgresql"
     if not os.path.isdir(bk_path):
-        mw.execShell("mkdir -p {}/upload".format(bk_path))
-
-    bk_path_upload = bk_path + "/upload"
-    return bk_path_upload
+        mw.execShell("mkdir -p {}".format(bk_path))
+    return bk_path
 
 
 def checkArgs(data, ck=[]):
@@ -674,7 +672,7 @@ def setUserPwd(version=''):
 
 
 def getDbBackupListFunc(dbname=''):
-    bkDir = mw.getRootDir() + '/backup/database'
+    bkDir = getBackupDir()
     blist = os.listdir(bkDir)
     r = []
 
@@ -708,11 +706,11 @@ def importDbBackup():
     file = args['file']
     name = args['name']
 
-    file_path = mw.getRootDir() + '/backup/database/' + file
-    file_path_sql = mw.getRootDir() + '/backup/database/' + file.replace('.gz', '')
+    file_path = getBackupDir() + '/' + file
+    file_path_sql = getBackupDir() + '/' + file.replace('.gz', '')
 
     if not os.path.exists(file_path_sql):
-        cmd = 'cd ' + mw.getRootDir() + '/backup/database && gzip -d ' + file
+        cmd = 'cd ' + getBackupDir() + ' && gzip -d ' + file
         mw.execShell(cmd)
 
     pwd = pSqliteDb('config').where('id=?', (1,)).getField('pg_root')
@@ -731,8 +729,7 @@ def deleteDbBackup():
     if not data[0]:
         return data[1]
 
-    bkDir = mw.getRootDir() + '/backup/database'
-
+    bkDir = getBackupDir()
     os.remove(bkDir + '/' + args['filename'])
     return mw.returnJson(True, 'ok')
 
@@ -744,7 +741,7 @@ def getDbBackupList():
         return data[1]
 
     r = getDbBackupListFunc(args['name'])
-    bkDir = mw.getRootDir() + '/backup/database'
+    bkDir = getBackupDir()
     rr = []
     for x in range(0, len(r)):
         p = bkDir + '/' + r[x]

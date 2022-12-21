@@ -13,11 +13,17 @@ rootPath=$(dirname "$rootPath")
 SERVER_ROOT=$rootPath/lib
 SOURCE_ROOT=$rootPath/source/lib
 
+cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
+HTTP_PREFIX="https://"
+if [ ! -z "$cn" ];then
+    HTTP_PREFIX="https://ghproxy.com/"
+fi
+
 if [ ! -d ${SERVER_ROOT}/zlib ];then
 
     cd $SOURCE_ROOT
     if [ ! -f ${SOURCE_ROOT}/zlib-1.2.11.tar.gz ];then
-        wget -O zlib-1.2.11.tar.gz --no-check-certificate https://github.com/madler/zlib/archive/v1.2.11.tar.gz -T 20
+        wget --no-check-certificate -O zlib-1.2.11.tar.gz ${HTTP_PREFIX}github.com/madler/zlib/archive/v1.2.11.tar.gz -T 20
     fi
 
     tar -zxvf zlib-1.2.11.tar.gz

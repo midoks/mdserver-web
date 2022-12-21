@@ -236,7 +236,7 @@ class plugins_api:
         if 'hook' in info:
             hooks = info['hook']
             for x in hooks:
-                if x in ['backup']:
+                if x in ['backup', 'database']:
                     self.hookInstallFile(x, info)
                     return True
         return False
@@ -245,7 +245,7 @@ class plugins_api:
         if 'hook' in info:
             hooks = info['hook']
             for x in hooks:
-                if x in ['backup']:
+                if x in ['backup', 'database']:
                     self.hookUninstallFile(x, info)
                     return True
         return False

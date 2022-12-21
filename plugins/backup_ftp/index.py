@@ -57,9 +57,8 @@ def getArgs():
         tmp[t[0]] = t[1]
     elif args_len > 1:
         for i in range(len(args)):
-            t = args[i].split(':')
+            t = args[i].split(':', 1)
             tmp[t[0]] = t[1]
-
     return tmp
 
 
@@ -180,28 +179,37 @@ def backupAllFunc(stype):
     name = sys.argv[2]
     num = sys.argv[3]
 
-    args = stype + " " + name + " " + num
-
-    cmd = 'python3 ' + mw.getRunDir() + '/scripts/backup.py ' + args
-    os.system(cmd)
-
-    # 开始执行上传信息
-
     prefix_dict = {
         "site": "web",
         "database": "db",
         "path": "path",
     }
 
-    find_path = mw.getBackupDir() + '/' + stype + '/' + \
-        prefix_dict[stype] + '_' + name
+    args = stype + " " + name + " " + num
+    cmd = 'python3 ' + mw.getRunDir() + '/scripts/backup.py ' + args
+    if stype.find('database_') > -1:
+        plugin_name = stype.replace('database_', '')
+        args = "database " + name + " " + num
+        cmd = 'python3 ' + mw.getRunDir() + '/plugins/' + plugin_name + \
+            '/scripts/backup.py ' + args
 
+    os.system(cmd)
+    # 开始执行上传信息
+
+    bk_prefix = prefix_dict[stype]
+    bk_name = stype
+    if stype.find('database_') > -1:
+        bk_name = 'database'
+        plugin_name = stype.replace('database_', '')
+        bk_prefix = plugin_name + '/db'
+
+    find_path = mw.getBackupDir() + '/' + bk_name + '/' + bk_prefix + '_' + name
     find_new_file = "ls " + find_path + \
         "_* | grep '.gz' | cut -d \  -f 1 | awk 'END {print}'"
 
     filename = mw.execShell(find_new_file)[0].strip()
     if filename == "":
-        print("not find upload file!")
+        mw.echoInfo("not find upload file!")
         return False
 
     ftp = FtpPSClient()
@@ -251,7 +259,7 @@ if __name__ == "__main__":
         print(deleteDir())
     elif func == 'delete_file':
         print(deleteFile())
-    elif in_array(func, ['site', 'database', 'path']):
+    elif in_array(func, ['site', 'database', 'path']) or func.find('database_') > -1:
         print(backupAllFunc(func))
     else:
         print('error')

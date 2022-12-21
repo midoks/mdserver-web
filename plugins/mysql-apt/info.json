@@ -1,4 +1,5 @@
 {
+	"hook":["database"],
 	"title":"MySQL[APT]",
 	"tip":"soft",
 	"name":"mysql-apt",
