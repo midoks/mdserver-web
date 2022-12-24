@@ -16,7 +16,7 @@ SOURCE_ROOT=$rootPath/source/lib
 
 VERSION=1.0.18
 #----------------------------- libsodium start -------------------------#
-if [ ! -d ${SERVER_ROOT}/libsodium-stable ];then
+if [ ! -d ${SERVER_ROOT}/libsodium ];then
     cd ${SOURCE_ROOT}
     if [ ! -f ${SOURCE_ROOT}/libsodium-${VERSION}-stable.tar.gz ];then
         # wget --no-check-certificate -O libsodium-1.0.18-stable.tar.gz https://download.libsodium.org/libsodium/releases/libsodium-1.0.18-stable.tar.gz -T 20
