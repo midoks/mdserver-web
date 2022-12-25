@@ -1270,6 +1270,7 @@ class site_api:
             content = content.replace('{$ROOT_DIR}', webdir)
             content = content.replace('{$SERVER_MAIN}', siteInfo['name'])
             content = content.replace('{$OR_REWRITE}', self.rewritePath)
+            content = content.replace('{$PHP_DIR}', self.setupPath + '/php')
             content = content.replace('{$LOGPATH}', mw.getLogsDir())
 
             conf += "\r\n" + content
