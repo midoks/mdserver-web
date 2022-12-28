@@ -33,6 +33,8 @@ if [ -f /usr/sbin/iptables ];then
 
     # iptables -nL --line-number
     
+    echo "iptables start"
+
     iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 22 -j ACCEPT
     iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
     iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 443 -j ACCEPT
@@ -48,6 +50,8 @@ if [ -f /usr/sbin/iptables ];then
     fi
     #安装时不开启
     service iptables stop
+
+    echo "iptables end"
 fi
 
 if [ ! -f /usr/sbin/iptables ];then
