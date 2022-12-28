@@ -28,16 +28,16 @@ elif grep -Eq "openSUSE" /etc/*-release; then
 	zypper install cron wget curl zip unzip
 elif grep -Eq "FreeBSD" /etc/*-release; then
 	OSNAME='freebsd'
-elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/redhat-release; then
+elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
 	OSNAME='rhel'
 	yum install -y wget curl zip unzip tar crontabs
 elif grep -Eqi "Fedora" /etc/issue || grep -Eq "Fedora" /etc/*-release; then
 	OSNAME='fedora'
 	yum install -y wget curl zip unzip tar crontabs
-elif grep -Eqi "Rocky" /etc/issue || grep -Eq "Rocky" /etc/redhat-release; then
+elif grep -Eqi "Rocky" /etc/issue || grep -Eq "Rocky" /etc/*-release; then
 	OSNAME='rhel'
 	yum install -y wget curl zip unzip tar crontabs
-elif grep -Eqi "AlmaLinux" /etc/issue || grep -Eq "AlmaLinux" /etc/redhat-release; then
+elif grep -Eqi "AlmaLinux" /etc/issue || grep -Eq "AlmaLinux" /etc/*-release; then
 	OSNAME='rhel'
 	yum install -y wget curl zip unzip tar crontabs
 elif grep -Eqi "Amazon Linux" /etc/issue || grep -Eq "Amazon Linux" /etc/*-release; then

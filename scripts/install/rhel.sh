@@ -28,6 +28,7 @@ if [ ! -d /root/.acme.sh ];then
     curl https://get.acme.sh | sh
 fi
 
+echo "iptables wrap start"
 if [ -f /usr/sbin/iptables ];then
     $PKGMGR install -y iptables-services
 
@@ -55,6 +56,7 @@ if [ -f /usr/sbin/iptables ];then
 
     echo "iptables end"
 fi
+echo "iptables wrap start"
 
 if [ ! -f /usr/sbin/iptables ];then
     $PKGMGR install firewalld -y
