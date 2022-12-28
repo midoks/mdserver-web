@@ -222,7 +222,7 @@ def isInstalledWeb():
 def isIpAddr(ip):
     check_ip = re.compile(
         '^(1\d{2}|2[0-4]\d|25[0-5]|[1-9]\d|[1-9])\.(1\d{2}|2[0-4]\d|25[0-5]|[1-9]\d|\d)\.(1\d{2}|2[0-4]\d|25[0-5]|[1-9]\d|\d)\.(1\d{2}|2[0-4]\d|25[0-5]|[1-9]\d|\d)$')
-    if check_ip.match(ipAddr):
+    if check_ip.match(ip):
         return True
     else:
         return False
