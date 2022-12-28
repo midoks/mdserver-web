@@ -3,6 +3,11 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 export LANG=en_US.UTF-8
 
+if [ ! -f /usr/bin/applydeltarpm ];then
+    yum -y provides '*/applydeltarpm'
+    yum -y install deltarpm
+fi
+
 setenforce 0
 sed -i 's#SELINUX=enforcing#SELINUX=disabled#g' /etc/selinux/config
 
