@@ -48,8 +48,10 @@ if [ -f /usr/sbin/iptables ];then
     if [ "${iptables_status}" == '' ];then
         service iptables restart
     fi
-    #安装时不开启
-    service iptables stop
+    # 安装时不开启
+    # stop之后清空了所有规则,所以安装是不能stop.
+    # 要在代码修复这个问题，开启时，重新执行一下放行端口。
+    #service iptables stop
 
     echo "iptables end"
 fi
