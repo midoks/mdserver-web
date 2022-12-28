@@ -456,8 +456,8 @@ class firewall_api:
         elif self.__isMac:
             return False
         else:
-            cmd = "ps -ef|grep iptables |grep -v grep  | awk '{print $2}'"
+            cmd = "systemctl status iptables | grep 'inactive'"
             data = mw.execShell(cmd)
-            if data[0] == '':
+            if data[0] != '':
                 return False
             return True

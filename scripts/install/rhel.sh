@@ -40,20 +40,20 @@ if [ -f /usr/sbin/iptables ];then
     # iptables -nL --line-number
     
     echo "iptables start"
-
-    iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 22 -j ACCEPT
-    iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
-    iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 443 -j ACCEPT
-    iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 888 -j ACCEPT
-    # iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 7200 -j ACCEPT
-    # iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 3306 -j ACCEPT
-    # iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 30000:40000 -j ACCEPT
-    service iptables save
-
-    iptables_status=`service iptables status | grep 'not running'`
-    if [ "${iptables_status}" == '' ];then
+    iptables_status=`systemctl status iptables | grep 'inactive'`
+    if [ "${iptables_status}" != '' ];then
         service iptables restart
+    
+        iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 22 -j ACCEPT
+        iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
+        iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 443 -j ACCEPT
+        iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 888 -j ACCEPT
+        # iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 7200 -j ACCEPT
+        # iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 3306 -j ACCEPT
+        # iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 30000:40000 -j ACCEPT
+        service iptables save
     fi
+    
     # 安装时不开启
     # stop之后清空了所有规则,所以安装是不能stop.
     # 要在代码修复这个问题，开启时，重新执行一下放行端口。
