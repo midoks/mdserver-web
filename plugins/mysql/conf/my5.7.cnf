@@ -70,9 +70,9 @@ binlog-ignore-db = information_schema
 binlog-ignore-db = performance_schema
 
 #slave
-# 5.7之后可不开启
+# 5.7 It can not be opened later
 #log-slave-updates = 1
-# 防止复制随着mysql启动而自动启动
+# Prevent replication from starting automatically with MySQL
 #skip-slave-start = 1
 #replicate-do-db
 replicate-ignore-db = information_schema
