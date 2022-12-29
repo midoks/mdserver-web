@@ -40,4 +40,16 @@ CREATE TABLE IF NOT EXISTS `slave_id_rsa` (
   `addtime` TEXT
 );
 
+-- drop table `slave_user`;
+CREATE TABLE IF NOT EXISTS `slave_sync_user` (
+  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+  `ip` TEXT,
+  `port` TEXT,
+  `user` TEXT,
+  `pass` TEXT,
+  `mode` TEXT,
+  `cmd` TEXT,
+  `addtime` TEXT
+);
+
 
