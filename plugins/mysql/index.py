@@ -1956,6 +1956,9 @@ def addMasterRepSlaveUser(version=''):
         sql = "grant replication SLAVE ON *.* TO  '" + username + \
             "'@'%' identified by '" + password + "';"
         result = pdb.execute(sql)
+
+        sql_select = "grant select on *.* to " + username + "@%;"
+
         result = pdb.execute('FLUSH PRIVILEGES;')
         isError = isSqlError(result)
         if isError != None:
@@ -2546,18 +2549,44 @@ def doFullSyncUser(version=''):
     if not data[0]:
         return data[1]
 
+    sync_db = args['db']
+
     db = pMysqlDb()
 
     conn = pSqliteDb('slave_sync_user')
     data = conn.field('ip,port,user,pass,mode,cmd').find()
     user = data['user']
     apass = data['pass']
+    port = data['port']
+    ip = data['ip']
 
-    dump_sql_data = getServerDir() + "/bin/mysqldump -uroot -p"
-
-    print(data)
+    bak_file = '/tmp/tmp.sql'
 
     writeDbSyncStatus({'code': 0, 'msg': '开始同步...', 'progress': 0})
+    dmp_option = ''
+    mode = recognizeDbMode()
+    if mode == 'gtid':
+        dmp_option = ' --set-gtid-purged=off '
+
+    writeDbSyncStatus({'code': 1, 'msg': '远程导出数据...', 'progress': 20})
+
+    if not os.path.exists(bak_file):
+        dump_sql_data = getServerDir() + "/bin/mysqldump " + dmp_option + " --force --opt --default-character-set=utf8 --single-transaction -h" + ip + " -P" + \
+            port + " -u" + user + " -p" + apass + " " + sync_db + " > " + bak_file
+        mw.execShell(dump_sql_data)
+
+    writeDbSyncStatus({'code': 2, 'msg': '本地导入数据...', 'progress': 40})
+    if os.path.exists(bak_file):
+        pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
+        sock = getSocketFile()
+        mysql_import_cmd = getServerDir() + '/bin/mysql -S ' + sock + ' -uroot -p' + pwd + \
+            ' ' + name + ' < ' + bak_file
+
+    db.query("start slave")
+    # db.query("start slave user='{}' password='{}';".format(user, apass))
+    writeDbSyncStatus({'code': 6, 'msg': '从库重启完成...', 'progress': 100})
+
+    # os.system("rm -rf "+bak_file)
     return True
 
 

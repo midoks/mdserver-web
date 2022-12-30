@@ -2427,10 +2427,10 @@ function masterOrSlaveConf(version=''){
                 getMasterDbList();
             }
             
-            if (rdata.slave_status){
+            // if (rdata.slave_status){
                 getAsyncMasterDbList();
                 getAsyncDataList()
-            }
+            // }
         });
     }
     getMasterStatus();
