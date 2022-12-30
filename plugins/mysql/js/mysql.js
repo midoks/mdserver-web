@@ -2342,7 +2342,6 @@ function masterOrSlaveConf(version=''){
         });
     }
 
-   
 
     function getMasterStatus(){
         myPost('get_master_status', '', function(rdata){
