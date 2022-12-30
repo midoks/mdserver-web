@@ -731,7 +731,7 @@ function addDatabase(type){
                         layer.close(index);
                         dbList();
                     }
-                },{icon: rdata.status ? 1 : 2},600);
+                },{icon: rdata.status ? 1 : 2}, 2000);
             });
         }
     });
