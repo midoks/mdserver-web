@@ -1944,7 +1944,7 @@ def addMasterRepSlaveUser(version=''):
         sql = "CREATE USER '" + username + \
             "'  IDENTIFIED WITH mysql_native_password BY '" + password + "';"
         pdb.execute(sql)
-        sql = "grant replication,select slave on *.* to '" + username + "'@'%';"
+        sql = "grant replication slave on *.* to '" + username + "'@'%';"
         result = pdb.execute(sql)
         isError = isSqlError(result)
         if isError != None:
@@ -1953,7 +1953,7 @@ def addMasterRepSlaveUser(version=''):
         sql = "FLUSH PRIVILEGES;"
         pdb.execute(sql)
     else:
-        sql = "grant replication,select SLAVE ON *.* TO  '" + username + \
+        sql = "grant replication SLAVE ON *.* TO  '" + username + \
             "'@'%' identified by '" + password + "';"
         result = pdb.execute(sql)
         result = pdb.execute('FLUSH PRIVILEGES;')
