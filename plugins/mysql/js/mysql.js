@@ -2234,7 +2234,7 @@ function masterOrSlaveConf(version=''){
             for(i in rdata.data){
 
                 var v = rdata.data[i];
-                var status = "异常";
+                var status = "<a class='btlink db_error'>异常</>";
                 if (v['Slave_SQL_Running'] == 'Yes' && v['Slave_IO_Running'] == 'Yes'){
                     status = "正常";
                 }
@@ -2276,6 +2276,26 @@ function masterOrSlaveConf(version=''){
             //     <span class="sync btn btn-default btn-sm" onclick="getMasterRepSlaveList()" title="">添加</span>\
             // </div>
             $(".table_slave_status_list").html(con);
+
+            $('.db_error').click(function(){
+                layer.open({
+                    type: 1,
+                    title: '同步异常信息',
+                    area: '500px',
+                    content:"<form class='bt-form pd20 pb70'>\
+                    <div class='line'>"+v['Last_Error']+"</div>\
+                    <div class='bt-form-submit-btn'>\
+                        <button type='button' class='btn btn-success btn-sm btn-title class-copy-db-err'>复制</button>\
+                    </div>\
+                  </form>",
+                    success:function(){
+                        copyText(v['Last_Error']);
+                        $('.class-copy-db-err').click(function(){
+                            copyText(v['Last_Error']);
+                        });
+                    }
+                });
+            });
         });
     }
 

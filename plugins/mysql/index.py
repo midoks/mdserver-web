@@ -2303,6 +2303,7 @@ def getSlaveList(version=''):
         tmp['Master_Log_File'] = dlist[x]["Master_Log_File"]
         tmp['Slave_IO_Running'] = dlist[x]["Slave_IO_Running"]
         tmp['Slave_SQL_Running'] = dlist[x]["Slave_SQL_Running"]
+        tmp['Last_Error'] = dlist[x]["Last_Error"]
         ret.append(tmp)
     data = {}
     data['data'] = ret
@@ -2579,8 +2580,9 @@ def doFullSyncUser(version=''):
     if os.path.exists(bak_file):
         pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
         sock = getSocketFile()
-        mysql_import_cmd = getServerDir() + '/bin/mysql -S ' + sock + ' -uroot -p' + pwd + \
-            ' ' + name + ' < ' + bak_file
+        my_import_cmd = getServerDir() + '/bin/mysql -S ' + sock + ' -uroot -p' + pwd + \
+            ' ' + sync_db + ' < ' + bak_file
+        mw.execShell(my_import_cmd)
 
     db.query("start slave")
     # db.query("start slave user='{}' password='{}';".format(user, apass))
