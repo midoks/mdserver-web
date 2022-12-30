@@ -1944,7 +1944,7 @@ def addMasterRepSlaveUser(version=''):
         sql = "CREATE USER '" + username + \
             "'  IDENTIFIED WITH mysql_native_password BY '" + password + "';"
         pdb.execute(sql)
-        sql = "grant replication slave on *.* to '" + username + "'@'%';"
+        sql = "grant replication,select slave on *.* to '" + username + "'@'%';"
         result = pdb.execute(sql)
         isError = isSqlError(result)
         if isError != None:
@@ -1953,7 +1953,7 @@ def addMasterRepSlaveUser(version=''):
         sql = "FLUSH PRIVILEGES;"
         pdb.execute(sql)
     else:
-        sql = "GRANT REPLICATION SLAVE ON *.* TO  '" + username + \
+        sql = "grant replication,select SLAVE ON *.* TO  '" + username + \
             "'@'%' identified by '" + password + "';"
         result = pdb.execute(sql)
         result = pdb.execute('FLUSH PRIVILEGES;')
@@ -2452,7 +2452,9 @@ def setSlaveStatusSyncUser(version=''):
             return mw.returnJson(False, '没有数据无法重启!')
         user = data['user']
         apass = data['pass']
-        db.query("start slave user='{}' password='{}';".format(user, apass))
+
+        db.query("start slave")
+        # db.query("start slave user='{}' password='{}';".format(user, apass))
 
     return mw.returnJson(True, '设置成功!')
 
@@ -2462,7 +2464,7 @@ def setSlaveStatusSSH(version=''):
     db = pMysqlDb()
     dlist = db.query('show slave status')
     if len(dlist) == 0:
-        return mw.returnJson(False, '需要手动添加主服务命令或者执行[初始化]!')
+        return mw.returnJson(False, '需要手动添加主服务命令或者执行初始化!')
 
     if len(dlist) > 0 and (dlist[0]["Slave_IO_Running"] == 'Yes' or dlist[0]["Slave_SQL_Running"] == 'Yes'):
         db.query('stop slave')
@@ -2527,6 +2529,39 @@ def writeDbSyncStatus(data):
 
 
 def doFullSync(version=''):
+    mode_file = getSyncModeFile()
+    if not os.path.exists(mode_file):
+        return mw.returnJson(False, '需要先设置同步配置')
+
+    mode = mw.readFile(mode_file)
+    if mode == 'ssh':
+        return doFullSyncSSH(version)
+    if mode == 'sync-user':
+        return doFullSyncUser(version)
+
+
+def doFullSyncUser(version=''):
+    args = getArgs()
+    data = checkArgs(args, ['db'])
+    if not data[0]:
+        return data[1]
+
+    db = pMysqlDb()
+
+    conn = pSqliteDb('slave_sync_user')
+    data = conn.field('ip,port,user,pass,mode,cmd').find()
+    user = data['user']
+    apass = data['pass']
+
+    dump_sql_data = getServerDir() + "/bin/mysqldump -uroot -p"
+
+    print(data)
+
+    writeDbSyncStatus({'code': 0, 'msg': '开始同步...', 'progress': 0})
+    return True
+
+
+def doFullSyncSSH(version=''):
 
     args = getArgs()
     data = checkArgs(args, ['db'])
