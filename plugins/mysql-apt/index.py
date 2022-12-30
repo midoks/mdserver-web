@@ -1104,7 +1104,7 @@ def addDb():
     dataAccess = args['dataAccess'].strip()
     ps = args['ps'].strip()
 
-    reg = "^[\w\.-]+$"
+    reg = "^[\w-]+$"
     if not re.match(reg, args['name']):
         return mw.returnJson(False, '数据库名称不能带有特殊符号!')
     checks = ['root', 'mysql', 'test', 'sys', 'panel_logs']
