@@ -2607,11 +2607,13 @@ def doFullSyncUser(version=''):
             ' ' + sync_db + ' < ' + bak_file
         mw.execShell(my_import_cmd)
 
-    db.query("start slave")
-    # db.query("start slave user='{}' password='{}';".format(user, apass))
-    writeDbSyncStatus({'code': 6, 'msg': '从库重启完成...', 'progress': 100})
+    if version == '8.0':
+        db.query("start slave user='{}' password='{}';".format(user, apass))
+    else:
+        db.query("start slave")
 
-    # os.system("rm -rf "+bak_file)
+    writeDbSyncStatus({'code': 6, 'msg': '从库重启完成...', 'progress': 100})
+    os.system("rm -rf " + bak_file)
     return True
 
 
