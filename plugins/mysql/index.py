@@ -1968,19 +1968,17 @@ def addMasterRepSlaveUser(version=''):
         if isError != None:
             return isError
 
-        sql = "FLUSH PRIVILEGES;"
-        pdb.execute(sql)
     else:
         sql = "grant replication SLAVE ON *.* TO  '" + username + \
             "'@'%' identified by '" + password + "';"
         result = pdb.execute(sql)
-
-        sql_select = "grant select on *.* to " + username + "@%;"
-
-        result = pdb.execute('FLUSH PRIVILEGES;')
         isError = isSqlError(result)
         if isError != None:
             return isError
+
+    sql_select = "grant select,lock tables,PROCESS on *.* to " + username + "@'%';"
+    pdb.execute(sql_select)
+    pdb.execute('FLUSH PRIVILEGES;')
 
     addTime = time.strftime('%Y-%m-%d %X', time.localtime())
     psdb.add('username,password,accept,ps,addtime',
