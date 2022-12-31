@@ -930,6 +930,11 @@ def importDbBackup():
         cmd = 'cd ' + mw.getRootDir() + '/backup/database && gzip -d ' + file
         mw.execShell(cmd)
 
+    local_mode = recognizeDbMode()
+    if local_mode == 'gtid':
+        pdb = pMysqlDb()
+        pdb.execute('reset master')
+
     pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
     sock = getSocketFile()
     mysql_cmd = getServerDir() + '/bin/mysql -S ' + sock + ' -uroot -p' + pwd + \
