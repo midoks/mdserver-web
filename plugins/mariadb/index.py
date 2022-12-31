@@ -1792,7 +1792,7 @@ def addMasterRepSlaveUser(version=''):
     # address = args['address'].strip()
     # dataAccess = args['dataAccess'].strip()
 
-    reg = "^[\w\.-]+$"
+    reg = "^[\w-]+$"
     if not re.match(reg, username):
         return mw.returnJson(False, '用户名不能带有特殊符号!')
     checks = ['root', 'mysql', 'test', 'sys', 'panel_logs']
