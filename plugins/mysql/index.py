@@ -141,7 +141,6 @@ def pSqliteDb(dbname='databases'):
         mw.writeFile(save_md5_file, md5_sql)
 
     if not os.path.exists(file) or import_sql:
-
         conn = mw.M(dbname).dbPos(getServerDir(), name)
         csql = mw.readFile(getPluginDir() + '/conf/mysql.sql')
         csql_list = csql.split(';')
