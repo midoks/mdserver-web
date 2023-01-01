@@ -4,7 +4,7 @@ export PATH
 export LANG=en_US.UTF-8
 export DEBIAN_FRONTEND=noninteractive
 
-localedef -v -c -i en_US -f UTF-8 en_US.UTF-8
+# localedef -v -c -i en_US -f UTF-8 en_US.UTF-8
 
 if grep -Eq "Ubuntu" /etc/*-release; then
     sudo ln -sf /bin/bash /bin/sh
