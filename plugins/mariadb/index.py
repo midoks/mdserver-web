@@ -287,6 +287,13 @@ def binLog():
     return mw.returnJson(True, '设置成功!')
 
 
+def cleanBinLog():
+    db = pMysqlDb()
+    cleanTime = time.strftime('%Y-%m-%d %H:%i:%s', time.localtime())
+    db.execute("PURGE MASTER LOGS BEFORE '" + cleanTime + "';")
+    return mw.returnJson(True, '清理BINLOG成功!')
+
+
 def setSkipGrantTables(v):
     '''
     设置是否密码验证
