@@ -66,7 +66,7 @@ fi
 cd /tmp && unzip /tmp/master.zip
 
 CP_CMD=/usr/bin/cp
-if [ -f /usr/cp ];then
+if [ -f /bin/cp ];then
 		CP_CMD=/bin/cp
 fi
 $CP_CMD -rf /tmp/mdserver-web-dev/* /www/server/mdserver-web
