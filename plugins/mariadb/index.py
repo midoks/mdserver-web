@@ -2226,8 +2226,7 @@ def initSlaveStatusSyncUser(version=''):
     # print(u['cmd'])
     t = db.query(u['cmd'])
     # print(t)
-    db.query("start slave user='{}' password='{}';".format(
-        u['user'], u['pass']))
+    db.query("start slave")
     return mw.returnJson(True, '初始化成功!')
 
 
@@ -2436,15 +2435,11 @@ def doFullSyncUser(version=''):
     bak_file = '/tmp/tmp.sql'
 
     writeDbSyncStatus({'code': 0, 'msg': '开始同步...', 'progress': 0})
-    dmp_option = ''
-    mode = recognizeDbMode()
-    if mode == 'gtid':
-        dmp_option = ' --set-gtid-purged=off '
 
     writeDbSyncStatus({'code': 1, 'msg': '远程导出数据...', 'progress': 20})
 
     if not os.path.exists(bak_file):
-        dump_sql_data = getServerDir() + "/bin/mysqldump " + dmp_option + " --force --opt --default-character-set=utf8 --single-transaction -h" + ip + " -P" + \
+        dump_sql_data = getServerDir() + "/bin/mysqldump --force --opt --default-character-set=utf8 --single-transaction -h" + ip + " -P" + \
             port + " -u" + user + " -p" + apass + " " + sync_db + " > " + bak_file
         mw.execShell(dump_sql_data)
 

@@ -39,7 +39,7 @@ function myPostN(method,args,callback, title){
     if (typeof(title) != 'undefined'){
         _title = title;
     }
-    $.post('/plugins/run', {name:'mysql', func:method, args:_args}, function(data) {
+    $.post('/plugins/run', {name:'mariadb', func:method, args:_args}, function(data) {
         if(typeof(callback) == 'function'){
             callback(data);
         }
