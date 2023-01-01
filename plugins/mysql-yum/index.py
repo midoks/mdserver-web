@@ -168,9 +168,16 @@ def pMysqlDb():
 
 def initDreplace(version=''):
 
-    my_dir = getServerDir() + '/etc'
-    if not os.path.exists(my_dir):
-        os.mkdir(my_dir)
+    conf_dir = getServerDir() + '/etc'
+    mode_dir = conf_dir + '/mode'
+
+    conf_list = [
+        conf_dir,
+        mode_dir,
+    ]
+    for conf in conf_list:
+        if not os.path.exists(conf):
+            os.mkdir(conf)
 
     tmp_dir = getServerDir() + '/tmp'
     if not os.path.exists(tmp_dir):
@@ -178,12 +185,26 @@ def initDreplace(version=''):
         mw.execShell("chown -R mysql:mysql " + tmp_dir)
         mw.execShell("chmod 750 " + tmp_dir)
 
-    mysql_conf = my_dir + '/my.cnf'
-    if not os.path.exists(mysql_conf):
-        mysql_conf_tpl = getPluginDir() + '/conf/my' + version + '.cnf'
-        content = mw.readFile(mysql_conf_tpl)
+    my_conf = conf_dir + '/my.cnf'
+    if not os.path.exists(my_conf):
+        tpl = getPluginDir() + '/conf/my' + version + '.cnf'
+        content = mw.readFile(tpl)
         content = contentReplace(content)
-        mw.writeFile(mysql_conf, content)
+        mw.writeFile(my_conf, content)
+
+    classic_conf = mode_dir + '/classic.cnf'
+    if not os.path.exists(classic_conf):
+        tpl = getPluginDir() + '/conf/classic.cnf'
+        content = mw.readFile(tpl)
+        content = contentReplace(content)
+        mw.writeFile(classic_conf, content)
+
+    gtid_conf = mode_dir + '/gtid.cnf'
+    if not os.path.exists(gtid_conf):
+        tpl = getPluginDir() + '/conf/gtid.cnf'
+        content = mw.readFile(tpl)
+        content = contentReplace(content)
+        mw.writeFile(gtid_conf, content)
 
     # systemd
     systemDir = mw.systemdCfgDir()
