@@ -1813,10 +1813,14 @@ def addMasterRepSlaveUser(version=''):
     sql = "GRANT REPLICATION SLAVE ON *.* TO  '" + username + \
         "'@'%' identified by '" + password + "';"
     result = pdb.execute(sql)
-    result = pdb.execute('FLUSH PRIVILEGES;')
+
     isError = isSqlError(result)
     if isError != None:
         return isError
+
+    sql_select = "grant select,lock tables,PROCESS on *.* to " + username + "@'%';"
+    pdb.execute(sql_select)
+    pdb.execute('FLUSH PRIVILEGES;')
 
     addTime = time.strftime('%Y-%m-%d %X', time.localtime())
     psdb.add('username,password,accept,ps,addtime',
@@ -2214,7 +2218,7 @@ def initSlaveStatusSyncUser(version=''):
         return mw.returnJson(False, '同步模式不一致!')
 
     t = db.query(u['cmd'])
-    # print(t)
+    print(t)
     db.query("start slave user='{}' password='{}';".format(
         u['user'], u['pass']))
     return mw.returnJson(True, '初始化成功!')
