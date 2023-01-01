@@ -2283,15 +2283,15 @@ function masterOrSlaveConf(version=''){
                     title: '同步异常信息',
                     area: '500px',
                     content:"<form class='bt-form pd20 pb70'>\
-                    <div class='line'>"+v['Last_Error']+"</div>\
+                    <div class='line'>"+v['Error']+"</div>\
                     <div class='bt-form-submit-btn'>\
                         <button type='button' class='btn btn-success btn-sm btn-title class-copy-db-err'>复制</button>\
                     </div>\
                   </form>",
                     success:function(){
-                        copyText(v['Last_Error']);
+                        copyText(v['Error']);
                         $('.class-copy-db-err').click(function(){
-                            copyText(v['Last_Error']);
+                            copyText(v['Error']);
                         });
                     }
                 });
