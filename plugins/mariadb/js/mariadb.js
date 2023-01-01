@@ -1504,7 +1504,7 @@ function getMasterRepSlaveUserCmd(username, db=''){
             title: '同步命令',
             area: '500px',
             content:"<form class='bt-form pd20 pb70' id='add_master'>\
-            <div class='line'>"+cmd+"</div>\
+            <div class='line' style='word-wrap: break-word;word-break: normal;'>"+cmd+"</div>\
             <div class='bt-form-submit-btn'>\
                 <button type='button' class='btn btn-success btn-sm btn-title class-copy-cmd'>复制</button>\
             </div>\
@@ -1795,11 +1795,27 @@ function addSlaveSSH(ip=''){
 }
 
 
+
 function delSlaveSSH(ip){
     myPost('del_slave_ssh', {ip:ip}, function(rdata){
         var rdata = $.parseJSON(rdata.data);
-        layer.msg(rdata.msg, {icon: rdata.status ? 1 : 2});
-        getSlaveSSHPage();
+        showMsg(rdata.msg,function(){
+            if (rdata.status){
+                getSlaveSSHPage();
+            }
+        },{icon: rdata.status ? 1 : 2}, 600);
+    });
+}
+
+
+function delSlaveSyncUser(ip){
+    myPost('del_slave_sync_user', {ip:ip}, function(rdata){
+        var rdata = $.parseJSON(rdata.data);
+        showMsg(rdata.msg,function(){
+            if (rdata.status){
+                getSlaveSyncUserPage();
+            }
+        },{icon: rdata.status ? 1 : 2}, 600);
     });
 }
 
@@ -1884,7 +1900,7 @@ function addSlaveSyncUser(ip=''){
                 <div class='line'><span class='tname'>同步账户</span><div class='info-r'><input name='user' class='bt-input-text mr5' type='text' style='width:330px;' value='"+user+"'></div></div>\
                 <div class='line'><span class='tname'>同步密码</span><div class='info-r'><input name='pass' class='bt-input-text mr5' type='text' style='width:330px;' value='"+pass+"'></div></div>\
                 <div class='line'>\
-                <span class='tname'>CMD[最好填好]</span>\
+                <span class='tname'>CMD[必填]</span>\
                 <div class='info-r'><textarea class='bt-input-text mr5' row='20' cols='30' name='cmd' style='width:330px;height:150px;'></textarea></div>\
                 </div>\
                 <input type='hidden' name='mode' value='"+mode+"' />\
@@ -1909,8 +1925,8 @@ function addSlaveSyncUser(ip=''){
                     $('input[name="user"]').val(a['MASTER_USER']);
                     $('input[name="pass"]').val(a['MASTER_PASSWORD']);
 
-                    console.log(a['MASTER_AUTO_POSITION'],typeof(a['MASTER_AUTO_POSITION']));
-                    if (typeof(a['MASTER_AUTO_POSITION']) != 'undefined' ){
+                    console.log(a['MASTER_USE_GTID'],typeof(a['MASTER_USE_GTID']));
+                    if (typeof(a['MASTER_USE_GTID']) != 'undefined' ){
                         $('input[name="mode"]').val('1');
                     }
                 });
@@ -2196,7 +2212,7 @@ function masterOrSlaveConf(version=''){
             for(i in rdata.data){
 
                 var v = rdata.data[i];
-                var status = "异常";
+                var status = "<a class='btlink db_error'>异常</>";
                 if (v['Slave_SQL_Running'] == 'Yes' && v['Slave_IO_Running'] == 'Yes'){
                     status = "正常";
                 }
@@ -2238,6 +2254,26 @@ function masterOrSlaveConf(version=''){
             //     <span class="sync btn btn-default btn-sm" onclick="getMasterRepSlaveList()" title="">添加</span>\
             // </div>
             $(".table_slave_status_list").html(con);
+
+            $('.db_error').click(function(){
+                layer.open({
+                    type: 1,
+                    title: '同步异常信息',
+                    area: '500px',
+                    content:"<form class='bt-form pd20 pb70'>\
+                    <div class='line'>"+v['Error']+"</div>\
+                    <div class='bt-form-submit-btn'>\
+                        <button type='button' class='btn btn-success btn-sm btn-title class-copy-db-err'>复制</button>\
+                    </div>\
+                  </form>",
+                    success:function(){
+                        copyText(v['Error']);
+                        $('.class-copy-db-err').click(function(){
+                            copyText(v['Error']);
+                        });
+                    }
+                });
+            });
         });
     }
 
@@ -2389,10 +2425,10 @@ function masterOrSlaveConf(version=''){
                 getMasterDbList();
             }
             
-            if (rdata.slave_status){
+            // if (rdata.slave_status){
                 getAsyncMasterDbList();
                 getAsyncDataList()
-            }
+            // }
         });
     }
     getMasterStatus();

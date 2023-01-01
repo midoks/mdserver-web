@@ -1861,7 +1861,10 @@ def getMasterRepSlaveUserCmd(version):
     if mode == "gtid":
         sql = "CHANGE MASTER TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
             clist[0]['username'] + "', MASTER_PASSWORD='" + \
-            clist[0]['password'] + "', MASTER_AUTO_POSITION=1"
+            clist[0]['password'] + "', " + "MASTER_LOG_FILE='" + mstatus[0]["File"] + \
+            "',MASTER_LOG_POS=" + \
+            str(mstatus[0]["Position"]) + \
+            ",MASTER_USE_GTID=slave_pos,MASTER_CONNECT_RETRY=10;"
     else:
         sql = "CHANGE MASTER TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
             clist[0]['username']  + "', MASTER_PASSWORD='" + \
@@ -2217,8 +2220,9 @@ def initSlaveStatusSyncUser(version=''):
     if local_mode != mode_name:
         return mw.returnJson(False, '同步模式不一致!')
 
+    # print(u['cmd'])
     t = db.query(u['cmd'])
-    print(t)
+    # print(t)
     db.query("start slave user='{}' password='{}';".format(
         u['user'], u['pass']))
     return mw.returnJson(True, '初始化成功!')
