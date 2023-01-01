@@ -1858,6 +1858,9 @@ def getMasterRepSlaveUserCmd(version):
 
     mode = recognizeDbMode()
 
+    # 查找同步点
+    # SELECT BINLOG_GTID_POS('master1-bin.000002', 561866201);
+
     if mode == "gtid":
         sql = "CHANGE MASTER TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
             clist[0]['username'] + "', MASTER_PASSWORD='" + \
