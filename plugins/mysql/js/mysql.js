@@ -2020,7 +2020,6 @@ function getSlaveSyncUserPage(page=1){
 
 function getSlaveCfg(){
 
-
     myPost('get_slave_sync_mode', '', function(data){
         var rdata = $.parseJSON(data.data);
         var mode_none = 'success';
