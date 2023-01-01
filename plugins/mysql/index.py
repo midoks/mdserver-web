@@ -2331,16 +2331,17 @@ def getSlaveList(version=''):
         tmp['Last_SQL_Error'] = dlist[x]["Last_SQL_Error"]
         tmp['Slave_SQL_Running_State'] = dlist[x]["Slave_SQL_Running_State"]
 
-        if tmp['Last_Error'] != "":
+        tmp['Error'] = ''
+        if tmp['Last_Error'] != '':
             tmp['Error'] = tmp['Last_Error']
 
-        if tmp['Last_IO_Error'] != "":
+        if tmp['Last_IO_Error'] != '':
             tmp['Error'] = tmp['Last_IO_Error']
 
-        if tmp['Last_SQL_Error'] != "":
+        if tmp['Last_SQL_Error'] != '':
             tmp['Error'] = tmp['Last_SQL_Error']
 
-        if tmp['Error'] == "":
+        if tmp['Error'] == '':
             tmp['Error'] = tmp['Slave_SQL_Running_State']
 
         ret.append(tmp)
