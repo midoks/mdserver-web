@@ -754,10 +754,12 @@ def importDbExternal():
     mysql_cmd = getServerDir() + '/bin/usr/bin/mysql -S ' + sock + ' -uroot -p' + \
         pwd + ' ' + name + ' < ' + import_sql
 
-    # print(mysql_cmd)
-    os.system(mysql_cmd)
+    rdata = mw.execShell(mysql_cmd)
     if ext != 'sql':
         os.remove(import_sql)
+
+    if rdata[1].lower().find('error') > -1:
+        return mw.returnJson(False, rdata[1])
 
     return mw.returnJson(True, 'ok')
 
@@ -783,8 +785,10 @@ def importDbBackup():
     mysql_cmd = getServerDir() + '/bin/usr/bin/mysql -S ' + sock + ' -uroot -p' + pwd + \
         ' ' + name + ' < ' + file_path_sql
 
-    # print(mysql_cmd)
-    os.system(mysql_cmd)
+    rdata = mw.execShell(mysql_cmd)
+    if rdata[1].lower().find('error') > -1:
+        return mw.returnJson(False, rdata[1])
+
     return mw.returnJson(True, 'ok')
 
 
