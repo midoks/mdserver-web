@@ -1118,6 +1118,26 @@ class site_api:
         host = self.getHostConf(siteName)
         return mw.getJson({'host': host})
 
+    def saveHostConfApi(self):
+        path = request.form.get('path', '')
+        data = request.form.get('data', '')
+        encoding = request.form.get('encoding', '')
+
+        import files_api
+
+        mw.backFile(path)
+        save_ret_data = files_api.files_api().saveBody(path, data, encoding)
+        rdata = json.loads(save_ret_data)
+
+        if rdata['status']:
+            isError = mw.checkWebConfig()
+            if isError != True:
+                mw.restoreFile(path)
+                return mw.returnJson(False, 'ERROR: 检测到配置文件有错误,请先排除后再操作<br><br><a style="color:red;">' + isError.replace("\n", '<br>') + '</a>')
+            mw.restartWeb()
+            mw.removeBackFile(path)
+        return save_ret_data
+
     def getRewriteConfApi(self):
         siteName = request.form.get('siteName', '')
         rewrite = self.getRewriteConf(siteName)

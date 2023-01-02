@@ -2379,7 +2379,7 @@ function configFile(webSite){
 function saveConfigFile(webSite,encoding,path){
 	var data = 'encoding='+encoding+'&data='+encodeURIComponent($("#configBody").val())+'&path='+path;
 	var loadT = layer.msg('保存中...',{icon:16,time:0,shade: [0.3, '#000']});
-	$.post('/files/save_body',data,function(rdata){
+	$.post('/site/save_host_conf',data,function(rdata){
 		layer.close(loadT);
 		if(rdata.status){
 			layer.msg(rdata.msg,{icon:1});
