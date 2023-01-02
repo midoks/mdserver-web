@@ -1231,14 +1231,15 @@ class site_api:
                 return mw.returnJson(False, '端口范围不合法!')
 
             opid = mw.M('domain').where(
-                "name=? AND (port=? OR pid=?)", (domain, domain_port, pid)).getField('pid')
-            if opid:
-                if mw.M('sites').where('id=?', (opid,)).count():
-                    return mw.returnJson(False, '指定域名已绑定过!')
-                mw.M('domain').where('pid=?', (opid,)).delete()
+                "name=? AND (port=? OR pid=?)", (domain_name, domain_port, pid,)).getField('pid')
+            if opid > 0:
+                return mw.returnJson(False, '您添加的域名[{}],已绑定!'.format(domain_name))
+                # if mw.M('sites').where('id=?', (opid,)).count():
+                #     return mw.returnJson(False, '指定域名已绑定过!')
+                # mw.M('domain').where('pid=?', (opid,)).delete()
 
             if mw.M('binding').where('domain=?', (domain,)).count():
-                return mw.returnJson(False, '您添加的域名已存在!')
+                return mw.returnJson(False, '您添加的域名,子目录已绑定!')
 
             self.nginxAddDomain(webname, domain_name, domain_port)
 
@@ -1294,14 +1295,14 @@ class site_api:
             content = content.replace('{$LOGPATH}', mw.getLogsDir())
 
             conf += "\r\n" + content
-            shutil.copyfile(filename, '/tmp/backup.conf')
+            mw.backFile(filename)
             mw.writeFile(filename, conf)
         conf = mw.readFile(filename)
 
         # 检查配置是否有误
         isError = mw.checkWebConfig()
         if isError != True:
-            shutil.copyfile('/tmp/backup.conf', filename)
+            mw.restoreFile(filename)
             return mw.returnJson(False, 'ERROR: <br><a style="color:red;">' + isError.replace("\n", '<br>') + '</a>')
 
         mw.M('binding').add('pid,domain,port,path,addtime',
@@ -1311,6 +1312,7 @@ class site_api:
                          (siteInfo['name'], dirName, domain))
         mw.writeLog('网站管理', msg)
         mw.restartWeb()
+        mw.removeBackFile(filename)
         return mw.returnJson(True, '添加成功!')
 
     def delDirBindApi(self):
