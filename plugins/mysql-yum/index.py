@@ -261,6 +261,13 @@ def binLog():
     return mw.returnJson(True, '设置成功!')
 
 
+def cleanBinLog():
+    db = pMysqlDb()
+    cleanTime = time.strftime('%Y-%m-%d %H:%i:%s', time.localtime())
+    db.execute("PURGE MASTER LOGS BEFORE '" + cleanTime + "';")
+    return mw.returnJson(True, '清理BINLOG成功!')
+
+
 def setSkipGrantTables(v):
     '''
     设置是否密码验证
@@ -1950,6 +1957,123 @@ def getSlaveSSHList(version=''):
     return mw.getJson(data)
 
 
+def getSlaveSyncUserByIp(version=''):
+    args = getArgs()
+    data = checkArgs(args, ['ip'])
+    if not data[0]:
+        return data[1]
+
+    ip = args['ip']
+
+    conn = pSqliteDb('slave_sync_user')
+    data = conn.field('ip,port,user,pass,mode,cmd').where(
+        "ip=?", (ip,)).select()
+    return mw.returnJson(True, 'ok', data)
+
+
+def addSlaveSyncUser(version=''):
+    import base64
+
+    args = getArgs()
+    data = checkArgs(args, ['ip'])
+    if not data[0]:
+        return data[1]
+
+    ip = args['ip']
+    if ip == "":
+        return mw.returnJson(True, 'ok')
+
+    data = checkArgs(args, ['port', 'user', 'pass', 'mode'])
+    if not data[0]:
+        return data[1]
+
+    cmd = args['cmd']
+    port = args['port']
+    user = args['user']
+    apass = args['pass']
+    mode = args['mode']
+    addTime = time.strftime('%Y-%m-%d %X', time.localtime())
+
+    conn = pSqliteDb('slave_sync_user')
+    data = conn.field('ip').where("ip=?", (ip,)).select()
+    if len(data) > 0:
+        res = conn.where("ip=?", (ip,)).save(
+            'port,user,pass,mode,cmd', (port, user, apass, mode, cmd))
+    else:
+        conn.add('ip,port,user,cmd,user,pass,mode,addtime',
+                 (ip, port, user, cmd, user, apass, mode, addTime))
+
+    return mw.returnJson(True, '设置成功!')
+
+
+def delSlaveSyncUser(version=''):
+    args = getArgs()
+    data = checkArgs(args, ['ip'])
+    if not data[0]:
+        return data[1]
+
+    ip = args['ip']
+
+    conn = pSqliteDb('slave_sync_user')
+    conn.where("ip=?", (ip,)).delete()
+    return mw.returnJson(True, '删除成功!')
+
+
+def getSlaveSyncUserList(version=''):
+    args = getArgs()
+    data = checkArgs(args, ['page', 'page_size'])
+    if not data[0]:
+        return data[1]
+
+    page = int(args['page'])
+    page_size = int(args['page_size'])
+
+    conn = pSqliteDb('slave_sync_user')
+    limit = str((page - 1) * page_size) + ',' + str(page_size)
+
+    field = 'id,ip,port,user,pass,cmd,addtime'
+    clist = conn.field(field).limit(limit).order('id desc').select()
+    count = conn.count()
+
+    data = {}
+    _page = {}
+    _page['count'] = count
+    _page['p'] = page
+    _page['row'] = page_size
+    _page['tojs'] = args['tojs']
+    data['page'] = mw.getPage(_page)
+    data['data'] = clist
+
+    return mw.getJson(data)
+
+
+def getSyncModeFile():
+    return getServerDir() + "/sync.mode"
+
+
+def getSlaveSyncMode(version):
+    sync_mode = getSyncModeFile()
+    if os.path.exists(sync_mode):
+        mode = mw.readFile(sync_mode).strip()
+        return mw.returnJson(True, 'ok', mode)
+    return mw.returnJson(False, 'fail')
+
+
+def setSlaveSyncMode(version):
+    args = getArgs()
+    data = checkArgs(args, ['mode'])
+    if not data[0]:
+        return data[1]
+    mode = args['mode']
+    sync_mode = getSyncModeFile()
+
+    if mode == 'none':
+        os.remove(sync_mode)
+    else:
+        mw.writeFile(sync_mode, mode)
+    return mw.returnJson(True, '设置成功', mode)
+
+
 def getSlaveSSHByIp(version=''):
     args = getArgs()
     data = checkArgs(args, ['ip'])
@@ -2052,6 +2176,47 @@ def getSlaveSyncCmd(version=''):
 
 
 def initSlaveStatus(version=''):
+    mode_file = getSyncModeFile()
+    if not os.path.exists(mode_file):
+        return mw.returnJson(False, '需要先设置同步配置')
+
+    mode = mw.readFile(mode_file)
+    if mode == 'ssh':
+        return initSlaveStatusSSH(version)
+    if mode == 'sync-user':
+        return initSlaveStatusSyncUser(version)
+
+
+def initSlaveStatusSyncUser(version=''):
+    conn = pSqliteDb('slave_sync_user')
+    data = conn.field('ip,port,user,pass,mode,cmd').find()
+    if len(data) < 1:
+        return mw.returnJson(False, '需要先添加同步用户配置!')
+
+    # print(data)
+    db = pMysqlDb()
+    dlist = db.query('show slave status')
+    if len(dlist) > 0:
+        return mw.returnJson(False, '已经初始化好了zz...')
+
+    u = data
+
+    mode_name = 'classic'
+    if u['mode'] == '1':
+        mode_name = 'gtid'
+
+    local_mode = recognizeDbMode()
+    if local_mode != mode_name:
+        return mw.returnJson(False, '同步模式不一致!')
+
+    t = db.query(u['cmd'])
+    # print(t)
+    db.query("start slave user='{}' password='{}';".format(
+        u['user'], u['pass']))
+    return mw.returnJson(True, '初始化成功!')
+
+
+def initSlaveStatusSSH(version=''):
     db = pMysqlDb()
     dlist = db.query('show slave status')
     if len(dlist) > 0:
@@ -2120,6 +2285,41 @@ def initSlaveStatus(version=''):
 
 
 def setSlaveStatus(version=''):
+    mode_file = getSyncModeFile()
+    if not os.path.exists(mode_file):
+        return mw.returnJson(False, '需要先设置同步配置')
+
+    mode = mw.readFile(mode_file)
+    if mode == 'ssh':
+        return setSlaveStatusSSH(version)
+    if mode == 'sync-user':
+        return setSlaveStatusSyncUser(version)
+
+
+def setSlaveStatusSyncUser(version=''):
+    db = pMysqlDb()
+    dlist = db.query('show slave status')
+    if len(dlist) == 0:
+        return mw.returnJson(False, '需要手动添加同步账户或者执行初始化!')
+
+    if len(dlist) > 0 and (dlist[0]["Slave_IO_Running"] == 'Yes' or dlist[0]["Slave_SQL_Running"] == 'Yes'):
+        db.query('stop slave')
+    else:
+        ip = dlist[0]['Master_Host']
+        conn = pSqliteDb('slave_sync_user')
+        data = conn.field('ip,port,user,pass,mode,cmd').find()
+        if len(data) == 0:
+            return mw.returnJson(False, '没有数据无法重启!')
+        user = data['user']
+        apass = data['pass']
+
+        db.query("start slave")
+        # db.query("start slave user='{}' password='{}';".format(user, apass))
+
+    return mw.returnJson(True, '设置成功!')
+
+
+def setSlaveStatusSSH(version=''):
 
     db = pMysqlDb()
     dlist = db.query('show slave status')
@@ -2188,6 +2388,68 @@ def writeDbSyncStatus(data):
 
 
 def doFullSync(version=''):
+    mode_file = getSyncModeFile()
+    if not os.path.exists(mode_file):
+        return mw.returnJson(False, '需要先设置同步配置')
+
+    mode = mw.readFile(mode_file)
+    if mode == 'ssh':
+        return doFullSyncSSH(version)
+    if mode == 'sync-user':
+        return doFullSyncUser(version)
+
+
+def doFullSyncUser(version=''):
+    args = getArgs()
+    data = checkArgs(args, ['db'])
+    if not data[0]:
+        return data[1]
+
+    sync_db = args['db']
+
+    db = pMysqlDb()
+
+    conn = pSqliteDb('slave_sync_user')
+    data = conn.field('ip,port,user,pass,mode,cmd').find()
+    user = data['user']
+    apass = data['pass']
+    port = data['port']
+    ip = data['ip']
+
+    bak_file = '/tmp/tmp.sql'
+
+    writeDbSyncStatus({'code': 0, 'msg': '开始同步...', 'progress': 0})
+    dmp_option = ''
+    mode = recognizeDbMode()
+    if mode == 'gtid':
+        dmp_option = ' --set-gtid-purged=off '
+
+    writeDbSyncStatus({'code': 1, 'msg': '远程导出数据...', 'progress': 20})
+
+    if not os.path.exists(bak_file):
+        dump_sql_data = getServerDir() + "/bin/mysqldump " + dmp_option + " --force --opt --default-character-set=utf8 --single-transaction -h" + ip + " -P" + \
+            port + " -u" + user + " -p" + apass + " " + sync_db + " > " + bak_file
+        mw.execShell(dump_sql_data)
+
+    writeDbSyncStatus({'code': 2, 'msg': '本地导入数据...', 'progress': 40})
+    if os.path.exists(bak_file):
+        pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
+        sock = getSocketFile()
+        my_import_cmd = getServerDir() + '/bin/mysql -S ' + sock + ' -uroot -p' + pwd + \
+            ' ' + sync_db + ' < ' + bak_file
+        mw.execShell(my_import_cmd)
+
+    if version == '8.0':
+        db.query("start slave user='{}' password='{}';".format(user, apass))
+    else:
+        db.query("start slave")
+
+    writeDbSyncStatus({'code': 6, 'msg': '从库重启完成...', 'progress': 100})
+    os.system("rm -rf " + bak_file)
+    return True
+
+
+def doFullSyncSSH(version=''):
 
     args = getArgs()
     data = checkArgs(args, ['db'])
@@ -2513,6 +2775,18 @@ if __name__ == "__main__":
         print(delSlaveSSH(version))
     elif func == 'update_slave_ssh':
         print(updateSlaveSSH(version))
+    elif func == 'get_slave_sync_user_list':
+        print(getSlaveSyncUserList(version))
+    elif func == 'get_slave_sync_user_by_ip':
+        print(getSlaveSyncUserByIp(version))
+    elif func == 'add_slave_sync_user':
+        print(addSlaveSyncUser(version))
+    elif func == 'del_slave_sync_user':
+        print(delSlaveSyncUser(version))
+    elif func == 'get_slave_sync_mode':
+        print(getSlaveSyncMode(version))
+    elif func == 'set_slave_sync_mode':
+        print(setSlaveSyncMode(version))
     elif func == 'init_slave_status':
         print(initSlaveStatus(version))
     elif func == 'set_slave_status':
