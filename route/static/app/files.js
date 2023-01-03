@@ -1366,10 +1366,10 @@ function getImage(fileName){
 	layer.open({
 		type:1,
 		closeBtn: 1,
-		title:false,
-		area: '500px',
+		title:"图片预览",
+		area: '400px',
 		shadeClose: true,
-		content: '<div class="showpicdiv"><img src="'+imgUrl+'"></div>'
+		content: '<div class="showpicdiv"><img max-width="400px;" src="'+imgUrl+'"></div>'
 	});
 }
 
