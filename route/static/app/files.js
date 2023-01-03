@@ -1369,7 +1369,7 @@ function getImage(fileName){
 		title:"图片预览",
 		area: '400px',
 		shadeClose: true,
-		content: '<div class="showpicdiv"><img max-width="400px;" src="'+imgUrl+'"></div>'
+		content: '<div class="showpicdiv"><img style="max-width:400px;" src="'+imgUrl+'"></div>'
 	});
 }
 
