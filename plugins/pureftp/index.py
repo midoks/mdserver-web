@@ -80,6 +80,19 @@ def contentReplace(content):
     content = content.replace('{$SERVER_PATH}', service_path)
     return content
 
+ def __release_port(port):
+    from collections import namedtuple
+    try:
+        import firewall_api
+        firewall_api.firewall_api().addAcceptPortArgs(port, 'pure-ftpd', 'port')
+        return port
+    except Exception as e:
+        return "Release failed {}".format(e)
+
+def openFtpPort():
+    for i in ["21", "39000:40000"]:
+        __release_port(i)
+    return True
 
 def initDreplace():
 
@@ -89,6 +102,7 @@ def initDreplace():
     initD_path = getServerDir() + '/init.d'
     if not os.path.exists(initD_path):
         os.mkdir(initD_path)
+        openFtpPort()
     file_bin = initD_path + '/' + getPluginName()
 
     # initd replace
