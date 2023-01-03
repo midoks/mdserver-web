@@ -80,7 +80,7 @@ def contentReplace(content):
     content = content.replace('{$SERVER_PATH}', service_path)
     return content
 
- def __release_port(port):
+ def ftp_release_port(port):
     from collections import namedtuple
     try:
         import firewall_api
@@ -91,7 +91,7 @@ def contentReplace(content):
 
 def openFtpPort():
     for i in ["21", "39000:40000"]:
-        __release_port(i)
+        ftp_release_port(i)
     return True
 
 def initDreplace():
