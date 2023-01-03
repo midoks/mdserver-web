@@ -817,9 +817,9 @@ class site_api:
         if not len(domains):
             return mw.returnJson(False, '请选择域名')
 
-        file = self.getHostConf(siteName)
-        if os.path.exists(file):
-            siteConf = mw.readFile(file)
+        host_conf_file = self.getHostConf(siteName)
+        if os.path.exists(host_conf_file):
+            siteConf = mw.readFile(host_conf_file)
             if siteConf.find('301-END') != -1:
                 return mw.returnJson(False, '检测到您的站点做了301重定向设置，请先关闭重定向!')
 
@@ -837,7 +837,15 @@ class site_api:
                     if os.path.exists(proxy_dir_file):
                         return mw.returnJson(False, '检测到您的站点做了反向代理设置，请先关闭反向代理!')
 
-        auth_to = self.getSitePath(siteName)
+            # fix binddir domain ssl apply question
+            mw.backFile(host_conf_file)
+            auth_to = self.getSitePath(siteName)
+            rep = "\s*root\s*(.+);"
+            replace_root = "\n\troot " + auth_to + ";"
+            siteConf = re.sub(rep, replace_root, siteConf)
+            mw.writeFile(host_conf_file, siteConf)
+            mw.restartWeb()
+
         to_args = {
             'domains': domains,
             'auth_type': 'http',
@@ -855,6 +863,7 @@ class site_api:
         if not os.path.exists(src_letpath):
             import cert_api
             data = cert_api.cert_api().applyCertApi(to_args)
+            mw.restoreFile(host_conf_file)
             if not data['status']:
                 msg = data['msg']
                 if type(data['msg']) != str:
