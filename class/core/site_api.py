@@ -885,6 +885,8 @@ class site_api:
 
         result['csr'] = mw.readFile(src_csrpath)
         result['key'] = mw.readFile(src_keypath)
+
+        mw.restartWeb()
         return mw.returnJson(data['status'], data['msg'], result)
 
     def getAcmeLogsApi(self):
