@@ -80,7 +80,8 @@ def contentReplace(content):
     content = content.replace('{$SERVER_PATH}', service_path)
     return content
 
- def ftp_release_port(port):
+
+def ftp_release_port(port):
     from collections import namedtuple
     try:
         import firewall_api
@@ -89,10 +90,12 @@ def contentReplace(content):
     except Exception as e:
         return "Release failed {}".format(e)
 
+
 def openFtpPort():
     for i in ["21", "39000:40000"]:
         ftp_release_port(i)
     return True
+
 
 def initDreplace():
 
