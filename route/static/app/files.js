@@ -1365,6 +1365,7 @@ function getImage(fileName){
 	var imgUrl = '/files/download?filename='+fileName;
 	layer.open({
 		type:1,
+		offset: '150px',
 		closeBtn: 1,
 		title:"图片预览",
 		area: '400px',
