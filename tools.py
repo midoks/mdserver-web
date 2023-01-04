@@ -17,6 +17,7 @@ import sys
 import os
 import json
 import time
+import re
 
 sys.path.append(os.getcwd() + "/class/core")
 import mw
