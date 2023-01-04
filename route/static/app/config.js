@@ -425,6 +425,7 @@ function getPanelSSL(){
 						$.post('/config/apply_panel_let_ssl',{},function(rdata){
 							layer.close(loadT);
 							if(rdata.status){
+								layer.close(index);
 								var tdata = rdata['data'];
 								$('.ssl_issue').text(tdata['info']['issuer']);
 								$('.ssl_endtime').text("剩余"+tdata['info']['endtime']+"天到期");
