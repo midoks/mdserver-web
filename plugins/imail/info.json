@@ -1,6 +1,6 @@
 {
 	"sort": 7,
-	"ps": "简单邮件服务[DEV]",
+	"ps": "[<b style='color:red;'>DEV</b>]简单邮件服务",
 	"name": "imail",
 	"title": "邮件服务",
 	"shell": "install.sh",

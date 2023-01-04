@@ -825,7 +825,7 @@ fi
                         ret_title, json.dumps(a_auth)))
                 break
 
-            if number_of_checks == self._max_check_num:
+            if number_of_checks == self.__max_check_num:
                 raise StopIteration(
                     "错误：已尝试验证{0}次. 最大验证次数为{1}. 验证时间间隔为{2}秒.".format(
                         number_of_checks,

@@ -39,7 +39,7 @@ function myPostN(method,args,callback, title){
     if (typeof(title) != 'undefined'){
         _title = title;
     }
-    $.post('/plugins/run', {name:'mysql', func:method, args:_args}, function(data) {
+    $.post('/plugins/run', {name:'mariadb', func:method, args:_args}, function(data) {
         if(typeof(callback) == 'function'){
             callback(data);
         }
@@ -655,8 +655,8 @@ function addDatabase(type){
                         <span class='tname'>数据库名</span>\
                         <div class='info-r'><input name='name' class='bt-input-text mr5' placeholder='新的数据库名称' type='text' style='width:65%' value=''>\
                         <select class='bt-input-text mr5 codeing_a5nGsm' name='codeing' style='width:27%'>\
-                            <option value='utf8'>utf-8</option>\
                             <option value='utf8mb4'>utf8mb4</option>\
+                            <option value='utf8'>utf-8</option>\
                             <option value='gbk'>gbk</option>\
                             <option value='big5'>big5</option>\
                         </select>\
@@ -1504,7 +1504,7 @@ function getMasterRepSlaveUserCmd(username, db=''){
             title: '同步命令',
             area: '500px',
             content:"<form class='bt-form pd20 pb70' id='add_master'>\
-            <div class='line'>"+cmd+"</div>\
+            <div class='line' style='word-wrap: break-word;word-break: normal;'>"+cmd+"</div>\
             <div class='bt-form-submit-btn'>\
                 <button type='button' class='btn btn-success btn-sm btn-title class-copy-cmd'>复制</button>\
             </div>\
@@ -1795,11 +1795,27 @@ function addSlaveSSH(ip=''){
 }
 
 
+
 function delSlaveSSH(ip){
     myPost('del_slave_ssh', {ip:ip}, function(rdata){
         var rdata = $.parseJSON(rdata.data);
-        layer.msg(rdata.msg, {icon: rdata.status ? 1 : 2});
-        getSlaveSSHPage();
+        showMsg(rdata.msg,function(){
+            if (rdata.status){
+                getSlaveSSHPage();
+            }
+        },{icon: rdata.status ? 1 : 2}, 600);
+    });
+}
+
+
+function delSlaveSyncUser(ip){
+    myPost('del_slave_sync_user', {ip:ip}, function(rdata){
+        var rdata = $.parseJSON(rdata.data);
+        showMsg(rdata.msg,function(){
+            if (rdata.status){
+                getSlaveSyncUserPage();
+            }
+        },{icon: rdata.status ? 1 : 2}, 600);
     });
 }
 
@@ -1848,6 +1864,234 @@ function getSlaveSSHPage(page=1){
     });
 }
 
+function addSlaveSyncUser(ip=''){
+
+    myPost('get_slave_sync_user_by_ip', {ip:ip}, function(rdata){
+        
+        var rdata = $.parseJSON(rdata.data);
+
+        var ip = '127.0.0.1';
+        var port = "22";
+        var cmd = '';
+        var user = 'input_sync_user';
+        var pass = 'input_sync_pwd';
+        var mode = '0';
+
+        if (rdata.data.length>0){
+            ip = rdata.data[0]['ip'];
+            port = rdata.data[0]['port'];
+            cmd = rdata.data[0]['cmd'];
+            user = rdata.data[0]['user'];
+            pass = rdata.data[0]['pass'];
+            mode = rdata.data[0]['mode'];
+        }
+
+        var index = layer.open({
+            type: 1,
+            area: ['500px','470px'],
+            title: '同步账户',
+            closeBtn: 1,
+            shift: 5,
+            shadeClose: true,
+            btn:["确认","取消"],
+            content: "<form class='bt-form pd20'>\
+                <div class='line'><span class='tname'>IP</span><div class='info-r'><input name='ip' class='bt-input-text mr5' type='text' style='width:330px;' value='"+ip+"'></div></div>\
+                <div class='line'><span class='tname'>端口</span><div class='info-r'><input name='port' class='bt-input-text mr5' type='number' style='width:330px;' value='"+port+"'></div></div>\
+                <div class='line'><span class='tname'>同步账户</span><div class='info-r'><input name='user' class='bt-input-text mr5' type='text' style='width:330px;' value='"+user+"'></div></div>\
+                <div class='line'><span class='tname'>同步密码</span><div class='info-r'><input name='pass' class='bt-input-text mr5' type='text' style='width:330px;' value='"+pass+"'></div></div>\
+                <div class='line'>\
+                <span class='tname'>CMD[必填]</span>\
+                <div class='info-r'><textarea class='bt-input-text mr5' row='20' cols='30' name='cmd' style='width:330px;height:150px;'></textarea></div>\
+                </div>\
+                <input type='hidden' name='mode' value='"+mode+"' />\
+              </form>",
+            success:function(){
+                $('textarea[name="cmd"]').html(cmd);
+
+                $('textarea[name="cmd"]').change(function(){
+                    var val = $(this).val();
+                    var vlist = val.split(',');
+                    var a = {};
+                    for (var i in vlist) {
+                        var tmp = toTrim(vlist[i]);
+                        var tmp_a = tmp.split(" ");
+                        var real_tmp = tmp_a[tmp_a.length-1];
+                        var kv = real_tmp.split("=");
+                        a[kv[0]] = kv[1].replace("'",'').replace("'",'');
+                    }
+
+                    $('input[name="ip"]').val(a['MASTER_HOST']);
+                    $('input[name="port"]').val(a['MASTER_PORT']);
+                    $('input[name="user"]').val(a['MASTER_USER']);
+                    $('input[name="pass"]').val(a['MASTER_PASSWORD']);
+
+                    console.log(a['MASTER_USE_GTID'],typeof(a['MASTER_USE_GTID']));
+                    if (typeof(a['MASTER_USE_GTID']) != 'undefined' ){
+                        $('input[name="mode"]').val('1');
+                    }
+                });
+            },
+            yes:function(index){
+                var ip = $('input[name="ip"]').val();
+                var port = $('input[name="port"]').val();
+                var user = $('input[name="user"]').val();
+                var pass = $('input[name="pass"]').val();
+                var cmd = $('textarea[name="cmd"]').val();
+                var mode = $('input[name="mode"]').val();
+
+                var data = {ip:ip,port:port,cmd:cmd,user:user,pass:pass,mode:mode};
+                myPost('add_slave_sync_user', data, function(ret_data){
+                    layer.close(index);
+                    var rdata = $.parseJSON(ret_data.data);
+                    showMsg(rdata.msg,function(){
+                        if (rdata.status){
+                            getSlaveSyncUserPage();
+                        }
+                    },{icon: rdata.status ? 1 : 2},600);
+                });
+            }
+        });
+    });
+}
+
+function getSlaveSyncUserPage(page=1){
+    var _data = {};    
+    _data['page'] = page;
+    _data['page_size'] = 5;
+    _data['tojs'] ='getSlaveSyncUserPage';
+    myPost('get_slave_sync_user_list', _data, function(data){
+        var layerId = null;
+        var rdata = [];
+        try {
+            rdata = $.parseJSON(data.data);
+        } catch(e) {
+            console.log(e);
+        }
+
+        var list = '';
+        var user_list = rdata['data'];
+        for (i in user_list) {
+            var ip = user_list[i]['ip'];
+            var port = user_list[i]['port'];
+            var user = user_list[i]['user'];
+            var apass = user_list[i]['pass'];
+            
+            var cmd = '未设置';
+            if (user_list[i]['cmd']!=''){
+                cmd = '已设置';
+            }
+
+            list += '<tr><td>'+ip+'</td>\
+                <td>'+port+'</td>\
+                <td>'+user+'</td>\
+                <td>'+apass+'</td>\
+                <td>'+cmd+'</td>\
+                <td>\
+                    <a class="btlink" onclick="addSlaveSyncUser(\''+ip+'\');">修改</a> | \
+                    <a class="btlink" onclick="delSlaveSyncUser(\''+ip+'\');">删除</a>\
+                </td>\
+            </tr>';
+        }
+
+        $('.get-slave-ssh-list tbody').html(list);
+        $('.dataTables_paginate_4').html(rdata['page']);
+    });
+}
+
+function getSlaveCfg(){
+
+    myPost('get_slave_sync_mode', '', function(data){
+        var rdata = $.parseJSON(data.data);
+        var mode_none = 'success';
+        var mode_ssh = 'danger';
+        var mode_sync_user = 'danger';
+        if(rdata.status){
+            var mode_none = 'danger';
+            if (rdata.data == 'ssh'){
+                var mode_ssh = 'success';
+                var mode_sync_user = 'danger';
+            } else {
+                var mode_ssh = 'danger';
+                var mode_sync_user = 'success';
+            }
+        }
+
+        layerId = layer.open({
+            type: 1,
+            title: '同步配置',
+            area: ['400px','180px'],
+            content:"<div class='bt-form pd20 c6'>\
+                    <p class='conf_p'>\
+                        <span class='f14 c6 mr20'>当前从库同步模式</span>\
+                        <b class='f14 c6 mr20'></b>\
+                        <button class='btn btn-"+mode_none+" btn-xs slave-db-mode btn-none'>无</button>\
+                        <button class='btn btn-"+mode_ssh+" btn-xs slave-db-mode btn-ssh'>SSH</button>\
+                        <button class='btn btn-"+mode_sync_user+" btn-xs slave-db-mode btn-sync-user'>同步账户</button>\
+                    </p>\
+                    <hr />\
+                    <p class='conf_p'>\
+                        <span class='f14 c6 mr20'>配置设置</span>\
+                        <b class='f14 c6 mr20'></b>\
+                        <button class='btn btn-success btn-xs btn-slave-ssh'>SSH</button>\
+                        <button class='btn btn-success btn-xs btn-slave-user'>同步账户</button>\
+                    </p>\
+                </div>",
+            success:function(){
+                $('.btn-slave-ssh').click(function(){
+                    getSlaveSSHList();
+                });
+
+                $('.btn-slave-user').click(function(){
+                    getSlaveUserList();
+                });
+
+                $('.slave-db-mode').click(function(){
+                    var _this = this;
+                    var mode = 'none';
+                    if ($(this).hasClass('btn-ssh')){
+                        mode = 'ssh';
+                    }
+                    if ($(this).hasClass('btn-sync-user')){
+                        mode = 'sync-user';
+                    }
+
+                    myPost('set_slave_sync_mode', {mode:mode}, function(data){
+                        var rdata = $.parseJSON(data.data);
+                        showMsg(rdata.msg,function(){
+                            $('.slave-db-mode').remove('btn-success').addClass('btn-danger');
+                            $(_this).removeClass('btn-danger').addClass('btn-success');
+                        },{icon:rdata.status?1:2},2000);
+                    });
+
+                });
+            }
+        });
+    });
+}
+
+function getSlaveUserList(){
+
+    var page = '<div class="dataTables_paginate_4 dataTables_paginate paging_bootstrap page" style="margin-top:0px;"></div>';
+    page += '<div class="table_toolbar" style="left:0px;"><span class="sync btn btn-default btn-sm" onclick="addSlaveSyncUser()" title="">添加同步账户</span></div>';
+
+    layerId = layer.open({
+        type: 1,
+        title: '同步账户列表',
+        area: '500px',
+        content:"<div class='bt-form pd20 c6'>\
+                 <div class='divtable mtb10'>\
+                    <div><table class='table table-hover get-slave-ssh-list'>\
+                        <thead><tr><th>IP</th><th>PORT</th><th>同步账户</th><th>同步密码</th><th>CMD</th><th>操作</th></tr></thead>\
+                        <tbody></tbody>\
+                    </table></div>\
+                    "+page +"\
+                </div>\
+            </div>",
+        success:function(){
+            getSlaveSyncUserPage(1);
+        }
+    });
+}
 
 function getSlaveSSHList(page=1){
 
@@ -1968,7 +2212,7 @@ function masterOrSlaveConf(version=''){
             for(i in rdata.data){
 
                 var v = rdata.data[i];
-                var status = "异常";
+                var status = "<a class='btlink db_error'>异常</>";
                 if (v['Slave_SQL_Running'] == 'Yes' && v['Slave_IO_Running'] == 'Yes'){
                     status = "正常";
                 }
@@ -2010,6 +2254,26 @@ function masterOrSlaveConf(version=''){
             //     <span class="sync btn btn-default btn-sm" onclick="getMasterRepSlaveList()" title="">添加</span>\
             // </div>
             $(".table_slave_status_list").html(con);
+
+            $('.db_error').click(function(){
+                layer.open({
+                    type: 1,
+                    title: '同步异常信息',
+                    area: '500px',
+                    content:"<form class='bt-form pd20 pb70'>\
+                    <div class='line'>"+v['Error']+"</div>\
+                    <div class='bt-form-submit-btn'>\
+                        <button type='button' class='btn btn-success btn-sm btn-title class-copy-db-err'>复制</button>\
+                    </div>\
+                  </form>",
+                    success:function(){
+                        copyText(v['Error']);
+                        $('.class-copy-db-err').click(function(){
+                            copyText(v['Error']);
+                        });
+                    }
+                });
+            });
         });
     }
 
@@ -2087,7 +2351,7 @@ function masterOrSlaveConf(version=''){
                 <p class="conf_p">\
                     <span class="f14 c6 mr20">Slave[从]配置</span><span class="f14 c6 mr20"></span>\
                     <button class="btn '+(!rdata.slave_status ? 'btn-danger' : 'btn-success')+' btn-xs btn-slave">'+(!rdata.slave_status ? '未启动' : '已启动') +'</button>\
-                    <button class="btn btn-success btn-xs" onclick="getSlaveSSHList()" >[主]SSH配置</button>\
+                    <button class="btn btn-success btn-xs" onclick="getSlaveCfg()" >同步配置</button>\
                     <button class="btn btn-success btn-xs" onclick="initSlaveStatus()" >初始化</button>\
                 </p>\
                 <hr/>\
@@ -2161,10 +2425,10 @@ function masterOrSlaveConf(version=''){
                 getMasterDbList();
             }
             
-            if (rdata.slave_status){
+            // if (rdata.slave_status){
                 getAsyncMasterDbList();
                 getAsyncDataList()
-            }
+            // }
         });
     }
     getMasterStatus();

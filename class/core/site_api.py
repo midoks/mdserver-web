@@ -817,9 +817,9 @@ class site_api:
         if not len(domains):
             return mw.returnJson(False, '请选择域名')
 
-        file = self.getHostConf(siteName)
-        if os.path.exists(file):
-            siteConf = mw.readFile(file)
+        host_conf_file = self.getHostConf(siteName)
+        if os.path.exists(host_conf_file):
+            siteConf = mw.readFile(host_conf_file)
             if siteConf.find('301-END') != -1:
                 return mw.returnJson(False, '检测到您的站点做了301重定向设置，请先关闭重定向!')
 
@@ -837,7 +837,15 @@ class site_api:
                     if os.path.exists(proxy_dir_file):
                         return mw.returnJson(False, '检测到您的站点做了反向代理设置，请先关闭反向代理!')
 
-        auth_to = self.getSitePath(siteName)
+            # fix binddir domain ssl apply question
+            mw.backFile(host_conf_file)
+            auth_to = self.getSitePath(siteName)
+            rep = "\s*root\s*(.+);"
+            replace_root = "\n\troot " + auth_to + ";"
+            siteConf = re.sub(rep, replace_root, siteConf)
+            mw.writeFile(host_conf_file, siteConf)
+            mw.restartWeb()
+
         to_args = {
             'domains': domains,
             'auth_type': 'http',
@@ -855,6 +863,7 @@ class site_api:
         if not os.path.exists(src_letpath):
             import cert_api
             data = cert_api.cert_api().applyCertApi(to_args)
+            mw.restoreFile(host_conf_file)
             if not data['status']:
                 msg = data['msg']
                 if type(data['msg']) != str:
@@ -876,6 +885,8 @@ class site_api:
 
         result['csr'] = mw.readFile(src_csrpath)
         result['key'] = mw.readFile(src_keypath)
+
+        mw.restartWeb()
         return mw.returnJson(data['status'], data['msg'], result)
 
     def getAcmeLogsApi(self):
@@ -1118,6 +1129,26 @@ class site_api:
         host = self.getHostConf(siteName)
         return mw.getJson({'host': host})
 
+    def saveHostConfApi(self):
+        path = request.form.get('path', '')
+        data = request.form.get('data', '')
+        encoding = request.form.get('encoding', '')
+
+        import files_api
+
+        mw.backFile(path)
+        save_ret_data = files_api.files_api().saveBody(path, data, encoding)
+        rdata = json.loads(save_ret_data)
+
+        if rdata['status']:
+            isError = mw.checkWebConfig()
+            if isError != True:
+                mw.restoreFile(path)
+                return mw.returnJson(False, 'ERROR: 检测到配置文件有错误,请先排除后再操作<br><br><a style="color:red;">' + isError.replace("\n", '<br>') + '</a>')
+            mw.restartWeb()
+            mw.removeBackFile(path)
+        return save_ret_data
+
     def getRewriteConfApi(self):
         siteName = request.form.get('siteName', '')
         rewrite = self.getRewriteConf(siteName)
@@ -1211,14 +1242,15 @@ class site_api:
                 return mw.returnJson(False, '端口范围不合法!')
 
             opid = mw.M('domain').where(
-                "name=? AND (port=? OR pid=?)", (domain, domain_port, pid)).getField('pid')
-            if opid:
-                if mw.M('sites').where('id=?', (opid,)).count():
-                    return mw.returnJson(False, '指定域名已绑定过!')
-                mw.M('domain').where('pid=?', (opid,)).delete()
+                "name=? AND (port=? OR pid=?)", (domain_name, domain_port, pid,)).getField('pid')
+            if opid > 0:
+                return mw.returnJson(False, '您添加的域名[{}],已绑定!'.format(domain_name))
+                # if mw.M('sites').where('id=?', (opid,)).count():
+                #     return mw.returnJson(False, '指定域名已绑定过!')
+                # mw.M('domain').where('pid=?', (opid,)).delete()
 
             if mw.M('binding').where('domain=?', (domain,)).count():
-                return mw.returnJson(False, '您添加的域名已存在!')
+                return mw.returnJson(False, '您添加的域名,子目录已绑定!')
 
             self.nginxAddDomain(webname, domain_name, domain_port)
 
@@ -1270,17 +1302,18 @@ class site_api:
             content = content.replace('{$ROOT_DIR}', webdir)
             content = content.replace('{$SERVER_MAIN}', siteInfo['name'])
             content = content.replace('{$OR_REWRITE}', self.rewritePath)
+            content = content.replace('{$PHP_DIR}', self.setupPath + '/php')
             content = content.replace('{$LOGPATH}', mw.getLogsDir())
 
             conf += "\r\n" + content
-            shutil.copyfile(filename, '/tmp/backup.conf')
+            mw.backFile(filename)
             mw.writeFile(filename, conf)
         conf = mw.readFile(filename)
 
         # 检查配置是否有误
         isError = mw.checkWebConfig()
         if isError != True:
-            shutil.copyfile('/tmp/backup.conf', filename)
+            mw.restoreFile(filename)
             return mw.returnJson(False, 'ERROR: <br><a style="color:red;">' + isError.replace("\n", '<br>') + '</a>')
 
         mw.M('binding').add('pid,domain,port,path,addtime',
@@ -1290,6 +1323,7 @@ class site_api:
                          (siteInfo['name'], dirName, domain))
         mw.writeLog('网站管理', msg)
         mw.restartWeb()
+        mw.removeBackFile(filename)
         return mw.returnJson(True, '添加成功!')
 
     def delDirBindApi(self):

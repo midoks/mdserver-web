@@ -92,15 +92,15 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.12.0
+### 版本更新 0.12.1
 
-此次版本:默认面板名为【大圣面板】。
-由于#309问题。先注释。提前发版。
-
-* 安装脚本优化 @hiCasper。
-* 数据库[pg/apt/yum/mariadb]计划任务备份ok。
-* php源码加入sodium扩展。
-* 站点分类问题 #300。
+* mysql/mariadb/mysql-apt/mysql-yum增加新的同步方式[同步账户]。
+* pureftp安装时自动放行端口。
+* 面板ssl，添加【申请Lets证书】功能。
+* 站点子域名绑定优化。
+* 修复添加数据库名字判断。
+* 增加PHP52的隐藏和显示指令。
+* 各种细节优化。
 
 
 ### JSDelivr安装地址

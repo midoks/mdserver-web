@@ -16,6 +16,10 @@ function toSize(a) {
 	}
 }
 
+function toTrim(x) {
+    return x.replace(/^\s+|\s+$/gm,'');
+}
+
 function inArray(f, arr){
 	for (var i = 0; i < arr.length; i++) {
 		if (f == arr[i]) {

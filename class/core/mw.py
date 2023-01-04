@@ -219,6 +219,15 @@ def isInstalledWeb():
     return False
 
 
+def isIpAddr(ip):
+    check_ip = re.compile(
+        '^(1\d{2}|2[0-4]\d|25[0-5]|[1-9]\d|[1-9])\.(1\d{2}|2[0-4]\d|25[0-5]|[1-9]\d|\d)\.(1\d{2}|2[0-4]\d|25[0-5]|[1-9]\d|\d)\.(1\d{2}|2[0-4]\d|25[0-5]|[1-9]\d|\d)$')
+    if check_ip.match(ip):
+        return True
+    else:
+        return False
+
+
 def restartWeb():
     return opWeb("reload")
 
@@ -488,6 +497,18 @@ def backFile(file, act=None):
 
     # print("cp -p {0} {1}".format(file, file + file_type))
     execShell("cp -p {0} {1}".format(file, file + file_type))
+
+
+def removeBackFile(file, act=None):
+    """
+        @name 删除备份配置文件
+        @param file 需要删除备份文件
+        @param act 如果存在，则还原默认配置
+    """
+    file_type = "_bak"
+    if act:
+        file_type = "_def"
+    execShell("rm -rf {0}".format(file + file_type))
 
 
 def restoreFile(file, act=None):

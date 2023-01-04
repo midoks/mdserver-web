@@ -27,7 +27,7 @@ from flask import request
 
 class config_api:
 
-    __version = '0.12.0'
+    __version = '0.12.1'
     __api_addr = 'data/api.json'
 
     def __init__(self):
@@ -340,11 +340,13 @@ class config_api:
 
     # 获取面板证书
     def getPanelSslApi(self):
-        cert = {}
+        cert = self.getPanelSslData()
+        return mw.getJson(cert)
 
+    def getPanelSslData(self):
+        cert = {}
         keyPath = 'ssl/private.pem'
         certPath = 'ssl/cert.pem'
-
         if not os.path.exists(certPath):
             mw.createSSL()
 
@@ -352,7 +354,7 @@ class config_api:
         cert['certPem'] = mw.readFile(certPath)
         cert['rep'] = os.path.exists('ssl/input.pl')
         cert['info'] = mw.getCertName(certPath)
-        return mw.getJson(cert)
+        return cert
 
     # 保存面板证书
     def savePanelSslApi(self):
@@ -377,6 +379,54 @@ class config_api:
             return mw.returnJson(False, '证书错误,请检查!')
         mw.writeFile('ssl/input.pl', 'True')
         return mw.returnJson(True, '证书已保存!')
+
+    # 申请面板let证书
+    def applyPanelLetSslApi(self):
+
+        # check domain is bind?
+        bind_domain = 'data/bind_domain.pl'
+        if not os.path.exists(bind_domain):
+            return mw.returnJson(False, '未绑定域名!')
+
+        siteName = mw.readFile(bind_domain).strip()
+        auth_to = mw.getRunDir() + "/tmp"
+        to_args = {
+            'domains': [siteName],
+            'auth_type': 'http',
+            'auth_to': auth_to,
+        }
+
+        src_letpath = mw.getServerDir() + '/web_conf/letsencrypt/' + siteName
+        src_csrpath = src_letpath + "/fullchain.pem"  # 生成证书路径
+        src_keypath = src_letpath + "/privkey.pem"  # 密钥文件路径
+
+        dst_letpath = mw.getRunDir() + '/ssl'
+        dst_csrpath = dst_letpath + '/cert.pem'
+        dst_keypath = dst_letpath + '/private.pem'
+
+        if not os.path.exists(src_letpath):
+            import cert_api
+            data = cert_api.cert_api().applyCertApi(to_args)
+            if not data['status']:
+                msg = data['msg']
+                if type(data['msg']) != str:
+                    msg = data['msg'][0]
+                    emsg = data['msg'][1]['challenges'][0]['error']
+                    msg = msg + '<p><span>响应状态:</span>' + str(emsg['status']) + '</p><p><span>错误类型:</span>' + emsg[
+                        'type'] + '</p><p><span>错误代码:</span>' + emsg['detail'] + '</p>'
+                return mw.returnJson(data['status'], msg, data['msg'])
+
+        mw.buildSoftLink(src_csrpath, dst_csrpath, True)
+        mw.buildSoftLink(src_keypath, dst_keypath, True)
+        mw.execShell('echo "lets" > "' + dst_letpath + '/README"')
+
+        data = self.getPanelSslData()
+
+        tmp_well_know = auth_to + '/.well-known'
+        if os.path.exists(tmp_well_know):
+            mw.execShell('rm -rf ' + tmp_well_know)
+
+        return mw.returnJson(True, '申请成功!', data)
 
     def setPanelDomainApi(self):
         domain = request.form.get('domain', '')

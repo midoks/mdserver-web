@@ -342,6 +342,28 @@ class firewall_api:
         status = request.form.get('status', '1')
         return mw.getJson(self.setFw(status))
 
+    def setFwIptables(self, status):
+        # iptables特殊处理
+        if status == '1':
+            mw.execShell('service iptables save')
+            mw.execShell('service iptables stop')
+        else:
+            # 重新导入数据
+
+            _list = mw.M('firewall').field('id,port,ps,addtime').limit(
+                '0,1000').order('id desc').select()
+
+            for x in _list:
+                port = x['port']
+                if mw.isIpAddr(port):
+                    cmd = 'iptables -I INPUT -s ' + port + ' -j DROP'
+                    mw.execShell(cmd)
+                else:
+                    self.addAcceptPort(port)
+
+            mw.execShell('service iptables save')
+            mw.execShell('service iptables start')
+
     def setFw(self, status):
         if status == '1':
             if self.__isUfw:
@@ -352,8 +374,7 @@ class firewall_api:
             elif self.__isMac:
                 pass
             else:
-                mw.execShell('service iptables save')
-                mw.execShell('service iptables stop')
+                self.setFwIptables(status)
         else:
             if self.__isUfw:
                 mw.execShell("echo 'y'| ufw enable")
@@ -363,8 +384,7 @@ class firewall_api:
             elif self.__isMac:
                 pass
             else:
-                mw.execShell('service iptables save')
-                mw.execShell('service iptables restart')
+                self.setFwIptables(status)
 
         return mw.returnData(True, '设置成功!')
 
@@ -456,8 +476,8 @@ class firewall_api:
         elif self.__isMac:
             return False
         else:
-            cmd = "ps -ef|grep iptables |grep -v grep  | awk '{print $2}'"
+            cmd = "systemctl status iptables | grep 'inactive'"
             data = mw.execShell(cmd)
-            if data[0] == '':
+            if data[0] != '':
                 return False
             return True

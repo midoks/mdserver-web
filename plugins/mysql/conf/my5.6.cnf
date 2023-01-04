@@ -69,7 +69,8 @@ binlog-ignore-db = performance_schema
 
 #slave
 log-slave-updates = 1
-skip-slave-start = 1
+# Prevent replication from starting automatically with MySQL
+#skip-slave-start = 1
 #replicate-do-db
 replicate-ignore-db = information_schema
 replicate-ignore-db = performance_schema

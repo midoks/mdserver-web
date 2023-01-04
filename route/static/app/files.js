@@ -300,13 +300,12 @@ function openFilename(obj){
 	if (inArray(ext,['svg'])){
 
 		$.post("/files/get_body", "path=" + encodeURIComponent(path), function(rdata) {
-			
 			if (rdata.data.status){
 				layer.open({
 					type:1,
 					closeBtn: 1,
-					title:false,
-					area: '600px',
+					title:"SVG预览",
+					area: '400px',
 					shadeClose: true,
 					content: '<div class="showpicdiv">'+rdata.data.data+'</div>'
 				});
@@ -1365,11 +1364,12 @@ function getImage(fileName){
 	var imgUrl = '/files/download?filename='+fileName;
 	layer.open({
 		type:1,
+		offset: '150px',
 		closeBtn: 1,
-		title:false,
-		area: '500px',
+		title:"图片预览",
+		area: '400px',
 		shadeClose: true,
-		content: '<div class="showpicdiv"><img src="'+imgUrl+'"></div>'
+		content: '<div class="showpicdiv"><img style="max-width:400px;" src="'+imgUrl+'"></div>'
 	});
 }
 

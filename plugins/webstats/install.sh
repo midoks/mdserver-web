@@ -108,6 +108,10 @@ Install_App()
 	echo '安装完成' > $install_tmp
 
 	cd $rootPath && python3 ${rootPath}/plugins/webstats/index.py start
+
+
+	# delete install data
+	rm -rf $serverPath/source/webstats
 }
 
 Uninstall_App()

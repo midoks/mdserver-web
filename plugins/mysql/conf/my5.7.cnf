@@ -8,9 +8,6 @@ default-character-set = UTF8MB4
 [mysqld]
 !include {$SERVER_APP_PATH}/etc/mode/classic.cnf
 
-;sha256_password_private_key_path=mysql.pem
-;sha256_password_public_key_path=mysql.pub
-
 pid-file = {$SERVER_APP_PATH}/data/mysql.pid
 user = mysql
 port		= 3306
@@ -44,6 +41,7 @@ open_files_limit = 2560
 max_allowed_packet = 128M
 
 skip_name_resolve = 1
+skip-ssl
 #skip-networking
 #skip-external-locking
 #loose-skip-innodb
@@ -70,8 +68,10 @@ binlog-ignore-db = information_schema
 binlog-ignore-db = performance_schema
 
 #slave
-log-slave-updates = 1
-skip-slave-start = 1
+# 5.7 It can not be opened later
+#log-slave-updates = 1
+# Prevent replication from starting automatically with MySQL
+#skip-slave-start = 1
 #replicate-do-db
 replicate-ignore-db = information_schema
 replicate-ignore-db = performance_schema
