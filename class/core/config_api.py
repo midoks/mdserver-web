@@ -400,7 +400,7 @@ class config_api:
         src_csrpath = src_letpath + "/fullchain.pem"  # 生成证书路径
         src_keypath = src_letpath + "/privkey.pem"  # 密钥文件路径
 
-        dst_letpath = mw.getRunDir() + '/' + siteName
+        dst_letpath = mw.getRunDir() + '/ssl'
         dst_csrpath = dst_letpath + '/cert.pem'
         dst_keypath = dst_letpath + '/private.pem'
 
