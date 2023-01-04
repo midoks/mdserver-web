@@ -122,16 +122,16 @@ def mwcli(mw_input=0):
         php_conf = 'plugins/php/info.json'
         if os.path.exists(php_conf):
             cont = mw.readFile(php_conf)
-            cont = cont.sub("\"53\"", "\"52\",\"53\"")
-            cont = cont.sub("\"5.3.29\"", "\"5.2.17\",\"5.3.29\"")
+            cont = re.sub("\"53\"", "\"52\",\"53\"", cont)
+            cont = re.sub("\"5.3.29\"", "\"5.2.17\",\"5.3.29\"", cont)
             mw.writeFile(php_conf, cont)
             print("|-执行PHP52显示成功!")
     elif mw_input == 101:
         php_conf = 'plugins/php/info.json'
         if os.path.exists(php_conf):
             cont = mw.readFile(php_conf)
-            cont = cont.sub("\"52\",", "")
-            cont = cont.sub("\"5.2.17\",")
+            cont = re.sub("\"52\",", "", cont)
+            cont = re.sub("\"5.2.17\",", cont)
             mw.writeFile(php_conf, cont)
             print("|-执行PHP52隐藏成功!")
 
