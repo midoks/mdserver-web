@@ -68,7 +68,7 @@ def mwcli(mw_input=0):
         except:
             mw_input = 0
 
-    nums = [1, 2, 3, 4, 5, 10, 11, 12, 13, 20, 21，100，101]
+    nums = [1, 2, 3, 4, 5, 10, 11, 12, 13, 20, 21, 100, 101]
     if not mw_input in nums:
         print(raw_tip)
         print("已取消!")
