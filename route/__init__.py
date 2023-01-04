@@ -223,9 +223,18 @@ def publicObject(toObject, func, action=None, get=None):
 #     print(os)
 #     return mw.getLocalIp()
 
-# 仅针对webhook插件
+@app.route("/.well-known/acme-challenge/<val>")
+def wellknow(val=None):
+    # 申请面板ssl使用
+    f = mw.getRunDir() + "/tmp/.well-known/acme-challenge/" + val
+    if os.path.exists(f):
+        return mw.readFile(f)
+    return ''
+
+
 @app.route("/hook")
 def webhook():
+    # 仅针对webhook插件
     input_args = {
         'access_key': request.args.get('access_key', '').strip(),
         'params': request.args.get('params', '').strip()
