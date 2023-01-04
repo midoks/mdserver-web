@@ -384,7 +384,8 @@ function getPanelSSL(){
 					</div>\
 				</div>\
 				<div class="ssl-btn pull-left mtb15" style="width:100%">\
-					<button class="btn btn-success btn-sm" onclick="savePanelSSL()">保存</button>\
+					<button class="btn btn-success btn-sm save-panel-ssl">保存</button>\
+					<button class="btn btn-success btn-sm apply-lets-ssl">申请Lets证书</button>\
 				</div>\
 			</div>\
 			<ul class="help-info-text c7 pull-left">\
@@ -399,10 +400,8 @@ function getPanelSSL(){
 			closeBtn: 1,
 			shift: 5,
 			shadeClose: false,
-			content:certBody
-		});
-	},'json');
-}
+			content:certBody,
+			success:function(layero, layer_id){
 
 				//保存SSL
 				$('.save-panel-ssl').click(function(){
