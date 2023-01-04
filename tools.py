@@ -46,18 +46,20 @@ def mwcli(mw_input=0):
     raw_tip = "======================================================"
     if not mw_input:
         print("===============mdserver-web cli tools=================")
-        print("(1) 重启面板服务")
-        print("(2) 停止面板服务")
-        print("(3) 启动面板服务")
-        print("(4) 重载面板服务")
-        print("(5) 修改面板端口")
-        print("(10) 查看面板默认信息")
-        print("(11) 修改面板密码")
-        print("(12) 修改面板用户名")
-        print("(13) 显示面板错误日志")
-        print("(20) 关闭BasicAuth认证")
-        print("(21) 解除域名绑定")
-        print("(0) 取消")
+        print("(1)   重启面板服务")
+        print("(2)   停止面板服务")
+        print("(3)   启动面板服务")
+        print("(4)   重载面板服务")
+        print("(5)   修改面板端口")
+        print("(10)  查看面板默认信息")
+        print("(11)  修改面板密码")
+        print("(12)  修改面板用户名")
+        print("(13)  显示面板错误日志")
+        print("(20)  关闭BasicAuth认证")
+        print("(21)  解除域名绑定")
+        print("(100) 开启PHP52显示")
+        print("(101) 关闭PHP52显示")
+        print("(0)   取消")
         print(raw_tip)
         try:
             mw_input = input("请输入命令编号：")
@@ -66,7 +68,7 @@ def mwcli(mw_input=0):
         except:
             mw_input = 0
 
-    nums = [1, 2, 3, 4, 5, 10, 11, 12, 13, 20, 21]
+    nums = [1, 2, 3, 4, 5, 10, 11, 12, 13, 20, 21，100，101]
     if not mw_input in nums:
         print(raw_tip)
         print("已取消!")
@@ -116,6 +118,22 @@ def mwcli(mw_input=0):
             os.remove(bind_domain)
             os.system(INIT_CMD + " unbind_domain")
             print("|-解除域名绑定成功")
+    elif mw_input == 100:
+        php_conf = 'plugins/php/info.json'
+        if os.path.exists(php_conf):
+            cont = mw.readFile(php_conf)
+            cont = cont.sub("\"53\"", "\"52\",\"53\"")
+            cont = cont.sub("\"5.3.29\"", "\"5.2.17\",\"5.3.29\"")
+            mw.writeFile(php_conf, cont)
+            print("|-执行PHP52显示成功!")
+    elif mw_input == 101:
+        php_conf = 'plugins/php/info.json'
+        if os.path.exists(php_conf):
+            cont = mw.readFile(php_conf)
+            cont = cont.sub("\"52\",", "")
+            cont = cont.sub("\"5.2.17\",")
+            mw.writeFile(php_conf, cont)
+            print("|-执行PHP52隐藏成功!")
 
 
 def set_panel_pwd(password, ncli=False):
