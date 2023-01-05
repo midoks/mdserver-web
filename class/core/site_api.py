@@ -1243,7 +1243,8 @@ class site_api:
 
             opid = mw.M('domain').where(
                 "name=? AND (port=? OR pid=?)", (domain_name, domain_port, pid,)).getField('pid')
-            if opid > 0:
+            # print(opid)
+            if len(opid) > 0:
                 return mw.returnJson(False, '您添加的域名[{}],已绑定!'.format(domain_name))
                 # if mw.M('sites').where('id=?', (opid,)).count():
                 #     return mw.returnJson(False, '指定域名已绑定过!')
