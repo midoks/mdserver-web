@@ -2578,6 +2578,22 @@ location ^~ {from} {\n\
             mw.execShell('rm -rf ' + ssl_acme_dir)
 
         mw.M('sites').where("id=?", (sid,)).delete()
+
+        # binding domain delete
+        binding_list = mw.M('binding').field(
+            'id,domain').where("pid=?", (sid,)).select()
+
+        for x in binding_list:
+            wlog = mw.getLogsDir() + "/" + webname + "_" + x['domain'] + ".log"
+            wlog_error = mw.getLogsDir() + "/" + webname + "_" + \
+                x['domain'] + ".error.log"
+
+            if os.path.exists(wlog):
+                mw.execShell('rm -rf ' + wlog)
+            if os.path.exists(wlog_error):
+                mw.execShell('rm -rf ' + wlog_error)
+
+        mw.M('binding').where("pid=?", (sid,)).delete()
         mw.restartWeb()
         return mw.returnJson(True, '站点删除成功!')
 
