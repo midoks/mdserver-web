@@ -14,6 +14,12 @@ install_tmp=${rootPath}/tmp/mw_install.pl
 VERSION=$2
 sys_os=`uname`
 
+cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
+HTTP_PREFIX="https://"
+if [ ! -z "$cn" ];then
+    HTTP_PREFIX="https://ghproxy.com/"
+fi
+
 if [ "$sys_os" == "Darwin" ];then
 	BAK='_bak'
 else
@@ -97,7 +103,7 @@ Install_App()
 	# 缓存数据
 	GEO_VERSION=$(get_latest_release "P3TERX/GeoLite.mmdb")
 	if [ ! -f $serverPath/source/webstats/GeoLite2-City.mmdb ];then
-		wget --no-check-certificate -O $serverPath/source/webstats/GeoLite2-City.mmdb https://github.com/P3TERX/GeoLite.mmdb/releases/download/${GEO_VERSION}/GeoLite2-City.mmdb
+		wget --no-check-certificate -O $serverPath/source/webstats/GeoLite2-City.mmdb ${HTTP_PREFIX}github.com/P3TERX/GeoLite.mmdb/releases/download/${GEO_VERSION}/GeoLite2-City.mmdb
 	fi
 
 	if [ -f $serverPath/source/webstats/GeoLite2-City.mmdb ];then
