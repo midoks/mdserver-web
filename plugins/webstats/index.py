@@ -406,7 +406,7 @@ def setSiteConf():
     for v in ['cdn_headers', 'exclude_extension', 'exclude_status', 'exclude_ip']:
         data = checkArgs(args, [v])
         if data[0]:
-            site_conf[v] = args[v].split("\\n")
+            site_conf[v] = args[v].strip().split("\\n")
 
     data = checkArgs(args, ['exclude_url'])
     if data[0]:
