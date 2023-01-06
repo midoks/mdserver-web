@@ -204,7 +204,7 @@ function _M.get_http_origin(self)
     if not headers then return data end
     if method ~='GET' then 
         -- API disabled in the context of log_by_lua*
-        ngx.req.read_body()
+        -- ngx.req.read_body()
         data = ngx.req.get_body_data()
         if not data then
             data = ngx.req.get_post_args(1000000)
