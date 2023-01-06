@@ -266,6 +266,11 @@ def initDreplace():
     return 'ok'
 
 
+def luaRestart():
+    mw.opWeb("stop")
+    mw.opWeb("start")
+
+
 def start():
     initDreplace()
 
@@ -276,7 +281,7 @@ def start():
         mw.execShell("chown -R www:www " + getServerDir())
 
     # issues:326
-    mw.opWeb("restart")
+    luaRestart()
     return 'ok'
 
 
@@ -288,14 +293,14 @@ def stop():
     import tool_task
     tool_task.removeBgTask()
 
-    mw.opWeb("restart")
+    luaRestart()
     return 'ok'
 
 
 def restart():
     initDreplace()
 
-    mw.opWeb("restart")
+    luaRestart()
     return 'ok'
 
 
@@ -311,7 +316,7 @@ def reload():
 
     loadDebugLogFile()
 
-    mw.opWeb("restart")
+    luaRestart()
     return 'ok'
 
 
@@ -389,7 +394,7 @@ def setGlobalConf():
     mw.writeFile(conf, json.dumps(content))
     conf_lua = getServerDir() + "/lua/webstats_config.lua"
     listToLuaFile(conf_lua, content)
-    mw.opWeb('restart')
+    luaRestart()
     return mw.returnJson(True, '设置成功')
 
 
@@ -482,7 +487,7 @@ def setSiteConf():
     mw.writeFile(conf, json.dumps(content))
     conf_lua = getServerDir() + "/lua/webstats_config.lua"
     listToLuaFile(conf_lua, content)
-    mw.opWeb('restart')
+    luaRestart()
     return mw.returnJson(True, '设置成功')
 
 
