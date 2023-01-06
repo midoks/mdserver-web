@@ -253,6 +253,7 @@ def start():
     if not mw.isAppleSystem():
         mw.execShell("chown -R www:www " + getServerDir())
 
+    # issues:326
     mw.opWeb("restart")
     return 'ok'
 
