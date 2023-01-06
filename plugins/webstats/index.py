@@ -222,6 +222,15 @@ def initDreplace():
         content = content.replace('{$ROOT_PATH}', mw.getServerDir())
         mw.writeFile(path, content)
 
+    # 已经安装的
+    al_config = getServerDir() + "/lua/config.json"
+    if os.path.exists(al_config):
+        tmp = json.loads(mw.readFile(al_config))
+        if tmp['global']['record_post_args'] or tmp['global']['record_get_403_args']:
+            openLuaNeedRequestBody()
+        else:
+            closeLuaNeedRequestBody()
+
     lua_dir = getServerDir() + "/lua"
     if not os.path.exists(lua_dir):
         mw.execShell('mkdir -p ' + lua_dir)
