@@ -427,7 +427,7 @@ def setSiteConf():
     mw.writeFile(conf, json.dumps(content))
     conf_lua = getServerDir() + "/lua/webstats_config.lua"
     listToLuaFile(conf_lua, content)
-    mw.restartWeb()
+    mw.opWeb('restart')
     return mw.returnJson(True, '设置成功')
 
 
