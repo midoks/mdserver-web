@@ -283,7 +283,7 @@ def stop():
 def restart():
     initDreplace()
 
-    mw.opWeb("reload")
+    mw.opWeb("restart")
     return 'ok'
 
 
