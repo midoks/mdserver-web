@@ -90,6 +90,17 @@ def loadLuaFile(name):
         mw.writeFile(lua_dst, content)
 
 
+def loadLuaFileReload(name):
+    lua_dir = getServerDir() + "/lua"
+    lua_dst = lua_dir + "/" + name
+
+    lua_tpl = getPluginDir() + '/lua/' + name
+    content = mw.readFile(lua_tpl)
+    content = content.replace('{$SERVER_APP}', getServerDir())
+    content = content.replace('{$ROOT_PATH}', mw.getServerDir())
+    mw.writeFile(lua_dst, content)
+
+
 def loadConfigFile():
     lua_dir = getServerDir() + "/lua"
     conf_tpl = getPluginDir() + "/conf/config.json"
@@ -290,6 +301,14 @@ def restart():
 
 def reload():
     initDreplace()
+
+    file_list = [
+        'webstats_common.lua',
+        'webstats_log.lua',
+    ]
+    for fl in file_list:
+        loadLuaFileReload(fl)
+
     loadDebugLogFile()
 
     mw.opWeb("restart")
