@@ -82,11 +82,12 @@ def loadLuaFile(name):
     lua_dir = getServerDir() + "/lua"
     lua_dst = lua_dir + "/" + name
 
-    lua_tpl = getPluginDir() + '/lua/' + name
-    content = mw.readFile(lua_tpl)
-    content = content.replace('{$SERVER_APP}', getServerDir())
-    content = content.replace('{$ROOT_PATH}', mw.getServerDir())
-    mw.writeFile(lua_dst, content)
+    if not os.path.exists(lua_dst):
+        lua_tpl = getPluginDir() + '/lua/' + name
+        content = mw.readFile(lua_tpl)
+        content = content.replace('{$SERVER_APP}', getServerDir())
+        content = content.replace('{$ROOT_PATH}', mw.getServerDir())
+        mw.writeFile(lua_dst, content)
 
 
 def loadConfigFile():
