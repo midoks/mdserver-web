@@ -5,6 +5,7 @@ import io
 import os
 import time
 import json
+import re
 
 sys.path.append(os.getcwd() + "/class/core")
 import mw
@@ -292,6 +293,22 @@ def getGlobalConf():
     return mw.returnJson(True, 'ok', content)
 
 
+def openLuaNeedRequestBody():
+    conf = luaConf()
+    content = mw.readFile(conf)
+    content = re.sub("lua_need_request_body (.*);",
+                     'lua_need_request_body on;', content)
+    mw.writeFile(conf, content)
+
+
+def closeLuaNeedRequestBody():
+    conf = luaConf()
+    content = mw.readFile(conf)
+    content = re.sub("lua_need_request_body (.*);",
+                     'lua_need_request_body off;', content)
+    mw.writeFile(conf, content)
+
+
 def setGlobalConf():
     args = getArgs()
 
@@ -299,13 +316,22 @@ def setGlobalConf():
     content = mw.readFile(conf)
     content = json.loads(content)
 
+    open_force_get_request_body = False
     for v in ['record_post_args', 'record_get_403_args']:
         data = checkArgs(args, [v])
         if data[0]:
             rval = False
             if args[v] == "true":
                 rval = True
+                open_force_get_request_body = True
+
             content['global'][v] = rval
+
+    # 开启强制获取日志配置
+    if open_force_get_request_body:
+        openLuaNeedRequestBody()
+    else:
+        closeLuaNeedRequestBody()
 
     for v in ['ip_top_num', 'uri_top_num', 'save_day']:
         data = checkArgs(args, [v])
