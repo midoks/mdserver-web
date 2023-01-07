@@ -1054,24 +1054,41 @@ def removeSiteCdnHeader():
 
 def outputData():
     args = getArgs()
-    data = checkArgs(args, ['s_Name'])
+    data = checkArgs(args, ['sname'])
     if not data[0]:
         return data[1]
 
-    path = getRuleJsonPath(args['s_Name'])
+    path = getRuleJsonPath(args['sname'])
     content = mw.readFile(path)
     return mw.returnJson(True, 'ok', content)
 
 
 def importData():
     args = getArgs()
-    data = checkArgs(args, ['s_Name', 'pdata'])
+    data = checkArgs(args, ['sname', 'pdata'])
     if not data[0]:
         return data[1]
 
-    path = getRuleJsonPath(args['s_Name'])
-    mw.writeFile(path, args['pdata'])
-    restartWeb()
+    path = getRuleJsonPath(args['sname'])
+
+    source_data = mw.readFile(path)
+    source_data = json.loads(source_data)
+
+    save_data = []
+    save_data.append(source_data[0])
+    pdata = args['pdata'].strip()
+    try:
+        pdata = json.loads(pdata)
+        mw.writeFile(path, json.dumps(pdata))
+    except Exception as e:
+        pdata = pdata.split("\\n")
+        for x in pdata:
+            pval = x.strip()
+            if pval != "":
+                vv = json.loads(pval)
+                save_data.append(vv[0])
+        mw.writeFile(path, json.dumps(save_data))
+    # restartWeb()
     return mw.returnJson(True, '设置成功!')
 
 

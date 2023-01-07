@@ -568,14 +568,14 @@ function outputLayer(rdata, name, type) {
             '<div class="ml0" style="position:relative;" id="focus_tips">' +
             '<textarea class="bt-input-text mr20 config" name="config" style="width: 300px; height: 250px; line-height: 22px; display: none;" id="lead_data">' + (rdata != '' ? JSON.stringify(rdata) : '') + '</textarea>' +
             '<div class="placeholder c9" style="top: 15px; left: 15px; display:' + (rdata == "" ? "block;" : "none;") + '">导入格式如下：' +
-            (name == 'ip_white' || name == 'ip_black' ? "[[[127, 0, 0, 1],[127, 0, 0, 255]]]" : "[\"^/test\",\"^/web\"]") +
+            (name == 'ip_white' || name == 'ip_black' ? "[[[127, 0, 0, 1],[127, 0, 0, 255]],[[192, 0, 0, 1],[192, 0, 0, 255]]]" : "[\"^/test\",\"^/web\"]") +
             '</div>' +
             '</div>' +
             '</div>' +
             '<div class="line "><div class="ml0">' +
             (type ? '<button name="btn_save_to" class="btn btn-success btn-sm mr5 btn_save_to" >导出配置</button>' : '<button name="btn_save" class="btn btn-success btn-sm mr5 btn_save">保存</button>') +
             '</div></div>' +
-            '</div>'
+            '</div>',
     });
     var lead_error = CodeMirror.fromTextArea(document.getElementById("lead_data"), {
         mode: 'html',
@@ -585,7 +585,10 @@ function outputLayer(rdata, name, type) {
     });
     setTimeout(function () {
         $('.btn_save').on('click', function () {
-            importData(name, lead_error.getValue());
+            importData(name, lead_error.getValue(), function(){
+                layer.close(window.Load_layer);
+                ipWhiteLoadList();
+            });
         })
         $('.btn_save_to').on('click', function () {
             funDownload(lead_error.getValue(), name + '.json');
@@ -601,7 +604,7 @@ function outputLayer(rdata, name, type) {
 function outputData(name, callback) {
     var loadT = layer.msg('正在导出数据..', { icon: 16, time: 0 });
 
-    owPost('output_data', { s_Name: name } , function(data){
+    owPost('output_data', { sname: name } , function(data){
         var tmp = $.parseJSON(data.data);
         var rdata = $.parseJSON(tmp.data);
         if (callback) callback(rdata,res);
@@ -611,7 +614,7 @@ function outputData(name, callback) {
 
 //导入数据
 function importData(name, pdata, callback) {
-    owPost('import_data', { s_Name: name, pdata: pdata } , function(data){
+    owPost('import_data', { sname: name, pdata: pdata } , function(data){
         var rdata = $.parseJSON(data.data);   
         if (callback) callback();
         layer.msg(rdata.msg, { icon: rdata.status ? 1 : 2 });
@@ -622,6 +625,22 @@ function fileInput(name) {
     outputLayer('', name, false);
 }
 
+
+function ipWhiteLoadList(){
+    getRuleByName('ip_white', function(data){
+        var tmp = $.parseJSON(data.data);
+        var rdata = $.parseJSON(tmp.data);
+        var tbody = ''
+        for (var i = 0; i < rdata.length; i++) {
+            tbody += '<tr>\
+                    <td>'+ rdata[i][0].join('.') + '</td>\
+                    <td>'+ rdata[i][1].join('.') + '</td>\
+                    <td class="text-right"><a class="btlink" onclick="removeIpWhite('+ i + ')">删除</a></td>\
+                </tr>'
+        }
+        $("#ip_white_con").html(tbody);
+    });
+}
 //IP白名单
 function ipWhite(type) {
     if (type == undefined) {
@@ -675,20 +694,7 @@ function ipWhite(type) {
         });
         tableFixed("ipWhite");
     }
-
-    getRuleByName('ip_white', function(data){
-        var tmp = $.parseJSON(data.data);
-        var rdata = $.parseJSON(tmp.data);
-        var tbody = ''
-        for (var i = 0; i < rdata.length; i++) {
-            tbody += '<tr>\
-                    <td>'+ rdata[i][0].join('.') + '</td>\
-                    <td>'+ rdata[i][1].join('.') + '</td>\
-                    <td class="text-right"><a class="btlink" onclick="removeIpWhite('+ i + ')">删除</a></td>\
-                </tr>'
-        }
-        $("#ip_white_con").html(tbody);
-    });
+    ipWhiteLoadList();
 }
 
 //IP白名单
