@@ -131,9 +131,16 @@ def confReplace():
     content = content.replace('{$OS_USER}', user)
     content = content.replace('{$OS_USER_GROUP}', user_group)
 
+    # ng_conf_md5 = ''
+    # ng_conf_md5_file = getServerDir() + '/nginx_conf.md5'
+    # if not os.path.exists(ng_conf_md5_file):
+    #     ng_conf_md5 = mw.md5(content)
+    #     mw.writeFile(ng_conf_md5_file, ng_conf_md5)
+    # else:
+    #     ng_conf_md5 = mw.writeFile(ng_conf_md5_file).strip()
+
     # 主配置文件
     nconf = getServerDir() + '/nginx/conf/nginx.conf'
-    # if not os.path.exists(nconf):
     mw.writeFile(nconf, content)
 
     # lua配置
