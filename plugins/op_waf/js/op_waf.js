@@ -1712,9 +1712,12 @@ function wafLogs(){
                             <button data-name="l7" type="button" class="btn btn-default">近7天</button>\
                             <button data-name="l30" type="button" class="btn btn-default">近30天</button>\
                         </div>\
-                        <span class="last-span"><input data-name="" type="text" id="time_choose" lay-key="1000001_'+randstr+'" class="form-control btn-group-sm" autocomplete="off" placeholder="自定义时间" style="display: inline-block;font-size: 12px;padding: 0 10px;height:30px;width: 200px;"></span>\
+                        <span class="last-span"><input data-name="" type="text" id="time_choose" lay-key="1000001_'+randstr+'" class="form-control btn-group-sm" autocomplete="off" placeholder="自定义时间" style="display: inline-block;font-size: 12px;padding: 0 10px;height:30px;width: 155px;"></span>\
                     </div>\
-                    <div style="float:right;"><button id="UncoverAll" class="btn btn-success btn-sm">解封所有</button></div>\
+                    <div style="float:right;">\
+                        <button id="UncoverAll" class="btn btn-success btn-sm" style="padding-left: 5px;padding-right: 5px;">解封所有</button>\
+                        <button id="testRun" class="btn btn-default btn-sm" style="padding-left: 5px;padding-right: 5px;">测试</button>\
+                    </div>\
                 </div>\
                 <div class="divtable mtb10" id="ws_table"></div>\
             </div>';
@@ -1733,6 +1736,15 @@ function wafLogs(){
         });
     });
 
+    //测试demo
+    $("#testRun").click(function(){
+        owPost('test_run',{},function(data){
+            var rdata = $.parseJSON(data.data);
+            showMsg(rdata.msg, function(){
+                wafLogRequest(1);
+            },{icon:1,shade: [0.3, '#000']},2000);
+        });
+    });
 
     //日期范围
     laydate.render({
