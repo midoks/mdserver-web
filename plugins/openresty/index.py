@@ -133,8 +133,8 @@ def confReplace():
 
     # 主配置文件
     nconf = getServerDir() + '/nginx/conf/nginx.conf'
-    if not os.path.exists(nconf):
-        mw.writeFile(nconf, content)
+    # if not os.path.exists(nconf):
+    mw.writeFile(nconf, content)
 
     # lua配置
     lua_conf_dir = mw.getServerDir() + '/web_conf/nginx/lua'
