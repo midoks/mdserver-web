@@ -5,6 +5,7 @@ import io
 import os
 import time
 import json
+import re
 
 sys.path.append(os.getcwd() + "/class/core")
 import mw
@@ -78,6 +79,18 @@ def status():
 
 
 def loadLuaFile(name):
+    lua_dir = getServerDir() + "/lua"
+    lua_dst = lua_dir + "/" + name
+
+    if not os.path.exists(lua_dst):
+        lua_tpl = getPluginDir() + '/lua/' + name
+        content = mw.readFile(lua_tpl)
+        content = content.replace('{$SERVER_APP}', getServerDir())
+        content = content.replace('{$ROOT_PATH}', mw.getServerDir())
+        mw.writeFile(lua_dst, content)
+
+
+def loadLuaFileReload(name):
     lua_dir = getServerDir() + "/lua"
     lua_dst = lua_dir + "/" + name
 
@@ -221,6 +234,15 @@ def initDreplace():
         content = content.replace('{$ROOT_PATH}', mw.getServerDir())
         mw.writeFile(path, content)
 
+    # 已经安装的
+    al_config = getServerDir() + "/lua/config.json"
+    if os.path.exists(al_config):
+        tmp = json.loads(mw.readFile(al_config))
+        if tmp['global']['record_post_args'] or tmp['global']['record_get_403_args']:
+            openLuaNeedRequestBody()
+        else:
+            closeLuaNeedRequestBody()
+
     lua_dir = getServerDir() + "/lua"
     if not os.path.exists(lua_dir):
         mw.execShell('mkdir -p ' + lua_dir)
@@ -244,6 +266,11 @@ def initDreplace():
     return 'ok'
 
 
+def luaRestart():
+    mw.opWeb("stop")
+    mw.opWeb("start")
+
+
 def start():
     initDreplace()
 
@@ -254,7 +281,7 @@ def start():
         mw.execShell("chown -R www:www " + getServerDir())
 
     # issues:326
-    mw.opWeb("restart")
+    luaRestart()
     return 'ok'
 
 
@@ -266,22 +293,30 @@ def stop():
     import tool_task
     tool_task.removeBgTask()
 
-    mw.opWeb("restart")
+    luaRestart()
     return 'ok'
 
 
 def restart():
     initDreplace()
 
-    mw.opWeb("reload")
+    luaRestart()
     return 'ok'
 
 
 def reload():
     initDreplace()
+
+    file_list = [
+        'webstats_common.lua',
+        'webstats_log.lua',
+    ]
+    for fl in file_list:
+        loadLuaFileReload(fl)
+
     loadDebugLogFile()
 
-    mw.opWeb("restart")
+    luaRestart()
     return 'ok'
 
 
@@ -292,6 +327,22 @@ def getGlobalConf():
     return mw.returnJson(True, 'ok', content)
 
 
+def openLuaNeedRequestBody():
+    conf = luaConf()
+    content = mw.readFile(conf)
+    content = re.sub("lua_need_request_body (.*);",
+                     'lua_need_request_body on;', content)
+    mw.writeFile(conf, content)
+
+
+def closeLuaNeedRequestBody():
+    conf = luaConf()
+    content = mw.readFile(conf)
+    content = re.sub("lua_need_request_body (.*);",
+                     'lua_need_request_body off;', content)
+    mw.writeFile(conf, content)
+
+
 def setGlobalConf():
     args = getArgs()
 
@@ -299,13 +350,22 @@ def setGlobalConf():
     content = mw.readFile(conf)
     content = json.loads(content)
 
+    open_force_get_request_body = False
     for v in ['record_post_args', 'record_get_403_args']:
         data = checkArgs(args, [v])
         if data[0]:
             rval = False
             if args[v] == "true":
                 rval = True
+                open_force_get_request_body = True
+
             content['global'][v] = rval
+
+    # 开启强制获取日志配置
+    if open_force_get_request_body:
+        openLuaNeedRequestBody()
+    else:
+        closeLuaNeedRequestBody()
 
     for v in ['ip_top_num', 'uri_top_num', 'save_day']:
         data = checkArgs(args, [v])
@@ -334,7 +394,7 @@ def setGlobalConf():
     mw.writeFile(conf, json.dumps(content))
     conf_lua = getServerDir() + "/lua/webstats_config.lua"
     listToLuaFile(conf_lua, content)
-    mw.restartWeb()
+    luaRestart()
     return mw.returnJson(True, '设置成功')
 
 
@@ -406,7 +466,7 @@ def setSiteConf():
     for v in ['cdn_headers', 'exclude_extension', 'exclude_status', 'exclude_ip']:
         data = checkArgs(args, [v])
         if data[0]:
-            site_conf[v] = args[v].split("\\n")
+            site_conf[v] = args[v].strip().split("\\n")
 
     data = checkArgs(args, ['exclude_url'])
     if data[0]:
@@ -427,7 +487,7 @@ def setSiteConf():
     mw.writeFile(conf, json.dumps(content))
     conf_lua = getServerDir() + "/lua/webstats_config.lua"
     listToLuaFile(conf_lua, content)
-    mw.restartWeb()
+    luaRestart()
     return mw.returnJson(True, '设置成功')
 
 

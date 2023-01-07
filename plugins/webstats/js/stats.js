@@ -853,16 +853,14 @@ function wsSitesListRequest(page){
                         });
                     },
                     yes:function(){
-                        var select = $('#webstats .tab-nav span');
                         var select_pos = 0;
-                        $('#webstats .tab-nav span').each(function(i){
+                        $('#site_conf .tab-nav span').each(function(i){
                             if ($(this).hasClass('on')){select_pos = i;}
                         });
                         var args = {"site":domain};
                         if ( [0,1,2,4].indexOf(select_pos)>-1 ){
                             var setting_cdn = $('textarea[name="setting-cdn"]').val();
                             // var list = setting_cdn.split('\n')
-
                             if ( select_pos == 0 ){
                                 args['cdn_headers'] = setting_cdn;
                             } else if ( select_pos == 1 ){

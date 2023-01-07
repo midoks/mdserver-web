@@ -104,14 +104,14 @@ rm -r /var/lib/mongodb
 Install_Linux_Debian()
 {
 ##################### debian start #####################
-if [ "$SYS_VERSION_ID" -ge "11" ]; then
+if [ "$SYS_VERSION_ID" -eq "11" ] && [ "$VERSION" -eq "4.4" ]; then
 	echo "Not yet supported"
 	exit 1
 fi
 
 
 if [ -f /usr/lib/systemd/system/mongod.service ];then
-	echo 'alreay exist!'
+	echo 'alreay install exist!'
 	exit 0
 fi
 

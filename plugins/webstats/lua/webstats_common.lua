@@ -205,16 +205,24 @@ function _M.get_http_origin(self)
     if method ~='GET' then 
         -- API disabled in the context of log_by_lua*
         -- ngx.req.read_body()
-        data = ngx.req.get_body_data()
+
+        -- proxy_pass, fastcgi_pass, uwsgi_pass, and scgi_pass
+        data = ngx.var.request_body
+        if not data then
+            data = ngx.req.get_body_data()
+        end
+
         if not data then
             data = ngx.req.get_post_args(1000000)
         end
+
         if "string" == type(data) then
             headers["payload"] = data
         end
 
         if "table" == type(data) then
-            headers = table.concat(headers, data)
+            -- headers = table.concat(headers, data)
+            headers["payload"] = table.concat(data, "&")
         end
     end
     return json.encode(headers)

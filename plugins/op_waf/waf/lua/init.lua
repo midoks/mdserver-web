@@ -1,3 +1,14 @@
+local waf_root = "{$WAF_ROOT}"
+local waf_cpath = waf_root.."/waf/lua/?.lua;"..waf_root.."/waf/conf/?.lua;"..waf_root.."/waf/html/?.lua;"
+local waf_sopath = waf_root.."/waf/conf/?.so;"
+
+if not package.path:find(waf_cpath) then
+    package.path = waf_cpath  .. package.path
+end
+
+if not package.cpath:find(waf_sopath) then
+    package.cpath = waf_sopath .. package.cpath
+end
 
 local json = require "cjson"
 local ngx_match = ngx.re.find
@@ -11,11 +22,11 @@ local config = require "waf_config"
 local site_config = require "waf_site"
 local config_domains = require "waf_domains"
 
--- C:D("config:"..C:to_json(config))
 
 C:setConfData(config, site_config)
 C:setDebug(true)
 
+-- C:D("config:"..C:to_json(config))
 
 local get_html = require "html_get"
 local post_html = require "html_post"
@@ -521,7 +532,6 @@ end
 
 function waf()
     min_route()
-
     -- white ip
     if waf_ip_white() then return true end
 
@@ -550,9 +560,8 @@ function waf()
 
     -- 扫描软件禁止
     if waf_scan_black() then return true end
-
     if waf_post() then return true end
-    
+
     if site_config[server_name] and site_config[server_name]['open'] then
         if X_Forwarded() then return true end
         if post_X_Forwarded() then return true end

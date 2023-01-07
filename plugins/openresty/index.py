@@ -131,9 +131,33 @@ def confReplace():
     content = content.replace('{$OS_USER}', user)
     content = content.replace('{$OS_USER_GROUP}', user_group)
 
+    # ng_conf_md5 = ''
+    # ng_conf_md5_file = getServerDir() + '/nginx_conf.md5'
+    # if not os.path.exists(ng_conf_md5_file):
+    #     ng_conf_md5 = mw.md5(content)
+    #     mw.writeFile(ng_conf_md5_file, ng_conf_md5)
+    # else:
+    #     ng_conf_md5 = mw.writeFile(ng_conf_md5_file).strip()
+
     # 主配置文件
     nconf = getServerDir() + '/nginx/conf/nginx.conf'
     mw.writeFile(nconf, content)
+
+    # lua配置
+    lua_conf_dir = mw.getServerDir() + '/web_conf/nginx/lua'
+    if not os.path.exists(lua_conf_dir):
+        mw.execShell('mkdir -p ' + lua_conf_dir)
+
+    lua_conf = lua_conf_dir + '/lua.conf'
+    if not os.path.exists(lua_conf):
+        lua_conf_tpl = getPluginDir() + '/conf/lua.conf'
+        lua_content = mw.readFile(lua_conf_tpl)
+        lua_content = lua_content.replace('{$SERVER_PATH}', service_path)
+        mw.writeFile(lua_conf, lua_content)
+
+    empty_lua = lua_conf_dir + '/empty.lua'
+    if not os.path.exists(empty_lua):
+        mw.writeFile(empty_lua, '')
 
     # 静态配置
     php_conf = mw.getServerDir() + '/web_conf/php/conf'

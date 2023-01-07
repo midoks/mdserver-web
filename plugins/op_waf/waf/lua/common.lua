@@ -1,3 +1,14 @@
+local waf_root = "{$WAF_ROOT}"
+local waf_cpath = waf_root.."/waf/lua/?.lua;"..waf_root.."/waf/conf/?.lua;"..waf_root.."/waf/html/?.lua;"
+local waf_sopath = waf_root.."/waf/conf/?.so;"
+
+if not package.path:find(waf_cpath) then
+    package.path = waf_cpath  .. package.path
+end
+
+if not package.cpath:find(waf_sopath) then
+    package.cpath = waf_sopath .. package.cpath
+end
 
 local setmetatable = setmetatable
 local _M = { _VERSION = '0.02' }
@@ -9,7 +20,6 @@ local sqlite3 = require "lsqlite3"
 local ngx_match = ngx.re.find
 local debug_mode = false
 
-local waf_root = "{$WAF_ROOT}"
 local cpath = waf_root.."/waf/"
 local log_dir = waf_root.."/logs/"
 local rpath = cpath.."/rule/"
@@ -62,12 +72,12 @@ end
 
 -- 后台任务
 function _M.cron(self)
-    local timer_every_get_data = function (premature)
-        self.clean_log()
+    local timer_every_get_data = function(premature)
+        self:clean_log()
     end
     ngx.timer.every(10, timer_every_get_data)
 
-    local timer_every_import_data = function (premature)
+    local timer_every_import_data = function(premature)
 
         local llen, _ = ngx.shared.waf_limit:llen('waf_limit_logs')
         if llen == 0 then
