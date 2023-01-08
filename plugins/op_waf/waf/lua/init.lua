@@ -257,7 +257,8 @@ local function waf_drop_ip()
 end
 
 local function waf_cc()
-    if not config['cc']['open'] or not C:is_site_config('cc') then return false end
+    if not config['cc']['open'] then return false end
+    if not C:is_site_config('cc') then return false end
 
     local ip = params['ip']
 
