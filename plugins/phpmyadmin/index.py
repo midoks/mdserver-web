@@ -85,7 +85,7 @@ def getPhpVer(expect=55):
     v = site_api.site_api().getPhpVersion()
     is_find = False
     for i in range(len(v)):
-        t = int(v[i]['version'])
+        t = str(v[i]['version'])
         if (t == expect):
             is_find = True
             return str(t)
