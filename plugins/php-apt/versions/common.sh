@@ -57,5 +57,4 @@ fi
 echo "apt install -y php${version}-${extName}"
 echo "apt remove -y php${version}-${extName}"
 
-
-
+systemctl restart php${version}-fpm

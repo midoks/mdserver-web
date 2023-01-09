@@ -82,11 +82,9 @@ if [ "${action}" == "install" ] && [ -d ${serverPath}/php-yum/${type} ];then
 	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install mbstring
 	echo "install PHP-YUM[${type}] extend end"
 
-	cd ${rootPath} && python3 ${rootPath}/plugins/php-yum/index.py restart ${type}
-
 	if [ ! -f /usr/local/bin/composer ];then
 		cd /tmp
-		curl -sS https://getcomposer.org/installer | php
+		curl -sS https://getcomposer.org/installer | /opt/remi/php${type}/root/usr/bin/php
 		mv composer.phar /usr/local/bin/composer
 	fi
 fi
