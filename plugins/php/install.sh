@@ -82,7 +82,7 @@ if [ "${action}" == "install" ] && [ -d ${serverPath}/php/${type} ];then
 
 	if [ ! -f /usr/local/bin/composer ];then
 		cd /tmp
-		curl -sS https://getcomposer.org/installer | php
+		curl -sS https://getcomposer.org/installer | /www/server/php/${type}/bin/php
 		mv composer.phar /usr/local/bin/composer
 	fi
 fi

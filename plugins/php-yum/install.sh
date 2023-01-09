@@ -68,6 +68,8 @@ if [ "${action}" == "install" ] && [ -d ${serverPath}/php-yum/${type} ];then
 
 	# 安装通用扩展
 	echo "install PHP-YUM[${type}] extend start"
+	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install mysqlnd
+	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install mysql
 	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install gd
 	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install iconv
 	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install exif
@@ -77,11 +79,12 @@ if [ "${action}" == "install" ] && [ -d ${serverPath}/php-yum/${type} ];then
 	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install gettext
 	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install redis
 	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install memcached
+	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install mbstring
 	echo "install PHP-YUM[${type}] extend end"
 
 	if [ ! -f /usr/local/bin/composer ];then
 		cd /tmp
-		curl -sS https://getcomposer.org/installer | php
+		curl -sS https://getcomposer.org/installer | /opt/remi/php${type}/root/usr/bin/php
 		mv composer.phar /usr/local/bin/composer
 	fi
 fi

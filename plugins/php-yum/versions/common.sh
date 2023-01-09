@@ -21,6 +21,7 @@ extName=$3
 FILE=${curPath}/${version}/${extName}.sh
 
 # yum install -y php81-php-yar
+# yum install -y php74-php-pecl-mysql
 
 
 if [ "$action" == 'install' ];then
@@ -30,6 +31,10 @@ if [ "$action" == 'install' ];then
 	else
 		yum install -y php${version}-php*-${extName}
 	fi
+
+	# if [ "${extName}" == "mysql" ];then
+	# 	yum install -y php74-php-pecl-mysql
+	# fi
 fi
 
 
@@ -45,6 +50,8 @@ fi
 
 echo "yum install -y php${version}-php-${extName}"
 echo "yum remove -y php${version}-php-${extName}"
+
+bash ${rootPath}/plugins/php-yum/versions/lib.sh $version restart
 
 
 
