@@ -210,7 +210,7 @@ def publicObject(toObject, func, action=None, get=None):
         return mw.getJson(data)
     except Exception as e:
         # API发生错误记录
-        print(traceback.print_exc())
+        #  print(traceback.print_exc())
         data = {'msg': '访问异常:' + str(e) + '!', "status": False}
         return mw.getJson(data)
 
