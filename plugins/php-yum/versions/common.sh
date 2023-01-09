@@ -51,5 +51,7 @@ fi
 echo "yum install -y php${version}-php-${extName}"
 echo "yum remove -y php${version}-php-${extName}"
 
+bash ${rootPath}/plugins/php-yum/versions/lib.sh $version restart
+
 
 

@@ -11,9 +11,9 @@ serverPath=$(dirname "$rootPath")
 version=$1
 action=$2
 
-if [ -f /lib/systemd/system/php${version}.service ];then
+if [ -f /lib/systemd/system/php${version}-php-fpm.service ];then
 	systemctl ${action} php${version}
-elif [[ -f /usr/lib/systemd/system/php${version}.service ]]; then
+elif [[ -f /usr/lib/systemd/system/php${version}-php-fpm.service ]]; then
 	systemctl ${action} php${version}
 else
 	$serverPath/php/init.d/php${version} ${action}
