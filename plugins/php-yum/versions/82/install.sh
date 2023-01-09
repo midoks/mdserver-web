@@ -28,7 +28,7 @@ fi
 
 Uninstall_php()
 {
-	# $serverPath/php-yum/init.d/php${PHP_VER} stop
+	yum remove -y php82 php82-php-fpm php82-*
 	rm -rf $serverPath/php-yum/${PHP_VER}
 	echo "卸载php-${version}..." > $install_tmp
 }
