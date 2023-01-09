@@ -69,6 +69,7 @@ if [ "${action}" == "install" ] && [ -d ${serverPath}/php-yum/${type} ];then
 	# 安装通用扩展
 	echo "install PHP-YUM[${type}] extend start"
 	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install mysqlnd
+	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install mysql
 	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install gd
 	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install iconv
 	cd ${rootPath}/plugins/php-yum/versions && bash common.sh ${type} install exif
