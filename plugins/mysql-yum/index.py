@@ -501,7 +501,7 @@ def setMyDbPos(version=''):
     start(version)
 
     result = mw.execShell(
-        'ps aux|grep mysqld| grep -v grep|grep -v python')
+        'ps aux|grep "mysql-apt/bin/usr/sbin/mysqld"| grep -v grep|grep -v python')
     if len(result[0]) > 10:
         mw.writeFile('data/datadir.pl', t_datadir)
         return mw.returnJson(True, '存储目录迁移成功!')
