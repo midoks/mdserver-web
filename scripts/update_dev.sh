@@ -64,7 +64,7 @@ fi
 # wget -O /tmp/dev.zip https://github.com/midoks/mdserver-web/archive/refs/heads/dev.zip
 cd /tmp && unzip /tmp/dev.zip
 
-echo "update panel code start"
+echo "update mdserver-web code start"
 if [ -f /usr/bin/cp ];then
 	/usr/bin/cp -rf /tmp/mdserver-web-dev/* /www/server/mdserver-web
 elif [ -f /bin/cp ];then
@@ -72,7 +72,7 @@ elif [ -f /bin/cp ];then
 else
 	/usr/bin/cp -rf /tmp/mdserver-web-dev/* /www/server/mdserver-web
 fi
-echo "update panel code end"
+echo "update mdserver-web code end"
 
 rm -rf /tmp/dev.zip
 rm -rf /tmp/mdserver-web-dev
