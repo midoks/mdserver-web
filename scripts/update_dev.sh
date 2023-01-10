@@ -64,10 +64,6 @@ fi
 # wget -O /tmp/dev.zip https://github.com/midoks/mdserver-web/archive/refs/heads/dev.zip
 cd /tmp && unzip /tmp/dev.zip
 
-CP_CMD=/usr/bin/cp
-if [ -f /bin/cp ];then
-		CP_CMD=/bin/cp
-fi
 echo "update panel code start"
 if [ -f /usr/bin/cp ];then
 	/usr/bin/cp -rf /tmp/mdserver-web-dev/* /www/server/mdserver-web
@@ -76,7 +72,6 @@ elif [ -f /bin/cp ];then
 else
 	/usr/bin/cp -rf /tmp/mdserver-web-dev/* /www/server/mdserver-web
 fi
-
 echo "update panel code end"
 
 rm -rf /tmp/dev.zip
