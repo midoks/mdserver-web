@@ -74,11 +74,6 @@ $CP_CMD -rf /tmp/mdserver-web-dev/* /www/server/mdserver-web
 rm -rf /tmp/master.zip
 rm -rf /tmp/mdserver-web-master
 
-
-if [ -f /etc/rc.d/init.d/mw ];then
-    sh /etc/rc.d/init.d/mw stop && rm -rf /www/server/mdserver-web/scripts/init.d/mw && rm -rf /etc/rc.d/init.d/mw
-fi
-
 #pip uninstall public
 echo "use system version: ${OSNAME}"
 cd /www/server/mdserver-web && bash scripts/update/${OSNAME}.sh

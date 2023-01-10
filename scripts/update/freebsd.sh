@@ -8,6 +8,9 @@ cd /www/server/mdserver-web/scripts && bash lib.sh
 chmod 755 /www/server/mdserver-web/data
 
 
+if [ -f /etc/rc.d/init.d/mw ];then
+    bash /etc/rc.d/init.d/mw stop && rm -rf /www/server/mdserver-web/scripts/init.d/mw && rm -rf /etc/rc.d/init.d/mw
+fi
 
 echo -e "start mw"
 cd /www/server/mdserver-web && bash cli.sh start

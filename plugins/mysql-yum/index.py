@@ -397,6 +397,7 @@ def my8cmd(version, method):
     initDreplace(version)
     # mysql 8.0  and 5.7
     try:
+        isInited = True
         if version == '5.7':
             isInited = initMysql57Data()
         elif version == '8.0':
@@ -469,7 +470,7 @@ def getMyDbPos():
     return tmp.groups()[0].strip()
 
 
-def setMyDbPos():
+def setMyDbPos(version=''):
     args = getArgs()
     data = checkArgs(args, ['datadir'])
     if not data[0]:
@@ -484,7 +485,7 @@ def setMyDbPos():
         mw.execShell('mkdir -p ' + t_datadir)
 
     # mw.execShell('/etc/init.d/mysqld stop')
-    stop()
+    stop(version)
     mw.execShell('cp -rf ' + s_datadir + '/* ' + t_datadir + '/')
     mw.execShell('chown -R mysql mysql ' + t_datadir)
     mw.execShell('chmod -R 755 ' + t_datadir)
@@ -498,17 +499,17 @@ def setMyDbPos():
 
     mycnf = mycnf.replace(s_datadir, t_datadir)
     mw.writeFile(myfile, mycnf)
-    start()
+    restart(version)
 
     result = mw.execShell(
-        'ps aux|grep mysqld| grep -v grep|grep -v python')
+        'ps aux|grep "mysql-apt/bin/usr/sbin/mysqld"| grep -v grep|grep -v python')
     if len(result[0]) > 10:
         mw.writeFile('data/datadir.pl', t_datadir)
         return mw.returnJson(True, '存储目录迁移成功!')
     else:
         mw.execShell('pkill -9 mysqld')
         mw.writeFile(myfile, mw.readFile(path + '/etc/my_backup.cnf'))
-        start()
+        start(version)
         return mw.returnJson(False, '文件迁移失败!')
 
 
@@ -2687,7 +2688,7 @@ if __name__ == "__main__":
     elif func == 'my_db_pos':
         print(getMyDbPos())
     elif func == 'set_db_pos':
-        print(setMyDbPos())
+        print(setMyDbPos(version))
     elif func == 'my_port':
         print(getMyPort())
     elif func == 'set_my_port':

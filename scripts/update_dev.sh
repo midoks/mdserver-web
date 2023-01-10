@@ -64,19 +64,18 @@ fi
 # wget -O /tmp/dev.zip https://github.com/midoks/mdserver-web/archive/refs/heads/dev.zip
 cd /tmp && unzip /tmp/dev.zip
 
-CP_CMD=/usr/bin/cp
-if [ -f /bin/cp ];then
-		CP_CMD=/bin/cp
+echo "update mdserver-web code start"
+if [ -f /usr/bin/cp ];then
+	/usr/bin/cp -rf /tmp/mdserver-web-dev/* /www/server/mdserver-web
+elif [ -f /bin/cp ];then
+	/bin/cp -rf /tmp/mdserver-web-dev/* /www/server/mdserver-web
+else
+	/usr/bin/cp -rf /tmp/mdserver-web-dev/* /www/server/mdserver-web
 fi
-$CP_CMD -rf /tmp/mdserver-web-dev/* /www/server/mdserver-web
-
+echo "update mdserver-web code end"
 
 rm -rf /tmp/dev.zip
 rm -rf /tmp/mdserver-web-dev
-
-if [ -f /etc/rc.d/init.d/mw ];then
-    sh /etc/rc.d/init.d/mw stop && rm -rf /www/server/mdserver-web/scripts/init.d/mw && rm -rf /etc/rc.d/init.d/mw
-fi
 
 #pip uninstall public
 echo "use system version: ${OSNAME}"
