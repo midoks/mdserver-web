@@ -488,7 +488,7 @@ def setMyDbPos(version=''):
     mw.execShell('cp -rf ' + s_datadir + '/* ' + t_datadir + '/')
     mw.execShell('chown -R mysql mysql ' + t_datadir)
     mw.execShell('chmod -R 755 ' + t_datadir)
-    mw.execShell('rm -f ' + t_datadir + '/*.pid')
+    # mw.execShell('rm -f ' + t_datadir + '/*.pid')
     mw.execShell('rm -f ' + t_datadir + '/*.err')
 
     path = getServerDir()
