@@ -397,6 +397,7 @@ def my8cmd(version, method):
     initDreplace(version)
     # mysql 8.0  and 5.7
     try:
+        isInited = True
         if version == '5.7':
             isInited = initMysql57Data()
         elif version == '8.0':
