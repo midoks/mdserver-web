@@ -498,7 +498,7 @@ def setMyDbPos(version=''):
 
     mycnf = mycnf.replace(s_datadir, t_datadir)
     mw.writeFile(myfile, mycnf)
-    start(version)
+    restart(version)
 
     result = mw.execShell(
         'ps aux|grep "mysql-apt/bin/usr/sbin/mysqld"| grep -v grep|grep -v python')
