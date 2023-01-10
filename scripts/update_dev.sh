@@ -68,8 +68,9 @@ CP_CMD=/usr/bin/cp
 if [ -f /bin/cp ];then
 		CP_CMD=/bin/cp
 fi
+echo "update panel code start"
 $CP_CMD -rf /tmp/mdserver-web-dev/* /www/server/mdserver-web
-
+echo "update panel code end"
 
 rm -rf /tmp/dev.zip
 rm -rf /tmp/mdserver-web-dev
