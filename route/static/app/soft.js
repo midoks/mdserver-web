@@ -5,6 +5,12 @@ function resetPluginWinWidth(width){
     $("div[id^='layui-layer'][class*='layui-layer-page']").width(width);
 }
 
+//重置插件弹出框宽度
+function resetPluginWinHeight(height){
+    $("div[id^='layui-layer'][class*='layui-layer-page']").height(height);
+    $(".bt-form .bt-w-main").height(height-42);
+}
+
 //软件管理窗口
 function softMain(name, title, version) {
 
