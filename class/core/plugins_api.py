@@ -618,6 +618,7 @@ class plugins_api:
             "ps": info['ps'],
             "dependnet": "",
             "mutex": "",
+            "icon": "",
             "path": path,
             "install_checks": checks,
             "uninsatll_checks": checks,
@@ -631,6 +632,9 @@ class plugins_api:
             "install_pre_inspection": False,
             "uninstall_pre_inspection": False,
         }
+
+        if 'icon' in info:
+            pInfo['icon'] = info['icon']
 
         if checks.find('VERSION') > -1:
             pInfo['install_checks'] = checks.replace(

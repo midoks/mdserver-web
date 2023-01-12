@@ -137,11 +137,14 @@ function getSList(isdisplay) {
                 plugin_title = plugin.title + ' ' + plugin.setup_version;
             }
 
+            icon_link = "/plugins/file?name="+plugin.name+"&f=ico.png";
+            if (plugin.icon != ''){
+                icon_link = "/plugins/file?name="+plugin.name+"&f="+plugin.icon;
+            }
 
             sBody += '<tr>' +
-                '<td><span ' + titleClick + 
-                '><img data-src="/plugins/file?name='+plugin.name+
-                '&f=ico.png" src="/static/img/loading.gif">' + plugin_title + '</span></td>' +
+                '<td><span ' + titleClick + '>'+
+                '<img data-src="'+icon_link+'" src="/static/img/loading.gif">' + plugin_title + '</span></td>' +
                 '<td>' + plugin.ps + '</td>' +
                 '<td>' + softPath + '</td>' +
                 '<td>' + state + '</td>' +
@@ -151,6 +154,8 @@ function getSList(isdisplay) {
         }
 
         sBody += pBody;
+
+
         $("#softList").html(sBody);
         $(".menu-sub span").click(function() {
             setCookie('soft_type', $(this).attr('typeid'));
