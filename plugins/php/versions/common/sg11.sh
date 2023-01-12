@@ -80,7 +80,12 @@ Install_lib()
 		fi
 		cd $php_lib/sg11
 		# echo "mv $php_lib/sg11/${DEFAULT_OSNAME}/ixed.${SG_VER}.lin $extFile"
-		cp -rf $php_lib/sg11/${DEFAULT_OSNAME}/ixed.${SG_VER}.${SUFFIX_NAME} $extFile
+		if [ -f $php_lib/sg11/${DEFAULT_OSNAME}/ixed.${SG_VER}.${SUFFIX_NAME} ];then
+			cp -rf $php_lib/sg11/${DEFAULT_OSNAME}/ixed.${SG_VER}.${SUFFIX_NAME} $extFile
+		else
+			echo 'Not supported temporarily'
+			exit
+		fi
 
 		if [ "$OSNAME" == 'macos' ];then
 			xattr -c * $extFile
