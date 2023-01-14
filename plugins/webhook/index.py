@@ -122,7 +122,7 @@ def getLog():
 
     logPath = args['path']
 
-    content = mw.getLastLine(logPath, 100)
+    content = mw.getLastLine(logPath, 16)
     return mw.returnJson(True, 'ok', content)
 
 
@@ -132,11 +132,16 @@ def runShellArgs(args):
         if data[i]['access_key'] == args['access_key']:
             script_dir = getServerDir() + "/scripts"
             shellFile = script_dir + '/' + args['access_key']
-            param = ''
-            if hasattr(args, 'param'):
-                param = args['param']
-            os.system("bash {} \"{}\" >> {}.log &".format(
-                shellFile, param.replace('"', r'\"'), shellFile))
+            param = args['params']
+            if param == '':
+                param = 'no-parameters'
+
+            param = re.sub("\"", '', param)
+
+            cmd = "bash {} {} >> {}.log 2>&1 &".format(
+                shellFile, param, shellFile)
+            # print(cmd)
+            os.system(cmd)
             data[i]['count'] += 1
             data[i]['uptime'] = int(time.time())
             mw.writeFile(getCfgFilePath(), json.dumps(data))
@@ -150,6 +155,7 @@ def runShell():
     if not check_arg[0]:
         return check_arg[1]
 
+    args['params'] = 'panel-test'
     return runShellArgs(args)
 
 

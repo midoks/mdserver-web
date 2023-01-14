@@ -75,7 +75,7 @@ app.config['BASIC_AUTH_OPEN'] = False
 if os.path.exists(basic_auth_conf):
     try:
         ba_conf = json.loads(mw.readFile(basic_auth_conf))
-        print(ba_conf)
+        # print(ba_conf)
         app.config['BASIC_AUTH_USERNAME'] = ba_conf['basic_user']
         app.config['BASIC_AUTH_PASSWORD'] = ba_conf['basic_pwd']
         app.config['BASIC_AUTH_OPEN'] = ba_conf['open']
@@ -232,13 +232,19 @@ def wellknow(val=None):
     return ''
 
 
-@app.route("/hook")
+@app.route("/hook", methods=['POST', 'GET'])
 def webhook():
     # 仅针对webhook插件
     input_args = {
         'access_key': request.args.get('access_key', '').strip(),
         'params': request.args.get('params', '').strip()
     }
+
+    if request.method == 'POST':
+        input_args = {
+            'access_key': request.form.get('access_key', '').strip(),
+            'params': request.form.get('params', '').strip()
+        }
 
     wh_install_path = mw.getServerDir() + '/webhook'
     if not os.path.exists(wh_install_path):
