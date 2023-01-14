@@ -26,6 +26,32 @@ function whPost(method, args,callback){
     },'json'); 
 }
 
+
+function whPostNoMessage(method, args,callback){
+
+    var req_data = {};
+    req_data['name'] = 'webhook';
+    req_data['func'] = method;
+ 
+    if (typeof(args) == 'string'){
+        req_data['args'] = JSON.stringify(toArrayObject(args));
+    } else {
+        req_data['args'] = JSON.stringify(args);
+    }
+
+    $.post('/plugins/run', req_data, function(data) {;
+        if (!data.status){
+            //错误展示10S
+            layer.msg(data.msg,{icon:0,time:2000,shade: [10, '#000']});
+            return;
+        }
+
+        if(typeof(callback) == 'function'){
+            callback(data);
+        }
+    },'json'); 
+}
+
 function whPostCallbak(method, version, args,callback){
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
 
@@ -153,40 +179,58 @@ function showWebHookCode(url,code){
             <div class="line help">\
                 <b>WebHook使用方法:</b><br>\
                 GET/POST:<br>\
-                '+window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port: '')+'/hook?access_key='+code+'&amp;param=aaa<br>\
+                '+window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port: '')+'/hook?access_key='+code+'&amp;params=aaa<br>\
                 @param access_key  string  HOOK密钥<br>\
-                @param param string 自定义参数（在hook脚本中使用$1接收）<br>\
+                @param params string 自定义参数（在hook脚本中使用$1接收）| 多个参数 "1 2" -> $1为1, $2为2<br>\
             </div>\
         </div>' 
     })
 }
 
-//查看日志
-function getLogs(path){
-
-
-    whPost('get_log', {"path":path}, function(rdata){
+function getLogsTimer(path,success,error){
+     whPostNoMessage('get_log', {"path":path}, function(rdata){
         var rdata = $.parseJSON(rdata.data);
         if (!rdata.status){
-            layer.msg(rdata.msg,{icon:2});
-        }
-        
-        layer.open({
-            type:1,
-            title:'任务执行日志',
-            area: ['600px','400px'], 
-            shadeClose:false,
-            closeBtn:2,
-            content:'<div class="bt-logs" style="font-size:0;">\
-                <textarea class="bt-input-text mr20 site_logs pd10" name="site_logs" style="width:100%;line-height:22px;white-space: pre-line;font-size:12px;height:358px;border: none;" readonly="readonly">'+ (rdata.data || '当前没有日志.') +'</textarea>\
-            </div>',
-            success:function(){
-                $('[name="site_logs"]').scrollTop($('[name="site_logs"]')[0].scrollHeight)
+            if (typeof(error) == 'function'){
+                error();
             }
-        });
+            return;   
+        }
 
-
+        $('[name="site_logs"]').text(rdata.data);
+        if (typeof(success) == 'function'){
+            success();
+        }
     });
+}
+
+//查看日志
+function getLogs(path){
+    logs_web = layer.open({
+        type:1,
+        title:'任务执行日志',
+        area: ['600px','400px'], 
+        shadeClose:false,
+        closeBtn:2,
+        content:'<div class="bt-logs" style="font-size:0;">\
+            <textarea class="bt-input-text mr20 site_logs pd10" name="site_logs" style="width:100%;line-height:22px;white-space: pre-line;font-size:12px;height:358px;border: none;" readonly="readonly">正在获取中...</textarea>\
+        </div>',
+        success:function(){
+            $('[name="site_logs"]').scrollTop($('[name="site_logs"]')[0].scrollHeight);
+
+            logs_timer = setInterval(function(){
+                getLogsTimer(path,function(){
+                
+                },function(){
+                    layer.msg(rdata.msg,{icon:2});
+                    layer.close(logs_web);
+                });
+            },1000);
+        },
+        cancel:function(){
+            clearInterval(logs_timer);
+        }
+    });    
 }
 
 //运行
@@ -219,6 +263,4 @@ function deleteHook(key, title){
         });
     });
 }
-
-
 
