@@ -49,15 +49,20 @@ if [ "$OSNAME" == "ubuntu" ];then
 fi
 # apt install $(grep-aptavail -S PHP-defaults -s Package -n)
 
+
 if [ ! -f /etc/apt/sources.list.d/php.list ] && [ "$OSNAME" == "debian" ];then
-# install php source
-
-apt update -y
-apt -y install apt-transport-https lsb-release ca-certificates curl
-curl -sSLo /usr/share/keyrings/deb.sury.org-php.gpg https://packages.sury.org/php/apt.gpg
-sh -c 'echo "deb [signed-by=/usr/share/keyrings/deb.sury.org-php.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list'
-apt update -y
-
+	# install php source
+	apt update -y
+	apt -y install apt-transport-https lsb-release ca-certificates curl
+	cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
+	if [ ! -z "$cn" ];then
+		curl -sSLo /usr/share/keyrings/deb.sury.org-php.gpg https://mirror.sjtu.edu.cn/sury/php/apt.gpg
+	 	sh -c 'echo "deb [signed-by=/usr/share/keyrings/deb.sury.org-php.gpg] https://mirror.sjtu.edu.cn/sury/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list'
+	else
+	 	curl -sSLo /usr/share/keyrings/deb.sury.org-php.gpg https://packages.sury.org/php/apt.gpg
+		sh -c 'echo "deb [signed-by=/usr/share/keyrings/deb.sury.org-php.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list'
+	fi
+	apt update -y
 fi 
 
 

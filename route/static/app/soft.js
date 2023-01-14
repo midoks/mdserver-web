@@ -5,6 +5,12 @@ function resetPluginWinWidth(width){
     $("div[id^='layui-layer'][class*='layui-layer-page']").width(width);
 }
 
+//重置插件弹出框宽度
+function resetPluginWinHeight(height){
+    $("div[id^='layui-layer'][class*='layui-layer-page']").height(height);
+    $(".bt-form .bt-w-main").height(height-42);
+}
+
 //软件管理窗口
 function softMain(name, title, version) {
 
@@ -137,11 +143,14 @@ function getSList(isdisplay) {
                 plugin_title = plugin.title + ' ' + plugin.setup_version;
             }
 
+            icon_link = "/plugins/file?name="+plugin.name+"&f=ico.png";
+            if (plugin.icon != ''){
+                icon_link = "/plugins/file?name="+plugin.name+"&f="+plugin.icon;
+            }
 
             sBody += '<tr>' +
-                '<td><span ' + titleClick + 
-                '><img data-src="/plugins/file?name='+plugin.name+
-                '&f=ico.png" src="/static/img/loading.gif">' + plugin_title + '</span></td>' +
+                '<td><span ' + titleClick + '>'+
+                '<img data-src="'+icon_link+'" src="/static/img/loading.gif">' + plugin_title + '</span></td>' +
                 '<td>' + plugin.ps + '</td>' +
                 '<td>' + softPath + '</td>' +
                 '<td>' + state + '</td>' +
@@ -151,6 +160,8 @@ function getSList(isdisplay) {
         }
 
         sBody += pBody;
+
+
         $("#softList").html(sBody);
         $(".menu-sub span").click(function() {
             setCookie('soft_type', $(this).attr('typeid'));

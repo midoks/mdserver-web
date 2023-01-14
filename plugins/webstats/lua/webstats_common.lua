@@ -94,7 +94,7 @@ function _M.setInputSn(self, input_sn)
     if config[input_sn] == nil then
         auto_config = global_config
     else
-        auto_config = config[site]
+        auto_config = config[input_sn]
         for k, v in pairs(global_config) do
             if auto_config[k] == nil then
                 auto_config[k] = v
@@ -624,7 +624,8 @@ end
 
 
 function _M._update_stat_pre(self, db, stat_table, key)
-    local update_stat_stmt = db:prepare(string.format("INSERT INTO %s(time) SELECT :time WHERE NOT EXISTS(SELECT time FROM %s WHERE time=:time);", stat_table, stat_table))
+    local local_sql = string.format("INSERT INTO %s(time) SELECT :time WHERE NOT EXISTS(SELECT time FROM %s WHERE time=:time);", stat_table, stat_table)
+    local update_stat_stmt = db:prepare(local_sql)
     update_stat_stmt:bind_names{time=key}
     update_stat_stmt:step()
     update_stat_stmt:finalize()
@@ -640,7 +641,8 @@ end
 function _M.update_stat(self, db, stat_table, key, columns)
     -- 根据指定表名，更新统计数据
     if not columns then return end
-    local stmt = db:prepare(string.format("INSERT INTO %s(time) SELECT :time WHERE NOT EXISTS(SELECT time FROM %s WHERE time=:time);", stat_table, stat_table))
+    local local_sql = string.format("INSERT INTO %s(time) SELECT :time WHERE NOT EXISTS(SELECT time FROM %s WHERE time=:time);", stat_table, stat_table)
+    local stmt = db:prepare(local_sql)
     stmt:bind_names{time=key}
     local res, err = stmt:step()
     stmt:finalize()
