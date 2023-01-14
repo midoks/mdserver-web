@@ -94,7 +94,7 @@ function _M.setInputSn(self, input_sn)
     if config[input_sn] == nil then
         auto_config = global_config
     else
-        auto_config = config[site]
+        auto_config = config[input_sn]
         for k, v in pairs(global_config) do
             if auto_config[k] == nil then
                 auto_config[k] = v
