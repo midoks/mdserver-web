@@ -28,10 +28,13 @@ from flask import request
 class firewall_api:
 
     __isFirewalld = False
+    __isIptables = False
     __isUfw = False
     __isMac = False
 
     def __init__(self):
+        if os.path.exists('/usr/sbin/iptables'):
+            self.__isIptables = True
         if os.path.exists('/usr/sbin/firewalld'):
             self.__isFirewalld = True
         if os.path.exists('/usr/sbin/ufw'):
@@ -349,7 +352,6 @@ class firewall_api:
             mw.execShell('service iptables stop')
         else:
             # 重新导入数据
-
             _list = mw.M('firewall').field('id,port,ps,addtime').limit(
                 '0,1000').order('id desc').select()
 
@@ -368,23 +370,23 @@ class firewall_api:
         if status == '1':
             if self.__isUfw:
                 mw.execShell('/usr/sbin/ufw disable')
-            if self.__isFirewalld:
+            elif self.__isIptables:
+                self.setFwIptables(status)
+            elif self.__isFirewalld:
                 mw.execShell('systemctl stop firewalld.service')
                 mw.execShell('systemctl disable firewalld.service')
-            elif self.__isMac:
-                pass
             else:
-                self.setFwIptables(status)
+                pass
         else:
             if self.__isUfw:
                 mw.execShell("echo 'y'| ufw enable")
-            if self.__isFirewalld:
+            elif self.__isIptables:
+                self.setFwIptables(status)
+            elif self.__isFirewalld:
                 mw.execShell('systemctl start firewalld.service')
                 mw.execShell('systemctl enable firewalld.service')
-            elif self.__isMac:
-                pass
             else:
-                self.setFwIptables(status)
+                pass
 
         return mw.returnData(True, '设置成功!')
 
