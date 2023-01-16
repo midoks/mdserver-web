@@ -58,13 +58,15 @@ class firewall_api:
         if self.__isUfw:
             mw.execShell('ufw deny from ' + address + ' to any')
         else:
-            if self.__isFirewalld:
+            if self.__isIptables:
+                cmd = 'iptables -I INPUT -s ' + address + ' -j DROP'
+                mw.execShell(cmd)
+            elif self.__isFirewalld:
                 cmd = 'firewall-cmd --permanent --add-rich-rule=\'rule family=ipv4 source address="' + \
                     address + '" drop\''
                 mw.execShell(cmd)
             else:
-                cmd = 'iptables -I INPUT -s ' + address + ' -j DROP'
-                mw.execShell(cmd)
+                pass
 
         msg = mw.getInfo('屏蔽IP[{1}]成功!', (address,))
         mw.writeLog("防火墙管理", msg)
@@ -120,15 +122,14 @@ class firewall_api:
         address = port
         if self.__isUfw:
             mw.execShell('ufw delete deny from ' + address + ' to any')
+        elif self.__isIptables:
+            cmd = 'iptables -D INPUT -s ' + address + ' -j DROP'
+            mw.execShell(cmd)
+        elif self.__isFirewalld:
+            mw.execShell(
+                'firewall-cmd --permanent --remove-rich-rule=\'rule family=ipv4 source address="' + address + '" drop\'')
         else:
-            if self.__isFirewalld:
-                mw.execShell(
-                    'firewall-cmd --permanent --remove-rich-rule=\'rule family=ipv4 source address="' + address + '" drop\'')
-            elif self.__isMac:
-                pass
-            else:
-                cmd = 'iptables -D INPUT -s ' + address + ' -j DROP'
-                mw.execShell(cmd)
+            pass
 
         msg = mw.getInfo('解除IP[{1}]的屏蔽!', (address,))
         mw.writeLog("防火墙管理", msg)
@@ -147,15 +148,16 @@ class firewall_api:
                 return mw.returnJson(False, '失败，不能删除当前面板端口!')
             if self.__isUfw:
                 mw.execShell('ufw delete allow ' + port + '/tcp')
+            elif self.__isIptables:
+                mw.execShell(
+                    'iptables -D INPUT -p tcp -m state --state NEW -m tcp --dport ' + port + ' -j ACCEPT')
+            elif self.__isFirewalld:
+                mw.execShell(
+                    'firewall-cmd --permanent --zone=public --remove-port=' + port + '/tcp')
+                mw.execShell(
+                    'firewall-cmd --permanent --zone=public --remove-port=' + port + '/udp')
             else:
-                if self.__isFirewalld:
-                    mw.execShell(
-                        'firewall-cmd --permanent --zone=public --remove-port=' + port + '/tcp')
-                    mw.execShell(
-                        'firewall-cmd --permanent --zone=public --remove-port=' + port + '/udp')
-                else:
-                    mw.execShell(
-                        'iptables -D INPUT -p tcp -m state --state NEW -m tcp --dport ' + port + ' -j ACCEPT')
+                pass
             msg = mw.getInfo('删除防火墙放行端口[{1}]成功!', (port,))
             mw.writeLog("防火墙管理", msg)
             mw.M('firewall').where("id=?", (sid,)).delete()
@@ -252,18 +254,20 @@ class firewall_api:
         conf = re.sub(rep, "Port " + port + "\n", conf)
         mw.writeFile(file, conf)
 
-        if self.__isFirewalld:
+        if self.__isUfw:
+            mw.execShell('ufw allow ' + port + '/tcp')
+            mw.execShell("service ssh restart")
+        elif self.__isIptables:
+            mw.execShell(
+                'iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport ' + port + ' -j ACCEPT')
+            mw.execShell("/etc/init.d/sshd restart")
+        elif self.__isFirewalld:
             mw.execShell('setenforce 0')
             mw.execShell(
                 'sed -i "s#SELINUX=enforcing#SELINUX=disabled#" /etc/selinux/config')
             mw.execShell("systemctl restart sshd.service")
-        elif self.__isUfw:
-            mw.execShell('ufw allow ' + port + '/tcp')
-            mw.execShell("service ssh restart")
         else:
-            mw.execShell(
-                'iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport ' + port + ' -j ACCEPT')
-            mw.execShell("/etc/init.d/sshd restart")
+            pass
 
         self.firewallReload()
         # mw.M('firewall').where(
@@ -457,13 +461,13 @@ class firewall_api:
         if self.__isUfw:
             mw.execShell('/usr/sbin/ufw reload')
             return
-        if self.__isFirewalld:
-            mw.execShell('firewall-cmd --reload')
-        elif self.__isMac:
-            pass
-        else:
+        elif self.__isIptables:
             mw.execShell('service iptables save')
             mw.execShell('service iptables restart')
+        elif self.__isFirewalld:
+            mw.execShell('firewall-cmd --reload')
+        else:
+            pass
 
     def getFwStatus(self):
         if self.__isUfw:
@@ -484,7 +488,5 @@ class firewall_api:
             if data[0] == '':
                 return False
             return True
-        elif self.__isMac:
-            return False
         else:
             return False
