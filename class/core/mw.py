@@ -461,8 +461,7 @@ def writeLog(stype, msg, args=()):
         uid = 1
         if 'uid' in session:
             uid = session['uid']
-        writeDbLog(stype, msg, args, uid)
-        return True
+        return writeDbLog(stype, msg, args, uid)
     except Exception as e:
         print(getTracebackInfo())
         return False
