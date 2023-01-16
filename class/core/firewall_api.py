@@ -471,7 +471,13 @@ class firewall_api:
             if data[0].strip() == 'inactive':
                 return False
             return True
-        if self.__isFirewalld:
+        elif self.__isIptables:
+            cmd = "systemctl status iptables | grep 'inactive'"
+            data = mw.execShell(cmd)
+            if data[0] != '':
+                return False
+            return True
+        elif self.__isFirewalld:
             cmd = "ps -ef|grep firewalld |grep -v grep | awk '{print $2}'"
             data = mw.execShell(cmd)
             if data[0] == '':
@@ -480,8 +486,4 @@ class firewall_api:
         elif self.__isMac:
             return False
         else:
-            cmd = "systemctl status iptables | grep 'inactive'"
-            data = mw.execShell(cmd)
-            if data[0] != '':
-                return False
-            return True
+            return False
