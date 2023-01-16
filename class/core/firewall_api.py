@@ -28,10 +28,13 @@ from flask import request
 class firewall_api:
 
     __isFirewalld = False
+    __isIptables = False
     __isUfw = False
     __isMac = False
 
     def __init__(self):
+        if os.path.exists('/usr/sbin/iptables'):
+            self.__isIptables = True
         if os.path.exists('/usr/sbin/firewalld'):
             self.__isFirewalld = True
         if os.path.exists('/usr/sbin/ufw'):
@@ -349,7 +352,6 @@ class firewall_api:
             mw.execShell('service iptables stop')
         else:
             # 重新导入数据
-
             _list = mw.M('firewall').field('id,port,ps,addtime').limit(
                 '0,1000').order('id desc').select()
 
@@ -365,26 +367,28 @@ class firewall_api:
             mw.execShell('service iptables start')
 
     def setFw(self, status):
+
+        if self.__isIptables:
+            self.setFwIptables(status)
+            return mw.returnData(True, '设置成功!')
+
         if status == '1':
             if self.__isUfw:
                 mw.execShell('/usr/sbin/ufw disable')
-            if self.__isFirewalld:
+
+            elif self.__isFirewalld:
                 mw.execShell('systemctl stop firewalld.service')
                 mw.execShell('systemctl disable firewalld.service')
-            elif self.__isMac:
-                pass
             else:
-                self.setFwIptables(status)
+                pass
         else:
             if self.__isUfw:
                 mw.execShell("echo 'y'| ufw enable")
-            if self.__isFirewalld:
+            elif self.__isFirewalld:
                 mw.execShell('systemctl start firewalld.service')
                 mw.execShell('systemctl enable firewalld.service')
-            elif self.__isMac:
-                pass
             else:
-                self.setFwIptables(status)
+                pass
 
         return mw.returnData(True, '设置成功!')
 
@@ -438,15 +442,16 @@ class firewall_api:
     def addAcceptPort(self, port):
         if self.__isUfw:
             mw.execShell('ufw allow ' + port + '/tcp')
+        elif self.__isIptables:
+            cmd = 'iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport ' + port + ' -j ACCEPT'
+            mw.execShell(cmd)
         elif self.__isFirewalld:
             port = port.replace(':', '-')
             cmd = 'firewall-cmd --permanent --zone=public --add-port=' + port + '/tcp'
             mw.execShell(cmd)
-        elif self.__isMac:
-            pass
         else:
-            cmd = 'iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport ' + port + ' -j ACCEPT'
-            mw.execShell(cmd)
+            pass
+        return True
 
     def firewallReload(self):
         if self.__isUfw:
@@ -467,7 +472,13 @@ class firewall_api:
             if data[0].strip() == 'inactive':
                 return False
             return True
-        if self.__isFirewalld:
+        elif self.__isIptables:
+            cmd = "systemctl status iptables | grep 'inactive'"
+            data = mw.execShell(cmd)
+            if data[0] != '':
+                return False
+            return True
+        elif self.__isFirewalld:
             cmd = "ps -ef|grep firewalld |grep -v grep | awk '{print $2}'"
             data = mw.execShell(cmd)
             if data[0] == '':
@@ -476,8 +487,4 @@ class firewall_api:
         elif self.__isMac:
             return False
         else:
-            cmd = "systemctl status iptables | grep 'inactive'"
-            data = mw.execShell(cmd)
-            if data[0] != '':
-                return False
-            return True
+            return False

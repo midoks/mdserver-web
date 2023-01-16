@@ -20,6 +20,8 @@
 import sys
 import io
 import os
+
+sys.dont_write_bytecode = True
 from route import app, socketio
 
 

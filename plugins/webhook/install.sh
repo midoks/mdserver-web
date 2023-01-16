@@ -21,7 +21,7 @@ Install_App()
 
 Uninstall_App()
 {
-	rm -rf $serverPath/redis
+	rm -rf $serverPath/webhook
 	echo "Uninstall_App" > $install_tmp
 }
 

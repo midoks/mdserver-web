@@ -43,7 +43,11 @@ mw_start(){
 
 mw_start_debug(){
 	python3 task.py >> $DIR/logs/task.log 2>&1 &
-	gunicorn -b :7200 -k gevent -w 1 app:app
+	port=7200    
+    if [ -f /www/server/mdserver-web/data/port.pl ];then
+        port=$(cat /www/server/mdserver-web/data/port.pl)
+    fi
+	gunicorn -b :${port} -k gevent -w 1 app:app
 }
 
 mw_start_debug2(){
