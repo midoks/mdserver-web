@@ -451,6 +451,7 @@ class firewall_api:
             mw.execShell(cmd)
         else:
             pass
+        return True
 
     def firewallReload(self):
         if self.__isUfw:
