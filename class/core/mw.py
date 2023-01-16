@@ -457,13 +457,22 @@ def getDate():
 def writeLog(stype, msg, args=()):
     # 写日志
     try:
-        import time
-        import db
-        import json
         from flask import session
         uid = 1
         if 'uid' in session:
             uid = session['uid']
+        writeDbLog(stype, msg, args, uid)
+        return True
+    except Exception as e:
+        print(getTracebackInfo())
+        return False
+
+
+def writeDbLog(stype, msg, args=(), uid=1):
+    try:
+        import time
+        import db
+        import json
         sql = db.Sql()
         mdate = time.strftime('%Y-%m-%d %X', time.localtime())
         wmsg = getInfo(msg, args)
