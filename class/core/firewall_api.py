@@ -367,11 +367,15 @@ class firewall_api:
             mw.execShell('service iptables start')
 
     def setFw(self, status):
+
+        if self.__isIptables:
+            self.setFwIptables(status)
+            return mw.returnData(True, '设置成功!')
+
         if status == '1':
             if self.__isUfw:
                 mw.execShell('/usr/sbin/ufw disable')
-            elif self.__isIptables:
-                self.setFwIptables(status)
+
             elif self.__isFirewalld:
                 mw.execShell('systemctl stop firewalld.service')
                 mw.execShell('systemctl disable firewalld.service')
@@ -380,8 +384,6 @@ class firewall_api:
         else:
             if self.__isUfw:
                 mw.execShell("echo 'y'| ufw enable")
-            elif self.__isIptables:
-                self.setFwIptables(status)
             elif self.__isFirewalld:
                 mw.execShell('systemctl start firewalld.service')
                 mw.execShell('systemctl enable firewalld.service')
