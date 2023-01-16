@@ -454,6 +454,12 @@ def getDate():
     return time.strftime('%Y-%m-%d %X', time.localtime())
 
 
+def getDataFromInt(val):
+    time_format = '%Y-%m-%d %H:%M:%S'
+    time_str = time.localtime(val)
+    return time.strftime(time_format, time_str)
+
+
 def writeLog(stype, msg, args=()):
     # 写日志
     try:
