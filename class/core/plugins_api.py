@@ -27,7 +27,7 @@ import sys
 import threading
 import multiprocessing
 
-
+from flask import render_template
 from flask import request
 
 
@@ -75,12 +75,35 @@ class plugins_api:
         data = self.getPluginList(sType, int(sPage))
         return mw.getJson(data)
 
+    def menuGetAbsPath(self, tag, path):
+        if path[0:1] == '/':
+            return path
+        else:
+            return mw.getPluginDir() + '/' + tag + '/' + path
+
+    def menuApi(self):
+        import config_api
+        data = config_api.config_api().get()
+        tag = request.args.get('tag', '')
+        menu_file = 'data/hook_menu.json'
+        content = ''
+        if os.path.exists(menu_file):
+            t = mw.readFile(menu_file)
+            tlist = json.loads(t)
+            for menu_data in tlist:
+                if 'path' in menu_data:
+                    tpath = self.menuGetAbsPath(tag, menu_data['path'])
+                    content = mw.readFile(tpath)
+        data['plugin_content'] = content
+        return render_template('plugin_menu.html', data=data)
+
     def fileApi(self):
         name = request.args.get('name', '')
         if name.strip() == '':
             return ''
 
         f = request.args.get('f', '')
+
         if f.strip() == '':
             return ''
 
@@ -88,8 +111,18 @@ class plugins_api:
         if not os.path.exists(file):
             return ''
 
-        c = open(file, 'rb').read()
-        return c
+        suffix = mw.getPathSuffix(file)
+        # c = open(file, 'rb').read()
+        content = mw.readFile(file)
+        print("ddd:", suffix)
+        if suffix == '.css':
+
+            from flask import Response
+            from flask import make_response
+            v = Response(content, headers={'Content-Type': 'css/text'})
+            return make_response(v)
+
+        return content
 
     def indexListApi(self):
         data = self.getIndexList()
@@ -252,7 +285,7 @@ class plugins_api:
         valid_hook = ['backup', 'database']
         valid_list_hook = ['menu']
         if 'hook' in info:
-            ooks = info['hook']
+            hooks = info['hook']
             hooks_type = type(hooks)
             if hooks_type == list:
                 for h in hooks:

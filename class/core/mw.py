@@ -1281,6 +1281,10 @@ def toSize(size):
     return str(round(size, 2)) + ' ' + b
 
 
+def getPathSuffix(path):
+    return os.path.splitext(path)[-1]
+
+
 def getMacAddress():
     # 获取mac
     import uuid
