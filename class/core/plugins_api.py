@@ -112,16 +112,14 @@ class plugins_api:
             return ''
 
         suffix = mw.getPathSuffix(file)
-        # c = open(file, 'rb').read()
-        content = mw.readFile(file)
-        print("ddd:", suffix)
         if suffix == '.css':
-
+            content = mw.readFile(file)
             from flask import Response
             from flask import make_response
-            v = Response(content, headers={'Content-Type': 'css/text'})
+            v = Response(content, headers={
+                         'Content-Type': 'text/css; charset="utf-8"'})
             return make_response(v)
-
+        content = open(file, 'rb').read()
         return content
 
     def indexListApi(self):
