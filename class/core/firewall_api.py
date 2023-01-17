@@ -359,6 +359,8 @@ class firewall_api:
             _list = mw.M('firewall').field('id,port,ps,addtime').limit(
                 '0,1000').order('id desc').select()
 
+            mw.execShell('iptables -P INPUT DROP')
+            mw.execShell('iptables -P OUTPUT ACCEPT')
             for x in _list:
                 port = x['port']
                 if mw.isIpAddr(port):
