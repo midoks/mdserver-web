@@ -214,10 +214,7 @@ class plugins_api:
                 isNeedAdd = False
 
         if isNeedAdd:
-            tmp = {}
-            tmp['title'] = info['title']
-            tmp['name'] = info['name']
-            data.append(tmp)
+            data.append(info)
         mw.writeFile(hookPath, json.dumps(data))
 
     def hookUninstallFile(self, hook_name, info):
@@ -233,21 +230,40 @@ class plugins_api:
         mw.writeFile(hookPath, json.dumps(data))
 
     def hookInstall(self, info):
+        valid_hook = ['backup', 'database']
+        valid_list_hook = ['menu']
         if 'hook' in info:
             hooks = info['hook']
-            for x in hooks:
-                if x in ['backup', 'database']:
-                    self.hookInstallFile(x, info)
-                    return True
+            hooks_type = type(hooks)
+            if hooks_type == list:
+                for h in hooks:
+                    tag = h['tag']
+                    if tag in valid_list_hook:
+                        self.hookInstallFile(tag, h[tag])
+
+            elif hooks_type == str:
+                for x in hooks:
+                    if x in valid_hook:
+                        self.hookInstallFile(x, info)
+                        return True
         return False
 
     def hookUninstall(self, info):
+        valid_hook = ['backup', 'database']
+        valid_list_hook = ['menu']
         if 'hook' in info:
-            hooks = info['hook']
-            for x in hooks:
-                if x in ['backup', 'database']:
-                    self.hookUninstallFile(x, info)
-                    return True
+            ooks = info['hook']
+            hooks_type = type(hooks)
+            if hooks_type == list:
+                for h in hooks:
+                    tag = h['tag']
+                    if tag in valid_list_hook:
+                        self.hookUninstallFile(tag, h[tag])
+            elif hooks_type == str:
+                for x in hooks:
+                    if x in valid_hook:
+                        self.hookUninstallFile(x, info)
+                        return True
         return False
 
     def uninstallOldApi(self):
