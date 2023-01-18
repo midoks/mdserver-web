@@ -123,6 +123,9 @@ function getSshInfo(){
 		}
 		$("#firewall_status").html(fStatus);
 		
+		showAccept(1);
+		getLogs(1);
+
 	},'json');
 }
 
