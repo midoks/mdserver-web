@@ -33,7 +33,8 @@ class firewall_api:
     __isMac = False
 
     def __init__(self):
-        if os.path.exists('/usr/sbin/iptables'):
+        iptables_file = mw.systemdCfgDir() + '/iptables.service'
+        if os.path.exists(iptables_file):
             self.__isIptables = True
         if os.path.exists('/usr/sbin/firewalld'):
             self.__isFirewalld = True

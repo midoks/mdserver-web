@@ -50,7 +50,6 @@ if [ -f /usr/sbin/ufw ];then
 	# ufw allow 7200/tcp
 	# ufw allow 3306/tcp
 	# ufw allow 30000:40000/tcp
-
 fi
 
 if [ -f /usr/sbin/ufw ];then
@@ -58,8 +57,13 @@ if [ -f /usr/sbin/ufw ];then
 fi
 
 if [ ! -f /usr/sbin/ufw ];then
+	# look
+    # firewall-cmd --list-all
+
 	apt install -y firewalld
 	systemctl enable firewalld
+	#取消服务锁定
+    systemctl unmask firewalld
 	systemctl start firewalld
 
 	firewall-cmd --permanent --zone=public --add-port=22/tcp
@@ -75,10 +79,10 @@ if [ ! -f /usr/sbin/ufw ];then
 	sed -i 's#IndividualCalls=no#IndividualCalls=yes#g' /etc/firewalld/firewalld.conf
 
 	firewall-cmd --reload
-fi
 
-#安装时不开启
-systemctl stop firewalld
+	#安装时不开启
+	systemctl stop firewalld
+fi
 
 #fix zlib1g-dev fail
 echo -e "\e[0;32mfix zlib1g-dev install question start\e[0m"
