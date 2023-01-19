@@ -63,6 +63,11 @@ function webShell_Menu() {
         }
     });
 
+    $(window).unload(function(){
+  　     term.destroy();
+        clearInterval(interval);
+    });
+
     if (socket) {
         socket.emit('connect_event', '');
         interval = setInterval(function () {
