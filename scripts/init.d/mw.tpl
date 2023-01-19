@@ -291,6 +291,7 @@ case "$1" in
     'close_admin_path') mw_close_admin_path;;
     'unbind_domain') mw_unbind_domain;;
     'debug') mw_debug;;
+    'mirror') mw_mirror;;
     'default')
         cd $mw_path
         port=7200
