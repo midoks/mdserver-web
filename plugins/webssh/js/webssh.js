@@ -1,4 +1,43 @@
-function web_shell2() {
+
+changeDivH();
+
+$(document).ready(function(){
+    changeDivH();
+    $(window).resize(function(){
+        changeDivH();
+    });
+
+    $('.term_content_tab .term-tool-button').click(function(){
+        if ($(this).hasClass('tool-show')){
+            $('#term_box_view').css('margin-right',300);
+            $('.term_tootls').css('display',"block");
+            $(this).removeClass('tool-show').addClass('tool-hide');
+            $(this).find('span').removeClass('glyphicon-menu-left').addClass('glyphicon-menu-right');
+        } else {
+            $('#term_box_view').css('margin-right',0);
+            $('.term_tootls').css('display',"none");
+            $(this).removeClass('tool-hide').addClass('tool-show');
+            $(this).find('span').removeClass('glyphicon-menu-right').addClass('glyphicon-menu-left');
+        }
+    });
+
+    $('.glyphicon-resize-full').click(function(ele){
+        const func = ele.requestFullscreen || ele.mozRequestFullScreen || ele.webkitRequestFullscreen || ele.msRequestFullscreen; 
+        var e = $('#term_box_view').parent();
+        func.call(e);
+    });
+
+    webShell_Menu();
+});
+
+
+function changeDivH(){
+    var l = $(window).height();
+    $('#term_box_view').parent().css('height',l-80);
+}
+
+
+function webShell_Menu() {
     var termCols = 83;
     var termRows = 21;
     var sendTotal = 0;
@@ -35,26 +74,8 @@ function web_shell2() {
         socket.emit('webssh', data);
     });
 
-
-    var term_box = layer.open({
-        type: 1,
-        title: "本地终端",
-        area: ['685px','435px'],
-        closeBtn: 2,
-        shadeClose: false,
-        content: '<div class="term-box"><div id="term"></div></div>\
-					<div class="shell-text-input">\
-                    <textarea type="text" class="bt-input-text-shell" placeholder="请将命令粘贴到此处.." value="" name="ssh_copy" />\
-					<div class="shell-btn-group">\
-                    <button class="shellbutton btn btn-success btn-sm pull-right shell_btn_1">发送(Ctrl+Enter)</button>\
-					<button class="shellbutton btn btn-default btn-sm pull-right shell_btn_close">关闭</button>\
-					</div>\
-                </div>',
-        cancel: function () {
-            term.destroy();
-            clearInterval(interval);
-        }
-    });
+    // term.destroy();
+    // clearInterval(interval);
 	$(".shell_btn_close").click(function(){
 		layer.close(term_box);
 		term.destroy();
@@ -62,8 +83,8 @@ function web_shell2() {
 	})
 	
     setTimeout(function () {
-        $('.terminal').detach().appendTo('#term');
-        $("#term").show();
+        $('.terminal').detach().appendTo('#ECFEfRWM8');
+        $("#ECFEfRWM8").show();
         socket.emit('webssh', "\n");
         term.focus();
 
