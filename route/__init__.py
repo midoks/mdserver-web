@@ -691,7 +691,7 @@ try:
     ssh = paramiko.SSHClient()
 
     # 启动尝试时连接
-    connect_ssh()
+    # connect_ssh()
 except Exception as e:
     print("本地终端无法使用")
 
