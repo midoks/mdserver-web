@@ -550,19 +550,45 @@ ssh = None
 shell = None
 
 
+def get_ssh_dir():
+    if mw.isAppleSystem():
+        user = mw.execShell(
+            "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
+        return '/Users/' + user + '/.ssh'
+    return '/root/.ssh'
+
+ssh_dir = get_ssh_dir()
+
+
 def create_rsa():
     # mw.execShell("rm -f /root/.ssh/*")
-    if not os.path.exists('/root/.ssh/authorized_keys'):
-        mw.execShell('touch /root/.ssh/authorized_keys')
+    if not os.path.exists(ssh_dir + '/authorized_keys'):
+        mw.execShell('touch ' + ssh_dir + '/authorized_keys')
 
-    if not os.path.exists('/root/.ssh/id_rsa.pub') and os.path.exists('/root/.ssh/id_rsa'):
+    if not os.path.exists(ssh_dir + '/id_rsa.pub') and os.path.exists(ssh_dir + '/id_rsa'):
         mw.execShell(
-            'echo y | ssh-keygen -q -t rsa -P "" -f /root/.ssh/id_rsa')
+            'echo y | ssh-keygen -q -t rsa -P "" -f ' + ssh_dir + '/id_rsa')
     else:
-        mw.execShell('ssh-keygen -q -t rsa -P "" -f /root/.ssh/id_rsa')
+        mw.execShell('ssh-keygen -q -t rsa -P "" -f ' + ssh_dir + '/id_rsa')
 
-    mw.execShell('cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys')
-    mw.execShell('chmod 600 /root/.ssh/authorized_keys')
+    mw.execShell('cat ' + ssh_dir + '/id_rsa.pub >> ' +
+                 ssh_dir + '/authorized_keys')
+    mw.execShell('chmod 600 ' + ssh_dir + '/authorized_keys')
+
+
+def create_ssh_info():
+    if not os.path.exists(ssh_dir + '/id_rsa') or not os.path.exists(ssh_dir + '/id_rsa.pub'):
+        create_rsa()
+
+    # 检查是否写入authorized_keys
+    data = mw.execShell("cat " + ssh_dir + "/id_rsa.pub | awk '{print $3}'")
+    if data[0] != "":
+        cmd = "cat " + ssh_dir + "/authorized_keys | grep " + data[0]
+        ak_data = mw.execShell(cmd)
+        if ak_data[0] == "":
+            cmd = 'cat ' + ssh_dir + '/id_rsa.pub >> ' + ssh_dir + '/authorized_keys'
+            mw.execShell(cmd)
+            mw.execShell('chmod 600 ' + ssh_dir + '/authorized_keys')
 
 
 def clear_ssh():
@@ -592,18 +618,8 @@ def connect_ssh():
     # print 'connect_ssh ....'
     # clear_ssh()
     global shell, ssh
-    if not os.path.exists('/root/.ssh/id_rsa') or not os.path.exists('/root/.ssh/id_rsa.pub'):
-        create_rsa()
 
-    # 检查是否写入authorized_keys
-    data = mw.execShell("cat /root/.ssh/id_rsa.pub | awk '{print $3}'")
-    if data[0] != "":
-        ak_data = mw.execShell(
-            "cat /root/.ssh/authorized_keys | grep " + data[0])
-        if ak_data[0] == "":
-            mw.execShell(
-                'cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys')
-            mw.execShell('chmod 600 /root/.ssh/authorized_keys')
+    create_ssh_info()
 
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
@@ -671,15 +687,15 @@ def connected_msg(msg):
         # print 'connected_msg:' + str(e)
 
 
-if not mw.isAppleSystem():
-    try:
-        import paramiko
-        ssh = paramiko.SSHClient()
+# if not mw.isAppleSystem():
+try:
+    import paramiko
+    ssh = paramiko.SSHClient()
 
-        # 启动尝试时连接
-        # connect_ssh()
-    except Exception as e:
-        print("本地终端无法使用")
+    # 启动尝试时连接
+    connect_ssh()
+except Exception as e:
+    print("本地终端无法使用")
 
 
 ##################### ssh  end ###########################
