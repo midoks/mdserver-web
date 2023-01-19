@@ -686,8 +686,6 @@ def connected_msg(msg):
         pass
         # print 'connected_msg:' + str(e)
 
-
-# if not mw.isAppleSystem():
 try:
     import paramiko
     ssh = paramiko.SSHClient()
