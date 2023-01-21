@@ -459,3 +459,131 @@ color: #bbb;
 .term_content_tab .xterm .xterm-viewport:hover::-webkit-scrollbar-track {
   background-color: #444;
 }
+
+.tootls_host_list,
+.tootls_commonly_list {
+  list-style: none;
+  border-top: none;
+  border: 1px solid #ececec;
+  overflow-y: auto;
+}
+
+.tootls_host_list,
+.tootls_commonly_list {
+  /* min-height: 300px; */
+  overflow: auto;
+  /* margin-bottom: 10px; */
+  overflow-x: hidden;
+  font-size: 12px;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  margin-top: 10px;
+}
+
+.tootls_commonly_list li,
+.tootls_host_list li {
+  display: inline-block;
+  height: 38px;
+  line-height: 38px;
+  color: #444;
+  border-bottom: 1px solid #ececec;
+  font-size: 13px;
+  cursor: pointer;
+  position: relative;
+  width: 100%;
+}
+
+.tootls_commonly_list li {
+  padding-left: 15px;
+}
+
+.tootls_commonly_list li:hover,
+.tootls_host_list li:hover {
+  background-color: #eee;
+}
+
+.tootls_commonly_list li:hover .tootls,
+.tootls_host_list li:hover .tootls {
+  display: inline-block;
+}
+
+.tootls_host_list li i {
+  display: inline-block;
+  height: 100%;
+  width: 38px;
+  background-size: 16px;
+  background: url('/plugins/file?name=webssh&f=img/ico-cmd.png') no-repeat center center;
+}
+
+.tootls_commonly_list li>span,
+.tootls_host_list li>span {
+  vertical-align: top;
+  display: inline-block;
+}
+
+.tootls_commonly_list li:hover>span:nth-child(2),
+.tootls_host_list li:hover>span:nth-child(2) {
+  width: 120px;
+}
+
+.tootls_commonly_list li>span:nth-child(2),
+.tootls_host_list li>span:nth-child(2) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  max-width: 190px;
+}
+
+
+/* .tootls_host_list li>span:nth-child(2){
+margin-left: 35px;
+} */
+
+.tootls_commonly_list li>span:nth-child(2) {
+  max-width: 190px;
+}
+
+.tootls_commonly_list li span:nth-child(3),
+.tootls_host_list li span:nth-child(3) {
+  padding-left: 10px;
+}
+
+.tootls_commonly_list li .tootls,
+.tootls_host_list li .tootls {
+  width: 70px;
+  text-align: right;
+  padding-right: 10px;
+  display: none;
+  position: absolute;
+  right: 5px;
+}
+
+.tootls_commonly_list li .tootls {
+  width: 90px;
+}
+
+.tootls_commonly_list li .tootls span,
+.tootls_host_list li .tootls span {
+  width: 22px;
+  height: 22px;
+  line-height: 22px;
+  text-align: center;
+}
+
+.tootls_commonly_list li .tootls span:nth-child(1),
+.tootls_host_list li .tootls span:nth-child(1) {
+  color: #888;
+  font-size: 14px;
+}
+
+.tootls_commonly_list li .tootls span:nth-child(2),
+.tootls_host_list li .tootls span:nth-child(2) {
+  color: #ea7575;
+}
+
+.tootls_commonly_list li .tootls span:nth-child(2):hover,
+.tootls_host_list li .tootls span:nth-child(2):hover {
+  color: red;
+}

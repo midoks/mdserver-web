@@ -1,5 +1,62 @@
 
-changeDivH();
+function appPost(method,args,callback){
+    var _args = null; 
+    if (typeof(args) == 'string'){
+        _args = JSON.stringify(toArrayObject(args));
+    } else {
+        _args = JSON.stringify(args);
+    }
+
+    var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
+    $.post('/plugins/run', {name:'webssh', func:method, args:_args}, function(data) {
+        layer.close(loadT);
+        if (!data.status){
+            layer.msg(data.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+            return;
+        }
+
+        if(typeof(callback) == 'function'){
+            callback(data);
+        }
+    },'json'); 
+}
+
+function appAsyncPost(method,args){
+    var _args = null; 
+    if (typeof(args) == 'string'){
+        _args = JSON.stringify(toArrayObject(args));
+    } else {
+        _args = JSON.stringify(args);
+    }
+    return syncPost('/plugins/run', {name:'webssh', func:method, args:_args}); 
+}
+
+function appPostCallbak(method, args, callback){
+    var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
+
+    var req_data = {};
+    req_data['name'] = 'webssh';
+    req_data['func'] = method;
+    args['version'] = '1.0';
+ 
+    if (typeof(args) == 'string'){
+        req_data['args'] = JSON.stringify(toArrayObject(args));
+    } else {
+        req_data['args'] = JSON.stringify(args);
+    }
+
+    $.post('/plugins/callback', req_data, function(data) {
+        layer.close(loadT);
+        if (!data.status){
+            layer.msg(data.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+            return;
+        }
+
+        if(typeof(callback) == 'function'){
+            callback(data);
+        }
+    },'json'); 
+}
 
 $(document).ready(function(){
     changeDivH();
@@ -21,10 +78,46 @@ $(document).ready(function(){
         }
     });
 
-    $('.glyphicon-resize-full').click(function(ele){
-        const func = ele.requestFullscreen || ele.mozRequestFullScreen || ele.webkitRequestFullscreen || ele.msRequestFullscreen; 
-        var e = $('#term_box_view').parent();
-        func.call(e);
+    $('.full_exit_screen').click(function(ele){
+        if($(this).hasClass('glyphicon-resize-full')){
+            requestFullScreen($('#term_box_view')[0]);
+            $(this).removeClass('glyphicon-resize-full').addClass('glyphicon-resize-small');
+        } else{
+            exitFull();
+            $(this).removeClass('glyphicon-resize-small').addClass('glyphicon-resize-full');
+        }
+    });
+
+    $('.addServer').click(function(){
+        webShell_addServer();
+    });
+
+    $('.tootls_host_btn').click(function(){
+        webShell_addServer();
+    });
+
+    $('.tootls_commonly_btn').click(function(){
+        webShell_cmd();
+    });
+
+    //服务器列表和常用命令
+    $('.term_tootls .tab-nav span').click(function(){
+        var list_type = $(this).attr('data-type');
+        if (!$(this).hasClass('on')){
+
+            $('.term_tootls .tab-nav span').removeClass('on');
+            $(this).addClass('on');
+
+            $('.term_tootls .tab-con .tab-block').removeClass('on')
+            if (list_type == 'host'){
+                $('.term_tootls .tab-con .tab-block').eq(0).addClass('on');
+            }
+
+            if (list_type == 'shell'){
+                $('.term_tootls .tab-con .tab-block').eq(1).addClass('on');
+                webShell_getCmdList();
+            }
+        }
     });
 
     webShell_Menu();
@@ -34,12 +127,114 @@ $(document).ready(function(){
 function changeDivH(){
     var l = $(window).height();
     $('#term_box_view').parent().css('height',l-80);
+
+    $('#xterm-viewport').css('height',l-80);
+
+
+    $('.tootls_host_list').css('display','block').css('height',l-192);
+    $('.tootls_commonly_list').css('display','block').css('height',l-192);
+    
+}
+
+
+// 窗口状态改变
+function fullScreenChange(el, callback) {
+    el.addEventListener("fullscreenchange", function () { 
+        callback && callback(document.fullscreen);
+    }); 
+
+    el.addEventListener("webkitfullscreenchange", function () { 
+        callback && callback(document.webkitIsFullScreen);
+    }); 
+
+    el.addEventListener("mozfullscreenchange", function () { 
+        callback && callback(document.mozFullScreen);
+    });
+
+    el.addEventListener("msfullscreenchange", function () { 
+        callback && callback(document.msFullscreenElement);
+    });
+}
+
+// 全屏
+function requestFullScreen(element) {
+    var requestMethod = element.requestFullScreen || //W3C
+    element.webkitRequestFullScreen ||    //Chrome等
+    element.mozRequestFullScreen || //FireFox
+    element.msRequestFullScreen; //IE11
+    if (requestMethod) {
+        requestMethod.call(element);
+    }else if (typeof window.ActiveXObject !== "undefined") {//for Internet Explorer
+        var wscript = new ActiveXObject("WScript.Shell");
+        if (wscript !== null) {
+            wscript.SendKeys("{F11}");
+        }
+    }
+}
+
+//退出全屏
+function exitFull() {
+    var exitMethod = document.exitFullscreen || //W3C
+    document.mozCancelFullScreen ||    //Chrome等
+    document.webkitExitFullscreen || //FireFox
+    document.webkitExitFullscreen; //IE11
+    if (exitMethod) {
+        exitMethod.call(document);
+    }else if (typeof window.ActiveXObject !== "undefined") {//for Internet Explorer
+        var wscript = new ActiveXObject("WScript.Shell");
+        if (wscript !== null) {
+            wscript.SendKeys("{F11}");
+        }
+    }
+}
+
+
+function webShell_getCmdList(){
+    appPost('get_cmd_list', {}, function(rdata){
+        var rdata = $.parseJSON(rdata.data);
+        var alist = rdata.data;
+
+        var tli = '';
+        for (var i = 0; i < alist.length; i++) {
+            tli+='<li class="data-cmd-list" data-index="'+i+'" data-clipboard-text="'+alist[i]['cmd']+'">\
+                    <i></i>\
+                    <span>'+alist[i]['title']+'</span>\
+                    <span class="tootls">\
+                        <span class="glyphicon glyphicon-edit" aria-hidden="true" title="编辑常用命令信息"></span>\
+                        <span class="glyphicon glyphicon-trash" aria-hidden="true" title="删除常用命令信息"></span>\
+                    </span>\
+                </li>';
+        }
+    
+        $('.tootls_commonly_list').html(tli);
+
+        $('.glyphicon-edit').click(function(){
+            var index = $(this).parent().parent().attr('data-index');
+            var t = alist[index];
+            webShell_cmd(t['title'],t['cmd']);
+        });
+
+        $('.glyphicon-trash').click(function(){
+            var index = $(this).parent().parent().attr('data-index');
+            var t = alist[index];
+            appPost('del_cmd', {title:t['title']}, function(rdata){
+                var rdata = $.parseJSON(rdata.data);
+                showMsg(rdata.msg, function(){
+                    webShell_getCmdList();
+                },{ icon: rdata.status ? 1 : 2 });
+            });
+        });
+
+        $('.data-cmd-list').click(function(){
+            copyText($(this).attr('data-clipboard-text'));
+        });
+    });
 }
 
 
 function webShell_Menu() {
     var termCols = 83;
-    var termRows = 21;
+    var termRows = 20;
     var sendTotal = 0;
     if(!socket)socket = io.connect();
     var term = new Terminal({ cols: termCols, rows: termRows, screenKeys: true, useStyle: true});
@@ -79,8 +274,6 @@ function webShell_Menu() {
         socket.emit('webssh', data);
     });
 
-    // term.destroy();
-    // clearInterval(interval);
 	$(".shell_btn_close").click(function(){
 		layer.close(term_box);
 		term.destroy();
@@ -187,19 +380,101 @@ function webShell_Menu() {
     }, 100);
 }
 
-function shell_to_baidu() {
-    var selectText = getCookie('ssh_selection');
-    remove_ssh_menu();
-    window.open('https://www.baidu.com/s?wd=' + selectText)
-    gterm.focus();
+function webShell_addServer(){
+    layer.open({
+        type: 1,
+        title: '添加主机信息',
+        area: '500px',
+        btn:["确定","取消"],
+        content:'<div class="bt-form pd20 c6">\
+                    <div class="line input_group">\
+                        <span class="tname">服务器IP</span>\
+                        <div class="info-r">\
+                            <input type="text" name="host" class="bt-input-text mr5" style="width:240px" value="127.0.0.1" placeholder="输入服务器IP" val="" autocomplete="off" />\
+                            <input type="text" name="port" class="bt-input-text mr5" style="width:60px" placeholder="端口" value="22" autocomplete="off"/>\
+                        </div>\
+                    </div>\
+                    <div class="line">\
+                        <span class="tname">SSH账号</span>\
+                        <div class="info-r">\
+                            <input type="text" name="username" class="bt-input-text mr5" style="width:305px" placeholder="输入SSH账号" value="root" autocomplete="off"/>\
+                        </div>\
+                    </div>\
+                    <div class="line">\
+                        <span class="tname">验证方式</span>\
+                        <div class="info-r ">\
+                            <div class="btn-group">\
+                                <button type="button" tabindex="-1" class="btn btn-sm auth_type_checkbox  btn-success" data-ctype="0">密码验证</button>\
+                                <button type="button" tabindex="-1" class="btn btn-sm auth_type_checkbox  btn-default" data-ctype="1">私钥验证\
+                                </button>\
+                            </div>\
+                        </div>\
+                    </div>\
+                    <div class="line c_password_view show">\
+                        <span class="tname">密码</span>\
+                        <div class="info-r">\
+                            <input type="text" name="password" class="bt-input-text mr5" placeholder="请输入SSH密码" style="width:305px;" value="" autocomplete="off"/>\
+                        </div>\
+                    </div>\
+                    <div class="line c_pkey_view hide">\
+                        <span class="tname">私钥</span>\
+                        <div class="info-r">\
+                            <textarea rows="4" name="pkey" class="bt-input-text mr5" placeholder="请输入SSH私钥" style="width:305px;height: 80px;line-height: 18px;padding-top:10px;"></textarea>\
+                        </div>\
+                    </div>\
+                    <div class="line key_pwd_line hide">\
+                        <span class="tname">私钥密码</span>\
+                        <div class="info-r">\
+                            <input type="text" name="pkey_passwd" class="bt-input-text mr5" placeholder="请输入私钥密码" style="width:305px;" value="" autocomplete="off"/>\
+                        </div>\
+                    </div>\
+                    <div class="line ssh_ps_tips">\
+                        <span class="tname">备注</span>\
+                        <div class="info-r">\
+                            <input type="text" name="ps" class="bt-input-text mr5" placeholder="请输入备注,可为空" style="width:305px;" value="" autocomplete="off"/>\
+                        </div>\
+                    </div>\
+                </div>',
+        success:function(){
+        }
+    });
 }
 
-function shell_paste_text(){
-    socket.emit('webssh', getCookie('ssh_selection'));
-    remove_ssh_menu();
-    gterm.focus();
+function webShell_cmd(title='', cmd=''){
+    layer.open({
+        type: 1,
+        title: '添加常用命令信息',
+        area: '500px',
+        btn:["确定","取消"],
+        content:'<div class="bt-form pd20 c6">\
+                    <div class="line">\
+                        <span class="tname">命令名称</span>\
+                        <div class="info-r">\
+                            <input type="text" name="title" class="bt-input-text mr5" style="width:305px" placeholder="请输入常用命令描述，必填项" value="'+title+'" autocomplete="off"/>\
+                        </div>\
+                    </div>\
+                    <div class="line">\
+                        <span class="tname">命令内容</span>\
+                        <div class="info-r">\
+                            <textarea rows="4" name="cmd" class="bt-input-text mr5" placeholder="请输入常用命令信息，必填项" style="width:305px;height: 150px;line-height: 18px;padding-top:10px;">'+cmd+'</textarea>\
+                        </div>\
+                    </div>\
+                </div>',
+        success:function(){
+        },
+        yes:function(l,layer_id){
+            var title = $('input[name="title"]').val();
+            var cmd = $('textarea[name="cmd"]').val();
+
+            appPost('add_cmd', {title:title,cmd:cmd}, function(rdata){
+                layer.close(l);
+                var rdata = $.parseJSON(rdata.data);
+                showMsg(rdata.msg, function(){
+                    webShell_getCmdList();
+                },{ icon: rdata.status ? 1 : 2 });
+            });
+            return false;
+        }
+    });   
 }
 
-function remove_ssh_menu() {
-    $(".contextmenu").remove();
-}
