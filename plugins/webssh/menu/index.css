@@ -470,9 +470,7 @@ color: #bbb;
 
 .tootls_host_list,
 .tootls_commonly_list {
-  /* min-height: 300px; */
   overflow: auto;
-  /* margin-bottom: 10px; */
   overflow-x: hidden;
   font-size: 12px;
   bottom: 0;

@@ -73,7 +73,7 @@ class App():
         if not check[0]:
             return check[1]
 
-        title = args['title']
+        title = args['title'].strip()
         cmd = args['cmd']
 
         t = {
@@ -90,7 +90,7 @@ class App():
         if not check[0]:
             return check[1]
 
-        title = args['title']
+        title = args['title'].strip()
         data_tmp = json.loads(mw.readFile(self.__cmd_path))
         for x in range(0, len(data_tmp)):
             if data_tmp[x]['title'] == title:
@@ -102,6 +102,13 @@ class App():
     def get_cmd_list(self):
         alist = json.loads(mw.readFile(self.__cmd_path))
         return mw.returnJson(True, 'ok', alist)
+
+    def add_server(self):
+        args = self.getArgs()
+        check = self.checkArgs(
+            args, ['host', 'port', 'username', 'password', 'pkey', 'pkey_passwd', 'ps'])
+        if not check[0]:
+            return check[1]
 
 if __name__ == "__main__":
     func = sys.argv[1]

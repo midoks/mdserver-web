@@ -402,10 +402,10 @@ function webShell_addServer(){
                     </div>\
                     <div class="line">\
                         <span class="tname">验证方式</span>\
-                        <div class="info-r ">\
+                        <div class="info-r">\
                             <div class="btn-group">\
-                                <button type="button" tabindex="-1" class="btn btn-sm auth_type_checkbox  btn-success" data-ctype="0">密码验证</button>\
-                                <button type="button" tabindex="-1" class="btn btn-sm auth_type_checkbox  btn-default" data-ctype="1">私钥验证\
+                                <button type="button" tabindex="-1" class="btn btn-sm auth_type_checkbox btn-success" data-ctype="0">密码验证</button>\
+                                <button type="button" tabindex="-1" class="btn btn-sm auth_type_checkbox btn-default" data-ctype="1">私钥验证\
                                 </button>\
                             </div>\
                         </div>\
@@ -436,7 +436,46 @@ function webShell_addServer(){
                     </div>\
                 </div>',
         success:function(){
-        }
+            $('.auth_type_checkbox').click(function(){
+                var ctype = $(this).attr('data-ctype');
+
+                $('.auth_type_checkbox').removeClass('btn-success');
+                $(this).addClass('btn-success');
+
+                if (ctype == 0){
+                    $('.c_password_view').removeClass('show').addClass('show');
+                    $('.c_pkey_view').removeClass('show').addClass('hide');
+                    $('.key_pwd_line').removeClass('show').addClass('hide');
+
+                }else{
+                    $('.c_password_view').removeClass('show').addClass('hide');
+                    $('.c_pkey_view').removeClass('show').addClass('show');
+                    $('.key_pwd_line').removeClass('show').addClass('show');
+
+                }
+            });
+        },
+        yes:function(l,layeror){
+            var host = $('input[name="host"]').val();
+            var port = $('input[name="port"]').val();
+            var username = $('input[name="username"]').val();
+            var password = $('input[name="password"]').val();
+            var pkey = $('input[name="pkey"]').val();
+            var pkey_passwd = $('input[name="pkey_passwd"]').val();
+            var ps = $('input[name="ps"]').val();
+
+            appPost('add_server',{
+                host:host,
+                port:port,
+                username:username,
+                password:password,
+                pkey:pkey,
+                pkey_passwd:pkey_passwd,
+                ps
+            },function(rdata){
+                console.log(rdata);
+            });
+        },
     });
 }
 
