@@ -47,7 +47,8 @@ mw_start_debug(){
     if [ -f /www/server/mdserver-web/data/port.pl ];then
         port=$(cat /www/server/mdserver-web/data/port.pl)
     fi
-	gunicorn -b :${port} -k gevent -w 1 app:app
+    # gunicorn -b :${port} -k gevent -w 1 app:app
+	gunicorn -b :${port} -k geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1 app:app
 }
 
 mw_start_debug2(){
