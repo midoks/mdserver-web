@@ -438,10 +438,9 @@ function webShell_addServer(){
         success:function(){
             $('.auth_type_checkbox').click(function(){
                 var ctype = $(this).attr('data-ctype');
-
                 $('.auth_type_checkbox').removeClass('btn-success');
                 $(this).addClass('btn-success');
-
+                
                 if (ctype == 0){
                     $('.c_password_view').removeClass('show').addClass('show');
                     $('.c_pkey_view').removeClass('show').addClass('hide');
@@ -451,7 +450,6 @@ function webShell_addServer(){
                     $('.c_password_view').removeClass('show').addClass('hide');
                     $('.c_pkey_view').removeClass('show').addClass('show');
                     $('.key_pwd_line').removeClass('show').addClass('show');
-
                 }
             });
         },
