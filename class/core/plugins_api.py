@@ -728,6 +728,7 @@ class plugins_api:
     def makeList(self, data, sType='0'):
         plugins_info = []
 
+        # 相应类型
         if (data['pid'] == sType):
             if type(data['versions']) == list and 'coexist' in data and data['coexist']:
                 tmp_data = self.makeCoexist(data)
@@ -738,6 +739,7 @@ class plugins_api:
                 plugins_info.append(pg)
             return plugins_info
 
+        # 全部
         if sType == '0':
             if type(data['versions']) == list and 'coexist' in data and data['coexist']:
                 tmp_data = self.makeCoexist(data)
@@ -746,6 +748,18 @@ class plugins_api:
             else:
                 pg = self.getPluginInfo(data)
                 plugins_info.append(pg)
+
+        # 已经安装
+        if sType == '-1':
+            if type(data['versions']) == list and 'coexist' in data and data['coexist']:
+                tmp_data = self.makeCoexist(data)
+                for index in range(len(tmp_data)):
+                    if tmp_data[index]['setup']:
+                        plugins_info.append(tmp_data[index])
+            else:
+                pg = self.getPluginInfo(data)
+                if pg['setup']:
+                    plugins_info.append(pg)
 
         # print plugins_info, data
         return plugins_info
