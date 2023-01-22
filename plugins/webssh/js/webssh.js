@@ -1,4 +1,7 @@
 
+
+
+
 function appPost(method,args,callback){
     var _args = null; 
     if (typeof(args) == 'string'){
@@ -129,7 +132,7 @@ function webShell_Load(){
         }
     });
 
-    // webShell_Menu();
+    webShell_Menu2();
 }
 
 
@@ -239,6 +242,10 @@ function webShell_getCmdList(){
 }
 
 
+function webShell_Menu2(){
+    new Terms('#ECFEfRWM8', { ssh_info: { host: "127.0.0.1", ps: "22", id: 'ECFEfRWM8' } });
+}
+
 function webShell_Menu() {
     var termCols = 83;
     var termRows = 20;
@@ -249,7 +256,7 @@ function webShell_Menu() {
     term.open();
     term.setOption('cursorBlink', true);
     term.setOption('fontSize', 14);
-    gterm = term
+    gterm = term;
 
     socket.on('server_response', function (data) {
         term.write(data.data);

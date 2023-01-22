@@ -114,12 +114,10 @@ class App():
 
     def get_server_list(self):
         host_list = []
-
         for name in os.listdir(self.__host_dir):
             info_file = self.__host_dir + '/' + name + '/info.json'
             if not os.path.exists(info_file):
                 continue
-
             try:
                 info_tmp = self.getSshInfo(info_file)
                 host_info = {}

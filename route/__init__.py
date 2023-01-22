@@ -8,6 +8,7 @@ import shutil
 import uuid
 import json
 import traceback
+import socket
 
 # reload(sys)
 #  sys.setdefaultencoding('utf-8')
@@ -26,6 +27,7 @@ from flask import url_for
 from flask import render_template_string, abort
 from flask_caching import Cache
 from flask_session import Session
+
 
 from whitenoise import WhiteNoise
 
@@ -67,6 +69,10 @@ app.config['SESSION_USE_SIGNER'] = True
 app.config['SESSION_KEY_PREFIX'] = 'MW_:'
 app.config['SESSION_COOKIE_NAME'] = "MW_VER_1"
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=31)
+
+if mw.isAppleSystem():
+    app.config['DEBUG'] = True
+
 # Session(app)
 
 # 设置BasicAuth
@@ -87,6 +93,10 @@ if os.path.exists(basic_auth_conf):
 from flask_socketio import SocketIO, emit, send
 socketio = SocketIO()
 socketio.init_app(app)
+
+# sockets
+from flask_sockets import Sockets
+sockets = Sockets(app)
 
 # from gevent.pywsgi import WSGIServer
 # from geventwebsocket.handler import WebSocketHandler
@@ -637,9 +647,41 @@ def connect_ssh():
     return True
 
 
+# methods=["GET", "OPTIONS", "HEAD"]
+# pip3 install flask==1.1.2
+# pip3 install  Werkzeug==1.0.1
+@sockets.route('/webssh', methods=["GET", "OPTIONS", "HEAD"])
+def webssh(ws):
+    print("connection start")
+    while not ws.closed:
+        msg = ws.receive()  # 同步阻塞
+        print(msg)
+        now = datetime.datetime.now().isoformat()
+        ws.send(now)  # 发送数据
+        time.sleep(1)
+
+
+# def handle_route_websocket(app_socket):
+#     @app_socket.route('/webssh')
+#     def page_websocket_test(ws):
+#         now = time.strftime('%Y-%m-%d-%H-%M-%S', time.localtime(time.time()))
+#         while not ws.closed:
+#               # 回传给clicent
+#             message = ws.receive()  # 接收到消息
+#             if message is not None:
+#                 print("client says(%s): %s" % (now, message))
+#                 ws.send(str("回执：server已收到消息!-- %s " % now))
+#                 ws.send(str(json.dumps(message)))  # 回传给clicent
+#             else:
+#                 print(now, "no receive")
+
+
+# handle_route_websocket(sockets)
+
+
 @socketio.on('webssh')
 def webssh(msg):
-    # print('webssh ...')
+    print('webssh cmd:' + msg)
     if not isLogined():
         emit('server_response', {'data': '会话丢失，请重新登陆面板!\r\n'})
         return None
