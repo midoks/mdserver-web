@@ -59,6 +59,13 @@ function appPostCallbak(method, args, callback){
 }
 
 $(document).ready(function(){
+   var tag = $.getUrlParam('tag');
+    if(tag == 'webssh'){
+        webShell_Load();
+    }
+});
+
+function webShell_Load(){
     changeDivH();
     $(window).resize(function(){
         changeDivH();
@@ -101,6 +108,7 @@ $(document).ready(function(){
     });
 
     //服务器列表和常用命令
+    webShell_getHostList();//默认调用
     $('.term_tootls .tab-nav span').click(function(){
         var list_type = $(this).attr('data-type');
         if (!$(this).hasClass('on')){
@@ -111,6 +119,7 @@ $(document).ready(function(){
             $('.term_tootls .tab-con .tab-block').removeClass('on')
             if (list_type == 'host'){
                 $('.term_tootls .tab-con .tab-block').eq(0).addClass('on');
+                webShell_getHostList();
             }
 
             if (list_type == 'shell'){
@@ -120,20 +129,17 @@ $(document).ready(function(){
         }
     });
 
-    webShell_Menu();
-});
+    // webShell_Menu();
+}
 
 
 function changeDivH(){
     var l = $(window).height();
     $('#term_box_view').parent().css('height',l-80);
-
     $('#xterm-viewport').css('height',l-80);
 
-
     $('.tootls_host_list').css('display','block').css('height',l-192);
-    $('.tootls_commonly_list').css('display','block').css('height',l-192);
-    
+    $('.tootls_commonly_list').css('display','block').css('height',l-192);    
 }
 
 
@@ -198,7 +204,7 @@ function webShell_getCmdList(){
         for (var i = 0; i < alist.length; i++) {
             tli+='<li class="data-cmd-list" data-index="'+i+'" data-clipboard-text="'+alist[i]['cmd']+'">\
                     <i></i>\
-                    <span>'+alist[i]['title']+'</span>\
+                    <span class="span_title">'+alist[i]['title']+'</span>\
                     <span class="tootls">\
                         <span class="glyphicon glyphicon-edit" aria-hidden="true" title="编辑常用命令信息"></span>\
                         <span class="glyphicon glyphicon-trash" aria-hidden="true" title="删除常用命令信息"></span>\
@@ -208,13 +214,13 @@ function webShell_getCmdList(){
     
         $('.tootls_commonly_list').html(tli);
 
-        $('.glyphicon-edit').click(function(){
+        $('.data-cmd-list .glyphicon-edit').click(function(){
             var index = $(this).parent().parent().attr('data-index');
             var t = alist[index];
             webShell_cmd(t['title'],t['cmd']);
         });
 
-        $('.glyphicon-trash').click(function(){
+        $('.data-cmd-list .glyphicon-trash').click(function(){
             var index = $(this).parent().parent().attr('data-index');
             var t = alist[index];
             appPost('del_cmd', {title:t['title']}, function(rdata){
@@ -225,8 +231,9 @@ function webShell_getCmdList(){
             });
         });
 
-        $('.data-cmd-list').click(function(){
-            copyText($(this).attr('data-clipboard-text'));
+        $('.data-cmd-list .span_title').click(function(e){
+            copyText($(this).parent().attr('data-clipboard-text'));
+            e.preventDefault();
         });
     });
 }
@@ -380,7 +387,47 @@ function webShell_Menu() {
     }, 100);
 }
 
-function webShell_addServer(){
+function webShell_getHostList(info){
+    appPost('get_server_list', {}, function(rdata){
+        var rdata = $.parseJSON(rdata.data);
+        var alist = rdata.data;
+
+        var tli = '';
+        for (var i = 0; i < alist.length; i++) {
+            tli+='<li class="data-host-list" data-index="'+i+'">\
+                    <i></i>\
+                    <span>'+alist[i]['host']+'</span>\
+                    <span class="tootls">\
+                        <span class="glyphicon glyphicon-edit" aria-hidden="true" title="编辑常用命令信息"></span>\
+                        <span class="glyphicon glyphicon-trash" aria-hidden="true" title="删除常用命令信息"></span>\
+                    </span>\
+                </li>';
+        }
+    
+        $('.tootls_host_list').html(tli);
+
+        $('.data-host-list .glyphicon-edit').click(function(){
+            var index = $(this).parent().parent().attr('data-index');
+            var info = alist[index];
+            webShell_addServer(info);
+        });
+
+        $('.data-host-list .glyphicon-trash').click(function(){
+            var index = $(this).parent().parent().attr('data-index');
+            var t = alist[index];
+            appPost('del_server', {host:t['host']}, function(rdata){
+                var rdata = $.parseJSON(rdata.data);
+                showMsg(rdata.msg, function(){
+                    webShell_getHostList();
+                },{ icon: rdata.status ? 1 : 2 });
+            });
+        });
+
+    });
+}
+
+function webShell_addServer(info=[]){
+    console.log(info);
     layer.open({
         type: 1,
         title: '添加主机信息',
@@ -440,7 +487,7 @@ function webShell_addServer(){
                 var ctype = $(this).attr('data-ctype');
                 $('.auth_type_checkbox').removeClass('btn-success');
                 $(this).addClass('btn-success');
-                
+
                 if (ctype == 0){
                     $('.c_password_view').removeClass('show').addClass('show');
                     $('.c_pkey_view').removeClass('show').addClass('hide');
@@ -457,12 +504,19 @@ function webShell_addServer(){
             var host = $('input[name="host"]').val();
             var port = $('input[name="port"]').val();
             var username = $('input[name="username"]').val();
-            var password = $('input[name="password"]').val();
-            var pkey = $('input[name="pkey"]').val();
-            var pkey_passwd = $('input[name="pkey_passwd"]').val();
+            
+            var type = $('.auth_type_checkbox').attr('data-ctype');
+            if (type == "0"){
+                var password = $('input[name="password"]').val();
+            } else{
+                var pkey = $('input[name="pkey"]').val();
+                var pkey_passwd = $('input[name="pkey_passwd"]').val();
+            }
+            
             var ps = $('input[name="ps"]').val();
 
             appPost('add_server',{
+                type:type,
                 host:host,
                 port:port,
                 username:username,
@@ -471,7 +525,11 @@ function webShell_addServer(){
                 pkey_passwd:pkey_passwd,
                 ps
             },function(rdata){
-                console.log(rdata);
+                layer.close(l);
+                var rdata = $.parseJSON(rdata.data);
+                showMsg(rdata.msg, function(){
+                    webShell_getHostList();
+                },{ icon: rdata.status ? 1 : 2 });
             });
         },
     });

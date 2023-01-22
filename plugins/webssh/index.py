@@ -15,12 +15,17 @@ class App():
 
     __cmd_file = 'cmd.json'
     __cmd_path = ''
+    __host_dir = ''
 
     def __init__(self):
         self.__cmd_path = self.getServerDir() + '/' + self.__cmd_file
 
         if not os.path.exists(self.__cmd_path):
             mw.writeFile(self.__cmd_path, '[]')
+
+        self.__host_dir = self.getServerDir() + '/host'
+        if not os.path.exists(self.__host_dir):
+            os.makedirs(self.__host_dir)
 
     def getPluginName(self):
         return 'webssh'
@@ -103,12 +108,73 @@ class App():
         alist = json.loads(mw.readFile(self.__cmd_path))
         return mw.returnJson(True, 'ok', alist)
 
+    def getSshInfo(self, file):
+        rdata = mw.readFile(file)
+        return json.loads(rdata)
+
+    def get_server_list(self):
+        host_list = []
+
+        for name in os.listdir(self.__host_dir):
+            info_file = self.__host_dir + '/' + name + '/info.json'
+            if not os.path.exists(info_file):
+                continue
+
+            try:
+                info_tmp = self.getSshInfo(info_file)
+                host_info = {}
+                host_info['host'] = name
+                host_info['port'] = info_tmp['port']
+                host_info['ps'] = info_tmp['ps']
+                # host_info['sort'] = int(info_tmp['sort'])
+            except Exception as e:
+                print(e)
+                # if os.path.exists(info_file):
+                #     os.remove(info_file)
+                # continue
+
+            host_list.append(host_info)
+
+        host_list = sorted(host_list, key=lambda x: x['host'], reverse=False)
+        return mw.returnJson(True, 'ok!', host_list)
+
+    def del_server(self):
+        args = self.getArgs()
+        check = self.checkArgs(args, ['host'])
+        if not check[0]:
+            return check[1]
+        host = args['host']
+        info_file = self.__host_dir + '/' + host
+        mw.execShell('rm -rf {}'.format(info_file))
+        return mw.returnJson(True, '删除成功!')
+
     def add_server(self):
         args = self.getArgs()
         check = self.checkArgs(
-            args, ['host', 'port', 'username', 'password', 'pkey', 'pkey_passwd', 'ps'])
+            args, ['host', 'port', 'type', 'username', 'ps'])
         if not check[0]:
             return check[1]
+
+        host = args['host']
+        info = {
+            'port': args['port'],
+            'username': args['username'],
+            'ps': args['ps'],
+            'type': args['type'],
+        }
+
+        if args['type'] == '0':
+            info['password'] = args['password']
+        else:
+            info['pkey'] = args['pkey']
+            info['pkey_passwd'] = args['pkey_passwd']
+
+        dst_host_dir = self.__host_dir + '/' + host
+        if not os.path.exists(dst_host_dir):
+            os.makedirs(dst_host_dir)
+
+        mw.writeFile(dst_host_dir + '/info.json', json.dumps(info))
+        return mw.returnJson(True, '添加成功!')
 
 if __name__ == "__main__":
     func = sys.argv[1]
