@@ -200,10 +200,10 @@ end
 
 function _M.get_http_origin(self)
     local data = ""
-    local method = ngx.req.get_method()
-    if not headers then return data end
     local headers = ngx.req.get_headers()
-    if method ~='GET' then 
+    if not headers then return data end
+    local req_method = ngx.req.get_method()
+    if req_method ~='GET' then 
         -- API disabled in the context of log_by_lua*
         -- ngx.req.read_body()
 
