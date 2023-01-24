@@ -10,6 +10,10 @@
 /* menu end  */
 
 
+.xterm{
+  position: inherit;
+}
+
 .tab-nav {
   border-bottom: #cacad9 1px solid;
 }

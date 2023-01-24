@@ -12,8 +12,7 @@ import socket
 
 # reload(sys)
 #  sys.setdefaultencoding('utf-8')
-
-
+import paramiko
 from datetime import timedelta
 
 from flask import Flask
@@ -612,7 +611,7 @@ do
     ps -t /dev/$i |grep -v TTY | awk '{print $1}' | xargs kill -9
 done
 
-#getHostAddr
+# getHostAddr
 PLIST=`who | grep "${ip}" | awk '{print $2}'`
 for i in $PLIST
 do
@@ -647,45 +646,32 @@ def connect_ssh():
     return True
 
 
-# methods=["GET", "OPTIONS", "HEAD"]
-# pip3 install flask==1.1.2
-# pip3 install  Werkzeug==1.0.1
-@sockets.route('/webssh', methods=["GET", "OPTIONS", "HEAD"])
-def webssh(ws):
-    print("connection start")
-    while not ws.closed:
-        msg = ws.receive()  # 同步阻塞
-        print(msg)
-        now = datetime.datetime.now().isoformat()
-        ws.send(now)  # 发送数据
-        time.sleep(1)
+shell_client = None
 
 
-# def handle_route_websocket(app_socket):
-#     @app_socket.route('/webssh')
-#     def page_websocket_test(ws):
-#         now = time.strftime('%Y-%m-%d-%H-%M-%S', time.localtime(time.time()))
-#         while not ws.closed:
-#               # 回传给clicent
-#             message = ws.receive()  # 接收到消息
-#             if message is not None:
-#                 print("client says(%s): %s" % (now, message))
-#                 ws.send(str("回执：server已收到消息!-- %s " % now))
-#                 ws.send(str(json.dumps(message)))  # 回传给clicent
-#             else:
-#                 print(now, "no receive")
+@socketio.on('webssh_websocketio')
+def webssh_websocketio(data):
+    if not isLogined():
+        emit('server_response', {'data': '会话丢失，请重新登陆面板!\r\n'})
+        return
 
+    global shell_client
+    if not shell_client:
+        import ssh_terminal
+        shell_client = ssh_terminal.ssh_terminal()
 
-# handle_route_websocket(sockets)
+    print("request.sid", request.sid)
+    shell_client.run(request.sid, data)
+    return
 
 
 @socketio.on('webssh')
 def webssh(msg):
-    print('webssh cmd:' + msg)
+    global shell, ssh
     if not isLogined():
         emit('server_response', {'data': '会话丢失，请重新登陆面板!\r\n'})
         return None
-    global shell, ssh
+
     ssh_success = True
     if not shell:
         ssh_success = connect_ssh()
@@ -729,7 +715,6 @@ def connected_msg(msg):
         # print 'connected_msg:' + str(e)
 
 try:
-    import paramiko
     ssh = paramiko.SSHClient()
 
     # 启动尝试时连接

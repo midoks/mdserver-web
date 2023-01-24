@@ -57,6 +57,7 @@ Terms.prototype = {
 
       }
   },
+  
   //websocket关闭事件
   on_close: function (ws_event) {
       this.set_term_icon(0);
@@ -65,7 +66,6 @@ Terms.prototype = {
 
   /**
    * @name 设置终端标题状态
-   * @author chudong<2020-08-10>
    * @param {number} status 终端状态
    * @return void 
   */

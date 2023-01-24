@@ -1,6 +1,6 @@
 
-
-
+//全局
+var host_ssh_list = [];
 
 function appPost(method,args,callback){
     var _args = null; 
@@ -110,8 +110,30 @@ function webShell_Load(){
         webShell_cmd();
     });
 
+    // 切换服务器终端视图
+    $('.term_item_tab .list').on('click', 'span.item', function (ev) {
+        var index = $(this).index(), data = $(this).data();
+        if ($(this).hasClass('addServer')) {
+        } else if ($(this).hasClass('tab_tootls')) {
+        } else {
+            $(this).addClass('active').siblings().removeClass('active');
+            $('.term_content_tab .term_item:eq(' + index + ')').addClass('active').siblings().removeClass('active');
+            var item = host_ssh_list[data.id];
+            // item.term.focus();
+            // item.term.FitAddon.fit();
+            // item.resize({ cols: item.term.cols, rows: item.term.rows });
+        }
+    });
+
+    $('.term_item_tab').on('click', '.icon-trem-close', function () {
+        var id = $(this).parent().data('id');
+        webShell_removeTermView(id);
+    })
+
     //服务器列表和常用命令
-    webShell_getHostList();//默认调用
+    webShell_getHostList();
+
+    //服务器列表和命令切换
     $('.term_tootls .tab-nav span').click(function(){
         var list_type = $(this).attr('data-type');
         if (!$(this).hasClass('on')){
@@ -243,155 +265,46 @@ function webShell_getCmdList(){
 
 
 function webShell_Menu2(){
-    new Terms('#ECFEfRWM8', { ssh_info: { host: "127.0.0.1", ps: "22", id: 'ECFEfRWM8' } });
+    var random = 'localhost';
+    host_ssh_list[random] = new Terms_WebSocketIO('#'+random, { ssh_info: { host: "127.0.0.1", ps: "22", id: random } });
 }
 
-function webShell_Menu() {
-    var termCols = 83;
-    var termRows = 20;
-    var sendTotal = 0;
-    if(!socket)socket = io.connect();
-    var term = new Terminal({ cols: termCols, rows: termRows, screenKeys: true, useStyle: true});
-
-    term.open();
-    term.setOption('cursorBlink', true);
-    term.setOption('fontSize', 14);
-    gterm = term;
-
-    socket.on('server_response', function (data) {
-        term.write(data.data);
-        if (data.data == '\r\n登出\r\n' || 
-            data.data == '登出\r\n' || 
-            data.data == '\r\nlogout\r\n' || 
-            data.data == 'logout\r\n') {
-            setTimeout(function () {
-                layer.closeAll();
-                term.destroy();
-                clearInterval(interval);
-            }, 500);
-        }
-    });
-
-    $(window).unload(function(){
-  　     term.destroy();
-        clearInterval(interval);
-    });
-
-    if (socket) {
-        socket.emit('connect_event', '');
-        interval = setInterval(function () {
-            socket.emit('connect_event', '');
-        }, 1000);
+function webShell_openTermView(info) {
+    console.log(info);
+    if (typeof info === "undefined") {
+        info = { host: '127.0.0.1', ps: '本地服务器' }
     }
-    
-    term.on('data', function (data) {
-        socket.emit('webssh', data);
-    });
-
-	$(".shell_btn_close").click(function(){
-		layer.close(term_box);
-		term.destroy();
-        clearInterval(interval);
-	})
-	
-    setTimeout(function () {
-        $('.terminal').detach().appendTo('#ECFEfRWM8');
-        $("#ECFEfRWM8").show();
-        socket.emit('webssh', "\n");
-        term.focus();
-
-        // 鼠标右键事件
-        var can = $("#term");
-        can.contextmenu(function (e) {
-            var winWidth = can.width();
-            var winHeight = can.height();
-            var mouseX = e.pageX;
-            var mouseY = e.pageY;
-            var menuWidth = $(".contextmenu").width();
-            var menuHeight = $(".contextmenu").height();
-            var minEdgeMargin = 10;
-            if (mouseX + menuWidth + minEdgeMargin >= winWidth &&
-                mouseY + menuHeight + minEdgeMargin >= winHeight) {
-                menuLeft = mouseX - menuWidth - minEdgeMargin + "px";
-                menuTop = mouseY - menuHeight - minEdgeMargin + "px";
-            }
-            else if (mouseX + menuWidth + minEdgeMargin >= winWidth) {
-                menuLeft = mouseX - menuWidth - minEdgeMargin + "px";
-                menuTop = mouseY + minEdgeMargin + "px";
-            }
-            else if (mouseY + menuHeight + minEdgeMargin >= winHeight) {
-                menuLeft = mouseX + minEdgeMargin + "px";
-                menuTop = mouseY - menuHeight - minEdgeMargin + "px";
-            }
-            else {
-                menuLeft = mouseX + minEdgeMargin + "px";
-                menuTop = mouseY + minEdgeMargin + "px";
-            };
-
-            var selectText = term.getSelection()
-            var style_str = '';
-            var paste_str = '';
-            if (!selectText) {
-                if (!getCookie('shell_copy_body')) {
-                    paste_str = 'style="color: #bbb;" disable';
-                }
-                style_str = 'style="color: #bbb;" disable';
-            } else {
-                setCookie('ssh_selection', selectText);
-            }
+    var random = getRandomString(9);
+    var tab_content = $('.term_content_tab');
+    var item_list = $('.term_item_tab .list');
+    tab_content.find('.term_item').removeClass('active').siblings().removeClass('active');
+    tab_content.append('<div class="term_item active" id="' + random + '" data-host="' + info.host + '"></div>');
+    item_list.find('.item').removeClass('active');
+    if (info.ps == ''){
+        info.ps = info.host;
+    }
+    item_list.append('<span class="active item ' + (info.host == '127.0.0.1' ? 'localhost_item' : '') + '" data-host="' + info.host + '" data-id="' + random + '"><i class="icon icon-sucess"></i><div class="content"><span>' + info.ps + '</span></div><span class="icon-trem-close"></span></span>');
+    host_ssh_list[random] = new Terms_WebSocketIO('#' + random, { ssh_info: { host: info.host, ps: info.ps, id: random } });
+}
 
 
-            var menudiv = '<ul class="contextmenu">\
-                        <li><a class="shell_copy_btn menu_ssh" data-clipboard-text="'+ selectText + '" ' + style_str + '>复制到剪切板</a></li>\
-                        <li><a  onclick="shell_paste_text()" '+ paste_str+'>粘贴选中项</a></li>\
-                        <li><a onclick="shell_to_baidu()" ' + style_str + '>百度搜索</a></li>\
-                    </ul>';
-            $("body").append(menudiv);
-            $(".contextmenu").css({
-                "left": menuLeft,
-                "top": menuTop
-            });
-            return false;
-        });
-        can.click(function () {
-            remove_ssh_menu();
-        });
+function webShell_removeTermView(id){
+    var item = $('[data-id="' + id + '"]'), next = item.next(), prev = item.prev();
+    $('#' + id).remove();
+    item.remove();
+    try {
+        host_ssh_list[id].close();
+    } catch (error) {
+    }
 
-        clipboard = new ClipboardJS('.shell_copy_btn');
-        clipboard.on('success', function (e) {
-            layer.msg('复制成功!');
-            setCookie('shell_copy_body', e.text)
-            remove_ssh_menu();
-            term.focus();
-        });
-
-        clipboard.on('error', function (e) {
-            layer.msg('复制失败，浏览器不兼容!');
-            setCookie('shell_copy_body', e.text)
-            remove_ssh_menu();
-            term.focus();
-        });
-
-        $(".shellbutton").click(function () {
-            var tobj = $("textarea[name='ssh_copy']");
-            var ptext = tobj.val();
-            tobj.val('');
-            if ($(this).text().indexOf('Alt') != -1) {
-                ptext +="\n";
-            }
-            socket.emit('webssh', ptext);
-            term.focus();
-        })
-        $("textarea[name='ssh_copy']").keydown(function (e) {
-
-            if (e.ctrlKey && e.keyCode == 13) {
-                $(".shell_btn_1").click();
-            } else if (e.altKey && e.keyCode == 13) {
-                $(".shell_btn_1").click();
-            }
-        });
-
-    }, 100);
+    delete host_ssh_list[id];
+    if (item.hasClass('active')) {
+        if (next.length > 0) {
+            next.click();
+        } else {
+            prev.click();
+        }
+    }
 }
 
 function webShell_getHostList(info){
@@ -401,7 +314,7 @@ function webShell_getHostList(info){
 
         var tli = '';
         for (var i = 0; i < alist.length; i++) {
-            tli+='<li class="data-host-list" data-index="'+i+'">\
+            tli+='<li class="data-host-list" data-index="'+i+'" data-host="'+alist[i]['host']+'">\
                     <i></i>\
                     <span>'+alist[i]['host']+'</span>\
                     <span class="tootls">\
@@ -430,11 +343,42 @@ function webShell_getHostList(info){
             });
         });
 
+
+        $('.tootls_host_list').on('click', 'li', function (e) {
+            var index = $(this).index();
+            var host = $(this).data('host');
+            $(this).find('i').addClass('active');
+            if ($('.item[data-host="' + host + '"]').length > 0) {
+                layer.msg('已经打开!', { icon: 0, time: 3000 })
+                // layer.msg('如需多会话窗口，请右键终端标题复制会话!', { icon: 0, time: 3000 });
+            } else {
+                webShell_openTermView(alist[index]);
+            }
+        });
+
+        // tab切换
+        $('.term_tootls .tab-nav span').click(function () {
+            if ($(this).hasClass('on')) return;
+            var index = $(this).index();
+            $(this).siblings('.on').removeClass('on');
+            $(this).addClass('on');
+            $('.term_tootls .tab-con .tab-block').removeClass('on');
+            $('.term_tootls .tab-con .tab-block').eq(index).addClass('on');
+            var type = $(this).attr('data-type');
+            switch (type) {
+              case 'host':
+                  that.reader_host_list();
+                  break;
+              case 'shell':
+                  that.reader_command_list();
+                  break;
+            }
+        });
+
     });
 }
 
 function webShell_addServer(info=[]){
-    console.log(info);
     layer.open({
         type: 1,
         title: '添加主机信息',
