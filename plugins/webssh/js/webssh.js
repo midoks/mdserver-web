@@ -2,6 +2,14 @@
 //全局
 var host_ssh_list = [];
 
+//刷新页面
+$(window).unload(function(){
+    for (i in host_ssh_list) {
+        host_ssh_list[i].close();
+    }
+    return false;
+});
+
 function appPost(method,args,callback){
     var _args = null; 
     if (typeof(args) == 'string'){
@@ -68,10 +76,20 @@ $(document).ready(function(){
     }
 });
 
+function webShell_Resize(){
+    var cur_ssh = $('.term_item_tab .list .active');
+    var data = $(cur_ssh).data();
+    var item = host_ssh_list[data.id];
+    item.term.focus();
+    item.term.fit();
+    item.resize({ cols: item.term.cols, rows: item.term.rows});
+}
+
 function webShell_Load(){
     changeDivH();
     $(window).resize(function(){
         changeDivH();
+        webShell_Resize();
     });
 
     $('.term_content_tab .term-tool-button').click(function(){
@@ -86,7 +104,10 @@ function webShell_Load(){
             $(this).removeClass('tool-hide').addClass('tool-show');
             $(this).find('span').removeClass('glyphicon-menu-right').addClass('glyphicon-menu-left');
         }
+        webShell_Resize();
     });
+
+
 
     $('.full_exit_screen').click(function(ele){
         if($(this).hasClass('glyphicon-resize-full')){
@@ -112,16 +133,14 @@ function webShell_Load(){
 
     // 切换服务器终端视图
     $('.term_item_tab .list').on('click', 'span.item', function (ev) {
-        var index = $(this).index(), data = $(this).data();
+        var index = $(this).index();
+        var data = $(this).data();
         if ($(this).hasClass('addServer')) {
         } else if ($(this).hasClass('tab_tootls')) {
         } else {
             $(this).addClass('active').siblings().removeClass('active');
             $('.term_content_tab .term_item:eq(' + index + ')').addClass('active').siblings().removeClass('active');
-            var item = host_ssh_list[data.id];
-            // item.term.focus();
-            // item.term.FitAddon.fit();
-            // item.resize({ cols: item.term.cols, rows: item.term.rows });
+            webShell_Resize();
         }
     });
 
@@ -155,6 +174,8 @@ function webShell_Load(){
     });
 
     webShell_Menu();
+    // webShell_Resize();
+    // $('.term_content_tab .term-tool-button').click();
 }
 
 
@@ -277,11 +298,9 @@ function webShell_Menu(){
     var random = 'localhost';
     // host_ssh_list[random] = new Terms_WebSocketIO('#'+random, { ssh_info: { host: "38.6.224.67", ps: "22", id: random } });
     host_ssh_list[random] = Terms_WebSocketIO_Create('127.0.0.1',random);
-    
 }
 
 function webShell_openTermView(info) {
-    console.log(info);
     if (typeof info === "undefined") {
         info = { host: '127.0.0.1', ps: '本地服务器' }
     }
@@ -296,6 +315,8 @@ function webShell_openTermView(info) {
     }
     item_list.append('<span class="active item ' + (info.host == '127.0.0.1' ? 'localhost_item' : '') + '" data-host="' + info.host + '" data-id="' + random + '"><i class="icon icon-sucess"></i><div class="content"><span>' + info.ps + '</span></div><span class="icon-trem-close"></span></span>');
     host_ssh_list[random] = Terms_WebSocketIO_Create(info.host, random);
+
+    webShell_Resize();
 }
 
 
@@ -308,6 +329,7 @@ function webShell_removeTermView(id){
     try {
         host_ssh_list[id].close();
     } catch (error) {
+        console.log(error);
     }
 
     delete host_ssh_list[id];

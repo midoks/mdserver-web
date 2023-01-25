@@ -53,12 +53,11 @@ class ssh_terminal:
     __ps = None
 
     __ssh_list = {}
+    __ssh_last_request_time = {}
 
     def __init__(self):
-        # ht = threading.Thread(target=self.heartbeat)
-        # ht.start()
-        # ht.join()
-        pass
+        ht = threading.Thread(target=self.heartbeat)
+        ht.start()
 
     def debug(self, msg):
         msg = "{} - {}:{} => {} \n".format(mw.formatDate(),
@@ -208,6 +207,7 @@ class ssh_terminal:
             term='xterm', width=83, height=21)
         ssh.setblocking(0)
         self.__ssh_list[self.__sid] = ssh
+        self.__ssh_last_request_time[self.__sid] = time.time()
         mw.writeLog(self.__log_type, '成功登录到SSH服务器 [{}:{}]'.format(
             self.__host, self.__port))
         self.debug('local-ssh:通道已构建')
@@ -329,6 +329,7 @@ class ssh_terminal:
         ssh.get_pty(term='xterm', width=100, height=34)
         ssh.invoke_shell()
         self.__ssh_list[self.__sid] = ssh
+        self.__ssh_last_request_time[self.__sid] = time.time()
         mw.writeLog(self.__log_type, '成功登录到SSH服务器 [{}:{}]'.format(
             self.__host, self.__port))
         self.debug('通道已构建')
@@ -355,10 +356,10 @@ class ssh_terminal:
         if 'pkey_passwd' in info:
             self.__key_passwd = info['pkey_passwd']
 
-        print(self.__host, self.__pass, self.__key_passwd)
+        # print(self.__host, self.__pass, self.__key_passwd)
         try:
             result = self.connect()
-            print(result)
+            # print(result)
         except Exception as ex:
             if str(ex).find("NoneType") == -1:
                 raise ex
@@ -378,16 +379,13 @@ class ssh_terminal:
         except:
             pass
 
-    def heartbeat(self):
-        while True:
-            time.sleep(3)
-            print("heartbeat:__ssh_list:", len(self.__ssh_list))
-            # self.debug("heartbeat:__ssh_list:" + str(len(self.__ssh_list)))
-            # if self.__tp and self.__tp.is_active():
-            #     self.__tp.send_ignore()
-
-            # if self.__ps and self.__ps.is_active():
-            #     self.__ps.send_ignore()
+    def resize(self, data):
+        try:
+            self.__ssh_list[self.__sid].resize_pty(
+                width=data['cols'], height=data['rows'])
+            return True
+        except:
+            return False
 
     def wsSend(self, recv):
         try:
@@ -395,42 +393,6 @@ class ssh_terminal:
             return emit('server_response', {'data': t})
         except Exception as e:
             return emit('server_response', {'data': recv})
-
-    def run(self, sid, info):
-        # sid = mw.md5(sid)
-        self.__sid = sid
-        if not self.__sid:
-            return self.wsSend('WebSocketIO无效')
-
-        if self.__connecting and not 'host' in info:
-            return
-
-        result = self.returnMsg(False, '')
-        if not sid in self.__ssh_list:
-            if type(info) == dict:
-                self.__connecting = True
-                result = self.setAttr(info)
-                self.__connecting = False
-
-        if sid in self.__ssh_list:
-            result = self.returnMsg(True, '已连接')
-
-        if result['status']:
-            if type(info) == str:
-                time.sleep(0.1)
-                if self.__ssh_list[sid].exit_status_ready():
-                    self.wsSend("logout\r\n")
-                    del(self.__ssh_list[sid])
-                    return
-                self.__ssh_list[sid].send(info)
-                try:
-                    time.sleep(0.005)
-                    recv = self.__ssh_list[sid].recv(8192)
-                    return self.wsSend(recv)
-                except Exception as ex:
-                    return self.wsSend('')
-        else:
-            return self.wsSend(result['msg'])
 
     def getSshDir(self):
         if mw.isAppleSystem():
@@ -470,3 +432,62 @@ class ssh_terminal:
                 mw.execShell(cmd)
                 cmd = 'chmod 600 ' + ssh_dir + '/authorized_keys'
                 mw.execShell(cmd)
+
+    def heartbeat(self):
+        while True:
+            time.sleep(3)
+
+            cur_time = time.time()
+            print("heartbeat:cur_time:", cur_time)
+            print("heartbeat:__ssh_list:", len(self.__ssh_list))
+            for x in self.__ssh_list:
+                ssh_last_time = self.__ssh_last_request_time[x]
+                print(x, self.__ssh_list[x])
+            # self.debug("heartbeat:__ssh_list:" + str(len(self.__ssh_list)))
+            # if self.__tp and self.__tp.is_active():
+            #     self.__tp.send_ignore()
+
+            # if self.__ps and self.__ps.is_active():
+            #     self.__ps.send_ignore()
+
+    def run(self, sid, info):
+        # sid = mw.md5(sid)
+        self.__sid = sid
+        if not self.__sid:
+            return self.wsSend('WebSocketIO无效')
+
+        if self.__connecting and not 'host' in info:
+            return
+
+        result = self.returnMsg(False, '')
+        if not sid in self.__ssh_list:
+            if type(info) == dict and 'host' in info:
+                self.__connecting = True
+                result = self.setAttr(info)
+                self.__connecting = False
+
+        if sid in self.__ssh_list:
+            if 'resize' in info:
+                self.resize(info)
+            result = self.returnMsg(True, '已连接')
+
+        print("req.__ssh_list:", str(len(self.__ssh_list)))
+        print("req.:cmd:", sid, info)
+        if result['status']:
+            if type(info) == str:
+                time.sleep(0.1)
+                cur_ssh = self.__ssh_list[sid]
+                if cur_ssh.exit_status_ready():
+                    self.wsSend("logout\r\n")
+                    del(self.__ssh_list[sid])
+                    return
+
+                cur_ssh.send(info)
+                try:
+                    time.sleep(0.005)
+                    recv = cur_ssh.recv(8192)
+                    return self.wsSend(recv)
+                except Exception as ex:
+                    return self.wsSend('')
+        else:
+            return self.wsSend(result['msg'])

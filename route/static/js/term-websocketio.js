@@ -23,80 +23,91 @@ Terms_WebSocketIO.prototype = {
         this.callback_close =  callback;
     },
 
-    // websocket持久化连接
-    connect: function (callback) {
+    connectWs: function (callback) {
         if(!this.ws){
             this.ws = io.connect();
         }
     },
 
-    //连接服务器成功
-    on_open: function (ws_event) {
-      this.term.FitAddon.fit();
-      this.resize({ cols: this.term.cols, rows: this.term.rows });
+    connectSsh:function(){
+        this.send(this.ssh_info);
+        this.send('\n');
     },
 
-    //服务器消息事件
+    close:function(){
+        this.ws.disconnect();
+        this.ws.close();
+    },
+
     on_message: function (ws_event) {
         this.term.write(ws_event.data);
+        console.log(ws_event.data);
         if (ws_event.data == '\r\n登出\r\n' ||  ws_event.data == '登出\r\n' || 
             ws_event.data == '\r\nlogout\r\n' ||  ws_event.data == 'logout\r\n'||
             ws_event.data == '\r\nexit\r\n' ||  ws_event.data == 'exit\r\n') {
             this.term.destroy();
-            clearInterval(this.term_timer);
             this.ws.disconnect();
             this.ws.close();
+            clearInterval(this.term_timer);
 
-            console.log('message',this.callback_close,typeof(this.callback_close));
             if (this.callback_close){
                 this.callback_close();
             }
         }
     },
 
-    resize: function (size) {
-      if (this.ws) {
-          size['resize'] = 1;
-          this.send(JSON.stringify(size));
-      }
+
+
+    on_connect:function(ws_event){
 
     },
+
+    on_exit:function(ws_event){
+
+    },
+
+    send:function(data){
+        this.ws.emit(this.route, data);
+    },
+
+    resize: function (size) {
+        if (this.ws) {
+            size['resize'] = 1;
+            this.send(size)
+        }
+    },
     run: function (ssh_info) {
-        this.connect();
+        this.connectWs();
 
         var that = this;    
         var termCols = 83;
         var termRows = 21;
-        this.term = new Terminal({ cols: termCols, rows: termRows, screenKeys: true, useStyle: true});
+        this.term = new Terminal({fontSize: this.fontSize,screenKeys: true, useStyle: true});
 
         this.term.open($('#'+this.id)[0]);
         this.term.setOption('cursorBlink', true);
-        this.term.setOption('fontSize', this.fontSize);
-
-        // console.log(this.term.cols,this.term.rows);
-        // this.term.fit();
-        // console.log(this.term.cols,this.term.rows);
-
-        // this.term.FitAddon = new window.FitAddon();
-        // this.term.loadAddon(this.term.FitAddon);
-        // this.term.WebLinksAddon = new WebLinksAddon.WebLinksAddon();
-        // this.term.loadAddon(this.term.WebLinksAddon);
-
         this.ws.on('server_response', function (ev) { that.on_message(ev)});
+        this.ws.on('connect', function (ev) { that.on_connect(ev)});
+        this.ws.on('exit', function (ev) { that.on_exit(ev)});
 
         if (this.ws) {
-            that.ws.emit('webssh_websocketio', '');
+            that.send('');
             this.term_timer = setInterval(function () {
-                that.ws.emit('webssh_websocketio', '');
-            }, 500);
+                that.send('');
+            }, 600);
         }
         
         this.term.on('data', function (data) {
-            that.ws.emit('webssh_websocketio', data);
+            try {
+                that.send(data)
+            } catch (e) {
+                that.term.write('\r\n连接丢失,正在尝试重新连接!\r\n');
+                that.connectSsh();
+            }
         });
-    
-        this.ws.emit('webssh_websocketio', this.ssh_info);
-        this.ws.emit('webssh_websocketio', '\n');
+        that.term.write('\r\n请稍等,正在链接中...\r\n');
+
+        this.connectSsh();
         this.term.focus();
     }
 }

@@ -310,6 +310,19 @@ color: #bbb;
   color: #4c4c4c;
 }
 
+
+
+.term_content_tab {
+  background-color: rgb(51, 51, 51);
+  position: absolute;
+  top: 38px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 10px 10px 10px 10px;
+  overflow: hidden;
+}
+
 .term_content_tab .term_item {
   height: 100%;
   width: 100%;
@@ -318,17 +331,6 @@ color: #bbb;
 
 .term_content_tab .term_item.active {
   display: inline-block;
-}
-
-.term_content_tab {
-  background-color: #000;
-  position: absolute;
-  top: 38px;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 10px 5px 10px 10px;
-  overflow: hidden;
 }
 
 .term-tool-button {
