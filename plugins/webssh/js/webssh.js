@@ -154,7 +154,7 @@ function webShell_Load(){
         }
     });
 
-    webShell_Menu2();
+    webShell_Menu();
 }
 
 
@@ -264,8 +264,9 @@ function webShell_getCmdList(){
 }
 
 
-function webShell_Menu2(){
+function webShell_Menu(){
     var random = 'localhost';
+    // host_ssh_list[random] = new Terms_WebSocketIO('#'+random, { ssh_info: { host: "38.6.224.67", ps: "22", id: random } });
     host_ssh_list[random] = new Terms_WebSocketIO('#'+random, { ssh_info: { host: "127.0.0.1", ps: "22", id: random } });
 }
 

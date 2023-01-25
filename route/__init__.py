@@ -660,7 +660,7 @@ def webssh_websocketio(data):
         import ssh_terminal
         shell_client = ssh_terminal.ssh_terminal()
 
-    print("request.sid", request.sid)
+    # print("request.sid", request.sid)
     shell_client.run(request.sid, data)
     return
 

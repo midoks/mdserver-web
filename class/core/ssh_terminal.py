@@ -52,13 +52,18 @@ class ssh_terminal:
     __tp = None
     __ps = None
 
+    __ssh_list = {}
+
     def __init__(self):
-        pass
+        ht = threading.Thread(target=self.heartbeat)
+        ht.start()
+        ht.join()
 
     def debug(self, msg):
         msg = "{} - {}:{} => {} \n".format(mw.formatDate(),
                                            self.__host, self.__port, msg)
-        # self.history_send(msg)
+        if not mw.isDebugMode():
+            return
         mw.writeFile(self.__debug_file, msg, 'a+')
 
     def returnMsg(self, status, msg):
@@ -193,10 +198,15 @@ class ssh_terminal:
             return self.returnMsg(False, "未知错误: {}".format(err))
 
         self.debug('local-ssh:认证成功，正在构建会话通道')
-        self.__ssh = self.__ps.invoke_shell(term='xterm', width=83, height=21)
-        self.__ssh.setblocking(0)
-        self.__connect_time = time.time()
-        self.__last_send = []
+        # self.__ssh = self.__ps.invoke_shell(term='xterm', width=83, height=21)
+        # self.__ssh.setblocking(0)
+        # self.__connect_time = time.time()
+        # self.__last_send = []
+
+        ssh = self.__ps.invoke_shell(
+            term='xterm', width=83, height=21)
+        ssh.setblocking(0)
+        self.__ssh_list[self.__sid] = ssh
         mw.writeLog(self.__log_type, '成功登录到SSH服务器 [{}:{}]'.format(
             self.__host, self.__port))
         self.debug('local-ssh:通道已构建')
@@ -209,9 +219,6 @@ class ssh_terminal:
             self.__user = 'root'
         if not self.__port:
             self.__port = 22
-
-        if self.__host in ['127.0.0.1', 'localhost']:
-            self.__port = mw.getSSHPort()
 
         self.setSshdConfig(True)
         num = 0
@@ -230,18 +237,16 @@ class ssh_terminal:
                 if num == 5:
                     self.setSshdConfig(True)
                     self.debug('重试连接失败,{}'.format(e))
-                    if self.__host in ['127.0.0.1', 'localhost']:
-                        return self.returnMsg(False, '连接目标服务器失败: {}'.format("Authentication failed ," + self.__user + "@" + self.__host + ":" + str(self.__port)))
                     return self.returnMsg(False, '连接目标服务器失败, {}:{}'.format(self.__host, self.__port))
                 else:
                     time.sleep(0.2)
 
-        # print(sock)
+        # print(self.__host, sock)
         self.__tp = paramiko.Transport(sock)
         try:
             self.__tp.start_client()
             self.__tp.banner_timeout = 60
-            if not self.__pass or not self.__pkey:
+            if not self.__pass and not self.__pkey:
                 return self.returnMsg(False, '密码或私钥不能都为空: {}:{}'.format(self.__host, self.__port))
 
             if self.__pkey:
@@ -313,11 +318,16 @@ class ssh_terminal:
             return self.returnMsg(False, "未知错误: {}".format(err))
 
         self.debug('认证成功，正在构建会话通道')
-        self.__ssh = self.__tp.open_session()
-        self.__ssh.get_pty(term='xterm', width=100, height=34)
-        self.__ssh.invoke_shell()
-        self.__connect_time = time.time()
-        self.__last_send = []
+        # self.__ssh = self.__tp.open_session()
+        # self.__ssh.get_pty(term='xterm', width=100, height=34)
+        # self.__ssh.invoke_shell()
+        # self.__connect_time = time.time()
+        # self.__last_send = []
+
+        ssh = self.__tp.open_session()
+        ssh.get_pty(term='xterm', width=100, height=34)
+        ssh.invoke_shell()
+        self.__ssh_list[self.__sid] = ssh
         mw.writeLog(self.__log_type, '成功登录到SSH服务器 [{}:{}]'.format(
             self.__host, self.__port))
         self.debug('通道已构建')
@@ -325,6 +335,13 @@ class ssh_terminal:
 
     def setAttr(self, info):
         self.__host = info['host'].strip()
+
+        # 外部连接获取
+        if not self.__host in ['127.0.0.1', 'localhost']:
+            dst_info = mw.getServerDir() + '/webssh/host/' + self.__host + '/info.json'
+            if os.path.exists(dst_info):
+                _t = mw.readFile(dst_info)
+                info = json.loads(_t)
 
         if 'port' in info:
             self.__port = int(info['port'])
@@ -336,8 +353,11 @@ class ssh_terminal:
             self.__pass = info['password']
         if 'pkey_passwd' in info:
             self.__key_passwd = info['pkey_passwd']
+
+        print(self.__host, self.__pass, self.__key_passwd)
         try:
             result = self.connect()
+            print(result)
         except Exception as ex:
             if str(ex).find("NoneType") == -1:
                 raise ex
@@ -359,7 +379,8 @@ class ssh_terminal:
 
     def heartbeat(self):
         while True:
-            time.sleep(0.1)
+            time.sleep(1)
+            print("heartbeat:__ssh_list:", len(self.__ssh_list))
             if self.__tp and self.__tp.is_active():
                 self.__tp.send_ignore()
             else:
@@ -378,6 +399,7 @@ class ssh_terminal:
             return emit('server_response', {'data': recv})
 
     def run(self, sid, info):
+        # sid = mw.md5(sid)
         self.__sid = sid
         if not self.__sid:
             return self.wsSend('WebSocketIO无效')
@@ -385,21 +407,27 @@ class ssh_terminal:
         if self.__connecting and not 'host' in info:
             return
 
-        if not self.__ssh:
-            self.__connecting = True
-            result = self.setAttr(info)
-            self.__connecting = False
-        else:
+        result = self.returnMsg(False, '')
+        if not sid in self.__ssh_list:
+            if type(info) == dict:
+                self.__connecting = True
+                result = self.setAttr(info)
+                self.__connecting = False
+
+        if sid in self.__ssh_list:
             result = self.returnMsg(True, '已连接')
 
         if result['status']:
             if type(info) == str:
                 time.sleep(0.1)
-                self.__ssh.send(info)
-
+                if self.__ssh_list[sid].exit_status_ready():
+                    self.wsSend("已关闭!\r\n")
+                    del(self.__ssh_list[sid])
+                    return
+                self.__ssh_list[sid].send(info)
                 try:
                     time.sleep(0.005)
-                    recv = self.__ssh.recv(8192)
+                    recv = self.__ssh_list[sid].recv(8192)
                     return self.wsSend(recv)
                 except Exception as ex:
                     return self.wsSend('')
