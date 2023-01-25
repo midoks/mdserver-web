@@ -47,7 +47,6 @@ class ssh_terminal:
     __rep_ssh_service = False
     __sshd_config_backup = None
 
-    __connecting = False
     __ssh = None
     __tp = None
     __ps = None
