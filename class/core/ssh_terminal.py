@@ -55,9 +55,10 @@ class ssh_terminal:
     __ssh_list = {}
 
     def __init__(self):
-        ht = threading.Thread(target=self.heartbeat)
-        ht.start()
-        ht.join()
+        # ht = threading.Thread(target=self.heartbeat)
+        # ht.start()
+        # ht.join()
+        pass
 
     def debug(self, msg):
         msg = "{} - {}:{} => {} \n".format(mw.formatDate(),
@@ -379,17 +380,14 @@ class ssh_terminal:
 
     def heartbeat(self):
         while True:
-            time.sleep(1)
+            time.sleep(3)
             print("heartbeat:__ssh_list:", len(self.__ssh_list))
-            if self.__tp and self.__tp.is_active():
-                self.__tp.send_ignore()
-            else:
-                break
+            # self.debug("heartbeat:__ssh_list:" + str(len(self.__ssh_list)))
+            # if self.__tp and self.__tp.is_active():
+            #     self.__tp.send_ignore()
 
-            if self.__ps and self.__ps.is_active():
-                self.__ps.send_ignore()
-            else:
-                break
+            # if self.__ps and self.__ps.is_active():
+            #     self.__ps.send_ignore()
 
     def wsSend(self, recv):
         try:
