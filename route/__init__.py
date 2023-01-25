@@ -555,97 +555,7 @@ def index(reqClass=None, reqAction=None, reqData=None):
 
 
 ##################### ssh  start ###########################
-ssh = None
 shell = None
-
-
-def get_ssh_dir():
-    if mw.isAppleSystem():
-        user = mw.execShell(
-            "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
-        return '/Users/' + user + '/.ssh'
-    return '/root/.ssh'
-
-ssh_dir = get_ssh_dir()
-
-
-def create_rsa():
-    # mw.execShell("rm -f /root/.ssh/*")
-    if not os.path.exists(ssh_dir + '/authorized_keys'):
-        mw.execShell('touch ' + ssh_dir + '/authorized_keys')
-
-    if not os.path.exists(ssh_dir + '/id_rsa.pub') and os.path.exists(ssh_dir + '/id_rsa'):
-        mw.execShell(
-            'echo y | ssh-keygen -q -t rsa -P "" -f ' + ssh_dir + '/id_rsa')
-    else:
-        mw.execShell('ssh-keygen -q -t rsa -P "" -f ' + ssh_dir + '/id_rsa')
-
-    mw.execShell('cat ' + ssh_dir + '/id_rsa.pub >> ' +
-                 ssh_dir + '/authorized_keys')
-    mw.execShell('chmod 600 ' + ssh_dir + '/authorized_keys')
-
-
-def create_ssh_info():
-    if not os.path.exists(ssh_dir + '/id_rsa') or not os.path.exists(ssh_dir + '/id_rsa.pub'):
-        create_rsa()
-
-    # 检查是否写入authorized_keys
-    data = mw.execShell("cat " + ssh_dir + "/id_rsa.pub | awk '{print $3}'")
-    if data[0] != "":
-        cmd = "cat " + ssh_dir + "/authorized_keys | grep " + data[0]
-        ak_data = mw.execShell(cmd)
-        if ak_data[0] == "":
-            cmd = 'cat ' + ssh_dir + '/id_rsa.pub >> ' + ssh_dir + '/authorized_keys'
-            mw.execShell(cmd)
-            mw.execShell('chmod 600 ' + ssh_dir + '/authorized_keys')
-
-
-def clear_ssh():
-    # 服务器IP
-    ip = mw.getHostAddr()
-    sh = '''
-#!/bin/bash
-PLIST=`who | grep localhost | awk '{print $2}'`
-for i in $PLIST
-do
-    ps -t /dev/$i |grep -v TTY | awk '{print $1}' | xargs kill -9
-done
-
-# getHostAddr
-PLIST=`who | grep "${ip}" | awk '{print $2}'`
-for i in $PLIST
-do
-    ps -t /dev/$i |grep -v TTY | awk '{print $1}' | xargs kill -9
-done
-'''
-    if not mw.isAppleSystem():
-        info = mw.execShell(sh)
-        print(info[0], info[1])
-
-
-def connect_ssh():
-    # print 'connect_ssh ....'
-    # clear_ssh()
-    global shell, ssh
-
-    create_ssh_info()
-
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-
-    try:
-        ssh.connect(mw.getHostAddr(), mw.getSSHPort(), timeout=5)
-    except Exception as e:
-        ssh.connect('127.0.0.1', mw.getSSHPort())
-    except Exception as e:
-        ssh.connect('localhost', mw.getSSHPort())
-    except Exception as e:
-        return False
-
-    shell = ssh.invoke_shell(term='xterm', width=83, height=21)
-    shell.setblocking(0)
-    return True
-
-
 shell_client = None
 
 
@@ -667,52 +577,25 @@ def webssh_websocketio(data):
 
 @socketio.on('webssh')
 def webssh(msg):
-    global shell, ssh
+    global shell
     if not isLogined():
         emit('server_response', {'data': '会话丢失，请重新登陆面板!\r\n'})
         return None
 
-    ssh_success = True
     if not shell:
-        ssh_success = connect_ssh()
-    if not shell:
-        emit('server_response', {'data': '连接SSH服务失败!\r\n'})
-        return
+        shell = mw.connectSsh()
+
     if shell.exit_status_ready():
-        ssh_success = connect_ssh()
-    if not ssh_success:
-        emit('server_response', {'data': '连接SSH服务失败!\r\n'})
-        return
-    shell.send(msg)
-    try:
-        time.sleep(0.005)
-        recv = shell.recv(4096)
-        emit('server_response', {'data': recv.decode("utf-8")})
-    except Exception as ex:
-        pass
-        # print 'webssh:' + str(ex)
+        shell = mw.connectSsh()
 
-
-@socketio.on('connect_event')
-def connected_msg(msg):
-    if not isLogined():
-        emit('server_response', {'data': '会话丢失，请重新登陆面板!\r\n'})
-        return None
-    global shell, ssh
-    ssh_success = True
-    if not shell:
-        ssh_success = connect_ssh()
-        # print(ssh_success)
-    if not ssh_success:
-        emit('server_response', {'data': '连接SSH服务失败!\r\n'})
-        return
-    try:
-        recv = shell.recv(8192)
-        # print recv.decode("utf-8")
-        emit('server_response', {'data': recv.decode("utf-8")})
-    except Exception as e:
-        pass
-        # print 'connected_msg:' + str(e)
+    if shell:
+        shell.send(msg)
+        try:
+            time.sleep(0.005)
+            recv = shell.recv(4096)
+            emit('server_response', {'data': recv.decode("utf-8")})
+        except Exception as ex:
+            emit('server_response', {'data': str(ex)})
 
 try:
     ssh = paramiko.SSHClient()
@@ -721,6 +604,5 @@ try:
     # connect_ssh()
 except Exception as e:
     print("本地终端无法使用")
-
 
 ##################### ssh  end ###########################

@@ -1531,10 +1531,10 @@ function webShell() {
     });
 
     if (socket) {
-        socket.emit('connect_event', '');
+        socket.emit('webssh', '');
         interval = setInterval(function () {
-            socket.emit('connect_event', '');
-        }, 1000);
+            socket.emit('webssh', '');
+        }, 500);
     }
     
     term.on('data', function (data) {
