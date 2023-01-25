@@ -597,12 +597,4 @@ def webssh(msg):
         except Exception as ex:
             emit('server_response', {'data': str(ex)})
 
-try:
-    ssh = paramiko.SSHClient()
-
-    # 启动尝试时连接
-    # connect_ssh()
-except Exception as e:
-    print("本地终端无法使用")
-
 ##################### ssh  end ###########################

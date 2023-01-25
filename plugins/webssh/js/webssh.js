@@ -78,11 +78,13 @@ $(document).ready(function(){
 
 function webShell_Resize(){
     var cur_ssh = $('.term_item_tab .list .active');
-    var data = $(cur_ssh).data();
-    var item = host_ssh_list[data.id];
-    item.term.focus();
-    item.term.fit();
-    item.resize({ cols: item.term.cols, rows: item.term.rows});
+    if (cur_ssh.length > 0){
+        var data = $(cur_ssh).data();
+        var item = host_ssh_list[data.id];
+        item.term.focus();
+        item.term.fit();
+        item.resize({ cols: item.term.cols, rows: item.term.rows});
+    }
 }
 
 function webShell_Load(){
@@ -174,8 +176,6 @@ function webShell_Load(){
     });
 
     webShell_Menu();
-    // webShell_Resize();
-    // $('.term_content_tab .term-tool-button').click();
 }
 
 
@@ -284,11 +284,15 @@ function webShell_getCmdList(){
     });
 }
 
-function Terms_WebSocketIO_Create(ip,random){
+function Terms_WebSocketIO_Create(ip, random){
     var n = new Terms_WebSocketIO('#'+random, { ssh_info: { host: ip, ps: "22", id: random } });
     n.registerCloseCallBack(function(){
         webShell_removeTermView(random);
         layer.msg('已经关闭【'+ip+'】', { icon: 1, time: 3000 });
+    });
+
+    n.registerConnectedCallBack(function(){
+        webShell_Resize();
     });
     return n;
 }
@@ -315,8 +319,6 @@ function webShell_openTermView(info) {
     }
     item_list.append('<span class="active item ' + (info.host == '127.0.0.1' ? 'localhost_item' : '') + '" data-host="' + info.host + '" data-id="' + random + '"><i class="icon icon-sucess"></i><div class="content"><span>' + info.ps + '</span></div><span class="icon-trem-close"></span></span>');
     host_ssh_list[random] = Terms_WebSocketIO_Create(info.host, random);
-
-    webShell_Resize();
 }
 
 

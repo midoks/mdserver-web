@@ -13,7 +13,10 @@ function Terms_WebSocketIO (el, config) {
     this.ssh_info = config.ssh_info;
     this.term_timer = null;
 
+    this.is_connected = false;
+
     this.callback_close = null;
+    this.callback_connected = null;
     this.run();
 }
 
@@ -23,10 +26,12 @@ Terms_WebSocketIO.prototype = {
         this.callback_close =  callback;
     },
 
+    registerConnectedCallBack:function(callback){
+        this.callback_connected =  callback;
+    },
+
     connectWs: function (callback) {
-        if(!this.ws){
-            this.ws = io.connect();
-        }
+        this.ws = io.connect();
     },
 
     connectSsh:function(){
@@ -35,13 +40,13 @@ Terms_WebSocketIO.prototype = {
     },
 
     close:function(){
+        console.log('try close...');
         this.ws.disconnect();
         this.ws.close();
     },
 
     on_message: function (ws_event) {
         this.term.write(ws_event.data);
-        console.log(ws_event.data);
         if (ws_event.data == '\r\n登出\r\n' ||  ws_event.data == '登出\r\n' || 
             ws_event.data == '\r\nlogout\r\n' ||  ws_event.data == 'logout\r\n'||
             ws_event.data == '\r\nexit\r\n' ||  ws_event.data == 'exit\r\n') {
@@ -59,7 +64,11 @@ Terms_WebSocketIO.prototype = {
 
 
     on_connect:function(ws_event){
-
+        // console.log(ws_event);
+        this.is_connected = true;
+        if (this.callback_connected){
+            this.callback_connected();
+        }
     },
 
     on_exit:function(ws_event){
@@ -93,16 +102,20 @@ Terms_WebSocketIO.prototype = {
         if (this.ws) {
             that.send('');
             this.term_timer = setInterval(function () {
-                that.send('');
+                if (that.is_connected){
+                    that.send('');
+                }
             }, 600);
         }
         
         this.term.on('data', function (data) {
-            try {
-                that.send(data)
-            } catch (e) {
-                that.term.write('\r\n连接丢失,正在尝试重新连接!\r\n');
-                that.connectSsh();
+            if (that.is_connected){
+                try {
+                    that.send(data)
+                } catch (e) {
+                    that.term.write('\r\n连接丢失,正在尝试重新连接!\r\n');
+                    that.connectSsh();
+                }
             }
         });
         that.term.write('\r\n请稍等,正在链接中...\r\n');

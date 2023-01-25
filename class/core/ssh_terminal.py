@@ -54,6 +54,7 @@ class ssh_terminal:
 
     __ssh_list = {}
     __ssh_last_request_time = {}
+    __ssh_connecting = {}
 
     def __init__(self):
         ht = threading.Thread(target=self.heartbeat)
@@ -164,7 +165,7 @@ class ssh_terminal:
             return self.connectBySocket()
 
     def connectLocalSsh(self):
-        self.createSshInfo()
+        mw.createSshInfo()
         self.__ps = paramiko.SSHClient()
         self.__ps.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
@@ -207,7 +208,6 @@ class ssh_terminal:
             term='xterm', width=83, height=21)
         ssh.setblocking(0)
         self.__ssh_list[self.__sid] = ssh
-        self.__ssh_last_request_time[self.__sid] = time.time()
         mw.writeLog(self.__log_type, '成功登录到SSH服务器 [{}:{}]'.format(
             self.__host, self.__port))
         self.debug('local-ssh:通道已构建')
@@ -329,7 +329,6 @@ class ssh_terminal:
         ssh.get_pty(term='xterm', width=100, height=34)
         ssh.invoke_shell()
         self.__ssh_list[self.__sid] = ssh
-        self.__ssh_last_request_time[self.__sid] = time.time()
         mw.writeLog(self.__log_type, '成功登录到SSH服务器 [{}:{}]'.format(
             self.__host, self.__port))
         self.debug('通道已构建')
@@ -394,61 +393,35 @@ class ssh_terminal:
         except Exception as e:
             return emit('server_response', {'data': recv})
 
-    def getSshDir(self):
-        if mw.isAppleSystem():
-            user = mw.execShell(
-                "who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
-            return '/Users/' + user + '/.ssh'
-        return '/root/.ssh'
-
-    def createRsa(self):
-        ssh_dir = self.getSshDir()
-        ssh_ak = ssh_dir + '/authorized_keys'
-        if not os.path.exists(ssh_ak):
-            mw.execShell('touch ' + ssh_ak)
-        if not os.path.exists(ssh_dir + '/id_rsa.pub') and os.path.exists(ssh_dir + '/id_rsa'):
-            cmd = 'echo y | ssh-keygen -q -t rsa -P "" -f ' + ssh_dir + '/id_rsa'
-            mw.execShell(cmd)
-        else:
-            cmd = 'ssh-keygen -q -t rsa -P "" -f ' + ssh_dir + '/id_rsa'
-            mw.execShell(cmd)
-        cmd = 'cat ' + ssh_dir + '/id_rsa.pub >> ' + ssh_dir + '/authorized_keys'
-        mw.execShell(cmd)
-        cmd = 'chmod 600 ' + ssh_dir + '/authorized_keys'
-        mw.execShell(cmd)
-
-    def createSshInfo(self):
-        ssh_dir = self.getSshDir()
-        if not os.path.exists(ssh_dir + '/id_rsa') or not os.path.exists(ssh_dir + '/id_rsa.pub'):
-            self.createRsa()
-        # 检查是否写入authorized_keys
-        cmd = "cat " + ssh_dir + "/id_rsa.pub | awk '{print $3}'"
-        data = mw.execShell(cmd)
-        if data[0] != "":
-            cmd = "cat " + ssh_dir + "/authorized_keys | grep " + data[0]
-            ak_data = mw.execShell(cmd)
-            if ak_data[0] == "":
-                cmd = 'cat ' + ssh_dir + '/id_rsa.pub >> ' + ssh_dir + '/authorized_keys'
-                mw.execShell(cmd)
-                cmd = 'chmod 600 ' + ssh_dir + '/authorized_keys'
-                mw.execShell(cmd)
+    def wsSendConnect(self):
+        return emit('connect', {'data': 'ok'})
 
     def heartbeat(self):
+        # limit_cos = 10
         while True:
             time.sleep(3)
-
             cur_time = time.time()
-            print("heartbeat:cur_time:", cur_time)
-            print("heartbeat:__ssh_list:", len(self.__ssh_list))
-            for x in self.__ssh_list:
+            for x in list(self.__ssh_list.keys()):
                 ssh_last_time = self.__ssh_last_request_time[x]
-                print(x, self.__ssh_list[x])
-            # self.debug("heartbeat:__ssh_list:" + str(len(self.__ssh_list)))
-            # if self.__tp and self.__tp.is_active():
-            #     self.__tp.send_ignore()
+                sid_off_cos = cur_time - ssh_last_time
 
-            # if self.__ps and self.__ps.is_active():
-            #     self.__ps.send_ignore()
+                print("heartbeat off cos :", x, sid_off_cos)
+
+                if sid_off_cos > 3:
+                    cur_ssh = self.__ssh_list[x]
+                    if not cur_ssh:
+                        del(self.__ssh_list[x])
+                        del(self.__ssh_last_request_time[x])
+                        continue
+
+                    if cur_ssh.exit_status_ready():
+                        del(self.__ssh_list[x])
+                        del(self.__ssh_last_request_time[x])
+                        continue
+
+                    cur_ssh.send("exit\r\n")
+                    del(self.__ssh_list[x])
+                    del(self.__ssh_last_request_time[x])
 
     def run(self, sid, info):
         # sid = mw.md5(sid)
@@ -456,38 +429,38 @@ class ssh_terminal:
         if not self.__sid:
             return self.wsSend('WebSocketIO无效')
 
-        if self.__connecting and not 'host' in info:
-            return
-
-        result = self.returnMsg(False, '')
+        self.__ssh_last_request_time[sid] = time.time()
         if not sid in self.__ssh_list:
             if type(info) == dict and 'host' in info:
-                self.__connecting = True
                 result = self.setAttr(info)
-                self.__connecting = False
+                if result['status']:
+                    return self.wsSendConnect()
+                else:
+                    return self.wsSend(result['msg'])
 
+        result = self.returnMsg(False, '')
         if sid in self.__ssh_list:
             if 'resize' in info:
                 self.resize(info)
             result = self.returnMsg(True, '已连接')
 
-        print("req.__ssh_list:", str(len(self.__ssh_list)))
-        print("req.:cmd:", sid, info)
-        if result['status']:
-            if type(info) == str:
-                time.sleep(0.1)
-                cur_ssh = self.__ssh_list[sid]
-                if cur_ssh.exit_status_ready():
-                    self.wsSend("logout\r\n")
-                    del(self.__ssh_list[sid])
-                    return
+            print("req.__ssh_list:", len(self.__ssh_list))
+            print("req.:cmd:", sid, info)
+            if result['status']:
+                if type(info) == str:
+                    time.sleep(0.1)
+                    cur_ssh = self.__ssh_list[sid]
+                    if cur_ssh.exit_status_ready():
+                        self.wsSend("logout\r\n")
+                        del(self.__ssh_list[sid])
+                        return
 
-                cur_ssh.send(info)
-                try:
-                    time.sleep(0.005)
-                    recv = cur_ssh.recv(8192)
-                    return self.wsSend(recv)
-                except Exception as ex:
-                    return self.wsSend('')
-        else:
-            return self.wsSend(result['msg'])
+                    cur_ssh.send(info)
+                    try:
+                        time.sleep(0.005)
+                        recv = cur_ssh.recv(8192)
+                        return self.wsSend(recv)
+                    except Exception as ex:
+                        return self.wsSend('')
+            else:
+                return self.wsSend(result['msg'])
