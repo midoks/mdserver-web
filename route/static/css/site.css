@@ -4399,7 +4399,8 @@ html .menu .menu_exit:hover {
     font-size: 14px;
     text-align:center;
 }
-.cloading{
+
+.cloading {
     background-image: url("data:image/gif;base64,R0lGODlhJQAlAJECAL3L2AYrTv///wAAACH/C05FVFNDQVBFMi4wAwEAAAAh+QQFCgACACwAAAAAJQAlAAACi5SPqcvtDyGYIFpF690i8xUw3qJBwUlSadmcLqYmGQu6KDIeM13beGzYWWy3DlB4IYaMk+Dso2RWkFCfLPcRvFbZxFLUDTt21BW56TyjRep1e20+i+eYMR145W2eefj+6VFmgTQi+ECVY8iGxcg35phGo/iDFwlTyXWphwlm1imGRdcnuqhHeop6UAAAIfkEBQoAAgAsEAACAAQACwAAAgWMj6nLXAAh+QQFCgACACwVAAUACgALAAACFZQvgRi92dyJcVJlLobUdi8x4bIhBQAh+QQFCgACACwXABEADAADAAACBYyPqcsFACH5BAUKAAIALBUAFQAKAAsAAAITlGKZwWoMHYxqtmplxlNT7ixGAQAh+QQFCgACACwQABgABAALAAACBYyPqctcACH5BAUKAAIALAUAFQAKAAsAAAIVlC+BGL3Z3IlxUmUuhtR2LzHhsiEFACH5BAUKAAIALAEAEQAMAAMAAAIFjI+pywUAIfkEBQoAAgAsBQAFAAoACwAAAhOUYJnAagwdjGq2amXGU1PuLEYBACH5BAUKAAIALBAAAgAEAAsAAAIFhI+py1wAIfkEBQoAAgAsFQAFAAoACwAAAhWUL4AIvdnciXFSZS6G1HYvMeGyIQUAIfkEBQoAAgAsFwARAAwAAwAAAgWEj6nLBQAh+QQFCgACACwVABUACgALAAACE5RgmcBqDB2MarZqZcZTU+4sRgEAIfkEBQoAAgAsEAAYAAQACwAAAgWEj6nLXAAh+QQFCgACACwFABUACgALAAACFZQvgAi92dyJcVJlLobUdi8x4bIhBQAh+QQFCgACACwBABEADAADAAACBYSPqcsFADs=");
     background-repeat: no-repeat;
     background-position: center 45px;
@@ -4409,32 +4410,7 @@ html .menu .menu_exit:hover {
     text-align: center;
     font-size: 14px;
 }
-/*6.0终端样式*/
-.term-box{
-    padding:0 10px 10px;
-    background-color:#333333;
-}
-.shell-text-input .bt-input-text-shell{
-    width:100%;
-    padding:10px 10px 0;
-    border:0 none;
-    height:60px;
-    overflow:auto;
-    resize:none;
-}
-.shell-text-input .bt-input-text-shell:focus,.shell-text-input .bt-input-text-shell:active{
-    border:0 none;
-    outline:none;
-}
-.shell-btn-group{
-    height:30px;
-    position:absolute;
-    bottom:10px;
-    right:10px;
-}
-.shell_btn_close{
-    margin-right:8px;
-}
+
 /*重启*/
 .rebt-con {
     height: 106px;
@@ -4794,7 +4770,7 @@ select[disabled]{
 
 /*6.0终端样式*/
 .term-box{
-    padding:0 10px 10px;
+    padding:5px 10px 10px;
     background-color:#333333;
 }
 .shell-text-input .bt-input-text-shell{
@@ -4805,14 +4781,16 @@ select[disabled]{
     overflow:auto;
     resize:none;
 }
+
 .shell-text-input .bt-input-text-shell:focus,.shell-text-input .bt-input-text-shell:active{
     border:0 none;
     outline:none;
 }
-.shell-btn-group{
+
+.shell-btn-group {
     height:30px;
     position:absolute;
-    bottom:10px;
+    bottom:20px;
     right:10px;
 }
 .shell_btn_close {

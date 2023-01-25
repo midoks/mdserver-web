@@ -1545,7 +1545,7 @@ function webShell() {
     var term_box = layer.open({
         type: 1,
         title: "本地终端",
-        area: ['685px','435px'],
+        area: ['685px','463px'],
         closeBtn: 1,
         shadeClose: false,
         content: '<div class="term-box"><div id="term"></div></div>\
@@ -1556,18 +1556,22 @@ function webShell() {
 					<button class="shellbutton btn btn-default btn-sm pull-right shell_btn_close">关闭</button>\
 					</div>\
                 </div>',
+        success:function(){
+        	$(".shell_btn_close").click(function(){
+				layer.close(term_box);
+				term.destroy();
+		        clearInterval(interval);
+			});
+        },
         cancel: function () {
             term.destroy();
             clearInterval(interval);
         }
     });
-	$(".shell_btn_close").click(function(){
-		layer.close(term_box);
-		term.destroy();
-        clearInterval(interval);
-	})
+	
 	
     setTimeout(function () {
+
         $('.terminal').detach().appendTo('#term');
         $("#term").show();
         socket.emit('webssh', "\n");
@@ -1654,16 +1658,14 @@ function webShell() {
             }
             socket.emit('webssh', ptext);
             term.focus();
-        })
+        });
         $("textarea[name='ssh_copy']").keydown(function (e) {
-
             if (e.ctrlKey && e.keyCode == 13) {
                 $(".shell_btn_1").click();
             } else if (e.altKey && e.keyCode == 13) {
                 $(".shell_btn_1").click();
             }
         });
-
     }, 100);
 }
 
