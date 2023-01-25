@@ -263,11 +263,21 @@ function webShell_getCmdList(){
     });
 }
 
+function Terms_WebSocketIO_Create(ip,random){
+    var n = new Terms_WebSocketIO('#'+random, { ssh_info: { host: ip, ps: "22", id: random } });
+    n.registerCloseCallBack(function(){
+        webShell_removeTermView(random);
+        layer.msg('已经关闭【'+ip+'】', { icon: 1, time: 3000 });
+    });
+    return n;
+}
+
 
 function webShell_Menu(){
     var random = 'localhost';
     // host_ssh_list[random] = new Terms_WebSocketIO('#'+random, { ssh_info: { host: "38.6.224.67", ps: "22", id: random } });
-    host_ssh_list[random] = new Terms_WebSocketIO('#'+random, { ssh_info: { host: "127.0.0.1", ps: "22", id: random } });
+    host_ssh_list[random] = Terms_WebSocketIO_Create('127.0.0.1',random);
+    
 }
 
 function webShell_openTermView(info) {
@@ -285,12 +295,14 @@ function webShell_openTermView(info) {
         info.ps = info.host;
     }
     item_list.append('<span class="active item ' + (info.host == '127.0.0.1' ? 'localhost_item' : '') + '" data-host="' + info.host + '" data-id="' + random + '"><i class="icon icon-sucess"></i><div class="content"><span>' + info.ps + '</span></div><span class="icon-trem-close"></span></span>');
-    host_ssh_list[random] = new Terms_WebSocketIO('#' + random, { ssh_info: { host: info.host, ps: info.ps, id: random } });
+    host_ssh_list[random] = Terms_WebSocketIO_Create(info.host, random);
 }
 
 
 function webShell_removeTermView(id){
-    var item = $('[data-id="' + id + '"]'), next = item.next(), prev = item.prev();
+    var item = $('[data-id="' + id + '"]');
+    var next = item.next();
+    var prev = item.prev();
     $('#' + id).remove();
     item.remove();
     try {

@@ -12,6 +12,8 @@ function Terms_WebSocketIO (el, config) {
     this.fontSize = 14; //终端字体大小
     this.ssh_info = config.ssh_info;
     this.term_timer = null;
+
+    this.callback_close = null;
     this.run();
 }
 
@@ -44,28 +46,14 @@ Terms_WebSocketIO.prototype = {
             clearInterval(this.term_timer);
             this.ws.disconnect();
             this.ws.close();
+
+            console.log('message',this.callback_close,typeof(this.callback_close));
             if (this.callback_close){
                 this.callback_close();
             }
         }
     },
 
-    on_close: function (ws_event) {
-      this.ws = null;
-    },
-
-    on_error: function (ws_event) {
-    },
-
-    send: function (data, num) {
-
-    },
-
-    //关闭连接
-    close: function () {
-      this.ws.close();
-      this.set_term_icon(0);
-    },
     resize: function (size) {
       if (this.ws) {
           size['resize'] = 1;

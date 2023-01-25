@@ -421,7 +421,7 @@ class ssh_terminal:
             if type(info) == str:
                 time.sleep(0.1)
                 if self.__ssh_list[sid].exit_status_ready():
-                    self.wsSend("已关闭!\r\n")
+                    self.wsSend("logout\r\n")
                     del(self.__ssh_list[sid])
                     return
                 self.__ssh_list[sid].send(info)
