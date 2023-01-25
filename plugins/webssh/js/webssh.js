@@ -81,9 +81,9 @@ function webShell_Resize(){
     if (cur_ssh.length > 0){
         var data = $(cur_ssh).data();
         var item = host_ssh_list[data.id];
-        item.term.focus();
         item.term.fit();
         item.resize({ cols: item.term.cols, rows: item.term.rows});
+        item.term.focus();
     }
 }
 
@@ -284,8 +284,9 @@ function webShell_getCmdList(){
     });
 }
 
+var n;
 function Terms_WebSocketIO_Create(ip, random){
-    var n = new Terms_WebSocketIO('#'+random, { ssh_info: { host: ip, ps: "22", id: random } });
+    n = new Terms_WebSocketIO('#'+random, { ssh_info: { host: ip, ps: "22", id: random } });
     n.registerCloseCallBack(function(){
         webShell_removeTermView(random);
         layer.msg('已经关闭【'+ip+'】', { icon: 1, time: 3000 });
@@ -392,26 +393,6 @@ function webShell_getHostList(info){
                 webShell_openTermView(alist[index]);
             }
         });
-
-        // tab切换
-        $('.term_tootls .tab-nav span').click(function () {
-            if ($(this).hasClass('on')) return;
-            var index = $(this).index();
-            $(this).siblings('.on').removeClass('on');
-            $(this).addClass('on');
-            $('.term_tootls .tab-con .tab-block').removeClass('on');
-            $('.term_tootls .tab-con .tab-block').eq(index).addClass('on');
-            var type = $(this).attr('data-type');
-            switch (type) {
-              case 'host':
-                  that.reader_host_list();
-                  break;
-              case 'shell':
-                  that.reader_command_list();
-                  break;
-            }
-        });
-
     });
 }
 

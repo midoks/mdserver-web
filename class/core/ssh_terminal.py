@@ -9,7 +9,7 @@
 # ---------------------------------------------------------------------------------
 
 # ---------------------------------------------------------------------------------
-# 公共操作
+# SSH终端操作
 # ---------------------------------------------------------------------------------
 
 import json
@@ -157,14 +157,14 @@ class ssh_terminal:
     def setSid(self, sid):
         self.__sid = sid
 
-    def connect(self):
+    def connect(self, sid):
         # self.connectBySocket()
         if self.__host in ['127.0.0.1', 'localhost']:
-            return self.connectLocalSsh()
+            return self.connectLocalSsh(sid)
         else:
-            return self.connectBySocket()
+            return self.connectBySocket(sid)
 
-    def connectLocalSsh(self):
+    def connectLocalSsh(self, sid):
         mw.createSshInfo()
         self.__ps = paramiko.SSHClient()
         self.__ps.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -199,21 +199,16 @@ class ssh_terminal:
             return self.returnMsg(False, "未知错误: {}".format(err))
 
         self.debug('local-ssh:认证成功，正在构建会话通道')
-        # self.__ssh = self.__ps.invoke_shell(term='xterm', width=83, height=21)
-        # self.__ssh.setblocking(0)
-        # self.__connect_time = time.time()
-        # self.__last_send = []
-
         ssh = self.__ps.invoke_shell(
             term='xterm', width=83, height=21)
         ssh.setblocking(0)
-        self.__ssh_list[self.__sid] = ssh
+        self.__ssh_list[sid] = ssh
         mw.writeLog(self.__log_type, '成功登录到SSH服务器 [{}:{}]'.format(
             self.__host, self.__port))
         self.debug('local-ssh:通道已构建')
         return self.returnMsg(True, '连接成功!')
 
-    def connectBySocket(self):
+    def connectBySocket(self, sid):
         if not self.__host:
             return self.returnMsg(False, '错误的连接地址')
         if not self.__user:
@@ -319,22 +314,17 @@ class ssh_terminal:
             return self.returnMsg(False, "未知错误: {}".format(err))
 
         self.debug('认证成功，正在构建会话通道')
-        # self.__ssh = self.__tp.open_session()
-        # self.__ssh.get_pty(term='xterm', width=100, height=34)
-        # self.__ssh.invoke_shell()
-        # self.__connect_time = time.time()
-        # self.__last_send = []
 
         ssh = self.__tp.open_session()
         ssh.get_pty(term='xterm', width=100, height=34)
         ssh.invoke_shell()
-        self.__ssh_list[self.__sid] = ssh
+        self.__ssh_list[sid] = ssh
         mw.writeLog(self.__log_type, '成功登录到SSH服务器 [{}:{}]'.format(
             self.__host, self.__port))
         self.debug('通道已构建')
         return self.returnMsg(True, '连接成功.')
 
-    def setAttr(self, info):
+    def setAttr(self, sid, info):
         self.__host = info['host'].strip()
 
         # 外部连接获取
@@ -357,7 +347,7 @@ class ssh_terminal:
 
         # print(self.__host, self.__pass, self.__key_passwd)
         try:
-            result = self.connect()
+            result = self.connect(sid)
             # print(result)
         except Exception as ex:
             if str(ex).find("NoneType") == -1:
@@ -378,9 +368,9 @@ class ssh_terminal:
         except:
             pass
 
-    def resize(self, data):
+    def resize(self, sid, data):
         try:
-            self.__ssh_list[self.__sid].resize_pty(
+            self.__ssh_list[sid].resize_pty(
                 width=data['cols'], height=data['rows'])
             return True
         except:
@@ -405,7 +395,7 @@ class ssh_terminal:
                 ssh_last_time = self.__ssh_last_request_time[x]
                 sid_off_cos = cur_time - ssh_last_time
 
-                print("heartbeat off cos :", x, sid_off_cos)
+                # print("heartbeat off cos :", x, sid_off_cos)
 
                 if sid_off_cos > 3:
                     cur_ssh = self.__ssh_list[x]
@@ -424,7 +414,6 @@ class ssh_terminal:
                     del(self.__ssh_last_request_time[x])
 
     def run(self, sid, info):
-        # sid = mw.md5(sid)
         self.__sid = sid
         if not self.__sid:
             return self.wsSend('WebSocketIO无效')
@@ -432,7 +421,7 @@ class ssh_terminal:
         self.__ssh_last_request_time[sid] = time.time()
         if not sid in self.__ssh_list:
             if type(info) == dict and 'host' in info:
-                result = self.setAttr(info)
+                result = self.setAttr(sid, info)
                 if result['status']:
                     return self.wsSendConnect()
                 else:
@@ -441,11 +430,8 @@ class ssh_terminal:
         result = self.returnMsg(False, '')
         if sid in self.__ssh_list:
             if 'resize' in info:
-                self.resize(info)
+                self.resize(sid, info)
             result = self.returnMsg(True, '已连接')
-
-            print("req.__ssh_list:", len(self.__ssh_list))
-            print("req.:cmd:", sid, info)
             if result['status']:
                 if type(info) == str:
                     time.sleep(0.1)
@@ -454,7 +440,6 @@ class ssh_terminal:
                         self.wsSend("logout\r\n")
                         del(self.__ssh_list[sid])
                         return
-
                     cur_ssh.send(info)
                     try:
                         time.sleep(0.005)

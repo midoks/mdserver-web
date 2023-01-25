@@ -32,15 +32,15 @@ Terms_WebSocketIO.prototype = {
 
     connectWs: function (callback) {
         this.ws = io.connect();
+        console.log(this.ws);
     },
 
     connectSsh:function(){
         this.send(this.ssh_info);
-        this.send('\n');
+        // this.send('\n');
     },
 
     close:function(){
-        console.log('try close...');
         this.ws.disconnect();
         this.ws.close();
     },
@@ -80,7 +80,7 @@ Terms_WebSocketIO.prototype = {
     },
 
     resize: function (size) {
-        if (this.ws) {
+        if (this.ws && this.is_connected) {
             size['resize'] = 1;
             this.send(size)
         }
