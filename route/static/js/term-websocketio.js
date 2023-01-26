@@ -32,7 +32,7 @@ Terms_WebSocketIO.prototype = {
 
     connectWs: function (callback) {
         this.ws = io.connect();
-        console.log(this.ws);
+        // console.log(this.ws);
     },
 
     connectSsh:function(){
