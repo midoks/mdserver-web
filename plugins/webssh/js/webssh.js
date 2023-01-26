@@ -293,7 +293,24 @@ function Terms_WebSocketIO_Create(ip, random){
     });
 
     n.registerConnectedCallBack(function(){
+        var that = this;
+        $('.term_item_tab .item').each(function(){
+            var id = $(this).data('id');
+            if (id == that.id){
+                $(this).find('.icon').removeClass('icon-warning').addClass('icon-sucess');
+            }
+        });
         webShell_Resize();
+    });
+
+    n.registerExitCallBack(function(){
+        var that = this;
+        $('.term_item_tab .item').each(function(){
+            var id = $(this).data('id');
+            if (id == that.id){
+                $(this).find('.icon').removeClass('icon-sucess').addClass('icon-warning');
+            }
+        });
     });
     return n;
 }

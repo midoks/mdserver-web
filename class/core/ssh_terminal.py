@@ -383,6 +383,9 @@ class ssh_terminal:
     def wsSendConnect(self):
         return emit('connect', {'data': 'ok'})
 
+    def wsSendReConnect(self):
+        return emit('reconnect', {'data': 'ok'})
+
     def heartbeat(self):
         # limit_cos = 10
         while True:
@@ -393,7 +396,6 @@ class ssh_terminal:
                 sid_off_cos = cur_time - ssh_last_time
 
                 # print("heartbeat off cos :", x, sid_off_cos)
-
                 if sid_off_cos > 3:
                     cur_ssh = self.__ssh_list[x]
                     if not cur_ssh:
@@ -423,6 +425,8 @@ class ssh_terminal:
                     return self.wsSendConnect()
                 else:
                     return self.wsSend(result['msg'])
+            else:
+                return self.wsSendReConnect()
 
         result = self.returnMsg(False, '')
         if sid in self.__ssh_list:
