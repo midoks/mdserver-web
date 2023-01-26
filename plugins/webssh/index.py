@@ -112,6 +112,33 @@ class App():
         rdata = mw.readFile(file)
         return json.loads(rdata)
 
+    def get_server_by_host(self):
+        args = self.getArgs()
+        check = self.checkArgs(args, ['host'])
+        if not check[0]:
+            return check[1]
+
+        info_file = self.__host_dir + '/' + args['host'] + '/info.json'
+        if os.path.exists(info_file):
+            try:
+                info_tmp = self.getSshInfo(info_file)
+                host_info = {}
+                host_info['host'] = args['host']
+                host_info['port'] = info_tmp['port']
+                host_info['ps'] = info_tmp['ps']
+                host_info['type'] = info_tmp['type']
+                if 'password' in info_tmp:
+                    host_info['password'] = info_tmp['password']
+                if 'pkey' in info_tmp:
+                    host_info['pkey'] = info_tmp['pkey']
+                if 'pkey_passwd' in info_tmp:
+                    host_info['pkey_passwd'] = info_tmp['pkey_passwd']
+            except Exception as e:
+                return mw.returnJson(False, '错误:' + str(e))
+
+            return mw.returnJson(True, 'ok!', host_info)
+        return mw.returnJson(False, '不存在此配置')
+
     def get_server_list(self):
         host_list = []
         for name in os.listdir(self.__host_dir):

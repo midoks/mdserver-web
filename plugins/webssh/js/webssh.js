@@ -354,7 +354,7 @@ function webShell_getHostList(info){
         for (var i = 0; i < alist.length; i++) {
             tli+='<li class="data-host-list" data-index="'+i+'" data-host="'+alist[i]['host']+'">\
                     <i></i>\
-                    <span>'+alist[i]['host']+'</span>\
+                    <span class="host">'+alist[i]['host']+'</span>\
                     <span class="tootls">\
                         <span class="glyphicon glyphicon-edit" aria-hidden="true" title="编辑常用命令信息"></span>\
                         <span class="glyphicon glyphicon-trash" aria-hidden="true" title="删除常用命令信息"></span>\
@@ -364,13 +364,13 @@ function webShell_getHostList(info){
     
         $('.tootls_host_list').html(tli);
 
-        $('.data-host-list .glyphicon-edit').click(function(){
+        $('.data-host-list .glyphicon-edit').click(function(e){
             var index = $(this).parent().parent().attr('data-index');
             var info = alist[index];
             webShell_addServer(info);
         });
 
-        $('.data-host-list .glyphicon-trash').click(function(){
+        $('.data-host-list .glyphicon-trash').click(function(e){
             var index = $(this).parent().parent().attr('data-index');
             var t = alist[index];
             appPost('del_server', {host:t['host']}, function(rdata){
@@ -382,16 +382,17 @@ function webShell_getHostList(info){
         });
 
 
-        $('.tootls_host_list').on('click', 'li', function (e) {
-            var index = $(this).index();
-            var host = $(this).data('host');
-            $(this).find('i').addClass('active');
+        $('.tootls_host_list .host').on('click', function (e) {
+            var _this = $(this).parent();
+            var index = $(_this).index();
+            var host = $(_this).data('host');
+            $(_this).find('i').addClass('active');
             if ($('.item[data-host="' + host + '"]').length > 0) {
-                layer.msg('已经打开!', { icon: 0, time: 3000 })
-                // layer.msg('如需多会话窗口，请右键终端标题复制会话!', { icon: 0, time: 3000 });
+                layer.msg('已经打开!', { icon: 0, time: 3000 });
             } else {
                 webShell_openTermView(alist[index]);
             }
+            e.preventDefault();
         });
     });
 }
@@ -420,7 +421,7 @@ function webShell_addServer(info=[]){
                         <span class="tname">验证方式</span>\
                         <div class="info-r">\
                             <div class="btn-group">\
-                                <button type="button" tabindex="-1" class="btn btn-sm auth_type_checkbox btn-success" data-ctype="0">密码验证</button>\
+                                <button type="button" tabindex="-1" class="btn btn-sm auth_type_checkbox btn-default btn-success" data-ctype="0">密码验证</button>\
                                 <button type="button" tabindex="-1" class="btn btn-sm auth_type_checkbox btn-default" data-ctype="1">私钥验证\
                                 </button>\
                             </div>\
@@ -452,6 +453,38 @@ function webShell_addServer(info=[]){
                     </div>\
                 </div>',
         success:function(){
+            if (typeof(info['host'])!='undefined'){
+                $('input[name="host"]').val(info['host']);
+                appPost('get_server_by_host',{host:info['host']},function(rdata){
+                    var rdata = $.parseJSON(rdata.data);
+                    var jdata = rdata.data;
+                    if (jdata['type'] == 0){
+                        $('input[name="password"]').val(jdata['password']);
+                    } else{
+                        $('textarea[name="pkey"]').val(jdata['pkey']);
+                        $('input[name="pkey_passwd"]').val(jdata['pkey_passwd']);
+                    }
+                    $('input[name="ps"]').val(jdata['ps']);
+                    $('.auth_type_checkbox').each(function(){
+                        if ($(this).data('ctype') == jdata['type']){
+                            $(this).addClass('btn-success');
+                        } else {
+                            $(this).removeClass('btn-success');
+                        }
+                    });
+                    if (jdata['type'] == 0){
+                        $('.c_password_view').removeClass('show').addClass('show');
+                        $('.c_pkey_view').removeClass('show').addClass('hide');
+                        $('.key_pwd_line').removeClass('show').addClass('hide');
+
+                    }else{
+                        $('.c_password_view').removeClass('show').addClass('hide');
+                        $('.c_pkey_view').removeClass('show').addClass('show');
+                        $('.key_pwd_line').removeClass('show').addClass('show');
+                    }
+                });
+            }
+
             $('.auth_type_checkbox').click(function(){
                 var ctype = $(this).attr('data-ctype');
                 $('.auth_type_checkbox').removeClass('btn-success');
@@ -473,18 +506,20 @@ function webShell_addServer(info=[]){
             var host = $('input[name="host"]').val();
             var port = $('input[name="port"]').val();
             var username = $('input[name="username"]').val();
-            
-            var type = $('.auth_type_checkbox').attr('data-ctype');
+            var password = '';
+            var pkey = '';
+            var pkey_passwd = '';
+            var type = $('.btn-group .btn-success').attr('data-ctype');
             if (type == "0"){
-                var password = $('input[name="password"]').val();
+                password = $('input[name="password"]').val();
             } else{
-                var pkey = $('input[name="pkey"]').val();
-                var pkey_passwd = $('input[name="pkey_passwd"]').val();
+                pkey = $('textarea[name="pkey"]').val();
+                pkey_passwd = $('input[name="pkey_passwd"]').val();
             }
             
             var ps = $('input[name="ps"]').val();
 
-            appPost('add_server',{
+            var req_data = {
                 type:type,
                 host:host,
                 port:port,
@@ -492,8 +527,12 @@ function webShell_addServer(info=[]){
                 password:password,
                 pkey:pkey,
                 pkey_passwd:pkey_passwd,
-                ps
-            },function(rdata){
+                ps:ps,
+            };
+
+            console.log(req_data);
+
+            appPost('add_server',req_data,function(rdata){
                 layer.close(l);
                 var rdata = $.parseJSON(rdata.data);
                 showMsg(rdata.msg, function(){

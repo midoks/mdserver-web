@@ -37,6 +37,7 @@ class ssh_terminal:
     __sid = ''
 
     __host = None
+    __type = '0'
     __port = 22
     __user = None
     __pass = None
@@ -243,28 +244,24 @@ class ssh_terminal:
             if not self.__pass and not self.__pkey:
                 return self.returnMsg(False, '密码或私钥不能都为空: {}:{}'.format(self.__host, self.__port))
 
-            if self.__pkey:
+            if self.__pkey != '' and self.__type != '0':
                 self.debug('正在认证私钥')
-                if sys.version_info[0] == 2:
-                    try:
-                        self.__pkey = self.__pkey.encode('utf-8')
-                    except:
-                        pass
-                    p_file = BytesIO(self.__pkey)
-                else:
-                    p_file = StringIO(self.__pkey)
-
+                p_file = StringIO(str(self.__pkey.replace('\\n', '\n')))
+                # p_file = "/tmp/t_ssh_pkey.txt"
+                # mw.writeFile(p_file, self.__pkey.replace('\\n', '\n'))
+                # mw.execShell('chmod 600 ' + p_file)
                 try:
+                    p_file.seek(0)
                     pkey = paramiko.RSAKey.from_private_key(p_file)
                 except:
                     try:
                         p_file.seek(0)  # 重置游标
-                        pkey = paramiko.Ed25519Key.from_private_key(p_file)
+                        pkey = paramiko.Ed25519Key.from_private_key(
+                            p_file)
                     except:
                         try:
                             p_file.seek(0)
-                            pkey = paramiko.ECDSAKey.from_private_key(
-                                p_file)
+                            pkey = paramiko.ECDSAKey.from_private_key(p_file)
                         except:
                             p_file.seek(0)
                             pkey = paramiko.DSSKey.from_private_key(p_file)
@@ -285,8 +282,7 @@ class ssh_terminal:
             self.setSshdConfig(True)
             self.__tp.close()
             e = str(e)
-            if e.find('websocket error!') != -1:
-                return self.returnMsg(True, '连接成功')
+            # print(e)
             if e.find('Authentication timeout') != -1:
                 self.debug("认证超时{}".format(e))
                 return self.returnMsg(False, '认证超时,请按回车重试!{}'.format(e))
@@ -331,6 +327,9 @@ class ssh_terminal:
             if os.path.exists(dst_info):
                 _t = mw.readFile(dst_info)
                 info = json.loads(_t)
+
+        if 'type' in info:
+            self.__type = info['type']
 
         if 'port' in info:
             self.__port = int(info['port'])
