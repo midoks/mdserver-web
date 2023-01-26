@@ -318,6 +318,11 @@ class ssh_terminal:
         self.debug('通道已构建')
         return self.returnMsg(True, '连接成功.')
 
+    def getSshInfo(self, file):
+        rdata = mw.readFile(file)
+        destr = mw.deCrypt('mdserver-web', rdata)
+        return json.loads(destr)
+
     def setAttr(self, sid, info):
         self.__host = info['host'].strip()
 
@@ -325,8 +330,7 @@ class ssh_terminal:
         if not self.__host in ['127.0.0.1', 'localhost']:
             dst_info = mw.getServerDir() + '/webssh/host/' + self.__host + '/info.json'
             if os.path.exists(dst_info):
-                _t = mw.readFile(dst_info)
-                info = json.loads(_t)
+                info = self.getSshInfo(dst_info)
 
         if 'type' in info:
             self.__type = info['type']

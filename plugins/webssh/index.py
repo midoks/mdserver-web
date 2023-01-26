@@ -110,7 +110,8 @@ class App():
 
     def getSshInfo(self, file):
         rdata = mw.readFile(file)
-        return json.loads(rdata)
+        destr = mw.deCrypt('mdserver-web', rdata)
+        return json.loads(destr)
 
     def get_server_by_host(self):
         args = self.getArgs()
@@ -198,7 +199,8 @@ class App():
         if not os.path.exists(dst_host_dir):
             os.makedirs(dst_host_dir)
 
-        mw.writeFile(dst_host_dir + '/info.json', json.dumps(info))
+        enstr = mw.enCrypt('mdserver-web', json.dumps(info))
+        mw.writeFile(dst_host_dir + '/info.json', enstr)
         return mw.returnJson(True, '添加成功!')
 
 if __name__ == "__main__":
