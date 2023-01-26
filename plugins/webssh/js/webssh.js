@@ -456,7 +456,7 @@ function webShell_addServer(info=[]){
                             <textarea rows="4" name="pkey" class="bt-input-text mr5" placeholder="请输入SSH私钥" style="width:305px;height: 80px;line-height: 18px;padding-top:10px;"></textarea>\
                         </div>\
                     </div>\
-                    <div class="line key_pwd_line hide">\
+                    <div class="line key_pwd_line hide" style="display:none;">\
                         <span class="tname">私钥密码</span>\
                         <div class="info-r">\
                             <input type="text" name="pkey_passwd" class="bt-input-text mr5" placeholder="请输入私钥密码" style="width:305px;" value="" autocomplete="off"/>\
@@ -479,7 +479,7 @@ function webShell_addServer(info=[]){
                         $('input[name="password"]').val(jdata['password']);
                     } else{
                         $('textarea[name="pkey"]').val(jdata['pkey']);
-                        $('input[name="pkey_passwd"]').val(jdata['pkey_passwd']);
+                        // $('input[name="pkey_passwd"]').val(jdata['pkey_passwd']);
                     }
                     $('input[name="ps"]').val(jdata['ps']);
                     $('.auth_type_checkbox').each(function(){
@@ -492,12 +492,12 @@ function webShell_addServer(info=[]){
                     if (jdata['type'] == 0){
                         $('.c_password_view').removeClass('show').addClass('show');
                         $('.c_pkey_view').removeClass('show').addClass('hide');
-                        $('.key_pwd_line').removeClass('show').addClass('hide');
+                        // $('.key_pwd_line').removeClass('show').addClass('hide');
 
                     }else{
                         $('.c_password_view').removeClass('show').addClass('hide');
                         $('.c_pkey_view').removeClass('show').addClass('show');
-                        $('.key_pwd_line').removeClass('show').addClass('show');
+                        // $('.key_pwd_line').removeClass('show').addClass('show');
                     }
                 });
             }
@@ -510,12 +510,12 @@ function webShell_addServer(info=[]){
                 if (ctype == 0){
                     $('.c_password_view').removeClass('show').addClass('show');
                     $('.c_pkey_view').removeClass('show').addClass('hide');
-                    $('.key_pwd_line').removeClass('show').addClass('hide');
+                    // $('.key_pwd_line').removeClass('show').addClass('hide');
 
                 }else{
                     $('.c_password_view').removeClass('show').addClass('hide');
                     $('.c_pkey_view').removeClass('show').addClass('show');
-                    $('.key_pwd_line').removeClass('show').addClass('show');
+                    // $('.key_pwd_line').removeClass('show').addClass('show');
                 }
             });
         },
