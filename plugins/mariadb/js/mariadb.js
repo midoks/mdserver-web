@@ -797,7 +797,7 @@ function openPhpmyadmin(name,username,password){
     data = syncPost('/plugins/run',{'name':'phpmyadmin','func':'get_cfg'});
     var rdata = $.parseJSON(data.data);
     if (rdata.choose != 'mariadb'){
-        layer.msg('当前为['+rdata.choose+']模式,若要使用请切换模式.',{icon:2,shade: [0.3, '#000']});
+        layer.msg('当前为['+rdata.choose+']模式,若要使用请修改phpMyAdmin访问切换.',{icon:2,shade: [0.3, '#000']});
         return;
     }
     var phpmyadmin_cfg = rdata;
