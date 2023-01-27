@@ -265,18 +265,17 @@ class plugins_api:
         valid_list_hook = ['menu']
         if 'hook' in info:
             hooks = info['hook']
-            hooks_type = type(hooks)
-            if hooks_type == list:
-                for h in hooks:
+            for h in hooks:
+                hooks_type = type(h)
+                if hooks_type == dict:
                     tag = h['tag']
                     if tag in valid_list_hook:
                         self.hookInstallFile(tag, h[tag])
-
-            elif hooks_type == str:
-                for x in hooks:
-                    if x in valid_hook:
-                        self.hookInstallFile(x, info)
-                        return True
+                elif hooks_type == str:
+                    for x in hooks:
+                        if x in valid_hook:
+                            self.hookInstallFile(x, info)
+                            return True
         return False
 
     def hookUninstall(self, info):
@@ -284,17 +283,17 @@ class plugins_api:
         valid_list_hook = ['menu']
         if 'hook' in info:
             hooks = info['hook']
-            hooks_type = type(hooks)
-            if hooks_type == list:
-                for h in hooks:
+            for h in hooks:
+                hooks_type = type(h)
+                if hooks_type == dict:
                     tag = h['tag']
                     if tag in valid_list_hook:
                         self.hookUninstallFile(tag, h[tag])
-            elif hooks_type == str:
-                for x in hooks:
-                    if x in valid_hook:
-                        self.hookUninstallFile(x, info)
-                        return True
+                elif hooks_type == str:
+                    for x in hooks:
+                        if x in valid_hook:
+                            self.hookUninstallFile(x, info)
+                            return True
         return False
 
     def uninstallOldApi(self):
