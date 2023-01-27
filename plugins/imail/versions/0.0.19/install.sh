@@ -24,7 +24,7 @@ get_arch() {
 	TMP_ARCH=`arch`
 	if [ "$TMP_ARCH" == "x86_64" ];then
 		ARCH="amd64"
-	else if [ "$TMP_ARCH" == "aarch64" ];then
+	elif [ "$TMP_ARCH" == "aarch64" ];then
 		ARCH="arm64"
 	else
 		echo $ARCH
