@@ -1,7 +1,7 @@
 <style>
 .migration_content {
     position: relative;
-    height: 150px;
+    height: 450px;
 }
 .step_head::after {
     background-color: #ddd;
@@ -65,7 +65,7 @@
     float: left;
 }
 .step_content .psync_info .mtb20{
-    padding-left: 70px;
+    padding-left: 40px;
     text-align: left;
 }
 .psync_path .table {
@@ -206,7 +206,7 @@ label.checkbox_label span {
     padding-left: 10px;
 }
 .psync_tips span{
-    font-weight: 600;
+    font-size: 12px;
 }
 </style>
 <div class="migration_api pd15">
@@ -216,8 +216,77 @@ label.checkbox_label span {
 				<li class="active"><span>1</span><p>填写信息</p></li>
 				<li><span>2</span><p>检测环境</p></li>
 				<li><span>3</span><p>选择数据</p></li>
-				<li class=""><span>4</span><p>一键迁移</p></li>
+				<li><span>4</span><p>一键迁移</p></li>
 			</ul>
 		</div>
+
+		<div class="step_content">
+            <div class="pd15 psync_info">
+                <div class="psync_tips">
+                	<span class="glyphicon glyphicon-alert" style="color: #f39c12; margin-right: 10px;"></span>只需在发送数据服务器安装本软件，请填写<span>『 接收数据服务器 』</span>资料，
+                	<a href="#" class="btlink" style="text-decoration:underline;" target="_blank">迁移教程</a>
+                	<a href="#" target="_blank" class="bt-ico-ask" style="cursor: pointer;">?</a>
+                </div>
+                <div class="mtb20">
+                    <span class="panel_setp_span">接收数据的面板地址</span>
+                    <input type="text" class="bt-input-text" name="psync_url" value="" placeholder="接收数据面板地址，如: http://127.0.0.1:8888">
+                </div>
+                <div class="mtb20">
+                    <span class="panel_setp_span">接收数据的面板API</span>
+                    <input type="text" class="bt-input-text" name="psync_token" value="" placeholder="接收数据面板API密钥" />
+                    <a href="#" target="_blank" class="btlink ml5">获取API秘钥</a>
+                </div>
+                <div class="mtb20">
+                    <span class="panel_setp_span">IP白名单</span>
+                    <span style="height: 32px;line-height: 32px;">必须将本机器IP加入接收数据服务器API的IP白名单，<a href="#" href="javascript:;" target="_blank" class="btlink">如何添加白名单</a></span>
+                </div>
+                <div class="mtb20" style="text-align: left;margin-left: 130px;">
+                    <button class="btn btn-success infoNext">下一步</button>
+                </div>
+            </div>
+            <div class="pa15 psync_path" style="margin:0 50px">
+            </div>
+            <div class="pa15 psync_data" style="text-align: left;">
+                <div class="checkbox_conten">
+                    <div class="checkbox_data">
+                        <div class="checkbox_item">
+                            <label class="checkbox_label">
+                                <input type="checkbox" id="sites_All" checked>
+                                <span>网站</span>
+                            </label>
+                            <ul></ul>
+                        </div>
+                    </div>
+                    <div class="checkbox_data">
+                        <div class="checkbox_item">
+                            <label class="checkbox_label">
+                                <input type="checkbox" id="db_All" checked>
+                                <span>数据库</span>
+                            </label>
+                            <ul></ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="line mtb20" style="margin:20px 0 0 50px">
+                    <button class="btn btn-default btn-sm mr20 dataBack">上一步</button>
+                    <button class="btn btn-success btn-sm dataMigrate">一键迁移</button>
+                </div>
+            </div>
+            <div class="pa15 psync_migrate"></div>
+        </div>
+        <hr style="margin-top: 5px;" />
+        <div class="step_footer" style="margin: 5px 0 0 20px;text-align: left;">
+            <ul class="help-info-text c7 mlr20" style="margin-top: 0px;">
+                <li>一键迁移过程中是后台执行可以关闭当前窗口</li>
+                <li>一键迁移迁移数据不涉及原来数据的增删（是将原来数据打包发送）</li>
+            </ul>
+        </div>
 	</div>
 </div>
+
+
+<script type="text/javascript">
+$.getScript( "/plugins/file?name=&f=js/app.js", function(){
+	pluginService('migration_api',$('.plugin_version').attr('version'));
+});
+</script>
