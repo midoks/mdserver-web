@@ -462,15 +462,15 @@ def getDataFromInt(val):
 
 def writeLog(stype, msg, args=()):
     # 写日志
+    uid = 1
     try:
         from flask import session
-        uid = 1
         if 'uid' in session:
             uid = session['uid']
-        return writeDbLog(stype, msg, args, uid)
     except Exception as e:
-        print(getTracebackInfo())
-        return False
+        pass
+        # print(getTracebackInfo())
+    return writeDbLog(stype, msg, args, uid)
 
 
 def writeDbLog(stype, msg, args=(), uid=1):
