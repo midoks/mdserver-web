@@ -10,8 +10,8 @@ serverPath=$(dirname "$rootPath")
 install_tmp=${rootPath}/tmp/mw_install.pl
 VERSION=0.0.19
 
-# bash install.sh install 0.0.16
-## cd /www/server/mdserver-web/plugins/imail && bash install.sh install 0.0.16
+# bash install.sh install 0.0.19
+## cd /www/server/mdserver-web/plugins/imail && bash install.sh install 0.0.19
 
 bash ${rootPath}/scripts/getos.sh
 OSNAME=`cat ${rootPath}/data/osname.pl`
