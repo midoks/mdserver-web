@@ -43,7 +43,12 @@ if [ -f /usr/sbin/iptables ];then
     iptables_status=`systemctl status iptables | grep 'inactive'`
     if [ "${iptables_status}" != '' ];then
         service iptables restart
-    
+        
+        # iptables -P FORWARD DROP
+        iptables -P INPUT DROP
+        iptables -P OUTPUT ACCEPT
+        iptables -A INPUT -p tcp -s 127.0.0.1 -j ACCEPT
+        
         iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 22 -j ACCEPT
         iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
         iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 443 -j ACCEPT

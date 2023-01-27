@@ -11,7 +11,7 @@
 	"checks":"server/backup_ftp",
 	"path": "server/backup_ftp",
 	"author":"midoks",
-	"home":"",
+	"home":"https://github.com/midoks/mdserver-web",
 	"date":"2022-10-23",
 	"pid": "4"
 }

@@ -27,7 +27,7 @@ from flask import request
 
 class config_api:
 
-    __version = '0.12.1'
+    __version = '0.12.2'
     __api_addr = 'data/api.json'
 
     def __init__(self):
@@ -781,12 +781,21 @@ class config_api:
             "id=?", (1,)).getField('username')
 
         # databases hook 获取
-        database_file = 'data/hook_database.json'
-        if os.path.exists(database_file):
-            df = mw.readFile(database_file)
+        database_hook_file = 'data/hook_database.json'
+        if os.path.exists(database_hook_file):
+            df = mw.readFile(database_hook_file)
             df = json.loads(df)
             data['hook_database'] = df
         else:
             data['hook_database'] = []
+
+        # menu hook 获取
+        menu_hook_file = 'data/hook_menu.json'
+        if os.path.exists(menu_hook_file):
+            df = mw.readFile(menu_hook_file)
+            df = json.loads(df)
+            data['hook_menu'] = df
+        else:
+            data['hook_menu'] = []
 
         return data

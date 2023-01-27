@@ -27,7 +27,7 @@ import sys
 import threading
 import multiprocessing
 
-
+from flask import render_template
 from flask import request
 
 
@@ -75,12 +75,35 @@ class plugins_api:
         data = self.getPluginList(sType, int(sPage))
         return mw.getJson(data)
 
+    def menuGetAbsPath(self, tag, path):
+        if path[0:1] == '/':
+            return path
+        else:
+            return mw.getPluginDir() + '/' + tag + '/' + path
+
+    def menuApi(self):
+        import config_api
+        data = config_api.config_api().get()
+        tag = request.args.get('tag', '')
+        menu_file = 'data/hook_menu.json'
+        content = ''
+        if os.path.exists(menu_file):
+            t = mw.readFile(menu_file)
+            tlist = json.loads(t)
+            for menu_data in tlist:
+                if 'path' in menu_data:
+                    tpath = self.menuGetAbsPath(tag, menu_data['path'])
+                    content = mw.readFile(tpath)
+        data['plugin_content'] = content
+        return render_template('plugin_menu.html', data=data)
+
     def fileApi(self):
         name = request.args.get('name', '')
         if name.strip() == '':
             return ''
 
         f = request.args.get('f', '')
+
         if f.strip() == '':
             return ''
 
@@ -88,8 +111,16 @@ class plugins_api:
         if not os.path.exists(file):
             return ''
 
-        c = open(file, 'rb').read()
-        return c
+        suffix = mw.getPathSuffix(file)
+        if suffix == '.css':
+            content = mw.readFile(file)
+            from flask import Response
+            from flask import make_response
+            v = Response(content, headers={
+                         'Content-Type': 'text/css; charset="utf-8"'})
+            return make_response(v)
+        content = open(file, 'rb').read()
+        return content
 
     def indexListApi(self):
         data = self.getIndexList()
@@ -214,10 +245,7 @@ class plugins_api:
                 isNeedAdd = False
 
         if isNeedAdd:
-            tmp = {}
-            tmp['title'] = info['title']
-            tmp['name'] = info['name']
-            data.append(tmp)
+            data.append(info)
         mw.writeFile(hookPath, json.dumps(data))
 
     def hookUninstallFile(self, hook_name, info):
@@ -233,21 +261,39 @@ class plugins_api:
         mw.writeFile(hookPath, json.dumps(data))
 
     def hookInstall(self, info):
+        valid_hook = ['backup', 'database']
+        valid_list_hook = ['menu']
         if 'hook' in info:
             hooks = info['hook']
-            for x in hooks:
-                if x in ['backup', 'database']:
-                    self.hookInstallFile(x, info)
-                    return True
+            for h in hooks:
+                hooks_type = type(h)
+                if hooks_type == dict:
+                    tag = h['tag']
+                    if tag in valid_list_hook:
+                        self.hookInstallFile(tag, h[tag])
+                elif hooks_type == str:
+                    for x in hooks:
+                        if x in valid_hook:
+                            self.hookInstallFile(x, info)
+                            return True
         return False
 
     def hookUninstall(self, info):
+        valid_hook = ['backup', 'database']
+        valid_list_hook = ['menu']
         if 'hook' in info:
             hooks = info['hook']
-            for x in hooks:
-                if x in ['backup', 'database']:
-                    self.hookUninstallFile(x, info)
-                    return True
+            for h in hooks:
+                hooks_type = type(h)
+                if hooks_type == dict:
+                    tag = h['tag']
+                    if tag in valid_list_hook:
+                        self.hookUninstallFile(tag, h[tag])
+                elif hooks_type == str:
+                    for x in hooks:
+                        if x in valid_hook:
+                            self.hookUninstallFile(x, info)
+                            return True
         return False
 
     def uninstallOldApi(self):
@@ -681,6 +727,7 @@ class plugins_api:
     def makeList(self, data, sType='0'):
         plugins_info = []
 
+        # 相应类型
         if (data['pid'] == sType):
             if type(data['versions']) == list and 'coexist' in data and data['coexist']:
                 tmp_data = self.makeCoexist(data)
@@ -691,6 +738,7 @@ class plugins_api:
                 plugins_info.append(pg)
             return plugins_info
 
+        # 全部
         if sType == '0':
             if type(data['versions']) == list and 'coexist' in data and data['coexist']:
                 tmp_data = self.makeCoexist(data)
@@ -699,6 +747,18 @@ class plugins_api:
             else:
                 pg = self.getPluginInfo(data)
                 plugins_info.append(pg)
+
+        # 已经安装
+        if sType == '-1':
+            if type(data['versions']) == list and 'coexist' in data and data['coexist']:
+                tmp_data = self.makeCoexist(data)
+                for index in range(len(tmp_data)):
+                    if tmp_data[index]['setup']:
+                        plugins_info.append(tmp_data[index])
+            else:
+                pg = self.getPluginInfo(data)
+                if pg['setup']:
+                    plugins_info.append(pg)
 
         # print plugins_info, data
         return plugins_info

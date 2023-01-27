@@ -23,6 +23,14 @@
       gtag('js', new Date());
       gtag('config', 'G-FC74BB2RGD');
     </script>
+
+
+    {% for menu in data['hook_menu'] %}
+    {% if menu['js_path'] %}
+    <!-- 加载插件css -->
+    <link href="/plugins/file?name={{menu['name']}}&v={{config.version}}&f={{menu['css_path']}}" rel="stylesheet" />
+    {% endif %}
+    {% endfor %}
 </head>
 
 <body>
@@ -33,12 +41,18 @@
                     <div id="task" class="task cw" onclick="messageBox();"></div>
                     <h3 class="mypcip"><span class="f14 cw">{{data['ip']}}</span></h3>
                     <ul class="menu">
-                        <li id="memuA"> <a class="menu_home" href="/">首页</a></li>
+                        <li id="memuA"><a class="menu_home" href="/">首页</a></li>
                         <li id="memuAsite"><a class="menu_web" href="/site">网站</a></li>
                         <li id="memuAcontrol"><a class="menu_control" href="/control">监控</a></li>
                         <li id="memuAfirewall"><a class="menu_firewall" href="/firewall">安全</a></li>
                         <li id="memuAfiles"><a class="menu_folder" href="/files">文件</a></li>
                         <li id="memuAcrontab"><a class="menu_day" href="/crontab">计划任务</a></li>
+                        <!-- 插件设置的菜单 -->
+                        {% for menu in data['hook_menu'] %}
+                        <li id="memuAplugins_{{menu['name']}}">
+                            <a class="menu_plugin_{{menu['name']}}" href="/plugins/menu?tag={{menu['name']}}">{{menu['title']}}</a>
+                        </li>
+                        {% endfor %}
                         <li id="memuAsoft"><a class="menu_soft" href="/soft">软件管理</a><span class="softnum">1</span></li>
                         <li id="memuAconfig"><a class="menu_set" href="/config">面板设置</a></li>
                         <li><a class="menu_exit" href="javascript:;" id="signout">退出</a></li>
@@ -61,6 +75,7 @@
             <script src="/static/build/addons/fullscreen/fullscreen.js?v={{config.version}}"></script>
             <script src="/static/js/socket.io.min.js?v={{config.version}}"></script>
             <script src="/static/build/addons/winptyCompat/winptyCompat.js?v={{config.version}}"></script>
+            <script src="/static/js/term-websocketio.js?v={{config.version}}"></script>
             <script src="/static/app/upload.js?v={{config.version}}"></script>
             <script src="/static/app/public.js?v={{config.version}}"></script>
             <script src="/static/js/echarts.min.js?v={{config.version}}"></script>
@@ -76,6 +91,14 @@
 </body>
 
 <script type="text/javascript">
+
+(function ($) {
+    $.getUrlParam = function (name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) return unescape(r[2]); return null;
+    }
+})(jQuery);
 
 function showAd(){
     layer.open({
@@ -110,16 +133,22 @@ function getUrlPath(){
     var pathArr = thisUrl.split('/');
     return pathArr[pathArr.length - 1];
 }
-
 var thisPath = getUrlPath();
-if(thisPath != undefined){
-    $('#memuA'+thisPath).css('background-color','#2c3138');
-} else {
-    $('#memuA').css('background-color','#f2f2f2');
+if (thisPath.indexOf('?')>-1){
+    var tag = $.getUrlParam('tag');
+    if(tag != undefined){
+        $('#memuAplugins_'+tag).css('background-color','#2c3138');
+    } else {
+        $('#memuA').css('background-color','#f2f2f2');
+    }
+} else{
+    if(thisPath != undefined){
+        $('#memuA'+thisPath).css('background-color','#2c3138');
+    } else {
+        $('#memuA').css('background-color','#f2f2f2');
+    }
 }
-
 </script>
-
 <script src="/static/codemirror/lib/codemirror.js?v={{config.version}}"></script>
 <script src="/static/codemirror/addon/edit/editAll.js?v={{config.version}}"></script>
 <script src="/static/codemirror/mode/modeAll.js?v={{config.version}}"></script>
@@ -127,5 +156,12 @@ if(thisPath != undefined){
 <script src="/static/codemirror/addon/search/search.js?v={{config.version}}"></script>
 <script src="/static/codemirror/addon/scroll/annotatescrollbar.js?v={{config.version}}"></script>
 <script src="/static/laydate/laydate.js?v={{config.version}}"></script>
+
+{% for menu in data['hook_menu'] %}
+{% if menu['js_path'] %}
+<!-- 加载插件js -->
+<script src="/plugins/file?name={{menu['name']}}&f={{menu['js_path']}}&v={{config.version}}"></script>
+{% endif %}
+{% endfor %}
 
 </html>

@@ -33,7 +33,8 @@ class firewall_api:
     __isMac = False
 
     def __init__(self):
-        if os.path.exists('/usr/sbin/iptables'):
+        iptables_file = mw.systemdCfgDir() + '/iptables.service'
+        if os.path.exists(iptables_file):
             self.__isIptables = True
         if os.path.exists('/usr/sbin/firewalld'):
             self.__isFirewalld = True
@@ -254,26 +255,15 @@ class firewall_api:
         conf = re.sub(rep, "Port " + port + "\n", conf)
         mw.writeFile(file, conf)
 
+        self.addAcceptPortArgs(port, 'SSH端口修改', 'port')
         if self.__isUfw:
-            mw.execShell('ufw allow ' + port + '/tcp')
             mw.execShell("service ssh restart")
         elif self.__isIptables:
-            mw.execShell(
-                'iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport ' + port + ' -j ACCEPT')
             mw.execShell("/etc/init.d/sshd restart")
         elif self.__isFirewalld:
-            mw.execShell('setenforce 0')
-            mw.execShell(
-                'sed -i "s#SELINUX=enforcing#SELINUX=disabled#" /etc/selinux/config')
             mw.execShell("systemctl restart sshd.service")
         else:
-            pass
-
-        self.firewallReload()
-        # mw.M('firewall').where(
-        #     "ps=?", ('SSH远程管理服务',)).setField('port', port)
-        msg = "改SSH端口为[{}]成功!".format(port)
-        mw.writeLog("防火墙管理", msg)
+            return mw.returnJson(False, '修改失败!')
         return mw.returnJson(True, '修改成功!')
 
     def setSshStatusApi(self):
@@ -359,6 +349,8 @@ class firewall_api:
             _list = mw.M('firewall').field('id,port,ps,addtime').limit(
                 '0,1000').order('id desc').select()
 
+            mw.execShell('iptables -P INPUT DROP')
+            mw.execShell('iptables -P OUTPUT ACCEPT')
             for x in _list:
                 port = x['port']
                 if mw.isIpAddr(port):

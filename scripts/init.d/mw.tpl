@@ -14,7 +14,7 @@
 
 
 PATH=/usr/local/bin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
-export LANG=en_US.UTF-8
+# export LANG=en_US.UTF-8
 
 mw_path={$SERVER_PATH}
 PATH=$PATH:$mw_path/bin
@@ -215,6 +215,17 @@ mw_update_dev()
     cd /www/server/mdserver-web
 }
 
+mw_mirror()
+{
+    cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
+    if [ ! -z "$cn" ];then
+        bash <(curl -sSL https://gitee.com/SuperManito/LinuxMirrors/raw/main/ChangeMirrors.sh)
+    else
+        bash <(curl -sSL https://raw.githubusercontent.com/midoks/change-linux-mirrors/main/change-mirrors.sh)
+    fi
+    cd /www/server/mdserver-web
+}
+
 mw_install_app()
 {
     bash $mw_path/scripts/quick/app.sh
@@ -280,6 +291,7 @@ case "$1" in
     'close_admin_path') mw_close_admin_path;;
     'unbind_domain') mw_unbind_domain;;
     'debug') mw_debug;;
+    'mirror') mw_mirror;;
     'default')
         cd $mw_path
         port=7200

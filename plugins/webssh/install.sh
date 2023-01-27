@@ -11,12 +11,13 @@ serverPath=$(dirname "$rootPath")
 
 install_tmp=${rootPath}/tmp/mw_install.pl
 
+VERSION=$2
 
 Install_webssh()
 {
 	echo '正在安装脚本文件...' > $install_tmp
 	mkdir -p $serverPath/webssh
-	echo '1.0' > $serverPath/webssh/version.pl
+	echo "${VERSION}" > $serverPath/webssh/version.pl
 	echo '安装完成' > $install_tmp
 
 }

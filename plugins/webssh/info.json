@@ -1,11 +1,23 @@
 {
+	"hook":[
+		{
+			"tag":"menu",
+			"menu": {
+				"title":"终端管理",
+				"name":"webssh",
+				"path":"menu/index.html",
+				"css_path":"menu/index.css",
+				"js_path":"js/webssh.js"
+			}
+		}
+	],
 	"id":3,
 	"title":"SSH终端",
 	"tip":"lib",
 	"name":"webssh",
 	"type":"扩展",
 	"ps":"完整功能的SSH客户端，仅用于连接本服务器",
-	"versions":"1.0",
+	"versions":"2.0",
 	"shell":"install.sh",
 	"checks":"server/webssh",
 	"path": "server/webssh",

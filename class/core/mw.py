@@ -454,6 +454,12 @@ def getDate():
     return time.strftime('%Y-%m-%d %X', time.localtime())
 
 
+def getDataFromInt(val):
+    time_format = '%Y-%m-%d %H:%M:%S'
+    time_str = time.localtime(val)
+    return time.strftime(time_format, time_str)
+
+
 def writeLog(stype, msg, args=()):
     # 写日志
     try:
@@ -573,28 +579,37 @@ def dePunycode(domain):
 def enCrypt(key, strings):
     # 加密字符串
     try:
+        import base64
+        _key = md5(key).encode('utf-8')
+        _key = base64.urlsafe_b64encode(_key)
+
         if type(strings) != bytes:
             strings = strings.encode('utf-8')
+        import cryptography
         from cryptography.fernet import Fernet
-        f = Fernet(key)
+        f = Fernet(_key)
         result = f.encrypt(strings)
         return result.decode('utf-8')
     except:
-        # print(get_error_info())
+        print(getTracebackInfo())
         return strings
 
 
 def deCrypt(key, strings):
     # 解密字符串
     try:
+        import base64
+        _key = md5(key).encode('utf-8')
+        _key = base64.urlsafe_b64encode(_key)
+
         if type(strings) != bytes:
-            strings = strings.decode('utf-8')
+            strings = strings.encode('utf-8')
         from cryptography.fernet import Fernet
-        f = Fernet(key)
+        f = Fernet(_key)
         result = f.decrypt(strings).decode('utf-8')
         return result
     except:
-        # print(get_error_info())
+        print(getTracebackInfo())
         return strings
 
 
@@ -1275,6 +1290,10 @@ def toSize(size):
     return str(round(size, 2)) + ' ' + b
 
 
+def getPathSuffix(path):
+    return os.path.splitext(path)[-1]
+
+
 def getMacAddress():
     # 获取mac
     import uuid
@@ -1483,8 +1502,95 @@ def getMyORMDb():
     o = ormDb.ORM()
     return o
 
+
+##################### ssh  start #########################################
+def getSshDir():
+    if isAppleSystem():
+        user = execShell("who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
+        return '/Users/' + user + '/.ssh'
+    return '/root/.ssh'
+
+
+def createRsa():
+    # ssh-keygen -t rsa -P "" -C "midoks@163.com"
+    ssh_dir = getSshDir()
+    # mw.execShell("rm -f /root/.ssh/*")
+    if not os.path.exists(ssh_dir + '/authorized_keys'):
+        execShell('touch ' + ssh_dir + '/authorized_keys')
+
+    if not os.path.exists(ssh_dir + '/id_rsa.pub') and os.path.exists(ssh_dir + '/id_rsa'):
+        execShell('echo y | ssh-keygen -q -t rsa -P "" -f ' +
+                  ssh_dir + '/id_rsa')
+    else:
+        execShell('ssh-keygen -q -t rsa -P "" -f ' + ssh_dir + '/id_rsa')
+
+    execShell('cat ' + ssh_dir + '/id_rsa.pub >> ' +
+              ssh_dir + '/authorized_keys')
+    execShell('chmod 600 ' + ssh_dir + '/authorized_keys')
+
+
+def createSshInfo():
+    ssh_dir = getSshDir()
+    if not os.path.exists(ssh_dir + '/id_rsa') or not os.path.exists(ssh_dir + '/id_rsa.pub'):
+        createRsa()
+
+    # 检查是否写入authorized_keys
+    data = execShell("cat " + ssh_dir + "/id_rsa.pub | awk '{print $3}'")
+    if data[0] != "":
+        cmd = "cat " + ssh_dir + "/authorized_keys | grep " + data[0]
+        ak_data = execShell(cmd)
+        if ak_data[0] == "":
+            cmd = 'cat ' + ssh_dir + '/id_rsa.pub >> ' + ssh_dir + '/authorized_keys'
+            execShell(cmd)
+            execShell('chmod 600 ' + ssh_dir + '/authorized_keys')
+
+
+def connectSsh():
+    import paramiko
+    ssh = paramiko.SSHClient()
+    createSshInfo()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
+    port = getSSHPort()
+    try:
+        ssh.connect('127.0.0.1', port, timeout=5)
+    except Exception as e:
+        ssh.connect('localhost', port, timeout=5)
+    except Exception as e:
+        ssh.connect(getHostAddr(), port, timeout=30)
+    except Exception as e:
+        return False
+
+    shell = ssh.invoke_shell(term='xterm', width=83, height=21)
+    shell.setblocking(0)
+    return shell
+
+
+def clearSsh():
+    # 服务器IP
+    ip = getHostAddr()
+    sh = '''
+#!/bin/bash
+PLIST=`who | grep localhost | awk '{print $2}'`
+for i in $PLIST
+do
+    ps -t /dev/$i |grep -v TTY | awk '{print $1}' | xargs kill -9
+done
+
+# getHostAddr
+PLIST=`who | grep "${ip}" | awk '{print $2}'`
+for i in $PLIST
+do
+    ps -t /dev/$i |grep -v TTY | awk '{print $1}' | xargs kill -9
+done
+'''
+    if not isAppleSystem():
+        info = execShell(sh)
+        print(info[0], info[1])
+##################### ssh  end   #########################################
+
 # ---------------------------------------------------------------------------------
-# 打印相关
+# 打印相关 START
 # ---------------------------------------------------------------------------------
 
 
@@ -1503,3 +1609,7 @@ def echoEnd(tag):
 
 def echoInfo(msg):
     print("|-{}".format(msg))
+
+# ---------------------------------------------------------------------------------
+# 打印相关 END
+# ---------------------------------------------------------------------------------
