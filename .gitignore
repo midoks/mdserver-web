@@ -156,6 +156,7 @@ data/bind_domain.pl
 
 plugins/l2tp
 plugins/openlitespeed
+plugins/migration_api
 plugins/system_safe
 plugins/tamper_proof
 plugins/gdrive
