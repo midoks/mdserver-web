@@ -724,6 +724,26 @@ class system_api:
                 mw.execShell('rm -rf ' + toPath + '/mdserver-web-' + version)
                 mw.execShell('rm -rf ' + toPath + '/mw.zip')
 
+                update_env = '''
+#!/bin/bash
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+
+if [ ! -f /www/server/mdserver-web/bin/activate ];then
+    cd /www/server/mdserver-web && python3 -m venv .
+    cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate
+else
+    cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate
+fi
+
+cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
+PIPSRC="https://pypi.python.org/simple"
+if [ ! -z "$cn" ];then
+    PIPSRC="https://pypi.tuna.tsinghua.edu.cn/simple"
+fi
+
+cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt -i $PIPSRC
+'''
+                os.system(update_env)
                 self.restartMw()
                 return mw.returnJson(True, '安装更新成功!')
 
