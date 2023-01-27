@@ -92,7 +92,7 @@ def mwcli(mw_input=0):
             firewall_api.firewall_api().addAcceptPortArgs(
                 in_port, 'WEB面板[TOOLS修改]', 'port')
             mw.writeFile('data/port.pl', in_port)
-            os.system(INIT_CMD + " restart")
+            os.system(INIT_CMD + " restart_panel")
         else:
             print("|-端口范围在0-65536之间")
         return
