@@ -91,14 +91,17 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.12.1
+### 版本更新 0.12.2
 
-* mysql/mariadb/mysql-apt/mysql-yum增加新的同步方式[同步账户]。
-* pureftp安装时自动放行端口。
-* 面板ssl，添加【申请Lets证书】功能。
-* 站点子域名绑定优化。
-* 修复添加数据库名字判断。
-* 增加PHP52的隐藏和显示指令。
+* 开放菜单权限配置。
+* 升级SSH终端2.0。
+* 增加已安装类型。
+* 加入切换linux软件源的命令。
+* iptables安装优化。
+* 网站统计POST获取数据优化。
+* mysql[apt/yum]迁移优化。
+* 优化防火墙导入。
+* 图标可设置。
 * 各种细节优化。
 
 
