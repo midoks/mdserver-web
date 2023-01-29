@@ -677,56 +677,30 @@ class files_api:
         if os.path.getsize(path) > 2097152:
             return mw.returnJson(False, '不能在线编辑大于2MB的文件!')
 
+        if os.path.isdir(path):
+            return mw.returnJson(False, '这不是一个文件!')
+
         fp = open(path, 'rb')
         data = {}
         data['status'] = True
-        try:
-            if fp:
-                from chardet.universaldetector import UniversalDetector
-                detector = UniversalDetector()
-                srcBody = b""
-                for line in fp.readlines():
-                    detector.feed(line)
-                    srcBody += line
-                detector.close()
-                char = detector.result
-                data['encoding'] = char['encoding']
-                if char['encoding'] == 'GB2312' or not char['encoding'] or char[
-                        'encoding'] == 'TIS-620' or char['encoding'] == 'ISO-8859-9':
-                    data['encoding'] = 'GBK'
-                if char['encoding'] == 'ascii' or char[
-                        'encoding'] == 'ISO-8859-1':
-                    data['encoding'] = 'utf-8'
-                if char['encoding'] == 'Big5':
-                    data['encoding'] = 'BIG5'
+        if fp:
+            srcBody = fp.read()
+            fp.close()
 
-                if not data['encoding'] in ['GBK', 'utf-8', 'BIG5']:
-                    data['encoding'] = 'utf-8'
-
+            encoding_list = ['utf-8', 'GBK', 'BIG5']
+            for el in encoding_list:
                 try:
-                    if sys.version_info[0] == 2:
-                        data['data'] = srcBody.decode(
-                            data['encoding']).encode('utf-8', errors='ignore')
-                    else:
-                        data['data'] = srcBody.decode(data['encoding'])
-                except:
-                    data['encoding'] = char['encoding']
-                    if sys.version_info[0] == 2:
-                        data['data'] = srcBody.decode(
-                            data['encoding']).encode('utf-8', errors='ignore')
-                    else:
-                        data['data'] = srcBody.decode(data['encoding'])
-                return mw.returnJson(True, 'OK', data)
-            else:
-                if sys.version_info[0] == 2:
-                    data['data'] = srcBody.decode('utf-8').encode('utf-8')
-                else:
-                    data['data'] = srcBody.decode('utf-8')
-                data['encoding'] = 'utf-8'
+                    data['encoding'] = el
+                    data['data'] = srcBody.decode(data['encoding'])
+                    break
+                except Exception as ex:
+                    if el == 'BIG5':
+                        return mw.returnJson(False, '文件编码不被兼容，无法正确读取文件!' + str(ex))
+        else:
+            data['encoding'] = 'utf-8'
+            data['data'] = srcBody.decode(data['encoding'])
 
-            return mw.returnJson(True, 'OK', data)
-        except Exception as ex:
-            return mw.returnJson(False, '文件编码不被兼容，无法正确读取文件!' + str(ex))
+        return mw.returnJson(True, 'OK', data)
 
     def saveBody(self, path, data, encoding='utf-8'):
         if not os.path.exists(path):
@@ -734,13 +708,10 @@ class files_api:
         try:
             if encoding == 'ascii':
                 encoding = 'utf-8'
-            if sys.version_info[0] == 2:
-                data = data.encode(encoding, errors='ignore')
-                fp = open(path, 'w+')
-            else:
-                data = data.encode(
-                    encoding, errors='ignore').decode(encoding)
-                fp = open(path, 'w+', encoding=encoding)
+
+            data = data.encode(
+                encoding, errors='ignore').decode(encoding)
+            fp = open(path, 'w+', encoding=encoding)
             fp.write(data)
             fp.close()
 
