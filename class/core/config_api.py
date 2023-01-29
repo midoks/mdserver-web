@@ -649,7 +649,6 @@ class config_api:
 
     def getPanelTokenApi(self):
         api_file = self.__api_addr
-
         tmp = mw.readFile(api_file)
         if not os.path.exists(api_file):
             ready_data = {"open": False, "token": "", "limit_addr": []}
@@ -668,7 +667,7 @@ class config_api:
             token = mw.getRandomString(32)
             data['token'] = mw.md5(token)
             data['token_crypt'] = mw.enCrypt(
-                data['token'], token).decode('utf-8')
+                data['token'], token)
             mw.writeFile(api_file, json.dumps(data))
             data['token'] = "***********************************"
 
