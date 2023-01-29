@@ -697,8 +697,7 @@ class files_api:
                     if el == 'BIG5':
                         return mw.returnJson(False, '文件编码不被兼容，无法正确读取文件!' + str(ex))
         else:
-            data['encoding'] = 'utf-8'
-            data['data'] = srcBody.decode(data['encoding'])
+            return mw.returnJson(False, '文件未正常打开!')
 
         return mw.returnJson(True, 'OK', data)
 
