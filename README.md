@@ -84,7 +84,7 @@ PHP[72-81]支持phpMyAdmin[5.2.0]
 # Docker
 
 - 由[DDSRem](https://github.com/DDSRem)开发维护。
-- https://hub.docker.com/r/ddsderek/mw-server
+- https://hub.docker.com/r/ddsderek/mw
 
 ```
 docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:443 -p 888:888 ddsderek/mw-server:latest
