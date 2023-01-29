@@ -3,12 +3,11 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 export DEBIAN_FRONTEND=noninteractive
 
-# apt install -y locate
-# locale-gen C.UTF-8
-# export LC_CTYPE=C.UTF-8
-# export LC_ALL=C.UTF-8
-# export LANG=C.UTF-8
-
+apt install -y locate
+locale-gen en_US.UTF-8
+export LC_CTYPE=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
 
 # echo "LC_ALL=en_US.UTF-8" > /etc/default/locale
 # echo "LANG=en_US.UTF-8" > /etc/default/locale
