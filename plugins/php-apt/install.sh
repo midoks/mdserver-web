@@ -83,6 +83,7 @@ if [ "${action}" == "install" ] && [ -d ${serverPath}/php-apt/${type} ];then
 
 	# 安装通用扩展
 	echo "install PHP-APT[${type}] extend start"
+	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type:0:1}.${type:1:2} install curl
 	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type:0:1}.${type:1:2} install gd
 	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type:0:1}.${type:1:2} install iconv
 	cd ${rootPath}/plugins/php-apt/versions && bash common.sh ${type:0:1}.${type:1:2} install exif
