@@ -187,7 +187,7 @@ function userProjectList(user, search){
                                 <thead><tr><th>项目</th><th>操作</th></tr></thead>\
                                 <tbody></tbody>\
                             </table>\
-                            <div class='gitea_page dataTables_paginate paging_bootstrap pagination' style='margin-top:0px;'><ul class='page'></ul></div>\
+                            <div class='dataTables_paginate paging_bootstrap pagination' style='margin-top:0px;'><ul class='gitea_page'></ul></div>\
                         </div>\
                     </div>\
                 </div>",
