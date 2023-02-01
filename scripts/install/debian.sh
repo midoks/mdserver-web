@@ -25,6 +25,9 @@ if [ ! -z "$cn" ];then
 fi
 ntpdate $NTPHOST | logger -t NTP
 
+SSH_PORT=`netstat -ntpl|grep sshd|grep -v grep | sed -n "1,1p" | awk '{print $4}' | awk -F : '{print $2}'`
+echo "SSH PORT:${SSH_PORT}"
+
 if [ ! -f /usr/sbin/locale-gen ];then
 	apt install -y locales
 	sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen
@@ -44,6 +47,7 @@ apt install -y python3-pip python3-dev python3-venv
 if [ -f /usr/sbin/ufw ];then
 
 	ufw allow 22/tcp
+	ufw allow $SSH_PORT/tcp
 	ufw allow 80/tcp
 	ufw allow 443/tcp
 	ufw allow 888/tcp
@@ -67,6 +71,7 @@ if [ ! -f /usr/sbin/ufw ];then
 	systemctl start firewalld
 
 	firewall-cmd --permanent --zone=public --add-port=22/tcp
+	firewall-cmd --permanent --zone=public --add-port=${SSH_PORT}/tcp
 	firewall-cmd --permanent --zone=public --add-port=80/tcp
 	firewall-cmd --permanent --zone=public --add-port=443/tcp
 	firewall-cmd --permanent --zone=public --add-port=888/tcp
