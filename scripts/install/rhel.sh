@@ -33,6 +33,9 @@ if [ ! -d /root/.acme.sh ];then
     curl https://get.acme.sh | sh
 fi
 
+SSH_PORT=`netstat -ntpl|grep sshd|grep -v grep | sed -n "1,1p" | awk '{print $4}' | awk -F : '{print $2}'`
+echo "SSH PORT:${SSH_PORT}"
+
 echo "iptables wrap start"
 if [ -f /usr/sbin/iptables ];then
     $PKGMGR install -y iptables-services
@@ -49,7 +52,12 @@ if [ -f /usr/sbin/iptables ];then
         iptables -P OUTPUT ACCEPT
         iptables -A INPUT -p tcp -s 127.0.0.1 -j ACCEPT
         
-        iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 22 -j ACCEPT
+        if [ "$SSH_PORT" != "" ];then
+            iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport ${SSH_PORT} -j ACCEPT
+        else
+            iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 22 -j ACCEPT
+        fi
+
         iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
         iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 443 -j ACCEPT
         iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 888 -j ACCEPT
@@ -81,7 +89,11 @@ if [ ! -f /usr/sbin/iptables ];then
     # look
     # firewall-cmd --list-all
 
-    firewall-cmd --permanent --zone=public --add-port=22/tcp
+    if [ "$SSH_PORT" != "" ];then
+        firewall-cmd --permanent --zone=public --add-port=${SSH_PORT}/tcp
+    else
+        firewall-cmd --permanent --zone=public --add-port=22/tcp
+    fi
     firewall-cmd --permanent --zone=public --add-port=80/tcp
     firewall-cmd --permanent --zone=public --add-port=443/tcp
     firewall-cmd --permanent --zone=public --add-port=888/tcp
