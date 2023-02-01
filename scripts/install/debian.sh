@@ -46,8 +46,12 @@ apt install -y python3-pip python3-dev python3-venv
 
 if [ -f /usr/sbin/ufw ];then
 
-	ufw allow 22/tcp
-	ufw allow $SSH_PORT/tcp
+	if [ "$SSH_PORT" != "" ];then
+		ufw allow $SSH_PORT/tcp
+	else
+		ufw allow 22/tcp
+	fi
+	
 	ufw allow 80/tcp
 	ufw allow 443/tcp
 	ufw allow 888/tcp
@@ -70,8 +74,11 @@ if [ ! -f /usr/sbin/ufw ];then
     systemctl unmask firewalld
 	systemctl start firewalld
 
-	firewall-cmd --permanent --zone=public --add-port=22/tcp
-	firewall-cmd --permanent --zone=public --add-port=${SSH_PORT}/tcp
+	if [ "$SSH_PORT" != "" ];then
+		firewall-cmd --permanent --zone=public --add-port=${SSH_PORT}/tcp
+	else
+		firewall-cmd --permanent --zone=public --add-port=22/tcp
+	fi
 	firewall-cmd --permanent --zone=public --add-port=80/tcp
 	firewall-cmd --permanent --zone=public --add-port=443/tcp
 	firewall-cmd --permanent --zone=public --add-port=888/tcp
