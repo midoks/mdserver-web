@@ -28,16 +28,17 @@ ntpdate $NTPHOST | logger -t NTP
 SSH_PORT=`netstat -ntpl|grep sshd|grep -v grep | sed -n "1,1p" | awk '{print $4}' | awk -F : '{print $2}'`
 echo "SSH PORT:${SSH_PORT}"
 
+# choose lang cmd
+# dpkg-reconfigure --frontend=noninteractive locales
 if [ ! -f /usr/sbin/locale-gen ];then
 	apt install -y locales
 	sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen
 	locale-gen en_US.UTF-8
-	localedef -v -c -i en_US -f UTF-8 en_US.UTF-8
-	dpkg-reconfigure --frontend=noninteractive locales
+	localedef -v -c -i en_US -f UTF-8 en_US.UTF-8 > /dev/null 2>&1
 	update-locale LANG=en_US.UTF-8
 else
 	locale-gen en_US.UTF-8
-	localedef -v -c -i en_US -f UTF-8 en_US.UTF-8
+	localedef -v -c -i en_US -f UTF-8 en_US.UTF-8 > /dev/null 2>&1
 fi
 
 apt-get update -y
