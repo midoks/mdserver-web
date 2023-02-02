@@ -550,6 +550,61 @@ function setTempAccessReq(page){
 	},'json');
 }
 
+function setStatusCode(o){
+	var code = $(o).data('code');
+    layer.open({
+        type: 1,
+        area: ['420px', '220px'],
+        title: "设置未认证时的响应状态",
+        closeBtn: 1,
+        shift: 5,
+        btn:['提交','关闭'],
+        shadeClose: false,
+        content: '<div class="bt-form bt-form pd20">\
+                    <div class="line">\
+                        <span class="tname">相应状态</span>\
+                        <div class="info-r">\
+                            <select class="bt-input-text mr5" name="status_code" style="width: 250px;"></select>\
+                        </div>\
+                    </div>\
+                    <ul class="help-info-text c7"><li style="color: red;">用于未登录且未正确输入安全入口时的响应,用于隐藏面板特征</li></ul>\
+                </div>',
+        success:function(){
+        	var msg_list = [
+        		{'code':'0','msg':'默认-安全入口错误提示'},
+        		{'code':'403','msg':'403-拒绝访问'},
+        		{'code':'404','msg':'404-页面不存在'},
+        		{'code':'416','msg':'416-无效的请求'},
+        		{'code':'408','msg':'408-客户端超时'},
+        		{'code':'400','msg':'400-客户端请求错误'},
+        		{'code':'401','msg':'401-未授权访问'},
+        	];
+
+        	var tbody = '';
+        	for(i in msg_list){
+        		if (msg_list[i]['code'] == code){
+        			tbody += '<option value="'+msg_list[i]['code']+'" selected>'+msg_list[i]['msg']+'</option>';
+        		} else{
+        			tbody += '<option value="'+msg_list[i]['code']+'">'+msg_list[i]['msg']+'</option>';
+        		}
+        		
+        	}
+        	$('select[name="status_code"]').append(tbody);
+        },
+        yes:function(index){
+		    var loadT = layer.msg("正在设置未认证时的响应状态", { icon: 16, time: 0, shade: [0.3, '#000'] });
+		    var status_code = $('select[name="status_code"]').val();
+		    $.post('/config/set_status_code', { status_code: status_code }, function (rdata) {
+		    	showMsg(rdata.msg, function(){
+		    		layer.close(index);
+		    		layer.close(loadT);
+		    		location.reload();
+		    	},{ icon: rdata.status ? 1 : 2 }, 2000);
+		    },'json');
+        }
+    });
+}
+
 function setTempAccess(){
 	layer.open({
 		area: ['700px', '250px'],

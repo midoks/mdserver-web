@@ -386,7 +386,10 @@ def get_admin_safe():
 
 def admin_safe_path(path, req, data, pageFile):
     if path != req and not isLogined():
-        return render_template('path.html')
+        if data['status_code'] == '0':
+            return render_template('path.html')
+        else:
+            return Response(status=int(data['status_code']))
 
     if not isLogined():
         return render_template('login.html', data=data)
