@@ -320,7 +320,6 @@ case "$1" in
             if [ "$v4" != "" ] && [ "$v6" != "" ]; then
 
                 if [ ! -f $mw_path/data/ipv6.pl ];then
-                    #  Need to restart ipv6 to take effect
                     echo 'True' > $mw_path/data/ipv6.pl
                     mw_stop
                     mw_start
