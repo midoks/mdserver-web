@@ -228,6 +228,13 @@ def isIpAddr(ip):
         return False
 
 
+def getWebStatus():
+    pid = getServerDir() + '/openresty/nginx/logs/nginx.pid'
+    if os.path.exists(pid):
+        return True
+    return False
+
+
 def restartWeb():
     return opWeb("reload")
 
