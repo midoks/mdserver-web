@@ -313,11 +313,19 @@ case "$1" in
             auth_path=$(cat $mw_path/data/admin_path.pl)
         fi
 	    
-        if [ "$address" = "" ];then
+        if [ "$address" == "" ];then
             v4=$(python3 $mw_path/tools.py getServerIp 4)
             v6=$(python3 $mw_path/tools.py getServerIp 6)
 
             if [ "$v4" != "" ] && [ "$v6" != "" ]; then
+
+                if [ ! -f $mw_path/data/ipv6.pl ];then
+                    #  Need to restart ipv6 to take effect
+                    echo 'True' > $mw_path/data/ipv6.pl
+                    mw_stop
+                    mw_start
+                fi
+
                 address="MW-Panel-Url-Ipv4: http://$v4:$port$auth_path \nMW-Panel-Url-Ipv6: http://[$v6]:$port$auth_path"
             elif [ "$v4" != "" ]; then
                 address="MW-Panel-Url: http://$v4:$port$auth_path"
