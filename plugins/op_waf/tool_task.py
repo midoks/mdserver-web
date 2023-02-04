@@ -153,7 +153,8 @@ def getCpuUsed():
         used = psutil.cpu_percent(interval=1)
         mw.writeFile(path, str(int(used)))
     else:
-        data = mw.execShell("top -n1 | fgrep 'Cpu(s)' | awk '{print 100-$8}'")
+        cmd = "top -bn 1 | fgrep 'Cpu(s)' | awk '{print 100 -$8}' | awk -F . '{print $1}'"
+        data = mw.execShell(cmd)
         mw.writeFile(path, str(int(data[0])))
 
 
