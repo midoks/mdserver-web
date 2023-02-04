@@ -155,7 +155,7 @@ def getCpuUsed():
     else:
         cmd = "top -bn 1 | fgrep 'Cpu(s)' | awk '{print 100 -$8}' | awk -F . '{print $1}'"
         data = mw.execShell(cmd)
-        mw.writeFile(path, str(int(data[0])))
+        mw.writeFile(path, str(int(data[0].strip())))
 
 
 def run():
