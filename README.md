@@ -29,6 +29,12 @@
 基本上可以使用,后续会继续优化!欢迎提供意见！
 
 - 吹水组 - https://t.me/mdserver_web
+
+```
+如果出现问题，最好私给我面板信息。不要让我猜。如果不提供，不要提出问题，自行解决。  — 座右铭
+Talk is cheap, show me the code.  -- linus
+```
+
 - [兼容性测试报告](/compatibility.md)
 - [常用命令说明](/cmd.md)
 
