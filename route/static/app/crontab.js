@@ -293,6 +293,11 @@ function planAdd(){
 		var where1 = $("#ptime input[name='where1']").val();
 		$("#set-Config input[name='where1']").val(where1);
 	}
+
+	if (type == 'month'){
+		var where1 = $("#ptime input[name='where1']").val();
+		$("#set-Config input[name='where1']").val(where1);
+	}
 	
 	$("#set-Config input[name='sName']").val(sName);
 	layer.msg('正在添加,请稍候...!',{icon:16,time:0,shade: [0.3, '#000']});
