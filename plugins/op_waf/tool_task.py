@@ -147,10 +147,14 @@ def removeBgTask():
 
 
 def getCpuUsed():
-    import psutil
-    used = psutil.cpu_percent(interval=1)
     path = getServerDir() + "/cpu.info"
-    mw.writeFile(path, str(int(used)))
+    if mw.isAppleSystem():
+        import psutil
+        used = psutil.cpu_percent(interval=1)
+        mw.writeFile(path, str(int(used)))
+    else:
+        data = mw.execShell("top -n1 | fgrep 'Cpu(s)' | awk '{print 100-$8}'")
+        mw.writeFile(path, str(int(data[0])))
 
 
 def run():
