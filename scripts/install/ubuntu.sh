@@ -29,6 +29,9 @@ echo "SSH PORT:${SSH_PORT}"
 
 if [ -f /usr/sbin/ufw ];then
 
+	# look
+	# ufw status
+
 	if [ "$SSH_PORT" != "" ];then
 		ufw allow $SSH_PORT/tcp
 	else
@@ -59,7 +62,7 @@ if [ ! -f /usr/sbin/ufw ];then
 	else
 		firewall-cmd --permanent --zone=public --add-port=22/tcp
 	fi
-	
+
 	firewall-cmd --permanent --zone=public --add-port=80/tcp
 	firewall-cmd --permanent --zone=public --add-port=443/tcp
 	firewall-cmd --permanent --zone=public --add-port=888/tcp
