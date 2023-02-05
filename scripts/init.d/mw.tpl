@@ -98,7 +98,7 @@ mw_stop_task()
     arr=($pids)
     for p in ${arr[@]}
     do
-        kill -9 $p 
+        kill -9 $p  > /dev/null 2>&1
     done
     echo -e "\033[32mdone\033[0m"
 }
