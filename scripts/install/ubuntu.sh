@@ -24,10 +24,17 @@ apt install -y locate
 locale-gen en_US.UTF-8
 localedef -v -c -i en_US -f UTF-8 en_US.UTF-8
 
+SSH_PORT=`netstat -ntpl|grep sshd|grep -v grep | sed -n "1,1p" | awk '{print $4}' | awk -F : '{print $2}'`
+echo "SSH PORT:${SSH_PORT}"
 
 if [ -f /usr/sbin/ufw ];then
 
-	ufw allow 22/tcp
+	if [ "$SSH_PORT" != "" ];then
+		ufw allow $SSH_PORT/tcp
+	else
+		ufw allow 22/tcp
+	fi
+
 	ufw allow 80/tcp
 	ufw allow 443/tcp
 	ufw allow 888/tcp
@@ -47,7 +54,12 @@ if [ ! -f /usr/sbin/ufw ];then
 	systemctl enable firewalld
 	systemctl start firewalld
 
-	firewall-cmd --permanent --zone=public --add-port=22/tcp
+	if [ "$SSH_PORT" != "" ];then
+		firewall-cmd --permanent --zone=public --add-port=${SSH_PORT}/tcp
+	else
+		firewall-cmd --permanent --zone=public --add-port=22/tcp
+	fi
+	
 	firewall-cmd --permanent --zone=public --add-port=80/tcp
 	firewall-cmd --permanent --zone=public --add-port=443/tcp
 	firewall-cmd --permanent --zone=public --add-port=888/tcp
