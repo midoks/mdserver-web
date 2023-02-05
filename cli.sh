@@ -62,14 +62,14 @@ mw_stop()
 	PLIST=`ps -ef|grep app:app |grep -v grep|awk '{print $2}'`
 	for i in $PLIST
 	do
-	    kill -9 $i
+	    kill -9 $i > /dev/null 2>&1
 	done
 
 	pids=`ps -ef|grep task.py | grep -v grep |awk '{print $2}'`
 	arr=($pids)
     for p in ${arr[@]}
     do
-    	kill -9 $p
+    	kill -9 $p > /dev/null 2>&1
     done
 }
 
