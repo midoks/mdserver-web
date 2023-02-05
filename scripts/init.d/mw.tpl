@@ -98,7 +98,7 @@ mw_stop_task()
     arr=($pids)
     for p in ${arr[@]}
     do
-            kill -9 $p
+        kill -9 $p 
     done
     echo -e "\033[32mdone\033[0m"
 }
@@ -109,7 +109,7 @@ mw_stop_panel()
     arr=`ps aux|grep 'gunicorn -c setting.py app:app'|grep -v grep|awk '{print $2}'`
     for p in ${arr[@]}
     do
-        kill -9 $p &>/dev/null
+        kill -9 $p > /dev/null 2>&1
     done
     
     pidfile=${mw_path}/logs/mw.pid
