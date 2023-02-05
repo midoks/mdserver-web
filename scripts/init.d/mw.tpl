@@ -38,7 +38,7 @@ mw_start_panel()
             sleep 0.5
             isStart=$(lsof -n -P -i:$port|grep LISTEN|grep -v grep|awk '{print $2}'|xargs)
             let n+=1
-            if [ $n -gt 15 ];then
+            if [ $n -gt 20 ];then
                 break;
             fi
         done
