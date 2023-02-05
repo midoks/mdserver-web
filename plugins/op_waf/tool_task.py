@@ -103,7 +103,7 @@ logs_file=$plugin_path/${rname}.log
         cmd += 'cd $mw_dir && source bin/activate && python3 $script_path/tool_task.py run >> $logs_file 2>&1' + "\n"
     else:
         cmd += 'echo "cd $mw_dir && source bin/activate && bash $script_path/shell/cpu_usage_file.sh >> $logs_file 2>&1"' + "\n"
-        cmd += 'cd $mw_dir && source bin/activate && bash $script_path/shell/cpu_usage.sh >> $logs_file 2>&1' + "\n"
+        cmd += 'cd $mw_dir && source bin/activate && bash $script_path/shell/cpu_usage_file.sh >> $logs_file 2>&1' + "\n"
 
     cmd += 'echo "【`date +"%Y-%m-%d %H:%M:%S"`】 END★" >> $logs_file' + "\n"
     cmd += 'echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" >> $logs_file' + "\n"
