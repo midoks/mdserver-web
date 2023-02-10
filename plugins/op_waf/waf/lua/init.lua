@@ -13,7 +13,7 @@ end
 local json = require "cjson"
 local ngx_match = ngx.re.find
 
-local __WAF = require "common"
+local __WAF = require "waf_common"
 
 -- print(json.encode(__C))
 local C = __WAF:getInstance()

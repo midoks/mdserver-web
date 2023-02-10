@@ -12,7 +12,7 @@ end
 
 local json = require "cjson"
 
-local __C = require "common"
+local __C = require "waf_common"
 local C = __C:getInstance()
 
 -- cron
