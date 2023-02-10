@@ -42,8 +42,9 @@ end
 
 
 function _M.getInstance(self)
-    if rawget(self, "instance") == nil then
-        rawset(self, "instance", self:new())
+    if self.instance == nil then
+        self.instance = self:new()
+        self.instance:initCron()
     end
     assert(self.instance ~= nil)
     return self.instance

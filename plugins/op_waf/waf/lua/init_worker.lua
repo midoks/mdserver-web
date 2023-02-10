@@ -15,9 +15,6 @@ local json = require "cjson"
 local __C = require "waf_common"
 local C = __C:getInstance()
 
--- cron
-C:initCron()
-
 local function timer_stats_total_log(premature)
     C:timer_stats_total()
 end
