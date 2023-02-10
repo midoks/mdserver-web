@@ -360,12 +360,14 @@ def initDreplace():
     content = mw.readFile(init_worker)
     content = contentReplace(content)
     mw.writeFile(dst_init_worker, content)
+    mw.writeFile(init_worker, content)
 
     access_file = root_access_dir + '/opwaf_init.lua'
     config = path + "/waf/lua/init.lua"
     content = mw.readFile(config)
     content = contentReplace(content)
     mw.writeFile(access_file, content)
+    mw.writeFile(config, content)
 
     waf_conf = dstWafConf()
     if not os.path.exists(waf_conf):
