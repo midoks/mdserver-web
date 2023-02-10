@@ -961,8 +961,12 @@ function wafScreen(){
     owPost('waf_srceen', {}, function(data){
         var rdata = $.parseJSON(data.data);
 
+        var end_time = Date.now();
+        var cos_time = (end_time/1000) - parseInt(rdata['start_time']);
+        var cos_day = parseInt(parseInt(cos_time)/86400);
+
         var con = '<div class="wavbox alert alert-success" style="margin-right:16px">总拦截<span>'+rdata.total+'</span>次</div>';
-        con += '<div class="wavbox alert alert-info" style="margin-right:16px">安全防护<span>0</span>天</div>';
+        con += '<div class="wavbox alert alert-info" style="margin-right:16px">安全防护<span>'+cos_day+'</span>天</div>';
 
         con += '<div class="screen">\
             <div class="line"><span class="name">POST渗透</span><span class="val">'+rdata.rules.post+'</span></div>\

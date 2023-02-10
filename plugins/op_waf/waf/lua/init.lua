@@ -533,41 +533,62 @@ end
 
 function waf()
     min_route()
+    -- C:D("min_route")
     -- white ip
     if waf_ip_white() then return true end
+
+    -- C:D("waf_ip_white")
 
     -- url white
     if waf_url_white() then return true end
 
+    -- C:D("waf_url_white")
+
     -- black ip
     if waf_ip_black() then return true end
 
+    -- C:D("waf_ip_black")
+
     -- 封禁ip返回
     if waf_drop_ip() then return true end
+    
+    -- C:D("waf_ip_black")
 
     -- ua check
     if waf_user_agent() then return true end
+    -- C:D("waf_user_agent")
     if waf_url() then return true end
+    -- C:D("waf_url")
 
     -- cc setting
     if waf_cc_increase() then return true end
+    -- C:D("waf_cc_increase")
     if waf_cc() then return true end
+    -- C:D("waf_cc")
 
     -- cookie检查
     if waf_cookie() then return true end
+    -- C:D("waf_cookie")
     
     -- args参数拦截
     if waf_get_args() then return true end
+    -- C:D("waf_get_args")
 
     -- 扫描软件禁止
     if waf_scan_black() then return true end
+    -- C:D("waf_scan_black")
     if waf_post() then return true end
+    -- C:D("waf_post")
 
     if site_config[server_name] and site_config[server_name]['open'] then
         if X_Forwarded() then return true end
+        -- C:D("X_Forwarded")
         if post_X_Forwarded() then return true end
+        -- C:D("post_X_Forwarded")
         if url_ext() then return true end
+        -- C:D("url_ext")
         if post_data() then return true end 
+        -- C:D("post_data")
     end
 end
 

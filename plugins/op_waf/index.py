@@ -225,6 +225,7 @@ def initTotalInfo():
             _name[name] = tmp
             total_contents['sites'] = _name
 
+    total_contents['start_time'] = str(time.time())
     cjson = mw.getJson(total_contents)
     mw.writeFile(path_total, cjson)
 
