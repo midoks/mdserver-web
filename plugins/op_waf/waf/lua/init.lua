@@ -536,23 +536,19 @@ function waf()
     -- C:D("min_route")
     -- white ip
     if waf_ip_white() then return true end
-
     -- C:D("waf_ip_white")
 
     -- url white
     if waf_url_white() then return true end
-
     -- C:D("waf_url_white")
 
     -- black ip
     if waf_ip_black() then return true end
-
     -- C:D("waf_ip_black")
 
     -- 封禁ip返回
     if waf_drop_ip() then return true end
-    
-    -- C:D("waf_ip_black")
+    -- C:D("waf_drop_ip")
 
     -- ua check
     if waf_user_agent() then return true end
