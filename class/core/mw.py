@@ -283,9 +283,9 @@ def opLuaMake(cmd_name):
         for f in files:
             t = readFile(f)
             f_base = os.path.basename(f)
-            content += '-- ' + '*' * 20 + f_base + ' start ' + '*' * 20 + "\n"
+            content += '-- ' + '*' * 20 + ' ' + f_base + ' start ' + '*' * 20 + "\n"
             content += t
-            content += "\n" + '-- ' + '*' * 20 + f_base + ' end ' + '*' * 20 + "\n"
+            content += "\n" + '-- ' + '*' * 20 + ' ' + f_base + ' end ' + '*' * 20 + "\n"
         writeFile(dst_path, content)
     else:
         if os.path.exists(dst_path):
