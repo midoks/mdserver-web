@@ -235,6 +235,7 @@ def getWebStatus():
     return False
 
 
+# ------------------------------ openresty start -----------------------------
 def restartWeb():
     return opWeb("reload")
 
@@ -257,6 +258,54 @@ def opWeb(method):
         return True
 
     return False
+
+
+def opLuaMake(cmd_name):
+    path = getServerDir() + '/web_conf/nginx/lua/lua.conf'
+    root_dir = getServerDir() + '/web_conf/nginx/lua/' + cmd_name
+    dst_path = getServerDir() + '/web_conf/nginx/lua/' + cmd_name + '.lua'
+    def_path = getServerDir() + '/web_conf/nginx/lua/empty.lua'
+
+    if not os.path.exists(root_dir):
+        execShell('mkdir -p ' + root_dir)
+
+    files = []
+    for fl in os.listdir(root_dir):
+        suffix = getFileSuffix(fl)
+        if suffix != 'lua':
+            continue
+        flpath = os.path.join(root_dir, fl)
+        files.append(flpath)
+
+    if len(files) > 0:
+        def_path = dst_path
+        content = ''
+        for f in files:
+            t = readFile(f)
+            f_base = os.path.basename(f)
+            content += '-- ' + '*' * 20 + f_base + ' start ' + '*' * 20 + "\n"
+            content += t
+            content += "\n" + '-- ' + '*' * 20 + f_base + ' end ' + '*' * 20 + "\n"
+        writeFile(dst_path, content)
+    else:
+        if os.path.exists(dst_path):
+            os.remove(dst_path)
+
+    conf = readFile(path)
+    conf = re.sub(cmd_name + ' (.*);',
+                  cmd_name + " " + def_path + ";", conf)
+    writeFile(path, conf)
+
+
+def opLuaInitWorkerFile():
+    opLuaMake('init_worker_by_lua_file')
+
+
+def opLuaInitAccessFile():
+    opLuaMake('access_by_lua_file')
+
+
+# ------------------------------ openresty end -----------------------------
 
 
 def restartMw():
