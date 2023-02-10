@@ -351,7 +351,7 @@ def initDreplace():
     mw.writeFile(config, mw.getJson(content))
 
     waf_common = path + "/waf/lua/waf_common.lua"
-    content = mw.readFile(config_common)
+    content = mw.readFile(waf_common)
     content = contentReplace(content)
     mw.writeFile(waf_common, content)
 
