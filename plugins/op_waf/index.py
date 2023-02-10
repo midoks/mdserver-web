@@ -325,7 +325,8 @@ def restartWeb():
 
 
 def initDreplace():
-
+    root_worker_dir = mw.getServerDir() + '/web_conf/nginx/lua/init_worker_by_lua_file'
+    root_access_dir = mw.getServerDir() + '/web_conf/nginx/lua/access_by_lua_file'
     path = getServerDir()
     if not os.path.exists(path + '/waf/lua'):
         sdir = getPluginDir() + '/waf'
@@ -348,20 +349,22 @@ def initDreplace():
     content['reqfile_path'] = wfDir
     mw.writeFile(config, mw.getJson(content))
 
-    config = path + "/waf/lua/init.lua"
-    content = mw.readFile(config)
-    content = contentReplace(content)
-    mw.writeFile(config, content)
-
     config_common = path + "/waf/lua/common.lua"
     content = mw.readFile(config_common)
     content = contentReplace(content)
     mw.writeFile(config_common, content)
 
+    dst_init_worker = root_worker_dir + '/opwaf_init_worker.lua'
     init_worker = path + "/waf/lua/init_worker.lua"
     content = mw.readFile(init_worker)
     content = contentReplace(content)
-    mw.writeFile(init_worker, content)
+    mw.writeFile(dst_init_worker, content)
+
+    access_file = root_access_dir + '/opwaf_init.lua'
+    config = path + "/waf/lua/init.lua"
+    content = mw.readFile(config)
+    content = contentReplace(content)
+    mw.writeFile(access_file, content)
 
     waf_conf = dstWafConf()
     if not os.path.exists(waf_conf):
@@ -396,15 +399,8 @@ def status():
 def start():
     initDreplace()
 
-    path = mw.getServerDir() + '/web_conf/nginx/lua/lua.conf'
-    init_worker_lua = getServerDir() + '/waf/lua/init_worker.lua'
-    init_lua = getServerDir() + '/waf/lua/init.lua'
-    conf = mw.readFile(path)
-    conf = re.sub('init_worker_by_lua_file (.*);',
-                  "init_worker_by_lua_file " + init_worker_lua + ";", conf)
-    conf = re.sub('access_by_lua_file (.*);',
-                  "access_by_lua_file " + init_lua + ";", conf)
-    mw.writeFile(path, conf)
+    mw.opLuaInitWorkerFile()
+    mw.opLuaInitAccessFile()
 
     import tool_task
     tool_task.createBgTask()
@@ -414,15 +410,16 @@ def start():
 
 
 def stop():
+    root_worker_dir = mw.getServerDir() + '/web_conf/nginx/lua/init_worker_by_lua_file'
+    root_access_dir = mw.getServerDir() + '/web_conf/nginx/lua/access_by_lua_file'
 
-    path = mw.getServerDir() + '/web_conf/nginx/lua/lua.conf'
-    empty_lua = mw.getServerDir() + '/web_conf/nginx/lua/empty.lua'
-    conf = mw.readFile(path)
-    conf = re.sub('init_worker_by_lua_file (.*);',
-                  "init_worker_by_lua_file " + empty_lua + ";", conf)
-    conf = re.sub('access_by_lua_file (.*);',
-                  "access_by_lua_file " + empty_lua + ";", conf)
-    mw.writeFile(path, conf)
+    dst_init_worker = root_worker_dir + '/opwaf_init_worker.lua'
+    if os.path.exists(dst_init_worker):
+        os.remove(dst_init_worker)
+
+    access_file = root_access_dir + '/opwaf_init.lua'
+    if os.path.exists(access_file):
+        os.remove(access_file)
 
     wafconf = dstWafConf()
     if os.path.exists(wafconf):
@@ -430,6 +427,9 @@ def stop():
 
     import tool_task
     tool_task.removeBgTask()
+
+    mw.opLuaInitWorkerFile()
+    mw.opLuaInitAccessFile()
 
     restartWeb()
     return 'ok'
