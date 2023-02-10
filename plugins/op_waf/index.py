@@ -350,10 +350,10 @@ def initDreplace():
     content['reqfile_path'] = wfDir
     mw.writeFile(config, mw.getJson(content))
 
-    config_common = path + "/waf/lua/common.lua"
+    waf_common = path + "/waf/lua/waf_common.lua"
     content = mw.readFile(config_common)
     content = contentReplace(content)
-    mw.writeFile(config_common, content)
+    mw.writeFile(waf_common, content)
 
     dst_init_worker = root_worker_dir + '/opwaf_init_worker.lua'
     init_worker = path + "/waf/lua/init_worker.lua"
