@@ -15,6 +15,11 @@ local json = require "cjson"
 local __C = require "waf_common"
 local C = __C:getInstance()
 
+local waf_config = require "waf_config"
+local waf_site_config = require "waf_site"
+C:setConfData(waf_config, waf_site_config)
+C:setDebug(true)
+
 local function timer_stats_total_log(premature)
     C:timer_stats_total()
 end
