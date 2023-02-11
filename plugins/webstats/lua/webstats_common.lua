@@ -507,7 +507,7 @@ function _M.store_logs_line(self, db, stmt, input_sn, info)
     local request_headers = logline["request_headers"]
     local excluded = logline["excluded"] 
 
-
+    -- self:D("json:"..json.encode(logline))
     local time_key = logline["time_key"]
     if not excluded then
 
