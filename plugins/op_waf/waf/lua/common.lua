@@ -644,9 +644,9 @@ function _M.write_log(self, name, rule)
     local ip = params['ip']
     local ngx_time = ngx.time()
     
-    local retry = config['retry']['retry']
-    local retry_time = config['retry']['retry_time']
-    local retry_cycle = config['retry']['retry_cycle']
+    local retry = tonumber(config['retry']['retry'])
+    local retry_time = tonumber(config['retry']['retry_time'])
+    local retry_cycle = tonumber(config['retry']['retry_cycle'])
     
     local count = ngx.shared.waf_drop_ip:get(ip)
     if count then
@@ -662,7 +662,7 @@ function _M.write_log(self, name, rule)
         error_rule = nil
     end
 
-    local count = ngx.shared.waf_drop_ip:get(ip)
+    local count = tonumber(ngx.shared.waf_drop_ip:get(ip))
     -- self:D("write_log; count:" ..tostring(count).. ",retry:" .. tostring(retry) )
     if (count > retry and name ~= 'cc') then
         local safe_count,_ = ngx.shared.waf_drop_sum:get(ip)
