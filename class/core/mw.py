@@ -297,6 +297,10 @@ def opLuaMake(cmd_name):
     writeFile(path, conf)
 
 
+def opLuaInitFile():
+    opLuaMake('init_by_lua_file')
+
+
 def opLuaInitWorkerFile():
     opLuaMake('init_worker_by_lua_file')
 
