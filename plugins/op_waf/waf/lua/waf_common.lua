@@ -44,33 +44,9 @@ end
 function _M.getInstance(self)
     if self.instance == nil then
         self.instance = self:new()
-        self.instance:initCron()
     end
     assert(self.instance ~= nil)
     return self.instance
-end
-
-function _M:initCron(self)
-    if 0 == ngx.worker.id() then
-        self:cron()
-    end
-end
-
-function _M.initDB(self)
-    local path = log_dir .. "/waf.db"
-    db, err = sqlite3.open(path)
-
-    if err then
-        self:D("initDB err:"..tostring(err))
-        return nil
-    end
-
-    db:exec([[PRAGMA synchronous = 0]])
-    db:exec([[PRAGMA cache_size = 8000]])
-    db:exec([[PRAGMA page_size = 32768]])
-    db:exec([[PRAGMA journal_mode = wal]])
-    db:exec([[PRAGMA journal_size_limit = 1073741824]])
-    return db
 end
 
 -- 后台任务
@@ -139,6 +115,22 @@ function _M.cron(self)
     ngx.timer.every(0.5, timer_every_import_data)
 end
 
+function _M.initDB(self)
+    local path = log_dir .. "/waf.db"
+    db, err = sqlite3.open(path)
+
+    if err then
+        self:D("initDB err:"..tostring(err))
+        return nil
+    end
+
+    db:exec([[PRAGMA synchronous = 0]])
+    db:exec([[PRAGMA cache_size = 8000]])
+    db:exec([[PRAGMA page_size = 32768]])
+    db:exec([[PRAGMA journal_mode = wal]])
+    db:exec([[PRAGMA journal_size_limit = 1073741824]])
+    return db
+end
 
 function _M.clean_log(self)
     local db = self:initDB()

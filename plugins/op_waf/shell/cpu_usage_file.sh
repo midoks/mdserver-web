@@ -15,10 +15,10 @@ function GetCpuUsage(){
 			cpu_total_time=`expr $cpu_total_time + $ci`
 		fi
 	done
-	#echo "user_cpu:${user_cpu}"
+	#echo "idle_cpu:${idle_cpu}"
 	#echo "cpu_total_time:${cpu_total_time}"
 
-	cpu_percet=$(awk "BEGIN{print ((${cpu_total_time}-${user_cpu})/${cpu_total_time})*100}")
+	cpu_percet=$(awk "BEGIN{print ((${cpu_total_time}-${idle_cpu})/${cpu_total_time})*100}")
 	echo "${cpu_percet}"
 	return 0
 }

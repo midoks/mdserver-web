@@ -20,6 +20,11 @@ local waf_site_config = require "waf_site"
 C:setConfData(waf_config, waf_site_config)
 C:setDebug(true)
 
+if ngx.worker.id() == 0 then
+    C:cron()
+end
+-- C:D("init worker"..tostring(ngx.worker.id()))
+
 local function timer_stats_total_log(premature)
     C:timer_stats_total()
 end
@@ -28,6 +33,7 @@ end
 ngx.shared.waf_limit:set("cpu_usage", 0, 10)
 function timer_every_get_cpu(premature)
     local cpu_percent = C:read_file_body(waf_root.."/cpu.info")
+    -- C:D("cpu_usage:"..tostring(cpu_percent ))
     if cpu_percent then
         ngx.shared.waf_limit:set("cpu_usage", tonumber(cpu_percent), 10)
     else
@@ -35,9 +41,7 @@ function timer_every_get_cpu(premature)
     end
 end
 
-if 0 == ngx.worker.id() then
-    ngx.timer.every(5, timer_every_get_cpu)
+ngx.timer.every(5, timer_every_get_cpu)
 
-    -- 异步执行
-    ngx.timer.every(3, timer_stats_total_log)
-end
+-- 异步执行
+ngx.timer.every(3, timer_stats_total_log)
