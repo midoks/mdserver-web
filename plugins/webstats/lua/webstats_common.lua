@@ -55,6 +55,7 @@ end
 function _M.getInstance(self)
     if self.instance == nil then
         self.instance = self:new()
+        self:cron()
     end
     assert(self.instance ~= nil)
     return self.instance
