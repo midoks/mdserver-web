@@ -390,6 +390,12 @@ function _M.read_file(self, name)
     return data
 end
 
+function _M.file_exists(self,path)
+  local file = io.open(path, "rb")
+  if file then file:close() end
+  return file ~= nil
+end
+
 
 function _M.select_rule(self, rules)
     if not rules then return {} end
