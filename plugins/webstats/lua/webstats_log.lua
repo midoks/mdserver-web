@@ -44,7 +44,7 @@ log_by_lua_block {
 	local sites = require "webstats_sites"
 
 	-- string.gsub(C:get_sn(ngx.var.server_name),'_','.')
-	local server_name = ngx.var.server_name
+	local server_name = C:get_sn(ngx.var.server_name)
 
 
 	C:setConfData(config, sites)
@@ -439,7 +439,7 @@ log_by_lua_block {
 		}
 
 		local push_data = json.encode(data)
-
+		-- C:D(json.encode(push_data))
 		local key = C:getTotalKey()
 		ngx.shared.mw_total:rpush(key, push_data)		
  	end
@@ -630,7 +630,7 @@ log_by_lua_block {
 	end
 
 	local function run_app()
-		-- D("------------ debug start ------------")
+		-- C:D("------------ debug start ------------")
 		init_var()
 
 		load_global_exclude_ip()
@@ -641,7 +641,7 @@ log_by_lua_block {
 
 		-- cache_logs_old(server_name)
 		-- store_logs(server_name)
-		-- D("------------ debug end -------------")
+		-- C:D("------------ debug end -------------")
 	end
 
 
