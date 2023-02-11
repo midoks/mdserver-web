@@ -5,7 +5,7 @@ DIS_FILE=${DST_DIR}/cpu.info
 
 function GetCpuUsage(){
 	cpu_info=`cat /proc/stat | head -n 1`
-	user_cpu=`echo $cpu_info|awk '{print $2}'`
+	idle_cpu=`echo $cpu_info|awk '{print $2}'`
 	cpu_total_time=0
 	for ci in ${cpu_info[@]}; do
 		if [ "$ci" == "cpu" ];then
@@ -18,7 +18,7 @@ function GetCpuUsage(){
 	#echo "user_cpu:${user_cpu}"
 	#echo "cpu_total_time:${cpu_total_time}"
 
-	cpu_percet=$(awk "BEGIN{print (${user_cpu}/${cpu_total_time})*100}")
+	cpu_percet=$(awk "BEGIN{print ((${cpu_total_time}-${user_cpu})/${cpu_total_time})*100}")
 	echo "${cpu_percet}"
 	return 0
 }
