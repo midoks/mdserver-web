@@ -10,7 +10,6 @@ local __WS_C = require "webstats_common"
 local WS_C = __WS_C:getInstance()
 
 WS_C:cronPre()
-WS_C:cron()
 
 local webstats_cron_pre = function(premature)
     WS_C:cronPre()
@@ -18,4 +17,5 @@ end
 
 if ngx.worker.id() == 0 then
     ngx.timer.every(60, webstats_cron_pre)
+    WS_C:cron()
 end
