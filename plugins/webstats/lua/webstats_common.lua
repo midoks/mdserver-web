@@ -45,6 +45,7 @@ end
 function _M.getInstance(self)
     if rawget(self, "instance") == nil then
         rawset(self, "instance", self.new())
+        self.cron()
     end
     assert(self.instance ~= nil)
     return self.instance
@@ -474,8 +475,7 @@ function _M.cron(self)
         ngx.update_time()
         -- self:D("PID:"..tostring(ngx.worker.id()).."--【"..tostring(llen).."】, elapsed: " .. tostring(ngx.now() - begin))
     end
-
-    ngx.timer.every(1, timer_every_get_data)
+    ngx.timer.every(0.5, timer_every_get_data)
 end
 
 

@@ -17,5 +17,4 @@ end
 
 if ngx.worker.id() == 0 then
     ngx.timer.every(60, webstats_cron_pre)
-    WS_C:cron()
 end
