@@ -47,7 +47,8 @@ local url_rules = require "rule_url"
 local url_white_rules = require "rule_url_white"
 
 
-local server_name = string.gsub(C:get_sn(config_domains),'_','.')
+-- local server_name = string.gsub(C:get_sn(config_domains),'_','.')
+local server_name = C:get_sn(config_domains)
 
 local function initParams()
     local data = {}
