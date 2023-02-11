@@ -51,11 +51,7 @@ end
 
 -- 后台任务
 function _M.cron(self)
-    local timer_every_get_data = function(premature)
-        self:clean_log()
-    end
-    ngx.timer.every(10, timer_every_get_data)
-
+    
     local timer_every_import_data = function(premature)
 
         local llen, _ = ngx.shared.waf_limit:llen('waf_limit_logs')
@@ -69,7 +65,6 @@ function _M.cron(self)
 
         local stmt2 = db:prepare[[INSERT INTO logs(time, ip, domain, server_name, method, status_code, uri, user_agent, rule_name, reason) 
             VALUES(:time, :ip, :domain, :server_name, :method, :status_code, :uri, :user_agent, :rule_name, :reason)]]
-
 
         if not stmt2 then
             self:D("waf timer db:prepare fail!:"..tostring(stmt2))
