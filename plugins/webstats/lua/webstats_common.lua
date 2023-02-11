@@ -229,6 +229,33 @@ function _M.get_http_origin(self)
     return json.encode(headers)
 end
 
+function _M.cronPre(self)
+    local time_key = self:get_store_key()
+    local time_key_next = self:get_store_key_with_time(ngx.time()+3600)
+
+    for site_k, site_v in ipairs(sites) do
+        local input_sn = site_v["name"]
+
+        local db = self:initDB(input_sn)
+
+        local wc_stat = {
+            'request_stat',
+            'client_stat',
+            'spider_stat'
+        }
+
+        for _,ws_v in pairs(wc_stat) do
+            self:_update_stat_pre(db, ws_v, time_key)
+            self:_update_stat_pre(db, ws_v, time_key_next)
+        end
+
+        if db and db:isopen() then
+            db:execute([[COMMIT]])
+            db:close()
+        end
+    end
+end
+
 -- 后台任务
 function _M.cron(self)
     local timer_every_get_data = function (premature)
@@ -277,18 +304,6 @@ function _M.cron(self)
                 tmp_stmt["web_logs"] = stmt
                 stmts[input_sn] = tmp_stmt
 
-                local wc_stat = {
-                    'request_stat',
-                    'client_stat',
-                    'spider_stat'
-                }
-
-                for _,ws_v in pairs(wc_stat) do
-                    self:_update_stat_pre(db, ws_v, time_key)
-                    self:_update_stat_pre(db, ws_v, time_key_next)
-                end
-
-
                 db:exec([[BEGIN TRANSACTION]])
             end
         end
@@ -309,7 +324,7 @@ function _M.cron(self)
 
             local info = json.decode(data)
 
-            -- self:D("info:"..info)
+            -- self:D("info:"..json.encode(info))
             local input_sn = info['server_name']
             -- self:D("insert data input_sn:"..input_sn)
             local db = dbs[input_sn]
