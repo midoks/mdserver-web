@@ -36,6 +36,8 @@ function _M.new(self)
         params = nil,
         site_config = nil,
         config = nil,
+        cron_num = 0,
+        cron_num_limit = 4,
 
     }
     -- self.dbs = {}
@@ -254,6 +256,13 @@ end
 
 -- 后台任务
 function _M.cron(self)
+    self.cron_num = self.cron_num + 1
+    if self.cron_num > self.cron_num_limit then
+        return
+    end
+    
+    -- self:D("PID:"..tostring(ngx.worker.id())..",cron_num:"..tostring(self.cron_num))
+
     local timer_every_get_data = function (premature)
 
         local llen, _ = ngx.shared.mw_total:llen(total_key)

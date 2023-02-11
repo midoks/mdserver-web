@@ -260,15 +260,15 @@ def initDreplace():
         loadLuaFile(fl)
 
     root_worker_dir = mw.getServerDir() + '/web_conf/nginx/lua/init_worker_by_lua_file'
-    webstats_worker_dst_file = root_worker_dir + '/webstats_worker.lua'
+    dst_file = root_worker_dir + '/webstats_worker.lua'
 
-    if not os.path.exists(webstats_worker_src_file):
+    if not os.path.exists(dst_file):
         loadLuaFile('webstats_worker.lua')
-        webstats_worker_src_file = lua_dir = getServerDir() + "/lua/webstats_worker.lua"
-        content = mw.readFile(webstats_worker_src_file)
-        mw.writeFile(webstats_worker_dst_file, content)
+        src_file = getServerDir() + "/lua/webstats_worker.lua"
+        content = mw.readFile(src_file)
+        mw.writeFile(dst_file, content)
         mw.opLuaInitWorkerFile()
-        os.remove(webstats_worker_src_file)
+        os.remove(src_file)
 
     loadConfigFile()
     loadLuaSiteFile()
@@ -302,9 +302,9 @@ def stop():
         os.remove(path)
 
     root_worker_dir = mw.getServerDir() + '/web_conf/nginx/lua/init_worker_by_lua_file'
-    webstats_worker_dst_file = root_worker_dir + '/webstats_worker.lua'
-    if os.path.exists(webstats_worker_dst_file):
-        os.remove(webstats_worker_dst_file)
+    dst_file = root_worker_dir + '/webstats_worker.lua'
+    if os.path.exists(dst_file):
+        os.remove(dst_file)
         mw.opLuaInitWorkerFile()
 
     import tool_task
