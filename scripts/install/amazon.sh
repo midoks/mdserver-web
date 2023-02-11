@@ -21,42 +21,43 @@ yum install -y curl-devel libmcrypt libmcrypt-devel
 yum install -y mysql-devel
 yum install -y expect
 
-if [ -f /usr/sbin/iptables ];then
+SSH_PORT=`netstat -ntpl|grep sshd|grep -v grep | sed -n "1,1p" | awk '{print $4}' | awk -F : '{print $2}'`
+echo "SSH PORT:${SSH_PORT}"
 
-	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 22 -j ACCEPT
-	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
-	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 443 -j ACCEPT
-	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 888 -j ACCEPT
-	# iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 7200 -j ACCEPT
-	# iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 3306 -j ACCEPT
-	# iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 30000:40000 -j ACCEPT
-	service iptables save
+# if [ -f /usr/sbin/iptables ];then
 
-	iptables_status=`service iptables status | grep 'not running'`
-	if [ "${iptables_status}" == '' ];then
-		service iptables restart
-	fi
+# 	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 22 -j ACCEPT
+# 	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
+# 	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 443 -j ACCEPT
+# 	iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 888 -j ACCEPT
+# 	service iptables save
 
-	#安装时不开启
-	service iptables stop
-fi
+# 	iptables_status=`service iptables status | grep 'not running'`
+# 	if [ "${iptables_status}" == '' ];then
+# 		service iptables restart
+# 	fi
+
+# 	#安装时不开启
+# 	service iptables stop
+# fi
 
 
-if [ ! -f /usr/sbin/iptables ];then
+if [ ! -f /usr/sbin/firewalld ];then
 	yum install firewalld -y
 	systemctl enable firewalld
 	#取消服务锁定
 	systemctl unmask firewalld
 	systemctl start firewalld
 
-	firewall-cmd --permanent --zone=public --add-port=22/tcp
+	if [ "$SSH_PORT" != "" ];then
+		firewall-cmd --permanent --zone=public --add-port=${SSH_PORT}/tcp
+	else
+		firewall-cmd --permanent --zone=public --add-port=22/tcp
+	fi
+
 	firewall-cmd --permanent --zone=public --add-port=80/tcp
 	firewall-cmd --permanent --zone=public --add-port=443/tcp
 	firewall-cmd --permanent --zone=public --add-port=888/tcp
-	# firewall-cmd --permanent --zone=public --add-port=7200/tcp
-	# firewall-cmd --permanent --zone=public --add-port=3306/tcp
-	# firewall-cmd --permanent --zone=public --add-port=30000-40000/tcp
-
 
 	sed -i 's#AllowZoneDrifting=yes#AllowZoneDrifting=no#g' /etc/firewalld/firewalld.conf
 	firewall-cmd --reload

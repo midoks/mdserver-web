@@ -27,33 +27,28 @@ localedef -v -c -i en_US -f UTF-8 en_US.UTF-8
 SSH_PORT=`netstat -ntpl|grep sshd|grep -v grep | sed -n "1,1p" | awk '{print $4}' | awk -F : '{print $2}'`
 echo "SSH PORT:${SSH_PORT}"
 
-if [ -f /usr/sbin/ufw ];then
+# if [ -f /usr/sbin/ufw ];then
 
-	# look
-	# ufw status
-	ufw enable
+# 	# look
+# 	# ufw status
+# 	ufw enable
 
-	if [ "$SSH_PORT" != "" ];then
-		ufw allow $SSH_PORT/tcp
-	else
-		ufw allow 22/tcp
-	fi
+# 	if [ "$SSH_PORT" != "" ];then
+# 		ufw allow $SSH_PORT/tcp
+# 	else
+# 		ufw allow 22/tcp
+# 	fi
 
-	ufw allow 80/tcp
-	ufw allow 443/tcp
-	ufw allow 888/tcp
-	# ufw allow 7200/tcp
-	# ufw allow 3306/tcp
-	# ufw allow 30000:40000/tcp
+# 	ufw allow 80/tcp
+# 	ufw allow 443/tcp
+# 	ufw allow 888/tcp
+# fi
 
-fi
+# if [ -f /usr/sbin/ufw ];then
+# 	ufw disable
+# fi
 
-
-if [ -f /usr/sbin/ufw ];then
-	ufw disable
-fi
-
-if [ ! -f /usr/sbin/ufw ];then
+if [ ! -f /usr/sbin/firewalld ];then
 	apt install -y firewalld
 	systemctl enable firewalld
 	systemctl start firewalld
@@ -67,9 +62,6 @@ if [ ! -f /usr/sbin/ufw ];then
 	firewall-cmd --permanent --zone=public --add-port=80/tcp
 	firewall-cmd --permanent --zone=public --add-port=443/tcp
 	firewall-cmd --permanent --zone=public --add-port=888/tcp
-	# firewall-cmd --permanent --zone=public --add-port=7200/tcp
-	# firewall-cmd --permanent --zone=public --add-port=3306/tcp
-	# firewall-cmd --permanent --zone=public --add-port=30000-40000/tcp
 
 	# fix:debian10 firewalld faq
 	# https://kawsing.gitbook.io/opensystem/andoid-shou-ji/untitled/fang-huo-qiang#debian-10-firewalld-0.6.3-error-commandfailed-usrsbinip6tablesrestorewn-failed-ip6tablesrestore-v1.8
