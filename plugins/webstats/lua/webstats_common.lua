@@ -46,10 +46,6 @@ end
 function _M.getInstance(self)
     if rawget(self, "instance") == nil then
         rawset(self, "instance", self.new())
-
-        if 0 == ngx.worker.id() then
-            self:cron()
-        end
     end
     assert(self.instance ~= nil)
     return self.instance
@@ -276,7 +272,7 @@ function _M.cron(self)
         local url_stats = {}
 
         local time_key = self:get_store_key()
-        
+
         for site_k, site_v in ipairs(sites) do
             local input_sn = site_v["name"]
             -- self:D("input_sn:"..input_sn)

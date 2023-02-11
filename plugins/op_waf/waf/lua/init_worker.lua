@@ -12,28 +12,28 @@ end
 
 local json = require "cjson"
 
-local __C = require "waf_common"
-local C = __C:getInstance()
+local __WAF_C = require "waf_common"
+local WAF_C = __WAF_C:getInstance()
 
 local waf_config = require "waf_config"
 local waf_site_config = require "waf_site"
-C:setConfData(waf_config, waf_site_config)
-C:setDebug(true)
+WAF_C:setConfData(waf_config, waf_site_config)
+WAF_C:setDebug(true)
 
 -- C:D("init worker"..tostring(ngx.worker.id()))
 
 local function waf_timer_stats_total_log(premature)
-    C:timer_stats_total()
+    WAF_C:timer_stats_total()
 end
 
 local waf_clean_expire_data = function(premature)
-    C:clean_log()
+    WAF_C:clean_log()
 end
 
 ngx.shared.waf_limit:set("cpu_usage", 0, 10)
 function waf_timer_every_get_cpu(premature)
-    local cpu_percent = C:read_file_body(waf_root.."/cpu.info")
-    -- C:D("cpu_usage:"..tostring(cpu_percent ))
+    local cpu_percent = WAF_C:read_file_body(waf_root.."/cpu.info")
+    -- WAF_C:D("cpu_usage:"..tostring(cpu_percent ))
     if cpu_percent then
         ngx.shared.waf_limit:set("cpu_usage", tonumber(cpu_percent), 10)
     else
@@ -48,5 +48,5 @@ if ngx.worker.id() == 0 then
     ngx.timer.every(3, waf_timer_stats_total_log)
     ngx.timer.every(10, waf_clean_expire_data)
 
-    C:cron()
+    WAF_C:cron()
 end
