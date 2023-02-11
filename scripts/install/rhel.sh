@@ -36,47 +36,48 @@ fi
 SSH_PORT=`netstat -ntpl|grep sshd|grep -v grep | sed -n "1,1p" | awk '{print $4}' | awk -F : '{print $2}'`
 echo "SSH PORT:${SSH_PORT}"
 
-echo "iptables wrap start"
-if [ -f /usr/sbin/iptables ];then
-    $PKGMGR install -y iptables-services
+# redhat , iptables no default
+# echo "iptables wrap start"
+# if [ -f /usr/sbin/iptables ];then
+#     $PKGMGR install -y iptables-services
 
-    # iptables -nL --line-number
+#     # iptables -nL --line-number
     
-    echo "iptables start"
-    iptables_status=`systemctl status iptables | grep 'inactive'`
-    if [ "${iptables_status}" != '' ];then
-        service iptables restart
+#     echo "iptables start"
+#     iptables_status=`systemctl status iptables | grep 'inactive'`
+#     if [ "${iptables_status}" != '' ];then
+#         service iptables restart
         
-        # iptables -P FORWARD DROP
-        iptables -P INPUT DROP
-        iptables -P OUTPUT ACCEPT
-        iptables -A INPUT -p tcp -s 127.0.0.1 -j ACCEPT
+#         # iptables -P FORWARD DROP
+#         iptables -P INPUT DROP
+#         iptables -P OUTPUT ACCEPT
+#         iptables -A INPUT -p tcp -s 127.0.0.1 -j ACCEPT
         
-        if [ "$SSH_PORT" != "" ];then
-            iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport ${SSH_PORT} -j ACCEPT
-        else
-            iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 22 -j ACCEPT
-        fi
+#         if [ "$SSH_PORT" != "" ];then
+#             iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport ${SSH_PORT} -j ACCEPT
+#         else
+#             iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 22 -j ACCEPT
+#         fi
 
-        iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
-        iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 443 -j ACCEPT
-        iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 888 -j ACCEPT
-        # iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 7200 -j ACCEPT
-        # iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 3306 -j ACCEPT
-        # iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 30000:40000 -j ACCEPT
-        service iptables save
-    fi
+#         iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
+#         iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 443 -j ACCEPT
+#         iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 888 -j ACCEPT
+#         # iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 7200 -j ACCEPT
+#         # iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 3306 -j ACCEPT
+#         # iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport 30000:40000 -j ACCEPT
+#         service iptables save
+#     fi
     
-    # 安装时不开启
-    # stop之后清空了所有规则,所以安装是不能stop.
-    # 要在代码修复这个问题，开启时，重新执行一下放行端口。
-    #service iptables stop
+#     # 安装时不开启
+#     # stop之后清空了所有规则,所以安装是不能stop.
+#     # 要在代码修复这个问题，开启时，重新执行一下放行端口。
+#     #service iptables stop
 
-    echo "iptables end"
-fi
-echo "iptables wrap start"
+#     echo "iptables end"
+# fi
+# echo "iptables wrap start"
 
-if [ ! -f /usr/sbin/iptables ];then
+if [ ! -f /usr/sbin/firewalld ];then
     $PKGMGR install firewalld -y
     systemctl enable firewalld
     #取消服务锁定
