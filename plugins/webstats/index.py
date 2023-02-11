@@ -266,8 +266,6 @@ def initDreplace():
         loadLuaFile('webstats_worker.lua')
         webstats_worker_src_file = lua_dir = getServerDir() + "/lua/webstats_worker.lua"
         content = mw.readFile(webstats_worker_src_file)
-        content = content.replace('{$SERVER_APP}', getServerDir())
-        content = content.replace('{$ROOT_PATH}', mw.getServerDir())
         mw.writeFile(webstats_worker_dst_file, content)
         mw.opLuaInitWorkerFile()
         os.remove(webstats_worker_src_file)
