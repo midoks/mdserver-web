@@ -266,6 +266,8 @@ end
 function _M.cron(self)
 
     local timer_every_get_data = function (premature)
+        self:cronPre()
+
 
         local llen, _ = ngx.shared.mw_total:llen(total_key)
         -- self:D("PID:"..tostring(ngx.worker.id())..",llen:"..tostring(llen))

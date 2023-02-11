@@ -259,17 +259,6 @@ def initDreplace():
     for fl in file_list:
         loadLuaFile(fl)
 
-    root_worker_dir = mw.getServerDir() + '/web_conf/nginx/lua/init_worker_by_lua_file'
-    dst_file = root_worker_dir + '/webstats_worker.lua'
-
-    if not os.path.exists(dst_file):
-        loadLuaFile('webstats_worker.lua')
-        src_file = getServerDir() + "/lua/webstats_worker.lua"
-        content = mw.readFile(src_file)
-        mw.writeFile(dst_file, content)
-        mw.opLuaInitWorkerFile()
-        os.remove(src_file)
-
     loadConfigFile()
     loadLuaSiteFile()
     loadDebugLogFile()
@@ -300,12 +289,6 @@ def stop():
     path = luaConf()
     if os.path.exists(path):
         os.remove(path)
-
-    root_worker_dir = mw.getServerDir() + '/web_conf/nginx/lua/init_worker_by_lua_file'
-    dst_file = root_worker_dir + '/webstats_worker.lua'
-    if os.path.exists(dst_file):
-        os.remove(dst_file)
-        mw.opLuaInitWorkerFile()
 
     import tool_task
     tool_task.removeBgTask()
