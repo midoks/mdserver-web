@@ -42,10 +42,19 @@ function _M.new(self)
 end
 
 
+-- function _M.getInstance(self)
+--     if rawget(self, "instance") == nil then
+--         rawset(self, "instance", self.new())
+--         self.cron()
+--     end
+--     assert(self.instance ~= nil)
+--     return self.instance
+-- end
+
+
 function _M.getInstance(self)
-    if rawget(self, "instance") == nil then
-        rawset(self, "instance", self.new())
-        self.cron()
+    if self.instance == nil then
+        self.instance = self:new()
     end
     assert(self.instance ~= nil)
     return self.instance
