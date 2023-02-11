@@ -244,7 +244,7 @@ local function waf_drop_ip()
     local count = ngx.shared.waf_drop_ip:get(ip)
     if not count then return false end
 
-    local retry = config['retry']['retry']
+    local retry = tonumber(config['retry']['retry'])
     -- C:D("waf_drop;count:"..tostring(count)..",retry:"..tostring(retry))
     -- C:D("waf_drop;count > retry:"..tostring(count > retry))
     if count >  retry then
