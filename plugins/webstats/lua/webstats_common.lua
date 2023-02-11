@@ -276,7 +276,6 @@ function _M.cron(self)
         local url_stats = {}
 
         local time_key = self:get_store_key()
-        local time_key_next = self:get_store_key_with_time(ngx.time()+3600)
         
         for site_k, site_v in ipairs(sites) do
             local input_sn = site_v["name"]
