@@ -47,9 +47,9 @@ function _M.getInstance(self)
     if rawget(self, "instance") == nil then
         rawset(self, "instance", self.new())
 
-        -- if 0 == ngx.worker.id() then
-        self:cron()
-        -- end
+        if 0 == ngx.worker.id() then
+            self:cron()
+        end
     end
     assert(self.instance ~= nil)
     return self.instance
@@ -234,7 +234,7 @@ function _M.cron(self)
     local timer_every_get_data = function (premature)
 
         local llen, _ = ngx.shared.mw_total:llen(total_key)
-        -- self:D("llen:"..tostring(llen))
+        -- self:D("PID:"..tostring(ngx.worker.id())..",llen:"..tostring(llen))
         if llen == 0 then
             return true
         end
@@ -253,6 +253,7 @@ function _M.cron(self)
         
         for site_k, site_v in ipairs(sites) do
             local input_sn = site_v["name"]
+            -- self:D("input_sn:"..input_sn)
             -- 迁移合并时不执行
             if self:is_migrating(input_sn) then
                 return true
@@ -307,7 +308,10 @@ function _M.cron(self)
             end
 
             local info = json.decode(data)
+
+            -- self:D("info:"..info)
             local input_sn = info['server_name']
+            -- self:D("insert data input_sn:"..input_sn)
             local db = dbs[input_sn]
             local stat_fields_is = stat_fields[input_sn]
             if not db then
@@ -458,7 +462,7 @@ function _M.cron(self)
         
         self:unlock_working(cron_key)
         ngx.update_time()
-        -- self:D("--【"..tostring(llen).."】, elapsed: " .. tostring(ngx.now() - begin))
+        -- self:D("PID:"..tostring(ngx.worker.id()).."--【"..tostring(llen).."】, elapsed: " .. tostring(ngx.now() - begin))
     end
 
     ngx.timer.every(1, timer_every_get_data)
