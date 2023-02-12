@@ -1,6 +1,10 @@
 #!/bin/sh
 export PATH=$PATH:/opt/stap/bin:/opt/stapxx
 
+# cd /www/server/mdserver-web/plugins/op_waf/t && bash ngx_debug.sh lua ok
+
+
+
 # https://moonbingbing.gitbooks.io/openresty-best-practices/content/flame_graph/install.html
 # apt install elfutils
 # sudo apt-get install -y systemtap gcc
@@ -72,7 +76,7 @@ else
 fi
 
 
-
+# debuginfo-install kernel-3.10.0-1160.80.1.el7.x86_64 
 # /opt/FlameGraph/stackcollapse-perf.pl perf.unfold &> perf.folded
 # /opt/FlameGraph/flamegraph.pl perf.folded > perf.svg
 
