@@ -56,3 +56,22 @@ function maPostCallbak(method, args, callback){
         }
     },'json'); 
 }
+
+
+
+function initStep(){
+    $('.infoNext').click(function(){
+        var step = $('.step_head .active span').text();
+        console.log(step);
+    });
+}
+
+
+
+
+
+
+
+
+
+

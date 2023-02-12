@@ -26,4 +26,5 @@ fi
 # $RUN_CMD --stap --shdict 'limit 10m' test_find_server_name.lua
 
 # $RUN_CMD  test_rand.lua
-$RUN_CMD  test_ffi_time.lua
+# $RUN_CMD  test_ffi_time.lua
+$RUN_CMD  test_get_cpu.lua

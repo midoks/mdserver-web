@@ -286,7 +286,8 @@ label.checkbox_label span {
 
 
 <script type="text/javascript">
-$.getScript( "/plugins/file?name=&f=js/app.js", function(){
-	pluginService('migration_api',$('.plugin_version').attr('version'));
+$.getScript( "/plugins/file?name=migration_api&f=js/app.js", function(){
+	// pluginService('migration_api',$('.plugin_version').attr('version'));
+    initStep();
 });
 </script>
