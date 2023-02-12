@@ -17,6 +17,7 @@ end
 collectgarbage()
 
 local json = require "cjson"
+local ngx_re = require "ngx.re"
 
 local function data_split(self, str,reps )
     local rsList = {}
@@ -52,6 +53,7 @@ local function get_cpu_percent()
     ngx.sleep(2)
     local cpu_total2,idie2,use_percent2 = get_cpu_stat()
     local cpu_usage_percent = tonumber(100-(((idie2-idie)/(cpu_total2-cpu_total))*100))
+    ngx.say("cpu_usage_percent:"..cpu_usage_percent)
     return cpu_usage_percent
 end
 
