@@ -34,21 +34,22 @@ ngx.shared.waf_limit:set("cpu_usage", 0, 10)
 function waf_timer_every_get_cpu(premature)
     if WAF_C:file_exists('/proc/stat') then
         local lua_cpu_percent = WAF_C:get_cpu_percent()
-        WAF_C:D("lua_cpu_percent:"..tostring(lua_cpu_percent))
-    end
-
-    local cpu_percent = WAF_C:read_file_body(waf_root.."/cpu.info")
-    -- WAF_C:D("cpu_usage:"..tostring(cpu_percent ))
-    if cpu_percent then
-        ngx.shared.waf_limit:set("cpu_usage", tonumber(cpu_percent), 10)
+        -- WAF_C:D("lua_cpu_percent:"..tostring(lua_cpu_percent))
+        ngx.shared.waf_limit:set("cpu_usage", math.floor(lua_cpu_percent), 10)
     else
-        ngx.shared.waf_limit:set("cpu_usage", 0, 10)
+        local cpu_percent = WAF_C:read_file_body(waf_root.."/cpu.info")
+        -- WAF_C:D("cpu_usage:"..tostring(cpu_percent ))
+        if cpu_percent then
+            ngx.shared.waf_limit:set("cpu_usage", tonumber(cpu_percent), 10)
+        else
+            ngx.shared.waf_limit:set("cpu_usage", 0, 10)
+        end
     end
 end
 
 if ngx.worker.id() == 0 then
 
-    ngx.timer.every(5, waf_timer_every_get_cpu)
+    ngx.timer.every(6, waf_timer_every_get_cpu)
     -- 异步执行
     ngx.timer.every(3, waf_timer_stats_total_log)
     ngx.timer.every(10, waf_clean_expire_data)

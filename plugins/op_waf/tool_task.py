@@ -54,7 +54,9 @@ def createBgTask():
         "period": "minute-n",
         "minute-n": "1",
     }
-    createBgTaskByName(getPluginName(), args)
+
+    if mw.isAppleSystem():
+        createBgTaskByName(getPluginName(), args)
 
 
 def createBgTaskByName(name, args):
@@ -134,6 +136,9 @@ logs_file=$plugin_path/${rname}.log
 
 
 def removeBgTask():
+    if not mw.isAppleSystem():
+        return False
+
     cfg_list = getConfigData()
     for x in range(len(cfg_list)):
         cfg = cfg_list[x]
