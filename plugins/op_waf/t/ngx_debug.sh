@@ -64,7 +64,7 @@ if [ ! -d /opt/FlameGraph ];then
 fi
  
 for pid in ${pids[@]}; do
-    echo $pid
+    echo "strace:$pid"
     if [ $1 == "lua" ]; then
         # --without-luajit-gc64 | lua 模式编译时需要使用此参数
         /opt/openresty-systemtap-toolkit/ngx-sample-lua-bt -p $pid --luajit20 -t 30 >temp.bt
