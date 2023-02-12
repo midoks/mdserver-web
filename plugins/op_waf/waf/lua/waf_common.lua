@@ -17,7 +17,9 @@ local mt = { __index = _M }
 local json = require "cjson"
 local sqlite3 = require "lsqlite3"
 
+local ngx_re = require "ngx.re"
 local ngx_match = ngx.re.find
+
 local debug_mode = false
 
 local cpath = waf_root.."/waf/"
