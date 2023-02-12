@@ -266,14 +266,14 @@ end
 function _M.cron(self)
 
     local timer_every_get_data = function (premature)
-        self:cronPre()
-
-
+        
         local llen, _ = ngx.shared.mw_total:llen(total_key)
         -- self:D("PID:"..tostring(ngx.worker.id())..",llen:"..tostring(llen))
         if llen == 0 then
             return true
         end
+
+        self:cronPre()
 
         ngx.update_time()
         local begin = ngx.now()
