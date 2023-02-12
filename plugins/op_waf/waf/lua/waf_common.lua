@@ -765,6 +765,34 @@ function _M.is_key(self, arr, key)
     return false
 end
 
+function _M.get_cpu_stat(self)
+    local cpu_total = 0
+    local fp = io.open('/proc/stat','r')
+    local cpu_line = fp:read()
+    fp:close()
+
+    local list = ngx_re.split(cpu_line," ")
+    table.remove(list,1)
+    table.remove(list,1)
+
+    local idie = list[4]
+    for i,v in pairs(list)
+    do
+        cpu_total = cpu_total + v
+    end
+
+    local use_percent = tonumber(100-(idie/cpu_total)*100)
+    return cpu_total,idie,use_percent
+end
+
+function _M.get_cpu_percent(self)
+    local cpu_total,idie,use_percent = self:get_cpu_stat()
+    ngx.sleep(2)
+    local cpu_total2,idie2,use_percent2 = self:get_cpu_stat()
+    local cpu_usage_percent = tonumber(100-(((idie2-idie)/(cpu_total2-cpu_total))*100))
+    return cpu_usage_percent
+end
+
 
 function _M.return_post_data(self)
     if method ~= "POST" then return false end

@@ -32,6 +32,11 @@ end
 
 ngx.shared.waf_limit:set("cpu_usage", 0, 10)
 function waf_timer_every_get_cpu(premature)
+    if WAF_C:file_exists('/proc/stat') then
+        local lua_cpu_percent = WAF_C:get_cpu_percent()
+        WAF_C:D("lua_cpu_percent:"..tostring(lua_cpu_percent))
+    end
+
     local cpu_percent = WAF_C:read_file_body(waf_root.."/cpu.info")
     -- WAF_C:D("cpu_usage:"..tostring(cpu_percent ))
     if cpu_percent then
