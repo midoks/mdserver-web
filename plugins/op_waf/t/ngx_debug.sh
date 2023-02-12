@@ -66,6 +66,7 @@ fi
 for pid in ${pids[@]}; do
     echo $pid
     if [ $1 == "lua" ]; then
+        # --without-luajit-gc64 | lua 模式编译时需要使用此参数
         /opt/openresty-systemtap-toolkit/ngx-sample-lua-bt -p $pid --luajit20 -t 30 >temp.bt
         /opt/openresty-systemtap-toolkit/fix-lua-bt temp.bt >${name}_${pid}.bt
     elif [ $1 == "c" ]; then
