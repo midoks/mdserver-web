@@ -309,6 +309,11 @@ def opLuaInitAccessFile():
     opLuaMake('access_by_lua_file')
 
 
+def opLuaMake():
+    opLuaInitFile()
+    opLuaInitWorkerFile()
+    opLuaInitAccessFile()
+
 # ------------------------------ openresty end -----------------------------
 
 
