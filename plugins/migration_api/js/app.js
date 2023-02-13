@@ -64,16 +64,36 @@ function initStep1(){
     });
 }
 
+function initStep2(){
+    maPost('step_one',{}, function(rdata){
+        console.log(rdata);
+    });
+}
+
+function initStep3(){
+    maPost('step_one',{}, function(rdata){
+        console.log(rdata);
+    });
+}
+
+function initStep4(){
+    maPost('step_one',{}, function(rdata){
+        console.log(rdata);
+    });
+}
+
 
 function initStep(){
     console.log($('.infoNext'));
     $('.infoNext').click(function(){
         var step = $('.step_head .active span').text();
-        console.log(step);
-        initStep1();
+        // console.log(step);
+        // initStep1();
         switch(step){
-            '1':initStep1();break;
-            '2':initStep2();break;
+            case '1':initStep1();break;
+            case '2':initStep2();break;
+            case '3':initStep3();break;
+            case '4':initStep4();break;
         }
     });
 }
