@@ -325,9 +325,43 @@ def restartWeb():
     mw.opWeb('start')
 
 
-def initDreplace():
+def makeDstLua():
+    root_init_dir = mw.getServerDir() + '/web_conf/nginx/lua/init_by_lua_file'
     root_worker_dir = mw.getServerDir() + '/web_conf/nginx/lua/init_worker_by_lua_file'
     root_access_dir = mw.getServerDir() + '/web_conf/nginx/lua/access_by_lua_file'
+    path = getServerDir()
+    path_tpl = getPluginDir()
+
+    waf_common_tpl = path_tpl + "/waf/lua/waf_common.lua"
+    waf_common_dst = path + "/waf/lua/waf_common.lua"
+    content = mw.readFile(waf_common_tpl)
+    content = contentReplace(content)
+    mw.writeFile(waf_common_dst, content)
+
+    waf_init_tpl = path_tpl + "/waf/lua/init_preload.lua"
+    waf_init_dst = root_init_dir + "/waf_init_preload.lua"
+    content = mw.readFile(waf_init_tpl)
+    content = contentReplace(content)
+    mw.writeFile(waf_init_dst, content)
+
+    init_worker_tpl = path_tpl + "/waf/lua/init_worker.lua"
+    init_worker_dst = root_worker_dir + '/opwaf_init_worker.lua'
+    content = mw.readFile(init_worker_tpl)
+    content = contentReplace(content)
+    mw.writeFile(init_worker_dst, content)
+
+    access_file_tpl = path_tpl + "/waf/lua/init.lua"
+    access_file_dst = root_access_dir + '/opwaf_init.lua'
+    content = mw.readFile(access_file_tpl)
+    content = contentReplace(content)
+    mw.writeFile(access_file_dst, content)
+
+    mw.opLuaInitFile()
+    mw.opLuaInitWorkerFile()
+    mw.opLuaInitAccessFile()
+
+
+def initDreplace():
     path = getServerDir()
     if not os.path.exists(path + '/waf/lua'):
         sdir = getPluginDir() + '/waf'
@@ -350,24 +384,7 @@ def initDreplace():
     content['reqfile_path'] = wfDir
     mw.writeFile(config, mw.getJson(content))
 
-    waf_common = path + "/waf/lua/waf_common.lua"
-    content = mw.readFile(waf_common)
-    content = contentReplace(content)
-    mw.writeFile(waf_common, content)
-
-    dst_init_worker = root_worker_dir + '/opwaf_init_worker.lua'
-    init_worker = path + "/waf/lua/init_worker.lua"
-    content = mw.readFile(init_worker)
-    content = contentReplace(content)
-    mw.writeFile(dst_init_worker, content)
-    mw.writeFile(init_worker, content)
-
-    access_file = root_access_dir + '/opwaf_init.lua'
-    config = path + "/waf/lua/init.lua"
-    content = mw.readFile(config)
-    content = contentReplace(content)
-    mw.writeFile(access_file, content)
-    mw.writeFile(config, content)
+    makeDstLua()
 
     waf_conf = dstWafConf()
     if not os.path.exists(waf_conf):
@@ -402,9 +419,6 @@ def status():
 def start():
     initDreplace()
 
-    mw.opLuaInitWorkerFile()
-    mw.opLuaInitAccessFile()
-
     import tool_task
     tool_task.createBgTask()
 
@@ -413,16 +427,21 @@ def start():
 
 
 def stop():
+    root_init_dir = mw.getServerDir() + '/web_conf/nginx/lua/init_by_lua_file'
     root_worker_dir = mw.getServerDir() + '/web_conf/nginx/lua/init_worker_by_lua_file'
     root_access_dir = mw.getServerDir() + '/web_conf/nginx/lua/access_by_lua_file'
 
-    dst_init_worker = root_worker_dir + '/opwaf_init_worker.lua'
-    if os.path.exists(dst_init_worker):
-        os.remove(dst_init_worker)
+    waf_init_dst = root_init_dir + "/waf_init_preload.lua"
+    if os.path.exists(waf_init_dst):
+        os.remove(waf_init_dst)
 
-    access_file = root_access_dir + '/opwaf_init.lua'
-    if os.path.exists(access_file):
-        os.remove(access_file)
+    init_worker_dst = root_worker_dir + '/opwaf_init_worker.lua'
+    if os.path.exists(init_worker_dst):
+        os.remove(init_worker_dst)
+
+    access_file_dst = root_access_dir + '/opwaf_init.lua'
+    if os.path.exists(access_file_dst):
+        os.remove(access_file_dst)
 
     wafconf = dstWafConf()
     if os.path.exists(wafconf):
@@ -431,6 +450,7 @@ def stop():
     import tool_task
     tool_task.removeBgTask()
 
+    mw.opLuaInitFile()
     mw.opLuaInitWorkerFile()
     mw.opLuaInitAccessFile()
 
@@ -446,26 +466,7 @@ def restart():
 def reload():
     stop()
 
-    path = getServerDir()
-    path_tpl = getPluginDir()
-
-    config = path + "/waf/lua/common.lua"
-    config_tpl = path_tpl + "/waf/lua/common.lua"
-    content = mw.readFile(config_tpl)
-    content = contentReplace(content)
-    mw.writeFile(config, content)
-
-    config = path + "/waf/lua/init_worker.lua"
-    config_tpl = path_tpl + "/waf/lua/init_worker.lua"
-    content = mw.readFile(config_tpl)
-    content = contentReplace(content)
-    mw.writeFile(config, content)
-
-    config = path + "/waf/lua/init.lua"
-    config_tpl = path_tpl + "/waf/lua/init.lua"
-    content = mw.readFile(config_tpl)
-    content = contentReplace(content)
-    mw.writeFile(config, content)
+    makeDstLua()
 
     errlog = mw.getServerDir() + "/openresty/nginx/logs/error.log"
     mw.execShell('rm -rf ' + errlog)
