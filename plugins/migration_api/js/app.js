@@ -58,11 +58,23 @@ function maPostCallbak(method, args, callback){
 }
 
 
+function initStep1(){
+    maPost('step_one',{}, function(rdata){
+        console.log(rdata);
+    });
+}
+
 
 function initStep(){
+    console.log($('.infoNext'));
     $('.infoNext').click(function(){
         var step = $('.step_head .active span').text();
         console.log(step);
+        initStep1();
+        switch(step){
+            '1':initStep1();break;
+            '2':initStep2();break;
+        }
     });
 }
 
