@@ -158,9 +158,7 @@ def confReplace():
     if not os.path.exists(empty_lua):
         mw.writeFile(empty_lua, '')
 
-    mw.opLuaInitFile()
-    mw.opLuaInitWorkerFile()
-    mw.opLuaInitAccessFile()
+    mw.opLuaMakeAll()
 
     # 静态配置
     php_conf = mw.getServerDir() + '/web_conf/php/conf'

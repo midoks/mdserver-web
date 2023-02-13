@@ -356,7 +356,7 @@ def makeDstLua():
     content = contentReplace(content)
     mw.writeFile(access_file_dst, content)
 
-    mw.opLuaMake()
+    mw.opLuaMakeAll()
 
 
 def initDreplace():
@@ -448,7 +448,7 @@ def stop():
     import tool_task
     tool_task.removeBgTask()
 
-    mw.opLuaMake()
+    mw.opLuaMakeAll()
 
     restartWeb()
     return 'ok'

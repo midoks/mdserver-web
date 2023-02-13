@@ -309,7 +309,7 @@ def opLuaInitAccessFile():
     opLuaMake('access_by_lua_file')
 
 
-def opLuaMake():
+def opLuaMakeAll():
     opLuaInitFile()
     opLuaInitWorkerFile()
     opLuaInitAccessFile()
