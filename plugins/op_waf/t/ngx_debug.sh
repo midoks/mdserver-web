@@ -77,9 +77,7 @@ if [ "$OSNAME" == "debian" ];then
     apt install  -y systemtap
     apt-get install -y build-essential 
     apt-get install -y linux-headers-$(uname -r)
-fi
-
-if [ "$OSNAME" == "centos" ];then
+elif [ "$OSNAME" == "centos" ];then
     yum install -y kernel-devel-$(uname -r)
 fi
 
