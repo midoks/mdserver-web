@@ -196,13 +196,14 @@ def backupAllFunc(stype):
     os.system(cmd)
     # 开始执行上传信息
 
-    bk_prefix = prefix_dict[stype]
     bk_name = stype
     if stype.find('database_') > -1:
         bk_name = 'database'
         stype = 'database'
         plugin_name = stype.replace('database_', '')
         bk_prefix = plugin_name + '/db'
+    else:
+        bk_prefix = prefix_dict[stype]
 
     find_path = mw.getBackupDir() + '/' + bk_name + '/' + bk_prefix + '_' + name
     find_new_file = "ls " + find_path + \
