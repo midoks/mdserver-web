@@ -58,19 +58,16 @@ apt install -y python3-pip python3-dev python3-venv
 # 	ufw allow 888/tcp
 # fi
 
-# if [ -f /usr/sbin/ufw ];then
-# 	ufw disable
-# fi
-
-if [ ! -f /usr/sbin/firewalld ];then
+if [ ! -f /usr/sbin/ufw ];then
 	# look
     # firewall-cmd --list-all
+    # apt remove -y firewalld
 
 	apt install -y firewalld
 	systemctl enable firewalld
 	#取消服务锁定
     systemctl unmask firewalld
-	systemctl start firewalld
+	
 
 	if [ "$SSH_PORT" != "" ];then
 		firewall-cmd --permanent --zone=public --add-port=${SSH_PORT}/tcp
@@ -81,13 +78,13 @@ if [ ! -f /usr/sbin/firewalld ];then
 	firewall-cmd --permanent --zone=public --add-port=443/tcp
 	firewall-cmd --permanent --zone=public --add-port=888/tcp
 
+	systemctl start firewalld
+
 	# fix:debian10 firewalld faq
 	# https://kawsing.gitbook.io/opensystem/andoid-shou-ji/untitled/fang-huo-qiang#debian-10-firewalld-0.6.3-error-commandfailed-usrsbinip6tablesrestorewn-failed-ip6tablesrestore-v1.8
 	sed -i 's#IndividualCalls=no#IndividualCalls=yes#g' /etc/firewalld/firewalld.conf
 
 	firewall-cmd --reload
-	#安装时不开启
-	systemctl stop firewalld
 fi
 
 #fix zlib1g-dev fail
