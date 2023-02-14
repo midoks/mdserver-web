@@ -44,14 +44,10 @@ echo "SSH PORT:${SSH_PORT}"
 # 	ufw allow 888/tcp
 # fi
 
-# if [ -f /usr/sbin/ufw ];then
-# 	ufw disable
-# fi
-
 if [ ! -f /usr/sbin/firewalld ];then
 	apt install -y firewalld
 	systemctl enable firewalld
-	systemctl start firewalld
+	
 
 	if [ "$SSH_PORT" != "" ];then
 		firewall-cmd --permanent --zone=public --add-port=${SSH_PORT}/tcp
@@ -63,16 +59,17 @@ if [ ! -f /usr/sbin/firewalld ];then
 	firewall-cmd --permanent --zone=public --add-port=443/tcp
 	firewall-cmd --permanent --zone=public --add-port=888/tcp
 
+	systemctl start firewalld
+
 	# fix:debian10 firewalld faq
 	# https://kawsing.gitbook.io/opensystem/andoid-shou-ji/untitled/fang-huo-qiang#debian-10-firewalld-0.6.3-error-commandfailed-usrsbinip6tablesrestorewn-failed-ip6tablesrestore-v1.8
 	sed -i 's#IndividualCalls=no#IndividualCalls=yes#g' /etc/firewalld/firewalld.conf
 
 	firewall-cmd --reload
+	
+	# #安装时不开启
+	# systemctl stop firewalld
 fi
-
-#安装时不开启
-systemctl stop firewalld
-
 
 apt install -y devscripts
 apt install -y net-tools
