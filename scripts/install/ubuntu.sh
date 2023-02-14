@@ -43,7 +43,7 @@ if [ -f /usr/sbin/ufw ];then
 	ufw allow 888/tcp
 fi
 
-if [ ! -f /usr/sbin/firewalld ];then
+if [ ! -f /usr/sbin/ufw ];then
 	apt install -y firewalld
 	systemctl enable firewalld
 	
