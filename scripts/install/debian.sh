@@ -58,7 +58,7 @@ apt install -y python3-pip python3-dev python3-venv
 # 	ufw allow 888/tcp
 # fi
 
-if [ ! -f /usr/sbin/ufw ];then
+if [ ! -f /usr/sbin/firewalld ];then
 	# look
     # firewall-cmd --list-all
     # apt remove -y firewalld
