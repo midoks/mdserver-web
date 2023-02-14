@@ -200,6 +200,7 @@ def backupAllFunc(stype):
     bk_name = stype
     if stype.find('database_') > -1:
         bk_name = 'database'
+        stype = 'database'
         plugin_name = stype.replace('database_', '')
         bk_prefix = plugin_name + '/db'
 
@@ -212,6 +213,7 @@ def backupAllFunc(stype):
         mw.echoInfo("not find upload file!")
         return False
 
+    print("|-准备上传文件 {}".format(filename))
     ftp = FtpPSClient()
     ftp.uploadFile(filename, stype)
 
