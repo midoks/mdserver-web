@@ -194,7 +194,8 @@ def backupAllFunc(stype):
             '/scripts/backup.py ' + args
 
     os.system(cmd)
-    # 开始执行上传信息
+
+    # 开始执行上传信息.
 
     if stype.find('database_') > -1:
         bk_name = 'database'
