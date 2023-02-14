@@ -36,10 +36,10 @@ class firewall_api:
         iptables_file = mw.systemdCfgDir() + '/iptables.service'
         if os.path.exists('/usr/sbin/firewalld'):
             self.__isFirewalld = True
-        elif os.path.exists(iptables_file):
-            self.__isIptables = True
         elif os.path.exists('/usr/sbin/ufw'):
             self.__isUfw = True
+        elif os.path.exists(iptables_file):
+            self.__isIptables = True
         elif mw.isAppleSystem():
             self.__isMac = True
 
