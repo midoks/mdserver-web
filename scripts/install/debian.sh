@@ -46,19 +46,22 @@ apt install -y wget curl lsof unzip tar cron expect locate
 apt install -y python3-pip python3-dev python3-venv
 
 
-# if [ -f /usr/sbin/ufw ];then
-# 	if [ "$SSH_PORT" != "" ];then
-# 		ufw allow $SSH_PORT/tcp
-# 	else
-# 		ufw allow 22/tcp
-# 	fi
+if [ -f /usr/sbin/ufw ];then
+	# look
+	# ufw status
+	ufw enable
+	if [ "$SSH_PORT" != "" ];then
+		ufw allow $SSH_PORT/tcp
+	else
+		ufw allow 22/tcp
+	fi
 
-# 	ufw allow 80/tcp
-# 	ufw allow 443/tcp
-# 	ufw allow 888/tcp
-# fi
+	ufw allow 80/tcp
+	ufw allow 443/tcp
+	ufw allow 888/tcp
+fi
 
-if [ ! -f /usr/sbin/firewalld ];then
+if [ ! -f /usr/sbin/ufw ];then
 	# look
     # firewall-cmd --list-all
     # apt remove -y firewalld

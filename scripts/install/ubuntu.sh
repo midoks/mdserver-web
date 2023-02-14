@@ -27,22 +27,21 @@ localedef -v -c -i en_US -f UTF-8 en_US.UTF-8
 SSH_PORT=`netstat -ntpl|grep sshd|grep -v grep | sed -n "1,1p" | awk '{print $4}' | awk -F : '{print $2}'`
 echo "SSH PORT:${SSH_PORT}"
 
-# if [ -f /usr/sbin/ufw ];then
+if [ -f /usr/sbin/ufw ];then
+	# look
+	# ufw status
+	ufw enable
 
-# 	# look
-# 	# ufw status
-# 	ufw enable
+	if [ "$SSH_PORT" != "" ];then
+		ufw allow $SSH_PORT/tcp
+	else
+		ufw allow 22/tcp
+	fi
 
-# 	if [ "$SSH_PORT" != "" ];then
-# 		ufw allow $SSH_PORT/tcp
-# 	else
-# 		ufw allow 22/tcp
-# 	fi
-
-# 	ufw allow 80/tcp
-# 	ufw allow 443/tcp
-# 	ufw allow 888/tcp
-# fi
+	ufw allow 80/tcp
+	ufw allow 443/tcp
+	ufw allow 888/tcp
+fi
 
 if [ ! -f /usr/sbin/firewalld ];then
 	apt install -y firewalld
