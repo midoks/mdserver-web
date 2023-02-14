@@ -228,6 +228,14 @@ def isIpAddr(ip):
         return False
 
 
+def getWebStatus():
+    pid = getServerDir() + '/openresty/nginx/logs/nginx.pid'
+    if os.path.exists(pid):
+        return True
+    return False
+
+
+# ------------------------------ openresty start -----------------------------
 def restartWeb():
     return opWeb("reload")
 
@@ -250,6 +258,63 @@ def opWeb(method):
         return True
 
     return False
+
+
+def opLuaMake(cmd_name):
+    path = getServerDir() + '/web_conf/nginx/lua/lua.conf'
+    root_dir = getServerDir() + '/web_conf/nginx/lua/' + cmd_name
+    dst_path = getServerDir() + '/web_conf/nginx/lua/' + cmd_name + '.lua'
+    def_path = getServerDir() + '/web_conf/nginx/lua/empty.lua'
+
+    if not os.path.exists(root_dir):
+        execShell('mkdir -p ' + root_dir)
+
+    files = []
+    for fl in os.listdir(root_dir):
+        suffix = getFileSuffix(fl)
+        if suffix != 'lua':
+            continue
+        flpath = os.path.join(root_dir, fl)
+        files.append(flpath)
+
+    if len(files) > 0:
+        def_path = dst_path
+        content = ''
+        for f in files:
+            t = readFile(f)
+            f_base = os.path.basename(f)
+            content += '-- ' + '*' * 20 + ' ' + f_base + ' start ' + '*' * 20 + "\n"
+            content += t
+            content += "\n" + '-- ' + '*' * 20 + ' ' + f_base + ' end ' + '*' * 20 + "\n"
+        writeFile(dst_path, content)
+    else:
+        if os.path.exists(dst_path):
+            os.remove(dst_path)
+
+    conf = readFile(path)
+    conf = re.sub(cmd_name + ' (.*);',
+                  cmd_name + " " + def_path + ";", conf)
+    writeFile(path, conf)
+
+
+def opLuaInitFile():
+    opLuaMake('init_by_lua_file')
+
+
+def opLuaInitWorkerFile():
+    opLuaMake('init_worker_by_lua_file')
+
+
+def opLuaInitAccessFile():
+    opLuaMake('access_by_lua_file')
+
+
+def opLuaMakeAll():
+    opLuaInitFile()
+    opLuaInitWorkerFile()
+    opLuaInitAccessFile()
+
+# ------------------------------ openresty end -----------------------------
 
 
 def restartMw():
@@ -580,7 +645,7 @@ def enCrypt(key, strings):
     # 加密字符串
     try:
         import base64
-        _key = md5(key).encode('utf-8')
+        _key = key.encode('utf-8')
         _key = base64.urlsafe_b64encode(_key)
 
         if type(strings) != bytes:
@@ -596,6 +661,44 @@ def enCrypt(key, strings):
 
 
 def deCrypt(key, strings):
+
+    # 解密字符串
+    try:
+        import base64
+        _key = key.encode('utf-8')
+        _key = base64.urlsafe_b64encode(_key)
+
+        if type(strings) != bytes:
+            strings = strings.encode('utf-8')
+        from cryptography.fernet import Fernet
+        f = Fernet(_key)
+        result = f.decrypt(strings).decode('utf-8')
+        return result
+    except:
+        print(getTracebackInfo())
+        return strings
+
+
+def enDoubleCrypt(key, strings):
+    # 加密字符串
+    try:
+        import base64
+        _key = md5(key).encode('utf-8')
+        _key = base64.urlsafe_b64encode(_key)
+
+        if type(strings) != bytes:
+            strings = strings.encode('utf-8')
+        import cryptography
+        from cryptography.fernet import Fernet
+        f = Fernet(_key)
+        result = f.encrypt(strings)
+        return result.decode('utf-8')
+    except:
+        print(getTracebackInfo())
+        return strings
+
+
+def deDoubleCrypt(key, strings):
     # 解密字符串
     try:
         import base64

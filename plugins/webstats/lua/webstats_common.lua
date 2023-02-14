@@ -36,20 +36,26 @@ function _M.new(self)
         params = nil,
         site_config = nil,
         config = nil,
-
     }
     -- self.dbs = {}
     return setmetatable(self, mt)
 end
 
 
-function _M.getInstance(self)
-    if rawget(self, "instance") == nil then
-        rawset(self, "instance", self.new())
+-- function _M.getInstance(self)
+--     if rawget(self, "instance") == nil then
+--         rawset(self, "instance", self.new())
+--         self.cron()
+--     end
+--     assert(self.instance ~= nil)
+--     return self.instance
+-- end
 
-        -- if 0 == ngx.worker.id() then
+
+function _M.getInstance(self)
+    if self.instance == nil then
+        self.instance = self:new()
         self:cron()
-        -- end
     end
     assert(self.instance ~= nil)
     return self.instance
@@ -229,15 +235,45 @@ function _M.get_http_origin(self)
     return json.encode(headers)
 end
 
+function _M.cronPre(self)
+    local time_key = self:get_store_key()
+    local time_key_next = self:get_store_key_with_time(ngx.time()+3600)
+
+    for site_k, site_v in ipairs(sites) do
+        local input_sn = site_v["name"]
+
+        local db = self:initDB(input_sn)
+
+        local wc_stat = {
+            'request_stat',
+            'client_stat',
+            'spider_stat'
+        }
+
+        for _,ws_v in pairs(wc_stat) do
+            self:_update_stat_pre(db, ws_v, time_key)
+            self:_update_stat_pre(db, ws_v, time_key_next)
+        end
+
+        if db and db:isopen() then
+            db:execute([[COMMIT]])
+            db:close()
+        end
+    end
+end
+
 -- 后台任务
 function _M.cron(self)
-    local timer_every_get_data = function (premature)
 
+    local timer_every_get_data = function (premature)
+        
         local llen, _ = ngx.shared.mw_total:llen(total_key)
-        -- self:D("llen:"..tostring(llen))
+        -- self:D("PID:"..tostring(ngx.worker.id())..",llen:"..tostring(llen))
         if llen == 0 then
             return true
         end
+
+        self:cronPre()
 
         ngx.update_time()
         local begin = ngx.now()
@@ -249,10 +285,10 @@ function _M.cron(self)
         local url_stats = {}
 
         local time_key = self:get_store_key()
-        local time_key_next = self:get_store_key_with_time(ngx.time()+3600)
-        
+
         for site_k, site_v in ipairs(sites) do
             local input_sn = site_v["name"]
+            -- self:D("input_sn:"..input_sn)
             -- 迁移合并时不执行
             if self:is_migrating(input_sn) then
                 return true
@@ -276,18 +312,6 @@ function _M.cron(self)
                 tmp_stmt["web_logs"] = stmt
                 stmts[input_sn] = tmp_stmt
 
-                local wc_stat = {
-                    'request_stat',
-                    'client_stat',
-                    'spider_stat'
-                }
-
-                for _,ws_v in pairs(wc_stat) do
-                    self:_update_stat_pre(db, ws_v, time_key)
-                    self:_update_stat_pre(db, ws_v, time_key_next)
-                end
-
-
                 db:exec([[BEGIN TRANSACTION]])
             end
         end
@@ -307,7 +331,10 @@ function _M.cron(self)
             end
 
             local info = json.decode(data)
+
+            -- self:D("info:"..json.encode(info))
             local input_sn = info['server_name']
+            -- self:D("insert data input_sn:"..input_sn)
             local db = dbs[input_sn]
             local stat_fields_is = stat_fields[input_sn]
             if not db then
@@ -458,10 +485,9 @@ function _M.cron(self)
         
         self:unlock_working(cron_key)
         ngx.update_time()
-        -- self:D("--【"..tostring(llen).."】, elapsed: " .. tostring(ngx.now() - begin))
+        -- self:D("PID:"..tostring(ngx.worker.id()).."--【"..tostring(llen).."】, elapsed: " .. tostring(ngx.now() - begin))
     end
-
-    ngx.timer.every(1, timer_every_get_data)
+    ngx.timer.every(0.5, timer_every_get_data)
 end
 
 
@@ -488,7 +514,7 @@ function _M.store_logs_line(self, db, stmt, input_sn, info)
     local request_headers = logline["request_headers"]
     local excluded = logline["excluded"] 
 
-
+    -- self:D("json:"..json.encode(logline))
     local time_key = logline["time_key"]
     if not excluded then
 

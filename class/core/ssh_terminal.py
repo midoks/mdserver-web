@@ -320,7 +320,7 @@ class ssh_terminal:
 
     def getSshInfo(self, file):
         rdata = mw.readFile(file)
-        destr = mw.deCrypt('mdserver-web', rdata)
+        destr = mw.enDoubleCrypt('mdserver-web', rdata)
         return json.loads(destr)
 
     def setAttr(self, sid, info):

@@ -27,7 +27,7 @@ from flask import request
 
 class config_api:
 
-    __version = '0.12.2'
+    __version = '0.12.3'
     __api_addr = 'data/api.json'
 
     def __init__(self):
@@ -647,9 +647,22 @@ class config_api:
         else:
             return False, ''
 
+    def setStatusCodeApi(self):
+        status_code = request.form.get('status_code', '').strip()
+        if re.match("^\d+$", status_code):
+            status_code = int(status_code)
+            if status_code != 0:
+                if status_code < 100 or status_code > 999:
+                    return mw.returnJson(False, '状态码范围错误!')
+        else:
+            return mw.returnJson(False, '状态码范围错误!')
+
+        mw.writeFile('data/unauthorized_status.pl', str(status_code))
+        mw.writeLog('面板设置', '将未授权响应状态码设置为:{}'.format(status_code))
+        return mw.returnJson(True, '设置成功!')
+
     def getPanelTokenApi(self):
         api_file = self.__api_addr
-
         tmp = mw.readFile(api_file)
         if not os.path.exists(api_file):
             ready_data = {"open": False, "token": "", "limit_addr": []}
@@ -668,7 +681,7 @@ class config_api:
             token = mw.getRandomString(32)
             data['token'] = mw.md5(token)
             data['token_crypt'] = mw.enCrypt(
-                data['token'], token).decode('utf-8')
+                data['token'], token)
             mw.writeFile(api_file, json.dumps(data))
             data['token'] = "***********************************"
 
@@ -713,6 +726,31 @@ class config_api:
             mw.writeLog('API配置', '变更IP限制为[%s]' % limit_addr)
             mw.writeFile(api_file, json.dumps(data))
             return mw.returnJson(True, '保存成功!')
+
+    def renderUnauthorizedStatus(self, data):
+        cfg_unauth_status = 'data/unauthorized_status.pl'
+        if os.path.exists(cfg_unauth_status):
+            status_code = mw.readFile(cfg_unauth_status)
+            data['status_code'] = status_code
+            data['status_code_msg'] = status_code
+            if status_code == '0':
+                data['status_code_msg'] = "默认-安全入口错误提示"
+            elif status_code == '400':
+                data['status_code_msg'] = "400-客户端请求错误"
+            elif status_code == '401':
+                data['status_code_msg'] = "401-未授权访问"
+            elif status_code == '403':
+                data['status_code_msg'] = "403-拒绝访问"
+            elif status_code == '404':
+                data['status_code_msg'] = "404-页面不存在"
+            elif status_code == '408':
+                data['status_code_msg'] = "408-客户端超时"
+            elif status_code == '416':
+                data['status_code_msg'] = "416-无效的请求"
+        else:
+            data['status_code'] = '0'
+            data['status_code_msg'] = "默认-安全入口错误提示"
+        return data
 
     def get(self):
 
@@ -765,6 +803,8 @@ class config_api:
             data['bind_domain'] = domain.strip()
         else:
             data['bind_domain'] = ''
+
+        data = self.renderUnauthorizedStatus(data)
 
         api_token = self.__api_addr
         if os.path.exists(api_token):

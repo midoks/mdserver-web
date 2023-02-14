@@ -1,6 +1,46 @@
 #!/bin/sh
 export PATH=$PATH:/opt/stap/bin:/opt/stapxx
 
+# cd /www/server/mdserver-web/plugins/op_waf/t && bash ngx_debug.sh lua ok
+# cd /www/server/mdserver-web/plugins/op_waf/t && bash ngx_debug.sh c ok
+
+
+if [ ${_os} == "Darwin" ]; then
+    OSNAME='macos'
+elif grep -Eq "openSUSE" /etc/*-release; then
+    OSNAME='opensuse'
+    zypper refresh
+    zypper install cron wget curl zip unzip
+elif grep -Eq "FreeBSD" /etc/*-release; then
+    OSNAME='freebsd'
+elif grep -Eqi "CentOS" /etc/issue || grep -Eq "CentOS" /etc/*-release; then
+    OSNAME='rhel'
+    yum install -y wget curl zip unzip tar crontabs
+elif grep -Eqi "Fedora" /etc/issue || grep -Eq "Fedora" /etc/*-release; then
+    OSNAME='fedora'
+    yum install -y wget curl zip unzip tar crontabs
+elif grep -Eqi "Rocky" /etc/issue || grep -Eq "Rocky" /etc/*-release; then
+    OSNAME='rhel'
+    yum install -y wget curl zip unzip tar crontabs
+elif grep -Eqi "AlmaLinux" /etc/issue || grep -Eq "AlmaLinux" /etc/*-release; then
+    OSNAME='rhel'
+    yum install -y wget curl zip unzip tar crontabs
+elif grep -Eqi "Amazon Linux" /etc/issue || grep -Eq "Amazon Linux" /etc/*-release; then
+    OSNAME='amazon'
+    yum install -y wget curl zip unzip tar crontabs
+elif grep -Eqi "Debian" /etc/issue || grep -Eq "Debian" /etc/os-release; then
+    OSNAME='debian'
+    apt update -y
+    apt install -y wget curl zip unzip tar cron
+elif grep -Eqi "Ubuntu" /etc/issue || grep -Eq "Ubuntu" /etc/os-release; then
+    OSNAME='ubuntu'
+    apt update -y
+    apt install -y wget curl zip unzip tar cron
+else
+    OSNAME='unknow'
+fi
+
+
 # https://moonbingbing.gitbooks.io/openresty-best-practices/content/flame_graph/install.html
 # apt install elfutils
 # sudo apt-get install -y systemtap gcc
@@ -23,7 +63,7 @@ then
     exit
 fi
  
-pid=`ps -ef|grep openresty | grep -v grep | awk '{print $2}'`
+pids=`ps -ef|grep nginx | grep -v grep | awk '{print $2}'`
 name=$2
 
 
@@ -33,7 +73,13 @@ name=$2
 # apt install -y kernel-debuginfo-common kernel-debuginfo
 # apt install -y kernel-*
 
-
+if [ "$OSNAME" == "debian" ];then
+    apt install  -y systemtap
+    apt-get install -y build-essential 
+    apt-get install -y linux-headers-$(uname -r)
+elif [ "$OSNAME" == "centos" ];then
+    yum install -y kernel-devel-$(uname -r)
+fi
 
 # /opt/stapxx/samples/lj-lua-stacks.sxx --arg time=5 --skip-badvars -x 45266  > tmp.bt
 
@@ -58,25 +104,45 @@ if [ ! -d /opt/FlameGraph ];then
     cd /opt && git clone https://github.com/brendangregg/FlameGraph
 fi
  
-if [ $1 == "lua" ]; then
-    # /opt/openresty-systemtap-toolkit/ngx-sample-lua-bt -p 377452 --luajit20 -t 30 >temp.bt
-    /opt/openresty-systemtap-toolkit/ngx-sample-lua-bt -p $pid --luajit20 -t 30 >temp.bt
-    # /opt/openresty-systemtap-toolkit/fix-lua-bt temp.bt >t1.bt
-    /opt/openresty-systemtap-toolkit/fix-lua-bt temp.bt >${name}.bt
-elif [ $1 == "c" ]; then
-    # /opt/openresty-systemtap-toolkit/sample-bt -p 496435 -t 10 -u > t2.bt
-    /opt/openresty-systemtap-toolkit/sample-bt -p $pid -t 10 -u > ${name}.bt
-else
-    echo "type is only lua/c"
-    exit
-fi
+for pid in ${pids[@]}; do
+    echo "strace:$pid"
+    if [ $1 == "lua" ]; then
+        # --without-luajit-gc64 | lua 模式编译时需要使用此参数
+        /opt/openresty-systemtap-toolkit/ngx-sample-lua-bt -p $pid --luajit20 -t 30 >temp.bt
+        /opt/openresty-systemtap-toolkit/fix-lua-bt temp.bt >${name}_${pid}.bt
+    elif [ $1 == "c" ]; then
+        /opt/openresty-systemtap-toolkit/sample-bt -p $pid -t 10 -u > ${name}_${pid}.bt
+    else
+        echo "type is only lua/c"
+        exit
+    fi
+
+    /opt/FlameGraph/stackcollapse-stap.pl ${name}_${pid}.bt >${name}_${pid}.cbt
+    /opt/FlameGraph/flamegraph.pl ${name}_${pid}.cbt >${name}_${pid}.svg
+    rm -f temp.bt ${name}_${pid}.bt ${name}_${pid}.cbt
+    echo "strace:$pid, end!"
+    echo "${name}_${pid}.svg -- make ok"
+done
+
+# if [ $1 == "lua" ]; then
+#     # /opt/openresty-systemtap-toolkit/ngx-sample-lua-bt -p 377452 --luajit20 -t 30 >temp.bt
+#     /opt/openresty-systemtap-toolkit/ngx-sample-lua-bt -p $pid --luajit20 -t 30 >temp.bt
+#     # /opt/openresty-systemtap-toolkit/fix-lua-bt temp.bt >t1.bt
+#     /opt/openresty-systemtap-toolkit/fix-lua-bt temp.bt >${name}.bt
+# elif [ $1 == "c" ]; then
+#     # /opt/openresty-systemtap-toolkit/sample-bt -p 496435 -t 10 -u > t2.bt
+#     /opt/openresty-systemtap-toolkit/sample-bt -p $pid -t 10 -u > ${name}.bt
+# else
+#     echo "type is only lua/c"
+#     exit
+# fi
 
 
+# # debuginfo-install kernel-3.10.0-1160.80.1.el7.x86_64 
+# # /opt/FlameGraph/stackcollapse-perf.pl perf.unfold &> perf.folded
+# # /opt/FlameGraph/flamegraph.pl perf.folded > perf.svg
 
-# /opt/FlameGraph/stackcollapse-perf.pl perf.unfold &> perf.folded
-# /opt/FlameGraph/flamegraph.pl perf.folded > perf.svg
-
-/opt/FlameGraph/stackcollapse-stap.pl ${name}.bt >${name}.cbt
-/opt/FlameGraph/flamegraph.pl ${name}.cbt >${name}.svg
-rm -f temp.bt ${name}.bt ${name}.cbt
+# /opt/FlameGraph/stackcollapse-stap.pl ${name}.bt >${name}.cbt
+# /opt/FlameGraph/flamegraph.pl ${name}.cbt >${name}.svg
+# rm -f temp.bt ${name}.bt ${name}.cbt
 

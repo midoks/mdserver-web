@@ -1,19 +1,8 @@
-local waf_root = "{$WAF_ROOT}"
-local waf_cpath = waf_root.."/waf/lua/?.lua;"..waf_root.."/waf/conf/?.lua;"..waf_root.."/waf/html/?.lua;"
-local waf_sopath = waf_root.."/waf/conf/?.so;"
-
-if not package.path:find(waf_cpath) then
-    package.path = waf_cpath  .. package.path
-end
-
-if not package.cpath:find(waf_sopath) then
-    package.cpath = waf_sopath .. package.cpath
-end
 
 local json = require "cjson"
 local ngx_match = ngx.re.find
 
-local __WAF = require "common"
+local __WAF = require "waf_common"
 
 -- print(json.encode(__C))
 local C = __WAF:getInstance()
@@ -47,7 +36,8 @@ local url_rules = require "rule_url"
 local url_white_rules = require "rule_url_white"
 
 
-local server_name = string.gsub(C:get_sn(config_domains),'_','.')
+-- local server_name = string.gsub(C:get_sn(config_domains),'_','.')
+local server_name = C:get_sn(config_domains)
 
 local function initParams()
     local data = {}
@@ -533,41 +523,58 @@ end
 
 function waf()
     min_route()
+    -- C:D("min_route")
     -- white ip
     if waf_ip_white() then return true end
+    -- C:D("waf_ip_white")
 
     -- url white
     if waf_url_white() then return true end
+    -- C:D("waf_url_white")
 
     -- black ip
     if waf_ip_black() then return true end
+    -- C:D("waf_ip_black")
 
     -- 封禁ip返回
     if waf_drop_ip() then return true end
+    -- C:D("waf_drop_ip")
 
     -- ua check
     if waf_user_agent() then return true end
+    -- C:D("waf_user_agent")
     if waf_url() then return true end
+    -- C:D("waf_url")
 
     -- cc setting
     if waf_cc_increase() then return true end
+    -- C:D("waf_cc_increase")
     if waf_cc() then return true end
+    -- C:D("waf_cc")
 
     -- cookie检查
     if waf_cookie() then return true end
+    -- C:D("waf_cookie")
     
     -- args参数拦截
     if waf_get_args() then return true end
+    -- C:D("waf_get_args")
 
     -- 扫描软件禁止
     if waf_scan_black() then return true end
+    -- C:D("waf_scan_black")
     if waf_post() then return true end
+    -- C:D("waf_post")
 
     if site_config[server_name] and site_config[server_name]['open'] then
         if X_Forwarded() then return true end
+        -- C:D("X_Forwarded")
         if post_X_Forwarded() then return true end
+        -- C:D("post_X_Forwarded")
         if url_ext() then return true end
+        -- C:D("url_ext")
         if post_data() then return true end 
+        -- C:D("post_data")
     end
 end
 

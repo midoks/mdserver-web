@@ -149,15 +149,16 @@ def confReplace():
         mw.execShell('mkdir -p ' + lua_conf_dir)
 
     lua_conf = lua_conf_dir + '/lua.conf'
-    if not os.path.exists(lua_conf):
-        lua_conf_tpl = getPluginDir() + '/conf/lua.conf'
-        lua_content = mw.readFile(lua_conf_tpl)
-        lua_content = lua_content.replace('{$SERVER_PATH}', service_path)
-        mw.writeFile(lua_conf, lua_content)
+    lua_conf_tpl = getPluginDir() + '/conf/lua.conf'
+    lua_content = mw.readFile(lua_conf_tpl)
+    lua_content = lua_content.replace('{$SERVER_PATH}', service_path)
+    mw.writeFile(lua_conf, lua_content)
 
     empty_lua = lua_conf_dir + '/empty.lua'
     if not os.path.exists(empty_lua):
         mw.writeFile(empty_lua, '')
+
+    mw.opLuaMakeAll()
 
     # 静态配置
     php_conf = mw.getServerDir() + '/web_conf/php/conf'
@@ -203,8 +204,8 @@ def initDreplace():
         mw.writeFile(file_bin, content)
         mw.execShell('chmod +x ' + file_bin)
 
-        # config replace
-        confReplace()
+    # config replace
+    confReplace()
 
     # systemd
     # /usr/lib/systemd/system

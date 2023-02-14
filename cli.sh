@@ -21,12 +21,12 @@ mw_start_task()
         sleep 0.3
         isStart=$(ps aux |grep 'task.py'|grep -v grep|awk '{print $2}')
         if [ "$isStart" == '' ];then
-                echo -e "\033[31mfailed\033[0m"
-                echo '------------------------------------------------------'
-                tail -n 20 $DIR/logs/task.log
-                echo '------------------------------------------------------'
-                echo -e "\033[31mError: mw-tasks service startup failed.\033[0m"
-                return;
+            echo -e "\033[31mfailed\033[0m"
+            echo '------------------------------------------------------'
+            tail -n 20 $DIR/logs/task.log
+            echo '------------------------------------------------------'
+            echo -e "\033[31mError: mw-tasks service startup failed.\033[0m"
+            return;
         fi
         echo -e "\033[32mdone\033[0m"
     else
@@ -62,14 +62,14 @@ mw_stop()
 	PLIST=`ps -ef|grep app:app |grep -v grep|awk '{print $2}'`
 	for i in $PLIST
 	do
-	    kill -9 $i
+	    kill -9 $i > /dev/null 2>&1
 	done
 
 	pids=`ps -ef|grep task.py | grep -v grep |awk '{print $2}'`
 	arr=($pids)
     for p in ${arr[@]}
     do
-    	kill -9 $p
+    	kill -9 $p > /dev/null 2>&1
     done
 }
 

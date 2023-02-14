@@ -16,7 +16,7 @@ function version_lt() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)"
 function version_ge() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" == "$1"; }
 
 
-version=8.2.0
+version=8.2.2
 PHP_VER=82
 Install_php()
 {

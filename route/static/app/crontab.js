@@ -257,7 +257,7 @@ function planAdd(){
 	$("#set-Config input[name='sType']").val(sType);
 	$("#set-Config textarea[name='sBody']").val(decodeURIComponent(sBody));
 	
-	if(sType == 'site' || sType == 'database'){
+	if(sType == 'site' || sType == 'database' || sType == 'path'){
 		var backupTo = $(".planBackupTo").find("b").attr("val");
 		$("#backupTo").val(backupTo);
 	}
@@ -293,10 +293,17 @@ function planAdd(){
 		var where1 = $("#ptime input[name='where1']").val();
 		$("#set-Config input[name='where1']").val(where1);
 	}
+
+	if (type == 'month'){
+		var where1 = $("#ptime input[name='where1']").val();
+		$("#set-Config input[name='where1']").val(where1);
+	}
+	
 	
 	$("#set-Config input[name='sName']").val(sName);
 	layer.msg('正在添加,请稍候...!',{icon:16,time:0,shade: [0.3, '#000']});
 	var data = $("#set-Config").serialize() + '&sBody='+sBody + '&urladdress=' + urladdress;
+	// console.log(data);
 	$.post('/crontab/add',data,function(rdata){
 		if(!rdata.status) {
 			layer.msg(rdata.msg,{icon:2, time:2000});

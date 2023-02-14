@@ -200,7 +200,7 @@ function webAddPage(type) {
 		}
 
 		domainlist = domainlist.substring(0,domainlist.length-1);//子域名json
-		domain ='{"domain":"'+domain[0]+'","domainlist":['+domainlist+'],"count":'+domain.length+'}';//拼接joson
+		domain ='{"domain":"'+domain[0]+'","domainlist":['+domainlist+'],"count":'+domain.length+'}';//拼接json
 		var loadT = layer.msg(lan.public.the_get,{icon:16,time:0,shade: [0.3, "#000"]})
 		var data = $("#addweb").serialize()+"&port="+webport+"&webinfo="+domain;
 

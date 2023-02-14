@@ -14,7 +14,7 @@
 
 
 PATH=/usr/local/bin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
-# export LANG=en_US.UTF-8
+export LANG=en_US.UTF-8
 
 mw_path={$SERVER_PATH}
 PATH=$PATH:$mw_path/bin
@@ -38,7 +38,7 @@ mw_start_panel()
             sleep 0.5
             isStart=$(lsof -n -P -i:$port|grep LISTEN|grep -v grep|awk '{print $2}'|xargs)
             let n+=1
-            if [ $n -gt 15 ];then
+            if [ $n -gt 20 ];then
                 break;
             fi
         done
@@ -98,7 +98,7 @@ mw_stop_task()
     arr=($pids)
     for p in ${arr[@]}
     do
-            kill -9 $p
+        kill -9 $p  > /dev/null 2>&1
     done
     echo -e "\033[32mdone\033[0m"
 }
@@ -109,7 +109,7 @@ mw_stop_panel()
     arr=`ps aux|grep 'gunicorn -c setting.py app:app'|grep -v grep|awk '{print $2}'`
     for p in ${arr[@]}
     do
-        kill -9 $p &>/dev/null
+        kill -9 $p > /dev/null 2>&1
     done
     
     pidfile=${mw_path}/logs/mw.pid
@@ -313,11 +313,18 @@ case "$1" in
             auth_path=$(cat $mw_path/data/admin_path.pl)
         fi
 	    
-        if [ "$address" = "" ];then
+        if [ "$address" == "" ];then
             v4=$(python3 $mw_path/tools.py getServerIp 4)
             v6=$(python3 $mw_path/tools.py getServerIp 6)
 
             if [ "$v4" != "" ] && [ "$v6" != "" ]; then
+
+                if [ ! -f $mw_path/data/ipv6.pl ];then
+                    echo 'True' > $mw_path/data/ipv6.pl
+                    mw_stop
+                    mw_start
+                fi
+
                 address="MW-Panel-Url-Ipv4: http://$v4:$port$auth_path \nMW-Panel-Url-Ipv6: http://[$v6]:$port$auth_path"
             elif [ "$v4" != "" ]; then
                 address="MW-Panel-Url: http://$v4:$port$auth_path"

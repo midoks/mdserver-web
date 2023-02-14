@@ -54,7 +54,9 @@ def createBgTask():
         "period": "minute-n",
         "minute-n": "1",
     }
-    createBgTaskByName(getPluginName(), args)
+
+    if mw.isAppleSystem():
+        createBgTaskByName(getPluginName(), args)
 
 
 def createBgTaskByName(name, args):
@@ -97,8 +99,14 @@ logs_file=$plugin_path/${rname}.log
 ''' % (mw_dir, name, getServerDir(), getPluginDir())
     cmd += 'echo "★【`date +"%Y-%m-%d %H:%M:%S"`】 STSRT★" >> $logs_file' + "\n"
     cmd += 'echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" >> $logs_file' + "\n"
-    cmd += 'echo "cd $mw_dir && source bin/activate && python3 $script_path/tool_task.py run >> $logs_file 2>&1"' + "\n"
-    cmd += 'cd $mw_dir && source bin/activate && python3 $script_path/tool_task.py run >> $logs_file 2>&1' + "\n"
+
+    if mw.isAppleSystem():
+        cmd += 'echo "cd $mw_dir && source bin/activate && python3 $script_path/tool_task.py run >> $logs_file 2>&1"' + "\n"
+        cmd += 'cd $mw_dir && source bin/activate && python3 $script_path/tool_task.py run >> $logs_file 2>&1' + "\n"
+    else:
+        cmd += 'echo "cd $mw_dir && source bin/activate && bash $script_path/shell/cpu_usage_file.sh >> $logs_file 2>&1"' + "\n"
+        cmd += 'cd $mw_dir && source bin/activate && bash $script_path/shell/cpu_usage.sh >> $logs_file 2>&1' + "\n"
+
     cmd += 'echo "【`date +"%Y-%m-%d %H:%M:%S"`】 END★" >> $logs_file' + "\n"
     cmd += 'echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" >> $logs_file' + "\n"
 
@@ -128,6 +136,9 @@ logs_file=$plugin_path/${rname}.log
 
 
 def removeBgTask():
+    if not mw.isAppleSystem():
+        return False
+
     cfg_list = getConfigData()
     for x in range(len(cfg_list)):
         cfg = cfg_list[x]
@@ -147,10 +158,15 @@ def removeBgTask():
 
 
 def getCpuUsed():
-    import psutil
-    used = psutil.cpu_percent(interval=1)
     path = getServerDir() + "/cpu.info"
-    mw.writeFile(path, str(int(used)))
+    if mw.isAppleSystem():
+        import psutil
+        used = psutil.cpu_percent(interval=1)
+        mw.writeFile(path, str(int(used)))
+    else:
+        cmd = "top -bn 1 | fgrep 'Cpu(s)' | awk '{print 100 -$8}' | awk -F . '{print $1}'"
+        data = mw.execShell(cmd)
+        mw.writeFile(path, str(int(data[0].strip())))
 
 
 def run():

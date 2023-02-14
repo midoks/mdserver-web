@@ -43,13 +43,16 @@ class App():
 
         if args_len == 1:
             t = args[0].strip('{').strip('}')
-            t = t.split(':')
+            if t.strip() == '':
+                tmp = []
+            else:
+                t = t.split(':')
+                tmp[t[0]] = t[1]
             tmp[t[0]] = t[1]
         elif args_len > 1:
             for i in range(len(args)):
                 t = args[i].split(':')
                 tmp[t[0]] = t[1]
-
         return tmp
 
     def checkArgs(self, data, ck=[]):
@@ -110,7 +113,7 @@ class App():
 
     def getSshInfo(self, file):
         rdata = mw.readFile(file)
-        destr = mw.deCrypt('mdserver-web', rdata)
+        destr = mw.enDoubleCrypt('mdserver-web', rdata)
         return json.loads(destr)
 
     def get_server_by_host(self):
@@ -199,7 +202,7 @@ class App():
         if not os.path.exists(dst_host_dir):
             os.makedirs(dst_host_dir)
 
-        enstr = mw.enCrypt('mdserver-web', json.dumps(info))
+        enstr = mw.enDoubleCrypt('mdserver-web', json.dumps(info))
         mw.writeFile(dst_host_dir + '/info.json', enstr)
         return mw.returnJson(True, '添加成功!')
 

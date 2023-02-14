@@ -1,0 +1,292 @@
+<style>
+.migration_content {
+    position: relative;
+    height: 450px;
+}
+.step_head::after {
+    background-color: #ddd;
+    border-top: 2px solid #ccc;
+    content: "";
+    display: block;
+    height: 3px;
+    left: 84px;
+    position: absolute;
+    top: 14px;
+    width: 500px;
+    z-index: -1;
+}
+.step_head {
+    margin: 20px 0;
+}
+.step_head ul li {
+    width: 24.5%;
+    display: inline-block;
+}
+.step_head ul li span {
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    display: block;
+    border-radius: 15px;
+    background-color: #ddd;
+    color: #878787;
+    margin: 0 auto;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 600;
+}
+.step_head ul li p {
+    text-align: center;
+    margin-top: 15px;
+}
+.step_head ul li.active span {
+    background-color: #20A53A;
+    color: #fff;
+}
+.step_content {
+    text-align: center;
+}
+.boxHide {
+    display: none
+}
+.step_content .psync_info input {
+    width: 300px;
+}
+.step_content .psync_info .panel_setp_span {
+    height: 32px;
+    line-height: 32px;
+    overflow: hidden;
+    padding-right: 20px;
+    text-align: right;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 130px;
+    display: inline-block;
+    float: left;
+}
+.step_content .psync_info .mtb20{
+    padding-left: 40px;
+    text-align: left;
+}
+.psync_path .table {
+    text-align: left;
+}
+.psync_path .table > tbody > tr > td:nth-child(2n),
+.psync_path .table > thead > tr > th:nth-child(2n),
+.terlist .table > thead > tr > th:nth-child(2n),
+.terlist .table > tbody > tr > td:nth-child(2n),
+.terlist .table > tbody > tr > td:nth-child(1),
+.terlist .table > thead > tr > th:nth-child(1) {
+    border-right: #ddd 1px solid;
+}
+
+.checkbox_conten {
+    background-color: #f3f3f3;
+    border: #ddd 1px solid;
+    border-radius: 4px;
+    padding: 10px;
+    margin: 0px 50px;
+}
+
+.checkbox_item span {
+    display: inline-block;
+    height: 15px;
+    overflow: hidden;
+    text-align: left;
+    display: block;
+    padding-left: 20px;
+    height: 20px;
+    line-height: 20px;
+    width: 152px;
+    text-overflow: ellipsis;
+}
+
+label.checkbox_label {
+    margin-left: 6px;
+    margin-bottom: 0;
+}
+
+label.checkbox_label span {
+    color: #000;
+}
+.psync_data {
+	display: none;
+}
+.psync_data .checkbox_item input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    position: absolute;
+    top: 50%;
+    margin-top: -6px;
+}
+
+.checkbox_item label {
+    font-weight: normal;
+    white-space: nowrap;
+    position: relative;
+}
+
+.psync_data .checkbox_data {
+    margin: 0 5px 5px;
+    display: inline-block;
+    width: 166px;
+    vertical-align: text-top;
+}
+
+.psync_data .checkbox_data:last-child {
+    margin-right: 0;
+}
+
+.checkbox_item ul {
+    background-color: #fff;
+    max-height: 174px;
+    overflow: auto;
+    width: 100%;
+    display: block;
+    margin-top: 10px;
+}
+
+.checkbox_item ul li {
+    padding: 0 6px;
+}
+
+.psync_data .checkbox_con {
+    display: block
+}
+
+.progress {
+    background-color: #e2e2e2;
+    border-radius: 8px;
+    height: 16px;
+    line-height: 16px;
+    position: relative;
+}
+
+.progress-bar {
+    background-color: #5ab76c;
+    border-radius: 8px;
+    height: 16px;
+    max-width: 100%;
+    position: absolute;
+    text-align: right;
+    transition: all 0.3s ease 0s;
+    width: 0;
+}
+
+.progress-text {
+    font-size: 12px;
+    color: #fff;
+    padding: 0 10px;
+    position: static;
+}
+
+.qystatus {
+    color: #666;
+    margin-bottom: 10px;
+    margin-left: 5px;
+}
+
+.success {
+    padding: 50px 0 60px;
+    margin-left: -60px;
+}
+
+.success p {
+    margin-top: 20px;
+    font-size: 16px;
+    color: #666;
+}
+.psync_tips{
+    color: red;
+    font-size: 15px;
+    background-color: #fbfbfb;
+    border: 1px solid #eee;
+    line-height: 46px;
+    margin-bottom: 15px;
+    padding-left: 10px;
+}
+.psync_tips span{
+    font-size: 12px;
+}
+</style>
+<div class="migration_api pd15">
+	<div class="migration_content">
+		<div class="step_head">
+			<ul>
+				<li class="active"><span>1</span><p>填写信息</p></li>
+				<li><span>2</span><p>检测环境</p></li>
+				<li><span>3</span><p>选择数据</p></li>
+				<li><span>4</span><p>一键迁移</p></li>
+			</ul>
+		</div>
+
+		<div class="step_content">
+            <div class="pd15 psync_info">
+                <div class="psync_tips">
+                	<span class="glyphicon glyphicon-alert" style="color: #f39c12; margin-right: 10px;"></span>只需在发送数据服务器安装本软件，请填写<span>『 接收数据服务器 』</span>资料。
+                	<a href="#" target="_blank" class="bt-ico-ask" style="cursor: pointer;">?</a>
+                </div>
+                <div class="mtb20">
+                    <span class="panel_setp_span">接收数据的面板地址</span>
+                    <input type="text" class="bt-input-text" name="psync_url" value="" placeholder="接收数据面板地址，如: http://127.0.0.1:8888">
+                </div>
+                <div class="mtb20">
+                    <span class="panel_setp_span">接收数据的面板API</span>
+                    <input type="text" class="bt-input-text" name="psync_token" value="" placeholder="接收数据面板API密钥" />
+                    <a href="#" target="_blank" class="btlink ml5">获取API秘钥</a>
+                </div>
+                <div class="mtb20">
+                    <span class="panel_setp_span">IP白名单</span>
+                    <span style="height: 32px;line-height: 32px;">必须将本机器IP加入接收数据服务器API的IP白名单，<a href="#" href="javascript:;" target="_blank" class="btlink">如何添加白名单</a></span>
+                </div>
+                <div class="mtb20" style="text-align: left;margin-left: 130px;">
+                    <button class="btn btn-success infoNext">下一步</button>
+                </div>
+            </div>
+            <div class="pa15 psync_path" style="margin:0 50px">
+            </div>
+            <div class="pa15 psync_data" style="text-align: left;">
+                <div class="checkbox_conten">
+                    <div class="checkbox_data">
+                        <div class="checkbox_item">
+                            <label class="checkbox_label">
+                                <input type="checkbox" id="sites_All" checked>
+                                <span>网站</span>
+                            </label>
+                            <ul></ul>
+                        </div>
+                    </div>
+                    <div class="checkbox_data">
+                        <div class="checkbox_item">
+                            <label class="checkbox_label">
+                                <input type="checkbox" id="db_All" checked>
+                                <span>数据库</span>
+                            </label>
+                            <ul></ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="line mtb20" style="margin:20px 0 0 50px">
+                    <button class="btn btn-default btn-sm mr20 dataBack">上一步</button>
+                    <button class="btn btn-success btn-sm dataMigrate">一键迁移</button>
+                </div>
+            </div>
+            <div class="pa15 psync_migrate"></div>
+        </div>
+        <hr style="margin-top: 5px;" />
+        <div class="step_footer" style="margin: 5px 0 0 20px;text-align: left;">
+            <ul class="help-info-text c7 mlr20" style="margin-top: 0px;">
+                <li>一键迁移过程中是后台执行可以关闭当前窗口</li>
+                <li>一键迁移迁移数据不涉及原来数据的增删（是将原来数据打包发送）</li>
+            </ul>
+        </div>
+	</div>
+</div>
+
+
+<script type="text/javascript">
+resetPluginWinWidth(700);
+$.getScript( "/plugins/file?name=migration_api&f=js/app.js", function(){
+    initStep();
+});
+</script>

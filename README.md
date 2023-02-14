@@ -29,6 +29,12 @@
 基本上可以使用,后续会继续优化!欢迎提供意见！
 
 - 吹水组 - https://t.me/mdserver_web
+
+```
+如果出现问题，最好私给我面板信息。不要让我猜。如果不提供，不要提出问题，自行解决。  — 座右铭
+Talk is cheap, show me the code.  -- linus
+```
+
 - [兼容性测试报告](/compatibility.md)
 - [常用命令说明](/cmd.md)
 
@@ -38,6 +44,7 @@
 * PHP[53-82] - PHP是世界上最好的编程语言。
 * MySQL - 一种关系数据库管理系统。
 * MariaDB - 是MySQL的一个重要分支。
+* MySQL[APT/YUM] - 一种关系数据库管理系统。
 * MongoDB - 一种非关系NOSQL数据库管理系统。
 * phpMyAdmin - 著名Web端MySQL管理工具。
 * Memcached - 一个高性能的分布式内存对象缓存系统。
@@ -84,26 +91,23 @@ PHP[72-81]支持phpMyAdmin[5.2.0]
 # Docker
 
 - 由[DDSRem](https://github.com/DDSRem)开发维护。
-- https://hub.docker.com/r/ddsderek/mw-server
+- https://hub.docker.com/r/ddsderek/mw
 
 ```
 docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:443 -p 888:888 ddsderek/mw-server:latest
 ```
 
 
-### 版本更新 0.12.2
+### 版本更新 0.12.3
 
-* 开放菜单权限配置。
-* 升级SSH终端2.0。
-* 增加已安装类型。
-* 加入切换linux软件源的命令。
-* iptables安装优化。
-* 网站统计POST获取数据优化。
-* mysql[apt/yum]迁移优化。
-* 优化防火墙导入。
-* 图标可设置。
+* 优先使用firewalld防火墙。
+* PHP[APT]加入curl扩展。
+* 配置添加【未认证响应状态】功能。
+* 存在ipv6时，启动时强制开启。
+* OP防火墙-性能优化。
+* 网站统计优化。
+* 优化backup_ftp插件。
 * 各种细节优化。
-
 
 ### JSDelivr安装地址
 

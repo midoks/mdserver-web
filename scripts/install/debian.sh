@@ -25,38 +25,44 @@ if [ ! -z "$cn" ];then
 fi
 ntpdate $NTPHOST | logger -t NTP
 
+SSH_PORT=`netstat -ntpl|grep sshd|grep -v grep | sed -n "1,1p" | awk '{print $4}' | awk -F : '{print $2}'`
+echo "SSH PORT:${SSH_PORT}"
+
+# choose lang cmd
+# dpkg-reconfigure --frontend=noninteractive locales
 if [ ! -f /usr/sbin/locale-gen ];then
 	apt install -y locales
 	sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen
 	locale-gen en_US.UTF-8
-	localedef -v -c -i en_US -f UTF-8 en_US.UTF-8
-	dpkg-reconfigure --frontend=noninteractive locales
+	localedef -v -c -i en_US -f UTF-8 en_US.UTF-8 > /dev/null 2>&1
 	update-locale LANG=en_US.UTF-8
 else
 	locale-gen en_US.UTF-8
-	localedef -v -c -i en_US -f UTF-8 en_US.UTF-8
+	localedef -v -c -i en_US -f UTF-8 en_US.UTF-8 > /dev/null 2>&1
 fi
 
 apt-get update -y
 apt install -y wget curl lsof unzip tar cron expect locate 
 apt install -y python3-pip python3-dev python3-venv
 
-if [ -f /usr/sbin/ufw ];then
 
-	ufw allow 22/tcp
-	ufw allow 80/tcp
-	ufw allow 443/tcp
-	ufw allow 888/tcp
-	# ufw allow 7200/tcp
-	# ufw allow 3306/tcp
-	# ufw allow 30000:40000/tcp
-fi
+# if [ -f /usr/sbin/ufw ];then
+# 	if [ "$SSH_PORT" != "" ];then
+# 		ufw allow $SSH_PORT/tcp
+# 	else
+# 		ufw allow 22/tcp
+# 	fi
 
-if [ -f /usr/sbin/ufw ];then
-	ufw disable
-fi
+# 	ufw allow 80/tcp
+# 	ufw allow 443/tcp
+# 	ufw allow 888/tcp
+# fi
 
-if [ ! -f /usr/sbin/ufw ];then
+# if [ -f /usr/sbin/ufw ];then
+# 	ufw disable
+# fi
+
+if [ ! -f /usr/sbin/firewalld ];then
 	# look
     # firewall-cmd --list-all
 
@@ -66,20 +72,20 @@ if [ ! -f /usr/sbin/ufw ];then
     systemctl unmask firewalld
 	systemctl start firewalld
 
-	firewall-cmd --permanent --zone=public --add-port=22/tcp
+	if [ "$SSH_PORT" != "" ];then
+		firewall-cmd --permanent --zone=public --add-port=${SSH_PORT}/tcp
+	else
+		firewall-cmd --permanent --zone=public --add-port=22/tcp
+	fi
 	firewall-cmd --permanent --zone=public --add-port=80/tcp
 	firewall-cmd --permanent --zone=public --add-port=443/tcp
 	firewall-cmd --permanent --zone=public --add-port=888/tcp
-	# firewall-cmd --permanent --zone=public --add-port=7200/tcp
-	# firewall-cmd --permanent --zone=public --add-port=3306/tcp
-	# firewall-cmd --permanent --zone=public --add-port=30000-40000/tcp
 
 	# fix:debian10 firewalld faq
 	# https://kawsing.gitbook.io/opensystem/andoid-shou-ji/untitled/fang-huo-qiang#debian-10-firewalld-0.6.3-error-commandfailed-usrsbinip6tablesrestorewn-failed-ip6tablesrestore-v1.8
 	sed -i 's#IndividualCalls=no#IndividualCalls=yes#g' /etc/firewalld/firewalld.conf
 
 	firewall-cmd --reload
-
 	#安装时不开启
 	systemctl stop firewalld
 fi

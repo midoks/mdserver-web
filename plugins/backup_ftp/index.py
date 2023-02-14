@@ -194,14 +194,17 @@ def backupAllFunc(stype):
             '/scripts/backup.py ' + args
 
     os.system(cmd)
-    # 开始执行上传信息
 
-    bk_prefix = prefix_dict[stype]
-    bk_name = stype
+    # 开始执行上传信息.
+
     if stype.find('database_') > -1:
         bk_name = 'database'
         plugin_name = stype.replace('database_', '')
         bk_prefix = plugin_name + '/db'
+        stype = 'database'
+    else:
+        bk_prefix = prefix_dict[stype]
+        bk_name = stype
 
     find_path = mw.getBackupDir() + '/' + bk_name + '/' + bk_prefix + '_' + name
     find_new_file = "ls " + find_path + \
@@ -212,10 +215,10 @@ def backupAllFunc(stype):
         mw.echoInfo("not find upload file!")
         return False
 
+    print("|-准备上传文件 {}".format(filename))
     ftp = FtpPSClient()
     ftp.uploadFile(filename, stype)
-
-    return True
+    return ''
 
 
 def backupSite():

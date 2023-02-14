@@ -154,11 +154,15 @@ data/basic_auth.json
 data/api.json
 data/bind_domain.pl
 
+plugins/vip_*
+plugins/own_*
+plugins/my_*
 plugins/l2tp
 plugins/openlitespeed
-plugins/migration_api
 plugins/system_safe
 plugins/tamper_proof
+plugins/tamper_proof_*
+plugins/op_load_balance
 plugins/gdrive
 plugins/mtproxy
 plugins/zimg
@@ -171,3 +175,4 @@ plugins/file_search
 debug.out
 
 
+data/unauthorized_status.pl

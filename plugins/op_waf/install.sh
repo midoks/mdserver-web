@@ -24,7 +24,7 @@ else
 fi
 
 
-Install_of(){
+Install_App(){
 	
 	echo '正在安装脚本文件...' > $install_tmp
 	mkdir -p $serverPath/source/op_waf
@@ -41,7 +41,9 @@ Install_of(){
 		cd $serverPath/source/op_waf && tar xvf luarocks-3.5.0.tar.gz
 		# cd luarocks-3.9.1 && ./configure && make bootstrap
 
-		cd luarocks-3.5.0 && ./configure --prefix=$serverPath/op_waf/luarocks --with-lua-include=$serverPath/openresty/luajit/include/luajit-2.1 --with-lua-bin=$serverPath/openresty/luajit/bin
+		cd luarocks-3.5.0 && ./configure --prefix=$serverPath/op_waf/luarocks \
+		--with-lua-include=$serverPath/openresty/luajit/include/luajit-2.1 \
+		--with-lua-bin=$serverPath/openresty/luajit/bin
 		make -I${serverPath}/openresty/luajit/bin
 		make install 
 	fi
@@ -85,13 +87,10 @@ Install_of(){
 	echo 'install ok' > $install_tmp
 
 	cd ${rootPath} && python3 ${rootPath}/plugins/op_waf/index.py start
-
-	
-
 	# cd ${rootPath} && python3 ${rootPath}/plugins/op_waf/index.py restart
 }
 
-Uninstall_of(){
+Uninstall_App(){
 
 	cd ${rootPath} && python3 ${rootPath}/plugins/op_waf/index.py stop
 	if [ "$?" == "0" ];then
@@ -102,7 +101,7 @@ Uninstall_of(){
 
 action=$1
 if [ "${1}" == 'install' ];then
-	Install_of
+	Install_App
 else
-	Uninstall_of
+	Uninstall_App
 fi
