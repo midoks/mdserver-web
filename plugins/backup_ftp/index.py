@@ -217,8 +217,7 @@ def backupAllFunc(stype):
     print("|-准备上传文件 {}".format(filename))
     ftp = FtpPSClient()
     ftp.uploadFile(filename, stype)
-
-    return True
+    return ''
 
 
 def backupSite():
