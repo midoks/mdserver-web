@@ -106,7 +106,16 @@ fi
 
 
 echo "use system version: ${OSNAME}"
-cd /www/server/mdserver-web && bash scripts/install/${OSNAME}.sh
+
+if [ "${OSNAME}" == "macos" ];then
+	cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
+	HTTP_PREFIX="https://"
+	if [ ! -z "$cn" ];then
+	    HTTP_PREFIX="https://ghproxy.com/"
+	fi
+else
+	cd /www/server/mdserver-web && bash scripts/install/${OSNAME}.sh
+fi
 
 if [ "${OSNAME}" == "macos" ];then
 	echo "macos end"

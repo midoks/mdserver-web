@@ -94,9 +94,12 @@ fi
 echo "use system version: ${OSNAME}"
 
 if [ "${OSNAME}" == "macos" ];then
-	USER=$(who | sed -n "2,1p" |awk '{print $1}')
-	DEV="/Users/${USER}/Desktop/mwdev"
-	cd $DEV && bash scripts/install/${OSNAME}.sh
+	cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
+	HTTP_PREFIX="https://"
+	if [ ! -z "$cn" ];then
+	    HTTP_PREFIX="https://ghproxy.com/"
+	fi
+	curl -fsSL ${HTTP_PREFIX}https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/install/macos.sh | bash
 else
 	cd /www/server/mdserver-web && bash scripts/install/${OSNAME}.sh
 fi
