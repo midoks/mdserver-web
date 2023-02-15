@@ -47,6 +47,12 @@ def getCfgData():
     return json.loads(t)
 
 
+def writeConf(data):
+    path = getConf()
+    mw.writeFile(path, json.dumps(data))
+    return True
+
+
 def getArgs():
     args = sys.argv[2:]
     tmp = {}
@@ -88,8 +94,14 @@ def stepOne():
     if not data[0]:
         return data[1]
 
+    url = args['url']
+    token = args['token']
+
     data = getCfgData()
-    print(data)
+
+    data['url'] = url
+    data['token'] = token
+    writeConf(data)
 
     return mw.returnJson(True, 'ok')
 
