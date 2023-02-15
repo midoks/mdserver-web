@@ -73,7 +73,7 @@ phpMyAdmin[4.4.15]支持MySQL[5.5-5.7]
 phpMyAdmin[5.2.0]支持MySQL[8.0]
 
 PHP[53-72]支持phpMyAdmin[4.4.15]
-PHP[72-81]支持phpMyAdmin[5.2.0]
+PHP[72-82]支持phpMyAdmin[5.2.0]
 ```
 
 # 特别赞助
