@@ -92,7 +92,14 @@ if [ $OSNAME != "macos" ];then
 fi
 
 echo "use system version: ${OSNAME}"
-cd /www/server/mdserver-web && bash scripts/install/${OSNAME}.sh
+
+if [ "${OSNAME}" == "macos" ];then
+	USER=$(who | sed -n "2,1p" |awk '{print $1}')
+	DEV="/Users/${USER}/Desktop/mwdev"
+	cd $DEV && bash scripts/install/${OSNAME}.sh
+else
+	cd /www/server/mdserver-web && bash scripts/install/${OSNAME}.sh
+fi
 
 if [ "${OSNAME}" == "macos" ];then
 	echo "macos end"
