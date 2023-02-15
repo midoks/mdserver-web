@@ -59,7 +59,9 @@ function maPostCallbak(method, args, callback){
 
 
 function initStep1(){
-    maPost('step_one',{}, function(rdata){
+    var url = $('input[name="sync_url"]').val();
+    var token = $('input[name="sync_token"]').val();
+    maPost('step_one',{url:url,token:token}, function(rdata){
         console.log(rdata);
     });
 }

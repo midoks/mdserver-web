@@ -5,6 +5,7 @@ import io
 import os
 import time
 import re
+import json
 
 sys.path.append(os.getcwd() + "/class/core")
 import mw
@@ -42,7 +43,7 @@ def getCfgData():
     if not os.path.exists(path):
         mw.writeFile(path, '{}')
 
-    t = mw.returnJson(path)
+    t = mw.readFile(path)
     return json.loads(t)
 
 
@@ -82,6 +83,11 @@ def initDreplace():
 
 
 def stepOne():
+    args = getArgs()
+    data = checkArgs(args, ['url', 'token'])
+    if not data[0]:
+        return data[1]
+
     data = getCfgData()
     print(data)
 
@@ -97,6 +103,6 @@ if __name__ == "__main__":
     elif func == 'stop':
         print(stop())
     elif func == 'step_one':
-        print(saveConf())
+        print(stepOne())
     else:
         print('error')
