@@ -108,6 +108,11 @@ fi
 echo "use system version: ${OSNAME}"
 cd /www/server/mdserver-web && bash scripts/install/${OSNAME}.sh
 
+if [ "${OSNAME}" == "macos" ];then
+	echo "macos end"
+	exit 0
+fi
+
 cd /www/server/mdserver-web && bash cli.sh start
 isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`
 n=0
