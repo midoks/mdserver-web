@@ -113,6 +113,7 @@ if [ "${OSNAME}" == "macos" ];then
 	if [ ! -z "$cn" ];then
 	    HTTP_PREFIX="https://ghproxy.com/"
 	fi
+	curl -fsSL ${HTTP_PREFIX}https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/install/macos.sh | bash
 else
 	cd /www/server/mdserver-web && bash scripts/install/${OSNAME}.sh
 fi
