@@ -198,7 +198,7 @@ def set_panel_username(username=None):
 def getServerIp():
     version = sys.argv[2]
     ip = mw.execShell(
-        "curl -{} -sS --connect-timeout 5 -m 60 https://v6r.ipip.net/?format=text".format(version))
+        "curl --insecure -{} -sS --connect-timeout 5 -m 60 https://v6r.ipip.net/?format=text".format(version))
     print(ip[0])
 
 
