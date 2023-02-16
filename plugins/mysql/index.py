@@ -2414,10 +2414,12 @@ def initSlaveStatusSyncUser(version=''):
 
     if u['cmd'] == '' and local_mode == 'gtid':
         sql = makeSyncUsercmd(u, version)
+        # print(sql)
         t = db.query(sql)
     else:
         if u['cmd'] == '':
             return mw.returnJson(False, '经典模式下,必须手写同步命令!')
+        # print(u['cmd'])
         t = db.query(u['cmd'])
     isError = isSqlError(t)
     if isError:
