@@ -204,8 +204,8 @@ def initDreplace():
         mw.writeFile(file_bin, content)
         mw.execShell('chmod +x ' + file_bin)
 
-    # config replace
-    confReplace()
+        # config replace
+        confReplace()
 
     # systemd
     # /usr/lib/systemd/system
