@@ -47,7 +47,8 @@ Install_phpmyadmin()
 
 	mkdir -p ${serverPath}/phpmyadmin
 	mkdir -p ${serverPath}/source/phpmyadmin
-
+	echo "${1}" > ${serverPath}/phpmyadmin/version.pl
+	
 	VER=$1
 	
 	FDIR=phpMyAdmin-${VER}-all-languages
@@ -67,7 +68,7 @@ Install_phpmyadmin()
 	cd $serverPath/phpmyadmin/ && mv $FDIR phpmyadmin
 
 
-	echo "${1}" > ${serverPath}/phpmyadmin/version.pl
+	
 	echo '安装完成' > $install_tmp
 
 	cd ${rootPath} && python3 ${rootPath}/plugins/phpmyadmin/index.py start
