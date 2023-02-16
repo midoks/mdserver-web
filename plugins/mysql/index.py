@@ -2371,6 +2371,25 @@ def initSlaveStatus(version=''):
         return initSlaveStatusSyncUser(version)
 
 
+def makeSyncUsercmd(u, version=''):
+    mode = recognizeDbMode()
+    sql = ''
+
+    ip = u['ip']
+    port = u['port']
+    username = u['user']
+    password = u['pass']
+    if mode == "gtid":
+        sql = "CHANGE MASTER TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
+            username + "', MASTER_PASSWORD='" + \
+            password + "', MASTER_AUTO_POSITION=1"
+        if version == '8.0':
+            sql = "CHANGE REPLICATION SOURCE TO SOURCE_HOST='" + ip  + "', SOURCE_PORT=" + port + ", SOURCE_USER='" + \
+                username  + "', SOURCE_PASSWORD='" + \
+                password + "', MASTER_AUTO_POSITION=1"
+    return sql
+
+
 def initSlaveStatusSyncUser(version=''):
     conn = pSqliteDb('slave_sync_user')
     data = conn.field('ip,port,user,pass,mode,cmd').find()
@@ -2393,8 +2412,17 @@ def initSlaveStatusSyncUser(version=''):
     if local_mode != mode_name:
         return mw.returnJson(False, '同步模式不一致!')
 
-    t = db.query(u['cmd'])
-    # print(t)
+    if u['cmd'] == '' and local_mode == 'gtid':
+        sql = makeSyncUsercmd(u, version)
+        t = db.query(sql)
+    else:
+        if u['cmd'] == '':
+            return mw.returnJson(False, '经典模式下,必须手写同步命令!')
+        t = db.query(u['cmd'])
+    isError = isSqlError(t)
+    if isError:
+        return isError
+
     db.query("start slave user='{}' password='{}';".format(
         u['user'], u['pass']))
     return mw.returnJson(True, '初始化成功!')
