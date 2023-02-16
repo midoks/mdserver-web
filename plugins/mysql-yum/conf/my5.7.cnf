@@ -66,6 +66,7 @@ binlog-ignore-db = performance_schema
 #slave
 log-slave-updates
 #replicate-do-db
+slave_skip_errors=1062
 replicate-ignore-db = information_schema
 replicate-ignore-db = performance_schema
 replicate-ignore-db = mysql
