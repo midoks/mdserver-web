@@ -212,7 +212,8 @@ def get_src_config(args):
         diskInfo = psutil.disk_usage('/www')
     except:
         diskInfo = psutil.disk_usage('/')
-    serverInfo['disk'] = diskInfo[2]
+
+    serverInfo['disk'] = mw.toSize(diskInfo[2])
     return serverInfo
 
 
@@ -222,15 +223,32 @@ def get_dst_config(args):
     api = classApi(data['url'], data['token'])
     disk = api.send('/system/disk_info', {})
     info = api.send('/system/get_env_info', {})
-    print(disk)
-    print(info)
+
+    result = info['data']
+
+    result['disk'] = disk
+    return result
 
 
 def stepTwo():
     data = {}
     data['local'] = get_src_config(None)
     data['remote'] = get_dst_config(None)
+    return mw.returnJson(True, 'ok', data)
 
+
+def get_src_info(args):
+    # 获取本地服务器网站、数据库.
+    data = {}
+    data['sites'] = mw.M('sites').field(
+        "id,name,path,ps,status,addtime").order("id desc").select()
+    data['databases'] = mw.M('databases').field(
+        'id,name,ps').order("id desc").select()
+    return data
+
+
+def stepThree():
+    data = get_src_info(None)
     return mw.returnJson(True, 'ok', data)
 
 if __name__ == "__main__":
@@ -247,5 +265,7 @@ if __name__ == "__main__":
         print(stepOne())
     elif func == 'step_two':
         print(stepTwo())
+    elif func == 'step_three':
+        print(stepThree())
     else:
         print('error')

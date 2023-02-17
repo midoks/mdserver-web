@@ -92,24 +92,40 @@ function initStep2(){
                 $('.psync_info').hide();
 
                 var info = rdata.data;
-                
+
                 var body = '<div class="divtable">\
                     <table class="table table-hover">\
                     <thead>\
                         <tr><th style="border-right:1px solid #ddd">服务</th><th>当前服务器</th><th>远程服务器</th></tr>\
                     </thead>\
                     <tbody>\
-                        <tr><td style="border-right:1px solid #ddd">网站服务</td><td>'+info['local']['webserver']+'</td><td>OpenResty</td></tr>\
-                        <tr><td style="border-right:1px solid #ddd">安装MySQL</td><td>'+(info['local']['mysql']?'是':'否')+'</td><td>是</td></tr>\
-                        <tr><td style="border-right:1px solid #ddd">安装PHP</td><td>'+info['local']['php'].join('/')+'</td><td>74</td></tr>\
-                        <tr><td style="border-right:1px solid #ddd">可用磁盘</td><td>'+info['local']['disk']+'</td><td>54GB</td></tr>\
+                        <tr>\
+                            <td style="border-right:1px solid #ddd">网站服务</td>\
+                            <td>'+info['local']['webserver']+'</td>\
+                            <td>'+info['remote']['webserver']+'</td>\
+                        </tr>\
+                        <tr>\
+                            <td style="border-right:1px solid #ddd">安装MySQL</td>\
+                            <td>'+(info['local']['mysql']?'是':'否')+'</td>\
+                            <td>'+(info['remote']['mysql']?'是':'否')+'</td>\
+                        </tr>\
+                        <tr>\
+                            <td style="border-right:1px solid #ddd">安装PHP</td>\
+                            <td>'+(info['local']['php'].join('/'))+'</td>\
+                            <td>'+(info['remote']['php'].join('/')) +'</td>\
+                        </tr>\
+                        <tr>\
+                            <td style="border-right:1px solid #ddd">可用磁盘</td>\
+                            <td>'+info['local']['disk']+'</td>\
+                            <td>'+info['remote']['disk'][0]['size'][0]+'</td>\
+                        </tr>\
                     </tbody>\
                     </table>\
                     </div>';
                 body += '<div class="line mtb20" style="text-align: left;">\
                     <button class="btn btn-default btn-sm mr20 pathTestting">重新检测</button>\
                     <button class="btn btn-default btn-sm mr20 pathBcak">上一步</button>\
-                    <button class="btn btn-success btn-sm psync-next pathNext" disabled="disabled">下一步</button>\
+                    <button class="btn btn-success btn-sm psync-next pathNext">下一步</button>\
                 </div>';
 
                 $('.psync_path').html(body);
