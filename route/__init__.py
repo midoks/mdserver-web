@@ -458,14 +458,14 @@ def api(reqClass=None, reqAction=None, reqData=None):
     request_token = request.form.get('request_token', '')
     request_ip = request.remote_addr
 
+    if not mw.inArray(data['limit_addr'], request_ip):
+        return mw.returnJson(False, '非法请求,请添加IP白名单')
+
     local_token = mw.deCrypt(data['token'], data['token_crypt'])
     token_md5 = mw.md5(str(request_time) + mw.md5(local_token))
 
     if not (token_md5 == request_token):
         return mw.returnJson(False, '密钥错误')
-
-    if not mw.inArray(data['limit_addr'], request_ip):
-        return mw.returnJson(False, '非法请求,请添加IP白名单')
 
     if reqClass == None:
         return mw.returnJson(False, '请指定请求方法类')
