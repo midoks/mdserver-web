@@ -176,7 +176,6 @@ def stepOne():
     api = classApi(url, token)
     # api = classApi('http://127.0.0.1:7200','HfJNKGP5RPqGvhIOyrwpXG4A2fTjSh9B')
     rdata = api.send('/task/count', {})
-    # print(rdata)
     if type(rdata) != int:
         return mw.returnJson(False, rdata['msg'])
     data = getCfgData()
