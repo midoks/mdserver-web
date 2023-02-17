@@ -477,7 +477,7 @@ def api(reqClass=None, reqAction=None, reqData=None):
                  'plugins_api', 'system_api', 'site_api', 'task_api')
     className = reqClass + '_api'
     if not className in classFile:
-        return "external api request error"
+        return mw.returnJson(False, 'external api request error')
 
     eval_str = "__import__('" + className + "')." + className + '()'
     newInstance = eval(eval_str)
