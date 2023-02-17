@@ -444,7 +444,6 @@ def login_temp_user(token):
 
 @app.route('/api/<reqClass>/<reqAction>', methods=['POST', 'GET'])
 def api(reqClass=None, reqAction=None, reqData=None):
-
     comReturn = common.local()
     if comReturn:
         return comReturn
@@ -457,6 +456,7 @@ def api(reqClass=None, reqAction=None, reqData=None):
     request_time = request.form.get('request_time', '')
     request_token = request.form.get('request_token', '')
     request_ip = request.remote_addr
+    request_ip = request_ip.replace('::ffff:', '')
 
     if not mw.inArray(data['limit_addr'], request_ip):
         return mw.returnJson(False, '非法请求,请添加IP白名单')
