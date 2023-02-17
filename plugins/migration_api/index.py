@@ -49,7 +49,7 @@ class classApi:
 
     def __http_post_cookie(self, url, p_data, timeout=1800):
         try:
-            print(url)
+            # print(url)
             res = self._REQUESTS.post(url, p_data, timeout=timeout)
             return res.text
         except Exception as ex:
@@ -64,7 +64,6 @@ class classApi:
         url = self.__MW_PANEL + '/api' + url
         post_data = self.__get_key_data()  # 取签名
         post_data.update(args)
-        print(post_data)
         result = self.__http_post_cookie(url, post_data, timeout)
         try:
             return json.loads(result)
@@ -174,11 +173,12 @@ def stepOne():
     url = args['url']
     token = args['token']
 
-    # api = classApi(url, token)
+    api = classApi(url, token)
     # api = classApi('http://127.0.0.1:7200','HfJNKGP5RPqGvhIOyrwpXG4A2fTjSh9B')
     rdata = api.send('/task/count', {})
+    # print(rdata)
     if type(rdata) != int:
-        return mw.returnJson(False, '验证失败')
+        return mw.returnJson(False, rdata['msg'])
     data = getCfgData()
 
     data['url'] = url

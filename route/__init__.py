@@ -465,7 +465,7 @@ def api(reqClass=None, reqAction=None, reqData=None):
         return mw.returnJson(False, '密钥错误')
 
     if not mw.inArray(data['limit_addr'], request_ip):
-        return mw.returnJson(False, '非法请求')
+        return mw.returnJson(False, '非法请求,请添加IP白名单')
 
     if reqClass == None:
         return mw.returnJson(False, '请指定请求方法类')
