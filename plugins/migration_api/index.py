@@ -187,6 +187,52 @@ def stepOne():
     return mw.returnJson(True, '验证成功')
 
 
+# 获取本地服务器和环境配置
+def get_src_config(args):
+    serverInfo = {}
+    serverInfo['status'] = True
+    sdir = mw.getServerDir()
+
+    serverInfo['webserver'] = '未安装'
+    if os.path.exists(sdir + '/openresty/nginx/sbin/nginx'):
+        serverInfo['webserver'] = 'OpenResty'
+    serverInfo['php'] = []
+    phpversions = ['52', '53', '54', '55', '56', '70', '71',
+                   '72', '73', '74', '80', '81', '82', '83', '84']
+    phpPath = sdir + '/php/'
+    for pv in phpversions:
+        if not os.path.exists(phpPath + pv + '/bin/php'):
+            continue
+        serverInfo['php'].append(pv)
+    serverInfo['mysql'] = False
+    if os.path.exists(sdir + '/mysql/bin/mysql'):
+        serverInfo['mysql'] = True
+    import psutil
+    try:
+        diskInfo = psutil.disk_usage('/www')
+    except:
+        diskInfo = psutil.disk_usage('/')
+    serverInfo['disk'] = diskInfo[2]
+    return serverInfo
+
+
+def get_dst_config(args):
+
+    data = getCfgData()
+    api = classApi(data['url'], data['token'])
+    disk = api.send('/system/disk_info', {})
+    info = api.send('/system/get_env_info', {})
+    print(disk)
+    print(info)
+
+
+def stepTwo():
+    data = {}
+    data['local'] = get_src_config(None)
+    data['remote'] = get_dst_config(None)
+
+    return mw.returnJson(True, 'ok', data)
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -199,5 +245,7 @@ if __name__ == "__main__":
         print(getStepOneData())
     elif func == 'step_one':
         print(stepOne())
+    elif func == 'step_two':
+        print(stepTwo())
     else:
         print('error')

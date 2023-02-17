@@ -30,6 +30,7 @@ function maAsyncPost(method,args){
     return syncPost('/plugins/run', {name:'migration_api', func:method, args:_args}); 
 }
 
+
 function maPostCallbak(method, args, callback){
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
 
@@ -58,6 +59,16 @@ function maPostCallbak(method, args, callback){
 }
 
 
+function selectProgress(val){
+    $('.step_head li').removeClass('active');
+    $('.step_head li').each(function(){
+        var v = $(this).find('span').text();
+        if (val == v){
+            $(this).addClass('active');
+        }
+    });
+}
+
 function initStep1(){
     var url = $('input[name="sync_url"]').val();
     var token = $('input[name="sync_token"]').val();
@@ -65,21 +76,46 @@ function initStep1(){
         var rdata = $.parseJSON(rdata.data);
         showMsg(rdata.msg,function(){
             if (rdata.status){
-
+                selectProgress(2);
+                initStep2();
             }
         },{ icon: rdata.status ? 1 : 2 });
     });
 }
 
 function initStep2(){
-    maPost('step_one',{}, function(rdata){
+    maPost('step_two',{}, function(rdata){
         var rdata = $.parseJSON(rdata.data);
         console.log(rdata);
-        if (rdata.status){
+        showMsg(rdata.msg,function(){
+            if (rdata.status){
+                $('.psync_info').hide();
 
-        } else {
+                var info = rdata.data;
+                
+                var body = '<div class="divtable">\
+                    <table class="table table-hover">\
+                    <thead>\
+                        <tr><th style="border-right:1px solid #ddd">服务</th><th>当前服务器</th><th>远程服务器</th></tr>\
+                    </thead>\
+                    <tbody>\
+                        <tr><td style="border-right:1px solid #ddd">网站服务</td><td>'+info['local']['webserver']+'</td><td>OpenResty</td></tr>\
+                        <tr><td style="border-right:1px solid #ddd">安装MySQL</td><td>'+(info['local']['mysql']?'是':'否')+'</td><td>是</td></tr>\
+                        <tr><td style="border-right:1px solid #ddd">安装PHP</td><td>'+info['local']['php'].join('/')+'</td><td>74</td></tr>\
+                        <tr><td style="border-right:1px solid #ddd">可用磁盘</td><td>'+info['local']['disk']+'</td><td>54GB</td></tr>\
+                    </tbody>\
+                    </table>\
+                    </div>';
+                body += '<div class="line mtb20" style="text-align: left;">\
+                    <button class="btn btn-default btn-sm mr20 pathTestting">重新检测</button>\
+                    <button class="btn btn-default btn-sm mr20 pathBcak">上一步</button>\
+                    <button class="btn btn-success btn-sm psync-next pathNext" disabled="disabled">下一步</button>\
+                </div>';
 
-        }
+                $('.psync_path').html(body);
+                $('.psync_path').show();
+            } 
+        },{ icon: rdata.status ? 1 : 2 });
     });
 }
 
