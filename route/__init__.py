@@ -179,7 +179,6 @@ def requestCheck():
 
 
 def isLogined():
-    # print('isLogined', session)
     if 'login' in session and 'username' in session and session['login'] == True:
         userInfo = mw.M('users').where(
             "id=?", (1,)).field('id,username,password').find()
@@ -459,7 +458,8 @@ def api(reqClass=None, reqAction=None, reqData=None):
     request_token = request.form.get('request_token', '')
     request_ip = request.remote_addr
 
-    token_md5 = mw.md5(str(request_time) + mw.md5(data['token_crypt']))
+    local_token = mw.deCrypt(data['token'], data['token_crypt'])
+    token_md5 = mw.md5(str(request_time) + mw.md5(local_token))
 
     if not (token_md5 == request_token):
         return mw.returnJson(False, '密钥错误')

@@ -62,13 +62,24 @@ function initStep1(){
     var url = $('input[name="sync_url"]').val();
     var token = $('input[name="sync_token"]').val();
     maPost('step_one',{url:url,token:token}, function(rdata){
-        console.log(rdata);
+        var rdata = $.parseJSON(rdata.data);
+        showMsg(rdata.msg,function(){
+            if (rdata.status){
+
+            }
+        },{ icon: rdata.status ? 1 : 2 });
     });
 }
 
 function initStep2(){
     maPost('step_one',{}, function(rdata){
+        var rdata = $.parseJSON(rdata.data);
         console.log(rdata);
+        if (rdata.status){
+
+        } else {
+
+        }
     });
 }
 
@@ -86,11 +97,14 @@ function initStep4(){
 
 
 function initStep(){
-    console.log($('.infoNext'));
+     maPost('get_conf',{}, function(rdata){
+        var rdata = $.parseJSON(rdata.data);
+        $('input[name="sync_url"]').val(rdata.data['url']);
+        $('input[name="sync_token"]').val(rdata.data['token']);
+    });
+
     $('.infoNext').click(function(){
         var step = $('.step_head .active span').text();
-        // console.log(step);
-        // initStep1();
         switch(step){
             case '1':initStep1();break;
             case '2':initStep2();break;
