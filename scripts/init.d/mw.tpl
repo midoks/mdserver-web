@@ -217,11 +217,11 @@ mw_update_dev()
 
 mw_mirror()
 {
-    cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
+    cn=$(curl --insecure -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
     if [ ! -z "$cn" ];then
-        bash <(curl -sSL https://gitee.com/SuperManito/LinuxMirrors/raw/main/ChangeMirrors.sh)
+        bash <(curl --insecure -sSL https://gitee.com/SuperManito/LinuxMirrors/raw/main/ChangeMirrors.sh)
     else
-        bash <(curl -sSL https://raw.githubusercontent.com/midoks/change-linux-mirrors/main/change-mirrors.sh)
+        bash <(curl --insecure -sSL https://raw.githubusercontent.com/midoks/change-linux-mirrors/main/change-mirrors.sh)
     fi
     cd /www/server/mdserver-web
 }
