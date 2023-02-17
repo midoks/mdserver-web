@@ -176,7 +176,7 @@ function initStep3(){
                 $('.psync_data').show();
                 $('.dataMigrate').click(function(){
                     selectProgress(4);
-                    initStep3();
+                    initStep4();
                 });
 
                 $('.dataBack').click(function(){
@@ -189,9 +189,26 @@ function initStep3(){
     });
 }
 
+// 
 function initStep4(){
     maPost('step_four',{}, function(rdata){
         var rdata = $.parseJSON(rdata.data);
+
+        var tby = '<div class="line">\
+            <div class="success text-center" style="padding: 10px 0 15px;">\
+            <p style="font-size: 14px;margin-top:2px;color: #939292;">传输大小: 4.92 KB,耗时: 0分6秒,平均速度: 840 B/s</p>\
+            <p class="mtb15">\
+                <button class="btn btn-success btn-sm mr5 okBtn">确定完成</button>\
+                <button class="btn btn-default btn-sm lookInfo">查看记录</button>\
+                <a class="btn btn-default btn-sm" style="margin-left: 10px;" href="/download?filename=/www/server/panel/logs/psync.log">迁移日志</a>\
+            </p>\
+            </div>\
+            </div>';
+
+        $('.psync_data').hide();
+        
+        $('.psync_migrate').html(tby);
+        $('.psync_migrate').show();
     });
 }
 
