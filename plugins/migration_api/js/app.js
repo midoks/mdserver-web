@@ -190,8 +190,8 @@ function initStep3(){
 }
 
 function initStep4(){
-    maPost('step_one',{}, function(rdata){
-        console.log(rdata);
+    maPost('step_four',{}, function(rdata){
+        var rdata = $.parseJSON(rdata.data);
     });
 }
 

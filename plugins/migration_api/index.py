@@ -253,6 +253,10 @@ def stepThree():
     data = get_src_info(None)
     return mw.returnJson(True, 'ok', data)
 
+
+def stepFour():
+    return mw.returnJson(True, 'ok')
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -269,5 +273,7 @@ if __name__ == "__main__":
         print(stepTwo())
     elif func == 'step_three':
         print(stepThree())
+    elif func == 'step_four':
+        print(stepFour())
     else:
         print('error')
