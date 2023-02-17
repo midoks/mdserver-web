@@ -198,9 +198,9 @@ mw_update()
 {
     cn=$(curl --insecure -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
     if [ ! -z "$cn" ];then
-        curl -fsSL https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/scripts/update.sh | bash
+        curl --insecure -fsSL https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/scripts/update.sh | bash
     else
-        curl -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/update.sh | bash
+        curl --insecure -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/update.sh | bash
     fi
 }
 
