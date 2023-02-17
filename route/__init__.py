@@ -459,7 +459,7 @@ def api(reqClass=None, reqAction=None, reqData=None):
     request_ip = request_ip.replace('::ffff:', '')
 
     if not mw.inArray(data['limit_addr'], request_ip):
-        return mw.returnJson(False, '非法请求,请添加IP白名单')
+        return mw.returnJson(False, 'IP校验失败,您的访问IP为[' + request_ip + ']')
 
     local_token = mw.deCrypt(data['token'], data['token_crypt'])
     token_md5 = mw.md5(str(request_time) + mw.md5(local_token))
