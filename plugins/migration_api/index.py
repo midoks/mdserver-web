@@ -242,8 +242,10 @@ def get_src_info(args):
     data = {}
     data['sites'] = mw.M('sites').field(
         "id,name,path,ps,status,addtime").order("id desc").select()
-    data['databases'] = mw.M('databases').field(
-        'id,name,ps').order("id desc").select()
+
+    my_db_pos = mw.getServerDir() + '/mysql'
+    conn = mw.M('databases').dbPos(my_db_pos, 'mysql')
+    data['databases'] = conn.field('id,name,ps').order("id desc").select()
     return data
 
 

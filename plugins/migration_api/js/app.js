@@ -130,14 +130,62 @@ function initStep2(){
 
                 $('.psync_path').html(body);
                 $('.psync_path').show();
+
+                $('.pathNext').click(function(){
+                    selectProgress(3);
+                    initStep3();
+                });
             } 
         },{ icon: rdata.status ? 1 : 2 });
     });
 }
 
 function initStep3(){
-    maPost('step_one',{}, function(rdata){
+    maPost('step_three',{}, function(rdata){
+        var rdata = $.parseJSON(rdata.data);
         console.log(rdata);
+        showMsg(rdata.msg,function(){
+            if (rdata.status){
+                var pdata = rdata.data;
+                var site_li = '';
+                for (var i = 0; i < pdata.sites.length; i++) {
+                    site_li+='<li>\
+                        <label>\
+                        <input type="checkbox" data-id="'+i+'" id="sites_'+pdata.sites[i]['name']+'" value="'+pdata.sites[i]['name']+'" name="sites" checked="">\
+                        <span title="'+pdata.sites[i]['name']+'">'+pdata.sites[i]['name']+'</span>\
+                        </label>\
+                    </li>';
+                }
+
+                $('#sites_li').html(site_li);
+
+
+                var db_li = '';
+                for (var i = 0; i < pdata.databases.length; i++) {
+                    db_li+='<li>\
+                        <label>\
+                        <input type="checkbox" data-id="'+i+'" id="sites_'+pdata.databases[i]['name']+'" value="'+pdata.databases[i]['name']+'" name="databases" checked="">\
+                        <span title="'+pdata.databases[i]['name']+'">'+pdata.databases[i]['name']+'</span>\
+                        </label>\
+                    </li>';
+                }
+                $('#db_li').html(db_li);
+
+
+                $('.psync_path').hide();
+                $('.psync_data').show();
+                $('.dataMigrate').click(function(){
+                    selectProgress(4);
+                    initStep3();
+                });
+
+                $('.dataBack').click(function(){
+                    selectProgress(3);
+                    $('.psync_data').hide();
+                    $('.psync_path').show();
+                });
+            } 
+        },{ icon: rdata.status ? 1 : 2 });
     });
 }
 
