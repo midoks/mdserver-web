@@ -84,8 +84,8 @@ if [ $OSNAME != "macos" ];then
 
 	# install acme.sh
 	if [ ! -d /root/.acme.sh ];then
-	    if [ ! -z "$cn" ];then
-	        curl -sSL -o /tmp/acme.tar.gz https://ghproxy.com/github.com/acmesh-official/acme.sh/archive/master.tar.gz
+	    if [ "$HTTP_PREFIX" == "https://ghproxy.com/" ];then
+	        curl -sSL -o /tmp/acme.tar.gz ${HTTP_PREFIX}github.com/acmesh-official/acme.sh/archive/master.tar.gz
 	        tar xvzf /tmp/acme.tar.gz -C /tmp
 	        cd /tmp/acme.sh-master
 	        bash acme.sh install
