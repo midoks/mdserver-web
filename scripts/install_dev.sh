@@ -60,6 +60,13 @@ else
 fi
 
 
+HTTP_PREFIX="https://"
+ping github.com -t 1
+if [ "$?" != "0" ];then
+	HTTP_PREFIX="https://ghproxy.com/"
+fi
+
+
 if [ $OSNAME != "macos" ];then
 	mkdir -p /www/server
 	mkdir -p /www/wwwroot
@@ -68,7 +75,7 @@ if [ $OSNAME != "macos" ];then
 	mkdir -p /www/backup/site
 
 	if [ ! -d /www/server/mdserver-web ];then
-		curl -sSLo /tmp/dev.zip https://github.com/midoks/mdserver-web/archive/refs/heads/dev.zip
+		curl -sSLo /tmp/dev.zip ${HTTP_PREFIX}github.com/midoks/mdserver-web/archive/refs/heads/dev.zip
 		cd /tmp && unzip /tmp/dev.zip
 		mv -f /tmp/mdserver-web-dev /www/server/mdserver-web
 		rm -rf /tmp/dev.zip
@@ -94,12 +101,12 @@ fi
 echo "use system version: ${OSNAME}"
 
 if [ "${OSNAME}" == "macos" ];then
-	cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
-	HTTP_PREFIX="https://"
-	if [ ! -z "$cn" ];then
-	    HTTP_PREFIX="https://ghproxy.com/"
-	fi
-	curl -fsSL ${HTTP_PREFIX}https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/install/macos.sh | bash
+	# cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
+	# HTTP_PREFIX="https://"
+	# if [ ! -z "$cn" ];then
+	#     HTTP_PREFIX="https://ghproxy.com/"
+	# fi
+	curl -fsSL ${HTTP_PREFIX}raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/install/macos.sh | bash
 else
 	cd /www/server/mdserver-web && bash scripts/install/${OSNAME}.sh
 fi

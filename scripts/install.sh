@@ -72,7 +72,7 @@ if [ $OSNAME != "macos" ];then
 
 	# https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/scripts/install.sh
 
-	cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
+	cn=$(curl --insecure -fsSL -m 10 https://ipinfo.io/json | grep "\"country\": \"CN\"")
 
 	if [ ! -d /www/server/mdserver-web ];then
 		if [ ! -z "$cn" ];then
