@@ -189,9 +189,19 @@ function initStep3(){
     });
 }
 
-// 
 function initStep4(){
-    maPost('step_four',{}, function(rdata){
+
+    var site_checked = '';
+    $('input[name="sites"]:checked').each(function(){
+        site_checked += $(this).val()+',';
+    });
+
+    var databases_checked = '';
+    $('input[name="databases"]').each(function(){
+        databases_checked+=$(this).val()+',';
+    });
+
+    maPost('step_four',{sites:site_checked,databases:databases_checked}, function(rdata){
         var rdata = $.parseJSON(rdata.data);
 
         var tby = '<div class="line">\

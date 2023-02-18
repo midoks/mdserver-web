@@ -128,6 +128,7 @@ def writeConf(data):
 def getArgs():
     args = sys.argv[2:]
     tmp = {}
+    # print(args)
     args_len = len(args)
     if args_len == 1:
         t = args[0].strip('{').strip('}')
@@ -138,7 +139,9 @@ def getArgs():
             tmp[t[0]] = t[1]
         tmp[t[0]] = t[1]
     elif args_len > 1:
+
         for i in range(len(args)):
+            # print(args[i])
             t = args[i].split(':', 1)
             tmp[t[0]] = t[1]
     return tmp
@@ -255,6 +258,21 @@ def stepThree():
 
 
 def stepFour():
+    args = getArgs()
+    data = checkArgs(args, ['sites', 'databases'])
+    if not data[0]:
+        return data[1]
+
+    sites = args['sites']
+    databases = args['databases']
+
+    data = getCfgData()
+    ready_data = {
+        'sites': sites.strip(',').split(','),
+        'databases': databases.strip(',').split(',')
+    }
+    data['ready'] = ready_data
+    writeConf(data)
     return mw.returnJson(True, 'ok')
 
 if __name__ == "__main__":
