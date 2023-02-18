@@ -61,7 +61,7 @@ fi
 
 
 HTTP_PREFIX="https://"
-ping github.com -t 1
+ping github.com -c 1
 if [ "$?" != "0" ];then
 	HTTP_PREFIX="https://ghproxy.com/"
 fi
