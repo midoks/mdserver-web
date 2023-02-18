@@ -60,10 +60,16 @@ else
 fi
 
 
+# HTTP_PREFIX="https://"
+# curl --insecure -fsSL -m 1 https://github.com
+# if [ "$?" != "0" ];then
+# 	HTTP_PREFIX="https://ghproxy.com/"
+# fi
+
+cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
 HTTP_PREFIX="https://"
-curl --insecure -fsSL -m 1 https://github.com
-if [ "$?" != "0" ];then
-	HTTP_PREFIX="https://ghproxy.com/"
+if [ ! -z "$cn" ];then
+    HTTP_PREFIX="https://ghproxy.com/"
 fi
 
 
@@ -101,11 +107,6 @@ fi
 echo "use system version: ${OSNAME}"
 
 if [ "${OSNAME}" == "macos" ];then
-	# cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
-	# HTTP_PREFIX="https://"
-	# if [ ! -z "$cn" ];then
-	#     HTTP_PREFIX="https://ghproxy.com/"
-	# fi
 	curl -fsSL ${HTTP_PREFIX}raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/install/macos.sh | bash
 else
 	cd /www/server/mdserver-web && bash scripts/install/${OSNAME}.sh
