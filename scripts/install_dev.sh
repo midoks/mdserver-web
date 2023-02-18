@@ -61,7 +61,7 @@ fi
 
 
 HTTP_PREFIX="https://"
-curl --insecure -fsSL -m 10 https://github.com
+curl --insecure -fsSL -m 1 https://github.com
 if [ "$?" != "0" ];then
 	HTTP_PREFIX="https://ghproxy.com/"
 fi
