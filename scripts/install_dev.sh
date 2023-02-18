@@ -60,17 +60,17 @@ else
 fi
 
 
-# HTTP_PREFIX="https://"
-# curl --insecure -fsSL -m 1 https://github.com
-# if [ "$?" != "0" ];then
-# 	HTTP_PREFIX="https://ghproxy.com/"
-# fi
-
-cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
 HTTP_PREFIX="https://"
-if [ ! -z "$cn" ];then
-    HTTP_PREFIX="https://ghproxy.com/"
+ping  -c 1 github.com > /dev/null 2>&1
+if [ "$?" != "0" ];then
+	HTTP_PREFIX="https://ghproxy.com/"
 fi
+
+# cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
+# HTTP_PREFIX="https://"
+# if [ ! -z "$cn" ];then
+#     HTTP_PREFIX="https://ghproxy.com/"
+# fi
 
 
 if [ $OSNAME != "macos" ];then
