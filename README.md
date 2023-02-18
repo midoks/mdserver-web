@@ -136,7 +136,7 @@ wget -O uninstall.sh https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/scri
 
 ```
 curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/install.sh | bash
-curl -fsSL  https://gitee.com/midoks/mdserver-web/raw/master/scripts/install.sh | bash
+curl --insecure -fsSL  https://gitee.com/midoks/mdserver-web/raw/master/scripts/install.sh | bash
 ```
 
 - 直接更新
