@@ -139,6 +139,9 @@ if [ $VERSION_ID -ge 8 ];then
         readline-devel rpcgen sqlite-devel tar unzip vim-minimal wget zip zlib zlib-devel ;
     do
         dnf $REPOS install -y $rpms;
+        if [ "$?" != "0" ];then
+            dnf install -y $rpms;
+        fi
     done
 else
     # CentOS 7
