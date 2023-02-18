@@ -5,7 +5,7 @@ export PATH
 is64bit=`getconf LONG_BIT`
 
 echo -e "您正在安装的是\033[31mmdserver-web测试版\033[0m，非开发测试用途请使用正式版 install.sh ！" 
-echo -e "You are installing\033[31mmdserver-web dev version\033[0m, normally use install.sh for production.\n" 
+echo -e "You are installing\033[31m mdserver-web dev version\033[0m, normally use install.sh for production.\n" 
 sleep 1
 
 {
