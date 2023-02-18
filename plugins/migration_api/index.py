@@ -257,6 +257,52 @@ def stepThree():
     return mw.returnJson(True, 'ok', data)
 
 
+def getPid():
+    result = mw.execShell(
+        "ps aux|grep index.py|grep -v grep|awk '{print $2}'|xargs")[0].strip()
+    if not result:
+        import psutil
+        for pid in psutil.pids():
+            if not os.path.exists('/proc/{}'.format(pid)):
+                continue  # 检查pid是否还存在
+            try:
+                p = psutil.Process(pid)
+            except:
+                return None
+            cmd = p.cmdline()
+            if len(cmd) < 2:
+                continue
+            if cmd[1].find('psync_api_main.py') != -1:
+                return pid
+        return None
+
+
+def bgProcessRun():
+    time.sleep(10)
+    return '123123'
+
+
+def bgProcess():
+    log_file = getServerDir() + '/sync.log'
+    log_file_error = getServerDir() + '/sync_error.log'
+
+    if os.path.exists(log_file_error):
+        os.remove(log_file_error)
+    if os.path.exists(log_file):
+        os.remove(log_file)
+
+    plugins_dir = mw.getServerDir() + '/mdserver-web'
+    exe = "cd {0} && source bin/activate && nohup python3 plugins/migration_api/index.py bg_process &>{1} &".format(
+        plugins_dir, log_file_error)
+
+    os.system(exe)
+    time.sleep(1)
+    # 检查是否执行成功
+    if not getPid():
+        return mw.returnJson(False, '创建进程失败!<br>{}'.format(mw.readFile(log_file_error)))
+    return mw.returnJson(True, "迁移进程创建成功!")
+
+
 def stepFour():
     args = getArgs()
     data = checkArgs(args, ['sites', 'databases'])
@@ -273,7 +319,36 @@ def stepFour():
     }
     data['ready'] = ready_data
     writeConf(data)
-    return mw.returnJson(True, 'ok')
+    return bgProcess()
+    # return mw.returnJson(True, 'ok')
+
+
+def get_speed_data():
+    path = getServerDir() + '/config/speed.json'
+    data = mw.readFile(path)
+    return json.loads(data)
+
+
+def get_speed(args):
+    # 取迁移进度
+    if not os.path.exists(self._SPEED_FILE):
+        return public.returnMsg(False, '正在准备..')
+    try:
+        speed_info = json.loads(mw.readFile(self._SPEED_FILE))
+    except:
+        return False
+    sync_info = self.get_sync_info(None)
+    speed_info['all_total'] = sync_info['total']
+    speed_info['all_speed'] = sync_info['speed']
+    speed_info['total_time'] = speed_info['end_time'] - speed_info['time']
+    speed_info['total_time'] = str(int(speed_info[
+                                   'total_time'] // 60)) + "分" + str(int(speed_info['total_time'] % 60)) + "秒"
+    log_file = '/www/server/panel/logs/psync.log'
+    speed_info['log'] = public.ExecShell(
+        "tail -n 10 {}".format(log_file))[0]
+    # if len(speed_info['log']) > 20480 and speed_info['action'] != 'True':
+    # return False
+    return speed_info
 
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -293,5 +368,7 @@ if __name__ == "__main__":
         print(stepThree())
     elif func == 'step_four':
         print(stepFour())
+    elif func == 'bg_process':
+        print(bgProcessRun())
     else:
         print('error')

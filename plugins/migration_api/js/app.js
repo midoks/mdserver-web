@@ -76,7 +76,6 @@ function initStep1(){
         var rdata = $.parseJSON(rdata.data);
         showMsg(rdata.msg,function(){
             if (rdata.status){
-                selectProgress(2);
                 initStep2();
             }
         },{ icon: rdata.status ? 1 : 2 });
@@ -86,9 +85,9 @@ function initStep1(){
 function initStep2(){
     maPost('step_two',{}, function(rdata){
         var rdata = $.parseJSON(rdata.data);
-        console.log(rdata);
         showMsg(rdata.msg,function(){
             if (rdata.status){
+                selectProgress(2);
                 $('.psync_info').hide();
 
                 var info = rdata.data;
@@ -143,7 +142,6 @@ function initStep2(){
 function initStep3(){
     maPost('step_three',{}, function(rdata){
         var rdata = $.parseJSON(rdata.data);
-        console.log(rdata);
         showMsg(rdata.msg,function(){
             if (rdata.status){
                 var pdata = rdata.data;
@@ -189,6 +187,9 @@ function initStep3(){
     });
 }
 
+
+function renderMer
+
 function initStep4(){
 
     var site_checked = '';
@@ -204,20 +205,32 @@ function initStep4(){
     maPost('step_four',{sites:site_checked,databases:databases_checked}, function(rdata){
         var rdata = $.parseJSON(rdata.data);
 
-        var tby = '<div class="line">\
-            <div class="success text-center" style="padding: 10px 0 15px;">\
-            <p style="font-size: 14px;margin-top:2px;color: #939292;">传输大小: 4.92 KB,耗时: 0分6秒,平均速度: 840 B/s</p>\
-            <p class="mtb15">\
-                <button class="btn btn-success btn-sm mr5 okBtn">确定完成</button>\
-                <button class="btn btn-default btn-sm lookInfo">查看记录</button>\
-                <a class="btn btn-default btn-sm" style="margin-left: 10px;" href="/download?filename=/www/server/panel/logs/psync.log">迁移日志</a>\
-            </p>\
+        var progress = '<div style="margin: 0 40px;">\
+            <div class="line">\
+                <div style="text-align:left"><span>|-迁移网站: [dev156.cachecha.com]</span>\
+                <span style="margin-left: 20px;">当前: 正在压缩</span><img src="/static/img/ing.gif"><a style="position: absolute;right: 40px;" class="btlink psync_close" onclick="migrate.close();">[取消]</a></div>\
+                <div class="bt-progress" style="border-radius:0;height:20px;line-height:19px">\
+                    <div class="bt-progress-bar" style="border-radius: 0px; height: 20px; width: 16.67%;">\
+                        <span class="bt-progress-text">16.67%</span></div>\
+                    </div>\
+                </div>\
             </div>\
-            </div>';
+            <pre style="height: 222px;text-align: left;margin:5px 38px 0;font-size: 12px;line-height: 20px;padding: 10px;background-color: #333;color: #fff;"></pre>\
+        </div>';
+
+
+        // var end = '<div class="line">\
+        //     <div class="success text-center" style="padding: 10px 0 15px;">\
+        //     <p style="font-size: 14px;margin-top:2px;color: #939292;">传输大小: 4.92 KB,耗时: 0分6秒,平均速度: 840 B/s</p>\
+        //     <p class="mtb15">\
+        //         <button class="btn btn-success btn-sm mr5 okBtn">确定完成</button>\
+        //         <a class="btn btn-default btn-sm" style="margin-left: 10px;" href="/download?filename=/www/server/migration_api/logs/psync.log">迁移日志</a>\
+        //     </p>\
+        //     </div>\
+        //     </div>';
 
         $('.psync_data').hide();
-        
-        $('.psync_migrate').html(tby);
+        $('.psync_migrate').html(progress);
         $('.psync_migrate').show();
     });
 }

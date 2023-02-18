@@ -61,8 +61,10 @@ fi
 
 
 HTTP_PREFIX="https://"
+LOCAL_ADDR=common
 ping  -c 1 github.com > /dev/null 2>&1
 if [ "$?" != "0" ];then
+	LOCAL_ADDR=cn
 	HTTP_PREFIX="https://ghproxy.com/"
 fi
 
