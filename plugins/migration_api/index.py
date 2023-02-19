@@ -21,6 +21,7 @@ class classApi:
     __MW_PANEL = 'http://127.0.0.1:7200'
 
     _REQUESTS = None
+    _SPEED_FILE = None
 
     # 如果希望多台面板，可以在实例化对象时，将面板地址与密钥传入
     def __init__(self, mw_panel=None, mw_key=None):
@@ -31,6 +32,8 @@ class classApi:
         import requests
         if not self._REQUESTS:
             self._REQUESTS = requests.session()
+
+        self._SPEED_FILE = getServerDir() + '/config/speed.json'
 
     # 计算MD5
     def __get_md5(self, s):
@@ -60,6 +63,29 @@ class classApi:
                 return mw.returnJson(False, '连接超时!')
             return mw.returnJson(False, '连接服务器失败!')
 
+    def write_speed(self, key, value):
+        # 写进度
+        if os.path.exists(self._SPEED_FILE):
+            speed_info = json.loads(mw.readFile(self._SPEED_FILE))
+        else:
+            speed_info = {"time": int(time.time()), "size": 0, "used": 0, "total_size": 0,
+                          "speed": 0, "action": "等待中", "done": "等待中", "end_time": int(time.time())}
+        if not key in speed_info:
+            speed_info[key] = 0
+        if key == 'total_size':
+            speed_info[key] += value
+        else:
+            speed_info[key] = value
+        mw.writeFile(self._SPEED_FILE, json.dumps(speed_info))
+
+    # 设置文件权限
+    def set_mode(self, filename, mode):
+        if not os.path.exists(filename):
+            return False
+        mode = int(str(mode), 8)
+        os.chmod(filename, mode)
+        return True
+
     def send(self, url, args, timeout=600):
         url = self.__MW_PANEL + '/api' + url
         post_data = self.__get_key_data()  # 取签名
@@ -70,7 +96,38 @@ class classApi:
         except Exception as e:
             return result
 
-    def send_file(self,):
+    def get_mode_and_user(self, path):
+        '''取文件或目录权限信息'''
+        data = {}
+        if not os.path.exists(path):
+            return None
+        stat = os.stat(path)
+        data['mode'] = str(oct(stat.st_mode)[-3:])
+        try:
+            data['user'] = pwd.getpwuid(stat.st_uid).pw_name
+        except:
+            data['user'] = str(stat.st_uid)
+        return data
+
+    def upload_file(self, sfile, dfile, chmod=None):
+        # 上传文件
+        if not os.path.exists(sfile):
+            write_log("|-指定目录不存在{}".format(sfile))
+            return False
+        pdata = self.__get_key_data()
+        pdata['f_name'] = os.path.basename(dfile)
+        pdata['f_path'] = os.path.dirname(dfile)
+        pdata['f_size'] = os.path.getsize(sfile)
+        pdata['f_start'] = 0
+        if chmod:
+            mode_user = self.get_mode_and_user(os.path.dirname(sfile))
+            pdata['dir_mode'] = mode_user['mode'] + ',' + mode_user['user']
+            mode_user = self.get_mode_and_user(sfile)
+            pdata['file_mode'] = mode_user['mode'] + ',' + mode_user['user']
+        f = open(sfile, 'rb')
+        return self.send_file(pdata, f)
+
+    def send_file(self, f):
         pass
 
     def save(self):
@@ -255,7 +312,8 @@ def stepOne():
     token = args['token']
 
     api = classApi(url, token)
-    # api = classApi('http://127.0.0.1:7200','HfJNKGP5RPqGvhIOyrwpXG4A2fTjSh9B')
+    # api =
+    # classApi('http://127.0.0.1:7200','HfJNKGP5RPqGvhIOyrwpXG4A2fTjSh9B')
     rdata = api.send('/task/count', {})
     if type(rdata) != int:
         return mw.returnJson(False, rdata['msg'])
@@ -432,7 +490,7 @@ def getSpeed():
     speed_info['all_speed'] = sync_info['speed']
     speed_info['total_time'] = speed_info['end_time'] - speed_info['time']
     speed_info['total_time'] = str(int(speed_info[
-                                   'total_time'] // 60)) + "分" + str(int(speed_info['total_time'] % 60)) + "秒"
+        'total_time'] // 60)) + "分" + str(int(speed_info['total_time'] % 60)) + "秒"
     log_file = getServerDir() + '/migration_api/sync.log'
     speed_info['log'] = mw.execShell("tail -n 10 {}".format(log_file))[0]
     return mw.returnJson(True, 'ok', speed_info)
