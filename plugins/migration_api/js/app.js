@@ -188,7 +188,20 @@ function initStep3(){
 }
 
 
-function renderMer
+
+function renderMigrationProgress(){
+    maPost('get_speed',{}, function(rdata){
+        var rdata = $.parseJSON(rdata.data);
+
+
+        console.log('sss:',rdata);
+        if (rdata.status){
+
+        } else{
+            layer.msg(rdata.msg,{icon:1});
+        }
+    });
+}
 
 function initStep4(){
 
@@ -232,6 +245,8 @@ function initStep4(){
         $('.psync_data').hide();
         $('.psync_migrate').html(progress);
         $('.psync_migrate').show();
+
+        renderMigrationProgress();
     });
 }
 

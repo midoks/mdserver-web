@@ -70,21 +70,99 @@ class classApi:
         except Exception as e:
             return result
 
-    # 取面板日志
-    def getLogs(self):
-        # 拼接URL地址
-        url = self.__MW_PANEL + '/firewall/get_log_list'
+    def send_file(self,):
+        pass
 
-        # 准备POST数据
-        post_data = self.__get_key_data()  # 取签名
-        post_data['limit'] = 10
-        post_data['p'] = '1'
+    def save(self):
+        # 保存迁移配置
+        mw.writeFile(self._INFO_FILE, json.dumps(self._SYNC_INFO))
 
-        # 请求面板接口
-        result = self.__http_post_cookie(url, post_data)
+    def state(self, stype, index, state, error=''):
+        # 设置状态
+        self._SYNC_INFO[stype][index]['state'] = state
+        self._SYNC_INFO[stype][index]['error'] = error
+        if self._SYNC_INFO[stype][index]['state'] != 1:
+            self._SYNC_INFO['speed'] += 1
+        self.save()
 
-        # 解析JSON数据
-        return json.loads(result)
+    def format_domain(self, domain):
+        # 格式化域名
+        domains = []
+        for d in domain:
+            domains.append("{}:{}".format(d['name'], d['port']))
+        return domains
+
+    def create_site(self, siteInfo, index):
+        pdata = {}
+        domains = self.format_domain(siteInfo['domain'])
+
+        pdata['webinfo'] = json.dumps(
+            {"domain": siteInfo['name'], "domainlist": domains, "count": len(domains)})
+        pdata['ps'] = siteInfo['ps']
+        pdata['path'] = siteInfo['path']
+        pdata['type'] = 'PHP'
+        pdata['version'] = '00'
+        pdata['type_id'] = '0'
+        pdata['port'] = siteInfo['port']
+        if not pdata['port']:
+            pdata['port'] = 80
+
+        result = self.send('/site/add', pdata)
+        if not result['status']:
+            err_msg = '站点[{}]创建失败, {}'.format(siteInfo['name'], result['msg'])
+            # self.state('sites', index, -1, err_msg)
+            # self.error(err_msg)
+            return False
+        return True
+
+    def send_site(self, siteInfo, index):
+        if not os.path.exists(siteInfo['path']):
+            err_msg = "网站根目录[{}]不存在,跳过!".format(siteInfo['path'])
+            self.state('sites', index, -1, err_msg)
+            self.error(err_msg)
+            return False
+        if not self.create_site(siteInfo, index):
+            return False
+
+    def sync_site(self):
+        data = getCfgData()
+        sites = data['ready']['sites']
+        for i in range(len(sites)):
+            siteInfo = mw.M('sites').where('name=?', (sites[i],)).field(
+                'id,name,path,ps,status,edate,addtime').find()
+
+            if not siteInfo:
+                err_msg = "指定站点[{}]不存在!".format(sites[i])
+                # self.state('sites', i, -1, err_msg)
+                # self.error(err_msg)
+                continue
+            pid = siteInfo['id']
+
+            siteInfo['port'] = mw.M('domain').where(
+                'pid=? and name=?', (pid, sites[i],)).getField('port')
+
+            siteInfo['domain'] = mw.M('domain').where(
+                'pid=? and name!=?', (pid, sites[i])).field('name,port').select()
+
+            print(sites[i])
+            print("dd:", mw.M('domain').where(
+                'pid=? and name!=?', (pid, sites[i])).field('name,port').select())
+
+            if self.send_site(siteInfo, i):
+                self.state('sites', i, 2)
+            write_log("=" * 50)
+        print(sites)
+
+    def run(self):
+        # 开始迁移
+        # mw.CheckMyCnf()
+        # self.sync_other()
+        self.sync_site()
+        # self.sync_database()
+        # self.sync_ftp()
+        # self.sync_path()
+        # self.write_speed('action', 'True')
+        write_log('|-所有项目迁移完成!')
 
 
 def getPluginName():
@@ -259,7 +337,7 @@ def stepThree():
 
 def getPid():
     result = mw.execShell(
-        "ps aux|grep index.py|grep -v grep|awk '{print $2}'|xargs")[0].strip()
+        "ps aux|grep plugins/migration_api/index.py|grep -v grep|awk '{print $2}'|xargs")[0].strip()
     if not result:
         import psutil
         for pid in psutil.pids():
@@ -272,14 +350,25 @@ def getPid():
             cmd = p.cmdline()
             if len(cmd) < 2:
                 continue
-            if cmd[1].find('psync_api_main.py') != -1:
+            if cmd[1].find('plugins/migration_api/index.py') != -1:
                 return pid
         return None
 
 
+def write_log(log_str):
+    log_file = getServerDir() + '/sync.log'
+    f = open(log_file, 'ab+')
+    log_str += "\n"
+    f.write(log_str.encode('utf-8'))
+    f.close()
+    return True
+
+
 def bgProcessRun():
-    time.sleep(10)
-    return '123123'
+    data = getCfgData()
+    api = classApi(data['url'], data['token'])
+    api.run()
+    return ''
 
 
 def bgProcess():
@@ -329,26 +418,24 @@ def get_speed_data():
     return json.loads(data)
 
 
-def get_speed(args):
+def getSpeed():
     # 取迁移进度
-    if not os.path.exists(self._SPEED_FILE):
-        return public.returnMsg(False, '正在准备..')
+    path = getServerDir() + '/config/speed.json'
+    if not os.path.exists(path):
+        return mw.returnJson(False, '正在准备..')
     try:
-        speed_info = json.loads(mw.readFile(self._SPEED_FILE))
+        speed_info = json.loads(mw.readFile(path))
     except:
-        return False
+        return mw.returnJson(False, '正在准备..')
     sync_info = self.get_sync_info(None)
     speed_info['all_total'] = sync_info['total']
     speed_info['all_speed'] = sync_info['speed']
     speed_info['total_time'] = speed_info['end_time'] - speed_info['time']
     speed_info['total_time'] = str(int(speed_info[
                                    'total_time'] // 60)) + "分" + str(int(speed_info['total_time'] % 60)) + "秒"
-    log_file = '/www/server/panel/logs/psync.log'
-    speed_info['log'] = public.ExecShell(
-        "tail -n 10 {}".format(log_file))[0]
-    # if len(speed_info['log']) > 20480 and speed_info['action'] != 'True':
-    # return False
-    return speed_info
+    log_file = getServerDir() + '/migration_api/sync.log'
+    speed_info['log'] = mw.execShell("tail -n 10 {}".format(log_file))[0]
+    return mw.returnJson(True, 'ok', speed_info)
 
 if __name__ == "__main__":
     func = sys.argv[1]
@@ -370,5 +457,7 @@ if __name__ == "__main__":
         print(stepFour())
     elif func == 'bg_process':
         print(bgProcessRun())
+    elif func == 'get_speed':
+        print(getSpeed())
     else:
         print('error')
