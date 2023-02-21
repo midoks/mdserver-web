@@ -247,8 +247,8 @@ class files_api:
             os.remove(task_log)
         return mw.returnJson(True, '任务已删除!')
 
-    # 上传文件
     def uploadFileApi(self):
+        # 上传文件
         from werkzeug.utils import secure_filename
         from flask import request
 
@@ -263,9 +263,84 @@ class files_api:
         if os.path.exists(filename):
             s_path = filename
         p_stat = os.stat(s_path)
+
+        print(filename)
         f.save(filename)
         os.chown(filename, p_stat.st_uid, p_stat.st_gid)
         os.chmod(filename, p_stat.st_mode)
+
+        msg = mw.getInfo('上传文件[{1}] 到 [{2}]成功!', (filename, path))
+        mw.writeLog('文件管理', msg)
+        return mw.returnMsg(True, '上传成功!')
+
+    def uploadSegmentApi(self):
+        # 分段上传
+        path = request.form.get('path', '')
+        name = request.form.get('name', '')
+        size = request.form.get('size')
+        start = request.form.get('start')
+        dir_mode = request.form.get('dir_mode', '')
+        file_mode = request.form.get('file_mode', '')
+
+        if not mw.fileNameCheck(name):
+            return mw.returnJson(False, '文件名中不能包含特殊字符!')
+
+        if path == '/':
+            return mw.returnJson(False, '不能直接上传文件到系统根目录!')
+
+        if name.find('./') != -1 or path.find('./') != -1:
+            return mw.returnJson(False, '错误的参数')
+
+        if not os.path.exists(path):
+            os.makedirs(path, 493)
+            if not dir_mode != '' or not file_mode != '':
+                mw.setMode(path)
+
+        save_path = os.path.join(
+            path, name + '.' + str(int(size)) + '.upload.tmp')
+        d_size = 0
+        if os.path.exists(save_path):
+            d_size = os.path.getsize(save_path)
+
+        if d_size != int(start):
+            return mw.returnJson(True, d_size)
+
+        f = open(save_path, 'ab')
+        b64_data = request.form.get('b64_data', '0')
+        if b64_data == '1':
+            import base64
+            b64_data = base64.b64decode(args.b64_data)
+            f.write(b64_data)
+        else:
+            upload_files = request.files.getlist("blob")
+            for tmp_f in upload_files:
+                f.write(tmp_f.read())
+
+        f.close()
+        f_size = os.path.getsize(save_path)
+        if f_size != int(size):
+            return mw.returnJson(True, f_size)
+
+        new_name = os.path.join(path, name)
+        if os.path.exists(new_name):
+            if new_name.find('.user.ini') != -1:
+                mw.execShell("chattr -i " + new_name)
+            try:
+                os.remove(new_name)
+            except:
+                mw.execShell("rm -f %s" % new_name)
+
+        os.renames(save_path, new_name)
+
+        if dir_mode != '' and dir_mode != '':
+            mode_tmp1 = dir_mode.split(',')
+            mw.setMode(path, mode_tmp1[0])
+            mw.setOwn(path, mode_tmp1[1])
+            mode_tmp2 = file_mode.split(',')
+            mw.setMode(new_name, mode_tmp2[0])
+            mw.setOwn(new_name, mode_tmp2[1])
+        else:
+            mw.setMode(new_name)
 
         msg = mw.getInfo('上传文件[{1}] 到 [{2}]成功!', (filename, path))
         mw.writeLog('文件管理', msg)

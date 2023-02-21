@@ -123,6 +123,14 @@ def getAcmeDir():
     return acme
 
 
+def fileNameCheck(filename):
+    f_strs = [';', '&', '<', '>']
+    for fs in f_strs:
+        if filename.find(fs) != -1:
+            return False
+    return True
+
+
 def triggerTask():
     isTask = getRunDir() + '/tmp/panelTask.pl'
     writeFile(isTask, 'True')
@@ -1119,6 +1127,15 @@ def setOwn(filename, user, group=None):
         user = user_info.pw_uid
         group = user_info.pw_gid
     os.chown(filename, user, group)
+    return True
+
+
+def setMode(filename, mode):
+    # 设置文件权限
+    if not os.path.exists(filename):
+        return False
+    mode = int(str(mode), 8)
+    os.chmod(filename, mode)
     return True
 
 
