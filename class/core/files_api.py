@@ -264,7 +264,7 @@ class files_api:
             s_path = filename
         p_stat = os.stat(s_path)
 
-        print(filename)
+        # print(filename)
         f.save(filename)
         os.chown(filename, p_stat.st_uid, p_stat.st_gid)
         os.chmod(filename, p_stat.st_mode)
@@ -272,6 +272,13 @@ class files_api:
         msg = mw.getInfo('上传文件[{1}] 到 [{2}]成功!', (filename, path))
         mw.writeLog('文件管理', msg)
         return mw.returnMsg(True, '上传成功!')
+
+    # 设置文件和目录权限
+    def setMode(self, path):
+        s_path = os.path.dirname(path)
+        p_stat = os.stat(s_path)
+        os.chown(path, p_stat.st_uid, p_stat.st_gid)
+        os.chmod(path, p_stat.st_mode)
 
     def uploadSegmentApi(self):
         # 分段上传
@@ -303,7 +310,7 @@ class files_api:
             d_size = os.path.getsize(save_path)
 
         if d_size != int(start):
-            return mw.returnJson(True, d_size)
+            return str(d_size)
 
         f = open(save_path, 'ab')
         b64_data = request.form.get('b64_data', '0')
@@ -319,7 +326,7 @@ class files_api:
         f.close()
         f_size = os.path.getsize(save_path)
         if f_size != int(size):
-            return mw.returnJson(True, f_size)
+            return str(f_size)
 
         new_name = os.path.join(path, name)
         if os.path.exists(new_name):
@@ -340,7 +347,7 @@ class files_api:
             mw.setMode(new_name, mode_tmp2[0])
             mw.setOwn(new_name, mode_tmp2[1])
         else:
-            mw.setMode(new_name)
+            self.setMode(new_name)
 
         msg = mw.getInfo('上传文件[{1}] 到 [{2}]成功!', (filename, path))
         mw.writeLog('文件管理', msg)
