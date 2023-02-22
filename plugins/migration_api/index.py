@@ -7,6 +7,7 @@ import time
 import re
 import hashlib
 import json
+import subprocess
 
 from requests_toolbelt import MultipartEncoder
 
@@ -71,6 +72,59 @@ class classApi:
                 return mw.returnJson(False, '连接超时!')
             return mw.returnJson(False, '连接服务器失败!')
 
+    def makeSyncInfo(self, args):
+        data = {}
+        sites = []
+        for i in args['sites']:
+            # print(i)
+            t = {'name': i}
+            sites.append(t)
+        data['sites'] = sites
+
+        databases = []
+        for i in args['databases']:
+            # print(i)
+            t = {'name': i}
+            databases.append(t)
+        data['databases'] = databases
+        return data
+
+    def fock_process(self, args):
+        log_file = getServerDir() + '/sync.log'
+        log_file_error = getServerDir() + '/sync_error.log'
+
+        if os.path.exists(log_file_error):
+            os.remove(log_file_error)
+        if os.path.exists(log_file):
+            os.remove(log_file)
+
+        plugins_dir = mw.getServerDir() + '/mdserver-web'
+        exe = "cd {0} && source bin/activate && nohup python3 plugins/migration_api/index.py bg_process &>{1} &".format(
+            plugins_dir, log_file_error)
+        mw.execShell(exe)
+        time.sleep(1)
+        # 检查是否执行成功
+        if not getPid():
+            return mw.returnJson(False, '创建进程失败!<br>{}'.format(mw.readFile(log_file_error)))
+        return mw.returnJson(True, "迁移进程创建成功!")
+
+    def set_sync_info(self, args):
+        # 设置要被迁移的网站、数据库
+        sync_info = self.makeSyncInfo(args)
+        sync_info['total'] = 0
+        sync_info['speed'] = 0
+        for i in range(len(sync_info['sites'])):
+            sync_info['sites'][i]['error'] = ''
+            sync_info['sites'][i]['state'] = 0
+            sync_info['total'] += 1
+        for i in range(len(sync_info['databases'])):
+            sync_info['databases'][i]['error'] = ''
+            sync_info['databases'][i]['state'] = 0
+            sync_info['total'] += 1
+        mw.writeFile(self._INFO_FILE, json.dumps(sync_info))
+        self.fock_process(None)
+        return mw.returnJson(True, '设置成功!')
+
     def get_sync_info(self, args):
         # 获取要被迁移的网站、数据库
         if not os.path.exists(self._INFO_FILE):
@@ -84,9 +138,6 @@ class classApi:
             result.append(i)
         for i in sync_info['databases']:
             i['type'] = "数据库"
-            result.append(i)
-        for i in sync_info['paths']:
-            i['type'] = "目录"
             result.append(i)
         return result
 
@@ -297,11 +348,10 @@ class classApi:
 
     def state(self, stype, index, state, error=''):
         # 设置状态
-        # print(self._SYNC_INFO)
-        # self._SYNC_INFO[stype][index]['state'] = state
-        # self._SYNC_INFO[stype][index]['error'] = error
-        # if self._SYNC_INFO[stype][index]['state'] != 1:
-        #     self._SYNC_INFO['speed'] += 1
+        self._SYNC_INFO[stype][index]['state'] = state
+        self._SYNC_INFO[stype][index]['error'] = error
+        if self._SYNC_INFO[stype][index]['state'] != 1:
+            self._SYNC_INFO['speed'] += 1
         self.save()
 
     def save(self):
@@ -582,10 +632,10 @@ class classApi:
     def send_database(self, dbInfo, index):
         # print(dbInfo)
         # 创建远程库
-        if not self.create_database(dbInfo, index):
-            return False
+        # if not self.create_database(dbInfo, index):
+        #     return False
 
-        # self.create_database(dbInfo, index)
+        self.create_database(dbInfo, index)
         filename = self.export_database(dbInfo['name'], index)
         if not filename:
             return False
@@ -597,7 +647,6 @@ class classApi:
                   {"shell": "rm -f " + upload_file, "path": "/www"}, 30)
 
         if self.upload_file(filename, upload_file):
-
             self.write_speed('done', '正在导入数据库')
             write_log("|-正在导入数据库{}...".format(dbInfo['name']))
 
@@ -833,22 +882,10 @@ def stepThree():
 
 def getPid():
     result = mw.execShell(
-        "ps aux|grep plugins/migration_api/index.py|grep -v grep|awk '{print $2}'|xargs")[0].strip()
+        "ps aux|grep 'plugins/migration_api/index.py bg_process' |grep -v grep|awk '{print $2}'|xargs")[0].strip()
     if not result:
-        import psutil
-        for pid in psutil.pids():
-            if not os.path.exists('/proc/{}'.format(pid)):
-                continue  # 检查pid是否还存在
-            try:
-                p = psutil.Process(pid)
-            except:
-                return None
-            cmd = p.cmdline()
-            if len(cmd) < 2:
-                continue
-            if cmd[1].find('plugins/migration_api/index.py') != -1:
-                return pid
         return None
+    return result
 
 
 def write_log(log_str):
@@ -865,36 +902,17 @@ def write_log(log_str):
 def bgProcessRun():
     data = getCfgData()
 
-    demo_url = 'http://127.0.0.1:7200'
-    demo_key = 'HfJNKGP5RPqGvhIOyrwpXG4A2fTjSh9B'
+    # demo_url = 'http://127.0.0.1:7200'
+    # demo_key = 'HfJNKGP5RPqGvhIOyrwpXG4A2fTjSh9B'
     # api = classApi(demo_url, demo_key)
     api = classApi(data['url'], data['token'])
     api.run()
     return ''
 
 
-def bgProcess():
-    log_file = getServerDir() + '/sync.log'
-    log_file_error = getServerDir() + '/sync_error.log'
-
-    if os.path.exists(log_file_error):
-        os.remove(log_file_error)
-    if os.path.exists(log_file):
-        os.remove(log_file)
-
-    plugins_dir = mw.getServerDir() + '/mdserver-web'
-    exe = "cd {0} && source bin/activate && nohup python3 plugins/migration_api/index.py bg_process &>{1} &".format(
-        plugins_dir, log_file_error)
-
-    os.system(exe)
-    time.sleep(1)
-    # 检查是否执行成功
-    if not getPid():
-        return mw.returnJson(False, '创建进程失败!<br>{}'.format(mw.readFile(log_file_error)))
-    return mw.returnJson(True, "迁移进程创建成功!")
-
-
 def stepFour():
+    if getPid():
+        return mw.returnJson(True, '正在运行中..')
     args = getArgs()
     data = checkArgs(args, ['sites', 'databases'])
     if not data[0]:
@@ -904,14 +922,12 @@ def stepFour():
     databases = args['databases']
 
     data = getCfgData()
-    ready_data = {
+    args = {
         'sites': sites.strip(',').split(','),
         'databases': databases.strip(',').split(',')
     }
-    data['ready'] = ready_data
-    writeConf(data)
-    return bgProcess()
-    # return mw.returnJson(True, 'ok')
+    api = classApi(data['url'], data['token'])
+    return api.set_sync_info(args)
 
 
 def get_speed_data():
@@ -929,14 +945,15 @@ def getSpeed():
         speed_info = json.loads(mw.readFile(path))
     except:
         return mw.returnJson(False, '正在准备..')
-    sync_info = self.get_sync_info(None)
-    print(sync_info)
+    data = getCfgData()
+    api = classApi(data['url'], data['token'])
+    sync_info = api.get_sync_info(None)
     speed_info['all_total'] = sync_info['total']
     speed_info['all_speed'] = sync_info['speed']
     speed_info['total_time'] = speed_info['end_time'] - speed_info['time']
     speed_info['total_time'] = str(int(speed_info[
         'total_time'] // 60)) + "分" + str(int(speed_info['total_time'] % 60)) + "秒"
-    log_file = getServerDir() + '/migration_api/sync.log'
+    log_file = getServerDir() + '/sync.log'
     speed_info['log'] = mw.execShell("tail -n 10 {}".format(log_file))[0]
     return mw.returnJson(True, 'ok', speed_info)
 

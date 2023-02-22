@@ -1,3 +1,23 @@
+
+function maPostNoMsg(method,args,callback){
+    var _args = null; 
+    if (typeof(args) == 'string'){
+        _args = JSON.stringify(toArrayObject(args));
+    } else {
+        _args = JSON.stringify(args);
+    }
+    $.post('/plugins/run', {name:'migration_api', func:method, args:_args}, function(data) {
+        if (!data.status){
+            layer.msg(data.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+            return;
+        }
+
+        if(typeof(callback) == 'function'){
+            callback(data);
+        }
+    },'json'); 
+}
+
 function maPost(method,args,callback){
     var _args = null; 
     if (typeof(args) == 'string'){
@@ -190,13 +210,15 @@ function initStep3(){
 
 
 function renderMigrationProgress(){
-    maPost('get_speed',{}, function(rdata){
+    maPostNoMsg('get_speed',{}, function(rdata){
         var rdata = $.parseJSON(rdata.data);
-
 
         console.log('sss:',rdata);
         if (rdata.status){
-
+            $('.psync_migrate .action').text(rdata['data']['action']);
+            $('.psync_migrate .done').text(rdata['data']['done']);
+            $('.psync_migrate pre').text(rdata['data']['log']);
+            renderMigrationProgress();
         } else{
             layer.msg(rdata.msg,{icon:1});
         }
@@ -220,11 +242,11 @@ function initStep4(){
 
         var progress = '<div style="margin: 0 40px;">\
             <div class="line">\
-                <div style="text-align:left"><span>|-迁移网站: [dev156.cachecha.com]</span>\
-                <span style="margin-left: 20px;">当前: 正在压缩</span><img src="/static/img/ing.gif"><a style="position: absolute;right: 40px;" class="btlink psync_close" onclick="migrate.close();">[取消]</a></div>\
+                <div style="text-align:left"><span class="action">--</span>\
+                <span style="margin-left: 20px;" class="done">当前: --</span><img src="/static/img/ing.gif"><a style="position: absolute;right: 40px;" class="btlink psync_close" onclick="migrate.close();">[取消]</a></div>\
                 <div class="bt-progress" style="border-radius:0;height:20px;line-height:19px">\
                     <div class="bt-progress-bar" style="border-radius: 0px; height: 20px; width: 16.67%;">\
-                        <span class="bt-progress-text">16.67%</span></div>\
+                        <span class="bt-progress-text ">16.67%</span></div>\
                     </div>\
                 </div>\
             </div>\
