@@ -926,7 +926,7 @@ def importDbExternal():
     mysql_cmd = getServerDir() + '/bin/mysql --defaults-file=' + my_cnf + \
         ' -uroot -p\"' + pwd + '\" -f ' + name + ' < ' + import_sql
 
-    print(mysql_cmd)
+    # print(mysql_cmd)
     rdata = mw.execShell(mysql_cmd)
     myPass(False, pwd)
     # print(rdata)
