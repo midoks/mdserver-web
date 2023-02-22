@@ -987,7 +987,7 @@ class files_api:
 
         return mw.getJson(data)
 
-    def execShellApi(self, get):
+    def execShellApi(self):
         # 执行SHELL命令
         shell = request.form.get('shell', '').strip()
         path = request.form.get('path', '').strip()
@@ -1006,7 +1006,7 @@ cd %s
             'nohup bash /tmp/panelShell.sh > /tmp/panelShell.pl 2>&1 &')
         return mw.returnJson(True, 'ok')
 
-    def getExecShellMsgApi(self, get):
+    def getExecShellMsgApi(self):
         # 取SHELL执行结果
         fileName = '/tmp/panelShell.pl'
         if not os.path.exists(fileName):
