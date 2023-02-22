@@ -349,7 +349,7 @@ class files_api:
         else:
             self.setMode(new_name)
 
-        msg = mw.getInfo('上传文件[{1}] 到 [{2}]成功!', (filename, path))
+        msg = mw.getInfo('上传文件[{1}] 到 [{2}]成功!', (new_name, path))
         mw.writeLog('文件管理', msg)
         return mw.returnMsg(True, '上传成功!')
 
