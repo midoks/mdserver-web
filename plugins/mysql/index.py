@@ -921,8 +921,8 @@ def importDbExternal():
     sock = getSocketFile()
 
     myPass(True, pwd)
-    mysql_cmd = getServerDir() + '/bin/mysql -S ' + sock + ' -uroot -p\"' + \
-        pwd + '\" -f ' + name + ' < ' + import_sql
+    mysql_cmd = getServerDir() + '/bin/mysql --defaults-file=' + my_cnf + \
+        ' -uroot -p\"' + pwd + '\" -f ' + name + ' < ' + import_sql
 
     # print(mysql_cmd)
     rdata = mw.execShell(mysql_cmd)
