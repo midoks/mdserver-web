@@ -123,14 +123,17 @@ class classApi:
         except Exception as e:
             return result
 
-    def sendPlugins(self, name, func, args):
+    def sendPlugins(self, name, func, args, timeout=36000):
         url = '/plugins/run'
 
         data = {}
         data['name'] = name
         data['func'] = func
         data['args'] = json.dumps(args).replace(": ", ":").replace(", ", ",")
-        return self.send(url, data)
+        r = self.send(url, data, timeout)
+        if r['status']:
+            return json.loads(r['data'])
+        return r
 
     def get_mode_and_user(self, path):
         '''取文件或目录权限信息'''
@@ -230,7 +233,7 @@ class classApi:
             except Exception as e:
                 times = time.time() - start_time
                 total_time += times
-                ex = str(ex)
+                ex = str(e)
                 if ex.find('Read timed out') != -1 or ex.find('Connection aborted') != -1:
                     # 发生超时的时候尝试调整分片大小, 以确保网络情况不好的时候能继续上传
                     self._buff_size = int(self._buff_size / 2)
@@ -487,17 +490,15 @@ class classApi:
         pdata['codeing'] = dbInfo['character']
 
         result = self.sendPlugins('mysql', 'add_db', pdata)
-        rdata = json.loads(result['data'])
-
-        if rdata['status']:
+        if result['status']:
             return True
-        err_msg = '数据库[{}]创建失败,{}'.format(dbInfo['name'], rdata['msg'])
+        err_msg = '数据库[{}]创建失败,{}'.format(dbInfo['name'], result['msg'])
         self.state('databases', index, -1, err_msg)
         self.error(err_msg)
         return False
 
     # 数据库密码处理
-    def mypass(self, act, root):
+    def myPass(self, act, root):
         # conf_file = '/etc/my.cnf'
         conf_file = self.getConf('mysql')
         mw.execShell("sed -i '/user=root/d' {}".format(conf_file))
@@ -513,6 +514,20 @@ class classApi:
                 mw.writeFile(conf_file, mycnf)
             return True
         return True
+
+    def recognizeDbMode(self):
+        conf = self.getConf('mysql')
+        con = mw.readFile(conf)
+
+        path = mw.getServerDir() + '/mysql'
+        rep = r"!include %s/(.*)?\.cnf" % (path + "/etc/mode",)
+        mode = 'none'
+        try:
+            data = re.findall(rep, con, re.M)
+            mode = data[0]
+        except Exception as e:
+            pass
+        return mode
 
     def export_database(self, name, index):
         self.write_speed('done', '正在导出数据库')
@@ -539,12 +554,20 @@ class classApi:
 
         root_dir = mw.getServerDir() + '/mysql'
         my_cnf = self.getConf('mysql')
+
+        mode = self.recognizeDbMode()
+        gtid_option = ''
+        if mode == 'gtid':
+            gtid_option = ' --set-gtid-purged=off '
+
+        self.myPass(True, root)
         cmd = root_dir + "/bin/mysqldump --defaults-file=" + my_cnf + " --default-character-set=" + \
             self.getDatabaseCharacter(
-                name) + " --force --opt \"" + name + "\" | gzip > " + backup_name
+                name) + gtid_option + " --force --opt \"" + name + "\" | gzip > " + backup_name
+        # print(cmd)
         mw.execShell(cmd)
 
-        self.mypass(False, root)
+        self.myPass(False, root)
         if not os.path.exists(backup_name) or os.path.getsize(backup_name) < 30:
             if os.path.exists(backup_name):
                 os.remove(backup_name)
@@ -559,27 +582,33 @@ class classApi:
     def send_database(self, dbInfo, index):
         # print(dbInfo)
         # 创建远程库
-        # if not self.create_database(dbInfo, index):
-        #     return False
+        if not self.create_database(dbInfo, index):
+            return False
 
-        self.create_database(dbInfo, index)
+        # self.create_database(dbInfo, index)
         filename = self.export_database(dbInfo['name'], index)
         if not filename:
             return False
 
-        db_dir = '/www/backup/database'
-        upload_file = db_dir + '/psync_import_{}.sql.gz'.format(dbInfo['name'])
-        d = self.send('/files/exec_shell',
-                      {"shell": "rm -f " + upload_file, "path": "/www"}, 30)
+        db_dir = '/www/backup/import'
+        new_db_name = 'psync_import_{}.sql.gz'.format(dbInfo['name'])
+        upload_file = db_dir + '/' + new_db_name
+        self.send('/files/exec_shell',
+                  {"shell": "rm -f " + upload_file, "path": "/www"}, 30)
 
-        print(d)
         if self.upload_file(filename, upload_file):
 
             self.write_speed('done', '正在导入数据库')
             write_log("|-正在导入数据库{}...".format(dbInfo['name']))
-            print(filename)
 
+            t = self.sendPlugins('mysql', 'import_db_external', {
+                "file": new_db_name, "name": dbInfo['name']})
+            # print(t)
+            self.send('/files/exec_shell',
+                      {"shell": "rm -f " + upload_file, "path": "/www"}, 30)
+            return True
         self.state('databases', index, -1, "数据传输失败")
+        return False
 
     def sync_database(self):
         data = getCfgData()
