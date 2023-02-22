@@ -923,16 +923,10 @@ def importDbExternal():
     my_cnf = getConf()
 
     myPass(True, pwd)
-
-    mode = recognizeDbMode()
-    gtid_option = ''
-    if mode == 'gtid':
-        gtid_option = ' --set-gtid-purged=off '
-
     mysql_cmd = getServerDir() + '/bin/mysql --defaults-file=' + my_cnf + \
-        gtid_option + ' -uroot -p\"' + pwd + '\" -f ' + name + ' < ' + import_sql
+        ' -uroot -p\"' + pwd + '\" -f ' + name + ' < ' + import_sql
 
-    # print(mysql_cmd)
+    print(mysql_cmd)
     rdata = mw.execShell(mysql_cmd)
     myPass(False, pwd)
     # print(rdata)
