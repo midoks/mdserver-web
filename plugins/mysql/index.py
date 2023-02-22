@@ -850,7 +850,7 @@ def setDbBackup():
 
 # 数据库密码处理
 def myPass(act, root):
-    conf_file = getConf('mysql')
+    conf_file = getConf()
     mw.execShell("sed -i '/user=root/d' {}".format(conf_file))
     mw.execShell("sed -i '/password=/d' {}".format(conf_file))
     if act:
