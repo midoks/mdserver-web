@@ -904,7 +904,7 @@ def importDbExternal():
 
     os.environ["MYSQL_PWD"] = pwd
     mysql_cmd = getServerDir() + '/bin/mysql -S ' + sock + ' -uroot -p\"' + \
-        pwd + '\" ' + name + ' < ' + import_sql
+        pwd + '\" -f ' + name + ' < ' + import_sql
 
     # print(mysql_cmd)
     rdata = mw.execShell(mysql_cmd)
