@@ -458,6 +458,7 @@ def api(reqClass=None, reqAction=None, reqData=None):
     request_ip = request.remote_addr
     request_ip = request_ip.replace('::ffff:', '')
 
+    # print(request_time, request_token)
     if not mw.inArray(data['limit_addr'], request_ip):
         return mw.returnJson(False, 'IP校验失败,您的访问IP为[' + request_ip + ']')
 
