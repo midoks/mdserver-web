@@ -348,7 +348,7 @@ class Sql():
         except Exception as ex:
             return "error: " + str(ex)
 
-    def query(self, sql, param):
+    def query(self, sql, param=()):
         # 执行SQL语句返回数据集
         self.__getConn()
         try:
