@@ -843,7 +843,6 @@ def setDbBackup():
         return data[1]
 
     scDir = mw.getRunDir() + '/scripts/backup.py'
-
     cmd = 'python3 ' + scDir + ' database ' + args['name'] + ' 3'
     os.system(cmd)
     return mw.returnJson(True, 'ok')
@@ -904,10 +903,12 @@ def importDbExternal():
     sock = getSocketFile()
 
     os.environ["MYSQL_PWD"] = pwd
-    mysql_cmd = getServerDir() + '/bin/mysql -S ' + sock + ' -uroot -p' + \
-        pwd + ' ' + name + ' < ' + import_sql
+    mysql_cmd = getServerDir() + '/bin/mysql -S ' + sock + ' -uroot -p\"' + \
+        pwd + '\" ' + name + ' < ' + import_sql
 
+    # print(mysql_cmd)
     rdata = mw.execShell(mysql_cmd)
+    # print(rdata)
     if ext != 'sql':
         os.remove(import_sql)
 

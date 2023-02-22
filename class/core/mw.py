@@ -1631,6 +1631,31 @@ def getSshDir():
     return '/root/.ssh'
 
 
+def processExists(pname, exe=None, cmdline=None):
+    # 进程是否存在
+    try:
+        import psutil
+        pids = psutil.pids()
+        for pid in pids:
+            try:
+                p = psutil.Process(pid)
+                if p.name() == pname:
+                    if not exe and not cmdline:
+                        return True
+                    else:
+                        if exe:
+                            if p.exe() == exe:
+                                return True
+                        if cmdline:
+                            if cmdline in p.cmdline():
+                                return True
+            except:
+                pass
+        return False
+    except:
+        return True
+
+
 def createRsa():
     # ssh-keygen -t rsa -P "" -C "midoks@163.com"
     ssh_dir = getSshDir()

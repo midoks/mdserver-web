@@ -987,6 +987,33 @@ class files_api:
 
         return mw.getJson(data)
 
+    def execShellApi(self, get):
+        # 执行SHELL命令
+        shell = request.form.get('shell', '').strip()
+        path = request.form.get('path', '').strip()
+        disabled = ['vi', 'vim', 'top', 'passwd', 'su']
+        tmp = shell.split(' ')
+        if tmp[0] in disabled:
+            return mw.returnJson(False, '禁止执行[{}]'.format(tmp[0]))
+        shellStr = '''#!/bin/bash
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
+export PATH
+cd %s
+%s
+''' % (path, shell)
+        mw.writeFile('/tmp/panelShell.sh', shellStr)
+        mw.execShell(
+            'nohup bash /tmp/panelShell.sh > /tmp/panelShell.pl 2>&1 &')
+        return mw.returnJson(True, 'ok')
+
+    def getExecShellMsgApi(self, get):
+        # 取SHELL执行结果
+        fileName = '/tmp/panelShell.pl'
+        if not os.path.exists(fileName):
+            return ''
+        status = not mw.processExists('bash', None, '/tmp/panelShell.sh')
+        return mw.returnJson(status, mw.getNumLines(fileName, 200))
+
     def __get_stats(self, filename, path=None):
         filename = filename.replace('//', '/')
         try:
