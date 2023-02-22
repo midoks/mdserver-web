@@ -848,6 +848,24 @@ def setDbBackup():
     return mw.returnJson(True, 'ok')
 
 
+# 数据库密码处理
+def myPass(act, root):
+    conf_file = getConf('mysql')
+    mw.execShell("sed -i '/user=root/d' {}".format(conf_file))
+    mw.execShell("sed -i '/password=/d' {}".format(conf_file))
+    if act:
+        mycnf = mw.readFile(conf_file)
+        src_dump = "[mysqldump]\n"
+        sub_dump = src_dump + "user=root\npassword=\"{}\"\n".format(root)
+        if not mycnf:
+            return False
+        mycnf = mycnf.replace(src_dump, sub_dump)
+        if len(mycnf) > 100:
+            mw.writeFile(conf_file, mycnf)
+        return True
+    return True
+
+
 def importDbExternal():
     args = getArgs()
     data = checkArgs(args, ['file', 'name'])
@@ -902,12 +920,13 @@ def importDbExternal():
     pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
     sock = getSocketFile()
 
-    os.environ["MYSQL_PWD"] = pwd
+    myPass(True, pwd)
     mysql_cmd = getServerDir() + '/bin/mysql -S ' + sock + ' -uroot -p\"' + \
         pwd + '\" -f ' + name + ' < ' + import_sql
 
     # print(mysql_cmd)
     rdata = mw.execShell(mysql_cmd)
+    myPass(False, pwd)
     # print(rdata)
     if ext != 'sql':
         os.remove(import_sql)
