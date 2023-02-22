@@ -673,7 +673,7 @@ class classApi:
                 dbInfo = self.getDbInfo(db)
                 dbInfo['accept'] = self.getDatabaseAccess(db)
                 dbInfo['character'] = self.getDatabaseCharacter(db)
-                print(dbInfo)
+                # print(dbInfo)
                 if self.send_database(dbInfo, i):
                     self.state('databases', i, 2)
                 write_log("=" * 50)
