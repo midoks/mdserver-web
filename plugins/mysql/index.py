@@ -920,6 +920,8 @@ def importDbExternal():
     pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
     sock = getSocketFile()
 
+    my_cnf = getConf()
+
     myPass(True, pwd)
     mysql_cmd = getServerDir() + '/bin/mysql --defaults-file=' + my_cnf + \
         ' -uroot -p\"' + pwd + '\" -f ' + name + ' < ' + import_sql
