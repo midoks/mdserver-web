@@ -960,6 +960,7 @@ def getSpeed():
         'total_time'] // 60)) + "分" + str(int(speed_info['total_time'] % 60)) + "秒"
     log_file = getServerDir() + '/sync.log'
     speed_info['log'] = mw.execShell("tail -n 10 {}".format(log_file))[0]
+    speed_info['log_file'] = log_file
     return mw.returnJson(True, 'ok', speed_info)
 
 if __name__ == "__main__":

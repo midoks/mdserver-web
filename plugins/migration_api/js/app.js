@@ -194,6 +194,7 @@ function initStep3(){
 
 
 
+
 function renderMigrationProgress(){
     maPostNoMsg('get_speed',{}, function(rdata){
         var rdata = $.parseJSON(rdata.data);
@@ -203,10 +204,10 @@ function renderMigrationProgress(){
                 var end = '<div class="line">\
                         <div class="success text-center" style="padding: 10px 0 15px;">\
                         <p>数据迁移完成,请务必检查数据完整性!</p>\
-                        <p style="font-size: 14px;margin-top:2px;color: #939292;">传输大小: 4.92 KB,耗时: 0分6秒,平均速度: 840 B/s</p>\
+                        <p style="font-size: 14px;margin-top:2px;color: #939292;">传输大小: '+toSize(rdata['data']['total_size'])+',耗时: '+rdata['data']['total_time']+',平均速度: '+toSize(rdata['data']['speed'])+'/s</p>\
                         <p class="mtb15">\
                             <button class="btn btn-success btn-sm mr5 okBtn">确定完成</button>\
-                            <a class="btn btn-default btn-sm" style="margin-left: 10px;" href="/download?filename=/www/server/migration_api/logs/psync.log">迁移日志</a>\
+                            <a class="btn btn-default btn-sm" style="margin-left: 10px;" target="_blank" href="/files/download?filename='+rdata['data']['log_file']+'">迁移日志</a>\
                         </p>\
                         </div>\
                     </div>';
