@@ -2588,6 +2588,8 @@ location ^~ {from} {\n\
             mw.execShell('rm -rf ' + ssl_acme_dir)
 
         mw.M('sites').where("id=?", (sid,)).delete()
+        mw.M('domain').where("pid=?", (sid,)).delete()
+        mw.M('domain').where("name=?", (webname,)).delete()
 
         # binding domain delete
         binding_list = mw.M('binding').field(
