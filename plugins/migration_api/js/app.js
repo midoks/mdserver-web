@@ -200,10 +200,25 @@ function renderMigrationProgress(){
 
         console.log('sss:',rdata);
         if (rdata.status){
-            $('.psync_migrate .action').text(rdata['data']['action']);
-            $('.psync_migrate .done').text(rdata['data']['done']);
-            $('.psync_migrate pre').text(rdata['data']['log']);
-            renderMigrationProgress();
+
+
+            if (rdata['data']['action'] == 'True'){
+                var end = '<div class="line">\
+                    <div class="success text-center" style="padding: 10px 0 15px;">\
+                    <p style="font-size: 14px;margin-top:2px;color: #939292;">传输大小: 4.92 KB,耗时: 0分6秒,平均速度: 840 B/s</p>\
+                    <p class="mtb15">\
+                        <button class="btn btn-success btn-sm mr5 okBtn">确定完成</button>\
+                        <a class="btn btn-default btn-sm" style="margin-left: 10px;" href="/download?filename=/www/server/migration_api/logs/psync.log">迁移日志</a>\
+                    </p>\
+                    </div>\
+                    </div>';
+                $('.psync_migrate').html(end);
+            } else{
+                $('.psync_migrate .action').text(rdata['data']['action']);
+                $('.psync_migrate .done').text(rdata['data']['done']);
+                $('.psync_migrate pre').text(rdata['data']['log']);
+                renderMigrationProgress();
+            }
         } else{
             layer.msg(rdata.msg,{icon:1});
         }
@@ -239,16 +254,6 @@ function initStep4(){
         </div>';
 
 
-        // var end = '<div class="line">\
-        //     <div class="success text-center" style="padding: 10px 0 15px;">\
-        //     <p style="font-size: 14px;margin-top:2px;color: #939292;">传输大小: 4.92 KB,耗时: 0分6秒,平均速度: 840 B/s</p>\
-        //     <p class="mtb15">\
-        //         <button class="btn btn-success btn-sm mr5 okBtn">确定完成</button>\
-        //         <a class="btn btn-default btn-sm" style="margin-left: 10px;" href="/download?filename=/www/server/migration_api/logs/psync.log">迁移日志</a>\
-        //     </p>\
-        //     </div>\
-        //     </div>';
-
         $('.psync_data').hide();
         $('.psync_migrate').html(progress);
         $('.psync_migrate').show();
@@ -264,12 +269,6 @@ function initStep(){
         $('input[name="sync_url"]').val(rdata.data['url']);
         $('input[name="sync_token"]').val(rdata.data['token']);
     });
-
-    var step = $('.step_head .active span').text();
-    $('.infoNext').click(function(){
-        initStep1();
-    });
-
 
     $('.infoNext').click(function(){
         initStep1();
@@ -299,6 +298,12 @@ function initStep(){
 
     $('.psync_data').on('click', '.dataMigrate', function(){ 
         initStep4();
+    });
+
+    $('.psync_migrate').on('click', '.okBtn', function(){ 
+        $('.psync_migrate').hide();
+        $('.psync_info').show();
+        selectProgress(1);
     });
 }
 
