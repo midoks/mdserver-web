@@ -476,7 +476,7 @@ class classApi:
              '/nginx/proxy/{}'.format(siteInfo['name']), "反向代理配置"],
             [self.__VHOST_PATH +
                 "/letsencrypt/{}".format(siteInfo['name']), "网站[LETS]SSL证书"],
-            # [self.__VHOST_PATH + "/ssl/", "网站SSL目录"],
+            [self.__VHOST_PATH + "/ssl/" + siteInfo['name'], "网站SSL目录"],
         ]
 
         if not mw.isAppleSystem():
