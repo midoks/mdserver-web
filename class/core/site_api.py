@@ -550,10 +550,7 @@ class site_api:
                 return mw.returnJson(False, '使用中,先关闭再删除')
             mw.execShell('rm -rf ' + ssl_lets_dir)
         elif ssl_type == 'acme':
-            ssl_acme_dir = mw.getAcmeDir() + '/' + site_name
-            ssl_acme_ecc = ssl_acme_dir + '_ecc'
-            if os.path.exists(ssl_acme_ecc):
-                ssl_acme_dir = ssl_acme_ecc
+            ssl_acme_dir = mw.getAcmeDomainDir(site_name)
             csr_acme_path = ssl_acme_dir + '/fullchain.cer'  # 生成证书路径
             if mw.md5(mw.readFile(csr_acme_path)) == mw.md5(mw.readFile(csr_path)):
                 return mw.returnJson(False, '使用中,先关闭再删除')
@@ -590,11 +587,7 @@ class site_api:
             csr_path = self.sslLetsDir + '/' + site_name + '/fullchain.pem'  # 生成证书路径
             key_path = self.sslLetsDir + '/' + site_name + '/privkey.pem'    # 密钥文件路径
         elif ssl_type == 'acme':
-            acme_dir = mw.getAcmeDir() + '/' + site_name
-            acme_dir_ecc = acme_dir + '_ecc'
-            if os.path.exists(acme_dir_ecc):
-                acme_dir = acme_dir_ecc
-
+            acme_dir = mw.getAcmeDomainDir(site_name)
             csr_path = acme_dir + '/fullchain.cer'  # 生成证书路径
             key_path = acme_dir + '/' + site_name + '.key'    # 密钥文件路径
 
@@ -996,11 +989,7 @@ class site_api:
         # print(cmd)
         result = mw.execShell(cmd)
 
-        src_path = acme_dir + '/' + domains[0]
-        src_path_ecc = src_path + '_ecc'
-        if os.path.exists(src_path_ecc):
-            src_path = src_path_ecc
-
+        src_path = mw.getAcmeDomainDir(domains[0])
         src_cert = src_path + '/fullchain.cer'
         src_key = src_path + '/' + domains[0] + '.key'
         src_cert.replace("\*", "*")

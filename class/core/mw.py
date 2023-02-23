@@ -123,6 +123,15 @@ def getAcmeDir():
     return acme
 
 
+def getAcmeDomainDir(domain):
+    acme_dir = getAcmeDir()
+    acme_domain = acme_dir + '/' + domain
+    acme_domain_ecc = acme_domain + '_ecc'
+    if os.path.exists(acme_domain_ecc):
+        acme_domain = acme_domain_ecc
+    return acme_domain
+
+
 def fileNameCheck(filename):
     f_strs = [';', '&', '<', '>']
     for fs in f_strs:
