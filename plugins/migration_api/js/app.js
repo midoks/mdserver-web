@@ -192,9 +192,6 @@ function initStep3(){
     });
 }
 
-
-
-
 function renderMigrationProgress(){
     maPostNoMsg('get_speed',{}, function(rdata){
         var rdata = $.parseJSON(rdata.data);
@@ -239,7 +236,7 @@ function initStep4(){
     });
 
     var databases_checked = '';
-    $('input[name="databases"]').each(function(){
+    $('input[name="databases"]:checked').each(function(){
         databases_checked+=$(this).val()+',';
     });
 
@@ -303,8 +300,19 @@ function initStep(){
         selectProgress(2);
     });
 
+    
     $('.psync_data').on('click', '.dataMigrate', function(){ 
         initStep4();
+    });
+
+    $('#sites_All').on('click',function(){ 
+        var ch = $(this).prop('checked');
+        $('#sites_li input').prop('checked',ch);
+    });
+
+    $('#db_All').on('click',function(){ 
+        var ch = $(this).prop('checked');
+        $('#db_li input').prop('checked',ch);
     });
 
     $('.psync_migrate').on('click', '.okBtn', function(){ 
