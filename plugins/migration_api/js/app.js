@@ -198,7 +198,7 @@ function initStep3(){
 function renderMigrationProgress(){
     maPostNoMsg('get_speed',{}, function(rdata){
         var rdata = $.parseJSON(rdata.data);
-        console.log('speed:',rdata.data);
+        // console.log('speed:',rdata.data);
         if (rdata.status){
             if (rdata['data']['action'] == 'True'){
                 var end = '<div class="line">\
