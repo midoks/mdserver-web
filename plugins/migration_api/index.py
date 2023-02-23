@@ -456,8 +456,8 @@ class classApi:
         #     return False
 
         s_files = [
-            [self.__VHOST_PATH +
-                '/nginx/vhost/{}.conf'.format(siteInfo['name']), "网站配置文件"],
+            # [self.__VHOST_PATH +
+            #     '/nginx/vhost/{}.conf'.format(siteInfo['name']), "网站配置文件"],
             [self.__VHOST_PATH +
              '/nginx/pass/{}.conf'.format(siteInfo['name']), "PASS"],
             [self.__VHOST_PATH +
@@ -466,9 +466,9 @@ class classApi:
              '/nginx/redirect/{}'.format(siteInfo['name']), "重定向配置"],
             [self.__VHOST_PATH +
              '/nginx/proxy/{}'.format(siteInfo['name']), "反向代理配置"],
-            [self.__VHOST_PATH +
-                "/letsencrypt/{}".format(siteInfo['name']), "网站SSL证书"],
-            [self.__VHOST_PATH + "/ssl/{}".format(siteInfo['name']), "网站SSL证书"]
+            # [self.__VHOST_PATH +
+            #     "/letsencrypt/{}".format(siteInfo['name']), "网站SSL证书"],
+            # [self.__VHOST_PATH + "/ssl/{}".format(siteInfo['name']), "网站SSL证书"]
         ]
 
         self.send_list(s_files)

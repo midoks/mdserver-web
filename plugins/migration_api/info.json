@@ -1,6 +1,6 @@
 {
 	"sort": 7,
-	"ps": "[<span style='color:red;'>潜龙勿用</span>]一键迁移,仅网站数据和MySQL数据",
+	"ps": "[<span style='color:red;'>潜龙勿用</span>]一键迁移,仅网站数据和MySQL数据(仅支持源码安装软件)",
 	"name": "migration_api",
 	"title": "一键迁移API",
 	"shell": "install.sh",
