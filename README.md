@@ -98,15 +98,12 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.12.3
+### 版本更新 0.13.0
 
-* 优先使用firewalld防火墙。
-* PHP[APT]加入curl扩展。
-* 配置添加【未认证响应状态】功能。
-* 存在ipv6时，启动时强制开启。
-* OP防火墙-性能优化。
-* 网站统计优化。
-* 优化backup_ftp插件。
+* 一键迁移插件。
+* 修复acme ssl申请。
+* IP识别优化。
+* 解决删除站点残留的问题。
 * 各种细节优化。
 
 ### JSDelivr安装地址
