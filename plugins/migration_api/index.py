@@ -467,7 +467,8 @@ class classApi:
             [self.__VHOST_PATH +
              '/nginx/proxy/{}'.format(siteInfo['name']), "反向代理配置"],
             [self.__VHOST_PATH +
-                "/letsencrypt/{}".format(siteInfo['name']), "网站SSL证书"]
+                "/letsencrypt/{}".format(siteInfo['name']), "网站SSL证书"],
+            [self.__VHOST_PATH + "/ssl/{}".format(siteInfo['name']), "网站SSL证书"]
         ]
 
         self.send_list(s_files)
@@ -880,6 +881,14 @@ def stepOne():
 
     url = args['url']
     token = args['token']
+
+    speed_file = getServerDir() + '/config/speed.json'
+    if os.path.exists(speed_file):
+        os.remove(speed_file)
+
+    sync_file = getServerDir() + '/config/sync_info.json'
+    if os.path.exists(sync_file):
+        os.remove(sync_file)
 
     api = classApi(url, token)
     # api =
