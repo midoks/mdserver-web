@@ -42,7 +42,7 @@ class classApi:
         self._SPEED_FILE = getServerDir() + '/config/speed.json'
         self._INFO_FILE = getServerDir() + '/config/sync_info.json'
         self._SYNC_INFO = self.get_sync_info(None)
-        self.__VHOST_PATH = mw.getServerDir() + '/web_conf/vhost'
+        self.__VHOST_PATH = mw.getServerDir() + '/web_conf'
 
     # 计算MD5
     def __get_md5(self, s):
@@ -353,9 +353,16 @@ class classApi:
                                                                 60), total_time % 60, toSize(pdata['size'] / total_time)))
         return True
 
+    def send_list(self, s_files):
+        # 发送文件列表
+        for f in s_files:
+            if not os.path.exists(f[0]):
+                continue
+            self.send_file_list(f[0], f[0])
+
     def send_file_list(self, spath, dpath):
         if not os.path.isdir(spath):
-            return self.send_file(spath, dpath, True)
+            return self.upload_file(spath, dpath, True)
 
         # 创建目录
         self.send('/files/create_dir', {"path": dpath})
@@ -448,6 +455,23 @@ class classApi:
         # if not self.create_site(siteInfo, index):
         #     return False
 
+        s_files = [
+            [self.__VHOST_PATH +
+                '/nginx/vhost/{}.conf'.format(siteInfo['name']), "网站配置文件"],
+            [self.__VHOST_PATH +
+             '/nginx/pass/{}.conf'.format(siteInfo['name']), "PASS"],
+            [self.__VHOST_PATH +
+             '/nginx/rewrite/{}.conf'.format(siteInfo['name']), "伪静态配置"],
+            [self.__VHOST_PATH +
+             '/nginx/redirect/{}'.format(siteInfo['name']), "重定向配置"],
+            [self.__VHOST_PATH +
+             '/nginx/proxy/{}'.format(siteInfo['name']), "反向代理配置"],
+            [self.__VHOST_PATH +
+                "/letsencrypt/{}".format(siteInfo['name']), "网站SSL证书"]
+        ]
+
+        self.send_list(s_files)
+
         if not self.send_file_list(siteInfo['path'], siteInfo['path']):
             self.state('sites', index, -1, '数据传输失败!')
             return False
@@ -475,6 +499,9 @@ class classApi:
 
                 siteInfo['domain'] = mw.M('domain').where(
                     'pid=? and name!=?', (pid, site_name)).field('name,port').select()
+
+                siteInfo['binding'] = mw.M('binding').where(
+                    'pid=?', (id,)).field('domain,path,port').select()
 
                 if self.send_site(siteInfo, i):
                     self.state('sites', i, 2)
@@ -742,7 +769,6 @@ class classApi:
         # 开始迁移
         # self.upload_file("/tmp/mysql-boost-5.7.39.tar.gz", "/tmp/mysql-boost-5.7.39.tar.gz")
 
-        # mw.CheckMyCnf()
         # self.sync_other()
         self.sync_site()
         self.sync_database()
