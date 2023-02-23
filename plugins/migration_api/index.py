@@ -361,6 +361,12 @@ class classApi:
             self.send_file_list(f[0], f[0])
 
     def send_file_list(self, spath, dpath):
+
+        if os.path.islink(spath):
+            dpath = os.readlink(spath)
+            mw.buildSoftLink(spath, dpath, True)
+            return True
+
         if not os.path.isdir(spath):
             return self.upload_file(spath, dpath, True)
 
@@ -468,12 +474,16 @@ class classApi:
              '/nginx/proxy/{}'.format(siteInfo['name']), "反向代理配置"],
             [self.__VHOST_PATH +
                 "/letsencrypt/{}".format(siteInfo['name']), "网站[LETS]SSL证书"],
-            # [self.__VHOST_PATH + "/ssl/{}".format(siteInfo['name']), "网站SSL证书"],
         ]
 
         if not mw.isAppleSystem():
             acme_dir = mw.getAcmeDomainDir(siteInfo['name'])
             s_files.append([acme_dir, "网站[ACME]SSL证书"])
+
+        s_files.append(
+            [self.__VHOST_PATH + "/ssl/{}/fullchain.pem".format(siteInfo['name']), "网站SSL[fullchain]证书"])
+        s_files.append(
+            [self.__VHOST_PATH + "/ssl/{}/privkey.pem".format(siteInfo['name']), "网站SSL[privkey]证书"])
 
         self.send_list(s_files)
 
@@ -772,7 +782,8 @@ class classApi:
 
     def run(self):
         # 开始迁移
-        # self.upload_file("/tmp/mysql-boost-5.7.39.tar.gz", "/tmp/mysql-boost-5.7.39.tar.gz")
+        # self.upload_file("/tmp/mysql-boost-5.7.39.tar.gz",
+        # "/tmp/mysql-boost-5.7.39.tar.gz")
 
         # self.sync_other()
         self.sync_site()
