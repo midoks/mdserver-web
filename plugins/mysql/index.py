@@ -48,19 +48,20 @@ def getInitDFile():
 
 def getArgs():
     args = sys.argv[2:]
-
     tmp = {}
     args_len = len(args)
-
     if args_len == 1:
         t = args[0].strip('{').strip('}')
-        t = t.split(':')
+        if t.strip() == '':
+            tmp = []
+        else:
+            t = t.split(':', 1)
+            tmp[t[0]] = t[1]
         tmp[t[0]] = t[1]
     elif args_len > 1:
         for i in range(len(args)):
-            t = args[i].split(':')
+            t = args[i].split(':', 1)
             tmp[t[0]] = t[1]
-
     return tmp
 
 
@@ -842,10 +843,27 @@ def setDbBackup():
         return data[1]
 
     scDir = mw.getRunDir() + '/scripts/backup.py'
-
     cmd = 'python3 ' + scDir + ' database ' + args['name'] + ' 3'
     os.system(cmd)
     return mw.returnJson(True, 'ok')
+
+
+# 数据库密码处理
+def myPass(act, root):
+    conf_file = getConf()
+    mw.execShell("sed -i '/user=root/d' {}".format(conf_file))
+    mw.execShell("sed -i '/password=/d' {}".format(conf_file))
+    if act:
+        mycnf = mw.readFile(conf_file)
+        src_dump = "[mysqldump]\n"
+        sub_dump = src_dump + "user=root\npassword=\"{}\"\n".format(root)
+        if not mycnf:
+            return False
+        mycnf = mycnf.replace(src_dump, sub_dump)
+        if len(mycnf) > 100:
+            mw.writeFile(conf_file, mycnf)
+        return True
+    return True
 
 
 def importDbExternal():
@@ -902,11 +920,16 @@ def importDbExternal():
     pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
     sock = getSocketFile()
 
-    os.environ["MYSQL_PWD"] = pwd
-    mysql_cmd = getServerDir() + '/bin/mysql -S ' + sock + ' -uroot -p' + \
-        pwd + ' ' + name + ' < ' + import_sql
+    my_cnf = getConf()
 
+    myPass(True, pwd)
+    mysql_cmd = getServerDir() + '/bin/mysql --defaults-file=' + my_cnf + \
+        ' -uroot -p\"' + pwd + '\" -f ' + name + ' < ' + import_sql
+
+    # print(mysql_cmd)
     rdata = mw.execShell(mysql_cmd)
+    myPass(False, pwd)
+    # print(rdata)
     if ext != 'sql':
         os.remove(import_sql)
 
@@ -2371,6 +2394,25 @@ def initSlaveStatus(version=''):
         return initSlaveStatusSyncUser(version)
 
 
+def makeSyncUsercmd(u, version=''):
+    mode = recognizeDbMode()
+    sql = ''
+
+    ip = u['ip']
+    port = u['port']
+    username = u['user']
+    password = u['pass']
+    if mode == "gtid":
+        sql = "CHANGE MASTER TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
+            username + "', MASTER_PASSWORD='" + \
+            password + "', MASTER_AUTO_POSITION=1"
+        if version == '8.0':
+            sql = "CHANGE REPLICATION SOURCE TO SOURCE_HOST='" + ip  + "', SOURCE_PORT=" + port + ", SOURCE_USER='" + \
+                username  + "', SOURCE_PASSWORD='" + \
+                password + "', MASTER_AUTO_POSITION=1"
+    return sql
+
+
 def initSlaveStatusSyncUser(version=''):
     conn = pSqliteDb('slave_sync_user')
     data = conn.field('ip,port,user,pass,mode,cmd').find()
@@ -2393,8 +2435,19 @@ def initSlaveStatusSyncUser(version=''):
     if local_mode != mode_name:
         return mw.returnJson(False, '同步模式不一致!')
 
-    t = db.query(u['cmd'])
-    # print(t)
+    if u['cmd'] == '' and local_mode == 'gtid':
+        sql = makeSyncUsercmd(u, version)
+        # print(sql)
+        t = db.query(sql)
+    else:
+        if u['cmd'] == '':
+            return mw.returnJson(False, '经典模式下,必须手写同步命令!')
+        # print(u['cmd'])
+        t = db.query(u['cmd'])
+    isError = isSqlError(t)
+    if isError:
+        return isError
+
     db.query("start slave user='{}' password='{}';".format(
         u['user'], u['pass']))
     return mw.returnJson(True, '初始化成功!')
@@ -2613,7 +2666,7 @@ def doFullSyncUser(version=''):
 
     if not os.path.exists(bak_file):
         dump_sql_data = getServerDir() + "/bin/mysqldump " + dmp_option + " --force --opt --default-character-set=utf8 --single-transaction -h" + ip + " -P" + \
-            port + " -u" + user + " -p" + apass + " " + sync_db + " > " + bak_file
+            port + " -u" + user + " -p\"" + apass + "\" " + sync_db + " > " + bak_file
         mw.execShell(dump_sql_data)
 
     writeDbSyncStatus({'code': 2, 'msg': '本地导入数据...', 'progress': 40})

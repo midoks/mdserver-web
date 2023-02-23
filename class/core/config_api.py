@@ -27,7 +27,7 @@ from flask import request
 
 class config_api:
 
-    __version = '0.12.3'
+    __version = '0.13.0'
     __api_addr = 'data/api.json'
 
     def __init__(self):
@@ -693,10 +693,6 @@ class config_api:
     def setPanelTokenApi(self):
         op_type = request.form.get('op_type', '').strip()
 
-        api_file = self.__api_addr
-        tmp = mw.readFile(api_file)
-        data = json.loads(tmp)
-
         if op_type == '1':
             token = mw.getRandomString(32)
             data['token'] = mw.md5(token)
@@ -706,7 +702,14 @@ class config_api:
             mw.writeFile(api_file, json.dumps(data))
             return mw.returnJson(True, 'ok', token)
 
-        elif op_type == '2':
+        api_file = self.__api_addr
+        if not os.path.exists(api_file):
+            return mw.returnJson(False, "先在API接口配置")
+        else:
+            tmp = mw.readFile(api_file)
+            data = json.loads(tmp)
+
+        if op_type == '2':
             data['open'] = not data['open']
             stats = {True: '开启', False: '关闭'}
             if not 'token_crypt' in data:
@@ -721,6 +724,7 @@ class config_api:
             return mw.returnJson(not not data['open'], token)
 
         elif op_type == '3':
+
             limit_addr = request.form.get('limit_addr', '').strip()
             data['limit_addr'] = limit_addr.split('\n')
             mw.writeLog('API配置', '变更IP限制为[%s]' % limit_addr)

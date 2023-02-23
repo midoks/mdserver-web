@@ -123,6 +123,23 @@ def getAcmeDir():
     return acme
 
 
+def getAcmeDomainDir(domain):
+    acme_dir = getAcmeDir()
+    acme_domain = acme_dir + '/' + domain
+    acme_domain_ecc = acme_domain + '_ecc'
+    if os.path.exists(acme_domain_ecc):
+        acme_domain = acme_domain_ecc
+    return acme_domain
+
+
+def fileNameCheck(filename):
+    f_strs = [';', '&', '<', '>']
+    for fs in f_strs:
+        if filename.find(fs) != -1:
+            return False
+    return True
+
+
 def triggerTask():
     isTask = getRunDir() + '/tmp/panelTask.pl'
     writeFile(isTask, 'True')
@@ -988,7 +1005,7 @@ def getLocalIp():
     try:
         ipaddress = readFile(filename)
         if not ipaddress or ipaddress == '127.0.0.1':
-            cmd = "curl -4 -sS --connect-timeout 5 -m 60 https://v6r.ipip.net/?format=text"
+            cmd = "curl --insecure -4 -sS --connect-timeout 5 -m 60 https://v6r.ipip.net/?format=text"
             ip = execShell(cmd)
             result = ip[0].strip()
             if result == '':
@@ -997,7 +1014,7 @@ def getLocalIp():
             return result
         return ipaddress
     except Exception as e:
-        cmd = "curl -6 -sS --connect-timeout 5 -m 60 https://v6r.ipip.net/?format=text"
+        cmd = "curl --insecure -6 -sS --connect-timeout 5 -m 60 https://v6r.ipip.net/?format=text"
         ip = execShell(cmd)
         result = ip[0].strip()
         if result == '':
@@ -1122,6 +1139,15 @@ def setOwn(filename, user, group=None):
     return True
 
 
+def setMode(filename, mode):
+    # 设置文件权限
+    if not os.path.exists(filename):
+        return False
+    mode = int(str(mode), 8)
+    os.chmod(filename, mode)
+    return True
+
+
 def checkPort(port):
     # 检查端口是否合法
     ports = ['21', '443', '888']
@@ -1207,7 +1233,7 @@ def makeConf():
     file = getRunDir() + '/data/json/config.json'
     if not os.path.exists(file):
         c = {}
-        c['title'] = '大圣面板'
+        c['title'] = '金蝉面板'
         c['home'] = 'http://github/midoks/mdserver-web'
         c['recycle_bin'] = True
         c['template'] = 'default'
@@ -1612,6 +1638,31 @@ def getSshDir():
         user = execShell("who | sed -n '2, 1p' |awk '{print $1}'")[0].strip()
         return '/Users/' + user + '/.ssh'
     return '/root/.ssh'
+
+
+def processExists(pname, exe=None, cmdline=None):
+    # 进程是否存在
+    try:
+        import psutil
+        pids = psutil.pids()
+        for pid in pids:
+            try:
+                p = psutil.Process(pid)
+                if p.name() == pname:
+                    if not exe and not cmdline:
+                        return True
+                    else:
+                        if exe:
+                            if p.exe() == exe:
+                                return True
+                        if cmdline:
+                            if cmdline in p.cmdline():
+                                return True
+            except:
+                pass
+        return False
+    except:
+        return True
 
 
 def createRsa():

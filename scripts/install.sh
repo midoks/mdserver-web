@@ -72,7 +72,7 @@ if [ $OSNAME != "macos" ];then
 
 	# https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/scripts/install.sh
 
-	cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
+	cn=$(curl --insecure -fsSL -m 10 https://ipinfo.io/json | grep "\"country\": \"CN\"")
 
 	if [ ! -d /www/server/mdserver-web ];then
 		if [ ! -z "$cn" ];then
@@ -106,7 +106,22 @@ fi
 
 
 echo "use system version: ${OSNAME}"
-cd /www/server/mdserver-web && bash scripts/install/${OSNAME}.sh
+
+if [ "${OSNAME}" == "macos" ];then
+	cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
+	HTTP_PREFIX="https://"
+	if [ ! -z "$cn" ];then
+	    HTTP_PREFIX="https://ghproxy.com/"
+	fi
+	curl -fsSL ${HTTP_PREFIX}https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/install/macos.sh | bash
+else
+	cd /www/server/mdserver-web && bash scripts/install/${OSNAME}.sh
+fi
+
+if [ "${OSNAME}" == "macos" ];then
+	echo "macos end"
+	exit 0
+fi
 
 cd /www/server/mdserver-web && bash cli.sh start
 isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`

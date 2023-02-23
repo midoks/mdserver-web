@@ -196,11 +196,11 @@ error_logs()
 
 mw_update()
 {
-    cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
+    cn=$(curl --insecure -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
     if [ ! -z "$cn" ];then
-        curl -fsSL https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/scripts/update.sh | bash
+        curl --insecure -fsSL https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/scripts/update.sh | bash
     else
-        curl -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/update.sh | bash
+        curl --insecure -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/update.sh | bash
     fi
 }
 
@@ -208,20 +208,20 @@ mw_update_dev()
 {
     cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
     if [ ! -z "$cn" ];then
-        curl -fsSL https://gitee.com/midoks/mdserver-web/raw/dev/scripts/update_dev.sh | bash
+        curl --insecure -fsSL https://gitee.com/midoks/mdserver-web/raw/dev/scripts/update_dev.sh | bash
     else
-        curl -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update_dev.sh | bash
+        curl --insecure -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update_dev.sh | bash
     fi
     cd /www/server/mdserver-web
 }
 
 mw_mirror()
 {
-    cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
+    cn=$(curl --insecure -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
     if [ ! -z "$cn" ];then
-        bash <(curl -sSL https://gitee.com/SuperManito/LinuxMirrors/raw/main/ChangeMirrors.sh)
+        bash <(curl --insecure -sSL https://gitee.com/SuperManito/LinuxMirrors/raw/main/ChangeMirrors.sh)
     else
-        bash <(curl -sSL https://raw.githubusercontent.com/midoks/change-linux-mirrors/main/change-mirrors.sh)
+        bash <(curl --insecure -sSL https://raw.githubusercontent.com/midoks/change-linux-mirrors/main/change-mirrors.sh)
     fi
     cd /www/server/mdserver-web
 }

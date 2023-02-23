@@ -550,7 +550,7 @@ class site_api:
                 return mw.returnJson(False, '使用中,先关闭再删除')
             mw.execShell('rm -rf ' + ssl_lets_dir)
         elif ssl_type == 'acme':
-            ssl_acme_dir = mw.getAcmeDir() + '/' + site_name
+            ssl_acme_dir = mw.getAcmeDomainDir(site_name)
             csr_acme_path = ssl_acme_dir + '/fullchain.cer'  # 生成证书路径
             if mw.md5(mw.readFile(csr_acme_path)) == mw.md5(mw.readFile(csr_path)):
                 return mw.returnJson(False, '使用中,先关闭再删除')
@@ -587,9 +587,9 @@ class site_api:
             csr_path = self.sslLetsDir + '/' + site_name + '/fullchain.pem'  # 生成证书路径
             key_path = self.sslLetsDir + '/' + site_name + '/privkey.pem'    # 密钥文件路径
         elif ssl_type == 'acme':
-            csr_path = mw.getAcmeDir() + '/' + site_name + '/fullchain.cer'  # 生成证书路径
-            key_path = mw.getAcmeDir() + '/' + site_name + '/' + \
-                site_name + '.key'    # 密钥文件路径
+            acme_dir = mw.getAcmeDomainDir(site_name)
+            csr_path = acme_dir + '/fullchain.cer'  # 生成证书路径
+            key_path = acme_dir + '/' + site_name + '.key'    # 密钥文件路径
 
         key = mw.readFile(key_path)
         csr = mw.readFile(csr_path)
@@ -989,16 +989,17 @@ class site_api:
         # print(cmd)
         result = mw.execShell(cmd)
 
-        src_path = acme_dir + '/' + domains[0]
+        src_path = mw.getAcmeDomainDir(domains[0])
         src_cert = src_path + '/fullchain.cer'
         src_key = src_path + '/' + domains[0] + '.key'
+        src_cert.replace("\*", "*")
 
         msg = '签发失败,您尝试申请证书的失败次数已达上限!<p>1、检查域名是否绑定到对应站点</p>\
             <p>2、检查域名是否正确解析到本服务器,或解析还未完全生效</p>\
             <p>3、如果您的站点设置了反向代理,或使用了CDN,请先将其关闭</p>\
             <p>4、如果您的站点设置了301重定向,请先将其关闭</p>\
             <p>5、如果以上检查都确认没有问题，请尝试更换DNS服务商</p>'
-        if not os.path.exists(src_cert.replace("\*", "*")):
+        if not os.path.exists(src_cert):
             data = {}
             data['err'] = result
             data['out'] = result[0]
@@ -2588,6 +2589,8 @@ location ^~ {from} {\n\
             mw.execShell('rm -rf ' + ssl_acme_dir)
 
         mw.M('sites').where("id=?", (sid,)).delete()
+        mw.M('domain').where("pid=?", (sid,)).delete()
+        mw.M('domain').where("name=?", (webname,)).delete()
 
         # binding domain delete
         binding_list = mw.M('binding').field(

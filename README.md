@@ -73,7 +73,7 @@ phpMyAdmin[4.4.15]支持MySQL[5.5-5.7]
 phpMyAdmin[5.2.0]支持MySQL[8.0]
 
 PHP[53-72]支持phpMyAdmin[4.4.15]
-PHP[72-81]支持phpMyAdmin[5.2.0]
+PHP[72-82]支持phpMyAdmin[5.2.0]
 ```
 
 # 特别赞助
@@ -98,15 +98,12 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.12.3
+### 版本更新 0.13.0
 
-* 优先使用firewalld防火墙。
-* PHP[APT]加入curl扩展。
-* 配置添加【未认证响应状态】功能。
-* 存在ipv6时，启动时强制开启。
-* OP防火墙-性能优化。
-* 网站统计优化。
-* 优化backup_ftp插件。
+* 一键迁移插件。
+* 修复acme ssl申请。
+* IP识别优化。
+* 解决删除站点残留的问题。
 * 各种细节优化。
 
 ### JSDelivr安装地址
@@ -115,6 +112,7 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 
 ```
 curl -fsSL https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/scripts/install.sh | bash
+
 ```
 
 - 直接更新
@@ -135,7 +133,7 @@ wget -O uninstall.sh https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/scri
 
 ```
 curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/install.sh | bash
-
+curl --insecure -fsSL  https://gitee.com/midoks/mdserver-web/raw/master/scripts/install.sh | bash
 ```
 
 - 直接更新

@@ -179,7 +179,6 @@ def requestCheck():
 
 
 def isLogined():
-    # print('isLogined', session)
     if 'login' in session and 'username' in session and session['login'] == True:
         userInfo = mw.M('users').where(
             "id=?", (1,)).field('id,username,password').find()
@@ -445,7 +444,6 @@ def login_temp_user(token):
 
 @app.route('/api/<reqClass>/<reqAction>', methods=['POST', 'GET'])
 def api(reqClass=None, reqAction=None, reqData=None):
-
     comReturn = common.local()
     if comReturn:
         return comReturn
@@ -458,14 +456,17 @@ def api(reqClass=None, reqAction=None, reqData=None):
     request_time = request.form.get('request_time', '')
     request_token = request.form.get('request_token', '')
     request_ip = request.remote_addr
+    request_ip = request_ip.replace('::ffff:', '')
 
-    token_md5 = mw.md5(str(request_time) + mw.md5(data['token_crypt']))
+    # print(request_time, request_token)
+    if not mw.inArray(data['limit_addr'], request_ip):
+        return mw.returnJson(False, 'IP校验失败,您的访问IP为[' + request_ip + ']')
+
+    local_token = mw.deCrypt(data['token'], data['token_crypt'])
+    token_md5 = mw.md5(str(request_time) + mw.md5(local_token))
 
     if not (token_md5 == request_token):
         return mw.returnJson(False, '密钥错误')
-
-    if not mw.inArray(data['limit_addr'], request_ip):
-        return mw.returnJson(False, '非法请求')
 
     if reqClass == None:
         return mw.returnJson(False, '请指定请求方法类')
@@ -477,7 +478,7 @@ def api(reqClass=None, reqAction=None, reqData=None):
                  'plugins_api', 'system_api', 'site_api', 'task_api')
     className = reqClass + '_api'
     if not className in classFile:
-        return "external api request error"
+        return mw.returnJson(False, 'external api request error')
 
     eval_str = "__import__('" + className + "')." + className + '()'
     newInstance = eval(eval_str)

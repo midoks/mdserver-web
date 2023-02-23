@@ -166,6 +166,33 @@ class system_api:
         except:
             return False
 
+    def getEnvInfoApi(self, get=None):
+        serverInfo = {}
+        serverInfo['status'] = True
+        sdir = mw.getServerDir()
+
+        serverInfo['webserver'] = '未安装'
+        if os.path.exists(sdir + '/openresty/nginx/sbin/nginx'):
+            serverInfo['webserver'] = 'OpenResty'
+        serverInfo['php'] = []
+        phpversions = ['52', '53', '54', '55', '56', '70', '71',
+                       '72', '73', '74', '80', '81', '82', '83', '84']
+        phpPath = sdir + '/php/'
+        for pv in phpversions:
+            if not os.path.exists(phpPath + pv + '/bin/php'):
+                continue
+            serverInfo['php'].append(pv)
+        serverInfo['mysql'] = False
+        if os.path.exists(sdir + '/mysql/bin/mysql'):
+            serverInfo['mysql'] = True
+        import psutil
+        try:
+            diskInfo = psutil.disk_usage('/www')
+        except:
+            diskInfo = psutil.disk_usage('/')
+        serverInfo['disk'] = diskInfo[2]
+        return mw.returnJson(True, 'ok', serverInfo)
+
     def getPanelInfo(self, get=None):
         # 取面板配置
         address = mw.GetLocalIp()

@@ -228,11 +228,11 @@ label.checkbox_label span {
                 </div>
                 <div class="mtb20">
                     <span class="panel_setp_span">接收数据的面板地址</span>
-                    <input type="text" class="bt-input-text" name="psync_url" value="" placeholder="接收数据面板地址，如: http://127.0.0.1:8888">
+                    <input type="text" class="bt-input-text" name="sync_url" value="" placeholder="接收数据面板地址，如: http://127.0.0.1:8888">
                 </div>
                 <div class="mtb20">
                     <span class="panel_setp_span">接收数据的面板API</span>
-                    <input type="text" class="bt-input-text" name="psync_token" value="" placeholder="接收数据面板API密钥" />
+                    <input type="text" class="bt-input-text" name="sync_token" value="" placeholder="接收数据面板API密钥" />
                     <a href="#" target="_blank" class="btlink ml5">获取API秘钥</a>
                 </div>
                 <div class="mtb20">
@@ -243,8 +243,7 @@ label.checkbox_label span {
                     <button class="btn btn-success infoNext">下一步</button>
                 </div>
             </div>
-            <div class="pa15 psync_path" style="margin:0 50px">
-            </div>
+            <div class="pa15 psync_path" style="margin:0 50px;"></div>
             <div class="pa15 psync_data" style="text-align: left;">
                 <div class="checkbox_conten">
                     <div class="checkbox_data">
@@ -253,7 +252,7 @@ label.checkbox_label span {
                                 <input type="checkbox" id="sites_All" checked>
                                 <span>网站</span>
                             </label>
-                            <ul></ul>
+                            <ul id="sites_li"></ul>
                         </div>
                     </div>
                     <div class="checkbox_data">
@@ -262,7 +261,7 @@ label.checkbox_label span {
                                 <input type="checkbox" id="db_All" checked>
                                 <span>数据库</span>
                             </label>
-                            <ul></ul>
+                            <ul id="db_li"></ul>
                         </div>
                     </div>
                 </div>
@@ -285,6 +284,7 @@ label.checkbox_label span {
 
 
 <script type="text/javascript">
+resetPluginWinWidth(700);
 resetPluginWinWidth(700);
 $.getScript( "/plugins/file?name=migration_api&f=js/app.js", function(){
     initStep();

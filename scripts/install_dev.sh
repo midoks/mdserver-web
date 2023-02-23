@@ -5,7 +5,7 @@ export PATH
 is64bit=`getconf LONG_BIT`
 
 echo -e "您正在安装的是\033[31mmdserver-web测试版\033[0m，非开发测试用途请使用正式版 install.sh ！" 
-echo -e "You are installing\033[31mmdserver-web dev version\033[0m, normally use install.sh for production.\n" 
+echo -e "You are installing\033[31m mdserver-web dev version\033[0m, normally use install.sh for production.\n" 
 sleep 1
 
 {
@@ -60,6 +60,21 @@ else
 fi
 
 
+HTTP_PREFIX="https://"
+LOCAL_ADDR=common
+ping  -c 1 github.com > /dev/null 2>&1
+if [ "$?" != "0" ];then
+	LOCAL_ADDR=cn
+	HTTP_PREFIX="https://ghproxy.com/"
+fi
+
+# cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
+# HTTP_PREFIX="https://"
+# if [ ! -z "$cn" ];then
+#     HTTP_PREFIX="https://ghproxy.com/"
+# fi
+
+
 if [ $OSNAME != "macos" ];then
 	mkdir -p /www/server
 	mkdir -p /www/wwwroot
@@ -68,7 +83,7 @@ if [ $OSNAME != "macos" ];then
 	mkdir -p /www/backup/site
 
 	if [ ! -d /www/server/mdserver-web ];then
-		curl -sSLo /tmp/dev.zip https://github.com/midoks/mdserver-web/archive/refs/heads/dev.zip
+		curl -sSLo /tmp/dev.zip ${HTTP_PREFIX}github.com/midoks/mdserver-web/archive/refs/heads/dev.zip
 		cd /tmp && unzip /tmp/dev.zip
 		mv -f /tmp/mdserver-web-dev /www/server/mdserver-web
 		rm -rf /tmp/dev.zip
@@ -77,8 +92,8 @@ if [ $OSNAME != "macos" ];then
 
 	# install acme.sh
 	if [ ! -d /root/.acme.sh ];then
-	    if [ ! -z "$cn" ];then
-	        curl -sSL -o /tmp/acme.tar.gz https://ghproxy.com/github.com/acmesh-official/acme.sh/archive/master.tar.gz
+	    if [ "$HTTP_PREFIX" == "https://ghproxy.com/" ];then
+	        curl -sSL -o /tmp/acme.tar.gz ${HTTP_PREFIX}github.com/acmesh-official/acme.sh/archive/master.tar.gz
 	        tar xvzf /tmp/acme.tar.gz -C /tmp
 	        cd /tmp/acme.sh-master
 	        bash acme.sh install
@@ -92,7 +107,17 @@ if [ $OSNAME != "macos" ];then
 fi
 
 echo "use system version: ${OSNAME}"
-cd /www/server/mdserver-web && bash scripts/install/${OSNAME}.sh
+
+if [ "${OSNAME}" == "macos" ];then
+	curl -fsSL ${HTTP_PREFIX}raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/install/macos.sh | bash
+else
+	cd /www/server/mdserver-web && bash scripts/install/${OSNAME}.sh
+fi
+
+if [ "${OSNAME}" == "macos" ];then
+	echo "macos end"
+	exit 0
+fi
 
 cd /www/server/mdserver-web && bash cli.sh start
 isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`

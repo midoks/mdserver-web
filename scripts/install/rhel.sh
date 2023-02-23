@@ -134,11 +134,14 @@ if [ $VERSION_ID -ge 8 ];then
         gmp-devel kernel-devel libXpm-devel libaio-devel libcap libcurl libcurl-devel libevent libevent-devel \
         libicu-devel libidn libidn-devel libmcrypt libmcrypt-devel libmemcached libmemcached-devel \
         libpng libpng-devel libstdc++.so.6 libtirpc libtirpc-devel libtool libtool-libs libwebp libwebp-devel \
-        libxml2 libxml2-devel libxslt libxslt-devel lsof make mysql-devel ncurses ncurses-devel net-tools \
+        libxml2 libxml2-devel libxslt libxslt-devel libarchive lsof make mysql-devel ncurses ncurses-devel net-tools \
         oniguruma oniguruma-devel patch pcre pcre-devel perl perl-Data-Dumper perl-devel procps psmisc python3-devel \
         readline-devel rpcgen sqlite-devel tar unzip vim-minimal wget zip zlib zlib-devel ;
     do
         dnf $REPOS install -y $rpms;
+        if [ "$?" != "0" ];then
+            dnf install -y $rpms;
+        fi
     done
 else
     # CentOS 7
