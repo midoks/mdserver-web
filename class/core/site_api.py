@@ -990,7 +990,7 @@ class site_api:
         result = mw.execShell(cmd)
 
         src_path = acme_dir + '/' + domains[0]
-        src_path_ecc = acme_dir + '/' + domains[0] + '_ecc'
+        src_path_ecc = src_path + '_ecc'
         if os.path.exists(src_path_ecc):
             src_path = src_path_ecc
 
