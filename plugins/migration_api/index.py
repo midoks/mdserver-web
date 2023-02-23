@@ -99,9 +99,12 @@ class classApi:
             os.remove(log_file)
 
         plugins_dir = mw.getServerDir() + '/mdserver-web'
-        exe = "cd {0} && source bin/activate && nohup python3 plugins/migration_api/index.py bg_process &>{1} &".format(
+        exe = "cd {0} && source bin/activate && python3 plugins/migration_api/index.py bg_process &>{1} &".format(
             plugins_dir, log_file_error)
-        mw.execShell(exe)
+        # mw.execShell(exe)
+        # os.system(exe)
+        subprocess.Popen(exe, shell=True, stdout=subprocess.PIPE,
+                         stderr=subprocess.PIPE)
         time.sleep(1)
         # 检查是否执行成功
         if not getPid():
@@ -350,7 +353,7 @@ class classApi:
         # 设置状态
         self._SYNC_INFO[stype][index]['state'] = state
         self._SYNC_INFO[stype][index]['error'] = error
-        if self._SYNC_INFO[stype][index]['state'] != 1:
+        if self._SYNC_INFO[stype][index]['state'] == 1:
             self._SYNC_INFO['speed'] += 1
         self.save()
 
@@ -399,24 +402,27 @@ class classApi:
 
     def sync_site(self):
         data = getCfgData()
-        sites = data['ready']['sites']
+        sites = self._SYNC_INFO['sites']
         for i in range(len(sites)):
+
+            site_name = sites[i]['name']
             try:
-                siteInfo = mw.M('sites').where('name=?', (sites[i],)).field(
+                self.state('sites', i, 1)
+                siteInfo = mw.M('sites').where('name=?', (site_name,)).field(
                     'id,name,path,ps,status,edate,addtime').find()
 
                 if not siteInfo:
-                    err_msg = "指定站点[{}]不存在!".format(sites[i])
+                    err_msg = "指定站点[{}]不存在!".format(site_name)
                     self.state('sites', i, -1, err_msg)
                     self.error(err_msg)
                     continue
                 pid = siteInfo['id']
 
                 siteInfo['port'] = mw.M('domain').where(
-                    'pid=? and name=?', (pid, sites[i],)).getField('port')
+                    'pid=? and name=?', (pid, site_name,)).getField('port')
 
                 siteInfo['domain'] = mw.M('domain').where(
-                    'pid=? and name!=?', (pid, sites[i])).field('name,port').select()
+                    'pid=? and name!=?', (pid, site_name)).field('name,port').select()
 
                 if self.send_site(siteInfo, i):
                     self.state('sites', i, 2)
@@ -661,12 +667,12 @@ class classApi:
 
     def sync_database(self):
         data = getCfgData()
-        databases = data['ready']['databases']
+
+        databases = self._SYNC_INFO['databases']
         for i in range(len(databases)):
             try:
                 self.state('databases', i, 1)
-                db = databases[i]
-
+                db = databases[i]['name']
                 sp_msg = "|-迁移数据库: [{}]".format(db)
                 self.write_speed('action', sp_msg)
                 write_log(sp_msg)
@@ -682,8 +688,7 @@ class classApi:
 
     def run(self):
         # 开始迁移
-        # self.upload_file(
-        #     "/Users/midoks/Desktop/mwdev/backup/mysql-boost-5.7.39.tar.gz", "/tmp/mysql-boost-5.7.39.tar.gz")
+        # self.upload_file("/tmp/mysql-boost-5.7.39.tar.gz", "/tmp/mysql-boost-5.7.39.tar.gz")
 
         # mw.CheckMyCnf()
         # self.sync_other()
@@ -732,7 +737,7 @@ def getConf():
 def getCfgData():
     path = getConf()
     if not os.path.exists(path):
-        mw.writeFile(path, '{}')
+        mw.writeFile(path, "{}")
 
     t = mw.readFile(path)
     return json.loads(t)
@@ -961,10 +966,6 @@ if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
         print(status())
-    elif func == 'start':
-        print(start())
-    elif func == 'stop':
-        print(stop())
     elif func == 'get_conf':
         print(getStepOneData())
     elif func == 'step_one':

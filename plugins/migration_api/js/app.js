@@ -197,26 +197,32 @@ function initStep3(){
 function renderMigrationProgress(){
     maPostNoMsg('get_speed',{}, function(rdata){
         var rdata = $.parseJSON(rdata.data);
-
-        console.log('sss:',rdata);
+        console.log('speed:',rdata.data);
         if (rdata.status){
-
-
             if (rdata['data']['action'] == 'True'){
                 var end = '<div class="line">\
-                    <div class="success text-center" style="padding: 10px 0 15px;">\
-                    <p style="font-size: 14px;margin-top:2px;color: #939292;">传输大小: 4.92 KB,耗时: 0分6秒,平均速度: 840 B/s</p>\
-                    <p class="mtb15">\
-                        <button class="btn btn-success btn-sm mr5 okBtn">确定完成</button>\
-                        <a class="btn btn-default btn-sm" style="margin-left: 10px;" href="/download?filename=/www/server/migration_api/logs/psync.log">迁移日志</a>\
-                    </p>\
-                    </div>\
+                        <div class="success text-center" style="padding: 10px 0 15px;">\
+                        <p>数据迁移完成,请务必检查数据完整性!</p>\
+                        <p style="font-size: 14px;margin-top:2px;color: #939292;">传输大小: 4.92 KB,耗时: 0分6秒,平均速度: 840 B/s</p>\
+                        <p class="mtb15">\
+                            <button class="btn btn-success btn-sm mr5 okBtn">确定完成</button>\
+                            <a class="btn btn-default btn-sm" style="margin-left: 10px;" href="/download?filename=/www/server/migration_api/logs/psync.log">迁移日志</a>\
+                        </p>\
+                        </div>\
                     </div>';
                 $('.psync_migrate').html(end);
             } else{
                 $('.psync_migrate .action').text(rdata['data']['action']);
                 $('.psync_migrate .done').text(rdata['data']['done']);
                 $('.psync_migrate pre').text(rdata['data']['log']);
+
+                var p = (rdata['data']['all_speed']/rdata['data']['all_total'])*100;
+                if (p>100){
+                    p = 100;
+                }
+                $('.psync_migrate .progress_info_bar').width(p+'%');
+                $('.psync_migrate .progress_info').text(p+'%');
+
                 renderMigrationProgress();
             }
         } else{
@@ -245,8 +251,8 @@ function initStep4(){
                 <div style="text-align:left"><span class="action">--</span>\
                 <span style="margin-left: 20px;" class="done">当前: --</span><img src="/static/img/ing.gif"><a style="position: absolute;right: 40px;" class="btlink psync_close" onclick="migrate.close();">[取消]</a></div>\
                 <div class="bt-progress" style="border-radius:0;height:20px;line-height:19px">\
-                    <div class="bt-progress-bar" style="border-radius: 0px; height: 20px; width: 16.67%;">\
-                        <span class="bt-progress-text ">16.67%</span></div>\
+                    <div class="bt-progress-bar progress_info_bar" style="border-radius: 0px; height: 20px; width: 0%;">\
+                        <span class="bt-progress-text progress_info"></span></div>\
                     </div>\
                 </div>\
             </div>\
