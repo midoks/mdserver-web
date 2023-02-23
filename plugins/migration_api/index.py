@@ -860,7 +860,7 @@ def stepTwo():
     data = {}
     data['local'] = get_src_config(None)
     data['remote'] = get_dst_config(None)
-    return mw.returnJson(True, 'ok', data)
+    return mw.returnJson(True, '获取成功!', data)
 
 
 def get_src_info(args):
@@ -877,7 +877,7 @@ def get_src_info(args):
 
 def stepThree():
     data = get_src_info(None)
-    return mw.returnJson(True, 'ok', data)
+    return mw.returnJson(True, '同步数据,获取成功!', data)
 
 
 def getPid():

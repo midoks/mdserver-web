@@ -18,7 +18,7 @@ function maPostNoMsg(method,args,callback){
     },'json'); 
 }
 
-function maPost(method,args,callback){
+function maPost(method,args,callback, msg = '正在获取...'){
     var _args = null; 
     if (typeof(args) == 'string'){
         _args = JSON.stringify(toArrayObject(args));
@@ -26,7 +26,7 @@ function maPost(method,args,callback){
         _args = JSON.stringify(args);
     }
 
-    var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
+    var loadT = layer.msg(msg, { icon: 16, time: 0, shade: 0.3 });
     $.post('/plugins/run', {name:'migration_api', func:method, args:_args}, function(data) {
         layer.close(loadT);
         if (!data.status){
@@ -99,7 +99,7 @@ function initStep1(){
                 initStep2();
             }
         },{ icon: rdata.status ? 1 : 2 });
-    });
+    },'API校验中...');
 }
 
 function initStep2(){
@@ -149,14 +149,9 @@ function initStep2(){
 
                 $('.psync_path').html(body);
                 $('.psync_path').show();
-
-                $('.pathNext').click(function(){
-                    selectProgress(3);
-                    initStep3();
-                });
             } 
         },{ icon: rdata.status ? 1 : 2 });
-    });
+    },'检测环境中...');
 }
 
 function initStep3(){
@@ -164,6 +159,7 @@ function initStep3(){
         var rdata = $.parseJSON(rdata.data);
         showMsg(rdata.msg,function(){
             if (rdata.status){
+                selectProgress(3);
                 var pdata = rdata.data;
                 var site_li = '';
                 for (var i = 0; i < pdata.sites.length; i++) {
@@ -189,19 +185,8 @@ function initStep3(){
                 }
                 $('#db_li').html(db_li);
 
-
                 $('.psync_path').hide();
                 $('.psync_data').show();
-                $('.dataMigrate').click(function(){
-                    selectProgress(4);
-                    initStep4();
-                });
-
-                $('.dataBack').click(function(){
-                    selectProgress(3);
-                    $('.psync_data').hide();
-                    $('.psync_path').show();
-                });
             } 
         },{ icon: rdata.status ? 1 : 2 });
     });
@@ -226,7 +211,6 @@ function renderMigrationProgress(){
 }
 
 function initStep4(){
-
     var site_checked = '';
     $('input[name="sites"]:checked').each(function(){
         site_checked += $(this).val()+',';
@@ -239,6 +223,7 @@ function initStep4(){
 
     maPost('step_four',{sites:site_checked,databases:databases_checked}, function(rdata){
         var rdata = $.parseJSON(rdata.data);
+        selectProgress(4);
 
         var progress = '<div style="margin: 0 40px;">\
             <div class="line">\
@@ -274,20 +259,46 @@ function initStep4(){
 
 
 function initStep(){
-     maPost('get_conf',{}, function(rdata){
+    maPost('get_conf',{}, function(rdata){
         var rdata = $.parseJSON(rdata.data);
         $('input[name="sync_url"]').val(rdata.data['url']);
         $('input[name="sync_token"]').val(rdata.data['token']);
     });
 
+    var step = $('.step_head .active span').text();
     $('.infoNext').click(function(){
-        var step = $('.step_head .active span').text();
-        switch(step){
-            case '1':initStep1();break;
-            case '2':initStep2();break;
-            case '3':initStep3();break;
-            case '4':initStep4();break;
-        }
+        initStep1();
+    });
+
+
+    $('.infoNext').click(function(){
+        initStep1();
+    });
+
+    // 重新检测按钮
+    $('.psync_path').on('click', '.pathTestting', function () {
+        initStep2();
+    });
+
+    $('.psync_path').on('click', '.pathBcak', function(){
+        $('.psync_path').hide();
+        $('.psync_info').show();
+        selectProgress(1);
+    });
+
+    $('.psync_path').on('click', '.pathNext', function(){
+        initStep3();
+    });
+
+
+    $('.psync_data').on('click', '.dataBack', function(){
+        $('.psync_data').hide();
+        $('.psync_path').show();
+        selectProgress(2);
+    });
+
+    $('.psync_data').on('click', '.dataMigrate', function(){ 
+        initStep4();
     });
 }
 
