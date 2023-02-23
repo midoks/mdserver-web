@@ -9,8 +9,6 @@ import hashlib
 import json
 import subprocess
 
-from requests_toolbelt import MultipartEncoder
-
 sys.path.append(os.getcwd() + "/class/core")
 import mw
 
