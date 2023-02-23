@@ -22,6 +22,7 @@ if mw.isAppleSystem():
 class classApi:
     __MW_KEY = 'app'
     __MW_PANEL = 'http://127.0.0.1:7200'
+    __VHOST_PATH = ''
 
     _buff_size = 1024 * 1024 * 2
 
@@ -43,6 +44,7 @@ class classApi:
         self._SPEED_FILE = getServerDir() + '/config/speed.json'
         self._INFO_FILE = getServerDir() + '/config/sync_info.json'
         self._SYNC_INFO = self.get_sync_info(None)
+        self.__VHOST_PATH = mw.getServerDir() + '/web_conf/vhost'
 
     # 计算MD5
     def __get_md5(self, s):
@@ -76,14 +78,18 @@ class classApi:
         data = {}
         sites = []
         for i in args['sites']:
-            # print(i)
+            # print('ss', i)
+            if i == '':
+                continue
             t = {'name': i}
             sites.append(t)
         data['sites'] = sites
 
         databases = []
         for i in args['databases']:
-            # print(i)
+            # print('db:', i)
+            if i == '':
+                continue
             t = {'name': i}
             databases.append(t)
         data['databases'] = databases
@@ -349,6 +355,48 @@ class classApi:
                                                                 60), total_time % 60, toSize(pdata['size'] / total_time)))
         return True
 
+    def send_file_list(self, spath, dpath):
+        if not os.path.isdir(spath):
+            return self.send_file(spath, dpath, True)
+
+        # 创建目录
+        self.send('/files/create_dir', {"path": dpath})
+
+        backup_path = mw.getRootDir() + '/backup'
+        if not os.path.exists(backup_path):
+            os.makedirs(backup_path, 384)
+
+        zip_file = backup_path + \
+            "/psync_tmp_{}.tar.gz".format(os.path.basename(spath))
+        zip_dst = mw.getRunDir() + '/tmp/psync_tmp_{}.tar.gz'.format(
+            os.path.basename(dpath))
+        write_log("|-正在压缩目录[{}]...".format(spath))
+        self.write_speed('done', '正在压缩')
+
+        mw.execShell(
+            "cd {} && tar zcvf {} ./ > /dev/null".format(spath, zip_file))
+        if not os.path.exists(zip_file):
+            self.error("目录[{}]打包失败!".format(spath))
+            return False
+
+        self.set_mode(zip_file, 600)
+        if not self.upload_file(zip_file, zip_dst, True):
+            self.error("目录[{}]上传失败!".format(spath))
+            if os.path.exists(zip_file):
+                os.remove(zip_file)
+            return False
+
+        if os.path.exists(zip_file):
+            os.remove(zip_file)
+        write_log("|-正在解压文件到目录[{}]...".format(dpath))
+        self.write_speed('done', '正在解压')
+
+        self.send('/files/unzip', {"sfile": zip_dst, "dfile": dpath,
+                                   "type": "tar", "coding": "UTF-8", "password": "undefined"})
+        self.send('/files/exec_shell',
+                  {"shell": "rm -f " + zip_dst, "path": "/www"}, 30)
+        return True
+
     def state(self, stype, index, state, error=''):
         # 设置状态
         self._SYNC_INFO[stype][index]['state'] = state
@@ -397,7 +445,13 @@ class classApi:
             self.state('sites', index, -1, err_msg)
             self.error(err_msg)
             return False
-        if not self.create_site(siteInfo, index):
+
+        self.create_site(siteInfo, index)
+        # if not self.create_site(siteInfo, index):
+        #     return False
+
+        if not self.send_file_list(siteInfo['path'], siteInfo['path']):
+            self.state('sites', index, -1, '数据传输失败!')
             return False
 
     def sync_site(self):
@@ -670,9 +724,9 @@ class classApi:
 
         databases = self._SYNC_INFO['databases']
         for i in range(len(databases)):
+            db = databases[i]['name']
             try:
                 self.state('databases', i, 1)
-                db = databases[i]['name']
                 sp_msg = "|-迁移数据库: [{}]".format(db)
                 self.write_speed('action', sp_msg)
                 write_log(sp_msg)
