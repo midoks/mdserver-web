@@ -364,7 +364,9 @@ class classApi:
 
         if os.path.islink(spath):
             dpath = os.readlink(spath)
-            mw.buildSoftLink(spath, dpath, True)
+            # mw.buildSoftLink(spath, dpath, True)
+            self.send('/files/exec_shell',
+                      {"shell": 'ln -sf "' + spath + '" "' + dpath + '"', "path": "/www"}, 30)
             return True
 
         if not os.path.isdir(spath):
