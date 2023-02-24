@@ -111,7 +111,12 @@ if [ $OSNAME != "macos" ];then
 fi
 
 echo "use system version: ${OSNAME}"
-	curl -fsSL ${HTTP_PREFIX}https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/install/macos.sh | bash
+if [ "${OSNAME}" == "macos" ];then
+	if [ "$LOCAL_ADDR" != "common" ];then
+		curl -fsSL https://gitee.com/midoks/mdserver-web/raw/dev/scripts/install/macos.sh | bash
+	else
+		curl -fsSL ${HTTP_PREFIX}https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/install/macos.sh | bash
+	fi
 else
 	cd /www/server/mdserver-web && bash scripts/install/${OSNAME}.sh
 fi
