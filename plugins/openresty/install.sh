@@ -59,15 +59,33 @@ Install_openresty()
 	mkdir -p ${openrestyDir}
 	echo '正在安装脚本文件...' > $install_tmp
 
-	if [ ! -f ${openrestyDir}/openresty-${VERSION}.tar.gz ];then
-		wget -O ${openrestyDir}/openresty-${VERSION}.tar.gz https://openresty.org/download/openresty-${VERSION}.tar.gz
+	LOCAL_ADDR=common
+	ping  -c 1 github.com > /dev/null 2>&1
+	if [ "$?" != "0" ];then
+		LOCAL_ADDR=cn
 	fi
 
 
+	if [ "$LOCAL_ADDR" != "common" ];then
+		# wget -O openresty-1.21.4.1.tar.gz https://gitee.com/mirrors/openresty/repository/archive/v1.21.4.1.tar.gz
+		if [ ! -f ${openrestyDir}/openresty-${VERSION}.tar.gz ];then
+			wget -O ${openrestyDir}/openresty-${VERSION}.tar.gz https://gitee.com/mirrors/openresty/repository/archive/v${VERSION}.tar.gz
+		fi
+	else
+		# wget -O openresty-1.21.4.1.tar.gz https://openresty.org/download/openresty-1.21.4.1.tar.gz
+		if [ ! -f ${openrestyDir}/openresty-${VERSION}.tar.gz ];then
+			wget -O ${openrestyDir}/openresty-${VERSION}.tar.gz https://openresty.org/download/openresty-${VERSION}.tar.gz
+		fi
+	fi
+
 	cd ${openrestyDir} && tar -zxvf openresty-${VERSION}.tar.gz
+	NEW_TAG=$VERSION
+	if [ -d ${openrestyDir}/openresty-v${VERSION} ];then
+		NEW_TAG="v${VERSION}"
+	fi
 
 	# --with-openssl=$serverPath/source/lib/openssl-1.0.2q
-	cd ${openrestyDir}/openresty-${VERSION} && ./configure \
+	cd ${openrestyDir}/openresty-${NEW_TAG} && ./configure \
 	--prefix=$serverPath/openresty \
 	--with-ipv6 \
 	--with-stream \
