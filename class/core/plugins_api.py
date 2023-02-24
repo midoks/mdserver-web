@@ -271,7 +271,6 @@ class plugins_api:
                     tag = h['tag']
                     if tag in valid_list_hook:
                         self.hookInstallFile(tag, h[tag])
-                        return True
                 elif hooks_type == str:
                     for x in hooks:
                         if x in valid_hook:
