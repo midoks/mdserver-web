@@ -2,35 +2,42 @@
 <html>
 
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="renderer" content="webkit">
-    <title>{{data['title']}}</title>
-    <link rel="shortcut icon" href="/static/favicon.ico" type="image/x-icon" />
-    <link href="/static/bootstrap-3.3.5/css/bootstrap.min.css?v={{config.version}}" rel="stylesheet">
-    <link href="/static/css/site.css?v={{config.version}}" rel="stylesheet">
-    <link href="/static/codemirror/lib/codemirror.css?v={{config.version}}" rel="stylesheet">
-    <script src="/static/language/Simplified_Chinese/lan.js?v={{config.version}}"></script>
-    <!--[if lte IE 9]>
-		<script src="/static/js/requestAnimationFrame.js"></script>
-	<![endif]-->
-    <!-- 统计一下用户量,让我的开发更有激情 -->
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FC74BB2RGD"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-FC74BB2RGD');
-    </script>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="renderer" content="webkit">
+<title>{{data['title']}}</title>
+<link rel="shortcut icon" href="/static/favicon.ico" type="image/x-icon" />
+<link href="/static/bootstrap-3.3.5/css/bootstrap.min.css?v={{config.version}}" rel="stylesheet">
+<link href="/static/css/site.css?v={{config.version}}" rel="stylesheet">
+<link href="/static/codemirror/lib/codemirror.css?v={{config.version}}" rel="stylesheet">
+<script src="/static/language/Simplified_Chinese/lan.js?v={{config.version}}"></script>
+<!--[if lte IE 9]>
+	<script src="/static/js/requestAnimationFrame.js"></script>
+<![endif]-->
+<!-- 统计一下用户量,让我的开发更有激情 -->
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-FC74BB2RGD"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-FC74BB2RGD');
+</script>
 
 
-    {% for menu in data['hook_menu'] %}
-    {% if menu['js_path'] %}
-    <!-- 加载插件css -->
-    <link href="/plugins/file?name={{menu['name']}}&v={{config.version}}&f={{menu['css_path']}}" rel="stylesheet" />
-    {% endif %}
-    {% endfor %}
+{% for menu in data['hook_menu'] %}
+{% if menu['css_path'] and data['hook_tag'] == menu['name'] %}
+<!-- 加载插件css -->
+<link href="/plugins/file?name={{menu['name']}}&v={{config.version}}&f={{menu['css_path']}}" rel="stylesheet" />
+{% endif %}
+{% endfor %}
+
+<!-- 全局静态HOOK -->
+{% for menu in data['hook_global_static'] %}
+{% if menu['css_path'] %}
+<link href="/plugins/file?name={{menu['name']}}&v={{config.version}}&f={{menu['css_path']}}" rel="stylesheet" />
+{% endif %}
+{% endfor %}
 </head>
 
 <body>
@@ -85,8 +92,8 @@
             <div class="footer bgw">mdserver-web &copy;2018-∞ Linux面板 (<a class="btlink" target="_blank" href="//github.com/midoks/mdserver-web">源码</a>) <span style="margin-left:5px;">/</span>
                 <a class="btlink" style="margin-left:5px;" href="//github.com/midoks/mdserver-web/wiki" target="_blank">WIKI</a><span style="margin-left:5px;">/</span>
                 <a class='btlink panel_ad_list_mode' style="margin-left:5px;">AD</a>
+            </div>
         </div>
-    </div>
     </div>
 </body>
 
@@ -158,8 +165,14 @@ if (thisPath.indexOf('?')>-1){
 <script src="/static/laydate/laydate.js?v={{config.version}}"></script>
 
 {% for menu in data['hook_menu'] %}
+{% if menu['js_path'] and data['hook_tag'] == menu['name'] %}
+<script src="/plugins/file?name={{menu['name']}}&f={{menu['js_path']}}&v={{config.version}}"></script>
+{% endif %}
+{% endfor %}
+
+<!-- 全局静态HOOK -->
+{% for menu in data['hook_global_static'] %}
 {% if menu['js_path'] %}
-<!-- 加载插件js -->
 <script src="/plugins/file?name={{menu['name']}}&f={{menu['js_path']}}&v={{config.version}}"></script>
 {% endif %}
 {% endfor %}

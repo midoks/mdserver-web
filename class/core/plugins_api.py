@@ -262,7 +262,7 @@ class plugins_api:
 
     def hookInstall(self, info):
         valid_hook = ['backup', 'database']
-        valid_list_hook = ['menu']
+        valid_list_hook = ['menu', 'global_static']
         if 'hook' in info:
             hooks = info['hook']
             for h in hooks:
@@ -271,6 +271,7 @@ class plugins_api:
                     tag = h['tag']
                     if tag in valid_list_hook:
                         self.hookInstallFile(tag, h[tag])
+                        return True
                 elif hooks_type == str:
                     for x in hooks:
                         if x in valid_hook:
@@ -280,7 +281,7 @@ class plugins_api:
 
     def hookUninstall(self, info):
         valid_hook = ['backup', 'database']
-        valid_list_hook = ['menu']
+        valid_list_hook = ['menu', 'global_static']
         if 'hook' in info:
             hooks = info['hook']
             for h in hooks:
