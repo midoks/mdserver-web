@@ -13,6 +13,7 @@
 		{
 			"tag":"global_static",
 			"global_static": {
+				"title":"终端管理",
 				"name":"webssh",
 				"css_path":"menu/ico.css"
 			}
