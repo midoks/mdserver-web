@@ -74,7 +74,6 @@ fi
 #     HTTP_PREFIX="https://ghproxy.com/"
 # fi
 
-
 if [ $OSNAME != "macos" ];then
 	mkdir -p /www/server
 	mkdir -p /www/wwwroot
@@ -83,7 +82,13 @@ if [ $OSNAME != "macos" ];then
 	mkdir -p /www/backup/site
 
 	if [ ! -d /www/server/mdserver-web ];then
-		curl -sSLo /tmp/dev.zip ${HTTP_PREFIX}github.com/midoks/mdserver-web/archive/refs/heads/dev.zip
+
+		if [ "$LOCAL_ADDR" == "common" ];then
+			curl -sSLo /tmp/dev.zip ${HTTP_PREFIX}github.com/midoks/mdserver-web/archive/refs/heads/dev.zip
+		else
+			curl -sSLo /tmp/dev.zip https://gitee.com/midoks/mdserver-web/repository/archive/dev.zip
+		fi
+		
 		cd /tmp && unzip /tmp/dev.zip
 		mv -f /tmp/mdserver-web-dev /www/server/mdserver-web
 		rm -rf /tmp/dev.zip
