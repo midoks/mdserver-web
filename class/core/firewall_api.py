@@ -149,14 +149,14 @@ class firewall_api:
                 return mw.returnJson(False, '失败，不能删除当前面板端口!')
             if self.__isUfw:
                 mw.execShell('ufw delete allow ' + port + '/tcp')
-            elif self.__isIptables:
-                mw.execShell(
-                    'iptables -D INPUT -p tcp -m state --state NEW -m tcp --dport ' + port + ' -j ACCEPT')
             elif self.__isFirewalld:
                 mw.execShell(
                     'firewall-cmd --permanent --zone=public --remove-port=' + port + '/tcp')
                 mw.execShell(
                     'firewall-cmd --permanent --zone=public --remove-port=' + port + '/udp')
+            elif self.__isIptables:
+                mw.execShell(
+                    'iptables -D INPUT -p tcp -m state --state NEW -m tcp --dport ' + port + ' -j ACCEPT')
             else:
                 pass
             msg = mw.getInfo('删除防火墙放行端口[{1}]成功!', (port,))
