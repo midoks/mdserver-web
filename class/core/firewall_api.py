@@ -438,12 +438,12 @@ class firewall_api:
     def addAcceptPort(self, port):
         if self.__isUfw:
             mw.execShell('ufw allow ' + port + '/tcp')
-        elif self.__isIptables:
-            cmd = 'iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport ' + port + ' -j ACCEPT'
-            mw.execShell(cmd)
         elif self.__isFirewalld:
             port = port.replace(':', '-')
             cmd = 'firewall-cmd --permanent --zone=public --add-port=' + port + '/tcp'
+            mw.execShell(cmd)
+        elif self.__isIptables:
+            cmd = 'iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport ' + port + ' -j ACCEPT'
             mw.execShell(cmd)
         else:
             pass
