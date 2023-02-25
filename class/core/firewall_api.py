@@ -123,12 +123,12 @@ class firewall_api:
         address = port
         if self.__isUfw:
             mw.execShell('ufw delete deny from ' + address + ' to any')
-        elif self.__isIptables:
-            cmd = 'iptables -D INPUT -s ' + address + ' -j DROP'
-            mw.execShell(cmd)
         elif self.__isFirewalld:
             mw.execShell(
                 'firewall-cmd --permanent --remove-rich-rule=\'rule family=ipv4 source address="' + address + '" drop\'')
+        elif self.__isIptables:
+            cmd = 'iptables -D INPUT -s ' + address + ' -j DROP'
+            mw.execShell(cmd)
         else:
             pass
 
