@@ -256,8 +256,9 @@ class plugins_api:
             data = json.loads(t)
 
         for idx in range(len(data)):
-            if data[idx]['title'] == info['title'] and data[idx]['name'] == info['name']:
+            if data[idx]['name'] == info['name']:
                 data.remove(data[idx])
+                break
         mw.writeFile(hookPath, json.dumps(data))
 
     def hookInstall(self, info):
