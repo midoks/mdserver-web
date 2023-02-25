@@ -150,6 +150,7 @@ class firewall_api:
             if self.__isUfw:
                 mw.execShell('ufw delete allow ' + port + '/tcp')
             elif self.__isFirewalld:
+                port = port.replace(':', '-')
                 mw.execShell(
                     'firewall-cmd --permanent --zone=public --remove-port=' + port + '/tcp')
                 mw.execShell(
