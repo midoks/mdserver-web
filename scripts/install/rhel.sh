@@ -85,7 +85,6 @@ if [ ! -f /usr/sbin/firewalld ];then
     systemctl start firewalld
 
     sed -i 's#AllowZoneDrifting=yes#AllowZoneDrifting=no#g' /etc/firewalld/firewalld.conf
-    firewall-cmd --reload
     
     # look
     # firewall-cmd --list-all
