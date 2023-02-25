@@ -91,7 +91,7 @@ class plugins_api:
             t = mw.readFile(menu_file)
             tlist = json.loads(t)
             for menu_data in tlist:
-                if 'path' in menu_data:
+                if tag == menu_data['name'] and 'path' in menu_data:
                     tpath = self.menuGetAbsPath(tag, menu_data['path'])
                     content = mw.readFile(tpath)
         data['plugin_content'] = content
