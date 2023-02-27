@@ -191,8 +191,10 @@ def pSqliteDb(dbname='web_logs', site_name='unset', name="logs"):
         conn = mw.M(dbname).dbPos(db_dir, name)
 
     conn.execute("PRAGMA synchronous = 0")
-    conn.execute("PRAGMA page_size = 4096")
+    conn.execute("PRAGMA cache_size = 8000")
+    conn.execute("PRAGMA page_size = 32768")
     conn.execute("PRAGMA journal_mode = wal")
+    conn.execute("PRAGMA journal_size_limit = 1073741824")
     return conn
 
 
