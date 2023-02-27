@@ -265,6 +265,8 @@ def initDreplace():
     loadLuaSiteFile()
     loadDebugLogFile()
 
+    if not mw.isAppleSystem():
+        mw.execShell("chown -R www:www " + getServerDir())
     return 'ok'
 
 
@@ -278,9 +280,6 @@ def start():
 
     import tool_task
     tool_task.createBgTask()
-
-    if not mw.isAppleSystem():
-        mw.execShell("chown -R www:www " + getServerDir())
 
     # issues:326
     luaRestart()
