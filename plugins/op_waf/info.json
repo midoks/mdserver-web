@@ -5,9 +5,9 @@
 			"site_cb": {
 				"title":"网站统计",
 				"name":"op_waf",
-				"add":{"func":"restart"},
-				"update":{"func":"restart"},
-				"delete":{"func":"restart"}
+				"add":{"func":"reload"},
+				"update":{"func":"reload"},
+				"delete":{"func":"reload"}
 			}
 		}
 	],
