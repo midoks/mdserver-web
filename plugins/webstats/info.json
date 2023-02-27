@@ -1,5 +1,17 @@
 {
-	"sort": 7,
+	"hook":[
+		{
+			"tag":"site_cb",
+			"site_cb": {
+				"title":"网站统计",
+				"name":"webstats",
+				"add":{"func":"restart"},
+				"update":{"func":"restart"},
+				"delete":{"func":"restart"}
+			}
+		}
+	],
+	"sort": "7",
 	"ps": "网站统计报表",
 	"name": "webstats",
 	"title": "网站统计",

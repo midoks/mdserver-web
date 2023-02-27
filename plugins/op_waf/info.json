@@ -1,4 +1,16 @@
 {
+	"hook":[
+		{
+			"tag":"site_cb",
+			"site_cb": {
+				"title":"网站统计",
+				"name":"op_waf",
+				"add":{"func":"restart"},
+				"update":{"func":"restart"},
+				"delete":{"func":"restart"}
+			}
+		}
+	],
 	"title":"OP防火墙",
 	"tip":"soft",
 	"name":"op_waf",

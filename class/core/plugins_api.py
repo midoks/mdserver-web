@@ -263,7 +263,7 @@ class plugins_api:
 
     def hookInstall(self, info):
         valid_hook = ['backup', 'database']
-        valid_list_hook = ['menu', 'global_static']
+        valid_list_hook = ['menu', 'global_static', 'site_cb']
         if 'hook' in info:
             hooks = info['hook']
             for h in hooks:
@@ -281,7 +281,7 @@ class plugins_api:
 
     def hookUninstall(self, info):
         valid_hook = ['backup', 'database']
-        valid_list_hook = ['menu', 'global_static']
+        valid_list_hook = ['menu', 'global_static', 'site_cb']
         if 'hook' in info:
             hooks = info['hook']
             for h in hooks:
@@ -796,7 +796,8 @@ class plugins_api:
                         for index in range(len(tmp_data)):
                             plugins_info.append(tmp_data[index])
                     except Exception as e:
-                        print(e)
+                        print(json_file)
+                        print(mw.getTracebackInfo())
 
         start = (page - 1) * pageSize
         end = start + pageSize
