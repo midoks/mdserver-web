@@ -1,4 +1,16 @@
 {
+	"hook":[
+		{
+			"tag":"site_cb",
+			"site_cb": {
+				"title":"网站统计",
+				"name":"op_waf",
+				"add":{"func":"reload"},
+				"update":{"func":"reload"},
+				"delete":{"func":"reload"}
+			}
+		}
+	],
 	"title":"OP防火墙",
 	"tip":"soft",
 	"name":"op_waf",
@@ -12,5 +24,5 @@
 	"home":"https://github.com/loveshell/ngx_lua_waf",
 	"date":"2019-04-21",
 	"pid": "1",
-	"versions": ["0.2.5"]
+	"versions": ["0.2.6"]
 }

@@ -648,7 +648,11 @@ function onlineEditFile(k, f) {
 				"Ctrl-S": function() {
 					$("#textBody").text(t.getValue());
 					onlineEditFile(2, f)
-				}
+				},
+				"Cmd-S":function() {
+					$("#textBody").text(t.getValue());
+					onlineEditFile(2, f)
+				},
 			},
 			mode: d,
 			lineNumbers: true,

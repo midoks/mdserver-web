@@ -1,10 +1,22 @@
 {
-	"sort": 7,
+	"hook":[
+		{
+			"tag":"site_cb",
+			"site_cb": {
+				"title":"网站统计",
+				"name":"webstats",
+				"add":{"func":"reload"},
+				"update":{"func":"reload"},
+				"delete":{"func":"reload"}
+			}
+		}
+	],
+	"sort": "7",
 	"ps": "网站统计报表",
 	"name": "webstats",
 	"title": "网站统计",
 	"shell": "install.sh",
-	"versions":["0.2.4"],
+	"versions":["0.2.5"],
 	"tip": "soft",
 	"install_pre_inspection":true,
 	"checks": "server/webstats",

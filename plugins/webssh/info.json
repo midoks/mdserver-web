@@ -9,6 +9,14 @@
 				"css_path":"menu/index.css",
 				"js_path":"js/webssh.js"
 			}
+		},
+		{
+			"tag":"global_static",
+			"global_static": {
+				"title":"终端管理",
+				"name":"webssh",
+				"css_path":"menu/ico.css"
+			}
 		}
 	],
 	"id":3,

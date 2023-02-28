@@ -83,9 +83,6 @@ if [ ! -f /usr/sbin/firewalld ];then
     #取消服务锁定
     systemctl unmask firewalld
     systemctl start firewalld
-
-    sed -i 's#AllowZoneDrifting=yes#AllowZoneDrifting=no#g' /etc/firewalld/firewalld.conf
-    firewall-cmd --reload
     
     # look
     # firewall-cmd --list-all
@@ -102,7 +99,7 @@ if [ ! -f /usr/sbin/firewalld ];then
     # firewall-cmd --permanent --zone=public --add-port=3306/tcp
     # firewall-cmd --permanent --zone=public --add-port=30000-40000/tcp
 
-    # sed -i 's#AllowZoneDrifting=yes#AllowZoneDrifting=no#g' /etc/firewalld/firewalld.conf
+    sed -i 's#AllowZoneDrifting=yes#AllowZoneDrifting=no#g' /etc/firewalld/firewalld.conf
     firewall-cmd --reload
 
     #安装时不开启

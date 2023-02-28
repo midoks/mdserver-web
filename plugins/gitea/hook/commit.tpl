@@ -33,7 +33,11 @@ if [ ! -d $WEB_PATH ];then
 	mkdir -p $WEB_PATH
 	rsync -vauP --delete --exclude=".*" $GIT_PROJECT_DIR/ $WEB_PATH
 else
-	rsync -vauP --exclude=".*" $GIT_PROJECT_DIR/ $WEB_PATH
+	if [ -f $GIT_PROJECT_DIR/exclude.list ];then
+		rsync -vauP --delete --exclude-from="$GIT_PROJECT_DIR/exclude.list" $GIT_PROJECT_DIR/ $WEB_PATH
+	else
+		rsync -vauP --exclude=".*" $GIT_PROJECT_DIR/ $WEB_PATH
+	fi
 fi
 
 sysName=`uname`

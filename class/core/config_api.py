@@ -27,7 +27,7 @@ from flask import request
 
 class config_api:
 
-    __version = '0.13.0'
+    __version = '0.13.1'
     __api_addr = 'data/api.json'
 
     def __init__(self):
@@ -824,7 +824,9 @@ class config_api:
         data['username'] = mw.M('users').where(
             "id=?", (1,)).getField('username')
 
-        # databases hook 获取
+        data['hook_tag'] = request.args.get('tag', '')
+
+        # databases hook
         database_hook_file = 'data/hook_database.json'
         if os.path.exists(database_hook_file):
             df = mw.readFile(database_hook_file)
@@ -833,7 +835,7 @@ class config_api:
         else:
             data['hook_database'] = []
 
-        # menu hook 获取
+        # menu hook
         menu_hook_file = 'data/hook_menu.json'
         if os.path.exists(menu_hook_file):
             df = mw.readFile(menu_hook_file)
@@ -841,5 +843,14 @@ class config_api:
             data['hook_menu'] = df
         else:
             data['hook_menu'] = []
+
+        # global_static hook
+        global_static_hook_file = 'data/hook_global_static.json'
+        if os.path.exists(global_static_hook_file):
+            df = mw.readFile(global_static_hook_file)
+            df = json.loads(df)
+            data['hook_global_static'] = df
+        else:
+            data['hook_global_static'] = []
 
         return data

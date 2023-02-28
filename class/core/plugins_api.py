@@ -91,7 +91,7 @@ class plugins_api:
             t = mw.readFile(menu_file)
             tlist = json.loads(t)
             for menu_data in tlist:
-                if 'path' in menu_data:
+                if tag == menu_data['name'] and 'path' in menu_data:
                     tpath = self.menuGetAbsPath(tag, menu_data['path'])
                     content = mw.readFile(tpath)
         data['plugin_content'] = content
@@ -256,13 +256,14 @@ class plugins_api:
             data = json.loads(t)
 
         for idx in range(len(data)):
-            if data[idx]['title'] == info['title'] and data[idx]['name'] == info['name']:
+            if data[idx]['name'] == info['name']:
                 data.remove(data[idx])
+                break
         mw.writeFile(hookPath, json.dumps(data))
 
     def hookInstall(self, info):
         valid_hook = ['backup', 'database']
-        valid_list_hook = ['menu']
+        valid_list_hook = ['menu', 'global_static', 'site_cb']
         if 'hook' in info:
             hooks = info['hook']
             for h in hooks:
@@ -280,7 +281,7 @@ class plugins_api:
 
     def hookUninstall(self, info):
         valid_hook = ['backup', 'database']
-        valid_list_hook = ['menu']
+        valid_list_hook = ['menu', 'global_static', 'site_cb']
         if 'hook' in info:
             hooks = info['hook']
             for h in hooks:
@@ -795,7 +796,8 @@ class plugins_api:
                         for index in range(len(tmp_data)):
                             plugins_info.append(tmp_data[index])
                     except Exception as e:
-                        print(e)
+                        print(json_file)
+                        print(mw.getTracebackInfo())
 
         start = (page - 1) * pageSize
         end = start + pageSize

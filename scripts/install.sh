@@ -56,6 +56,16 @@ else
 fi
 
 
+# cn=$(curl --insecure -fsSL -m 10 https://ipinfo.io/json | grep "\"country\": \"CN\"")
+
+HTTP_PREFIX="https://"
+LOCAL_ADDR=common
+ping  -c 1 github.com > /dev/null 2>&1
+if [ "$?" != "0" ];then
+	LOCAL_ADDR=cn
+	HTTP_PREFIX="https://ghproxy.com/"
+fi
+
 if [ $OSNAME != "macos" ];then
 	if id www &> /dev/null ;then 
 	    echo ""
@@ -71,11 +81,8 @@ if [ $OSNAME != "macos" ];then
 	mkdir -p /www/backup/site
 
 	# https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/scripts/install.sh
-
-	cn=$(curl --insecure -fsSL -m 10 https://ipinfo.io/json | grep "\"country\": \"CN\"")
-
 	if [ ! -d /www/server/mdserver-web ];then
-		if [ ! -z "$cn" ];then
+		if [ "$LOCAL_ADDR" != "common" ];then
 			curl -sSLo /tmp/master.zip https://gitee.com/midoks/mdserver-web/repository/archive/master.zip
 		else
 			curl -sSLo /tmp/master.zip https://codeload.github.com/midoks/mdserver-web/zip/master
@@ -89,8 +96,8 @@ if [ $OSNAME != "macos" ];then
 
 	# install acme.sh
 	if [ ! -d /root/.acme.sh ];then
-	    if [ ! -z "$cn" ];then
-	        curl -sSL -o /tmp/acme.tar.gz https://ghproxy.com/github.com/acmesh-official/acme.sh/archive/master.tar.gz
+	    if [ "$LOCAL_ADDR" != "common" ];then
+	        curl -sSLo /tmp/acme.tar.gz https://gitee.com/neilpang/acme.sh/repository/archive/master.tar.gz
 	        tar xvzf /tmp/acme.tar.gz -C /tmp
 	        cd /tmp/acme.sh-master
 	        bash acme.sh install
@@ -103,17 +110,13 @@ if [ $OSNAME != "macos" ];then
 	fi
 fi
 
-
-
 echo "use system version: ${OSNAME}"
-
 if [ "${OSNAME}" == "macos" ];then
-	cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
-	HTTP_PREFIX="https://"
-	if [ ! -z "$cn" ];then
-	    HTTP_PREFIX="https://ghproxy.com/"
+	if [ "$LOCAL_ADDR" != "common" ];then
+		curl -fsSL https://gitee.com/midoks/mdserver-web/raw/dev/scripts/install/macos.sh | bash
+	else
+		curl -fsSL ${HTTP_PREFIX}https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/install/macos.sh | bash
 	fi
-	curl -fsSL ${HTTP_PREFIX}https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/install/macos.sh | bash
 else
 	cd /www/server/mdserver-web && bash scripts/install/${OSNAME}.sh
 fi

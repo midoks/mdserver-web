@@ -1110,7 +1110,7 @@ function reName(type, fileName) {
 				</div>',
 		success:function(){
 			$("#newFileName").focus().keyup(function(e){
-				if(e.keyCode == 13) $("#ReNameBtn").click();
+				if(e.keyCode == 13) $(".layui-layer-btn0").click();
 			});
 		},
 		yes:function(){

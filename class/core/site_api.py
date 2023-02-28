@@ -72,6 +72,30 @@ class site_api:
             mw.execShell("mkdir -p " + self.sslLetsDir +
                          " && chmod -R 755 " + self.sslLetsDir)
 
+    def runHook(self, hook_name, func_name):
+        # 站点操作Hook
+        hook_file = 'data/hook_site_cb.json'
+        hook_cfg = []
+        if os.path.exists(hook_file):
+            t = mw.readFile(hook_file)
+            hook_cfg = json.loads(t)
+
+        hook_num = len(hook_cfg)
+        if hook_num == 0:
+            return
+
+        import plugins_api
+        pa = plugins_api.plugins_api()
+
+        for x in range(hook_num):
+            hook_data = hook_cfg[x]
+            if func_name in hook_data:
+                app_name = hook_data["name"]
+                run_func = hook_data[func_name]['func']
+                # print(app_name, run_func)
+                pa.run(app_name, run_func)
+        return True
+
     ##### ----- start ----- ###
     def listApi(self):
         limit = request.form.get('limit', '10')
@@ -1272,6 +1296,7 @@ class site_api:
             mw.M('domain').add('pid,name,port,addtime',
                                (pid, domain_name, domain_port, mw.getDate()))
 
+        self.runHook('site_cb', 'add')
         return mw.returnJson(True, '域名添加成功!')
 
     def addDirBindApi(self):
@@ -1401,7 +1426,7 @@ class site_api:
             data['filename'] = filename
         return mw.getJson(data)
 
-        # 修改物理路径
+    # 修改物理路径
     def setPathApi(self):
         mid = request.form.get('id', '')
         path = request.form.get('path', '')
@@ -2530,16 +2555,18 @@ location ^~ {from} {\n\
         self.createRootDir(self.sitePath)
         self.nginxAddConf()
 
+        mw.M('domain').add('pid,name,port,addtime',
+                           (pid, self.siteName, self.sitePort, mw.getDate()))
+
         # 添加更多域名
         for domain in siteMenu['domainlist']:
             self.addDomain(domain, self.siteName, pid)
 
-        mw.M('domain').add('pid,name,port,addtime',
-                           (pid, self.siteName, self.sitePort, mw.getDate()))
-
         data = {}
         data['siteStatus'] = False
         mw.restartWeb()
+
+        self.runHook('site_cb', 'add')
         return mw.returnJson(True, '添加成功')
 
     def deleteWSLogs(self, webname):
@@ -2608,6 +2635,8 @@ location ^~ {from} {\n\
 
         mw.M('binding').where("pid=?", (sid,)).delete()
         mw.restartWeb()
+
+        self.runHook('site_cb', 'delete')
         return mw.returnJson(True, '站点删除成功!')
 
     def setEndDate(self, sid, edate):

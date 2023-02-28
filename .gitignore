@@ -162,6 +162,7 @@ plugins/openlitespeed
 plugins/system_safe
 plugins/tamper_proof
 plugins/tamper_proof_*
+plugins/cryptocurrency_trade
 plugins/op_load_balance
 plugins/gdrive
 plugins/mtproxy

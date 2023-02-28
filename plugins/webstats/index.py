@@ -191,8 +191,10 @@ def pSqliteDb(dbname='web_logs', site_name='unset', name="logs"):
         conn = mw.M(dbname).dbPos(db_dir, name)
 
     conn.execute("PRAGMA synchronous = 0")
-    conn.execute("PRAGMA page_size = 4096")
+    conn.execute("PRAGMA cache_size = 8000")
+    conn.execute("PRAGMA page_size = 32768")
     conn.execute("PRAGMA journal_mode = wal")
+    conn.execute("PRAGMA journal_size_limit = 1073741824")
     return conn
 
 
@@ -263,6 +265,8 @@ def initDreplace():
     loadLuaSiteFile()
     loadDebugLogFile()
 
+    if not mw.isAppleSystem():
+        mw.execShell("chown -R www:www " + getServerDir())
     return 'ok'
 
 
@@ -276,9 +280,6 @@ def start():
 
     import tool_task
     tool_task.createBgTask()
-
-    if not mw.isAppleSystem():
-        mw.execShell("chown -R www:www " + getServerDir())
 
     # issues:326
     luaRestart()

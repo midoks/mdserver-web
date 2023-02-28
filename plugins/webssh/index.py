@@ -25,7 +25,7 @@ class App():
 
         self.__host_dir = self.getServerDir() + '/host'
         if not os.path.exists(self.__host_dir):
-            os.makedirs(self.__host_dir)
+            mw.execShell('mkdir -p ' + self.__host_dir)
 
     def getPluginName(self):
         return 'webssh'
@@ -145,24 +145,25 @@ class App():
 
     def get_server_list(self):
         host_list = []
-        for name in os.listdir(self.__host_dir):
-            info_file = self.__host_dir + '/' + name + '/info.json'
-            if not os.path.exists(info_file):
-                continue
-            try:
-                info_tmp = self.getSshInfo(info_file)
-                host_info = {}
-                host_info['host'] = name
-                host_info['port'] = info_tmp['port']
-                host_info['ps'] = info_tmp['ps']
-                # host_info['sort'] = int(info_tmp['sort'])
-            except Exception as e:
-                print(e)
-                # if os.path.exists(info_file):
-                #     os.remove(info_file)
-                # continue
+        if os.path.exists(self.__host_dir):
+            for name in os.listdir(self.__host_dir):
+                info_file = self.__host_dir + '/' + name + '/info.json'
+                if not os.path.exists(info_file):
+                    continue
+                try:
+                    info_tmp = self.getSshInfo(info_file)
+                    host_info = {}
+                    host_info['host'] = name
+                    host_info['port'] = info_tmp['port']
+                    host_info['ps'] = info_tmp['ps']
+                    # host_info['sort'] = int(info_tmp['sort'])
+                except Exception as e:
+                    print(e)
+                    # if os.path.exists(info_file):
+                    #     os.remove(info_file)
+                    # continue
 
-            host_list.append(host_info)
+                host_list.append(host_info)
 
         host_list = sorted(host_list, key=lambda x: x['host'], reverse=False)
         return mw.returnJson(True, 'ok!', host_list)

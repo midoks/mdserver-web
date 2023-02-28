@@ -29,6 +29,7 @@
 基本上可以使用,后续会继续优化!欢迎提供意见！
 
 - 吹水组 - https://t.me/mdserver_web
+- 交流论坛 - https://bbs.midoks.me
 
 ```
 如果出现问题，最好私给我面板信息。不要让我猜。如果不提供，不要提出问题，自行解决。  — 座右铭
@@ -98,12 +99,12 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.13.0
+### 版本更新 0.13.1
 
-* 一键迁移插件。
-* 修复acme ssl申请。
-* IP识别优化。
-* 解决删除站点残留的问题。
+* 关闭issue，建立bbs.midoks.me。问题集中处理，发挥群众的力量。
+* 添加站操作回调钩子site_cb。 网站统计和OP防火墙不再手动重载配置
+* 修复ubuntu20 pureftp 安装时,端口没有加入安全里
+* 增加global_static hook关键字,并优化menu的文件加载hook
 * 各种细节优化。
 
 ### JSDelivr安装地址
@@ -112,7 +113,6 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 
 ```
 curl -fsSL https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/scripts/install.sh | bash
-
 ```
 
 - 直接更新

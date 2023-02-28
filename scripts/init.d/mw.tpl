@@ -196,32 +196,44 @@ error_logs()
 
 mw_update()
 {
-    cn=$(curl --insecure -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
-    if [ ! -z "$cn" ];then
-        curl --insecure -fsSL https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/scripts/update.sh | bash
-    else
+    LOCAL_ADDR=common
+    ping  -c 1 github.com > /dev/null 2>&1
+    if [ "$?" != "0" ];then
+        LOCAL_ADDR=cn
+    fi
+    if [ "$LOCAL_ADDR" == "common" ];then
         curl --insecure -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/update.sh | bash
+    else
+        curl --insecure -fsSL  https://gitee.com/midoks/mdserver-web/raw/master/scripts/install.sh | bash
     fi
 }
 
 mw_update_dev()
 {
-    cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
-    if [ ! -z "$cn" ];then
-        curl --insecure -fsSL https://gitee.com/midoks/mdserver-web/raw/dev/scripts/update_dev.sh | bash
-    else
+    LOCAL_ADDR=common
+    ping  -c 1 github.com > /dev/null 2>&1
+    if [ "$?" != "0" ];then
+        LOCAL_ADDR=cn
+    fi
+    if [ "$LOCAL_ADDR" == "common" ];then
         curl --insecure -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update_dev.sh | bash
+    else
+        curl --insecure -fsSL https://gitee.com/midoks/mdserver-web/raw/dev/scripts/update_dev.sh | bash
     fi
     cd /www/server/mdserver-web
 }
 
 mw_mirror()
 {
-    cn=$(curl --insecure -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
-    if [ ! -z "$cn" ];then
-        bash <(curl --insecure -sSL https://gitee.com/SuperManito/LinuxMirrors/raw/main/ChangeMirrors.sh)
-    else
+    LOCAL_ADDR=common
+    ping  -c 1 github.com > /dev/null 2>&1
+    if [ "$?" != "0" ];then
+        LOCAL_ADDR=cn
+    fi
+    if [ "$LOCAL_ADDR" == "common" ];then
         bash <(curl --insecure -sSL https://raw.githubusercontent.com/midoks/change-linux-mirrors/main/change-mirrors.sh)
+    else
+        bash <(curl --insecure -sSL https://gitee.com/SuperManito/LinuxMirrors/raw/main/ChangeMirrors.sh)
     fi
     cd /www/server/mdserver-web
 }

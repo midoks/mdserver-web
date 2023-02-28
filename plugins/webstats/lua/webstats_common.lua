@@ -1084,6 +1084,7 @@ end
 function _M.get_client_ip(self)
     local client_ip = "unknown"
     local cdn = auto_config['cdn']
+    local request_header = ngx.req.get_headers()
     if cdn == true then
         for _,v in ipairs(auto_config['cdn_headers']) do
             if request_header[v] ~= nil and request_header[v] ~= "" then

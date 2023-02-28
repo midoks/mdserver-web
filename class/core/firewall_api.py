@@ -123,12 +123,12 @@ class firewall_api:
         address = port
         if self.__isUfw:
             mw.execShell('ufw delete deny from ' + address + ' to any')
-        elif self.__isIptables:
-            cmd = 'iptables -D INPUT -s ' + address + ' -j DROP'
-            mw.execShell(cmd)
         elif self.__isFirewalld:
             mw.execShell(
                 'firewall-cmd --permanent --remove-rich-rule=\'rule family=ipv4 source address="' + address + '" drop\'')
+        elif self.__isIptables:
+            cmd = 'iptables -D INPUT -s ' + address + ' -j DROP'
+            mw.execShell(cmd)
         else:
             pass
 
@@ -149,14 +149,15 @@ class firewall_api:
                 return mw.returnJson(False, '失败，不能删除当前面板端口!')
             if self.__isUfw:
                 mw.execShell('ufw delete allow ' + port + '/tcp')
-            elif self.__isIptables:
-                mw.execShell(
-                    'iptables -D INPUT -p tcp -m state --state NEW -m tcp --dport ' + port + ' -j ACCEPT')
             elif self.__isFirewalld:
+                port = port.replace(':', '-')
                 mw.execShell(
                     'firewall-cmd --permanent --zone=public --remove-port=' + port + '/tcp')
                 mw.execShell(
                     'firewall-cmd --permanent --zone=public --remove-port=' + port + '/udp')
+            elif self.__isIptables:
+                mw.execShell(
+                    'iptables -D INPUT -p tcp -m state --state NEW -m tcp --dport ' + port + ' -j ACCEPT')
             else:
                 pass
             msg = mw.getInfo('删除防火墙放行端口[{1}]成功!', (port,))
@@ -438,12 +439,12 @@ class firewall_api:
     def addAcceptPort(self, port):
         if self.__isUfw:
             mw.execShell('ufw allow ' + port + '/tcp')
-        elif self.__isIptables:
-            cmd = 'iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport ' + port + ' -j ACCEPT'
-            mw.execShell(cmd)
         elif self.__isFirewalld:
             port = port.replace(':', '-')
             cmd = 'firewall-cmd --permanent --zone=public --add-port=' + port + '/tcp'
+            mw.execShell(cmd)
+        elif self.__isIptables:
+            cmd = 'iptables -I INPUT -p tcp -m state --state NEW -m tcp --dport ' + port + ' -j ACCEPT'
             mw.execShell(cmd)
         else:
             pass

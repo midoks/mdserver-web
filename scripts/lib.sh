@@ -47,9 +47,17 @@ else
     echo "OK"
 fi
 
-cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
+# cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
+HTTP_PREFIX="https://"
+LOCAL_ADDR=common
+ping  -c 1 github.com > /dev/null 2>&1
+if [ "$?" != "0" ];then
+    LOCAL_ADDR=cn
+    HTTP_PREFIX="https://ghproxy.com/"
+fi
+
 PIPSRC="https://pypi.python.org/simple"
-if [ ! -z "$cn" ];then
+if [ "$LOCAL_ADDR" != "common" ];then
     PIPSRC="https://pypi.tuna.tsinghua.edu.cn/simple"
 fi
 

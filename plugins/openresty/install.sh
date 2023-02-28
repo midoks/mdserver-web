@@ -59,10 +59,10 @@ Install_openresty()
 	mkdir -p ${openrestyDir}
 	echo '正在安装脚本文件...' > $install_tmp
 
+	# wget -O openresty-1.21.4.1.tar.gz https://openresty.org/download/openresty-1.21.4.1.tar.gz
 	if [ ! -f ${openrestyDir}/openresty-${VERSION}.tar.gz ];then
 		wget -O ${openrestyDir}/openresty-${VERSION}.tar.gz https://openresty.org/download/openresty-${VERSION}.tar.gz
 	fi
-
 
 	cd ${openrestyDir} && tar -zxvf openresty-${VERSION}.tar.gz
 
