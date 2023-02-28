@@ -1522,7 +1522,7 @@ fullchain.pem       粘贴到证书输入框
                             self.__config['orders'][i]['auth_to'] = auth_to
 
                     # 是否到了允许重试的时间
-                    if 'next_retry_time' in self._config['orders'][i]:
+                    if 'next_retry_time' in self.__config['orders'][i]:
                         timeout = self.__config['orders'][i][
                             'next_retry_time'] - int(time.time())
                         if timeout > 0:
