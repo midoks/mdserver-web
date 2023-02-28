@@ -2555,12 +2555,12 @@ location ^~ {from} {\n\
         self.createRootDir(self.sitePath)
         self.nginxAddConf()
 
+        mw.M('domain').add('pid,name,port,addtime',
+                           (pid, self.siteName, self.sitePort, mw.getDate()))
+
         # 添加更多域名
         for domain in siteMenu['domainlist']:
             self.addDomain(domain, self.siteName, pid)
-
-        mw.M('domain').add('pid,name,port,addtime',
-                           (pid, self.siteName, self.sitePort, mw.getDate()))
 
         data = {}
         data['siteStatus'] = False
