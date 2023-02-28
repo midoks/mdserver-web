@@ -99,12 +99,12 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.13.0
+### 版本更新 0.13.1
 
-* 一键迁移插件。
-* 修复acme ssl申请。
-* IP识别优化。
-* 解决删除站点残留的问题。
+* 关闭issue，建立bbs.midoks.me。问题集中处理，发挥群众的力量。
+* 添加站操作回调钩子site_cb。 网站统计和OP防火墙不再手动重载配置
+* 修复ubuntu20 pureftp 安装时,端口没有加入安全里
+* 增加global_static hook关键字,并优化menu的文件加载hook
 * 各种细节优化。
 
 ### JSDelivr安装地址
