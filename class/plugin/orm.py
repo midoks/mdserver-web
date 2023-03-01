@@ -65,6 +65,9 @@ class ORM:
     def setCharset(self, charset):
         self.__DB_CHARSET = charset
 
+    def setHost(self, host):
+        self.__DB_HOST = host
+
     def setPort(self, port):
         self.__DB_PORT = port
 
