@@ -70,6 +70,7 @@ function supList(page, search){
 
             list += '<td style="text-align:right">\
             			<a href="javascript:;" class="btlink" onclick="startOrStop(\''+rdata.data[i]['program']+'\',\''+sup_status+'\')" title="启动|停止">'+sup_status_desc+'</a> | ' +
+            			'<a href="javascript:;" class="btlink" onclick="restartJob(\''+rdata.data[i]['program']+'\',\''+sup_status+'\')" title="重启">重启</a> | ' +
                         '<a href="javascript:;" class="btlink" onclick="updateJob(\''+rdata.data[i]['program']+'\')">修改</a> | ' +
                         '<a href="javascript:;" class="btlink" onclick="delJob(\''+rdata.data[i]['program']+'\')" title="删除">删除</a>' +
                     '</td>';
@@ -120,6 +121,16 @@ function supList(page, search){
 
 function startOrStop(name,status){
 	myPost('start_job',{'name':name,'status':status}, function(data){
+		var rdata = $.parseJSON(data.data);
+		layer.msg(rdata.msg,{icon:rdata.status?1:2});
+		setTimeout(function(){
+			supList(1,10);
+		},2000);
+	});
+}
+
+function restartJob(name,status){
+	myPost('restart_job',{'name':name,'status':status}, function(data){
 		var rdata = $.parseJSON(data.data);
 		layer.msg(rdata.msg,{icon:rdata.status?1:2});
 		setTimeout(function(){
