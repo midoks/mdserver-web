@@ -220,7 +220,8 @@ def getSupList():
                 infos = fr.readlines()
             for line in infos:
                 if "command=" in line.strip():
-                    d["command"] = line.strip().split('=')[1]
+                    # d["command"] = line.strip().split('=')[1]
+                    d["command"] = "子配置查看"
                 if "user=" in line.strip():
                     d["user"] = line.strip().split('=')[1]
                 if "priority=" in line.strip():
