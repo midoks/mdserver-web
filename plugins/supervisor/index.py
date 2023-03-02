@@ -220,7 +220,8 @@ def getSupList():
                 infos = fr.readlines()
             for line in infos:
                 if "command=" in line.strip():
-                    d["command"] = line.strip().split('=')[1]
+                    # d["command"] = line.strip().split('=')[1]
+                    d["command"] = "子配置查看"
                 if "user=" in line.strip():
                     d["user"] = line.strip().split('=')[1]
                 if "priority=" in line.strip():
@@ -327,6 +328,26 @@ def startJob():
     if data[1] != '':
         return mw.returnJson(False, action + '[' + name + ']失败!')
     return mw.returnJson(True, action + '[' + name + ']成功!')
+
+
+def restartJob():
+    args = getArgs()
+    data = checkArgs(args, ['name', 'status'])
+    if not data[0]:
+        return data[1]
+
+    supCtl = 'supervisorctl -c ' + getServerDir() + "/supervisor.conf"
+
+    name = args['name']
+    status = args['status']
+
+    action = "启动"
+    cmd = supCtl + " restart " + name
+    data = mw.execShell(cmd)
+
+    if data[1] != '':
+        return mw.returnJson(False,  '[' + name + ']重启失败!')
+    return mw.returnJson(True,  '[' + name + ']重启成功!')
 
 
 def delJob():
@@ -567,6 +588,8 @@ if __name__ == "__main__":
         print(addJob())
     elif func == 'start_job':
         print(startJob())
+    elif func == 'restart_job':
+        print(restartJob())
     elif func == 'del_job':
         print(delJob())
     elif func == 'update_job':

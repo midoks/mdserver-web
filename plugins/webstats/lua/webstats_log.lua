@@ -134,6 +134,7 @@ log_by_lua_block {
 
 	local function exclude_url()
 		if not ngx.var.uri then return false end
+		if not ngx.var.request_uri then return false end
 		if not auto_config['exclude_url'] then return false end
 		local the_uri = string.sub(ngx.var.request_uri, 2)
 		local url_conf = auto_config["exclude_url"]
