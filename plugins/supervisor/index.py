@@ -341,7 +341,6 @@ def restartJob():
     name = args['name']
     status = args['status']
 
-    action = "启动"
     cmd = supCtl + " stop " + name
     data = mw.execShell(cmd)
     cmd = supCtl + " start " + name
