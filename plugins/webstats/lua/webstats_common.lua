@@ -239,6 +239,7 @@ function _M.cronPre(self)
     local time_key = self:get_store_key()
     local time_key_next = self:get_store_key_with_time(ngx.time()+3600)
 
+
     for site_k, site_v in ipairs(sites) do
         local input_sn = site_v["name"]
 
@@ -250,16 +251,24 @@ function _M.cronPre(self)
             'spider_stat'
         }
 
+        local v1 = true
+        local v2 = true
         for _,ws_v in pairs(wc_stat) do
-            self:_update_stat_pre(db, ws_v, time_key)
-            self:_update_stat_pre(db, ws_v, time_key_next)
+            v1 = self:_update_stat_pre(db, ws_v, time_key)
+            v2 = self:_update_stat_pre(db, ws_v, time_key_next)
         end
 
         if db and db:isopen() then
             db:execute([[COMMIT]])
             db:close()
         end
+
+        if  not v1 or not v2 then
+            return false
+        end
     end
+
+    return true
 end
 
 -- 后台任务
@@ -273,7 +282,12 @@ function _M.cron(self)
             return true
         end
 
-        self:cronPre()
+        -- self:D("dedebide:cron task is busy!")
+        local ready_ok = self:cronPre()
+        if not ready_ok then
+            self:D("cron task is busy!")
+            return true
+        end
 
         ngx.update_time()
         local begin = ngx.now()
@@ -653,9 +667,14 @@ end
 function _M._update_stat_pre(self, db, stat_table, key)
     local local_sql = string.format("INSERT INTO %s(time) SELECT :time WHERE NOT EXISTS(SELECT time FROM %s WHERE time=:time);", stat_table, stat_table)
     local update_stat_stmt = db:prepare(local_sql)
-    update_stat_stmt:bind_names{time=key}
-    update_stat_stmt:step()
-    update_stat_stmt:finalize()
+
+    if update_stat_stmt then
+        update_stat_stmt:bind_names{time=key}
+        update_stat_stmt:step()
+        update_stat_stmt:finalize()
+        return true
+    end
+    return false
 end
 
 function _M.update_stat_quick(self, db, stat_table, key,columns)
