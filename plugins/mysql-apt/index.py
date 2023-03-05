@@ -2474,7 +2474,8 @@ def doFullSyncUser(version=''):
 
     if not os.path.exists(bak_file):
         dump_sql_data = getServerDir() + "/bin/mysqldump " + dmp_option + " --force --opt --default-character-set=utf8 --single-transaction -h" + ip + " -P" + \
-            port + " -u" + user + " -p" + apass + " " + sync_db + " > " + bak_file
+            port + " -u" + user + " -p" + apass + \
+            " --ssl-mode=DISABLED " + sync_db + " > " + bak_file
         mw.execShell(dump_sql_data)
 
     writeDbSyncStatus({'code': 2, 'msg': '本地导入数据...', 'progress': 40})

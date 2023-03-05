@@ -344,13 +344,22 @@ local function waf_cc_increase()
     local make_uri = "/"..make_uri_str
 
     if params['uri_request_args']['token'] then
+        ngx.header.content_type = "application/json"
         local args_token = params['uri_request_args']['token']
         if args_token == make_token then
-            ngx.shared.waf_limit:set(cache_token, 1, config['safe_verify']['time'])
+            ngx.shared.waf_limit:set(cache_token, 1, tonumber(config['safe_verify']['time']))
             local data = get_return_state(0, "ok")
             ngx.say(json.encode(data))
             ngx.exit(200)
         end
+
+        -- C:D("debug[args]:"..tostring(params['uri_request_args']['debug']))
+        -- if params['uri_request_args']['debug'] == 'ok' then
+        --     ngx.header.content_type = "application/json"
+        --     local data = get_return_state(0, "ok")
+        --     ngx.say(json.encode(data))
+        --     ngx.exit(200)
+        -- end
     end    
 
     local cc_html = ngx.re.gsub(cc_safe_js_html, "{uri}", make_uri_str)
