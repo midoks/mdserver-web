@@ -42,6 +42,13 @@ def writeConf(data):
 
 # start tgbot
 cfg = getConfigData()
+while True:
+    cfg = getConfigData()
+    if 'bot' in cfg and 'app_token' in cfg['bot']:
+        if cfg['bot']['app_token'] != '' and cfg['bot']['app_token'] != 'app_token':
+            break
+    time.sleep(3)
+
 bot = telebot.TeleBot(cfg['bot']['app_token'])
 
 
