@@ -1662,6 +1662,48 @@ def getMyORMDb():
     o = ormDb.ORM()
     return o
 
+##################### notify  start #########################################
+
+
+def initNotifyConfig():
+    p = getNotifyPath()
+    if not os.path.exists(p):
+        writeFile(p, '{}')
+    return True
+
+
+def getNotifyPath():
+    path = 'data/notify.json'
+    return path
+
+
+def getNotifyData():
+    initNotifyConfig()
+    p = getNotifyPath()
+    t = readFile(p)
+    return json.loads(t)
+
+
+def writeNotify(data):
+    p = getNotifyPath()
+    return writeFile(p, json.dumps(data))
+
+
+def tgbotNotifyTest(app_token, chat_id):
+    import telebot
+    bot = telebot.TeleBot(app_token)
+
+    try:
+        data = bot.send_message(chat_id, "MW-通知验证测试OK")
+        # print(data)
+        return True
+    except Exception as e:
+        pass
+    return False
+
+
+##################### notify  end #########################################
+
 
 ##################### ssh  start #########################################
 def getSshDir():
