@@ -211,6 +211,11 @@ def setBotConf():
     return mw.returnJson(True, '保存成功!', [])
 
 
+def runLog():
+    p = getServerDir() + '/task.log'
+    return p
+
+
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -233,7 +238,8 @@ if __name__ == "__main__":
         print(getBotConf())
     elif func == 'set_bot_conf':
         print(setBotConf())
-    elif func == 'conf':
-        print(getConf())
+    elif func == 'run_log':
+        print(runLog())
+
     else:
         print('error')

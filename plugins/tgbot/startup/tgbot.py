@@ -40,6 +40,15 @@ def writeConf(data):
     mw.writeFile(cfg_path, json.dumps(data))
     return True
 
+
+def writeLog(log_str):
+    if __name__ == "__main__":
+        print(log_str)
+
+    log_file = getServerDir() + '/task.log'
+    mw.writeFileLog(log_str, log_file, limit_size=5 * 1024)
+    return True
+
 # start tgbot
 cfg = getConfigData()
 while True:
@@ -47,7 +56,7 @@ while True:
     if 'bot' in cfg and 'app_token' in cfg['bot']:
         if cfg['bot']['app_token'] != '' and cfg['bot']['app_token'] != 'app_token':
             break
-    print('wait input config')
+    writeLog('等待输入配置,填写app_token')
     time.sleep(3)
 
 bot = telebot.TeleBot(cfg['bot']['app_token'])
@@ -67,5 +76,6 @@ def hanle_start_help(message):
 def hanle_get_chat_id(message):
     bot.reply_to(message, message.chat.id)
 
+writeLog('启动成功')
 bot.polling()
 # asyncio.run(bot.polling())
