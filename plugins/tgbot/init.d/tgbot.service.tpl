@@ -1,5 +1,5 @@
 [Unit]
-Description=Redis In-Memory Data Store
+Description=Tgbot Service
 After=network.target
 
 [Service]
