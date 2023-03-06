@@ -91,6 +91,7 @@ def initDreplace():
 
     file_tpl = getInitDTpl()
     service_path = mw.getServerDir()
+    app_path = service_path + '/' + getPluginName()
 
     initD_path = getServerDir() + '/init.d'
     if not os.path.exists(initD_path):
@@ -101,8 +102,7 @@ def initDreplace():
     # if not os.path.exists(file_bin):
     content = mw.readFile(file_tpl)
     content = content.replace('{$SERVER_PATH}', service_path + '/mdserver-web')
-    content = content.replace(
-        '{$APP_PATH}', service_path + '/' + getPluginName())
+    content = content.replace('{$APP_PATH}', app_path)
 
     mw.writeFile(file_bin, content)
     mw.execShell('chmod +x ' + file_bin)
@@ -114,7 +114,7 @@ def initDreplace():
     if os.path.exists(systemDir) and not os.path.exists(systemService):
         service_path = mw.getServerDir()
         se_content = mw.readFile(systemServiceTpl)
-        se_content = se_content.replace('{$SERVER_PATH}', service_path)
+        se_content = se_content.replace('{$APP_PATH}', app_path)
         mw.writeFile(systemService, se_content)
         mw.execShell('systemctl daemon-reload')
 
