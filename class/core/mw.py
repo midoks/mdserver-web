@@ -28,6 +28,8 @@ import re
 import db
 from random import Random
 
+import telebot
+
 
 def execShell(cmdstring, cwd=None, timeout=None, shell=True):
 
@@ -1689,26 +1691,39 @@ def writeNotify(data):
     return writeFile(p, json.dumps(data))
 
 
-def tgbotNotify(app_token):
-    import telebot
+def tgbotNotifyObject(app_token):
     bot = telebot.TeleBot(app_token)
     return bot
 
 
 def tgbotNotifyMessage(app_token, chat_id, msg):
-    bot = tgbotNotify(app_token)
+    bot = tgbotNotifyObject(app_token)
 
     try:
         data = bot.send_message(chat_id, msg)
         # print(data)
         return True
     except Exception as e:
-        pass
+        writeFileLog(str(e))
     return False
 
 
 def tgbotNotifyTest(app_token, chat_id):
-    return tgbotNotifyMessage(app_token, chat_id, 'MW-通知验证测试OK')
+    # return tgbotNotifyMessage(app_token, chat_id, 'MW-通知验证测试OK')
+    msg = 'MW-通知验证测试OK'
+    try:
+
+        url = 'https://api.telegram.org/bot' + app_token + '/sendMessage'
+        post_data = {
+            'chat_id': chat_id,
+            'text': msg,
+        }
+        rdata = httpPost(url, post_data)
+        json.loads(rdata)
+        return True
+    except Exception as e:
+        writeFileLog(str(e))
+    return False
 
 
 def notifyMessage(msg):
