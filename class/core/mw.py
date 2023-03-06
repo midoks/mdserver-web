@@ -1708,7 +1708,7 @@ def tgbotNotifyMessage(app_token, chat_id, msg):
 
 
 def tgbotNotifyTest(app_token, chat_id):
-    return tgbotNotifyApp(app_token, chat_id, 'MW-通知验证测试OK')
+    return tgbotNotifyMessage(app_token, chat_id, 'MW-通知验证测试OK')
 
 
 def notifyMessage(msg):
