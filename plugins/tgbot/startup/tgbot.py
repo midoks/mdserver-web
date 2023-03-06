@@ -47,6 +47,7 @@ while True:
     if 'bot' in cfg and 'app_token' in cfg['bot']:
         if cfg['bot']['app_token'] != '' and cfg['bot']['app_token'] != 'app_token':
             break
+    print('wait input config')
     time.sleep(3)
 
 bot = telebot.TeleBot(cfg['bot']['app_token'])
