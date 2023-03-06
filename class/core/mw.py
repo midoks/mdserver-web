@@ -1689,17 +1689,38 @@ def writeNotify(data):
     return writeFile(p, json.dumps(data))
 
 
-def tgbotNotifyTest(app_token, chat_id):
+def tgbotNotify(app_token):
     import telebot
     bot = telebot.TeleBot(app_token)
+    return bot
+
+
+def tgbotNotifyMessage(app_token, chat_id, msg):
+    bot = tgbotNotify(app_token)
 
     try:
-        data = bot.send_message(chat_id, "MW-通知验证测试OK")
+        data = bot.send_message(chat_id, msg)
         # print(data)
         return True
     except Exception as e:
         pass
     return False
+
+
+def tgbotNotifyTest(app_token, chat_id):
+    return tgbotNotifyApp(app_token, chat_id, 'MW-通知验证测试OK')
+
+
+def notifyMessage(msg):
+    data = getNotifyData()
+    # tag_list = ['tgbot', 'email']
+    # tagbot
+    do_notify = False
+    if 'tgbot' in data and 'enable' in data['tgbot']:
+        if data['tgbot']['enable']:
+            t = data['tgbot']
+            do_notify = tgbotNotifyMessage(t['app_token'], t['chat_id'], msg)
+    return do_notify
 
 
 ##################### notify  end #########################################
