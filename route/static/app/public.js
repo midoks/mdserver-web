@@ -2277,6 +2277,8 @@ function pluginOpInitD(a, _version, b) {
 }
 
 function pluginLogs(_name, version, func, line){
+
+	var _this = this;
     if ( typeof(version) == 'undefined' ){
         version = '';
     }
@@ -2317,9 +2319,10 @@ function pluginLogs(_name, version, func, line){
             if(rdata.data == '') {
             	rdata.data = '当前没有日志!';
             }
-            var ebody = '<div class="soft-man-con">\
-            	<textarea readonly="" style="margin: 0px;width: 100%;height: 520px;background-color: #333;color:#fff; padding:0 5px" id="info_log">'+rdata.data+'</textarea>\
-            	</div>';
+
+     
+            var h =  parseInt($('.bt-w-menu').css('height')) - 40;
+            var ebody = '<textarea readonly="" style="margin: 0px;height: '+h+'px;width: 100%;background-color: #333;color:#fff; padding:0 5px" id="info_log">'+rdata.data+'</textarea>';
             $(".soft-man-con").html(ebody);
             var ob = document.getElementById('info_log');
             ob.scrollTop = ob.scrollHeight; 
