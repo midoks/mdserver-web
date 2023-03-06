@@ -1,14 +1,3 @@
-
-function str2Obj(str){
-    var data = {};
-    kv = str.split('&');
-    for(i in kv){
-        v = kv[i].split('=');
-        data[v[0]] = v[1];
-    }
-    return data;
-}
-
 function redisPost(method, version, args,callback){
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
 
@@ -18,7 +7,7 @@ function redisPost(method, version, args,callback){
     req_data['version'] = version;
  
     if (typeof(args) == 'string'){
-        req_data['args'] = JSON.stringify(str2Obj(args));
+        req_data['args'] = JSON.stringify(toArrayObject(args));
     } else {
         req_data['args'] = JSON.stringify(args);
     }
@@ -46,7 +35,7 @@ function redisPostCallbak(method, version, args,callback){
     args['version'] = version;
  
     if (typeof(args) == 'string'){
-        req_data['args'] = JSON.stringify(str2Obj(args));
+        req_data['args'] = JSON.stringify(toArrayObject(args));
     } else {
         req_data['args'] = JSON.stringify(args);
     }
