@@ -1709,10 +1709,8 @@ def tgbotNotifyMessage(app_token, chat_id, msg):
 
 
 def tgbotNotifyTest(app_token, chat_id):
-    # return tgbotNotifyMessage(app_token, chat_id, 'MW-通知验证测试OK')
     msg = 'MW-通知验证测试OK'
     try:
-
         url = 'https://api.telegram.org/bot' + app_token + '/sendMessage'
         post_data = {
             'chat_id': chat_id,
