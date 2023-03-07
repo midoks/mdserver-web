@@ -28,8 +28,6 @@ import re
 import db
 from random import Random
 
-import telebot
-
 
 def execShell(cmdstring, cwd=None, timeout=None, shell=True):
 
@@ -1692,6 +1690,7 @@ def writeNotify(data):
 
 
 def tgbotNotifyObject(app_token):
+    import telebot
     bot = telebot.TeleBot(app_token)
     return bot
 
