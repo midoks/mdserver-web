@@ -462,8 +462,9 @@ def configTpl():
     pathFile = os.listdir(path)
     tmp = []
     for one in pathFile:
-        file = path + '/' + one
-        tmp.append(file)
+        if one.endswith(".ini"):
+            file = path + '/' + one
+            tmp.append(file)
     return mw.getJson(tmp)
 
 
