@@ -1,0 +1,17 @@
+{
+	"sort": 7,
+	"ps": "[<b style='color:red;'>DEV</b>]简单Telegram机器人",
+	"name": "tgbot",
+	"title": "tgbot",
+	"shell": "install.sh",
+	"versions":["0.1"],
+	"tip": "soft",
+	"checks": "server/tgbot",
+	"path": "server/tgbot",
+	"display": 1,
+	"author": "Zend",
+	"date": "2023-03-06",
+	"home": "https://core.telegram.org/bots/api",
+	"type": 0,
+	"pid": "5"
+}

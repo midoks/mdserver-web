@@ -354,6 +354,78 @@ function setPanelSSL(){
 	});
 }
 
+function setNotifyApi(tag, obj){
+	var enable = $(obj).prop("checked");
+	console.log(tag,obj,enable);
+	$.post('/config/set_notify_enable', {'tag':tag, 'enable':enable},function(rdata){
+		showMsg(rdata.msg, function(){
+			if (rdata.status){}
+		} ,{icon:rdata.status?1:2}, 1000);
+	},'json');
+}
+
+function getTgbot(){
+	var loadT = layer.msg('正在获取TgBot信息...',{icon:16,time:0,shade: [0.3, '#000']});
+	$.post('/config/get_notify',{},function(data){
+		layer.close(loadT);
+
+		var app_token = '';
+		var chat_id = '';
+
+		if (data.status){
+			if (typeof(data['data']['tgbot']) !='undefined'){
+				app_token = data['data']['tgbot']['data']['app_token'];
+				chat_id = data['data']['tgbot']['data']['chat_id'];
+			}
+		}
+
+		layer.open({
+			type: 1,
+			area: "500px",
+			title: '配置TgBot配置',
+			closeBtn: 1,
+			shift: 5,
+			btn:["确定","关闭","验证"],
+			shadeClose: false,
+			content: "<div class='bt-form pd20'>\
+					<div class='line'>\
+						<span class='tname'>APP_TOKEN</span>\
+						<div class='info-r'><input class='bt-input-text' type='text' name='app_token' value='"+app_token+"' style='width:100%'/></div>\
+					</div>\
+					<div class='line'>\
+						<span class='tname'>CHAT_ID</span>\
+						<div class='info-r'><input class='bt-input-text' type='text' name='chat_id' value='"+chat_id+"' style='width:100%' /></div>\
+					</div>\
+				</div>",
+			yes:function(index){
+				var pdata = {};
+				pdata['app_token'] = $('input[name="app_token"]').val();
+				pdata['chat_id'] = $('input[name="chat_id"]').val();
+				$.post('/config/set_notify',{'tag':'tgbot', 'data':JSON.stringify(pdata)},function(rdata){
+					showMsg(rdata.msg, function(){
+						if (rdata.status){
+							layer.close(index);
+						}
+					},{icon:rdata.status?1:2},2000);
+				});
+			},
+
+			btn3:function(index){
+				var pdata = {};
+				pdata['app_token'] = $('input[name="app_token"]').val();
+				pdata['chat_id'] = $('input[name="chat_id"]').val();
+				$.post('/config/set_notify_test',{'tag':'tgbot', 'data':JSON.stringify(pdata)},function(rdata){
+					showMsg(rdata.msg, function(){
+						if (rdata.status){
+							layer.close(index);
+						}
+					},{icon:rdata.status?1:2},2000);
+				});
+				return false;
+			}
+		});
+	});
+}
 
 function getPanelSSL(){
 	var loadT = layer.msg('正在获取证书信息...',{icon:16,time:0,shade: [0.3, '#000']});

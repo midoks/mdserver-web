@@ -82,6 +82,10 @@ def getPanelDataDir():
     return getRunDir() + '/data'
 
 
+def getPanelTmp():
+    return getRunDir() + '/tmp'
+
+
 def getServerDir():
     return getRootDir() + '/server'
 
@@ -538,6 +542,14 @@ def getDate():
     return time.strftime('%Y-%m-%d %X', time.localtime())
 
 
+def getDateFromNow(tf_format="%Y-%m-%d %H:%M:%S", time_zone="Asia/Shanghai"):
+    # 取格式时间
+    import time
+    os.environ['TZ'] = time_zone
+    time.tzset()
+    return time.strftime(tf_format, time.localtime())
+
+
 def getDataFromInt(val):
     time_format = '%Y-%m-%d %H:%M:%S'
     time_str = time.localtime(val)
@@ -553,7 +565,7 @@ def writeLog(stype, msg, args=()):
             uid = session['uid']
     except Exception as e:
         pass
-        # print(getTracebackInfo())
+        # writeFileLog(getTracebackInfo())
     return writeDbLog(stype, msg, args, uid)
 
 
@@ -704,7 +716,7 @@ def enCrypt(key, strings):
         result = f.encrypt(strings)
         return result.decode('utf-8')
     except:
-        print(getTracebackInfo())
+        writeFileLog(getTracebackInfo())
         return strings
 
 
@@ -723,7 +735,7 @@ def deCrypt(key, strings):
         result = f.decrypt(strings).decode('utf-8')
         return result
     except:
-        print(getTracebackInfo())
+        writeFileLog(getTracebackInfo())
         return strings
 
 
@@ -742,7 +754,7 @@ def enDoubleCrypt(key, strings):
         result = f.encrypt(strings)
         return result.decode('utf-8')
     except:
-        print(getTracebackInfo())
+        writeFileLog(getTracebackInfo())
         return strings
 
 
@@ -760,7 +772,7 @@ def deDoubleCrypt(key, strings):
         result = f.decrypt(strings).decode('utf-8')
         return result
     except:
-        print(getTracebackInfo())
+        writeFileLog(getTracebackInfo())
         return strings
 
 
@@ -1564,7 +1576,7 @@ def getCertName(certPath):
             result['notAfter'], "%Y-%m-%d")) - time.time()) / 86400)
         return result
     except Exception as e:
-        # print(getTracebackInfo())
+        writeFileLog(getTracebackInfo())
         return None
 
 
@@ -1661,6 +1673,141 @@ def getMyORMDb():
     import ormDb
     o = ormDb.ORM()
     return o
+
+##################### notify  start #########################################
+
+
+def initNotifyConfig():
+    p = getNotifyPath()
+    if not os.path.exists(p):
+        writeFile(p, '{}')
+    return True
+
+
+def getNotifyPath():
+    path = 'data/notify.json'
+    return path
+
+
+def getNotifyData(is_parse=False):
+    initNotifyConfig()
+    notify_file = getNotifyPath()
+    notify_data = readFile(notify_file)
+
+    data = json.loads(notify_data)
+
+    if is_parse:
+        tag_list = ['tgbot']
+        for t in tag_list:
+            if t in data and 'cfg' in data[t]:
+                data[t]['data'] = json.loads(deDoubleCrypt(t, data[t]['cfg']))
+    return data
+
+
+def writeNotify(data):
+    p = getNotifyPath()
+    return writeFile(p, json.dumps(data))
+
+
+def tgbotNotifyChatID():
+    data = getNotifyData(True)
+    if 'tgbot' in data and 'enable' in data['tgbot']:
+        if data['tgbot']['enable']:
+            t = data['tgbot']['data']
+            return t['chat_id']
+    return ''
+
+
+def tgbotNotifyObject():
+    data = getNotifyData(True)
+    if 'tgbot' in data and 'enable' in data['tgbot']:
+        if data['tgbot']['enable']:
+            t = data['tgbot']['data']
+            import telebot
+            bot = telebot.TeleBot(app_token)
+            return True, bot
+    return False, None
+
+
+def tgbotNotifyMessage(app_token, chat_id, msg):
+    import telebot
+    bot = telebot.TeleBot(app_token)
+    try:
+        data = bot.send_message(chat_id, msg)
+        return True
+    except Exception as e:
+        writeFileLog(str(e))
+    return False
+
+
+def tgbotNotifyHttpPost(app_token, chat_id, msg):
+    try:
+        url = 'https://api.telegram.org/bot' + app_token + '/sendMessage'
+        post_data = {
+            'chat_id': chat_id,
+            'text': msg,
+        }
+        rdata = httpPost(url, post_data)
+        return True
+    except Exception as e:
+        writeFileLog(str(e))
+    return False
+
+
+def tgbotNotifyTest(app_token, chat_id):
+    msg = 'MW-通知验证测试OK'
+    return tgbotNotifyHttpPost(app_token, chat_id, msg)
+
+
+def notifyMessageTry(msg, stype='common', trigger_time=300, is_write_log=True):
+
+    lock_file = getPanelTmp() + '/notify_lock.json'
+    if not os.path.exists(lock_file):
+        writeFile(lock_file, '{}')
+
+    lock_data = json.loads(readFile(lock_file))
+    if stype in lock_data:
+        diff_time = time.time() - lock_data[stype]['do_time']
+        if diff_time >= trigger_time:
+            lock_data[stype]['do_time'] = time.time()
+        else:
+            return False
+    else:
+        lock_data[stype] = {'do_time': time.time()}
+
+    writeFile(lock_file, json.dumps(lock_data))
+
+    if is_write_log:
+        writeLog("通知管理[" + stype + "]", msg)
+
+    data = getNotifyData(True)
+    # tag_list = ['tgbot', 'email']
+    # tagbot
+    do_notify = False
+    if 'tgbot' in data and 'enable' in data['tgbot']:
+        if data['tgbot']['enable']:
+            t = data['tgbot']['data']
+            i = sys.version_info
+
+            # telebot 在python小于3.7无法使用
+            if i[0] < 3 or i[1] < 7:
+                do_notify = tgbotNotifyHttpPost(
+                    t['app_token'], t['chat_id'], msg)
+            else:
+                do_notify = tgbotNotifyMessage(
+                    t['app_token'], t['chat_id'], msg)
+    return do_notify
+
+
+def notifyMessage(msg, stype='common', trigger_time=300, is_write_log=True):
+    try:
+        return notifyMessageTry(msg, stype, trigger_time, is_write_log)
+    except Exception as e:
+        writeFileLog(getTracebackInfo())
+        return False
+
+
+##################### notify  end #########################################
 
 
 ##################### ssh  start #########################################

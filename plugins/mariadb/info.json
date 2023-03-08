@@ -8,7 +8,7 @@
 	"uninstall_pre_inspection":true,
 	"checks": "server/mariadb",
 	"path": "server/mariadb",
-	"versions":["10.6","10.7","10.8","10.9"],
+	"versions":["10.6","10.7","10.8","10.9","10.11","11.0"],
 	"shell":"install.sh",
 	"checks":"server/mariadb",
 	"path":"server/mariadb",

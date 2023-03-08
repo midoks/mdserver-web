@@ -1,0 +1,25 @@
+<div class="bt-form">
+	<div class='plugin_version'></div>
+	<div class="bt-w-main">
+		<div class="bt-w-menu">
+			<p class="bgw" onclick="pluginService('tgbot');">服务</p>
+			<p onclick="pluginInitD('tgbot');">自启动</p>
+			<p onclick="botConf();">Bot配置</p>
+			<p onclick="pluginLogs('tgbot','','run_log');">日志</p>
+		</div>
+		<div class="bt-w-con pd15">
+			<div class="soft-man-con"></div>
+		</div>
+	</div>
+</div>
+<style>
+.conf_p span{
+	width: 70px;
+}
+</style>
+<script type="text/javascript">
+resetPluginWinHeight(300);
+$.getScript( "/plugins/file?name=tgbot&f=js/tgbot.js", function(){
+	pluginService('tgbot');
+});
+</script>

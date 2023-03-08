@@ -14,7 +14,7 @@ sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 mariadbDir=${serverPath}/source/mariadb
 
-MY_VER=10.7.8
+MY_VER=10.11.2
 
 Install_app()
 {
@@ -63,7 +63,7 @@ Install_app()
 	# 	wget --no-check-certificate -O ${mariadbDir}/mariadb-${MY_VER}.tar.gz --tries=3 https://mirrors.aliyun.com/mariadb/mariadb-${MY_VER}/source/mariadb-${MY_VER}.tar.gz
 	# fi
 
-	# https://downloads.mariadb.org/interstitial/mariadb-10.7.4/source/mariadb-10.7.4.tar.gz
+	# https://downloads.mariadb.org/interstitial/mariadb-10.9.1/source/mariadb-10.9.1.tar.gz
 	if [ ! -f ${mariadbDir}/mariadb-${MY_VER}.tar.gz ];then
 		wget --no-check-certificate -O ${mariadbDir}/mariadb-${MY_VER}.tar.gz --tries=3 https://archive.mariadb.org/mariadb-${MY_VER}/source/mariadb-${MY_VER}.tar.gz
 	fi
@@ -71,6 +71,7 @@ Install_app()
 	if [ ! -d ${mariadbDir}/mariadb-${MY_VER} ];then
 		 cd ${mariadbDir} && tar -zxvf  ${mariadbDir}/mariadb-${MY_VER}.tar.gz
 	fi
+	
 
 	if [ ! -d $serverPath/mariadb ];then
 		cd ${mariadbDir}/mariadb-${MY_VER} && cmake \
@@ -91,7 +92,7 @@ Install_app()
 		make -j${cpuCore} && make install && make clean
 
 		if [ -d $serverPath/mariadb ];then
-			echo '10.7' > $serverPath/mariadb/version.pl
+			echo '10.11' > $serverPath/mariadb/version.pl
 			echo '安装完成' > $install_tmp
 		else
 			echo '安装失败' > $install_tmp

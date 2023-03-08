@@ -515,29 +515,24 @@ function openPath(a) {
 	window.location.href = "/files/"
 }
 
-function onlineEditFile(k, f) {
+function onlineEditFile(k, f, callback) {
 	if(k != 0) {
 		var l = $("#PathPlace input").val();
 		var h = encodeURIComponent($("#textBody").val());
 		var a = $("select[name=encoding]").val();
-		var loadT = layer.msg(lan.bt.save_file, {
-			icon: 16,
-			time: 0
-		});
-		$.post("/files/save_body", "data=" + h + "&path=" + encodeURIComponent(f) + "&encoding=" + a, function(m) {
+		var loadT = layer.msg('正在保存,请稍候...', {icon: 16,time: 0});
+		$.post("/files/save_body", "data=" + h + "&path=" + encodeURIComponent(f) + "&encoding=" + a, function(data) {
 			if(k == 1) {
 				layer.close(loadT);
 			}
-			layer.msg(m.msg, {
-				icon: m.status ? 1 : 2
-			});
+			layer.msg(data.msg, {icon: data.status ? 1 : 2});
+			if (data.status && typeof(callback) == 'function'){
+				callback(k, f);
+			}
 		},'json');
 		return
 	}
-	var e = layer.msg(lan.bt.read_file, {
-		icon: 16,
-		time: 0
-	});
+	var e = layer.msg('正在读取文件,请稍候...', {icon: 16,time: 0});
 	var g = f.split(".");
 	var b = g[g.length - 1];
 	var d;
@@ -595,15 +590,12 @@ function onlineEditFile(k, f) {
 		default:
 			var j = {
 				name: "htmlmixed",
-				scriptTypes: [{
-					matches: /\/x-handlebars-template|\/x-mustache/i,
-					mode: null
-				}, {
-					matches: /(text|application)\/(x-)?vb(a|script)/i,
-					mode: "vbscript"
-				}]
+				scriptTypes: [
+					{matches: /\/x-handlebars-template|\/x-mustache/i,mode: null}, 
+					{matches: /(text|application)\/(x-)?vb(a|script)/i,mode: "vbscript"}
+				]
 			};
-			d = j
+			d = j;
 	}
 	$.post("/files/get_body", "path=" + encodeURIComponent(f), function(s) {
 		if(s.status === false){
@@ -619,55 +611,57 @@ function onlineEditFile(k, f) {
 			m = s.data.encoding == u[p] ? "selected" : "";
 			n += '<option value="' + u[p] + '" ' + m + ">" + u[p] + "</option>";
 		}
+		var code_mirror = null;
 		var r = layer.open({
 			type: 1,
 			shift: 5,
 			closeBtn: 1,
 			area: ["90%", "90%"],
-			title: lan.bt.edit_title+"[" + f + "]",
-			content: '<form class="bt-form pd20 pb70">\
+			btn:['保存','关闭'],
+			title: "在线编辑[" + f + "]",
+			content: '<form class="bt-form pd20">\
 				<div class="line">\
-					<p style="color:red;margin-bottom:10px">' + lan.bt.edit_ps + '\
+					<p style="color:red;margin-bottom:10px">提示：Ctrl+F 搜索关键字，Ctrl+G 查找下一个，Ctrl+S 保存，Ctrl+Shift+R 查找替换!\
 						<select class="bt-input-text" name="encoding" style="width: 74px;position: absolute;top: 31px;right: 19px;height: 22px;z-index: 9999;border-radius: 0;">' + n + '</select>\
 					</p>\
 					<textarea class="mCustomScrollbar bt-input-text" id="textBody" style="width:100%;margin:0 auto;line-height: 1.8;position: relative;top: 10px;" value="" />\
 				</div>\
-				<div class="bt-form-submit-btn" style="position:absolute; bottom:0; width:100%">\
-				<button type="button" class="btn btn-danger btn-sm btn-editor-close">'+lan.public.close+'</button>\
-				<button id="OnlineEditFileBtn" type="button" class="btn btn-success btn-sm">'+lan.public.save+'</button>\
-				</div>\
-			</form>'
-		});
-		$("#textBody").text(s.data.data);
-		var q = $(window).height() * 0.9;
-		$("#textBody").height(q - 160);
-		var t = CodeMirror.fromTextArea(document.getElementById("textBody"), {
-			extraKeys: {
-				"Ctrl-F": "findPersistent",
-				"Ctrl-H": "replaceAll",
-				"Ctrl-S": function() {
-					$("#textBody").text(t.getValue());
-					onlineEditFile(2, f)
-				},
-				"Cmd-S":function() {
-					$("#textBody").text(t.getValue());
-					onlineEditFile(2, f)
-				},
+			</form>',
+			success:function(){
+				$("#textBody").text(s.data.data);
+				var q = $(window).height() * 0.9;
+				$("#textBody").height(q - 160);
+				code_mirror = CodeMirror.fromTextArea(document.getElementById("textBody"), {
+					extraKeys: {
+						"Ctrl-F": "findPersistent",
+						"Ctrl-H": "replaceAll",
+						"Ctrl-S": function() {
+							$("#textBody").text(code_mirror.getValue());
+							onlineEditFile(2, f,callback);
+						},
+						"Cmd-S":function() {
+							$("#textBody").text(code_mirror.getValue());
+							onlineEditFile(2, f,callback);
+						},
+					},
+					mode: d,
+					lineNumbers: true,
+					matchBrackets: true,
+					matchtags: true,
+					autoMatchParens: true
+				});
+				code_mirror.focus();
+				code_mirror.setSize("auto", q - 150);
+
+				$(window).resize(function(){
+                    var q = $(window).height() * 0.9;
+                    code_mirror.setSize("auto", q - 150);
+                }); 
 			},
-			mode: d,
-			lineNumbers: true,
-			matchBrackets: true,
-			matchtags: true,
-			autoMatchParens: true
-		});
-		t.focus();
-		t.setSize("auto", q - 150);
-		$("#OnlineEditFileBtn").click(function() {
-			$("#textBody").text(t.getValue());
-			onlineEditFile(1, f);
-		});
-		$(".btn-editor-close").click(function() {
-			layer.close(r);
+			yes:function(){
+				$("#textBody").text(code_mirror.getValue());
+				onlineEditFile(1, f,callback);
+			}
 		});
 	},'json');
 }
@@ -1137,18 +1131,21 @@ function bindPanel(a,type,ip,btid,url,user,pw){
 					<li><font style='color:red'>注意，开启广告拦截会导致无法快捷登录。</font></li></ul>\
 				</div>\
 				<div class='bt-form-submit-btn'><button type='button' class='btn btn-danger btn-sm' onclick=\"layer.closeAll()\">关闭</button> "+btn+"</div>\
-			</div>"
-	});
-	$("#btaddress").on("input",function(){
-		var str =$(this).val();
-		var isip = /([\w-]+\.){2,6}\w+/;
-		var iptext = str.match(isip);
-		if(iptext) $("#bttitle").val(iptext[0]);
-	}).blur(function(){
-		var str =$(this).val();
-		var isip = /([\w-]+\.){2,6}\w+/;
-		var iptext = str.match(isip);
-		if(iptext) $("#bttitle").val(iptext[0]);
+			</div>",
+
+		success:function(){
+			$("#btaddress").on("input",function(){
+				var str =$(this).val();
+				var isip = /([\w-]+\.){2,6}\w+/;
+				var iptext = str.match(isip);
+				if(iptext) $("#bttitle").val(iptext[0]);
+			}).blur(function(){
+				var str =$(this).val();
+				var isip = /([\w-]+\.){2,6}\w+/;
+				var iptext = str.match(isip);
+				if(iptext) $("#bttitle").val(iptext[0]);
+			});
+		}
 	});
 }
 //删除快捷登录
@@ -1773,6 +1770,159 @@ function entitiesDecode(text) {
     return text;
 }
 
+// base64.js
+// base64加密
+function base64_encode(str) {
+    var base64EncodeChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    var out, i, len;
+    var c1, c2, c3;
+
+    len = str.length;
+    i = 0;
+    out = "";
+    while(i < len) {
+        c1 = str.charCodeAt(i++) & 0xff;
+        if(i == len)
+        {
+            out += base64EncodeChars.charAt(c1 >> 2);
+            out += base64EncodeChars.charAt((c1 & 0x3) << 4);
+            out += "==";
+            break;
+        }
+        c2 = str.charCodeAt(i++);
+        if(i == len)
+        {
+            out += base64EncodeChars.charAt(c1 >> 2);
+            out += base64EncodeChars.charAt(((c1 & 0x3)<< 4) | ((c2 & 0xF0) >> 4));
+            out += base64EncodeChars.charAt((c2 & 0xF) << 2);
+            out += "=";
+            break;
+        }
+        c3 = str.charCodeAt(i++);
+        out += base64EncodeChars.charAt(c1 >> 2);
+        out += base64EncodeChars.charAt(((c1 & 0x3)<< 4) | ((c2 & 0xF0) >> 4));
+        out += base64EncodeChars.charAt(((c2 & 0xF) << 2) | ((c3 & 0xC0) >>6));
+        out += base64EncodeChars.charAt(c3 & 0x3F);
+    }
+    return out;
+}
+
+
+// base64解密
+function base64_decode(str) {
+    var base64DecodeChars = new Array(
+        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 62, -1, -1, -1, 63,
+        52, 53, 54, 55, 56, 57, 58, 59, 60, 61, -1, -1, -1, -1, -1, -1,
+        -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
+        15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, -1, -1, -1, -1, -1,
+        -1, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
+        41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, -1, -1, -1, -1, -1);
+    var c1, c2, c3, c4;
+    var i, len, out;
+
+    len = str.length;
+    i = 0;
+    out = "";
+    while(i < len) {
+        /* c1 */
+        do {
+            c1 = base64DecodeChars[str.charCodeAt(i++) & 0xff];
+        } while(i < len && c1 == -1);
+        if(c1 == -1)
+            break;
+
+        /* c2 */
+        do {
+            c2 = base64DecodeChars[str.charCodeAt(i++) & 0xff];
+        } while(i < len && c2 == -1);
+        if(c2 == -1)
+            break;
+
+        out += String.fromCharCode((c1 << 2) | ((c2 & 0x30) >> 4));
+
+        /* c3 */
+        do {
+            c3 = str.charCodeAt(i++) & 0xff;
+            if(c3 == 61)
+                return out;
+            c3 = base64DecodeChars[c3];
+        } while(i < len && c3 == -1);
+        if(c3 == -1)
+            break;
+
+        out += String.fromCharCode(((c2 & 0XF) << 4) | ((c3 & 0x3C) >> 2));
+
+        /* c4 */
+        do {
+            c4 = str.charCodeAt(i++) & 0xff;
+            if(c4 == 61)
+                return out;
+            c4 = base64DecodeChars[c4];
+        } while(i < len && c4 == -1);
+        if(c4 == -1)
+            break;
+        out += String.fromCharCode(((c3 & 0x03) << 6) | c4);
+    }
+    return out;
+}
+
+function utf16to8(str) {
+    var out, i, len, c;
+
+    out = "";
+    len = str.length;
+    for(i = 0; i < len; i++) {
+        c = str.charCodeAt(i);
+        if ((c >= 0x0001) && (c <= 0x007F)) {
+            out += str.charAt(i);
+        } else if (c > 0x07FF) {
+            out += String.fromCharCode(0xE0 | ((c >> 12) & 0x0F));
+            out += String.fromCharCode(0x80 | ((c >> 6) & 0x3F));
+            out += String.fromCharCode(0x80 | ((c >> 0) & 0x3F));
+        } else {
+            out += String.fromCharCode(0xC0 | ((c >> 6) & 0x1F));
+            out += String.fromCharCode(0x80 | ((c >> 0) & 0x3F));
+        }
+    }
+    return out;
+}
+
+function utf8to16(str) {
+    var out, i, len, c;
+    var char2, char3;
+
+    out = "";
+    len = str.length;
+    i = 0;
+    while(i < len) {
+        c = str.charCodeAt(i++);
+        switch(c >> 4)
+        {
+            case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7:
+            // 0xxxxxxx
+            out += str.charAt(i-1);
+            break;
+            case 12: case 13:
+            // 110x xxxx 10xx xxxx
+            char2 = str.charCodeAt(i++);
+            out += String.fromCharCode(((c & 0x1F) << 6) | (char2 & 0x3F));
+            break;
+            case 14:
+                // 1110 xxxx 10xx xxxx 10xx xxxx
+                char2 = str.charCodeAt(i++);
+                char3 = str.charCodeAt(i++);
+                out += String.fromCharCode(((c & 0x0F) << 12) |
+                    ((char2 & 0x3F) << 6) |
+                    ((char3 & 0x3F) << 0));
+                break;
+        }
+    }
+
+    return out;
+}
+
 
 function pluginService(_name, version){
 	var data = {name:_name, func:'status'}
@@ -2124,6 +2274,8 @@ function pluginOpInitD(a, _version, b) {
 }
 
 function pluginLogs(_name, version, func, line){
+
+	var _this = this;
     if ( typeof(version) == 'undefined' ){
         version = '';
     }
@@ -2164,9 +2316,10 @@ function pluginLogs(_name, version, func, line){
             if(rdata.data == '') {
             	rdata.data = '当前没有日志!';
             }
-            var ebody = '<div class="soft-man-con">\
-            	<textarea readonly="" style="margin: 0px;width: 100%;height: 520px;background-color: #333;color:#fff; padding:0 5px" id="info_log">'+rdata.data+'</textarea>\
-            	</div>';
+
+     
+            var h =  parseInt($('.bt-w-menu').css('height')) - 40;
+            var ebody = '<textarea readonly="" style="margin: 0px;height: '+h+'px;width: 100%;background-color: #333;color:#fff; padding:0 5px" id="info_log">'+rdata.data+'</textarea>';
             $(".soft-man-con").html(ebody);
             var ob = document.getElementById('info_log');
             ob.scrollTop = ob.scrollHeight; 

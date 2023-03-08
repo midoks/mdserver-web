@@ -99,13 +99,15 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.13.1
+### 版本更新 0.13.2
 
-* 关闭issue，建立bbs.midoks.me。问题集中处理，发挥群众的力量。
-* 添加站操作回调钩子site_cb。 网站统计和OP防火墙不再手动重载配置
-* 修复ubuntu20 pureftp 安装时,端口没有加入安全里
-* 增加global_static hook关键字,并优化menu的文件加载hook
-* 各种细节优化。
+* supervisor添加重启功能。
+* 加入滚动写入日志 mw.writeFileLog方法。
+* mysql导出优化优化。
+* 添加tgbot插件[仅测试]。
+* TelegramBot机器人通知-加入配置。
+* mariadb更新版本。
+* 在线文件编辑优化。
 
 ### JSDelivr安装地址
 

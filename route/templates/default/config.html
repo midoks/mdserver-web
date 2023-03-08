@@ -102,7 +102,6 @@
 			</div>
 
 			<div class="title c6 plr15"><h3 class="f16">安全</h3></div>
-
 			<div class="setting-con pd15">
 
 				<p class="mtb15">
@@ -147,6 +146,21 @@
 					<button type="button" class="btn btn-success btn-sm ml5" onclick="setTempAccess()">临时访问授权管理</button>
 					<span class="set-info c7">为非管理员临时提供面板访问权限</span>
 				</p>
+			</div>
+
+
+			<div class="title c6 plr15"><h3 class="f16">通知</h3></div>
+
+			<div class="setting-con pd15">
+
+				<p class="mtb15">
+					<span class="set-tit text-right" title="TelegramBot" style="float: left;">TG机器人通知</span>
+						<input id="cfg_tgbot" name="cfg_tgbot" onclick="setNotifyApi('tgbot',this)" class="btswitch btswitch-ios" type="checkbox" {{data['notify_tgbot_enable']}}>
+						<label class="btswitch-btn ml5" for="cfg_tgbot" style="float: left;margin-top:4px;"></label>
+	                <button ype="button" class="btn btn-default btn-xs panel_api_btn" style="vertical-align: middle; margin-left: 10px" onclick="getTgbot();">TelegramBot配置</button>
+					<span class="set-info c7">Telegram Bot机器人通知【<b style="color:red;">国内可能无法使用</b>】</span>
+				</p>
+
 			</div>
 		</div>
 	</div>

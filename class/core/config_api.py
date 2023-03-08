@@ -27,7 +27,7 @@ from flask import request
 
 class config_api:
 
-    __version = '0.13.1'
+    __version = '0.13.2'
     __api_addr = 'data/api.json'
 
     def __init__(self):
@@ -661,6 +661,60 @@ class config_api:
         mw.writeLog('面板设置', '将未授权响应状态码设置为:{}'.format(status_code))
         return mw.returnJson(True, '设置成功!')
 
+    def getNotifyApi(self):
+        # 获取
+        data = mw.getNotifyData(True)
+        return mw.returnData(True, 'ok', data)
+
+    def setNotifyApi(self):
+        tag = request.form.get('tag', '').strip()
+        data = request.form.get('data', '').strip()
+
+        cfg = mw.getNotifyData(False)
+
+        crypt_data = mw.enDoubleCrypt(tag, data)
+        if tag in cfg:
+            cfg[tag]['cfg'] = crypt_data
+        else:
+            t = {'cfg': crypt_data}
+            cfg[tag] = t
+
+        mw.writeNotify(cfg)
+        return mw.returnData(True, '设置成功')
+
+    def setNotifyTestApi(self):
+        # 异步通知验证
+        tag = request.form.get('tag', '').strip()
+        tag_data = request.form.get('data', '').strip()
+
+        if tag == 'tgbot':
+            t = json.loads(tag_data)
+            test_bool = mw.tgbotNotifyTest(t['app_token'], t['chat_id'])
+            if test_bool:
+                return mw.returnData(True, '验证成功')
+            return mw.returnData(False, '验证失败')
+
+        return mw.returnData(False, '暂时未支持该验证')
+
+    def setNotifyEnableApi(self):
+        # 异步通知验证
+        tag = request.form.get('tag', '').strip()
+        tag_enable = request.form.get('enable', '').strip()
+
+        data = mw.getNotifyData(False)
+        op_enable = True
+        op_action = '开启'
+        if tag_enable != 'true':
+            op_enable = False
+            op_action = '关闭'
+
+        if tag in data:
+            data[tag]['enable'] = op_enable
+
+        mw.writeNotify(data)
+
+        return mw.returnData(True, op_action + '成功')
+
     def getPanelTokenApi(self):
         api_file = self.__api_addr
         tmp = mw.readFile(api_file)
@@ -852,5 +906,15 @@ class config_api:
             data['hook_global_static'] = df
         else:
             data['hook_global_static'] = []
+
+        # notiy config
+        notify_data = mw.getNotifyData(True)
+        notify_tag_list = ['tgbot', 'email']
+        for tag in notify_tag_list:
+            new_tag = 'notify_' + tag + '_enable'
+            data[new_tag] = ''
+            if tag in notify_data and 'enable' in notify_data[tag]:
+                if notify_data[tag]['enable']:
+                    data[new_tag] = 'checked'
 
         return data
