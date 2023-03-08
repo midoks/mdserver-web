@@ -151,8 +151,10 @@ data/system.db-journal
 data/hook_*.json
 data/letsencrypt.json
 data/basic_auth.json
+data/notify.json
 data/api.json
 data/bind_domain.pl
+data/unauthorized_status.pl
 
 plugins/vip_*
 plugins/own_*
@@ -176,4 +178,5 @@ plugins/file_search
 debug.out
 
 
-data/unauthorized_status.pl
+
+
