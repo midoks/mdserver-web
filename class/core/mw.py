@@ -564,7 +564,8 @@ def writeLog(stype, msg, args=()):
         if 'uid' in session:
             uid = session['uid']
     except Exception as e:
-        writeFileLog(getTracebackInfo())
+        pass
+        # writeFileLog(getTracebackInfo())
     return writeDbLog(stype, msg, args, uid)
 
 
