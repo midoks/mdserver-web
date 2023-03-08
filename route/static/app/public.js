@@ -520,24 +520,16 @@ function onlineEditFile(k, f) {
 		var l = $("#PathPlace input").val();
 		var h = encodeURIComponent($("#textBody").val());
 		var a = $("select[name=encoding]").val();
-		var loadT = layer.msg(lan.bt.save_file, {
-			icon: 16,
-			time: 0
-		});
+		var loadT = layer.msg('正在保存,请稍候...', {icon: 16,time: 0});
 		$.post("/files/save_body", "data=" + h + "&path=" + encodeURIComponent(f) + "&encoding=" + a, function(m) {
 			if(k == 1) {
 				layer.close(loadT);
 			}
-			layer.msg(m.msg, {
-				icon: m.status ? 1 : 2
-			});
+			layer.msg(m.msg, {icon: m.status ? 1 : 2});
 		},'json');
 		return
 	}
-	var e = layer.msg(lan.bt.read_file, {
-		icon: 16,
-		time: 0
-	});
+	var e = layer.msg('正在读取文件,请稍候...', {icon: 16,time: 0});
 	var g = f.split(".");
 	var b = g[g.length - 1];
 	var d;
@@ -595,15 +587,12 @@ function onlineEditFile(k, f) {
 		default:
 			var j = {
 				name: "htmlmixed",
-				scriptTypes: [{
-					matches: /\/x-handlebars-template|\/x-mustache/i,
-					mode: null
-				}, {
-					matches: /(text|application)\/(x-)?vb(a|script)/i,
-					mode: "vbscript"
-				}]
+				scriptTypes: [
+					{matches: /\/x-handlebars-template|\/x-mustache/i,mode: null}, 
+					{matches: /(text|application)\/(x-)?vb(a|script)/i,mode: "vbscript"}
+				]
 			};
-			d = j
+			d = j;
 	}
 	$.post("/files/get_body", "path=" + encodeURIComponent(f), function(s) {
 		if(s.status === false){
@@ -619,55 +608,57 @@ function onlineEditFile(k, f) {
 			m = s.data.encoding == u[p] ? "selected" : "";
 			n += '<option value="' + u[p] + '" ' + m + ">" + u[p] + "</option>";
 		}
+		var code_mirror = null;
 		var r = layer.open({
 			type: 1,
 			shift: 5,
 			closeBtn: 1,
 			area: ["90%", "90%"],
-			title: lan.bt.edit_title+"[" + f + "]",
-			content: '<form class="bt-form pd20 pb70">\
+			btn:['保存','关闭'],
+			title: "在线编辑[" + f + "]",
+			content: '<form class="bt-form pd20">\
 				<div class="line">\
-					<p style="color:red;margin-bottom:10px">' + lan.bt.edit_ps + '\
+					<p style="color:red;margin-bottom:10px">提示：Ctrl+F 搜索关键字，Ctrl+G 查找下一个，Ctrl+S 保存，Ctrl+Shift+R 查找替换!\
 						<select class="bt-input-text" name="encoding" style="width: 74px;position: absolute;top: 31px;right: 19px;height: 22px;z-index: 9999;border-radius: 0;">' + n + '</select>\
 					</p>\
 					<textarea class="mCustomScrollbar bt-input-text" id="textBody" style="width:100%;margin:0 auto;line-height: 1.8;position: relative;top: 10px;" value="" />\
 				</div>\
-				<div class="bt-form-submit-btn" style="position:absolute; bottom:0; width:100%">\
-				<button type="button" class="btn btn-danger btn-sm btn-editor-close">'+lan.public.close+'</button>\
-				<button id="OnlineEditFileBtn" type="button" class="btn btn-success btn-sm">'+lan.public.save+'</button>\
-				</div>\
-			</form>'
-		});
-		$("#textBody").text(s.data.data);
-		var q = $(window).height() * 0.9;
-		$("#textBody").height(q - 160);
-		var t = CodeMirror.fromTextArea(document.getElementById("textBody"), {
-			extraKeys: {
-				"Ctrl-F": "findPersistent",
-				"Ctrl-H": "replaceAll",
-				"Ctrl-S": function() {
-					$("#textBody").text(t.getValue());
-					onlineEditFile(2, f)
-				},
-				"Cmd-S":function() {
-					$("#textBody").text(t.getValue());
-					onlineEditFile(2, f)
-				},
+			</form>',
+			success:function(){
+				$("#textBody").text(s.data.data);
+				var q = $(window).height() * 0.9;
+				$("#textBody").height(q - 160);
+				code_mirror = CodeMirror.fromTextArea(document.getElementById("textBody"), {
+					extraKeys: {
+						"Ctrl-F": "findPersistent",
+						"Ctrl-H": "replaceAll",
+						"Ctrl-S": function() {
+							$("#textBody").text(code_mirror.getValue());
+							onlineEditFile(2, f)
+						},
+						"Cmd-S":function() {
+							$("#textBody").text(code_mirror.getValue());
+							onlineEditFile(2, f)
+						},
+					},
+					mode: d,
+					lineNumbers: true,
+					matchBrackets: true,
+					matchtags: true,
+					autoMatchParens: true
+				});
+				code_mirror.focus();
+				code_mirror.setSize("auto", q - 150);
+
+				$(window).resize(function(){
+                    var q = $(window).height() * 0.9;
+                    code_mirror.setSize("auto", q - 150);
+                }); 
 			},
-			mode: d,
-			lineNumbers: true,
-			matchBrackets: true,
-			matchtags: true,
-			autoMatchParens: true
-		});
-		t.focus();
-		t.setSize("auto", q - 150);
-		$("#OnlineEditFileBtn").click(function() {
-			$("#textBody").text(t.getValue());
-			onlineEditFile(1, f);
-		});
-		$(".btn-editor-close").click(function() {
-			layer.close(r);
+			yes:function(){
+				$("#textBody").text(code_mirror.getValue());
+				onlineEditFile(1, f);
+			}
 		});
 	},'json');
 }
@@ -1137,18 +1128,21 @@ function bindPanel(a,type,ip,btid,url,user,pw){
 					<li><font style='color:red'>注意，开启广告拦截会导致无法快捷登录。</font></li></ul>\
 				</div>\
 				<div class='bt-form-submit-btn'><button type='button' class='btn btn-danger btn-sm' onclick=\"layer.closeAll()\">关闭</button> "+btn+"</div>\
-			</div>"
-	});
-	$("#btaddress").on("input",function(){
-		var str =$(this).val();
-		var isip = /([\w-]+\.){2,6}\w+/;
-		var iptext = str.match(isip);
-		if(iptext) $("#bttitle").val(iptext[0]);
-	}).blur(function(){
-		var str =$(this).val();
-		var isip = /([\w-]+\.){2,6}\w+/;
-		var iptext = str.match(isip);
-		if(iptext) $("#bttitle").val(iptext[0]);
+			</div>",
+
+		success:function(){
+			$("#btaddress").on("input",function(){
+				var str =$(this).val();
+				var isip = /([\w-]+\.){2,6}\w+/;
+				var iptext = str.match(isip);
+				if(iptext) $("#bttitle").val(iptext[0]);
+			}).blur(function(){
+				var str =$(this).val();
+				var isip = /([\w-]+\.){2,6}\w+/;
+				var iptext = str.match(isip);
+				if(iptext) $("#bttitle").val(iptext[0]);
+			});
+		}
 	});
 }
 //删除快捷登录
