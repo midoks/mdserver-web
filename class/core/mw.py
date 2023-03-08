@@ -1735,7 +1735,7 @@ def tgbotNotifyTest(app_token, chat_id):
     return False
 
 
-def notifyMessage(msg, stype='common', trigger_time=300, is_write_log=True):
+def notifyMessageTry(msg, stype='common', trigger_time=300, is_write_log=True):
 
     lock_file = getPanelTmp() + '/notify_lock.json'
     if not os.path.exists(lock_file):
@@ -1765,6 +1765,14 @@ def notifyMessage(msg, stype='common', trigger_time=300, is_write_log=True):
             t = data['tgbot']['data']
             do_notify = tgbotNotifyMessage(t['app_token'], t['chat_id'], msg)
     return do_notify
+
+
+def notifyMessage(msg, stype='common', trigger_time=300, is_write_log=True):
+    try:
+        return notifyMessageTry(msg, stype, trigger_time, is_write_log)
+    except Exception as e:
+        print(mw.getTracebackInfo())
+        return False
 
 
 ##################### notify  end #########################################
