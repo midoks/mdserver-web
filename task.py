@@ -259,7 +259,7 @@ def systemTask():
             if tmp['used'] > 80:
                 panel_title = mw.getConfig('title')
                 ip = mw.getHostAddr()
-                now_time = getDateFromNow()
+                now_time = mw.getDateFromNow()
                 msg = now_time + '|节点[' + panel_title + ':' + ip + \
                     ']处于高负载[' + str(tmp['used']) + '],请排查原因!'
                 mw.notifyMessage(msg, '面板监控', 600)
