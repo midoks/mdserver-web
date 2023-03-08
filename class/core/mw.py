@@ -1771,7 +1771,7 @@ def notifyMessage(msg, stype='common', trigger_time=300, is_write_log=True):
     try:
         return notifyMessageTry(msg, stype, trigger_time, is_write_log)
     except Exception as e:
-        print(mw.getTracebackInfo())
+        print(getTracebackInfo())
         return False
 
 
