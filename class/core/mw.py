@@ -1719,8 +1719,7 @@ def tgbotNotifyMessage(app_token, chat_id, msg):
     return False
 
 
-def tgbotNotifyTest(app_token, chat_id):
-    msg = 'MW-通知验证测试OK'
+def tgbotNotifyHttpPost(app_token, chat_id, msg):
     try:
         url = 'https://api.telegram.org/bot' + app_token + '/sendMessage'
         post_data = {
@@ -1728,11 +1727,15 @@ def tgbotNotifyTest(app_token, chat_id):
             'text': msg,
         }
         rdata = httpPost(url, post_data)
-        json.loads(rdata)
         return True
     except Exception as e:
         writeFileLog(str(e))
     return False
+
+
+def tgbotNotifyTest(app_token, chat_id):
+    msg = 'MW-通知验证测试OK'
+    return tgbotNotifyHttpPost(app_token, chat_id, msg)
 
 
 def notifyMessageTry(msg, stype='common', trigger_time=300, is_write_log=True):
@@ -1763,7 +1766,15 @@ def notifyMessageTry(msg, stype='common', trigger_time=300, is_write_log=True):
     if 'tgbot' in data and 'enable' in data['tgbot']:
         if data['tgbot']['enable']:
             t = data['tgbot']['data']
-            do_notify = tgbotNotifyMessage(t['app_token'], t['chat_id'], msg)
+            i = sys.version_info
+
+            # telebot 在python小于3.7无法使用
+            if i[0] < 3 or i[1] < 7:
+                do_notify = tgbotNotifyHttpPost(
+                    t['app_token'], t['chat_id'], msg)
+            else:
+                do_notify = tgbotNotifyMessage(
+                    t['app_token'], t['chat_id'], msg)
     return do_notify
 
 
