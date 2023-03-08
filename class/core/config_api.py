@@ -668,12 +668,18 @@ class config_api:
 
     def setNotifyApi(self):
         tag = request.form.get('tag', '').strip()
-        tag_data = request.form.get('data', '').strip()
+        data = request.form.get('data', '').strip()
 
-        data = mw.getNotifyData()
-        data[tag] = json.loads(tag_data)
+        cfg = mw.getNotifyData()
 
-        mw.writeNotify(data)
+        crypt_data = mw.enDoubleCrypt(tag, data)
+        if tag in cfg:
+            cfg[tag]['cfg'] = crypt_data
+        else:
+            t = {'cfg': crypt_data}
+            cfg[tag] = t
+
+        mw.writeNotify(cfg)
         return mw.returnData(True, '设置成功')
 
     def setNotifyTestApi(self):
