@@ -1685,7 +1685,7 @@ def getNotifyData():
     data = json.loads(notify_data)
     tag_list = ['tgbot']
     for t in tag_list:
-        if t in data:
+        if t in data and 'cfg' in data[t]['cfg']:
             data[t]['data'] = json.loads(deDoubleCrypt(t, data[t]['cfg']))
     return data
 
