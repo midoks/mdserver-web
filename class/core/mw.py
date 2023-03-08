@@ -556,8 +556,7 @@ def writeLog(stype, msg, args=()):
         if 'uid' in session:
             uid = session['uid']
     except Exception as e:
-        pass
-        # print(getTracebackInfo())
+        writeFileLog(getTracebackInfo())
     return writeDbLog(stype, msg, args, uid)
 
 
@@ -708,7 +707,7 @@ def enCrypt(key, strings):
         result = f.encrypt(strings)
         return result.decode('utf-8')
     except:
-        print(getTracebackInfo())
+        writeFileLog(getTracebackInfo())
         return strings
 
 
@@ -727,7 +726,7 @@ def deCrypt(key, strings):
         result = f.decrypt(strings).decode('utf-8')
         return result
     except:
-        print(getTracebackInfo())
+        writeFileLog(getTracebackInfo())
         return strings
 
 
@@ -746,7 +745,7 @@ def enDoubleCrypt(key, strings):
         result = f.encrypt(strings)
         return result.decode('utf-8')
     except:
-        print(getTracebackInfo())
+        writeFileLog(getTracebackInfo())
         return strings
 
 
@@ -764,7 +763,7 @@ def deDoubleCrypt(key, strings):
         result = f.decrypt(strings).decode('utf-8')
         return result
     except:
-        print(getTracebackInfo())
+        writeFileLog(getTracebackInfo())
         return strings
 
 
@@ -1568,7 +1567,7 @@ def getCertName(certPath):
             result['notAfter'], "%Y-%m-%d")) - time.time()) / 86400)
         return result
     except Exception as e:
-        # print(getTracebackInfo())
+        writeFileLog(getTracebackInfo())
         return None
 
 
@@ -1782,7 +1781,7 @@ def notifyMessage(msg, stype='common', trigger_time=300, is_write_log=True):
     try:
         return notifyMessageTry(msg, stype, trigger_time, is_write_log)
     except Exception as e:
-        print(getTracebackInfo())
+        writeFileLog(getTracebackInfo())
         return False
 
 
