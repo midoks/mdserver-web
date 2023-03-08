@@ -542,6 +542,14 @@ def getDate():
     return time.strftime('%Y-%m-%d %X', time.localtime())
 
 
+def getDateFromNow(tf_format="%Y-%m-%d %H:%M:%S", time_zone="Asia/Shanghai"):
+    # 取格式时间
+    import time
+    os.environ['TZ'] = time_zone
+    time.tzset()
+    return time.strftime(tf_format, time.localtime())
+
+
 def getDataFromInt(val):
     time_format = '%Y-%m-%d %H:%M:%S'
     time_str = time.localtime(val)
