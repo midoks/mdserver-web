@@ -82,6 +82,10 @@ def getPanelDataDir():
     return getRunDir() + '/data'
 
 
+def getPanelTmp():
+    return getRunDir() + '/tmp'
+
+
 def getServerDir():
     return getRootDir() + '/server'
 
@@ -1677,16 +1681,18 @@ def getNotifyPath():
     return path
 
 
-def getNotifyData():
+def getNotifyData(is_parse=False):
     initNotifyConfig()
     notify_file = getNotifyPath()
     notify_data = readFile(notify_file)
 
     data = json.loads(notify_data)
-    tag_list = ['tgbot']
-    for t in tag_list:
-        if t in data and 'cfg' in data[t]:
-            data[t]['data'] = json.loads(deDoubleCrypt(t, data[t]['cfg']))
+
+    if is_parse:
+        tag_list = ['tgbot']
+        for t in tag_list:
+            if t in data and 'cfg' in data[t]:
+                data[t]['data'] = json.loads(deDoubleCrypt(t, data[t]['cfg']))
     return data
 
 
@@ -1729,7 +1735,27 @@ def tgbotNotifyTest(app_token, chat_id):
     return False
 
 
-def notifyMessage(msg):
+def notifyMessage(msg, stype='common', trigger_time=300, is_write_log=True):
+
+    lock_file = getPanelTmp() + '/notify_lock.json'
+    if not os.path.exists(lock_file):
+        writeFile(lock_file, '{}')
+
+    lock_data = json.loads(readFile(lock_file))
+    if stype in lock_data:
+        diff_time = time.time() - lock_data[stype]['do_time']
+        if diff_time >= trigger_time:
+            lock_data[stype]['do_time'] = time.time()
+        else:
+            return False
+    else:
+        lock_data[stype] = {'do_time': time.time()}
+
+    writeFile(lock_file, json.dumps(lock_data))
+
+    if is_write_log:
+        writeLog("通知管理[" + stype + "]", msg)
+
     data = getNotifyData()
     # tag_list = ['tgbot', 'email']
     # tagbot

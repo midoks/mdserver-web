@@ -663,14 +663,14 @@ class config_api:
 
     def getNotifyApi(self):
         # 获取
-        data = mw.getNotifyData()
+        data = mw.getNotifyData(True)
         return mw.returnData(True, 'ok', data)
 
     def setNotifyApi(self):
         tag = request.form.get('tag', '').strip()
         data = request.form.get('data', '').strip()
 
-        cfg = mw.getNotifyData()
+        cfg = mw.getNotifyData(False)
 
         crypt_data = mw.enDoubleCrypt(tag, data)
         if tag in cfg:
@@ -701,7 +701,7 @@ class config_api:
         tag = request.form.get('tag', '').strip()
         tag_enable = request.form.get('enable', '').strip()
 
-        data = mw.getNotifyData()
+        data = mw.getNotifyData(False)
         op_enable = True
         op_action = '开启'
         if tag_enable != 'true':
@@ -908,7 +908,7 @@ class config_api:
             data['hook_global_static'] = []
 
         # notiy config
-        notify_data = mw.getNotifyData()
+        notify_data = mw.getNotifyData(True)
         notify_tag_list = ['tgbot', 'email']
         for tag in notify_tag_list:
             new_tag = 'notify_' + tag + '_enable'
