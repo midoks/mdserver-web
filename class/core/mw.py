@@ -1709,18 +1709,31 @@ def writeNotify(data):
     return writeFile(p, json.dumps(data))
 
 
-def tgbotNotifyObject(app_token):
-    import telebot
-    bot = telebot.TeleBot(app_token)
-    return bot
+def tgbotNotifyChatID():
+    data = getNotifyData(True)
+    if 'tgbot' in data and 'enable' in data['tgbot']:
+        if data['tgbot']['enable']:
+            t = data['tgbot']['data']
+            return t['chat_id']
+    return ''
+
+
+def tgbotNotifyObject():
+    data = getNotifyData(True)
+    if 'tgbot' in data and 'enable' in data['tgbot']:
+        if data['tgbot']['enable']:
+            t = data['tgbot']['data']
+            import telebot
+            bot = telebot.TeleBot(app_token)
+            return True, bot
+    return False, None
 
 
 def tgbotNotifyMessage(app_token, chat_id, msg):
-    bot = tgbotNotifyObject(app_token)
-
+    import telebot
+    bot = telebot.TeleBot(app_token)
     try:
         data = bot.send_message(chat_id, msg)
-        # print(data)
         return True
     except Exception as e:
         writeFileLog(str(e))
