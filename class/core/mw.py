@@ -1679,9 +1679,15 @@ def getNotifyPath():
 
 def getNotifyData():
     initNotifyConfig()
-    p = getNotifyPath()
-    t = readFile(p)
-    return json.loads(t)
+    notify_file = getNotifyPath()
+    notify_data = readFile(notify_file)
+
+    data = json.loads(notify_data)
+    tag_list = ['tgbot']
+    for t in tag_list:
+        if t in data:
+            data[t]['data'] = json.loads(deDoubleCrypt(t, data[t]['cfg']))
+    return data
 
 
 def writeNotify(data):
@@ -1730,7 +1736,7 @@ def notifyMessage(msg):
     do_notify = False
     if 'tgbot' in data and 'enable' in data['tgbot']:
         if data['tgbot']['enable']:
-            t = data['tgbot']
+            t = data['tgbot']['data']
             do_notify = tgbotNotifyMessage(t['app_token'], t['chat_id'], msg)
     return do_notify
 

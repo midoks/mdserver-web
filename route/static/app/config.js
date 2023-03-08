@@ -374,8 +374,8 @@ function getTgbot(){
 
 		if (data.status){
 			if (typeof(data['data']['tgbot']) !='undefined'){
-				app_token = data['data']['tgbot']['app_token'];
-				chat_id = data['data']['tgbot']['chat_id'];
+				app_token = data['data']['tgbot']['data']['app_token'];
+				chat_id = data['data']['tgbot']['data']['chat_id'];
 			}
 		}
 
