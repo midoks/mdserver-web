@@ -257,9 +257,9 @@ def systemTask():
             # 取当前CPU Io
             tmp['used'] = psutil.cpu_percent(interval=1)
             if tmp['used'] > 80:
-                panel_data = mw.getConfig()
+                panel_title = mw.getConfig('title')
                 ip = mw.getHostAddr()
-                msg = '节点[' + panel_data['title'] + ':' + ip + \
+                msg = '节点[' + panel_title + ':' + ip + \
                     ']处于高负载[' + str(tmp['used']) + '],请排查原因!'
                 mw.notifyMessage(msg, '面板监控', 600)
 
