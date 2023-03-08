@@ -1756,7 +1756,7 @@ def notifyMessage(msg, stype='common', trigger_time=300, is_write_log=True):
     if is_write_log:
         writeLog("通知管理[" + stype + "]", msg)
 
-    data = getNotifyData()
+    data = getNotifyData(True)
     # tag_list = ['tgbot', 'email']
     # tagbot
     do_notify = False
