@@ -256,6 +256,11 @@ def systemTask():
             tmp = {}
             # 取当前CPU Io
             tmp['used'] = psutil.cpu_percent(interval=1)
+            if tmp['used'] > 80:
+                panel_data = mw.getConfig()
+                ip = mw.getHostAddr()
+                msg = '节点[' + panel_data['title'] + ':' + ip + ']处于高负载,请排查原因!'
+                mw.notifyMessage(msg, '面板任务', 600)
 
             if not cpuInfo:
                 tmp['mem'] = sm.getMemUsed()
