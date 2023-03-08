@@ -515,17 +515,20 @@ function openPath(a) {
 	window.location.href = "/files/"
 }
 
-function onlineEditFile(k, f) {
+function onlineEditFile(k, f, callback) {
 	if(k != 0) {
 		var l = $("#PathPlace input").val();
 		var h = encodeURIComponent($("#textBody").val());
 		var a = $("select[name=encoding]").val();
 		var loadT = layer.msg('正在保存,请稍候...', {icon: 16,time: 0});
-		$.post("/files/save_body", "data=" + h + "&path=" + encodeURIComponent(f) + "&encoding=" + a, function(m) {
+		$.post("/files/save_body", "data=" + h + "&path=" + encodeURIComponent(f) + "&encoding=" + a, function(data) {
 			if(k == 1) {
 				layer.close(loadT);
 			}
-			layer.msg(m.msg, {icon: m.status ? 1 : 2});
+			layer.msg(data.msg, {icon: data.status ? 1 : 2});
+			if (data.status && typeof(callback) == 'function'){
+				callback(k, f);
+			}
 		},'json');
 		return
 	}
@@ -634,11 +637,11 @@ function onlineEditFile(k, f) {
 						"Ctrl-H": "replaceAll",
 						"Ctrl-S": function() {
 							$("#textBody").text(code_mirror.getValue());
-							onlineEditFile(2, f)
+							onlineEditFile(2, f,callback);
 						},
 						"Cmd-S":function() {
 							$("#textBody").text(code_mirror.getValue());
-							onlineEditFile(2, f)
+							onlineEditFile(2, f,callback);
 						},
 					},
 					mode: d,
@@ -657,7 +660,7 @@ function onlineEditFile(k, f) {
 			},
 			yes:function(){
 				$("#textBody").text(code_mirror.getValue());
-				onlineEditFile(1, f);
+				onlineEditFile(1, f,callback);
 			}
 		});
 	},'json');
