@@ -210,18 +210,18 @@ function _M.get_http_origin(self)
     if not headers then return data end
     local req_method = ngx.req.get_method()
     if req_method ~='GET' then 
-        -- API disabled in the context of log_by_lua*
-        -- ngx.req.read_body()
-
+    
         -- proxy_pass, fastcgi_pass, uwsgi_pass, and scgi_pass
         data = ngx.var.request_body
         if not data then
             data = ngx.req.get_body_data()
         end
 
-        if not data then
-            data = ngx.req.get_post_args(1000000)
-        end
+        -- API disabled in the context of log_by_lua
+        -- if not data then
+        --     ngx.req.read_body()
+        --     data = ngx.req.get_post_args(1000000)
+        -- end
 
         if "string" == type(data) then
             headers["payload"] = data
