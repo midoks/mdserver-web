@@ -9,7 +9,7 @@
 	"checks": "server/tgbot",
 	"path": "server/tgbot",
 	"display": 1,
-	"author": "Zend",
+	"author": "midokos",
 	"date": "2023-03-06",
 	"home": "https://core.telegram.org/bots/api",
 	"type": 0,
