@@ -72,6 +72,11 @@ def hanle_start_help(message):
     bot.reply_to(message, "hello world")
 
 
+@bot.message_handler(commands=['mw'])
+def hanle_start_help(message):
+    bot.reply_to(message, "我就是最靓的仔!")
+
+
 @bot.message_handler(commands=['chat_id'])
 def hanle_get_chat_id(message):
     bot.reply_to(message, message.chat.id)
