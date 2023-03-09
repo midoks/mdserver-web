@@ -8,6 +8,7 @@ import time
 import re
 import json
 import base64
+import threading
 
 sys.path.append(os.getcwd() + "/class/core")
 import mw
@@ -73,7 +74,7 @@ def hanle_start_help(message):
 
 
 @bot.message_handler(commands=['mw'])
-def hanle_start_help(message):
+def hanle_start_mw(message):
     bot.reply_to(message, "我就是最靓的仔!")
 
 
@@ -87,10 +88,32 @@ def hanle_get_chat_id(message):
     bot.reply_to(message, message.chat.id)
 
 
-# @bot.message_handler(func=lambda message: True)
-# def echo_message(message):
-#     bot.reply_to(message, "拦截所有消息:" + message.text)
+@bot.message_handler(func=lambda message: True)
+def echo_message(message):
+    print(message)
+    # bot.reply_to(message, "拦截所有消息:" + message.text)
 
-writeLog('启动成功')
-bot.polling()
+
+def setDaemon(t):
+    if sys.version_info.major == 3 and sys.version_info.minor >= 10:
+        t.daemon = True
+    else:
+        t.setDaemon(True)
+    return t
+
+
+def botPush():
+    while True:
+        print('a')
+        time.sleep(3)
+
+if __name__ == "__main__":
+
+    # 机器人推送任务
+    botPushTask = threading.Thread(target=botPush)
+    botPushTask = setDaemon(botPushTask)
+    botPushTask.start()
+
+    writeLog('启动成功')
+    bot.polling()
 # asyncio.run(bot.polling())
