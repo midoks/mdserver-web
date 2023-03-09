@@ -77,9 +77,19 @@ def hanle_start_help(message):
     bot.reply_to(message, "我就是最靓的仔!")
 
 
-@bot.message_handler(commands=['chat_id'])
+@bot.message_handler(commands=['mw_echo'])
+def hanle_start_help(message):
+    bot.reply_to(message, message.text)
+
+
+@bot.message_handler(commands=['mw_chat_id'])
 def hanle_get_chat_id(message):
     bot.reply_to(message, message.chat.id)
+
+
+# @bot.message_handler(func=lambda message: True)
+# def echo_message(message):
+#     bot.reply_to(message, "拦截所有消息:" + message.text)
 
 writeLog('启动成功')
 bot.polling()
