@@ -528,10 +528,8 @@ function _M.store_logs_line(self, db, stmt, input_sn, info)
     local request_headers = logline["request_headers"]
     local excluded = logline["excluded"] 
 
-    -- self:D("json:"..json.encode(logline))
     local time_key = logline["time_key"]
     if not excluded then
-
         stmt:bind_names {
             time=time,
             ip=ip,
@@ -553,13 +551,16 @@ function _M.store_logs_line(self, db, stmt, input_sn, info)
 
         local res, err = stmt:step()
         if tostring(res) == "5" then
+            self:D("json:"..json.encode(logline))
             self:D("step res:"..tostring(res) ..",step err:"..tostring(err))
             self:D("the step database connection is busy, so it will be stored later.")
+            if stmt then
+                stmt:reset()
+            end
             return false
         end
         stmt:reset()
     end
-
     return true
 end
 
