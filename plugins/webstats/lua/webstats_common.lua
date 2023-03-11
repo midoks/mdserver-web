@@ -355,7 +355,10 @@ function _M.cron(self)
                 break
             end
 
-            self:store_logs_line(db, stmts[input_sn]["web_logs"], input_sn, info)
+            local insert_ok = self:store_logs_line(db, stmts[input_sn]["web_logs"], input_sn, info)
+            if not insert_ok then
+                break
+            end
 
             local excluded = info["log_kv"]['excluded']
             local stat_tmp_fields = info['stat_fields']
@@ -552,8 +555,7 @@ function _M.store_logs_line(self, db, stmt, input_sn, info)
         local res, err = stmt:step()
         if tostring(res) == "5" then
             self:D("json:"..json.encode(logline))
-            self:D("step res:"..tostring(res) ..",step err:"..tostring(err))
-            self:D("the step database connection is busy, so it will be stored later.")
+            self:D("the step database connection is busy, so it will be stored later | step res:"..tostring(res) ..",step err:"..tostring(err))
             if stmt then
                 stmt:reset()
             end
