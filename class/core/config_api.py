@@ -516,8 +516,6 @@ class config_api:
             return mw.returnJson(True, 'SSL已关闭，请使用http协议访问面板!')
         else:
             try:
-                if not os.path.exists('ssl/input.ssl'):
-                    mw.createSSL()
                 mw.writeFile(sslConf, 'True')
 
                 keyPath = mw.getRunDir() + '/ssl/private.pem'
