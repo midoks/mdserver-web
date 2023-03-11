@@ -517,7 +517,7 @@ function getPanelSSL(){
 				// 设置面板SSL的Http
 				$('.set_panel_http_to_https').click(function(){
 					var https = $('#toHttps').prop('checked');
-					$.post('/config/del_panel_ssl',{'https':https},function(rdata){
+					$.post('/config/set_panel_http_to_https',{'https':https},function(rdata){
 						layer.close(loadT);
 						if(rdata.status){
 							layer.closeAll();
