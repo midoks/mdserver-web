@@ -416,13 +416,13 @@ class config_api:
                 conf = conf.replace('#error_page 404/404.html;', to)
                 mw.writeFile(panel_ssl, conf)
         else:
-            conf = mw.readFile(file)
+            conf = mw.readFile(panel_ssl)
             if conf:
                 rep = "\n\s*#HTTP_TO_HTTPS_START(.|\n){1,300}#HTTP_TO_HTTPS_END"
                 conf = re.sub(rep, '', conf)
                 rep = "\s+if.+server_port.+\n.+\n\s+\s*}"
                 conf = re.sub(rep, '', conf)
-                mw.writeFile(file, conf)
+                mw.writeFile(panel_ssl, conf)
 
         mw.restartWeb()
 
