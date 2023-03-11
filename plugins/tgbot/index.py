@@ -158,7 +158,7 @@ def reload():
     content = mw.readFile(tgbot_tpl)
     mw.writeFile(tgbot_dst, content)
 
-    return tbOp('reload')
+    return tbOp('restart')
 
 
 def initdStatus():
