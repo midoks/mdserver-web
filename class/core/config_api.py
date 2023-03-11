@@ -410,6 +410,8 @@ class config_api:
         is_https = request.form.get('https', '').strip()
 
         panel_ssl = mw.getServerDir() + "/web_conf/nginx/vhost/panel.conf"
+        if not os.path.exists(panel_ssl):
+            return mw.returnJson(False, '未开启面板SSL!')
 
         if is_https == 'false':
             conf = mw.readFile(panel_ssl)
