@@ -446,9 +446,9 @@ function getPanelSSL(){
 				<span class='ellipsis_text ssl_subject'>"+cert['info']['subject']+"</span></div>\
 				<div class='state_item'>\
 					<span>强制HTTPS：</span>\
-					<span class='ellipsis_text switch'>\
+					<span class='switch'>\
 						<input class='btswitch btswitch-ios' id='toHttps' type='checkbox'>\
-						<label class='btswitch-btn' for='toHttps' onclick=\"panelHttpToHttps()\"></label>\
+						<label class='btswitch-btn set_panel_http_to_https' for='toHttps'></label>\
 					</span>\
 				</div>\
 			</div></div>";
@@ -485,7 +485,7 @@ function getPanelSSL(){
 			shadeClose: false,
 			content:certBody,
 			success:function(layero, layer_id){
-				
+
 				//保存SSL
 				$('.save-panel-ssl').click(function(){
 					var data = {
@@ -506,6 +506,18 @@ function getPanelSSL(){
 				$('.del-panel-ssl').click(function(){
 					var loadT = layer.msg('正在删除SSL...',{icon:16,time:0,shade: [0.3, '#000']});
 					$.post('/config/del_panel_ssl',data,function(rdata){
+						layer.close(loadT);
+						if(rdata.status){
+							layer.closeAll();
+						}
+						layer.msg(rdata.msg,{icon:rdata.status?1:2});
+					},'json');
+				});
+
+				// 设置面板SSL的Http
+				$('.set_panel_http_to_https').click(function(){
+					var https = $('#toHttps').prop('checked');
+					$.post('/config/del_panel_ssl',{'https':https},function(rdata){
 						layer.close(loadT);
 						if(rdata.status){
 							layer.closeAll();

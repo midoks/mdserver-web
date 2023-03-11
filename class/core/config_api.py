@@ -387,6 +387,50 @@ class config_api:
         mw.writeFile('ssl/input.pl', 'True')
         return mw.returnJson(True, '证书已保存!')
 
+    # 设置面板SSL证书设置
+    def setPanelHttpToHttps(self):
+
+        bind_domain = 'data/bind_domain.pl'
+        if not os.path.exists(bind_domain):
+            return mw.returnJson(False, '先要绑定域名!')
+
+        keyPath = 'ssl/private.pem'
+        if not os.path.exists(keyPath):
+            return mw.returnJson(False, '未申请SSL证书!')
+
+        is_https = request.form.get('https', '').strip()
+
+        panel_ssl = mw.getServerDir() + "/web_conf/nginx/vhost/panel.conf"
+
+        if is_https == 'true':
+            conf = mw.readFile(panel_ssl)
+            if conf:
+                if conf.find('ssl_certificate') == -1:
+                    return mw.returnJson(False, '当前未开启SSL')
+                to = "#error_page 404/404.html;\n\
+        # HTTP_TO_HTTPS_START\n\
+        if ($server_port !~ 443){\n\
+            rewrite ^(/.*)$ https://$host$1 permanent;\n\
+        }\n\
+        # HTTP_TO_HTTPS_END"
+                conf = conf.replace('#error_page 404/404.html;', to)
+                mw.writeFile(panel_ssl, conf)
+        else:
+            conf = mw.readFile(file)
+            if conf:
+                rep = "\n\s*#HTTP_TO_HTTPS_START(.|\n){1,300}#HTTP_TO_HTTPS_END"
+                conf = re.sub(rep, '', conf)
+                rep = "\s+if.+server_port.+\n.+\n\s+\s*}"
+                conf = re.sub(rep, '', conf)
+                mw.writeFile(file, conf)
+
+        mw.restartWeb()
+
+        action = '开启'
+        if is_https == 'false':
+            action = '关闭'
+        return mw.returnJson(True, action + 'HTTPS跳转成功!')
+
     # 删除面板证书
     def delPanelSslApi(self):
         bind_domain = 'data/bind_domain.pl'
