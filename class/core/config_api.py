@@ -358,9 +358,6 @@ class config_api:
                             'notAfter': '无', 'notBefore': '无', 'issuer': '无'}
             return cert
 
-        if conf.find('$server_port !~ 443') != -1:
-            return True
-
         panel_ssl = mw.getServerDir() + "/web_conf/nginx/vhost/panel.conf"
         if not os.exists.exists(panel_ssl):
             cert['is_https'] = ''
