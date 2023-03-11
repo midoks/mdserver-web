@@ -75,6 +75,7 @@ bot.set_my_commands(
     commands=[
         telebot.types.BotCommand("start", "查看帮助信息"),
         telebot.types.BotCommand("mw_chat_id", "查看群组ChatID")
+    ],
     # scope=telebot.types.BotCommandScopeChat(12345678)  # use for personal command for users
     # scope=telebot.types.BotCommandScopeAllPrivateChats()  # use for all
     # private chats
