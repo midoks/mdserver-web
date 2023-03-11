@@ -359,7 +359,7 @@ class config_api:
             return cert
 
         panel_ssl = mw.getServerDir() + "/web_conf/nginx/vhost/panel.conf"
-        if not os.exists.exists(panel_ssl):
+        if not os.path.exists(panel_ssl):
             cert['is_https'] = ''
         else:
             ssl_data = mw.readFile(panel_ssl)
