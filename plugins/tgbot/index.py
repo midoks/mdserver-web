@@ -211,6 +211,17 @@ def setBotConf():
     return mw.returnJson(True, '保存成功!', [])
 
 
+def installPreInspection():
+    i = sys.version_info
+    if i[0] < 3 or i[1] < 7:
+        return "telebot在python小于3.7无法正常使用"
+    return 'ok'
+
+
+def uninstallPreInspection():
+    return "请手动删除<br/> rm -rf {}".format(getServerDir())
+
+
 def runLog():
     p = getServerDir() + '/task.log'
     return p
@@ -234,6 +245,10 @@ if __name__ == "__main__":
         print(initdInstall())
     elif func == 'initd_uninstall':
         print(initdUinstall())
+    elif func == 'install_pre_inspection':
+        print(installPreInspection())
+    elif func == 'uninstall_pre_inspection':
+        print(uninstallPreInspection(version))
     elif func == 'get_bot_conf':
         print(getBotConf())
     elif func == 'set_bot_conf':

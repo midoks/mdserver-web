@@ -8,6 +8,7 @@
 	"tip": "soft",
 	"checks": "server/tgbot",
 	"path": "server/tgbot",
+	"install_pre_inspection":true,
 	"display": 1,
 	"author": "midokos",
 	"date": "2023-03-06",
