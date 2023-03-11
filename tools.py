@@ -61,6 +61,7 @@ def mwcli(mw_input=0):
         print("(100)    开启PHP52显示")
         print("(101)    关闭PHP52显示")
         print("(200)    切换Linux系统软件源")
+        print("(201)    简单速度测试")
         print("(0)      取消")
         print(raw_tip)
         try:
@@ -70,7 +71,7 @@ def mwcli(mw_input=0):
         except:
             mw_input = 0
 
-    nums = [1, 2, 3, 4, 5, 10, 11, 12, 13, 20, 21, 100, 101, 200]
+    nums = [1, 2, 3, 4, 5, 10, 11, 12, 13, 20, 21, 100, 101, 200, 201]
     if not mw_input in nums:
         print(raw_tip)
         print("已取消!")
@@ -140,6 +141,8 @@ def mwcli(mw_input=0):
             print("|-执行PHP52隐藏成功!")
     elif mw_input == 200:
         os.system(INIT_CMD + " mirror")
+    elif mw_input == 201:
+        os.system('curl -Lso- bench.sh | bash')
 
 
 def set_panel_pwd(password, ncli=False):
