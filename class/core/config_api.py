@@ -387,6 +387,30 @@ class config_api:
         mw.writeFile('ssl/input.pl', 'True')
         return mw.returnJson(True, '证书已保存!')
 
+    # 删除面板证书
+    def delPanelSslApi(self):
+        bind_domain = 'data/bind_domain.pl'
+        if not os.path.exists(bind_domain):
+            return mw.returnJson(False, '未绑定域名!')
+
+        siteName = mw.readFile(bind_domain).strip()
+
+        src_letpath = mw.getServerDir() + '/web_conf/letsencrypt/' + siteName
+
+        dst_letpath = mw.getRunDir() + '/ssl'
+        dst_csrpath = dst_letpath + '/cert.pem'
+        dst_keypath = dst_letpath + '/private.pem'
+
+        if os.path.exists(src_letpath) or os.path.exists(dst_csrpath):
+            if os.path.exists(src_letpath):
+                mw.execShell('rm -rf ' + src_letpath)
+            if os.path.exists(dst_csrpath):
+                mw.execShell('rm -rf ' + dst_csrpath)
+            if os.path.exists(dst_keypath):
+                mw.execShell('rm -rf ' + dst_keypath)
+            return mw.returnJson(True, '已经删除SSL!')
+        return mw.returnJson(False, '已经不存在SSL!')
+
     # 申请面板let证书
     def applyPanelLetSslApi(self):
 
