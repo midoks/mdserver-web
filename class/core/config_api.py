@@ -393,7 +393,7 @@ class config_api:
         # check domain is bind?
         bind_domain = 'data/bind_domain.pl'
         if not os.path.exists(bind_domain):
-            return mw.returnJson(False, '未绑定域名!')
+            return mw.returnJson(False, '先要绑定域名!')
 
         siteName = mw.readFile(bind_domain).strip()
         auth_to = mw.getRunDir() + "/tmp"
@@ -411,6 +411,8 @@ class config_api:
         dst_csrpath = dst_letpath + '/cert.pem'
         dst_keypath = dst_letpath + '/private.pem'
 
+        is_already_apply = False
+
         if not os.path.exists(src_letpath):
             import cert_api
             data = cert_api.cert_api().applyCertApi(to_args)
@@ -422,6 +424,8 @@ class config_api:
                     msg = msg + '<p><span>响应状态:</span>' + str(emsg['status']) + '</p><p><span>错误类型:</span>' + emsg[
                         'type'] + '</p><p><span>错误代码:</span>' + emsg['detail'] + '</p>'
                 return mw.returnJson(data['status'], msg, data['msg'])
+        else:
+            is_already_apply = True
 
         mw.buildSoftLink(src_csrpath, dst_csrpath, True)
         mw.buildSoftLink(src_keypath, dst_keypath, True)
@@ -432,6 +436,9 @@ class config_api:
         tmp_well_know = auth_to + '/.well-known'
         if os.path.exists(tmp_well_know):
             mw.execShell('rm -rf ' + tmp_well_know)
+
+        if is_already_apply:
+            return mw.returnJson(True, '重复申请!', data)
 
         return mw.returnJson(True, '申请成功!', data)
 
