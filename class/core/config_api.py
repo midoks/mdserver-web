@@ -351,11 +351,23 @@ class config_api:
             # 不再自动生成证书
             # mw.createSSL()
             cert['privateKey'] = ''
+            cert['is_https'] = ''
             cert['certPem'] = ''
             cert['rep'] = os.path.exists('ssl/input.pl')
             cert['info'] = {'endtime': 0, 'subject': '无',
                             'notAfter': '无', 'notBefore': '无', 'issuer': '无'}
             return cert
+
+        if conf.find('$server_port !~ 443') != -1:
+            return True
+
+        panel_ssl = mw.getServerDir() + "/web_conf/nginx/vhost/panel.conf"
+        if not os.exists.exists(panel_ssl):
+            cert['is_https'] = ''
+        else:
+            ssl_data = mw.readFile(panel_ssl)
+            if ssl_data.find('$server_port !~ 443') != -1:
+                cert['is_https'] = 'checked'
 
         cert['privateKey'] = mw.readFile(keyPath)
         cert['certPem'] = mw.readFile(certPath)

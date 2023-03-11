@@ -447,7 +447,7 @@ function getPanelSSL(){
 				<div class='state_item'>\
 					<span>强制HTTPS：</span>\
 					<span class='switch'>\
-						<input class='btswitch btswitch-ios' id='toHttps' type='checkbox'>\
+						<input class='btswitch btswitch-ios' id='toHttps' type='checkbox' "+cert['info']['is_https']+">\
 						<label class='btswitch-btn set_panel_http_to_https' for='toHttps'></label>\
 					</span>\
 				</div>\
