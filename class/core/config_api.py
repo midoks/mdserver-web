@@ -348,7 +348,14 @@ class config_api:
         keyPath = 'ssl/private.pem'
         certPath = 'ssl/cert.pem'
         if not os.path.exists(certPath):
-            mw.createSSL()
+            # 不再自动生成证书
+            # mw.createSSL()
+            cert['privateKey'] = ''
+            cert['certPem'] = ''
+            cert['rep'] = os.path.exists('ssl/input.pl')
+            cert['info'] = {'endtime': 0, 'subject': '无',
+                            'notAfter': '无', 'notBefore': '无', 'issuer': '无'}
+            return cert
 
         cert['privateKey'] = mw.readFile(keyPath)
         cert['certPem'] = mw.readFile(certPath)
