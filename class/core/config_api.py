@@ -402,7 +402,7 @@ class config_api:
 
         panel_ssl = mw.getServerDir() + "/web_conf/nginx/vhost/panel.conf"
 
-        if is_https == 'true':
+        if is_https == 'false':
             conf = mw.readFile(panel_ssl)
             if conf:
                 if conf.find('ssl_certificate') == -1:
@@ -427,7 +427,7 @@ class config_api:
         mw.restartWeb()
 
         action = '开启'
-        if is_https == 'false':
+        if is_https == 'true':
             action = '关闭'
         return mw.returnJson(True, action + 'HTTPS跳转成功!')
 
