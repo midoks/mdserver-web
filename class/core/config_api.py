@@ -452,10 +452,10 @@ class config_api:
                 mw.execShell('rm -rf ' + dst_csrpath)
             if os.path.exists(dst_keypath):
                 mw.execShell('rm -rf ' + dst_keypath)
-            mw.restartWeb()
+            # mw.restartWeb()
             return mw.returnJson(True, '已经删除SSL!')
 
-        mw.restartWeb()
+        # mw.restartWeb()
         return mw.returnJson(False, '已经不存在SSL!')
 
     # 申请面板let证书
