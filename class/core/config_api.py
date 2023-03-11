@@ -388,7 +388,7 @@ class config_api:
         return mw.returnJson(True, '证书已保存!')
 
     # 设置面板SSL证书设置
-    def setPanelHttpToHttps(self):
+    def setPanelHttpToHttpsApi(self):
 
         bind_domain = 'data/bind_domain.pl'
         if not os.path.exists(bind_domain):
