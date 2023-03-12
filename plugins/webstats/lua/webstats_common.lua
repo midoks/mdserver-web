@@ -289,6 +289,11 @@ function _M.cron(self)
             return true
         end
 
+        local cron_key = 'cron_every_1s'
+        if self:is_working(cron_key) then
+            return true
+        end
+
         ngx.update_time()
         local begin = ngx.now()
 
@@ -328,11 +333,6 @@ function _M.cron(self)
 
                 db:exec([[BEGIN TRANSACTION]])
             end
-        end
-
-        local cron_key = 'cron_every_1s'
-        if self:is_working(cron_key) then
-            return true
         end
 
         self:lock_working(cron_key)
