@@ -353,12 +353,14 @@ function _M.cron(self)
             local db = dbs[input_sn]
             local stat_fields_is = stat_fields[input_sn]
             if not db then
+                ngx.shared.mw_total:rpush(total_key, data)
                 self:unlock_working(cron_key)
                 break
             end
 
             local insert_ok = self:store_logs_line(db, stmts[input_sn]["web_logs"], input_sn, info)
             if not insert_ok then
+                ngx.shared.mw_total:rpush(total_key, data)
                 self:unlock_working(cron_key)
                 break
             end
