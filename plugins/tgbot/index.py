@@ -48,6 +48,22 @@ def writeConf(data):
     return True
 
 
+def getExtCfg():
+    cfg_path = getServerDir() + "/extend.cfg"
+    if not os.path.exists(cfg_path):
+        mw.writeFile(cfg_path, '{}')
+    t = mw.readFile(cfg_path)
+    return json.loads(t)
+
+
+def writeExtCfg(data):
+    cfg_path = getServerDir() + "/extend.cfg"
+    if not os.path.exists(cfg_path):
+        mw.writeFile(cfg_path, '{}')
+    t = mw.readFile(cfg_path)
+    return json.loads(t)
+
+
 def getInitDTpl():
     path = getPluginDir() + "/init.d/" + getPluginName() + ".tpl"
     return path
@@ -158,6 +174,11 @@ def reload():
     content = mw.readFile(tgbot_tpl)
     mw.writeFile(tgbot_dst, content)
 
+    ext_src = getPluginDir() + '/startup/extend'
+    ext_dst = getServerDir()
+
+    mw.execShell('cp -rf ' + ext_src + ' ' + ext_dst)
+
     return tbOp('restart')
 
 
@@ -222,6 +243,22 @@ def uninstallPreInspection():
     return "请手动删除<br/> rm -rf {}".format(getServerDir())
 
 
+def botExtList():
+    ext_path = getServerDir() + '/extend'
+    if not os.path.exists(ext_path):
+        return mw.returnJson(False, 'ok', [])
+    elist_source = os.listdir(ext_path)
+
+    elist = []
+    for e in elist_source:
+        if e.endswith('py'):
+            elist.append(e)
+
+    # extList = getExtCfg()
+
+    print(elist)
+
+
 def runLog():
     p = getServerDir() + '/task.log'
     return p
@@ -253,6 +290,8 @@ if __name__ == "__main__":
         print(getBotConf())
     elif func == 'set_bot_conf':
         print(setBotConf())
+    elif func == 'bot_ext_list':
+        print(botExtList())
     elif func == 'run_log':
         print(runLog())
 

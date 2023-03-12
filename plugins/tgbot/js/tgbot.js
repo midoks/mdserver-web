@@ -76,3 +76,75 @@ function submitBotConf(){
         layer.msg(rdata['msg'],{icon:rdata['status']?1:2,time:2000,shade: [0.3, '#000']});
     });
 }
+
+
+function botExtList(){
+    var body = '<div class="divtable mtb10">\
+            <table class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0">\
+                <thead>\
+                    <tr>\
+                        <th width="20">脚本</th>\
+                        <th width="120">类型</th>\
+                        <th width="10">状态</th>\
+                        <th style="text-align: right;" width="50">操作</th>\
+                    </tr>\
+                </thead>\
+                <tbody id="ext_list"></tbody>\
+            </table>\
+            <div class="dataTables_paginate paging_bootstrap pagination">\
+                <ul id="ext_list_page" class="page"></ul>\
+            </div>\
+        </div>';
+    $('.soft-man-con').html(body);
+
+
+    botExtListP(1)
+}
+function botExtListP(p=1){
+    appPost('bot_ext_list',{'page':p}, function(rdata){
+        var rdata = $.parseJSON(rdata.data);
+        var tBody = '';
+
+        if (rdata.data.length == 0 ){
+            var tBody = '<tr><td colspan="4"><div style="text-align:center;">无数据</div></td></tr>';
+        }
+
+        var ldata = rdata.data;
+        for (var i = 0; i < ldata.length; i++) {
+            tBody += '<tr data-id="'+ldata[i]['name']+'">'
+            tBody += '<td>'+ldata[i]['id']+'</td>';
+            tBody += '<td>'+ldata[i]['name']+'</td>';
+
+            if (ldata[i]['status'] == 'start'){
+                tBody += '<td><span style="color:#20a53a;cursor: pointer;"  class="strategy_status glyphicon glyphicon-play"></span></td>';
+            } else{
+                tBody += '<td><span style="color:red;cursor: pointer;" class="strategy_status glyphicon glyphicon-pause"></span></td>';
+            }
+            
+            tBody += "<td style='text-align: right;'><a class='btlink restart'>重启</a> | <a class='btlink edit'>编辑</a></td>";
+            tBody +='<tr>';
+        };
+        $('#ext_list').html(tBody);
+        // $('#strategy_list_page').html(rdata.data.list);
+
+
+        // $('#strategy_list .strategy_status').click(function(){
+        //     var id = $(this).parent().parent().data('id');
+        //     var status = 'stop';
+        //     if ($(this).hasClass('glyphicon-pause')){
+        //         status = 'start';
+        //     }
+        //     setStrategyStatus(id,status);
+        // });
+
+        // $('#strategy_list .restart').click(function(){
+        //     var id = $(this).parent().parent().data('id');
+        //     setStrategyRestart(id);
+        // });
+
+        // $('#strategy_list .edit').click(function(){
+        //     var id = $(this).parent().parent().data('id');
+        //     setStrategyEdit(id);
+        // });
+    });
+}
