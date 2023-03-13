@@ -11,5 +11,5 @@ import base64
 import threading
 
 
-def run():
+def run(bot):
     print("!11")

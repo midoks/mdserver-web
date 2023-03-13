@@ -85,14 +85,7 @@ while True:
 bot = telebot.TeleBot(cfg['bot']['app_token'])
 
 
-# from telebot.async_telebot import AsyncTeleBot
-# import asyncio
-# bot = AsyncTeleBot(cfg['bot']['app_token'])
-
-
-# use in for delete with the necessary scope and language_code if necessary
 bot.delete_my_commands(scope=None, language_code=None)
-
 bot.set_my_commands(
     commands=[
         telebot.types.BotCommand("start", "查看帮助信息"),
@@ -123,7 +116,9 @@ def all_message(message):
             script = r['name'].split('.')[0]
             __import__(script).run(bot, message)
         except Exception as e:
-            pass
+            writeLog('-----all_message error start -------')
+            writeLog(mw.getTracebackInfo())
+            writeLog('-----all_message error end -------')
 
 
 def runBotPushTask():
@@ -133,7 +128,9 @@ def runBotPushTask():
             script = p['name'].split('.')[0]
             __import__(script).run(bot)
         except Exception as e:
-            pass
+            writeLog('-----runBotPushTask error start -------')
+            writeLog(mw.getTracebackInfo())
+            writeLog('-----runBotPushTask error end -------')
 
 
 def botPush():
