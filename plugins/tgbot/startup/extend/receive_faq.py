@@ -34,7 +34,10 @@ def getReadCmd(cmd, msg):
 
 def searchFaq(bot, message, cmd_text):
     # print(search_text)
-    bot.reply_to(message, cmd_text)
+    return_msg = "你正在寻找答案:\n"
+    return_msg += cmd_text + "\n"
+    return_msg += "此功能还在开发中...请持续关注!\n"
+    bot.reply_to(message, return_msg)
     return True
 
 
@@ -43,6 +46,11 @@ def run(bot, message):
     if isThisCmd('/?:', text_body):
         cmd_text = getReadCmd('/?:', text_body)
         return searchFaq(bot, message, cmd_text)
+
+    if text_body.find('?') > -1:
+        return_msg = "你似乎在寻找答案:\n"
+        return_msg += "/?:开始寻找你的问题\n"
+        bot.reply_to(message, return_msg)
 
     return bot
 
