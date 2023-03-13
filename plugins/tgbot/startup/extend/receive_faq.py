@@ -34,8 +34,7 @@ def getReadCmd(cmd, msg):
 
 def searchFaq(bot, message, cmd_text):
     # print(search_text)
-    return_msg = "你正在寻找答案:\n"
-    return_msg += cmd_text + "\n"
+    return_msg = "你正在寻找答案【" + cmd_text + "】:\n"
     return_msg += "此功能还在开发中...请持续关注!\n"
     bot.reply_to(message, return_msg)
     return True
