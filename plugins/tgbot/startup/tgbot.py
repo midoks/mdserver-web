@@ -96,7 +96,6 @@ bot.delete_my_commands(scope=None, language_code=None)
 bot.set_my_commands(
     commands=[
         telebot.types.BotCommand("start", "查看帮助信息"),
-        telebot.types.BotCommand("mw_chat_id", "查看群组ChatID")
     ],
 )
 
@@ -111,7 +110,7 @@ def hanle_mw_echo(message):
     bot.reply_to(message, message.text)
 
 
-@bot.message_handler(commands=['mw_chat_id'])
+@bot.message_handler(commands=['chat_id'])
 def hanle_get_chat_id(message):
     bot.reply_to(message, message.chat.id)
 
