@@ -67,8 +67,9 @@ def writeLog(log_str):
     if __name__ == "__main__":
         print(log_str)
 
+    now = mw.getDateFromNow()
     log_file = getServerDir() + '/task.log'
-    mw.writeFileLog(log_str, log_file, limit_size=5 * 1024)
+    mw.writeFileLog(now + ':' + log_str, log_file, limit_size=5 * 1024)
     return True
 
 # start tgbot
