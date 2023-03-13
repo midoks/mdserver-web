@@ -140,7 +140,7 @@ def runBotPushTask():
 def botPush():
     while True:
         runBotPushTask()
-        time.sleep(3)
+        time.sleep(1)
 
 
 def setDaemon(t):
