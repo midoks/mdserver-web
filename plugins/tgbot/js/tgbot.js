@@ -86,7 +86,6 @@ function botExtList(){
                         <th width="20">脚本</th>\
                         <th width="120">类型</th>\
                         <th width="10">状态</th>\
-                        <th style="text-align: right;" width="50">操作</th>\
                     </tr>\
                 </thead>\
                 <tbody id="ext_list"></tbody>\
@@ -96,55 +95,54 @@ function botExtList(){
             </div>\
         </div>';
     $('.soft-man-con').html(body);
-
-
-    botExtListP(1)
+    botExtListP(1);
 }
-function botExtListP(p=1){
-    appPost('bot_ext_list',{'page':p}, function(rdata){
+
+function setBotExtStatus(name,status){
+    appPost('set_ext_status',{'name':name,'status':status}, function(rdata){
         var rdata = $.parseJSON(rdata.data);
+        layer.msg(rdata['msg'],);
+        showMsg(rdata['msg'], function(){
+            botExtListP(1);
+        },{icon:rdata['status']?1:2,shade: [0.3, '#000']},2000);
+    });
+}
+
+function botExtListP(p=1){
+    appPost('bot_ext_list',{'p':p}, function(rdata){
+        // console.log(rdata);
+        var rdata = $.parseJSON(rdata.data);
+        // console.log(rdata);
         var tBody = '';
 
-        if (rdata.data.length == 0 ){
+        if (!rdata.status && rdata.data.length == 0 ){
             var tBody = '<tr><td colspan="4"><div style="text-align:center;">无数据</div></td></tr>';
-        }
+        } else{
+            var ldata = rdata.data.data;
+            for (var i = 0; i < ldata.length; i++) {
+                tBody += '<tr data-name="'+ldata[i]['name']+'">'
+                tBody += '<td>'+ldata[i]['name']+'</td>';
+                tBody += '<td>'+ldata[i]['tag']+'</td>';
 
-        var ldata = rdata.data;
-        for (var i = 0; i < ldata.length; i++) {
-            tBody += '<tr data-id="'+ldata[i]['name']+'">'
-            tBody += '<td>'+ldata[i]['id']+'</td>';
-            tBody += '<td>'+ldata[i]['name']+'</td>';
-
-            if (ldata[i]['status'] == 'start'){
-                tBody += '<td><span style="color:#20a53a;cursor: pointer;"  class="strategy_status glyphicon glyphicon-play"></span></td>';
-            } else{
-                tBody += '<td><span style="color:red;cursor: pointer;" class="strategy_status glyphicon glyphicon-pause"></span></td>';
+                if (ldata[i]['status'] == 'start'){
+                    tBody += '<td><span style="color:#20a53a;cursor: pointer;"  class="ext_status glyphicon glyphicon-play"></span></td>';
+                } else{
+                    tBody += '<td><span style="color:red;cursor: pointer;" class="ext_status glyphicon glyphicon-pause"></span></td>';
+                }
+                tBody +='<tr>';
             }
-            
-            tBody += "<td style='text-align: right;'><a class='btlink restart'>重启</a> | <a class='btlink edit'>编辑</a></td>";
-            tBody +='<tr>';
-        };
+        }
+        
         $('#ext_list').html(tBody);
-        // $('#strategy_list_page').html(rdata.data.list);
+        $('#ext_list_page').html(rdata.data.list);
 
-
-        // $('#strategy_list .strategy_status').click(function(){
-        //     var id = $(this).parent().parent().data('id');
-        //     var status = 'stop';
-        //     if ($(this).hasClass('glyphicon-pause')){
-        //         status = 'start';
-        //     }
-        //     setStrategyStatus(id,status);
-        // });
-
-        // $('#strategy_list .restart').click(function(){
-        //     var id = $(this).parent().parent().data('id');
-        //     setStrategyRestart(id);
-        // });
-
-        // $('#strategy_list .edit').click(function(){
-        //     var id = $(this).parent().parent().data('id');
-        //     setStrategyEdit(id);
-        // });
+        $('#ext_list .ext_status').click(function(){
+            var name = $(this).parent().parent().data('name');
+            var status = 'stop';
+            if ($(this).hasClass('glyphicon-pause')){
+                status = 'start';
+            }
+            setBotExtStatus(name,status);
+        });
     });
 }

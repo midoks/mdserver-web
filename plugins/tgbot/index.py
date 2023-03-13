@@ -58,10 +58,7 @@ def getExtCfg():
 
 def writeExtCfg(data):
     cfg_path = getServerDir() + "/extend.cfg"
-    if not os.path.exists(cfg_path):
-        mw.writeFile(cfg_path, '{}')
-    t = mw.readFile(cfg_path)
-    return json.loads(t)
+    return mw.writeFile(cfg_path, json.dumps(data))
 
 
 def getInitDTpl():
@@ -147,9 +144,9 @@ def tbOp(method):
         return data[1]
 
     data = mw.execShell(file + ' ' + method)
-    print(data)
-    # if data[1] == '':
-    #     return 'ok'
+    # print(data)
+    if data[1] == '':
+        return 'ok'
     return 'ok'
 
 
@@ -243,7 +240,21 @@ def uninstallPreInspection():
     return "请手动删除<br/> rm -rf {}".format(getServerDir())
 
 
+def getExtCfgByName(name):
+    elist = getExtCfg()
+    for x in elist:
+        if x['name'] == name:
+            return x
+    return None
+
+
 def botExtList():
+
+    args = getArgs()
+    data_args = checkArgs(args, ['p'])
+    if not data_args[0]:
+        return data_args[1]
+
     ext_path = getServerDir() + '/extend'
     if not os.path.exists(ext_path):
         return mw.returnJson(False, 'ok', [])
@@ -254,9 +265,63 @@ def botExtList():
         if e.endswith('py'):
             elist.append(e)
 
-    # extList = getExtCfg()
+    page = int(args['p'])
+    page_size = 5
 
-    print(elist)
+    make_ext_list = []
+    for ex in elist:
+        tmp = {}
+        tmp['name'] = ex
+        edata = getExtCfgByName(ex)
+        if edata:
+            tmp['status'] = edata['status']
+        else:
+            tmp['status'] = 'stop'
+
+        tmp['tag'] = ex.split('_')[0]
+        make_ext_list.append(tmp)
+
+    writeExtCfg(make_ext_list)
+    dlist_sum = len(make_ext_list)
+
+    page_start = int((page - 1) * page_size)
+    page_end = page_start + page_size
+
+    if page_end >= dlist_sum:
+        ret_data = make_ext_list[page_start:]
+    else:
+        ret_data = make_ext_list[page_start:page_end]
+
+    data = {}
+    data['data'] = ret_data
+    data['args'] = args
+    data['list'] = mw.getPage(
+        {'count': dlist_sum, 'p': page, 'row': page_size, 'tojs': 'botExtListP'})
+
+    return mw.returnJson(True, 'ok', data)
+
+
+def setExtStatus():
+    args = getArgs()
+    data_args = checkArgs(args, ['name', 'status'])
+    if not data_args[0]:
+        return data_args[1]
+
+    elist = getExtCfg()
+    name = args['name']
+    status = args['status']
+    for x in range(len(elist)):
+        if elist[x]['name'] == name:
+            elist[x]['status'] = status
+            break
+
+    writeExtCfg(elist)
+
+    action = '开启'
+    if status == 'stop':
+        action = '关闭'
+
+    return mw.returnJson(True, action + '[' + name + ']扩展成功')
 
 
 def runLog():
@@ -292,6 +357,8 @@ if __name__ == "__main__":
         print(setBotConf())
     elif func == 'bot_ext_list':
         print(botExtList())
+    elif func == 'set_ext_status':
+        print(setExtStatus())
     elif func == 'run_log':
         print(runLog())
 

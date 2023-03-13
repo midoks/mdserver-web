@@ -28,6 +28,9 @@ def getServerDir():
     return mw.getServerDir() + '/' + getPluginName()
 
 
+sys.path.append(getServerDir() + "/extend")
+
+
 def getConfigData():
     cfg_path = getServerDir() + "/data.cfg"
     if not os.path.exists(cfg_path):
@@ -40,6 +43,24 @@ def writeConf(data):
     cfg_path = getServerDir() + "/data.cfg"
     mw.writeFile(cfg_path, json.dumps(data))
     return True
+
+
+def getExtCfg():
+    cfg_path = getServerDir() + "/extend.cfg"
+    if not os.path.exists(cfg_path):
+        mw.writeFile(cfg_path, '{}')
+    t = mw.readFile(cfg_path)
+    return json.loads(t)
+
+
+def getStartExtCfgByTag(tag='push'):
+    # 获取开启的扩展
+    elist = getExtCfg()
+    rlist = []
+    for x in elist:
+        if x['tag'] == tag and x['status'] == 'start':
+            rlist.append(x)
+    return rlist
 
 
 def writeLog(log_str):
@@ -60,6 +81,7 @@ while True:
     writeLog('等待输入配置,填写app_token')
     time.sleep(3)
 
+
 bot = telebot.TeleBot(cfg['bot']['app_token'])
 
 
@@ -76,9 +98,6 @@ bot.set_my_commands(
         telebot.types.BotCommand("start", "查看帮助信息"),
         telebot.types.BotCommand("mw_chat_id", "查看群组ChatID")
     ],
-    # scope=telebot.types.BotCommandScopeChat(12345678)  # use for personal command for users
-    # scope=telebot.types.BotCommandScopeAllPrivateChats()  # use for all
-    # private chats
 )
 
 
@@ -87,13 +106,8 @@ def hanle_start_help(message):
     bot.reply_to(message, "hello world")
 
 
-@bot.message_handler(commands=['mw'])
-def hanle_start_mw(message):
-    bot.reply_to(message, "我就是最靓的仔!")
-
-
 @bot.message_handler(commands=['mw_echo'])
-def hanle_start_help(message):
+def hanle_mw_echo(message):
     bot.reply_to(message, message.text)
 
 
@@ -103,9 +117,30 @@ def hanle_get_chat_id(message):
 
 
 @bot.message_handler(func=lambda message: True)
-def echo_message(message):
-    print(message)
-    # bot.reply_to(message, "拦截所有消息:" + message.text)
+def all_message(message):
+    rlist = getStartExtCfgByTag('receive')
+    for r in rlist:
+        try:
+            script = r['name'].split('.')[0]
+            __import__(script).run(bot, message)
+        except Exception as e:
+            pass
+
+
+def runBotPushTask():
+    plist = getStartExtCfgByTag('push')
+    for p in plist:
+        try:
+            script = p['name'].split('.')[0]
+            __import__(script).run(bot)
+        except Exception as e:
+            pass
+
+
+def botPush():
+    while True:
+        runBotPushTask()
+        time.sleep(3)
 
 
 def setDaemon(t):
@@ -113,19 +148,13 @@ def setDaemon(t):
         t.daemon = True
     else:
         t.setDaemon(True)
-    return t
-
-
-def botPush():
-    while True:
-        print('a')
-        time.sleep(3)
 
 if __name__ == "__main__":
 
     # 机器人推送任务
     botPushTask = threading.Thread(target=botPush)
-    botPushTask = setDaemon(botPushTask)
+    # print(botPushTask)
+    # botPushTask = setDaemon(botPushTask)
     botPushTask.start()
 
     writeLog('启动成功')
