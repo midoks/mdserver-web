@@ -8,9 +8,6 @@ import base64
 import threading
 
 # import telebot
-cmd_list = [
-    '/?:',
-]
 
 
 def isThisCmd(cmd, msg):
