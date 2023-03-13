@@ -182,6 +182,9 @@ def migrateSiteHotLogs(site_name, query_date):
             os.remove(hot_db_tmp)
 
     print("{} logs migrate ok.".format(site_name))
+
+    if not mw.isAppleSystem():
+        mw.execShell("chown -R www:www " + getServerDir())
     return mw.returnMsg(True, "{} logs migrate ok".format(site_name))
 
 
