@@ -7,8 +7,9 @@ import json
 import base64
 import threading
 
-# import telebot
+import telebot
 from telebot import types
+from telebot.util import quick_markup
 
 
 def isThisCmd(cmd, msg):
@@ -65,10 +66,16 @@ def searchDebugReply(bot, message, cmd_text):
 
 
 def searchDebugMsgInline(bot, message, cmd_text):
-    button = {"test1": {"callback_data": "test"},
-              "test2": {"url": "google.com"}}
-    bot.send_message(message.chat.id, "Test",
-                     reply_markup=quick_markup(button, row_width=2))
+    button = {
+        "如何在安装面板?": {"callback_data": "bbs_id_1"},
+        "如何在安装面板2?": {"callback_data": "bbs_id_2"},
+        "下一页": {"callback_data": "bbs_pre"},
+        "上一页": {"url": "google.com"}
+    }
+
+    bot.reply_to(message, "Test",
+                 reply_markup=quick_markup(button, row_width=2))
+    # bot.send_message(message.chat.id, "Test",reply_markup=quick_markup(button, row_width=2))
     return True
 
 
@@ -77,19 +84,27 @@ def searchDebug(bot, message, cmd_text):
     return True
 
 
+def answer_callback_query(bot, call):
+    print(call)
+    bot.send_message(call.message.chat.id, "Test Callback")
+    # bot.answer_callback_query(call.id)
+
+
 def run(bot, message):
+    print(message)
     text_body = message.text
-    if isThisCmd('/?:', text_body):
-        cmd_text = getReadCmd('/?:', text_body)
+    # print(text_body)
+    if isThisCmd('/faq:', text_body):
+        cmd_text = getReadCmd('/faq:', text_body)
         return searchFaq(bot, message, cmd_text)
 
     if isThisCmd('/debug', text_body):
         cmd_text = getReadCmd('/debug', text_body)
         return searchDebug(bot, message, cmd_text)
 
-    if text_body.find('?') > -1:
-        return_msg = "你似乎在寻找答案:\n"
-        return_msg += "/?:开始寻找你的问题\n"
+    if text_body.find('?') > -1 or text_body.find('？') > -1:
+        return_msg = "你似乎在寻找【" + text_body + "】答案:\n"
+        return_msg += "/faq:开始寻找你的问题\n"
         bot.reply_to(message, return_msg)
 
     return bot

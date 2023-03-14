@@ -122,6 +122,19 @@ def all_message(message):
             writeLog('-----all_message error end -------')
 
 
+@bot.callback_query_handler(func=lambda call: True)
+def callback_query_handler(call):
+    rlist = getStartExtCfgByTag('receive')
+    for r in rlist:
+        try:
+            script = r['name'].split('.')[0]
+            __import__(script).answer_callback_query(bot, call)
+        except Exception as e:
+            writeLog('-----callback_query_handler error start -------')
+            writeLog(mw.getTracebackInfo())
+            writeLog('-----callback_query_handler error end -------')
+
+
 def runBotPushTask():
     plist = getStartExtCfgByTag('push')
     for p in plist:
