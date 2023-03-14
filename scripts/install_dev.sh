@@ -84,9 +84,9 @@ if [ $OSNAME != "macos" ];then
 	if [ ! -d /www/server/mdserver-web ];then
 
 		if [ "$LOCAL_ADDR" == "common" ];then
-			curl -sSLo /tmp/dev.zip ${HTTP_PREFIX}github.com/midoks/mdserver-web/archive/refs/heads/dev.zip
+			curl --insecure -sSLo /tmp/dev.zip ${HTTP_PREFIX}github.com/midoks/mdserver-web/archive/refs/heads/dev.zip
 		else
-			curl -sSLo /tmp/dev.zip https://gitee.com/midoks/mdserver-web/repository/archive/dev.zip
+			curl --insecure -sSLo /tmp/dev.zip https://gitee.com/midoks/mdserver-web/repository/archive/dev.zip
 		fi
 		
 		cd /tmp && unzip /tmp/dev.zip
@@ -99,7 +99,7 @@ if [ $OSNAME != "macos" ];then
 	if [ ! -d /root/.acme.sh ];then
 	    if [ "$LOCAL_ADDR" != "common" ];then
 	        # curl -sSL -o /tmp/acme.tar.gz ${HTTP_PREFIX}github.com/acmesh-official/acme.sh/archive/master.tar.gz
-	        curl -sSLo /tmp/acme.tar.gz https://gitee.com/neilpang/acme.sh/repository/archive/master.tar.gz
+	        curl --insecure -sSLo /tmp/acme.tar.gz https://gitee.com/neilpang/acme.sh/repository/archive/master.tar.gz
 	        tar xvzf /tmp/acme.tar.gz -C /tmp
 	        cd /tmp/acme.sh-master
 	        bash acme.sh install
@@ -116,9 +116,9 @@ echo "use system version: ${OSNAME}"
 
 if [ "${OSNAME}" == "macos" ];then
 	if [ "$LOCAL_ADDR" != "common" ];then
-		curl -fsSL https://gitee.com/midoks/mdserver-web/raw/dev/scripts/install/macos.sh | bash
+		curl --insecure -fsSL https://gitee.com/midoks/mdserver-web/raw/dev/scripts/install/macos.sh | bash
 	else
-		curl -fsSL ${HTTP_PREFIX}https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/install/macos.sh | bash
+		curl --insecure -fsSL ${HTTP_PREFIX}https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/install/macos.sh | bash
 	fi
 else
 	cd /www/server/mdserver-web && bash scripts/install/${OSNAME}.sh
