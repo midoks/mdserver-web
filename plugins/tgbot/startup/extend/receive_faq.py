@@ -8,6 +8,7 @@ import base64
 import threading
 
 # import telebot
+from telebot import types
 
 
 def isThisCmd(cmd, msg):
@@ -37,8 +38,42 @@ def searchFaq(bot, message, cmd_text):
     return True
 
 
+def searchDebugReply(bot, message, cmd_text):
+    markup = types.ReplyKeyboardMarkup(row_width=2)
+    itembtn1 = types.KeyboardButton('a')
+    itembtn2 = types.KeyboardButton('v')
+    itembtn3 = types.KeyboardButton('d')
+    markup.add(itembtn1, itembtn2, itembtn3)
+    bot.send_message(chat_id, "Choose one letter:", reply_markup=markup)
+
+    # or add KeyboardButton one row at a time:
+    markup = types.ReplyKeyboardMarkup()
+    itembtna = types.KeyboardButton('a')
+    itembtnv = types.KeyboardButton('v')
+    itembtnc = types.KeyboardButton('c')
+    itembtnd = types.KeyboardButton('d')
+    itembtne = types.KeyboardButton('e')
+    markup.row(itembtna, itembtnv)
+    markup.row(itembtnc, itembtnd, itembtne)
+    bot.send_message(message.chat.id, "Choose one letter:",
+                     reply_markup=markup)
+
+    markup = types.ReplyKeyboardRemove(selective=False)
+    bot.send_message(message.chat.id, message, reply_markup=markup)
+    # bot.reply_to(message, "http://baidu.com")
+    return True
+
+
+def searchDebugMsgInline(bot, message, cmd_text):
+    button = {"test1": {"callback_data": "test"},
+              "test2": {"url": "google.com"}}
+    bot.send_message(message.chat.id, "Test",
+                     reply_markup=quick_markup(button, row_width=2))
+    return True
+
+
 def searchDebug(bot, message, cmd_text):
-    bot.reply_to(message, "http://baidu.com")
+    searchDebugMsgInline(bot, message, cmd_text)
     return True
 
 
