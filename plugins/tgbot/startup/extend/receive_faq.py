@@ -37,11 +37,20 @@ def searchFaq(bot, message, cmd_text):
     return True
 
 
+def searchDebug(bot, message, cmd_text):
+    bot.reply_to(message, "http://baidu.com")
+    return True
+
+
 def run(bot, message):
     text_body = message.text
     if isThisCmd('/?:', text_body):
         cmd_text = getReadCmd('/?:', text_body)
         return searchFaq(bot, message, cmd_text)
+
+    if isThisCmd('/debug', text_body):
+        cmd_text = getReadCmd('/debug', text_body)
+        return searchDebug(bot, message, cmd_text)
 
     if text_body.find('?') > -1:
         return_msg = "你似乎在寻找答案:\n"
