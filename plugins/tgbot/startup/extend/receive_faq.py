@@ -63,7 +63,8 @@ def searchHttpPage(kw='', p=1, size=1):
             tmp = {}
             tmp['tid'] = x['tid']
             tmp['subject'] = x['subject']
-            tmp['url'] = 'https://bbs.midoks.me/forum-' + x['tid'] + '-1.html'
+            tmp['url'] = 'https://bbs.midoks.me/thread-' + \
+                x['tid'] + '-1-1.html'
             r.append(tmp)
         data['data']['list'] = r
     return data
