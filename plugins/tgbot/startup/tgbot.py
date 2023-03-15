@@ -95,14 +95,14 @@ bot.set_my_commands(
 )
 
 
-@bot.message_handler(commands=['start', 'help'])
-def hanle_start_help(message):
-    bot.reply_to(message, "hello world")
+# @bot.message_handler(commands=['start', 'help'])
+# def hanle_start_help(message):
+#     bot.reply_to(message, "hello world")
 
 
-@bot.message_handler(commands=['mw_echo'])
-def hanle_mw_echo(message):
-    bot.reply_to(message, message.text)
+# @bot.message_handler(commands=['mw_echo'])
+# def hanle_mw_echo(message):
+#     bot.reply_to(message, message.text)
 
 
 @bot.message_handler(commands=['chat_id'])
