@@ -186,6 +186,8 @@ def migrateSiteHotLogs(site_name, query_date):
 
     if not mw.isAppleSystem():
         mw.execShell("chown -R www:www " + getServerDir())
+
+    mw.opWeb('restart')
     return mw.returnMsg(True, "{} logs migrate ok".format(site_name))
 
 
