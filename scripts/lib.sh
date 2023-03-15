@@ -61,6 +61,7 @@ if [ "$LOCAL_ADDR" != "common" ];then
     PIPSRC="https://pypi.tuna.tsinghua.edu.cn/simple"
 fi
 
+echo "pypi source:{$PIPSRC}"
 #面板需要的库
 if [ ! -f /usr/local/bin/pip3 ] && [ ! -f /usr/bin/pip3 ];then
     python3 -m pip install --upgrade pip setuptools wheel -i $PIPSRC
