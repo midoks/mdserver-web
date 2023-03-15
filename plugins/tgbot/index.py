@@ -237,6 +237,7 @@ def installPreInspection():
 
 
 def uninstallPreInspection():
+    stop()
     return "请手动删除<br/> rm -rf {}".format(getServerDir())
 
 
@@ -350,7 +351,7 @@ if __name__ == "__main__":
     elif func == 'install_pre_inspection':
         print(installPreInspection())
     elif func == 'uninstall_pre_inspection':
-        print(uninstallPreInspection(version))
+        print(uninstallPreInspection())
     elif func == 'get_bot_conf':
         print(getBotConf())
     elif func == 'set_bot_conf':
