@@ -1,6 +1,6 @@
 {
 	"sort": 7,
-	"ps": "[<b style='color:red;'>DEV</b>]简单Telegram机器人",
+	"ps": "简单Telegram机器人",
 	"name": "tgbot",
 	"title": "tgbot",
 	"shell": "install.sh",
