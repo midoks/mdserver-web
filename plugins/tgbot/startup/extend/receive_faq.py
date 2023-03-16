@@ -193,7 +193,15 @@ def run(bot, message):
     if text_body.find('?') > -1 or text_body.find('？') > -1:
         return_msg = "你似乎在寻找【" + text_body + "】答案:\n"
         return_msg += "/faq:开始寻找你的问题\n"
-        bot.reply_to(message, return_msg)
+        keyboard = [
+            [
+                types.InlineKeyboardButton(
+                    text="也可以在论坛,补充你的提问", url='https://bbs.midoks.me'),
+            ]
+
+        ]
+        markup = types.InlineKeyboardMarkup(keyboard)
+        bot.reply_to(message, return_msg, reply_markup=markup)
 
     return bot
 
