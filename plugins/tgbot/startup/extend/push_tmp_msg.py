@@ -16,8 +16,7 @@ import telebot
 from telebot import types
 from telebot.util import quick_markup
 
-# 广告推送实例
-
+# 轮播实例
 
 chat_id = -1001578009023
 # chat_id = 5568699210
@@ -55,13 +54,13 @@ def send_msg(bot, tag='ad', trigger_time=300):
     ]
     markup = types.InlineKeyboardMarkup(keyboard)
     msg = bot.send_message(
-        chat_id, "由于在解决的问题的时候，不给信息，无法了解情况。以后不再群里回答技术问题。全部去论坛提问。为了让群里都知晓。轮播一个月", reply_markup=markup)
+        chat_id, "由于在解决的问题的时候，不给信息，无法了解情况。以后不再群里回答技术问题。全部去论坛提问。在解决问题的过程中，可能需要面板信息，和SSH信息，如无法提供请不要提问。为了让群里都知晓。轮播一年", reply_markup=markup)
 
     # print(msg.message_id)
-    time.sleep(20)
+    time.sleep(10)
     del_msg = bot.delete_message(chat_id=chat_id, message_id=msg.message_id)
     # print(del_msg)
 
 
 def run(bot):
-    send_msg(bot, 'tmp_msg', 30)
+    send_msg(bot, 'tmp_msg', 13)
