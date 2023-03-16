@@ -64,4 +64,4 @@ def send_msg(bot, tag='ad', trigger_time=300):
 
 
 def run(bot):
-    send_msg(bot, 'tmp_msg', 5 * 60)
+    send_msg(bot, 'tmp_msg', 3 * 60)
