@@ -196,7 +196,7 @@ def run(bot, message):
         keyboard = [
             [
                 types.InlineKeyboardButton(
-                    text="也可以在论坛,补充你的提问", url='https://bbs.midoks.me'),
+                    text="如未找到，可以在论坛补充你的提问!", url='https://bbs.midoks.me'),
             ]
 
         ]
