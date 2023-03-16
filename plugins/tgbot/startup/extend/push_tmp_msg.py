@@ -53,7 +53,7 @@ def send_msg(bot, tag='ad', trigger_time=300):
                 text="搜索", url='https://bbs.midoks.me/search.php')
         ]
     ]
-
+    markup = types.InlineKeyboardMarkup(keyboard)
     msg = bot.send_message(
         chat_id, "由于在解决的问题的时候，不给信息，无法了解情况。以后不再群里回答技术问题。全部去论坛提问。为了让群里都知晓。轮播一个月", reply_markup=markup)
 
