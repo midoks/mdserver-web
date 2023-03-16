@@ -155,6 +155,24 @@ def botPush():
         time.sleep(1)
 
 
+def runBotPushOtherTask():
+    plist = getStartExtCfgByTag('other')
+    for p in plist:
+        try:
+            script = p['name'].split('.')[0]
+            __import__(script).run(bot)
+        except Exception as e:
+            writeLog('-----runBotPushOtherTask error start -------')
+            writeLog(mw.getTracebackInfo())
+            writeLog('-----runBotPushOtherTask error end -------')
+
+
+def botPushOther():
+    while True:
+        runBotPushOtherTask()
+        time.sleep(1)
+
+
 def setDaemon(t):
     if sys.version_info.major == 3 and sys.version_info.minor >= 10:
         t.daemon = True
@@ -165,9 +183,11 @@ if __name__ == "__main__":
 
     # 机器人推送任务
     botPushTask = threading.Thread(target=botPush)
-    # print(botPushTask)
-    # botPushTask = setDaemon(botPushTask)
     botPushTask.start()
+
+    # 机器人其他推送任务
+    botPushOtherTask = threading.Thread(target=botPushOther)
+    botPushOtherTask.start()
 
     writeLog('启动成功')
     bot.polling()
