@@ -5,6 +5,7 @@
 			<p class="bgw" onclick="pluginService('tgbot');">服务</p>
 			<p onclick="pluginInitD('tgbot');">自启动</p>
 			<p onclick="botConf();">Bot配置</p>
+			<p onclick="botExtList();">扩展列表</p>
 			<p onclick="pluginLogs('tgbot','','run_log');">日志</p>
 		</div>
 		<div class="bt-w-con pd15">
@@ -18,7 +19,7 @@
 }
 </style>
 <script type="text/javascript">
-resetPluginWinHeight(300);
+resetPluginWinHeight(350);
 $.getScript( "/plugins/file?name=tgbot&f=js/tgbot.js", function(){
 	pluginService('tgbot');
 });

@@ -66,9 +66,9 @@ fi
 
 
 if [ "$LOCAL_ADDR" != "common" ];then
-	curl -sSLo /tmp/master.zip https://gitee.com/midoks/mdserver-web/repository/archive/master.zip
+	curl --insecure -sSLo /tmp/master.zip https://gitee.com/midoks/mdserver-web/repository/archive/master.zip
 else
-	curl -sSLo /tmp/master.zip https://codeload.github.com/midoks/mdserver-web/zip/master
+	curl --insecure -sSLo /tmp/master.zip https://codeload.github.com/midoks/mdserver-web/zip/master
 fi
 
 

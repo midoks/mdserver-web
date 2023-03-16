@@ -27,7 +27,7 @@ from flask import request
 
 class config_api:
 
-    __version = '0.13.2'
+    __version = '0.13.3'
     __api_addr = 'data/api.json'
 
     def __init__(self):
@@ -348,7 +348,23 @@ class config_api:
         keyPath = 'ssl/private.pem'
         certPath = 'ssl/cert.pem'
         if not os.path.exists(certPath):
-            mw.createSSL()
+            # 不再自动生成证书
+            # mw.createSSL()
+            cert['privateKey'] = ''
+            cert['is_https'] = ''
+            cert['certPem'] = ''
+            cert['rep'] = os.path.exists('ssl/input.pl')
+            cert['info'] = {'endtime': 0, 'subject': '无',
+                            'notAfter': '无', 'notBefore': '无', 'issuer': '无'}
+            return cert
+
+        panel_ssl = mw.getServerDir() + "/web_conf/nginx/vhost/panel.conf"
+        if not os.path.exists(panel_ssl):
+            cert['is_https'] = ''
+        else:
+            ssl_data = mw.readFile(panel_ssl)
+            if ssl_data.find('$server_port !~ 443') != -1:
+                cert['is_https'] = 'checked'
 
         cert['privateKey'] = mw.readFile(keyPath)
         cert['certPem'] = mw.readFile(certPath)
@@ -380,13 +396,86 @@ class config_api:
         mw.writeFile('ssl/input.pl', 'True')
         return mw.returnJson(True, '证书已保存!')
 
+    # 设置面板SSL证书设置
+    def setPanelHttpToHttpsApi(self):
+
+        bind_domain = 'data/bind_domain.pl'
+        if not os.path.exists(bind_domain):
+            return mw.returnJson(False, '先要绑定域名!')
+
+        keyPath = 'ssl/private.pem'
+        if not os.path.exists(keyPath):
+            return mw.returnJson(False, '未申请SSL证书!')
+
+        is_https = request.form.get('https', '').strip()
+
+        panel_ssl = mw.getServerDir() + "/web_conf/nginx/vhost/panel.conf"
+        if not os.path.exists(panel_ssl):
+            return mw.returnJson(False, '未开启面板SSL!')
+
+        if is_https == 'false':
+            conf = mw.readFile(panel_ssl)
+            if conf:
+                if conf.find('ssl_certificate') == -1:
+                    return mw.returnJson(False, '当前未开启SSL')
+                to = "#error_page 404/404.html;\n\
+    #HTTP_TO_HTTPS_START\n\
+    if ($server_port !~ 443){\n\
+        rewrite ^(/.*)$ https://$host$1 permanent;\n\
+    }\n\
+    #HTTP_TO_HTTPS_END"
+                conf = conf.replace('#error_page 404/404.html;', to)
+                mw.writeFile(panel_ssl, conf)
+        else:
+            conf = mw.readFile(panel_ssl)
+            if conf:
+                rep = "\n\s*#HTTP_TO_HTTPS_START(.|\n){1,300}#HTTP_TO_HTTPS_END"
+                conf = re.sub(rep, '', conf)
+                rep = "\s+if.+server_port.+\n.+\n\s+\s*}"
+                conf = re.sub(rep, '', conf)
+                mw.writeFile(panel_ssl, conf)
+
+        mw.restartWeb()
+
+        action = '开启'
+        if is_https == 'true':
+            action = '关闭'
+        return mw.returnJson(True, action + 'HTTPS跳转成功!')
+
+    # 删除面板证书
+    def delPanelSslApi(self):
+        bind_domain = 'data/bind_domain.pl'
+        if not os.path.exists(bind_domain):
+            return mw.returnJson(False, '未绑定域名!')
+
+        siteName = mw.readFile(bind_domain).strip()
+
+        src_letpath = mw.getServerDir() + '/web_conf/letsencrypt/' + siteName
+
+        dst_letpath = mw.getRunDir() + '/ssl'
+        dst_csrpath = dst_letpath + '/cert.pem'
+        dst_keypath = dst_letpath + '/private.pem'
+
+        if os.path.exists(src_letpath) or os.path.exists(dst_csrpath):
+            if os.path.exists(src_letpath):
+                mw.execShell('rm -rf ' + src_letpath)
+            if os.path.exists(dst_csrpath):
+                mw.execShell('rm -rf ' + dst_csrpath)
+            if os.path.exists(dst_keypath):
+                mw.execShell('rm -rf ' + dst_keypath)
+            # mw.restartWeb()
+            return mw.returnJson(True, '已经删除SSL!')
+
+        # mw.restartWeb()
+        return mw.returnJson(False, '已经不存在SSL!')
+
     # 申请面板let证书
     def applyPanelLetSslApi(self):
 
         # check domain is bind?
         bind_domain = 'data/bind_domain.pl'
         if not os.path.exists(bind_domain):
-            return mw.returnJson(False, '未绑定域名!')
+            return mw.returnJson(False, '先要绑定域名!')
 
         siteName = mw.readFile(bind_domain).strip()
         auth_to = mw.getRunDir() + "/tmp"
@@ -404,6 +493,8 @@ class config_api:
         dst_csrpath = dst_letpath + '/cert.pem'
         dst_keypath = dst_letpath + '/private.pem'
 
+        is_already_apply = False
+
         if not os.path.exists(src_letpath):
             import cert_api
             data = cert_api.cert_api().applyCertApi(to_args)
@@ -415,6 +506,8 @@ class config_api:
                     msg = msg + '<p><span>响应状态:</span>' + str(emsg['status']) + '</p><p><span>错误类型:</span>' + emsg[
                         'type'] + '</p><p><span>错误代码:</span>' + emsg['detail'] + '</p>'
                 return mw.returnJson(data['status'], msg, data['msg'])
+        else:
+            is_already_apply = True
 
         mw.buildSoftLink(src_csrpath, dst_csrpath, True)
         mw.buildSoftLink(src_keypath, dst_keypath, True)
@@ -425,6 +518,9 @@ class config_api:
         tmp_well_know = auth_to + '/.well-known'
         if os.path.exists(tmp_well_know):
             mw.execShell('rm -rf ' + tmp_well_know)
+
+        if is_already_apply:
+            return mw.returnJson(True, '重复申请!', data)
 
         return mw.returnJson(True, '申请成功!', data)
 
@@ -509,8 +605,6 @@ class config_api:
             return mw.returnJson(True, 'SSL已关闭，请使用http协议访问面板!')
         else:
             try:
-                if not os.path.exists('ssl/input.ssl'):
-                    mw.createSSL()
                 mw.writeFile(sslConf, 'True')
 
                 keyPath = mw.getRunDir() + '/ssl/private.pem'

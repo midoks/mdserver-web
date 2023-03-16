@@ -99,15 +99,11 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.13.2
+### 版本更新 0.13.3
 
-* supervisor添加重启功能。
-* 加入滚动写入日志 mw.writeFileLog方法。
-* mysql导出优化优化。
-* 添加tgbot插件[仅测试]。
-* TelegramBot机器人通知-加入配置。
-* mariadb更新版本。
-* 在线文件编辑优化。
+* tgbot插件[增加扩展功能]。
+* ssl功能优化。
+* 网站统计-计划任务归档优化。
 
 ### JSDelivr安装地址
 

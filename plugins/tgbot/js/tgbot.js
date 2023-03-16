@@ -76,3 +76,73 @@ function submitBotConf(){
         layer.msg(rdata['msg'],{icon:rdata['status']?1:2,time:2000,shade: [0.3, '#000']});
     });
 }
+
+
+function botExtList(){
+    var body = '<div class="divtable mtb10">\
+            <table class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0">\
+                <thead>\
+                    <tr>\
+                        <th width="20">脚本</th>\
+                        <th width="120">类型</th>\
+                        <th width="10">状态</th>\
+                    </tr>\
+                </thead>\
+                <tbody id="ext_list"></tbody>\
+            </table>\
+            <div class="dataTables_paginate paging_bootstrap pagination">\
+                <ul id="ext_list_page" class="page"></ul>\
+            </div>\
+        </div>';
+    $('.soft-man-con').html(body);
+    botExtListP(1);
+}
+
+function setBotExtStatus(name,status){
+    appPost('set_ext_status',{'name':name,'status':status}, function(rdata){
+        var rdata = $.parseJSON(rdata.data);
+        layer.msg(rdata['msg'],);
+        showMsg(rdata['msg'], function(){
+            botExtListP(1);
+        },{icon:rdata['status']?1:2,shade: [0.3, '#000']},2000);
+    });
+}
+
+function botExtListP(p=1){
+    appPost('bot_ext_list',{'p':p}, function(rdata){
+        // console.log(rdata);
+        var rdata = $.parseJSON(rdata.data);
+        // console.log(rdata);
+        var tBody = '';
+
+        if (!rdata.status && rdata.data.length == 0 ){
+            var tBody = '<tr><td colspan="4"><div style="text-align:center;">无数据</div></td></tr>';
+        } else{
+            var ldata = rdata.data.data;
+            for (var i = 0; i < ldata.length; i++) {
+                tBody += '<tr data-name="'+ldata[i]['name']+'">'
+                tBody += '<td>'+ldata[i]['name']+'</td>';
+                tBody += '<td>'+ldata[i]['tag']+'</td>';
+
+                if (ldata[i]['status'] == 'start'){
+                    tBody += '<td><span style="color:#20a53a;cursor: pointer;"  class="ext_status glyphicon glyphicon-play"></span></td>';
+                } else{
+                    tBody += '<td><span style="color:red;cursor: pointer;" class="ext_status glyphicon glyphicon-pause"></span></td>';
+                }
+                tBody +='<tr>';
+            }
+        }
+        
+        $('#ext_list').html(tBody);
+        $('#ext_list_page').html(rdata.data.list);
+
+        $('#ext_list .ext_status').click(function(){
+            var name = $(this).parent().parent().data('name');
+            var status = 'stop';
+            if ($(this).hasClass('glyphicon-pause')){
+                status = 'start';
+            }
+            setBotExtStatus(name,status);
+        });
+    });
+}

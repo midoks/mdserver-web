@@ -1,17 +1,20 @@
 {
 	"sort": 7,
-	"ps": "[<b style='color:red;'>DEV</b>]简单Telegram机器人",
+	"ps": "简单Telegram机器人",
 	"name": "tgbot",
 	"title": "tgbot",
 	"shell": "install.sh",
-	"versions":["0.1"],
+	"versions":["1.0"],
 	"tip": "soft",
 	"checks": "server/tgbot",
 	"path": "server/tgbot",
+	"install_pre_inspection":true,
+	"uninstall_pre_inspection":true,
 	"display": 1,
-	"author": "Zend",
+	"author": "midokos",
 	"date": "2023-03-06",
 	"home": "https://core.telegram.org/bots/api",
+	"depend_doc1":"https://github.com/eternnoir/pyTelegramBotAPI",
 	"type": 0,
 	"pid": "5"
 }

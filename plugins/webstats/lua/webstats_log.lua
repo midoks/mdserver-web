@@ -442,7 +442,7 @@ log_by_lua_block {
 		local push_data = json.encode(data)
 		-- C:D(json.encode(push_data))
 		local key = C:getTotalKey()
-		ngx.shared.mw_total:rpush(key, push_data)		
+		ngx.shared.mw_total:rpush(key, push_data)
  	end
 
  	local function store_logs_line(db, stmt, input_server_name, lineno)

@@ -210,18 +210,18 @@ function _M.get_http_origin(self)
     if not headers then return data end
     local req_method = ngx.req.get_method()
     if req_method ~='GET' then 
-        -- API disabled in the context of log_by_lua*
-        -- ngx.req.read_body()
-
+    
         -- proxy_pass, fastcgi_pass, uwsgi_pass, and scgi_pass
         data = ngx.var.request_body
         if not data then
             data = ngx.req.get_body_data()
         end
 
-        if not data then
-            data = ngx.req.get_post_args(1000000)
-        end
+        -- API disabled in the context of log_by_lua
+        -- if not data then
+        --     ngx.req.read_body()
+        --     data = ngx.req.get_post_args(1000000)
+        -- end
 
         if "string" == type(data) then
             headers["payload"] = data
@@ -289,6 +289,11 @@ function _M.cron(self)
             return true
         end
 
+        local cron_key = 'cron_every_1s'
+        if self:is_working(cron_key) then
+            return true
+        end
+
         ngx.update_time()
         local begin = ngx.now()
 
@@ -330,17 +335,13 @@ function _M.cron(self)
             end
         end
 
-        local cron_key = 'cron_every_1s'
-        if self:is_working(cron_key) then
-            return true
-        end
-
         self:lock_working(cron_key)
         
         -- 每秒100条
         for i=1,llen do
             local data, _ = ngx.shared.mw_total:lpop(total_key)
             if not data then
+                self:unlock_working(cron_key)
                 break
             end
 
@@ -352,10 +353,17 @@ function _M.cron(self)
             local db = dbs[input_sn]
             local stat_fields_is = stat_fields[input_sn]
             if not db then
+                ngx.shared.mw_total:rpush(total_key, data)
+                self:unlock_working(cron_key)
                 break
             end
 
-            self:store_logs_line(db, stmts[input_sn]["web_logs"], input_sn, info)
+            local insert_ok = self:store_logs_line(db, stmts[input_sn]["web_logs"], input_sn, info)
+            if not insert_ok then
+                ngx.shared.mw_total:rpush(total_key, data)
+                self:unlock_working(cron_key)
+                break
+            end
 
             local excluded = info["log_kv"]['excluded']
             local stat_tmp_fields = info['stat_fields']
@@ -528,10 +536,8 @@ function _M.store_logs_line(self, db, stmt, input_sn, info)
     local request_headers = logline["request_headers"]
     local excluded = logline["excluded"] 
 
-    -- self:D("json:"..json.encode(logline))
     local time_key = logline["time_key"]
     if not excluded then
-
         stmt:bind_names {
             time=time,
             ip=ip,
@@ -553,13 +559,15 @@ function _M.store_logs_line(self, db, stmt, input_sn, info)
 
         local res, err = stmt:step()
         if tostring(res) == "5" then
-            self:D("step res:"..tostring(res) ..",step err:"..tostring(err))
-            self:D("the step database connection is busy, so it will be stored later.")
+            -- self:D("json:"..json.encode(logline))
+            -- self:D("the step database connection is busy, so it will be stored later | step res:"..tostring(res) ..",step err:"..tostring(err))
+            if stmt then
+                stmt:reset()
+            end
             return false
         end
         stmt:reset()
     end
-
     return true
 end
 
