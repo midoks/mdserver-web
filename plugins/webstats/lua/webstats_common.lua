@@ -560,7 +560,7 @@ function _M.store_logs_line(self, db, stmt, input_sn, info)
         local res, err = stmt:step()
         if tostring(res) == "5" then
             -- self:D("json:"..json.encode(logline))
-            self:D("the step database connection is busy, so it will be stored later | step res:"..tostring(res) ..",step err:"..tostring(err))
+            -- self:D("the step database connection is busy, so it will be stored later | step res:"..tostring(res) ..",step err:"..tostring(err))
             if stmt then
                 stmt:reset()
             end
