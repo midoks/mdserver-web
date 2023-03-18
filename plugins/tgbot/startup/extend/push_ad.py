@@ -48,6 +48,10 @@ def send_msg(bot, tag='ad', trigger_time=300):
         ],
         [
             types.InlineKeyboardButton(
+                text="🙎‍♂️代实名🙍‍♀️过人脸🅾️国际阿里云腾讯云(赞助商)", url='https://t.me/gjgzs2022')
+        ],
+        [
+            types.InlineKeyboardButton(
                 text="💎DigitalVirt(赞助商)", url='https://digitalvirt.com/aff.php?aff=154')
         ],
         [
