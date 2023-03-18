@@ -48,6 +48,10 @@ def send_msg(bot, tag='ad', trigger_time=300):
         ],
         [
             types.InlineKeyboardButton(
+                text="💎DigitalVirt(赞助商)", url='https://digitalvirt.com/aff.php?aff=154')
+        ],
+        [
+            types.InlineKeyboardButton(
                 text="论坛", url='https://bbs.midoks.me'),
             types.InlineKeyboardButton(
                 text="搜索", url='https://bbs.midoks.me/search.php')
