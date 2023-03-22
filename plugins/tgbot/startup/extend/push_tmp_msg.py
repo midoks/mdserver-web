@@ -72,4 +72,4 @@ def send_msg(bot, tag='ad', trigger_time=300):
 
 
 def run(bot):
-    send_msg(bot, 'tmp_msg', 90)
+    send_msg(bot, 'tmp_msg', 200)
