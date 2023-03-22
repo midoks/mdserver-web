@@ -90,7 +90,4 @@ def run(bot):
 
 
 if __name__ == "__main__":
-    # print(isThisCmd('/?:', '/?:如何在安装面板'))
-    # print(getReadCmd('/?:', '/?:如何在安装面板'))
-    # print(searchHttpPage('mw'))
     print(get_newest_tid())
