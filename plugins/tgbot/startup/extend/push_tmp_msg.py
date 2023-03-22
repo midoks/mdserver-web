@@ -67,8 +67,11 @@ def send_msg(bot, tag='ad', trigger_time=300):
 
     # print(msg.message_id)
     time.sleep(50)
-    del_msg = bot.delete_message(chat_id=chat_id, message_id=msg.message_id)
-    # print(del_msg)
+    try:
+        bot.delete_message(
+            chat_id=chat_id, message_id=msg.message_id)
+    except Exception as e:
+        pass
 
 
 def run(bot):
