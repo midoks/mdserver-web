@@ -40,7 +40,7 @@ def get_newest_tid():
     tid = mw.readFile(tid_push)
     data = mw.httpGet(api_next + tid)
     data = json.loads(data)
-    if data['code'] == 0 and len(data['data']) > 1:
+    if data['code'] == 0 and len(data['data']) > 0:
         # print(data)
         tid = data['data'][0]['tid']
         mw.writeFile(tid_push, tid)
