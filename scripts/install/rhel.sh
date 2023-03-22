@@ -125,13 +125,13 @@ if [ $VERSION_ID -ge 8 ];then
         REPOS='--enablerepo=appstream,baseos,epel,extras,powertools'
     fi
 
-    for rpms in autoconf bzip2 bzip2-devel c-ares-devel \
+    for rpms in gcc gcc-c++ lsof autoconf bzip2 bzip2-devel c-ares-devel \
         ca-certificates cairo-devel cmake crontabs curl curl-devel diffutils e2fsprogs e2fsprogs-devel \
-        expat-devel expect file flex gcc gcc-c++ gd gd-devel gettext gettext-devel glib2 glib2-devel glibc.i686 \
+        expat-devel expect file flex gd gd-devel gettext gettext-devel glib2 glib2-devel glibc.i686 \
         gmp-devel kernel-devel libXpm-devel libaio-devel libcap libcurl libcurl-devel libevent libevent-devel \
         libicu-devel libidn libidn-devel libmcrypt libmcrypt-devel libmemcached libmemcached-devel \
         libpng libpng-devel libstdc++.so.6 libtirpc libtirpc-devel libtool libtool-libs libwebp libwebp-devel \
-        libxml2 libxml2-devel libxslt libxslt-devel libarchive lsof make mysql-devel ncurses ncurses-devel net-tools \
+        libxml2 libxml2-devel libxslt libxslt-devel libarchive make mysql-devel ncurses ncurses-devel net-tools \
         oniguruma oniguruma-devel patch pcre pcre-devel perl perl-Data-Dumper perl-devel procps psmisc python3-devel \
         readline-devel rpcgen sqlite-devel tar unzip vim-minimal wget zip zlib zlib-devel ;
     do
@@ -142,13 +142,13 @@ if [ $VERSION_ID -ge 8 ];then
     done
 else
     # CentOS 7
-    for rpms in autoconf bison bzip2 bzip2-devel c-ares-devel ca-certificates cairo-devel \
+    for rpms in gcc gcc-c++ lsof autoconf bison bzip2 bzip2-devel c-ares-devel ca-certificates cairo-devel \
         cmake cmake3 crontabs curl curl-devel diffutils e2fsprogs e2fsprogs-devel expat-devel expect file \
-        flex freetype freetype-devel gcc gcc-c++ gd gd-devel gettext gettext-devel git-core glib2 glib2-devel \
+        flex freetype freetype-devel gd gd-devel gettext gettext-devel git-core glib2 glib2-devel \
         glibc.i686 gmp-devel graphviz icu kernel-devel libXpm-devel libaio-devel libcap libcurl libcurl-devel \
         libevent libevent-devel libicu-devel libidn libidn-devel libjpeg-devel libmcrypt libmcrypt-devel \
         libmemcached libmemcached-devel libpng-devel libstdc++.so.6 libtirpc libtirpc-devel libtool libtool-libs \
-        libwebp libwebp-devel libxml2 libxml2-devel libxslt libxslt-devel libzip libzip-devel libzstd-devel lsof \
+        libwebp libwebp-devel libxml2 libxml2-devel libxslt libxslt-devel libzip libzip-devel libzstd-devel \
         make mysql-devel ncurses ncurses-devel net-tools oniguruma oniguruma-devel openldap openldap-devel \
         openssl openssl-devel patch pcre pcre-devel perl perl-Data-Dumper perl-devel psmisc python-devel \
         python3-devel python3-pip re2c readline-devel rpcgen sqlite-devel tar unzip vim-minimal vixie-cron \
