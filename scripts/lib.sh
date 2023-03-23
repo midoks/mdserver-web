@@ -47,13 +47,16 @@ else
     echo "OK"
 fi
 
-# cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
+
 HTTP_PREFIX="https://"
 LOCAL_ADDR=common
-ping -c 1 pypi.python.org > /dev/null 2>&1
-if [ "$?" != "0" ];then
-    LOCAL_ADDR=cn
-    HTTP_PREFIX="https://ghproxy.com/"
+ping -c 1 ipinfo.io > /dev/null 2>&1
+if [ "$?" == "0" ];then
+    CN=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
+    if [ -z $CN ];then
+        LOCAL_ADDR=cn
+        HTTP_PREFIX="https://ghproxy.com/"
+    fi
 fi
 
 PIPSRC="https://pypi.python.org/simple"
@@ -69,6 +72,7 @@ fi
 
 which pip && pip install --upgrade pip -i $PIPSRC
 pip3 install --upgrade pip setuptools wheel -i $PIPSRC
+
 cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt -i $PIPSRC
 
 # pip3 install flask-caching==1.10.1
