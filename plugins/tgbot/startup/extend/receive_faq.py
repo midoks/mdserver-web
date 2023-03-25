@@ -181,6 +181,11 @@ def answer_callback_query(bot, call):
 
 def run(bot, message):
     text_body = message.text
+    is_has_url = re.search(
+        '(https?|ftp|file)://[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]', text_body)
+    if is_has_url:
+        return bot
+
     # print(text_body)
     if isThisCmd('/faq:', text_body):
         cmd_text = getReadCmd('/faq:', text_body)
