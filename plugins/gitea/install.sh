@@ -14,7 +14,7 @@ if [ -f ${rootPath}/bin/activate ];then
 fi
 
 
-URL_DOWNLOAD=https://dl.gitea.io/
+URL_DOWNLOAD=https://dl.gitea.com
 
 
 bash ${rootPath}/scripts/getos.sh
