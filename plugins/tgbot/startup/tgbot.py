@@ -201,7 +201,6 @@ if __name__ == "__main__":
     botPushOtherTask.start()
 
     writeLog('启动成功')
-
     runBot(bot)
 
 
