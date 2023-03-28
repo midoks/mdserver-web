@@ -48,6 +48,14 @@ def send_msg(bot, tag='ad', trigger_time=300):
         ],
         [
             types.InlineKeyboardButton(
+                text="CMS导航网", url='https://t.me/maccms_jccms')
+        ],
+        [
+            types.InlineKeyboardButton(
+                text="高价收量", url='https://t.me/taohaozhan')
+        ],
+        [
+            types.InlineKeyboardButton(
                 text="🙎‍♂️代实名🙍‍♀️过人脸🅾️国际阿里云腾讯云(赞助商)", url='https://t.me/gjgzs2022')
         ],
         [
