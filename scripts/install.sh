@@ -85,7 +85,7 @@ if [ $OSNAME != "macos" ];then
 		if [ "$LOCAL_ADDR" != "common" ];then
 			curl --insecure -sSLo /tmp/master.zip https://gitee.com/midoks/mdserver-web/repository/archive/master.zip
 		else
-			curl --insecure -sSLo /tmp/master.zip https://codeload.github.com/midoks/mdserver-web/zip/master
+			curl --insecure -sSLo /tmp/master.zip https://code.midoks.me/midoks/mdserver-web/archive/master.zip
 		fi
 
 		cd /tmp && unzip /tmp/master.zip
@@ -113,7 +113,7 @@ fi
 echo "use system version: ${OSNAME}"
 if [ "${OSNAME}" == "macos" ];then
 	if [ "$LOCAL_ADDR" != "common" ];then
-		curl --insecure -fsSL https://gitee.com/midoks/mdserver-web/raw/dev/scripts/install/macos.sh | bash
+		curl --insecure -fsSL https://code.midoks.me/midoks/mdserver-web/raw/branch/master/scripts/install/macos.sh | bash
 	else
 		curl --insecure -fsSL ${HTTP_PREFIX}https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/install/macos.sh | bash
 	fi
