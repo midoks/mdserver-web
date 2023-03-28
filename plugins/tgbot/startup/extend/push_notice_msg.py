@@ -41,6 +41,7 @@ def send_msg(bot, tag='ad', trigger_time=300):
     # 信号只在一个周期内执行一次|end
 
     # https://t.me/gjgzs2022 ｜ 19/m
+    # ♻️CMS导航网♻️/💰流量变现💰 ｜ 28/m
     keyboard = [
         [
             types.InlineKeyboardButton(
