@@ -166,8 +166,8 @@ wget --no-check-certificate -O uninstall.sh https://raw.githubusercontent.com/mi
 
 curl --insecure -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/quick/debug.sh | bash
 
-curl --insecure -fsSL https://gitee.com/midoks/mdserver-web/raw/dev/scripts/install_dev.sh | bash
-curl --insecure -fsSL https://gitee.com/midoks/mdserver-web/raw/dev/scripts/update_dev.sh | bash
+curl --insecure -fsSL https://code.midoks.me/midoks/mdserver-web/raw/branch/dev/scripts/install_dev.sh | bash
+curl --insecure -fsSL https://code.midoks.me/midoks/mdserver-web/raw/branch/dev/scripts/update_dev.sh | bash
 ```
 
 ### 捐赠地址 USDT（TRC20）
