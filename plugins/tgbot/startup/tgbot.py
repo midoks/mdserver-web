@@ -179,6 +179,17 @@ def setDaemon(t):
     else:
         t.setDaemon(True)
 
+
+def runBot(bot):
+    try:
+        bot.polling()
+    except Exception as e:
+        writeLog('-----runBot error start -------')
+        writeLog(str(e))
+        writeLog('-----runBot error end -------')
+        time.sleep(1)
+        runBot(bot)
+
 if __name__ == "__main__":
 
     # 机器人推送任务
@@ -190,5 +201,8 @@ if __name__ == "__main__":
     botPushOtherTask.start()
 
     writeLog('启动成功')
-    bot.polling()
+
+    runBot(bot)
+
+
 # asyncio.run(bot.polling())
