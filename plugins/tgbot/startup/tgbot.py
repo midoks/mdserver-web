@@ -86,14 +86,15 @@ while True:
 bot = telebot.TeleBot(cfg['bot']['app_token'])
 
 
-bot.delete_my_commands(scope=None, language_code=None)
-bot.set_my_commands(
-    commands=[
-        telebot.types.BotCommand("start", "查看帮助信息"),
-        telebot.types.BotCommand("faq", "查看bbs帖子主题【不要忘记:冒号】"),
-    ],
-)
-
+init_list = getStartExtCfgByTag('init')
+for p in init_list:
+    try:
+        script = p['name'].split('.')[0]
+        __import__(script).init(bot)
+    except Exception as e:
+        writeLog('-----init error start -------')
+        writeLog(mw.getTracebackInfo())
+        writeLog('-----init error end -------')
 
 # @bot.message_handler(commands=['start', 'help'])
 # def hanle_start_help(message):
@@ -154,20 +155,53 @@ def botPush():
         time.sleep(1)
 
 
+def runBotPushOtherTask():
+    plist = getStartExtCfgByTag('other')
+    for p in plist:
+        try:
+            script = p['name'].split('.')[0]
+            __import__(script).run(bot)
+        except Exception as e:
+            writeLog('-----runBotPushOtherTask error start -------')
+            writeLog(mw.getTracebackInfo())
+            writeLog('-----runBotPushOtherTask error end -------')
+
+
+def botPushOther():
+    while True:
+        runBotPushOtherTask()
+        time.sleep(1)
+
+
 def setDaemon(t):
     if sys.version_info.major == 3 and sys.version_info.minor >= 10:
         t.daemon = True
     else:
         t.setDaemon(True)
 
+
+def runBot(bot):
+    try:
+        bot.polling()
+    except Exception as e:
+        writeLog('-----runBot error start -------')
+        writeLog(str(e))
+        writeLog('-----runBot error end -------')
+        time.sleep(1)
+        runBot(bot)
+
 if __name__ == "__main__":
 
     # 机器人推送任务
     botPushTask = threading.Thread(target=botPush)
-    # print(botPushTask)
-    # botPushTask = setDaemon(botPushTask)
     botPushTask.start()
 
+    # 机器人其他推送任务
+    botPushOtherTask = threading.Thread(target=botPushOther)
+    botPushOtherTask.start()
+
     writeLog('启动成功')
-    bot.polling()
+    runBot(bot)
+
+
 # asyncio.run(bot.polling())

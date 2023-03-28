@@ -99,30 +99,31 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.13.3
+### 版本更新 0.13.4
 
-* tgbot插件[增加扩展功能]。
-* ssl功能优化。
-* 网站统计-计划任务归档优化。
+无重大更新
+
+* 国内安装不在依赖gitee。
+* tgbot优化。
 
 ### JSDelivr安装地址
 
 - 初始安装
 
 ```
-curl -fsSL https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/scripts/install.sh | bash
+curl --insecure -fsSL https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/scripts/install.sh | bash
 ```
 
 - 直接更新
 
 ```
-curl -fsSL https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/scripts/update.sh | bash
+curl --insecure -fsSL https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/scripts/update.sh | bash
 ```
 
 - 卸载脚本
 
 ```
-wget -O uninstall.sh https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/scripts/uninstall.sh && bash uninstall.sh
+wget --no-check-certificate -O uninstall.sh https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/scripts/uninstall.sh && bash uninstall.sh
 ```
 
 ### 备用地址
@@ -130,20 +131,20 @@ wget -O uninstall.sh https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/scri
 - 初始安装
 
 ```
-curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/install.sh | bash
+curl --insecure -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/install.sh | bash
 curl --insecure -fsSL  https://gitee.com/midoks/mdserver-web/raw/master/scripts/install.sh | bash
 ```
 
 - 直接更新
 
 ```
-curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/update.sh | bash
+curl --insecure -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/update.sh | bash
 ```
 
 - 卸载脚本
 
 ```
-wget -O uninstall.sh https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/uninstall.sh && bash uninstall.sh
+wget --no-check-certificate -O uninstall.sh https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/uninstall.sh && bash uninstall.sh
 ```
 
 
@@ -152,22 +153,22 @@ wget -O uninstall.sh https://raw.githubusercontent.com/midoks/mdserver-web/maste
 - 需已经安装mdserver-web
 
 ```
-curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/quick/app.sh | bash
+curl --insecure -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/quick/app.sh | bash
 ```
 
 
 ### DEV使用
 
 ```
-curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/install_dev.sh | bash
-curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update_dev.sh | bash
+curl --insecure -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/install_dev.sh | bash
+curl --insecure -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update_dev.sh | bash
 
-wget -O uninstall.sh https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/uninstall.sh && bash uninstall.sh
+wget --no-check-certificate -O uninstall.sh https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/uninstall.sh && bash uninstall.sh
 
-curl -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/quick/debug.sh | bash
+curl --insecure -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/quick/debug.sh | bash
 
-curl -fsSL https://gitee.com/midoks/mdserver-web/raw/dev/scripts/install_dev.sh | bash
-curl -fsSL https://gitee.com/midoks/mdserver-web/raw/dev/scripts/update_dev.sh | bash
+curl --insecure -fsSL https://code.midoks.me/midoks/mdserver-web/raw/branch/dev/scripts/install_dev.sh | bash
+curl --insecure -fsSL https://code.midoks.me/midoks/mdserver-web/raw/branch/dev/scripts/update_dev.sh | bash
 ```
 
 ### 捐赠地址 USDT（TRC20）

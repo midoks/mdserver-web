@@ -1,8 +1,8 @@
 {
-	"ps": "Gitea 是一个开源社区驱动的轻量级代码托管解决方案。",
+	"ps": "Gitea是一个开源社区驱动的轻量级代码托管解决方案。",
 	"name": "gitea",
 	"title": "Gitea",
-	"versions": ["1.17.2"],
+	"versions": ["1.17.2","1.18.5"],
 	"tip": "soft",
 	"install_pre_inspection":false,
 	"uninstall_pre_inspection":true,

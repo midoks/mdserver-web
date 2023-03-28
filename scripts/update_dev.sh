@@ -64,7 +64,7 @@ if [ "$?" != "0" ];then
 fi
 
 if [ "$LOCAL_ADDR" != "common" ];then
-	curl --insecure -sSLo /tmp/dev.zip https://gitee.com/midoks/mdserver-web/repository/archive/dev.zip
+	curl --insecure -sSLo /tmp/dev.zip https://code.midoks.me/midoks/mdserver-web/archive/dev.zip
 else
 	curl --insecure -sSLo /tmp/dev.zip https://github.com/midoks/mdserver-web/archive/refs/heads/dev.zip
 fi

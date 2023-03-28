@@ -14,11 +14,25 @@ install_tmp=${rootPath}/tmp/mw_install.pl
 VERSION=$2
 sys_os=`uname`
 
-cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
+# cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
+# HTTP_PREFIX="https://"
+# if [ ! -z "$cn" ];then
+#     HTTP_PREFIX="https://ghproxy.com/"
+# fi
+
 HTTP_PREFIX="https://"
-if [ ! -z "$cn" ];then
+LOCAL_ADDR=common
+ping -c 1 gihub.com > /dev/null 2>&1
+if [ "$?" != "0" ];then
+    LOCAL_ADDR=cn
     HTTP_PREFIX="https://ghproxy.com/"
 fi
+
+PIPSRC="https://pypi.python.org/simple"
+if [ "$LOCAL_ADDR" != "common" ];then
+    PIPSRC="https://pypi.tuna.tsinghua.edu.cn/simple"
+fi
+
 
 if [ "$sys_os" == "Darwin" ];then
 	BAK='_bak'
@@ -96,7 +110,7 @@ Install_App()
 	fi
 
 	# https://github.com/P3TERX/GeoLite.mmdb
-	pip install geoip2
+	pip install geoip2 -i $PIPSRC
 	# if [ ! -f $serverPath/webstats/GeoLite2-City.mmdb ];then
 	# 	wget --no-check-certificate -O $serverPath/webstats/GeoLite2-City.mmdb https://github.com/P3TERX/GeoLite.mmdb/releases/download/2022.10.16/GeoLite2-City.mmdb
 	# fi

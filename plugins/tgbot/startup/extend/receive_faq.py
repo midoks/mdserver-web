@@ -181,6 +181,13 @@ def answer_callback_query(bot, call):
 
 def run(bot, message):
     text_body = message.text
+
+    # 过滤URL
+    is_has_url = re.search(
+        '(https?|ftp|file)://[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]', text_body)
+    if is_has_url:
+        return bot
+
     # print(text_body)
     if isThisCmd('/faq:', text_body):
         cmd_text = getReadCmd('/faq:', text_body)
@@ -193,7 +200,15 @@ def run(bot, message):
     if text_body.find('?') > -1 or text_body.find('？') > -1:
         return_msg = "你似乎在寻找【" + text_body + "】答案:\n"
         return_msg += "/faq:开始寻找你的问题\n"
-        bot.reply_to(message, return_msg)
+        keyboard = [
+            [
+                types.InlineKeyboardButton(
+                    text="如未找到，可以在论坛补充你的提问!", url='https://bbs.midoks.me'),
+            ]
+
+        ]
+        markup = types.InlineKeyboardMarkup(keyboard)
+        bot.reply_to(message, return_msg, reply_markup=markup)
 
     return bot
 

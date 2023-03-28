@@ -204,7 +204,7 @@ mw_update()
     if [ "$LOCAL_ADDR" == "common" ];then
         curl --insecure -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/update.sh | bash
     else
-        curl --insecure -fsSL  https://gitee.com/midoks/mdserver-web/raw/master/scripts/install.sh | bash
+        curl --insecure -fsSL  https://code.midoks.me/midoks/mdserver-web/raw/branch/dev/scripts/update.sh | bash
     fi
 }
 
@@ -218,7 +218,7 @@ mw_update_dev()
     if [ "$LOCAL_ADDR" == "common" ];then
         curl --insecure -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update_dev.sh | bash
     else
-        curl --insecure -fsSL https://gitee.com/midoks/mdserver-web/raw/dev/scripts/update_dev.sh | bash
+        curl --insecure -fsSL https://code.midoks.me/midoks/mdserver-web/raw/branch/dev/scripts/update_dev.sh | bash
     fi
     cd /www/server/mdserver-web
 }

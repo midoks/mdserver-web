@@ -61,7 +61,18 @@ Install_openresty()
 
 	# wget -O openresty-1.21.4.1.tar.gz https://openresty.org/download/openresty-1.21.4.1.tar.gz
 	if [ ! -f ${openrestyDir}/openresty-${VERSION}.tar.gz ];then
-		wget -O ${openrestyDir}/openresty-${VERSION}.tar.gz https://openresty.org/download/openresty-${VERSION}.tar.gz
+		wget --no-check-certificate -O ${openrestyDir}/openresty-${VERSION}.tar.gz https://openresty.org/download/openresty-${VERSION}.tar.gz -T 3
+	fi
+
+	DOWNLOAD_SIZE=`wc -c ${openrestyDir}/openresty-${VERSION}.tar.gz | awk '{print $1}'`
+	if [ "$DOWNLOAD_SIZE" == "0" ];then
+		echo 'download failed, download again'
+		rm -rf ${openrestyDir}/openresty-${VERSION}.tar.gz
+	fi
+
+	# Last Download Method
+	if [ ! -f ${openrestyDir}/openresty-${VERSION}.tar.gz ];then
+		wget --no-check-certificate -O ${openrestyDir}/openresty-${VERSION}.tar.gz https://dl.midoks.me/soft/openresty/openresty-${VERSION}.tar.gz -T 3
 	fi
 
 	cd ${openrestyDir} && tar -zxvf openresty-${VERSION}.tar.gz
