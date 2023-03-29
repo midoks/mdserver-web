@@ -42,10 +42,11 @@ def send_msg(bot, tag='ad', trigger_time=300):
 
     # https://t.me/gjgzs2022 ｜ 19/m
     # ♻️CMS导航网♻️/💰流量变现💰 ｜ 28/m
+    # CK资源采集 ｜29/m
     keyboard = [
         [
             types.InlineKeyboardButton(
-                text="为了不打扰双方，私聊解决问题先转100U，否则无视!", url='tg://user?id=5568699210')
+                text="CK资源采集", url='https://ckzy1.com/')
         ],
         [
             types.InlineKeyboardButton(
@@ -67,15 +68,19 @@ def send_msg(bot, tag='ad', trigger_time=300):
             types.InlineKeyboardButton(
                 text="论坛", url='https://bbs.midoks.me'),
             types.InlineKeyboardButton(
-                text="搜索", url='https://bbs.midoks.me/search.php')
+                text="搜索", url='https://bbs.midoks.me/search.php'),
+            types.InlineKeyboardButton(
+                text="@ME", url='tg://user?id=5568699210')
         ]
     ]
     markup = types.InlineKeyboardMarkup(keyboard)
-    msg = bot.send_message(
-        chat_id, "由于在解决的问题的时候，不给信息，无法了解情况。以后不再群里回答技术问题。全部去论坛提问。在解决问题的过程中，可能需要面板信息，和SSH信息，如无法提供请不要提问。为了让群里都知晓。轮播一年", reply_markup=markup)
+
+    msg_notice = "由于在解决的问题的时候，不给信息，无法了解情况。以后不再群里回答技术问题。全部去论坛提问。在解决问题的过程中，可能需要面板信息，和SSH信息，如无法提供请不要提问。为了让群里都知晓。轮播一年！\n"
+    msg_notice += "为了不打扰双方，私聊解决问题先转100U，否则无视!"
+    msg = bot.send_message(chat_id, msg_notice, reply_markup=markup)
 
     # print(msg.message_id)
-    time.sleep(50)
+    time.sleep(60)
     try:
         bot.delete_message(
             chat_id=chat_id, message_id=msg.message_id)
@@ -84,4 +89,4 @@ def send_msg(bot, tag='ad', trigger_time=300):
 
 
 def run(bot):
-    send_msg(bot, 'tmp_msg', 200)
+    send_msg(bot, 'tmp_msg', 180)
