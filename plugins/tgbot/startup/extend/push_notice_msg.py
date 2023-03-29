@@ -80,7 +80,7 @@ def send_msg(bot, tag='ad', trigger_time=300):
         chat_id, "由于在解决的问题的时候，不给信息，无法了解情况。以后不再群里回答技术问题。全部去论坛提问。在解决问题的过程中，可能需要面板信息，和SSH信息，如无法提供请不要提问。为了让群里都知晓。轮播一年", reply_markup=markup)
 
     # print(msg.message_id)
-    time.sleep(50)
+    time.sleep(60)
     try:
         bot.delete_message(
             chat_id=chat_id, message_id=msg.message_id)
@@ -89,4 +89,4 @@ def send_msg(bot, tag='ad', trigger_time=300):
 
 
 def run(bot):
-    send_msg(bot, 'tmp_msg', 200)
+    send_msg(bot, 'tmp_msg', 180)
