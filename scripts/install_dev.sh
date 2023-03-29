@@ -86,7 +86,7 @@ if [ $OSNAME != "macos" ];then
 		if [ "$LOCAL_ADDR" == "common" ];then
 			curl --insecure -sSLo /tmp/dev.zip ${HTTP_PREFIX}github.com/midoks/mdserver-web/archive/refs/heads/dev.zip
 		else
-			curl --insecure -sSLo /tmp/dev.zip https://code.midoks.me/midoks/mdserver-web/archive/dev.tar.gz
+			curl --insecure -sSLo /tmp/dev.zip https://code.midoks.me/midoks/mdserver-web/archive/dev.zip
 		fi
 		
 		cd /tmp && unzip /tmp/dev.zip
