@@ -48,6 +48,10 @@ def send_msg(bot, tag='ad', trigger_time=300):
         ],
         [
             types.InlineKeyboardButton(
+                text="CK资源采集", url='https://ckzy1.com/')
+        ],
+        [
+            types.InlineKeyboardButton(
                 text="♻️CMS导航网♻️", url='https://t.me/maccms_jccms')
         ],
         [
