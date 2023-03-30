@@ -161,7 +161,27 @@
 					<span class="set-info c7">Telegram Bot机器人通知【<b style="color:red;">国内可能无法使用</b>】</span>
 				</p>
 
+				<p class="mtb15">
+					<span class="set-tit text-right" title="绑定账号" style="float: left;">邮件通知</span>
+						<input id="cfg_email" name="cfg_email" onclick="setNotifyApi('email',this)" class="btswitch btswitch-ios" type="checkbox" {{data['notify_email_enable']}}>
+						<label class="btswitch-btn ml5" for="cfg_email" style="float: left;margin-top:4px;"></label>
+	                <button ype="button" class="btn btn-default btn-xs panel_api_btn" style="vertical-align: middle; margin-left: 10px" onclick="getEmailCfg();">邮件配置</button>
+					<span class="set-info c7">邮件通知</span>
+				</p>
+
 			</div>
+
+			<!-- <div class="title c6 plr15"><h3 class="f16">VIP</h3></div>
+			<div class="setting-con pd15">
+				<p class="mtb15">
+					<span class="set-tit text-right" title="用户登录" style="float: left;">用户登录</span>
+						<input id="cfg_login" name="cfg_login" onclick="" class="btswitch btswitch-ios" type="checkbox">
+						<label class="btswitch-btn ml5" for="cfg_login" style="float: left;margin-top:4px;"></label>
+	                <button ype="button" class="btn btn-default btn-xs" style="vertical-align: middle; margin-left: 10px" onclick="">绑定</button>
+					<span class="set-info c7">【<b style="color:red;">请勿使用</b>】(开发中)</span>
+				</p>
+
+			</div> -->
 		</div>
 	</div>
 </div>

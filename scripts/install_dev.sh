@@ -85,14 +85,17 @@ if [ $OSNAME != "macos" ];then
 
 		if [ "$LOCAL_ADDR" == "common" ];then
 			curl --insecure -sSLo /tmp/dev.zip ${HTTP_PREFIX}github.com/midoks/mdserver-web/archive/refs/heads/dev.zip
+			cd /tmp && unzip /tmp/dev.zip
+			mv -f /tmp/mdserver-web-dev /www/server/mdserver-web
+			rm -rf /tmp/dev.zip
+			rm -rf /tmp/mdserver-web-dev
 		else
 			curl --insecure -sSLo /tmp/dev.zip https://code.midoks.me/midoks/mdserver-web/archive/dev.zip
-		fi
-		
-		cd /tmp && unzip /tmp/dev.zip
-		mv -f /tmp/mdserver-web-dev /www/server/mdserver-web
-		rm -rf /tmp/dev.zip
-		rm -rf /tmp/mdserver-web-dev
+			cd /tmp && unzip /tmp/dev.zip
+			mv -f /tmp/mdserver-web /www/server/mdserver-web
+			rm -rf /tmp/dev.zip
+			rm -rf /tmp/mdserver-web
+		fi	
 	fi
 
 	# install acme.sh
@@ -115,11 +118,7 @@ fi
 echo "use system version: ${OSNAME}"
 
 if [ "${OSNAME}" == "macos" ];then
-	if [ "$LOCAL_ADDR" != "common" ];then
-		curl --insecure -fsSL https://code.midoks.me/midoks/mdserver-web/raw/branch/master/scripts/install/macos.sh | bash
-	else
-		curl --insecure -fsSL ${HTTP_PREFIX}https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/install/macos.sh | bash
-	fi
+	curl --insecure -fsSL https://code.midoks.me/midoks/mdserver-web/raw/branch/master/scripts/install/macos.sh | bash
 else
 	cd /www/server/mdserver-web && bash scripts/install/${OSNAME}.sh
 fi

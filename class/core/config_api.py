@@ -27,7 +27,7 @@ from flask import request
 
 class config_api:
 
-    __version = '0.13.4'
+    __version = '0.13.5'
     __api_addr = 'data/api.json'
 
     def __init__(self):
@@ -784,6 +784,13 @@ class config_api:
         if tag == 'tgbot':
             t = json.loads(tag_data)
             test_bool = mw.tgbotNotifyTest(t['app_token'], t['chat_id'])
+            if test_bool:
+                return mw.returnData(True, '验证成功')
+            return mw.returnData(False, '验证失败')
+
+        if tag == 'email':
+            t = json.loads(tag_data)
+            test_bool = mw.emailNotifyTest(t)
             if test_bool:
                 return mw.returnData(True, '验证成功')
             return mw.returnData(False, '验证失败')

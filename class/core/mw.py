@@ -1697,7 +1697,7 @@ def getNotifyData(is_parse=False):
     data = json.loads(notify_data)
 
     if is_parse:
-        tag_list = ['tgbot']
+        tag_list = ['tgbot', 'email']
         for t in tag_list:
             if t in data and 'cfg' in data[t]:
                 data[t]['data'] = json.loads(deDoubleCrypt(t, data[t]['cfg']))
@@ -1759,6 +1759,34 @@ def tgbotNotifyTest(app_token, chat_id):
     return tgbotNotifyHttpPost(app_token, chat_id, msg)
 
 
+def emailNotifyMessage(data):
+    '''
+    邮件通知
+    '''
+    sys.path.append(os.getcwd() + "/class/plugin")
+    import memail
+    try:
+        if data['smtp_ssl'] == 'ssl':
+            memail.sendSSL(data['smtp_host'], data['smtp_port'],
+                           data['username'], data['password'],
+                           data['to_mail_addr'], data['subject'], data['content'])
+        else:
+            memail.send(data['smtp_host'], data['smtp_port'],
+                        data['username'], data['password'],
+                        data['to_mail_addr'], data['subject'], data['content'])
+        return True
+    except Exception as e:
+        print(getTracebackInfo())
+    return False
+
+
+def emailNotifyTest(data):
+    print(data)
+    data['subject'] = 'MW通知测试'
+    data['content'] = data['mail_test']
+    return emailNotifyMessage(data)
+
+
 def notifyMessageTry(msg, stype='common', trigger_time=300, is_write_log=True):
 
     lock_file = getPanelTmp() + '/notify_lock.json'
@@ -1796,6 +1824,13 @@ def notifyMessageTry(msg, stype='common', trigger_time=300, is_write_log=True):
             else:
                 do_notify = tgbotNotifyMessage(
                     t['app_token'], t['chat_id'], msg)
+
+    if 'email' in data and 'enable' in data['email']:
+        if data['email']['enable']:
+            t = data['email']['data']
+            t['subject'] = 'MW通知'
+            t['content'] = msg
+            do_notify = emailNotifyMessage(t)
     return do_notify
 
 

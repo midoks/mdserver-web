@@ -89,4 +89,9 @@ def send_msg(bot, tag='ad', trigger_time=300):
 
 
 def run(bot):
-    send_msg(bot, 'tmp_msg', 180)
+    try:
+        send_msg(bot, 'notice_msg', 180)
+    except Exception as e:
+        writeLog('-----push_notice_msg error start -------')
+        print(mw.getTracebackInfo())
+        writeLog('-----push_notice_msg error start -------')
