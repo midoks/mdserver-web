@@ -788,6 +788,13 @@ class config_api:
                 return mw.returnData(True, '验证成功')
             return mw.returnData(False, '验证失败')
 
+        if tag == 'email':
+            t = json.loads(tag_data)
+            test_bool = mw.emailNotifyTest(t)
+            if test_bool:
+                return mw.returnData(True, '验证成功')
+            return mw.returnData(False, '验证失败')
+
         return mw.returnData(False, '暂时未支持该验证')
 
     def setNotifyEnableApi(self):
