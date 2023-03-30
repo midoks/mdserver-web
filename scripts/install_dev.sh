@@ -85,14 +85,17 @@ if [ $OSNAME != "macos" ];then
 
 		if [ "$LOCAL_ADDR" == "common" ];then
 			curl --insecure -sSLo /tmp/dev.zip ${HTTP_PREFIX}github.com/midoks/mdserver-web/archive/refs/heads/dev.zip
+			cd /tmp && unzip /tmp/dev.zip
+			mv -f /tmp/mdserver-web-dev /www/server/mdserver-web
+			rm -rf /tmp/dev.zip
+			rm -rf /tmp/mdserver-web-dev
 		else
 			curl --insecure -sSLo /tmp/dev.zip https://code.midoks.me/midoks/mdserver-web/archive/dev.zip
-		fi
-		
-		cd /tmp && unzip /tmp/dev.zip
-		mv -f /tmp/mdserver-web-dev /www/server/mdserver-web
-		rm -rf /tmp/dev.zip
-		rm -rf /tmp/mdserver-web-dev
+			cd /tmp && unzip /tmp/dev.zip
+			mv -f /tmp/mdserver-web /www/server/mdserver-web
+			rm -rf /tmp/dev.zip
+			rm -rf /tmp/mdserver-web
+		fi	
 	fi
 
 	# install acme.sh
