@@ -83,15 +83,19 @@ if [ $OSNAME != "macos" ];then
 	# https://cdn.jsdelivr.net/gh/midoks/mdserver-web@latest/scripts/install.sh
 	if [ ! -d /www/server/mdserver-web ];then
 		if [ "$LOCAL_ADDR" == "common" ];then
-			curl --insecure -sSLo /tmp/dev.zip ${HTTP_PREFIX}github.com/midoks/mdserver-web/archive/refs/heads/dev.zip
+			curl --insecure -sSLo /tmp/master.zip ${HTTP_PREFIX}github.com/midoks/mdserver-web/archive/refs/heads/master.zip
+			cd /tmp && unzip /tmp/master.zip
+			mv -f /tmp/mdserver-web-master /www/server/mdserver-web
+			rm -rf /tmp/master.zip
+			rm -rf /tmp/mdserver-web-master
 		else
-			curl --insecure -sSLo /tmp/dev.zip https://code.midoks.me/midoks/mdserver-web/archive/dev.zip
+			curl --insecure -sSLo /tmp/master.zip https://code.midoks.me/midoks/mdserver-web/archive/master.zip
+			mv -f /tmp/mdserver-we /www/server/mdserver-web
+			rm -rf /tmp/master.zip
+			rm -rf /tmp/mdserver-web
 		fi
 
-		cd /tmp && unzip /tmp/master.zip
-		mv -f /tmp/mdserver-web-master /www/server/mdserver-web
-		rm -rf /tmp/master.zip
-		rm -rf /tmp/mdserver-web-master
+		
 	fi
 
 	# install acme.sh
