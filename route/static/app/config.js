@@ -382,7 +382,7 @@ function getTgbot(){
 		layer.open({
 			type: 1,
 			area: "500px",
-			title: '配置TgBot配置',
+			title: 'TgBot配置',
 			closeBtn: 1,
 			shift: 5,
 			btn:["确定","关闭","验证"],
@@ -401,6 +401,17 @@ function getTgbot(){
 				var pdata = {};
 				pdata['app_token'] = $('input[name="app_token"]').val();
 				pdata['chat_id'] = $('input[name="chat_id"]').val();
+
+				if (pdata['app_token'] == ''){
+					layer.msg('app_token不能为空!', {icon:2});
+					return false;
+				}
+
+				if (pdata['chat_id'] == ''){
+					layer.msg('chat_id不能为空!', {icon:2});
+					return false;
+				}
+
 				$.post('/config/set_notify',{'tag':'tgbot', 'data':JSON.stringify(pdata)},function(rdata){
 					showMsg(rdata.msg, function(){
 						if (rdata.status){
@@ -414,7 +425,187 @@ function getTgbot(){
 				var pdata = {};
 				pdata['app_token'] = $('input[name="app_token"]').val();
 				pdata['chat_id'] = $('input[name="chat_id"]').val();
+
+				if (pdata['app_token'] == ''){
+					layer.msg('app_token不能为空!', {icon:2});
+					return false;
+				}
+
+				if (pdata['chat_id'] == ''){
+					layer.msg('chat_id不能为空!', {icon:2});
+					return false;
+				}
+
 				$.post('/config/set_notify_test',{'tag':'tgbot', 'data':JSON.stringify(pdata)},function(rdata){
+					showMsg(rdata.msg, function(){
+						if (rdata.status){
+							layer.close(index);
+						}
+					},{icon:rdata.status?1:2},2000);
+				});
+				return false;
+			}
+		});
+	});
+}
+
+function getEmailCfg(){
+	var loadT = layer.msg('正在获取邮件配置信息...',{icon:16,time:0,shade: [0.3, '#000']});
+	$.post('/config/get_notify',{},function(data){
+		layer.close(loadT);
+
+		var smtp_host = 'smtp.163.com';
+		var smtp_port = '25';
+		var username = 'admin';
+		var password = '';
+		var to_mail_addr = '';
+
+		var smtp_ssl_no = 'checked';
+		var smtp_ssl_yes = '';
+
+		if (data.status){
+			if (typeof(data['data']['email']) !='undefined'){
+				smtp_host = data['data']['email']['data']['smtp_host'];
+				smtp_port = data['data']['email']['data']['smtp_port'];
+				username = data['data']['email']['data']['username'];
+				password = data['data']['email']['data']['password'];
+				to_mail_addr = data['data']['email']['data']['to_mail_addr'];
+
+
+				var smtp_ssl = data['data']['email']['data']['smtp_ssl'];
+				if (smtp_ssl == 'ssl'){
+					smtp_ssl_no = '';
+					smtp_ssl_yes = 'checked';
+				}
+			}
+		}
+
+		layer.open({
+			type: 1,
+			area: "500px",
+			title: '邮件配置',
+			closeBtn: 1,
+			shift: 5,
+			btn:["确定","关闭","验证"],
+			shadeClose: false,
+			content: "<div class='bt-form pd20'>\
+					<div class='line'>\
+						<span class='tname'>SMTP服务器</span>\
+						<div class='info-r'><input class='bt-input-text' type='text' name='smtp_host' value='"+smtp_host+"' style='width:100%'/></div>\
+					</div>\
+					<div class='line'>\
+						<span class='tname'>SMTP安全</span>\
+						<div class='info-r checkbox'>\
+							<label><input name='smtp_ssl' type='radio' value='' style='margin-right: 4px;' "+smtp_ssl_no+">None</label>\
+							<label><input name='smtp_ssl' type='radio' value='ssl' style='margin-right: 4px;' "+smtp_ssl_yes+">SSL</label>\
+						</div>\
+					</div>\
+					<div class='line'>\
+						<span class='tname'>SMTP端口</span>\
+						<div class='info-r'><input class='bt-input-text' type='text' name='smtp_port' value='"+smtp_port+"' style='width:100%' /></div>\
+					</div>\
+					<div class='line'>\
+						<span class='tname'>用户名</span>\
+						<div class='info-r'><input class='bt-input-text' type='text' name='username' value='"+username+"' style='width:100%' autocomplete='off'/></div>\
+					</div>\
+					<div class='line'>\
+						<span class='tname'>授权码</span>\
+						<div class='info-r'><input class='bt-input-text' type='password' name='password' value='"+password+"' style='width:100%' autocomplete='off'/></div>\
+					</div>\
+					<div class='line'>\
+						<span class='tname'>发送地址</span>\
+						<div class='info-r'><input class='bt-input-text' type='text' name='to_mail_addr' value='"+to_mail_addr+"' style='width:100%' autocomplete='off'/></div>\
+					</div>\
+					<div class='line'>\
+						<span class='tname'>验证测试</span>\
+						<div class='info-r'>\
+							<textarea class='bt-input-text' name='mail_test' style='width:100%; height: 80px; line-height: 20px; padding: 5px 8px;'>验证测试</textarea></div>\
+					</div>\
+				</div>",
+			yes:function(index){
+				var pdata = {};
+				pdata['smtp_host'] = $('input[name="smtp_host"]').val();
+				pdata['smtp_port'] = $('input[name="smtp_port"]').val();
+				pdata['smtp_ssl'] = $('input[name="smtp_ssl"]:checked').val();
+				pdata['username'] = $('input[name="username"]').val();
+				pdata['password'] = $('input[name="password"]').val();
+				pdata['to_mail_addr'] = $('input[name="to_mail_addr"]').val();
+
+				if (pdata['smtp_host'] == ''){
+					layer.msg('SMTP服务器不能为空!', {icon:2});
+					return false;
+				}
+
+				if (pdata['smtp_port'] == ''){
+					layer.msg('SMTP端口不能为空!', {icon:2});
+					return false;
+				}
+
+				if (pdata['username'] == ''){
+					layer.msg('用户名不能为空!', {icon:2});
+					return false;
+				}
+
+				if (pdata['password'] == ''){
+					layer.msg('授权码不能为空!', {icon:2});
+					return false;
+				}
+
+				if (pdata['to_mail_addr'] == ''){
+					layer.msg('发送地址不能为空!', {icon:2});
+					return false;
+				}
+
+				$.post('/config/set_notify',{'tag':'email', 'data':JSON.stringify(pdata)},function(rdata){
+					showMsg(rdata.msg, function(){
+						if (rdata.status){
+							layer.close(index);
+						}
+					},{icon:rdata.status?1:2},2000);
+				});
+			},
+
+			btn3:function(index){
+				var pdata = {};
+				pdata['smtp_host'] = $('input[name="smtp_host"]').val();
+				pdata['smtp_port'] = $('input[name="smtp_port"]').val();
+				pdata['smtp_ssl'] = $('input[name="smtp_ssl"]:checked').val();
+				pdata['username'] = $('input[name="username"]').val();
+				pdata['password'] = $('input[name="password"]').val();
+				pdata['to_mail_addr'] = $('input[name="to_mail_addr"]').val();
+				pdata['mail_test'] = $('textarea[name="mail_test"]').val();
+
+
+				if (pdata['smtp_host'] == ''){
+					layer.msg('SMTP服务器不能为空!', {icon:2});
+					return false;
+				}
+
+				if (pdata['smtp_port'] == ''){
+					layer.msg('SMTP端口不能为空!', {icon:2});
+					return false;
+				}
+
+				if (pdata['username'] == ''){
+					layer.msg('用户名不能为空!', {icon:2});
+					return false;
+				}
+
+				if (pdata['password'] == ''){
+					layer.msg('授权码不能为空!', {icon:2});
+					return false;
+				}
+
+				if (pdata['to_mail_addr'] == ''){
+					layer.msg('发送地址不能为空!', {icon:2});
+					return false;
+				}
+
+				if (pdata['mail_test'] == ''){
+					layer.msg('验证测试不能为空!', {icon:2});
+					return false;
+				}
+				$.post('/config/set_notify_test',{'tag':'email', 'data':JSON.stringify(pdata)},function(rdata){
 					showMsg(rdata.msg, function(){
 						if (rdata.status){
 							layer.close(index);
