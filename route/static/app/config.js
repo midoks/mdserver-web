@@ -86,6 +86,55 @@ $('input[name="bind_ssl"]').click(function(){
 /** op **/
 
 
+// VIP -- start
+function setVipInfo(){
+	layer.open({
+		type: 1,
+		area: "400px",
+		title: 'VIP登录',
+		closeBtn: 1,
+		shift: 5,
+		btn:["登录","关闭"],
+		shadeClose: false,
+		content: "<div class='bt-form pd20'>\
+				<div class='line'>\
+					<span class='tname'>用户名</span>\
+					<div class='info-r'><input class='bt-input-text' type='text' name='username' value='' style='width:85%' autocomplete='off'/></div>\
+				</div>\
+				<div class='line'>\
+					<span class='tname'>密码</span>\
+					<div class='info-r'><input class='bt-input-text' type='password' name='password' value='' style='width:85%' autocomplete='off'/></div>\
+				</div>\
+			</div>",
+		yes:function(index){
+			var pdata = {};
+
+			pdata['username'] = $('input[name="username"]').val();
+			pdata['password'] = $('input[name="password"]').val();
+
+			if (pdata['username'] == ''){
+				layer.msg('用户名不能为空!', {icon:2});
+				return false;
+			}
+
+			if (pdata['password'] == ''){
+				layer.msg('密码不能为空!', {icon:2});
+				return false;
+			}
+
+			$.post('/vip/login',{'username':pdata['username'], 'password':pdata['password']},function(rdata){
+				showMsg(rdata.msg, function(){
+					if (rdata.status){
+						layer.close(index);
+					}
+				},{icon:rdata.status?1:2},2000);
+			},'json');
+		},
+	});
+}
+// VIP -- end
+
+
 //关闭面板
 function closePanel(){
 	layer.confirm('关闭面板会导致您无法访问面板 ,您真的要关闭Linux面板吗？',{title:'关闭面板',closeBtn:2,icon:13,cancel:function(){
