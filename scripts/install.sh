@@ -90,7 +90,7 @@ if [ $OSNAME != "macos" ];then
 			rm -rf /tmp/mdserver-web-master
 		else
 			curl --insecure -sSLo /tmp/master.zip https://code.midoks.me/midoks/mdserver-web/archive/master.zip
-			mv -f /tmp/mdserver-we /www/server/mdserver-web
+			mv -f /tmp/mdserver-web /www/server/mdserver-web
 			rm -rf /tmp/master.zip
 			rm -rf /tmp/mdserver-web
 		fi
