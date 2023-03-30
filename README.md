@@ -99,12 +99,10 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.13.4
+### 版本更新 0.13.5
 
-无重大更新
-
-* 国内安装不在依赖gitee。
-* tgbot优化。
+* 添加邮件通知功能。
+* 修复初始安装脚本。
 
 ### JSDelivr安装地址
 
