@@ -14,6 +14,8 @@
 
 import mw
 
+from flask import request
+
 
 class vip_api:
 
@@ -21,4 +23,9 @@ class vip_api:
         pass
 
     def loginApi(self):
+        username = request.form.get('username', '')
+        password = request.form.get('password', '')
+
+        print(username, password)
+
         return mw.returnJson(False, "测试中!")
