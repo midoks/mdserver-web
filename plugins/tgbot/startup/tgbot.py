@@ -173,13 +173,6 @@ def botPushOther():
         time.sleep(1)
 
 
-def setDaemon(t):
-    if sys.version_info.major == 3 and sys.version_info.minor >= 10:
-        t.daemon = True
-    else:
-        t.setDaemon(True)
-
-
 def runBot(bot):
     try:
         bot.polling()

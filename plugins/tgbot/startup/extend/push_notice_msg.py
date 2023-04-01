@@ -77,6 +77,11 @@ def send_msg(bot, tag='ad', trigger_time=300):
 
     msg_notice = "由于在解决的问题的时候，不给信息，无法了解情况。以后不再群里回答技术问题。全部去论坛提问。在解决问题的过程中，可能需要面板信息，和SSH信息，如无法提供请不要提问。为了让群里都知晓。轮播一年！\n"
     msg_notice += "为了不打扰双方，私聊解决问题先转100U，否则无视!"
+    msg_notice += "现阶段3件事:\n"
+    msg_notice += "* 炒币\n"
+    msg_notice += "* 量化交易\n"
+    msg_notice += "* MW-VIP系统开发\n"
+    msg_notice += "至少1年时间都没空。非诚勿扰!"
     msg = bot.send_message(chat_id, msg_notice, reply_markup=markup)
 
     # print(msg.message_id)
