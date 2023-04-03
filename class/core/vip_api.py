@@ -28,4 +28,12 @@ class vip_api:
 
         print(username, password)
 
+        password = mw.aesEncrypt(
+            password, 'ABCDEFGHIJKLMNOP', '0102030405060708')
+
+        print(password)
+
+        p = mw.aesDecrypt(password, 'ABCDEFGHIJKLMNOP', '0102030405060708')
+        print(p)
+
         return mw.returnJson(False, "测试中!")
