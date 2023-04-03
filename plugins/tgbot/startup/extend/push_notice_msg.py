@@ -47,7 +47,7 @@ def send_msg(bot, tag='ad', trigger_time=300):
     keyboard = [
         [
             types.InlineKeyboardButton(
-                text="高防服务器CDN请联系玥玥", url='https://t.me/CDNYUEYUE')
+                text="海外服务器高防CDN请联系玥玥", url='https://t.me/CDNYUEYUE')
         ],
         [
             types.InlineKeyboardButton(
