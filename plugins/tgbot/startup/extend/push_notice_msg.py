@@ -43,7 +43,12 @@ def send_msg(bot, tag='ad', trigger_time=300):
     # https://t.me/gjgzs2022 ｜ 19/m
     # ♻️CMS导航网♻️/💰流量变现💰 ｜ 28/m
     # CK资源采集 ｜29/m
+    # 高防服务器CDN请联系玥玥 ｜3/m
     keyboard = [
+        [
+            types.InlineKeyboardButton(
+                text="高防服务器CDN请联系玥玥", url='https://t.me/CDNYUEYUE')
+        ],
         [
             types.InlineKeyboardButton(
                 text="CK资源采集", url='https://ckzy1.com/')
