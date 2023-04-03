@@ -23,10 +23,12 @@ import shlex
 import datetime
 import subprocess
 import glob
-
+import base64
 import re
-import db
+
 from random import Random
+
+import db
 
 
 def execShell(cmdstring, cwd=None, timeout=None, shell=True):
@@ -774,6 +776,133 @@ def deDoubleCrypt(key, strings):
     except:
         writeFileLog(getTracebackInfo())
         return strings
+
+
+def aesEncrypt(data, key='ABCDEFGHIJKLMNOP', vi='0102030405060708'):
+    # aes加密
+    # @param data 被加密的数据
+    # @param key 加解密密匙 16位
+    # @param vi 16位
+
+    from cryptography.hazmat.primitives import padding
+    from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+    from cryptography.hazmat.backends import default_backend
+
+    if not isinstance(data, bytes):
+        data = data.encode()
+
+    # AES_CBC_KEY = os.urandom(32)
+    # AES_CBC_IV = os.urandom(16)
+
+    AES_CBC_KEY = key.encode()
+    AES_CBC_IV = vi.encode()
+
+    # print("AES_CBC_KEY:", AES_CBC_KEY)
+    # print("AES_CBC_IV:", AES_CBC_IV)
+
+    padder = padding.PKCS7(algorithms.AES.block_size).padder()
+    padded_data = padder.update(data) + padder.finalize()
+
+    cipher = Cipher(algorithms.AES(AES_CBC_KEY),
+                    modes.CBC(AES_CBC_IV),
+                    backend=default_backend())
+    encryptor = cipher.encryptor()
+
+    edata = encryptor.update(padded_data)
+
+    # print(edata)
+    # print(str(edata))
+    # print(edata.decode())
+    return edata
+
+
+def aesDecrypt(data, key='ABCDEFGHIJKLMNOP', vi='0102030405060708'):
+    # aes加密
+    # @param data 被解密的数据
+    # @param key 加解密密匙 16位
+    # @param vi 16位
+
+    from cryptography.hazmat.primitives import padding
+    from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+    from cryptography.hazmat.backends import default_backend
+
+    from cryptography.hazmat.primitives import padding
+    from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+    from cryptography.hazmat.backends import default_backend
+
+    if not isinstance(data, bytes):
+        data = data.encode()
+
+    AES_CBC_KEY = key.encode()
+    AES_CBC_IV = vi.encode()
+
+    cipher = Cipher(algorithms.AES(AES_CBC_KEY),
+                    modes.CBC(AES_CBC_IV),
+                    backend=default_backend())
+    decryptor = cipher.decryptor()
+
+    ddata = decryptor.update(data)
+
+    unpadder = padding.PKCS7(algorithms.AES.block_size).unpadder()
+    data = unpadder.update(ddata)
+
+    try:
+        uppadded_data = data + unpadder.finalize()
+    except ValueError:
+        raise Exception('无效的加密信息!')
+
+    return uppadded_data
+
+
+def aesEncrypt_Crypto(data, key, vi):
+    # 该方法保留，暂时不使用
+    # aes加密
+    # @param data 被加密的数据
+    # @param key 加解密密匙 16位
+    # @param vi 16位
+
+    from Crypto.Cipher import AES
+    cryptor = AES.new(key.encode('utf8'), AES.MODE_CBC, vi.encode('utf8'))
+    # 判断是否含有中文
+    zhmodel = re.compile(u'[\u4e00-\u9fff]')
+    match = zhmodel.search(data)
+    if match == None:
+        # 无中文时
+        add = 16 - len(data) % 16
+        pad = lambda s: s + add * chr(add)
+        data = pad(data)
+        enctext = cryptor.encrypt(data.encode('utf8'))
+    else:
+        # 含有中文时
+        data = data.encode()
+        add = 16 - len(data) % 16
+        data = data + add * (chr(add)).encode()
+        enctext = cryptor.encrypt(data)
+    encodestrs = base64.b64encode(enctext).decode('utf8')
+    return encodestrs
+
+
+def aesDecrypt_Crypto(data, key, vi):
+    # 该方法保留，暂时不使用
+    # aes加密
+    # @param data 被加密的数据
+    # @param key 加解密密匙 16位
+    # @param vi 16位
+
+    from crypto.Cipher import AES
+    data = data.encode('utf8')
+    encodebytes = base64.urlsafe_b64decode(data)
+    cipher = AES.new(key.encode('utf8'), AES.MODE_CBC, vi.encode('utf8'))
+    text_decrypted = cipher.decrypt(encodebytes)
+    # 判断是否含有中文
+    zhmodel = re.compile(u'[\u4e00-\u9fff]')
+    match = zhmodel.search(text_decrypted)
+    if match == False:
+        # 无中文时补位
+        unpad = lambda s: s[0:-s[-1]]
+        text_decrypted = unpad(text_decrypted)
+    text_decrypted = text_decrypted.decode('utf8').rstrip()  # 去掉补位的右侧空格
+    return text_decrypted
 
 
 def buildSoftLink(src, dst, force=False):

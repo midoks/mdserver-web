@@ -548,7 +548,7 @@ def index(reqClass=None, reqAction=None, reqData=None):
 
     # API请求
     classFile = ('config_api', 'crontab_api', 'files_api', 'firewall_api',
-                 'plugins_api', 'system_api', 'site_api', 'task_api')
+                 'plugins_api', 'system_api', 'site_api', 'task_api', 'vip_api')
     className = reqClass + '_api'
     if not className in classFile:
         return "api error request"
