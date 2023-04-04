@@ -26,14 +26,14 @@ class vip_api:
         username = request.form.get('username', '')
         password = request.form.get('password', '')
 
-        print(username, password)
+        # print(username, password)
 
         password = mw.aesEncrypt(
             password, 'ABCDEFGHIJKLMNOP', '0102030405060708')
 
-        print(password)
+        print("pwd:", str(password))
 
         p = mw.aesDecrypt(password, 'ABCDEFGHIJKLMNOP', '0102030405060708')
-        print(p)
+        print("d:", p)
 
         return mw.returnJson(False, "测试中!")
