@@ -27,7 +27,7 @@ sys_start()
     if [ "$isStart" == '' ];then
         echo -e "Starting system_safe service... \c"
         cd $rootPath/mdserver-web
-        nohup python3 plugins/system_safe/index.py bg_start &> $mw_path/service.log &
+        nohup python3 plugins/system_safe/system_safe.py bg_start &> $mw_path/service.log &
         sleep 0.5
         isStart=$(ps aux |grep -E "(system_safe)"|grep -v grep|awk '{print $2}'|xargs)
         if [ "$isStart" == '' ];then
@@ -54,7 +54,7 @@ sys_stop()
         kill -9 $p
     done
     cd $rootPath/mdserver-web
-    python3 plugins/system_safe/index.py bg_stop
+    python3 plugins/system_safe/system_safe.py bg_stop
     echo -e "\033[32mdone\033[0m"
 }
 
