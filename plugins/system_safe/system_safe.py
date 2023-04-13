@@ -155,7 +155,7 @@ class App:
 
     def status(self):
         data = mw.execShell(
-            'ps -ef|grep "system_safe/index.py bg_start" | grep -v grep | awk \'{print $2}\'')
+            'ps -ef|grep "system_safe/system_safe.py bg_start" | grep -v grep | awk \'{print $2}\'')
         if data[0] == '':
             return 'stop'
         return 'start'
