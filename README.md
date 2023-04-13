@@ -99,10 +99,9 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.13.6
+### 版本更新 0.14.0
 
-* 修复初始化安装，缺少解压命令。
-* 加入aes加密/解密方法。
+* 加入系统加固插件。
 
 ### JSDelivr安装地址
 
@@ -129,14 +128,14 @@ wget --no-check-certificate -O uninstall.sh https://cdn.jsdelivr.net/gh/midoks/m
 - 初始安装
 
 ```
-curl --insecure -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/install.sh | bash
-curl --insecure -fsSL  https://gitee.com/midoks/mdserver-web/raw/master/scripts/install.sh | bash
+curl --insecure -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/install.sh | bash
+curl --insecure -fsSL https://code.midoks.me/midoks/mdserver-web/raw/branch/master/scripts/install.sh | bash
 ```
 
 - 直接更新
 
 ```
-curl --insecure -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/update.sh | bash
+curl --insecure -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/master/scripts/update.sh | bash
 ```
 
 - 卸载脚本

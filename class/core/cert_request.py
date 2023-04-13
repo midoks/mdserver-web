@@ -916,7 +916,7 @@ class cert_request:
         try:
             result = {}
             x509 = OpenSSL.crypto.load_certificate(
-                OpenSSL.crypto.FILETYPE_PEM, public.readFile(pem_file))
+                OpenSSL.crypto.FILETYPE_PEM, mw.readFile(pem_file))
             # 取产品名称
             issuer = x509.get_issuer()
             result['issuer'] = ''
@@ -1186,16 +1186,16 @@ fullchain.pem       粘贴到证书输入框
     # 获取当前正在使用此证书的网站目录
     def getSslUsedSite(self, save_path):
         pkey_file = '{}/privkey.pem'.format(save_path)
-        pkey = public.readFile(pkey_file)
+        pkey = mw.readFile(pkey_file)
         if not pkey:
             return False
         cert_paths = 'vhost/cert'
         import panelSite
-        args = public.dict_obj()
+        args = mw.dict_obj()
         args.siteName = ''
         for c_name in os.listdir(cert_paths):
             skey_file = '{}/{}/privkey.pem'.format(cert_paths, c_name)
-            skey = public.readFile(skey_file)
+            skey = mw.readFile(skey_file)
             if not skey:
                 continue
             if skey == pkey:
@@ -1203,7 +1203,7 @@ fullchain.pem       粘贴到证书输入框
                 run_path = panelSite.panelSite().GetRunPath(args)
                 if not run_path:
                     continue
-                sitePath = public.M('sites').where(
+                sitePath = mw.M('sites').where(
                     'name=?', c_name).getField('path')
                 if not sitePath:
                     continue
@@ -1221,7 +1221,7 @@ fullchain.pem       粘贴到证书输入框
             self.__config['orders'] = {}
         import panelSite
         siteObj = panelSite.panelSite()
-        args = public.dict_obj()
+        args = mw.dict_obj()
         for siteName in os.listdir(cert_path):
             try:
                 cert_file = '{}/{}/fullchain.pem'.format(cert_path, siteName)

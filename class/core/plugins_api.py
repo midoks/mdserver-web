@@ -1016,8 +1016,11 @@ class plugins_api:
 
     # shell 调用
     def run(self, name, func, version='', args='', script='index'):
-        path = self.__plugin_dir + \
-            '/' + name + '/' + script + '.py'
+
+        path = self.__plugin_dir + '/' + name + '/' + script + '.py'
+        if not os.path.exists(path):
+            path = self.__plugin_dir + '/' + name + '/' + name + '.py'
+
         py = 'python3 ' + path
 
         if args == '':

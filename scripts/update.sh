@@ -65,23 +65,27 @@ if [ "$?" != "0" ];then
 fi
 
 
-if [ "$LOCAL_ADDR" != "common" ];then
-	curl --insecure -sSLo /tmp/master.zip https://code.midoks.me/midoks/mdserver-web/archive/master.zip
-else
-	curl --insecure -sSLo /tmp/master.zip https://codeload.github.com/midoks/mdserver-web/zip/master
-fi
-
-
-cd /tmp && unzip /tmp/master.zip
-
 CP_CMD=/usr/bin/cp
 if [ -f /bin/cp ];then
 		CP_CMD=/bin/cp
 fi
-$CP_CMD -rf /tmp/mdserver-web-master/* /www/server/mdserver-web
 
-rm -rf /tmp/master.zip
-rm -rf /tmp/mdserver-web-master
+if [ "$LOCAL_ADDR" != "common" ];then
+	curl --insecure -sSLo /tmp/master.zip https://code.midoks.me/midoks/mdserver-web/archive/master.zip
+	cd /tmp && unzip /tmp/master.zip
+
+	$CP_CMD -rf /tmp/mdserver-web/* /www/server/mdserver-web
+	rm -rf /tmp/master.zip
+	rm -rf /tmp/mdserver-web
+else
+	curl --insecure -sSLo /tmp/master.zip https://codeload.github.com/midoks/mdserver-web/zip/master
+
+	cd /tmp && unzip /tmp/master.zip
+	$CP_CMD -rf /tmp/mdserver-web-master/* /www/server/mdserver-web
+	rm -rf /tmp/master.zip
+	rm -rf /tmp/mdserver-web-master
+fi
+
 
 #pip uninstall public
 echo "use system version: ${OSNAME}"

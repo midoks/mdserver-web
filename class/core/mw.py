@@ -1910,7 +1910,7 @@ def emailNotifyMessage(data):
 
 
 def emailNotifyTest(data):
-    print(data)
+    # print(data)
     data['subject'] = 'MW通知测试'
     data['content'] = data['mail_test']
     return emailNotifyMessage(data)

@@ -63,23 +63,28 @@ if [ "$?" != "0" ];then
 	HTTP_PREFIX="https://ghproxy.com/"
 fi
 
-if [ "$LOCAL_ADDR" != "common" ];then
-	curl --insecure -sSLo /tmp/dev.zip https://code.midoks.me/midoks/mdserver-web/archive/dev.zip
-else
-	curl --insecure -sSLo /tmp/dev.zip https://github.com/midoks/mdserver-web/archive/refs/heads/dev.zip
+CP_CMD=/usr/bin/cp
+if [ -f /bin/cp ];then
+		CP_CMD=/bin/cp
 fi
-
-# wget -O /tmp/dev.zip https://github.com/midoks/mdserver-web/archive/refs/heads/dev.zip
-cd /tmp && unzip /tmp/dev.zip
 
 echo "update mdserver-web code start"
-if [ -f /usr/bin/cp ];then
-	/usr/bin/cp -rf /tmp/mdserver-web-dev/* /www/server/mdserver-web
-elif [ -f /bin/cp ];then
-	/bin/cp -rf /tmp/mdserver-web-dev/* /www/server/mdserver-web
+
+if [ "$LOCAL_ADDR" != "common" ];then
+	curl --insecure -sSLo /tmp/dev.zip https://code.midoks.me/midoks/mdserver-web/archive/dev.zip
+	cd /tmp && unzip /tmp/dev.zip
+
+	$CP_CMD -rf /tmp/mdserver-web/* /www/server/mdserver-web
+	rm -rf /tmp/master.zip
+	rm -rf /tmp/mdserver-web
 else
-	/usr/bin/cp -rf /tmp/mdserver-web-dev/* /www/server/mdserver-web
+	curl --insecure -sSLo /tmp/dev.zip https://github.com/midoks/mdserver-web/archive/refs/heads/dev.zip
+	cd /tmp && unzip /tmp/dev.zip
+	$CP_CMD -rf /tmp/mdserver-web-dev/* /www/server/mdserver-web
+	rm -rf /tmp/dev.zip
+	rm -rf /tmp/mdserver-web-dev
 fi
+
 echo "update mdserver-web code end"
 
 rm -rf /tmp/dev.zip
