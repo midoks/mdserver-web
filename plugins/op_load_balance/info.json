@@ -1,0 +1,16 @@
+{
+	"title":"OP负载均衡",
+	"tip":"soft",
+	"name":"op_load_balance",
+	"type":"其他插件",
+	"install_pre_inspection":true,
+	"ps":"基于OpenResty的负载均衡",
+	"shell":"install.sh",
+	"checks":"server/op_load_balance",
+	"path":"server/op_load_balance",
+	"author":"midoks",
+	"home":"https://github.com/midoks",
+	"date":"2023-02-02",
+	"pid": "1",
+	"versions": ["1.0"]
+}
