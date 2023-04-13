@@ -1,0 +1,24 @@
+<div class="bt-form">
+	<div class="bt-w-main">
+		<div class="bt-w-menu">
+			<p class="bgw" onclick="pluginService('system_safe');">服务</p>
+			<p onclick="pluginInitD('system_safe');">自启动</p>
+			<p onclick="ssConfigList();">防护配置</p>
+			<p onclick="ssLockAddress();">封锁IP</p>
+			<p onclick="ssLogAudit();">日志审计</p>
+			<p onclick="ssOpLog();">操作日志</p>
+		</div>
+		<div class="bt-w-con pd15">
+			<div class="soft-man-con"></div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript" src="/plugins/file?name=system_safe&f=js/app.js"></script>
+<script type="text/javascript">
+resetPluginWinWidth(800);
+resetPluginWinHeight(500);
+$.getScript("/plugins/file?name=system_safe&f=js/app.js", function(){
+	pluginService('system_safe');
+});
+</script>
