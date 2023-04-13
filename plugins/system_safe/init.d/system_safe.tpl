@@ -23,7 +23,7 @@ fi
 
 sys_start()
 {
-    isStart=$(ps aux |grep -E "(system_safe)"|grep -v grep|grep -v '/bin/bash'|grep -v 'system_safe/index.py start' | grep -v 'system_safe/index.py reload' | grep -v 'system_safe/index.py restart' | grep -v systemctl | grep -v '/bin/sh' | awk '{print $2}'|xargs)
+    isStart=$(ps aux |grep -E "(system_safe)"|grep -v grep|grep -v '/bin/bash'|grep -v 'system_safe/system_safe.py start' | grep -v 'system_safe/system_safe.py reload' | grep -v 'system_safe/system_safe.py restart' | grep -v systemctl | grep -v '/bin/sh' | awk '{print $2}'|xargs)
     if [ "$isStart" == '' ];then
         echo -e "Starting system_safe service... \c"
         cd $rootPath/mdserver-web
@@ -47,7 +47,7 @@ sys_start()
 sys_stop()
 {
     echo -e "Stopping system_safe service... \c";
-    pids=$(ps aux |grep -E "(system_safe)"|grep -v grep|grep -v '/bin/bash'|grep -v systemctl | grep -v 'system_safe/index.py bg_stop'|grep -v 'system_safe/index.py stop' | grep -v 'system_safe/index.py reload' | grep -v 'system_safe/index.py restart' |awk '{print $2}'|xargs)
+    pids=$(ps aux |grep -E "(system_safe)"|grep -v grep|grep -v '/bin/bash'|grep -v systemctl | grep -v 'system_safe/system_safe.py bg_stop'|grep -v 'system_safe/system_safe.py stop' | grep -v 'system_safe/system_safe.py reload' | grep -v 'system_safe/system_safe.py restart' |awk '{print $2}'|xargs)
     arr=($pids)
     for p in ${arr[@]}
     do
