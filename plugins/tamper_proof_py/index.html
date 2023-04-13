@@ -1,0 +1,1163 @@
+<style>
+/*防篡改*/
+.anti-switch {
+    margin-left: 20px;
+    margin-top: 4px;
+}
+
+.anti_lib_tit {
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: #ddd 1px solid;
+}
+
+.anti_lib_con {
+    background-color: #FBFBFB;
+    border: #F0F0F0 1px solid;
+    padding: 15px 10px;
+}
+
+.anti_rule_add {
+    margin-bottom: 10px;
+}
+
+.anti_rule_add input {
+    width: 360px;
+}
+
+.data-count-all {
+    background-color: #FAFAFA;
+    border: #ddd 1px solid;
+    width: 100%;
+    float: left;
+}
+
+.data-count-all .data-count-box {
+    height: 100%;
+    text-align: center;
+    width: 20%;
+    float: left;
+    margin-bottom: 15px;
+}
+
+.data-count-box .dname {
+  color: #78797D;
+  margin-top: 12px;
+  margin-bottom: 10px;
+}
+
+.data-count-box .dval {
+    color: #333;
+}
+
+.data-count-box .dval span {
+    font-family: arial;
+    color: #121313;
+    font-size: 20px;
+}
+
+.anti_rule_list_type {
+    float: left;
+    width: 45%;
+}
+
+.anti_rule_list {
+    width: 100%;
+    float: left;
+    margin-bottom: 20px;
+}
+
+.search-day {
+    height: 32px;
+    margin-left: 1px;
+}
+
+.search-day span {
+    float: left;
+    height: 32px;
+    line-height: 30px;
+    border: #ddd 1px solid;
+    padding: 0 20px;
+    margin-left: -1px;
+    cursor: pointer;
+    position: relative;
+}
+
+.search-day span.cur {
+    background-color: #20a53a;
+    color: #fff;
+}
+
+.search-day span.cur input,
+.search-day span.cur em {
+    color: #666;
+}
+
+.search-day span:last-child {
+    padding: 0;
+}
+
+.search-day span input {
+    border: 0 none;
+    height: 30px;
+    padding: 0 10px;
+    width: 105px;
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAHBAMAAADOnLEXAAAAA3NCSVQICAjb4U/gAAAAElBMVEX////v7++oqKiSkpJgYGAzMzNVUvUKAAAABnRSTlMA//////96eeD+AAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAFnRFWHRDcmVhdGlvbiBUaW1lADA3LzEzLzE442/mwwAAABx0RVh0U29mdHdhcmUAQWRvYmUgRmlyZXdvcmtzIENTNui8sowAAAApSURBVAiZYxBiAAJFBhEDBgZmRwbmYAYGUwMQBrGAXBAHyAVxgFwgBwBYpgOoNMjLNgAAAABJRU5ErkJggg==");
+    background-repeat: no-repeat;
+    background-position: 86px center;
+}
+
+.search-day span input:active {
+    border: 0 none;
+}
+
+.search-day span.cur input {
+    color: #fff;
+    background-color: #20a53a;
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAHBAMAAADOnLEXAAAAA3NCSVQICAjb4U/gAAAAElBMVEX////f8+Pg8+Sx2LghpTsgpTp3yIRgAAAACXBIWXMAAA6cAAAOnAEHlFPdAAAAFnRFWHRDcmVhdGlvbiBUaW1lADA3LzEzLzE442/mwwAAABx0RVh0U29mdHdhcmUAQWRvYmUgRmlyZXdvcmtzIENTNui8sowAAAAxSURBVAiZY1B2DQ0NNWJQMA0NDWZkCGYODTUwZQBiIIshNJjZwBRIhRoAhYFUMFARAPlECn96zZKZAAAAAElFTkSuQmCC");
+}
+
+.total-all{
+    overflow: hidden;
+}
+
+.anti-open {
+    position: absolute;
+    top: 16px;
+    left: 300px;
+    line-height: 32px;
+}
+
+.bt-w-main {
+    height: 610px;
+}
+
+.nowrap_block {
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+[name="status"] option{
+    padding: 5px;
+}
+/* 模拟攻击 */
+.mtl0 {
+	margin-top: 0;
+	margin-left: 15px;
+}
+/* end */
+</style>
+<div class="bt-form">
+  <div class="bt-w-main">
+    <div class="pd15">
+      <div class="anti-tamper-con"></div>
+    </div>
+  </div>
+</div>
+<script type="text/javascript">
+
+var siteList = [];
+$('.layui-layer-page').css({'width': '800px','height':'500px'});
+$(".bt-w-menu p").click(function () {
+    $(this).addClass('bgw').siblings().removeClass('bgw');
+});
+
+$('.bt-w-main').on('click', '.simulated_attacks_btn', function () {
+    var isEdit = false;
+    layer.open({
+        type: 1,
+        title: '模拟攻击',
+        area: '600px',
+        closeBtn: 2,
+        content: '<div id="bt_waf_test_table" class="pd20 bt_table" style="padding-bottom:30px;">\
+            <div class="divtable" style="max-height:308px; border: 1px solid #ddd;">\
+              <table class="table table-hover" style="border: none;">\
+                <thead>\
+                  <tr>\
+                    <th width="300px"><span data-index="1"><span>模拟攻击网站列表</span></span></th>\
+                    <th width="80px" style="text-align:right"><span data-index="2"><span>操作</span></span></th>\
+                  </tr>\
+                </thead>\
+                <tbody id="waf_test_table_body"></tbody>\
+              </table>\
+            </div>\
+          </div>\
+          <ul class="mtl0 c7" style="font-size: 13px;position:relative;bottom:20px;padding-right: 40px;">\
+            <li style="list-style:inside disc;margin-top:5px" style="">此模拟攻击为:黑客进行SQL注入获取数据库权限.不会影响业务的正常运行</li>\
+            <li style="list-style:inside disc;margin-top:5px">如果你的IP在IP白名单中测试则无效果</li>\
+            <li style="list-style:inside disc;margin-top:5px">如需测试其他的网站可使用【http://网站域名/?id=/etc/passwd】进行攻击</li>\
+            <li style="list-style:inside disc;margin-top:5px">返回拦截信息则表示拦截成功,如发现未拦截,建议更新至最新版</li>\
+            <li style="list-style:inside disc;margin-top:5px">如有疑问请联系宝塔运维</li>\
+          </ul>',
+        success: function (index, layers) {
+            // bt.fixed_table('bt_waf_test_table table');
+            for (var i = 0; i < siteList.length; i++) {
+                var item = siteList[i];
+                $('#waf_test_table_body').append($('<tr>\
+                    <td>' + item.siteName +  '</td>\
+                    <td class="text-right"><a class="btlink defense" href="javascript:;">查看防护效果</a></td>\
+                </tr>').data({ data: item, index: i }));
+            }
+            $('#waf_test_table_body').on('click', '.defense', function () {
+                var data = $(this).parents('tr').data('data');
+                anti_tamper.sim_test({path: data.path}, function (res) {
+                    isEdit = true;
+                    layer.msg(res.msg,{icon:1});
+                });
+            });
+        },
+        cancel: function (index, layero) {
+            isEdit && anti_tamper.get_day();
+        }
+    });
+});
+
+//表格头固定
+function tableFixed(name) {
+    var tableName = document.querySelector('#' + name);
+    tableName.addEventListener('scroll', scrollHandle);
+}
+
+function scrollHandle(e) {
+    var scrollTop = this.scrollTop;
+    $(this).find("thead").css({"transform": "translateY(" + scrollTop + "px)","position": "relative","z-index": "1"});
+}
+
+function appPost(method,args,callback, msg = ''){
+    var _args = null; 
+    if (typeof(args) == 'string'){
+        _args = JSON.stringify(toArrayObject(args));
+    } else {
+        _args = JSON.stringify(args);
+    }
+
+    if (msg == ''){
+        msg = '正在获取...';
+    }
+
+    var loadT = layer.msg(msg, { icon: 16, time: 0, shade: 0.3 });
+    $.post('/plugins/run', {name:'tamper_proof_py', func:method, args:_args}, function(data) {
+        layer.close(loadT);
+        if (!data.status){
+            layer.msg(data.msg,{icon:0,time:2000,shade: [0.3, '#000']});
+            return;
+        }
+
+        if(typeof(callback) == 'function'){
+            callback(data);
+        }
+    },'json'); 
+}
+
+var anti_tamper = {
+speed_index: null,
+//查看面板运行日志
+get_run_logs: function () {
+    appPost('get_run_logs',{},function (rdata) {
+        var rdata = $.parseJSON(rdata.data);
+        if (!rdata.status) {
+            layer.msg(rdata.msg, { icon: 2 });
+            return;
+        };
+        layer.open({
+            type: 1,
+            title: '防篡改服务运行日志',
+            area: ['700px', '490px'],
+            shadeClose: false,
+            closeBtn: 2,
+            content: '<div class="setchmod bt-form pb70">'
+                + '<pre class="run-log" style="overflow: auto; border: 0px none; line-height:23px;padding: 15px; margin: 0px; white-space: pre-wrap; height: 405px; background-color: rgb(51,51,51);color:#f1f1f1;border-radius:0px;font-family: \"微软雅黑\"">' 
+                    + (rdata.msg == '' ? '当前日志为空' : rdata.msg) 
+                + '</pre>'
+                + '</div>'
+        });
+        setTimeout(function () {
+            $("#run-log").text(rdata.msg);
+            var div = document.getElementsByClassName('run-log')[0]
+            div.scrollTop = div.scrollHeight;
+        }, 200);
+    });
+},
+get_speed: function(){
+	// $.get('/plugin?action=a&s=get_speed&name=tamper_proof',function(result){
+	// 	if(!result['speed'] || result['speed'] == '>>>>>>>>>>END<<<<<<<<<<'){
+	// 		if(anti_tamper.speed_index){
+	// 			layer.close(anti_tamper.speed_index);
+	// 			anti_tamper.speed_index = null;
+	// 		}
+	// 		return
+	// 	}
+
+	// 	if(!anti_tamper.speed_index){
+	// 		anti_tamper.speed_index = layer.open({
+	// 			title: false,
+	// 			type: 1,
+	// 			closeBtn: 0,
+	// 			shade: 0.3,
+	// 			area: "500px",
+	// 			offset: "30%",
+	// 			content: "<pre style='margin-bottom: 0px;height:250px;text-align: left;background-color: #000;color: #fff;white-space: pre-wrap;' id='tamper_speed'></pre>"
+	// 		});
+	// 	}
+
+	// 	$("#tamper_speed").text(result['log']);
+	// 	setTimeout(function(){
+	// 		anti_tamper.get_speed();
+	// 	},1000)
+
+	// });
+},
+get_day: function () {
+    var con = '<div class="search-day">\
+        <span class="cur" onclick="anti_tamper.index(\'' + anti_tamper.getBeforeDate(0) + '\')">今日</span>\
+        <span onclick="anti_tamper.index(\'' + anti_tamper.getBeforeDate(1) +'\')">昨日</span>\
+        <span class="last-span">\
+            <input id="webdate-select" type="text" value="">\
+        </span>\
+        <div class="pull-right">\
+            <button class="btn btn-default btn-sm" onclick="anti_tamper.get_run_logs()">运行日志</button>\
+            <button style="margin-left: 5px;" class="btn btn-success btn-sm va0 simulated_attacks_btn">模拟攻击</button>\
+        </div>\
+    </div>\
+    <div class="total-all"></div>\
+    <div class="webDataStats-day"></div>';
+    
+    $(".anti-tamper-con").html(con);
+    anti_tamper.index();
+    $(".search-day span").not(".last-span").click(function () {
+        $(this).addClass("cur").siblings().removeClass("cur");
+    })
+
+    laydate.render({
+        elem: '#webdate-select',
+        value: new Date(),
+        max: 0,
+        done: function (value, date, endDate) {
+            anti_tamper.index(value);
+            $("#date-select").val(value);
+            $(".last-span").addClass("cur").siblings().removeClass("cur");
+        }
+    });
+},
+index: function (day) {
+    var _this = this;
+    $(".webDataStats-day").html("<div class='cloading' style='margin-top:120px'>加载中，请稍侯</div>");
+    appPost('get_index', {day:day}, function(rdata){
+        var rdata = $.parseJSON(rdata.data);
+        var rdata = rdata.data;
+        if (rdata === false) {
+            layer.closeAll();
+            layer.msg('当前插件未购买，请刷新列表后重试', {icon: 2});
+            return;
+        }
+        siteList = rdata.sites;
+        var serviceOpen = rdata.open ? 'checked' : '';
+        var siteBody = '';
+        var _day_total = 0;
+        var _day_create = 0;
+        var _day_delete = 0;
+        var _day_modify = 0;
+        var _day_move = 0;
+        for (var i = 0; i < rdata.sites.length; i++) {
+            var day_arr = rdata.sites[i].total;
+            var total = day_arr.site.total;
+            var dayTotal = day_arr.day.total;
+            var _sitename = rdata.sites[i].siteName;
+            $.each(day_arr.day, function (key, val) {
+                switch (key) {
+                    case 'total': _day_total += val;break;
+                    case 'create':_day_create += val;break;
+                    case 'delete':_day_delete += val;break;
+                    case 'modify':_day_modify += val;break;
+                    case 'move':_day_move += val;break;
+                }
+            });
+            siteBody += '<tr>\
+                <td><label><input type="checkbox" class="cust—checkbox-input" data-checkbox="'+ i +'"></label></td>\
+                <td><span class="nowrap_block" style="width:90px;" title="' + _sitename +'">' + _sitename + '</span></td>\
+                <td><span class="nowrap_block" style="width:200px;" title="' + _sitename +'">' + rdata.sites[i].path + '</span></td>\
+                <td><span title="创建：' + day_arr.site.create + '\n删除：' + day_arr.site.delete + '\n修改：' + day_arr.site.modify + '\n移动：' + day_arr.site.move + '">' + total + '</span></td>\
+                <td><span title="创建：' + day_arr.day.create + '\n删除：' + day_arr.day.delete +'\n修改：' + day_arr.day.modify + '\n移动：' + day_arr.day.move + '">' + dayTotal + '</span></td>\
+                <td>\
+                  <div class="pull-left">\
+                      <input class="btswitch btswitch-ios" id="close_anti_site_' + i +'" type="checkbox" ' + (rdata.sites[i].open ? 'checked' : '') + ' />\
+                      <label class="btswitch-btn" for="close_anti_site_' + i +'" onclick=\'anti_tamper.set_site_status("' + _sitename + '",' + (rdata.sites[i].open ? 1 : 0) +',' + i + ')\' style="width:2.0em;height:1.2em;margin-bottom:0"></label>\
+                    </div>\
+                  </td>\
+                <td>\
+                    <a onclick="anti_tamper.show_site_log(\'' + _sitename + '\')" class="btlink">日志</a> | \
+                    <a onclick="anti_tamper.site_exclude_path(\'' + _sitename + '\',\''+rdata.sites[i].path+'\')" class="btlink">排除</a> | \
+                    <a onclick="anti_tamper.site_tmaper_ext(\'' + _sitename + '\',\''+rdata.sites[i].path+'\')" class="btlink">保护</a>\
+                </td >\
+              </tr>';
+            }
+            var con = '<div class="anti-open">\
+              <span class="pull-left">防篡改开关</span>\
+              <div class="anti-switch pull-left">\
+                <input class="btswitch btswitch-ios" id="close_anti" type="checkbox" ' + serviceOpen + '>\
+                <label class="btswitch-btn" for="close_anti" onclick="anti_tamper.service_status()"></label>\
+              </div>\
+            </div>';
+
+            var con1 = '<div class="anti_rule_list anti_home_box">\
+                <div class="divtable bt_table">\
+                <div id="site_list_box" style="max-height:425px;overflow:auto;border:#ddd 1px solid">\
+                  <table class="table table-hover" style="border:none">\
+                    <thead>\
+                        <tr>\
+                        <th width="34px">\
+                            <span>\
+                                <label>\
+                                <input type="checkbox" class="cust—checkbox-input" data-checkbox="all"/>\
+                                </label>\
+                            </span>\
+                        </th>\
+                        <th>站点</th>\
+                        <th>监听目录</th>\
+                        <th>总次数</th>\
+                        <th>当日次数</th>\
+                        <th>状态</th>\
+                        <th width="120">操作</th>\
+                        </tr>\
+                    </thead>\
+                    <tbody>' + siteBody + '</tbody>\
+                  </table>\
+                </div>\
+                <div class="bt_batch mt10">\
+                    <label><input type="checkbox" class="cust—checkbox" data-checkbox="all"/></label>\
+                    <select class="bt-input-text mr5" name="status" disabled="disabled" style="height:28px;color: #666;" placeholder="请选择批量操作">\
+                        <option style="color: #b6b6b6;display:none;" disabled selected>请选择批量操作</option>\
+                        <option value="1">开启防篡改</option>\
+                        <option value="0">关闭防篡改</option>\
+                    </select>\
+                    <button class="btn btn-success btn-sm setBatchStatus" disabled="disabled">批量操作</button>\
+                </div>\
+                </div></div>\
+                <ul class="help-info-text c7">\
+                    <li>您可以通过【排除】按钮来编辑不受保护的目录名称，通过【保护】按钮来编辑受保护的文件类型</li>\
+                    <li>如果开启防篡改后您的网站出现异常，请尝试排除网站日志、缓存、临时文件、上传等目录后重试，或直接关闭异常网站防篡改功能</li>\
+                </ul>';
+            $(".total-all").html(con);
+            $('.webDataStats-day').html(con1);
+            tableFixed("site_list_box");
+
+            $('.anti_home_box .bt_table .cust—checkbox,.anti_home_box .bt_table .cust—checkbox-input').click(function(){
+                var checkbox = $(this).data('checkbox'),
+                length = $('#site_list_box tbody tr').length,
+                active = $(this).prop('checked');
+                if(checkbox == 'all'){
+                    if(active){
+                        $('.anti_home_box .cust—checkbox-input').prop('checked',true);
+                        $('.anti_home_box .cust—checkbox-input').addClass('active');
+                        $('.anti_home_box .setBatchStatus').removeAttr('disabled');
+                        $('.anti_home_box select[name="status"]').removeAttr('disabled');
+                    } else {
+                        $('.anti_home_box .cust—checkbox-input').prop('checked',false);
+                        $('.anti_home_box .cust—checkbox-input').removeClass('active');
+                        $('.anti_home_box .setBatchStatus').attr('disabled','disabled');
+                        $('.anti_home_box select[name="status"]').attr('disabled','disabled');
+                    }
+                } else {
+                    if(active){
+                        $(this).addClass('active');
+                        $('.anti_home_box .setBatchStatus,.anti_home_box [name="status"]').removeAttr('disabled');
+                    } else {
+                        $(this).removeClass('active');
+                    }
+                }
+                active_length = $('#site_list_box tbody tr .cust—checkbox-input.active').length;
+                if(active_length === length){
+                    $('.anti_home_box [data-checkbox="all"]').addClass('active');
+                } else if(active_length === 0) {
+                    $('.anti_home_box .setBatchStatus,.anti_home_box [name="status"]').attr('disabled','disabled');
+                } else {
+                    $('.anti_home_box [data-checkbox="all"]').removeClass('active');
+                }
+            });
+
+            $('.anti_home_box .setBatchStatus').click(function(){
+                var siteState = parseInt($('.anti_home_box [name="status"]').val());
+                var siteNames = [];
+
+                console.log(rdata['sites']);
+                $('#site_list_box tbody tr .cust—checkbox-input.active').each(function(){
+                    var i = $(this).data('checkbox');
+                    siteNames.push(rdata.sites[i].siteName);
+                });
+
+                if(isNaN(siteState)){
+                    layer.msg({status:false,msg:'请选择批量操作类型'});
+                    return false;
+                }
+
+                layer.confirm('批量'+ (siteState?'开启':'关闭') +'防篡改状态，该操作可能会存在风险，是否继续？',{
+                    title: "批量设置防篡改状态",
+                    icon: 3,
+                    closeBtn: 2,
+                    cancel: function () {
+                        if (status) {
+                            $("#close_anti").prop("checked", true);
+                        } else {
+                            $("#close_anti").prop("checked", false);
+                        }
+                    }
+                }, function () {
+                    _this.set_site_bath_status({siteState:siteState,siteNames:siteNames},function(res){
+                        layer.msg(res.msg, {icon: 1,time: 2000,shade: 0.3});
+                        anti_tamper.get_day();
+                    });
+                });
+            });
+    });
+},
+set_site_bath_status:function(config,fun){
+    var siteNames = [];
+    appPost('set_site_status_all', {siteNames:JSON.stringify(config.siteNames),siteState:config.siteState}, function(res){
+        var res = $.parseJSON(res.data);
+        setTimeout(function(){
+            anti_tamper.get_speed();
+        },1000);
+	
+        if(!res.status && typeof(res.msg)=== "string"){
+            layer.msg(res.msg, {icon: 1,time: 2000,shade: 0.3});
+            return false;
+        }
+
+        if(fun) {
+            fun(res);
+        }
+    },'正在设置站点防篡改状态，请稍侯...');
+},
+//控制服务状态，若服务状态(open)为关闭，则所有站点失去防篡改保护
+// start 启动
+// stop 停止
+// restart 重启
+service_status: function () {
+    var txt = "是否开启防篡改";
+    var status = $("#close_anti").prop("checked");
+    var _status = 'start';
+    if (status) {
+        txt = "是否关闭防篡改";
+        _status = "stop";
+    }
+
+    layer.confirm(txt, {title: "防篡改开关",icon: 3,closeBtn: 2, cancel: function () {
+            if (status) {
+                $("#close_anti").prop("checked", true);
+            } else {
+                $("#close_anti").prop("checked", false);
+            }
+        }
+    }, function () {
+        appPost('service_admin', {serviceStatus: _status}, function(rdata){
+            var rdata = $.parseJSON(rdata.data);
+            if (!rdata.status){
+                layer.msg(rdata.msg, {icon: 2,time: 2000,shade: 0.3});
+                $("#close_anti").prop("checked", false);
+                return;
+            }
+            layer.msg(rdata.msg, {icon: rdata.status ? 1 : 2});
+        },'正在设置防篡改总开关状态，请稍侯...');
+    },function(){
+        if (status) {
+            $("#close_anti").prop("checked", true);
+        } else {
+            $("#close_anti").prop("checked", false);
+        }
+    });
+},
+
+//站点状态控制
+//用于控制指定站点是否被保护,当open为False时，请求此接口将open改为True，反之为False
+set_site_status: function (siteName, _lock, index) {
+    // var txt = "是否开启站点备份模式，该模式将会消耗与站点同等大小的磁盘空间！";
+    var status = $("#close_anti_site_" + index).prop("checked");
+    var txt_status = {true:'关闭',false:'开启'};
+    var txt = "是否"+txt_status[status]+"站点["+ siteName +"],防篡改";
+    layer.confirm(txt,{title: "防篡改开关",icon: 3,closeBtn: 2,cancel: function () {
+            $("#close_anti_site_" + index).prop('checked', _lock === 1 ? true : false);
+        }
+    }, function () {
+        appPost('set_site_status', {siteName: siteName}, function(rdata){
+            var rdata = $.parseJSON(rdata.data);
+            anti_tamper.get_day();
+            layer.msg(rdata.msg, {icon: rdata.status ? 1 : 2});
+            // anti_tamper.get_speed();
+        },'正在设置站点防篡改状态，请稍侯...');
+    }, function () {
+        $("#close_anti_site_" + index).prop('checked', _lock === 1 ? true : false);
+    });
+},
+
+//显示站点防御日志
+show_site_log: function (siteName, day) {
+    var _this = this;
+    if (day != undefined) {
+        pdata['day'] = day;
+    }
+    appPost('get_safe_logs', {siteName: siteName,day: day}, function(rdata){
+        var rdata = $.parseJSON(rdata.data);
+        var rdata = rdata.data;
+
+        var selectLogDay = "";
+        var day = rdata[0];
+        for (var i = 0; i < rdata.days.length; i++) {
+            selectLogDay += '<option value="' + rdata.days[i] + '">' + rdata.days[i] + '</option>';
+        }
+
+        if (rdata.logs == "") {
+            layer.msg("暂无日志记录", {icon: 6,shade: 0.3,time: 1000});
+            return;
+        }
+        var con = '';
+        var logs_len = rdata.logs.length;
+        for (var i = 0; i < logs_len; i++) {
+            var txt = '';
+            switch (rdata.logs[i][1]) {
+                case 'create':txt = '创建';break;
+                case 'delete':txt = '删除';break;
+                case 'modify':txt = '修改';break;
+                case 'move':txt = '移动';break;
+            }
+            con += '<tr>\
+                <td>' + anti_tamper.timestampToTime(rdata.logs[i][0]) + '</td>\
+                <td>' + txt + '</td>\
+                <td>' + rdata.logs[i][2] + '</td>\
+                <td>防护成功</td>\
+            </tr>'
+        }
+        layer.open({
+            type: 1,
+            title: "日志【" + siteName + "】",
+            area: ['860px', '550px'],
+            closeBtn: 2,
+            shadeClose: false,
+            content: '<div class="lib-box pd15 lib-box-log">\
+    			<div class="lib-con-title" style="height:40px">\
+    				<select id="selectLogDay" class="bt-input-text" onchange="anti_tamper.show_site_log_con(\'' + siteName +'\',this.options[this.options.selectedIndex].value)">' + selectLogDay + '</select>\
+    				<button class="btn btn-success btn-sm va0 mb15 remove_logs mr5">清理日志</button>\
+    			</div>\
+    			<div class="lib-con">\
+    				<div class="divtable">\
+    					<div id="site_anti_log" style="max-height:400px;overflow:auto;border:#ddd 1px solid">\
+    					<table class="table table-hover" style="border:none;">\
+    						<thead><tr><th width="150">时间</th><th width="70">类型</th><th>文件</th><th>溯源日志</th><th width="80">状态</th></tr></thead>\
+    						<tbody id="LogDayCon"></tbody>\
+    					</table>\
+    					</div>\
+    					<p class="mtb10 c9" style="border: #ddd 1px solid;padding: 5px 8px;float: right;">共<span id="logs_len">' + logs_len + '</span>条记录</p>\
+    				</div>\
+    			</div>\
+    		</div>',
+            success: function () {
+                $('.remove_logs').click(function () {
+                    var select = $('#selectLogDay').val();
+                    var confirm = layer.confirm('是否清理&nbsp;[' + select + ']&nbsp;的日志？', {title: '提示',btn: ['确定', '取消'],icon: 0,closeBtn: 2}, function () {
+                        var loadT = layer.msg('正在清理日志，请稍候..', {
+                          icon: 16,
+                          time: 0
+                        });
+                        $.post('/plugin?action=a&s=ClearDayLog&name=tamper_proof', {
+                          siteName: siteName,
+                          day: select
+                        }, function (rdata) {
+                            layer.close(loadT);
+                            layer.msg(rdata.msg, {icon: rdata.status ? 1 : 2});
+                            if (rdata.status) {
+                                $('#LogDayCon').html('');
+                                $('#logs_len').html('0')
+                            }
+                        });
+                    });
+                });
+                $('#LogDayCon').on('click','.get_traceability_log', function(){
+                    var index = $(this).parents('tr').index()
+                    _this.get_traceability_log(siteName,_this.site_log_data[index])
+                });
+            }
+        });
+        anti_tamper.show_site_log_con(siteName, day);
+        tableFixed("site_anti_log");
+    });
+},
+// 站点日志列表
+site_log_data:[],
+
+show_site_log_con: function (siteName, day) {
+    var _this = this;
+    $("#site_waf_log").scrollTop(0);
+    appPost('get_safe_logs', {siteName: siteName,day: day}, function(rdata){
+        var rdata = $.parseJSON(rdata.data);
+        if (rdata.logs == "") {
+            layer.msg("暂无日志记录", {icon: 6,shade: 0.3,time: 1000});
+            return;
+        }
+        _this.site_log_data = rdata.logs;
+        var con = '';
+        var logs_len = rdata.logs.length;
+        for (var i = 0; i < logs_len; i++) {
+            var txt = '';
+            switch (rdata.logs[i][1]) {
+                case 'create':txt = '创建';break;
+                case 'delete':txt = '删除';break;
+                case 'modify':txt = '修改';break;
+                case 'move':txt = '移动';break;
+            }
+            con += '<tr>\
+    			<td>' + anti_tamper.timestampToTime(rdata.logs[i][0]) + '</td>\
+    			<td>' + txt + '</td>\
+    			<td>' + rdata.logs[i][2] + '</td>\
+    			<td>' + '<a class="btlink get_traceability_log">溯源日志</a>' + '</td>\
+    			<td >防护成功</td>\
+    		</tr>';
+        }
+        $("#LogDayCon").html(con);
+        $("#logs_len").text(logs_len);
+    });
+},
+//获取排除的目录
+site_exclude_path: function (siteName,path) {
+    var con ='<div class="pd15"><div class="anti_rule_add">\
+        <input style="display:none;" id="select-exclude" value="'+path+'" />\
+        <textarea id="input-exclude" class="bt-input-text mr5" type="rule" placeholder="排除目录或文件,每行一条" spellcheck="false" style="margin: 0px 5px -10px 0px; width: 449px; height: 68px; line-height: 18px;"></textarea>\
+        <span style="margin-right: 10px;position: fixed;top: 58px;" class="glyphicon glyphicon-folder-open cursor" onclick="changePath(\'input-exclude\')" title="点击选择文件或目录"></span>\
+        <button class="btn btn-default btn-sm va0" onclick=\'anti_tamper.add_exclude_path("' + siteName + '","'+path+'",this)\'>添加排除</button>\
+        </div>\
+        <div class="anti_rule_list rule_out_box">\
+			<div class="divtable bt_table">\
+				<div id="site_exclude_path" style="max-height:320px;overflow:auto;border:#ddd 1px solid">\
+                <table class="table table-hover" style="border:none">\
+                    <thead>\
+                    <tr>\
+                        <th width="34px">\
+                            <span><label><input type="checkbox" class="cust—checkbox-input" data-checkbox="all"/></label></span>\
+                        </th>\
+                        <th>名称或路径</th>\
+                        <th class="text-right">操作</th>\
+                    </tr>\
+					</thead>\
+				    <tbody id="site_exclude_path_con"></tbody>\
+				</table>\
+				</div>\
+                <div class="bt_batch mt10">\
+                <label>\
+                  <input type="checkbox" class="cust—checkbox-input" data-checkbox="all" />\
+                </label>\
+                <select class="bt-input-text mr5" name="status" disabled="disabled" style="height:28px;color: #666;" placeholder="请选择批量操作">\
+                  <option style="color: #b6b6b6;display:none;" disabled selected>请选择批量操作</option>\
+                  <option value="1">删除选中</option>\
+                </select>\
+                <button class="btn btn-success btn-sm setBatchStatus" disabled="disabled">批量操作</button>\
+            </div>\
+		</div>\
+		</div>\
+		<ul class="help-info-text c7">\
+			<li>在此列表中的目录或文件名将不受保护</li>\
+			<li>可以是目录或文件名称,也可以是完整绝对路径,如: cache或/tmp</li>\
+			<li>目录或文件名称在完全匹配的情况下生效,绝对路径则使用从左到右匹配成功时生效</li>\
+		</ul>\
+	</div>';
+    layer.open({
+        type: 1,
+        title: "排除文件或目录【" + siteName + "】",
+        area: ['600px', '605px'],
+        closeBtn: 2,
+        shadeClose: false,
+        content: con,
+        success:function(index,lay){
+            $("#select-exclude").change(function(){
+                var exclude = $("#input-exclude").val()
+                var select_exclude = $(this).val();
+                $(this).val(path);
+                if(exclude){
+                  exclude += select_exclude + "\n";
+                } else {
+                  exclude = select_exclude + "\n";
+                }
+    			$("#input-exclude").val(exclude);
+            }
+        )}
+    });
+    anti_tamper.site_exclude_path_post(siteName);
+    tableFixed("site_exclude_path");
+},
+
+site_exclude_path_post: function (siteName, callback) {
+    var that = this;
+    var pdata = {siteName: siteName};
+    appPost('get_site_find',pdata,function (rdata) {
+        var rdata = $.parseJSON(rdata.data);
+        var rdata = rdata.data;
+        var excludeBody = ''
+        for (var i = 0; i < rdata.excludePath.length; i++) {
+          excludeBody += '<tr>\
+                <td><label><input type="checkbox" class="cust—checkbox-input" data-checkbox="'+ i +'"></label></td>\
+                <td>' + rdata.excludePath[i] +'</td>\
+                <td class="text-right"><a href=\'javascript:anti_tamper.remove_exclude_path("' + siteName +'","' + rdata.excludePath[i] + '")\' class="btlink">删除</a></td>\
+                </tr>';
+        }
+        $("#site_exclude_path_con").html(excludeBody);
+        $('.rule_out_box .bt_table .cust—checkbox,.rule_out_box .bt_table .cust—checkbox-input').click(function(){
+            var checkbox = $(this).data('checkbox'),
+            length = $('#site_exclude_path tbody tr').length,
+            active = $(this).prop('checked');
+            if(checkbox == 'all'){
+                if(active){
+                    $('.rule_out_box .cust—checkbox-input').addClass('active').prop('checked',true);
+                    $('.rule_out_box .setBatchStatus,.rule_out_box select[name="status"]').removeAttr('disabled');
+                }else{
+                    $('.rule_out_box .cust—checkbox-input').removeClass('active').prop('checked',false);
+                    $('.rule_out_box .setBatchStatus,.rule_out_box select[name="status"]').attr('disabled','disabled');
+                }
+            }else{
+                if(active){
+                    $(this).addClass('active').prop('checked',true);
+                    $('.rule_out_box .setBatchStatus,.rule_out_box select[name="status"]').removeAttr('disabled');
+                }else{
+                    $(this).removeClass('active').prop('checked',false);
+                }
+            }
+            var active_length = $('#site_exclude_path tbody tr .cust—checkbox-input.active').length;
+            if(active_length === length){
+                $('.rule_out_box [data-checkbox="all"]').addClass('active');
+            } else if(active_length === 0){
+                $('.rule_out_box .setBatchStatus,.rule_out_box [name="status"]').attr('disabled','disabled');
+            } else {
+                $('.rule_out_box [data-checkbox="all"]').removeClass('active');
+            }
+        });
+        $('.rule_out_box .setBatchStatus').click(function(){
+            
+            var siteState = parseInt($('.rule_out_box [name="status"]').val());
+            var rules = [];
+
+            $('#site_exclude_path tbody tr .cust—checkbox-input.active').each(function(){
+                var i = $(this).data('checkbox');
+                rules.push(rdata.excludePath[i]);
+            });
+
+            if(isNaN(siteState)){
+                layer.msg({status:false,msg:'请选择批量操作类型'});
+                return false;
+            }
+            layer.confirm('批量删除选中的名称或路径，该操作可能会存在风险，是否继续？',{title: "批量删除",icon: 3,closeBtn: 2}, function () {
+                that.batch_del_rule_out({siteName:siteName,rule:rules.join(',')});
+            });
+        });
+        if (callback){
+            callback(rdata);
+        }
+    },'正在获取排除列表，请稍候..');
+},
+//显示受保护的文件类型
+site_tmaper_ext: function (siteName,path) {
+    var con ='<div class="pd15">\
+                <div class="anti_rule_add">\
+                    <input style="display:none;" id="select-safe" value="'+path+'" />\
+                    <textarea id="input-safe" class="bt-input-text mr5" type="rule" placeholder="受保护的文件或扩展名,每行一条" spellcheck="false" style="margin: 0px 5px -10px 0px; width: 449px; height: 68px; line-height: 18px;"></textarea>\
+                    <span style="margin-right: 10px;position: fixed;top: 58px;" class="glyphicon glyphicon-folder-open cursor" onclick="changePath(\'input-safe\')" title="点击选择文件"></span>\
+                    <button class="btn btn-default btn-sm va0" onclick=\'anti_tamper.add_protect_ext("' + siteName + '","' + path + '",this)\'>添加保护</button>\
+                </div>\
+            <div class="anti_rule_list rule_protect_box">\
+			<div class="divtable bt_table">\
+			<div id="site_exclude_path" style="max-height:320px;overflow:auto;border:#ddd 1px solid">\
+                <table class="table table-hover" style="border:none">\
+			    <thead>\
+                <tr>\
+                    <th width="34px"><span><label>\<input type="checkbox" class="cust—checkbox-input" data-checkbox="all"/></label></span></th>\
+                    <th>扩展名/文件名</th>\
+                    <th class="text-right">操作</th>\
+                </tr>\
+				</thead>\
+				<tbody id="site_exclude_path_con"></tbody>\
+                </table>\
+            </div>\
+            <div class="bt_batch mt10">\
+                <label>\
+                    <input type="checkbox" class="cust—checkbox-input" data-checkbox="all" />\
+                </label>\
+                <select class="bt-input-text mr5" name="status" disabled="disabled" style="height:28px;color: #666;" placeholder="请选择批量操作">\
+                    <option style="color: #b6b6b6;display:none;" disabled selected>请选择批量操作</option>\
+                    <option value="1">删除选中</option>\
+                </select>\
+                <button class="btn btn-success btn-sm setBatchStatus" disabled="disabled">批量操作</button>\
+            </div>\
+        </div>\
+        </div>\
+		<ul class="help-info-text c7">\
+			<li>可以是文件扩展名(如:php等)，也可以是文件名或文件全路径(如: /tmp/1.txt)</li>\
+			<li>一般添加常见容易被篡改的扩展名即可，如html,php,js等</li>\
+		</ul>\
+	</div>';
+    layer.open({
+        type: 1,
+        title: "保护配置【" + siteName + "】",
+        area: ['600px', '580px'],
+        closeBtn: 2,
+        shadeClose: false,
+        content: con,
+        success:function(index,lay){
+            $("#select-safe").change(function(){
+                var safe = $("#input-safe").val()
+                var select_safe = $(this).val();
+                $(this).val(path);
+                if(safe){
+                    safe += select_safe + "\n";
+                } else {
+                    safe = select_safe + "\n";
+                }
+                $("#input-safe").val(safe);
+            });
+        }
+    });
+    anti_tamper.site_tmaper_ext_post(siteName);
+    tableFixed("site_exclude_path");
+},
+
+site_tmaper_ext_post: function (siteName, callback) {
+    var that = this;
+    var pdata = {siteName: siteName};
+
+    appPost('get_site_find',pdata,function (rdata) {
+        var rdata = $.parseJSON(rdata.data);
+        var rdata = rdata.data;
+        var protectBody = ''
+        for (var i = 0; i < rdata.protectExt.length; i++) {
+          protectBody += '<tr><td><label><input type="checkbox" class="cust—checkbox-input" data-checkbox="'+ i +'"></label></td><td>' + rdata.protectExt[i] +
+            '</td><td class="text-right"><a href=\'javascript:anti_tamper.remove_protect_ext("' + siteName +
+            '","' + rdata.protectExt[i] + '")\' class="btlink">删除</a></td></tr>';
+        }
+        $("#site_exclude_path_con").html(protectBody);
+        $('.rule_protect_box .bt_table .cust—checkbox,.rule_protect_box .bt_table .cust—checkbox-input').click(function(){
+            var checkbox = $(this).data('checkbox'),
+            length = $('#site_exclude_path tbody tr').length,
+            active = $(this).prop('checked'),
+            active_length;
+            if(checkbox == 'all'){
+                if(active){
+                    $('.rule_protect_box .cust—checkbox-input').addClass('active').prop('checked',true);
+                    $('.rule_protect_box .setBatchStatus,.rule_protect_box [name="status"]').removeAttr('disabled');
+                }else{
+                    $('.rule_protect_box .cust—checkbox-input').removeClass('active').prop('checked',false);
+                    $('.rule_protect_box .setBatchStatus,.rule_protect_box [name="status"]').attr('disabled','disabled');
+                }
+            }else{
+                if(active){
+                    $(this).addClass('active').prop('checked',true);
+                    $('.rule_protect_box .setBatchStatus,.rule_protect_box [name="status"]').removeAttr('disabled');
+                }else{
+                    $(this).removeClass('active').prop('checked',false);
+                }
+            }
+            active_length = $('#site_exclude_path tbody tr .cust—checkbox-input.active').length;
+            if(active_length === length){
+                $('.rule_protect_box [data-checkbox="all"]').addClass('active');
+            }else if(active_length === 0){
+                $('.rule_protect_box .setBatchStatus,.rule_protect_box [name="status"]').attr('disabled','disabled');
+            }else{
+                $('.rule_protect_box [data-checkbox="all"]').removeClass('active');
+            }
+        });
+
+        $('.rule_protect_box .setBatchStatus').click(function(){
+            var siteState = parseInt($('.rule_protect_box [name="status"]').val());
+            var rules = [];
+            $('#site_exclude_path tbody tr .cust—checkbox-input.active').each(function(){
+                var i = $(this).data('checkbox');
+                rules.push(rdata.protectExt[i]);
+            });
+
+            if(isNaN(siteState)){
+                layer.msg({status:false,msg:'请选择批量操作类型'});
+                return false;
+            }
+
+            layer.confirm('批量删除选中的扩展名或文件名，该操作可能会存在风险，是否继续？',{title: "批量删除",icon: 3,closeBtn: 2}, function () {
+                that.batch_del_ext_name({siteName:siteName,rule:rules.join(',')});
+            });
+        });
+        if (callback) {
+            callback(rdata);
+        }
+    },'正在获取受保护列表，请稍候..');
+},
+
+// 批量删除排除规则 
+batch_del_rule_out:function(config){
+    appPost('remove_excloud',{siteName:config.siteName,excludePath:config.rule},function(res){
+        var res = $.parseJSON(res.data);
+        if(!res.status && typeof res.msg  === "string"){
+            layer.msg(res.msg, {icon: 1});
+            return false;
+        }
+        if(res.status){
+            anti_tamper.site_exclude_path_post(config.siteName)
+            layer.msg(res.msg, {icon: 1});
+        }
+    },'正在批量删除，请稍侯...');
+},
+//添加排除目录
+add_exclude_path: function (siteName, path, event) {
+    path = $("#input-exclude").val();
+    pdata = {siteName: siteName,excludePath: path};
+    appPost('add_excloud', pdata, function (rdata) {
+        var rdata = $.parseJSON(rdata.data);
+        if (rdata.status) {
+            $(event).prev().val('');
+            anti_tamper.site_exclude_path_post(siteName, function () {
+                layer.msg(rdata.msg, {icon: 1});
+            });
+        } else {
+            layer.msg(rdata.msg, {icon: 2});
+        }
+    },'正在添加排除目录，请稍候..');
+},
+//删除排除目录
+remove_exclude_path: function (siteName, path) {
+    pdata = {siteName: siteName,excludePath: path}
+    appPost('remove_excloud', pdata,  function (rdata) {
+        if (rdata.status) {
+            $(event).prev().val('');
+            anti_tamper.site_exclude_path_post(siteName, function () {
+                layer.msg(rdata.msg, {icon: 1});
+            });
+        } else {
+            layer.msg(rdata.msg, {icon: 2});
+        }
+    },'正在删除排除目录，请稍候..');
+},
+//添加受保护的文件类型
+add_protect_ext: function (siteName, ext, event) {
+    ext = $("#input-safe").val();
+    pdata = {siteName: siteName,protectExt: ext}
+    appPost('add_protect_ext',pdata, function (rdata) {
+        var rdata = $.parseJSON(rdata.data);
+        if (rdata.status) {
+            $(event).prev().val('');
+            anti_tamper.site_tmaper_ext_post(siteName, function () {
+                layer.msg(rdata.msg, {icon: 1});
+            });
+        } else {
+            layer.msg(rdata.msg, {icon: 2});
+        }
+    },'正在添加受保护文件或类型，请稍候..');
+},
+//删除受保护的文件类型
+remove_protect_ext: function (siteName, ext) {
+    pdata = {siteName: siteName,protectExt: ext};
+
+    appPost('remove_protect_ext',pdata, function (rdata) {
+        var rdata = $.parseJSON(rdata.data);
+        if (rdata.status) {
+            $(event).prev().val('');
+            anti_tamper.site_tmaper_ext_post(siteName, function () {
+                layer.msg(rdata.msg, {icon: 1});
+            });
+        } else {
+          layer.msg(rdata.msg, {icon: 2});
+        }
+    },'正在删除受保护文件类型，请稍候..');
+},
+// 批量删除保护扩展名/文件名
+batch_del_ext_name:function(config){
+    appPost('remove_protect_ext',{siteName:config.siteName,protectExt:config.rule},function(res){
+        var res = $.parseJSON(res.data);
+        if(!res.status && typeof res.msg  === "string"){
+          layer.msg(res.msg, {icon: 1});
+          return false;
+        }
+        if(res.status){
+          anti_tamper.site_tmaper_ext_post(config.siteName)
+          layer.msg(res.msg,{icon: 1});
+        }
+    },'正在批量删除，请稍侯...');
+},
+
+//获取溯源日志
+get_traceability_log:function(siteName,item){
+    layer.open({
+        type: 1,
+        title: '溯源日志['+ siteName +']',
+        area: '700px',
+        shadeClose: false,
+        closeBtn: 2,
+        content: '<div class="setchmod bt-form">'
+        + '<pre class="run-log" style="overflow: auto; border: 0px none; line-height:23px;padding: 15px; margin: 0px; white-space: pre-wrap; height: 405px; background-color: rgb(51,51,51);color:#f1f1f1;border-radius:0px;font-family: \"微软雅黑\"">' + (item[3].length == '' ? '当前日志为空' : item[3].join('\n')) + '</pre>'
+        + '</div>'
+    });
+},
+//取操作日志
+operation_log: function (p) {
+    if (p == undefined) p = 1;
+    var loadT = layer.msg('正在获取操作日志，请稍候..', {icon: 16,time: 0,shade: 0.3});
+    $.get('/plugin?action=a&s=get_logs&name=tamper_proof&tojs=anti_tamper.operation_log&p=' + p, function (rdata) {
+        layer.close(loadT);
+        var logBody = '';
+        for (var i = 0; i < rdata.data.length; i++) {
+          logBody += '<tr><td>' + rdata.data[i].addtime +
+            '</td><td><span style="width: 605px;" class="nowrap_block" title="' + rdata.data[i].log + '">' +
+            rdata.data[i].log + '</span></td></tr>'
+        }
+        var con = '<div class="anti_rule_list"><div class="divtable">\
+                            <table class="table table-hover">\
+                                <thead>\
+                                    <tr><th>时间</th><th>详情</th></tr>\
+                                </thead>\
+                                <tbody>' + logBody + '</tbody>\
+                            </table>\
+                        </div><div class="page" style="margin-top:15px">' + rdata.page + '</div</div>';
+        $('.anti-tamper-con').html(con);
+    });
+},
+// 模拟攻击
+sim_test: function (data, callback) {
+    appPost('sim_test', data, function(rdata){
+        var rdata = $.parseJSON(rdata.data);
+		if (rdata.status) {
+			callback && callback(rdata);
+		} else {
+			layer.msg(rdata.msg, { icon: 2 });
+		}
+	},'正在模拟攻击，请稍候..');
+},
+//时间戳转换
+timestampToTime: function (date) {
+    var date = new Date(date * 1000);
+    var Y = date.getFullYear() + '-';
+    var M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-';
+    var D = (date.getDate() < 10 ? '0' + (date.getDate()) : date.getDate()) + ' ';
+    var h = (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':';
+    var m = (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) + ':';
+    var s = (date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds());
+    return Y + M + D + h + m + s;
+},
+//定义周期时间
+getBeforeDate: function (n) {
+    var n = n;
+    var d = new Date();
+    var year = d.getFullYear();
+    var mon = d.getMonth() + 1;
+    var day = d.getDate();
+    if (day <= n) {
+        if (mon > 1) {
+            mon = mon - 1;
+        } else {
+            year = year - 1;
+            mon = 12;
+        }
+    }
+    d.setDate(d.getDate() - n);
+    year = d.getFullYear();
+    mon = d.getMonth() + 1;
+    day = d.getDate();
+    s = year + "-" + (mon < 10 ? ('0' + mon) : mon) + "-" + (day < 10 ? ('0' + day) : day);
+    return s;
+}
+///     END
+}
+
+anti_tamper.get_day();
+anti_tamper.get_speed();
+</script>

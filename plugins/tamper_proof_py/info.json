@@ -1,0 +1,15 @@
+{
+  "title": "网站防篡改程序[PY]",
+  "tip": "lib",
+  "name": "tamper_proof_py",
+  "type": "soft",
+  "ps": "事件型防篡改程序,可有效保护网站重要文件不被木马篡改",
+  "versions": "1.0",
+  "shell": "install.sh",
+  "checks": "server/tamper_proof_py",
+  "path": "server/tamper_proof_py",
+  "author": "midoks",
+  "home": "",
+  "date":"2022-01-18",
+  "pid":"4"
+}
