@@ -41,6 +41,11 @@ def send_msg(bot, tag='ad', trigger_time=300):
     mw.writeFile(lock_file, json.dumps(lock_data))
     # 信号只在一个周期内执行一次|end
 
+    # https://t.me/gjgzs2022 ｜ 19/m
+    # ♻️CMS导航网♻️/💰流量变现💰 ｜ 28/m
+    # CK资源采集 ｜29/m
+    # 高防服务器CDN请联系玥玥 ｜3/m
+
     keyboard = [
         [
             types.InlineKeyboardButton(
