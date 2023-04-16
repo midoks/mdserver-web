@@ -75,7 +75,9 @@ def send_msg(bot, tag='ad', trigger_time=300):
             types.InlineKeyboardButton(
                 text="搜索", url='https://bbs.midoks.me/search.php'),
             types.InlineKeyboardButton(
-                text="@ME", url='tg://user?id=5568699210')
+                text="@ME", url='tg://user?id=5568699210'),
+            types.InlineKeyboardButton(
+                text="100RMB/M", url='tg://user?id=5568699210')
         ]
     ]
     markup = types.InlineKeyboardMarkup(keyboard)
