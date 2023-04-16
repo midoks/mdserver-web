@@ -46,6 +46,8 @@ def send_msg(bot, tag='ad', trigger_time=300):
     # CK资源采集 ｜29/m
     # 高防服务器CDN请联系玥玥 ｜3/m
 
+    # https://zhaoziyuan.la/ | 15/m | 2m | next,5/15
+
     keyboard = [
         [
             types.InlineKeyboardButton(
