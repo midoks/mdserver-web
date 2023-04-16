@@ -7,7 +7,7 @@ urllib3>=1.21.1
 flask==2.0.3
 flask-session==0.3.2
 flask-helper==0.19
-flask-bcrypt=1.0.1
+flask-bcrypt==1.0.1
 flask-caching>=1.10.1
 cache==1.0.3
 gevent==21.12.0
