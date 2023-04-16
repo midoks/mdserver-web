@@ -1,0 +1,21 @@
+<div class="bt-form">
+	<div class="bt-w-main">
+		<div class="bt-w-menu">
+			<p class="bgw" onclick="pluginService('op_load_balance');">服务</p>
+			<p onclick="loadBalanceList();">负载均衡</p>
+		</div>
+		<div class="bt-w-con pd15">
+			<div class="soft-man-con"></div>
+		</div>
+	</div>
+
+</div>
+
+<script type="text/javascript" src="/plugins/file?name=op_load_balance&f=js/app.js"></script>
+<script type="text/javascript">
+resetPluginWinWidth(800);
+resetPluginWinHeight(300);
+$.getScript( "/plugins/file?name=op_load_balance&f=js/app.js", function(){
+	pluginService('op_load_balance');
+});
+</script>
