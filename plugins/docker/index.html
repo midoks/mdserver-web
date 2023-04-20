@@ -1,0 +1,21 @@
+<div class="bt-form">
+	<div class='plugin_version'></div>
+	<div class="bt-w-main">
+		<div class="bt-w-menu">
+			<p class="bgw" onclick="pluginService('docker');">服务</p>
+			<p onclick="pluginInitD('docker');">自启动</p>
+			<p onclick="pluginConfig('docker');">配置修改</p>
+			<p onclick="getRedisConfig($('.plugin_version').attr('version'));">性能调整</p>
+			<p onclick="redisStatus($('.plugin_version').attr('version'));">负载状态</p>
+			<p onclick="pluginLogs('docker','','run_log');">日志</p>
+		</div>
+		<div class="bt-w-con pd15">
+			<div class="soft-man-con"></div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+$.getScript( "/plugins/file?name=docker&f=js/docker.js", function(){
+	pluginService('docker', $('.plugin_version').attr('version'));
+});
+</script>
