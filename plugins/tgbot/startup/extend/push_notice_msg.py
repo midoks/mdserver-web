@@ -89,7 +89,7 @@ def send_msg(bot, tag='ad', trigger_time=300):
     msg = bot.send_message(chat_id, msg_notice, reply_markup=markup)
 
     # print(msg.message_id)
-    time.sleep(60)
+    time.sleep(90)
     try:
         bot.delete_message(
             chat_id=chat_id, message_id=msg.message_id)
