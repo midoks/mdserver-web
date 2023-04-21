@@ -17,9 +17,11 @@ Install_Docker()
 	echo '正在安装脚本文件...' > $install_tmp
 	mkdir -p $serverPath/source
 
-	curl -fsSL https://get.docker.com | bash
-
-	mkdir -p $serverPath/docker
+	if [ ! -d  $serverPath/docker ];then
+		curl -fsSL https://get.docker.com | bash
+		mkdir -p $serverPath/docker
+	fi
+	
 	if [ -d $serverPath/docker ];then
 		echo "${VERSION}" > $serverPath/docker/version.pl
 		echo '安装完成' > $install_tmp
