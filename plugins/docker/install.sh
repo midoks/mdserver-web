@@ -17,42 +17,34 @@ Install_Docker()
 	echo '正在安装脚本文件...' > $install_tmp
 	mkdir -p $serverPath/source
 
-	if [ ! -f $serverPath/source/redis-${VERSION}.tar.gz ];then
-		wget -O $serverPath/source/redis-${VERSION}.tar.gz http://download.redis.io/releases/redis-${VERSION}.tar.gz
-	fi
-	
-	cd $serverPath/source && tar -zxvf redis-${VERSION}.tar.gz
+	curl -fsSL https://get.docker.com | bash
 
-	mkdir -p $serverPath/redis
-	mkdir -p $serverPath/redis/data
-	cd redis-${VERSION} && make PREFIX=$serverPath/redis install
-	sed '/^ *#/d' redis.conf > $serverPath/redis/redis.conf
-
-	if [ -d $serverPath/redis ];then
-		echo "${VERSION}" > $serverPath/redis/version.pl
+	mkdir -p $serverPath/docker
+	if [ -d $serverPath/docker ];then
+		echo "${VERSION}" > $serverPath/docker/version.pl
 		echo '安装完成' > $install_tmp
 
 
-		cd ${rootPath} && python3 ${rootPath}/plugins/redis/index.py start
-		cd ${rootPath} && python3 ${rootPath}/plugins/redis/index.py initd_install
+		cd ${rootPath} && python3 ${rootPath}/plugins/docker/index.py start
+		cd ${rootPath} && python3 ${rootPath}/plugins/docker/index.py initd_install
 	fi
 }
 
 Uninstall_Docker()
 {
-	if [ -f /usr/lib/systemd/system/redis.service ];then
-		systemctl stop redis
-		systemctl disable redis
-		rm -rf /usr/lib/systemd/system/redis.service
-		systemctl daemon-reload
-	fi
+	# if [ -f /usr/lib/systemd/system/docker.service ];then
+	# 	systemctl stop docker
+	# 	systemctl disable docker
+	# 	rm -rf /usr/lib/systemd/system/docker.service
+	# 	systemctl daemon-reload
+	# fi
 
-	if [ -f $serverPath/redis/initd/redis ];then
-		$serverPath/redis/initd/redis stop
-	fi
+	# if [ -f $serverPath/docker/initd/docker ];then
+	# 	$serverPath/docker/initd/docker stop
+	# fi
 
-	rm -rf $serverPath/redis
-	echo "Uninstall_redis" > $install_tmp
+	rm -rf $serverPath/docker
+	echo "Uninstall_Docker" > $install_tmp
 }
 
 action=$1
