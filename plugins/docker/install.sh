@@ -43,6 +43,18 @@ Uninstall_Docker()
 	# 	$serverPath/docker/initd/docker stop
 	# fi
 
+	yum remove docker \
+	docker-client \
+	docker-client-latest \
+	docker-common \
+	docker-latest \
+	docker-latest-logrotate \
+	docker-logrotate \
+	docker-selinux \
+	docker-engine-selinux \
+	docker-engine \
+	docker-ce
+
 	rm -rf $serverPath/docker
 	echo "Uninstall_Docker" > $install_tmp
 }
