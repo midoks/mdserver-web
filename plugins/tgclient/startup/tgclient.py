@@ -1,14 +1,22 @@
 # coding:utf-8
 
+import sys
+import io
+import os
+import time
+import re
+import json
+import base64
+import threading
 
 # python /Users/midoks/Desktop/mwdev/server/tgclient/tgclient.py
+# python /www/server/tgclient/tgclient.py
 
 from telethon import TelegramClient
 
+
 sys.path.append(os.getcwd() + "/class/core")
 import mw
-
-sys.path.append(getServerDir() + "/extend")
 
 
 def getPluginName():
@@ -21,6 +29,9 @@ def getPluginDir():
 
 def getServerDir():
     return mw.getServerDir() + '/' + getPluginName()
+
+
+sys.path.append(getServerDir() + "/extend")
 
 
 def getConfigData():
@@ -69,12 +80,12 @@ def writeLog(log_str):
 cfg = getConfigData()
 while True:
     cfg = getConfigData()
-    if 'bot' in cfg and 'app_id' in cfg['bot']:
-        if cfg['bot']['app_id'] != '' and cfg['bot']['app_id'] != 'app_id':
+    if 'bot' in cfg and 'api_id' in cfg['bot']:
+        if cfg['bot']['api_id'] != '' and cfg['bot']['api_id'] != 'api_id':
             break
-        if cfg['bot']['app_hash'] != '' and cfg['bot']['app_hash'] != 'app_hash':
+        if cfg['bot']['api_hash'] != '' and cfg['bot']['api_hash'] != 'api_hash':
             break
-    writeLog('等待输入配置,app_id,app_hash')
+    writeLog('等待输入配置,填写app_token')
     time.sleep(3)
 
 client = TelegramClient('mdioks', cfg['bot']['api_id'], cfg['bot']['api_hash'])
