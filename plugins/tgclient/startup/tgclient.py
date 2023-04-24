@@ -85,7 +85,7 @@ while True:
             break
         if cfg['bot']['api_hash'] != '' and cfg['bot']['api_hash'] != 'api_hash':
             break
-    writeLog('等待输入配置,填写app_token')
+    writeLog('等待输入配置,api_id')
     time.sleep(3)
 
 client = TelegramClient('mdioks', cfg['bot']['api_id'], cfg['bot']['api_hash'])
