@@ -108,9 +108,6 @@ async def main(loop):
     task = loop.create_task(change_name_auto())
     await task
 
-    # Now you can use all client methods listed below, like for example...
-    # await client.send_message('me', 'Hello to myself!')
-
     print('It works.')
     await client.run_until_disconnected()
     task.cancel()
