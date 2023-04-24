@@ -4,7 +4,7 @@
 	"name": "tgclient",
 	"title": "tgclient",
 	"shell": "install.sh",
-	"versions":["1.0"],
+	"versions":["1.1"],
 	"tip": "soft",
 	"checks": "server/tgclient",
 	"path": "server/tgclient",
