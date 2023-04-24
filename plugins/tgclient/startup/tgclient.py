@@ -100,7 +100,7 @@ async def change_name_auto():
     print('will change name')
     await asyncio.sleep(1)
 
-async def main():
+async def main(loop):
     await client.start()
 
     # create new task
