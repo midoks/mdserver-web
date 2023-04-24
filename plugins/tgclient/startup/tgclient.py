@@ -8,6 +8,8 @@ import re
 import json
 import base64
 import threading
+import asyncio
+import logging
 
 # python /Users/midoks/Desktop/mwdev/server/tgclient/tgclient.py
 # python /www/server/tgclient/tgclient.py
@@ -17,6 +19,10 @@ from telethon import TelegramClient
 
 sys.path.append(os.getcwd() + "/class/core")
 import mw
+
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 
 def getPluginName():
@@ -90,9 +96,25 @@ while True:
 
 client = TelegramClient('mdioks', cfg['bot']['api_id'], cfg['bot']['api_hash'])
 
-async def main():
-    # Now you can use all client methods listed below, like for example...
-    await client.send_message('me', 'Hello to myself!')
+async def change_name_auto():
+    print('will change name')
+    await asyncio.sleep(1)
 
-with client:
-    client.loop.run_until_complete(main())
+async def main():
+    await client.start()
+
+    # create new task
+    print('creating task')
+    task = loop.create_task(change_name_auto())
+    await task
+
+    # Now you can use all client methods listed below, like for example...
+    # await client.send_message('me', 'Hello to myself!')
+
+    print('It works.')
+    await client.run_until_disconnected()
+    task.cancel()
+
+if __name__ == '__main__':
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main(loop))
