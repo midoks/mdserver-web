@@ -120,6 +120,10 @@ def initDreplace():
     mw.writeFile(file_bin, content)
     mw.execShell('chmod +x ' + file_bin)
 
+    pyMainTplContent = mw.readFile(getPluginDir() + '/startup/tgclient.py')
+    toPyMainPath = mw.getServerDir() + '/tgclient.py'
+    mw.writeFile(toPyMainPath, pyMainTplContent)
+
     # systemd
     systemDir = mw.systemdCfgDir()
     systemService = systemDir + '/tgclient.service'
