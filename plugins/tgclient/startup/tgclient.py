@@ -111,7 +111,7 @@ async def main(loop):
     await client.start()
 
     # create new task
-    print('creating plugins_run task')
+    print('creating plugins_run task.')
     task = loop.create_task(plugins_run())
     await task
 
