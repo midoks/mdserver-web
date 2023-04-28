@@ -96,22 +96,16 @@ while True:
 
 client = TelegramClient('mdioks', cfg['bot']['api_id'], cfg['bot']['api_hash'])
 
-async def change_name_auto():
-    while True:
-        print('will change name')
-        await asyncio.sleep(1)
-
-
 async def plugins_run():
-    init_list = getStartExtCfgByTag('client')
-    for p in init_list:
+    plist = getStartExtCfgByTag('client')
+    for p in plist:
         try:
             script = p['name'].split('.')[0]
-            __import__(script).init(client)
+            await __import__(script).run(client)
         except Exception as e:
-            writeLog('-----init error start -------')
+            writeLog('-----client error start -------')
             writeLog(mw.getTracebackInfo())
-            writeLog('-----init error end -------')
+            writeLog('-----client error end -------')
 
 async def main(loop):
     await client.start()
