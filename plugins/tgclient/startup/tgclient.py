@@ -12,7 +12,7 @@ import asyncio
 import logging
 
 # python /Users/midoks/Desktop/mwdev/server/tgclient/tgclient.py
-# python /www/server/tgclient/tgclient.py
+# cd /www/server/mdserver-web && python3 /www/server/tgclient/tgclient.py
 
 from telethon import TelegramClient
 
@@ -97,15 +97,28 @@ while True:
 client = TelegramClient('mdioks', cfg['bot']['api_id'], cfg['bot']['api_hash'])
 
 async def change_name_auto():
-    print('will change name')
-    await asyncio.sleep(1)
+    while True:
+        print('will change name')
+        await asyncio.sleep(1)
+
+
+async def plugins_run():
+    init_list = getStartExtCfgByTag('client')
+    for p in init_list:
+        try:
+            script = p['name'].split('.')[0]
+            __import__(script).init(client)
+        except Exception as e:
+            writeLog('-----init error start -------')
+            writeLog(mw.getTracebackInfo())
+            writeLog('-----init error end -------')
 
 async def main(loop):
     await client.start()
 
     # create new task
-    print('creating task')
-    task = loop.create_task(change_name_auto())
+    print('creating plugins_run task')
+    task = loop.create_task(plugins_run())
     await task
 
     print('It works.')
