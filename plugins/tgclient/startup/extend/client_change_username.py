@@ -16,8 +16,13 @@ from telebot import types
 from telebot.util import quick_markup
 
 
+chat_id = -1001578009023
+
+
 async def run(client):
     while True:
+
+        await client.send_message(chat_id, 'Hello, group!')
         print("123123" + str(time.time()))
         await asyncio.sleep(1)
 
