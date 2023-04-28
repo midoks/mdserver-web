@@ -20,11 +20,7 @@ async def run(client):
     while True:
         print("123123" + str(time.time()))
         await asyncio.sleep(1)
-    # print(client)
 
 
 if __name__ == "__main__":
-    # print(isThisCmd('/?:', '/?:如何在安装面板'))
-    # print(getReadCmd('/?:', '/?:如何在安装面板'))
-    # print(searchHttpPage('mw'))
-    print(getFaqKw('寻找【mw】问题如下:'))
+    pass
