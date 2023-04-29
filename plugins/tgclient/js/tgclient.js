@@ -1,6 +1,6 @@
 function readme(){
     var readme = '<ul class="help-info-text c7">';
-    readme += '<li>在填写好配置信息好后,还要执行下面命令。进行手机号和短信码验证。</li>';
+    readme += '<li>在填写好配置信息好后,还要执行下面命令。进行手机号和短信码验证。再重启，即可正常使用</li>';
     readme += '<li>cd /www/server/mdserver-web && source bin/activate && python3 /www/server/tgclient/tgclient.py</li>';
     readme += '</ul>';
     $('.soft-man-con').html(readme);
