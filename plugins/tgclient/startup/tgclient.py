@@ -111,11 +111,11 @@ async def main(loop):
     await client.start()
 
     # create new task
-    print('creating plugins_run task.')
+    writeLog('creating plugins_run task.')
     task = loop.create_task(plugins_run())
     await task
 
-    print('It works.')
+    writeLog('It works.')
     await client.run_until_disconnected()
     task.cancel()
 
