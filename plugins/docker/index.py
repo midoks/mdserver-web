@@ -84,19 +84,19 @@ def initDreplace():
     initD_path = getServerDir() + '/init.d'
     if not os.path.exists(initD_path):
         os.mkdir(initD_path)
-    file_bin = initD_path + '/' + getPluginName()
+    # file_bin = initD_path + '/' + getPluginName()
 
     # initd replace
-    if not os.path.exists(file_bin):
-        content = mw.readFile(file_tpl)
-        content = content.replace('{$SERVER_PATH}', service_path)
-        mw.writeFile(file_bin, content)
-        mw.execShell('chmod +x ' + file_bin)
+    # if not os.path.exists(file_bin):
+    #     content = mw.readFile(file_tpl)
+    #     content = content.replace('{$SERVER_PATH}', service_path)
+    #     mw.writeFile(file_bin, content)
+    #     mw.execShell('chmod +x ' + file_bin)
 
     # log
-    dataLog = getServerDir() + '/data'
-    if not os.path.exists(dataLog):
-        mw.execShell('chmod +x ' + file_bin)
+    # dataLog = getServerDir() + '/data'
+    # if not os.path.exists(dataLog):
+    #     mw.execShell('chmod +x ' + file_bin)
 
     # # config replace
     # dst_conf = getServerDir() + '/redis.conf'
@@ -124,7 +124,7 @@ def initDreplace():
     return file_bin
 
 
-def redisOp(method):
+def dockerOp(method):
     file = initDreplace()
 
     if not mw.isAppleSystem():
@@ -140,15 +140,15 @@ def redisOp(method):
 
 
 def start():
-    return redisOp('start')
+    return dockerOp('start')
 
 
 def stop():
-    return redisOp('stop')
+    return dockerOp('stop')
 
 
 def restart():
-    status = redisOp('restart')
+    status = dockerOp('restart')
 
     log_file = runLog()
     mw.execShell("echo '' > " + log_file)
@@ -156,7 +156,7 @@ def restart():
 
 
 def reload():
-    return redisOp('reload')
+    return dockerOp('reload')
 
 
 def runInfo():
