@@ -103,9 +103,9 @@ async def plugins_run():
             script = p['name'].split('.')[0]
             await __import__(script).run(client)
         except Exception as e:
-            writeLog('-----client error start -------')
+            writeLog('----- client error start -------')
             writeLog(mw.getTracebackInfo())
-            writeLog('-----client error end -------')
+            writeLog('----- client error end -------')
 
 async def main(loop):
     await client.start()
