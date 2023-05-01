@@ -21,7 +21,7 @@ from telebot.util import quick_markup
 
 
 # 指定群ID
-chat_id_list = [-1001578009023, -953760154]
+chat_id_list = [-1001578009023, -1001979545570]
 
 async def run(client):
     while True:
