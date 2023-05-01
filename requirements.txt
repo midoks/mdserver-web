@@ -4,7 +4,7 @@ wheel==0.37.1
 gunicorn==20.1.0
 requests==2.27.1
 urllib3>=1.21.1
-flask==2.0.3
+flask==2.3.2
 flask-session==0.3.2
 flask-helper==0.19
 flask-bcrypt==1.0.1
