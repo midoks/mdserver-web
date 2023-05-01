@@ -1,6 +1,6 @@
 # coding:utf-8
 
-# func: 自动检测已经注销群成员
+# func: 自动邀请群成员
 
 import sys
 import io
@@ -21,7 +21,7 @@ from telebot.util import quick_markup
 
 
 # 指定群ID
-chat_id = -1001578009023
+chat_id = -953760154
 
 async def run(client):
     while True:
