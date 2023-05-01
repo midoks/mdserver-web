@@ -38,7 +38,7 @@ async def run(client):
             await client.edit_message(chat_id, s.id, '自动检测已经注销群成员完毕!!!')
             await asyncio.sleep(3)
             await client.delete_messages(chat_id, s)
-            await asyncio.sleep(300)
+        await asyncio.sleep(300)
 
 
 if __name__ == "__main__":
