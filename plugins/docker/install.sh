@@ -15,6 +15,12 @@ VERSION=$2
 
 Install_Docker()
 {
+	which docker
+	if [ "$?" == "0" ];then
+		echo '安装已经完成docker' > $install_tmp
+		exit 0
+	fi
+
 	echo '正在安装脚本文件...' > $install_tmp
 	mkdir -p $serverPath/source
 
@@ -26,7 +32,6 @@ Install_Docker()
 	if [ -d $serverPath/docker ];then
 		echo "${VERSION}" > $serverPath/docker/version.pl
 		echo '安装完成' > $install_tmp
-
 
 		cd ${rootPath} && python3 ${rootPath}/plugins/docker/index.py start
 		cd ${rootPath} && python3 ${rootPath}/plugins/docker/index.py initd_install
