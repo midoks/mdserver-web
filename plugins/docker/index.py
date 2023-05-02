@@ -143,68 +143,6 @@ def runLog():
     return getServerDir() + '/data/redis.log'
 
 
-def getRedisConfInfo():
-    conf = getServerDir() + '/redis.conf'
-    content = mw.readFile(conf)
-
-    gets = [
-        {'name': 'bind', 'type': 2, 'ps': '绑定IP(修改绑定IP可能会存在安全隐患)'},
-        {'name': 'port', 'type': 2, 'ps': '绑定端口'},
-        {'name': 'timeout', 'type': 2, 'ps': '空闲链接超时时间,0表示不断开'},
-        {'name': 'maxclients', 'type': 2, 'ps': '最大输入时间'},
-        {'name': 'databases', 'type': 2, 'ps': '数据库数量'},
-        {'name': 'requirepass', 'type': 2, 'ps': 'redis密码,留空代表没有设置密码'},
-        {'name': 'maxmemory', 'type': 2, 'ps': 'MB,最大使用内存,0表示不限制'}
-    ]
-    content = mw.readFile(conf)
-
-    result = []
-    for g in gets:
-        rep = "^(" + g['name'] + ')\s*([.0-9A-Za-z_& ~]+)'
-        tmp = re.search(rep, content, re.M)
-        if not tmp:
-            g['value'] = ''
-            result.append(g)
-            continue
-        g['value'] = tmp.groups()[1]
-        if g['name'] == 'maxmemory':
-            g['value'] = g['value'].strip("mb")
-        result.append(g)
-
-    return result
-
-
-def getRedisConf():
-    data = getRedisConfInfo()
-    return mw.getJson(data)
-
-
-def submitRedisConf():
-    gets = ['bind', 'port', 'timeout', 'maxclients',
-            'databases', 'requirepass', 'maxmemory']
-    args = getArgs()
-    conf = getServerDir() + '/redis.conf'
-    content = mw.readFile(conf)
-    for g in gets:
-        if g in args:
-            rep = g + '\s*([.0-9A-Za-z_& ~]+)'
-            val = g + ' ' + args[g]
-
-            if g == 'maxmemory':
-                val = g + ' ' + args[g] + "mb"
-
-            if g == 'requirepass' and args[g] == '':
-                content = re.sub('requirepass', '#requirepass', content)
-            if g == 'requirepass' and args[g] != '':
-                content = re.sub('#requirepass', 'requirepass', content)
-                content = re.sub(rep, val, content)
-
-            if g != 'requirepass':
-                content = re.sub(rep, val, content)
-    mw.writeFile(conf, content)
-    reload()
-    return mw.returnJson(True, '设置成功')
-
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
