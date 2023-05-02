@@ -54,7 +54,7 @@ function dPostCallbak(method, version, args,callback){
 }
 
 function dockerList(){
-    
+    $(".soft-man-con").html('');
 }
 
 
