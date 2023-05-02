@@ -53,4 +53,8 @@ function dPostCallbak(method, version, args,callback){
     },'json'); 
 }
 
+function dockerList(){
+    
+}
+
 
