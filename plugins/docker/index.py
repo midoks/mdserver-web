@@ -111,57 +111,6 @@ def reload():
     return dockerOp('reload')
 
 
-def runInfo():
-    s = status()
-    if s == 'stop':
-        return mw.returnJson(False, '未启动')
-
-    requirepass = ""
-
-    conf = getServerDir() + '/redis.conf'
-    content = mw.readFile(conf)
-    rep = "^(requirepass" + ')\s*([.0-9A-Za-z_& ~]+)'
-    tmp = re.search(rep, content, re.M)
-    if tmp:
-        requirepass = tmp.groups()[1]
-
-    default_ip = '127.0.0.1'
-    # findDebian = mw.execShell('cat /etc/issue |grep Debian')
-    # if findDebian[0] != '':
-    #     default_ip = mw.getLocalIp()
-    cmd = getServerDir() + "/bin/redis-cli -h " + default_ip + " info"
-    if requirepass != "":
-        cmd = getServerDir() + '/bin/redis-cli -h ' + default_ip + \
-            ' -a "' + requirepass + '" info'
-
-    data = mw.execShell(cmd)[0]
-    res = [
-        'tcp_port',
-        'uptime_in_days',  # 已运行天数
-        'connected_clients',  # 连接的客户端数量
-        'used_memory',  # Redis已分配的内存总量
-        'used_memory_rss',  # Redis占用的系统内存总量
-        'used_memory_peak',  # Redis所用内存的高峰值
-        'mem_fragmentation_ratio',  # 内存碎片比率
-        'total_connections_received',  # 运行以来连接过的客户端的总数量
-        'total_commands_processed',  # 运行以来执行过的命令的总数量
-        'instantaneous_ops_per_sec',  # 服务器每秒钟执行的命令数量
-        'keyspace_hits',  # 查找数据库键成功的次数
-        'keyspace_misses',  # 查找数据库键失败的次数
-        'latest_fork_usec'  # 最近一次 fork() 操作耗费的毫秒数
-    ]
-    data = data.split("\n")
-    result = {}
-    for d in data:
-        if len(d) < 3:
-            continue
-        t = d.strip().split(':')
-        if not t[0] in res:
-            continue
-        result[t[0]] = t[1]
-    return mw.getJson(result)
-
-
 def initdStatus():
     if mw.isAppleSystem():
         return "Apple Computer does not support"
