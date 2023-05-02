@@ -67,6 +67,8 @@ def send_msg(bot, tag='ad', trigger_time=300):
         ],
         [
             types.InlineKeyboardButton(
+                text="倩倩CDN服务器", url='https://t.me/KLT_12'),
+            types.InlineKeyboardButton(
                 text="💎DigitalVirt(赞助商)", url='https://digitalvirt.com/aff.php?aff=154')
         ],
         [
@@ -75,7 +77,9 @@ def send_msg(bot, tag='ad', trigger_time=300):
             types.InlineKeyboardButton(
                 text="搜索", url='https://bbs.midoks.me/search.php'),
             types.InlineKeyboardButton(
-                text="@ME", url='tg://user?id=5568699210')
+                text="@ME", url='tg://user?id=5568699210'),
+            types.InlineKeyboardButton(
+                text="100RMB/M", url='tg://user?id=5568699210')
         ]
     ]
     markup = types.InlineKeyboardMarkup(keyboard)
@@ -85,7 +89,7 @@ def send_msg(bot, tag='ad', trigger_time=300):
     msg = bot.send_message(chat_id, msg_notice, reply_markup=markup)
 
     # print(msg.message_id)
-    time.sleep(60)
+    time.sleep(90)
     try:
         bot.delete_message(
             chat_id=chat_id, message_id=msg.message_id)

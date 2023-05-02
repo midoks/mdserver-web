@@ -11,7 +11,7 @@
 	"install_pre_inspection":true,
 	"uninstall_pre_inspection":true,
 	"display": 1,
-	"author": "midokos",
+	"author": "midoks",
 	"date": "2023-03-06",
 	"home": "https://core.telegram.org/bots/api",
 	"depend_doc1":"https://github.com/eternnoir/pyTelegramBotAPI",

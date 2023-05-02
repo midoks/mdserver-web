@@ -99,11 +99,11 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.14.1
+### 版本更新 0.14.2
 
-* 安装优化。
-* 加入OP负载均衡插件。
-* 网站防篡改程序（测试中）。
+* 加入TgClient插件
+* 网站防篡改程序（测试中）
+* Docker(测试中)
 
 ### JSDelivr安装地址
 

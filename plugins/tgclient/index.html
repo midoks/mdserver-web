@@ -1,0 +1,27 @@
+<div class="bt-form">
+	<div class='plugin_version'></div>
+	<div class="bt-w-main">
+		<div class="bt-w-menu">
+			<p class="bgw" onclick="pluginService('tgclient');">服务</p>
+			<p onclick="pluginInitD('tgclient');">自启动</p>
+			<p onclick="clientConf();">配置</p>
+			<p onclick="botExtList();">扩展列表</p>
+			<p onclick="pluginLogs('tgclient','','run_log');">日志</p>
+			<p onclick="readme();">说明</p>
+		</div>
+		<div class="bt-w-con pd15">
+			<div class="soft-man-con"></div>
+		</div>
+	</div>
+</div>
+<style>
+.conf_p span{
+	width: 70px;
+}
+</style>
+<script type="text/javascript">
+resetPluginWinHeight(350);
+$.getScript( "/plugins/file?name=tgclient&f=js/tgclient.js", function(){
+	pluginService('tgclient');
+});
+</script>

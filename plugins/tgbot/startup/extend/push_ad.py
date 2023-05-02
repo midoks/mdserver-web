@@ -46,6 +46,8 @@ def send_msg(bot, tag='ad', trigger_time=300):
     # CK资源采集 ｜29/m
     # 高防服务器CDN请联系玥玥 ｜3/m
 
+    # https://zhaoziyuan.la/ | 15/m | 2m | next,5/15
+
     keyboard = [
         [
             types.InlineKeyboardButton(
@@ -69,6 +71,8 @@ def send_msg(bot, tag='ad', trigger_time=300):
         ],
         [
             types.InlineKeyboardButton(
+                text="倩倩CDN服务器", url='https://t.me/KLT_12'),
+            types.InlineKeyboardButton(
                 text="💎DigitalVirt(赞助商)", url='https://digitalvirt.com/aff.php?aff=154')
         ],
         [
@@ -77,7 +81,9 @@ def send_msg(bot, tag='ad', trigger_time=300):
             types.InlineKeyboardButton(
                 text="搜索", url='https://bbs.midoks.me/search.php'),
             types.InlineKeyboardButton(
-                text="@ME", url='tg://user?id=5568699210')
+                text="@ME", url='tg://user?id=5568699210'),
+            types.InlineKeyboardButton(
+                text="100RMB/M", url='tg://user?id=5568699210')
         ]
     ]
     markup = types.InlineKeyboardMarkup(keyboard)
