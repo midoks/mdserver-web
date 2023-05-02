@@ -57,7 +57,7 @@ Uninstall_Docker()
 	# 	$serverPath/docker/initd/docker stop
 	# fi
 
-	$CMD remove -y docker docker-ce-cli
+	$CMD remove -y docker docker-ce-cli containerd.io
 	# docker-client \
 	# docker-client-latest \
 	# docker-common \
