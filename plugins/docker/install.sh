@@ -46,16 +46,12 @@ Uninstall_Docker()
 		CMD=apt
 	fi
 
-	# if [ -f /usr/lib/systemd/system/docker.service ];then
-	# 	systemctl stop docker
-	# 	systemctl disable docker
-	# 	rm -rf /usr/lib/systemd/system/docker.service
-	# 	systemctl daemon-reload
-	# fi
-
-	# if [ -f $serverPath/docker/initd/docker ];then
-	# 	$serverPath/docker/initd/docker stop
-	# fi
+	if [ -f /usr/lib/systemd/system/docker.service ];then
+		systemctl stop docker
+		systemctl disable docker
+		rm -rf /usr/lib/systemd/system/docker.service
+		systemctl daemon-reload
+	fi
 
 	$CMD remove -y docker docker-ce-cli containerd.io
 	# docker-client \
