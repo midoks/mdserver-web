@@ -7,9 +7,10 @@ rootPath=$(dirname "$curPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
+# cd /www/server/mdserver-web/plugins/docker && /bin/bash install.sh uninstall 1.0
+# cd /www/server/mdserver-web/plugins/docker && /bin/bash install.sh install 1.0
 
 install_tmp=${rootPath}/tmp/mw_install.pl
-
 VERSION=$2
 
 Install_Docker()
@@ -51,7 +52,7 @@ Uninstall_Docker()
 	# 	$serverPath/docker/initd/docker stop
 	# fi
 
-	$CMD remove docker docker-ce-cli
+	$CMD remove -y docker docker-ce-cli
 	# docker-client \
 	# docker-client-latest \
 	# docker-common \
