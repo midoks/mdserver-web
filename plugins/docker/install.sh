@@ -34,6 +34,12 @@ Install_Docker()
 
 Uninstall_Docker()
 {
+	CMD=yum
+	which apt
+	if [ "$?" == "0" ];then
+		CMD=apt
+	fi
+
 	# if [ -f /usr/lib/systemd/system/docker.service ];then
 	# 	systemctl stop docker
 	# 	systemctl disable docker
@@ -45,17 +51,17 @@ Uninstall_Docker()
 	# 	$serverPath/docker/initd/docker stop
 	# fi
 
-	yum remove docker \
-	docker-client \
-	docker-client-latest \
-	docker-common \
-	docker-latest \
-	docker-latest-logrotate \
-	docker-logrotate \
-	docker-selinux \
-	docker-engine-selinux \
-	docker-engine \
-	docker-ce
+	$CMD remove docker docker-ce-cli
+	# docker-client \
+	# docker-client-latest \
+	# docker-common \
+	# docker-latest \
+	# docker-latest-logrotate \
+	# docker-logrotate \
+	# docker-selinux \
+	# docker-engine-selinux \
+	# docker-engine \
+	# docker-ce
 
 	rm -rf $serverPath/docker
 	echo "Uninstall_Docker" > $install_tmp
