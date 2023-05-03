@@ -26,31 +26,30 @@ filter_g_id = [-1001771526434]
 
 
 async def run(client):
-    while True:
-        info = await client.get_dialogs()
-        for chat in info:
-            is_sleep = True
-            print('name:{0} id:{1} is_user:{2} is_channel:{3} is_group:{4}'.format(
-                chat.name, chat.id, chat.is_user, chat.is_channel, chat.is_group))
-            if chat.is_group and chat.id != chat_id:
-                list_user = []
-                async for user in client.iter_participants(chat.id):
-                    if chat.id in filter_g_id:
-                        is_sleep = False
-                        continue
+    info = await client.get_dialogs()
+    for chat in info:
+        is_sleep = True
+        print('name:{0} id:{1} is_user:{2} is_channel:{3} is_group:{4}'.format(
+            chat.name, chat.id, chat.is_user, chat.is_channel, chat.is_group))
+        if chat.is_group and chat.id != chat_id:
+            list_user = []
+            async for user in client.iter_participants(chat.id):
+                if chat.id in filter_g_id:
+                    is_sleep = False
+                    continue
 
-                    if filter_user_id != user.id and user.username != None and user.bot == False:
-                        list_user.append(user.username)
-                print(list_user)
-                try:
-                    await client(InviteToChannelRequest(
-                        channel=chat_id,  # chat_id
-                        users=list_user,  # 被邀请人id
-                    ))
-                except Exception as e:
-                    print(str(e))
-                if is_sleep:
-                    await asyncio.sleep(90000)
+                if filter_user_id != user.id and user.username != None and user.bot == False:
+                    list_user.append(user.username)
+            print(list_user)
+            try:
+                await client(InviteToChannelRequest(
+                    channel=chat_id,  # chat_id
+                    users=list_user,  # 被邀请人id
+                ))
+            except Exception as e:
+                print(str(e))
+            if is_sleep:
+                await asyncio.sleep(90000)
 
 if __name__ == "__main__":
     pass

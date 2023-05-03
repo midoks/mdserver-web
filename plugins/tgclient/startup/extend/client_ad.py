@@ -70,22 +70,21 @@ async def send_msg(client, chat_id, tag='ad', trigger_time=300):
 
 
 async def run(client):
-    while True:
-        client.parse_mode = 'html'
-        # for chat_id in chat_id_list:
-        #     await send_msg(client, chat_id)
-        #     await asyncio.sleep(30)
+    client.parse_mode = 'html'
+    # for chat_id in chat_id_list:
+    #     await send_msg(client, chat_id)
+    #     await asyncio.sleep(30)
 
-        info = await client.get_dialogs()
-        for chat in info:
-            await writeLog('name:{0} id:{1} is_user:{2} is_channel:{3} is_group:{4}'.format(
-                chat.name, chat.id, chat.is_user, chat.is_channel, chat.is_group))
-            if chat.is_group and not chat.id in filter_g_id:
-                try:
-                    await send_msg(client, chat.id, 'ad_' + str(chat.id))
-                    await asyncio.sleep(3)
-                except Exception as e:
-                    await writeLog(str(e))
+    info = await client.get_dialogs()
+    for chat in info:
+        await writeLog('name:{0} id:{1} is_user:{2} is_channel:{3} is_group:{4}'.format(
+            chat.name, chat.id, chat.is_user, chat.is_channel, chat.is_group))
+        if chat.is_group and not chat.id in filter_g_id:
+            try:
+                await send_msg(client, chat.id, 'ad_' + str(chat.id))
+                await asyncio.sleep(3)
+            except Exception as e:
+                await writeLog(str(e))
 
 if __name__ == "__main__":
     pass
