@@ -1,7 +1,7 @@
 # coding:utf-8
 
 # func: 在其他发送推送AD
-
+# url: https://docs.telethon.dev/en/stable/modules/client.html
 import sys
 import io
 import os
