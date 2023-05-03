@@ -46,7 +46,7 @@ async def writeLog(log_str):
     mw.writeFileLog(now + ':' + log_str, log_file, limit_size=5 * 1024)
     return True
 
-async def send_msg(client, chat_id, tag='ad', trigger_time=300):
+async def send_msg(client, chat_id, tag='ad', trigger_time=3600):
     # 信号只在一个周期内执行一次|start
     lock_file = mw.getServerDir() + '/tgclient/lock.json'
     if not os.path.exists(lock_file):
@@ -67,7 +67,7 @@ async def send_msg(client, chat_id, tag='ad', trigger_time=300):
     msg = await client.send_message(chat_id, msg_ad)
     await asyncio.sleep(30)
     await client.delete_messages(chat_id, msg)
-
+    await asyncio.sleep(3)
 
 async def run(client):
     client.parse_mode = 'html'
@@ -82,7 +82,6 @@ async def run(client):
         if chat.is_group and not chat.id in filter_g_id:
             try:
                 await send_msg(client, chat.id, 'ad_' + str(chat.id))
-                await asyncio.sleep(3)
             except Exception as e:
                 await writeLog(str(e))
 
