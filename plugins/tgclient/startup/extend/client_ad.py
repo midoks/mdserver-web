@@ -21,40 +21,71 @@ from telethon.tl.functions.messages import AddChatUserRequest
 from telethon.tl.functions.channels import InviteToChannelRequest
 # 指定群ID
 chat_id_list = [-1001578009023]
-filter_g_id = [-1001771526434]
+filter_g_id = [-1001771526434, -1001578009023]
+
+
+msg_ad = "本人软件推广(30s)\n"
+msg_ad += "\n"
+msg_ad += "开源地址(站长): \n"
+msg_ad += "https://github.com/midoks/mdserver-web \n"
+msg_ad += "\n"
+msg_ad += "加入群聊,一起进步! \n"
+msg_ad += "https://t.me/mdserver_web \n"
+msg_ad += "不收费,全靠TG乞讨!😭\n\n"
+msg_ad += "捐赠地址 USDT（TRC20）\n"
+msg_ad += "TVbNgrpeGBGZVm5gTLa21ADP7RpnPFhjya\n"
+msg_ad += "日行一善，以后必定大富大贵\n"
+
+
+async def writeLog(log_str):
+    if __name__ == "__main__":
+        print(log_str)
+
+    now = mw.getDateFromNow()
+    log_file = mw.getServerDir() + '/tgclient/task.log'
+    mw.writeFileLog(now + ':' + log_str, log_file, limit_size=5 * 1024)
+    return True
+
+async def send_msg(client, chat_id, tag='ad', trigger_time=300):
+    # 信号只在一个周期内执行一次|start
+    lock_file = mw.getServerDir() + '/tgclient/lock.json'
+    if not os.path.exists(lock_file):
+        mw.writeFile(lock_file, '{}')
+
+    lock_data = json.loads(mw.readFile(lock_file))
+    if tag in lock_data:
+        diff_time = time.time() - lock_data[tag]['do_time']
+        if diff_time >= trigger_time:
+            lock_data[tag]['do_time'] = time.time()
+        else:
+            return False, 0, 0
+    else:
+        lock_data[tag] = {'do_time': time.time()}
+    mw.writeFile(lock_file, json.dumps(lock_data))
+    # 信号只在一个周期内执行一次|end
+
+    msg = await client.send_message(chat_id, msg_ad)
+    await asyncio.sleep(30)
+    await client.delete_messages(chat_id, msg)
 
 
 async def run(client):
     while True:
-        for chat_id in chat_id_list:
-            s = await client.send_message(chat_id, '推送消息测试')
-            await asyncio.sleep(30)
-            await client.delete_messages(chat_id, s)
-        await asyncio.sleep(3)
-        # info = await client.get_dialogs()
-        # for chat in info:
-        #     is_sleep = True
-        #     print('name:{0} id:{1} is_user:{2} is_channel:{3} is_group:{4}'.format(
-        #         chat.name, chat.id, chat.is_user, chat.is_channel, chat.is_group))
-        #     if chat.is_group and chat.id != chat_id:
-        #         list_user = []
-        #         async for user in client.iter_participants(chat.id):
-        #             if chat.id in filter_g_id:
-        #                 is_sleep = False
-        #                 continue
+        client.parse_mode = 'html'
+        # for chat_id in chat_id_list:
+        #     await send_msg(client, chat_id)
+        #     await asyncio.sleep(30)
 
-        #             if filter_user_id != user.id and user.username != None and user.bot == False:
-        #                 list_user.append(user.username)
-        #         print(list_user)
-        #         try:
-        #             await client(InviteToChannelRequest(
-        #                 channel=chat_id,  # chat_id
-        #                 users=list_user,  # 被邀请人id
-        #             ))
-        #         except Exception as e:
-        #             print(str(e))
-        #         if is_sleep:
-        #             await asyncio.sleep(90000)
+        info = await client.get_dialogs()
+        for chat in info:
+            await writeLog('name:{0} id:{1} is_user:{2} is_channel:{3} is_group:{4}'.format(
+                chat.name, chat.id, chat.is_user, chat.is_channel, chat.is_group))
+            if chat.is_group and not chat.id in filter_g_id:
+                try:
+                    await send_msg(client, chat.id, 'ad_' + str(chat.id))
+                    await asyncio.sleep(3)
+                except Exception as e:
+                    await writeLog(str(e))
 
 if __name__ == "__main__":
     pass
