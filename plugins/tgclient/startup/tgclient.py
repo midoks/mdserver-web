@@ -99,7 +99,7 @@ while True:
 
 client = TelegramClient('mdioks', cfg['bot']['api_id'], cfg['bot']['api_hash'])
 
-async def plugins_run():
+async def plugins_run_task():
     plist = getStartExtCfgByTag('client')
     for p in plist:
         try:
@@ -109,6 +109,11 @@ async def plugins_run():
             writeLog('----- client error start -------')
             writeLog(mw.getTracebackInfo())
             writeLog('----- client error end -------')
+
+async def plugins_run():
+    while True:
+        await plugins_run_task()
+        time.sleep(1)
 
 async def main(loop):
     await client.start()
