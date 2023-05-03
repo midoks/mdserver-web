@@ -77,9 +77,9 @@ async def run(client):
 
     info = await client.get_dialogs()
     for chat in info:
-        await writeLog('name:{0} id:{1} is_user:{2} is_channel:{3} is_group:{4}'.format(
-            chat.name, chat.id, chat.is_user, chat.is_channel, chat.is_group))
         if chat.is_group and not chat.id in filter_g_id:
+            await writeLog('name:{0} id:{1} is_user:{2} is_channel:{3} is_group:{4}'.format(
+                chat.name, chat.id, chat.is_user, chat.is_channel, chat.is_group))
             try:
                 await send_msg(client, chat.id, 'ad_' + str(chat.id))
             except Exception as e:
