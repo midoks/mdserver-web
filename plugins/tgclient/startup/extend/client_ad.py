@@ -26,7 +26,7 @@ filter_g_id = [-1001771526434, -1001578009023]
 
 msg_ad = "本人软件推广(30s)\n"
 msg_ad += "\n"
-msg_ad += "开源地址(站长): \n"
+msg_ad += "开源地址(Linux面板): \n"
 msg_ad += "https://github.com/midoks/mdserver-web \n"
 msg_ad += "\n"
 msg_ad += "加入群聊,一起进步! \n"
