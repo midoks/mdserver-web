@@ -17,6 +17,7 @@ datadir = {$SERVER_APP_PATH}/data
 log-error =  {$SERVER_APP_PATH}/data/error.log
 server-id	= {$SERVER_ID}
 
+explicit_defaults_for_timestamp=true
 default_storage_engine = InnoDB
 
 
@@ -94,8 +95,8 @@ innodb_write_io_threads = 1
 innodb_file_per_table = 1
 innodb_large_prefix = 1
 
-secure-file-priv={$SERVER_APP_PATH}/tmp
-
+#secure-file-priv={$SERVER_APP_PATH}/tmp
+secure-file-priv=disabled
 [mysqldump]
 quick
 
