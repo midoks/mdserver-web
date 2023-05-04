@@ -383,7 +383,7 @@ def initMysql57Data():
         myconf = serverdir + "/etc/my.cnf"
         user = pGetDbUser()
         cmd = 'cd ' + serverdir + ' && ./bin/mysqld --defaults-file=' + myconf + \
-            ' --initialize-insecure --explicit_defaults_for_timestamp'
+            ' --initialize-insecure --explicit_defaults_for_timestamp --user=mysql'
         data = mw.execShell(cmd)
         # print(data)
         return False
