@@ -31,13 +31,13 @@ elif grep -Eqi "CentOS" /etc/issue || grep -Eqi "CentOS" /etc/*-release; then
 	OSNAME='centos'
 	yum install -y wget zip unzip
 elif grep -Eqi "Fedora" /etc/issue || grep -Eqi "Fedora" /etc/*-release; then
-	OSNAME='fedora'
+	OSNAME='rhel'
 	yum install -y wget zip unzip
 elif grep -Eqi "Rocky" /etc/issue || grep -Eqi "Rocky" /etc/*-release; then
-	OSNAME='rocky'
+	OSNAME='rhel'
 	yum install -y wget zip unzip
 elif grep -Eqi "AlmaLinux" /etc/issue || grep -Eqi "AlmaLinux" /etc/*-release; then
-	OSNAME='alma'
+	OSNAME='rhel'
 	yum install -y wget zip unzip
 elif grep -Eqi "Amazon Linux" /etc/issue || grep -Eqi "Amazon Linux" /etc/*-release; then
 	OSNAME='amazon'

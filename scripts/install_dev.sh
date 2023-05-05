@@ -36,7 +36,7 @@ elif grep -Eqi "CentOS" /etc/issue || grep -Eqi "CentOS" /etc/*-release; then
 	OSNAME='rhel'
 	yum install -y wget zip unzip
 elif grep -Eqi "Fedora" /etc/issue || grep -Eqi "Fedora" /etc/*-release; then
-	OSNAME='fedora'
+	OSNAME='rhel'
 	yum install -y wget zip unzip
 elif grep -Eqi "Rocky" /etc/issue || grep -Eqi "Rocky" /etc/*-release; then
 	OSNAME='rhel'
