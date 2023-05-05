@@ -43,7 +43,7 @@ $('input[name="port"]').change(function(){
 			showMsg(rdata.msg,function(){
 				window.location.href = window.location.href.replace(old_port,port);
 				// window.location.reload();
-			},{icon:rdata.status?1:2},2000);
+			},{icon:rdata.status?1:2},5000);
 		},'json');
 	});
 });
