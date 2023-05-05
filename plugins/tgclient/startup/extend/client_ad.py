@@ -46,7 +46,7 @@ async def writeLog(log_str):
     mw.writeFileLog(now + ':' + log_str, log_file, limit_size=5 * 1024)
     return True
 
-async def send_msg(client, chat_id, tag='ad', trigger_time=3600):
+async def send_msg(client, chat_id, tag='ad', trigger_time=600):
     # 信号只在一个周期内执行一次|start
     lock_file = mw.getServerDir() + '/tgclient/lock.json'
     if not os.path.exists(lock_file):
