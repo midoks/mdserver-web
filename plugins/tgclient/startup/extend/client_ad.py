@@ -24,17 +24,17 @@ chat_id_list = [-1001578009023]
 filter_g_id = [-1001771526434, -1001578009023]
 
 
-msg_ad = "本人软件推广(30s)\n"
-msg_ad += "\n"
-msg_ad += "开源地址(Linux面板): \n"
-msg_ad += "https://github.com/midoks/mdserver-web \n"
-msg_ad += "\n"
-msg_ad += "加入群聊,一起进步! \n"
-msg_ad += "https://t.me/mdserver_web \n"
-msg_ad += "不收费,无毒。源码为证。全靠TG乞讨!😭\n\n"
-msg_ad += "捐赠地址 USDT（TRC20）\n"
-msg_ad += "TVbNgrpeGBGZVm5gTLa21ADP7RpnPFhjya\n"
-msg_ad += "日行一善，以后必定大富大贵\n"
+msg_ad = "本人软件推广(30s)\n\n"
+msg_ad += "开源地址(Linux面板) mdserver-web,站长必备,不收费,无毒。源码为证。全靠TG乞讨! \n"
+msg_ad += "看个人简介,加入群聊,一起进步!\n"
+# msg_ad += "https://github.com/midoks/mdserver-web \n"
+# msg_ad += "\n"
+# msg_ad += "加入群聊,一起进步! \n"
+# msg_ad += "https://t.me/mdserver_web \n"
+# msg_ad += "不收费,无毒。源码为证。全靠TG乞讨!😭\n\n"
+# msg_ad += "捐赠地址 USDT（TRC20）\n"
+# msg_ad += "TVbNgrpeGBGZVm5gTLa21ADP7RpnPFhjya\n"
+# msg_ad += "日行一善，以后必定大富大贵\n"
 
 
 async def writeLog(log_str):
