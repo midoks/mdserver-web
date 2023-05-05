@@ -99,7 +99,7 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.14.2
+### 版本更新 0.14.3
 
 * 安装优化，针对oracle中的curl库优化。
 * PHP的Composer安装优化。
