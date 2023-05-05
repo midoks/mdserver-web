@@ -21,7 +21,7 @@ from telethon.tl.functions.messages import AddChatUserRequest
 from telethon.tl.functions.channels import InviteToChannelRequest
 # 指定群ID
 chat_id_list = [-1001578009023]
-filter_g_id = [-1001771526434, -1001578009023]
+filter_g_id = [-1001771526434]
 
 
 msg_ad = "本人软件推广(30s)\n\n"
