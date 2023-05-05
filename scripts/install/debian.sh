@@ -188,7 +188,12 @@ fi
 #https://blog.csdn.net/qq_36228377/article/details/123154344
 # ln -s  /usr/include/x86_64-linux-gnu/curl  /usr/include/curl
 if [ ! -d /usr/include/curl ];then
-    ln -s  /usr/include/x86_64-linux-gnu/curl  /usr/include/curl
+	SYS_ARCH=`arch`
+	if [ -f /usr/include/x86_64-linux-gnu/curl ];then
+		ln -s /usr/include/x86_64-linux-gnu/curl /usr/include/curl
+	else
+		ln -s /usr/include/${SYS_ARCH}-linux-gnu/curl /usr/include/curl
+	fi 
 fi
 
 apt install -y graphviz bison re2c flex libsqlite3-dev libonig-dev perl g++ libtool libxslt1-dev
