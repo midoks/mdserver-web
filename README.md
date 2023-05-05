@@ -101,9 +101,8 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 
 ### 版本更新 0.14.2
 
-* 加入TgClient插件
-* 网站防篡改程序（测试中）
-* Docker(测试中)
+* 安装优化，针对oracle中的curl库优化。
+* PHP的Composer安装优化。
 
 ### JSDelivr安装地址
 
