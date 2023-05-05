@@ -30,9 +30,11 @@ if [ $VERSION_ID -ge 8 ];then
 fi
 
 # install remi source 
-if [ $VERSION_ID -ge 8 ];then
-    rpm -ivh http://rpms.famillecollet.com/enterprise/remi-release-9.rpm
-    rpm --import http://rpms.famillecollet.com/RPM-GPG-KEY-remi
+if [ $VERSION_ID -eq 9 ];then
+    if [ ! -d /etc/yum.repos.d/remi.repo ];then
+        rpm -ivh http://rpms.famillecollet.com/enterprise/remi-release-9.rpm
+        rpm --import http://rpms.famillecollet.com/RPM-GPG-KEY-remi
+    fi
 fi
 
 #https need
