@@ -99,10 +99,10 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.14.3
+### 版本更新 0.14.4
 
-* 安装优化，针对oracle中的curl库优化。
-* PHP的Composer安装优化。
+* 安装优化，redat系列优化。
+* PHP74-82在redat的安装修复(oniguruma)。
 
 ### JSDelivr安装地址
 
