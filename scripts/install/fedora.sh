@@ -68,7 +68,7 @@ yum install -y epel-release
 
 yum install -y libevent libevent-devel zip libmcrypt libmcrypt-devel
 yum install -y gcc libffi-devel python-devel openssl-devel 
-yum install -y curl-devel libmcrypt libmcrypt-devel python3-devel
+yum install -y libmcrypt libmcrypt-devel python3-devel
 
 yum install -y wget python-devel python-imaging libicu-devel unzip bzip2-devel gcc libxml2 libxml2-devel libjpeg-devel libpng-devel libwebp libwebp-devel pcre pcre-devel crontabs
 yum install -y net-tools
