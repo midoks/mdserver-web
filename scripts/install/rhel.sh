@@ -30,7 +30,7 @@ if [ $VERSION_ID -ge 8 ];then
 fi
 
 # install remi source 
-if [ $VERSION_ID -eq 9 ];then
+if [ "$VERSION_ID" == "9" ];then
     if [ ! -d /etc/yum.repos.d/remi.repo ];then
         rpm -ivh http://rpms.famillecollet.com/enterprise/remi-release-9.rpm
         rpm --import http://rpms.famillecollet.com/RPM-GPG-KEY-remi
@@ -144,6 +144,7 @@ if [ $VERSION_ID -ge 8 ];then
         oniguruma oniguruma-devel oniguruma5php-devel patch pcre pcre-devel perl perl-Data-Dumper perl-devel procps psmisc python3-devel \
         readline-devel rpcgen sqlite-devel tar unzip vim-minimal wget zip zlib zlib-devel ;
     do
+        # dnf --enablerepo=remi install -y oniguruma5php-devel
         dnf $REPOS install -y $rpms;
         if [ "$?" != "0" ];then
             dnf install -y $rpms;
