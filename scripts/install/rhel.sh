@@ -31,7 +31,7 @@ fi
 
 # install remi source 
 if [ "$VERSION_ID" == "9" ];then
-    if [ ! -d /etc/yum.repos.d/remi.repo ];then
+    if [ ! -f /etc/yum.repos.d/remi.repo ];then
         rpm -ivh http://rpms.famillecollet.com/enterprise/remi-release-9.rpm
         rpm --import http://rpms.famillecollet.com/RPM-GPG-KEY-remi
     fi
