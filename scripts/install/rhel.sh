@@ -138,9 +138,10 @@ if [ $VERSION_ID -ge 8 ];then
     for REPO_VAR in ${REPO_LIST[@]}
     do
         if [ -f /etc/yum.repos.d/${REPO_VAR}.repo ];then
-            REPOS="${REPOS}${REPO_VAR},"
+            REPOS="${REPOS},${REPO_VAR}"
         fi
     done
+    REPOS=${REPOS//=,/=}
     echo "REPOS:${REPOS}"
 
     # if [ $VERSION_ID -ge 9 ];then
