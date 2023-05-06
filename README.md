@@ -103,6 +103,7 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 
 * 安装优化，redat系列优化。
 * PHP74-82在redat的安装修复(oniguruma)。
+* 面板端口修改优化。
 
 ### JSDelivr安装地址
 
