@@ -29,7 +29,7 @@ if [ $VERSION_ID -ge 8 ];then
     PKGMGR='dnf'
 fi
 
-# install remi source 
+echo "install remi source"
 if [ "$VERSION_ID" == "9" ];then
     echo "install remi start"
     if [ ! -f /etc/yum.repos.d/remi.repo ];then
