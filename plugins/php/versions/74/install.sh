@@ -10,7 +10,6 @@ sourcePath=${serverPath}/source
 sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
 
-
 function version_gt() { test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" != "$1"; }
 function version_le() { test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" == "$1"; }
 function version_lt() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" != "$1"; }
@@ -28,6 +27,12 @@ mkdir -p $serverPath/php
 cd ${rootPath}/plugins/php/lib && /bin/bash freetype_new.sh
 cd ${rootPath}/plugins/php/lib && /bin/bash zlib.sh
 cd ${rootPath}/plugins/php/lib && /bin/bash libzip.sh
+
+# redat ge 8
+which yum
+if [ "$?" == "0" ];then
+	cd ${rootPath}/plugins/php/lib && /bin/bash oniguruma.sh
+fi
 
 if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 

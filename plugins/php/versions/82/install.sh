@@ -28,6 +28,11 @@ mkdir -p $serverPath/php
 cd ${rootPath}/plugins/php/lib && /bin/bash freetype_new.sh
 cd ${rootPath}/plugins/php/lib && /bin/bash zlib.sh
 
+# redat ge 8
+which yum
+if [ "$?" == "0" ];then
+	cd ${rootPath}/plugins/php/lib && /bin/bash oniguruma.sh
+fi
 
 if [ ! -d $sourcePath/php/php${PHP_VER} ];then
 
