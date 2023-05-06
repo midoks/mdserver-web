@@ -130,11 +130,24 @@ $PKGMGR groupinstall -y "Development Tools"
 
 if [ $VERSION_ID -ge 8 ];then
     # EL8 及以上
-    if [ $VERSION_ID -ge 9 ];then
-        REPOS='--enablerepo=remi,appstream,baseos,epel,extras,crb'
-    else
-        REPOS='--enablerepo=remi,appstream,baseos,epel,extras,powertools'
-    fi
+
+    # find repo
+
+    REPO_LIST=(remi appstream baseos epel extras crb powertools)
+    REPOS='--enablerepo='
+    for REPO_VAR in ${REPO_LIST[@]}
+    do
+        if [ -f /etc/yum.repos.d/${REPO_VAR}.repo ];then
+            REPOS="${REPOS}${REPO_VAR},"
+        fi
+    done
+    echo "REPOS:${REPOS}"
+
+    # if [ $VERSION_ID -ge 9 ];then
+    #     REPOS='--enablerepo=remi,appstream,baseos,epel,extras,crb'
+    # else
+    #     REPOS='--enablerepo=remi,appstream,baseos,epel,extras,powertools'
+    # fi
 
     for rpms in gcc gcc-c++ lsof autoconf bzip2 bzip2-devel c-ares-devel \
         ca-certificates cairo-devel cmake crontabs curl curl-devel diffutils e2fsprogs e2fsprogs-devel \
@@ -146,7 +159,7 @@ if [ $VERSION_ID -ge 8 ];then
         oniguruma oniguruma-devel oniguruma5php-devel patch pcre pcre-devel perl perl-Data-Dumper perl-devel procps psmisc python3-devel \
         readline-devel rpcgen sqlite-devel tar unzip vim-minimal wget zip zlib zlib-devel ;
     do
-        # dnf --enablerepo=remi install -y oniguruma5php-devel
+        # dnf --enablerepo=remi,appstream,baseos,epel,extras,powertools install -y oniguruma5php-devel
         dnf $REPOS install -y $rpms;
         if [ "$?" != "0" ];then
             dnf install -y $rpms;
