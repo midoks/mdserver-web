@@ -25,7 +25,7 @@ filter_g_id = [-1001771526434]
 
 
 msg_ad = "本人软件推广(10s)\n\n"
-msg_ad += "开源地址Linux面板【mdserver-web】,站长必备,不收费,无毒。源码为证，全靠TG乞讨! \n"
+msg_ad += "开源Linux面板【mdserver-web】,站长必备,不收费,无毒。源码为证，全靠TG乞讨! \n"
 msg_ad += "看个人简介,加入群聊,一起进步!\n"
 # msg_ad += "https://github.com/midoks/mdserver-web \n"
 # msg_ad += "\n"
@@ -84,7 +84,9 @@ async def run(client):
             try:
                 await send_msg(client, chat.id, 'ad_' + str(chat.id))
             except Exception as e:
+                await writeLog(str(chat))
                 await writeLog(str(e))
+
 
 if __name__ == "__main__":
     pass
