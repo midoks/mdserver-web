@@ -55,15 +55,9 @@ async def run(client):
 
     for chat_id in chat_id_list_other:
         try:
-            count = 0
             async for user in client.iter_participants(chat_id):
                 if user.deleted:
-                    count += 1
                     msg = await client.kick_participant(chat_id, user)
-
-            other_s = await client.send_message(chat_id, '已经检测到有(%d)个账户已失效,并已经删除!' % (count))
-            await asyncio.sleep(3)
-            await client.delete_messages(chat_id, other_s)
         except Exception as e:
             print(str(e))
             writeLog(str(e))
