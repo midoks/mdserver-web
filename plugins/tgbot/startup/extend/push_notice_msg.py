@@ -22,6 +22,16 @@ chat_id = -1001578009023
 # chat_id = 5568699210
 
 
+def writeLog(log_str):
+    if __name__ == "__main__":
+        print(log_str)
+
+    now = mw.getDateFromNow()
+    log_file = mw.getServerDir() + '/tgbot/task.log'
+    mw.writeFileLog(now + ':' + log_str, log_file, limit_size=5 * 1024)
+    return True
+
+
 def send_msg(bot, tag='ad', trigger_time=300):
     # 信号只在一个周期内执行一次|start
     lock_file = mw.getServerDir() + '/tgbot/lock.json'
