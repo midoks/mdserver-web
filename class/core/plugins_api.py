@@ -942,7 +942,7 @@ class plugins_api:
         return plugins_info
 
     def getPluginList(self, sType,  kw='', sPage=1, sPageSize=10):
-        print(sType, kw, sPage, sPageSize)
+        # print(sType, kw, sPage, sPageSize)
 
         ret = {}
         ret['type'] = json.loads(mw.readFile(self.__type))
