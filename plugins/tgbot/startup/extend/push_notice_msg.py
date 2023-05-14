@@ -22,6 +22,16 @@ chat_id = -1001578009023
 # chat_id = 5568699210
 
 
+def writeLog(log_str):
+    if __name__ == "__main__":
+        print(log_str)
+
+    now = mw.getDateFromNow()
+    log_file = mw.getServerDir() + '/tgbot/task.log'
+    mw.writeFileLog(now + ':' + log_str, log_file, limit_size=5 * 1024)
+    return True
+
+
 def send_msg(bot, tag='ad', trigger_time=300):
     # 信号只在一个周期内执行一次|start
     lock_file = mw.getServerDir() + '/tgbot/lock.json'
@@ -43,7 +53,12 @@ def send_msg(bot, tag='ad', trigger_time=300):
     # https://t.me/gjgzs2022 ｜ 19/m
     # ♻️CMS导航网♻️/💰流量变现💰 ｜ 28/m
     # CK资源采集 ｜29/m
+    # 香港高防CDN ｜9/m
     keyboard = [
+        [
+            types.InlineKeyboardButton(
+                text="香港高防CDN、免实名、试用30天", url='www.100dun.com')
+        ],
         [
             types.InlineKeyboardButton(
                 text="CK资源采集", url='https://ckzy1.com/')
@@ -58,7 +73,7 @@ def send_msg(bot, tag='ad', trigger_time=300):
         ],
         [
             types.InlineKeyboardButton(
-                text="🙎‍♂️代实名🙍‍♀️过人脸🅾️国际阿里云腾讯云(赞助商)", url='https://t.me/gjgzs2022')
+                text="🙎‍♂️代实名🙍‍♀️过人脸🅾️国际阿里云腾讯云", url='https://t.me/gjgzs2022')
         ],
         [
             types.InlineKeyboardButton(

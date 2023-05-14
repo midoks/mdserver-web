@@ -71,8 +71,9 @@ class plugins_api:
         if not mw.isNumber(sType):
             sType = 0
 
-        # print sPage
-        data = self.getPluginList(sType, int(sPage))
+        # print(sPage, sType)
+        search = request.args.get('search', '').lower()
+        data = self.getPluginList(sType, search, int(sPage))
         return mw.getJson(data)
 
     def menuGetAbsPath(self, tag, path):
@@ -781,7 +782,18 @@ class plugins_api:
                     print(e)
         return plugins_info
 
-    def getAllListPage(self, sType='0', page=1, pageSize=10):
+    def searchKey(self, info, kw):
+        try:
+            if info['title'].lower().find(kw) > -1:
+                return True
+            if info['ps'].lower().find(kw) > -1:
+                return True
+            if info['name'].lower().find(kw) > -1:
+                return True
+        except Exception as e:
+            return False
+
+    def getAllListPage(self, sType='0', kw='', page=1, pageSize=10):
         plugins_info = []
         for dirinfo in os.listdir(self.__plugin_dir):
             if dirinfo[0:1] == '.':
@@ -792,11 +804,13 @@ class plugins_api:
                 if os.path.exists(json_file):
                     try:
                         data = json.loads(mw.readFile(json_file))
+                        # 判断是否搜索
+                        if kw != '' and not self.searchKey(data, kw):
+                            continue
                         tmp_data = self.makeList(data, sType)
                         for index in range(len(tmp_data)):
                             plugins_info.append(tmp_data[index])
                     except Exception as e:
-                        print(json_file)
                         print(mw.getTracebackInfo())
 
         start = (page - 1) * pageSize
@@ -927,14 +941,14 @@ class plugins_api:
 
         return plugins_info
 
-    def getPluginList(self, sType, sPage=1, sPageSize=10):
-        # print sType, sPage, sPageSize
+    def getPluginList(self, sType,  kw='', sPage=1, sPageSize=10):
+        # print(sType, kw, sPage, sPageSize)
 
         ret = {}
         ret['type'] = json.loads(mw.readFile(self.__type))
         # plugins_info = self.getAllListThread(sType)
         # plugins_info = self.getAllListProcess(sType)
-        data = self.getAllListPage(sType, sPage, sPageSize)
+        data = self.getAllListPage(sType, kw, sPage,  sPageSize)
         ret['data'] = data[0]
 
         args = {}

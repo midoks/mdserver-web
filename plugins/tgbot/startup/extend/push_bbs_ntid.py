@@ -22,6 +22,16 @@ chat_id = -1001578009023
 # chat_id = 5568699210
 
 
+def writeLog(log_str):
+    if __name__ == "__main__":
+        print(log_str)
+
+    now = mw.getDateFromNow()
+    log_file = mw.getServerDir() + '/tgbot/task.log'
+    mw.writeFileLog(now + ':' + log_str, log_file, limit_size=5 * 1024)
+    return True
+
+
 def get_newest_tid():
 
     api_new = 'https://bbs.midoks.me/plugin.php?id=external_api&f=bbs_newest'
@@ -86,7 +96,13 @@ def send_msg(bot, tag='ad', trigger_time=300):
 
 
 def run(bot):
-    send_msg(bot, 'push_bbs_newest_tid', 300)
+
+    try:
+        send_msg(bot, 'push_bbs_newest_tid', 300)
+    except Exception as e:
+        writeLog('-----push_bbs_newest_tid error start -------')
+        print(mw.getTracebackInfo())
+        writeLog('-----push_bbs_newest_tid error start -------')
 
 
 if __name__ == "__main__":
