@@ -99,11 +99,10 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.14.4
+### 版本更新 0.14.5
 
-* 安装优化，redat系列优化。
-* PHP74-82在redat的安装修复(oniguruma)。
-* 面板端口修改优化。
+* 软件管理-搜索功能。
+* 文件-右键功能优化。
 
 ### JSDelivr安装地址
 
