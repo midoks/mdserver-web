@@ -51,10 +51,11 @@ Install_pureftp()
 
 	# https://github.com/jedisct1/pure-ftpd/releases/download/1.0.49/pure-ftpd-1.0.49.tar.gz
 	# https://download.pureftpd.org/pub/pure-ftpd/releases/pure-ftpd-1.0.49.tar.gz
-	# DOWNLOAD=https://github.com/jedisct1/pure-ftpd/releases/download/${VER}/pure-ftpd-${VER}.tar.gz
+	
 
 	VER=$1
-	DOWNLOAD=https://download.pureftpd.org/pub/pure-ftpd/releases/pure-ftpd-${VER}.tar.gz
+	DOWNLOAD=https://github.com/jedisct1/pure-ftpd/releases/download/${VER}/pure-ftpd-${VER}.tar.gz
+	# DOWNLOAD=https://download.pureftpd.org/pub/pure-ftpd/releases/pure-ftpd-${VER}.tar.gz
 
 	# curl -sSLo pure-ftpd-1.0.49.tar.gz https://download.pureftpd.org/pub/pure-ftpd/releases/pure-ftpd-1.0.49.tar.gz
 	if [ ! -f $serverPath/source/pureftp/pure-ftpd-${VER}.tar.gz ];then
