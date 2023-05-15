@@ -46,10 +46,15 @@ def send_msg(bot, tag='ad', trigger_time=300):
     # CK资源采集 ｜29/m
     # https://zhaoziyuan.la/ | 15/m | 2m | next,7/15
     # 香港高防CDN ｜9/m
+    # 😄代实名lDCApp +86接码全天在线 | 15/m
     keyboard = [
         [
             types.InlineKeyboardButton(
-                text="香港高防CDN、免实名、试用30天", url='www.100dun.com')
+                text="😄代实名lDCApp +86接码全天在线", url='https://t.me/ljh09852')
+        ],
+        [
+            types.InlineKeyboardButton(
+                text="香港高防CDN、免实名、试用30天", url='https://www.100dun.com')
         ],
         [
             types.InlineKeyboardButton(
