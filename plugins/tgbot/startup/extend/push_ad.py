@@ -50,7 +50,7 @@ def send_msg(bot, tag='ad', trigger_time=300):
     keyboard = [
         [
             types.InlineKeyboardButton(
-                text="😄代实名lDCApp +86接码全天在线", url='https://t.me/ljh09852')
+                text="🅾️代实名lDCApp +86接码全天在线", url='https://t.me/ljh09852')
         ],
         [
             types.InlineKeyboardButton(

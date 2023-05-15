@@ -54,6 +54,7 @@ def send_msg(bot, tag='ad', trigger_time=300):
     # ♻️CMS导航网♻️/💰流量变现💰 ｜ 28/m
     # CK资源采集 ｜29/m
     # 香港高防CDN ｜9/m
+    # 🅾️代实名lDCApp +86接码全天在线 | 15/m
     keyboard = [
         [
             types.InlineKeyboardButton(
