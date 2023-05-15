@@ -62,7 +62,7 @@ def send_msg(bot, tag='ad', trigger_time=300):
         ],
         [
             types.InlineKeyboardButton(
-                text="香港高防CDN、免实名、试用30天", url='www.100dun.com')
+                text="香港高防CDN、免实名、试用30天", url='https://www.100dun.com')
         ],
         [
             types.InlineKeyboardButton(
