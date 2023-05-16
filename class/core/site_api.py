@@ -101,19 +101,31 @@ class site_api:
         limit = request.form.get('limit', '10')
         p = request.form.get('p', '1')
         type_id = request.form.get('type_id', '0').strip()
+        search = request.form.get('search', '').strip()
 
         start = (int(p) - 1) * (int(limit))
 
         siteM = mw.M('sites').field('id,name,path,status,ps,addtime,edate')
-        if type_id != '' and int(type_id) >= 0:
-            siteM.where('type_id=?', (type_id,))
+
+        sql_where = ''
+        if search != '':
+            sql_where = " name like '%" + search + "%' "
+
+        if type_id != '' and int(type_id) >= 0 and search != '':
+            sql_where = sql_where + " and type_id=" + type_id + ""
+        elif type_id != '' and int(type_id) >= 0:
+            sql_where = " type_id=" + type_id
+
+        if sql_where != '':
+            siteM.where(sql_where)
 
         _list = siteM.limit((str(start)) + ',' +
                             limit).order('id desc').select()
 
-        for i in range(len(_list)):
-            _list[i]['backup_count'] = mw.M('backup').where(
-                "pid=? AND type=?", (_list[i]['id'], 0)).count()
+        if _list != None:
+            for i in range(len(_list)):
+                _list[i]['backup_count'] = mw.M('backup').where(
+                    "pid=? AND type=?", (_list[i]['id'], 0)).count()
 
         _ret = {}
         _ret['data'] = _list
