@@ -109,7 +109,7 @@ class site_api:
 
         sql_where = ''
         if search != '':
-            sql_where = " name like '%" + search + "%' "
+            sql_where = " name like '%" + search + "%' or ps like '%" + search + "%' "
 
         if type_id != '' and int(type_id) >= 0 and search != '':
             sql_where = sql_where + " and type_id=" + type_id + ""
