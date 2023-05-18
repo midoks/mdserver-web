@@ -62,11 +62,11 @@ def send_msg(bot, tag='ad', trigger_time=300):
         ],
         [
             types.InlineKeyboardButton(
-                text="♻️CMS导航网♻️", url='https://t.me/maccms_jccms')
+                text="代付支付宝微信❤️淘宝帮付", url='https://t.me/Uxuanzhenpin')
         ],
         [
             types.InlineKeyboardButton(
-                text="💰流量变现💰", url='https://t.me/taohaozhan')
+                text="💰流量变现💰集团收量", url='https://t.me/taohaozhan')
         ],
         [
             types.InlineKeyboardButton(

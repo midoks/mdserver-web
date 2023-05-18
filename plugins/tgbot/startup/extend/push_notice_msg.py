@@ -51,7 +51,7 @@ def send_msg(bot, tag='ad', trigger_time=300):
     # 信号只在一个周期内执行一次|end
 
     # https://t.me/gjgzs2022 ｜ 19/m
-    # ♻️CMS导航网♻️/💰流量变现💰 ｜ 28/m
+    # 代付支付宝微信❤️淘宝帮付/💰流量变现💰集团收量 ｜ 28/m
     # CK资源采集 ｜29/m
     # 香港高防CDN ｜9/m
     # 🅾️代实名lDCApp🙎‍♂️+86接码全天在线🅾️ | 15/m
@@ -70,11 +70,11 @@ def send_msg(bot, tag='ad', trigger_time=300):
         ],
         [
             types.InlineKeyboardButton(
-                text="♻️CMS导航网♻️", url='https://t.me/maccms_jccms')
+                text="代付支付宝微信❤️淘宝帮付", url='https://t.me/Uxuanzhenpin')
         ],
         [
             types.InlineKeyboardButton(
-                text="💰流量变现💰", url='https://t.me/taohaozhan')
+                text="💰流量变现💰集团收量", url='https://t.me/taohaozhan')
         ],
         [
             types.InlineKeyboardButton(
