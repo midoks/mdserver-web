@@ -42,13 +42,6 @@ async def run(client):
     # -1001800000000
     # -1000000000001
 
-    for i in range(9999999999):
-        try:
-            my_channel = await client.get_entity(PeerChannel(-1001397840771))
-            print(my_channel)
-        except Exception as e:
-            print(str(e))
-
     info = await client.get_dialogs()
     for chat in info:
         if not chat.is_group and chat.is_channel:
