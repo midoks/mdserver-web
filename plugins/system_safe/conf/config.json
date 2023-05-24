@@ -923,7 +923,8 @@
             "python",
             "python3",
             "ifdown",
-            "node"
+            "node",
+            "sd-pam"
         ],
         "process_exclude": [
             "php-fpm",
