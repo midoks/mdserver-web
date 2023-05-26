@@ -54,7 +54,38 @@ function dPostCallbak(method, version, args,callback){
 }
 
 function dockerList(){
-    $(".soft-man-con").html('');
+
+    // dPost('list', '', {}, function(rdata){
+    //     var rdata = $.parseJSON(rdata.data);
+    //     console.log(rdata);
+    // })
+
+    var con = '<div class="safe bgw">\
+            <button onclick="" title="" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">添加数据库</button>\
+            <span style="float:right">              \
+                <button batch="true" style="float: right;display: none;margin-left:10px;" onclick="delDbBatch();" title="删除选中项" class="btn btn-default btn-sm">删除选中</button>\
+            </span>\
+            <div class="divtable mtb10">\
+                <div class="tablescroll">\
+                    <table id="DataBody" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
+                    <thead><tr><th width="30"><input class="check" onclick="checkSelect();" type="checkbox"></th>\
+                    <th>数据库名</th>\
+                    <th>用户名</th>\
+                    <th>密码</th>\
+                    '+
+                    // '<th>备份</th>'+
+                    '<th>备注</th>\
+                    <th style="text-align:right;">操作</th></tr></thead>\
+                    <tbody>\
+                    ' +'\
+                    </tbody></table>\
+                </div>\
+                <div id="databasePage" class="dataTables_paginate paging_bootstrap page"></div>\
+            </div>\
+        </div>';
+
+
+    $(".soft-man-con").html(con);
 }
 
 
