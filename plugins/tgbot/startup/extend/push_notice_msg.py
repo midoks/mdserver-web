@@ -52,7 +52,6 @@ def send_msg(bot, tag='ad', trigger_time=300):
 
     # https://t.me/gjgzs2022 ｜ 19/m
     # 代付支付宝微信❤️淘宝帮付/💰流量变现💰集团收量/🕵️‍♀️实名认证/接码✅过人脸👤 ｜ 28/m
-    # CK资源采集 ｜29/m
     # 香港高防CDN ｜9/m
     # 🅾️代实名lDCApp🙎‍♂️+86接码全天在线🅾️ | 15/m
     keyboard = [
@@ -63,10 +62,6 @@ def send_msg(bot, tag='ad', trigger_time=300):
         [
             types.InlineKeyboardButton(
                 text="香港高防CDN、免实名、试用30天", url='https://www.100dun.com')
-        ],
-        [
-            types.InlineKeyboardButton(
-                text="CK资源采集", url='https://ckzy1.com/')
         ],
         [
             types.InlineKeyboardButton(
