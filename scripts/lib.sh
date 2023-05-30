@@ -70,7 +70,7 @@ if [ ! -f /usr/local/bin/pip3 ] && [ ! -f /usr/bin/pip3 ];then
     python3 -m pip install --upgrade pip setuptools wheel -i $PIPSRC
 fi
 
-which pip && pip install --upgrade pip -i $PIPSRC
+which pip3 && pip3 install --upgrade pip -i $PIPSRC
 pip3 install --upgrade pip setuptools wheel -i $PIPSRC
 
 cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt -i $PIPSRC
@@ -85,7 +85,7 @@ else
     cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate
 fi
 
-pip install --upgrade pip -i $PIPSRC
+pip3 install --upgrade pip -i $PIPSRC
 pip3 install --upgrade setuptools -i $PIPSRC
 cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirements.txt -i $PIPSRC
 
