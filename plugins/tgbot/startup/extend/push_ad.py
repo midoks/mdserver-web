@@ -73,7 +73,7 @@ def send_msg(bot, tag='ad', trigger_time=300):
         ],
         [
             types.InlineKeyboardButton(
-                text="倩倩CDN服务器", url='https://t.me/KLT_12'),
+                text="官网", url='https://github.com/midoks/mdserver-web'),
             types.InlineKeyboardButton(
                 text="💎DigitalVirt(赞助商)", url='https://digitalvirt.com/aff.php?aff=154')
         ],
