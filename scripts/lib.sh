@@ -7,7 +7,6 @@ function version_lt() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)"
 function version_ge() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" == "$1"; }
 
 P_VER=`python3 -V | awk '{print $2}'`
-
 echo "python:$P_VER"
 
 curPath=`pwd`
