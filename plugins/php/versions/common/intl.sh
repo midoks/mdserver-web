@@ -33,7 +33,7 @@ else
 fi
 
 OPTIONS=''
-if [ "$version" -lt "71" ];then
+if [ "$version" -lt "74" ];then
 	cd ${rootPath}/plugins/php/lib && /bin/bash icu.sh
 	OPTIONS="--with-icu-dir=${serverPath}/lib/icu"
 fi
