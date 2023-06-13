@@ -10,6 +10,7 @@ flask-helper==0.19
 flask-bcrypt==1.0.1
 flask-caching>=1.10.1
 cache==1.0.3
+gevent==22.10.2
 gevent-websocket==0.10.1
 psutil==5.9.1
 chardet==3.0.4
@@ -30,4 +31,3 @@ PyMySQL==1.0.2
 whitenoise==5.3.0
 pyTelegramBotAPI
 telebot
-gevent==22.10.2
