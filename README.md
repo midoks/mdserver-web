@@ -99,10 +99,9 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.14.5
+### 版本更新 0.15.0
 
-* 软件管理-搜索功能。
-* 文件-右键功能优化。
+* debian12适配。
 
 ### JSDelivr安装地址
 
