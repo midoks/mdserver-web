@@ -23,7 +23,7 @@ if [ "$version" -lt "73" ];then
 fi
 
 if [ "$version" -gt "74" ];then
-	LIBV=5.1.2
+	LIBV=5.2.1
 fi
 
 LIB_PATH_NAME=lib/php
