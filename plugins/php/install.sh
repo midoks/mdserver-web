@@ -59,6 +59,7 @@ if [ "${action}" == "install" ] && [ -d ${serverPath}/php/${type} ];then
 	echo "install PHP${type} extend start"
 
 	# cd /www/server/mdserver-web/plugins/php/versions/common  && bash iconv.sh install 53
+	# cd /www/server/mdserver-web/plugins/php/versions/common  && bash intl.sh install 73
 	# cd /www/server/mdserver-web/plugins/php/versions/common  && bash gd.sh install 56
 	# cd /www/server/mdserver-web/plugins/php/versions/common  && bash openssl.sh install 56
 	# cd /www/server/mdserver-web/plugins/php/versions/common  && bash sodium.sh install 81
