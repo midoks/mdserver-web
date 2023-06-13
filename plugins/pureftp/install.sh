@@ -69,11 +69,6 @@ Install_pureftp()
 		md5_check=`md5sum $serverPath/source/pureftp/pure-ftpd-${VER}.tar.gz  | awk '{print $1}'`
 		if [ "${md5_ok}" == "${md5_check}" ]; then
 			echo "pure-ftpd file  check ok"
-		else
-			# 重新下载
-			rm -rf $serverPath/source/pureftp/pure-ftpd-${VER}
-			wget --no-check-certificate -O $serverPath/source/pureftp/pure-ftpd-${VER}.tar.gz $DOWNLOAD
-			# curl -sSLo $serverPath/source/pureftp/pure-ftpd-${VER}.tar.gz $DOWNLOAD
 		fi
 	fi
 
