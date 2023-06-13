@@ -1,6 +1,15 @@
 #!/bin/bash
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 
+function version_gt() { test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" != "$1"; }
+function version_le() { test "$(echo "$@" | tr " " "\n" | sort -V | head -n 1)" == "$1"; }
+function version_lt() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" != "$1"; }
+function version_ge() { test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" == "$1"; }
+
+P_VER=`python3 -V | awk '{print $2}'`
+
+echo "python:$P_VER"
+
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
 serverPath=$(dirname "$rootPath")
@@ -79,7 +88,11 @@ cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/requirem
 # pip3 install mysqlclient
 
 if [ ! -f /www/server/mdserver-web/bin/activate ];then
-    cd /www/server/mdserver-web && python3 -m venv .
+    if version_ge "$P_VER" "3.11.0" ;then
+        cd /www/server/mdserver-web && python3 -m venv /www/server/mdserver-web
+    else
+        cd /www/server/mdserver-web && python3 -m venv .
+    fi
     cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate
 else
     cd /www/server/mdserver-web && source /www/server/mdserver-web/bin/activate
