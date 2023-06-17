@@ -787,7 +787,7 @@ class site_api:
                 mw.execShell('echo "lets" > "' + path + '/README"')
         elif ssl_type == 'acme':
             ssl_acme_dir = mw.getAcmeDir() + '/' + site_name
-            if not os.path.exists(pathacme):
+            if not os.path.exists(ssl_acme_dir):
                 ssl_acme_dir = mw.getAcmeDir() + '/' + site_name + '_ecc'
 
             acme_csrpath = ssl_acme_dir + '/fullchain.cer'
