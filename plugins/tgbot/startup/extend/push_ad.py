@@ -48,7 +48,7 @@ def send_msg(bot, tag='ad', trigger_time=300):
     keyboard = [
         [
             types.InlineKeyboardButton(
-                text="实卡接码🙎‍♂️代实名/过人脸🅾️代付", url='https://t.me/gjgzs2022')
+                text="实卡接码🙎‍♂️代实名/过人脸🅾️开飞机会员", url='https://t.me/gjgzs2022')
         ],
         [
             types.InlineKeyboardButton(
