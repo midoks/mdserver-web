@@ -50,9 +50,14 @@ def send_msg(bot, tag='ad', trigger_time=300):
     mw.writeFile(lock_file, json.dumps(lock_data))
     # 信号只在一个周期内执行一次|end
 
+    # https://t.me/gjgzs2022 ｜ 22/m
     # 代付支付宝微信❤️淘宝帮付/💰流量变现💰集团收量/🕵️‍♀️实名认证/接码✅过人脸👤 ｜ 28/m
     # 香港高防CDN ｜9/m
     keyboard = [
+        [
+            types.InlineKeyboardButton(
+                text="实卡接码🙎‍♂️代实名/过人脸🅾️代付", url='https://t.me/gjgzs2022')
+        ],
         [
             types.InlineKeyboardButton(
                 text="香港高防CDN、免实名、试用30天", url='https://www.100dun.com')
