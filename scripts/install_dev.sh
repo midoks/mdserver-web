@@ -106,7 +106,6 @@ if [ $OSNAME != "macos" ];then
 	        tar xvzf /tmp/acme.tar.gz -C /tmp
 	        cd /tmp/acme.sh-master
 	        bash acme.sh install
-	        cd -
 	    fi
 
 	    if [ ! -d /root/.acme.sh ];then
