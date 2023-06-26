@@ -82,17 +82,17 @@ Install_dashborad(){
 	echo '正在安装哪吒监控...' > $install_tmp
 	mkdir -p $serverPath/source
 
-
-	DOWNLOAD_URL="https://${GITHUB_URL}/midoks/nezha/releases/download/v${VERSION}/nezha-${OS}-${ARCH}.zip"
-
-	DOWNLOAD_FILE="$(mktemp).zip"
-	download_file $DOWNLOAD_URL $DOWNLOAD_FILE
-
-	if [ ! -d $TARGET_DIR ]; then
-		mkdir -p $TARGET_DIR
-	fi
-
 	if [ ! -f $TARGET_DIR/nezha ];then
+
+		DOWNLOAD_URL="https://${GITHUB_URL}/midoks/nezha/releases/download/v${VERSION}/nezha-${OS}-${ARCH}.zip"
+
+		DOWNLOAD_FILE="$(mktemp).zip"
+		download_file $DOWNLOAD_URL $DOWNLOAD_FILE
+
+		if [ ! -d $TARGET_DIR ]; then
+			mkdir -p $TARGET_DIR
+		fi
+
 		unzip $DOWNLOAD_FILE -d $TARGET_DIR
 		rm -rf $DOWNLOAD_FILE
 	fi
@@ -110,13 +110,13 @@ Install_agent(){
 	DOWNLOAD_URL="https://${GITHUB_URL}/nezhahq/agent/releases/download/${version}/nezha-agent_${OS}_${ARCH}.zip"
 	DOWNLOAD_FILE="$(mktemp).zip"
 
-	download_file $DOWNLOAD_URL $DOWNLOAD_FILE
-
-	if [ ! -d $AGENT_TARGET_DIR ]; then
-		mkdir -p $AGENT_TARGET_DIR
-	fi
-
 	if [ ! -f $AGENT_TARGET_DIR/nezha-agent ];then
+		download_file $DOWNLOAD_URL $DOWNLOAD_FILE
+
+		if [ ! -d $AGENT_TARGET_DIR ]; then
+			mkdir -p $AGENT_TARGET_DIR
+		fi
+	
 		unzip $DOWNLOAD_FILE -d $AGENT_TARGET_DIR
 		rm -rf $DOWNLOAD_FILE
 	fi
