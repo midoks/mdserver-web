@@ -75,6 +75,7 @@ apt install -y net-tools
 apt install -y python3-dev
 apt install -y autoconf
 apt install -y gcc
+apt install -y lrzsz
 
 apt install -y libffi-dev
 apt install -y cmake automake make
