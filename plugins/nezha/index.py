@@ -190,6 +190,10 @@ class App:
 
         return file_agent_bin
 
+    def init_cfg(self):
+        self.initDreplace()
+        self.initDAgent()
+
     def imOp(self, method):
 
         file = self.initDreplace()

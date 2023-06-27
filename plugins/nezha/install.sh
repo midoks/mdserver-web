@@ -23,3 +23,21 @@ if [ ! -d $curPath/versions/$2 ];then
 fi
 
 sh -x $curPath/versions/$2/install.sh $1
+
+if [ "${action}" == "uninstall" ];then
+	if [ -f /usr/lib/systemd/system/nezha.service ] || [ -f /lib/systemd/system/nezha.service ] ;then
+		systemctl stop nezha
+		systemctl disable nezha
+		rm -rf /usr/lib/systemd/system/nezha.service
+		rm -rf /lib/systemd/system/nezha.service
+		systemctl daemon-reload
+	fi
+
+	if [ -f /usr/lib/systemd/system/nezha-agent.service ] || [ -f /lib/systemd/system/nezha-agent.service ] ;then
+		systemctl stop nezha-agent
+		systemctl disable nezha-agent
+		rm -rf /usr/lib/systemd/system/nezha-agent.service
+		rm -rf /lib/systemd/system/nezha-agent.service
+		systemctl daemon-reload
+	fi
+fi
