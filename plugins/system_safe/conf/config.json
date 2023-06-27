@@ -928,6 +928,7 @@
         ],
         "process_exclude": [
             "php-fpm",
+            "git",
             "mysqld",
             "mongod",
             "dockerd",
