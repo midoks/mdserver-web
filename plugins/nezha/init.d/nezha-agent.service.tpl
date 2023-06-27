@@ -14,8 +14,8 @@ After=syslog.target
 Type=simple
 User=root
 Group=root
-WorkingDirectory=/opt/nezha/agent/
-ExecStart=/opt/nezha/agent/nezha-agent -s nz_grpc_host:nz_grpc_port -p nz_client_secret
+WorkingDirectory={$SERVER_PATH}/nezha/agent/
+ExecStart={$SERVER_PATH}/nezha/agent/nezha-agent -s {$APP_HOST} -p {$APP_SECRET}
 Restart=always
 #Environment=DEBUG=true
 

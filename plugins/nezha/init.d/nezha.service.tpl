@@ -14,8 +14,8 @@ After=mariadb.service mysqld.service postgresql.service memcached.service redis.
 Type=simple
 #User=root
 #Group=root
-WorkingDirectory=/opt/nezha/dashboard/
-ExecStart=/opt/nezha/dashboard/nezha web
+WorkingDirectory={$SERVER_PATH}/nezha/dashboard/
+ExecStart={$SERVER_PATH}/nezha/dashboard/nezha web
 Restart=always
 #Environment=DEBUG=true
 

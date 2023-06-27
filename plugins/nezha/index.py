@@ -20,16 +20,13 @@ if mw.isAppleSystem():
 
 class App:
     __setupPath = '/www/server/nezha'
-    __SR = ''
+    __cfg = ''
+    __agent_cfg = ''
 
     def __init__(self):
         self.__setupPath = self.getServerDir()
-
-        self.__SR = '''#!/bin/bash
-    PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
-    export PATH
-    export USER=%s
-    export HOME=%s && ''' % ( self.getRunUser(), self.getHomeDir())
+        self.__cfg = self.__setupPath + '/nezha.cfg'
+        self.__agent_cfg = self.__setupPath + '/agent.cfg'
 
     def getArgs(self):
         args = sys.argv[3:]
@@ -38,14 +35,20 @@ class App:
 
         if args_len == 1:
             t = args[0].strip('{').strip('}')
-            t = t.split(':')
+            t = t.split(':', 1)
             tmp[t[0]] = t[1]
         elif args_len > 1:
             for i in range(len(args)):
-                t = args[i].split(':')
+                t = args[i].split(':', 1)
                 tmp[t[0]] = t[1]
 
         return tmp
+
+    def checkArgs(self, data, ck=[]):
+        for i in range(len(ck)):
+            if not ck[i] in data:
+                return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
+        return (True, mw.returnJson(True, 'ok'))
 
     def __release_port(self, port):
         from collections import namedtuple
@@ -72,6 +75,10 @@ class App:
 
     def getInitdConfTpl(self):
         path = self.getPluginDir() + "/init.d/nezha.tpl"
+        return path
+
+    def getInitdAgentConfTpl(self):
+        path = self.getPluginDir() + "/init.d/nezha-agent.tpl"
         return path
 
     def getHomeDir(self):
@@ -146,32 +153,49 @@ class App:
 
         return file_bin
 
+    def contentAgentReplace(self, content):
+        path = self.__agent_cfg
+        if os.path.exists(path):
+            data = self.get_agent_cfg()
+            content = content.replace('{$APP_HOST}', data['host'])
+            content = content.replace('{$APP_SECRET}', data['secret'])
+
+        return content
+
     def initDAgent(self):
+        file_tpl = self.getInitdAgentConfTpl()
+
         initD_path = self.getServerDir() + '/init.d'
         if not os.path.exists(initD_path):
             os.mkdir(initD_path)
 
         file_agent_bin = initD_path + '/nezha-agent'
-        if not os.path.exists(file_agent_bin):
-            content = mw.readFile(file_tpl)
-            content = self.contentReplace(content)
-            mw.writeFile(file_agent_bin, content)
-            mw.execShell('chmod +x ' + file_agent_bin)
+
+        content = mw.readFile(file_tpl)
+        content = self.contentReplace(content)
+        content = self.contentAgentReplace(content)
+        mw.writeFile(file_agent_bin, content)
+        mw.execShell('chmod +x ' + file_agent_bin)
 
         # systemd
         sysDir = mw.systemdCfgDir()
         sysService = sysDir + '/nezha-agent.service'
         sysServiceTpl = self.getPluginDir() + '/init.d/nezha-agent.service.tpl'
-        if os.path.exists(sysDir) and not os.path.exists(sysService):
-            service_path = mw.getServerDir()
-            content = mw.readFile(sysServiceTpl)
-            content = self.contentReplace(content)
-            mw.writeFile(sysService, content)
-            mw.execShell('systemctl daemon-reload')
+        service_path = mw.getServerDir()
+        content = mw.readFile(sysServiceTpl)
+        content = self.contentReplace(content)
+        content = self.contentAgentReplace(content)
+        mw.writeFile(sysService, content)
+        mw.execShell('systemctl daemon-reload')
 
         return file_agent_bin
 
     def imOp(self, method):
+
+        path = self.__agent_cfg
+        if not os.path.exists(path):
+            return '请先设置Agent配置!'
+
         file = self.initDreplace()
 
         if not mw.isAppleSystem():
@@ -243,12 +267,70 @@ class App:
     def conf(self):
         return self.getServerDir() + '/dashboard/data/config.yaml'
 
-    def run_log(self):
-        ilog = self.getServerDir() + '/logs/imail.log'
-        if not os.path.exists(ilog):
-            return mw.returnJson(False, "请先安装初始化!<br/>默认地址:http://" + mw.getLocalIp() + ":1080")
+    def nezha_cfg(self):
+        path = self.__cfg
+        if not os.path.exists(path):
+            d = {}
+            cmd_un = 'cd ' + self.getServerDir() + '/dashboard && ./nezha conf -u ""'
+            td = mw.execShell(cmd_un)
+            d['username'] = td[0].strip()
 
-        return self.getServerDir() + '/logs/imail.log'
+            pwd = mw.getRandomString(16)
+            cmd_pwd = 'cd ' + self.getServerDir() + '/dashboard && ./nezha conf -u "" -p ' + pwd
+            td = mw.execShell(cmd_pwd)
+            d['password'] = pwd
+
+            mw.writeFile(path, mw.enDoubleCrypt('nezha', mw.getJson(d)))
+
+        info = mw.readFile(path)
+        info = mw.deDoubleCrypt('nezha', info)
+
+        info = json.loads(info)
+        return mw.returnJson(True, 'ok', info)
+
+    def nezha_save_cfg(self):
+        args = self.getArgs()
+        data = self.checkArgs(args, ['username', 'password'])
+        if not data[0]:
+            return data[1]
+        path = self.__cfg
+
+        cmd = 'cd ' + self.getServerDir() + '/dashboard && ./nezha conf -u "' + \
+            args['username'] + '" -p ' + args['password']
+        t = mw.execShell(cmd)
+        # print(t)
+        mw.writeFile(path, mw.enDoubleCrypt('nezha', mw.getJson(args)))
+        return mw.returnJson(True, '修改成功!')
+
+    def get_agent_cfg(self):
+        path = self.__agent_cfg
+        info = mw.readFile(path)
+        info = mw.deDoubleCrypt('agent', info)
+        info = json.loads(info)
+        return info
+
+    def agent_cfg(self):
+        path = self.__agent_cfg
+        if not os.path.exists(path):
+            d = {}
+            d['host'] = '127.0.0.1:5555'
+            d['secret'] = 'secret'
+            mw.writeFile(path, mw.enDoubleCrypt('agent', mw.getJson(d)))
+
+        info = self.get_agent_cfg()
+        return mw.returnJson(True, 'ok', info)
+
+    def agent_save_cfg(self):
+        args = self.getArgs()
+        data = self.checkArgs(args, ['host', 'secret'])
+        if not data[0]:
+            return data[1]
+        path = self.__agent_cfg
+        mw.writeFile(path, mw.enDoubleCrypt('agent', mw.getJson(args)))
+        return mw.returnJson(True, '修改成功!')
+
+    def run_log(self):
+        return self.getServerDir() + '/logs/nezha.log'
 
 
 if __name__ == "__main__":

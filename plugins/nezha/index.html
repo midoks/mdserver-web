@@ -4,9 +4,11 @@
 		<div class="bt-w-menu">
 			<p class="bgw" onclick="pluginService('nezha');">面板服务</p>
 			<p onclick="pluginInitD('nezha');">面板自启动</p>
+			<p onclick="nezha.cfg($('.plugin_version').attr('version'));">面板配置</p>
+			<p onclick="pluginConfig('nezha', $('.plugin_version').attr('version'), 'conf');">面板配置文件</p>
 			<p onclick="pluginService('nezha', $('.plugin_version').attr('version'), 'agent');">AGENT服务</p>
 			<p onclick="pluginInitD('nezha', $('.plugin_version').attr('version'), 'agent');">AGENT自启动</p>
-			<p onclick="pluginConfig('nezha',null, 'conf');">面板配置文件</p>
+			<p onclick="nezha.agent_cfg($('.plugin_version').attr('version'));">AGENT配置</p>
 		</div>
 		<div class="bt-w-con pd15">
 			<div class="soft-man-con"></div>
