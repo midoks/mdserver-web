@@ -291,6 +291,7 @@ class App:
         if not os.path.exists(path):
             d = {}
             cmd_un = 'cd ' + self.getServerDir() + '/dashboard && ./nezha conf -u ""'
+            mw.execShell(cmd_un)
             td = mw.execShell(cmd_un)
             d['username'] = td[0].strip()
 
