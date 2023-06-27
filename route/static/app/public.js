@@ -233,16 +233,41 @@ function changePathCallback(default_dir, callback) {
 		closeBtn: 1,
 		shift: 5,
 		shadeClose: false,
-		content: "<div class='changepath'><div class='path-top'><button type='button' class='btn btn-default btn-sm' onclick='backFile()'><span class='glyphicon glyphicon-share-alt'></span>返回</button>\
-		<div class='place' id='PathPlace'>当前路径：<span></span></div></div><div class='path-con'><div class='path-con-left'><dl><dt id='changecomlist' onclick='backMyComputer()'>计算机</dt></dl></div>\
-		<div class='path-con-right'><ul class='default' id='computerDefautl'></ul><div class='file-list divtable'>\
-			<table class='table table-hover' style='border:0 none'>\
-				<thead><tr class='file-list-head'><th width='40%'>文件名</th><th width='20%'>修改时间</th><th width='10%'>权限</th><th width='10%'>所有者</th><th width='10%'></th></tr></thead>\
-				<tbody id='tbody' class='list-list'></tbody></table></div></div></div></div><div class='getfile-btn' style='margin-top:0'>\
-				<button type='button' class='btn btn-default btn-sm pull-left' onclick='createFolder()'>新建文件夹</button>\
-				<button type='button' class='btn btn-danger btn-sm mr5 btn-close'>关闭</button>\
-				<button type='button' class='btn btn-success btn-sm btn-choose'>选择</button>\
-		</div>",
+		content: "<div class='changepath'>\
+					<div class='path-top'>\
+						<button type='button' class='btn btn-default btn-sm' onclick='backFile()'>\
+							<span class='glyphicon glyphicon-share-alt'></span>返回\
+						</button>\
+						<div class='place' id='PathPlace'>当前路径：<span></span></div>\
+					</div>\
+					<div class='path-con'>\
+						<div class='path-con-left'>\
+						<dl><dt id='changecomlist' onclick='backMyComputer()'>计算机</dt></dl>\
+						</div>\
+						<div class='path-con-right'>\
+							<ul class='default' id='computerDefautl'></ul>\
+							<div class='file-list divtable'>\
+								<table class='table table-hover' style='border:0 none'>\
+									<thead>\
+										<tr class='file-list-head'>\
+											<th width='40%'>文件名</th>\
+											<th width='20%'>修改时间</th>\
+											<th width='10%'>权限</th>\
+											<th width='10%'>所有者</th>\
+											<th width='10%'></th>\
+										</tr>\
+									</thead>\
+									<tbody id='tbody' class='list-list'></tbody>\
+								</table>\
+							</div>\
+						</div>\
+					</div>\
+				</div>\
+				<div class='getfile-btn' style='margin-top:0'>\
+					<button type='button' class='btn btn-default btn-sm pull-left' onclick='createFolder()'>新建文件夹</button>\
+					<button type='button' class='btn btn-danger btn-sm mr5 btn-close'>关闭</button>\
+					<button type='button' class='btn btn-success btn-sm btn-choose'>选择</button>\
+				</div>",
 		success:function(layero,layer_index){
 			$('.btn-close').click(function(){
 				layer.close(layer_index);
@@ -274,16 +299,38 @@ function changePath(d) {
 		closeBtn: 1,
 		shift: 5,
 		shadeClose: false,
-		content: "<div class='changepath'><div class='path-top'><button type='button' class='btn btn-default btn-sm' onclick='backFile()'><span class='glyphicon glyphicon-share-alt'></span>返回</button>\
-		<div class='place' id='PathPlace'>当前路径：<span></span></div></div><div class='path-con'><div class='path-con-left'><dl><dt id='changecomlist' onclick='backMyComputer()'>计算机</dt></dl></div>\
-		<div class='path-con-right'><ul class='default' id='computerDefautl'></ul><div class='file-list divtable'>\
-			<table class='table table-hover' style='border:0 none'>\
-				<thead><tr class='file-list-head'><th width='40%'>文件名</th><th width='20%'>修改时间</th><th width='10%'>权限</th><th width='10%'>所有者</th><th width='10%'></th></tr></thead>\
-				<tbody id='tbody' class='list-list'></tbody></table></div></div></div></div><div class='getfile-btn' style='margin-top:0'>\
+		content: "\
+			<div class='changepath'>\
+				<div class='path-top'>\
+					<button type='button' class='btn btn-default btn-sm' onclick='backFile()'><span class='glyphicon glyphicon-share-alt'></span>返回</button>\
+					<div class='place' id='PathPlace'>当前路径：<span></span></div>\
+				</div>\
+				<div class='path-con'>\
+					<div class='path-con-left'><dl><dt id='changecomlist' onclick='backMyComputer()'>计算机</dt></dl></div>\
+					<div class='path-con-right'>\
+						<ul class='default' id='computerDefautl'></ul>\
+						<div class='file-list divtable'>\
+							<table class='table table-hover' style='border:0 none'>\
+								<thead>\
+									<tr class='file-list-head'>\
+										<th width='40%'>文件名</th>\
+										<th width='20%'>修改时间</th>\
+										<th width='10%'>权限</th>\
+										<th width='10%'>所有者</th>\
+										<th width='10%'></th>\
+									</tr>\
+								</thead>\
+								<tbody id='tbody' class='list-list'></tbody>\
+							</table>\
+						</div>\
+					</div>\
+				</div>\
+			</div>\
+			<div class='getfile-btn' style='margin-top:0'>\
 				<button type='button' class='btn btn-default btn-sm pull-left' onclick='createFolder()'>新建文件夹</button>\
 				<button type='button' class='btn btn-danger btn-sm mr5' onclick=\"layer.close(getCookie('changePath'))\">关闭</button>\
 				<button type='button' class='btn btn-success btn-sm' onclick='getfilePath()'>选择</button>\
-		</div>"
+			</div>"
 	});
 	setCookie("changePath", c);
 	var b = $("#" + d).val();
@@ -323,7 +370,13 @@ function getDiskList(b) {
 					e = e.substring(0, 10) + "..."
 				}
 			}
-			d += "<tr><td onclick=\"getDiskList('" + h.PATH + "/" + g[0] + "')\" title='" + g[0] + "'><span class='glyphicon glyphicon-folder-open'></span>" + e + "</td><td>" + getLocalTime(g[2]) + "</td><td>" + g[3] + "</td><td>" + g[4] + "</td><td><span class='delfile-btn' onclick=\"NewDelFile('" + h.PATH + "/" + g[0] + "')\">X</span></td></tr>"
+			d += "<tr>\
+				<td onclick=\"getDiskList('" + h.PATH + "/" + g[0] + "')\" title='" + g[0] + "'>\
+					<span class='glyphicon glyphicon-folder-open'></span>" + e + "</td><td>" + getLocalTime(g[2]) + "</td>\
+				<td>" + g[3] + "</td>\
+				<td>" + g[4] + "</td>\
+				<td><span class='delfile-btn' onclick=\"NewDelFile('" + h.PATH + "/" + g[0] + "')\">X</span></td>\
+			</tr>";
 		}
 		if(h.FILES != null && h.FILES != "") {
 			for(var f = 0; f < h.FILES.length; f++) {
@@ -337,7 +390,13 @@ function getDiskList(b) {
 						e = e.substring(0, 10) + "..."
 					}
 				}
-				d += "<tr><td title='" + g[0] + "'><span class='glyphicon glyphicon-file'></span>" + e + "</td><td>" + getLocalTime(g[2]) + "</td><td>" + g[3] + "</td><td>" + g[4] + "</td><td></td></tr>"
+				d += "<tr>\
+					<td title='" + g[0] + "'><span class='glyphicon glyphicon-file'></span>" + e + "</td>\
+					<td>" + getLocalTime(g[2]) + "</td>\
+					<td>" + g[3] + "</td>\
+					<td>" + g[4] + "</td>\
+					<td></td>\
+				</tr>";
 			}
 		}
 		$(".default").hide();
@@ -720,7 +779,12 @@ function safeMessage(j, h, g, f) {
 		area: "350px",
 		closeBtn: 1,
 		shadeClose: true,
-		content: "<div class='bt-form webDelete pd20 pb70'><p>" + h + "</p>" + f + "<div class='vcode'>"+lan.bt.cal_msg+"<span class='text'>" + sumtext + "</span>=<input type='number' id='vcodeResult' value=''></div><div class='bt-form-submit-btn'><button type='button' class='btn btn-danger btn-sm bt-cancel'>"+lan.public.cancel+"</button> <button type='button' id='toSubmit' class='btn btn-success btn-sm' >"+lan.public.ok+"</button></div></div>"
+		content: "<div class='bt-form webDelete pd20 pb70'>\
+			<p>" + h + "</p>" + f + "<div class='vcode'>"+lan.bt.cal_msg+"<span class='text'>" + sumtext + "</span>=<input type='number' id='vcodeResult' value=''></div>\
+			<div class='bt-form-submit-btn'>\
+				<button type='button' class='btn btn-danger btn-sm bt-cancel'>"+lan.public.cancel+"</button>\
+				<button type='button' id='toSubmit' class='btn btn-success btn-sm' >"+lan.public.ok+"</button></div>\
+			</div>"
 	});
 	$("#vcodeResult").focus().keyup(function(a) {
 		if(a.keyCode == 13) {
@@ -856,16 +920,32 @@ function GetTaskList(a) {
 				case "-1":
 					f = true;
 					if(g.data[d].type != "download") {
-						b = "<li><span class='titlename'>" + g.data[d].name + "</span><span class='state'>正在安装 <img src='/static/img/ing.gif'> | <a href=\"javascript:removeTask(" + g.data[d].id + ")\">关闭</a></span><span class='opencmd'></span><pre class='cmd'></pre></li>"
+						b = "<li>\
+								<span class='titlename'>" + g.data[d].name + "</span>\
+								<span class='state'>正在安装 <img src='/static/img/ing.gif'> | <a href=\"javascript:removeTask(" + g.data[d].id + ")\">关闭</a></span>\
+								<span class='opencmd'></span><pre class='cmd'></pre>\
+							</li>";
 					} else {
-						b = "<li><div class='line-progress' style='width:0%'></div><span class='titlename'>" + g.data[d].name + "<a id='speed' style='margin-left:130px;'>0.0M/12.5M</a></span><span class='com-progress'>0%</span><span class='state'>下载中 <img src='/static/img/ing.gif'> | <a href=\"javascript:removeTask(" + g.data[d].id + ")\">"+lan.public.close+"</a></span></li>"
+						b = "<li>\
+							<div class='line-progress' style='width:0%'></div>\
+							<span class='titlename'>" + g.data[d].name + "<a id='speed' style='margin-left:130px;'>0.0M/12.5M</a></span>\
+							<span class='com-progress'>0%</span><span class='state'>\
+								下载中 <img src='/static/img/ing.gif'> | <a href=\"javascript:removeTask(" + g.data[d].id + ")\">"+lan.public.close+"</a>\
+							</span>\
+						</li>";
 					}
 					break;
 				case "0":
-					c += "<li><span class='titlename'>" + g.data[d].name + "</span><span class='state'>等待</span> | <a href=\"javascript:removeTask(" + g.data[d].id + ")\">删除</a></li>";
+					c += "<li>\
+							<span class='titlename'>" + g.data[d].name + "</span>\
+							<span class='state'>等待</span> | <a href=\"javascript:removeTask(" + g.data[d].id + ")\">删除</a>\
+						</li>";
 					break;
 				case "1":
-					e += "<li><span class='titlename'>" + g.data[d].name + "</span><span class='state'>" + g.data[d].addtime + "  "+'已完成'+"  "+ '耗时' + (g.data[d].end - g.data[d].start)+"秒</span></li>"
+					e += "<li>\
+						<span class='titlename'>" + g.data[d].name + "</span>\
+						<span class='state'>" + g.data[d].addtime + "  "+'已完成'+"  "+ '耗时' + (g.data[d].end - g.data[d].start)+"秒</span>\
+						</li>";
 			}
 		}
 		$("#srunning").html(b + c);
@@ -1070,7 +1150,8 @@ function bindPanel(a,type,ip,btid,url,user,pw){
 		btn = "<button type='button' class='btn btn-success btn-sm' onclick=\"bindPanel(1,'b')\">添加</button>";
 	} else {
 		titleName = '修改关联' + ip;
-		btn = "<button type='button' class='btn btn-default btn-sm' onclick=\"bindPaneldel('"+btid+"')\">删除</button><button type='button' class='btn btn-success btn-sm' onclick=\"bindPanel(1,'c','"+ip+"','"+btid+"')\" style='margin-left:7px'>修改</button>";
+		btn = "<button type='button' class='btn btn-default btn-sm' onclick=\"bindPaneldel('"+btid+"')\">删除</button>\
+		<button type='button' class='btn btn-success btn-sm' onclick=\"bindPanel(1,'c','"+ip+"','"+btid+"')\" style='margin-left:7px'>修改</button>";
 	}
 	if(url == undefined) url="http://";
 	if(user == undefined) user="";
@@ -1255,13 +1336,37 @@ function remind(a){
 		for(var d = 0; d < g.data.length; d++) {
 			if(g.data[d].status != '1'){
 				task_count++;
-				e += '<tr><td><input type="checkbox"></td><td><div class="titlename c3">'+g.data[d].name+'</span><span class="rs-status">【'+lan.bt.task_the+'】<span><span class="rs-time">耗时['+ getSFM(g.data[d].end - g.data[d].start) +']</span></div></td><td class="text-right c3">'+g.data[d].addtime+'</td></tr>'
+				e += '<tr>\
+						<td><input type="checkbox"></td>\
+						<td>\
+							<div class="titlename c3">\
+								<span>'+g.data[d].name+'</span>\
+								<span class="rs-status">【'+lan.bt.task_the+'】<span>\
+								<span class="rs-time">耗时['+ getSFM(g.data[d].end - g.data[d].start) +']</span>\
+							</div>\
+						</td>\
+						<td class="text-right c3">'+g.data[d].addtime+'</td>\
+					</tr>';
 			} else{
-				e += '<tr><td><input type="checkbox"></td><td><div class="titlename c3">'+g.data[d].name+'</span><span class="rs-status">【'+lan.bt.task_ok+'】<span><span class="rs-time">耗时['+ getSFM(g.data[d].end - g.data[d].start) +']</span></div></td><td class="text-right c3">'+g.data[d].addtime+'</td></tr>';
+				e += '<tr>\
+						<td><input type="checkbox"></td>\
+						<td>\
+							<div class="titlename c3">'+g.data[d].name+'</span>\
+								<span class="rs-status">【'+lan.bt.task_ok+'】<span>\
+								<span class="rs-time">耗时['+ getSFM(g.data[d].end - g.data[d].start) +']</span>\
+							</div>\
+						</td>\
+						<td class="text-right c3">'+g.data[d].addtime+'</td>\
+					</tr>';
 			}
 		}
 		var con = '<div class="divtable"><table class="table table-hover">\
-					<thead><tr><th width="20"><input id="Rs-checkAll" type="checkbox" onclick="RscheckSelect()"></th><th>'+lan.bt.task_name+'</th><th class="text-right">'+lan.bt.task_time+'</th></tr></thead>\
+					<thead>\
+						<tr>\
+							<th width="20"><input id="Rs-checkAll" type="checkbox" onclick="RscheckSelect()"></th>\
+							<th>'+lan.bt.task_name+'</th><th class="text-right">'+lan.bt.task_time+'</th>\
+						</tr>\
+					</thead>\
 					<tbody id="remind">'+e+'</tbody>\
 					</table></div>\
 					<div class="mtb15" style="height:32px">\
@@ -1325,12 +1430,26 @@ function getReloads() {
 							c += f[e] + "<br>"
 						}
 						if(h.task[g].name.indexOf("扫描") != -1) {
-							b = "<li><span class='titlename'>" + h.task[g].name + "</span><span class='state'>正在扫描<img src='/static/img/ing.gif'> | <a href=\"javascript:removeTask(" + h.task[g].id + ")\">关闭</a></span><span class='opencmd'></span><div class='cmd'>" + c + "</div></li>"
+							b = "<li>\
+								<span class='titlename'>" + h.task[g].name + "</span>\
+								<span class='state'>正在扫描<img src='/static/img/ing.gif'> | <a href=\"javascript:removeTask(" + h.task[g].id + ")\">关闭</a></span>\
+								<span class='opencmd'></span>\
+								<div class='cmd'>" + c + "</div>\
+							</li>";
 						} else {
-							b = "<li><span class='titlename'>" + h.task[g].name + "</span><span class='state'>正在安装<img src='/static/img/ing.gif'> | <a href=\"javascript:removeTask(" + h.task[g].id + ")\">关闭</a></span><div class='cmd'>" + c + "</div></li>"
+							b = "<li>\
+								<span class='titlename'>" + h.task[g].name + "</span>\
+								<span class='state'>正在安装<img src='/static/img/ing.gif'> | <a href=\"javascript:removeTask(" + h.task[g].id + ")\">关闭</a></span>\
+								<div class='cmd'>" + c + "</div>\
+							</li>";
 						}
 					} else {
-						b = "<li><div class='line-progress' style='width:" + h.msg.pre + "%'></div><span class='titlename'>" + h.task[g].name + "<a style='margin-left:130px;'>" + (toSize(h.msg.used) + "/" + toSize(h.msg.total)) + "</a></span><span class='com-progress'>" + h.msg.pre + "%</span><span class='state'>"+lan.bt.task_downloading+" <img src='/static/img/ing.gif'> | <a href=\"javascript:removeTask(" + h.task[g].id + ")\">"+lan.public.close+"</a></span></li>"
+						b = "<li>\
+								<div class='line-progress' style='width:" + h.msg.pre + "%'></div>\
+								<span class='titlename'>" + h.task[g].name + "<a style='margin-left:130px;'>" + (toSize(h.msg.used) + "/" + toSize(h.msg.total)) + "</a></span>\
+									<span class='com-progress'>" + h.msg.pre + "%</span>\
+									<span class='state'>"+lan.bt.task_downloading+" <img src='/static/img/ing.gif'> | <a href=\"javascript:removeTask(" + h.task[g].id + ")\">"+lan.public.close+"</a></span>\
+							</li>"
 					}
 				} else {
 					d += "<li><span class='titlename'>" + h.task[g].name + "</span><span class='state'>等待 | <a style='color:green' href=\"javascript:removeTask(" + h.task[g].id + ')">删除</a></span></li>'
@@ -1380,14 +1499,24 @@ function tasklist(a){
 				case "-1":
 					f = true;
 					if(g.data[d].type != "download") {
-						b = "<li><span class='titlename'>" + g.data[d].name + "</span><span class='state pull-right c6'>正在安装<img src='/static/img/ing.gif'> | <a class='btlink' href=\"javascript:removeTask(" + g.data[d].id + ")\">关闭</a></span><span class='opencmd'></span><pre class='cmd'></pre></li>"
+						b = "<li>\
+							<span class='titlename'>" + g.data[d].name + "</span>\
+							<span class='state pull-right c6'>正在安装<img src='/static/img/ing.gif'> | <a class='btlink' href=\"javascript:removeTask(" + g.data[d].id + ")\">关闭</a></span>\
+							<span class='opencmd'></span><pre class='cmd'></pre>\
+						</li>";
 					} else {
-						b = "<li><div class='line-progress' style='width:0%'></div><span class='titlename'>" + g.data[d].name + "<a id='speed' style='margin-left:130px;'>0.0M/12.5M</a></span><span class='com-progress'>0%</span><span class='state'>下载中 <img src='/static/img/ing.gif'> | <a href=\"javascript:removeTask(" + g.data[d].id + ")\">关闭</a></span></li>"
+						b = "<li>\
+							<div class='line-progress' style='width:0%'></div><span class='titlename'>" + g.data[d].name + "<a id='speed' style='margin-left:130px;'>0.0M/12.5M</a></span>\
+							<span class='com-progress'>0%</span><span class='state'>下载中 <img src='/static/img/ing.gif'> | <a href=\"javascript:removeTask(" + g.data[d].id + ")\">关闭</a></span>\
+						</li>";
 					}
 					task_count++;
 					break;
 				case "0":
-					c += "<li><span class='titlename'>" + g.data[d].name + "</span><span class='state pull-right c6'>等待</span> | <a href=\"javascript:removeTask(" + g.data[d].id + ")\" class='btlink'>"+lan.public.del+"</a></li>";
+					c += "<li>\
+						<span class='titlename'>" + g.data[d].name + "</span>\
+						<span class='state pull-right c6'>等待</span> | <a href=\"javascript:removeTask(" + g.data[d].id + ")\" class='btlink'>"+lan.public.del+"</a>\
+					</li>";
 					task_count++;
 					break;
 			}
@@ -1704,7 +1833,8 @@ function showSpeed(filename) {
  * 显示进度窗口
  */
 function showSpeedWindow(msg, speed_log_func_name, callback){
-	var speed_msg = "<pre style='margin-bottom: 0px;height:250px;text-align: left;background-color: #000;color: #fff;white-space: pre-wrap;' id='speed_log_lst'>[MSG]</pre>";
+	var speed_msg = "<pre style='margin-bottom: 0px;height:250px;text-align: left;background-color: #000;\
+		color: #fff;white-space: pre-wrap;' id='speed_log_lst'>[MSG]</pre>";
 	var showSpeedKey = layer.open({
 		title: false,
 		type: 1,
@@ -2227,14 +2357,18 @@ function pluginConfigSave(fileName) {
     },'json');
 }
 
-
-
-function pluginInitD(_name,_version){
+function pluginInitD(_name, _version, _suffix_name=''){
 	if (typeof _version == 'undefined'){
     	_version = '';
     }
+
+    var default_name = 'initd_status';
+	if ( _suffix_name != '' ){
+		default_name = 'initd_status_'+_suffix_name;
+	}
+
 	var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
-	$.post('/plugins/run', {name:_name, func:'initd_status',version : _version}, function(data) {
+	$.post('/plugins/run', {name:_name, func:default_name, version : _version}, function(data) {
 		layer.close(loadT);
         if( !data.status ){
             layer.msg(data.msg,{icon:0,time:3000,shade: [0.3, '#000']});
@@ -2245,35 +2379,48 @@ function pluginInitD(_name,_version){
             return;
         }
         if (data.data == 'ok'){
-            pluginSetInitD(_name, _version, true);
+            pluginSetInitD(_name, _version, true, _suffix_name);
         } else {
-            pluginSetInitD(_name, _version, false);
+            pluginSetInitD(_name, _version, false, _suffix_name);
         }
     },'json');
 }
 
-function pluginSetInitD(_name, _version, status){
+function pluginSetInitD(_name, _version, status,_suffix_name=''){
+
+	var default_name = (status?'initd_uninstall':'initd_install');
+	if ( _suffix_name != '' ){
+		default_name = default_name + '_' + _suffix_name;
+	}
+
 	var serviceCon ='<p class="status">当前状态：<span>'+(status ? '已加载' : '未加载' )+
         '</span><span style="color: '+
         (status?'#20a53a;':'red;')+
         ' margin-left: 3px;" class="glyphicon ' + (status?'glyphicon glyphicon-play':'glyphicon-pause')+'"></span></p><div class="sfm-opt">\
-            <button class="btn btn-default btn-sm" onclick="pluginOpInitD(\''+_name+'\',\''+_version+'\',\''+(status?'initd_uninstall':'initd_install')+'\')">'+(status?'卸载':'加载')+'</button>\
+            <button class="btn btn-default btn-sm" onclick="pluginOpInitD(\''+_name+'\',\''+_version+'\',\''+default_name+'\',\''+_suffix_name+'\')">'+(status?'卸载':'加载')+'</button>\
         </div>'; 
     $(".soft-man-con").html(serviceCon);
 }
 
-function pluginOpInitD(a, _version, b) {
+function pluginOpInitD(a, _version, b, _suffix_name='') {
     var c = "name=" + a + "&func=" + b + "&version="+_version;
     var d = "";
+    b = b.split('_'+_suffix_name)[0];
     switch(b) {
         case "initd_install":d = '加载';break;
         case "initd_uninstall":d = '卸载';break;
     }
-    layer.confirm( msgTpl('您真的要{1}{2}{3}服务吗？', [d,a,_version]), {icon:3,closeBtn: 1}, function() {
-        var e = layer.msg(msgTpl('正在{1}{2}{3}服务,请稍候...',[d,a,_version]), {icon: 16,time: 0});
+
+    _ver = _version;
+    if(_version != ''){
+    	_ver = '【' + _version + '】';
+    }
+
+    layer.confirm( msgTpl('您真的要{1}{2}{3}服务吗？', [d,a,_ver]), {icon:3,closeBtn: 1}, function() {
+        var e = layer.msg(msgTpl('正在{1}{2}{3}服务,请稍候...',[d,a,_ver]), {icon: 16,time: 0});
         $.post("/plugins/run", c, function(g) {
             layer.close(e);
-            var f = g.data == 'ok' ? msgTpl('{1}{3}服务已{2}',[a,d,_version]) : msgTpl('{1}{3}服务{2}失败!',[a,d,_version]);
+            var f = g.data == 'ok' ? msgTpl('{1}{3}服务已{2}',[a,d,_ver]) : msgTpl('{1}{3}服务{2}失败!',[a,d,_ver]);
             layer.msg(f, {icon: g.data == 'ok' ? 1 : 2});
             
             if ( b == 'initd_install' && g.data == 'ok' ) {

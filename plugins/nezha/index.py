@@ -264,6 +264,21 @@ class App:
         mw.execShell('systemctl disable nezha')
         return 'ok'
 
+    def initd_status_agent(self):
+        cmd = 'systemctl status nezha-agent | grep loaded | grep "enabled;"'
+        data = mw.execShell(cmd)
+        if data[0] == '':
+            return 'fail'
+        return 'ok'
+
+    def initd_install_agent(self):
+        mw.execShell('systemctl enable nezha-agent')
+        return 'ok'
+
+    def initd_uinstall_agent(self):
+        mw.execShell('systemctl disable nezha-agent')
+        return 'ok'
+
     def conf(self):
         return self.getServerDir() + '/dashboard/data/config.yaml'
 
