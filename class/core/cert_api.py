@@ -31,8 +31,9 @@ import mw
 
 try:
     import OpenSSL
-except Exception as e:
-    raise e
+except:
+    mw.execShell("pip install pyopenssl")
+    import OpenSSL
 
 
 def echoErr(msg):
