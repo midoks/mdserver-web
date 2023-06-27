@@ -40,7 +40,7 @@ max_connect_errors = 100
 open_files_limit = 2560
 max_allowed_packet = 128M
 
-skip_name_resolve = 1
+skip_name_resolve=1
 #skip-networking
 #skip-external-locking
 #loose-skip-innodb
