@@ -312,6 +312,7 @@ class App:
 
         cmd = 'cd ' + self.getServerDir() + '/dashboard && ./nezha conf -su "' + \
             args['username'] + '" -p ' + args['password']
+        # print(cmd)
         t = mw.execShell(cmd)
         # print(t)
         mw.writeFile(path, mw.enDoubleCrypt('nezha', mw.getJson(args)))
