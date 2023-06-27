@@ -260,7 +260,7 @@ class App:
         mw.execShell('systemctl enable nezha')
         return 'ok'
 
-    def initd_uinstall(self):
+    def initd_uninstall(self):
         mw.execShell('systemctl disable nezha')
         return 'ok'
 
