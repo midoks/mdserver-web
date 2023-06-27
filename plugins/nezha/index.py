@@ -192,10 +192,6 @@ class App:
 
     def imOp(self, method):
 
-        path = self.__agent_cfg
-        if not os.path.exists(path):
-            return '请先设置Agent配置!'
-
         file = self.initDreplace()
 
         if not mw.isAppleSystem():
@@ -224,6 +220,10 @@ class App:
 
     def agOp(self, method):
         file = self.initDAgent()
+
+        path = self.__agent_cfg
+        if not os.path.exists(path):
+            return '请先设置Agent配置!'
 
         if not mw.isAppleSystem():
             cmd = 'systemctl {} {}'.format(method, 'nezha-agent')
