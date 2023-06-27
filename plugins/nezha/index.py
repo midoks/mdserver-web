@@ -133,7 +133,7 @@ class App:
         if os.path.exists(systemDir) and not os.path.exists(systemService):
             service_path = mw.getServerDir()
             se_content = mw.readFile(systemServiceTpl)
-            se_content = se_content.replace('{$SERVER_PATH}', service_path)
+            se_content = self.contentReplace(se_content)
             mw.writeFile(systemService, se_content)
             mw.execShell('systemctl daemon-reload')
 
@@ -149,7 +149,7 @@ class App:
                 return 'ok'
             return 'fail'
 
-        data = mw.execShell(self.__SR + file + ' ' + method)
+        data = mw.execShell(file + ' ' + method)
         if data[1] == '':
             return 'ok'
         return data[0]
