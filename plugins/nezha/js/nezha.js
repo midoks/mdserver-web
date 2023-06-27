@@ -171,5 +171,14 @@ var nezha  = {
                 $(".soft-man-con").html(conf);
             }
         });
+    },
+
+    readme:function (){
+        var readme = '<ul class="help-info-text c7">';
+        readme += '<li>安装时不会自动启动。</li>';
+        readme += '<li>哪吒面板是改造版，用户名和密码登录【面板配置】，不依赖github/gitee/gitlab。</li>';
+        readme += '<li>Agent需要先手动填写正确信息。</li>';
+        readme += '</ul>';
+        $('.soft-man-con').html(readme);
     }
 }
