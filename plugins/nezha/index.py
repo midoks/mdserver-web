@@ -98,6 +98,13 @@ class App:
             return 'stop'
         return 'start'
 
+    def status_agent(self):
+        cmd = "ps -ef | grep nezha-agent | grep -v grep | grep -v python | awk '{print $2}'"
+        data = mw.execShell(cmd)
+        if data[0] == '':
+            return 'stop'
+        return 'start'
+
     def contentReplace(self, content):
 
         service_path = mw.getServerDir()
@@ -139,6 +146,31 @@ class App:
 
         return file_bin
 
+    def initDAgent(self):
+        initD_path = self.getServerDir() + '/init.d'
+        if not os.path.exists(initD_path):
+            os.mkdir(initD_path)
+
+        file_agent_bin = initD_path + '/nezha-agent'
+        if not os.path.exists(file_agent_bin):
+            content = mw.readFile(file_tpl)
+            content = self.contentReplace(content)
+            mw.writeFile(file_agent_bin, content)
+            mw.execShell('chmod +x ' + file_agent_bin)
+
+        # systemd
+        sysDir = mw.systemdCfgDir()
+        sysService = sysDir + '/nezha-agent.service'
+        sysServiceTpl = self.getPluginDir() + '/init.d/nezha-agent.service.tpl'
+        if os.path.exists(sysDir) and not os.path.exists(sysService):
+            service_path = mw.getServerDir()
+            content = mw.readFile(sysServiceTpl)
+            content = self.contentReplace(content)
+            mw.writeFile(sysService, content)
+            mw.execShell('systemctl daemon-reload')
+
+        return file_agent_bin
+
     def imOp(self, method):
         file = self.initDreplace()
 
@@ -165,6 +197,33 @@ class App:
 
     def reload(self):
         return self.imOp('reload')
+
+    def agOp(self, method):
+        file = self.initDAgent()
+
+        if not mw.isAppleSystem():
+            cmd = 'systemctl {} {}'.format(method, 'nezha-agent')
+            data = mw.execShell(cmd)
+            if data[1] == '':
+                return 'ok'
+            return 'fail'
+
+        data = mw.execShell(file + ' ' + method)
+        if data[1] == '':
+            return 'ok'
+        return data[0]
+
+    def start_agent(self):
+        return self.agOp('start')
+
+    def stop_agent(self):
+        return self.agOp('stop')
+
+    def restart_agent(self):
+        return self.agOp('restart')
+
+    def reload_agent(self):
+        return self.agentOp('reload')
 
     def initd_status(self):
         cmd = 'systemctl status nezha | grep loaded | grep "enabled;"'

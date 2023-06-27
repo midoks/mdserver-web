@@ -1924,14 +1924,19 @@ function utf8to16(str) {
 }
 
 
-function pluginService(_name, version){
-	var data = {name:_name, func:'status'}
+function pluginService(_name, version, _suffix_name=''){
+
+	var default_name = 'status';
+	if ( _suffix_name != '' ){
+		default_name = 'status_'+_suffix_name;
+	}
+
+	var data = {name:_name, func:default_name};
 	if ( typeof(version) != 'undefined' ){
 		data['version'] = version;
 	} else {
 		version = '';
 	}
-	// console.log(version);
 
 	var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
 	$.post('/plugins/run', data, function(data) {
@@ -1941,27 +1946,39 @@ function pluginService(_name, version){
             return;
         }
         if (data.data == 'start'){
-            pluginSetService(_name, true, version);
+            pluginSetService(_name, true, version, _suffix_name);
         } else {
-            pluginSetService(_name, false, version);
+            pluginSetService(_name, false, version, _suffix_name);
         }
     },'json');
 }
 
-function pluginSetService(_name ,status, version){
+function pluginSetService(_name ,status, version, _suffix_name=''){
+
+	var default_name = 'status';
+	var restart_name = 'restart';
+	var reload_name = 'reload';
+	var status_ss = (status?'stop':'start');
+	if ( _suffix_name != '' ){
+		default_name = 'status_'+_suffix_name;
+		restart_name = 'restart_'+_suffix_name;
+		reload_name = 'reload_'+_suffix_name;
+		status_ss = status_ss+'_'+_suffix_name;
+	}
+
 	var serviceCon ='<p class="status">当前状态：<span>'+(status ? '开启' : '关闭' )+
         '</span><span style="color: '+
         (status?'#20a53a;':'red;')+
         ' margin-left: 3px;" class="glyphicon ' + (status?'glyphicon glyphicon-play':'glyphicon-pause')+'"></span></p><div class="sfm-opt">\
-            <button class="btn btn-default btn-sm" onclick="pluginOpService(\''+_name+'\',\''+(status?'stop':'start')+'\',\''+version+'\')">'+(status?'停止':'启动')+'</button>\
-            <button class="btn btn-default btn-sm" onclick="pluginOpService(\''+_name+'\',\'restart\',\''+version+'\')">重启</button>\
-            <button class="btn btn-default btn-sm" onclick="pluginOpService(\''+_name+'\',\'reload\',\''+version+'\')">重载配置</button>\
+            <button class="btn btn-default btn-sm" onclick="pluginOpService(\''+_name+'\',\''+status_ss+'\',\''+version+'\',\''+_suffix_name+'\')">'+(status?'停止':'启动')+'</button>\
+            <button class="btn btn-default btn-sm" onclick="pluginOpService(\''+_name+'\',\''+restart_name+'\',\''+version+'\',\''+_suffix_name+'\')">重启</button>\
+            <button class="btn btn-default btn-sm" onclick="pluginOpService(\''+_name+'\',\''+reload_name+'\',\''+version+'\',\''+_suffix_name+'\')">重载配置</button>\
         </div>'; 
     $(".soft-man-con").html(serviceCon);
 }
 
 
-function pluginOpService(a, b, v) {
+function pluginOpService(a, b, v, _suffix_name='') {
 
     var c = "name=" + a + "&func=" + b;
     if(v != ''){
@@ -1969,6 +1986,8 @@ function pluginOpService(a, b, v) {
     }
 
     var d = "";
+
+    b = b.split('_')[0];
     switch(b) {
         case "stop":d = '停止';break;
         case "start":d = '启动';break;
@@ -1980,15 +1999,14 @@ function pluginOpService(a, b, v) {
         $.post("/plugins/run", c, function(g) {
             layer.close(e);
             
-            
             var f = g.data == 'ok' ? msgTpl('{1}{2}服务已{3}',[a,v,d]) : msgTpl('{1}{2}服务{3}失败!',[a,v,d]);
             layer.msg(f, {icon: g.data == 'ok' ? 1 : 2});
             
             if( b != "reload" && g.data == 'ok' ) {
                 if ( b == 'start' ) {
-                    pluginSetService(a, true, v);
+                    pluginSetService(a, true, v, _suffix_name);
                 } else if ( b == 'stop' ){
-                    pluginSetService(a, false, v);
+                    pluginSetService(a, false, v, _suffix_name);
                 }
             }
 
