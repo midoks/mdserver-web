@@ -275,7 +275,7 @@ class App:
         mw.execShell('systemctl enable nezha-agent')
         return 'ok'
 
-    def initd_uinstall_agent(self):
+    def initd_uninstall_agent(self):
         mw.execShell('systemctl disable nezha-agent')
         return 'ok'
 
