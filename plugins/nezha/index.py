@@ -310,7 +310,7 @@ class App:
             return data[1]
         path = self.__cfg
 
-        cmd = 'cd ' + self.getServerDir() + '/dashboard && ./nezha conf -u "' + \
+        cmd = 'cd ' + self.getServerDir() + '/dashboard && ./nezha conf -su "' + \
             args['username'] + '" -p ' + args['password']
         t = mw.execShell(cmd)
         # print(t)
