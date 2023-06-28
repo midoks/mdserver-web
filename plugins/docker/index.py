@@ -144,15 +144,35 @@ def initdUinstall():
     mw.execShell('systemctl disable ' + getPluginName())
     return 'ok'
 
+# UTC时间转换为时间戳
+
+
+def utc_to_local(utc_time_str, utc_format='%Y-%m-%dT%H:%M:%S'):
+    import pytz
+    import datetime
+    import time
+    local_tz = pytz.timezone('Asia/Chongqing')
+    local_format = "%Y-%m-%d %H:%M"
+    utc_dt = datetime.datetime.strptime(utc_time_str, utc_format)
+    local_dt = utc_dt.replace(tzinfo=pytz.utc).astimezone(local_tz)
+    time_str = local_dt.strftime(local_format)
+    return int(time.mktime(time.strptime(time_str, local_format)))
+
 
 def conList():
-
     c = getDClient()
-
     clist = c.containers.list(all=True)
+    conList = []
+    for con in clist:
+        tmp = con.attrs
+        tmp['Created'] = utc_to_local(tmp['Created'].split('.')[0])
+        conList.append(tmp)
+        return conList
+    return mw.returnJson(True, 'ok', conList)
 
-    print(clist)
-    return mw.returnJson(True, 'ok')
+
+def imageList():
+    pass
 
 
 def runLog():
@@ -183,5 +203,7 @@ if __name__ == "__main__":
         print(runLog())
     elif func == 'con_list':
         print(conList())
+    elif func == 'image_list':
+        print(imageList())
     else:
         print('error')
