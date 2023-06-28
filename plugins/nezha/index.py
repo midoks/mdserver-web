@@ -102,7 +102,7 @@ class App:
             " |grep -v grep | grep -v nezha-agent | grep -v python | awk '{print $2}'"
         data = mw.execShell(cmd)
         if data[0] == '':
-            return 'stop'
+            return self.status_agent()
         return 'start'
 
     def status_agent(self):
