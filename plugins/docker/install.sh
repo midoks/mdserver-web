@@ -13,6 +13,10 @@ serverPath=$(dirname "$rootPath")
 install_tmp=${rootPath}/tmp/mw_install.pl
 VERSION=$2
 
+if [ -f ${rootPath}/bin/activate ];then
+	source ${rootPath}/bin/activate
+fi
+
 Install_Docker()
 {
 	which docker
@@ -28,6 +32,8 @@ Install_Docker()
 		curl -fsSL https://get.docker.com | bash
 		mkdir -p $serverPath/docker
 	fi
+
+	pip install docker
 	
 	if [ -d $serverPath/docker ];then
 		echo "${VERSION}" > $serverPath/docker/version.pl

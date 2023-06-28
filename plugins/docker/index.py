@@ -9,6 +9,9 @@ import re
 sys.path.append(os.getcwd() + "/class/core")
 import mw
 
+import docker
+client = docker.from_env()
+
 app_debug = False
 if mw.isAppleSystem():
     app_debug = True
@@ -139,6 +142,10 @@ def initdUinstall():
     return 'ok'
 
 
+def conList():
+    return mw.returnJson(True, 'ok')
+
+
 def runLog():
     return getServerDir() + '/data/redis.log'
 
@@ -165,5 +172,7 @@ if __name__ == "__main__":
         print(getConf())
     elif func == 'run_log':
         print(runLog())
+    elif func == 'con_list':
+        print(conList())
     else:
         print('error')

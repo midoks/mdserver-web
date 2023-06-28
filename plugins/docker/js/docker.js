@@ -55,10 +55,10 @@ function dPostCallbak(method, version, args,callback){
 
 function dockerList(){
 
-    // dPost('list', '', {}, function(rdata){
-    //     var rdata = $.parseJSON(rdata.data);
-    //     console.log(rdata);
-    // })
+    dPost('con_list', '', {}, function(rdata){
+        var rdata = $.parseJSON(rdata.data);
+        console.log(rdata);
+    });
 
     var con = '<div class="safe bgw">\
             <button onclick="" title="" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">添加数据库</button>\
