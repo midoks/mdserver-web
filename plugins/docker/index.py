@@ -159,7 +159,7 @@ def utc_to_local(utc_time_str, utc_format='%Y-%m-%dT%H:%M:%S'):
     return int(time.mktime(time.strptime(time_str, local_format)))
 
 
-def conList():
+def conListData():
     c = getDClient()
     clist = c.containers.list(all=True)
     conList = []
@@ -171,8 +171,35 @@ def conList():
     return mw.returnJson(True, 'ok', conList)
 
 
-def imageList():
-    pass
+def imageListData():
+    imageList = []
+    c = getDClient()
+    ilist = c.images.list()
+    for image in ilist:
+        tmp_attrs = image.attrs
+        if len(tmp_attrs['RepoTags']) == 1:
+            tmp_image = {}
+            tmp_image['Id'] = tmp_attrs['Id'].split(':')[1][:12]
+            tmp_image['RepoTags'] = tmp_attrs['RepoTags'][0]
+            tmp_image['Size'] = tmp_attrs['Size']
+            tmp_image['Labels'] = tmp_attrs['Config']['Labels']
+            tmp_image['Comment'] = tmp_attrs['Comment']
+            tmp_image['Created'] = utc_to_local(
+                tmp_attrs['Created'].split('.')[0])
+            imageList.append(tmp_image)
+        else:
+            for i in range(len(tmp_attrs['RepoTags'])):
+                tmp_image = {}
+                tmp_image['Id'] = tmp_attrs['Id'].split(':')[1][:12]
+                tmp_image['RepoTags'] = tmp_attrs['RepoTags'][i]
+                tmp_image['Size'] = tmp_attrs['Size']
+                tmp_image['Labels'] = tmp_attrs['Config']['Labels']
+                tmp_image['Comment'] = tmp_attrs['Comment']
+                tmp_image['Created'] = utc_to_local(
+                    tmp_attrs['Created'].split('.')[0])
+                imageList.append(tmp_image)
+    imageList = sorted(imageList, key=lambda x: x['Created'], reverse=True)
+    return imageList
 
 
 def runLog():
@@ -202,8 +229,8 @@ if __name__ == "__main__":
     elif func == 'run_log':
         print(runLog())
     elif func == 'con_list':
-        print(conList())
+        print(conListData())
     elif func == 'image_list':
-        print(imageList())
+        print(imageListData())
     else:
         print('error')
