@@ -61,7 +61,7 @@ function dockerList(){
     });
 
     var con = '<div class="safe bgw">\
-            <button onclick="" title="" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">添加数据库</button>\
+            <button onclick="" title="" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">创建容器</button>\
             <span style="float:right">              \
                 <button batch="true" style="float: right;display: none;margin-left:10px;" onclick="delDbBatch();" title="删除选中项" class="btn btn-default btn-sm">删除选中</button>\
             </span>\

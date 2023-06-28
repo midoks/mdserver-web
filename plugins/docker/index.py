@@ -10,11 +10,20 @@ sys.path.append(os.getcwd() + "/class/core")
 import mw
 
 import docker
-client = docker.from_env()
+
 
 app_debug = False
 if mw.isAppleSystem():
     app_debug = True
+
+
+def getDClient():
+    try:
+        client = docker.from_env()
+    except Exception as e:
+        client = docker.DockerClient(
+            base_url='unix:///Users/midoks/.docker/run/docker.sock')
+    return client
 
 
 def getPluginName():
@@ -27,12 +36,6 @@ def getPluginDir():
 
 def getServerDir():
     return mw.getServerDir() + '/' + getPluginName()
-
-
-def getInitDFile():
-    if app_debug:
-        return '/tmp/' + getPluginName()
-    return '/etc/init.d/' + getPluginName()
 
 
 def getConf():
@@ -60,19 +63,19 @@ def getArgs():
         if t.strip() == '':
             tmp = []
         else:
-            t = t.split(':')
+            t = t.split(':', 1)
             tmp[t[0]] = t[1]
         tmp[t[0]] = t[1]
     elif args_len > 1:
         for i in range(len(args)):
-            t = args[i].split(':')
+            t = args[i].split(':', 1)
             tmp[t[0]] = t[1]
     return tmp
 
 
 def status():
     data = mw.execShell(
-        "ps -ef|grep dockerd |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'")
+        "ps -ef|grep docker |grep -v grep | grep -v python | grep -v mdserver-web | awk '{print $2}'")
 
     if data[0] == '':
         return 'stop'
@@ -143,6 +146,12 @@ def initdUinstall():
 
 
 def conList():
+
+    c = getDClient()
+
+    clist = c.containers.list(all=True)
+
+    print(clist)
     return mw.returnJson(True, 'ok')
 
 
