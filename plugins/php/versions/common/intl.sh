@@ -64,7 +64,7 @@ OPTIONS=''
 if [ "$version" -lt "74" ];then
 
 	if [ $OSNAME == 'debian' ] || [ $OSNAME == 'ubuntu' ] ;then
-		echo ""
+		echo "debian/ubuntu use system!"
 	else
 		cd ${rootPath}/plugins/php/lib && /bin/bash icu.sh
 		OPTIONS="--with-icu-dir=${serverPath}/lib/icu"
