@@ -51,6 +51,9 @@ load_vars() {
         GITHUB_RAW_URL="cdn.jsdelivr.net/gh/midoks/nezha@main"
         GITHUB_URL="dn-dao-github-mirror.daocloud.io"
     fi
+
+    echo $GITHUB_RAW_URL
+    echo $GITHUB_URL
 }
 
 # download file
