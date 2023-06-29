@@ -56,15 +56,22 @@ else
 fi
 
 
-# cn=$(curl --insecure -fsSL -m 10 https://ipinfo.io/json | grep "\"country\": \"CN\"")
+# HTTP_PREFIX="https://"
+# LOCAL_ADDR=common
+# ping  -c 1 github.com > /dev/null 2>&1
+# if [ "$?" != "0" ];then
+# 	LOCAL_ADDR=cn
+# 	HTTP_PREFIX="https://ghproxy.com/"
+# fi
 
+cn=$(curl -fsSL -m 10 -s http://ipinfo.io/json | grep "\"country\": \"CN\"")
 HTTP_PREFIX="https://"
 LOCAL_ADDR=common
-ping  -c 1 github.com > /dev/null 2>&1
-if [ "$?" != "0" ];then
+if [ ! -z "$cn" ];then
 	LOCAL_ADDR=cn
-	HTTP_PREFIX="https://ghproxy.com/"
+    HTTP_PREFIX="https://ghproxy.com/"
 fi
+
 
 if [ $OSNAME != "macos" ];then
 	if id www &> /dev/null ;then 
