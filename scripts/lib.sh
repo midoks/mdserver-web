@@ -108,6 +108,7 @@ P_VER_D=`echo "$P_VER"|awk -F '.' '{print $1}'`
 P_VER_M=`echo "$P_VER"|awk -F '.' '{print $2}'`
 NEW_P_VER=${VER_D}.${VER_M}
 
+echo "cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/version/r${NEW_P_VER}.txt"
 if [ -f /www/server/mdserver-web/version/r${NEW_P_VER}.txt ];then
     cd /www/server/mdserver-web && pip3 install -r /www/server/mdserver-web/version/r${NEW_P_VER}.txt -i $PIPSRC
 fi
