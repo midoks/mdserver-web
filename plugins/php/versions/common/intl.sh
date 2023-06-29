@@ -68,7 +68,7 @@ if [ "$version" -lt "74" ];then
 	else
 		cd ${rootPath}/plugins/php/lib && /bin/bash icu.sh
 		OPTIONS="--with-icu-dir=${serverPath}/lib/icu"
-	if
+	fi
 fi
 
 
