@@ -83,9 +83,6 @@ if [ ! -f /usr/local/bin/pip3 ] && [ ! -f /usr/bin/pip3 ];then
     pip3 install --upgrade pip setuptools wheel -i $PIPSRC
 fi
 
-# pip3 install flask-caching==1.10.1
-# pip3 install mysqlclient
-
 if [ ! -f /www/server/mdserver-web/bin/activate ];then
     if version_ge "$P_VER" "3.11.0" ;then
         cd /www/server/mdserver-web && python3 -m venv /www/server/mdserver-web
@@ -114,6 +111,3 @@ if [ -f /www/server/mdserver-web/version/r${NEW_P_VER}.txt ];then
 fi
 
 echo "lib ok!"
-# pip3 install flask-caching==1.10.1
-# pip3 install mysqlclient
-
