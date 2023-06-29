@@ -53,12 +53,7 @@ function dPostCallbak(method, version, args,callback){
     },'json'); 
 }
 
-function dockerList(){
-
-    dPost('con_list', '', {}, function(rdata){
-        var rdata = $.parseJSON(rdata.data);
-        console.log(rdata);
-    });
+function dockerConList(){
 
     var con = '<div class="safe bgw">\
             <button onclick="" title="" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">创建容器</button>\
@@ -77,15 +72,100 @@ function dockerList(){
                     '<th>备注</th>\
                     <th style="text-align:right;">操作</th></tr></thead>\
                     <tbody>\
-                    ' +'\
-                    </tbody></table>\
+                    ' + '</tbody></table>\
                 </div>\
                 <div id="databasePage" class="dataTables_paginate paging_bootstrap page"></div>\
             </div>\
         </div>';
 
+    $(".soft-man-con").html(con);
+
+    dPost('con_list', '', {}, function(rdata){
+        // console.log(rdata);
+        var rdata = $.parseJSON(rdata.data);
+
+        var list = '';
+
+        var rlist = rdata.data;
+
+        for (var i = 0; i < rlist.length; i++) {
+
+            var status = '<span class="glyphicon glyphicon-pause" style="color:red;font-size:12px"></span>';
+            if (rlist[i]['State']['Status'] == 'running'){
+                status = '<span class="glyphicon glyphicon-play" style="color:#20a53a;font-size:12px"></span>';
+            }
+
+
+            list += '<tr>';
+            list += '<td>'+rlist[i]['Name'].substring(1)+'</td>';
+            list += '<td>'+rlist[i]['Config']['Image']+'</td>';
+            list += '<td>'+rlist[i]['Created']+'</td>';
+            list += '<td>'+status+'</td>';
+            list += '<td>'+'操作'+'</td>';
+            list += '</tr>';
+        }
+
+        $('#con_list tbody').html(list);
+    });
+    
+}
+
+function dockerImageList(){
+
+    var con = '<div class="safe bgw">\
+            <button onclick="" title="" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">获取镜像</button>\
+            <div class="divtable mtb10">\
+                <div class="tablescroll">\
+                    <table id="con_list" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
+                    <thead><tr>\
+                    <th>名称</th>\
+                    <th>版本</th>\
+                    <th>大小</th>\
+                    <th>证书</th>\
+                    <th>描述</th>\
+                    <th style="text-align:right;">操作</th></tr></thead>\
+                    <tbody>\
+                    ' + '</tbody></table>\
+                </div>\
+                <div id="databasePage" class="dataTables_paginate paging_bootstrap page"></div>\
+            </div>\
+        </div>';
 
     $(".soft-man-con").html(con);
+
+    dPost('image_list', '', {}, function(rdata){
+        console.log(rdata);
+        var rdata = $.parseJSON(rdata.data);
+        console.log(rdata);
+        var list = '';
+
+        var rlist = rdata.data;
+
+
+
+        for (var i = 0; i < rlist.length; i++) {
+
+            var tag = rlist[i]['RepoTags'].split(":")[1];
+
+            var license = 'null';
+
+            if (typeof(rlist[i]['Labels']) == 'null'){
+                license = 'free';
+            }
+
+
+            list += '<tr>';
+            list += '<td>'+rlist[i]['RepoTags']+'</td>';
+            list += '<td>'+tag+'</td>';
+            list += '<td>'+rlist[i]['Size']+'</td>';
+            list += '<td>'+license+'</td>';
+            list += '<td>'+'操作'+'</td>';
+            list += '</tr>';
+        }
+
+        $('#con_list tbody').html(list);
+    });
+    
 }
 
 

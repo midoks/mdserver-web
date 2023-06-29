@@ -167,7 +167,6 @@ def conListData():
         tmp = con.attrs
         tmp['Created'] = utc_to_local(tmp['Created'].split('.')[0])
         conList.append(tmp)
-        return conList
     return mw.returnJson(True, 'ok', conList)
 
 
@@ -199,7 +198,7 @@ def imageListData():
                     tmp_attrs['Created'].split('.')[0])
                 imageList.append(tmp_image)
     imageList = sorted(imageList, key=lambda x: x['Created'], reverse=True)
-    return imageList
+    return mw.returnJson(True, 'ok', imageList)
 
 
 def runLog():

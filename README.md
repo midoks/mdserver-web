@@ -104,6 +104,7 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 * debian12适配。
 * 添加nezha插件。
 * 优化域名ssl保存功能。
+* 修复PHP扩展intl不加载问题(debian/ubuntu)。
 
 ### JSDelivr安装地址
 
