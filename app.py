@@ -29,9 +29,8 @@ from gevent.pywsgi import WSGIServer
 from geventwebsocket.handler import WebSocketHandler
 
 
-if sys.version_info.minor <= 7:
-    from gevent import monkey
-    monkey.patch_all()
+from gevent import monkey
+monkey.patch_all()
 
 try:
     if __name__ == "__main__":
