@@ -28,8 +28,10 @@ from route import app, socketio
 from gevent.pywsgi import WSGIServer
 from geventwebsocket.handler import WebSocketHandler
 
-from gevent import monkey
-monkey.patch_all()
+
+if sys.version_info.minor == '6':
+    from gevent import monkey
+    monkey.patch_all()
 
 try:
     if __name__ == "__main__":
