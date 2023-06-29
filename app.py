@@ -29,7 +29,7 @@ from gevent.pywsgi import WSGIServer
 from geventwebsocket.handler import WebSocketHandler
 
 
-if sys.version_info.minor == '6':
+if sys.version_info.minor <= '7':
     from gevent import monkey
     monkey.patch_all()
 
