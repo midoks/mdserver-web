@@ -2124,12 +2124,18 @@ function pluginOpService(a, b, v, _suffix_name='') {
         case "restart":d = '重启';break;
         case "reload":d = '重载';break;
     }
-    layer.confirm( msgTpl('您真的要{1}{2}{3}服务吗？', [d,a,v]), {icon:3,closeBtn: 1}, function() {
-        var e = layer.msg(msgTpl('正在{1}{2}{3}服务,请稍候...',[d,a,v]), {icon: 16,time: 0});
+
+    _ver = v;
+    if(v != ''){
+    	_ver = '【' + v + '】';
+    }
+
+    layer.confirm( msgTpl('您真的要{1}{2}{3}服务吗？', [d,a,_ver]), {icon:3,closeBtn: 1}, function() {
+        var e = layer.msg(msgTpl('正在{1}{2}{3}服务,请稍候...',[d,a,_ver]), {icon: 16,time: 0});
         $.post("/plugins/run", c, function(g) {
             layer.close(e);
             
-            var f = g.data == 'ok' ? msgTpl('{1}{2}服务已{3}',[a,v,d]) : msgTpl('{1}{2}服务{3}失败!',[a,v,d]);
+            var f = g.data == 'ok' ? msgTpl('{1}{2}服务已{3}',[a,_ver,d]) : msgTpl('{1}{2}服务{3}失败!',[a,_ver,d]);
             layer.msg(f, {icon: g.data == 'ok' ? 1 : 2});
             
             if( b != "reload" && g.data == 'ok' ) {
