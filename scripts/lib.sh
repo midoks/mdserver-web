@@ -57,15 +57,20 @@ else
 fi
 
 
+# HTTP_PREFIX="https://"
+# LOCAL_ADDR=common
+# ping  -c 1 github.com > /dev/null 2>&1
+# if [ "$?" != "0" ];then
+#   LOCAL_ADDR=cn
+#   HTTP_PREFIX="https://ghproxy.com/"
+# fi
+
+cn=$(curl -fsSL -m 10 -s http://ipinfo.io/json | grep "\"country\": \"CN\"")
 HTTP_PREFIX="https://"
 LOCAL_ADDR=common
-ping -c 1 ipinfo.io > /dev/null 2>&1
-if [ "$?" == "0" ];then
-    CN=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
-    if [ ! -z "$CN" ];then
-        LOCAL_ADDR=cn
-        HTTP_PREFIX="https://ghproxy.com/"
-    fi
+if [ ! -z "$cn" ];then
+    LOCAL_ADDR=cn
+    HTTP_PREFIX="https://ghproxy.com/"
 fi
 
 PIPSRC="https://pypi.python.org/simple"
