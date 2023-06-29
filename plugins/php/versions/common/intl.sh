@@ -12,31 +12,31 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
 
-_os=`uname`
+# _os=`uname`
 
-if [ ${_os} == "Darwin" ]; then
-	OSNAME='macos'
-elif grep -Eq "openSUSE" /etc/*-release; then
-	OSNAME='opensuse'
-elif grep -Eq "FreeBSD" /etc/*-release; then
-	OSNAME='freebsd'
-elif grep -Eqi "CentOS" /etc/issue || grep -Eqi "CentOS" /etc/*-release; then
-	OSNAME='rhel'
-elif grep -Eqi "Fedora" /etc/issue || grep -Eqi "Fedora" /etc/*-release; then
-	OSNAME='rhel'
-elif grep -Eqi "Rocky" /etc/issue || grep -Eqi "Rocky" /etc/*-release; then
-	OSNAME='rhel'
-elif grep -Eqi "AlmaLinux" /etc/issue || grep -Eqi "AlmaLinux" /etc/*-release; then
-	OSNAME='rhel'
-elif grep -Eqi "Amazon Linux" /etc/issue || grep -Eqi "Amazon Linux" /etc/*-release; then
-	OSNAME='amazon'
-elif grep -Eqi "Debian" /etc/issue || grep -Eqi "Debian" /etc/*-release; then
-	OSNAME='debian'
-elif grep -Eqi "Ubuntu" /etc/issue || grep -Eqi "Ubuntu" /etc/*-release; then
-	OSNAME='ubuntu'
-else
-	OSNAME='unknow'
-fi
+# if [ ${_os} == "Darwin" ]; then
+# 	OSNAME='macos'
+# elif grep -Eq "openSUSE" /etc/*-release; then
+# 	OSNAME='opensuse'
+# elif grep -Eq "FreeBSD" /etc/*-release; then
+# 	OSNAME='freebsd'
+# elif grep -Eqi "CentOS" /etc/issue || grep -Eqi "CentOS" /etc/*-release; then
+# 	OSNAME='rhel'
+# elif grep -Eqi "Fedora" /etc/issue || grep -Eqi "Fedora" /etc/*-release; then
+# 	OSNAME='rhel'
+# elif grep -Eqi "Rocky" /etc/issue || grep -Eqi "Rocky" /etc/*-release; then
+# 	OSNAME='rhel'
+# elif grep -Eqi "AlmaLinux" /etc/issue || grep -Eqi "AlmaLinux" /etc/*-release; then
+# 	OSNAME='rhel'
+# elif grep -Eqi "Amazon Linux" /etc/issue || grep -Eqi "Amazon Linux" /etc/*-release; then
+# 	OSNAME='amazon'
+# elif grep -Eqi "Debian" /etc/issue || grep -Eqi "Debian" /etc/*-release; then
+# 	OSNAME='debian'
+# elif grep -Eqi "Ubuntu" /etc/issue || grep -Eqi "Ubuntu" /etc/*-release; then
+# 	OSNAME='ubuntu'
+# else
+# 	OSNAME='unknow'
+# fi
 
 actionType=$1
 version=$2
@@ -63,12 +63,9 @@ fi
 OPTIONS=''
 if [ "$version" -lt "74" ];then
 
-	if [ $OSNAME == 'debian' ] || [ $OSNAME == 'ubuntu' ] ;then
-		echo "debian/ubuntu use system!"
-	else
-		cd ${rootPath}/plugins/php/lib && /bin/bash icu.sh
-		OPTIONS="--with-icu-dir=${serverPath}/lib/icu"
-	fi
+	# cd /www/server/mdserver-web/plugins/php/lib && /bin/bash icu.sh
+	cd ${rootPath}/plugins/php/lib && /bin/bash icu.sh
+	OPTIONS="--with-icu-dir=${serverPath}/lib/icu"
 fi
 
 
