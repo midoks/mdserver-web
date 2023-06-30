@@ -167,7 +167,7 @@ def conList():
         tmp = con.attrs
         tmp['Created'] = utc_to_local(tmp['Created'].split('.')[0])
         conList.append(tmp)
-    return mw.returnJson(True, 'ok', conList)
+    return conList
 
 
 def conListData():

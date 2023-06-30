@@ -92,7 +92,6 @@ function dockerConList(){
         var rlist = rdata.data;
 
         for (var i = 0; i < rlist.length; i++) {
-
             var status = '<span class="glyphicon glyphicon-pause" style="color:red;font-size:12px"></span>';
             if (rlist[i]['State']['Status'] == 'running'){
                 status = '<span class="glyphicon glyphicon-play" style="color:#20a53a;font-size:12px"></span>';
@@ -174,10 +173,86 @@ function dockerImageList(){
 }
 
 
+function loginDockerImages(obj){
+    console.log(obj);
+}
+
+// login
+function repoLogin(){
+    var _option1= "";
+    var obj = {hub_name: "", namespace: "",name: "", registry: "", user_pass: "", user_name: "",arry: ['Docker Repository','Other Repository']};
+    for(var i = 0; i< obj.arry.length;i++){ 
+        _option1 += '<option value="'+ obj.arry[i] +'">'+ obj.arry[i] +'</option>';
+    }
+    var layer_index = layer.open({
+        type: 1,
+        title: "Login to Repository",
+        area: '450px',
+        closeBtn: 2,
+        shadeClose: false,
+        content: '<div class="bt-docker-con docker_content">'+
+                    '<style>.line .tname{width:120px;}</style>'+
+                    '<div class="soft-man-con pd20 pb70 private_pull">'+
+                        '<div class="line"><span class="tname">Repository Type</span><div class="info-r c4"><select class="bt-input-text mr5 project_version" name="dtype" style="width:250px">'+ _option1 +'</select></div></div>'+
+                        '<div class="line"><span class="tname">Name:</span><div class="info-r"><input class="bt-input-text" type="text" name="ctm_name" style="width:250px" value="'+obj.name+'"></div></div>'+
+                        '<div class="line"><span class="tname">Username:</span><div class="info-r"><input class="bt-input-text" type="text" name="user" style="width:250px" value="'+obj.user_name+'"></div></div>'+
+                        '<div class="line"><span class="tname">Password:</span><div class="info-r"><input class="bt-input-text" type="password" name="passwd" style="width:250px" value="'+obj.user_pass+'"></div></div>'+
+                        '<div class="line"><span class="tname">Repository Name:</span><div class="info-r"><input class="bt-input-text" type="text" name="hub_name" style="width:250px" value="'+obj.hub_name+'"></div></div>'+
+                        '<div class="line"><span class="tname">Namespaces:</span><div class="info-r"><input class="bt-input-text" type="text" name="namespace" style="width:250px" value="'+obj.namespace+'"></div></div>'+
+                        '<div class="line" style="display:none"><span class="tname">Registry:</span><div class="info-r"><input class="bt-input-text" type="text" name="registry" style="width:250px" value="'+obj.registry+'"></div></div>'+
+                        '<div class="bt-form-submit-btn"><button type="button" class="btn btn-sm btn-success login_aliyun">Login</button></div>'+
+                    '</div>'+
+                '</div>',
+        success:function(){
+            setTimeout(function(){
+                $('[name="dtype"]').change(function(e){
+                    var docker_type = $(this).val();
+                    if(docker_type == 'Other Repository'){
+                        $('.docker_content .line').show();
+                    }else{
+                        $('.docker_content .line').filter(":lt(3)").show().end().filter(":gt(4)").hide();
+                    }
+                }); 
+                $('.login_aliyun').click(function(){
+                    var user = $('[name="user"]').val(),
+                    passwd = $('[name="passwd"]').val(),
+                    registry = $('[name="registry"]').val(),
+                    name = $('[name="ctm_name"]').val(),
+                    hub_name = $('[name="hub_name"]').val(),
+                    namespace = $('[name="namespace"]').val();
+                    if($('[name="dtype"]').val() == 'Docker Repository'){
+                        loginDockerImages({
+                            user:user,
+                            passwd:passwd,
+                            registry:'',
+                            repository_name:name,
+                            hub_name:hub_name,
+                            namespace:namespace
+                        });
+                    }else{
+                        loginDockerImages({
+                            user:user,
+                            passwd:passwd,
+                            registry:registry,
+                            repository_name:name,
+                            hub_name:hub_name,
+                            namespace:namespace
+                        });
+                    }
+                });
+            },500);
+        }
+    });
+
+
+
+}
+
+
 function repoList(){
 
     var con = '<div class="safe bgw">\
-            <button onclick="" title="" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">登录</button>\
+            <button id="docker_login" title="" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">登录</button>\
             <div class="divtable mtb10">\
                 <div class="tablescroll">\
                     <table id="con_list" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
@@ -196,6 +271,11 @@ function repoList(){
         </div>';
 
     $(".soft-man-con").html(con);
+
+    //login
+    $('#docker_login').click(function(){
+        repoLogin();
+    });
 
     dPost('image_list', '', {}, function(rdata){
         var rdata = $.parseJSON(rdata.data);
