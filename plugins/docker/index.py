@@ -258,6 +258,13 @@ def dockerLogin():
     ret_status = dockerLoginCheck(user_name, user_pass, registry)
     path = getServerDir()
     if ret_status:
+        user_file = path + '/user.json'
+        user_info = mw.readFile(user_file)
+        if not user_info:
+            user_info = []
+        else:
+            user_info = json.loads(user_info)
+
         ret = {}
         ret['user_name'] = user_name
         ret['user_pass'] = user_pass
@@ -265,7 +272,10 @@ def dockerLogin():
         ret['hub_name'] = hub_name
         ret['namespace'] = namespace
         ret['repository_name'] = repository_name
-        mw.writeFile(path + '/user.json', json.dumps(ret))
+        if not registry:
+            ret['registry'] = "docker.io"
+        user_info.append(ret)
+        mw.writeFile(user_file, json.dumps(user_info))
         return mw.returnJson(True, '成功登录!')
     return mw.returnJson(False, '登录失败!')
 
