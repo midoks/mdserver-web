@@ -281,6 +281,25 @@ def dockerLogin():
     return mw.returnJson(False, '登录失败!')
 
 
+def repoList():
+    repostory_info = []
+    user_file = path + '/user.json'
+
+    if os.path.exists(user_file):
+        user_info = mw.readFile(user_file)
+        if user_info:
+            user_info = json.loads(user_info)
+            for i in user_info:
+                tmp = {}
+                tmp["hub_name"] = i["hub_name"]
+                tmp["registry"] = i["registry"]
+                tmp["namespace"] = i["namespace"]
+                tmp['repository_name'] = i["repository_name"]
+                repostory_info.append(tmp)
+
+    return mw.returnJson(True, 'ok', repostory_info)
+
+
 def runLog():
     return getServerDir() + '/data/redis.log'
 
@@ -313,5 +332,7 @@ if __name__ == "__main__":
         print(imageListData())
     elif func == 'docker_login':
         print(dockerLogin())
+    elif func == 'repo_list':
+        print(repoList())
     else:
         print('error')
