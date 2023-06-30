@@ -81,6 +81,10 @@ function dockerConList(){
     dPost('con_list', '', {}, function(rdata){
         // console.log(rdata);
         var rdata = $.parseJSON(rdata.data);
+        if (!rdata.status){
+            layer.msg(rdata.msg,{icon:2,time:2000});
+            return; 
+        }
 
         var list = '';
 
@@ -132,14 +136,14 @@ function dockerImageList(){
     $(".soft-man-con").html(con);
 
     dPost('image_list', '', {}, function(rdata){
-        console.log(rdata);
+        
         var rdata = $.parseJSON(rdata.data);
-        console.log(rdata);
+        if (!rdata.status){
+            layer.msg(rdata.msg,{icon:2,time:2000});
+            return; 
+        }
         var list = '';
-
         var rlist = rdata.data;
-
-
 
         for (var i = 0; i < rlist.length; i++) {
 

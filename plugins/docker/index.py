@@ -159,7 +159,7 @@ def utc_to_local(utc_time_str, utc_format='%Y-%m-%dT%H:%M:%S'):
     return int(time.mktime(time.strptime(time_str, local_format)))
 
 
-def conListData():
+def conList():
     c = getDClient()
     clist = c.containers.list(all=True)
     conList = []
@@ -170,7 +170,15 @@ def conListData():
     return mw.returnJson(True, 'ok', conList)
 
 
-def imageListData():
+def conListData():
+    try:
+        clist = conList()
+    except Exception as e:
+        return mw.returnJson(False, '未开启Docker')
+    return mw.returnJson(True, 'ok', clist)
+
+
+def imageList():
     imageList = []
     c = getDClient()
     ilist = c.images.list()
@@ -198,7 +206,15 @@ def imageListData():
                     tmp_attrs['Created'].split('.')[0])
                 imageList.append(tmp_image)
     imageList = sorted(imageList, key=lambda x: x['Created'], reverse=True)
-    return mw.returnJson(True, 'ok', imageList)
+    return imageList
+
+
+def imageListData():
+    try:
+        ilist = imageList()
+    except Exception as e:
+        return mw.returnJson(False, '未开启Docker')
+    return mw.returnJson(True, 'ok', ilist)
 
 
 def runLog():
