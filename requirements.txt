@@ -15,8 +15,8 @@ gevent-websocket==0.10.1
 psutil==5.9.1
 chardet==3.0.4
 flask-sqlalchemy==2.3.2
-pyOpenSSL==22.0.0
-cryptography==38.0.4
+pyOpenSSL==23.2.0
+cryptography==41.0.1
 configparser==5.2.0
 python-engineio==4.3.2
 python-socketio>=4.2.0
