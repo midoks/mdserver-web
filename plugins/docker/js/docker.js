@@ -161,7 +161,7 @@ function dockerImageList(){
             list += '<tr>';
             list += '<td>'+rlist[i]['RepoTags']+'</td>';
             list += '<td>'+tag+'</td>';
-            list += '<td>'+rlist[i]['Size']+'</td>';
+            list += '<td>'+toSize(rlist[i]['Size'])+'</td>';
             list += '<td>'+license+'</td>';
             list += '<td>'+desc+'</td>';
             list += '<td>'+'操作'+'</td>';
@@ -222,7 +222,7 @@ function repoList(){
             list += '<tr>';
             list += '<td>'+rlist[i]['RepoTags']+'</td>';
             list += '<td>'+tag+'</td>';
-            list += '<td>'+rlist[i]['Size']+'</td>';
+            list += '<td>'+toSize(rlist[i]['Size'])+'</td>';
             list += '<td>'+license+'</td>';
             list += '<td>'+desc+'</td>';
             list += '<td>'+'操作'+'</td>';

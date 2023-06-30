@@ -209,6 +209,18 @@ def imageList():
     return imageList
 
 
+# 登陆验证
+def dockerLoginCheck(user_name, user_pass, registry):
+    login_test = mw.execShell('docker login -u=%s -p %s %s' %
+                              (user_name, user_pass, registry))
+    ret = 'required$|Error'
+    ret2 = re.findall(ret, login_test[-1])
+    if len(ret2) == 0:
+        return True
+    else:
+        return False
+
+
 def imageListData():
     try:
         ilist = imageList()
