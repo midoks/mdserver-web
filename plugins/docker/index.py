@@ -54,7 +54,7 @@ def getInitDTpl():
 
 
 def getArgs():
-    args = sys.argv[3:]
+    args = sys.argv[2:]
     tmp = {}
     args_len = len(args)
 
@@ -71,6 +71,14 @@ def getArgs():
             t = args[i].split(':', 1)
             tmp[t[0]] = t[1]
     return tmp
+
+
+def checkArgs(self, data, ck=[]):
+    for i in range(len(ck)):
+        print(data[i])
+        if not ck[i] in data:
+            return (False, mw.returnJson(False, '参数:(' + ck[i] + ')没有!'))
+    return (True, mw.returnJson(True, 'ok'))
 
 
 def status():
@@ -209,10 +217,20 @@ def imageList():
     return imageList
 
 
-# 登陆验证
+def imageListData():
+    try:
+        ilist = imageList()
+    except Exception as e:
+        return mw.returnJson(False, '未开启Docker')
+    return mw.returnJson(True, 'ok', ilist)
+
+
 def dockerLoginCheck(user_name, user_pass, registry):
-    login_test = mw.execShell('docker login -u=%s -p %s %s' %
-                              (user_name, user_pass, registry))
+    # 登陆验证
+    cmd = 'docker login -u=%s -p %s %s' % (user_name, user_pass, registry)
+    # print(cmd)
+    login_test = mw.execShell(cmd)
+    # print(login_test)
     ret = 'required$|Error'
     ret2 = re.findall(ret, login_test[-1])
     if len(ret2) == 0:
@@ -221,12 +239,35 @@ def dockerLoginCheck(user_name, user_pass, registry):
         return False
 
 
-def imageListData():
-    try:
-        ilist = imageList()
-    except Exception as e:
-        return mw.returnJson(False, '未开启Docker')
-    return mw.returnJson(True, 'ok', ilist)
+def dockerLogin():
+    args = getArgs()
+
+    # print(args)
+    data = checkArgs(args, ['user', 'passwd', 'hub_name',
+                            'namespace', 'registry', 'repository_name'])
+    if not data[0]:
+        return data[1]
+
+    user_name = args['user']
+    user_pass = args['passwd']
+    registry = args['registry']
+    hub_name = args['hub_name']
+    namespace = args['namespace']
+    repository_name = args['repository_name']
+
+    ret_status = dockerLoginCheck(user_name, user_pass, registry)
+    path = getServerDir()
+    if ret_status:
+        ret = {}
+        ret['user_name'] = user_name
+        ret['user_pass'] = user_pass
+        ret['registry'] = registry
+        ret['hub_name'] = hub_name
+        ret['namespace'] = namespace
+        ret['repository_name'] = repository_name
+        mw.writeFile(path + '/user.json', json.dumps(ret))
+        return mw.returnJson(True, '成功登录!')
+    return mw.returnJson(False, '登录失败!')
 
 
 def runLog():
@@ -259,5 +300,7 @@ if __name__ == "__main__":
         print(conListData())
     elif func == 'image_list':
         print(imageListData())
+    elif func == 'docker_login':
+        print(dockerLogin())
     else:
         print('error')

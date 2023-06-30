@@ -172,11 +172,6 @@ function dockerImageList(){
     
 }
 
-
-function loginDockerImages(obj){
-    console.log(obj);
-}
-
 // login
 function repoLogin(){
     var _option1= "";
@@ -186,7 +181,7 @@ function repoLogin(){
     }
     var layer_index = layer.open({
         type: 1,
-        title: "Login to Repository",
+        title: "登录到存储库",
         area: '450px',
         closeBtn: 2,
         shadeClose: false,
@@ -204,48 +199,50 @@ function repoLogin(){
                     '</div>'+
                 '</div>',
         success:function(){
-            setTimeout(function(){
-                $('[name="dtype"]').change(function(e){
-                    var docker_type = $(this).val();
-                    if(docker_type == 'Other Repository'){
-                        $('.docker_content .line').show();
-                    }else{
-                        $('.docker_content .line').filter(":lt(3)").show().end().filter(":gt(4)").hide();
-                    }
-                }); 
-                $('.login_aliyun').click(function(){
-                    var user = $('[name="user"]').val(),
-                    passwd = $('[name="passwd"]').val(),
-                    registry = $('[name="registry"]').val(),
-                    name = $('[name="ctm_name"]').val(),
-                    hub_name = $('[name="hub_name"]').val(),
-                    namespace = $('[name="namespace"]').val();
-                    if($('[name="dtype"]').val() == 'Docker Repository'){
-                        loginDockerImages({
-                            user:user,
-                            passwd:passwd,
-                            registry:'',
-                            repository_name:name,
-                            hub_name:hub_name,
-                            namespace:namespace
-                        });
-                    }else{
-                        loginDockerImages({
-                            user:user,
-                            passwd:passwd,
-                            registry:registry,
-                            repository_name:name,
-                            hub_name:hub_name,
-                            namespace:namespace
-                        });
-                    }
+            $('[name="dtype"]').change(function(e){
+                var docker_type = $(this).val();
+                if(docker_type == 'Other Repository'){
+                    $('.docker_content .line').show();
+                }else{
+                    $('.docker_content .line').filter(":lt(3)").show().end().filter(":gt(4)").hide();
+                }
+            }); 
+            $('.login_aliyun').click(function(){
+                var user = $('[name="user"]').val(),
+                passwd = $('[name="passwd"]').val(),
+                registry = $('[name="registry"]').val(),
+                name = $('[name="ctm_name"]').val(),
+                hub_name = $('[name="hub_name"]').val(),
+                namespace = $('[name="namespace"]').val();
+
+                var args = {
+                    user:user,
+                    passwd:passwd,
+                    registry:'',
+                    repository_name:name,
+                    hub_name:hub_name,
+                    namespace:namespace
+                };
+                if($('[name="dtype"]').val() == 'Docker Repository'){
+                    args.registry = '';
+                }else{
+                    args.registry = registry;
+                }
+
+                console.log(obj);
+                dPost('docker_login', '', args, function(rdata){
+                    var rdata = $.parseJSON(rdata.data);
+                    console.log(rdata);
+                    layer.msg(rdata.msg,{icon:rdata.status?1:2});
+                    // if(res.status){
+                    //     docker.get_repository_list();
+                    //     // docker.get_login_stuats();
+                    // }
                 });
-            },500);
+            });
         }
     });
-
-
-
+    
 }
 
 
