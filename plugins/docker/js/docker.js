@@ -81,13 +81,14 @@ function dockerConList(){
     dPost('con_list', '', {}, function(rdata){
         // console.log(rdata);
         var rdata = $.parseJSON(rdata.data);
+        console.log(rdata);
         if (!rdata.status){
             layer.msg(rdata.msg,{icon:2,time:2000});
             return; 
         }
+        
 
         var list = '';
-
         var rlist = rdata.data;
 
         for (var i = 0; i < rlist.length; i++) {
@@ -136,12 +137,13 @@ function dockerImageList(){
     $(".soft-man-con").html(con);
 
     dPost('image_list', '', {}, function(rdata){
-        
         var rdata = $.parseJSON(rdata.data);
+        console.log(rdata);
         if (!rdata.status){
             layer.msg(rdata.msg,{icon:2,time:2000});
             return; 
         }
+        
         var list = '';
         var rlist = rdata.data;
 
@@ -150,17 +152,79 @@ function dockerImageList(){
             var tag = rlist[i]['RepoTags'].split(":")[1];
 
             var license = 'null';
+            var desc = 'null';
 
             if (typeof(rlist[i]['Labels']) == 'null'){
                 license = 'free';
             }
-
 
             list += '<tr>';
             list += '<td>'+rlist[i]['RepoTags']+'</td>';
             list += '<td>'+tag+'</td>';
             list += '<td>'+rlist[i]['Size']+'</td>';
             list += '<td>'+license+'</td>';
+            list += '<td>'+desc+'</td>';
+            list += '<td>'+'操作'+'</td>';
+            list += '</tr>';
+        }
+
+        $('#con_list tbody').html(list);
+    });
+    
+}
+
+
+function repoList(){
+
+    var con = '<div class="safe bgw">\
+            <button onclick="" title="" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">登录</button>\
+            <div class="divtable mtb10">\
+                <div class="tablescroll">\
+                    <table id="con_list" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
+                    <thead><tr>\
+                    <th>名称</th>\
+                    <th>版本</th>\
+                    <th>大小</th>\
+                    <th>证书</th>\
+                    <th>描述</th>\
+                    <th style="text-align:right;">操作</th></tr></thead>\
+                    <tbody>\
+                    ' + '</tbody></table>\
+                </div>\
+                <div id="databasePage" class="dataTables_paginate paging_bootstrap page"></div>\
+            </div>\
+        </div>';
+
+    $(".soft-man-con").html(con);
+
+    dPost('image_list', '', {}, function(rdata){
+        var rdata = $.parseJSON(rdata.data);
+        console.log(rdata);
+        if (!rdata.status){
+            layer.msg(rdata.msg,{icon:2,time:2000});
+            return; 
+        }
+        
+        var list = '';
+        var rlist = rdata.data;
+
+        for (var i = 0; i < rlist.length; i++) {
+
+            var tag = rlist[i]['RepoTags'].split(":")[1];
+
+            var license = 'null';
+            var desc = 'null';
+
+            if (typeof(rlist[i]['Labels']) == 'null'){
+                license = 'free';
+            }
+
+            list += '<tr>';
+            list += '<td>'+rlist[i]['RepoTags']+'</td>';
+            list += '<td>'+tag+'</td>';
+            list += '<td>'+rlist[i]['Size']+'</td>';
+            list += '<td>'+license+'</td>';
+            list += '<td>'+desc+'</td>';
             list += '<td>'+'操作'+'</td>';
             list += '</tr>';
         }

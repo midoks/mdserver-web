@@ -19,11 +19,11 @@ fi
 
 Install_Docker()
 {
-	which docker
-	if [ "$?" == "0" ];then
-		echo '安装已经完成docker' > $install_tmp
-		exit 0
-	fi
+	# which docker
+	# if [ "$?" == "0" ];then
+	# 	echo '安装已经完成docker' > $install_tmp
+	# 	exit 0
+	# fi
 
 	echo '正在安装脚本文件...' > $install_tmp
 	mkdir -p $serverPath/source
@@ -34,6 +34,7 @@ Install_Docker()
 	fi
 
 	pip install docker
+	pip install pytz
 	
 	if [ -d $serverPath/docker ];then
 		echo "${VERSION}" > $serverPath/docker/version.pl
