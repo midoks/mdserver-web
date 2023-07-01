@@ -281,6 +281,41 @@ def dockerLogin():
     return mw.returnJson(False, '登录失败!')
 
 
+# 删除用户信息
+def delete_user_info(registry):
+    path = getServerDir()
+    user_file = path + '/user.json'
+    user_info = mw.readFile(user_file)
+    if user_info:
+        user_info = json.loads(user_info)
+        for i in range(len(user_info)):
+            if registry in user_info[i].values():
+                del(user_info[i])
+                mw.writeFile(user_file, json.dumps(user_info))
+                return True
+
+
+def dockerLogout():
+    args = getArgs()
+    data = checkArgs(args, ['registry'])
+    if not data[0]:
+        return data[1]
+
+    registry = args['registry']
+    if registry == "docker.io":
+        registry = ""
+        login_test = mw.execShell('docker logout %s' % get.registry)
+        if registry == "":
+            registry = "docker.io"
+        ret = 'required$|Error'
+        ret2 = re.findall(ret, login_test[-1])
+        delete_user_info(registry)
+        if len(ret2) == 0:
+            return mw.returnJson(True, '退出成功')
+        else:
+            return mw.returnJson(True, '退出失败')
+
+
 def repoList():
     path = getServerDir()
     repostory_info = []
@@ -326,6 +361,8 @@ if __name__ == "__main__":
         print(imageListData())
     elif func == 'docker_login':
         print(dockerLogin())
+    elif func == 'docker_logout':
+        print(dockerLogout())
     elif func == 'repo_list':
         print(repoList())
     else:
