@@ -156,9 +156,7 @@ function dockerConList(){
         </div>';
 
     $(".soft-man-con").html(con);
-
     dockerConListRender();
-    
 }
 
 function deleteImages(tag, id){
