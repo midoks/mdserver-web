@@ -234,10 +234,10 @@ function repoLogin(){
                     var rdata = $.parseJSON(rdata.data);
                     console.log(rdata);
                     layer.msg(rdata.msg,{icon:rdata.status?1:2});
-                    // if(res.status){
-                    //     docker.get_repository_list();
-                    //     // docker.get_login_stuats();
-                    // }
+                    if(res.status){
+                        repoListRender();
+                        layer.close(layer_index);
+                    }
                 });
             });
         }
