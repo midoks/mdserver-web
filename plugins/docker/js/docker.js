@@ -195,7 +195,7 @@ function repoLogin(){
                         '<div class="line"><span class="tname">Repository Name:</span><div class="info-r"><input class="bt-input-text" type="text" name="hub_name" style="width:250px" value="'+obj.hub_name+'"></div></div>'+
                         '<div class="line"><span class="tname">Namespaces:</span><div class="info-r"><input class="bt-input-text" type="text" name="namespace" style="width:250px" value="'+obj.namespace+'"></div></div>'+
                         '<div class="line" style="display:none"><span class="tname">Registry:</span><div class="info-r"><input class="bt-input-text" type="text" name="registry" style="width:250px" value="'+obj.registry+'"></div></div>'+
-                        '<div class="bt-form-submit-btn"><button type="button" class="btn btn-sm btn-success login_aliyun">Login</button></div>'+
+                        '<div class="bt-form-submit-btn"><button type="button" class="btn btn-sm btn-success login_aliyun">登录</button></div>'+
                     '</div>'+
                 '</div>',
         success:function(){
