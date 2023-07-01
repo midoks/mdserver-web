@@ -233,6 +233,44 @@ def dockerLogCon():
         return mw.returnJson(False, 'Get Logs failed')
 
 
+def dockerRunCon():
+    # 启动容器
+    args = getArgs()
+    data = checkArgs(args, ['Hostname'])
+    if not data[0]:
+        return data[1]
+
+    Hostname = args['Hostname']
+    c = getDClient()
+    try:
+        conFind = c.containers.get(Hostname)
+        if not conFind:
+            return mw.returnJson(False, 'The specified container does not exist!')
+        conFind.start()
+        return mw.returnJson(True, '启动成功!')
+    except docker.errors.APIError as ex:
+        return mw.returnJson(False, '启动失败!' + str(ex))
+
+
+def dockerStopCon():
+    # 停止容器
+    args = getArgs()
+    data = checkArgs(args, ['Hostname'])
+    if not data[0]:
+        return data[1]
+
+    Hostname = args['Hostname']
+    c = getDClient()
+    try:
+        conFind = c.containers.get(Hostname)
+        if not conFind:
+            return mw.returnJson(False, 'The specified container does not exist!')
+        conFind.stop()
+        return mw.returnJson(True, '停止成功!')
+    except docker.errors.APIError as ex:
+        return mw.returnJson(False, '停止失败!' + str(ex))
+
+
 def imageList():
     imageList = []
     c = getDClient()
@@ -428,6 +466,10 @@ if __name__ == "__main__":
         print(dockerLogCon())
     elif func == 'docker_remove_con':
         print(dockerRemoveCon())
+    elif func == 'docker_run_con':
+        print(dockerRunCon())
+    elif func == 'docker_stop_con':
+        print(dockerStopCon())
     elif func == 'image_list':
         print(imageListData())
     elif func == 'docker_remove_image':

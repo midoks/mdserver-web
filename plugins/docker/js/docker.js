@@ -94,9 +94,29 @@ function deleteCon(Hostname){
     });
 }
 
+
+function startCon(Hostname){
+    dPost('docker_run_con','',{Hostname:Hostname},function(rdata){
+        var rdata = $.parseJSON(rdata.data);
+        layer.msg(rdata.msg,{icon:rdata.status?1:2});
+        if(rdata.status) {
+            dockerConListRender();
+        }
+    });
+}
+
+function stopCon(Hostname){
+    dPost('docker_stop_con','',{Hostname:Hostname},function(rdata){
+        var rdata = $.parseJSON(rdata.data);
+        layer.msg(rdata.msg,{icon:rdata.status?1:2});
+        if(rdata.status) {
+            dockerConListRender();
+        }
+    });
+}
+
 function dockerConListRender(){
     dPost('con_list', '', {}, function(rdata){
-        // console.log(rdata);
         var rdata = $.parseJSON(rdata.data);
         console.log(rdata);
         if (!rdata.status){
@@ -109,8 +129,10 @@ function dockerConListRender(){
         var rlist = rdata.data;
 
         for (var i = 0; i < rlist.length; i++) {
+            var docker_status = 'stop';
             var status = '<span class="glyphicon glyphicon-pause" style="color:red;font-size:12px"></span>';
             if (rlist[i]['State']['Status'] == 'running'){
+                docker_status = 'start';
                 status = '<span class="glyphicon glyphicon-play" style="color:#20a53a;font-size:12px"></span>';
             }
 
@@ -119,12 +141,17 @@ function dockerConListRender(){
             op += '<a href="javascript:;" onclick="logsCon(\''+rlist[i]['Id']+'\')" class="btlink">日志</a> | ';
             op += '<a href="javascript:;" onclick="deleteCon(\''+rlist[i]['Config']['Hostname']+'\')" class="btlink">删除</a>';
 
-
             list += '<tr>';
             list += '<td>'+rlist[i]['Name'].substring(1)+'</td>';
             list += '<td>'+rlist[i]['Config']['Image']+'</td>';
             list += '<td>'+getFormatTime(rlist[i]['Created'])+'</td>';
-            list += '<td>'+status+'</td>';
+
+
+            if (docker_status == 'start'){
+                list += '<td style="cursor:pointer;" align="center" onclick="stopCon(\''+rlist[i]['Config']['Hostname']+'\')">'+status+'</td>';  
+            } else{
+                list += '<td style="cursor:pointer;" align="center" onclick="startCon(\''+rlist[i]['Config']['Hostname']+'\')">'+status+'</td>';
+            }
             list += '<td class="text-right">'+op+'</td>';
             list += '</tr>';
         }
@@ -136,9 +163,6 @@ function dockerConList(){
 
     var con = '<div class="safe bgw">\
             <button onclick="" title="" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">创建容器</button>\
-            <span style="float:right">              \
-                <button batch="true" style="float: right;display: none;margin-left:10px;" onclick="delDbBatch();" title="删除选中项" class="btn btn-default btn-sm">删除选中</button>\
-            </span>\
             <div class="divtable mtb10">\
                 <div class="tablescroll">\
                     <table id="con_list" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
