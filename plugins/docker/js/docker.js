@@ -53,6 +53,85 @@ function dPostCallbak(method, version, args,callback){
     },'json'); 
 }
 
+
+function logsCon(id){
+    dPost('docker_con_log','',{Hostname:id},function(rdata){
+        var rdata = $.parseJSON(rdata.data);
+        if(!rdata.status) {
+            layer.msg(rdata.msg,{icon:2});
+            return;
+        };
+        layer.open({
+            type:1,
+            title:'Docker日志',
+            area: '600px',
+            closeBtn: 2,
+            content:'<div class="bt-form">'
+                    +'<pre class="crontab-log" style="overflow: auto; \
+                    border: 0px none; line-height:23px;padding: 15px; \
+                    margin: 0px; white-space: pre-wrap; height: 405px; \
+                    background-color: rgb(51,51,51);color:#f1f1f1;\
+                    border-radius:0px;">'+ (rdata.msg == '' ? 'No logs':rdata.msg) +'</pre>'
+                    +'</div>',
+            success:function(index,layers){
+                $(".crontab-log").scrollTop(1000000);
+            }
+        });
+    });
+}
+
+function deleteCon(Hostname){
+    // 删除容器
+    safeMessage('删除容器 ', '删除容器 ['+Hostname+'], 确定?',function(){
+        dPost('docker_remove_con','',{Hostname:Hostname},function(rdata){
+            var rdata = $.parseJSON(rdata.data);
+            showMsg(rdata.msg,function(){
+                if(rdata.status) {
+                    dockerConListRender();
+                }
+            },{icon:rdata.status?1:2});
+        });
+    });
+}
+
+function dockerConListRender(){
+    dPost('con_list', '', {}, function(rdata){
+        // console.log(rdata);
+        var rdata = $.parseJSON(rdata.data);
+        console.log(rdata);
+        if (!rdata.status){
+            layer.msg(rdata.msg,{icon:2,time:2000});
+            return; 
+        }
+        
+
+        var list = '';
+        var rlist = rdata.data;
+
+        for (var i = 0; i < rlist.length; i++) {
+            var status = '<span class="glyphicon glyphicon-pause" style="color:red;font-size:12px"></span>';
+            if (rlist[i]['State']['Status'] == 'running'){
+                status = '<span class="glyphicon glyphicon-play" style="color:#20a53a;font-size:12px"></span>';
+            }
+
+            var op = '';
+            op += '<a href="javascript:;" onclick="pullImages(\''+rlist[i]['RepoTags']+'\',\''+rlist[i]['Id']+'\')" class="btlink">终端</a> | ';
+            op += '<a href="javascript:;" onclick="logsCon(\''+rlist[i]['Id']+'\')" class="btlink">日志</a> | ';
+            op += '<a href="javascript:;" onclick="deleteCon(\''+rlist[i]['Config']['Hostname']+'\')" class="btlink">删除</a>';
+
+
+            list += '<tr>';
+            list += '<td>'+rlist[i]['Name'].substring(1)+'</td>';
+            list += '<td>'+rlist[i]['Config']['Image']+'</td>';
+            list += '<td>'+getFormatTime(rlist[i]['Created'])+'</td>';
+            list += '<td>'+status+'</td>';
+            list += '<td class="text-right">'+op+'</td>';
+            list += '</tr>';
+        }
+
+        $('#con_list tbody').html(list);
+    });
+}
 function dockerConList(){
 
     var con = '<div class="safe bgw">\
@@ -78,42 +157,7 @@ function dockerConList(){
 
     $(".soft-man-con").html(con);
 
-    dPost('con_list', '', {}, function(rdata){
-        // console.log(rdata);
-        var rdata = $.parseJSON(rdata.data);
-        console.log(rdata);
-        if (!rdata.status){
-            layer.msg(rdata.msg,{icon:2,time:2000});
-            return; 
-        }
-        
-
-        var list = '';
-        var rlist = rdata.data;
-
-        for (var i = 0; i < rlist.length; i++) {
-            var status = '<span class="glyphicon glyphicon-pause" style="color:red;font-size:12px"></span>';
-            if (rlist[i]['State']['Status'] == 'running'){
-                status = '<span class="glyphicon glyphicon-play" style="color:#20a53a;font-size:12px"></span>';
-            }
-
-            var op = '';
-            op += '<a href="javascript:;" onclick="pullImages(\''+rlist[i]['RepoTags']+'\',\''+rlist[i]['Id']+'\')" class="btlink">终端</a> | ';
-            op += '<a href="javascript:;" onclick="pullImages(\''+rlist[i]['RepoTags']+'\',\''+rlist[i]['Id']+'\')" class="btlink">日志</a> | ';
-            op += '<a href="javascript:;" onclick="deleteImages(\''+rlist[i]['RepoTags']+'\',\''+rlist[i]['Id']+'\')" class="btlink">删除</a>';
-
-
-            list += '<tr>';
-            list += '<td>'+rlist[i]['Name'].substring(1)+'</td>';
-            list += '<td>'+rlist[i]['Config']['Image']+'</td>';
-            list += '<td>'+getFormatTime(rlist[i]['Created'])+'</td>';
-            list += '<td>'+status+'</td>';
-            list += '<td class="text-right">'+op+'</td>';
-            list += '</tr>';
-        }
-
-        $('#con_list tbody').html(list);
-    });
+    dockerConListRender();
     
 }
 

@@ -187,6 +187,52 @@ def conListData():
     return mw.returnJson(True, 'ok', clist)
 
 
+def dockerRemoveCon():
+    args = getArgs()
+    data = checkArgs(args, ['Hostname'])
+    if not data[0]:
+        return data[1]
+
+    Hostname = args['Hostname']
+
+    c = getDClient()
+    try:
+        conFind = c.containers.get(Hostname)
+        try:
+            path_list = conFind.attrs['GraphDriver'][
+                'Data']['LowerDir'].split(':')
+            for i in path_list:
+                mw.execShell('chattr -R -i %s' % i)
+        except:
+            pass
+        conFind.remove(force=True)
+        return mw.returnJson(True, '成功删除!')
+    except docker.errors.APIError as ex:
+        return mw.returnJson(False, '删除失败!' + str(ex))
+
+
+def dockerLogCon():
+
+    args = getArgs()
+    data = checkArgs(args, ['Hostname'])
+    if not data[0]:
+        return data[1]
+
+    Hostname = args['Hostname']
+
+    c = getDClient()
+    try:
+        conFind = c.containers.get(Hostname)
+        if not conFind:
+            return mw.returnJson(False, 'The specified container does not exist!')
+        log = conFind.logs()
+        if not isinstance(log, str):
+            log = log.decode()
+        return mw.returnJson(True, log)
+    except docker.errors.APIError as ex:
+        return mw.returnJson(False, 'Get Logs failed')
+
+
 def imageList():
     imageList = []
     c = getDClient()
@@ -378,6 +424,10 @@ if __name__ == "__main__":
         print(getConf())
     elif func == 'con_list':
         print(conListData())
+    elif func == 'docker_con_log':
+        print(dockerLogCon())
+    elif func == 'docker_remove_con':
+        print(dockerRemoveCon())
     elif func == 'image_list':
         print(imageListData())
     elif func == 'docker_remove_image':
