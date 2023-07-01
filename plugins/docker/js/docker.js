@@ -254,12 +254,40 @@ function delRepo(address){
                 var rdata = $.parseJSON(rdata.data);
                 layer.msg(rdata.msg,{icon:rdata.status?1:2});
                 if(rdata.status) {
-                    docker.get_repository_list();
+                    repoListRender();
+                }
             }
-        });
+        );
     });
 }
 
+
+function repoListRender(){
+    dPost('repo_list', '', {}, function(rdata){
+        var rdata = $.parseJSON(rdata.data);
+        console.log(rdata);
+        if (!rdata.status){
+            layer.msg(rdata.msg,{icon:2,time:2000});
+            return; 
+        }
+        
+        var list = '';
+        var rlist = rdata.data;
+
+        for (var i = 0; i < rlist.length; i++) {
+
+            list += '<tr>';
+            list += '<td>'+rlist[i]['hub_name']+'</td>';
+            list += '<td>'+rlist[i]['repository_name']+'</td>';
+            list += '<td>'+rlist[i]['namespace']+'</td>';
+            list += '<td>'+rlist[i]['registry']+'</td>';
+            list += '<td><a href="javascript:;" onclick="delRepo(\''+rlist[i]['registry']+'\')" class="btlink">删除</a></td>';
+            list += '</tr>';
+        }
+
+        $('#con_list tbody').html(list);
+    });
+}
 function repoList(){
 
     var con = '<div class="safe bgw">\
@@ -287,31 +315,7 @@ function repoList(){
         repoLogin();
     });
 
-    dPost('repo_list', '', {}, function(rdata){
-        var rdata = $.parseJSON(rdata.data);
-        console.log(rdata);
-        if (!rdata.status){
-            layer.msg(rdata.msg,{icon:2,time:2000});
-            return; 
-        }
-        
-        var list = '';
-        var rlist = rdata.data;
-
-        for (var i = 0; i < rlist.length; i++) {
-
-            list += '<tr>';
-            list += '<td>'+rlist[i]['hub_name']+'</td>';
-            list += '<td>'+rlist[i]['repository_name']+'</td>';
-            list += '<td>'+rlist[i]['namespace']+'</td>';
-            list += '<td>'+rlist[i]['registry']+'</td>';
-            list += '<td><a href="javascript:;" onclick="delRepo(\''+rlist[i]['registry']+'\')" class="btlink">删除</a></td>';
-            list += '</tr>';
-        }
-
-        $('#con_list tbody').html(list);
-    });
-    
+    repoListRender();
 }
 
 
