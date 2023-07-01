@@ -246,7 +246,7 @@ function repoLogin(){
 }
 
 
-function delRepo(){
+function delRepo(address){
     safeMessage('退出','你将退出 ['+address+'],确定?',function(){
         dPost('docker_logout', '',
             {registry:address},
@@ -299,13 +299,13 @@ function repoList(){
         var rlist = rdata.data;
 
         for (var i = 0; i < rlist.length; i++) {
-            
+
             list += '<tr>';
             list += '<td>'+rlist[i]['hub_name']+'</td>';
             list += '<td>'+rlist[i]['repository_name']+'</td>';
             list += '<td>'+rlist[i]['namespace']+'</td>';
             list += '<td>'+rlist[i]['registry']+'</td>';
-            list += '<td><a href="javascript:;" onclick="docker.logout_aliyun(\''+rlist[i]['registry']+'\')" class="btlink">删除</a></td>';
+            list += '<td><a href="javascript:;" onclick="delRepo(\''+rlist[i]['registry']+'\')" class="btlink">删除</a></td>';
             list += '</tr>';
         }
 
