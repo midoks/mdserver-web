@@ -300,10 +300,6 @@ def repoList():
     return mw.returnJson(True, 'ok', repostory_info)
 
 
-def runLog():
-    return getServerDir() + '/data/redis.log'
-
-
 if __name__ == "__main__":
     func = sys.argv[1]
     if func == 'status':
@@ -324,8 +320,6 @@ if __name__ == "__main__":
         print(initdUinstall())
     elif func == 'conf':
         print(getConf())
-    elif func == 'run_log':
-        print(runLog())
     elif func == 'con_list':
         print(conListData())
     elif func == 'image_list':
