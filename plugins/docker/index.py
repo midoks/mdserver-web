@@ -304,7 +304,7 @@ def dockerLogout():
     registry = args['registry']
     if registry == "docker.io":
         registry = ""
-        login_test = mw.execShell('docker logout %s' % get.registry)
+        login_test = mw.execShell('docker logout %s' % registry)
         if registry == "":
             registry = "docker.io"
         ret = 'required$|Error'
