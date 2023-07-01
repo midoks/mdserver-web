@@ -242,7 +242,7 @@ function repoLogin(){
             });
         }
     });
-    
+
 }
 
 
@@ -254,11 +254,10 @@ function repoList(){
                 <div class="tablescroll">\
                     <table id="con_list" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
                     <thead><tr>\
-                    <th>名称</th>\
-                    <th>版本</th>\
-                    <th>大小</th>\
-                    <th>证书</th>\
-                    <th>描述</th>\
+                    <th>Name</th>\
+                    <th>Repository Name</th>\
+                    <th>NameSpace</th>\
+                    <th>地址</th>\
                     <th style="text-align:right;">操作</th></tr></thead>\
                     <tbody>\
                     ' + '</tbody></table>\
@@ -274,7 +273,7 @@ function repoList(){
         repoLogin();
     });
 
-    dPost('image_list', '', {}, function(rdata){
+    dPost('repo_list', '', {}, function(rdata){
         var rdata = $.parseJSON(rdata.data);
         console.log(rdata);
         if (!rdata.status){
@@ -287,21 +286,11 @@ function repoList(){
 
         for (var i = 0; i < rlist.length; i++) {
 
-            var tag = rlist[i]['RepoTags'].split(":")[1];
-
-            var license = 'null';
-            var desc = 'null';
-
-            if (typeof(rlist[i]['Labels']) == 'null'){
-                license = 'free';
-            }
-
             list += '<tr>';
-            list += '<td>'+rlist[i]['RepoTags']+'</td>';
-            list += '<td>'+tag+'</td>';
-            list += '<td>'+toSize(rlist[i]['Size'])+'</td>';
-            list += '<td>'+license+'</td>';
-            list += '<td>'+desc+'</td>';
+            list += '<td>'+rlist[i]['hub_name']+'</td>';
+            list += '<td>'+rlist[i]['repository_name']+'</td>';
+            list += '<td>'+rlist[i]['namespace']+'</td>';
+            list += '<td>'+rlist[i]['registry']+'</td>';
             list += '<td>'+'操作'+'</td>';
             list += '</tr>';
         }
