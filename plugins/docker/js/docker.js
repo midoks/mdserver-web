@@ -98,20 +98,22 @@ function deleteCon(Hostname){
 function startCon(Hostname){
     dPost('docker_run_con','',{Hostname:Hostname},function(rdata){
         var rdata = $.parseJSON(rdata.data);
-        layer.msg(rdata.msg,{icon:rdata.status?1:2});
-        if(rdata.status) {
-            dockerConListRender();
-        }
+        showMsg(rdata.msg,function(){
+            if(rdata.status) {
+                dockerConListRender();
+            }
+        },{icon:rdata.status?1:2});
     });
 }
 
 function stopCon(Hostname){
     dPost('docker_stop_con','',{Hostname:Hostname},function(rdata){
         var rdata = $.parseJSON(rdata.data);
-        layer.msg(rdata.msg,{icon:rdata.status?1:2});
-        if(rdata.status) {
-            dockerConListRender();
-        }
+        showMsg(rdata.msg,function(){
+            if(rdata.status) {
+                dockerConListRender();
+            }
+        },{icon:rdata.status?1:2});
     });
 }
 
