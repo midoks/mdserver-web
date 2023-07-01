@@ -1,2 +1,3 @@
 cryptography==36.0.1
 flask==2.0.3
+pyOpenSSL==22.0.0
