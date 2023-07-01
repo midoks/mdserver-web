@@ -226,6 +226,27 @@ def imageListData():
     return mw.returnJson(True, 'ok', ilist)
 
 
+def dockerRemoveImage():
+    args = getArgs()
+    data = checkArgs(args, ['imageId', 'repoTags'])
+    if not data[0]:
+        return data[1]
+
+    repoTags = args['repoTags']
+    imageId = args['imageId']
+
+    c = getDClient()
+    try:
+        c.images.remove(repoTags)
+        return mw.returnJson(True, '成功删除')
+    except:
+        try:
+            c.images.remove(imageId)
+            return mw.returnJson(True, '成功删除!')
+        except docker.errors.APIError as ex:
+            return mw.returnJson(False, '删除失败, 当前镜像正在使用!')
+
+
 def dockerLoginCheck(user_name, user_pass, registry):
     # 登陆验证
     cmd = 'docker login -u=%s -p %s %s' % (user_name, user_pass, registry)
@@ -359,6 +380,8 @@ if __name__ == "__main__":
         print(conListData())
     elif func == 'image_list':
         print(imageListData())
+    elif func == 'docker_remove_image':
+        print(dockerRemoveImage())
     elif func == 'docker_login':
         print(dockerLogin())
     elif func == 'docker_logout':

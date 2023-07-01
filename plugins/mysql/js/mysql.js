@@ -181,7 +181,7 @@ function changeMySQLDataPath(act) {
     $.post('/database?action=GetMySQLInfo', '', function(rdata) {
         var LimitCon = '<p class="conf_p">\
                             <input id="datadir" class="phpUploadLimit bt-input-text mr5" style="width:350px;" type="text" value="' + rdata.datadir + '" name="datadir">\
-                            <span onclick="ChangePath(\'datadir\')" class="glyphicon glyphicon-folder-open cursor mr20" style="width:auto"></span><button class="btn btn-success btn-sm" onclick="changeMySQLDataPath(1)">' + lan.soft.mysql_to + '</button>\
+                            <span onclick="changePath(\'datadir\')" class="glyphicon glyphicon-folder-open cursor mr20" style="width:auto"></span><button class="btn btn-success btn-sm" onclick="changeMySQLDataPath(1)">' + lan.soft.mysql_to + '</button>\
                         </p>';
         $(".soft-man-con").html(LimitCon);
     });

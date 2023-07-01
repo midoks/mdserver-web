@@ -97,13 +97,18 @@ function dockerConList(){
                 status = '<span class="glyphicon glyphicon-play" style="color:#20a53a;font-size:12px"></span>';
             }
 
+            var op = '';
+            op += '<a href="javascript:;" onclick="pullImages(\''+rlist[i]['RepoTags']+'\',\''+rlist[i]['Id']+'\')" class="btlink">终端</a> | ';
+            op += '<a href="javascript:;" onclick="pullImages(\''+rlist[i]['RepoTags']+'\',\''+rlist[i]['Id']+'\')" class="btlink">日志</a> | ';
+            op += '<a href="javascript:;" onclick="deleteImages(\''+rlist[i]['RepoTags']+'\',\''+rlist[i]['Id']+'\')" class="btlink">删除</a>';
+
 
             list += '<tr>';
             list += '<td>'+rlist[i]['Name'].substring(1)+'</td>';
             list += '<td>'+rlist[i]['Config']['Image']+'</td>';
-            list += '<td>'+rlist[i]['Created']+'</td>';
+            list += '<td>'+getFormatTime(rlist[i]['Created'])+'</td>';
             list += '<td>'+status+'</td>';
-            list += '<td>'+'操作'+'</td>';
+            list += '<td class="text-right">'+op+'</td>';
             list += '</tr>';
         }
 
@@ -112,29 +117,25 @@ function dockerConList(){
     
 }
 
-function dockerImageList(){
+function deleteImages(tag, id){
+    safeMessage('删除镜像','删除镜像['+tag+'],确定？',function(){
+        dPost('docker_remove_image','', {imageId:id,repoTags:tag},function(rdata){
+            var rdata = $.parseJSON(rdata.data);
+            showMsg(rdata.msg,function(){
+                if(rdata.status) {
+                    dockerImageListRender();
+                }
+            },{ icon: rdata.status ? 1 : 2 });
+        });
+    });
+}
 
-    var con = '<div class="safe bgw">\
-            <button onclick="" title="" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">获取镜像</button>\
-            <div class="divtable mtb10">\
-                <div class="tablescroll">\
-                    <table id="con_list" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
-                    <thead><tr>\
-                    <th>名称</th>\
-                    <th>版本</th>\
-                    <th>大小</th>\
-                    <th>证书</th>\
-                    <th>描述</th>\
-                    <th style="text-align:right;">操作</th></tr></thead>\
-                    <tbody>\
-                    ' + '</tbody></table>\
-                </div>\
-                <div id="databasePage" class="dataTables_paginate paging_bootstrap page"></div>\
-            </div>\
-        </div>';
+function pullImages(tag, id){
+    console.log(tag, id);
+    layer.msg('开发中!',{ icon: 2 });
+}
 
-    $(".soft-man-con").html(con);
-
+function dockerImageListRender(){
     dPost('image_list', '', {}, function(rdata){
         var rdata = $.parseJSON(rdata.data);
         console.log(rdata);
@@ -152,10 +153,13 @@ function dockerImageList(){
 
             var license = 'null';
             var desc = 'null';
-
-            if (typeof(rlist[i]['Labels']) == 'null'){
+            if (rlist[i]['Labels'] == null){
                 license = 'free';
             }
+
+            var op = '';
+            op += '<a href="javascript:;" onclick="pullImages(\''+rlist[i]['RepoTags']+'\',\''+rlist[i]['Id']+'\')" class="btlink">拉取</a> | ';
+            op += '<a href="javascript:;" onclick="deleteImages(\''+rlist[i]['RepoTags']+'\',\''+rlist[i]['Id']+'\')" class="btlink">删除</a>';
 
             list += '<tr>';
             list += '<td>'+rlist[i]['RepoTags']+'</td>';
@@ -163,13 +167,37 @@ function dockerImageList(){
             list += '<td>'+toSize(rlist[i]['Size'])+'</td>';
             list += '<td>'+license+'</td>';
             list += '<td>'+desc+'</td>';
-            list += '<td>'+'操作'+'</td>';
+            list += '<td class="text-right">'+op+'</td>';
             list += '</tr>';
         }
 
         $('#con_list tbody').html(list);
     });
-    
+}
+
+function dockerImageList(){
+
+    var con = '<div class="safe bgw">\
+            <button onclick="" title="" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">获取镜像</button>\
+            <div class="divtable mtb10">\
+                <div class="tablescroll">\
+                    <table id="con_list" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
+                    <thead><tr>\
+                    <th>名称</th>\
+                    <th>版本</th>\
+                    <th>大小</th>\
+                    <th>证书</th>\
+                    <th>描述</th>\
+                    <th style="text-align:right;">操作</th></tr></thead>\
+                    <tbody></tbody></table>\
+                </div>\
+                <div id="databasePage" class="dataTables_paginate paging_bootstrap page"></div>\
+            </div>\
+        </div>';
+
+    $(".soft-man-con").html(con);
+
+    dockerImageListRender();
 }
 
 // login
@@ -281,7 +309,7 @@ function repoListRender(){
             list += '<td>'+rlist[i]['repository_name']+'</td>';
             list += '<td>'+rlist[i]['namespace']+'</td>';
             list += '<td>'+rlist[i]['registry']+'</td>';
-            list += '<td><a href="javascript:;" onclick="delRepo(\''+rlist[i]['registry']+'\')" class="btlink">删除</a></td>';
+            list += '<td class="text-right"><a href="javascript:;" onclick="delRepo(\''+rlist[i]['registry']+'\')" class="btlink">删除</a></td>';
             list += '</tr>';
         }
 

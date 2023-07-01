@@ -13,6 +13,7 @@
 	"author": "Zend",
 	"date": "2017-04-01",
 	"home": "https://docker.io",
+	"doc1":"https://docker-py.readthedocs.io/",
 	"type": 0,
 	"pid": "2"
 }
