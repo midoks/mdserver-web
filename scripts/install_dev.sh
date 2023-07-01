@@ -76,7 +76,7 @@ if [ ! -z "$cn" ];then
     HTTP_PREFIX="https://ghproxy.com/"
 fi
 
-echo "local:${$LOCAL_ADDR}"
+echo "local:${LOCAL_ADDR}"
 
 if [ $OSNAME != "macos" ];then
 	mkdir -p /www/server

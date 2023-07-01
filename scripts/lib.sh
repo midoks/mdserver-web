@@ -78,7 +78,7 @@ if [ "$LOCAL_ADDR" != "common" ];then
     PIPSRC="https://pypi.tuna.tsinghua.edu.cn/simple"
 fi
 
-echo "local:${$LOCAL_ADDR}"
+echo "local:${LOCAL_ADDR}"
 echo "pypi source:$PIPSRC"
 
 #面板需要的库
