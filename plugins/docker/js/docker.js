@@ -117,6 +117,31 @@ function stopCon(Hostname){
     });
 }
 
+function execCon(Hostname){
+    webShell();
+    var pdata_socket = {};
+    var shell = setInterval(function(){
+        if($('.term-box').length == 0){
+            pdata_socket['data'] = 'exit\n';
+            socket.emit('webssh',pdata_socket);
+            setTimeout(function(){socket.emit('webssh',pdata_socket['data']);},1000);
+            clearInterval(shell);
+        }
+    },500);
+    setTimeout(function(){
+        dPost('docker_exec','',{Hostname:Hostname},function(res){
+            var res = $.parseJSON(res.data);
+            if(!res.status){
+                layer.msg(res.msg,{icon:res.status?1:2});
+            }else{
+                pdata_socket['data'] = 'clear && ' + res.msg +'\n'
+                socket.emit('webssh',pdata_socket);
+                setTimeout(function(){socket.emit('webssh',pdata_socket['data']);},1000);
+            }
+        });
+    });
+}
+
 function dockerConListRender(){
     dPost('con_list', '', {}, function(rdata){
         var rdata = $.parseJSON(rdata.data);
@@ -139,7 +164,7 @@ function dockerConListRender(){
             }
 
             var op = '';
-            op += '<a href="javascript:;" onclick="pullImages(\''+rlist[i]['RepoTags']+'\',\''+rlist[i]['Id']+'\')" class="btlink">终端</a> | ';
+            op += '<a href="javascript:;" onclick="execCon(\''+rlist[i]['Config']['Hostname']+'\')" class="btlink">终端</a> | ';
             op += '<a href="javascript:;" onclick="logsCon(\''+rlist[i]['Id']+'\')" class="btlink">日志</a> | ';
             op += '<a href="javascript:;" onclick="deleteCon(\''+rlist[i]['Config']['Hostname']+'\')" class="btlink">删除</a>';
 

@@ -271,6 +271,28 @@ def dockerStopCon():
         return mw.returnJson(False, '停止失败!' + str(ex))
 
 
+def dockerExec():
+    # 容器执行命令
+    args = getArgs()
+    data = checkArgs(args, ['Hostname'])
+    if not data[0]:
+        return data[1]
+
+    Hostname = args['Hostname']
+
+    debug_path = 'data/debug.pl'
+    if os.path.exists(debug_path):
+        return mw.returnJson(False, '开发模式不能进入!')
+
+    c = getDClient()
+    try:
+        conFind = c.containers.get(Hostname)
+        cmd = 'docker container exec -it %s /bin/bash' % Hostname
+        return mw.returnJson(True, cmd)
+    except docker.errors.APIError as ex:
+        return mw.returnJson(False, '连接失败!')
+
+
 def imageList():
     imageList = []
     c = getDClient()
@@ -470,6 +492,8 @@ if __name__ == "__main__":
         print(dockerRunCon())
     elif func == 'docker_stop_con':
         print(dockerStopCon())
+    elif func == 'docker_exec':
+        print(dockerExec())
     elif func == 'image_list':
         print(imageListData())
     elif func == 'docker_remove_image':
