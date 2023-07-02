@@ -307,7 +307,7 @@ function dockerPullImagesFileTemplate(){
                         </div>\
                     </div>\
                 </div>',
-        success:function(layero,layer){
+        success:function(layero,layer_id){
 
             $('.docker-sub span').click(function(){
                 var index = $(this).index();
