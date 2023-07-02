@@ -324,6 +324,82 @@ def imageList():
     return imageList
 
 
+def dockerPull():
+    # pull Dockr 官方镜像
+    args = getArgs()
+    data = checkArgs(args, ['images'])
+    if not data[0]:
+        return data[1]
+
+    images = args['images']
+    if ':' in images:
+        pass
+    else:
+        images = images + ':latest'
+
+    c = getDClient()
+    try:
+        ret = c.images.pull(images)
+        if ret:
+            return mw.returnJson(True, '拉取成功！')
+        else:
+            return mw.returnJson(False, '拉取失败，请检查镜像名称或是否需要登录docker进行下载')
+    except:
+        ret = mw.execShell('docker image pull %s' % images)
+        if 'invalid' in ret[-1]:
+            return mw.returnJson(False, '拉取失败，请检查镜像名称或是否需要登录docker进行下载')
+        else:
+            return mw.returnJson(True, '拉取成功！')
+
+
+def dockerPlulPath(path):
+    if not path and path == '':
+        return mw.returnJson(False, 'Invalid address')
+
+    ret = mw.execShell('docker image pull %s' % path)
+    if 'invalid' in ret[-1]:
+        return mw.returnJson(False, '拉取失败，请检查镜像名称或是否需要登录docker进行下载')
+    else:
+        return mw.returnJson(True, '拉取成功！')
+
+
+def dockerPullReg():
+    # pull Dockr 官方镜像
+    args = getArgs()
+    data = checkArgs(args, ['path'])
+    if not data[0]:
+        return data[1]
+
+    path = args['path']
+    return dockerPlulPath(path)
+
+
+# 判断镜像是否存在
+def checkImage(path):
+    image_list = imageList()
+    for i in image_list:
+        if path == i["RepoTags"]:
+            return mw.returnData(False, '镜像已存在!')
+
+
+def dockerPullPrivateNew():
+    # pull Dockr 官方镜像
+    args = getArgs()
+    data = checkArgs(args, ['path'])
+    if not data[0]:
+        return data[1]
+
+    path = args['path']
+    check = checkImage(path)
+    if check:
+        return mw.getJson(check)
+
+    my_repo = repoList()
+    if not my_repo:
+        return mw.returnJson(False, '未登录任何私人存储库，请登录然后拉取')
+    return dockerPlulPath(path)
+
+
 def imageListData():
     try:
         ilist = imageList()
@@ -494,6 +570,10 @@ if __name__ == "__main__":
         print(dockerStopCon())
     elif func == 'docker_exec':
         print(dockerExec())
+    elif func == 'docker_pull':
+        print(dockerPull())
+    elif func == 'docker_pull_reg':
+        print(dockerPullReg())
     elif func == 'image_list':
         print(imageListData())
     elif func == 'docker_remove_image':

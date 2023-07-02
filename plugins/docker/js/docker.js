@@ -268,10 +268,113 @@ function dockerImageListRender(){
     });
 }
 
+function dockerPullImagesFileTemplate(){
+    // 拉取镜像文件模板
+    var layer_index = layer.open({
+        type: 1,
+        title: "获取镜像",
+        area: '500px',
+        closeBtn: 2,
+        shadeClose: false,
+        content: '<div class="bt-docker pd20">'+
+                    '<div class="docker-sub">'+
+                        '<span class="on">官方库</span>'+
+                        '<span>公共库</span>'+
+                        '<span>私有库</span>'+
+                    '</div>'+
+                    '<div class="bt-form bt-docker-con">'+
+                        '<div class="conter official_pull pd15"><div class="line">'+
+                            '<span class="tname">镜像名:</span>\
+                            <div class="info-r c4">\
+                                <input class="bt-input-text mr5" type="text" name="official_pull_name" style="width:218px" value="">\
+                                <button type="button" class="btn btn-sm btn-success official_pull_btn">获取</button>\
+                            </div>'+
+                        '</div></div>'+
+                        '<div class="conter public_pull pd15" style="display: none;"><div class="line">'+
+                            '<span class="tname">镜像名:</span>\
+                            <div class="info-r c4">\
+                                <input class="bt-input-text mr5" type="text" name="public_pull_path" style="width:218px" value="">\
+                                <button type="button" class="btn btn-sm btn-success public_pull_btn">获取</button>\
+                            </div>'+
+                        '</div></div>'+
+                        '<div class="conter private_pull pd15" style="display: none;">'+
+                            '<div class="line"><span class="tname">镜像地址:</span>\
+                                <div class="info-r c4">\
+                                    <input class="bt-input-text mr5" type="text" name="private_pull_path" style="width:218px" value="">\
+                                    <button type="button" class="btn btn-sm btn-success private_pull_btn">获取</button>\
+                                </div>\
+                            </div>\
+                        </div>\
+                    </div>\
+                </div>',
+        success:function(layero,layer){
+
+            $('.docker-sub span').click(function(){
+                var index = $(this).index();
+                $(this).addClass('on').siblings().removeClass('on');
+                $(this).parent().next().find('.conter').eq(index).show().siblings().hide();
+            });
+
+            $('.official_pull_btn').click(function(){
+                var name = $('[name="official_pull_name"]').val();
+                if(name == ''){
+                    layer.msg('镜像名不能为空!');
+                    return;
+                }
+                dPost('docker_pull','',{images:name}, function(rdata){
+                    var rdata = $.parseJSON(rdata.data);
+                    showMsg(rdata.msg,function(){
+                        if(rdata.status) {
+                            dockerImageListRender();
+                            layer.close(layer_index);
+                        }
+                    },{ icon: rdata.status ? 1 : 2 });
+                });
+            });
+
+            $('.public_pull_btn').click(function(){
+                var path = $('[name="public_pull_path"]').val();
+                if(path == ''){
+                    layer.msg('公共网络镜像地址不能为空。');
+                    return;
+                }
+
+                dPost('docker_pull_reg','',{path:path}, function(rdata){
+                    var rdata = $.parseJSON(rdata.data);
+                    showMsg(rdata.msg,function(){
+                        if(rdata.status) {
+                            dockerImageListRender();
+                            layer.close(layer_index);
+                        }
+                    },{ icon: rdata.status ? 1 : 2 });
+                });
+            });
+            $('.private_pull_btn').click(function(){
+                var path = $('[name="private_pull_path"]').val();
+                if(path == ''){
+                    layer.msg('专用镜像地址不能为空!');
+                    return
+                }
+
+                dPost('docker_pull_private_new','',{path:path}, function(rdata){
+                    var rdata = $.parseJSON(rdata.data);
+                    showMsg(rdata.msg,function(){
+                        if(rdata.status) {
+                            dockerImageListRender();
+                            layer.close(layer_index);
+                        }
+                    },{ icon: rdata.status ? 1 : 2 });
+                });
+            });
+        }
+
+    });
+}
+
 function dockerImageList(){
 
     var con = '<div class="safe bgw">\
-            <button onclick="" title="" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">获取镜像</button>\
+            <button onclick="dockerPullImagesFileTemplate()" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">获取镜像</button>\
             <div class="divtable mtb10">\
                 <div class="tablescroll">\
                     <table id="con_list" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
