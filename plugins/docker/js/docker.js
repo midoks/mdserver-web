@@ -186,10 +186,15 @@ function dockerConListRender(){
         $('#con_list tbody').html(list);
     });
 }
+
+function createConTemplate(){
+    console.log('###');
+}
+
 function dockerConList(){
 
     var con = '<div class="safe bgw">\
-            <button onclick="" title="" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">创建容器</button>\
+            <button onclick="createConTemplate();" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">创建容器</button>\
             <div class="divtable mtb10">\
                 <div class="tablescroll">\
                     <table id="con_list" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
@@ -199,10 +204,8 @@ function dockerConList(){
                     <th>创建时间</th>\
                     <th>状态</th>\
                     <th style="text-align:right;">操作</th></tr></thead>\
-                    <tbody>\
-                    ' + '</tbody></table>\
+                    <tbody></tbody></table>\
                 </div>\
-                <div id="databasePage" class="dataTables_paginate paging_bootstrap page"></div>\
             </div>\
         </div>';
 
