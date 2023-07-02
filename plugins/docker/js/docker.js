@@ -325,8 +325,9 @@ function dockerPullImagesFileTemplate(){
                     var rdata = $.parseJSON(rdata.data);
                     showMsg(rdata.msg,function(){
                         if(rdata.status) {
-                            dockerImageListRender();
                             layer.close(layer_index);
+                            dockerImageListRender();
+                            
                         }
                     },{ icon: rdata.status ? 1 : 2 });
                 });
@@ -343,8 +344,8 @@ function dockerPullImagesFileTemplate(){
                     var rdata = $.parseJSON(rdata.data);
                     showMsg(rdata.msg,function(){
                         if(rdata.status) {
-                            dockerImageListRender();
                             layer.close(layer_index);
+                            dockerImageListRender();
                         }
                     },{ icon: rdata.status ? 1 : 2 });
                 });
@@ -360,8 +361,8 @@ function dockerPullImagesFileTemplate(){
                     var rdata = $.parseJSON(rdata.data);
                     showMsg(rdata.msg,function(){
                         if(rdata.status) {
-                            dockerImageListRender();
                             layer.close(layer_index);
+                            dockerImageListRender();
                         }
                     },{ icon: rdata.status ? 1 : 2 });
                 });
