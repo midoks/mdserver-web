@@ -481,11 +481,7 @@ def dockerCreateCon():
         return data[1]
 
     environments = args['environments']
-
-    c = getDClient()
-
-    # if __name__ == "__main__":
-    #     print(args)
+    environments = environments.strip().split()
 
     command = args['command']
     entrypoint = args['entrypoint']
@@ -495,9 +491,11 @@ def dockerCreateCon():
     ports = ports.replace('[', '(').replace(']', ')')
     volumes = args['volumes']
 
+    # if __name__ == "__main__":
+    #     print(args)
     try:
-        environments = environments.strip().split()
 
+        c = getDClient()
         conObject = c.containers.run(
             image=image,
             mem_limit=mem_limit + 'M',
