@@ -33,6 +33,7 @@ tg_start(){
         echo -e "starting tgbot... \c"
         cd $mw_path
         python3 {$APP_PATH}/tgbot.py >> {$APP_PATH}/task.log &
+        python3 {$APP_PATH}/tgpush.py >> {$APP_PATH}/push.log &
         isStart=""
         while [[ "$isStart" == "" ]];
         do
@@ -59,6 +60,15 @@ tg_start(){
 tg_stop(){
 	echo -e "stopping tgbot ... \c";
     arr=`ps aux|grep 'tgbot.py'|grep -v grep|awk '{print $2}'`
+    for p in ${arr[@]}
+    do
+        kill -9 $p > /dev/null 2>&1
+    done
+    echo -e "\033[32mdone\033[0m"
+
+
+    echo -e "stopping tgpush ... \c";
+    arr=`ps aux|grep 'tgpush.py'|grep -v grep|awk '{print $2}'`
     for p in ${arr[@]}
     do
         kill -9 $p > /dev/null 2>&1

@@ -67,7 +67,7 @@ def writeLog(log_str):
         print(log_str)
 
     now = mw.getDateFromNow()
-    log_file = getServerDir() + '/task.log'
+    log_file = getServerDir() + '/push.log'
     mw.writeFileLog(now + ':' + log_str, log_file, limit_size=5 * 1024)
     return True
 
@@ -85,62 +85,48 @@ while True:
 bot = telebot.TeleBot(cfg['bot']['app_token'])
 
 
-init_list = getStartExtCfgByTag('init')
-for p in init_list:
-    try:
-        script = p['name'].split('.')[0]
-        __import__(script).init(bot)
-    except Exception as e:
-        writeLog('-----init error start -------')
-        writeLog(mw.getTracebackInfo())
-        writeLog('-----init error end -------')
-
-
-@bot.message_handler(commands=['chat_id'])
-def hanle_get_chat_id(message):
-    bot.reply_to(message, message.chat.id)
-
-
-@bot.message_handler(func=lambda message: True)
-def all_message(message):
-    rlist = getStartExtCfgByTag('receive')
-    for r in rlist:
+def runBotPushTask():
+    plist = getStartExtCfgByTag('push')
+    for p in plist:
         try:
-            script = r['name'].split('.')[0]
-            __import__(script).run(bot, message)
+            script = p['name'].split('.')[0]
+            __import__(script).run(bot)
         except Exception as e:
-            writeLog('-----all_message error start -------')
+            writeLog('-----runBotPushTask error start -------')
             writeLog(mw.getTracebackInfo())
-            writeLog('-----all_message error end -------')
+            writeLog('-----runBotPushTask error end -------')
 
 
-@bot.callback_query_handler(func=lambda call: True)
-def callback_query_handler(call):
-    rlist = getStartExtCfgByTag('receive')
-    for r in rlist:
-        try:
-            script = r['name'].split('.')[0]
-            __import__(script).answer_callback_query(bot, call)
-        except Exception as e:
-            writeLog('-----callback_query_handler error start -------')
-            writeLog(mw.getTracebackInfo())
-            writeLog('-----callback_query_handler error end -------')
-
-
-def runBot(bot):
-    try:
-        bot.polling()
-    except Exception as e:
-        writeLog('-----runBot error start -------')
-        writeLog(str(e))
-        writeLog('-----runBot error end -------')
+def botPush():
+    while True:
+        runBotPushTask()
         time.sleep(1)
-        runBot(bot)
+
+
+def runBotPushOtherTask():
+    plist = getStartExtCfgByTag('other')
+    for p in plist:
+        try:
+            script = p['name'].split('.')[0]
+            __import__(script).run(bot)
+        except Exception as e:
+            writeLog('-----runBotPushOtherTask error start -------')
+            writeLog(mw.getTracebackInfo())
+            writeLog('-----runBotPushOtherTask error end -------')
+
+
+def botPushOther():
+    while True:
+        runBotPushOtherTask()
+        time.sleep(1)
+
 
 if __name__ == "__main__":
 
-    writeLog('启动成功')
-    runBot(bot)
+    # 机器人推送任务
+    botPushTask = threading.Thread(target=botPush)
+    botPushTask.start()
 
-
-# asyncio.run(bot.polling())
+    # 机器人其他推送任务
+    botPushOtherTask = threading.Thread(target=botPushOther)
+    botPushOtherTask.start()
