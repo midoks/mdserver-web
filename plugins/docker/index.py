@@ -287,7 +287,7 @@ def dockerExec():
     c = getDClient()
     try:
         conFind = c.containers.get(Hostname)
-        cmd = 'docker container exec -it %s /bin/bash' % Hostname
+        cmd = 'docker container exec -it %s /bin/sh' % Hostname
         return mw.returnJson(True, cmd)
     except docker.errors.APIError as ex:
         return mw.returnJson(False, '连接失败!')
