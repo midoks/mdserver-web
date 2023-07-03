@@ -443,6 +443,85 @@ def dockerLoginCheck(user_name, user_pass, registry):
         return False
 
 
+def getDockerIpList():
+    # 取IP列表
+    path = getServerDir()
+    ipConf = path + '/iplist.json'
+    if not os.path.exists(ipConf):
+        return []
+    iplist = json.loads(mw.readFile(ipConf))
+    return iplist
+
+
+def getDockerCreateInfo():
+    # 取创建依赖
+    import psutil
+    data = {}
+    data['images'] = imageList()
+    data['memSize'] = int(psutil.virtual_memory().total / 1024 / 1024)
+    data['iplist'] = getDockerIpList()
+    return mw.returnJson(True, 'ok!', data)
+
+
+def __release_port(port):
+    from collections import namedtuple
+    try:
+        import firewall_api
+        firewall_api.firewall_api().addAcceptPortArgs(port, 'docker', 'port')
+        return port
+    except Exception as e:
+        return "Release failed {}".format(e)
+
+
+def dockerCreateCon():
+    args = getArgs()
+    data = checkArgs(args, ['environments', 'command',
+                            'entrypoint', 'image', 'mem_limit', 'ports', 'volumes'])
+    if not data[0]:
+        return data[1]
+
+    environments = args['environments']
+
+    c = getDClient()
+
+    # if __name__ == "__main__":
+    #     print(args)
+
+    command = args['command']
+    entrypoint = args['entrypoint']
+    image = args['image']
+    mem_limit = args['mem_limit']
+    ports = args['ports']
+    ports = ports.replace('[', '(').replace(']', ')')
+    volumes = args['volumes']
+
+    try:
+        environments = environments.strip().split()
+
+        conObject = c.containers.run(
+            image=image,
+            mem_limit=mem_limit + 'M',
+            ports=eval(ports),
+            auto_remove=False,
+            command=command,
+            detach=True,
+            stdin_open=True,
+            tty=True,
+            entrypoint=entrypoint,
+            privileged=True,
+            volumes=json.loads(volumes),
+            cpu_shares=10,
+            environment=environments
+        )
+        if conObject:
+            __release_port(ports)
+            return mw.returnJson(True, '创建成功!')
+
+        return mw.returnJson(False, '创建失败!')
+    except docker.errors.APIError as ex:
+        return mw.returnJson(False, '创建失败!' + str(ex))
+
+
 def dockerLogin():
     args = getArgs()
 
@@ -576,6 +655,10 @@ if __name__ == "__main__":
         print(dockerPullReg())
     elif func == 'image_list':
         print(imageListData())
+    elif func == 'get_docker_create_info':
+        print(getDockerCreateInfo())
+    elif func == 'docker_create_con':
+        print(dockerCreateCon())
     elif func == 'docker_remove_image':
         print(dockerRemoveImage())
     elif func == 'docker_login':

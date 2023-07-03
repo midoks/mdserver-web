@@ -188,7 +188,243 @@ function dockerConListRender(){
 }
 
 function createConTemplate(){
-    console.log('###');
+
+    dPost('get_docker_create_info','',{},function(rdata){
+        var rdata = $.parseJSON(rdata.data);
+        console.log(rdata);
+        var rdata = rdata.data;
+        var imageOpt = '';
+        for(var i=0;i<rdata.images.length;i++){
+            var imageName = rdata.images[i].RepoTags.indexOf('panel') == -1? rdata.images[i].RepoTags:'aaPanel:'+rdata.images[i].RepoTags.split(':')[1];
+            imageOpt += '<option value="'+rdata.images[i].RepoTags+'">'+imageName+'</option>';
+        }
+        var iplistOpt = '';
+        for(var i=0;i<rdata.iplist.length;i++){
+            iplistOpt += '<option value="'+rdata.iplist[i].address+'">'+rdata.iplist[i].address+'</option>';
+        }
+
+        var layer_index = layer.open({
+            type: 1,
+            title: "创建容器",
+            area: '556',
+            closeBtn: 2,
+            shadeClose: false,
+            btn: ['确定', '取消'],
+            content: '<div class="bt-form pd20 pb70 ceart-docker new_tname">\
+                        <div class="line">\
+                            <span class="tname">镜像</span>\
+                            <div class="info-r c4"><select class="bt-input-text docker-image" style="width:330px">'+imageOpt+'</select></div>\
+                        </div>\
+                        <div class="line">\
+                            <span class="tname">绑定IP</span>\
+                            <div class="info-r c4"><select class="bt-input-text docker-address" style="width:330px"><option value="0.0.0.0">0.0.0.0</optin>'+iplistOpt+'</select></div>\
+                        </div>\
+                        <div class="line">\
+                            <span class="tname">端口映射</span>\
+                            <div class="info-r c4">\
+                                <div class="type-port">\
+                                    <input class="bt-input-text" name="name1" type="number" placeholder="容器端口" style="width:110px;margin-right:15px">\
+                                    <select class="bt-input-text" style="width:90px;margin-right:15px"><option value="TCP">TCP</optin><option value="UDP">UDP</optin></select>\
+                                    <input class="bt-input-text" name="name2" type="number" placeholder="服务器端口" style="width:90px">\
+                                    <span class="plus glyphicon glyphicon-plus" style="color: #20a53a;font-size: 11px;"></span>\
+                                </div>\
+                                <div class="divtable" style="max-height:100px;overflow:auto; margin-top:15px;width:330px;padding-left: 0px;">\
+                                    <table class="table table-hover">\
+                                        <tbody id="portabletr"><tr class="more1"><td>当前未添加端口映射</td></tr></tbody>\
+                                    </table>\
+                                </div>\
+                            </div>\
+                        </div>\
+                        <div class="line">\
+                            <span class="tname">目录映射</span>\
+                            <div class="info-r c4">\
+                                <div class="type-volumes">\
+                                    <input class="bt-input-text" name="path1" type="text" placeholder="容器目录" style="width:110px;margin-right:15px">\
+                                    <select class="bt-input-text" style="width:90px;margin-right:15px"><option value="rw">read-write</optin><option value="ro">read only</optin></select>\
+                                    <input class="bt-input-text" name="path2" type="text" placeholder="服务器目录" style="width:90px">\
+                                    <span class="plus2 glyphicon glyphicon-plus" style="color: #20a53a;font-size: 11px;"></span>\
+                                </div>\
+                                <div class="divtable" style="max-height:100px;overflow:auto; margin-top:15px;width:330px;padding-left: 0px;">\
+                                    <table class="table table-hover">\
+                                        <tbody id="portabletr2"><tr class="more2"><td>当前未添加目录映射</td></tr></tbody>\
+                                    </table>\
+                                </div>\
+                            </div>\
+                        </div>\
+                        <div class="line">\
+                            <span class="tname" style="height: auto;line-height: 20px;">环境变量<br>(每行一个)</span>\
+                            <div class="info-r c4" style="margin-bottom: 0;">\
+                                <div class="type-volumes">\
+                                    <textarea placeholder="Add variables format as following, one per line:\nJAVA_HOME=/usr/local/java8&#10;HOSTNAME=master" name="environments" class="docker-environments"></textarea>\
+                                </div>\
+                            </div>\
+                        </div>\
+                        <div class="line">\
+                            <span class="tname">内存配额</span>\
+                            <div class="info-r c4"><input class="bt-input-text mr5 docker-mem" type="number" style="width:100px" value="'+parseInt(rdata.memSize/2)+'">\
+                            <span class="dc-un">MB</span><i class="help">不超过， '+ rdata.memSize +'MB</i></div>\
+                        </div>\
+                        <div class="line">\
+                            <span class="tname">CPU配额</span>\
+                            <div class="info-r c4">\
+                            <input class="bt-input-text mr5 docker-cpu" type="number" max="100" min="1" style="width:100px" value="100">\
+                            <span class="dc-un"></span><i class="help">越大，占用的CPU越多</i></div>\
+                        </div>\
+                        <div class="line">\
+                            <span class="tname">执行命令</span>\
+                            <div class="info-r c4"><input class="bt-input-text docker-command" type="text" style="width:330px" value="" placeholder="/bin/bash"></div>\
+                        </div>\
+                        <div class="line" style="display:none">\
+                            <span class="tname">entrypoint</span>\
+                            <div class="info-r c4"><input class="bt-input-text docker-entrypoint" type="text" style="width:300px" value=""></div>\
+                        </div>\
+                    </div>',
+            success:function(){
+                $(".bt-cancel").click(function(){
+                    layer.close(layer_index);
+                });
+
+
+                $(".plus").click(function(){
+                    var name1 = $(".type-port input[name='name1']").val();
+                    var name2 = $(".type-port input[name='name2']").val();
+                    if(name1 < 1 || name1 > 65535 || name2 < 1 || name2 > 65535 || isNaN(name1) || isNaN(name2)){
+                        layer.msg('Port setting value range is invalid, range [1-65535]',{icon:2});
+                        return;
+                    }
+                    
+                    var portval = $('#portabletr')[0].childNodes;
+                    for(var i=0;i<portval.length;i++){
+                        if(portval[i].childNodes[0].innerText == '当前未添加目录映射') continue;
+                        var sport = portval[i].childNodes[2].innerText;
+                        if(name2 == sport){
+                            layer.msg('The port ['+name2+'] is already in the mapping list!',{icon:2});
+                            return;
+                        }
+                    }
+                    var address = $('.docker-address').val();
+                    if(address == '0.0.0.0'){
+                        address = '*';
+                    }
+                    var port = address + ':' + name2;
+                    var loadT = layer.msg('Testing <img src="/static/img/ing.gif">',{icon:16,time:0,shade: [0.3, "#000"]});
+                    $.post('/plugin?action=a&name=docker&s=IsPortExists',{port:port},function(rdata){
+                        layer.close(loadT);
+                        if(rdata !== false){
+                            layer.msg('Port ['+name2+'] is already in the mapping list!',{icon:2});
+                            return;
+                        }
+                        var selecttype = $(".type-port select").val();
+                        var portable= '<tr><td>'+name1+'</td><td>'+selecttype+'</td><td>'+name2+'</td><td class="text-right" width="60"><a href="javascript:;" class="btlink minus">Del</a></td></tr>';
+                        $("#portabletr").append(portable);
+                        $(".more1").remove();
+                        $(".minus").click(function(){
+                            $(this).parents("tr").remove();
+                        });
+                    });
+                });
+                
+                $(".plus2").click(function(){
+                    var path1 = $(".type-volumes input[name='path1']").val();
+                    var path2 = $(".type-volumes input[name='path2']").val();
+                    
+                    var notPath = ['/boot','/bin','/sbin','/etc','/usr/bin','/usr/sbin','/dev']
+                    if($.inArray(path2,notPath) != -1){
+                        layer.msg('Cannot map' + path2,{icon:2});
+                        return;
+                    }           
+                    var portval = $('#portabletr2')[0].childNodes;
+                    for(var i=0;i<portval.length;i++){
+                        if(portval[i].childNodes[0].innerText == '当前未添加目录映射') continue;
+                        var sport = portval[i].childNodes[2].innerText;
+                        if(path2 == sport){
+                            layer.msg('Directory ['+path2+'] is already in the mapping list!',{icon:2});
+                            return;
+                        }
+                    }
+                    var selecttype = $(".type-volumes select").val();
+                    var portable= '<tr>\
+                        <td class="td_width_1" title="'+path1+'">'+path1+'</td>\
+                        <td>'+selecttype+'</td><td title="'+path2+'" class="td_width_1" style="max-width: 138px;">'+path2+'</td>\
+                        <td class="text-right" width="50"><a href="javascript:;" class="btlink minus2">Del</a></td>\
+                    </tr>';
+                    $("#portabletr2").append(portable);
+                    $(".more2").remove();
+                    $(".minus2").click(function(){
+                        $(this).parents("tr").remove();
+                    });
+                });
+            },
+            yes:function(layero,layer_id){
+                console.log(layero,layer_id);
+
+                var ports = {};
+                var volumes = {};
+                var portval = $('#portabletr')[0].childNodes;
+                var address = $('.docker-address').val();
+                var portval2 = $('#portabletr2')[0].childNodes;
+                var command = $('.docker-command').val()
+                var entrypoint = $('.docker-entrypoint').val()
+                var accept = [];
+
+                //遍历端口映射
+                for(var i=0;i<portval.length;i++){
+                    console.log(portval[i].childNodes[0].innerText);
+                    if(portval[i].childNodes[0].innerText == '当前未添加端口映射') {
+                        continue;
+                    }
+                    var port = portval[i].childNodes[0].innerText.replace(/\s/g,'');
+                    var dport = port + '/' + portval[i].childNodes[1].innerText.toLowerCase().replace(/\s/g,'');
+                    var sport = [address,parseInt(portval[i].childNodes[2].innerText.replace(/\s/g,''))];
+                    ports[dport] = sport
+                    accept.push(port);
+                }
+                
+                //遍历目录映射
+                volumes['/sys/fs/cgroup'] = {'bind':'/sys/fs/cgroup', 'mode': 'rw'};
+                for(var i=0;i<portval2.length;i++){
+                    if(portval2[i].childNodes[0].innerText.replace(/\s/g,' ') == '当前未添加目录映射') {
+                        continue;
+                    }
+                    var dpath = portval2[i].childNodes[2].innerText.replace(/\s/g,'');
+                    var spath = {'bind':portval2[i].childNodes[0].innerText.replace(/\s/g,''),'mode':portval2[i].childNodes[1].innerText.toLowerCase().replace(/\s/g,'')};
+                    volumes[dpath] = spath
+                }
+                
+                var data = {
+                    image:$('.docker-image').val(),
+                    ports:JSON.stringify(ports),
+                    accept:JSON.stringify(accept),
+                    volumes:JSON.stringify(volumes),
+                    environments:$('.docker-environments').val(),
+                    mem_limit:$('.docker-mem').val(),
+                    cpu_shares:$('.docker-cpu').val(),
+                    command:command,
+                    entrypoint:entrypoint
+                }
+                
+                if(data.mem_limit > rdata.memSize){
+                    layer.msg('内存配额不能大于物理内存 ['+rdata.memSize+']!',{icon:2});
+                    return;
+                }
+                
+                if(data.cpu_shares > 100 || data.cpu_shares < 1){
+                    layer.msg('CPU配额设置值范围应为 [1-100]!',{icon:2});
+                    return;
+                }
+                dPost('docker_create_con','', data, function(rdata){
+                    var rdata = $.parseJSON(rdata.data);
+                    showMsg(rdata.msg,function(){
+                        if(rdata.status) {
+                            layer.close(layer_index);
+                            dockerConListRender();
+                        }
+                    },{ icon: rdata.status ? 1 : 2 });
+                });
+            }
+        });
+    });
+
 }
 
 function dockerConList(){
