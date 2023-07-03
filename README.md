@@ -106,6 +106,7 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 * 优化域名ssl保存功能。
 * 修复PHP扩展intl不加载问题(debian/ubuntu)。
 * 修复redhat安装openresty缺少openssl-devel。
+* docker插件-将就能用。
 
 ### JSDelivr安装地址
 
