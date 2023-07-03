@@ -356,8 +356,6 @@ function createConTemplate(){
                 });
             },
             yes:function(layero,layer_id){
-                console.log(layero,layer_id);
-
                 var ports = {};
                 var volumes = {};
                 var portval = $('#portabletr')[0].childNodes;
@@ -369,7 +367,7 @@ function createConTemplate(){
 
                 //遍历端口映射
                 for(var i=0;i<portval.length;i++){
-                    console.log(portval[i].childNodes[0].innerText);
+                    // console.log(portval[i].childNodes[0].innerText);
                     if(portval[i].childNodes[0].innerText == '当前未添加端口映射') {
                         continue;
                     }
