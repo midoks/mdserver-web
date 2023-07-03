@@ -840,7 +840,8 @@ class cert_request:
                 index).encode()
         )
         X509Req.set_pubkey(pk)
-        X509Req.set_version(2)
+        # X509Req.set_version(2)
+        X509Req.set_version(0)
         X509Req.sign(pk, self.__digest)
         return OpenSSL.crypto.dump_certificate_request(OpenSSL.crypto.FILETYPE_ASN1, X509Req)
 
