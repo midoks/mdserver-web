@@ -41,35 +41,34 @@ def send_msg(bot, tag='ad', trigger_time=300):
     mw.writeFile(lock_file, json.dumps(lock_data))
     # 信号只在一个周期内执行一次|end
 
-    # https://t.me/gjgzs2022 ｜ 19/m
-    # ♻️CMS导航网♻️/💰流量变现💰 ｜ 28/m
-    # CK资源采集 ｜29/m
+    # https://t.me/gjgzs2022 ｜ 22/m
+    # 代付支付宝微信❤️淘宝帮付/💰流量变现💰集团收量/🕵️‍♀️实名认证/接码✅过人脸👤 ｜ 28/m
     # https://zhaoziyuan.la/ | 15/m | 2m | next,7/15
     # 香港高防CDN ｜9/m
     keyboard = [
         [
             types.InlineKeyboardButton(
-                text="香港高防CDN、免实名、试用30天", url='www.100dun.com')
+                text="实卡接码🙎‍♂️代实名/过人脸🅾️开飞机会员", url='https://t.me/gjgzs2022')
         ],
         [
             types.InlineKeyboardButton(
-                text="CK资源采集", url='https://ckzy1.com/')
+                text="香港高防CDN、免实名、试用30天", url='https://www.100dun.com')
         ],
         [
             types.InlineKeyboardButton(
-                text="♻️CMS导航网♻️", url='https://t.me/maccms_jccms')
+                text="🕵️‍♀️实名认证/接码✅过人脸👤", url='https://t.me/zhanzhangyewu')
         ],
         [
             types.InlineKeyboardButton(
-                text="💰流量变现💰", url='https://t.me/taohaozhan')
+                text="代付支付宝微信❤️淘宝帮付", url='https://t.me/Uxuanzhenpin')
         ],
         [
             types.InlineKeyboardButton(
-                text="🙎‍♂️代实名🙍‍♀️过人脸🅾️国际阿里云腾讯云", url='https://t.me/gjgzs2022')
+                text="💰流量变现💰集团收量", url='https://t.me/taohaozhan')
         ],
         [
             types.InlineKeyboardButton(
-                text="倩倩CDN服务器", url='https://t.me/KLT_12'),
+                text="官网", url='https://github.com/midoks/mdserver-web'),
             types.InlineKeyboardButton(
                 text="💎DigitalVirt(赞助商)", url='https://digitalvirt.com/aff.php?aff=154')
         ],

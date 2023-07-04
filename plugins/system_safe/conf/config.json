@@ -923,10 +923,12 @@
             "python",
             "python3",
             "ifdown",
-            "node"
+            "node",
+            "sd-pam"
         ],
         "process_exclude": [
             "php-fpm",
+            "git",
             "mysqld",
             "mongod",
             "dockerd",

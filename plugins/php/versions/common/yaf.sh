@@ -32,6 +32,11 @@ if [ "$version" -eq "72" ] || [ "$version" -eq "73" ];then
 fi
 
 
+if [ "$version" -gt "74" ];then
+	LIBV=3.3.5
+fi
+
+
 LIB_PATH_NAME=lib/php
 if [ -d $serverPath/php/${version}/lib64 ];then
 	LIB_PATH_NAME=lib64

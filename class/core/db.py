@@ -65,7 +65,7 @@ class Sql():
         self.__DB_TABLE = table
         return self
 
-    def where(self, where, param):
+    def where(self, where, param=()):
         # WHERE条件
         if where:
             self.__OPT_WHERE = " WHERE " + where

@@ -1,0 +1,18 @@
+{
+	"sort": 7,
+	"ps": "哪吒监控面板/改造版",
+	"name": "nezha",
+	"title": "哪吒监控",
+	"shell": "install.sh",
+	"versions":["0.15.2"],
+	"tip": "soft",
+	"checks": "server/nezha",
+	"path": "server/nezha",
+	"display": 1,
+	"author": "midoks",
+	"date": "2023-06-26",
+	"home": "https://github.com/midoks/nezha",
+	"doc1": "https://nezha.wiki/",
+	"type": 0,
+	"pid": "5"
+}

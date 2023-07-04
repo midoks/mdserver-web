@@ -86,6 +86,7 @@ Install_mysql()
 		make -j${cpuCore} && make install && make clean
 
 		if [ -d $serverPath/mysql ];then
+			rm -rf ${mysqlDir}/mysql-${VERSION}
 			echo '5.5' > $serverPath/mysql/version.pl
 			echo '安装完成' > $install_tmp
 		else

@@ -4,8 +4,8 @@
  * @param {String} search 搜索条件
  */
  function getWeb(page, search, type_id) {
-	search = $("#SearchValue").prop("value");
-	page = page == undefined ? '1':page;
+	var search = $("#SearchValue").prop("value");
+	var page = page == undefined ? '1':page;
 	var order = getCookie('order');
 	if(order){
 		order = '&order=' + order;
@@ -127,7 +127,7 @@
 			if(databak == null){
 				databak = '';
 			}
-			$(this).hide().after("<input class='baktext' type='text' data-id='"+dataid+"' name='bak' value='" + databak + "' placeholder='备注信息' onblur='getBakPost(\"sites\")' />");
+			$(this).hide().after("<input class='baktext' type='text' data-id='"+dataid+"' data-page='"+page+"' name='bak' value='" + databak + "' placeholder='备注信息' onblur='getBakPost(\"sites\")' />");
 			$(".baktext").focus();
 		});
 
@@ -138,22 +138,23 @@
 
 function getBakPost(b) {
 	$(".baktext").hide().prev().show();
-	var c = $(".baktext").attr("data-id");
+	var id = $(".baktext").attr("data-id");
+	var page = $(".baktext").attr("data-page");
 	var a = $(".baktext").val();
 	if(a == "") {
 		a = '空';
 	}
-	setWebPs(b, c, a);
-	$("a[data-id='" + c + "']").html(a);
+	setWebPs(b, id, a,page);
+	$("a[data-id='" + id + "']").html(a);
 	$(".baktext").remove();
 }
 
-function setWebPs(b, e, a) {
+function setWebPs(b, id, ps,page) {
 	var d = layer.load({shade: true,shadeClose: false});
-	var c = 'ps=' + a;
-	$.post('/site/set_ps', 'id=' + e + "&" + c, function(data) {
+	var ps = 'ps=' + ps;
+	$.post('/site/set_ps', 'id=' + id + "&" + ps, function(data) {
 		if(data['status']) {
-			getWeb(1);
+			getWeb(page);
 			layer.closeAll();
 			layer.msg('修改成功!', {icon: 1});
 		} else {

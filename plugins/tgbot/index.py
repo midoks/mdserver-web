@@ -171,6 +171,12 @@ def reload():
     content = mw.readFile(tgbot_tpl)
     mw.writeFile(tgbot_dst, content)
 
+    tgpush_tpl = getPluginDir() + '/startup/tgpush.py'
+    tgpush_dst = getServerDir() + '/tgpush.py'
+
+    content = mw.readFile(tgpush_tpl)
+    mw.writeFile(tgpush_dst, content)
+
     ext_src = getPluginDir() + '/startup/extend'
     ext_dst = getServerDir()
 

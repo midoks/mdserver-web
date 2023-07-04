@@ -95,15 +95,6 @@ for p in init_list:
         writeLog(mw.getTracebackInfo())
         writeLog('-----init error end -------')
 
-# @bot.message_handler(commands=['start', 'help'])
-# def hanle_start_help(message):
-#     bot.reply_to(message, "hello world")
-
-
-# @bot.message_handler(commands=['mw_echo'])
-# def hanle_mw_echo(message):
-#     bot.reply_to(message, message.text)
-
 
 @bot.message_handler(commands=['chat_id'])
 def hanle_get_chat_id(message):
@@ -136,42 +127,6 @@ def callback_query_handler(call):
             writeLog('-----callback_query_handler error end -------')
 
 
-def runBotPushTask():
-    plist = getStartExtCfgByTag('push')
-    for p in plist:
-        try:
-            script = p['name'].split('.')[0]
-            __import__(script).run(bot)
-        except Exception as e:
-            writeLog('-----runBotPushTask error start -------')
-            writeLog(mw.getTracebackInfo())
-            writeLog('-----runBotPushTask error end -------')
-
-
-def botPush():
-    while True:
-        runBotPushTask()
-        time.sleep(1)
-
-
-def runBotPushOtherTask():
-    plist = getStartExtCfgByTag('other')
-    for p in plist:
-        try:
-            script = p['name'].split('.')[0]
-            __import__(script).run(bot)
-        except Exception as e:
-            writeLog('-----runBotPushOtherTask error start -------')
-            writeLog(mw.getTracebackInfo())
-            writeLog('-----runBotPushOtherTask error end -------')
-
-
-def botPushOther():
-    while True:
-        runBotPushOtherTask()
-        time.sleep(1)
-
-
 def runBot(bot):
     try:
         bot.polling()
@@ -183,14 +138,6 @@ def runBot(bot):
         runBot(bot)
 
 if __name__ == "__main__":
-
-    # 机器人推送任务
-    botPushTask = threading.Thread(target=botPush)
-    botPushTask.start()
-
-    # 机器人其他推送任务
-    botPushOtherTask = threading.Thread(target=botPushOther)
-    botPushOtherTask.start()
 
     writeLog('启动成功')
     runBot(bot)

@@ -21,9 +21,9 @@ from telebot.util import quick_markup
 
 
 # 指定群ID
-chat_id_list = [-1001578009023, -1001979545570]
+chat_id_list = [-1001979545570]
 # 别人群ID[有API调用限制]
-chat_id_list_other = [-1001771526434]
+chat_id_list_other = [-1001578009023, -1001771526434]
 
 async def writeLog(log_str):
     if __name__ == "__main__":

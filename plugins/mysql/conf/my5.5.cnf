@@ -39,7 +39,7 @@ max_connections = 500
 max_connect_errors = 100
 open_files_limit = 65535
 
-skip-name-resolve=1
+skip_name_resolve=1
 #skip-grant-tables
 #skip-networking
 #skip-external-locking

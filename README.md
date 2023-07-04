@@ -99,10 +99,15 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.14.5
+### 版本更新 0.15.0
 
-* 软件管理-搜索功能。
-* 文件-右键功能优化。
+* debian12适配。
+* 添加nezha插件。
+* 优化域名ssl保存功能。
+* 修复PHP扩展intl不加载问题(debian/ubuntu)。
+* 修复redhat安装openresty缺少openssl-devel。
+* docker插件-将就能用。
+* tgbot接收和push任务分离。
 
 ### JSDelivr安装地址
 
