@@ -43,8 +43,9 @@ def send_msg(bot, tag='ad', trigger_time=300):
 
     # https://t.me/gjgzs2022 ｜ 22/m
     # 代付支付宝微信❤️淘宝帮付/💰流量变现💰集团收量/🕵️‍♀️实名认证/接码✅过人脸👤 ｜ 28/m
-    # https://zhaoziyuan.la/ | 15/m | 2m | next,7/15
+    # https://zhaoziyuan.la/ | web | 15/m | 2m | next,7/15
     # 香港高防CDN ｜9/m
+    # mvirtua | web | 7/m
     keyboard = [
         [
             types.InlineKeyboardButton(
