@@ -2,7 +2,7 @@ setuptools>=33.1.1
 Werkzeug>=1.0.1
 wheel>=0.37.1
 gunicorn==20.1.0
-requests==2.31.1
+requests>=2.31.0
 urllib3>=1.21.1
 flask>=2.0.3
 flask-session==0.3.2
