@@ -88,6 +88,7 @@ PHP[72-82]支持phpMyAdmin[5.2.0]
 | 服务商			| 	LOGO   |  推广地址  | 优惠码 |
 | ------------- |----------|-----------|-------|
 | digitalvirt	|[![digitalvirt](https://digitalvirt.com/templates/BlueWhite/img/logo-dark.svg)](https://digitalvirt.com/aff.php?aff=154) | https://digitalvirt.com/aff.php?aff=154 | mdserver-web |
+| mvirtua |[![mvirtua](https://mvirtua.com/upload/logo-black.png)](https://mvirtua.com/aff/FUSKXVDH) | https://mvirtua.com/aff/FUSKXVDH | mdserver-web (全场8折)|
 
 # Docker
 
