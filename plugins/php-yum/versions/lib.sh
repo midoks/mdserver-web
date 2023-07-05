@@ -12,9 +12,9 @@ version=$1
 action=$2
 
 if [ -f /lib/systemd/system/php${version}-php-fpm.service ];then
-	systemctl ${action} php${version}
+	systemctl ${action} php${version}-php-fpm
 elif [[ -f /usr/lib/systemd/system/php${version}-php-fpm.service ]]; then
-	systemctl ${action} php${version}
+	systemctl ${action} php${version}-php-fpm
 else
 	$serverPath/php/init.d/php${version} ${action}
 fi
