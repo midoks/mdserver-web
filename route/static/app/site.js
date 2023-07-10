@@ -2428,7 +2428,7 @@ function rewrite(siteName){
 			$("#SetRewriteBtn").click(function(){
 				$("#rewriteBody").empty();
 				$("#rewriteBody").text(editor.getValue());
-				setRewrite(filename);
+				setRewrite(filename, encodeURIComponent(editor.getValue()));
 			});
 			$("#SetRewriteBtnTel").click(function(){
 				$("#rewriteBody").empty();
@@ -2460,8 +2460,8 @@ function rewrite(siteName){
 
 
 //设置伪静态
-function setRewrite(filename){
-	var data = 'data='+encodeURIComponent($("#rewriteBody").val())+'&path='+filename+'&encoding=utf-8';
+function setRewrite(filename,data){
+	var data = 'data='+data+'&path='+filename+'&encoding=utf-8';
 	var loadT = layer.msg(lan.site.saving_txt,{icon:16,time:0,shade: [0.3, '#000']});
 	$.post('/site/set_rewrite',data,function(rdata){
 		layer.close(loadT);
