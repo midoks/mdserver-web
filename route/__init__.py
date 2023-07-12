@@ -47,7 +47,7 @@ cache.init_app(app, config={'CACHE_TYPE': 'simple'})
 
 try:
     from flask_sqlalchemy import SQLAlchemy
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/mw_session.db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/py_mw_session.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
     app.config['SESSION_TYPE'] = 'sqlalchemy'
     app.config['SESSION_SQLALCHEMY'] = sdb
@@ -60,7 +60,6 @@ except:
         str(sys.version_info[0])
     app.config['SESSION_FILE_THRESHOLD'] = 1024
     app.config['SESSION_FILE_MODE'] = 384
-    mw.execShell("pip install flask_sqlalchemy &")
 
 app.secret_key = uuid.UUID(int=uuid.getnode()).hex[-12:]
 app.config['SESSION_PERMANENT'] = True
@@ -176,6 +175,12 @@ def requestCheck():
     domain_check = mw.checkDomainPanel()
     if domain_check:
         return domain_check
+
+
+@app.after_request
+def requestAfter(response):
+    response.headers['soft'] = 'mdserver-web'
+    return response
 
 
 def isLogined():
