@@ -180,7 +180,7 @@ def requestCheck():
 @app.after_request
 def requestAfter(response):
     response.headers['soft'] = 'mdserver-web'
-    response.headers['mw_version'] = app.config.version
+    response.headers['mw-version'] = app.config.version
     return response
 
 
