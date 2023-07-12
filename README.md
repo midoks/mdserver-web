@@ -106,6 +106,7 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 * 域名伪静态保存优化。
 * 自动同步gitee。
 * nezha保存优化。
+* OP防火墙优化(站点配置-状态关闭后,不再防御)。
 
 ### JSDelivr安装地址
 
