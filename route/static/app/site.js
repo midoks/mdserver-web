@@ -1301,7 +1301,7 @@ function showRewrite(rdata){
 					<select class='bt-input-text mr20' id='myRewrite' name='rewrite' style='width:30%;'>"+rList+"</select>\
 					<textarea class='bt-input-text mtb15' style='height: 260px; width: 470px; line-height:18px;padding:5px;' id='rewriteBody'>"+rdata.data+"</textarea>\
 				</div>\
-				<button id='SetRewriteBtn' class='btn btn-success btn-sm' onclick=\"SetRewrite('"+rdata.filename+"')\">保存</button>\
+				<button id='setRewriteBtn' class='btn btn-success btn-sm'>保存</button>\
 				<ul class='help-info-text c7 ptb10'>\
 					<li>请选择您的应用，若设置伪静态后，网站无法正常访问，请尝试设置回default</li>\
 					<li>您可以对伪静态规则进行修改，修改完后保存即可。</li>\
@@ -1314,14 +1314,21 @@ function showRewrite(rdata){
 		closeBtn: 1,
 		shift: 5,
 		shadeClose: true,
-		content:webBakHtml
-	});
-	
-	$("#myRewrite").change(function(){
-		var rewriteName = $(this).val();
-		$.post('/files/get_body','path='+rdata['rewrite_dir']+'/'+rewriteName+'.conf',function(fileBody){
-			 $("#rewriteBody").val(fileBody.data.data);
-		},'json');
+		content:webBakHtml,
+		success:function(){
+
+			$("#myRewrite").change(function(){
+				var rewriteName = $(this).val();
+				$.post('/files/get_body','path='+rdata['rewrite_dir']+'/'+rewriteName+'.conf',function(fileBody){
+					 $("#rewriteBody").val(fileBody.data.data);
+				},'json');
+			});
+
+			$('#setRewriteBtn').click(function(){
+				var data = $("#rewriteBody").val();
+				setRewrite(rdata.filename, encodeURIComponent(data));
+			});
+		}
 	});
 }
 
@@ -1334,7 +1341,7 @@ function addDirBinding(id){
 		return;
 	}
 	
-	var data = 'id='+id+'&domain='+domain+'&dirName='+dirName
+	var data = 'id='+id+'&domain='+domain+'&dirName='+dirName;
 	$.post('/site/add_dir_bind',data,function(rdata){
 		dirBinding(id);
 		layer.msg(rdata.msg,{icon:rdata.status?1:2});
