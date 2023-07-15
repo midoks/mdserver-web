@@ -97,6 +97,7 @@ if [ ! -f /usr/sbin/firewalld ];then
     
     # look
     # firewall-cmd --list-all
+    # systemctl status firewalld
 
     if [ "$SSH_PORT" != "" ];then
         firewall-cmd --permanent --zone=public --add-port=${SSH_PORT}/tcp

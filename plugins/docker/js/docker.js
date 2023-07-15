@@ -468,7 +468,7 @@ function pullImages(tag, id){
 function dockerImageListRender(){
     dPost('image_list', '', {}, function(rdata){
         var rdata = $.parseJSON(rdata.data);
-        console.log(rdata);
+        // console.log(rdata);
         if (!rdata.status){
             layer.msg(rdata.msg,{icon:2,time:2000});
             return; 
@@ -632,6 +632,87 @@ function dockerImageList(){
     $(".soft-man-con").html(con);
 
     dockerImageListRender();
+}
+
+function deleteIpList(address){
+    safeMessage('删除IP','你将删除从IP地址池['+address+'],确定？',function(){
+        dPost('docker_del_ip','', {address:address},function(rdata){
+            var rdata = $.parseJSON(rdata.data);
+            showMsg(rdata.msg,function(){
+                if(rdata.status) {
+                    dockerIpListRender();
+                }
+            },{ icon: rdata.status ? 1 : 2 });
+        });
+    });
+}
+
+function dockerIpListRender(){
+    dPost('docker_get_iplist', '', {}, function(rdata){
+        var rdata = $.parseJSON(rdata.data);
+        // console.log(rdata);
+        if (!rdata.status){
+            layer.msg(rdata.msg,{icon:2,time:2000});
+            return; 
+        }
+        
+        var list = '';
+        var rlist = rdata.data;
+
+        for (var i = 0; i < rlist.length; i++) {
+
+            var op = '';
+            op += '<a href="javascript:;" onclick="deleteIpList(\''+rlist[i]['address']+'\')" class="btlink">删除</a>';
+
+            list += '<tr>';
+            list += '<td>'+rlist[i]['address']+'</td>';
+            list += '<td>'+rlist[i]['netmask']+'</td>';
+            list += '<td>'+rlist[i]['gateway']+'</td>';
+            list += '<td class="text-right">'+op+'</td>';
+            list += '</tr>';
+        }
+
+        $('#ip_list tbody').html(list);
+    });
+}
+
+function dockerAddIpPool(){
+    var address = $('input[name="address"]').val();
+    var netmask = $('input[name="netmask"]').val();
+    var gateway = $('input[name="gateway"]').val();
+    dPost('docker_add_ip','', {address:address,netmask:netmask,gateway:gateway}, function(rdata){
+        var rdata = $.parseJSON(rdata.data);
+        showMsg(rdata.msg, function(){
+            dockerIpListRender();
+        },{icon:rdata.status?1:2})
+    });
+}
+
+function dockerIpList(){
+    var con = '<div class="safe bgw">\
+            <div class="search_input">\
+                <input class="bt-input-text mr5" type="text" style="width:150px" name="address" placeholder="IP地址">\
+                <input class="bt-input-text mr5" name="netmask" type="text" style="width:150px" placeholder="子网掩码">\
+                <input name="gateway" class="bt-input-text mr5" type="text" style="width:150px" placeholder="网关">\
+                <button class="btn btn-success btn-sm va0" onclick="dockerAddIpPool()">添加</button>\
+            </div>\
+            <div class="divtable mtb10">\
+                <div class="tablescroll">\
+                    <table id="ip_list" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
+                    <thead><tr>\
+                    <th>IP地址</th>\
+                    <th>子网掩码</th>\
+                    <th>网关</th>\
+                    <th style="text-align:right;">操作</th></tr></thead>\
+                    <tbody></tbody></table>\
+                </div>\
+                <div id="databasePage" class="dataTables_paginate paging_bootstrap page"></div>\
+            </div>\
+        </div>';
+
+    $(".soft-man-con").html(con);
+
+    dockerIpListRender();
 }
 
 // login

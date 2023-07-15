@@ -108,6 +108,8 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 * nezha保存优化。
 * OP防火墙优化(站点配置-状态关闭后,不再防御)-已安装的,需要重载。
 * 修复子目录绑定-伪静态问题。
+* [插件]docker - 添加IP地址池。
+* PHP下载中国优化。
 
 ### JSDelivr安装地址
 

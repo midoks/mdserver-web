@@ -443,7 +443,7 @@ def dockerLoginCheck(user_name, user_pass, registry):
         return False
 
 
-def getDockerIpList():
+def getDockerIpListData():
     # 取IP列表
     path = getServerDir()
     ipConf = path + '/iplist.json'
@@ -453,13 +453,63 @@ def getDockerIpList():
     return iplist
 
 
+def getDockerIpList():
+    data = getDockerIpListData()
+    return mw.returnJson(True, 'ok!', data)
+
+
+def dockerAddIP():
+    # 添加IP
+    args = getArgs()
+    data = checkArgs(args, ['address', 'netmask', 'gateway'])
+    if not data[0]:
+        return data[1]
+
+    path = getServerDir()
+    ipConf = path + '/iplist.json'
+    if not os.path.exists(ipConf):
+        iplist = []
+        mw.writeFile(ipConf, json.dumps(iplist))
+
+    iplist = json.loads(mw.readFile(ipConf))
+    ipInfo = {
+        'address': args['address'],
+        'netmask': args['netmask'],
+        'gateway': args['gateway'],
+    }
+    iplist.append(ipInfo)
+    mw.writeFile(ipConf, json.dumps(iplist))
+    return mw.returnJson(True, '添加成功!')
+
+
+def dockerDelIP():
+    # 删除IP
+    args = getArgs()
+    data = checkArgs(args, ['address'])
+    if not data[0]:
+        return data[1]
+
+    path = getServerDir()
+    ipConf = path + '/iplist.json'
+    if not os.path.exists(ipConf):
+        return mw.returnJson(False, '指定的IP不存在。！')
+    iplist = json.loads(mw.readFile(ipConf))
+    newList = []
+    for ipInfo in iplist:
+        if ipInfo['address'] == args['address']:
+            continue
+        newList.append(ipInfo)
+    mw.writeFile(ipConf, json.dumps(newList))
+    return mw.returnJson(True, '成功删除!')
+
+
 def getDockerCreateInfo():
     # 取创建依赖
     import psutil
     data = {}
     data['images'] = imageList()
     data['memSize'] = int(psutil.virtual_memory().total / 1024 / 1024)
-    data['iplist'] = getDockerIpList()
+    data['iplist'] = getDockerIpListData()
     return mw.returnJson(True, 'ok!', data)
 
 
@@ -653,6 +703,12 @@ if __name__ == "__main__":
         print(dockerPullReg())
     elif func == 'image_list':
         print(imageListData())
+    elif func == 'docker_get_iplist':
+        print(getDockerIpList())
+    elif func == 'docker_del_ip':
+        print(dockerDelIP())
+    elif func == 'docker_add_ip':
+        print(dockerAddIP())
     elif func == 'get_docker_create_info':
         print(getDockerCreateInfo())
     elif func == 'docker_create_con':
