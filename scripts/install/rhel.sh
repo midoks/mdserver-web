@@ -113,8 +113,8 @@ if [ ! -f /usr/sbin/firewalld ];then
     sed -i 's#AllowZoneDrifting=yes#AllowZoneDrifting=no#g' /etc/firewalld/firewalld.conf
     firewall-cmd --reload
 
-    #安装时不开启
-    systemctl stop firewalld
+    #安装就开启
+    systemctl restart firewalld
 fi
 
 $PKGMGR install -y epel-release
