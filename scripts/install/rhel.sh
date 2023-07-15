@@ -89,6 +89,7 @@ echo "SSH PORT:${SSH_PORT}"
 # echo "iptables wrap start"
 
 
+echo "firewall open common port start"
 if [ ! -f /usr/sbin/firewalld ];then
     $PKGMGR install firewalld -y
     systemctl enable firewalld
@@ -103,7 +104,6 @@ if [ ! -f /usr/sbin/firewalld ];then
     systemctl restart firewalld
 fi
 
-echo "firewall open common port start"
 if [ -f /usr/sbin/firewalld ];then
     # look
     # firewall-cmd --list-all
