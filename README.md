@@ -110,6 +110,7 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 * 修复子目录绑定-伪静态问题。
 * [插件]docker - 添加IP地址池。
 * PHP下载中国优化。
+* 监控页面-自定义时间优化。
 
 ### JSDelivr安装地址
 

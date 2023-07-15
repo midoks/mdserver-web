@@ -1,78 +1,100 @@
 //默认显示7天周期图表
+
 setTimeout(function(){
 	Wday(0,'getload');
-},500);
+},100);
 setTimeout(function(){
 	Wday(0,'cpu');
-},500);
+},200);
 setTimeout(function(){
 	Wday(0,'mem');
-},1000);
+},500);
 setTimeout(function(){
 	Wday(0,'disk');
-},1500);
+},100);
 setTimeout(function(){
 	Wday(0,'network');
-},2000);
+},1500);
 
-$(".st").hover(function(){
+
+$(".searcTime .st").click(function(){
+	var status = $(this).data('status');
+	if (status == 'show'){
+		$(this).next().hide();
+		$(this).data('status','hide');
+	} else{
+		$(this).next().show();
+		$(this).data('status','show');
+	}
+});
+
+//自定义时间-切换
+$(".searcTime .st").hover(function(){
+	$(this).data('status','show');
 	$(this).next().show();
 },function(){
-	$(this).next().hide();
-	$(this).next().hover(function(){
-		$(this).show();
-	},function(){
-		$(this).hide();
-	})
+	// $(this).next().hide();
+	// $(this).next().hover(function(){
+	// 	$(this).show();
+	// },function(){
+	// 	$(this).hide();
+	// })
 })
+
 $(".searcTime .gt").click(function(){
 	$(this).addClass("on").siblings().removeClass("on");
 })
-$(".loadbtn").click(function(){
-	$(this).parents(".searcTime").find("span").removeClass("on");
-	$(this).parents(".searcTime").find(".st").addClass("on");
-	var b = (new Date($(this).parent().find(".btime").val()).getTime())/1000;
-	var e = (new Date($(this).parent().find(".etime").val()).getTime())/1000;
+
+
+//渲染日期时间范围 start
+var render_dlist = [
+	'loadbtn_rtime',
+	'cpubtn_rtime',
+	'membtn_rtime',
+	'diskbtn_rtime',
+	'networkbtn_rtime'
+];
+
+for (var i = 0; i < render_dlist.length; i++) {
+	
+	laydate.render({
+		elem: '#'+render_dlist[i]
+		,type: 'datetime'
+		,range: true
+	});
+
+
+	var b = getBeforeDate(28).replaceAll('/','-') + " 00:00:00";
+	var e = getBeforeDate(0).replaceAll('/','-') + " 23:59:59";
+
+	$('#'+render_dlist[i]).val(b + ' - ' + e);
+}
+//渲染日期时间范围 end
+
+
+$('.sbtn').click(function(){
+	$(".searcTime .st").next().hide();
+
+	var rtime = $(this).parent().find(".rtime").val();
+	var rarr = rtime.split(' - ');
+
+	var b = (new Date(rarr[0]).getTime())/1000;
+	var e = (new Date(rarr[1]).getTime())/1000;
+
 	b = Math.round(b);
 	e = Math.round(e);
-	getload(b,e)
-})
-$(".cpubtn").click(function(){
-	$(this).parents(".searcTime").find("span").removeClass("on");
-	$(this).parents(".searcTime").find(".st").addClass("on");
-	var b = (new Date($(this).parent().find(".btime").val()).getTime())/1000;
-	var e = (new Date($(this).parent().find(".etime").val()).getTime())/1000;
-	b = Math.round(b);
-	e = Math.round(e);
-	cpu(b,e)
-})
-$(".membtn").click(function(){
-	$(this).parents(".searcTime").find("span").removeClass("on");
-	$(this).parents(".searcTime").find(".st").addClass("on");
-	var b = (new Date($(this).parent().find(".btime").val()).getTime())/1000;
-	var e = (new Date($(this).parent().find(".etime").val()).getTime())/1000;
-	b = Math.round(b);
-	e = Math.round(e);
-	mem(b,e)
-})
-$(".diskbtn").click(function(){
-	$(this).parents(".searcTime").find("span").removeClass("on");
-	$(this).parents(".searcTime").find(".st").addClass("on");
-	var b = (new Date($(this).parent().find(".btime").val()).getTime())/1000;
-	var e = (new Date($(this).parent().find(".etime").val()).getTime())/1000;
-	b = Math.round(b);
-	e = Math.round(e);
-	disk(b,e)
-})
-$(".networkbtn").click(function(){
-	$(this).parents(".searcTime").find("span").removeClass("on");
-	$(this).parents(".searcTime").find(".st").addClass("on");
-	var b = (new Date($(this).parent().find(".btime").val()).getTime())/1000;
-	var e = (new Date($(this).parent().find(".etime").val()).getTime())/1000;
-	b = Math.round(b);
-	e = Math.round(e);
-	network(b,e)
-})
+
+	if ($(this).hasClass('loadbtn')){
+		getload(b,e);
+	} else if ($(this).hasClass('cpubtn')){
+		cpu(b,e);
+	}else if ($(this).hasClass('membtn')){
+		mem(b,e);
+	} else if ($(this).hasClass('diskbtn')){
+		disk(b,e);
+	}
+});
+
 //指定天数
 function Wday(day,name){
 	var now = (new Date().getTime())/1000;
@@ -94,19 +116,19 @@ function Wday(day,name){
 	}
 	switch (name){
 		case "cpu":
-			cpu(b,e);
+			cpu(b, e);
 			break;
 		case "mem":
-			mem(b,e);
+			mem(b, e);
 			break;
 		case "disk":
-			disk(b,e);
+			disk(b, e);
 			break;
 		case "network":
-			network(b,e);
+			network(b, e);
 			break;
 		case "getload":
-			getload(b,e);
+			getload(b, e);
 			break;
 	}
 }
@@ -119,6 +141,7 @@ function getToday(){
    return str;
 }
 
+getStatus();
 //取监控状态
 function getStatus(){
 	loadT = layer.msg('正在读取,请稍候...',{icon:16,time:0})
@@ -141,7 +164,7 @@ function getStatus(){
 
 	},'json');
 }
-getStatus();
+
 
 //设置监控状态
 function setControl(act, value=false){
@@ -172,8 +195,9 @@ function setControl(act, value=false){
 	
 	loadT = layer.msg('正在处理,请稍候...',{icon:16,time:0})
 	$.post('/system/set_control','type='+type+'&day='+day,function(rdata){
-		layer.close(loadT);
-		layer.msg(rdata.msg,{icon:rdata.status?1:2});
+		showMsg(rdata.msg, function(){
+			layer.close(loadT);
+		},{icon:rdata.status?1:2})
 	},'json');
 }
 
@@ -183,8 +207,9 @@ function closeControl(){
 	layer.confirm('您真的清空所有监控记录吗？',{title:'清空记录',icon:3,closeBtn:1}, function() {
 		loadT = layer.msg('正在处理,请稍候...',{icon:16,time:0})
 		$.post('/system/set_control','type=del',function(rdata){
-			layer.close(loadT);
-			layer.msg(rdata.msg,{icon:rdata.status?1:2});
+			showMsg(rdata.msg, function(){
+				layer.close(loadT);
+			},{icon:rdata.status?1:2})
 		},'json');
 	});
 }
@@ -199,19 +224,18 @@ function getBeforeDate(n){
     var day=d.getDate();
     if(day <= n){
 		if(mon>1) {
-		   mon=mon-1;
-		}
-		else {
-		 year = year-1;
-		 mon = 12;
+		  	mon = mon-1;
+		} else {
+			year = year-1;
+			mon = 12;
 		}
 	}
 	d.setDate(d.getDate()-n);
 	year = d.getFullYear();
 	mon=d.getMonth()+1;
 	day=d.getDate();
-    s = year+"/"+(mon<10?('0'+mon):mon)+"/"+(day<10?('0'+day):day);
-    return s;
+  	s = year+"/"+(mon<10?('0'+mon):mon)+"/"+(day<10?('0'+day):day);
+	return s;
 }
 //cpu
 function cpu(b,e){
@@ -229,20 +253,14 @@ function cpu(b,e){
 		option = {
 			tooltip: {
 				trigger: 'axis',
-				axisPointer: {
-					type: 'cross'
-				},
+				axisPointer: { type: 'cross' },
 				formatter: '{b}<br />{a}: {c}%'
 			},
 			xAxis: {
 				type: 'category',
 				boundaryGap: false,
 				data: xData,
-				axisLine:{
-					lineStyle:{
-						color:"#666"
-					}
-				}
+				axisLine:{ lineStyle:{ color:"#666"} } 
 			},
 			yAxis: {
 				type: 'value',
@@ -250,16 +268,8 @@ function cpu(b,e){
 				boundaryGap: [0, '100%'],
 				min:0,
 				max: 100,
-				splitLine:{
-					lineStyle:{
-						color:"#ddd"
-					}
-				},
-				axisLine:{
-					lineStyle:{
-						color:"#666"
-					}
-				}
+				splitLine:{ lineStyle:{ color:"#ddd" } },
+				axisLine:{ lineStyle:{ color:"#666" } }
 			},
 			dataZoom: [{
 				type: 'inside',
@@ -286,17 +296,13 @@ function cpu(b,e){
 					smooth:true,
 					symbol: 'none',
 					sampling: 'average',
-					itemStyle: {
-						normal: {
-							color: 'rgb(0, 153, 238)'
-						}
-					},
+					itemStyle: { normal: { color: 'rgb(0, 153, 238)' } },
 					data: yData
 				}
 			]
 		};
 		myChartCpu.setOption(option);
-	    window.addEventListener("resize",function(){
+	   window.addEventListener("resize",function(){
 			myChartCpu.resize();
 		});
 	},'json');
@@ -318,20 +324,14 @@ function mem(b,e){
 		option = {
 			tooltip: {
 				trigger: 'axis',
-				axisPointer: {
-					type: 'cross'
-				},
+				axisPointer: { type: 'cross' },
 				formatter: '{b}<br />{a}: {c}%'
 			},
 			xAxis: {
 				type: 'category',
 				boundaryGap: false,
 				data: xData,
-				axisLine:{
-					lineStyle:{
-						color:"#666"
-					}
-				}
+				axisLine:{ lineStyle:{ color:"#666" } }
 			},
 			yAxis: {
 				type: 'value',
@@ -339,16 +339,8 @@ function mem(b,e){
 				boundaryGap: [0, '100%'],
 				min:0,
 				max: 100,
-				splitLine:{
-					lineStyle:{
-						color:"#ddd"
-					}
-				},
-				axisLine:{
-					lineStyle:{
-						color:"#666"
-					}
-				}
+				splitLine:{ lineStyle:{ color:"#ddd" } },
+				axisLine:{ lineStyle:{ color:"#666" } }
 			},
 			dataZoom: [{
 				type: 'inside',
@@ -375,11 +367,7 @@ function mem(b,e){
 					smooth:true,
 					symbol: 'none',
 					sampling: 'average',
-					itemStyle: {
-						normal: {
-							color: 'rgb(0, 153, 238)'
-						}
-					},
+					itemStyle: { normal: { color: 'rgb(0, 153, 238)' } },
 					data: zData
 				}
 			]
@@ -423,26 +411,14 @@ function disk(b,e){
 				type: 'category',
 				boundaryGap: false,
 				data: xData,
-				axisLine:{
-					lineStyle:{
-						color:"#666"
-					}
-				}
+				axisLine:{ lineStyle:{ color:"#666" }}
 			},
 			yAxis: {
 				type: 'value',
 				name: '单位:KB/s',
 				boundaryGap: [0, '100%'],
-				splitLine:{
-					lineStyle:{
-						color:"#ddd"
-					}
-				},
-				axisLine:{
-					lineStyle:{
-						color:"#666"
-					}
-				}
+				splitLine:{ lineStyle:{ color:"#ddd"} },
+				axisLine:{ lineStyle:{ color:"#666" } }
 			},
 			dataZoom: [{
 				type: 'inside',
@@ -469,11 +445,7 @@ function disk(b,e){
 					smooth:true,
 					symbol: 'none',
 					sampling: 'average',
-					itemStyle: {
-						normal: {
-							color: 'rgb(255, 70, 131)'
-						}
-					},
+					itemStyle: { normal: { color: 'rgb(255, 70, 131)' } },
 					data: rData
 				},
 				{
@@ -482,11 +454,7 @@ function disk(b,e){
 					smooth:true,
 					symbol: 'none',
 					sampling: 'average',
-					itemStyle: {
-						normal: {
-							color: 'rgba(46, 165, 186, .7)'
-						}
-					},
+					itemStyle: { normal: { color: 'rgba(46, 165, 186, .7)'} },
 					data: wData
 				}
 			]
@@ -522,9 +490,7 @@ function network(b,e){
 		option = {
 			tooltip: {
 				trigger: 'axis',
-				axisPointer: {
-					type: 'cross'
-				}
+				axisPointer: { type: 'cross' }
 			},
 			legend: {
 				data:[lan.index.net_up,lan.index.net_down]
@@ -533,26 +499,14 @@ function network(b,e){
 				type: 'category',
 				boundaryGap: false,
 				data: xData,
-				axisLine:{
-					lineStyle:{
-						color:"#666"
-					}
-				}
+				axisLine:{ lineStyle:{ color:"#666" } }
 			},
 			yAxis: {
 				type: 'value',
 				name: lan.index.unit+':KB/s',
 				boundaryGap: [0, '100%'],
-				splitLine:{
-					lineStyle:{
-						color:"#ddd"
-					}
-				},
-				axisLine:{
-					lineStyle:{
-						color:"#666"
-					}
-				}
+				splitLine:{ lineStyle:{ color:"#ddd" } },
+				axisLine:{ lineStyle:{ color:"#666" } }
 			},
 			dataZoom: [{
 				type: 'inside',
@@ -579,11 +533,7 @@ function network(b,e){
 					smooth:true,
 					symbol: 'none',
 					sampling: 'average',
-					itemStyle: {
-						normal: {
-							color: 'rgb(255, 140, 0)'
-						}
-					},
+					itemStyle: { normal: { color: 'rgb(255, 140, 0)' } },
 					data: yData
 				},
 				{
@@ -592,11 +542,7 @@ function network(b,e){
 					smooth:true,
 					symbol: 'none',
 					sampling: 'average',
-					itemStyle: {
-						normal: {
-							color: 'rgb(30, 144, 255)'
-						}
-					},
+					itemStyle: { normal: { color: 'rgb(30, 144, 255)' } },
 					data: zData
 				}
 			]
@@ -879,17 +825,8 @@ function getload(b,e){
 				{
 					name: '资源使用率%',
 					type: 'line',
-					lineStyle: {
-						normal: {
-							width: 2,
-							color: 'rgb(255, 140, 0)'
-						}
-					},
-					itemStyle: {
-						normal: {
-							color: 'rgb(255, 140, 0)'
-						}
-					},
+					lineStyle: { normal: { width: 2, color: 'rgb(255, 140, 0)'}},
+					itemStyle: {normal: { color: 'rgb(255, 140, 0)' }},
 					data: yData
 				},
 				{
@@ -897,17 +834,8 @@ function getload(b,e){
 					yAxisIndex: 1,
 					name: '1分钟',
 					type: 'line',
-					lineStyle: {
-						normal: {
-							width: 2,
-							color: 'rgb(30, 144, 255)'
-						}
-					},
-					itemStyle: {
-						normal: {
-							color: 'rgb(30, 144, 255)'
-						}
-					},
+					lineStyle: { normal: {width: 2,color: 'rgb(30, 144, 255)' }},
+					itemStyle: { normal: { color: 'rgb(30, 144, 255)'} },
 					data: zData
 				},
 				{
@@ -915,17 +843,8 @@ function getload(b,e){
 					yAxisIndex: 1,
 					name: '5分钟',
 					type: 'line',
-					lineStyle: {
-						normal: {
-							width: 2,
-							color: 'rgb(0, 178, 45)'
-						}
-					},
-					itemStyle: {
-						normal: {
-							color: 'rgb(0, 178, 45)'
-						}
-					},
+					lineStyle: { normal: { width: 2, color: 'rgb(0, 178, 45)'} },
+					itemStyle: { normal: { color: 'rgb(0, 178, 45)' } },
 					data: aData
 				},
 				{
@@ -933,28 +852,16 @@ function getload(b,e){
 					yAxisIndex: 1,
 					name: '15分钟',
 					type: 'line',
-					lineStyle: {
-						normal: {
-							width: 2,
-							color: 'rgb(147, 38, 255)'
-						}
-					},
-					itemStyle: {
-						normal: {
-							color: 'rgb(147, 38, 255)'
-						}
-					},
+					lineStyle: { normal: { width: 2, color: 'rgb(147, 38, 255)'}},
+					itemStyle: { normal: { color: 'rgb(147, 38, 255)' } },
 					data: bData
 				}
 			],
-			textStyle: {
-				color: '#666',
-				fontSize: 12
-			}
+			textStyle: { color: '#666',fontSize: 12}
 		}
 		myChartgetload.setOption(option);
 		window.addEventListener("resize",function(){
 			myChartgetload.resize();
 		})
-	},'json')
+	},'json');
 }

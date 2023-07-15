@@ -51,14 +51,15 @@
 									<div class="ss">
 										<span class="st">自定义时间</span>
 										<div class="time">
-											<span class="bt">开始时间<input class="btime" type="text" value="2017/1/10 00:00:00"></span>
-											<span class="et">结束时间<input class="etime" type="text" value="2017/1/13 00:00:00"></span>
+											<span class="bt">时间范围
+												<input id="loadbtn_rtime" class="rtime" type="text" value="2023-07-06 00:00:00 - 2023-08-08 00:00:00">
+											</span>
 											<div class="sbtn loadbtn">提交</div>
 										</div>
 									</div>
 								</div>
 							</div>
-							<div id="getloadview" style="width:100%; height:330px"></div>
+							<div id="getloadview" style="width:100%; height:330px;"></div>
 						</div>
 					</div>
 				</div>
@@ -67,12 +68,18 @@
 						<div class="bgw pb15">
 							<div class="title c6 plr15">
 								<h3 class="c-tit f16">CPU</h3>
-								<div class="searcTime pull-right"><span class="tit">区间检索：</span><span class="gt" onclick="Wday(1,'cpu')">昨天</span><span class="gt on" onclick="Wday(0,'cpu')">今天</span><span class="gt" onclick="Wday(7,'cpu')">最近7天</span><span class="gt" onclick="Wday(30,'cpu')">最近30天</span>
+								<div class="searcTime pull-right">
+									<span class="tit">区间检索：</span>
+									<span class="gt" onclick="Wday(1,'cpu')">昨天</span>
+									<span class="gt on" onclick="Wday(0,'cpu')">今天</span>
+									<span class="gt" onclick="Wday(7,'cpu')">最近7天</span>
+									<span class="gt" onclick="Wday(30,'cpu')">最近30天</span>
 									<div class="ss">
 										<span class="st">自定义时间</span>
 										<div class="time">
-											<span class="bt">开始时间<input class="btime" type="text" value="2017/1/10 00:00:00"></span>
-											<span class="et">结束时间<input class="etime" type="text" value="2017/1/13 00:00:00"></span>
+											<span class="bt">时间范围
+												<input id="cpubtn_rtime" class="rtime" type="text" value="2023-07-06 00:00:00 - 2023-08-08 00:00:00">
+											</span>
 											<div class="sbtn cpubtn">提交</div>
 										</div>
 									</div>
@@ -87,12 +94,18 @@
 						<div class="bgw pb15">
 							<div class="title c6 plr15">
 								<h3 class="c-tit f16">内存</h3>
-								<div class="searcTime pull-right"><span class="tit">区间检索：</span><span class="gt" onclick="Wday(1,'mem')">昨天</span><span class="gt on" onclick="Wday(0,'mem')">今天</span><span class="gt" onclick="Wday(7,'mem')">最近7天</span><span class="gt" onclick="Wday(30,'mem')">最近30天</span>
+								<div class="searcTime pull-right">
+									<span class="tit">区间检索：</span>
+									<span class="gt" onclick="Wday(1,'mem')">昨天</span>
+									<span class="gt on" onclick="Wday(0,'mem')">今天</span>、
+									<span class="gt" onclick="Wday(7,'mem')">最近7天</span>
+									<span class="gt" onclick="Wday(30,'mem')">最近30天</span>
 									<div class="ss">
 										<span class="st">自定义时间</span>
 										<div class="time">
-											<span class="bt">开始时间<input class="btime" type="text" value="2017/1/10 00:00:00"></span>
-											<span class="et">结束时间<input class="etime" type="text" value="2017/1/13 00:00:00"></span>
+											<span class="bt">时间范围
+												<input id="membtn_rtime" class="rtime" type="text" value="2023-07-06 00:00:00 - 2023-08-08 00:00:00">
+											</span>
 											<div class="sbtn membtn">提交</div>
 										</div>
 									</div>
@@ -107,12 +120,18 @@
 						<div class="bgw pb15">
 							<div class="title c6 plr15 mb15">
 								<h3 class="c-tit f16">磁盘IO</h3>
-								<div class="searcTime pull-right"><span class="tit">$data['lan']['S1']</span><span class="gt" onclick="Wday(1,'disk')">昨天</span><span class="gt on" onclick="Wday(0,'disk')">今天</span><span class="gt" onclick="Wday(7,'disk')">最近7天</span><span class="gt" onclick="Wday(30,'disk')">最近30天</span>
+								<div class="searcTime pull-right">
+									<span class="tit">$data['lan']['S1']</span>
+									<span class="gt" onclick="Wday(1,'disk')">昨天</span>
+									<span class="gt on" onclick="Wday(0,'disk')">今天</span>
+									<span class="gt" onclick="Wday(7,'disk')">最近7天</span>
+									<span class="gt" onclick="Wday(30,'disk')">最近30天</span>
 									<div class="ss">
 										<span class="st">自定义时间</span>
 										<div class="time">
-											<span class="bt">开始时间<input class="btime" type="text" value="2017/1/10 00:00:00"></span>
-											<span class="et">结束时间<input class="etime" type="text" value="2017/1/13 00:00:00"></span>
+											<span class="bt">时间范围
+												<input id="diskbtn_rtime" class="rtime" type="text" value="2023-07-06 00:00:00 - 2023-08-08 00:00:00">
+											</span>
 											<div class="sbtn diskbtn">提交</div>
 										</div>
 									</div>
@@ -127,12 +146,18 @@
 						<div class="bgw pb15">
 							<div class="title c6 plr15 mb15">
 								<h3 class="c-tit f16">网络IO</h3>
-								<div class="searcTime pull-right"><span class="tit">$data['lan']['S1']</span><span class="gt" onclick="Wday(1,'network')">昨天</span><span class="gt on" onclick="Wday(0,'network')">今天</span><span class="gt" onclick="Wday(7,'network')">最近7天</span><span class="gt" onclick="Wday(30,'network')">最近30天</span>
+								<div class="searcTime pull-right">
+									<span class="tit">$data['lan']['S1']</span>
+									<span class="gt" onclick="Wday(1,'network')">昨天</span>
+									<span class="gt on" onclick="Wday(0,'network')">今天</span>
+									<span class="gt" onclick="Wday(7,'network')">最近7天</span>
+									<span class="gt" onclick="Wday(30,'network')">最近30天</span>
 									<div class="ss">
 										<span class="st">自定义时间</span>
 										<div class="time">
-											<span class="bt">开始时间<input class="btime" type="text" value="2017/1/10 00:00:00"></span>
-											<span class="et">结束时间<input class="etime" type="text" value="2017/1/13 00:00:00"></span>
+											<span class="bt">时间范围
+												<input id="networkbtn_rtime" class="rtime" type="text" value="2023-07-06 00:00:00 - 2023-08-08 00:00:00">
+											</span>
 											<div class="sbtn networkbtn">提交</div>
 										</div>
 									</div>
@@ -146,6 +171,6 @@
 		</div>
 	</div>
 </div>
+<script type="text/javascript" src="/static/laydate/laydate.js?v={{config.version}}"></script>
 <script src="/static/app/control.js?v={{config.version}}"></script>
-
 {% endblock %}
