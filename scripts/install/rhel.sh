@@ -103,11 +103,12 @@ if [ ! -f /usr/sbin/firewalld ];then
     systemctl restart firewalld
 fi
 
+echo "firewall open common port start"
 if [ -f /usr/sbin/firewalld ];then
     # look
     # firewall-cmd --list-all
     # systemctl status firewalld
-    echo "firewall open common port start"
+    
     if [ "$SSH_PORT" != "" ];then
         firewall-cmd --permanent --zone=public --add-port=${SSH_PORT}/tcp
     else
@@ -121,8 +122,9 @@ if [ -f /usr/sbin/firewalld ];then
     # firewall-cmd --permanent --zone=public --add-port=30000-40000/tcp
 
     firewall-cmd --reload
-    echo "firewall open common port end"
+    
 fi
+echo "firewall open common port end"
 
 $PKGMGR install -y epel-release
 if [ ! -z "$cn" ];then
