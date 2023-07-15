@@ -16,7 +16,7 @@ mw_start_task()
 {
     isStart=$(ps aux |grep 'task.py'|grep -v grep|awk '{print $2}')
     if [ "$isStart" == '' ];then
-        echo -e "Starting mw-tasks... \c"
+        echo -e "starting mw-tasks... \c"
         cd $DIR && python3 task.py >> ${DIR}/logs/task.log 2>&1 &
         sleep 0.3
         isStart=$(ps aux |grep 'task.py'|grep -v grep|awk '{print $2}')
@@ -30,7 +30,7 @@ mw_start_task()
         fi
         echo -e "\033[32mdone\033[0m"
     else
-        echo "Starting mw-tasks... mw-tasks (pid $(echo $isStart)) already running"
+        echo "starting mw-tasks... mw-tasks (pid $(echo $isStart)) already running"
     fi
 }
 
