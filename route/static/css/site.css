@@ -1805,7 +1805,7 @@ html .menu .menu_exit:hover {
 
 .view1,
 .view2 {
-    margin-bottom: 15px
+    margin-bottom: 15px;
 }
 
 .searcTime {
@@ -1840,7 +1840,7 @@ html .menu .menu_exit:hover {
     display: inline-block;
     position: relative;
     float: left;
-    line-height: 16px
+    line-height: 16px;
 }
 
 .searcTime .ss .st {
@@ -1848,7 +1848,7 @@ html .menu .menu_exit:hover {
     border: #ddd 1px solid;
     margin-right: -1px;
     cursor: pointer;
-    float: left
+    float: left;
 }
 
 .searcTime .ss .time {
@@ -1859,26 +1859,27 @@ html .menu .menu_exit:hover {
     position: absolute;
     right: -1px;
     top: 27px;
-    width: 217px;
-    z-index: 99
+    width: 306px;
+    z-index: 99;
 }
 
 .searcTime .ss .time span {
     margin-bottom: 10px;
-    display: block
+    display: block;
 }
 
 .searcTime .ss .time input {
     border: 1px solid #ddd;
     height: 22px;
     padding: 0 5px;
-    width: 132px
+    margin-left:5px;
+    width: 227px;
 }
 
 .searcTime .ss .time input:focus {
     border: #66afe9 1px solid;
     -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
-    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6)
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
 }
 
 .searcTime .ss .sbtn {

@@ -141,6 +141,7 @@ apt install -y devscripts
 apt install -y net-tools
 apt install -y autoconf
 apt install -y gcc
+apt install -y patchelf
 
 apt install -y libffi-dev
 apt install -y cmake automake make

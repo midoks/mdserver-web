@@ -88,16 +88,28 @@ echo "SSH PORT:${SSH_PORT}"
 # fi
 # echo "iptables wrap start"
 
+
+echo "firewall open common port start"
 if [ ! -f /usr/sbin/firewalld ];then
     $PKGMGR install firewalld -y
     systemctl enable firewalld
     #取消服务锁定
     systemctl unmask firewalld
     systemctl start firewalld
-    
+
+    sed -i 's#AllowZoneDrifting=yes#AllowZoneDrifting=no#g' /etc/firewalld/firewalld.conf
+    firewall-cmd --reload
+
+    #安装就开启
+    systemctl restart firewalld
+fi
+
+if [ -f /usr/sbin/firewalld ];then
     # look
     # firewall-cmd --list-all
-
+    # systemctl status firewalld
+    # firewall-cmd --zone=public --remove-port=80/tcp --permanent
+    
     if [ "$SSH_PORT" != "" ];then
         firewall-cmd --permanent --zone=public --add-port=${SSH_PORT}/tcp
     else
@@ -110,12 +122,10 @@ if [ ! -f /usr/sbin/firewalld ];then
     # firewall-cmd --permanent --zone=public --add-port=3306/tcp
     # firewall-cmd --permanent --zone=public --add-port=30000-40000/tcp
 
-    sed -i 's#AllowZoneDrifting=yes#AllowZoneDrifting=no#g' /etc/firewalld/firewalld.conf
     firewall-cmd --reload
-
-    #安装时不开启
-    systemctl stop firewalld
+    
 fi
+echo "firewall open common port end"
 
 $PKGMGR install -y epel-release
 if [ ! -z "$cn" ];then

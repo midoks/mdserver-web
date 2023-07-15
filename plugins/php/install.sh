@@ -49,6 +49,7 @@ fi
 
 cd ${curPath} && sh -x $curPath/versions/$2/install.sh $1
 
+
 if [ "${action}" == "install" ] && [ -d ${serverPath}/php/${type} ];then
 
 	#初始化 

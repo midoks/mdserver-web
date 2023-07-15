@@ -29,7 +29,7 @@ class App:
         self.__agent_cfg = self.__setupPath + '/agent.cfg'
 
     def getArgs(self):
-        args = sys.argv[2:]
+        args = sys.argv[3:]
         tmp = {}
         args_len = len(args)
 

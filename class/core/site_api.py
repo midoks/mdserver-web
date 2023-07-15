@@ -1435,6 +1435,8 @@ class site_api:
             data['data'] = mw.readFile(filename)
             data['rlist'] = []
             for ds in os.listdir(self.rewritePath):
+                if ds[0:1] == '.':
+                    continue
                 if ds == 'list.txt':
                     continue
                 data['rlist'].append(ds[0:len(ds) - 5])

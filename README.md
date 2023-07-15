@@ -100,15 +100,17 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ```
 
 
-### 版本更新 0.15.0
+### 版本更新 0.15.1
 
-* debian12适配。
-* 添加nezha插件。
-* 优化域名ssl保存功能。
-* 修复PHP扩展intl不加载问题(debian/ubuntu)。
-* 修复redhat安装openresty缺少openssl-devel。
-* docker插件-将就能用。
-* tgbot接收和push任务分离。
+* 升级功能优化。
+* 域名伪静态保存优化。
+* 自动同步gitee。
+* nezha保存优化。
+* OP防火墙优化(站点配置-状态关闭后,不再防御)-已安装的,需要重载。
+* 修复子目录绑定-伪静态问题。
+* [插件]docker - 添加IP地址池。
+* PHP下载中国优化。
+* 监控页面-自定义时间优化。
 
 ### JSDelivr安装地址
 
