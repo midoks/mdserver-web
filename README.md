@@ -79,7 +79,7 @@ PHP[72-82]支持phpMyAdmin[5.2.0]
 
 # 特别赞助
 
-- [找资源 - 阿里云盘资源搜索引擎](https://zhaoziyuan.la/)
+- [找资源 - 阿里云盘资源搜索引擎](https://zhaoziyuan.pw/)
 
 # AD - VPS推荐 - 🙏
 
