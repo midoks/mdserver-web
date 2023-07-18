@@ -51,7 +51,7 @@ def send_msg(bot, tag='ad', trigger_time=300):
     # 信号只在一个周期内执行一次|end
 
     # https://t.me/gjgzs2022 ｜ 22/m
-    # 代付支付宝微信❤️淘宝帮付/💰流量变现💰集团收量/🕵️‍♀️实名认证/接码✅过人脸👤 ｜ 28/m
+    # 高价收量 👑 集团收量 ❤️ 流量变现/支付宝代付 ❤️ 微信代付/实名认证/过人脸🕵️‍♀️各种账号处理✅ ｜ 28/m
     # https://zhaoziyuan.la/ | web | 15/m | 2m | next,7/15
     # 香港高防CDN ｜9/m
     # mvirtua | web | 7/m
@@ -66,15 +66,15 @@ def send_msg(bot, tag='ad', trigger_time=300):
         ],
         [
             types.InlineKeyboardButton(
-                text="🕵️‍♀️实名认证/接码✅过人脸👤", url='https://t.me/zhanzhangyewu')
+                text="实名认证/过人脸🕵️‍♀️各种账号处理✅", url='https://t.me/zhanzhangyewu')
         ],
         [
             types.InlineKeyboardButton(
-                text="代付支付宝微信❤️淘宝帮付", url='https://t.me/Uxuanzhenpin')
+                text="支付宝代付 ❤️ 微信代付", url='https://t.me/Uxuanzhenpin')
         ],
         [
             types.InlineKeyboardButton(
-                text="💰流量变现💰集团收量", url='https://t.me/taohaozhan')
+                text="高价收量 👑 集团收量 ❤️ 流量变现", url='https://t.me/maccms_jccms/93')
         ],
         [
             types.InlineKeyboardButton(
