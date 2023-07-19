@@ -665,7 +665,7 @@ function installPHPLib(version, name, title, pathinfo) {
 
 //卸载扩展
 function uninstallPHPLib(version, name, title, pathinfo) {
-    layer.confirm('您真的要安装{1}吗?'.replace('{1}', name), { icon: 3, closeBtn: 2 }, function() {
+    layer.confirm('您真的要卸载{1}吗?'.replace('{1}', name), { icon: 3, closeBtn: 2 }, function() {
         name = name.toLowerCase();
         var data = 'name=' + name + '&version=' + version;
         phpPost('uninstall_lib', version, data, function(data){
