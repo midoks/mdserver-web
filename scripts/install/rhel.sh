@@ -138,7 +138,7 @@ fi
 $PKGMGR makecache
 $PKGMGR groupinstall -y "Development Tools"
 
-if [ $VERSION_ID -ge 8 ];then
+if [ "$VERSION_ID" -ge "8" ];then
     # EL8 及以上
 
     # find repo
