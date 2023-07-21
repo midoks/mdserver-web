@@ -52,7 +52,7 @@ def send_msg(bot, tag='ad', trigger_time=300):
 
     # https://t.me/gjgzs2022 ｜ 22/m
     # 高价收量 👑 集团收量 ❤️ 流量变现/支付宝代付 ❤️ 微信代付/实名认证/过人脸🕵️‍♀️各种账号处理✅ ｜ 28/m
-    # https://zhaoziyuan.la/ | web | 15/m | 2m | next,7/15
+    # https://zhaoziyuan.la/ | web | 15/m | 2m | next,9/15
     # 香港高防CDN ｜9/m
     # mvirtua | web | 7/m
     keyboard = [
