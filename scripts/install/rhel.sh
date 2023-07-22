@@ -151,6 +151,12 @@ if [ "$VERSION_ID" -ge "8" ];then
             REPOS="${REPOS},${REPO_VAR}"
         fi
     done
+
+    if [ "$REPOS" == "--enablerepo=" ];then
+        # if not find, reset emtpy
+        REPOS=''
+    fi
+
     REPOS=${REPOS//=,/=}
     echo "REPOS:${REPOS}"
 
