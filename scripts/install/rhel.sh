@@ -31,6 +31,9 @@ fi
 
 echo "install remi source"
 if [ "$VERSION_ID" == "9" ];then
+    # dnf upgrade --refresh -y
+    dnf config-manager --set-enabled crb
+    
     echo "install remi start"
     if [ ! -f /etc/yum.repos.d/remi.repo ];then
         rpm -ivh http://rpms.famillecollet.com/enterprise/remi-release-9.rpm
