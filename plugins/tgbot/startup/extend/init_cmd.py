@@ -22,6 +22,6 @@ def init(bot):
     bot.set_my_commands(
         commands=[
             telebot.types.BotCommand("start", "查看帮助信息"),
-            telebot.types.BotCommand("?:", "查看bbs帖子主题【不要忘记:冒号】"),
+            telebot.types.BotCommand("faq", "查看bbs帖子主题【?:】"),
         ],
     )
