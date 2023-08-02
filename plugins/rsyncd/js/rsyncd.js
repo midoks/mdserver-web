@@ -562,7 +562,7 @@ function rsyncdConf(){
 }
 
 function rsyncdLog(){
-    pluginStandAloneLogs("rsyncd","","run_log");
+    pluginRollingLogs("rsyncd","","run_log");
 }
 
 
