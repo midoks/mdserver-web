@@ -523,14 +523,14 @@ function dockerPullImagesFileTemplate(){
                         '<div class="conter official_pull pd15"><div class="line">'+
                             '<span class="tname">镜像名:</span>\
                             <div class="info-r c4">\
-                                <input class="bt-input-text mr5" type="text" name="official_pull_name" style="width:218px" value="">\
+                                <input class="bt-input-text mr5" type="text" name="official_pull_name" style="width:218px" value="" placeholder="memcached:latest">\
                                 <button type="button" class="btn btn-sm btn-success official_pull_btn">获取</button>\
                             </div>'+
                         '</div></div>'+
                         '<div class="conter public_pull pd15" style="display: none;"><div class="line">'+
                             '<span class="tname">镜像名:</span>\
                             <div class="info-r c4">\
-                                <input class="bt-input-text mr5" type="text" name="public_pull_path" style="width:218px" value="">\
+                                <input class="bt-input-text mr5" type="text" name="public_pull_path" style="width:218px" value="" placeholder="memcached:latest">\
                                 <button type="button" class="btn btn-sm btn-success public_pull_btn">获取</button>\
                             </div>'+
                         '</div></div>'+
