@@ -476,7 +476,7 @@ function lsyncdExclude(name){
 }
 
 function lsyncdConfLog(){
-    pluginStandAloneLogs("rsyncd","","lsyncd_conf_log");;
+    pluginRollingLogs("rsyncd","","lsyncd_conf_log");;
 }
 
 function lsyncdSend(){
