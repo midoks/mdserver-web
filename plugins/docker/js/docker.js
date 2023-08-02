@@ -634,6 +634,70 @@ function dockerImageList(){
     dockerImageListRender();
 }
 
+
+function dockerImageOutputRender(){
+    dPost('image_list', '', {}, function(rdata){
+        var rdata = $.parseJSON(rdata.data);
+        // console.log(rdata);
+        if (!rdata.status){
+            layer.msg(rdata.msg,{icon:2,time:2000});
+            return; 
+        }
+        
+        var list = '';
+        var rlist = rdata.data;
+
+        for (var i = 0; i < rlist.length; i++) {
+
+            var tag = rlist[i]['RepoTags'].split(":")[1];
+
+            var license = 'null';
+            var desc = 'null';
+            if (rlist[i]['Labels'] == null){
+                license = 'free';
+            }
+
+            var op = '';
+            op += '<a href="javascript:;" onclick="pullImages(\''+rlist[i]['RepoTags']+'\',\''+rlist[i]['Id']+'\')" class="btlink">拉取</a> | ';
+            op += '<a href="javascript:;" onclick="deleteImages(\''+rlist[i]['RepoTags']+'\',\''+rlist[i]['Id']+'\')" class="btlink">删除</a>';
+
+            list += '<tr>';
+            list += '<td>'+rlist[i]['RepoTags']+'</td>';
+            list += '<td>'+tag+'</td>';
+            list += '<td>'+toSize(rlist[i]['Size'])+'</td>';
+            list += '<td>'+license+'</td>';
+            list += '<td>'+desc+'</td>';
+            list += '<td class="text-right">'+op+'</td>';
+            list += '</tr>';
+        }
+
+        $('#con_list tbody').html(list);
+    });
+}
+
+function dockerImageOutput(){
+    var con = '<div class="safe bgw">\
+            <button onclick="dockerPullImagesFileTemplate()" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">镜像打包</button>\
+            <button onclick="dockerPullImagesFileTemplate()" class="btn btn-sm" type="button" style="margin-right: 5px;">上传镜像</button>\
+            <div class="divtable mtb10">\
+                <div class="tablescroll">\
+                    <table id="con_list" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
+                    <thead><tr>\
+                    <th>名称</th>\
+                    <th>大小</th>\
+                    <th>时间</th>\
+                    <th style="text-align:right;">操作</th></tr></thead>\
+                    <tbody></tbody></table>\
+                </div>\
+                <div id="databasePage" class="dataTables_paginate paging_bootstrap page"></div>\
+            </div>\
+        </div>';
+
+    $(".soft-man-con").html(con);
+
+    dockerImageOutputRender();
+}
+
 function deleteIpList(address){
     safeMessage('删除IP','你将删除从IP地址池['+address+'],确定？',function(){
         dPost('docker_del_ip','', {address:address},function(rdata){
