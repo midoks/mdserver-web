@@ -678,7 +678,7 @@ function dockerImageOutputRender(){
 function dockerImageOutput(){
     var con = '<div class="safe bgw">\
             <button onclick="dockerPullImagesFileTemplate()" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">镜像打包</button>\
-            <button onclick="dockerPullImagesFileTemplate()" class="btn btn-sm" type="button" style="margin-right: 5px;">上传镜像</button>\
+            <button onclick="dockerPullImagesFileTemplate()" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">上传镜像</button>\
             <div class="divtable mtb10">\
                 <div class="tablescroll">\
                     <table id="con_list" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
