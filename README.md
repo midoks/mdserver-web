@@ -103,6 +103,7 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ### 版本更新 0.15.2
 
 * OpenResty升级到1.21.4.2
+* 计划任务自动脚本运行时间
 
 
 ### JSDelivr安装地址
