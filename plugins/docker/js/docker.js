@@ -1,3 +1,10 @@
+
+function dPostOrgin(args, callback){
+    $.post('/plugins/run', args, function(data) {
+        callback(data);
+    },'json'); 
+}
+
 function dPost(method, version, args,callback){
     var loadT = layer.msg('正在获取...', { icon: 16, time: 0, shade: 0.3 });
 
@@ -12,7 +19,7 @@ function dPost(method, version, args,callback){
         req_data['args'] = JSON.stringify(args);
     }
 
-    $.post('/plugins/run', req_data, function(data) {
+    dPostOrgin(req_data, function(data){
         layer.close(loadT);
         if (!data.status){
             //错误展示10S
@@ -23,7 +30,7 @@ function dPost(method, version, args,callback){
         if(typeof(callback) == 'function'){
             callback(data);
         }
-    },'json'); 
+    });
 }
 
 function dPostCallbak(method, version, args,callback){
@@ -634,13 +641,37 @@ function dockerImageList(){
     dockerImageListRender();
 }
 
+//获取文件数据
+function dockerGetFileBytes(fileName){
+    window.open('/files/download?filename='+encodeURIComponent(fileName));
+}
+
+//删除文件
+function dockerDeleteFile(fileName){
+    layer.confirm(lan.get('recycle_bin_confirm',[fileName]),{title:'删除文件',closeBtn:2,icon:3},function(){
+        layer.msg('正在处理,请稍候...',{icon:16,time:0,shade: [0.3, '#000']});
+        $.post('/files/delete', 'path=' + encodeURIComponent(fileName), function(rdata) {
+            showMsg(rdata.msg,function(){
+                dockerImageOutputRender();
+            },{icon: rdata.status ? 1 : 2});
+        },'json');
+    });
+}
+
+function dockerLoadFile(fileName){
+    dPost('image_pick_load', '', {file:fileName}, function(rdata){
+        var rdata = $.parseJSON(rdata.data);
+        showMsg(rdata.msg,function(){
+                dockerImageOutputRender();
+        },{icon: rdata.status ? 1 : 2});
+    });
+}
 
 function dockerImageOutputRender(){
-    dPost('image_list', '', {}, function(rdata){
+    dPost('image_pick_list', '', {}, function(rdata){
         var rdata = $.parseJSON(rdata.data);
-        // console.log(rdata);
         if (!rdata.status){
-            layer.msg(rdata.msg,{icon:2,time:2000});
+            layer.msg(rdata.msg,{icon:2,time:10000});
             return; 
         }
         
@@ -649,24 +680,15 @@ function dockerImageOutputRender(){
 
         for (var i = 0; i < rlist.length; i++) {
 
-            var tag = rlist[i]['RepoTags'].split(":")[1];
-
-            var license = 'null';
-            var desc = 'null';
-            if (rlist[i]['Labels'] == null){
-                license = 'free';
-            }
-
             var op = '';
-            op += '<a href="javascript:;" onclick="pullImages(\''+rlist[i]['RepoTags']+'\',\''+rlist[i]['Id']+'\')" class="btlink">拉取</a> | ';
-            op += '<a href="javascript:;" onclick="deleteImages(\''+rlist[i]['RepoTags']+'\',\''+rlist[i]['Id']+'\')" class="btlink">删除</a>';
+            op += '<a href="javascript:;" onclick="dockerGetFileBytes(\''+rlist[i]['file']+'\')" class="btlink">下载</a> | ';
+            op += '<a href="javascript:;" onclick="dockerLoadFile(\''+rlist[i]['file']+'\')" class="btlink">导入</a> | ';
+            op += '<a href="javascript:;" onclick="dockerDeleteFile(\''+rlist[i]['file']+'\')" class="btlink">删除</a>';
 
             list += '<tr>';
-            list += '<td>'+rlist[i]['RepoTags']+'</td>';
-            list += '<td>'+tag+'</td>';
-            list += '<td>'+toSize(rlist[i]['Size'])+'</td>';
-            list += '<td>'+license+'</td>';
-            list += '<td>'+desc+'</td>';
+            list += '<td>'+rlist[i]['name']+'</td>';
+            list += '<td>'+rlist[i]['size']+'</td>';
+            list += '<td>'+rlist[i]['time']+'</td>';
             list += '<td class="text-right">'+op+'</td>';
             list += '</tr>';
         }
@@ -675,10 +697,117 @@ function dockerImageOutputRender(){
     });
 }
 
+//上传文件
+function uploadImageFiles(upload_dir){
+    var image_layer = layer.open({
+        type:1,
+        closeBtn: 1,
+        title:"上传导入文件["+upload_dir+']',
+        area: ['500px','300px'],
+        shadeClose:false,
+        content:'<div class="fileUploadDiv">\
+                <input type="hidden" id="input-val" value="'+upload_dir+'" />\
+                <input type="file" id="file_input"  multiple="true" autocomplete="off" />\
+                <button type="button"  id="opt" autocomplete="off">添加文件</button>\
+                <button type="button" id="up" autocomplete="off" >开始上传</button>\
+                <span id="totalProgress" style="position: absolute;top: 7px;right: 147px;"></span>\
+                <span style="float:right;margin-top: 9px;">\
+                <font>文件编码:</font>\
+                <select id="fileCodeing" >\
+                    <option value="byte">二进制</option>\
+                    <option value="utf-8">UTF-8</option>\
+                    <option value="gb18030">GB2312</option>\
+                </select>\
+                </span>\
+                <button type="button" id="filesClose" autocomplete="off">关闭</button>\
+                <ul id="up_box"></ul>\
+            </div>',
+        success:function(){
+            $('#filesClose').click(function(){
+                layer.close(image_layer);
+            });
+        }
+
+    });
+    uploadStart(function(){
+        showMsg('上传成功!', function(){
+            dockerImageOutputRender();
+            layer.close(image_layer);
+        },{icon:1,time:2000});
+    });
+}
+
+function dockerImagePick(){
+
+    dPost('image_list', '', {}, function(rdata){
+        var rdata = $.parseJSON(rdata.data);
+        var imageList = rdata.data;
+        // console.log(imageList);
+        var _tbody = '';
+        for (var i = 0; i < imageList.length; i++) {
+            if (imageList[i] == null) {
+                _tbody = '<tr><td colspan="5" align="center">当前无镜像</td></tr>';
+                continue;
+            }
+            var versionData = imageList[i].RepoTags,version,reg = new RegExp('((?<=:)[0-9A-z/.-]*)$');
+            version = versionData.match(reg);
+            _tbody += "<tr><td><input data-name='"+imageList[i].RepoTags+"' type='checkbox' name='images'></td>\
+                    <td><span class='max_span' title='"+imageList[i].RepoTags+"'>"+imageList[i].RepoTags+"</span></td>\
+                    <td>"+ version[0] +"</td>\
+                    <td>"+ toSize(imageList[i].Size) +"</td></tr>";
+        }
+
+
+        var layerS = layer.open({
+            type: 1,
+            title: "选择镜像",
+            area: '500px',
+            closeBtn: 2,
+            btn:['打包','取消'],
+            shadeClose: false,
+            content: '<div class="divtable images_pull" style="padding:10px;">\
+                        <table class="table" id="images_table">\
+                        <thead><tr>\
+                            <th style="padding:8px 10px;"><input type="checkbox" name="images_all"></th>\
+                            <th>名称</th>\
+                            <th>版本</th>\
+                            <th>大小</th>\
+                        </tr></thead>\
+                        <tbody>'+ _tbody +'</tbody>\
+                        </table>\
+                    </div>',
+            success:function(){
+                readerTableChecked();
+                tableFixed('images_table');
+            },
+            yes:function(layers,index){
+                var data = '', tit = '\xa0',
+                choose_num = $(".images_pull tbody [name=images]:checked").length;
+                for (var i = 0; i < choose_num; i++) {
+                    if(choose_num == 0){
+                        layer.msg('Please choose the images which need to pack',{icon:2});
+                        return false;
+                    }
+                    data += $(".images_pull tbody [name=images]:checked").eq(i).attr('data-name');
+                    if(i != (choose_num-1)) data += ' ';
+                }
+
+                dPost('image_pick_save', '', {images:data}, function(rdata){
+                    var rdata = $.parseJSON(rdata['data']);
+                    showMsg(rdata.msg, function(){
+                        dockerImageOutputRender();
+                        layer.close(layerS);
+                    },{icon:rdata.status?1:2,time:2000});
+                });
+            }
+        });
+    });
+}
+
 function dockerImageOutput(){
     var con = '<div class="safe bgw">\
-            <button onclick="dockerPullImagesFileTemplate()" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">镜像打包</button>\
-            <button onclick="dockerPullImagesFileTemplate()" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">上传镜像</button>\
+            <button onclick="dockerImagePick()" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">镜像打包</button>\
+            <button id="btn_image_upload" class="btn btn-default btn-sm" type="button" style="margin-right: 5px;">上传镜像</button>\
             <div class="divtable mtb10">\
                 <div class="tablescroll">\
                     <table id="con_list" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
@@ -694,6 +823,19 @@ function dockerImageOutput(){
         </div>';
 
     $(".soft-man-con").html(con);
+
+
+    $('#btn_image_upload').click(function(){
+        dPostOrgin({
+            name:'docker',
+            func:'image_pick_dir',
+            version:'',
+        },function(rdata){
+            var rdata = $.parseJSON(rdata['data']);
+            var upload_dir = rdata['data'];
+            uploadImageFiles(upload_dir);
+        });
+    });
 
     dockerImageOutputRender();
 }
