@@ -609,6 +609,45 @@ def __release_port(port):
         return "Release failed {}".format(e)
 
 
+def dockerPortCheck():
+    args = getArgs()
+    data = checkArgs(args, ['port'])
+    if not data[0]:
+        return data[1]
+
+    port = args['port']
+    is_ok = IsPortExists(port)
+    if is_ok:
+        return mw.returnJson(True, 'ok')
+    return mw.returnJson(False, 'fail')
+
+
+def IsPortExists(port):
+    # 判断端口是否被占用
+    ret = __check_dst_port(ip='localhost', port=port)
+    ret2 = __check_dst_port(ip='0.0.0.0', port=port)
+    if ret:
+        return ret
+    if not ret and ret2:
+        return ret2
+    if not ret and not ret2:
+        return False
+
+
+def __check_dst_port(ip, port, timeout=3):
+    # 端口检测
+    import socket
+    ok = True
+    try:
+        s = socket.socket()
+        s.settimeout(timeout)
+        s.connect((ip, port))
+        s.close()
+    except:
+        ok = False
+    return ok
+
+
 def dockerCreateCon():
     args = getArgs()
     data = checkArgs(args, ['environments', 'command',
@@ -809,6 +848,8 @@ if __name__ == "__main__":
         print(dockerCreateCon())
     elif func == 'docker_remove_image':
         print(dockerRemoveImage())
+    elif func == 'docker_port_check':
+        print(dockerPortCheck())
     elif func == 'docker_login':
         print(dockerLogin())
     elif func == 'docker_logout':
