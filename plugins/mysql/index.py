@@ -167,7 +167,6 @@ def pMysqlDb():
 
 def makeInitRsaKey(version=''):
     datadir = getServerDir() + "/data"
-
     mysql_pem = datadir + "/mysql.pem"
     if not os.path.exists(mysql_pem):
         rdata = mw.execShell(
@@ -575,11 +574,11 @@ def my8cmd(version, method):
 
 
 def appCMD(version, action):
+    makeInitRsaKey(version)
     if version == '8.0' or version == '5.7':
         status = my8cmd(version, action)
     else:
         status = myOp(version, action)
-    makeInitRsaKey(version)
     return status
 
 
