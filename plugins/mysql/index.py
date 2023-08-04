@@ -176,11 +176,11 @@ def makeInitRsaKey(version=''):
             'cd ' + datadir + ' && openssl rsa -in mysql.pem -pubout -out mysql.pub')
         # print(rdata)
 
-        if not mw.isAppleSystem():
-            mw.execShell('cd ' + datadir + ' && chmod 400 mysql.pem')
-            mw.execShell('cd ' + datadir + ' && chmod 444 mysql.pub')
-            mw.execShell('cd ' + datadir + ' && chown mysql:mysql mysql.pem')
-            mw.execShell('cd ' + datadir + ' && chown mysql:mysql mysql.pub')
+    if not mw.isAppleSystem():
+        mw.execShell('cd ' + datadir + ' && chmod 400 mysql.pem')
+        mw.execShell('cd ' + datadir + ' && chmod 444 mysql.pub')
+        mw.execShell('cd ' + datadir + ' && chown mysql:mysql mysql.pem')
+        mw.execShell('cd ' + datadir + ' && chown mysql:mysql mysql.pub')
 
 
 def initDreplace(version=''):
