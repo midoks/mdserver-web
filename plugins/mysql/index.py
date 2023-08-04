@@ -251,6 +251,14 @@ def initDreplace(version=''):
     return file_bin
 
 
+def process_status():
+    cmd = "ps -ef|grep mysql |grep -v grep | grep -v python | awk '{print $2}'"
+    data = mw.execShell(cmd)
+    if data[0] == '':
+        return 'stop'
+    return 'start'
+
+
 def status(version=''):
     path = getConf()
     if not os.path.exists(path):
@@ -450,7 +458,7 @@ def initMysqlPwd():
 
 
 def initMysql8Pwd():
-    time.sleep(2)
+    time.sleep(1)
 
     serverdir = getServerDir()
     myconf = serverdir + "/etc/my.cnf"
@@ -540,7 +548,12 @@ def my8cmd(version, method):
             else:
                 mw.execShell('systemctl start mysql')
 
-            initMysql8Pwd()
+            for x in range(10):
+                mydb_status = process_status()
+                if mydb_status == 'start':
+                    initMysql8Pwd()
+                    break
+                time.sleep(1)
 
             if mw.isAppleSystem():
                 cmd_init_stop = init_file + ' stop'
