@@ -1561,82 +1561,164 @@ function to301(siteName, type, obj){
 }
 
 
-function toProxySwitch(){
-	var status = $("input[name='open_proxy']").prop("checked")==true?1:0;
-	if(status==1){
-		$("input[name='open_proxy']").prop("checked",false);
-	}else{
-		$("input[name='open_proxy']").prop("checked",true);
-	}
-}
-
 //反向代理
 function toProxy(siteName, type, obj) {
 	// 设置 页面展示
 	if(type == 1) {
-		var proxy_form = layer.open({
+		var proxy_title = "创建反向代理";
+		if (typeof(obj) != 'undefined'){
+			proxy_title = "编辑反向代理";
+		}
+
+		layer.open({
 			type: 1,
 			area: '650px',
-			title: "创建反向代理",
+			title: proxy_title,
 			closeBtn: 1,
 			shift: 5,
 			shadeClose: false,
 			btn: ['提交','关闭'],
-			content: "<form id='form_redirect' class='divtable pd15' style='padding-bottom: 10px'>" +
-				"<div class='line'>" +
-					'<span class="tname">开启代理</span>'+ 
-					"<div class='info-r ml0'>" +
-						"<input name='open_proxy' class='btswitch btswitch-ios' type='checkbox' checked><label id='open_proxy' class='btswitch-btn' for='openProxy' onclick='toProxySwitch();'></label>" +
-					"</div>" +
-				"</div>" +
-				"<div class='line'>"+
-					"<span class='tname'>代理目录</span>" +
-					"<div class='info-r ml0'>" +
-					"<input name='from' value='/' placeholder='/' class='bt-input-text mr5' type='text' style='width:200px''>" +
-					"</div>" +
-				"</div>" +
-				"<div class='line'>" +
-					"<span class='tname'>目标URL</span>" +
-					"<div class='info-r ml0'>" +
-					"<input name='to' class='bt-input-text mr5' type='text' style='width:200px;float: left;margin-right:0px''>" +
-					"<span class='tname' style='width:90px'>发送域名</span>" +
-					"<input name='host' value='$host' class='bt-input-text mr5' type='text' style='width:200px'>" +
-					"</div>" +
-				"</div>" +
-				"<div class='help-info-text c7'>" +
-					"<ul class='help-info-text c7'>" +
-					"<li>代理目录：访问这个目录时将会把目标URL的内容返回并显示</li>" +
-					"<li>目标URL：可以填写你需要代理的站点，目标URL必须为可正常访问的URL，否则将返回错误</li>" +
-					"<li>发送域名：将域名添加到请求头传递到代理服务器，默认为目标URL域名，若设置不当可能导致代理无法正常运行</li>" +
-					"</ul>" +
-				"</div>" +
-				"</form>",
-			yes:function(){
-				var data = $('#form_redirect').serializeArray();
+			content: "<form id='form_proxy' class='divtable pd15' style='padding-bottom: 10px'>\
+				<div class='line'>\
+					<span class='tname'>开启代理</span>\
+					<div class='info-r ml0 mt5'>\
+						<input name='open_proxy' class='btswitch btswitch-ios' type='checkbox' checked>\
+						<label id='open_proxy' class='btswitch-btn' for='openProxy' style='float:left'></label>\
+						<div style='display: inline-block'>\
+							<span class='tname' style='margin-left:15px;position: relative;top: -5px;'>是否缓存</span>\
+							<input class='btswitch btswitch-ios' type='checkbox' name='open_cache'>\
+							<label class='btswitch-btn' id='open_cache' for='openCache' style='float:left'></label>\
+						</div>\
+					</div>\
+				</div>\
+				<div class='line'>\
+					<span class='tname'>名称</span>\
+					<div class='info-r ml0'>\
+					<input name='name' value='index' placeholder='请输入名称' class='bt-input-text mr5' type='text' style='width:200px''>\
+					</div>\
+				</div>\
+				<div class='line' style='display:none' id='cache_time'>\
+					<span class='tname'>缓存时间</span>\
+					<div class='info-r ml0'>\
+					<input name='cache_time' value='1' class='bt-input-text mr5' type='text' style='width:200px''>分钟\
+					</div>\
+				</div>\
+				<div class='line'>\
+					<span class='tname'>代理目录</span>\
+					<div class='info-r ml0'>\
+					<input name='from' value='/' placeholder='/' class='bt-input-text mr5' type='text' style='width:200px''>\
+					</div>\
+				</div>\
+				<div class='line'>\
+					<span class='tname'>目标URL</span>\
+					<div class='info-r ml0'>\
+					<input name='to' class='bt-input-text mr5' type='text' style='width:200px;float: left;margin-right:0px''>\
+					<span class='tname' style='width:90px'>发送域名</span>\
+					<input name='host' value='$host' class='bt-input-text mr5' type='text' style='width:200px'>\
+					</div>\
+				</div>\
+				<input name='id' value='' type='hidden'>\
+				<div class='help-info-text c7'>\
+					<ul class='help-info-text c7'>\
+					<li>代理目录：访问这个目录时将会把目标URL的内容返回并显示</li>\
+					<li>目标URL：可以填写你需要代理的站点，目标URL必须为可正常访问的URL，否则将返回错误</li>\
+					<li>发送域名：将域名添加到请求头传递到代理服务器，默认为目标URL域名，若设置不当可能导致代理无法正常运行</li>\
+					</ul>\
+				</div>\
+				</form>",
+			success:function(){
+
+				if (typeof(obj) != 'undefined'){
+					// console.log(obj);
+					$('input[name="name"]').val(obj['name']).attr('readonly','readonly').addClass('disabled');
+					if (obj['open_cache'] == 'on'){
+						$("input[name='open_cache']").prop("checked",true);
+						$('#cache_time').show();
+					}
+
+					$('input[name="from"]').val(obj['from']);
+					$('input[name="to"]').val(obj['to']);
+
+					var url = obj['to'];
+					var ip_reg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/;
+	                url = url.replace(/^http[s]?:\/\//, '');
+	                url = url.replace(/(:|\?|\/|\\)(.*)$/, '');
+	                if (ip_reg.test(url)) {
+	                    $("[name='host']").val('$host');
+	                } else {
+	                    $("[name='host']").val(url);
+	                }
+
+	                $('input[name="id"]').val(obj['id']);
+	                $('input[name="cache_time"]').val(obj['cache_time']);
+				}
+
+
+				$('input[name="to"]').on('keyup', function(){
+					var url = $(this).val();
+					var ip_reg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/;
+	                url = url.replace(/^http[s]?:\/\//, '');
+	                url = url.replace(/(:|\?|\/|\\)(.*)$/, '');
+	                if (ip_reg.test(url)) {
+	                    $("[name='host']").val('$host');
+	                } else {
+	                    $("[name='host']").val(url);
+	                }
+				});
+
+				$("#open_proxy").click(function(){
+					var status = $("input[name='open_proxy']").prop("checked")==true?1:0;
+					if(status==1){
+						$("input[name='open_proxy']").prop("checked",false);
+					}else{
+						$("input[name='open_proxy']").prop("checked",true);
+					}
+				});
+
+				$('#open_cache').click(function(){
+					var status = $("input[name='open_cache']").prop("checked")==true?1:0;
+					if(status==1){
+						$('#cache_time').hide();
+						$("input[name='open_cache']").prop("checked",false);
+					}else{
+						$('#cache_time').show();
+						$("input[name='open_cache']").prop("checked",true);
+					}
+				});
+			},
+			yes:function(index,layer_ro){
+				var data = $('#form_proxy').serializeArray();
 				var t = {};
 				t['name'] = 'siteName';
 				t['value'] = siteName;
 				data.push(t);
 
-				var loading = layer.msg('添加中...',{icon:16,time:0,shade: [0.3, '#000']});
+				// console.log(data);
+				var loading = layer.msg('正在'+proxy_title+'...',{icon:16,time:0,shade: [0.3, '#000']});
 				$.post('/site/set_proxy',data, function(res) {
 					layer.close(loading);
-					if (res.status) {
-						layer.close(proxy_form);
-						toProxy(siteName)
-					} else {
-						layer.msg(res.msg, {icon: 2});
+					if (!res.status){
+						layer.msg(res.msg, {icon: 2,time:10000});
+						return;
 					}
+
+					showMsg(proxy_title+"成功!",function(){
+						layer.close(index);
+						toProxy(siteName);
+					},{icon: 1, time:2000});
 				},'json');
 			}
 		});
 	}
 
 	if (type == 2) {
+		var loading = layer.msg('正在删除中...',{icon:16,time:0,shade: [0.3, '#000']});
 		$.post('/site/del_proxy', {siteName: siteName,id: obj,}, function(res) {
+			layer.close(loading);
 			if (res.status == true) {
-				layer.msg('删除成功', {time: 1000,icon: 1});
-				toProxy(siteName)
+				showMsg('删除成功', function(){
+					toProxy(siteName);
+				},{time: 1000,icon: 1});
 			} else {
 				layer.msg(res.msg, {time: 1000,icon: 2});
 			}
@@ -1650,90 +1732,118 @@ function toProxy(siteName, type, obj) {
 		var data = {siteName: siteName,id: obj};
 		$.post('/site/get_proxy_conf', data, function(res) {
 			layer.close(laoding);
-			if (res.status == true) {
-				var mBody = "<div class='webEdit-box' style='padding: 20px'>\
-				<textarea style='height: 320px; width: 445px; margin-left: 20px; line-height:18px' id='configProxyBody'>"+res.data.result+"</textarea>\
-					<div class='info-r'>\
-						<ul class='help-info-text c7 ptb10'>\
-							<li>此处为反向代理配置文件,若您不了解配置规则,请勿随意修改.</li>\
-						</ul>\
-					</div>\
-				</div>";
-				var editor;
-				var index = layer.open({
-					type: 1,
-					title: '编辑配置文件',
-					closeBtn: 1,
-					shadeClose: true,
-					area: ['500px', '500px'],
-					btn: ['提交','关闭'],
-					content: mBody,
-					success: function () {
-						editor = CodeMirror.fromTextArea(document.getElementById("configProxyBody"), {
-							extraKeys: {"Ctrl-Space": "autocomplete"},
-							lineNumbers: true,
-							matchBrackets:true,
-						});
-						editor.focus();
-						$(".CodeMirror-scroll").css({"height":"300px","margin":0,"padding":0});
-						$("#onlineEditFileBtn").unbind('click');
-					},
-					yes:function(index,layero){
-						$("#configProxyBody").empty().text(editor.getValue());
-						var load = layer.load();
-						var data = {
-							siteName: siteName,
-							id: obj,
-							config: editor.getValue(),
-						};
-
-						$.post('/site/save_proxy_conf', data, function(res) {
-							layer.close(load)
-							if (res.status == true) {
-								layer.msg('保存成功', {icon: 1});
-								layer.close(index);
-							} else {
-								layer.msg(res.msg, {time: 3000,icon: 2});
-							}
-						},'json');
-						return true;
-			        },
-				});
-			} else {
+			if (!res.status){
 				layer.msg('请求错误!!', {time: 3000,icon: 2});
+				return;
 			}
+
+			var mBody = "<div class='webEdit-box' style='padding: 20px'>\
+			<textarea style='height: 320px; width: 445px; margin-left: 20px; line-height:18px' id='configProxyBody'>"+res.data.result+"</textarea>\
+				<div class='info-r'>\
+					<ul class='help-info-text c7 ptb10'>\
+						<li>此处为反向代理配置文件,若您不了解配置规则,请勿随意修改.</li>\
+					</ul>\
+				</div>\
+			</div>";
+			var editor;
+			var index = layer.open({
+				type: 1,
+				title: '编辑配置文件',
+				closeBtn: 1,
+				shadeClose: true,
+				area: ['500px', '500px'],
+				btn: ['提交','关闭'],
+				content: mBody,
+				success: function () {
+					editor = CodeMirror.fromTextArea(document.getElementById("configProxyBody"), {
+						extraKeys: {"Ctrl-Space": "autocomplete"},
+						lineNumbers: true,
+						matchBrackets:true,
+					});
+					editor.focus();
+					$(".CodeMirror-scroll").css({"height":"300px","margin":0,"padding":0});
+					$("#onlineEditFileBtn").unbind('click');
+				},
+				yes:function(index,layero){
+					$("#configProxyBody").empty().text(editor.getValue());
+					var load = layer.load();
+					var data = {
+						siteName: siteName,
+						id: obj,
+						config: editor.getValue(),
+					};
+
+					$.post('/site/save_proxy_conf', data, function(res) {
+						layer.close(load)
+						if (res.status == true) {
+							layer.msg('保存成功', {icon: 1});
+							layer.close(index);
+						} else {
+							layer.msg(res.msg, {time: 3000,icon: 2});
+						}
+					},'json');
+					return true;
+		        },
+			});
 		},'json');
-		return
+		return;
 	}
 
 	if (type == 10 || type == 11) {
 		//[11]启动 或 停止[10]
 		status = type==10 ? '0' : '1';
 		var loading = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});
-		$.post('/site/set_proxy_status', {siteName: siteName,'status':status,'id':obj}, function(res) {
+		$.post('/site/set_proxy_status', {siteName: siteName,'status':status,'id':obj}, function(rdata) {
 			layer.close(loading);
-			if (res.status == true) {
-				layer.msg('设置成功', {icon: 1});
-				toProxy(siteName);
-			} else {
+			if (!rdata.status){
 				layer.msg(res.msg, {time: 3000,icon: 2});
+				return;
 			}
+
+			showMsg("设置成功",function(){
+				toProxy(siteName);
+			},{icon: 1,time:2000});
+		},'json');
+		return;
+	}
+
+	if (type == 20 || type == 21) {
+		//[20] 开始缓存 或 [21] 停止缓存
+		var status = type == 20 ? 'on' : '';
+		obj['open_cache'] = status;
+		obj['siteName'] = siteName;
+
+		var loading = layer.msg('正在提交请求...',{icon:16,time:0,shade: [0.3, '#000']});
+		$.post('/site/set_proxy',obj, function(rdata) {
+			layer.close(loading);
+			if (!rdata.status){
+				layer.msg(rdata.msg, {icon: 2,time:2000});
+				return;
+			}
+
+			showMsg("设置成功!",function(){
+				toProxy(siteName);
+			},{icon: 1, time:2000});
 		},'json');
 		return;
 	}
 
 	var body = '<div id="proxy_list" class="bt_table">\
 					<div style="padding-bottom: 10px">\
-						<button type="button" title="添加反向代理" class="btn btn-success btn-sm mr5" onclick="toProxy(\''+siteName+'\',1)" ><span>添加反向代理</span></button>\
+						<button type="button" title="添加反向代理" class="btn btn-success btn-sm mr5" onclick="toProxy(\''+siteName+'\',1)" >\
+							<span>添加反向代理</span>\
+						</button>\
 					</div>\
 					<div class="divtable" style="max-height:200px;">\
 						<table class="table table-hover" >\
 							<thead style="position: relative;z-index: 1;">\
 								<tr>\
-									<th><span data-index="1"><span>代理目录</span></span></th>\
-									<th><span data-index="2"><span>目标地址</span></span></th>\
-									<th><span data-index="2"><span>状态</span></span></th>\
-									<th><span data-index="3"><span>操作</span></span></th>\
+									<th>名称</th>\
+									<th>代理目录</th>\
+									<th>目标地址</th>\
+									<th>缓存</th>\
+									<th>状态</th>\
+									<th>操作</th>\
 								</tr>\
 							</thead>\
 							<tbody id="md-301-body"></tbody>\
@@ -1745,28 +1855,64 @@ function toProxy(siteName, type, obj) {
 	var loading = layer.msg(lan.site.the_msg,{icon:16,time:0,shade: [0.3, '#000']});
 	$.post("/site/get_proxy_list", {siteName: siteName},function (res) {
 		layer.close(loading);
-		if (res.status === true) {
-			let data = res.data.result;
-			data.forEach(function(item){
-				var switchProxy  = '<span onclick="toProxy(\''+siteName+'\', 10, \''+ item.id +'\')" style="color:rgb(92, 184, 92);" class="btlink glyphicon glyphicon-play"></span>';
-				if (!item['status']){
-					switchProxy = '<span onclick="toProxy(\''+siteName+'\', 11, \''+ item.id +'\')" style="color:rgb(255, 0, 0);" class="btlink glyphicon glyphicon-pause"></span>';
-				}
-
-				let tmp = '<tr>\
-					<td><span data-index="1"><span>'+item.from+'</span></span></td>\
-					<td><span data-index="2"><span>'+item.to+'</span></span></td>\
-					<td>'+switchProxy+'</td>\
-					<td>\
-					   <span data-index="4" onclick="toProxy(\''+siteName+'\', 3, \''+ item.id +'\')" class="btlink">详细</span> |\
-					   <span data-index="4" onclick="toProxy(\''+siteName+'\', 2, \''+ item.id +'\')" class="btlink">删除</span>\
-					</td>\
-				</tr>';
-				$("#md-301-body").append(tmp);
-			})
-		} else {
+		if (!res.status){
 			layer.msg(res.msg, {icon:2});
+			return;
 		}
+	
+		var data = res.data.result;
+		for (var i = 0; i < data.length; i++) {
+			var item = data[i];
+		
+			var switchProxy  = '<span onclick="toProxy(\''+siteName+'\', 10, \''+ item.id +'\')" style="color:rgb(92, 184, 92);" class="btlink glyphicon glyphicon-play"></span>';
+			if (!item['status']){
+				switchProxy = '<span onclick="toProxy(\''+siteName+'\', 11, \''+ item.id +'\')" style="color:rgb(255, 0, 0);" class="btlink glyphicon glyphicon-pause"></span>';
+			}
+
+			var openCache = '<span  data-index="'+i+'" class="btlink cache off">未开启</span>';
+			if (item['open_cache'] == 'on'){
+				openCache = '<span  data-index="'+i+'" class="btlink cache on">已开启</span>';
+			}
+
+			let tmp = '<tr>\
+				<td>'+item.name+'</td>\
+				<td>'+item.from+'</td>\
+				<td>'+item.to+'</td>\
+				<td>'+openCache+'</td>\
+				<td>'+switchProxy+'</td>\
+				<td>\
+				   <span data-index="'+i+'" class="btlink detail">详细</span> |\
+				   <span data-index="'+i+'" class="btlink edit">编辑</span> |\
+				   <span data-index="'+i+'" class="btlink delete">删除</span>\
+				</td>\
+			</tr>';
+			$("#md-301-body").append(tmp);
+		}
+
+		$('#md-301-body .detail').click(function(){
+			var index = $(this).data('index');
+			toProxy(siteName, 3 ,data[index]['id']);
+		});
+
+		$('#md-301-body .edit').click(function(){
+			var index = $(this).data('index');
+			toProxy(siteName, 1 ,data[index]);
+		});
+
+		$('#md-301-body .delete').click(function(){
+			var index = $(this).data('index');
+			toProxy(siteName, 2 ,data[index]['id']);
+		});
+
+		$('#md-301-body .cache').click(function(){
+			var index = $(this).data('index');
+			if ($(this).hasClass('on')){
+				toProxy(siteName, 21 ,data[index]);
+			} else{
+				toProxy(siteName, 20 ,data[index]);
+			}
+		});
+		
 	},'json');
 /////////
 }
@@ -1779,7 +1925,8 @@ function sslAdmin(siteName){
 		var rdata = data['data'];
 		var tbody = '';
 		for(var i=0;i<rdata.length;i++){
-			tbody += '<tr><td>'+rdata[i].subject+'</td>\
+			tbody += '<tr>\
+				<td>'+rdata[i].subject+'</td>\
 				<td>'+rdata[i].dns.join('<br>')+'</td>\
 				<td>'+rdata[i].notAfter+'</td>\
 				<td>'+rdata[i].issuer.split(' ')[0]+'</td>\
