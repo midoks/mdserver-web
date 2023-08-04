@@ -175,7 +175,6 @@ def makeInitRsaKey(version=''):
         rdata = mw.execShell(
             'cd ' + datadir + ' && openssl rsa -in mysql.pem -pubout -out mysql.pub')
         # print(rdata)
-
     if not mw.isAppleSystem():
         mw.execShell('cd ' + datadir + ' && chmod 400 mysql.pem')
         mw.execShell('cd ' + datadir + ' && chmod 444 mysql.pub')
