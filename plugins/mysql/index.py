@@ -456,7 +456,7 @@ def initMysqlPwd():
 
 
 def initMysql8Pwd():
-    time.sleep(10)
+    time.sleep(8)
 
     serverdir = getServerDir()
     myconf = serverdir + "/etc/my.cnf"
