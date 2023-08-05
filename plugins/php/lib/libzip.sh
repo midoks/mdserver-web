@@ -28,9 +28,14 @@ if [ ! -d ${SERVER_ROOT}/libzip ];then
     fi
 
     tar -zxvf libzip-1.3.2.tar.gz
-    cd ${SOURCE_ROOT}libzip-1.3.2
+    cd ${SOURCE_ROOT}/libzip-1.3.2
 
     ./configure --prefix=${SERVER_ROOT}/libzip && make && make install
     #cd $SOURCE_ROOT
-    rm -rf ${SOURCE_ROOT}libzip-1.3.2
+
+    if [ "$?" == "0" ];then
+        rm -rf ${SOURCE_ROOT}/libzip-1.3.2
+        rm -rf ${SOURCE_ROOT}/libzip-1.3.2.tar.gz
+    fi
+
 fi
