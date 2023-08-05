@@ -33,6 +33,7 @@ from flask import redirect
 
 def init():
     initDB()
+    initDBSshPort()
     initUserInfo()
     initInitD()
     initInitTask()
@@ -60,6 +61,19 @@ def initDB():
 
     except Exception as ex:
         print(str(ex))
+
+
+def initDBSshPort():
+    # SSH端口必须放开
+    import firewall_api
+    ssh_port = mw.execShell(
+        "cat /etc/ssh/sshd_config | grep 'Port \d*' | tail -1")
+    ssh_port = ssh_port.replace("Port ", '')
+
+    if ssh_port == '':
+        firewall_api.firewall_api().addAcceptPortArgs(22, 'SSH端口', 'port')
+    else:
+        firewall_api.firewall_api().addAcceptPortArgs(ssh_port, 'SSH端口', 'port')
 
 
 def doContentReplace(src, dst):

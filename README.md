@@ -108,6 +108,7 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 * 使用mariadb二进制导入备份文件
 * docker插件-镜像导入导出功能
 * 网站设置反向代理升级功能
+* 优化初始化安装SSH端口识别
 
 ### JSDelivr安装地址
 
