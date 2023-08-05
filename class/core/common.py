@@ -70,9 +70,8 @@ def initDBSshPort():
         "cat /etc/ssh/sshd_config | grep '^Port \d*' | tail -1")
     ssh_port = cmd_data[0].replace("Port ", '').strip()
     if ssh_port == '':
-        firewall_api.firewall_api().addAcceptPortArgs(22, 'SSH远程管理服务', 'port')
-    else:
-        firewall_api.firewall_api().addAcceptPortArgs(ssh_port, 'SSH远程管理服务', 'port')
+        ssh_port = 22
+    firewall_api.firewall_api().addAcceptPortArgs(ssh_port, 'SSH远程管理服务', 'port')
 
 
 def doContentReplace(src, dst):
