@@ -24,7 +24,8 @@ apt install -y locate
 locale-gen en_US.UTF-8
 localedef -v -c -i en_US -f UTF-8 en_US.UTF-8
 
-SSH_PORT=`netstat -ntpl|grep sshd|grep -v grep | sed -n "1,1p" | awk '{print $4}' | awk -F : '{print $2}'`
+SSH_PORT_LINE=`cat /etc/ssh/sshd_config |grep Port | grep 22| tail -1`
+SSH_PORT=${SSH_PORT_LINE/"Port "/""}
 echo "SSH PORT:${SSH_PORT}"
 
 if [ -f /usr/sbin/ufw ];then
