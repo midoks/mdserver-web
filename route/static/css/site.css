@@ -4503,7 +4503,7 @@ html .menu .menu_exit:hover {
     margin-right: 3px;
 }
 /*微信二维码*/
- .boxConter {
+.boxConter {
     height: 458px;
     position: relative;
     overflow: auto;
@@ -4854,3 +4854,21 @@ select[disabled]{
   font-weight: 400;
 }
 
+#form_proxy .sub-groud .bt-input-text{
+    margin-right: 10px;
+}
+#form_proxy .sub-groud {
+    margin-bottom: 15px;
+}
+#form_proxy .btswitch-btn{
+    display:inline-block;
+}
+#form_proxy .add-replace-prosy {
+    position: relative;
+    top: -10px;
+}
+#form_proxy .disabled{
+    background-color: #eee !important;
+    cursor: default;
+    border: 1px solid #dbdbea;
+}

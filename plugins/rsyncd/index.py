@@ -782,20 +782,20 @@ def lsyncdAdd():
 
     info['rsync'] = rsync
 
-    if not 'exclude' in info:
-        info["exclude"] = [
-            "/**.upload.tmp",
-            "**/*.log",
-            "**/*.tmp",
-            "**/*.temp",
-            ".git",
-            ".gitignore",
-            ".user.ini",
-        ]
-
     data = getDefaultConf()
+
     slist = data['send']["list"]
     res = lsyncdListFindName(slist, info['name'])
+
+    if not 'exclude' in info:
+        if res[0]:
+            info["exclude"] = slist[res[1]]['exclude']
+        else:
+            info["exclude"] = [
+                "/**.upload.tmp", "**/*.log", "**/*.tmp",
+                "**/*.temp", ".git", ".gitignore", ".user.ini",
+            ]
+
     if res[0]:
         list_index = res[1]
         slist[list_index] = info

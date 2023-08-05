@@ -180,6 +180,17 @@ def confReplace():
         cmd_s = 'chmod u+s ' + ng_exe_bin
         os.system('echo %s|sudo -S %s' % (sudoPwd, cmd_s))
 
+    # vhost
+    vhost_dir = mw.getServerDir() + '/web_conf/nginx/vhost'
+    vhost_tpl_dir = getPluginDir() + '/conf/vhost'
+    # print(vhost_dir, vhost_tpl_dir)
+    vhost_list = ['0.websocket.conf', '0.nginx_status.conf']
+    for f in vhost_list:
+        a_conf = vhost_dir + '/' + f
+        a_conf_tpl = vhost_tpl_dir + '/' + f
+        if not os.path.exists(a_conf):
+            mw.writeFile(a_conf, mw.readFile(a_conf_tpl))
+
 
 def initDreplace():
 
@@ -290,6 +301,7 @@ def restart():
 
 
 def reload():
+    confReplace()
     return restyOp('reload')
 
 

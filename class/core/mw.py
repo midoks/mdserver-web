@@ -1215,6 +1215,12 @@ def formatDate(format="%Y-%m-%d %H:%M:%S", times=None):
     return time.strftime(format, time_local)
 
 
+def strfToTime(sdate):
+    # 转换时间
+    import time
+    return time.strftime('%Y-%m-%d', time.strptime(sdate, '%b %d %H:%M:%S %Y %Z'))
+
+
 def checkIp(ip):
     # 检查是否为IPv4地址
     import re

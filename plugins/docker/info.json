@@ -1,6 +1,6 @@
 {
 	"sort": 7,
-	"ps": "Docker 是一个开源的应用容器引擎(开发测试中)",
+	"ps": "Docker是一个开源的应用容器引擎",
 	"name": "docker",
 	"title": "Docker",
 	"shell": "install.sh",

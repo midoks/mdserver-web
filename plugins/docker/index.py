@@ -429,6 +429,92 @@ def dockerRemoveImage():
             return mw.returnJson(False, '删除失败, 当前镜像正在使用!')
 
 
+def getImageListFunc(dbname=''):
+    bkDir = mw.getRootDir() + '/backup/docker'
+    blist = os.listdir(bkDir)
+    r = []
+
+    bname = 'db_' + dbname
+    blen = len(bname)
+    for x in blist:
+        fbstr = x[0:blen]
+        if fbstr == bname:
+            r.append(x)
+    return r
+
+
+def dockerImagePickDir():
+    bkDir = mw.getRootDir() + '/backup/docker'
+    return mw.returnJson(True, 'ok', bkDir)
+
+
+def dockerImagePickList():
+
+    bkDir = mw.getRootDir() + '/backup/docker'
+    if not os.path.exists(bkDir):
+        os.mkdir(bkDir)
+
+    r = os.listdir(bkDir)
+    rr = []
+    for x in range(0, len(r)):
+        p = bkDir + '/' + r[x]
+        data = {}
+        data['name'] = r[x]
+
+        rsize = os.path.getsize(p)
+        data['size'] = mw.toSize(rsize)
+
+        t = os.path.getctime(p)
+        t = time.localtime(t)
+
+        data['time'] = time.strftime('%Y-%m-%d %H:%M:%S', t)
+        rr.append(data)
+
+        data['file'] = p
+
+    return mw.returnJson(True, 'ok', rr)
+
+
+def dockerImagePickSave():
+    # image 导出
+    args = getArgs()
+    data = checkArgs(args, ['images'])
+    if not data[0]:
+        return data[1]
+
+    bkDir = mw.getRootDir() + '/backup/docker/'
+    images = args['images']
+    try:
+        file_name = bkDir + \
+            str(time.strftime('%Y%m%d_%H%M%S', time.localtime())) + '.tar.gz'
+        mw.execShell('docker image save %s | gzip > %s' %
+                     (images, file_name))
+        return mw.returnJson(True, '导出镜像 {} 成功!'.format(file_name))
+    except docker.errors.APIError as ex:
+        return mw.returnJson(False, '操作失败: ' + str(ex))
+
+
+def dockerImagePickLoad():
+    # 镜像文件导入
+    args = getArgs()
+    data = checkArgs(args, ['file'])
+    if not data[0]:
+        return data[1]
+    try:
+        file_path = args['file']
+        if not os.path.exists(file_path):
+            return mw.returnJson(False, '文件不存在')
+        if file_path.endswith('.tar'):
+            mw.execShell('docker image load < %s' % file_path)
+        elif file_path.endswith('.tar.gz'):
+            mw.execShell('gunzip -c %s | docker image load' % file_path)
+        else:
+            return mw.returnJson(False, '不支持改文件类型!')
+        return mw.returnJson(True, '导入镜像文件成功!')
+    except docker.errors.APIError as ex:
+        return mw.returnJson(False, '操作失败: ' + str(ex))
+
+
 def dockerLoginCheck(user_name, user_pass, registry):
     # 登陆验证
     cmd = 'docker login -u=%s -p %s %s' % (user_name, user_pass, registry)
@@ -521,6 +607,45 @@ def __release_port(port):
         return port
     except Exception as e:
         return "Release failed {}".format(e)
+
+
+def dockerPortCheck():
+    args = getArgs()
+    data = checkArgs(args, ['port'])
+    if not data[0]:
+        return data[1]
+
+    port = args['port']
+    is_ok = IsPortExists(port)
+    if is_ok:
+        return mw.returnJson(True, 'ok')
+    return mw.returnJson(False, 'fail')
+
+
+def IsPortExists(port):
+    # 判断端口是否被占用
+    ret = __check_dst_port(ip='localhost', port=port)
+    ret2 = __check_dst_port(ip='0.0.0.0', port=port)
+    if ret:
+        return ret
+    if not ret and ret2:
+        return ret2
+    if not ret and not ret2:
+        return False
+
+
+def __check_dst_port(ip, port, timeout=3):
+    # 端口检测
+    import socket
+    ok = True
+    try:
+        s = socket.socket()
+        s.settimeout(timeout)
+        s.connect((ip, port))
+        s.close()
+    except:
+        ok = False
+    return ok
 
 
 def dockerCreateCon():
@@ -703,6 +828,14 @@ if __name__ == "__main__":
         print(dockerPullReg())
     elif func == 'image_list':
         print(imageListData())
+    elif func == 'image_pick_dir':
+        print(dockerImagePickDir())
+    elif func == 'image_pick_save':
+        print(dockerImagePickSave())
+    elif func == 'image_pick_load':
+        print(dockerImagePickLoad())
+    elif func == 'image_pick_list':
+        print(dockerImagePickList())
     elif func == 'docker_get_iplist':
         print(getDockerIpList())
     elif func == 'docker_del_ip':
@@ -715,6 +848,8 @@ if __name__ == "__main__":
         print(dockerCreateCon())
     elif func == 'docker_remove_image':
         print(dockerRemoveImage())
+    elif func == 'docker_port_check':
+        print(dockerPortCheck())
     elif func == 'docker_login':
         print(dockerLogin())
     elif func == 'docker_logout':

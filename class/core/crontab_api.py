@@ -508,6 +508,22 @@ class crontab_api:
         else:
             head = "#!/bin/bash\nPATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin\nexport PATH\n"
 
+            start_head = '''
+SCRIPT_RUN_TIME="0s"
+MW_ToSeconds()
+{
+    SEC=$1
+    if [ $SEC -lt 60 ]; then
+       SCRIPT_RUN_TIME="${SEC}s"
+    elif [ $SEC -ge 60 ] && [ $SEC -lt 3600 ];then
+       SCRIPT_RUN_TIME="$(( SEC / 60 ))m$(( SEC % 60 ))s"
+    elif [ $SEC -ge 3600 ]; then
+       SCRIPT_RUN_TIME="$(( SEC / 3600 ))h$(( (SEC % 3600) / 60 ))m$(( (SEC % 3600) % 60 ))s"
+    fi
+}
+START_MW_SHELL_TIME=`date +%s`
+'''
+
             source_bin_activate = '''
 export LANG=en_US.UTF-8
 MW_PATH=%s/bin/activate
@@ -515,7 +531,7 @@ if [ -f $MW_PATH ];then
     source $MW_PATH
 fi''' % (mw.getRunDir(),)
 
-            head = head + source_bin_activate + "\n"
+            head = head + start_head + source_bin_activate + "\n"
             log = '.log'
 
             script_dir = mw.getRunDir() + "/scripts"
@@ -557,7 +573,10 @@ fi''' % (mw.getRunDir(),)
                 shell += '''
 echo "----------------------------------------------------------------------------"
 endDate=`date +"%Y-%m-%d %H:%M:%S"`
-echo "★[$endDate] Successful"
+END_MW_SHELL_TIME=`date +"%s"`
+((SHELL_COS_TIME=($END_MW_SHELL_TIME-$START_MW_SHELL_TIME)))
+MW_ToSeconds $SHELL_COS_TIME
+echo "★[$endDate] Successful | Script Run [$SCRIPT_RUN_TIME] "
 echo "----------------------------------------------------------------------------"
 '''
         cronPath = mw.getServerDir() + '/cron'

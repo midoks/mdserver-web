@@ -167,7 +167,6 @@ def pMysqlDb():
 
 def makeInitRsaKey(version=''):
     datadir = getServerDir() + "/data"
-
     mysql_pem = datadir + "/mysql.pem"
     if not os.path.exists(mysql_pem):
         rdata = mw.execShell(
@@ -176,12 +175,11 @@ def makeInitRsaKey(version=''):
         rdata = mw.execShell(
             'cd ' + datadir + ' && openssl rsa -in mysql.pem -pubout -out mysql.pub')
         # print(rdata)
-
-        if not mw.isAppleSystem():
-            mw.execShell('cd ' + datadir + ' && chmod 400 mysql.pem')
-            mw.execShell('cd ' + datadir + ' && chmod 444 mysql.pub')
-            mw.execShell('cd ' + datadir + ' && chown mysql:mysql mysql.pem')
-            mw.execShell('cd ' + datadir + ' && chown mysql:mysql mysql.pub')
+    if not mw.isAppleSystem():
+        mw.execShell('cd ' + datadir + ' && chmod 400 mysql.pem')
+        mw.execShell('cd ' + datadir + ' && chmod 444 mysql.pub')
+        mw.execShell('cd ' + datadir + ' && chown mysql:mysql mysql.pem')
+        mw.execShell('cd ' + datadir + ' && chown mysql:mysql mysql.pub')
 
 
 def initDreplace(version=''):
@@ -249,6 +247,14 @@ def initDreplace(version=''):
         mw.writeFile(file_bin, content)
         mw.execShell('chmod +x ' + file_bin)
     return file_bin
+
+
+def process_status():
+    cmd = "ps -ef|grep mysql |grep -v grep | grep -v python | awk '{print $2}'"
+    data = mw.execShell(cmd)
+    if data[0] == '':
+        return 'stop'
+    return 'start'
 
 
 def status(version=''):
@@ -450,7 +456,7 @@ def initMysqlPwd():
 
 
 def initMysql8Pwd():
-    time.sleep(2)
+    time.sleep(8)
 
     serverdir = getServerDir()
     myconf = serverdir + "/etc/my.cnf"
@@ -540,7 +546,12 @@ def my8cmd(version, method):
             else:
                 mw.execShell('systemctl start mysql')
 
-            initMysql8Pwd()
+            for x in range(10):
+                mydb_status = process_status()
+                if mydb_status == 'start':
+                    initMysql8Pwd()
+                    break
+                time.sleep(1)
 
             if mw.isAppleSystem():
                 cmd_init_stop = init_file + ' stop'
@@ -562,11 +573,11 @@ def my8cmd(version, method):
 
 
 def appCMD(version, action):
+    makeInitRsaKey(version)
     if version == '8.0' or version == '5.7':
         status = my8cmd(version, action)
     else:
         status = myOp(version, action)
-    makeInitRsaKey(version)
     return status
 
 

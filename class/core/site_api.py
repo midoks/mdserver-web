@@ -1870,19 +1870,16 @@ class site_api:
         if _id == '' or _siteName == '':
             return mw.returnJson(False, "必填项不能为空!")
 
-        _old_config = mw.readFile(
-            "{}/{}/{}.conf".format(self.proxyPath, _siteName, _id))
-        if _old_config == False:
-            return mw.returnJson(False, "非法操作")
-
-        mw.writeFile("{}/{}/{}.conf".format(self.proxyPath,
-                                            _siteName, _id), _config)
+        proxy_file = "{}/{}/{}.conf".format(self.proxyPath, _siteName, _id)
+        mw.backFile(proxy_file)
+        mw.writeFile(proxy_file, _config)
         rule_test = mw.checkWebConfig()
         if rule_test != True:
-            mw.writeFile("{}/{}/{}.conf".format(self.proxyPath,
-                                                _siteName, _id), _old_config)
+            mw.restoreFile(proxy_file)
+            mw.removeBackFile(proxy_file)
             return mw.returnJson(False, "OpenResty 配置测试不通过, 请重试: {}".format(rule_test))
 
+        mw.removeBackFile(proxy_file)
         self.operateRedirectConf(_siteName, 'start')
         mw.restartWeb()
         return mw.returnJson(True, "ok")
@@ -1923,21 +1920,20 @@ class site_api:
         _from = request.form.get('from', '')
         _to = request.form.get('to', '')
         _host = request.form.get('host', '')
+        _name = request.form.get('name', '')
         _open_proxy = request.form.get('open_proxy', '')
+        _open_cache = request.form.get('open_cache', '')
+        _cache_time = request.form.get('cache_time', '')
+        _id = request.form.get('id', '')
 
-        if _siteName == "" or _from == "" or _to == "" or _host == "":
+        # print(_name, _siteName, _from, _to, _host)
+        if _name == "" or _siteName == "" or _from == "" or _to == "" or _host == "":
             return mw.returnJson(False, "必填项不能为空")
-
-        data_path = self.getProxyDataPath(_siteName)
-        data_content = mw.readFile(
-            data_path) if os.path.exists(data_path) else ""
-        data = json.loads(data_content) if data_content != "" else []
 
         rep = "http(s)?\:\/\/([a-zA-Z0-9][-a-zA-Z0-9]{0,62}\.)+([a-zA-Z0-9][a-zA-Z0-9]{0,62})+.?"
         if not re.match(rep, _to):
             return mw.returnJson(False, "错误的目标地址!")
 
-        # _to = _to.strip("/")
         # get host from url
         try:
             if _host == "$host":
@@ -1946,7 +1942,11 @@ class site_api:
         except:
             return mw.returnJson(False, "错误的目标地址")
 
-        # location ~* ^{from}(.*)$ {
+        proxy_site_path = self.getProxyDataPath(_siteName)
+        data_content = mw.readFile(
+            proxy_site_path) if os.path.exists(proxy_site_path) else ""
+        data = json.loads(data_content) if data_content != "" else []
+
         tpl = "#PROXY-START\n\
 location ^~ {from} {\n\
     proxy_pass {to};\n\
@@ -1954,12 +1954,29 @@ location ^~ {from} {\n\
     proxy_set_header X-Real-IP $remote_addr;\n\
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n\
     proxy_set_header REMOTE-HOST $remote_addr;\n\
+    proxy_set_header Upgrade $http_upgrade;\n\
+    proxy_set_header Connection $connection_upgrade;\n\
+    proxy_http_version 1.1;\n\
     \n\
     add_header X-Cache $upstream_cache_status;\n\
-    proxy_ignore_headers Set-Cookie Cache-Control expires;\n\
-    add_header Cache-Control no-cache;\n\
     \n\
-    set $static_files_app 0;\n\
+     {proxy_cache}\n\
+}\n\
+# PROXY-END"
+
+        tpl_proxy_cache = "\n\
+    if ( $uri ~* \"\.(gif|png|jpg|css|js|woff|woff2)$\" )\n\
+    {\n\
+        expires {cache_time}m;\n\
+    }\n\
+    proxy_ignore_headers Set-Cookie Cache-Control expires;\n\
+    proxy_cache mw_cache;\n\
+    proxy_cache_key \"$host$uri$is_args$args\";\n\
+    proxy_cache_valid 200 304 301 302 {cache_time}m;\n\
+"
+
+        tpl_proxy_nocache = "\n\
+    set $static_files_app 0; \n\
     if ( $uri ~* \"\.(gif|png|jpg|css|js|woff|woff2)$\" )\n\
     {\n\
         set $static_files_app 1;\n\
@@ -1969,8 +1986,7 @@ location ^~ {from} {\n\
     {\n\
         add_header Cache-Control no-cache;\n\
     }\n\
-}\n\
-#PROXY-END"
+"
 
         # replace
         if _from[0] != '/':
@@ -1978,28 +1994,69 @@ location ^~ {from} {\n\
         tpl = tpl.replace("{from}", _from, 999)
         tpl = tpl.replace("{to}", _to)
         tpl = tpl.replace("{host}", _host, 999)
+        tpl = tpl.replace("{cache_time}", _cache_time, 999)
 
-        _id = mw.md5("{}+{}+{}".format(_from, _to, _siteName))
-        for item in data:
-            if item["id"] == _id:
-                return mw.returnJson(False, "已存在该规则!")
-            if item["from"] == _from:
-                return mw.returnJson(False, "代理目录已存在!")
-        data.append({
-            "from": _from,
-            "to": _to,
-            "host": _host,
-            "id": _id
-        })
+        if _open_cache == 'on':
+            tpl_proxy_cache = tpl_proxy_cache.replace(
+                "{cache_time}", _cache_time, 999)
+            tpl = tpl.replace("{proxy_cache}", tpl_proxy_cache, 999)
+        else:
+            tpl = tpl.replace("{proxy_cache}", tpl_proxy_nocache, 999)
 
-        conf_file = "{}/{}.conf".format(self.getProxyPath(_siteName), _id)
+        proxy_action = 'add'
+        if _id == "":
+            _id = mw.md5("{}".format(_name))
+        else:
+            proxy_action = 'edit'
+
+        conf_proxy = "{}/{}.conf".format(self.getProxyPath(_siteName), _id)
+        conf_bk = "{}/{}.conf.txt".format(self.getProxyPath(_siteName), _id)
+
+        mw.writeFile(conf_proxy, tpl)
+
+        rule_test = mw.checkWebConfig()
+        if rule_test != True:
+            os.remove(conf_proxy)
+            return mw.returnJson(False, "OpenResty配置测试不通过, 请重试: {}".format(rule_test))
+
+        if proxy_action == "add":
+            # 添加代理
+            _id = mw.md5("{}".format(_name))
+            for item in data:
+                if item["name"] == _name:
+                    return mw.returnJson(False, "名称重复!")
+                if item["from"] == _from:
+                    return mw.returnJson(False, "代理目录已存在!")
+            data.append({
+                "name": _name,
+                "from": _from,
+                "to": _to,
+                "host": _host,
+                "open_cache": _open_cache,
+                "open_proxy": _open_proxy,
+                "cache_time": _cache_time,
+                "id": _id,
+            })
+        else:
+            # 修改代理
+            dindex = -1
+            for x in range(len(data)):
+                if data[x]["id"] == _id:
+                    dindex = x
+                    break
+            if dindex < 0:
+                return mw.returnJson(False, "异常请求")
+            data[dindex]['from'] = _from
+            data[dindex]['to'] = _to
+            data[dindex]['host'] = _host
+            data[dindex]['open_cache'] = _open_cache
+            data[dindex]['open_proxy'] = _open_proxy
+            data[dindex]['cache_time'] = _cache_time
+
         if _open_proxy != 'on':
-            conf_file = "{}/{}.conf.txt".format(
-                self.getProxyPath(_siteName), _id)
+            os.rename(conf_proxy, conf_bk)
 
-        mw.writeFile(data_path, json.dumps(data))
-        mw.writeFile(conf_file, tpl)
-
+        mw.writeFile(proxy_site_path, json.dumps(data))
         self.operateProxyConf(_siteName, 'start')
         mw.restartWeb()
         return mw.returnJson(True, "ok", {"hash": _id})
@@ -2030,10 +2087,10 @@ location ^~ {from} {\n\
                 self.getProxyPath(_siteName), _id)
             mw.execShell(cmd)
         except:
-            return mw.returnJson(False, "删除失败!")
+            return mw.returnJson(False, "删除反代失败!")
 
         mw.restartWeb()
-        return mw.returnJson(True, "删除成功!")
+        return mw.returnJson(True, "删除反代成功!")
 
     def getSiteTypesApi(self):
         # 取网站分类
@@ -2100,7 +2157,7 @@ location ^~ {from} {\n\
 
     ##### ----- end   ----- ###
 
-        # 域名编码转换
+    # 域名编码转换
     def toPunycode(self, domain):
         import re
         if sys.version_info[0] == 2:
@@ -2108,7 +2165,7 @@ location ^~ {from} {\n\
         tmp = domain.split('.')
         newdomain = ''
         for dkey in tmp:
-                # 匹配非ascii字符
+            # 匹配非ascii字符
             match = re.search(u"[\x80-\xff]+", dkey)
             if not match:
                 newdomain += dkey + '.'
@@ -2663,7 +2720,7 @@ location ^~ {from} {\n\
         mw.writeLog('TYPE_SITE', '设置成功,站点到期后将自动停止!', (siteName, edate))
         return mw.returnJson(True, '设置成功,站点到期后将自动停止!')
 
-    # ssl相关方法 start
+# ssl相关方法 start
     def setSslConf(self, siteName):
         file = self.getHostConf(siteName)
         conf = mw.readFile(file)
@@ -2762,9 +2819,4 @@ location ^~ {from} {\n\
         mw.execShell("chattr +i " + filename)
 
         return mw.returnJson(True, '已打开防跨站设置!')
-
-    # 转换时间
-    def strfToTime(self, sdate):
-        import time
-        return time.strftime('%Y-%m-%d', time.strptime(sdate, '%b %d %H:%M:%S %Y %Z'))
-    # ssl相关方法 end
+# ssl相关方法 end

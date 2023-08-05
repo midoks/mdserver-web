@@ -789,18 +789,15 @@ function batchPasteTo(data,path){
 
 function getSuffixName(fileName){
 	var extArr = fileName.split(".");	
-	var exts = ['folder','folder-unempty','sql','c','cpp','cs','flv','css','js',
+	var exts = ['folder-unempty','sql','c','cpp','cs','flv','css','js',
 	'htm','html','java','log','mht','url','xml','ai','bmp','cdr','gif','ico',
-	'jpeg','jpg','JPG','png','psd','webp','ape','avi','flv','mkv','mov','mp3','mp4',
+	'jpeg','jpg','JPG','png','psd','webp','ape','avi','mkv','mov','mp3','mp4',
 	'mpeg','mpg','rm','rmvb','swf','wav','webm','wma','wmv','rtf','docx','fdf','potm',
 	'pptx','txt','xlsb','xlsx','7z','cab','iso','rar','zip','gz','bt','file','apk','bookfolder',
-	'folder','folder-empty','folder-unempty','fromchromefolder','documentfolder','fromphonefolder',
-	'mix','musicfolder','picturefolder','videofolder','sefolder','access','mdb','accdb','sql','c',
-	'cpp','cs','js','fla','flv','htm','html','java','mht','url','xml','ai','bmp','cdr',
-	'gif','ico','jpeg','jpg','JPG','png','psd','webp','ape','avi','flv','mkv','mov','mp3','mp4','mpeg',
-	'mpg','rm','rmvb','swf','wav','webm','wma','wmv','doc','docm','dotx','dotm','dot','rtf','docx','pdf',
-	'fdf','ppt','pptm','pot','potm','pptx','txt','xls','csv','xlsm','xlsb','xlsx','7z','gz','cab','iso',
-	'rar','zip','bt','file','apk','css','scss','svg','pl','py','php','md','json','sh'];
+	'folder','folder-empty','fromchromefolder','documentfolder','fromphonefolder',
+	'mix','musicfolder','picturefolder','videofolder','sefolder','access','mdb','accdb',
+	'fla','doc','docm','dotx','dotm','dot','pdf',
+	'ppt','pptm','pot','xls','csv','xlsm','scss','svg','pl','py','php','md','json','sh','conf'];
 	var extLastName = extArr[extArr.length - 1];
 	for(var i=0; i<exts.length; i++){
 		if(exts[i]==extLastName){
@@ -818,13 +815,9 @@ function getExtName(fileName){
 	'jpeg','jpg','JPG','png','psd','webp','ape','avi','flv','mkv','mov','mp3','mp4',
 	'mpeg','mpg','rm','rmvb','swf','wav','webm','wma','wmv','rtf','docx','fdf','potm',
 	'pptx','txt','xlsb','xlsx','7z','cab','iso','rar','zip','gz','bt','file','apk','bookfolder',
-	'folder','folder-empty','folder-unempty','fromchromefolder','documentfolder','fromphonefolder',
-	'mix','musicfolder','picturefolder','videofolder','sefolder','access','mdb','accdb','sql','c',
-	'cpp','cs','js','fla','flv','htm','html','java','log','mht','url','xml','ai','bmp','cdr',
-	'gif','ico','jpeg','jpg','JPG','png','psd','webp','ape','avi','flv','mkv','mov','mp3','mp4','mpeg',
-	'mpg','rm','rmvb','swf','wav','webm','wma','wmv','doc','docm','dotx','dotm','dot','rtf','docx','pdf',
-	'fdf','ppt','pptm','pot','potm','pptx','txt','xls','csv','xlsm','xlsb','xlsx','7z','gz','cab','iso',
-	'rar','zip','bt','file','apk','css'];
+	'folder-empty','fromchromefolder','documentfolder','fromphonefolder',
+	'mix','musicfolder','picturefolder','videofolder','sefolder','access','mdb','accdb',
+	'fla','flv','doc','docm','dotx','dotm','dot','pdf','ppt','pptm','pot','xls','csv','xlsm'];
 	var extLastName = extArr[extArr.length - 1];
 	for(var i=0; i<exts.length; i++){
 		if(exts[i]==extLastName){
@@ -842,7 +835,7 @@ function ShowEditMenu(){
 		$(this).removeClass("hover");
 	}).click(function(){
 		$(this).addClass("on").siblings().removeClass("on");
-	})
+	});
 }
 
 //取磁盘

@@ -476,7 +476,7 @@ function lsyncdExclude(name){
 }
 
 function lsyncdConfLog(){
-    pluginStandAloneLogs("rsyncd","","lsyncd_conf_log");;
+    pluginRollingLogs("rsyncd","","lsyncd_conf_log");;
 }
 
 function lsyncdSend(){
@@ -492,7 +492,7 @@ function lsyncdSend(){
 
         con += '<div style="padding-top:1px;">\
                 <button class="btn btn-success btn-sm" onclick="createSendTask();">创建发送任务</button>\
-                <button class="btn btn-success btn-sm" onclick="lsyncdConfLog();">日志</button>\
+                <button class="btn btn-success btn-sm" onclick="lsyncdConfLog();">自动同步日志</button>\
             </div>';
 
         con += '<div class="divtable" style="margin-top:5px;"><table class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0">';
@@ -532,7 +532,7 @@ function lsyncdSend(){
                 '<td>' + period +'</td>' +
                 '<td>\
                     <a class="btlink" onclick="lsyncdRun(\''+list[i]['name']+'\')">同步</a>\
-                    | <a class="btlink" onclick="lsyncdLog(\''+list[i]['name']+'\')">日志</a>\
+                    | <a class="btlink" onclick="lsyncdLog(\''+list[i]['name']+'\')">手动日志</a>\
                     | <a class="btlink" onclick="lsyncdExclude(\''+list[i]['name']+'\')">过滤器</a>\
                     | <a class="btlink" onclick="createSendTask(\''+list[i]['name']+'\')">编辑</a>\
                     | <a class="btlink" onclick="lsyncdDelete(\''+list[i]['name']+'\')">删除</a>\
@@ -562,7 +562,7 @@ function rsyncdConf(){
 }
 
 function rsyncdLog(){
-    pluginStandAloneLogs("rsyncd","","run_log");
+    pluginRollingLogs("rsyncd","","run_log");
 }
 
 

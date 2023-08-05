@@ -53,6 +53,10 @@ zypper install -y freetype2-devel
 # zypper install -y  php-config
 
 SSH_PORT=`netstat -ntpl|grep sshd|grep -v grep | sed -n "1,1p" | awk '{print $4}' | awk -F : '{print $2}'`
+if [ "$SSH_PORT" == "" ];then
+	SSH_PORT_LINE=`cat /etc/ssh/sshd_config | grep "Port \d*" | tail -1`
+	SSH_PORT=${SSH_PORT_LINE/"Port "/""}
+fi
 echo "SSH PORT:${SSH_PORT}"
 
 # if [ -f /usr/sbin/iptables ];then
