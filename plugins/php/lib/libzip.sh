@@ -24,7 +24,7 @@ if [ ! -d ${SERVER_ROOT}/libzip ];then
 
     cd $SOURCE_ROOT
     if [ ! -f ${SOURCE_ROOT}/libzip-1.3.2.tar.gz ];then
-        wget --no-check-certificate -O libzip-1.3.2.tar.gz --no-check-certificate https://libzip.org/download/libzip-1.3.2.tar.gz -T 20
+        wget --no-check-certificate -O libzip-1.3.2.tar.gz https://libzip.org/download/libzip-1.3.2.tar.gz -T 20
     fi
 
     tar -zxvf libzip-1.3.2.tar.gz
