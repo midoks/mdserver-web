@@ -124,7 +124,7 @@ fi
 
 if [ ! -d $serverPath/php/${PHP_VER} ];then
 	cd $sourcePath/php/php${PHP_VER} && make clean
-	./buildconf --force
+	# ./buildconf --force
 	./configure \
 	--prefix=$serverPath/php/${PHP_VER} \
 	--exec-prefix=$serverPath/php/${PHP_VER} \
