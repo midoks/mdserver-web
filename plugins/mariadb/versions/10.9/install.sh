@@ -81,9 +81,9 @@ Install_app()
 		touch /var/log/mariadb/mariadb.log
 		INSTALL_CMD=cmake3
 	fi
-	
+
 	if [ ! -d $serverPath/mariadb ];then
-		cd ${mariadbDir}/mariadb-${MY_VER} && cmake \
+		cd ${mariadbDir}/mariadb-${MY_VER} && ${INSTALL_CMD} \
 		-DCMAKE_INSTALL_PREFIX=$serverPath/mariadb \
 		-DMYSQL_DATADIR=$serverPath/mariadb/data/ \
 		-DMYSQL_USER=mysql \
