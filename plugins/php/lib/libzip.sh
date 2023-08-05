@@ -13,19 +13,29 @@ rootPath=$(dirname "$rootPath")
 SERVER_ROOT=$rootPath/lib
 SOURCE_ROOT=$rootPath/source/lib
 
+
+cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
+HTTP_PREFIX="https://"
+if [ ! -z "$cn" ];then
+    HTTP_PREFIX="https://ghproxy.com/"
+fi
+
 if [ ! -d ${SERVER_ROOT}/libzip ];then
 
     cd $SOURCE_ROOT
     if [ ! -f ${SOURCE_ROOT}/libzip-1.3.2.tar.gz ];then
-        wget --no-check-certificate -O libzip-1.3.2.tar.gz --no-check-certificate https://nih.at/libzip/libzip-1.3.2.tar.gz -T 20
+        wget --no-check-certificate -O libzip-1.3.2.tar.gz ${HTTP_PREFIX}github.com/midoks/mdserver-web/releases/download/init/libzip-1.3.2.tar.gz -T 20
     fi
 
     tar -zxvf libzip-1.3.2.tar.gz
-    cd libzip-1.3.2
+    cd ${SOURCE_ROOT}/libzip-1.3.2
 
     ./configure --prefix=${SERVER_ROOT}/libzip && make && make install
-
     #cd $SOURCE_ROOT
-    #rm -rf libzip-1.3.2
-    #rm -rf libzip-1.3.2.tar.gz
+
+    if [ "$?" == "0" ];then
+        rm -rf ${SOURCE_ROOT}/libzip-1.3.2
+        rm -rf ${SOURCE_ROOT}/libzip-1.3.2.tar.gz
+    fi
+
 fi
