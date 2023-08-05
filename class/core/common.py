@@ -69,7 +69,6 @@ def initDBSshPort():
     cmd_data = mw.execShell(
         "cat /etc/ssh/sshd_config | grep 'Port \d*' | tail -1")
     ssh_port = cmd_data[0].replace("Port ", '')
-
     if ssh_port == '':
         firewall_api.firewall_api().addAcceptPortArgs(22, 'SSH远程管理服务', 'port')
     else:
