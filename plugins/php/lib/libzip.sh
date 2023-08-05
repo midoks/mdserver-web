@@ -22,17 +22,27 @@ fi
 
 if [ ! -d ${SERVER_ROOT}/libzip ];then
 
+    # cd $SOURCE_ROOT
+    # if [ ! -f ${SOURCE_ROOT}/libzip-1.3.2.tar.gz ];then
+    #     wget --no-check-certificate -O libzip-1.3.2.tar.gz --no-check-certificate https://nih.at/libzip/libzip-1.3.2.tar.gz -T 20
+    # fi
+
+    # tar -zxvf libzip-1.3.2.tar.gz
+    # cd libzip-1.3.2
+
+    # ./configure --prefix=${SERVER_ROOT}/libzip && make && make install
+    #cd $SOURCE_ROOT
+    #rm -rf libzip-1.3.2
+    #rm -rf libzip-1.3.2.tar.gz
+
     cd $SOURCE_ROOT
     if [ ! -f ${SOURCE_ROOT}/libzip-1.6.1.tar.gz ];then
         wget --no-check-certificate -O libzip-1.6.1.tar.gz ${HTTP_PREFIX}github.com/nih-at/libzip/releases/download/rel-1-6-1/libzip-1.6.1.tar.gz -T 20
     fi
 
     tar -zxvf libzip-1.6.1.tar.gz
-    cd libzip-1.6.1
+    cd ${SOURCE_ROOT}/libzip-1.6.1
 
-    ./configure --prefix=${SERVER_ROOT}/libzip && make && make install
+    cmake -DCMAKE_INSTALL_PREFIX=${SERVER_ROOT}/libzip && make && make install
 
-    #cd $SOURCE_ROOT
-    #rm -rf libzip-1.3.2
-    #rm -rf libzip-1.3.2.tar.gz
 fi
