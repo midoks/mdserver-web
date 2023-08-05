@@ -2467,7 +2467,7 @@ location ^~ {from} {\n\
            return 404;
         }
     }
-    # SECURITY-END
+    #SECURITY-END
     include %s/enable-php-''' % (fix.strip().replace(',', '|'), domains.strip().replace(',', ' '), pre_path)
                 conf = re.sub(re_path, rconf, conf)
                 mw.writeLog('网站管理', '站点[' + name + ']已开启防盗链!')
