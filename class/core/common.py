@@ -71,9 +71,9 @@ def initDBSshPort():
     ssh_port = ssh_port.replace("Port ", '')
 
     if ssh_port == '':
-        firewall_api.firewall_api().addAcceptPortArgs(22, 'SSH端口', 'port')
+        firewall_api.firewall_api().addAcceptPortArgs(22, 'SSH远程管理服务', 'port')
     else:
-        firewall_api.firewall_api().addAcceptPortArgs(ssh_port, 'SSH端口', 'port')
+        firewall_api.firewall_api().addAcceptPortArgs(ssh_port, 'SSH远程管理服务', 'port')
 
 
 def doContentReplace(src, dst):
