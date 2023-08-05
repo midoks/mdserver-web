@@ -72,6 +72,14 @@ Install_app()
 		 cd ${mariadbDir} && tar -zxvf  ${mariadbDir}/mariadb-${MY_VER}.tar.gz
 	fi
 	
+	INSTALL_CMD=cmake
+	# check cmake version
+	CMAKE_VERSION=`cmake -version | grep version | awk '{print $3}' | awk -F '.' '{print $1}'`
+	if [ "$CMAKE_VERSION" -eq "2" ];then
+		mkdir -p /var/log/mariadb
+		touch /var/log/mariadb/mariadb.log
+		INSTALL_CMD=cmake3
+	fi
 
 	if [ ! -d $serverPath/mariadb ];then
 		cd ${mariadbDir}/mariadb-${MY_VER} && cmake \
