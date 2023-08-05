@@ -2077,7 +2077,7 @@ function getSlaveUserList(){
     layerId = layer.open({
         type: 1,
         title: '同步账户列表',
-        area: '500px',
+        area: '600px',
         content:"<div class='bt-form pd20 c6'>\
                  <div class='divtable mtb10'>\
                     <div><table class='table table-hover get-slave-ssh-list'>\
@@ -2101,7 +2101,7 @@ function getSlaveSSHList(page=1){
     layerId = layer.open({
         type: 1,
         title: 'SSH列表',
-        area: '500px',
+        area: '600px',
         content:"<div class='bt-form pd20 c6'>\
                  <div class='divtable mtb10'>\
                     <div><table class='table table-hover get-slave-ssh-list'>\
