@@ -70,7 +70,7 @@ def initDBSshPort():
         "cat /etc/ssh/sshd_config | grep '^Port \d*' | tail -1")
     ssh_port = cmd_data[0].replace("Port ", '').strip()
     if ssh_port == '':
-        ssh_port = 22
+        ssh_port = '22'
     firewall_api.firewall_api().addAcceptPortArgs(ssh_port, 'SSH远程管理服务', 'port')
 
 
