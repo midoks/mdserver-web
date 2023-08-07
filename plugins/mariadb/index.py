@@ -1884,11 +1884,16 @@ def getMasterRepSlaveUserCmd(version):
     if sid != '':
         connection_name = "'r{}' ".format(sid)
 
+    # MASTER_USE_GTID={current_pos|slave_pos|no}
+    # current_pos  依赖-> select @@global.gtid_current_pos;
+    # slave_pos  依赖-> select @@global.gtid_slave_pos;
+    # no -> 啥都不依赖,保证多主同步成功。同步出问题,根据日志查找问题。
+
     if mode == "gtid":
         sql = "CHANGE MASTER " + connection_name + "TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
             clist[0]['username'] + "', MASTER_PASSWORD='" + \
             clist[0]['password'] + "', " + "MASTER_LOG_FILE='" + mstatus[0]["File"] + \
-            "',MASTER_USE_GTID=slave_pos,MASTER_CONNECT_RETRY=10;"
+            "',MASTER_USE_GTID=no,MASTER_CONNECT_RETRY=10;"
     else:
         sql = "CHANGE MASTER " + connection_name + "TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
             clist[0]['username']  + "', MASTER_PASSWORD='" + \
