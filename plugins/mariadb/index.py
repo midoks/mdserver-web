@@ -2290,9 +2290,9 @@ def initSlaveStatusSSH(version=''):
     import paramiko
 
     for data in ssh_list:
-        SSH_PRIVATE_KEY = "/tmp/t_ssh_" + ip + ".txt"
         ip = data['ip']
         master_port = data['port']
+        SSH_PRIVATE_KEY = "/tmp/t_ssh_" + ip + ".txt"
 
         mw.writeFile(SSH_PRIVATE_KEY, data['id_rsa'].replace('\\n', '\n'))
         mw.execShell("chmod 600 " + SSH_PRIVATE_KEY)
