@@ -2259,17 +2259,9 @@ def initSlaveStatusSyncUser(version=''):
             return mw.returnJson(False, base_t + '->CMD同步命令不合规范!')
 
         pdb.query(cmd_sql)
-        if 'Connection_name' in pinfo:
-            # pdb.query("stop slave '{}'".format(pinfo['Connection_name']))
-            pdb.query("start slave '{}'".format(pinfo['Connection_name']))
-        else:
-            pdb.query("start slave")
 
-        # # if len(t) > 0:
-        # #     msg += "Error:" + t[1]
-        # t = pdb.query("start slave")
-        # if len(t) > 0:
-        #     msg += "Error:" + t[1]
+    pdb.query("start slave")
+    pdb.query("start all slaves ")
 
     if msg == '':
         msg = '初始化成功!'
