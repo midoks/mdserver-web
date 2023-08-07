@@ -2183,7 +2183,7 @@ def getSlaveList(version=''):
 def getSlaveSyncCmd(version=''):
     root = mw.getRunDir()
     cmd = 'cd ' + root + ' && python3 ' + root + \
-        '/plugins/mariadb/index.py do_full_sync {"db":"all"}'
+        '/plugins/mariadb/index.py do_full_sync {"db":"all","sign":""}'
     return mw.returnJson(True, 'ok', cmd)
 
 
@@ -2423,9 +2423,6 @@ def asyncTmpfile():
 
 def writeDbSyncStatus(data):
     path = asyncTmpfile()
-    # status_data['code'] = 1
-    # status_data['msg'] = '主服务器备份完成...'
-    # status_data['progress'] = 30
     mw.writeFile(path, json.dumps(data))
 
 

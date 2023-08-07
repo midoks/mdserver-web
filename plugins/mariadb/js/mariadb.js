@@ -1681,6 +1681,11 @@ function getFullSyncStatus(db){
         var rdata = $.parseJSON(data.data);
         var rsource = rdata.data;
         // console.log(rdata);
+        
+        if (db == 'ALL' && rsource.length>1){
+            layer.msg("多主不支持该模式!",{icon:2});
+            return;
+        }
 
         var dataSource = '';
         if (rsource.length>1){
