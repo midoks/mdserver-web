@@ -2287,6 +2287,7 @@ def initSlaveStatusSSH(version=''):
     if len(ssh_list) < 1:
         return mw.returnJson(False, '需要先配置【[主]SSH配置】!')
 
+    import paramiko
     SSH_PRIVATE_KEY = "/tmp/t_ssh.txt"
 
     for data in ssh_list:
@@ -2296,7 +2297,6 @@ def initSlaveStatusSSH(version=''):
         mw.writeFile(SSH_PRIVATE_KEY, data['id_rsa'].replace('\\n', '\n'))
         mw.execShell("chmod 600 " + SSH_PRIVATE_KEY)
 
-        import paramiko
         paramiko.util.log_to_file('paramiko.log')
         ssh = paramiko.SSHClient()
 
