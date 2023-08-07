@@ -53,14 +53,15 @@ def getArgs():
     args_len = len(args)
 
     if args_len == 1:
-        t = args[0].strip('{').strip('}')
+        t = args[0].strip('{').strip('}').strip()
+        if (t == ''):
+            return tmp
         t = t.split(':')
         tmp[t[0]] = t[1]
     elif args_len > 1:
         for i in range(len(args)):
             t = args[i].split(':')
             tmp[t[0]] = t[1]
-
     return tmp
 
 
