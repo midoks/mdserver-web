@@ -438,18 +438,6 @@ function syncToDatabase(type){
 }
 
 function setRootPwd(type, pwd){
-    if (type==1){
-        var password = $("#MyPassword").val();
-        myPost('set_root_pwd', {password:password}, function(data){
-            var rdata = $.parseJSON(data.data);
-            showMsg(rdata.msg,function(){
-                dbList();
-                $('.layui-layer-close1').click();
-            },{icon: rdata.status ? 1 : 2});   
-        });
-        return;
-    }
-
     var index = layer.open({
         type: 1,
         area: '500px',
@@ -466,8 +454,16 @@ function setRootPwd(type, pwd){
                         </div>\
                     </div>\
                   </form>",
-        yes:function(){
-            setRootPwd(1);
+        yes:function(index,layero){
+            var password = $("#MyPassword").val();
+            myPost('set_root_pwd', {password:password}, function(data){
+                var rdata = $.parseJSON(data.data);
+                showMsg(rdata.msg,function(){
+                    dbList();
+                    layer.close(index);
+                },{icon: rdata.status ? 1 : 2});   
+            });
+            return;
         }
     });
 }
