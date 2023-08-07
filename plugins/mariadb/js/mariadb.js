@@ -1680,8 +1680,7 @@ function getFullSyncStatus(db){
     myPost('get_slave_list', {page:1,page_size:100}, function(data){
         var rdata = $.parseJSON(data.data);
         var rsource = rdata.data;
-        // console.log(rdata);
-        
+
         if (db == 'ALL' && rsource.length>1){
             layer.msg("多主不支持该模式!",{icon:2});
             return;
