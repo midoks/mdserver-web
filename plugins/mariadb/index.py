@@ -2323,6 +2323,7 @@ def initSlaveStatusSSH(version=''):
         ps = u['username'] + "|" + u['password']
         conn.where('ip=?', (ip,)).setField('ps', ps)
         db.query('stop slave')
+        db.query('stop all slaves')
 
         # 保证同步IP一致
         cmd = cmd_data['data']['cmd']
@@ -2337,6 +2338,7 @@ def initSlaveStatusSSH(version=''):
         # print(cmd)
         db.query(cmd)
         db.query("start slave")
+        db.query("start all slaves")
 
     except Exception as e:
         return mw.returnJson(False, 'SSH认证配置连接失败!' + str(e))
