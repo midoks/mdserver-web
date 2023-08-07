@@ -1866,6 +1866,9 @@ def getMasterRepSlaveUserCmd(version):
         clist = psdb.field(f).where("username=?", (username,)).limit(
             '1').order('id desc').select()
 
+    if len(clist) == 0:
+        return mw.returnJson(False, '错误同步账户!')
+
     ip = mw.getLocalIp()
     port = getMyPort()
     db = pMysqlDb()
@@ -2275,8 +2278,8 @@ def initSlaveStatusSyncUser(version=''):
 def initSlaveStatusSSH(version=''):
     db = pMysqlDb()
     dlist = db.query('show slave status')
-    if len(dlist) > 0:
-        return mw.returnJson(False, '已经初始化好了zz...')
+    if len(dlist) == 0:
+        dlist = db.query('show all slaves status')
 
     conn = pSqliteDb('slave_id_rsa')
     data = conn.field('ip,port,id_rsa,db_user').find()
