@@ -2288,6 +2288,8 @@ def initSlaveStatusSSH(version=''):
         return mw.returnJson(False, '需要先配置【[主]SSH配置】!')
 
     import paramiko
+    paramiko.util.log_to_file('paramiko.log')
+    ssh = paramiko.SSHClient()
 
     for data in ssh_list:
         ip = data['ip']
@@ -2297,9 +2299,6 @@ def initSlaveStatusSSH(version=''):
         mw.writeFile(SSH_PRIVATE_KEY, data['id_rsa'].replace('\\n', '\n'))
         mw.execShell("chmod 600 " + SSH_PRIVATE_KEY)
 
-        paramiko.util.log_to_file('paramiko.log')
-        ssh = paramiko.SSHClient()
-
         try:
             key = paramiko.RSAKey.from_private_key_file(SSH_PRIVATE_KEY)
             ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -2307,7 +2306,7 @@ def initSlaveStatusSSH(version=''):
                         username='root', pkey=key)
 
             db_user = data['db_user']
-            cmd = 'cd /www/server/mdserver-web && python3 plugins/mariadb/index.py get_master_rep_slave_user_cmd {"username":"' + db_user + '","db":""}'
+            cmd = 'cd /www/server/mdserver-web && source bin/activate && python3 plugins/mariadb/index.py get_master_rep_slave_user_cmd {"username":"' + db_user + '","db":""}'
             stdin, stdout, stderr = ssh.exec_command(cmd)
             result = stdout.read()
             result = result.decode('utf-8')
