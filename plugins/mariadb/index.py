@@ -2181,10 +2181,9 @@ def getSlaveList(version=''):
 
 
 def getSlaveSyncCmd(version=''):
-
     root = mw.getRunDir()
     cmd = 'cd ' + root + ' && python3 ' + root + \
-        '/plugins/mysql/index.py do_full_sync {"db":"all"}'
+        '/plugins/mariadb/index.py do_full_sync {"db":"all"}'
     return mw.returnJson(True, 'ok', cmd)
 
 
