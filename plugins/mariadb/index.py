@@ -2597,7 +2597,7 @@ def doFullSyncSSH(version=''):
 
     writeDbSyncStatus({'code': 0, 'msg': '登录Master成功...', 'progress': 5})
     dbname = args['db']
-    cmd = "cd /www/server/mdserver-web && python3 plugins/mariadb/index.py dump_mysql_data {\"db\":'" + dbname + "'}"
+    cmd = "cd /www/server/mdserver-web && source bin/activate &&  python3 plugins/mariadb/index.py dump_mysql_data {\"db\":'" + dbname + "'}"
     print(cmd)
     stdin, stdout, stderr = ssh.exec_command(cmd)
     result = stdout.read()
@@ -2620,13 +2620,19 @@ def doFullSyncSSH(version=''):
     if copy_status == None:
         writeDbSyncStatus({'code': 2, 'msg': '数据同步本地完成...', 'progress': 40})
 
-    cmd = 'cd /www/server/mdserver-web && python3 plugins/mariadb/index.py get_master_rep_slave_user_cmd {"username":"' + db_user + '","db":""}'
+    cmd = 'cd /www/server/mdserver-web && source bin/activate && python3 plugins/mariadb/index.py get_master_rep_slave_user_cmd {"username":"' + db_user + '","db":""}'
     stdin, stdout, stderr = ssh.exec_command(cmd)
     result = stdout.read()
     result = result.decode('utf-8')
+
+    if result == '':
+        writeDbSyncStatus({'code': 1, 'msg': '同步命令获取失败!', 'progress': 100})
+        return 'fail'
+
     cmd_data = json.loads(result)
 
     db.query('stop slave')
+    db.query('stop all slaves')
     writeDbSyncStatus({'code': 3, 'msg': '停止从库完成...', 'progress': 45})
 
     cmd = cmd_data['data']['cmd']
@@ -2659,6 +2665,7 @@ def doFullSyncSSH(version=''):
         return 'fail'
 
     db.query("start slave")
+    db.query("start all slaves")
     writeDbSyncStatus({'code': 6, 'msg': '从库重启完成...', 'progress': 100})
 
     os.system("rm -rf " + SSH_PRIVATE_KEY)
