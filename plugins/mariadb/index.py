@@ -1887,7 +1887,7 @@ def getMasterRepSlaveUserCmd(version):
     # MASTER_USE_GTID={current_pos|slave_pos|no}
     # current_pos  依赖-> select @@global.gtid_current_pos;
     # slave_pos  依赖-> select @@global.gtid_slave_pos;
-    # no -> 啥都不依赖,保证多主同步成功。同步出问题,根据日志查找问题。
+    # no -> 啥都不依赖,保证多主同步成功。同步出现问题,根据日志查找问题。
 
     if mode == "gtid":
         sql = "CHANGE MASTER " + connection_name + "TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
