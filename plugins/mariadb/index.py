@@ -1888,7 +1888,7 @@ def getMasterRepSlaveUserCmd(version):
         sql = "CHANGE MASTER " + connection_name + "TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
             clist[0]['username'] + "', MASTER_PASSWORD='" + \
             clist[0]['password'] + "', " + "MASTER_LOG_FILE='" + mstatus[0]["File"] + \
-            ",MASTER_USE_GTID=current_pos,MASTER_CONNECT_RETRY=10;"
+            "',MASTER_USE_GTID=current_pos,MASTER_CONNECT_RETRY=10;"
     else:
         sql = "CHANGE MASTER " + connection_name + "TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
             clist[0]['username']  + "', MASTER_PASSWORD='" + \
