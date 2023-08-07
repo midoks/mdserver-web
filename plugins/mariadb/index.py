@@ -2434,16 +2434,20 @@ def writeDbSyncStatus(data):
 
 def fullSync(version=''):
     args = getArgs()
-    data = checkArgs(args, ['db', 'sign', 'begin'])
+    data = checkArgs(args, ['db', 'begin'])
     if not data[0]:
         return data[1]
+
+    sign = ''
+    if 'sign' in args:
+        sign = args['sign']
 
     status_file = asyncTmpfile()
     if args['begin'] == '1':
         cmd = 'cd ' + mw.getRunDir() + ' && python3 ' + \
             getPluginDir() + \
             '/index.py do_full_sync {"db":"' + \
-            args['db'] + '","sign":"' + args['sign'] + '"} &'
+            args['db'] + '","sign":"' + sign + '"} &'
         print(cmd)
         mw.execShell(cmd)
         return json.dumps({'code': 0, 'msg': '同步数据中!', 'progress': 0})
