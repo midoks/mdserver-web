@@ -2231,6 +2231,9 @@ def initSlaveStatusSyncUser(version=''):
 
     msg = ''
 
+    pdb.query("stop slave")
+    pdb.query("stop all slaves")
+
     local_mode = recognizeDbMode()
     for x in range(len(slave_data)):
         slave_t = slave_data[x]
