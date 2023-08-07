@@ -2288,7 +2288,6 @@ def initSlaveStatusSSH(version=''):
         return mw.returnJson(False, '需要先配置【[主]SSH配置】!')
 
     import paramiko
-    SSH_PRIVATE_KEY = "/tmp/t_ssh.txt"
 
     for data in ssh_list:
 
@@ -2296,7 +2295,7 @@ def initSlaveStatusSSH(version=''):
         master_port = data['port']
         mw.writeFile(SSH_PRIVATE_KEY, data['id_rsa'].replace('\\n', '\n'))
         mw.execShell("chmod 600 " + SSH_PRIVATE_KEY)
-
+        SSH_PRIVATE_KEY = "/tmp/t_ssh_" + ip + ".txt"
         paramiko.util.log_to_file('paramiko.log')
         ssh = paramiko.SSHClient()
 
@@ -2311,15 +2310,17 @@ def initSlaveStatusSSH(version=''):
             stdin, stdout, stderr = ssh.exec_command(cmd)
             result = stdout.read()
             result = result.decode('utf-8')
+            if result.strip() == "":
+                return mw.returnJson(False, '[主][' + ip + ']:获取同步命令失败!')
             cmd_data = json.loads(result)
             time.sleep(1)
             ssh.close()
             if not cmd_data['status']:
-                return mw.returnJson(False, '[主]:' + cmd_data['msg'])
+                return mw.returnJson(False, '[主][' + ip + ']:' + cmd_data['msg'])
 
             local_mode = recognizeDbMode()
             if local_mode != cmd_data['data']['mode']:
-                return mw.returnJson(False, '主【{}】从【{}】,运行模式不一致!'.format(cmd_data['data']['mode'], local_mode))
+                return mw.returnJson(False, '[主][' + ip + ']【{}】从【{}】,运行模式不一致!'.format(cmd_data['data']['mode'], local_mode))
 
             u = cmd_data['data']['info']
             ps = u['username'] + "|" + u['password']
@@ -2341,12 +2342,11 @@ def initSlaveStatusSSH(version=''):
             db.query(cmd)
             db.query("start slave")
             db.query("start all slaves")
-
+            if os.path.exists(SSH_PRIVATE_KEY):
+                os.system("rm -rf " + SSH_PRIVATE_KEY)
         except Exception as e:
-            return mw.returnJson(False, ip + ':SSH认证配置连接失败!' + str(e))
+            return mw.returnJson(False, '[主][' + ip + ']:SSH认证配置连接失败!' + str(e))
 
-    if os.path.exists(SSH_PRIVATE_KEY):
-        os.system("rm -rf " + SSH_PRIVATE_KEY)
     return mw.returnJson(True, '初始化成功!')
 
 
