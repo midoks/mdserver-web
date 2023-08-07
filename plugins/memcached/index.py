@@ -14,6 +14,10 @@ if mw.isAppleSystem():
     app_debug = True
 
 
+import warnings
+warnings.filterwarnings('ignore', category=DeprecationWarning)
+
+
 def getPluginName():
     return 'memcached'
 

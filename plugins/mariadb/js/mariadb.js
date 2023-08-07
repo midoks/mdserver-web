@@ -431,7 +431,6 @@ function syncToDatabase(type){
     var postData = 'type='+type+'&ids='+JSON.stringify(data); 
     myPost('sync_to_databases', postData, function(data){
         var rdata = $.parseJSON(data.data);
-        // console.log(rdata);
         showMsg(rdata.msg,function(){
             dbList();
         },{ icon: rdata.status ? 1 : 2 });
@@ -490,7 +489,6 @@ function showHidePass(obj){
 function checkSelect(){
     setTimeout(function () {
         var num = $('input[type="checkbox"].check:checked').length;
-        // console.log(num);
         if (num == 1) {
             $('button[batch="true"]').hide();
             $('button[batch="false"]').show();
@@ -861,7 +859,6 @@ function downloadBackup(file){
 
 function importBackup(file,name){
     myPost('import_db_backup',{file:file,name:name}, function(data){
-        // console.log(data);
         layer.msg('执行成功!');
     });
 }
@@ -1619,7 +1616,6 @@ function getMasterRepSlaveList(){
     _data['page'] = page;
     _data['page_size'] = 10;
     myPost('get_master_rep_slave_list', _data, function(data){
-        // console.log(data);
         var rdata = [];
         try {
             rdata = $.parseJSON(data.data);
@@ -1672,8 +1668,8 @@ function getMasterRepSlaveListPage(){
 }
 
 
-function deleteSlave(){
-    myPost('delete_slave', {}, function(data){
+function deleteSlave(sign = ''){
+    myPost('delete_slave', {sign:sign}, function(data){
         var rdata = $.parseJSON(data.data);
         showMsg(rdata['msg'], function(){
             masterOrSlaveConf();
@@ -1685,28 +1681,65 @@ function deleteSlave(){
 function getFullSyncStatus(db){
     var timeId = null;
 
-    var btn = '<div class="table_toolbar" style="left:0px;"><span data-status="init" class="sync btn btn-default btn-sm" id="begin_full_sync" title="">开始</span></div>';
-    var loadOpen = layer.open({
-        type: 1,
-        title: '全量同步['+db+']',
-        area: '500px',
-        content:"<div class='bt-form pd20 c6'>\
-                 <div class='divtable mtb10'>\
-                    <span id='full_msg'></span>\
-                    <div class='progress'>\
-                        <div class='progress-bar' role='progressbar' aria-valuenow='0' aria-valuemin='0' aria-valuemax='100' style='min-width: 2em;'>0%</div>\
-                    </div>\
-                </div>\
-                "+btn+"\
-            </div>",
-        cancel: function(){ 
-            clearInterval(timeId);
+    myPost('get_slave_list', {page:1,page_size:100}, function(data){
+        var rdata = $.parseJSON(data.data);
+        var rsource = rdata.data;
+        // console.log(rdata);
+
+        var dataSource = '';
+        if (rsource.length>1){
+            var sourceList = '';
+            for (var i = 0; i < rsource.length; i++) {
+                if ('Connection_name' in rsource[i]){
+                    sourceList += '<option val="'+rsource[i]['Master_Host']+'">'+rsource[i]['Master_Host']+'</option>';
+                }
+            }
+
+            dataSource = "<p class='line' style='text-align:center;'>\
+                <span>同步数据源：</span>\
+                <select class='bt-input-text' name='data_source' style='width:200px;'>" + sourceList + "</select>\
+            </p>";
         }
+
+        var loadOpen = layer.open({
+            type: 1,
+            title: '全量同步['+db+']',
+            area: '500px',
+            content:"<div class='bt-form pd15'>\
+                     <div class='divtable mtb10'>\
+                        "+dataSource+"\
+                        <span id='full_msg'></span>\
+                        <div class='progress'>\
+                            <div class='progress-bar' role='progressbar' aria-valuenow='0' aria-valuemin='0' aria-valuemax='100' style='min-width: 2em;'>0%</div>\
+                        </div>\
+                    </div>\
+                    <div class='table_toolbar' style='left:0px;'>\
+                        <span data-status='init' class='sync btn btn-default btn-sm' id='begin_full_sync'>开始</span>\
+                    </div>\
+                </div>",
+            cancel: function(){ 
+                clearInterval(timeId);
+            },
+            success:function(){
+                $('#begin_full_sync').click(function(){
+                    var val = $(this).data('status');
+                    var sign = $('select[name="data_source"]').val();
+                    if (val == 'init'){
+                        fullSync(db, sign, 1);
+                        timeId = setInterval(function(){
+                            fullSync(db,sign,0);
+                        }, 1000);
+                        $(this).data('status','starting');
+                    } else {
+                        layer.msg("正在同步中..",{icon:0});
+                    }
+                });
+            }
+        });
     });
 
-    function fullSync(db,begin){
-       
-        myPostN('full_sync', {db:db,begin:begin}, function(data){
+    function fullSync(db, sign, begin){
+        myPostN('full_sync', {db:db,sign:sign,begin:begin}, function(data){
             var rdata = $.parseJSON(data.data);
             $('#full_msg').text(rdata['msg']);
             $('.progress-bar').css('width',rdata['progress']+'%');
@@ -1715,23 +1748,11 @@ function getFullSyncStatus(db){
             if (rdata['code']==6 ||rdata['code']<0){
                 layer.msg(rdata['msg']);
                 clearInterval(timeId);
-                $("#begin_full_sync").attr('data-status','init');
+                $("#begin_full_sync").data('status','init');
             }
         });
     }
-
-    $('#begin_full_sync').click(function(){
-        var val = $(this).attr('data-status');
-        if (val == 'init'){
-            fullSync(db,1);
-            timeId = setInterval(function(){
-                fullSync(db,0);
-            }, 1000);
-            $(this).attr('data-status','starting');
-        } else {
-            layer.msg("正在同步中..");
-        }
-    });
+    
 }
 
 function addSlaveSSH(ip=''){
@@ -2142,11 +2163,15 @@ function handlerRun(){
 function initSlaveStatus(){
     myPost('init_slave_status', '', function(data){
         var rdata = $.parseJSON(data.data);
+        if (!rdata.status ){
+            layer.msg(rdata.msg,{icon:2,time:10000});
+            return;
+        }
         showMsg(rdata.msg,function(){
             if (rdata.status){
                 masterOrSlaveConf();
             }
-        },{icon:rdata.status?1:2},2000);
+        },{icon:1},2000);
     });
 }
 
@@ -2204,31 +2229,46 @@ function masterOrSlaveConf(version=''){
         }
         
         _data['page'] = page;
-        _data['page_size'] = 10;
+        _data['page_size'] = 100;
 
         myPost('get_slave_list', _data, function(data){
             var rdata = $.parseJSON(data.data);
             var list = '';
+
+            var isHasSign = false;
             for(i in rdata.data){
 
                 var v = rdata.data[i];
-                var status = "<a class='btlink db_error'>异常</>";
+                if ('Connection_name' in v){
+                    isHasSign = true;
+                }
+
+                var status = "<a data-id="+i+" class='btlink db_error'>异常</>";
                 if (v['Slave_SQL_Running'] == 'Yes' && v['Slave_IO_Running'] == 'Yes'){
                     status = "正常";
                 }
 
                 list += '<tr>';
-                list += '<td>' + rdata.data[i]['Master_Host'] +'</td>';
-                list += '<td>' + rdata.data[i]['Master_Port'] +'</td>';
-                list += '<td>' + rdata.data[i]['Master_User'] +'</td>';
-                list += '<td>' + rdata.data[i]['Master_Log_File'] +'</td>';
-                list += '<td>' + rdata.data[i]['Slave_IO_Running'] +'</td>';
-                list += '<td>' + rdata.data[i]['Slave_SQL_Running'] +'</td>';
+                list += '<td>' + v['Master_Host'] +'</td>';
+                list += '<td>' + v['Master_Port'] +'</td>';
+                list += '<td>' + v['Master_User'] +'</td>';
+                list += '<td>' + v['Master_Log_File'] +'</td>';
+                list += '<td>' + v['Slave_IO_Running'] +'</td>';
+                list += '<td>' + v['Slave_SQL_Running'] +'</td>';
+                if (isHasSign){
+                    list += '<td>' + v['Connection_name'] +'</td>';
+                }
+
                 list += '<td>' + status +'</td>';
-                list += '<td style="text-align:right">' + 
-                    '<a href="javascript:;" class="btlink" onclick="deleteSlave()" title="删除">删除</a>' +
-                '</td>';
+                list += '<td style="text-align:right">\
+                        <a data-id="'+i+'" href="javascript:;" class="btlink btn_delete_slave" title="删除">删除</a>\
+                    </td>';
                 list += '</tr>';
+            }
+
+            var signThead_th = '';
+            if (isHasSign){
+                var signThead_th = '<th>标识</th>';
             }
 
             var con = '<div class="divtable mtb10">\
@@ -2241,6 +2281,7 @@ function masterOrSlaveConf(version=''){
                         <th>日志</th>\
                         <th>IO</th>\
                         <th>SQL</th>\
+                        '+signThead_th+'\
                         <th>状态</th>\
                         <th style="text-align:right;">操作</th></tr></thead>\
                         <tbody>\
@@ -2255,22 +2296,76 @@ function masterOrSlaveConf(version=''){
             // </div>
             $(".table_slave_status_list").html(con);
 
+
+            $(".btn_delete_slave").click(function(){
+                var id = $(this).data('id');
+                var v = rdata.data[id];
+                if ('Connection_name' in v){
+                    deleteSlave(v['Connection_name']);
+                } else{
+                    deleteSlave();
+                }
+            });
+
             $('.db_error').click(function(){
+                var id = $(this).data('id');
+                var info = rdata.data[id];
+                console.log(info);
+
+                var err_line = "";
+                err_line +="<tr>\
+                    <td>IO错误</td>\
+                    <td>"+ (info['Last_IO_Error'] == '' ? '无':info['Last_IO_Error'])+"</td>\
+                </tr>";
+                err_line +="<tr>\
+                    <td>SQL错误</td>\
+                    <td>"+(info['Last_SQL_Error'] == '' ? '无':info['Last_SQL_Error'])+"</td>\
+                </tr>";
+
+                err_line +="<tr>\
+                    <td>状态</td>\
+                    <td>"+(info['Slave_SQL_Running_State'] == '' ? '无':info['Slave_SQL_Running_State']) +"</td>\
+                </tr>";
+
                 layer.open({
                     type: 1,
                     title: '同步异常信息',
-                    area: '500px',
-                    content:"<form class='bt-form pd20 pb70'>\
-                    <div class='line'>"+v['Error']+"</div>\
-                    <div class='bt-form-submit-btn'>\
-                        <button type='button' class='btn btn-success btn-sm btn-title class-copy-db-err'>复制</button>\
+                    area: ['600px','300px'],
+                    btn:['复制错误',"取消"],
+                    content:"<form class='bt-form pd15'>\
+                        <div class='divtable mtb10'>\
+                        <div class='tablescroll'>\
+                            <table class='table table-hover' width='100%' cellspacing='0' cellpadding='0' border='0' style='border: 0 none;'>\
+                            <thead><tr>\
+                                <th style='width:80px;'>类型</th>\
+                                <th>内容</th>\
+                            </tr></thead>\
+                            <tbody>"+ err_line +"</tbody>\
+                            </table>\
+                        </div>\
                     </div>\
-                  </form>",
+                    </form>",
                     success:function(){
-                        copyText(v['Error']);
-                        $('.class-copy-db-err').click(function(){
-                            copyText(v['Error']);
-                        });
+                        // copyText(v['Error']);
+                        // $('.class-copy-db-err').click(function(){
+                        //     copyText(v['Error']);
+                        // });
+                    },
+                    yes:function(){
+                        if (info['Last_IO_Error'] != ''){
+                            copyText(info['Last_IO_Error']);
+                            return;
+                        }
+
+                        if (info['Last_SQL_Error'] != ''){
+                            copyText(info['Last_SQL_Error']);
+                            return;
+                        }
+
+                        if (info['Slave_SQL_Running_State'] != ''){
+                            copyText(info['Slave_SQL_Running_State']);
+                            return;
+                        }
                     }
                 });
             });
@@ -2320,14 +2415,12 @@ function masterOrSlaveConf(version=''){
         });
     }
 
-   
-
     function getMasterStatus(){
         myPost('get_master_status', '', function(rdata){
             var rdata = $.parseJSON(rdata.data);
             // console.log('mode:',rdata.data);
             if ( typeof(rdata.status) != 'undefined' && !rdata.status && rdata.data == 'pwd'){
-                layer.msg(rdata.msg, {icon:2});
+                layer.msg(rdata.msg, {icon:2,time:2000});
                 return;
             }
 
@@ -2409,7 +2502,6 @@ function masterOrSlaveConf(version=''){
                         return false;
                     },
                     change:function(index,mode,reload){
-                        console.log(index,mode,reload);
                         myPost('set_dbrun_mode',{'mode':mode,'reload':reload},function(data){
                             layer.close(index);
                             var rdata = $.parseJSON(data.data);
@@ -2425,10 +2517,8 @@ function masterOrSlaveConf(version=''){
                 getMasterDbList();
             }
             
-            // if (rdata.slave_status){
-                getAsyncMasterDbList();
-                getAsyncDataList()
-            // }
+            getAsyncMasterDbList();
+            getAsyncDataList()
         });
     }
     getMasterStatus();

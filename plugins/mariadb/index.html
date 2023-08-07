@@ -2,7 +2,7 @@
 	<div class='plugin_version'></div>
 	<div class="bt-w-main">
 		<div class="bt-w-menu">
-			<script type="text/javascript">console.log($('.plugin_version').attr('version'));</script>
+			<!-- <script type="text/javascript">console.log($('.plugin_version').attr('version'));</script> -->
 			<p class="bgw" onclick="pluginService('mariadb', $('.plugin_version').attr('version'));">服务</p>
 			<p onclick="pluginInitD('mariadb', $('.plugin_version').attr('version'));">自启动</p>
 			<p onclick="pluginConfig('mariadb', $('.plugin_version').attr('version'));">配置文件</p>
@@ -19,9 +19,7 @@
 			<div class="soft-man-con"></div>
 		</div>
 	</div>
-
 </div>
-
 
 <style type="text/css">
 .db_list{
@@ -52,10 +50,7 @@
 </style>
 <script type="text/javascript">
 resetPluginWinWidth(800);
-
-var loading = layer.msg("资源加载中...", { icon: 16, time: 0, shade: 0.3 });
 $.getScript( "/plugins/file?name=mariadb&f=js/mariadb.js", function(){
-	layer.close(loading);
 	pluginService('mariadb',$('.plugin_version').attr('version'));
 });
 </script>
