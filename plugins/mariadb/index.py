@@ -2282,68 +2282,71 @@ def initSlaveStatusSSH(version=''):
         dlist = db.query('show all slaves status')
 
     conn = pSqliteDb('slave_id_rsa')
-    data = conn.field('ip,port,id_rsa,db_user').find()
+    ssh_list = conn.field('ip,port,id_rsa,db_user').select()
 
-    if len(data) < 1:
+    if len(ssh_list) < 1:
         return mw.returnJson(False, '需要先配置【[主]SSH配置】!')
 
     SSH_PRIVATE_KEY = "/tmp/t_ssh.txt"
-    ip = data['ip']
-    master_port = data['port']
-    mw.writeFile(SSH_PRIVATE_KEY, data['id_rsa'].replace('\\n', '\n'))
 
-    import paramiko
-    paramiko.util.log_to_file('paramiko.log')
-    ssh = paramiko.SSHClient()
+    for data in ssh_list:
 
-    try:
-
+        ip = data['ip']
+        master_port = data['port']
+        mw.writeFile(SSH_PRIVATE_KEY, data['id_rsa'].replace('\\n', '\n'))
         mw.execShell("chmod 600 " + SSH_PRIVATE_KEY)
-        key = paramiko.RSAKey.from_private_key_file(SSH_PRIVATE_KEY)
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(hostname=ip, port=int(master_port),
-                    username='root', pkey=key)
 
-        db_user = data['db_user']
-        cmd = 'cd /www/server/mdserver-web && python3 plugins/mariadb/index.py get_master_rep_slave_user_cmd {"username":"' + db_user + '","db":""}'
-        stdin, stdout, stderr = ssh.exec_command(cmd)
-        result = stdout.read()
-        result = result.decode('utf-8')
-        cmd_data = json.loads(result)
-        time.sleep(1)
-        ssh.close()
-        if not cmd_data['status']:
-            return mw.returnJson(False, '[主]:' + cmd_data['msg'])
+        import paramiko
+        paramiko.util.log_to_file('paramiko.log')
+        ssh = paramiko.SSHClient()
 
-        local_mode = recognizeDbMode()
-        if local_mode != cmd_data['data']['mode']:
-            return mw.returnJson(False, '主【{}】从【{}】,运行模式不一致!'.format(cmd_data['data']['mode'], local_mode))
+        try:
+            key = paramiko.RSAKey.from_private_key_file(SSH_PRIVATE_KEY)
+            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            ssh.connect(hostname=ip, port=int(master_port),
+                        username='root', pkey=key)
 
-        u = cmd_data['data']['info']
-        ps = u['username'] + "|" + u['password']
-        conn.where('ip=?', (ip,)).setField('ps', ps)
-        db.query('stop slave')
-        db.query('stop all slaves')
+            db_user = data['db_user']
+            cmd = 'cd /www/server/mdserver-web && python3 plugins/mariadb/index.py get_master_rep_slave_user_cmd {"username":"' + db_user + '","db":""}'
+            stdin, stdout, stderr = ssh.exec_command(cmd)
+            result = stdout.read()
+            result = result.decode('utf-8')
+            cmd_data = json.loads(result)
+            time.sleep(1)
+            ssh.close()
+            if not cmd_data['status']:
+                return mw.returnJson(False, '[主]:' + cmd_data['msg'])
 
-        # 保证同步IP一致
-        cmd = cmd_data['data']['cmd']
-        if cmd.find('SOURCE_HOST') > -1:
-            cmd = re.sub(r"SOURCE_HOST='(.*?)'",
-                         "SOURCE_HOST='" + ip + "'", cmd, 1)
+            local_mode = recognizeDbMode()
+            if local_mode != cmd_data['data']['mode']:
+                return mw.returnJson(False, '主【{}】从【{}】,运行模式不一致!'.format(cmd_data['data']['mode'], local_mode))
 
-        if cmd.find('MASTER_HOST') > -1:
-            cmd = re.sub(r"MASTER_HOST='(.*?)'",
-                         "MASTER_HOST='" + ip + "'", cmd, 1)
+            u = cmd_data['data']['info']
+            ps = u['username'] + "|" + u['password']
+            conn.where('ip=?', (ip,)).setField('ps', ps)
+            db.query('stop slave')
+            db.query('stop all slaves')
 
-        # print(cmd)
-        db.query(cmd)
-        db.query("start slave")
-        db.query("start all slaves")
+            # 保证同步IP一致
+            cmd = cmd_data['data']['cmd']
+            if cmd.find('SOURCE_HOST') > -1:
+                cmd = re.sub(r"SOURCE_HOST='(.*?)'",
+                             "SOURCE_HOST='" + ip + "'", cmd, 1)
 
-    except Exception as e:
-        return mw.returnJson(False, 'SSH认证配置连接失败!' + str(e))
+            if cmd.find('MASTER_HOST') > -1:
+                cmd = re.sub(r"MASTER_HOST='(.*?)'",
+                             "MASTER_HOST='" + ip + "'", cmd, 1)
 
-    os.system("rm -rf " + SSH_PRIVATE_KEY)
+            # print(cmd)
+            db.query(cmd)
+            db.query("start slave")
+            db.query("start all slaves")
+
+        except Exception as e:
+            return mw.returnJson(False, ip + ':SSH认证配置连接失败!' + str(e))
+
+    if os.path.exists(SSH_PRIVATE_KEY):
+        os.system("rm -rf " + SSH_PRIVATE_KEY)
     return mw.returnJson(True, '初始化成功!')
 
 
