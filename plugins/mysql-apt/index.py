@@ -165,6 +165,10 @@ def pMysqlDb():
 
 def initDreplace(version=''):
 
+    t = getServerDir()
+    if not os.path.exists(t):
+        return
+
     conf_dir = getServerDir() + '/etc'
     mode_dir = conf_dir + '/mode'
 
