@@ -2250,98 +2250,129 @@ def initSlaveStatus(version=''):
 
 def initSlaveStatusSyncUser(version=''):
     conn = pSqliteDb('slave_sync_user')
-    data = conn.field('ip,port,user,pass,mode,cmd').find()
-    if len(data) < 1:
+    slave_data = conn.field('ip,port,user,pass,mode,cmd').select()
+    if len(slave_data) < 1:
         return mw.returnJson(False, '需要先添加同步用户配置!')
 
     # print(data)
-    db = pMysqlDb()
-    dlist = db.query('show slave status')
-    if len(dlist) > 0:
-        return mw.returnJson(False, '已经初始化好了zz...')
+    pdb = pMysqlDb()
+    if len(slave_data) == 1:
+        dlist = pdb.query('show slave status')
+        if len(dlist) > 0:
+            return mw.returnJson(False, '已经初始化好了zz...')
 
-    u = data
-
-    mode_name = 'classic'
-    if u['mode'] == '1':
-        mode_name = 'gtid'
-
+    msg = ''
     local_mode = recognizeDbMode()
-    if local_mode != mode_name:
-        return mw.returnJson(False, '同步模式不一致!')
+    for x in range(len(slave_data)):
+        slave_t = slave_data[x]
+        mode_name = 'classic'
+        base_t = 'IP:' + slave_t['ip'] + ",PORT:" + \
+            slave_t['port'] + ",USER:" + slave_t['user']
 
-    t = db.query(u['cmd'])
-    # print(t)
-    db.query("start slave user='{}' password='{}';".format(
-        u['user'], u['pass']))
-    return mw.returnJson(True, '初始化成功!')
+        if slave_t['mode'] == '1':
+            mode_name = 'gtid'
+
+        if local_mode != mode_name:
+            msg += base_t + '->同步模式不一致'
+            continue
+
+        cmd_sql = slave_t['cmd']
+        if cmd_sql == '':
+            msg += base_t + '->同步命令不能为空'
+            continue
+
+        try:
+            pinfo = parseSlaveSyncCmd(cmd_sql)
+        except Exception as e:
+            return mw.returnJson(False, base_t + '->CMD同步命令不合规范!')
+        # print(u['cmd'])
+        t = pdb.query(cmd_sql)
+        isError = isSqlError(t)
+        if isError:
+            return isError
+
+        # pdb.query("start slave user='{}' password='{}';".format(
+        #     u['user'], u['pass']))
+
+    pdb.query("start slave")
+    pdb.query("start all slaves")
+
+    if msg == '':
+        msg = '初始化成功!'
+    return mw.returnJson(True, msg)
 
 
 def initSlaveStatusSSH(version=''):
     db = pMysqlDb()
     dlist = db.query('show slave status')
-    if len(dlist) > 0:
-        return mw.returnJson(False, '已经初始化好了zz...')
 
     conn = pSqliteDb('slave_id_rsa')
-    data = conn.field('ip,port,id_rsa').find()
+    ssh_list = conn.field('ip,port,id_rsa,db_user').select()
 
-    if len(data) < 1:
+    if len(ssh_list) < 1:
         return mw.returnJson(False, '需要先配置【[主]SSH配置】!')
 
-    SSH_PRIVATE_KEY = "/tmp/t_ssh.txt"
-    ip = data['ip']
-    master_port = data['port']
-    mw.writeFile(SSH_PRIVATE_KEY, data['id_rsa'].replace('\\n', '\n'))
+    local_mode = recognizeDbMode()
 
     import paramiko
     paramiko.util.log_to_file('paramiko.log')
     ssh = paramiko.SSHClient()
 
-    try:
-
+    db.query('stop slave')
+    db.query('reset slave all')
+    for data in ssh_list:
+        ip = data['ip']
+        SSH_PRIVATE_KEY = "/tmp/t_ssh_" + ip + ".txt"
+        master_port = data['port']
+        mw.writeFile(SSH_PRIVATE_KEY, data['id_rsa'].replace('\\n', '\n'))
         mw.execShell("chmod 600 " + SSH_PRIVATE_KEY)
-        key = paramiko.RSAKey.from_private_key_file(SSH_PRIVATE_KEY)
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(hostname=ip, port=int(master_port),
-                    username='root', pkey=key)
+        try:
+            key = paramiko.RSAKey.from_private_key_file(SSH_PRIVATE_KEY)
+            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            ssh.connect(hostname=ip, port=int(master_port),
+                        username='root', pkey=key)
 
-        cmd = 'cd /www/server/mdserver-web && python3 plugins/mysql/index.py get_master_rep_slave_user_cmd {"username":"","db":""}'
-        stdin, stdout, stderr = ssh.exec_command(cmd)
-        result = stdout.read()
-        result = result.decode('utf-8')
-        cmd_data = json.loads(result)
+            db_user = data['db_user']
+            cmd = 'cd /www/server/mdserver-web && source bin/activate && python3 ' + \
+                getSPluginDir() + \
+                '/index.py get_master_rep_slave_user_cmd {"username":"' + \
+                db_user + '","db":""}'
+            stdin, stdout, stderr = ssh.exec_command(cmd)
+            result = stdout.read()
+            result = result.decode('utf-8')
+            if result.strip() == "":
+                return mw.returnJson(False, '[主][' + ip + ']:获取同步命令失败!')
 
-        if not cmd_data['status']:
-            return mw.returnJson(False, '[主]:' + cmd_data['msg'])
+            cmd_data = json.loads(result)
+            if not cmd_data['status']:
+                return mw.returnJson(False, '[主][' + ip + ']:' + cmd_data['msg'])
 
-        local_mode = recognizeDbMode()
-        if local_mode != cmd_data['data']['mode']:
-            return mw.returnJson(False, '主【{}】从【{}】,运行模式不一致!'.format(cmd_data['data']['mode'], local_mode))
+            if local_mode != cmd_data['data']['mode']:
+                return mw.returnJson(False, '[主][' + ip + ']:【{}】从【{}】,运行模式不一致!'.format(cmd_data['data']['mode'], local_mode))
 
-        u = cmd_data['data']['info']
-        ps = u['username'] + "|" + u['password']
-        conn.where('ip=?', (ip,)).setField('ps', ps)
-        db.query('stop slave')
+            u = cmd_data['data']['info']
 
-        # 保证同步IP一致
-        cmd = cmd_data['data']['cmd']
-        if cmd.find('SOURCE_HOST') > -1:
-            cmd = re.sub(r"SOURCE_HOST='(.*)'",
-                         "SOURCE_HOST='" + ip + "'", cmd, 1)
+            ps = u['username'] + "|" + u['password']
+            print(ps)
+            conn.where('ip=?', (ip,)).setField('ps', ps)
+            db.query('stop slave')
 
-        if cmd.find('MASTER_HOST') > -1:
-            cmd = re.sub(r"MASTER_HOST='(.*)'",
-                         "MASTER_HOST='" + ip + "'", cmd, 1)
-        db.query(cmd)
-        db.query("start slave user='{}' password='{}';".format(
-            u['username'], u['password']))
-    except Exception as e:
-        return mw.returnJson(False, 'SSH认证配置连接失败!' + str(e))
+            # 保证同步IP一致
+            cmd = cmd_data['data']['cmd']
+            if cmd.find('SOURCE_HOST') > -1:
+                cmd = re.sub(r"SOURCE_HOST='(.*?)'",
+                             "SOURCE_HOST='" + ip + "'", cmd, 1)
 
-    ssh.close()
-    time.sleep(1)
-    os.system("rm -rf " + SSH_PRIVATE_KEY)
+            if cmd.find('MASTER_HOST') > -1:
+                cmd = re.sub(r"MASTER_HOST='(.*?)'",
+                             "MASTER_HOST='" + ip + "'", cmd, 1)
+            db.query(cmd)
+            ssh.close()
+            if os.path.exists(SSH_PRIVATE_KEY):
+                os.system("rm -rf " + SSH_PRIVATE_KEY)
+        except Exception as e:
+            return mw.returnJson(False, '[主][' + ip + ']:SSH认证配置连接失败!' + str(e))
+    db.query('start slave')
     return mw.returnJson(True, '初始化成功!')
 
 
