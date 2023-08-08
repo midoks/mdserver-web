@@ -2474,7 +2474,7 @@ def doFullSyncUser(version=''):
     writeDbSyncStatus({'code': 1, 'msg': '远程导出数据...', 'progress': 20})
 
     if not os.path.exists(bak_file):
-        dump_sql_data = getServerDir() + "/bin/mysqldump " + dmp_option + "  --force --opt --default-character-set=utf8 --single-transaction -h" + ip + " -P" + \
+        dump_sql_data = getServerDir() + "/bin/usr/bin/mysqldump " + dmp_option + "  --force --opt --default-character-set=utf8 --single-transaction -h" + ip + " -P" + \
             port + " -u" + user + " -p\"" + apass + \
             "\" --ssl-mode=DISABLED " + sync_db + " > " + bak_file
         # print(dump_sql_data)
@@ -2484,7 +2484,7 @@ def doFullSyncUser(version=''):
     if os.path.exists(bak_file):
         pwd = pSqliteDb('config').where('id=?', (1,)).getField('mysql_root')
         sock = getSocketFile()
-        my_import_cmd = getServerDir() + '/bin/mysql -S ' + sock + ' -uroot -p' + pwd + \
+        my_import_cmd = getServerDir() + '/bin/usr/bin/mysql -S ' + sock + ' -uroot -p' + pwd + \
             ' ' + sync_db + ' < ' + bak_file
         mw.execShell(my_import_cmd)
 
