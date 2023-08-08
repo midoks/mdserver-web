@@ -48,7 +48,6 @@ def getInitDFile():
 
 def getArgs():
     args = sys.argv[2:]
-
     tmp = {}
     args_len = len(args)
 

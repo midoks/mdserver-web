@@ -1669,7 +1669,7 @@ function deleteSlave(sign = ''){
         var rdata = $.parseJSON(data.data);
         showMsg(rdata['msg'], function(){
             masterOrSlaveConf();
-        },{},3000);
+        },{icon:rdata.status?1:2,time:3000},3000);
     });
 }
 
@@ -1701,7 +1701,7 @@ function getFullSyncStatus(db){
             </p>";
         }
 
-        var loadOpen = layer.open({
+        layer.open({
             type: 1,
             title: '全量同步['+db+']',
             area: '500px',
@@ -2310,7 +2310,6 @@ function masterOrSlaveConf(version=''){
             $('.db_error').click(function(){
                 var id = $(this).data('id');
                 var info = rdata.data[id];
-                console.log(info);
 
                 var err_line = "";
                 err_line +="<tr>\
