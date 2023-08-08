@@ -1969,7 +1969,6 @@ function addSlaveSyncUser(ip=''){
               </form>",
             success:function(){
                 $('textarea[name="cmd"]').html(cmd);
-
                 $('textarea[name="cmd"]').change(function(){
                     var val = $(this).val();
                     var a = {};
