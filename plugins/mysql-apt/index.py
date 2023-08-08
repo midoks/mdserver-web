@@ -1889,27 +1889,34 @@ def getMasterRepSlaveUserCmd(version):
 
     mode = recognizeDbMode()
 
+    sid = getDbServerId()
+    channel_name = ""
+    if sid != '':
+        channel_name = " for channel 'r{}';".format(sid)
+
     if mode == "gtid":
         sql = "CHANGE MASTER TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
             clist[0]['username'] + "', MASTER_PASSWORD='" + \
-            clist[0]['password'] + "', MASTER_AUTO_POSITION=1"
+            clist[0]['password'] + "', MASTER_AUTO_POSITION=1" + channel_name
         if version == '8.0':
             sql = "CHANGE REPLICATION SOURCE TO SOURCE_HOST='" + ip + "', SOURCE_PORT=" + port + ", SOURCE_USER='" + \
                 clist[0]['username']  + "', SOURCE_PASSWORD='" + \
-                clist[0]['password'] + "', MASTER_AUTO_POSITION=1"
+                clist[0]['password'] + \
+                "', MASTER_AUTO_POSITION=1" + channel_name
     else:
         sql = "CHANGE MASTER TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
             clist[0]['username']  + "', MASTER_PASSWORD='" + \
             clist[0]['password'] + \
             "', MASTER_LOG_FILE='" + mstatus[0]["File"] + \
-            "',MASTER_LOG_POS=" + str(mstatus[0]["Position"])
+            "',MASTER_LOG_POS=" + str(mstatus[0]["Position"]) + channel_name
 
         if version == "8.0":
             sql = "CHANGE REPLICATION SOURCE TO SOURCE_HOST='" + ip + "', SOURCE_PORT=" + port + ", SOURCE_USER='" + \
                 clist[0]['username']  + "', SOURCE_PASSWORD='" + \
                 clist[0]['password'] + \
                 "', SOURCE_LOG_FILE='" + mstatus[0]["File"] + \
-                "',SOURCE_LOG_POS=" + str(mstatus[0]["Position"])
+                "',SOURCE_LOG_POS=" + \
+                str(mstatus[0]["Position"]) + channel_name
 
     data = {}
     data['cmd'] = sql
