@@ -33,6 +33,11 @@ else
 	echo $ARCH
 fi
 
+if [ "$ARCH" != "amd64" ];then
+	echo "暂时不支持该${ARCH}" > $install_tmp
+	exit 0
+fi
+
 
 MYSQL_VER=8.0.30
 SUFFIX_NAME=${MYSQL_VER}-1${OSNAME}${VERSION_ID}_${ARCH}
@@ -92,7 +97,6 @@ Install_mysql()
 	    groupadd mysql
 		useradd -g mysql mysql
 	fi
-
 
 	isApt=`which apt`
 	if [ "$isApt" != "" ];then
