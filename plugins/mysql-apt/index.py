@@ -28,6 +28,10 @@ def getPluginDir():
     return mw.getPluginDir() + '/' + getPluginName()
 
 
+def getSPluginDir():
+    return '/www/server/mdserver-web/plugins/' + getPluginName()
+
+
 def getServerDir():
     return mw.getServerDir() + '/' + getPluginName()
 
@@ -2336,60 +2340,37 @@ def setSlaveStatus(version=''):
         return mw.returnJson(False, '需要先设置同步配置')
 
     mode = mw.readFile(mode_file)
-    if mode == 'ssh':
-        return setSlaveStatusSSH(version)
-    if mode == 'sync-user':
-        return setSlaveStatusSyncUser(version)
-
-
-def setSlaveStatusSyncUser(version=''):
-    db = pMysqlDb()
-    dlist = db.query('show slave status')
+    pdb = pMysqlDb()
+    dlist = pdb.query('show slave status')
     if len(dlist) == 0:
         return mw.returnJson(False, '需要手动添加同步账户或者执行初始化!')
 
-    if len(dlist) > 0 and (dlist[0]["Slave_IO_Running"] == 'Yes' or dlist[0]["Slave_SQL_Running"] == 'Yes'):
-        db.query('stop slave')
-    else:
-        ip = dlist[0]['Master_Host']
-        conn = pSqliteDb('slave_sync_user')
-        data = conn.field('ip,port,user,pass,mode,cmd').find()
-        if len(data) == 0:
-            return mw.returnJson(False, '没有数据无法重启!')
-        user = data['user']
-        apass = data['pass']
+    for v in dlist:
+        connection_name = ''
+        cmd = "slave"
+        if 'Channel_Name' in v:
+            ch_name = v['Channel_Name']
+            cmd = "slave for channel '{}'".format(ch_name)
 
-        db.query("start slave")
-        # db.query("start slave user='{}' password='{}';".format(user, apass))
-
-    return mw.returnJson(True, '设置成功!')
-
-
-def setSlaveStatusSSH(version=''):
-
-    db = pMysqlDb()
-    dlist = db.query('show slave status')
-    if len(dlist) == 0:
-        return mw.returnJson(False, '需要手动添加主服务命令或者执行[初始化]!')
-
-    if len(dlist) > 0 and (dlist[0]["Slave_IO_Running"] == 'Yes' or dlist[0]["Slave_SQL_Running"] == 'Yes'):
-        db.query('stop slave')
-    else:
-        ip = dlist[0]['Master_Host']
-        conn = pSqliteDb('slave_id_rsa')
-        data = conn.field('ip,ps').where("ip=?", (ip,)).find()
-        if len(data) == 0:
-            return mw.returnJson(False, '没有数据无法重启!')
-        u = data['ps'].split("|")
-        db.query("start slave user='{}' password='{}';".format(u[0], u[1]))
+        if (v["Slave_IO_Running"] == 'Yes' or v["Slave_SQL_Running"] == 'Yes'):
+            pdb.query("stop {}".format(cmd))
+        else:
+            pdb.query("start {}".format(cmd))
 
     return mw.returnJson(True, '设置成功!')
 
 
 def deleteSlave(version=''):
+    args = getArgs()
     db = pMysqlDb()
-    dlist = db.query('stop slave')
-    dlist = db.query('reset slave all')
+    if 'sign' in args:
+        sign = args['sign']
+        db.query("stop slave for channel '{}'".format(sign))
+        db.query("reset slave all for channel '{}'".format(sign))
+    else:
+        db.query('stop slave')
+        db.query('reset slave all')
+
     return mw.returnJson(True, '删除成功!')
 
 
@@ -2425,11 +2406,13 @@ def dumpMysqlData(version=''):
 
 ############### --- 重要 同步---- ###########
 
+def asyncTmpfile():
+    path = '/tmp/mysql_apt_async_status.txt'
+    return path
+
+
 def writeDbSyncStatus(data):
-    path = '/tmp/db_async_status.txt'
-    # status_data['code'] = 1
-    # status_data['msg'] = '主服务器备份完成...'
-    # status_data['progress'] = 30
+    path = asyncTmpfile()
     mw.writeFile(path, json.dumps(data))
 
 
@@ -2447,16 +2430,22 @@ def doFullSync(version=''):
 
 def doFullSyncUser(version=''):
     args = getArgs()
-    data = checkArgs(args, ['db'])
+    data = checkArgs(args, ['db', 'sign'])
     if not data[0]:
         return data[1]
 
     sync_db = args['db']
+    sync_sign = args['sign']
 
     db = pMysqlDb()
 
     conn = pSqliteDb('slave_sync_user')
-    data = conn.field('ip,port,user,pass,mode,cmd').find()
+    if sync_sign != '':
+        data = conn.field('ip,port,user,pass,mode,cmd').where(
+            'ip=?', (sync_sign,)).find()
+    else:
+        data = conn.field('ip,port,user,pass,mode,cmd').find()
+
     user = data['user']
     apass = data['pass']
     port = data['port']
@@ -2473,9 +2462,10 @@ def doFullSyncUser(version=''):
     writeDbSyncStatus({'code': 1, 'msg': '远程导出数据...', 'progress': 20})
 
     if not os.path.exists(bak_file):
-        dump_sql_data = getServerDir() + "/bin/mysqldump " + dmp_option + " --force --opt --default-character-set=utf8 --single-transaction -h" + ip + " -P" + \
-            port + " -u" + user + " -p" + apass + \
-            " --ssl-mode=DISABLED " + sync_db + " > " + bak_file
+        dump_sql_data = getServerDir() + "/bin/mysqldump " + dmp_option + "  --force --opt --default-character-set=utf8 --single-transaction -h" + ip + " -P" + \
+            port + " -u" + user + " -p\"" + apass + \
+            "\" --ssl-mode=DISABLED " + sync_db + " > " + bak_file
+        # print(dump_sql_data)
         mw.execShell(dump_sql_data)
 
     writeDbSyncStatus({'code': 2, 'msg': '本地导入数据...', 'progress': 40})
@@ -2492,21 +2482,30 @@ def doFullSyncUser(version=''):
         db.query("start slave")
 
     writeDbSyncStatus({'code': 6, 'msg': '从库重启完成...', 'progress': 100})
-    os.system("rm -rf " + bak_file)
+
+    if os.path.exists(bak_file):
+        os.system("rm -rf " + bak_file)
     return True
 
 
 def doFullSyncSSH(version=''):
 
     args = getArgs()
-    data = checkArgs(args, ['db'])
+    data = checkArgs(args, ['db', 'sign'])
     if not data[0]:
         return data[1]
+
+    sync_db = args['db']
+    sync_sign = args['sign']
 
     db = pMysqlDb()
 
     id_rsa_conn = pSqliteDb('slave_id_rsa')
-    data = id_rsa_conn.field('ip,port,db_user,id_rsa').find()
+    if sync_sign != '':
+        data = id_rsa_conn.field('ip,port,db_user,id_rsa').where(
+            'ip=?', (sync_sign,)).find()
+    else:
+        data = id_rsa_conn.field('ip,port,db_user,id_rsa').find()
 
     SSH_PRIVATE_KEY = "/tmp/mysql_sync_id_rsa.txt"
     id_rsa = data['id_rsa'].replace('\\n', '\n')
@@ -2548,7 +2547,8 @@ def doFullSyncSSH(version=''):
     writeDbSyncStatus({'code': 0, 'msg': '登录Master成功...', 'progress': 5})
 
     dbname = args['db']
-    cmd = "cd /www/server/mdserver-web && python3 plugins/mysql/index.py dump_mysql_data {\"db\":'" + dbname + "'}"
+    cmd = "cd /www/server/mdserver-web && source bin/activate && python3 " + \
+        getSPluginDir() + "/index.py dump_mysql_data {\"db\":'" + dbname + "'}"
     print(cmd)
     stdin, stdout, stderr = ssh.exec_command(cmd)
     result = stdout.read()
@@ -2571,7 +2571,10 @@ def doFullSyncSSH(version=''):
     if copy_status == None:
         writeDbSyncStatus({'code': 2, 'msg': '数据同步本地完成...', 'progress': 40})
 
-    cmd = 'cd /www/server/mdserver-web && python3 plugins/mysql/index.py get_master_rep_slave_user_cmd {"username":"' + db_user + '","db":""}'
+    cmd = 'cd /www/server/mdserver-web && source bin/activate && python3 ' + \
+        getSPluginDir() + \
+        '/index.py get_master_rep_slave_user_cmd {"username":"' + \
+        db_user + '","db":""}'
     stdin, stdout, stderr = ssh.exec_command(cmd)
     result = stdout.read()
     result = result.decode('utf-8')
@@ -2583,10 +2586,12 @@ def doFullSyncSSH(version=''):
     cmd = cmd_data['data']['cmd']
     # 保证同步IP一致
     if cmd.find('SOURCE_HOST') > -1:
-        cmd = re.sub(r"SOURCE_HOST='(.*)'", "SOURCE_HOST='" + ip + "'", cmd, 1)
+        cmd = re.sub(r"SOURCE_HOST='(.*?)'",
+                     "SOURCE_HOST='" + ip + "'", cmd, 1)
 
     if cmd.find('MASTER_HOST') > -1:
-        cmd = re.sub(r"MASTER_HOST='(.*)'", "SOURCE_HOST='" + ip + "'", cmd, 1)
+        cmd = re.sub(r"MASTER_HOST='(.*?)'",
+                     "MASTER_HOST='" + ip + "'", cmd, 1)
 
     db.query(cmd)
     uinfo = cmd_data['data']['info']
@@ -2600,6 +2605,8 @@ def doFullSyncSSH(version=''):
     mw.execShell("cd /tmp && gzip -d dump.sql.gz")
     cmd = root_dir + "/bin/mysql -S " + msock + \
         " -uroot -p" + pwd + " < /tmp/dump.sql"
+
+    print(cmd)
     import_data = mw.execShell(cmd)
     if import_data[0] == '':
         print(import_data[1])
@@ -2609,8 +2616,9 @@ def doFullSyncSSH(version=''):
         writeDbSyncStatus({'code': 5, 'msg': '导入数据失败...', 'progress': 100})
         return 'fail'
 
-    db.query("start slave user='{}' password='{}';".format(
-        uinfo['username'], uinfo['password']))
+    # "start slave user='{}' password='{}';".format(uinfo['username'], uinfo['password'])
+
+    db.query("start slave")
     writeDbSyncStatus({'code': 6, 'msg': '从库重启完成...', 'progress': 100})
 
     os.system("rm -rf " + SSH_PRIVATE_KEY)

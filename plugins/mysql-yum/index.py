@@ -36,6 +36,10 @@ def getPluginDir():
     return mw.getPluginDir() + '/' + getPluginName()
 
 
+def getSPluginDir():
+    return '/www/server/mdserver-web/plugins/' + getPluginName()
+
+
 def getServerDir():
     return mw.getServerDir() + '/' + getPluginName()
 
@@ -2556,7 +2560,7 @@ def doFullSyncSSH(version=''):
 
     dbname = args['db']
     cmd = "cd /www/server/mdserver-web && source bin/activate && python3 " + \
-        getPluginDir() + "/index.py dump_mysql_data {\"db\":'" + dbname + "'}"
+        getSPluginDir() + "/index.py dump_mysql_data {\"db\":'" + dbname + "'}"
     print(cmd)
     stdin, stdout, stderr = ssh.exec_command(cmd)
     result = stdout.read()
@@ -2580,7 +2584,7 @@ def doFullSyncSSH(version=''):
         writeDbSyncStatus({'code': 2, 'msg': '数据同步本地完成...', 'progress': 40})
 
     cmd = 'cd /www/server/mdserver-web && source bin/activate && python3 ' + \
-        getPluginDir() + \
+        getSPluginDir() + \
         '/index.py get_master_rep_slave_user_cmd {"username":"' + \
         db_user + '","db":""}'
     stdin, stdout, stderr = ssh.exec_command(cmd)
