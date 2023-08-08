@@ -1972,8 +1972,20 @@ function addSlaveSyncUser(ip=''){
 
                 $('textarea[name="cmd"]').change(function(){
                     var val = $(this).val();
-                    var vlist = val.split(',');
                     var a = {};
+                    if (val.toLowerCase().indexOf('for')>0){
+                        cmd_tmp = val.split('for');
+                        val = cmd_tmp[0].trim();
+
+                        const channel_str = cmd_tmp[1].trim();
+                        const ch_reg = /channel \'(.*)\';/;
+                        var match_val = channel_str.match(ch_reg);
+                        if (match_val.length>1){
+                            a['channel'] = match_val[1];
+                        }
+                    }
+
+                    var vlist = val.split(',');
                     for (var i in vlist) {
                         var tmp = toTrim(vlist[i]);
                         var tmp_a = tmp.split(" ");
