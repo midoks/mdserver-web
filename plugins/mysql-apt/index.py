@@ -2232,7 +2232,7 @@ def getSlaveSyncCmd(version=''):
 
     root = mw.getRunDir()
     cmd = 'cd ' + root + ' && python3 ' + root + \
-        '/plugins/mysql/index.py do_full_sync {"db":"all"}'
+        '/plugins/mysql/index.py do_full_sync {"db":"all","sign":""}'
     return mw.returnJson(True, 'ok', cmd)
 
 
@@ -2246,6 +2246,27 @@ def initSlaveStatus(version=''):
         return initSlaveStatusSSH(version)
     if mode == 'sync-user':
         return initSlaveStatusSyncUser(version)
+
+
+def parseSlaveSyncCmd(cmd):
+    a = {}
+    if cmd.lower().find('for') > 0:
+        cmd_tmp = cmd.split('for')
+        cmd = cmd_tmp[0].strip()
+
+        pattern_c = r"channel \'(.*)\';"
+        match_val = re.match(pattern_c, cmd_tmp[1].strip(), re.I)
+        if match_val:
+            m_groups = match_val.groups()
+            a['channel'] = m_groups[0]
+    vlist = cmd.split(',')
+    for i in vlist:
+        tmp = i.strip()
+        tmp_a = tmp.split(" ")
+        real_tmp = tmp_a[len(tmp_a) - 1]
+        kv = real_tmp.split("=")
+        a[kv[0]] = kv[1].replace("'", '').replace("'", '').replace(";", '')
+    return a
 
 
 def initSlaveStatusSyncUser(version=''):
