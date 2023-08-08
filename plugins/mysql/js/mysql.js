@@ -162,34 +162,6 @@ function myPort(){
     });
 }
 
-
-//数据库存储信置
-function changeMySQLDataPath(act) {
-    if (act != undefined) {
-        layer.confirm(lan.soft.mysql_to_msg, { closeBtn: 2, icon: 3 }, function() {
-            var datadir = $("#datadir").val();
-            var data = 'datadir=' + datadir;
-            var loadT = layer.msg(lan.soft.mysql_to_msg1, { icon: 16, time: 0, shade: [0.3, '#000'] });
-            $.post('/database?action=SetDataDir', data, function(rdata) {
-                layer.close(loadT)
-                layer.msg(rdata.msg, { icon: rdata.status ? 1 : 5 });
-            });
-        });
-        return;
-    }
-
-    $.post('/database?action=GetMySQLInfo', '', function(rdata) {
-        var LimitCon = '<p class="conf_p">\
-                            <input id="datadir" class="phpUploadLimit bt-input-text mr5" style="width:350px;" type="text" value="' + rdata.datadir + '" name="datadir">\
-                            <span onclick="changePath(\'datadir\')" class="glyphicon glyphicon-folder-open cursor mr20" style="width:auto"></span><button class="btn btn-success btn-sm" onclick="changeMySQLDataPath(1)">' + lan.soft.mysql_to + '</button>\
-                        </p>';
-        $(".soft-man-con").html(LimitCon);
-    });
-}
-
-
-
-
 //数据库配置状态
 function myPerfOpt() {
     //获取MySQL配置

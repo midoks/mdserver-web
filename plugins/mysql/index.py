@@ -2477,7 +2477,7 @@ def initSlaveStatusSyncUser(version=''):
         #     u['user'], u['pass']))
 
     pdb.query("start slave")
-    pdb.query("start all slaves ")
+    pdb.query("start all slaves")
 
     if msg == '':
         msg = '初始化成功!'
@@ -2514,7 +2514,11 @@ def initSlaveStatusSSH(version=''):
             ssh.connect(hostname=ip, port=int(master_port),
                         username='root', pkey=key)
 
-            cmd = 'cd /www/server/mdserver-web && source bin/activate && python3 plugins/mysql/index.py get_master_rep_slave_user_cmd {"username":"","db":""}'
+            db_user = data['db_user']
+            cmd = 'cd /www/server/mdserver-web && source bin/activate && python3 ' + \
+                getPluginDir() + \
+                '/index.py get_master_rep_slave_user_cmd {"username":"' + \
+                db_user + '","db":""}'
             stdin, stdout, stderr = ssh.exec_command(cmd)
             result = stdout.read()
             result = result.decode('utf-8')
@@ -2768,7 +2772,8 @@ def doFullSyncSSH(version=''):
     writeDbSyncStatus({'code': 0, 'msg': '登录Master成功...', 'progress': 5})
 
     dbname = args['db']
-    cmd = "cd /www/server/mdserver-web && source bin/activate && python3 plugins/mysql/index.py dump_mysql_data {\"db\":'" + dbname + "'}"
+    cmd = "cd /www/server/mdserver-web && source bin/activate && python3 " + \
+        getPluginDir() + "/index.py dump_mysql_data {\"db\":'" + dbname + "'}"
     print(cmd)
     stdin, stdout, stderr = ssh.exec_command(cmd)
     result = stdout.read()
@@ -2791,7 +2796,10 @@ def doFullSyncSSH(version=''):
     if copy_status == None:
         writeDbSyncStatus({'code': 2, 'msg': '数据同步本地完成...', 'progress': 40})
 
-    cmd = 'cd /www/server/mdserver-web && source bin/activate && python3 plugins/mysql/index.py get_master_rep_slave_user_cmd {"username":"' + db_user + '","db":""}'
+    cmd = 'cd /www/server/mdserver-web && source bin/activate && python3 ' + \
+        getPluginDir() + \
+        '/index.py get_master_rep_slave_user_cmd {"username":"' + \
+        db_user + '","db":""}'
     stdin, stdout, stderr = ssh.exec_command(cmd)
     result = stdout.read()
     result = result.decode('utf-8')
