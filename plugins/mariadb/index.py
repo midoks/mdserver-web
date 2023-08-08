@@ -2424,7 +2424,7 @@ def dumpMysqlData(version=''):
 
 
 def asyncTmpfile():
-    path = '/tmp/db_async_status.txt'
+    path = '/tmp/mariadb_async_status.txt'
     return path
 
 
