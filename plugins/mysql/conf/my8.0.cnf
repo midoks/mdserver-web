@@ -77,6 +77,8 @@ replicate-ignore-db = performance_schema
 replicate-ignore-db = mysql
 replicate-ignore-db = test
 
+master_info_repository = table
+relay_log_info_repository = table
 
 innodb_data_home_dir = {$SERVER_APP_PATH}/data
 innodb_data_file_path = ibdata1:10M:autoextend
