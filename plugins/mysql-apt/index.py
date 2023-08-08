@@ -2632,12 +2632,12 @@ def fullSync(version=''):
     if not data[0]:
         return data[1]
 
-    status_file = '/tmp/db_async_status.txt'
+    status_file = asyncTmpfile()
     if args['begin'] == '1':
-        cmd = 'cd ' + mw.getRunDir() + ' && python3 ' + \
-            getPluginDir() + \
-            '/index.py do_full_sync {"db":"' + args['db'] + '"} &'
-        print(cmd)
+        cmd = 'cd ' + mw.getRunDir() + ' && python3 ' + getPluginDir() + \
+            '/index.py do_full_sync {"db":"' + \
+            args['db'] + '","sign":"' + sign + '"} &'
+        # print(cmd)
         mw.execShell(cmd)
         return json.dumps({'code': 0, 'msg': '同步数据中!', 'progress': 0})
 
