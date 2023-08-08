@@ -1722,7 +1722,10 @@ function getFullSyncStatus(db){
             success:function(){
                 $('#begin_full_sync').click(function(){
                     var val = $(this).data('status');
-                    var sign = $('select[name="data_source"]').val();
+                    var sign = '';
+                    if (dataSource !=''){
+                        sign = $('select[name="data_source"]').val();
+                    }
                     if (val == 'init'){
                         fullSync(db, sign, 1);
                         timeId = setInterval(function(){
@@ -1748,23 +1751,10 @@ function getFullSyncStatus(db){
             if (rdata['code']==6 ||rdata['code']<0){
                 layer.msg(rdata['msg']);
                 clearInterval(timeId);
-                $("#begin_full_sync").attr('data-status','init');
+                $("#begin_full_sync").data('data','init');
             }
         });
     }
-
-    $('#begin_full_sync').click(function(){
-        var val = $(this).attr('data-status');
-        if (val == 'init'){
-            fullSync(db,1);
-            timeId = setInterval(function(){
-                fullSync(db,0);
-            }, 1000);
-            $(this).attr('data-status','starting');
-        } else {
-            layer.msg("正在同步中..");
-        }
-    });
 }
 
 function addSlaveSSH(ip=''){

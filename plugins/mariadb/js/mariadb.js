@@ -1723,7 +1723,10 @@ function getFullSyncStatus(db){
             success:function(){
                 $('#begin_full_sync').click(function(){
                     var val = $(this).data('status');
-                    var sign = $('select[name="data_source"]').val();
+                    var sign = '';
+                    if (dataSource !=''){
+                        sign = $('select[name="data_source"]').val();
+                    }
                     if (val == 'init'){
                         fullSync(db, sign, 1);
                         timeId = setInterval(function(){
