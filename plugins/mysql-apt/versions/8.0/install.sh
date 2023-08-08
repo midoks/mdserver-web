@@ -30,12 +30,12 @@ if [ "$TMP_ARCH" == "x86_64" ];then
 elif [ "$TMP_ARCH" == "aarch64" ];then
 	ARCH="arm64"
 else
-	echo $ARCH
+	ARCH="amd64"
 fi
 
 if [ "$ARCH" != "amd64" ];then
 	echo "暂时不支持该${ARCH}" > $install_tmp
-	exit 0
+	exit 1
 fi
 
 
