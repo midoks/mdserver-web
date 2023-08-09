@@ -52,7 +52,7 @@ def send_msg(bot, tag='ad', trigger_time=300):
         ],
         [
             types.InlineKeyboardButton(
-                text="🚀腾云机场|解锁流媒体和ChatGPT", url='https://www.tencloud.net')
+                text="🚀腾云机场|解锁流媒体和ChatGPT", url='https://www.tencloud.net/#/register?code=OGvXSTsc')
         ],
         [
             types.InlineKeyboardButton(
