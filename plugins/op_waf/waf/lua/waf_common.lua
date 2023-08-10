@@ -360,7 +360,9 @@ end
 
 function _M.return_html(self, status, html)
     ngx.header.content_type = "text/html"
+    ngx.header.Cache_Control = "no-cache"
     status = tonumber(status)
+
     -- self:D("return_html:"..tostring(status))
     if status == 200 then
         ngx.say(html)
