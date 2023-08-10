@@ -65,6 +65,10 @@ def send_msg(bot, tag='ad', trigger_time=300):
         ],
         [
             types.InlineKeyboardButton(
+                text="🐶干净卫生|就是看片", url='https://www.zzzkan.com/?code=tg_mdserver-web')
+        ],
+        [
+            types.InlineKeyboardButton(
                 text="实名认证/过人脸🕵️‍♀️各种账号处理✅", url='https://t.me/zhanzhangyewu')
         ],
         [
