@@ -1550,7 +1550,9 @@ def checkInput(data):
 
 def checkCert(certPath='ssl/certificate.pem'):
     # 验证证书
-    openssl = '/usr/local/openssl/bin/openssl'
+    openssl = '/usr/bin/openssl'
+    if not os.path.exists(openssl):
+        openssl = '/usr/local/openssl/bin/openssl'
     if not os.path.exists(openssl):
         openssl = 'openssl'
     certPem = readFile(certPath)
