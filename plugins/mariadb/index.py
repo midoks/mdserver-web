@@ -48,19 +48,19 @@ def getInitDFile():
 
 def getArgs():
     args = sys.argv[2:]
-
     tmp = {}
     args_len = len(args)
 
     if args_len == 1:
-        t = args[0].strip('{').strip('}')
+        t = args[0].strip('{').strip('}').strip()
+        if (t == ''):
+            return tmp
         t = t.split(':')
         tmp[t[0]] = t[1]
     elif args_len > 1:
         for i in range(len(args)):
             t = args[i].split(':')
             tmp[t[0]] = t[1]
-
     return tmp
 
 
@@ -103,6 +103,14 @@ def getDbPort():
     file = getConf()
     content = mw.readFile(file)
     rep = 'port\s*=\s*(.*)'
+    tmp = re.search(rep, content)
+    return tmp.groups()[0].strip()
+
+
+def getDbServerId():
+    file = getConf()
+    content = mw.readFile(file)
+    rep = 'server-id\s*=\s*(.*)'
     tmp = re.search(rep, content)
     return tmp.groups()[0].strip()
 
@@ -664,15 +672,15 @@ def isSqlError(mysqlMsg):
         return mw.returnJson(False, "Can't connect to MySQL server on '127.0.0.1' (61)")
     if "using password:" in mysqlMsg:
         return mw.returnJson(False, '数据库密码错误,在管理列表-点击【修复】!')
-    if "1045" in mysqlMsg:
+    if "1045," in mysqlMsg:
         return mw.returnJson(False, '连接错误!')
     if "SQL syntax" in mysqlMsg:
         return mw.returnJson(False, 'SQL语法错误!')
     if "Connection refused" in mysqlMsg:
         return mw.returnJson(False, '数据库连接失败,请检查数据库服务是否启动!')
-    if "1133" in mysqlMsg:
+    if "1133," in mysqlMsg:
         return mw.returnJson(False, '数据库用户不存在!')
-    if "1007" in mysqlMsg:
+    if "1007," in mysqlMsg:
         return mw.returnJson(False, '数据库已经存在!')
     return None
 
@@ -940,7 +948,7 @@ def getDbList():
 
 
 def syncGetDatabases():
-    pdb = pMysqlDb()
+    pdb = pMysqlDb('mysql')
     psdb = pSqliteDb('databases')
     data = pdb.query('show databases')
     isError = isSqlError(data)
@@ -1706,12 +1714,14 @@ def getMasterStatus(version=''):
         data['mode'] = recognizeDbMode()
         data['status'] = master_status
 
-        db = pMysqlDb()
-        dlist = db.query('show slave status')
+        pdb = pMysqlDb('mysql')
+        dlist = pdb.query('show slave status')
+        if len(dlist) < 1:
+            dlist = pdb.query("show all slaves status")
 
-        # print(dlist[0])
-        if len(dlist) > 0 and (dlist[0]["Slave_IO_Running"] == 'Yes' or dlist[0]["Slave_SQL_Running"] == 'Yes'):
-            data['slave_status'] = True
+        for v in dlist:
+            if v["Slave_IO_Running"] == 'Yes' or v["Slave_SQL_Running"] == 'Yes':
+                data['slave_status'] = True
 
         return mw.returnJson(master_status, '设置成功', data)
     except Exception as e:
@@ -1855,6 +1865,9 @@ def getMasterRepSlaveUserCmd(version):
         clist = psdb.field(f).where("username=?", (username,)).limit(
             '1').order('id desc').select()
 
+    if len(clist) == 0:
+        return mw.returnJson(False, '错误同步账户!')
+
     ip = mw.getLocalIp()
     port = getMyPort()
     db = pMysqlDb()
@@ -1868,15 +1881,23 @@ def getMasterRepSlaveUserCmd(version):
     # 查找同步点
     # SELECT BINLOG_GTID_POS('master1-bin.000002', 561866201);
 
+    sid = getDbServerId()
+    connection_name = ""
+    if sid != '':
+        connection_name = "'r{}' ".format(sid)
+
+    # MASTER_USE_GTID={current_pos|slave_pos|no}
+    # current_pos  依赖-> select @@global.gtid_current_pos;
+    # slave_pos  依赖-> select @@global.gtid_slave_pos;
+    # no -> 啥都不依赖,保证多主同步成功。同步出现问题,根据日志查找问题。
+
     if mode == "gtid":
-        sql = "CHANGE MASTER TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
+        sql = "CHANGE MASTER " + connection_name + "TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
             clist[0]['username'] + "', MASTER_PASSWORD='" + \
             clist[0]['password'] + "', " + "MASTER_LOG_FILE='" + mstatus[0]["File"] + \
-            "',MASTER_LOG_POS=" + \
-            str(mstatus[0]["Position"]) + \
-            ",MASTER_USE_GTID=slave_pos,MASTER_CONNECT_RETRY=10;"
+            "',MASTER_USE_GTID=no,MASTER_CONNECT_RETRY=10;"
     else:
-        sql = "CHANGE MASTER TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
+        sql = "CHANGE MASTER " + connection_name + "TO MASTER_HOST='" + ip + "', MASTER_PORT=" + port + ", MASTER_USER='" + \
             clist[0]['username']  + "', MASTER_PASSWORD='" + \
             clist[0]['password'] + \
             "', MASTER_LOG_FILE='" + mstatus[0]["File"] + \
@@ -2151,48 +2172,20 @@ def updateSlaveSSH(version=''):
 
 
 def getSlaveList(version=''):
-
     db = pMysqlDb()
     dlist = db.query('show slave status')
-    ret = []
-    for x in range(0, len(dlist)):
-        tmp = {}
-        tmp['Master_User'] = dlist[x]["Master_User"]
-        tmp['Master_Host'] = dlist[x]["Master_Host"]
-        tmp['Master_Port'] = dlist[x]["Master_Port"]
-        tmp['Master_Log_File'] = dlist[x]["Master_Log_File"]
-        tmp['Slave_IO_Running'] = dlist[x]["Slave_IO_Running"]
-        tmp['Slave_SQL_Running'] = dlist[x]["Slave_SQL_Running"]
-        tmp['Last_Error'] = dlist[x]["Last_Error"]
-        tmp['Last_IO_Error'] = dlist[x]["Last_IO_Error"]
-        tmp['Last_SQL_Error'] = dlist[x]["Last_SQL_Error"]
-        tmp['Slave_SQL_Running_State'] = dlist[x]["Slave_SQL_Running_State"]
+    if len(dlist) == 0:
+        dlist = db.query('show all slaves status')
 
-        tmp['Error'] = ''
-        if tmp['Last_Error'] != '':
-            tmp['Error'] = tmp['Last_Error']
-
-        if tmp['Last_IO_Error'] != '':
-            tmp['Error'] = tmp['Last_IO_Error']
-
-        if tmp['Last_SQL_Error'] != '':
-            tmp['Error'] = tmp['Last_SQL_Error']
-
-        if tmp['Error'] == '':
-            tmp['Error'] = tmp['Slave_SQL_Running_State']
-
-        ret.append(tmp)
     data = {}
-    data['data'] = ret
-
+    data['data'] = dlist
     return mw.getJson(data)
 
 
 def getSlaveSyncCmd(version=''):
-
     root = mw.getRunDir()
     cmd = 'cd ' + root + ' && python3 ' + root + \
-        '/plugins/mysql/index.py do_full_sync {"db":"all"}'
+        '/plugins/mariadb/index.py do_full_sync {"db":"all","sign":""}'
     return mw.returnJson(True, 'ok', cmd)
 
 
@@ -2208,102 +2201,151 @@ def initSlaveStatus(version=''):
         return initSlaveStatusSyncUser(version)
 
 
+def parseSlaveSyncCmd(cmd):
+    a = {}
+    vlist = cmd.split(',')
+
+    has_connection_name = vlist[0]
+
+    pattern_c = r"CHANGE MASTER \'(.*)\' TO MASTER_HOST"
+    match_val = re.match(pattern_c, has_connection_name, re.I)
+    if match_val:
+        m_groups = match_val.groups()
+        a['Connection_name'] = m_groups[0]
+
+    for i in vlist:
+        tmp = i.strip()
+        tmp_a = tmp.split(" ")
+        real_tmp = tmp_a[len(tmp_a) - 1]
+        kv = real_tmp.split("=")
+        a[kv[0]] = kv[1].replace("'", '').replace("'", '').replace(";", '')
+    return a
+
+
 def initSlaveStatusSyncUser(version=''):
     conn = pSqliteDb('slave_sync_user')
-    data = conn.field('ip,port,user,pass,mode,cmd').find()
-    if len(data) < 1:
+
+    slave_data = conn.field('id,ip,port,user,pass,mode,cmd').select()
+    if len(slave_data) < 1:
         return mw.returnJson(False, '需要先添加同步用户配置!')
 
-    # print(data)
-    db = pMysqlDb()
-    dlist = db.query('show slave status')
-    if len(dlist) > 0:
-        return mw.returnJson(False, '已经初始化好了zz...')
+    pdb = pMysqlDb()
+    if len(slave_data) == 1:
+        dlist = pdb.query('show slave status')
+        if len(dlist) > 0:
+            return mw.returnJson(False, '已经初始化好了zz...')
 
-    u = data
+    msg = ''
 
-    mode_name = 'classic'
-    if u['mode'] == '1':
-        mode_name = 'gtid'
+    pdb.query("stop slave")
+    pdb.query("stop all slaves")
 
     local_mode = recognizeDbMode()
-    if local_mode != mode_name:
-        return mw.returnJson(False, '同步模式不一致!')
+    for x in range(len(slave_data)):
+        slave_t = slave_data[x]
+        base_t = 'IP:' + slave_t['ip'] + ",PORT:" + \
+            slave_t['port'] + ",USER:" + slave_t['user']
 
-    # print(u['cmd'])
-    t = db.query(u['cmd'])
-    # print(t)
-    db.query("start slave")
-    return mw.returnJson(True, '初始化成功!')
+        mode_name = 'classic'
+        if slave_data[x]['mode'] == '1':
+            mode_name = 'gtid'
+
+        if local_mode != mode_name:
+            msg += base_t + '->同步模式不一致'
+            continue
+
+        cmd_sql = slave_t['cmd']
+        if cmd_sql == '':
+            msg += base_t + '->同步命令不能为空'
+            continue
+
+        try:
+            pinfo = parseSlaveSyncCmd(cmd_sql)
+        except Exception as e:
+            return mw.returnJson(False, base_t + '->CMD同步命令不合规范!')
+
+        pdb.query(cmd_sql)
+
+    pdb.query("start slave")
+    pdb.query("start all slaves ")
+
+    if msg == '':
+        msg = '初始化成功!'
+    return mw.returnJson(True, msg)
 
 
 def initSlaveStatusSSH(version=''):
     db = pMysqlDb()
     dlist = db.query('show slave status')
-    if len(dlist) > 0:
-        return mw.returnJson(False, '已经初始化好了zz...')
+    if len(dlist) == 0:
+        dlist = db.query('show all slaves status')
 
     conn = pSqliteDb('slave_id_rsa')
-    data = conn.field('ip,port,id_rsa,db_user').find()
+    ssh_list = conn.field('ip,port,id_rsa,db_user').select()
 
-    if len(data) < 1:
+    if len(ssh_list) < 1:
         return mw.returnJson(False, '需要先配置【[主]SSH配置】!')
-
-    SSH_PRIVATE_KEY = "/tmp/t_ssh.txt"
-    ip = data['ip']
-    master_port = data['port']
-    mw.writeFile(SSH_PRIVATE_KEY, data['id_rsa'].replace('\\n', '\n'))
 
     import paramiko
     paramiko.util.log_to_file('paramiko.log')
     ssh = paramiko.SSHClient()
 
-    try:
+    for data in ssh_list:
+        ip = data['ip']
+        master_port = data['port']
+        SSH_PRIVATE_KEY = "/tmp/t_ssh_" + ip + ".txt"
 
+        mw.writeFile(SSH_PRIVATE_KEY, data['id_rsa'].replace('\\n', '\n'))
         mw.execShell("chmod 600 " + SSH_PRIVATE_KEY)
-        key = paramiko.RSAKey.from_private_key_file(SSH_PRIVATE_KEY)
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(hostname=ip, port=int(master_port),
-                    username='root', pkey=key)
 
-        db_user = data['db_user']
-        cmd = 'cd /www/server/mdserver-web && python3 plugins/mariadb/index.py get_master_rep_slave_user_cmd {"username":"' + db_user + '","db":""}'
-        stdin, stdout, stderr = ssh.exec_command(cmd)
-        result = stdout.read()
-        result = result.decode('utf-8')
-        cmd_data = json.loads(result)
-        time.sleep(1)
-        ssh.close()
-        if not cmd_data['status']:
-            return mw.returnJson(False, '[主]:' + cmd_data['msg'])
+        try:
+            key = paramiko.RSAKey.from_private_key_file(SSH_PRIVATE_KEY)
+            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            ssh.connect(hostname=ip, port=int(master_port),
+                        username='root', pkey=key)
 
-        local_mode = recognizeDbMode()
-        if local_mode != cmd_data['data']['mode']:
-            return mw.returnJson(False, '主【{}】从【{}】,运行模式不一致!'.format(cmd_data['data']['mode'], local_mode))
+            db_user = data['db_user']
+            cmd = 'cd /www/server/mdserver-web && source bin/activate && python3 plugins/mariadb/index.py get_master_rep_slave_user_cmd {"username":"' + db_user + '","db":""}'
+            stdin, stdout, stderr = ssh.exec_command(cmd)
+            result = stdout.read()
+            result = result.decode('utf-8')
+            if result.strip() == "":
+                return mw.returnJson(False, '[主][' + ip + ']:获取同步命令失败!')
+            cmd_data = json.loads(result)
+            time.sleep(1)
+            ssh.close()
+            if not cmd_data['status']:
+                return mw.returnJson(False, '[主][' + ip + ']:' + cmd_data['msg'])
 
-        u = cmd_data['data']['info']
-        ps = u['username'] + "|" + u['password']
-        conn.where('ip=?', (ip,)).setField('ps', ps)
-        db.query('stop slave')
+            local_mode = recognizeDbMode()
+            if local_mode != cmd_data['data']['mode']:
+                return mw.returnJson(False, '[主][' + ip + ']【{}】从【{}】,运行模式不一致!'.format(cmd_data['data']['mode'], local_mode))
 
-        # 保证同步IP一致
-        cmd = cmd_data['data']['cmd']
-        if cmd.find('SOURCE_HOST') > -1:
-            cmd = re.sub(r"SOURCE_HOST='(.*?)'",
-                         "SOURCE_HOST='" + ip + "'", cmd, 1)
+            u = cmd_data['data']['info']
+            ps = u['username'] + "|" + u['password']
+            conn.where('ip=?', (ip,)).setField('ps', ps)
+            db.query('stop slave')
+            db.query('stop all slaves')
 
-        if cmd.find('MASTER_HOST') > -1:
-            cmd = re.sub(r"MASTER_HOST='(.*?)'",
-                         "MASTER_HOST='" + ip + "'", cmd, 1)
+            # 保证同步IP一致
+            cmd = cmd_data['data']['cmd']
+            if cmd.find('SOURCE_HOST') > -1:
+                cmd = re.sub(r"SOURCE_HOST='(.*?)'",
+                             "SOURCE_HOST='" + ip + "'", cmd, 1)
 
-        # print(cmd)
-        db.query(cmd)
-        db.query("start slave")
+            if cmd.find('MASTER_HOST') > -1:
+                cmd = re.sub(r"MASTER_HOST='(.*?)'",
+                             "MASTER_HOST='" + ip + "'", cmd, 1)
 
-    except Exception as e:
-        return mw.returnJson(False, 'SSH认证配置连接失败!' + str(e))
+            # print(cmd)
+            db.query(cmd)
+            db.query("start slave")
+            db.query("start all slaves")
+            if os.path.exists(SSH_PRIVATE_KEY):
+                os.system("rm -rf " + SSH_PRIVATE_KEY)
+        except Exception as e:
+            return mw.returnJson(False, '[主][' + ip + ']:SSH认证配置连接失败!' + str(e))
 
-    os.system("rm -rf " + SSH_PRIVATE_KEY)
     return mw.returnJson(True, '初始化成功!')
 
 
@@ -2312,61 +2354,39 @@ def setSlaveStatus(version=''):
     if not os.path.exists(mode_file):
         return mw.returnJson(False, '需要先设置同步配置')
 
-    mode = mw.readFile(mode_file)
-    if mode == 'ssh':
-        return setSlaveStatusSSH(version)
-    if mode == 'sync-user':
-        return setSlaveStatusSyncUser(version)
+    pdb = pMysqlDb()
+    dlist = pdb.query('show slave status')
+    if len(dlist) == 0:
+        dlist = pdb.query('show all slaves status')
 
-
-def setSlaveStatusSyncUser(version=''):
-    db = pMysqlDb()
-    dlist = db.query('show slave status')
     if len(dlist) == 0:
         return mw.returnJson(False, '需要手动添加同步账户或者执行初始化!')
 
-    if len(dlist) > 0 and (dlist[0]["Slave_IO_Running"] == 'Yes' or dlist[0]["Slave_SQL_Running"] == 'Yes'):
-        db.query('stop slave')
-    else:
-        ip = dlist[0]['Master_Host']
-        conn = pSqliteDb('slave_sync_user')
-        data = conn.field('ip,port,user,pass,mode,cmd').find()
-        if len(data) == 0:
-            return mw.returnJson(False, '没有数据无法重启!')
-        user = data['user']
-        apass = data['pass']
+    for v in dlist:
+        connection_name = ''
+        cmd = "slave"
+        if 'Connection_name' in v:
+            connection_name = v['Connection_name']
+            cmd = "slave '{}'".format(connection_name)
 
-        db.query("start slave")
-        # db.query("start slave user='{}' password='{}';".format(user, apass))
-
-    return mw.returnJson(True, '设置成功!')
-
-
-def setSlaveStatusSSH(version=''):
-
-    db = pMysqlDb()
-    dlist = db.query('show slave status')
-    if len(dlist) == 0:
-        return mw.returnJson(False, '需要手动添加主服务命令或者执行[初始化]!')
-
-    # print(dlist)
-    if len(dlist) > 0 and (dlist[0]["Slave_IO_Running"] == 'Yes' or dlist[0]["Slave_SQL_Running"] == 'Yes'):
-        db.query('stop slave')
-    else:
-        ip = dlist[0]['Master_Host']
-        conn = pSqliteDb('slave_id_rsa')
-        data = conn.field('ip,ps').where("ip=?", (ip,)).find()
-        if len(data) == 0:
-            return mw.returnJson(False, '没有数据无法重启!')
-        db.query("start slave")
+        if (v["Slave_IO_Running"] == 'Yes' or v["Slave_SQL_Running"] == 'Yes'):
+            pdb.query("stop {}".format(cmd))
+        else:
+            pdb.query("start {}".format(cmd))
 
     return mw.returnJson(True, '设置成功!')
 
 
 def deleteSlave(version=''):
+    args = getArgs()
     db = pMysqlDb()
-    dlist = db.query('stop slave')
-    dlist = db.query('reset slave all')
+    if 'sign' in args:
+        sign = args['sign']
+        db.query("stop slave '{}'".format(sign))
+        db.query("reset slave '{}' all".format(sign))
+    else:
+        db.query('stop slave')
+        db.query('reset slave all')
     return mw.returnJson(True, '删除成功!')
 
 
@@ -2402,12 +2422,52 @@ def dumpMysqlData(version=''):
 
 ############### --- 重要 同步---- ###########
 
+
+def asyncTmpfile():
+    path = '/tmp/mariadb_async_status.txt'
+    return path
+
+
 def writeDbSyncStatus(data):
-    path = '/tmp/db_async_status.txt'
-    # status_data['code'] = 1
-    # status_data['msg'] = '主服务器备份完成...'
-    # status_data['progress'] = 30
+    path = asyncTmpfile()
     mw.writeFile(path, json.dumps(data))
+
+
+def fullSync(version=''):
+    args = getArgs()
+    data = checkArgs(args, ['db', 'begin'])
+    if not data[0]:
+        return data[1]
+
+    sign = ''
+    if 'sign' in args:
+        sign = args['sign']
+
+    status_file = asyncTmpfile()
+    if args['begin'] == '1':
+        cmd = 'cd ' + mw.getRunDir() + ' && python3 ' + \
+            getPluginDir() + \
+            '/index.py do_full_sync {"db":"' + \
+            args['db'] + '","sign":"' + sign + '"} &'
+        # print(cmd)
+        mw.execShell(cmd)
+        return json.dumps({'code': 0, 'msg': '同步数据中!', 'progress': 0})
+
+    if os.path.exists(status_file):
+        c = mw.readFile(status_file)
+        tmp = json.loads(c)
+        if tmp['code'] == 1:
+            sys_dump_sql = "/tmp/dump.sql"
+            if os.path.exists(sys_dump_sql):
+                dump_size = os.path.getsize(sys_dump_sql)
+                tmp['msg'] = tmp['msg'] + ":" + "同步文件:" + mw.toSize(dump_size)
+            c = json.dumps(tmp)
+
+        # if tmp['code'] == 6:
+        #     os.remove(status_file)
+        return c
+
+    return json.dumps({'code': 0, 'msg': '点击开始,开始同步!', 'progress': 0})
 
 
 def doFullSync(version=''):
@@ -2424,16 +2484,23 @@ def doFullSync(version=''):
 
 def doFullSyncUser(version=''):
     args = getArgs()
-    data = checkArgs(args, ['db'])
+    data = checkArgs(args, ['db', 'sign'])
     if not data[0]:
         return data[1]
 
     sync_db = args['db']
+    sync_sign = args['sign']
 
+    # print(sync_sign, sync_db)
     db = pMysqlDb()
 
     conn = pSqliteDb('slave_sync_user')
-    data = conn.field('ip,port,user,pass,mode,cmd').find()
+    if sync_sign != '':
+        data = conn.field('ip,port,user,pass,mode,cmd').where(
+            'ip=?', (sync_sign,)).find()
+    else:
+        data = conn.field('ip,port,user,pass,mode,cmd').find()
+
     user = data['user']
     apass = data['pass']
     port = data['port']
@@ -2442,12 +2509,12 @@ def doFullSyncUser(version=''):
     bak_file = '/tmp/tmp.sql'
 
     writeDbSyncStatus({'code': 0, 'msg': '开始同步...', 'progress': 0})
-
-    writeDbSyncStatus({'code': 1, 'msg': '远程导出数据...', 'progress': 20})
+    writeDbSyncStatus({'code': 1, 'msg': '远程导出数据...', 'progress': 10})
 
     if not os.path.exists(bak_file):
         dump_sql_data = getServerDir() + "/bin/mysqldump --force --opt --default-character-set=utf8 --single-transaction -h" + ip + " -P" + \
             port + " -u" + user + " -p" + apass + " " + sync_db + " > " + bak_file
+        print(dump_sql_data)
         mw.execShell(dump_sql_data)
 
     writeDbSyncStatus({'code': 2, 'msg': '本地导入数据...', 'progress': 40})
@@ -2458,24 +2525,38 @@ def doFullSyncUser(version=''):
             ' ' + sync_db + ' < ' + bak_file
         mw.execShell(my_import_cmd)
 
-    db.query("start slave")
+    pinfo = parseSlaveSyncCmd(data['cmd'])
+    # print(pinfo)
+    if 'Connection_name' in pinfo:
+        db.query("start slave '{}'".format(pinfo['Connection_name']))
+    else:
+        db.query("start slave")
 
     writeDbSyncStatus({'code': 6, 'msg': '从库重启完成...', 'progress': 100})
-    os.system("rm -rf " + bak_file)
+
+    if os.path.exists(bak_file):
+        os.system("rm -rf " + bak_file)
     return True
 
 
 def doFullSyncSSH(version=''):
 
     args = getArgs()
-    data = checkArgs(args, ['db'])
+    data = checkArgs(args, ['db', 'sign'])
     if not data[0]:
         return data[1]
 
     db = pMysqlDb()
 
+    sync_db = args['db']
+    sync_sign = args['sign']
+
     id_rsa_conn = pSqliteDb('slave_id_rsa')
-    data = id_rsa_conn.field('ip,port,db_user,id_rsa').find()
+    if sync_sign != '':
+        data = id_rsa_conn.field('ip,port,db_user,id_rsa').where(
+            'ip=?', (sync_sign,)).find()
+    else:
+        data = id_rsa_conn.field('ip,port,db_user,id_rsa').find()
 
     SSH_PRIVATE_KEY = "/tmp/mysql_sync_id_rsa.txt"
     id_rsa = data['id_rsa'].replace('\\n', '\n')
@@ -2498,7 +2579,6 @@ def doFullSyncSSH(version=''):
         return 'fail'
 
     try:
-        # ssh.load_system_host_keys()
         mw.execShell("chmod 600 " + SSH_PRIVATE_KEY)
         key = paramiko.RSAKey.from_private_key_file(SSH_PRIVATE_KEY)
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -2516,7 +2596,7 @@ def doFullSyncSSH(version=''):
 
     writeDbSyncStatus({'code': 0, 'msg': '登录Master成功...', 'progress': 5})
     dbname = args['db']
-    cmd = "cd /www/server/mdserver-web && python3 plugins/mariadb/index.py dump_mysql_data {\"db\":'" + dbname + "'}"
+    cmd = "cd /www/server/mdserver-web && source bin/activate &&  python3 plugins/mariadb/index.py dump_mysql_data {\"db\":'" + dbname + "'}"
     print(cmd)
     stdin, stdout, stderr = ssh.exec_command(cmd)
     result = stdout.read()
@@ -2539,13 +2619,19 @@ def doFullSyncSSH(version=''):
     if copy_status == None:
         writeDbSyncStatus({'code': 2, 'msg': '数据同步本地完成...', 'progress': 40})
 
-    cmd = 'cd /www/server/mdserver-web && python3 plugins/mariadb/index.py get_master_rep_slave_user_cmd {"username":"' + db_user + '","db":""}'
+    cmd = 'cd /www/server/mdserver-web && source bin/activate && python3 plugins/mariadb/index.py get_master_rep_slave_user_cmd {"username":"' + db_user + '","db":""}'
     stdin, stdout, stderr = ssh.exec_command(cmd)
     result = stdout.read()
     result = result.decode('utf-8')
+
+    if result == '':
+        writeDbSyncStatus({'code': 1, 'msg': '同步命令获取失败!', 'progress': 100})
+        return 'fail'
+
     cmd_data = json.loads(result)
 
     db.query('stop slave')
+    db.query('stop all slaves')
     writeDbSyncStatus({'code': 3, 'msg': '停止从库完成...', 'progress': 45})
 
     cmd = cmd_data['data']['cmd']
@@ -2578,43 +2664,12 @@ def doFullSyncSSH(version=''):
         return 'fail'
 
     db.query("start slave")
+    db.query("start all slaves")
     writeDbSyncStatus({'code': 6, 'msg': '从库重启完成...', 'progress': 100})
 
     os.system("rm -rf " + SSH_PRIVATE_KEY)
     os.system("rm -rf /tmp/dump.sql")
     return True
-
-
-def fullSync(version=''):
-    args = getArgs()
-    data = checkArgs(args, ['db', 'begin'])
-    if not data[0]:
-        return data[1]
-
-    status_file = '/tmp/db_async_status.txt'
-    if args['begin'] == '1':
-        cmd = 'cd ' + mw.getRunDir() + ' && python3 ' + \
-            getPluginDir() + \
-            '/index.py do_full_sync {"db":"' + args['db'] + '"} &'
-        print(cmd)
-        mw.execShell(cmd)
-        return json.dumps({'code': 0, 'msg': '同步数据中!', 'progress': 0})
-
-    if os.path.exists(status_file):
-        c = mw.readFile(status_file)
-        tmp = json.loads(c)
-        if tmp['code'] == 1:
-            sys_dump_sql = "/tmp/dump.sql"
-            if os.path.exists(sys_dump_sql):
-                dump_size = os.path.getsize(sys_dump_sql)
-                tmp['msg'] = tmp['msg'] + ":" + "同步文件:" + mw.toSize(dump_size)
-            c = json.dumps(tmp)
-
-        # if tmp['code'] == 6:
-        #     os.remove(status_file)
-        return c
-
-    return json.dumps({'code': 0, 'msg': '点击开始,开始同步!', 'progress': 0})
 
 
 def installPreInspection(version):

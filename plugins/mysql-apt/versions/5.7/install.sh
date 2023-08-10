@@ -35,7 +35,22 @@ if [ "$OSNAME" == "ubuntu" ];then
 	VERSION_ID="18.04"
 fi
 
-SUFFIX_NAME=${MYSQL_VER}-1${OSNAME}${VERSION_ID}_amd64
+ARCH="amd64"
+TMP_ARCH=`arch`
+if [ "$TMP_ARCH" == "x86_64" ];then
+	ARCH="amd64"
+elif [ "$TMP_ARCH" == "aarch64" ];then
+	ARCH="arm64"
+else
+	ARCH="amd64"
+fi
+
+if [ "$ARCH" != "amd64" ];then
+	echo "暂时不支持该${ARCH}" > $install_tmp
+	exit 0
+fi
+
+SUFFIX_NAME=${MYSQL_VER}-1${OSNAME}${VERSION_ID}_${ARCH}
 
 APT_INSTALL()
 {

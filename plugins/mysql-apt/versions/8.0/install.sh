@@ -22,8 +22,25 @@ VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -
 
 # cd /www/server/mdserver-web/plugins/mysql-apt && bash install.sh install 8.0
 
+
+ARCH="amd64"
+TMP_ARCH=`arch`
+if [ "$TMP_ARCH" == "x86_64" ];then
+	ARCH="amd64"
+elif [ "$TMP_ARCH" == "aarch64" ];then
+	ARCH="arm64"
+else
+	ARCH="amd64"
+fi
+
+if [ "$ARCH" != "amd64" ];then
+	echo "暂时不支持该${ARCH}" > $install_tmp
+	exit 1
+fi
+
+
 MYSQL_VER=8.0.30
-SUFFIX_NAME=${MYSQL_VER}-1${OSNAME}${VERSION_ID}_amd64
+SUFFIX_NAME=${MYSQL_VER}-1${OSNAME}${VERSION_ID}_${ARCH}
 
 
 # /lib/systemd/system/mysql.service
@@ -80,7 +97,6 @@ Install_mysql()
 	    groupadd mysql
 		useradd -g mysql mysql
 	fi
-
 
 	isApt=`which apt`
 	if [ "$isApt" != "" ];then

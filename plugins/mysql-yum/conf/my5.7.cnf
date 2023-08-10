@@ -14,6 +14,9 @@ port		= 33206
 socket		= {$SERVER_APP_PATH}/mysql.sock
 datadir = {$SERVER_APP_PATH}/data
 log-error =  {$SERVER_APP_PATH}/data/error.log
+server-id	= {$SERVER_ID}
+sql-mode=NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES
+
 default_storage_engine = InnoDB
 language={$SERVER_APP_PATH}/bin/usr/share/mysql/english
 
@@ -46,7 +49,6 @@ skip-ssl
 
 log-bin=mysql-bin
 binlog_format=mixed
-server-id	= 1
 slow_query_log=1
 slow-query-log-file={$SERVER_APP_PATH}/data/mysql-slow.log
 long_query_time=3
@@ -71,6 +73,9 @@ replicate-ignore-db = information_schema
 replicate-ignore-db = performance_schema
 replicate-ignore-db = mysql
 replicate-ignore-db = test
+
+master_info_repository = table
+relay_log_info_repository = table
 
 default_storage_engine = InnoDB
 innodb_data_home_dir = {$SERVER_APP_PATH}/data
