@@ -531,6 +531,7 @@ end
 
 
 function waf()
+    if server_name =="unset" then ngx.exit(403) end
     min_route()
     -- C:D("min_route")
     
