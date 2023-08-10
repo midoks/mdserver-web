@@ -1103,6 +1103,8 @@ def getLogsList():
     domain = args['site']
     tojs = args['tojs']
 
+    setDefaultSite(domain)
+
     conn = pSqliteDb('logs')
 
     field = 'time,ip,domain,server_name,method,uri,user_agent,rule_name,reason'
