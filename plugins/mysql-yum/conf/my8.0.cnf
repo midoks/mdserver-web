@@ -16,6 +16,9 @@ mysqlx_port = 33260
 socket		= {$SERVER_APP_PATH}/mysql.sock
 datadir = {$SERVER_APP_PATH}/data
 log-error =  {$SERVER_APP_PATH}/data/error.log
+server-id	= {$SERVER_ID}
+sql-mode=NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES
+
 default_storage_engine = InnoDB
 
 key_buffer_size = 8M
@@ -43,7 +46,6 @@ max_allowed_packet = 128M
 
 log-bin=mysql-bin
 binlog_format=mixed
-server-id	= 1
 slow_query_log=1
 slow-query-log-file={$SERVER_APP_PATH}/data/mysql-slow.log
 long_query_time=3

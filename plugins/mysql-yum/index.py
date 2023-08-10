@@ -135,6 +135,9 @@ def contentReplace(content):
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$SERVER_APP_PATH}',
                               service_path + '/' + getPluginName())
+
+    server_id = int(time.time())
+    content = content.replace('{$SERVER_ID}', str(server_id))
     return content
 
 

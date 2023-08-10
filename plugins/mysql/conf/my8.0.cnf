@@ -20,6 +20,7 @@ basedir = {$SERVER_APP_PATH}
 datadir = {$SERVER_APP_PATH}/data
 log-error =  {$SERVER_APP_PATH}/data/error.log
 server-id	= {$SERVER_ID}
+sql-mode=NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES
 
 default_storage_engine = InnoDB
 
