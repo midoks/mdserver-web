@@ -505,7 +505,7 @@ def reload():
     mw.opWeb('stop')
 
     makeOpDstRunLua(True)
-    autoMakeConfig(True, False)
+    autoMakeConfig(True, True)
 
     elog = mw.getServerDir() + "/openresty/nginx/logs/error.log"
     if os.path.exists(elog):
