@@ -122,7 +122,7 @@ end
 
 function _M.initDB(self)
     local path = log_dir .. "/waf.db"
-    db, err = sqlite3.open(path)
+    local db, err = sqlite3.open(path)
 
     if err then
         self:D("initDB err:"..tostring(err))
@@ -371,7 +371,7 @@ function _M.return_html(self, status, html)
 end
 
 function _M.read_file_body(self, filename)
-    fp = io.open(filename, 'r')
+    local fp = io.open(filename, 'r')
     if fp == nil then
         return nil
     end

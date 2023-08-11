@@ -27,6 +27,15 @@
 
 <script type="text/javascript">
 
+function getQueryString(name) {
+    let reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+    let r = window.location.search.substr(1).match(reg);
+    if (r != null) {
+        return decodeURIComponent(r[2]);
+    };
+    return null;
+ }
+
 function ajax(type,bool){
 	var xhr = {};
 	if(typeof(type)=='undefined'){
@@ -135,7 +144,14 @@ var ok = setInterval(function(){
 			if (data['status'] == 0 && data['msg'] == 'ok'){
 				document.getElementById('status').innerHTML = 'ok';
 				setTimeout(function(){
-					location.reload();
+					var f = getQueryString('f');
+					// console.log(f,typeof(f));
+					if (f && f!=''){
+						location.href = f;
+					} else {
+						location.reload();
+					}
+					
 				},500);
 			} else{
 				document.getElementById('change').innerHTML = '?';

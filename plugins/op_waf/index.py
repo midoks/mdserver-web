@@ -101,10 +101,11 @@ def pSqliteDb(dbname='logs'):
     return conn
 
 
-def initDomainInfo():
+def initDomainInfo(conf_reload=False):
     data = []
     path_domains = getJsonPath('domains')
-
+    if not os.path.exists(path_domains) and not conf_reload:
+        return True
     _list = mw.M('sites').field('id,name,path').where(
         'status=?', ('1',)).order('id desc').select()
 
@@ -126,11 +127,15 @@ def initDomainInfo():
     mw.writeFile(path_domains, cjson)
 
 
-def initSiteInfo():
+def initSiteInfo(conf_reload=False):
     data = []
+
+    path_site = getJsonPath('site')
+    if os.path.exists(path_site) and not conf_reload:
+        return True
+
     path_domains = getJsonPath('domains')
     path_config = getJsonPath('config')
-    path_site = getJsonPath('site')
 
     config_contents = mw.readFile(path_config)
     config_contents = json.loads(config_contents)
@@ -140,6 +145,8 @@ def initSiteInfo():
 
     try:
         site_contents = mw.readFile(path_site)
+        if not site_contents:
+            site_contents = "{}"
     except Exception as e:
         site_contents = "{}"
 
@@ -196,10 +203,14 @@ def initSiteInfo():
     mw.writeFile(path_site, cjson)
 
 
-def initTotalInfo():
+def initTotalInfo(conf_reload=False):
     data = []
-    path_domains = getJsonPath('domains')
+
     path_total = getJsonPath('total')
+    if os.path.exists(path_total) or not conf_reload:
+        return True
+
+    path_domains = getJsonPath('domains')
 
     domain_contents = mw.readFile(path_domains)
     domain_contents = json.loads(domain_contents)
@@ -255,6 +266,13 @@ def autoMakeLuaConfSingle(file, conf_reload=False):
         listToLuaFile(dst_path, content)
 
 
+def autoCpImport(file):
+    path = getPluginDir() + "/waf/" + file + ".json"
+    dst_path = getServerDir() + "/waf/" + file + ".json"
+    content = mw.readFile(path)
+    mw.writeFile(dst_path, content)
+
+
 def autoMakeLuaImportSingle(file, conf_reload=False):
     path = getServerDir() + "/waf/" + file + ".json"
     dst_path = getServerDir() + "/waf/conf/waf_" + file + ".lua"
@@ -281,7 +299,7 @@ def autoCpHtml(file):
     mw.writeFile(dst_path, content)
 
 
-def autoMakeLuaConf(conf_reload=False):
+def autoMakeLuaConf(conf_reload=False, cp_reload=False):
     conf_list = ['args', 'cookie', 'ip_black', 'ip_white',
                  'ipv6_black', 'post', 'scan_black', 'url',
                  'url_white', 'user_agent']
@@ -290,11 +308,13 @@ def autoMakeLuaConf(conf_reload=False):
 
     import_list = ['config', 'site', 'domains']
     for x in import_list:
+        if cp_reload:
+            autoCpImport(x)
         autoMakeLuaImportSingle(x, conf_reload)
 
     html_list = ['get', 'post', 'safe_js', 'user_agent', 'cookie', 'other']
     for x in html_list:
-        if conf_reload:
+        if cp_reload:
             autoCpHtml(x)
         autoMakeLuaHtmlSingle(x, conf_reload)
 
@@ -303,30 +323,39 @@ def initDefaultInfo(conf_reload=False):
     path = getServerDir()
     djson = path + "/waf/domains.json"
     default_json = path + "/waf/default.json"
-    if not os.path.exists(djson) or conf_reload:
-        content = mw.readFile(djson)
-        content = json.loads(content)
+    if os.path.exists(djson) and not conf_reload:
+        return True
 
-        ddata = {}
-        dlist = []
-        for i in content:
-            dlist.append(i["name"])
+    content = mw.readFile(djson)
+    content = json.loads(content)
 
-        dlist.append('unset')
-        ddata["list"] = dlist
-        if len(ddata["list"]) < 1:
-            ddata["default"] = "unset"
-        else:
-            ddata["default"] = dlist[0]
+    ddata = {}
+    dlist = []
+    for i in content:
+        dlist.append(i["name"])
 
-        mw.writeFile(default_json, json.dumps(ddata))
+    dlist.append('unset')
+    ddata["list"] = dlist
+    if len(ddata["list"]) < 1:
+        ddata["default"] = "unset"
+    else:
+        ddata["default"] = dlist[0]
+
+    mw.writeFile(default_json, json.dumps(ddata))
 
 
-def autoMakeConfig(conf_reload=False):
+def autoMakeConfig(conf_reload=False, cp_reload=False):
     initDomainInfo(conf_reload)
     initSiteInfo(conf_reload)
     initTotalInfo(conf_reload)
-    autoMakeLuaConf(conf_reload)
+    autoMakeLuaConf(conf_reload, cp_reload)
+    initDefaultInfo(conf_reload)
+
+
+def setConfRestartWeb():
+    autoMakeConfig(True, False)
+    mw.opWeb('stop')
+    mw.opWeb('start')
 
 
 def restartWeb():
@@ -419,7 +448,6 @@ def initDreplace():
     config = path + '/waf/config.json'
     content = mw.readFile(config)
     content = json.loads(content)
-
     content['reqfile_path'] = path + "/waf/html"
     mw.writeFile(config, mw.getJson(content))
 
@@ -432,11 +460,7 @@ def initDreplace():
         content = contentReplace(content)
         mw.writeFile(waf_conf, content)
 
-    initDomainInfo()
-    initSiteInfo()
-    initTotalInfo()
-    autoMakeLuaConf()
-    initDefaultInfo()
+    autoMakeConfig()
 
     pSqliteDb()
 
@@ -481,8 +505,7 @@ def reload():
     mw.opWeb('stop')
 
     makeOpDstRunLua(True)
-    autoMakeLuaConf(True)
-    initDefaultInfo(True)
+    autoMakeConfig(True, False)
 
     elog = mw.getServerDir() + "/openresty/nginx/logs/error.log"
     if os.path.exists(elog):
@@ -538,7 +561,8 @@ def addRule():
 
     cjson = mw.getJson(content)
     mw.writeFile(fpath, cjson)
-    restartWeb()
+
+    setConfRestartWeb()
     return mw.returnJson(True, '设置成功!', content)
 
 
@@ -560,7 +584,8 @@ def removeRule():
 
     cjson = mw.getJson(content)
     mw.writeFile(fpath, cjson)
-    restartWeb()
+
+    setConfRestartWeb()
     return mw.returnJson(True, '设置成功!', content)
 
 
@@ -585,7 +610,8 @@ def setRuleState():
 
     cjson = mw.getJson(content)
     mw.writeFile(fpath, cjson)
-    restartWeb()
+
+    setConfRestartWeb()
     return mw.returnJson(True, '设置成功!', content)
 
 
@@ -616,7 +642,8 @@ def modifyRule():
 
     cjson = mw.getJson(content)
     mw.writeFile(fpath, cjson)
-    restartWeb()
+
+    setConfRestartWeb()
     return mw.returnJson(True, '设置成功!', content)
 
 
@@ -657,7 +684,8 @@ def addSiteRule():
 
     cjson = mw.getJson(content)
     mw.writeFile(path, cjson)
-    restartWeb()
+
+    setConfRestartWeb()
     return mw.returnJson(True, '设置成功!')
 
 
@@ -693,7 +721,7 @@ def addIpWhite():
 
     cjson = mw.getJson(content)
     mw.writeFile(path, cjson)
-    restartWeb()
+    setConfRestartWeb()
     return mw.returnJson(True, '设置成功!')
 
 
@@ -715,7 +743,7 @@ def removeIpWhite():
     cjson = mw.getJson(content)
     mw.writeFile(path, cjson)
 
-    restartWeb()
+    setConfRestartWeb()
     return mw.returnJson(True, '设置成功!')
 
 
@@ -752,7 +780,7 @@ def addIpBlack():
     cjson = mw.getJson(content)
     mw.writeFile(path, cjson)
 
-    restartWeb()
+    setConfRestartWeb()
     return mw.returnJson(True, '设置成功!')
 
 
@@ -774,7 +802,7 @@ def removeIpBlack():
     cjson = mw.getJson(content)
     mw.writeFile(path, cjson)
 
-    restartWeb()
+    setConfRestartWeb()
     return mw.returnJson(True, '设置成功!')
 
 
@@ -793,7 +821,7 @@ def setIpv6Black():
 
     cjson = mw.getJson(content)
     mw.writeFile(path, cjson)
-    restartWeb()
+    setConfRestartWeb()
     return mw.returnJson(True, '设置成功!')
 
 
@@ -813,7 +841,7 @@ def delIpv6Black():
     cjson = mw.getJson(content)
     mw.writeFile(path, cjson)
 
-    restartWeb()
+    setConfRestartWeb()
     return mw.returnJson(True, '设置成功!')
 
 
@@ -837,7 +865,7 @@ def removeSiteRule():
     cjson = mw.getJson(content)
     mw.writeFile(path, cjson)
 
-    restartWeb()
+    setConfRestartWeb()
     return mw.returnJson(True, '设置成功!')
 
 
@@ -858,7 +886,7 @@ def setObjStatus():
     cjson = mw.getJson(cobj)
     mw.writeFile(conf, cjson)
 
-    restartWeb()
+    setConfRestartWeb()
     return mw.returnJson(True, '设置成功!')
 
 
@@ -878,13 +906,13 @@ def setRetry():
     cjson = mw.getJson(cobj)
     mw.writeFile(conf, cjson)
 
-    restartWeb()
+    setConfRestartWeb()
     return mw.returnJson(True, '设置成功!', [])
 
 
 def setSafeVerify():
     args = getArgs()
-    data = checkArgs(args, ['auto', 'time', 'cpu'])
+    data = checkArgs(args, ['auto', 'time', 'cpu', 'mode'])
     if not data[0]:
         return data[1]
 
@@ -894,6 +922,7 @@ def setSafeVerify():
 
     cobj['safe_verify']['time'] = args['time']
     cobj['safe_verify']['cpu'] = int(args['cpu'])
+    cobj['safe_verify']['mode'] = args['mode']
 
     if args['auto'] == '0':
         cobj['safe_verify']['auto'] = False
@@ -903,7 +932,7 @@ def setSafeVerify():
     cjson = mw.getJson(cobj)
     mw.writeFile(conf, cjson)
 
-    restartWeb()
+    setConfRestartWeb()
     return mw.returnJson(True, '设置成功!', [])
 
 
@@ -934,7 +963,7 @@ def setCcConf():
     cjson = mw.getJson(cobj)
     mw.writeFile(conf, cjson)
 
-    restartWeb()
+    setConfRestartWeb()
     return mw.returnJson(True, '设置成功!', [])
 
 
@@ -952,7 +981,7 @@ def saveScanRule():
     cjson = mw.getJson(args)
     mw.writeFile(path, cjson)
 
-    restartWeb()
+    setConfRestartWeb()
     return mw.returnJson(True, '设置成功!', [])
 
 
@@ -1046,7 +1075,7 @@ def addSiteCdnHeader():
     cjson = mw.getJson(content)
     mw.writeFile(path, cjson)
 
-    restartWeb()
+    setConfRestartWeb()
     return mw.returnJson(True, '添加成功!')
 
 
@@ -1067,7 +1096,7 @@ def removeSiteCdnHeader():
     cjson = mw.getJson(content)
     mw.writeFile(path, cjson)
 
-    restartWeb()
+    setConfRestartWeb()
     return mw.returnJson(True, '删除成功!')
 
 
@@ -1193,7 +1222,7 @@ def setObjOpen():
 
     cjson = mw.getJson(cobj)
     mw.writeFile(conf, cjson)
-    restartWeb()
+    setConfRestartWeb()
     return mw.returnJson(True, '设置成功!')
 
 
@@ -1223,7 +1252,7 @@ def setSiteObjOpen():
 
     cjson = mw.getJson(content)
     mw.writeFile(path, cjson)
-    restartWeb()
+    setConfRestartWeb()
     return mw.returnJson(True, '设置成功!')
 
 

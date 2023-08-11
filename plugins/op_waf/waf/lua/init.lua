@@ -358,8 +358,31 @@ local function waf_cc_increase()
         ngx.exit(200)
     end    
 
-    local cc_html = ngx.re.gsub(cc_safe_js_html, "{uri}", make_uri_str)
-    C:return_html(200, cc_html)
+    if not config['safe_verify']['mode'] then return false end
+
+    if config['safe_verify']['mode'] == 'url' then
+        local page = '/safe_verify_'..cache_token
+        local request_uri = params['uri']
+        local to_url = page..'?f='..request_uri
+
+        local cache_url_key = cache_token..':url'
+        local cache_url_val = ngx.shared.waf_limit:get(cache_url_key)
+
+        if page == request_uri then
+            local cc_html = ngx.re.gsub(cc_safe_js_html, "{uri}", make_uri_str)
+            return C:return_html(200, cc_html)
+        end
+
+        if not cache_url_val then
+            ngx.shared.waf_limit:set(cache_url_key, request_uri,30)
+            return ngx.redirect(to_url)
+        end
+    end
+
+    if config['safe_verify']['mode'] == 'local' then
+        local cc_html = ngx.re.gsub(cc_safe_js_html, "{uri}", make_uri_str)
+        C:return_html(200, cc_html)
+    end
 end
 
 

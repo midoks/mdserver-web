@@ -26,7 +26,7 @@ local function waf_timer_stats_total_log(premature)
     WAF_C:timer_stats_total()
 end
 
-local waf_clean_expire_data = function(premature)
+local function waf_clean_expire_data(premature)
     WAF_C:clean_log()
 end
 
