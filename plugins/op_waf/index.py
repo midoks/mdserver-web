@@ -204,9 +204,6 @@ def initTotalInfo(conf_reload=False):
     data = []
 
     path_total = getJsonPath('total')
-    if os.path.exists(path_total) or not conf_reload:
-        return True
-
     path_domains = getJsonPath('domains')
 
     domain_contents = mw.readFile(path_domains)
