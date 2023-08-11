@@ -360,15 +360,16 @@ local function waf_cc_increase()
 
     if not config['safe_verify']['mode'] then return false end
 
+    -- C:D(C:to_json(params['uri_request_args']))
     if config['safe_verify']['mode'] == 'url' then
-        local page = '/safe_verify_'..cache_token
-        local request_uri = params['uri']
-        local to_url = page..'?f='..request_uri
+        local page = 'safe_verify_'..cache_token
+        local request_uri = params['request_uri']
+        local to_url = '/?'..page..'&f='..request_uri
 
         local cache_url_key = cache_token..':url'
         local cache_url_val = ngx.shared.waf_limit:get(cache_url_key)
 
-        if page == request_uri then
+        if params['uri_request_args'][page] then
             local cc_html = ngx.re.gsub(cc_safe_js_html, "{uri}", make_uri_str)
             return C:return_html(200, cc_html)
         end
