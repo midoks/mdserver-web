@@ -36,7 +36,6 @@ Install_App(){
 	fi
 	
 	# which luarocks
-	# if [ "$?" != "0" ];then
 	if [ ! -d $serverPath/op_waf/luarocks ];then
 		cd $serverPath/source/op_waf && tar xvf luarocks-3.5.0.tar.gz
 		# cd luarocks-3.9.1 && ./configure && make bootstrap

@@ -207,7 +207,7 @@ function _M.D(self, msg)
     local _msg = ''
     if type(msg) == 'table' then
         for key, val in pairs(msg) do
-            _msg = tostring( key)..':'.."\n"
+            _msg = tostring(key)..':'.."\n"
         end
     elseif type(msg) == 'string' then
         _msg = msg
