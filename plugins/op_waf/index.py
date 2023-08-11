@@ -319,8 +319,6 @@ def initDefaultInfo(conf_reload=False):
     path = getServerDir()
     djson = path + "/waf/domains.json"
     default_json = path + "/waf/default.json"
-    if os.path.exists(djson) and not conf_reload:
-        return True
 
     content = mw.readFile(djson)
     content = json.loads(content)
