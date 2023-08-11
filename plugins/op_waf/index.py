@@ -131,9 +131,6 @@ def initSiteInfo(conf_reload=False):
     data = []
 
     path_site = getJsonPath('site')
-    if os.path.exists(path_site) and not conf_reload:
-        return True
-
     path_domains = getJsonPath('domains')
     path_config = getJsonPath('config')
 
@@ -287,7 +284,6 @@ def autoMakeLuaHtmlSingle(file, conf_reload=False):
     path = getServerDir() + "/waf/html/" + file + ".html"
     dst_path = getServerDir() + "/waf/html/html_" + file + ".lua"
     if not os.path.exists(dst_path) or conf_reload:
-        # print(path)
         content = mw.readFile(path)
         htmlToLuaFile(dst_path, content)
 
@@ -371,28 +367,28 @@ def makeOpDstRunLua(conf_reload=False):
     path_tpl = getPluginDir()
 
     waf_common_dst = path + "/waf/lua/waf_common.lua"
-    if os.path.exists(waf_common_dst) or conf_reload:
+    if not os.path.exists(waf_common_dst) or conf_reload:
         waf_common_tpl = path_tpl + "/waf/lua/waf_common.lua"
         content = mw.readFile(waf_common_tpl)
         content = contentReplace(content)
         mw.writeFile(waf_common_dst, content)
 
     waf_init_dst = root_init_dir + "/waf_init_preload.lua"
-    if os.path.exists(waf_init_dst) or conf_reload:
+    if not os.path.exists(waf_init_dst) or conf_reload:
         waf_init_tpl = path_tpl + "/waf/lua/init_preload.lua"
         content = mw.readFile(waf_init_tpl)
         content = contentReplace(content)
         mw.writeFile(waf_init_dst, content)
 
     init_worker_dst = root_worker_dir + '/opwaf_init_worker.lua'
-    if os.path.exists(init_worker_dst) or conf_reload:
+    if not os.path.exists(init_worker_dst) or conf_reload:
         init_worker_tpl = path_tpl + "/waf/lua/init_worker.lua"
         content = mw.readFile(init_worker_tpl)
         content = contentReplace(content)
         mw.writeFile(init_worker_dst, content)
 
     access_file_dst = root_access_dir + '/opwaf_init.lua'
-    if os.path.exists(access_file_dst) or conf_reload:
+    if not os.path.exists(access_file_dst) or conf_reload:
         access_file_tpl = path_tpl + "/waf/lua/init.lua"
         content = mw.readFile(access_file_tpl)
         content = contentReplace(content)
@@ -422,9 +418,6 @@ def makeOpDstStopLua():
     wafconf = dstWafConfPath()
     if os.path.exists(wafconf):
         os.remove(wafconf)
-
-    import tool_task
-    tool_task.removeBgTask()
 
     mw.opLuaMakeAll()
     return True
@@ -491,7 +484,12 @@ def start():
 
 
 def stop():
+
     makeOpDstStopLua()
+
+    import tool_task
+    tool_task.removeBgTask()
+
     restartWeb()
     return 'ok'
 
