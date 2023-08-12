@@ -101,7 +101,7 @@ Install_App(){
 	fi
 
 	libmaxminddb_ver='1.7.1'
-	if [ ! -f $serverPath/op_waf/waf/ff.so ];then
+	if [ ! -f $serverPath/op_waf/waf/mmdb/lib/libmaxminddb.a ] && [ ! -f $serverPath/op_waf/waf/mmdb/lib/libmaxminddb.so ];then
 		libmaxminddb_local_path=$serverPath/source/op_waf/libmaxminddb-${libmaxminddb_ver}.tar.gz
 		libmaxminddb_url_path=${HTTP_PREFIX}github.com/maxmind/libmaxminddb/releases/download/${libmaxminddb_ver}/libmaxminddb-${libmaxminddb_ver}.tar.gz
 		if [ ! -f ${libmaxminddb_local_path} ]; then
@@ -112,8 +112,6 @@ Install_App(){
 		cd $serverPath/source/op_waf/libmaxminddb-${libmaxminddb_ver} && \
 		./configure --prefix=$serverPath/op_waf/waf/mmdb && make && make install
 	fi
-
-
 
 	echo "${version}" > $serverPath/op_waf/version.pl
 	echo 'install ok' > $install_tmp
