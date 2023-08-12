@@ -82,6 +82,22 @@ Install_App(){
 		cp -rf ${DEFAULT_DIR}/lsqlite3.so $serverPath/op_waf/waf/conf/lsqlite3.so
 	fi
 
+	cn=$(curl -fsSL -m 10 http://ipinfo.io/json | grep "\"country\": \"CN\"")
+	HTTP_PREFIX="https://"
+	if [ ! -z "$cn" ];then
+	    HTTP_PREFIX="https://ghproxy.com/"
+	fi
+
+	# DL GeoLite Data
+	TAG=2023.08.10
+	if [ ! -f $serverPath/op_waf/GeoLite2-City.mmdb ];then
+		wget --no-check-certificate -O $serverPath/op_waf/GeoLite2-City.mmdb ${HTTP_PREFIX}github.com/P3TERX/GeoLite.mmdb/releases/download/${TAG}/GeoLite2-City.mmdb
+	fi
+
+	if [ ! -f $serverPath/op_waf/GeoLite2-Country.mmdb ];then
+		wget --no-check-certificate -O $serverPath/op_waf/GeoLite2-Country.mmdb ${HTTP_PREFIX}github.com/P3TERX/GeoLite.mmdb/releases/download/${TAG}/GeoLite2-Country.mmdb
+	fi
+
 	echo "${version}" > $serverPath/op_waf/version.pl
 	echo 'install ok' > $install_tmp
 
