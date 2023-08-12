@@ -12,7 +12,7 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
 LIBNAME=solr
-LIBV=2.5.1
+LIBV=2.6.0
 sysName=`uname`
 actionType=$1
 version=$2
