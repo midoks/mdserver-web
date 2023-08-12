@@ -22,7 +22,7 @@ if [ "$version" -lt "73" ];then
 	exit 1
 fi
 
-if [ "$version" -gt "74" ];then
+if [ "$version" -gt "73" ];then
 	LIBV=5.2.3
 fi
 
