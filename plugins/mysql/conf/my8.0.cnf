@@ -72,7 +72,7 @@ log_replica_updates = 1
 # Prevent replication from starting automatically with MySQL
 #skip_replica_start = 1
 #replicate-do-db
-replica_skip_errors=1062
+replica_skip_errors=1062,1396
 replicate-ignore-db = information_schema
 replicate-ignore-db = performance_schema
 replicate-ignore-db = mysql
