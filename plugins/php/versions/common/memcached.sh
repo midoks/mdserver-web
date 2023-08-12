@@ -12,7 +12,7 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
 LIBNAME=memcached
-LIBV=3.1.5
+LIBV=3.2.0
 sysName=`uname`
 actionType=$1
 version=$2
@@ -20,11 +20,6 @@ version=$2
 if [ "$version" -lt "70" ];then
 	LIBV=2.2.0
 fi
-
-if [ "$version" -eq "70" ] || [ "$version" -eq "71" ];then
-	LIBV=3.1.5
-fi
-
 
 LIB_PATH_NAME=lib/php
 if [ -d $serverPath/php/${version}/lib64 ];then
