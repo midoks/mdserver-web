@@ -24,7 +24,7 @@ elif [ "$version" == "70" ];then
 elif [ "$version" == "71" ];then
 	LIBV=4.5.2
 elif [ "$version" -gt "74" ];then
-	LIBV=5.0.1
+	LIBV=5.0.3
 else
 	echo 'other?'
 fi
