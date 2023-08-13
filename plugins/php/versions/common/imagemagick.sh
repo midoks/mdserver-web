@@ -20,7 +20,11 @@ version=$2
 
 if [ "$version" == "53" ];then
 	echo 'not need'
-	exit 1
+	exit 0
+elif [ "$version" == "74" ];then
+	LIBV=3.6.0
+else
+	echo 'ok'
 fi
 
 
