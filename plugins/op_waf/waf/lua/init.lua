@@ -549,11 +549,47 @@ local function waf_cookie()
     return false
 end
 
+local function initmaxminddb()
+    if geo ==nil then 
+        maxminddb ,geo = pcall(function() return  require 'waf_maxminddb' end)
+        if not maxminddb then
+            return nil
+        end
+    end
+    if type(geo)=='number' then return nil end
+    local ok2,data=pcall(function()
+        if not geo.initted() then
+            geo.init("{$WAF_ROOT}/GeoLite2-City.mmdb")
+        end
+    end )
+    if not ok2 then
+        geo=nil
+    end
+end 
+
+
+
+local function  get_ip_Country()
+    initmaxminddb()
+    if type(geo)=='number' then return "21" end
+    if geo==nil then return "22" end 
+    if geo.lookup==nil then return "23" end 
+    local res,err=geo.lookup(param['ip'] or ngx.var.remote_addr)
+    if not res then
+            return "2"
+    else
+        return res
+    end
+end
+
 
 function waf()
     if server_name == "unset" then ngx.exit(403) end
     min_route()
     -- C:D("min_route")
+
+    overcon = get_ip_Country()
+    C:D(tostring(overcon))
     
     if site_config[server_name] and site_config[server_name]['open'] then
         -- white ip

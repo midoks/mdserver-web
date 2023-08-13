@@ -117,7 +117,7 @@ Install_App(){
 	echo 'install ok' > $install_tmp
 
 	cd ${rootPath} && python3 ${rootPath}/plugins/op_waf/index.py start
-	# cd ${rootPath} && python3 ${rootPath}/plugins/op_waf/index.py restart
+	echo "cd ${rootPath} && python3 ${rootPath}/plugins/op_waf/index.py start"
 }
 
 Uninstall_App(){

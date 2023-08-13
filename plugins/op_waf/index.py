@@ -104,8 +104,6 @@ def pSqliteDb(dbname='logs'):
 def initDomainInfo(conf_reload=False):
     data = []
     path_domains = getJsonPath('domains')
-    if not os.path.exists(path_domains) and not conf_reload:
-        return True
     _list = mw.M('sites').field('id,name,path').where(
         'status=?', ('1',)).order('id desc').select()
 
@@ -301,8 +299,6 @@ def autoMakeLuaConf(conf_reload=False, cp_reload=False):
 
     import_list = ['config', 'site', 'domains']
     for x in import_list:
-        if cp_reload:
-            autoCpImport(x)
         autoMakeLuaImportSingle(x, conf_reload)
 
     html_list = ['get', 'post', 'safe_js', 'user_agent', 'cookie', 'other']
@@ -314,10 +310,12 @@ def autoMakeLuaConf(conf_reload=False, cp_reload=False):
 
 def initDefaultInfo(conf_reload=False):
     path = getServerDir()
-    djson = path + "/waf/domains.json"
-    default_json = path + "/waf/default.json"
-
-    content = mw.readFile(djson)
+    dst_path = path + "/waf/default.pl"
+    default_site = ''
+    if os.path.exists(dst_path):
+        return True
+    source_path = path + "/waf/domains.json"
+    content = mw.readFile(source_path)
     content = json.loads(content)
 
     ddata = {}
@@ -328,11 +326,43 @@ def initDefaultInfo(conf_reload=False):
     dlist.append('unset')
     ddata["list"] = dlist
     if len(ddata["list"]) < 1:
-        ddata["default"] = "unset"
+        default_site = "unset"
     else:
-        ddata["default"] = dlist[0]
+        default_site = dlist[0]
 
-    mw.writeFile(default_json, json.dumps(ddata))
+    mw.writeFile(dst_path, default_site)
+
+
+def getSiteListData():
+    path = getServerDir()
+    source_path = path + "/waf/domains.json"
+    dst_path = path + "/waf/default.pl"
+
+    content = mw.readFile(source_path)
+    content = json.loads(content)
+    dlist = []
+    for i in content:
+        dlist.append(i["name"])
+    dlist.append('unset')
+
+    default_site = mw.readFile(dst_path)
+
+    data = {}
+    data['list'] = dlist
+    data['default'] = default_site
+    return data
+
+
+def setDefaultSite(name):
+    path = getServerDir()
+    dst_path = path + "/waf/default.pl"
+    mw.writeFile(dst_path, name)
+    return mw.returnJson(True, 'OK')
+
+
+def getDefaultSite():
+    data = getSiteListData()
+    return mw.returnJson(True, 'OK', data)
 
 
 def autoMakeConfig(conf_reload=False, cp_reload=False):
@@ -385,9 +415,18 @@ def makeOpDstRunLua(conf_reload=False):
     access_file_dst = root_access_dir + '/opwaf_init.lua'
     if not os.path.exists(access_file_dst) or conf_reload:
         access_file_tpl = path_tpl + "/waf/lua/init.lua"
+        access_file_dst_s = path + "/waf/lua/init.lua"
         content = mw.readFile(access_file_tpl)
         content = contentReplace(content)
         mw.writeFile(access_file_dst, content)
+        mw.writeFile(access_file_dst_s, content)
+
+    waf_mmdb_dst = path + "/waf/lua/waf_maxminddb.lua"
+    if not os.path.exists(waf_mmdb_dst) or conf_reload:
+        waf_mmdb_tpl = path_tpl + "/waf/lua/waf_maxminddb.lua"
+        content = mw.readFile(waf_mmdb_tpl)
+        content = contentReplace(content)
+        mw.writeFile(waf_mmdb_dst, content)
 
     mw.opLuaMakeAll()
     return True
@@ -498,7 +537,7 @@ def reload():
     mw.opWeb('stop')
 
     makeOpDstRunLua(True)
-    autoMakeConfig(True, False)
+    autoMakeConfig(True, True)
 
     elog = mw.getServerDir() + "/openresty/nginx/logs/error.log"
     if os.path.exists(elog):
@@ -1012,26 +1051,6 @@ def getSiteConfig():
 
     content = mw.getJson(content)
     return mw.returnJson(True, 'ok!', content)
-
-
-def getSiteListData():
-    path = getServerDir() + "/waf/default.json"
-    data = mw.readFile(path)
-    return json.loads(data)
-
-
-def setDefaultSite(name):
-    path = getServerDir() + "/waf/default.json"
-    data = mw.readFile(path)
-    data = json.loads(data)
-    data['default'] = name
-    mw.writeFile(path, json.dumps(data))
-    return mw.returnJson(True, 'OK')
-
-
-def getDefaultSite():
-    data = getSiteListData()
-    return mw.returnJson(True, 'OK', data)
 
 
 def getSiteConfigByName():
