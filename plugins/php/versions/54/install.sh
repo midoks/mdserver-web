@@ -90,7 +90,7 @@ fi
 # ----- cpu end ------
 
 if [ "${SYS_ARCH}" == "aarch64" ];then
-	$OPTIONS="$OPTIONS --build=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu"	
+	$OPTIONS="$OPTIONS --build=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu"
 fi
 
 if [ ! -d $serverPath/php/${PHP_VER} ];then
