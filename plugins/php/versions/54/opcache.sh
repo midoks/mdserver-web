@@ -10,7 +10,7 @@ rootPath=$(dirname "$rootPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
-
+SYS_ARCH=`arch`
 LIBNAME=opcache
 LIBV=7.0.5
 sysName=`uname`
@@ -39,12 +39,19 @@ Install_lib()
 		php_lib=$sourcePath/php_lib
 		mkdir -p $php_lib
 
-		wget -O $php_lib/zendopcache-7.0.5.tgz http://pecl.php.net/get/zendopcache-7.0.5.tgz
+		if [ ! -d  $php_lib/zendopcache-7.0.5 ];then
+			wget -O $php_lib/zendopcache-7.0.5.tgz http://pecl.php.net/get/zendopcache-7.0.5.tgz
+			cd $php_lib && tar xvf zendopcache-7.0.5.tgz
+		fi
+		cd $php_lib/zendopcache-7.0.5
 
-		cd $php_lib && tar xvf zendopcache-7.0.5.tgz
-		cd zendopcache-7.0.5
+		OPTIONS=''
+		if [ "${SYS_ARCH}" == "aarch64" ] && [ "$version" -lt "56" ];then
+			OPTIONS="$OPTIONS --build=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu"
+		fi
+
 		$serverPath/php/$version/bin/phpize
-		./configure --with-php-config=$serverPath/php/$version/bin/php-config
+		./configure --with-php-config=$serverPath/php/$version/bin/php-config $OPTIONS
 		make && make install && make clean
 
 		# cp modules/opcache.la $serverPath/php/${version}/lib/php/extensions/no-debug-non-zts-20100525/

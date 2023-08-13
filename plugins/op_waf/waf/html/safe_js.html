@@ -19,13 +19,22 @@
 	<div class="main">
 		<div class="title">OP网站防火墙|安全校验</div>
 		<div class="content">
-			<p id="change">5</p>
+			<p id="change">3</p>
 		</div>
 		<div id="status" style="display: none;">false</div>
 	</div>
 </body>
 
 <script type="text/javascript">
+
+function getQueryString(name) {
+    let reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+    let r = window.location.search.substr(1).match(reg);
+    if (r != null) {
+        return decodeURIComponent(r[2]);
+    };
+    return null;
+ }
 
 function ajax(type,bool){
 	var xhr = {};
@@ -125,22 +134,29 @@ function ajax(type,bool){
 	return xhr;
 }
 
-ajax('JSON',true).post('{uri}',{'pass':"ok"}, function(data){
-	if (data['status'] == 0){
-		document.getElementById('status').innerHTML = 'ok';
-		location.reload();
-	}
-});
 
 var ok = setInterval(function(){
 	var id = document.getElementById('change').innerHTML;
 	id = id - 1;
 	if (id == 0){
-		document.getElementById('change').innerHTML = '稍等';
 		clearInterval(ok);
-		if (document.getElementById('status').innerHTML == 'ok'){
-			location.reload();
-		}
+		ajax('JSON',true).post('{uri}',{'pass':"ok"}, function(data){
+			if (data['status'] == 0 && data['msg'] == 'ok'){
+				document.getElementById('status').innerHTML = 'ok';
+				setTimeout(function(){
+					var f = getQueryString('f');
+					// console.log(f,typeof(f));
+					if (f && f!=''){
+						location.href = f;
+					} else {
+						location.reload();
+					}
+					
+				},500);
+			} else{
+				document.getElementById('change').innerHTML = '?';
+			}
+		});
 	} else {
 		document.getElementById('change').innerHTML = id;
 	}

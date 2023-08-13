@@ -35,10 +35,8 @@ local cookie_rules = require "rule_cookie"
 local url_rules = require "rule_url"
 local url_white_rules = require "rule_url_white"
 
-
 -- local server_name = string.gsub(C:get_sn(config_domains),'_','.')
 local server_name = C:get_sn(config_domains)
-
 local function initParams()
     local data = {}
     data['server_name'] = server_name
@@ -53,10 +51,12 @@ local function initParams()
     data['user_agent'] = data['request_header']['user-agent']
     data['cookie'] = ngx.var.http_cookie
     data['time'] = ngx.time()
+
     return data
 end
 
 local params = initParams()
+-- C:D(C:to_json(params))
 C:setParams(params)
 
 local cpu_percent = ngx.shared.waf_limit:get("cpu_usage")
@@ -343,6 +343,7 @@ local function waf_cc_increase()
     local make_uri_str = "?token="..make_token
     local make_uri = "/"..make_uri_str
 
+    -- C:D("token:"..tostring(params['uri_request_args']['token']))
     if params['uri_request_args']['token'] then
         ngx.header.content_type = "application/json"
         local args_token = params['uri_request_args']['token']
@@ -352,18 +353,37 @@ local function waf_cc_increase()
             ngx.say(json.encode(data))
             ngx.exit(200)
         end
-
-        -- C:D("debug[args]:"..tostring(params['uri_request_args']['debug']))
-        -- if params['uri_request_args']['debug'] == 'ok' then
-        --     ngx.header.content_type = "application/json"
-        --     local data = get_return_state(0, "ok")
-        --     ngx.say(json.encode(data))
-        --     ngx.exit(200)
-        -- end
+        local data = get_return_state(0, "unset")
+        ngx.say(json.encode(data))
+        ngx.exit(200)
     end    
 
-    local cc_html = ngx.re.gsub(cc_safe_js_html, "{uri}", make_uri_str)
-    C:return_html(200, cc_html)
+    if not config['safe_verify']['mode'] then return false end
+
+    -- C:D(C:to_json(params['uri_request_args']))
+    if config['safe_verify']['mode'] == 'url' then
+        local page = 'safe_verify_'..cache_token
+        local request_uri = params['request_uri']
+        local to_url = '/?'..page..'&f='..request_uri
+
+        local cache_url_key = cache_token..':url'
+        local cache_url_val = ngx.shared.waf_limit:get(cache_url_key)
+
+        if params['uri_request_args'][page] then
+            local cc_html = ngx.re.gsub(cc_safe_js_html, "{uri}", make_uri_str)
+            return C:return_html(200, cc_html)
+        end
+
+        if not cache_url_val then
+            ngx.shared.waf_limit:set(cache_url_key, request_uri,30)
+            return ngx.redirect(to_url)
+        end
+    end
+
+    if config['safe_verify']['mode'] == 'local' then
+        local cc_html = ngx.re.gsub(cc_safe_js_html, "{uri}", make_uri_str)
+        C:return_html(200, cc_html)
+    end
 end
 
 
@@ -531,6 +551,7 @@ end
 
 
 function waf()
+    if server_name == "unset" then ngx.exit(403) end
     min_route()
     -- C:D("min_route")
     

@@ -11,7 +11,7 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
 
-# support 52-74
+# support 55-74
 
 LIBNAME=ioncube
 LIBV=0
@@ -21,7 +21,7 @@ version=$2
 IC_VERSION=${version:0:1}.${version:1:2}
 ARCH=`uname -m`
 
-if [ "$version" -gt "74" ];then
+if [ "$version" -gt "55" ];then
 	echo "not need"
 	exit 1
 fi

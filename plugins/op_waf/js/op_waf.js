@@ -227,7 +227,7 @@ function setRetry(retry_cycle, retry, retry_time, siteName) {
 
 
 //设置safe_verify规则
-function setSafeVerify(auto, cpu, time, siteName) {
+function setSafeVerify(auto, cpu, time, mode,siteName) {
     var svlayer = layer.open({
         type: 1,
         title: "设置强制安全验证",
@@ -241,7 +241,18 @@ function setSafeVerify(auto, cpu, time, siteName) {
                 </div>\
                 <div class="line">\
                     <span class="tname">通行时间</span>\
-                    <div class="info-r"><input class="bt-input-text" name="time" type="number" value="'+ time + '" /> 秒</div>\
+                    <div class="info-r">\
+                        <input class="bt-input-text" name="time" type="number" value="'+ time + '" /> 秒\
+                    </div>\
+                </div>\
+                <div class="line">\
+                    <span class="tname">验证模式</span>\
+                    <div class="info-r">\
+                        <select class="bt-input-text mr5" style="width:200px" name="mode">\
+                        <option value="url" '+(mode=='url'?"selected=selected":"")+'>URL跳转验证</option>\
+                        <option value="local" '+(mode=='local'?"selected=selected":"")+'>本地验证</option>\
+                        </select>\
+                    </div>\
                 </div>\
                 <div class="line">\
                     <span class="tname">开启自动</span>\
@@ -249,8 +260,8 @@ function setSafeVerify(auto, cpu, time, siteName) {
                         <select class="bt-input-text mr5" style="width:80px" name="auto">\
                         <option value="0" '+(auto==false?"selected=selected":"")+'>关闭</option>\
                         <option value="1" '+(auto==true?"selected=selected":"")+'>开启</option>\
-                    </select>\
-                </div>\
+                        </select>\
+                    </div>\
                 </div>\
                 <ul class="help-info-text c7 ptb10">\
                     <li><font style="color:red;">全局设置强制安全验证</font></li>\
@@ -266,6 +277,7 @@ function setSafeVerify(auto, cpu, time, siteName) {
                     siteName: siteName,
                     cpu: $("input[name='cpu']").val(),
                     auto: $("select[name='auto']").val(),
+                    mode: $("select[name='mode']").val(),
                     time: $("input[name='time']").val(),
                 }
                 var act = 'set_safe_verify';
@@ -459,7 +471,7 @@ function scanRule() {
         var tmp = $.parseJSON(data.data);
         var rdata = $.parseJSON(tmp.data);
 
-        create_l = layer.open({
+        create_l = ({
             type: 1,
             title: "常用扫描器过滤规则",
             area: '650px',
@@ -1036,7 +1048,7 @@ function wafGloabl(){
                             <input class="btswitch btswitch-ios" id="close_safe_verify" type="checkbox" '+(rdata.safe_verify.open ? 'checked' : '')+'>\
                             <label class="btswitch-btn" for="close_safe_verify" onclick="setObjOpen(\'safe_verify\')"></label></div>\
                         </td>\
-                        <td class="text-right"><a class="btlink" onclick="setSafeVerify('+ rdata.safe_verify.auto + ',' + rdata.safe_verify.cpu + ',' + rdata.safe_verify.time + ')">设置</a> | <a class="btlink" href="javascript:;" onclick="onlineEditFile(0,\''+rdata['reqfile_path']+'/safe_js.html\')">响应内容</a></td>\
+                        <td class="text-right"><a class="btlink" onclick="setSafeVerify('+ rdata.safe_verify.auto + ',' + rdata.safe_verify.cpu + ',' + rdata.safe_verify.time + ',\'' + rdata.safe_verify.mode + '\')">设置</a> | <a class="btlink" href="javascript:;" onclick="onlineEditFile(0,\''+rdata['reqfile_path']+'/safe_js.html\')">响应内容</a></td>\
                     </tr>\
                     <tr>\
                         <td>GET-URI过滤</td>\

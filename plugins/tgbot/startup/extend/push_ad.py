@@ -45,6 +45,7 @@ def send_msg(bot, tag='ad', trigger_time=300):
     # 高价收量 👑 集团收量 ❤️ 流量变现/支付宝代付 ❤️ 微信代付/实名认证/过人脸🕵️‍♀️各种账号处理✅ ｜ 28/m
     # https://zhaoziyuan.la/ | web | 15/m | 2m | next,7/15
     # 腾云机场 ｜9/m
+    # 🚀鲲鹏VPN | 13/m
     keyboard = [
         [
             types.InlineKeyboardButton(
@@ -52,7 +53,7 @@ def send_msg(bot, tag='ad', trigger_time=300):
         ],
         [
             types.InlineKeyboardButton(
-                text="🚀腾云机场|解锁流媒体和ChatGPT", url='https://www.tencloud.net/#/register?code=OGvXSTsc')
+                text="🚀腾云机场|解锁流媒体和ChatGPT", url='https://www.tencloud.net/index.php#/register?code=OGvXSTsc')
         ],
         [
             types.InlineKeyboardButton(

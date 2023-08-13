@@ -10,9 +10,9 @@ rootPath=$(dirname "$rootPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
-
+SYS_ARCH=`arch`
 LIBNAME=memcached
-LIBV=3.1.5
+LIBV=3.2.0
 sysName=`uname`
 actionType=$1
 version=$2
@@ -20,11 +20,6 @@ version=$2
 if [ "$version" -lt "70" ];then
 	LIBV=2.2.0
 fi
-
-if [ "$version" -eq "70" ] || [ "$version" -eq "71" ];then
-	LIBV=3.1.5
-fi
-
 
 LIB_PATH_NAME=lib/php
 if [ -d $serverPath/php/${version}/lib64 ];then
@@ -60,10 +55,16 @@ Install_lib()
 		fi 
 		cd $php_lib/${LIBNAME}-${LIBV}
 
+		OPTIONS=""
+		if [ "${SYS_ARCH}" == "aarch64" ] && [ "$version" -lt "56" ];then
+			OPTIONS="$OPTIONS --build=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu"
+		fi
+
 		# sed -i '_bak' "3237,3238s#ulong#zend_ulong#g" $php_lib/${LIBNAME}-${LIBV}/php_memcached.c
 		$serverPath/php/$version/bin/phpize
 	
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
+		$OPTIONS \
 		--enable-memcached \
 		--disable-memcached-sasl
 		make clean && make && make install && make clean

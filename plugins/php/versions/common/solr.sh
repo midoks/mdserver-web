@@ -10,14 +10,14 @@ rootPath=$(dirname "$rootPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
-
+SYS_ARCH=`arch`
 LIBNAME=solr
-LIBV=2.5.1
+LIBV=2.6.0
 sysName=`uname`
 actionType=$1
 version=$2
 
-if [ "$version" -lt "70" ];then
+if [ "$version" -lt "72" ];then
 	LIBV=2.4.0
 fi
 
@@ -57,8 +57,12 @@ Install_lib()
 			wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
 			cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
 		fi
-		
 		cd  $php_lib/${LIBNAME}-${LIBV}
+
+		if [ "${SYS_ARCH}" == "aarch64" ] && [ "$version" -lt "56" ];then
+			OPTIONS="$OPTIONS --build=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu"
+		fi
+
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config $OPTIONS
 		make clean && make && make install && make clean

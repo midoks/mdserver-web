@@ -122,7 +122,7 @@ end
 
 function _M.initDB(self)
     local path = log_dir .. "/waf.db"
-    db, err = sqlite3.open(path)
+    local db, err = sqlite3.open(path)
 
     if err then
         self:D("initDB err:"..tostring(err))
@@ -207,7 +207,7 @@ function _M.D(self, msg)
     local _msg = ''
     if type(msg) == 'table' then
         for key, val in pairs(msg) do
-            _msg = tostring( key)..':'.."\n"
+            _msg = tostring(key)..':'.."\n"
         end
     elseif type(msg) == 'string' then
         _msg = msg
@@ -360,7 +360,9 @@ end
 
 function _M.return_html(self, status, html)
     ngx.header.content_type = "text/html"
+    ngx.header.Cache_Control = "no-cache"
     status = tonumber(status)
+
     -- self:D("return_html:"..tostring(status))
     if status == 200 then
         ngx.say(html)
@@ -369,7 +371,7 @@ function _M.return_html(self, status, html)
 end
 
 function _M.read_file_body(self, filename)
-    fp = io.open(filename, 'r')
+    local fp = io.open(filename, 'r')
     if fp == nil then
         return nil
     end

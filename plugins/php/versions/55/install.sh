@@ -9,7 +9,7 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source
 sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
-
+SYS_ARCH=`arch`
 version=5.5.38
 PHP_VER=55
 Install_php()
@@ -87,6 +87,12 @@ else
 	cpuCore="1"
 fi
 # ----- cpu end ------
+
+if [ "${SYS_ARCH}" == "aarch64" ];then
+	# 修复aarch64架构下安装
+	# /www/server/mdserver-web/plugins/php/versions/56/src/zend_multiply.h > /www/server/source/php/php56/Zend/zend_multiply.h
+	cat ${curPath}/versions/${PHP_VER}/src/zend_multiply.h > $sourcePath/php/php${PHP_VER}/Zend/zend_multiply.h
+fi
 
 if [ ! -d $serverPath/php/55  ];then
 	cd $sourcePath/php/php${PHP_VER} && ./configure \

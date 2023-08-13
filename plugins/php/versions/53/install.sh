@@ -9,8 +9,7 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source
 sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
-
-
+SYS_ARCH=`arch`
 
 version=5.3.29
 PHP_VER=53
@@ -96,6 +95,10 @@ else
 	cpuCore="1"
 fi
 # ----- cpu end ------
+
+if [ "${SYS_ARCH}" == "aarch64" ];then
+	OPTIONS="$OPTIONS --build=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu"
+fi
 
 if [ ! -d $serverPath/php/53/bin ];then
 	cd $sourcePath/php/php${PHP_VER} && ./configure \

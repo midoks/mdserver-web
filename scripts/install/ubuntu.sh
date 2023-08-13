@@ -122,6 +122,7 @@ if [ ! -d /usr/include/curl ];then
 	if [ -f /usr/include/x86_64-linux-gnu/curl ];then
 		ln -s /usr/include/x86_64-linux-gnu/curl /usr/include/curl
 	else
+		# ln -s /usr/include/aarch64-linux-gnu/curl /usr/include/curl
 		ln -s /usr/include/${SYS_ARCH}-linux-gnu/curl /usr/include/curl
 	fi 
 fi

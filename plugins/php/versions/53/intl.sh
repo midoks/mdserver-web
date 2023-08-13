@@ -10,7 +10,7 @@ rootPath=$(dirname "$rootPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
-
+SYS_ARCH=`arch`
 LIBNAME=intl
 LIBV=3.0.0
 sysName=`uname`
@@ -41,13 +41,20 @@ Install_lib()
 		mkdir -p $php_lib
 
 		cd ${rootPath}/plugins/php/lib && /bin/bash icu.sh
+		if [ -d $php_lib/${LIBNAME}-${LIBV} ];then
+			wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
+			cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
+		fi
+		cd $php_lib/${LIBNAME}-${LIBV}
 
-		wget -O $php_lib/${LIBNAME}-${LIBV}.tgz http://pecl.php.net/get/${LIBNAME}-${LIBV}.tgz
+		OPTIONS=''
+		if [ "${SYS_ARCH}" == "aarch64" ];then
+			OPTIONS="$OPTIONS --build=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu"
+		fi
 
-		cd $php_lib && tar xvf ${LIBNAME}-${LIBV}.tgz
-		cd ${LIBNAME}-${LIBV}
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
+		$OPTIONS \
 		--with-icu-dir=${serverPath}/lib/icu
 
 		make && make install && make clean

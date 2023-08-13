@@ -9,8 +9,7 @@ serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source
 sysName=`uname`
 install_tmp=${rootPath}/tmp/mw_install.pl
-
-
+SYS_ARCH=`arch`
 
 version=5.2.17
 PHP_VER=52
@@ -99,6 +98,10 @@ fi
 IS_64BIT=`getconf LONG_BIT`
 if [ "$IS_64BIT" == "64" ];then
 	OPTIONS="${OPTIONS} --with-libdir=lib64"
+fi
+
+if [ "${SYS_ARCH}" == "aarch64" ];then
+	OPTIONS="$OPTIONS --build=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu"
 fi
 
 
