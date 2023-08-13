@@ -66,7 +66,7 @@ def send_msg(bot, tag='ad', trigger_time=300):
         ],
         [
             types.InlineKeyboardButton(
-                text="🚀鲲鹏VPN，解锁流媒体和chatGPT", url='https://down.xbjc888.top/?agent_code=github')
+                text="❤️干净卫生|就是看片", url='https://www.zzzkan.com/?f=tg')
         ],
         [
             types.InlineKeyboardButton(
