@@ -49,7 +49,7 @@
 	long __tmpvar; 													\
 	__asm__("smull %0, %1, %2, %3\n"								\
 		"sub %1, %1, %0, asr #31"									\
-			: "=r"(__tmpvar), "=r"(usedval)							\
+			: "=&r"(__tmpvar), "=&r"(usedval)							\
 			: "r"(a), "r"(b));										\
 	if (usedval) (dval) = (double) (a) * (double) (b);				\
 	else (lval) = __tmpvar;											\
