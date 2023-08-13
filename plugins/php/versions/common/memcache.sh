@@ -64,7 +64,9 @@ Install_lib()
 		fi
 
 		$serverPath/php/$version/bin/phpize
-		./configure --with-php-config=$serverPath/php/$version/bin/php-config --enable-memcache --with-zlib-dir
+		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
+		$OPTIONS \
+		--enable-memcache --with-zlib-dir
 		make clean && make && make install && make clean
 
 	fi
