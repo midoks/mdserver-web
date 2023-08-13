@@ -40,7 +40,7 @@ cd $DIR
 PHP_VER_LIST=(53 54 55 56 70 71 72 73 74 80 81 82)
 # yar
 PHP_EXT_LIST=(ioncube ZendGuardLoader pdo mysqlnd sqlite3 openssl pcntl opcache mcrypt fileinfo \
-	exif gd intl memcache memcached redis imagemagick xdebug xhprof \
+	exif gd intl memcache memcached redis imagemagick xdebug \
 	swoole yac apc mongo mongodb solr seaslog mbstring iconv)
 
 for PHP_VER in ${PHP_VER_LIST[@]}; do
