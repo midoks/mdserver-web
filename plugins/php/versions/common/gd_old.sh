@@ -10,12 +10,13 @@ rootPath=$(dirname "$rootPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
-
+SYS_ARCH=`arch`
 actionType=$1
 version=$2
 
 LIBNAME=gd
 LIBV=0
+
 
 
 # if [ "$version" -lt "74" ];then
@@ -67,10 +68,16 @@ Install_lib()
 		
 		$serverPath/php/$version/bin/phpize
 
+		OPTIONS=""
+		if [ "${SYS_ARCH}" == "aarch64" ] && [ "$version" -lt "56" ];then
+			OPTIONS="$OPTIONS --build=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu"
+		fi
+
 		#--with-xpm
 		# =${serverPath}/lib/freetype_old
 		# =/usr/lib
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
+		$OPTIONS \
 		--with-gd \
 		--with-jpeg-dir \
 		--with-freetype-dir=${serverPath}/lib/freetype_old \
