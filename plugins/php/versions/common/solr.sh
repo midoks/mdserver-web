@@ -17,7 +17,7 @@ sysName=`uname`
 actionType=$1
 version=$2
 
-if [ "$version" -lt "71" ];then
+if [ "$version" -lt "72" ];then
 	LIBV=2.4.0
 fi
 
