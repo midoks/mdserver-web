@@ -10,7 +10,7 @@ rootPath=$(dirname "$rootPath")
 rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 sourcePath=${serverPath}/source/php
-
+SYS_ARCH=`arch`
 actionType=$1
 version=$2
 
@@ -63,9 +63,15 @@ Install_lib()
 			tar xvf ${LIBNAME}-${LIBV}.tgz
 		fi
 		cd $php_lib/${LIBNAME}-${LIBV}
+
+		OPTIONS=""
+		if [ "${SYS_ARCH}" == "aarch64" ] && [ "$version" -lt "56" ];then
+			OPTIONS="$OPTIONS --build=aarch64-unknown-linux-gnu --host=aarch64-unknown-linux-gnu"
+		fi
 		
 		$serverPath/php/$version/bin/phpize
 		./configure --with-php-config=$serverPath/php/$version/bin/php-config \
+		$OPTIONS \
 		--enable-openssl \
 		--with-openssl-dir=$serverPath/lib/openssl \
 		--enable-sockets
