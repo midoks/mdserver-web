@@ -102,6 +102,7 @@ docker run -itd --name mw-server --privileged=true -p 7200:7200 -p 80:80 -p 443:
 ### 版本更新 0.15.4
 
 * OP防火墙-验证优化。
+* 在aarch64架构下低于PHP70的版本[安装/扩展安装]优化。
 
 ### JSDelivr安装地址
 
