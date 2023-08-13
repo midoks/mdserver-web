@@ -553,28 +553,39 @@ local function initmaxminddb()
     if geo ==nil then 
         maxminddb ,geo = pcall(function() return  require 'waf_maxminddb' end)
         if not maxminddb then
+            C:D("debug error on :"..tostring(geo))
             return nil
         end
     end
+    C:D("----1-----")
     if type(geo)=='number' then return nil end
     local ok2,data=pcall(function()
         if not geo.initted() then
+            C:D("----2--ok---")
             geo.init("{$WAF_ROOT}/GeoLite2-City.mmdb")
         end
     end )
+
+    C:D("----3-----"..tostring(ok2))
     if not ok2 then
         geo=nil
     end
 end 
 
 
+local geo=nil 
+local waf_country=""
+local geo2=nil 
 
 local function  get_ip_Country()
     initmaxminddb()
+    C:D("----ip-----"..params['ip'])
     if type(geo)=='number' then return "21" end
     if geo==nil then return "22" end 
     if geo.lookup==nil then return "23" end 
-    local res,err=geo.lookup(param['ip'] or ngx.var.remote_addr)
+    
+    -- local res,err=geo.lookup(param['ip'] or ngx.var.remote_addr)
+    local res,err=geo.lookup("182.96.210.214")
     if not res then
             return "2"
     else
@@ -588,8 +599,8 @@ function waf()
     min_route()
     -- C:D("min_route")
 
-    overcon = get_ip_Country()
-    C:D(tostring(overcon))
+    waf_country = get_ip_Country()
+    C:D(tostring(waf_country))
     
     if site_config[server_name] and site_config[server_name]['open'] then
         -- white ip

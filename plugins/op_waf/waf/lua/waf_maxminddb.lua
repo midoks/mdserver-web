@@ -2,14 +2,14 @@
 	a lua interface (build with luajit ffi) for  maxminddb to get country code from ip address
 ]]
 
-local 	json				= 	require('cjson');  
-local	json_encode			=	json.encode
-local	json_decode			=	json.decode
-local	ht_print			=	ngx.print
-local   ngx_log         	=   ngx.log
-local   ngx_ERR         	=   ngx.ERR
-local   ngx_CRIT			=   ngx.CRIT
-local   ngx_INFO			=   ngx.INFO
+local json				= 	require('cjson');  
+local json_encode	    =	json.encode
+local json_decode		=	json.decode
+local ht_print			=	ngx.print
+local ngx_log         	=   ngx.log
+local ngx_ERR         	=   ngx.ERR
+local ngx_CRIT			=   ngx.CRIT
+local ngx_INFO			=   ngx.INFO
 
 local ngx_sub				=	ngx.re.sub;
 local ngx_gsub				=	ngx.re.gsub;
@@ -134,7 +134,7 @@ local MMDB_DATA_TYPE_BYTES		=	4
 
 
 -- you should install the libmaxminddb to your system
-local maxm 	= ffi.load('libmaxminddb.so')
+local maxm 	= ffi.load('{$WAF_ROOT}/mmdb/lib/libmaxminddb.so')
 --https://github.com/maxmind/libmaxminddb
 
 
