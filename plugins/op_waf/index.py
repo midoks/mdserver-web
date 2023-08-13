@@ -245,6 +245,12 @@ def contentReplace(content):
     content = content.replace('{$SERVER_PATH}', service_path)
     content = content.replace('{$WAF_PATH}', waf_path)
     content = content.replace('{$WAF_ROOT}', waf_root)
+
+    if mw.isAppleSystem():
+        content = content.replace('{$MMDB_FILE_SUFFIX}', 'dylib')
+    else:
+        content = content.replace('{$MMDB_FILE_SUFFIX}', 'so')
+
     return content
 
 
