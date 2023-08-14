@@ -549,63 +549,72 @@ local function waf_cookie()
     return false
 end
 
-local function initmaxminddb()
-    if geo ==nil then 
-        maxminddb ,geo = pcall(function() return  require 'waf_maxminddb' end)
-        if not maxminddb then
-            C:D("debug error on :"..tostring(geo))
-            return nil
-        end
-    end
-    C:D("----1-----")
-    if type(geo)=='number' then return nil end
-    local ok2,data=pcall(function()
-        if not geo.initted() then
-            C:D("----2--ok---")
-            geo.init("{$WAF_ROOT}/GeoLite2-City.mmdb")
-        end
-    end )
-
-    C:D("----3-----"..tostring(ok2))
-    if not ok2 then
-        geo=nil
-    end
-end 
-
-
 local geo=nil 
 local waf_country=""
 local geo2=nil 
 
-local function  get_ip_Country()
-    initmaxminddb()
-    C:D("----ip-----"..params['ip'])
-    if type(geo)=='number' then return "21" end
-    if geo==nil then return "22" end 
-    if geo.lookup==nil then return "23" end 
-    
-    -- local res,err=geo.lookup(param['ip'] or ngx.var.remote_addr)
-    local res,err=geo.lookup("182.96.210.214")
-    if not res then
-            return "2"
-    else
-        return res
+
+local function initmaxminddb()
+    if geo==nil then 
+        maxminddb ,geo = pcall(function() return  require 'waf_maxminddb' end)
+        if not maxminddb then
+            C:D("debug waf error on :"..tostring(geo))
+            return nil
+        end
+    end
+    if type(geo)=='number' then return nil end
+    local ok2,data=pcall(function()
+        if not geo.initted() then
+            geo.init("{$WAF_ROOT}/GeoLite2-City.mmdb")
+        end
+    end )
+    if not ok2 then
+        geo=nil
     end
 end
 
 
-function waf()
-    if server_name == "unset" then ngx.exit(403) end
+local function  get_ip_country(ip)
+    initmaxminddb()
+    if type(geo)=='number' then return "2" end
+    if geo==nil then return "2" end 
+    if geo.lookup==nil then return "2" end 
+    local res,err=geo.lookup(ip or ngx.var.remote_addr)
+    if not res then
+        return "2"
+    else
+        C:D("res:"..tostring(res))
+        return res
+    end
+end
+
+local function get_country()
+    local ip = params['ip']
+    if ngx.shared.waf_limit:get("get_country"..ip) then 
+        return ngx.shared.waf_limit:get("get_country"..ip)
+    end
+    local ip_postion=get_ip_country(ip)
+    if ip_postion=="2" then return false end 
+    if ip_postion["country"]==nil then return false end 
+    if ip_postion["country"]["names"]==nil then return false end 
+    if ip_postion["country"]["names"]["zh-CN"]==nil then return false end 
+    ngx.shared.waf_limit:set("get_country"..ip,ip_postion["country"]["names"]["zh-CN"],3600)
+    return ip_postion["country"]["names"]["zh-CN"]
+end 
+
+
+function run_app_waf()
     min_route()
     -- C:D("min_route")
 
-    waf_country = get_ip_Country()
+    local waf_country = get_country()
     C:D(tostring(waf_country))
     
     if site_config[server_name] and site_config[server_name]['open'] then
         -- white ip
         if waf_ip_white() then return true end
         -- C:D("waf_ip_white")
+
 
         -- url white
         if waf_url_white() then return true end
@@ -654,6 +663,26 @@ function waf()
         -- C:D("url_ext")
         if post_data() then return true end 
         -- C:D("post_data")
+    end
+end
+
+
+local waf_run_status = nil
+function waf()
+    if waf_run_status then
+        run_app_waf()
+    else
+        local ok,waf_err=pcall(function()
+            run_app_waf()
+        end)
+
+        if waf_err ~= nil then
+            C:D("----waf error-----"..tostring(waf_err))
+        end
+
+        if ok then
+            waf_run_status = true
+        end
     end
 end
 
