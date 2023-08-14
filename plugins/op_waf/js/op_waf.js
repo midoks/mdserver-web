@@ -1634,6 +1634,187 @@ function wafSite(){
     });
 }
 
+function wafAreaLimitRender(){
+    owPost('get_area_limit', {}, function(rdata) {
+        var rdata = $.parseJSON(rdata.data);
+        console.log(rdata);
+        if (!rdata.status) {
+            layer.msg(rdata.msg, { icon: 2, time: 2000 });
+            return;
+        }
+
+
+        var list = '';
+        var rlist = rdata.data;
+
+        for (var i = 0; i < rlist.length; i++) {
+            var docker_status = 'stop';
+            var status = '<span class="glyphicon glyphicon-pause" style="color:red;font-size:12px"></span>';
+            if (rlist[i]['State']['Status'] == 'running') {
+                docker_status = 'start';
+                status = '<span class="glyphicon glyphicon-play" style="color:#20a53a;font-size:12px"></span>';
+            }
+
+            var op = '';
+            op += '<a href="javascript:;" onclick="execCon(\'' + rlist[i]['Config']['Hostname'] + '\')" class="btlink">终端</a> | ';
+            op += '<a href="javascript:;" onclick="logsCon(\'' + rlist[i]['Id'] + '\')" class="btlink">日志</a> | ';
+            op += '<a href="javascript:;" onclick="deleteCon(\'' + rlist[i]['Config']['Hostname'] + '\')" class="btlink">删除</a>';
+
+            list += '<tr>';
+            list += '<td>' + rlist[i]['Name'].substring(1) + '</td>';
+            list += '<td>' + rlist[i]['Config']['Image'] + '</td>';
+            list += '<td>' + getFormatTime(rlist[i]['Created']) + '</td>';
+
+
+            if (docker_status == 'start') {
+                list += '<td style="cursor:pointer;" align="center" onclick="stopCon(\'' + rlist[i]['Config']['Hostname'] + '\')">' + status + '</td>';
+            } else {
+                list += '<td style="cursor:pointer;" align="center" onclick="startCon(\'' + rlist[i]['Config']['Hostname'] + '\')">' + status + '</td>';
+            }
+            list += '<td class="text-right">' + op + '</td>';
+            list += '</tr>';
+        }
+
+        $('#con_list tbody').html(list);
+    });
+}
+
+// 地区限制
+function wafAreaLimit(){
+    var con = '<div class="safe bgw">\
+            <button id="create_area_limit" class="btn btn-success btn-sm" type="button" style="margin-right: 5px;">添加地区限制</button>\
+            <div class="divtable mtb10">\
+                <div class="tablescroll">\
+                    <table id="con_list" class="table table-hover" width="100%" cellspacing="0" cellpadding="0" border="0" style="border: 0 none;">\
+                    <thead><tr>\
+                    <th>地区</th>\
+                    <th>站点</th>\
+                    <th>类型</th>\
+                    <th style="text-align:right;">操作</th></tr></thead>\
+                    <tbody></tbody></table>\
+                </div>\
+            </div>\
+        </div>';
+    $(".soft-man-con").html(con);
+    wafAreaLimitRender();
+
+    $('#create_area_limit').click(function(){
+        layer.open({
+            type: 1,
+            title: '添加地区限制',
+            area: ['450px','280px'],
+            closeBtn: 1,
+            btn: ['添加', '取消'],
+            content: '<div class="waf-form pd20">\
+                <div class="line">\
+                    <span class="tname">类型</span>\
+                    <div class="info-r c4">\
+                        <select class="bt-input-text docker-image" style="width:230px">\
+                            <option value="refuse" selected="">拦截</option>\
+                            <option value="accept">只放行</option>\
+                        </select>\
+                    </div>\
+                </div>\
+                <div class="line">\
+                    <span class="tname">站点</span>\
+                    <div class="info-r">\
+                        <div id="demo1"></div>\
+                    </div>\
+                </div>\
+                <div class="line">\
+                    <span class="tname">地区</span>\
+                    <div class="info-r" id="demo2"></div>\
+                </div>\
+            </div>',
+            success: function (layers, index) {
+                document.getElementById('layui-layer' + index).getElementsByClassName('layui-layer-content')[0].style.overflow = 'unset';
+
+
+                var demo1 = xmSelect.render({
+                    el: '#demo1',
+                    language: 'zn',
+                    toolbar: {show: true,},
+                    paging: true,
+                    pageSize: 10,
+                    data: [
+                        {name: '张三', value: 1},
+                        {name: '李四', value: 2},
+                        {name: '王五', value: 3},
+                    ]
+                })
+
+                var demo2 = xmSelect.render({
+                    el: '#demo2',
+                    language: 'zn',
+                    toolbar: {show: true,},
+                    paging: true,
+                    pageSize: 10,
+                    data: [
+                        {name: '张三', value: 1},
+                        {name: '李四', value: 2},
+                        {name: '王五', value: 3},
+                    ]
+                })
+                
+                // var robj = $('.bt-form'),
+                //     reg_html = '',
+                //     site_html = '',
+                //     elName = ['multi_reg', 'multi_site'];
+                // $.post('/plugin?action=a&name=btwaf&s=city', function (res) {
+                //     for (var i = 0; i < res.length; i++) {
+                //         reg_html += '<li><a><span class="text">' + res[i] + '</span><span class="glyphicon check-mark"></span></a></li>';
+                //     }
+                //     robj.append('<div class="line" style="height: 45px;"><span class="tname">地区</span><div class="info-r ml0">' + that.multi_select_view(elName[0], reg_html) + '</div></div>');
+                //     that.nulti_event(elName[0], res, '地区');
+                // });
+                // $.post('/plugin?action=a&name=btwaf&s=reg_domains', function (res) {
+                //     var data = [];
+                //     for (var i = 0; i < res.length; i++) {
+                //         data.push(res[i].name);
+                //         site_html += '<li><a><span class="text">' + res[i].name + '</span><span class="glyphicon check-mark"></span></a></li>';
+                //     }
+                //     site_length = data.length;
+                //     robj.append('<div class="line" style="height: 45px;"><span class="tname">站点</span><div class="info-r ml0">' + that.multi_select_view(elName[1], site_html) + '</div></div>');
+                //     that.nulti_event(elName[1], data, '站点');
+                // });
+            },
+            yes: function (indexs) {
+                // var region = $('.multi_reg .btn .filter-option')
+                //     .text()
+                //     .replace('中国大陆以外的地区(包括[中国特别行政区:港,澳,台])', '海外')
+                //     .replace('中国大陆(不包括[中国特别行政区:港,澳,台])', '中国')
+                //     .replace('中国香港', '香港')
+                //     .replace('中国澳门', '澳门')
+                //     .replace('中国台湾', '台湾');
+                // var site_text = $('.multi_site .btn .filter-option').text(),
+                //     site = '';
+                // if (site_length === site.split(',').length) {
+                //     site = 'allsite';
+                // } else {
+                //     site = site_text;
+                // }
+                // if (region.indexOf('请选择') > -1) return layer.msg('地区最少选一个!', { icon: 2 });
+                // if (site.indexOf('请选择') > -1) return layer.msg('站点最少选一个!', { icon: 2 });
+                // that.ajaxTask(
+                //     'add_reg_tions',
+                //     {
+                //         region: region,
+                //         types: formData.types,
+                //         site: site,
+                //     },
+                //     function (res) {
+                //         if (res.status) {
+                //             layer.close(indexs);
+                //             that.render_regional_restrictions();
+                //         }
+                //         layer.msg(res.msg, { icon: res.status ? 1 : 2 });
+                //     }
+                // );
+            },
+        });
+    });
+}
+
 function wafLogRequest(page){
     var args = {};   
     args['page'] = page;

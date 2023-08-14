@@ -1284,6 +1284,14 @@ def getWafConf():
     return mw.readFile(conf)
 
 
+def getAreaLimit():
+    conf = getJsonPath('area_limit')
+    if not os.path.exists(conf):
+        mw.writeFile(conf, '[]')
+    setConfRestartWeb()
+    return mw.readFile(conf)
+
+
 def cleanDropIp():
     url = "http://127.0.0.1/clean_waf_drop_ip"
     data = mw.httpGet(url)
@@ -1397,8 +1405,8 @@ if __name__ == "__main__":
         print(getWafSrceen())
     elif func == 'waf_conf':
         print(getWafConf())
-    elif func == 'waf_site':
-        print(getWafSite())
+    elif func == 'get_area_limit':
+        print(getAreaLimit())
     elif func == 'clean_drop_ip':
         print(cleanDropIp())
     elif func == 'test_run':
