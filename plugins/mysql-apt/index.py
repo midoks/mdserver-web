@@ -2501,6 +2501,9 @@ def doFullSyncUser(version=''):
         return data[1]
 
     sync_db = args['db']
+    if sync_db.lower() == 'all':
+        sync_db = '--all-databases'
+
     sync_sign = args['sign']
 
     db = pMysqlDb()
