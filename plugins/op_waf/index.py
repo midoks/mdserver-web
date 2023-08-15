@@ -520,7 +520,7 @@ def initDreplace():
         content = contentReplace(content)
         mw.writeFile(waf_conf, content)
 
-    autoMakeConfig()
+    autoMakeConfig(True, False)
 
     pSqliteDb()
 
