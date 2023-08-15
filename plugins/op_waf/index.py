@@ -1,5 +1,9 @@
 # coding:utf-8
 
+'''
+cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/op_waf && bash install.sh install 0.3.2
+python3 /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/op_waf/index.py reload
+'''
 import sys
 import io
 import os
@@ -303,7 +307,7 @@ def autoMakeLuaConf(conf_reload=False, cp_reload=False):
     for x in conf_list:
         autoMakeLuaConfSingle(x, conf_reload)
 
-    import_list = ['config', 'site', 'domains']
+    import_list = ['config', 'site', 'domains', 'area_limit']
     for x in import_list:
         autoMakeLuaImportSingle(x, conf_reload)
 
@@ -369,6 +373,29 @@ def setDefaultSite(name):
 def getDefaultSite():
     data = getSiteListData()
     return mw.returnJson(True, 'OK', data)
+
+
+def getCountry():
+    data = ['中国大陆以外的地区(包括[中国特别行政区:港,澳,台])', '中国大陆(不包括[中国特别行政区:港,澳,台])', '中国香港', '中国澳门', '中国台湾',
+            '美国', '日本', '英国', '德国', '韩国', '法国', '巴西', '加拿大', '意大利', '澳大利亚', '荷兰', '俄罗斯', '印度', '瑞典', '西班牙', '墨西哥',
+            '比利时', '南非', '波兰', '瑞士', '阿根廷', '印度尼西亚', '埃及', '哥伦比亚', '土耳其', '越南', '挪威', '芬兰', '丹麦', '乌克兰', '奥地利',
+            '伊朗', '智利', '罗马尼亚', '捷克', '泰国', '沙特阿拉伯', '以色列', '新西兰', '委内瑞拉', '摩洛哥', '马来西亚', '葡萄牙', '爱尔兰', '新加坡',
+            '欧洲联盟', '匈牙利', '希腊', '菲律宾', '巴基斯坦', '保加利亚', '肯尼亚', '阿拉伯联合酋长国', '阿尔及利亚', '塞舌尔', '突尼斯', '秘鲁', '哈萨克斯坦',
+            '斯洛伐克', '斯洛文尼亚', '厄瓜多尔', '哥斯达黎加', '乌拉圭', '立陶宛', '塞尔维亚', '尼日利亚', '克罗地亚', '科威特', '巴拿马', '毛里求斯', '白俄罗斯',
+            '拉脱维亚', '多米尼加', '卢森堡', '爱沙尼亚', '苏丹', '格鲁吉亚', '安哥拉', '玻利维亚', '赞比亚', '孟加拉国', '巴拉圭', '波多黎各', '坦桑尼亚',
+            '塞浦路斯', '摩尔多瓦', '阿曼', '冰岛', '叙利亚', '卡塔尔', '波黑', '加纳', '阿塞拜疆', '马其顿', '约旦', '萨尔瓦多', '伊拉克', '亚美尼亚', '马耳他',
+            '危地马拉', '巴勒斯坦', '斯里兰卡', '特立尼达和多巴哥', '黎巴嫩', '尼泊尔', '纳米比亚', '巴林', '洪都拉斯', '莫桑比克', '尼加拉瓜', '卢旺达', '加蓬',
+            '阿尔巴尼亚', '利比亚', '吉尔吉斯坦', '柬埔寨', '古巴', '喀麦隆', '乌干达', '塞内加尔', '乌兹别克斯坦', '黑山', '关岛', '牙买加', '蒙古', '文莱',
+            '英属维尔京群岛', '留尼旺', '库拉索岛', '科特迪瓦', '开曼群岛', '巴巴多斯', '马达加斯加', '伯利兹', '新喀里多尼亚', '海地', '马拉维', '斐济', '巴哈马',
+            '博茨瓦纳', '扎伊尔', '阿富汗', '莱索托', '百慕大', '埃塞俄比亚', '美属维尔京群岛', '列支敦士登', '津巴布韦', '直布罗陀', '苏里南', '马里', '也门',
+            '老挝', '塔吉克斯坦', '安提瓜和巴布达', '贝宁', '法属玻利尼西亚', '圣基茨和尼维斯', '圭亚那', '布基纳法索', '马尔代夫', '泽西岛', '摩纳哥', '巴布亚新几内亚',
+            '刚果', '塞拉利昂', '吉布提', '斯威士兰', '缅甸', '毛里塔尼亚', '法罗群岛', '尼日尔', '安道尔', '阿鲁巴', '布隆迪', '圣马力诺', '利比里亚',
+            '冈比亚', '不丹', '几内亚', '圣文森特岛', '荷兰加勒比区', '圣马丁', '多哥', '格陵兰', '佛得角', '马恩岛', '索马里', '法属圭亚那', '西萨摩亚',
+            '土库曼斯坦', '瓜德罗普', '马里亚那群岛', '瓦努阿图', '马提尼克', '赤道几内亚', '南苏丹', '梵蒂冈', '格林纳达', '所罗门群岛', '特克斯和凯科斯群岛', '多米尼克',
+            '乍得', '汤加', '瑙鲁', '圣多美和普林西比', '安圭拉岛', '法属圣马丁', '图瓦卢', '库克群岛', '密克罗尼西亚联邦', '根西岛', '东帝汶', '中非',
+            '几内亚比绍', '帕劳', '美属萨摩亚', '厄立特里亚', '科摩罗', '圣皮埃尔和密克隆', '瓦利斯和富图纳', '英属印度洋领地', '托克劳', '马绍尔群岛', '基里巴斯',
+            '纽埃', '诺福克岛', '蒙特塞拉特岛', '朝鲜', '马约特', '圣卢西亚', '圣巴泰勒米岛']
+    return mw.returnJson(True, 'ok', data)
 
 
 def autoMakeConfig(conf_reload=False, cp_reload=False):
@@ -1288,8 +1315,111 @@ def getAreaLimit():
     conf = getJsonPath('area_limit')
     if not os.path.exists(conf):
         mw.writeFile(conf, '[]')
+
+    d = mw.readFile(conf)
+    data = json.loads(d)
+    return mw.returnJson(True, 'ok!', data)
+
+
+def delAreaLimit():
+    args = getArgs()
+    data = checkArgs(args, ['site', 'types', 'region'])
+    if not data[0]:
+        return data[1]
+
+    type_list = ["refuse", "accept"]
+    if not args['types'] in type_list:
+        return mw.returnJson(False, '输入的类型错误!')
+
+    region_l = args['region'].split(",")
+    site_l = args['site'].split(",")
+
+    paramMode = {}
+    for i in region_l:
+        if not i:
+            continue
+        i = i.strip()
+        if not i in paramMode:
+            paramMode[i] = "1"
+
+    sitesMode = {}
+    for i in site_l:
+        i = i.strip()
+        if not i:
+            continue
+
+        if not i in sitesMode:
+            sitesMode[i] = "1"
+
+    if len(paramMode) == 0:
+        return mw.returnJson(False, '输入的请求类型错误!')
+    if len(sitesMode) == 0:
+        return mw.returnJson(False, '输入的站点错误!')
+
+    conf = getJsonPath('area_limit')
+    t_data = json.loads(mw.readFile(conf))
+
+    data = {"site": sitesMode, "types": args['types'], "region": paramMode}
+    if not data in t_data:
+        return mw.returnJson(False, '不存在!')
+
+    t_data.remove(data)
+    mw.writeFile(conf, json.dumps(t_data))
+
     setConfRestartWeb()
-    return mw.readFile(conf)
+    return mw.returnJson(True, '删除成功!')
+
+
+def addAreaLimit():
+    args = getArgs()
+    data = checkArgs(args, ['site', 'types', 'region'])
+    if not data[0]:
+        return data[1]
+
+    type_list = ["refuse", "accept"]
+    if not args['types'] in type_list:
+        return mw.returnJson(False, '输入的类型错误!')
+
+    region_l = args['region'].split(",")
+    site_l = args['site'].split(",")
+
+    paramMode = {}
+    for i in region_l:
+        if not i:
+            continue
+        i = i.strip()
+        if not i in paramMode:
+            paramMode[i] = "1"
+
+    if '海外' in paramMode and '中国' in paramMode:
+        return mw.returnJson(False, '不允许设置【中国大陆】和【中国大陆以外地区】一同开启地区限制!')
+
+    sitesMode = {}
+    for i in site_l:
+        i = i.strip()
+        if not i:
+            continue
+
+        if not i in sitesMode:
+            sitesMode[i] = "1"
+
+    if len(paramMode) == 0:
+        return mw.returnJson(False, '输入的请求类型错误!')
+    if len(sitesMode) == 0:
+        return mw.returnJson(False, '输入的站点错误!')
+
+    conf = getJsonPath('area_limit')
+    t_data = json.loads(mw.readFile(conf))
+
+    data = {"site": sitesMode, "types": args['types'], "region": paramMode}
+    if data in t_data:
+        return mw.returnJson(False, '已存在!')
+
+    t_data.insert(0, data)
+    mw.writeFile(conf, json.dumps(t_data))
+
+    setConfRestartWeb()
+    return mw.returnJson(True, '添加成功!')
 
 
 def cleanDropIp():
@@ -1387,6 +1517,8 @@ if __name__ == "__main__":
         print(getSiteConfig())
     elif func == 'get_default_site':
         print(getDefaultSite())
+    elif func == 'get_country':
+        print(getCountry())
     elif func == 'get_site_config_byname':
         print(getSiteConfigByName())
     elif func == 'add_site_cdn_header':
@@ -1407,6 +1539,10 @@ if __name__ == "__main__":
         print(getWafConf())
     elif func == 'get_area_limit':
         print(getAreaLimit())
+    elif func == 'add_area_limit':
+        print(addAreaLimit())
+    elif func == 'del_area_limit':
+        print(delAreaLimit())
     elif func == 'clean_drop_ip':
         print(cleanDropIp())
     elif func == 'test_run':

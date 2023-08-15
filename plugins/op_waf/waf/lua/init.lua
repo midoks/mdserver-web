@@ -35,6 +35,8 @@ local cookie_rules = require "rule_cookie"
 local url_rules = require "rule_url"
 local url_white_rules = require "rule_url_white"
 
+local waf_area_limit = require "waf_area_limit"
+
 -- local server_name = string.gsub(C:get_sn(config_domains),'_','.')
 local server_name = C:get_sn(config_domains)
 local function initParams()
@@ -602,15 +604,63 @@ local function get_country()
     return ip_postion["country"]["names"]["zh-CN"]
 end 
 
+local function area_limit(overall_country, server_name, status)
+
+    if overall_country and overall_country~="" and C:count_size(waf_area_limit)>=1 then
+        for k, val in pairs(waf_area_limit) do
+            -- C:D(tostring(k)..':'..tostring(val['site']['allsite']) ..':'.. tostring(val['site']['allsite'] == '1') ..':'.. tostring(val['site']['allsite']))
+            if val['site']['allsite'] and val['site']['allsite'] == '1' and val['types'] == 'refuse' then
+                for rk, reg_val in pairs(val['region']) do
+                    if rk == overall_country then
+                        ngx.exit(403)
+                        return true
+                    end
+                end
+            end
+
+            if val['site'][server_name] and val['site'][server_name] == '1' and val['types'] == 'refuse' then
+                for rk, reg_val in pairs(val['region']) do
+                    if rk == overall_country then
+                        ngx.exit(403)
+                        return true
+                    end
+                end
+            end
+
+            if val['site']['allsite'] and val['site']['allsite'] == '1' and val['types'] == 'accept' then
+                for rk, reg_val in pairs(val['region']) do
+                    if rk == overall_country then
+                        return false
+                    end
+                end
+                ngx.exit(403)
+                return true
+            end
+
+            if val['site'][server_name] and val['site'][server_name] == '1' and val['types'] == 'accept' then
+                for rk, reg_val in pairs(val['region']) do
+                    if rk == overall_country then
+                        return false
+                    end
+                end
+                ngx.exit(403)
+                return true
+            end
+        end
+    end
+    return false
+end
 
 function run_app_waf()
     min_route()
     -- C:D("min_route")
-
+    -- country limit
     local waf_country = get_country()
-    C:D(tostring(waf_country))
+    if area_limit(waf_country, server_name, site_config[server_name]['open']) then return true end
     
     if site_config[server_name] and site_config[server_name]['open'] then
+        
+
         -- white ip
         if waf_ip_white() then return true end
         -- C:D("waf_ip_white")
