@@ -118,6 +118,8 @@ Install_App(){
 
 	cd ${rootPath} && python3 ${rootPath}/plugins/op_waf/index.py start
 	echo "cd ${rootPath} && python3 ${rootPath}/plugins/op_waf/index.py start"
+	sleep 2
+	cd ${rootPath} && python3 ${rootPath}/plugins/op_waf/index.py reload
 }
 
 Uninstall_App(){
