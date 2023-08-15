@@ -606,6 +606,10 @@ end
 
 local function area_limit(overall_country, server_name, status)
 
+    if not status then
+        return false
+    end
+
     if overall_country and overall_country~="" and C:count_size(waf_area_limit)>=1 then
         for k, val in pairs(waf_area_limit) do
             -- C:D(tostring(k)..':'..tostring(val['site']['allsite']) ..':'.. tostring(val['site']['allsite'] == '1') ..':'.. tostring(val['site']['allsite']))

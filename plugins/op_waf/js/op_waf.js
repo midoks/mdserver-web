@@ -2037,7 +2037,7 @@ function wafLogs(){
         wafLogRequest(1);
     });
 
-    owPost('get_default_site',{},function(rdata){
+    owPostN('get_default_site',{},function(rdata){
         $('select[name="site"]').html('');
 
         var rdata = $.parseJSON(rdata.data);
