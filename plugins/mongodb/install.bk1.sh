@@ -16,10 +16,10 @@ VERSION=$2
 sysName=`uname`
 echo "use system: ${sysName}"
 
-OSNAME=`bash ${rootPath}/scripts/getos.sh`
-if [ "macos" != "$OSNAME" ];then
-	SYS_VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
-fi
+bash ${rootPath}/scripts/getos.sh
+OSNAME=`cat ${rootPath}/data/osname.pl`
+SYS_VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
+
 
 Install_app_mac()
 {
@@ -211,9 +211,6 @@ rm -rf /etc/yum.repos.d/mongodb-org-${VERSION}.repo
 
 Install_app_linux()
 {
-
-
-
 	if [ "$OSNAME" == "ubuntu" ];then
 		Install_Linux_Ubuntu
 	elif [ "$OSNAME" == "debian" ];then
@@ -233,14 +230,11 @@ Install_app()
 {
 	echo '正在安装脚本文件...' > $install_tmp
 	mkdir -p $serverPath/source
-
-	shell_file=${curPath}/versions/${VERSION}/${OSNAME}.sh
-
-	if [ -f $shell_file ];then
-		bash -x $shell_file
+	
+	if [ "macos" == "$OSNAME" ];then
+		Install_app_mac
 	else
-		echo '不支持...' > $install_tmp 
-		exit 1
+		Install_app_linux
 	fi
 
 	if [ "$?" == "0" ];then
