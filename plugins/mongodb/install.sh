@@ -45,7 +45,7 @@ Install_app()
 
 
 	cd $MG_DIR/mongodb-src-r${VERSION} && python3 buildscripts/scons.py core MONGO_VERSION=${VERSION} -j 4
-	cd $MG_DIR/mongodb-src-r${VERSION} && python3 buildscripts/scons.py -–prefix=$serverPath/mongodb install MONGO_VERSION=${VERSION}
+	cd $MG_DIR/mongodb-src-r${VERSION} && python3 buildscripts/scons.py --prefix=$serverPath/mongodb install MONGO_VERSION=${VERSION}
 
 
 	if [ "$?" == "0" ];then
