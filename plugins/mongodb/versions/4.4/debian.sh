@@ -14,8 +14,8 @@ MG_DIR=$serverPath/source/mongodb
 mkdir -p $MG_DIR
 
 if [ ! -f $MG_DIR/mongodb-linux-x86_64-debian10-${VERSION}.tgz ]; then
-	wget --no-check-certificate -O $MG_DIR/mongodb-macos-x86_64-${VERSION}.tgz https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-debian10-${VERSION}.tgz
-	echo "wget --no-check-certificate -O $MG_DIR/mongodb-macos-x86_64-${VERSION}.tgz https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-debian10-${VERSION}.tgz"
+	wget --no-check-certificate -O $MG_DIR/mongodb-linux-x86_64-debian10-${VERSION}.tgz https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-debian10-${VERSION}.tgz
+	echo "wget --no-check-certificate -O $MG_DIR/mongodb-linux-x86_64-debian10-${VERSION}.tgz https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-debian10-${VERSION}.tgz"
 fi
 
 if [ ! -d $MG_DIR/mongodb-linux-x86_64-debian10-${VERSION} ];then 
