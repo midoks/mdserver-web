@@ -19,7 +19,7 @@ if [ ! -f $MG_DIR/mongodb-linux-x86_64-debian11-${VERSION}.tgz ]; then
 fi
 
 if [ ! -d $MG_DIR/mongodb-linux-x86_64-debian11-${VERSION} ];then 
-	cd $MG_DIR && tar -zxvf mongodb-linux-x86_64-debian11--${VERSION}.tgz
+	cd $MG_DIR && tar -zxvf mongodb-linux-x86_64-debian11-${VERSION}.tgz
 fi
 
 if [ ! -d  $serverPath/mongodb/bin ];then
