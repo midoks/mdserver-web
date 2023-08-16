@@ -39,14 +39,13 @@ Install_app()
 	cd $MG_DIR/mongodb-src-r${VERSION} && python3 -m pip install requirements_parser
 	cd $MG_DIR/mongodb-src-r${VERSION} && python3 -m pip install -r etc/pip/compile-requirements.txt
 
-	cd $MG_DIR/mongodb-src-r${VERSION} && python3 buildscripts/scons.py all -j 2
-	echo "cd $MG_DIR/mongodb-src-r${VERSION} && python3 buildscripts/scons.py all -j 2"
+	# cd $MG_DIR/mongodb-src-r${VERSION} && python3 buildscripts/scons.py all -j 2
+	# echo "cd $MG_DIR/mongodb-src-r${VERSION} && python3 buildscripts/scons.py all -j 2"
+	# cd $MG_DIR/mongodb-src-r${VERSION} && python3 buildscripts/scons.py all MONGO_VERSION=${VERSION} -j 4
 
-	cd $MG_DIR/mongodb-src-r${VERSION} && python3 buildscripts/scons.py all MONGO_VERSION=${VERSION} -j 4
 
-
-	python3 buildscripts/scons.py core MONGO_VERSION=${VERSION} -j 4
-	python3 buildscripts/scons.py –prefix=$serverPath/mongodb install MONGO_VERSION=${VERSION}
+	cd $MG_DIR/mongodb-src-r${VERSION} && python3 buildscripts/scons.py core MONGO_VERSION=${VERSION} -j 4
+	cd $MG_DIR/mongodb-src-r${VERSION} && python3 buildscripts/scons.py -–prefix=$serverPath/mongodb install MONGO_VERSION=${VERSION}
 
 
 	if [ "$?" == "0" ];then
