@@ -27,8 +27,8 @@ Install_app()
 	MG_DIR=$serverPath/source/mongodb
 	mkdir -p $MG_DIR
 
-	cd ${rootPath}/plugins/php/lib && /bin/bash libzip.sh
-	export PKG_CONFIG_PATH=$serverPath/lib/libzip/lib/pkgconfig
+	cd ${rootPath}/plugins/php/lib && /bin/bash openssl.sh
+	export PKG_CONFIG_PATH=$serverPath/lib/openssl/lib/pkgconfig
 
 	if [ ! -f $MG_DIR/mongodb-src-r${VERSION}.tar.gz ]; then
 		wget --no-check-certificate -O $MG_DIR/mongodb-src-r${VERSION}.tar.gz https://fastdl.mongodb.org/src/mongodb-src-r${VERSION}.tar.gz
