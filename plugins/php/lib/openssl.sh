@@ -12,6 +12,7 @@ opensslVersion="3.0.10"
 
 SERVER_ROOT=$rootPath/lib
 SOURCE_ROOT=$rootPath/source/lib
+mkdir -p $SOURCE_ROOT
 
 if [ ! -d ${SERVER_ROOT}/openssl ];then
     cd ${SOURCE_ROOT}
