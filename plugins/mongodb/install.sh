@@ -48,12 +48,11 @@ Install_app()
 	# cd $MG_DIR/mongodb-src-r${VERSION} && python3 buildscripts/scons.py all MONGO_VERSION=${VERSION} -j 4
 
 
-	cd $MG_DIR/mongodb-src-r${VERSION} && python3 buildscripts/scons.py core MONGO_VERSION=${VERSION} -j 4
-	cd $MG_DIR/mongodb-src-r${VERSION} && python3 buildscripts/scons.py --prefix=$serverPath/mongodb install MONGO_VERSION=${VERSION} \
-	--ssl CPPPATH=$serverPath/lib/openssl/include \
-	LIBPATH=$serverPath/lib/openssl/lib
-	echo "cd $MG_DIR/mongodb-src-r${VERSION} && python3 buildscripts/scons.py --prefix=$serverPath/mongodb install MONGO_VERSION=${VERSION} \
-	--ssl CPPPATH=$serverPath/lib/openssl/include \
+	cd $MG_DIR/mongodb-src-r${VERSION} && python3 buildscripts/scons.py install-mongod MONGO_VERSION=${VERSION} -j 4
+	cd $MG_DIR/mongodb-src-r${VERSION} && python3 buildscripts/scons.py DESTDIR=$serverPath/mongodb install-mongod MONGO_VERSION=${VERSION} \
+	--ssl=off
+	echo "cd $MG_DIR/mongodb-src-r${VERSION} && python3 buildscripts/scons.py DESTDIR=$serverPath/mongodb install MONGO_VERSION=${VERSION} \
+	--ssl=off CPPPATH=$serverPath/lib/openssl/include \
 	LIBPATH=$serverPath/lib/openssl/lib"
 
 	if [ "$?" == "0" ];then
