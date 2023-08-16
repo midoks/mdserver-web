@@ -27,6 +27,9 @@ Install_app()
 	MG_DIR=$serverPath/source/mongodb
 	mkdir -p $MG_DIR
 
+	cd ${rootPath}/plugins/php/lib && /bin/bash libzip.sh
+	export PKG_CONFIG_PATH=$serverPath/lib/libzip/lib/pkgconfig
+
 	if [ ! -f $MG_DIR/mongodb-src-r${VERSION}.tar.gz ]; then
 		wget --no-check-certificate -O $MG_DIR/mongodb-src-r${VERSION}.tar.gz https://fastdl.mongodb.org/src/mongodb-src-r${VERSION}.tar.gz
 		echo "wget --no-check-certificate -O $MG_DIR/mongodb-src-r${VERSION}.tar.gz https://fastdl.mongodb.org/src/mongodb-src-r${VERSION}.tar.gz"
@@ -45,7 +48,9 @@ Install_app()
 
 
 	cd $MG_DIR/mongodb-src-r${VERSION} && python3 buildscripts/scons.py core MONGO_VERSION=${VERSION} -j 4
-	cd $MG_DIR/mongodb-src-r${VERSION} && python3 buildscripts/scons.py --prefix=$serverPath/mongodb install MONGO_VERSION=${VERSION}
+	cd $MG_DIR/mongodb-src-r${VERSION} && python3 buildscripts/scons.py --prefix=$serverPath/mongodb install MONGO_VERSION=${VERSION} \
+	--ssl CPPPATH=$serverPath/1.0.2j/include \
+	LIBPATH=$serverPath/openssl/1.0.2j/lib
 	echo "cd $MG_DIR/mongodb-src-r${VERSION} && python3 buildscripts/scons.py --prefix=$serverPath/mongodb install MONGO_VERSION=${VERSION}"
 
 	if [ "$?" == "0" ];then
