@@ -28,6 +28,7 @@ Install_app()
 	mkdir -p $MG_DIR
 
 	cd ${rootPath}/plugins/php/lib && /bin/bash openssl.sh
+	echo "cd ${rootPath}/plugins/php/lib && /bin/bash openssl.sh"
 	export PKG_CONFIG_PATH=$serverPath/lib/openssl/lib/pkgconfig
 
 	if [ ! -f $MG_DIR/mongodb-src-r${VERSION}.tar.gz ]; then
@@ -49,9 +50,11 @@ Install_app()
 
 	cd $MG_DIR/mongodb-src-r${VERSION} && python3 buildscripts/scons.py core MONGO_VERSION=${VERSION} -j 4
 	cd $MG_DIR/mongodb-src-r${VERSION} && python3 buildscripts/scons.py --prefix=$serverPath/mongodb install MONGO_VERSION=${VERSION} \
-	--ssl CPPPATH=$serverPath/1.0.2j/include \
-	LIBPATH=$serverPath/openssl/1.0.2j/lib
-	echo "cd $MG_DIR/mongodb-src-r${VERSION} && python3 buildscripts/scons.py --prefix=$serverPath/mongodb install MONGO_VERSION=${VERSION}"
+	--ssl CPPPATH=$serverPath/lib/openssl/include \
+	LIBPATH=$serverPath/lib/openssl/lib
+	echo "cd $MG_DIR/mongodb-src-r${VERSION} && python3 buildscripts/scons.py --prefix=$serverPath/mongodb install MONGO_VERSION=${VERSION} \
+	--ssl CPPPATH=$serverPath/lib/openssl/include \
+	LIBPATH=$serverPath/lib/openssl/lib"
 
 	if [ "$?" == "0" ];then
 		mkdir -p $serverPath/mongodb
