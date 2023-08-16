@@ -101,6 +101,17 @@ def initDreplace():
     conf_content = conf_content.replace('{$SERVER_PATH}', service_path)
     mw.writeFile(getServerDir() + '/mongodb.conf', conf_content)
 
+    # systemd
+    systemDir = mw.systemdCfgDir()
+    systemService = systemDir + '/mongodb.service'
+    systemServiceTpl = getPluginDir() + '/init.d/mongodb.service.tpl'
+    if os.path.exists(systemDir) and not os.path.exists(systemService):
+        service_path = mw.getServerDir()
+        se_content = mw.readFile(systemServiceTpl)
+        se_content = se_content.replace('{$SERVER_PATH}', service_path)
+        mw.writeFile(systemService, se_content)
+        mw.execShell('systemctl daemon-reload')
+
     return file_bin
 
 
@@ -111,10 +122,6 @@ def mgOp(method):
         if data[1] == '':
             return 'ok'
         return data[1]
-
-    cmd = 'systemctl ' + method + ' mongod'
-    if os.path.exists("/usr/lib/systemd/system/mongodb.service"):
-        cmd = 'systemctl ' + start + ' mongodb'
 
     data = mw.execShell(cmd)
     if data[1] == '':
