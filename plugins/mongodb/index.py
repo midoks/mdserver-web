@@ -35,13 +35,8 @@ def getInitDFile():
 
 
 def getConf():
-    if mw.isAppleSystem():
-        path = getServerDir() + "/mongodb.conf"
-        return path
-
-    if os.path.exists("/etc/mongodb.conf"):
-        return "/etc/mongodb.conf"
-    return "/etc/mongod.conf"
+    path = getServerDir() + "/mongodb.conf"
+    return path
 
 
 def getConfTpl():
@@ -223,13 +218,7 @@ def initdUinstall():
 
 
 def runLog():
-    if mw.isAppleSystem():
-        return getServerDir() + '/logs/mongodb.log'
-
-    if os.path.exists("/var/log/mongodb/mongodb.log"):
-        return "/var/log/mongodb/mongodb.log"
-
-    return "/var/log/mongodb/mongod.log"
+    return getServerDir() + '/logs/mongodb.log'
 
 
 def installPreInspection(version):
