@@ -172,13 +172,7 @@ def runInfo():
     result["version"] = serverStatus['version']
     result["uptime"] = serverStatus['uptime']
 
-    result['db_path'] = '/var/lib/mongo'
-
-    if os.path.exists("/var/lib/mongodb"):
-        result['db_path'] = '/var/lib/mongodb'
-
-    if mw.isAppleSystem():
-        result['db_path'] = getServerDir() + "/data"
+    result['db_path'] = getServerDir() + "/data"
 
     result["connections"] = serverStatus['connections']['current']
     if 'catalogStats' in serverStatus:
@@ -192,11 +186,7 @@ def initdStatus():
     if mw.isAppleSystem():
         return "Apple Computer does not support"
 
-    shell_cmd = 'systemctl status mongod | grep loaded | grep "enabled;"'
-
-    if os.path.exists("/usr/lib/systemd/system/mongodb.service"):
-        shell_cmd = 'systemctl status mongodb | grep loaded | grep "enabled;"'
-
+    shell_cmd = 'systemctl status mongodb | grep loaded | grep "enabled;"'
     data = mw.execShell(shell_cmd)
     if data[0] == '':
         return 'fail'
@@ -207,10 +197,7 @@ def initdInstall():
     if mw.isAppleSystem():
         return "Apple Computer does not support"
 
-    if os.path.exists("/usr/lib/systemd/system/mongodb.service"):
-        mw.execShell('systemctl enable mongodb')
-    else:
-        mw.execShell('systemctl enable mongod')
+    mw.execShell('systemctl enable mongodb')
     return 'ok'
 
 
@@ -218,10 +205,7 @@ def initdUinstall():
     if mw.isAppleSystem():
         return "Apple Computer does not support"
 
-    if os.path.exists("/usr/lib/systemd/system/mongodb.service"):
-        mw.execShell('systemctl disable mongodb')
-    else:
-        mw.execShell('systemctl disable mongod')
+    mw.execShell('systemctl disable mongodb')
     return 'ok'
 
 
