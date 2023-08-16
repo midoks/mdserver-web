@@ -2,8 +2,13 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
-# cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/mongodb && /bin/bash install.sh install 5.0.4
-# cd /www/server/mdserver-web/plugins/mongodb && /bin/bash install.sh install 7.0
+'''
+cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/mongodb && /bin/bash install.sh install 5.0.4
+cd /www/server/mdserver-web/plugins/mongodb && /bin/bash install.sh install 7.0
+
+cd /www/server/mdserver-web && python3 /www/server/mdserver-web/plugins/mongodb/index.py start
+'''
+
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
@@ -63,6 +68,16 @@ Uninstall_app()
 {
 	cd ${rootPath} && python3 ${rootPath}/plugins/mongodb/index.py stop
 	rm -rf $serverPath/mongodb
+
+
+	if [ -f /usr/lib/systemd/system/mongodb.service ] || [ -f /lib/systemd/system/mongodb.service ];then
+		systemctl stop mongodb
+		systemctl disable mongodb
+		rm -rf /usr/lib/systemd/system/mongodb.service
+		rm -rf /lib/systemd/system/mongodb.service
+		systemctl daemon-reload
+	fi
+
 	echo "Uninstall_mongodb" > $install_tmp
 }
 

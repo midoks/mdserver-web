@@ -5,12 +5,14 @@ After=network-online.target
 Wants=network-online.target
 
 [Service]
-User=mongodb
-Group=mongodb
+User=root
+Group=root
 #EnvironmentFile=-/etc/default/mongod
 Environment="MONGODB_CONFIG_OVERRIDE_NOFORK=1"
+PIDFile={$SERVER_PATH}/mongodb/mongodb.pid
 ExecStart={$SERVER_PATH}/mongodb/bin/mongod -f {$SERVER_PATH}/mongodb/mongodb.conf
-RuntimeDirectory=mongodb
+ExecReload=/bin/kill -HUP $MAINPID
+#RuntimeDirectory=mongodb
 # file size
 LimitFSIZE=infinity
 # cpu time
