@@ -29,6 +29,7 @@ Install_app()
 
 	if [ ! -f $MG_DIR/mongodb-src-r${VERSION}.tar.gz ]; then
 		wget -no-check-certificate -O $MG_DIR/mongodb-src-r${VERSION}.tar.gz https://fastdl.mongodb.org/src/mongodb-src-r${VERSION}.tar.gz
+		echo "wget -no-check-certificate -O $MG_DIR/mongodb-src-r${VERSION}.tar.gz https://fastdl.mongodb.org/src/mongodb-src-r${VERSION}.tar.gz"
 	fi
 
 	if [ ! -d $MG_DIR/mongodb-src-r${VERSION} ];then
