@@ -28,7 +28,7 @@ if [ ! -f $MG_DIR/${FILE_NAME_TGZ} ]; then
 fi
 
 if [ ! -d $MG_DIR/${FILE_NAME} ];then 
-	cd $MG_DIR && tar -zxvf ${FILE_NAME}
+	cd $MG_DIR && tar -zxvf ${FILE_NAME_TGZ}
 fi
 
 if [ ! -d  $serverPath/mongodb/bin ];then
