@@ -3,7 +3,7 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
 # cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/mongodb && /bin/bash install.sh install 5.0.4
-# cd /www/server/mdserver-web/plugins/mongodb && /bin/bash install.sh install 5.0.4
+# cd /www/server/mdserver-web/plugins/mongodb && /bin/bash install.sh install 7.0
 
 curPath=`pwd`
 rootPath=$(dirname "$curPath")
@@ -17,6 +17,11 @@ sysName=`uname`
 echo "use system: ${sysName}"
 
 OSNAME=`bash ${rootPath}/scripts/getos.sh`
+
+if [ "" == "$OSNAME" ];then
+	OSNAME=`cat ${rootPath}/data/osname.pl`
+fi
+
 if [ "macos" != "$OSNAME" ];then
 	SYS_VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 fi

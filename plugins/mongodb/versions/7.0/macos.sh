@@ -22,7 +22,7 @@ if [ ! -d $MG_DIR/mongodb-macos-x86_64-${VERSION} ];then
 	cd $MG_DIR && tar -zxvf mongodb-macos-x86_64-${VERSION}.tgz
 fi
 
-if [ ! -d  $serverPath/mongodb/bin ];then
+if [ ! -d $serverPath/mongodb/bin ];then
 	mkdir -p $serverPath/mongodb
 	cd $MG_DIR/mongodb-macos-x86_64-${VERSION} && cp -rf ./bin $serverPath/mongodb
 fi
