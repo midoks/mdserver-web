@@ -85,6 +85,14 @@ def initDreplace():
         os.mkdir(initD_path)
     file_bin = initD_path + '/' + getPluginName()
 
+    logs_dir = getServerDir() + '/logs'
+    if not os.path.exists(logs_dir):
+        os.mkdir(logs_dir)
+
+    data_dir = getServerDir() + '/data'
+    if not os.path.exists(data_dir):
+        os.mkdir(data_dir)
+
     # initd replace
     content = mw.readFile(file_tpl)
     content = content.replace('{$SERVER_PATH}', service_path)
