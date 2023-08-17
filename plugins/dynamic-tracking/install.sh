@@ -17,6 +17,17 @@ if [ -f ${rootPath}/bin/activate ];then
 	source ${rootPath}/bin/activate
 fi
 
+
+OSNAME=`bash ${rootPath}/scripts/getos.sh`
+
+if [ "" == "$OSNAME" ];then
+	OSNAME=`cat ${rootPath}/data/osname.pl`
+fi
+
+if [ "macos" != "$OSNAME" ];then
+	SYS_VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
+fi
+
 Install_App()
 {
 
@@ -27,6 +38,14 @@ Install_App()
 
 	echo "开发中..."
 
+	shell_file=${curPath}/versions/${VERSION}/${OSNAME}.sh
+
+	if [ -f $shell_file ];then
+		bash -x $shell_file
+	else
+		echo '不支持...' > $install_tmp 
+		exit 1
+	fi
 
 	echo "${VERSION}" > $serverPath/dynamic-tracking/version.pl
 	echo '安装完成' > $install_tmp
