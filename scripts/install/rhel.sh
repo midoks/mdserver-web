@@ -181,8 +181,8 @@ if [ "$VERSION_ID" -ge "8" ];then
         libpng libpng-devel libstdc++.so.6 libtirpc libtirpc-devel libtool libtool-libs libwebp libwebp-devel \
         libxml2 libxml2-devel libxslt libxslt-devel libarchive make mysql-devel ncurses ncurses-devel net-tools \
         oniguruma oniguruma-devel patch pcre pcre-devel perl perl-Data-Dumper perl-devel procps psmisc python3-devel \
-        openssl openssl-devel \
-        readline-devel rpcgen sqlite-devel tar unzip vim-minimal wget zip zlib zlib-devel patchelf;
+        openssl openssl-devel patchelf\
+        readline-devel rpcgen sqlite-devel tar unzip vim-minimal wget zip zlib zlib-devel;
     do
         # dnf --enablerepo=remi,appstream,baseos,epel,extras,powertools install -y oniguruma5php-devel
         dnf $REPOS install -y $rpms;
