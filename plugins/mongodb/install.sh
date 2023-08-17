@@ -2,6 +2,8 @@
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
+# https://www.mongodb.com/try/download/community
+
 '''
 cd /Users/midoks/Desktop/mwdev/server/mdserver-web/plugins/mongodb && /bin/bash install.sh install 5.0.4
 cd /www/server/mdserver-web/plugins/mongodb && /bin/bash install.sh install 7.0

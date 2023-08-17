@@ -217,6 +217,9 @@ def runLog():
 
 
 def installPreInspection(version):
+    if mw.isAppleSystem():
+        return 'ok'
+
     sys = mw.execShell(
         "cat /etc/*-release | grep PRETTY_NAME |awk -F = '{print $2}' | awk -F '\"' '{print $2}'| awk '{print $1}'")
 
@@ -229,17 +232,9 @@ def installPreInspection(version):
     sysName = sys[0].strip().lower()
     sysId = sys_id[0].strip()
 
-    if not sysName in ('centos', 'fedora', 'ubuntu', 'debian'):
-        return '暂时仅不支持{}'.format(sysName)
-
-    if sysName == 'debian':
-        if version > 10:
-            return 'mongodb[' + version + ']不支持安装在debian[' + sysId + ']'
-
-    if sysName == 'ubuntu':
-        if version < 16:
-            return 'mongodb[' + version + ']不支持安装在ubuntu[' + sysId + ']'
-
+    supportOs = ['centos', 'ubuntu', 'debian', 'opensuse']
+    if not sysName in supportOs:
+        return '暂时仅支持{}'.format(','.join(supportOs))
     return 'ok'
 
 if __name__ == "__main__":
