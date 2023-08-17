@@ -1,6 +1,6 @@
 {
 	"sort": 7,
-	"ps": "专业使用,动态追踪调试程序![<span style='color:red;'>潜龙勿用</span>]",
+	"ps": "专业使用,动态追踪调试程序<无侵入>![<span style='color:red;'>潜龙勿用</span>]",
 	"name": "dynamic-tracking",
 	"title": "动态追踪",
 	"shell": "install.sh",
