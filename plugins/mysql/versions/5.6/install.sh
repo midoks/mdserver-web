@@ -76,9 +76,9 @@ Install_mysql()
 	OPENSSL_VERSION=`openssl version|awk '{print $2}'|awk -F '.' '{print $1}'`
 	if [ "${OPENSSL_VERSION}" -ge "3" ];then
 		#openssl version to high
-		cd ${rootPath}/plugins/php/lib && /bin/bash openssl.sh
-		export PKG_CONFIG_PATH=$serverPath/lib/openssl/lib/pkgconfig
-		OPTIONS="-DWITH_SSL=${serverPath}/lib/openssl"
+		cd ${rootPath}/plugins/php/lib && /bin/bash openssl10.sh
+		export PKG_CONFIG_PATH=$serverPath/lib/openssl10/lib/pkgconfig
+		OPTIONS="-DWITH_SSL=${serverPath}/lib/openssl10"
 	fi
 
 	if [ ! -d $serverPath/mysql ];then
