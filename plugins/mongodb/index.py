@@ -210,7 +210,10 @@ def initdUinstall():
 
 
 def runLog():
-    return getServerDir() + '/logs/mongodb.log'
+    f = getServerDir() + '/logs/mongodb.log'
+    if os.path.exists(f):
+        return f
+    return getServerDir() + '/logs.pl'
 
 
 def installPreInspection(version):
