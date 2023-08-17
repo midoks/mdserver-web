@@ -13,6 +13,11 @@ SYS_ARCH=`arch`
 
 SYS_VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
 SYS_NAME=${SYS_VERSION_ID/./}
+SYS_NAME_LEN=`echo "$SYS_NAME" | wc -L`
+
+if [ "$SYS_NAME_LEN" == "1" ];then
+	SYS_NAME=${SYS_NAME}0	
+fi
 
 # https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-rhel70-4.4.23.tgz
 
