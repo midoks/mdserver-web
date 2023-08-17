@@ -19,12 +19,17 @@ if [ "$SYS_NAME_LEN" == "1" ];then
 	SYS_NAME=${SYS_NAME}0	
 fi
 
-if [ "$SYS_NAME" -gt "82" ];then
+if [ "$SYS_ARCH" == "aarch64" ];then
 	SYS_NAME="82"
-fi
+else
 
-if [ "$SYS_NAME" -lt "70" ];then
-	SYS_NAME="70"
+	if [ "$SYS_NAME" -gt "80" ];then
+		SYS_NAME="80"
+	fi
+
+	if [ "$SYS_NAME" -lt "70" ];then
+		SYS_NAME="70"
+	fi
 fi
 
 MG_DIR=$serverPath/source/mongodb
