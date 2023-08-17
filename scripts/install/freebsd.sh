@@ -15,8 +15,6 @@ pkg install -y python3
 pkg install -y lsof
 pkg install -y sqlite3
 pkg install -y py38-sqlite3
-pkg install -y py38-mysqlclient
-pkg install -y py38-cffi
 
 pkg install -y gcc
 pkg install -y autoconf
