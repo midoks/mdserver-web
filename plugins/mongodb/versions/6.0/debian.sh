@@ -9,20 +9,35 @@ serverPath=$(dirname "$rootPath")
 
 install_tmp=${rootPath}/tmp/mw_install.pl
 VERSION=6.0.9
+SYS_ARCH=`arch`
+SYS_VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
+SYS_NAME=${SYS_VERSION_ID/./}
+
+if [ "$SYS_NAME" -gt "11" ];then
+	SYS_NAME="11"
+fi
+
+if [ "$SYS_NAME" -lt "10" ];then
+	SYS_NAME="10"
+fi
+
+FILE_NAME=mongodb-linux-${SYS_ARCH}-debian${SYS_NAME}-${VERSION}
+FILE_NAME_TGZ=${FILE_NAME}.tgz
+
 
 MG_DIR=$serverPath/source/mongodb
 mkdir -p $MG_DIR
 
-if [ ! -f $MG_DIR/mongodb-linux-x86_64-debian11-${VERSION}.tgz ]; then
-	wget --no-check-certificate -O $MG_DIR/mongodb-linux-x86_64-debian11-${VERSION}.tgz https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-debian11-${VERSION}.tgz
-	echo "wget --no-check-certificate -O mongodb-linux-x86_64-debian11-${VERSION}.tgz https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-debian11-${VERSION}.tgz"
+if [ ! -f $MG_DIR/${FILE_NAME_TGZ} ]; then
+	wget --no-check-certificate -O $MG_DIR/${FILE_NAME_TGZ} https://fastdl.mongodb.org/linux/${FILE_NAME_TGZ}
+	echo "wget --no-check-certificate -O $MG_DIR/${FILE_NAME_TGZ} https://fastdl.mongodb.org/linux/${FILE_NAME_TGZ}"
 fi
 
-if [ ! -d $MG_DIR/mongodb-linux-x86_64-debian11-${VERSION} ];then 
-	cd $MG_DIR && tar -zxvf mongodb-linux-x86_64-debian11-${VERSION}.tgz
+if [ ! -d $MG_DIR/${FILE_NAME_TGZ} ];then 
+	cd $MG_DIR && tar -zxvf ${FILE_NAME_TGZ}
 fi
 
 if [ ! -d  $serverPath/mongodb/bin ];then
 	mkdir -p $serverPath/mongodb
-	cd $MG_DIR/mongodb-linux-x86_64-debian11-${VERSION} && cp -rf ./bin $serverPath/mongodb
+	cd $MG_DIR/${FILE_NAME}} && cp -rf ./bin $serverPath/mongodb
 fi
