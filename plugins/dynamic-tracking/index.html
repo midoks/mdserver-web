@@ -1,0 +1,19 @@
+<div class="bt-form">
+	<div class='plugin_version'></div>
+	<div class="bt-w-main">
+		<div class="bt-w-menu">
+			<p class="bgw" onclick="pluginService('dynamic-tracking');">服务</p>
+			<p onclick="pluginInitD('dynamic-tracking');">自启动</p>
+			<p onclick="pluginLogs('dynamic-tracking','','run_log');">日志</p>
+		</div>
+		<div class="bt-w-con pd15">
+			<div class="soft-man-con"></div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+resetPluginWinHeight(300);
+$.getScript( "/plugins/file?name=dynamic-tracking&f=js/dynamic-tracking.js", function(){
+	pluginService('dynamic-tracking', $('.plugin_version').attr('version'));
+});
+</script>
