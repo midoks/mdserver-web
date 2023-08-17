@@ -7,7 +7,11 @@ if grep -Eq "FreeBSD" /etc/*-release && [ ! -f /bin/bash ]; then
     ln -sf /usr/local/bin/bash /bin/bash
 fi
 
-echo "y" | pkg update 
+# freebsd-update -r 13.0-RELEASE upgrade
+
+echo "y" | pkg update
+# echo "y" | pkg upgrade
+# echo "y" | freebsd-update fetch install
 pkg install -y python3
 # python3 -m ensurepip
 # pip3 install --upgrade setuptools
