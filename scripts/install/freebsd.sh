@@ -33,8 +33,6 @@ pkg install -y oniguruma
 pkg install -y brotli
 pkg install -y harfbuzz
 
-# pkg install -y py38-cffi
-
 pkg autoremove -y
 
 SSH_PORT=`netstat -ntpl|grep sshd|grep -v grep | sed -n "1,1p" | awk '{print $4}' | awk -F : '{print $2}'`
