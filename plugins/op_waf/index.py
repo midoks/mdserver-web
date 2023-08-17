@@ -1434,7 +1434,8 @@ def testRun():
     # if not data[0]:
     #     return data[1]
 
-    default_site = getServerDir() + "/waf/default.pl"
+    default_path = getServerDir() + "/waf/default.pl"
+    default_site = mw.readFile(default_path)
     url = "http://" + default_site + '/?t=../etc/passwd'
     returnData = mw.httpGet(url, 3)
 
