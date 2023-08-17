@@ -8,7 +8,7 @@ rootPath=$(dirname "$rootPath")
 serverPath=$(dirname "$rootPath")
 
 install_tmp=${rootPath}/tmp/mw_install.pl
-VERSION=5.0.20
+VERSION=7.0.0
 SYS_ARCH=`arch`
 
 SYS_VERSION_ID=`cat /etc/*-release | grep VERSION_ID | awk -F = '{print $2}' | awk -F "\"" '{print $2}'`
@@ -19,7 +19,7 @@ if [ "$SYS_NAME_LEN" == "1" ];then
 	SYS_NAME=${SYS_NAME}0	
 fi
 
-if [ "$SYS_NAME" -gt "82" ];then
+if [ "$SYS_NAME" -gt "90" ];then
 	SYS_NAME="82"
 fi
 
